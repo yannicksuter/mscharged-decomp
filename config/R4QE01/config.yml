@@ -1,0 +1,9 @@
+# Mario Strikers Charged (USA), disc revision 1.
+# See config.example.yml for documentation.
+object_base: orig/R4QE01
+object: sys/main.dol
+hash: e96d2298067b70652752145b4e63644e6e1b1560
+extract_objects: true
+symbols: config/R4QE01/symbols.txt
+splits: config/R4QE01/splits.txt
+mw_comment_version: 14 # GC Linker 3.0+

@@ -1,0 +1,64 @@
+Language: Cpp
+Standard: Cpp03 # Keeps '> >' instead of '>>'.
+
+BasedOnStyle: WebKit
+ColumnLimit: 0 # Disable the column limit to prevent forced line breaks.
+SortIncludes: false
+
+IndentWidth: 4
+TabWidth: 4
+
+AlignConsecutiveAssignments:
+  Enabled: false
+  AcrossEmptyLines: true
+  AcrossComments: false
+
+BreakBeforeBraces: Allman
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterObjCDeclaration: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+
+UseTab: Never
+
+NamespaceIndentation: None
+FixNamespaceComments: true
+CompactNamespaces: false
+
+AlignTrailingComments: true
+AlignAfterOpenBracket: false
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: Left
+AlignOperands: AlignAfterOperator
+
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+Cpp11BracedListStyle: false
+
+AlwaysBreakTemplateDeclarations: false
+BreakStringLiterals: true
+ReflowComments: true
+
+InsertNewlineAtEOF: true
+
+AllowAllParametersOfDeclarationOnNextLine: true
+AlwaysBreakAfterReturnType: None
+AlwaysBreakAfterDefinitionReturnType: None
+
+BinPackArguments: false
+# BinPackTemplateParameters is not supported by every clang-format version.
+# BinPackTemplateParameters: false
+BreakBeforeBinaryOperators: All
