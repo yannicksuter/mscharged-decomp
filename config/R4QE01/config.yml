@@ -7,3 +7,7 @@ extract_objects: true
 symbols: config/R4QE01/symbols.txt
 splits: config/R4QE01/splits.txt
 mw_comment_version: 14 # GC Linker 3.0+
+force_active:
+  - __init_cpp_exceptions_reference
+  - __destroy_global_chain_reference
+  - __fini_cpp_exceptions_reference

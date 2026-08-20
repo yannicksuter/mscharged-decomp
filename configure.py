@@ -233,6 +233,8 @@ elif args.warn == "error":
 # Metrowerks library flags
 cflags_runtime = [
     *cflags_base,
+    "-i libs/Runtime/include",
+    "-i libs/MSL_C/include",
     "-use_lmw_stmw on",
     "-str reuse,pool,readonly",
     "-gccinc",
@@ -262,8 +264,16 @@ config.libs = [
         "cflags": cflags_runtime,
         "progress_category": "sdk",  # str | List[str]
         "objects": [
-            Object(NonMatching, "Runtime.PPCEABI.H/global_destructor_chain.c"),
-            Object(NonMatching, "Runtime.PPCEABI.H/__init_cpp_exceptions.cpp"),
+            # GC/3.0a3, GC/3.0a5, and GC/3.0a5.2 all reproduce these units.
+            Object(Matching, "Runtime/__mem.c"),
+            Object(Matching, "Runtime/__va_arg.c"),
+            Object(Matching, "Runtime/global_destructor_chain.c"),
+            Object(Matching, "Runtime/NMWException.cpp", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "Runtime/ptmf.c"),
+            Object(Matching, "Runtime/runtime.c"),
+            Object(Matching, "Runtime/__init_cpp_exceptions.cpp"),
+            Object(Matching, "Runtime/Gecko_ExceptionPPC.cpp"),
+            Object(Matching, "Runtime/GCN_mem_alloc.c"),
         ],
     },
 ]
