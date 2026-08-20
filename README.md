@@ -20,7 +20,10 @@ generated splits rebuild the original `main.dol` byte-for-byte; source
 reconstruction is at an early stage. The disc contains no separate REL or RSO
 modules.
 
-The target compiler is Metrowerks CodeWarrior `GC/3.0a5`.
+The bootstrap linker/compiler default is Metrowerks CodeWarrior `GC/3.0a5`.
+Exact compiler revisions are still being determined per library and translation
+unit. The first matched `Runtime.PPCEABI.H` units reproduce with `GC/3.0a3`,
+`GC/3.0a5`, and `GC/3.0a5.2`.
 
 ## Dependencies
 
@@ -91,7 +94,8 @@ This project is based on
 [encounter/dtk-template](https://github.com/encounter/dtk-template) and uses
 [decomp-toolkit](https://github.com/encounter/decomp-toolkit). Thanks to the
 GameCube/Wii decompilation community for the tools and documentation that make
-projects like this possible.
+projects like this possible. The initial CodeWarrior runtime sources were
+adapted from [Petari](https://github.com/SMGCommunity/Petari).
 
 ## License
 
