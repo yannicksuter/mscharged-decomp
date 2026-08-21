@@ -1,4 +1,30 @@
-# Mario Strikers Charged
+Mario Strikers Charged  
+[![Build Status]][actions] [![Code Progress]][progress] [![Link Progress]][progress] [![Discord Badge]][discord]
+=============
+
+<!--
+Replace with your repository's URL.
+-->
+[Build Status]: https://github.com/yannicksuter/mscharged-decomp/actions/workflows/build.yml/badge.svg
+[actions]: https://github.com/yannicksuter/mscharged-decomp/actions/workflows/build.yml
+<!--
+decomp.dev progress badges
+See https://decomp.dev/api for an API overview.
+-->
+[Code Progress]: https://decomp.dev/yannicksuter/mscharged-decomp.svg?mode=shield&measure=code&label=Code
+[Link Progress]: https://decomp.dev/yannicksuter/mscharged-decomp.svg?mode=shield&measure=complete_code_percent&label=Linked
+[Fuzzy Progress]: https://decomp.dev/yannicksuter/mscharged-decomp.svg?mode=shield&measure=fuzzy_match_percent&label=Fuzzy
+[progress]: https://decomp.dev/yannicksuter/mscharged-decomp
+<!--
+Replace with your Discord server's ID and invite URL.
+-->
+[Discord Badge]: https://img.shields.io/discord/727908905392275526?color=%237289DA&logo=discord&logoColor=%23FFFFFF
+[discord]: https://discord.gg/hKx3FJJgrV
+
+> [!IMPORTANT]
+> This repository does **not** provide a new way to play *Super Mario Strikers*. It is not a modern recompilation ("recomp") or a port. Its 100% code and linking status refers to a high-fidelity reconstruction of what the original source code may have looked like—one that compiles into an executable byte-for-byte identical to the original retail GameCube release.
+>
+> Recompilations and ports may emerge elsewhere from this work—and we look forward to seeing them—but they are outside the scope of this repository. Please do not ask for recompilations or ports in the decompilation Discord, as producing and supporting them is not the focus of this community.
 
 A work-in-progress matching decompilation of *Mario Strikers Charged* for
 Nintendo Wii, developed by Next Level Games and published by Nintendo.
