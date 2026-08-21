@@ -22,8 +22,9 @@ modules.
 
 The bootstrap linker/compiler default is Metrowerks CodeWarrior `GC/3.0a5`.
 Exact compiler revisions are still being determined per library and translation
-unit. The first matched `Runtime.PPCEABI.H` units reproduce with `GC/3.0a3`,
-`GC/3.0a5`, and `GC/3.0a5.2`.
+unit. The first matched `Runtime.PPCEABI.H` units and ODE `obstack.cpp`
+reproduce across the tested `GC/3.0` revisions. `obstack.cpp` excludes
+`GC/2.7`, but cannot distinguish `GC/3.0a5` from the other tested 3.0 builds.
 
 ## Dependencies
 
@@ -102,5 +103,7 @@ the reconstructed source areas adapted from them.
 ## License
 
 The repository's original source contributions are dedicated to the public
-domain under [CC0 1.0](LICENSE). Game assets and other copyrighted material are
-not covered and must not be committed.
+domain under [CC0 1.0](LICENSE). Third-party source retains its own terms; see
+[LICENSES](LICENSES) and the [source provenance record](docs/PROVENANCE.md).
+Game assets and other copyrighted material are not covered and must not be
+committed.

@@ -251,6 +251,22 @@ cflags_rvl_sdk = [
     "-fp_contract off",
 ]
 
+# Open Dynamics Engine flags. R4QE01 uses the single-precision, assertions-off
+# configuration retained from the GameCube predecessor. obstack.cpp excludes
+# GC/2.7; all tested GC/3.0 revisions through 3.0a5.2 emit the same code.
+cflags_ode = [
+    *cflags_base,
+    "-i src/ode",
+    "-inline auto",
+    "-char signed",
+    "-use_lmw_stmw on",
+    "-common off",
+    "-DdNODEBUG=1",
+    "-DdSINGLE=1",
+    "-DdTHREADING_INTF_DISABLED",
+    "-DHAVE_MALLOC_H=1",
+]
+
 config.linker_version = "GC/3.0a5"
 
 
@@ -267,6 +283,28 @@ def MatchingFor(*versions):
 config.warn_missing_config = True
 config.warn_missing_source = False
 config.libs = [
+    {
+        "lib": "Open Dynamics Engine (ODE)",
+        "mw_version": config.linker_version,
+        "cflags": cflags_ode,
+        "progress_category": "game",
+        "objects": [
+            Object(Matching, "ode/collision_kernel.cpp"),
+            Object(Matching, "ode/collision_space.cpp"),
+            Object(Matching, "ode/collision_transform.cpp"),
+            Object(Matching, "ode/ext/dFinitePlane.cpp"),
+            Object(Matching, "ode/error.cpp"),
+            Object(Matching, "ode/joint.cpp"),
+            Object(Matching, "ode/matrix.cpp"),
+            Object(Matching, "ode/memory.cpp", extra_cflags=["-inline deferred"]),
+            Object(Matching, "ode/mass.cpp", extra_cflags=["-inline deferred"]),
+            Object(Matching, "ode/obstack.cpp", extra_cflags=["-inline deferred"]),
+            Object(Matching, "ode/odemath.cpp"),
+            Object(Matching, "ode/ode.cpp"),
+            Object(Matching, "ode/rotation.cpp", extra_cflags=["-inline deferred"]),
+            Object(Matching, "ode/NLGAdditions.cpp"),
+        ],
+    },
     {
         "lib": "Runtime.PPCEABI.H",
         "mw_version": config.linker_version,

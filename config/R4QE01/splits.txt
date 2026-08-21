@@ -13,6 +13,71 @@ Sections:
 	.sdata2     type:rodata align:8
 	.sbss2      type:bss align:16
 
+ode/collision_kernel.cpp:
+	.text       start:0x80344814 end:0x80345C44
+	.data       start:0x805344D8 end:0x80534548
+	.bss        start:0x80584C08 end:0x80585360
+	.sbss       start:0x806E2198 end:0x806E21A0
+
+ode/collision_space.cpp:
+	.text       start:0x80345C44 end:0x80346780
+	.data       start:0x80534548 end:0x805345A8
+	.sdata2     start:0x806E6A20 end:0x806E6A28
+
+ode/collision_transform.cpp:
+	.text       start:0x8034B1EC end:0x8034BA14
+	.data       start:0x805345F8 end:0x80534610
+
+ode/ext/dFinitePlane.cpp:
+	.text       start:0x80351F34 end:0x80352600
+	.sdata      start:0x806DF880 end:0x806DF884
+	.sdata2     start:0x806E6AC8 end:0x806E6AD4
+
+ode/error.cpp:
+	.text       start:0x80352A60 end:0x80352C54
+	.data       start:0x80534610 end:0x8053463C
+	.sdata      start:0x806DF890 end:0x806DF89C
+	.sbss       start:0x806E21A0 end:0x806E21A8
+
+ode/joint.cpp:
+	.text       start:0x80352C54 end:0x80353480
+	.data       start:0x80534640 end:0x80534658
+	.sdata2     start:0x806E6AE8 end:0x806E6AF0
+
+ode/matrix.cpp:
+	.text       start:0x80353480 end:0x8035446C
+	.sdata2     start:0x806E6AF0 end:0x806E6AF8
+
+ode/memory.cpp:
+	.text       start:0x8035446C end:0x803544C0
+	.sbss       start:0x806E21A8 end:0x806E21B4
+
+ode/mass.cpp:
+	.text       start:0x803544C0 end:0x80354C10
+	.sdata2     start:0x806E6AF8 end:0x806E6B20
+
+ode/obstack.cpp:
+	.text       start:0x80354C10 end:0x80354EE4
+	.data       start:0x80534658 end:0x80534670
+
+ode/odemath.cpp:
+	.text       start:0x80354EE4 end:0x80355254
+	.sdata2     start:0x806E6B20 end:0x806E6B2C
+
+ode/ode.cpp:
+	.text       start:0x80355254 end:0x80356130
+	.data       start:0x80534670 end:0x805346A4
+	.sdata2     start:0x806E6B30 end:0x806E6B50
+
+ode/rotation.cpp:
+	.text       start:0x80357E24 end:0x80358240
+	.sdata2     start:0x806E6B60 end:0x806E6B70
+
+ode/NLGAdditions.cpp:
+	.text       start:0x80358E7C end:0x8035952C
+	.data       start:0x80534738 end:0x80534750
+	.sdata2     start:0x806E6B88 end:0x806E6BA0
+
 Runtime/__mem.c:
 	.init       start:0x80005FB4 end:0x800060E8
 	.text       start:0x8038D1EC end:0x8038D208
