@@ -284,6 +284,22 @@ config.warn_missing_config = True
 config.warn_missing_source = False
 config.libs = [
     {
+        "lib": "Game",
+        "mw_version": config.linker_version,
+        "cflags": cflags_base,
+        "progress_category": "game",
+        "objects": [
+            Object(Matching, "Game/WorldUpdateTask.cpp"),
+            Object(Matching, "Game/EndFrameTask.cpp"),
+            Object(Matching, "Game/NetworkUpdateTask.cpp"),
+            Object(Matching, "Game/PlatPadUpdateTask.cpp"),
+            Object(Matching, "Game/TextWindowTask.cpp"),
+            Object(Matching, "Game/TweakerTask.cpp"),
+            Object(Matching, "Game/ProfilerTask.cpp"),
+            Object(Matching, "Game/ParticleUpdateTask.cpp"),
+        ],
+    },
+    {
         "lib": "Open Dynamics Engine (ODE)",
         "mw_version": config.linker_version,
         "cflags": cflags_ode,
