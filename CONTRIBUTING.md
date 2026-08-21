@@ -20,7 +20,6 @@ code.
 - [Code style](#code-style)
 - [Working on matches](#working-on-matches)
 - [Header and module organization](#header-and-module-organization)
-- [Use of AI tools](#use-of-ai-tools)
 - [Helpful tooling](#helpful-tooling)
 - [Code of conduct](#code-of-conduct)
 
@@ -122,17 +121,6 @@ The source tree will evolve as translation units and ownership become clearer.
 Changes that place declarations in the correct module, eliminate incorrect
 dependencies, or establish accurate visibility are welcome. Keep structural
 reorganization separate from unrelated matching changes whenever possible.
-
-## Use of AI tools
-
-AI-assisted work is welcome when it helps reach an understood, verified result.
-Generated output is a starting point, not evidence of correctness:
-
-- Review and test every generated change.
-- Compare reconstructed code against the original binary with objdiff.
-- Submit only code you understand and can explain during review.
-- Disclose material AI assistance when it helps reviewers evaluate the work.
-- Do not submit large, uncurated generated patches.
 
 ## Helpful tooling
 
