@@ -48,4 +48,63 @@ Runtime/Gecko_ExceptionPPC.cpp:
 	.bss        start:0x805A3268 end:0x805A3278
 
 Runtime/GCN_mem_alloc.c:
-	.text       start:0x8038DFF0 end:0x8038E0A8
+	.text       start:0x8038DFF0 end:0x8038E160
+
+RVL_SDK/mem/mem_heapCommon.c:
+	.text       start:0x803AD034 end:0x803AD4A0
+	.bss        start:0x805BFFA8 end:0x805BFFD0
+	.sbss       start:0x806E2858 end:0x806E285C
+
+RVL_SDK/mem/mem_expHeap.c:
+	.text       start:0x803AD4A0 end:0x803ADCE4
+
+RVL_SDK/mem/mem_frameHeap.c:
+	.text       start:0x803ADCE4 end:0x803ADFD0
+
+RVL_SDK/mem/mem_unitHeap.c:
+	.text       start:0x803ADFD0 end:0x803AE2A8
+
+RVL_SDK/mem/mem_allocator.c:
+	.text       start:0x803AE2A8 end:0x803AE32C
+	.sdata2     start:0x806E74A8 end:0x806E74B8
+
+RVL_SDK/mem/mem_list.c:
+	.text       start:0x803AE32C end:0x803AE440
+
+RVL_SDK/os/OSAlloc.c:
+	.text       start:0x803B44D8 end:0x803B47E0
+	.sdata      start:0x806DFCF0 end:0x806DFCF4
+	.sbss       start:0x806E28C8 end:0x806E28D8
+
+RVL_SDK/os/OSArena.c:
+	.text       start:0x803B47E0 end:0x803B48A8
+	.sdata      start:0x806DFCF8 end:0x806DFD00
+	.sbss       start:0x806E28D8 end:0x806E28E0
+
+RVL_SDK/os/OSLink.c:
+	.text       start:0x803B96B8 end:0x803B96D0
+
+RVL_SDK/os/OSMessage.c:
+	.text       start:0x803B96D0 end:0x803B98D4
+
+RVL_SDK/os/OSMutex.c:
+	.text       start:0x803BA0E8 end:0x803BA3F4
+
+RVL_SDK/os/OSReboot.c:
+	.text       start:0x803BA3F4 end:0x803BA468
+	.sbss       start:0x806E2928 end:0x806E2930
+
+RVL_SDK/os/OSRtc.c:
+	.text       start:0x803BABB4 end:0x803BB640
+	.bss        start:0x805D4E80 end:0x805D4ED8
+
+RVL_SDK/os/OSIpc.c:
+	.text       start:0x803BD564 end:0x803BD58C
+	.sdata      start:0x806DFD30 end:0x806DFD34
+	.sbss       start:0x806E2950 end:0x806E2954
+
+RVL_SDK/os/OSStateTM.c:
+	.text       start:0x803BD58C end:0x803BDBD0
+	.data       start:0x8054A430 end:0x8054A4F8
+	.bss        start:0x805D58E0 end:0x805D59A0
+	.sbss       start:0x806E2958 end:0x806E2978
