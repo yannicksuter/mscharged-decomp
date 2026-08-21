@@ -9,7 +9,7 @@ extern const char lbl_804EC5F8[];
 #define OSRoundUp32B(x) (((unsigned int)(x) + 32 - 1) & ~(32 - 1))
 #define OSRoundDown32B(x) (((unsigned int)(x)) & ~(32 - 1))
 
-static void InitDefaultHeap()
+static inline void InitDefaultHeap()
 {
 	void* arenaLo;
 	void* arenaHi;
@@ -30,9 +30,12 @@ static void InitDefaultHeap()
 	OSSetArenaLo(arenaLo = arenaHi);
 }
 
-// unused
-void __sys_alloc()
+void __sys_alloc(unsigned int size)
 {
+	if (__OSCurrHeap == -1) {
+		InitDefaultHeap();
+	}
+	OSAllocFromHeap(__OSCurrHeap, size);
 }
 
 __declspec(weak) extern void __sys_free(void* ptr)

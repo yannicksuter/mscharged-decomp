@@ -242,6 +242,15 @@ cflags_runtime = [
     "-inline auto",
 ]
 
+# Revolution SDK library flags.
+cflags_rvl_sdk = [
+    *cflags_base,
+    "-i libs/RVL_SDK/include",
+    "-i libs/MSL_C/include",
+    "-ipa file",
+    "-fp_contract off",
+]
+
 config.linker_version = "GC/3.0a5"
 
 
@@ -274,6 +283,29 @@ config.libs = [
             Object(Matching, "Runtime/__init_cpp_exceptions.cpp"),
             Object(Matching, "Runtime/Gecko_ExceptionPPC.cpp"),
             Object(Matching, "Runtime/GCN_mem_alloc.c"),
+        ],
+    },
+    {
+        "lib": "RVL_SDK",
+        "mw_version": config.linker_version,
+        "cflags": cflags_rvl_sdk,
+        "progress_category": "sdk",
+        "objects": [
+            Object(Matching, "RVL_SDK/mem/mem_heapCommon.c"),
+            Object(Matching, "RVL_SDK/mem/mem_expHeap.c"),
+            Object(Matching, "RVL_SDK/mem/mem_frameHeap.c"),
+            Object(Matching, "RVL_SDK/mem/mem_unitHeap.c"),
+            Object(Matching, "RVL_SDK/mem/mem_allocator.c"),
+            Object(Matching, "RVL_SDK/mem/mem_list.c"),
+            Object(Matching, "RVL_SDK/os/OSAlloc.c"),
+            Object(Matching, "RVL_SDK/os/OSArena.c"),
+            Object(Matching, "RVL_SDK/os/OSLink.c"),
+            Object(Matching, "RVL_SDK/os/OSMessage.c"),
+            Object(Matching, "RVL_SDK/os/OSMutex.c"),
+            Object(Matching, "RVL_SDK/os/OSReboot.c"),
+            Object(Matching, "RVL_SDK/os/OSRtc.c"),
+            Object(Matching, "RVL_SDK/os/OSIpc.c"),
+            Object(Matching, "RVL_SDK/os/OSStateTM.c"),
         ],
     },
 ]

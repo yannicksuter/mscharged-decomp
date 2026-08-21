@@ -95,7 +95,9 @@ This project is based on
 [decomp-toolkit](https://github.com/encounter/decomp-toolkit). Thanks to the
 GameCube/Wii decompilation community for the tools and documentation that make
 projects like this possible. The initial CodeWarrior runtime sources were
-adapted from [Petari](https://github.com/SMGCommunity/Petari).
+adapted from [Petari](https://github.com/SMGCommunity/Petari). See
+[docs/PROVENANCE.md](docs/PROVENANCE.md) for the pinned reference revisions and
+the reconstructed source areas adapted from them.
 
 ## License
 
