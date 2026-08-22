@@ -13,22 +13,27 @@ Sections:
 	.sdata2     type:rodata align:8
 	.sbss2      type:bss align:16
 
-Game/WorldUpdateTask.cpp:
+Game/Task/WorldUpdateTask.cpp:
 	.text       start:0x80112C70 end:0x80112C7C
 	.data       start:0x80507EA8 end:0x80507EC0
 	.sdata      start:0x806DC7C0 end:0x806DC7C8
 
-Game/EndFrameTask.cpp:
+Game/Task/EndFrameTask.cpp:
 	.text       start:0x80112C7C end:0x80112DEC
 	.data       start:0x80507EC0 end:0x80507EE0
 
-Game/NetworkUpdateTask.cpp:
+Game/Task/NetworkUpdateTask.cpp:
 	.text       start:0x80115020 end:0x80115118
 	.data       start:0x80508038 end:0x80508060
 
-Game/PlatPadUpdateTask.cpp:
+Game/Task/PlatPadUpdateTask.cpp:
 	.text       start:0x80115118 end:0x80115128
 	.data       start:0x80508060 end:0x80508080
+
+Game/Task/DispatchEventsTask.cpp:
+	.text       start:0x80115F10 end:0x80116028
+	.data       start:0x80508170 end:0x80508198
+	.sbss       start:0x806E1030 end:0x806E1034
 
 NL/nlTask.cpp:
 	.text       start:0x802B4E68 end:0x802B51B8
@@ -36,26 +41,49 @@ NL/nlTask.cpp:
 	.sbss       start:0x806E1DA0 end:0x806E1DA8
 	.sdata2     start:0x806E60B8 end:0x806E60C0
 
-Game/TextWindowTask.cpp:
+Game/Task/SmokeTestUpdateTask.cpp:
+	.text       start:0x802BD4E4 end:0x802BD814
+	.ctors      start:0x804DB9A0 end:0x804DB9A4
+	.data       start:0x8052B900 end:0x8052B9D4
+	.bss        start:0x8057C260 end:0x8057C488
+	.sdata      start:0x806DF2D8 end:0x806DF2E0
+	.sbss       start:0x806E1DF0 end:0x806E1E00
+	.sdata2     start:0x806E6298 end:0x806E62A0
+
+Game/Task/TextWindowTask.cpp:
 	.text       start:0x802BD820 end:0x802BDA28
 	.data       start:0x8052B9E8 end:0x8052BA08
 	.sbss       start:0x806E1E00 end:0x806E1E08
 
-Game/TweakerTask.cpp:
+Game/Task/TweakerTask.cpp:
 	.text       start:0x802BDA3C end:0x802BDAF0
 	.data       start:0x8052BA08 end:0x8052BA20
 	.sdata      start:0x806DF300 end:0x806DF308
 
-Game/ProfilerTask.cpp:
+Game/Task/ProfilerTask.cpp:
 	.text       start:0x802BDB10 end:0x802BDB50
 	.data       start:0x8052BA20 end:0x8052BA40
 	.sbss       start:0x806E1E10 end:0x806E1E18
 
-Game/ParticleUpdateTask.cpp:
+Game/Task/ParticleUpdateTask.cpp:
 	.text       start:0x802EB344 end:0x802EB59C
 	.data       start:0x8052F3A0 end:0x8052F3C8
 	.sbss       start:0x806E2010 end:0x806E2018
 	.sdata2     start:0x806E65A0 end:0x806E65A8
+
+Game/Physics/PhysicsPlane.cpp:
+	.text       start:0x80321530 end:0x803215DC
+	.data       start:0x80530638 end:0x80530668
+
+Game/Physics/PhysicsRoundedCorner.cpp:
+	.text       start:0x803215DC end:0x803216A8
+	.data       start:0x80530668 end:0x80530698
+	.sdata2     start:0x806E6900 end:0x806E6904
+
+Game/Physics/PhysicsSphere.cpp:
+	.text       start:0x803216A8 end:0x8032177C
+	.data       start:0x80530698 end:0x805306C8
+	.sdata2     start:0x806E6908 end:0x806E690C
 
 ode/collision_kernel.cpp:
 	.text       start:0x80344814 end:0x80345C44
