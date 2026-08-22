@@ -35,6 +35,12 @@ Game/Task/DispatchEventsTask.cpp:
 	.data       start:0x80508170 end:0x80508198
 	.sbss       start:0x806E1030 end:0x806E1034
 
+NL/nlMath.cpp:
+	.text       start:0x802A9B98 end:0x802AA5F0
+	.rodata     start:0x804E88C0 end:0x804E8900
+	.data       start:0x8052AC80 end:0x8052ACA0
+	.sdata2     start:0x806E5FC8 end:0x806E6098
+
 NL/nlTask.cpp:
 	.text       start:0x802B4E68 end:0x802B51B8
 	.sdata      start:0x806DF240 end:0x806DF244
