@@ -30,6 +30,12 @@ Game/PlatPadUpdateTask.cpp:
 	.text       start:0x80115118 end:0x80115128
 	.data       start:0x80508060 end:0x80508080
 
+NL/nlTask.cpp:
+	.text       start:0x802B4E68 end:0x802B51B8
+	.sdata      start:0x806DF240 end:0x806DF244
+	.sbss       start:0x806E1DA0 end:0x806E1DA8
+	.sdata2     start:0x806E60B8 end:0x806E60C0
+
 Game/TextWindowTask.cpp:
 	.text       start:0x802BD820 end:0x802BDA28
 	.data       start:0x8052B9E8 end:0x8052BA08
