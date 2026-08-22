@@ -1,4 +1,4 @@
-#include "Game/NetworkUpdateTask.h"
+#include "Game/Task/NetworkUpdateTask.h"
 
 #include "types.h"
 
