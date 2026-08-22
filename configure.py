@@ -289,6 +289,7 @@ config.libs = [
         "cflags": cflags_base,
         "progress_category": "game",
         "objects": [
+            Object(Matching, "NL/nlTask.cpp"),
             Object(Matching, "Game/WorldUpdateTask.cpp"),
             Object(Matching, "Game/EndFrameTask.cpp"),
             Object(Matching, "Game/NetworkUpdateTask.cpp"),
