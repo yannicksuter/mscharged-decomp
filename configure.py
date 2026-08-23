@@ -291,6 +291,16 @@ config.libs = [
         "objects": [
             Object(Matching, "NL/nlMath.cpp"),
             Object(Matching, "NL/nlTask.cpp"),
+            Object(Matching, "NL/gl/glStat.cpp"),
+            Object(Matching, "NL/gl/glStruct.cpp"),
+            Object(
+                Matching,
+                "Game/Drawable/DrawableNetMesh.cpp",
+                extra_cflags=["-use_lmw_stmw on"],
+            ),
+            Object(NonMatching, "Game/Drawable/DrawableCharacter.cpp"),
+            Object(Matching, "Game/Drawable/DrawableBall.cpp"),
+            Object(Matching, "Game/Drawable/DrawablePowerup.cpp"),
             Object(Matching, "Game/Task/WorldUpdateTask.cpp"),
             Object(Matching, "Game/Task/EndFrameTask.cpp"),
             Object(Matching, "Game/Task/NetworkUpdateTask.cpp"),

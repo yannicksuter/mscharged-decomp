@@ -26,6 +26,7 @@ extern "C" RenderContext* fn_8027267C(int index);
 extern "C" void fn_801B3EF4(u8* enabled);
 extern "C" void fn_801B3F2C(u8* enabled);
 extern "C" int fn_8024891C();
+extern "C" void fn_802C80FC();
 extern "C" void fn_803A38E4(u16 x, u16 y, u32 colour);
 
 void EndFrameTask::Run(float)
@@ -63,7 +64,8 @@ void EndFrameTask::Run(float)
 
         if (lbl_806E18D8 != 0 && lbl_806E18D8->flag90 && lbl_806E18D8->flag91)
         {
-            glDiscardFrame(fn_8024891C());
+            fn_8024891C();
+            fn_802C80FC();
         }
 
         g_FrameCounter.FinishTiming();
