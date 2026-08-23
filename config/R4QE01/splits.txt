@@ -35,6 +35,37 @@ Game/Task/DispatchEventsTask.cpp:
 	.data       start:0x80508170 end:0x80508198
 	.sbss       start:0x806E1030 end:0x806E1034
 
+Game/Drawable/DrawableNetMesh.cpp:
+	.text       start:0x8017AB34 end:0x8017BA64
+	.ctors      start:0x804DB688 end:0x804DB68C
+	.rodata     start:0x804DCCD0 end:0x804DCCE0
+	.data       start:0x80511240 end:0x80511298
+	.bss        start:0x80570938 end:0x80570958
+	.sdata      start:0x806DCB38 end:0x806DCB48
+	.sbss       start:0x806E1320 end:0x806E1388
+	.sdata2     start:0x806E4B18 end:0x806E4B40
+
+Game/Drawable/DrawableCharacter.cpp:
+	.text       start:0x8017BA64 end:0x8017E4BC
+	.ctors      start:0x804DB68C end:0x804DB690
+	.data       start:0x80511298 end:0x80511378
+	.sdata      start:0x806DCB48 end:0x806DCB98
+	.sbss       start:0x806E1388 end:0x806E1408
+	.sdata2     start:0x806E4B40 end:0x806E4B80
+
+Game/Drawable/DrawableBall.cpp:
+	.text       start:0x8017E4BC end:0x8017EE44
+	.ctors      start:0x804DB690 end:0x804DB694
+	.sdata      start:0x806DCB98 end:0x806DCBA0
+	.sdata2     start:0x806E4B80 end:0x806E4B98
+
+Game/Drawable/DrawablePowerup.cpp:
+	.text       start:0x80180C90 end:0x80181518
+	.ctors      start:0x804DB6AC end:0x804DB6B0
+	.data       start:0x805113F0 end:0x80511420
+	.sdata      start:0x806DCC08 end:0x806DCC10
+	.sdata2     start:0x806E4C58 end:0x806E4C98
+
 NL/nlMath.cpp:
 	.text       start:0x802A9B98 end:0x802AA5F0
 	.rodata     start:0x804E88C0 end:0x804E8900
@@ -70,6 +101,13 @@ Game/Task/ProfilerTask.cpp:
 	.text       start:0x802BDB10 end:0x802BDB50
 	.data       start:0x8052BA20 end:0x8052BA40
 	.sbss       start:0x806E1E10 end:0x806E1E18
+
+NL/gl/glStat.cpp:
+	.text       start:0x802CCDFC end:0x802CCE00
+
+NL/gl/glStruct.cpp:
+	.text       start:0x802CD778 end:0x802CD7A0
+	.bss        start:0x8057F1F8 end:0x8057F220
 
 Game/Task/ParticleUpdateTask.cpp:
 	.text       start:0x802EB344 end:0x802EB59C
