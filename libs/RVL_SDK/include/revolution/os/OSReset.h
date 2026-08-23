@@ -34,6 +34,16 @@ enum {
     OS_SHUTDOWN_LAUNCH = 7
 };
 
+typedef enum OSShutdownEvent {
+    OS_SD_EVENT_FATAL = OS_SHUTDOWN_FATAL,
+    OS_SD_EVENT_1 = OS_SHUTDOWN_REBOOT,
+    OS_SD_EVENT_SHUTDOWN = OS_SHUTDOWN_SHUTDOWN,
+    OS_SD_EVENT_3 = OS_SHUTDOWN_IDLE,
+    OS_SD_EVENT_RESTART = OS_SHUTDOWN_RESTART,
+    OS_SD_EVENT_RETURN_TO_MENU = OS_SHUTDOWN_RETURN_MENU,
+    OS_SD_EVENT_LAUNCH_APP = OS_SHUTDOWN_EXEC,
+} OSShutdownEvent;
+
 void OSRegisterShutdownFunction(OSShutdownFunctionInfo* info);
 BOOL __OSCallShutdownFunctions(BOOL final, u32 event);
 void __OSShutdownDevices(u32 event);

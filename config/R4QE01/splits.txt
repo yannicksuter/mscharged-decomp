@@ -76,6 +76,11 @@ Game/Drawable/DrawablePowerup.cpp:
 	.sdata      start:0x806DCC08 end:0x806DCC10
 	.sdata2     start:0x806E4C58 end:0x806E4C98
 
+Game/FE/GameSceneManager.cpp:
+	.text       start:0x801C6174 end:0x801C620C
+	.data       start:0x805170A8 end:0x805170C0
+	.sbss       start:0x806E182C end:0x806E1830
+
 NL/nlMath.cpp:
 	.text       start:0x802A9B98 end:0x802AA5F0
 	.rodata     start:0x804E88C0 end:0x804E8900
@@ -138,6 +143,10 @@ Game/AI/Variant.cpp:
 	.data       start:0x80530318 end:0x80530390
 	.bss        start:0x80584340 end:0x80584360
 	.sdata      start:0x806DF5C8 end:0x806DF5E8
+
+Game/FE/BaseSceneHandler.cpp:
+	.text       start:0x803060FC end:0x8030616C
+	.data       start:0x8052FF10 end:0x8052FF40
 
 Game/Physics/PhysicsPlane.cpp:
 	.text       start:0x80321530 end:0x803215DC
@@ -264,6 +273,19 @@ Runtime/Gecko_ExceptionPPC.cpp:
 Runtime/GCN_mem_alloc.c:
 	.text       start:0x8038DFF0 end:0x8038E160
 
+RVL_SDK/ipc/ipcMain.c:
+	.text       start:0x803A827C end:0x803A8300
+	.sbss       start:0x806E2808 end:0x806E281C
+
+RVL_SDK/ipc/memory.c:
+	.text       start:0x803A9A00 end:0x803A9F24
+	.bss        start:0x805BE998 end:0x805BEA18
+
+RVL_SDK/ipc/ipcProfile.c:
+	.text       start:0x803A9F24 end:0x803AA0E8
+	.bss        start:0x805BEA18 end:0x805BEB18
+	.sbss       start:0x806E2830 end:0x806E2838
+
 RVL_SDK/mem/mem_heapCommon.c:
 	.text       start:0x803AD034 end:0x803AD4A0
 	.bss        start:0x805BFFA8 end:0x805BFFD0
@@ -285,6 +307,11 @@ RVL_SDK/mem/mem_allocator.c:
 RVL_SDK/mem/mem_list.c:
 	.text       start:0x803AE32C end:0x803AE440
 
+RVL_SDK/os/OSAlarm.c:
+	.text       start:0x803B3CF4 end:0x803B44D8
+	.data       start:0x8053D198 end:0x8053D1A8
+	.sbss       start:0x806E28C0 end:0x806E28C8
+
 RVL_SDK/os/OSAlloc.c:
 	.text       start:0x803B44D8 end:0x803B47E0
 	.sdata      start:0x806DFCF0 end:0x806DFCF4
@@ -295,11 +322,51 @@ RVL_SDK/os/OSArena.c:
 	.sdata      start:0x806DFCF8 end:0x806DFD00
 	.sbss       start:0x806E28D8 end:0x806E28E0
 
+RVL_SDK/os/OSAudioSystem.c:
+	.text       start:0x803B48A8 end:0x803B4D5C
+	.data       start:0x8053D1A8 end:0x8053D228
+
+RVL_SDK/os/OSCache.c:
+	.text       start:0x803B4D5C end:0x803B535C
+	.data       start:0x8053D228 end:0x8053D45A
+
+RVL_SDK/os/OSContext.c:
+	.text       start:0x803B535C end:0x803B5BE4
+	.data       start:0x8053D460 end:0x8053D640
+
+RVL_SDK/os/OSError.c:
+	.text       start:0x803B5BE4 end:0x803B6318
+	.data       start:0x8053D640 end:0x8053D95C
+	.bss        start:0x805C43D0 end:0x805C4414
+	.sdata      start:0x806DFD00 end:0x806DFD08
+
+RVL_SDK/os/OSFatal.c:
+	.text       start:0x803B7648 end:0x803B826C
+	.bss        start:0x805D4BA0 end:0x805D4E74
+	.sdata      start:0x806DFD18 end:0x806DFD1C
+	.sdata2     start:0x806E74F8 end:0x806E7538
+
+RVL_SDK/os/OSFont.c:
+	.text       start:0x803B826C end:0x803B8F34
+	.data       start:0x8053D990 end:0x8053E49A
+	.sdata      start:0x806DFD20 end:0x806DFD28
+	.sbss       start:0x806E2900 end:0x806E2910
+	.sdata2     start:0x806E7538 end:0x806E7540
+
+RVL_SDK/os/OSInterrupt.c:
+	.text       start:0x803B8F34 end:0x803B96B8
+	.data       start:0x8053E4A0 end:0x8053E4D0
+	.sbss       start:0x806E2910 end:0x806E2928
+
 RVL_SDK/os/OSLink.c:
 	.text       start:0x803B96B8 end:0x803B96D0
 
 RVL_SDK/os/OSMessage.c:
 	.text       start:0x803B96D0 end:0x803B98D4
+
+RVL_SDK/os/OSMemory.c:
+	.text       start:0x803B98D4 end:0x803BA0E8
+	.data       start:0x8053E4D0 end:0x8053E4E0
 
 RVL_SDK/os/OSMutex.c:
 	.text       start:0x803BA0E8 end:0x803BA3F4
@@ -317,6 +384,23 @@ RVL_SDK/os/OSRtc.c:
 	.text       start:0x803BABB4 end:0x803BB640
 	.bss        start:0x805D4E80 end:0x805D4ED8
 
+RVL_SDK/os/OSSync.c:
+	.text       start:0x803BB640 end:0x803BB6C0
+
+RVL_SDK/os/OSThread.c:
+	.text       start:0x803BB6C0 end:0x803BCC78
+	.bss        start:0x805D4ED8 end:0x805D58D0
+	.sdata      start:0x806DFD28 end:0x806DFD2C
+	.sbss       start:0x806E2940 end:0x806E294C
+
+RVL_SDK/os/OSTime.c:
+	.text       start:0x803BCC78 end:0x803BD32C
+	.data       start:0x8053E590 end:0x8053E5F0
+
+RVL_SDK/os/OSUtf.c:
+	.text       start:0x803BD32C end:0x803BD564
+	.data       start:0x8053E5F0 end:0x8054A430
+
 RVL_SDK/os/OSIpc.c:
 	.text       start:0x803BD564 end:0x803BD58C
 	.sdata      start:0x806DFD30 end:0x806DFD34
@@ -327,3 +411,15 @@ RVL_SDK/os/OSStateTM.c:
 	.data       start:0x8054A430 end:0x8054A4F8
 	.bss        start:0x805D58E0 end:0x805D59A0
 	.sbss       start:0x806E2958 end:0x806E2978
+
+RVL_SDK/os/OSPlayRecord.c:
+	.text       start:0x803BDBD0 end:0x803BE2C8
+	.data       start:0x8054A4F8 end:0x8054A540
+	.bss        start:0x805D59A0 end:0x805D5BA0
+	.sdata      start:0x806DFD38 end:0x806DFD40
+	.sbss       start:0x806E2980 end:0x806E29A0
+
+RVL_SDK/os/OSStateFlags.c:
+	.text       start:0x803BE2C8 end:0x803BE4D4
+	.data       start:0x8054A540 end:0x8054A568
+	.bss        start:0x805D5BA0 end:0x805D5BC0
