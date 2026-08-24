@@ -182,6 +182,14 @@ Game/SAnim/pnFeather.cpp:
 	.bss        start:0x80584178 end:0x805841A0
 	.sdata2     start:0x806E6808 end:0x806E6820
 
+Game/Physics/CollisionSpace.cpp:
+	.text       start:0x8031BA84 end:0x8031BD68
+	.data       start:0x80530390 end:0x805303C0
+
+Game/Physics/PhysicsBox.cpp:
+	.text       start:0x8031BD68 end:0x8031BEC4
+	.data       start:0x805303C0 end:0x805303F0
+
 Game/Physics/PhysicsPlane.cpp:
 	.text       start:0x80321530 end:0x803215DC
 	.data       start:0x80530638 end:0x80530668
@@ -195,6 +203,16 @@ Game/Physics/PhysicsSphere.cpp:
 	.text       start:0x803216A8 end:0x8032177C
 	.data       start:0x80530698 end:0x805306C8
 	.sdata2     start:0x806E6908 end:0x806E690C
+
+Game/Physics/PhysicsTransform.cpp:
+	.text       start:0x8032177C end:0x80321B44
+	.data       start:0x805306C8 end:0x805306F8
+	.sdata2     start:0x806E6910 end:0x806E6914
+
+Game/Physics/PhysicsWorld.cpp:
+	.text       start:0x80321B44 end:0x80322588
+	.data       start:0x805306F8 end:0x8053077C
+	.sdata      start:0x806DF608 end:0x806DF628
 
 ode/collision_kernel.cpp:
 	.text       start:0x80344814 end:0x80345C44

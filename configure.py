@@ -355,9 +355,13 @@ config.libs = [
                 "Game/SAnim/pnFeather.cpp",
                 extra_cflags=["-inline auto,depth=3"],
             ),
+            Object(Matching, "Game/Physics/CollisionSpace.cpp"),
+            Object(Matching, "Game/Physics/PhysicsBox.cpp"),
             Object(Matching, "Game/Physics/PhysicsPlane.cpp"),
             Object(Matching, "Game/Physics/PhysicsRoundedCorner.cpp"),
             Object(Matching, "Game/Physics/PhysicsSphere.cpp"),
+            Object(Matching, "Game/Physics/PhysicsTransform.cpp"),
+            Object(Matching, "Game/Physics/PhysicsWorld.cpp"),
         ],
     },
     {
