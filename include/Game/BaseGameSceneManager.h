@@ -8,6 +8,8 @@ enum SceneList
     SCENE_INVALID = -2,
     SCENE_TITLE = 0,
     SCENE_MAIN_MENU = 1,
+    SCENE_CHOOSE_CAPTAINS_DOMINATION = 2,
+    SCENE_CHOOSE_CAPTAINS_STRIKER_CUP = 6,
 };
 
 enum ScreenMovement
@@ -16,6 +18,14 @@ enum ScreenMovement
     SCREEN_FORWARD = 1,
     SCREEN_BACK = 2,
 };
+
+struct SceneEntry
+{
+    u32 sceneId;
+    const char* filename;
+}; // size 0x8
+
+extern SceneEntry SceneEntryTable[];
 
 class BaseGameSceneManager
 {
