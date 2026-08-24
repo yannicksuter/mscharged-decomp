@@ -93,6 +93,12 @@ NL/nlTask.cpp:
 	.sbss       start:0x806E1DA0 end:0x806E1DA8
 	.sdata2     start:0x806E60B8 end:0x806E60C0
 
+Game/Sys/clock.cpp:
+	.text       start:0x802B6CD8 end:0x802B75BC
+	.data       start:0x8052B550 end:0x8052B560
+	.sbss       start:0x806E1DA8 end:0x806E1DB8
+	.sdata2     start:0x806E6158 end:0x806E6160
+
 Game/Task/SmokeTestUpdateTask.cpp:
 	.text       start:0x802BD4E4 end:0x802BD814
 	.ctors      start:0x804DB9A0 end:0x804DB9A4
@@ -147,6 +153,34 @@ Game/AI/Variant.cpp:
 Game/FE/BaseSceneHandler.cpp:
 	.text       start:0x803060FC end:0x8030616C
 	.data       start:0x8052FF10 end:0x8052FF40
+
+Game/SAnim/pnSAnimController.cpp:
+	.text       start:0x803097F8 end:0x8030A93C
+	.ctors      start:0x804DBA94 end:0x804DBA98
+	.data       start:0x8052FFE0 end:0x80530008
+	.bss        start:0x805840F0 end:0x80584118
+	.sdata2     start:0x806E6798 end:0x806E67C8
+
+Game/SAnim/pnBlender.cpp:
+	.text       start:0x8030CCD8 end:0x8030D214
+	.ctors      start:0x804DBA98 end:0x804DBA9C
+	.data       start:0x80530028 end:0x80530050
+	.bss        start:0x80584128 end:0x80584150
+	.sdata2     start:0x806E67E8 end:0x806E67F8
+
+Game/SAnim/pnSingleAxisBlender.cpp:
+	.text       start:0x8030D28C end:0x8030D9A0
+	.ctors      start:0x804DBA9C end:0x804DBAA0
+	.data       start:0x80530050 end:0x80530078
+	.bss        start:0x80584150 end:0x80584178
+	.sdata2     start:0x806E67F8 end:0x806E6808
+
+Game/SAnim/pnFeather.cpp:
+	.text       start:0x8030DA7C end:0x8030E4D8
+	.ctors      start:0x804DBAA0 end:0x804DBAA4
+	.data       start:0x80530078 end:0x805300A0
+	.bss        start:0x80584178 end:0x805841A0
+	.sdata2     start:0x806E6808 end:0x806E6820
 
 Game/Physics/PhysicsPlane.cpp:
 	.text       start:0x80321530 end:0x803215DC
