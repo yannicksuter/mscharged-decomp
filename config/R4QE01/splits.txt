@@ -19,6 +19,45 @@ Game/AI/AiUtil.cpp:
 	.sdata      start:0x806DB3D8 end:0x806DB470
 	.sdata2     start:0x806E3080 end:0x806E30D0
 
+Game/AI/Fielder.cpp:
+	.text       start:0x8002DB1C end:0x80042A68
+	.ctors      start:0x804DB514 end:0x804DB518
+	.rodata     start:0x804DBE68 end:0x804DBE90
+	.data       start:0x804F9D28 end:0x804FA8A0
+	.bss        start:0x8056B908 end:0x8056B940
+	.sdata      start:0x806DB6E8 end:0x806DB890
+	.sbss       start:0x806E0C50 end:0x806E0C68
+	.sdata2     start:0x806E3418 end:0x806E3538
+
+Game/Goalie.cpp:
+	.text       start:0x80077224 end:0x8008288C
+	.ctors      start:0x804DB530 end:0x804DB534
+	.rodata     start:0x804DBFF8 end:0x804DC030
+	.data       start:0x804FD8D8 end:0x804FE2A0
+	.bss        start:0x8056CF28 end:0x8056CF60
+	.sdata      start:0x806DBB08 end:0x806DBBE0
+	.sbss       start:0x806E0D10 end:0x806E0D18
+	.sdata2     start:0x806E3858 end:0x806E3998
+
+Game/AI/GoalieActions.cpp:
+	.text       start:0x8008288C end:0x80091020
+	.ctors      start:0x804DB534 end:0x804DB538
+	.rodata     start:0x804DC030 end:0x804DC088
+	.data       start:0x804FE2A0 end:0x804FE3C0
+	.bss        start:0x8056CF60 end:0x8056D008
+	.sdata      start:0x806DBBE0 end:0x806DBD5C
+	.sbss       start:0x806E0D18 end:0x806E0D30
+	.sdata2     start:0x806E3998 end:0x806E3B00
+
+Game/AI/Desire.cpp:
+	.text       start:0x800B0358 end:0x800B6DC0
+	.ctors      start:0x804DB560 end:0x804DB564
+	.rodata     start:0x804DC180 end:0x804DC190
+	.data       start:0x805012B8 end:0x80501B10
+	.bss        start:0x8056DA00 end:0x8056DA60
+	.sdata      start:0x806DC04C end:0x806DC0B8
+	.sdata2     start:0x806E3EA0 end:0x806E3F58
+
 Game/AI/Fuzzy.cpp:
 	.text       start:0x800E2FA8 end:0x800E30A8
 	.sdata2     start:0x806E42C8 end:0x806E42D4
@@ -109,6 +148,13 @@ NL/nlMath.cpp:
 NL/nlMemory.cpp:
 	.text       start:0x802AA5F0 end:0x802AA864
 
+NL/nlPrint.cpp:
+	.text       start:0x802AA864 end:0x802AAA20
+
+NL/nlTicker.cpp:
+	.text       start:0x802AAA20 end:0x802AAACC
+	.sdata2     start:0x806E6098 end:0x806E60A8
+
 NL/nlString.cpp:
 	.text       start:0x802AAACC end:0x802AAC88
 
@@ -143,6 +189,10 @@ Game/Sys/clock.cpp:
 	.data       start:0x8052B550 end:0x8052B560
 	.sbss       start:0x806E1DA8 end:0x806E1DB8
 	.sdata2     start:0x806E6158 end:0x806E6160
+
+NL/nlTimer.cpp:
+	.text       start:0x802B75BC end:0x802B7798
+	.sdata2     start:0x806E6160 end:0x806E6178
 
 Game/Task/SmokeTestUpdateTask.cpp:
 	.text       start:0x802BD4E4 end:0x802BD814
@@ -369,6 +419,9 @@ ode/NLGAdditions.cpp:
 	.text       start:0x80358E7C end:0x8035952C
 	.data       start:0x80534738 end:0x80534750
 	.sdata2     start:0x806E6B88 end:0x806E6BA0
+
+NL/nlEndian.cpp:
+	.text       start:0x8036D6F0 end:0x8036D6F8
 
 Runtime/__mem.c:
 	.init       start:0x80005FB4 end:0x800060E8

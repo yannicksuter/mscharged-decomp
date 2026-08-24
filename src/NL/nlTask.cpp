@@ -2,9 +2,8 @@
 
 #include "NL/nlDLRing.h"
 #include "NL/nlMemory.h"
+#include "NL/nlTicker.h"
 
-extern "C" u32 fn_802AAA24();
-extern "C" float fn_802AAA78(u32 start, u32 end);
 extern "C" void fn_80371264();
 
 inline void* operator new(unsigned long, void* memory)
@@ -31,7 +30,7 @@ void nlTaskManager::AddTask(nlTask* task, u32 priority, u32 activeStates)
 {
     task->mPriority = priority;
     task->mActiveStates = activeStates;
-    task->mPreviousTicker = fn_802AAA24();
+    task->mPreviousTicker = nlGetTicker();
 
     if (m_pInstance->mTaskList == 0)
     {
@@ -80,8 +79,8 @@ void nlTaskManager::RunAllTasks()
 
         nlTask* taskIterator = nlDLRingGetStart<nlTask>(m_pInstance->mTaskList);
     task_loop:
-        u32 currentTicker = fn_802AAA24();
-        float tickerDifference = fn_802AAA78(taskIterator->mPreviousTicker, currentTicker);
+        u32 currentTicker = nlGetTicker();
+        float tickerDifference = nlGetTickerDifference(taskIterator->mPreviousTicker, currentTicker);
         taskIterator->mPreviousTicker = currentTicker;
         if (taskIterator->mActiveStates & m_pInstance->mCurrentState)
         {
@@ -102,7 +101,7 @@ void nlTaskManager::RunAllTasks()
             m_pInstance->mCurrentTimeDelta = deltaTime;
             taskIterator->Run(deltaTime);
             taskIterator->mExecutionTime =
-                fn_802AAA78(taskIterator->mPreviousTicker, fn_802AAA24());
+                nlGetTickerDifference(taskIterator->mPreviousTicker, nlGetTicker());
             fn_80371264();
         }
         if (taskIterator != m_pInstance->mTaskList)

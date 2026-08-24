@@ -16,7 +16,7 @@ The project was built with or adapted source from the following projects:
 | [koopthekoopa/wii-ipl at `0b0cedd`](https://github.com/koopthekoopa/wii-ipl/tree/0b0cedd44d83fa187eb3f52748c3eecf0840865b) | RVL SDK reconstructions. |
 | [zeldaret/oot-vc at `9c18537`](https://github.com/zeldaret/oot-vc/tree/9c1853710bcf6b598b0710022fdb87b9a8e99e2c) | RVL SDK reconstructions. |
 | [zeldaret/tp at `ecafc81`](https://github.com/zeldaret/tp/tree/ecafc81d53cadf3c29ac01b03170cbe9bc37c686) | RVL SDK reconstructions. |
-| [yannicksuter/smstrikers-decomp at `8bd8729`](https://github.com/yannicksuter/smstrikers-decomp/tree/8bd872998439d7204061624980cc268528874ea2) | Predecessor game code, Dolphin SDK lineage, and Next Level Games' ODE extensions. |
+| [yannicksuter/smstrikers-decomp at `6123c35`](https://github.com/yannicksuter/smstrikers-decomp/tree/6123c3546baf59aa5d564e98fdd76cf16443c80f) | Predecessor game code, Dolphin SDK lineage, and Next Level Games' ODE extensions. |
 | Open Dynamics Engine 0.5 (`ode-040529`) | Baseline for ODE-derived source. |
 
 The referenced decompilation projects publish their reconstruction work under
