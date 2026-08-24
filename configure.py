@@ -374,7 +374,7 @@ config.libs = [
             Object(Matching, "Game/Task/TweakerTask.cpp"),
             Object(Matching, "Game/Task/ProfilerTask.cpp"),
             Object(Matching, "Game/Task/ParticleUpdateTask.cpp"),
-            Object(NonMatching, "Game/FE/GameSceneManager.cpp"),
+            Object(Matching, "Game/FE/GameSceneManager.cpp"),
             Object(Matching, "Game/FE/BaseSceneHandler.cpp"),
             Object(
                 Matching,
