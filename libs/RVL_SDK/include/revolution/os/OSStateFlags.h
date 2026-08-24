@@ -8,17 +8,12 @@ extern "C" {
 #endif
 
 typedef struct OSStateFlags {
-    u32 checksum;
-    u8 BYTE_0x4;
-    u8 BYTE_0x5;
+    u32 checkSum;
+    u8 lastAppType;
+    u8 shutdownType;
     u8 discState;
-    u8 BYTE_0x7;
-    u32 WORD_0x8;
-    u32 WORD_0xC;
-    u32 WORD_0x10;
-    u32 WORD_0x14;
-    u32 WORD_0x18;
-    u32 WORD_0x1C;
+    u8 menuMode;
+    u8 padding[24];
 } OSStateFlags;
 
 BOOL __OSWriteStateFlags(const OSStateFlags* state);

@@ -143,13 +143,6 @@ Game/Task/ParticleUpdateTask.cpp:
 	.sbss       start:0x806E2010 end:0x806E2018
 	.sdata2     start:0x806E65A0 end:0x806E65A8
 
-Game/AI/Variant.cpp:
-	.text       start:0x8031A104 end:0x8031B570
-	.ctors      start:0x804DBABC end:0x804DBAC0
-	.data       start:0x80530318 end:0x80530390
-	.bss        start:0x80584340 end:0x80584360
-	.sdata      start:0x806DF5C8 end:0x806DF5E8
-
 Game/FE/BaseSceneHandler.cpp:
 	.text       start:0x803060FC end:0x8030616C
 	.data       start:0x8052FF10 end:0x8052FF40
@@ -181,6 +174,13 @@ Game/SAnim/pnFeather.cpp:
 	.data       start:0x80530078 end:0x805300A0
 	.bss        start:0x80584178 end:0x805841A0
 	.sdata2     start:0x806E6808 end:0x806E6820
+
+Game/AI/Variant.cpp:
+	.text       start:0x8031A104 end:0x8031B570
+	.ctors      start:0x804DBABC end:0x804DBAC0
+	.data       start:0x80530318 end:0x80530390
+	.bss        start:0x80584340 end:0x80584360
+	.sdata      start:0x806DF5C8 end:0x806DF5E8
 
 Game/Physics/CollisionSpace.cpp:
 	.text       start:0x8031BA84 end:0x8031BD68
@@ -429,7 +429,7 @@ RVL_SDK/os/OSReboot.c:
 
 RVL_SDK/os/OSReset.c:
 	.text       start:0x803BA468 end:0x803BABB4
-	.data       start:0x8053E4E0 end:0x8053E58C
+	.data       start:0x8053E4E0 end:0x8053E590
 	.sbss       start:0x806E2930 end:0x806E2940
 
 RVL_SDK/os/OSRtc.c:
