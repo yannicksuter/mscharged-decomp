@@ -236,6 +236,11 @@ Game/Physics/PhysicsBox.cpp:
 	.text       start:0x8031BD68 end:0x8031BEC4
 	.data       start:0x805303C0 end:0x805303F0
 
+Game/Physics/PhysicsCapsule.cpp:
+	.text       start:0x8031BEC4 end:0x8031C068
+	.data       start:0x805303F0 end:0x80530420
+	.sdata2     start:0x806E68A0 end:0x806E68A4
+
 Game/Physics/PhysicsPlane.cpp:
 	.text       start:0x80321530 end:0x803215DC
 	.data       start:0x80530638 end:0x80530668
