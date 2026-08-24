@@ -1,11 +1,14 @@
-#ifndef _NLVECTOR_H_
-#define _NLVECTOR_H_
+#ifndef NL_VECTOR_H
+#define NL_VECTOR_H
 
 template <typename T, typename Allocator>
 class Vector
 {
 public:
     Vector()
+        : mData(0)
+        , mSize(0)
+        , mCapacity(0)
     {
     }
 
@@ -18,14 +21,14 @@ public:
         const T* scan = string;
         while (*scan++ != 0)
         {
-            mSize++;
+            ++mSize;
         }
 
-        mSize++;
+        ++mSize;
         mData = Allocator::template New<T>(mSize + 1, 0);
         mCapacity = mSize;
 
-        for (int i = 0; i < mSize; i++)
+        for (int i = 0; i < mSize; ++i)
         {
             mData[i] = *string++;
         }
@@ -36,7 +39,7 @@ public:
         mData = Allocator::template New<T>(other.mSize, name);
         mSize = other.mSize;
         mCapacity = other.mSize;
-        for (int i = 0; i < mSize; i++)
+        for (int i = 0; i < mSize; ++i)
         {
             mData[i] = other.mData[i];
         }
@@ -47,53 +50,15 @@ public:
         mData = Allocator::template New<T>(count, name);
         mSize = count;
         mCapacity = count;
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < count; ++i)
         {
             mData[i] = T();
         }
     }
 
-    ~Vector();
-
-    Vector& operator=(const Vector& other)
+    ~Vector()
     {
-        if (mSize >= other.mSize)
-        {
-            for (int i = 0; i < other.mSize; i++)
-            {
-                mData[i] = other.mData[i];
-            }
-            mSize = other.mSize;
-        }
-        else
-        {
-            Vector tmp(other);
-            Swap(tmp);
-        }
-        return *this;
-    }
-
-    void Swap(Vector& other);
-
-    void insert(T* at, const T* begin, const T* end)
-    {
-        int size = end - begin;
-        int offset = at - mData;
-        reserve(mSize + size);
-        at = mData + offset;
-        T* item = mData + mSize - 1;
-        while (item >= at)
-        {
-            *(item + size) = *item;
-            item--;
-        }
-        while (begin != end)
-        {
-            *at = *begin;
-            begin++;
-            at++;
-        }
-        mSize += size;
+        Allocator::template Delete<T>(mData);
     }
 
     void reserve(int capacity)
@@ -101,7 +66,7 @@ public:
         if (mCapacity < capacity)
         {
             Vector other(capacity, 0);
-            for (int i = 0; i < mSize; i++)
+            for (int i = 0; i < mSize; ++i)
             {
                 other.mData[i] = mData[i];
             }
@@ -110,7 +75,33 @@ public:
         }
     }
 
-    void erase(const T* first, const T* last);
+    void erase(const T* begin, const T* end)
+    {
+        const T* eraseEnd = end;
+        int count = end - begin;
+        int offset = begin - mData;
+        T* at = mData + offset;
+        while (eraseEnd != mData + mSize)
+        {
+            *at++ = *eraseEnd++;
+        }
+        mSize -= count;
+    }
+
+    void Swap(Vector& other)
+    {
+        int oldSize = mSize;
+        mSize = other.mSize;
+        other.mSize = oldSize;
+
+        int oldCapacity = mCapacity;
+        mCapacity = other.mCapacity;
+        other.mCapacity = oldCapacity;
+
+        T* oldData = mData;
+        mData = other.mData;
+        other.mData = oldData;
+    }
 
     T& operator[](int index)
     {
@@ -122,40 +113,4 @@ public:
     int mCapacity;
 };
 
-template <typename T, typename Allocator>
-inline Vector<T, Allocator>::~Vector()
-{
-    Allocator::template Delete<T>(mData);
-}
-
-template <typename T, typename Allocator>
-inline void Vector<T, Allocator>::erase(const T* begin, const T* end)
-{
-    const T* eraseEnd = end;
-    int size = end - begin;
-    int offset = begin - mData;
-    T* at = mData + offset;
-    while (eraseEnd != mData + mSize)
-    {
-        *at++ = *eraseEnd++;
-    }
-    mSize -= size;
-}
-
-template <typename T, typename Allocator>
-inline void Vector<T, Allocator>::Swap(Vector& other)
-{
-    int oldSize = mSize;
-    mSize = other.mSize;
-    other.mSize = oldSize;
-
-    int oldCapacity = mCapacity;
-    mCapacity = other.mCapacity;
-    other.mCapacity = oldCapacity;
-
-    T* oldData = mData;
-    mData = other.mData;
-    other.mData = oldData;
-}
-
-#endif // _NLVECTOR_H_
+#endif // NL_VECTOR_H

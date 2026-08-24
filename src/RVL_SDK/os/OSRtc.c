@@ -43,7 +43,7 @@ static BOOL ReadSram(void* buffer) {
 
 static BOOL WriteSram(void* buffer, u32 offset, u32 size);
 
-static void WriteSramCallback(s32 channel, OSContext* context) {
+static void WriteSramCallback(EXIChannel channel, OSContext* context) {
     Scb.sync = WriteSram(Scb.sram + Scb.offset, Scb.offset, 64 - Scb.offset);
 
     if (Scb.sync) {

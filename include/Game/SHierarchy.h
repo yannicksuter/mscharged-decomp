@@ -7,6 +7,7 @@
 class cSHierarchy
 {
 public:
+    int GetNodeIndexByID(unsigned int id) const;
     int GetChild(int nodeIndex, int childIndex) const;
     int GetNumChildren(int nodeIndex) const;
     int GetParent(int nodeIndex) const;

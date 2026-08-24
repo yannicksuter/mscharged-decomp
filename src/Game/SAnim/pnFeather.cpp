@@ -1,6 +1,6 @@
 #include "Game/SAnim/pnFeather.h"
 
-extern "C" void* fn_802AA79C(u32 size, u32 alignment, bool clear);
+#include "NL/nlMemory.h"
 
 SlotPool<cPN_Feather> cPN_Feather::m_FeatherSlotPool(16, 16);
 
@@ -17,7 +17,7 @@ cPN_Feather::cPN_Feather(
     m_eFeatherBlendMode = FEATHER_BLEND_OUT;
     m_pBaseHierarchy = hierarchy;
 
-    m_pFeatherWeights = (float*)fn_802AA79C(hierarchy->m_nNumNodes * sizeof(float), 8, false);
+    m_pFeatherWeights = (float*)nlMalloc(hierarchy->m_nNumNodes * sizeof(float), 8, false);
 
     int i = 0;
     int offset = 0;

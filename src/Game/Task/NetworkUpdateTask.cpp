@@ -1,5 +1,6 @@
 #include "Game/Task/NetworkUpdateTask.h"
 
+#include "NL/nlMemory.h"
 #include "types.h"
 
 struct NetworkManager
@@ -48,7 +49,6 @@ extern "C" void fn_803328AC(NetworkManager*, void*);
 extern "C" void fn_80332EDC();
 extern "C" void fn_801274A4();
 extern "C" void fn_8012AE4C();
-extern "C" void* fn_802AA79C(u32, u32, u32);
 extern "C" void* fn_801360A4(void*);
 extern "C" void fn_8012F378();
 extern "C" s32 fn_8011C19C();
@@ -76,7 +76,7 @@ void NetworkUpdateTask::Initialize()
 
     if (lbl_806E1194 == 0)
     {
-        void* instance = fn_802AA79C(0xEB0, 8, 0);
+        void* instance = nlMalloc(0xEB0, 8, false);
         if (instance != 0)
         {
             instance = fn_801360A4(instance);

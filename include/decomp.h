@@ -10,9 +10,13 @@
 
 #define ROUND_UP(x, align) ROUNDUP((x), (align))
 #define ROUND_DOWN_PTR(x, align) ((void*)ROUNDDOWN((unsigned long)(x), (align)))
+#define ROUND_UP_PTR(x, align) PTR_ROUNDUP((x), (align))
 
 #define CLAMP(low, high, x) \
     ((x) > (high) ? (high) : ((x) < (low) ? (low) : (x)))
+
+#define DECL_SECTION(x) __declspec(section x)
+#define DECL_WEAK __declspec(weak)
 
 #define DECOMP_DONT_INLINE __attribute__((never_inline))
 #define DECOMP_FORCEACTIVE(module, ...)                       \
