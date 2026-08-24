@@ -1,5 +1,6 @@
 #include "NL/nlMath.h"
 #include "NL/gl/glState.h"
+#include "NL/nlString.h"
 
 struct UnidentifiedStaticState
 {
@@ -92,7 +93,6 @@ struct ShadowHeight
     float height;
 };
 
-extern "C" u32 fn_802AAAFC(const char*);
 extern "C" PowerupBase* fn_8009AC5C(u32);
 extern "C" float fn_8009B874(const PowerupBase*);
 extern "C" RenderObject* fn_8027725C(u32);
@@ -235,7 +235,7 @@ static void DrawShadow(float radius, float x, float y, float z)
 
 void DrawablePowerup::Grab(int idx)
 {
-    PowerupBase* powerup = fn_8009AC5C(fn_802AAAFC(GetName(idx)));
+    PowerupBase* powerup = fn_8009AC5C(nlStringLowerHash(GetName(idx)));
     if (powerup != 0)
     {
         mType = powerup->mType;
@@ -253,8 +253,8 @@ void DrawablePowerup::Grab(int idx)
 
 void DrawablePowerup::Render(int idx) const
 {
-    fn_8009AC5C(fn_802AAAFC(GetName(idx)));
-    RenderObject* object = fn_8027725C(fn_802AAAFC(GetName(idx)));
+    fn_8009AC5C(nlStringLowerHash(GetName(idx)));
+    RenderObject* object = fn_8027725C(nlStringLowerHash(GetName(idx)));
 
     if (object == 0)
     {

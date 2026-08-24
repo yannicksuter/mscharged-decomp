@@ -1,6 +1,7 @@
 #ifndef REVOLUTION_OS_TIME_H
 #define REVOLUTION_OS_TIME_H
 
+#include <revolution/os/OSHardware.h>
 #include <revolution/types.h>
 
 #ifdef __cplusplus
@@ -22,8 +23,6 @@ typedef struct OSCalendarTime {
     s32 msec;
     s32 usec;
 } OSCalendarTime;
-
-u32 OS_BUS_CLOCK_SPEED AT_ADDRESS(0x800000F8);
 
 #define OS_TIME_SPEED (OS_BUS_CLOCK_SPEED / 4)
 

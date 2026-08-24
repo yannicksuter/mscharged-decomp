@@ -18,4 +18,15 @@ public:
     /* 0x08 */ ListEntry<T>* m_Tail;
 };
 
-#endif
+template <typename T>
+inline void nlListAddStart(T** head, T* newNode, T** tail)
+{
+    if (tail != 0 && *head == 0)
+    {
+        *tail = newNode;
+    }
+    newNode->next = *head;
+    *head = newNode;
+}
+
+#endif // NL_NL_LIST_H

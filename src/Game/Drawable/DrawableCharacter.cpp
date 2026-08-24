@@ -3,6 +3,9 @@
 
 extern "C" void* fn_802CDF0C();
 
+#include "NL/nlMemory.h"
+#include "NL/nlString.h"
+
 #pragma cpp_extensions on
 
 void* operator new(unsigned long, void*);
@@ -302,8 +305,6 @@ struct SkinAnimatedMovableNpc
     u8 visible;
 };
 
-extern "C" void* fn_802AA79C(u32, u32, bool);
-extern "C" u32 fn_802AAAFC(const char*);
 extern "C" void fn_802B5544(nlQuaternion*, const nlQuaternion*, const nlQuaternion*, float);
 extern "C" PoseAccumulator* fn_8030A9D0(PoseAccumulator*, Hierarchy*, bool);
 extern "C" void fn_8030B1C0(PoseAccumulator*);
@@ -663,7 +664,7 @@ void DrawableCharacter::Grab(Character& source)
     if (poseAccumulator == 0)
     {
         PoseAccumulator* accumulator =
-            (PoseAccumulator*)fn_802AA79C(0x7C, 8, false);
+            (PoseAccumulator*)nlMalloc(0x7C, 8, false);
         if (accumulator != 0)
         {
             accumulator = fn_8030ABF8(
@@ -896,7 +897,7 @@ void DrawableCharacter::SendToGl(Character& source, int renderPass)
         fn_8001EFCC(&source, skinMesh, model);
     }
 
-    static u32 alphaValueHash = fn_802AAAFC(CharacterAlphaValueName);
+    static u32 alphaValueHash = nlStringLowerHash(CharacterAlphaValueName);
     if (characterClass == 10)
     {
         int packetCount = model->packetCount;
@@ -951,7 +952,7 @@ void DrawableCharacter::Grab(SkinAnimatedMovableNpc& npc)
     if (poseAccumulator == 0)
     {
         PoseAccumulator* accumulator =
-            (PoseAccumulator*)fn_802AA79C(0x7C, 8, false);
+            (PoseAccumulator*)nlMalloc(0x7C, 8, false);
         if (accumulator != 0)
         {
             accumulator = fn_8030ABF8(accumulator, npc.poseAccumulator);
@@ -1006,13 +1007,13 @@ void DrawableCharacter::Blend(
                 if (lbl_806E1394 <= 0)
                 {
                     Hierarchy* hierarchy = lhs.poseAccumulator->hierarchy;
-                    u32 hash = fn_802AAAFC(CharacterLeftPropJointName);
+                    u32 hash = nlStringLowerHash(CharacterLeftPropJointName);
                     lbl_806E1394 = fn_8030CC1C(hierarchy, hash);
                     hierarchy = lhs.poseAccumulator->hierarchy;
-                    hash = fn_802AAAFC(CharacterRightPropJointName);
+                    hash = nlStringLowerHash(CharacterRightPropJointName);
                     lbl_806E1398 = fn_8030CC1C(hierarchy, hash);
                     hierarchy = lhs.poseAccumulator->hierarchy;
-                    hash = fn_802AAAFC(CharacterSpineJointName);
+                    hash = nlStringLowerHash(CharacterSpineJointName);
                     lbl_806E139C = fn_8030CC1C(hierarchy, hash);
                 }
 
@@ -1082,7 +1083,7 @@ void DrawableCharacter::Blend(
     if (poseAccumulator == 0)
     {
         PoseAccumulator* accumulator =
-            (PoseAccumulator*)fn_802AA79C(sizeof(PoseAccumulator), 8, false);
+            (PoseAccumulator*)nlMalloc(sizeof(PoseAccumulator), 8, false);
         if (accumulator != 0)
         {
             accumulator = fn_8030A9D0(
@@ -1411,7 +1412,7 @@ void DrawableCharacter::ApplyMaterialEffects(
     eCharacterRenderPass renderPass,
     bool* attachEffects)
 {
-    static u32 blendAmountHash = fn_802AAAFC(CharacterBlendAmountName);
+    static u32 blendAmountHash = nlStringLowerHash(CharacterBlendAmountName);
 
     EffectsTexturing* texturing = effectsTexturing;
     int characterClass = source.characterClass;
@@ -1515,7 +1516,7 @@ void DrawableCharacter::ApplyDamageEffects(
     ModelPacket* packet;
     u32 shadowColourValue;
     u32 damageTexture;
-    static u32 shadowLevelHash = fn_802AAAFC(CharacterShadowLevelName);
+    static u32 shadowLevelHash = nlStringLowerHash(CharacterShadowLevelName);
 
     int shadowAlpha = fn_80183DEC(&self->bip01Position);
     float fade = 1.0f;
@@ -1546,7 +1547,7 @@ void DrawableCharacter::ApplyDamageEffects(
         packet = (ModelPacket*)((char*)packet + 0x30);
     }
 
-    static u32 blackHash = fn_802AAAFC(CharacterAlphaValueName);
+    static u32 blackHash = nlStringLowerHash(CharacterAlphaValueName);
     const float one = 1.0f;
     float blackAmount =
         one != lbl_806DCB48 ? lbl_806DCB48 : self->blendAmount;
@@ -1560,7 +1561,7 @@ void DrawableCharacter::ApplyDamageEffects(
         }
     }
 
-    static u32 megaBlendHash = fn_802AAAFC(CharacterMegaBlendName);
+    static u32 megaBlendHash = nlStringLowerHash(CharacterMegaBlendName);
     const float zero = 0.0f;
     float megaAmount =
         zero != lbl_806E13A8 ? lbl_806E13A8 : source.megaBlend;
@@ -1588,7 +1589,7 @@ void DrawableCharacter::ApplyDamageEffects(
         }
     }
 
-    static u32 damage1EnabledHash = fn_802AAAFC(CharacterDamage1EnabledName);
+    static u32 damage1EnabledHash = nlStringLowerHash(CharacterDamage1EnabledName);
     bool damage1Enabled = false;
     if (lbl_806E13A0 > 0.0f || self->damage1 > 0.0f)
     {
@@ -1647,7 +1648,7 @@ void DrawableCharacter::ApplyDamageEffects(
         }
     }
 
-    static u32 damage2EnabledHash = fn_802AAAFC(CharacterDamage2EnabledName);
+    static u32 damage2EnabledHash = nlStringLowerHash(CharacterDamage2EnabledName);
     bool damage2Enabled = false;
     if (lbl_806E13A4 > 0.0f || self->damage2 > 0.0f)
     {
@@ -1691,7 +1692,7 @@ void DrawableCharacter::RenderCharacterShadow(
         ? lbl_806DCB48
         : drawable->blendAmount;
 
-    static u32 blackHash = fn_802AAAFC(CharacterAlphaValueName);
+    static u32 blackHash = nlStringLowerHash(CharacterAlphaValueName);
     params.scalar = 1.0f;
     light = source.shadowLight;
     float lightRadius = light->radius;

@@ -1,5 +1,6 @@
 #include "NL/nlMath.h"
 #include "NL/gl/glState.h"
+#include "NL/nlMemory.h"
 
 struct nlColour
 {
@@ -245,7 +246,6 @@ extern "C" WorldDarkening* fn_801AF510();
 extern "C" void nlBreak__Fv();
 extern "C" void* memcpy(void*, const void*, u32);
 extern "C" void fn_802CF510(u32, WriterModel*, bool);
-extern "C" void* fn_802AA79C(u32, u32, bool);
 extern "C" MeshResource* fn_802CBFD8(const StreamDefinition*, int, const char*);
 extern "C" void* memset(void*, int, u32);
 extern "C" void fn_8013AEC8(NetMesh*);
@@ -462,15 +462,15 @@ void DrawableNetMesh::Reset()
 
 void DrawableNetMesh::Initialize(int numVertices, int numTriIndices)
 {
-    mPositions = (nlVector3*)fn_802AA79C(numVertices * sizeof(nlVector3), 8, false);
+    mPositions = (nlVector3*)nlMalloc(numVertices * sizeof(nlVector3), 8, false);
 
     if (!lbl_806E1350[mNetIndex])
     {
-        lbl_806E1348[mNetIndex] = (u16*)fn_802AA79C(numTriIndices * sizeof(u16), 8, false);
+        lbl_806E1348[mNetIndex] = (u16*)nlMalloc(numTriIndices * sizeof(u16), 8, false);
 
         int allocationSize = numVertices * 4;
-        lbl_806E1338[mNetIndex] = (shortVector2*)fn_802AA79C(allocationSize, 8, false);
-        lbl_806E1340[mNetIndex] = (u32*)fn_802AA79C(allocationSize, 8, false);
+        lbl_806E1338[mNetIndex] = (shortVector2*)nlMalloc(allocationSize, 8, false);
+        lbl_806E1340[mNetIndex] = (u32*)nlMalloc(allocationSize, 8, false);
         memset(lbl_806E1340[mNetIndex], 0xFF, allocationSize);
 
         lbl_806E1350[mNetIndex] = true;

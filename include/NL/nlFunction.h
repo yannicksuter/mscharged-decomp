@@ -24,6 +24,28 @@ public:
     {
     }
 
+    Function0(const Function0& other)
+        : mTag(other.mTag)
+    {
+        if (mTag == FUNCTION_FREE)
+        {
+            mFreeFunction = other.mFreeFunction;
+        }
+        else if (mTag == FUNCTION_FUNCTOR)
+        {
+            mFunctor = other.mFunctor->Clone();
+        }
+    }
+
+    ~Function0()
+    {
+        if (mTag == FUNCTION_FUNCTOR && mFunctor != 0)
+        {
+            delete mFunctor;
+        }
+        mTag = FUNCTION_EMPTY;
+    }
+
     operator bool() const
     {
         return mTag != FUNCTION_EMPTY;
@@ -43,6 +65,82 @@ private:
     union
     {
         ReturnType (*mFreeFunction)();
+        FunctorBase* mFunctor;
+    };
+};
+
+template <typename ReturnType, typename P1>
+class Function1
+{
+public:
+    struct FunctorBase
+    {
+        virtual ~FunctorBase() { }
+        virtual ReturnType operator()(P1) = 0;
+        virtual FunctorBase* Clone() const = 0;
+    };
+
+    Function1()
+        : mTag(FUNCTION_EMPTY)
+    {
+    }
+
+    Function1(ReturnType (*function)(P1))
+        : mTag(FUNCTION_FREE)
+        , mFreeFunction(function)
+    {
+    }
+
+    Function1(const Function1& other)
+        : mTag(other.mTag)
+    {
+        if (mTag == FUNCTION_FREE)
+        {
+            mFreeFunction = other.mFreeFunction;
+        }
+        else if (mTag == FUNCTION_FUNCTOR)
+        {
+            mFunctor = other.mFunctor->Clone();
+        }
+    }
+
+    ~Function1()
+    {
+        Clear();
+    }
+
+    void Clear()
+    {
+        if (this == 0)
+        {
+            return;
+        }
+        if (mTag == FUNCTION_FUNCTOR)
+        {
+            delete mFunctor;
+        }
+        mTag = FUNCTION_EMPTY;
+    }
+
+    operator bool() const
+    {
+        return mTag != FUNCTION_EMPTY;
+    }
+
+    ReturnType operator()(P1 p0) const
+    {
+        if (mTag == FUNCTION_FREE)
+        {
+            return mFreeFunction(p0);
+        }
+        return (*mFunctor)(p0);
+    }
+
+private:
+    FunctionTag mTag;
+    union
+    {
+        ReturnType (*mFreeFunction)(P1);
         FunctorBase* mFunctor;
     };
 };

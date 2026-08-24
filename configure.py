@@ -230,9 +230,16 @@ elif args.warn == "error":
     cflags_base.append("-W error")
 
 # Metrowerks library flags
+# The game library is built without data pooling. NL/nlStringSupport.cpp is the
+# discriminating unit: with pooling on, CodeWarrior anchors the translation
+# unit's .bss objects on a shared section base register and defers the two
+# global allocator objects behind their destructor-chain records. R4QE01
+# addresses every .bss object through its own symbol and places each record
+# immediately before the object it registers.
 cflags_game_common = [
     *cflags_base,
     "-use_lmw_stmw on",
+    "-pool off",
     "-DdNODEBUG=1",
     "-DdSINGLE=1",
 ]
@@ -262,6 +269,7 @@ cflags_runtime = [
 cflags_rvl_sdk = [
     *cflags_base,
     "-i libs/RVL_SDK/include",
+    "-i libs/MetroTRK/include",
     "-i libs/MSL_C/include",
     "-inline auto",
     "-ipa file",
@@ -321,7 +329,30 @@ config.libs = [
                     "-char signed",
                 ],
             ),
+            Object(NonMatching, "Game/GameInfo.cpp"),
             Object(Matching, "NL/nlMath.cpp"),
+            Object(Matching, "NL/nlMemory.cpp"),
+            Object(
+                Matching,
+                "NL/nlString.cpp",
+                extra_cflags=["-i libs/MSL_C/include"],
+            ),
+            Object(Matching, "Game/Sys/simpleparser.cpp"),
+            Object(
+                NonMatching,
+                "NL/nlConfig.cpp",
+                extra_cflags=["-i libs/MSL_C/include", "-use_lmw_stmw on"],
+            ),
+            Object(
+                Matching,
+                "NL/nlSlotPool.cpp",
+                extra_cflags=["-use_lmw_stmw on"],
+            ),
+            Object(
+                Matching,
+                "NL/nlStringSupport.cpp",
+                extra_cflags=["-i libs/MSL_C/include", "-ipa file"],
+            ),
             Object(Matching, "NL/nlTask.cpp"),
             Object(Matching, "Game/Sys/clock.cpp"),
             Object(Matching, "NL/gl/glStat.cpp"),
@@ -336,6 +367,8 @@ config.libs = [
             Object(Matching, "Game/Task/NetworkUpdateTask.cpp"),
             Object(Matching, "Game/Task/PlatPadUpdateTask.cpp"),
             Object(Matching, "Game/Task/DispatchEventsTask.cpp"),
+            Object(NonMatching, "Game/Task/TransitionTask.cpp"),
+            Object(Matching, "Game/Task/LoadingTask.cpp"),
             Object(Matching, "Game/Task/SmokeTestUpdateTask.cpp"),
             Object(Matching, "Game/Task/TextWindowTask.cpp"),
             Object(Matching, "Game/Task/TweakerTask.cpp"),
@@ -372,7 +405,11 @@ config.libs = [
         "objects": [
             Object(Matching, "ode/collision_kernel.cpp"),
             Object(Matching, "ode/collision_space.cpp"),
+            Object(NonMatching, "ode/collision_std.cpp"),
             Object(Matching, "ode/collision_transform.cpp"),
+            Object(Matching, "ode/collision_util.cpp"),
+            Object(NonMatching, "ode/dCylinder.cpp"),
+            Object(Matching, "ode/ext/dColumn.cpp"),
             Object(Matching, "ode/ext/dFinitePlane.cpp"),
             Object(Matching, "ode/ext/dRoundedCorner.cpp"),
             Object(Matching, "ode/error.cpp"),
@@ -383,6 +420,7 @@ config.libs = [
             Object(Matching, "ode/obstack.cpp", extra_cflags=["-inline deferred"]),
             Object(Matching, "ode/odemath.cpp"),
             Object(Matching, "ode/ode.cpp"),
+            Object(NonMatching, "ode/quickstep.cpp"),
             Object(Matching, "ode/rotation.cpp", extra_cflags=["-inline deferred"]),
             Object(Matching, "ode/util.cpp"),
             Object(Matching, "ode/NLGAdditions.cpp"),
@@ -412,7 +450,13 @@ config.libs = [
         "cflags": cflags_rvl_sdk,
         "progress_category": "sdk",
         "objects": [
+            Object(Matching, "RVL_SDK/base/PPCArch.c"),
+            Object(Matching, "RVL_SDK/db/db.c"),
+            Object(Matching, "RVL_SDK/exi/EXIBios.c", extra_cflags=["-schedule off"]),
+            Object(Matching, "RVL_SDK/exi/EXIUart.c"),
+            Object(Matching, "RVL_SDK/exi/EXICommon.c"),
             Object(Matching, "RVL_SDK/ipc/ipcMain.c"),
+            Object(NonMatching, "RVL_SDK/ipc/ipcclt.c"),
             Object(Matching, "RVL_SDK/ipc/memory.c"),
             Object(Matching, "RVL_SDK/ipc/ipcProfile.c"),
             Object(Matching, "RVL_SDK/mem/mem_heapCommon.c"),
@@ -421,6 +465,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/mem/mem_unitHeap.c"),
             Object(Matching, "RVL_SDK/mem/mem_allocator.c"),
             Object(Matching, "RVL_SDK/mem/mem_list.c"),
+            Object(Matching, "RVL_SDK/os/OS.c"),
             Object(Matching, "RVL_SDK/os/OSAlarm.c"),
             Object(Matching, "RVL_SDK/os/OSAlloc.c"),
             Object(Matching, "RVL_SDK/os/OSArena.c"),
@@ -443,6 +488,9 @@ config.libs = [
             Object(Matching, "RVL_SDK/os/OSTime.c"),
             Object(Matching, "RVL_SDK/os/OSUtf.c"),
             Object(Matching, "RVL_SDK/os/OSIpc.c"),
+            Object(Matching, "RVL_SDK/os/__start.c"),
+            Object(Matching, "RVL_SDK/os/__ppc_eabi_init.c"),
+            Object(Matching, "RVL_SDK/os/OSNet.c"),
             Object(Matching, "RVL_SDK/os/OSStateTM.c"),
             Object(Matching, "RVL_SDK/os/OSPlayRecord.c"),
             Object(Matching, "RVL_SDK/os/OSStateFlags.c"),

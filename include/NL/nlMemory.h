@@ -1,0 +1,18 @@
+#ifndef NL_MEMORY_H
+#define NL_MEMORY_H
+
+#include "types.h"
+
+void* operator new(unsigned long size);
+void* operator new[](unsigned long size);
+void operator delete(void* ptr);
+void operator delete[](void* ptr);
+
+void* nlMalloc(unsigned long size);
+void* nlMalloc(unsigned long size, unsigned int alignment, bool fromEnd);
+void nlFree(void* ptr);
+
+void nlInitMemory();
+extern u8 gMemoryInitialized;
+
+#endif // NL_MEMORY_H

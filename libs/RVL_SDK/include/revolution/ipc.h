@@ -1,6 +1,7 @@
 #ifndef REVOLUTION_IPC_H
 #define REVOLUTION_IPC_H
 
+#include <revolution/os/OSThread.h>
 #include <revolution/types.h>
 
 #ifdef __cplusplus
@@ -13,18 +14,58 @@ extern "C"
 
     typedef enum IPCHwReg
     {
+        IPC_PPCMSG = 0x00 / 4,
+        IPC_PPCCTRL = 0x04 / 4,
+        IPC_ARMMSG = 0x08 / 4,
         IPC_PPCIRQMASK = 0x34 / 4,
         IPC_DIFLAGS = 0x180 / 4,
         IPC_GPIO2DIR = 0x1CC / 4,
         IPC_GPIO2IN = 0x1D0 / 4
     } IPCHwReg;
 
+    typedef enum ACRHwReg
+    {
+        ACR_PPCIRQFLAG = 0x030,
+        ACR_PPCIRQMASK = 0x034
+    } ACRHwReg;
+
+    inline u32 ACRReadReg(u32 reg)
+    {
+        return IPC_HW_REGS_PPC[reg / 4];
+    }
+
+    inline void ACRWriteReg(u32 reg, u32 val)
+    {
+        IPC_HW_REGS_PPC[reg / 4] = val;
+    }
+
     typedef enum IPCResult
     {
+        IPC_RESULT_ALLOC_FAILED = -22,
+        IPC_RESULT_BUSY_INTERNAL = -8,
         IPC_RESULT_CONN_MAX_INTERNAL = -5,
         IPC_RESULT_INVALID_INTERNAL = -4,
         IPC_RESULT_OK = 0
     } IPCResult;
+
+    typedef enum IPCRequestType
+    {
+        IPC_REQ_NONE,
+        IPC_REQ_OPEN,
+        IPC_REQ_CLOSE,
+        IPC_REQ_READ,
+        IPC_REQ_WRITE,
+        IPC_REQ_SEEK,
+        IPC_REQ_IOCTL,
+        IPC_REQ_IOCTLV
+    } IPCRequestType;
+
+    typedef enum IPCSeekMode
+    {
+        IPC_SEEK_BEG,
+        IPC_SEEK_CUR,
+        IPC_SEEK_END
+    } IPCSeekMode;
 
     typedef enum IPCOpenMode
     {
@@ -42,7 +83,65 @@ extern "C"
         u32 length;
     } IPCIOVector;
 
-    typedef struct IPCRequestEx IPCRequestEx;
+    typedef struct IPCOpenArgs
+    {
+        const char* path;
+        IPCOpenMode mode;
+    } IPCOpenArgs;
+
+    typedef struct IPCReadWriteArgs
+    {
+        void* data;
+        u32 length;
+    } IPCReadWriteArgs;
+
+    typedef struct IPCSeekArgs
+    {
+        s32 offset;
+        IPCSeekMode mode;
+    } IPCSeekArgs;
+
+    typedef struct IPCIoctlArgs
+    {
+        s32 type;
+        void* in;
+        s32 inSize;
+        void* out;
+        s32 outSize;
+    } IPCIoctlArgs;
+
+    typedef struct IPCIoctlvArgs
+    {
+        s32 type;
+        u32 inCount;
+        u32 outCount;
+        IPCIOVector* vectors;
+    } IPCIoctlvArgs;
+
+    typedef struct IPCRequest
+    {
+        IPCRequestType type;
+        s32 ret;
+        s32 fd;
+        union
+        {
+            IPCOpenArgs open;
+            IPCReadWriteArgs rw;
+            IPCSeekArgs seek;
+            IPCIoctlArgs ioctl;
+            IPCIoctlvArgs ioctlv;
+        };
+    } IPCRequest;
+
+    typedef struct IPCRequestEx
+    {
+        IPCRequest base;
+        IPCAsyncCallback callback;
+        void* callbackArg;
+        BOOL reboot;
+        OSThreadQueue queue;
+        char padding[64 - 0x34];
+    } IPCRequestEx;
 
     void IPCInit(void);
     u32 IPCReadReg(s32 index);
@@ -51,7 +150,23 @@ extern "C"
     void* IPCGetBufferLo(void);
     void IPCSetBufferLo(void* lo);
 
+    s32 IPCCltInit(void);
+    s32 IOS_OpenAsync(const char* path, IPCOpenMode mode, IPCAsyncCallback callback,
+        void* callbackArg);
     s32 IOS_Open(const char* path, IPCOpenMode mode);
+    s32 IOS_CloseAsync(s32 fd, IPCAsyncCallback callback, void* callbackArg);
+    s32 IOS_Close(s32 fd);
+    s32 IOS_ReadAsync(s32 fd, void* buf, s32 len, IPCAsyncCallback callback,
+        void* callbackArg);
+    s32 IOS_Read(s32 fd, void* buf, s32 len);
+    s32 IOS_WriteAsync(s32 fd, const void* buf, s32 len, IPCAsyncCallback callback,
+        void* callbackArg);
+    s32 IOS_Write(s32 fd, const void* buf, s32 len);
+    s32 IOS_SeekAsync(s32 fd, s32 offset, IPCSeekMode mode,
+        IPCAsyncCallback callback, void* callbackArg);
+    s32 IOS_Seek(s32 fd, s32 offset, IPCSeekMode mode);
+    s32 IOS_IoctlvAsync(s32 fd, s32 type, s32 inCount, s32 outCount,
+        IPCIOVector* vectors, IPCAsyncCallback callback, void* callbackArg);
     s32 IOS_IoctlAsync(s32 fd, s32 type, void* in, s32 inSize, void* out, s32 outSize,
         IPCAsyncCallback callback, void* callbackArg);
     s32 IOS_Ioctl(s32 fd, s32 type, void* in, s32 inSize, void* out, s32 outSize);

@@ -32,9 +32,29 @@ PURE_INLINE dReal dDOT14(const dReal* a, const dReal* b)
 {
     return dDOTpq(a, b, 1, 4);
 }
+
+PURE_INLINE dReal dDOT41(const dReal* a, const dReal* b)
+{
+    return dDOTpq(a, b, 4, 1);
+}
+
+PURE_INLINE dReal dDOT44(const dReal* a, const dReal* b)
+{
+    return dDOTpq(a, b, 4, 4);
+}
+
+PURE_INLINE dReal dDISTANCE(const dReal a[3], const dReal b[3])
+{
+    return dSqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1])
+                 + (a[2] - b[2]) * (a[2] - b[2]));
+}
 #else
 #define dDOT(a, b) dDOTpq(a, b, 1, 1)
 #define dDOT14(a, b) dDOTpq(a, b, 1, 4)
+#define dDOT41(a, b) dDOTpq(a, b, 4, 1)
+#define dDISTANCE(a, b)                                                                  \
+    (dSqrt(((a)[0] - (b)[0]) * ((a)[0] - (b)[0]) + ((a)[1] - (b)[1]) * ((a)[1] - (b)[1]) \
+           + ((a)[2] - (b)[2]) * ((a)[2] - (b)[2])))
 #endif
 
 #define dCROSSMAT(A, a, skip, plus, minus) \
@@ -49,6 +69,11 @@ PURE_INLINE dReal dDOT14(const dReal* a, const dReal* b)
     (A)[0] op dDOT((B), (C));           \
     (A)[1] op dDOT((B) + 4, (C));       \
     (A)[2] op dDOT((B) + 8, (C))
+
+#define dMULTIPLYOP1_331(A, op, B, C) \
+    (A)[0] op dDOT41((B), (C));       \
+    (A)[1] op dDOT41((B) + 1, (C));   \
+    (A)[2] op dDOT41((B) + 2, (C))
 
 #define dMULTIPLYOP0_333(A, op, B, C)   \
     (A)[0] op dDOT14((B), (C));         \
@@ -69,12 +94,19 @@ PURE_INLINE void dMULTIPLY0_331(TA* A, const TB* B, const TC* C)
 }
 
 template <class TA, class TB, class TC>
+PURE_INLINE void dMULTIPLY1_331(TA* A, const TB* B, const TC* C)
+{
+    dMULTIPLYOP1_331(A, =, B, C);
+}
+
+template <class TA, class TB, class TC>
 PURE_INLINE void dMULTIPLY0_333(TA* A, const TB* B, const TC* C)
 {
     dMULTIPLYOP0_333(A, =, B, C);
 }
 #else
 #define dMULTIPLY0_331(A, B, C) dMULTIPLYOP0_331(A, =, B, C)
+#define dMULTIPLY1_331(A, B, C) dMULTIPLYOP1_331(A, =, B, C)
 #define dMULTIPLY0_333(A, B, C) dMULTIPLYOP0_333(A, =, B, C)
 #endif
 

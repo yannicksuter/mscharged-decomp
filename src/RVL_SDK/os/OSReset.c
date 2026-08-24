@@ -7,10 +7,6 @@ typedef struct SCIdleModeInfo {
     u8 wc24;
 } SCIdleModeInfo;
 
-typedef struct OSIOSRev {
-    u8 data[8];
-} OSIOSRev;
-
 typedef struct OSNandbootInfo {
     u8 unk_0x00[8];
     u32 returnValue;
@@ -50,7 +46,6 @@ void __OSGetIOSRev(OSIOSRev* rev);
 void SCInit(void);
 u32 SCCheckStatus(void);
 
-u8 fn_803B3CD4(void);
 void __OSLaunchMenu(void);
 void fn_803B6B00(void);
 void fn_803BE578(OSNandbootInfo* info);
@@ -60,18 +55,6 @@ void __VISetRGBModeImm(void);
 u32 __DVDGetCoverStatus(void);
 void __DVDPrepareReset(void);
 void fn_8040C264(SCIdleModeInfo* info);
-
-typedef struct OSExecParams {
-    BOOL valid;
-    u32 restartCode;
-    u32 bootDol;
-    void* regionStart;
-    void* regionEnd;
-    BOOL argsUseDefault;
-    void* argsAddr;
-} OSExecParams;
-
-extern OSExecParams __OSRebootParams;
 
 static u32 bootThisDol = 0;
 volatile BOOL __OSIsReturnToIdle = FALSE;
@@ -306,7 +289,7 @@ void OSShutdownSystemForBS(u32 resetCode) {
 void OSRestart(u32 resetCode) {
     u8 appType;
 
-    appType = fn_803B3CD4();
+    appType = OSGetAppType();
 
     __OSStopPlayRecord();
     __OSUnRegisterStateEvent();

@@ -1,8 +1,8 @@
 #include "NL/nlTask.h"
 
 #include "NL/nlDLRing.h"
+#include "NL/nlMemory.h"
 
-extern "C" void* fn_802AA79C(u32 size, u32 alignment, bool clear);
 extern "C" u32 fn_802AAA24();
 extern "C" float fn_802AAA78(u32 start, u32 end);
 extern "C" void fn_80371264();
@@ -18,7 +18,7 @@ float g_fTaskTimeLowerBound;
 
 void nlTaskManager::Startup(u32 initialState)
 {
-    m_pInstance = new (fn_802AA79C(sizeof(nlTaskManager), 8, false)) nlTaskManager;
+    m_pInstance = new (nlMalloc(sizeof(nlTaskManager), 8, false)) nlTaskManager;
     m_pInstance->mPreviousState = initialState;
     m_pInstance->mCurrentState = initialState;
     m_pInstance->mPendingState = initialState;

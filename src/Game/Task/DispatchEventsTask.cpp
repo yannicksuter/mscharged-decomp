@@ -1,5 +1,6 @@
 #include "NL/nlSlotPool.h"
 #include "NL/nlTask.h"
+#include "NL/nlMemory.h"
 
 #include "types.h"
 
@@ -90,7 +91,6 @@ public:
     EventDispatcher dispatcher;
 };
 
-extern "C" void* fn_802AA79C(u32, u32, bool);
 extern "C" void fn_802B467C(void*);
 
 inline void* operator new(unsigned long, void* memory)
@@ -103,7 +103,7 @@ DispatchEventsTask* gDispatchEventsTask;
 extern "C" void fn_80115F10()
 {
     gDispatchEventsTask =
-        new (fn_802AA79C(sizeof(DispatchEventsTask), 8, false)) DispatchEventsTask;
+        new (nlMalloc(sizeof(DispatchEventsTask), 8, false)) DispatchEventsTask;
 }
 
 extern "C" void fn_80115FB4()
