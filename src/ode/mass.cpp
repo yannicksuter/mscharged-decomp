@@ -14,163 +14,274 @@
 
 #define _I(i, j) I[(i) * 4 + (j)]
 
-static int checkMass(dMass* m);
+#define M_PI REAL(3.1415927)
 
-/* MWCC emits this TU's function bodies in reverse source order. */
+static int checkMass (dMass *m);
 
-void dMassAdjust(dMass* m, dReal newmass)
+void dMassAdd (dMass *a, const dMass *b)
 {
-    dReal scale;
-    int i;
-    int j;
-
-    dAASSERT(m);
-    scale = newmass / m->mass;
-    m->mass = newmass;
-    for (i = 0; i < 3; i++)
-        for (j = 0; j < 3; j++)
-            m->_I(i, j) *= scale;
+  int i;
+  dAASSERT (a && b);
+  dReal denom = dRecip (a->mass + b->mass);
+  for (i=0; i<3; i++) a->c[i] = (a->c[i]*a->mass + b->c[i]*b->mass)*denom;
+  a->mass += b->mass;
+  for (i=0; i<12; i++) a->I[i] += b->I[i];
 }
 
-void dMassSetBoxTotal(dMass* m, dReal total_mass, dReal lx, dReal ly,
-                      dReal lz)
+void dMassRotate (dMass *m, const dMatrix3 R)
 {
-    dAASSERT(m);
-    dMassSetZero(m);
-    m->mass = total_mass;
-    m->_I(0, 0) = total_mass / REAL(12.0) * (ly * ly + lz * lz);
-    m->_I(1, 1) = total_mass / REAL(12.0) * (lx * lx + lz * lz);
-    m->_I(2, 2) = total_mass / REAL(12.0) * (lx * lx + ly * ly);
+  // if the body is rotated by `R' relative to its point of reference,
+  // the new inertia about the point of reference is:
+  //
+  //   R * I * R'
+  //
+  // where I is the old inertia.
+
+  dMatrix3 t1;
+  dReal t2[3];
+
+  dAASSERT (m);
+
+  // rotate inertia matrix
+  dMULTIPLY2_333 (t1,m->I,R);
+  dMULTIPLY0_333 (m->I,R,t1);
+
+  // ensure perfect symmetry
+  m->_I(1,0) = m->_I(0,1);
+  m->_I(2,0) = m->_I(0,2);
+  m->_I(2,1) = m->_I(1,2);
+
+  // rotate center of mass
+  dMULTIPLY0_331 (t2,R,m->c);
+  m->c[0] = t2[0];
+  m->c[1] = t2[1];
+  m->c[2] = t2[2];
+
+# ifndef dNODEBUG
+  checkMass (m);
+# endif
 }
 
-void dMassSetCappedCylinderTotal(dMass* m, dReal total_mass, int direction,
-                                 dReal a, dReal b)
+void dMassTranslate (dMass *m, dReal x, dReal y, dReal z)
 {
-    dReal M1;
-    dReal M2;
-    dReal Ia;
-    dReal Ib;
-    dMassSetZero(m);
+  // if the body is translated by `a' relative to its point of reference,
+  // the new inertia about the point of reference is:
+  //
+  //   I + mass*(crossmat(c)^2 - crossmat(c+a)^2)
+  //
+  // where c is the existing center of mass and I is the old inertia.
 
-    dReal density = REAL(1.0);
-    dReal M1raw = REAL(3.1415927) * a * a * b;
-    M1 = density * M1raw;
-    M2 = REAL(4.1887903) * a * a * a * density;
-    m->mass = M1 + M2;
+  int i,j;
+  dMatrix3 ahat,chat,t1,t2;
+  dReal a[3];
 
-    Ia = M1 * (REAL(0.25) * a * a + REAL(0.083333336) * b * b)
-       + M2 * (REAL(0.4) * a * a + REAL(0.375) * a * b
-             + REAL(0.25) * b * b);
-    Ib = (M1 * REAL(0.5) + M2 * REAL(0.4)) * a * a;
+  dAASSERT (m);
 
-    m->_I(0, 0) = Ia;
-    m->_I(1, 1) = Ia;
-    m->_I(2, 2) = Ia;
-    m->_I(direction - 1, direction - 1) = Ib;
+  // adjust inertia matrix
+  dSetZero (chat,12);
+  dCROSSMAT (chat,m->c,4,+,-);
+  a[0] = x + m->c[0];
+  a[1] = y + m->c[1];
+  a[2] = z + m->c[2];
+  dSetZero (ahat,12);
+  dCROSSMAT (ahat,a,4,+,-);
+  dMULTIPLY0_333 (t1,ahat,ahat);
+  dMULTIPLY0_333 (t2,chat,chat);
+  for (i=0; i<3; i++) for (j=0; j<3; j++)
+    m->_I(i,j) += m->mass * (t2[i*4+j]-t1[i*4+j]);
 
-    dReal scale = total_mass / m->mass;
-    m->mass = total_mass;
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            m->_I(i, j) *= scale;
+  // ensure perfect symmetry
+  m->_I(1,0) = m->_I(0,1);
+  m->_I(2,0) = m->_I(0,2);
+  m->_I(2,1) = m->_I(1,2);
+
+  // adjust center of mass
+  m->c[0] += x;
+  m->c[1] += y;
+  m->c[2] += z;
+
+# ifndef dNODEBUG
+  checkMass (m);
+# endif
 }
 
-void dMassSetSphereTotal(dMass* m, dReal total_mass, dReal radius)
+void dMassAdjust (dMass *m, dReal newmass)
 {
-    dReal II;
+  dAASSERT (m);
+  dReal scale = newmass / m->mass;
+  m->mass = newmass;
+  for (int i=0; i<3; i++) for (int j=0; j<3; j++) m->_I(i,j) *= scale;
 
-    dAASSERT(m);
-    dMassSetZero(m);
-    m->mass = total_mass;
-    II = REAL(0.4) * total_mass * radius * radius;
-    m->_I(0, 0) = II;
-    m->_I(1, 1) = II;
-    m->_I(2, 2) = II;
+# ifndef dNODEBUG
+  checkMass (m);
+# endif
 }
 
-void dMassSetParameters(dMass* m, dReal themass, dReal cgx, dReal cgy,
-                        dReal cgz, dReal I11, dReal I22, dReal I33,
-                        dReal I12, dReal I13, dReal I23)
+void dMassSetBoxTotal (dMass *m, dReal total_mass,
+		       dReal lx, dReal ly, dReal lz)
 {
-    dAASSERT(m);
-    dMassSetZero(m);
-    m->mass = themass;
-    m->c[0] = cgx;
-    m->c[1] = cgy;
-    m->c[2] = cgz;
-    m->_I(0, 0) = I11;
-    m->_I(1, 1) = I22;
-    m->_I(2, 2) = I33;
-    m->_I(0, 1) = I12;
-    m->_I(0, 2) = I13;
-    m->_I(1, 2) = I23;
-    m->_I(1, 0) = I12;
-    m->_I(2, 0) = I13;
-    m->_I(2, 1) = I23;
-    checkMass(m);
+  dAASSERT (m);
+  dMassSetZero (m);
+  m->mass = total_mass;
+  m->_I(0,0) = total_mass/REAL(12.0) * (ly*ly + lz*lz);
+  m->_I(1,1) = total_mass/REAL(12.0) * (lx*lx + lz*lz);
+  m->_I(2,2) = total_mass/REAL(12.0) * (lx*lx + ly*ly);
+
+# ifndef dNODEBUG
+  checkMass (m);
+# endif
 }
 
-void dMassSetZero(dMass* m)
+void dMassSetBox (dMass *m, dReal density,
+		  dReal lx, dReal ly, dReal lz)
 {
-    dAASSERT(m);
-    m->mass = REAL(0.0);
-    dSetZero(m->c, sizeof(m->c) / sizeof(dReal));
-    dSetZero(m->I, sizeof(m->I) / sizeof(dReal));
+  dMassSetBoxTotal (m, lx*ly*lz*density, lx, ly, lz);
 }
 
-static int checkMass(dMass* m)
+void dMassSetCylinderTotal (dMass *m, dReal total_mass, int direction,
+			    dReal radius, dReal length)
 {
-    int i;
+  dReal r2,I;
+  dAASSERT (m);
+  dMassSetZero (m);
+  r2 = radius*radius;
+  m->mass = total_mass;
+  I = total_mass*(REAL(0.25)*r2 + (REAL(1.0)/REAL(12.0))*length*length);
+  m->_I(0,0) = I;
+  m->_I(1,1) = I;
+  m->_I(2,2) = I;
+  m->_I(direction-1,direction-1) = total_mass*REAL(0.5)*r2;
 
-    if (m->mass <= REAL(0.0)) {
-        dDEBUGMSG("mass must be > 0");
-        return 0;
-    }
-    if (!dIsPositiveDefinite(m->I, 3)) {
-        dDEBUGMSG("inertia must be positive definite");
-        return 0;
-    }
-
-    dMatrix3 I2, chat;
-    dSetZero(chat, 12);
-    dCROSSMAT(chat, m->c, 4, +, -);
-    dMULTIPLY0_333(I2, chat, chat);
-    for (i = 0; i < 3; i++)
-        I2[i] = m->I[i] + m->mass * I2[i];
-    for (i = 4; i < 7; i++)
-        I2[i] = m->I[i] + m->mass * I2[i];
-    for (i = 8; i < 11; i++)
-        I2[i] = m->I[i] + m->mass * I2[i];
-
-    if (!dIsPositiveDefinite(I2, 3)) {
-        dDEBUGMSG("center of mass inconsistent with mass parameters");
-        return 0;
-    }
-    return 1;
+# ifndef dNODEBUG
+  checkMass (m);
+# endif
 }
 
-/*
- * MWCC lays out this TU's literal pool using constants from all source
- * routines, including ODE entry points later removed by the linker. This
- * helper preserves that observable order. Its custom code section lies outside
- * the retail DOL layout, so the helper contributes no DOL code.
- */
-#pragma section code_type ".mass_literals"
-
-void massLiteralPoolOrder(float& v0, float& v1, float& v2, float& v3,
-                          float& v4, float& v5, float& v6, float& v7,
-                          float& v8, float& v9)
+void dMassSetCylinder (dMass *m, dReal density, int direction,
+		       dReal radius, dReal length)
 {
-    v0 = 0.0f;
-    v1 = 4.1887903f;
-    v2 = 0.4f;
-    v3 = 3.1415927f;
-    v4 = 0.25f;
-    v5 = 0.083333336f;
-    v6 = 0.375f;
-    v7 = 0.5f;
-    v8 = 1.0f;
-    v9 = 12.0f;
+  dMassSetCylinderTotal (m, M_PI*radius*radius*length*density,
+			    direction, radius, length);
 }
 
-#pragma section code_type
+void dMassSetCappedCylinderTotal (dMass *m, dReal total_mass, int direction,
+			     dReal a, dReal b)
+{
+  dMassSetCappedCylinder (m, 1.0, direction, a, b);
+  dMassAdjust (m, total_mass);
+}
+
+void dMassSetCappedCylinder (dMass *m, dReal density, int direction,
+			     dReal radius, dReal length)
+{
+  dReal M1,M2,Ia,Ib;
+  dAASSERT (m);
+  dUASSERT (direction >= 1 && direction <= 3,"bad direction number");
+  dMassSetZero (m);
+  M1 = M_PI*radius*radius*length*density;			// cylinder mass
+  M2 = (REAL(4.0)/REAL(3.0))*M_PI*radius*radius*radius*density;	// total cap mass
+  m->mass = M1+M2;
+  Ia = M1*(REAL(0.25)*radius*radius + (REAL(1.0)/REAL(12.0))*length*length) +
+    M2*(REAL(0.4)*radius*radius + REAL(0.375)*radius*length + REAL(0.25)*length*length);
+  Ib = (M1*REAL(0.5) + M2*REAL(0.4))*radius*radius;
+  m->_I(0,0) = Ia;
+  m->_I(1,1) = Ia;
+  m->_I(2,2) = Ia;
+  m->_I(direction-1,direction-1) = Ib;
+
+# ifndef dNODEBUG
+  checkMass (m);
+# endif
+}
+
+void dMassSetSphereTotal (dMass *m, dReal total_mass, dReal radius)
+{
+  dAASSERT (m);
+  dMassSetZero (m);
+  m->mass = total_mass;
+  dReal II = REAL(0.4) * total_mass * radius*radius;
+  m->_I(0,0) = II;
+  m->_I(1,1) = II;
+  m->_I(2,2) = II;
+
+# ifndef dNODEBUG
+  checkMass (m);
+# endif
+}
+
+void dMassSetSphere (dMass *m, dReal density, dReal radius)
+{
+  dMassSetSphereTotal (m, (REAL(4.0)/REAL(3.0)) * M_PI *
+			  radius*radius*radius * density, radius);
+}
+
+void dMassSetParameters (dMass *m, dReal themass,
+			 dReal cgx, dReal cgy, dReal cgz,
+			 dReal I11, dReal I22, dReal I33,
+			 dReal I12, dReal I13, dReal I23)
+{
+  dAASSERT (m);
+  dMassSetZero (m);
+  m->mass = themass;
+  m->c[0] = cgx;
+  m->c[1] = cgy;
+  m->c[2] = cgz;
+  m->_I(0,0) = I11;
+  m->_I(1,1) = I22;
+  m->_I(2,2) = I33;
+  m->_I(0,1) = I12;
+  m->_I(0,2) = I13;
+  m->_I(1,2) = I23;
+  m->_I(1,0) = I12;
+  m->_I(2,0) = I13;
+  m->_I(2,1) = I23;
+  checkMass (m);
+}
+
+void dMassSetZero (dMass *m)
+{
+  dAASSERT (m);
+  m->mass = REAL(0.0);
+  dSetZero (m->c,sizeof(m->c) / sizeof(dReal));
+  dSetZero (m->I,sizeof(m->I) / sizeof(dReal));
+}
+
+static int checkMass (dMass *m)
+{
+  int i;
+
+  if (m->mass <= 0) {
+    dDEBUGMSG ("mass must be > 0");
+    return 0;
+  }
+  if (!dIsPositiveDefinite (m->I,3)) {
+    dDEBUGMSG ("inertia must be positive definite");
+    return 0;
+  }
+
+  // verify that the center of mass position is consistent with the mass
+  // and inertia matrix. this is done by checking that the inertia around
+  // the center of mass is also positive definite. from the comment in
+  // dMassTranslate(), if the body is translated so that its center of mass
+  // is at the point of reference, then the new inertia is:
+  //   I + mass*crossmat(c)^2
+  // note that requiring this to be positive definite is exactly equivalent
+  // to requiring that the spatial inertia matrix
+  //   [ mass*eye(3,3)   M*crossmat(c)^T ]
+  //   [ M*crossmat(c)   I               ]
+  // is positive definite, given that I is PD and mass>0. see the theorem
+  // about partitioned PD matrices for proof.
+
+  dMatrix3 I2,chat;
+  dSetZero (chat,12);
+  dCROSSMAT (chat,m->c,4,+,-);
+  dMULTIPLY0_333 (I2,chat,chat);
+  for (i=0; i<3; i++) I2[i] = m->I[i] + m->mass*I2[i];
+  for (i=4; i<7; i++) I2[i] = m->I[i] + m->mass*I2[i];
+  for (i=8; i<11; i++) I2[i] = m->I[i] + m->mass*I2[i];
+  if (!dIsPositiveDefinite (I2,3)) {
+    dDEBUGMSG ("center of mass inconsistent with mass parameters");
+    return 0;
+  }
+  return 1;
+}

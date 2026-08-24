@@ -19,6 +19,15 @@ Game/AI/AiUtil.cpp:
 	.sdata      start:0x806DB3D8 end:0x806DB470
 	.sdata2     start:0x806E3080 end:0x806E30D0
 
+Game/Character.cpp:
+	.text       start:0x8001BA0C end:0x80025E9C
+	.ctors      start:0x804DB4FC end:0x804DB500
+	.rodata     start:0x804DBE58 end:0x804DBE68
+	.data       start:0x804F5078 end:0x804F7F18
+	.bss        start:0x8056B7B0 end:0x8056B800
+	.sdata      start:0x806DB5D8 end:0x806DB630
+	.sdata2     start:0x806E3240 end:0x806E32B0
+
 Game/AI/Fielder.cpp:
 	.text       start:0x8002DB1C end:0x80042A68
 	.ctors      start:0x804DB514 end:0x804DB518
@@ -61,6 +70,12 @@ Game/AI/Desire.cpp:
 Game/AI/Fuzzy.cpp:
 	.text       start:0x800E2FA8 end:0x800E30A8
 	.sdata2     start:0x806E42C8 end:0x806E42D4
+
+Game/DB/BasicGameInfo.cpp:
+	.text       start:0x800FBBA0 end:0x800FC20C
+	.ctors      start:0x804DB5D0 end:0x804DB5D4
+	.data       start:0x80505748 end:0x80506550
+	.sdata      start:0x806DC600 end:0x806DC68C
 
 Game/GameInfo.cpp:
 	.text       start:0x800FC20C end:0x800FDD54
@@ -128,6 +143,32 @@ Game/Drawable/DrawableBall.cpp:
 	.sdata      start:0x806DCB98 end:0x806DCBA0
 	.sdata2     start:0x806E4B80 end:0x806E4B98
 
+Game/Drawable/DrawableBulletBill.cpp:
+	.text       start:0x8017EE44 end:0x8017F3B4
+	.data       start:0x80511378 end:0x80511390
+	.sdata      start:0x806DCBA0 end:0x806DCBB4
+	.sdata2     start:0x806E4B98 end:0x806E4BB8
+
+Game/Drawable/DrawableBirdoEgg.cpp:
+	.text       start:0x8017F3D4 end:0x8017F9E4
+	.data       start:0x80511390 end:0x805113A8
+	.sdata      start:0x806DCBB8 end:0x806DCBD0
+	.sdata2     start:0x806E4BB8 end:0x806E4BD8
+
+Game/Drawable/DrawableFlyingCamera.cpp:
+	.text       start:0x8017FA04 end:0x8017FFCC
+	.ctors      start:0x804DB69C end:0x804DB6A0
+	.data       start:0x805113A8 end:0x805113D8
+	.sdata      start:0x806DCBD0 end:0x806DCBE8
+	.sbss       start:0x806E1408 end:0x806E140C
+	.sdata2     start:0x806E4BD8 end:0x806E4BF8
+
+Game/Drawable/DrawableKoopaShell.cpp:
+	.text       start:0x80180678 end:0x80180C70
+	.data       start:0x805113D8 end:0x805113F0
+	.sdata      start:0x806DCBF0 end:0x806DCC08
+	.sdata2     start:0x806E4C28 end:0x806E4C58
+
 Game/Drawable/DrawablePowerup.cpp:
 	.text       start:0x80180C90 end:0x80181518
 	.ctors      start:0x804DB6AC end:0x804DB6B0
@@ -135,9 +176,43 @@ Game/Drawable/DrawablePowerup.cpp:
 	.sdata      start:0x806DCC08 end:0x806DCC10
 	.sdata2     start:0x806E4C58 end:0x806E4C98
 
+Game/Drawable/DrawableThwomp.cpp:
+	.text       start:0x80181518 end:0x80181AAC
+	.data       start:0x80511420 end:0x80511438
+	.sdata      start:0x806DCC10 end:0x806DCC28
+	.sdata2     start:0x806E4C98 end:0x806E4CB0
+
+Game/Drawable/DrawableYoshiEgg.cpp:
+	.text       start:0x80181ACC end:0x801820DC
+	.data       start:0x80511438 end:0x80511450
+	.sdata      start:0x806DCC28 end:0x806DCC40
+	.sdata2     start:0x806E4CB0 end:0x806E4CD0
+
 Game/FE/GameSceneManager.cpp:
 	.text       start:0x801C6174 end:0x801C620C
 	.data       start:0x805170A8 end:0x805170C0
+
+Game/NisPlayer.cpp:
+	.text       start:0x8027B138 end:0x80280C84
+	.ctors      start:0x804DB7E8 end:0x804DB7EC
+	.data       start:0x80523200 end:0x80523644
+	.bss        start:0x8057AB50 end:0x8057AB68
+	.sdata      start:0x806DEE98 end:0x806DEF28
+	.sbss       start:0x806E19C0 end:0x806E19D8
+	.sdata2     start:0x806E5CB8 end:0x806E5CF8
+
+Game/Render/Nis.cpp:
+	.text       start:0x80280C84 end:0x80283D9C
+	.ctors      start:0x804DB7EC end:0x804DB7F0
+	.rodata     start:0x804E86E8 end:0x804E8700
+	.data       start:0x80523644 end:0x805237F0
+	.bss        start:0x8057AB68 end:0x8057ABB0
+	.sdata      start:0x806DEF28 end:0x806DEF60
+	.sbss       start:0x806E19D8 end:0x806E1A20
+	.sdata2     start:0x806E5CF8 end:0x806E5D18
+
+NL/nlAVLTree.cpp:
+	.text       start:0x802A8D80 end:0x802A9538
 
 NL/nlMath.cpp:
 	.text       start:0x802A9B98 end:0x802AA5F0
@@ -161,6 +236,10 @@ NL/nlString.cpp:
 Game/Sys/simpleparser.cpp:
 	.text       start:0x802AAFD0 end:0x802AB77C
 	.sdata      start:0x806DF1C8 end:0x806DF1D4
+
+NL/MemAlloc.cpp:
+	.text       start:0x802AE92C end:0x802AF51C
+	.data       start:0x8052B370 end:0x8052B490
 
 NL/nlConfig.cpp:
 	.text       start:0x802AF51C end:0x802B18E8
@@ -218,6 +297,10 @@ Game/Task/ProfilerTask.cpp:
 	.data       start:0x8052BA20 end:0x8052BA40
 	.sbss       start:0x806E1E10 end:0x806E1E18
 
+NL/nlBundleFile.cpp:
+	.text       start:0x802BDB70 end:0x802BE64C
+	.data       start:0x8052BA40 end:0x8052BA70
+
 NL/gl/glStat.cpp:
 	.text       start:0x802CCDFC end:0x802CCE00
 
@@ -237,6 +320,18 @@ Game/Task/ParticleUpdateTask.cpp:
 	.data       start:0x8052F3A0 end:0x8052F3C8
 	.sbss       start:0x806E2010 end:0x806E2018
 	.sdata2     start:0x806E65A0 end:0x806E65A8
+
+NL/nlLocalization.cpp:
+	.text       start:0x80302D04 end:0x80302F44
+	.rodata     start:0x804EB380 end:0x804EB410
+	.data       start:0x8052FE28 end:0x8052FEA8
+	.sdata      start:0x806DF518 end:0x806DF54C
+	.sbss       start:0x806E2088 end:0x806E208C
+	.sdata2     start:0x806E6718 end:0x806E6720
+
+NL/nlTextBox.cpp:
+	.text       start:0x80305778 end:0x80305D68
+	.sdata2     start:0x806E6748 end:0x806E6760
 
 Game/FE/BaseSceneHandler.cpp:
 	.text       start:0x803060FC end:0x8030616C
@@ -370,7 +465,7 @@ ode/ext/dRoundedCorner.cpp:
 ode/error.cpp:
 	.text       start:0x80352A60 end:0x80352C54
 	.data       start:0x80534610 end:0x8053463C
-	.sdata      start:0x806DF890 end:0x806DF89C
+	.sdata      start:0x806DF890 end:0x806DF89A
 	.sbss       start:0x806E21A0 end:0x806E21A8
 
 ode/joint.cpp:
@@ -415,10 +510,28 @@ ode/util.cpp:
 	.text       start:0x80358240 end:0x80358B08
 	.sdata2     start:0x806E6B70 end:0x806E6B88
 
+ode/body_debug.cpp:
+	.text       start:0x80358B08 end:0x80358E7C
+	.data       start:0x805346A8 end:0x80534738
+	.sdata      start:0x806DF8A0 end:0x806DF910
+
 ode/NLGAdditions.cpp:
 	.text       start:0x80358E7C end:0x8035952C
 	.data       start:0x80534738 end:0x80534750
 	.sdata2     start:0x806E6B88 end:0x806E6BA0
+
+NL/glx/glxGX.cpp:
+	.text       start:0x8036C23C end:0x8036CE48
+	.bss        start:0x8058A288 end:0x8058A508
+	.sbss       start:0x806E2318 end:0x806E2374
+	.sdata2     start:0x806E6D60 end:0x806E6D68
+
+NL/glx/glxSwap.cpp:
+	.text       start:0x8036CE48 end:0x8036D6F0
+	.data       start:0x805354C0 end:0x80535588
+	.sdata      start:0x806DFA78 end:0x806DFA94
+	.sbss       start:0x806E2378 end:0x806E23CC
+	.sdata2     start:0x806E6D68 end:0x806E6D6C
 
 NL/nlEndian.cpp:
 	.text       start:0x8036D6F0 end:0x8036D6F8
@@ -460,6 +573,63 @@ Runtime/Gecko_ExceptionPPC.cpp:
 Runtime/GCN_mem_alloc.c:
 	.text       start:0x8038DFF0 end:0x8038E160
 
+RVL_SDK/ai/ai.c:
+	.text       start:0x8038E160 end:0x8038E6C8
+	.data       start:0x80536C98 end:0x80536CE0
+	.sdata      start:0x806DFB70 end:0x806DFB74
+	.sbss       start:0x806E24E8 end:0x806E2524
+
+RVL_SDK/arc/arc.c:
+	.text       start:0x8038E6C8 end:0x8038F040
+	.data       start:0x80536CE0 end:0x80536D50
+	.sdata      start:0x806DFB78 end:0x806DFB80
+
+RVL_SDK/ax/AX.c:
+	.text       start:0x8038F040 end:0x8038F09C
+	.data       start:0x80536D50 end:0x80536D98
+	.sdata      start:0x806DFB80 end:0x806DFB84
+	.sbss       start:0x806E2528 end:0x806E252C
+
+RVL_SDK/ax/AXComp.c:
+	.data       start:0x80536E40 end:0x80537E00
+
+RVL_SDK/ax/DSPCode.c:
+	.data       start:0x80537E00 end:0x80539E00
+	.sdata      start:0x806DFB88 end:0x806DFB90
+
+RVL_SDK/ax/AXAlloc.c:
+	.text       start:0x8038F09C end:0x8038F554
+	.bss        start:0x805A3278 end:0x805A3378
+	.sbss       start:0x806E2530 end:0x806E2534
+
+RVL_SDK/ax/AXAux.c:
+	.text       start:0x8038F554 end:0x8038FD6C
+	.bss        start:0x805A3380 end:0x805A6500
+	.sbss       start:0x806E2538 end:0x806E2580
+
+RVL_SDK/ax/AXCL.c:
+	.text       start:0x8038FD6C end:0x803907F8
+	.bss        start:0x805A6500 end:0x805A6600
+	.sbss       start:0x806E2580 end:0x806E259C
+
+RVL_SDK/ax/AXOut.c:
+	.text       start:0x803907F8 end:0x80390FE4
+	.bss        start:0x805A6600 end:0x805A7400
+	.sbss       start:0x806E25A0 end:0x806E25DC
+
+RVL_SDK/ax/AXSPB.c:
+	.text       start:0x80390FE4 end:0x80391404
+	.bss        start:0x805A7400 end:0x805A7478
+	.sbss       start:0x806E25E0 end:0x806E2630
+
+RVL_SDK/ax/AXProf.c:
+	.text       start:0x80392BC0 end:0x80392C00
+	.sbss       start:0x806E2650 end:0x806E2660
+
+RVL_SDK/axfx/AXFXHooks.c:
+	.text       start:0x803959AC end:0x803959E4
+	.sdata      start:0x806DFB90 end:0x806DFB98
+
 RVL_SDK/base/PPCArch.c:
 	.text       start:0x803959E4 end:0x80395B54
 	.data       start:0x8053A160 end:0x8053A198
@@ -468,6 +638,40 @@ RVL_SDK/db/db.c:
 	.text       start:0x80395B54 end:0x80395C3C
 	.data       start:0x8053A198 end:0x8053A1B0
 	.sbss       start:0x806E2660 end:0x806E2668
+
+RVL_SDK/dsp/dsp.c:
+	.text       start:0x80395C3C end:0x80395E78
+	.data       start:0x8053A1B0 end:0x8053A230
+	.sdata      start:0x806DFB98 end:0x806DFB9C
+	.sbss       start:0x806E2668 end:0x806E266C
+
+RVL_SDK/dsp/dsp_debug.c:
+	.text       start:0x80395E78 end:0x80395EC8
+
+RVL_SDK/dsp/dsp_task.c:
+	.text       start:0x80395EC8 end:0x8039675C
+	.data       start:0x8053A230 end:0x8053A370
+	.sbss       start:0x806E2670 end:0x806E2688
+
+RVL_SDK/dvd/dvdqueue.c:
+	.text       start:0x8039B0F0 end:0x8039B348
+	.bss        start:0x805BD750 end:0x805BD770
+
+RVL_SDK/dvd/dvderror.c:
+	.text       start:0x8039B348 end:0x8039B650
+	.data       start:0x8053A700 end:0x8053A730
+	.bss        start:0x805BD780 end:0x805BD960
+	.sbss       start:0x806E2730 end:0x806E2734
+
+RVL_SDK/dvd/dvdidutils.c:
+	.text       start:0x8039B650 end:0x8039B740
+
+RVL_SDK/dvd/dvdFatal.c:
+	.text       start:0x8039B740 end:0x8039B87C
+	.rodata     start:0x804EC668 end:0x804EC684
+	.data       start:0x8053A730 end:0x8053ABE0
+	.sbss       start:0x806E2738 end:0x806E273C
+	.sdata2     start:0x806E7368 end:0x806E736C
 
 RVL_SDK/exi/EXIBios.c:
 	.text       start:0x8039D5D8 end:0x8039EE6C
@@ -482,6 +686,10 @@ RVL_SDK/exi/EXIUart.c:
 
 RVL_SDK/exi/EXICommon.c:
 	.text       start:0x8039F1A0 end:0x8039F32C
+
+RVL_SDK/gx/GXDisplayList.c:
+	.text       start:0x803A7190 end:0x803A7360
+	.bss        start:0x805BE248 end:0x805BE948
 
 RVL_SDK/ipc/ipcMain.c:
 	.text       start:0x803A827C end:0x803A8300
@@ -655,6 +863,30 @@ RVL_SDK/os/OSNet.c:
 	.text       start:0x803BE4D4 end:0x803BE578
 	.data       start:0x8054A568 end:0x8054A6D0
 
+RVL_SDK/os/OSNandbootInfo.c:
+	.text       start:0x803BE578 end:0x803BE868
+	.data       start:0x8054A6D0 end:0x8054A6EC
+
 RVL_SDK/os/__ppc_eabi_init.c:
 	.init       start:0x800063C8 end:0x80006420
 	.text       start:0x803BE868 end:0x803BE91C
+
+RVL_SDK/hbm/nw4hbm/ut/ut_FileStream.cpp:
+	.text       start:0x80479830 end:0x80479974
+	.ctors      start:0x804DBBA8 end:0x804DBBAC
+	.data       start:0x80560518 end:0x805605FC
+	.sbss       start:0x806E2E88 end:0x806E2E8C
+
+RVL_SDK/hbm/nw4hbm/ut/ut_IOStream.cpp:
+	.text       start:0x80479B38 end:0x80479D74
+	.ctors      start:0x804DBBAC end:0x804DBBB0
+	.data       start:0x80560678 end:0x80560740
+	.sbss       start:0x806E2E90 end:0x806E2E94
+
+RVL_SDK/hbm/nw4hbm/ut/ut_LinkList.cpp:
+	.text       start:0x80479D74 end:0x8047A2E0
+	.data       start:0x80560740 end:0x805608E8
+
+RVL_SDK/hbm/nw4hbm/ut/ut_list.cpp:
+	.text       start:0x8047A2E0 end:0x8047A688
+	.data       start:0x805608E8 end:0x80560948

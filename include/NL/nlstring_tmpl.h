@@ -7,25 +7,47 @@ CharT nlToUpper(CharT value);
 template <typename CharT>
 inline unsigned long nlStrLen(const CharT* str)
 {
-    unsigned long length = 0;
-    if (str != 0)
+    unsigned long n = 0;
+    if (str)
     {
-        while (str[length] != 0)
-        {
-            ++length;
-        }
+        while (str[n])
+            n++;
     }
-    return length;
+    return n;
 }
 
 template <typename CharT>
-inline CharT nlToLower(CharT value)
+inline CharT* nlStrNCpy(CharT* str1, const CharT* str2, unsigned long len)
 {
-    if (value >= 0x41 && value <= 0x5A)
+    unsigned long n;
+    int p;
+    unsigned long c;
+    n = len - 1;
+    p = 0;
+    goto test;
+loop:
+    p++;
+    str2++;
+test:
+    if (n-- == 0)
+        goto done;
+    c = *(const unsigned char*)str2;
+    str1[p] = c;
+    if ((CharT)c)
+        goto loop;
+done:
+    str1[p] = '\0';
+    return str1;
+}
+
+template <typename CharT>
+inline CharT nlToLower(CharT c)
+{
+    if ((c >= 0x41) && (c <= 0x5A))
     {
-        value = (CharT)(value | 0x20);
+        c = (CharT)(c | 0x20);
     }
-    return value;
+    return c;
 }
 
 template <typename CharT>

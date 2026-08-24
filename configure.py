@@ -210,6 +210,11 @@ cflags_base = [
     "-enc SJIS",
     "-i include",
     f"-i build/{config.version}/include",
+    "-i libs/Runtime/include",
+    "-i libs/MSL_C/include",
+    "-i libs/RVL_SDK/include",
+    "-i libs/MetroTRK/include",
+    "-i src/ode",
     f"-DBUILD_VERSION={version_num}",
     f"-DVERSION_{config.version}",
 ]
@@ -238,7 +243,6 @@ elif args.warn == "error":
 # immediately before the object it registers.
 cflags_game_common = [
     *cflags_base,
-    "-i libs/MSL_C/include",
     "-use_lmw_stmw on",
     "-pool off",
     "-DdNODEBUG=1",
@@ -257,8 +261,6 @@ cflags_game_deferred = [
 
 cflags_runtime = [
     *cflags_base,
-    "-i libs/Runtime/include",
-    "-i libs/MSL_C/include",
     "-use_lmw_stmw on",
     "-str reuse,pool,readonly",
     "-gccinc",
@@ -269,12 +271,18 @@ cflags_runtime = [
 # Revolution SDK library flags.
 cflags_rvl_sdk = [
     *cflags_base,
-    "-i libs/RVL_SDK/include",
-    "-i libs/MetroTRK/include",
-    "-i libs/MSL_C/include",
     "-inline auto",
     "-ipa file",
     "-fp_contract off",
+]
+
+# Home Button Menu library flags. R4QE01 links the HBM build dated
+# Dec  7 2006, whose nw4hbm assertions are compiled in: every retained
+# ut/lyt/snd routine still calls nw4hbm::db::Panic with its source file name
+# and an explicit line number.
+cflags_rvl_hbm = [
+    *cflags_rvl_sdk,
+    "-DHBM_ASSERT",
 ]
 
 # Open Dynamics Engine flags. R4QE01 uses the single-precision, assertions-off
@@ -282,7 +290,6 @@ cflags_rvl_sdk = [
 # GC/2.7; all tested GC/3.0 revisions through 3.0a5.2 emit the same code.
 cflags_ode = [
     *cflags_base,
-    "-i src/ode",
     "-inline auto",
     "-char signed",
     "-use_lmw_stmw on",
@@ -316,33 +323,50 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(Matching, "Game/AI/AiUtil.cpp"),
+            Object(NonMatching, "Game/Character.cpp", extra_cflags=["-inline deferred"]),
             Object(NonMatching, "Game/AI/Fielder.cpp"),
             Object(NonMatching, "Game/Goalie.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/AI/GoalieActions.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/AI/Desire.cpp"),
             Object(Matching, "Game/AI/Fuzzy.cpp"),
-            Object(Equivalent, "Game/AI/Variant.cpp", cflags=[*cflags_game_deferred, "-i libs/Runtime/include", "-char signed"]),
-            Object(NonMatching, "Game/GameInfo.cpp"),
+            Object(Equivalent, "Game/AI/Variant.cpp", cflags=[*cflags_game_deferred, "-char signed"]),
+            Object(Matching, "Game/DB/BasicGameInfo.cpp", extra_cflags=["-ipa file"]),
+            Object(NonMatching, "Game/GameInfo.cpp", extra_cflags=["-ipa file"]),
+            Object(NonMatching, "Game/NisPlayer.cpp", extra_cflags=["-inline deferred"]),
+            Object(NonMatching, "Game/Render/Nis.cpp", extra_cflags=["-inline deferred"]),
+            Object(Matching, "NL/nlAVLTree.cpp"),
             Object(Matching, "NL/nlMath.cpp"),
             Object(Matching, "NL/nlMemory.cpp"),
             Object(Matching, "NL/nlPrint.cpp"),
             Object(Matching, "NL/nlTicker.cpp"),
             Object(Matching, "NL/nlString.cpp"),
             Object(Matching, "Game/Sys/simpleparser.cpp"),
+            Object(NonMatching, "NL/MemAlloc.cpp"),
             Object(NonMatching, "NL/nlConfig.cpp"),
             Object(Matching, "NL/nlSlotPool.cpp"),
             Object(Matching, "NL/nlStringSupport.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "NL/nlTask.cpp"),
+            Object(Matching, "NL/nlLocalization.cpp"),
+            Object(Matching, "NL/nlBundleFile.cpp"),
+            Object(NonMatching, "NL/nlTextBox.cpp"),
             Object(Matching, "Game/Sys/clock.cpp"),
             Object(Matching, "NL/nlTimer.cpp"),
             Object(Matching, "NL/nlEndian.cpp"),
             Object(Matching, "NL/gl/glStat.cpp"),
             Object(Matching, "NL/gl/glState.cpp"),
             Object(Matching, "NL/gl/glStruct.cpp"),
+            Object(Matching, "NL/glx/glxGX.cpp"),
+            Object(Matching, "NL/glx/glxSwap.cpp", extra_cflags=["-inline noauto"]),
             Object(Matching, "Game/Drawable/DrawableNetMesh.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableCharacter.cpp"),
             Object(Matching, "Game/Drawable/DrawableBall.cpp"),
+            Object(NonMatching, "Game/Drawable/DrawableBulletBill.cpp"),
+            Object(NonMatching, "Game/Drawable/DrawableBirdoEgg.cpp"),
+            Object(NonMatching, "Game/Drawable/DrawableYoshiEgg.cpp"),
+            Object(NonMatching, "Game/Drawable/DrawableFlyingCamera.cpp"),
+            Object(NonMatching, "Game/Drawable/DrawableKoopaShell.cpp"),
             Object(Matching, "Game/Drawable/DrawablePowerup.cpp"),
+            Object(NonMatching, "Game/Drawable/DrawableThwomp.cpp"),
             Object(Matching, "Game/Task/WorldUpdateTask.cpp"),
             Object(Matching, "Game/Task/EndFrameTask.cpp"),
             Object(Matching, "Game/Task/NetworkUpdateTask.cpp"),
@@ -399,6 +423,7 @@ config.libs = [
             Object(NonMatching, "ode/quickstep.cpp"),
             Object(Matching, "ode/rotation.cpp", extra_cflags=["-inline deferred"]),
             Object(Matching, "ode/util.cpp"),
+            Object(NonMatching, "ode/body_debug.cpp"),
             Object(Matching, "ode/NLGAdditions.cpp"),
         ],
     },
@@ -426,6 +451,26 @@ config.libs = [
         "cflags": cflags_rvl_sdk,
         "progress_category": "sdk",
         "objects": [
+            Object(Matching, "RVL_SDK/arc/arc.c"),
+            Object(Matching, "RVL_SDK/ai/ai.c"),
+            Object(Matching, "RVL_SDK/ax/AX.c"),
+            Object(Matching, "RVL_SDK/ax/AXAlloc.c"),
+            Object(Matching, "RVL_SDK/ax/AXAux.c"),
+            Object(Matching, "RVL_SDK/ax/AXCL.c"),
+            Object(Matching, "RVL_SDK/ax/AXOut.c"),
+            Object(Matching, "RVL_SDK/ax/AXSPB.c"),
+            Object(Matching, "RVL_SDK/ax/AXProf.c"),
+            Object(Matching, "RVL_SDK/ax/AXComp.c"),
+            Object(Matching, "RVL_SDK/ax/DSPCode.c"),
+            Object(Matching, "RVL_SDK/dsp/dsp.c"),
+            Object(Matching, "RVL_SDK/dsp/dsp_debug.c"),
+            Object(Matching, "RVL_SDK/dsp/dsp_task.c"),
+            Object(Matching, "RVL_SDK/dvd/dvdqueue.c"),
+            Object(Matching, "RVL_SDK/dvd/dvderror.c"),
+            Object(Matching, "RVL_SDK/dvd/dvdidutils.c"),
+            Object(Matching, "RVL_SDK/dvd/dvdFatal.c"),
+            Object(Matching, "RVL_SDK/gx/GXDisplayList.c"),
+            Object(Matching, "RVL_SDK/axfx/AXFXHooks.c"),
             Object(Matching, "RVL_SDK/base/PPCArch.c"),
             Object(Matching, "RVL_SDK/db/db.c"),
             Object(Matching, "RVL_SDK/exi/EXIBios.c", extra_cflags=["-schedule off"]),
@@ -470,6 +515,11 @@ config.libs = [
             Object(Matching, "RVL_SDK/os/OSStateTM.c"),
             Object(Matching, "RVL_SDK/os/OSPlayRecord.c"),
             Object(Matching, "RVL_SDK/os/OSStateFlags.c"),
+            Object(Matching, "RVL_SDK/os/OSNandbootInfo.c"),
+            Object(Matching, "RVL_SDK/hbm/nw4hbm/ut/ut_FileStream.cpp", cflags=cflags_rvl_hbm),
+            Object(Matching, "RVL_SDK/hbm/nw4hbm/ut/ut_IOStream.cpp", cflags=cflags_rvl_hbm),
+            Object(Matching, "RVL_SDK/hbm/nw4hbm/ut/ut_LinkList.cpp", cflags=cflags_rvl_hbm),
+            Object(Matching, "RVL_SDK/hbm/nw4hbm/ut/ut_list.cpp", cflags=cflags_rvl_hbm),
         ],
     },
 ]

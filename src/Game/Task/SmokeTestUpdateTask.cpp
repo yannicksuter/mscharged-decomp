@@ -1,4 +1,5 @@
 #include "NL/nlTask.h"
+#include "NL/nlDebugFile.h"
 #include "NL/nlPrint.h"
 
 #include "types.h"
@@ -65,9 +66,6 @@ extern "C" void fn_802BD718(const char* name, const char* units, float value);
 
 extern "C" void fn_802BB048(void*, void*, void*, int, const char*, ...);
 extern "C" const char* fn_802C2D20(const char*, const char*);
-extern "C" void* fn_802B18E8(const char*, bool, bool);
-extern "C" void fn_802B19BC(void*, const char*, bool);
-extern "C" void fn_802B1A1C(void*);
 extern "C" void fn_8000C280(char*, const char*, const char*, u32);
 
 bool lbl_806E1DF0;
@@ -110,9 +108,9 @@ void SmokeTestUpdateTask::Run(float dt)
             lbl_806E1DF4();
         }
 
-        void* file = fn_802B18E8(sProfilePath, false, false);
-        fn_802B19BC(file, "\n", false);
-        fn_802B1A1C(file);
+        void* file = nlOpenFileDebug(sProfilePath, false, false);
+        nlWriteLineDebug(file, "\n", false);
+        nlCloseFileDebug(file);
         mComplete = true;
         return;
     }
@@ -140,9 +138,9 @@ extern "C" void fn_802BD644(const char* format, ...)
         va_start(args, format);
         nlVSNPrintf(sSmokeLogBuffer, sizeof(sSmokeLogBuffer), format, args);
 
-        void* file = fn_802B18E8(sSmokeLogPath, false, true);
-        fn_802B19BC(file, sSmokeLogBuffer, false);
-        fn_802B1A1C(file);
+        void* file = nlOpenFileDebug(sSmokeLogPath, false, true);
+        nlWriteLineDebug(file, sSmokeLogBuffer, false);
+        nlCloseFileDebug(file);
         va_end(args);
     }
 }

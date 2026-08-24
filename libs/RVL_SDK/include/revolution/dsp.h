@@ -38,6 +38,7 @@ typedef enum DSPHwReg {
     DSP_AI_DMA_BYTES_LEFT,
 } DSPHwReg;
 
+#define DSP_DSPMBOX_H_STATUS (1 << 15)
 #define DSP_CPUMBOX_H_STATUS (1 << 15)
 #define DSP_CSR_RES (1 << 11)
 #define DSP_CSR_DMAINT (1 << 9)
@@ -50,5 +51,82 @@ typedef enum DSPHwReg {
 #define DSP_CSR_HALT (1 << 2)
 
 #define DSP_AI_DMA_CSR_PLAY (1 << 15)
+
+#define DSP_SEND_MAIL_SYNC(x)          \
+    do {                               \
+        DSPSendMailToDSP((DSPMail)(u32)(x)); \
+        while (DSPCheckMailToDSP()) {  \
+            ;                          \
+        }                              \
+    } while (0)
+
+typedef struct OSContext OSContext;
+
+typedef void* DSPMail;
+
+typedef enum {
+    DSP_TASK_ACTIVE = (1 << 0),
+    DSP_TASK_CANCELED = (1 << 1),
+} DSPTaskFlags;
+
+typedef enum {
+    DSP_TASK_STATE_0,
+    DSP_TASK_STATE_1,
+    DSP_TASK_STATE_2,
+    DSP_TASK_STATE_3,
+} DSPTaskState;
+
+typedef struct DSPTask DSPTask;
+
+typedef void (*DSPTaskCallback)(DSPTask* task);
+
+typedef struct DSPTask {
+    /* 0x00 */ u32 state;
+    /* 0x04 */ volatile u32 prio;
+    /* 0x08 */ u32 flags;
+    /* 0x0C */ void* iramMmemAddr;
+    /* 0x10 */ u32 iramMmemLen;
+    /* 0x14 */ u32 iramDspAddr;
+    /* 0x18 */ void* dramMmemAddr;
+    /* 0x1C */ u32 dramMmemLen;
+    /* 0x20 */ u32 dramDspAddr;
+    /* 0x24 */ u16 startVector;
+    /* 0x26 */ u16 resumeVector;
+    /* 0x28 */ DSPTaskCallback initCallback;
+    /* 0x2C */ DSPTaskCallback resumeCallback;
+    /* 0x30 */ DSPTaskCallback doneCallback;
+    /* 0x34 */ DSPTaskCallback requestCallback;
+    /* 0x38 */ DSPTask* next;
+    /* 0x3C */ DSPTask* prev;
+    /* 0x40 */ char UNK_0x40[0x50 - 0x40];
+} DSPTask; // size = 0x50
+
+extern BOOL __DSP_rude_task_pending;
+extern DSPTask* __DSP_rude_task;
+extern DSPTask* __DSP_tmp_task;
+extern DSPTask* __DSP_last_task;
+extern DSPTask* __DSP_first_task;
+extern DSPTask* __DSP_curr_task;
+
+BOOL DSPCheckMailToDSP(void);
+BOOL DSPCheckMailFromDSP(void);
+DSPMail DSPReadMailFromDSP(void);
+void DSPSendMailToDSP(DSPMail mail);
+void DSPAssertInt(void);
+void DSPInit(void);
+BOOL DSPCheckInit(void);
+DSPTask* DSPAddTask(DSPTask* task);
+DSPTask* DSPAssertTask(DSPTask* task);
+
+void __DSP_debug_printf(const char* fmt, ...);
+
+void __DSPHandler(s16 intr, OSContext* ctx);
+void __DSP_exec_task(DSPTask* task1, DSPTask* task2);
+void __DSP_boot_task(DSPTask* task);
+void __DSP_insert_task(DSPTask* task);
+void __DSP_add_task(DSPTask* task);
+void __DSP_remove_task(DSPTask* task);
+
+#define DSP_CSR_PIINT (1 << 1)
 
 #endif  // REVOLUTION_DSP_H

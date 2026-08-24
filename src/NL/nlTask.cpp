@@ -43,12 +43,12 @@ void nlTaskManager::AddTask(nlTask* task, u32 priority, u32 activeStates)
     {
         if (currentTask->mPriority >= priority)
         {
-            currentTask = currentTask->mPrev;
+            currentTask = currentTask->m_prev;
             break;
         }
         else if (!nlDLRingIsEnd<nlTask>(m_pInstance->mTaskList, currentTask))
         {
-            currentTask = currentTask->mNext;
+            currentTask = currentTask->m_next;
         }
         else
         {
@@ -70,7 +70,7 @@ void nlTaskManager::RunAllTasks()
             currentTask->StateTransition(m_pInstance->mCurrentState, m_pInstance->mPendingState);
             if (!nlDLRingIsEnd<nlTask>(m_pInstance->mTaskList, currentTask))
             {
-                currentTask = currentTask->mNext;
+                currentTask = currentTask->m_next;
                 goto transition_loop;
             }
             m_pInstance->mPreviousState = m_pInstance->mCurrentState;
@@ -106,7 +106,7 @@ void nlTaskManager::RunAllTasks()
         }
         if (taskIterator != m_pInstance->mTaskList)
         {
-            taskIterator = taskIterator->mNext;
+            taskIterator = taskIterator->m_next;
             goto task_loop;
         }
     }

@@ -19,8 +19,6 @@
 #define MAX_ALLOC_SIZE \
     ((size_t)(dOBSTACK_ARENA_SIZE - sizeof(Arena) - EFFICIENT_ALIGNMENT + 1))
 
-/* MWCC emits this TU's function bodies in reverse source order. */
-
 void* dObStack::next(int num_bytes)
 {
     if (!current_arena)

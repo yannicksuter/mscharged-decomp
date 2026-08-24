@@ -147,30 +147,12 @@ GameInfoManager::GameInfoManager()
     fn_800FBCB0(mGameInfo[GM_MODE_4], 0);
 
     if (fn_802C2C84("User/skipfe", false)) {
-        mCurrentMode = GM_FRIENDLY;
-        unknown_0x122 = 0;
-        unknown_0x120 = 0;
-        mGameInfo[mCurrentMode]->mTeamIndex[0] = 3;
-
-        {
-            BasicGameInfo* info = mGameInfo[mCurrentMode];
-
-            for (int i = 0; i < 3; i++) {
-                info->mSidekickIndex[0][i] = 1;
-            }
-        }
-
-        mGameInfo[mCurrentMode]->mTeamIndex[1] = 0;
-
-        {
-            BasicGameInfo* info = mGameInfo[mCurrentMode];
-
-            for (int i = 0; i < 3; i++) {
-                info->mSidekickIndex[1][i] = 0;
-            }
-        }
-
-        mGameInfo[mCurrentMode]->mStadiumIndex = 13;
+        SetMode(GM_FRIENDLY, false);
+        SetTeam(0, 3);
+        SetSidekick(0, 1, -1);
+        SetTeam(1, 0);
+        SetSidekick(1, 0, -1);
+        SetStadium(13);
     }
 
     unknown_0x9C = fn_802B6594(-1, &lbl_806DF248);

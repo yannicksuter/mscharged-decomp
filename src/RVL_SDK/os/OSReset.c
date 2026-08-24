@@ -1,18 +1,12 @@
 #include <decomp.h>
 #include <revolution/os.h>
+#include <revolution/os/OSNandbootInfo.h>
 #include <mem.h>
 
 typedef struct SCIdleModeInfo {
     u8 standby;
     u8 wc24;
 } SCIdleModeInfo;
-
-typedef struct OSNandbootInfo {
-    u8 unk_0x00[8];
-    u32 returnValue;
-    u32 argValue;
-    u8 unk_0x10[0x1020 - 0x10];
-} OSNandbootInfo;
 
 enum {
     OS_STATE_FLAGS_SHUTDOWN_NONE = 0,
@@ -48,8 +42,6 @@ u32 SCCheckStatus(void);
 
 void __OSLaunchMenu(void);
 void fn_803B6B00(void);
-void fn_803BE578(OSNandbootInfo* info);
-void fn_803BE6D0(OSNandbootInfo* info);
 BOOL __PADDisableRecalibration(BOOL disable);
 void __VISetRGBModeImm(void);
 u32 __DVDGetCoverStatus(void);
@@ -269,10 +261,10 @@ void OSShutdownSystemForBS(u32 resetCode) {
     nandInfo = OSAllocFromMEM1ArenaLo(sizeof(OSNandbootInfo), 32);
     memset(nandInfo, 0, sizeof(OSNandbootInfo));
 
-    fn_803BE6D0(nandInfo);
+    __OSReadNandbootInfo(nandInfo);
     nandInfo->returnValue = 1;
     nandInfo->argValue = resetCode | 0x80000000;
-    fn_803BE578(nandInfo);
+    __OSWriteNandbootInfo(nandInfo);
 
     if (__OSReadStateFlags(&state)) {
         state.shutdownType = OS_STATE_FLAGS_SHUTDOWN_RETURN_MENU;

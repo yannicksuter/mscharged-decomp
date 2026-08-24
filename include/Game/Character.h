@@ -1,19 +1,85 @@
 #ifndef GAME_CHARACTER_H
 #define GAME_CHARACTER_H
 
+#include "NL/nlMath.h"
 #include "types.h"
 
-class PhysicsCharacterBase;
+class Blinker;
+class BlurHandler;
+class EffectsTexturing;
+class EffectsGroup;
+class EmissionController;
+class GLSkinMesh;
+class PhysicsCharacter;
 class cPN_SAnimController;
+class cPoseAccumulator;
+class cPoseNode;
+class glModel;
+
+enum eCharacterClass
+{
+    CHARACTER_CLASS_INVALID = -1,
+    BIRDO = 0,
+    DAISY = 1,
+    DONKEYKONG = 2,
+    HAMMERBROS = 3,
+    KOOPA = 4,
+    LUIGI = 5,
+    MARIO = 6,
+    PEACH = 7,
+    TOAD = 8,
+    WALUIGI = 9,
+    WARIO = 10,
+    YOSHI = 11,
+    MYSTERY = 12,
+};
+
+enum eMovementState
+{
+    MOVEMENT_COAST = 0,
+    MOVEMENT_DECELERATE_EXPONENTIAL = 1,
+    MOVEMENT_FROM_ANIM = 2,
+    MOVEMENT_FROM_ANIM_SEEK = 3,
+    MOVEMENT_NONE = 4,
+    MOVEMENT_RUNNING = 5,
+    MOVEMENT_RUNNING_NO_TURN = 6,
+    MOVEMENT_STRAFING = 7,
+    MOVEMENT_UNUSED = 8,
+};
+
+enum eClassTypes
+{
+    CHARACTER = 0,
+    PLAYER = 1,
+    FIELDER = 2,
+    GOALIE = 3,
+    NUM_CLASSES = 4,
+};
+
+enum eCharacterModelType
+{
+    CharModel_Rigid = 0,
+    CharModel_Blend = 1,
+    CharModel_Num = 2,
+};
 
 class cCharacter
 {
 public:
     virtual ~cCharacter();
-    virtual void fn_8001D608();
     virtual void PostPhysicsUpdate();
     virtual void PrePhysicsUpdate(float dt);
     virtual void PreUpdate(float dt);
+    virtual void SetAnimID(int animID);
+    virtual void Unknown5();
+    virtual void ResetEffects();
+    virtual void Unknown7();
+    virtual void Unknown8();
+    virtual void SetPosition(const nlVector3& position);
+    virtual void Unknown10();
+    virtual void Unknown11();
+    virtual void Unknown12();
+    virtual void Update(float fDeltaT);
 
     void SetAnimState(int animID, bool useBlendTime, float nonDefaultBlendTime,
         bool restartCyclic, bool forceMirrorSwap);
@@ -23,16 +89,85 @@ public:
             unsigned int, cPN_SAnimController*),
         unsigned int nPlaybackSpeedCallbackParam);
 
-protected:
-    /* 0x004 */ u8 mUnknown004[0x1C];
-    /* 0x020 */ PhysicsCharacterBase* m_pPhysicsCharacter;
-    /* 0x024 */ u8 mUnknown024[0x3C];
-    /* 0x060 */ unsigned short m_aDesiredFacingDirection;
-    /* 0x062 */ unsigned short m_aActualFacingDirection;
-    /* 0x064 */ u8 mUnknown064[0x64];
+    void SetElectrocutionTextureEnabled(bool isEnabled);
+    bool IsPlayingEffect(const EffectsGroup* effectGroup) const;
+    void EndEffect(const EffectsGroup* effectGroup);
+    void KillEffect(const EffectsGroup* effectGroup);
+    void PerformBlinking(GLSkinMesh* skinMesh, glModel* model) const;
+    void UpdateBlinking(float fDeltaT);
+    void SetVelocity(const nlVector3& velocity);
+    void SetFacingDirection(
+        unsigned short dir, bool bSetMovementDirection);
+    float SeekSpeedExponential(float currentValue, float targetValue,
+        float responsiveness, float deltaTime);
+    void InitMovementStrafing(float fDirectionSeekSpeed,
+        float fDirectionSeekFalloff, float fAccel, float fDecel);
+    void InitMovementRunningNoTurn(float fAccel, float fDecel);
+    void InitMovementRunning(float fDirectionSeekSpeed,
+        float fDirectionSeekFalloff, float fAccel, float fDecel);
+    void InitMovementNone(
+        float fDirectionSeekSpeed, float fDirectionSeekFalloff);
+    void InitMovementFromAnimSeek(
+        float fDirectionSeekSpeed, float fDirectionSeekFalloff);
+    void InitMovementFromAnim(short fDirectionSeekSpeed,
+        const nlVector3& v3AnimMoveAdjust, float fAdjustEndTime,
+        bool bBlended);
+    void InitMovementDecelerateExponential(float fDecel);
+    void InitMovementCoast();
+    void EndBlur();
+    nlVector3& GetPrevJointPosition(int jointIndex);
+    nlVector3& GetJointPosition(int jointIndex) const;
+    s16 GetFacingDeltaToPosition(const nlVector3& position);
+    void AttachEffect(EmissionController* pEmissionController);
+    GLSkinMesh* GetSkinMesh(int modelType) const;
+
+    /* 0x004 */ u8 unknown_0x004[0x04];
+    /* 0x008 */ GLSkinMesh* m_pSkinMesh[4];
+    /* 0x018 */ bool unknown_0x018[4];
+    /* 0x01C */ int m_ModelType;
+    /* 0x020 */ PhysicsCharacter* m_pPhysicsCharacter;
+    /* 0x024 */ eCharacterClass m_eCharacterClass;
+    /* 0x028 */ eMovementState m_eMovementState;
+    /* 0x02C */ bool m_bFromAnimBlended;
+    /* 0x02D */ u8 unknown_0x02D[0x03];
+    /* 0x030 */ nlVector3 m_v3Position;
+    /* 0x03C */ nlVector3 m_v3PrevPosition;
+    /* 0x048 */ nlVector3 m_v3Velocity;
+    /* 0x054 */ u8 unknown_0x054[0x0C];
+    /* 0x060 */ u16 m_aDesiredFacingDirection;
+    /* 0x062 */ u16 m_aActualFacingDirection;
+    /* 0x064 */ u16 m_aPrevFacingDirection;
+    /* 0x066 */ u16 m_aDesiredMovementDirection;
+    /* 0x068 */ u16 m_aActualMovementDirection;
+    /* 0x06A */ u8 unknown_0x06A[0x02];
+    /* 0x06C */ float m_fAnimAdjustBeginTime;
+    /* 0x070 */ float m_fAnimAdjustEndTime;
+    /* 0x074 */ float m_fDirectionSeekSpeed;
+    /* 0x078 */ float m_fDirectionSeekFalloff;
+    /* 0x07C */ float m_fAccel;
+    /* 0x080 */ float m_fDecel;
+    /* 0x084 */ float m_fDesiredSpeed;
+    /* 0x088 */ float m_fActualSpeed;
+    /* 0x08C */ float m_fLeanAmount;
+    /* 0x090 */ s16 m_nAnimTurnAdjust;
+    /* 0x092 */ u8 unknown_0x092[0x02];
+    /* 0x094 */ nlVector3 m_v3AnimMoveAdjust;
+    /* 0x0A0 */ u8 unknown_0x0A0[0x1C];
+    /* 0x0BC */ cPoseAccumulator* m_pPoseAccumulator;
+    /* 0x0C0 */ cPoseNode* m_pPoseTree;
+    /* 0x0C4 */ u32 unknown_0x0C4;
     /* 0x0C8 */ cPN_SAnimController* m_pCurrentAnimController;
     /* 0x0CC */ int m_eAnimID;
-    /* 0x0D0 */ u8 mUnknown0D0[0x114];
+    /* 0x0D0 */ u8 unknown_0x0D0[0x24];
+    /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;
+    /* 0x0F5 */ u8 unknown_0x0F5[0x2F];
+    /* 0x124 */ nlMatrix4 m_m4WorldMatrix;
+    /* 0x164 */ u8 unknown_0x164[0x0C];
+    /* 0x170 */ BlurHandler* m_pBlurHandler;
+    /* 0x174 */ Blinker* m_pBlinker;
+    /* 0x178 */ u8 unknown_0x178[0x38];
+    /* 0x1B0 */ EffectsTexturing* m_pEffectsTexturing;
+    /* 0x1B4 */ u8 unknown_0x1B4[0x30];
 }; // total size: 0x1E4
 
 #endif // GAME_CHARACTER_H

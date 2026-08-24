@@ -25,6 +25,7 @@
 
 extern "C" {
 void* memcpy(void* destination, const void* source, size_t size);
+void* memmove(void* destination, const void* source, size_t size);
 void dSetValue(dReal* a, int n, dReal value);
 void dMultiply0(dReal* A, const dReal* B, const dReal* C, int p, int q, int r);
 void dMultiply1(dReal* A, const dReal* B, const dReal* C, int p, int q, int r);
@@ -106,31 +107,31 @@ void dMultiply1(dReal* A, const dReal* B, const dReal* C, int p, int q, int r)
     }
 }
 
-// void dMultiply2(dReal* A, const dReal* B, const dReal* C, int p, int q, int r)
-// {
-//     int i, j, k, z, rpad, qskip;
-//     dReal sum;
-//     const dReal *bb, *cc;
-//     dAASSERT(A && B && C && p > 0 && q > 0 && r > 0);
-//     rpad = dPAD(r) - r;
-//     qskip = dPAD(q);
-//     bb = B;
-//     for (i = p; i; i--)
-//     {
-//         cc = C;
-//         for (j = r; j; j--)
-//         {
-//             z = 0;
-//             sum = 0;
-//             for (k = q; k; k--, z++)
-//                 sum += bb[z] * cc[z];
-//             *(A++) = sum;
-//             cc += qskip;
-//         }
-//         A += rpad;
-//         bb += qskip;
-//     }
-// }
+void dMultiply2(dReal* A, const dReal* B, const dReal* C, int p, int q, int r)
+{
+    int i, j, k, z, rpad, qskip;
+    dReal sum;
+    const dReal *bb, *cc;
+    dAASSERT(A && B && C && p > 0 && q > 0 && r > 0);
+    rpad = dPAD(r) - r;
+    qskip = dPAD(q);
+    bb = B;
+    for (i = p; i; i--)
+    {
+        cc = C;
+        for (j = r; j; j--)
+        {
+            z = 0;
+            sum = 0;
+            for (k = q; k; k--, z++)
+                sum += bb[z] * cc[z];
+            *(A++) = sum;
+            cc += qskip;
+        }
+        A += rpad;
+        bb += qskip;
+    }
+}
 
 int dFactorCholesky(dReal* A, int n)
 {
@@ -239,92 +240,20 @@ void dSolveL1T (const dReal *L, dReal *b, int n, int nskip)
 }
 */
 
-// void dVectorScale(dReal* a, const dReal* d, int n)
-// {
-//     dAASSERT(a && d && n >= 0);
-//     for (int i = 0; i < n; i++)
-//         a[i] *= d[i];
-// }
+void dVectorScale(dReal* a, const dReal* d, int n)
+{
+    dAASSERT(a && d && n >= 0);
+    for (int i = 0; i < n; i++)
+        a[i] *= d[i];
+}
 
-// void dSolveLDLT(const dReal* L, const dReal* d, dReal* b, int n, int nskip)
-// {
-//     dAASSERT(L && d && b && n > 0 && nskip >= n);
-//     dSolveL1(L, b, n, nskip);
-//     dVectorScale(b, d, n);
-//     dSolveL1T(L, b, n, nskip);
-// }
-
-// void dLDLTAddTL(dReal* L, dReal* d, const dReal* a, int n, int nskip)
-// {
-//     int j, p;
-//     dReal *W1, *W2, W11, W21, alpha1, alpha2, alphanew, gamma1, gamma2, k1, k2, Wp, ell, dee;
-//     dAASSERT(L && d && a && n > 0 && nskip >= n);
-
-//     if (n < 2)
-//         return;
-//     W1 = (dReal*)ALLOCA(n * sizeof(dReal));
-//     W2 = (dReal*)ALLOCA(n * sizeof(dReal));
-
-//     W1[0] = 0;
-//     W2[0] = 0;
-//     for (j = 1; j < n; j++)
-//         W1[j] = W2[j] = a[j] * M_SQRT1_2;
-//     W11 = (REAL(0.5) * a[0] + 1) * M_SQRT1_2;
-//     W21 = (REAL(0.5) * a[0] - 1) * M_SQRT1_2;
-
-//     alpha1 = 1;
-//     alpha2 = 1;
-
-//     dee = d[0];
-//     alphanew = alpha1 + (W11 * W11) * dee;
-//     dee /= alphanew;
-//     gamma1 = W11 * dee;
-//     dee *= alpha1;
-//     alpha1 = alphanew;
-//     alphanew = alpha2 - (W21 * W21) * dee;
-//     dee /= alphanew;
-//     gamma2 = W21 * dee;
-//     alpha2 = alphanew;
-//     k1 = REAL(1.0) - W21 * gamma1;
-//     k2 = W21 * gamma1 * W11 - W21;
-//     for (p = 1; p < n; p++)
-//     {
-//         Wp = W1[p];
-//         ell = L[p * nskip];
-//         W1[p] = Wp - W11 * ell;
-//         W2[p] = k1 * Wp + k2 * ell;
-//     }
-
-//     for (j = 1; j < n; j++)
-//     {
-//         dee = d[j];
-//         alphanew = alpha1 + (W1[j] * W1[j]) * dee;
-//         dee /= alphanew;
-//         gamma1 = W1[j] * dee;
-//         dee *= alpha1;
-//         alpha1 = alphanew;
-//         alphanew = alpha2 - (W2[j] * W2[j]) * dee;
-//         dee /= alphanew;
-//         gamma2 = W2[j] * dee;
-//         dee *= alpha2;
-//         d[j] = dee;
-//         alpha2 = alphanew;
-
-//         k1 = W1[j];
-//         k2 = W2[j];
-//         for (p = j + 1; p < n; p++)
-//         {
-//             ell = L[p * nskip + j];
-//             Wp = W1[p] - k1 * ell;
-//             ell += gamma1 * Wp;
-//             W1[p] = Wp;
-//             Wp = W2[p] - k2 * ell;
-//             ell -= gamma2 * Wp;
-//             W2[p] = Wp;
-//             L[p * nskip + j] = ell;
-//         }
-//     }
-// }
+void dSolveLDLT(const dReal* L, const dReal* d, dReal* b, int n, int nskip)
+{
+    dAASSERT(L && d && b && n > 0 && nskip >= n);
+    dSolveL1(L, b, n, nskip);
+    dVectorScale(b, d, n);
+    dSolveL1T(L, b, n, nskip);
+}
 
 // macros for dLDLTRemove() for accessing A - either access the matrix
 // directly or access it via row pointers. we are only supposed to reference
@@ -333,73 +262,61 @@ void dSolveL1T (const dReal *L, dReal *b, int n, int nskip)
 // indexes - this should not slow things down too much, as we don't do this
 // in an inner loop.
 
-// #define _GETA(i, j) (A[i][j])
-// #define _GETA(i,j) (A[(i)*nskip+(j)])
-// #define GETA(i, j) ((i > j) ? _GETA(i, j) : _GETA(j, i))
+#define _GETA(i, j) (A[i][j])
+#define GETA(i, j) ((i > j) ? _GETA(i, j) : _GETA(j, i))
 
-// void dLDLTRemove(dReal** A, const int* p, dReal* L, dReal* d,
-//     int n1, int n2, int r, int nskip)
-// {
-//     int i;
-//     dAASSERT(A && p && L && d && n1 > 0 && n2 > 0 && r >= 0 && r < n2 && n1 >= n2 && nskip >= n1);
-// #ifndef dNODEBUG
-//     for (i = 0; i < n2; i++)
-//         dIASSERT(p[i] >= 0 && p[i] < n1);
-// #endif
-
-//     if (r == n2 - 1)
-//     {
-//         return; // deleting last row/col is easy
-//     }
-//     else if (r == 0)
-//     {
-//         dReal* a = (dReal*)ALLOCA(n2 * sizeof(dReal));
-//         for (i = 0; i < n2; i++)
-//             a[i] = -GETA(p[i], p[0]);
-//         a[0] += REAL(1.0);
-//         dLDLTAddTL(L, d, a, n2, nskip);
-//     }
-//     else
-//     {
-//         dReal* t = (dReal*)ALLOCA(r * sizeof(dReal));
-//         dReal* a = (dReal*)ALLOCA((n2 - r) * sizeof(dReal));
-//         for (i = 0; i < r; i++)
-//             t[i] = L[r * nskip + i] / d[i];
-//         for (i = 0; i < (n2 - r); i++)
-//             a[i] = dDot(L + (r + i) * nskip, t, r) - GETA(p[r + i], p[r]);
-//         a[0] += REAL(1.0);
-//         dLDLTAddTL(L + r * nskip + r, d + r, a, n2 - r, nskip);
-//     }
-
-//     // snip out row/column r from L and d
-//     dRemoveRowCol(L, n2, nskip, r);
-//     if (r < (n2 - 1))
-//         memmove(d + r, d + r + 1, (n2 - r - 1) * sizeof(dReal));
-// }
-
-// void dRemoveRowCol(dReal* A, int n, int nskip, int r)
-// {
-//     int i;
-//     dAASSERT(A && n > 0 && nskip >= n && r >= 0 && r < n);
-//     if (r >= n - 1)
-//         return;
-//     if (r > 0)
-//     {
-//         for (i = 0; i < r; i++)
-//             memmove(A + i * nskip + r, A + i * nskip + r + 1, (n - r - 1) * sizeof(dReal));
-//         for (i = r; i < (n - 1); i++)
-//             memcpy(A + i * nskip, A + i * nskip + nskip, r * sizeof(dReal));
-//     }
-//     for (i = r; i < (n - 1); i++)
-//         memcpy(A + i * nskip + r, A + i * nskip + nskip + r + 1, (n - r - 1) * sizeof(dReal));
-// }
-
-/**
- * Stub only for field order; unreferenced so the linker drops it.
- * Forces emission of specific constants/operations so the compiler lays out the related fields to match the original binary.
- */
-void matrix_stub(float& v0, float& v1)
+void dLDLTRemove(dReal** A, const int* p, dReal* L, dReal* d,
+    int n1, int n2, int r, int nskip)
 {
-    v0 = 1.0f;
-    v1 = 0.0f;
+    int i;
+    dAASSERT(A && p && L && d && n1 > 0 && n2 > 0 && r >= 0 && r < n2 && n1 >= n2 && nskip >= n1);
+#ifndef dNODEBUG
+    for (i = 0; i < n2; i++)
+        dIASSERT(p[i] >= 0 && p[i] < n1);
+#endif
+
+    if (r == n2 - 1)
+    {
+        return;
+    }
+    else if (r == 0)
+    {
+        dReal* a = (dReal*)ALLOCA(n2 * sizeof(dReal));
+        for (i = 0; i < n2; i++)
+            a[i] = -GETA(p[i], p[0]);
+        a[0] += REAL(1.0);
+        dLDLTAddTL(L, d, a, n2, nskip);
+    }
+    else
+    {
+        dReal* t = (dReal*)ALLOCA(r * sizeof(dReal));
+        dReal* a = (dReal*)ALLOCA((n2 - r) * sizeof(dReal));
+        for (i = 0; i < r; i++)
+            t[i] = L[r * nskip + i] / d[i];
+        for (i = 0; i < (n2 - r); i++)
+            a[i] = dDot(L + (r + i) * nskip, t, r) - GETA(p[r + i], p[r]);
+        a[0] += REAL(1.0);
+        dLDLTAddTL(L + r * nskip + r, d + r, a, n2 - r, nskip);
+    }
+
+    dRemoveRowCol(L, n2, nskip, r);
+    if (r < (n2 - 1))
+        memmove(d + r, d + r + 1, (n2 - r - 1) * sizeof(dReal));
+}
+
+void dRemoveRowCol(dReal* A, int n, int nskip, int r)
+{
+    int i;
+    dAASSERT(A && n > 0 && nskip >= n && r >= 0 && r < n);
+    if (r >= n - 1)
+        return;
+    if (r > 0)
+    {
+        for (i = 0; i < r; i++)
+            memmove(A + i * nskip + r, A + i * nskip + r + 1, (n - r - 1) * sizeof(dReal));
+        for (i = r; i < (n - 1); i++)
+            memcpy(A + i * nskip, A + i * nskip + nskip, r * sizeof(dReal));
+    }
+    for (i = r; i < (n - 1); i++)
+        memcpy(A + i * nskip + r, A + i * nskip + nskip + r + 1, (n - r - 1) * sizeof(dReal));
 }

@@ -28,12 +28,23 @@ struct dMass {
 void dMassSetParameters(dMass* m, dReal mass, dReal cgx, dReal cgy,
                         dReal cgz, dReal I11, dReal I22, dReal I33,
                         dReal I12, dReal I13, dReal I23);
+void dMassSetSphere(dMass* m, dReal density, dReal radius);
 void dMassSetSphereTotal(dMass* m, dReal total_mass, dReal radius);
+void dMassSetCappedCylinder(dMass* m, dReal density, int direction,
+                            dReal radius, dReal length);
 void dMassSetCappedCylinderTotal(dMass* m, dReal total_mass, int direction,
                                  dReal radius, dReal length);
+void dMassSetCylinder(dMass* m, dReal density, int direction,
+                      dReal radius, dReal length);
+void dMassSetCylinderTotal(dMass* m, dReal total_mass, int direction,
+                           dReal radius, dReal length);
+void dMassSetBox(dMass* m, dReal density, dReal lx, dReal ly, dReal lz);
 void dMassSetBoxTotal(dMass* m, dReal total_mass, dReal lx, dReal ly,
                       dReal lz);
 void dMassAdjust(dMass* m, dReal newmass);
+void dMassTranslate(dMass* m, dReal x, dReal y, dReal z);
+void dMassRotate(dMass* m, const dMatrix3 R);
+void dMassAdd(dMass* a, const dMass* b);
 
 #ifdef __cplusplus
 }

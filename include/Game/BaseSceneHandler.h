@@ -15,8 +15,8 @@ public:
     virtual void Update() = 0;
     virtual void OnActivate() = 0;
 
-    /* 0x04 */ BaseScreenHandler* mNext;
-    /* 0x08 */ BaseScreenHandler* mPrev;
+    /* 0x04 */ BaseScreenHandler* m_next;
+    /* 0x08 */ BaseScreenHandler* m_prev;
     /* 0x0C */ TLInstance* mTLInstance;
     /* 0x10 */ FEScene* mFEScene;
 }; // size 0x14
