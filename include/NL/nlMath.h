@@ -41,6 +41,16 @@ inline int DegreesToAngle(float degrees)
     return (int)(65536.0f * degrees / 360.0f);
 }
 
+inline bool nlNear(float first, float second)
+{
+    return (float)__fabs(first - second) <= 0.0001f;
+}
+
+inline s16 nlAngleDiff(u16 a, u16 b)
+{
+    return (s16)(a - b);
+}
+
 #pragma cpp_extensions on
 
 class nlVector2
@@ -141,6 +151,40 @@ inline float nlGetLength3D(float x, float y, float z)
     float zz = z * z;
     const float lengthSquared = xx + yy + zz;
     return nlSqrt(lengthSquared, true);
+}
+
+inline float nlVec2DotProduct(const nlVector2& a, const nlVector2& b)
+{
+    return a.x * b.x + a.y * b.y;
+}
+
+inline float nlVec2LengthSquared(const nlVector2& v)
+{
+    return nlGetLengthSquared2D(v.x, v.y);
+}
+
+/**
+ * Vector-reference length. The single-expression form below is required by
+ * R4QE01 and is not interchangeable with nlGetLength2D()/nlGetLength3D():
+ * those keep their named per-component temporaries, which CodeWarrior
+ * schedules differently. Do not "unify" the two bodies.
+ */
+inline float nlVec2Length(const nlVector2& v)
+{
+    return nlSqrt(v.x * v.x + v.y * v.y, true);
+}
+
+inline float nlVec3Length(const nlVector3& v)
+{
+    return nlSqrt(v.x * v.x + v.y * v.y + v.z * v.z, true);
+}
+
+inline float nlVec3DistanceSquared2D(const nlVector3& a, const nlVector3& b)
+{
+    nlVector2 delta;
+    delta.x = a.x - b.x;
+    delta.y = a.y - b.y;
+    return nlGetLengthSquared2D(delta.x, delta.y);
 }
 
 inline void nlVec3Set(nlVector3& v0, float _x, float _y, float _z)
@@ -270,6 +314,16 @@ inline void nlVec4Set(nlVector4& v0, float _x, float _y, float _z, float _w)
 inline float nlPlaneDot(const nlVector4& plane, const nlVector3& v)
 {
     return v.x * plane.x + v.y * plane.y + v.z * plane.z + plane.w;
+}
+
+/**
+ * Signed side of a plane stored as (normal.xyz, distance), where the plane
+ * satisfies dot(normal, p) == w. Note the sign convention differs from
+ * nlPlaneDot(), which adds w instead of subtracting it.
+ */
+inline float nlPlaneSide(const nlVector3& point, const nlVector4& plane)
+{
+    return nlVec3DotProduct(point, *(const nlVector3*)&plane) - plane.w;
 }
 
 class nlMatrix3

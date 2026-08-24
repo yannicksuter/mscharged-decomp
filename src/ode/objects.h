@@ -38,7 +38,9 @@ enum
     dxBodyFlagFiniteRotationAxis = 2, // use finite rotations only along axis
     dxBodyDisabled = 4,               // body is disabled
     dxBodyNoGravity = 8,              // body is not influenced by gravity
-    dxBodyAutoDisable = 16            // enable auto-disable on body
+    dxBodyAutoDisable = 16,           // enable auto-disable on body
+    dxBodyLinearUpdateDisabled = 32,  // do not integrate linear velocity
+    dxBodyAngularUpdateDisabled = 64  // do not integrate angular velocity
 };
 
 // base class that does correct object allocation / deallocation

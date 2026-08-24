@@ -289,6 +289,12 @@ config.libs = [
         "cflags": cflags_base,
         "progress_category": "game",
         "objects": [
+            Object(
+                Matching,
+                "Game/AI/AiUtil.cpp",
+                extra_cflags=["-i libs/MSL_C/include"],
+            ),
+            Object(Matching, "Game/AI/Fuzzy.cpp"),
             Object(Matching, "NL/nlMath.cpp"),
             Object(Matching, "NL/nlTask.cpp"),
             Object(Matching, "NL/gl/glStat.cpp"),
@@ -338,6 +344,7 @@ config.libs = [
             Object(Matching, "ode/collision_space.cpp"),
             Object(Matching, "ode/collision_transform.cpp"),
             Object(Matching, "ode/ext/dFinitePlane.cpp"),
+            Object(Matching, "ode/ext/dRoundedCorner.cpp"),
             Object(Matching, "ode/error.cpp"),
             Object(Matching, "ode/joint.cpp"),
             Object(Matching, "ode/matrix.cpp"),
@@ -347,6 +354,7 @@ config.libs = [
             Object(Matching, "ode/odemath.cpp"),
             Object(Matching, "ode/ode.cpp"),
             Object(Matching, "ode/rotation.cpp", extra_cflags=["-inline deferred"]),
+            Object(Matching, "ode/util.cpp"),
             Object(Matching, "ode/NLGAdditions.cpp"),
         ],
     },

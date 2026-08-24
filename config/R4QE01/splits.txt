@@ -13,6 +13,16 @@ Sections:
 	.sdata2     type:rodata align:8
 	.sbss2      type:bss align:16
 
+Game/AI/AiUtil.cpp:
+	.text       start:0x8000821C end:0x80009628
+	.data       start:0x804F41C0 end:0x804F42A0
+	.sdata      start:0x806DB3D8 end:0x806DB470
+	.sdata2     start:0x806E3080 end:0x806E30D0
+
+Game/AI/Fuzzy.cpp:
+	.text       start:0x800E2FA8 end:0x800E30A8
+	.sdata2     start:0x806E42C8 end:0x806E42D4
+
 Game/Task/WorldUpdateTask.cpp:
 	.text       start:0x80112C70 end:0x80112C7C
 	.data       start:0x80507EA8 end:0x80507EC0
@@ -149,6 +159,11 @@ ode/ext/dFinitePlane.cpp:
 	.sdata      start:0x806DF880 end:0x806DF884
 	.sdata2     start:0x806E6AC8 end:0x806E6AD4
 
+ode/ext/dRoundedCorner.cpp:
+	.text       start:0x80352600 end:0x80352A60
+	.sdata      start:0x806DF888 end:0x806DF88C
+	.sdata2     start:0x806E6AD8 end:0x806E6AE4
+
 ode/error.cpp:
 	.text       start:0x80352A60 end:0x80352C54
 	.data       start:0x80534610 end:0x8053463C
@@ -188,6 +203,10 @@ ode/ode.cpp:
 ode/rotation.cpp:
 	.text       start:0x80357E24 end:0x80358240
 	.sdata2     start:0x806E6B60 end:0x806E6B70
+
+ode/util.cpp:
+	.text       start:0x80358240 end:0x80358B08
+	.sdata2     start:0x806E6B70 end:0x806E6B88
 
 ode/NLGAdditions.cpp:
 	.text       start:0x80358E7C end:0x8035952C
