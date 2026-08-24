@@ -324,7 +324,7 @@ config.libs = [
             Object(Matching, "NL/nlMath.cpp"),
             Object(Matching, "NL/nlTask.cpp"),
             Object(Matching, "NL/gl/glStat.cpp"),
-            Object(NonMatching, "NL/gl/glState.cpp"),
+            Object(Matching, "NL/gl/glState.cpp"),
             Object(Matching, "NL/gl/glStruct.cpp"),
             Object(Matching, "Game/Drawable/DrawableNetMesh.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableCharacter.cpp"),
