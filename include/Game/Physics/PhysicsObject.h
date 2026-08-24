@@ -48,10 +48,14 @@ public:
     void SetAngularVelocity(const nlVector3&);
     void SetLinearVelocity(const nlVector3&);
     void GetRotation(nlMatrix4*) const;
-    void SetRotation(const nlMatrix4&);
+    void SetRotation(const nlMatrix4&, CoordinateType = WORLD_COORDINATES);
     void GetPosition(nlVector3*) const;
     void SetPosition(const nlVector3&, CoordinateType);
     void SetDefaultCollideBits();
+    void SetDefaultContactInfo(dContact*);
+    void SetCategory(unsigned int);
+    void SetCollide(unsigned int);
+    nlVector3& GetPosition() const;
 
     /* 0x04 */ dBodyID m_bodyID;
     /* 0x08 */ dGeomID m_geomID;

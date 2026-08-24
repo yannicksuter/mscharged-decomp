@@ -241,6 +241,15 @@ Game/Physics/PhysicsCapsule.cpp:
 	.data       start:0x805303F0 end:0x80530420
 	.sdata2     start:0x806E68A0 end:0x806E68A4
 
+Game/Physics/PhysicsCharacterBase.cpp:
+	.text       start:0x8031C068 end:0x8031CF44
+	.data       start:0x80530420 end:0x805304F8
+	.sdata      start:0x806DF5E8 end:0x806DF600
+	.sdata2     start:0x806E68A8 end:0x806E68C8
+
+Game/Physics/PhysicsCharacterBaseData.cpp:
+	.data       start:0x805304F8 end:0x80530534
+
 Game/Physics/PhysicsPlane.cpp:
 	.text       start:0x80321530 end:0x803215DC
 	.data       start:0x80530638 end:0x80530668

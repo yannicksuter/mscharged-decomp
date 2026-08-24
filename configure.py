@@ -391,6 +391,8 @@ config.libs = [
             Object(Matching, "Game/Physics/CollisionSpace.cpp"),
             Object(Matching, "Game/Physics/PhysicsBox.cpp"),
             Object(Matching, "Game/Physics/PhysicsCapsule.cpp"),
+            Object(Matching, "Game/Physics/PhysicsCharacterBase.cpp"),
+            Object(Matching, "Game/Physics/PhysicsCharacterBaseData.cpp"),
             Object(Matching, "Game/Physics/PhysicsPlane.cpp"),
             Object(Matching, "Game/Physics/PhysicsRoundedCorner.cpp"),
             Object(Matching, "Game/Physics/PhysicsSphere.cpp"),

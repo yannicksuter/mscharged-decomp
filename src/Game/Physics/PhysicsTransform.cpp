@@ -99,7 +99,7 @@ void PhysicsTransform::SetSubObjectTransform(
     const nlMatrix4& transform, PhysicsObject::CoordinateType coordinateType)
 {
     nlVector3 position;
-    m_SubObject->SetRotation(transform);
+    m_SubObject->SetRotation(transform, coordinateType);
     float z = transform.e2[3][2];
     float y = transform.e2[3][1];
     float x = transform.e2[3][0];
