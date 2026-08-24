@@ -37,49 +37,6 @@ char* g_sSurfaceNames[6] = {
     "Thunder"
 };
 
-static inline void AiVec2Sub(nlVector2& result, const nlVector3& a, const nlVector3& b)
-{
-    float dy = a.y - b.y;
-    float dx = a.x - b.x;
-    result.x = dx;
-    result.y = dy;
-}
-
-static inline void AiVec2Sub(nlVector2& result, const nlVector2& a, const nlVector2& b)
-{
-    float dy = a.y - b.y;
-    float dx = a.x - b.x;
-    nlVec2Set(result, dx, dy);
-}
-
-static inline void AiVec3Sub(nlVector3& result, const nlVector3& a, const nlVector3& b)
-{
-    float x = a.x - b.x;
-    float y = a.y - b.y;
-    float z = a.z - b.z;
-    nlVec3Set(result, x, y, z);
-}
-
-static inline void AiVec2Add(nlVector2& result, const nlVector2& a, const nlVector2& b)
-{
-    float x = a.x + b.x;
-    float y = a.y + b.y;
-    nlVec2Set(result, x, y);
-}
-
-static inline float AiDistanceSquared2D(const nlVector3& a, const nlVector3& b)
-{
-    nlVector2 delta;
-    delta.x = a.x - b.x;
-    delta.y = a.y - b.y;
-    return nlGetLengthSquared2D(delta.x, delta.y);
-}
-
-static inline float AiPlaneSide(const nlVector3& point, const nlVector4& plane)
-{
-    return nlVec3DotProduct(point, *(const nlVector3*)&plane) - plane.w;
-}
-
 void MakePerpendicularPlane(const nlVector3& v3Position, unsigned short aNormalAngle, nlVector4& v4Plane, float fPlaneOffset)
 {
     float fSin;
@@ -112,8 +69,8 @@ void MakePerpendicularPlane(const nlVector3& v3Position, const nlVector3& v3Norm
 
 bool IsPointInCone(const nlVector3& v3Point, const nlVector3& v3Pivot, const nlVector3& v3Plane1, const nlVector3& v3Plane2)
 {
-    float distSqA = AiDistanceSquared2D(v3Plane1, v3Pivot);
-    float distSqP = AiDistanceSquared2D(v3Plane1, v3Point);
+    float distSqA = nlVec3DistanceSquared2D(v3Plane1, v3Pivot);
+    float distSqP = nlVec3DistanceSquared2D(v3Plane1, v3Point);
 
     if (distSqP < distSqA)
     {
@@ -134,8 +91,8 @@ bool IsPointInCone(const nlVector3& v3Point, const nlVector3& v3Pivot, const nlV
         float zeroVal = 0.0f;
         v4Plane.w = (v3Pivot.x * v4Plane.x + v3Pivot.y * v4Plane.y + v3Pivot.z * v4Plane.z) + zeroVal;
 
-        f32 sideLeft = AiPlaneSide(v3Plane1, v4Plane);
-        f32 sideRight = AiPlaneSide(v3Plane2, v4Plane);
+        f32 sideLeft = nlPlaneSide(v3Plane1, v4Plane);
+        f32 sideRight = nlPlaneSide(v3Plane2, v4Plane);
 
         if (sideLeft * sideRight < zeroVal)
         {
@@ -149,15 +106,10 @@ bool IsPointInCone(const nlVector3& v3Point, const nlVector3& v3Pivot, const nlV
 #undef abs
 extern "C" int abs(int n);
 
-static inline s16 AngleDiff(u16 a, u16 b)
-{
-    return (s16)(a - b);
-}
-
 unsigned short SeekDirection(unsigned short aCurrent, unsigned short aDesired, float fSeekSpeed, float fFalloff, float fDeltaT)
 {
     u16 current = aCurrent;
-    s16 diff = AngleDiff(aDesired, current);
+    s16 diff = nlAngleDiff(aDesired, current);
     signed short nDeltaDisplacement;
 
     if (diff != 0)
@@ -489,6 +441,16 @@ float AIsgn(float fValue)
     return -1.0f;
 }
 
+/*
+ * Matching scaffolding for GetClosestPointOnLineABFromPointC(), not reusable
+ * math -- keep all of it local to this file.
+ *
+ * AiIdentity() and AiMultiply() only fix operand order. AiClosestInitialSub(),
+ * AiClosestOffsetSub() and AiClosestSub() are textually identical on purpose:
+ * CodeWarrior expands each inline symbol independently, so folding them onto
+ * one name -- or onto nlMath.h's nlVec2Sub()/nlVec3Sub() -- shifts register
+ * allocation in both overloads and loses the match.
+ */
 static inline float AiIdentity(float value)
 {
     return value;
@@ -499,32 +461,17 @@ static inline float AiMultiply(float first, float second)
     return first * second;
 }
 
-static inline bool AiNear(float first, float second)
-{
-    return (float)fabs(first - second) <= 0.0001f;
-}
-
 static inline bool AiCoincident(const nlVector2& a, const nlVector2& b)
 {
-    return AiNear(b.x, AiIdentity(a.x))
-        && AiNear(b.y, AiIdentity(a.y));
+    return nlNear(b.x, AiIdentity(a.x))
+        && nlNear(b.y, AiIdentity(a.y));
 }
 
 static inline bool AiCoincident(const nlVector3& a, const nlVector3& b)
 {
-    return (AiNear(b.x, AiIdentity(a.x))
-        && AiNear(b.y, AiIdentity(a.y)))
-        && AiNear(b.z, AiIdentity(a.z));
-}
-
-static inline float AiClosestLength(const nlVector2& value)
-{
-    return nlSqrt(value.x * value.x + value.y * value.y, true);
-}
-
-static inline float AiClosestLength(const nlVector3& value)
-{
-    return nlSqrt(value.x * value.x + value.y * value.y + value.z * value.z, true);
+    return (nlNear(b.x, AiIdentity(a.x))
+        && nlNear(b.y, AiIdentity(a.y)))
+        && nlNear(b.z, AiIdentity(a.z));
 }
 
 static inline void AiClosestInitialSub(nlVector2& result, const nlVector2& a, const nlVector2& b)
@@ -547,20 +494,10 @@ static inline void AiClosestInitialSub(nlVector3& result, const nlVector3& a, co
     nlVec3Set(result, x, y, z);
 }
 
-static inline float AiClosestDot(const nlVector2& a, const nlVector2& b)
-{
-    return a.x * b.x + a.y * b.y;
-}
-
-static inline float AiClosestLengthSquared(const nlVector2& value)
-{
-    return value.x * value.x + value.y * value.y;
-}
-
 static inline float AiClosestProjectionFactor(const nlVector2& ac, const nlVector2& ab)
 {
-    float dot = AiClosestDot(ac, ab);
-    float length = AiClosestLengthSquared(ab);
+    float dot = nlVec2DotProduct(ac, ab);
+    float length = nlVec2LengthSquared(ab);
     return dot / length;
 }
 
@@ -667,17 +604,17 @@ nlVector3 GetClosestPointOnLineABFromPointC(const nlVector3& a, const nlVector3&
     AiClosestSub(toA, a, projected);
     AiClosestSub(toB, b, projected);
 
-    if (AiClosestLength(toA) > AiClosestLength(ab))
+    if (nlVec3Length(toA) > nlVec3Length(ab))
     {
         goto outside;
     }
-    if (!(AiClosestLength(toB) > AiClosestLength(ab)))
+    if (!(nlVec3Length(toB) > nlVec3Length(ab)))
     {
         goto projected_result;
     }
 
 outside:
-    if (AiClosestLength(toA) < AiClosestLength(toB))
+    if (nlVec3Length(toA) < nlVec3Length(toB))
     {
         return a;
     }
@@ -713,17 +650,17 @@ nlVector2 GetClosestPointOnLineABFromPointC(const nlVector2& a, const nlVector2&
     AiClosestSub(toA, a, projected);
     AiClosestSub(toB, b, projected);
 
-    if (AiClosestLength(toA) > AiClosestLength(ab))
+    if (nlVec2Length(toA) > nlVec2Length(ab))
     {
         goto outside;
     }
-    if (!(AiClosestLength(toB) > AiClosestLength(ab)))
+    if (!(nlVec2Length(toB) > nlVec2Length(ab)))
     {
         goto projected_result;
     }
 
 outside:
-    if (AiClosestLength(toA) < AiClosestLength(toB))
+    if (nlVec2Length(toA) < nlVec2Length(toB))
     {
         return a;
     }
