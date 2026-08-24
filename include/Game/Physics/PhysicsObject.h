@@ -6,6 +6,8 @@
 #include "ode/objects.h"
 
 class DebugWriteCache;
+class nlMatrix4;
+class nlVector3;
 class PhysicsWorld;
 
 enum ContactType
@@ -19,6 +21,12 @@ enum ContactType
 class PhysicsObject
 {
 public:
+    enum CoordinateType
+    {
+        WORLD_COORDINATES = 0,
+        RELATIVE_TO_PARENT = 1,
+    };
+
     PhysicsObject(PhysicsWorld*);
     virtual ~PhysicsObject();
 
@@ -32,6 +40,17 @@ public:
     virtual ContactType Contact(PhysicsObject*, dContact*, int, PhysicsObject*);
     virtual void SyncLog(void*, DebugWriteCache*);
 
+    void Reconnect(dSpaceID);
+    dSpaceID Disconnect();
+    void EnableCollisions();
+    void DisableCollisions();
+    void ZeroForceAccumulators();
+    void SetAngularVelocity(const nlVector3&);
+    void SetLinearVelocity(const nlVector3&);
+    void GetRotation(nlMatrix4*) const;
+    void SetRotation(const nlMatrix4&);
+    void GetPosition(nlVector3*) const;
+    void SetPosition(const nlVector3&, CoordinateType);
     void SetDefaultCollideBits();
 
     /* 0x04 */ dBodyID m_bodyID;

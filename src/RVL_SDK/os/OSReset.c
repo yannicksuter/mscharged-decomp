@@ -2,15 +2,6 @@
 #include <revolution/os.h>
 #include <mem.h>
 
-typedef struct OSStateFlags {
-    u32 checkSum;
-    u8 lastAppType;
-    u8 shutdownType;
-    u8 discState;
-    u8 menuMode;
-    u8 padding[24];
-} OSStateFlags;
-
 typedef struct SCIdleModeInfo {
     u8 standby;
     u8 wc24;
@@ -55,28 +46,13 @@ enum {
 
 OSThreadQueue __OSActiveThreadQueue AT_ADDRESS(OS_BASE_CACHED | 0x000000DC);
 
-void OSDisableScheduler(void);
-void OSEnableScheduler(void);
-BOOL __OSSyncSram(void);
-BOOL __OSGetRTCFlags(u32* flags);
-BOOL __OSClearRTCFlags(void);
-void __OSHotReset(void);
-void __OSShutdownToSBY(void);
 void __OSGetIOSRev(OSIOSRev* rev);
 void SCInit(void);
 u32 SCCheckStatus(void);
-void* OSAllocFromMEM1ArenaLo(u32 size, u32 align);
-void OSSetArenaLo(void* lo);
-void OSSetArenaHi(void* hi);
 
-void __OSStopAudioSystem(void);
-void LCDisable(void);
 u8 fn_803B3CD4(void);
 void __OSLaunchMenu(void);
 void fn_803B6B00(void);
-void __OSWriteStateFlags(OSStateFlags* flags);
-BOOL __OSReadStateFlags(OSStateFlags* flags);
-void __OSStopPlayRecord(void);
 void fn_803BE578(OSNandbootInfo* info);
 void fn_803BE6D0(OSNandbootInfo* info);
 BOOL __PADDisableRecalibration(BOOL disable);

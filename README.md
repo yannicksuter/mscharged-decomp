@@ -39,18 +39,18 @@ your own legally obtained copy of the game.
 
 Other regions and revisions are not configured.
 
-## Project status
+Decompilation
+=============
 
-The initial Wii project configuration and DOL analysis are complete. The
-generated splits rebuild the original `main.dol` byte-for-byte; source
-reconstruction is at an early stage. The disc contains no separate REL or RSO
-modules.
+Decompilation is the process of reverse-engineering compiled machine code back into human-readable source code. Unlike disassembly, which produces assembly language, decompilation aims to reconstruct high-level code (like C or C++) that closely matches what the original developers wrote. This process involves analyzing the binary executable, understanding its structure and behavior, and translating it back into source code that compiles to produce identical machine code. In this project, the goal is not just a close match, but a **100% match**—the decompiled source code must compile to produce byte-for-byte identical machine code to the original. This is why diffing (see the [Diffing](#diffing) section below) is an essential piece of the process, as it allows us to verify that our decompiled code produces exactly the same binary output as the original game. Decompilation projects like this one enable deeper understanding of game mechanics, facilitate modding and preservation, and serve as valuable learning resources for understanding how games were built.
 
-The bootstrap linker/compiler default is Metrowerks CodeWarrior `GC/3.0a5`.
-Exact compiler revisions are still being determined per library and translation
-unit. The first matched `Runtime.PPCEABI.H` units and ODE `obstack.cpp`
-reproduce across the tested `GC/3.0` revisions. `obstack.cpp` excludes
-`GC/2.7`, but cannot distinguish `GC/3.0a5` from the other tested 3.0 builds.
+Progress
+========
+
+![progress overview](https://decomp.dev/yannicksuter/mscharged-decomp/R4QE01.svg?mode=overview)
+
+Track the project decompilation progress and explore the interactive graph on [decomp.dev](https://decomp.dev/yannicksuter/mscharged-decomp).
+
 
 ## Dependencies
 

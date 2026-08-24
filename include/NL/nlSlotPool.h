@@ -6,6 +6,8 @@
 typedef void* (*SlotPoolAllocatorFunc)(unsigned long size);
 typedef void (*SlotPoolFreeFunc)(void* data);
 
+extern "C" void fn_802B467C(void* pool);
+
 struct SlotPoolBlock;
 struct SlotPoolEntry;
 
@@ -24,6 +26,61 @@ public:
     SlotPoolEntry* m_FreeList;
     SlotPoolAllocatorFunc m_AllocFn;
     SlotPoolFreeFunc m_FreeFn;
+};
+
+struct SlotPoolBlock
+{
+    SlotPoolBlock* next;
+};
+
+struct SlotPoolEntry
+{
+    SlotPoolEntry* next;
+};
+
+template <typename T>
+class SlotPool : public SlotPoolBase
+{
+public:
+    SlotPool(int initial, int delta)
+        : SlotPoolBase()
+    {
+        m_Delta = delta;
+        m_Initial = initial;
+        if (m_Initial == 0)
+        {
+            SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
+        }
+    }
+
+    ~SlotPool()
+    {
+        if (this != 0)
+        {
+            fn_802B467C(this);
+            SlotPoolBase::BaseFreeBlocks(this, sizeof(T));
+        }
+    }
+
+    void Allocate(T*& out)
+    {
+        if (m_FreeList == 0)
+        {
+            BaseAddNewBlock(this, sizeof(T));
+        }
+        if (m_FreeList != 0)
+        {
+            out = (T*)m_FreeList;
+            m_FreeList = m_FreeList->next;
+        }
+    }
+
+    void Free(T* entry)
+    {
+        SlotPoolEntry* slot = (SlotPoolEntry*)entry;
+        slot->next = m_FreeList;
+        m_FreeList = slot;
+    }
 };
 
 #endif // NL_SLOT_POOL_H

@@ -7,7 +7,7 @@ static OSStateFlags StateFlags __attribute__((aligned(32)));
 
 static u32 CheckSum(const OSStateFlags* state) {
     int i;
-    const u32* ptr = (const u32*)&state->BYTE_0x4;
+    const u32* ptr = (const u32*)&state->lastAppType;
     u32 checksum = 0;
 
     for (i = 0; i < (sizeof(OSStateFlags) / sizeof(u32)) - 1; i++) {
@@ -21,7 +21,7 @@ BOOL __OSWriteStateFlags(const OSStateFlags* state) {
     NANDFileInfo file;
 
     memcpy(&StateFlags, state, sizeof(OSStateFlags));
-    StateFlags.checksum = CheckSum(&StateFlags);
+    StateFlags.checkSum = CheckSum(&StateFlags);
 
     if (NANDOpen("/title/00000001/00000002/data/state.dat", &file,
                  NAND_ACCESS_WRITE) == NAND_RESULT_OK) {
@@ -58,7 +58,7 @@ BOOL __OSReadStateFlags(OSStateFlags* state) {
         return FALSE;
     }
 
-    if (CheckSum(&StateFlags) != StateFlags.checksum) {
+    if (CheckSum(&StateFlags) != StateFlags.checkSum) {
         memset(state, 0, sizeof(OSStateFlags));
         return FALSE;
     }
