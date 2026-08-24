@@ -1,4 +1,5 @@
 #include "NL/nlMath.h"
+#include "NL/gl/glState.h"
 
 struct UnidentifiedStaticState
 {
@@ -102,15 +103,6 @@ extern "C" nlMatrix4* fn_80368D70(nlMatrix4*, float, float, float);
 extern "C" nlMatrix4* fn_80368788(nlMatrix4*, const nlMatrix4*, const nlMatrix4*);
 extern "C" void* fn_802CC360(void*, int, int);
 extern "C" void fn_801869AC(void*, void*, int, int, const DrawablePowerup*, float);
-extern "C" void fn_802CD624(bool);
-extern "C" void fn_802CD1F0(int, u32);
-extern "C" u32 fn_802CD610();
-extern "C" void fn_802CD108(u32);
-extern "C" u32 fn_802CD180(const char*);
-extern "C" void fn_802CD0A8(u32, int);
-extern "C" void fn_802CD498(int, u32);
-extern "C" u32 fn_802CD618();
-extern "C" void fn_802CD134(u32);
 extern "C" u32 fn_8027262C();
 extern "C" bool fn_802C9664(glQuad3*, u32, int);
 
@@ -228,15 +220,15 @@ static void DrawShadow(float radius, float x, float y, float z)
     quad.mColour[1].packed = packed;
     quad.mColour[0].packed = packed;
 
-    fn_802CD624(true);
-    fn_802CD1F0(5, 1);
-    fn_802CD1F0(6, 0);
-    fn_802CD1F0(1, 0);
-    fn_802CD108(fn_802CD610());
+    glSetDefaultState(true);
+    glSetRasterState((eGLState)5, 1);
+    glSetRasterState((eGLState)6, 0);
+    glSetRasterState((eGLState)1, 0);
+    glSetCurrentRasterState(glHandleizeRasterState());
 
-    fn_802CD0A8(fn_802CD180("global/ball_shadow"), 0);
-    fn_802CD498(0, 3);
-    fn_802CD134(fn_802CD618());
+    glSetCurrentTexture(glGetTexture("global/ball_shadow"), (eGLTextureType)0);
+    glSetTextureState((eGLTextureState)0, 3);
+    glSetCurrentTextureState(glHandleizeTextureState());
 
     fn_802C9664(&quad, fn_8027262C(), 0);
 }

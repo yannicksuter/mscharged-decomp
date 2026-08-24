@@ -30,6 +30,11 @@ typedef int BOOL;
 typedef volatile BOOL vBOOL;
 
 typedef int bool;
+typedef int UNKWORD;
+typedef void UNKTYPE;
+#ifndef __cplusplus
+typedef unsigned short wchar_t;
+#endif
 
 #ifndef true
 #define true 1
@@ -54,6 +59,7 @@ typedef int bool;
 #endif
 
 #define DEFAULT_ALIGN 32
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
 
 int __abs(int value);
 

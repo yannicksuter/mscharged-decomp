@@ -200,7 +200,6 @@ cflags_base = [
     "-fp hardware",
     "-Cpp_exceptions off",
     "-O4,p",
-    "-inline auto",
     '-pragma "cats off"',
     '-pragma "warn_notinlined off"',
     "-maxerrors 1",
@@ -231,6 +230,23 @@ elif args.warn == "error":
     cflags_base.append("-W error")
 
 # Metrowerks library flags
+cflags_game_common = [
+    *cflags_base,
+    "-use_lmw_stmw on",
+    "-DdNODEBUG=1",
+    "-DdSINGLE=1",
+]
+
+cflags_game = [
+    *cflags_game_common,
+    "-inline auto",
+]
+
+cflags_game_deferred = [
+    *cflags_game_common,
+    "-inline auto,deferred",
+]
+
 cflags_runtime = [
     *cflags_base,
     "-i libs/Runtime/include",
@@ -247,6 +263,7 @@ cflags_rvl_sdk = [
     *cflags_base,
     "-i libs/RVL_SDK/include",
     "-i libs/MSL_C/include",
+    "-inline auto",
     "-ipa file",
     "-fp_contract off",
 ]
@@ -286,7 +303,7 @@ config.libs = [
     {
         "lib": "Game",
         "mw_version": config.linker_version,
-        "cflags": cflags_base,
+        "cflags": cflags_game,
         "progress_category": "game",
         "objects": [
             Object(
@@ -295,15 +312,21 @@ config.libs = [
                 extra_cflags=["-i libs/MSL_C/include"],
             ),
             Object(Matching, "Game/AI/Fuzzy.cpp"),
+            Object(
+                Equivalent,
+                "Game/AI/Variant.cpp",
+                cflags=[
+                    *cflags_game_deferred,
+                    "-i libs/Runtime/include",
+                    "-char signed",
+                ],
+            ),
             Object(Matching, "NL/nlMath.cpp"),
             Object(Matching, "NL/nlTask.cpp"),
             Object(Matching, "NL/gl/glStat.cpp"),
+            Object(Matching, "NL/gl/glState.cpp"),
             Object(Matching, "NL/gl/glStruct.cpp"),
-            Object(
-                Matching,
-                "Game/Drawable/DrawableNetMesh.cpp",
-                extra_cflags=["-use_lmw_stmw on"],
-            ),
+            Object(Matching, "Game/Drawable/DrawableNetMesh.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableCharacter.cpp"),
             Object(Matching, "Game/Drawable/DrawableBall.cpp"),
             Object(Matching, "Game/Drawable/DrawablePowerup.cpp"),
@@ -317,21 +340,11 @@ config.libs = [
             Object(Matching, "Game/Task/TweakerTask.cpp"),
             Object(Matching, "Game/Task/ProfilerTask.cpp"),
             Object(Matching, "Game/Task/ParticleUpdateTask.cpp"),
-            Object(
-                Matching,
-                "Game/Physics/PhysicsPlane.cpp",
-                extra_cflags=["-DdNODEBUG=1", "-DdSINGLE=1"],
-            ),
-            Object(
-                Matching,
-                "Game/Physics/PhysicsRoundedCorner.cpp",
-                extra_cflags=["-DdNODEBUG=1", "-DdSINGLE=1"],
-            ),
-            Object(
-                Matching,
-                "Game/Physics/PhysicsSphere.cpp",
-                extra_cflags=["-DdNODEBUG=1", "-DdSINGLE=1"],
-            ),
+            Object(NonMatching, "Game/FE/GameSceneManager.cpp"),
+            Object(Matching, "Game/FE/BaseSceneHandler.cpp"),
+            Object(Matching, "Game/Physics/PhysicsPlane.cpp"),
+            Object(Matching, "Game/Physics/PhysicsRoundedCorner.cpp"),
+            Object(Matching, "Game/Physics/PhysicsSphere.cpp"),
         ],
     },
     {
@@ -382,21 +395,40 @@ config.libs = [
         "cflags": cflags_rvl_sdk,
         "progress_category": "sdk",
         "objects": [
+            Object(Matching, "RVL_SDK/ipc/ipcMain.c"),
+            Object(Matching, "RVL_SDK/ipc/memory.c"),
+            Object(Matching, "RVL_SDK/ipc/ipcProfile.c"),
             Object(Matching, "RVL_SDK/mem/mem_heapCommon.c"),
             Object(Matching, "RVL_SDK/mem/mem_expHeap.c"),
             Object(Matching, "RVL_SDK/mem/mem_frameHeap.c"),
             Object(Matching, "RVL_SDK/mem/mem_unitHeap.c"),
             Object(Matching, "RVL_SDK/mem/mem_allocator.c"),
             Object(Matching, "RVL_SDK/mem/mem_list.c"),
+            Object(Matching, "RVL_SDK/os/OSAlarm.c"),
             Object(Matching, "RVL_SDK/os/OSAlloc.c"),
             Object(Matching, "RVL_SDK/os/OSArena.c"),
+            Object(Matching, "RVL_SDK/os/OSAudioSystem.c"),
+            Object(Matching, "RVL_SDK/os/OSCache.c"),
+            Object(Matching, "RVL_SDK/os/OSContext.c"),
+            Object(Matching, "RVL_SDK/os/OSError.c"),
+            Object(Matching, "RVL_SDK/os/OSFatal.c"),
+            Object(Matching, "RVL_SDK/os/OSFont.c"),
+            Object(Matching, "RVL_SDK/os/OSInterrupt.c"),
             Object(Matching, "RVL_SDK/os/OSLink.c"),
             Object(Matching, "RVL_SDK/os/OSMessage.c"),
+            Object(Matching, "RVL_SDK/os/OSMemory.c"),
             Object(Matching, "RVL_SDK/os/OSMutex.c"),
             Object(Matching, "RVL_SDK/os/OSReboot.c"),
+            Object(Matching, "RVL_SDK/os/OSReset.c"),
             Object(Matching, "RVL_SDK/os/OSRtc.c"),
+            Object(Matching, "RVL_SDK/os/OSSync.c"),
+            Object(Matching, "RVL_SDK/os/OSThread.c"),
+            Object(Matching, "RVL_SDK/os/OSTime.c"),
+            Object(Matching, "RVL_SDK/os/OSUtf.c"),
             Object(Matching, "RVL_SDK/os/OSIpc.c"),
             Object(Matching, "RVL_SDK/os/OSStateTM.c"),
+            Object(Matching, "RVL_SDK/os/OSPlayRecord.c"),
+            Object(Matching, "RVL_SDK/os/OSStateFlags.c"),
         ],
     },
 ]

@@ -33,6 +33,13 @@ inline void nlDLRingAddStart(T** head, T* newNode)
 }
 
 template <typename T>
+inline void nlDLRingAddEnd(T** head, T* newNode)
+{
+    nlDLRingAddStart(head, newNode);
+    *head = newNode;
+}
+
+template <typename T>
 inline T* nlDLRingGetStart(T* current)
 {
     if (current == 0)
