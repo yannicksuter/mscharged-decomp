@@ -115,6 +115,13 @@ Game/Task/ProfilerTask.cpp:
 NL/gl/glStat.cpp:
 	.text       start:0x802CCDFC end:0x802CCE00
 
+NL/gl/glState.cpp:
+	.text       start:0x802CCE00 end:0x802CD778
+	.data       start:0x8052E2F0 end:0x8052E410
+	.bss        start:0x8057F1C8 end:0x8057F1F8
+	.sbss       start:0x806E1EE0 end:0x806E1F00
+	.sdata2     start:0x806E6340 end:0x806E634C
+
 NL/gl/glStruct.cpp:
 	.text       start:0x802CD778 end:0x802CD7A0
 	.bss        start:0x8057F1F8 end:0x8057F220
@@ -124,6 +131,13 @@ Game/Task/ParticleUpdateTask.cpp:
 	.data       start:0x8052F3A0 end:0x8052F3C8
 	.sbss       start:0x806E2010 end:0x806E2018
 	.sdata2     start:0x806E65A0 end:0x806E65A8
+
+Game/AI/Variant.cpp:
+	.text       start:0x8031A104 end:0x8031B570
+	.ctors      start:0x804DBABC end:0x804DBAC0
+	.data       start:0x80530318 end:0x80530390
+	.bss        start:0x80584340 end:0x80584360
+	.sdata      start:0x806DF5C8 end:0x806DF5E8
 
 Game/Physics/PhysicsPlane.cpp:
 	.text       start:0x80321530 end:0x803215DC
@@ -293,6 +307,11 @@ RVL_SDK/os/OSMutex.c:
 RVL_SDK/os/OSReboot.c:
 	.text       start:0x803BA3F4 end:0x803BA468
 	.sbss       start:0x806E2928 end:0x806E2930
+
+RVL_SDK/os/OSReset.c:
+	.text       start:0x803BA468 end:0x803BABB4
+	.data       start:0x8053E4E0 end:0x8053E58C
+	.sbss       start:0x806E2930 end:0x806E2940
 
 RVL_SDK/os/OSRtc.c:
 	.text       start:0x803BABB4 end:0x803BB640

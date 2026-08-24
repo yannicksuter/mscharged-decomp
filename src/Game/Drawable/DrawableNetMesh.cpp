@@ -1,4 +1,5 @@
 #include "NL/nlMath.h"
+#include "NL/gl/glState.h"
 
 struct nlColour
 {
@@ -193,11 +194,10 @@ __declspec(weak) char WhiteTextureName[] = "global/white";
 __declspec(weak) char NetMeshTextureName[] = "global/netmesh";
 __declspec(weak) char CheckerTextureName[] = "global/checkers";
 
-extern "C" u32 fn_802CD180(const char*);
 
-u32 lbl_806E1320 = fn_802CD180(LightTextureName);
-u32 lbl_806E1324 = fn_802CD180(BlackTextureName);
-u32 lbl_806E1328 = fn_802CD180(WhiteTextureName);
+u32 lbl_806E1320 = glGetTexture(LightTextureName);
+u32 lbl_806E1324 = glGetTexture(BlackTextureName);
+u32 lbl_806E1328 = glGetTexture(WhiteTextureName);
 
 MeshResource* lbl_80570938[2][2];
 ModelHandle* lbl_80570948[2][2];
@@ -219,8 +219,8 @@ int lbl_806E1370[2];
 u8 lbl_806E1378;
 int lbl_806E137C;
 
-u32 lbl_806E1380 = fn_802CD180(NetMeshTextureName);
-u32 lbl_806E1384 = fn_802CD180(CheckerTextureName);
+u32 lbl_806E1380 = glGetTexture(NetMeshTextureName);
+u32 lbl_806E1384 = glGetTexture(CheckerTextureName);
 
 template <typename T>
 UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
@@ -239,20 +239,10 @@ extern "C" void __dla__FPv(void*);
 extern "C" void fn_802CC02C(MeshResource*);
 extern "C" float fn_8002D170(u32);
 extern "C" void fn_802C9254(u32, int, glQuad3*);
-extern "C" void fn_802CD0A8(u32, int);
-extern "C" void fn_802CD108();
-extern "C" void fn_802CD134();
-extern "C" void fn_802CD1F0(int, int);
-extern "C" void fn_802CD498(int, int);
-extern "C" void fn_802CD610();
-extern "C" void fn_802CD618();
-extern "C" void fn_802CD624(bool);
 extern "C" void fn_80368A28(nlMatrix4&, float);
-extern "C" void fn_802CBE70();
-extern "C" void fn_802CD168();
+extern "C" u32 fn_802CBE70();
 extern "C" WorldDarkening* fn_801AF510();
 extern "C" void nlBreak__Fv();
-extern "C" u32 fn_802CD090(int);
 extern "C" void* memcpy(void*, const void*, u32);
 extern "C" void fn_802CF510(u32, WriterModel*, bool);
 extern "C" void* fn_802AA79C(u32, u32, bool);
@@ -299,16 +289,14 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
     float netHeight = lbl_806DBD70;
     float netWidth = lbl_806DBD74;
 
-    fn_802CD624(true);
-    fn_802CD1F0(1, 1);
-    fn_802CD1F0(5, 1);
-    fn_802CD1F0(6, 0);
-    fn_802CD610();
-    fn_802CD108();
-    fn_802CD0A8(lbl_806E1328, 0);
-    fn_802CD498(0, 0);
-    fn_802CD618();
-    fn_802CD134();
+    glSetDefaultState(true);
+    glSetRasterState((eGLState)1, 1);
+    glSetRasterState((eGLState)5, 1);
+    glSetRasterState((eGLState)6, 0);
+    glSetCurrentRasterState(glHandleizeRasterState());
+    glSetCurrentTexture(lbl_806E1328, (eGLTextureType)0);
+    glSetTextureState((eGLTextureState)0, 0);
+    glSetCurrentTextureState(glHandleizeTextureState());
 
     nlMatrix4 matrix;
     fn_80368A28(matrix, 1.5707964f);
@@ -366,24 +354,22 @@ void DrawableNetMesh::Render() const
     nlVector3* sourcePositions = mPositions;
     shortVector2* sourceTexcoords = lbl_806E1338[mNetIndex];
 
-    fn_802CD624(true);
-    fn_802CD1F0(6, 0);
-    fn_802CD1F0(5, 1);
-    fn_802CD1F0(3, 1);
-    fn_802CD1F0(0, 1);
-    fn_802CD498(0, 0);
-    fn_802CD1F0(1, 1);
-    fn_802CD610();
-    fn_802CD108();
-    fn_802CBE70();
-    fn_802CD168();
+    glSetDefaultState(true);
+    glSetRasterState((eGLState)6, 0);
+    glSetRasterState((eGLState)5, 1);
+    glSetRasterState((eGLState)3, 1);
+    glSetRasterState((eGLState)0, 1);
+    glSetTextureState((eGLTextureState)0, 0);
+    glSetRasterState((eGLState)1, 1);
+    glSetCurrentRasterState(glHandleizeRasterState());
+    glSetCurrentProgram(fn_802CBE70());
 
     u32 texture = lbl_806E11AC;
     if (lbl_806E1378)
     {
         texture = lbl_806E1384;
     }
-    fn_802CD0A8(texture, 0);
+    glSetCurrentTexture(texture, (eGLTextureType)0);
 
     u16* indices = lbl_806E1348[mNetIndex];
     if ((!lbl_806E1368[mNetIndex] || mVisible == true)
@@ -444,7 +430,7 @@ void DrawableNetMesh::Render() const
         }
 
         memcpy(writer.model->data->header->colour, colour, sizeof(colour));
-        u32 state = fn_802CD090(0);
+        u32 state = glGetCurrentTexture((eGLTextureType)0);
         RenderHeader* header = writer.model->data->header;
         header->state = state;
         header->field4 = 0xFFFF;

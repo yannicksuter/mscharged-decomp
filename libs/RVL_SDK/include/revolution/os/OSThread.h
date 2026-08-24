@@ -43,11 +43,13 @@ struct OSThread {
     OSThreadQueue queueJoin;
     OSMutex* mutex;
     OSMutexQueue queueMutex;
+    OSThreadLink linkActive;
 };
 
 void OSInitThreadQueue(OSThreadQueue* queue);
 void OSSleepThread(OSThreadQueue* queue);
 void OSWakeupThread(OSThreadQueue* queue);
+void OSCancelThread(OSThread* thread);
 OSThread* OSGetCurrentThread(void);
 
 s32 __OSGetEffectivePriority(OSThread* thread);

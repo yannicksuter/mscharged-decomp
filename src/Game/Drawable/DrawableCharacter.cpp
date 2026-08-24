@@ -1,4 +1,7 @@
 #include "Game/Drawable/DrawableCharacter.h"
+#include "NL/gl/glState.h"
+
+extern "C" void* fn_802CDF0C();
 
 #pragma cpp_extensions on
 
@@ -91,11 +94,6 @@ struct PoseNode
 enum eGLBlend
 {
     GLB_None = 0,
-};
-
-enum eGLState
-{
-    GLS_AlphaBlend = 5,
 };
 
 struct EffectsTexturing
@@ -359,9 +357,6 @@ extern "C" void fn_802CC6C0(ModelPacket*, u32, u32);
 extern "C" float fn_802CC758(ModelPacket*, u32);
 extern "C" u32 fn_802CC7E4(ModelPacket*, u32);
 extern "C" bool fn_802CC8FC(ModelPacket*, u32);
-extern "C" u32 fn_802CD180(const char*);
-extern "C" u32 fn_802CD29C(u32&, eGLState, u32);
-extern "C" void* fn_802CDF0C();
 extern "C" ResolvedTexture fn_802CE1B8(void*, u32);
 extern "C" int fn_802DD1EC(void*, const nlVector3*, float);
 
@@ -402,9 +397,9 @@ float lbl_806DCB88 = 0.25f;
 float lbl_806DCB8C = 1.175f;
 float lbl_806DCB90 = 1.125f;
 
-u32 lbl_806E1388 = fn_802CD180(CharacterLightTextureName);
-u32 lbl_806E138C = fn_802CD180(CharacterBlackTextureName);
-u32 lbl_806E1390 = fn_802CD180(CharacterWhiteTextureName);
+u32 lbl_806E1388 = glGetTexture(CharacterLightTextureName);
+u32 lbl_806E138C = glGetTexture(CharacterBlackTextureName);
+u32 lbl_806E1390 = glGetTexture(CharacterWhiteTextureName);
 int lbl_806E1394;
 int lbl_806E1398;
 int lbl_806E139C;
@@ -1439,8 +1434,8 @@ void DrawableCharacter::ApplyMaterialEffects(
             u32& raster = packet->raster;
             if (texturing->blendMode != GLB_None)
             {
-                fn_802CD29C(
-                    raster, GLS_AlphaBlend, texturing->blendMode);
+                glSetRasterState(
+                    raster, GLS_AlphaBlend, (unsigned long)texturing->blendMode);
             }
 
             if (texturing->detail)
@@ -1491,7 +1486,7 @@ void DrawableCharacter::ApplyMaterialEffects(
         {
             if (scorchTexture == 0)
             {
-                scorchTexture = fn_802CD180(CharacterBlackTextureName);
+                scorchTexture = glGetTexture(CharacterBlackTextureName);
                 void* textureManager = fn_802CDF0C();
                 resolvedScorchTexture =
                     fn_802CE1B8(textureManager, scorchTexture);
@@ -1589,7 +1584,7 @@ void DrawableCharacter::ApplyDamageEffects(
              packet < model->packets + model->packetCount;
              packet = (ModelPacket*)((char*)packet + 0x30))
         {
-            fn_802CD29C(packet->raster, (eGLState)6, 2);
+            glSetRasterState(packet->raster, (eGLState)6, 2);
         }
     }
 
@@ -1602,7 +1597,7 @@ void DrawableCharacter::ApplyDamageEffects(
     if (damage1Enabled)
     {
         int characterIndex = fn_800FC748(lbl_806E0F54);
-        damageTexture = fn_802CD180(CharacterScorchTextureName);
+        damageTexture = glGetTexture(CharacterScorchTextureName);
         bool useDamageTexture = false;
         if (self->damageType != 1
             && (self->damageType == 2
