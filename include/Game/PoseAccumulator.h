@@ -5,6 +5,7 @@
 #include "types.h"
 
 class cSHierarchy;
+class cPoseNode;
 class nlMatrix4;
 class nlQuaternion;
 struct RotAccum;
@@ -33,10 +34,11 @@ public:
     nlMatrix4& GetNodeMatrix(int nodeIndex) const;
     void BlendRotIdentity(int nodeIndex, float weight);
     void BlendScaleIdentity(int nodeIndex, float weight);
+    void Pose(const cPoseNode& poseNode, const nlMatrix4& matrix);
 
     cSHierarchy* m_pHierarchy;
     nlMatrix4* m_pNodeMatrices;
-    u32 m_Unknown08;
+    nlMatrix4* m_PrevNodeMatrices;
     nlQuaternion* m_pQuaternions;
     RotAccum* m_pRotations;
     VectorAccum* m_pScales;

@@ -76,8 +76,6 @@ dxGeomTransform::~dxGeomTransform()
         delete obj;
 }
 
-// Compute the final position and rotation before compiling callers so that
-// CodeWarrior can apply the retail auto-inlining decision.
 void dxGeomTransform::computeFinalTx()
 {
     dMULTIPLY0_331(final_pos, R, obj->pos);

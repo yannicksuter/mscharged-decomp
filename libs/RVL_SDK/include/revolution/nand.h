@@ -96,7 +96,24 @@ struct NANDCommandBlock {
     const char** dir;
 };
 
+#define NAND_PERM_OTHER_READ (1 << 0)
+#define NAND_PERM_OTHER_WRITE (1 << 1)
+#define NAND_PERM_GROUP_READ (1 << 2)
+#define NAND_PERM_GROUP_WRITE (1 << 3)
+#define NAND_PERM_OWNER_READ (1 << 4)
+#define NAND_PERM_OWNER_WRITE (1 << 5)
+#define NAND_PERM_RALL \
+    (NAND_PERM_OTHER_READ | NAND_PERM_GROUP_READ | NAND_PERM_OWNER_READ)
+#define NAND_PERM_WALL \
+    (NAND_PERM_OTHER_WRITE | NAND_PERM_GROUP_WRITE | NAND_PERM_OWNER_WRITE)
+#define NAND_PERM_RWALL (NAND_PERM_RALL | NAND_PERM_WALL)
+#define NAND_PERM_ALL_RW 0x3F
+
 s32 NANDInit(void);
+s32 NANDPrivateCreate(const char* path, u8 perm, u8 attr);
+s32 NANDPrivateDelete(const char* path);
+s32 NANDPrivateGetStatus(const char* path, NANDStatus* status);
+s32 NANDPrivateOpen(const char* path, NANDFileInfo* info, u8 access);
 s32 NANDDelete(const char* path);
 s32 NANDOpen(const char* path, NANDFileInfo* info, u8 access);
 s32 NANDOpenAsync(const char* path, NANDFileInfo* info, u8 access,

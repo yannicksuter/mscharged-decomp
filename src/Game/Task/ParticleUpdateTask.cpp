@@ -41,7 +41,7 @@ void ParticleUpdateTask::Run(float dt)
     }
     if (mUpdateEnabled && update)
     {
-        void* manager = fn_802E7658();
+        void* manager = EmissionManager::Instance();
         fn_802E7720(manager, dt * mTimeScale);
     }
 
@@ -52,16 +52,16 @@ void ParticleUpdateTask::Run(float dt)
     }
     if (mRenderEnabled && render)
     {
-        void* manager = fn_802E7658();
+        void* manager = EmissionManager::Instance();
         fn_802E7B30(manager);
     }
 }
 
 void ParticleUpdateTask::Shutdown()
 {
-    if (fn_802E7658() != 0)
+    if (EmissionManager::Instance() != 0)
     {
-        fn_802E6DF8(fn_802E7658());
+        fn_802E6DF8(EmissionManager::Instance());
     }
 }
 
@@ -70,8 +70,9 @@ void ParticleUpdateTask::Initialize(void* context, int parameter1, int parameter
     mContext = context;
     mParameter1 = parameter1;
     mParameter2 = parameter2;
-    fn_802E7658();
-    fn_802E6C20(fn_802E7658(), context, parameter1, parameter2);
+    EmissionManager::Instance();
+    fn_802E6C20(
+        EmissionManager::Instance(), context, parameter1, parameter2);
 }
 
 void ParticleUpdateTask::StartLoading(bool first, bool second, bool third, bool fourth)

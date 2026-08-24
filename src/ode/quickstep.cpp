@@ -34,23 +34,6 @@ extern "C" void* memcpy(void*, const void*, size_t);
 #define dFabs(x) ((float)__fabs(float(x)))
 #define dInfinity (3.402823466e+38F)
 
-#define dMULTIPLYOP2_333(A, op, B, C) \
-    (A)[0] op dDOT((B), (C));          \
-    (A)[1] op dDOT((B), (C) + 4);      \
-    (A)[2] op dDOT((B), (C) + 8);      \
-    (A)[4] op dDOT((B) + 4, (C));      \
-    (A)[5] op dDOT((B) + 4, (C) + 4);  \
-    (A)[6] op dDOT((B) + 4, (C) + 8);  \
-    (A)[8] op dDOT((B) + 8, (C));      \
-    (A)[9] op dDOT((B) + 8, (C) + 4);  \
-    (A)[10] op dDOT((B) + 8, (C) + 8)
-
-template <class TA, class TB, class TC>
-inline void dMULTIPLY2_333(TA* A, const TB* B, const TC* C)
-{
-    dMULTIPLYOP2_333(A, =, B, C);
-}
-
 template <class TA, class TB, class TC>
 inline void dMULTIPLYADD0_331(TA* A, const TB* B, const TC* C)
 {

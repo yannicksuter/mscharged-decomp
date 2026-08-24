@@ -495,7 +495,7 @@ void Config::Set(const char* tag, const String& value)
     Set(tag, value.c_str());
 }
 
-static void* ConfigParserAllocate(unsigned long size, unsigned int alignment, bool fromEnd);
+void* ConfigParserAllocate(unsigned long size, unsigned int alignment, bool fromEnd);
 
 #pragma dont_inline on
 void Config::Parse(const char* data, int size, Parser& parser)
@@ -610,7 +610,7 @@ void SetTagValuePair::Comment(const char*, unsigned int)
 #pragma inline_depth()
 #pragma inline_max_size()
 
-static void* ConfigParserAllocate(unsigned long size, unsigned int alignment, bool fromEnd)
+void* ConfigParserAllocate(unsigned long size, unsigned int alignment, bool fromEnd)
 {
     return nlMalloc(size, alignment, fromEnd);
 }

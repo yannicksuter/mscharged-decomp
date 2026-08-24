@@ -6,6 +6,16 @@
 #include <ode/rotation.h>
 #include <ode/odemath.h>
 
+extern "C"
+{
+    float sinf(float);
+    float cosf(float);
+}
+
+#define dRecipSqrt(x) ((float)(1.0f / dSqrt(x)))
+#define dSin(x)       ((float)sinf(float(x)))
+#define dCos(x)       ((float)cosf(float(x)))
+
 #define _R(i, j) R[(i) * 4 + (j)]
 
 #define SET_3x3_IDENTITY   \
@@ -21,8 +31,6 @@
     _R(2, 1) = REAL(0.0); \
     _R(2, 2) = REAL(1.0); \
     _R(2, 3) = REAL(0.0);
-
-/* MWCC emits this TU's function bodies in reverse source order. */
 
 void dDQfromW(dReal dq[4], const dVector3 w, const dQuaternion q)
 {
@@ -112,6 +120,33 @@ void dRfromQ(dMatrix3 R, const dQuaternion q)
     _R(2, 2) = 1 - qq1 - qq2;
 }
 
+void dQMultiply3(dQuaternion qa, const dQuaternion qb, const dQuaternion qc)
+{
+    dAASSERT(qa && qb && qc);
+    qa[0] = qb[0] * qc[0] - qb[1] * qc[1] - qb[2] * qc[2] - qb[3] * qc[3];
+    qa[1] = -qb[0] * qc[1] - qb[1] * qc[0] + qb[2] * qc[3] - qb[3] * qc[2];
+    qa[2] = -qb[0] * qc[2] - qb[2] * qc[0] + qb[3] * qc[1] - qb[1] * qc[3];
+    qa[3] = -qb[0] * qc[3] - qb[3] * qc[0] + qb[1] * qc[2] - qb[2] * qc[1];
+}
+
+void dQMultiply2(dQuaternion qa, const dQuaternion qb, const dQuaternion qc)
+{
+    dAASSERT(qa && qb && qc);
+    qa[0] = qb[0] * qc[0] + qb[1] * qc[1] + qb[2] * qc[2] + qb[3] * qc[3];
+    qa[1] = -qb[0] * qc[1] + qb[1] * qc[0] - qb[2] * qc[3] + qb[3] * qc[2];
+    qa[2] = -qb[0] * qc[2] + qb[2] * qc[0] - qb[3] * qc[1] + qb[1] * qc[3];
+    qa[3] = -qb[0] * qc[3] + qb[3] * qc[0] - qb[1] * qc[2] + qb[2] * qc[1];
+}
+
+void dQMultiply1(dQuaternion qa, const dQuaternion qb, const dQuaternion qc)
+{
+    dAASSERT(qa && qb && qc);
+    qa[0] = qb[0] * qc[0] + qb[1] * qc[1] + qb[2] * qc[2] + qb[3] * qc[3];
+    qa[1] = qb[0] * qc[1] - qb[1] * qc[0] - qb[2] * qc[3] + qb[3] * qc[2];
+    qa[2] = qb[0] * qc[2] - qb[2] * qc[0] - qb[3] * qc[1] + qb[1] * qc[3];
+    qa[3] = qb[0] * qc[3] - qb[3] * qc[0] - qb[1] * qc[2] + qb[2] * qc[1];
+}
+
 void dQMultiply0(dQuaternion qa, const dQuaternion qb, const dQuaternion qc)
 {
     dAASSERT(qa && qb && qc);
@@ -121,21 +156,129 @@ void dQMultiply0(dQuaternion qa, const dQuaternion qb, const dQuaternion qc)
     qa[3] = qb[0] * qc[3] + qb[3] * qc[0] + qb[1] * qc[2] - qb[2] * qc[1];
 }
 
+void dQFromAxisAndAngle(dQuaternion q, dReal ax, dReal ay, dReal az,
+    dReal angle)
+{
+    dAASSERT(q);
+    dReal l = ax * ax + ay * ay + az * az;
+    if (l > REAL(0.0))
+    {
+        angle *= REAL(0.5);
+        q[0] = dCos(angle);
+        l = dSin(angle) * dRecipSqrt(l);
+        q[1] = ax * l;
+        q[2] = ay * l;
+        q[3] = az * l;
+    }
+    else
+    {
+        q[0] = 1;
+        q[1] = 0;
+        q[2] = 0;
+        q[3] = 0;
+    }
+}
+
+void dQSetIdentity(dQuaternion q)
+{
+    dAASSERT(q);
+    q[0] = 1;
+    q[1] = 0;
+    q[2] = 0;
+    q[3] = 0;
+}
+
+void dRFromZAxis(dMatrix3 R, dReal ax, dReal ay, dReal az)
+{
+    dVector3 n, p, q;
+    n[0] = ax;
+    n[1] = ay;
+    n[2] = az;
+    dNormalize3(n);
+    dPlaneSpace(n, p, q);
+    _R(0, 0) = p[0];
+    _R(1, 0) = p[1];
+    _R(2, 0) = p[2];
+    _R(0, 1) = q[0];
+    _R(1, 1) = q[1];
+    _R(2, 1) = q[2];
+    _R(0, 2) = n[0];
+    _R(1, 2) = n[1];
+    _R(2, 2) = n[2];
+}
+
+void dRFrom2Axes(dMatrix3 R, dReal ax, dReal ay, dReal az,
+    dReal bx, dReal by, dReal bz)
+{
+    dReal l, k;
+    dAASSERT(R);
+    l = dSqrt(ax * ax + ay * ay + az * az);
+    if (l <= REAL(0.0))
+    {
+        dDEBUGMSG("zero length vector");
+        return;
+    }
+    l = dRecip(l);
+    ax *= l;
+    ay *= l;
+    az *= l;
+    k = ax * bx + ay * by + az * bz;
+    bx -= k * ax;
+    by -= k * ay;
+    bz -= k * az;
+    l = dSqrt(bx * bx + by * by + bz * bz);
+    if (l <= REAL(0.0))
+    {
+        dDEBUGMSG("zero length vector");
+        return;
+    }
+    l = dRecip(l);
+    bx *= l;
+    by *= l;
+    bz *= l;
+    _R(0, 0) = ax;
+    _R(1, 0) = ay;
+    _R(2, 0) = az;
+    _R(0, 1) = bx;
+    _R(1, 1) = by;
+    _R(2, 1) = bz;
+    _R(0, 2) = -by * az + ay * bz;
+    _R(1, 2) = -bz * ax + az * bx;
+    _R(2, 2) = -bx * ay + ax * by;
+}
+
+void dRFromEulerAngles(dMatrix3 R, dReal phi, dReal theta, dReal psi)
+{
+    dReal sphi, cphi, stheta, ctheta, spsi, cpsi;
+    dAASSERT(R);
+    sphi = dSin(phi);
+    cphi = dCos(phi);
+    stheta = dSin(theta);
+    ctheta = dCos(theta);
+    spsi = dSin(psi);
+    cpsi = dCos(psi);
+    _R(0, 0) = cpsi * ctheta;
+    _R(0, 1) = spsi * ctheta;
+    _R(0, 2) = -stheta;
+    _R(1, 0) = cpsi * stheta * sphi - spsi * cphi;
+    _R(1, 1) = spsi * stheta * sphi + cpsi * cphi;
+    _R(1, 2) = ctheta * sphi;
+    _R(2, 0) = cpsi * stheta * cphi + spsi * sphi;
+    _R(2, 1) = spsi * stheta * cphi - cpsi * sphi;
+    _R(2, 2) = ctheta * cphi;
+}
+
+void dRFromAxisAndAngle(dMatrix3 R, dReal ax, dReal ay, dReal az,
+    dReal angle)
+{
+    dAASSERT(R);
+    dQuaternion q;
+    dQFromAxisAndAngle(q, ax, ay, az, angle);
+    dQtoR(q, R);
+}
+
 void dRSetIdentity(dMatrix3 R)
 {
     dAASSERT(R);
     SET_3x3_IDENTITY;
 }
-
-/* Keep the target literal order without adding retail code. */
-#pragma section code_type ".rotation_literals"
-
-void rotationLiteralPoolOrder(float& one, float& zero, float& half, float& two)
-{
-    one = 1.0f;
-    zero = 0.0f;
-    half = 0.5f;
-    two = 2.0f;
-}
-
-#pragma section code_type

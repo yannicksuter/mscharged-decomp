@@ -13,8 +13,6 @@ static dAllocFunction* allocfn = 0;
 static dReallocFunction* reallocfn = 0;
 static dFreeFunction* freefn = 0;
 
-/* MWCC emits this TU's function bodies in reverse source order. */
-
 void dFree(void* ptr, size_t size)
 {
     if (!ptr)

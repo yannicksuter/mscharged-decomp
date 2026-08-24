@@ -1,54 +1,36 @@
-#ifndef REVOLUTION_GX_H
-#define REVOLUTION_GX_H
+/**
+ * References: YAGCD, Dolphin Emulator, publicly available patents
+ */
 
-#include <revolution/types.h>
-
+#ifndef RVL_SDK_PUBLIC_GX_H
+#define RVL_SDK_PUBLIC_GX_H
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define GX_VFILTER_SZ 7
-
-typedef u8 GXBool;
-
-typedef struct GXColor {
-    u8 r;
-    u8 g;
-    u8 b;
-    u8 a;
-} GXColor;
-
-typedef struct GXRenderModeObj {
-    u32 tvInfo;
-    u16 fbWidth;
-    u16 efbHeight;
-    u16 xfbHeight;
-    u16 viXOrigin;
-    u16 viYOrigin;
-    u16 viWidth;
-    u16 viHeight;
-    u32 xfbMode;
-    GXBool field_rendering;
-    GXBool aa;
-    u8 sample_pattern[12][2];
-    u8 vfilter[GX_VFILTER_SZ];
-} GXRenderModeObj;
-
-typedef enum GXTexFmt {
-    GX_TF_I4,
-    GX_TF_I8,
-    GX_TF_IA4,
-    GX_TF_IA8,
-    GX_TF_RGB565,
-    GX_TF_RGB5A3,
-    GX_TF_RGBA8,
-    GX_TF_CMPR = 14,
-} GXTexFmt;
-
-void GXAbortFrame(void);
+#include <revolution/gx/GXAttr.h>
+#include <revolution/gx/GXBump.h>
+#include <revolution/gx/GXDisplayList.h>
+#include <revolution/gx/GXDraw.h>
+#include <revolution/gx/GXFifo.h>
+#include <revolution/gx/GXFrameBuf.h>
+#include <revolution/gx/GXGeometry.h>
+#include <revolution/gx/GXHardware.h>
+#include <revolution/gx/GXHardwareBP.h>
+#include <revolution/gx/GXHardwareCP.h>
+#include <revolution/gx/GXHardwareXF.h>
+#include <revolution/gx/GXInit.h>
+#include <revolution/gx/GXInternal.h>
+#include <revolution/gx/GXLight.h>
+#include <revolution/gx/GXMisc.h>
+#include <revolution/gx/GXPixel.h>
+#include <revolution/gx/GXTev.h>
+#include <revolution/gx/GXTexture.h>
+#include <revolution/gx/GXTransform.h>
+#include <revolution/gx/GXTypes.h>
+#include <revolution/gx/GXVert.h>
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif  // REVOLUTION_GX_H
+#endif

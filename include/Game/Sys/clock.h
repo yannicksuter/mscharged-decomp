@@ -31,8 +31,8 @@ public:
     /* 0x18 */ eClockState m_clockState;
     /* 0x1C */ unsigned long m_uParam1;
     /* 0x20 */ unsigned long m_uParam2;
-    /* 0x24 */ Clock* mNext;
-    /* 0x28 */ Clock* mPrev;
+    /* 0x24 */ Clock* m_next;
+    /* 0x28 */ Clock* m_prev;
 }; // size 0x2C
 
 class ClockManager

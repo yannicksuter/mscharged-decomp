@@ -29,18 +29,18 @@ typedef volatile f64 vf64;
 typedef int BOOL;
 typedef volatile BOOL vBOOL;
 
-typedef int bool;
 typedef int UNKWORD;
 typedef void UNKTYPE;
 #ifndef __cplusplus
+typedef int bool;
 typedef unsigned short wchar_t;
-#endif
 
 #ifndef true
 #define true 1
 #endif
 #ifndef false
 #define false 0
+#endif
 #endif
 
 #ifndef TRUE
@@ -53,6 +53,10 @@ typedef unsigned short wchar_t;
 #ifndef NULL
 #define NULL 0
 #endif
+
+typedef unsigned long uintptr_t;
+
+#define ALIGN(x) __attribute__((aligned(x)))
 
 #define DEFAULT_ALIGN 32
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))

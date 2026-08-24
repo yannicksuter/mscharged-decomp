@@ -1,13 +1,15 @@
 #ifndef NL_DL_RING_H
 #define NL_DL_RING_H
 
+#include "NL/nlRing.h"
+
 template <typename T>
 inline void nlDLRingInsert(T** head, T* afterNode, T* newNode)
 {
-    afterNode->mNext->mPrev = newNode;
-    newNode->mNext = afterNode->mNext;
-    newNode->mPrev = afterNode;
-    afterNode->mNext = newNode;
+    afterNode->m_next->m_prev = newNode;
+    newNode->m_next = afterNode->m_next;
+    newNode->m_prev = afterNode;
+    afterNode->m_next = newNode;
     if ((void*)*head == afterNode)
     {
         *head = newNode;
@@ -21,15 +23,15 @@ inline void nlDLRingAddStart(T** head, T* newNode)
     if (current == 0)
     {
         *head = newNode;
-        newNode->mNext = newNode;
-        newNode->mPrev = newNode;
+        newNode->m_next = newNode;
+        newNode->m_prev = newNode;
         return;
     }
 
-    current->mNext->mPrev = newNode;
-    newNode->mNext = current->mNext;
-    newNode->mPrev = current;
-    current->mNext = newNode;
+    current->m_next->m_prev = newNode;
+    newNode->m_next = current->m_next;
+    newNode->m_prev = current;
+    current->m_next = newNode;
 }
 
 template <typename T>
@@ -42,7 +44,7 @@ inline void nlDLRingAddEnd(T** head, T* newNode)
 template <typename T>
 inline void nlDLRingRemove(T** head, T* current)
 {
-    T* next = current->mNext;
+    T* next = current->m_next;
 
     if (next == current)
     {
@@ -50,12 +52,12 @@ inline void nlDLRingRemove(T** head, T* current)
         return;
     }
 
-    current->mPrev->mNext = next;
-    current->mNext->mPrev = current->mPrev;
+    current->m_prev->m_next = next;
+    current->m_next->m_prev = current->m_prev;
 
     if (*head == current)
     {
-        *head = current->mPrev;
+        *head = current->m_prev;
     }
 }
 
@@ -66,7 +68,7 @@ inline T* nlDLRingGetStart(T* current)
     {
         return 0;
     }
-    return current->mNext;
+    return current->m_next;
 }
 
 template <typename T>
@@ -87,7 +89,7 @@ inline bool nlDLRingValidateContainsElement(T* head, const T* node)
         return false;
     }
 
-    T* current = head->mNext;
+    T* current = head->m_next;
 
     for (;;)
     {
@@ -96,7 +98,7 @@ inline bool nlDLRingValidateContainsElement(T* head, const T* node)
             return true;
         }
 
-        T* next = current->mNext;
+        T* next = current->m_next;
 
         if (current == head)
         {
@@ -119,18 +121,18 @@ inline bool nlDLRingRemoveSafely(T** head, const T* node)
         return false;
     }
 
-    next = node->mNext;
+    next = node->m_next;
     if (next == node)
     {
         *head = 0;
         return true;
     }
 
-    node->mPrev->mNext = next;
-    node->mNext->mPrev = node->mPrev;
+    node->m_prev->m_next = next;
+    node->m_next->m_prev = node->m_prev;
     if (*head == node)
     {
-        *head = node->mPrev;
+        *head = node->m_prev;
         return true;
     }
 
@@ -151,13 +153,30 @@ inline void nlDLRingAppendRing(T** head, T* current)
             return;
         }
 
-        nextAfterHead = currentHead->mNext;
-        currentHead->mNext = current->mNext;
-        current->mNext->mPrev = *head;
-        current->mNext = nextAfterHead;
-        nextAfterHead->mPrev = current;
+        nextAfterHead = currentHead->m_next;
+        currentHead->m_next = current->m_next;
+        current->m_next->m_prev = *head;
+        current->m_next = nextAfterHead;
+        nextAfterHead->m_prev = current;
         *head = current;
     }
+}
+
+template <typename T>
+inline T* nlDLRingGetEnd(T* current)
+{
+    if (current == 0)
+    {
+        return 0;
+    }
+    return current;
+}
+
+template <typename T, typename CallbackType>
+inline void nlWalkDLRing(T* head, CallbackType* callback, void (CallbackType::*callbackFunc)(T*))
+{
+    void (CallbackType::*func)(T*) = callbackFunc;
+    nlWalkRing(head, callback, func);
 }
 
 #endif // NL_DL_RING_H

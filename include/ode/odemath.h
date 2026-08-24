@@ -86,6 +86,17 @@ PURE_INLINE dReal dDISTANCE(const dReal a[3], const dReal b[3])
     (A)[9] op dDOT14((B) + 8, (C) + 1); \
     (A)[10] op dDOT14((B) + 8, (C) + 2)
 
+#define dMULTIPLYOP2_333(A, op, B, C)   \
+    (A)[0] op dDOT((B), (C));            \
+    (A)[1] op dDOT((B), (C) + 4);        \
+    (A)[2] op dDOT((B), (C) + 8);        \
+    (A)[4] op dDOT((B) + 4, (C));        \
+    (A)[5] op dDOT((B) + 4, (C) + 4);    \
+    (A)[6] op dDOT((B) + 4, (C) + 8);    \
+    (A)[8] op dDOT((B) + 8, (C));        \
+    (A)[9] op dDOT((B) + 8, (C) + 4);    \
+    (A)[10] op dDOT((B) + 8, (C) + 8)
+
 #ifdef __cplusplus
 template <class TA, class TB, class TC>
 PURE_INLINE void dMULTIPLY0_331(TA* A, const TB* B, const TC* C)
@@ -104,10 +115,17 @@ PURE_INLINE void dMULTIPLY0_333(TA* A, const TB* B, const TC* C)
 {
     dMULTIPLYOP0_333(A, =, B, C);
 }
+
+template <class TA, class TB, class TC>
+PURE_INLINE void dMULTIPLY2_333(TA* A, const TB* B, const TC* C)
+{
+    dMULTIPLYOP2_333(A, =, B, C);
+}
 #else
 #define dMULTIPLY0_331(A, B, C) dMULTIPLYOP0_331(A, =, B, C)
 #define dMULTIPLY1_331(A, B, C) dMULTIPLYOP1_331(A, =, B, C)
 #define dMULTIPLY0_333(A, B, C) dMULTIPLYOP0_333(A, =, B, C)
+#define dMULTIPLY2_333(A, B, C) dMULTIPLYOP2_333(A, =, B, C)
 #endif
 
 #ifdef __cplusplus

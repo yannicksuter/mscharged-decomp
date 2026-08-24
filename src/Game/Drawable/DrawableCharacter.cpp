@@ -1,4 +1,6 @@
 #include "Game/Drawable/DrawableCharacter.h"
+
+#include "Game/CharacterEffects.h"
 #include "NL/gl/glState.h"
 
 extern "C" void* fn_802CDF0C();
@@ -328,7 +330,6 @@ extern "C" PoseAccumulator* fn_8030ABF8(
     PoseAccumulator*, PoseAccumulator*);
 extern "C" PoseAccumulator* fn_8030AD14(
     PoseAccumulator*, PoseAccumulator*);
-extern "C" EffectsTexturing* fn_8017A9EC(int);
 extern "C" bool fn_8001C534(Character*, bool);
 extern "C" SkinMesh* fn_8001C550(Character*, int);
 extern "C" void fn_8001C574(Character*);
@@ -699,7 +700,7 @@ void DrawableCharacter::Grab(Character& source)
     EffectsTexturing* texturing = source.effectsTexturing;
     if (texturing == 0)
     {
-        texturing = fn_8017A9EC(0);
+        texturing = fxGetTexturing(eFXTex_Nothing);
     }
     effectsTexturing = texturing;
 }
@@ -1295,7 +1296,7 @@ void DrawableCharacter::EvaluateFrom(
     poseAccumulator->scale = poseScale;
     poseAccumulator->InitAccumulators(poseScale, currentDamage2);
     poseNode.Evaluate(1.0f, poseAccumulator);
-    effectsTexturing = fn_8017A9EC(0);
+    effectsTexturing = fxGetTexturing(eFXTex_Nothing);
 
     PoseAccumulator* accumulator = poseAccumulator;
     nlMatrix4 matrix;

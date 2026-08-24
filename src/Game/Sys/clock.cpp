@@ -22,11 +22,11 @@ void ClockManager::Update(float fDeltaT)
     if (m_activeList != 0)
     {
         m_bUpdatingClocks = true;
-        pClock = m_activeList->mNext;
+        pClock = m_activeList->m_next;
 
         for (;;)
         {
-            next = pClock->mNext;
+            next = pClock->m_next;
             if ((pClock->m_clockState == CLOCK_PAUSED)
                 || !(pClock->m_uActiveStates & nlTaskManager::m_pInstance->mCurrentState))
             {

@@ -57,9 +57,7 @@ extern const float __float_max;
 // and moving it to the front of the space's list. all the parents of a
 // dirty geom also become dirty.
 
-#pragma push
-#pragma force_active on
-inline void dGeomMoved(dxGeom* geom)
+static inline void geomMoved(dxGeom* geom)
 {
     dAASSERT(geom);
 
@@ -85,9 +83,10 @@ inline void dGeomMoved(dxGeom* geom)
         geom = geom->parent_space;
     }
 }
-#pragma pop
-
-static void (*dGeomMoved_reference)(dxGeom*) = dGeomMoved;
+void dGeomMoved(dxGeom* geom)
+{
+    geomMoved(geom);
+}
 
 #define GEOM_ENABLED(g) ((g)->gflags & GEOM_ENABLED)
 
@@ -226,7 +225,7 @@ void dxSpace::add(dxGeom* geom)
     // considered to be dirty. as a consequence, this space and all its
     // parents are dirty too.
     geom->gflags |= GEOM_DIRTY | GEOM_AABB_BAD;
-    dGeomMoved(this);
+    geomMoved(this);
 }
 
 void dxSpace::remove(dxGeom* geom)
@@ -249,7 +248,7 @@ void dxSpace::remove(dxGeom* geom)
 
     // the bounding box of this space (and that of all the parents) may have
     // changed as a consequence of the removal.
-    dGeomMoved(this);
+    geomMoved(this);
 }
 
 void dxSpace::dirty(dxGeom* geom)

@@ -1,6 +1,8 @@
 #include "Game/Task/TransitionTask.h"
 
+#include "Game/Character.h"
 #include "Game/Drawable/DrawableCharacter.h"
+#include "Game/NisPlayer.h"
 #include "NL/nlTask.h"
 #include "types.h"
 
@@ -26,17 +28,6 @@ struct UnidentifiedStaticStorage
 };
 
 struct UnidentifiedStaticTag;
-
-struct Character
-{
-    virtual void Unknown0();
-    virtual void Unknown1();
-    virtual void Unknown2();
-    virtual void Unknown3();
-    virtual void Unknown4();
-    virtual void Unknown5();
-    virtual void ResetEffects();
-};
 
 // The pending-callback list walked below belongs to the game object and is not
 // reconstructed yet. Only the offsets and the flag bits the target reads are
@@ -122,7 +113,6 @@ static PendingIter MakeIterAt(PendingNode* head, PendingNode* node);
 
 extern "C" {
 void fn_80137CB8(int);
-void fn_8027B138();
 void fn_8027C86C();
 void fn_8027D11C();
 void* fn_802772BC();
@@ -154,7 +144,7 @@ extern void* lbl_806E1860;
 extern void* lbl_806E1608;
 extern void* lbl_806E12C8[2];
 extern Game* lbl_806E0C94;
-extern Character* lbl_8056B800[10];
+extern cCharacter* lbl_8056B800[10];
 
 void TransitionTask::Initialize()
 {
@@ -294,7 +284,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (to == 0x10)
     {
-        fn_8027B138();
+        NisPlayer::Instance();
         fn_8027D11C();
     }
 
@@ -325,7 +315,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         {
             if ((from & 0x18) || (from == 1 && (nlTaskManager::m_pInstance->mPreviousState & 0x18)))
             {
-                fn_8027B138();
+                NisPlayer::Instance();
                 fn_8027C86C();
                 fn_80188360();
                 fn_801882B4();

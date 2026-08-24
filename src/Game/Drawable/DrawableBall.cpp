@@ -1,5 +1,7 @@
 #include "Game/Drawable/DrawableCharacter.h"
 
+#include "Game/Drawable/RenderObject.h"
+
 struct UnidentifiedStaticState
 {
     UnidentifiedStaticState()
@@ -71,28 +73,6 @@ union DrawableBallFlags
         u32 passTargetIndex : 5;
         u32 unused : 7;
     } bits;
-};
-
-class RenderObject
-{
-public:
-    virtual void V0();
-    virtual void V1();
-    virtual void V2();
-    virtual void V3();
-    virtual void V4();
-    virtual void Draw();
-
-    char _004[0x6C];
-    u32 objectFlags;
-    char _074[4];
-    u32 renderFlags;
-    nlQuaternion orientation;
-    nlVector3 translation;
-    float modelScale;
-    float snapshotScale;
-    char _0A0[0x40];
-    bool worldMatrixUpToDate;
 };
 
 class DrawableBall
