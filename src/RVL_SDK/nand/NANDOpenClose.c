@@ -19,9 +19,8 @@ static u32 nandGetUniqueNumber(void);
 static s32 nandOpen(const char* path, u8 mode, NANDCommandBlock* block,
                     BOOL async, BOOL priv) {
     IPCOpenMode ipcMode;
-    char absPath[64];
+    char absPath[64] = {0};
 
-    MEMCLR(&absPath);
     ipcMode = IPC_OPEN_NONE;
     nandGenerateAbsPath(absPath, path);
 
@@ -358,8 +357,7 @@ static void nandSafeCloseCallback(s32 result, void* arg) {
             myResult = ISFS_RenameAsync(info->tempPath, info->openPath,
                                         nandSafeCloseCallback, block);
         } else if (block->state == 13) {
-            char parentDir[64];
-            MEMCLR(&parentDir);
+            char parentDir[64] = {0};
 
             info->stage = 8;
             nandGetParentDirectory(parentDir, info->tempPath);

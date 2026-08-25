@@ -890,13 +890,15 @@ RVL_SDK/fs/fs.c:
 
 RVL_SDK/gx/GXAttr.c:
 	.text       start:0x803A26DC end:0x803A31D0
-	.sdata      start:0x806DFBF8 end:0x806DFC00
+	.data       start:0x8053BAD0 end:0x8053BC30
+	.sdata      start:0x806DFBF8 end:0x806DFC04
 
 RVL_SDK/gx/GXGeometry.c:
 	.text       start:0x803A3AE8 end:0x803A4084
 
 RVL_SDK/gx/GXLight.c:
 	.text       start:0x803A4BFC end:0x803A5130
+	.sdata2     start:0x806E73B0 end:0x806E73C0
 
 RVL_SDK/gx/GXBump.c:
 	.text       start:0x803A606C end:0x803A650C
@@ -1111,6 +1113,10 @@ RVL_SDK/os/__ppc_eabi_init.c:
 
 RVL_SDK/si/SIBios.c:
 	.text       start:0x803BFB3C end:0x803C0F30
+	.data       start:0x8054A6F0 end:0x8054A760
+	.bss        start:0x805D5C40 end:0x805D5E60
+	.sdata      start:0x806DFD60 end:0x806DFD64
+	.sbss       start:0x806E29C0 end:0x806E29D0
 
 RVL_SDK/si/SISamplingRate.c:
 	.text       start:0x803C0F30 end:0x803C1010
@@ -1166,11 +1172,10 @@ RVL_SDK/sc/scapi_prdinfo.c:
 	.sdata      start:0x806DFF90 end:0x806DFF98
 
 RVL_SDK/nand/nand.c:
-	.text       start:0x8040CA48 end:0x8040D934
-	.sdata      start:0x806DFFA8 end:0x806DFFB0
+	.text       start:0x8040C920 end:0x8040D934
 
 RVL_SDK/nand/NANDOpenClose.c:
-	.text       start:0x8040DA48 end:0x8040E628
+	.text       start:0x8040D934 end:0x8040E628
 	.data       start:0x80554B20 end:0x80554B38
 	.sdata      start:0x806DFFB0 end:0x806DFFB8
 	.sbss       start:0x806E2CB0 end:0x806E2CB4
@@ -1202,17 +1207,22 @@ RVL_SDK/nwc24/NWC24FileApi.c:
 	.sbss       start:0x806E2CC8 end:0x806E2CD4
 
 RVL_SDK/nwc24/NWC24Config.c:
-	.text       start:0x80412588 end:0x80412970
+	.text       start:0x80412558 end:0x80412970
 	.data       start:0x80554EF0 end:0x80554F58
 	.sdata      start:0x806E0008 end:0x806E0014
 	.sbss       start:0x806E2CD8 end:0x806E2CE0
 
 RVL_SDK/nwc24/NWC24Manage.c:
 	.text       start:0x80412970 end:0x80412C28
-	.sbss       start:0x806E2CE0 end:0x806E2CF0
+	.data       start:0x80554F58 end:0x80555068
+	.sdata      start:0x806E0018 end:0x806E001C
+	.sbss       start:0x806E2CE0 end:0x806E2CF4
 
 RVL_SDK/nwc24/NWC24MBoxCtrl.c:
 	.text       start:0x80412C28 end:0x80412F90
+	.data       start:0x80555068 end:0x805550A8
+	.sdata      start:0x806E0020 end:0x806E0028
+	.sbss       start:0x806E2CF8 end:0x806E2D00
 
 RVL_SDK/nwc24/NWC24Mime.c:
 	.text       start:0x80412F90 end:0x80413270
@@ -1235,6 +1245,9 @@ RVL_SDK/nwc24/NWC24SecretFList.c:
 
 RVL_SDK/nwc24/NWC24Time.c:
 	.text       start:0x80413A70 end:0x80413C4C
+	.data       start:0x80555114 end:0x80555140
+	.bss        start:0x80619660 end:0x80619740
+	.sbss       start:0x806E2D10 end:0x806E2D18
 
 RVL_SDK/nwc24/NWC24Ipc.c:
 	.text       start:0x80413C4C end:0x80413DC0
@@ -1254,6 +1267,10 @@ RVL_SDK/nwc24/NWC24System.c:
 
 RVL_SDK/so/soCommon.c:
 	.text       start:0x80414608 end:0x804154A0
+	.data       start:0x805551A8 end:0x80555384
+	.bss        start:0x806197A0 end:0x806197B8
+	.sdata      start:0x806E0048 end:0x806E0050
+	.sbss       start:0x806E2D30 end:0x806E2D38
 
 RVL_SDK/so/soBasic.c:
 	.text       start:0x804154A0 end:0x80415574
@@ -1332,7 +1349,8 @@ RVL_SDK/vf/pf_file.c:
 
 RVL_SDK/vf/pf_path.c:
 	.text       start:0x80430C50 end:0x80433990
-	.sdata      start:0x806E00E8 end:0x806E011C
+	.sdata      start:0x806E00E8 end:0x806E0118
+	.sdata2     start:0x806E7608 end:0x806E7614
 
 RVL_SDK/vf/pf_sector.c:
 	.text       start:0x80433990 end:0x80434080
@@ -1382,12 +1400,13 @@ RVL_SDK/vf/pf_system.c:
 
 RVL_SDK/vf/d_vf.c:
 	.text       start:0x804354C0 end:0x80435A8C
-	.bss        start:0x80645FC0 end:0x80645FD8
+	.bss        start:0x80645FC0 end:0x806ADFE0
 	.sbss       start:0x806E2D58 end:0x806E2D60
 
 RVL_SDK/vf/d_vf_sys.c:
 	.text       start:0x80435A8C end:0x80436750
-	.sbss       start:0x806E2D60 end:0x806E2D80
+	.bss        start:0x806ADFE0 end:0x806AE048
+	.sbss       start:0x806E2D60 end:0x806E2D78
 
 RVL_SDK/vf/d_hash.c:
 	.text       start:0x80436750 end:0x80436B70

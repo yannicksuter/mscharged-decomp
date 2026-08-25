@@ -2,6 +2,7 @@
 #define GAME_AI_POWERUPS_H
 
 #include "NL/nlMath.h"
+#include "NL/nlSlotPool.h"
 #include "NL/nlTimer.h"
 #include "Game/Drawable/DrawableObj.h"
 
@@ -10,6 +11,34 @@ class Bowser;
 class cFielder;
 class PhysicsObject;
 class SFXEmitter;
+
+class unk_8000CD44
+{
+public:
+    unk_8000CD44(int);
+    virtual ~unk_8000CD44();
+
+private:
+    /* 0x04 */ u8 mUnidentified004[0x10];
+};
+
+class PowerupBase;
+
+class unk_804F47E0 : public unk_8000CD44
+{
+public:
+    unk_804F47E0(PowerupBase* pPowerup)
+        : unk_8000CD44(2)
+        , m_pPowerup(pPowerup)
+        , mUnidentified018(0)
+    {
+    }
+    virtual ~unk_804F47E0();
+
+private:
+    /* 0x14 */ PowerupBase* m_pPowerup;
+    /* 0x18 */ void* mUnidentified018;
+};
 
 struct PowerupSounds
 {
@@ -56,6 +85,25 @@ enum ePowerupSize
     POWERUPSIZE_LARGE = 2,
 };
 
+enum eThrowStyle
+{
+    THROW_ARROW = 0,
+    THROW_HORIZONTAL_LINE = 1,
+    THROW_SURROUND = 2,
+    THROW_SPREAD = 3,
+    NUM_THROW_TYPES = 4,
+};
+
+struct unk_8009A5D8
+{
+    /* 0x00 */ int nnumOfPowerups;
+    /* 0x04 */ eThrowStyle eStyle;
+    /* 0x08 */ ePowerupSize eSize;
+    /* 0x0C */ ePowerUpType eType;
+    /* 0x10 */ float fRadius;
+    /* 0x14 */ bool bExplode;
+}; // total size: 0x18
+
 class PowerupBase
 {
 public:
@@ -77,21 +125,32 @@ public:
     virtual void Destroy(bool bSilent);
     virtual void PreThrow(cFielder* pFielder);
     virtual void ThrowAt(cFielder* pThrower, Bowser* pBowser);
-    virtual void fn_8009CAC0(void*);
+    virtual void fn_8009CAC0(cFielder* pFielder);
     virtual void Init(cFielder* pFielder, Bowser* pBowser);
     virtual void Update(float dt);
 
     float GetRadius() const;
+    void fn_8009CEBC(const nlVector3& v3Unidentified);
+    void fn_8009D500();
+    void fn_8009D74C(float seconds, bool bEnableCollisions);
+    void SpeedManagement();
+    void UpdateTransform();
     static void CollisionCallback(PhysicsObject* pObjA,
         PhysicsObject* pObjB, const nlVector3& v3Pos, void* pParam);
     static unsigned long GetSoundType(ePowerUpType type, PowerupSound powerupSnd);
+    static void PlayPowerupSound(ePowerUpType type, PowerupSound powerupSnd,
+        PhysicsObject* pPhysObj, float fVol, void* pParam);
+    static void PlayPowerupSound(ePowerUpType type, PowerupSound powerupSnd,
+        const nlVector3& v3Pos, float fVol, void* pParam);
+    static void StopPowerupInEffectSound(ePowerUpType type, PowerupSound powerupSnd,
+        void* pParam);
 
     /* 0x04 */ bool m_bShouldDestroy;
     /* 0x08 */ DrawableObject* m_pDrawableObj;
     /* 0x0C */ PhysicsObject* m_pPhysicsObject;
     /* 0x10 */ cFielder* m_pTarget;
     /* 0x14 */ cFielder* m_pThrower;
-    /* 0x18 */ void* m_unk18;
+    /* 0x18 */ unk_8000CD44* m_unk18;
     /* 0x1C */ ePowerUpType m_eType;
     /* 0x20 */ bool m_unk20;
     /* 0x24 */ Timer mtActiveTimer;
@@ -120,12 +179,110 @@ public:
 class Bobomb : public PowerupBase
 {
 public:
+    virtual ~Bobomb();
+    static void operator delete(void* ptr)
+    {
+        m_BobombSlotPool.Free((Bobomb*)ptr);
+    }
+
+    virtual void Destroy(bool bSilent);
+    virtual void ThrowAt(cFielder* pThrower, Bowser* pBowser);
+    virtual void Update(float dt);
+
+    void fn_8009F454(PowerupBase*, int nThrowOrder);
+
     /* 0xA9 */ bool mbIsMine;
     /* 0xAC */ float m_unkAC;
     /* 0xB0 */ SFXEmitter* pMovementEmitter;
+
+    static SlotPool<Bobomb> m_BobombSlotPool;
 }; // total size: 0xB4
 
+class FreezeShell : public PowerupBase
+{
+public:
+    FreezeShell(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
+    virtual ~FreezeShell();
+    static void operator delete(void* ptr)
+    {
+        m_FreezeShellSlotPool.Free((FreezeShell*)ptr);
+    }
+    virtual void Update(float fDeltaT);
+    void Destroy(bool bSilent);
+
+    static SlotPool<FreezeShell> m_FreezeShellSlotPool;
+}; // total size: 0xAC
+
+class SpinyShell : public PowerupBase
+{
+public:
+    SpinyShell(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
+    virtual ~SpinyShell();
+    static void operator delete(void* ptr)
+    {
+        m_SpinyShellSlotPool.Free((SpinyShell*)ptr);
+    }
+    virtual void Update(float dt);
+    void Destroy(bool bSilent);
+
+    static SlotPool<SpinyShell> m_SpinyShellSlotPool;
+}; // total size: 0xAC
+
+class Banana : public PowerupBase
+{
+public:
+    Banana(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
+    virtual ~Banana();
+    static void operator delete(void* ptr)
+    {
+        m_BananaSlotPool.Free((Banana*)ptr);
+    }
+    virtual void Update(float dt);
+    void Destroy(bool bSilent);
+    virtual void ThrowAt(cFielder* pThrower, Bowser* pBowser);
+
+    static SlotPool<Banana> m_BananaSlotPool;
+}; // total size: 0xAC
+
+class RedShell : public PowerupBase
+{
+public:
+    RedShell(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
+    virtual ~RedShell();
+    static void operator delete(void* ptr)
+    {
+        m_RedShellSlotPool.Free((RedShell*)ptr);
+    }
+    virtual void Update(float dt);
+    void Destroy(bool bSilent);
+    void SeekTarget();
+
+    static SlotPool<RedShell> m_RedShellSlotPool;
+}; // total size: 0xAC
+
+class GreenShell : public PowerupBase
+{
+public:
+    GreenShell(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
+    virtual ~GreenShell();
+    static void operator delete(void* ptr)
+    {
+        m_GreenShellSlotPool.Free((GreenShell*)ptr);
+    }
+    virtual void Update(float dt);
+    void Destroy(bool bSilent);
+
+    static SlotPool<GreenShell> m_GreenShellSlotPool;
+}; // total size: 0xAC
+
 PowerupBase* FindPowerUp(unsigned long hashOfDrawable);
+cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType);
+void CompactPowerups();
 void InitializePowerups();
 
 #endif // GAME_AI_POWERUPS_H

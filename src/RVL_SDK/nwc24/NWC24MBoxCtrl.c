@@ -345,12 +345,12 @@ static NWC24Err GetMBoxFilePath(NWC24MsgBoxId id, char* pDst, s32 maxlen) {
 
     switch (id) {
     case NWC24_MSGBOX_SEND: {
-        Mail_sprintf(pDst, "%s%s", pMBoxDir, SEND_MAIL_MBOX);
+        Mail_sprintf(pDst, "%s%s", pMBoxDir, RECV_MAIL_MBOX);
         break;
     }
 
     case NWC24_MSGBOX_RECV: {
-        Mail_sprintf(pDst, "%s%s", pMBoxDir, RECV_MAIL_MBOX);
+        Mail_sprintf(pDst, "%s%s", pMBoxDir, SEND_MAIL_MBOX);
         break;
     }
 

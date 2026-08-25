@@ -22,6 +22,9 @@ public:
     void PickupBall(cBall* pBall);
     cGlobalPad* GetGlobalPad();
     bool IsOnSameTeam(cPlayer* other);
+    float DoFlashLight(const nlVector3& Position, unsigned short aDirection,
+        float fAngleWeighting, float fIgnoreObjectCloserThanThis,
+        float fIgnoreObjectFartherThanThis);
     void fn_8009750C();
     void fn_80097648(float fParam);
 

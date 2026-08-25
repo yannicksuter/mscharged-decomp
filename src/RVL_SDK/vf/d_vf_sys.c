@@ -441,6 +441,18 @@ void VFSysInit(void* i_heap_start_address_p, u32 i_size) {
     VFi_InitSDWrok();
 }
 
+void VFSysFinalize() {
+    VFSys_destroy_handle_table();
+    VFSys_destroy_device_table(l_vfsys_vol_max);
+
+    if (l_vfsys_exp_heap_handle != NULL) {
+        MEMDestroyExpHeap(l_vfsys_exp_heap_handle);
+        l_vfsys_exp_heap_handle = NULL;
+    }
+
+    l_vfsys_vol_max = 0;
+}
+
 static void VFSys_set_device_err_info(struct VF_HANDLE_TYPE* o_handle_p, s32 i_err) {
     if (o_handle_p != NULL && o_handle_p->drive.pf_disk_p != NULL) {
         dCommon_setLastDeviceErrorToDisk(o_handle_p->drive.pf_disk_p, i_err);

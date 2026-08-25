@@ -12,10 +12,8 @@ static BOOL nandInspectPermission(u8 perm);
 
 static s32 nandCreate(const char* path, u8 perm, u8 attr,
                       NANDCommandBlock* block, BOOL async, BOOL priv) {
-    char absPath[64];
+    char absPath[64] = {0};
     u32 ownerPerm, groupPerm, otherPerm;
-
-    MEMCLR(&absPath);
 
     ownerPerm = 0;
     groupPerm = 0;
@@ -59,6 +57,17 @@ s32 NANDPrivateCreate(const char* path, u8 perm, u8 attr) {
         nandCreate(path, perm, attr, NULL, FALSE, TRUE));
 }
 
+s32 NANDCreateAsync(const char* path, u8 perm, u8 attr,
+                    NANDAsyncCallback callback, NANDCommandBlock* block) {
+    if (!nandIsInitialized()) {
+        return NAND_RESULT_FATAL_ERROR;
+    }
+
+    block->callback = callback;
+    return nandConvertErrorCode(
+        nandCreate(path, perm, attr, block, TRUE, FALSE));
+}
+
 s32 NANDPrivateCreateAsync(const char* path, u8 perm, u8 attr,
                            NANDAsyncCallback callback,
                            NANDCommandBlock* block) {
@@ -73,9 +82,8 @@ s32 NANDPrivateCreateAsync(const char* path, u8 perm, u8 attr,
 
 static s32 nandDelete(const char* path, NANDCommandBlock* block, BOOL async,
                       BOOL priv) {
-    char absPath[64];
+    char absPath[64] = {0};
 
-    MEMCLR(&absPath);
     nandGenerateAbsPath(absPath, path);
 
     if (!priv && nandIsPrivatePath(absPath)) {
@@ -95,6 +103,16 @@ s32 NANDDelete(const char* path) {
     }
 
     return nandConvertErrorCode(nandDelete(path, NULL, FALSE, FALSE));
+}
+
+s32 NANDDeleteAsync(const char* path, NANDAsyncCallback callback,
+                    NANDCommandBlock* block) {
+    if (!nandIsInitialized()) {
+        return NAND_RESULT_FATAL_ERROR;
+    }
+
+    block->callback = callback;
+    return nandConvertErrorCode(nandDelete(path, block, TRUE, FALSE));
 }
 
 s32 NANDPrivateDelete(const char* path) {
@@ -198,10 +216,9 @@ s32 NANDSeekAsync(NANDFileInfo* info, s32 offset, NANDSeekMode whence,
 
 static s32 nandCreateDir(const char* path, u8 perm, u8 attr,
                          NANDCommandBlock* block, BOOL async, BOOL priv) {
-    char absPath[64];
+    char absPath[64] = {0};
     u32 ownerPerm, groupPerm, otherPerm;
 
-    MEMCLR(&absPath);
     nandGenerateAbsPath(absPath, path);
 
     if (!priv && nandIsPrivatePath(absPath)) {
@@ -223,6 +240,26 @@ static s32 nandCreateDir(const char* path, u8 perm, u8 attr,
     } else {
         return ISFS_CreateDir(absPath, attr, ownerPerm, groupPerm, otherPerm);
     }
+}
+
+s32 NANDCreateDir(const char* path, u8 perm, u8 attr) {
+    if (!nandIsInitialized()) {
+        return NAND_RESULT_FATAL_ERROR;
+    }
+
+    return nandConvertErrorCode(
+        nandCreateDir(path, perm, attr, NULL, FALSE, FALSE));
+}
+
+s32 NANDCreateDirAsync(const char* path, u8 perm, u8 attr,
+                       NANDAsyncCallback callback, NANDCommandBlock* block) {
+    if (!nandIsInitialized()) {
+        return NAND_RESULT_FATAL_ERROR;
+    }
+
+    block->callback = callback;
+    return nandConvertErrorCode(
+        nandCreateDir(path, perm, attr, block, TRUE, FALSE));
 }
 
 s32 NANDPrivateCreateDir(const char* path, u8 perm, u8 attr) {
@@ -420,9 +457,8 @@ static s32 nandGetStatus(const char* path, NANDStatus* status,
     s32 result;
     u32 attr;
     u32 ownerPerm, groupPerm, otherPerm;
-    char absPath[64];
+    char absPath[64] = {0};
 
-    MEMCLR(&absPath);
     nandGenerateAbsPath(absPath, path);
 
     if (!priv && nandIsUnderPrivatePath(absPath)) {

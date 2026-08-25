@@ -8,6 +8,7 @@ class PowerupBase;
 class PhysicsBanana : public PhysicsSphere
 {
 public:
+    PhysicsBanana(float radius);
     virtual int GetObjectType() const { return 0x15; }
 
     /* 0x38 */ void (*m_pTriggerCallbackFunc)(PhysicsObject*, PhysicsObject*, nlVector3&, void*);

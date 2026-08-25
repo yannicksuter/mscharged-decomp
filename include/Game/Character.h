@@ -159,7 +159,8 @@ public:
     /* 0x090 */ s16 m_nAnimTurnAdjust;
     /* 0x092 */ u8 unknown_0x092[0x02];
     /* 0x094 */ nlVector3 m_v3AnimMoveAdjust;
-    /* 0x0A0 */ u8 unknown_0x0A0[0x1C];
+    /* 0x0A0 */ float mUnidentified0A0;
+    /* 0x0A4 */ u8 unknown_0x0A4[0x18];
     /* 0x0BC */ cPoseAccumulator* m_pPoseAccumulator;
     /* 0x0C0 */ cPoseNode* m_pPoseTree;
     /* 0x0C4 */ cPoseNode** m_pAILayer;

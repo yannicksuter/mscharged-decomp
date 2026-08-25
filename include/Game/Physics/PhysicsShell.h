@@ -8,6 +8,7 @@ class PowerupBase;
 class PhysicsShell : public PhysicsSphere
 {
 public:
+    PhysicsShell(float radius);
     virtual int GetObjectType() const { return 0x14; }
 
     /* 0x38 */ void (*m_pTriggerCallbackFunc)(PhysicsObject*, PhysicsObject*, nlVector3&, void*);

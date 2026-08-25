@@ -414,7 +414,7 @@ static inline void VISetRGBOverDrive(VIOverDrive level) {
     Vdac_Flag_Changed |= 0x40;
 }
 
-static inline VISetRGBModeImm(void) { Vdac_Flag_Changed |= 0x80; }
+void VISetRGBModeImm(void) { Vdac_Flag_Changed |= 0x80; }
 
 static inline void __VISetVideoMode(VIVideo vmode, VIBool outsel) {
     u8 buffer[2];
