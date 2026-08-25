@@ -16,6 +16,9 @@ typedef struct Vec2 {
     f32 x, y;
 } Vec2;
 
+typedef Vec* VecPtr;
+typedef f32 (*MtxPtr)[4];
+
 typedef struct Quaternion {
     f32 x, y, z, w;
 } Quaternion;

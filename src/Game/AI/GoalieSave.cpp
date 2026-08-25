@@ -1,3 +1,4 @@
+#include "NL/nlAVLTree.h"
 #include "Game/AI/GoalieSave.h"
 
 #include "Game/Field.h"
@@ -17,6 +18,7 @@ struct SaveInfo
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
+static nlAVLTree<int, SaveData*, DefaultKeyCompare<int> > gSaveMap;
 nlListContainer<SaveData*> gSaveGrid[6][4];
 static float fDefaultMilestoneValues[2] = { 0.4f, 0.7f };
 
@@ -67,6 +69,38 @@ void SaveData::Init(
 
     nlStrNCpy<char>(mszName, info.mszName, 16);
     muIndex = uIndex;
+}
+
+SaveData* GoalieSave::FindSaveData(int animID)
+{
+    SaveData** ppSaveData;
+    if (animID >= 0 && gSaveMap.FindGet(animID, &ppSaveData))
+    {
+        return *ppSaveData;
+    }
+
+    return 0;
+}
+
+void GoalieSave::ClearData()
+{
+    if (!mbInitialized)
+        return;
+
+    gSaveMap.Clear();
+    ClearGrid();
+
+    if (mpSaveTable != 0)
+    {
+        delete[] ((u8*)mpSaveTable - 0x10);
+    }
+
+    if (mpPositionTable != 0)
+    {
+        delete[] ((u8*)mpPositionTable - 0x10);
+    }
+
+    mbInitialized = 0;
 }
 
 SaveData* GoalieSave::GetMissChipSaveData(bool bLeft, bool bFar)
@@ -523,6 +557,17 @@ void GoalieSave::FindVerticalBoundingPoints(SaveData* pSaveData,
     {
         *pHiPoint = pHiSaveData;
         *pLoPoint = pLoSaveData;
+    }
+}
+
+void GoalieSave::ClearGrid()
+{
+    for (int i = 0; i < 6; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            gSaveGrid[i][j].Clear();
+        }
     }
 }
 

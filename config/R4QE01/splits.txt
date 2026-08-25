@@ -79,6 +79,16 @@ Game/AI/GoalieSave.cpp:
 	.sbss       start:0x806E0D38 end:0x806E0D68
 	.sdata2     start:0x806E3B28 end:0x806E3B70
 
+Game/AI/Powerups.cpp:
+	.text       start:0x80099660 end:0x8009FF20
+	.ctors      start:0x804DB540 end:0x804DB544
+	.rodata     start:0x804DC0E0 end:0x804DC0F0
+	.data       start:0x804FF888 end:0x804FFFC0
+	.bss        start:0x8056D3D8 end:0x8056D958
+	.sdata      start:0x806DBDA0 end:0x806DBE58
+	.sbss       start:0x806E0DA8 end:0x806E0DD0
+	.sdata2     start:0x806E3C28 end:0x806E3CA8
+
 Game/AI/Desire.cpp:
 	.text       start:0x800B0358 end:0x800B6DC0
 	.ctors      start:0x804DB560 end:0x804DB564
@@ -820,6 +830,13 @@ RVL_SDK/fs/fs.c:
 	.sdata      start:0x806DFBE0 end:0x806DFBF0
 	.sbss       start:0x806E2790 end:0x806E27A4
 
+RVL_SDK/gx/GXGeometry.c:
+	.text       start:0x803A3AE8 end:0x803A4084
+
+RVL_SDK/gx/GXBump.c:
+	.text       start:0x803A606C end:0x803A650C
+	.sdata2     start:0x806E73E8 end:0x806E73EC
+
 RVL_SDK/gx/GXDisplayList.c:
 	.text       start:0x803A7190 end:0x803A7360
 	.bss        start:0x805BE248 end:0x805BE948
@@ -1041,6 +1058,13 @@ RVL_SDK/thp/THPDec.c:
 RVL_SDK/thp/THPAudio.c:
 	.text       start:0x803C4BE0 end:0x803C5074
 
+RVL_SDK/vi/vi3in1.c:
+	.text       start:0x803C8460 end:0x803C9B04
+	.data       start:0x8054ACF0 end:0x8054B27C
+	.bss        start:0x805D6120 end:0x805D613C
+	.sdata      start:0x806DFDA0 end:0x806DFDB4
+	.sbss       start:0x806E2BC0 end:0x806E2BD4
+
 RVL_SDK/usb/usb.c:
 	.text       start:0x80409744 end:0x8040A7E4
 	.data       start:0x805542E8 end:0x80554908
@@ -1063,6 +1087,12 @@ RVL_SDK/sc/scapi_prdinfo.c:
 	.data       start:0x80554AD8 end:0x80554B20
 	.sdata      start:0x806DFF90 end:0x806DFF98
 
+RVL_SDK/nand/NANDOpenClose.c:
+	.text       start:0x8040DA48 end:0x8040E628
+	.data       start:0x80554B20 end:0x80554B38
+	.sdata      start:0x806DFFB0 end:0x806DFFB8
+	.sbss       start:0x806E2CB0 end:0x806E2CB4
+
 RVL_SDK/nand/NANDCheck.c:
 	.text       start:0x8040FCC4 end:0x8040FE88
 	.data       start:0x80554C60 end:0x80554D0C
@@ -1078,12 +1108,74 @@ RVL_SDK/nwc24/NWC24FileApi.c:
 	.sdata      start:0x806DFFF8 end:0x806E0004
 	.sbss       start:0x806E2CC8 end:0x806E2CD4
 
+RVL_SDK/nwc24/NWC24Config.c:
+	.text       start:0x80412588 end:0x80412970
+	.data       start:0x80554EF0 end:0x80554F58
+	.sdata      start:0x806E0008 end:0x806E0014
+	.sbss       start:0x806E2CD8 end:0x806E2CE0
+
+RVL_SDK/nwc24/NWC24FriendList.c:
+	.text       start:0x80413838 end:0x80413954
+	.data       start:0x805550D8 end:0x805550F8
+	.sdata      start:0x806E0028 end:0x806E002C
+
+RVL_SDK/nwc24/NWC24SecretFList.c:
+	.text       start:0x80413954 end:0x80413A70
+	.data       start:0x805550F8 end:0x80555114
+	.sdata      start:0x806E0030 end:0x806E0034
+
 RVL_SDK/nwc24/NWC24Ipc.c:
 	.text       start:0x80413C4C end:0x80413DC0
 	.sbss       start:0x806E2D18 end:0x806E2D1C
 
+RVL_SDK/nwc24/NWC24Download.c:
+	.text       start:0x80413DC0 end:0x804142EC
+	.data       start:0x80555140 end:0x8055515C
+	.sdata      start:0x806E0038 end:0x806E003C
+
+RVL_SDK/vf/pf_clib.c:
+	.text       start:0x8041FEB4 end:0x804201B4
+
+RVL_SDK/vf/pf_code.c:
+	.text       start:0x804201B4 end:0x804201D0
+	.rodata     start:0x804ECEC0 end:0x804ECF20
+
+RVL_SDK/vf/pf_service.c:
+	.text       start:0x804201D0 end:0x804202F8
+
+RVL_SDK/vf/pf_str.c:
+	.text       start:0x804202F8 end:0x80420880
+
+RVL_SDK/vf/pf_w_clib.c:
+	.text       start:0x80420880 end:0x80420914
+
+RVL_SDK/vf/pf_driver.c:
+	.text       start:0x80420914 end:0x804212E4
+
+RVL_SDK/vf/pdm_bpb.c:
+	.text       start:0x804212E4 end:0x80421B40
+
+RVL_SDK/vf/pdm_disk.c:
+	.text       start:0x80421B40 end:0x80422900
+
+RVL_SDK/vf/pdm_partition.c:
+	.text       start:0x80422900 end:0x80423810
+
+RVL_SDK/vf/pdm_mbr.c:
+	.text       start:0x80423810 end:0x80423DD0
+
+RVL_SDK/vf/pdm_dskmng.c:
+	.text       start:0x80423DD0 end:0x80423EF8
+	.bss        start:0x8061D4A0 end:0x8061E008
+
+RVL_SDK/vf/pf_cache.c:
+	.text       start:0x80423EF8 end:0x80425DA0
+
 RVL_SDK/vf/pf_cluster.c:
 	.text       start:0x80425DA0 end:0x80426258
+
+RVL_SDK/vf/pf_dir.c:
+	.text       start:0x80426258 end:0x804262E8
 
 RVL_SDK/vf/pf_entry.c:
 	.text       start:0x804262E8 end:0x80427C1C
@@ -1125,12 +1217,72 @@ RVL_SDK/vf/pf_cp932.c:
 	.text       start:0x80434C20 end:0x80435130
 	.rodata     start:0x804ECF60 end:0x804F11D4
 
+RVL_SDK/vf/pf_api_util.c:
+	.text       start:0x80435130 end:0x80435278
+	.data       start:0x80555608 end:0x805556A8
+
+RVL_SDK/vf/pf_fopen.c:
+	.text       start:0x804352E4 end:0x80435380
+
+RVL_SDK/vf/pf_init_prfile2.c:
+	.text       start:0x804353F4 end:0x80435434
+
 RVL_SDK/vf/pf_filelock.c:
 	.text       start:0x80435434 end:0x80435448
 	.sbss       start:0x806E2D50 end:0x806E2D54
 
 RVL_SDK/vf/pf_system.c:
 	.text       start:0x80435448 end:0x804354C0
+
+RVL_SDK/vf/d_vf.c:
+	.text       start:0x804354C0 end:0x80435A8C
+	.bss        start:0x80645FC0 end:0x80645FD8
+	.sbss       start:0x806E2D58 end:0x806E2D60
+
+RVL_SDK/vf/d_hash.c:
+	.text       start:0x80436750 end:0x80436B70
+	.bss        start:0x806AE048 end:0x806AE288
+
+RVL_SDK/vf/d_time.c:
+	.text       start:0x80436B70 end:0x80436C00
+
+RVL_SDK/vf/d_common.c:
+	.text       start:0x80436C00 end:0x80436E3C
+	.bss        start:0x806AE288 end:0x806AE490
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_animation.cpp:
+	.text       start:0x804466AC end:0x8044761C
+	.data       start:0x80556F18 end:0x80557388
+	.sdata      start:0x806E0228 end:0x806E0230
+	.sdata2     start:0x806E76C0 end:0x806E76E0
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_bounding.cpp:
+	.text       start:0x80447D20 end:0x80447E38
+	.ctors      start:0x804DBB6C end:0x804DBB70
+	.data       start:0x80557600 end:0x80557668
+	.sbss       start:0x806E2DC8 end:0x806E2DCC
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_drawInfo.cpp:
+	.text       start:0x80448CB8 end:0x80448D6C
+	.data       start:0x805576D8 end:0x805576E8
+	.sdata2     start:0x806E76F0 end:0x806E76F8
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_picture.cpp:
+	.text       start:0x8044EC64 end:0x8044F384
+	.ctors      start:0x804DBB74 end:0x804DBB78
+	.data       start:0x805583E0 end:0x80558608
+	.sbss       start:0x806E2DE8 end:0x806E2DEC
+	.sdata2     start:0x806E7740 end:0x806E7744
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_resourceAccessor.cpp:
+	.text       start:0x8044F384 end:0x8044F3DC
+	.data       start:0x80558608 end:0x80558620
+
+RVL_SDK/hbm/nw4hbm/snd/snd_Lfo.cpp:
+	.text       start:0x8045EF20 end:0x8045F17C
+	.rodata     start:0x804F1A60 end:0x804F1A88
+	.data       start:0x8055B160 end:0x8055B1A8
+	.sdata2     start:0x806E7890 end:0x806E78C0
 
 RVL_SDK/hbm/nw4hbm/ut/ut_FileStream.cpp:
 	.text       start:0x80479830 end:0x80479974

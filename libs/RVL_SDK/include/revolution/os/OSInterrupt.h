@@ -59,6 +59,8 @@ extern s64 __OSLastInterruptTime;
 
 OSInterruptHandler __OSSetInterruptHandler(OSInterruptType type, OSInterruptHandler handler);
 OSInterruptHandler __OSGetInterruptHandler(OSInterruptType type);
+typedef s16 __OSInterrupt;
+
 void __OSInterruptInit(void);
 u32 __OSMaskInterrupts(u32 userMask);
 u32 __OSUnmaskInterrupts(u32 userMask);

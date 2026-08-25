@@ -60,6 +60,7 @@ struct SaveBlendInfo
 
 class GoalieSave
 {
+    static void ClearGrid();
     static void FindVerticalBoundingPoints(SaveData* pSaveData,
         const nlVector3& v3TargetPoint, SaveData** pLoPoint,
         SaveData** pHiPoint);
