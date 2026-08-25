@@ -69,17 +69,17 @@ public:
     virtual ~cCharacter();
     virtual void PostPhysicsUpdate();
     virtual void PrePhysicsUpdate(float dt);
+    virtual void Unknown7();
     virtual void PreUpdate(float dt);
-    virtual void SetAnimID(int animID);
     virtual void Unknown5();
     virtual void ResetEffects();
-    virtual void Unknown7();
+    virtual void SetAnimID(int animID);
     virtual void Unknown8();
     virtual void SetPosition(const nlVector3& position);
+    virtual void Update(float fDeltaT);
     virtual void Unknown10();
     virtual void Unknown11();
     virtual void Unknown12();
-    virtual void Update(float fDeltaT);
 
     void SetAnimState(int animID, bool useBlendTime, float nonDefaultBlendTime,
         bool restartCyclic, bool forceMirrorSwap);
@@ -88,6 +88,7 @@ public:
         void (*funcPlaybackSpeedCallback)(
             unsigned int, cPN_SAnimController*),
         unsigned int nPlaybackSpeedCallbackParam);
+    bool ShouldStartCrossBlend(int animID);
 
     void SetElectrocutionTextureEnabled(bool isEnabled);
     bool IsPlayingEffect(const EffectsGroup* effectGroup) const;
@@ -116,6 +117,12 @@ public:
     void InitMovementCoast();
     void EndBlur();
     nlVector3& GetPrevJointPosition(int jointIndex);
+    void GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
+        int nJointIndex, float fTime, bool bAddRootTrans,
+        bool bAddRootRot, bool bUsePrevPosition, bool bParam4);
+    void GetCurrentAnimFuture(int nJointIndex, float fTime,
+        nlVector3& v3Out, nlVector3& v3FutureRoot,
+        unsigned short& outFacing);
     nlVector3& GetJointPosition(int jointIndex) const;
     s16 GetFacingDeltaToPosition(const nlVector3& position);
     void AttachEffect(EmissionController* pEmissionController);
@@ -155,10 +162,11 @@ public:
     /* 0x0A0 */ u8 unknown_0x0A0[0x1C];
     /* 0x0BC */ cPoseAccumulator* m_pPoseAccumulator;
     /* 0x0C0 */ cPoseNode* m_pPoseTree;
-    /* 0x0C4 */ u32 unknown_0x0C4;
+    /* 0x0C4 */ cPoseNode** m_pAILayer;
     /* 0x0C8 */ cPN_SAnimController* m_pCurrentAnimController;
     /* 0x0CC */ int m_eAnimID;
-    /* 0x0D0 */ u8 unknown_0x0D0[0x24];
+    /* 0x0D0 */ u8 unknown_0x0D0[0x20];
+    /* 0x0F0 */ eClassTypes m_eClassType;
     /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;
     /* 0x0F5 */ u8 unknown_0x0F5[0x2F];
     /* 0x124 */ nlMatrix4 m_m4WorldMatrix;

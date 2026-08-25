@@ -1,3 +1,5 @@
+#include "Game/Field.h"
+#include "Game/Net.h"
 #include "NL/nlMath.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMemory.h"
@@ -228,8 +230,6 @@ UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
 
-extern float lbl_806DBD70;
-extern float lbl_806DBD74;
 extern u8 lbl_806E11A8;
 extern u8 lbl_806DC7D8;
 extern u32 lbl_806E11AC;
@@ -238,7 +238,6 @@ extern const StreamDefinition lbl_804DCCE0;
 extern "C" void* fn_8027267C(int);
 extern "C" void __dla__FPv(void*);
 extern "C" void fn_802CC02C(MeshResource*);
-extern "C" float fn_8002D170(u32);
 extern "C" void fn_802C9254(u32, int, glQuad3*);
 extern "C" void fn_80368A28(nlMatrix4&, float);
 extern "C" u32 fn_802CBE70();
@@ -285,9 +284,9 @@ DrawableNetMesh::~DrawableNetMesh()
 
 void DrawableNetMesh::RenderInvisiblePlanes() const
 {
-    float goalLineX = fn_8002D170(1);
-    float netHeight = lbl_806DBD70;
-    float netWidth = lbl_806DBD74;
+    float goalLineX = cField::GetGoalLineX(1);
+    float netHeight = cNet::m_fNetHeight;
+    float netWidth = cNet::m_fNetWidth;
 
     glSetDefaultState(true);
     glSetRasterState((eGLState)1, 1);

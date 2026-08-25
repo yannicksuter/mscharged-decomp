@@ -69,8 +69,9 @@ public:
     static void ClearData();
     static void InitData(Goalie* pGoalie);
     static SaveData* FindBestSave(SaveBlendInfo& blendInfo,
-        const nlVector3& v3LocalPos, float fTime, bool bDoNearSearch,
-        unsigned int uSaveType, bool bFromTakeoff);
+        const nlVector3& v3LocalPos, const nlVector3& v3LocalVelocity,
+        float fTime, bool bDoNearSearch, unsigned int uSaveType,
+        bool bFromTakeoff);
     static SaveData* FindBestInList(SaveBlendInfo& blendInfo,
         nlListContainer<SaveData*>& SaveList, const nlVector3& v3LocalPos,
         float fTime, unsigned int uSaveType, bool bFromTakeoff);

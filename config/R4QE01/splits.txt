@@ -58,6 +58,17 @@ Game/AI/GoalieActions.cpp:
 	.sbss       start:0x806E0D18 end:0x806E0D30
 	.sdata2     start:0x806E3998 end:0x806E3B00
 
+Game/GoalieFatigue.cpp:
+	.text       start:0x80091020 end:0x8009109C
+	.sdata2     start:0x806E3B00 end:0x806E3B08
+
+Game/AI/GoalieLooseBall.cpp:
+	.text       start:0x8009109C end:0x80091704
+	.rodata     start:0x804DC088 end:0x804DC0B8
+	.bss        start:0x8056D008 end:0x8056D260
+	.sbss       start:0x806E0D30 end:0x806E0D38
+	.sdata2     start:0x806E3B08 end:0x806E3B18
+
 Game/AI/GoalieSave.cpp:
 	.text       start:0x80091704 end:0x80094A2C
 	.ctors      start:0x804DB538 end:0x804DB53C
@@ -128,6 +139,20 @@ Game/Task/LoadingTask.cpp:
 	.data       start:0x805081C0 end:0x805081D4
 	.bss        start:0x8056E420 end:0x8056E444
 	.sdata2     start:0x806E46A8 end:0x806E46AC
+
+Game/Physics/PhysicsCharacter.cpp:
+	.text       start:0x80142A1C end:0x80143FD4
+	.data       start:0x8050E810 end:0x8050EE30
+	.bss        start:0x8056FF70 end:0x80570100
+	.sdata      start:0x806DCA88 end:0x806DCA90
+	.sdata2     start:0x806E48E0 end:0x806E4900
+
+Game/Physics/PhysicsNet.cpp:
+	.text       start:0x80171298 end:0x80172790
+	.data       start:0x80510848 end:0x80510858
+	.sdata      start:0x806DCAA8 end:0x806DCAB0
+	.sbss       start:0x806E12A8 end:0x806E12C8
+	.sdata2     start:0x806E49C0 end:0x806E4A08
 
 Game/Drawable/DrawableNetMesh.cpp:
 	.text       start:0x8017AB34 end:0x8017BA64
@@ -404,9 +429,30 @@ Game/Physics/PhysicsCharacterBase.cpp:
 Game/Physics/PhysicsCharacterBaseData.cpp:
 	.data       start:0x805304F8 end:0x80530534
 
+Game/Physics/PhysicsColumn.cpp:
+	.text       start:0x8031CF44 end:0x8031D0D4
+	.data       start:0x80530538 end:0x80530568
+	.sdata2     start:0x806E68C8 end:0x806E68D0
+
 Game/Physics/PhysicsCompositeObject.cpp:
 	.text       start:0x8031D0D4 end:0x8031D524
 	.data       start:0x80530568 end:0x805305A8
+
+Game/Physics/PhysicsCylinder.cpp:
+	.text       start:0x8031D52C end:0x8031D6D0
+	.data       start:0x805305A8 end:0x805305D8
+	.sdata2     start:0x806E68D0 end:0x806E68D4
+
+Game/Physics/PhysicsFinitePlane.cpp:
+	.text       start:0x8031D6D0 end:0x8031D8E4
+	.data       start:0x805305D8 end:0x80530608
+	.sdata2     start:0x806E68D8 end:0x806E68E0
+
+Game/Physics/PhysicsObject.cpp:
+	.text       start:0x8031D8E4 end:0x80321530
+	.data       start:0x80530608 end:0x80530638
+	.sdata      start:0x806DF600 end:0x806DF608
+	.sdata2     start:0x806E68E0 end:0x806E6900
 
 Game/Physics/PhysicsPlane.cpp:
 	.text       start:0x80321530 end:0x803215DC

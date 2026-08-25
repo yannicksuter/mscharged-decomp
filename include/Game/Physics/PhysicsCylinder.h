@@ -2,6 +2,7 @@
 #define GAME_PHYSICS_PHYSICS_CYLINDER_H
 
 #include "Game/Physics/PhysicsObject.h"
+#include "ode/ext/dCylinder.h"
 
 class CollisionSpace;
 class PhysicsWorld;
@@ -15,6 +16,12 @@ public:
     void SetLength(float);
 
     virtual int GetObjectType() const { return 3; }
+
+private:
+    void SetParams(float radius, float length)
+    {
+        dGeomCylinderSetParams(m_geomID, radius, length);
+    }
 };
 
 #endif

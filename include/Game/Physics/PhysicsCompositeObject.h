@@ -13,22 +13,36 @@ public:
     virtual ~PhysicsCompositeObject();
 
     virtual void Unknown0();
-    virtual int GetObjectType() const;
+    virtual int GetObjectType() const { return 9; }
 
-    int AddObject(PhysicsObject*);
     void AdjustTransform(int, nlMatrix4&, bool);
+    int AddObject(PhysicsObject*);
     PhysicsTransform* GetComponent(unsigned int i)
     {
-        nlDLListIterator<PhysicsTransform*> current = m_Components.Begin();
+        DLListEntry<PhysicsTransform*>* current;
+        DLListEntry<PhysicsTransform*>* head;
+        nlDLListIterator<PhysicsTransform*> iterator = m_Components.Begin();
+
+        head = iterator.m_Head;
+        current = iterator.m_Curr;
+
         for (unsigned int count = 0; count < i; ++count)
         {
-            if (nlDLRingIsEnd(current.m_Head, current.m_Curr))
+            if (nlDLRingIsEnd(head, current))
             {
                 return 0;
             }
-            current.next();
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
         }
-        return *current;
+
+        return current->entry;
     }
 
     /* 0x38 */ nlDLListContainer<PhysicsTransform*> m_Components;
