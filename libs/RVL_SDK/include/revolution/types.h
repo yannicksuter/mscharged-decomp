@@ -58,6 +58,7 @@ typedef unsigned long uintptr_t;
 typedef unsigned long int byte4_t;
 
 #define ALIGN(x) __attribute__((aligned(x)))
+#define PACKED __attribute__((packed))
 
 #define DEFAULT_ALIGN 32
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))

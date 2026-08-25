@@ -1188,6 +1188,9 @@ RVL_SDK/nand/NANDCheck.c:
 	.data       start:0x80554C60 end:0x80554D0C
 	.sdata      start:0x806DFFE0 end:0x806DFFF0
 
+RVL_SDK/ncd/ncdsystem.c:
+	.text       start:0x80410168 end:0x804109E4
+
 RVL_SDK/nwc24/NWC24StdApi.c:
 	.text       start:0x804109E4 end:0x80411548
 	.data       start:0x80554E38 end:0x80554EBC
@@ -1424,6 +1427,10 @@ RVL_SDK/hbm/nw4hbm/lyt/lyt_drawInfo.cpp:
 	.data       start:0x805576D8 end:0x805576E8
 	.sdata2     start:0x806E76F0 end:0x806E76F8
 
+RVL_SDK/hbm/nw4hbm/lyt/lyt_group.cpp:
+	.text       start:0x80448D6C end:0x80449214
+	.data       start:0x805576E8 end:0x805577E8
+
 RVL_SDK/hbm/nw4hbm/lyt/lyt_picture.cpp:
 	.text       start:0x8044EC64 end:0x8044F384
 	.ctors      start:0x804DBB74 end:0x804DBB78
@@ -1500,6 +1507,9 @@ RVL_SDK/hbm/nw4hbm/snd/snd_StrmSound.cpp:
 	.data       start:0x8055ED48 end:0x8055EEC8
 	.sbss       start:0x806E2E58 end:0x806E2E5C
 
+RVL_SDK/hbm/nw4hbm/snd/snd_StrmSoundHandle.cpp:
+	.text       start:0x804704C4 end:0x804704FC
+
 RVL_SDK/hbm/nw4hbm/snd/snd_TaskManager.cpp:
 	.text       start:0x804704FC end:0x80470CE4
 	.data       start:0x8055EEC8 end:0x8055F094
@@ -1522,10 +1532,20 @@ RVL_SDK/hbm/nw4hbm/snd/snd_WaveSound.cpp:
 	.data       start:0x8055F5C0 end:0x8055F7B0
 	.sbss       start:0x806E2E70 end:0x806E2E74
 
+RVL_SDK/hbm/nw4hbm/snd/snd_WaveSoundHandle.cpp:
+	.text       start:0x80472530 end:0x80472568
+
 RVL_SDK/hbm/nw4hbm/snd/snd_WsdTrack.cpp:
 	.text       start:0x80473B88 end:0x80474710
 	.data       start:0x8055FD78 end:0x8055FFA0
 	.sdata2     start:0x806E79A0 end:0x806E79C8
+
+RVL_SDK/hbm/nw4hbm/ut/ut_CharWriter.cpp:
+	.text       start:0x80475A94 end:0x80479824
+	.data       start:0x80560238 end:0x80560518
+	.bss        start:0x806C9850 end:0x806C9870
+	.sbss       start:0x806E2E78 end:0x806E2E80
+	.sdata2     start:0x806E79C8 end:0x806E79E8
 
 RVL_SDK/hbm/nw4hbm/ut/ut_FileStream.cpp:
 	.text       start:0x80479830 end:0x80479974

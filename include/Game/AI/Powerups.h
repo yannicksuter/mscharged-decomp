@@ -9,6 +9,7 @@ class BlurHandler;
 class Bowser;
 class cFielder;
 class PhysicsObject;
+class SFXEmitter;
 
 struct PowerupSounds
 {
@@ -81,6 +82,8 @@ public:
     virtual void Update(float dt);
 
     float GetRadius() const;
+    static void CollisionCallback(PhysicsObject* pObjA,
+        PhysicsObject* pObjB, const nlVector3& v3Pos, void* pParam);
     static unsigned long GetSoundType(ePowerUpType type, PowerupSound powerupSnd);
 
     /* 0x04 */ bool m_bShouldDestroy;
@@ -113,6 +116,14 @@ public:
     /* 0xA4 */ ePowerupSize meSize;
     /* 0xA8 */ bool mbExploder;
 }; // total size: 0xAC
+
+class Bobomb : public PowerupBase
+{
+public:
+    /* 0xA9 */ bool mbIsMine;
+    /* 0xAC */ float m_unkAC;
+    /* 0xB0 */ SFXEmitter* pMovementEmitter;
+}; // total size: 0xB4
 
 PowerupBase* FindPowerUp(unsigned long hashOfDrawable);
 void InitializePowerups();

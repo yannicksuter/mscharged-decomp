@@ -1,15 +1,87 @@
 #include "Game/AI/Powerups.h"
 
+#include "Game/AI/AIPad.h"
+#include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
+#include "Game/Ball.h"
+#include "Game/Effects/EmissionController.h"
+#include "Game/Effects/EmissionManager.h"
+#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsBanana.h"
+#include "Game/Physics/PhysicsCharacter.h"
+#include "Game/Physics/PhysicsShell.h"
 #include "Game/Physics/PhysicsSphere.h"
 #include "NL/globalpad.h"
+#include "NL/nlFunction.h"
 #include "NL/nlPrint.h"
+#include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
 
 extern "C" DrawableObject* fn_8027725C(unsigned long);
 extern "C" void fn_802772A4(DrawableObject*);
+extern "C" bool fn_8003877C(cFielder*);
+extern "C" bool fn_8003886C(cFielder*);
+extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
+extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
+extern "C" float fn_8002CFF0(PlayerTweaks*);
+extern "C" void fn_80146964(void*);
+extern "C" void fn_8014777C(void*);
+extern "C" void fn_801478C4(void*);
+extern "C" void fn_80147A0C(void*);
+extern "C" void fn_80147B54(void*);
+extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
+extern "C" EmissionController* fn_802E7FE4(EmissionManager*, EffectsGroup*, int, bool, bool);
+extern "C" void fn_8009F1B8(EmissionController&);
+
+struct CollisionBallShellData
+{
+    cBall* pBall;
+    PowerupBase* pPowerup;
+    nlVector3 v3CollisionVelocity;
+};
+
+struct CollisionPlayerBananaData
+{
+    cFielder* pPlayer;
+    cFielder* pThrower;
+    int nThrowerPadID;
+    nlVector3 v3CollisionLocation;
+};
+
+struct CollisionPlayerShellData
+{
+    cFielder* pPlayer;
+    cFielder* pThrower;
+    u8 nThrowerPadID;
+    bool bIsExploder;
+    int eSize;
+    nlVector3 v3CollisionLocation;
+    nlVector3 v3CollisionVelocity;
+};
+
+struct CollisionPlayerFreezeData
+{
+    cFielder* pPlayer;
+    cFielder* pThrower;
+    int nThrowerPadID;
+    int eSize;
+};
+
+struct PowerupHitPlayerEventData
+{
+    ePowerUpType Type;
+    cPlayer* Thrower;
+    cPlayer* Target;
+};
+
+extern SlotPool<CollisionBallShellData> lbl_80571618;
+extern SlotPool<CollisionPlayerShellData> lbl_80571668;
+extern SlotPool<CollisionPlayerFreezeData> lbl_80571690;
+extern SlotPool<CollisionPlayerBananaData> lbl_805716B8;
+extern SlotPool<PowerupHitPlayerEventData> lbl_805719D8;
 
 static int gBobombAnticipationVoiceID;
+static float lbl_806DBDE0 = 0.5f;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -55,7 +127,7 @@ PowerupModelPool powerupModelPool;
 PowerupRegistry powerupRegistry;
 }
 
-static u8 gbAlwaysSurround;
+static u8 gbAlwaysSurround = true;
 
 namespace
 {
@@ -74,6 +146,358 @@ const char* uBANANA_STREAK_TEXTURE;
 float PowerupBase::GetRadius() const
 {
     return ((PhysicsSphere*)m_pPhysicsObject)->GetRadius();
+}
+
+/**
+ * Offset/Address/Size: 0x2DE0 | 0x8009C440 | size: 0x680
+ */
+void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
+    PhysicsObject* pObjB, const nlVector3& v3Pos, void* pParam)
+{
+    PowerupBase* pObj = (PowerupBase*)pParam;
+    cCharacter* pCharacter = 0;
+    cPlayer* pPlayerTarget = 0;
+
+    if (pObj->m_unk44.m_uPackedTime != 0)
+    {
+        return;
+    }
+
+    int type = pObjB->GetObjectType();
+    switch (type)
+    {
+    case 0x04:
+        pCharacter = ((PhysicsCharacter*)pObjB->m_parentObject)->m_pAICharacter;
+        break;
+    case 0x10:
+    {
+        cBall* pBall = ((PhysicsBall*)pObjB)->m_pBall;
+        if (pBall->m_bBallPathChangeCount != 0)
+        {
+            if (pBall->m_pOwner == 0)
+            {
+                CollisionBallShellData* pData = 0;
+                lbl_80571618.Allocate(pData);
+                pData->pPowerup = pObj;
+                pData->pBall = pBall;
+                pData->v3CollisionVelocity = pObj->m_v3Velocity;
+                fn_80146964(pData);
+            }
+            else if (pBall->GetOwnerFielder() != 0)
+            {
+                pCharacter = pBall->GetOwnerFielder();
+            }
+        }
+        break;
+    }
+    case 0x14:
+    {
+        if (((PhysicsShell*)pObjB)->m_pPowerupObject->m_unk44.m_uPackedTime != 0)
+        {
+            break;
+        }
+
+        ePowerupSize otherSize = ((PhysicsShell*)pObjB)->m_pPowerupObject->meSize;
+        if (pObj->meSize > otherSize)
+        {
+            ((PhysicsShell*)pObjB)->m_pPowerupObject->m_bShouldDestroy = true;
+        }
+        else if (pObj->meSize == otherSize)
+        {
+            if (pObj->m_eType == POWER_UP_BANANA)
+            {
+                pObj->m_bShouldDestroy = true;
+            }
+            else if (pObj->m_eType == POWER_UP_SPINY_SHELL
+                     && ((PhysicsShell*)pObjB)->m_pPowerupObject->m_eType == POWER_UP_SPINY_SHELL)
+            {
+            }
+            else if (pObj->m_eType == POWER_UP_RED_SHELL
+                     && ((PhysicsShell*)pObjB)->m_pPowerupObject->m_eType == POWER_UP_RED_SHELL)
+            {
+            }
+            else if (pObj->m_eType == POWER_UP_SPINY_SHELL)
+            {
+                ((PhysicsShell*)pObjB)->m_pPowerupObject->m_bShouldDestroy = true;
+            }
+            else if (((PhysicsShell*)pObjB)->m_pPowerupObject->m_eType == POWER_UP_SPINY_SHELL)
+            {
+                pObj->m_bShouldDestroy = true;
+            }
+            else
+            {
+                ((PhysicsShell*)pObjB)->m_pPowerupObject->m_bShouldDestroy = true;
+                pObj->m_bShouldDestroy = true;
+            }
+        }
+        else
+        {
+            pObj->m_bShouldDestroy = true;
+        }
+        break;
+    }
+    case 0x15:
+    {
+        PowerupBase* pOther = ((PhysicsBanana*)pObjB)->m_pPowerupObject;
+        if (pOther->m_unk44.m_uPackedTime != 0)
+        {
+            break;
+        }
+
+        ePowerupSize otherSize = pOther->meSize;
+        if (pObj->meSize > otherSize)
+        {
+            pOther->m_bShouldDestroy = true;
+        }
+        else if (pObj->meSize == otherSize)
+        {
+            pOther->m_bShouldDestroy = true;
+            if (pObj->m_eType != POWER_UP_SPINY_SHELL)
+            {
+                pObj->m_bShouldDestroy = true;
+            }
+        }
+        else
+        {
+            pObj->m_bShouldDestroy = true;
+        }
+        break;
+    }
+    default:
+        if (pObj->m_eType == POWER_UP_BOBOMB
+            && pObjB->GetObjectType() == 0x12
+            && !((Bobomb*)pObj)->mbIsMine)
+        {
+            ((Bobomb*)pObj)->mbIsMine = true;
+            ((Bobomb*)pObj)->m_unkAC = lbl_806DBDE0;
+            pObj->m_v3Velocity = v3Zero;
+            pObj->m_pPhysicsObject->SetLinearVelocity(v3Zero);
+
+            EffectsGroup* pEffectsGroup;
+            if (pObj->meSize == POWERUPSIZE_SMALL)
+            {
+                pEffectsGroup = fn_802E7CDC(
+                    EmissionManager::Instance(), "bobomb_ground");
+            }
+            else
+            {
+                pEffectsGroup = fn_802E7CDC(
+                    EmissionManager::Instance(), "bobomb_ground_large");
+            }
+
+            EmissionController* pController = fn_802E7FE4(
+                EmissionManager::Instance(), pEffectsGroup, 3, true, false);
+            pController->SetPosition(pObj->m_v3Position);
+            pController->m_uUserData = (u32)pObj;
+            Function1<void, EmissionController&> callback(fn_8009F1B8);
+            pController->SetUpdateCallback(callback);
+        }
+        break;
+    }
+
+    if (pCharacter != 0)
+    {
+        if (pCharacter->m_eClassType == GOALIE)
+        {
+            pObj->m_bShouldDestroy = true;
+        }
+        else
+        {
+            pPlayerTarget = (cPlayer*)pCharacter;
+            if (((cFielder*)pCharacter)->mbWasHitByPowerupThisFrame)
+            {
+                return;
+            }
+            ((cFielder*)pCharacter)->mbWasHitByPowerupThisFrame = true;
+
+            unsigned long soundID = powerupSounds[pObj->m_eType].sndHit;
+            if (soundID != 0)
+            {
+                fn_800EBBFC(0x10, soundID, 0, 0);
+            }
+
+            {
+                if (pObj->m_eType == POWER_UP_BANANA)
+                {
+                    CollisionPlayerBananaData* pData = 0;
+                    lbl_805716B8.Allocate(pData);
+                    pData->pPlayer = (cFielder*)pCharacter;
+                    pData->pThrower = pObj->m_pThrower;
+                    pData->nThrowerPadID = pObj->m_nThrowerPadID;
+                    pData->v3CollisionLocation = v3Pos;
+                    fn_801478C4(pData);
+                    pObj->m_bShouldDestroy = true;
+                }
+                else if (pObj->m_eType != POWER_UP_BOBOMB)
+                {
+                    bool bUnknown = fn_8003877C((cFielder*)pCharacter);
+                    if (pObj->m_eType != POWER_UP_FREEZE_SHELL)
+                    {
+                        if (!bUnknown || pObj->m_eType == POWER_UP_SPINY_SHELL)
+                        {
+                            CollisionPlayerShellData* pData = 0;
+                            lbl_80571668.Allocate(pData);
+                            pData->pPlayer = (cFielder*)pCharacter;
+                            pData->eSize = (int)pObj->meSize;
+                            pData->pThrower = pObj->m_pThrower;
+                            pData->nThrowerPadID = (u8)pObj->m_nThrowerPadID;
+                            if (pObj->mbExploder)
+                            {
+                                pData->bIsExploder = true;
+                            }
+                            else
+                            {
+                                pData->bIsExploder = false;
+                            }
+                            pData->v3CollisionLocation = v3Pos;
+                            pData->v3CollisionVelocity = pObj->m_v3Velocity;
+                            fn_80147A0C(pData);
+                        }
+                    }
+                    else
+                    {
+                        CollisionPlayerFreezeData* pData = 0;
+                        lbl_80571690.Allocate(pData);
+                        pData->pPlayer = (cFielder*)pCharacter;
+                        pData->eSize = (int)pObj->meSize;
+                        pData->pThrower = pObj->m_pThrower;
+                        pData->nThrowerPadID = pObj->m_nThrowerPadID;
+                        fn_80147B54(pData);
+                    }
+
+                    if (!bUnknown)
+                    {
+                        if (pObj->meSize != POWERUPSIZE_LARGE)
+                        {
+                            pObj->m_bShouldDestroy = true;
+                        }
+                        else
+                        {
+                            pObj->m_pTarget = 0;
+                        }
+                    }
+                }
+                else if (pObj->m_eType == POWER_UP_BOBOMB)
+                {
+                    pObj->m_bShouldDestroy = true;
+                }
+            }
+
+            bool bInvincible = !fn_8003886C((cFielder*)pCharacter)
+                            && (((cFielder*)pCharacter)->muInvincibleStatus & 8) != 0;
+            if (bInvincible)
+            {
+                pObj->m_bShouldDestroy = true;
+            }
+        }
+    }
+
+    if (pPlayerTarget != 0)
+    {
+        PowerupHitPlayerEventData* pData = 0;
+        lbl_805719D8.Allocate(pData);
+        pData->Type = pObj->m_eType;
+        pData->Thrower = (cPlayer*)pObj->m_pThrower;
+        pData->Target = pPlayerTarget;
+        fn_8014777C(pData);
+    }
+}
+
+/**
+ * Offset/Address/Size: 0x352C | 0x8009CB8C | size: 0x330
+ */
+void PowerupBase::ThrowAt(cFielder* pThrower, Bowser* pBowser)
+{
+    unsigned long soundID = powerupSounds[m_eType].sndActivate;
+    if (soundID != 0)
+    {
+        if (this != 0)
+        {
+            fn_800EBBFC(0x10, soundID, "Powerup", this);
+        }
+        else
+        {
+            fn_800EBBFC(0x10, soundID, 0, 0);
+        }
+    }
+
+    int nNumSolutions;
+    float pSolutions[2];
+    nlVector3 v3TargetPos;
+    nlVector3 v3TargetVel;
+
+    v3TargetPos = pThrower->m_v3Position;
+    v3TargetVel = pThrower->m_v3Velocity;
+
+    if (m_pTarget != 0)
+    {
+        v3TargetPos = m_pTarget->m_v3Position;
+        v3TargetVel = m_pTarget->m_v3Velocity;
+    }
+
+    float speed = fn_8002CFF0(fn_8003E6E4(pThrower));
+
+    if (gbAlwaysSurround || pThrower->GetGlobalPad() == 0)
+    {
+        nlVector3 v3Direction;
+        v3Direction.Sub2D(v3TargetPos, m_v3Position);
+        v3Direction.z = v3TargetPos.z - m_v3Position.z;
+        float invDist = nlRecipSqrt(v3Direction.GetLengthSq3D(), true);
+        nlVec3Scale(v3Direction, invDist);
+
+        CalcInterceptXY(m_v3Position, speed, 0.0f, v3TargetPos, v3TargetVel, nNumSolutions, pSolutions);
+
+        if (nNumSolutions != 0)
+        {
+            float t;
+            if (nNumSolutions == 2)
+            {
+                t = (pSolutions[0] < pSolutions[1]) ? pSolutions[0] : pSolutions[1];
+            }
+            else
+            {
+                t = pSolutions[0];
+            }
+
+            nlVector3 v3BobombVelocity;
+            nlVector2 v2TargetPos;
+            v2TargetPos.x = v3TargetVel.x * t + v3TargetPos.x;
+            v2TargetPos.y = v3TargetVel.y * t + v3TargetPos.y;
+
+            v3BobombVelocity.x = (v2TargetPos.x - m_v3Position.x) / t;
+            v3BobombVelocity.y = (v2TargetPos.y - m_v3Position.y) / t;
+            v3BobombVelocity.z = 0.0f;
+
+            m_v3Velocity = v3BobombVelocity;
+            m_pPhysicsObject->SetLinearVelocity(v3BobombVelocity);
+        }
+        else
+        {
+            nlVector3 v3BobombVelocity;
+            nlVec3Scale(v3BobombVelocity, v3Direction, speed);
+            v3BobombVelocity.z = 0.0f;
+
+            m_v3Velocity = v3BobombVelocity;
+            m_pPhysicsObject->SetLinearVelocity(v3BobombVelocity);
+        }
+    }
+    else
+    {
+        unsigned short aDirection = pThrower->m_aActualFacingDirection;
+        if (pThrower->m_pController != 0
+            && pThrower->m_pController->GetMovementStickMagnitude() > 0.01f)
+        {
+            aDirection = pThrower->m_pController->GetMovementStickDirection();
+        }
+
+        nlVector3 v3BobombVelocity;
+        nlPolarToCartesian(v3BobombVelocity.x, v3BobombVelocity.y, aDirection, 1.0f);
+        v3BobombVelocity.z = 0.0f;
+        nlVec3Scale(v3BobombVelocity, v3BobombVelocity, speed);
+
+        m_v3Velocity = v3BobombVelocity;
+        m_pPhysicsObject->SetLinearVelocity(v3BobombVelocity);
+    }
 }
 
 /**
