@@ -17,12 +17,6 @@ enum {
     OS_STATE_FLAGS_SHUTDOWN_IDLE
 };
 
-enum {
-    DVD_STATE_BUSY = 1,
-    DVD_STATE_WAITING,
-    DVD_STATE_COVER_CLOSED
-};
-
 #define DVD_COVER_CLOSED 2
 
 #define SC_STATUS_BUSY 1
@@ -46,7 +40,6 @@ BOOL __PADDisableRecalibration(BOOL disable);
 void __VISetRGBModeImm(void);
 u32 __DVDGetCoverStatus(void);
 void __DVDPrepareReset(void);
-void fn_8040C264(SCIdleModeInfo* info);
 
 static u32 bootThisDol = 0;
 volatile BOOL __OSIsReturnToIdle = FALSE;
@@ -213,7 +206,7 @@ void OSShutdownSystem(void) {
     while (SCCheckStatus() == SC_STATUS_BUSY) {
     }
 
-    fn_8040C264(&idleInfo);
+    SCGetIdleMode(&idleInfo);
 
     __OSStopPlayRecord();
     __OSUnRegisterStateEvent();

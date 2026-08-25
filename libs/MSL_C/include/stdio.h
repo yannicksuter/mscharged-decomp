@@ -2,12 +2,16 @@
 #define MSL_STDIO_H
 
 #include <stdarg.h>
+#include <size_t.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+int sprintf(char* s, const char* format, ...);
+int snprintf(char* s, size_t n, const char* format, ...);
 int vprintf(const char* format, va_list arguments);
+int vsprintf(char* s, const char* format, va_list arguments);
 
 #ifdef __cplusplus
 }

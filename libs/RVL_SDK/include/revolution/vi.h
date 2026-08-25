@@ -44,6 +44,11 @@ typedef enum VIHwReg
 
 #define VI_VICLK_SPEED (1 << 0)
 
+typedef enum VIClkSpeed {
+    VI_VICLK_27MHZ,
+    VI_VICLK_54MHZ,
+} VIClkSpeed;
+
 VIRetraceCallback VISetPreRetraceCallback(VIRetraceCallback callback);
 VIRetraceCallback VISetPostRetraceCallback(VIRetraceCallback callback);
 void VIInit(void);

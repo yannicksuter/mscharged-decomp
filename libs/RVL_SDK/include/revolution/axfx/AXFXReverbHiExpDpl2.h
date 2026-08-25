@@ -7,7 +7,9 @@ extern "C" {
 
 // Forward declarations
 typedef struct AXFX_BUS AXFX_BUS;
+typedef struct AXFX_BUS_DPL2 AXFX_BUS_DPL2;
 typedef struct AXFX_BUFFERUPDATE AXFX_BUFFERUPDATE;
+typedef struct AXFX_BUFFERUPDATE_DPL2 AXFX_BUFFERUPDATE_DPL2;
 
 typedef struct AXFX_REVERBHI_EXP_DPL2 {
     f32* earlyLine[4];  // at 0x0
@@ -51,10 +53,10 @@ typedef struct AXFX_REVERBHI_EXP_DPL2 {
     f32 crosstalk;       // at 0x15C
     f32 earlyGain;       // at 0x160
     f32 fusedGain;       // at 0x164
-    AXFX_BUS* busIn;     // at 0x168
-    AXFX_BUS* busOut;    // at 0x16C
-    f32 outGain;         // at 0x170
-    f32 sendGain;        // at 0x174
+    AXFX_BUS_DPL2* busIn;  // at 0x168
+    AXFX_BUS_DPL2* busOut; // at 0x16C
+    f32 outGain;           // at 0x170
+    f32 sendGain;          // at 0x174
 } AXFX_REVERBHI_EXP_DPL2;
 
 u32 AXFXReverbHiExpGetMemSizeDpl2(const AXFX_REVERBHI_EXP_DPL2* fx);

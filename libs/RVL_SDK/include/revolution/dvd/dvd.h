@@ -99,6 +99,7 @@ BOOL DVDInquiryAsync(DVDCommandBlock* block, DVDDriveInfo* info,
 s32 DVDGetCommandBlockStatus(const DVDCommandBlock* block);
 s32 DVDGetDriveStatus(void);
 void DVDPause(void);
+BOOL DVDSetAutoInvalidation(BOOL autoInval);
 void DVDResume(void);
 BOOL DVDCancelAsync(DVDCommandBlock* block, DVDCommandCallback callback);
 s32 DVDCancel(DVDCommandBlock* block);

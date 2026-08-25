@@ -4,6 +4,7 @@
 #include <revolution/os/OSContext.h>
 #include <revolution/os/OSThread.h>
 #include <revolution/types.h>
+#include <revolution/dvd/dvd.h>
 
 #define OS_PHYS_BOOT_INFO 0x00000000
 #define OS_PHYS_TV_FORMAT 0x000000CC
@@ -66,8 +67,13 @@ typedef struct OSBI2 {
     u32 simulatedMem2Size;
 } OSBI2;
 
+typedef enum {
+    OS_BOOT_MAGIC_BOOTROM = 0xD15EA5E,
+    OS_BOOT_MAGIC_JTAG = 0xE5207C22,
+} OSBootMagic;
+
 typedef struct OSBootInfo {
-    u8 diskID[0x20];
+    DVDDiskID diskID;
     u32 bootMagic;
     u32 apploaderVersion;
     u32 physicalMemorySize;
@@ -77,6 +83,8 @@ typedef struct OSBootInfo {
     void* fstStart;
     u32 fstSize;
 } OSBootInfo;
+
+u8 OS_SC_PRDINFO[0x100] AT_ADDRESS(0x80003800);
 
 volatile u32 PI_HW_REGS[] AT_ADDRESS(0xCC003000);
 

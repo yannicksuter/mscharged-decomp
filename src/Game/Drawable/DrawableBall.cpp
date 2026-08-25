@@ -136,7 +136,7 @@ struct BallScaleData
     float scale;
 };
 
-extern BallObject* lbl_806E0BC0;
+extern BallObject* g_pBall;
 extern TaskManager* m_pInstance__13nlTaskManager;
 extern "C" float fn_800155A0(BallObject*, int);
 extern "C" LiveBallTrail* fn_8001B284(u32);
@@ -167,16 +167,16 @@ DrawableBall::DrawableBall(RenderSnapshot* renderSnapshot)
 
 void DrawableBall::Grab()
 {
-    mOrientation = lbl_806E0BC0->orientation;
-    mPosition = lbl_806E0BC0->position;
-    mVelocity = lbl_806E0BC0->velocity;
-    mScale = fn_800155A0(lbl_806E0BC0, 0);
+    mOrientation = g_pBall->orientation;
+    mPosition = g_pBall->position;
+    mVelocity = g_pBall->velocity;
+    mScale = fn_800155A0(g_pBall, 0);
 
-    mFlags.bits.ownerIndex = fn_80026C6C(lbl_806E0BC0->owner);
-    mFlags.bits.previousOwnerIndex = fn_80026C6C(lbl_806E0BC0->previousOwner);
-    mFlags.bits.passTargetIndex = fn_80026C6C(lbl_806E0BC0->passTarget);
-    mFlags.bits.lastTouchIndex = fn_80026C6C(lbl_806E0BC0->lastTouch);
-    BallObject* ball = lbl_806E0BC0;
+    mFlags.bits.ownerIndex = fn_80026C6C(g_pBall->owner);
+    mFlags.bits.previousOwnerIndex = fn_80026C6C(g_pBall->previousOwner);
+    mFlags.bits.passTargetIndex = fn_80026C6C(g_pBall->passTarget);
+    mFlags.bits.lastTouchIndex = fn_80026C6C(g_pBall->lastTouch);
+    BallObject* ball = g_pBall;
     mFlags.bits.visible = ball->visible;
     mFlags.bits.transient = 0;
 
@@ -192,7 +192,7 @@ void DrawableBall::Grab()
 
 void DrawableBall::Render() const
 {
-    RenderObject* drawable = lbl_806E0BC0->drawable;
+    RenderObject* drawable = g_pBall->drawable;
     if (mFlags.bits.visible)
     {
         drawable->objectFlags |= 1;
@@ -211,7 +211,7 @@ void DrawableBall::Render() const
 
         if ((m_pInstance__13nlTaskManager->flags & 0x20018) == 0)
         {
-            if (lbl_806E0BC0->owner == 0)
+            if (g_pBall->owner == 0)
             {
                 drawable->modelScale = 1.5f;
             }

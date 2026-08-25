@@ -1,4 +1,5 @@
 #include "NL/nlBundleFile.h"
+#include "NL/nlFileGC.h"
 
 #include <string.h>
 
@@ -10,8 +11,6 @@ extern "C" nlFile* fn_80366C04(const char* filename);
 extern "C" void fn_802B3718(nlFile* file, void* buffer, unsigned long size, unsigned long offset);
 extern "C" void fn_802B3728(nlFile* file);
 extern "C" void fn_80367720(nlFile* file, void* buffer, unsigned long size, nlFileAsyncCallback callback, unsigned long userParam, unsigned long offset);
-extern "C" void fn_80367824(nlFile* file, unsigned long offset, unsigned long origin);
-
 struct AsyncReadCallbackData
 {
     FileReadAsyncCallback callback;
@@ -24,7 +23,7 @@ static void fn_802BDC38(nlFile*, void* buffer, unsigned int size, unsigned long 
 static void fn_802BDB70(nlFile*, void*, unsigned int, unsigned long userParam)
 {
     BundleFile* bundle = (BundleFile*)userParam;
-    fn_80367824(bundle->m_pFile, bundle->nDirectoryOffsetInSectors * bundle->nSectorSize, 0);
+    nlSeek(bundle->m_pFile, bundle->nDirectoryOffsetInSectors * bundle->nSectorSize, 0);
     bundle->m_pDirectory = (BundleFileDirectoryEntry*)nlMalloc(bundle->nNumFiles * sizeof(BundleFileDirectoryEntry), 0x20, true);
     fn_80367720(bundle->m_pFile, bundle->m_pDirectory, bundle->nNumFiles * sizeof(BundleFileDirectoryEntry), fn_802BDBEC, (unsigned long)bundle, 0);
 }
@@ -116,7 +115,7 @@ bool BundleFile::Open(const char* filename, bool keepFilename)
     }
     else
     {
-        fn_80367824(m_pFile, nDirectoryOffsetInSectors * nSectorSize, 0);
+        nlSeek(m_pFile, nDirectoryOffsetInSectors * nSectorSize, 0);
         m_pDirectory = (BundleFileDirectoryEntry*)nlMalloc(nNumFiles * sizeof(BundleFileDirectoryEntry), 0x20, true);
         fn_802B3718(m_pFile, m_pDirectory, nNumFiles * sizeof(BundleFileDirectoryEntry), 0);
     }
@@ -223,7 +222,7 @@ bool BundleFile::GetFileInfoByIndex(unsigned long index, BundleFileDirectoryEntr
 void BundleFile::ReadFileByIndex(unsigned long index, void* buffer, unsigned long)
 {
     BundleFileDirectoryEntry* entry = &m_pDirectory[index];
-    fn_80367824(m_pFile, entry->m_blockNumber * nSectorSize, 0);
+    nlSeek(m_pFile, entry->m_blockNumber * nSectorSize, 0);
     fn_802B3718(m_pFile, buffer, entry->m_length, 0);
 }
 
@@ -234,7 +233,7 @@ void BundleFile::ReadFileAsync(const char* filename, void* buffer, unsigned long
     data->callback = callback;
     data->userParam = userParam;
     BundleFileDirectoryEntry* entry = &m_pDirectory[index];
-    fn_80367824(m_pFile, entry->m_blockNumber * nSectorSize, 0);
+    nlSeek(m_pFile, entry->m_blockNumber * nSectorSize, 0);
     fn_80367720(m_pFile, buffer, size, fn_802BDC38, (unsigned long)data, 0);
 }
 
@@ -245,7 +244,7 @@ void BundleFile::ReadFileAsync(unsigned long hash, void* buffer, unsigned long s
     data->callback = callback;
     data->userParam = userParam;
     BundleFileDirectoryEntry* entry = &m_pDirectory[index];
-    fn_80367824(m_pFile, entry->m_blockNumber * nSectorSize, 0);
+    nlSeek(m_pFile, entry->m_blockNumber * nSectorSize, 0);
     fn_80367720(m_pFile, buffer, size, fn_802BDC38, (unsigned long)data, 0);
 }
 
@@ -255,6 +254,6 @@ void BundleFile::ReadFileAsyncByIndex(unsigned long index, void* buffer, unsigne
     data->callback = callback;
     data->userParam = userParam;
     BundleFileDirectoryEntry* entry = &m_pDirectory[index];
-    fn_80367824(m_pFile, entry->m_blockNumber * nSectorSize, 0);
+    nlSeek(m_pFile, entry->m_blockNumber * nSectorSize, 0);
     fn_80367720(m_pFile, buffer, size, fn_802BDC38, (unsigned long)data, 0);
 }

@@ -27,11 +27,10 @@ inline CharT* nlStrNCpy(CharT* str1, const CharT* str2, unsigned long len)
     goto test;
 loop:
     p++;
-    str2++;
 test:
     if (n-- == 0)
         goto done;
-    c = *(const unsigned char*)str2;
+    c = *(const unsigned char*)&str2[p];
     str1[p] = c;
     if ((CharT)c)
         goto loop;

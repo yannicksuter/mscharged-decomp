@@ -138,7 +138,7 @@ void fn_800F2404();
 
 extern u8 lbl_806E13C2;
 extern u8 lbl_806E181D;
-extern void* lbl_806E0BC0;
+extern void* g_pBall;
 extern void* lbl_806E0DF8[];
 extern void* lbl_806E1860;
 extern void* lbl_806E1608;
@@ -331,9 +331,9 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if ((from == 2 && to != 1) || (from == 1 && to != 2))
     {
-        if (lbl_806E0BC0 != 0)
+        if (g_pBall != 0)
         {
-            fn_800180AC(lbl_806E0BC0);
+            fn_800180AC(g_pBall);
         }
     }
 

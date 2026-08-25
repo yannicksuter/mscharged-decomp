@@ -107,6 +107,18 @@ inline bool SimpleParser::NextChar()
     return true;
 }
 
+inline bool SimpleParser::SkipToEOL()
+{
+    do
+    {
+        if (!AdvanceEnd())
+        {
+            return false;
+        }
+    } while (*mEndOfLine != '\n');
+    return true;
+}
+
 inline bool SimpleParser::IsSeparator(char value) const
 {
     return Contains(mSeparators, value);
@@ -123,54 +135,25 @@ bool SimpleParser::StartParsing(char* data, int size, const char* separators)
         return false;
     }
 
-restart:
     for (;;)
     {
-        if (!IsSeparator(*mEndOfLine))
+        if (IsSeparator(*mEndOfLine))
         {
-            break;
-        }
-        if (!AdvanceEnd())
-        {
-            return false;
-        }
-    }
-
-    if (*mEndOfLine == '#')
-    {
-        for (;;)
-        {
-            unsigned char advanced;
-            if (mAmountLeft <= 1)
-            {
-                advanced = 0;
-            }
-            else
-            {
-                advanced = 1;
-                ++mEndOfLine;
-                --mAmountLeft;
-            }
-
-            unsigned char foundNewline;
-            if (advanced == 0)
-            {
-                foundNewline = 0;
-            }
-            else if (*mEndOfLine == '\n')
-            {
-                foundNewline = 1;
-            }
-            else
-            {
-                continue;
-            }
-
-            if (foundNewline == 0)
+            if (!AdvanceEnd())
             {
                 return false;
             }
-            goto restart;
+        }
+        else if (*mEndOfLine == '#')
+        {
+            if (!SkipToEOL())
+            {
+                return false;
+            }
+        }
+        else
+        {
+            break;
         }
     }
 
@@ -188,54 +171,25 @@ inline bool SimpleParser::AdvanceLineInternal()
         return false;
     }
 
-restart:
     for (;;)
     {
-        if (!IsSeparator(*mEndOfLine))
+        if (IsSeparator(*mEndOfLine))
         {
-            break;
-        }
-        if (!AdvanceEnd())
-        {
-            return false;
-        }
-    }
-
-    if (*mEndOfLine == '#')
-    {
-        for (;;)
-        {
-            unsigned char advanced;
-            if (mAmountLeft <= 1)
-            {
-                advanced = 0;
-            }
-            else
-            {
-                advanced = 1;
-                ++mEndOfLine;
-                --mAmountLeft;
-            }
-
-            unsigned char foundNewline;
-            if (advanced == 0)
-            {
-                foundNewline = 0;
-            }
-            else if (*mEndOfLine == '\n')
-            {
-                foundNewline = 1;
-            }
-            else
-            {
-                continue;
-            }
-
-            if (foundNewline == 0)
+            if (!AdvanceEnd())
             {
                 return false;
             }
-            goto restart;
+        }
+        else if (*mEndOfLine == '#')
+        {
+            if (!SkipToEOL())
+            {
+                return false;
+            }
+        }
+        else
+        {
+            break;
         }
     }
 

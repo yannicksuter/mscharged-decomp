@@ -30,6 +30,7 @@ private:
     inline bool AdvanceEnd();
     inline bool AdvanceLineInternal();
     inline bool NextChar();
+    inline bool SkipToEOL();
     inline bool IsSeparator(char value) const;
 
     /* 0x000 */ char mTokenBuffer[5][256];

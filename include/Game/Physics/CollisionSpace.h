@@ -32,4 +32,6 @@ public:
     /* 0x0C */ PhysicsWorld* m_physicsWorld;
 }; // size: 0x10
 
+extern CollisionSpace* g_CollisionSpace;
+
 #endif
