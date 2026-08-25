@@ -19,6 +19,9 @@ void GXSetIndTexOrder(GXIndTexStageID stage, GXTexCoordID coord,
                       GXTexMapID map);
 void GXSetNumIndStages(u8 num);
 void GXSetTevDirect(GXTevStageID stage);
+void GXSetTevIndWarp(GXTevStageID tev_stage, GXIndTexStageID ind_stage,
+                     GXBool signed_offsets, GXBool replace_mode,
+                     GXIndTexMtxID matrix_sel);
 
 void __GXUpdateBPMask(void);
 void __GXSetIndirectMask(u32 mask);

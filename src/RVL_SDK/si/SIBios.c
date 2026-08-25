@@ -1,7 +1,7 @@
 #include <revolution/si.h>
 #include <revolution/os.h>
 
-static const char* __SIVersion = "<< RVL_SDK - SI \trelease build: Aug  8 2007 02:07:10 (0x4199_60831) >>";
+static const char* __SIVersion = "<< RVL_SDK - SI \trelease build: Nov 30 2006 03:31:44 (0x4199_60831) >>";
 
 static SIControl Si = { -1, 0, 0, NULL, NULL };
 static SIPacket Packet[SI_MAX_CHAN];

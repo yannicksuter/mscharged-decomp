@@ -35,6 +35,11 @@ typedef struct OSCalendarTime {
 #define OS_USEC_TO_TICKS(x) ((x) * (OS_TIME_SPEED / 125000) / 8)
 #define OS_NSEC_TO_TICKS(x) ((x) * (OS_TIME_SPEED / 125000) / 8000)
 
+#define OSSecondsToTicks(sec) OS_SEC_TO_TICKS(sec)
+#define OSMillisecondsToTicks(msec) OS_MSEC_TO_TICKS(msec)
+#define OSMicrosecondsToTicks(usec) OS_USEC_TO_TICKS(usec)
+#define OSNanosecondsToTicks(nsec) OS_NSEC_TO_TICKS(nsec)
+
 #define OS_TICKS_DELTA(x, y) ((s32)(x) - (s32)(y))
 
 OSTime OSGetTime(void);

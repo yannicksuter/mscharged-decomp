@@ -24,6 +24,7 @@ public:
     void SetVelocity(const nlVector3& velocity, eSpinType spin,
         const nlVector3* pAngularVelocity);
     cFielder* GetOwnerFielder();
+    cFielder* GetPassTargetFielder() const;
 
     /* 0x00 */ u8 m_bBallPathChangeCount;
 

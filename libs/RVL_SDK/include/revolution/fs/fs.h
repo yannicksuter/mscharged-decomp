@@ -44,6 +44,9 @@ s32 ISFS_Rename(const char* from, const char* to);
 s32 ISFS_RenameAsync(const char* from, const char* to, FSAsyncCallback callback,
                      void* callbackArg);
 s32 ISFS_GetUsage(const char* path, s32* blockCountOut, s32* fileCountOut);
+s32 ISFS_GetUsageAsync(const char* path, s32* blockCountOut,
+                       s32* fileCountOut, FSAsyncCallback callback,
+                       void* callbackArg);
 s32 ISFS_CreateFile(const char* path, u32 attr, u32 ownerPerm, u32 groupPerm,
                     u32 otherPerm);
 s32 ISFS_CreateFileAsync(const char* path, u32 attr, u32 ownerPerm,

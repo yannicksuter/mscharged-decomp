@@ -21,32 +21,12 @@ static NWC24Err CheckConfig(void) DECOMP_DONT_INLINE;
 static NWC24Err GenerateUserId(u64* pId);
 
 NWC24Err NWC24GetMyUserId(u64* pId) {
-    NWC24Err scdErr;
-    NWC24Err result;
-
-    result = NWC24_OK;
-
-    if (NWC24IsMsgLibOpened() || NWC24IsMsgLibOpenedByTool()) {
-        *pId = config->userId;
-    } else {
-        scdErr = NWC24SuspendScheduler();
-        if (scdErr < 0) {
-            return scdErr;
-        }
-
-        result = NWC24GenerateNewUserId(pId);
-        if (result == NWC24_ERR_ID_GENERATED ||
-            result == NWC24_ERR_ID_REGISTERED) {
-            result = NWC24_OK;
-        }
-
-        scdErr = NWC24ResumeScheduler();
-        if (scdErr < 0) {
-            result = result != NWC24_OK ? result : scdErr;
-        }
+    if (NWC24WorkP == NULL) {
+        return NWC24_ERR_LIB_NOT_OPENED;
     }
 
-    return result;
+    *pId = config->userId;
+    return NWC24_OK;
 }
 
 NWC24Err NWC24GenerateNewUserId(u64* pId) {
@@ -169,7 +149,7 @@ const char* NWC24GetMBoxDir(void) {
     if (rev.idLo == 0 &&
         (rev.verMajor == 7 && rev.verMinor == 0 || rev.verMajor < 7)) {
         // clang-format off
-#line 666
+#line 627
     OS_ERROR("stopped.");
         // clang-format on
     }

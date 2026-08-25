@@ -16,6 +16,16 @@ private:
     /* 0x0C */ float* m_pValue;
 }; // total size: 0x10
 
+class unk_80029F58
+{
+private:
+    /* 0x000 */ u8 mUnidentified000[0x3F4];
+
+public:
+    /* 0x3F4 */ TweakValue_804F4DC8 fGreenShellSpeed;
+    /* 0x404 */ TweakValue_804F4DC8 mUnidentified404;
+};
+
 class PlayerTweaks
 {
 protected:

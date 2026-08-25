@@ -7,7 +7,7 @@
 #include <revolution/os.h>
 
 const char* __SO_VERSION =
-    "<< RVL_SDK - SO \trelease build: Dec 10 2007 10:02:35 (0x4199_60831) >>";
+    "<< RVL_SDK - SO \trelease build: Mar  9 2007 15:08:35 (0x4199_60831) >>";
 
 u8 soState = 0;
 SOSysWork soWork;
@@ -62,7 +62,7 @@ int SOFinish(void) {
   return result;
 }
 
-int SOStartup(void) { return SOStartupEx(0xea60); }
+int SOStartup(void) { return SOStartupEx(0x927c0); }
 
 inline int SO_Startup_ErrWtf(s32 errNwc24, s32 exErr) {
   s32 result = -0x1c;

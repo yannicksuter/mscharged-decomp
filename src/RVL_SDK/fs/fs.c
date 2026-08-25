@@ -761,6 +761,60 @@ static s32 _FSGetUsageCb(s32 result, FSCommandBlock* block) {
     return IPC_RESULT_OK;
 }
 
+s32 ISFS_GetUsageAsync(const char* path, s32* blockCountOut,
+                       s32* fileCountOut, FSAsyncCallback callback,
+                       void* callbackArg) {
+    s32 ret;
+    u32* blockCountWork;
+    u32* fileCountWork;
+    IPCIOVector* vectors;
+    FSCommandBlock* block;
+    char* pathWork;
+    size_t len;
+
+    block = NULL;
+
+    if (path == NULL || __fsFd < 0 || blockCountOut == NULL ||
+        fileCountOut == NULL ||
+        (len = strnlen(path, FS_MAX_PATH)) == FS_MAX_PATH) {
+        ret = IPC_RESULT_INVALID;
+        goto end;
+    }
+
+    block = (FSCommandBlock*)iosAllocAligned(hId, sizeof(FSCommandBlock), 32);
+    if (block == NULL) {
+        ret = IPC_RESULT_BUSY;
+        goto end;
+    }
+
+    block->callback = callback;
+    block->callbackArg = callbackArg;
+    block->callbackState = CB_STATE_GET_USAGE;
+    block->getUsageCtx.blockCountOut = (u32*)blockCountOut;
+    block->getUsageCtx.fileCountOut = (u32*)fileCountOut;
+
+    vectors = (IPCIOVector*)block->ioctlWork;
+    pathWork = ROUND_UP_PTR((u8*)vectors + (sizeof(IPCIOVector) * 3), 32);
+    memcpy(pathWork, path, len + 1);
+
+    vectors[0].base = pathWork;
+    vectors[0].length = FS_MAX_PATH;
+
+    blockCountWork = ROUND_UP_PTR(pathWork + FS_MAX_PATH, 32);
+    fileCountWork = ROUND_UP_PTR((u8*)blockCountWork + sizeof(u32), 32);
+
+    vectors[1].base = blockCountWork;
+    vectors[1].length = sizeof(u32);
+    vectors[2].base = fileCountWork;
+    vectors[2].length = sizeof(u32);
+
+    ret = IOS_IoctlvAsync(__fsFd, FS_IOCTLV_GET_USAGE, 1, 2, vectors,
+                          _isfsFuncCb, block);
+
+end:
+    return ret;
+}
+
 s32 ISFS_CreateFile(const char* path, u32 attr, u32 ownerPerm, u32 groupPerm,
                     u32 otherPerm) {
     FSCommandBlock* block;

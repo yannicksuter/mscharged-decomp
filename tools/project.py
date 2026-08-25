@@ -1500,7 +1500,7 @@ def generate_build_ninja(
         inputs=config.config_path,
         outputs=build_config_path,
         rule="split",
-        implicit=dtk,
+        implicit=[dtk, *(config.reconfig_deps or [])],
         variables={"out_dir": build_path},
     )
     n.newline()

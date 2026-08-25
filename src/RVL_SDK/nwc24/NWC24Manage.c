@@ -17,7 +17,7 @@ typedef enum {
     NWC24_FAIL_FATAL = 1 << 2
 } NWC24FailFlag;
 
-RVL_LIB_VERSION(NWC24, "May 10 2007", "17:58:59", "0x4199_60831");
+RVL_LIB_VERSION(NWC24, "Mar  9 2007", "15:08:21", "0x4199_60831");
 
 NWC24iWork* NWC24WorkP = NULL;
 
@@ -147,9 +147,6 @@ static NWC24Err NWC24OpenLibInternal(NWC24iWork* pWork, NWC24LibState state) {
     case NWC24_ERR_INTERNAL_VF:
     case NWC24_ERR_INTERNAL_IPC:
     case NWC24_ERR_NAND_CORRUPT:
-    case NWC24_ERR_INPROGRESS:
-    case NWC24_ERR_BUSY:
-    case NWC24_ERR_MUTEX:
     case NWC24_ERR_FILE_OTHER:
     case NWC24_ERR_FILE_NOEXISTS:
     case NWC24_ERR_FILE_WRITE:

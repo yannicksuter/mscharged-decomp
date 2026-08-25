@@ -15,6 +15,7 @@ typedef enum {
 } NANDLibState;
 
 static void nandShutdownCallback(s32 result, void* arg);
+static void nandChangeDirCallback(s32 result, void* arg);
 static void nandGetTypeCallback(s32 result, void* arg);
 static BOOL nandOnShutdown(BOOL final, u32 event);
 static s32 _ES_InitLib(s32* fd);
@@ -129,7 +130,11 @@ BOOL nandIsRelativePath(const char* path) {
 
 BOOL nandIsPrivatePath(const char* path) {
     size_t len = sizeof("/shared2") - 1;
-    return strncmp(path, "/shared2", len) == 0;
+    if (strncmp(path, "/shared2", len) == 0) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
 }
 
 BOOL nandIsUnderPrivatePath(const char* path) {
@@ -137,9 +142,9 @@ BOOL nandIsUnderPrivatePath(const char* path) {
 
     if (strncmp(path, "/shared2/", len) == 0 && path[len] != '\0') {
         return TRUE;
+    } else {
+        return FALSE;
     }
-
-    return FALSE;
 }
 
 BOOL nandIsInitialized(void) {
@@ -330,6 +335,64 @@ static void nandShutdownCallback(s32 result, void* arg) {
     *(BOOL*)arg = TRUE;
 }
 
+static s32 nandChangeDir(const char* path, NANDCommandBlock* block, BOOL isAsync,
+                         BOOL hasPrivateAccess) {
+    if (isAsync) {
+        nandGenerateAbsPath(block->path, path);
+        if (!hasPrivateAccess && nandIsPrivatePath(block->path)) {
+            return IPC_RESULT_ACCESS;
+        } else {
+            return ISFS_ReadDirAsync(block->path, NULL, &block->dirFileCount,
+                                     nandChangeDirCallback, block);
+        }
+    } else {
+        u32 num = 0;
+        char absPath[NAND_MAX_PATH] = "";
+
+        nandGenerateAbsPath(absPath, path);
+        if (!hasPrivateAccess && nandIsPrivatePath(absPath)) {
+            return IPC_RESULT_ACCESS;
+        } else {
+            s32 err = ISFS_ReadDir(absPath, NULL, &num);
+            if (err == IPC_RESULT_OK) {
+                BOOL enabled = OSDisableInterrupts();
+                strcpy(s_currentDir, absPath);
+                OSRestoreInterrupts(enabled);
+            }
+            return err;
+        }
+    }
+}
+
+s32 NANDChangeDir(const char* path) {
+    if (!nandIsInitialized()) {
+        return NAND_RESULT_FATAL_ERROR;
+    }
+
+    return nandConvertErrorCode(nandChangeDir(path, NULL, FALSE, FALSE));
+}
+
+s32 NANDChangeDirAsync(const char* path, NANDAsyncCallback callback,
+                       NANDCommandBlock* block) {
+    if (!nandIsInitialized()) {
+        return NAND_RESULT_FATAL_ERROR;
+    }
+
+    block->callback = callback;
+    return nandConvertErrorCode(nandChangeDir(path, block, TRUE, FALSE));
+}
+
+static void nandChangeDirCallback(s32 result, void* arg) {
+    NANDCommandBlock* block = (NANDCommandBlock*)arg;
+    if (result == IPC_RESULT_OK) {
+        BOOL enabled = OSDisableInterrupts();
+        strcpy(s_currentDir, block->path);
+        OSRestoreInterrupts(enabled);
+    }
+
+    block->callback(nandConvertErrorCode(result), block);
+}
+
 s32 NANDGetCurrentDir(char* out) {
     BOOL enabled;
 
@@ -358,19 +421,15 @@ void nandCallback(s32 result, void* arg) {
 }
 
 static s32 nandGetType(const char* path, u8* type, NANDCommandBlock* block,
-                       BOOL async, BOOL priv) {
-    char absPath[64];
-    u32 numFiles;
-    s32 result;
-
+                       BOOL isAsync, BOOL hasPrivateAccess) {
     if (strlen(path) == 0) {
         return IPC_RESULT_INVALID;
     }
 
-    if (async) {
+    if (isAsync) {
         nandGenerateAbsPath(block->path, path);
 
-        if (!priv && nandIsUnderPrivatePath(block->path)) {
+        if (!hasPrivateAccess && nandIsUnderPrivatePath(block->path)) {
             return IPC_RESULT_ACCESS;
         }
 
@@ -378,24 +437,26 @@ static s32 nandGetType(const char* path, u8* type, NANDCommandBlock* block,
         return ISFS_ReadDirAsync(block->path, NULL, &block->dirFileCount,
                                  nandGetTypeCallback, block);
     } else {
-        MEMCLR(&absPath);
+        char absPath[NAND_MAX_PATH] = "";
+
         nandGenerateAbsPath(absPath, path);
 
-        if (!priv && nandIsUnderPrivatePath(absPath)) {
+        if (!hasPrivateAccess && nandIsUnderPrivatePath(absPath)) {
             return IPC_RESULT_ACCESS;
-        }
+        } else {
+            u32 dummy = 0;
+            s32 err = ISFS_ReadDir(absPath, NULL, &dummy);
 
-        numFiles = 0;
-        result = ISFS_ReadDir(absPath, NULL, &numFiles);
-        if (result == IPC_RESULT_OK || result == IPC_RESULT_ACCESS) {
-            *type = NAND_FILE_TYPE_DIR;
-            return IPC_RESULT_OK;
-        } else if (result == IPC_RESULT_INVALID) {
-            *type = NAND_FILE_TYPE_FILE;
-            return IPC_RESULT_OK;
-        }
+            if (err == IPC_RESULT_OK || err == IPC_RESULT_ACCESS) {
+                *type = NAND_FILE_TYPE_DIR;
+                err = IPC_RESULT_OK;
+            } else if (err == IPC_RESULT_INVALID) {
+                *type = NAND_FILE_TYPE_FILE;
+                err = IPC_RESULT_OK;
+            }
 
-        return result;
+            return err;
+        }
     }
 }
 

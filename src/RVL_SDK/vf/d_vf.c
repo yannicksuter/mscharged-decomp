@@ -4,6 +4,7 @@
 static OSMutex l_Mutex;
 static s32 l_InitedMutex;
 static s32 l_vf_init;
+__declspec(align(32)) char l_vf_drive_work[0x68000];
 
 #define VF_ERROR_B001 0xB001
 #define VF_ERR_GENERIC 0xB002
@@ -34,6 +35,10 @@ s32 VFIsAvailable() {
     return l_vf_init != 0;
 }
 
+void VFInit() {
+    VFInitEx(l_vf_drive_work, sizeof(l_vf_drive_work));
+}
+
 void VFInitEx(void* i_heap_start_address_p, u32 i_size) {
     _VFInitMutex();
     _VFLockMutex();
@@ -44,6 +49,17 @@ void VFInitEx(void* i_heap_start_address_p, u32 i_size) {
         VFipdm_init_diskmanager(0, 0);
         VFipf2_init_prfile2(0, 0);
         dHash_InitHashTable();
+    }
+
+    _VFUnlockMutex();
+}
+
+void VFFinalize() {
+    _VFLockMutex();
+
+    if (l_vf_init != 0) {
+        VFSysFinalize();
+        l_vf_init = 0;
     }
 
     _VFUnlockMutex();
