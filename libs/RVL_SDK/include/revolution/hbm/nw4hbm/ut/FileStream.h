@@ -30,7 +30,9 @@ public:
 protected:
     class FilePosition {
     public:
-        FilePosition() : mFileSize(0), mPosition(0) {}
+        FilePosition() :
+            mFileSize(0),
+            mPosition(0) {}
 
         u32 GetFileSize() const { return mFileSize; }
         void SetFileSize(u32 size) { mFileSize = size; }

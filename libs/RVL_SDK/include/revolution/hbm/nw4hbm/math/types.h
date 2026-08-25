@@ -77,7 +77,7 @@ typedef const f32 (*CMtxPtr)[4];
 
 struct MTX34 : public _MTX34 {
 public:
-    MTX34() {}
+    MTX34() {} // NOTE: must be non-defaulted
 
     // operators
     operator MtxPtr() { return mtx; }

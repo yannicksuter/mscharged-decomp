@@ -1,10 +1,12 @@
 #ifndef NW4HBM_UT_LINK_LIST_H
 #define NW4HBM_UT_LINK_LIST_H
 
-#include <revolution/types.h>
+#include "revolution/types.h"
+
+#include "revolution/hbm/nw4hbm/ut/inlines.h"
 
 #include "revolution/hbm/HBMAssert.hpp"
-#include "revolution/hbm/nw4hbm/ut/inlines.h"
+#include <stddef.h>
 
 namespace nw4hbm {
 namespace ut {
@@ -22,7 +24,9 @@ class LinkListNode : private NonCopyable {
     friend class detail::LinkListImpl;
 
 public:
-    LinkListNode() : mNext(NULL), mPrev(NULL) {}
+    LinkListNode() :
+        mNext(NULL),
+        mPrev(NULL) {}
 
     LinkListNode* GetNext() const { return mNext; }
     LinkListNode* GetPrev() const { return mPrev; }
@@ -43,13 +47,18 @@ class LinkListImpl : private NonCopyable {
 public:
     class ConstIterator;
 
+    /******************************************************************************
+     * Iterator implementation
+     ******************************************************************************/
     class Iterator {
         friend class LinkListImpl;
         friend class ConstIterator;
 
     public:
-        Iterator() : mPointer(NULL) {}
-        explicit Iterator(LinkListNode* pNode) : mPointer(pNode) {}
+        Iterator() :
+            mPointer(NULL) {}
+        explicit Iterator(LinkListNode* pNode) :
+            mPointer(pNode) {}
 
         Iterator& operator++() {
             mPointer = mPointer->GetNext();
@@ -71,11 +80,15 @@ public:
         /* 0x00 */ LinkListNode* mPointer;
     }; // size = 0x04
 
+    /******************************************************************************
+     * Iterator implementation (const-view)
+     ******************************************************************************/
     class ConstIterator {
         friend class LinkListImpl;
 
     public:
-        explicit ConstIterator(Iterator it) : mNode(it.mPointer) {}
+        explicit ConstIterator(Iterator it) :
+            mNode(it.mPointer) {}
 
         ConstIterator& operator++() {
             mNode = mNode->GetNext();

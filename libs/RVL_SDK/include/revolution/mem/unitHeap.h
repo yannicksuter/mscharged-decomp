@@ -19,6 +19,10 @@ typedef struct MEMiUntHeapHead {
 } MEMiUntHeapHead;
 
 MEMHeapHandle MEMCreateUnitHeapEx(void* start, u32 heapSize, u32 memBlockSize, int align, u16 flags);
+static inline MEMHeapHandle MEMCreateUnitHeap(void* start, u32 heapSize, u32 memBlockSize) {
+    return MEMCreateUnitHeapEx(start, heapSize, memBlockSize, 4, 0);
+}
+
 void* MEMAllocFromUnitHeap(MEMHeapHandle heap);
 void MEMFreeToUnitHeap(MEMHeapHandle heap, void* address);
 u32 MEMCountFreeBlockForUnitHeap(MEMHeapHandle heap);

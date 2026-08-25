@@ -180,6 +180,123 @@ static inline void AddPointToGrid(
     cell.AddEntry(pSaveData);
 }
 
+extern "C" void fn_80092B48(SaveBlendInfo& blendInfo)
+{
+    SaveData* pConnected;
+    int segment;
+    int anim;
+    float fLastTime;
+    float fThisTime;
+    unsigned char bEmptySpot;
+    float fInvSegTime;
+
+    bEmptySpot = 0;
+
+    {
+        for (anim = 0; anim < 4; anim++)
+        {
+            pConnected = blendInfo.mpSaveData[anim];
+            if (pConnected == 0)
+                continue;
+
+            {
+                fLastTime = 0.0f;
+
+                for (segment = 0; segment < 5; segment++)
+                {
+                    fThisTime = pConnected->mfMilestonePercent[segment]
+                        * pConnected->mfDuration;
+                    if (fThisTime > 0.0f)
+                    {
+                        blendInfo.mfMilestoneScale[anim][segment] =
+                            fThisTime - fLastTime;
+                        fLastTime = fThisTime;
+                    }
+                    else
+                    {
+                        blendInfo.mfMilestoneScale[anim][segment] = -1.0f;
+                        bEmptySpot = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    {
+        fLastTime = 0.0f;
+        for (segment = 0; segment < 5; segment++)
+        {
+            fThisTime = blendInfo.mfMilestoneTime[segment];
+            if (fThisTime > 0.0f)
+            {
+                float fSegDuration = fThisTime - fLastTime;
+                fInvSegTime = 1.0f / fSegDuration;
+                fLastTime = fThisTime;
+
+                if (blendInfo.mpSaveData[0])
+                    blendInfo.mfMilestoneScale[0][segment] *= fInvSegTime;
+                if (blendInfo.mpSaveData[1])
+                    blendInfo.mfMilestoneScale[1][segment] *= fInvSegTime;
+                if (blendInfo.mpSaveData[2])
+                    blendInfo.mfMilestoneScale[2][segment] *= fInvSegTime;
+                if (blendInfo.mpSaveData[3])
+                    blendInfo.mfMilestoneScale[3][segment] *= fInvSegTime;
+            }
+        }
+    }
+
+    if ((unsigned char)bEmptySpot)
+    {
+        for (segment = 3; segment >= 0; segment--)
+        {
+            if (blendInfo.mfMilestoneTime[segment] <= 0.0f)
+            {
+                for (anim = 0; anim < 4; anim++)
+                {
+                    blendInfo.mfMilestoneScale[anim][segment] =
+                        blendInfo.mfMilestoneScale[anim][segment + 1];
+                }
+            }
+        }
+    }
+}
+
+extern "C" unsigned int lbl_806E0D4C;
+
+extern "C" SaveData* fn_800925C0(
+    SaveBlendInfo& blendInfo, const nlVector3& v3TargetPos)
+{
+    SaveData* pSaveData;
+    if (v3TargetPos.y > 0.0f)
+    {
+        pSaveData = &GoalieSave::mpSaveTable[lbl_806E0D4C];
+    }
+    else
+    {
+        pSaveData = &GoalieSave::mpSaveTable[lbl_806E0D4C + 4];
+    }
+
+    SaveData* pClosest = GoalieSave::GetClosestBlendedPos(
+        blendInfo, v3TargetPos, pSaveData);
+    if (pClosest != 0)
+    {
+        fn_80092B48(blendInfo);
+    }
+    return pClosest;
+}
+
+extern "C" SaveData* fn_80092644(SaveData* pSaveData,
+    SaveBlendInfo& blendInfo, const nlVector3& v3TargetPos)
+{
+    SaveData* pClosest = GoalieSave::GetClosestBlendedPos(
+        blendInfo, v3TargetPos, pSaveData);
+    if (pClosest != 0)
+    {
+        fn_80092B48(blendInfo);
+    }
+    return pClosest;
+}
+
 void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
 {
     SaveData* const pRoot = pSaveData;

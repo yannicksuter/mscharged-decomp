@@ -199,17 +199,17 @@ void DrawableThwomp::Render(ThwompObject* object) const
 
     if (mVisible)
     {
-        drawable->objectFlags |= 1;
+        drawable->m_uObjectFlags |= 1;
     }
     else
     {
-        drawable->objectFlags &= ~1;
+        drawable->m_uObjectFlags &= ~1;
     }
 
     int state = ((ThwompObjectFields*)object)->mState;
     if (state == 1 || state == 0 || state == 6)
     {
-        drawable->objectFlags &= ~1;
+        drawable->m_uObjectFlags &= ~1;
     }
 
     if (!mVisible)

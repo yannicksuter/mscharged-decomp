@@ -32,7 +32,7 @@ public:
     /* 0x24 */ virtual void CalculateMtx(const DrawInfo& drawInfo);
     /* 0x28 */ virtual void Draw(const DrawInfo& drawInfo);
     /* 0x2C */ virtual void Animate(u32 option = 0);
-    /* 0x30 */ virtual void SetTagProcessor(ut::WideTagProcessor* pTagProcessor);
+    /* 0x30 */ virtual void SetTagProcessor(ut::WideTagProcessor* pTagProcessor) DECOMP_DONT_INLINE;
 
     const ut::Rect GetLayoutRect() const;
     Pane* GetRootPane() const { return mpRootPane; }
@@ -44,7 +44,7 @@ public:
     static void* AllocMemory(u32 size) { return MEMAllocFromAllocator(mspAllocator, size); }
     static void FreeMemory(void* ptr) { MEMFreeToAllocator(mspAllocator, ptr); }
 
-    static Pane* BuildPaneObj(s32 kind, const void* dataPtr, const ResBlockSet& resBlockSet);
+    static Pane* BuildPaneObj(s32 kind, const void* dataPtr, const ResBlockSet& resBlockSet) DECOMP_DONT_INLINE;
 
 private:
     /* 0x00 (vtable) */

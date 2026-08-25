@@ -7,21 +7,18 @@
 namespace nw4hbm {
 namespace math {
 
-// clang-format off
 inline f32 FSelect(register f32 cond, register f32 ifPos, register f32 ifNeg) {
     register f32 ret;
 
-#ifdef __MWERKS__
-    asm {
+#ifdef __MWERKS__ // clang-format off
+    asm { 
         fsel ret, cond, ifPos, ifNeg
     }
-#endif
+#endif // clang-format on
 
     return ret;
 }
-// clang-format on
 
-// clang-format off
 inline f32 FAbs(f32 x) {
     f32 ret;
 
@@ -29,7 +26,6 @@ inline f32 FAbs(f32 x) {
 
     return ret;
 }
-// clang-format on
 
 inline u16 F32ToU16(f32 x) {
     u16 rval;

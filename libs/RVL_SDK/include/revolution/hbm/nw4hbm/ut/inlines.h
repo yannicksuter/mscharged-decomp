@@ -1,7 +1,7 @@
 #ifndef NW4HBM_UT_INLINE_FUNCTIONS_H
 #define NW4HBM_UT_INLINE_FUNCTIONS_H
 
-#include <revolution/types.h>
+#include "revolution/types.h"
 
 namespace nw4hbm {
 namespace ut {

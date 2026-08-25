@@ -6,6 +6,7 @@
 #include <revolution/types.h>
 #include <revolution/dvd/dvd.h>
 
+#define OS_PHYS_WIFI_AFH_CHANNEL 0x000031A2
 #define OS_PHYS_BOOT_INFO 0x00000000
 #define OS_PHYS_TV_FORMAT 0x000000CC
 #define OS_PHYS_INTR_HANDLER_TABLE 0x3040

@@ -6,6 +6,7 @@
 #include "revolution/hbm/nw4hbm/lyt/pane.h"
 
 #include "revolution/hbm/nw4hbm/ut/LinkList.h"
+#include <stddef.h>
 
 namespace nw4hbm {
 namespace lyt {

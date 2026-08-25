@@ -22,6 +22,13 @@ The project was built with or adapted source from the following projects:
 | [yannicksuter/smstrikers-decomp at `6123c35`](https://github.com/yannicksuter/smstrikers-decomp/tree/6123c3546baf59aa5d564e98fdd76cf16443c80f) | Predecessor game code, Dolphin SDK lineage, and Next Level Games' ODE extensions. |
 | Open Dynamics Engine 0.5 (`ode-040529`) | Baseline for ODE-derived source. |
 
+`libs/RVL_SDK/include/revolution/bte.h` declares the handful of Broadcom BTE
+types and entry points the SDK's WPAD and WUD headers refer to (`BD_ADDR`,
+`BT_HDR`, `GKI_getbuf`, and the `BTA_Hh*` calls). Their names and widths follow
+Broadcom's published BTE/Bluedroid headers, which carry an Apache-2.0 notice.
+No Broadcom source is vendored or compiled here; the file exists only so the
+WPAD translation unit can be declared and built.
+
 The referenced decompilation projects publish their reconstruction work under
 CC0 1.0. ODE-derived source retains the
 [ODE BSD-style license](../LICENSES/ODE-BSD.txt). Other third-party material

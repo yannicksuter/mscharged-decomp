@@ -26,8 +26,26 @@ extern "C"
     typedef enum ACRHwReg
     {
         ACR_PPCIRQFLAG = 0x030,
-        ACR_PPCIRQMASK = 0x034
+        ACR_PPCIRQMASK = 0x034,
+        ACR_GPIO1BOUT = 0x0C0
     } ACRHwReg;
+
+    typedef enum GPIOReg
+    {
+        GPIO_POWER = (1 << 0),
+        GPIO_SHUTDOWN = (1 << 1),
+        GPIO_FAN = (1 << 2),
+        GPIO_DCDC = (1 << 3),
+        GPIO_DISPIN = (1 << 4),
+        GPIO_SLOTLED = (1 << 5),
+        GPIO_EJECTBTN = (1 << 6),
+        GPIO_SLOTIN = (1 << 7),
+        GPIO_SENSORBAR = (1 << 8),
+        GPIO_DOEJECT = (1 << 9),
+        GPIO_EEP_CS = (1 << 10),
+        GPIO_EEP_CLK = (1 << 11),
+        GPIO_EEP_MOSI = (1 << 12)
+    } GPIOReg;
 
     inline u32 ACRReadReg(u32 reg)
     {
