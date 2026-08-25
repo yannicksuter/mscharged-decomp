@@ -10,7 +10,7 @@ typedef f32 Mtx44[4][4];
 
 typedef struct Vec {
     f32 x, y, z;
-} Vec;
+} Vec, Point3d;
 
 typedef struct Vec2 {
     f32 x, y;

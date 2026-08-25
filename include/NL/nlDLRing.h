@@ -4,6 +4,63 @@
 #include "NL/nlRing.h"
 
 template <typename T>
+class DLListEntry
+{
+public:
+    DLListEntry()
+        : m_next(0)
+        , m_prev(0)
+        , entry()
+    {
+    }
+
+    DLListEntry(const T& data)
+        : m_next(0)
+        , m_prev(0)
+        , entry(data)
+    {
+    }
+
+    /* 0x00 */ DLListEntry<T>* m_next;
+    /* 0x04 */ DLListEntry<T>* m_prev;
+    /* 0x08 */ T entry;
+};
+
+template <typename T>
+class nlDLListIterator
+{
+public:
+    typedef DLListEntry<T>* Pointer;
+    typedef T& Reference;
+
+    nlDLListIterator(Pointer head, Pointer current)
+    {
+        m_Curr = current;
+        m_Head = head;
+    }
+
+    Reference operator*() const { return m_Curr->entry; }
+    bool hasNext() const { return m_Curr != 0; }
+
+    Pointer next()
+    {
+        Pointer ret = m_Curr;
+        if (nlDLRingIsEnd(m_Head, m_Curr) || m_Curr == 0)
+        {
+            m_Curr = 0;
+        }
+        else
+        {
+            m_Curr = m_Curr->m_next;
+        }
+        return ret;
+    }
+
+    Pointer m_Head;
+    Pointer m_Curr;
+};
+
+template <typename T>
 inline void nlDLRingInsert(T** head, T* afterNode, T* newNode)
 {
     afterNode->m_next->m_prev = newNode;

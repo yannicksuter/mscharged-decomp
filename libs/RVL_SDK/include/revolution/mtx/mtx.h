@@ -3,6 +3,10 @@
 #include <revolution/types.h>
 
 #include <revolution/mtx/mtxtypes.h>
+
+#define MTXDegToRad(d) ((d) * 0.01745329252f)
+#define MTXRadToDeg(r) ((r) * 57.29577951f)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -16,7 +20,7 @@ void PSMTXTranspose(const Mtx, Mtx);
 u32 PSMTXInverse(const Mtx, Mtx);
 u32 PSMTXInvXpose(const Mtx, Mtx);
 void PSMTXRotRad(Mtx, char, f32);
-void PSMTXRotTrig(Mtx, f32, f32, char);
+void PSMTXRotTrig(Mtx, char, f32, f32);
 void PSMTXRotAxisRad(Mtx, const Vec*, f32);
 void PSMTXTrans(Mtx, f32, f32, f32);
 void PSMTXTransApply(const Mtx, Mtx, f32, f32, f32);

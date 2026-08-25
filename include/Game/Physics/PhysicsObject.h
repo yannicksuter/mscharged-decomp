@@ -40,6 +40,7 @@ public:
     virtual ContactType Contact(PhysicsObject*, dContact*, int, PhysicsObject*);
     virtual void SyncLog(void*, DebugWriteCache*);
 
+    void MakeStatic();
     void Reconnect(dSpaceID);
     dSpaceID Disconnect();
     void EnableCollisions();

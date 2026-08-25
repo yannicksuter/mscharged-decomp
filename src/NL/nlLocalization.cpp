@@ -1,5 +1,7 @@
 #include "NL/nlLocalization.h"
 
+#include <string.h>
+
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 
@@ -9,7 +11,6 @@
 // service is not reconstructed yet and stays address-named.
 extern "C" {
 int fn_802B396C(const char* path, void* callback, void* user, int align, int, int, int, void* queue);
-int fn_80380F9C(const void* a, const char* b, unsigned long size);
 }
 
 extern const unsigned short LocalizationTableNotFound[] = L"Localization Table Not Found";
@@ -57,7 +58,7 @@ static void OnTableLoaded(LOCHeader* pFile, unsigned long, nlLocalization* pLoca
 {
     pLocalization->m_pFile = pFile;
 
-    if (fn_80380F9C(pFile, nlLocalization::Thumbprint, 4) != 0 || pFile->Version != 1
+    if (memcmp(pFile, nlLocalization::Thumbprint, 4) != 0 || pFile->Version != 1
         || pFile->Language != nlLocalization::LanguageId[pLocalization->m_CurrentLanguage])
     {
         nlFree(pFile);

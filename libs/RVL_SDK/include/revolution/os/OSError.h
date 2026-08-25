@@ -12,6 +12,10 @@ extern "C"
 
 #define OS_ERROR(...) OSPanic(__FILE__, __LINE__, __VA_ARGS__)
 
+#define OS_ASSERT(exp, ...)              \
+    if (!(exp))                          \
+    OSPanic(__FILE__, __LINE__, __VA_ARGS__)
+
 #define OSAssert(file, line, expression, ...) \
     if (!(expression))                        \
     {                                         \

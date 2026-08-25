@@ -24,6 +24,7 @@
 #include <revolution/os/OSContext.h>
 #include <revolution/os/OSError.h>
 #include <revolution/os/OSExec.h>
+#include <revolution/os/OSFastCast.h>
 #include <revolution/os/OSFatal.h>
 #include <revolution/os/OSFont.h>
 #include <revolution/os/OSHardware.h>

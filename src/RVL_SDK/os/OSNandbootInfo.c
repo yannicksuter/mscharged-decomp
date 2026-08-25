@@ -22,10 +22,10 @@ BOOL __OSCreateNandbootInfo(void) {
     s32 result;
 
     result = NANDPrivateGetStatus("/shared2/sys/NANDBOOTINFO", &status);
-    if (result == NAND_RESULT_OK && status.permission == NAND_PERM_ALL_RW) {
+    if (result == NAND_RESULT_OK && status.perm == NAND_PERM_RWALL) {
         return TRUE;
     } else if (result == NAND_RESULT_OK &&
-               status.permission != NAND_PERM_ALL_RW) {
+               status.perm != NAND_PERM_RWALL) {
         result = NANDPrivateDelete("/shared2/sys/NANDBOOTINFO");
 
         if (result != NAND_RESULT_OK) {
@@ -36,7 +36,7 @@ BOOL __OSCreateNandbootInfo(void) {
     }
 
     result =
-        NANDPrivateCreate("/shared2/sys/NANDBOOTINFO", NAND_PERM_ALL_RW, 0);
+        NANDPrivateCreate("/shared2/sys/NANDBOOTINFO", NAND_PERM_RWALL, 0);
 
     if (result != NAND_RESULT_OK) {
         return FALSE;

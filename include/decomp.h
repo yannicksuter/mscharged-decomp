@@ -18,6 +18,7 @@
 #define DECL_SECTION(x) __declspec(section x)
 #define DECL_WEAK __declspec(weak)
 
+#define DECOMP_INLINE inline
 #define DECOMP_DONT_INLINE __attribute__((never_inline))
 #define DECOMP_FORCEACTIVE(module, ...)                       \
     void fake_function(...);                                 \

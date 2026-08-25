@@ -19,6 +19,16 @@ class ShotMeter
 {
 public:
     void Reset(cFielder* pFielder);
+    static bool IsActive(eShotMeterState state)
+    {
+        bool bShotMeterActive = false;
+        if (state == SHOT_METER_ACTIVE || state == SHOT_METER_STS_ACTIVE
+            || state == SHOT_METER_STS_TRANSISTION)
+        {
+            bShotMeterActive = true;
+        }
+        return bShotMeterActive;
+    }
 
     /* 0x00 */ eShotMeterState m_eShotMeterState;
     /* 0x04 */ float m_fTime;
