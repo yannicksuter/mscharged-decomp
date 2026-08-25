@@ -1221,8 +1221,26 @@ RVL_SDK/vf/pf_api_util.c:
 	.text       start:0x80435130 end:0x80435278
 	.data       start:0x80555608 end:0x805556A8
 
+RVL_SDK/vf/pf_errnum.c:
+	.text       start:0x80435278 end:0x8043529C
+
+RVL_SDK/vf/pf_fclose.c:
+	.text       start:0x8043529C end:0x804352C0
+
+RVL_SDK/vf/pf_finfo.c:
+	.text       start:0x804352C0 end:0x804352E4
+
 RVL_SDK/vf/pf_fopen.c:
 	.text       start:0x804352E4 end:0x80435380
+
+RVL_SDK/vf/pf_fread.c:
+	.text       start:0x80435380 end:0x804353A8
+
+RVL_SDK/vf/pf_fseek.c:
+	.text       start:0x804353A8 end:0x804353CC
+
+RVL_SDK/vf/pf_fwrite.c:
+	.text       start:0x804353CC end:0x804353F4
 
 RVL_SDK/vf/pf_init_prfile2.c:
 	.text       start:0x804353F4 end:0x80435434
