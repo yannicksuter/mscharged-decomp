@@ -1,7 +1,7 @@
 #ifndef NW4HBM_UT_RUNTIME_TYPE_INFO_H
 #define NW4HBM_UT_RUNTIME_TYPE_INFO_H
 
-#include <revolution/types.h>
+#include "revolution/types.h"
 
 namespace nw4hbm {
 namespace ut {
@@ -16,9 +16,9 @@ namespace ut {
     const nw4hbm::ut::detail::RuntimeTypeInfo T::typeInfo(&D::typeInfo);
 
 namespace detail {
-
 struct RuntimeTypeInfo {
-    explicit RuntimeTypeInfo(const RuntimeTypeInfo* base) : mParentTypeInfo(base) {}
+    explicit RuntimeTypeInfo(const RuntimeTypeInfo* base) :
+        mParentTypeInfo(base) {}
 
     bool IsDerivedFrom(const RuntimeTypeInfo* base) const {
         for (const RuntimeTypeInfo* it = this; it != NULL; it = it->mParentTypeInfo) {
@@ -33,7 +33,6 @@ struct RuntimeTypeInfo {
 }; // size = 0x04
 
 template <typename T> inline const RuntimeTypeInfo* GetTypeInfoFromPtr_(T* pPtr) { return &pPtr->typeInfo; }
-
 } // namespace detail
 
 template <typename TDerived, typename TBase> inline TDerived DynamicCast(TBase* pPtr) {

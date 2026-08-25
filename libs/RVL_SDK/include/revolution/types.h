@@ -55,6 +55,7 @@ typedef unsigned short wchar_t;
 #endif
 
 typedef unsigned long uintptr_t;
+typedef unsigned long int byte4_t;
 
 #define ALIGN(x) __attribute__((aligned(x)))
 

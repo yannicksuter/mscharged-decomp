@@ -19,6 +19,7 @@ typedef struct OSMessageQueue {
     s32 usedCount;
 } OSMessageQueue;
 
+#define OS_MESSAGE_NO_FLAGS 0
 #define OS_MESSAGE_BLOCK (1 << 0)
 
 void OSInitMessageQueue(OSMessageQueue* queue, OSMessage* msgArray, s32 msgCount);

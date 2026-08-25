@@ -280,7 +280,7 @@ s32 VFiPFCACHE_DoAllocatePage(struct PF_VOLUME* p_vol, struct PF_CACHE_PAGE** pp
             (*pp_page)->p_mod_ebuf = 0;
 
             if (do_flush) {
-                if (dCommon_flush_from_handle_p((struct VF_HANDLE_TYPE*)p_vol, 1)) {
+                if (dCommon_FlushFromVol(p_vol, 1)) {
                     return 17;
                 }
             }
@@ -402,7 +402,7 @@ s32 VFiPFCACHE_DoReadPageAndFlushIfNeeded(struct PF_VOLUME* p_vol, struct PF_CAC
             }
 
             if (do_flush) {
-                err = dCommon_flush_from_handle_p((struct VF_HANDLE_TYPE*)p_vol, 1);
+                err = dCommon_FlushFromVol(p_vol, 1);
                 if (err) {
                     return 17;
                 }
@@ -493,7 +493,7 @@ s32 VFiPFCACHE_DoWritePage(struct PF_VOLUME* p_vol, struct PF_CACHE_PAGE** pp_he
             return err;
         }
 
-        if (do_flush && dCommon_flush_from_handle_p((struct VF_HANDLE_TYPE*)p_vol, 1)) {
+        if (do_flush && dCommon_FlushFromVol(p_vol, 1)) {
             return 17;
         }
     }
@@ -535,7 +535,7 @@ s32 VFiPFCACHE_DoWriteSector(struct PF_VOLUME* p_vol, struct PF_CACHE_PAGE** pp_
             return err;
         }
 
-        if (do_flush && dCommon_flush_from_handle_p((struct VF_HANDLE_TYPE*)p_vol, 1)) {
+        if (do_flush && dCommon_FlushFromVol(p_vol, 1)) {
             return 17;
         }
     } else {
@@ -548,7 +548,7 @@ s32 VFiPFCACHE_DoWriteSector(struct PF_VOLUME* p_vol, struct PF_CACHE_PAGE** pp_
             return 17;
         }
 
-        err = dCommon_flush_from_handle_p((struct VF_HANDLE_TYPE*)p_vol, 1);
+        err = dCommon_FlushFromVol(p_vol, 1);
         if (err) {
             return 17;
         }
@@ -623,7 +623,7 @@ s32 VFiPFCACHE_DoWriteNumSectorAndFreeIfNeeded(struct PF_VOLUME* p_vol, struct P
         if (err) {
             return err;
         }
-        if (dCommon_flush_from_handle_p((struct VF_HANDLE_TYPE*)p_vol, 1)) {
+        if (dCommon_FlushFromVol(p_vol, 1)) {
             return 17;
         }
     }
@@ -680,7 +680,7 @@ s32 VFiPFCACHE_DoFlushCache(struct PF_VOLUME* p_vol, struct PF_CACHE_PAGE* p_hea
     if (do_flush) {
         set_device_err = !first_err;
         do_flush = set_device_err;
-        set_device_err = dCommon_flush_from_handle_p((struct VF_HANDLE_TYPE*)p_vol, do_flush);
+        set_device_err = dCommon_FlushFromVol(p_vol, do_flush);
         if (set_device_err != 0 && do_flush == 1) {
             return 17;
         }
@@ -940,7 +940,7 @@ s32 VFiPFCACHE_FlushDataCacheSpecific(struct PF_VOLUME* p_vol, void* signature) 
                 err = VFiPFCACHE_FlushPageIfNeeded(p_vol, p_page);
                 if (err) {
                     if (do_flush) {
-                        dCommon_flush_from_handle_p((struct VF_HANDLE_TYPE*)p_vol, 0);
+                        dCommon_FlushFromVol(p_vol, 0);
                     }
                     return err;
                 }
@@ -952,7 +952,7 @@ s32 VFiPFCACHE_FlushDataCacheSpecific(struct PF_VOLUME* p_vol, void* signature) 
         }
 
         if (do_flush) {
-            if (dCommon_flush_from_handle_p((struct VF_HANDLE_TYPE*)p_vol, 1)) {
+            if (dCommon_FlushFromVol(p_vol, 1)) {
                 return 17;
             }
         }

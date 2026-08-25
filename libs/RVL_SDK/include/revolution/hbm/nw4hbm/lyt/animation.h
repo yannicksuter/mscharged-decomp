@@ -4,7 +4,6 @@
 #include "revolution/hbm/nw4hbm/lyt/resourceAccessor.h"
 #include "revolution/hbm/nw4hbm/lyt/resources.h"
 #include "revolution/hbm/nw4hbm/lyt/types.h"
-
 #include <stddef.h>
 
 #define TexMtxMax 10

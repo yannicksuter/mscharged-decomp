@@ -64,4 +64,6 @@ VITVFormat VIGetTvFormat(void);
 }
 #endif
 
+void VIWaitForRetrace(void);
+
 #endif // REVOLUTION_VI_H

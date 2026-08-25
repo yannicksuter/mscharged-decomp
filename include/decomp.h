@@ -8,6 +8,14 @@
 #define FOURCC(a, b, c, d) \
     ((u32)(a) << 24 | (u32)(b) << 16 | (u32)(c) << 8 | (u32)(d))
 
+#ifdef __MWERKS__
+#define ASM asm
+#define ASM_VOLATILE asm volatile
+#else
+#define ASM(...)
+#define ASM_VOLATILE(...)
+#endif
+
 #define __CONCAT(x, y) x##y
 #define CONCAT(x, y) __CONCAT(x, y)
 

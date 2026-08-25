@@ -1,9 +1,8 @@
 #ifndef NW4HBM_UT_LIST_H
 #define NW4HBM_UT_LIST_H
 
-#include <revolution/types.h>
-
 #include "revolution/hbm/HBMAssert.hpp"
+#include "revolution/types.h"
 
 namespace nw4hbm {
 namespace ut {
@@ -29,6 +28,9 @@ void List_Remove(List* list, void* object);
 void* List_GetNext(const List* list, const void* object);
 void* List_GetPrev(const List* list, const void* object);
 void* List_GetNth(const List* list, u16 index);
+
+static void* List_GetFirst(const List* list) { return List_GetNext(list, NULL); }
+static void* List_GetLast(const List* list) { return List_GetPrev(list, NULL); }
 
 inline u16 List_GetSize(const List* list) {
     NW4HBMAssertPointerNonnull_Line(list, 207);

@@ -195,11 +195,11 @@ void DrawableBall::Render() const
     RenderObject* drawable = g_pBall->drawable;
     if (mFlags.bits.visible)
     {
-        drawable->objectFlags |= 1;
+        drawable->m_uObjectFlags |= 1;
     }
     else
     {
-        drawable->objectFlags &= ~1;
+        drawable->m_uObjectFlags &= ~1;
     }
 
     if (mFlags.bits.visible)
@@ -256,11 +256,11 @@ void DrawableBall::Render() const
 
         if (mTrail[i].visible)
         {
-            trail->objectFlags |= 1;
+            trail->m_uObjectFlags |= 1;
         }
         else
         {
-            trail->objectFlags &= ~1;
+            trail->m_uObjectFlags &= ~1;
         }
 
         if (mTrail[i].visible)

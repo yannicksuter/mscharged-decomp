@@ -23,7 +23,7 @@ void __GXSetSUTexRegs(void);
 
 void GXInitTexObj(GXTexObj* obj, void* image, u16 w, u16 h, GXTexFmt fmt,
                   GXTexWrapMode wrap_s, GXTexWrapMode wrap_t, GXBool mipmap);
-void GXInitTexObjCI(GXTexObj*, void*, u16, u16, GXTexFmt, GXTexWrapMode,
+void GXInitTexObjCI(GXTexObj*, void*, u16, u16, GXCITexFmt, GXTexWrapMode,
                     GXTexWrapMode, GXBool, u32);
 void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt,
                      f32 min_lod, f32 max_lod, f32 lod_bias, GXBool bias_clamp,
@@ -55,6 +55,7 @@ GXBool GXGetTexObjMipMap(const GXTexObj* obj);
 void GXLoadTexObj(const GXTexObj*, GXTexMapID);
 
 void GXInitTexObjTlut(GXTexObj*, u32);
+void GXInitTexObjUserData(const GXTexObj* obj, void* user_data);
 u32 GXGetTexObjTlut(GXTexObj*);
 
 void GXInitTlutObj(GXTlutObj*, void*, GXTlutFmt, u16);

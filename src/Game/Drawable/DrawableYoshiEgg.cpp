@@ -194,11 +194,11 @@ void DrawableYoshiEgg::Render(const YoshiEggObject* object) const
 
     if (mVisible)
     {
-        drawable->objectFlags |= 1;
+        drawable->m_uObjectFlags |= 1;
     }
     else
     {
-        drawable->objectFlags &= ~1;
+        drawable->m_uObjectFlags &= ~1;
     }
 
     if (!mVisible)

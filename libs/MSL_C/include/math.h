@@ -10,6 +10,7 @@ extern "C"
 
 // #define M_PI 3.141592653589793
 #define M_PI 3.1415927f
+#define M_SQRT3 1.73205f
 
 #ifndef _MATH_INLINE
 #define _MATH_INLINE static inline

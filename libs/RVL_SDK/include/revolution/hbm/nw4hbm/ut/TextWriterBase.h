@@ -102,6 +102,8 @@ public:
         return sizeof(T) == sizeof(char) ? strlen((const char*)str) : wcslen((const wchar_t*)str);
     }
 
+    void ut_TextWriterBase_unused1(Rect* pRect, const T* str, int length);
+
     f32 CalcLineWidth(const T* str, int length);
     int CalcLineRectImpl(Rect* pRect, const T* str, int length);
     void CalcStringRectImpl(Rect* pRect, const T* str, int length);

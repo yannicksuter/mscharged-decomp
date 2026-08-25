@@ -4,6 +4,7 @@
 
 #include <revolution/mtx/mtxtypes.h>
 
+#define MTXRowCol(m, r, c) ((m)[(r)][(c)])
 #define MTXDegToRad(d) ((d) * 0.01745329252f)
 #define MTXRadToDeg(r) ((r) * 57.29577951f)
 

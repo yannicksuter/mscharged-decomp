@@ -76,7 +76,13 @@ public:
     /* 0x430 */ eFielderActionState m_eActionState;
 
 private:
-    /* 0x434 */ u8 mUnknown434[0x2C];
+    /* 0x434 */ u8 mUnknown434[0x14];
+
+public:
+    /* 0x448 */ int m_nPowerupAnimID;
+
+private:
+    /* 0x44C */ u8 mUnknown44C[0x14];
     /* 0x460 */ eRole m_eRole;
     /* 0x464 */ u8 mUnknown464[0x10];
     /* 0x474 */ bool mbWasHitByPowerupThisFrame;

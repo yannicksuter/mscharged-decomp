@@ -25,6 +25,8 @@ struct MEMiHeapHead {
 };
 
 typedef MEMiHeapHead* MEMHeapHandle;
+
+#define MEM_HEAP_INVALID_HANDLE 0
 typedef u32 UIntPtr;
 
 static inline UIntPtr GetUIntPtr(const void* ptr) {
@@ -63,10 +65,14 @@ static inline int ComparePtr(const void* a, const void* b) {
     return left - right;
 }
 
+/* Only the C implementation of MEM uses these. Keeping them out of C++ stops
+   them shadowing nw4hbm::ut::RoundUp, which is a template of the same name. */
+#ifndef __cplusplus
 #define RoundUp(value, alignment) (((value) + ((alignment) - 1)) & ~((alignment) - 1))
 #define RoundUpPtr(ptr, alignment) ((void*)RoundUp(GetUIntPtr(ptr), (alignment)))
 #define RoundDown(value, alignment) ((value) & ~((alignment) - 1))
 #define RoundDownPtr(ptr, alignment) ((void*)RoundDown(GetUIntPtr(ptr), (alignment)))
+#endif
 
 static inline void LockHeap(MEMiHeapHead* heap) {
     if (GetOptForHeap(heap) & 4) {

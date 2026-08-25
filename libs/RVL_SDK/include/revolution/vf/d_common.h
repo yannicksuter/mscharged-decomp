@@ -28,7 +28,7 @@ u32 dCommon_getResvSecNumFromDisk(struct PDM_DISK* p_disk);
 void dCommon_setResvSecNumToDisk(struct PDM_DISK* p_disk, u32 i_reservedSecNum);
 u32 dCommon_getRootEntNumFromDisk(struct PDM_DISK* p_disk);
 void dCommon_setRootEntNumToDisk(struct PDM_DISK* p_disk, u32 i_rootEntNum);
-s32 dCommon_flush_from_handle_p(struct VF_HANDLE_TYPE* i_handle_p, int i_setLastDeviceError);
+s32 dCommon_FlushFromVol(struct PF_VOLUME* i_vol_p, int i_setLastDeviceError);
 
 #ifdef __cplusplus
 }

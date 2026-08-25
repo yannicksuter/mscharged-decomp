@@ -38,11 +38,10 @@ extern "C"
     // Clears one external framebuffer; owned by the still-unsplit platform TU.
     void fn_803693C4(void* fb);
     // View/token name lookups owned by an unsplit debug TU.
+    void VIWaitForRetrace();
     void* fn_80364020();
     const char* fn_803640E8(void* view, u16 token);
     const char* fn_803640F0(void* view, u16 token);
-    // Retrace wait owned by an unsplit platform TU.
-    void fn_803C6434();
     // Allocator-state helpers retained in the following automatic range.
     void fn_8036D6F8(MemoryAllocator* allocator);
     void fn_8036D71C();
@@ -438,23 +437,23 @@ static void swap_Post()
     if (glx_SwapMode == 2)
     {
         AdvanceFrame();
-        fn_803C6434();
+        VIWaitForRetrace();
         if (VIGetRetraceCount() < glx_nRetraceAtSwap + 2)
         {
-            fn_803C6434();
+            VIWaitForRetrace();
         }
     }
     else if (glx_SwapMode == 1)
     {
         AdvanceFrame();
-        fn_803C6434();
+        VIWaitForRetrace();
     }
     else if (glx_SwapMode == 3)
     {
         AdvanceFrame();
         if (OSTicksToMicroseconds(OSGetTick() - (u32)glx_LastRetraceTick) > 0x2EE0 || retrace == glx_nRetraceAtSwap)
         {
-            fn_803C6434();
+            VIWaitForRetrace();
         }
     }
     else if (glx_SwapMode == 0)

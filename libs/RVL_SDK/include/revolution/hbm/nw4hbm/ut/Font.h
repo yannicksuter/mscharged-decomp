@@ -64,8 +64,11 @@ public:
 
     void InitReaderFunc(FontEncoding encoding);
 
-    CharStrmReader GetCharStrmReader() const {
+    CharStrmReader GetCharStrmReader() const DECOMP_DONT_INLINE {
+        //! TODO: required to make `ut_TextWriterBase.cpp` happy
+#ifndef NO_THIS_ASSERT
         NW4HBMAssertPointerValid_Line(this, 117);
+#endif
         CharStrmReader reader(mReaderFunc);
         return reader;
     }

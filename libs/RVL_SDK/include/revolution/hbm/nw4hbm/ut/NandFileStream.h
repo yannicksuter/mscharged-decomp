@@ -14,7 +14,7 @@ public:
     NandFileStream(const NANDFileInfo* info, u32 mode, bool enableClose);
 
     bool Open(const char* path, u32 mode);
-    bool Open(const NANDFileInfo* info, u32 mode, bool enableClose);
+    bool Open(const NANDFileInfo* info, u32 mode, bool enableClose) DECOMP_DONT_INLINE;
 
     /* 0x08 */ NW4HBM_UT_RUNTIME_TYPEINFO;
     /* 0x0C */ virtual ~NandFileStream();

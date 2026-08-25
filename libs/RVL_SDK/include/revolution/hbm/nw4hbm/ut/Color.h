@@ -29,6 +29,8 @@ typedef struct Color : public GXColor {
     Color(const GXColor& color) { *this = color; }
     Color(int red, int green, int blue, int alpha) { Set(red, green, blue, alpha); }
 
+    // Left out destructor
+
     ~Color() {}
 
     // Operators

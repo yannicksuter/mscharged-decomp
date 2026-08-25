@@ -3,12 +3,24 @@
 
 #include "NL/nlMath.h"
 #include "NL/nlTimer.h"
+#include "Game/Drawable/DrawableObj.h"
 
 class BlurHandler;
 class Bowser;
 class cFielder;
-class DrawableObject;
 class PhysicsObject;
+
+struct PowerupSounds
+{
+    /* 0x00 */ unsigned long sndAcquire;
+    /* 0x04 */ unsigned long sndActivate;
+    /* 0x08 */ unsigned long sndInEffect;
+    /* 0x0C */ unsigned long sndHit;
+    /* 0x10 */ unsigned long sndBounceWall;
+    /* 0x14 */ unsigned long sndBounceGround;
+    /* 0x18 */ unsigned long sndExplode;
+    /* 0x1C */ unsigned long sndEnd;
+}; // total size: 0x20
 
 enum ePowerUpType
 {
@@ -26,6 +38,16 @@ enum ePowerUpType
     NUM_POWER_UPS = 9,
 };
 
+struct PowerupModelPool
+{
+    PowerupModelPool() { mNum = 0; }
+    void Initialize(int type, unsigned long objHashName);
+
+    /* 0x000 */ int mNum;
+    /* 0x004 */ DrawableObject* mObjs[NUM_DRAWABLE_POWER_UPS][25];
+    /* 0x25C */ bool mFree[NUM_DRAWABLE_POWER_UPS][25];
+}; // total size: 0x2F4
+
 enum ePowerupSize
 {
     POWERUPSIZE_SMALL = 0,
@@ -36,17 +58,30 @@ enum ePowerupSize
 class PowerupBase
 {
 public:
+    enum PowerupSound
+    {
+        PWRUP_SOUND_ACQUIRE = 0,
+        PWRUP_SOUND_ACTIVATE = 1,
+        PWRUP_SOUND_IN_EFFECT = 2,
+        PWRUP_SOUND_HIT = 3,
+        PWRUP_SOUND_BOUNCE_WALL = 4,
+        PWRUP_SOUND_BOUNCE_GROUND = 5,
+        PWRUP_SOUND_EXPLODE = 6,
+        PWRUP_SOUND_END = 7,
+    };
+
     PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         ePowerupSize eSize, bool bExplode, int nIndex);
     virtual ~PowerupBase();
     virtual void Destroy(bool bSilent);
-    virtual void PreThrow(cFielder* pFielder, Bowser* pBowser);
+    virtual void PreThrow(cFielder* pFielder);
     virtual void ThrowAt(cFielder* pThrower, Bowser* pBowser);
     virtual void fn_8009CAC0(void*);
     virtual void Init(cFielder* pFielder, Bowser* pBowser);
     virtual void Update(float dt);
 
     float GetRadius() const;
+    static unsigned long GetSoundType(ePowerUpType type, PowerupSound powerupSnd);
 
     /* 0x04 */ bool m_bShouldDestroy;
     /* 0x08 */ DrawableObject* m_pDrawableObj;
@@ -80,5 +115,6 @@ public:
 }; // total size: 0xAC
 
 PowerupBase* FindPowerUp(unsigned long hashOfDrawable);
+void InitializePowerups();
 
 #endif // GAME_AI_POWERUPS_H

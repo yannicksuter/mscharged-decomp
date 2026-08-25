@@ -1,7 +1,7 @@
 #ifndef NW4HBM_UT_IO_STREAM_H
 #define NW4HBM_UT_IO_STREAM_H
 
-#include <revolution/types.h>
+#include "revolution/types.h"
 
 #include "revolution/hbm/nw4hbm/ut/RuntimeTypeInfo.h"
 
@@ -12,7 +12,10 @@ class IOStream {
 public:
     typedef void (*IOStreamCallback)(s32 result, IOStream* pStream, void* pCallbackArg);
 
-    IOStream() : mAvailable(false), mCallback(NULL), mArg(NULL) {}
+    IOStream() :
+        mAvailable(false),
+        mCallback(NULL),
+        mArg(NULL) {}
 
     /* 0x08 */ NW4HBM_UT_RUNTIME_TYPEINFO;
     /* 0x0C */ virtual ~IOStream() {}
@@ -39,7 +42,7 @@ protected:
     /* 0x10 */ void* mArg;
 }; // size = 0x14
 
-} // namespace ut
-} // namespace nw4hbm
+}; // namespace ut
+}; // namespace nw4hbm
 
 #endif

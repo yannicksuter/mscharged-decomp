@@ -16,6 +16,7 @@
 #include "revolution/hbm/nw4hbm/lyt/drawInfo.h"
 #include "revolution/hbm/nw4hbm/lyt/material.h"
 #include "revolution/hbm/nw4hbm/lyt/types.h"
+#include <stddef.h>
 
 namespace nw4hbm {
 namespace lyt {
