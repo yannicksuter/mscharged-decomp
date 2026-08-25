@@ -187,7 +187,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
     if (objectType == 0x1D)
     {
         if (m_pAICharacter->m_eClassType == FIELDER
-            && !((cFielder*)m_pAICharacter)->mUnidentified475)
+            && !((cFielder*)m_pAICharacter)->mbTangible)
         {
             fn_8013F854("PhysChar PHYSOBJ_TRON_WALL IsTangible\n");
             return NO_CONTACT;
@@ -318,7 +318,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             return NO_CONTACT;
         }
         if (m_pAICharacter->m_eClassType == FIELDER
-            && !((cFielder*)m_pAICharacter)->mUnidentified475)
+            && !((cFielder*)m_pAICharacter)->mbTangible)
         {
             fn_8013F854("PhysChar Ball !IsTangible\n");
             return NO_CONTACT;
@@ -372,7 +372,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             }
 
             bool invincible = !fn_8003886C(fielder)
-                           && (ReadU32(fielder, 0x454) & 1) != 0;
+                           && (fielder->muInvincibleStatus & 1) != 0;
             if (invincible)
             {
                 fn_8013F854("PhysChar IsInvincibleChars\n");
@@ -469,7 +469,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             }
 
             bool invincible = !fn_8003886C(fielder)
-                           && (ReadU32(fielder, 0x454) & 1) != 0;
+                           && (fielder->muInvincibleStatus & 1) != 0;
             if (invincible
                 || fn_800344DC(fielder, &otherFielder->m_v3Position)
                 || fn_8003886C(fielder)
@@ -480,7 +480,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             else
             {
                 invincible = !fn_8003886C(otherFielder)
-                          && (ReadU32(otherFielder, 0x454) & 1) != 0;
+                          && (otherFielder->muInvincibleStatus & 1) != 0;
                 if (invincible
                     || fn_800344DC(otherFielder, &fielder->m_v3Position)
                     || fn_8003886C(otherFielder))

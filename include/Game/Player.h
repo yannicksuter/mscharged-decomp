@@ -5,6 +5,7 @@
 #include "NL/nlTimer.h"
 
 class cBall;
+class cAIPad;
 class cGlobalPad;
 class cTeam;
 class PlayerTweaks;
@@ -46,10 +47,9 @@ public:
     /* 0x304 */ int m_nLeftHandJointIndex;
     /* 0x308 */ int m_nRightHandJointIndex;
 
-protected:
-    /* 0x30C */ u8 mUnknown30C[0x04];
-
 public:
+    /* 0x30C */ cAIPad* m_pController;
+
     /* 0x310 */ cBall* m_pBall;
     /* 0x314 */ cTeam* m_pTeam;
     /* 0x318 */ u32 mUnidentified318;

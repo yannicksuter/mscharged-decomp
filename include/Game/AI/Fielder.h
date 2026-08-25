@@ -82,13 +82,19 @@ public:
     /* 0x448 */ int m_nPowerupAnimID;
 
 private:
-    /* 0x44C */ u8 mUnknown44C[0x14];
-    /* 0x460 */ eRole m_eRole;
-    /* 0x464 */ u8 mUnknown464[0x10];
-    /* 0x474 */ bool mbWasHitByPowerupThisFrame;
+    /* 0x44C */ u8 mUnknown44C[0x08];
 
 public:
-    /* 0x475 */ bool mUnidentified475;
+    /* 0x454 */ u32 muInvincibleStatus;
+
+private:
+    /* 0x458 */ u8 mUnknown458[0x08];
+    /* 0x460 */ eRole m_eRole;
+    /* 0x464 */ u8 mUnknown464[0x10];
+
+public:
+    /* 0x474 */ bool mbWasHitByPowerupThisFrame;
+    /* 0x475 */ bool mbTangible;
 
 private:
     /* 0x476 */ u8 mUnknown476[6];

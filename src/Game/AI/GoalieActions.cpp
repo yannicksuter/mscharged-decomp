@@ -912,7 +912,7 @@ void Goalie::fn_8008A610(float fDeltaT)
                 return;
             }
 
-            if (!mpTarget->mUnidentified475)
+            if (!mpTarget->mbTangible)
             {
                 mPursueDekeType = 4;
                 return;
@@ -935,7 +935,7 @@ void Goalie::fn_8008A610(float fDeltaT)
         case 3:
         case 5:
         {
-            if (!mpTarget->mUnidentified475)
+            if (!mpTarget->mbTangible)
             {
                 InitActionMove(false);
                 return;
@@ -951,7 +951,7 @@ void Goalie::fn_8008A610(float fDeltaT)
             float radius;
             mpTarget->m_pPhysicsCharacter->GetRadius(&radius);
 
-            if (!mpTarget->mUnidentified475
+            if (!mpTarget->mbTangible
                 || distSq
                        > (mpLooseBallInfo->mfPickupDistance + radius
                              + lbl_806DBD10)
@@ -1042,7 +1042,7 @@ void Goalie::fn_8008A610(float fDeltaT)
         case 1:
         case 2:
         {
-            if (!mpTarget->mUnidentified475)
+            if (!mpTarget->mbTangible)
             {
                 InitActionMove(false);
                 return;
@@ -1088,7 +1088,7 @@ void Goalie::fn_8008A610(float fDeltaT)
         case 4:
         {
             nlVector3 v3Target = mpTarget->m_v3Position;
-            if (mpTarget->mUnidentified475)
+            if (mpTarget->mbTangible)
             {
                 mPursueDekeType = 0;
             }
@@ -1115,7 +1115,7 @@ void Goalie::fn_8008A610(float fDeltaT)
     }
     else if (mPursueDekeState == 1)
     {
-        if (!mpTarget->mUnidentified475)
+        if (!mpTarget->mbTangible)
         {
             float pickupTime = mpLooseBallInfo->mfPickupTime;
             float animTime = m_pCurrentAnimController->m_fTime;
