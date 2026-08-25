@@ -1,3 +1,4 @@
+#include "Game/AI/Powerups.h"
 #include "NL/nlMath.h"
 #include "NL/gl/glState.h"
 #include "NL/nlString.h"
@@ -41,19 +42,6 @@ public:
     nlColour mColour[4];
 };
 
-class PowerupBase
-{
-public:
-    char _00[0x1C];
-    int mType;
-    bool mVisible;
-    char _21[0x3B];
-    u16 mOrientation;
-    char _5E[2];
-    float mScale;
-    nlVector3 mPosition;
-};
-
 class DrawablePowerup
 {
 public:
@@ -93,8 +81,6 @@ struct ShadowHeight
     float height;
 };
 
-extern "C" PowerupBase* fn_8009AC5C(u32);
-extern "C" float fn_8009B874(const PowerupBase*);
 extern "C" RenderObject* fn_8027725C(u32);
 extern "C" ShadowHeight* fn_802772BC();
 extern "C" void fn_802B549C(nlQuaternion*, u16);
@@ -235,15 +221,15 @@ static void DrawShadow(float radius, float x, float y, float z)
 
 void DrawablePowerup::Grab(int idx)
 {
-    PowerupBase* powerup = fn_8009AC5C(nlStringLowerHash(GetName(idx)));
+    PowerupBase* powerup = FindPowerUp(nlStringLowerHash(GetName(idx)));
     if (powerup != 0)
     {
-        mType = powerup->mType;
-        mVisible = powerup->mVisible;
-        mRadius = fn_8009B874(powerup);
-        mOrientation = powerup->mOrientation;
-        mPosition = powerup->mPosition;
-        mScale = powerup->mScale;
+        mType = powerup->m_eType;
+        mVisible = powerup->m_unk20;
+        mRadius = powerup->GetRadius();
+        mOrientation = powerup->m_aOrientation;
+        mPosition = powerup->m_v3Position;
+        mScale = powerup->m_scale;
     }
     else
     {
@@ -253,7 +239,7 @@ void DrawablePowerup::Grab(int idx)
 
 void DrawablePowerup::Render(int idx) const
 {
-    fn_8009AC5C(nlStringLowerHash(GetName(idx)));
+    FindPowerUp(nlStringLowerHash(GetName(idx)));
     RenderObject* object = fn_8027725C(nlStringLowerHash(GetName(idx)));
 
     if (object == 0)
