@@ -10,16 +10,19 @@
 // clang-format on
 
 // for some reasons this is required
+#undef CLAMP
+#define CLAMP(x, l, h) (((x) > (h)) ? (h) : (((x) < (l)) ? (l) : (x)))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define VI_MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 #define MARK_CHANGED(index) (changed |= 1LL << (63 - (index)))
 
-const char* __VIVersion = "<< RVL_SDK - VI \trelease build: Sep 26 2006 17:27:57 (0x4200_60422) >>";
+const char* __VIVersion = "<< RVL_SDK - VI \trelease build: Nov 30 2006 03:31:49 (0x4199_60831) >>";
 
 static void __VIRetraceHandler(__OSInterrupt, OSContext*);
+void VISetRGBModeImm(void);
 extern bool __OSIsDiag;
 
-static volatile VITimeToDIM g_current_time_to_dim;
 static volatile u32 retraceCount;
 static volatile u32 flushFlag;
 static volatile u32 flushFlag3in1;
@@ -30,15 +33,17 @@ static vu32 vsync_timing_test_flag = 0;
 static volatile bool __VIDimming_All_Clear = false;
 static volatile bool __VIDimmingFlag_Enable;
 static volatile bool __VIDVDStopFlag_Enable;
+static volatile VITimeToDIM g_current_time_to_dim;
+static vu32 THD_TIME_TO_DIMMING = 0;
 static vu32 NEW_TIME_TO_DIMMING = 0;
 static vu32 THD_TIME_TO_DVD_STOP = 0;
 static vu32 _gIdleCount_dimming = 0;
 static vu32 _gIdleCount_dvd = 0;
+static volatile bool __VIDimmingState = false;
 static VIPositionCallback PositionCallback = NULL;
 static s16 displayOffsetH = 0;
 static s16 displayOffsetV = 0;
 static vu32 changeMode = 0;
-static vu32 THD_TIME_TO_DIMMING = 0;
 static vu64 changed = 0;
 static vu32 shdwChangeMode = 0;
 static vu64 shdwChanged = 0;
@@ -60,9 +65,9 @@ static OSThreadQueue retraceQueue;
 #define VI_NUMREGS ARRAY_COUNT(VI_HW_REGS)
 
 static u16 shdwRegs[VI_NUMREGS] = {0};
-static vu32 __VIDimmingFlag_DEV_IDLE[10];
-static u16 regs[VI_NUMREGS];
+static u16 regs[VI_NUMREGS] = {0};
 static HorVer_s HorVer;
+static vu32 __VIDimmingFlag_DEV_IDLE[10];
 
 static VIRetraceCallback PreCB;
 static VIRetraceCallback PostCB;
@@ -97,20 +102,33 @@ static OSShutdownFunctionInfo ShutdownFunctionInfo = {OnShutdown, 127};
 
 
 static bool OnShutdown(bool final, u32 event) {
-    bool retval = final;
+    bool retval;
+    static bool first = true;
+    static u32 count;
 
-    if (retval == false) {
+    if (final == false) {
         switch (event) {
             case 3:
             case 1:
             case 2:
-                __VISetRGBModeImm();
-                retval = true;
+                if (first) {
+                    VISetRGBModeImm();
+                    VIFlush();
+                    count = retraceCount;
+                    first = false;
+                    retval = false;
+                } else {
+                    if (count == retraceCount) {
+                        retval = false;
+                    } else {
+                        retval = true;
+                    }
+                }
                 break;
             case 4:
             case 0:
-            case 5:
             case 6:
+            case 5:
                 retval = true;
                 break;
         }
@@ -260,11 +278,31 @@ static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context) {
 
         switch (now_tvtype) {
             case VI_PAL:
-                NEW_TIME_TO_DIMMING = 15000;
+                switch (g_current_time_to_dim) {
+                    case VI_DM_10M:
+                        NEW_TIME_TO_DIMMING = 30000;
+                        break;
+                    case VI_DM_15M:
+                        NEW_TIME_TO_DIMMING = 45000;
+                        break;
+                    default:
+                        NEW_TIME_TO_DIMMING = 15000;
+                        break;
+                }
                 THD_TIME_TO_DVD_STOP = 90000;
                 break;
             default:
-                NEW_TIME_TO_DIMMING = 18000;
+                switch (g_current_time_to_dim) {
+                    case VI_DM_10M:
+                        NEW_TIME_TO_DIMMING = 36000;
+                        break;
+                    case VI_DM_15M:
+                        NEW_TIME_TO_DIMMING = 54000;
+                        break;
+                    default:
+                        NEW_TIME_TO_DIMMING = 18000;
+                        break;
+                }
                 THD_TIME_TO_DVD_STOP = 108000;
                 break;
         }
@@ -301,6 +339,9 @@ static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context) {
                     break;
                 case 0x40:
                     __VISetRGBOverDrive();
+                    break;
+                case 0x80:
+                    __VISetRGBModeImm();
                     break;
             }
 
@@ -351,6 +392,7 @@ static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context) {
 
         _gIdleCount_dimming = 0;
         _gIdleCount_dvd = 0;
+        THD_TIME_TO_DIMMING = NEW_TIME_TO_DIMMING;
     }
 
     if (__VIDimmingFlag_Enable_old != __VIDimmingFlag_Enable) {
@@ -361,6 +403,7 @@ static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context) {
         }
 
         _gIdleCount_dimming = 0;
+        THD_TIME_TO_DIMMING = NEW_TIME_TO_DIMMING;
     }
 
     if (_gIdleCount_dimming == NEW_TIME_TO_DIMMING) {
@@ -370,12 +413,14 @@ static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context) {
     if (DimmingOFF_Pending) {
         if (__OSSetVIForceDimming(false, 2, 2) == true) {
             DimmingOFF_Pending = 0;
+            __VIDimmingState = false;
         }
     }
 
     if (DimmingON_Pending) {
         if (__OSSetVIForceDimming(true, 2, 2) == true) {
             DimmingON_Pending = 0;
+            __VIDimmingState = true;
         }
     }
 
@@ -401,6 +446,10 @@ static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context) {
 
     __VIDimmingFlag_Enable_old = __VIDimmingFlag_Enable;
     __VIDVDStopFlag_Enable_old = __VIDVDStopFlag_Enable;
+
+    if ((NEW_TIME_TO_DIMMING > _gIdleCount_dimming) && (__VIDimmingState == false)) {
+        THD_TIME_TO_DIMMING = NEW_TIME_TO_DIMMING;
+    }
 }
 
 static void setScalingRegs(u16 panSizeX, u16 dispSizeX, bool threeD) {
@@ -725,10 +774,12 @@ void VIInit(void) {
 
     switch (VIGetTvFormat()) {
         case VI_PAL:
+            THD_TIME_TO_DIMMING = 15000;
             NEW_TIME_TO_DIMMING = 15000;
             THD_TIME_TO_DVD_STOP = 90000;
             break;
         default:
+            THD_TIME_TO_DIMMING = 18000;
             NEW_TIME_TO_DIMMING = 18000;
             THD_TIME_TO_DVD_STOP = 108000;
             break;
@@ -736,7 +787,9 @@ void VIInit(void) {
 
     _gIdleCount_dimming = 0;
     _gIdleCount_dvd = 0;
+    g_current_time_to_dim = VI_DM_DEFAULT;
     __VIDimming_All_Clear = VI_DM_10M;
+    __VIDimmingState = false;
 
     VIEnableDimming(true);
 
@@ -982,7 +1035,7 @@ void VIConfigure(const GXRenderModeObj* rm) {
             }
         default:
         panic:
-            OSPanic("vi.c", 2465, "VIConfigure(): Tried to change mode from (%d) to (%d), which is forbidden\n",
+            OSPanic("vi.c", 2544, "VIConfigure(): Tried to change mode from (%d) to (%d), which is forbidden\n",
                     tvInBootrom, tvInGame);
     }
 
@@ -1129,17 +1182,6 @@ void VISetBlack(bool black) {
 }
 
 u32 VIGetRetraceCount(void) { return retraceCount; }
-
-u32 VIGetNextField(void) {
-    s32 nextField;
-    bool enabled;
-
-    enabled = OSDisableInterrupts();
-    nextField = getCurrentFieldEvenOdd() ^ 1;
-    OSRestoreInterrupts(enabled);
-
-    return nextField ^ (HorVer.AdjustedDispPosY & 1);
-}
 
 u32 VIGetCurrentLine(void) {
     u32 halfLine;
@@ -1307,6 +1349,41 @@ static inline bool VIEnableDimming(bool enable) {
 
     __VIDimmingFlag_Enable = enable;
     return old;
+}
+
+VITimeToDIM VISetTimeToDimming(VITimeToDIM time) {
+    VITimeToDIM old_time = g_current_time_to_dim;
+    g_current_time_to_dim = time;
+
+    switch (VIGetTvFormat()) {
+        case VI_PAL:
+            switch (g_current_time_to_dim) {
+                case VI_DM_10M:
+                    NEW_TIME_TO_DIMMING = 30000;
+                    break;
+                case VI_DM_15M:
+                    NEW_TIME_TO_DIMMING = 45000;
+                    break;
+                default:
+                    NEW_TIME_TO_DIMMING = 15000;
+                    break;
+            }
+            break;
+        default:
+            switch (g_current_time_to_dim) {
+                case VI_DM_10M:
+                    NEW_TIME_TO_DIMMING = 36000;
+                    break;
+                case VI_DM_15M:
+                    NEW_TIME_TO_DIMMING = 54000;
+                    break;
+                default:
+                    NEW_TIME_TO_DIMMING = 18000;
+                    break;
+            }
+            break;
+    }
+    return old_time;
 }
 
 bool fn_8009AA34(void) {

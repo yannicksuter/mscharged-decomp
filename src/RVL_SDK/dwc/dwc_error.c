@@ -28,10 +28,7 @@ s32 DWC_GetLastErrorEx(s32* errorCode, DWCErrorType* errorType) {
       *errorType = 6;
       break;
     case 6:
-      if (stDwcErrorCode == -80430)
-        *errorType = 2;
-      else
-        *errorType = 3;
+      *errorType = 3;
       break;
     case 7:
       *errorType = 4;
@@ -52,16 +49,10 @@ s32 DWC_GetLastErrorEx(s32* errorCode, DWCErrorType* errorType) {
       break;
     case 15:
     case 17:
-    case 19:
       *errorType = 6;
       break;
     case 16:
-    case 20:
-    case 21:
       *errorType = 2;
-      break;
-    case 18:
-      *errorType = 1;
       break;
     default:
       *errorType = 0;
