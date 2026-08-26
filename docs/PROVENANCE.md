@@ -25,13 +25,27 @@ The project was built with or adapted source from the following projects:
 `libs/RVL_SDK/include/revolution/bte.h` declares the handful of Broadcom BTE
 types and entry points the SDK's WPAD and WUD headers refer to (`BD_ADDR`,
 `BT_HDR`, `GKI_getbuf`, and the `BTA_Hh*` calls). Their names and widths follow
-Broadcom's published BTE/Bluedroid headers, which carry an Apache-2.0 notice.
-No Broadcom source is vendored or compiled here; the file exists only so the
-WPAD translation unit can be declared and built.
+Broadcom's published BTE/Bluedroid headers.
+
+`src/RVL_SDK/bte/` and `libs/RVL_SDK/include/private/bte/` do vendor Broadcom
+source. Both trees carry Broadcom's original copyright notice and its
+Apache-2.0 licence header, and each file records the Bluedroid path it came
+from. That material is licensed under
+[Apache-2.0](../LICENSES/Apache-2.0.txt) and is not covered by the CC0 terms
+below.
+
+`src/RVL_SDK/gamespy/` vendors the GameSpy SDK, the middleware behind the
+game's online matchmaking and profile services. IGN Entertainment released it
+in 2011 under a three-clause BSD licence, reproduced in
+[LICENSES/BSD-3-Clause-GameSpy.txt](../LICENSES/BSD-3-Clause-GameSpy.txt) and
+kept alongside the source as `license.txt`. Its headers sit beside its sources
+and are included by bare name, so the library's own directory layout is
+preserved rather than folded into a shared include root.
 
 The referenced decompilation projects publish their reconstruction work under
 CC0 1.0. ODE-derived source retains the
-[ODE BSD-style license](../LICENSES/ODE-BSD.txt). Other third-party material
+[ODE BSD-style license](../LICENSES/ODE-BSD.txt). GameSpy source retains its
+[three-clause BSD licence](../LICENSES/BSD-3-Clause-GameSpy.txt). Other third-party material
 retains its respective upstream terms.
 
 External source is accepted only after comparison against R4QE01. A unit is
