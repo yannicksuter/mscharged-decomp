@@ -19,6 +19,11 @@ Game/AI/AiUtil.cpp:
 	.sdata      start:0x806DB3D8 end:0x806DB470
 	.sdata2     start:0x806E3080 end:0x806E30D0
 
+Game/AnimInventory.cpp:
+	.text       start:0x80009648 end:0x80009B34
+	.data       start:0x804F42A0 end:0x804F4330
+	.sbss       start:0x806E0B90 end:0x806E0B98
+
 Game/Character.cpp:
 	.text       start:0x8001BA0C end:0x80025E9C
 	.ctors      start:0x804DB4FC end:0x804DB500
@@ -255,6 +260,14 @@ Game/Render/Nis.cpp:
 	.sdata      start:0x806DEF28 end:0x806DEF60
 	.sbss       start:0x806E19D8 end:0x806E1A20
 	.sdata2     start:0x806E5CF8 end:0x806E5D18
+
+Game/AnimProps/globalanimproperties.cpp:
+	.data       start:0x80525568 end:0x80527A18
+	.sdata      start:0x806DF0E8 end:0x806DF120
+
+Game/AnimProps/goalieanimproperties.cpp:
+	.data       start:0x80527A18 end:0x8052A878
+	.sdata      start:0x806DF120 end:0x806DF190
 
 NL/nlAVLTree.cpp:
 	.text       start:0x802A8D80 end:0x802A9538

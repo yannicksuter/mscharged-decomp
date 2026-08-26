@@ -55,14 +55,32 @@ public:
     /* 0x134 */ TweakValue_804F4DC8 fGetupSpeedLow;
 
 private:
-    /* 0x144 */ u8 mUnidentified144[0x50];
+    /* 0x144 */ u8 mUnidentified144[0x10];
+
+public:
+    /* 0x154 */ TweakValue_804F4DC8 fGoalieBallTime;
+
+private:
+    /* 0x164 */ u8 mUnidentified164[0x30];
 
 public:
     /* 0x194 */ TweakValue_804F4DC8 fSaveDirectionSeekSpeed;
     /* 0x1A4 */ TweakValue_804F4DC8 fSaveDirectionSeekFalloff;
 
 private:
-    /* 0x1B4 */ u8 mUnidentified1B4[0x184];
+    /* 0x1B4 */ u8 mUnidentified1B4[0x30];
+
+public:
+    /* 0x1E4 */ TweakValue_804F4DC8 fLobShotStumbleChance;
+
+private:
+    /* 0x1F4 */ u8 mUnidentified1F4[0x10];
+
+public:
+    /* 0x204 */ TweakValue_804F4DC8 fSaveCatchTolerance;
+
+private:
+    /* 0x214 */ u8 mUnidentified214[0x124];
 
 public:
     /* 0x338 */ TweakValue_804F4DC8 fRunningDirectionSeekSpeed;

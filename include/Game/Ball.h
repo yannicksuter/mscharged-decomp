@@ -60,25 +60,39 @@ public:
     /* 0x6C */ nlVector3 m_v3Velocity;
 
 private:
-    /* 0x78 */ u8 mUnidentified078[0x34];
+    /* 0x78 */ u8 mUnidentified078[0x1C];
+
+public:
+    /* 0x94 */ nlVector3 m_v3ShotTarget;
+
+private:
+    /* 0xA0 */ u8 mUnidentified0A0[0x0C];
 
 public:
     /* 0xAC */ unsigned int m_uGoalType;
 
 private:
-    /* 0xB0 */ u8 mUnidentified0B0[0x18];
+    /* 0xB0 */ u8 mUnidentified0B0[0x08];
+
+public:
+    /* 0xB8 */ int mUnidentified0B8;
+
+private:
+    /* 0xBC */ u8 mUnidentified0BC[0x0C];
 
 public:
     /* 0xC8 */ cPlayer* m_pOwner;
 
 private:
-    /* 0xCC */ u8 mUnidentified0CC[0x08];
+    /* 0xCC */ cPlayer* m_pPrevOwner;
+    /* 0xD0 */ cPlayer* m_pLastTouch;
 
 public:
     /* 0xD4 */ cPlayer* m_pPassTarget;
+    /* 0xD8 */ cPlayer* m_pShooter;
 
 private:
-    /* 0xD8 */ u8 mUnidentified0D8[0x10];
+    /* 0xDC */ u8 mUnidentified0DC[0x0C];
 
 public:
     /* 0xE8 */ PhysicsBall* m_pPhysicsBall;

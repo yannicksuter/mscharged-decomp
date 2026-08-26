@@ -6,6 +6,7 @@
 
 class Blinker;
 class BlurHandler;
+class cAnimInventory;
 class EffectsTexturing;
 class EffectsGroup;
 class EmissionController;
@@ -160,13 +161,17 @@ public:
     /* 0x092 */ u8 unknown_0x092[0x02];
     /* 0x094 */ nlVector3 m_v3AnimMoveAdjust;
     /* 0x0A0 */ float mUnidentified0A0;
-    /* 0x0A4 */ u8 unknown_0x0A4[0x18];
+    /* 0x0A4 */ u8 unknown_0x0A4[0x14];
+    /* 0x0B8 */ cAnimInventory* m_pAnimInventory;
     /* 0x0BC */ cPoseAccumulator* m_pPoseAccumulator;
     /* 0x0C0 */ cPoseNode* m_pPoseTree;
     /* 0x0C4 */ cPoseNode** m_pAILayer;
     /* 0x0C8 */ cPN_SAnimController* m_pCurrentAnimController;
     /* 0x0CC */ int m_eAnimID;
-    /* 0x0D0 */ u8 unknown_0x0D0[0x20];
+    /* 0x0D0 */ u8 unknown_0x0D0[0x08];
+    /* 0x0D8 */ int m_nHeadJointIndex;
+    /* 0x0DC */ int mUnidentified0DC;
+    /* 0x0E0 */ u8 unknown_0x0E0[0x10];
     /* 0x0F0 */ eClassTypes m_eClassType;
     /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;
     /* 0x0F5 */ u8 unknown_0x0F5[0x2F];

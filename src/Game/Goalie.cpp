@@ -22,6 +22,9 @@ extern void* lbl_806E0C94;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
+bool Goalie::mbPosGoalieNetCheck;
+bool Goalie::mbNegGoalieNetCheck;
+
 void Goalie::SetGoalieAction(
     eGoalieActionState newGoalieState, int newSubstate)
 {

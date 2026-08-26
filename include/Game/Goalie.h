@@ -17,9 +17,11 @@ class cPN_SingleAxisBlender;
 enum eGoalieActionState
 {
     GOALIEACTION_MOVE = 0,
+    GOALIEACTION_MOVE_WB = 1,
     GOALIEACTION_SAVE_SETUP = 2,
     GOALIEACTION_SAVE_REPOSITION = 3,
     GOALIEACTION_SAVE = 4,
+    GOALIEACTION_MISS_CHIP_SHOT = 5,
     GOALIEACTION_DIVE_RECOVER = 6,
     GOALIEACTION_STS_RECOVER = 7,
     GOALIEACTION_PASS = 8,
@@ -34,9 +36,24 @@ enum eGoalieActionState
     GOALIEACTION_LOOSEBALL_PURSUE_BOUNCING = 17,
     GOALIEACTION_LOOSEBALL_PURSUE_ROLLING = 18,
     GOALIEACTION_LOOSEBALL_DESPERATE = 19,
+    GOALIEACTION_UNIDENTIFIED_20 = 20,
+    GOALIEACTION_UNIDENTIFIED_21 = 21,
     GOALIEACTION_OFFPLAY = 22,
     GOALIEACTION_SNAP_BALL = 23,
     GOALIEACTION_GRAB_BALL = 24,
+    GOALIEACTION_UNIDENTIFIED_25 = 25,
+    GOALIEACTION_UNIDENTIFIED_26 = 26,
+    GOALIEACTION_UNIDENTIFIED_27 = 27,
+    GOALIEACTION_UNIDENTIFIED_28 = 28,
+    GOALIEACTION_UNIDENTIFIED_29 = 29,
+    GOALIEACTION_UNIDENTIFIED_30 = 30,
+    GOALIEACTION_UNIDENTIFIED_31 = 31,
+    GOALIEACTION_UNIDENTIFIED_32 = 32,
+    GOALIEACTION_UNIDENTIFIED_33 = 33,
+    GOALIEACTION_STS_ATTACK_SETUP = 34,
+    GOALIEACTION_STS_ATTACK = 35,
+    GOALIEACTION_UNIDENTIFIED_36 = 36,
+    GOALIEACTION_UNIDENTIFIED_37 = 37,
 };
 
 enum eGoalieMoveDirection
@@ -77,14 +94,21 @@ public:
     void CleanGoalieAction();
     float CheckForDelflectAwayFromNet();
     void CheckForLimbEndZoneCollision();
+    void fn_800883D4(bool& bAdjustY, float& fXAdjustment,
+        float& fYAdjustment, const nlVector3& v3JointPosition,
+        float fXLimit, float fYLimit);
     void InitActionMove(bool bParam);
     void InitActionMoveWB();
+    void InitActionChipShotStumble(float fTargetTime);
+    void InitActionDiveRecover();
+    void InitActionOffplay(eGoalieOffplayType type);
     void InitActionPass(bool useTarget);
     void InitActionPreCrouch(eGoalieCrouchType crouchType);
     void fn_8008BBB0(cFielder* pTarget, int nPursueDekeType);
     void InitActionLooseBallPickup(float fDistance, bool bStartPickup);
     void InitActionSaveSetup(bool bCanReposition);
     void InitActionSave();
+    void fn_80090320(float fParam);
     inline void InitActionPassInterceptSave();
     inline void InitActionPursueBallCarrier();
     inline void InitActionPursueBallPounce();
@@ -96,13 +120,16 @@ public:
     void SetDesiredSaveFacing(const nlVector3& v3BallPosition);
     bool IsCloseToPlane(const nlVector3& rPos1,
         const nlVector3& rPos2, float fThreshold);
+    bool IsInsideNetArea(const nlVector3& v3Target);
     void MakeExertEvent();
     bool CanInterceptPass();
     bool CheckForSTSAttack();
+    bool IsOpponentInSTS();
     bool IsWithinPounceRange();
     bool IsOpponentBallCarrierInRange();
     cPlayer* FindOpenPassTarget();
     bool IsTargetViable(cPlayer* pTarget);
+    bool ShouldReposition();
     bool fn_8007BC40();
     bool fn_8007C73C();
     bool fn_8007D740();
@@ -121,7 +148,21 @@ public:
     void InitActionSaveReposition();
     void InitActionLooseBallPursueRolling();
     void InitActionLooseBallSetup();
+    void fn_8008CD08();
+    void fn_8008CED8(float fTargetTime,
+        const nlVector3& v3TargetPosition,
+        const nlVector3& v3TargetVelocity);
+    void fn_8008D210(float fDeltaT);
+    void fn_8008DAB4(float fDeltaT);
+    void fn_8008DEF4(float fParam);
+    void fn_8008E130();
+    void fn_8008E2D0();
+    void InitActionSTSAttackSetup(float fWaitTime);
+    void InitActionSTSAttack();
     void InitActionLooseBallCatch();
+    void fn_8008EC2C();
+    void fn_8008ED44(bool bParam);
+    void fn_8008EF58();
     static void MoveDirectionCB(
         unsigned int nParam, cPN_SingleAxisBlender* blender);
     static void MoveWeightCB(
@@ -130,7 +171,10 @@ public:
         unsigned int nParam, cPN_SAnimController* controller);
     static void RunWeightCB(
         unsigned int nParam, cPN_SingleAxisBlender* blender);
+    void ActionMove(float deltaTime);
     void ActionSaveSetup(float deltaTime);
+    void ActionSaveReposition(float deltaTime);
+    void ActionSave(float fDeltaT);
     void ActionDiveRecover(float fDeltaT);
     void ActionPass(float deltaTime);
     void ActionPassIntercept(float deltaTime);
@@ -143,6 +187,17 @@ public:
     void ActionSnapBall(float fDeltaT);
     void ActionGrabBall(float fDeltaT);
     void fn_8008B718(float fDeltaT);
+    void fn_8008E69C(float fDeltaT);
+    void fn_8008895C(float deltaTime);
+    void ActionSTSRecover(float deltaTime);
+    void fn_80088A94(float deltaTime);
+    void ActionSTSAttackSetup(float deltaTime);
+    void fn_800891E8(float deltaTime);
+    void ActionChipShotStumble(float deltaTime);
+    void ActionSTSAttack(float deltaTime);
+
+    static bool mbPosGoalieNetCheck;
+    static bool mbNegGoalieNetCheck;
 
 private:
     /* 0x328 */ eGoalieActionState mGoalieActionState;
@@ -183,7 +238,7 @@ private:
     /* 0x3A4 */ nlVector3 mv3NavTarget;
     /* 0x3B0 */ nlVector3 mv3LocalNavTarget;
     /* 0x3BC */ unsigned short maLocalAngle;
-    /* 0x3BE */ u8 mUnidentified3BE[2];
+    /* 0x3BE */ unsigned short mUnidentified3BE;
     /* 0x3C0 */ unsigned short maInitialAngle;
     /* 0x3C2 */ unsigned short maSaveAngle;
     /* 0x3C4 */ float mfTargetTime;
@@ -203,7 +258,8 @@ private:
     /* 0x3FC */ int mBallsLaunched;
     /* 0x400 */ int mLowLobAnim;
     /* 0x404 */ Timer mFreezeTimer;
-    /* 0x40C */ void* mMegaMachine;
+    /* 0x40C */ s8 mUnidentified40C;
+    /* 0x40D */ u8 mUnknown40D[0x03];
     /* 0x410 */ cPlayer* mpPassTarget;
     /* 0x414 */ cFielder* mpShooter;
     /* 0x418 */ cFielder* mpTarget;
