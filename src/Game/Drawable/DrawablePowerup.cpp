@@ -1,4 +1,5 @@
 #include "Game/AI/Powerups.h"
+#include "NL/gl/glModel.h"
 #include "NL/nlMath.h"
 #include "NL/gl/glState.h"
 #include "NL/nlString.h"
@@ -70,7 +71,7 @@ public:
     virtual void Draw();
 
     char _04[0x60];
-    void* model;
+    glModel* model;
     char _68[8];
     u32 flags;
 };
@@ -87,7 +88,6 @@ extern "C" void fn_802B549C(nlQuaternion*, u16);
 extern "C" void fn_80368374(nlMatrix4*, const nlQuaternion*, bool);
 extern "C" nlMatrix4* fn_80368D70(nlMatrix4*, float, float, float);
 extern "C" nlMatrix4* fn_80368788(nlMatrix4*, const nlMatrix4*, const nlMatrix4*);
-extern "C" void* fn_802CC360(void*, int, int);
 extern "C" void fn_801869AC(void*, void*, int, int, const DrawablePowerup*, float);
 extern "C" u32 fn_8027262C();
 extern "C" bool fn_802C9664(glQuad3*, u32, int);
@@ -122,7 +122,7 @@ inline char* GetName(int idx)
 
     return powerupLookup;
 }
-}
+} // namespace
 
 static void DrawShadow(float radius, float x, float y, float z)
 {
@@ -287,9 +287,9 @@ void DrawablePowerup::Render(int idx) const
 
     if (sUseModelPowerupShadows != 0)
     {
-        void* model = object->model;
+        glModel* model = object->model;
         void* source = object->GetShadowSource();
-        void* geometry = fn_802CC360(model, 0, 0);
+        glModel* geometry = glModelDupNoStreams(model, false, 0);
         fn_801869AC(geometry, source, 1, 0, this, 0.5f);
     }
     else

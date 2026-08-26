@@ -385,6 +385,9 @@ NL/nlBundleFile.cpp:
 	.text       start:0x802BDB70 end:0x802BE64C
 	.data       start:0x8052BA40 end:0x8052BA70
 
+NL/gl/glModel.cpp:
+	.text       start:0x802CC0EC end:0x802CC370
+
 NL/gl/glStat.cpp:
 	.text       start:0x802CCDFC end:0x802CCE00
 
@@ -398,6 +401,11 @@ NL/gl/glState.cpp:
 NL/gl/glStruct.cpp:
 	.text       start:0x802CD778 end:0x802CD7A0
 	.bss        start:0x8057F1F8 end:0x8057F220
+
+Game/GL/GLInventory.cpp:
+	.text       start:0x802D0864 end:0x802D2B2C
+	.text       start:0x802D2B2C end:0x802D38A4
+	.data       start:0x8052E5C0 end:0x8052E758
 
 Game/Task/ParticleUpdateTask.cpp:
 	.text       start:0x802EB344 end:0x802EB59C
@@ -650,11 +658,17 @@ NL/glx/glxSwap.cpp:
 	.sbss       start:0x806E2378 end:0x806E23CC
 	.sdata2     start:0x806E6D68 end:0x806E6D6C
 
-MSL/float.c:
-	.sdata      start:0x806DFB58 end:0x806DFB68
-
 NL/nlEndian.cpp:
 	.text       start:0x8036D6F0 end:0x8036D6F8
+
+NL/glx/glxDisplayList.cpp:
+	.text       start:0x8036F2E8 end:0x8036F648
+	.data       start:0x805356A0 end:0x805356B0
+	.sdata      start:0x806DFAB8 end:0x806DFAC0
+	.sbss       start:0x806E23F4 end:0x806E2400
+
+MSL/float.c:
+	.sdata      start:0x806DFB58 end:0x806DFB68
 
 MSL/math_sun.c:
 	extab       start:0x80006738 end:0x80006740

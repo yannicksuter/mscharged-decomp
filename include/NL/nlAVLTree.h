@@ -113,6 +113,25 @@ public:
         return &((Entry*)existingNode)->value;
     }
 
+    template <typename CallbackType>
+    void Walk(CallbackType* cbClass,
+        void (CallbackType::*cb)(const KeyType&, ValueType*))
+    {
+        InorderWalk(m_Root, cbClass, cb);
+    }
+
+    template <typename CallbackType>
+    void InorderWalk(Entry* curr, CallbackType* cbClass,
+        void (CallbackType::*cb)(const KeyType&, ValueType*))
+    {
+        while (curr != 0)
+        {
+            InorderWalk((Entry*)curr->node.left, cbClass, cb);
+            (cbClass->*cb)(curr->key, &curr->value);
+            curr = (Entry*)curr->node.right;
+        }
+    }
+
     nlAVLTreeIterator<KeyType, ValueType, CompareType>* GetIterator();
 
     static void DeleteEntry(AVLTreeUntemplated* tree, AVLTreeNode* entry)
