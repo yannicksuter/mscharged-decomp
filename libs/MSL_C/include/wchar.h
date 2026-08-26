@@ -5,11 +5,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
 
+/* wchar_t is a keyword only in C++; declaring this unguarded makes
+   <wchar.h> invalid for every C translation unit that includes it. */
 size_t wcslen(const wchar_t* s);
 
-#ifdef __cplusplus
 }
 #endif
 

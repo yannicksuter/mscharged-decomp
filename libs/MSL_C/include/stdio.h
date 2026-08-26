@@ -1,6 +1,9 @@
 #ifndef MSL_STDIO_H
 #define MSL_STDIO_H
 
+/* Longest file name the library can open (C89 4.9.1). */
+#define FILENAME_MAX 256
+
 #include <stdarg.h>
 #include <size_t.h>
 
@@ -8,6 +11,29 @@
 extern "C" {
 #endif
 
+/* Streams (C89 4.9.1). FILE stays incomplete here: the library owns its
+   layout and every user of this header holds it only through a pointer. */
+typedef struct _FILE FILE;
+
+#define EOF (-1)
+
+/* SEEK_SET/SEEK_CUR/SEEK_END are deliberately absent: nw4hbm's
+   ut::FileStream::SeekOrigin spells its enumerators with those names, and a
+   macro would rewrite them in every C++ unit that reaches both headers. */
+
+extern FILE* stdin;
+extern FILE* stdout;
+extern FILE* stderr;
+
+/* File operations (C89 4.9.4) and file access (4.9.5). */
+int remove(const char* filename);
+int rename(const char* old, const char* new_);
+FILE* fopen(const char* filename, const char* mode);
+int fclose(FILE* stream);
+int fflush(FILE* stream);
+
+/* Formatted output (C89 4.9.6). */
+int fprintf(FILE* stream, const char* format, ...);
 int sprintf(char* s, const char* format, ...);
 int snprintf(char* s, size_t n, const char* format, ...);
 int vprintf(const char* format, va_list arguments);
@@ -18,6 +44,20 @@ int vsnprintf(char* s, size_t n, const char* format, va_list arguments);
    invalid for every C translation unit that includes it. */
 int vswprintf(wchar_t* s, size_t n, const wchar_t* format, va_list arguments);
 #endif
+
+/* Direct input/output (C89 4.9.8). */
+size_t fread(void* ptr, size_t size, size_t nmemb, FILE* stream);
+size_t fwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream);
+
+/* File positioning (C89 4.9.9). */
+int fseek(FILE* stream, long offset, int whence);
+long ftell(FILE* stream);
+void rewind(FILE* stream);
+
+/* Error handling (C89 4.9.10). */
+void clearerr(FILE* stream);
+int feof(FILE* stream);
+int ferror(FILE* stream);
 
 #ifdef __cplusplus
 }
