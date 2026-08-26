@@ -341,6 +341,8 @@ config.libs = [
             Object(NonMatching, "Game/GameInfo.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/NisPlayer.cpp", extra_cflags=["-inline deferred"]),
             Object(NonMatching, "Game/Render/Nis.cpp", extra_cflags=["-inline deferred"]),
+            Object(Matching, "Game/AnimProps/globalanimproperties.cpp"),
+            Object(Matching, "Game/AnimProps/goalieanimproperties.cpp"),
             Object(Matching, "NL/nlAVLTree.cpp"),
             Object(Matching, "NL/nlMath.cpp"),
             Object(Matching, "NL/nlMemory.cpp"),

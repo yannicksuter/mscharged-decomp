@@ -256,6 +256,14 @@ Game/Render/Nis.cpp:
 	.sbss       start:0x806E19D8 end:0x806E1A20
 	.sdata2     start:0x806E5CF8 end:0x806E5D18
 
+Game/AnimProps/globalanimproperties.cpp:
+	.data       start:0x80525568 end:0x80527A18
+	.sdata      start:0x806DF0E8 end:0x806DF120
+
+Game/AnimProps/goalieanimproperties.cpp:
+	.data       start:0x80527A18 end:0x8052A878
+	.sdata      start:0x806DF120 end:0x806DF190
+
 NL/nlAVLTree.cpp:
 	.text       start:0x802A8D80 end:0x802A9538
 
