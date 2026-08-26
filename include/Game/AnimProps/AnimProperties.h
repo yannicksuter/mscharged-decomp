@@ -7,7 +7,15 @@ struct AnimProperties
     const char* animation;
     unsigned int flagsA;
     float blend;
-    unsigned int flagsB;
+    union
+    {
+        unsigned int flagsB;
+        struct
+        {
+            bool mirror;
+            unsigned char mPadding11[3];
+        };
+    };
     unsigned int flagsC;
     unsigned int flagsD;
     unsigned int flagsE;

@@ -7,6 +7,7 @@
 class cBall;
 class cAIPad;
 class cGlobalPad;
+class cPN_Feather;
 class cTeam;
 class PlayerTweaks;
 
@@ -18,9 +19,10 @@ public:
     virtual void PrePhysicsUpdate(float dt);
     virtual void PreUpdate(float dt);
 
-    void ReleaseBall(bool bParam);
+    void ReleaseBall(int nParam);
     void PickupBall(cBall* pBall);
     cGlobalPad* GetGlobalPad();
+    u8 SwapController(bool bParam);
     bool IsOnSameTeam(cPlayer* other);
     float DoFlashLight(const nlVector3& Position, unsigned short aDirection,
         float fAngleWeighting, float fIgnoreObjectCloserThanThis,
@@ -29,7 +31,13 @@ public:
     void fn_80097648(float fParam);
 
 protected:
-    /* 0x1E4 */ u8 mUnknown1E4[0x48];
+    /* 0x1E4 */ u8 mUnknown1E4[0x0C];
+    /* 0x1F0 */ float mUnidentified1F0;
+    /* 0x1F4 */ u8 mUnknown1F4;
+    /* 0x1F5 */ bool mUnidentified1F5;
+    /* 0x1F6 */ bool mUnidentified1F6;
+    /* 0x1F7 */ u8 mUnknown1F7;
+    /* 0x1F8 */ u8 mUnknown1F8[0x34];
 
 public:
     /* 0x22C */ Timer m_tNoPickupTimer;
@@ -38,13 +46,16 @@ protected:
     /* 0x234 */ u8 mUnknown234[0x1C];
     /* 0x250 */ u32 mUnidentified250;
     /* 0x254 */ void* mUnidentified254;
-    /* 0x258 */ u8 mUnknown258[0xA0];
+    /* 0x258 */ u8 mUnknown258[0x98];
+    /* 0x2F0 */ cPN_Feather* mUnidentified2F0;
+    /* 0x2F4 */ u8 mUnknown2F4[0x04];
 
 public:
     /* 0x2F8 */ int m_nBallJointIndex;
 
 protected:
-    /* 0x2FC */ u8 mUnknown2FC[0x08];
+    /* 0x2FC */ int m_nRightFootJointIndex;
+    /* 0x300 */ int m_nLeftFootJointIndex;
 
 public:
     /* 0x304 */ int m_nLeftHandJointIndex;
