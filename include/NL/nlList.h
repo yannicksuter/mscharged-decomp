@@ -35,6 +35,11 @@ public:
         return (T*)nlMalloc(sizeof(T), 8, false);
     }
 
+    void Allocate(T*& out)
+    {
+        out = (T*)nlMalloc(sizeof(T), 8, false);
+    }
+
     T* New(const T& value)
     {
         T* entry = (T*)nlMalloc(sizeof(T), 8, false);
