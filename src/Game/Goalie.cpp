@@ -13,9 +13,13 @@
 #include "Game/SAnim/pnSingleAxisBlender.h"
 #include "Game/Team.h"
 
+#include <math.h>
+
 extern void KillDaze(cPlayer* player);
 extern "C" bool fn_800EBBFC(
     int nParam0, unsigned int nParam1, void* pParam2, void* pParam3);
+extern "C" void fn_8005D948(
+    void* pGame, const GoalieSaveData* pData);
 extern "C" void fn_8005E9FC(
     void* pManager, const PlayerAttackData* pData);
 extern void* lbl_806E0C94;
@@ -24,6 +28,42 @@ static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 bool Goalie::mbPosGoalieNetCheck;
 bool Goalie::mbNegGoalieNetCheck;
+
+bool Goalie::IsTargetViable(cPlayer* pTarget)
+{
+    if ((float)fabs(pTarget->m_v3Position.x)
+            > (float)fabs(static_cast<cPlayer*>(this)->m_v3Position.x)
+        && fabsf(pTarget->m_v3Position.y) < cField::GetPenaltyBoxY())
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void Goalie::MakeExertEvent()
+{
+    GoalieSaveData pSaveData;
+
+    pSaveData.pGoalie = this;
+    pSaveData.v3BallVelocity = v3Zero;
+    pSaveData.fWowFactor = 0.0f;
+    pSaveData.isSTS = 0;
+
+    pSaveData.saveType = g_pBall->m_uGoalType;
+    pSaveData.pShooter = g_pBall->m_pShooter;
+
+    if (mpSaveData != 0)
+    {
+        pSaveData.padding = mpSaveData->muSaveType;
+    }
+    else
+    {
+        pSaveData.padding = 3;
+    }
+
+    fn_8005D948(lbl_806E0C94, &pSaveData);
+}
 
 void Goalie::SetGoalieAction(
     eGoalieActionState newGoalieState, int newSubstate)
@@ -198,29 +238,14 @@ void Goalie::PlayBlendedAnims(
                 float* pDefaultStartPercent = fDefaultStartPercent;
                 float fDefaultStart = pDefaultStartPercent[nMilestone];
 
-                SaveData* pData0 = mBlendInfo.mpSaveData[0];
-                if (pData0 != 0)
+                for (int i = 0; i < 4; i++)
                 {
-                    fStartPercent[0]
-                        = fDefaultStart * pData0->mfMilestonePercent[2];
-                }
-                SaveData* pData1 = mBlendInfo.mpSaveData[1];
-                if (pData1 != 0)
-                {
-                    fStartPercent[1]
-                        = fDefaultStart * pData1->mfMilestonePercent[2];
-                }
-                SaveData* pData2 = mBlendInfo.mpSaveData[2];
-                if (pData2 != 0)
-                {
-                    fStartPercent[2]
-                        = fDefaultStart * pData2->mfMilestonePercent[2];
-                }
-                SaveData* pData3 = mBlendInfo.mpSaveData[3];
-                if (pData3 != 0)
-                {
-                    fStartPercent[3]
-                        = fDefaultStart * pData3->mfMilestonePercent[2];
+                    SaveData* pData = mBlendInfo.mpSaveData[i];
+                    if (pData != 0)
+                    {
+                        fStartPercent[i]
+                            = fDefaultStart * pData->mfMilestonePercent[2];
+                    }
                 }
             }
         }
@@ -345,6 +370,43 @@ void Goalie::PlayNewAnim(int nAnimID)
     }
 
     SetAnimState(nAnimID, true, 0.2f, false, false);
+}
+
+int Goalie::ChooseRunAnim(
+    short nAngle, const nlVector3& rTargetPos, float fThreshold)
+{
+    int nCurrentAnimID = m_eAnimID;
+    unsigned short nAbsAngle;
+    nlVector2 v3Delta;
+    v3Delta.x = rTargetPos.x - m_v3Position.x;
+    v3Delta.y = rTargetPos.y - m_v3Position.y;
+
+    if (nlGetLengthSquared2D(v3Delta.x, v3Delta.y)
+        < nlGetLengthSquared1D(fThreshold))
+    {
+        mMoveDirection = GOALIEDIR_IDLE;
+        return 5;
+    }
+
+    nAbsAngle = (u16)abs_s16(nAngle);
+
+    mMoveDirection = GOALIEDIR_FORWARD;
+
+    if (((nCurrentAnimID == 0x22) || (nCurrentAnimID == 0x23))
+        && (m_pCurrentAnimController->m_fTime < 0.92f))
+    {
+        return nCurrentAnimID;
+    }
+    if (nAbsAngle <= 0x2AF8 || nCurrentAnimID == 0x24)
+    {
+        return 0x24;
+    }
+    if (nAngle > 0)
+    {
+        return 0x23;
+    }
+
+    return 0x22;
 }
 
 void Goalie::CleanupStun()
@@ -482,13 +544,13 @@ void Goalie::TrackTarget(
 
     GetCurrentAnimFuture(m_nBallJointIndex, mpLooseBallInfo->mfPickupTime, v3FutureBallPos, v3FuturePos, aRot);
 
-    float fAngleDeltaY = v3Target.y - m_v3Position.y;
+    float fZero = 0.0f;
     float fDeltaY = v3Target.y - v3FutureBallPos.y;
-    float fAngleDeltaX = v3Target.x - m_v3Position.x;
+    float fAngleDeltaY = v3Target.y - m_v3Position.y;
     float fDeltaX = v3Target.x - v3FutureBallPos.x;
+    float fAngleDeltaX = v3Target.x - m_v3Position.x;
 
     nlVector3 v3Velocity;
-    float fZero = 0.0f;
     v3Velocity.y = fDeltaY;
     v3Velocity.x = fDeltaX;
     v3Velocity.z = fZero;

@@ -94,47 +94,38 @@ public:
 };
 
 template <typename T>
-class SlotPool : public SlotPoolBase
+class SlotPool : public BasicSlotPool<T>
 {
 public:
     SlotPool(int initial, int delta)
-        : SlotPoolBase()
+        : BasicSlotPool<T>()
     {
-        m_Delta = delta;
-        m_Initial = initial;
-        if (m_Initial == 0)
+        this->m_Delta = delta;
+        this->m_Initial = initial;
+        if (this->m_Initial == 0)
         {
             SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
-        }
-    }
-
-    ~SlotPool()
-    {
-        if (this != 0)
-        {
-            fn_802B467C(this);
-            SlotPoolBase::BaseFreeBlocks(this, sizeof(T));
         }
     }
 
     void Allocate(T*& out)
     {
-        if (m_FreeList == 0)
+        if (this->m_FreeList == 0)
         {
             SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
         }
-        if (m_FreeList != 0)
+        if (this->m_FreeList != 0)
         {
-            out = (T*)m_FreeList;
-            m_FreeList = m_FreeList->next;
+            out = (T*)this->m_FreeList;
+            this->m_FreeList = this->m_FreeList->next;
         }
     }
 
     void Free(T* entry)
     {
         SlotPoolEntry* slot = (SlotPoolEntry*)entry;
-        slot->next = m_FreeList;
-        m_FreeList = slot;
+        slot->next = this->m_FreeList;
+        this->m_FreeList = slot;
     }
 
     void FreeBlocks()

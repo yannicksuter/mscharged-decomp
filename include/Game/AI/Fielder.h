@@ -42,14 +42,33 @@ const LooseBallContactAnimInfo* GetOneTimerLeadGroundContactAnims();
 int GetNumOneTimerLeadGroundContactAnims();
 
 class ShotMeter;
+struct UnidentifiedFielderInput;
 
 class cFielder : public cPlayer
 {
 public:
     virtual ~cFielder();
     virtual void PreUpdate(float fTime);
+    virtual bool CanPickupBall(cBall* pBall, bool bParam);
+    virtual void CollideWithCharacterCallback(
+        CollisionPlayerPlayerData* pData);
+    virtual void CollideWithWallCallback(
+        const CollisionPlayerWallData* pData);
+    virtual void InitActionPostWhistle();
+    virtual void fn_80099074(UnidentifiedPlayerEventData*);
 
     void CleanUpAction();
+    bool CanGetElectrocuted(
+        const CollisionPlayerWallData* eventData);
+    bool CanDoCaptainShootToScore();
+    bool CanReceivePass();
+    void fn_8002FDC4(unsigned short aParam, bool bParam);
+    void fn_8003057C(void* pParam);
+    void fn_800305DC(float fParam);
+    void fn_8003063C(PlayerTweaks* pParam);
+    void fn_800306A0(cFielder* pParam);
+    void fn_800306DC();
+    bool fn_800306F4(cFielder* pParam);
     void DoResetShotMeter(float fTime);
     bool IsActionDone() const;
     bool IsFallenDown() const;
@@ -61,14 +80,20 @@ public:
     void EndDesire();
     void EndAction();
     void InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent);
+    void InitActionElectrocution(const nlVector3& wallPosition,
+        const nlVector3& wallNormal, bool bParam);
     bool IsStriker() const;
     bool IsWinger() const;
     bool IsMidField() const;
     bool IsDefense() const;
 
 private:
-    /* 0x328 */ u8 mUnknown328[0x08];
-    /* 0x330 */ u8 mUnknown330[0xFC];
+    /* 0x328 */ u8 mUnknown328[0x04];
+    /* 0x32C */ PlayerTweaks* mUnidentified32C;
+    /* 0x330 */ u8 mUnknown330[0xAC];
+    /* 0x3DC */ bool mUnidentified3DC;
+    /* 0x3DD */ u8 mUnknown3DD[0x4B];
+    /* 0x428 */ UnidentifiedFielderInput* mUnidentified428;
     /* 0x42C */ bool m_bHasBeenUpdated;
     /* 0x42D */ u8 mUnknown42D[3];
 
@@ -90,7 +115,7 @@ public:
 private:
     /* 0x458 */ u8 mUnknown458[0x08];
     /* 0x460 */ eRole m_eRole;
-    /* 0x464 */ u8 mUnknown464[0x10];
+    /* 0x464 */ cFielder* mUnidentified464[4];
 
 public:
     /* 0x474 */ bool mbWasHitByPowerupThisFrame;

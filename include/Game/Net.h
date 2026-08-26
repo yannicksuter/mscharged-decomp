@@ -11,6 +11,10 @@ public:
 
     static float GetNetHeight();
     static float GetNetWidth();
+    static float GetPostRadius()
+    {
+        return m_fNetPostRadius;
+    }
 
     /* 0x00 */ int m_nIndex;
     /* 0x04 */ float m_fDirection;

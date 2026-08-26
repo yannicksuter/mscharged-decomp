@@ -28,8 +28,11 @@ public:
 
 class PlayerTweaks
 {
+public:
+    virtual ~PlayerTweaks();
+
 protected:
-    /* 0x00 */ u8 mUnidentified000[0x44];
+    /* 0x04 */ u8 mUnidentified004[0x40];
 };
 
 class GoalieTweaks : public PlayerTweaks
@@ -79,8 +82,16 @@ private:
 public:
     /* 0x204 */ TweakValue_804F4DC8 fSaveCatchTolerance;
 
+    /* 0x214 */ TweakValue_804F4DC8 fShotFatigueDefault;
+    /* 0x224 */ TweakValue_804F4DC8 fShotFatigueStandCatch;
+    /* 0x234 */ TweakValue_804F4DC8 fShotFatigueDiveCatch;
+    /* 0x244 */ TweakValue_804F4DC8 fShotFatigueStandDeflect;
+    /* 0x254 */ TweakValue_804F4DC8 fShotFatigueDiveDeflect;
+    /* 0x264 */ TweakValue_804F4DC8 fShotFatigueStandPunch;
+    /* 0x274 */ TweakValue_804F4DC8 fShotFatigueLegSave;
+
 private:
-    /* 0x214 */ u8 mUnidentified214[0x124];
+    /* 0x284 */ u8 mUnidentified284[0xB4];
 
 public:
     /* 0x338 */ TweakValue_804F4DC8 fRunningDirectionSeekSpeed;

@@ -2,6 +2,7 @@
 
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
+#include "Game/EventDataTypes.h"
 #include "Game/Field.h"
 #include "Game/GameInfo.h"
 #include "Game/Physics/CollisionSpace.h"
@@ -27,13 +28,6 @@ extern "C" bool fn_8003E948(cFielder*);
 extern "C" bool fn_800976F8(cFielder*, float);
 extern "C" void fn_8016C3E4();
 extern void* lbl_806E1608;
-
-struct CollisionPlayerWallData
-{
-    cPlayer* pPlayer;
-    nlVector3 contactPoint;
-    nlVector3 wallNormal;
-};
 
 struct CollisionPlayerBallData
 {

@@ -10,6 +10,9 @@ class cGlobalPad;
 class cPN_Feather;
 class cTeam;
 class PlayerTweaks;
+struct CollisionPlayerPlayerData;
+struct CollisionPlayerWallData;
+struct UnidentifiedPlayerEventData;
 
 class cPlayer : public cCharacter
 {
@@ -18,11 +21,23 @@ public:
     virtual void PostPhysicsUpdate();
     virtual void PrePhysicsUpdate(float dt);
     virtual void PreUpdate(float dt);
+    virtual bool CanPickupBall(cBall* pBall, bool bParam);
+    virtual void CollideWithBallCallback(cBall* pBall);
+    virtual void CollideWithCharacterCallback(
+        CollisionPlayerPlayerData* pData);
+    virtual void CollideWithWallCallback(
+        const CollisionPlayerWallData* pData);
+    virtual void InitActionPostWhistle();
+    virtual void fn_80099074(UnidentifiedPlayerEventData*);
 
     void ReleaseBall(int nParam);
     void PickupBall(cBall* pBall);
+    void SetNoPickUpTime(float NewNoPickUpTime);
     cGlobalPad* GetGlobalPad();
-    u8 SwapController(bool bParam);
+    int GetBallJointIndex() const
+    {
+        return m_nBallJointIndex;
+    }
     bool IsOnSameTeam(cPlayer* other);
     float DoFlashLight(const nlVector3& Position, unsigned short aDirection,
         float fAngleWeighting, float fIgnoreObjectCloserThanThis,

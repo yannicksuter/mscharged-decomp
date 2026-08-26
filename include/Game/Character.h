@@ -13,6 +13,7 @@ class EmissionController;
 class GLSkinMesh;
 class PhysicsCharacter;
 class cPN_SAnimController;
+class cAnimInventory;
 class cPoseAccumulator;
 class cPoseNode;
 class glModel;
@@ -128,6 +129,10 @@ public:
     s16 GetFacingDeltaToPosition(const nlVector3& position);
     void AttachEffect(EmissionController* pEmissionController);
     GLSkinMesh* GetSkinMesh(int modelType) const;
+    cAnimInventory* GetAnimInventory() const
+    {
+        return m_pAnimInventory;
+    }
 
     /* 0x004 */ u8 unknown_0x004[0x04];
     /* 0x008 */ GLSkinMesh* m_pSkinMesh[4];
@@ -170,7 +175,7 @@ public:
     /* 0x0CC */ int m_eAnimID;
     /* 0x0D0 */ u8 unknown_0x0D0[0x08];
     /* 0x0D8 */ int m_nHeadJointIndex;
-    /* 0x0DC */ int mUnidentified0DC;
+    /* 0x0DC */ int m_nBip01JointIndex_0xA4;
     /* 0x0E0 */ u8 unknown_0x0E0[0x10];
     /* 0x0F0 */ eClassTypes m_eClassType;
     /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;

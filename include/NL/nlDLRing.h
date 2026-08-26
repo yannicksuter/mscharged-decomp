@@ -105,6 +105,16 @@ inline bool nlDLRingIsEnd(T* head, T* current)
 }
 
 template <typename T>
+inline bool nlDLRingIsStart(T* head, T* current)
+{
+    if (head == 0)
+    {
+        return false;
+    }
+    return head->m_next == current;
+}
+
+template <typename T>
 inline bool nlDLRingValidateContainsElement(T* head, const T* node)
 {
     if (head == 0)
@@ -218,6 +228,10 @@ public:
     }
 
     Reference operator*() const { return m_Curr->entry; }
+
+    Pointer CurrentEntry() const { return m_Curr; }
+
+    bool hasNext() const { return m_Curr != 0; }
 
     bool IsEnd() const { return nlDLRingIsEnd(m_Head, m_Curr); }
 

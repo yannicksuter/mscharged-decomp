@@ -10,6 +10,8 @@ struct SaveInfo;
 class SavePositionData
 {
 public:
+    void Init(Goalie* pGoalie, int animID);
+
     /* 0x00 */ int mnAnimID;
     /* 0x04 */ float mfAnimDistance;
     /* 0x08 */ float mfAnimTime;
@@ -22,6 +24,7 @@ public:
     static float LookupFatigueValue(
         Goalie* pGoalie, const SaveInfo& info);
     void Init(Goalie* pGoalie, const SaveInfo& info, unsigned int uIndex);
+    void PostInit(const SaveInfo& info);
 
     float GetMilestoneTime(int milestone) const
     {
@@ -75,11 +78,13 @@ public:
         bool bFromTakeoff);
     static SaveData* FindBestInList(SaveBlendInfo& blendInfo,
         nlListContainer<SaveData*>& SaveList, const nlVector3& v3LocalPos,
-        float fTime, unsigned int uSaveType, bool bFromTakeoff);
+        const nlVector3& v3LocalVelocity, float fTime,
+        unsigned int uSaveType, bool bFromTakeoff);
     static SaveData* GetClosestBlendedPos(SaveBlendInfo& blendInfo,
         const nlVector3& v3TargetPos, SaveData* pSaveData);
     static SaveData* GetMissChipSaveData(bool bLeft, bool bFar);
     static SaveData* GetSTSSpinMissData(bool bLeft);
+    static SaveData* GetRandomSTSMissData(bool bCatchAnimOnly);
     static bool TriggerCallback(float fTime, float fDuration,
         unsigned long uEventID, float fIntensity, void* pUserData);
     static void AddAreaToGrid(SaveData* pSaveData);
@@ -96,7 +101,9 @@ public:
     static SavePositionData* mpPositionTable;
     static unsigned int muNumPositionEntries;
     static unsigned int muMissChipIndexStart;
+    static unsigned int muMissChipCount;
     static unsigned int muSTSMissIndexStart;
+    static unsigned int muSTSMissCount;
     static float mfCrouchDuration;
 };
 

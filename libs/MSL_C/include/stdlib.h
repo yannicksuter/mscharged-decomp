@@ -3,25 +3,66 @@
 
 #include <stddef.h>
 
-#define RAND_MAX 32767
-
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-    void srand(unsigned int seed);
-    int rand(void);
-    void abort(void);
-    void exit(int status);
-    int atoi(const char* str);
+/* Integer arithmetic (C89 4.10.6). CodeWarrior lowers abs/labs to inline
+   intrinsics, so the library forms are macros rather than calls. */
+#define abs(x) __abs(x)
+#define labs(x) __labs(x)
 
-    typedef int (*_compare_function)(const void*, const void*);
-    void qsort(void* table_base, size_t num_members, size_t member_size,
-        _compare_function compare_members);
+typedef struct {
+    int quot;
+    int rem;
+} div_t;
+
+typedef struct {
+    long quot;
+    long rem;
+} ldiv_t;
+
+div_t div(int numer, int denom);
+ldiv_t ldiv(long numer, long denom);
+
+/* String conversion (C89 4.10.1). */
+double atof(const char* nptr);
+int atoi(const char* nptr);
+long atol(const char* nptr);
+double strtod(const char* nptr, char** endptr);
+long strtol(const char* nptr, char** endptr, int base);
+unsigned long strtoul(const char* nptr, char** endptr, int base);
+
+/* Pseudo-random sequence generation (C89 4.10.2). */
+#define RAND_MAX 32767
+
+int rand(void);
+void srand(unsigned int seed);
+
+/* Memory management (C89 4.10.3). */
+void* calloc(size_t nmemb, size_t size);
+void free(void* ptr);
+void* malloc(size_t size);
+void* realloc(void* ptr, size_t size);
+
+/* Communication with the environment (C89 4.10.4). `exit` is deliberately
+   absent: the EABI startup header already declares this build's own
+   `void exit(void)`, and a second, differing declaration would make every
+   translation unit that reaches both invalid. */
+#define EXIT_SUCCESS 0
+#define EXIT_FAILURE 1
+
+void abort(void);
+char* getenv(const char* name);
+
+/* Searching and sorting (C89 4.10.5). */
+void* bsearch(const void* key, const void* base, size_t nmemb, size_t size,
+              int (*compar)(const void*, const void*));
+void qsort(void* base, size_t nmemb, size_t size,
+           int (*compar)(const void*, const void*));
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // _STDLIB_H_
+#endif

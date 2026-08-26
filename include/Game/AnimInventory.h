@@ -13,6 +13,11 @@ public:
 
     void AddAnimBundle(char* pMem, int len, const char* szFilename);
 
+    cSAnim* GetAnim(int i)
+    {
+        return m_pSAnims[i];
+    }
+
     bool GetMirrored(int i)
     {
         return m_pAnimProperties[i].mirror;
