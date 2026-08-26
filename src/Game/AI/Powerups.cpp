@@ -67,6 +67,8 @@ extern float lbl_806DBDA4;
 extern float lbl_806DBDA8;
 extern float lbl_806DBDAC;
 extern float lbl_806DBDB0;
+extern float lbl_806DBDB4;
+extern float lbl_806DBDB8;
 extern float lbl_806DBDBC;
 extern float lbl_806DBDC8;
 extern float lbl_806DBDCC;
@@ -334,6 +336,204 @@ cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)
     return pBestCandidate;
 }
 
+void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
+    PowerupBase* pNewPowerup, PowerupBase* pFirstPowerup,
+    unsigned short aDirection)
+{
+    if (pFirstPowerup->m_eType == POWER_UP_BOBOMB)
+    {
+        ((Bobomb*)pNewPowerup)->fn_8009F454(pFirstPowerup, nThrowOrder);
+        return;
+    }
+
+    float fPowerupOffSet
+        = 2.0f * ((PhysicsSphere*)pFirstPowerup->m_pPhysicsObject)->GetRadius();
+    if (eStyle == THROW_ARROW)
+    {
+        fPowerupOffSet += lbl_806DBDB8;
+    }
+    else
+    {
+        fPowerupOffSet += lbl_806DBDB4;
+    }
+
+    switch (eStyle)
+    {
+    case THROW_HORIZONTAL_LINE:
+    {
+        nlVector3 v3StartPosition;
+        nlVector3 v3VelocityDirection;
+        nlVector3 v3PerpToVelocity;
+
+        pNewPowerup->m_v3Velocity = pFirstPowerup->m_v3Velocity;
+        pNewPowerup->m_pPhysicsObject->SetLinearVelocity(
+            pFirstPowerup->m_v3Velocity);
+
+        v3VelocityDirection = pFirstPowerup->m_v3Velocity;
+        v3VelocityDirection.z = 0.0f;
+        if (nlVec3Length(v3VelocityDirection) > 0.01f)
+        {
+            float invLen = nlRecipSqrt(
+                v3VelocityDirection.x * v3VelocityDirection.x
+                    + v3VelocityDirection.y * v3VelocityDirection.y
+                    + v3VelocityDirection.z * v3VelocityDirection.z,
+                true);
+            nlVec3Set(v3VelocityDirection,
+                invLen * v3VelocityDirection.x,
+                invLen * v3VelocityDirection.y,
+                invLen * v3VelocityDirection.z);
+        }
+        else
+        {
+            nlPolarToCartesian(v3VelocityDirection.x,
+                v3VelocityDirection.y, aDirection, 1.0f);
+        }
+
+        if (nThrowOrder % 2 == 0)
+        {
+            RotateVectorZAxis(v3PerpToVelocity, v3VelocityDirection, 0x4000);
+        }
+        else
+        {
+            RotateVectorZAxis(v3PerpToVelocity, v3VelocityDirection, 0xC000);
+        }
+
+        fPowerupOffSet *= (float)((nThrowOrder + 1) / 2);
+        nlVec3Set(v3PerpToVelocity,
+            fPowerupOffSet * v3PerpToVelocity.x,
+            fPowerupOffSet * v3PerpToVelocity.y,
+            fPowerupOffSet * v3PerpToVelocity.z);
+        nlVec3Set(v3StartPosition,
+            pFirstPowerup->m_v3Position.x + v3PerpToVelocity.x,
+            pFirstPowerup->m_v3Position.y + v3PerpToVelocity.y,
+            pFirstPowerup->m_v3Position.z + v3PerpToVelocity.z);
+
+        pNewPowerup->m_v3Position = v3StartPosition;
+        pNewPowerup->m_pPhysicsObject->SetPosition(
+            pNewPowerup->m_v3Position, PhysicsObject::WORLD_COORDINATES);
+        break;
+    }
+    case THROW_ARROW:
+    {
+        nlVector3 v3StartPosition;
+        nlVector3 v3VelocityDirection;
+        nlVector3 v3PerpToVelocity;
+        nlVector3 v3Offset;
+
+        pNewPowerup->m_v3Velocity = pFirstPowerup->m_v3Velocity;
+        pNewPowerup->m_pPhysicsObject->SetLinearVelocity(
+            pFirstPowerup->m_v3Velocity);
+
+        v3VelocityDirection = pFirstPowerup->m_v3Velocity;
+        v3VelocityDirection.z = 0.0f;
+        if (nlVec3Length(v3VelocityDirection) > 0.01f)
+        {
+            float invLen = nlRecipSqrt(
+                v3VelocityDirection.x * v3VelocityDirection.x
+                    + v3VelocityDirection.y * v3VelocityDirection.y
+                    + v3VelocityDirection.z * v3VelocityDirection.z,
+                true);
+            nlVec3Set(v3VelocityDirection,
+                invLen * v3VelocityDirection.x,
+                invLen * v3VelocityDirection.y,
+                invLen * v3VelocityDirection.z);
+        }
+        else
+        {
+            nlPolarToCartesian(v3VelocityDirection.x,
+                v3VelocityDirection.y, aDirection, 1.0f);
+        }
+
+        if (nThrowOrder % 2 == 0)
+        {
+            RotateVectorZAxis(v3PerpToVelocity, v3VelocityDirection, 0x4000);
+        }
+        else
+        {
+            RotateVectorZAxis(v3PerpToVelocity, v3VelocityDirection, 0xC000);
+        }
+
+        fPowerupOffSet *= (float)((nThrowOrder + 1) / 2);
+        nlVec3Set(v3PerpToVelocity,
+            fPowerupOffSet * v3PerpToVelocity.x,
+            fPowerupOffSet * v3PerpToVelocity.y,
+            fPowerupOffSet * v3PerpToVelocity.z);
+        nlVec3Set(v3VelocityDirection,
+            fPowerupOffSet * v3VelocityDirection.x,
+            fPowerupOffSet * v3VelocityDirection.y,
+            fPowerupOffSet * v3VelocityDirection.z);
+
+        RotateVectorZAxis(
+            v3VelocityDirection, v3VelocityDirection, 0x8000);
+
+        nlVec3Add(v3Offset, v3PerpToVelocity, v3VelocityDirection);
+        nlVec3Add(v3StartPosition, pFirstPowerup->m_v3Position, v3Offset);
+
+        pNewPowerup->m_v3Position = v3StartPosition;
+        pNewPowerup->m_pPhysicsObject->SetPosition(
+            pNewPowerup->m_v3Position, PhysicsObject::WORLD_COORDINATES);
+        break;
+    }
+    case THROW_SURROUND:
+    {
+        pNewPowerup->m_v3Position = pFirstPowerup->m_v3Position;
+        pNewPowerup->m_pPhysicsObject->SetPosition(
+            pNewPowerup->m_v3Position, PhysicsObject::WORLD_COORDINATES);
+
+        nlPolar pCurrentVelocity;
+        nlCartesianToPolar(pCurrentVelocity,
+            pFirstPowerup->m_v3Velocity.x,
+            pFirstPowerup->m_v3Velocity.y);
+
+        s16 nFlipAngle = 0x1FFF;
+        if (nThrowOrder % 2 != 0)
+        {
+            nFlipAngle = -nFlipAngle;
+        }
+
+        if (pFirstPowerup->m_pTarget != 0)
+        {
+            nFlipAngle += pCurrentVelocity.a;
+        }
+        else
+        {
+            nFlipAngle += pFirstPowerup->m_pThrower->m_aActualFacingDirection;
+        }
+
+        nlVector3 v3CurrentVelocity = { 0.0f, 0.0f, 0.0f };
+        nlPolarToCartesian(v3CurrentVelocity.x, v3CurrentVelocity.y,
+            (u16)nFlipAngle, pCurrentVelocity.r);
+
+        pNewPowerup->m_v3Velocity = v3CurrentVelocity;
+        pNewPowerup->m_pPhysicsObject->SetLinearVelocity(v3CurrentVelocity);
+        break;
+    }
+    case THROW_SPREAD:
+    {
+        pNewPowerup->m_v3Position = pFirstPowerup->m_v3Position;
+        pNewPowerup->m_pPhysicsObject->SetPosition(
+            pNewPowerup->m_v3Position, PhysicsObject::WORLD_COORDINATES);
+
+        nlVector3 v3CurrentVelocity;
+        v3CurrentVelocity = pFirstPowerup->m_v3Velocity;
+
+        s16 nFlipAngle = (s16)(((nThrowOrder + 1) / 2) * 0x1999);
+        if (nThrowOrder % 2 != 0)
+        {
+            nFlipAngle = -nFlipAngle;
+        }
+        RotateVectorZAxis(
+            v3CurrentVelocity, v3CurrentVelocity, (u16)nFlipAngle);
+
+        pNewPowerup->m_v3Velocity = v3CurrentVelocity;
+        pNewPowerup->m_pPhysicsObject->SetLinearVelocity(v3CurrentVelocity);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 extern "C" float fn_8009A478(ePowerUpType eType, ePowerupSize eSize)
 {
     float fUnidentified = 0.0f;
@@ -467,6 +667,183 @@ extern "C" void fn_8009A5D8(cFielder* pThrower, ePowerUpType eType,
 
     pUnidentified->fRadius = fn_8009A478(
         pUnidentified->eType, pUnidentified->eSize);
+}
+
+inline GreenShell::GreenShell(cFielder* pTarget, int nIndex, float fRadius,
+    ePowerupSize eSize, bool bExplode)
+    : PowerupBase(pTarget, POWER_UP_GREEN_SHELL, fRadius, eSize, bExplode,
+          nIndex)
+{
+}
+
+inline RedShell::RedShell(cFielder* pTarget, int nIndex, float fRadius,
+    ePowerupSize eSize, bool bExplode)
+    : PowerupBase(pTarget, POWER_UP_RED_SHELL, fRadius, eSize, bExplode,
+          nIndex)
+{
+}
+
+inline Banana::Banana(cFielder* pTarget, int nIndex, float fRadius,
+    ePowerupSize eSize, bool bExplode)
+    : PowerupBase(pTarget, POWER_UP_BANANA, fRadius, eSize, bExplode, nIndex)
+{
+}
+
+inline SpinyShell::SpinyShell(cFielder* pTarget, int nIndex, float fRadius,
+    ePowerupSize eSize, bool bExplode)
+    : PowerupBase(pTarget, POWER_UP_SPINY_SHELL, fRadius, eSize, bExplode,
+          nIndex)
+{
+}
+
+inline FreezeShell::FreezeShell(cFielder* pTarget, int nIndex, float fRadius,
+    ePowerupSize eSize, bool bExplode)
+    : PowerupBase(pTarget, POWER_UP_FREEZE_SHELL, fRadius, eSize, bExplode,
+          nIndex)
+{
+}
+
+inline Bobomb::Bobomb(cFielder* pTarget, int nIndex, float fRadius,
+    ePowerupSize eSize, bool bExplode)
+    : PowerupBase(pTarget, POWER_UP_BOBOMB, fRadius, eSize, bExplode, nIndex)
+{
+    pMovementEmitter = 0;
+    mbIsMine = false;
+    m_unkAC = lbl_806DBDE0;
+}
+
+u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
+    const unk_8009A5D8* pSettings)
+{
+    PowerupBase* pFirstPowerup = 0;
+    cTeam* pTargetTeam = pThrower->m_pTeam->GetOtherTeam();
+    cFielder* pTargetFielders[4];
+    for (int i = 0; i < 4; i++)
+    {
+        pTargetFielders[i] = pTargetTeam->GetFielder(i);
+    }
+
+    for (int j = 0; j < pSettings->nnumOfPowerups; j++)
+    {
+        bool bFoundLocation = false;
+        for (int i = 0; i < 25; i++)
+        {
+            if (bFoundLocation)
+            {
+                continue;
+            }
+            if (g_pPowerups[i] != 0)
+            {
+                continue;
+            }
+
+            PowerupBase* pPowerup;
+            switch (pSettings->eType)
+            {
+            case POWER_UP_BANANA:
+            {
+                Banana* pBanana = 0;
+                Banana::m_BananaSlotPool.Allocate(pBanana);
+                new (pBanana) Banana(pTarget, i, pSettings->fRadius,
+                    pSettings->eSize, pSettings->bExplode);
+                pPowerup = pBanana;
+                break;
+            }
+            case POWER_UP_BOBOMB:
+            {
+                Bobomb* pBobomb = 0;
+                Bobomb::m_BobombSlotPool.Allocate(pBobomb);
+                new (pBobomb) Bobomb(pTarget, i, pSettings->fRadius,
+                    pSettings->eSize, true);
+                pPowerup = pBobomb;
+                break;
+            }
+            case POWER_UP_GREEN_SHELL:
+            {
+                GreenShell* pGreenShell = 0;
+                GreenShell::m_GreenShellSlotPool.Allocate(pGreenShell);
+                new (pGreenShell) GreenShell(pTarget, i, pSettings->fRadius,
+                    pSettings->eSize, pSettings->bExplode);
+                pPowerup = pGreenShell;
+                break;
+            }
+            case POWER_UP_FREEZE_SHELL:
+            {
+                FreezeShell* pFreezeShell = 0;
+                FreezeShell::m_FreezeShellSlotPool.Allocate(pFreezeShell);
+                new (pFreezeShell) FreezeShell(pTarget, i,
+                    pSettings->fRadius, pSettings->eSize,
+                    pSettings->bExplode);
+                pPowerup = pFreezeShell;
+                break;
+            }
+            case POWER_UP_RED_SHELL:
+            {
+                RedShell* pRedShell = 0;
+                RedShell::m_RedShellSlotPool.Allocate(pRedShell);
+                new (pRedShell) RedShell(pTarget, i, pSettings->fRadius,
+                    pSettings->eSize, pSettings->bExplode);
+                pPowerup = pRedShell;
+                break;
+            }
+            case POWER_UP_SPINY_SHELL:
+            {
+                SpinyShell* pSpinyShell = 0;
+                SpinyShell::m_SpinyShellSlotPool.Allocate(pSpinyShell);
+                new (pSpinyShell) SpinyShell(pTarget, i,
+                    pSettings->fRadius, pSettings->eSize,
+                    pSettings->bExplode);
+                pPowerup = pSpinyShell;
+                break;
+            }
+            default:
+                break;
+            }
+
+            pPowerup->Init(pThrower);
+            if (pFirstPowerup == 0)
+            {
+                pPowerup->ThrowAt(pThrower);
+                pFirstPowerup = pPowerup;
+            }
+            else
+            {
+                PowerupThrowPosition(j, pSettings->eStyle, pPowerup,
+                    pFirstPowerup, pThrower->m_aActualFacingDirection);
+
+                if (pPowerup->m_eType == POWER_UP_RED_SHELL)
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (pFirstPowerup->m_pTarget == pTargetFielders[i])
+                        {
+                            pTargetFielders[i] = 0;
+                        }
+
+                        if (pTargetFielders[i] != 0
+                            && fn_800387CC(pTargetFielders[i]) == true)
+                        {
+                            pTargetFielders[i] = 0;
+                        }
+
+                        if (pTargetFielders[i] != 0)
+                        {
+                            pPowerup->m_pTarget = pTargetFielders[i];
+                            pTargetFielders[i] = 0;
+                            break;
+                        }
+
+                        pPowerup->m_pTarget = 0;
+                    }
+                }
+            }
+
+            g_pPowerups[i] = pPowerup;
+            bFoundLocation = true;
+        }
+    }
+
+    return 1;
 }
 
 /**
@@ -1029,7 +1406,7 @@ void PowerupBase::fn_8009CAC0(cFielder* pFielder)
 /**
  * Offset/Address/Size: 0x352C | 0x8009CB8C | size: 0x330
  */
-void PowerupBase::ThrowAt(cFielder* pThrower, Bowser* pBowser)
+void PowerupBase::ThrowAt(cFielder* pThrower)
 {
     unsigned long soundID = powerupSounds[m_eType].sndActivate;
     if (soundID != 0)
@@ -1591,7 +1968,7 @@ static inline DrawableObject* AcquirePowerupModel(int type)
 /**
  * Offset/Address/Size: 0x3A44 | 0x8009DADC | size: 0x158
  */
-void PowerupBase::Init(cFielder* pFielder, Bowser*)
+void PowerupBase::Init(cFielder* pFielder)
 {
     m_pDrawableObj = AcquirePowerupModel(m_eType);
 
@@ -1915,7 +2292,7 @@ Banana::~Banana()
 /**
  * Offset/Address/Size: 0x5170 | 0x8009E7D0 | size: 0x17C
  */
-void Banana::ThrowAt(cFielder* pThrower, Bowser* pBowser)
+void Banana::ThrowAt(cFielder* pThrower)
 {
     nlVector3 v3Unidentified = { 0.0f, 0.0f, 0.0f };
     unsigned short aDirection = pThrower->m_aActualFacingDirection;
@@ -2295,7 +2672,7 @@ void Bobomb::fn_8009F454(PowerupBase*, int nThrowOrder)
 /**
  * Offset/Address/Size: 0x61A0 | 0x8009F800 | size: 0xC
  */
-void Bobomb::ThrowAt(cFielder* pThrower, Bowser* pBowser)
+void Bobomb::ThrowAt(cFielder* pThrower)
 {
     fn_8009F454(0, 0);
 }

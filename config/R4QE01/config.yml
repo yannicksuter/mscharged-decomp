@@ -7,6 +7,15 @@ extract_objects: true
 symbols: config/R4QE01/symbols.txt
 splits: config/R4QE01/splits.txt
 mw_comment_version: 14 # GC Linker 3.0+
+add_relocations:
+  - { source: .text:0x8009A7CC, type: ha, target: __vt__6Bobomb }
+  - { source: .text:0x8009A7D8, type: ha, target: __vt__10GreenShell }
+  - { source: .text:0x8009A7F0, type: ha, target: __vt__11FreezeShell }
+  - { source: .text:0x8009A7F4, type: l, target: __vt__6Bobomb }
+  - { source: .text:0x8009A810, type: ha, target: __vt__8RedShell }
+  - { source: .text:0x8009A814, type: l, target: __vt__10GreenShell }
+  - { source: .text:0x8009A834, type: l, target: __vt__11FreezeShell }
+  - { source: .text:0x8009A854, type: l, target: __vt__8RedShell }
 block_relocations:
   - { source: 0x804EFFD0 }
   - { source: 0x804EFFD4 }

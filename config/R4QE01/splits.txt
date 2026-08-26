@@ -43,6 +43,11 @@ Game/AI/Fielder.cpp:
 	.sbss       start:0x806E0C50 end:0x806E0C68
 	.sdata2     start:0x806E3418 end:0x806E3538
 
+Game/AI/FilteredRandom.cpp:
+	.text       start:0x800505AC end:0x80050704
+	.rodata     start:0x804DBEF8 end:0x804DBF18
+	.sdata2     start:0x806E3660 end:0x806E3668
+
 Game/Goalie.cpp:
 	.text       start:0x80077224 end:0x8008288C
 	.ctors      start:0x804DB530 end:0x804DB534

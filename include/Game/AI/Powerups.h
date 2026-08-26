@@ -7,7 +7,6 @@
 #include "Game/Drawable/DrawableObj.h"
 
 class BlurHandler;
-class Bowser;
 class cFielder;
 class PhysicsObject;
 class SFXEmitter;
@@ -124,9 +123,9 @@ public:
     virtual ~PowerupBase();
     virtual void Destroy(bool bSilent);
     virtual void PreThrow(cFielder* pFielder);
-    virtual void ThrowAt(cFielder* pThrower, Bowser* pBowser);
+    virtual void ThrowAt(cFielder* pThrower);
     virtual void fn_8009CAC0(cFielder* pFielder);
-    virtual void Init(cFielder* pFielder, Bowser* pBowser);
+    virtual void Init(cFielder* pFielder);
     virtual void Update(float dt);
 
     float GetRadius() const;
@@ -179,6 +178,8 @@ public:
 class Bobomb : public PowerupBase
 {
 public:
+    Bobomb(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
     virtual ~Bobomb();
     static void operator delete(void* ptr)
     {
@@ -186,7 +187,7 @@ public:
     }
 
     virtual void Destroy(bool bSilent);
-    virtual void ThrowAt(cFielder* pThrower, Bowser* pBowser);
+    virtual void ThrowAt(cFielder* pThrower);
     virtual void Update(float dt);
 
     void fn_8009F454(PowerupBase*, int nThrowOrder);
@@ -242,7 +243,7 @@ public:
     }
     virtual void Update(float dt);
     void Destroy(bool bSilent);
-    virtual void ThrowAt(cFielder* pThrower, Bowser* pBowser);
+    virtual void ThrowAt(cFielder* pThrower);
 
     static SlotPool<Banana> m_BananaSlotPool;
 }; // total size: 0xAC
@@ -282,6 +283,11 @@ public:
 
 PowerupBase* FindPowerUp(unsigned long hashOfDrawable);
 cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType);
+u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
+    const unk_8009A5D8* pSettings);
+void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
+    PowerupBase* pNewPowerup, PowerupBase* pFirstPowerup,
+    unsigned short aDirection);
 void CompactPowerups();
 void InitializePowerups();
 
