@@ -46,6 +46,14 @@ public:
 
     bool IsManaging(const void* ptr) const { return mResource == ptr; }
 
+    void* RemoveResourceBuffer() {
+        void* resource = mResource;
+
+        mResource = NULL;
+        mFontInfo = NULL;
+        return resource;
+    }
+
 private:
     /* 0x00 (base) */
     /* 0x10 */ void* mResource;
@@ -60,6 +68,7 @@ public:
     virtual ~ResFont();
 
     bool SetResource(void* brfnt);
+    void* RemoveResource();
     static FontInformation* Rebuild(BinaryFileHeader* fileHeader);
 
 private:

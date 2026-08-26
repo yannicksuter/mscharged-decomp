@@ -39,13 +39,15 @@ typedef struct _GXData {
     char UNK_0x128[0x148 - 0x128];
     u32 scissorTL; // at 0x148
     u32 scissorBR; // at 0x14C
-    char UNK_0x150[0x170 - 0x150];
-    u32 ras1_iref; // at 0x170
+    u32 tref[GX_MAX_TEVSTAGE / 2]; // at 0x150
+    u32 ras1_iref;                 // at 0x170
     u32 ind_imask; // at 0x174
     u32 ras1_ss0;  // at 0x178
     u32 ras1_ss1;  // at 0x17C
-    char UNK_0x180[0x220 - 0x180];
-    u32 blendMode; // at 0x220
+    u32 tevc[GX_MAX_TEVSTAGE];        // at 0x180
+    u32 teva[GX_MAX_TEVSTAGE];        // at 0x1C0
+    u32 tevKsel[GX_MAX_TEVSTAGE / 2]; // at 0x200
+    u32 blendMode;                    // at 0x220
     u32 dstAlpha;  // at 0x224
     u32 zMode;     // at 0x228
     u32 zControl;  // at 0x22C
@@ -70,7 +72,11 @@ typedef struct _GXData {
     }; // at 0x544
     f32 offsetZ; // at 0x55C
     f32 scaleZ;  // at 0x560
-    char UNK_0x564[0x5F8 - 0x564];
+    char UNK_0x564[0x5A4 - 0x564];
+    u32 texmapId[GX_MAX_TEVSTAGE]; // at 0x5A4
+    char UNK_0x5E4[0x5E8 - 0x5E4];
+    u32 tevTcEnab; // at 0x5E8
+    char UNK_0x5EC[0x5F8 - 0x5EC];
     GXBool dlistActive; // at 0x5F8
     GXBool dlistSave;   // at 0x5F9
     u8 BYTE_0x5FA;

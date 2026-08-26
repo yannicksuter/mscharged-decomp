@@ -120,6 +120,26 @@ typedef enum {
     WGPIPE.i = (data);
 
 /**
+ * Positional register-field helpers.
+ *
+ * GX_SET_REG names a field by its first and last PowerPC bit; SET_REG_FIELD
+ * names the same field by LSB shift and width. Both reduce to the single
+ * rlwimi the hardware registers are built with.
+ */
+#define GX_SET_REG(reg, x, st, end)                                            \
+    ((reg) = GX_BITSET((reg), (st), (end) - (st) + 1, (x)))
+
+#define GX_SET_REG2(reg, x, st, end) GX_SET_REG((reg), (x), (st), (end))
+
+#define SET_REG_FIELD(reg, size, shift, val)                                   \
+    ((reg) = GX_BITSET((reg), 32 - (shift) - (size), (size), (val)))
+
+/**
+ * Load immediate value into BP register (rasterizer spelling)
+ */
+#define GX_WRITE_RAS_REG(value) GX_BP_LOAD_REG(value)
+
+/**
  * Set BP command opcode (first 8 bits)
  */
 #define GX_BP_SET_OPCODE(cmd, opcode) (cmd) = GX_BITSET(cmd, 0, 8, (opcode))

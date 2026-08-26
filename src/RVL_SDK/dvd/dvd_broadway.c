@@ -16,6 +16,7 @@ typedef enum {
     DVD_IOCTL_INQUIRY = 0x12,
     DVD_IOCTL_READ_DISK_ID = 0x70,
     DVD_IOCTL_READ = 0x71,
+    DVD_IOCTL_WAIT_FOR_COVER_CLOSE = 0x79,
     DVD_IOCTL_PREPARE_COVER_REGISTER = 0x7A,
     DVD_IOCTL_CLEAR_COVER_INTERRUPT = 0x86,
     DVD_IOCTL_RESET = 0x8A,
@@ -152,6 +153,41 @@ static s32 doTransactionCallback(s32 intType, void* arg) {
 
             if (intType & DVD_INTTYPE_TC) {
                 readLength = 0;
+            }
+
+            ctx->callback(intType);
+
+            callbackInProgress = FALSE;
+        }
+    }
+
+    ctx->inUse = FALSE;
+    return IPC_RESULT_OK;
+}
+
+/**
+ * Cover-close completion callback.
+ *
+ * R4QE01 never calls DVDLowWaitForCoverClose, so the link drops both that
+ * routine and this callback. Their messages still occupy the pooled string
+ * block, which is what places every later string at the offset the retained
+ * DVDLow* routines reference.
+ */
+static s32 doCoverCallback(s32 intType, void* arg) {
+    DVDLowContext* ctx = (DVDLowContext*)arg;
+
+    requestInProgress = FALSE;
+
+    if (ctx->magic != DVD_LOW_CTX_MAGIC) {
+        OSReport("(doCoverCallback) Error - context mangled!\n");
+        ctx->magic = DVD_LOW_CTX_MAGIC;
+    } else {
+        if (ctx->callback != NULL) {
+            callbackInProgress = TRUE;
+
+            if (breakRequested == TRUE) {
+                breakRequested = FALSE;
+                intType |= DVD_INTTYPE_BR;
             }
 
             ctx->callback(intType);
@@ -461,6 +497,33 @@ BOOL DVDLowStopMotor(BOOL eject, BOOL kill, DVDLowCallback callback) {
     if (result != IPC_RESULT_OK) {
         OSReport("@@@ (DVDLowStopMotor) IOS_IoctlAsync returned error: %d\n",
                  result);
+        ctx->inUse = FALSE;
+
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+BOOL DVDLowWaitForCoverClose(DVDLowCallback callback) {
+    DVDLowContext* ctx;
+    IPCResult result;
+
+    requestInProgress = TRUE;
+    ctx = newContext(callback, 1);
+
+    nextCommandBuf();
+    diCommand[freeCommandBuf].command = DVD_IOCTL_WAIT_FOR_COVER_CLOSE;
+
+    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_WAIT_FOR_COVER_CLOSE,
+                            &diCommand[freeCommandBuf],
+                            sizeof(DVDLowDICommand), NULL, 0, doCoverCallback,
+                            ctx);
+
+    if (result != IPC_RESULT_OK) {
+        OSReport(
+            "@@@ (DVDLowWaitForCoverClose) IOS_IoctlAsync returned error: %d\n",
+            result);
         ctx->inUse = FALSE;
 
         return FALSE;

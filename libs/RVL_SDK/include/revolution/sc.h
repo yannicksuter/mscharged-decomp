@@ -114,6 +114,9 @@ typedef struct SCDevInfo {
     char UNK_0x30[0x10];
 } SCDevInfo;
 
+/* the same structure under the SDK's other spelling */
+typedef SCDevInfo SC_BT_DEV_INFO;
+
 typedef struct SCBtDeviceInfo {
     BD_ADDR addr;
     SCDevInfo info;
@@ -129,6 +132,23 @@ typedef struct SCBtDeviceInfoArray {
         SCBtDeviceInfo devices[SC_MAX_DEV_ENTRY];
     };
 } SCBtDeviceInfoArray;
+
+typedef struct SCBtCmpDevInfo {
+    BD_ADDR addr;      // 0x00
+    u8 name[64];       // 0x06
+    LINK_KEY linkKey;  // 0x30
+} SCBtCmpDevInfo;
+
+typedef struct SCBtCmpDevInfoArray {
+    u8 numRegist;                                      // 0x00
+    SCBtCmpDevInfo devices[SC_MAX_DEV_ENTRY_FOR_SMP];  // 0x01
+} SCBtCmpDevInfoArray;
+
+BOOL SCGetBtCmpDevInfoArray(SCBtCmpDevInfoArray* devInfo);
+BOOL SCSetBtCmpDevInfoArray(SCBtCmpDevInfoArray* devInfo);
+
+u32 SCGetBtDpdSensibility(void);
+BOOL SCSetBtDpdSensibility(u32 dpdSensibility);
 
 u8 SCGetAspectRatio(void);
 s8 SCGetDisplayOffsetH(void);

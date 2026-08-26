@@ -14,53 +14,17 @@
 #define NCD_IPC_HEAP_SIZE 0x1B60
 #define NCD_MAX_PROFILE 3
 
-static u32 ncdInitialized;
-static NCDConfig* ncdConfig;
+static u32 ncdInitialized = 0;
+static NCDConfig* ncdCommonBuffer;
 
-static OSMutex ncdMutex;
-/* IOS ioctl buffers: the IPC path requires 32-byte alignment. */
-static u8 ncdWork0[0x20] ALIGN(32);
-static u8 ncdWork1[0x20] ALIGN(32);
+OSMutex ncdMutex = {0};
+s32 ncdCommonResult[8] ALIGN(32);
+IPCIOVector ncdCommonVector[4] ALIGN(32);
 
 extern const char* __NCDVersion;
 
-/*
- * Retail global at 0x804108F4. The DOL preserves no name for it, so the
- * address placeholder stands until one is established.
- */
-void fn_804108F4(void);
-s32 fn_80410760(const char* name, u32 arg1, u32 arg2);
-
-void fn_804108F4(void) {
-    BOOL enabled;
-    void* lo;
-
-    enabled = OSDisableInterrupts();
-
-    if (!(ncdInitialized & 1)) {
-        OSRegisterVersion(__NCDVersion);
-        OSInitMutex(&ncdMutex);
-
-        lo = (void*)OSRoundUp32B(IPCGetBufferLo());
-
-        if ((u32)IPCGetBufferHi() - (u32)lo < NCD_IPC_HEAP_SIZE) {
-            OSPanic("ncdsystem.c", 1448,
-                    "Could not reserve heap for NCD library from IPC arena");
-        }
-
-        IPCSetBufferLo((void*)((u32)lo + NCD_IPC_HEAP_SIZE));
-        ncdConfig = (NCDConfig*)lo;
-
-        memset(ncdConfig, 0, NCD_IPC_HEAP_SIZE);
-        memset(ncdWork0, 0, sizeof(ncdWork0));
-        memset(ncdWork1, 0, sizeof(ncdWork1));
-
-        ncdInitialized |= 1;
-    }
-
-    OSRestoreInterrupts(enabled);
-    OSLockMutex(&ncdMutex);
-}
+static void LockRight(void);
+static NCDErr ExecConfigCommand(const char* name, NCDConfig* config, u32 command);
 
 NCDErr NCDGetCurrentIfConfig(NCDIfConfig* ifConfig) {
     NCDErr err = 0;
@@ -72,12 +36,12 @@ NCDErr NCDGetCurrentIfConfig(NCDIfConfig* ifConfig) {
         return -3;
     }
 
-    fn_804108F4();
+    LockRight();
 
-    err = fn_80410760("NCDGetCurrentIfConfig", 0, 3);
+    err = ExecConfigCommand("NCDGetCurrentIfConfig", 0, 3);
     if (err == 0) {
-        config = ncdConfig;
-        idx = *(s32*)&ncdWork0[4];
+        config = ncdCommonBuffer;
+        idx = ncdCommonResult[1];
 
         if (idx < 0 || idx >= NCD_MAX_PROFILE) {
             err = -7;
@@ -111,12 +75,12 @@ NCDErr NCDGetCurrentIpConfig(NCDIpConfig* ipConfig) {
         return -3;
     }
 
-    fn_804108F4();
+    LockRight();
 
-    err = fn_80410760("NCDGetCurrentIpConfig", 0, 3);
+    err = ExecConfigCommand("NCDGetCurrentIpConfig", 0, 3);
     if (err == 0) {
-        config = ncdConfig;
-        idx = *(s32*)&ncdWork0[4];
+        config = ncdCommonBuffer;
+        idx = ncdCommonResult[1];
 
         if (idx < 0 || idx >= NCD_MAX_PROFILE) {
             err = -7;
@@ -147,4 +111,223 @@ NCDErr NCDGetCurrentIpConfig(NCDIpConfig* ipConfig) {
 
     OSUnlockMutex(&ncdMutex);
     return err;
+}
+
+NCDErr NCDGetLinkStatus(void) {
+    NCDErr err;
+    s32 fd;
+
+    if (OSGetCurrentThread() == NULL) {
+        return -5;
+    }
+
+    LockRight();
+
+    fd = IOS_Open("/dev/net/ncd/manage", IPC_OPEN_NONE);
+    if (fd < 0) {
+        if (fd == IPC_RESULT_NOEXISTS_INTERNAL) {
+            err = -8;
+        } else {
+            err = -2;
+        }
+    } else {
+        ncdCommonVector[0].base = ncdCommonResult;
+        ncdCommonVector[0].length = sizeof(ncdCommonResult);
+
+        if (IOS_Ioctlv(fd, 7, 0, 1, ncdCommonVector) < 0) {
+            err = -2;
+        } else {
+            err = ncdCommonResult[0];
+            if (err == 0) {
+                err = ncdCommonResult[1];
+                err = err >= 0 ? err : -1;
+            }
+        }
+
+        if (IOS_Close(fd) < 0) {
+            err = -1;
+        }
+    }
+
+    OSUnlockMutex(&ncdMutex);
+    return err;
+}
+
+NCDErr NCDiGetWirelessMacAddress(u8* macAddr) {
+    NCDErr err = 0;
+    s32 fd;
+
+    if (macAddr == (void*)NULL) {
+        return -3;
+    }
+    if (OSGetCurrentThread() == NULL) {
+        return -5;
+    }
+
+    LockRight();
+
+    fd = IOS_Open("/dev/net/ncd/manage", IPC_OPEN_NONE);
+    if (fd < 0) {
+        if (fd == IPC_RESULT_NOEXISTS_INTERNAL) {
+            err = -8;
+        } else {
+            err = -2;
+        }
+    } else {
+        ncdCommonVector[0].base = ncdCommonResult;
+        ncdCommonVector[0].length = sizeof(ncdCommonResult);
+        ncdCommonVector[1].base = ncdCommonBuffer;
+        ncdCommonVector[1].length = NCD_MAC_ADDRESS_LENGTH;
+
+        if (IOS_Ioctlv(fd, 8, 0, 2, ncdCommonVector) < 0) {
+            err = -2;
+        } else {
+            err = ncdCommonResult[0];
+            if (err == 0) {
+                memcpy(macAddr, ncdCommonBuffer, NCD_MAC_ADDRESS_LENGTH);
+            }
+        }
+
+        if (IOS_Close(fd) < 0) {
+            err = -1;
+        }
+    }
+
+    OSUnlockMutex(&ncdMutex);
+    return err;
+}
+
+NCDErr NCDiGetEnabledConfigList(u32* list0, u32* list1, u32* list2) {
+    NCDErr err;
+    u32 mask0 = 0;
+    u32 mask1 = 0;
+    u32 mask2 = 0;
+    u8 flags;
+    u32 i;
+
+    LockRight();
+
+    err = ExecConfigCommand("NCDiGetEnabledConfigList", 0, 3);
+    if (err == 0) {
+        for (i = 0; i < NCD_MAX_PROFILE; i++) {
+            NCDProfile* profile = &ncdCommonBuffer->profiles[i];
+
+            flags = profile->flags;
+
+            if (flags & 0x80) {
+                if (flags & 1) {
+                    mask0 |= 1 << i;
+                } else {
+                    if (profile->netif.wireless.configMethod != 1) {
+                        mask1 |= 1 << i;
+                    }
+                    if (ncdCommonBuffer->profiles[i].netif.wireless.configMethod == 1) {
+                        mask2 |= 1 << i;
+                    }
+                }
+            }
+        }
+    }
+
+    OSUnlockMutex(&ncdMutex);
+
+    if (list0 != NULL) {
+        *list0 = mask0;
+    }
+    if (list1 != NULL) {
+        *list1 = mask1;
+    }
+    if (list2 != NULL) {
+        *list2 = mask2;
+    }
+
+    return err;
+}
+
+static NCDErr ExecConfigCommand(const char* name, NCDConfig* config, u32 command) {
+    NCDErr err = 0;
+    s32 fd;
+
+    if (OSGetCurrentThread() == NULL) {
+        return -5;
+    }
+
+    LockRight();
+
+    fd = IOS_Open("/dev/net/ncd/manage", IPC_OPEN_NONE);
+    if (fd < 0) {
+        if (fd == IPC_RESULT_NOEXISTS_INTERNAL) {
+            err = -8;
+        } else {
+            err = -2;
+        }
+    } else {
+        ncdCommonVector[0].base = ncdCommonBuffer;
+        ncdCommonVector[0].length = sizeof(NCDConfig);
+        ncdCommonVector[1].base = ncdCommonResult;
+        ncdCommonVector[1].length = sizeof(ncdCommonResult);
+
+        switch (command) {
+        case 3:
+        case 5:
+            if (IOS_Ioctlv(fd, command, 0, 2, ncdCommonVector) < 0) {
+                err = -2;
+            } else {
+                err = ncdCommonResult[0];
+                if (err == 0 && config != (void*)NULL) {
+                    memcpy(config, ncdCommonBuffer, sizeof(NCDConfig));
+                }
+            }
+            break;
+        case 4:
+        case 6:
+            if (config != (void*)NULL) {
+                memcpy(ncdCommonBuffer, config, sizeof(NCDConfig));
+            }
+            if (IOS_Ioctlv(fd, command, 1, 1, ncdCommonVector) < 0) {
+                err = -2;
+            } else {
+                err = ncdCommonResult[0];
+            }
+            break;
+        }
+
+        if (IOS_Close(fd) < 0) {
+            err = -1;
+        }
+    }
+
+    OSUnlockMutex(&ncdMutex);
+    return err;
+}
+
+static void LockRight(void) {
+    BOOL enabled;
+    void* lo;
+
+    enabled = OSDisableInterrupts();
+
+    if (!(ncdInitialized & 1)) {
+        OSRegisterVersion(__NCDVersion);
+        OSInitMutex(&ncdMutex);
+
+        lo = (void*)OSRoundUp32B(IPCGetBufferLo());
+
+        if ((u32)IPCGetBufferHi() - (u32)lo < NCD_IPC_HEAP_SIZE) {
+            OSPanic("ncdsystem.c", 1448,
+                    "Could not reserve heap for NCD library from IPC arena");
+        }
+
+        IPCSetBufferLo((void*)((u32)lo + NCD_IPC_HEAP_SIZE));
+        ncdCommonBuffer = (NCDConfig*)lo;
+
+        memset(ncdCommonBuffer, 0, NCD_IPC_HEAP_SIZE);
+        memset(ncdCommonResult, 0, sizeof(ncdCommonResult));
+        memset(ncdCommonVector, 0, sizeof(ncdCommonVector));
+
+        ncdInitialized |= 1;
+    }
+
+    OSRestoreInterrupts(enabled);
+    OSLockMutex(&ncdMutex);
 }

@@ -11,6 +11,24 @@ namespace nw4hbm {
 
 static void SetupGXCommon();
 
+namespace ut {
+
+CharWriter::CharWriter() :
+    mAlpha(0xff),
+    mIsWidthFixed(false),
+    mFixedWidth(0.0f),
+    mFont(NULL) {
+    mLoadingTexture.Reset();
+    ResetColorMapping();
+    SetGradationMode(GRADMODE_NONE);
+    SetTextColor(0xffffffff);
+    SetScale(1.0f, 1.0f);
+    SetCursor(0.0f, 0.0f, 0.0f);
+    EnableLinearFilter(true, true);
+}
+
+} // namespace ut
+
 void SetupGXCommon() {
     static ut::Color fog(0x00000000);
 
@@ -29,20 +47,6 @@ void SetupGXCommon() {
 namespace ut {
 
 CharWriter::LoadingTexture CharWriter::mLoadingTexture;
-
-CharWriter::CharWriter() :
-    mAlpha(0xff),
-    mIsWidthFixed(false),
-    mFixedWidth(0.0f),
-    mFont(NULL) {
-    mLoadingTexture.Reset();
-    ResetColorMapping();
-    SetGradationMode(GRADMODE_NONE);
-    SetTextColor(0xffffffff);
-    SetScale(1.0f, 1.0f);
-    SetCursor(0.0f, 0.0f, 0.0f);
-    EnableLinearFilter(true, true);
-}
 
 CharWriter::~CharWriter() {}
 
