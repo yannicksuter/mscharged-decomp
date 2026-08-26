@@ -4,6 +4,8 @@
 #include <revolution/os/OSContext.h>
 #include <revolution/types.h>
 
+#define OSGetAlarmUserDataAny(type_, alarm_) ((type_)(OSGetAlarmUserData(alarm_)))
+
 #ifdef __cplusplus
 extern "C" {
 #endif

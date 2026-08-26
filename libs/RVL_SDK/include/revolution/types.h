@@ -55,7 +55,14 @@ typedef unsigned short wchar_t;
 #endif
 
 typedef unsigned long uintptr_t;
+typedef unsigned short int byte2_t;
+typedef unsigned char byte1_t;
+typedef byte1_t byte_t;
 typedef unsigned long int byte4_t;
+
+typedef unsigned char char_t;
+typedef unsigned char char8_t;
+typedef unsigned short char16_t;
 
 #define ALIGN(x) __attribute__((aligned(x)))
 #define PACKED __attribute__((packed))

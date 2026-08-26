@@ -106,3 +106,6 @@ inline MTX34* MTX34Identity(MTX34* pOut) {
 } // namespace nw4hbm
 
 #endif
+#define CONST_FLOAT_PI 3.1415926f
+#define DEG_TO_RAD_MULT_CONSTANT (CONST_FLOAT_PI / 180.0f)
+#define DEG_TO_RAD(x) ((x) * DEG_TO_RAD_MULT_CONSTANT)

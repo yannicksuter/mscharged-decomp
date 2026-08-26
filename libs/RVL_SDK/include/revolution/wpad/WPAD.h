@@ -4,6 +4,9 @@
 
 #include <revolution/sc.h>
 #include <revolution/wud.h>
+#define WPAD_ENODEV WPAD_ERR_NO_CONTROLLER
+#define WPAD_CENODEV (WPAD_ENODEV + 0)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
