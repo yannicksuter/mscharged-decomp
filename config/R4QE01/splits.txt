@@ -43,6 +43,11 @@ Game/AI/Fielder.cpp:
 	.sbss       start:0x806E0C50 end:0x806E0C68
 	.sdata2     start:0x806E3418 end:0x806E3538
 
+Game/AI/FilteredRandom.cpp:
+	.text       start:0x800505AC end:0x80050704
+	.rodata     start:0x804DBEF8 end:0x804DBF18
+	.sdata2     start:0x806E3660 end:0x806E3668
+
 Game/Goalie.cpp:
 	.text       start:0x80077224 end:0x8008288C
 	.ctors      start:0x804DB530 end:0x804DB534
@@ -154,6 +159,25 @@ Game/Task/LoadingTask.cpp:
 	.data       start:0x805081C0 end:0x805081D4
 	.bss        start:0x8056E420 end:0x8056E444
 	.sdata2     start:0x806E46A8 end:0x806E46AC
+
+Game/Render/NetMesh.cpp:
+	.text       start:0x8013A284 end:0x8013BB34
+	.rodata     start:0x804DCC30 end:0x804DCC40
+	.data       start:0x8050E040 end:0x8050E1C0
+	.sdata      start:0x806DC988 end:0x806DC9F8
+	.sbss       start:0x806E11A8 end:0x806E11C0
+	.sdata2     start:0x806E47A0 end:0x806E47C0
+
+Game/NetMeshEdge.cpp:
+	.text       start:0x8013BB34 end:0x8013BE4C
+	.sdata2     start:0x806E47C0 end:0x806E47E0
+
+Game/NetMeshModelLoader.cpp:
+	.text       start:0x8013BE4C end:0x8013D720
+	.data       start:0x8050E1C0 end:0x8050E220
+	.sdata      start:0x806DC9F8 end:0x806DCA00
+	.sbss       start:0x806E11C0 end:0x806E11C8
+	.sdata2     start:0x806E47E0 end:0x806E47F8
 
 Game/Physics/PhysicsCharacter.cpp:
 	.text       start:0x80142A1C end:0x80143FD4
@@ -272,6 +296,9 @@ Game/AnimProps/goalieanimproperties.cpp:
 NL/nlAVLTree.cpp:
 	.text       start:0x802A8D80 end:0x802A9538
 
+NL/nlDebug.cpp:
+	.text       start:0x802A9B8C end:0x802A9B98
+
 NL/nlMath.cpp:
 	.text       start:0x802A9B98 end:0x802AA5F0
 	.rodata     start:0x804E88C0 end:0x804E8900
@@ -321,6 +348,10 @@ NL/nlTask.cpp:
 	.sbss       start:0x806E1DA0 end:0x806E1DA8
 	.sdata2     start:0x806E60B8 end:0x806E60C0
 
+NL/utility.cpp:
+	.text       start:0x802B6234 end:0x802B6568
+	.sdata2     start:0x806E6108 end:0x806E6128
+
 Game/Sys/clock.cpp:
 	.text       start:0x802B6CD8 end:0x802B75BC
 	.data       start:0x8052B550 end:0x8052B560
@@ -359,6 +390,9 @@ NL/nlBundleFile.cpp:
 	.text       start:0x802BDB70 end:0x802BE64C
 	.data       start:0x8052BA40 end:0x8052BA70
 
+NL/gl/glModel.cpp:
+	.text       start:0x802CC0EC end:0x802CC370
+
 NL/gl/glStat.cpp:
 	.text       start:0x802CCDFC end:0x802CCE00
 
@@ -372,6 +406,11 @@ NL/gl/glState.cpp:
 NL/gl/glStruct.cpp:
 	.text       start:0x802CD778 end:0x802CD7A0
 	.bss        start:0x8057F1F8 end:0x8057F220
+
+Game/GL/GLInventory.cpp:
+	.text       start:0x802D0864 end:0x802D2B2C
+	.text       start:0x802D2B2C end:0x802D38A4
+	.data       start:0x8052E5C0 end:0x8052E758
 
 Game/Task/ParticleUpdateTask.cpp:
 	.text       start:0x802EB344 end:0x802EB59C
@@ -390,6 +429,14 @@ NL/nlLocalization.cpp:
 NL/nlTextBox.cpp:
 	.text       start:0x80305778 end:0x80305D68
 	.sdata2     start:0x806E6748 end:0x806E6760
+
+NL/nlTextEscape.cpp:
+	.text       start:0x80305D68 end:0x80306034
+	.text       start:0x80306034 end:0x803060FC
+	.ctors      start:0x804DBA88 end:0x804DBA8C
+	.rodata     start:0x804EB410 end:0x804EB428
+	.bss        start:0x80580720 end:0x80580748
+	.sdata2     start:0x806E6760 end:0x806E6768
 
 Game/FE/BaseSceneHandler.cpp:
 	.text       start:0x803060FC end:0x8030616C
@@ -616,11 +663,17 @@ NL/glx/glxSwap.cpp:
 	.sbss       start:0x806E2378 end:0x806E23CC
 	.sdata2     start:0x806E6D68 end:0x806E6D6C
 
-MSL/float.c:
-	.sdata      start:0x806DFB58 end:0x806DFB68
-
 NL/nlEndian.cpp:
 	.text       start:0x8036D6F0 end:0x8036D6F8
+
+NL/glx/glxDisplayList.cpp:
+	.text       start:0x8036F2E8 end:0x8036F648
+	.data       start:0x805356A0 end:0x805356B0
+	.sdata      start:0x806DFAB8 end:0x806DFAC0
+	.sbss       start:0x806E23F4 end:0x806E2400
+
+MSL/float.c:
+	.sdata      start:0x806DFB58 end:0x806DFB68
 
 MSL/math_sun.c:
 	extab       start:0x80006738 end:0x80006740

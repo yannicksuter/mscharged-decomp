@@ -3,6 +3,8 @@
 
 #include "types.h"
 
+void* operator new(unsigned long, void*);
+
 typedef void* (*SlotPoolAllocatorFunc)(unsigned long size);
 typedef void (*SlotPoolFreeFunc)(void* data);
 
@@ -49,28 +51,7 @@ public:
 
     ~BasicSlotPool()
     {
-        fn_802B467C(this);
-        SlotPoolBase::BaseFreeBlocks(this, sizeof(T));
-    }
-
-    void Allocate(T*& out)
-    {
-        if (this->m_FreeList == 0)
-        {
-            SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
-        }
-        if (this->m_FreeList != 0)
-        {
-            out = (T*)this->m_FreeList;
-            this->m_FreeList = this->m_FreeList->next;
-        }
-    }
-
-    void Free(T* entry)
-    {
-        SlotPoolEntry* e = (SlotPoolEntry*)entry;
-        e->next = this->m_FreeList;
-        this->m_FreeList = e;
+        FreeBlocks();
     }
 
     void FreeBlocks()
@@ -78,21 +59,88 @@ public:
         fn_802B467C(this);
         SlotPoolBase::BaseFreeBlocks(this, sizeof(T));
     }
-};
 
-template <typename T>
-class SlotPool : public BasicSlotPool<T>
-{
-public:
-    SlotPool(int initial, int delta)
-        : BasicSlotPool<T>()
+    void Initialize(int initial, int delta)
     {
-        this->m_Delta = delta;
-        this->m_Initial = initial;
-        if (this->m_Initial == 0)
+        m_Delta = delta;
+        m_Initial = initial;
+        if (m_Initial == 0)
         {
             SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
         }
+    }
+
+    void Allocate(T*& out)
+    {
+        out = 0;
+        if (m_FreeList == 0)
+        {
+            BaseAddNewBlock(this, sizeof(T));
+        }
+        if (m_FreeList != 0)
+        {
+            out = (T*)m_FreeList;
+            m_FreeList = m_FreeList->next;
+        }
+        new (out) T;
+    }
+
+    void DeleteEntry(T* entry)
+    {
+        SlotPoolEntry* e = (SlotPoolEntry*)entry;
+        e->next = m_FreeList;
+        m_FreeList = e;
+    }
+};
+
+template <typename T>
+class SlotPool : public SlotPoolBase
+{
+public:
+    SlotPool(int initial, int delta)
+        : SlotPoolBase()
+    {
+        m_Delta = delta;
+        m_Initial = initial;
+        if (m_Initial == 0)
+        {
+            SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
+        }
+    }
+
+    ~SlotPool()
+    {
+        if (this != 0)
+        {
+            fn_802B467C(this);
+            SlotPoolBase::BaseFreeBlocks(this, sizeof(T));
+        }
+    }
+
+    void Allocate(T*& out)
+    {
+        if (m_FreeList == 0)
+        {
+            SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
+        }
+        if (m_FreeList != 0)
+        {
+            out = (T*)m_FreeList;
+            m_FreeList = m_FreeList->next;
+        }
+    }
+
+    void Free(T* entry)
+    {
+        SlotPoolEntry* slot = (SlotPoolEntry*)entry;
+        slot->next = m_FreeList;
+        m_FreeList = slot;
+    }
+
+    void FreeBlocks()
+    {
+        fn_802B467C(this);
+        SlotPoolBase::BaseFreeBlocks(this, sizeof(T));
     }
 };
 

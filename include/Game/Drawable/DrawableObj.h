@@ -2,13 +2,14 @@
 #define GAME_DRAWABLE_DRAWABLE_OBJ_H
 
 #include "NL/nlMath.h"
+#include "NL/gl/glModel.h"
 
 class DrawableObject
 {
 public:
     virtual void V0();
     virtual void V1();
-    virtual void V2();
+    virtual nlMatrix4& GetWorldMatrix();
     virtual void V3(const nlMatrix4*);
     virtual void V4();
     virtual void Draw();
@@ -20,7 +21,9 @@ public:
     unsigned long GetHashID() const { return m_uHashID; }
 
     /* 0x04 */ unsigned long m_uHashID;
-    /* 0x08 */ u8 mUnidentified08[0x68];
+    /* 0x08 */ u8 mUnidentified08[0x5C];
+    /* 0x64 */ glModel* m_pModel;
+    /* 0x68 */ u8 mUnidentified68[0x08];
     /* 0x70 */ unsigned long m_uObjectFlags;
     /* 0x74 */ char _074[4];
     /* 0x78 */ u32 renderFlags;

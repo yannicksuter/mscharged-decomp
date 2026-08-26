@@ -1,5 +1,6 @@
 #include "Game/Field.h"
 #include "Game/Net.h"
+#include "Game/Render/NetMesh.h"
 #include "NL/nlMath.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMemory.h"
@@ -7,19 +8,6 @@
 struct nlColour
 {
     u8 c[4];
-};
-
-struct shortVector2
-{
-    union
-    {
-        u16 e[2];
-        struct
-        {
-            s16 x;
-            s16 y;
-        };
-    };
 };
 
 struct glQuad3
@@ -113,24 +101,6 @@ struct WorldDarkening
 {
     u32 unused;
     float position;
-};
-
-struct NetMesh
-{
-    char _000[4];
-    bool initialized;
-    char _005[3];
-    nlVector3* positions;
-    char _00C[0x10];
-    u16* triStripIndices;
-    int numTriStripIndices;
-    shortVector2* textureCoords;
-    char _028[0x0C];
-    int numParticles;
-    char _038[0x30];
-    bool visible;
-    char _069[7];
-    float jolt;
 };
 
 struct LoadFrame
@@ -230,9 +200,7 @@ UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
 
-extern u8 lbl_806E11A8;
 extern u8 lbl_806DC7D8;
-extern u32 lbl_806E11AC;
 extern const StreamDefinition lbl_804DCCE0;
 
 extern "C" void* fn_8027267C(int);
@@ -247,7 +215,6 @@ extern "C" void* memcpy(void*, const void*, u32);
 extern "C" void fn_802CF510(u32, WriterModel*, bool);
 extern "C" MeshResource* fn_802CBFD8(const StreamDefinition*, int, const char*);
 extern "C" void* memset(void*, int, u32);
-extern "C" void fn_8013AEC8(NetMesh*);
 
 static inline u8 KeepPacketFlagBit1(u8 value)
 {
@@ -339,7 +306,7 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
 
 void DrawableNetMesh::Render() const
 {
-    if (!lbl_806DCB3A || !mInitialized || !lbl_806E11A8)
+    if (!lbl_806DCB3A || !mInitialized || !NetMesh::s_bAnimatedNetMeshEnabled)
     {
         return;
     }
@@ -363,7 +330,7 @@ void DrawableNetMesh::Render() const
     glSetCurrentRasterState(glHandleizeRasterState());
     glSetCurrentProgram(fn_802CBE70());
 
-    u32 texture = lbl_806E11AC;
+    u32 texture = NetMesh::sNetTextureHandle;
     if (lbl_806E1378)
     {
         texture = lbl_806E1384;
@@ -520,15 +487,15 @@ void DrawableNetMesh::Grab(NetMesh& netMesh)
     mNetMesh = &netMesh;
     mVisible = false;
 
-    if (!netMesh.initialized)
+    if (!netMesh.mbInitialized)
     {
         return;
     }
 
     if (!mInitialized)
     {
-        int numTriIndices = netMesh.numTriStripIndices;
-        int numVertices = netMesh.numParticles;
+        int numTriIndices = netMesh.m_NumTriStripIndices;
+        int numVertices = netMesh.m_NumParticles;
         mNumVertices = numVertices;
         mNumTriIndices = numTriIndices;
         Initialize(numVertices, numTriIndices);
@@ -538,18 +505,18 @@ void DrawableNetMesh::Grab(NetMesh& netMesh)
 
     shortVector2* texcoords = lbl_806E1338[mNetIndex];
     u16* triIndices = lbl_806E1348[mNetIndex];
-    for (int i = 0; i < netMesh.numTriStripIndices; ++i)
+    for (int i = 0; i < netMesh.m_NumTriStripIndices; ++i)
     {
-        *triIndices++ = netMesh.triStripIndices[i];
+        *triIndices++ = netMesh.m_TriStripIndices[i];
     }
 
-    for (int i = 0; i < netMesh.numParticles; ++i)
+    for (int i = 0; i < netMesh.m_NumParticles; ++i)
     {
-        mPositions[i] = netMesh.positions[i];
-        *texcoords++ = netMesh.textureCoords[i];
+        mPositions[i] = netMesh.m_v3Position[i];
+        *texcoords++ = netMesh.m_v2TextureCoords[i];
     }
 
-    mVisible = netMesh.visible;
+    mVisible = netMesh.mbIsActive;
 }
 
 void DrawableNetMesh::Blend(
@@ -605,7 +572,7 @@ void DrawableNetMesh::Replay(LoadFrame& frame)
         mJoltCache = joltValue;
         if (mNetMesh != 0 && mJoltCache > 0.0f)
         {
-            fn_8013AEC8(mNetMesh);
+            mNetMesh->JoltNet();
         }
     }
 
@@ -621,7 +588,7 @@ void DrawableNetMesh::Replay(LoadFrame& frame)
 
 void DrawableNetMesh::Replay(SaveFrame& frame)
 {
-    mJoltCache = mNetMesh->jolt;
+    mJoltCache = mNetMesh->mJolt;
     memcpy(frame.position, &mJoltCache, sizeof(mJoltCache));
     frame.position += sizeof(mJoltCache);
     memcpy(frame.position, &mVisible, sizeof(mVisible));
