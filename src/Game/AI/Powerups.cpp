@@ -29,7 +29,7 @@ inline void* operator new(unsigned long, void* memory)
 extern "C" DrawableObject* fn_8027725C(unsigned long);
 extern "C" void fn_802772A4(DrawableObject*);
 extern "C" bool fn_8003877C(cFielder*);
-extern "C" bool fn_800387CC(cFielder*);
+extern "C" unsigned int fn_800387CC(cFielder*);
 extern "C" bool fn_8003886C(cFielder*);
 extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
 extern "C" void fn_800EBF78(int, unsigned long, const void*, void*, int);
@@ -38,6 +38,10 @@ extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
 extern "C" float fn_8002CFF0(PlayerTweaks*);
 extern "C" bool fn_800344B0(cFielder*);
+extern "C" bool fn_800A6764(cTeam*);
+extern "C" void fn_800EDCE8(cPlayer*);
+extern "C" bool fn_8019C988(void*);
+extern "C" bool fn_800AA060(void*, int);
 extern "C" void fn_80146964(void*);
 extern "C" void fn_8014777C(void*);
 extern "C" void fn_801478C4(void*);
@@ -62,21 +66,46 @@ struct cGame
 };
 
 extern cGame* lbl_806E0C94;
+extern void* lbl_806E0FA0;
+extern void* lbl_806E1608;
 
-extern float lbl_806DBDA4;
-extern float lbl_806DBDA8;
-extern float lbl_806DBDAC;
-extern float lbl_806DBDB0;
-extern float lbl_806DBDB4;
-extern float lbl_806DBDB8;
-extern float lbl_806DBDBC;
-extern float lbl_806DBDC8;
-extern float lbl_806DBDCC;
-extern float lbl_806DBDD0;
-extern float lbl_806DBDD4;
-extern bool lbl_806DBDD8;
-extern float lbl_806DBDDC;
-extern int gBobombAnticipationVoiceID;
+u8 lbl_806DBDA0 = true;
+float lbl_806DBDA4 = 6.0f;
+float lbl_806DBDA8 = 0.175f;
+float lbl_806DBDAC = 0.225f;
+float lbl_806DBDB0 = -40.0f;
+float lbl_806DBDB4 = 1.0f;
+float lbl_806DBDB8 = 0.4f;
+float lbl_806DBDBC = 0.95f;
+float lbl_806DBDC0 = 0.4f;
+float lbl_806DBDC4 = 1.0f;
+float lbl_806DBDC8 = 0.15f;
+float lbl_806DBDCC = 2.5f;
+float lbl_806DBDD0 = 5.1f;
+float lbl_806DBDD4 = 5.1f;
+bool lbl_806DBDD8 = true;
+float lbl_806DBDDC = 6.0f;
+static float lbl_806DBDE0 = 0.5f;
+int lbl_806DBDE4 = 12;
+float lbl_806DBDE8 = 0.4f;
+int lbl_806DBDEC = 12;
+float lbl_806DBDF0 = 10.0f;
+int lbl_806DBDF4 = 12;
+float lbl_806DBDF8 = 2.0f;
+int lbl_806DBDFC = 13;
+float lbl_806DBE00 = 1.35f;
+int lbl_806DBE04 = 12;
+float lbl_806DBE08 = 0.4f;
+int lbl_806DBE0C = 13;
+float lbl_806DBE10 = 2.0f;
+int lbl_806DBE14 = 1;
+float lbl_806DBE18 = -0.5f;
+float lbl_806DBE1C = -1.1f;
+int lbl_806DBE20 = 13;
+float lbl_806DBE24 = 4.0f;
+int lbl_806DBE28 = 20;
+float lbl_806DBE2C = -0.6f;
+static int gBobombAnticipationVoiceID = -1;
 
 struct CollisionBallShellData
 {
@@ -126,7 +155,6 @@ extern SlotPool<CollisionPlayerBananaData> lbl_805716B8;
 extern SlotPool<PowerupHitPlayerEventData> lbl_805719D8;
 
 static int lbl_806E0DA8;
-static float lbl_806DBDE0 = 0.5f;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -142,7 +170,7 @@ unsigned long uPowerupTexID[NUM_POWER_UPS] = {
     nlStringLowerHash("fe/star"),
 };
 
-static PowerupSounds powerupSounds[NUM_POWER_UPS] = {
+static PowerupSounds powerupSounds[21] = {
     { 0x4E4E16EA, 0xA82B862F, 0x00000000, 0x00000000, 0xA807A02B, 0x00000000, 0x5FCB9348, 0x00000000 },
     { 0x4E4E16EA, 0xA82B862F, 0x27BD7734, 0x00000000, 0xA807A02B, 0x00000000, 0x5FCB9348, 0x00000000 },
     { 0x4E4E16EA, 0xA82B862F, 0x00000000, 0x00000000, 0xA807A02B, 0x00000000, 0x5FCB9348, 0x00000000 },
@@ -152,6 +180,18 @@ static PowerupSounds powerupSounds[NUM_POWER_UPS] = {
     { 0x4E4E16EA, 0x96033ECB, 0x36088C3A, 0x302EE87F, 0x00000000, 0xDB5B98D6, 0x00000000, 0x00000000 },
     { 0x4E4E16EA, 0x56C25EB1, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xBCFAF477 },
     { 0x4E4E16EA, 0x00000000, 0x70886861, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0xDABB08B7, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x1313EE94, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x1313EE94, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x1313EE94, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x99781579, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x1313EE94, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x1313EE94, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x1313EE94, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x1313EE94, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x1313EE94, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x1313EE94, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xBD8AB76A, 0x1313EE94, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
 };
 
 PowerupBase* g_pPowerups[25] = { 0 };
@@ -192,7 +232,7 @@ const char* uRED_SHELL_STREAK_TEXTURE = "global/redshellstreak";
 const char* uBOBOMB_STREAK_TEXTURE = "global/bobombstreak";
 } // namespace
 
-static u8 gbAlwaysSurround = true;
+static u8 gbAlwaysSurround;
 
 SlotPool<FreezeShell> FreezeShell::m_FreezeShellSlotPool(16, 16);
 SlotPool<GreenShell> GreenShell::m_GreenShellSlotPool(16, 16);
@@ -346,7 +386,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
         return;
     }
 
-    float fPowerupOffSet
+    f32 fPowerupOffSet
         = 2.0f * ((PhysicsSphere*)pFirstPowerup->m_pPhysicsObject)->GetRadius();
     if (eStyle == THROW_ARROW)
     {
@@ -373,7 +413,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
         v3VelocityDirection.z = 0.0f;
         if (nlVec3Length(v3VelocityDirection) > 0.01f)
         {
-            float invLen = nlRecipSqrt(
+            f32 invLen = nlRecipSqrt(
                 v3VelocityDirection.x * v3VelocityDirection.x
                     + v3VelocityDirection.y * v3VelocityDirection.y
                     + v3VelocityDirection.z * v3VelocityDirection.z,
@@ -391,18 +431,20 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
 
         if (nThrowOrder % 2 == 0)
         {
-            RotateVectorZAxis(v3PerpToVelocity, v3VelocityDirection, 0x4000);
+            RotateVectorZAxis(
+                v3PerpToVelocity, v3VelocityDirection, 0x4000);
         }
         else
         {
-            RotateVectorZAxis(v3PerpToVelocity, v3VelocityDirection, 0xC000);
+            RotateVectorZAxis(
+                v3PerpToVelocity, v3VelocityDirection, 0xC000);
         }
 
-        fPowerupOffSet *= (float)((nThrowOrder + 1) / 2);
-        nlVec3Set(v3PerpToVelocity,
-            fPowerupOffSet * v3PerpToVelocity.x,
-            fPowerupOffSet * v3PerpToVelocity.y,
-            fPowerupOffSet * v3PerpToVelocity.z);
+        fPowerupOffSet *= (f32)((nThrowOrder + 1) / 2);
+        float fPerpZ = fPowerupOffSet * v3PerpToVelocity.z;
+        float fPerpY = fPowerupOffSet * v3PerpToVelocity.y;
+        float fPerpX = fPowerupOffSet * v3PerpToVelocity.x;
+        nlVec3Set(v3PerpToVelocity, fPerpX, fPerpY, fPerpZ);
         nlVec3Set(v3StartPosition,
             pFirstPowerup->m_v3Position.x + v3PerpToVelocity.x,
             pFirstPowerup->m_v3Position.y + v3PerpToVelocity.y,
@@ -418,7 +460,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
         nlVector3 v3StartPosition;
         nlVector3 v3VelocityDirection;
         nlVector3 v3PerpToVelocity;
-        nlVector3 v3Offset;
+        nlVector3 v3PowerupOffSet;
 
         pNewPowerup->m_v3Velocity = pFirstPowerup->m_v3Velocity;
         pNewPowerup->m_pPhysicsObject->SetLinearVelocity(
@@ -428,7 +470,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
         v3VelocityDirection.z = 0.0f;
         if (nlVec3Length(v3VelocityDirection) > 0.01f)
         {
-            float invLen = nlRecipSqrt(
+            f32 invLen = nlRecipSqrt(
                 v3VelocityDirection.x * v3VelocityDirection.x
                     + v3VelocityDirection.y * v3VelocityDirection.y
                     + v3VelocityDirection.z * v3VelocityDirection.z,
@@ -446,14 +488,17 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
 
         if (nThrowOrder % 2 == 0)
         {
-            RotateVectorZAxis(v3PerpToVelocity, v3VelocityDirection, 0x4000);
+            RotateVectorZAxis(
+                v3PerpToVelocity, v3VelocityDirection, 0x4000);
         }
         else
         {
-            RotateVectorZAxis(v3PerpToVelocity, v3VelocityDirection, 0xC000);
+            RotateVectorZAxis(
+                v3PerpToVelocity, v3VelocityDirection, 0xC000);
         }
 
-        fPowerupOffSet *= (float)((nThrowOrder + 1) / 2);
+        fPowerupOffSet *= (f32)((nThrowOrder + 1) / 2);
+
         nlVec3Set(v3PerpToVelocity,
             fPowerupOffSet * v3PerpToVelocity.x,
             fPowerupOffSet * v3PerpToVelocity.y,
@@ -466,8 +511,17 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
         RotateVectorZAxis(
             v3VelocityDirection, v3VelocityDirection, 0x8000);
 
-        nlVec3Add(v3Offset, v3PerpToVelocity, v3VelocityDirection);
-        nlVec3Add(v3StartPosition, pFirstPowerup->m_v3Position, v3Offset);
+        float fOffsetZ = v3PerpToVelocity.z + v3VelocityDirection.z;
+        float fOffsetY = v3PerpToVelocity.y + v3VelocityDirection.y;
+        float fOffsetX = v3PerpToVelocity.x + v3VelocityDirection.x;
+        nlVec3Set(v3PowerupOffSet, fOffsetX, fOffsetY, fOffsetZ);
+        float fStartZ
+            = pFirstPowerup->m_v3Position.z + v3PowerupOffSet.z;
+        float fStartY
+            = pFirstPowerup->m_v3Position.y + v3PowerupOffSet.y;
+        float fStartX
+            = pFirstPowerup->m_v3Position.x + v3PowerupOffSet.x;
+        nlVec3Set(v3StartPosition, fStartX, fStartY, fStartZ);
 
         pNewPowerup->m_v3Position = v3StartPosition;
         pNewPowerup->m_pPhysicsObject->SetPosition(
@@ -480,8 +534,8 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
         pNewPowerup->m_pPhysicsObject->SetPosition(
             pNewPowerup->m_v3Position, PhysicsObject::WORLD_COORDINATES);
 
-        nlPolar pCurrentVelocity;
-        nlCartesianToPolar(pCurrentVelocity,
+        nlPolar polar;
+        nlCartesianToPolar(polar,
             pFirstPowerup->m_v3Velocity.x,
             pFirstPowerup->m_v3Velocity.y);
 
@@ -493,7 +547,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
 
         if (pFirstPowerup->m_pTarget != 0)
         {
-            nFlipAngle += pCurrentVelocity.a;
+            nFlipAngle += polar.a;
         }
         else
         {
@@ -502,7 +556,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
 
         nlVector3 v3CurrentVelocity = { 0.0f, 0.0f, 0.0f };
         nlPolarToCartesian(v3CurrentVelocity.x, v3CurrentVelocity.y,
-            (u16)nFlipAngle, pCurrentVelocity.r);
+            (u16)nFlipAngle, polar.r);
 
         pNewPowerup->m_v3Velocity = v3CurrentVelocity;
         pNewPowerup->m_pPhysicsObject->SetLinearVelocity(v3CurrentVelocity);
@@ -669,37 +723,9 @@ extern "C" void fn_8009A5D8(cFielder* pThrower, ePowerUpType eType,
         pUnidentified->eType, pUnidentified->eSize);
 }
 
-inline GreenShell::GreenShell(cFielder* pTarget, int nIndex, float fRadius,
-    ePowerupSize eSize, bool bExplode)
-    : PowerupBase(pTarget, POWER_UP_GREEN_SHELL, fRadius, eSize, bExplode,
-          nIndex)
-{
-}
-
-inline RedShell::RedShell(cFielder* pTarget, int nIndex, float fRadius,
-    ePowerupSize eSize, bool bExplode)
-    : PowerupBase(pTarget, POWER_UP_RED_SHELL, fRadius, eSize, bExplode,
-          nIndex)
-{
-}
-
 inline Banana::Banana(cFielder* pTarget, int nIndex, float fRadius,
     ePowerupSize eSize, bool bExplode)
     : PowerupBase(pTarget, POWER_UP_BANANA, fRadius, eSize, bExplode, nIndex)
-{
-}
-
-inline SpinyShell::SpinyShell(cFielder* pTarget, int nIndex, float fRadius,
-    ePowerupSize eSize, bool bExplode)
-    : PowerupBase(pTarget, POWER_UP_SPINY_SHELL, fRadius, eSize, bExplode,
-          nIndex)
-{
-}
-
-inline FreezeShell::FreezeShell(cFielder* pTarget, int nIndex, float fRadius,
-    ePowerupSize eSize, bool bExplode)
-    : PowerupBase(pTarget, POWER_UP_FREEZE_SHELL, fRadius, eSize, bExplode,
-          nIndex)
 {
 }
 
@@ -712,40 +738,68 @@ inline Bobomb::Bobomb(cFielder* pTarget, int nIndex, float fRadius,
     m_unkAC = lbl_806DBDE0;
 }
 
+inline GreenShell::GreenShell(cFielder* pTarget, int nIndex, float fRadius,
+    ePowerupSize eSize, bool bExplode)
+    : PowerupBase(pTarget, POWER_UP_GREEN_SHELL, fRadius, eSize, bExplode, nIndex)
+{
+}
+
+inline FreezeShell::FreezeShell(cFielder* pTarget, int nIndex, float fRadius,
+    ePowerupSize eSize, bool bExplode)
+    : PowerupBase(pTarget, POWER_UP_FREEZE_SHELL, fRadius, eSize, bExplode, nIndex)
+{
+}
+
+inline RedShell::RedShell(cFielder* pTarget, int nIndex, float fRadius,
+    ePowerupSize eSize, bool bExplode)
+    : PowerupBase(pTarget, POWER_UP_RED_SHELL, fRadius, eSize, bExplode, nIndex)
+{
+}
+
+inline SpinyShell::SpinyShell(cFielder* pTarget, int nIndex, float fRadius,
+    ePowerupSize eSize, bool bExplode)
+    : PowerupBase(pTarget, POWER_UP_SPINY_SHELL, fRadius, eSize, bExplode, nIndex)
+{
+}
+
 u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
-    const unk_8009A5D8* pSettings)
+    unk_8009A5D8* pUnidentified)
 {
     PowerupBase* pFirstPowerup = 0;
     cTeam* pTargetTeam = pThrower->m_pTeam->GetOtherTeam();
     cFielder* pTargetFielders[4];
-    for (int i = 0; i < 4; i++)
+
+    for (int a = 0; a < 4; a++)
     {
-        pTargetFielders[i] = pTargetTeam->GetFielder(i);
+        pTargetFielders[a] = pTargetTeam->GetFielder(a);
     }
 
-    for (int j = 0; j < pSettings->nnumOfPowerups; j++)
+    for (int j = 0; j < pUnidentified->nnumOfPowerups; j++)
     {
-        bool bFoundLocation = false;
+        u8 bFoundLocation = false;
+
         for (int i = 0; i < 25; i++)
         {
             if (bFoundLocation)
             {
                 continue;
             }
+
             if (g_pPowerups[i] != 0)
             {
                 continue;
             }
 
             PowerupBase* pPowerup;
-            switch (pSettings->eType)
+
+            switch (pUnidentified->eType)
             {
             case POWER_UP_BANANA:
             {
                 Banana* pBanana = 0;
                 Banana::m_BananaSlotPool.Allocate(pBanana);
-                new (pBanana) Banana(pTarget, i, pSettings->fRadius,
-                    pSettings->eSize, pSettings->bExplode);
+                new (pBanana) Banana(pTarget, i, pUnidentified->fRadius,
+                    pUnidentified->eSize, pUnidentified->bExplode);
                 pPowerup = pBanana;
                 break;
             }
@@ -753,8 +807,8 @@ u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
             {
                 Bobomb* pBobomb = 0;
                 Bobomb::m_BobombSlotPool.Allocate(pBobomb);
-                new (pBobomb) Bobomb(pTarget, i, pSettings->fRadius,
-                    pSettings->eSize, true);
+                new (pBobomb) Bobomb(pTarget, i,
+                    pUnidentified->fRadius, pUnidentified->eSize, true);
                 pPowerup = pBobomb;
                 break;
             }
@@ -762,8 +816,9 @@ u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
             {
                 GreenShell* pGreenShell = 0;
                 GreenShell::m_GreenShellSlotPool.Allocate(pGreenShell);
-                new (pGreenShell) GreenShell(pTarget, i, pSettings->fRadius,
-                    pSettings->eSize, pSettings->bExplode);
+                new (pGreenShell) GreenShell(pTarget, i,
+                    pUnidentified->fRadius, pUnidentified->eSize,
+                    pUnidentified->bExplode);
                 pPowerup = pGreenShell;
                 break;
             }
@@ -772,8 +827,8 @@ u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
                 FreezeShell* pFreezeShell = 0;
                 FreezeShell::m_FreezeShellSlotPool.Allocate(pFreezeShell);
                 new (pFreezeShell) FreezeShell(pTarget, i,
-                    pSettings->fRadius, pSettings->eSize,
-                    pSettings->bExplode);
+                    pUnidentified->fRadius, pUnidentified->eSize,
+                    pUnidentified->bExplode);
                 pPowerup = pFreezeShell;
                 break;
             }
@@ -781,8 +836,9 @@ u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
             {
                 RedShell* pRedShell = 0;
                 RedShell::m_RedShellSlotPool.Allocate(pRedShell);
-                new (pRedShell) RedShell(pTarget, i, pSettings->fRadius,
-                    pSettings->eSize, pSettings->bExplode);
+                new (pRedShell) RedShell(pTarget, i,
+                    pUnidentified->fRadius, pUnidentified->eSize,
+                    pUnidentified->bExplode);
                 pPowerup = pRedShell;
                 break;
             }
@@ -791,8 +847,8 @@ u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
                 SpinyShell* pSpinyShell = 0;
                 SpinyShell::m_SpinyShellSlotPool.Allocate(pSpinyShell);
                 new (pSpinyShell) SpinyShell(pTarget, i,
-                    pSettings->fRadius, pSettings->eSize,
-                    pSettings->bExplode);
+                    pUnidentified->fRadius, pUnidentified->eSize,
+                    pUnidentified->bExplode);
                 pPowerup = pSpinyShell;
                 break;
             }
@@ -801,6 +857,7 @@ u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
             }
 
             pPowerup->Init(pThrower);
+
             if (pFirstPowerup == 0)
             {
                 pPowerup->ThrowAt(pThrower);
@@ -808,7 +865,7 @@ u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
             }
             else
             {
-                PowerupThrowPosition(j, pSettings->eStyle, pPowerup,
+                PowerupThrowPosition(j, pUnidentified->eStyle, pPowerup,
                     pFirstPowerup, pThrower->m_aActualFacingDirection);
 
                 if (pPowerup->m_eType == POWER_UP_RED_SHELL)
@@ -843,7 +900,7 @@ u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
         }
     }
 
-    return 1;
+    return true;
 }
 
 /**
@@ -981,12 +1038,17 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
 
     if (eType != POWER_UP_BANANA)
     {
-        mtNoHitTimer.SetSeconds(0.4f);
+        mtNoHitTimer.SetSeconds(lbl_806DBDC0);
     }
     else
     {
-        mtNoHitTimer.SetSeconds(1.0f);
+        mtNoHitTimer.SetSeconds(lbl_806DBDC4);
     }
+
+    m_unk4C = lbl_806DBDC8;
+    m_v3Position.x = 0.0f;
+    m_v3Position.y = 0.0f;
+    m_v3Position.z = fRadius;
 
     m_unk44.m_unk0 = m_unk44.m_uPackedTime != 0;
     m_unk44.m_uPackedTime = 0;
@@ -994,13 +1056,9 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     m_unk3C.m_uPackedTime = 0;
     m_unk34.m_unk0 = m_unk34.m_uPackedTime != 0;
     m_unk34.m_uPackedTime = 0;
-    m_unk4C = lbl_806DBDC8;
+
     nlVector3 v3Unidentified = v3Zero;
     m_unk50 = v3Unidentified;
-
-    m_v3Position.x = 0.0f;
-    m_v3Position.y = 0.0f;
-    m_v3Position.z = fRadius;
     m_v3PrevPosition = m_v3Position;
     m_v3Velocity = v3Zero;
 
@@ -1121,6 +1179,414 @@ void PowerupBase::Update(float dt)
             m_unk20 = false;
         }
     }
+}
+
+/**
+ * Offset/Address/Size: 0x2430 | 0x8009BA90 | size: 0x9B0
+ */
+int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
+{
+    if ((!GameInfoManager::Instance()->GetCurrentSettings()->unknown_0x14
+            && pTeam->m_nSide == 0)
+        || (!GameInfoManager::Instance()->GetCurrentSettings()->unknown_0x15
+            && pTeam->m_nSide == 1)
+        || GameInfoManager::Instance()->IsRule0x0Equal11())
+    {
+        return -1;
+    }
+
+    int nDifference = pTeam->m_nScore - pTeam->GetOtherTeam()->m_nScore;
+
+    if ((u32)(nDifference < 0 ? -nDifference : nDifference)
+        <= (u32)lbl_8056CF08.m_pGameTweaks->nScoreDifferenceMinimum)
+    {
+        nDifference = 0;
+    }
+    else
+    {
+        if (nDifference
+            < -lbl_8056CF08.m_pGameTweaks->nScoreDifferenceMaximum)
+        {
+            nDifference
+                = -lbl_8056CF08.m_pGameTweaks->nScoreDifferenceMaximum;
+        }
+        else if (nDifference
+            > lbl_8056CF08.m_pGameTweaks->nScoreDifferenceMaximum)
+        {
+            nDifference
+                = lbl_8056CF08.m_pGameTweaks->nScoreDifferenceMaximum;
+        }
+    }
+
+    if (nDifference < 0)
+    {
+        nDifference *= nDifference;
+        nDifference = -nDifference;
+    }
+    else
+    {
+        nDifference *= nDifference;
+    }
+
+    int nChanceForChainChomp
+        = lbl_806DBE14 + (int)(nDifference * lbl_806DBE18);
+    if (nChanceForChainChomp < 0 || lbl_806E0C94->m_eGameState == (eGameState)6)
+    {
+        nChanceForChainChomp = 0;
+    }
+
+    int nChanceForStar
+        = lbl_806E0DA8 + (int)(nDifference * lbl_806DBE1C);
+    if (nChanceForStar < 0)
+    {
+        nChanceForStar = 0;
+    }
+
+    cTeam* pOtherTeam = pTeam->GetOtherTeam();
+    for (int i = 0; i < 2; i++)
+    {
+        if (pOtherTeam->GetPowerUpByIndex(i).eType
+            == POWER_UP_CHAIN_CHOMP)
+        {
+            nChanceForChainChomp = 0;
+        }
+        if (pTeam->GetPowerUpByIndex(i).eType == POWER_UP_CHAIN_CHOMP)
+        {
+            nChanceForChainChomp = 0;
+        }
+        if (pTeam->GetPowerUpByIndex(i).eType == POWER_UP_STAR)
+        {
+            nChanceForStar = 0;
+        }
+    }
+
+    if (!fn_8019C988(*(void**)((u8*)lbl_806E1608 + 0x20))
+        || fn_800AA060(*(void**)((u8*)lbl_806E0C94 + 0x10DC), 7))
+    {
+        nChanceForChainChomp = 0;
+    }
+
+    ePowerUpType powerUpType = POWER_UP_NONE;
+
+    int nChanceForCaptainPowerup
+        = lbl_806DBE28 + (int)(nDifference * lbl_806DBE2C);
+    if (nChanceForCaptainPowerup < 0)
+    {
+        nChanceForCaptainPowerup = 0;
+    }
+    if (fn_800A6764(pTeam) || fn_800387CC(pTeam->GetCaptain()) == 1)
+    {
+        nChanceForCaptainPowerup = 0;
+    }
+
+    int nChanceForSpinyShell
+        = lbl_806DBDF4 + (int)(nDifference * lbl_806DBDF8);
+    if (nChanceForSpinyShell < 0)
+    {
+        nChanceForSpinyShell = 0;
+    }
+
+    int nChanceForRedShell
+        = lbl_806DBE04 + (int)(nDifference * lbl_806DBE08);
+    if (nChanceForRedShell < 0)
+    {
+        nChanceForRedShell = 0;
+    }
+
+    int nChanceForBoBomb
+        = lbl_806DBDE4 + (int)(nDifference * lbl_806DBDE8);
+    if (nChanceForBoBomb < 0)
+    {
+        nChanceForBoBomb = 0;
+    }
+
+    int nChanceForBanana
+        = lbl_806DBDEC + (int)(nDifference * lbl_806DBDF0);
+    if (nChanceForBanana < 0)
+    {
+        nChanceForBanana = 0;
+    }
+
+    int nChanceForMushroom
+        = lbl_806DBE20 + (int)(nDifference * lbl_806DBE24);
+    if (nChanceForMushroom < 0)
+    {
+        nChanceForMushroom = 0;
+    }
+
+    int nChanceForGreenShell
+        = lbl_806DBE0C + (int)(nDifference * lbl_806DBE10);
+    if (nChanceForGreenShell < 0)
+    {
+        nChanceForGreenShell = 0;
+    }
+
+    int nChanceForFreezeShell
+        = lbl_806DBDFC + (int)(nDifference * lbl_806DBE00);
+    if (nChanceForFreezeShell < 0)
+    {
+        nChanceForFreezeShell = 0;
+    }
+
+    switch (GameInfoManager::Instance()->GetRule0x0())
+    {
+    case 1:
+        nChanceForChainChomp = nChanceForStar = nChanceForMushroom
+            = nChanceForFreezeShell = nChanceForCaptainPowerup = 0;
+        powerUpType = POWER_UP_BOBOMB;
+        break;
+    case 2:
+        nChanceForChainChomp = nChanceForStar = nChanceForCaptainPowerup
+            = nChanceForSpinyShell = nChanceForRedShell = nChanceForBanana
+            = nChanceForBoBomb = nChanceForMushroom
+            = nChanceForGreenShell = 0;
+        powerUpType = POWER_UP_FREEZE_SHELL;
+        break;
+    case 4:
+        nChanceForStar = nChanceForCaptainPowerup = nChanceForMushroom = 0;
+        powerUpType = POWER_UP_GREEN_SHELL;
+        break;
+    case 3:
+        nChanceForChainChomp = nChanceForStar = nChanceForBanana
+            = nChanceForBoBomb = nChanceForCaptainPowerup
+            = nChanceForMushroom = 0;
+        powerUpType = nlRandomf(1.0f, &nlDefaultSeed) < 0.66f
+            ? POWER_UP_RED_SHELL
+            : POWER_UP_GREEN_SHELL;
+        break;
+    case 5:
+        nChanceForChainChomp = nChanceForSpinyShell = nChanceForRedShell
+            = nChanceForBanana = nChanceForBoBomb = nChanceForGreenShell
+            = nChanceForCaptainPowerup = nChanceForFreezeShell = 0;
+        powerUpType = POWER_UP_MUSHROOM;
+        break;
+    case 6:
+        nChanceForChainChomp = nChanceForStar = nChanceForCaptainPowerup
+            = nChanceForSpinyShell = nChanceForRedShell = nChanceForBoBomb
+            = nChanceForGreenShell = nChanceForFreezeShell = 0;
+        powerUpType = nlRandomf(1.0f, &nlDefaultSeed) < 0.5f
+            ? POWER_UP_BANANA
+            : POWER_UP_MUSHROOM;
+        break;
+    case 7:
+        nChanceForStar = nChanceForCaptainPowerup = nChanceForSpinyShell
+            = nChanceForBanana = nChanceForMushroom = nChanceForGreenShell
+            = nChanceForFreezeShell = 0;
+        powerUpType = POWER_UP_RED_SHELL;
+        break;
+    case 8:
+        nChanceForChainChomp = nChanceForStar = nChanceForCaptainPowerup
+            = nChanceForSpinyShell = nChanceForRedShell = nChanceForBanana
+            = nChanceForMushroom = nChanceForGreenShell
+            = nChanceForFreezeShell = 0;
+        powerUpType = POWER_UP_BOBOMB;
+        break;
+    case 9:
+        nChanceForChainChomp = nChanceForStar = nChanceForSpinyShell
+            = nChanceForRedShell = nChanceForBanana = nChanceForMushroom
+            = nChanceForBoBomb = nChanceForGreenShell
+            = nChanceForFreezeShell = 0;
+        if (!fn_800A6764(pTeam)
+            && fn_800387CC(pTeam->GetCaptain()) != 1)
+        {
+            powerUpType = *(ePowerUpType*)(
+                *(u8**)((u8*)pTeam->GetCaptain() + 0x11C) + 0x14);
+        }
+        break;
+    default:
+        powerUpType = POWER_UP_MUSHROOM;
+        break;
+    }
+
+    nChanceForStar += nChanceForChainChomp;
+    nChanceForCaptainPowerup += nChanceForStar;
+    nChanceForSpinyShell += nChanceForCaptainPowerup;
+    nChanceForRedShell += nChanceForSpinyShell;
+    nChanceForBoBomb += nChanceForRedShell;
+    nChanceForBanana += nChanceForBoBomb;
+    nChanceForMushroom += nChanceForBanana;
+    nChanceForGreenShell += nChanceForMushroom;
+    nChanceForFreezeShell += nChanceForGreenShell;
+
+    int nChance = nlRandom(nChanceForFreezeShell);
+    if (nChance < nChanceForChainChomp)
+    {
+        powerUpType = POWER_UP_CHAIN_CHOMP;
+    }
+    else if (nChance < nChanceForStar)
+    {
+        powerUpType = POWER_UP_STAR;
+    }
+    else if (nChance < nChanceForCaptainPowerup)
+    {
+        powerUpType = *(ePowerUpType*)(
+            *(u8**)((u8*)pTeam->GetCaptain() + 0x11C) + 0x14);
+    }
+    else if (nChance < nChanceForSpinyShell)
+    {
+        powerUpType = POWER_UP_SPINY_SHELL;
+    }
+    else if (nChance < nChanceForRedShell)
+    {
+        powerUpType = POWER_UP_RED_SHELL;
+    }
+    else if (nChance < nChanceForBoBomb)
+    {
+        powerUpType = POWER_UP_BOBOMB;
+    }
+    else if (nChance < nChanceForBanana)
+    {
+        powerUpType = POWER_UP_BANANA;
+    }
+    else if (nChance < nChanceForMushroom)
+    {
+        powerUpType = POWER_UP_MUSHROOM;
+    }
+    else if (nChance < nChanceForGreenShell)
+    {
+        powerUpType = POWER_UP_GREEN_SHELL;
+    }
+    else if (nChance < nChanceForFreezeShell)
+    {
+        powerUpType = POWER_UP_FREEZE_SHELL;
+    }
+
+    if (GameInfoManager::Instance()->GetRule0x0() == 9)
+    {
+        if (powerUpType
+            != *(ePowerUpType*)(
+                *(u8**)((u8*)pTeam->GetCaptain() + 0x11C) + 0x14))
+        {
+            powerUpType = POWER_UP_NONE;
+        }
+
+        if (GameInfoManager::Instance()->IsRule0x0Equal10()
+            && powerUpType == POWER_UP_NONE && !fn_800A6764(pTeam)
+            && fn_800387CC(pTeam->GetCaptain()) == 0)
+        {
+            powerUpType = *(ePowerUpType*)(
+                *(u8**)((u8*)pTeam->GetCaptain() + 0x11C) + 0x14);
+        }
+    }
+
+    if (powerUpType == POWER_UP_NONE)
+    {
+        return -1;
+    }
+
+    int nNumOfPowerups = 1;
+    float fRandom = nlRandomf(1.0f);
+
+    switch (powerUpType)
+    {
+    case POWER_UP_GREEN_SHELL:
+    case POWER_UP_SPINY_SHELL:
+    case POWER_UP_FREEZE_SHELL:
+    {
+        const float fFiveChance
+            = lbl_8056CF08.m_pGameTweaks->fShellFiveChance;
+        const float fThreeChance = fFiveChance
+            + lbl_8056CF08.m_pGameTweaks->fShellThreeChance;
+        if (fRandom < fFiveChance)
+        {
+            nNumOfPowerups = 5;
+        }
+        else if (fRandom < fThreeChance)
+        {
+            nNumOfPowerups = 3;
+        }
+        break;
+    }
+    case POWER_UP_RED_SHELL:
+    {
+        bool bThreeChance
+            = fRandom < lbl_8056CF08.m_pGameTweaks->fShellThreeChance;
+        if (bThreeChance)
+        {
+            nNumOfPowerups = 3;
+        }
+        break;
+    }
+    case POWER_UP_BOBOMB:
+    {
+        const float fFiveChance
+            = lbl_8056CF08.m_pGameTweaks->fBobombFiveChance;
+        const float fThreeChance = fFiveChance
+            + lbl_8056CF08.m_pGameTweaks->fBobombThreeChance;
+        if (fRandom < fFiveChance)
+        {
+            nNumOfPowerups = 5;
+        }
+        else if (fRandom < fThreeChance)
+        {
+            nNumOfPowerups = 3;
+        }
+        break;
+    }
+    case POWER_UP_BANANA:
+    {
+        const float fFiveChance
+            = lbl_8056CF08.m_pGameTweaks->fBananaFiveChance;
+        const float fThreeChance = fFiveChance
+            + lbl_8056CF08.m_pGameTweaks->fBananaThreeChance;
+        if (fRandom < fFiveChance)
+        {
+            nNumOfPowerups = 5;
+        }
+        else if (fRandom < fThreeChance)
+        {
+            nNumOfPowerups = 3;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    if (GameInfoManager::Instance()->GetRule0x0() == 4
+        || GameInfoManager::Instance()->GetRule0x0() == 1)
+    {
+        nNumOfPowerups = 1;
+    }
+
+    if (pTeam->SetCurrentPowerUp(powerUpType, nNumOfPowerups))
+    {
+        if (lbl_806E0C94->m_eGameState == (eGameState)1
+            && GameInfoManager::Instance()->IsInMode4())
+        {
+            int mode = *(int*)((u8*)lbl_806E0FA0 + 0x34);
+            if (!(mode != 6 && mode != 7))
+            {
+                return powerUpType;
+            }
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            cPlayer* pTeamPlayer = pTeam->GetPlayer(i);
+            if (pTeamPlayer->GetGlobalPad() != 0)
+            {
+                fn_800EDCE8(pTeamPlayer);
+                unsigned long soundID
+                    = powerupSounds[POWER_UP_BANANA].sndAcquire;
+                if (soundID != 0)
+                {
+                    fn_800EBBFC(0x10, soundID, 0, 0);
+                }
+            }
+        }
+
+        if ((int)powerUpType >= 9 && (int)powerUpType <= 20
+            && pFielder != 0)
+        {
+            fn_800EBBFC(pFielder->mUnidentified318,
+                powerupSounds[powerUpType].sndAcquire, 0, 0);
+        }
+
+        return powerUpType;
+    }
+
+    return -1;
 }
 
 /**
@@ -1435,13 +1901,13 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
 
     float fSpeed = fn_8002CFF0(fn_8003E6E4(pThrower));
 
-    if (gbAlwaysSurround || pThrower->GetGlobalPad() == 0)
+    if (lbl_806DBDA0 || pThrower->GetGlobalPad() == 0)
     {
         nlVector3 v3Direction;
-        nlVec3Set(v3Direction,
-            v3TargetPos.x - m_v3Position.x,
-            v3TargetPos.y - m_v3Position.y,
-            v3TargetPos.z - m_v3Position.z);
+        float fDirectionY = v3TargetPos.y - m_v3Position.y;
+        float fDirectionX = v3TargetPos.x - m_v3Position.x;
+        float fDirectionZ = v3TargetPos.z - m_v3Position.z;
+        nlVec3Set(v3Direction, fDirectionX, fDirectionY, fDirectionZ);
         float fInvDistance = nlRecipSqrt(v3Direction.GetLengthSq3D(), true);
         nlVec3Scale(v3Direction, fInvDistance);
 
@@ -1951,26 +2417,28 @@ static inline void RegisterPowerup(unsigned long hashID, PowerupBase* powerup)
     nlBreak();
 }
 
-static inline DrawableObject* AcquirePowerupModel(int type)
-{
-    for (int i = 0; i < 25; i++)
-    {
-        if (powerupModelPool.mFree[type][i])
-        {
-            powerupModelPool.mFree[type][i] = false;
-            return powerupModelPool.mObjs[type][i];
-        }
-    }
-
-    return 0;
-}
-
 /**
  * Offset/Address/Size: 0x3A44 | 0x8009DADC | size: 0x158
  */
 void PowerupBase::Init(cFielder* pFielder)
 {
-    m_pDrawableObj = AcquirePowerupModel(m_eType);
+    int type = m_eType;
+    DrawableObject* pObj;
+    int i;
+
+    for (i = 0; i < 25; i++)
+    {
+        if (powerupModelPool.mFree[type][i])
+        {
+            powerupModelPool.mFree[type][i] = false;
+            pObj = powerupModelPool.mObjs[type][i];
+            goto found1;
+        }
+    }
+    pObj = 0;
+
+found1:
+    m_pDrawableObj = pObj;
 
     {
         DrawableObject* pD = m_pDrawableObj;
@@ -2001,11 +2469,11 @@ inline void PowerupBase::SpeedManagement()
     if (mtNoHitTimer.m_uPackedTime == 0 && m_unk44.m_uPackedTime == 0)
     {
         nlCartesianToPolar(aShell, m_v3Velocity.x, m_v3Velocity.y);
-        if (aShell.r < 0.0001f)
+        if (aShell.r < 0.99f)
         {
             m_bShouldDestroy = true;
         }
-        else if (aShell.r > 0.0f)
+        else if (aShell.r > 25.0f)
         {
             v2NewVelocity = *(const nlVector2*)&m_v3Velocity;
             f32 recipLen = nlRecipSqrt(
@@ -2014,8 +2482,8 @@ inline void PowerupBase::SpeedManagement()
                 true);
             v2NewVelocity.y = recipLen * v2NewVelocity.y;
             v2NewVelocity.x = recipLen * v2NewVelocity.x;
-            f32 scaledY = 30.0f * v2NewVelocity.y;
-            f32 scaledX = 30.0f * v2NewVelocity.x;
+            f32 scaledY = 24.0f * v2NewVelocity.y;
+            f32 scaledX = 24.0f * v2NewVelocity.x;
             v2NewVelocity.x = scaledX;
             v2NewVelocity.y = scaledY;
             v3NewVelocity.y = v2NewVelocity.y;
@@ -2253,13 +2721,17 @@ void RedShell::SeekTarget()
     nlVec2Set(v2Direction,
         invDist * v2Delta.x, invDist * v2Delta.y);
 
+    float velX = m_v3Velocity.y;
+    float velY = m_v3Velocity.x;
+    float xx = velY * velY;
+    float yy = velX * velX;
+    const float lengthSquared = xx + yy;
+
     float turnRate = lbl_806DBDA4;
     nlVec2Set(v2Delta,
         turnRate * v2Direction.x, turnRate * v2Direction.y);
 
-    float velY = m_v3Velocity.y;
-    float velX = m_v3Velocity.x;
-    fCurrSpeed = nlGetLength2D(velY, velX);
+    fCurrSpeed = nlSqrt(lengthSquared, true);
 
     nlVector2 v2NewVelocity;
     v2NewVelocity.x = v2Delta.x + m_v3Velocity.x;
@@ -2271,8 +2743,8 @@ void RedShell::SeekTarget()
     v2NormalizedVelocity.y = invNewSpeed * v2NewVelocity.y;
     v2NormalizedVelocity.x = invNewSpeed * v2NewVelocity.x;
 
-    v2NewVelocity.y = fCurrSpeed * v2NormalizedVelocity.y;
     v2NewVelocity.x = fCurrSpeed * v2NormalizedVelocity.x;
+    v2NewVelocity.y = fCurrSpeed * v2NormalizedVelocity.y;
 
     v3NewVelocity.x = v2NewVelocity.x;
     v3NewVelocity.y = v2NewVelocity.y;

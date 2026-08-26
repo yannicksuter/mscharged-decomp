@@ -75,7 +75,7 @@ private:
     /* 0xB0 */ u8 mUnidentified0B0[0x08];
 
 public:
-    /* 0xB8 */ int mUnidentified0B8;
+    /* 0xB8 */ int m_unk_0xA4;
 
 private:
     /* 0xBC */ u8 mUnidentified0BC[0x0C];

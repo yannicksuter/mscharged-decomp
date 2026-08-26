@@ -8,6 +8,7 @@
 
 class BlurHandler;
 class cFielder;
+class cTeam;
 class PhysicsObject;
 class SFXEmitter;
 
@@ -66,6 +67,13 @@ enum ePowerUpType
     POWER_UP_STAR = 8,
     NUM_POWER_UPS = 9,
 };
+
+struct PowerUpTeamType
+{
+    /* 0x0 */ ePowerUpType eType;
+    /* 0x4 */ int nnumOfPowerups;
+    /* 0x8 */ unsigned char bIsNew;
+}; // total size: 0xC
 
 struct PowerupModelPool
 {
@@ -134,6 +142,7 @@ public:
     void fn_8009D74C(float seconds, bool bEnableCollisions);
     void SpeedManagement();
     void UpdateTransform();
+    static int AwardPowerup(cTeam* pTeam, cFielder* pFielder);
     static void CollisionCallback(PhysicsObject* pObjA,
         PhysicsObject* pObjB, const nlVector3& v3Pos, void* pParam);
     static unsigned long GetSoundType(ePowerUpType type, PowerupSound powerupSnd);
@@ -284,7 +293,7 @@ public:
 PowerupBase* FindPowerUp(unsigned long hashOfDrawable);
 cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType);
 u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
-    const unk_8009A5D8* pSettings);
+    unk_8009A5D8* pUnidentified);
 void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
     PowerupBase* pNewPowerup, PowerupBase* pFirstPowerup,
     unsigned short aDirection);

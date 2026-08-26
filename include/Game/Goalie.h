@@ -59,6 +59,7 @@ enum eGoalieActionState
 enum eGoalieMoveDirection
 {
     GOALIEDIR_IDLE = 0,
+    GOALIEDIR_FORWARD = 1,
 };
 
 enum eGoalieCrouchType
@@ -80,9 +81,26 @@ enum eUrgency
     URGENCY_HIGH = 2,
 };
 
+struct GoalieSaveData
+{
+    /* 0x00 */ nlVector3 v3BallVelocity;
+    /* 0x0C */ cPlayer* pGoalie;
+    /* 0x10 */ cPlayer* pShooter;
+    /* 0x14 */ u32 saveType;
+    /* 0x18 */ float fWowFactor;
+    /* 0x1C */ unsigned int isSTS : 1;
+    /* 0x1C */ unsigned int padding : 31;
+}; // total size: 0x20
+
 class Goalie : public cPlayer
 {
 public:
+    virtual void CollideWithBallCallback(cBall* pBall);
+    virtual void CollideWithCharacterCallback(
+        CollisionPlayerPlayerData* pData);
+    virtual void InitActionPostWhistle();
+    virtual void fn_80099074(UnidentifiedPlayerEventData*);
+
     void SetGoalieAction(eGoalieActionState newGoalieState, int newSubstate);
     static void SaveBlendCallback(
         unsigned int nParam, cPN_SAnimController* pAnimCtrl);
@@ -101,7 +119,7 @@ public:
     void InitActionMoveWB();
     void InitActionChipShotStumble(float fTargetTime);
     void InitActionDiveRecover();
-    void InitActionOffplay(eGoalieOffplayType type);
+    void fn_80090858(eGoalieOffplayType offplayType);
     void InitActionPass(bool useTarget);
     void InitActionPreCrouch(eGoalieCrouchType crouchType);
     void fn_8008BBB0(cFielder* pTarget, int nPursueDekeType);
@@ -109,6 +127,9 @@ public:
     void InitActionSaveSetup(bool bCanReposition);
     void InitActionSave();
     void fn_80090320(float fParam);
+    void InitActionSnapBall();
+    void fn_800908F8();
+    bool IsTeammateHoardingBall();
     inline void InitActionPassInterceptSave();
     inline void InitActionPursueBallCarrier();
     inline void InitActionPursueBallPounce();
@@ -175,6 +196,9 @@ public:
     void ActionSaveSetup(float deltaTime);
     void ActionSaveReposition(float deltaTime);
     void ActionSave(float fDeltaT);
+    void ActionLooseBallCatch(float deltaTime);
+    void ActionLooseBallPursueRolling(float deltaTime);
+    void ActionLooseBallSetup(float fDeltaT);
     void ActionDiveRecover(float fDeltaT);
     void ActionPass(float deltaTime);
     void ActionPassIntercept(float deltaTime);
@@ -187,6 +211,7 @@ public:
     void ActionSnapBall(float fDeltaT);
     void ActionGrabBall(float fDeltaT);
     void fn_8008B718(float fDeltaT);
+    void fn_80084D70(int nCurTarget, float fScore);
     void fn_8008E69C(float fDeltaT);
     void fn_8008895C(float deltaTime);
     void ActionSTSRecover(float deltaTime);
@@ -198,6 +223,8 @@ public:
 
     static bool mbPosGoalieNetCheck;
     static bool mbNegGoalieNetCheck;
+
+    static float mfGoalieStepDist;
 
 private:
     /* 0x328 */ eGoalieActionState mGoalieActionState;
@@ -270,6 +297,8 @@ private:
     /* 0x4B8 */ GoalieFatigue mFatigue;
     /* 0x4C8 */ u8 mUnidentified4C8[4];
     /* 0x4CC */ const LooseBallInfo* mpLooseBallInfo;
-}; // total size: 0x4D0
+    /* 0x4D0 */ int mUnidentified4D0[10];
+    /* 0x4F8 */ float mUnidentified4F8[10];
+}; // total size: at least 0x520
 
 #endif // GAME_GOALIE_H
