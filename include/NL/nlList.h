@@ -30,6 +30,11 @@ template <typename T>
 class NewAdapter
 {
 public:
+    T* Allocate()
+    {
+        return (T*)nlMalloc(sizeof(T), 8, false);
+    }
+
     T* New(const T& value)
     {
         T* entry = (T*)nlMalloc(sizeof(T), 8, false);
@@ -69,93 +74,25 @@ inline void nlListAddStart(T** head, T* entry, T** tail)
     *head = entry;
 }
 
-template <typename T, typename Adapter>
-class ListContainerBase
-{
-public:
-    typedef void (ListContainerBase::*EntryCallback)(ListEntry<T>*);
-
-    ListContainerBase()
-        : m_Head(0)
-        , m_Tail(0)
-    {
-    }
-
-    ~ListContainerBase()
-    {
-        Clear();
-    }
-
-    void Clear()
-    {
-        EntryCallback callback = &ListContainerBase::DeleteEntry;
-        nlWalkList(m_Head, this, callback);
-        m_Head = 0;
-        m_Tail = 0;
-    }
-
-    void DeleteEntry(ListEntry<T>* entry)
-    {
-        m_Allocator.DeleteEntry(entry);
-    }
-
-    void AddEntry(const T& value)
-    {
-        ListEntry<T> local(value);
-        ListEntry<T>* entry = m_Allocator.New(local);
-        nlListAddStart(&m_Head, entry, &m_Tail);
-    }
-
-    nlListIterator<T> Begin();
-
-    /* 0x00 */ Adapter m_Allocator;
-    /* 0x04 */ ListEntry<T>* m_Head;
-    /* 0x08 */ ListEntry<T>* m_Tail;
-};
-
 template <typename T>
-class nlListIterator
+inline T* nlListRemoveStart(T** head, T** tail)
 {
-public:
-    nlListIterator(ListEntry<T>* current)
-        : m_Curr(current)
+    T* first = *head;
+    if (first == 0)
     {
+        return 0;
     }
 
-    bool IsValid() const
+    if (tail != 0 && *tail == first)
     {
-        return m_Curr != 0;
+        *tail = 0;
     }
 
-    T& Current() const
-    {
-        return m_Curr->entry;
-    }
-
-    void Next()
-    {
-        m_Curr = m_Curr->next;
-    }
-
-    ListEntry<T>* CurrentEntry() const
-    {
-        return m_Curr;
-    }
-
-private:
-    ListEntry<T>* m_Curr;
-};
-
-template <typename T, typename Adapter>
-inline nlListIterator<T> ListContainerBase<T, Adapter>::Begin()
-{
-    return nlListIterator<T>(m_Head);
+    T* tmp = *head;
+    *head = tmp->next;
+    return tmp;
 }
 
-template <typename T>
-class nlListContainer
-    : public ListContainerBase<T, NewAdapter<ListEntry<T> > >
-{
-};
+#include "NL/nlListContainer.h"
 
 #endif

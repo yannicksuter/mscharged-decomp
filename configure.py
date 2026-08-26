@@ -326,6 +326,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(Matching, "Game/AI/AiUtil.cpp"),
+            Object(Matching, "Game/AnimInventory.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/Character.cpp", extra_cflags=["-inline deferred"]),
             Object(NonMatching, "Game/AI/Fielder.cpp"),
             Object(NonMatching, "Game/Goalie.cpp", cflags=cflags_game_deferred),

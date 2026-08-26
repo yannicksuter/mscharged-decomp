@@ -23,9 +23,64 @@ public:
     cSAnimCallback* m_pNext;
 };
 
+class nlChunk
+{
+public:
+    nlChunk* GetNextChunk();
+    nlChunk* GetLastChunk();
+    void* GetUnalignedData();
+    u32 GetSize();
+    u32 GetID();
+
+    u32 m_ID;
+    u32 m_Size;
+};
+
+inline nlChunk* nlChunk::GetNextChunk()
+{
+    u8* address = (u8*)GetUnalignedData() + GetSize();
+    u32 offset = (u32)address & 3;
+    return (nlChunk*)(address + (offset != 0) * (4 - offset));
+}
+
+inline nlChunk* nlChunk::GetLastChunk()
+{
+    return (nlChunk*)((u8*)this + GetSize() + sizeof(nlChunk));
+}
+
+inline void* nlChunk::GetUnalignedData()
+{
+    return this + 1;
+}
+
+inline u32 nlChunk::GetSize()
+{
+    return m_Size;
+}
+
+inline u32 nlChunk::GetID()
+{
+    return m_ID & 0x80FFFFFF;
+}
+
 class cSAnim
 {
 public:
+    typedef char* MemType;
+
+    static cSAnim* Initialize(nlChunk* pChunk);
+    static u8 IsValidChunkID(u32 id)
+    {
+        return (id & 0x80FFFFFF) == 0x80017000;
+    }
+
+    void Destroy();
+
+    unsigned int GetHashID() const
+    {
+        return m_uHashID;
+    }
+
     void BlendRot(int accumulatorNode, int animNode, float time, float weight,
         cPoseAccumulator* accumulator, bool mirror) const;
     void BlendScale(int accumulatorNode, int animNode, float time, float weight,
@@ -48,7 +103,8 @@ public:
         return (float)m_nNumKeys / 30.0f;
     }
 
-    u32 m_Unknown00[2];
+    const char* m_szName;
+    unsigned int m_uHashID;
     unsigned int m_nNumKeys;
     unsigned int m_nNumNodes;
     unsigned int m_nNumMorphChannels;
