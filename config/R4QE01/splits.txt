@@ -90,7 +90,7 @@ Game/AI/GoalieSave.cpp:
 	.sdata2     start:0x806E3B28 end:0x806E3B70
 
 Game/AI/Powerups.cpp:
-	.text       start:0x80099660 end:0x8009FF20
+	.text       start:0x80099C80 end:0x8009FF20
 	.ctors      start:0x804DB540 end:0x804DB544
 	.rodata     start:0x804DC0E0 end:0x804DC0F0
 	.data       start:0x804FF888 end:0x804FFFC0
@@ -970,9 +970,22 @@ RVL_SDK/gx/GXBump.c:
 	.text       start:0x803A606C end:0x803A650C
 	.sdata2     start:0x806E73E8 end:0x806E73EC
 
+RVL_SDK/gx/GXTev.c:
+	.text       start:0x803A650C end:0x803A6B8C
+	.data       start:0x8053C038 end:0x8053C0AC
+
+RVL_SDK/gx/GXPixel.c:
+	.text       start:0x803A6B8C end:0x803A7190
+	.data       start:0x8053C0B0 end:0x8053C0D0
+	.sdata2     start:0x806E73F0 end:0x806E7428
+
 RVL_SDK/gx/GXDisplayList.c:
 	.text       start:0x803A7190 end:0x803A7360
 	.bss        start:0x805BE248 end:0x805BE948
+
+RVL_SDK/gx/GXTransform.c:
+	.text       start:0x803A7360 end:0x803A7A40
+	.sdata2     start:0x806E7428 end:0x806E743C
 
 RVL_SDK/ipc/ipcMain.c:
 	.text       start:0x803A827C end:0x803A8300
@@ -1202,8 +1215,11 @@ RVL_SDK/thp/THPAudio.c:
 	.text       start:0x803C4BE0 end:0x803C5074
 
 RVL_SDK/vi/vi.c:
-	.text       start:0x803C5B4C end:0x803C7A44
-	.sbss       start:0x806E2B14 end:0x806E2BB0
+	.text       start:0x803C51A8 end:0x803C7A44
+	.data       start:0x8054A870 end:0x8054ACF0
+	.bss        start:0x805D5FB0 end:0x805D6120
+	.sdata      start:0x806DFD78 end:0x806DFD98
+	.sbss       start:0x806E2B08 end:0x806E2BB8
 
 RVL_SDK/vi/vi3in1.c:
 	.text       start:0x803C8460 end:0x803C9B04
@@ -1214,6 +1230,213 @@ RVL_SDK/vi/vi3in1.c:
 
 RVL_SDK/wpad/WPAD.c:
 	.text       start:0x803C9DDC end:0x803D1408
+
+RVL_SDK/wud/debug_msg.c:
+	.text       start:0x803D6F64 end:0x803D6FB4
+
+RVL_SDK/wud/WUD.c:
+	.text       start:0x803D6FB4 end:0x803DB324
+
+RVL_SDK/wud/WUDHidHost.c:
+	.text       start:0x803DB324 end:0x803DB848
+	.data       start:0x8054DB58 end:0x8054DDD8
+
+RVL_SDK/bte/gki_buffer.c:
+	.text       start:0x803DB8C0 end:0x803DCD04
+	.data       start:0x8054DDD8 end:0x8054DF1C
+
+RVL_SDK/bte/gki_time.c:
+	.text       start:0x803DCD04 end:0x803DD25C
+
+RVL_SDK/bte/hcisu_h2.c:
+	.text       start:0x803DD4EC end:0x803DDB88
+
+RVL_SDK/bte/bte_hcisu.c:
+	.text       start:0x803DF064 end:0x803DF11C
+	.sbss       start:0x806E2C60 end:0x806E2C68
+
+RVL_SDK/bte/bte_init.c:
+	.text       start:0x803DF11C end:0x803DF148
+
+RVL_SDK/bte/bte_logmsg.c:
+	.text       start:0x803DF148 end:0x803DF2AC
+	.bss        start:0x80606240 end:0x80606A10
+	.sdata      start:0x806DFE20 end:0x806DFE24
+
+RVL_SDK/bte/btu_task1.c:
+	.text       start:0x803DF404 end:0x803DF854
+	.bss        start:0x80607A50 end:0x80607AD4
+	.sdata      start:0x806DFE30 end:0x806DFE38
+	.sbss       start:0x806E2C70 end:0x806E2C78
+
+RVL_SDK/bte/bta_sys_conn.c:
+	.text       start:0x803DF958 end:0x803DFB7C
+
+RVL_SDK/bte/bta_sys_main.c:
+	.text       start:0x803DFB7C end:0x803DFDB8
+
+RVL_SDK/bte/ptim.c:
+	.text       start:0x803DFDC0 end:0x803DFFA0
+
+RVL_SDK/bte/bta_dm_act.c:
+	.text       start:0x803DFFE4 end:0x803E2320
+
+RVL_SDK/bte/bta_dm_api.c:
+	.text       start:0x803E2320 end:0x803E278C
+	.sdata2     start:0x806E75D0 end:0x806E75E0
+
+RVL_SDK/bte/bta_dm_main.c:
+	.text       start:0x803E278C end:0x803E28EC
+	.rodata     start:0x804EC8F8 end:0x804ECA20
+	.bss        start:0x80607B98 end:0x80607D18
+
+RVL_SDK/bte/bta_dm_pm.c:
+	.text       start:0x803E28EC end:0x803E32FC
+
+RVL_SDK/bte/bta_hh_act.c:
+	.text       start:0x803E3308 end:0x803E4A50
+	.data       start:0x8054EEA0 end:0x8054F398
+	.sdata      start:0x806DFE38 end:0x806DFE3C
+
+RVL_SDK/bte/bta_hh_main.c:
+	.text       start:0x803E4E20 end:0x803E5374
+	.rodata     start:0x804ECA20 end:0x804ECAA8
+	.data       start:0x8054F3C8 end:0x8054F6A8
+	.bss        start:0x80607D48 end:0x80607F78
+
+RVL_SDK/bte/btm_acl.c:
+	.text       start:0x803E573C end:0x803E7464
+
+RVL_SDK/bte/btm_dev.c:
+	.text       start:0x803E7464 end:0x803E7B30
+
+RVL_SDK/bte/btm_devctl.c:
+	.text       start:0x803E7B30 end:0x803E94B8
+
+RVL_SDK/bte/btm_inq.c:
+	.text       start:0x803E95EC end:0x803EB084
+
+RVL_SDK/bte/btm_main.c:
+	.text       start:0x803EB084 end:0x803EB0E0
+	.bss        start:0x80607F78 end:0x8060A73C
+
+RVL_SDK/bte/btm_pm.c:
+	.text       start:0x803EB0E0 end:0x803EBD74
+	.rodata     start:0x804ECAA8 end:0x804ECAB4
+	.data       start:0x805501F8 end:0x80550238
+	.sdata2     start:0x806E75F0 end:0x806E75F8
+
+RVL_SDK/bte/btm_sco.c:
+	.text       start:0x803EBD74 end:0x803ECBAC
+	.rodata     start:0x804ECAB8 end:0x804ECAC8
+	.data       start:0x80550238 end:0x80550538
+
+RVL_SDK/bte/btm_sec.c:
+	.text       start:0x803ECBAC end:0x803EFB70
+	.data       start:0x80550538 end:0x80550F48
+	.sdata2     start:0x806E75F8 end:0x806E7600
+
+RVL_SDK/bte/btu_hcif.c:
+	.text       start:0x803EFB70 end:0x803F0DCC
+	.data       start:0x80550F48 end:0x80550FD8
+
+RVL_SDK/bte/btu_init.c:
+	.text       start:0x803F0DCC end:0x803F0E44
+	.sdata2     start:0x806E7600 end:0x806E7608
+
+RVL_SDK/bte/gap_utils.c:
+	.text       start:0x803F1AC0 end:0x803F20DC
+
+RVL_SDK/bte/hcicmds.c:
+	.text       start:0x803F20DC end:0x803F47F8
+
+RVL_SDK/bte/hidd_pm.c:
+	.text       start:0x803F49E8 end:0x803F4D64
+
+RVL_SDK/bte/hidh_api.c:
+	.text       start:0x803F4D64 end:0x803F5AE4
+	.data       start:0x805513E8 end:0x80551500
+	.bss        start:0x8060AC38 end:0x8060B040
+
+RVL_SDK/bte/hidh_conn.c:
+	.text       start:0x803F5AE4 end:0x803F7B24
+	.rodata     start:0x804ECAD8 end:0x804ECB00
+	.data       start:0x80551500 end:0x805518E8
+
+RVL_SDK/bte/l2c_api.c:
+	.text       start:0x803F7B24 end:0x803F86D0
+	.data       start:0x805518E8 end:0x80552078
+
+RVL_SDK/bte/l2c_csm.c:
+	.text       start:0x803F86F0 end:0x803F9BCC
+	.data       start:0x80552078 end:0x805528B0
+
+RVL_SDK/bte/l2c_link.c:
+	.text       start:0x803F9BCC end:0x803FAD58
+
+RVL_SDK/bte/l2c_main.c:
+	.text       start:0x803FAD58 end:0x803FBD88
+	.data       start:0x80552B20 end:0x80552E1C
+	.bss        start:0x8060B040 end:0x8060B828
+
+RVL_SDK/bte/l2c_utils.c:
+	.text       start:0x803FBD88 end:0x803FDC4C
+
+RVL_SDK/bte/port_rfc.c:
+	.text       start:0x803FDC9C end:0x803FF098
+	.data       start:0x80552F08 end:0x80553234
+
+RVL_SDK/bte/port_utils.c:
+	.text       start:0x803FF098 end:0x803FF670
+
+RVL_SDK/bte/rfc_l2cap_if.c:
+	.text       start:0x803FF670 end:0x803FFF88
+
+RVL_SDK/bte/rfc_mx_fsm.c:
+	.text       start:0x803FFFA4 end:0x80400BE8
+	.data       start:0x805534C0 end:0x80553778
+
+RVL_SDK/bte/rfc_port_fsm.c:
+	.text       start:0x80400BE8 end:0x80401D88
+	.data       start:0x80553778 end:0x80553AA0
+
+RVL_SDK/bte/rfc_port_if.c:
+	.text       start:0x80401D88 end:0x804022B4
+	.bss        start:0x8060B828 end:0x8060BC40
+
+RVL_SDK/bte/rfc_ts_frames.c:
+	.text       start:0x804022B4 end:0x804038FC
+	.data       start:0x80553AA0 end:0x80553B78
+	.sdata      start:0x806DFE70 end:0x806DFE80
+
+RVL_SDK/bte/rfc_utils.c:
+	.text       start:0x804038FC end:0x804040DC
+	.rodata     start:0x804ECB00 end:0x804ECC00
+	.data       start:0x80553B78 end:0x80553C04
+
+RVL_SDK/bte/sdp_api.c:
+	.text       start:0x804040DC end:0x80404F20
+
+RVL_SDK/bte/sdp_db.c:
+	.text       start:0x80404F44 end:0x80405C10
+
+RVL_SDK/bte/sdp_discovery.c:
+	.text       start:0x80405C10 end:0x80406E88
+	.data       start:0x80553CF0 end:0x80553E4C
+
+RVL_SDK/bte/sdp_main.c:
+	.text       start:0x80406E88 end:0x804079F4
+	.data       start:0x80553E50 end:0x805541B0
+	.bss        start:0x8060BC40 end:0x80610280
+
+RVL_SDK/bte/sdp_server.c:
+	.text       start:0x804079F4 end:0x80408704
+	.data       start:0x805541B0 end:0x805541F0
+
+RVL_SDK/bte/sdp_utils.c:
+	.text       start:0x80408704 end:0x80409744
+	.rodata     start:0x804ECC00 end:0x804ECC10
+	.data       start:0x805541F0 end:0x805542E8
 
 RVL_SDK/usb/usb.c:
 	.text       start:0x80409744 end:0x8040A7E4
@@ -1261,6 +1484,9 @@ RVL_SDK/nand/NANDCheck.c:
 
 RVL_SDK/ncd/ncdsystem.c:
 	.text       start:0x80410168 end:0x804109E4
+	.data       start:0x80554D90 end:0x80554E38
+	.bss        start:0x80619480 end:0x806194E0
+	.sbss       start:0x806E2CC0 end:0x806E2CC8
 
 RVL_SDK/nwc24/NWC24StdApi.c:
 	.text       start:0x804109E4 end:0x80411548
@@ -1488,6 +1714,18 @@ RVL_SDK/vf/d_common.c:
 RVL_SDK/vf/sd_drv.c:
 	.text       start:0x80437140 end:0x80437144
 
+RVL_SDK/hbm/HBMAnmController.cpp:
+	.text       start:0x80441838 end:0x804418FC
+
+RVL_SDK/hbm/HBMFrameController.cpp:
+	.text       start:0x804418FC end:0x80441A9C
+
+RVL_SDK/hbm/HBMGUIManager.cpp:
+	.text       start:0x80441C5C end:0x80443118
+
+RVL_SDK/hbm/nw4hbm/db/db_console.cpp:
+	.text       start:0x80444A48 end:0x80445348
+
 RVL_SDK/hbm/nw4hbm/lyt/lyt_animation.cpp:
 	.text       start:0x804466AC end:0x8044761C
 	.data       start:0x80556F18 end:0x80557388
@@ -1516,6 +1754,12 @@ RVL_SDK/hbm/nw4hbm/lyt/lyt_group.cpp:
 	.text       start:0x80448D6C end:0x80449214
 	.data       start:0x805576E8 end:0x805577E8
 
+RVL_SDK/hbm/nw4hbm/lyt/lyt_layout.cpp:
+	.text       start:0x80449214 end:0x8044D94C
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_pane.cpp:
+	.text       start:0x8044D94C end:0x8044EC50
+
 RVL_SDK/hbm/nw4hbm/lyt/lyt_picture.cpp:
 	.text       start:0x8044EC64 end:0x8044F384
 	.ctors      start:0x804DBB74 end:0x804DBB78
@@ -1527,6 +1771,9 @@ RVL_SDK/hbm/nw4hbm/lyt/lyt_resourceAccessor.cpp:
 	.text       start:0x8044F384 end:0x8044F3DC
 	.data       start:0x80558608 end:0x80558620
 
+RVL_SDK/hbm/nw4hbm/lyt/lyt_textBox.cpp:
+	.text       start:0x8044F3DC end:0x80452210
+
 RVL_SDK/hbm/nw4hbm/lyt/lyt_window.cpp:
 	.text       start:0x80452224 end:0x80454AF8
 	.ctors      start:0x804DBB7C end:0x804DBB80
@@ -1534,9 +1781,21 @@ RVL_SDK/hbm/nw4hbm/lyt/lyt_window.cpp:
 	.sbss       start:0x806E2DF8 end:0x806E2E00
 	.sdata2     start:0x806E7760 end:0x806E7778
 
+RVL_SDK/hbm/nw4hbm/snd/snd_AxManager.cpp:
+	.text       start:0x80454D68 end:0x80456B48
+
+RVL_SDK/hbm/nw4hbm/snd/snd_AxVoice.cpp:
+	.text       start:0x80456B48 end:0x8045A744
+
 RVL_SDK/hbm/nw4hbm/snd/snd_Bank.cpp:
 	.text       start:0x8045A748 end:0x8045A970
 	.sdata2     start:0x806E7800 end:0x806E7820
+
+RVL_SDK/hbm/nw4hbm/snd/snd_BankFile.cpp:
+	.text       start:0x8045A970 end:0x8045AFC0
+	.data       start:0x8055A5B0 end:0x8055A84A
+	.sdata      start:0x806E0250 end:0x806E0270
+	.sdata2     start:0x806E7820 end:0x806E7824
 
 RVL_SDK/hbm/nw4hbm/snd/snd_BasicSound.cpp:
 	.text       start:0x8045AFC0 end:0x8045C2C8
@@ -1553,23 +1812,70 @@ RVL_SDK/hbm/nw4hbm/snd/snd_Channel.cpp:
 	.sbss       start:0x806E2E10 end:0x806E2E14
 	.sdata2     start:0x806E7838 end:0x806E7860
 
+RVL_SDK/hbm/nw4hbm/snd/snd_DisposeCallbackManager.cpp:
+	.text       start:0x8045D55C end:0x8045D9FC
+	.data       start:0x8055ABE0 end:0x8055AC40
+	.bss        start:0x806BEB10 end:0x806BEB28
+	.sbss       start:0x806E2E18 end:0x806E2E1C
+
+RVL_SDK/hbm/nw4hbm/snd/snd_EnvGenerator.cpp:
+	.text       start:0x8045DA3C end:0x8045E04C
+	.rodata     start:0x804F1760 end:0x804F1A60
+	.data       start:0x8055AC40 end:0x8055AD90
+	.sdata2     start:0x806E7860 end:0x806E7890
+
+RVL_SDK/hbm/nw4hbm/snd/snd_ExternalSoundPlayer.cpp:
+	.text       start:0x8045E04C end:0x8045E218
+	.data       start:0x8055ADC0 end:0x8055AE20
+
+RVL_SDK/hbm/nw4hbm/snd/snd_InstancePool.cpp:
+	.text       start:0x8045EC70 end:0x8045EF20
+	.data       start:0x8055B118 end:0x8055B160
+
 RVL_SDK/hbm/nw4hbm/snd/snd_Lfo.cpp:
 	.text       start:0x8045EF20 end:0x8045F17C
 	.rodata     start:0x804F1A60 end:0x804F1A88
 	.data       start:0x8055B160 end:0x8055B1A8
 	.sdata2     start:0x806E7890 end:0x806E78C0
 
+RVL_SDK/hbm/nw4hbm/snd/snd_MemorySoundArchive.cpp:
+	.text       start:0x8045F17C end:0x8045F5E4
+
+RVL_SDK/hbm/nw4hbm/snd/snd_MmlParser.cpp:
+	.text       start:0x8045F7C4 end:0x804608F8
+
 RVL_SDK/hbm/nw4hbm/snd/snd_MmlSeqTrack.cpp:
 	.text       start:0x804608F8 end:0x804609C4
-	.data       start:0x8055B810 end:0x8055B830
+	.data       start:0x8055B820 end:0x8055B830
 
 RVL_SDK/hbm/nw4hbm/snd/snd_MmlSeqTrackAllocator.cpp:
 	.text       start:0x804609C4 end:0x80460B0C
 	.data       start:0x8055B830 end:0x8055B890
 
+RVL_SDK/hbm/nw4hbm/snd/snd_SeqFile.cpp:
+	.text       start:0x80461368 end:0x8046151C
+	.data       start:0x8055BA80 end:0x8055BBE4
+
+RVL_SDK/hbm/nw4hbm/snd/snd_SeqPlayer.cpp:
+	.text       start:0x8046151C end:0x80462E7C
+	.ctors      start:0x804DBB88 end:0x804DBB8C
+
+RVL_SDK/hbm/nw4hbm/snd/snd_SeqSound.cpp:
+	.text       start:0x80462E84 end:0x80463534
+	.ctors      start:0x804DBB8C end:0x804DBB90
+
+RVL_SDK/hbm/nw4hbm/snd/snd_SeqTrack.cpp:
+	.text       start:0x80463534 end:0x80464DD4
+
+RVL_SDK/hbm/nw4hbm/snd/snd_SoundArchiveFile.cpp:
+	.text       start:0x804653C0 end:0x80466868
+
 RVL_SDK/hbm/nw4hbm/snd/snd_SoundArchiveLoader.cpp:
 	.text       start:0x80466868 end:0x80467210
 	.data       start:0x8055CF00 end:0x8055CF48
+
+RVL_SDK/hbm/nw4hbm/snd/snd_SoundArchivePlayer.cpp:
+	.text       start:0x80467210 end:0x8046A7AC
 
 RVL_SDK/hbm/nw4hbm/snd/snd_SoundHandle.cpp:
 	.text       start:0x8046A8DC end:0x8046A9A8
@@ -1577,7 +1883,19 @@ RVL_SDK/hbm/nw4hbm/snd/snd_SoundHandle.cpp:
 
 RVL_SDK/hbm/nw4hbm/snd/snd_SoundHeap.cpp:
 	.text       start:0x8046A9A8 end:0x8046AB34
-	.data       start:0x8055DD00 end:0x8055DD20
+	.data       start:0x8055DD00 end:0x8055DD10
+
+RVL_SDK/hbm/nw4hbm/snd/snd_SoundPlayer.cpp:
+	.text       start:0x8046AB34 end:0x8046C830
+
+RVL_SDK/hbm/nw4hbm/snd/snd_SoundSystem.cpp:
+	.text       start:0x8046C89C end:0x8046CA80
+	.data       start:0x8055E478 end:0x8055E4E0
+	.sbss       start:0x806E2E48 end:0x806E2E4C
+
+RVL_SDK/hbm/nw4hbm/snd/snd_StrmChannel.cpp:
+	.text       start:0x8046CFDC end:0x8046D224
+	.data       start:0x8055E5A0 end:0x8055E5D4
 
 RVL_SDK/hbm/nw4hbm/snd/snd_StrmPlayer.cpp:
 	.text       start:0x8046D8EC end:0x804700BC
@@ -1611,6 +1929,10 @@ RVL_SDK/hbm/nw4hbm/snd/snd_Util.cpp:
 RVL_SDK/hbm/nw4hbm/snd/snd_WaveFile.cpp:
 	.text       start:0x804712B8 end:0x804714E8
 
+RVL_SDK/hbm/nw4hbm/snd/snd_WavePlayer.cpp:
+	.text       start:0x804714E8 end:0x804720AC
+	.ctors      start:0x804DBB98 end:0x804DBB9C
+
 RVL_SDK/hbm/nw4hbm/snd/snd_WaveSound.cpp:
 	.text       start:0x804720AC end:0x80472530
 	.ctors      start:0x804DBB9C end:0x804DBBA0
@@ -1620,13 +1942,31 @@ RVL_SDK/hbm/nw4hbm/snd/snd_WaveSound.cpp:
 RVL_SDK/hbm/nw4hbm/snd/snd_WaveSoundHandle.cpp:
 	.text       start:0x80472530 end:0x80472568
 
+RVL_SDK/hbm/nw4hbm/snd/snd_WsdFile.cpp:
+	.text       start:0x80472568 end:0x80472AA0
+	.data       start:0x8055F7B0 end:0x8055F9F0
+	.sdata      start:0x806E0340 end:0x806E0360
+	.sdata2     start:0x806E7990 end:0x806E7994
+
+RVL_SDK/hbm/nw4hbm/snd/snd_WsdPlayer.cpp:
+	.text       start:0x80472AA0 end:0x80473B70
+	.ctors      start:0x804DBBA0 end:0x804DBBA4
+
 RVL_SDK/hbm/nw4hbm/snd/snd_WsdTrack.cpp:
 	.text       start:0x80473B88 end:0x80474710
 	.data       start:0x8055FD78 end:0x8055FFA0
 	.sdata2     start:0x806E79A0 end:0x806E79C8
 
+RVL_SDK/hbm/nw4hbm/ut/ut_binaryFileFormat.cpp:
+	.text       start:0x80474710 end:0x80474968
+	.data       start:0x8055FFA0 end:0x805600F0
+
+RVL_SDK/hbm/nw4hbm/ut/ut_CharStrmReader.cpp:
+	.text       start:0x80474968 end:0x804752C8
+	.data       start:0x805600F0 end:0x80560238
+
 RVL_SDK/hbm/nw4hbm/ut/ut_CharWriter.cpp:
-	.text       start:0x80475A94 end:0x80479824
+	.text       start:0x804752C8 end:0x80479824
 	.data       start:0x80560238 end:0x80560518
 	.bss        start:0x806C9850 end:0x806C9870
 	.sbss       start:0x806E2E78 end:0x806E2E80
@@ -1637,6 +1977,10 @@ RVL_SDK/hbm/nw4hbm/ut/ut_FileStream.cpp:
 	.ctors      start:0x804DBBA8 end:0x804DBBAC
 	.data       start:0x80560518 end:0x805605FC
 	.sbss       start:0x806E2E88 end:0x806E2E8C
+
+RVL_SDK/hbm/nw4hbm/ut/ut_Font.cpp:
+	.text       start:0x80479974 end:0x80479B38
+	.data       start:0x80560600 end:0x80560678
 
 RVL_SDK/hbm/nw4hbm/ut/ut_IOStream.cpp:
 	.text       start:0x80479B38 end:0x80479D74
@@ -1652,6 +1996,10 @@ RVL_SDK/hbm/nw4hbm/ut/ut_list.cpp:
 	.text       start:0x8047A2E0 end:0x8047A688
 	.data       start:0x805608E8 end:0x80560948
 
+RVL_SDK/hbm/nw4hbm/ut/ut_ResFont.cpp:
+	.text       start:0x8047A688 end:0x8047B6A0
+	.data       start:0x80560948 end:0x80561200
+
 RVL_SDK/hbm/nw4hbm/ut/ut_ResFontBase.cpp:
 	.text       start:0x8047B6A0 end:0x8047EE80
 	.data       start:0x80561200 end:0x80561518
@@ -1661,5 +2009,41 @@ RVL_SDK/hbm/nw4hbm/ut/ut_TagProcessorBase.cpp:
 	.data       start:0x80561518 end:0x805615F0
 	.sdata2     start:0x806E79E8 end:0x806E79F0
 
+RVL_SDK/hbm/nw4hbm/ut/ut_TextWriterBase.cpp:
+	.text       start:0x80480088 end:0x80488D6C
+	.ctors      start:0x804DBBB0 end:0x804DBBB4
+
 RVL_SDK/dwc/dwc_error.c:
 	.text       start:0x804890D4 end:0x804891C8
+	.data       start:0x80561C30 end:0x80561C78
+	.sbss       start:0x806E2EA8 end:0x806E2EB0
+
+RVL_SDK/gamespy/darray.c:
+	.text       start:0x804A2508 end:0x804A2F5C
+
+RVL_SDK/gamespy/hashtable.c:
+	.text       start:0x804A2F5C end:0x804A33F4
+
+RVL_SDK/gamespy/md5c.c:
+	.text       start:0x804A3434 end:0x804A4314
+	.data       start:0x80565AA0 end:0x80565AE0
+	.sdata      start:0x806E0568 end:0x806E0570
+
+RVL_SDK/gamespy/gt2/gt2Auth.c:
+	.text       start:0x804B4C84 end:0x804B5048
+	.data       start:0x80566CA0 end:0x80566CC4
+
+RVL_SDK/gamespy/gt2/gt2Buffer.c:
+	.text       start:0x804B5048 end:0x804B51EC
+
+RVL_SDK/gamespy/gt2/gt2Callback.c:
+	.text       start:0x804B51EC end:0x804B5A6C
+
+RVL_SDK/gamespy/gt2/gt2Connection.c:
+	.text       start:0x804B5A6C end:0x804B6140
+
+RVL_SDK/gamespy/gt2/gt2Socket.c:
+	.text       start:0x804B95C0 end:0x804BA154
+
+RVL_SDK/gamespy/ghttp/ghttpCallbacks.c:
+	.text       start:0x804BD5D0 end:0x804BD6F0
