@@ -1,4 +1,5 @@
 #include "NL/gl/glPlat.h"
+#include "NL/gl/glView.h"
 
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxSwap.h"
@@ -14,33 +15,6 @@ struct PlatformViewport
     s32 height;
 };
 
-class PlatformMatrixSource
-{
-public:
-    virtual void GetViewMatrix(nlMatrix4& matrix) = 0;
-    virtual void GetProjectionMatrix(nlMatrix4& matrix) = 0;
-};
-
-struct PlatformViewState
-{
-    u8 pad_00[0x18];
-    s32 viewportX;
-    s32 viewportY;
-    s32 viewportWidth;
-    s32 viewportHeight;
-    u8 pad_28[9];
-    bool hasDefaultTarget;
-    bool targetFlag1;
-    bool targetFlag0;
-    s32 targetMode;
-    u8 pad_38[8];
-    bool renderEnabled;
-    u8 pad_41[3];
-    u32 renderName;
-    u8 pad_48[8];
-    PlatformMatrixSource* matrixSource;
-};
-
 class PlatformRenderTarget
 {
 public:
@@ -51,12 +25,6 @@ public:
     virtual void Reserved4() = 0;
     virtual void Reserved5() = 0;
     virtual void Configure(bool flag0, bool flag1, bool flag2) = 0;
-};
-
-struct PlatformRenderPair
-{
-    void* state;
-    PlatformRenderTarget* target;
 };
 
 class PlatformStartupObject
@@ -76,13 +44,6 @@ struct PlatformStartupEntry
     PlatformStartupObject* object;
     void* key;
 };
-
-struct PlatformIterator
-{
-    u8 storage[0x48];
-};
-
-struct PlatformViewList;
 
 struct UnidentifiedStaticState
 {
@@ -142,12 +103,6 @@ extern "C"
     void fn_80376150();
 
     void fn_802CB848(Function2<bool, PlatformStartupEntry&, PlatformStartupEntry&>* callback);
-    void fn_802CF950(PlatformIterator* iterator, PlatformViewList* list);
-    PlatformViewState* fn_802CFCA4(PlatformIterator* iterator);
-    PlatformRenderPair fn_802CF8E4(PlatformViewState* view);
-    void fn_802CF5F4(PlatformViewState* view, void (*callback)());
-    void fn_802CFB68(PlatformIterator* iterator);
-    bool fn_802CFCC8(PlatformIterator* iterator);
     void* fn_80364020();
     void fn_803640E4(void* owner, u32 name);
     void fn_803640DC();
@@ -162,7 +117,6 @@ extern "C"
     extern GXRenderModeObj lbl_8053BD5C;
     extern GXRenderModeObj lbl_8053BD98;
     extern GXRenderModeObj lbl_8053BDD4;
-    extern PlatformViewList lbl_8057F250;
 }
 
 static GXRenderModeObj glPal480IntDf = {
@@ -434,7 +388,7 @@ extern "C" PlatformViewport* fn_80369A30()
 static void glx_SendViews()
 {
     PlatformRenderTarget* target;
-    PlatformViewState* view;
+    GLView* view;
 
     glx_viewport.x = 0;
     glx_viewport.y = 0;
@@ -448,33 +402,32 @@ static void glx_SendViews()
         1.0f);
     fn_803A78A4(0, 0, 640, 448);
 
-    PlatformIterator iterator;
-    fn_802CF950(&iterator, &lbl_8057F250);
-    for (; !fn_802CFCC8(&iterator); fn_802CFB68(&iterator))
+    GLViewIterator iterator(&lbl_8057F250);
+    for (; !iterator.IsDone(); iterator.Next())
     {
-        view = fn_802CFCA4(&iterator);
-        if (view->viewportWidth != 0 && view->viewportHeight != 0)
+        view = iterator.Current();
+        if (view->m_ViewportWidth != 0 && view->m_ViewportHeight != 0)
         {
-            PlatformRenderPair renderPair = fn_802CF8E4(view);
-            target = renderPair.target;
+            GLRenderPair renderPair = view->GetRenderPair();
+            target = (PlatformRenderTarget*)renderPair.target;
             target->Begin(0);
 
-            glx_viewport.x = view->viewportX;
-            glx_viewport.y = view->viewportY;
-            glx_viewport.width = view->viewportWidth;
-            glx_viewport.height = view->viewportHeight;
-            const s32 viewportHeight = view->viewportHeight;
-            const s32 viewportWidth = view->viewportWidth;
-            const s32 viewportY = view->viewportY;
-            const s32 viewportX = view->viewportX;
+            glx_viewport.x = view->m_ViewportX;
+            glx_viewport.y = view->m_ViewportY;
+            glx_viewport.width = view->m_ViewportWidth;
+            glx_viewport.height = view->m_ViewportHeight;
+            const s32 viewportHeight = view->m_ViewportHeight;
+            const s32 viewportWidth = view->m_ViewportWidth;
+            const s32 viewportY = view->m_ViewportY;
+            const s32 viewportX = view->m_ViewportX;
             fn_803A7828((f32)viewportX, (f32)viewportY, (f32)viewportWidth, (f32)viewportHeight, 0.0f, 1.0f);
             fn_803A78A4(viewportX, viewportY, viewportWidth, viewportHeight);
-            fn_803640E4(fn_80364020(), view->renderName);
+            fn_803640E4(fn_80364020(), (u32)view->m_Name);
 
-            if (view->hasDefaultTarget || view->targetFlag0 || view->targetFlag1)
+            if (view->m_ClearColour || view->m_Unknown33 || view->m_ClearDepth)
             {
                 bool hasRenderTarget = false;
-                if (renderPair.state != 0)
+                if (renderPair.hash != 0)
                 {
                     if (target != 0)
                     {
@@ -483,14 +436,14 @@ static void glx_SendViews()
                 }
                 if (hasRenderTarget)
                 {
-                    target->Configure(view->targetFlag0, view->hasDefaultTarget, view->targetFlag1);
+                    target->Configure(view->m_Unknown33, view->m_ClearColour, view->m_ClearDepth);
                 }
             }
 
-            if (view->renderEnabled)
+            if (view->m_Visible)
             {
-                fn_802CF5F4(view, fn_8036E59C);
-                const s32 targetMode = view->targetMode;
+                view->Iterate((GLViewPacketCallback)fn_8036E59C);
+                const s32 targetMode = view->m_Target;
                 if (targetMode != 8)
                 {
                     if (targetMode != 9)
@@ -551,14 +504,14 @@ extern "C" u32 fn_80369D64()
     return 480;
 }
 
-extern "C" void fn_80369D6C(PlatformViewState* view, const nlVector3& world, nlVector3& ndc)
+extern "C" void fn_80369D6C(GLView* view, const nlVector3& world, nlVector3& ndc)
 {
     nlMatrix4 viewMatrix;
     nlMatrix4 projectionMatrix;
     nlVector3 viewPosition;
 
-    view->matrixSource->GetViewMatrix(viewMatrix);
-    view->matrixSource->GetProjectionMatrix(projectionMatrix);
+    view->m_Interface->GetViewMatrix(viewMatrix);
+    view->m_Interface->GetProjectionMatrix(projectionMatrix);
     nlMultPosVectorMatrix(viewPosition, world, viewMatrix);
     nlMultPosVectorMatrix(ndc, viewPosition, projectionMatrix);
 

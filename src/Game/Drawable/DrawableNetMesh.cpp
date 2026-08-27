@@ -1,6 +1,7 @@
 #include "Game/Field.h"
 #include "Game/Net.h"
 #include "Game/Render/NetMesh.h"
+#include "NL/gl/glView.h"
 #include "NL/nlMath.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
@@ -180,7 +181,7 @@ bool lbl_806DCB38[2] = { true, true };
 u8 lbl_806DCB3A = 1;
 char lbl_806DCB40[8] = "NetMesh";
 
-u32 lbl_806E132C;
+GLView* lbl_806E132C;
 u32 lbl_806E1330;
 shortVector2* lbl_806E1338[2];
 u32* lbl_806E1340[2];
@@ -211,7 +212,6 @@ extern "C" void fn_802C9254(u32, int, glQuad3*);
 extern "C" WorldDarkening* fn_801AF510();
 extern "C" void nlBreak__Fv();
 extern "C" void* memcpy(void*, const void*, u32);
-extern "C" void fn_802CF510(u32, WriterModel*, bool);
 extern "C" MeshResource* fn_802CBFD8(const StreamDefinition*, int, const char*);
 extern "C" void* memset(void*, int, u32);
 
@@ -239,7 +239,7 @@ DrawableNetMesh::DrawableNetMesh(bool isPositiveXNet)
     , mInitialized(false)
     , mVisible(false)
 {
-    lbl_806E132C = (u32)fn_8027267C(0x16);
+    lbl_806E132C = (GLView*)fn_8027267C(0x16);
     lbl_806E1330 = (u32)fn_8027267C(0x1C);
 }
 
@@ -413,7 +413,8 @@ void DrawableNetMesh::Render() const
 
     if (lbl_806E1368[mNetIndex] && lbl_806E1360[mNetIndex])
     {
-        fn_802CF510(lbl_806E132C, lbl_806E1360[mNetIndex], false);
+        lbl_806E132C->AttachModel(
+            (glModel*)lbl_806E1360[mNetIndex], false);
     }
 
     RenderInvisiblePlanes();

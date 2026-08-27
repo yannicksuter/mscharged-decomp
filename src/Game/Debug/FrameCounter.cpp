@@ -1,4 +1,5 @@
 #include "Game/Debug/FrameCounter.h"
+#include "NL/gl/glFont.h"
 
 #include "Game/Debug/TimeRegions.h"
 #include "NL/nlColour.h"
@@ -11,9 +12,6 @@
 extern "C" void fn_802B9670(TimeRegionData* data, float value);
 extern "C" void* fn_802B77A0();
 extern "C" void fn_802BB11C(void* font, const nlColour& colour, float x, float y, float width, float height, float depth, int align, bool drawBackground, bool clip);
-extern "C" void fn_802C9D84(bool drop);
-extern "C" void fn_802CA428(void* font, int x, int y, int colour, const char* str);
-extern "C" void fn_802C9E10();
 extern "C" void* fn_802B9A3C();
 extern "C" void fn_802B9A6C(void* display, TimeRegionData* data);
 extern "C" void fn_802B9A88(void* display);
@@ -149,9 +147,9 @@ void FrameCounter::DisplayFrameRate()
     unsigned long length = nlStrLen(str);
     fn_802BB11C(fn_802B77A0(), FrameBackgroundColour, 0.0f, 0.0f,
         (float)length, 1.0f, 0.0f, 0, true, true);
-    fn_802C9D84(false);
-    fn_802CA428(fn_802B77A0(), 0, 0, 0, str);
-    fn_802C9E10();
+    glFontBegin(false);
+    glFontPrint(fn_802B77A0(), (eGLView)0, 0, 0, str);
+    glFontEnd();
 }
 
 void FrameCounter::fn_802B7FD4()

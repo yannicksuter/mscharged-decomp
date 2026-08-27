@@ -1,10 +1,9 @@
 #include "NL/gl/glState.h"
 
+#include "NL/gl/gl.h"
 #include "NL/gl/glMatrix.h"
 
 extern "C" void* memcpy(void* dest, const void* src, unsigned long size);
-
-extern "C" u32 fn_802C8098(const char* name);
 
 class glRasterState
 {
@@ -278,7 +277,7 @@ u32 glGetTexture(const char* textureName)
         return 0xFFFFFFFFu;
     }
 
-    return fn_802C8098(textureName);
+    return glHash(textureName);
 }
 
 u32 glGetRasterState(unsigned long raster, eGLState state)

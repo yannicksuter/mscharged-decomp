@@ -20,6 +20,14 @@ block_relocations:
   - { source: 0x804EFFD0 }
   - { source: 0x804EFFD4 }
   - { source: 0x804EFFD8 }
+  - { source: 0x8052D1E0 }
+  - { source: 0x8052D1E4 }
+  - { source: 0x8052D258 }
+  - { source: 0x8052D49C }
+  - { source: 0x8052DC30 }
+  - { source: 0x8052DC34 }
+  - { source: 0x8052DC90 }
+  - { source: 0x8052DE80 }
 force_active:
   - __init_cpp_exceptions_reference
   - __destroy_global_chain_reference

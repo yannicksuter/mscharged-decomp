@@ -40,8 +40,27 @@ enum eGLView
     GLV_Num = 34,
 };
 
+enum eGLPrimitive
+{
+    GLP_TriList = 0,
+    GLP_TriStrip = 1,
+    GLP_TriFan = 2,
+    GLP_QuadList = 3,
+    GLP_LineList = 4,
+    GLP_LineStrip = 5,
+    GLP_Num = 6,
+};
+
+unsigned long glHash(const char* string);
+int glGetCurrentFrame();
+bool glHasQuads();
+void glBeginFrame();
 void glEndFrame();
 void glDiscardFrame(int count);
 void glSendFrame();
+void glFinish();
+unsigned long glGetNumTriangles(eGLPrimitive primitive, unsigned long count);
+float glGetOrthographicWidth();
+float glGetOrthographicHeight();
 
 #endif // NL_GL_GL_H
