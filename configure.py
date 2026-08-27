@@ -451,6 +451,7 @@ config.libs = [
             Object(Matching, "Game/Task/ParticleUpdateTask.cpp"),
             Object(Matching, "Game/FE/GameSceneManager.cpp"),
             Object(Matching, "Game/FE/BaseSceneHandler.cpp"),
+            Object(NonMatching, "Game/FE/tlSlide.cpp"),
             Object(Matching, "Game/SAnim/pnSAnimController.cpp", extra_cflags=["-inline deferred"]),
             Object(Matching, "Game/SAnim/pnBlender.cpp"),
             Object(Matching, "Game/SAnim/pnSingleAxisBlender.cpp"),
