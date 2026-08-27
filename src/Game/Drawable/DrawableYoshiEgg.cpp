@@ -42,7 +42,6 @@ extern "C"
     float fn_8002D194(int);
     void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
     float fn_801B5B30(const YoshiEggObject*);
-    void fn_80368374(nlMatrix4*, const DrawableYoshiEgg*, int);
 }
 
 static float gShadowScaleIn = 1.0f;
@@ -207,7 +206,7 @@ void DrawableYoshiEgg::Render(const YoshiEggObject* object) const
         return;
     }
 
-    fn_80368374(&matrix, this, 1);
+    nlQuatToMatrix(matrix, mOrientation, true);
 
     if (1.0f != mScale)
     {

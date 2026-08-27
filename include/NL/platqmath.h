@@ -40,6 +40,7 @@ f32 nlQuatDot(const nlQuaternion& q1, const nlQuaternion& q2);
 void nlMultQuat(nlQuaternion& out, const nlQuaternion& q1, const nlQuaternion& q2);
 void nlMatrixToQuat(nlQuaternion& out, const nlMatrix4& in);
 void nlQuatToMatrix(nlMatrix4& out, const nlQuaternion& quat);
+void nlQuatToMatrix(nlMatrix4& out, const nlQuaternion& quat, bool setRemainingRows);
 void nlQuatSlerp(nlQuaternion& out, const nlQuaternion& q1, const nlQuaternion& q2, float t);
 
 #endif // _PLATQMATH_H_

@@ -39,8 +39,6 @@ struct ThwompObjectFields
 extern "C"
 {
     void* fn_8027267C(int);
-    void fn_80368374(nlMatrix4*, const nlQuaternion*, int);
-    void fn_80368450(nlQuaternion*, const nlMatrix4*);
     void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
     const nlVector3* fn_801B327C(const ThwompObject*);
     float fn_801B3364(ThwompObject*);
@@ -172,7 +170,7 @@ void DrawableThwomp::Grab(const ThwompObject* object)
     mVisible = ((const ThwompObjectFields*)object)->mVisible;
     mPosition = *fn_801B327C(object);
     ((const ThwompObjectFields*)object)->mPhysics->GetRotation(&rotation);
-    fn_80368450(&mOrientation, &rotation);
+    nlMatrixToQuat(mOrientation, rotation);
 }
 
 void DrawableThwomp::Render(ThwompObject* object) const
@@ -218,7 +216,7 @@ void DrawableThwomp::Render(ThwompObject* object) const
         return;
     }
 
-    fn_80368374(&matrix, &mOrientation, 1);
+    nlQuatToMatrix(matrix, mOrientation, true);
     matrix.m41 = mPosition.x;
     matrix.m42 = mPosition.y;
     matrix.m43 = mPosition.z;

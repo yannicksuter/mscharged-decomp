@@ -1,6 +1,33 @@
 #ifndef NL_RING_H
 #define NL_RING_H
 
+template <typename T>
+inline void nlDeleteRing(T** head)
+{
+    T* next;
+    T* current;
+
+    T* headPtr = *head;
+    if (headPtr != 0)
+    {
+        current = headPtr->m_next;
+        for (;;)
+        {
+            next = current->m_next;
+            delete current;
+            if (current != *head)
+            {
+                current = next;
+            }
+            else
+            {
+                break;
+            }
+        }
+        *head = 0;
+    }
+}
+
 template <typename T, typename CallbackType>
 inline void nlWalkRing(T* head, CallbackType* callback, void (CallbackType::*callbackFunc)(T*))
 {

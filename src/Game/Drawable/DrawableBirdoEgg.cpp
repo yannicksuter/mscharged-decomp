@@ -43,7 +43,6 @@ extern "C"
     float fn_8002D194(int);
     void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
     float fn_8019A574(const BirdoEggObject*);
-    void fn_80368374(nlMatrix4*, const DrawableBirdoEgg*, int);
 }
 
 static float gShadowScaleIn = 0.125f;
@@ -208,7 +207,7 @@ void DrawableBirdoEgg::Render(const BirdoEggObject* object) const
         return;
     }
 
-    fn_80368374(&matrix, this, 1);
+    nlQuatToMatrix(matrix, mOrientation, true);
 
     if (1.0f != mScale)
     {
