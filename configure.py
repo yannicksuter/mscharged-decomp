@@ -401,6 +401,7 @@ config.libs = [
             Object(Matching, "NL/nlTextEscape.cpp", cflags=[*cflags_game_deferred, "-sym on"]),
             Object(Matching, "Game/Sys/clock.cpp"),
             Object(Matching, "NL/nlTimer.cpp"),
+            Object(NonMatching, "Game/Debug/FrameCounter.cpp"),
             Object(Matching, "NL/nlEndian.cpp"),
             Object(Matching, "NL/gl/glStat.cpp"),
             Object(Matching, "NL/gl/glState.cpp"),

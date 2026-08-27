@@ -371,6 +371,15 @@ NL/nlTimer.cpp:
 	.text       start:0x802B75BC end:0x802B7798
 	.sdata2     start:0x806E6160 end:0x806E6178
 
+Game/Debug/FrameCounter.cpp:
+	.text       start:0x802B7BDC end:0x802B94B4
+	.ctors      start:0x804DB990 end:0x804DB994
+	.data       start:0x8052B560 end:0x8052B590
+	.bss        start:0x8057C0F0 end:0x8057C108
+	.sdata      start:0x806DF258 end:0x806DF290
+	.sbss       start:0x806E1DC0 end:0x806E1DC8
+	.sdata2     start:0x806E6180 end:0x806E61F0
+
 Game/Task/SmokeTestUpdateTask.cpp:
 	.text       start:0x802BD4E4 end:0x802BD814
 	.ctors      start:0x804DB9A0 end:0x804DB9A4
