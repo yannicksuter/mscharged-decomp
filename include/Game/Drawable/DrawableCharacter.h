@@ -6,9 +6,9 @@
 struct Character;
 struct EffectsTexturing;
 struct Model;
-struct PoseAccumulator;
 struct PoseNode;
-struct SkinAnimatedMovableNpc;
+class cPoseAccumulator;
+class SkinAnimatedMovableNPC;
 
 struct ResolvedTexture
 {
@@ -31,13 +31,13 @@ public:
     void Free();
     void* GetAnimController() const;
     void Grab(Character&);
-    static void HeadTrackCallback(u32, u32, PoseAccumulator*, u32, int);
-    void BuildNodeMatrices(PoseAccumulator*);
+    static void HeadTrackCallback(u32, u32, cPoseAccumulator*, u32, int);
+    void BuildNodeMatrices(cPoseAccumulator*);
     void BuildNpcMatrix();
     void Render(Character&);
     void SendToGl(Character&, int);
-    void Grab(SkinAnimatedMovableNpc&);
-    void Render(SkinAnimatedMovableNpc&);
+    void Grab(SkinAnimatedMovableNPC&);
+    void Render(SkinAnimatedMovableNPC&);
     void Blend(float*, DrawableCharacter&, DrawableCharacter&);
     void EvaluateFrom(PoseNode&, const nlVector3&, u16, float);
     nlVector3 GetBallPosition() const;
@@ -75,7 +75,7 @@ public:
     float shadowLevel;
     nlVector3 velocity;
     void* object;
-    PoseAccumulator* poseAccumulator;
+    cPoseAccumulator* poseAccumulator;
     EffectsTexturing* effectsTexturing;
     Character* character;
     nlVector4 megaBasis;

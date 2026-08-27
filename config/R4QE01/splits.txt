@@ -271,6 +271,11 @@ Game/Drawable/DrawableYoshiEgg.cpp:
 	.sdata      start:0x806DCC28 end:0x806DCC40
 	.sdata2     start:0x806E4CB0 end:0x806E4CD0
 
+Game/Render/ChainChomp.cpp:
+	.text       start:0x8019CAC8 end:0x8019CE78
+	.sdata      start:0x806DCD94 end:0x806DCD9C
+	.sdata2     start:0x806E4F6C end:0x806E4F84
+
 Game/FE/GameSceneManager.cpp:
 	.text       start:0x801C6174 end:0x801C620C
 	.data       start:0x805170A8 end:0x805170C0

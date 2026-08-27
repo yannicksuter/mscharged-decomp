@@ -67,6 +67,12 @@ public:
     /* 0x374 */ TweakValue_804F4DC8 fBobombBigChance;
     /* 0x384 */ TweakValue_804F4DC8 fBobombFiveChance;
     /* 0x394 */ TweakValue_804F4DC8 fBobombThreeChance;
+
+private:
+    /* 0x3A4 */ u8 mUnidentified3A4[0x1A0];
+
+public:
+    /* 0x544 */ TweakValue_804F4DC8 fChainChompRadius;
 };
 
 struct unk_8056CF08

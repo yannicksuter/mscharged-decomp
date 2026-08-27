@@ -429,6 +429,7 @@ config.libs = [
             Object(NonMatching, "Game/Drawable/DrawableKoopaShell.cpp"),
             Object(Matching, "Game/Drawable/DrawablePowerup.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableThwomp.cpp"),
+            Object(NonMatching, "Game/Render/ChainChomp.cpp"),
             Object(NonMatching, "Game/Render/NetMesh.cpp"),
             Object(Matching, "Game/NetMeshEdge.cpp"),
             Object(NonMatching, "Game/NetMeshModelLoader.cpp"),

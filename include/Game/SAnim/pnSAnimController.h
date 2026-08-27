@@ -55,6 +55,11 @@ public:
     bool TestFrameTrigger(float frame);
     int RemapNode(int nodeIndex) const;
 
+    inline const float get_fTime() const
+    {
+        return m_fTime;
+    }
+
     cSAnim* m_pSAnim;
     float m_fTime;
     const AnimRetarget* m_pAnimRetarget;

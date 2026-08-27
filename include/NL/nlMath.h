@@ -426,7 +426,10 @@ public:
         e2[row][3] = w;
     }
 
-    nlVector3& GetTranslation() const;
+    inline nlVector3& GetTranslation() const
+    {
+        return *(nlVector3*)&e2[3][0];
+    }
     void SetTranslation(const nlVector3& trans);
 
     inline nlVector4 operator*(const nlVector4& v_in) const
