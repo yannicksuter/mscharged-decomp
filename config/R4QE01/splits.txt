@@ -452,6 +452,15 @@ NL/gl/glStruct.cpp:
 	.text       start:0x802CD778 end:0x802CD7A0
 	.bss        start:0x8057F1F8 end:0x8057F220
 
+NL/gl/glTarget.cpp:
+	.text       start:0x802CD7A0 end:0x802CDC34
+	.ctors      start:0x804DB9E8 end:0x804DB9EC
+	.data       start:0x8052E410 end:0x8052E450
+	.bss        start:0x8057F220 end:0x8057F240
+	.sdata      start:0x806DF3F8 end:0x806DF400
+	.sbss       start:0x806E1F00 end:0x806E1F08
+	.sbss2      start:0x806E7BC0 end:0x806E7BC8
+
 NL/gl/glView.cpp:
 	.text       start:0x802CEF1C end:0x802D0458
 	.ctors      start:0x804DB9F0 end:0x804DB9F4

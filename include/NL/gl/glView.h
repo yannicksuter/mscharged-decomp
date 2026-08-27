@@ -2,6 +2,7 @@
 #define NL_GL_GLVIEW_H
 
 #include "NL/gl/glModel.h"
+#include "NL/gl/glTarget.h"
 #include "NL/nlList.h"
 #include "NL/nlMath.h"
 
@@ -20,12 +21,6 @@ enum GLViewSortMode
     GLViewSort_None = 3,
     GLViewSort_Reverse = 4,
     GLViewSort_Count = 5
-};
-
-struct GLRenderPair
-{
-    unsigned long hash;
-    void* target;
 };
 
 class GLViewInterface

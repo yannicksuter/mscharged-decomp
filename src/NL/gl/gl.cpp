@@ -6,12 +6,12 @@
 #include "NL/gl/glStat.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glStruct.h"
+#include "NL/gl/glTarget.h"
 #include "NL/gl/glView.h"
 #include "NL/nlString.h"
 
 extern "C" void fn_802A0A14();
 extern "C" void fn_802CBEC8();
-extern "C" void fn_802CD7A0();
 extern "C" void fn_802CEC68();
 extern "C" void fn_802CEF18();
 extern "C" unsigned long fn_80369D5C();
@@ -50,7 +50,7 @@ extern "C" bool fn_802C7FD0(void (*startupCallback)())
     glSetTextureStateDefaults();
     glSetCurrentTextureState(glHandleizeTextureState());
     gl_MatrixStartup();
-    fn_802CD7A0();
+    gl_TargetStartup();
     fn_802CEF18();
 
     if (!glplatPostStartup())

@@ -11,8 +11,6 @@ extern "C" void fn_802CCD1C(
     void*, GLView*, GLViewPacketCallback);
 extern "C" void fn_802CCD3C(void*, const glModelPacket*, unsigned long);
 
-extern "C" GLRenderPair fn_802CD82C();
-
 class PacketCallbackManager
 {
 public:
