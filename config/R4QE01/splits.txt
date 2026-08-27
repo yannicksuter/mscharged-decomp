@@ -782,6 +782,75 @@ NL/glx/glxDisplayList.cpp:
 MSL/float.c:
 	.sdata      start:0x806DFB58 end:0x806DFB68
 
+RVL_SDK/thp/THPSimple.c:
+	.text       start:0x803713EC end:0x80372980
+
+MetroTRK/mainloop.c:
+	.text       start:0x80376F3C end:0x80377034
+
+MetroTRK/nubevent.c:
+	.text       start:0x80377034 end:0x8037725C
+
+MetroTRK/nubinit.c:
+	.text       start:0x8037725C end:0x803773E0
+
+MetroTRK/msg.c:
+	.text       start:0x803773E0 end:0x803774FC
+
+MetroTRK/msgbuf.c:
+	.text       start:0x803774FC end:0x80377C50
+
+MetroTRK/serpoll.c:
+	.text       start:0x80377C50 end:0x80377DF4
+
+MetroTRK/usr_put.c:
+	.text       start:0x80377DF4 end:0x80377E80
+
+MetroTRK/dispatch.c:
+	.text       start:0x80377E80 end:0x80377FC8
+
+MetroTRK/mutex_TRK.c:
+	.text       start:0x80379758 end:0x80379770
+
+MetroTRK/flush_cache.c:
+	.text       start:0x80379808 end:0x80379840
+
+MetroTRK/mem_TRK.c:
+	.text       start:0x80379840 end:0x80379924
+
+MetroTRK/targimpl.c:
+	.text       start:0x80379924 end:0x8037B330
+
+MetroTRK/targsupp.c:
+	.text       start:0x8037B330 end:0x8037B350
+
+MetroTRK/mpc_7xx_603e.c:
+	.text       start:0x8037B350 end:0x8037B820
+
+MetroTRK/mslsupp.c:
+	.text       start:0x8037B820 end:0x8037BD00
+
+MetroTRK/dolphin_trk.c:
+	.text       start:0x8037BD00 end:0x8037C060
+
+MetroTRK/dolphin_trk_glue.c:
+	.text       start:0x8037C060 end:0x8037C520
+
+MetroTRK/targcont.c:
+	.text       start:0x8037C520 end:0x8037C570
+
+MetroTRK/cc_udp.c:
+	.text       start:0x8037C570 end:0x8037C5B8
+
+MetroTRK/cc_gdev.c:
+	.text       start:0x8037C5B8 end:0x8037C82C
+
+MetroTRK/CircleBuffer.c:
+	.text       start:0x8037C82C end:0x8037CAE0
+
+MetroTRK/MWCriticalSection.c:
+	.text       start:0x8037CAE0 end:0x8037CB38
+
 MSL/math_sun.c:
 	extab       start:0x80006738 end:0x80006740
 	extabindex  start:0x80006E84 end:0x80006E90
@@ -1136,6 +1205,10 @@ RVL_SDK/mem/mem_allocator.c:
 
 RVL_SDK/mem/mem_list.c:
 	.text       start:0x803AE32C end:0x803AE440
+
+RVL_SDK/mix/mix.c:
+	.text       start:0x803AE440 end:0x803B1A30
+	.data       start:0x8053C218 end:0x8053CDA8
 
 RVL_SDK/mtx/mtx.c:
 	.text       start:0x803B1A30 end:0x803B20BC
@@ -1704,6 +1777,57 @@ RVL_SDK/so/soCommon.c:
 RVL_SDK/so/soBasic.c:
 	.text       start:0x804154A0 end:0x80415574
 
+RVL_SDK/so/SOInformation.c:
+	.text       start:0x804164F4 end:0x804169F4
+
+RVL_SDK/so/SOOption.c:
+	.text       start:0x804169F4 end:0x80416DD8
+
+RVL_SDK/nhttp/NHTTP_bgnend.c:
+	.text       start:0x80416DD8 end:0x80417138
+
+RVL_SDK/nhttp/NHTTP_control.c:
+	.text       start:0x80417138 end:0x80417448
+
+RVL_SDK/nhttp/NHTTP_list.c:
+	.text       start:0x80417448 end:0x80417698
+
+RVL_SDK/nhttp/NHTTP_os_RVL.c:
+	.text       start:0x80417698 end:0x804178BC
+
+RVL_SDK/nhttp/NHTTP_recvbuf.c:
+	.text       start:0x804178BC end:0x80417F58
+
+RVL_SDK/nhttp/NHTTP_request.c:
+	.text       start:0x80417F58 end:0x80418924
+
+RVL_SDK/nhttp/NHTTP_response.c:
+	.text       start:0x80418924 end:0x80418B24
+
+RVL_SDK/nhttp/NHTTP_socket_RVL.c:
+	.text       start:0x80418B24 end:0x80419380
+
+RVL_SDK/nhttp/NHTTP_stdlib_RVL.c:
+	.text       start:0x80419380 end:0x80419CF4
+
+RVL_SDK/nhttp/NHTTP_thread.c:
+	.text       start:0x80419CF4 end:0x8041DDBC
+
+RVL_SDK/nhttp/d_nhttp_private.c:
+	.text       start:0x8041DDBC end:0x8041E0CC
+
+RVL_SDK/nhttp/d_nhttp.c:
+	.text       start:0x8041E0CC end:0x8041EAFC
+
+RVL_SDK/nhttp/d_nhttp_common.c:
+	.text       start:0x8041EAFC end:0x8041F1C0
+
+RVL_SDK/ssl/ssl_api.c:
+	.text       start:0x8041F1C0 end:0x8041FEA8
+
+RVL_SDK/ssl/ssl_mutex.c:
+	.text       start:0x8041FEA8 end:0x8041FEB4
+
 RVL_SDK/vf/pf_clib.c:
 	.text       start:0x8041FEB4 end:0x804201B4
 
@@ -2150,10 +2274,28 @@ RVL_SDK/hbm/nw4hbm/ut/ut_TextWriterBase.cpp:
 	.text       start:0x80480088 end:0x80488D6C
 	.ctors      start:0x804DBBB0 end:0x804DBBB4
 
+RVL_SDK/dwc/dwc_base64.c:
+	.text       start:0x80488D6C end:0x804890D4
+
 RVL_SDK/dwc/dwc_error.c:
 	.text       start:0x804890D4 end:0x804891C8
 	.data       start:0x80561C30 end:0x80561C78
 	.sbss       start:0x806E2EA8 end:0x806E2EB0
+
+RVL_SDK/dwc/dwc_init.c:
+	.text       start:0x804891C8 end:0x80489510
+
+RVL_SDK/dwc/dwc_memfunc.c:
+	.text       start:0x80489510 end:0x8048975C
+
+RVL_SDK/dwc/dwc_report.c:
+	.text       start:0x8048975C end:0x80489A8C
+
+RVL_SDK/dwc/dwc_nonport.c:
+	.text       start:0x8049BB0C end:0x8049D180
+
+RVL_SDK/dwc/dwc_auth_interface.c:
+	.text       start:0x8049EDC0 end:0x804A0B5C
 
 RVL_SDK/gamespy/darray.c:
 	.text       start:0x804A2508 end:0x804A2F5C
