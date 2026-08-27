@@ -1,5 +1,6 @@
 #include "NL/glx/glxSwap.h"
 
+#include "NL/gl/glPlat.h"
 #include "NL/glx/glxGX.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlEndian.h"
@@ -35,8 +36,6 @@ extern "C"
     void GXCopyDisp(void* dest, u8 clear);
     void nlBreak__Fv();
 
-    // Clears one external framebuffer; owned by the still-unsplit platform TU.
-    void fn_803693C4(void* fb);
     // View/token name lookups owned by an unsplit debug TU.
     void VIWaitForRetrace();
     void* fn_80364020();
@@ -268,8 +267,8 @@ static void loading_indicator()
         nFirstFrame--;
         if (nFirstFrame == 0)
         {
-            fn_803693C4(glx_FrameBuffer[0]);
-            fn_803693C4(glx_FrameBuffer[1]);
+            glx_ClearXFB(glx_FrameBuffer[0]);
+            glx_ClearXFB(glx_FrameBuffer[1]);
             VISetBlack(0);
             VIFlush();
         }
@@ -324,7 +323,7 @@ void glxInitSwap(void* fb0, void* fb1)
     VISetPostRetraceCallback(vi_post_cb);
 }
 
-void glxSwapPost()
+void glxSwapPost(bool)
 {
     if (glx_bLoadingIndicator == 0)
     {
@@ -332,7 +331,7 @@ void glxSwapPost()
     }
 }
 
-void glxSwapPre()
+void glxSwapPre(bool)
 {
     if (glx_bLoadingIndicator == 0)
     {

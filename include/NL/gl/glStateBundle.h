@@ -7,7 +7,7 @@ struct glStateBundle
 {
     /* 0x00 */ unsigned long long texturestate;
     /* 0x08 */ unsigned long raster;
-    /* 0x0C */ unsigned long program;
+    /* 0x0C */ unsigned long matrix;
     /* 0x10 */ unsigned long texture[6];
     /* 0x28 */ unsigned char texconfig;
     /* 0x2C */ unsigned long userStateKey;

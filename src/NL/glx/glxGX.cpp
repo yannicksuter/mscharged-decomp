@@ -1,5 +1,7 @@
 #include "NL/glx/glxGX.h"
 
+#include "NL/gl/glPlat.h"
+
 // R4QE01 links the Revolution SDK GX library as automatic objects. Its entry
 // points are declared here rather than through <revolution/gx.h> because that
 // header's <revolution/types.h> and the game's own "types.h" spell the
@@ -10,23 +12,6 @@ struct GXColor
     u8 g;
     u8 b;
     u8 a;
-};
-
-struct GXRenderModeObj
-{
-    u32 tvInfo;
-    u16 fbWidth;
-    u16 efbHeight;
-    u16 xfbHeight;
-    u16 viXOrigin;
-    u16 viYOrigin;
-    u16 viWidth;
-    u16 viHeight;
-    u32 xfbMode;
-    u8 field_rendering;
-    u8 aa;
-    u8 sample_pattern[12][2];
-    u8 vfilter[7];
 };
 
 extern "C"
@@ -59,9 +44,6 @@ extern "C"
     void GXSetCurrentMtx(u32 id);
     void GXSetScissorBoxOffset(s32 x_off, s32 y_off);
 
-    // Owned by the still-unsplit platform translation unit that starts the
-    // video mode; only its GXRenderModeObj layout is established here.
-    extern GXRenderModeObj lbl_80589DA8;
 }
 
 enum
@@ -234,7 +216,7 @@ void gxInit()
         GXSetTevSwapMode(stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     }
 
-    GXSetCopyFilter(lbl_80589DA8.aa, lbl_80589DA8.sample_pattern, 1, lbl_80589DA8.vfilter);
+    GXSetCopyFilter(glx_rmode.aa, glx_rmode.sample_pattern, 1, glx_rmode.vfilter);
 
     GXSetCoPlanar(0);
     gx_coplanar = false;

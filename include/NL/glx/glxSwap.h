@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-void glxSwapPost();
-void glxSwapPre();
+void glxSwapPost(bool send);
+void glxSwapPre(bool send);
 void glxInitSwap(void* fb0, void* fb1);
 void glxSwapWaitDrawDone();
 void glxSwapBuffers();

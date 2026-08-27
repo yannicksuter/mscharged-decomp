@@ -74,8 +74,8 @@ u32 glGetCurrentRasterState();
 u32 glSetCurrentRasterState(unsigned long raster);
 unsigned long long glGetCurrentTextureState();
 unsigned long long glSetCurrentTextureState(unsigned long long state);
-u32 glGetCurrentProgram();
-u32 glSetCurrentProgram(unsigned long program);
+u32 glGetCurrentMatrix();
+u32 glSetCurrentMatrix(unsigned long matrix);
 
 u32 glGetRasterState(unsigned long raster, eGLState state);
 u32 glSetRasterState(u32& raster, eGLState state, unsigned long value);

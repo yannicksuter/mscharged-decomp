@@ -54,6 +54,11 @@ public:
     {
         delete entry;
     }
+
+    void Free(T* entry)
+    {
+        delete entry;
+    }
 };
 
 template <typename EntryT, typename ContainerT>

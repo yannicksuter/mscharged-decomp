@@ -417,6 +417,24 @@ NL/nlBundleFile.cpp:
 	.text       start:0x802BDB70 end:0x802BE64C
 	.data       start:0x8052BA40 end:0x8052BA70
 
+NL/gl/gl.cpp:
+	.text       start:0x802C7FD0 end:0x802C8290
+	.sbss       start:0x806E1EA0 end:0x806E1EAC
+	.sdata2     start:0x806E62E8 end:0x806E62F0
+
+NL/gl/glFont.cpp:
+	.text       start:0x802C9A0C end:0x802CA770
+	.ctors      start:0x804DB9DC end:0x804DB9E0
+	.data       start:0x8052C018 end:0x8052E220
+	.bss        start:0x8057C798 end:0x8057F1A8
+	.sdata      start:0x806DF3D0 end:0x806DF3F0
+	.sbss       start:0x806E1EB8 end:0x806E1ED0
+	.sdata2     start:0x806E6310 end:0x806E632C
+
+NL/gl/glMatrix.cpp:
+	.text       start:0x802CBE10 end:0x802CBEC4
+	.sdata      start:0x806DF3F0 end:0x806DF3F4
+
 NL/gl/glModel.cpp:
 	.text       start:0x802CC0EC end:0x802CC370
 
@@ -433,6 +451,23 @@ NL/gl/glState.cpp:
 NL/gl/glStruct.cpp:
 	.text       start:0x802CD778 end:0x802CD7A0
 	.bss        start:0x8057F1F8 end:0x8057F220
+
+NL/gl/glTarget.cpp:
+	.text       start:0x802CD7A0 end:0x802CDC34
+	.ctors      start:0x804DB9E8 end:0x804DB9EC
+	.data       start:0x8052E410 end:0x8052E450
+	.bss        start:0x8057F220 end:0x8057F240
+	.sdata      start:0x806DF3F8 end:0x806DF400
+	.sbss       start:0x806E1F00 end:0x806E1F08
+	.sbss2      start:0x806E7BC0 end:0x806E7BC8
+
+NL/gl/glView.cpp:
+	.text       start:0x802CEF1C end:0x802D0458
+	.ctors      start:0x804DB9F0 end:0x804DB9F4
+	.data       start:0x8052E4E8 end:0x8052E5C0
+	.bss        start:0x8057F240 end:0x8057F2A8
+	.sdata      start:0x806DF400 end:0x806DF408
+	.sbss       start:0x806E1F38 end:0x806E1F40
 
 Game/GL/GLInventory.cpp:
 	.text       start:0x802D0864 end:0x802D2B2C
@@ -676,6 +711,22 @@ ode/NLGAdditions.cpp:
 	.text       start:0x80358E7C end:0x8035952C
 	.data       start:0x80534738 end:0x80534750
 	.sdata2     start:0x806E6B88 end:0x806E6BA0
+
+NL/plat/platvmath.cpp:
+	.text       start:0x80368784 end:0x80368E00
+	.sdata2     start:0x806E6D08 end:0x806E6D14
+
+NL/gc/gcSwizzler.cpp:
+	.text       start:0x80368E64 end:0x80369394
+
+NL/gl/glPlat.cpp:
+	.text       start:0x80369394 end:0x80369E5C
+	.ctors      start:0x804DBB48 end:0x804DBB4C
+	.data       start:0x805352E8 end:0x805353B8
+	.bss        start:0x80589DA8 end:0x80589DF8
+	.sdata      start:0x806DFA60 end:0x806DFA78
+	.sbss       start:0x806E22E0 end:0x806E2300
+	.sdata2     start:0x806E6D18 end:0x806E6D30
 
 NL/glx/glxGX.cpp:
 	.text       start:0x8036C23C end:0x8036CE48

@@ -145,4 +145,76 @@ private:
     };
 };
 
+template <typename ReturnType, typename P1, typename P2>
+class Function2
+{
+public:
+    struct FunctorBase
+    {
+        virtual ~FunctorBase() { }
+        virtual ReturnType operator()(P1, P2) = 0;
+        virtual FunctorBase* Clone() const = 0;
+    };
+
+    Function2()
+        : mTag(FUNCTION_EMPTY)
+    {
+    }
+
+    Function2(ReturnType (*function)(P1, P2))
+        : mTag(FUNCTION_FREE)
+        , mFreeFunction(function)
+    {
+    }
+
+    Function2(const Function2& other)
+        : mTag(other.mTag)
+    {
+        if (mTag == FUNCTION_FREE)
+        {
+            mFreeFunction = other.mFreeFunction;
+        }
+        else if (mTag == FUNCTION_FUNCTOR)
+        {
+            mFunctor = other.mFunctor->Clone();
+        }
+    }
+
+    ~Function2()
+    {
+        Clear();
+    }
+
+    void Clear()
+    {
+        if (mTag == FUNCTION_FUNCTOR)
+        {
+            delete mFunctor;
+        }
+        mTag = FUNCTION_EMPTY;
+    }
+
+    operator bool() const
+    {
+        return mTag != FUNCTION_EMPTY;
+    }
+
+    ReturnType operator()(P1 p0, P2 p1) const
+    {
+        if (mTag == FUNCTION_FREE)
+        {
+            return mFreeFunction(p0, p1);
+        }
+        return (*mFunctor)(p0, p1);
+    }
+
+private:
+    FunctionTag mTag;
+    union
+    {
+        ReturnType (*mFreeFunction)(P1, P2);
+        FunctorBase* mFunctor;
+    };
+};
+
 #endif // NL_FUNCTION_H

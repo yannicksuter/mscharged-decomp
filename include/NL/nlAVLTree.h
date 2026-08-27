@@ -137,7 +137,7 @@ public:
     static void DeleteEntry(AVLTreeUntemplated* tree, AVLTreeNode* entry)
     {
         AVLTreeBase* self = (AVLTreeBase*)tree;
-        self->m_Allocator.DeleteEntry((Entry*)entry);
+        self->m_Allocator.Free((Entry*)entry);
     }
 
     virtual int CompareNodes(AVLTreeNode* node1, AVLTreeNode* node2)

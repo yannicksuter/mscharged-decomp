@@ -85,11 +85,16 @@ public:
         new (out) T;
     }
 
-    void DeleteEntry(T* entry)
+    void Free(T* entry)
     {
         SlotPoolEntry* e = (SlotPoolEntry*)entry;
         e->next = m_FreeList;
         m_FreeList = e;
+    }
+
+    void DeleteEntry(T* entry)
+    {
+        Free(entry);
     }
 };
 
