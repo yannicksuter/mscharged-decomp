@@ -1,30 +1,13 @@
 #include "NL/nlConfig.h"
 
 #include "Game/Sys/simpleparser.h"
+#include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 #include "ctype.h"
 #include "cstring"
 
 extern "C" double atof(const char* string);
 extern "C" void fn_8004F594(int category, const char* format, ...);
-extern "C" void* fn_802B37A0(
-    const char* filename,
-    unsigned long* size,
-    unsigned int alignment,
-    int allocateWhere,
-    void*,
-    void*,
-    void*);
-extern "C" bool fn_802B396C(
-    const char* filename,
-    void (*callback)(void*, unsigned long, void*),
-    void* userData,
-    unsigned int alignment,
-    int allocateWhere,
-    void*,
-    void*,
-    void*);
-
 typedef Config::String BString;
 
 static char sBoolTrue[] = "true";
@@ -234,7 +217,7 @@ void Config::LoadFromFile(const char* filename)
     fn_8004F594(0x13, "reading config file: %s\n", filename);
 
     unsigned long size = 0;
-    void* loaded = fn_802B37A0(filename, &size, 0x20, 1, 0, 0, 0);
+    void* loaded = nlLoadEntireFile(filename, &size, 0x20, AllocateEnd, 0, 0, 0);
     char* buffer;
     if (loaded != 0)
     {
@@ -259,7 +242,7 @@ void Config::LoadFromFileAsync(const char* filename, const Function1<void, Confi
 {
     void* storage = nlMalloc(sizeof(ConfigLoadCallback), 8, true);
     ConfigLoadCallback* data = ::new (storage) ConfigLoadCallback(this, callback);
-    fn_802B396C(filename, ConfigLoadComplete, data, 0x20, 1, 0, 0, 0);
+    nlLoadEntireFileAsync(filename, ConfigLoadComplete, data, 0x20, AllocateEnd, 0, 0, 0);
 }
 
 static void ConfigLoadComplete(void* buffer, unsigned long size, void* userData)

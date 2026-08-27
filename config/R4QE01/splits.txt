@@ -334,6 +334,15 @@ NL/nlConfig.cpp:
 	.sbss       start:0x806E1D80 end:0x806E1D88
 	.sdata2     start:0x806E60A8 end:0x806E60B0
 
+NL/nlDebugFile.cpp:
+	.text       start:0x802B18E8 end:0x802B1A30
+	.sdata      start:0x806DF228 end:0x806DF238
+	.sbss       start:0x806E1D88 end:0x806E1D90
+
+NL/nlFile.cpp:
+	.text       start:0x802B36B8 end:0x802B3B38
+	.data       start:0x8052B538 end:0x8052B54C
+
 NL/nlSlotPool.cpp:
 	.text       start:0x802B4514 end:0x802B4834
 

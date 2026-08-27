@@ -41,7 +41,7 @@ public:
         LangEnd = 11,
     };
 
-    unsigned char Load(nlLanguage Language, bool ingameloc, void* queue);
+    unsigned char Load(nlLanguage Language, bool ingameloc, void* allocator);
     static void Initialize();
 
     LOCHeader* m_pFile;

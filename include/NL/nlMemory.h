@@ -12,6 +12,11 @@ void* nlMalloc(unsigned long size);
 void* nlMalloc(unsigned long size, unsigned int alignment, bool fromEnd);
 void nlFree(void* ptr);
 
+inline void* operator new(unsigned long size, unsigned int alignment, bool fromEnd)
+{
+    return nlMalloc(size, alignment, fromEnd);
+}
+
 void nlInitMemory();
 extern u8 gMemoryInitialized;
 

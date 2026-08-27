@@ -389,6 +389,8 @@ config.libs = [
             Object(Matching, "Game/Sys/simpleparser.cpp"),
             Object(NonMatching, "NL/MemAlloc.cpp"),
             Object(NonMatching, "NL/nlConfig.cpp"),
+            Object(Matching, "NL/nlDebugFile.cpp"),
+            Object(Matching, "NL/nlFile.cpp"),
             Object(Matching, "NL/nlSlotPool.cpp"),
             Object(Matching, "NL/nlStringSupport.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "NL/nlTask.cpp"),
