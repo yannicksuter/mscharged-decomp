@@ -409,6 +409,7 @@ config.libs = [
             Object(Matching, "NL/gl/glStruct.cpp"),
             Object(Matching, "NL/gl/glModel.cpp"),
             Object(Matching, "NL/plat/platvmath.cpp"),
+            Object(Matching, "NL/gc/gcSwizzler.cpp"),
             Object(NonMatching, "NL/gl/glPlat.cpp"),
             Object(NonMatching, "Game/GL/GLInventory.cpp", extra_cflags=["-inline depth=3"]),
             Object(Matching, "NL/glx/glxGX.cpp"),

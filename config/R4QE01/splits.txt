@@ -685,6 +685,9 @@ NL/plat/platvmath.cpp:
 	.text       start:0x80368784 end:0x80368E00
 	.sdata2     start:0x806E6D08 end:0x806E6D14
 
+NL/gc/gcSwizzler.cpp:
+	.text       start:0x80368E64 end:0x80369394
+
 NL/gl/glPlat.cpp:
 	.text       start:0x80369394 end:0x80369E5C
 	.ctors      start:0x804DBB48 end:0x804DBB4C
