@@ -361,6 +361,7 @@ config.libs = [
         "objects": [
             Object(Matching, "Game/AI/AiUtil.cpp"),
             Object(Matching, "Game/AnimInventory.cpp", extra_cflags=["-ipa file"]),
+            Object(NonMatching, "Game/Ball.cpp"),
             Object(NonMatching, "Game/Character.cpp", extra_cflags=["-inline deferred"]),
             Object(NonMatching, "Game/AI/Fielder.cpp"),
             Object(Matching, "Game/AI/FilteredRandom.cpp", cflags=cflags_game_deferred),
@@ -403,6 +404,7 @@ config.libs = [
             Object(Matching, "NL/nlTimer.cpp"),
             Object(NonMatching, "Game/Debug/FrameCounter.cpp"),
             Object(Matching, "NL/nlEndian.cpp"),
+            Object(Matching, "NL/gl/glDraw3.cpp"),
             Object(Matching, "NL/gl/glFont.cpp"),
             Object(Matching, "NL/gl/glMatrix.cpp"),
             Object(Matching, "NL/gl/glStat.cpp"),

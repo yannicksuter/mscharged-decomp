@@ -24,6 +24,11 @@ Game/AnimInventory.cpp:
 	.data       start:0x804F42A0 end:0x804F4330
 	.sbss       start:0x806E0B90 end:0x806E0B98
 
+Game/Ball.cpp:
+	.text       start:0x80014EE8 end:0x80015068
+	.sdata      start:0x806DB514 end:0x806DB518 align:4
+	.sdata2     start:0x806E31B4 end:0x806E31BC align:4
+
 Game/Character.cpp:
 	.text       start:0x8001BA0C end:0x80025E9C
 	.ctors      start:0x804DB4FC end:0x804DB500
@@ -426,6 +431,11 @@ NL/gl/gl.cpp:
 	.text       start:0x802C7FD0 end:0x802C8290
 	.sbss       start:0x806E1EA0 end:0x806E1EAC
 	.sdata2     start:0x806E62E8 end:0x806E62F0
+
+NL/gl/glDraw3.cpp:
+	.text       start:0x802C9254 end:0x802C99EC
+	.data       start:0x8052C008 end:0x8052C018
+	.sdata2     start:0x806E6300 end:0x806E6310
 
 NL/gl/glFont.cpp:
 	.text       start:0x802C9A0C end:0x802CA770

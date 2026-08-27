@@ -1,7 +1,8 @@
 #include "Game/AI/Powerups.h"
+#include "NL/gl/glDraw3.h"
 #include "NL/gl/glModel.h"
-#include "NL/nlMath.h"
 #include "NL/gl/glState.h"
+#include "NL/nlMath.h"
 #include "NL/nlString.h"
 
 struct UnidentifiedStaticState
@@ -24,24 +25,6 @@ struct UnidentifiedStaticTag;
 
 template <typename T>
 UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
-
-class nlColour
-{
-public:
-    union
-    {
-        u8 rgba[4];
-        u32 packed;
-    };
-};
-
-class glQuad3
-{
-public:
-    nlVector3 mPos[4];
-    nlVector2 mUV[4];
-    nlColour mColour[4];
-};
 
 class DrawablePowerup
 {
@@ -88,7 +71,6 @@ extern "C" void fn_802B549C(nlQuaternion*, u16);
 extern "C" void fn_80368374(nlMatrix4*, const nlQuaternion*, bool);
 extern "C" void fn_801869AC(void*, void*, int, int, const DrawablePowerup*, float);
 extern "C" u32 fn_8027262C();
-extern "C" bool fn_802C9664(glQuad3*, u32, int);
 
 u8 sDrawPowerupShadows = 1;
 u8 sUseModelPowerupShadows = 1;
@@ -170,27 +152,27 @@ static void DrawShadow(float radius, float x, float y, float z)
     float maxX = position.x + shadowRadius;
 
     glQuad3 quad;
-    quad.mPos[0].x = minX;
-    quad.mPos[0].y = minY;
-    quad.mPos[0].z = position.z;
-    quad.mPos[1].x = minX;
-    quad.mPos[1].y = maxY;
-    quad.mPos[1].z = position.z;
-    quad.mPos[2].x = maxX;
-    quad.mPos[2].y = maxY;
-    quad.mPos[2].z = position.z;
-    quad.mPos[3].x = maxX;
-    quad.mPos[3].y = minY;
-    quad.mPos[3].z = position.z;
+    quad.m_pos[0].x = minX;
+    quad.m_pos[0].y = minY;
+    quad.m_pos[0].z = position.z;
+    quad.m_pos[1].x = minX;
+    quad.m_pos[1].y = maxY;
+    quad.m_pos[1].z = position.z;
+    quad.m_pos[2].x = maxX;
+    quad.m_pos[2].y = maxY;
+    quad.m_pos[2].z = position.z;
+    quad.m_pos[3].x = maxX;
+    quad.m_pos[3].y = minY;
+    quad.m_pos[3].z = position.z;
 
-    quad.mUV[0].x = 1.0f;
-    quad.mUV[0].y = 1.0f;
-    quad.mUV[1].x = 0.0f;
-    quad.mUV[1].y = 1.0f;
-    quad.mUV[2].x = 0.0f;
-    quad.mUV[2].y = 0.0f;
-    quad.mUV[3].x = 1.0f;
-    quad.mUV[3].y = 0.0f;
+    quad.m_uv[0].x = 1.0f;
+    quad.m_uv[0].y = 1.0f;
+    quad.m_uv[1].x = 0.0f;
+    quad.m_uv[1].y = 1.0f;
+    quad.m_uv[2].x = 0.0f;
+    quad.m_uv[2].y = 0.0f;
+    quad.m_uv[3].x = 1.0f;
+    quad.m_uv[3].y = 0.0f;
 
     u8 colour[4];
     colour[0] = 0xFF;
@@ -199,10 +181,10 @@ static void DrawShadow(float radius, float x, float y, float z)
     colour[3] = (u8)alpha;
 
     u32 packed = *(u32*)colour;
-    quad.mColour[3].packed = packed;
-    quad.mColour[2].packed = packed;
-    quad.mColour[1].packed = packed;
-    quad.mColour[0].packed = packed;
+    *(u32*)&quad.m_colour[3] = packed;
+    *(u32*)&quad.m_colour[2] = packed;
+    *(u32*)&quad.m_colour[1] = packed;
+    *(u32*)&quad.m_colour[0] = packed;
 
     glSetDefaultState(true);
     glSetRasterState((eGLState)5, 1);
@@ -214,7 +196,7 @@ static void DrawShadow(float radius, float x, float y, float z)
     glSetTextureState((eGLTextureState)0, 3);
     glSetCurrentTextureState(glHandleizeTextureState());
 
-    fn_802C9664(&quad, fn_8027262C(), 0);
+    quad.Attach((eGLView)fn_8027262C(), 0);
 }
 
 void DrawablePowerup::Grab(int idx)

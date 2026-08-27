@@ -13,6 +13,7 @@ class cFielder;
 class cPoseNode;
 class cPN_SAnimController;
 class cPN_SingleAxisBlender;
+struct UnidentifiedMegaBallState;
 
 enum eGoalieActionState
 {
@@ -129,6 +130,7 @@ public:
     void fn_80090320(float fParam);
     void InitActionSnapBall();
     void fn_800908F8();
+    bool fn_80090958(bool bParam);
     bool IsTeammateHoardingBall();
     inline void InitActionPassInterceptSave();
     inline void InitActionPursueBallCarrier();
@@ -192,13 +194,29 @@ public:
         unsigned int nParam, cPN_SAnimController* controller);
     static void RunWeightCB(
         unsigned int nParam, cPN_SingleAxisBlender* blender);
+    static void fn_80087434(
+        unsigned int nParam, cPN_SAnimController* controller);
+    void StartRunBlend();
+    void ActionMoveWB(float fDeltaT);
     void ActionMove(float deltaTime);
     void ActionSaveSetup(float deltaTime);
     void ActionSaveReposition(float deltaTime);
     void ActionSave(float fDeltaT);
     void ActionLooseBallCatch(float deltaTime);
+    void ActionLooseBallDesperate(float fDeltaT);
+    void ActionLooseBallPickup(float fDeltaT);
     void ActionLooseBallPursueRolling(float deltaTime);
     void ActionLooseBallSetup(float fDeltaT);
+    void fn_80083750(float fDeltaT);
+    void fn_800838F8(float fDeltaT);
+    void fn_80083DE0(float fDeltaT);
+    void fn_80084568(unsigned int nIndex, float fParam);
+    bool fn_80084724(unsigned int nParam, float* pScore);
+    void fn_80084840(UnidentifiedMegaBallState* pState);
+    void fn_80084C3C(bool bParam);
+    void fn_80084CE0();
+    void fn_80084AE0(UnidentifiedMegaBallState* pState);
+    void fn_80084D94(float fParam);
     void ActionDiveRecover(float fDeltaT);
     void ActionPass(float deltaTime);
     void ActionPassIntercept(float deltaTime);
@@ -299,6 +317,9 @@ private:
     /* 0x4CC */ const LooseBallInfo* mpLooseBallInfo;
     /* 0x4D0 */ int mUnidentified4D0[10];
     /* 0x4F8 */ float mUnidentified4F8[10];
-}; // total size: at least 0x520
+    /* 0x520 */ u8 mUnidentified520[8];
+    /* 0x528 */ bool mUnidentified528;
+    /* 0x529 */ bool mUnidentified529;
+}; // total size: at least 0x52A
 
 #endif // GAME_GOALIE_H

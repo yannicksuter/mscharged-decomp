@@ -1,5 +1,6 @@
 #include "Game/Drawable/DrawableCharacter.h"
 
+#include "Game/BallTrail.h"
 #include "Game/Drawable/RenderObject.h"
 
 struct UnidentifiedStaticState
@@ -112,16 +113,6 @@ struct BallObject
     void* passTarget;
     char _0D8[0x0C];
     RenderObject* drawable;
-};
-
-struct LiveBallTrail
-{
-    nlQuaternion orientation;
-    nlVector3 position;
-    char _01C[0x18];
-    RenderObject* drawable;
-    char _038[4];
-    bool visible;
 };
 
 struct TaskManager

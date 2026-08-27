@@ -15,6 +15,7 @@ enum eSpinType
 
 class cFielder;
 class cPlayer;
+class DrawableObject;
 class PhysicsBall;
 
 class cBall
@@ -23,8 +24,13 @@ public:
     void SetPosition(const nlVector3& pos);
     void SetVelocity(const nlVector3& velocity, eSpinType spin,
         const nlVector3* pAngularVelocity);
+    nlVector3* GetAIVelocity() const;
+    nlVector3* GetDrawablePosition() const;
+    float fn_80014F38(float fScale) const;
     cFielder* GetOwnerFielder();
+    cPlayer* GetOwnerGoalie();
     cFielder* GetPassTargetFielder() const;
+    bool GetInNet(int& nSide);
 
     /* 0x00 */ u8 m_bBallPathChangeCount;
 
@@ -92,7 +98,10 @@ public:
     /* 0xD8 */ cPlayer* m_pShooter;
 
 private:
-    /* 0xDC */ u8 mUnidentified0DC[0x0C];
+    /* 0xDC */ u8 mUnidentified0DC[0x08];
+
+public:
+    /* 0xE4 */ DrawableObject* m_pDrawableBall;
 
 public:
     /* 0xE8 */ PhysicsBall* m_pPhysicsBall;

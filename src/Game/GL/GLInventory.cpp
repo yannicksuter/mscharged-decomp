@@ -302,33 +302,56 @@ void GLInventory::AddSkinData(unsigned long key, nlChunk* skinData)
 GLSkinMesh* GLInventory::MakeSkinMesh(
     unsigned long hashID, cSHierarchy* hierarchy)
 {
-    nlChunk* pChunk = 0;
-    for (int i = m_nLevel; i >= 0; i--)
+    struct SkinDataHelper
     {
-        unsigned long key = hashID;
-        nlChunk** pResult;
-        bool found = m_pSkinData[i]->m_pItems->FindGet(key, &pResult);
-        if (found)
-            pChunk = *pResult;
-        else
-            pChunk = 0;
-        if (pChunk != 0)
-            break;
-    }
+        static inline nlChunk* Get(GLInventory* self, unsigned long id)
+        {
+            nlChunk* result;
+            int i;
+            for (i = self->m_nLevel; i >= 0; i--)
+            {
+                unsigned long key = id;
+                nlChunk** pResult;
+                bool found =
+                    self->m_pSkinData[i]->m_pItems->FindGet(key, &pResult);
+                if (found)
+                    result = *pResult;
+                else
+                    result = 0;
+                if (result != 0)
+                    return result;
+            }
+            return 0;
+        }
+    };
 
-    GLMaterialList* pMaterialList = 0;
-    for (int i = m_nLevel; i >= 0; i--)
+    struct MaterialListHelper
     {
-        unsigned long key = hashID;
-        GLMaterialList** pResult;
-        bool found = m_pMaterialLists[i]->m_pItems->FindGet(key, &pResult);
-        if (found)
-            pMaterialList = *pResult;
-        else
-            pMaterialList = 0;
-        if (pMaterialList != 0)
-            break;
-    }
+        static inline GLMaterialList* Get(
+            GLInventory* self, unsigned long id)
+        {
+            for (int i = self->m_nLevel; i >= 0; i--)
+            {
+                unsigned long key = id;
+                GLMaterialList** pResult;
+                bool found = self->m_pMaterialLists[i]->m_pItems->FindGet(
+                    key, &pResult);
+                GLMaterialList* result;
+                if (found)
+                    result = *pResult;
+                else
+                    result = 0;
+                if (result != 0)
+                    return result;
+            }
+            return 0;
+        }
+    };
+
+    nlChunk* foundChunk = SkinDataHelper::Get(this, hashID);
+    nlChunk* pChunk = foundChunk;
+    GLMaterialList* pMaterialList =
+        MaterialListHelper::Get(this, hashID);
 
     return fn_8036A378(pChunk, pMaterialList, hierarchy);
 }

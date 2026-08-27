@@ -1,24 +1,12 @@
 #include "Game/Field.h"
 #include "Game/Net.h"
 #include "Game/Render/NetMesh.h"
-#include "NL/gl/glView.h"
-#include "NL/nlMath.h"
+#include "NL/gl/glDraw3.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
+#include "NL/gl/glView.h"
 #include "NL/nlMemory.h"
-
-struct nlColour
-{
-    u8 c[4];
-};
-
-struct glQuad3
-{
-    char data[0x60];
-
-    void SetupRotatedRectangle(float, float, const nlMatrix4&, bool, bool);
-    void SetColour(const nlColour&);
-};
+#include "NL/nlMath.h"
 
 struct StreamDefinition
 {
@@ -169,7 +157,6 @@ __declspec(weak) char WhiteTextureName[] = "global/white";
 __declspec(weak) char NetMeshTextureName[] = "global/netmesh";
 __declspec(weak) char CheckerTextureName[] = "global/checkers";
 
-
 u32 lbl_806E1320 = glGetTexture(LightTextureName);
 u32 lbl_806E1324 = glGetTexture(BlackTextureName);
 u32 lbl_806E1328 = glGetTexture(WhiteTextureName);
@@ -208,7 +195,6 @@ extern const StreamDefinition lbl_804DCCE0;
 extern "C" void* fn_8027267C(int);
 extern "C" void __dla__FPv(void*);
 extern "C" void fn_802CC02C(MeshResource*);
-extern "C" void fn_802C9254(u32, int, glQuad3*);
 extern "C" WorldDarkening* fn_801AF510();
 extern "C" void nlBreak__Fv();
 extern "C" void* memcpy(void*, const void*, u32);
@@ -276,7 +262,7 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
     matrix.e2[3][3] = 1.0f;
     quad.SetupRotatedRectangle(netHeight, netWidth, matrix, false, false);
     quad.SetColour(colour);
-    fn_802C9254(lbl_806E1330, 1, &quad);
+    glAttachQuad3((eGLView)lbl_806E1330, 1, &quad);
 
     matrix.e2[3][0] = goalLineX + 0.05f;
     matrix.e2[3][1] = 0.0f;
@@ -284,7 +270,7 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
     matrix.e2[3][3] = 1.0f;
     quad.SetupRotatedRectangle(netHeight, netWidth, matrix, false, false);
     quad.SetColour(colour);
-    fn_802C9254(lbl_806E1330, 1, &quad);
+    glAttachQuad3((eGLView)lbl_806E1330, 1, &quad);
 
     matrix.e2[3][0] = -goalLineX - 0.05f;
     matrix.e2[3][1] = 0.0f;
@@ -292,7 +278,7 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
     matrix.e2[3][3] = 1.0f;
     quad.SetupRotatedRectangle(netHeight, netWidth, matrix, false, false);
     quad.SetColour(colour);
-    fn_802C9254(lbl_806E1330, 1, &quad);
+    glAttachQuad3((eGLView)lbl_806E1330, 1, &quad);
 
     matrix.e2[3][0] = 0.05f + -goalLineX;
     matrix.e2[3][1] = 0.0f;
@@ -300,7 +286,7 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
     matrix.e2[3][3] = 1.0f;
     quad.SetupRotatedRectangle(netHeight, netWidth, matrix, false, false);
     quad.SetColour(colour);
-    fn_802C9254(lbl_806E1330, 1, &quad);
+    glAttachQuad3((eGLView)lbl_806E1330, 1, &quad);
 }
 
 void DrawableNetMesh::Render() const
@@ -353,8 +339,7 @@ void DrawableNetMesh::Render() const
             ((volatile u8*)lbl_806DCB38)[volatileThis->mNetIndex] = true;
             {
                 int index = volatileThis->mNetIndex;
-                ModelHandle* handle =
-                    lbl_80570938[index][lbl_806E1370[index]]->Acquire();
+                ModelHandle* handle = lbl_80570938[index][lbl_806E1370[index]]->Acquire();
                 ((ModelHandle* volatile*)lbl_80570948[(unsigned int)index])
                     [lbl_806E1370[(unsigned int)index]] = handle;
             }
@@ -373,8 +358,7 @@ void DrawableNetMesh::Render() const
                 lbl_80570948[mNetIndex][lbl_806E1370[mNetIndex]]);
             const volatile DrawableNetMesh* volatileThis = this;
             int index = volatileThis->mNetIndex;
-            ModelHandle* handle =
-                lbl_80570938[index][lbl_806E1370[index]]->Acquire();
+            ModelHandle* handle = lbl_80570938[index][lbl_806E1370[index]]->Acquire();
             lbl_80570948[(unsigned int)index][lbl_806E1370[(unsigned int)index]] = handle;
         }
 

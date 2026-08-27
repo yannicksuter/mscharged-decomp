@@ -1485,8 +1485,9 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     {
         const float fFiveChance
             = lbl_8056CF08.m_pGameTweaks->fShellFiveChance;
-        const float fThreeChance = fFiveChance
-            + lbl_8056CF08.m_pGameTweaks->fShellThreeChance;
+        float fThreeChance
+            = lbl_8056CF08.m_pGameTweaks->fShellThreeChance;
+        fThreeChance += fFiveChance;
         if (fRandom < fFiveChance)
         {
             nNumOfPowerups = 5;
@@ -1511,8 +1512,9 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     {
         const float fFiveChance
             = lbl_8056CF08.m_pGameTweaks->fBobombFiveChance;
-        const float fThreeChance = fFiveChance
-            + lbl_8056CF08.m_pGameTweaks->fBobombThreeChance;
+        float fThreeChance
+            = lbl_8056CF08.m_pGameTweaks->fBobombThreeChance;
+        fThreeChance += fFiveChance;
         if (fRandom < fFiveChance)
         {
             nNumOfPowerups = 5;
@@ -1527,8 +1529,9 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     {
         const float fFiveChance
             = lbl_8056CF08.m_pGameTweaks->fBananaFiveChance;
-        const float fThreeChance = fFiveChance
-            + lbl_8056CF08.m_pGameTweaks->fBananaThreeChance;
+        float fThreeChance
+            = lbl_8056CF08.m_pGameTweaks->fBananaThreeChance;
+        fThreeChance += fFiveChance;
         if (fRandom < fFiveChance)
         {
             nNumOfPowerups = 5;

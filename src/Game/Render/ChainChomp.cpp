@@ -152,33 +152,33 @@ void ChainChomp::DrawShadow(
         c.c[2] = 255;
         c.c[3] = (unsigned char)alpha;
 
-        ShadowQuad quad;
-        quad.corners[0].x = minX;
-        quad.corners[0].y = minY;
-        quad.corners[0].z = position.z;
-        quad.corners[1].x = minX;
-        quad.corners[1].y = maxY;
-        quad.corners[1].z = position.z;
-        quad.corners[2].x = maxX;
-        quad.corners[2].y = maxY;
-        quad.corners[2].z = position.z;
-        quad.corners[3].x = maxX;
-        quad.corners[3].y = minY;
-        quad.corners[3].z = position.z;
+        glQuad3 quad;
+        quad.m_pos[0].x = minX;
+        quad.m_pos[0].y = minY;
+        quad.m_pos[0].z = position.z;
+        quad.m_pos[1].x = minX;
+        quad.m_pos[1].y = maxY;
+        quad.m_pos[1].z = position.z;
+        quad.m_pos[2].x = maxX;
+        quad.m_pos[2].y = maxY;
+        quad.m_pos[2].z = position.z;
+        quad.m_pos[3].x = maxX;
+        quad.m_pos[3].y = minY;
+        quad.m_pos[3].z = position.z;
 
-        quad.uv[0][0] = lbl_806E4F04;
-        quad.uv[0][1] = lbl_806E4F04;
-        quad.uv[1][0] = lbl_806E4EF0;
-        quad.uv[1][1] = lbl_806E4F04;
-        quad.uv[2][0] = lbl_806E4EF0;
-        quad.uv[2][1] = lbl_806E4EF0;
-        quad.uv[3][0] = lbl_806E4F04;
-        quad.uv[3][1] = lbl_806E4EF0;
+        quad.m_uv[0].x = lbl_806E4F04;
+        quad.m_uv[0].y = lbl_806E4F04;
+        quad.m_uv[1].x = lbl_806E4EF0;
+        quad.m_uv[1].y = lbl_806E4F04;
+        quad.m_uv[2].x = lbl_806E4EF0;
+        quad.m_uv[2].y = lbl_806E4EF0;
+        quad.m_uv[3].x = lbl_806E4F04;
+        quad.m_uv[3].y = lbl_806E4EF0;
 
-        quad.colors[3] = *(u32*)&c;
-        quad.colors[2] = *(u32*)&c;
-        quad.colors[1] = *(u32*)&c;
-        quad.colors[0] = *(u32*)&c;
+        *(u32*)&quad.m_colour[3] = *(u32*)&c;
+        *(u32*)&quad.m_colour[2] = *(u32*)&c;
+        *(u32*)&quad.m_colour[1] = *(u32*)&c;
+        *(u32*)&quad.m_colour[0] = *(u32*)&c;
 
         glSetDefaultState(true);
         glSetRasterState(GLS_AlphaBlend, 1);
@@ -198,7 +198,7 @@ void ChainChomp::DrawShadow(
         {
             renderContext = lbl_806E14F8;
         }
-        fn_802C9664(&quad, renderContext, 0);
+        quad.Attach((eGLView)(u32)renderContext, 0);
         break;
     case CHAIN_STATE_HIDDEN:
     case CHAIN_STATE_FALL:

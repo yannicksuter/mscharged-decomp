@@ -842,11 +842,12 @@ SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
                 }
 
                 {
-                    fTimeOffset = fThisTime - fTime;
-                    nlVec3ScaleAdd(v3AdjLocalPos, fTimeOffset,
+                    fTimeDelta = fThisTime - fTime;
+                    nlVec3ScaleAdd(v3AdjLocalPos, fTimeDelta,
                         v3LocalVelocity, v3LocalPos);
+                    fTimeOffsetSq = fTimeDelta * fTimeDelta;
                     v3AdjLocalPos.z -=
-                        10.0f * (fTimeOffset * fTimeOffset);
+                        10.0f * fTimeOffsetSq;
                 }
                 if (v3AdjLocalPos.z < 0.18f)
                     v3AdjLocalPos.z = 0.18f;
@@ -872,12 +873,14 @@ SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
 
                 if (fSaveTime <= fThisTime)
                 {
-                    float fDistZ = v3AdjLocalPos.z
-                        - candidateBlendInfo.mv3BlendedSavePos.z;
                     float fDistY = v3AdjLocalPos.y
                         - candidateBlendInfo.mv3BlendedSavePos.y;
                     float fDistSq =
-                        fDistY * fDistY + fDistZ * fDistZ;
+                        fDistY * fDistY
+                        + (v3AdjLocalPos.z
+                              - candidateBlendInfo.mv3BlendedSavePos.z)
+                            * (v3AdjLocalPos.z
+                                - candidateBlendInfo.mv3BlendedSavePos.z);
 
                     if (fDistSq < fClosest)
                     {
@@ -891,9 +894,9 @@ SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
 
                             blendInfo.mfStartTime =
                                 (0.0f
-                                    >= blendInfo.mfMilestoneTime[2] - fTime)
+                                    >= blendInfo.mfMilestoneTime[2] - fThisTime)
                                 ? 0.0f
-                                : blendInfo.mfMilestoneTime[2] - fTime;
+                                : blendInfo.mfMilestoneTime[2] - fThisTime;
 
                             if (bFromTakeoff)
                             {
