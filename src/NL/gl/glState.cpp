@@ -1,9 +1,10 @@
 #include "NL/gl/glState.h"
 
+#include "NL/gl/glMatrix.h"
+
 extern "C" void* memcpy(void* dest, const void* src, unsigned long size);
 
 extern "C" u32 fn_802C8098(const char* name);
-extern "C" u32 fn_802CBE70();
 
 class glRasterState
 {
@@ -258,15 +259,15 @@ unsigned long long glSetCurrentTextureState(unsigned long long state)
     return prev;
 }
 
-u32 glGetCurrentProgram()
+u32 glGetCurrentMatrix()
 {
-    return _bundle.program;
+    return _bundle.matrix;
 }
 
-u32 glSetCurrentProgram(unsigned long program)
+u32 glSetCurrentMatrix(unsigned long matrix)
 {
-    unsigned long prev = _bundle.program;
-    _bundle.program = program;
+    unsigned long prev = _bundle.matrix;
+    _bundle.matrix = matrix;
     return prev;
 }
 
@@ -521,7 +522,7 @@ void glSetDefaultState(bool setRasterDefaults)
 
     _bundle.raster = _state.m_State;
     _bundle.texturestate = _textureState.m_State;
-    _bundle.program = fn_802CBE70();
+    _bundle.matrix = glGetIdentityMatrix();
 
     glSetCurrentTextureInline((u32)-1, GLTT_Diffuse);
     glSetCurrentTextureInline((u32)-1, GLTT_Detail);

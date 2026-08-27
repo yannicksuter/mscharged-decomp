@@ -320,9 +320,6 @@ extern "C" void fn_8030C380(PoseAccumulator*, int, void (*)(void*), void*, int);
 extern "C" int fn_8030CC1C(Hierarchy*, u32);
 extern "C" void fn_80368374(nlMatrix4*, const nlVector4*, bool);
 extern "C" void fn_80368450(nlQuaternion*, const nlMatrix4*);
-extern "C" void fn_80368788(nlMatrix4*, const nlMatrix4*, const nlMatrix4*);
-extern "C" void fn_80368AA4(nlMatrix4*, float);
-extern "C" void fn_80368BB0(nlMatrix4*, float, float, float);
 extern "C" void fn_8017BF84(void*);
 extern "C" void fn_80094E60(u16, u16);
 extern "C" void fn_8030AE14(PoseAccumulator*, bool);
@@ -535,7 +532,7 @@ static inline void BlendScaleAccum(
 static inline void BuildCharacterMatrices(DrawableCharacter* drawable, PoseAccumulator* accumulator)
 {
     nlMatrix4 matrix;
-    fn_80368AA4(&matrix, 0.0000958738f * (float)drawable->facingDirection);
+    nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)drawable->facingDirection);
     SetMatrixTranslation(matrix, drawable->position);
     if (drawable->character != 0)
     {
@@ -554,7 +551,7 @@ static inline void BuildCharacterMatrices(DrawableCharacter* drawable, PoseAccum
 static inline void BuildNpcMatrices(DrawableCharacter* drawable)
 {
     nlMatrix4 matrix;
-    fn_80368AA4(&matrix, 0.0000958738f * (float)drawable->facingDirection);
+    nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)drawable->facingDirection);
     SetMatrixTranslation(matrix, drawable->position);
     fn_8030B9C8(drawable->poseAccumulator, &matrix);
 }
@@ -715,7 +712,7 @@ void DrawableCharacter::HeadTrackCallback(
 void DrawableCharacter::BuildNodeMatrices(PoseAccumulator* accumulator)
 {
     nlMatrix4 matrix;
-    fn_80368AA4(&matrix, 0.0000958738f * (float)facingDirection);
+    nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)facingDirection);
     matrix.e2[3][0] = position.x;
     matrix.e2[3][1] = position.y;
     matrix.e2[3][2] = position.z;
@@ -738,7 +735,7 @@ void DrawableCharacter::BuildNodeMatrices(PoseAccumulator* accumulator)
 void DrawableCharacter::BuildNpcMatrix()
 {
     nlMatrix4 matrix;
-    fn_80368AA4(&matrix, 0.0000958738f * (float)facingDirection);
+    nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)facingDirection);
     matrix.e2[3][0] = position.x;
     matrix.e2[3][1] = position.y;
     matrix.e2[3][2] = position.z;
@@ -975,7 +972,7 @@ void DrawableCharacter::Render(SkinAnimatedMovableNpc& npc)
 
     u16 angleValue = ((volatile DrawableCharacter*)this)->facingDirection;
     nlMatrix4 worldMatrix;
-    fn_80368AA4(&worldMatrix, 0.0000958738f * (float)angleValue);
+    nlMakeRotationMatrixZ(worldMatrix, 0.0000958738f * (float)angleValue);
     worldMatrix.SetRow_(3, position);
     npc.visible = visible;
     npc.RenderFromReplay(*poseAccumulator, &worldMatrix);
@@ -1206,8 +1203,8 @@ void DrawableCharacter::Blend(
         else if (lbl_806E13AF || !flag3)
         {
             nlMatrix4 rotation;
-            fn_80368BB0(
-                &rotation,
+            nlMakeRotationMatrixEulerAngles(
+                rotation,
                 DegreesToRadians(lbl_806DCB5C),
                 DegreesToRadians(lbl_806DCB60),
                 DegreesToRadians(lbl_806DCB64));
@@ -1224,17 +1221,17 @@ void DrawableCharacter::Blend(
             rotation.e2[3][2] = translationZ;
             rotation.e2[3][3] = translationW;
             nlMatrix4 matrix;
-            fn_80368788(
-                &matrix, &rotation,
-                fn_8030C2F0(poseAccumulator, lbl_806E139C));
+            nlMultMatrices(
+                matrix, rotation,
+                *fn_8030C2F0(poseAccumulator, lbl_806E139C));
             poseAccumulator->nodeMatrices[lbl_806E1398] = matrix;
         }
 
         if (lbl_806E13AE || !flag2)
         {
             nlMatrix4 rotation;
-            fn_80368BB0(
-                &rotation,
+            nlMakeRotationMatrixEulerAngles(
+                rotation,
                 DegreesToRadians(lbl_806DCB74),
                 DegreesToRadians(lbl_806DCB78),
                 DegreesToRadians(lbl_806DCB7C));
@@ -1251,9 +1248,9 @@ void DrawableCharacter::Blend(
             rotation.e2[3][2] = translationZ;
             rotation.e2[3][3] = translationW;
             nlMatrix4 matrix;
-            fn_80368788(
-                &matrix, &rotation,
-                fn_8030C2F0(poseAccumulator, lbl_806E139C));
+            nlMultMatrices(
+                matrix, rotation,
+                *fn_8030C2F0(poseAccumulator, lbl_806E139C));
             poseAccumulator->nodeMatrices[lbl_806E1394] = matrix;
         }
     }
@@ -1300,7 +1297,7 @@ void DrawableCharacter::EvaluateFrom(
 
     PoseAccumulator* accumulator = poseAccumulator;
     nlMatrix4 matrix;
-    fn_80368AA4(&matrix, 0.0000958738f * (float)facingDirection);
+    nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)facingDirection);
     matrix.e2[3][0] = position.x;
     matrix.e2[3][1] = position.y;
     matrix.e2[3][2] = position.z;

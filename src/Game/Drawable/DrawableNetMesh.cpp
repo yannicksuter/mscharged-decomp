@@ -2,6 +2,7 @@
 #include "Game/Net.h"
 #include "Game/Render/NetMesh.h"
 #include "NL/nlMath.h"
+#include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMemory.h"
 
@@ -207,8 +208,6 @@ extern "C" void* fn_8027267C(int);
 extern "C" void __dla__FPv(void*);
 extern "C" void fn_802CC02C(MeshResource*);
 extern "C" void fn_802C9254(u32, int, glQuad3*);
-extern "C" void fn_80368A28(nlMatrix4&, float);
-extern "C" u32 fn_802CBE70();
 extern "C" WorldDarkening* fn_801AF510();
 extern "C" void nlBreak__Fv();
 extern "C" void* memcpy(void*, const void*, u32);
@@ -265,7 +264,7 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
     glSetCurrentTextureState(glHandleizeTextureState());
 
     nlMatrix4 matrix;
-    fn_80368A28(matrix, 1.5707964f);
+    nlMakeRotationMatrixY(matrix, 1.5707964f);
 
     nlColour colour = { 0xFF, 0xFF, 0x00, 0x00 };
     colour.c[3] = (u8)lbl_806E137C;
@@ -328,7 +327,7 @@ void DrawableNetMesh::Render() const
     glSetTextureState((eGLTextureState)0, 0);
     glSetRasterState((eGLState)1, 1);
     glSetCurrentRasterState(glHandleizeRasterState());
-    glSetCurrentProgram(fn_802CBE70());
+    glSetCurrentMatrix(glGetIdentityMatrix());
 
     u32 texture = NetMesh::sNetTextureHandle;
     if (lbl_806E1378)

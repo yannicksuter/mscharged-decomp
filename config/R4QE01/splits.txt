@@ -417,6 +417,10 @@ NL/nlBundleFile.cpp:
 	.text       start:0x802BDB70 end:0x802BE64C
 	.data       start:0x8052BA40 end:0x8052BA70
 
+NL/gl/glMatrix.cpp:
+	.text       start:0x802CBE10 end:0x802CBEC4
+	.sdata      start:0x806DF3F0 end:0x806DF3F4
+
 NL/gl/glModel.cpp:
 	.text       start:0x802CC0EC end:0x802CC370
 
@@ -676,6 +680,19 @@ ode/NLGAdditions.cpp:
 	.text       start:0x80358E7C end:0x8035952C
 	.data       start:0x80534738 end:0x80534750
 	.sdata2     start:0x806E6B88 end:0x806E6BA0
+
+NL/plat/platvmath.cpp:
+	.text       start:0x80368784 end:0x80368E00
+	.sdata2     start:0x806E6D08 end:0x806E6D14
+
+NL/gl/glPlat.cpp:
+	.text       start:0x80369394 end:0x80369E5C
+	.ctors      start:0x804DBB48 end:0x804DBB4C
+	.data       start:0x805352E8 end:0x805353B8
+	.bss        start:0x80589DA8 end:0x80589DF8
+	.sdata      start:0x806DFA60 end:0x806DFA78
+	.sbss       start:0x806E22E0 end:0x806E2300
+	.sdata2     start:0x806E6D18 end:0x806E6D30
 
 NL/glx/glxGX.cpp:
 	.text       start:0x8036C23C end:0x8036CE48

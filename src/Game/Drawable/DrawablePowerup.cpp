@@ -86,8 +86,6 @@ extern "C" RenderObject* fn_8027725C(u32);
 extern "C" ShadowHeight* fn_802772BC();
 extern "C" void fn_802B549C(nlQuaternion*, u16);
 extern "C" void fn_80368374(nlMatrix4*, const nlQuaternion*, bool);
-extern "C" nlMatrix4* fn_80368D70(nlMatrix4*, float, float, float);
-extern "C" nlMatrix4* fn_80368788(nlMatrix4*, const nlMatrix4*, const nlMatrix4*);
 extern "C" void fn_801869AC(void*, void*, int, int, const DrawablePowerup*, float);
 extern "C" u32 fn_8027262C();
 extern "C" bool fn_802C9664(glQuad3*, u32, int);
@@ -268,10 +266,10 @@ void DrawablePowerup::Render(int idx) const
     transform.e2[3][3] = 1.0f;
 
     nlMatrix4 scale;
-    fn_80368D70(&scale, mScale, mScale, mScale);
+    nlMakeScaleMatrix(scale, mScale, mScale, mScale);
 
     nlMatrix4 world;
-    fn_80368788(&world, &scale, &transform);
+    nlMultMatrices(world, scale, transform);
     object->SetTransform(&world);
 
     if (!mVisible)
