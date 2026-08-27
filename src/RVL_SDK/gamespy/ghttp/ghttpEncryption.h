@@ -70,27 +70,13 @@ typedef struct GHIEncryptor {
   void* mInterface; // only SSL is currently supported
   GHTTPEncryptionEngine mEngine;
   GHTTPBool mInitialized;
-  GHTTPBool mSessionStarted;     // handshake started?
-  GHTTPBool mSessionEstablished; // handshake completed?
-
-  // (As coded, these two are exclusive!)
-  //    pattern 1 = manually encrypt the buffer, then send using normal socket
-  //    functions pattern 2 = send plain text through the encryption engine, it
-  //    will send
-  GHTTPBool
-      mEncryptOnBuffer; // engine encrypts when writing to a buffer? (pattern 1)
-  GHTTPBool
-      mEncryptOnSend; // engine encrypts when sending over socket? (pattern 2)
-
-  // If GHTTPTrue, the SSL library handles sending/receiving handshake messages
-  GHTTPBool mLibSendsHandshakeMessages;
+  GHTTPBool mSessionStarted; // handshake started?
 
   // Functions for engine use
   GHTTPEncryptorInitFunc mInitFunc;
   GHTTPEncryptorCleanupFunc mCleanupFunc;
   GHTTPEncryptorStartFunc mStartFunc; // start the handshake process
   GHTTPEncryptorEncryptFunc mEncryptFunc;
-  GHTTPEncryptorDecryptFunc mDecryptFunc;
 } GHIEncryptor;
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -159,7 +159,7 @@ if not config.non_matching:
 config.binutils_tag = "2.42-2"
 config.compilers_tag = "20251118"
 config.dtk_tag = "v1.8.3"
-config.objdiff_tag = "v3.6.1"
+config.objdiff_tag = "v3.7.3"
 config.sjiswrap_tag = "v1.2.2"
 config.wibo_tag = "1.0.3"
 
@@ -429,6 +429,7 @@ config.libs = [
             Object(NonMatching, "Game/Drawable/DrawableKoopaShell.cpp"),
             Object(Matching, "Game/Drawable/DrawablePowerup.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableThwomp.cpp"),
+            Object(NonMatching, "Game/Render/ChainChomp.cpp"),
             Object(NonMatching, "Game/Render/NetMesh.cpp"),
             Object(Matching, "Game/NetMeshEdge.cpp"),
             Object(NonMatching, "Game/NetMeshModelLoader.cpp"),
@@ -652,6 +653,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/nwc24/NWC24Ipc.c"),
             Object(Matching, "RVL_SDK/thp/THPDec.c"),
             Object(Matching, "RVL_SDK/thp/THPAudio.c"),
+            Object(Matching, "RVL_SDK/tpl/TPL.c"),
             Object(Matching, "RVL_SDK/base/PPCArch.c"),
             Object(Matching, "RVL_SDK/db/db.c"),
             Object(Matching, "RVL_SDK/euart/euart.c"),
@@ -672,6 +674,8 @@ config.libs = [
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Connection.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Socket.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpCallbacks.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpConnection.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiUtility.c", cflags=cflags_rvl_spy),
             Object(NonMatching, "RVL_SDK/kpad/KPAD.c"),
             Object(Matching, "RVL_SDK/mem/mem_heapCommon.c"),
             Object(Matching, "RVL_SDK/mem/mem_expHeap.c"),
@@ -715,12 +719,17 @@ config.libs = [
             Object(Matching, "RVL_SDK/os/OSStateFlags.c"),
             Object(Matching, "RVL_SDK/os/OSNandbootInfo.c"),
             Object(NonMatching, "RVL_SDK/vi/vi.c"),
+            Object(Matching, "RVL_SDK/vi/i2c.c"),
             Object(Matching, "RVL_SDK/vi/vi3in1.c"),
+            Object(Matching, "RVL_SDK/wenc/wenc.c", mw_version="GC/3.0a5.2"),
             Object(NonMatching, "RVL_SDK/wpad/WPAD.c"),
+            Object(Matching, "RVL_SDK/wpad/WPADEncrypt.c"),
+            Object(Matching, "RVL_SDK/wpad/debug_msg.c"),
             Object(Matching, "RVL_SDK/so/soCommon.c", mw_version="GC/3.0a5.2"),
             Object(Matching, "RVL_SDK/so/soBasic.c"),
             Object(Matching, "RVL_SDK/si/SIBios.c"),
             Object(Matching, "RVL_SDK/si/SISamplingRate.c"),
+            Object(Matching, "RVL_SDK/sp/sp.c"),
             Object(NonMatching, "RVL_SDK/bte/hcicmds.c", cflags=cflags_rvl_bte),
             Object(Matching, "RVL_SDK/bte/bte_hcisu.c", cflags=cflags_rvl_bte),
             Object(Matching, "RVL_SDK/bte/rfc_port_if.c", cflags=cflags_rvl_bte),

@@ -1,6 +1,8 @@
 #include "Game/Drawable/DrawableCharacter.h"
 
 #include "Game/CharacterEffects.h"
+#include "Game/PoseAccumulator.h"
+#include "Game/Render/SkinAnimatedMovableNPC.h"
 #include "NL/gl/glState.h"
 
 extern "C" void* fn_802CDF0C();
@@ -44,16 +46,6 @@ struct RotAccum
     u8 tail[3];
 };
 
-struct VectorAccum
-{
-    nlVector3 value;
-    float accumulatedWeight;
-    u8 identity;
-    u8 tail[3];
-};
-
-struct Hierarchy;
-
 struct HeadTrack
 {
     char _000[0x54];
@@ -69,31 +61,11 @@ struct LightObject
     float radius;
 };
 
-struct PoseAccumulator
-{
-    void InitAccumulators(float, float);
-    nlMatrix4& GetNodeMatrix(int) const;
-
-    Hierarchy* hierarchy;
-    nlMatrix4* nodeMatrices;
-    u32 unknown08;
-    nlQuaternion* quaternions;
-    RotAccum* rotations;
-    VectorAccum* scales;
-    VectorAccum* translations;
-    u32 unknown1C;
-    float morphWeights[20];
-    u32 unknown70;
-    float scale;
-    u8 useObject;
-    u8 tail79[3];
-};
-
 struct PoseNode
 {
     virtual void Reserved0() = 0;
     virtual void Reserved1() = 0;
-    virtual void Evaluate(float, PoseAccumulator*) = 0;
+    virtual void Evaluate(float, cPoseAccumulator*) = 0;
 };
 
 enum eGLBlend
@@ -132,7 +104,7 @@ struct Character
         float scale;
     };
     char _0A4[0x18];
-    PoseAccumulator* sourcePoseAccumulator;
+    cPoseAccumulator* sourcePoseAccumulator;
     void* object;
     void* unknownC4;
     void* animationController;
@@ -289,48 +261,30 @@ struct TaskManager
     u32 state;
 };
 
-struct SkinAnimatedMovableNpc
-{
-    virtual void Reserved0() = 0;
-    virtual void Reserved1() = 0;
-    virtual void Reserved2() = 0;
-    virtual void RenderFromReplay(PoseAccumulator&, nlMatrix4*) = 0;
-
-    char _004[0x40];
-    u16 facingDirection;
-    char _046[2];
-    nlVector3 position;
-    char _054[4];
-    PoseAccumulator* poseAccumulator;
-    char _05C[4];
-    void* object;
-    u8 visible;
-};
-
 extern "C" void fn_802B5544(nlQuaternion*, const nlQuaternion*, const nlQuaternion*, float);
-extern "C" PoseAccumulator* fn_8030A9D0(PoseAccumulator*, Hierarchy*, bool);
-extern "C" void fn_8030B1C0(PoseAccumulator*);
-extern "C" void fn_8030B318(PoseAccumulator*, const nlMatrix4*);
-extern "C" void fn_8030B9C8(PoseAccumulator*, const nlMatrix4*);
-extern "C" void fn_8030BD18(PoseAccumulator*, int, const nlQuaternion*, bool, float);
-extern "C" void fn_8030BE68(PoseAccumulator*, int, u16, float);
-extern "C" nlMatrix4* fn_8030C2F0(PoseAccumulator*, int);
-extern "C" int fn_8030C374(PoseAccumulator*);
-extern "C" void fn_8030C380(PoseAccumulator*, int, void (*)(void*), void*, int);
-extern "C" int fn_8030CC1C(Hierarchy*, u32);
+extern "C" cPoseAccumulator* fn_8030A9D0(cPoseAccumulator*, cSHierarchy*, bool);
+extern "C" void fn_8030B1C0(cPoseAccumulator*);
+extern "C" void fn_8030B318(cPoseAccumulator*, const nlMatrix4*);
+extern "C" void fn_8030B9C8(cPoseAccumulator*, const nlMatrix4*);
+extern "C" void fn_8030BD18(cPoseAccumulator*, int, const nlQuaternion*, bool, float);
+extern "C" void fn_8030BE68(cPoseAccumulator*, int, u16, float);
+extern "C" nlMatrix4* fn_8030C2F0(cPoseAccumulator*, int);
+extern "C" int fn_8030C374(cPoseAccumulator*);
+extern "C" void fn_8030C380(cPoseAccumulator*, int, void (*)(void*), void*, int);
+extern "C" int fn_8030CC1C(cSHierarchy*, u32);
 extern "C" void fn_80368374(nlMatrix4*, const nlVector4*, bool);
 extern "C" void fn_80368450(nlQuaternion*, const nlMatrix4*);
 extern "C" void fn_8017BF84(void*);
 extern "C" void fn_80094E60(u16, u16);
-extern "C" void fn_8030AE14(PoseAccumulator*, bool);
-extern "C" PoseAccumulator* fn_8030ABF8(
-    PoseAccumulator*, PoseAccumulator*);
-extern "C" PoseAccumulator* fn_8030AD14(
-    PoseAccumulator*, PoseAccumulator*);
+extern "C" void fn_8030AE14(cPoseAccumulator*, bool);
+extern "C" cPoseAccumulator* fn_8030ABF8(
+    cPoseAccumulator*, cPoseAccumulator*);
+extern "C" cPoseAccumulator* fn_8030AD14(
+    cPoseAccumulator*, cPoseAccumulator*);
 extern "C" bool fn_8001C534(Character*, bool);
 extern "C" SkinMesh* fn_8001C550(Character*, int);
 extern "C" void fn_8001C574(Character*);
-extern "C" void fn_8001D6F4(Character*, PoseAccumulator*, int);
+extern "C" void fn_8001D6F4(Character*, cPoseAccumulator*, int);
 extern "C" void fn_8001EFCC(Character*, SkinMesh*, Model*);
 extern "C" Character* fn_800A6954();
 extern "C" void fn_800A6A94(void*);
@@ -492,16 +446,16 @@ static inline void BlendTranslationAccum(
     if (lhs.identity && rhs.identity)
     {
         output.identity = true;
-        output.value.x = zero;
-        output.value.y = zero;
-        output.value.z = zero;
+        output.t.x = zero;
+        output.t.y = zero;
+        output.t.z = zero;
     }
     else
     {
         output.identity = false;
-        output.value.x = Lerp(lhs.value.x, rhs.value.x, weight, one);
-        output.value.y = Lerp(lhs.value.y, rhs.value.y, weight, one);
-        output.value.z = Lerp(lhs.value.z, rhs.value.z, weight, one);
+        output.t.x = Lerp(lhs.t.x, rhs.t.x, weight, one);
+        output.t.y = Lerp(lhs.t.y, rhs.t.y, weight, one);
+        output.t.z = Lerp(lhs.t.z, rhs.t.z, weight, one);
     }
 }
 
@@ -516,20 +470,20 @@ static inline void BlendScaleAccum(
     if (lhs.identity && rhs.identity)
     {
         output.identity = true;
-        output.value.x = one;
-        output.value.y = one;
-        output.value.z = one;
+        output.t.x = one;
+        output.t.y = one;
+        output.t.z = one;
     }
     else
     {
         output.identity = false;
-        output.value.x = Lerp(lhs.value.x, rhs.value.x, weight, one);
-        output.value.y = Lerp(lhs.value.y, rhs.value.y, weight, one);
-        output.value.z = Lerp(lhs.value.z, rhs.value.z, weight, one);
+        output.t.x = Lerp(lhs.t.x, rhs.t.x, weight, one);
+        output.t.y = Lerp(lhs.t.y, rhs.t.y, weight, one);
+        output.t.z = Lerp(lhs.t.z, rhs.t.z, weight, one);
     }
 }
 
-static inline void BuildCharacterMatrices(DrawableCharacter* drawable, PoseAccumulator* accumulator)
+static inline void BuildCharacterMatrices(DrawableCharacter* drawable, cPoseAccumulator* accumulator)
 {
     nlMatrix4 matrix;
     nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)drawable->facingDirection);
@@ -650,7 +604,7 @@ void DrawableCharacter::Grab(Character& source)
     headSpin = (u16)(int)source.headTrack->headSpin;
     headTilt = (u16)(int)source.headTrack->headTilt;
     visible = true;
-    useObject = source.sourcePoseAccumulator->useObject;
+    useObject = source.sourcePoseAccumulator->m_bUseObject;
     damage1 = source.damage1;
     damage2 = source.damage2;
     damageType = source.damageType;
@@ -661,8 +615,8 @@ void DrawableCharacter::Grab(Character& source)
 
     if (poseAccumulator == 0)
     {
-        PoseAccumulator* accumulator =
-            (PoseAccumulator*)nlMalloc(0x7C, 8, false);
+        cPoseAccumulator* accumulator =
+            (cPoseAccumulator*)nlMalloc(0x7C, 8, false);
         if (accumulator != 0)
         {
             accumulator = fn_8030ABF8(
@@ -691,7 +645,7 @@ void DrawableCharacter::Grab(Character& source)
         matrix.e2[3][2] = megaTranslation.z;
         matrix.e2[3][3] = 1.0f;
 
-        poseAccumulator->nodeMatrices[lbl_806E1398] = matrix;
+        poseAccumulator->m_pNodeMatrices[lbl_806E1398] = matrix;
     }
 
     EffectsTexturing* texturing = source.effectsTexturing;
@@ -703,13 +657,13 @@ void DrawableCharacter::Grab(Character& source)
 }
 
 void DrawableCharacter::HeadTrackCallback(
-    u32 context, u32, PoseAccumulator*, u32, int)
+    u32 context, u32, cPoseAccumulator*, u32, int)
 {
     DrawableCharacter* drawable = (DrawableCharacter*)context;
     fn_80094E60(drawable->headSpin, drawable->headTilt);
 }
 
-void DrawableCharacter::BuildNodeMatrices(PoseAccumulator* accumulator)
+void DrawableCharacter::BuildNodeMatrices(cPoseAccumulator* accumulator)
 {
     nlMatrix4 matrix;
     nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)facingDirection);
@@ -939,31 +893,31 @@ void DrawableCharacter::SendToGl(Character& source, int renderPass)
     RenderCharacterShadow(source, model, view);
 }
 
-void DrawableCharacter::Grab(SkinAnimatedMovableNpc& npc)
+void DrawableCharacter::Grab(SkinAnimatedMovableNPC& npc)
 {
-    position = npc.position;
-    height = fn_8030C2F0(npc.poseAccumulator, 0)->e2[3][2];
-    facingDirection = npc.facingDirection;
-    object = npc.object;
-    visible = npc.visible;
+    position = npc.mv3Position;
+    height = npc.mpPoseAccumulator->GetNodeMatrix(0).e2[3][2];
+    facingDirection = npc.maFacingDirection;
+    object = npc.mpPoseTree;
+    visible = npc.mbIsVisible;
 
     if (poseAccumulator == 0)
     {
-        PoseAccumulator* accumulator =
-            (PoseAccumulator*)nlMalloc(0x7C, 8, false);
+        cPoseAccumulator* accumulator =
+            (cPoseAccumulator*)nlMalloc(0x7C, 8, false);
         if (accumulator != 0)
         {
-            accumulator = fn_8030ABF8(accumulator, npc.poseAccumulator);
+            accumulator = fn_8030ABF8(accumulator, npc.mpPoseAccumulator);
         }
         poseAccumulator = accumulator;
     }
     else
     {
-        fn_8030AD14(poseAccumulator, npc.poseAccumulator);
+        fn_8030AD14(poseAccumulator, npc.mpPoseAccumulator);
     }
 }
 
-void DrawableCharacter::Render(SkinAnimatedMovableNpc& npc)
+void DrawableCharacter::Render(SkinAnimatedMovableNPC& npc)
 {
     if (!visible)
     {
@@ -974,7 +928,7 @@ void DrawableCharacter::Render(SkinAnimatedMovableNpc& npc)
     nlMatrix4 worldMatrix;
     nlMakeRotationMatrixZ(worldMatrix, 0.0000958738f * (float)angleValue);
     worldMatrix.SetRow_(3, position);
-    npc.visible = visible;
+    npc.mbIsVisible = visible;
     npc.RenderFromReplay(*poseAccumulator, &worldMatrix);
 }
 
@@ -1004,13 +958,13 @@ void DrawableCharacter::Blend(
                 specialCharacter = true;
                 if (lbl_806E1394 <= 0)
                 {
-                    Hierarchy* hierarchy = lhs.poseAccumulator->hierarchy;
+                    cSHierarchy* hierarchy = lhs.poseAccumulator->m_pHierarchy;
                     u32 hash = nlStringLowerHash(CharacterLeftPropJointName);
                     lbl_806E1394 = fn_8030CC1C(hierarchy, hash);
-                    hierarchy = lhs.poseAccumulator->hierarchy;
+                    hierarchy = lhs.poseAccumulator->m_pHierarchy;
                     hash = nlStringLowerHash(CharacterRightPropJointName);
                     lbl_806E1398 = fn_8030CC1C(hierarchy, hash);
-                    hierarchy = lhs.poseAccumulator->hierarchy;
+                    hierarchy = lhs.poseAccumulator->m_pHierarchy;
                     hash = nlStringLowerHash(CharacterSpineJointName);
                     lbl_806E139C = fn_8030CC1C(hierarchy, hash);
                 }
@@ -1080,28 +1034,28 @@ void DrawableCharacter::Blend(
 
     if (poseAccumulator == 0)
     {
-        PoseAccumulator* accumulator =
-            (PoseAccumulator*)nlMalloc(sizeof(PoseAccumulator), 8, false);
+        cPoseAccumulator* accumulator =
+            (cPoseAccumulator*)nlMalloc(sizeof(cPoseAccumulator), 8, false);
         if (accumulator != 0)
         {
             accumulator = fn_8030A9D0(
-                accumulator, lhs.poseAccumulator->hierarchy, false);
+                accumulator, lhs.poseAccumulator->m_pHierarchy, false);
         }
         poseAccumulator = accumulator;
     }
 
-    poseAccumulator->scale = scale;
+    poseAccumulator->m_Scale = scale;
     fn_8030B1C0(poseAccumulator);
 
     for (int morphIndex = 0; morphIndex < 20; ++morphIndex)
     {
         float& lhsMorphWeight =
-            lhs.poseAccumulator->morphWeights[morphIndex];
-        poseAccumulator->morphWeights[morphIndex] +=
+            lhs.poseAccumulator->m_MorphWeights[morphIndex];
+        poseAccumulator->m_MorphWeights[morphIndex] +=
             lhsMorphWeight * lhsWeight;
         float& rhsMorphWeight =
-            rhs.poseAccumulator->morphWeights[morphIndex];
-        poseAccumulator->morphWeights[morphIndex] +=
+            rhs.poseAccumulator->m_MorphWeights[morphIndex];
+        poseAccumulator->m_MorphWeights[morphIndex] +=
             rhsMorphWeight * rhsWeight;
     }
 
@@ -1111,8 +1065,8 @@ void DrawableCharacter::Blend(
         identityZero = 0.0f;
         for (int i = 0; i < fn_8030C374(poseAccumulator); ++i)
         {
-            RotAccum& lhsRot = lhs.poseAccumulator->rotations[i];
-            RotAccum& rhsRot = rhs.poseAccumulator->rotations[i];
+            RotAccum& lhsRot = lhs.poseAccumulator->m_pRotations[i];
+            RotAccum& rhsRot = rhs.poseAccumulator->m_pRotations[i];
             float lhsRotAroundZWeight =
                 lhsRot.rotAroundZAccumulatedWeight * lhsWeight;
             float rhsRotAroundZWeight = rhsRot.rotAroundZAccumulatedWeight * rhsWeight;
@@ -1130,16 +1084,16 @@ void DrawableCharacter::Blend(
                 poseAccumulator, i, &rhsRot.q, false, rhsQuaternionWeight);
 
             BlendTranslationAccum(
-                poseAccumulator->translations[i],
-                lhs.poseAccumulator->translations[i],
-                rhs.poseAccumulator->translations[i],
+                poseAccumulator->m_pTranslations[i],
+                lhs.poseAccumulator->m_pTranslations[i],
+                rhs.poseAccumulator->m_pTranslations[i],
                 rhsWeight,
                 identityOne,
                 identityZero);
             BlendScaleAccum(
-                poseAccumulator->scales[i],
-                lhs.poseAccumulator->scales[i],
-                rhs.poseAccumulator->scales[i],
+                poseAccumulator->m_pScales[i],
+                lhs.poseAccumulator->m_pScales[i],
+                rhs.poseAccumulator->m_pScales[i],
                 rhsWeight,
                 identityOne);
         }
@@ -1162,21 +1116,21 @@ void DrawableCharacter::Blend(
         for (int i = 0; i < fn_8030C374(poseAccumulator); ++i)
         {
             fn_802B5544(
-                &poseAccumulator->quaternions[i],
-                &lhs.poseAccumulator->quaternions[i],
-                &rhs.poseAccumulator->quaternions[i],
+                &poseAccumulator->m_pQuaternions[i],
+                &lhs.poseAccumulator->m_pQuaternions[i],
+                &rhs.poseAccumulator->m_pQuaternions[i],
                 rhsWeight);
             BlendTranslationAccum(
-                poseAccumulator->translations[i],
-                lhs.poseAccumulator->translations[i],
-                rhs.poseAccumulator->translations[i],
+                poseAccumulator->m_pTranslations[i],
+                lhs.poseAccumulator->m_pTranslations[i],
+                rhs.poseAccumulator->m_pTranslations[i],
                 rhsWeight,
                 identityZero,
                 identityOne);
             BlendScaleAccum(
-                poseAccumulator->scales[i],
-                lhs.poseAccumulator->scales[i],
-                rhs.poseAccumulator->scales[i],
+                poseAccumulator->m_pScales[i],
+                lhs.poseAccumulator->m_pScales[i],
+                rhs.poseAccumulator->m_pScales[i],
                 rhsWeight,
                 identityZero);
         }
@@ -1198,7 +1152,7 @@ void DrawableCharacter::Blend(
                 }
             }
             SetMatrixTranslation(matrix, megaTranslation);
-            poseAccumulator->nodeMatrices[lbl_806E1398] = matrix;
+            poseAccumulator->m_pNodeMatrices[lbl_806E1398] = matrix;
         }
         else if (lbl_806E13AF || !flag3)
         {
@@ -1224,7 +1178,7 @@ void DrawableCharacter::Blend(
             nlMultMatrices(
                 matrix, rotation,
                 *fn_8030C2F0(poseAccumulator, lbl_806E139C));
-            poseAccumulator->nodeMatrices[lbl_806E1398] = matrix;
+            poseAccumulator->m_pNodeMatrices[lbl_806E1398] = matrix;
         }
 
         if (lbl_806E13AE || !flag2)
@@ -1251,7 +1205,7 @@ void DrawableCharacter::Blend(
             nlMultMatrices(
                 matrix, rotation,
                 *fn_8030C2F0(poseAccumulator, lbl_806E139C));
-            poseAccumulator->nodeMatrices[lbl_806E1394] = matrix;
+            poseAccumulator->m_pNodeMatrices[lbl_806E1394] = matrix;
         }
     }
 }
@@ -1290,12 +1244,12 @@ void DrawableCharacter::EvaluateFrom(
     damageType = character->damageType;
     shadowLevel = initialOne;
 
-    poseAccumulator->scale = poseScale;
+    poseAccumulator->m_Scale = poseScale;
     poseAccumulator->InitAccumulators(poseScale, currentDamage2);
     poseNode.Evaluate(1.0f, poseAccumulator);
     effectsTexturing = fxGetTexturing(eFXTex_Nothing);
 
-    PoseAccumulator* accumulator = poseAccumulator;
+    cPoseAccumulator* accumulator = poseAccumulator;
     nlMatrix4 matrix;
     nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)facingDirection);
     matrix.e2[3][0] = position.x;

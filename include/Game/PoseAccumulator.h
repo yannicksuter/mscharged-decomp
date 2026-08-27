@@ -30,6 +30,7 @@ struct MorphWeightAccum
 class cPoseAccumulator
 {
 public:
+    void InitAccumulators(float scale, float damage);
     int GetNumNodes() const;
     nlMatrix4& GetNodeMatrix(int nodeIndex) const;
     void BlendRotIdentity(int nodeIndex, float weight);
