@@ -403,6 +403,7 @@ config.libs = [
             Object(Matching, "NL/nlTimer.cpp"),
             Object(NonMatching, "Game/Debug/FrameCounter.cpp"),
             Object(Matching, "NL/nlEndian.cpp"),
+            Object(Matching, "NL/gl/glDraw3.cpp"),
             Object(Matching, "NL/gl/glFont.cpp"),
             Object(Matching, "NL/gl/glMatrix.cpp"),
             Object(Matching, "NL/gl/glStat.cpp"),

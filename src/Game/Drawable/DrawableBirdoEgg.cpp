@@ -38,11 +38,12 @@ public:
     char _021[3];
 };
 
-extern "C" {
-float fn_8002D194(int);
-void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
-float fn_8019A574(const BirdoEggObject*);
-void fn_80368374(nlMatrix4*, const DrawableBirdoEgg*, int);
+extern "C"
+{
+    float fn_8002D194(int);
+    void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
+    float fn_8019A574(const BirdoEggObject*);
+    void fn_80368374(nlMatrix4*, const DrawableBirdoEgg*, int);
 }
 
 static float gShadowScaleIn = 0.125f;
@@ -57,7 +58,7 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
     nlVector3 extent;
     nlVector3 position;
     nlVector3 transformed;
-    ShadowQuad quad;
+    glQuad3 quad;
 
     float fade = matrix.m43 / gShadowFadeHeight;
     if (fade < 0.0f)
@@ -115,24 +116,24 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
     colour[2] = 255;
     colour[3] = (u8)value;
 
-    nlVec3Set(quad.corners[0], position.x + extent.y, position.y - extent.x, position.z);
-    nlVec3Set(quad.corners[1], position.x - extent.x, position.y - extent.y, position.z);
-    nlVec3Set(quad.corners[2], position.x - extent.y, position.y + extent.x, position.z);
-    nlVec3Set(quad.corners[3], position.x + extent.x, position.y + extent.y, position.z);
+    nlVec3Set(quad.m_pos[0], position.x + extent.y, position.y - extent.x, position.z);
+    nlVec3Set(quad.m_pos[1], position.x - extent.x, position.y - extent.y, position.z);
+    nlVec3Set(quad.m_pos[2], position.x - extent.y, position.y + extent.x, position.z);
+    nlVec3Set(quad.m_pos[3], position.x + extent.x, position.y + extent.y, position.z);
 
-    quad.uv[0][0] = 1.0f;
-    quad.uv[0][1] = 1.0f;
-    quad.uv[1][0] = 0.0f;
-    quad.uv[1][1] = 1.0f;
-    quad.uv[2][0] = 0.0f;
-    quad.uv[2][1] = 0.0f;
-    quad.uv[3][0] = 1.0f;
-    quad.uv[3][1] = 0.0f;
+    quad.m_uv[0].x = 1.0f;
+    quad.m_uv[0].y = 1.0f;
+    quad.m_uv[1].x = 0.0f;
+    quad.m_uv[1].y = 1.0f;
+    quad.m_uv[2].x = 0.0f;
+    quad.m_uv[2].y = 0.0f;
+    quad.m_uv[3].x = 1.0f;
+    quad.m_uv[3].y = 0.0f;
 
-    quad.colors[3] = *(u32*)colour;
-    quad.colors[2] = *(u32*)colour;
-    quad.colors[1] = *(u32*)colour;
-    quad.colors[0] = *(u32*)colour;
+    *(u32*)&quad.m_colour[3] = *(u32*)colour;
+    *(u32*)&quad.m_colour[2] = *(u32*)colour;
+    *(u32*)&quad.m_colour[1] = *(u32*)colour;
+    *(u32*)&quad.m_colour[0] = *(u32*)colour;
 
     glSetDefaultState(true);
     glSetRasterState(GLS_AlphaBlend, 1);
@@ -142,7 +143,7 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
     glSetCurrentTexture(glGetTexture("global/ball_shadow"), GLTT_Diffuse);
     glSetTextureState(GLTS_DiffuseWrap, 3);
     glSetCurrentTextureState(glHandleizeTextureState());
-    fn_802C9664(&quad, fn_8027262C(), 0);
+    quad.Attach((eGLView)(u32)fn_8027262C(), 0);
 }
 
 DrawableBirdoEgg::DrawableBirdoEgg()
