@@ -46,6 +46,12 @@ public:
         nlListAddStart(&m_Head, entry, &m_Tail);
     }
 
+    void AddEnd(const T& data)
+    {
+        ListEntry<T>* entry = m_Allocator.New(ListEntry<T>(data));
+        nlListAddEnd(&m_Head, &m_Tail, entry);
+    }
+
     ListEntry<T>* RemoveStart()
     {
         return nlListRemoveStart(&m_Head, &m_Tail);

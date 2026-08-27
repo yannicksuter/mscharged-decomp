@@ -179,6 +179,15 @@ Game/NetMeshModelLoader.cpp:
 	.sbss       start:0x806E11C0 end:0x806E11C8
 	.sdata2     start:0x806E47E0 end:0x806E47F8
 
+Game/Physics.cpp:
+	.text       start:0x8013D720 end:0x8013E2E4
+	.ctors      start:0x804DB638 end:0x804DB63C
+	.data       start:0x8050E220 end:0x8050E280
+	.bss        start:0x8056FF08 end:0x8056FF70
+	.sdata      start:0x806DCA00 end:0x806DCA08
+	.sbss       start:0x806E11C8 end:0x806E11D8
+	.sdata2     start:0x806E47F8 end:0x806E4810
+
 Game/Physics/PhysicsCharacter.cpp:
 	.text       start:0x80142A1C end:0x80143FD4
 	.data       start:0x8050E810 end:0x8050EE30

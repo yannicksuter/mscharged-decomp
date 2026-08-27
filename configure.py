@@ -424,6 +424,7 @@ config.libs = [
             Object(NonMatching, "Game/Render/NetMesh.cpp"),
             Object(Matching, "Game/NetMeshEdge.cpp"),
             Object(NonMatching, "Game/NetMeshModelLoader.cpp"),
+            Object(NonMatching, "Game/Physics.cpp"),
             Object(Matching, "Game/Task/WorldUpdateTask.cpp"),
             Object(Matching, "Game/Task/EndFrameTask.cpp"),
             Object(Matching, "Game/Task/NetworkUpdateTask.cpp"),
