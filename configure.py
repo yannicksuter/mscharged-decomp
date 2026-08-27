@@ -374,6 +374,7 @@ config.libs = [
             Object(NonMatching, "Game/AI/Desire.cpp"),
             Object(Matching, "Game/AI/Fuzzy.cpp"),
             Object(Equivalent, "Game/AI/Variant.cpp", cflags=[*cflags_game_deferred, "-char signed"]),
+            Object(NonMatching, "Game/Camera/CameraMan.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/DB/BasicGameInfo.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/GameInfo.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/NisPlayer.cpp", extra_cflags=["-inline deferred"]),

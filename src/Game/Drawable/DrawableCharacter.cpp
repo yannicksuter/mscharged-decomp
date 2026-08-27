@@ -272,8 +272,6 @@ extern "C" nlMatrix4* fn_8030C2F0(cPoseAccumulator*, int);
 extern "C" int fn_8030C374(cPoseAccumulator*);
 extern "C" void fn_8030C380(cPoseAccumulator*, int, void (*)(void*), void*, int);
 extern "C" int fn_8030CC1C(cSHierarchy*, u32);
-extern "C" void fn_80368374(nlMatrix4*, const nlVector4*, bool);
-extern "C" void fn_80368450(nlQuaternion*, const nlMatrix4*);
 extern "C" void fn_8017BF84(void*);
 extern "C" void fn_80094E60(u16, u16);
 extern "C" void fn_8030AE14(cPoseAccumulator*, bool);
@@ -632,7 +630,7 @@ void DrawableCharacter::Grab(Character& source)
     if (lbl_806E13B0 == 0 && megaEnabled)
     {
         nlMatrix4 matrix;
-        fn_80368374(&matrix, &megaBasis, true);
+        nlQuatToMatrix(matrix, *(const nlQuaternion*)&megaBasis, true);
         for (int row = 0; row < 3; ++row)
         {
             for (int column = 0; column < 3; ++column)
@@ -1143,7 +1141,7 @@ void DrawableCharacter::Blend(
         if (!lbl_806E13B0 && megaEnabled)
         {
             nlMatrix4 matrix;
-            fn_80368374(&matrix, &megaBasis, true);
+            nlQuatToMatrix(matrix, *(const nlQuaternion*)&megaBasis, true);
             for (int row = 0; row < 3; ++row)
             {
                 for (int column = 0; column < 3; ++column)
@@ -1312,13 +1310,13 @@ nlQuaternion DrawableCharacter::GetBallOrientation()
             nlVec3LengthSquared(*(nlVector3*)&matrix.e2[2][0]), true);
         nlVec3Scale(*(nlVector3*)&matrix.e2[2][0], reciprocalLength);
 
-        fn_80368450(&result, &matrix);
+        nlMatrixToQuat(result, matrix);
     }
     else
     {
         nlMatrix4* source =
             fn_8030C2F0(poseAccumulator, ballJointIndex);
-        fn_80368450(&result, source);
+        nlMatrixToQuat(result, *source);
     }
 
     return result;

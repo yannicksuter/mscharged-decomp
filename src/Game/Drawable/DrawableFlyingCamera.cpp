@@ -57,7 +57,6 @@ public:
 extern "C"
 {
     void* fn_8027267C(int);
-    void fn_80368374(nlMatrix4*, const DrawableFlyingCamera*, int);
     FlyingCameraObject* fn_801A0C44(int);
     RenderObject* fn_80276360(int, int);
     void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
@@ -194,7 +193,7 @@ void DrawableFlyingCamera::Render() const
         return;
     }
 
-    fn_80368374(&matrix, this, 1);
+    nlQuatToMatrix(matrix, mOrientation, true);
 
     nlVec3Scale(*(nlVector3*)matrix.e2[0], mScale);
     nlVec3Scale(*(nlVector3*)matrix.e2[1], mScale);

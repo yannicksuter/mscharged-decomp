@@ -68,7 +68,6 @@ struct ShadowHeight
 extern "C" RenderObject* fn_8027725C(u32);
 extern "C" ShadowHeight* fn_802772BC();
 extern "C" void fn_802B549C(nlQuaternion*, u16);
-extern "C" void fn_80368374(nlMatrix4*, const nlQuaternion*, bool);
 extern "C" void fn_801869AC(void*, void*, int, int, const DrawablePowerup*, float);
 extern "C" u32 fn_8027262C();
 
@@ -241,7 +240,7 @@ void DrawablePowerup::Render(int idx) const
     }
 
     nlMatrix4 transform;
-    fn_80368374(&transform, &orientation, true);
+    nlQuatToMatrix(transform, orientation, true);
     transform.e2[3][0] = mPosition.x;
     transform.e2[3][1] = mPosition.y;
     transform.e2[3][2] = mPosition.z;

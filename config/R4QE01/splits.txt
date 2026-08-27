@@ -117,6 +117,16 @@ Game/AI/Fuzzy.cpp:
 	.text       start:0x800E2FA8 end:0x800E30A8
 	.sdata2     start:0x806E42C8 end:0x806E42D4
 
+Game/Camera/CameraMan.cpp:
+	.text       start:0x800F0240 end:0x800F2504
+	.ctors      start:0x804DB5B8 end:0x804DB5BC
+	.rodata     start:0x804DC3C8 end:0x804DC4F0
+	.data       start:0x80504348 end:0x80504EC8
+	.bss        start:0x8056DCE0 end:0x8056E220
+	.sdata      start:0x806DC478 end:0x806DC498
+	.sbss       start:0x806E0EB0 end:0x806E0EE8
+	.sdata2     start:0x806E4398 end:0x806E43C8
+
 Game/DB/BasicGameInfo.cpp:
 	.text       start:0x800FBBA0 end:0x800FC20C
 	.ctors      start:0x804DB5D0 end:0x804DB5D4

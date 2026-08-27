@@ -41,7 +41,6 @@ public:
 extern "C"
 {
     void* fn_8027267C(int);
-    void fn_80368374(nlMatrix4*, const DrawableBulletBill*, int);
     void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
 }
 
@@ -187,7 +186,7 @@ void DrawableBulletBill::Render(const BulletBillObject* object) const
         return;
     }
 
-    fn_80368374(&matrix, this, 1);
+    nlQuatToMatrix(matrix, mOrientation, true);
 
     if (mScale < 1.0f)
     {
