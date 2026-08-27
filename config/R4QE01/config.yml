@@ -17,6 +17,10 @@ add_relocations:
   - { source: .text:0x8009A834, type: l, target: __vt__11FreezeShell }
   - { source: .text:0x8009A854, type: l, target: __vt__8RedShell }
 block_relocations:
+  # WPADEncrypt.c tb[] bytes that scan as plausible pointers
+  - { source: 0x8054BA9C }
+  - { source: 0x8054BF10 }
+  - { source: 0x8054C090 }
   - { source: 0x804EFFD0 }
   - { source: 0x804EFFD4 }
   - { source: 0x804EFFD8 }

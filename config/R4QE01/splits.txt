@@ -1285,6 +1285,10 @@ RVL_SDK/si/SISamplingRate.c:
 	.data       start:0x8054A760 end:0x8054A7F8
 	.sbss       start:0x806E29D0 end:0x806E29D4
 
+RVL_SDK/sp/sp.c:
+	.text       start:0x803C1010 end:0x803C1810
+	.sdata2     start:0x806E7540 end:0x806E7550
+
 RVL_SDK/thp/THPDec.c:
 	.text       start:0x803C1810 end:0x803C4BE0
 	.rodata     start:0x804EC688 end:0x804EC718
@@ -1297,12 +1301,22 @@ RVL_SDK/thp/THPDec.c:
 RVL_SDK/thp/THPAudio.c:
 	.text       start:0x803C4BE0 end:0x803C5074
 
+RVL_SDK/tpl/TPL.c:
+	.text       start:0x803C5074 end:0x803C51A8
+	.data       start:0x8054A840 end:0x8054A86B
+	.sdata      start:0x806DFD70 end:0x806DFD76
+
 RVL_SDK/vi/vi.c:
 	.text       start:0x803C51A8 end:0x803C7A44
 	.data       start:0x8054A870 end:0x8054ACF0
 	.bss        start:0x805D5FB0 end:0x805D6120
 	.sdata      start:0x806DFD78 end:0x806DFD98
 	.sbss       start:0x806E2B08 end:0x806E2BB8
+
+RVL_SDK/vi/i2c.c:
+	.text       start:0x803C7A44 end:0x803C8460
+	.sdata      start:0x806DFD98 end:0x806DFD9C
+	.sbss       start:0x806E2BB8 end:0x806E2BBC
 
 RVL_SDK/vi/vi3in1.c:
 	.text       start:0x803C8460 end:0x803C9B04
@@ -1311,18 +1325,34 @@ RVL_SDK/vi/vi3in1.c:
 	.sdata      start:0x806DFDA0 end:0x806DFDB4
 	.sbss       start:0x806E2BC0 end:0x806E2BD4
 
+RVL_SDK/wenc/wenc.c:
+	.text       start:0x803C9B04 end:0x803C9DDC
+	.rodata     start:0x804EC718 end:0x804EC758
+	.sdata2     start:0x806E7570 end:0x806E7578
+
 RVL_SDK/wpad/WPAD.c:
 	.text       start:0x803C9DDC end:0x803D1408
 
-RVL_SDK/wud/debug_msg.c:
+RVL_SDK/wpad/WPADHIDParser.c:
+	.text       start:0x803D1408 end:0x803D5EBC
+
+RVL_SDK/wpad/WPADEncrypt.c:
+	.text       start:0x803D5EBC end:0x803D6F64
+	.data       start:0x8054B9C8 end:0x8054CCF0
+	.sbss       start:0x806E2C20 end:0x806E2C24
+
+RVL_SDK/wpad/debug_msg.c:
 	.text       start:0x803D6F64 end:0x803D6FB4
 
 RVL_SDK/wud/WUD.c:
 	.text       start:0x803D6FB4 end:0x803DB324
 
 RVL_SDK/wud/WUDHidHost.c:
-	.text       start:0x803DB324 end:0x803DB848
+	.text       start:0x803DB324 end:0x803DB870
 	.data       start:0x8054DB58 end:0x8054DDD8
+
+RVL_SDK/wud/debug_msg.c:
+	.text       start:0x803DB870 end:0x803DB8C0
 
 RVL_SDK/bte/gki_buffer.c:
 	.text       start:0x803DB8C0 end:0x803DCD04
@@ -2112,6 +2142,11 @@ RVL_SDK/gamespy/md5c.c:
 	.data       start:0x80565AA0 end:0x80565AE0
 	.sdata      start:0x806E0568 end:0x806E0570
 
+RVL_SDK/gamespy/GP/gpiUtility.c:
+	.text       start:0x804B46A0 end:0x804B4C84
+	.data       start:0x80566C48 end:0x80566CA0
+	.sdata      start:0x806E08F0 end:0x806E0908
+
 RVL_SDK/gamespy/gt2/gt2Auth.c:
 	.text       start:0x804B4C84 end:0x804B5048
 	.data       start:0x80566CA0 end:0x80566CC4
@@ -2130,3 +2165,8 @@ RVL_SDK/gamespy/gt2/gt2Socket.c:
 
 RVL_SDK/gamespy/ghttp/ghttpCallbacks.c:
 	.text       start:0x804BD5D0 end:0x804BD6F0
+
+RVL_SDK/gamespy/ghttp/ghttpConnection.c:
+	.text       start:0x804BDB60 end:0x804BE2AC
+	.data       start:0x80567630 end:0x8056763C
+	.sbss       start:0x806E2F68 end:0x806E2F78
