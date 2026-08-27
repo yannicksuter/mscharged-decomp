@@ -2,16 +2,9 @@
 
 #include <string.h>
 
+#include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
-
-// Charged loads the localization table asynchronously: Load only queues the
-// request and the header is validated in the completion callback, so the
-// predecessor's single synchronous Load is split in two here. The file-request
-// service is not reconstructed yet and stays address-named.
-extern "C" {
-int fn_802B396C(const char* path, void* callback, void* user, int align, int, int, int, void* queue);
-}
 
 extern const unsigned short LocalizationTableNotFound[] = L"Localization Table Not Found";
 extern const unsigned short MissingLocString[] = L"missing loc string";
@@ -85,7 +78,7 @@ void nlLocalization::Initialize()
     g_pLocalization = pLocalization;
 }
 
-unsigned char nlLocalization::Load(nlLanguage Language, bool ingameloc, void* queue)
+unsigned char nlLocalization::Load(nlLanguage Language, bool ingameloc, void* allocator)
 {
     char Filename[64] = { 0 };
 
@@ -103,13 +96,13 @@ unsigned char nlLocalization::Load(nlLanguage Language, bool ingameloc, void* qu
     }
 
     int result;
-    if (queue != 0)
+    if (allocator != 0)
     {
-        result = fn_802B396C(Filename, (void*)OnTableLoaded, this, 32, 0, 0, 0, queue);
+        result = nlLoadEntireFileAsync(Filename, (LoadAsyncCallback)OnTableLoaded, this, 32, AllocateStart, 0, 0, (MemoryAllocator*)allocator);
     }
     else
     {
-        result = fn_802B396C(Filename, (void*)OnTableLoaded, this, 32, 0, 0, 0, 0);
+        result = nlLoadEntireFileAsync(Filename, (LoadAsyncCallback)OnTableLoaded, this, 32, AllocateStart, 0, 0, 0);
     }
 
     return result != 0;

@@ -80,6 +80,22 @@ inline void nlListAddStart(T** head, T* entry, T** tail)
 }
 
 template <typename T>
+inline void nlListAddEnd(T** head, T** tail, T* entry)
+{
+    entry->next = 0;
+    T* oldTail = *tail;
+    if (oldTail != 0)
+    {
+        oldTail->next = entry;
+        *tail = entry;
+        return;
+    }
+
+    *tail = entry;
+    *head = entry;
+}
+
+template <typename T>
 inline T* nlListRemoveStart(T** head, T** tail)
 {
     T* first = *head;

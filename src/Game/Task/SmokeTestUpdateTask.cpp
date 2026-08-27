@@ -1,6 +1,7 @@
 #include "NL/nlTask.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlPrint.h"
+#include "NL/nlString.h"
 
 #include "types.h"
 
@@ -66,7 +67,6 @@ extern "C" void fn_802BD718(const char* name, const char* units, float value);
 
 extern "C" void fn_802BB048(void*, void*, void*, int, const char*, ...);
 extern "C" const char* fn_802C2D20(const char*, const char*);
-extern "C" void fn_8000C280(char*, const char*, const char*, u32);
 
 bool lbl_806E1DF0;
 void (*lbl_806E1DF4)();
@@ -156,10 +156,10 @@ extern "C" void fn_802BD718(const char* name, const char* units, float value)
     if (units != 0)
     {
         nlSNPrintf(unitsOutput, sizeof(unitsOutput), sGraphUnitsFormat, units);
-        fn_8000C280(output, output, unitsOutput, sizeof(output));
+        nlStrNCat(output, output, unitsOutput, sizeof(output));
     }
 
-    fn_8000C280(output, output, "\n", sizeof(output));
+    nlStrNCat(output, output, "\n", sizeof(output));
     fn_802BD644(output);
 }
 

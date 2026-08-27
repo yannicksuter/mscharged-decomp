@@ -8,6 +8,7 @@
 #include "Game/Physics/CollisionSpace.h"
 #include "Game/Physics/PhysicsBall.h"
 #include "Game/Physics/PhysicsColumn.h"
+#include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Player.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
@@ -26,7 +27,6 @@ extern "C" bool fn_80038918(cFielder*);
 extern "C" bool fn_8003E74C(cCharacter*);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" bool fn_800976F8(cFielder*, float);
-extern "C" void fn_8016C3E4();
 extern void* lbl_806E1608;
 
 struct CollisionPlayerBallData
@@ -225,9 +225,9 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 wallData->pPlayer = (cPlayer*)m_pAICharacter;
                 wallData->contactPoint = contactPosition;
                 nlVec3Set(wallData->wallNormal,
-                    contacts[i].geom.normal[0],
-                    contacts[i].geom.normal[1],
-                    contacts[i].geom.normal[2]);
+                    contacts->geom.normal[0],
+                    contacts->geom.normal[1],
+                    contacts->geom.normal[2]);
                 fn_80145F18(wallData);
             }
         }
@@ -325,9 +325,9 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             m_bSupportingBallThisFrame = true;
         }
 
-        cCharacter* character = m_pAICharacter;
         PhysicsBall* physicsBall = (PhysicsBall*)other;
         cBall* ball = physicsBall->m_pBall;
+        cCharacter* character = m_pAICharacter;
         if ((!physicsBall->m_bCollideWithFielders
                 && character->m_eClassType == FIELDER)
             || (!physicsBall->m_bCollideWithGoalies
@@ -338,7 +338,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         }
 
         if (other->m_parentObject == 0)
-            fn_8016C3E4();
+            FakeBallWorld::InvalidateBallCache();
 
         if (ball->GetOwnerFielder() != 0
             && m_pAICharacter->m_eClassType == FIELDER)

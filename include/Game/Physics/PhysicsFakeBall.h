@@ -6,6 +6,7 @@
 class FakeBallWorld
 {
 public:
+    static void InvalidateBallCache();
     static bool GetPredictedBallPosition(
         float fDeltaTime, nlVector3& v3Position, nlVector3& v3Velocity);
 };

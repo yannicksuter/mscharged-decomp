@@ -179,6 +179,15 @@ Game/NetMeshModelLoader.cpp:
 	.sbss       start:0x806E11C0 end:0x806E11C8
 	.sdata2     start:0x806E47E0 end:0x806E47F8
 
+Game/Physics.cpp:
+	.text       start:0x8013D720 end:0x8013E2E4
+	.ctors      start:0x804DB638 end:0x804DB63C
+	.data       start:0x8050E220 end:0x8050E280
+	.bss        start:0x8056FF08 end:0x8056FF70
+	.sdata      start:0x806DCA00 end:0x806DCA08
+	.sbss       start:0x806E11C8 end:0x806E11D8
+	.sdata2     start:0x806E47F8 end:0x806E4810
+
 Game/Physics/PhysicsCharacter.cpp:
 	.text       start:0x80142A1C end:0x80143FD4
 	.data       start:0x8050E810 end:0x8050EE30
@@ -334,6 +343,15 @@ NL/nlConfig.cpp:
 	.sbss       start:0x806E1D80 end:0x806E1D88
 	.sdata2     start:0x806E60A8 end:0x806E60B0
 
+NL/nlDebugFile.cpp:
+	.text       start:0x802B18E8 end:0x802B1A30
+	.sdata      start:0x806DF228 end:0x806DF238
+	.sbss       start:0x806E1D88 end:0x806E1D90
+
+NL/nlFile.cpp:
+	.text       start:0x802B36B8 end:0x802B3B38
+	.data       start:0x8052B538 end:0x8052B54C
+
 NL/nlSlotPool.cpp:
 	.text       start:0x802B4514 end:0x802B4834
 
@@ -361,6 +379,15 @@ Game/Sys/clock.cpp:
 NL/nlTimer.cpp:
 	.text       start:0x802B75BC end:0x802B7798
 	.sdata2     start:0x806E6160 end:0x806E6178
+
+Game/Debug/FrameCounter.cpp:
+	.text       start:0x802B7BDC end:0x802B94B4
+	.ctors      start:0x804DB990 end:0x804DB994
+	.data       start:0x8052B560 end:0x8052B590
+	.bss        start:0x8057C0F0 end:0x8057C108
+	.sdata      start:0x806DF258 end:0x806DF290
+	.sbss       start:0x806E1DC0 end:0x806E1DC8
+	.sdata2     start:0x806E6180 end:0x806E61F0
 
 Game/Task/SmokeTestUpdateTask.cpp:
 	.text       start:0x802BD4E4 end:0x802BD814

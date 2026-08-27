@@ -6,8 +6,6 @@
 extern void nlPrintf(const char*, ...);
 extern void nlBreak();
 
-extern "C" bool fn_802B1A20(void*);
-
 char lbl_8052B370[] = "Total Free Memory: %d\n";
 char lbl_8052B388[] = "Largest Free Block: %d\n";
 char lbl_8052B3A0[] = "FreePanicDump.txt";
@@ -70,7 +68,7 @@ static inline void DumpFreeMemory(MemoryAllocator* allocator, const char* filena
     dump.total = 0;
     dump.count = 0;
     void* file = dump.file;
-    if (fn_802B1A20(file))
+    if (nlDebugFileIsValid(file))
     {
         nlWriteLineDebug(file, lbl_8052B414, false);
     }
@@ -84,7 +82,7 @@ static inline void DumpFreeMemory(MemoryAllocator* allocator, const char* filena
     char buffer[512];
     nlSNPrintf(buffer, sizeof(buffer), lbl_8052B45C, dump.total);
     buffer[511] = 0;
-    if (fn_802B1A20(file))
+    if (nlDebugFileIsValid(file))
     {
         nlWriteLineDebug(file, buffer, false);
     }
@@ -93,7 +91,7 @@ static inline void DumpFreeMemory(MemoryAllocator* allocator, const char* filena
         nlPrintf(buffer);
     }
 
-    if (fn_802B1A20(file))
+    if (nlDebugFileIsValid(file))
     {
         nlCloseFileDebug(file);
     }
@@ -459,7 +457,7 @@ void FreePanicDumpCallback_802AF470::Callback(FreeBlockList* block)
     char buffer[512];
     nlSNPrintf(buffer, sizeof(buffer), "%4d| 0x%08x| %10d| \n", count, block, block->m_size);
     buffer[511] = 0;
-    if (fn_802B1A20(file))
+    if (nlDebugFileIsValid(file))
     {
         nlWriteLineDebug(file, buffer, false);
     }

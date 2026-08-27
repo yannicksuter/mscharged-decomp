@@ -45,10 +45,11 @@ extern "C"
     // Allocator-state helpers retained in the following automatic range.
     void fn_8036D6F8(MemoryAllocator* allocator);
     void fn_8036D71C();
-    // C stdio wrappers retained in the MSL region.
-    void* fn_8038052C(const char* path, const char* mode);
-    void fn_80380030(const void* buffer, unsigned long size, unsigned long count, void* file);
-    void fn_8038033C(void* file);
+    // C stdio entry points retained in the MSL region.
+    typedef struct _FILE FILE;
+    FILE* fopen(const char* path, const char* mode);
+    unsigned long fwrite(const void* buffer, unsigned long size, unsigned long count, FILE* file);
+    int fclose(FILE* file);
 }
 
 struct GXColor
@@ -186,7 +187,7 @@ static void glx_ScreenCapture(bool isMovie)
     }
 
     _shotno++;
-    file = fn_8038052C(filename, "wb");
+    file = fopen(filename, "wb");
 
     if (file != 0)
     {
@@ -222,9 +223,9 @@ static void glx_ScreenCapture(bool isMovie)
             }
         }
 
-        fn_80380030(&header, 1, sizeof(TargaHeader), file);
-        fn_80380030(imageData, 3, 0x46000, file);
-        fn_8038033C(file);
+        fwrite(&header, 1, sizeof(TargaHeader), (FILE*)file);
+        fwrite(imageData, 3, 0x46000, (FILE*)file);
+        fclose((FILE*)file);
         delete[] imageData;
     }
 }
