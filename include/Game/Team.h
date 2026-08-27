@@ -31,4 +31,6 @@ public:
     /* 0xE8 */ cNet* m_pNet;
 };
 
+extern cTeam* g_pTeams[];
+
 #endif // GAME_TEAM_H
