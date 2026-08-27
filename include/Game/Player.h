@@ -8,6 +8,8 @@ class cBall;
 class cAIPad;
 class cGlobalPad;
 class cPN_Feather;
+class cPN_SAnimController;
+class cPN_SingleAxisBlender;
 class cTeam;
 class PlayerTweaks;
 struct CollisionPlayerPlayerData;
@@ -44,6 +46,11 @@ public:
         float fIgnoreObjectFartherThanThis);
     void fn_8009750C();
     void fn_80097648(float fParam);
+    cPN_SingleAxisBlender* CreateSingleAxisBlender(
+        const int* pSABAnims, int nNumSABAnims, int nPrimaryAnim,
+        void (*fWeightCB)(unsigned int, cPN_SingleAxisBlender*),
+        float fWeightSeek, cPN_SAnimController* pSynchingController,
+        float fInitialWeight);
 
 protected:
     /* 0x1E4 */ u8 mUnknown1E4[0x0C];
@@ -61,7 +68,9 @@ protected:
     /* 0x234 */ u8 mUnknown234[0x1C];
     /* 0x250 */ u32 mUnidentified250;
     /* 0x254 */ void* mUnidentified254;
-    /* 0x258 */ u8 mUnknown258[0x98];
+    /* 0x258 */ u8 mUnknown258[0x04];
+    /* 0x25C */ int m_eLastPadAction;
+    /* 0x260 */ u8 mUnknown260[0x90];
     /* 0x2F0 */ cPN_Feather* mUnidentified2F0;
     /* 0x2F4 */ u8 mUnknown2F4[0x04];
 

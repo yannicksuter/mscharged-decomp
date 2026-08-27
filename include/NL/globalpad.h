@@ -4,6 +4,7 @@
 class cGlobalPad
 {
 public:
+    bool JustPressed(int button, bool remap);
     int fn_80332748();
 };
 

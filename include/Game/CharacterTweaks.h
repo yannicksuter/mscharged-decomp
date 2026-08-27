@@ -91,7 +91,14 @@ public:
     /* 0x274 */ TweakValue_804F4DC8 fShotFatigueLegSave;
 
 private:
-    /* 0x284 */ u8 mUnidentified284[0xB4];
+    /* 0x284 */ u8 mUnidentified284[0x24];
+
+public:
+    /* 0x2A8 */ TweakValue_804F4DC8 mUnidentified2A8;
+    /* 0x2B8 */ TweakValue_804F4DC8 mUnidentified2B8;
+
+private:
+    /* 0x2C8 */ u8 mUnidentified2C8[0x70];
 
 public:
     /* 0x338 */ TweakValue_804F4DC8 fRunningDirectionSeekSpeed;
