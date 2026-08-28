@@ -122,6 +122,8 @@ enum {
 
 #define SO_SOL_CONFIG 0xfffe
 
+#define SO_SO_RCVBUF 0x1002
+
 #define SO_IPPROTO_ICMP 1
 #define SO_IPPROTO_IGMP 2
 #define SO_IPPROTO_TCP 6
