@@ -53,6 +53,14 @@ Game/AI/FilteredRandom.cpp:
 	.rodata     start:0x804DBEF8 end:0x804DBF18
 	.sdata2     start:0x806E3660 end:0x806E3668
 
+Game/Formation.cpp:
+	.text       start:0x80050744 end:0x800551F0
+	.rodata     start:0x804DBF18 end:0x804DBFD8
+	.data       start:0x804FAD90 end:0x804FAFB8
+	.sdata      start:0x806DBA20 end:0x806DBA28
+	.sbss       start:0x806E0C80 end:0x806E0C88
+	.sdata2     start:0x806E3668 end:0x806E36D0
+
 Game/Goalie.cpp:
 	.text       start:0x80077224 end:0x8008288C
 	.ctors      start:0x804DB530 end:0x804DB534

@@ -373,6 +373,7 @@ config.libs = [
             Object(NonMatching, "Game/Character.cpp", extra_cflags=["-inline deferred"]),
             Object(NonMatching, "Game/AI/Fielder.cpp"),
             Object(Matching, "Game/AI/FilteredRandom.cpp", cflags=cflags_game_deferred),
+            Object(NonMatching, "Game/Formation.cpp", cflags=cflags_game),
             Object(NonMatching, "Game/Goalie.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/AI/GoalieActions.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/GoalieFatigue.cpp"),

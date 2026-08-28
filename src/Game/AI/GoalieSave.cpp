@@ -352,9 +352,10 @@ void GoalieSave::InitData(Goalie* pGoalie)
         GetAnimTriggerInfo(
             pGoalie, pSaveData->mnAnimID, TriggerCallback, pSaveData);
         pSaveData->mfMilestonePercent[4] = 1.0f;
+        float fGoalTime = pSaveData->mfMilestonePercent[2];
         pGoalie->GetJointPositionFuture(&pSaveData->mv3SavePos,
             pSaveData->mnAnimID, nBallJointIndex,
-            pSaveData->mfMilestonePercent[2], true, true, false, true);
+            fGoalTime, true, true, false, true);
         if (pSaveData->mfMilestonePercent[1] > 0.0f)
         {
             pGoalie->GetJointPositionFuture(&pSaveData->mv3TakeoffPos,
@@ -1215,7 +1216,7 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
         blendInfo.mpSaveData[3] = 0;
         blendInfo.mpSaveData[2] = 0;
 
-        if (pUp != pDown)
+        if (pDown != pUp)
         {
             float fPrimary =
                 (v3TargetPos.z - pDown->mv3SavePos.z)

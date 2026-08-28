@@ -52,8 +52,11 @@ public:
         float fWeightSeek, cPN_SAnimController* pSynchingController,
         float fInitialWeight);
 
+public:
+    /* 0x1E4 */ int m_ID;
+
 protected:
-    /* 0x1E4 */ u8 mUnknown1E4[0x0C];
+    /* 0x1E8 */ u8 mUnknown1E8[0x08];
     /* 0x1F0 */ float mUnidentified1F0;
     /* 0x1F4 */ u8 mUnknown1F4;
     /* 0x1F5 */ bool mUnidentified1F5;
@@ -66,6 +69,8 @@ public:
 
 protected:
     /* 0x234 */ u8 mUnknown234[0x1C];
+
+public:
     /* 0x250 */ u32 mUnidentified250;
     /* 0x254 */ void* mUnidentified254;
     /* 0x258 */ u8 mUnknown258[0x04];

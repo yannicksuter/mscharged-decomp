@@ -65,8 +65,11 @@ private:
 public:
     /* 0x6C */ nlVector3 m_v3Velocity;
 
+public:
+    /* 0x78 */ nlVector3 m_v3PassIntercept;
+
 private:
-    /* 0x78 */ u8 mUnidentified078[0x1C];
+    /* 0x84 */ u8 mUnidentified084[0x10];
 
 public:
     /* 0x94 */ nlVector3 m_v3ShotTarget;

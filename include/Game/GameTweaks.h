@@ -16,10 +16,37 @@ private:
     /* 0x0C */ int* m_pValue;
 }; // total size: 0x10
 
+class UnidentifiedFormationTweakValue
+{
+public:
+    operator float() const
+    {
+        return *m_pValue;
+    }
+
+private:
+    /* 0x00 */ float* m_pValue;
+    /* 0x04 */ u8 mUnidentified004[0x0C];
+}; // total size: 0x10
+
+struct UnidentifiedFormationTweakVector2
+{
+    UnidentifiedFormationTweakValue x;
+    UnidentifiedFormationTweakValue y;
+}; // total size: 0x20
+
 class GameTweaks
 {
 private:
-    /* 0x000 */ u8 mUnidentified000[0x184];
+    /* 0x000 */ u8 mUnidentified000[0x70];
+
+public:
+    /* 0x070 */ UnidentifiedFormationTweakVector2 vGetInPositionKeyFielderDist;
+    /* 0x090 */ UnidentifiedFormationTweakVector2 vGetInPositionInRadius;
+    /* 0x0B0 */ UnidentifiedFormationTweakVector2 vGetInPositionOutRadius;
+
+private:
+    /* 0x0D0 */ u8 mUnidentified0D0[0xB4];
 
 public:
     /* 0x184 */ TweakValue_804F4DC8 fBananaActiveTime;

@@ -10,6 +10,8 @@ enum eFielderActionState
     ACTION_SHOT = 0x0B,
     ACTION_SHOOT_TO_SCORE = 0x0C,
     ACTION_UNKNOWN_15 = 0x15,
+    ACTION_UNKNOWN_32 = 0x20,
+    ACTION_UNKNOWN_34 = 0x22,
 };
 
 enum eFielderDesireState
@@ -86,13 +88,26 @@ public:
     bool IsWinger() const;
     bool IsMidField() const;
     bool IsDefense() const;
+    cFielder* GetMark() const { return mUnidentified464[0]; }
 
 private:
     /* 0x328 */ u8 mUnknown328[0x04];
     /* 0x32C */ PlayerTweaks* mUnidentified32C;
     /* 0x330 */ u8 mUnknown330[0xAC];
     /* 0x3DC */ bool mUnidentified3DC;
-    /* 0x3DD */ u8 mUnknown3DD[0x4B];
+    /* 0x3DD */ u8 mUnknown3DD[0x23];
+
+public:
+    /* 0x400 */ void* mUnidentified400;
+
+private:
+    /* 0x404 */ u8 mUnknown404[0x20];
+
+public:
+    /* 0x424 */ bool mUnidentified424;
+
+private:
+    /* 0x425 */ u8 mUnknown425[0x03];
     /* 0x428 */ UnidentifiedFielderInput* mUnidentified428;
     /* 0x42C */ bool m_bHasBeenUpdated;
     /* 0x42D */ u8 mUnknown42D[3];
@@ -114,7 +129,11 @@ public:
 
 private:
     /* 0x458 */ u8 mUnknown458[0x08];
+
+public:
     /* 0x460 */ eRole m_eRole;
+
+private:
     /* 0x464 */ cFielder* mUnidentified464[4];
 
 public:
@@ -123,6 +142,8 @@ public:
 
 private:
     /* 0x476 */ u8 mUnknown476[6];
+
+public:
     /* 0x47C */ ShotMeter* m_pShotMeter;
 }; // total size: 0x480
 

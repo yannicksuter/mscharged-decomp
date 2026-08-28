@@ -252,21 +252,6 @@ const unsigned long uBOBOMB_MASTER_OBJECT = nlStringLowerHash("gameplay/bobomb")
 const char* uBANANA_STREAK_TEXTURE;
 } // namespace
 
-static inline void ReleasePowerupModel(ePowerUpType type, DrawableObject* pDrawable)
-{
-    int i;
-
-    for (i = 0; i < 25; i++)
-    {
-        if (pDrawable == powerupModelPool.mObjs[type][i])
-        {
-            pDrawable->m_uObjectFlags &= ~1;
-            powerupModelPool.mFree[type][i] = true;
-            break;
-        }
-    }
-}
-
 extern "C" int fn_80099C80(ePowerUpType eType)
 {
     int nUnidentified = 0;
@@ -1095,10 +1080,24 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
 /**
  * Offset/Address/Size: 0x2110 | 0x8009B76C | size: 0x108
  */
-PowerupBase::~PowerupBase()
+inline PowerupBase::~PowerupBase()
 {
     delete m_unk18;
-    ReleasePowerupModel(m_eType, m_pDrawableObj);
+
+    int type = m_eType;
+    DrawableObject* pDrawable = m_pDrawableObj;
+    int i;
+
+    for (i = 0; i < 25; i++)
+    {
+        if (pDrawable == powerupModelPool.mObjs[type][i])
+        {
+            pDrawable->m_uObjectFlags &= ~1;
+            powerupModelPool.mFree[type][i] = true;
+            break;
+        }
+    }
+
     delete m_pPhysicsObject;
 }
 

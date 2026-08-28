@@ -85,6 +85,28 @@ public:
         new (out) T;
     }
 
+    void AllocateForReturn(T*& out)
+    {
+        T* entry = 0;
+        if (m_FreeList == 0)
+        {
+            BaseAddNewBlock(this, sizeof(T));
+        }
+        if (m_FreeList != 0)
+        {
+            entry = (T*)m_FreeList;
+            m_FreeList = m_FreeList->next;
+        }
+        out = entry;
+    }
+
+    T* Allocate()
+    {
+        T* out = 0;
+        AllocateForReturn(out);
+        return out;
+    }
+
     void Free(T* entry)
     {
         SlotPoolEntry* e = (SlotPoolEntry*)entry;
