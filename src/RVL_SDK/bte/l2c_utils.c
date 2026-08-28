@@ -1274,25 +1274,3 @@ void l2cu_check_feature_rsp(tL2C_LCB *p_lcb, UINT8 id, UINT8 *p_data,
 	if (p_data != p_end)
 		L2CAP_TRACE(ERROR, "L2CAP - badly formatted feature rsp");
 }
-
-void l2cu_stop_compression(/* void? */)
-{
-#if 0
-	/* ... */
-#endif
-}
-
-BOOLEAN l2cu_lcb_has_feature_enable(/* tL2C_LCB *p_lcb? */)
-{
-	return FALSE;
-}
-
-BOOLEAN l2cu_ccb_has_compression_enable(/* tL2C_CCB *p_ccb? */)
-{
-	return FALSE;
-}
-
-UINT32 L2CA_GetCompressionFixMemoryPoolSize(/* void? */)
-{
-	return 0;
-}

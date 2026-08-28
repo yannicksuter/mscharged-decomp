@@ -24,6 +24,7 @@
 #define ROUND_UP_PTR(x, align) PTR_ROUNDUP((x), (align))
 
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
+#define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
 #define CLAMP(low, high, x) \
     ((x) > (high) ? (high) : ((x) < (low) ? (low) : (x)))

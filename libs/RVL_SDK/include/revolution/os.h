@@ -14,6 +14,16 @@
 #define OSRoundUp32B(x) ROUNDUP((unsigned long)(x), 32)
 #define OSRoundDown32B(x) ROUNDDOWN((unsigned long)(x), 32)
 
+#ifdef DEBUG
+#define ASSERTLINE(x, line) \
+    (void)((x) || (OSPanic(__FILE__, line, "Failed assertion " #x), 0))
+#define ASSERTMSGLINE(x, line, ...) \
+    (void)((x) || (OSPanic(__FILE__, line, __VA_ARGS__), 0))
+#else
+#define ASSERTLINE(x, line) ((void)0)
+#define ASSERTMSGLINE(x, line, ...) ((void)0)
+#endif
+
 #include <revolution/os/OS.h>
 #include <revolution/os/__ppc_eabi_init.h>
 #include <revolution/os/OSAlloc.h>

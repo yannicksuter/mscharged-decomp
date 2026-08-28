@@ -68,6 +68,7 @@ typedef unsigned short char16_t;
 #define PACKED __attribute__((packed))
 
 #define DEFAULT_ALIGN 32
+#define ALIGN32 ALIGN(DEFAULT_ALIGN)
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
 
 typedef void (*funcptr_t)(void);

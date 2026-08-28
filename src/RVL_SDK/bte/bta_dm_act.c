@@ -1634,7 +1634,6 @@ void bta_dm_immediate_disable(void)
 
 void bta_dm_reset_complete(void *p1)
 {
-	/* ... */
 }
 
 void bta_dm_send_hci_reset(tBTA_DM_MSG *p_data)
