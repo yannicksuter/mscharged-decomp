@@ -18,9 +18,23 @@ class cSAnimCallback
 {
 public:
     float m_fTime;
-    unsigned int m_nParam;
-    void (*m_pCallback)(cSAnim*, unsigned int);
-    cSAnimCallback* m_pNext;
+    unsigned int m_nParam1;
+    void (*m_funcCallback)(cSAnim*, unsigned int);
+    cSAnimCallback* next;
+};
+
+struct PackedScale
+{
+    signed short x;
+    signed short y;
+    signed short z;
+};
+
+struct PackedTrans
+{
+    float x;
+    float y;
+    float z;
 };
 
 class nlChunk
@@ -70,7 +84,7 @@ inline void* nlChunk::GetData()
 
 inline void* nlChunk::GetUnalignedData()
 {
-    return this + 1;
+    return (u8*)this + sizeof(nlChunk);
 }
 
 inline void* nlChunk::GetAlignedData()
@@ -109,7 +123,24 @@ inline u32 nlChunk::GetID()
     return m_ID & 0x80FFFFFF;
 }
 
-class cSAnim
+class cIdentifier
+{
+public:
+    unsigned int GetHashID() const
+    {
+        return m_uHashID;
+    }
+
+    void Destroy()
+    {
+    }
+
+protected:
+    const char* m_szName;
+    unsigned int m_uHashID;
+};
+
+class cSAnim : public cIdentifier
 {
 public:
     typedef char* MemType;
@@ -121,11 +152,7 @@ public:
     }
 
     void Destroy();
-
-    unsigned int GetHashID() const
-    {
-        return m_uHashID;
-    }
+    void fn_80308610(nlChunk* nodeChunk, int nodeIndex);
 
     void BlendRot(int accumulatorNode, int animNode, float time, float weight,
         cPoseAccumulator* accumulator, bool mirror) const;
@@ -137,6 +164,9 @@ public:
         cPoseAccumulator* accumulator, bool mirror) const;
     void GetRootRot(float time, u16* rootRotation) const;
     void GetRootTrans(float time, nlVector3* rootTranslation) const;
+    bool fn_8030939C(int channel, float time, float* weight) const;
+    void CreateCallback(float fTime, unsigned int nParam1,
+        void (*funcCallback)(cSAnim*, unsigned int));
     float GetMorphWeight(int channel, float time) const;
 
     cSAnimCallback* GetCallbackList() const
@@ -149,13 +179,26 @@ public:
         return (float)m_nNumKeys / 30.0f;
     }
 
-    const char* m_szName;
-    unsigned int m_uHashID;
     unsigned int m_nNumKeys;
     unsigned int m_nNumNodes;
     unsigned int m_nNumMorphChannels;
-    u8 m_Unknown14[0x38];
+    const unsigned int* m_pNodeProperties;
+    const unsigned int* m_Unknown18;
+    const unsigned int* m_Unknown1C;
+    void** m_pRotKeys;
+    PackedScale** m_pScaleKeys;
+    PackedTrans** m_pTransKeys;
+    unsigned char** m_Unknown2C;
+    void** m_Unknown30;
+    unsigned int m_nNumRootKeys;
+    unsigned short* m_pRootRot;
+    nlVector3* m_pRootTrans;
+    unsigned long* m_nMorphIds;
+    const unsigned int* m_pNumMorphKeys;
+    unsigned char* m_pMorphKeys;
     cSAnimCallback* m_pCallbackList;
+    float m_fLinearSpeed;
+    unsigned long m_nHierarchySignature;
 };
 
 #endif // GAME_SANIM_H

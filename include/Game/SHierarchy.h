@@ -1,21 +1,47 @@
 #ifndef GAME_S_HIERARCHY_H
 #define GAME_S_HIERARCHY_H
 
+#include "Game/SAnim.h"
 #include "NL/nlMath.h"
 #include "types.h"
 
-class cSHierarchy
+class cSHierarchy : public cIdentifier
 {
 public:
-    int GetNodeIndexByID(unsigned int id) const;
-    int GetChild(int nodeIndex, int childIndex) const;
-    int GetNumChildren(int nodeIndex) const;
-    int GetParent(int nodeIndex) const;
-    int GetMirroredNode(int nodeIndex) const;
-    nlVector3& GetTranslationOffset(int nodeIndex) const;
+    typedef char* MemType;
 
-    const char* m_Name;
-    u32 m_HashID;
+    static cSHierarchy* Initialize(nlChunk* pChunk);
+    static bool IsValidChunkID(u32 id)
+    {
+        return (id & 0x80FFFFFF) == 0x80018000;
+    }
+
+    void BuildPushPopFlags(int nNode, int nParentDepth, int& nCurrentDepth);
+    int GetNodeIndexByID(unsigned int id) const;
+    int GetChild(int i, int j) const;
+    u32 GetNodeID(int i) const;
+    int GetNumChildren(int i) const;
+    int GetParent(int i) const;
+    int GetMirroredNode(int i) const;
+    int GetPushPop(int i) const;
+    nlVector3& GetTranslationOffset(int i) const;
+    bool PreserveBoneLength(int i) const;
+
+    int GetNumNodes() const
+    {
+        return m_nNumNodes;
+    }
+
+    int GetPelvisNodeIndex() const
+    {
+        return m_nPelvisNodeIndex;
+    }
+
+    int GetSpineNodeIndex() const
+    {
+        return m_nSpineNodeIndex;
+    }
+
     int m_nNumNodes;
     u32* m_pNodeID;
     int* m_pParent;
@@ -25,7 +51,7 @@ public:
     int* m_pMirrorTable;
     int m_nPelvisNodeIndex;
     int m_nSpineNodeIndex;
-    nlVector3* m_pTranslationOffset;
+    nlVector3* m_pV3TranslationOffset;
     u8* m_pPreserveBoneLength;
 };
 

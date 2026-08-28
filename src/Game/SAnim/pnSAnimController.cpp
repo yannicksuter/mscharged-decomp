@@ -66,9 +66,9 @@ void cPN_SAnimController::ProcessCallbacks()
     {
         if (TestTrigger(callback->m_fTime))
         {
-            callback->m_pCallback(m_pSAnim, callback->m_nParam);
+            callback->m_funcCallback(m_pSAnim, callback->m_nParam1);
         }
-        callback = callback->m_pNext;
+        callback = callback->next;
     }
 }
 
@@ -317,10 +317,10 @@ void cPN_SAnimController::UpdateSynchronized(float time, bool looped)
         {
             if (controller->TestTrigger(callback->m_fTime))
             {
-                callback->m_pCallback(
-                    controller->m_pSAnim, callback->m_nParam);
+                callback->m_funcCallback(
+                    controller->m_pSAnim, callback->m_nParam1);
             }
-            callback = callback->m_pNext;
+            callback = callback->next;
         }
     }
 
@@ -341,10 +341,10 @@ void cPN_SAnimController::UpdateSynchronized(float time, bool looped)
         {
             if (controller->TestTrigger(callback->m_fTime))
             {
-                callback->m_pCallback(
-                    controller->m_pSAnim, callback->m_nParam);
+                callback->m_funcCallback(
+                    controller->m_pSAnim, callback->m_nParam1);
             }
-            callback = callback->m_pNext;
+            callback = callback->next;
         }
     }
 
@@ -486,10 +486,10 @@ cPoseNode* cPN_SAnimController::Update(float dt)
             {
                 if (TestTrigger(rootState.callback->m_fTime))
                 {
-                    rootState.callback->m_pCallback(
-                        m_pSAnim, rootState.callback->m_nParam);
+                    rootState.callback->m_funcCallback(
+                        m_pSAnim, rootState.callback->m_nParam1);
                 }
-                rootState.callback = rootState.callback->m_pNext;
+                rootState.callback = rootState.callback->next;
             }
         }
 
@@ -515,11 +515,11 @@ cPoseNode* cPN_SAnimController::Update(float dt)
                     if (synchronizedController->TestTrigger(
                             synchronizedCallback->m_fTime))
                     {
-                        synchronizedCallback->m_pCallback(
+                        synchronizedCallback->m_funcCallback(
                             synchronizedController->m_pSAnim,
-                            synchronizedCallback->m_nParam);
+                            synchronizedCallback->m_nParam1);
                     }
-                    synchronizedCallback = synchronizedCallback->m_pNext;
+                    synchronizedCallback = synchronizedCallback->next;
                 }
             }
 
@@ -541,12 +541,12 @@ cPoseNode* cPN_SAnimController::Update(float dt)
                         if (secondController->TestTrigger(
                                 synchronizedCallback->m_fTime))
                         {
-                            synchronizedCallback->m_pCallback(
+                            synchronizedCallback->m_funcCallback(
                                 secondController->m_pSAnim,
-                                synchronizedCallback->m_nParam);
+                                synchronizedCallback->m_nParam1);
                         }
                         synchronizedCallback
-                            = synchronizedCallback->m_pNext;
+                            = synchronizedCallback->next;
                     }
                 }
 
@@ -569,12 +569,12 @@ cPoseNode* cPN_SAnimController::Update(float dt)
                             if (thirdController->TestTrigger(
                                     synchronizedCallback->m_fTime))
                             {
-                                synchronizedCallback->m_pCallback(
+                                synchronizedCallback->m_funcCallback(
                                     thirdController->m_pSAnim,
-                                    synchronizedCallback->m_nParam);
+                                    synchronizedCallback->m_nParam1);
                             }
                             synchronizedCallback
-                                = synchronizedCallback->m_pNext;
+                                = synchronizedCallback->next;
                         }
                     }
 
@@ -597,12 +597,12 @@ cPoseNode* cPN_SAnimController::Update(float dt)
                                 if (fourthController->TestTrigger(
                                         synchronizedCallback->m_fTime))
                                 {
-                                    synchronizedCallback->m_pCallback(
+                                    synchronizedCallback->m_funcCallback(
                                         fourthController->m_pSAnim,
-                                        synchronizedCallback->m_nParam);
+                                        synchronizedCallback->m_nParam1);
                                 }
                                 synchronizedCallback
-                                    = synchronizedCallback->m_pNext;
+                                    = synchronizedCallback->next;
                             }
                         }
 

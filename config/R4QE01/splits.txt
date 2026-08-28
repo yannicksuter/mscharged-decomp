@@ -790,12 +790,21 @@ Game/FE/BaseSceneHandler.cpp:
 	.text       start:0x803060FC end:0x8030616C
 	.data       start:0x8052FF10 end:0x8052FF40
 
+Game/SAnim.cpp:
+	.text       start:0x80307A0C end:0x80309788
+	.ctors      start:0x804DBA90 end:0x804DBA94
+	.bss        start:0x805840C8 end:0x805840F0
+	.sdata2     start:0x806E6778 end:0x806E6798
+
 Game/SAnim/pnSAnimController.cpp:
 	.text       start:0x803097F8 end:0x8030A93C
 	.ctors      start:0x804DBA94 end:0x804DBA98
 	.data       start:0x8052FFE0 end:0x80530008
 	.bss        start:0x805840F0 end:0x80584118
 	.sdata2     start:0x806E6798 end:0x806E67C8
+
+Game/SHierarchy.cpp:
+	.text       start:0x8030C3B4 end:0x8030CCD8
 
 Game/SAnim/pnBlender.cpp:
 	.text       start:0x8030CCD8 end:0x8030D214
@@ -817,6 +826,9 @@ Game/SAnim/pnFeather.cpp:
 	.data       start:0x80530078 end:0x805300A0
 	.bss        start:0x80584178 end:0x805841A0
 	.sdata2     start:0x806E6808 end:0x806E6820
+
+Game/SAnim/AnimRetargeter.cpp:
+	.text       start:0x8030E940 end:0x8030EC30
 
 Game/AI/Variant.cpp:
 	.text       start:0x8031A104 end:0x8031B570
