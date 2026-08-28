@@ -36,7 +36,8 @@ public:
     /* 0x0C */ float m_fSpeedValue;
     /* 0x10 */ float m_fSTSValue;
     /* 0x14 */ float mfSShotAimValue;
-    /* 0x18 */ u8 mUnknown018[8];
+    /* 0x18 */ float mUnidentified018;
+    /* 0x1C */ float mUnidentified01C;
 }; // total size: 0x20
 
 #endif // GAME_AI_SHOT_METER_H

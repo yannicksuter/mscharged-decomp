@@ -209,7 +209,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
     {
         nlVector3 contactPosition;
         nlVec3Set(contactPosition, contacts->geom.pos[0], contacts->geom.pos[1], contacts->geom.pos[2]);
-        bool sidelineCollision = fabsf(contactPosition.x) < cField::GetGoalLineX(1) - 1.0f;
+        bool sidelineCollision = fabsf(contactPosition.x) < cField::GetGoalLineX(1U) - 1.0f;
         fn_8013F854("PhysChar WALL or corner %d conpos %f %f %f\n",
             sidelineCollision,
             contacts->geom.pos[0],
@@ -258,7 +258,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
 
         float radius;
         m_pPlayerPlayerColumn->GetRadius(&radius);
-        if (fabsf(contactPosition.x) > cField::GetGoalLineX(1) - radius
+        if (fabsf(contactPosition.x) > cField::GetGoalLineX(1U) - radius
             && (m_pAICharacter->m_eClassType == FIELDER
                 || !m_CanCollideWithGoalLine))
         {
@@ -272,7 +272,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             float netDepth = cNet::m_fNetDepth;
             float absoluteX = fabsf(contactPosition.x);
             if (absoluteX
-                    >= netDepth + cField::GetGoalLineX(1) - radius
+                    >= netDepth + cField::GetGoalLineX(1U) - radius
                 || fabsf(contactPosition.y)
                        >= 0.5f * cNet::m_fNetWidth - radius
                 || contactPosition.z
@@ -627,7 +627,7 @@ void PhysicsCharacter::PostUpdate()
 
     float radius;
     m_pPlayerPlayerColumn->GetRadius(&radius);
-    if (fabsf(position.x) < cField::GetGoalLineX(1) - radius)
+    if (fabsf(position.x) < cField::GetGoalLineX(1U) - radius)
     {
         m_bInsideNet = false;
         m_bWasInsideNet = false;
@@ -640,14 +640,14 @@ void PhysicsCharacter::PostUpdate()
         position.y = Clamp(position.y, -halfWidth, halfWidth);
 
         float netDepth = cNet::m_fNetDepth;
-        float netBack = netDepth + cField::GetGoalLineX(1) - radius;
+        float netBack = netDepth + cField::GetGoalLineX(1U) - radius;
         position.x = Clamp(position.x, -netBack, netBack);
     }
 
     if (m_pAICharacter->m_eClassType == FIELDER
         && fn_8003E74C(m_pAICharacter))
     {
-        float goalLine = cField::GetGoalLineX(1) - radius;
+        float goalLine = cField::GetGoalLineX(1U) - radius;
         position.x = Clamp(position.x, -goalLine, goalLine);
     }
 

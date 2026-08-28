@@ -1333,7 +1333,7 @@ void Goalie::fn_80084840(UnidentifiedMegaBallState* pState)
     float fNetWidth = cNet::m_fNetWidth;
     float fYLimit = 0.5f * fNetWidth - 0.7f;
     v3TargetPosition.x
-        = fDirection * (cField::GetGoalLineX(1) + 0.5f);
+        = fDirection * (cField::GetGoalLineX(1U) + 0.5f);
     float fY = pBallTrail->position.y;
     fY = nlMaxEquals(fY, -fYLimit);
     fY = nlMinEquals(fY, fYLimit);
@@ -2163,7 +2163,7 @@ void Goalie::ActionMove(float deltaTime)
                     nlVec3ScaleAdd(mv3TargetPosition, fScale, v3NormalizedDir, mv3TargetPosition);
 
                     float fGoalLineX
-                        = cField::GetGoalLineX(1) - 0.8f;
+                        = cField::GetGoalLineX(1U) - 0.8f;
                     mv3TargetPosition.x = nlMinEquals(
                         nlMaxEquals(
                             mv3TargetPosition.x, -fGoalLineX),

@@ -123,6 +123,21 @@ public:
         mTag = FUNCTION_EMPTY;
     }
 
+    Function1& operator=(const Function1& other)
+    {
+        Clear();
+        mTag = other.mTag;
+        if (mTag == FUNCTION_FREE)
+        {
+            mFreeFunction = other.mFreeFunction;
+        }
+        else if (mTag == FUNCTION_FUNCTOR)
+        {
+            mFunctor = other.mFunctor->Clone();
+        }
+        return *this;
+    }
+
     operator bool() const
     {
         return mTag != FUNCTION_EMPTY;

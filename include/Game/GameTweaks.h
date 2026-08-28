@@ -60,7 +60,14 @@ public:
     /* 0x1E4 */ TweakValueInt_804F4DC8 nScoreDifferenceMinimum;
 
 private:
-    /* 0x1F4 */ u8 mUnidentified1F4[0x40];
+    /* 0x1F4 */ u8 mUnidentified1F4[0x10];
+
+public:
+    /* 0x204 */ TweakValue_804F4DC8 fBananaResistance;
+    /* 0x214 */ TweakValue_804F4DC8 fShellBounceGround;
+
+private:
+    /* 0x224 */ u8 mUnidentified224[0x10];
 
 public:
     /* 0x234 */ TweakValue_804F4DC8 fShellSmallRadius;
@@ -102,15 +109,26 @@ public:
     /* 0x544 */ TweakValue_804F4DC8 fChainChompRadius;
 };
 
+struct unk_800A9274;
+
 struct unk_8056CF08
 {
 private:
-    /* 0x00 */ u8 mUnidentified00[0x10];
+    /* 0x00 */ u8 mUnidentified00[0x04];
+
+public:
+    /* 0x04 */ unk_800A9274* mUnidentified04;
+
+private:
+    /* 0x08 */ u8 mUnidentified08[0x08];
 
 public:
     /* 0x10 */ GameTweaks* m_pGameTweaks;
     /* 0x14 */ unk_80029F58* m_unk14;
-};
+
+private:
+    /* 0x18 */ u8 mUnidentified18[0x08];
+}; // total size: 0x20
 
 extern unk_8056CF08 lbl_8056CF08;
 

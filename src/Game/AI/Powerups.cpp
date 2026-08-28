@@ -2214,7 +2214,7 @@ void PowerupBase::fn_8009D500()
     u8 bUnidentified = false;
     if (m_pPhysicsObject->GetObjectType() == 0x15)
     {
-        bUnidentified = ((PhysicsBanana*)m_pPhysicsObject)->mUnidentified044[1];
+        bUnidentified = ((PhysicsBanana*)m_pPhysicsObject)->mUnidentified045[0];
     }
     else if (m_pPhysicsObject->GetObjectType() == 0x14)
     {
