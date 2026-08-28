@@ -64,6 +64,7 @@ public:
         const CollisionPlayerWallData* eventData);
     bool CanDoCaptainShootToScore();
     bool CanReceivePass();
+    cFielder* GetMark() const { return mUnidentified464[0]; }
     void fn_8002FDC4(unsigned short aParam, bool bParam);
     void fn_8003057C(void* pParam);
     void fn_800305DC(float fParam);
@@ -88,12 +89,21 @@ public:
     bool IsWinger() const;
     bool IsMidField() const;
     bool IsDefense() const;
-    cFielder* GetMark() const { return mUnidentified464[0]; }
 
 private:
     /* 0x328 */ u8 mUnknown328[0x04];
     /* 0x32C */ PlayerTweaks* mUnidentified32C;
-    /* 0x330 */ u8 mUnknown330[0xAC];
+    /* 0x330 */ u8 mUnknown330[0x31];
+
+public:
+    struct
+    {
+        /* 0x00 */ bool bIsShootToScore;
+        /* 0x01 */ bool bIsChipShot;
+    } mActionShotVars; // offset 0x361, size 0x2
+
+private:
+    /* 0x363 */ u8 mUnknown363[0x79];
     /* 0x3DC */ bool mUnidentified3DC;
     /* 0x3DD */ u8 mUnknown3DD[0x23];
 
@@ -108,7 +118,11 @@ public:
 
 private:
     /* 0x425 */ u8 mUnknown425[0x03];
+
+public:
     /* 0x428 */ UnidentifiedFielderInput* mUnidentified428;
+
+private:
     /* 0x42C */ bool m_bHasBeenUpdated;
     /* 0x42D */ u8 mUnknown42D[3];
 

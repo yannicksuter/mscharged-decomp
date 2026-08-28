@@ -7,13 +7,19 @@
 
 class DebugWriteCache;
 class cFielder;
-struct UnidentifiedDesireContext;
+class Variant;
 struct UnidentifiedDesireUpdate;
 
 struct UnidentifiedStateTransition
 {
     int mUnidentifiedHash;
     void* mUnidentifiedFunction;
+};
+
+struct UnidentifiedDesireContext
+{
+    u8 mUnidentified000[0x64];
+    Variant* mUnidentifiedValue;
 };
 
 class shdStateMachine

@@ -7,7 +7,7 @@ float nlBezier(float* fControlPoints, int nNumPoints, float fMu);
 float nlATan(float x);
 float nlATan2f(float y, float x);
 float nlTan(unsigned short angle);
-u16 nlACos(float x);
+int nlACos(float x);
 void nlSinCos(float* presult_sin, float* presult_cos, unsigned short angle);
 float nlSin(unsigned short angle);
 float nlRecipSqrt(float x, bool bAccurate);

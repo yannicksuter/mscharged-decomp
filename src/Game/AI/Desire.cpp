@@ -8,18 +8,6 @@ struct DebugFieldType
     void* writer;
 };
 
-struct UnidentifiedDesireFielderSlot
-{
-    u8 mUnidentified000[0x08];
-    cFielder* mUnidentifiedFielder;
-};
-
-struct UnidentifiedDesireContext
-{
-    u8 mUnidentified000[0x64];
-    UnidentifiedDesireFielderSlot* mUnidentifiedFielderSlot;
-};
-
 struct UnidentifiedDesireUpdate
 {
     u8 mUnidentified000[0x08];
@@ -60,7 +48,7 @@ void Desire::UnidentifiedSetContext(UnidentifiedDesireContext* context)
     shdStateMachine::UnidentifiedSetContext(context);
     if (context != 0)
     {
-        mUnidentifiedFielder = context->mUnidentifiedFielderSlot->mUnidentifiedFielder;
+        mUnidentifiedFielder = (cFielder*)context->mUnidentifiedValue->mData.pointer;
     }
     else
     {

@@ -1,6 +1,7 @@
 #include "Game/Drawable/DrawableCharacter.h"
 
 #include "Game/CharacterEffects.h"
+#include "Game/AI/HeadTrack.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 #include "NL/gl/glState.h"
@@ -46,13 +47,6 @@ struct RotAccum
     u8 tail[3];
 };
 
-struct HeadTrack
-{
-    char _000[0x54];
-    float headSpin;
-    float headTilt;
-};
-
 struct LightObject
 {
     char _000[0x2C];
@@ -95,7 +89,7 @@ struct Character
     void* unknownC4;
     void* animationController;
     char _0CC[8];
-    HeadTrack* headTrack;
+    cHeadTrack* headTrack;
     int headJointIndex;
     int bip01JointIndex;
     char _0E0[0x10];
@@ -258,7 +252,6 @@ extern "C" int fn_8030C374(cPoseAccumulator*);
 extern "C" void fn_8030C380(cPoseAccumulator*, int, void (*)(void*), void*, int);
 extern "C" int fn_8030CC1C(cSHierarchy*, u32);
 extern "C" void fn_8017BF84(void*);
-extern "C" void fn_80094E60(u16, u16);
 extern "C" void fn_8030AE14(cPoseAccumulator*, bool);
 extern "C" cPoseAccumulator* fn_8030ABF8(
     cPoseAccumulator*, cPoseAccumulator*);
@@ -584,8 +577,8 @@ void DrawableCharacter::Grab(Character& source)
     shadowLevel = shadowLevel * blendAmount;
     velocity = source.velocity;
     facingDirection = source.facingDirection;
-    headSpin = (u16)(int)source.headTrack->headSpin;
-    headTilt = (u16)(int)source.headTrack->headTilt;
+    headSpin = (u16)(int)source.headTrack->m_fHeadSpin;
+    headTilt = (u16)(int)source.headTrack->m_fHeadTilt;
     visible = true;
     useObject = source.sourcePoseAccumulator->m_bUseObject;
     damage1 = source.damage1;
@@ -640,10 +633,11 @@ void DrawableCharacter::Grab(Character& source)
 }
 
 void DrawableCharacter::HeadTrackCallback(
-    u32 context, u32, cPoseAccumulator*, u32, int)
+    u32 context, u32, cPoseAccumulator* accumulator, u32 headNodeIndex, int)
 {
     DrawableCharacter* drawable = (DrawableCharacter*)context;
-    fn_80094E60(drawable->headSpin, drawable->headTilt);
+    CalcHeadTrackMatrix(drawable->headSpin, drawable->headTilt,
+        accumulator, headNodeIndex);
 }
 
 void DrawableCharacter::BuildNodeMatrices(cPoseAccumulator* accumulator)

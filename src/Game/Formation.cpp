@@ -48,7 +48,7 @@ extern "C" float fn_800DFF1C();
 extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void* memset(void*, int, unsigned long);
 extern "C" void* fn_802DF3E4(InterpreterCore*, unsigned int*);
-extern "C" FuzzyVariant* fn_80312360(InterpreterCore*, void*, int, cTeam*, int);
+extern "C" UnidentifiedVariant_80054AB8* fn_80312360(InterpreterCore*, void*, int, cTeam*, int);
 int nlPrintf(const char*, ...);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -322,7 +322,7 @@ void FormationManager::ChooseNewFormations()
     unsigned int ballFormationSet;
 
     InterpreterCore* context = fn_800A695C(m_pTeam);
-    FuzzyVariant result = fn_80054AB8(context, "BestDefensiveFormation", m_pTeam);
+    UnidentifiedVariant_80054AB8 result = fn_80054AB8(context, "BestDefensiveFormation", m_pTeam);
     defensiveFormation = result.GetInt();
 
     result = fn_80054AB8(context, "BestOffensiveFormation", m_pTeam);
@@ -1710,23 +1710,26 @@ FormationSet::~FormationSet()
     }
 }
 
-extern "C" FuzzyVariant fn_80054AC8(InterpreterCore*, cTeam*, const char*);
-extern "C" FuzzyVariant fn_80054B28(InterpreterCore*, const unsigned int&, cTeam*);
+extern "C" UnidentifiedVariant_80054AB8 fn_80054AC8(InterpreterCore*, cTeam*, const char*);
+extern "C" UnidentifiedVariant_80054AB8 fn_80054B28(InterpreterCore*, const unsigned int&, cTeam*);
 
-extern "C" FuzzyVariant fn_80054AB8(InterpreterCore* context, const char* name, cTeam* team)
+extern "C" UnidentifiedVariant_80054AB8 fn_80054AB8(
+    InterpreterCore* context, const char* name, cTeam* team)
 {
     return fn_80054AC8(context, team, name);
 }
 
-extern "C" FuzzyVariant fn_80054AC8(InterpreterCore* context, cTeam* team, const char* name)
+extern "C" UnidentifiedVariant_80054AB8 fn_80054AC8(
+    InterpreterCore* context, cTeam* team, const char* name)
 {
     unsigned int hash = nlStringHash(name);
     return fn_80054B28(context, hash, team);
 }
 
-extern "C" FuzzyVariant fn_80054B28(InterpreterCore* context, const unsigned int& hash, cTeam* team)
+extern "C" UnidentifiedVariant_80054AB8 fn_80054B28(
+    InterpreterCore* context, const unsigned int& hash, cTeam* team)
 {
     unsigned int localHash = hash;
-    return FuzzyVariant(fn_80312360(
+    return UnidentifiedVariant_80054AB8(fn_80312360(
         context, fn_802DF3E4(context, &localHash), 1, team, 0));
 }

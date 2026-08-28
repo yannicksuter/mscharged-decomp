@@ -119,6 +119,10 @@ Game/AI/GoalieSave.cpp:
 	.sbss       start:0x806E0D38 end:0x806E0D68
 	.sdata2     start:0x806E3B28 end:0x806E3B70
 
+Game/AI/HeadTrack.cpp:
+	.text       start:0x80094A2C end:0x80094FB4
+	.sdata2     start:0x806E3B70 end:0x806E3B98
+
 Game/AI/Powerups.cpp:
 	.text       start:0x80099C80 end:0x8009FF20
 	.ctors      start:0x804DB540 end:0x804DB544
@@ -129,7 +133,7 @@ Game/AI/Powerups.cpp:
 	.sbss       start:0x806E0DA8 end:0x806E0DD0
 	.sdata2     start:0x806E3C28 end:0x806E3CA8
 
-unclassified/tu_8009FF20.cpp:
+Game/AI/ShotMeter.cpp:
 	.text       start:0x8009FF20 end:0x800A07A0
 	.rodata     start:0x804DC0F0 end:0x804DC100
 	.sdata      start:0x806DBE58 end:0x806DBE78
@@ -159,9 +163,42 @@ Game/AI/Desire.cpp:
 	.sdata      start:0x806DC04C end:0x806DC0B8
 	.sdata2     start:0x806E3EA0 end:0x806E3F58
 
+Game/AI/Scripts/ScriptDefines.cpp:
+	.text       start:0x800D645C end:0x800D6604
+	.sbss       start:0x806E0E68 end:0x806E0E80
+
 Game/AI/Fuzzy.cpp:
 	.text       start:0x800E2FA8 end:0x800E30A8
 	.sdata2     start:0x806E42C8 end:0x806E42D4
+
+Game/AI/Scripts/FuzzyAIRuntime.cpp:
+	.text       start:0x800E30A8 end:0x800E9394
+	.ctors      start:0x804DB59C end:0x804DB5A0
+	.data       start:0x80503A28 end:0x80503F70
+	.bss        start:0x8056DBA0 end:0x8056DBC8
+	.sdata      start:0x806DC3F0 end:0x806DC418
+	.sdata2     start:0x806E42D8 end:0x806E42E0
+
+Game/AI/FuzzyVariant.cpp:
+	.text       start:0x800E9394 end:0x800EB184
+	.ctors      start:0x804DB5A0 end:0x804DB5A4
+	.data       start:0x80503F70 end:0x80503F98
+	.bss        start:0x8056DBC8 end:0x8056DBE8
+	.sdata      start:0x806DC418 end:0x806DC445
+
+Game/AI/TeamDesire.cpp:
+	.text       start:0x800EB184 end:0x800EB290
+	.data       start:0x80503F98 end:0x80503FBC
+	.sdata2     start:0x806E42E0 end:0x806E42E8
+
+Game/AI/TeamPlayMachine.cpp:
+	.text       start:0x800EB380 end:0x800EB5BC
+	.data       start:0x80503FC0 end:0x80504000
+	.sdata      start:0x806DC448 end:0x806DC450
+
+Game/AI/TutorialMegastrikeDesire.cpp:
+	.text       start:0x800EB5BC end:0x800EB6AC
+	.data       start:0x80504000 end:0x80504040
 
 Game/Camera/CameraMan.cpp:
 	.text       start:0x800F0240 end:0x800F2504

@@ -203,7 +203,7 @@ static inline unsigned short nlFloatToUShort(float value)
     return (unsigned short)(s32)value;
 }
 
-unsigned short nlACos(float x)
+int nlACos(float x)
 {
     u8 complement = x < 0.0f;
     x = 1.0f - nlFAbs(x);
