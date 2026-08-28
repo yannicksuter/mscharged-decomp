@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 #define RX_BUFFER_SIZE ROUND_UP(sizeof(WPADStatusEx), 32)
+#define WPAD_RX_DATASIZE 96
 
 #define WPAD_CONFIG_BLOCK_CHECKSUM_BIAS 0x55
 #define WPAD_MAX_CONFIG_BLOCKS 2
@@ -49,6 +50,8 @@ extern "C" {
 // Extension register addresses
 #define WM_REG_EXTENSION_CONFIG         WM_EXT_REG_ADDR(EXTENSION, 0x20)
 #define WM_REG_EXTENSION_40             WM_EXT_REG_ADDR(EXTENSION, 0x40)
+#define WM_REG_EXTENSION_46             WM_EXT_REG_ADDR(EXTENSION, 0x46)
+#define WM_REG_EXTENSION_4C             WM_EXT_REG_ADDR(EXTENSION, 0x4C)
 #define WM_REG_EXTENSION_CERT_PARAM     WM_EXT_REG_ADDR(EXTENSION, 0x50)
 #define WM_REG_EXTENSION_F0             WM_EXT_REG_ADDR(EXTENSION, 0xF0)
 #define WM_REG_EXTENSION_CERT_CHALLENGE WM_EXT_REG_ADDR(EXTENSION, 0xF1)
@@ -110,76 +113,60 @@ typedef struct WPADCommandQueue {
     u32 capacity;        // at 0x8
 } WPADCommandQueue;
 
+typedef WPADCommandQueue WPADCmdQueue;
+
 typedef struct WPADDevConfig {
-    DPDObject dpd[WPAD_MAX_DPD_OBJECTS]; // at 0x0
-
-    s16 accX0g; // at 0x20
-    s16 accY0g; // at 0x22
-    s16 accZ0g; // at 0x24
-
-    s16 accX1g; // at 0x26
-    s16 accY1g; // at 0x28
-    s16 accZ1g; // at 0x2A
-
+    DPDObject obj[WPAD_MAX_DPD_OBJECTS]; // at 0x0
+    WPADAcc acc_0g;                     // at 0x20
+    WPADAcc acc_1g;                     // at 0x26
     u8 motor;  // at 0x2C
     u8 volume; // at 0x2D
 } WPADDevConfig;
 
+typedef struct WPADStick {
+    s16 x;
+    s16 x_min;
+    s16 x_max;
+    s16 y;
+    s16 y_min;
+    s16 y_max;
+} WPADStick;
+
+typedef struct WPADFsConfig {
+    WPADStick stick;
+    WPADAcc acc_0g;
+    WPADAcc acc_1g;
+} WPADFsConfig;
+
+typedef struct WPADClConfig {
+    WPADStick lstk;
+    WPADStick rstk;
+    u8 triggerL;
+    u8 triggerR;
+} WPADClConfig;
+
 typedef struct WPADExtConfig {
     union {
-        struct WPADFSConfig {
-            s16 stickXCenter; // at 0x0
-            s16 at_0x02;      // at 0x2
-            s16 at_0x04;      // at 0x4
-            s16 stickYCenter; // at 0x6
-            s16 at_0x08;      // at 0x8
-            s16 at_0x0a;      // at 0xA
-
-            s16 accX0g; // at 0xC
-            s16 accY0g; // at 0xE
-            s16 accZ0g; // at 0x10
-
-            s16 accX1g; // at 0x12
-            s16 accY1g; // at 0x14
-            s16 accZ1g; // at 0x16
-        } fs;
-
-        struct WPADCLConfig {
-            s16 lStickXCenter; // at 0x0
-            s16 at_0x02;       // at 0x2
-            s16 at_0x04;       // at 0x4
-            s16 lStickYCenter; // at 0x6
-            s16 at_0x08;       // at 0x8
-            s16 at_0x0a;       // at 0xA
-
-            s16 rStickXCenter; // at 0xC
-            s16 at_0x0e;       // at 0xE
-            s16 at_0x10;       // at 0x10
-            s16 rStickYCenter; // at 0x12
-            s16 at_0x14;       // at 0x14
-            s16 at_0x16;       // at 0x16
-
-            u8 triggerLZero; // at 0x18
-            u8 triggerRZero; // at 0x19
-        } cl;
-    } u;
+        WPADFsConfig fs;
+        WPADClConfig cl;
+    };
 } WPADExtConfig;
 
 typedef struct WPADCB {
     WPADGameInfo gameInfo; // at 0x0
-    s32 UNK_0x38[2];
+    s32 gameInfoErr[2];
     u8 rxBufMain[RX_BUFFER_SIZE];      // at 0x40
     u8 rxBufs[2][RX_BUFFER_SIZE];      // at 0xA0
     WPADCommandQueue stdCmdQueue;      // at 0x160
     WPADCommand stdCmdQueueList[24];   // at 0x16C
     WPADCommandQueue extCmdQueue;      // at 0x5EC
     WPADCommand extCmdQueueList[12];   // at 0x5F8
-    WPADInfo wpInfo;                   // at 0x838
-    WPADInfo* wpInfoOut;               // at 0x850
-    WPADDevConfig devConfig;           // at 0x854
-    WPADExtConfig extConfig;           // at 0x882
-    WPADCallback cmdBlkCB;             // at 0x89C
-    WPADExtensionCallback extensionCB; // at 0x8A0
+    WPADInfo info;                      // at 0x838
+    WPADInfo* infoOut;                  // at 0x850
+    WPADDevConfig devConf;              // at 0x854
+    WPADExtConfig extConf;              // at 0x882
+    WPADCallback cmdBlkCallback;        // at 0x89C
+    WPADExtensionCallback extensionCallback; // at 0x8A0
     WPADConnectCallback connectCB;     // at 0x8A4
     WPADSamplingCallback samplingCB;   // at 0x8A8
     union {
@@ -199,7 +186,7 @@ typedef struct WPADCB {
     s32 UNK_0x8C4;
     u8 rxBufIndex; // at 0x8C8
     s8 UNK_0x8C9;
-    u8 defaultDpdSize;            // at 0x8CA
+    u8 dpdDummyObjSize;           // at 0x8CA
     u8 currentDpdCommand;         // at 0x8CB
     u8 pendingDpdCommand;         // at 0x8CC
     u8 radioQuality;              // at 0x8CD
@@ -209,7 +196,7 @@ typedef struct WPADCB {
     BOOL motorRunning;            // at 0x8D4
     BOOL used;                    // at 0x8D8
     BOOL handshakeFinished;       // at 0x8DC
-    s32 configIndex;              // at 0x8E0
+    BOOL oldFw;                   // at 0x8E0
     OSThreadQueue threadQueue;    // at 0x8E4
     s64 lastControllerDataUpdate; // at 0x8F0
     u16 filterDiffDpd;            // at 0x8F8
@@ -222,23 +209,25 @@ typedef struct WPADCB {
     u8 UNK_0x910;
     u8 calibrated;         // at 0x911
     u16 comboHeld;         // at 0x912
-    u8 encryptionKey[16];  // at 0x914
+    u8 key[16];            // at 0x914
     u8 decryptAddTable[8]; // at 0x924
     u8 decryptXorTable[8]; // at 0x92C
     u8 wmReadDataBuf[64];  // at 0x934
-    u8* wmReadDataPtr;     // at 0x974
-    u32 wmReadAddress;     // at 0x978
-    int wmReadHadError;    // at 0x97C
+    void* wmReadDataPtr;   // at 0x974
+    u32 wmReadAddr;        // at 0x978
+    int wmReadErr;         // at 0x97C
     u16 wmReadLength;      // at 0x980
     s8 UNK_0x982;
     u8 radioSensitivity;    // at 0x983
     u16 copyOutCount;       // at 0x984
     u8 sleeping;            // at 0x986
-    u8 lastReportID;        // at 0x987
+    u8 lastReportId;        // at 0x987
     WPADCallback getInfoCB; // at 0x988
     u8 getInfoBusy;         // at 0x98C
     u8 UNK_0x98F[0x9A0 - 0x990];
 } WPADCB;
+
+typedef WPADCB WPADControlBlock;
 
 extern WPADCB _wpd[WPAD_MAX_CONTROLLERS];
 extern WPADCB* _wpdcb[WPAD_MAX_CONTROLLERS];
@@ -247,6 +236,8 @@ void WPADiInitSub(void);
 
 void WPADiExcludeButton(s32 chan);
 void WPADiCopyOut(s32 chan);
+void WPADiCreateKey(s32 chan);
+void WPADiCreateKeyFor3rd(s32 chan);
 
 BOOL WPADiSendSetPort(WPADCommandQueue* pQueue, u8 port,
                       WPADCallback pCallback);

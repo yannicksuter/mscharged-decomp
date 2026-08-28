@@ -415,12 +415,12 @@ void WPADiCreateKey(s32 chan)
 
     for (i = 0; i < 10; i++)
     {
-        p_wpd->encryptionKey[i] = tblRnd[9 - i];
+        p_wpd->key[i] = tblRnd[9 - i];
     }
 
     for (i = 0; i < 6; i++)
     {
-        p_wpd->encryptionKey[i + 10] = key[5 - i];
+        p_wpd->key[i + 10] = key[5 - i];
     }
 
     memcpy(p_wpd->decryptAddTable, ft, 8);
@@ -492,11 +492,11 @@ void WPADiCreateKeyFor3rd(s32 chan)
 
     for (i = 0; i < 10; i++)
     {
-        p_wpd->encryptionKey[i] = tblRnd[9 - i];
+        p_wpd->key[i] = tblRnd[9 - i];
     }
     for (i = 0; i < 6; i++)
     {
-        p_wpd->encryptionKey[i + 10] = key[5 - i];
+        p_wpd->key[i + 10] = key[5 - i];
     }
     memcpy(p_wpd->decryptAddTable, ft, 8);
     memcpy(p_wpd->decryptXorTable, sb, 8);

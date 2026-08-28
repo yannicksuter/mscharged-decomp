@@ -744,6 +744,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/vi/vi3in1.c"),
             Object(Matching, "RVL_SDK/wenc/wenc.c", mw_version="GC/3.0a5.2"),
             Object(NonMatching, "RVL_SDK/wpad/WPAD.c"),
+            Object(NonMatching, "RVL_SDK/wpad/WPADHIDParser.c"),
             Object(Matching, "RVL_SDK/wpad/WPADEncrypt.c"),
             Object(Matching, "RVL_SDK/wpad/debug_msg.c"),
             Object(Matching, "RVL_SDK/so/soCommon.c", mw_version="GC/3.0a5.2"),

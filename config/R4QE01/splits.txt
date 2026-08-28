@@ -1432,6 +1432,10 @@ RVL_SDK/wpad/WPAD.c:
 
 RVL_SDK/wpad/WPADHIDParser.c:
 	.text       start:0x803D1408 end:0x803D5EBC
+	.data       start:0x8054B568 end:0x8054B9C8
+	.bss        start:0x805D9868 end:0x805D9880
+	.sbss       start:0x806E2C08 end:0x806E2C20
+	.sdata2     start:0x806E7580 end:0x806E75A8
 
 RVL_SDK/wpad/WPADEncrypt.c:
 	.text       start:0x803D5EBC end:0x803D6F64

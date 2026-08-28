@@ -28,13 +28,15 @@ typedef struct WPADMemBlock {
 } WPADMemBlock;
 
 typedef struct WPADGameInfo {
-    s64 timestamp;        // at 0x0
-    u16 gameName[16 + 1]; // at 0x8
-    char gameID[4];       // at 0x2A
+    s64 calendarTimeTick; // at 0x0
+    u16 gameTitle[17];    // at 0x8
+    char gameId[4];       // at 0x2A
     u8 gameType;          // at 0x2E
-    u8 checksum;          // at 0x2F
-    u8 UNK_0x30[8];
+    u8 checkSum;          // at 0x2F
+    u8 reserved[8];       // at 0x30
 } WPADGameInfo;
+
+typedef WPADGameInfo WPADMEMGameInfo;
 
 extern WPADMemBlock _wmb[WPAD_MAX_CONTROLLERS];
 
