@@ -9,7 +9,6 @@ struct GroundInfo
     /* 0x98 */ float height;
 };
 
-extern "C" GroundInfo* fn_802772BC();
 extern "C" void* fn_8027262C();
 
 #endif // GAME_DRAWABLE_SHADOW_PROP_H

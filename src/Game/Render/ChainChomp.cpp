@@ -2,6 +2,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Powerups.h"
+#include "Game/BasicStadium.h"
 #include "Game/Drawable/ShadowProp.h"
 #include "Game/GameTweaks.h"
 #include "Game/PoseAccumulator.h"
@@ -128,7 +129,8 @@ void ChainChomp::DrawShadow(
             alpha = 255;
         }
 
-        GroundInfo* ground = fn_802772BC();
+        GroundInfo* ground =
+            reinterpret_cast<GroundInfo*>(BasicStadium::GetCurrentStadium());
         float groundHeight = lbl_806E4EF0;
         if (ground != 0)
         {

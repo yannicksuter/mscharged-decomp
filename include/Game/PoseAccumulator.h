@@ -33,8 +33,17 @@ public:
     void InitAccumulators(float scale, float damage);
     int GetNumNodes() const;
     nlMatrix4& GetNodeMatrix(int nodeIndex) const;
+    void BlendRot(int nodeIndex, const nlQuaternion* rotation, float weight,
+        bool additive);
+    void BlendRotAroundZ(int nodeIndex, unsigned short rotation, float weight);
+    void BlendScale(int nodeIndex, const nlVector3* scale, float weight,
+        bool additive);
+    void BlendTrans(int nodeIndex, const nlVector3* translation, float weight,
+        bool mirror);
     void BlendRotIdentity(int nodeIndex, float weight);
     void BlendScaleIdentity(int nodeIndex, float weight);
+    void fn_8030C1B0(int nodeIndex, const nlVector3* scale, float weight);
+    void BlendTransIdentity(int nodeIndex, float weight);
     void Pose(const cPoseNode& poseNode, const nlMatrix4& matrix);
 
     cSHierarchy* m_pHierarchy;

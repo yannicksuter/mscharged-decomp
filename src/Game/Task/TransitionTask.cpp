@@ -1,5 +1,6 @@
 #include "Game/Task/TransitionTask.h"
 
+#include "Game/BasicStadium.h"
 #include "Game/Character.h"
 #include "Game/Drawable/DrawableCharacter.h"
 #include "Game/NisPlayer.h"
@@ -115,7 +116,6 @@ extern "C" {
 void fn_80137CB8(int);
 void fn_8027C86C();
 void fn_8027D11C();
-void* fn_802772BC();
 void fn_80278A00(void*, int, int);
 Presentation* fn_80284A58();
 void fn_80285714(Presentation*, u32, u32);
@@ -288,15 +288,15 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         fn_8027D11C();
     }
 
-    if (fn_802772BC() != 0)
+    if (BasicStadium::GetCurrentStadium() != 0)
     {
         if (to == 0x10 && fn_80284A58()->mUnknown164)
         {
-            fn_80278A00(fn_802772BC(), 0x37, 1);
+            fn_80278A00(BasicStadium::GetCurrentStadium(), 0x37, 1);
         }
         else
         {
-            fn_80278A00(fn_802772BC(), 0x37, 0);
+            fn_80278A00(BasicStadium::GetCurrentStadium(), 0x37, 0);
         }
     }
 

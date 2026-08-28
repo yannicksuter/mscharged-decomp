@@ -1,4 +1,5 @@
 #include "Game/AI/AiUtil.h"
+#include "Game/BasicStadium.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Drawable/ShadowProp.h"
 #include "NL/gl/glState.h"
@@ -92,7 +93,8 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
         }
     }
 
-    GroundInfo* ground = fn_802772BC();
+    GroundInfo* ground =
+        reinterpret_cast<GroundInfo*>(BasicStadium::GetCurrentStadium());
     float groundHeight = 0.0f;
     if (ground != 0)
     {

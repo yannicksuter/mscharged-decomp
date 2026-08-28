@@ -1,5 +1,6 @@
 #include "Game/Drawable/DrawableCharacter.h"
 
+#include "Game/BasicStadium.h"
 #include "Game/CharacterEffects.h"
 #include "Game/AI/HeadTrack.h"
 #include "Game/PoseAccumulator.h"
@@ -276,7 +277,6 @@ extern "C" CameraManager* fn_8027261C();
 extern "C" void fn_8027267C(int);
 extern "C" void fn_80273A4C(int, Model*, int);
 extern "C" bool fn_80277238();
-extern "C" Camera* fn_802772BC();
 extern "C" Model* fn_802CC360(void*, int, int);
 extern "C" void fn_802CC458(ModelPacket*, u32, u32);
 extern "C" void fn_802CC4FC(
@@ -1616,7 +1616,7 @@ void DrawableCharacter::RenderCharacterShadow(
         return;
     }
 
-    camera = fn_802772BC();
+    camera = reinterpret_cast<Camera*>(BasicStadium::GetCurrentStadium());
     blackAmount = 1.0f != lbl_806DCB48
         ? lbl_806DCB48
         : drawable->blendAmount;
