@@ -41,7 +41,6 @@ public:
 extern "C"
 {
     void* fn_8027267C(int);
-    void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
 }
 
 static float gShadowAlphaScale = 0.4f;
@@ -220,7 +219,7 @@ void DrawableBulletBill::Blend(const float* factors, const DrawableBulletBill& l
 
     float t = factors[2];
     mScale = (1.0f - t) * lhs.mScale + t * rhs.mScale;
-    fn_802B5544(mOrientation, lhs.mOrientation, rhs.mOrientation, t);
+    nlQuatNLerp(mOrientation, lhs.mOrientation, rhs.mOrientation, t);
     mPosition.x = (1.0f - t) * lhs.mPosition.x + t * rhs.mPosition.x;
     mPosition.y = (1.0f - t) * lhs.mPosition.y + t * rhs.mPosition.y;
     mPosition.z = (1.0f - t) * lhs.mPosition.z + t * rhs.mPosition.z;

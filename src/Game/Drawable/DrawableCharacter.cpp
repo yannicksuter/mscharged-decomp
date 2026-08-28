@@ -247,7 +247,6 @@ struct TaskManager
     u32 state;
 };
 
-extern "C" void fn_802B5544(nlQuaternion*, const nlQuaternion*, const nlQuaternion*, float);
 extern "C" cPoseAccumulator* fn_8030A9D0(cPoseAccumulator*, cSHierarchy*, bool);
 extern "C" void fn_8030B1C0(cPoseAccumulator*);
 extern "C" void fn_8030B318(cPoseAccumulator*, const nlMatrix4*);
@@ -1099,10 +1098,10 @@ void DrawableCharacter::Blend(
         identityOne = 0.0f;
         for (int i = 0; i < fn_8030C374(poseAccumulator); ++i)
         {
-            fn_802B5544(
-                &poseAccumulator->m_pQuaternions[i],
-                &lhs.poseAccumulator->m_pQuaternions[i],
-                &rhs.poseAccumulator->m_pQuaternions[i],
+            nlQuatNLerp(
+                poseAccumulator->m_pQuaternions[i],
+                lhs.poseAccumulator->m_pQuaternions[i],
+                rhs.poseAccumulator->m_pQuaternions[i],
                 rhsWeight);
             BlendTranslationAccum(
                 poseAccumulator->m_pTranslations[i],

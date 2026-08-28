@@ -480,6 +480,14 @@ struct nlPolar
 }; // size: 0x8
 
 void nlInvertRotTransMatrix(nlMatrix4& out, const nlMatrix4& in);
+void nlMakeRotTransMatrix(nlMatrix4& out, const nlVector3& v3ForwardVector,
+    const nlVector3& v3UpVector, const nlVector3& v3AlternateUpVector,
+    const nlVector3& v3Translation);
+void nlMakeRotationMatrixAxisAngle(
+    nlMatrix4& out, const nlVector3& v3RotationAxis, float ang_rad);
+void GetRotationBetweenVectors(
+    nlQuaternion& quat, const nlVector3& v3Vec1, const nlVector3& v3Vec2);
+void RotateVector(nlVector3& result, const nlVector3& v, nlQuaternion& q);
 void nlQuatNLerp(nlQuaternion& out, const nlQuaternion& q1, const nlQuaternion& q2, float t);
 void nlQuatInverse(nlQuaternion& out, const nlQuaternion& in);
 void nlQuatNormalize(nlQuaternion& out, const nlQuaternion& in);

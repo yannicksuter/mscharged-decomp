@@ -20,6 +20,13 @@ enum eGXTextureFormat
 class PlatTexture
 {
 public:
+    void Prepare();
+    void Swizzle(bool bDeleteLinear);
+    void Create(int width, int height, eGXTextureFormat format,
+        bool permanent, int numLevels, bool bLinearData, bool bNewResourceMemory);
+    void CreateWithMemory(int width, int height, eGXTextureFormat format,
+        int numLevels, const void* pTextureData);
+
     /* 0x00 */ u16 m_Width;
     /* 0x02 */ u16 m_Height;
     /* 0x04 */ u8 m_Levels;
@@ -39,5 +46,11 @@ public:
 };
 
 PlatTexture* glx_GetTex(unsigned long handle);
+PlatTexture* glx_CreatePlatTexture(bool permanent);
+bool glplatTextureLoad(PlatTexture* texture);
+int glplatTextureGetNumBits(int component);
+u32 glplatTextureGetHeight();
+u32 glplatTextureGetWidth();
+void glxInitTex();
 
 #endif // _GLXTEXTURE_H_

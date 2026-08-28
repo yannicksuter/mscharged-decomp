@@ -7,8 +7,6 @@ extern "C"
     void* memcpy(void* dest, const void* src, size_t num);
     void C_MTXPerspective(float m[4][4], float fovY, float aspect, float near, float far);
     void C_MTXOrtho(float m[4][4], float top, float bottom, float left, float right, float near, float far);
-    void fn_802B5684(nlQuaternion& out, const nlVector3& from, const nlVector3& to);
-    void fn_802B58B0(nlVector3& out, const nlVector3& in, nlQuaternion& rotation);
     void fn_802B5D74(nlVector3& out, const nlVector3& point, const nlVector4& plane);
 }
 
@@ -66,8 +64,8 @@ void glplatMatrixLookAt(nlMatrix4& m, const nlVector3& eye, const nlVector3& at,
         {
             nlQuaternion rotation;
             const nlVector3 fallbackAxis = { 0.0f, 0.0f, 1.0f };
-            fn_802B5684(rotation, fallbackAxis, projectedUp);
-            fn_802B58B0(cameraUp, cameraUp, rotation);
+            GetRotationBetweenVectors(rotation, fallbackAxis, projectedUp);
+            RotateVector(cameraUp, cameraUp, rotation);
             nlVec3CrossProduct(view, side, cameraUp);
             nlVec3ScaleAdd(cameraEye, length, view, at);
         }

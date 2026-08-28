@@ -133,7 +133,6 @@ extern "C" float fn_800155A0(BallObject*, int);
 extern "C" LiveBallTrail* fn_8001B284(u32);
 extern "C" u32 fn_8001B30C(BallObject*);
 extern "C" int fn_80026C6C(void*);
-extern "C" void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
 extern "C" BallScaleData* fn_80284A58(u32);
 
 static float g_fBallTrailScale = 2.25f;
@@ -274,7 +273,7 @@ void DrawableBall::Blend(
     const float factor = *blendFactors;
 
     mPrevOrientation = mOrientation;
-    fn_802B5544(mOrientation, lhs.mOrientation, rhs.mOrientation, factor);
+    nlQuatNLerp(mOrientation, lhs.mOrientation, rhs.mOrientation, factor);
 
     mPosition.x = (1.0f - factor) * lhs.mPosition.x + factor * rhs.mPosition.x;
     mPosition.y = (1.0f - factor) * lhs.mPosition.y + factor * rhs.mPosition.y;
@@ -305,7 +304,7 @@ void DrawableBall::Blend(
                 (1.0f - factor) * lhs.mTrail[i].position.y + factor * rhs.mTrail[i].position.y;
             mTrail[i].position.z =
                 (1.0f - factor) * lhs.mTrail[i].position.z + factor * rhs.mTrail[i].position.z;
-            fn_802B5544(
+            nlQuatNLerp(
                 mTrail[i].orientation, lhs.mTrail[i].orientation, rhs.mTrail[i].orientation, factor);
         }
     }

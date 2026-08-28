@@ -530,6 +530,10 @@ NL/nlTicker.cpp:
 NL/nlString.cpp:
 	.text       start:0x802AAACC end:0x802AAC88
 
+NL/nlMain.cpp:
+	.text       start:0x802AAC88 end:0x802AAFD0
+	.data       start:0x8052ACE0 end:0x8052B0E0
+
 Game/Sys/simpleparser.cpp:
 	.text       start:0x802AAFD0 end:0x802AB77C
 	.sdata      start:0x806DF1C8 end:0x806DF1D4
@@ -568,6 +572,10 @@ NL/nlTask.cpp:
 	.sdata      start:0x806DF240 end:0x806DF244
 	.sbss       start:0x806E1DA0 end:0x806E1DA8
 	.sdata2     start:0x806E60B8 end:0x806E60C0
+
+NL/math.cpp:
+	.text       start:0x802B51D8 end:0x802B6234
+	.sdata2     start:0x806E60C0 end:0x806E6108
 
 NL/utility.cpp:
 	.text       start:0x802B6234 end:0x802B6568
@@ -711,6 +719,12 @@ NL/nlLocalization.cpp:
 	.sdata      start:0x806DF518 end:0x806DF54C
 	.sbss       start:0x806E2088 end:0x806E208C
 	.sdata2     start:0x806E6718 end:0x806E6720
+
+NL/nlFont.cpp:
+	.text       start:0x80302F44 end:0x80305778
+	.data       start:0x8052FEA8 end:0x8052FF10
+	.sdata      start:0x806DF550 end:0x806DF560
+	.sdata2     start:0x806E6720 end:0x806E6748
 
 NL/nlTextBox.cpp:
 	.text       start:0x80305778 end:0x80305D68
@@ -935,6 +949,11 @@ ode/NLGAdditions.cpp:
 	.text       start:0x80358E7C end:0x8035952C
 	.data       start:0x80534738 end:0x80534750
 	.sdata2     start:0x806E6B88 end:0x806E6BA0
+
+NL/plat/platqmath.cpp:
+	.text       start:0x80368360 end:0x80368784
+	.rodata     start:0x804EB440 end:0x804EB450
+	.sdata2     start:0x806E6CE8 end:0x806E6D08
 
 NL/plat/platvmath.cpp:
 	.text       start:0x80368784 end:0x80368E00

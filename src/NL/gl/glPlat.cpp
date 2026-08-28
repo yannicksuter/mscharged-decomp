@@ -2,7 +2,9 @@
 #include "NL/gl/glView.h"
 
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxSend.h"
 #include "NL/glx/glxSwap.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/nlFunction.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
@@ -98,7 +100,6 @@ extern "C"
     void fn_803A1D10(void* fifo, u32 highWatermark, u32 lowWatermark);
     void* fn_80372B30(u32 size, s32 arena);
     void fn_8004F594(s32 category, const char* format, ...);
-    void fn_8036BE84();
     void fn_8036D89C();
     void fn_80376150();
 
@@ -107,8 +108,6 @@ extern "C"
     void fn_803640E4(void* owner, u32 name);
     void fn_803640DC();
     void fn_8036DF24(PlatformRenderTarget* target, bool flag0, bool flag1);
-    void fn_8036E550();
-    void fn_8036E59C();
 
     extern GXRenderModeObj lbl_8053BC30;
     extern GXRenderModeObj lbl_8053BC6C;
@@ -353,7 +352,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
         VIWaitForRetrace();
     }
     glxInitSwap(glx_FrameBuffer[0], glx_FrameBuffer[1]);
-    fn_8036BE84();
+    glxInitTex();
     fn_8036D89C();
     return true;
 }
@@ -442,7 +441,7 @@ static void glx_SendViews()
 
             if (view->m_Visible)
             {
-                view->Iterate((GLViewPacketCallback)fn_8036E59C);
+                view->Iterate(glx_SendFrame_cb);
                 const s32 targetMode = view->m_Target;
                 if (targetMode != 8)
                 {
@@ -461,7 +460,7 @@ static void glx_SendViews()
 
     fn_80364020();
     fn_803640DC();
-    fn_8036E550();
+    glx_SendEnd();
 }
 
 void glplatSendFrame()

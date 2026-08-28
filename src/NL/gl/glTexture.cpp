@@ -1,4 +1,5 @@
 #include "NL/gl/glTexture.h"
+#include "NL/glx/glxTexture.h"
 
 extern "C"
 {
@@ -6,10 +7,6 @@ extern "C"
 
     unsigned long fn_802CE1B8(void* manager, unsigned long texture);
     void* fn_802CE294(void* manager, const unsigned long* texture);
-    bool fn_8036B5C8(void* texture);
-    u32 fn_8036B620();
-    u32 fn_8036B62C();
-    int fn_8036B63C(int component);
 }
 
 bool glTextureLoad(unsigned long texture)
@@ -19,20 +16,20 @@ bool glTextureLoad(unsigned long texture)
         return false;
 
     unsigned long key = result;
-    return fn_8036B5C8(fn_802CE294(lbl_806E1F08, &key));
+    return glplatTextureLoad((PlatTexture*)fn_802CE294(lbl_806E1F08, &key));
 }
 
 u32 glTextureGetWidth()
 {
-    return fn_8036B620();
+    return glplatTextureGetWidth();
 }
 
 u32 glTextureGetHeight()
 {
-    return fn_8036B62C();
+    return glplatTextureGetHeight();
 }
 
 int glTextureGetNumBits(int component)
 {
-    return fn_8036B63C(component);
+    return glplatTextureGetNumBits(component);
 }
