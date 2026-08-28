@@ -787,11 +787,16 @@ NL/glx/glxDisplayList.cpp:
 	.sdata      start:0x806DFAB8 end:0x806DFAC0
 	.sbss       start:0x806E23F4 end:0x806E2400
 
+RVL_SDK/thp/THPSimple.cpp:
+	.text       start:0x803713E8 end:0x80372980
+	.data       start:0x80535728 end:0x80535828
+	.bss        start:0x8059BF40 end:0x8059C400
+	.sdata      start:0x806DFAE0 end:0x806DFB00
+	.sbss       start:0x806E2448 end:0x806E2460
+	.sdata2     start:0x806E6DC0 end:0x806E6DD0
+
 MSL/float.c:
 	.sdata      start:0x806DFB58 end:0x806DFB68
-
-RVL_SDK/thp/THPSimple.c:
-	.text       start:0x803713EC end:0x80372980
 
 MetroTRK/mainloop.c:
 	.text       start:0x80376F3C end:0x80377034

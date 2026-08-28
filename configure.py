@@ -664,6 +664,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/nwc24/NWC24StdApi.c"),
             Object(Matching, "RVL_SDK/nwc24/NWC24FileApi.c"),
             Object(Matching, "RVL_SDK/nwc24/NWC24Ipc.c"),
+            Object(NonMatching, "RVL_SDK/thp/THPSimple.cpp", cflags=cflags_game),
             Object(Matching, "RVL_SDK/thp/THPDec.c"),
             Object(Matching, "RVL_SDK/thp/THPAudio.c"),
             Object(Matching, "RVL_SDK/tpl/TPL.c"),
