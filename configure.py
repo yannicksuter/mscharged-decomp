@@ -531,6 +531,7 @@ config.libs = [
             Object(NonMatching, "unclassified/tu_802A8218.cpp"),
             Object(NonMatching, "unclassified/tu_802E3D4C.cpp"),
             Object(NonMatching, "unclassified/tu_802E4358.cpp"),
+            Object(NonMatching, "Game/Audio/SoundMap.cpp"),
             Object(Matching, "Game/FE/GameSceneManager.cpp"),
             Object(Matching, "Game/FE/BaseSceneHandler.cpp"),
             Object(NonMatching, "Game/FE/tlSlide.cpp"),
