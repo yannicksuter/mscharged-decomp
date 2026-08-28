@@ -1017,10 +1017,11 @@ RVL_SDK/ax/AXSPB.c:
 	.sbss       start:0x806E25E0 end:0x806E2630
 
 RVL_SDK/ax/AXVPB.c:
-	.text       start:0x80391404 end:0x80391F6C
+	.text       start:0x80391404 end:0x80392BC0
 	.data       start:0x80536D98 end:0x80536E28
 	.bss        start:0x805A7480 end:0x805B8B80
 	.sbss       start:0x806E2630 end:0x806E264C
+	.sdata2     start:0x806E7298 end:0x806E72B8
 
 RVL_SDK/ax/AXComp.c:
 	.data       start:0x80536E40 end:0x80537E00
