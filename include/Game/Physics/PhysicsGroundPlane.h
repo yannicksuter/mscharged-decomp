@@ -8,9 +8,9 @@ class CollisionSpace;
 class PhysicsGroundPlane : public PhysicsPlane
 {
 public:
-    PhysicsGroundPlane(CollisionSpace*);
+    PhysicsGroundPlane(CollisionSpace* collision_space);
     virtual ~PhysicsGroundPlane() { }
-    virtual int GetObjectType() const { return 0x11; }
+    virtual int GetObjectType() const { return 0x12; }
 };
 
 #endif // GAME_PHYSICS_PHYSICS_GROUND_PLANE_H

@@ -69,9 +69,14 @@ private:
     };
 };
 
+template <typename Signature>
+class Function;
+
 template <typename ReturnType, typename P1>
 class Function1
 {
+    friend class Function<P1>;
+
 public:
     struct FunctorBase
     {
@@ -111,15 +116,26 @@ public:
 
     void Clear()
     {
-        if (this == 0)
-        {
-            return;
-        }
         if (mTag == FUNCTION_FUNCTOR)
         {
             delete mFunctor;
         }
         mTag = FUNCTION_EMPTY;
+    }
+
+    Function1& operator=(const Function1& other)
+    {
+        Clear();
+        mTag = other.mTag;
+        if (mTag == FUNCTION_FREE)
+        {
+            mFreeFunction = other.mFreeFunction;
+        }
+        else if (mTag == FUNCTION_FUNCTOR)
+        {
+            mFunctor = other.mFunctor->Clone();
+        }
+        return *this;
     }
 
     operator bool() const
@@ -143,6 +159,28 @@ private:
         ReturnType (*mFreeFunction)(P1);
         FunctorBase* mFunctor;
     };
+};
+
+template <typename P1>
+class Function : public Function1<void, P1>
+{
+    typedef Function1<void, P1> Base;
+
+public:
+    Function()
+        : Base()
+    {
+    }
+
+    Function(void (*function)(P1))
+        : Base(function)
+    {
+    }
+
+    operator bool() const
+    {
+        return this->mTag != FUNCTION_EMPTY;
+    }
 };
 
 template <typename ReturnType, typename P1, typename P2>

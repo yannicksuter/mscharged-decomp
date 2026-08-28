@@ -236,7 +236,7 @@ DrawableNetMesh::~DrawableNetMesh()
 
 void DrawableNetMesh::RenderInvisiblePlanes() const
 {
-    float goalLineX = cField::GetGoalLineX(1);
+    float goalLineX = cField::GetGoalLineX(1U);
     float netHeight = cNet::m_fNetHeight;
     float netWidth = cNet::m_fNetWidth;
 

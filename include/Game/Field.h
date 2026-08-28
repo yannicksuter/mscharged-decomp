@@ -21,9 +21,12 @@ struct sSideLinePlane
 class cField
 {
 public:
+    static void Init(cNet* net0, cNet* net1);
     static cNet* GetNet(float side);
+    static float GetGoalLineX(float side);
     static float GetGoalLineX(unsigned int side);
     static float GetSidelineY(unsigned int side);
+    static float GetCornerRadius();
     static float GetPenaltyBoxX(unsigned int side);
     static float GetPenaltyBoxY();
 
@@ -39,8 +42,12 @@ public:
         return *(const sCornerSegment*)(base + index * sizeof(sCornerSegment));
     }
 
+    static nlVector3 mv3FieldPosition;
     static sSideLinePlane mSidelines[4];
     static sCornerSegment mCorners[4];
+    static float mfPenaltyBoxX;
+    static float mfPenaltyBoxY;
+    static cNet* mpNet[2];
 };
 
 #endif // GAME_FIELD_H

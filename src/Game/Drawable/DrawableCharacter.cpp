@@ -68,20 +68,6 @@ struct PoseNode
     virtual void Evaluate(float, cPoseAccumulator*) = 0;
 };
 
-enum eGLBlend
-{
-    GLB_None = 0,
-};
-
-struct EffectsTexturing
-{
-    u32 texture;
-    ResolvedTexture resolvedTexture;
-    eGLBlend blendMode;
-    bool enviro;
-    bool detail;
-};
-
 struct Character
 {
     nlVector3& GetJointPosition(int) const;
@@ -1367,11 +1353,11 @@ void DrawableCharacter::ApplyMaterialEffects(
     EffectsTexturing* texturing = effectsTexturing;
     int characterClass = source.characterClass;
 
-    if (texturing != 0 && texturing->texture == 0xFFFFFFFF)
+    if (texturing != 0 && texturing->m_uTexture == 0xFFFFFFFF)
     {
         texturing = 0;
     }
-    if (texturing != 0 && texturing->detail)
+    if (texturing != 0 && texturing->m_bDetail)
     {
         texturing = 0;
     }
@@ -1383,17 +1369,17 @@ void DrawableCharacter::ApplyMaterialEffects(
              ++packet)
         {
             u32& raster = packet->raster;
-            if (texturing->blendMode != GLB_None)
+            if (texturing->m_eBlendMode != GLB_None)
             {
                 glSetRasterState(
-                    raster, GLS_AlphaBlend, (unsigned long)texturing->blendMode);
+                    raster, GLS_AlphaBlend, (unsigned long)texturing->m_eBlendMode);
             }
 
-            if (texturing->detail)
+            if (texturing->m_bDetail)
             {
                 fn_802CC458(
-                    packet, lbl_806E1F10, texturing->texture);
-                ResolvedTexture texture = texturing->resolvedTexture;
+                    packet, lbl_806E1F10, texturing->m_uTexture);
+                ResolvedTexture texture = texturing->m_ResolvedTexture;
                 fn_802CC4FC(packet, lbl_806E1F10, texture);
                 fn_802CC628(
                     packet, blendAmountHash, lbl_806DCB88);
@@ -1401,8 +1387,8 @@ void DrawableCharacter::ApplyMaterialEffects(
             else
             {
                 fn_802CC458(
-                    packet, lbl_806E1F0C, texturing->texture);
-                ResolvedTexture texture = texturing->resolvedTexture;
+                    packet, lbl_806E1F0C, texturing->m_uTexture);
+                ResolvedTexture texture = texturing->m_ResolvedTexture;
                 fn_802CC4FC(packet, lbl_806E1F0C, texture);
             }
         }

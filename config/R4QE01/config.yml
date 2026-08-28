@@ -17,6 +17,10 @@ add_relocations:
   - { source: .text:0x8009A834, type: l, target: __vt__11FreezeShell }
   - { source: .text:0x8009A854, type: l, target: __vt__8RedShell }
 block_relocations:
+  # OSInit's MEM1 arena-lo default is the constant 0x80004000 (donor-supported
+  # source spelling); it is not a reference to the .init routine at that address
+  - { source: 0x803B354C }
+  - { source: 0x803B35C4 }
   # WPADEncrypt.c tb[] bytes that scan as plausible pointers
   - { source: 0x8054BA9C }
   - { source: 0x8054BF10 }

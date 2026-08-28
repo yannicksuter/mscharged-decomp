@@ -1,19 +1,14 @@
 #ifndef _DRAWABLECHARACTER_H_
 #define _DRAWABLECHARACTER_H_
 
+#include "Game/CharacterEffects.h"
 #include "NL/nlMath.h"
 
 struct Character;
-struct EffectsTexturing;
 struct Model;
 struct PoseNode;
 class cPoseAccumulator;
 class SkinAnimatedMovableNPC;
-
-struct ResolvedTexture
-{
-    u32 value;
-};
 
 enum eCharacterRenderPass
 {
