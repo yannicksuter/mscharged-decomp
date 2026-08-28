@@ -39,12 +39,12 @@ dContactGeom::g1 and dContactGeom::g2.
 #include "collision_util.h"
 
 #include "NL/nlMath.h"
+#include "math.h"
 
 extern "C" void* memcpy(void*, const void*, size_t);
 
-#define dFabs(x) ((float)__fabs(float(x)))
+#define dFabs(x) ((float)fabsf(float(x)))
 #define dInfinity (3.402823466e+38F)
-#define M_PI REAL(3.1415926535897932384626433832795029)
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4291) // for VC++, no complaints about "no matching operator delete found"
