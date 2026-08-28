@@ -16,6 +16,8 @@ The project was built with or adapted source from the following projects:
 | [koopthekoopa/wii-ipl at `0b0cedd`](https://github.com/koopthekoopa/wii-ipl/tree/0b0cedd44d83fa187eb3f52748c3eecf0840865b) | RVL SDK reconstructions. |
 | [doldecomp/ogws at `a764c49`](https://github.com/doldecomp/ogws/tree/a764c49183610bce30ec79ca83e228b86d2ca0ab) | RVL SDK reconstructions at the same library revision as R4QE01. |
 | [doldecomp/Rhae at `35929a0`](https://github.com/doldecomp/Rhae/tree/35929a0bfcca6c55c6305a72cc86caef54203c1f) | Expanded RVL SDK AXFX reverb reconstructions. |
+| [doldecomp/mkw at `94585b8`](https://github.com/doldecomp/mkw/tree/94585b8a8fd7a2a52f30640ccff316e57880b6c1) | DWC allocator and initialization reconstructions, plus DWC GHTTP, common-utility, friend-unit, login-unit, main-unit, and transport-unit symbol and boundary references. |
+| [DarkRTA/rb3 at `ababaa9`](https://github.com/DarkRTA/rb3/tree/ababaa9bb6a669af06aa7def7dd735c4f5265061) | DWC report and initialization structural references. |
 | [zeldaret/oot-vc at `9c18537`](https://github.com/zeldaret/oot-vc/tree/9c1853710bcf6b598b0710022fdb87b9a8e99e2c) | RVL SDK and Home Button Menu (`nw4hbm`) reconstructions. |
 | [projectPiki/pik1wii at `96c1af6`](https://github.com/projectPiki/pik1wii/tree/96c1af63ed75996755e53bb85decce3c890e5ca4) | RVL SDK WPAD encryption and HID parser reconstructions. |
 | [conhlee/rhf at `4429cbc`](https://github.com/conhlee/rhf/tree/4429cbcb000abff644683d98701f6ab8c1671e10) | RVL SDK `DVDSetAutoInvalidation` reconstruction. |
@@ -43,8 +45,9 @@ kept alongside the source as `license.txt`. Its headers sit beside its sources
 and are included by bare name, so the library's own directory layout is
 preserved rather than folded into a shared include root.
 
-The referenced decompilation projects publish their reconstruction work under
-CC0 1.0. ODE-derived source retains the
+Referenced decompilation material remains subject to its source project's
+terms; material explicitly published under CC0 1.0 remains CC0. ODE-derived
+source retains the
 [ODE BSD-style license](../LICENSES/ODE-BSD.txt). GameSpy source retains its
 [three-clause BSD licence](../LICENSES/BSD-3-Clause-GameSpy.txt). Other third-party material
 retains its respective upstream terms.

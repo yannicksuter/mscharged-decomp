@@ -2284,12 +2284,55 @@ RVL_SDK/dwc/dwc_error.c:
 
 RVL_SDK/dwc/dwc_init.c:
 	.text       start:0x804891C8 end:0x80489510
+	.data       start:0x80561C78 end:0x80561EC8
+	.sdata      start:0x806E0370 end:0x806E037E
+	.sbss       start:0x806E2EB0 end:0x806E2EB4
 
 RVL_SDK/dwc/dwc_memfunc.c:
 	.text       start:0x80489510 end:0x8048975C
+	.sbss       start:0x806E2EB8 end:0x806E2EC0
 
 RVL_SDK/dwc/dwc_report.c:
 	.text       start:0x8048975C end:0x80489A8C
+	.data       start:0x80561EC8 end:0x8056202B
+	.sbss       start:0x806E2EC0 end:0x806E2EC4
+
+RVL_SDK/dwc/dwc_ghttp.c:
+	.text       start:0x80489A8C end:0x8048A17C
+	.data       start:0x80562030 end:0x80562140
+	.sdata      start:0x806E0380 end:0x806E0384
+	.sbss       start:0x806E2EC8 end:0x806E2ED0
+
+RVL_SDK/dwc/dwc_common.c:
+	.text       start:0x8048A17C end:0x8048A684
+	.data       start:0x80562140 end:0x80562150
+	.bss        start:0x806C9888 end:0x806C98A0
+	.sdata      start:0x806E0388 end:0x806E0390
+
+RVL_SDK/dwc/dwc_friend.c:
+	.text       start:0x8048A684 end:0x8048C214
+	.data       start:0x80562150 end:0x805626E0
+	.sdata      start:0x806E0390 end:0x806E0398
+	.sbss       start:0x806E2ED0 end:0x806E2ED8
+
+RVL_SDK/dwc/dwc_login.c:
+	.text       start:0x8048C214 end:0x8048CF78
+	.data       start:0x805626E0 end:0x80562AE0
+	.sdata      start:0x806E0398 end:0x806E03A0
+	.sbss       start:0x806E2ED8 end:0x806E2EE0
+
+RVL_SDK/dwc/dwc_main.c:
+	.text       start:0x8048CF78 end:0x8048F554
+	.data       start:0x80562AE0 end:0x80563478
+	.bss        start:0x806C98A0 end:0x806C9920
+	.sdata      start:0x806E03A0 end:0x806E03C8
+	.sbss       start:0x806E2EE0 end:0x806E2EE8
+
+RVL_SDK/dwc/dwc_transport.c:
+	.text       start:0x8049AE0C end:0x8049BB0C
+	.data       start:0x80564D50 end:0x80565038
+	.sdata      start:0x806E0438 end:0x806E0440
+	.sbss       start:0x806E2F00 end:0x806E2F08
 
 RVL_SDK/dwc/dwc_nonport.c:
 	.text       start:0x8049BB0C end:0x8049D180

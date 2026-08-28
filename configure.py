@@ -279,6 +279,14 @@ cflags_rvl_sdk = [
     "-fp_contract off",
 ]
 
+# DWC consumes the vendored GameSpy interfaces below the RVL SDK source root.
+cflags_rvl_dwc = [
+    *cflags_rvl_sdk,
+    "-i src/RVL_SDK",
+    "-i src/RVL_SDK/gamespy/common",
+    "-i src/RVL_SDK/gamespy/gstats",
+]
+
 # Home Button Menu library flags. R4QE01 links the HBM build dated
 # Dec  7 2006, whose nw4hbm assertions are compiled in: every retained
 # ut/lyt/snd routine still calls nw4hbm::db::Panic with its source file name
@@ -669,6 +677,15 @@ config.libs = [
             Object(Matching, "RVL_SDK/ipc/memory.c"),
             Object(Matching, "RVL_SDK/ipc/ipcProfile.c"),
             Object(Matching, "RVL_SDK/dwc/dwc_error.c"),
+            Object(Matching, "RVL_SDK/dwc/dwc_init.c", cflags=cflags_rvl_dwc),
+            Object(Matching, "RVL_SDK/dwc/dwc_memfunc.c"),
+            Object(Matching, "RVL_SDK/dwc/dwc_report.c"),
+            Object(NonMatching, "RVL_SDK/dwc/dwc_ghttp.c", cflags=cflags_rvl_dwc),
+            Object(NonMatching, "RVL_SDK/dwc/dwc_common.c", cflags=cflags_rvl_dwc),
+            Object(NonMatching, "RVL_SDK/dwc/dwc_friend.c", cflags=cflags_rvl_dwc),
+            Object(NonMatching, "RVL_SDK/dwc/dwc_login.c", cflags=cflags_rvl_dwc),
+            Object(NonMatching, "RVL_SDK/dwc/dwc_main.c", cflags=cflags_rvl_dwc),
+            Object(NonMatching, "RVL_SDK/dwc/dwc_transport.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/gamespy/darray.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/hashtable.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/md5c.c", cflags=cflags_rvl_spy),
