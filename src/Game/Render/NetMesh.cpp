@@ -6,6 +6,7 @@
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBall.h"
 #include "Game/Physics/PhysicsSphere.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
@@ -55,13 +56,6 @@ struct BallNetmeshEventData
 {
     NetMesh* netMesh;
     nlVector3 collisionVelocity;
-};
-
-struct PlatTexture
-{
-    u8 padding[4];
-    u8 m_Levels;
-    u8 m_MaxLevel;
 };
 
 extern "C" DebugFieldType lbl_80533C98[];

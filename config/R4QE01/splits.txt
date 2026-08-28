@@ -669,6 +669,9 @@ NL/gl/glTarget.cpp:
 	.sbss       start:0x806E1F00 end:0x806E1F08
 	.sbss2      start:0x806E7BC0 end:0x806E7BC8
 
+NL/gl/glTexture.cpp:
+	.text       start:0x802CDC34 end:0x802CDC8C
+
 NL/gl/glView.cpp:
 	.text       start:0x802CEF1C end:0x802D0458
 	.ctors      start:0x804DB9F0 end:0x804DB9F4
@@ -964,6 +967,16 @@ NL/glx/glxSwap.cpp:
 
 NL/nlEndian.cpp:
 	.text       start:0x8036D6F0 end:0x8036D6F8
+
+NL/glx/glxMatrix.cpp:
+	.text       start:0x8036DF68 end:0x8036E430
+	.rodata     start:0x804EB450 end:0x804EB460
+	.sdata      start:0x806DFA98 end:0x806DFA9C
+	.sbss       start:0x806E23E0 end:0x806E23E4
+	.sdata2     start:0x806E6D70 end:0x806E6D88
+
+NL/glx/glxFont.cpp:
+	.text       start:0x8036E4C4 end:0x8036E550
 
 NL/glx/glxDisplayList.cpp:
 	.text       start:0x8036F2E8 end:0x8036F648

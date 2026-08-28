@@ -1,5 +1,6 @@
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glFont.h"
+#include "NL/glx/glxFont.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMemory.h"
@@ -14,7 +15,6 @@ extern "C" bool fn_802C8874(void* renderView, eGLView view, unsigned long numPol
 extern "C" bool fn_802CC094();
 extern "C" void fn_802CDF14(unsigned long texture, unsigned long platformTexture, bool permanent);
 extern "C" float fn_802CE7B0(void* renderView);
-extern "C" unsigned long fn_8036E4C4(unsigned long width, unsigned long height, const void* data, unsigned long texture, bool permanent);
 
 enum eGLFont
 {
@@ -158,7 +158,7 @@ void gl_FontStartup()
             }
         }
 
-        unsigned long platformTexture = fn_8036E4C4(width, height, image, texture, fn_802CC094());
+        unsigned long platformTexture = glplatCreateFont(width, height, image, texture, fn_802CC094());
         fn_802CDF14(texture, platformTexture, fn_802CC094());
         delete[] image;
     }

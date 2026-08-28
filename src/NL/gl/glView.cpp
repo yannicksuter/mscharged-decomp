@@ -263,7 +263,7 @@ inline void GLPacketSorterIterator::PushLeft(Entry* entry)
     {
         m_Stack[m_NumStackEntries] = (AVLTreeNode*)entry;
         ++m_NumStackEntries;
-        entry = (Entry*)entry->node.left;
+        entry = *(Entry**)&entry->node.left;
     }
     m_Stack[m_NumStackEntries] = (AVLTreeNode*)entry;
     ++m_NumStackEntries;
@@ -344,7 +344,7 @@ GLView::GLView(GLViewInterface* interface, const GLRenderPair& renderPair,
 }
 
 inline GLView::GLView()
-    : m_RenderPair()
+    : m_RenderPair(0, 0)
 {
     m_Unknown38 = 0;
     m_Unknown3C = 0;
@@ -403,9 +403,13 @@ void GLView::AttachPacket(const glModelPacket* packet, unsigned long sortKey)
 void GLView::AttachModel(const glModel* model, unsigned long sortKey)
 {
     GLPacketSorter& sorter = *GetSorter(sortKey);
-    for (unsigned long index = 0; index < model->numPackets; ++index)
+    unsigned long packetOffset;
+    unsigned long index;
+    for (index = 0, packetOffset = 0; index < model->numPackets;
+         packetOffset += sizeof(glModelPacket), ++index)
     {
-        sorter.Attach(this, &model->packets[index]);
+        sorter.Attach(this,
+            (const glModelPacket*)((const u8*)model->packets + packetOffset));
     }
 }
 
