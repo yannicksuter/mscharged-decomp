@@ -1,9 +1,7 @@
 #ifndef GAME_BLINKER_H
 #define GAME_BLINKER_H
 
-#include "types.h"
-
-class glModel;
+#include "NL/gl/glModel.h"
 
 enum eBlinkState
 {
@@ -17,12 +15,14 @@ enum eBlinkState
 class Blinker
 {
 public:
-    Blinker(unsigned long arg0, unsigned long arg1, unsigned long arg2);
+    Blinker(unsigned long texture0, unsigned long texture1,
+        unsigned long texture2);
+
     void Blink(glModel* model);
     void Update(float fDeltaT);
 
-    /* 0x00 */ unsigned long unknown_0x00[4];
-    /* 0x10 */ unsigned long m_Textures[4];
+    /* 0x00 */ unsigned long m_Textures[4];
+    /* 0x10 */ unsigned long m_ResolvedTextures[4];
     /* 0x20 */ float m_fTime;
     /* 0x24 */ eBlinkState m_State;
     /* 0x28 */ float m_fBlinkTimes[4];

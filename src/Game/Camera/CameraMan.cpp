@@ -1,7 +1,11 @@
 #include "Game/Camera/CameraMan.h"
 #include "Game/AI/AiUtil.h"
+#include "Game/Camera/AnimViewerCam.h"
+#include "Game/Camera/animcam.h"
 #include "NL/nlConfig.h"
+#include "NL/nlFile.h"
 #include "NL/nlMemory.h"
+#include "NL/nlSlotPool.h"
 
 #include <string.h>
 
@@ -15,26 +19,20 @@ struct UnidentifiedCameraModeManager
 
 extern "C" UnidentifiedCameraModeManager* fn_802D5F6C();
 extern "C" void fn_802D6CE0(UnidentifiedCameraModeManager*, int);
-extern "C" void fn_800EE6DC(void*, void*, void*, bool);
-extern "C" void fn_800F02DC(void*, void*, void*);
+extern "C" void fn_800F02DC(void*, unsigned long, void*);
 extern "C" cBaseCamera* fn_800F2510(void*, int);
 extern "C" cBaseCamera* fn_800F5974(void*);
 extern "C" cBaseCamera* fn_800EF2E8(void*);
-extern "C" cBaseCamera* fn_800F3C1C(void*, int);
-extern "C" cBaseCamera* fn_800EE8B4(void*);
 extern "C" cBaseCamera* fn_800EF4E0(void*);
 extern "C" cBaseCamera* fn_800F447C(void*);
 extern "C" cBaseCamera* fn_800F5798(void*);
 extern "C" cBaseCamera* fn_800F5684(void*);
-extern "C" cBaseCamera* fn_800F9238(void*);
 extern "C" cBaseCamera* fn_800F3A14(void*, float);
 extern "C" cBaseCamera* fn_800F9300(void*);
 extern "C" cRumbleFilter* fn_800EF5F8(void*);
 extern "C" UnidentifiedCameraFilter* fn_800EF9F0(void*);
 extern "C" const char* fn_801CBE80(int);
-extern "C" bool fn_802B396C(const char*, void (*)(void*, void*, void*), const char*, u32, bool, int, int, int);
 extern "C" void fn_8005B330(nlVector3*, float, float);
-extern "C" void fn_800EE818();
 extern "C" float fn_80112E0C();
 extern "C" float fn_80112E14();
 extern "C" void fn_80277BB0();
@@ -465,20 +463,20 @@ void cCameraManager::UpdateGameCameraType()
         }
         case eCameraType_FollowCharacter:
         {
-            void* pMemory = nlMalloc(0xA4, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800F3C1C(pMemory, 1) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((cFollowCamera*)nlMalloc(sizeof(cFollowCamera), 8, false))
+                cFollowCamera(cFollowCamera::FOLLOW_CHARACTER);
             break;
         }
         case eCameraType_FollowBall:
         {
-            void* pMemory = nlMalloc(0xA4, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800F3C1C(pMemory, 0) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((cFollowCamera*)nlMalloc(sizeof(cFollowCamera), 8, false))
+                cFollowCamera(cFollowCamera::FOLLOW_BALL);
             break;
         }
         case eCameraType_Animated:
         {
-            void* pMemory = nlMalloc(0xB4, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800EE8B4(pMemory) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((cAnimCamera*)nlMalloc(sizeof(cAnimCamera), 8, false))
+                cAnimCamera();
             break;
         }
         case eCameraType_KickOff:
@@ -507,8 +505,8 @@ void cCameraManager::UpdateGameCameraType()
         }
         case eCameraType_AnimViewer:
         {
-            void* pMemory = nlMalloc(0xA8, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800F9238(pMemory) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((cAnimViewerCamera*)nlMalloc(sizeof(cAnimViewerCamera), 8, false))
+                cAnimViewerCamera();
             break;
         }
         case eCameraType_FaceCloseup:
@@ -691,7 +689,7 @@ void cCameraManager::Shutdown()
 {
     nlDeleteDLRing<cBaseCamera>(&m_cameraStack);
     m_cameraStack = NULL;
-    fn_800EE818();
+    cAnimCamera::FreeCameraAnimations();
 
     if (lbl_806E0EDC != 0)
         delete lbl_806E0EDC;
@@ -780,7 +778,7 @@ extern "C" void fn_800F030C(bool bUnidentified)
 
     if (!bUnidentified)
     {
-        if (fn_802B396C("art/cameras/ShootToScoreCamera.cam", fn_800F02DC, "ShootToScoreCamera", 0x20, true, 0, 0, 0))
+        if (nlLoadEntireFileAsync("art/cameras/ShootToScoreCamera.cam", fn_800F02DC, (void*)"ShootToScoreCamera", 0x20, AllocateEnd, 0, 0, 0))
             lbl_806E0ED0++;
 
         i = 0;
@@ -789,11 +787,11 @@ extern "C" void fn_800F030C(bool bUnidentified)
         {
             nlSNPrintf(fileName, 100, "art/cameras/%s_shoottoscorecamera.cam", fn_801CBE80(i));
             nlSNPrintf(camName, 100, "%s_ShootToScoreCamera", fn_801CBE80(i));
-            if (fn_802B396C(fileName, fn_800F02DC, camName, 0x20, true, 0, 0, 0))
+            if (nlLoadEntireFileAsync(fileName, fn_800F02DC, (void*)camName, 0x20, AllocateEnd, 0, 0, 0))
                 lbl_806E0ED0++;
         }
 
-        if (fn_802B396C("art/cameras/pause.cam", fn_800F02DC, "pause", 0x20, true, 0, 0, 0))
+        if (nlLoadEntireFileAsync("art/cameras/pause.cam", fn_800F02DC, (void*)"pause", 0x20, AllocateEnd, 0, 0, 0))
             lbl_806E0ED0++;
     }
     else
@@ -840,7 +838,7 @@ extern "C" void fn_800F030C(bool bUnidentified)
 
         for (int animationIndex = 0; animationIndex < 37; animationIndex++)
         {
-            if (fn_802B396C(unidentifiedLoadInfo[animationIndex].pUnidentified0, fn_800F02DC, unidentifiedLoadInfo[animationIndex].pUnidentified1, 0x20, true, 0, 0, 0))
+            if (nlLoadEntireFileAsync(unidentifiedLoadInfo[animationIndex].pUnidentified0, fn_800F02DC, (void*)unidentifiedLoadInfo[animationIndex].pUnidentified1, 0x20, AllocateEnd, 0, 0, 0))
                 lbl_806E0ED0++;
         }
     }
@@ -849,9 +847,9 @@ extern "C" void fn_800F030C(bool bUnidentified)
 /**
  * Offset/Address/Size: 0x9C | 0x800F02DC | size: 0x30
  */
-extern "C" void fn_800F02DC(void* pUnidentified0, void* pUnidentified1, void* pUnidentified2)
+extern "C" void fn_800F02DC(void* pUnidentified0, unsigned long pUnidentified1, void* pUnidentified2)
 {
-    fn_800EE6DC(pUnidentified0, pUnidentified1, pUnidentified2, true);
+    cAnimCamera::LoadCameraAnimation((nlChunk*)pUnidentified0, pUnidentified1, (const char*)pUnidentified2, true);
     lbl_806E0ED4++;
 }
 

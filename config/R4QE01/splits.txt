@@ -200,6 +200,15 @@ Game/AI/TutorialMegastrikeDesire.cpp:
 	.text       start:0x800EB5BC end:0x800EB6AC
 	.data       start:0x80504000 end:0x80504040
 
+Game/Camera/animcam.cpp:
+	.text       start:0x800EDEC0 end:0x800EF2E8
+	.ctors      start:0x804DB5B4 end:0x804DB5B8
+	.rodata     start:0x804DC398 end:0x804DC3B4
+	.data       start:0x80504250 end:0x805042B0
+	.sdata      start:0x806DC460 end:0x806DC470
+	.sbss       start:0x806E0E90 end:0x806E0EA0
+	.sdata2     start:0x806E4300 end:0x806E432C
+
 Game/Camera/CameraMan.cpp:
 	.text       start:0x800F0240 end:0x800F2504
 	.ctors      start:0x804DB5B8 end:0x804DB5BC
@@ -209,6 +218,10 @@ Game/Camera/CameraMan.cpp:
 	.sdata      start:0x806DC478 end:0x806DC498
 	.sbss       start:0x806E0EB0 end:0x806E0EE8
 	.sdata2     start:0x806E4398 end:0x806E43C8
+
+Game/Camera/AnimViewerCam.cpp:
+	.text       start:0x800F9238 end:0x800F9300
+	.data       start:0x80505480 end:0x805054A8
 
 Game/DB/BasicGameInfo.cpp:
 	.text       start:0x800FBBA0 end:0x800FC20C
@@ -442,9 +455,10 @@ Game/Drawable/DrawableYoshiEgg.cpp:
 	.sdata      start:0x806DCC28 end:0x806DCC40
 	.sdata2     start:0x806E4CB0 end:0x806E4CD0
 
-unclassified/tu_80199B30.cpp:
+Game/Blinker.cpp:
 	.text       start:0x80199B30 end:0x80199E84
 	.rodata     start:0x804DCD80 end:0x804DCD90
+	.sdata      start:0x806DCD60 end:0x806DCD68
 	.sdata2     start:0x806E4EB8 end:0x806E4ED0
 
 unclassified/tu_80199E84.cpp:

@@ -1,3 +1,4 @@
+#include "Game/BasicStadium.h"
 #include "Game/AI/Powerups.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glModel.h"
@@ -66,7 +67,6 @@ struct ShadowHeight
 };
 
 extern "C" RenderObject* fn_8027725C(u32);
-extern "C" ShadowHeight* fn_802772BC();
 extern "C" void fn_802B549C(nlQuaternion*, u16);
 extern "C" void fn_801869AC(void*, void*, int, int, const DrawablePowerup*, float);
 extern "C" u32 fn_8027262C();
@@ -131,7 +131,8 @@ static void DrawShadow(float radius, float x, float y, float z)
         alpha = 0xFF;
     }
 
-    ShadowHeight* shadowHeight = fn_802772BC();
+    ShadowHeight* shadowHeight =
+        reinterpret_cast<ShadowHeight*>(BasicStadium::GetCurrentStadium());
     float height = 0.0f;
     if (shadowHeight != 0)
     {

@@ -1,3 +1,4 @@
+#include "Game/BasicStadium.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Drawable/ShadowProp.h"
 #include "Game/Physics/PhysicsObject.h"
@@ -88,7 +89,8 @@ static void DrawShadow(ThwompObject* object, const nlMatrix4& matrix, void* mate
         value = 255;
     }
 
-    GroundInfo* ground = fn_802772BC();
+    GroundInfo* ground =
+        reinterpret_cast<GroundInfo*>(BasicStadium::GetCurrentStadium());
     float groundHeight = 0.0f;
     if (ground != 0)
     {

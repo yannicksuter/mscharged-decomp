@@ -4,6 +4,8 @@
 #include "Game/Camera/rumblefilter.h"
 #include "NL/nlMath.h"
 
+#include <string.h>
+
 enum eCameraType
 {
     eCameraType_Debug = 0,
@@ -24,7 +26,15 @@ enum eCameraType
 class cBaseCamera
 {
 public:
-    virtual ~cBaseCamera();
+    cBaseCamera()
+    {
+        mUpVector.x = 0.0f;
+        mUpVector.y = 0.0f;
+        mUpVector.z = 1.0f;
+        memset(m_pFilter, 0, sizeof(m_pFilter));
+    }
+
+    virtual ~cBaseCamera() { }
     virtual eCameraType GetType() = 0;
     virtual void Update(float) = 0;
     virtual const nlMatrix4& GetViewMatrix() const = 0;
