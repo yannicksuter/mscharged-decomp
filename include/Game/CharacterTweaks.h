@@ -1,20 +1,7 @@
 #ifndef GAME_CHARACTER_TWEAKS_H
 #define GAME_CHARACTER_TWEAKS_H
 
-#include "types.h"
-
-class TweakValue_804F4DC8
-{
-public:
-    operator float() const
-    {
-        return *m_pValue;
-    }
-
-private:
-    /* 0x00 */ u8 mUnidentified000[0x0C];
-    /* 0x0C */ float* m_pValue;
-}; // total size: 0x10
+#include "Game/TweakValue.h"
 
 class unk_80029F58
 {

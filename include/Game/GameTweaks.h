@@ -3,19 +3,6 @@
 
 #include "Game/CharacterTweaks.h"
 
-class TweakValueInt_804F4DC8
-{
-public:
-    operator int() const
-    {
-        return *m_pValue;
-    }
-
-private:
-    /* 0x00 */ u8 mUnidentified000[0x0C];
-    /* 0x0C */ int* m_pValue;
-}; // total size: 0x10
-
 class UnidentifiedFormationTweakValue
 {
 public:

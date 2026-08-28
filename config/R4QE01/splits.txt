@@ -154,6 +154,10 @@ unclassified/tu_800A9588.cpp:
 	.sdata      start:0x806DBF1C end:0x806DBF20
 	.sdata2     start:0x806E3DE8 end:0x806E3E00
 
+Game/TweaksBase.cpp:
+	.text       start:0x800A9AE0 end:0x800A9B78
+	.data       start:0x80500D18 end:0x80500D28
+
 Game/AI/Desire.cpp:
 	.text       start:0x800B0358 end:0x800B6DC0
 	.ctors      start:0x804DB560 end:0x804DB564
@@ -166,6 +170,11 @@ Game/AI/Desire.cpp:
 Game/AI/Scripts/ScriptDefines.cpp:
 	.text       start:0x800D645C end:0x800D6604
 	.sbss       start:0x806E0E68 end:0x806E0E80
+
+Game/ScriptTuning.cpp:
+	.text       start:0x800E0CF0 end:0x800E2F88
+	.data       start:0x80502DD8 end:0x80503A28
+	.sdata2     start:0x806E42C0 end:0x806E42C8
 
 Game/AI/Fuzzy.cpp:
 	.text       start:0x800E2FA8 end:0x800E30A8
