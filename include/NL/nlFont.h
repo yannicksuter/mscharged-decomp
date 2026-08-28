@@ -2,7 +2,9 @@
 #define NL_FONT_H
 
 #include "NL/gl/gl.h"
+#include "NL/nlAlgorithm.h"
 #include "NL/nlMath.h"
+#include "NL/nlMemory.h"
 
 struct nlColour;
 class FontCharString;
@@ -17,6 +19,21 @@ struct TextMetrics
     /* 0x10 */ float LineHeight;
 };
 
+enum TextureType
+{
+    InvalidTextureType = 0,
+    Colour = 1,
+    Greyscale = 2,
+    SplitFX = 3,
+};
+
+enum Distribution
+{
+    InvalidDistribution = 0,
+    English = 1,
+    InOrder = 2,
+};
+
 class nlFont
 {
 public:
@@ -28,11 +45,77 @@ public:
         PASS_TextAndEffect = 3,
     };
 
-    unsigned long GetCharWidth(unsigned short FontChar, unsigned short PrevFontChar) const;
-    void DrawString(eGLView View, const FontCharString& Text, const nlVector2& Position, const nlColour& Colour, const nlColour& EffectColour, int Length, nlFont::TextPass Passes, bool FlipY, unsigned long* pMatrix, nlColour* pOverrideColour) const;
+    struct ScissorBox
+    {
+        /* 0x0 */ unsigned short X;
+        /* 0x2 */ unsigned short Y;
+        /* 0x4 */ unsigned short Width;
+        /* 0x6 */ unsigned short Height;
+    };
 
-    /* 0x000 */ unsigned char _pad[0xC0];
+    struct GlyphInfo
+    {
+        GlyphInfo() { nlVec2Set(uv, -1.0f, -1.0f); }
+
+        /* 0x00 */ nlVector2 uv;
+        /* 0x08 */ unsigned char _pad_08[8];
+        /* 0x10 */ unsigned char Advance;
+        /* 0x11 */ unsigned char RenderWidth;
+        /* 0x12 */ unsigned char _pad_12[2];
+        /* 0x14 */ signed char Offset;
+        /* 0x15 */ unsigned char Page : 4;
+        /* 0x15 */ unsigned char HasKernPairs : 1;
+        union
+        {
+            /* 0x16 */ unsigned short UnicodeChar;
+            /* 0x16 */ unsigned short hash;
+        };
+    };
+
+    struct KernPair
+    {
+        union
+        {
+            struct
+            {
+                /* 0x0 */ unsigned short A;
+                /* 0x2 */ unsigned short B;
+            } s;
+            /* 0x0 */ unsigned long hash;
+        };
+        /* 0x4 */ int Kern;
+
+        operator unsigned long() const { return hash; }
+    };
+
+    unsigned long GetCharWidth(unsigned short FontChar, unsigned short PrevFontChar) const;
+    void DisableScissorBox() const;
+    void SetScissorBox(const ScissorBox& other) const;
+    void DrawString(eGLView View, const FontCharString& Text, const nlVector2& Position, const nlColour& Colour, const nlColour& EffectColour, int Length, nlFont::TextPass Passes, bool FlipY, unsigned long* pMatrix, nlColour* pOverrideColour) const;
+    unsigned char Load(const char* szFontName, char* pFontDescData, unsigned long HashId);
+
+    ~nlFont();
+    nlFont();
+
+    /* 0x000 */ unsigned long m_PageCount;
+    /* 0x004 */ unsigned long m_TextureHandles[16];
+    /* 0x044 */ unsigned long m_EffectTextureHandles[16];
+    /* 0x084 */ TextureType m_TextureType;
+    /* 0x088 */ mutable unsigned char m_bScissorBox;
+    /* 0x089 */ unsigned char _pad_089;
+    /* 0x08A */ mutable ScissorBox m_scissorBox;
+    /* 0x092 */ unsigned char _pad_092[2];
+    /* 0x094 */ Distribution m_Distribution;
+    /* 0x098 */ unsigned long m_CharacterSet;
+    /* 0x09C */ unsigned long m_PageSize;
+    /* 0x0A0 */ char m_FontName[32];
     /* 0x0C0 */ TextMetrics m_Metrics;
+    /* 0x0D4 */ float m_InvTexSize;
+    /* 0x0D8 */ GlyphInfo m_GlyphLookup[95];
+    /* 0x9C0 */ GlyphInfo* m_pExtendedGlyphs;
+    /* 0x9C4 */ unsigned long m_ExtendedGlyphCount;
+    /* 0x9C8 */ KernPair* m_pKernTable;
+    /* 0x9CC */ unsigned long m_KernTableSize;
 };
 
 class FontCharString

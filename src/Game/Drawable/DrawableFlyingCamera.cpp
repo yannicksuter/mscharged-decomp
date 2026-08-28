@@ -59,7 +59,6 @@ extern "C"
     void* fn_8027267C(int);
     FlyingCameraObject* fn_801A0C44(int);
     RenderObject* fn_80276360(int, int);
-    void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
 }
 
 static float gShadowScaleHigh = 0.5f;
@@ -227,7 +226,7 @@ void DrawableFlyingCamera::Blend(const float* factors, const DrawableFlyingCamer
 
     float t = factors[2];
     mScale = (1.0f - t) * lhs.mScale + t * rhs.mScale;
-    fn_802B5544(mOrientation, lhs.mOrientation, rhs.mOrientation, t);
+    nlQuatNLerp(mOrientation, lhs.mOrientation, rhs.mOrientation, t);
     mPosition.x = (1.0f - t) * lhs.mPosition.x + t * rhs.mPosition.x;
     mPosition.y = (1.0f - t) * lhs.mPosition.y + t * rhs.mPosition.y;
     mPosition.z = (1.0f - t) * lhs.mPosition.z + t * rhs.mPosition.z;

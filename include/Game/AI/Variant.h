@@ -23,6 +23,13 @@ enum eVariantType
 class Variant
 {
 public:
+    template <typename T>
+    Variant(eVariantType type, T value)
+    {
+        *(T*)&mData = value;
+        mType = type;
+    }
+
     Variant()
         : mType(FT_UNSPECIFIED)
     {

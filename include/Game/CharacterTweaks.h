@@ -35,6 +35,15 @@ protected:
     /* 0x04 */ u8 mUnidentified004[0x40];
 };
 
+class FielderTweaks : public PlayerTweaks
+{
+private:
+    /* 0x044 */ u8 mUnidentified044[0x60];
+
+public:
+    /* 0x0A4 */ TweakValue_804F4DC8 fShooting;
+};
+
 class GoalieTweaks : public PlayerTweaks
 {
 public:

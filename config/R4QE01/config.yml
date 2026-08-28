@@ -21,6 +21,8 @@ block_relocations:
   # source spelling); it is not a reference to the .init routine at that address
   - { source: 0x803B354C }
   - { source: 0x803B35C4 }
+  # nlMain.cpp crcTable[] value that scans as a plausible pointer
+  - { source: 0x8052AF34 }
   # WPADEncrypt.c tb[] bytes that scan as plausible pointers
   - { source: 0x8054BA9C }
   - { source: 0x8054BF10 }

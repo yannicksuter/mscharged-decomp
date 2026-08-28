@@ -26,6 +26,7 @@ public:
     virtual void StopRumble() = 0;
 
     bool JustPressed(int button, bool remap);
+    bool JustReleased(int button, bool remap);
     int fn_80332748();
 
     /* 0x04 */ u8 mUnidentified004[0x40];

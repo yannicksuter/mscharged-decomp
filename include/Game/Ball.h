@@ -58,9 +58,7 @@ private:
 
 public:
     /* 0x54 */ nlVector3 m_v3Position;
-
-private:
-    /* 0x60 */ u8 mUnidentified060[0x0C];
+    /* 0x60 */ nlVector3 m_v3PrevPosition;
 
 public:
     /* 0x6C */ nlVector3 m_v3Velocity;

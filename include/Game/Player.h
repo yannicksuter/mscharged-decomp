@@ -44,6 +44,7 @@ public:
     float DoFlashLight(const nlVector3& Position, unsigned short aDirection,
         float fAngleWeighting, float fIgnoreObjectCloserThanThis,
         float fIgnoreObjectFartherThanThis);
+    nlVector3 GetAIOffNetLocation(const nlVector3* v3ReferencePos);
     void fn_8009750C();
     void fn_80097648(float fParam);
     cPN_SingleAxisBlender* CreateSingleAxisBlender(

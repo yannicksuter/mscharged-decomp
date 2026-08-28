@@ -3,6 +3,7 @@
 #include "Game/SAnim.h"
 #include "Game/SHierarchy.h"
 #include "NL/gl/glModel.h"
+#include "NL/glx/glxLoadModel.h"
 
 #include <string.h>
 
@@ -11,8 +12,6 @@ inline void* operator new(unsigned long, void* memory)
     return memory;
 }
 
-extern "C" GLSkinMesh* fn_8036A378(
-    nlChunk*, GLMaterialList*, cSHierarchy*);
 extern "C" void fn_802D3C1C(GLTextureAnim*, float);
 extern "C" void fn_802D3F7C(glModel*, float);
 
@@ -353,7 +352,7 @@ GLSkinMesh* GLInventory::MakeSkinMesh(
     GLMaterialList* pMaterialList =
         MaterialListHelper::Get(this, hashID);
 
-    return fn_8036A378(pChunk, pMaterialList, hierarchy);
+    return glx_MakeSkinMesh(pChunk, pMaterialList, hierarchy);
 }
 
 void GLInventory::Update(float deltaTime)

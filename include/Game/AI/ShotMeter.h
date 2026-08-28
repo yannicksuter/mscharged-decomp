@@ -18,7 +18,16 @@ enum eShotMeterState
 class ShotMeter
 {
 public:
+    void Update(float fDeltaT);
+    void Abort();
+    void CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass);
+    void CalcShotAim(cFielder* pFielder);
     void Reset(cFielder* pFielder);
+    void ShotReleased(cFielder* pFielder);
+    float GetShotAimValue() const
+    {
+        return mfSShotAimValue;
+    }
     static bool IsActive(eShotMeterState state)
     {
         bool bShotMeterActive = false;
@@ -32,12 +41,12 @@ public:
 
     /* 0x00 */ eShotMeterState m_eShotMeterState;
     /* 0x04 */ float m_fTime;
-    /* 0x08 */ float m_fScoreValue;
-    /* 0x0C */ float m_fSpeedValue;
-    /* 0x10 */ float m_fSTSValue;
-    /* 0x14 */ float mfSShotAimValue;
-    /* 0x18 */ float mUnidentified018;
-    /* 0x1C */ float mUnidentified01C;
+    /* 0x08 */ float mUnidentified008;
+    /* 0x0C */ float mUnidentified00C;
+    /* 0x10 */ float m_fScoreValue;
+    /* 0x14 */ float m_fSpeedValue;
+    /* 0x18 */ float m_fSTSValue;
+    /* 0x1C */ float mfSShotAimValue;
 }; // total size: 0x20
 
 #endif // GAME_AI_SHOT_METER_H

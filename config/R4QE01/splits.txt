@@ -119,6 +119,10 @@ Game/AI/GoalieSave.cpp:
 	.sbss       start:0x806E0D38 end:0x806E0D68
 	.sdata2     start:0x806E3B28 end:0x806E3B70
 
+Game/AI/HeadTrack.cpp:
+	.text       start:0x80094A2C end:0x80094FB4
+	.sdata2     start:0x806E3B70 end:0x806E3B98
+
 Game/AI/Powerups.cpp:
 	.text       start:0x80099C80 end:0x8009FF20
 	.ctors      start:0x804DB540 end:0x804DB544
@@ -129,7 +133,7 @@ Game/AI/Powerups.cpp:
 	.sbss       start:0x806E0DA8 end:0x806E0DD0
 	.sdata2     start:0x806E3C28 end:0x806E3CA8
 
-unclassified/tu_8009FF20.cpp:
+Game/AI/ShotMeter.cpp:
 	.text       start:0x8009FF20 end:0x800A07A0
 	.rodata     start:0x804DC0F0 end:0x804DC100
 	.sdata      start:0x806DBE58 end:0x806DBE78
@@ -159,9 +163,42 @@ Game/AI/Desire.cpp:
 	.sdata      start:0x806DC04C end:0x806DC0B8
 	.sdata2     start:0x806E3EA0 end:0x806E3F58
 
+Game/AI/Scripts/ScriptDefines.cpp:
+	.text       start:0x800D645C end:0x800D6604
+	.sbss       start:0x806E0E68 end:0x806E0E80
+
 Game/AI/Fuzzy.cpp:
 	.text       start:0x800E2FA8 end:0x800E30A8
 	.sdata2     start:0x806E42C8 end:0x806E42D4
+
+Game/AI/Scripts/FuzzyAIRuntime.cpp:
+	.text       start:0x800E30A8 end:0x800E9394
+	.ctors      start:0x804DB59C end:0x804DB5A0
+	.data       start:0x80503A28 end:0x80503F70
+	.bss        start:0x8056DBA0 end:0x8056DBC8
+	.sdata      start:0x806DC3F0 end:0x806DC418
+	.sdata2     start:0x806E42D8 end:0x806E42E0
+
+Game/AI/FuzzyVariant.cpp:
+	.text       start:0x800E9394 end:0x800EB184
+	.ctors      start:0x804DB5A0 end:0x804DB5A4
+	.data       start:0x80503F70 end:0x80503F98
+	.bss        start:0x8056DBC8 end:0x8056DBE8
+	.sdata      start:0x806DC418 end:0x806DC445
+
+Game/AI/TeamDesire.cpp:
+	.text       start:0x800EB184 end:0x800EB290
+	.data       start:0x80503F98 end:0x80503FBC
+	.sdata2     start:0x806E42E0 end:0x806E42E8
+
+Game/AI/TeamPlayMachine.cpp:
+	.text       start:0x800EB380 end:0x800EB5BC
+	.data       start:0x80503FC0 end:0x80504000
+	.sdata      start:0x806DC448 end:0x806DC450
+
+Game/AI/TutorialMegastrikeDesire.cpp:
+	.text       start:0x800EB5BC end:0x800EB6AC
+	.data       start:0x80504000 end:0x80504040
 
 Game/Camera/CameraMan.cpp:
 	.text       start:0x800F0240 end:0x800F2504
@@ -530,6 +567,10 @@ NL/nlTicker.cpp:
 NL/nlString.cpp:
 	.text       start:0x802AAACC end:0x802AAC88
 
+NL/nlMain.cpp:
+	.text       start:0x802AAC88 end:0x802AAFD0
+	.data       start:0x8052ACE0 end:0x8052B0E0
+
 Game/Sys/simpleparser.cpp:
 	.text       start:0x802AAFD0 end:0x802AB77C
 	.sdata      start:0x806DF1C8 end:0x806DF1D4
@@ -568,6 +609,10 @@ NL/nlTask.cpp:
 	.sdata      start:0x806DF240 end:0x806DF244
 	.sbss       start:0x806E1DA0 end:0x806E1DA8
 	.sdata2     start:0x806E60B8 end:0x806E60C0
+
+NL/math.cpp:
+	.text       start:0x802B51D8 end:0x802B6234
+	.sdata2     start:0x806E60C0 end:0x806E6108
 
 NL/utility.cpp:
 	.text       start:0x802B6234 end:0x802B6568
@@ -625,6 +670,12 @@ NL/gl/gl.cpp:
 	.sbss       start:0x806E1EA0 end:0x806E1EAC
 	.sdata2     start:0x806E62E8 end:0x806E62F0
 
+NL/gl/glDraw2.cpp:
+	.text       start:0x802C8290 end:0x802C9234
+	.data       start:0x8052BFD0 end:0x8052C008
+	.sbss       start:0x806E1EB0 end:0x806E1EB8
+	.sdata2     start:0x806E62F0 end:0x806E6300
+
 NL/gl/glDraw3.cpp:
 	.text       start:0x802C9254 end:0x802C99EC
 	.data       start:0x8052C008 end:0x8052C018
@@ -669,6 +720,9 @@ NL/gl/glTarget.cpp:
 	.sbss       start:0x806E1F00 end:0x806E1F08
 	.sbss2      start:0x806E7BC0 end:0x806E7BC8
 
+NL/gl/glTexture.cpp:
+	.text       start:0x802CDC34 end:0x802CDC8C
+
 NL/gl/glView.cpp:
 	.text       start:0x802CEF1C end:0x802D0458
 	.ctors      start:0x804DB9F0 end:0x804DB9F4
@@ -708,6 +762,12 @@ NL/nlLocalization.cpp:
 	.sdata      start:0x806DF518 end:0x806DF54C
 	.sbss       start:0x806E2088 end:0x806E208C
 	.sdata2     start:0x806E6718 end:0x806E6720
+
+NL/nlFont.cpp:
+	.text       start:0x80302F44 end:0x80305778
+	.data       start:0x8052FEA8 end:0x8052FF10
+	.sdata      start:0x806DF550 end:0x806DF560
+	.sdata2     start:0x806E6720 end:0x806E6748
 
 NL/nlTextBox.cpp:
 	.text       start:0x80305778 end:0x80305D68
@@ -933,6 +993,11 @@ ode/NLGAdditions.cpp:
 	.data       start:0x80534738 end:0x80534750
 	.sdata2     start:0x806E6B88 end:0x806E6BA0
 
+NL/plat/platqmath.cpp:
+	.text       start:0x80368360 end:0x80368784
+	.rodata     start:0x804EB440 end:0x804EB450
+	.sdata2     start:0x806E6CE8 end:0x806E6D08
+
 NL/plat/platvmath.cpp:
 	.text       start:0x80368784 end:0x80368E00
 	.sdata2     start:0x806E6D08 end:0x806E6D14
@@ -949,6 +1014,19 @@ NL/gl/glPlat.cpp:
 	.sbss       start:0x806E22E0 end:0x806E2300
 	.sdata2     start:0x806E6D18 end:0x806E6D30
 
+NL/glx/glxLoadModel.cpp:
+	.text       start:0x80369E5C end:0x8036A800
+	.data       start:0x805353B8 end:0x805353F0
+	.sdata2     start:0x806E6D30 end:0x806E6D38
+
+NL/glx/glxTexture.cpp:
+	.text       start:0x8036AC9C end:0x8036C23C
+	.ctors      start:0x804DBB4C end:0x804DBB50
+	.data       start:0x805353F0 end:0x805354C0
+	.bss        start:0x8058A1F8 end:0x8058A288
+	.sbss       start:0x806E2300 end:0x806E2318
+	.sdata2     start:0x806E6D50 end:0x806E6D60
+
 NL/glx/glxGX.cpp:
 	.text       start:0x8036C23C end:0x8036CE48
 	.bss        start:0x8058A288 end:0x8058A508
@@ -964,6 +1042,16 @@ NL/glx/glxSwap.cpp:
 
 NL/nlEndian.cpp:
 	.text       start:0x8036D6F0 end:0x8036D6F8
+
+NL/glx/glxMatrix.cpp:
+	.text       start:0x8036DF68 end:0x8036E430
+	.rodata     start:0x804EB450 end:0x804EB460
+	.sdata      start:0x806DFA98 end:0x806DFA9C
+	.sbss       start:0x806E23E0 end:0x806E23E4
+	.sdata2     start:0x806E6D70 end:0x806E6D88
+
+NL/glx/glxFont.cpp:
+	.text       start:0x8036E4C4 end:0x8036E550
 
 NL/glx/glxDisplayList.cpp:
 	.text       start:0x8036F2E8 end:0x8036F648

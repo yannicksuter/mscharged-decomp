@@ -40,7 +40,6 @@ public:
 extern "C"
 {
     float fn_8002D194(int);
-    void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
     float fn_801B5B30(const YoshiEggObject*);
 }
 
@@ -243,7 +242,7 @@ void DrawableYoshiEgg::Blend(const float* factors, const DrawableYoshiEgg& lhs, 
 
     float t = factors[2];
     mScale = (1.0f - t) * lhs.mScale + t * rhs.mScale;
-    fn_802B5544(mOrientation, lhs.mOrientation, rhs.mOrientation, t);
+    nlQuatNLerp(mOrientation, lhs.mOrientation, rhs.mOrientation, t);
     mPosition.x = (1.0f - t) * lhs.mPosition.x + t * rhs.mPosition.x;
     mPosition.y = (1.0f - t) * lhs.mPosition.y + t * rhs.mPosition.y;
     mPosition.z = (1.0f - t) * lhs.mPosition.z + t * rhs.mPosition.z;

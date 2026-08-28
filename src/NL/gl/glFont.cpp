@@ -1,5 +1,6 @@
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glFont.h"
+#include "NL/glx/glxFont.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMemory.h"
@@ -10,11 +11,11 @@
 
 extern "C" void fn_802C8280(const char* name);
 extern "C" void fn_802C8288();
-extern "C" bool fn_802C8874(void* renderView, eGLView view, unsigned long numPolys, glPoly2* polys, const void* userData);
-extern "C" bool fn_802CC094();
-extern "C" void fn_802CDF14(unsigned long texture, unsigned long platformTexture, bool permanent);
+extern "C" MemoryAllocator* fn_802CC094();
+extern "C" void fn_802CDF14(
+    unsigned long texture, unsigned long platformTexture,
+    MemoryAllocator* allocator);
 extern "C" float fn_802CE7B0(void* renderView);
-extern "C" unsigned long fn_8036E4C4(unsigned long width, unsigned long height, const void* data, unsigned long texture, bool permanent);
 
 enum eGLFont
 {
@@ -158,7 +159,7 @@ void gl_FontStartup()
             }
         }
 
-        unsigned long platformTexture = fn_8036E4C4(width, height, image, texture, fn_802CC094());
+        unsigned long platformTexture = glplatCreateFont(width, height, image, texture, fn_802CC094());
         fn_802CDF14(texture, platformTexture, fn_802CC094());
         delete[] image;
     }
@@ -312,7 +313,7 @@ int glFontPrint(void* renderView, eGLView view, int virtualX, int virtualY, cons
             poly[i].depth += -0.001f;
         }
 
-        fn_802C8874(renderView, view, numChars, lbl_8057C7A8, 0);
+        glAttachPoly2((GLView*)renderView, view, numChars, lbl_8057C7A8, 0);
 
         poly = lbl_8057C7A8;
         for (int i = 0; i < numChars; ++i)
@@ -327,7 +328,7 @@ int glFontPrint(void* renderView, eGLView view, int virtualX, int virtualY, cons
         }
     }
 
-    fn_802C8874(renderView, view, numChars, lbl_8057C7A8, 0);
+    glAttachPoly2((GLView*)renderView, view, numChars, lbl_8057C7A8, 0);
     return numChars;
 }
 

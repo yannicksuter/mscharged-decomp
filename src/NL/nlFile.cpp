@@ -120,7 +120,7 @@ static void nlLoadEntireFileAsyncCallback(nlFile*, void*, unsigned int, unsigned
     delete data;
 }
 
-bool nlLoadEntireFileAsync(const char* filename, LoadAsyncCallback callback, void* user_data, unsigned int alignment, eAllocType type, void* buffer, unsigned long bufferSize, MemoryAllocator* allocator)
+unsigned int nlLoadEntireFileAsync(const char* filename, LoadAsyncCallback callback, void* user_data, unsigned int alignment, eAllocType type, void* buffer, unsigned long bufferSize, MemoryAllocator* allocator)
 {
     unsigned int filesize;
     unsigned long datasize;

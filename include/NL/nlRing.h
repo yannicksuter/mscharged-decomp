@@ -2,6 +2,29 @@
 #define NL_RING_H
 
 template <typename T>
+inline void nlRingAddStart(T** list, T* item)
+{
+    T* head = *list;
+    if (head == 0)
+    {
+        *list = item;
+        item->m_next = item;
+        return;
+    }
+
+    item->m_next = head->m_next;
+    head = *list;
+    head->m_next = item;
+}
+
+template <typename T>
+inline void nlRingAddEnd(T** list, T* item)
+{
+    nlRingAddStart(list, item);
+    *list = item;
+}
+
+template <typename T>
 inline void nlDeleteRing(T** head)
 {
     T* next;

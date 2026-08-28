@@ -39,7 +39,6 @@ struct ThwompObjectFields
 extern "C"
 {
     void* fn_8027267C(int);
-    void fn_802B5544(nlQuaternion&, const nlQuaternion&, const nlQuaternion&, float);
     const nlVector3* fn_801B327C(const ThwompObject*);
     float fn_801B3364(ThwompObject*);
     void fn_801B339C(ThwompObject*);
@@ -245,7 +244,7 @@ void DrawableThwomp::Blend(const float* factors, const DrawableThwomp& lhs, cons
     }
 
     float t = factors[2];
-    fn_802B5544(mOrientation, lhs.mOrientation, rhs.mOrientation, t);
+    nlQuatNLerp(mOrientation, lhs.mOrientation, rhs.mOrientation, t);
     mPosition.x = (1.0f - t) * lhs.mPosition.x + t * rhs.mPosition.x;
     mPosition.y = (1.0f - t) * lhs.mPosition.y + t * rhs.mPosition.y;
     mPosition.z = (1.0f - t) * lhs.mPosition.z + t * rhs.mPosition.z;

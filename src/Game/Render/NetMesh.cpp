@@ -6,6 +6,7 @@
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBall.h"
 #include "Game/Physics/PhysicsSphere.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
@@ -57,13 +58,6 @@ struct BallNetmeshEventData
     nlVector3 collisionVelocity;
 };
 
-struct PlatTexture
-{
-    u8 padding[4];
-    u8 m_Levels;
-    u8 m_MaxLevel;
-};
-
 extern "C" DebugFieldType lbl_80533C98[];
 extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
 extern "C" void fn_80338F78(DebugWriteCache*);
@@ -80,7 +74,6 @@ extern "C" NetMeshFrameProvider* fn_8011166C();
 extern "C" RenderObject* fn_8027725C(unsigned long);
 extern "C" void fn_80146424(BallNetmeshEventData*, bool);
 extern "C" PlatTexture* fn_802D064C(unsigned long);
-extern "C" void fn_8036BA00(PlatTexture*);
 
 extern void* lbl_806E2168;
 extern NetMeshGameState* lbl_806E0C94;
@@ -814,6 +807,6 @@ void NetMesh::SetTexture(unsigned long texture)
     {
         PlatTexture* tex = fn_802D064C(texture);
         tex->m_MaxLevel = tex->m_Levels - 1;
-        fn_8036BA00(tex);
+        tex->Prepare();
     }
 }
