@@ -751,6 +751,8 @@ config.libs = [
             Object(Matching, "RVL_SDK/wpad/debug_msg.c"),
             Object(Matching, "RVL_SDK/so/soCommon.c", mw_version="GC/3.0a5.2"),
             Object(Matching, "RVL_SDK/so/soBasic.c"),
+            Object(Matching, "RVL_SDK/ssl/ssl_api.c"),
+            Object(Matching, "RVL_SDK/ssl/ssl_mutex.c"),
             Object(Matching, "RVL_SDK/si/SIBios.c"),
             Object(Matching, "RVL_SDK/si/SISamplingRate.c"),
             Object(Matching, "RVL_SDK/sp/sp.c"),

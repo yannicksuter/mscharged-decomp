@@ -1929,6 +1929,9 @@ RVL_SDK/nhttp/d_nhttp_common.c:
 
 RVL_SDK/ssl/ssl_api.c:
 	.text       start:0x8041F1C0 end:0x8041FEA8
+	.data       start:0x805555E8 end:0x805555F8
+	.bss        start:0x8061A480 end:0x8061D4A0
+	.sbss       start:0x806E2D48 end:0x806E2D50
 
 RVL_SDK/ssl/ssl_mutex.c:
 	.text       start:0x8041FEA8 end:0x8041FEB4
