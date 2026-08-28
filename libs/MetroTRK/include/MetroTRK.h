@@ -4,16 +4,17 @@
 #include <revolution/types.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void InitMetroTRK(void);
-void InitMetroTRK_BBA(void);
-void InitMetroTRKCommTable(s32 type);
-void EnableMetroTRKInterrupts(void);
+    void InitMetroTRK(void);
+    void InitMetroTRK_BBA(void);
+    int InitMetroTRKCommTable(s32 type);
+    void EnableMetroTRKInterrupts(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // METROTRK_H
+#endif // METROTRK_H

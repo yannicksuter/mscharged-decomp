@@ -279,6 +279,22 @@ cflags_rvl_sdk = [
     "-fp_contract off",
 ]
 
+# MetroTRK uses its own debugger-runtime optimization model.
+cflags_metrotrk = [
+    *(flag for flag in cflags_base if flag != "-enc SJIS"),
+    "-str reuse,readonly",
+    "-use_lmw_stmw on",
+    "-inline on,deferred",
+    "-func_align 4",
+    "-sdata 0",
+    "-sdata2 0",
+]
+
+cflags_metrotrk_deferred_auto = [
+    *(flag for flag in cflags_metrotrk if not flag.startswith("-inline ")),
+    "-inline deferred,auto",
+]
+
 # DWC consumes the vendored GameSpy interfaces below the RVL SDK source root.
 cflags_rvl_dwc = [
     *cflags_rvl_sdk,
@@ -512,6 +528,43 @@ config.libs = [
             Object(Matching, "ode/util.cpp"),
             Object(NonMatching, "ode/body_debug.cpp"),
             Object(Matching, "ode/NLGAdditions.cpp"),
+        ],
+    },
+    {
+        "lib": "MetroTRK",
+        "mw_version": "GC/2.7",
+        "cflags": cflags_metrotrk,
+        "progress_category": "sdk",
+        "objects": [
+            Object(Matching, "MetroTRK/mainloop.c", cflags=cflags_metrotrk_deferred_auto),
+            Object(Matching, "MetroTRK/mutex_TRK.c"),
+            Object(Matching, "MetroTRK/nubevent.c"),
+            Object(Matching, "MetroTRK/nubinit.c", cflags=cflags_metrotrk_deferred_auto),
+            Object(Matching, "MetroTRK/msg.c"),
+            Object(Matching, "MetroTRK/msgbuf.c", cflags=cflags_metrotrk_deferred_auto),
+            Object(Matching, "MetroTRK/serpoll.c", cflags=cflags_metrotrk_deferred_auto, extra_cflags=["-sdata 8"]),
+            Object(Matching, "MetroTRK/usr_put.c"),
+            Object(Matching, "MetroTRK/dispatch.c"),
+            Object(Matching, "MetroTRK/msghndlr.c", cflags=cflags_metrotrk_deferred_auto),
+            Object(Matching, "MetroTRK/support.c", cflags=cflags_metrotrk_deferred_auto),
+            Object(Matching, "MetroTRK/notify.c", cflags=cflags_metrotrk_deferred_auto),
+            Object(Matching, "MetroTRK/flush_cache.c"),
+            Object(Matching, "MetroTRK/mem_TRK.c"),
+            Object(Matching, "MetroTRK/string_TRK.c"),
+            Object(Matching, "MetroTRK/targimpl.c", cflags=cflags_metrotrk_deferred_auto),
+            Object(Matching, "MetroTRK/targsupp.c"),
+            Object(Matching, "MetroTRK/mpc_7xx_603e.c"),
+            Object(Matching, "MetroTRK/mslsupp.c"),
+            Object(Matching, "MetroTRK/__exception.s"),
+            Object(Matching, "MetroTRK/dolphin_trk.c", cflags=cflags_metrotrk_deferred_auto),
+            Object(Matching, "MetroTRK/main_TRK.c"),
+            Object(Matching, "MetroTRK/dolphin_trk_glue.c"),
+            Object(Matching, "MetroTRK/targcont.c"),
+            Object(Matching, "MetroTRK/target_options.c"),
+            Object(Matching, "MetroTRK/UDP_Stubs.c"),
+            Object(Matching, "MetroTRK/cc_gdev.c", extra_cflags=["-sdata 8"]),
+            Object(Matching, "MetroTRK/CircleBuffer.c"),
+            Object(Matching, "MetroTRK/MWCriticalSection_gc.c"),
         ],
     },
     {
