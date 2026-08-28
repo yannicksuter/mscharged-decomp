@@ -3,6 +3,7 @@
 
 #include "NL/nlBasicString.h"
 #include "NL/nlMath.h"
+#include "NL/nlMemory.h"
 
 enum eVariantType
 {
@@ -28,9 +29,23 @@ public:
         Reset();
     }
 
+    Variant(const Variant& other)
+        : mType(FT_UNSPECIFIED)
+    {
+        Reset();
+        CopyFrom(other);
+    }
+
     ~Variant()
     {
         Reset();
+    }
+
+    Variant& operator=(Variant other)
+    {
+        Reset();
+        CopyFrom(other);
+        return *this;
     }
 
     virtual void Reset()
@@ -54,6 +69,29 @@ public:
     virtual bool IsPointerType() const;
 
     bool IsSet() const;
+
+protected:
+    void CopyFrom(const Variant& other)
+    {
+        mType = other.mType;
+        if (other.mType == FT_STRING)
+        {
+            const char* source = other.mData.string;
+            Reset();
+            mType = FT_STRING;
+
+            int size = nlStrLen(source) + 1;
+            char* copy = (char*)nlMalloc(size, 8, false);
+            mData.string = copy;
+            nlStrNCpy(copy, source, size);
+        }
+        else
+        {
+            mData.vector = other.mData.vector;
+        }
+    }
+
+public:
 
     eVariantType mType;
     union

@@ -29,6 +29,11 @@ typedef enum {
     AI_DSP_48KHZ,
 } AIDSPSampleRate;
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 AIDMACallback AIRegisterDMACallback(AIDMACallback callback);
 void AIInitDMA(void* buffer, u32 length);
 void AIStartDMA(void);
@@ -40,5 +45,9 @@ void AISetDSPSampleRate(u32 rate);
 u32 AIGetDSPSampleRate(void);
 void AIInit(void* stack);
 void __AIDHandler(s16 intr, OSContext* ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // REVOLUTION_AI_H

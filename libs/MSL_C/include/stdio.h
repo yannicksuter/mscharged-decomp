@@ -34,6 +34,7 @@ int fflush(FILE* stream);
 
 /* Formatted output (C89 4.9.6). */
 int fprintf(FILE* stream, const char* format, ...);
+int printf(const char* format, ...);
 int sprintf(char* s, const char* format, ...);
 int snprintf(char* s, size_t n, const char* format, ...);
 int vprintf(const char* format, va_list arguments);

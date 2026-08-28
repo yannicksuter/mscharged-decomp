@@ -554,7 +554,6 @@ typedef struct {
   gsi_char locationString[GP_LOCATION_STRING_LEN]; // 0x108
   unsigned int ip;                                 // 0x208
   int port;                                        // 0x20C
-  GPEnum quietModeFlags;                           // 0x210
 } GPBuddyStatus;
 
 // BETA

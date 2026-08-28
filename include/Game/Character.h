@@ -133,7 +133,6 @@ public:
     {
         return m_pAnimInventory;
     }
-
     /* 0x004 */ u8 unknown_0x004[0x04];
     /* 0x008 */ GLSkinMesh* m_pSkinMesh[4];
     /* 0x018 */ bool unknown_0x018[4];
@@ -184,7 +183,9 @@ public:
     /* 0x164 */ u8 unknown_0x164[0x0C];
     /* 0x170 */ BlurHandler* m_pBlurHandler;
     /* 0x174 */ Blinker* m_pBlinker;
-    /* 0x178 */ u8 unknown_0x178[0x38];
+    /* 0x178 */ float mUnidentified178;
+    /* 0x17C */ bool mUnidentified17C;
+    /* 0x17D */ u8 unknown_0x17D[0x33];
     /* 0x1B0 */ EffectsTexturing* m_pEffectsTexturing;
     /* 0x1B4 */ u8 unknown_0x1B4[0x30];
 }; // total size: 0x1E4

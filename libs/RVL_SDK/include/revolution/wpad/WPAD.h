@@ -19,6 +19,16 @@ extern "C" {
 #define WPAD_MAX_DPD_X 1023
 #define WPAD_MAX_DPD_Y 767
 
+#define WPAD_DPD_MAX_OBJECTS WPAD_MAX_DPD_OBJECTS
+#define WPAD_DPD_IMG_RESO_WX (WPAD_MAX_DPD_X + 1)
+#define WPAD_DPD_IMG_RESO_WY (WPAD_MAX_DPD_Y + 1)
+
+#define WPAD_BATTERY_LEVEL_CRITICAL 0
+#define WPAD_BATTERY_LEVEL_LOW 1
+#define WPAD_BATTERY_LEVEL_MEDIUM 2
+#define WPAD_BATTERY_LEVEL_HIGH 3
+#define WPAD_BATTERY_LEVEL_MAX 4
+
 #define WPAD_MAX_SPEAKER_VOLUME 127
 
 #define WPAD_ADDR_LEN WUD_ADDR_LEN
@@ -55,6 +65,9 @@ typedef enum {
 
     WPAD_ERR_BUSY = WPAD_ERR_COMMUNICATION_ERROR,
 } WPADResult;
+
+#define WPAD_CESUCCESS (WPAD_ERR_OK + 0)
+#define WPAD_CETRANSFER (WPAD_ERR_TRANSFER + 0)
 
 typedef enum {
     WPAD_SYNC_BUSY = WUD_RESULT_SYNC_BUSY,
@@ -124,6 +137,10 @@ typedef enum {
     WPAD_DEV_NULL = 254,
     WPAD_DEV_UNKNOWN = 255,
 } WPADDeviceType;
+
+#define WPAD_DEV_FS WPAD_DEV_FREESTYLE
+#define WPAD_DEV_NONE WPAD_DEV_NOT_FOUND
+#define WPAD_DEV_INITIALIZING WPAD_DEV_UNKNOWN
 
 typedef enum {
     WPAD_FMT_CORE_BTN,
@@ -273,6 +290,8 @@ typedef struct WPADAccGravityUnit {
     s16 y; // at 0x2
     s16 z; // at 0x4
 } WPADAccGravityUnit;
+
+typedef WPADAccGravityUnit WPADAcc;
 
 void WPADInit(void);
 void WPADShutdown(void);

@@ -508,9 +508,6 @@ void L2CA_SetCompression(UINT16 local_cid, UINT8 pe_type, UINT8 mem_level,
 
 void L2CA_RegisterCompression(tL2CA_COMPRESS_CB *param_1, int param_2)
 {
-#if 0
-	/* ... */
-#endif
 }
 
 UINT8 L2CA_Flush(UINT16 cid)

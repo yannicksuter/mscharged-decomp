@@ -85,19 +85,18 @@ inline void nlListAddStart(T** head, T* entry, T** tail)
 }
 
 template <typename T>
-inline void nlListAddEnd(T** head, T** tail, T* entry)
+inline void nlListAddEnd(T** head, T** tail, T* node)
 {
-    entry->next = 0;
-    T* oldTail = *tail;
-    if (oldTail != 0)
+    node->next = 0;
+    T* temp_r6 = *tail;
+    if (temp_r6 != 0)
     {
-        oldTail->next = entry;
-        *tail = entry;
+        temp_r6->next = node;
+        *tail = node;
         return;
     }
-
-    *tail = entry;
-    *head = entry;
+    *tail = node;
+    *head = node;
 }
 
 template <typename T>
@@ -117,6 +116,42 @@ inline T* nlListRemoveStart(T** head, T** tail)
     T* tmp = *head;
     *head = tmp->next;
     return tmp;
+}
+
+template <typename T>
+T* nlListRemoveElement(T** head, T* element, T** tail)
+{
+    if (head == 0)
+        return 0;
+
+    if (*head == element)
+    {
+        if (tail != 0 && *tail == *head)
+        {
+            *tail = 0;
+        }
+        T* first = *head;
+        *head = first->next;
+        return 0;
+    }
+
+    T* prev = *head;
+    T* current = prev->next;
+    while (current != 0)
+    {
+        if (current == element)
+        {
+            prev->next = current->next;
+            if (tail != 0 && *tail == current)
+            {
+                *tail = prev;
+            }
+            return prev;
+        }
+        prev = current;
+        current = current->next;
+    }
+    return 0;
 }
 
 #include "NL/nlListContainer.h"

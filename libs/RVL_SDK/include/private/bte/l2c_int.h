@@ -309,11 +309,6 @@ BOOLEAN l2cu_check_feature_req(tL2C_LCB *p_lcb, UINT8 id, UINT8 *p_data,
                                UINT16 data_len);
 void l2cu_check_feature_rsp(tL2C_LCB *p_lcb, UINT8 id, UINT8 *p_data,
                             UINT16 data_len);
-void l2cu_stop_compression(/* void? */);
-BOOLEAN l2cu_lcb_has_feature_enable(/* tL2C_LCB *p_lcb? */);
-BOOLEAN l2cu_ccb_has_compression_enable(/* tL2C_CCB *p_ccb? */);
-UINT32 L2CA_GetCompressionFixMemoryPoolSize(/* void? */);
-
 #ifdef __cplusplus
 	}
 #endif

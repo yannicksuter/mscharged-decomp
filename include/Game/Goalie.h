@@ -73,6 +73,13 @@ enum eGoalieCrouchType
 enum eGoalieOffplayType
 {
     GOALIE_OFFPLAY_NONE = 0,
+    GOALIE_OFFPLAY_GOAL_FOR = 1,
+    GOALIE_OFFPLAY_GOAL_AGAINST = 2,
+    GOALIE_OFFPLAY_ENDGAME_WIN = 3,
+    GOALIE_OFFPLAY_ENDGAME_LOSE = 4,
+    GOALIE_OFFPLAY_HALFTIME = 5,
+    GOALIE_OFFPLAY_PENALTY = 6,
+    NUM_GOALIE_OFFPLAY_TYPES = 7,
 };
 
 enum eUrgency
@@ -150,6 +157,7 @@ public:
     bool IsOpponentInSTS();
     bool IsWithinPounceRange();
     bool IsOpponentBallCarrierInRange();
+    bool FindSTSMissData(const nlVector3& rPos);
     cPlayer* FindOpenPassTarget();
     bool IsTargetViable(cPlayer* pTarget);
     bool ShouldReposition();
@@ -209,7 +217,9 @@ public:
     void ActionLooseBallSetup(float fDeltaT);
     void fn_80083750(float fDeltaT);
     void fn_800838F8(float fDeltaT);
+    void fn_80083960(float fDeltaT);
     void fn_80083DE0(float fDeltaT);
+    void fn_8008418C(float fDeltaT);
     void fn_80084568(unsigned int nIndex, float fParam);
     bool fn_80084724(unsigned int nParam, float* pScore);
     void fn_80084840(UnidentifiedMegaBallState* pState);
@@ -308,7 +318,7 @@ private:
     /* 0x410 */ cPlayer* mpPassTarget;
     /* 0x414 */ cFielder* mpShooter;
     /* 0x418 */ cFielder* mpTarget;
-    /* 0x41C */ cPlayer* mpMonty;
+    /* 0x41C */ cFielder* mpMonty;
     /* 0x420 */ cPlayer* mpSkillShooter;
     /* 0x424 */ SaveData* mpSaveData;
     /* 0x428 */ SaveBlendInfo mBlendInfo;

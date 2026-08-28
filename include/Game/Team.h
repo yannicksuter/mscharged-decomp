@@ -7,6 +7,7 @@
 class cNet;
 class cFielder;
 class cPlayer;
+class FormationManager;
 
 class cTeam
 {
@@ -25,10 +26,24 @@ public:
     /* 0x04 */ int m_nScore;
 
 private:
-    /* 0x08 */ u8 mUnidentified008[0xE0];
+    /* 0x08 */ u8 mUnidentified008[0x10];
 
 public:
+    /* 0x18 */ u32 field_0x18;
+
+private:
+    /* 0x1C */ u8 mUnidentified01C[0x6C];
+
+public:
+    /* 0x88 */ cFielder* m_pBallInterceptOrderedFielders[4];
+
+private:
+    /* 0x98 */ u8 mUnidentified098[0x40];
+
+public:
+    /* 0xD8 */ cFielder* mUnidentified0D8[4];
     /* 0xE8 */ cNet* m_pNet;
+    /* 0xEC */ FormationManager* m_pFormationManager;
 };
 
 extern cTeam* g_pTeams[];

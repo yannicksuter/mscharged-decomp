@@ -547,7 +547,7 @@ static BOOL WPADiProcessExtCommand(s32 chan) {
         if (WPADiGetCommand(&p->extCmdQueue, &command)) {
 
             if (command.reportID == RPTID_SET_DATA_REPORT_MODE ||
-                p->wpInfo.attach) {
+                p->info.attach) {
 
                 if (WPADiSendData(chan, command) == WPAD_ERR_OK) {
                     WPADiPopCommand(&p->extCmdQueue);
@@ -715,12 +715,12 @@ static void __ClearControlBlock(s32 chan) {
     WPADStatus* pStatus;
 
     p->rxBufIndex = 0;
-    p->wpInfoOut = NULL;
+    p->infoOut = NULL;
 
     p->motorRunning = FALSE;
 
-    p->cmdBlkCB = NULL;
-    p->extensionCB = NULL;
+    p->cmdBlkCallback = NULL;
+    p->extensionCallback = NULL;
     p->samplingCB = NULL;
 
     p->samplingBuf = NULL;
@@ -737,7 +737,7 @@ static void __ClearControlBlock(s32 chan) {
 
     p->statusReqBusy = FALSE;
 
-    p->defaultDpdSize = 12;
+    p->dpdDummyObjSize = 12;
     p->currentDpdCommand = WPAD_DPD_DISABLE;
     p->pendingDpdCommand = 0;
 
@@ -754,13 +754,13 @@ static void __ClearControlBlock(s32 chan) {
     p->UNK_0x8C9 = 0;
     p->UNK_0x8C4 = 0;
     p->wmReadDataPtr = NULL;
-    p->wmReadAddress = 0;
+    p->wmReadAddr = 0;
     p->wmReadLength = 0;
-    p->wmReadHadError = 0;
+    p->wmReadErr = 0;
     p->devHandle = WUD_DEV_HANDLE_INVALID;
     p->used = FALSE;
     p->handshakeFinished = FALSE;
-    p->configIndex = 0;
+    p->oldFw = 0;
     p->radioQuality = WPAD_RADIO_QUALITY_BAD;
     p->radioQualityOkMs = 0;
     p->audioFrames = 0;
@@ -771,21 +771,21 @@ static void __ClearControlBlock(s32 chan) {
     p->getInfoBusy = FALSE;
     p->getInfoCB = NULL;
 
-    memset(&p->wpInfo, 0, sizeof(p->wpInfo));
+    memset(&p->info, 0, sizeof(p->info));
     memset(&p->wmReadDataBuf, 0, sizeof(p->wmReadDataBuf));
 
     memset(p->rxBufs, 0, sizeof(p->rxBufs));
     memset(p->rxBufMain, 0, RX_BUFFER_SIZE);
 
-    memset(&p->devConfig, 0, sizeof(WPADDevConfig));
-    memset(&p->extConfig, 0, sizeof(WPADExtConfig));
-    memset(&p->encryptionKey, 0, sizeof(p->encryptionKey));
+    memset(&p->devConf, 0, sizeof(WPADDevConfig));
+    memset(&p->extConf, 0, sizeof(WPADExtConfig));
+    memset(&p->key, 0, sizeof(p->key));
     memset(&p->decryptAddTable, 0, sizeof(p->decryptAddTable));
     memset(&p->decryptXorTable, 0, sizeof(p->decryptXorTable));
     memset(&p->gameInfo, 0, sizeof(WPADGameInfo));
 
-    p->UNK_0x38[0] = -1;
-    p->UNK_0x38[1] = -1;
+    p->gameInfoErr[0] = -1;
+    p->gameInfoErr[1] = -1;
 
     p->stdCmdQueue.buffer = p->stdCmdQueueList;
     p->stdCmdQueue.capacity = ARRAY_SIZE(p->stdCmdQueueList);
@@ -1019,7 +1019,7 @@ static void firmwareCheckCallback(s32 chan, s32 status) {
 
     enabled = OSDisableInterrupts();
 
-    p->configIndex = status == WPAD_ERR_OK ? 1 : 0;
+    p->oldFw = status == WPAD_ERR_OK ? 1 : 0;
     p->status = WPAD_ERR_OK;
 
     OSRestoreInterrupts(enabled);
@@ -1029,7 +1029,7 @@ static void firmwareCheckCallback(s32 chan, s32 status) {
         status == WPAD_ERR_OK ? WM_ADDR_MEM_176C : WM_ADDR_MEM_DEV_CONFIG_0;
 
     DEBUGPrint(" ==>this error means that the firmware is for NDEV %s\n",
-               p->configIndex != 0 ? "2.0" : "2.1 or later");
+               p->oldFw != 0 ? "2.0" : "2.1 or later");
 
     WPADiSendSetReportType(&p->stdCmdQueue, WPAD_FMT_CORE_BTN,
                            &abortConnCallback);
@@ -1120,8 +1120,8 @@ static void WPADiConnCallback(UINT8 devHandle, u8 open) {
             p = _wpdcb[chan];
             p->status = WPAD_ERR_NO_CONTROLLER;
 
-            if (p->cmdBlkCB != NULL) {
-                p->cmdBlkCB(chan, WPAD_ERR_NO_CONTROLLER);
+            if (p->cmdBlkCallback != NULL) {
+                p->cmdBlkCallback(chan, WPAD_ERR_NO_CONTROLLER);
             } else if (_wmb[chan].at_0x10 != NULL) {
                 _wmb[chan].at_0x10(chan, WPAD_ERR_NO_CONTROLLER);
             }
@@ -1191,16 +1191,16 @@ void WPADGetAccGravityUnit(s32 chan, u32 type, WPADAccGravityUnit* pAcc) {
     if (pAcc != NULL) {
         switch (type) {
         case WPAD_ACC_GRAVITY_UNIT_CORE: {
-            pAcc->x = p->devConfig.accX1g - p->devConfig.accX0g;
-            pAcc->y = p->devConfig.accY1g - p->devConfig.accY0g;
-            pAcc->z = p->devConfig.accZ1g - p->devConfig.accZ0g;
+            pAcc->x = p->devConf.acc_1g.x - p->devConf.acc_0g.x;
+            pAcc->y = p->devConf.acc_1g.y - p->devConf.acc_0g.y;
+            pAcc->z = p->devConf.acc_1g.z - p->devConf.acc_0g.z;
             break;
         }
 
         case WPAD_ACC_GRAVITY_UNIT_FS: {
-            pAcc->x = p->extConfig.u.fs.accX1g - p->extConfig.u.fs.accX0g;
-            pAcc->y = p->extConfig.u.fs.accY1g - p->extConfig.u.fs.accY0g;
-            pAcc->z = p->extConfig.u.fs.accZ1g - p->extConfig.u.fs.accZ0g;
+            pAcc->x = p->extConf.fs.acc_1g.x - p->extConf.fs.acc_0g.x;
+            pAcc->y = p->extConf.fs.acc_1g.y - p->extConf.fs.acc_0g.y;
+            pAcc->z = p->extConf.fs.acc_1g.z - p->extConf.fs.acc_0g.z;
             break;
         }
         }
@@ -1333,8 +1333,8 @@ WPADSetExtensionCallback(s32 chan, WPADExtensionCallback pCallback) {
     enabled = OSDisableInterrupts();
     p = _wpdcb[chan];
 
-    pOldCallback = p->extensionCB;
-    p->extensionCB = pCallback;
+    pOldCallback = p->extensionCallback;
+    p->extensionCallback = pCallback;
 
     OSRestoreInterrupts(enabled);
     return pOldCallback;
@@ -1775,7 +1775,7 @@ BOOL WPADIsSpeakerEnabled(s32 chan) {
     WPADCB* p = _wpdcb[chan];
     BOOL enabled = OSDisableInterrupts();
 
-    BOOL spkEnabled = p->wpInfo.speaker;
+    BOOL spkEnabled = p->info.speaker;
 
     OSRestoreInterrupts(enabled);
     return spkEnabled;
@@ -1801,7 +1801,7 @@ s32 WPADControlSpeaker(s32 chan, u32 command, WPADCallback pCallback) {
 
     enabled = OSDisableInterrupts();
 
-    spkEnable = p->wpInfo.speaker;
+    spkEnable = p->info.speaker;
     status = p->status;
     handshake = p->handshakeFinished;
 
@@ -2051,7 +2051,7 @@ BOOL WPADIsDpdEnabled(s32 chan) {
     WPADCB* p = _wpdcb[chan];
     BOOL enabled = OSDisableInterrupts();
 
-    BOOL dpdEnabled = p->wpInfo.dpd;
+    BOOL dpdEnabled = p->info.dpd;
 
     OSRestoreInterrupts(enabled);
     return dpdEnabled;
@@ -2061,7 +2061,7 @@ static void __dpdCb(s32 chan, s32 result) {
     WPADCB* p = _wpdcb[chan];
 
     p->currentDpdCommand = p->pendingDpdCommand;
-    p->wpInfo.dpd = p->pendingDpdCommand == WPAD_DPD_DISABLE ? 0 : 1;
+    p->info.dpd = p->pendingDpdCommand == WPAD_DPD_DISABLE ? 0 : 1;
 }
 
 s32 WPADControlDpd(s32 chan, u32 command, WPADCallback pCallback) {
@@ -2095,7 +2095,7 @@ s32 WPADControlDpd(s32 chan, u32 command, WPADCallback pCallback) {
 
     enabled = OSDisableInterrupts();
 
-    dpdEnabled = p->wpInfo.dpd;
+    dpdEnabled = p->info.dpd;
     currCmd = p->currentDpdCommand;
     pendingCmd = p->pendingDpdCommand;
     status = p->status;
@@ -2233,8 +2233,8 @@ static void __SendData(s32 chan, WPADCommand command) {
         }
 
         case RPTID_READ_DATA: {
-            p->wmReadHadError = 0;
-            p->wmReadAddress = command.readAddress;
+            p->wmReadErr = 0;
+            p->wmReadAddr = command.readAddress;
             p->wmReadLength = command.readLength;
             p->wmReadDataPtr = command.dstBuf;
             break;
@@ -2242,7 +2242,7 @@ static void __SendData(s32 chan, WPADCommand command) {
 
         case RPTID_REQUEST_STATUS: {
             p->status = status;
-            p->wpInfoOut = command.statusReportOut;
+            p->infoOut = command.statusReportOut;
             p->statusReqBusy = TRUE;
             break;
         }
@@ -2261,8 +2261,8 @@ static void __SendData(s32 chan, WPADCommand command) {
         }
         }
 
-        p->cmdBlkCB = command.cmdCB;
-        p->lastReportID = reportID;
+        p->cmdBlkCallback = command.cmdCB;
+        p->lastReportId = reportID;
         p->lastReportSendTime = __OSGetSystemTime() + OS_SEC_TO_TICKS(2);
         p->UNK_0x910 = 0;
 
