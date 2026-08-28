@@ -45,14 +45,14 @@ struct SetTagValuePair : public Config::Parser
 
 struct ConfigLoadCallback
 {
-    ConfigLoadCallback(Config* owner, const Function1<void, Config*>& completed)
+    ConfigLoadCallback(Config* owner, const Function<Config*>& completed)
         : config(owner)
         , callback(completed)
     {
     }
 
     Config* config;
-    Function1<void, Config*> callback;
+    Function<Config*> callback;
 };
 
 unsigned int Config::Hash(const char* string) const
@@ -238,7 +238,7 @@ void Config::LoadFromFile(const char* filename)
 
 static void ConfigLoadComplete(void* buffer, unsigned long size, void* userData);
 
-void Config::LoadFromFileAsync(const char* filename, const Function1<void, Config*>& callback)
+void Config::LoadFromFileAsync(const char* filename, const Function<Config*>& callback)
 {
     void* storage = nlMalloc(sizeof(ConfigLoadCallback), 8, true);
     ConfigLoadCallback* data = ::new (storage) ConfigLoadCallback(this, callback);

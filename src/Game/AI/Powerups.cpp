@@ -3083,9 +3083,9 @@ void Bobomb::fn_8009F454(PowerupBase*, int nThrowOrder)
         else
         {
             float invLength = nlRecipSqrt(v3TargetVel.GetLengthSq3D(), true);
-            v3TargetVel.x *= invLength;
-            v3TargetVel.y *= invLength;
-            v3TargetVel.z *= invLength;
+            v3TargetVel.x = invLength * v3TargetVel.x;
+            v3TargetVel.y = invLength * v3TargetVel.y;
+            v3TargetVel.z = invLength * v3TargetVel.z;
             nlVec3Scale(v3TargetVel, v3TargetVel, lbl_806DBDDC);
         }
     }

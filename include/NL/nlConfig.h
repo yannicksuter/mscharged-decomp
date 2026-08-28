@@ -55,7 +55,7 @@ public:
     static Config& Global();
 
     void LoadFromFile(const char* filename);
-    void LoadFromFileAsync(const char* filename, const Function1<void, Config*>& callback);
+    void LoadFromFileAsync(const char* filename, const Function<Config*>& callback);
     unsigned int Hash(const char* string) const;
     bool Exists(const char* tag) const;
     TagValuePair& FindTvp(const char* tag);
