@@ -9,6 +9,7 @@
 #include "NL/gl/glTarget.h"
 #include "NL/gl/glView.h"
 #include "NL/glx/glxLoadModel.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/nlString.h"
 
 extern "C" void fn_802A0A14();
@@ -17,9 +18,6 @@ extern "C" void fn_802CEC68();
 extern "C" void fn_802CEF18();
 extern "C" unsigned long fn_80369D5C();
 extern "C" unsigned long fn_80369D64();
-
-extern "C" bool fn_8036B518(const char*, void (*)(void*, unsigned long, void*), void*);
-extern "C" void* fn_8036B558(const char*, void*);
 
 static int gl_frameCounter;
 static int gl_nDiscard;
@@ -157,7 +155,7 @@ extern "C" bool fn_802C8200(const char* filename, void (*callback)(void*, unsign
 
 extern "C" bool fn_802C8204(const char* filename, void (*callback)(void*, unsigned long, void*), void* param)
 {
-    return fn_8036B518(filename, callback, param);
+    return glplatBeginLoadTextureBundle(filename, callback, param);
 }
 
 extern "C" void* fn_802C8208(
@@ -166,9 +164,10 @@ extern "C" void* fn_802C8208(
     return glplatLoadModel(filename, pNumModels, context);
 }
 
-extern "C" void* fn_802C820C(const char* filename, void* arg1)
+extern "C" bool fn_802C820C(
+    const char* filename, MemoryAllocator* allocator)
 {
-    return fn_8036B558(filename, arg1);
+    return glplatLoadTextureBundle(filename, allocator);
 }
 
 float glGetOrthographicWidth()

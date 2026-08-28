@@ -64,24 +64,6 @@ struct MeshWriter_802A8218
     }
 };
 
-struct UnidentifiedTextureState
-{
-    u32 texture;
-    u16 unknown04;
-    u8 flags;
-    u8 field7;
-
-    void SetWrapS(unsigned char enabled)
-    {
-        flags = (flags & 2) | enabled;
-    }
-
-    void SetWrapT(unsigned char enabled)
-    {
-        flags = (flags & 1) | (enabled << 1);
-    }
-};
-
 bool glAttachQuad3(eGLView view, unsigned long count, glQuad3* quads)
 {
     int i = 0;
@@ -150,10 +132,10 @@ const glModel* glQuad3::GetModel() const
         UnidentifiedTextureState* state =
             (UnidentifiedTextureState*)writer.model->packets->unknown20;
         state->texture = lbl_806E1F34;
-        state->unknown04 = 0xFFFF;
+        state->textureIndex = 0xFFFF;
         state->SetWrapS(true);
         state->SetWrapT(true);
-        state->field7 = 0;
+        state->unknown07 = 0;
     }
     else
     {
@@ -178,10 +160,10 @@ const glModel* glQuad3::GetModel() const
         UnidentifiedTextureState* state =
             (UnidentifiedTextureState*)writer.model->packets->unknown20;
         state->texture = texture;
-        state->unknown04 = 0xFFFF;
+        state->textureIndex = 0xFFFF;
         state->SetWrapS(wrapS);
         state->SetWrapT(wrapT);
-        state->field7 = 0;
+        state->unknown07 = 0;
     }
 
     if (writer.End())

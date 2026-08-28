@@ -3,6 +3,12 @@
 
 #include "types.h"
 
+#include <string.h>
+
+class MemoryAllocator;
+
+typedef unsigned long (*glxTextureLoadCallback_t)(unsigned long);
+
 enum eGXTextureFormat
 {
     GXTex_RGB565 = 0,
@@ -17,13 +23,61 @@ enum eGXTextureFormat
     GXTex_Num = 9,
 };
 
+struct GXTextureHeader
+{
+    /* 0x00 */ unsigned long numLevels;
+    /* 0x04 */ eGXTextureFormat format;
+    /* 0x08 */ unsigned char numBits[4];
+    /* 0x0C */ unsigned char missingTexture;
+    /* 0x0D */ unsigned char _pad0D;
+    /* 0x0E */ unsigned short width;
+    /* 0x10 */ unsigned short height;
+    /* 0x12 */ unsigned char _pad12[2];
+    /* 0x14 */ unsigned long numEntries;
+    /* 0x18 */ unsigned long _pad18[2];
+};
+
+struct BundleEntry
+{
+    /* 0x00 */ unsigned long hash;
+    /* 0x04 */ unsigned long offset;
+    /* 0x08 */ unsigned long fileSize;
+    /* 0x0C */ unsigned long pad;
+};
+
+struct glTexBundleDict : public BundleEntry
+{
+};
+
 class PlatTexture
 {
 public:
+    PlatTexture()
+    {
+        m_Width = 0;
+        m_Height = 0;
+        m_Levels = 0;
+        m_MaxLevel = 0;
+        m_Format = GXTex_Num;
+        m_nPaletteEntries = 0;
+        m_bMissingTexture = false;
+        m_SwizzledData = 0;
+        m_LinearData = 0;
+        m_PaletteData = 0;
+        memset(m_TexObj, 0, sizeof(m_TexObj));
+        memset(m_TlutObj, 0, sizeof(m_TlutObj));
+        memset(m_Bits, 0xFF, sizeof(m_Bits));
+        unknown0E = 0xFFFF;
+    }
+
+    ~PlatTexture();
+
+    void ClearData();
     void Prepare();
     void Swizzle(bool bDeleteLinear);
     void Create(int width, int height, eGXTextureFormat format,
-        bool permanent, int numLevels, bool bLinearData, bool bNewResourceMemory);
+        MemoryAllocator* allocator, int numLevels, bool bLinearData,
+        bool bNewResourceMemory);
     void CreateWithMemory(int width, int height, eGXTextureFormat format,
         int numLevels, const void* pTextureData);
 
@@ -46,11 +100,21 @@ public:
 };
 
 PlatTexture* glx_GetTex(unsigned long handle);
-PlatTexture* glx_CreatePlatTexture(bool permanent);
+PlatTexture* glx_CreatePlatTexture(MemoryAllocator* allocator);
+PlatTexture* glx_MakeTexture(GXTextureHeader* header,
+    MemoryAllocator* allocator, unsigned long handle);
+void glplatTextureReplace(PlatTexture* pTex, const void* textureData,
+    unsigned long size);
+bool glplatBeginLoadTextureBundle(const char* filename,
+    void (*callback)(void*, unsigned long, void*), void* param);
+bool glplatLoadTextureBundle(
+    const char* filename, MemoryAllocator* allocator);
 bool glplatTextureLoad(PlatTexture* texture);
 int glplatTextureGetNumBits(int component);
 u32 glplatTextureGetHeight();
 u32 glplatTextureGetWidth();
 void glxInitTex();
+glxTextureLoadCallback_t glx_SetLoadCallback(
+    glxTextureLoadCallback_t callback);
 
 #endif // _GLXTEXTURE_H_

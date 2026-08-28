@@ -633,6 +633,12 @@ NL/gl/gl.cpp:
 	.sbss       start:0x806E1EA0 end:0x806E1EAC
 	.sdata2     start:0x806E62E8 end:0x806E62F0
 
+NL/gl/glDraw2.cpp:
+	.text       start:0x802C8290 end:0x802C9234
+	.data       start:0x8052BFD0 end:0x8052C008
+	.sbss       start:0x806E1EB0 end:0x806E1EB8
+	.sdata2     start:0x806E62F0 end:0x806E6300
+
 NL/gl/glDraw3.cpp:
 	.text       start:0x802C9254 end:0x802C99EC
 	.data       start:0x8052C008 end:0x8052C018
@@ -970,6 +976,19 @@ NL/gl/glPlat.cpp:
 	.sdata      start:0x806DFA60 end:0x806DFA78
 	.sbss       start:0x806E22E0 end:0x806E2300
 	.sdata2     start:0x806E6D18 end:0x806E6D30
+
+NL/glx/glxLoadModel.cpp:
+	.text       start:0x80369E5C end:0x8036A800
+	.data       start:0x805353B8 end:0x805353F0
+	.sdata2     start:0x806E6D30 end:0x806E6D38
+
+NL/glx/glxTexture.cpp:
+	.text       start:0x8036AC9C end:0x8036C23C
+	.ctors      start:0x804DBB4C end:0x804DBB50
+	.data       start:0x805353F0 end:0x805354C0
+	.bss        start:0x8058A1F8 end:0x8058A288
+	.sbss       start:0x806E2300 end:0x806E2318
+	.sdata2     start:0x806E6D50 end:0x806E6D60
 
 NL/glx/glxGX.cpp:
 	.text       start:0x8036C23C end:0x8036CE48

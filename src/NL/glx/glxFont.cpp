@@ -5,10 +5,10 @@
 
 u32 glplatCreateFont(
     unsigned long width, unsigned long height, const unsigned short* data,
-    unsigned long handle, bool permanent)
+    unsigned long handle, MemoryAllocator* allocator)
 {
-    PlatTexture* pTex = glx_CreatePlatTexture(permanent);
-    pTex->Create(width, height, GXTex_RGB5A3, permanent, 1, true, false);
+    PlatTexture* pTex = glx_CreatePlatTexture(allocator);
+    pTex->Create(width, height, GXTex_RGB5A3, allocator, 1, true, false);
     memcpy(pTex->m_LinearData, data, height * (width * 2));
     pTex->Swizzle(true);
     pTex->Prepare();

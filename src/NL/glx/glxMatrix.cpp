@@ -43,20 +43,15 @@ void glplatMatrixLookAt(nlMatrix4& m, const nlVector3& eye, const nlVector3& at,
     cameraEye = eye;
     nlVec3Set(view, x, y, z);
     float length = nlSqrt(nlVec3LengthSquared(view), true);
-    float inverseLength = 1.0f / length;
-    nlVec3Scale(view, view, inverseLength);
+    nlVec3Scale(view, view, 1.0f / length);
     nlVec3CrossProduct(side, up, view);
-    inverseLength = nlRecipSqrt(nlVec3LengthSquared(side), true);
-    nlVec3Scale(side, side, inverseLength);
+    nlVec3Scale(side, side, nlRecipSqrt(nlVec3LengthSquared(side), true));
     nlVec3CrossProduct(cameraUp, view, side);
 
     if (nlAbs(up.z) > 0.5f && (nlAbs(up.x) > 0.001f || nlAbs(up.y) > 0.001f))
     {
         nlVector4 sidePlane;
-        sidePlane.x = side.x;
-        sidePlane.y = side.y;
-        sidePlane.z = side.z;
-        sidePlane.w = 0.0f;
+        nlVec4Set(sidePlane, side.x, side.y, side.z, 0.0f);
 
         nlVector3 projectedUp;
         fn_802B5D74(projectedUp, up, sidePlane);
@@ -71,11 +66,17 @@ void glplatMatrixLookAt(nlMatrix4& m, const nlVector3& eye, const nlVector3& at,
         }
     }
 
-    m.SetColumn_(0, side);
+    m.e2[0][0] = side.x;
+    m.e2[1][0] = side.y;
+    m.e2[2][0] = side.z;
     m.e2[3][0] = -nlVec3DotProduct(side, cameraEye);
-    m.SetColumn_(1, cameraUp);
+    m.e2[0][1] = cameraUp.x;
+    m.e2[1][1] = cameraUp.y;
+    m.e2[2][1] = cameraUp.z;
     m.e2[3][1] = -nlVec3DotProduct(cameraUp, cameraEye);
-    m.SetColumn_(2, view);
+    m.e2[0][2] = view.x;
+    m.e2[1][2] = view.y;
+    m.e2[2][2] = view.z;
     m.e2[3][2] = -nlVec3DotProduct(view, cameraEye);
     m.e2[0][3] = 0.0f;
     m.e2[1][3] = 0.0f;

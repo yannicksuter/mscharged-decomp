@@ -33,6 +33,6 @@ void nlRead(nlFile* file, void* buffer, unsigned int size, unsigned long bufferS
 void nlClose(nlFile* file);
 bool nlFileExists(const char* filename);
 void* nlLoadEntireFile(const char* filename, unsigned long* outSize, unsigned int alignment, eAllocType type, void* buffer, unsigned long bufferSize, MemoryAllocator* allocator);
-bool nlLoadEntireFileAsync(const char* filename, LoadAsyncCallback callback, void* userData, unsigned int alignment, eAllocType type, void* buffer, unsigned long bufferSize, MemoryAllocator* allocator);
+unsigned int nlLoadEntireFileAsync(const char* filename, LoadAsyncCallback callback, void* userData, unsigned int alignment, eAllocType type, void* buffer, unsigned long bufferSize, MemoryAllocator* allocator);
 
 #endif // NL_FILE_H

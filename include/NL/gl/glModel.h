@@ -6,6 +6,24 @@
 struct DisplayList;
 class nlMatrix4;
 
+struct UnidentifiedTextureState
+{
+    /* 0x00 */ u32 texture;
+    /* 0x04 */ u16 textureIndex;
+    /* 0x06 */ u8 flags;
+    /* 0x07 */ u8 unknown07;
+
+    void SetWrapS(unsigned char enabled)
+    {
+        flags = (flags & 2) | enabled;
+    }
+
+    void SetWrapT(unsigned char enabled)
+    {
+        flags = (flags & 1) | (enabled << 1);
+    }
+}; // size: 0x8
+
 struct glModelStream
 {
     /* 0x00 */ void* address;
