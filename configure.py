@@ -622,7 +622,7 @@ config.libs = [
             Object(NonMatching, "Game/Physics.cpp"),
             Object(NonMatching, "unclassified/tu_80141000.cpp"),
             Object(NonMatching, "unclassified/tu_8016F34C.cpp"),
-            Object(Matching, "unclassified/tu_80170028.cpp"),
+            Object(Matching, "Game/Physics/PhysicsGroundPlane.cpp"),
             Object(NonMatching, "unclassified/tu_801700D8.cpp"),
             Object(NonMatching, "unclassified/tu_801709D0.cpp"),
             Object(NonMatching, "unclassified/tu_80176EF4.cpp"),
