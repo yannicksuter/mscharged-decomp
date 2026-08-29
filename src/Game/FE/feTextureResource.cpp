@@ -12,22 +12,22 @@ FETextureResource::FETextureResource()
     m_type = FERT_TEXTURE;
 }
 
-extern "C" void fn_8030009C(FETextureResource* texture, const unsigned long* handle)
+void FETextureResource::fn_8030009C(const unsigned long& textureReference)
 {
-    texture->m_glTextureHandle = *handle;
-    if (glTextureLoad(*handle))
+    m_glTextureHandle = textureReference;
+    if (glTextureLoad(textureReference))
     {
-        texture->m_width = glTextureGetWidth();
-        texture->m_height = glTextureGetHeight();
+        m_uWidth = glTextureGetWidth();
+        m_uHeight = glTextureGetHeight();
     }
     else
     {
-        texture->m_width = 1;
-        texture->m_height = 1;
+        m_uWidth = 1;
+        m_uHeight = 1;
     }
 }
 
-unsigned long FETextureResource::GetTextureHandle() const
+u32 FETextureResource::GetTextureHandle() const
 {
     return m_glTextureHandle;
 }

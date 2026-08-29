@@ -113,13 +113,13 @@ extern "C" float fn_80302270(TLInstance* instance)
 
 bool TLInstance::IsValidAtTime(float fCurrentTime)
 {
+    float sinceStart;
     float duration;
     float elapsed;
     bool valid;
 
     valid = true;
-    float sinceStart = fCurrentTime;
-    sinceStart -= m_fStartTime;
+    sinceStart = fCurrentTime - m_fStartTime;
     if (!(sinceStart > 0.0001f))
     {
         if (!((float)fabs(sinceStart) <= 0.0001f))
@@ -130,7 +130,7 @@ bool TLInstance::IsValidAtTime(float fCurrentTime)
 
     if (valid != 0)
     {
-        valid = true;
+        valid = 1;
         duration = m_fDuration;
         elapsed = fCurrentTime - m_fStartTime;
         if (!((m_fDuration - elapsed) > 0.0001f))

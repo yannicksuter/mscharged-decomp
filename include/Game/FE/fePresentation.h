@@ -13,7 +13,7 @@ public:
     {
         return m_currentSlide;
     }
-    void SetActiveSlide(const char* slideName, bool arg2);
+    void SetActiveSlide(const char* slideName, bool resetTime);
 
     /* 0x00 */ TLSlide* m_slides;
     /* 0x04 */ TLSlide* m_currentSlide;

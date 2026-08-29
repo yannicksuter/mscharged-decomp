@@ -4,6 +4,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/Ball.h"
+#include "Game/Field.h"
 #include "Game/GameTweaks.h"
 #include "Game/InterpreterCore.h"
 #include "Game/MathHelpers.h"
@@ -43,7 +44,6 @@ extern "C" cFielder* fn_800A8808(cTeam*);
 extern "C" cFielder* fn_800A8884(cTeam*);
 extern "C" nlVector3 fn_80098060(cFielder*, void*);
 extern "C" void fn_800180F4(cBall*, nlVector3*, float);
-extern "C" bool fn_8002D268(const nlVector2*);
 extern "C" float fn_800DFF1C();
 extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void* memset(void*, int, unsigned long);
@@ -1494,7 +1494,7 @@ void FormationBallPosition::Update(float fDeltaT)
         m_pFormationManager->m_pTeam->m_nSide);
 
     nlVector2 vAIBallLoc = *(const nlVector2*)&v3AIBallLoc;
-    if (fn_8002D268(&vAIBallLoc))
+    if (cField::IsOnField(vAIBallLoc))
     {
         SelectClosestBallFormations(vAIBallLoc);
 

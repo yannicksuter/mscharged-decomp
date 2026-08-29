@@ -1,5 +1,5 @@
-#ifndef GAME_FE_SCENE_RESOURCE_H
-#define GAME_FE_SCENE_RESOURCE_H
+#ifndef _FESCENERESOURCE_H_
+#define _FESCENERESOURCE_H_
 
 #include "Game/FE/feResourceManager.h"
 
@@ -11,7 +11,7 @@ public:
     FESceneResource();
 
     /* 0x18 */ FEScene* m_pFESceneContext;
-    /* 0x1C */ u32 field_0x1C;
-}; // size 0x20
+    /* 0x1C */ unsigned long m_glResourceMarker;
+}; // total size: 0x20
 
-#endif // GAME_FE_SCENE_RESOURCE_H
+#endif // _FESCENERESOURCE_H_

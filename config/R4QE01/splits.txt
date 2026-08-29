@@ -47,7 +47,7 @@ Game/Character.cpp:
 	.sdata      start:0x806DB5D8 end:0x806DB630
 	.sdata2     start:0x806E3240 end:0x806E32B0
 
-unclassified/tu_8002D120.cpp:
+Game/Field.cpp:
 	.text       start:0x8002D120 end:0x8002DB1C
 	.ctors      start:0x804DB510 end:0x804DB514
 	.data       start:0x804F9CA8 end:0x804F9D28
@@ -318,9 +318,10 @@ Game/DB/UserOptions.cpp:
 	.rodata     start:0x804DC630 end:0x804DC660
 	.sdata2     start:0x806E45E0 end:0x806E45E8
 
-unclassified/tu_80111654.cpp:
+Game/FixedUpdateTask.cpp:
 	.text       start:0x80111654 end:0x801123B4
 	.ctors      start:0x804DB5E0 end:0x804DB5E4
+	.data       start:0x80507C58 end:0x80507C6C
 
 Game/Task/WorldUpdateTask.cpp:
 	.text       start:0x80112C70 end:0x80112C7C
@@ -334,7 +335,7 @@ Game/Task/EndFrameTask.cpp:
 unclassified/tu_80112E0C.cpp:
 	.text       start:0x80112E0C end:0x80114458
 
-unclassified/tu_80114614.cpp:
+Game/FrontEndTask.cpp:
 	.text       start:0x80114614 end:0x80114FE0
 	.data       start:0x80507FD0 end:0x80507FF0
 	.sbss       start:0x806E0FF0 end:0x806E0FFC
@@ -573,9 +574,17 @@ Game/Effects/PhotoFlashEffect.cpp:
 	.sdata      start:0x806DD030 end:0x806DD038
 	.sdata2     start:0x806E5280 end:0x806E528C
 
+Game/FE/feManager.cpp:
+	.text       start:0x801C3920 end:0x801C4B7C
+	.ctors      start:0x804DB76C end:0x804DB770
+
 Game/FE/GameSceneManager.cpp:
 	.text       start:0x801C6174 end:0x801C620C
 	.data       start:0x805170A8 end:0x805170C0
+
+Game/FE/Overlay/OverlayHandlerDemo.cpp:
+	.text       start:0x801F698C end:0x801F6A24
+	.data       start:0x8051A6D0 end:0x8051A6FC
 
 Game/NisPlayer.cpp:
 	.text       start:0x8027B138 end:0x80280C84
@@ -1402,7 +1411,7 @@ Game/FE/fePackage.cpp:
 
 Game/FE/fePresentation.cpp:
 	.text       start:0x802FBBB0 end:0x802FBCC0
-	.sdata2     start:0x806E6678 end:0x806E667C
+	.sdata2     start:0x806E6678 end:0x806E6680
 
 Game/FE/feRender.cpp:
 	.text       start:0x802FBCC0 end:0x802FC850
@@ -1458,9 +1467,16 @@ Game/FE/tlComponentInstance.cpp:
 
 Game/FE/tlInstance.cpp:
 	.text       start:0x80302150 end:0x80302514
+	.data       start:0x8052FE10 end:0x8052FE28
+	.sdata2     start:0x806E6700 end:0x806E6708
 
 Game/FE/tlTextInstance.cpp:
-	.text       start:0x80302514 end:0x80302A98
+	.text       start:0x80302514 end:0x803025A4
+	.sdata      start:0x806DF510 end:0x806DF518
+
+Game/FE/tlTextInstance_runtime.cpp:
+	.text       start:0x803025A4 end:0x80302A98
+	.sdata2     start:0x806E6708 end:0x806E6718
 
 NL/nlLocalization.cpp:
 	.text       start:0x80302D04 end:0x80302F44
@@ -1491,6 +1507,14 @@ NL/nlTextEscape.cpp:
 Game/FE/BaseSceneHandler.cpp:
 	.text       start:0x803060FC end:0x8030616C
 	.data       start:0x8052FF10 end:0x8052FF40
+
+Game/Font/fontmanager.cpp:
+	.text       start:0x8030616C end:0x80307564
+	.ctors      start:0x804DBA8C end:0x804DBA90
+	.data       start:0x8052FF64 end:0x8052FF98
+	.bss        start:0x80580748 end:0x80584048
+	.sbss       start:0x806E2090 end:0x806E2098
+	.sdata2     start:0x806E6768 end:0x806E6770
 
 Game/SAnim.cpp:
 	.text       start:0x80307A0C end:0x80309788

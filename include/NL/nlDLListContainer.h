@@ -95,20 +95,19 @@ public:
     nlDLListSlotPool()
         : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >()
     {
-        this->m_Allocator.m_Delta = 16;
-        this->m_Allocator.m_Initial = 16;
-        SlotPoolBase::BaseAddNewBlock(&this->m_Allocator, sizeof(DLListEntry<T>));
+        this->m_Allocator.Initialize(16, 16);
     }
 
-    nlDLListSlotPool(int initial, int delta)
+    nlDLListSlotPool(const int initial)
         : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >()
     {
-        this->m_Allocator.m_Delta = delta;
-        this->m_Allocator.m_Initial = initial;
-        if (initial != 0)
-        {
-            SlotPoolBase::BaseAddNewBlock(&this->m_Allocator, sizeof(DLListEntry<T>));
-        }
+        this->m_Allocator.Initialize(initial, 0);
+    }
+
+    nlDLListSlotPool(const int initial, const int delta)
+        : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >()
+    {
+        this->m_Allocator.Initialize(initial, delta);
     }
 };
 
