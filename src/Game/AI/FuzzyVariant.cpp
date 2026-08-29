@@ -1,31 +1,30 @@
 #include "Game/AI/FuzzyVariant.h"
 
-char lbl_806DC418[] = "???";
-char lbl_806DC420[] = "{0} {1}";
-char lbl_806DC428[] = "Home";
-char lbl_806DC430[] = "Away";
-char lbl_806DC438[] = "Game";
-char lbl_806DC440[] = "Ball";
-char lbl_80503F70[] = "Team={0}";
+#include "Game/DB/CharacterInfo.h"
+#include "Game/Player.h"
+#include "Game/Team.h"
+#include "NL/nlFormat.h"
+
+FuzzyVariant lbl_8056DBD4;
 
 unsigned long FuzzyVariant::GetHash() const
 {
     unsigned long hash = 0;
 
-    if (mType != FT_UNSPECIFIED && mType >= (eVariantType)9)
+    if (mType != FT_UNSPECIFIED && mType >= NUM_V_TYPES)
     {
         switch (GetType())
         {
-        case (eVariantType)9:
+        case FT_PLAYER:
             hash = (unsigned long)mData.pointer;
             break;
-        case (eVariantType)10:
+        case FT_TEAM:
             hash = mData.u;
             break;
-        case (eVariantType)11:
+        case FT_GAME:
             hash = (unsigned long)mData.pointer;
             break;
-        case (eVariantType)12:
+        case FT_BALL:
             hash = mData.u;
             break;
         }
@@ -34,4 +33,60 @@ unsigned long FuzzyVariant::GetHash() const
     return hash;
 }
 
-FuzzyVariant lbl_8056DBD4;
+NLString FuzzyVariant::ToString() const
+{
+    NLString toString;
+
+    if (mType != FT_UNSPECIFIED && mType >= NUM_V_TYPES)
+    {
+        NLString dataString = "???";
+
+        switch (GetType())
+        {
+        case FT_PLAYER:
+        {
+            cPlayer* pPlayer = mData.pPlayer;
+            if (pPlayer != 0)
+            {
+                NLString formatString("{0} {1}");
+                int playerID;
+                const char* playerName;
+                playerName = GetCharacterInfo(pPlayer->m_eCharacterClass).mName;
+                playerID = pPlayer->m_ID;
+                dataString = Format(formatString, playerID, playerName);
+            }
+            break;
+        }
+
+        case FT_TEAM:
+            if (mData.pTeam != 0)
+            {
+                dataString = Format(NLString("Team={0}"),
+                    mData.pTeam->m_nSide == 0 ? "Home" : "Away");
+            }
+            break;
+
+        case FT_GAME:
+            if (mData.pointer != 0)
+            {
+                dataString = "Game";
+            }
+            break;
+
+        case FT_BALL:
+            if (mData.pointer != 0)
+            {
+                dataString = "Ball";
+            }
+            break;
+        }
+
+        toString = dataString;
+    }
+    else
+    {
+        toString = Variant::ToString();
+    }
+
+    return toString;
+}

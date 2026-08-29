@@ -17,6 +17,11 @@ inline void* operator new(unsigned long size, unsigned int alignment, bool fromE
     return nlMalloc(size, alignment, fromEnd);
 }
 
+inline void* operator new[](unsigned long size, unsigned int alignment, bool fromEnd)
+{
+    return nlMalloc(size, alignment, fromEnd);
+}
+
 void nlInitMemory();
 extern u8 gMemoryInitialized;
 

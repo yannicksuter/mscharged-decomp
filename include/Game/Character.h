@@ -133,6 +133,10 @@ public:
     {
         return m_pAnimInventory;
     }
+    int GetHeadJointIndex() const
+    {
+        return m_nHeadJointIndex;
+    }
     /* 0x004 */ u8 unknown_0x004[0x04];
     /* 0x008 */ GLSkinMesh* m_pSkinMesh[4];
     /* 0x018 */ bool unknown_0x018[4];

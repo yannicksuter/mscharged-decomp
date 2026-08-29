@@ -16,9 +16,9 @@ enum eCameraType
     eCameraType_FollowBall = 5,
     eCameraType_Goal = 6,
     eCameraType_ShootToScore = 7,
-    eCameraType_MatrixEffect = 8,
+    eCameraType_Replay = 8,
     eCameraType_Animated = 9,
-    eCameraType_Replay = 10,
+    eCameraType_MatrixEffect = 10,
     eCameraType_AnimViewer = 11,
     eCameraType_FaceCloseup = 12,
 };

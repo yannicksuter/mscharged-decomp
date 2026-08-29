@@ -5,6 +5,7 @@
 #include "Game/AI/Variant.h"
 
 class cTeam;
+class UnidentifiedVariantCollection;
 
 struct Unidentified8002E1A4Result
 {
@@ -19,18 +20,6 @@ struct UnidentifiedStringHash
 
     unsigned long mHash;
     unsigned long mUnidentified004;
-};
-
-class UnidentifiedVariantCollection
-{
-public:
-    UnidentifiedVariantCollection();
-    ~UnidentifiedVariantCollection();
-
-    void Set(int index, const Variant& value);
-
-private:
-    void* mUnidentifiedValues[19];
 };
 
 class UnidentifiedScriptMachine
