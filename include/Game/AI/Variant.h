@@ -5,6 +5,9 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
+class cPlayer;
+class cTeam;
+
 enum eVariantType
 {
     FT_UNSPECIFIED = -1,
@@ -18,6 +21,10 @@ enum eVariantType
     FT_POINTER = 7,
     FT_STRING = 8,
     NUM_V_TYPES = 9,
+    FT_PLAYER = NUM_V_TYPES,
+    FT_TEAM,
+    FT_GAME,
+    FT_BALL,
 };
 
 class Variant
@@ -111,6 +118,8 @@ public:
         float f;
         nlVector3 vector;
         void* pointer;
+        cPlayer* pPlayer;
+        cTeam* pTeam;
         const char* string;
     } mData;
 };

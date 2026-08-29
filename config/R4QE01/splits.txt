@@ -956,6 +956,13 @@ Game/GL/GLInventory.cpp:
 	.text       start:0x802D2B2C end:0x802D38A4
 	.data       start:0x8052E5C0 end:0x8052E758
 
+Game/InterpreterCore.cpp:
+	.text       start:0x802DE284 end:0x802E0010
+	.ctors      start:0x804DBA1C end:0x804DBA20
+	.data       start:0x8052EDC8 end:0x8052EED4
+	.sdata      start:0x806DF460 end:0x806DF468
+	.sdata2     start:0x806E6490 end:0x806E64B0
+
 unclassified/tu_802E3D4C.cpp:
 	.text       start:0x802E3D4C end:0x802E4338
 

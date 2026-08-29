@@ -7,30 +7,52 @@
 class cTeam;
 class InterpreterCore;
 
-class UnidentifiedFuzzyVariantBase : public Variant
+class FuzzyVariant : public Variant
 {
 public:
-    UnidentifiedFuzzyVariantBase()
+    FuzzyVariant()
+        : Variant()
     {
     }
 
-    UnidentifiedFuzzyVariantBase(const UnidentifiedFuzzyVariantBase& other)
+    FuzzyVariant(const FuzzyVariant& other)
         : Variant(other)
     {
     }
 
-    UnidentifiedFuzzyVariantBase(const Variant& other)
+    FuzzyVariant(const Variant& other)
         : Variant(other)
     {
     }
 
+    FuzzyVariant(float value)
+        : Variant(FT_FLOAT, value)
+    {
+    }
+
+    FuzzyVariant(cPlayer* value)
+        : Variant()
+    {
+        mType = FT_PLAYER;
+        mData.pPlayer = value;
+    }
+
+    template <typename T>
+    FuzzyVariant(eVariantType type, T value)
+        : Variant(type, value)
+    {
+    }
+
+    virtual unsigned long GetHash() const;
+    virtual NLString ToString() const;
+    virtual bool IsPointerType() const;
 };
 
-class UnidentifiedFuzzyVariantData : public Variant
+class UnidentifiedFuzzyVariantData : public FuzzyVariant
 {
 public:
     UnidentifiedFuzzyVariantData(
-        int index, const UnidentifiedFuzzyVariantBase& value);
+        int index, const FuzzyVariant& value);
 
     UnidentifiedFuzzyVariantData& operator=(
         const UnidentifiedFuzzyVariantData& other)
@@ -47,21 +69,36 @@ public:
     int mIndex;
 };
 
-class UnidentifiedFuzzyVariantDataSet
+class UnidentifiedVariantCollection
 {
 public:
-    UnidentifiedFuzzyVariantDataSet();
-    ~UnidentifiedFuzzyVariantDataSet();
+    UnidentifiedVariantCollection();
+    ~UnidentifiedVariantCollection();
 
     bool IsSet(int index) const;
+    Variant* Get(int index);
     void Remove(int index);
+    void Set(int index, const Variant& value);
 
     UnidentifiedFuzzyVariantData* mData[19];
 };
 
-class UnidentifiedVariant_80054AB8 : public UnidentifiedFuzzyVariantBase
+class UnidentifiedVariant_80054AB8 : public FuzzyVariant
 {
 public:
+    UnidentifiedVariant_80054AB8(cPlayer* value)
+        : FuzzyVariant(value)
+        , mTemporary(false)
+    {
+    }
+
+    template <typename T>
+    UnidentifiedVariant_80054AB8(eVariantType type, T value)
+        : FuzzyVariant(type, value)
+        , mTemporary(false)
+    {
+    }
+
     UnidentifiedVariant_80054AB8(const UnidentifiedVariant_80054AB8& other);
     UnidentifiedVariant_80054AB8(UnidentifiedVariant_80054AB8* other);
 
@@ -87,30 +124,30 @@ public:
     }
 
     float Confidence;
-    UnidentifiedFuzzyVariantDataSet ExtraData;
+    UnidentifiedVariantCollection ExtraData;
     bool mTemporary;
 };
 
 extern BasicSlotPool<UnidentifiedFuzzyVariantData> lbl_80584200;
 extern BasicSlotPool<UnidentifiedVariant_80054AB8> lbl_805842C8;
 
-extern "C" void fn_8030EDB0(UnidentifiedFuzzyVariantDataSet*);
-extern "C" void fn_8030EEB8(UnidentifiedFuzzyVariantDataSet*, int);
+extern "C" void fn_8030EEB8(UnidentifiedVariantCollection*, int);
 extern "C" bool fn_8030F030(
-    const UnidentifiedFuzzyVariantDataSet*, int);
+    const UnidentifiedVariantCollection*, int);
+extern "C" Variant* fn_8030F060(UnidentifiedVariantCollection*, int);
 extern "C" UnidentifiedVariant_80054AB8 fn_80054AB8(InterpreterCore*, const char*, cTeam*);
 
-inline UnidentifiedFuzzyVariantDataSet::UnidentifiedFuzzyVariantDataSet()
-{
-    fn_8030EDB0(this);
-}
-
-inline bool UnidentifiedFuzzyVariantDataSet::IsSet(int index) const
+inline bool UnidentifiedVariantCollection::IsSet(int index) const
 {
     return fn_8030F030(this, index);
 }
 
-inline void UnidentifiedFuzzyVariantDataSet::Remove(int index)
+inline Variant* UnidentifiedVariantCollection::Get(int index)
+{
+    return fn_8030F060(this, index);
+}
+
+inline void UnidentifiedVariantCollection::Remove(int index)
 {
     fn_8030EEB8(this, index);
 }
@@ -122,7 +159,7 @@ inline void UnidentifiedVariant_80054AB8::operator delete(void* entry)
 
 inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
     const UnidentifiedVariant_80054AB8& other)
-    : UnidentifiedFuzzyVariantBase(other)
+    : FuzzyVariant(other)
 {
     for (int i = 0; i < 19; i++)
     {
@@ -132,7 +169,7 @@ inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
             {
                 ExtraData.mData[i] = new (lbl_80584200.Allocate())
                     UnidentifiedFuzzyVariantData(
-                        i, UnidentifiedFuzzyVariantBase(*other.ExtraData.mData[i]));
+                        i, FuzzyVariant(*other.ExtraData.mData[i]));
             }
             else
             {
@@ -150,7 +187,7 @@ inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
 
 inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
     UnidentifiedVariant_80054AB8* other)
-    : UnidentifiedFuzzyVariantBase(*other)
+    : FuzzyVariant(*other)
 {
     for (int i = 0; i < 19; i++)
     {
@@ -160,7 +197,7 @@ inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
             {
                 ExtraData.mData[i] = new (lbl_80584200.Allocate())
                     UnidentifiedFuzzyVariantData(
-                        i, UnidentifiedFuzzyVariantBase(*other->ExtraData.mData[i]));
+                        i, FuzzyVariant(*other->ExtraData.mData[i]));
             }
             else
             {
@@ -184,8 +221,7 @@ inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
     const UnidentifiedVariant_80054AB8& other)
 {
     {
-        UnidentifiedFuzzyVariantBase base(
-            (const UnidentifiedFuzzyVariantBase&)other);
+        FuzzyVariant base((const FuzzyVariant&)other);
         Variant value(base);
         Reset();
         CopyFrom(value);
@@ -199,7 +235,7 @@ inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
             {
                 ExtraData.mData[i] = new (lbl_80584200.Allocate())
                     UnidentifiedFuzzyVariantData(
-                        i, UnidentifiedFuzzyVariantBase(*other.ExtraData.mData[i]));
+                        i, FuzzyVariant(*other.ExtraData.mData[i]));
             }
             else
             {
@@ -215,23 +251,5 @@ inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
     mTemporary = false;
     return *this;
 }
-
-class FuzzyVariant : public Variant
-{
-public:
-    FuzzyVariant()
-        : Variant()
-    {
-    }
-
-    FuzzyVariant(float value)
-        : Variant(FT_FLOAT, value)
-    {
-    }
-
-    virtual unsigned long GetHash() const;
-    virtual NLString ToString() const;
-    virtual bool IsPointerType() const;
-};
 
 #endif // GAME_AI_FUZZYVARIANT_H
