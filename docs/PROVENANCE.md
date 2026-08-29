@@ -18,12 +18,20 @@ The project was built with or adapted source from the following projects:
 | [doldecomp/Rhae at `35929a0`](https://github.com/doldecomp/Rhae/tree/35929a0bfcca6c55c6305a72cc86caef54203c1f) | Expanded RVL SDK AXFX reverb reconstructions. |
 | [doldecomp/mkw at `94585b8`](https://github.com/doldecomp/mkw/tree/94585b8a8fd7a2a52f30640ccff316e57880b6c1) | DWC allocator and initialization reconstructions, plus DWC GHTTP, common-utility, friend-unit, login-unit, main-unit, and transport-unit symbol and boundary references. |
 | [DarkRTA/rb3 at `ababaa9`](https://github.com/DarkRTA/rb3/tree/ababaa9bb6a669af06aa7def7dd735c4f5265061) | DWC report and initialization structural references. |
+| [pret/pokerevo at `ae02670`](https://github.com/pret/pokerevo/tree/ae02670ef33650e44313443dd95180f485150d84) | PowerPC DWC non-port, digest, and account function identities and code-shape references. |
+| [pret/pokediamond at `038ccca`](https://github.com/pret/pokediamond/tree/038cccaed5de8f013875bc5d734f912d1de08e0f) | Nitro SDK CRC API, structure, and source reconstruction. |
+| [RushRE/SonicRushAdventure-Decomp at `94de7ce`](https://github.com/RushRE/SonicRushAdventure-Decomp/tree/94de7ce8e95c1136f8d14e93f1dc3c07d10f20b9) | Nitro SDK random-number API and inline implementation reference. |
+| [NicholasMoser/Naruto-GNT-Modding at `a16d1c0`](https://github.com/NicholasMoser/Naruto-GNT-Modding/tree/a16d1c03572832d168d096c405fa085b04d86050) | DWC `dwci_np_math.c` retail-map ownership and retained-function reference. |
+| [MelgMKW/Pulsar at `820ad92`](https://github.com/MelgMKW/Pulsar/tree/820ad929c3c7141a0396692d8b0896d1546240fd) | Mario Kart Wii retail-map identities and ordering for DWC non-port and authentication helpers. |
+| [doldecomp/brawl at `ec22759`](https://github.com/doldecomp/brawl/tree/ec2275908c1b22af4e47cc57bee51e070aff2adb) | DWC time-helper code-shape and `DWC_GetDateTime` identity reference. |
+| [NitroDWC 1.2 patch-plus4 (2006-08-25)](https://twlsdk.randommeaninglesscharacters.com/download/NitroDWC/NitroDWC-1_2-patch-plus4-20060825.zip) | DWC account, NAS-time, and ranking API, structure, semantics, and donor naming reference. |
 | [zeldaret/oot-vc at `9c18537`](https://github.com/zeldaret/oot-vc/tree/9c1853710bcf6b598b0710022fdb87b9a8e99e2c) | MetroTRK, RVL SDK, and Home Button Menu (`nw4hbm`) reconstructions. |
 | [projectPiki/pik1wii at `96c1af6`](https://github.com/projectPiki/pik1wii/tree/96c1af63ed75996755e53bb85decce3c890e5ca4) | RVL SDK WPAD encryption and HID parser reconstructions. |
 | [conhlee/rhf at `4429cbc`](https://github.com/conhlee/rhf/tree/4429cbcb000abff644683d98701f6ab8c1671e10) | RVL SDK `DVDSetAutoInvalidation` reconstruction. |
 | [zeldaret/tp at `ecafc81`](https://github.com/zeldaret/tp/tree/ecafc81d53cadf3c29ac01b03170cbe9bc37c686) | RVL SDK reconstructions. |
 | [yannicksuter/smstrikers-decomp at `6123c35`](https://github.com/yannicksuter/smstrikers-decomp/tree/6123c3546baf59aa5d564e98fdd76cf16443c80f) | Predecessor game code, Dolphin SDK lineage, and Next Level Games' ODE extensions. |
 | Open Dynamics Engine 0.5 (`ode-040529`) | Baseline for ODE-derived source. |
+| [zlib 1.2.2](https://zlib.net/fossils/zlib-1.2.2.tar.gz) | Pristine upstream decompression and checksum sources. |
 
 `libs/RVL_SDK/include/revolution/bte.h` declares the handful of Broadcom BTE
 types and entry points the SDK's WPAD and WUD headers refer to (`BD_ADDR`,

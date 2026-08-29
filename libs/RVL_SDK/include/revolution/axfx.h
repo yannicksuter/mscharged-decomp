@@ -8,6 +8,7 @@ extern "C" {
 #include <revolution/axfx/AXFXChorusExp.h>
 #include <revolution/axfx/AXFXCommon.h>
 #include <revolution/axfx/AXFXDelay.h>
+#include <revolution/axfx/AXFXDelayExpDpl2.h>
 #include <revolution/axfx/AXFXHooks.h>
 #include <revolution/axfx/AXFXLfoTable.h>
 #include <revolution/axfx/AXFXReverbHi.h>

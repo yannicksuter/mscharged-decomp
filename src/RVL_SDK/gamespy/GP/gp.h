@@ -978,8 +978,6 @@ GPResult gpGetBuddyStatus(GPConnection* connection, int index,
 GPResult gpGetBuddyStatusInfo(GPConnection* connection, int index,
                               GPBuddyStatusInfo* statusInfo);
 
-GPResult gpSetBuddyAddr(GPConnection* connection, int index,
-                        unsigned int buddyIp, unsigned short buddyPort);
 #endif
 // gpGetBuddyIndex
 //////////////////

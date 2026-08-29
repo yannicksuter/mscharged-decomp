@@ -142,10 +142,9 @@ void cCameraManager::GetViewVector(nlVector3& viewVector)
 float cCameraManager::GetDistanceFromCameraToObject(const nlVector3& objectPosition)
 {
     nlVector3 diff;
-    nlVec3Set(diff,
-        objectPosition.x - cCameraManager::m_cameraPosition.x,
-        objectPosition.y - cCameraManager::m_cameraPosition.y,
-        objectPosition.z - cCameraManager::m_cameraPosition.z);
+    float dy = objectPosition.y - cCameraManager::m_cameraPosition.y;
+    float dx = objectPosition.x - cCameraManager::m_cameraPosition.x;
+    nlVec3Set(diff, dx, dy, objectPosition.z - cCameraManager::m_cameraPosition.z);
 
     return nlSqrt(((diff.x) * (diff.x)) + ((diff.y) * (diff.y)) + ((diff.z) * (diff.z)), 1);
 }
@@ -177,10 +176,11 @@ cBaseCamera* cCameraManager::PopCameraWithTransition(float fDuration, eCameraTra
         }
     }
 
+    float fTransitionTime = m_fTransitionTime;
     m_transition = transition;
     m_pCallback = pCallback;
     m_fTransitionSpeed = 1.0f / fDuration;
-    m_fTransitionTime = 1.0f - m_fTransitionTime;
+    m_fTransitionTime = 1.0f - fTransitionTime;
 
     cBaseCamera* pCamera = nlDLRingRemoveStart<cBaseCamera>(&m_cameraStack);
     for (int i = 0; i < 2; i++)
@@ -692,11 +692,15 @@ void cCameraManager::Shutdown()
     cAnimCamera::FreeCameraAnimations();
 
     if (lbl_806E0EDC != 0)
+    {
         delete lbl_806E0EDC;
-    lbl_806E0EDC = NULL;
+        lbl_806E0EDC = NULL;
+    }
     if (lbl_806E0EE0 != 0)
+    {
         delete lbl_806E0EE0;
-    lbl_806E0EE0 = NULL;
+        lbl_806E0EE0 = NULL;
+    }
 }
 
 /**
@@ -743,7 +747,6 @@ extern "C" void fn_800F06D4()
  */
 extern "C" void fn_800F030C(bool bUnidentified)
 {
-    int i;
     cBaseCamera* pBaseCamera;
     char fileName[100];
     lbl_806E0ED8 = bUnidentified;
@@ -781,13 +784,12 @@ extern "C" void fn_800F030C(bool bUnidentified)
         if (nlLoadEntireFileAsync("art/cameras/ShootToScoreCamera.cam", fn_800F02DC, (void*)"ShootToScoreCamera", 0x20, AllocateEnd, 0, 0, 0))
             lbl_806E0ED0++;
 
-        i = 0;
-        char* camName = lbl_8056DD70[i];
-        for (; i < 12; i++, camName += 100)
+        int i = 0;
+        for (; i < 12; i++)
         {
             nlSNPrintf(fileName, 100, "art/cameras/%s_shoottoscorecamera.cam", fn_801CBE80(i));
-            nlSNPrintf(camName, 100, "%s_ShootToScoreCamera", fn_801CBE80(i));
-            if (nlLoadEntireFileAsync(fileName, fn_800F02DC, (void*)camName, 0x20, AllocateEnd, 0, 0, 0))
+            nlSNPrintf(lbl_8056DD70[i], 100, "%s_ShootToScoreCamera", fn_801CBE80(i));
+            if (nlLoadEntireFileAsync(fileName, fn_800F02DC, (void*)lbl_8056DD70[i], 0x20, AllocateEnd, 0, 0, 0))
                 lbl_806E0ED0++;
         }
 

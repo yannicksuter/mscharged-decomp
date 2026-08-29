@@ -92,12 +92,12 @@ extern "C"
     f32 fn_803A43C4(u16 efbHeight, u16 xfbHeight);
     void fn_803A7828(f32 x, f32 y, f32 width, f32 height, f32 nearZ, f32 farZ);
     void fn_803A78A4(u32 x, u32 y, u32 width, u32 height);
-    void fn_803A41BC(u16 left, u16 top, u16 width, u16 height);
-    void fn_803A423C(u16 width, u16 height);
-    void fn_803A45F4(f32 scale);
-    void fn_803A491C(s32 gamma);
+    void GXSetDispCopySrc(u16 left, u16 top, u16 width, u16 height);
+    void GXSetDispCopyDst(u16 width, u16 height);
+    void GXSetDispCopyYScale(f32 scale);
+    void GXSetDispCopyGamma(s32 gamma);
     void fn_803A6FE8(u8 fieldMode, u8 halfAspectRatio);
-    void fn_803A1D10(void* fifo, u32 highWatermark, u32 lowWatermark);
+    void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
     void* fn_80372B30(u32 size, s32 arena);
     void fn_8004F594(s32 category, const char* format, ...);
     void fn_8036D89C();
@@ -109,11 +109,11 @@ extern "C"
     void fn_803640DC();
     void fn_8036DF24(PlatformRenderTarget* target, bool flag0, bool flag1);
 
-    extern GXRenderModeObj lbl_8053BC30;
+    extern GXRenderModeObj GXNtsc480IntDf;
     extern GXRenderModeObj lbl_8053BC6C;
     extern GXRenderModeObj lbl_8053BCA8;
-    extern GXRenderModeObj lbl_8053BCE4;
-    extern GXRenderModeObj lbl_8053BD5C;
+    extern GXRenderModeObj GXMpal480IntDf;
+    extern GXRenderModeObj GXEurgb60Hz480IntDf;
     extern GXRenderModeObj lbl_8053BD98;
     extern GXRenderModeObj lbl_8053BDD4;
 }
@@ -196,15 +196,15 @@ static void glx_InitGX()
     GXRenderModeObj& mode = glx_rmode;
     fn_803A7828(0.0f, 0.0f, (f32)mode.fbWidth, (f32)mode.efbHeight, 0.0f, 1.0f);
     fn_803A78A4(0, 0, mode.fbWidth, mode.efbHeight);
-    fn_803A41BC(0, 0, mode.fbWidth, mode.efbHeight);
-    fn_803A423C(mode.fbWidth, mode.xfbHeight);
-    fn_803A45F4(glx_CopyDispScaleFactor);
+    GXSetDispCopySrc(0, 0, mode.fbWidth, mode.efbHeight);
+    GXSetDispCopyDst(mode.fbWidth, mode.xfbHeight);
+    GXSetDispCopyYScale(glx_CopyDispScaleFactor);
     GXSetCopyFilter(mode.aa, mode.sample_pattern, true, mode.vfilter);
     fn_803A6FE8(true, false);
     gxSetDither(true);
     gxSetColourUpdate(true);
     gxSetAlphaUpdate(true);
-    fn_803A491C(0);
+    GXSetDispCopyGamma(0);
 
     for (int stage = 0; stage < 16; stage++)
     {
@@ -261,7 +261,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     {
     case 0:
         glx_VideoMode = 0;
-        renderMode = &lbl_8053BC30;
+        renderMode = &GXNtsc480IntDf;
         break;
     case 1:
         glx_VideoMode = 1;
@@ -269,11 +269,11 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
         break;
     case 2:
         glx_VideoMode = 2;
-        renderMode = &lbl_8053BCE4;
+        renderMode = &GXMpal480IntDf;
         break;
     case 5:
         glx_VideoMode = 4;
-        renderMode = &lbl_8053BD5C;
+        renderMode = &GXEurgb60Hz480IntDf;
         break;
     default:
         extern void nlBreak();
@@ -297,7 +297,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     }
     else if (tvFormat == 5 || SCGetEuRgb60Mode() == 1)
     {
-        renderMode = &lbl_8053BD5C;
+        renderMode = &GXEurgb60Hz480IntDf;
         OSReport("Setting Interlaced EURGB60 Mode\n");
     }
 
@@ -326,7 +326,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
         return false;
     }
     glx_FIFO = GXInit(glx_FIFOMem, glx_FIFOSize);
-    fn_803A1D10(glx_FIFO, glx_FIFOSize - 0x10000, glx_FIFOSize - 0x40000);
+    GXInitFifoLimits(glx_FIFO, glx_FIFOSize - 0x10000, glx_FIFOSize - 0x40000);
 
     u32 fbSize = ((glx_rmode.fbWidth + 15) & 0xFFF0) * glx_rmode.xfbHeight * 2;
     if (fbSize < 0x9F600)

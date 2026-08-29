@@ -5,6 +5,7 @@
 #include <revolution/ipc.h>
 #include <revolution/os.h>
 #include <revolution/os.h>
+#include <string.h>
 
 const char* __SO_VERSION =
     "<< RVL_SDK - SO \trelease build: Mar  9 2007 15:08:35 (0x4199_60831) >>";
@@ -25,6 +26,56 @@ s32 NWC24iStartupSocket(s32*);
 s32 NWC24iCleanupSocket(s32*);
 s32 NWC24iLockSocket();
 s32 NWC24iUnlockSocket();
+
+int SOInit(SOLibraryConfig* config) {
+  OSThread* cur;
+  void* ptr;
+  int result = SO_SUCCESS;
+  int enabled = OSDisableInterrupts();
+
+  if (!soRegistered) {
+    OSRegisterVersion(__SO_VERSION);
+    soRegistered = true;
+  }
+
+  switch (soState) {
+  case SO_INTERNAL_STATE_READY:
+  case SO_INTERNAL_STATE_ACTIVE:
+    result = SO_EALREADY;
+    break;
+  case SO_INTERNAL_STATE_TERMINATED:
+  default:
+    if (config == NULL || config->alloc == NULL || config->free == NULL) {
+      result = SO_EINVAL;
+      break;
+    }
+
+    memset(&soWork, 0, sizeof(soWork));
+    soWork.allocFunc = config->alloc;
+    soWork.freeFunc = config->free;
+    soWork.allocCount = 0;
+    soWork.rmState = SO_INTERNAL_RM_STATE_CLOSED;
+    soWork.rmFd = -1;
+
+    ptr = SOiAlloc(0xB, 0x460);
+    soWork._unk10 = (u32)ptr;
+
+    if (ptr == NULL) {
+      result = SO_ENOMEM;
+    } else {
+      soState = SO_INTERNAL_STATE_READY;
+    }
+    break;
+  }
+
+  cur = OSGetCurrentThread();
+  if (cur)
+    cur->error = result;
+  else
+    soError = result;
+  OSRestoreInterrupts(enabled);
+  return result;
+}
 
 int SOFinish(void) {
   OSThread* cur;

@@ -1,5 +1,6 @@
 #include <dwc/dwc_main.h>
 
+#include <dwc/dwc_auth_interface.h>
 #include <dwc/dwc_error.h>
 #include <dwc/dwc_report.h>
 #include <revolution/types.h>
@@ -36,8 +37,6 @@ static DWCLoginControlView* sLoginControl;
 
 u64 fn_8049D8E8(DWCLoginIdView* arg0);
 u32 fn_8049D8F8(DWCLoginIdView* arg0);
-BOOL fn_8049F704(void);
-void fn_8049EF74(void);
 BOOL fn_8048C8D0(void);
 
 void fn_8048C214(DWCLoginControlView* arg0, DWCUserDataView* arg1, void* arg2, u32 arg3,
@@ -106,9 +105,9 @@ void fn_8048C54C(int arg0, int arg1)
 
 void fn_8048C5D0(void)
 {
-    if (!fn_8049F704())
+    if (!DWCi_Auth_IsFinished())
     {
-        fn_8049EF74();
+        DWCi_Auth_AbortAuthentication();
     }
     sLoginControl = NULL;
 }

@@ -19,6 +19,8 @@
 #include "gsCommon.h"
 
 typedef gsi_i16 int_least16_t;
+typedef gsi_u32 uint32_t;
+typedef gsi_u8 uint8_t;
 
 #ifndef _SHA_enum_
 #define _SHA_enum_

@@ -26,6 +26,8 @@ typedef enum {
 
 typedef void* (*DWCAllocEx)(DWCAllocType name, u32 size, int align);
 typedef void (*DWCFreeEx)(DWCAllocType name, void* ptr, u32 size);
+typedef void* (*DWCAllocFunc)(DWCAllocType name, u32 size);
+typedef void (*DWCFreeFunc)(DWCAllocType name, void* ptr, u32 size);
 
 void* DWC_Alloc(DWCAllocType name, u32 size);
 void* DWC_AllocEx(DWCAllocType name, u32 size, int align);

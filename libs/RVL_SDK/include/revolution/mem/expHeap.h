@@ -49,6 +49,10 @@ void* MEMAllocFromExpHeapEx(MEMHeapHandle heap, u32 size, int alignment);
 void MEMFreeToExpHeap(MEMHeapHandle heap, void* memBlock);
 u32 MEMGetAllocatableSizeForExpHeapEx(MEMHeapHandle heap, int alignment);
 
+static inline u32 MEMGetAllocatableSizeForExpHeap(MEMHeapHandle heap) {
+    return MEMGetAllocatableSizeForExpHeapEx(heap, 4);
+}
+
 #ifdef __cplusplus
 }
 #endif

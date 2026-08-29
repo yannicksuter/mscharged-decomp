@@ -223,6 +223,21 @@ public:
         Clear();
     }
 
+    Function2& operator=(const Function2& other)
+    {
+        Clear();
+        mTag = other.mTag;
+        if (mTag == FUNCTION_FREE)
+        {
+            mFreeFunction = other.mFreeFunction;
+        }
+        else if (mTag == FUNCTION_FUNCTOR)
+        {
+            mFunctor = other.mFunctor->Clone();
+        }
+        return *this;
+    }
+
     void Clear()
     {
         if (mTag == FUNCTION_FUNCTOR)

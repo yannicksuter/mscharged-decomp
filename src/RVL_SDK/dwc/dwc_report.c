@@ -6,11 +6,11 @@
 
 static u32 sReportLevel = 0;
 
-void DWC_SetReportLevel(int level) {
+void DWC_SetReportLevel(u32 level) {
     sReportLevel = level;
 }
 
-void DWC_Printf(int id, const char* format, ...) {
+void DWC_Printf(u32 id, const char* format, ...) {
     va_list args;
     if ((id & sReportLevel) == 0) return;
     switch (id) {

@@ -17,9 +17,14 @@ typedef struct _FILE FILE;
 
 #define EOF (-1)
 
-/* SEEK_SET/SEEK_CUR/SEEK_END are deliberately absent: nw4hbm's
+/* SEEK_SET/SEEK_CUR/SEEK_END are defined for C only: nw4hbm's
    ut::FileStream::SeekOrigin spells its enumerators with those names, and a
    macro would rewrite them in every C++ unit that reaches both headers. */
+#ifndef __cplusplus
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
+#endif
 
 extern FILE* stdin;
 extern FILE* stdout;
@@ -36,6 +41,7 @@ int fflush(FILE* stream);
 int fprintf(FILE* stream, const char* format, ...);
 int printf(const char* format, ...);
 int sprintf(char* s, const char* format, ...);
+int sscanf(const char* s, const char* format, ...);
 int snprintf(char* s, size_t n, const char* format, ...);
 int vprintf(const char* format, va_list arguments);
 int vsprintf(char* s, const char* format, va_list arguments);

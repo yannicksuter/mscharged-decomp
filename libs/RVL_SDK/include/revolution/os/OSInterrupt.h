@@ -61,6 +61,9 @@ OSInterruptHandler __OSSetInterruptHandler(OSInterruptType type, OSInterruptHand
 OSInterruptHandler __OSGetInterruptHandler(OSInterruptType type);
 typedef s16 __OSInterrupt;
 
+#define __OS_INTERRUPT_PI_CP OS_INTR_PI_CP
+#define OS_INTERRUPTMASK_PI_CP OS_INTR_MASK(OS_INTR_PI_CP)
+
 void __OSInterruptInit(void);
 u32 __OSMaskInterrupts(u32 userMask);
 u32 __OSUnmaskInterrupts(u32 userMask);

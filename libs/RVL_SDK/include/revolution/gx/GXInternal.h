@@ -29,16 +29,29 @@ extern "C" {
     } name;
 
 typedef struct _GXFifoObjImpl {
-    void* base;        // at 0x0
-    void* end;         // at 0x4
-    u32 size;          // at 0x8
-    void* hiWatermark; // at 0xC
-    void* loWatermark; // at 0x10
-    void* readPtr;     // at 0x14
-    void* writePtr;    // at 0x18
-    u32 count;         // at 0x1C
-    u8 wrap;           // at 0x20
+    u8* base;        // at 0x0
+    union {
+        u8* top;
+        u8* end;
+    };               // at 0x4
+    u32 size;        // at 0x8
+    u32 hiWatermark; // at 0xC
+    u32 loWatermark; // at 0x10
+    union {
+        void* rdPtr;
+        void* readPtr;
+    };               // at 0x14
+    union {
+        void* wrPtr;
+        void* writePtr;
+    };               // at 0x18
+    s32 count;       // at 0x1C
+    GXBool wrap;     // at 0x20
+    GXBool bind_cpu; // at 0x21
+    GXBool bind_gp;  // at 0x22
 } GXFifoObjImpl;
+
+typedef GXFifoObjImpl __GXFifoObj;
 
 typedef struct _GXLightObjImpl {
     char UNK_0x0[0xC];
@@ -58,20 +71,45 @@ typedef struct _GXLightObjImpl {
 } GXLightObjImpl;
 
 typedef struct _GXTexObjImpl {
-    u8 todo;
+    u32 mode0;
+    u32 mode1;
+    u32 image0;
+    u32 image3;
+    void* userData;
+    GXTexFmt fmt;
+    u32 tlutName;
+    u16 loadCnt;
+    u8 loadFmt;
+    u8 flags;
 } GXTexObjImpl;
 
+typedef GXTexObjImpl __GXTexObjInt;
+
 typedef struct _GXTlutObjImpl {
-    u8 todo;
+    u32 tlut;
+    u32 loadTlut0;
+    u16 numEntries;
 } GXTlutObjImpl;
 
+typedef GXTlutObjImpl __GXTlutObjInt;
+
 typedef struct _GXTexRegionImpl {
-    u8 todo;
+    u32 image1;
+    u32 image2;
+    u16 sizeEven;
+    u16 sizeOdd;
+    u8 is32bMipmap;
+    u8 isCached;
 } GXTexRegionImpl;
 
+typedef GXTexRegionImpl __GXTexRegionInt;
+
 typedef struct _GXTlutRegionImpl {
-    u8 todo;
+    u32 loadTlut1;
+    GXTlutObjImpl tlutObj;
 } GXTlutRegionImpl;
+
+typedef GXTlutRegionImpl __GXTlutRegionInt;
 
 #ifdef __cplusplus
 }

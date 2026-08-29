@@ -118,6 +118,11 @@ public:
     {
         Free(entry);
     }
+
+    void Delete(T* entry)
+    {
+        Free(entry);
+    }
 };
 
 template <typename T>

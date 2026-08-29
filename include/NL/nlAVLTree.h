@@ -113,6 +113,13 @@ public:
         return &((Entry*)existingNode)->value;
     }
 
+    void Remove(const KeyType& key)
+    {
+        Entry* removedEntry = (Entry*)RemoveAVLNode((AVLTreeNode**)&m_Root, (void*)&key);
+        if (removedEntry != 0)
+            m_Allocator.Free(removedEntry);
+    }
+
     template <typename CallbackType>
     void Walk(CallbackType* cbClass,
         void (CallbackType::*cb)(const KeyType&, ValueType*))
@@ -258,9 +265,7 @@ inline nlAVLTreeIterator<KeyType, ValueType, CompareType>*
 AVLTreeBase<KeyType, ValueType, AllocatorType, CompareType>::GetIterator()
 {
     typedef nlAVLTreeIterator<KeyType, ValueType, CompareType> Iterator;
-    Iterator* iterator = (Iterator*)nlMalloc(sizeof(Iterator), 8, false);
-    if (iterator != 0)
-        iterator->m_NumStackEntries = 0;
+    Iterator* iterator = new (8, false) Iterator();
     iterator->Initialize(m_Root);
     return iterator;
 }

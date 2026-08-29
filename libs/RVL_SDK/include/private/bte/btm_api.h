@@ -735,7 +735,7 @@ DEV_CLASS_PTR BTM_ReadDeviceClass(void);
 UINT8 *BTM_ReadLocalFeatures(void);
 tBTM_DEV_STATUS_CB *BTM_RegisterForDeviceStatusNotif(tBTM_DEV_STATUS_CB *p_cb);
 tBTM_STATUS BTM_VendorSpecificCommand(UINT16 opcode, UINT8 param_len,
-                                      UINT8 *p_param_buf, tBTM_CMPL_CB *p_cb);
+                                      UINT8 *p_param_buf, tBTM_VSC_CMPL_CB *p_cb);
 /**/
 tBTM_STATUS BTM_RegisterForVSEvents(tBTM_VS_EVT_CB *p_cb);
 tBTM_STATUS BTM_WritePageTimeout(UINT16 timeout);

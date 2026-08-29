@@ -23,7 +23,7 @@ void __a1_3d_data_type(u8 chan, u8* data);
 void __a1_3e_data_type(u8 chan, u8* data);
 void __a1_3f_data_type(u8 chan, u8* data);
 void __a1_unused_report(u8 chan, u8* data);
-void __parse_dpd_data(s32 chan, WPADStatus** p_status, u8 fmt, u8* p_data, u8 len);
+void __parse_dpd_data(WPADStatus** p_status, u8 fmt, u8* p_data, u8 len);
 
 #define HID_WPAD_BUTTON_MASK  (u16)(0x9F1F)
 #define HID_WPAD_BUTTON_CLEAR (u16)(0x60E0)
@@ -176,23 +176,23 @@ void getDevConfig(s32 chan, s32 result, WPADStatus* p_status, u8* data)
             {
                 DEBUGPrint("Dpd Setting is ok.\n");
 
-                p_status->obj[0].x = (s16)((s16)((u16)p_buf[index] & 0xFF) | (u16)((u16)(p_buf[index + 2] & 0x30) << 4));
-                p_status->obj[0].y = (s16)(WPAD_DPD_IMG_RESO_WY - 1 - (s16)((s16)(((u16)(p_buf[index + 1])) & 0xFF) | (u16)(((u16)(p_buf[index + 2] & 0xC0)) << 2)));
+                p_status->obj[0].x = (s16)((s16)((u16)data[index] & 0xFF) | (u16)((u16)(data[index + 2] & 0x30) << 4));
+                p_status->obj[0].y = (s16)(WPAD_DPD_IMG_RESO_WY - 1 - (s16)((s16)(((u16)(data[index + 1])) & 0xFF) | (u16)(((u16)(data[index + 2] & 0xC0)) << 2)));
                 p_status->obj[0].size = p_wpd->dpdDummyObjSize;
                 p_status->obj[0].traceId = 0;
 
-                p_status->obj[1].x = (s16)((s16)((u16)p_buf[index + 3] & 0xFF) | (u16)((u16)(p_buf[index + 2] & (u8)(0x30 >> 4)) << 8));
-                p_status->obj[1].y = (s16)(WPAD_DPD_IMG_RESO_WY - 1 - (s16)((s16)(((u16)(p_buf[index + 4])) & 0xFF) | (u16)(((u16)(p_buf[index + 2] & (u8)(0xC0 >> 4))) << 6)));
+                p_status->obj[1].x = (s16)((s16)((u16)data[index + 3] & 0xFF) | (u16)((u16)(data[index + 2] & (u8)(0x30 >> 4)) << 8));
+                p_status->obj[1].y = (s16)(WPAD_DPD_IMG_RESO_WY - 1 - (s16)((s16)(((u16)(data[index + 4])) & 0xFF) | (u16)(((u16)(data[index + 2] & (u8)(0xC0 >> 4))) << 6)));
                 p_status->obj[1].size = p_wpd->dpdDummyObjSize;
                 p_status->obj[1].traceId = 1;
 
-                p_status->obj[2].x = (s16)((s16)((u16)p_buf[index + 5] & 0xFF) | (u16)((u16)(p_buf[index + 7] & 0x30) << 4));
-                p_status->obj[2].y = (s16)(WPAD_DPD_IMG_RESO_WY - 1 - (s16)((s16)(((u16)(p_buf[index + 6])) & 0xFF) | (u16)(((u16)(p_buf[index + 7] & 0xC0)) << 2)));
+                p_status->obj[2].x = (s16)((s16)((u16)data[index + 5] & 0xFF) | (u16)((u16)(data[index + 7] & 0x30) << 4));
+                p_status->obj[2].y = (s16)(WPAD_DPD_IMG_RESO_WY - 1 - (s16)((s16)(((u16)(data[index + 6])) & 0xFF) | (u16)(((u16)(data[index + 7] & 0xC0)) << 2)));
                 p_status->obj[2].size = p_wpd->dpdDummyObjSize;
                 p_status->obj[2].traceId = 2;
 
-                p_status->obj[3].x = (s16)((s16)((u16)p_buf[index + 8] & 0xFF) | (u16)((u16)(p_buf[index + 7] & (u8)(0x30 >> 4)) << 8));
-                p_status->obj[3].y = (s16)(WPAD_DPD_IMG_RESO_WY - 1 - (s16)((s16)(((u16)(p_buf[index + 9])) & 0xFF) | (u16)(((u16)(p_buf[index + 7] & (u8)(0xC0 >> 4))) << 6)));
+                p_status->obj[3].x = (s16)((s16)((u16)data[index + 8] & 0xFF) | (u16)((u16)(data[index + 7] & (u8)(0x30 >> 4)) << 8));
+                p_status->obj[3].y = (s16)(WPAD_DPD_IMG_RESO_WY - 1 - (s16)((s16)(((u16)(data[index + 9])) & 0xFF) | (u16)(((u16)(data[index + 7] & (u8)(0xC0 >> 4))) << 6)));
                 p_status->obj[3].size = p_wpd->dpdDummyObjSize;
                 p_status->obj[3].traceId = 3;
 
@@ -570,8 +570,8 @@ void __a1_20_status_report(u8 chan, u8* data)
         {
             DEBUGPrint("initialize attachment\n");
 
-            _retryCnt[chan] = 0;
             extcb = p_wpd->extensionCallback;
+            _retryCnt[chan] = 0;
             initExtension(chan);
 
             p_wpd->calibrated = 0;
@@ -666,7 +666,10 @@ void __a1_21_user_data(u8 chan, u8* data)
 
         if (p_wpd->cmdBlkCallback)
         {
-            p_wpd->cmdBlkCallback(chan, WPAD_ERR_TRANSFER);
+            if (p_wpd->extensionCallback == NULL || p_wpd->extensionCallback != p_wpd->cmdBlkCallback)
+            {
+                p_wpd->cmdBlkCallback(chan, WPAD_ERR_TRANSFER);
+            }
             p_wpd->cmdBlkCallback = NULL;
         }
         p_wpd->status = WPAD_ERR_OK;
@@ -785,7 +788,7 @@ void __a1_22_ack(u8 chan, u8* data)
     OSRestoreInterrupts(enable);
 }
 
-void __parse_dpd_data(s32 chan, WPADStatus** p_status, u8 fmt, u8* p_data, u8 len)
+void __parse_dpd_data(WPADStatus** p_status, u8 fmt, u8* p_data, u8 len)
 {
     u8 i;
     u8 x;
@@ -878,9 +881,9 @@ void __a1_30_data_type(u8 chan, u8* data)
 
     if (p_cb->dataFormat == WPAD_FMT_CORE_BTN)
     {
-        p_status->err = p_cb->status;
+        p_status->err = WPAD_ERR_OK;
     }
-    else if (p_cb->status == 0)
+    else
     {
         p_status->err = WPAD_ERR_INVALID;
     }
@@ -911,9 +914,9 @@ void __a1_31_data_type(u8 chan, u8* data)
 
     if (p_cb->dataFormat == WPAD_FMT_CORE_BTN || p_cb->dataFormat == WPAD_FMT_CORE_BTN_ACC)
     {
-        p_status->err = p_cb->status;
+        p_status->err = WPAD_ERR_OK;
     }
-    else if (p_cb->status == 0)
+    else
     {
         p_status->err = WPAD_ERR_INVALID;
     }
@@ -951,9 +954,9 @@ void __a1_32_data_type(u8 chan, u8* data)
 
     if (p_cb->dataFormat == WPAD_FMT_CORE_BTN || p_cb->dataFormat == WPAD_FMT_FS_BTN || p_cb->dataFormat == WPAD_FMT_CLASSIC_BTN)
     {
-        p_status->err = p_cb->status;
+        p_status->err = WPAD_ERR_OK;
     }
-    else if (p_cb->status == 0)
+    else
     {
         p_status->err = WPAD_ERR_INVALID;
     }
@@ -1021,8 +1024,8 @@ void __a1_32_data_type(u8 chan, u8* data)
             case 1:
                 p_clStat = (WPADCLStatus*)&p_cb->rxBufs[p_cb->rxBufIndex];
 
-                p_clStat->clLStickX = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE9]) & (s16)0x003F) << 4));
-                p_clStat->clLStickY = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE10]) & (s16)0x003F) << 4));
+                p_clStat->clLStickX = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE9]) & (s16)0x003F) << 4) - (s16)(1024 / 2));
+                p_clStat->clLStickY = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE10]) & (s16)0x003F) << 4) - (s16)(1024 / 2));
                 p_clStat->clRStickX = (s16)((s16)((s16)((s16)((s16)((s16)(data[HID_IDX_BYTE9]) >> 3) & (s16)0x0018) | (s16)((s16)((s16)(data[HID_IDX_BYTE10]) >> 5) & (s16)0x0006) | (s16)((s16)((s16)(data[HID_IDX_BYTE11]) >> 7) & (s16)0x0001))
                                                   << 5)
                                             - (s16)(1024 / 2));
@@ -1073,26 +1076,26 @@ void __a1_32_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clLStickX - p_cb->extConf.cl.lstk.x);
             y = (s16)(p_clStat->clLStickY - p_cb->extConf.cl.lstk.y);
 
-            if (x < -0x400)
+            if (x < -0x200)
             {
-                p_clStat->clLStickX = -0x400;
+                p_clStat->clLStickX = -0x200;
             }
-            else if (x > 0x3FF)
+            else if (x > 0x1FF)
             {
-                p_clStat->clLStickX = 0x3FF;
+                p_clStat->clLStickX = 0x1FF;
             }
             else
             {
                 p_clStat->clLStickX = x;
             }
 
-            if (y < -0x400)
+            if (y < -0x200)
             {
-                p_clStat->clLStickY = -0x400;
+                p_clStat->clLStickY = -0x200;
             }
-            else if (y > 0x3FF)
+            else if (y > 0x1FF)
             {
-                p_clStat->clLStickY = 0x3FF;
+                p_clStat->clLStickY = 0x1FF;
             }
             else
             {
@@ -1102,26 +1105,26 @@ void __a1_32_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clRStickX - p_cb->extConf.cl.rstk.x);
             y = (s16)(p_clStat->clRStickY - p_cb->extConf.cl.rstk.y);
 
-            if (x < -0x400)
+            if (x < -0x200)
             {
-                p_clStat->clRStickX = -0x400;
+                p_clStat->clRStickX = -0x200;
             }
-            else if (x > 0x3FF)
+            else if (x > 0x1FF)
             {
-                p_clStat->clRStickX = 0x3FF;
+                p_clStat->clRStickX = 0x1FF;
             }
             else
             {
                 p_clStat->clRStickX = x;
             }
 
-            if (y < -0x400)
+            if (y < -0x200)
             {
-                p_clStat->clRStickY = -0x400;
+                p_clStat->clRStickY = -0x200;
             }
-            else if (y > 0x3FF)
+            else if (y > 0x1FF)
             {
-                p_clStat->clRStickY = 0x3FF;
+                p_clStat->clRStickY = 0x1FF;
             }
             else
             {
@@ -1150,7 +1153,7 @@ void __a1_32_data_type(u8 chan, u8* data)
             }
         }
 
-        if (!memcmp(checkBuffer, checkInvalidData, 7))
+        if (!memcmp(checkBuffer, checkInvalidData, 8))
         {
             if (p_status->err == WPAD_ERR_OK)
             {
@@ -1196,7 +1199,7 @@ void __a1_33_data_type(u8 chan, u8* data)
     p_status->accY = (s16)((s16)((s16)((s16)((s16)((s16)(data[HID_IDX_BYTE10]) << 2) & (s16)0xFFFC) | (s16)((s16)((u16)(data[HID_IDX_BYTE8] >> 4)) & (s16)0x0002))) - (s16)(p_cb->devConf.acc_0g.y));
     p_status->accZ = (s16)((s16)((s16)((s16)((s16)((s16)(data[HID_IDX_BYTE11]) << 2) & (s16)0xFFFC) | (s16)((s16)((u16)(data[HID_IDX_BYTE8] >> 5)) & (s16)0x0002))) - (s16)(p_cb->devConf.acc_0g.z));
 
-    __parse_dpd_data(chan, &p_status, WPAD_DPD_STANDARD, data, 0);
+    __parse_dpd_data(&p_status, p_cb->currentDpdCommand, data + HID_IDX_BYTE12, 12);
 
     old = OSDisableInterrupts();
     p_cb->rxBufIndex = (u8)((p_cb->rxBufIndex) ? 0 : 1);
@@ -1229,9 +1232,9 @@ void __a1_35_data_type(u8 chan, u8* data)
 
     if (p_cb->dataFormat == WPAD_FMT_CORE_BTN || p_cb->dataFormat == WPAD_FMT_CORE_BTN_ACC || p_cb->dataFormat == WPAD_FMT_FS_BTN || p_cb->dataFormat == WPAD_FMT_FS_BTN_ACC || p_cb->dataFormat == WPAD_FMT_CLASSIC_BTN || p_cb->dataFormat == WPAD_FMT_CLASSIC_BTN_ACC)
     {
-        p_status->err = p_cb->status;
+        p_status->err = WPAD_ERR_OK;
     }
-    else if (p_cb->status != 0)
+    else
     {
         p_status->err = WPAD_ERR_INVALID;
     }
@@ -1353,26 +1356,26 @@ void __a1_35_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clLStickX - p_cb->extConf.cl.lstk.x);
             y = (s16)(p_clStat->clLStickY - p_cb->extConf.cl.lstk.y);
 
-            if (x < -0x400)
+            if (x < -0x200)
             {
-                p_clStat->clLStickX = -0x400;
+                p_clStat->clLStickX = -0x200;
             }
-            else if (x > 0x3FF)
+            else if (x > 0x1FF)
             {
-                p_clStat->clLStickX = 0x3FF;
+                p_clStat->clLStickX = 0x1FF;
             }
             else
             {
                 p_clStat->clLStickX = x;
             }
 
-            if (y < -0x400)
+            if (y < -0x200)
             {
-                p_clStat->clLStickY = -0x400;
+                p_clStat->clLStickY = -0x200;
             }
-            else if (y > 0x3FF)
+            else if (y > 0x1FF)
             {
-                p_clStat->clLStickY = 0x3FF;
+                p_clStat->clLStickY = 0x1FF;
             }
             else
             {
@@ -1382,26 +1385,26 @@ void __a1_35_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clRStickX - p_cb->extConf.cl.rstk.x);
             y = (s16)(p_clStat->clRStickY - p_cb->extConf.cl.rstk.y);
 
-            if (x < -0x400)
+            if (x < -0x200)
             {
-                p_clStat->clRStickX = -0x400;
+                p_clStat->clRStickX = -0x200;
             }
-            else if (x > 0x3FF)
+            else if (x > 0x1FF)
             {
-                p_clStat->clRStickX = 0x3FF;
+                p_clStat->clRStickX = 0x1FF;
             }
             else
             {
                 p_clStat->clRStickX = x;
             }
 
-            if (y < -0x400)
+            if (y < -0x200)
             {
-                p_clStat->clRStickY = -0x400;
+                p_clStat->clRStickY = -0x200;
             }
-            else if (y > 0x3FF)
+            else if (y > 0x1FF)
             {
-                p_clStat->clRStickY = 0x3FF;
+                p_clStat->clRStickY = 0x1FF;
             }
             else
             {
@@ -1508,9 +1511,9 @@ void __a1_37_data_type(u8 chan, u8* data)
 
     if (p_cb->dataFormat == WPAD_FMT_CORE_BTN || p_cb->dataFormat == WPAD_FMT_CORE_BTN_ACC || p_cb->dataFormat == WPAD_FMT_CORE_BTN_ACC_DPD || p_cb->dataFormat == WPAD_FMT_FS_BTN || p_cb->dataFormat == WPAD_FMT_FS_BTN_ACC || p_cb->dataFormat == WPAD_FMT_FS_BTN_ACC_DPD || p_cb->dataFormat == WPAD_FMT_CLASSIC_BTN || p_cb->dataFormat == WPAD_FMT_CLASSIC_BTN_ACC || p_cb->dataFormat == WPAD_FMT_CLASSIC_BTN_ACC_DPD)
     {
-        p_status->err = p_cb->status;
+        p_status->err = WPAD_ERR_OK;
     }
-    else if (p_cb->status == 0)
+    else
     {
         p_status->err = WPAD_ERR_INVALID;
     }
@@ -1521,7 +1524,7 @@ void __a1_37_data_type(u8 chan, u8* data)
     p_status->accY = (s16)((s16)((s16)((s16)((s16)data[HID_IDX_BYTE10] << 2) & (s16)0xFFFC) | (s16)((s16)(u16)(data[HID_IDX_BYTE8] >> 4) & (s16)0x0002)) - p_cb->devConf.acc_0g.y);
     p_status->accZ = (s16)((s16)((s16)((s16)((s16)data[HID_IDX_BYTE11] << 2) & (s16)0xFFFC) | (s16)((s16)(u16)(data[HID_IDX_BYTE8] >> 5) & (s16)0x0002)) - p_cb->devConf.acc_0g.z);
 
-    __parse_dpd_data(chan, &p_status, WPAD_DPD_STANDARD, data, 0);
+    __parse_dpd_data(&p_status, p_cb->currentDpdCommand, data + HID_IDX_BYTE12, 10);
 
     memcpy(checkBuffer, data + HID_IDX_BYTE22, 6);
     WPADiDecode(chan, data + HID_IDX_BYTE22, 6, 0);
@@ -1634,26 +1637,26 @@ void __a1_37_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clLStickX - p_cb->extConf.cl.lstk.x);
             y = (s16)(p_clStat->clLStickY - p_cb->extConf.cl.lstk.y);
 
-            if (x < -0x400)
+            if (x < -0x200)
             {
-                p_clStat->clLStickX = -0x400;
+                p_clStat->clLStickX = -0x200;
             }
-            else if (x > 0x3FF)
+            else if (x > 0x1FF)
             {
-                p_clStat->clLStickX = 0x3FF;
+                p_clStat->clLStickX = 0x1FF;
             }
             else
             {
                 p_clStat->clLStickX = x;
             }
 
-            if (y < -0x400)
+            if (y < -0x200)
             {
-                p_clStat->clLStickY = -0x400;
+                p_clStat->clLStickY = -0x200;
             }
-            else if (y > 0x3FF)
+            else if (y > 0x1FF)
             {
-                p_clStat->clLStickY = 0x3FF;
+                p_clStat->clLStickY = 0x1FF;
             }
             else
             {
@@ -1663,26 +1666,26 @@ void __a1_37_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clRStickX - p_cb->extConf.cl.rstk.x);
             y = (s16)(p_clStat->clRStickY - p_cb->extConf.cl.rstk.y);
 
-            if (x < -0x400)
+            if (x < -0x200)
             {
-                p_clStat->clRStickX = -0x400;
+                p_clStat->clRStickX = -0x200;
             }
-            else if (x > 0x3FF)
+            else if (x > 0x1FF)
             {
-                p_clStat->clRStickX = 0x3FF;
+                p_clStat->clRStickX = 0x1FF;
             }
             else
             {
                 p_clStat->clRStickX = x;
             }
 
-            if (y < -0x400)
+            if (y < -0x200)
             {
-                p_clStat->clRStickY = -0x400;
+                p_clStat->clRStickY = -0x200;
             }
-            else if (y > 0x3FF)
+            else if (y > 0x1FF)
             {
-                p_clStat->clRStickY = 0x3FF;
+                p_clStat->clRStickY = 0x1FF;
             }
             else
             {
@@ -1753,9 +1756,9 @@ void __a1_3e_data_type(u8 chan, u8* data)
 
     if (p_cb->dataFormat == WPAD_FMT_CORE_BTN || p_cb->dataFormat == WPAD_FMT_CORE_BTN_ACC || p_cb->dataFormat == WPAD_FMT_BTN_ACC_DPD_EXTENDED)
     {
-        p_status->err = p_cb->status;
+        p_status->err = WPAD_ERR_OK;
     }
-    else if (p_cb->status == 0)
+    else
     {
         p_status->err = WPAD_ERR_INVALID;
     }
@@ -1843,9 +1846,9 @@ void __a1_3f_data_type(u8 chan, u8* data)
 
     if (p_cb->dataFormat == WPAD_FMT_CORE_BTN || p_cb->dataFormat == WPAD_FMT_CORE_BTN_ACC || p_cb->dataFormat == WPAD_FMT_BTN_ACC_DPD_EXTENDED)
     {
-        p_status->err = p_cb->status;
+        p_status->err = WPAD_ERR_OK;
     }
-    else if (p_cb->status == 0)
+    else
     {
         p_status->err = WPAD_ERR_INVALID;
     }

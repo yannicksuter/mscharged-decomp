@@ -2,7 +2,7 @@
 
 #include <revolution/types.h>
 
-#include <revolution/os.h>
+#include <revolution/os/OSTime.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,6 +10,14 @@ extern "C" {
 
 typedef void* (*SO_AllocFunc)(u32, s32);
 typedef void (*SO_FreeFunc)(u32, void*, s32);
+
+typedef SO_AllocFunc SOAlloc;
+typedef SO_FreeFunc SOFree;
+
+typedef struct SOLibraryConfig {
+  SOAlloc alloc;
+  SOFree free;
+} SOLibraryConfig;
 
 typedef struct SOSysWork {
   SO_AllocFunc allocFunc; // 0x00
@@ -129,6 +137,13 @@ enum {
 #define SO_IPPROTO_TCP 6
 #define SO_IPPROTO_UDP 17
 
+#define SO_CONFIG_IP_ADDR_NUMBER 0x4002
+#define SO_CONFIG_IP_ADDR_TABLE 0x4003
+
+#define SO_F_GETFL 3
+#define SO_F_SETFL 4
+#define SO_O_NONBLOCK 4
+
 #define SO_CONFIG_FILTER_INPUT 0x1001
 #define SO_CONFIG_FILTER_OUTPUT 0x1002
 
@@ -167,6 +182,7 @@ struct SOAddrInfo {
 extern const char* __SO_VERSION;
 extern const char* __SOCKET_VERSION;
 
+int SOInit(SOLibraryConfig* config);
 int SOFinish(void);
 int SOStartup(void);
 int SOStartupEx(int timeout);
@@ -201,6 +217,12 @@ typedef struct SOInAddr {
   u32 addr;
 
 } SOInAddr;
+
+typedef struct IPAddrEntry {
+  SOInAddr addr;
+  SOInAddr netmask;
+  SOInAddr broadcast;
+} IPAddrEntry;
 
 typedef struct SOSockAddr {
   u8 len;

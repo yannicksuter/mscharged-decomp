@@ -87,7 +87,7 @@ typedef struct {
   int inputBufferSize;
   GPIBuffer outputBuffer;
   SOCKET peerSocket;
-  unsigned short peerPort;
+  unsigned int peerPort;
   int nextOperationID;
   int numSearches;
 

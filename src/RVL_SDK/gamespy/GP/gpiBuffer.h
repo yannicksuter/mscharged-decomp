@@ -90,7 +90,3 @@ GPResult gpiReadMessageFromBuffer(GPConnection* connection,
                                   int* type, int* len);
 
 GPResult gpiClipBufferToPosition(GPConnection* connection, GPIBuffer* buffer);
-
-GPResult gpiSendBufferToPeer(GPConnection* connection, unsigned int ip,
-                             unsigned short port, GPIBuffer* outputBuffer,
-                             GPIBool* closed, GPIBool clipSentData);

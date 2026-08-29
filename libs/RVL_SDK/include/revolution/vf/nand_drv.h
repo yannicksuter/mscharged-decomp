@@ -9,6 +9,7 @@ extern "C" {
 s32 VFi_NandCreate(const char* path, u8 perm, u8 attr);
 s32 VFi_NandDelete(const char* path);
 s32 VFi_NandClose(struct NANDFileInfo* info);
+s32 VFi_NandOpen(const char* path, struct NANDFileInfo* info, u8 accType);
 s32 VFi_NandPrivateOpen(const char* path, struct NANDFileInfo* info, u8 accType);
 s32 VFi_NandRead(struct NANDFileInfo* info, void* buf, u32 length);
 s32 VFi_NandCreateDir(const char* path, u8 perm, u8 attr);
