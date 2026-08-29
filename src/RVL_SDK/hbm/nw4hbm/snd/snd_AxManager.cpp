@@ -166,18 +166,18 @@ void AxManager::Update() {
             u16 volume = static_cast<u16>(AX_MAX_VOLUME * ratio);
 
             switch (i) {
-                case 0: {
-                    AXSetMasterVolume(volume);
-                    break;
-                }
-
-                case 1: {
+                case AUX_A: {
                     AXSetAuxAReturnVolume(volume);
                     break;
                 }
 
-                case 2: {
+                case AUX_B: {
                     AXSetAuxBReturnVolume(volume);
+                    break;
+                }
+
+                case AUX_C: {
+                    AXSetAuxCReturnVolume(volume);
                     break;
                 }
             }

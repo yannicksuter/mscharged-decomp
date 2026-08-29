@@ -87,7 +87,7 @@ public:
     int ParseNextTick(bool doNoteOn);
 
     void StopAllChannel();
-    void ReleaseAllChannel(int release) DECOMP_DONT_INLINE;
+    void ReleaseAllChannel(int release);
     void PauseAllChannel(bool flag);
     void AddChannel(Channel* channel);
     void UpdateChannelParam();

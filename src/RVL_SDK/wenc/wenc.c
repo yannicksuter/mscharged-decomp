@@ -1,6 +1,16 @@
 #include <revolution/wenc.h>
 #include <string.h>
 
+typedef struct {
+    s32 nXN;
+    s32 nDL;
+    s32 nQN;
+    s32 nDN;
+    s32 nDLH;
+    s32 nDLQ;
+    u8 padding[8];
+} WENCBlock;
+
 s32 WENCGetEncodeData(WENCInfo* info, u32 flag, const s16* pcmData, s32 samples, u8* adpcmData)
 {
     const f64 table[] = {
@@ -31,6 +41,7 @@ s32 WENCGetEncodeData(WENCInfo* info, u32 flag, const s16* pcmData, s32 samples,
     s32 dlh;
     s32 dlq;
     u8 by;
+    WENCBlock* block = (WENCBlock*)info;
 
     encodeSize = (samples + 1) / 2;
     memset(adpcmData, 0, encodeSize);
@@ -49,12 +60,12 @@ s32 WENCGetEncodeData(WENCInfo* info, u32 flag, const s16* pcmData, s32 samples,
     }
     else
     {
-        xn = info->xn;
-        dl = info->dl;
-        qn = info->qn;
-        dn = info->dn;
-        dlh = info->dlh;
-        dlq = info->dlq;
+        xn = block->nXN;
+        dl = block->nDL;
+        qn = block->nQN;
+        dn = block->nDN;
+        dlh = block->nDLH;
+        dlq = block->nDLQ;
     }
 
     for (i = 0; i < samples; i++)
@@ -132,12 +143,12 @@ s32 WENCGetEncodeData(WENCInfo* info, u32 flag, const s16* pcmData, s32 samples,
         }
     }
 
-    info->xn = xn;
-    info->dl = dl;
-    info->qn = qn;
-    info->dn = dn;
-    info->dlh = dlh;
-    info->dlq = dlq;
+    block->nXN = xn;
+    block->nDL = dl;
+    block->nQN = qn;
+    block->nDN = dn;
+    block->nDLH = dlh;
+    block->nDLQ = dlq;
 
     return samples;
 }

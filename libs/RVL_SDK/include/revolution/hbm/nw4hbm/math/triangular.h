@@ -24,8 +24,6 @@ namespace math {
 #define NW4HBM_MATH_RAD_TO_FIDX(x) ((x) * (128.0f / NW4HBM_MATH_PI))
 #define NW4HBM_MATH_FIDX_TO_RAD(x) ((x) * (NW4HBM_MATH_PI / 128.0f))
 
-f32 AtanFIdx(f32 x);
-
 f32 SinFIdx(f32 fidx);
 inline f32 SinIdx(u16 idx) { return SinFIdx(NW4HBM_MATH_IDX_TO_FIDX(U16ToF32(idx))); }
 inline f32 SinDeg(f32 deg) { return SinFIdx(NW4HBM_MATH_DEG_TO_FIDX(deg)); }
@@ -34,6 +32,8 @@ inline f32 SinRad(f32 rad) { return SinFIdx(NW4HBM_MATH_RAD_TO_FIDX(rad)); }
 f32 CosFIdx(f32 fidx);
 inline f32 CosDeg(f32 deg) { return CosFIdx(NW4HBM_MATH_DEG_TO_FIDX(deg)); }
 inline f32 CosRad(f32 rad) { return CosFIdx(NW4HBM_MATH_RAD_TO_FIDX(rad)); }
+
+void SinCosFIdx(f32* pSin, f32* pCos, f32 fidx);
 
 f32 AtanFIdx(f32 x);
 inline f32 AtanDeg(f32 x) { return NW4HBM_MATH_FIDX_TO_DEG(AtanFIdx(x)); }

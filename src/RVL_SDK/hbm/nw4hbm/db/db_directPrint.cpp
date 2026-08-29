@@ -150,7 +150,7 @@ void DirectPrint_EraseXfb(int posh, int posv, int sizeh, int sizev) {
 
     for (int cntv = 0; cntv < sizev; cntv++) {
         for (int cnth = 0; cnth < sizeh; cnth++) {
-            *pixel++ = 0x1080; // some sort of white or black?
+            *pixel++ = 0x1080;
         }
 
         pixel += sFrameBufferInfo.frameRow - sizeh;
@@ -180,7 +180,6 @@ void DirectPrint_DrawString(int posh, int posv, bool turnOver, char const* forma
     }
 }
 
-// Intel IPP RGBToYCbCr algorithm, same as OSFatal.c::RGB2YUV
 void DirectPrint_SetColor(u8 r, u8 g, u8 b) {
     int y = (int)(0.257f * (int)r + 0.504f * (int)g + 0.098f * (int)b + 16.0f);
     int u = (int)(-0.148f * (int)r - 0.291f * (int)g + 0.439f * (int)b + 128.0f);
@@ -209,7 +208,6 @@ void detail::DirectPrint_DrawStringToXfb(int posh, int posv, char const* format,
     NW4HBMAssert_Line(sFrameBufferInfo.frameMemory != NULL, 647);
 
     int length = vsnprintf(string, sizeof(string), format, vargs);
-    int posLeftStart = posh;
 
     if (length > 0) {
         DrawStringToXfb_(posh, posv, string, turnOver, backErase);
@@ -271,7 +269,7 @@ static char const* DrawStringLineToXfb_(int posh, int posv, char const* str, int
     NW4HBMAssert_Line(width > 0, 746);
 
     for (; (c = *str) != '\0'; str++) {
-        if (c == '\n' || c == '\0') { // another check against null character?
+        if (c == '\n' || c == '\0') {
             return str;
         }
 
@@ -372,10 +370,10 @@ static void DrawCharToXfb_(int posh, int posv, int code) {
 }
 
 static void detail::WaitVIRetrace_(void) {
-    int intrStatus = OSEnableInterrupts(); /* int enabled; */
+    int intrStatus = OSEnableInterrupts();
     u32 preCnt = VIGetRetraceCount();
 
-    while (preCnt == VIGetRetraceCount()) { /* ... */
+    while (preCnt == VIGetRetraceCount()) {
     }
 
     OSRestoreInterrupts(intrStatus);
@@ -384,7 +382,7 @@ static void detail::WaitVIRetrace_(void) {
 static void* detail::CreateFB_(GXRenderModeObj const* rmode) {
     u32 arenaHi = (u32)OSGetArenaHi();
     u32 memSize = (u16)ROUND_UP((u16)rmode->fbWidth, 16) * rmode->xfbHeight * 2;
-    u32 frameBuf = ROUND_DOWN(arenaHi - memSize, 32);
+    u32 frameBuf = ROUNDDOWN(arenaHi - memSize, 32);
 
     VIConfigure(rmode);
     VISetNextFrameBuffer(reinterpret_cast<void*>(frameBuf));

@@ -976,7 +976,7 @@ u8 WPADGetSensorBarPosition(void) {
     return pos;
 }
 
-static void setupCallback(s32 chan, s32 status) {
+static void setupCallback(WPADChannel chan, WPADResult status) {
     WPADCB* p = _wpdcb[chan];
 
     if (status == WPAD_ERR_NO_CONTROLLER) {
@@ -994,7 +994,7 @@ static void setupCallback(s32 chan, s32 status) {
     }
 }
 
-static void abortConnCallback(s32 chan, s32 status) {
+static void abortConnCallback(WPADChannel chan, WPADResult status) {
     WPADCB* p = _wpdcb[chan];
 
     if (status != WPAD_ERR_OK) {
@@ -1006,7 +1006,7 @@ static void abortConnCallback(s32 chan, s32 status) {
     }
 }
 
-static void firmwareCheckCallback(s32 chan, s32 status) {
+static void firmwareCheckCallback(WPADChannel chan, WPADResult status) {
     WPADCB* p = _wpdcb[chan];
     BOOL enabled;
     u32 address;
@@ -1209,7 +1209,7 @@ void WPADGetAccGravityUnit(s32 chan, u32 type, WPADAccGravityUnit* pAcc) {
     OSRestoreInterrupts(enabled);
 }
 
-static void DisconnectCallback(s32 chan, s32 status) {
+static void DisconnectCallback(WPADChannel chan, WPADResult status) {
     WPADCB* p = _wpdcb[chan];
 
     if (status != WPAD_ERR_NO_CONTROLLER) {
@@ -1258,7 +1258,7 @@ void WPADDisconnect(s32 chan) {
     WPADiDisconnect(chan, TRUE);
 }
 
-s32 WPADProbe(s32 chan, s32* pDevType) {
+WPADResult WPADProbe(WPADChannel chan, WPADDeviceType* pDevType) {
     WPADCB* p = _wpdcb[chan];
     BOOL enabled;
     s32 status;
@@ -1302,12 +1302,12 @@ WPADSamplingCallback WPADSetSamplingCallback(s32 chan,
     return pOldCallback;
 }
 
-WPADConnectCallback WPADSetConnectCallback(s32 chan,
-                                           WPADConnectCallback pCallback) {
+WPADConnectCallback* WPADSetConnectCallback(s32 chan,
+                                            WPADConnectCallback* pCallback) {
 
     WPADCB* p;
     BOOL enabled;
-    WPADConnectCallback pOldCallback;
+    WPADConnectCallback* pOldCallback;
 
     DEBUGPrint("WPADSetConnectCallback()\n");
 
@@ -1321,12 +1321,12 @@ WPADConnectCallback WPADSetConnectCallback(s32 chan,
     return pOldCallback;
 }
 
-WPADExtensionCallback
-WPADSetExtensionCallback(s32 chan, WPADExtensionCallback pCallback) {
+WPADExtensionCallback*
+WPADSetExtensionCallback(s32 chan, WPADExtensionCallback* pCallback) {
 
     WPADCB* p;
     BOOL enabled;
-    WPADExtensionCallback pOldCallback;
+    WPADExtensionCallback* pOldCallback;
 
     DEBUGPrint("WPADSetExtensionCallback()\n");
 
@@ -1392,7 +1392,7 @@ _end:
     return status;
 }
 
-static void __infoCallback(s32 chan, s32 result) {
+static void __infoCallback(WPADChannel chan, WPADResult result) {
     WPADCB* p = _wpdcb[chan];
 
     if (p->getInfoCB != NULL) {
@@ -1781,7 +1781,7 @@ BOOL WPADIsSpeakerEnabled(s32 chan) {
     return spkEnabled;
 }
 
-s32 WPADControlSpeaker(s32 chan, u32 command, WPADCallback pCallback) {
+WPADResult WPADControlSpeaker(WPADChannel chan, u32 command, WPADCallback pCallback) {
     WPADCB* p;
     BOOL enabled;
     BOOL spkEnable;
@@ -2057,7 +2057,7 @@ BOOL WPADIsDpdEnabled(s32 chan) {
     return dpdEnabled;
 }
 
-static void __dpdCb(s32 chan, s32 result) {
+static void __dpdCb(WPADChannel chan, WPADResult result) {
     WPADCB* p = _wpdcb[chan];
 
     p->currentDpdCommand = p->pendingDpdCommand;

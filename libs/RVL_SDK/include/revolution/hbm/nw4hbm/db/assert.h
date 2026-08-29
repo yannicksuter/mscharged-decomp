@@ -1,6 +1,7 @@
 #ifndef NW4HBM_DB_ASSERT_H
 #define NW4HBM_DB_ASSERT_H
 
+#include "decomp.h"
 #include "revolution/hbm/HBMAssert.hpp"
 
 #include <stdarg.h>

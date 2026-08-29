@@ -1,6 +1,7 @@
 #ifndef NW4HBM_DB_CONSOLE_H
 #define NW4HBM_DB_CONSOLE_H
 
+#include "revolution/hbm/HBMAssert.hpp"
 #include "revolution/types.h"
 
 #include "revolution/hbm/nw4hbm/ut/TextWriter.h"
@@ -48,9 +49,25 @@ void Console_DrawDirect(ConsoleHandle console);
 void Console_VFPrintf(ConsoleOutputType type, ConsoleHandle console, const char* format, va_list vlist);
 void Console_Printf(ConsoleHandle console, const char* format, ...);
 s32 Console_GetTotalLines(ConsoleHandle console);
-u16 Console_GetViewHeight(ConsoleHandle console);
-bool Console_SetVisible(ConsoleHandle console, bool isVisible);
-s32 Console_SetViewBaseLine(ConsoleHandle console, s32 line);
+
+inline u16 Console_GetViewHeight(ConsoleHandle console) {
+    NW4HBMAssertHeaderPointerNonnull_FileLine(console, "console.h", 434);
+    return console->viewLines;
+}
+
+inline bool Console_SetVisible(ConsoleHandle console, bool isVisible) {
+    NW4HBMAssertHeaderPointerNonnull_FileLine(console, "console.h", 497);
+    bool before = console->isVisible;
+    console->isVisible = isVisible;
+    return before;
+}
+
+inline s32 Console_SetViewBaseLine(ConsoleHandle console, s32 line) {
+    NW4HBMAssertHeaderPointerNonnull_FileLine(console, "console.h", 557);
+    s32 before = console->viewTopLine;
+    console->viewTopLine = line;
+    return before;
+}
 
 inline s32 Console_GetViewBaseLine(ConsoleHandle console) { return console->viewTopLine; }
 inline s16 Console_GetPositionX(ConsoleHandle console) { return console->viewPosX; }

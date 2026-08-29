@@ -6,7 +6,6 @@
 #include "revolution/hbm/nw4hbm/ut.h"
 #include "revolution/nand.h"
 
-
 namespace nw4hbm {
 namespace snd {
 
@@ -35,7 +34,7 @@ public:
     u32 GetLabelStringDataSize() const { return mFileReader.GetLabelStringChunkSize(); }
 
 private:
-    bool LoadFileHeader() DECOMP_DONT_INLINE;
+    bool LoadFileHeader();
 
 private:
     /* 0x108 */ detail::SoundArchiveFileReader mFileReader;

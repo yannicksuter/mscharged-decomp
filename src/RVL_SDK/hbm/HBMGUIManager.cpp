@@ -32,7 +32,7 @@ static void drawLine_(f32 x0, f32 y0, f32 x1, f32 y1, f32 z, u8 uWidth, GXColor&
 
     GXSetNumTexGens(0);
     GXSetNumTevStages(1);
-    GXSetTevOp(GX_TEVSTAGE0, GX_BLEND);
+    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_NOOP);
 

@@ -5,8 +5,6 @@
 
 #include "revolution/hbm/HBMAssert.hpp"
 
-#include "decomp.h"
-
 typedef u8 GetCharFunc(u8 const* buf);
 
 namespace nw4hbm {
@@ -22,7 +20,7 @@ static u32 XStrToU32_(u8 const* str);
 static u32 CopySymbol_(u8 const* buf, u8* str, u32 strLenMax, u8 splitter);
 
 static bool QuerySymbolToMapFile_(u8* buf, OSModuleInfo const* moduleInfo, u32 address, u8* strBuf, u32 strBufSize);
-static bool QuerySymbolToSingleMapFile_(MapFile* pMapFile, u32 address, u8* strBuf, u32 strBufSize) DECOMP_DONT_INLINE;
+static bool QuerySymbolToSingleMapFile_(MapFile* pMapFile, u32 address, u8* strBuf, u32 strBufSize);
 } // namespace db
 } // namespace nw4hbm
 
@@ -40,14 +38,13 @@ static GetCharFunc* GetCharPtr_;
 
 namespace nw4hbm {
 namespace db {
-bool MapFile_Exists(void) { return ((sMapFileList) ? (bool)1 : (bool)0); }
+bool MapFile_Exists(void) { return sMapFileList ? true : false; }
 
 static u8 GetCharOnMem_(u8 const* buf) { return *buf; }
 
 static s32 GetSize(s32 offset, u32 length) {
     if (offset + ARRAY_COUNT(sMapBuf) >= length) {
         return ROUND_UP(length - offset, 32);
-        ;
     }
 
     return ARRAY_COUNT(sMapBuf);
@@ -65,15 +62,15 @@ static u8 GetCharOnDvd_(u8 const* buf) {
         s32 len;
         s32 size;
 
-        sMapBufOffset = ROUND_DOWN(address, 32);
+        sMapBufOffset = ROUNDDOWN(address, 32);
         offset = address - sMapBufOffset;
         size = GetSize(sMapBufOffset, sFileLength);
 
-        int intrStatus = OSEnableInterrupts(); /* int enabled; */
+        int intrStatus = OSEnableInterrupts();
 
         len = DVDReadAsyncPrio(&sFileInfo, sMapBuf, size, sMapBufOffset, NULL, 2);
 
-        while (DVDGetCommandBlockStatus(&sFileInfo.block)) { /* ... */
+        while (DVDGetCommandBlockStatus(&sFileInfo.block)) {
         }
 
         OSRestoreInterrupts(intrStatus);
@@ -170,9 +167,9 @@ static u32 XStrToU32_(u8 const* str) {
         if ('0' <= c && c <= '9') {
             num = static_cast<u32>(c - '0');
         } else if ('a' <= c && c <= 'z') {
-            num = static_cast<u32>(c - ('a' - 10)); // ?
+            num = static_cast<u32>(c - ('a' - 10));
         } else if ('A' <= c && c <= 'Z') {
-            num = static_cast<u32>(c - ('A' - 10)); // What's the - 10 for
+            num = static_cast<u32>(c - ('A' - 10));
         } else {
             return val;
         }
