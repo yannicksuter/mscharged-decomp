@@ -145,7 +145,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299CA0>::Draw(
     textureMatrix[1][2] = 0.0f;
     textureMatrix[1][3] = 0.0f;
     textureMatrix[0][3] = offset + 1.0f;
-    GXLoadTexMtxImm(textureMatrix, 30, GX_MTX_3x4);
+    GXLoadTexMtxImm(textureMatrix, 30, GX_MTX3x4);
 
     if (packet->displayList != 0 && glx_CompiledDraw)
     {

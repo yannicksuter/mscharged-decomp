@@ -268,7 +268,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Draw(
     memcpy(textureMatrix, lbl_804E8880, sizeof(Mtx));
     textureMatrix[0][3] = offsetX;
     textureMatrix[1][3] = offsetY;
-    GXLoadTexMtxImm(textureMatrix, 30, GX_MTX_3x4);
+    GXLoadTexMtxImm(textureMatrix, 30, GX_MTX3x4);
 
     if (useTextureMatrix == 1)
         gxSetTexCoordGen(1, 0, 5, 30);

@@ -12,6 +12,7 @@ class cPN_SAnimController;
 class cPN_SingleAxisBlender;
 class cTeam;
 class PlayerTweaks;
+class UnidentifiedPlayerRadius;
 struct CollisionPlayerPlayerData;
 struct CollisionPlayerWallData;
 struct UnidentifiedPlayerEventData;
@@ -99,7 +100,10 @@ public:
     /* 0x318 */ u32 mUnidentified318;
 
 protected:
-    /* 0x31C */ u8 mUnknown31C[0x08];
+    /* 0x31C */ u8 mUnknown31C[0x04];
+
+public:
+    /* 0x320 */ UnidentifiedPlayerRadius* mUnidentified320;
 
 public:
     /* 0x324 */ PlayerTweaks* m_pTweaks;

@@ -25,28 +25,34 @@ namespace Detail
 template <typename Allocator>
 struct LexicalCastImpl<BasicString<char, Allocator>, const char*>
 {
-    static BasicString<char, Allocator> Do(const char* const& string)
+    static BasicString<char, Allocator> Do(const char* const& s)
     {
-        return BasicString<char, Allocator>(string);
+        return BasicString<char, Allocator>(s);
     }
 };
 
 template <typename Allocator>
 struct LexicalCastImpl<BasicString<char, Allocator>, unsigned long>
 {
-    static BasicString<char, Allocator> Do(unsigned long value);
+    static BasicString<char, Allocator> Do(unsigned long t);
 };
 
 template <typename Allocator>
 struct LexicalCastImpl<BasicString<char, Allocator>, int>
 {
-    static BasicString<char, Allocator> Do(int value);
+    static BasicString<char, Allocator> Do(int t);
 };
 
 template <typename Allocator>
 struct LexicalCastImpl<BasicString<char, Allocator>, float>
 {
-    static BasicString<char, Allocator> Do(float value);
+    static BasicString<char, Allocator> Do(float t);
+};
+
+template <typename Allocator>
+struct LexicalCastImpl<BasicString<char, Allocator>, bool>
+{
+    static BasicString<char, Allocator> Do(bool t);
 };
 
 template <typename To>
@@ -62,6 +68,7 @@ inline NLString LexicalCastImpl<NLString, char>::Do(char value)
     nlSNPrintf(buffer, sizeof(buffer), "%c", value);
     return NLString(buffer);
 }
+
 } // namespace Detail
 
 #endif // _NLLEXICALCAST_H_

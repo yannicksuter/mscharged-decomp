@@ -29,6 +29,9 @@ public:
     static float GetCornerRadius();
     static float GetPenaltyBoxX(unsigned int side);
     static float GetPenaltyBoxY();
+    static bool IsOnField(const nlVector3& location);
+    static bool IsOnField(const nlVector2& location);
+    static void SetFieldDimensions(float fX, float fY, float fZ);
 
     static const sSideLinePlane& GetSideline(int index)
     {

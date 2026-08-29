@@ -158,7 +158,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029E8F8>::Activate(GLView* view)
     texture.flags = 3;
     texture.unknown07 = 0;
     fn_8036BE88(4, &texture);
-    GXLoadTexMtxImm(lbl_805243A0, 67, GX_MTX_3x4);
+    GXLoadTexMtxImm(lbl_805243A0, 67, GX_MTX3x4);
 }
 
 template <>
@@ -244,7 +244,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029E8F8>::Draw(
         memcpy(textureMatrix, lbl_804E8820, sizeof(Mtx));
         textureMatrix[0][0] = 0.5f * scaleX;
         textureMatrix[1][1] = -0.5f * scaleY;
-        GXLoadTexMtxImm(textureMatrix, 64, GX_MTX_3x4);
+        GXLoadTexMtxImm(textureMatrix, 64, GX_MTX3x4);
         lbl_806E1BA0.x = scaleX;
         lbl_806E1BA0.y = scaleY;
     }
@@ -305,7 +305,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029E8F8>::Draw(
         nlMultMatrices(modelview, model, lbl_8057B2D8);
         glxCopyMatrix(source, modelview);
         PSMTXInvXpose(source, inverse);
-        GXLoadTexMtxImm(inverse, 30, GX_MTX_3x4);
+        GXLoadTexMtxImm(inverse, 30, GX_MTX3x4);
     }
 
     fn_80183B40(packet->matrix);

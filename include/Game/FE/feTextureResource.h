@@ -1,5 +1,5 @@
-#ifndef GAME_FE_TEXTURE_RESOURCE_H
-#define GAME_FE_TEXTURE_RESOURCE_H
+#ifndef _FETEXTURERESOURCE_H_
+#define _FETEXTURERESOURCE_H_
 
 #include "Game/FE/feResourceManager.h"
 
@@ -8,11 +8,12 @@ class FETextureResource : public FEResourceHandle
 public:
     FETextureResource();
 
-    unsigned long GetTextureHandle() const;
+    void fn_8030009C(const unsigned long& textureReference);
+    u32 GetTextureHandle() const;
 
-    /* 0x18 */ unsigned long m_glTextureHandle;
-    /* 0x1C */ signed short m_width;
-    /* 0x1E */ signed short m_height;
-}; // size 0x20
+    /* 0x18 */ u32 m_glTextureHandle;
+    /* 0x1C */ u16 m_uWidth;
+    /* 0x1E */ u16 m_uHeight;
+}; // total size: 0x20
 
-#endif // GAME_FE_TEXTURE_RESOURCE_H
+#endif // _FETEXTURERESOURCE_H_

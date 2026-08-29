@@ -1,5 +1,7 @@
 #include "Game/Task/NetworkUpdateTask.h"
 
+#include "Game/NetworkSession.h"
+
 #include "NL/nlMemory.h"
 #include "types.h"
 
@@ -15,24 +17,8 @@ struct NetworkStatus
     u8 enabled;
 };
 
-struct NetworkSubsystem
-{
-    u8 padding[0x242C];
-    virtual void Unknown0();
-    virtual void Unknown1();
-    virtual void Unknown2();
-    virtual void Unknown3();
-    virtual void Unknown4();
-    virtual void Unknown5();
-    virtual void Unknown6();
-    virtual void Unknown7();
-    virtual void Unknown8();
-    virtual void Update();
-};
-
 extern NetworkManager* lbl_806E2138;
 extern NetworkStatus* lbl_806E2168;
-extern NetworkSubsystem* lbl_806E20D8;
 extern void* lbl_806E1194;
 extern s32 lbl_806E1188;
 extern u8 lbl_806E1008;

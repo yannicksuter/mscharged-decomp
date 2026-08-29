@@ -114,7 +114,7 @@ ResourceResult FEResourceManager::IssueSceneContextSwitch(FESceneResource* pFeSc
         s_pCurrentFESceneResourceContext->m_pFESceneContext->AllResourcesLoadedCallback();
     }
 
-    pFeSceneResource->field_0x1C = s_pResourceInterface->MarkResource();
+    pFeSceneResource->m_glResourceMarker = s_pResourceInterface->MarkResource();
     pFeSceneResource->m_bValid = true;
     s_pCurrentFESceneResourceContext = pFeSceneResource;
     return FERR_WaitingForResource;
@@ -384,7 +384,7 @@ void FEResourceManager::UnloadResource(FEResourceHandle* pFeResourceHandle)
         RemoveResourceFromResourceList(pFeResourceHandle);
         break;
     case FERT_SCENE:
-        s_pResourceInterface->ReleaseResource(((FESceneResource*)pFeResourceHandle)->field_0x1C);
+        s_pResourceInterface->ReleaseResource(((FESceneResource*)pFeResourceHandle)->m_glResourceMarker);
         break;
     default:
         break;

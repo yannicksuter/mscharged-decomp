@@ -1,5 +1,7 @@
 #include "Game/Field.h"
 
+#include "math.h"
+
 static const float cornerRadius = 3.0f;
 
 nlVector3 cField::mv3FieldPosition = { 20.6f, 12.5f, 0.0f };
@@ -76,4 +78,34 @@ cNet* cField::GetNet(float side)
         return mpNet[1];
     }
     return mpNet[0];
+}
+
+bool cField::IsOnField(const nlVector3& location)
+{
+    if ((float)fabs(location.x) <= mv3FieldPosition.x + 0.18f)
+    {
+        if ((float)fabs(location.y) <= mv3FieldPosition.y + 0.18f)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool cField::IsOnField(const nlVector2& location)
+{
+    if ((float)fabs(location.x) <= mv3FieldPosition.x + 0.18f)
+    {
+        if ((float)fabs(location.y) <= mv3FieldPosition.y + 0.18f)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void cField::SetFieldDimensions(float fX, float fY, float fZ)
+{
+    mpNet[0]->m_v3NetLocation.x = -mv3FieldPosition.x;
+    mpNet[1]->m_v3NetLocation.x = mv3FieldPosition.x;
 }

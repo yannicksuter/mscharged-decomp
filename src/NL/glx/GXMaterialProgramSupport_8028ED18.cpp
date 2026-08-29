@@ -71,7 +71,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802997B8>::Activate(GLView* view)
     view->m_Interface->GetViewMatrix(lbl_8057AF80);
     lbl_806E1AFC = -1;
     lbl_806E1B04 = -1;
-    GXLoadTexMtxImm(lbl_80524290, 67, GX_MTX_3x4);
+    GXLoadTexMtxImm(lbl_80524290, 67, GX_MTX3x4);
     gxSetTexCoordGen(3, 0, 1, 30, true, 67);
 
     if (lbl_806DF039)
@@ -261,7 +261,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802997B8>::Draw(
         Mtx inverse;
         glxCopyMatrix(source, modelview);
         PSMTXInvXpose(source, inverse);
-        GXLoadTexMtxImm(inverse, 30, GX_MTX_3x4);
+        GXLoadTexMtxImm(inverse, 30, GX_MTX3x4);
         lbl_806E1AFC = packet->matrix;
     }
 

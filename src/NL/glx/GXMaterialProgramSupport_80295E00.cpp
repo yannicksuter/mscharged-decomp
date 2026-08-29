@@ -136,7 +136,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029EF54>::Draw(
     textureMatrix[2][1] = 0.0f;
     textureMatrix[2][2] = 1.0f;
     textureMatrix[2][3] = 0.0f;
-    GXLoadTexMtxImm(textureMatrix, 33, GX_MTX_3x4);
+    GXLoadTexMtxImm(textureMatrix, 33, GX_MTX3x4);
 
     if (*(int*)((unsigned char*)packet->unknown20 + 40) == 1)
     {
