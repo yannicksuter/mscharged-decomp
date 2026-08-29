@@ -22,7 +22,14 @@ typedef struct decimal {
     } sig;
 } decimal;
 
+typedef struct decform {
+    char style;
+    char unused;
+    s16 digits;
+} decform;
+
 double __dec2num(const decimal* d);
+void __num2dec(const decform* form, double value, decimal* d);
 
 #ifdef __cplusplus
 }

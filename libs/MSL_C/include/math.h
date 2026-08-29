@@ -55,6 +55,10 @@ extern "C"
     {
         return __fabs(x);
     }
+    _MATH_INLINE long double fabsl(long double x)
+    {
+        return __fabs((double)x);
+    }
 #else
 int abs(int n);
 long labs(long n);

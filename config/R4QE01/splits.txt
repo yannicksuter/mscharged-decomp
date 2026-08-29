@@ -1512,6 +1512,17 @@ MSL/strtoul.c:
 	.text       start:0x8038691C end:0x80387468
 	.data       start:0x80536968 end:0x805369F0
 
+MSL/wmem.c:
+	.text       start:0x80387468 end:0x80387498
+
+MSL/wprintf.c:
+	extab       start:0x800066F8 end:0x80006730
+	extabindex  start:0x80006E24 end:0x80006E78
+	.text       start:0x80387498 end:0x80389600
+	.rodata     start:0x804EC2D0 end:0x804EC2D1
+	.data       start:0x805369F0 end:0x80536C96
+	.sdata2     start:0x806E6EB8 end:0x806E6EC0
+
 MSL/math_sun.c:
 	extab       start:0x80006738 end:0x80006740
 	extabindex  start:0x80006E84 end:0x80006E90
