@@ -216,7 +216,9 @@ typedef enum _GXCompCnt {
     GX_CLR_RGBA,
 
     GX_TEX_S = 0,
-    GX_TEX_ST
+    GX_TEX_ST,
+
+    GX_COMPCNT_NULL = 0
 } GXCompCnt;
 
 typedef enum _GXCompType {
@@ -231,7 +233,9 @@ typedef enum _GXCompType {
     GX_RGBX8,
     GX_RGBA4,
     GX_RGBA6,
-    GX_RGBA8
+    GX_RGBA8,
+
+    GX_COMP_NULL = 0
 } GXCompType;
 
 typedef enum _GXCopyClamp {
@@ -239,6 +243,7 @@ typedef enum _GXCopyClamp {
     GX_CLAMP_TOP,
     GX_CLAMP_BOTTOM,
     GX_CLAMP_ALL,
+    GX_CLAMP_BOTH = GX_CLAMP_TOP | GX_CLAMP_BOTTOM,
 } GXCopyClamp;
 
 typedef enum _GXCullMode {
@@ -756,7 +761,7 @@ typedef enum _GXTexFmt {
     GX_CTF_Z8L = 58,
     GX_CTF_Z16L = 60,
 
-    GX_TF_A8 = GX_CTF_YUVA8
+    GX_TF_A8 = GX_CTF_A8
 } GXTexFmt;
 
 typedef enum _GXTexGenSrc {
@@ -825,10 +830,17 @@ typedef enum _GXTexMtx {
     GX_TEXMTX7 = 51,
     GX_TEXMTX8 = 54,
     GX_TEXMTX9 = 57,
-    GX_IDENTITY = 60,
+    GX_TEXMTX_IDENT = 60,
+    GX_IDENTITY = GX_TEXMTX_IDENT,
 } GXTexMtx;
 
 #define GX_TEXMTX_NUM ((GX_TEXMTX9 - GX_TEXMTX0) / 3 + 1)
+
+typedef enum _GXGamma {
+    GX_GM_1_0,
+    GX_GM_1_7,
+    GX_GM_2_2,
+} GXGamma;
 
 typedef enum _GXPTTexMtx {
     // 3x4 matrices (in dual-tex / "post-matrix" XF matrix memory)
@@ -855,6 +867,105 @@ typedef enum _GXPTTexMtx {
     GX_PTTEXMTX19 = 121,
     GX_PTIDENTITY = 125
 } GXPTTexMtx;
+
+typedef enum _GXTexOffset {
+    GX_TO_ZERO,
+    GX_TO_SIXTEENTH,
+    GX_TO_EIGHTH,
+    GX_TO_FOURTH,
+    GX_TO_HALF,
+    GX_TO_ONE,
+    GX_MAX_TEXOFFSET,
+} GXTexOffset;
+
+typedef enum _GXTexMtxType {
+    GX_MTX3x4,
+    GX_MTX2x4,
+} GXTexMtxType;
+
+typedef enum _GXCopyMode {
+    GX_COPY_PROGRESSIVE = 0,
+    GX_COPY_INTLC_EVEN = 2,
+    GX_COPY_INTLC_ODD = 3,
+} GXCopyMode;
+
+typedef enum _GXAlphaReadMode {
+    GX_READ_00,
+    GX_READ_FF,
+    GX_READ_NONE,
+} GXAlphaReadMode;
+
+typedef enum _GXMiscToken {
+    GX_MT_NULL,
+    GX_MT_XF_FLUSH,
+    GX_MT_DL_SAVE_CONTEXT,
+    GX_MT_ABORT_WAIT_COPYOUT,
+} GXMiscToken;
+
+typedef enum _GXPerf0 {
+    GX_PERF0_VERTICES,
+    GX_PERF0_CLIP_VTX,
+    GX_PERF0_CLIP_CLKS,
+    GX_PERF0_XF_WAIT_IN,
+    GX_PERF0_XF_WAIT_OUT,
+    GX_PERF0_XF_XFRM_CLKS,
+    GX_PERF0_XF_LIT_CLKS,
+    GX_PERF0_XF_BOT_CLKS,
+    GX_PERF0_XF_REGLD_CLKS,
+    GX_PERF0_XF_REGRD_CLKS,
+    GX_PERF0_CLIP_RATIO,
+    GX_PERF0_TRIANGLES,
+    GX_PERF0_TRIANGLES_CULLED,
+    GX_PERF0_TRIANGLES_PASSED,
+    GX_PERF0_TRIANGLES_SCISSORED,
+    GX_PERF0_TRIANGLES_0TEX,
+    GX_PERF0_TRIANGLES_1TEX,
+    GX_PERF0_TRIANGLES_2TEX,
+    GX_PERF0_TRIANGLES_3TEX,
+    GX_PERF0_TRIANGLES_4TEX,
+    GX_PERF0_TRIANGLES_5TEX,
+    GX_PERF0_TRIANGLES_6TEX,
+    GX_PERF0_TRIANGLES_7TEX,
+    GX_PERF0_TRIANGLES_8TEX,
+    GX_PERF0_TRIANGLES_0CLR,
+    GX_PERF0_TRIANGLES_1CLR,
+    GX_PERF0_TRIANGLES_2CLR,
+    GX_PERF0_QUAD_0CVG,
+    GX_PERF0_QUAD_NON0CVG,
+    GX_PERF0_QUAD_1CVG,
+    GX_PERF0_QUAD_2CVG,
+    GX_PERF0_QUAD_3CVG,
+    GX_PERF0_QUAD_4CVG,
+    GX_PERF0_AVG_QUAD_CNT,
+    GX_PERF0_CLOCKS,
+    GX_PERF0_NONE
+} GXPerf0;
+
+typedef enum _GXPerf1 {
+    GX_PERF1_TEXELS,
+    GX_PERF1_TX_IDLE,
+    GX_PERF1_TX_REGS,
+    GX_PERF1_TX_MEMSTALL,
+    GX_PERF1_TC_CHECK1_2,
+    GX_PERF1_TC_CHECK3_4,
+    GX_PERF1_TC_CHECK5_6,
+    GX_PERF1_TC_CHECK7_8,
+    GX_PERF1_TC_MISS,
+    GX_PERF1_VC_ELEMQ_FULL,
+    GX_PERF1_VC_MISSQ_FULL,
+    GX_PERF1_VC_MEMREQ_FULL,
+    GX_PERF1_VC_STATUS7,
+    GX_PERF1_VC_MISSREP_FULL,
+    GX_PERF1_VC_STREAMBUF_LOW,
+    GX_PERF1_VC_ALL_STALLS,
+    GX_PERF1_VERTICES,
+    GX_PERF1_FIFO_REQ,
+    GX_PERF1_CALL_REQ,
+    GX_PERF1_VC_MISS_REQ,
+    GX_PERF1_CP_ALL_REQ,
+    GX_PERF1_CLOCKS,
+    GX_PERF1_NONE
+} GXPerf1;
 
 typedef enum _GXTexWrapMode {
     GX_CLAMP,
@@ -886,6 +997,10 @@ typedef enum _GXTlut {
     GX_BIGTLUT1,
     GX_BIGTLUT2,
     GX_BIGTLUT3,
+
+    GX_MAX_TLUT = 16,
+    GX_MAX_BIGTLUT = 4,
+    GX_MAX_TLUT_ALL = GX_MAX_TLUT + GX_MAX_BIGTLUT,
 } GXTlut;
 
 typedef enum _GXTlutFmt {

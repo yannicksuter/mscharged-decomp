@@ -1,5 +1,6 @@
 #ifndef RVL_SDK_GX_MISC_H
 #define RVL_SDK_GX_MISC_H
+#include <revolution/gx/GXTypes.h>
 #include <revolution/types.h>
 #ifdef __cplusplus
 extern "C" {
@@ -8,7 +9,7 @@ extern "C" {
 typedef void (*GXDrawDoneCallback)(void);
 typedef void (*GXDrawSyncCallback)(u16 token);
 
-void GXSetMisc(UNKWORD token, UNKWORD val);
+void GXSetMisc(GXMiscToken token, u32 val);
 void GXFlush(void);
 void GXResetWriteGatherPipe(void);
 

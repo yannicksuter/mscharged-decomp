@@ -65,11 +65,16 @@ typedef unsigned char char8_t;
 typedef unsigned short char16_t;
 
 #define ALIGN(x) __attribute__((aligned(x)))
+#define ATTRIBUTE_ALIGN(x) ALIGN(x)
 #define PACKED __attribute__((packed))
 
 #define DEFAULT_ALIGN 32
 #define ALIGN32 ALIGN(DEFAULT_ALIGN)
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
+
+#ifndef NO_INLINE
+#define NO_INLINE __attribute__((noinline))
+#endif
 
 typedef void (*funcptr_t)(void);
 

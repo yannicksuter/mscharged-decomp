@@ -765,7 +765,7 @@ tBTM_DEV_STATUS_CB *BTM_RegisterForDeviceStatusNotif(tBTM_DEV_STATUS_CB *p_cb)
 }
 
 tBTM_STATUS BTM_VendorSpecificCommand(UINT16 opcode, UINT8 param_len,
-                                      UINT8 *p_param_buf, tBTM_CMPL_CB *p_cb)
+                                      UINT8 *p_param_buf, tBTM_VSC_CMPL_CB *p_cb)
 {
 	void *p_buf;
 
@@ -804,7 +804,7 @@ tBTM_STATUS BTM_VendorSpecificCommand(UINT16 opcode, UINT8 param_len,
 
 void btm_vsc_complete(UINT8 *p, UINT16 opcode, UINT16 evt_len)
 {
-	tBTM_CMPL_CB *p_cb = btm_cb.devcb.p_vsc_cmpl_cb;
+	tBTM_VSC_CMPL_CB *p_cb = btm_cb.devcb.p_vsc_cmpl_cb;
 	tBTM_VSC_CMPL vcs_cplt_params;
 	UINT8 *p_dest = vcs_cplt_params.param_buf;
 

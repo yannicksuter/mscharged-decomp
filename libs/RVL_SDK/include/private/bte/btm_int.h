@@ -206,7 +206,7 @@ typedef struct
 	tBTM_CMPL_CB			*p_lnk_qual_cmpl_cb;		// 0x94
 	TIMER_LIST_ENT			qossu_timer;				// 0x98
 	tBTM_CMPL_CB			*p_qossu_cmpl_cb;			// 0xb0
-	tBTM_CMPL_CB			*p_vsc_cmpl_cb;				// 0xb4
+	tBTM_VSC_CMPL_CB		*p_vsc_cmpl_cb;				// 0xb4
 	tBTM_CMPL_CB			*p_reset_only_cmpl_cb;		// 0xb8
 	tBTM_ROLE_SWITCH_CMPL	switch_role_ref_data;		// 0xbc
 	tBTM_CMPL_CB			*p_switch_role_cb;			// 0xc4

@@ -6,10 +6,14 @@
 
 #define OS_CACHED_REGION_PREFIX 0x8000
 #define OS_BASE_CACHED (OS_CACHED_REGION_PREFIX << 16)
+#define OS_BASE_UNCACHED 0xC0000000
 
 #define OSPhysicalToCached(paddr) ((void*)((u32)(paddr) + OS_BASE_CACHED))
 #define OSCachedToPhysical(caddr) ((void*)((u32)(caddr)-OS_BASE_CACHED))
 #define OSPhysicalToUncached(paddr) ((void*)((u32)(paddr) + 0xC0000000))
+#define OSUncachedToPhysical(ucaddr) ((u32)((u8*)(ucaddr)-OS_BASE_UNCACHED))
+
+#define OS_BUS_CLOCK OS_BUS_CLOCK_SPEED
 
 #define OSRoundUp32B(x) ROUNDUP((unsigned long)(x), 32)
 #define OSRoundDown32B(x) ROUNDDOWN((unsigned long)(x), 32)

@@ -28,6 +28,8 @@ extern "C" {
  *
  ***********************************************************/
 
+#define GXFIFO_ADDR 0xCC008000
+
 /**
  * FIFO write/gather pipe
  */
@@ -44,6 +46,11 @@ extern volatile union {
     void* p;
     float f;
 } WGPIPE AT_ADDRESS(0xCC008000);
+
+#define GX_WRITE_U8(value) (WGPIPE.uc = (u8)(value))
+#define GX_WRITE_U16(value) (WGPIPE.us = (u16)(value))
+#define GX_WRITE_U32(value) (WGPIPE.ui = (u32)(value))
+#define GX_WRITE_F32(value) (WGPIPE.f = (f32)(value))
 
 /**
  * FIFO commands
@@ -132,7 +139,19 @@ typedef enum {
 #define GX_SET_REG2(reg, x, st, end) GX_SET_REG((reg), (x), (st), (end))
 
 #define SET_REG_FIELD(reg, size, shift, val)                                   \
-    ((reg) = GX_BITSET((reg), 32 - (shift) - (size), (size), (val)))
+    do {                                                                        \
+        (reg) = (u32)__rlwimi((u32)(reg), (val), (shift),                      \
+                              32 - (shift) - (size), 31 - (shift));             \
+    } while (0)
+
+#define FAST_FLAG_SET(reg, value, shift, size)                                 \
+    do {                                                                        \
+        (reg) = (u32)__rlwimi((int)(reg), (int)(value), (shift),               \
+                              32 - (shift) - (size), 31 - (shift));             \
+    } while (0)
+
+#define GET_REG_FIELD(reg, size, shift)                                        \
+    ((int)((reg) >> (shift)) & ((1 << (size)) - 1))
 
 /**
  * Load immediate value into BP register (rasterizer spelling)
@@ -154,6 +173,68 @@ typedef enum {
  *
  *
  ***********************************************************/
+
+extern volatile void* __piReg;
+extern volatile void* __cpReg;
+extern volatile void* __peReg;
+extern volatile void* __memReg;
+
+#define GX_PI_ADDR 0x0C003000
+#define GX_CP_ADDR 0x0C000000
+#define GX_PE_ADDR 0x0C001000
+#define GX_MEM_ADDR 0x0C004000
+
+#define GX_GET_MEM_REG(offset)                                                 \
+    (*(volatile u16*)((volatile u16*)__memReg + (offset)))
+#define GX_GET_CP_REG(offset)                                                  \
+    (*(volatile u16*)((volatile u16*)__cpReg + (offset)))
+#define GX_GET_PE_REG(offset)                                                  \
+    (*(volatile u16*)((volatile u16*)__peReg + (offset)))
+#define GX_GET_PI_REG(offset)                                                  \
+    (*(volatile u32*)((volatile u32*)__piReg + (offset)))
+
+#define GX_SET_MEM_REG(offset, value)                                          \
+    (*(volatile u16*)((volatile u16*)__memReg + (offset)) = (value))
+
+#define GX_SET_CP_REG(offset, value)                                           \
+    (*(volatile u16*)((volatile u16*)__cpReg + (offset)) = (value))
+#define GX_SET_PE_REG(offset, value)                                           \
+    (*(volatile u16*)((volatile u16*)__peReg + (offset)) = (value))
+#define GX_SET_PI_REG(offset, value)                                           \
+    (*(volatile u32*)((volatile u32*)__piReg + (offset)) = (value))
+
+#define GX_WRITE_CP_STRM_REG(addr, vtxfmt, data)                               \
+    {                                                                          \
+        GX_WRITE_U8(GX_FIFO_CMD_LOAD_CP_REG);                                  \
+        GX_WRITE_U8((vtxfmt) | ((addr) << 4));                                 \
+        GX_WRITE_U32(data);                                                    \
+    }
+
+#define GX_WRITE_XF_REG(addr, data, count)                                     \
+    {                                                                          \
+        GX_WRITE_U8(GX_FIFO_CMD_LOAD_XF_REG);                                  \
+        GX_WRITE_U32((addr) | ((count) << 16));                                \
+        GX_WRITE_U32(data);                                                    \
+    }
+
+#define GX_WRITE_RA_REG(reg)                                                   \
+    {                                                                          \
+        GX_WRITE_U8(GX_FIFO_CMD_LOAD_BP_REG);                                  \
+        GX_WRITE_U32(reg);                                                     \
+    }
+
+static inline u32 GXReadMEMReg(u32 addrLo, u32 addrHi) {
+    u32 hiStart, hiNew, lo;
+
+    hiStart = GX_GET_MEM_REG(addrHi);
+    do {
+        hiNew = hiStart;
+        lo = GX_GET_MEM_REG(addrLo);
+        hiStart = GX_GET_MEM_REG(addrHi);
+    } while (hiStart != hiNew);
+
+    return (hiStart << 16) | lo;
+}
 
 /**
  * Load immediate value into CP register

@@ -383,7 +383,7 @@ static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context) {
             _gIdleCount_dvd++;
         }
     } else {
-        if (_gIdleCount_dimming >= NEW_TIME_TO_DIMMING) {
+        if (_gIdleCount_dimming >= THD_TIME_TO_DIMMING) {
             DimmingOFF_Pending = 1;
         }
         if (_gIdleCount_dvd >= THD_TIME_TO_DVD_STOP) {
@@ -397,7 +397,7 @@ static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context) {
 
     if (__VIDimmingFlag_Enable_old != __VIDimmingFlag_Enable) {
         if (__VIDimmingFlag_Enable == false) {
-            if (_gIdleCount_dimming >= NEW_TIME_TO_DIMMING) {
+            if (_gIdleCount_dimming >= THD_TIME_TO_DIMMING) {
                 DimmingOFF_Pending = 1;
             }
         }
@@ -406,7 +406,7 @@ static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context) {
         THD_TIME_TO_DIMMING = NEW_TIME_TO_DIMMING;
     }
 
-    if (_gIdleCount_dimming == NEW_TIME_TO_DIMMING) {
+    if (_gIdleCount_dimming == THD_TIME_TO_DIMMING) {
         DimmingON_Pending = 1;
     }
 

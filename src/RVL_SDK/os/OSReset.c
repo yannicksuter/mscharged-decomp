@@ -35,7 +35,7 @@ void SCInit(void);
 u32 SCCheckStatus(void);
 
 void __OSLaunchMenu(void);
-void fn_803B6B00(void);
+void __OSRelaunchTitle(void);
 BOOL __PADDisableRecalibration(BOOL disable);
 void __VISetRGBModeImm(void);
 u32 __DVDGetCoverStatus(void);
@@ -268,7 +268,7 @@ void OSShutdownSystemForBS(u32 resetCode) {
     __OSShutdownDevices(OS_SHUTDOWN_RESTART);
     OSEnableScheduler();
 
-    fn_803B6B00();
+    __OSRelaunchTitle();
 }
 
 void OSRestart(u32 resetCode) {

@@ -29,6 +29,11 @@ void WUD_DEBUGPrint(const char* format, ...);
 #define WUD_DEV_NAME_IS_CNT_01(NAME) WUD_DEV_NAME_IS(NAME, "Nintendo RVL-CNT-01")
 
 typedef enum {
+    WUD_STATE_START = 0,
+    WUD_STATE_ERROR = 255,
+} WUDState;
+
+typedef enum {
     WUD_STATE_SYNC_START = 0,
     WUD_STATE_SYNC_PREPARE_SEARCH = 1,
     WUD_STATE_SYNC_START_SEARCH = 2,
@@ -197,10 +202,8 @@ typedef struct WUDCB {
     OSAlarm alarm;        // 0x710
     u32 hhFlags;          // 0x740
 
-    u16 bufferStatus0;          // 0x744
-    u16 bufferStatus1;          // 0x746
-    s16 waitStartSearchFrames;  // 0x748
-    s16 waitIncomingFrames;     // 0x74A
+    u16 bufferStatus0;  // 0x744
+    u16 bufferStatus1;  // 0x746
 } WUDCB;
 
 extern WUDCB _wcb;

@@ -190,7 +190,7 @@ typedef struct
 	tBTA_DM_INQ_MODE	mode;			// 0x00
 	UINT8				duration;		// 0x01
 	UINT8				max_resps;		// 0x02
-	tBTA_DM_INQ_FILT	filter_type;	// 0x03
+	BOOLEAN			report_dup;	// 0x03
 	tBTA_DM_INQ_COND	filter_cond;	// 0x04
 } tBTA_DM_INQ; // size 0x10
 

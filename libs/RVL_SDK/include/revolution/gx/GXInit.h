@@ -3,6 +3,7 @@
 #include <revolution/types.h>
 
 #include <revolution/gx/GXFifo.h>
+#include <revolution/gx/GXTexture.h>
 #include <revolution/gx/GXTransform.h>
 #ifdef __cplusplus
 extern "C" {
@@ -10,86 +11,228 @@ extern "C" {
 
 typedef struct _GXData {
     union {
-        UNKWORD WORD_0x0;
+        u32 WORD_0x0;
         struct {
-            u16 SHORT_0x0;      // at 0x0
-            u16 lastWriteWasXF; // at 0x2
+            union {
+                u16 vNumNot;
+                u16 SHORT_0x0;
+            };
+            union {
+                u16 bpSentNot;
+                u16 lastWriteWasXF;
+            };
         };
-    }; // at 0x0
-    u16 SHORT_0x4;
-    u16 vlim;      // at 0x6
-    u32 cpCtrlReg; // at 0x8
-    u32 cpStatReg; // at 0xC
-    char UNK_0x10[0x4];
-    u32 vcdLoReg;            // at 0x14
-    u32 vcdHiReg;            // at 0x18
-    u32 vatA[GX_MAX_VTXFMT]; // at 0x1C
-    u32 vatB[GX_MAX_VTXFMT]; // at 0x3C
-    u32 vatC[GX_MAX_VTXFMT]; // at 0x5C
-    u32 linePtWidth;         // at 0x7C
-    u32 matrixIndex0;        // at 0x80
-    u32 matrixIndex1;        // at 0x84
-    char UNK_0x88[0xA8 - 0x88];
-    GXColor ambColors[2];             // at 0xA8
-    GXColor matColors[2];             // at 0xB0
-    u32 colorControl[4];              // at 0xB8
-    u32 texRegs[GX_MAX_TEXCOORD];     // at 0xC8
-    u32 dualTexRegs[GX_MAX_TEXCOORD]; // at 0xE8
-    u32 txcRegs[GX_MAX_TEXCOORD];     // at 0x108
-    char UNK_0x128[0x148 - 0x128];
-    u32 scissorTL; // at 0x148
-    u32 scissorBR; // at 0x14C
-    u32 tref[GX_MAX_TEVSTAGE / 2]; // at 0x150
-    u32 ras1_iref;                 // at 0x170
-    u32 ind_imask; // at 0x174
-    u32 ras1_ss0;  // at 0x178
-    u32 ras1_ss1;  // at 0x17C
-    u32 tevc[GX_MAX_TEVSTAGE];        // at 0x180
-    u32 teva[GX_MAX_TEVSTAGE];        // at 0x1C0
-    u32 tevKsel[GX_MAX_TEVSTAGE / 2]; // at 0x200
-    u32 blendMode;                    // at 0x220
-    u32 dstAlpha;  // at 0x224
-    u32 zMode;     // at 0x228
-    u32 zControl;  // at 0x22C
-    char UNK_0x230[0x254 - 0x230];
-    u32 genMode; // at 0x254
-    char UNK_0x258[0x520 - 0x258];
-    GXAttrType normalType;          // at 0x520
-    GXBool normal;                  // at 0x524
-    GXBool binormal;                // at 0x525
-    GXProjectionType projType;      // at 0x528
-    f32 proj[GX_PROJECTION_SZ - 1]; // at 0x52C
+    };
+    union {
+        u16 vNum;
+        u16 SHORT_0x4;
+    };
+    union {
+        u16 vLim;
+        u16 vlim;
+    };
+    union {
+        u32 cpEnable;
+        u32 cpCtrlReg;
+    };
+    union {
+        u32 cpStatus;
+        u32 cpStatReg;
+    };
+    u32 cpClr;
+    union {
+        u32 vcdLo;
+        u32 vcdLoReg;
+    };
+    union {
+        u32 vcdHi;
+        u32 vcdHiReg;
+    };
+    u32 vatA[GX_MAX_VTXFMT];
+    u32 vatB[GX_MAX_VTXFMT];
+    u32 vatC[GX_MAX_VTXFMT];
+    union {
+        u32 lpSize;
+        u32 linePtWidth;
+    };
+    union {
+        u32 matIdxA;
+        u32 matrixIndex0;
+    };
+    union {
+        u32 matIdxB;
+        u32 matrixIndex1;
+    };
+    u32 indexBase[4];
+    u32 indexStride[4];
+    union {
+        u32 ambColor[2];
+        GXColor ambColors[2];
+    };
+    union {
+        u32 matColor[2];
+        GXColor matColors[2];
+    };
+    union {
+        u32 chanCtrl[4];
+        u32 colorControl[4];
+    };
+    union {
+        u32 texGenCtrl[GX_MAX_TEXCOORD];
+        u32 texRegs[GX_MAX_TEXCOORD];
+    };
+    union {
+        u32 dualTexGenCtrl[GX_MAX_TEXCOORD];
+        u32 dualTexRegs[GX_MAX_TEXCOORD];
+    };
+    union {
+        u32 suTs0[GX_MAX_TEXCOORD];
+        u32 txcRegs[GX_MAX_TEXCOORD];
+    };
+    u32 suTs1[GX_MAX_TEXCOORD];
+    union {
+        u32 suScis0;
+        u32 scissorTL;
+    };
+    union {
+        u32 suScis1;
+        u32 scissorBR;
+    };
+    u32 tref[GX_MAX_TEVSTAGE / 2];
+    union {
+        u32 iref;
+        u32 ras1_iref;
+    };
+    union {
+        u32 bpMask;
+        u32 ind_imask;
+    };
+    union {
+        u32 IndTexScale0;
+        u32 ras1_ss0;
+    };
+    union {
+        u32 IndTexScale1;
+        u32 ras1_ss1;
+    };
+    u32 tevc[GX_MAX_TEVSTAGE];
+    u32 teva[GX_MAX_TEVSTAGE];
+    u32 tevKsel[GX_MAX_TEVSTAGE / 2];
+    union {
+        u32 cmode0;
+        u32 blendMode;
+    };
+    union {
+        u32 cmode1;
+        u32 dstAlpha;
+    };
+    union {
+        u32 zmode;
+        u32 zMode;
+    };
+    union {
+        u32 peCtrl;
+        u32 zControl;
+    };
+    u32 cpDispSrc;
+    u32 cpDispSize;
+    u32 cpDispStride;
+    u32 cpDisp;
+    u32 cpTexSrc;
+    u32 cpTexSize;
+    u32 cpTexStride;
+    u32 cpTex;
+    GXBool cpTexZ;
+    u8 padding_251[3];
+    u32 genMode;
+    GXTexRegion TexRegions0[GX_MAX_TEXMAP];
+    GXTexRegion TexRegions1[GX_MAX_TEXMAP];
+    GXTexRegion TexRegions2[GX_MAX_TEXMAP];
+    GXTlutRegion TlutRegions[GX_MAX_TLUT_ALL];
+    GXTexRegionCallback texRegionCallback;
+    GXTlutRegionCallback tlutRegionCallback;
+    union {
+        GXAttrType nrmType;
+        GXAttrType normalType;
+    };
+    union {
+        GXBool hasNrms;
+        GXBool normal;
+    };
+    union {
+        GXBool hasBiNrms;
+        GXBool binormal;
+    };
+    u8 padding_526[2];
+    GXProjectionType projType;
+    union {
+        f32 projMtx[GX_PROJECTION_SZ - 1];
+        f32 proj[GX_PROJECTION_SZ - 1];
+    };
     union {
         struct {
-            f32 vpOx;   // at 0x544
-            f32 vpOy;   // at 0x548
-            f32 vpSx;   // at 0x54C
-            f32 vpSy;   // at 0x550
-            f32 vpNear; // at 0x554
-            f32 vpFar;  // at 0x558
+            f32 vpLeft;
+            f32 vpTop;
+            f32 vpWd;
+            f32 vpHt;
+            f32 vpNearz;
+            f32 vpFarz;
+        };
+        struct {
+            f32 vpOx;
+            f32 vpOy;
+            f32 vpSx;
+            f32 vpSy;
+            f32 vpNear;
+            f32 vpFar;
         };
         f32 view[GX_VIEWPORT_SZ];
-    }; // at 0x544
-    f32 offsetZ; // at 0x55C
-    f32 scaleZ;  // at 0x560
-    char UNK_0x564[0x5A4 - 0x564];
-    u32 texmapId[GX_MAX_TEVSTAGE]; // at 0x5A4
-    char UNK_0x5E4[0x5E8 - 0x5E4];
-    u32 tevTcEnab; // at 0x5E8
-    char UNK_0x5EC[0x5F8 - 0x5EC];
-    GXBool dlistActive; // at 0x5F8
-    GXBool dlistSave;   // at 0x5F9
-    u8 BYTE_0x5FA;
-    u8 vatDirtyFlags; // at 0x5FB
-    u32 gxDirtyFlags; // at 0x5FC
+    };
+    union {
+        f32 zOffset;
+        f32 offsetZ;
+    };
+    union {
+        f32 zScale;
+        f32 scaleZ;
+    };
+    u32 tImage0[GX_MAX_TEXMAP];
+    u32 tMode0[GX_MAX_TEXMAP];
+    u32 texmapId[GX_MAX_TEVSTAGE];
+    u32 tcsManEnab;
+    u32 tevTcEnab;
+    GXPerf0 perf0;
+    GXPerf1 perf1;
+    u32 perfSel;
+    union {
+        GXBool inDispList;
+        GXBool dlistActive;
+    };
+    union {
+        GXBool dlSaveContext;
+        GXBool dlistSave;
+    };
+    union {
+        GXBool abtWaitPECopy;
+        u8 BYTE_0x5FA;
+    };
+    union {
+        u8 dirtyVAT;
+        u8 vatDirtyFlags;
+    };
+    union {
+        u32 dirtyState;
+        u32 gxDirtyFlags;
+    };
 } GXData;
 
 extern GXData* const __GXData;
 
-// I hate typing this name out
+#define gx __GXData
 #define gxdt __GXData
 
 GXFifoObj* GXInit(void*, u32);
+void __GXInitGX(void);
 
 #ifdef __cplusplus
 }

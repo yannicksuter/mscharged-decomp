@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+#define OS_RESET_PRIO_GX 127
+
 typedef BOOL (*OSShutdownFunction)(BOOL final, u32 event);
 
 typedef struct OSShutdownFunctionInfo OSShutdownFunctionInfo;

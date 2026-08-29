@@ -69,35 +69,21 @@ void WUDHidHostCallback(tBTA_HH_EVT event, tBTA_HH* pData) {
                 WUDSetSniffMode(pInfo->devAddr, 8);
 
                 if (p->hidConnCB != NULL) {
-                    p->hidConnCB(pInfo, TRUE);
+                    p->hidConnCB(pConn->handle, TRUE);
                 }
             } else {
                 DEBUGPrint("error code: %d\n", pConn->status);
 
-                if (p->syncState != WUD_STATE_SYNC_START) {
-                    pInfo = &_work;
-                    if (WUD_BDCMP(pConn->bda, pInfo->devAddr) == 0 && pInfo->status == 2) {
-                        if (WUDiGetDevInfo(pConn->bda) && pConn->status == BTA_HH_ERR_AUTH_FAILED) {
-                            WUDiRemoveDevice(pConn->bda);
-                            p->linkedNum--;
-                        }
+                pInfo = &_work;
 
-                        p->syncState = WUD_STATE_SYNC_ERROR;
-                    }
-                } else {
+                if (WUD_BDCMP(pConn->bda, pInfo->devAddr) == 0 && p->syncState != WUD_STATE_SYNC_START
+                    && pInfo->status == 2) {
                     if (WUDiGetDevInfo(pConn->bda) && pConn->status == BTA_HH_ERR_AUTH_FAILED) {
-                        pInfo = WUDiGetDevInfo(pConn->bda);
-                        if (pInfo) {
-                            if (pInfo->UNK_0x5B == 3 || pInfo->UNK_0x5B == 1) {
-                                WUDiMoveBottomSmpDevInfoPtr(pInfo);
-                            } else {
-                                WUDiMoveBottomStdDevInfoPtr(pInfo);
-                            }
-                        }
-
                         WUDiRemoveDevice(pConn->bda);
                         p->linkedNum--;
                     }
+
+                    p->syncState = WUD_STATE_SYNC_ERROR;
                 }
             }
 
@@ -126,7 +112,7 @@ void WUDHidHostCallback(tBTA_HH_EVT event, tBTA_HH* pData) {
             _dev_handle_notack_num[pCbData->handle] = 0;
 
             if (p->hidConnCB != NULL) {
-                p->hidConnCB(pInfo, FALSE);
+                p->hidConnCB(pCbData->handle, FALSE);
             }
             break;
         }
@@ -170,9 +156,6 @@ void WUDHidHostCallback(tBTA_HH_EVT event, tBTA_HH* pData) {
 
             pInfo = WUDiGetDevInfo(pConn->bda);
             pInfo->devHandle = pConn->handle;
-            _dev_handle_to_bda[pConn->handle] = pInfo->devAddr;
-            _dev_handle_queue_size[pConn->handle] = 0;
-            _dev_handle_notack_num[pConn->handle] = 0;
             break;
         }
         case BTA_HH_RMV_DEV_EVT: {

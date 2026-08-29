@@ -11,6 +11,14 @@ extern "C" {
 typedef void* (*SO_AllocFunc)(u32, s32);
 typedef void (*SO_FreeFunc)(u32, void*, s32);
 
+typedef SO_AllocFunc SOAlloc;
+typedef SO_FreeFunc SOFree;
+
+typedef struct SOLibraryConfig {
+  SOAlloc alloc;
+  SOFree free;
+} SOLibraryConfig;
+
 typedef struct SOSysWork {
   SO_AllocFunc allocFunc; // 0x00
   SO_FreeFunc freeFunc;   // 0x04
@@ -167,6 +175,7 @@ struct SOAddrInfo {
 extern const char* __SO_VERSION;
 extern const char* __SOCKET_VERSION;
 
+int SOInit(SOLibraryConfig* config);
 int SOFinish(void);
 int SOStartup(void);
 int SOStartupEx(int timeout);
