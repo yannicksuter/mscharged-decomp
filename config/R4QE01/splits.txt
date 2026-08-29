@@ -349,7 +349,7 @@ Game/Task/PlatPadUpdateTask.cpp:
 	.text       start:0x80115118 end:0x80115128
 	.data       start:0x80508060 end:0x80508080
 
-unclassified/tu_80115128.cpp:
+Game/Task/GameRenderTask.cpp:
 	.text       start:0x80115128 end:0x80115EC4
 	.data       start:0x80508128 end:0x80508148
 
@@ -1809,6 +1809,10 @@ NL/glx/glxDisplayList.cpp:
 	.data       start:0x805356A0 end:0x805356B0
 	.sdata      start:0x806DFAB8 end:0x806DFAC0
 	.sbss       start:0x806E23F4 end:0x806E2400
+
+Game/GL/ShaderSkinMesh.cpp:
+	.text       start:0x8036F648 end:0x80370808
+	.ctors      start:0x804DBB58 end:0x804DBB5C
 
 RVL_SDK/thp/THPSimple.cpp:
 	.text       start:0x803713E8 end:0x80372980
