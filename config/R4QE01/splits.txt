@@ -1374,8 +1374,11 @@ Game/Audio/AudioResourceLoadOwner_802ED144.cpp:
 	.text       start:0x802ED144 end:0x802ED678
 	.data       start:0x8052F490 end:0x8052F49C
 
-unclassified/tu_802ED74C.cpp:
+Game/Audio/XSoundHandle_802ED74C.cpp:
 	.text       start:0x802ED74C end:0x802ED964
+	.data       start:0x8052F4A0 end:0x8052F528
+	.sdata      start:0x806DF4C8 end:0x806DF4CC
+	.sdata2     start:0x806E65B8 end:0x806E65BC
 
 Game/Audio/AudioResourceLoader_802EDA38.cpp:
 	.text       start:0x802EDA38 end:0x802EDA7C

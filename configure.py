@@ -652,7 +652,7 @@ config.libs = [
             Object(NonMatching, "unclassified/tu_802E3D4C.cpp"),
             Object(NonMatching, "Game/Effects/EmissionController.cpp"),
             Object(Equivalent, "Game/Audio/AudioResourceLoadOwner_802ED144.cpp"),
-            Object(NonMatching, "unclassified/tu_802ED74C.cpp"),
+            Object(Equivalent, "Game/Audio/XSoundHandle_802ED74C.cpp"),
             Object(Matching, "Game/Audio/AudioResourceLoader_802EDA38.cpp"),
             Object(NonMatching, "Game/Audio/AudioBundleManager_802EDA7C.cpp"),
             Object(NonMatching, "Game/Audio/SoundMap.cpp"),
