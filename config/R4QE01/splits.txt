@@ -157,6 +157,12 @@ Game/AI/HeadTrack.cpp:
 	.text       start:0x80094A2C end:0x80094FB4
 	.sdata2     start:0x806E3B70 end:0x806E3B98
 
+Game/Net.cpp:
+	.text       start:0x80094FB4 end:0x800950B0
+	.sdata      start:0x806DBD70 end:0x806DBD80
+	.sbss       start:0x806E0D68 end:0x806E0D6C
+	.sdata2     start:0x806E3B98 end:0x806E3BA8
+
 Game/AI/Powerups.cpp:
 	.text       start:0x80099C80 end:0x8009FF20
 	.ctors      start:0x804DB540 end:0x804DB544
