@@ -58,8 +58,9 @@ char* getenv(const char* name);
 /* Searching and sorting (C89 4.10.5). */
 void* bsearch(const void* key, const void* base, size_t nmemb, size_t size,
               int (*compar)(const void*, const void*));
-void qsort(void* base, size_t nmemb, size_t size,
-           int (*compar)(const void*, const void*));
+typedef int (*_compare_function)(const void*, const void*);
+void qsort(void* table_base, size_t num_members, size_t member_size,
+           _compare_function compare_members);
 
 #ifdef __cplusplus
 }

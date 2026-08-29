@@ -6,6 +6,7 @@
 
 #include <stdarg.h>
 #include <size_t.h>
+#include "stdio_api.h"
 
 #ifdef __cplusplus
 extern "C" {

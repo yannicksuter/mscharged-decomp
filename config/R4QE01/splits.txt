@@ -1368,9 +1368,6 @@ RVL_SDK/thp/THPSimple.cpp:
 	.sbss       start:0x806E2448 end:0x806E2460
 	.sdata2     start:0x806E6DC0 end:0x806E6DD0
 
-MSL/float.c:
-	.sdata      start:0x806DFB58 end:0x806DFB68
-
 MetroTRK/mainloop.c:
 	.text       start:0x80376F3C end:0x80377034
 
@@ -1482,6 +1479,32 @@ MetroTRK/CircleBuffer.c:
 
 MetroTRK/MWCriticalSection_gc.c:
 	.text       start:0x8037CAE0 end:0x8037CB38
+
+MSL/qsort.c:
+	extab       start:0x80006690 end:0x80006698
+	extabindex  start:0x80006D88 end:0x80006D94
+	.text       start:0x80383864 end:0x803839D4
+
+MSL/rand.c:
+	.text       start:0x803839D4 end:0x803839FC
+	.sdata      start:0x806DFB48 end:0x806DFB50
+
+MSL/string.c:
+	extab       start:0x800066B0 end:0x800066C0
+	extabindex  start:0x80006DB8 end:0x80006DD0
+	.text       start:0x80384F68 end:0x803854A4
+	.sdata      start:0x806DFB50 end:0x806DFB58
+	.sdata2     start:0x806E6E78 end:0x806E6E80
+
+MSL/float.c:
+	.sdata      start:0x806DFB58 end:0x806DFB68
+
+MSL/strtold.c:
+	extab       start:0x800066C0 end:0x800066C8
+	extabindex  start:0x80006DD0 end:0x80006DDC
+	.text       start:0x803854A4 end:0x80386898
+	.rodata     start:0x804EBCC0 end:0x804EBCD0
+	.sdata2     start:0x806E6E80 end:0x806E6EA0
 
 MSL/math_sun.c:
 	extab       start:0x80006738 end:0x80006740

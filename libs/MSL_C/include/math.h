@@ -132,6 +132,7 @@ long labs(long n);
     }
     double log(double x);
     double exp(double x);
+    double nan(const char* arg);
 
     double ldexp(double x, int n);
 
