@@ -562,6 +562,343 @@ Game/Render/Nis.cpp:
 	.sbss       start:0x806E19D8 end:0x806E1A20
 	.sdata2     start:0x806E5CF8 end:0x806E5D18
 
+NL/glx/GXMaterialProgramSupport_8028A98C.cpp:
+	.text       start:0x8028A98C end:0x8028B1DC
+	.data       start:0x805240B0 end:0x80524110
+	.bss        start:0x8057AD48 end:0x8057AD88
+	.sdata      start:0x806DEFE0 end:0x806DEFF0
+	.sbss       start:0x806E1A50 end:0x806E1A60
+	.sdata2     start:0x806E5D98 end:0x806E5DA8
+
+NL/glx/GXMaterialProgramSupport_8028B1FC.cpp:
+	.text       start:0x8028B1FC end:0x8028BBF0
+	.ctors      start:0x804DB7FC end:0x804DB800
+	.rodata     start:0x804E8700 end:0x804E8730
+	.data       start:0x80524110 end:0x80524190
+	.bss        start:0x8057AD88 end:0x8057ADF0
+	.sdata      start:0x806DEFF0 end:0x806DF008
+	.sbss       start:0x806E1A60 end:0x806E1A80
+	.sdata2     start:0x806E5DA8 end:0x806E5DC0
+
+NL/glx/GXMaterialProgramSupport_8028BBF0.cpp:
+	.text       start:0x8028BBF0 end:0x8028C66C
+	.ctors      start:0x804DB800 end:0x804DB804
+	.rodata     start:0x804E8730 end:0x804E8760
+	.data       start:0x80524190 end:0x80524210
+	.bss        start:0x8057ADF0 end:0x8057AE58
+	.sbss       start:0x806E1A80 end:0x806E1AA0
+	.sdata2     start:0x806E5DC0 end:0x806E5DD8
+
+NL/glx/GXMaterialProgramSupport_8028C66C.cpp:
+	.text       start:0x8028C66C end:0x8028D230
+	.ctors      start:0x804DB804 end:0x804DB808
+	.rodata     start:0x804E8760 end:0x804E8790
+	.data       start:0x80524210 end:0x80524290
+	.bss        start:0x8057AE58 end:0x8057AEC0
+	.sdata      start:0x806DF008 end:0x806DF028
+	.sbss       start:0x806E1AA0 end:0x806E1AD0
+	.sdata2     start:0x806E5DD8 end:0x806E5DF0
+
+NL/glx/GXMaterialProgramSupport_8028D230.cpp:
+	.text       start:0x8028D230 end:0x8028D970
+	.bss        start:0x8057AEC0 end:0x8057AF00
+	.sbss       start:0x806E1AD0 end:0x806E1AD8
+	.sdata2     start:0x806E5DF0 end:0x806E5E00
+
+NL/glx/GXMaterialProgramSupport_8028D990.cpp:
+	.text       start:0x8028D990 end:0x8028E2F8
+	.bss        start:0x8057AF00 end:0x8057AF40
+	.sdata      start:0x806DF028 end:0x806DF038
+	.sbss       start:0x806E1AD8 end:0x806E1AE8
+	.sdata2     start:0x806E5E00 end:0x806E5E10
+
+NL/glx/GXMaterialProgramSupport_8028E318.cpp:
+	.text       start:0x8028E318 end:0x8028ECF8
+	.bss        start:0x8057AF40 end:0x8057AF80
+	.sbss       start:0x806E1AE8 end:0x806E1AF8
+	.sdata2     start:0x806E5E10 end:0x806E5E20
+
+NL/glx/GXMaterialProgramSupport_8028ED18.cpp:
+	.text       start:0x8028ED18 end:0x8028F79C
+	.ctors      start:0x804DB814 end:0x804DB818
+	.data       start:0x80524290 end:0x80524320
+	.bss        start:0x8057AF80 end:0x8057AFD8
+	.sdata      start:0x806DF038 end:0x806DF050
+	.sbss       start:0x806E1AF8 end:0x806E1B08
+	.sdata2     start:0x806E5E20 end:0x806E5E30
+
+NL/glx/GXMaterialProgramSupport_8028F79C.cpp:
+	.text       start:0x8028F79C end:0x8028F98C
+	.bss        start:0x8057AFD8 end:0x8057B018
+	.sbss       start:0x806E1B08 end:0x806E1B10
+
+NL/glx/GXMaterialProgramSupport_8028F9AC.cpp:
+	.text       start:0x8028F9AC end:0x8029003C
+	.ctors      start:0x804DB81C end:0x804DB820
+	.data       start:0x80524320 end:0x80524370
+	.bss        start:0x8057B018 end:0x8057B098
+	.sdata      start:0x806DF058 end:0x806DF060
+	.sdata2     start:0x806E5E30 end:0x806E5E40
+
+NL/glx/GXMaterialProgramSupport_8029003C.cpp:
+	.text       start:0x8029003C end:0x80290230
+
+NL/glx/GXMaterialProgramSupport_80290250.cpp:
+	.text       start:0x80290250 end:0x802904B8
+	.bss        start:0x8057B098 end:0x8057B0D8
+	.sbss       start:0x806E1B10 end:0x806E1B18
+
+NL/glx/GXMaterialProgramSupport_802904D8.cpp:
+	.text       start:0x802904D8 end:0x802906BC
+	.sbss       start:0x806E1B18 end:0x806E1B20
+
+NL/glx/GXMaterialProgramSupport_802906DC.cpp:
+	.text       start:0x802906DC end:0x802908F4
+
+NL/glx/GXMaterialProgramSupport_80290914.cpp:
+	.text       start:0x80290914 end:0x80291384
+	.bss        start:0x8057B0D8 end:0x8057B118
+	.sdata      start:0x806DF060 end:0x806DF068
+	.sdata2     start:0x806E5E40 end:0x806E5E70
+
+NL/glx/GXMaterialProgramSupport_802913A4.cpp:
+	.text       start:0x802913A4 end:0x80291AF4
+	.bss        start:0x8057B118 end:0x8057B158
+	.sdata      start:0x806DF068 end:0x806DF070
+	.sbss       start:0x806E1B20 end:0x806E1B30
+	.sdata2     start:0x806E5E70 end:0x806E5E78
+
+NL/glx/GXMaterialProgramSupport_80291B14.cpp:
+	.text       start:0x80291B14 end:0x80292420
+	.bss        start:0x8057B158 end:0x8057B198
+	.sdata      start:0x806DF070 end:0x806DF078
+	.sbss       start:0x806E1B30 end:0x806E1B40
+	.sdata2     start:0x806E5E78 end:0x806E5E80
+
+NL/glx/GXMaterialProgramSupport_80292440.cpp:
+	.text       start:0x80292440 end:0x80293134
+	.rodata     start:0x804E8790 end:0x804E87C0
+	.bss        start:0x8057B198 end:0x8057B1D8
+	.sdata      start:0x806DF078 end:0x806DF080
+	.sbss       start:0x806E1B40 end:0x806E1B50
+	.sdata2     start:0x806E5E80 end:0x806E5E98
+
+NL/glx/GXMaterialProgramSupport_80293154.cpp:
+	.text       start:0x80293154 end:0x80293898
+	.bss        start:0x8057B1D8 end:0x8057B218
+	.sdata      start:0x806DF080 end:0x806DF088
+	.sbss       start:0x806E1B50 end:0x806E1B60
+	.sdata2     start:0x806E5E98 end:0x806E5EA8
+
+NL/glx/GXMaterialProgramSupport_802938B8.cpp:
+	.text       start:0x802938B8 end:0x802943E4
+	.rodata     start:0x804E87C0 end:0x804E87F0
+	.bss        start:0x8057B218 end:0x8057B258
+	.sdata      start:0x806DF088 end:0x806DF090
+	.sbss       start:0x806E1B60 end:0x806E1B70
+	.sdata2     start:0x806E5EA8 end:0x806E5EC0
+
+NL/glx/GXMaterialProgramSupport_80294404.cpp:
+	.text       start:0x80294404 end:0x80294B08
+	.rodata     start:0x804E87F0 end:0x804E8820
+	.bss        start:0x8057B258 end:0x8057B298
+	.sdata      start:0x806DF090 end:0x806DF098
+	.sbss       start:0x806E1B70 end:0x806E1B88
+	.sdata2     start:0x806E5EC0 end:0x806E5ED8
+
+NL/glx/GXMaterialProgramSupport_80294B28.cpp:
+	.text       start:0x80294B28 end:0x80295184
+	.bss        start:0x8057B298 end:0x8057B2D8
+	.sdata      start:0x806DF098 end:0x806DF0A0
+	.sbss       start:0x806E1B88 end:0x806E1B98
+	.sdata2     start:0x806E5ED8 end:0x806E5EE0
+
+NL/glx/GXMaterialProgramSupport_802951A4.cpp:
+	.text       start:0x802951A4 end:0x80295E00
+	.ctors      start:0x804DB850 end:0x804DB854
+	.rodata     start:0x804E8820 end:0x804E8850
+	.data       start:0x805243D0 end:0x80524420
+	.bss        start:0x8057B2D8 end:0x8057B330
+	.sdata      start:0x806DF0A0 end:0x806DF0B0
+	.sbss       start:0x806E1B98 end:0x806E1BB8
+	.sdata2     start:0x806E5EE0 end:0x806E5F08
+
+NL/glx/GXMaterialProgramSupport_80295E00.cpp:
+	.text       start:0x80295E00 end:0x80296394
+	.bss        start:0x8057B330 end:0x8057B370
+	.sdata      start:0x806DF0B0 end:0x806DF0B8
+	.sbss       start:0x806E1BB8 end:0x806E1BC0
+	.sdata2     start:0x806E5F08 end:0x806E5F18
+
+NL/glx/GXMaterialProgramSupport_802963B4.cpp:
+	.text       start:0x802963B4 end:0x80296B8C
+	.rodata     start:0x804E8850 end:0x804E8880
+	.bss        start:0x8057B370 end:0x8057B3B0
+	.sdata      start:0x806DF0B8 end:0x806DF0C0
+	.sbss       start:0x806E1BC0 end:0x806E1BC8
+	.sdata2     start:0x806E5F18 end:0x806E5F38
+
+NL/glx/GXMaterialProgramSupport_80296BAC.cpp:
+	.text       start:0x80296BAC end:0x802977CC
+	.rodata     start:0x804E8880 end:0x804E88B0
+	.bss        start:0x8057B3B0 end:0x8057B3F0
+	.sdata      start:0x806DF0C0 end:0x806DF0C8
+	.sbss       start:0x806E1BC8 end:0x806E1BE8
+	.sdata2     start:0x806E5F38 end:0x806E5F58
+
+NL/glx/GXMaterialProgramSupport_802977EC.cpp:
+	.text       start:0x802977EC end:0x80297F70
+	.ctors      start:0x804DB860 end:0x804DB864
+	.sdata      start:0x806DF0C8 end:0x806DF0E8
+	.sbss       start:0x806E1BE8 end:0x806E1BF8
+	.sdata2     start:0x806E5F58 end:0x806E5F70
+
+NL/glx/GXMaterialProgramSupport_80298074.cpp:
+	.text       start:0x80298074 end:0x802981D0
+
+NL/glx/GXMaterialProgram_802981F0.cpp:
+	.text       start:0x802981F0 end:0x80298458
+	.data       start:0x80524488 end:0x80524508
+	.sbss       start:0x806E1C00 end:0x806E1C08
+
+NL/glx/GXMaterialProgram_80298478.cpp:
+	.text       start:0x80298478 end:0x80298780
+	.data       start:0x80524508 end:0x805245D0
+	.sbss       start:0x806E1C08 end:0x806E1C10
+
+NL/glx/GXMaterialProgram_802987A0.cpp:
+	.text       start:0x802987A0 end:0x80298AF8
+	.data       start:0x805245D0 end:0x805246B8
+	.sbss       start:0x806E1C10 end:0x806E1C18
+
+NL/glx/GXMaterialProgram_80298B18.cpp:
+	.text       start:0x80298B18 end:0x80298EC0
+	.data       start:0x805246B8 end:0x805247C8
+	.sbss       start:0x806E1C18 end:0x806E1C20
+
+NL/glx/GXMaterialProgram_80298EE0.cpp:
+	.text       start:0x80298EE0 end:0x80299198
+	.data       start:0x805247C8 end:0x80524860
+	.sbss       start:0x806E1C20 end:0x806E1C28
+
+NL/glx/GXMaterialProgram_802991B8.cpp:
+	.text       start:0x802991B8 end:0x80299470
+	.data       start:0x80524860 end:0x80524910
+	.sbss       start:0x806E1C28 end:0x806E1C30
+
+NL/glx/GXMaterialProgram_80299490.cpp:
+	.text       start:0x80299490 end:0x80299798
+	.data       start:0x80524910 end:0x805249D8
+	.sbss       start:0x806E1C30 end:0x806E1C38
+
+NL/glx/GXMaterialProgram_802997B8.cpp:
+	.text       start:0x802997B8 end:0x80299A70
+	.data       start:0x805249D8 end:0x80524A60
+	.sbss       start:0x806E1C38 end:0x806E1C40
+
+NL/glx/GXMaterialProgram_80299A90.cpp:
+	.text       start:0x80299A90 end:0x80299C80
+	.data       start:0x80524A60 end:0x80524AA0
+	.sbss       start:0x806E1C40 end:0x806E1C48
+
+NL/glx/GXMaterialProgram_80299CA0.cpp:
+	.text       start:0x80299CA0 end:0x8029A4A0
+	.ctors      start:0x804DB88C end:0x804DB890
+	.data       start:0x80524AA0 end:0x80524B28
+	.bss        start:0x8057B3F0 end:0x8057B430
+	.sbss       start:0x806E1C48 end:0x806E1C50
+	.sdata2     start:0x806E5F70 end:0x806E5F80
+
+NL/glx/GXMaterialProgram_8029A4A0.cpp:
+	.text       start:0x8029A4A0 end:0x8029AAEC
+	.data       start:0x80524B28 end:0x80524B80
+	.sbss       start:0x806E1C50 end:0x806E1C58
+
+NL/glx/GXMaterialProgram_8029AB0C.cpp:
+	.text       start:0x8029AB0C end:0x8029AFA4
+	.data       start:0x80524B80 end:0x80524BD0
+	.sbss       start:0x806E1C58 end:0x806E1C60
+
+NL/glx/GXMaterialProgram_8029AFC4.cpp:
+	.text       start:0x8029AFC4 end:0x8029B414
+	.data       start:0x80524BD0 end:0x80524C10
+	.sbss       start:0x806E1C60 end:0x806E1C68
+
+NL/glx/GXMaterialProgram_8029B434.cpp:
+	.text       start:0x8029B434 end:0x8029B9E4
+	.data       start:0x80524C10 end:0x80524C60
+	.sbss       start:0x806E1C68 end:0x806E1C70
+
+NL/glx/GXMaterialProgram_8029BA04.cpp:
+	.text       start:0x8029BA04 end:0x8029BC7C
+	.data       start:0x80524C60 end:0x80524E48
+	.sbss       start:0x806E1C70 end:0x806E1C78
+
+NL/glx/GXMaterialProgram_8029BC9C.cpp:
+	.text       start:0x8029BC9C end:0x8029C2D8
+	.data       start:0x80524E48 end:0x80524EB8
+	.sbss       start:0x806E1C78 end:0x806E1C80
+
+NL/glx/GXMaterialProgram_8029C2F8.cpp:
+	.text       start:0x8029C2F8 end:0x8029C9D0
+	.data       start:0x80524EB8 end:0x80524F50
+	.sbss       start:0x806E1C80 end:0x806E1C88
+
+NL/glx/GXMaterialProgram_8029C9F0.cpp:
+	.text       start:0x8029C9F0 end:0x8029D0C8
+	.data       start:0x80524F50 end:0x80525020
+	.sbss       start:0x806E1C88 end:0x806E1C90
+
+NL/glx/GXMaterialProgram_8029D0E8.cpp:
+	.text       start:0x8029D0E8 end:0x8029D7C0
+	.data       start:0x80525020 end:0x805250C0
+	.sbss       start:0x806E1C90 end:0x806E1C98
+
+NL/glx/GXMaterialProgram_8029D7E0.cpp:
+	.text       start:0x8029D7E0 end:0x8029DE1C
+	.data       start:0x805250C0 end:0x80525178
+	.sbss       start:0x806E1C98 end:0x806E1CA0
+
+NL/glx/GXMaterialProgram_8029DE3C.cpp:
+	.text       start:0x8029DE3C end:0x8029E318
+	.data       start:0x80525178 end:0x80525200
+	.sbss       start:0x806E1CA0 end:0x806E1CA8
+
+NL/glx/GXMaterialProgram_8029E338.cpp:
+	.text       start:0x8029E338 end:0x8029E8D8
+	.data       start:0x80525200 end:0x80525268
+	.sbss       start:0x806E1CA8 end:0x806E1CB0
+
+NL/glx/GXMaterialProgram_8029E8F8.cpp:
+	.text       start:0x8029E8F8 end:0x8029EF34
+	.data       start:0x80525268 end:0x80525300
+	.sbss       start:0x806E1CB0 end:0x806E1CB8
+
+NL/glx/GXMaterialProgram_8029EF54.cpp:
+	.text       start:0x8029EF54 end:0x8029F590
+	.data       start:0x80525300 end:0x80525398
+	.sbss       start:0x806E1CB8 end:0x806E1CC0
+
+NL/glx/GXMaterialProgram_8029F5B0.cpp:
+	.text       start:0x8029F5B0 end:0x8029FBEC
+	.data       start:0x80525398 end:0x80525450
+	.sbss       start:0x806E1CC0 end:0x806E1CC8
+
+NL/glx/GXMaterialProgram_8029FC0C.cpp:
+	.text       start:0x8029FC0C end:0x802A01AC
+	.data       start:0x80525450 end:0x805254F0
+	.sbss       start:0x806E1CC8 end:0x806E1CD0
+
+NL/glx/GXMaterialProgram_802A01CC.cpp:
+	.text       start:0x802A01CC end:0x802A0584
+	.data       start:0x805254F0 end:0x80525530
+	.sbss       start:0x806E1CD0 end:0x806E1CD8
+
+NL/glx/GXMaterialProgram_802A05A4.cpp:
+	.text       start:0x802A05A4 end:0x802A09F4
+	.data       start:0x80525530 end:0x80525568
+	.sbss       start:0x806E1CD8 end:0x806E1CE0
+
 Game/AnimProps/globalanimproperties.cpp:
 	.data       start:0x80525568 end:0x80527A18
 	.sdata      start:0x806DF0E8 end:0x806DF120
@@ -570,165 +907,146 @@ Game/AnimProps/goalieanimproperties.cpp:
 	.data       start:0x80527A18 end:0x8052A878
 	.sdata      start:0x806DF120 end:0x806DF190
 
-unclassified/tu_8029A4A0.cpp:
-	.text       start:0x8029A4A0 end:0x8029AAEC
+NL/glx/GXMaterialProgramRegistry_802A0A14.cpp:
+	.text       start:0x802A0A14 end:0x802A0EE4
 
-unclassified/tu_8029AB0C.cpp:
-	.text       start:0x8029AB0C end:0x8029AFA4
-
-unclassified/tu_8029AFC4.cpp:
-	.text       start:0x8029AFC4 end:0x8029B414
-
-unclassified/tu_8029B434.cpp:
-	.text       start:0x8029B434 end:0x8029B9E4
-
-unclassified/tu_8029BA04.cpp:
-	.text       start:0x8029BA04 end:0x8029BC7C
-
-unclassified/tu_8029BC9C.cpp:
-	.text       start:0x8029BC9C end:0x8029C2D8
-
-unclassified/tu_8029C2F8.cpp:
-	.text       start:0x8029C2F8 end:0x8029C9D0
-
-unclassified/tu_8029C9F0.cpp:
-	.text       start:0x8029C9F0 end:0x8029D0C8
-
-unclassified/tu_8029D0E8.cpp:
-	.text       start:0x8029D0E8 end:0x8029D7C0
-
-unclassified/tu_8029D7E0.cpp:
-	.text       start:0x8029D7E0 end:0x8029DE1C
-
-unclassified/tu_8029DE3C.cpp:
-	.text       start:0x8029DE3C end:0x8029E318
-
-unclassified/tu_8029E338.cpp:
-	.text       start:0x8029E338 end:0x8029E8D8
-
-unclassified/tu_8029E8F8.cpp:
-	.text       start:0x8029E8F8 end:0x8029EF34
-
-unclassified/tu_8029EF54.cpp:
-	.text       start:0x8029EF54 end:0x8029F590
-
-unclassified/tu_8029F5B0.cpp:
-	.text       start:0x8029F5B0 end:0x8029FBEC
-
-unclassified/tu_8029FC0C.cpp:
-	.text       start:0x8029FC0C end:0x802A01AC
-
-unclassified/tu_802A01CC.cpp:
-	.text       start:0x802A01CC end:0x802A0584
-
-unclassified/tu_802A05A4.cpp:
-	.text       start:0x802A05A4 end:0x802A09F4
-
-unclassified/tu_802A0F04.cpp:
-	.text       start:0x802A0F04 end:0x802A12C4
-
-unclassified/tu_802A12E4.cpp:
-	.text       start:0x802A12E4 end:0x802A15B4
-
-unclassified/tu_802A15D4.cpp:
-	.text       start:0x802A15D4 end:0x802A193C
-
-unclassified/tu_802A195C.cpp:
-	.text       start:0x802A195C end:0x802A1BD4
-
-unclassified/tu_802A1BF4.cpp:
-	.text       start:0x802A1BF4 end:0x802A1EC4
-
-unclassified/tu_802A1EE4.cpp:
+NL/glx/GXMaterialProgramSupport_802A1EE4.cpp:
 	.text       start:0x802A1EE4 end:0x802A2034
 
-unclassified/tu_802A2054.cpp:
+NL/glx/GXMaterialProgramSupport_802A2054.cpp:
 	.text       start:0x802A2054 end:0x802A2200
+	.sdata2     start:0x806E5F80 end:0x806E5F84
 
-unclassified/tu_802A2220.cpp:
+NL/glx/GXMaterialProgramSupport_802A2220.cpp:
 	.text       start:0x802A2220 end:0x802A23D4
+	.sdata2     start:0x806E5F88 end:0x806E5F8C
 
-unclassified/tu_802A23F4.cpp:
+NL/glx/GXMaterialProgramSupport_802A23F4.cpp:
 	.text       start:0x802A23F4 end:0x802A251C
 
-unclassified/tu_802A253C.cpp:
+NL/glx/GXMaterialProgramSupport_802A253C.cpp:
 	.text       start:0x802A253C end:0x802A2758
+	.sdata2     start:0x806E5F90 end:0x806E5F94
 
-unclassified/tu_802A2778.cpp:
+NL/glx/GXMaterialProgramSupport_802A2778.cpp:
 	.text       start:0x802A2778 end:0x802A2A74
+	.rodata     start:0x804E88B0 end:0x804E88C0
+	.sdata2     start:0x806E5F98 end:0x806E5F9C
 
-unclassified/tu_802A2A94.cpp:
+NL/glx/GXMaterialProgramSupport_802A2A94.cpp:
 	.text       start:0x802A2A94 end:0x802A2CDC
+	.bss        start:0x8057B430 end:0x8057B470
+	.sdata2     start:0x806E5FA0 end:0x806E5FA4
 
-unclassified/tu_802A2CFC.cpp:
+NL/glx/GXMaterialProgramSupport_802A2CFC.cpp:
 	.text       start:0x802A2CFC end:0x802A2EBC
+	.sdata2     start:0x806E5FA8 end:0x806E5FAC
 
-unclassified/tu_802A2EDC.cpp:
+NL/glx/GXMaterialProgramSupport_802A2EDC.cpp:
 	.text       start:0x802A2EDC end:0x802A30C4
+	.bss        start:0x8057B470 end:0x8057B4B0
 
-unclassified/tu_802A30E4.cpp:
+NL/glx/GXMaterialProgramSupport_802A30E4.cpp:
 	.text       start:0x802A30E4 end:0x802A3234
 
-unclassified/tu_802A3254.cpp:
+NL/glx/GXMaterialProgramSupport_802A3254.cpp:
 	.text       start:0x802A3254 end:0x802A33C0
+	.sdata2     start:0x806E5FB0 end:0x806E5FB4
 
-unclassified/tu_802A33E0.cpp:
+NL/glx/GXMaterialProgramSupport_802A33E0.cpp:
 	.text       start:0x802A33E0 end:0x802A360C
+	.sdata2     start:0x806E5FB8 end:0x806E5FBC
 
-unclassified/tu_802A362C.cpp:
+NL/glx/GXMaterialProgramSupport_802A362C.cpp:
 	.text       start:0x802A362C end:0x802A3718
 
-unclassified/tu_802A3738.cpp:
+NL/glx/GXMaterialProgramSupport_802A3738.cpp:
 	.text       start:0x802A3738 end:0x802A3D9C
 	.ctors      start:0x804DB924 end:0x804DB928
+	.data       start:0x8052A878 end:0x8052A890
+	.bss        start:0x8057B4B0 end:0x8057B530
+	.sdata      start:0x806DF190 end:0x806DF1AA
+	.sbss       start:0x806E1CE0 end:0x806E1CE4
+	.sdata2     start:0x806E5FC0 end:0x806E5FC4
 
-unclassified/tu_802A3D9C.cpp:
+NL/glx/GXMaterialProgramSupport_802A3D9C.cpp:
 	.text       start:0x802A3D9C end:0x802A3ED0
+	.sdata      start:0x806DF1B0 end:0x806DF1B8
 
-unclassified/tu_802A3EF0.cpp:
+NL/glx/GXMaterialProgram_802A3EF0.cpp:
 	.text       start:0x802A3EF0 end:0x802A4340
+	.data       start:0x8052A890 end:0x8052A8C8
+	.sbss       start:0x806E1CE8 end:0x806E1CF0
 
-unclassified/tu_802A4360.cpp:
+NL/glx/GXMaterialProgram_802A4360.cpp:
 	.text       start:0x802A4360 end:0x802A4724
+	.data       start:0x8052A8C8 end:0x8052A908
+	.sbss       start:0x806E1CF0 end:0x806E1CF8
 
-unclassified/tu_802A4744.cpp:
+NL/glx/GXMaterialProgram_802A4744.cpp:
 	.text       start:0x802A4744 end:0x802A4B08
+	.data       start:0x8052A908 end:0x8052A948
+	.sbss       start:0x806E1CF8 end:0x806E1D00
 
-unclassified/tu_802A4B28.cpp:
+NL/glx/GXMaterialProgram_802A4B28.cpp:
 	.text       start:0x802A4B28 end:0x802A4EEC
+	.data       start:0x8052A948 end:0x8052A980
+	.sbss       start:0x806E1D00 end:0x806E1D08
 
-unclassified/tu_802A4F0C.cpp:
+NL/glx/GXMaterialProgram_802A4F0C.cpp:
 	.text       start:0x802A4F0C end:0x802A5394
+	.data       start:0x8052A980 end:0x8052A9D0
+	.sbss       start:0x806E1D08 end:0x806E1D10
 
-unclassified/tu_802A53B4.cpp:
+NL/glx/GXMaterialProgram_802A53B4.cpp:
 	.text       start:0x802A53B4 end:0x802A58C8
+	.data       start:0x8052A9D0 end:0x8052AA20
+	.sbss       start:0x806E1D10 end:0x806E1D18
 
-unclassified/tu_802A58E8.cpp:
+NL/glx/GXMaterialProgram_802A58E8.cpp:
 	.text       start:0x802A58E8 end:0x802A5D38
+	.data       start:0x8052AA20 end:0x8052AA78
+	.sbss       start:0x806E1D18 end:0x806E1D20
 
-unclassified/tu_802A5D58.cpp:
+NL/glx/GXMaterialProgram_802A5D58.cpp:
 	.text       start:0x802A5D58 end:0x802A61A8
+	.data       start:0x8052AA78 end:0x8052AB00
+	.sbss       start:0x806E1D20 end:0x806E1D28
 
-unclassified/tu_802A61C8.cpp:
+NL/glx/GXMaterialProgram_802A61C8.cpp:
 	.text       start:0x802A61C8 end:0x802A63B8
+	.data       start:0x8052AB00 end:0x8052AB40
+	.sbss       start:0x806E1D28 end:0x806E1D30
 
-unclassified/tu_802A63D8.cpp:
+NL/glx/GXMaterialProgram_802A63D8.cpp:
 	.text       start:0x802A63D8 end:0x802A6828
+	.data       start:0x8052AB40 end:0x8052AB78
+	.sbss       start:0x806E1D30 end:0x806E1D38
 
-unclassified/tu_802A6848.cpp:
+NL/glx/GXMaterialProgram_802A6848.cpp:
 	.text       start:0x802A6848 end:0x802A6B4C
+	.data       start:0x8052AB78 end:0x8052ABA0
+	.sbss       start:0x806E1D38 end:0x806E1D40
 
-unclassified/tu_802A6B6C.cpp:
+NL/glx/GXMaterialProgram_802A6B6C.cpp:
 	.text       start:0x802A6B6C end:0x802A6FBC
+	.data       start:0x8052ABA0 end:0x8052ABE0
+	.sbss       start:0x806E1D40 end:0x806E1D48
 
-unclassified/tu_802A6FDC.cpp:
+NL/glx/GXMaterialProgram_802A6FDC.cpp:
 	.text       start:0x802A6FDC end:0x802A7390
+	.data       start:0x8052ABE0 end:0x8052AC08
+	.sbss       start:0x806E1D48 end:0x806E1D50
 
-unclassified/tu_802A73B0.cpp:
+NL/glx/GXMaterialProgram_802A73B0.cpp:
 	.text       start:0x802A73B0 end:0x802A7800
+	.data       start:0x8052AC08 end:0x8052AC48
+	.sbss       start:0x806E1D50 end:0x806E1D58
 
-unclassified/tu_802A7820.cpp:
+NL/glx/GXMaterialProgram_802A7820.cpp:
 	.text       start:0x802A7820 end:0x802A7C70
+	.data       start:0x8052AC48 end:0x8052AC80
+	.sbss       start:0x806E1D58 end:0x806E1D60
 
 unclassified/tu_802A7C90.cpp:
 	.text       start:0x802A7C90 end:0x802A7F60

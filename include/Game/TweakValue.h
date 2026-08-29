@@ -10,18 +10,21 @@ class TweakValueBase_8052BF70
 public:
     TweakValueBase_8052BF70();
     virtual ~TweakValueBase_8052BF70();
-    virtual void UnidentifiedVirtual0C();
-    virtual void UnidentifiedVirtual10();
-    virtual void UnidentifiedVirtual14();
+    virtual int UnidentifiedVirtual0C();
+    virtual int UnidentifiedVirtual10();
+    virtual void UnidentifiedVirtual14(float*, float*, float*);
     virtual void UnidentifiedVirtual18();
     virtual void UnidentifiedVirtual1C();
-    virtual void UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24();
-    virtual void UnidentifiedVirtual28();
-    virtual void UnidentifiedVirtual2C();
+    virtual void* UnidentifiedVirtual20();
+    virtual int UnidentifiedVirtual24(char*, unsigned long);
+    virtual void UnidentifiedVirtual28(const char*);
+    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
 
-private:
-    /* 0x04 */ u8 mUnidentified004[0x08];
+protected:
+    /* 0x04 */ const char* mName;
+    /* 0x08 */ u8 mUnidentified008;
+    /* 0x09 */ bool mUnidentified009;
+    /* 0x0A */ u8 mUnidentified00A[2];
 }; // total size: 0x0C
 
 class TweakValueImpl_804F4DC8 : public TweakValueBase_8052BF70
@@ -44,6 +47,18 @@ class TweakValue_804F4DC8
 {
 public:
     void fn_8002D078(const char*, float, const char*, bool, float, float, float);
+    bool fn_802C4FEC(const char*, float, const char*, bool, float, float);
+
+    TweakValue_804F4DC8& operator=(float value)
+    {
+        *mValue.m_pValue = value;
+        return *this;
+    }
+
+    float GetDefaultValue()
+    {
+        return mValue.UnidentifiedVirtual3C();
+    }
 
     operator float() const
     {
