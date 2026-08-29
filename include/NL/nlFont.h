@@ -156,12 +156,11 @@ inline FontCharString::FontCharString(const T* Source, const nlFont* pFont, T* p
 
     unsigned short* dest = m_pString;
     const T* src = Source;
-    unsigned short escBegin = nlEscapeSequence::ESCAPE_BEGIN;
     unsigned short ch;
 
     while ((ch = *src) != 0)
     {
-        if (ch == escBegin)
+        if (ch == nlEscapeSequence::ESCAPE_BEGIN)
         {
             nlEscapeSequence EscSeq(src);
             const T* end = (const T*)EscSeq.m_pEnd;

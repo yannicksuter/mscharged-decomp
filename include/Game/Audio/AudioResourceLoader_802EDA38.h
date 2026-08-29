@@ -4,6 +4,9 @@
 #include "types.h"
 
 class MemoryAllocator;
+class AudioBankLoader_802EF6B0;
+class SoundMap;
+struct AudioResourceSource_802ED144;
 
 struct AudioResourceLoadOwner_802EDA54;
 typedef void (*AudioResourceLoadCallback_802EDA54)(
@@ -11,11 +14,17 @@ typedef void (*AudioResourceLoadCallback_802EDA54)(
 
 struct AudioResourceLoadOwner_802EDA54
 {
-    u8 m_Unknown00[8];
+    AudioResourceSource_802ED144* m_Source;
+    void* m_LoadedData;
     u8 m_Completed;
-    u8 m_Unknown09[0xF];
+    u8 m_Unknown09[3];
+    void* m_ResourceObject;
+    AudioBankLoader_802EF6B0* m_Loader;
+    SoundMap* m_SoundMap;
     AudioResourceLoadCallback_802EDA54 m_Callback;
     void* m_CallbackParam;
+    u32 m_Unknown20;
+    MemoryAllocator* m_Allocator;
 };
 
 class AudioResourceLoader_802EDA38

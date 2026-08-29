@@ -93,4 +93,49 @@ private:
     /* 0x9C */ float mPivotY;
 }; // size 0xA0
 
+inline void TU80300104Component::fn_802196A8(float value)
+{
+    mMinX = value;
+}
+
+inline void TU80300104Component::fn_802141F4(float value)
+{
+    mMaxX = value;
+}
+
+inline void TU80300104Component::fn_802196A0(float value)
+{
+    mMaxY = value;
+}
+
+inline void TU80300104Component::fn_80219698(float value)
+{
+    mMinY = value;
+}
+
+inline float TU80300104Component::fn_80219690() const
+{
+    return mMinX;
+}
+
+inline float TU80300104Component::fn_80219688() const
+{
+    return mMaxX;
+}
+
+inline float TU80300104Component::fn_80219680() const
+{
+    return mMaxY;
+}
+
+inline float TU80300104Component::fn_80219678() const
+{
+    return mMinY;
+}
+
+inline bool TU80300104Base::fn_80219668()
+{
+    return !mDisabled;
+}
+
 #endif // UNCLASSIFIED_TU_80300104_H

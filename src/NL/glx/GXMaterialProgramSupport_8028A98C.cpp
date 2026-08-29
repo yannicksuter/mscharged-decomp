@@ -226,7 +226,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802981F0>::Draw(
     nlMultMatrices(modelview, model, lbl_8057AD48);
     fn_80183B40(packet->matrix);
 
-    if (*(unsigned long*)packet->unknown28 == 0)
+    if (packet->unknown28 == 0)
     {
         fn_803640E0(
             fn_80364020(), "CharacterSkinCustom - RLXLoadSkinMatrices");

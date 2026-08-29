@@ -254,7 +254,7 @@ public:
 
     static float mfGoalieStepDist;
 
-private:
+public:
     /* 0x328 */ eGoalieActionState mGoalieActionState;
     /* 0x32C */ eGoalieActionState mPrevGoalieActionState;
     /* 0x330 */ eUrgency mUrgency;

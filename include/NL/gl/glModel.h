@@ -33,6 +33,17 @@ struct glModelStream
     /* 0x07 */ u8 unknown07;
 }; // size: 0x8
 
+struct glModelPacket;
+
+class UnidentifiedPacketResource
+{
+public:
+    virtual void fn_Unknown0();
+    virtual void fn_Unknown1();
+    virtual void fn_Unknown2(glModelPacket* packet);
+    virtual void fn_Unknown3(glModelPacket* packet);
+};
+
 struct glModelPacket
 {
     /* 0x00 */ u16* indexBuffer;
@@ -47,7 +58,8 @@ struct glModelPacket
     /* 0x1C */ u32 rasterState;
     /* 0x20 */ void* unknown20;
     /* 0x24 */ DisplayList* displayList;
-    /* 0x28 */ u8 unknown28[8];
+    /* 0x28 */ u32 unknown28;
+    /* 0x2C */ u32 unknown2C;
 }; // size: 0x30
 
 struct glModel

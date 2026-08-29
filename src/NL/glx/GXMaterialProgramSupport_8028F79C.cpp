@@ -69,7 +69,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Draw(
     glGetMatrix(packet->matrix, model);
     nlMultMatrices(modelview, model, sViewMatrix);
 
-    if (*(unsigned long*)packet->unknown28 == 0)
+    if (packet->unknown28 == 0)
     {
         const unsigned char* parameters = (const unsigned char*)packet->unknown20;
         fn_8036D7EC(*(const void**)(parameters + 8),

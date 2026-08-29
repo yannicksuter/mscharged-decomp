@@ -606,7 +606,7 @@ void GLViewInterface::GetInverseViewMatrix(nlMatrix4& matrix)
     matrix.SetIdentity();
 }
 
-void GLViewInterface::GetInverseProjectionMatrix(nlMatrix4& matrix)
+void GLViewInterface::GetViewProjectionMatrix(nlMatrix4& matrix)
 {
     matrix.SetIdentity();
 }

@@ -265,7 +265,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802997B8>::Draw(
         lbl_806E1AFC = packet->matrix;
     }
 
-    if (*(unsigned long*)packet->unknown28 == 0)
+    if (packet->unknown28 == 0)
     {
         fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }

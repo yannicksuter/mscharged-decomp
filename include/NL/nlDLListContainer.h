@@ -16,6 +16,12 @@ public:
     {
     }
 
+    DLListContainerBase(int initial, int delta)
+        : m_Allocator(initial, delta)
+        , m_Head(0)
+    {
+    }
+
     ~DLListContainerBase()
     {
         Clear();
@@ -70,6 +76,11 @@ public:
         return nlDLListIterator<T>(m_Head, nlDLRingGetStart(m_Head));
     }
 
+    nlDLListIterator<T> Begin(DLListEntry<T>* current) const
+    {
+        return nlDLListIterator<T>(m_Head, current);
+    }
+
     void DeleteEntry(DLListEntry<T>* entry);
 
     /* 0x00 */ Adapter m_Allocator;
@@ -105,9 +116,8 @@ public:
     }
 
     nlDLListSlotPool(const int initial, const int delta)
-        : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >()
+        : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >(initial, delta)
     {
-        this->m_Allocator.Initialize(initial, delta);
     }
 };
 
@@ -115,6 +125,10 @@ template <typename T, typename Adapter>
 void DLListContainerBase<T, Adapter>::DeleteEntry(
     DLListEntry<T>* entry)
 {
+    if (entry != 0)
+    {
+        entry->entry.~T();
+    }
     m_Allocator.DeleteEntry(entry);
 }
 

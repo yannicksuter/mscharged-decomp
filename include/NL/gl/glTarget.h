@@ -11,6 +11,8 @@ struct GLRenderPair
     TargetPlatform_8036DE50* target;
 
     GLRenderPair()
+        : hash(0)
+        , target(0)
     {
     }
 

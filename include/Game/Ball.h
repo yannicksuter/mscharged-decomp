@@ -54,7 +54,13 @@ public:
     /* 0x24 */ Timer m_tPassTargetTimer;
 
 private:
-    /* 0x2C */ u8 mUnidentified02C[0x28];
+    /* 0x2C */ u8 mUnidentified02C[0x1E];
+
+public:
+    /* 0x4A */ bool mUnidentified4A;
+
+private:
+    /* 0x4B */ u8 mUnidentified04B[0x09];
 
 public:
     /* 0x54 */ nlVector3 m_v3Position;
@@ -90,8 +96,10 @@ private:
 public:
     /* 0xC8 */ cPlayer* m_pOwner;
 
-private:
+public:
     /* 0xCC */ cPlayer* m_pPrevOwner;
+
+private:
     /* 0xD0 */ cPlayer* m_pLastTouch;
 
 public:
@@ -106,6 +114,7 @@ public:
 
 public:
     /* 0xE8 */ PhysicsBall* m_pPhysicsBall;
+    /* 0xEC */ void* mUnidentifiedEC;
 };
 
 extern cBall* g_pBall;

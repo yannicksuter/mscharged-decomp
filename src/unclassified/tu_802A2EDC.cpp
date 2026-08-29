@@ -83,7 +83,7 @@ extern "C" void fn_802A2FF8(void* renderer, const glModelPacket* packet)
     glGetMatrix(packet->matrix, matrix);
     nlMultMatrices(product, matrix, lbl_8057B470);
 
-    if (*reinterpret_cast<const u32*>(&packet->unknown28[0]) == 0)
+    if (packet->unknown28 == 0)
     {
         SkinParameters_802A2FF8* parameters = static_cast<SkinParameters_802A2FF8*>(packet->unknown20);
         fn_8036D7EC(parameters->matrices, parameters->matrixBytes / 0x30, &product, 0);

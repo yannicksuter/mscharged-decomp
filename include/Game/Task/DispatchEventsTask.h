@@ -6,13 +6,9 @@
 #include "NL/nlSlotPool.h"
 #include "NL/nlTask.h"
 
-// These descriptive dispatcher names are not present in the stripped retail
-// executable. Their interface and layout follow from the vtables and callers.
-struct EventCallback
-{
-    u32 kind;
-    void* target;
-};
+#include "NL/nlFunction.h"
+
+typedef Function<bool> EventCallback;
 
 template <typename T>
 struct EventCallbackEntry
@@ -74,6 +70,7 @@ class EventDispatcher : public EventDispatcherBase
 {
 public:
     EventDispatcher() { }
+    EventDispatcher(const char*);
 
     virtual void Dispatch(bool);
     virtual void Clear();

@@ -67,7 +67,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A61C8>::Draw(
     glGetMatrix(packet->matrix, model);
     nlMultMatrices(modelview, model, mview);
 
-    if (*(unsigned long*)packet->unknown28 == 0)
+    if (packet->unknown28 == 0)
     {
         GXMaterialProgramParameters_802A61C8* parameters = (GXMaterialProgramParameters_802A61C8*)packet->unknown20;
         fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, false);

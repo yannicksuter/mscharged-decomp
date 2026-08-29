@@ -275,7 +275,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029BA04>::Draw(
         GXSetChanCtrl(GX_COLOR0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)(GX_LIGHT0 | GX_LIGHT1 | GX_LIGHT2 | GX_LIGHT3), GX_DF_NONE, GX_AF_SPOT);
     }
 
-    if (*(unsigned long*)packet->unknown28 == 0)
+    if (packet->unknown28 == 0)
     {
         fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }

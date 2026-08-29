@@ -30,7 +30,10 @@ loop:
 test:
     if (n-- == 0)
         goto done;
-    c = *(const unsigned char*)&str2[p];
+    if (sizeof(CharT) == 1)
+        c = *(const unsigned char*)&str2[p];
+    else
+        c = str2[p];
     str1[p] = c;
     if ((CharT)c)
         goto loop;

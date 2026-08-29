@@ -73,11 +73,8 @@ extern "C" GLRenderPair fn_802CD884(const char* name, void* targetInfo)
     nlStrNCat(targetName, "target/", name, sizeof(targetName));
     unsigned long hash = glHash(targetName);
 
-    GLRenderPair target = FindTarget(hash);
-    GLRenderPair result;
-    if (target)
-        result = target;
-    else
+    GLRenderPair result = FindTarget(hash);
+    if (!result)
         result = CreateTarget(hash, targetInfo);
 
     fn_802C8288();
