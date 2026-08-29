@@ -279,6 +279,11 @@ Game/GameInfo.cpp:
 	.sdata      start:0x806DC690 end:0x806DC6B8
 	.sbss       start:0x806E0F50 end:0x806E0F58
 
+Game/DB/UserOptions.cpp:
+	.text       start:0x80109890 end:0x80109CF0
+	.rodata     start:0x804DC630 end:0x804DC660
+	.sdata2     start:0x806E45E0 end:0x806E45E8
+
 unclassified/tu_80111654.cpp:
 	.text       start:0x80111654 end:0x801123B4
 	.ctors      start:0x804DB5E0 end:0x804DB5E4
@@ -984,8 +989,14 @@ unclassified/tu_802ED144.cpp:
 unclassified/tu_802ED74C.cpp:
 	.text       start:0x802ED74C end:0x802ED964
 
-unclassified/tu_802EDA38.cpp:
-	.text       start:0x802EDA38 end:0x802EE08C
+Game/Audio/AudioResourceLoader_802EDA38.cpp:
+	.text       start:0x802EDA38 end:0x802EDA7C
+	.data       start:0x8052F528 end:0x8052F538
+
+Game/Audio/AudioBundleManager_802EDA7C.cpp:
+	.text       start:0x802EDA7C end:0x802EE08C
+	.data       start:0x8052F538 end:0x8052F570
+	.sdata      start:0x806DF4D0 end:0x806DF4D8
 
 Game/Audio/SoundMap.cpp:
 	.text       start:0x802EE178 end:0x802EE890
@@ -1334,6 +1345,14 @@ ode/NLGAdditions.cpp:
 	.text       start:0x80358E7C end:0x8035952C
 	.data       start:0x80534738 end:0x80534750
 	.sdata2     start:0x806E6B88 end:0x806E6BA0
+
+Game/Audio/AudioResourcePlatform_8035DE28.cpp:
+	.text       start:0x8035DE28 end:0x8035EA28
+	.ctors      start:0x804DBB14 end:0x804DBB18
+	.data       start:0x80534BA0 end:0x80534CD0
+	.bss        start:0x80585558 end:0x80585C10
+	.sdata      start:0x806DF9D8 end:0x806DF9E0
+	.sbss       start:0x806E2200 end:0x806E2210
 
 NL/plat/platqmath.cpp:
 	.text       start:0x80368360 end:0x80368784
