@@ -179,7 +179,7 @@ private:
 
 public:
     void play_sound(int id);
-    void createSound(nw4hbm::snd::NandSoundArchive* pNandSoundArchive, bool bCreateSoundHeap);
+    void createSound(nw4hbm::snd::MemorySoundArchive* pNandSoundArchive, bool bCreateSoundHeap);
     void deleteSound();
     void draw_impl();
     void updateSoundArchivePlayer();
@@ -226,6 +226,7 @@ private:
     /* 0x08E */ bool mEndInitSoundFlag;
     /* 0x08F */ bool mForceStopSyncFlag;
     /* 0x090 */ bool mForceEndMsgAnmFlag;
+    /* 0x091 */ bool mStartBlackOutFlag;
 #if HBM_REVISION > 1
     /* 0x094 */ int mSoundRetryCnt;
 #endif
@@ -236,41 +237,45 @@ private:
     /* 0x0B4 */ wchar_t* mpText[7][6];
     /* 0x15C */ WPADInfo mWpadInfo[WPAD_MAX_CONTROLLERS];
     /* 0x1BC */ WPADSyncDeviceCallback mSimpleSyncCallback;
-    /* 0x1CC */ f32 mOnPaneVibFrame[4];
-    /* 0x1DC */ f32 mOnPaneVibWaitFrame[4];
+    /* 0x1C0 */ f32 mOnPaneVibFrame[4];
+    /* 0x1D0 */ f32 mOnPaneVibWaitFrame[4];
     /* 0x1E0 */ int mWaitStopMotorCount;
-    /* 0x1E4 */ nw4hbm::lyt::Layout* mpLayout;
-    /* 0x1E8 */ nw4hbm::lyt::Layout* mpCursorLayout[WPAD_MAX_CONTROLLERS];
-    /* 0x1F8 */ nw4hbm::lyt::ArcResourceAccessor* mpResAccessor;
-    /* 0x1FC */ gui::PaneManager* mpPaneManager;
-    /* 0x200 */ HomeButtonEventHandler* mpHomeButtonEventHandler;
-    /* 0x204 */ nw4hbm::lyt::DrawInfo mDrawInfo;
-    /* 0x258 */ Controller* mpController[WPAD_MAX_CONTROLLERS];
-    /* 0x268 */ RemoteSpk* mpRemoteSpk;
-    /* 0x26C */ GroupAnmController* mpAnmController[12];
-    /* 0x29C */ GroupAnmController* mpGroupAnmController[74];
-    /* 0x3C4 */ GroupAnmController* mpPairGroupAnmController[15];
-    /* 0x400 */ BlackFader mFader;
-    /* 0x410 */ OSAlarm mAlarm[WPAD_MAX_CONTROLLERS];
-    /* 0x4D0 */ OSAlarm mSpeakerAlarm[WPAD_MAX_CONTROLLERS];
-    /* 0x590 */ OSAlarm mSimpleSyncAlarm;
-    /* 0x5C0 */ nw4hbm::snd::SoundArchivePlayer* mpSoundArchivePlayer;
-    /* 0x5C4 */ nw4hbm::snd::DvdSoundArchive* mpDvdSoundArchive;
-    /* 0x5C8 */ nw4hbm::snd::MemorySoundArchive* mpMemorySoundArchive;
-    /* 0x5CC */ nw4hbm::snd::NandSoundArchive* mpNandSoundArchive;
-    /* 0x5D0 */ nw4hbm::snd::SoundHeap* mpSoundHeap;
-    /* 0x5D4 */ nw4hbm::snd::SoundHandle* mpSoundHandle;
-    /* 0x5D8 */ u16 mAppVolume[3];
-    /* 0x5E0 */ AXFXAllocHook mAxFxAlloc;
-    /* 0x5E4 */ AXFXFreeHook mAxFxFree;
-    /* 0x5E8 */ AXFX_REVERBHI mAxFxReverb;
-    /* 0x748 */ AXAuxCallback mAuxCallback;
-    /* 0x74C */ void* mpAuxContext;
-    /* 0x750 */ f32 mFadeOutSeTime;
+    /* 0x1E4 */ int mDisConnectCount;
+    /* 0x1E8 */ nw4hbm::lyt::Layout* mpLayout;
+    /* 0x1EC */ nw4hbm::lyt::Layout* mpCursorLayout[WPAD_MAX_CONTROLLERS];
+    /* 0x1FC */ nw4hbm::lyt::ArcResourceAccessor* mpResAccessor;
+    /* 0x200 */ gui::PaneManager* mpPaneManager;
+    /* 0x204 */ HomeButtonEventHandler* mpHomeButtonEventHandler;
+    /* 0x208 */ nw4hbm::lyt::DrawInfo mDrawInfo;
+    /* 0x25C */ Controller* mpController[WPAD_MAX_CONTROLLERS];
+    /* 0x26C */ RemoteSpk* mpRemoteSpk;
+    /* 0x270 */ GroupAnmController* mpAnmController[12];
+    /* 0x2A0 */ GroupAnmController* mpGroupAnmController[74];
+    /* 0x3C8 */ GroupAnmController* mpPairGroupAnmController[15];
+    /* 0x404 */ BlackFader mFader;
+    /* 0x418 */ OSAlarm mAlarm[WPAD_MAX_CONTROLLERS];
+    /* 0x4D8 */ OSAlarm mSpeakerAlarm[WPAD_MAX_CONTROLLERS];
+    /* 0x598 */ OSAlarm mSimpleSyncAlarm;
+    /* 0x5C8 */ int iReConnectTime;
+    /* 0x5CC */ int iReConnectTime2;
+    /* 0x5D0 */ nw4hbm::snd::SoundArchivePlayer* mpSoundArchivePlayer;
+    /* 0x5D4 */ nw4hbm::snd::DvdSoundArchive* mpDvdSoundArchive;
+    /* 0x5D8 */ nw4hbm::snd::MemorySoundArchive* mpMemorySoundArchive;
+    /* 0x5DC */ nw4hbm::snd::NandSoundArchive* mpNandSoundArchive;
+    /* 0x5E0 */ nw4hbm::snd::SoundHeap* mpSoundHeap;
+    /* 0x5E4 */ nw4hbm::snd::SoundHandle* mpSoundHandle;
+    /* 0x5E8 */ u16 mAppVolume[3];
+    /* 0x5F0 */ AXFXAllocHook mAxFxAlloc;
+    /* 0x5F4 */ AXFXFreeHook mAxFxFree;
+    /* 0x5F8 */ AXFX_REVERBHI mAxFxReverb;
+    /* 0x758 */ AXAuxCallback mAuxCallback;
+    /* 0x75C */ void* mpAuxContext;
+    /* 0x760 */ f32 mFadeOutSeTime;
 
     // static members
 private:
     static HomeButton* spHomeButtonObj;
+    static OSMutex sMutex;
 
     static const char* scCursorLytName[WPAD_MAX_CONTROLLERS];
     static const char* scCursorPaneName;
@@ -289,7 +294,7 @@ private:
     static const char* scFuncTouchPaneName[10];
     static const char* scFuncTextPaneName[3];
     static const char* scBatteryPaneName[WPAD_MAX_CONTROLLERS][4];
-}; // size = 0x740
+}; // size = 0x768
 
 } // namespace homebutton
 

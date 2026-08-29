@@ -1,7 +1,7 @@
 #ifndef NW4HBM_SND_REMOTE_SPEAKER_H
 #define NW4HBM_SND_REMOTE_SPEAKER_H
 
-#include "revolution/os.h"
+#include "revolution/os/OSAlarm.h"
 #include "revolution/wenc.h"
 #include "revolution/wpad.h"
 

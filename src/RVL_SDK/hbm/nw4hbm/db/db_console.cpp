@@ -4,8 +4,6 @@
 #include "revolution/hbm/nw4hbm/db/directPrint.h"
 #include "revolution/os.h"
 
-#include "decomp.h"
-
 namespace nw4hbm {
 namespace db {
 
@@ -18,8 +16,7 @@ static inline u8* GetTextPtr_(ConsoleHandle console, u16 line, u16 xPos) {
 static inline u32 CodeWidth_(u8 const* p) { return *p >= 0x81 ? sizeof(wchar_t) : sizeof(char); }
 
 static inline u32 GetTabSize_(ConsoleHandle console) {
-    s32 tab = (console->attr & /* REGISTER16_BITFIELD(12, 13) */ 0xC) >> 2;
-    // EXTRACT_BIT_FIELD does not generate srawi
+    s32 tab = (console->attr & 0xC) >> 2;
 
     return static_cast<u32>(2 << tab);
 }
@@ -35,15 +32,13 @@ static inline u8 const* SearchEndOfLine_(u8 const* str) {
 static inline u16 GetRingUsedLines_(ConsoleHandle console) {
     NW4HBMAssertPointerNonnull_Line(console, 112);
 
-    { // 39ac92 wants lexical_block
-        s32 lines = console->printTop - console->ringTop;
+    s32 lines = console->printTop - console->ringTop;
 
-        if (lines < 0) {
-            lines += console->height;
-        }
-
-        return static_cast<u16>(lines);
+    if (lines < 0) {
+        lines += console->height;
     }
+
+    return static_cast<u16>(lines);
 }
 
 static inline u16 GetActiveLines_(ConsoleHandle console) {
@@ -207,8 +202,7 @@ static void PrintToBuffer_(ConsoleHandle console, u8 const* str) {
             break;
         }
 
-        while (*str) // ? just use continue? am i missing something?
-        {
+        while (*str) {
             bool newLineFlag = false;
 
             if (*str == '\n') {
@@ -289,10 +283,6 @@ void Console_Printf(ConsoleHandle console, char const* format, ...) {
 
 s32 Console_GetTotalLines(ConsoleHandle console) {
     s32 count;
-
-    // this is not part of this function but it's required to generate the dtor (`nw4hbm::ut::Color::~Color()`)
-    // it was probably part of a function that got stripped by the linker
-    ::nw4hbm::ut::Color unused;
 
     NW4HBMAssertPointerNonnull_Line(console, 1050);
 

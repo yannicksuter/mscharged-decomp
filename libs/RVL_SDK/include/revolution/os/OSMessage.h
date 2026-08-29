@@ -26,6 +26,8 @@ void OSInitMessageQueue(OSMessageQueue* queue, OSMessage* msgArray, s32 msgCount
 BOOL OSSendMessage(OSMessageQueue* queue, OSMessage msg, s32 flags);
 BOOL OSReceiveMessage(OSMessageQueue* queue, OSMessage* msg, s32 flags);
 
+#define OSSendMessageAny(msgQueue_, msg_, flags_) OSSendMessage(msgQueue_, (OSMessage)(msg_), flags_)
+
 #ifdef __cplusplus
 }
 #endif

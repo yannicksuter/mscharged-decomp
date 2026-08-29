@@ -4,7 +4,9 @@
 
 #include <revolution/sc.h>
 #include <revolution/wud.h>
+#define WPAD_ESUCCESS WPAD_ERR_OK
 #define WPAD_ENODEV WPAD_ERR_NO_CONTROLLER
+#define WPAD_ECOMM WPAD_ERR_COMMUNICATION_ERROR
 #define WPAD_CENODEV (WPAD_ENODEV + 0)
 
 #ifdef __cplusplus
@@ -38,11 +40,6 @@ extern u8 _scFlush;
 typedef WUDAllocFunc WPADAllocFunc;
 typedef WUDFreeFunc WPADFreeFunc;
 
-typedef void (*WPADCallback)(s32 chan, s32 result);
-typedef void (*WPADSamplingCallback)(s32 chan);
-typedef void (*WPADConnectCallback)(s32 chan, s32 result);
-typedef void (*WPADExtensionCallback)(s32 chan, s32 dev);
-
 typedef WUDSyncDeviceCallback WPADSyncDeviceCallback;
 typedef WUDClearDeviceCallback WPADClearDeviceCallback;
 typedef SCFlushCallback WPADSaveCallback;
@@ -55,7 +52,7 @@ typedef enum {
     WPAD_LIB_STATUS_4 = WUD_LIB_STATUS_4,
 } WPADLibStatus;
 
-typedef enum {
+typedef enum WPADResult {
     WPAD_ERR_OK = 0,
     WPAD_ERR_NO_CONTROLLER = -1,
     WPAD_ERR_COMMUNICATION_ERROR = -2,
@@ -75,7 +72,8 @@ typedef enum {
     WPAD_SYNC_DONE = WUD_RESULT_SYNC_DONE,
 } WPADSyncResult;
 
-typedef enum {
+typedef s32 WPADChannel;
+enum _WPADChannel {
     WPAD_CHAN0,
     WPAD_CHAN1,
     WPAD_CHAN2,
@@ -83,7 +81,12 @@ typedef enum {
 
     WPAD_MAX_CONTROLLERS,
     WPAD_CHAN_INVALID = -1
-} WPADChannel;
+};
+
+typedef void (*WPADCallback)(WPADChannel chan, WPADResult result);
+typedef void (*WPADSamplingCallback)(WPADChannel chan);
+typedef void WPADConnectCallback(WPADChannel chan, WPADResult result);
+typedef void WPADExtensionCallback(WPADChannel chan, s32 dev);
 
 typedef enum {
     // Wii Remote (Core)
@@ -304,6 +307,8 @@ BOOL WPADStartClearDevice(void);
 WPADSyncDeviceCallback
 WPADSetSimpleSyncCallback(WPADSyncDeviceCallback pCallback);
 
+u8 WPADGetRadioSensitivity(WPADChannel chan);
+
 WPADClearDeviceCallback
 WPADSetClearDeviceCallback(WPADClearDeviceCallback pCallback);
 
@@ -317,14 +322,14 @@ u8 WPADGetSensorBarPosition(void);
 void WPADGetAccGravityUnit(s32 chan, u32 type, WPADAccGravityUnit* pAcc);
 
 void WPADDisconnect(s32 chan);
-s32 WPADProbe(s32 chan, s32* pDevType);
+WPADResult WPADProbe(WPADChannel chan, WPADDeviceType* pDevType);
 
 WPADSamplingCallback WPADSetSamplingCallback(s32 chan,
                                              WPADSamplingCallback pCallback);
-WPADConnectCallback WPADSetConnectCallback(s32 chan,
-                                           WPADConnectCallback pCallback);
-WPADExtensionCallback WPADSetExtensionCallback(s32 chan,
-                                               WPADExtensionCallback pCallback);
+WPADConnectCallback* WPADSetConnectCallback(s32 chan,
+                                            WPADConnectCallback* pCallback);
+WPADExtensionCallback* WPADSetExtensionCallback(s32 chan,
+                                                WPADExtensionCallback* pCallback);
 
 u32 WPADGetDataFormat(s32 chan);
 s32 WPADSetDataFormat(s32 chan, u32 format);
@@ -343,7 +348,7 @@ void WPADRead(s32 chan, WPADStatus* pStatus);
 void WPADSetAutoSamplingBuf(s32 chan, void* pBuffer, u32 len);
 
 BOOL WPADIsSpeakerEnabled(s32 chan);
-s32 WPADControlSpeaker(s32 chan, u32 command, WPADCallback pCallback);
+WPADResult WPADControlSpeaker(WPADChannel chan, u32 command, WPADCallback pCallback);
 u8 WPADGetSpeakerVolume(void);
 void WPADSetSpeakerVolume(u8 volume);
 

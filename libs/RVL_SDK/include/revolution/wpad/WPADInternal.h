@@ -166,8 +166,8 @@ typedef struct WPADCB {
     WPADDevConfig devConf;              // at 0x854
     WPADExtConfig extConf;              // at 0x882
     WPADCallback cmdBlkCallback;        // at 0x89C
-    WPADExtensionCallback extensionCallback; // at 0x8A0
-    WPADConnectCallback connectCB;     // at 0x8A4
+    WPADExtensionCallback* extensionCallback; // at 0x8A0
+    WPADConnectCallback* connectCB;     // at 0x8A4
     WPADSamplingCallback samplingCB;   // at 0x8A8
     union {
         WPADStatus* samplingBuf;

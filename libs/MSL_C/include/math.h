@@ -55,6 +55,10 @@ extern "C"
     {
         return __fabs(x);
     }
+    _MATH_INLINE long double fabsl(long double x)
+    {
+        return __fabs((double)x);
+    }
 #else
 int abs(int n);
 long labs(long n);
@@ -132,6 +136,7 @@ long labs(long n);
     }
     double log(double x);
     double exp(double x);
+    double nan(const char* arg);
 
     double ldexp(double x, int n);
 

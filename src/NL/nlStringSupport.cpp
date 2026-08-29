@@ -4,7 +4,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 
-extern "C" long strtol(const char* str, char** endPtr, int base);
+extern "C" unsigned long strtoul(const char* str, char** endPtr, int base);
 
 void nlStrToWcs(const char* str, unsigned short* wstr, unsigned long maxLen)
 {
@@ -43,7 +43,7 @@ unsigned long nlWcsToul(const unsigned short* str, unsigned short**, int base)
 {
     char buffer[100];
     nlWcsToStr(str, buffer, sizeof(buffer));
-    return strtol(buffer, 0, base);
+    return strtoul(buffer, 0, base);
 }
 
 namespace Detail

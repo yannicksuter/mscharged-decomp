@@ -56,9 +56,9 @@ bool SoundArchiveFileReader::IsValidFileHeader(const void* soundArchiveData) {
 }
 
 void SoundArchiveFileReader::SetStringChunk(const void* stringChunk, u32 size) {
-    NW4HBMAssertPointerNonnull(stringChunk);
+    NW4HBMAssertPointerNonnull_Line(stringChunk, 96);
     const SoundArchiveFile::SymbolBlock* symbolBlock = static_cast<const SoundArchiveFile::SymbolBlock*>(stringChunk);
-    NW4HBMAssert(symbolBlock->blockHeader.kind == SoundArchiveFile::SIGNATURE_SYMB_BLOCK);
+    NW4HBMAssert_Line(symbolBlock->blockHeader.kind == SoundArchiveFile::SIGNATURE_SYMB_BLOCK, 99);
     const SoundArchiveFile::StringBlock* pStringBlock = &symbolBlock->stringBlock;
 
     mStringBase = pStringBlock;

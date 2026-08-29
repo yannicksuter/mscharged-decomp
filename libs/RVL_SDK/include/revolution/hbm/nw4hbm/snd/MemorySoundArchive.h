@@ -23,7 +23,7 @@ public:
     /* 0x1C */ virtual ut::FileStream* OpenExtStream(void* buffer, int size, const char* extPath, u32 offset,
                                                      u32 length) const;
 
-    bool Setup(const void* buffer);
+    bool Setup(const void* soundArchiveData);
     void Shutdown();
 
 private:

@@ -204,7 +204,7 @@ void GXSetCurrentMtx(u32 id) {
     gxdt->gxDirtyFlags |= GX_DIRTY_MTX_IDX;
 }
 
-void GXLoadTexMtxImm(const Mtx mtx, u32 id, GXMtxType type) {
+void GXLoadTexMtxImm(const Mtx mtx, u32 id, GXTexMtxType type) {
     u32 addr;
     u32 num;
     u32 cmd;
@@ -215,13 +215,13 @@ void GXLoadTexMtxImm(const Mtx mtx, u32 id, GXMtxType type) {
                : id * 4 + (u64)GX_XF_MEM_POSMTX;
 
     // Number of elements in matrix, as an XF load-register size field
-    num = type == GX_MTX_2x4 ? (u64)(2 * 4) : 3 * 4;
+    num = type == GX_MTX2x4 ? (u64)(2 * 4) : 3 * 4;
     num = (num - 1) << 16;
 
     cmd = addr | num;
     GX_XF_LOAD_REG_HDR(cmd);
 
-    if (type == GX_MTX_3x4) {
+    if (type == GX_MTX3x4) {
         WriteMTXPS4x3(&WGPIPE, mtx);
     } else {
         WriteMTXPS4x2(&WGPIPE, mtx);

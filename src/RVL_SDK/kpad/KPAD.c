@@ -1136,7 +1136,7 @@ void read_kpad_button(KPADInsideStatus* kp, u32 dev_type, u32 count, u32 core, u
 }
 
 static void KPADiSamplingCallback(s32 chan);
-static void KPADiControlDpdCallback(s32 chan, s32 result);
+static void KPADiControlDpdCallback(WPADChannel chan, WPADResult result);
 
 s32 KPADRead(KPADChannel chan, KPADStatus samplingBufs[], u32 length) {
     KPADTmpStatus* tp = (KPADTmpStatus*)samplingBufs;
@@ -1423,7 +1423,7 @@ static void KPADiSamplingCallback(s32 chan) {
     } table[] = {{0, WPAD_FMT_CORE_BTN_ACC},          {3, WPAD_FMT_CORE_BTN_ACC_DPD}, {0, WPAD_FMT_FS_BTN_ACC},
                  {1, WPAD_FMT_FS_BTN_ACC_DPD}, {0, WPAD_FMT_CLASSIC_BTN_ACC},  {1, WPAD_FMT_CLASSIC_BTN_ACC_DPD}};
 
-    if (WPADProbe(chan, (s32*)&type) == WPAD_ERR_NO_CONTROLLER) {
+    if (WPADProbe(chan, (WPADDeviceType*)&type) == WPAD_ERR_NO_CONTROLLER) {
         goto finish;
     }
 
@@ -1506,7 +1506,7 @@ finish:
     }
 }
 
-void KPADiControlDpdCallback(s32 chan, s32 result) {
+void KPADiControlDpdCallback(WPADChannel chan, WPADResult result) {
     KPADInsideStatus* kp = &inside_kpads[chan];
 
     if (result == WPAD_ERR_OK) {

@@ -46,19 +46,22 @@ MemorySoundArchive::MemorySoundArchive() :
 
 MemorySoundArchive::~MemorySoundArchive() {}
 
-bool MemorySoundArchive::Setup(const void* buffer) {
-    mFileReader.Init(buffer);
+bool MemorySoundArchive::Setup(const void* soundArchiveData) {
+    NW4HBMAssertPointerNonnull_Line(soundArchiveData, 67);
+    NW4HBMAssertAligned_Line(68, soundArchiveData, 4);
+
+    mFileReader.Init(soundArchiveData);
     SoundArchive::Setup(&mFileReader);
 
-    const void* pInfoChunk = ut::AddOffsetToPtr(buffer, mFileReader.GetInfoChunkOffset());
+    const void* pInfoChunk = ut::AddOffsetToPtr(soundArchiveData, mFileReader.GetInfoChunkOffset());
 
     mFileReader.SetInfoChunk(pInfoChunk, mFileReader.GetInfoChunkSize());
 
-    const void* pStringChunk = ut::AddOffsetToPtr(buffer, mFileReader.GetLabelStringChunkOffset());
+    const void* pStringChunk = ut::AddOffsetToPtr(soundArchiveData, mFileReader.GetLabelStringChunkOffset());
 
     mFileReader.SetStringChunk(pStringChunk, mFileReader.GetLabelStringChunkSize());
 
-    mData = buffer;
+    mData = soundArchiveData;
     return true;
 }
 
@@ -113,11 +116,6 @@ const void* MemorySoundArchive::detail_GetWaveDataFileAddress(u32 id) const {
     return ut::AddOffsetToPtr(mData, groupInfo.waveDataOffset + itemInfo.waveDataOffset);
 }
 
-MemorySoundArchive::MemoryFileStream::MemoryFileStream(const void* buffer, u32 size) :
-    mData(buffer),
-    mSize(size),
-    mOffset(0) {}
-
 ut::FileStream* MemorySoundArchive::OpenStream(void* buffer, int size, u32 offset, u32 length) const {
     if (mData == NULL) {
         return NULL;
@@ -132,10 +130,16 @@ ut::FileStream* MemorySoundArchive::OpenStream(void* buffer, int size, u32 offse
 
 ut::FileStream* MemorySoundArchive::OpenExtStream(void* buffer, int size, const char* extPath, u32 offset,
                                                   u32 length) const {
+    NW4HBMWarningMessage_Line(189, "Cannot OpenExtStream for MemorySoundArchive\n");
     return NULL;
 }
 
 int MemorySoundArchive::detail_GetRequiredStreamBufferSize() const { return sizeof(MemoryFileStream); }
+
+MemorySoundArchive::MemoryFileStream::MemoryFileStream(const void* buffer, u32 size) :
+    mData(buffer),
+    mSize(size),
+    mOffset(0) {}
 
 void MemorySoundArchive::MemoryFileStream::Close() {
     mData = NULL;
@@ -165,6 +169,7 @@ void MemorySoundArchive::MemoryFileStream::Seek(s32 offset, u32 origin) {
             break;
         }
         default: {
+            NW4HBMPanicMessage_Line(236, "Unsupported Seek origin");
             return;
         }
     }

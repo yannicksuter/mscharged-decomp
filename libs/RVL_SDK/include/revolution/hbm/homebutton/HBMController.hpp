@@ -87,6 +87,7 @@ private:
     /* 0x41 */ bool mSoundOffFlag;
     /* 0x42 */ bool mCheckSoundTimeFlag;
     /* 0x43 */ bool mCheckSoundIntervalFlag;
+    /* 0x44 */ bool mRumbleFlag;
 
 private:
     static bool sBatteryFlag[WPAD_MAX_CONTROLLERS];
@@ -96,7 +97,7 @@ private:
     static bool sSetInfoAsync[WPAD_MAX_CONTROLLERS];
     static RemoteSpk* sPInstance;
     static s32 lbl_8025DBBC;
-}; // size = 0x44
+}; // size = 0x48
 
 } // namespace homebutton
 

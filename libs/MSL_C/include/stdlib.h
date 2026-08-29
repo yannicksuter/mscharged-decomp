@@ -2,6 +2,7 @@
 #define _STDLIB_H_
 
 #include <stddef.h>
+#include <wchar_t.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,8 +10,12 @@ extern "C" {
 
 /* Integer arithmetic (C89 4.10.6). CodeWarrior lowers abs/labs to inline
    intrinsics, so the library forms are macros rather than calls. */
+#ifndef abs
 #define abs(x) __abs(x)
+#endif
+#ifndef labs
 #define labs(x) __labs(x)
+#endif
 
 typedef struct {
     int quot;
@@ -32,6 +37,8 @@ long atol(const char* nptr);
 double strtod(const char* nptr, char** endptr);
 long strtol(const char* nptr, char** endptr, int base);
 unsigned long strtoul(const char* nptr, char** endptr, int base);
+int mbtowc(wchar_t* pwc, const char* s, size_t n);
+size_t mbstowcs(wchar_t* pwcs, const char* s, size_t n);
 
 /* Pseudo-random sequence generation (C89 4.10.2). */
 #define RAND_MAX 32767
@@ -58,8 +65,9 @@ char* getenv(const char* name);
 /* Searching and sorting (C89 4.10.5). */
 void* bsearch(const void* key, const void* base, size_t nmemb, size_t size,
               int (*compar)(const void*, const void*));
-void qsort(void* base, size_t nmemb, size_t size,
-           int (*compar)(const void*, const void*));
+typedef int (*_compare_function)(const void*, const void*);
+void qsort(void* table_base, size_t num_members, size_t member_size,
+           _compare_function compare_members);
 
 #ifdef __cplusplus
 }

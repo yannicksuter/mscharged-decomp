@@ -89,7 +89,7 @@ static u8 checkBuffer[21];
 
 static inline void initExtension(s32 chan);
 
-void abortInitExtension(s32 chan, s32 result)
+void abortInitExtension(WPADChannel chan, WPADResult result)
 {
     WPADControlBlock* p_wpd = _wpdcb[chan];
     u32 type;
@@ -421,7 +421,8 @@ void getExtType(s32 chan, s32 result)
                 WPADiSendWriteData(cmdq, p_wpd->key, 6, WM_REG_EXTENSION_40, abortInitExtension);
                 WPADiSendWriteData(cmdq, p_wpd->key + 6, 6, WM_REG_EXTENSION_46, abortInitExtension);
                 WPADiSendWriteData(cmdq, p_wpd->key + 12, 4, WM_REG_EXTENSION_4C, abortInitExtension);
-                WPADiSendReadData(cmdq, p_wpd->wmReadDataBuf, 32, WM_REG_EXTENSION_CONFIG, p_wpd->extensionCallback);
+                WPADiSendReadData(cmdq, p_wpd->wmReadDataBuf, 32, WM_REG_EXTENSION_CONFIG,
+                                  (WPADCallback)p_wpd->extensionCallback);
             }
             else
             {
@@ -430,7 +431,8 @@ void getExtType(s32 chan, s32 result)
                 WPADiSendWriteData(cmdq, p_wpd->key, 6, WM_REG_EXTENSION_40, abortInitExtension);
                 WPADiSendWriteData(cmdq, p_wpd->key + 6, 6, WM_REG_EXTENSION_46, abortInitExtension);
                 WPADiSendWriteData(cmdq, p_wpd->key + 12, 4, WM_REG_EXTENSION_4C, abortInitExtension);
-                WPADiSendReadData(cmdq, p_wpd->wmReadDataBuf, 32, WM_REG_EXTENSION_CONFIG, p_wpd->extensionCallback);
+                WPADiSendReadData(cmdq, p_wpd->wmReadDataBuf, 32, WM_REG_EXTENSION_CONFIG,
+                                  (WPADCallback)p_wpd->extensionCallback);
             }
         }
     }
@@ -508,7 +510,7 @@ void __a1_20_status_report(u8 chan, u8* data)
     BOOL enable;
     BOOL attach;
     WPADStatus* p_status;
-    WPADExtensionCallback extcb;
+    WPADExtensionCallback* extcb;
     u8* p_clear;
     int i;
 
@@ -666,7 +668,8 @@ void __a1_21_user_data(u8 chan, u8* data)
 
         if (p_wpd->cmdBlkCallback)
         {
-            if (p_wpd->extensionCallback == NULL || p_wpd->extensionCallback != p_wpd->cmdBlkCallback)
+            if (p_wpd->extensionCallback == NULL ||
+                (WPADCallback)p_wpd->extensionCallback != p_wpd->cmdBlkCallback)
             {
                 p_wpd->cmdBlkCallback(chan, WPAD_ERR_TRANSFER);
             }

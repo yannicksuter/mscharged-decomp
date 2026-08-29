@@ -410,8 +410,6 @@ void MmlParser::CommandProc(MmlSeqTrack* track, u32 command, s32 varNo, s32 arg2
 
                 const vs16* pVar = GetVariablePtr(player, track, varNo);
 
-                // clang-format off
-
                 // Convert absolute index into variable type-relative index
                 int _varNo = varNo >= SeqPlayer::VARIABLE_NUM       ? varNo - SeqPlayer::VARIABLE_NUM
                         : (varNo >= SeqPlayer::LOCAL_VARIABLE_NUM ? varNo - SeqPlayer::LOCAL_VARIABLE_NUM : varNo);
@@ -420,8 +418,6 @@ void MmlParser::CommandProc(MmlSeqTrack* track, u32 command, s32 varNo, s32 arg2
                 // 'T' = Track variable, 'G' = Global (player) variable
                 const char* pVarType = varNo >= SeqPlayer::VARIABLE_NUM       ? "T"
                                     : (varNo >= SeqPlayer::LOCAL_VARIABLE_NUM ? "G" : "");
-
-                // clang-format on
 
                 OSReport("#%08x[%d]: printvar %sVAR_%d(%d) = %d\n", player, track->GetPlayerTrackNo(), pVarType, _varNo,
                          varNo, *pVar);

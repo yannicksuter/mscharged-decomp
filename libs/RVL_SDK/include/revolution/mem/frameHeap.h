@@ -33,6 +33,20 @@ void* MEMDestroyFrmHeap(MEMHeapHandle heap);
 void* MEMAllocFromFrmHeapEx(MEMHeapHandle heap, u32 size, int align);
 void MEMFreeToFrmHeap(MEMHeapHandle heap, int mode);
 u32 MEMGetAllocatableSizeForFrmHeapEx(MEMHeapHandle heap, int align);
+BOOL MEMRecordStateForFrmHeap(MEMHeapHandle heap, u32 id);
+BOOL MEMFreeByStateToFrmHeap(MEMHeapHandle heap, u32 id);
+
+static inline MEMHeapHandle MEMCreateFrmHeap(void* start, u32 size) {
+    return MEMCreateFrmHeapEx(start, size, 0);
+}
+
+static inline void* MEMAllocFromFrmHeap(MEMHeapHandle heap, u32 size) {
+    return MEMAllocFromFrmHeapEx(heap, size, 4);
+}
+
+static inline u32 MEMGetAllocatableSizeForFrmHeap(MEMHeapHandle heap) {
+    return MEMGetAllocatableSizeForFrmHeapEx(heap, 4);
+}
 
 #ifdef __cplusplus
 }

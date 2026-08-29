@@ -15,7 +15,7 @@ namespace db {
 
 static void Assertion_Printf_(char const* fmt, ...);
 static bool ShowMapInfoSubroutine_(u32 address, bool preCRFlag);
-static void ShowStack_(register_t sp) DECOMP_DONT_INLINE;
+static void ShowStack_(register_t sp);
 static void WarningAlarmFunc_(OSAlarm* alarm, OSContext* ctx);
 
 static u32 sWarningTime;
@@ -94,7 +94,7 @@ static void ShowStack_(register_t sp) {
 DECL_WEAK void VPanic(const char* file, int line, const char* fmt, va_list vlist) {
     register register_t stackPointer;
 
-    asm { mr stackPointer, r1 } // not OSGetStackPointer?
+    asm { mr stackPointer, r1 }
 
     stackPointer = *reinterpret_cast<register_t*>(stackPointer);
 
@@ -126,31 +126,6 @@ DECL_WEAK void VPanic(const char* file, int line, const char* fmt, va_list vlist
     PPCHalt();
 }
 // clang-format on
-
-/* --- */
-
-// this is very dumb but it works to make .data match
-
-u16 Console_GetViewHeight(ConsoleHandle console) {
-    NW4HBMAssertHeaderPointerNonnull_FileLine(console, "console.h", 434);
-    return console->viewLines;
-}
-
-bool Console_SetVisible(ConsoleHandle console, bool isVisible) {
-    NW4HBMAssertHeaderPointerNonnull_FileLine(console, "console.h", 497);
-    bool before = console->isVisible;
-    console->isVisible = isVisible;
-    return before;
-}
-
-s32 Console_SetViewBaseLine(ConsoleHandle console, s32 line) {
-    NW4HBMAssertHeaderPointerNonnull_FileLine(console, "console.h", 557);
-    s32 before = console->viewTopLine;
-    console->viewTopLine = line;
-    return before;
-}
-
-/* --- */
 
 DECL_WEAK void Panic(char const* file, int line, char const* msg, ...) {
     va_list vlist;

@@ -6,7 +6,7 @@
 #define DB_REMOTE_MEM_ADDR 0
 #define READ_RETRY_MAX 3
 
-static void readcallback_(s32 chan, s32 result);
+static void readcallback_(WPADChannel chan, WPADResult result);
 
 static void clearDatabase_(RFLiCtrlBuf* buf) {
     int i;
@@ -146,7 +146,7 @@ static void clearDeleted_(RFLiCtrlBuf* buf) {
     }
 }
 
-static void readcallback_(s32 chan, s32 result) {
+static void readcallback_(WPADChannel chan, WPADResult result) {
     RFLiCtrlBufManager* mgr;
     RFLiCtrlBuf* buf;
     RFLiCtrlBuf* validBuf;
@@ -215,7 +215,7 @@ static void readbuffer_(s32 chan, RFLiCtrlBuf* dst, BOOL ch) {
 
     mgr = RFLiGetCtrlBufManager();
 
-    reason = WPADProbe(chan, &type);
+    reason = WPADProbe(chan, (WPADDeviceType*)&type);
     if (reason != WPAD_ERR_OK) {
         RFLiEndWorkingReason(RFLErrcode_Controllerfail, reason);
         return;

@@ -2,8 +2,6 @@
 #define NW4HBM_SND_REMOTE_SPEAKER_MANAGER_H
 
 #include "revolution/hbm/nw4hbm/snd/RemoteSpeaker.h"
-#include "revolution/os.h"
-#include "revolution/wpad.h"
 
 namespace nw4hbm {
 namespace snd {

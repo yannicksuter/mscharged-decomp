@@ -5,6 +5,7 @@
 #include <revolution/types.h>
 
 #define OSGetAlarmUserDataAny(type_, alarm_) ((type_)(OSGetAlarmUserData(alarm_)))
+#define OSSetAlarmUserDataAny(alarm_, data_) OSSetAlarmUserData(alarm_, (void*)(data_))
 
 #ifdef __cplusplus
 extern "C" {

@@ -19,6 +19,13 @@ extern "C" {
 #define __MSL_ISUPPER_MAP  (1 << 9)
 #define __MSL_ISXDIGIT_MAP (1 << 10)
 
+inline int isalpha(int value)
+{
+    return value < 0 || value >= 256
+        ? 0
+        : _current_locale.ctype_cmpt_ptr->ctype_map_ptr[value] & __MSL_ISALPHA_MAP;
+}
+
 inline int isdigit(int value)
 {
     return value < 0 || value >= 256
@@ -31,6 +38,13 @@ inline int isspace(int value)
     return value < 0 || value >= 256
         ? 0
         : _current_locale.ctype_cmpt_ptr->ctype_map_ptr[value] & __MSL_ISSPACE_MAP;
+}
+
+inline int isxdigit(int value)
+{
+    return value < 0 || value >= 256
+        ? 0
+        : _current_locale.ctype_cmpt_ptr->ctype_map_ptr[value] & __MSL_ISXDIGIT_MAP;
 }
 
 inline int tolower(int value)
