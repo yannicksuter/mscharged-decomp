@@ -11,8 +11,14 @@ class PhysicsBall : public PhysicsSphere
 public:
     static float GetBallMaxVelocity();
 
+public:
+    /* 0x38 */ nlVector3 mUnidentified038;
+    /* 0x44 */ nlVector3 mUnidentified044;
+    /* 0x50 */ bool mUnidentified050;
+    /* 0x51 */ bool mUnidentified051;
+
 private:
-    /* 0x38 */ u8 mUnidentified038[0x1C];
+    /* 0x52 */ u8 mUnidentified052[0x02];
 
 public:
     /* 0x54 */ bool mUnidentified054;

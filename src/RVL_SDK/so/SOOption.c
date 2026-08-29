@@ -1,6 +1,7 @@
 #include <revolution/so.h>
 
 #include <revolution/ipc.h>
+#include <revolution/os.h>
 
 #include <string.h>
 

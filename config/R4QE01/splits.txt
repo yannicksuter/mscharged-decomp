@@ -371,11 +371,13 @@ Game/Task/LoadingTask.cpp:
 	.bss        start:0x8056E420 end:0x8056E444
 	.sdata2     start:0x806E46A8 end:0x806E46AC
 
-unclassified/tu_8011BD0C.cpp:
+Game/ResetTask.cpp:
 	.text       start:0x8011BD0C end:0x8011C0AC
 	.data       start:0x80509528 end:0x8050953C
+	.bss        start:0x8056E548 end:0x8056E558
 	.sdata      start:0x806DC858 end:0x806DC860
-	.sbss       start:0x806E1070 end:0x806E1080
+	.sbss       start:0x806E1070 end:0x806E1088
+	.sdata2     start:0x806E46E0 end:0x806E46F8
 
 unclassified/tu_80139B18.cpp:
 	.text       start:0x80139B18 end:0x8013A25C
@@ -414,11 +416,14 @@ Game/Physics.cpp:
 	.sbss       start:0x806E11C8 end:0x806E11D8
 	.sdata2     start:0x806E47F8 end:0x806E4810
 
-unclassified/tu_80141000.cpp:
-	.text       start:0x80141000 end:0x80141B1C
-	.rodata     start:0x804DCC50 end:0x804DCC60
-	.data       start:0x8050E650 end:0x8050E680
-	.sdata2     start:0x806E4890 end:0x806E48C0
+Game/Physics/PhysicsBanana.cpp:
+	.text       start:0x80141000 end:0x80141AB0
+	.rodata     start:0x804DCC50 end:0x804DCC5C
+	.data       start:0x8050E5E8 end:0x8050E680
+	.sdata2     start:0x806E4890 end:0x806E48BC
+
+unclassified/tu_80141AB0.cpp:
+	.text       start:0x80141AB0 end:0x80141B1C
 
 Game/Physics/PhysicsCharacter.cpp:
 	.text       start:0x80142A1C end:0x80143FD4
@@ -557,9 +562,14 @@ Game/Render/ChainChomp.cpp:
 	.sdata      start:0x806DCD94 end:0x806DCD9C
 	.sdata2     start:0x806E4F6C end:0x806E4F84
 
-unclassified/tu_8019DB88.cpp:
+Game/Render/depthoffield.cpp:
 	.text       start:0x8019DB88 end:0x8019DEA0
 	.ctors      start:0x804DB6F0 end:0x804DB6F4
+	.rodata     start:0x804DCE08 end:0x804DCE20
+	.data       start:0x80511D58 end:0x80511D74
+	.bss        start:0x80571B38 end:0x80571B48
+	.sbss       start:0x806E1500 end:0x806E1504
+	.sdata2     start:0x806E4F98 end:0x806E4FB8
 
 unclassified/tu_801AC30C.cpp:
 	.text       start:0x801AC30C end:0x801AD0EC
@@ -1354,8 +1364,9 @@ Game/Task/ParticleUpdateTask.cpp:
 	.sbss       start:0x806E2010 end:0x806E2018
 	.sdata2     start:0x806E65A0 end:0x806E65A8
 
-unclassified/tu_802ED144.cpp:
+Game/Audio/AudioResourceLoadOwner_802ED144.cpp:
 	.text       start:0x802ED144 end:0x802ED678
+	.data       start:0x8052F490 end:0x8052F49C
 
 unclassified/tu_802ED74C.cpp:
 	.text       start:0x802ED74C end:0x802ED964
