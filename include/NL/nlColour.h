@@ -18,6 +18,11 @@ struct nlColour
     }
 };
 
+struct nlFloatColour
+{
+    float c[4];
+};
+
 inline void nlColourSet(nlColour& c0, u8 _r, u8 _g, u8 _b, u8 _a)
 {
     c0.c[0] = _r;

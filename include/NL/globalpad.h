@@ -14,13 +14,13 @@ public:
     virtual float GetPressureDerivative(int button, bool remap) = 0;
     virtual bool PlatJustPressed(int button, bool remap) = 0;
     virtual bool PlatJustReleased(int button, bool remap) = 0;
+    virtual int Unidentified24(int button, bool remap) = 0;
+    virtual int Unidentified28(int buttonIndex) = 0;
     virtual float GetButtonStateTime(int button, bool remap) = 0;
     virtual float AnalogLeftX() = 0;
     virtual float AnalogLeftY() = 0;
     virtual float AnalogRightX() = 0;
     virtual float AnalogRightY() = 0;
-    virtual void Unidentified38() = 0;
-    virtual void Unidentified3C() = 0;
     virtual bool RumbleActive() = 0;
     virtual void StartRumble(float fDuration, float fIntensity, float fFrequency) = 0;
     virtual void StopRumble() = 0;
@@ -29,7 +29,19 @@ public:
     bool JustReleased(int button, bool remap);
     int fn_80332748();
 
-    /* 0x04 */ u8 mUnidentified004[0x40];
+    void DisableLeftAnalogToDPadMap()
+    {
+        m_isLeftAnalogToDPadMapEnabled = false;
+    }
+
+    void EnableLeftAnalogToDPadMap()
+    {
+        m_isLeftAnalogToDPadMapEnabled = true;
+    }
+
+    /* 0x04 */ u8 mUnidentified004[0x14];
+    /* 0x18 */ bool m_isLeftAnalogToDPadMapEnabled;
+    /* 0x19 */ u8 mUnidentified019[0x2B];
     /* 0x44 */ nlPolar m_polarAnalogLeft;
     /* 0x4C */ nlPolar m_polarAnalogRight;
     /* 0x54 */ u8 mUnidentified054[0x34];

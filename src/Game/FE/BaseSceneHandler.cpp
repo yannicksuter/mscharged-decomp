@@ -1,12 +1,8 @@
 #include "Game/BaseSceneHandler.h"
 
-#include "NL/nlDLRing.h"
+#include "Game/FE/feScene.h"
 
-class FEScene
-{
-public:
-    void Update(float dt);
-};
+#include "NL/nlDLRing.h"
 
 void BaseSceneHandler::Update(float dt)
 {

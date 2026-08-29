@@ -4,6 +4,11 @@
 #include "types.h"
 #include "NL/nlMath.h"
 
+static inline u16 RadToAng16(f32 r)
+{
+    return (u16)(s32)(10430.378f * r);
+}
+
 static inline float nlMaxEquals(float a, float b)
 {
     return (a >= b) ? a : b;

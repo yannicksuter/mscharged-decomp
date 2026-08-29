@@ -22,9 +22,9 @@ struct BundleFileHeader
 
 struct BundleFileDirectoryEntry
 {
-    u32 m_hash;
-    u32 m_blockNumber;
-    u32 m_length;
+    unsigned long m_hash;
+    unsigned long m_blockNumber;
+    unsigned long m_length;
 };
 
 class BundleFile

@@ -5,6 +5,8 @@
 #include "NL/nlAlgorithm.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
+#include "NL/nlString.h"
+#include "NL/nlTextEscape.h"
 
 struct nlColour;
 class FontCharString;
@@ -70,6 +72,8 @@ public:
             /* 0x16 */ unsigned short UnicodeChar;
             /* 0x16 */ unsigned short hash;
         };
+
+        operator unsigned long() const { return UnicodeChar; }
     };
 
     struct KernPair
@@ -122,6 +126,8 @@ class FontCharString
 {
 public:
     FontCharString() { }
+    template <typename T>
+    FontCharString(const T*, const nlFont*, T*);
     ~FontCharString()
     {
         if (m_InternalBuffer != 0)
@@ -133,5 +139,63 @@ public:
     /* 0x0 */ unsigned short* m_pString;
     /* 0x4 */ unsigned char m_InternalBuffer;
 };
+
+template <typename T>
+inline FontCharString::FontCharString(const T* Source, const nlFont* pFont, T* pBuffer)
+{
+    m_InternalBuffer = 0;
+    if (pBuffer == 0)
+    {
+        m_pString = (unsigned short*)nlMalloc((nlStrLen<T>(Source) + 1) * sizeof(T), 8, false);
+        m_InternalBuffer = 1;
+    }
+    else
+    {
+        m_pString = pBuffer;
+    }
+
+    unsigned short* dest = m_pString;
+    const T* src = Source;
+    unsigned short escBegin = nlEscapeSequence::ESCAPE_BEGIN;
+    unsigned short ch;
+
+    while ((ch = *src) != 0)
+    {
+        if (ch == escBegin)
+        {
+            nlEscapeSequence EscSeq(src);
+            const T* end = (const T*)EscSeq.m_pEnd;
+            while (src < end)
+            {
+                *dest++ = *src++;
+            }
+        }
+        else
+        {
+            if (ch <= 0x7F)
+            {
+                ch &= 0xFFFF;
+            }
+            else
+            {
+                nlFont::GlyphInfo key;
+                key.UnicodeChar = ch;
+                nlFont::GlyphInfo* result;
+                if (pFont->m_pExtendedGlyphs != 0 && pFont->m_ExtendedGlyphCount != 0 && (result = nlBSearch<nlFont::GlyphInfo, nlFont::GlyphInfo>(key, pFont->m_pExtendedGlyphs, pFont->m_ExtendedGlyphCount)) != 0)
+                {
+                    ch = ((result - pFont->m_pExtendedGlyphs) + 0x80) & 0xFFFF;
+                }
+                else
+                {
+                    ch = 0x3F;
+                }
+            }
+            *dest++ = ch;
+            src++;
+        }
+    }
+
+    *dest = 0;
+}
 
 #endif // NL_FONT_H

@@ -937,14 +937,112 @@ Game/Task/ParticleUpdateTask.cpp:
 	.sbss       start:0x806E2010 end:0x806E2018
 	.sdata2     start:0x806E65A0 end:0x806E65A8
 
+unclassified/tu_802ED144.cpp:
+	.text       start:0x802ED144 end:0x802ED678
+
+unclassified/tu_802ED74C.cpp:
+	.text       start:0x802ED74C end:0x802ED964
+
+unclassified/tu_802EDA38.cpp:
+	.text       start:0x802EDA38 end:0x802EE08C
+
 Game/Audio/SoundMap.cpp:
 	.text       start:0x802EE178 end:0x802EE890
 	.data       start:0x8052F570 end:0x8052F5D0
+
+unclassified/tu_802EE964.cpp:
+	.text       start:0x802EE964 end:0x802EFA9C
+
+unclassified/tu_802EFB70.cpp:
+	.text       start:0x802EFB70 end:0x802F0614
+
+unclassified/tu_802F076C.cpp:
+	.text       start:0x802F076C end:0x802F1684
 	.sdata      start:0x806DF4D8 end:0x806DF4E0
+
+unclassified/tu_802F1758.cpp:
+	.text       start:0x802F1758 end:0x802F1FF8
+
+unclassified/tu_802F2110.cpp:
+	.text       start:0x802F2110 end:0x802F2B24
+
+unclassified/tu_802F2C3C.cpp:
+	.text       start:0x802F2C3C end:0x802F39EC
+
+Game/FE/feFontResource.cpp:
+	.text       start:0x802FA614 end:0x802FA61C
+
+Game/FE/feInput.cpp:
+	.text       start:0x802FA61C end:0x802FBBA0
+	.data       start:0x8052FA68 end:0x8052FA78
+	.bss        start:0x8057FC30 end:0x8057FEE0
+	.sbss       start:0x806E2038 end:0x806E203C
+	.sdata2     start:0x806E6670 end:0x806E6678
+
+Game/FE/fePackage.cpp:
+	.text       start:0x802FBBA0 end:0x802FBBB0
+
+Game/FE/fePresentation.cpp:
+	.text       start:0x802FBBB0 end:0x802FBCC0
+	.sdata2     start:0x806E6678 end:0x806E667C
+
+Game/FE/feRender.cpp:
+	.text       start:0x802FBCC0 end:0x802FC850
+	.ctors      start:0x804DBA78 end:0x804DBA7C
+	.rodata     start:0x804EB350 end:0x804EB380
+	.data       start:0x8052FA78 end:0x8052FA8C
+	.bss        start:0x8057FEE0 end:0x8057FEF0
+	.sdata      start:0x806DF508 end:0x806DF510
+	.sbss       start:0x806E2040 end:0x806E2050
+	.sdata2     start:0x806E6680 end:0x806E66A8
+
+Game/FE/feResourceManager.cpp:
+	.text       start:0x802FC850 end:0x802FE574
+	.ctors      start:0x804DBA7C end:0x804DBA80
+	.data       start:0x8052FA90 end:0x8052FD00
+	.bss        start:0x8057FEF0 end:0x8057FF60
+	.sbss       start:0x806E2050 end:0x806E2070
+
+Game/FE/feScene.cpp:
+	.text       start:0x802FE574 end:0x802FEB04
+	.data       start:0x8052FD00 end:0x8052FD28
+	.sdata2     start:0x806E66A8 end:0x806E66B8
+
+Game/FE/feSceneManager.cpp:
+	.text       start:0x802FEB04 end:0x802FF854
+	.data       start:0x8052FD28 end:0x8052FD48
+
+Game/FE/feSceneResource.cpp:
+	.text       start:0x802FFAD8 end:0x802FFAFC
 
 Game/FE/tlSlide.cpp:
 	.text       start:0x802FFAFC end:0x8030007C
 	.data       start:0x8052FD60 end:0x8052FD78
+
+Game/FE/feTextureResource.cpp:
+	.text       start:0x8030007C end:0x80300104
+
+unclassified/tu_80300104.cpp:
+	.text       start:0x80300104 end:0x80301D68
+	.data       start:0x8052FD78 end:0x8052FE00
+	.sdata2     start:0x806E66C0 end:0x806E66F0
+
+Game/FE/tlComponent.cpp:
+	.text       start:0x80301D68 end:0x80301F3C
+
+Game/FE/feLibObject.cpp:
+	.text       start:0x80301FE4 end:0x803020DC
+	.data       start:0x8052FE00 end:0x8052FE10
+	.sdata2     start:0x806E66F8 end:0x806E6700
+
+Game/FE/tlComponentInstance.cpp:
+	.text       start:0x80302114 end:0x80302150
+
+Game/FE/tlInstance.cpp:
+	.text       start:0x80302150 end:0x80302514
+
+Game/FE/tlTextInstance.cpp:
+	.text       start:0x80302514 end:0x80302A98
 
 NL/nlLocalization.cpp:
 	.text       start:0x80302D04 end:0x80302F44
