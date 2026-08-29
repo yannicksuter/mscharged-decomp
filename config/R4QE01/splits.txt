@@ -428,7 +428,7 @@ unclassified/tu_80179858.cpp:
 unclassified/tu_801798A8.cpp:
 	.text       start:0x801798A8 end:0x8017A0D0
 
-unclassified/tu_8017A9EC.cpp:
+Game/CharacterEffects.cpp:
 	.text       start:0x8017A9EC end:0x8017AB34
 	.ctors      start:0x804DB684 end:0x804DB688
 	.data       start:0x805111F8 end:0x80511240
@@ -842,6 +842,11 @@ NL/math.cpp:
 NL/utility.cpp:
 	.text       start:0x802B6234 end:0x802B6568
 	.sdata2     start:0x806E6108 end:0x806E6128
+
+Game/Core/mtRandom.cpp:
+	.text       start:0x802B66D8 end:0x802B68E8
+	.bss        start:0x8057B730 end:0x8057C0F0
+	.sdata      start:0x806DF250 end:0x806DF254
 
 Game/Sys/clock.cpp:
 	.text       start:0x802B6CD8 end:0x802B75BC

@@ -14,9 +14,8 @@ static EffectsTexturing fxTexturing[] = {
 
 EffectsTexturing* fxGetTexturing(eEffectsTextureType type)
 {
-    unsigned long texture;
     EffectsTexturing* texturing = &fxTexturing[type];
-    texture = texturing->m_uTexture;
+    unsigned long texture = texturing->m_uTexture;
     if (texture != 0xFFFFFFFF
         && texturing->m_ResolvedTexture.value == 0xFFFF)
     {
