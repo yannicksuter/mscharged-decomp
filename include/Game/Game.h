@@ -12,9 +12,9 @@ class cPlayer;
 
 struct UnidentifiedCircularByteQueue
 {
-    u8 UnidentifiedRemoveStart()
+    bool UnidentifiedRemoveStart()
     {
-        u8* entry;
+        bool* entry;
         if (mSize == 0)
         {
             entry = mData + (mStart & mCapacity);
@@ -32,7 +32,7 @@ struct UnidentifiedCircularByteQueue
         return *entry;
     }
 
-    /* 0x00 */ u8* mData;
+    /* 0x00 */ bool* mData;
     /* 0x04 */ u32 mStart;
     /* 0x08 */ int mSize;
     /* 0x0C */ u32 mCapacity;
@@ -66,7 +66,7 @@ public:
     void fn_80059A1C();
     void fn_80059B70(void* param1);
     void fn_80059D80(u8 param1);
-    void fn_80059DEC(u8 param1, u8 param2, float param3, float param4);
+    void fn_80059DEC(int param1, int param2, float param3, float param4);
     void fn_80059E78();
     void fn_80059EDC();
     void fn_80059F40(u8 param1, u8 param2, float param3);
@@ -106,10 +106,18 @@ public:
 private:
     /* 0x28 */ u32 mUnidentified028;
     /* 0x2C */ u32 mUnidentified02C;
+
+public:
     /* 0x30 */ u32 mUnidentified030;
+
+private:
     /* 0x34 */ int mUnidentified034;
     /* 0x38 */ u32 mUnidentified038;
+
+public:
     /* 0x3C */ cFielder* mUnidentified03C;
+
+private:
 
 public:
     /* 0x40 */ bool mUnidentified040;
@@ -133,14 +141,13 @@ public:
     /* 0xBD */ bool mUnidentified0BD;
 
 private:
-    /* 0xBE */ u8 mUnidentified0BE[0x06];
+    /* 0xBE */ u8 mUnidentified0BE[0x02];
 
 public:
-    /* 0xC4 */ u32 mUnidentified0C4;
-    /* 0xC8 */ u32 mUnidentified0C8;
+    /* 0xC0 */ UnidentifiedCircularByteQueue mUnidentified0C0;
 
 private:
-    /* 0xCC */ u8 mUnidentified0CC[0x68];
+    /* 0xD0 */ u8 mUnidentified0D0[0x64];
 
 public:
     /* 0x134 */ UnidentifiedCircularByteQueue mUnidentified134;
@@ -159,6 +166,7 @@ private:
 public:
     /* 0x10D8 */ void* mUnidentified10D8;
     /* 0x10DC */ void* mUnidentified10DC;
+    /* 0x10E0 */ void* mUnidentified10E0;
 };
 
 extern cGame* lbl_806E0C94;

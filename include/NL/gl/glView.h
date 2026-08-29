@@ -29,12 +29,12 @@ public:
     virtual void GetViewMatrix(nlMatrix4&);
     virtual void GetProjectionMatrix(nlMatrix4&);
     virtual void GetInverseViewMatrix(nlMatrix4&);
-    virtual void GetInverseProjectionMatrix(nlMatrix4&);
+    virtual void GetViewProjectionMatrix(nlMatrix4&);
     virtual const nlMatrix4* GetViewMatrix() const;
     virtual const nlMatrix4* GetProjectionMatrix() const;
-    virtual bool IsShadowEnabled() const
+    virtual const nlMatrix4* GetShadowMatrix()
     {
-        return false;
+        return 0;
     }
 };
 
@@ -53,6 +53,11 @@ public:
     void RemoveChild(GLView*);
     GLRenderPair GetRenderPair() const;
     inline GLPacketSorter* GetSorter(unsigned long);
+
+    void SetRenderPair(GLRenderPair renderPair)
+    {
+        m_RenderPair = renderPair;
+    }
 
     virtual void BeginRender();
     virtual void EndRender();

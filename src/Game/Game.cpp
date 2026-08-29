@@ -415,8 +415,8 @@ void DestroyPowerups()
 
 void cGame::fn_80057FC0()
 {
-    mUnidentified0C4 = 0;
-    mUnidentified0C8 = 0;
+    mUnidentified0C0.mStart = 0;
+    mUnidentified0C0.mSize = 0;
     mUnidentified134.mStart = 0;
     mUnidentified134.mSize = 0;
 }
@@ -523,8 +523,8 @@ void cGame::fn_80058498(bool param1, int param2, int param3)
     else
     {
         mUnidentified028 = 0;
-        mUnidentified0C4 = 0;
-        mUnidentified0C8 = 0;
+        mUnidentified0C0.mStart = 0;
+        mUnidentified0C0.mSize = 0;
         mUnidentified134.mStart = 0;
         mUnidentified134.mSize = 0;
     }
@@ -737,7 +737,7 @@ void cGame::fn_80059D80(u8 param1)
 }
 
 void cGame::fn_80059DEC(
-    u8 param1, u8 param2, float param3, float param4)
+    int param1, int param2, float param3, float param4)
 {
     struct Message
     {

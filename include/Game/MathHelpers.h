@@ -4,6 +4,11 @@
 #include "types.h"
 #include "NL/nlMath.h"
 
+static inline u16 nlVector3ToAngle(const nlVector3& dir, u16 offset = 0)
+{
+    return (u16)((u32)(u16)(s32)(10430.378f * nlATan2f(dir.y, dir.x)) + offset);
+}
+
 static inline u16 RadToAng16(f32 r)
 {
     return (u16)(s32)(10430.378f * r);

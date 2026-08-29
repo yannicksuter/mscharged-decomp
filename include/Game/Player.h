@@ -37,6 +37,7 @@ public:
     void PickupBall(cBall* pBall);
     void SetNoPickUpTime(float NewNoPickUpTime);
     cGlobalPad* GetGlobalPad();
+    void SetAIPad(cAIPad* pPad);
     int GetBallJointIndex() const
     {
         return m_nBallJointIndex;
@@ -64,20 +65,39 @@ protected:
     /* 0x1F5 */ bool mUnidentified1F5;
     /* 0x1F6 */ bool mUnidentified1F6;
     /* 0x1F7 */ u8 mUnknown1F7;
-    /* 0x1F8 */ u8 mUnknown1F8[0x34];
+    /* 0x1F8 */ u8 mUnknown1F8[0x24];
+
+public:
+    /* 0x21C */ Timer mUnidentified21C;
+
+protected:
+    /* 0x224 */ u8 mUnknown224[0x08];
 
 public:
     /* 0x22C */ Timer m_tNoPickupTimer;
 
 protected:
-    /* 0x234 */ u8 mUnknown234[0x1C];
+    /* 0x234 */ u8 mUnknown234[0x04];
+
+public:
+    /* 0x238 */ Timer mUnidentified238;
+
+protected:
+    /* 0x240 */ u8 mUnknown240[0x10];
 
 public:
     /* 0x250 */ u32 mUnidentified250;
-    /* 0x254 */ void* mUnidentified254;
-    /* 0x258 */ u8 mUnknown258[0x04];
+    /* 0x254 */ int mUnidentified254;
+    /* 0x258 */ bool mUnidentified258;
+    /* 0x259 */ u8 mUnknown259[0x03];
     /* 0x25C */ int m_eLastPadAction;
-    /* 0x260 */ u8 mUnknown260[0x90];
+    /* 0x260 */ u8 mUnknown260[0x04];
+
+public:
+    /* 0x264 */ Timer mUnidentified264;
+
+protected:
+    /* 0x26C */ u8 mUnknown26C[0x84];
     /* 0x2F0 */ cPN_Feather* mUnidentified2F0;
     /* 0x2F4 */ u8 mUnknown2F4[0x04];
 

@@ -7,6 +7,7 @@
 class Blinker;
 class BlurHandler;
 class cAnimInventory;
+class cHeadTrack;
 class EffectsTexturing;
 class EffectsGroup;
 class EmissionController;
@@ -76,7 +77,7 @@ public:
     virtual void Unknown5();
     virtual void ResetEffects();
     virtual void SetAnimID(int animID);
-    virtual void Unknown8();
+    virtual void Unknown8(unsigned short aDirection, bool bParam);
     virtual void SetPosition(const nlVector3& position);
     virtual void Update(float fDeltaT);
     virtual void Unknown10();
@@ -101,8 +102,8 @@ public:
     void SetVelocity(const nlVector3& velocity);
     void SetFacingDirection(
         unsigned short dir, bool bSetMovementDirection);
-    float SeekSpeedExponential(float currentValue, float targetValue,
-        float responsiveness, float deltaTime);
+    static float SeekSpeedExponential(float currentValue,
+        float targetValue, float responsiveness, float deltaTime);
     void InitMovementStrafing(float fDirectionSeekSpeed,
         float fDirectionSeekFalloff, float fAccel, float fDecel);
     void InitMovementRunningNoTurn(float fAccel, float fDecel);
@@ -149,7 +150,7 @@ public:
     /* 0x030 */ nlVector3 m_v3Position;
     /* 0x03C */ nlVector3 m_v3PrevPosition;
     /* 0x048 */ nlVector3 m_v3Velocity;
-    /* 0x054 */ u8 unknown_0x054[0x0C];
+    /* 0x054 */ nlVector3 mUnidentified054;
     /* 0x060 */ u16 m_aDesiredFacingDirection;
     /* 0x062 */ u16 m_aActualFacingDirection;
     /* 0x064 */ u16 m_aPrevFacingDirection;
@@ -176,7 +177,8 @@ public:
     /* 0x0C4 */ cPoseNode** m_pAILayer;
     /* 0x0C8 */ cPN_SAnimController* m_pCurrentAnimController;
     /* 0x0CC */ int m_eAnimID;
-    /* 0x0D0 */ u8 unknown_0x0D0[0x08];
+    /* 0x0D0 */ u8 unknown_0x0D0[0x04];
+    /* 0x0D4 */ cHeadTrack* m_pHeadTrack;
     /* 0x0D8 */ int m_nHeadJointIndex;
     /* 0x0DC */ int m_nBip01JointIndex_0xA4;
     /* 0x0E0 */ u8 unknown_0x0E0[0x10];

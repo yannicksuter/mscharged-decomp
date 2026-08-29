@@ -5,7 +5,7 @@
 #include "Game/Team.h"
 #include "NL/nlFormat.h"
 
-FuzzyVariant lbl_8056DBD4;
+FuzzyVariant fvNotSet;
 
 unsigned long FuzzyVariant::GetHash() const
 {

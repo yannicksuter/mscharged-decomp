@@ -335,7 +335,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298B18>::Draw(
         GXLoadTexMtxImm(texturePlane, 33, GX_MTX2x4);
     }
 
-    if (*(unsigned long*)packet->unknown28 == 0)
+    if (packet->unknown28 == 0)
     {
         fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }

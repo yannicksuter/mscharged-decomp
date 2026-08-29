@@ -12,18 +12,6 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
-extern "C"
-{
-    void* fn_802C0F04();
-    void* fn_802C0E30(void*);
-    void fn_802C2DF4(
-        void*, GXMaterialFloatTweak_804F4190*, const char*);
-    void* fn_802C4504(void*, const char*, int);
-    void fn_802C5780(void*, GXMaterialFloatTweak_804F4190*);
-}
-
-extern const char* lbl_806E1E90;
-
 static bool glx_CompiledDraw = true;
 static bool glx_AllowUncompiledDraws = true;
 static bool sUseCrystalTexture_806DF05A = true;
@@ -159,31 +147,6 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299CA0>::Draw(
         else
             static_cast<GXMaterialProgram_80299CA0*>(this)->DrawIndexed(packet);
     }
-}
-
-inline GXMaterialFloatTweak_804F4190::GXMaterialFloatTweak_804F4190(
-    const char* name, const char* category)
-    : value(1.0f)
-{
-    mName = name;
-    mUnidentified009 = true;
-
-    void* config = fn_802C0F04();
-    if (config == 0)
-    {
-        void* entry = nlMalloc(0x18, 8, true);
-        if (entry != 0)
-            fn_802C2DF4(entry, this, category);
-    }
-    else
-    {
-        config = fn_802C0E30(config);
-        void* entry = fn_802C4504(config, category, 0);
-        if (entry != 0)
-            fn_802C5780(entry, this);
-    }
-
-    lbl_806E1E90 = category;
 }
 
 GXMaterialFloatTweak_804F4190 sCrystalConfigTweak_8057B028(

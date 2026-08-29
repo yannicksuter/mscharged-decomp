@@ -7,16 +7,6 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMemory.h"
 
-extern "C"
-{
-    void* fn_802C0F04();
-    void* fn_802C0E30(void*);
-    void fn_802C2DF4(
-        void*, GXMaterialColourTweak_804FC520*, const char*);
-    void* fn_802C4504(void*, const char*, int);
-    void fn_802C5780(void*, GXMaterialColourTweak_804FC520*);
-}
-
 extern const char* lbl_806E1E90;
 
 static int sShadowVolumeMode;

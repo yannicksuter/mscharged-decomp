@@ -270,7 +270,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802987A0>::Draw(
         GXLoadTexMtxImm(inverse, 30, GX_MTX3x4);
     }
 
-    if (*(unsigned long*)packet->unknown28 == 0)
+    if (packet->unknown28 == 0)
     {
         fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }

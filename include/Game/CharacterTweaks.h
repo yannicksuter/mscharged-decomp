@@ -19,13 +19,22 @@ public:
     virtual ~PlayerTweaks();
 
 protected:
-    /* 0x04 */ u8 mUnidentified004[0x40];
+    /* 0x04 */ u8 mUnidentified004[0x3C];
+
+public:
+    /* 0x40 */ float* mUnidentified040;
 };
 
 class FielderTweaks : public PlayerTweaks
 {
 private:
-    /* 0x044 */ u8 mUnidentified044[0x60];
+    /* 0x044 */ u8 mUnidentified044[0x2C];
+
+public:
+    /* 0x070 */ float* mUnidentified070;
+
+private:
+    /* 0x074 */ u8 mUnidentified074[0x30];
 
 public:
     /* 0x0A4 */ TweakValue_804F4DC8 fShooting;

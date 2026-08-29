@@ -1,6 +1,7 @@
 #ifndef GAME_TWEAK_VALUE_H
 #define GAME_TWEAK_VALUE_H
 
+#include "NL/nlMemory.h"
 #include "types.h"
 
 class InterpreterCore;
@@ -24,8 +25,7 @@ protected:
     /* 0x04 */ const char* mName;
     /* 0x08 */ u8 mUnidentified008;
     /* 0x09 */ bool mUnidentified009;
-    /* 0x0A */ u8 mUnidentified00A[2];
-}; // total size: 0x0C
+}; // total size: 0x0C (0x0A..0x0C tail padding, reused by derived classes)
 
 class TweakValueImpl_804F4DC8 : public TweakValueBase_8052BF70
 {
@@ -89,6 +89,8 @@ class TweakValueBoolImpl_804F4538 : public TweakValueBase_8052BF70
 {
 public:
     TweakValueBoolImpl_804F4538(bool* value = 0);
+    TweakValueBoolImpl_804F4538(const char* group, const char* name,
+        bool* value, bool defaultValue);
     virtual void UnidentifiedVirtual30();
     virtual void UnidentifiedVirtual34();
     virtual void UnidentifiedVirtual38();
@@ -113,5 +115,53 @@ public:
 private:
     /* 0x00 */ TweakValueIntImpl_804FD898 mValue;
 }; // total size: 0x10
+
+extern "C"
+{
+    void* fn_802C0F04();
+    void* fn_802C0E30(void*);
+    void fn_802C2DF4(void*, TweakValueBase_8052BF70*, const char*);
+    void* fn_802C4504(void*, const char*, int);
+    void fn_802C5780(void*, TweakValueBase_8052BF70*);
+}
+
+extern const char* lbl_806E1E90;
+
+class TweakValueBool_804F4578 : public TweakValueBase_8052BF70
+{
+public:
+    TweakValueBool_804F4578(const char* name, const char* category, bool value)
+    {
+        mValue = value;
+        mName = name;
+        mUnidentified009 = true;
+        void* config = fn_802C0F04();
+        if (config == 0)
+        {
+            void* entry = nlMalloc(0x18, 8, true);
+            if (entry != 0)
+            {
+                fn_802C2DF4(entry, this, category);
+            }
+        }
+        else
+        {
+            config = fn_802C0E30(config);
+            void* entry = fn_802C4504(config, category, 0);
+            if (entry != 0)
+            {
+                fn_802C5780(entry, this);
+            }
+        }
+        lbl_806E1E90 = category;
+    }
+
+    bool GetValue() const
+    {
+        return mValue;
+    }
+
+    /* 0x0A */ bool mValue;
+}; // total size: 0x0C
 
 #endif // GAME_TWEAK_VALUE_H

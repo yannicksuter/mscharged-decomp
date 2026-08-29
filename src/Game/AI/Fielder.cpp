@@ -41,8 +41,6 @@ extern "C" float fn_8002BFA8(PlayerTweaks* pTweaks, float fTime);
 extern "C" bool fn_8002F310(cFielder* pFielder);
 extern "C" void fn_8001DCCC(
     cFielder* pFielder, unsigned short aParam, bool bParam);
-extern "C" void fn_8004D238(cFielder* pFielder);
-extern "C" void fn_80046244(cFielder* pFielder);
 extern "C" void fn_8005001C(cFielder* pFielder, bool bParam);
 extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
 extern "C" void fn_800ED92C(unsigned long soundID);
@@ -585,7 +583,7 @@ void cFielder::CollideWithWallCallback(
 
         if ((u16)absFacingDelta < 0x2000)
         {
-            fn_8004D238(this);
+            fn_8004D238();
         }
     }
 
@@ -612,7 +610,7 @@ void cFielder::CollideWithWallCallback(
         distance -= fn_8002BFA8(m_pTweaks, lbl_806E3418);
         if (distance > cField::GetSidelineY(1) + lbl_806E3424)
         {
-            fn_80046244(this);
+            fn_80046244();
         }
     }
 }

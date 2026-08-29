@@ -25,15 +25,6 @@ extern "C"
     void DCFlushRange(void* address, unsigned long size);
 }
 
-class UnidentifiedPacketResource
-{
-public:
-    virtual void fn_Unknown0();
-    virtual void fn_Unknown1();
-    virtual void fn_Unknown2();
-    virtual void fn_Unknown3(glModelPacket* packet);
-};
-
 struct UnidentifiedLoadContext
 {
     unsigned char m_Unknown00[0x0C];

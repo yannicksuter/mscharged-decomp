@@ -49,6 +49,17 @@ public:
     {
     }
 
+    BasicSlotPool(int initial, int delta)
+        : SlotPoolBase()
+    {
+        m_Delta = delta;
+        m_Initial = initial;
+        if (m_Initial == 0)
+        {
+            SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
+        }
+    }
+
     ~BasicSlotPool()
     {
         FreeBlocks();
