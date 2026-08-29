@@ -208,7 +208,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029BA04>::Draw(
         translation = 2.0f * translation - 1.0f;
         textureMatrix[0][2] = translation;
         textureMatrix[1][2] = translation;
-        GXLoadTexMtxImm(textureMatrix, GX_TEXMTX0, GX_MTX_3x4);
+        GXLoadTexMtxImm(textureMatrix, GX_TEXMTX0, GX_MTX3x4);
     }
     else
     {

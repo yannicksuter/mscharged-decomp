@@ -252,8 +252,8 @@ unsigned char FERender::RenderImageInstance(const TLImageInstance* pTLImageInsta
     }
 
     unsigned long textureHandle = pTexRes->GetTextureHandle();
-    float halfPixelU = 0.5f / (float)pTexRes->m_width;
-    float halfPixelV = 0.5f / (float)pTexRes->m_height;
+    float halfPixelU = 0.5f / (float)pTexRes->m_uWidth;
+    float halfPixelV = 0.5f / (float)pTexRes->m_uHeight;
     float left = fn_80302210(pTLImageInstance);
     float top = fn_80302230(pTLImageInstance);
     float bottom = 1.0f - (fn_80302270(pTLImageInstance) + top);

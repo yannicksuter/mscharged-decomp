@@ -118,7 +118,7 @@ static inline void LoadScrollingTextureMatrix_802963B4(
     memcpy(textureMatrix, lbl_804E8850, sizeof(Mtx));
     textureMatrix[0][3] = WrapTextureOffset_802963B4(time * speed.x);
     textureMatrix[1][3] = WrapTextureOffset_802963B4(time * speed.y);
-    GXLoadTexMtxImm(textureMatrix, matrix, GX_MTX_3x4);
+    GXLoadTexMtxImm(textureMatrix, matrix, GX_MTX3x4);
 }
 
 struct FloatColour_802963B4
@@ -160,7 +160,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Draw(
     cameraTextureMatrix[2][1] = 0.0f;
     cameraTextureMatrix[2][2] = 1.0f;
     cameraTextureMatrix[2][3] = 0.0f;
-    GXLoadTexMtxImm(cameraTextureMatrix, 33, GX_MTX_3x4);
+    GXLoadTexMtxImm(cameraTextureMatrix, 33, GX_MTX3x4);
 
     nlVector2 parameterSpeed;
     parameterSpeed.x = *(float*)((unsigned char*)packet->unknown20 + 44);

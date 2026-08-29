@@ -190,7 +190,7 @@ static inline void LoadScrollingTextureMatrix_802938B8(
     memcpy(textureMatrix, lbl_804E87C0, sizeof(Mtx));
     textureMatrix[0][3] = WrapTextureOffset_802938B8(time * speedX);
     textureMatrix[1][3] = WrapTextureOffset_802938B8(time * speedY);
-    GXLoadTexMtxImm(textureMatrix, matrix, GX_MTX_3x4);
+    GXLoadTexMtxImm(textureMatrix, matrix, GX_MTX3x4);
 }
 
 template <>

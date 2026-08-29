@@ -230,7 +230,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029DE3C>::Draw(
     memcpy(textureMatrix, lbl_804E87F0, sizeof(Mtx));
     textureMatrix[0][3] = offsetX;
     textureMatrix[1][3] = offsetY;
-    GXLoadTexMtxImm(textureMatrix, 30, GX_MTX_3x4);
+    GXLoadTexMtxImm(textureMatrix, 30, GX_MTX3x4);
 
     if (packet->displayList != 0)
         GXCallDisplayList(packet->displayList->list, packet->displayList->size);

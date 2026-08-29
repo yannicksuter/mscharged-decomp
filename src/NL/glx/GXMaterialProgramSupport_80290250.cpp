@@ -18,7 +18,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029AB0C>::Activate(GLView* view)
 {
     static_cast<GXMaterialProgram_8029AB0C*>(this)->ConfigureVertexFormat(true);
     view->m_Interface->GetViewMatrix(sViewMatrix);
-    GXLoadTexMtxImm(lbl_80524370, 64, GX_MTX_3x4);
+    GXLoadTexMtxImm(lbl_80524370, 64, GX_MTX3x4);
     GXSetTexCoordGen2(
         GX_TEXCOORD1, GX_TG_MTX3x4, GX_TG_NRM, 30, true, 64);
     sLoadedMatrix = -1;
@@ -68,7 +68,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029AB0C>::Draw(
         nlMultMatrices(modelview, model, sViewMatrix);
         glxCopyMatrix(source, modelview);
         PSMTXInvXpose(source, inverse);
-        GXLoadTexMtxImm(inverse, 30, GX_MTX_3x4);
+        GXLoadTexMtxImm(inverse, 30, GX_MTX3x4);
     }
 
     if (packet->displayList != 0)
