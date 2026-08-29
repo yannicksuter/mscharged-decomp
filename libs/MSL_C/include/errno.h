@@ -10,6 +10,7 @@ extern "C" {
 extern int errno;
 
 #define EDOM 33
+#define ERANGE 34
 
 #ifdef __cplusplus
 }

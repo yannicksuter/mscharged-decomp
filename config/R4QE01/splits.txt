@@ -1506,6 +1506,12 @@ MSL/strtold.c:
 	.rodata     start:0x804EBCC0 end:0x804EBCD0
 	.sdata2     start:0x806E6E80 end:0x806E6EA0
 
+MSL/strtoul.c:
+	extab       start:0x800066D0 end:0x800066F8
+	extabindex  start:0x80006DE8 end:0x80006E24
+	.text       start:0x8038691C end:0x80387468
+	.data       start:0x80536968 end:0x805369F0
+
 MSL/math_sun.c:
 	extab       start:0x80006738 end:0x80006740
 	extabindex  start:0x80006E84 end:0x80006E90

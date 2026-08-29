@@ -8,6 +8,10 @@
 #include <size_t.h>
 #include "stdio_api.h"
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
