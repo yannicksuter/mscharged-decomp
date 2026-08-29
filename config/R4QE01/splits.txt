@@ -75,6 +75,16 @@ Game/AI/FielderActions.cpp:
 	.sbss       start:0x806E0C68 end:0x806E0C78
 	.sdata2     start:0x806E3538 end:0x806E3628
 
+Game/AI/FielderAbility.cpp:
+	.text       start:0x8004F828 end:0x800505AC
+	.ctors      start:0x804DB51C end:0x804DB520
+	.rodata     start:0x804DBEE8 end:0x804DBEF8
+	.data       start:0x804FAD80 end:0x804FAD90
+	.bss        start:0x8056B978 end:0x8056B990
+	.sdata      start:0x806DB9C8 end:0x806DBA20
+	.sbss       start:0x806E0C78 end:0x806E0C80
+	.sdata2     start:0x806E3628 end:0x806E3660
+
 Game/AI/FilteredRandom.cpp:
 	.text       start:0x800505AC end:0x80050704
 	.rodata     start:0x804DBEF8 end:0x804DBF18

@@ -192,7 +192,6 @@ extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" float fn_800E02B8(cTeam* pTeam);
 extern "C" bool fn_8003E99C(cFielder* pFielder);
 extern "C" bool fn_8003E9F0(cFielder* pFielder);
-extern "C" void fn_8005001C(cFielder* pFielder, bool bParam);
 extern "C" void fn_801B8FF4(cFielder* pFielder);
 extern "C" float fn_800A9274(void* pParam);
 extern "C" void fn_80080BFC(Goalie* pGoalie, float fDeltaT);
@@ -1742,7 +1741,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
     if (mUnidentified3DC)
     {
-        fn_8005001C(this, true);
+        fn_8005001C(true);
     }
 
     bool bNearGoal = false;
@@ -3274,14 +3273,14 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     {
         if (mUnidentified3DC)
         {
-            fn_8005001C(this, false);
+            fn_8005001C(false);
         }
     }
     else if (fn_8003E9F0(this))
     {
         if (mUnidentified3DC)
         {
-            fn_8005001C(this, false);
+            fn_8005001C(false);
         }
     }
     else if (m_eCharacterClass == (eCharacterClass)0x13)

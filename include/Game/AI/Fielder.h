@@ -181,6 +181,18 @@ public:
     bool InitActionPass(
         cPlayer* pPassTarget, bool bVolleyPass, int nParam, bool bParam);
     void ActionPass(float fDeltaT);
+    void fn_8004F828();
+    void fn_8004F8E8();
+    void fn_8004F974(float fDeltaT);
+    void fn_8004FA34();
+    void fn_8004FB04();
+    void fn_8004FC90(float fDeltaT);
+    void fn_8004FF40();
+    float fn_8004FFF8();
+    void fn_80050008();
+    void fn_8005001C(bool bForce);
+    void fn_800501F0(bool bParam);
+    bool fn_80050284();
     void fn_80045AEC(PhysicsObject* pObject);
     void ActionPostWhistle(float fDeltaT);
     void ShootBallDueToContact(const nlVector3& v3IncomingVelocity);
@@ -244,7 +256,7 @@ public:
     bool IsDefense() const;
 
 private:
-    /* 0x328 */ u8 mUnknown328[0x04];
+    /* 0x328 */ PlayerTweaks* mUnidentified328;
     /* 0x32C */ PlayerTweaks* mUnidentified32C;
     /* 0x330 */ UnidentifiedFielderPair330 mUnidentified330;
     /* 0x338 */ u16 mUnidentified338;
@@ -358,13 +370,32 @@ public:
 
 private:
     /* 0x3DC */ bool mUnidentified3DC;
-    /* 0x3DD */ u8 mUnknown3DD[0x23];
+    /* 0x3DD */ bool mUnidentified3DD;
+
+private:
+    /* 0x3DE */ u8 mUnknown3DE[0x02];
+
+public:
+    /* 0x3E0 */ float mUnidentified3E0;
+    /* 0x3E4 */ float mUnidentified3E4;
+    /* 0x3E8 */ float mUnidentified3E8;
+    /* 0x3EC */ float mUnidentified3EC;
+    /* 0x3F0 */ int mUnidentified3F0;
+    /* 0x3F4 */ float mUnidentified3F4;
+    /* 0x3F8 */ float mUnidentified3F8;
+    /* 0x3FC */ float mUnidentified3FC;
 
 public:
     /* 0x400 */ void* mUnidentified400;
 
 private:
-    /* 0x404 */ u8 mUnknown404[0x0C];
+    /* 0x404 */ u8 mUnknown404[0x04];
+
+public:
+    /* 0x408 */ float mUnidentified408;
+
+private:
+    /* 0x40C */ u8 mUnknown40C[0x04];
 
 public:
     /* 0x410 */ nlVector3 mUnidentified410;

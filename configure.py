@@ -404,6 +404,7 @@ config.libs = [
             Object(NonMatching, "Game/Field.cpp"),
             Object(NonMatching, "Game/AI/Fielder.cpp"),
             Object(NonMatching, "Game/AI/FielderActions.cpp", extra_cflags=["-ipa file"]),
+            Object(NonMatching, "Game/AI/FielderAbility.cpp"),
             Object(Matching, "Game/AI/FilteredRandom.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/Formation.cpp", cflags=cflags_game),
             Object(NonMatching, "Game/FormationDefines.cpp", cflags=cflags_game),

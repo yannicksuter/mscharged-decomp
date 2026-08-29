@@ -41,7 +41,6 @@ extern "C" float fn_8002BFA8(PlayerTweaks* pTweaks, float fTime);
 extern "C" bool fn_8002F310(cFielder* pFielder);
 extern "C" void fn_8001DCCC(
     cFielder* pFielder, unsigned short aParam, bool bParam);
-extern "C" void fn_8005001C(cFielder* pFielder, bool bParam);
 extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" bool fn_801B6278(int stadium);
@@ -245,7 +244,7 @@ bool cFielder::CanGetElectrocuted(
             if (bUnidentified && mUnidentified3DC)
             {
                 fn_80060608(lbl_806E0C94, this);
-                fn_8005001C(this, true);
+                fn_8005001C(true);
                 return false;
             }
 

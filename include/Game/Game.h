@@ -84,6 +84,11 @@ public:
     void fn_8005DB44(int param1, bool param2);
     void fn_8005DF38();
 
+    inline bool IsGameplayOrOvertime()
+    {
+        return (m_eGameState == 5 || m_eGameState == 6);
+    }
+
     /* 0x04 */ FuzzyTweaks* m_pFuzzyTweaks;
     /* 0x08 */ Clock* m_pGameClock;
     /* 0x0C */ Clock* m_pPostResetClock;
