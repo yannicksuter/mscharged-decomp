@@ -541,6 +541,145 @@ unclassified/tu_8029B434.cpp:
 unclassified/tu_8029BA04.cpp:
 	.text       start:0x8029BA04 end:0x8029BC7C
 
+unclassified/tu_8029BC9C.cpp:
+	.text       start:0x8029BC9C end:0x8029C2D8
+
+unclassified/tu_8029C2F8.cpp:
+	.text       start:0x8029C2F8 end:0x8029C9D0
+
+unclassified/tu_8029C9F0.cpp:
+	.text       start:0x8029C9F0 end:0x8029D0C8
+
+unclassified/tu_8029D0E8.cpp:
+	.text       start:0x8029D0E8 end:0x8029D7C0
+
+unclassified/tu_8029D7E0.cpp:
+	.text       start:0x8029D7E0 end:0x8029DE1C
+
+unclassified/tu_8029DE3C.cpp:
+	.text       start:0x8029DE3C end:0x8029E318
+
+unclassified/tu_8029E338.cpp:
+	.text       start:0x8029E338 end:0x8029E8D8
+
+unclassified/tu_8029E8F8.cpp:
+	.text       start:0x8029E8F8 end:0x8029EF34
+
+unclassified/tu_8029EF54.cpp:
+	.text       start:0x8029EF54 end:0x8029F590
+
+unclassified/tu_8029F5B0.cpp:
+	.text       start:0x8029F5B0 end:0x8029FBEC
+
+unclassified/tu_8029FC0C.cpp:
+	.text       start:0x8029FC0C end:0x802A01AC
+
+unclassified/tu_802A01CC.cpp:
+	.text       start:0x802A01CC end:0x802A0584
+
+unclassified/tu_802A05A4.cpp:
+	.text       start:0x802A05A4 end:0x802A09F4
+
+unclassified/tu_802A0F04.cpp:
+	.text       start:0x802A0F04 end:0x802A12C4
+
+unclassified/tu_802A12E4.cpp:
+	.text       start:0x802A12E4 end:0x802A15B4
+
+unclassified/tu_802A15D4.cpp:
+	.text       start:0x802A15D4 end:0x802A193C
+
+unclassified/tu_802A195C.cpp:
+	.text       start:0x802A195C end:0x802A1BD4
+
+unclassified/tu_802A1BF4.cpp:
+	.text       start:0x802A1BF4 end:0x802A1EC4
+
+unclassified/tu_802A1EE4.cpp:
+	.text       start:0x802A1EE4 end:0x802A2034
+
+unclassified/tu_802A2054.cpp:
+	.text       start:0x802A2054 end:0x802A2200
+
+unclassified/tu_802A2220.cpp:
+	.text       start:0x802A2220 end:0x802A23D4
+
+unclassified/tu_802A23F4.cpp:
+	.text       start:0x802A23F4 end:0x802A251C
+
+unclassified/tu_802A253C.cpp:
+	.text       start:0x802A253C end:0x802A2758
+
+unclassified/tu_802A2778.cpp:
+	.text       start:0x802A2778 end:0x802A2A74
+
+unclassified/tu_802A2A94.cpp:
+	.text       start:0x802A2A94 end:0x802A2CDC
+
+unclassified/tu_802A2CFC.cpp:
+	.text       start:0x802A2CFC end:0x802A2EBC
+
+unclassified/tu_802A2EDC.cpp:
+	.text       start:0x802A2EDC end:0x802A30C4
+
+unclassified/tu_802A30E4.cpp:
+	.text       start:0x802A30E4 end:0x802A3234
+
+unclassified/tu_802A3254.cpp:
+	.text       start:0x802A3254 end:0x802A33C0
+
+unclassified/tu_802A33E0.cpp:
+	.text       start:0x802A33E0 end:0x802A360C
+
+unclassified/tu_802A362C.cpp:
+	.text       start:0x802A362C end:0x802A3718
+
+unclassified/tu_802A3738.cpp:
+	.text       start:0x802A3738 end:0x802A3D9C
+	.ctors      start:0x804DB924 end:0x804DB928
+
+unclassified/tu_802A3D9C.cpp:
+	.text       start:0x802A3D9C end:0x802A3ED0
+
+unclassified/tu_802A3EF0.cpp:
+	.text       start:0x802A3EF0 end:0x802A4340
+
+unclassified/tu_802A4360.cpp:
+	.text       start:0x802A4360 end:0x802A4724
+
+unclassified/tu_802A4744.cpp:
+	.text       start:0x802A4744 end:0x802A4B08
+
+unclassified/tu_802A4B28.cpp:
+	.text       start:0x802A4B28 end:0x802A4EEC
+
+unclassified/tu_802A4F0C.cpp:
+	.text       start:0x802A4F0C end:0x802A5394
+
+unclassified/tu_802A53B4.cpp:
+	.text       start:0x802A53B4 end:0x802A58C8
+
+unclassified/tu_802A58E8.cpp:
+	.text       start:0x802A58E8 end:0x802A5D38
+
+unclassified/tu_802A5D58.cpp:
+	.text       start:0x802A5D58 end:0x802A61A8
+
+unclassified/tu_802A61C8.cpp:
+	.text       start:0x802A61C8 end:0x802A63B8
+
+unclassified/tu_802A63D8.cpp:
+	.text       start:0x802A63D8 end:0x802A6828
+
+unclassified/tu_802A6848.cpp:
+	.text       start:0x802A6848 end:0x802A6B4C
+
+unclassified/tu_802A6B6C.cpp:
+	.text       start:0x802A6B6C end:0x802A6FBC
+
+unclassified/tu_802A6FDC.cpp:
+	.text       start:0x802A6FDC end:0x802A7390
+
 unclassified/tu_802A73B0.cpp:
 	.text       start:0x802A73B0 end:0x802A7800
 
