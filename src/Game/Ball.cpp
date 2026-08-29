@@ -79,7 +79,8 @@ bool cBall::GetInNet(int& nSide)
     {
         if (m_pPhysicsBall->m_bInsideNet)
         {
-            nSide = !(g_pTeams[0]->m_pNet->m_fDirection * m_v3Position.x > 1.0f);
+            float fDirection = g_pTeams[0]->m_pNet->m_fDirection;
+            nSide = !(m_v3Position.x * fDirection > 1.0f);
             return true;
         }
     }
@@ -87,7 +88,8 @@ bool cBall::GetInNet(int& nSide)
                  > lbl_806E0C94->mUnidentified28
              && lbl_806E0C94->mUnidentified30 != 0)
     {
-        nSide = !(g_pTeams[0]->m_pNet->m_fDirection * m_v3Position.x > 1.0f);
+        float fDirection = g_pTeams[0]->m_pNet->m_fDirection;
+        nSide = !(m_v3Position.x * fDirection > 1.0f);
         return true;
     }
 
