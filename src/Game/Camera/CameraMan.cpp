@@ -1,7 +1,13 @@
 #include "Game/Camera/CameraMan.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/Camera/AnimViewerCam.h"
+#include "Game/Camera/FaceCam.h"
+#include "Game/Camera/GoalCam.h"
+#include "Game/Camera/MatrixEffectCam.h"
+#include "Game/Camera/ShootToScoreCam.h"
+#include "Game/Camera/TopDownCamera.h"
 #include "Game/Camera/animcam.h"
+#include "Game/Camera/kickoffcam.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
@@ -22,13 +28,7 @@ extern "C" void fn_802D6CE0(UnidentifiedCameraModeManager*, int);
 extern "C" void fn_800F02DC(void*, unsigned long, void*);
 extern "C" cBaseCamera* fn_800F2510(void*, int);
 extern "C" cBaseCamera* fn_800F5974(void*);
-extern "C" cBaseCamera* fn_800EF2E8(void*);
-extern "C" cBaseCamera* fn_800EF4E0(void*);
 extern "C" cBaseCamera* fn_800F447C(void*);
-extern "C" cBaseCamera* fn_800F5798(void*);
-extern "C" cBaseCamera* fn_800F5684(void*);
-extern "C" cBaseCamera* fn_800F3A14(void*, float);
-extern "C" cBaseCamera* fn_800F9300(void*);
 extern "C" cRumbleFilter* fn_800EF5F8(void*);
 extern "C" UnidentifiedCameraFilter* fn_800EF9F0(void*);
 extern "C" const char* fn_801CBE80(int);
@@ -449,7 +449,7 @@ void cCameraManager::UpdateGameCameraType()
             pBaseCamera = pMemory != 0 ? fn_800F2510(pMemory, 1) : static_cast<cBaseCamera*>(pMemory);
             break;
         }
-        case eCameraType_MatrixEffect:
+        case eCameraType_Replay:
         {
             void* pMemory = nlMalloc(0x100, 8, false);
             pBaseCamera = pMemory != 0 ? fn_800F5974(pMemory) : static_cast<cBaseCamera*>(pMemory);
@@ -457,8 +457,7 @@ void cCameraManager::UpdateGameCameraType()
         }
         case eCameraType_TopDown:
         {
-            void* pMemory = nlMalloc(0x78, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800EF2E8(pMemory) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((TopDownCamera*)nlMalloc(sizeof(TopDownCamera), 8, false)) TopDownCamera();
             break;
         }
         case eCameraType_FollowCharacter:
@@ -481,8 +480,7 @@ void cCameraManager::UpdateGameCameraType()
         }
         case eCameraType_KickOff:
         {
-            void* pMemory = nlMalloc(0x78, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800EF4E0(pMemory) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((cKickOffCamera*)nlMalloc(sizeof(cKickOffCamera), 8, false)) cKickOffCamera();
             break;
         }
         case eCameraType_Gameplay:
@@ -491,16 +489,14 @@ void cCameraManager::UpdateGameCameraType()
             pBaseCamera = pMemory != 0 ? fn_800F447C(pMemory) : static_cast<cBaseCamera*>(pMemory);
             break;
         }
-        case eCameraType_Replay:
+        case eCameraType_MatrixEffect:
         {
-            void* pMemory = nlMalloc(0x84, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800F5798(pMemory) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((MatrixEffectCam*)nlMalloc(sizeof(MatrixEffectCam), 8, false)) MatrixEffectCam();
             break;
         }
         case eCameraType_Goal:
         {
-            void* pMemory = nlMalloc(0x78, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800F5684(pMemory) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((GoalCamera*)nlMalloc(sizeof(GoalCamera), 8, false)) GoalCamera();
             break;
         }
         case eCameraType_AnimViewer:
@@ -511,14 +507,12 @@ void cCameraManager::UpdateGameCameraType()
         }
         case eCameraType_FaceCloseup:
         {
-            void* pMemory = nlMalloc(0x84, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800F3A14(pMemory, 2.0f) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((FaceCam*)nlMalloc(sizeof(FaceCam), 8, false)) FaceCam(2.0f);
             break;
         }
         case eCameraType_ShootToScore:
         {
-            void* pMemory = nlMalloc(0x7C, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800F9300(pMemory) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((cShootToScoreCamera*)nlMalloc(sizeof(cShootToScoreCamera), 8, false)) cShootToScoreCamera();
             break;
         }
         }

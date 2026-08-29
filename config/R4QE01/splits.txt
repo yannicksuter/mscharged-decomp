@@ -218,6 +218,20 @@ Game/Camera/animcam.cpp:
 	.sbss       start:0x806E0E90 end:0x806E0EA0
 	.sdata2     start:0x806E4300 end:0x806E432C
 
+Game/Camera/TopDownCamera.cpp:
+	.text       start:0x800EF2E8 end:0x800EF4E0
+	.rodata     start:0x804DC3B8 end:0x804DC3C4
+	.data       start:0x805042B0 end:0x805042D8
+	.sdata      start:0x806DC470 end:0x806DC478
+	.sbss       start:0x806E0EA0 end:0x806E0EA8
+	.sdata2     start:0x806E4330 end:0x806E4340
+
+Game/Camera/kickoffcam.cpp:
+	.text       start:0x800EF4E0 end:0x800EF5F8
+	.data       start:0x805042D8 end:0x80504310
+	.bss        start:0x8056DCD0 end:0x8056DCDC
+	.sdata2     start:0x806E4340 end:0x806E4348
+
 Game/Camera/CameraMan.cpp:
 	.text       start:0x800F0240 end:0x800F2504
 	.ctors      start:0x804DB5B8 end:0x804DB5BC
@@ -228,9 +242,29 @@ Game/Camera/CameraMan.cpp:
 	.sbss       start:0x806E0EB0 end:0x806E0EE8
 	.sdata2     start:0x806E4398 end:0x806E43C8
 
+Game/Camera/FaceCam.cpp:
+	.text       start:0x800F3A10 end:0x800F3C1C
+	.data       start:0x80504FD0 end:0x80504FF8
+	.sdata2     start:0x806E4408 end:0x806E4410
+
+Game/Camera/GoalCam.cpp:
+	.text       start:0x800F5684 end:0x800F5798
+	.data       start:0x80505168 end:0x80505190
+	.sdata2     start:0x806E44B0 end:0x806E44B8
+
+Game/Camera/MatrixEffectCam.cpp:
+	.text       start:0x800F5798 end:0x800F5970
+	.data       start:0x80505190 end:0x805051B8
+	.sdata2     start:0x806E44B8 end:0x806E44D8
+
 Game/Camera/AnimViewerCam.cpp:
 	.text       start:0x800F9238 end:0x800F9300
 	.data       start:0x80505480 end:0x805054A8
+
+Game/Camera/ShootToScoreCam.cpp:
+	.text       start:0x800F9300 end:0x800F9460
+	.data       start:0x805054A8 end:0x805054D0
+	.sdata2     start:0x806E4570 end:0x806E4590
 
 Game/DB/BasicGameInfo.cpp:
 	.text       start:0x800FBBA0 end:0x800FC20C
