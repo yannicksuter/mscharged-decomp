@@ -103,7 +103,14 @@ public:
     } mActionShotVars; // offset 0x361, size 0x2
 
 private:
-    /* 0x363 */ u8 mUnknown363[0x79];
+    /* 0x363 */ u8 mUnknown363[0x2D];
+
+public:
+    /* 0x390 */ float mUnidentified390;
+    /* 0x394 */ float mUnidentified394;
+
+private:
+    /* 0x398 */ u8 mUnknown398[0x44];
     /* 0x3DC */ bool mUnidentified3DC;
     /* 0x3DD */ u8 mUnknown3DD[0x23];
 

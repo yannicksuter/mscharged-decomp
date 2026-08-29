@@ -182,7 +182,8 @@ public:
     /* 0x0E0 */ u8 unknown_0x0E0[0x10];
     /* 0x0F0 */ eClassTypes m_eClassType;
     /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;
-    /* 0x0F5 */ u8 unknown_0x0F5[0x2F];
+    /* 0x0F5 */ u8 unknown_0x0F5[0x2B];
+    /* 0x120 */ int mUnidentified120;
     /* 0x124 */ nlMatrix4 m_m4WorldMatrix;
     /* 0x164 */ u8 unknown_0x164[0x0C];
     /* 0x170 */ BlurHandler* m_pBlurHandler;

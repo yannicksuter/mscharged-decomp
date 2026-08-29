@@ -5,6 +5,7 @@
 #include "Game/AI/HeadTrack.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
+#include "Game/Team.h"
 #include "NL/gl/glState.h"
 
 extern "C" void* fn_802CDF0C();
@@ -133,7 +134,7 @@ struct Character
     char _1B4[0x144];
     int ballJointIndex;
     char _2FC[0x18];
-    void* teamOrPlayer;
+    cTeam* teamOrPlayer;
 };
 
 struct SkinMesh
@@ -263,8 +264,6 @@ extern "C" SkinMesh* fn_8001C550(Character*, int);
 extern "C" void fn_8001C574(Character*);
 extern "C" void fn_8001D6F4(Character*, cPoseAccumulator*, int);
 extern "C" void fn_8001EFCC(Character*, SkinMesh*, Model*);
-extern "C" Character* fn_800A6954();
-extern "C" void fn_800A6A94(void*);
 extern "C" bool fn_80182120();
 extern "C" void fn_80182EC8(int);
 extern "C" int fn_800FC748(int);
@@ -709,8 +708,8 @@ void DrawableCharacter::Render(Character& source)
     Character* renderOnly = renderOnlyCharacter;
     if (renderOnly == 0 || renderOnly == &source
         || (renderOpposingGoalie
-            && (fn_800A6A94(renderOnly->teamOrPlayer),
-                &source == fn_800A6954())))
+            && (void*)&source
+                == (void*)renderOnly->teamOrPlayer->GetOtherTeam()->GetGoalie()))
     {
         if (special)
         {

@@ -7,26 +7,44 @@
 class cNet;
 class cFielder;
 class cPlayer;
+class Goalie;
 class FormationManager;
+
+enum eTeamSide
+{
+    NO_SIDE = -1,
+    HOME = 0,
+    AWAY = 1,
+    HOME_AWAY = 2,
+};
 
 class cTeam
 {
 public:
+    void ClearAllPowerUps();
+    void ClearCurrentPowerUp();
     cFielder* GetFielder(int nIndex);
     cPlayer* GetPlayer(int nIndex);
     cFielder* GetCaptain();
     cTeam* GetOtherTeam();
+    Goalie* GetGoalie();
     cNet* GetOtherNet();
+    void PreUpdate(float fDeltaT);
     PowerUpTeamType GetPowerUpByIndex(int index) const;
     bool SetCurrentPowerUp(
         ePowerUpType eNewPowerUpType, int nnumOfPowerups);
+    void SetDifficulty(int difficulty, int param2, bool param3);
+    void fn_800A607C();
 
 public:
     /* 0x00 */ int m_nSide;
     /* 0x04 */ int m_nScore;
 
+public:
+    /* 0x08 */ float mfPowerupMeter;
+
 private:
-    /* 0x08 */ u8 mUnidentified008[0x10];
+    /* 0x0C */ u8 mUnidentified00C[0x0C];
 
 public:
     /* 0x18 */ u32 field_0x18;

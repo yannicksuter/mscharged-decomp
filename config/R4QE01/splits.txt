@@ -78,6 +78,40 @@ Game/Formation.cpp:
 	.sbss       start:0x806E0C80 end:0x806E0C88
 	.sdata2     start:0x806E3668 end:0x806E36D0
 
+Game/FormationDefines.cpp:
+	.text       start:0x80055210 end:0x80056CA4
+	.rodata     start:0x804DBFD8 end:0x804DBFE8
+	.data       start:0x804FAFB8 end:0x804FB060
+	.sdata      start:0x806DBA28 end:0x806DBA68
+	.sbss       start:0x806E0C88 end:0x806E0C90
+	.sdata2     start:0x806E36D0 end:0x806E3738
+
+Game/Game.cpp:
+	.text       start:0x80056CA4 end:0x80073898
+	.ctors      start:0x804DB524 end:0x804DB528
+	.rodata     start:0x804DBFE8 end:0x804DBFF8
+	.data       start:0x804FB060 end:0x804FC7F0
+	.bss        start:0x8056B940 end:0x8056BA00
+	.sdata      start:0x806DBA68 end:0x806DBAE8
+	.sbss       start:0x806E0C90 end:0x806E0D10
+	.sdata2     start:0x806E3738 end:0x806E37A0
+
+unclassified/tu_80073898.cpp:
+	.text       start:0x80073898 end:0x800742DC
+	.ctors      start:0x804DB528 end:0x804DB52C
+	.data       start:0x804FC7F0 end:0x804FC8C0
+	.bss        start:0x8056BA00 end:0x8056CF08
+	.sdata      start:0x806DBAE8 end:0x806DBB00
+	.sdata2     start:0x806E37A0 end:0x806E37A8
+
+Game/GameTweaks.cpp:
+	.text       start:0x800742DC end:0x80077224
+	.ctors      start:0x804DB52C end:0x804DB530
+	.data       start:0x804FC8C0 end:0x804FD8D8
+	.bss        start:0x8056CF08 end:0x8056CF28
+	.sdata      start:0x806DBB00 end:0x806DBB08
+	.sdata2     start:0x806E37A8 end:0x806E3858
+
 Game/Goalie.cpp:
 	.text       start:0x80077224 end:0x8008288C
 	.ctors      start:0x804DB530 end:0x804DB534
