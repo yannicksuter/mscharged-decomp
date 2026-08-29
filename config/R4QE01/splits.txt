@@ -534,6 +534,11 @@ unclassified/tu_801AC30C.cpp:
 	.sbss       start:0x806E1610 end:0x806E1618
 	.sdata2     start:0x806E5218 end:0x806E5248
 
+Game/Effects/PhotoFlashEffect.cpp:
+	.text       start:0x801AE008 end:0x801AE0C4
+	.sdata      start:0x806DD030 end:0x806DD038
+	.sdata2     start:0x806E5280 end:0x806E528C
+
 Game/FE/GameSceneManager.cpp:
 	.text       start:0x801C6174 end:0x801C620C
 	.data       start:0x805170A8 end:0x805170C0
@@ -976,7 +981,7 @@ Game/InterpreterCore.cpp:
 unclassified/tu_802E3D4C.cpp:
 	.text       start:0x802E3D4C end:0x802E4338
 
-unclassified/tu_802E4358.cpp:
+Game/Effects/EmissionController.cpp:
 	.text       start:0x802E4358 end:0x802E5B40
 	.data       start:0x8052F098 end:0x8052F0E8
 	.sbss       start:0x806E1FD0 end:0x806E1FD4
@@ -1025,6 +1030,10 @@ unclassified/tu_802F2110.cpp:
 
 unclassified/tu_802F2C3C.cpp:
 	.text       start:0x802F2C3C end:0x802F39EC
+
+Game/FE/feAnimation.cpp:
+	.text       start:0x802F9CD8 end:0x802FA1C4
+	.sdata2     start:0x806E6660 end:0x806E6664
 
 Game/FE/feFontResource.cpp:
 	.text       start:0x802FA614 end:0x802FA61C

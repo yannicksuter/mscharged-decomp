@@ -1,5 +1,8 @@
 #include "Game/Effects/EmissionController.h"
 
+#include "NL/nlFile.h"
+#include "NL/nlMemory.h"
+
 void EmissionController::SetPosition(const nlVector3& pos)
 {
     m_vPosition = pos;
@@ -25,6 +28,34 @@ void EmissionController::SetAnimController(
     const cPN_SAnimController& animController)
 {
     m_pAnimController = &animController;
+}
+
+bool EmissionController::IsLingering() const
+{
+    return m_bLingering;
+}
+
+void* fxLoadEntireFileHigh(const char* filename, unsigned long* fileSize)
+{
+    void* buffer = 0;
+    u32 datasize = 0;
+
+    nlFile* file = nlOpen(filename);
+    if (file != 0)
+    {
+        unsigned int size;
+        datasize = nlFileSize(file, &size);
+        buffer = nlMalloc(size, 0x20, true);
+        nlRead(file, buffer, datasize, 0);
+        nlClose(file);
+    }
+
+    if (fileSize != 0)
+    {
+        *fileSize = datasize;
+    }
+
+    return buffer;
 }
 
 void EmissionController::SetUpdateCallback(
