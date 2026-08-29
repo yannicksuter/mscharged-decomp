@@ -26,11 +26,25 @@ inline int isdigit(int value)
         : _current_locale.ctype_cmpt_ptr->ctype_map_ptr[value] & __MSL_ISDIGIT_MAP;
 }
 
+inline int isspace(int value)
+{
+    return value < 0 || value >= 256
+        ? 0
+        : _current_locale.ctype_cmpt_ptr->ctype_map_ptr[value] & __MSL_ISSPACE_MAP;
+}
+
 inline int tolower(int value)
 {
     return value < 0 || value >= 256
         ? value
         : _current_locale.ctype_cmpt_ptr->lower_map_ptr[value];
+}
+
+inline int toupper(int value)
+{
+    return value < 0 || value >= 256
+        ? value
+        : _current_locale.ctype_cmpt_ptr->upper_map_ptr[value];
 }
 
 #ifdef __cplusplus

@@ -11,7 +11,7 @@ extern "C" {
 #define CLOCKS_PER_SEC 1000
 
 typedef unsigned long clock_t;
-typedef unsigned long time_t;
+typedef signed long long time_t;
 
 struct tm {
     int tm_sec;

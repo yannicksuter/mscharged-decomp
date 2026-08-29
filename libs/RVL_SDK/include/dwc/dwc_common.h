@@ -1,13 +1,12 @@
 #pragma once
 
+#include <dwc/dwc_account.h>
 #include <revolution/types.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-    typedef union DWCFriendData DWCFriendData;
 
     int DWC_SetCommonKeyValueString(const char* key, const char* value,
         char* string, char separator);

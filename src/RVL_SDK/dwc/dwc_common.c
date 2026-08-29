@@ -10,7 +10,7 @@
 
 u64 lbl_806C9888[3];
 
-int NCDGetWirelessMacAddress(u8* macAddr);
+int NETGetWirelessMacAddress(void* data);
 BOOL fn_8048B76C(const DWCFriendData* friendData, GPBuddyStatus* buddyStatus);
 
 int DWC_SetCommonKeyValueString(const char* key, const char* value,
@@ -90,7 +90,7 @@ u32 fn_8048A3BC(u32 max)
 
     if (lbl_806C9888[0] == 0 && lbl_806C9888[1] == 0 && lbl_806C9888[2] == 0)
     {
-        NCDGetWirelessMacAddress((u8*)&macAddress);
+        NETGetWirelessMacAddress(&macAddress);
         macAddress = ((u64)OSGetTime() << 24) | ((macAddress >> 24) & 0xFFFFFF);
         lbl_806C9888[0] = macAddress;
         lbl_806C9888[1] = 0x5D588B656C078965ULL;

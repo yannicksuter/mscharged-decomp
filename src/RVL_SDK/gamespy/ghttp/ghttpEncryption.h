@@ -70,13 +70,13 @@ typedef struct GHIEncryptor {
   void* mInterface; // only SSL is currently supported
   GHTTPEncryptionEngine mEngine;
   GHTTPBool mInitialized;
-  GHTTPBool mSessionStarted; // handshake started?
+  GHTTPBool mSessionEstablished; // handshake completed?
 
   // Functions for engine use
   GHTTPEncryptorInitFunc mInitFunc;
   GHTTPEncryptorCleanupFunc mCleanupFunc;
-  GHTTPEncryptorStartFunc mStartFunc; // start the handshake process
   GHTTPEncryptorEncryptFunc mEncryptFunc;
+  GHTTPEncryptorDecryptFunc mDecryptFunc;
 } GHIEncryptor;
 
 ///////////////////////////////////////////////////////////////////////////////

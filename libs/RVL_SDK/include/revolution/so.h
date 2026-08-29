@@ -2,7 +2,7 @@
 
 #include <revolution/types.h>
 
-#include <revolution/os.h>
+#include <revolution/os/OSTime.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -137,6 +137,13 @@ enum {
 #define SO_IPPROTO_TCP 6
 #define SO_IPPROTO_UDP 17
 
+#define SO_CONFIG_IP_ADDR_NUMBER 0x4002
+#define SO_CONFIG_IP_ADDR_TABLE 0x4003
+
+#define SO_F_GETFL 3
+#define SO_F_SETFL 4
+#define SO_O_NONBLOCK 4
+
 #define SO_CONFIG_FILTER_INPUT 0x1001
 #define SO_CONFIG_FILTER_OUTPUT 0x1002
 
@@ -210,6 +217,12 @@ typedef struct SOInAddr {
   u32 addr;
 
 } SOInAddr;
+
+typedef struct IPAddrEntry {
+  SOInAddr addr;
+  SOInAddr netmask;
+  SOInAddr broadcast;
+} IPAddrEntry;
 
 typedef struct SOSockAddr {
   u8 len;

@@ -737,6 +737,30 @@ Game/Sys/simpleparser.cpp:
 	.text       start:0x802AAFD0 end:0x802AB77C
 	.sdata      start:0x806DF1C8 end:0x806DF1D4
 
+zlib/adler32.c:
+	.text       start:0x802AB77C end:0x802AB8FC
+
+zlib/crc32.c:
+	.text       start:0x802AB8FC end:0x802AC108
+	.rodata     start:0x804E8900 end:0x804EA900
+
+zlib/inffast.c:
+	.text       start:0x802AC108 end:0x802AC640
+	.data       start:0x8052B0E0 end:0x8052B138
+
+zlib/inflate.c:
+	.text       start:0x802AC640 end:0x802AE160
+	.rodata     start:0x804EA900 end:0x804EB1A8
+	.data       start:0x8052B138 end:0x8052B370
+	.sdata      start:0x806DF1D8 end:0x806DF1E0
+
+zlib/inftrees.c:
+	.text       start:0x802AE160 end:0x802AE8F4
+	.rodata     start:0x804EB1A8 end:0x804EB2A8
+
+zlib/zutil.c:
+	.text       start:0x802AE8F4 end:0x802AE92C
+
 NL/MemAlloc.cpp:
 	.text       start:0x802AE92C end:0x802AF51C
 	.data       start:0x8052B370 end:0x8052B490
@@ -2666,6 +2690,29 @@ RVL_SDK/vf/nand_drv.c:
 RVL_SDK/vf/sd_drv.c:
 	.text       start:0x80437140 end:0x80437144
 
+RVL_SDK/net/md5.c:
+	.text       start:0x80437144 end:0x80437870
+	.rodata     start:0x804F11D4 end:0x804F11F8
+	.data       start:0x805556A8 end:0x80555868
+	.sdata      start:0x806E0118 end:0x806E0120
+
+RVL_SDK/net/hmac.c:
+	.text       start:0x80437870 end:0x80437C60
+	.data       start:0x80555868 end:0x805558C0
+	.sdata      start:0x806E0120 end:0x806E0130
+
+RVL_SDK/net/neterrorcode.c:
+	.text       start:0x80437C60 end:0x804380D0
+	.data       start:0x805558C0 end:0x805558E0
+
+RVL_SDK/net/NETVersion.c:
+	.text       start:0x804380D0 end:0x804380D8
+	.data       start:0x805558E0 end:0x80555918
+	.sdata      start:0x806E0130 end:0x806E0138
+
+RVL_SDK/net/wireless_macaddr.c:
+	.text       start:0x804380D8 end:0x804380DC
+
 RVL_SDK/hbm/HBMAnmController.cpp:
 	.text       start:0x80441838 end:0x804418FC
 
@@ -2967,6 +3014,8 @@ RVL_SDK/hbm/nw4hbm/ut/ut_TextWriterBase.cpp:
 
 RVL_SDK/dwc/dwc_base64.c:
 	.text       start:0x80488D6C end:0x804890D4
+	.data       start:0x80561BE8 end:0x80561C29
+	.sdata      start:0x806E0368 end:0x806E036C
 
 RVL_SDK/dwc/dwc_error.c:
 	.text       start:0x804890D4 end:0x804891C8
@@ -3026,10 +3075,43 @@ RVL_SDK/dwc/dwc_transport.c:
 	.sbss       start:0x806E2F00 end:0x806E2F08
 
 RVL_SDK/dwc/dwc_nonport.c:
-	.text       start:0x8049BB0C end:0x8049D180
+	.text       start:0x8049BB0C end:0x8049BD6C
+	.data       start:0x80565038 end:0x805650A0
+	.bss        start:0x806CA178 end:0x806CA19C
+	.sbss       start:0x806E2F08 end:0x806E2F18
+
+RVL_SDK/dwc/dwci_np_math.c:
+	.text       start:0x8049BD6C end:0x8049D180
+
+RVL_SDK/dwc/dwc_ranking.c:
+	.text       start:0x8049D180 end:0x8049D8E8
+	.sbss       start:0x806E2F18 end:0x806E2F20
+
+RVL_SDK/dwc/dwc_account.c:
+	.text       start:0x8049D8E8 end:0x8049ED50
+	.data       start:0x805650A0 end:0x805651B0
+	.sdata      start:0x806E0440 end:0x806E0448
 
 RVL_SDK/dwc/dwc_auth_interface.c:
-	.text       start:0x8049EDC0 end:0x804A0B5C
+	.text       start:0x8049ED50 end:0x804A0B58
+	.data       start:0x805651B0 end:0x80565878
+	.bss        start:0x806CA1A0 end:0x806CA5E8
+	.sdata      start:0x806E0448 end:0x806E0540
+	.sbss       start:0x806E2F20 end:0x806E2F30
+
+RVL_SDK/dwc/dwc_nastime.c:
+	.text       start:0x804A0B5C end:0x804A0C34
+
+RVL_SDK/dwc/dwc_ranksession.c:
+	.text       start:0x804A0C34 end:0x804A2068
+	.rodata     start:0x804F3210 end:0x804F3238
+	.data       start:0x80565878 end:0x80565A40
+	.sdata      start:0x806E0540 end:0x806E0568
+	.sbss       start:0x806E2F30 end:0x806E2F38
+
+RVL_SDK/dwc/unknown_804A2068.c:
+	.text       start:0x804A2068 end:0x804A2508
+	.data       start:0x80565A40 end:0x80565AA0
 
 RVL_SDK/gamespy/darray.c:
 	.text       start:0x804A2508 end:0x804A2F5C
@@ -3038,9 +3120,83 @@ RVL_SDK/gamespy/hashtable.c:
 	.text       start:0x804A2F5C end:0x804A33F4
 
 RVL_SDK/gamespy/md5c.c:
-	.text       start:0x804A3434 end:0x804A4314
+	.text       start:0x804A33F4 end:0x804A4314
 	.data       start:0x80565AA0 end:0x80565AE0
 	.sdata      start:0x806E0568 end:0x806E0570
+
+RVL_SDK/gamespy/common/gsPlatformSocket.c:
+	.text       start:0x804A4314 end:0x804A5258
+
+RVL_SDK/gamespy/common/gsPlatformUtil.c:
+	.text       start:0x804A5258 end:0x804A5A48
+
+RVL_SDK/gamespy/common/gsMemory.c:
+	.text       start:0x804A5A48 end:0x804A5AA8
+	.bss        start:0x806CA5E8 end:0x806CA5F8
+
+RVL_SDK/gamespy/common/gsAvailable.c:
+	.text       start:0x804A5AA8 end:0x804A5DE4
+	.data       start:0x80565AF0 end:0x80565B18
+	.bss        start:0x806CA7B8 end:0x806CA890
+	.sdata      start:0x806E0580 end:0x806E0584
+	.sbss       start:0x806E2F48 end:0x806E2F4C
+
+RVL_SDK/gamespy/common/gsLargeInt.c:
+	.text       start:0x804A5DE4 end:0x804A8B80
+
+RVL_SDK/gamespy/common/gsSHA1.c:
+	.text       start:0x804A8B80 end:0x804A952C
+	.rodata     start:0x804F3238 end:0x804F3248
+
+RVL_SDK/gamespy/GP/gp.c:
+	.text       start:0x804A953C end:0x804AA2A4
+	.data       start:0x80565B18 end:0x80565D48
+	.sdata      start:0x806E0588 end:0x806E0598
+
+RVL_SDK/gamespy/GP/gpi.c:
+	.text       start:0x804AA2A4 end:0x804AAAA0
+	.data       start:0x80565D48 end:0x80565DC0
+	.sdata      start:0x806E0598 end:0x806E05C8
+
+RVL_SDK/gamespy/GP/gpiBuddy.c:
+	.text       start:0x804AAAA0 end:0x804ABA6C
+	.data       start:0x80565DC0 end:0x80565E68
+	.sdata      start:0x806E05C8 end:0x806E0620
+
+RVL_SDK/gamespy/GP/gpiBuffer.c:
+	.text       start:0x804ABA6C end:0x804AC3B8
+	.data       start:0x80565E68 end:0x80565ED0
+	.sdata      start:0x806E0620 end:0x806E0640
+
+RVL_SDK/gamespy/GP/gpiCallback.c:
+	.text       start:0x804AC3B8 end:0x804AC870
+	.data       start:0x80565ED0 end:0x80565EE0
+
+RVL_SDK/gamespy/GP/gpiConnect.c:
+	.text       start:0x804AC870 end:0x804ADE1C
+	.data       start:0x80565EE0 end:0x805662A8
+	.sdata      start:0x806E0640 end:0x806E06D0
+
+RVL_SDK/gamespy/GP/gpiInfo.c:
+	.text       start:0x804ADE1C end:0x804B02B4
+	.data       start:0x805662A8 end:0x80566600
+	.sdata      start:0x806E06D0 end:0x806E0788
+	.sdata2     start:0x806E7A18 end:0x806E7A1C
+
+RVL_SDK/gamespy/GP/gpiOperation.c:
+	.text       start:0x804B02B4 end:0x804B0934
+	.data       start:0x80566600 end:0x80566610
+
+RVL_SDK/gamespy/GP/gpiPeer.c:
+	.text       start:0x804B0934 end:0x804B1CA4
+
+RVL_SDK/gamespy/GP/gpiProfile.c:
+	.text       start:0x804B1CA4 end:0x804B2464
+	.data       start:0x80566730 end:0x805668E8
+	.sdata      start:0x806E07F0 end:0x806E0800
+
+RVL_SDK/gamespy/GP/gpiSearch.c:
+	.text       start:0x804B2464 end:0x804B46A0
 
 RVL_SDK/gamespy/GP/gpiUtility.c:
 	.text       start:0x804B46A0 end:0x804B4C84
@@ -3060,16 +3216,98 @@ RVL_SDK/gamespy/gt2/gt2Callback.c:
 RVL_SDK/gamespy/gt2/gt2Connection.c:
 	.text       start:0x804B5A6C end:0x804B6140
 
+RVL_SDK/gamespy/gt2/gt2Main.c:
+	.text       start:0x804B6140 end:0x804B64F8
+
 RVL_SDK/gamespy/gt2/gt2Socket.c:
 	.text       start:0x804B95C0 end:0x804BA154
 
+RVL_SDK/gamespy/gt2/gt2Utility.c:
+	.text       start:0x804BA154 end:0x804BA440
+	.bss        start:0x806DA920 end:0x806DA94C
+	.sdata      start:0x806E0918 end:0x806E092C
+	.sbss       start:0x806E2F50 end:0x806E2F54
+
+RVL_SDK/gamespy/qr2/qr2.c:
+	.text       start:0x804BA440 end:0x804BCBD8
+
+RVL_SDK/gamespy/qr2/qr2regkeys.c:
+	.text       start:0x804BCBD8 end:0x804BCC00
+	.data       start:0x80567158 end:0x80567630
+	.sdata      start:0x806E0960 end:0x806E09C8
+
+RVL_SDK/gamespy/ghttp/ghttpBuffer.c:
+	.text       start:0x804BCC00 end:0x804BD5D0
+	.sdata      start:0x806E09C8 end:0x806E09D8
+
 RVL_SDK/gamespy/ghttp/ghttpCallbacks.c:
 	.text       start:0x804BD5D0 end:0x804BD6F0
+
+RVL_SDK/gamespy/ghttp/ghttpCommon.c:
+	.text       start:0x804BD6F0 end:0x804BDB60
 
 RVL_SDK/gamespy/ghttp/ghttpConnection.c:
 	.text       start:0x804BDB60 end:0x804BE2AC
 	.data       start:0x80567630 end:0x8056763C
 	.sbss       start:0x806E2F68 end:0x806E2F78
+
+RVL_SDK/gamespy/ghttp/ghttpMain.c:
+	.text       start:0x804C0078 end:0x804C05DC
+	.sbss       start:0x806E2F78 end:0x806E2F7C
+
+RVL_SDK/gamespy/ghttp/ghttpPost.c:
+	.text       start:0x804C05DC end:0x804C1CD8
+
+RVL_SDK/gamespy/ghttp/ghttpProcess.c:
+	.text       start:0x804C1CD8 end:0x804C3568
+
+RVL_SDK/gamespy/gstats/gbucket.c:
+	.text       start:0x804C3568 end:0x804C4700
+	.sbss       start:0x806E2F98 end:0x806E2FAC
+	.sdata2     start:0x806E7A30 end:0x806E7A38
+
+RVL_SDK/gamespy/gstats/gstats.c:
+	.text       start:0x804C4700 end:0x804C67E8
+
+RVL_SDK/gamespy/natneg/NATify.c:
+	.text       start:0x804C67E8 end:0x804C6F50
+	.bss        start:0x806DAEA8 end:0x806DB0D8
+	.sdata      start:0x806E0AE0 end:0x806E0AF0
+	.sbss       start:0x806E2FD0 end:0x806E2FF0
+
+RVL_SDK/gamespy/natneg/natneg.c:
+	.text       start:0x804C6F50 end:0x804C8890
+	.data       start:0x80567C20 end:0x80567C78
+	.bss        start:0x806DB0D8 end:0x806DB3B0
+	.sdata      start:0x806E0AF0 end:0x806E0B10
+	.sbss       start:0x806E2FF0 end:0x806E301C
+
+RVL_SDK/gamespy/serverbrowsing/sb_crypt.c:
+	.text       start:0x804C8890 end:0x804C8CC4
+
+RVL_SDK/gamespy/serverbrowsing/sb_queryengine.c:
+	.text       start:0x804C8CC4 end:0x804C9770
+	.data       start:0x80567C78 end:0x80567CA0
+	.sdata      start:0x806E0B10 end:0x806E0B18
+
+RVL_SDK/gamespy/serverbrowsing/sb_server.c:
+	.text       start:0x804C9770 end:0x804CA420
+	.data       start:0x80567CA0 end:0x80567CB0
+	.sdata      start:0x806E0B18 end:0x806E0B48
+	.sbss       start:0x806E3020 end:0x806E302C
+	.sdata2     start:0x806E7A38 end:0x806E7A40
+
+RVL_SDK/gamespy/serverbrowsing/sb_serverbrowsing.c:
+	.text       start:0x804CA420 end:0x804CAC34
+	.data       start:0x80567CB0 end:0x80567CD0
+	.sdata      start:0x806E0B48 end:0x806E0B50
+
+RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c:
+	.text       start:0x804CAC34 end:0x804CE5EC
+	.data       start:0x80567CD0 end:0x80567CFC
+	.sdata      start:0x806E0B50 end:0x806E0B60
+	.sbss       start:0x806E3030 end:0x806E3038
+	.sdata2     start:0x806E7A40 end:0x806E7A4C
 
 RVL_SDK/rfl/RFL_System.c:
 	extab       start:0x80006788 end:0x800067B0
