@@ -15,15 +15,30 @@ enum eSpinType
 
 class cFielder;
 class cPlayer;
+class BlurHandler;
+class DebugWriteCache;
 class DrawableObject;
 class PhysicsBall;
+class RunningChecksum;
+struct UnidentifiedBallRuntime;
 
 class cBall
 {
 public:
+    cBall();
+    ~cBall();
+
+    void ClearOwner();
+    void ClearBallEffects();
+    void ClearBallBlur();
+    void SetOwner(cPlayer* pOwner);
     void SetPosition(const nlVector3& pos);
     void SetVelocity(const nlVector3& velocity, eSpinType spin,
         const nlVector3* pAngularVelocity);
+    void ShootAtFast(nlVector3& v3Vel, const nlVector3& v3Target,
+        float fDesiredTime);
+    void SyncLog(void* context, DebugWriteCache* cache);
+    void fn_8001A898(RunningChecksum* runningChecksum);
     nlVector3* GetAIVelocity() const;
     nlVector3* GetDrawablePosition() const;
     float fn_80014F38(float fScale) const;
@@ -32,90 +47,50 @@ public:
     cFielder* GetPassTargetFielder() const;
     bool GetInNet(int& nSide);
 
-    /* 0x00 */ u8 m_bBallPathChangeCount;
-
-private:
-    /* 0x01 */ u8 mUnidentified001[0x03];
-
-public:
-    /* 0x04 */ u32 m_bBallDeflectCount;
-
-public:
-    /* 0x08 */ u32 mUnidentified008;
-
-public:
-    /* 0x0C */ Timer m_tShotTimer;
-
-private:
-    /* 0x14 */ u8 mUnidentified014[0x08];
-
-public:
+    /* 0x00 */ bool m_bVisible;
+    /* 0x01 */ u8 mPadding001[0x03];
+    /* 0x04 */ u32 m_bBallPathChangeCount;
+    /* 0x08 */ u32 m_bBallDeflectCount;
+    /* 0x0C */ Timer m_tLightningTimer;
+    /* 0x14 */ Timer m_tShotTimer;
     /* 0x1C */ Timer m_tNoPickupTimer;
     /* 0x24 */ Timer m_tPassTargetTimer;
-
-private:
-    /* 0x2C */ u8 mUnidentified02C[0x1E];
-
-public:
-    /* 0x4A */ bool mUnidentified4A;
-
-private:
-    /* 0x4B */ u8 mUnidentified04B[0x09];
-
-public:
+    /* 0x2C */ Timer mtStuckInRiotTimer;
+    /* 0x34 */ Timer mtNoChargeLossTimer;
+    /* 0x3C */ Timer mtShotClockTimer;
+    /* 0x44 */ int mnShotClockTeam;
+    /* 0x48 */ bool mbStuckInRiotDone;
+    /* 0x49 */ bool mbBallOnFire;
+    /* 0x4A */ bool mbBallFrozen;
+    /* 0x4B */ u8 mPadding04B;
+    /* 0x4C */ float m_fTotalPassTime;
+    /* 0x50 */ int m_iConsecutiveVolleyPasses;
     /* 0x54 */ nlVector3 m_v3Position;
     /* 0x60 */ nlVector3 m_v3PrevPosition;
-
-public:
     /* 0x6C */ nlVector3 m_v3Velocity;
-
-public:
     /* 0x78 */ nlVector3 m_v3PassIntercept;
-
-private:
-    /* 0x84 */ u8 mUnidentified084[0x10];
-
-public:
+    /* 0x84 */ nlQuaternion m_qOrientation;
     /* 0x94 */ nlVector3 m_v3ShotTarget;
-
-private:
-    /* 0xA0 */ u8 mUnidentified0A0[0x0C];
-
-public:
+    /* 0xA0 */ nlVector3 m_v3ShotOrigin;
     /* 0xAC */ unsigned int m_uGoalType;
-
-private:
-    /* 0xB0 */ u8 mUnidentified0B0[0x08];
-
-public:
-    /* 0xB8 */ int m_unk_0xA4;
-
-private:
-    /* 0xBC */ u8 mUnidentified0BC[0x0C];
-
-public:
+    /* 0xB0 */ unsigned int m_uVoiceID;
+    /* 0xB4 */ unsigned int m_CurrentGlowEffect;
+    /* 0xB8 */ int meBallState;
+    /* 0xBC */ int mePrevBallState;
+    /* 0xC0 */ float mfChargeValue;
+    /* 0xC4 */ float mfSkillShotTime;
     /* 0xC8 */ cPlayer* m_pOwner;
-
-public:
     /* 0xCC */ cPlayer* m_pPrevOwner;
-
-private:
     /* 0xD0 */ cPlayer* m_pLastTouch;
-
-public:
     /* 0xD4 */ cPlayer* m_pPassTarget;
     /* 0xD8 */ cPlayer* m_pShooter;
-
-private:
-    /* 0xDC */ u8 mUnidentified0DC[0x08];
-
-public:
+    /* 0xDC */ cPlayer* mpDamageTarget;
+    /* 0xE0 */ BlurHandler* m_pBlurHandler;
     /* 0xE4 */ DrawableObject* m_pDrawableBall;
-
-public:
     /* 0xE8 */ PhysicsBall* m_pPhysicsBall;
-    /* 0xEC */ void* mUnidentifiedEC;
-};
+    /* 0xEC */ UnidentifiedBallRuntime* mUnidentifiedEC;
+    /* 0xF0 */ unsigned long mUnidentifiedF0;
+}; // total size: 0xF4
 
 extern cBall* g_pBall;
 

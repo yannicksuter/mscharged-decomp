@@ -587,7 +587,7 @@ void cFielder::fn_80043C18(float fDeltaT)
     case 0x7C:
     {
         float fSpin
-            = 1.0f - *((FielderTweaks*)fn_8003E6E4(this))->mUnidentified070;
+            = 1.0f - fn_8003E6E4(this)->mUnidentified064;
         Unknown8(m_aActualFacingDirection
                 + (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f)),
             false);
@@ -1003,12 +1003,12 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
     s16 nFacingDelta = aAngle - pAttacker->m_aActualFacingDirection;
 
     float fIntensityA
-        = *((FielderTweaks*)fn_8003E6E4(pFielder))->mUnidentified070;
+        = fn_8003E6E4(pFielder)->mUnidentified064;
     float fIntensityB = 1.0f;
     if (pAttacker->m_eClassType == FIELDER)
     {
-        fIntensityB = *((FielderTweaks*)fn_8003E6E4((cFielder*)pAttacker))
-                           ->mUnidentified070;
+        fIntensityB
+            = fn_8003E6E4((cFielder*)pAttacker)->mUnidentified064;
     }
 
     int nReact = 1;
@@ -1317,7 +1317,7 @@ bool cFielder::DoCommonInitActionLooseBall(
     float fMaxCatchupSpeed = fn_8002E1B0(this);
     float fMinBallZ = lbl_806E35FC;
     bool bNoContactFound = true;
-    bool bBallState5 = g_pBall->m_unk_0xA4 == 5;
+    bool bBallState5 = g_pBall->meBallState == 5;
 
     while (fSimulatedTime < fMaxSimulatedTime)
     {
@@ -1676,7 +1676,7 @@ void cFielder::fn_800489C0()
 
 float cFielder::fn_800489C4()
 {
-    float fShooting = ((FielderTweaks*)fn_8003E6E4(this))->fShooting;
+    float fShooting = fn_8003E6E4(this)->fShooting;
     if (fShooting > 1.0f)
     {
         fShooting = 1.0f;
@@ -1686,7 +1686,7 @@ float cFielder::fn_800489C4()
 
 float cFielder::fn_80048A08()
 {
-    float fShooting = ((FielderTweaks*)fn_8003E6E4(this))->fShooting;
+    float fShooting = fn_8003E6E4(this)->fShooting;
     if (fShooting > 1.0f)
     {
         fShooting = 1.0f;
@@ -1811,7 +1811,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         mUnidentified3AC = lbl_806DB924;
         mUnidentified3B8 = false;
 
-        float fShooting = ((FielderTweaks*)fn_8003E6E4(this))->fShooting;
+        float fShooting = fn_8003E6E4(this)->fShooting;
         if (fShooting > 1.0f)
         {
             fShooting = 1.0f;
@@ -1908,10 +1908,10 @@ void cFielder::fn_80048FB0(float fDeltaT, bool bButtonPressed, int nParam)
 
             mUnidentified3A4 = InterpolateClamped(lbl_806DB934,
                 lbl_806DB938,
-                ((FielderTweaks*)fn_8003E6E4(this))->fShooting);
+                fn_8003E6E4(this)->fShooting);
             float fSecondPhaseTime = InterpolateClamped(lbl_806DB940,
                 lbl_806DB944,
-                ((FielderTweaks*)fn_8003E6E4(this))->fShooting);
+                fn_8003E6E4(this)->fShooting);
 
             mUnidentified3B8 = true;
             mUnidentified3AC = mUnidentified3B0;
@@ -2013,7 +2013,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
         m_pTeam->GetGoalie()->fn_8008E2D0();
         m_pTeam->GetOtherTeam()->GetGoalie()->fn_8008E2D0();
 
-        g_pBall->mUnidentified4A = true;
+        g_pBall->mbBallFrozen = true;
         muInvincibleStatus |= 0x1F;
 
         m_pTeam->GetOtherTeam()->GetGoalie()->fn_8008EF58();
@@ -2084,7 +2084,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
         float fHalfWidth = (float)fabs(mUnidentified3A4 * 0.5f);
         if (fDelta
             < InterpolateClamped(lbl_806DB940, lbl_806DB944,
-                  ((FielderTweaks*)fn_8003E6E4(this))->fShooting)
+                  fn_8003E6E4(this)->fShooting)
                 * 0.5f)
         {
             fDelta = 0.0f;
@@ -2163,7 +2163,7 @@ extern "C" float fn_800499EC(cFielder* pFielder, int nParam)
     float fMeterMax = pFielder->fn_80048A08();
     float fMeterRange = fMeterMax - pFielder->fn_800489C4();
 
-    float fShooting = ((FielderTweaks*)fn_8003E6E4(pFielder))->fShooting;
+    float fShooting = fn_8003E6E4(pFielder)->fShooting;
     if (fShooting > 1.0f)
     {
         fShooting = 1.0f;
@@ -2240,7 +2240,7 @@ extern "C" float fn_80049CC0(cFielder* pFielder, int nParam)
             = (float)fabs(pFielder->mUnidentified3A4 * 0.5f);
         if (fDelta
             < InterpolateClamped(lbl_806DB940, lbl_806DB944,
-                  ((FielderTweaks*)fn_8003E6E4(pFielder))->fShooting)
+                  fn_8003E6E4(pFielder)->fShooting)
                 * 0.5f)
         {
             fDelta = 0.0f;
@@ -2529,7 +2529,7 @@ void cFielder::asmRunningWB(float fDeltaT)
     s16 nAbsActualToDesiredFacingDirection = (s16)(u16)abs_s16(
         (s16)(m_aDesiredFacingDirection - m_aActualFacingDirection));
     float fSpeedFactor = InterpolateRangeClamped(
-        0.96f, 0.6f, 0.0f, 0.5f, *fn_8003E6E4(this)->mUnidentified040);
+        0.96f, 0.6f, 0.0f, 0.5f, fn_8003E6E4(this)->mUnidentified034);
     bool bFirstTime;
 
     do
@@ -2784,7 +2784,7 @@ void cFielder::asmRunning()
     s16 nAbsActualToDesiredMovementDirection = (s16)(u16)abs_s16(
         (s16)(m_aDesiredMovementDirection - m_aActualMovementDirection));
     float fSpeedFactor = InterpolateRangeClamped(
-        0.96f, 0.6f, 0.0f, 0.5f, *fn_8003E6E4(this)->mUnidentified040);
+        0.96f, 0.6f, 0.0f, 0.5f, fn_8003E6E4(this)->mUnidentified034);
     bool bFirstTime;
 
     do
@@ -3476,7 +3476,7 @@ void cFielder::fn_80044290(float fDeltaT)
             }
 
             float fSpin = 1.0f
-                - *((FielderTweaks*)fn_8003E6E4(this))->mUnidentified070;
+                - fn_8003E6E4(this)->mUnidentified064;
             Unknown8(m_aActualFacingDirection
                     + (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f)),
                 false);
@@ -3807,7 +3807,7 @@ void cFielder::ActionElectrocution(float dt)
         {
             nlVector3 v3Position = m_v3Position;
             float fShake
-                = *((FielderTweaks*)fn_8003E6E4(this))->mUnidentified070;
+                = fn_8003E6E4(this)->mUnidentified064;
             float fRise = lbl_806DB9A0
                 * ((1.0f - fShake) * nlRandomf(0.5f) + 0.5f);
             v3Position.z += fRise * dt;
@@ -4586,7 +4586,7 @@ void cFielder::fn_8004B2E4(float fDeltaT)
 
         if (gbUseTurboCharging != 0)
         {
-            float fValue = *fn_8003E6E4(this)->mUnidentified040;
+            float fValue = fn_8003E6E4(this)->mUnidentified034;
             float fFraction
                 = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fValue);
             float fCharge = Interpolate(lbl_806DB980, lbl_806DB984, fFraction);
@@ -4954,7 +4954,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
         {
             fn_80037AC8(this, 0);
 
-            if (g_pBall->m_unk_0xA4 == 8)
+            if (g_pBall->meBallState == 8)
             {
                 if (m_eCharacterClass == (eCharacterClass)0x11)
                 {
@@ -5047,7 +5047,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
     }
 
     if (g_pBall->m_pOwner == 0 && !fn_80014E20(g_pBall)
-        && g_pBall->m_tShotTimer.m_uPackedTime == 0
+        && g_pBall->m_tLightningTimer.m_uPackedTime == 0
         && !(g_pBall->m_tNoPickupTimer.m_uPackedTime != 0
             && g_pBall->m_pPrevOwner != 0
             && g_pBall->m_pPrevOwner->m_eClassType == GOALIE))
@@ -5062,8 +5062,8 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
         if (bTouched && bCanPickup)
         {
-            bool bAirborne = g_pBall->m_unk_0xA4 == 5
-                || g_pBall->m_unk_0xA4 == 3;
+            bool bAirborne = g_pBall->meBallState == 5
+                || g_pBall->meBallState == 3;
             bool bStolen = bAirborne && g_pBall->m_pPassTarget != 0;
 
             if (bStolen && g_pBall->m_pPrevOwner != 0

@@ -33,19 +33,61 @@ Game/AnimInventory.cpp:
 	.data       start:0x804F42A0 end:0x804F4330
 	.sbss       start:0x806E0B90 end:0x806E0B98
 
+Game/AI/AvoidController.cpp:
+	.text       start:0x8000EF9C end:0x800133B8
+	.rodata     start:0x804DBC20 end:0x804DBC30
+	.data       start:0x804F48A0 end:0x804F4A50
+	.sdata      start:0x806DB4E0 end:0x806DB500
+	.sdata2     start:0x806E3140 end:0x806E31B0
+
 Game/Ball.cpp:
-	.text       start:0x80014EE8 end:0x80015068
-	.sdata      start:0x806DB514 end:0x806DB518 align:4
-	.sdata2     start:0x806E31B4 end:0x806E31BC align:4
+	.text       start:0x800133D8 end:0x8001BA0C
+	.ctors      start:0x804DB4F8 end:0x804DB4FC
+	.rodata     start:0x804DBC30 end:0x804DBE58
+	.data       start:0x804F4A50 end:0x804F5078
+	.bss        start:0x8056B260 end:0x8056B7B0
+	.sdata      start:0x806DB500 end:0x806DB5D8
+	.sbss       start:0x806E0BC0 end:0x806E0C18
+	.sdata2     start:0x806E31B0 end:0x806E3240
 
 Game/Character.cpp:
 	.text       start:0x8001BA0C end:0x80025E9C
 	.ctors      start:0x804DB4FC end:0x804DB500
 	.rodata     start:0x804DBE58 end:0x804DBE68
-	.data       start:0x804F5078 end:0x804F7F18
+	.data       start:0x804F5078 end:0x804F59C0
 	.bss        start:0x8056B7B0 end:0x8056B800
 	.sdata      start:0x806DB5D8 end:0x806DB630
+	.sbss       start:0x806E0C18 end:0x806E0C30
 	.sdata2     start:0x806E3240 end:0x806E32B0
+
+Game/CharacterTemplate.cpp:
+	.text       start:0x80025E9C end:0x80026F24
+	.ctors      start:0x804DB500 end:0x804DB504
+	.data       start:0x804F59C0 end:0x804F8F08
+	.bss        start:0x8056B800 end:0x8056B890
+	.sdata      start:0x806DB630 end:0x806DB6A0
+	.sbss       start:0x806E0C30 end:0x806E0C40
+
+Game/GoalieTweaks.cpp:
+	.text       start:0x80026F24 end:0x80028BDC
+	.ctors      start:0x804DB504 end:0x804DB508
+	.data       start:0x804F8F08 end:0x804F9370
+	.sdata2     start:0x806E32B0 end:0x806E3318
+
+Game/CrowdRiot.cpp:
+	.text       start:0x80028BDC end:0x80029F58
+	.ctors      start:0x804DB508 end:0x804DB50C
+	.data       start:0x804F9370 end:0x804F9578
+	.bss        start:0x8056B890 end:0x8056B908
+	.sdata      start:0x806DB6A0 end:0x806DB6D0
+	.sdata2     start:0x806E3318 end:0x806E3340
+
+Game/CharacterTweaks.cpp:
+	.text       start:0x80029F58 end:0x8002D120
+	.ctors      start:0x804DB50C end:0x804DB510
+	.data       start:0x804F9578 end:0x804F9CA8
+	.sdata      start:0x806DB6D0 end:0x806DB6E0
+	.sdata2     start:0x806E3340 end:0x806E3400
 
 Game/Field.cpp:
 	.text       start:0x8002D120 end:0x8002DB1C
@@ -86,7 +128,7 @@ Game/AI/FielderAbility.cpp:
 	.sdata2     start:0x806E3628 end:0x806E3660
 
 Game/AI/FilteredRandom.cpp:
-	.text       start:0x800505AC end:0x80050704
+	.text       start:0x800505AC end:0x80050744
 	.rodata     start:0x804DBEF8 end:0x804DBF18
 	.sdata2     start:0x806E3660 end:0x806E3668
 

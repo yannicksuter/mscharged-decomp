@@ -4,6 +4,15 @@
 #include "NL/nlMath.h"
 
 class cPlayer;
+class CrowdRiot;
+class PhysicsObject;
+
+struct UnidentifiedEventData_80066B08
+{
+    /* 0x00 */ nlVector3 mUnidentified00;
+    /* 0x0C */ PhysicsObject* mUnidentified0C;
+    /* 0x10 */ CrowdRiot* mUnidentified10;
+}; // total size: 0x14
 
 struct UnidentifiedEventData00;
 struct UnidentifiedEventData01;

@@ -111,7 +111,7 @@ private:
 
 public:
     /* 0x10 */ GameTweaks* m_pGameTweaks;
-    /* 0x14 */ unk_80029F58* m_unk14;
+    /* 0x14 */ FielderTweaks* m_unk14;
 
 private:
     /* 0x18 */ u8 mUnidentified18[0x08];

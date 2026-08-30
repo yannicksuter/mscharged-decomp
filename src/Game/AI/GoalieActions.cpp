@@ -537,7 +537,7 @@ void Goalie::ActionLooseBallDesperate(float fDeltaT)
         return;
     }
 
-    if (muBallDeflectCount != pBall->m_bBallDeflectCount
+    if (muBallDeflectCount != pBall->m_bBallPathChangeCount
         || mnOffplayPending != GOALIE_OFFPLAY_NONE
         || pBall->m_pOwner != 0)
     {
@@ -922,7 +922,7 @@ void Goalie::fn_80083960(float)
                 v3BallPosition, 1.5f, v3Facing, m_v3Position);
             v3BallPosition.z = 0.2f;
             g_pBall->SetPosition(v3BallPosition);
-            g_pBall->m_bBallPathChangeCount = 1;
+            g_pBall->m_bVisible = 1;
             fn_8007EB90(this);
         }
 
@@ -974,7 +974,7 @@ void Goalie::fn_80083960(float)
                 {
                     mpMonty->ReleaseBall(0);
                     PickupBall(g_pBall);
-                    g_pBall->m_bBallPathChangeCount = 0;
+                    g_pBall->m_bVisible = 0;
                 }
 
                 fn_8004F204(mpMonty);
@@ -1409,7 +1409,7 @@ void Goalie::fn_80084C3C(bool bParam)
         fn_80013898(g_pBall);
     }
 
-    g_pBall->m_bBallPathChangeCount = true;
+    g_pBall->m_bVisible = true;
     g_pBall->SetVelocity(v3Zero, SPINTYPE_NONE, 0);
     g_pBall->m_pPhysicsBall->m_bCollideWithGoalies = true;
     g_pBall->m_pPhysicsBall->m_bCollideWithFielders = true;
@@ -1846,11 +1846,11 @@ void Goalie::ActionSave(float fDeltaT)
                    < cField::GetGoalLineX(1U))
         {
             bool bBallThreat = true;
-            if (g_pBall->m_tShotTimer.m_uPackedTime == 0)
+            if (g_pBall->m_tLightningTimer.m_uPackedTime == 0)
             {
                 bBallThreat = false;
-                if ((g_pBall->m_unk_0xA4 == 5
-                        || g_pBall->m_unk_0xA4 == 3)
+                if ((g_pBall->meBallState == 5
+                        || g_pBall->meBallState == 3)
                     && g_pBall->m_pPassTarget != 0)
                 {
                     bBallThreat = true;
@@ -1862,14 +1862,14 @@ void Goalie::ActionSave(float fDeltaT)
                 && !fn_80016768(g_pBall))
             {
                 bool bState8Shot = false;
-                if (g_pBall->m_tShotTimer.m_uPackedTime != 0
-                    && g_pBall->m_unk_0xA4 == 8)
+                if (g_pBall->m_tLightningTimer.m_uPackedTime != 0
+                    && g_pBall->meBallState == 8)
                 {
                     bState8Shot = true;
                 }
 
                 if (!bState8Shot
-                    || g_pBall->m_bBallPathChangeCount == 0)
+                    || g_pBall->m_bVisible == 0)
                 {
                     const nlVector3& v3LHand
                         = GetJointPosition(m_nLeftHandJointIndex);
@@ -2049,7 +2049,7 @@ void Goalie::ActionMove(float deltaTime)
         if (CanInterceptPass())
         {
             SetGoalieAction(GOALIEACTION_PASS_INTERCEPT, 0);
-            muBallDeflectCount = g_pBall->m_bBallDeflectCount;
+            muBallDeflectCount = g_pBall->m_bBallPathChangeCount;
             if (mfWaitTime <= 0.02f)
             {
                 InitActionPassInterceptSave();
@@ -2858,7 +2858,7 @@ void Goalie::fn_80090858(eGoalieOffplayType offplayType)
 void Goalie::fn_800908F8()
 {
     cPlayer* pShooter = g_pBall->m_pShooter;
-    if (pShooter != 0 && g_pBall->m_unk_0xA4 == 8)
+    if (pShooter != 0 && g_pBall->meBallState == 8)
     {
         mpSkillShooter = pShooter;
         switch (pShooter->m_eCharacterClass)
@@ -2894,8 +2894,8 @@ bool Goalie::fn_80090958(bool bParam)
     {
         pBall = g_pBall;
         bState8Shot = false;
-        if (pBall->m_tShotTimer.m_uPackedTime != 0
-            && pBall->m_unk_0xA4 == 8)
+        if (pBall->m_tLightningTimer.m_uPackedTime != 0
+            && pBall->meBallState == 8)
         {
             bState8Shot = true;
         }
@@ -3000,8 +3000,8 @@ bool Goalie::fn_80090958(bool bParam)
     {
         pBall = g_pBall;
         bState8Shot = false;
-        if (pBall->m_tShotTimer.m_uPackedTime != 0
-            && pBall->m_unk_0xA4 == 8)
+        if (pBall->m_tLightningTimer.m_uPackedTime != 0
+            && pBall->meBallState == 8)
         {
             bState8Shot = true;
         }
@@ -3165,7 +3165,7 @@ void Goalie::ActionPass(float deltaTime)
 
 void Goalie::ActionPassIntercept(float deltaTime)
 {
-    if (muBallDeflectCount != g_pBall->m_bBallDeflectCount)
+    if (muBallDeflectCount != g_pBall->m_bBallPathChangeCount)
     {
         InitActionMove(true);
         return;
@@ -3619,7 +3619,7 @@ void Goalie::ActionPursueBallPounce(float fDeltaT)
 
         float pickupTime = mpLooseBallInfo->mfPickupTime;
         if (animTime < pickupTime
-            && g_pBall->m_tShotTimer.m_uPackedTime == 0)
+            && g_pBall->m_tLightningTimer.m_uPackedTime == 0)
         {
             bool bWallBlock = mfWallBlock > 0.0f;
             if (!bWallBlock)
@@ -3865,7 +3865,7 @@ void Goalie::fn_8008A610(float fDeltaT)
             mbGrabMonty = true;
             mpMonty = mpTarget;
             fn_8004F204(mpTarget);
-            g_pBall->m_bBallPathChangeCount = 0;
+            g_pBall->m_bVisible = 0;
             m_fDesiredSpeed = 0.0f;
             m_fActualSpeed = 0.0f;
             SetVelocity(v3Zero);
@@ -4055,7 +4055,7 @@ void Goalie::ActionLooseBallPursueBouncing(float deltaTime)
         return;
     }
 
-    if (muBallDeflectCount != g_pBall->m_bBallDeflectCount)
+    if (muBallDeflectCount != g_pBall->m_bBallPathChangeCount)
     {
         InitActionLooseBallSetup();
         return;
@@ -4553,8 +4553,8 @@ void Goalie::InitActionLooseBallSetup()
     const nlVector3* pBallVelocity = &g_pBall->m_v3Velocity;
     nlVector3 v3BallPosition = g_pBall->m_v3Position;
     const nlVector3& v3NetBase = m_pTeam->m_pNet->m_v3NetLocation;
-    muBallDeflectCount = g_pBall->m_bBallDeflectCount;
-    mUnidentified3E4 = g_pBall->mUnidentified008;
+    muBallDeflectCount = g_pBall->m_bBallPathChangeCount;
+    mUnidentified3E4 = g_pBall->m_bBallDeflectCount;
 
     bool bInCone = fn_8007D644(this);
     float fBallSpeed = pBallVelocity->x * pBallVelocity->x
@@ -5168,7 +5168,7 @@ void Goalie::fn_8008CED8(float fTargetTime,
 
     mbIsDown = false;
     mbTryLobSave = true;
-    muBallDeflectCount = g_pBall->m_bBallDeflectCount;
+    muBallDeflectCount = g_pBall->m_bBallPathChangeCount;
     mUrgency = URGENCY_MED;
     mbDoHeadTrack = true;
     mnSubstate = 1;
@@ -5262,7 +5262,7 @@ void Goalie::fn_8008D210(float fDeltaT)
     bool bPredictionChanged = false;
     float fMoveSpeed = 0.2f;
 
-    if (muBallDeflectCount != g_pBall->m_bBallDeflectCount)
+    if (muBallDeflectCount != g_pBall->m_bBallPathChangeCount)
     {
         InitActionMove(false);
         return;
@@ -5732,7 +5732,7 @@ void Goalie::fn_8008DEF4(float fParam)
     {
         ReleaseBall(4);
     }
-    else if (g_pBall->m_unk_0xA4 != 4)
+    else if (g_pBall->meBallState != 4)
     {
         fn_80015C38(g_pBall, 4);
     }
@@ -6232,7 +6232,7 @@ void Goalie::ActionChipShotStumble(float deltaTime)
     if (m_pCurrentAnimController->m_fTime
         < mpSaveData->mfMilestonePercent[2])
     {
-        if (mUnidentified3E4 != g_pBall->mUnidentified008)
+        if (mUnidentified3E4 != g_pBall->m_bBallDeflectCount)
         {
             m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
             mbTryLobSave = false;
@@ -6467,8 +6467,8 @@ void Goalie::ActionSTSAttack(float deltaTime)
     if (!mbPickedUp)
     {
         bool bUnidentified = false;
-        if ((g_pBall->m_unk_0xA4 == 5
-                || g_pBall->m_unk_0xA4 == 3)
+        if ((g_pBall->meBallState == 5
+                || g_pBall->meBallState == 3)
             && g_pBall->m_pPassTarget != 0)
         {
             bUnidentified = true;
@@ -6482,7 +6482,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
 
         float fShotMeter = fn_800DEB04(mpShooter);
         if (!(fShotMeter > 0.0f && fShotMeter <= 1.0f)
-            && g_pBall->m_tShotTimer.m_uPackedTime != 0)
+            && g_pBall->m_tLightningTimer.m_uPackedTime != 0)
         {
             InitActionMove(false);
             return;
@@ -6536,7 +6536,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
     }
 
     if (mpLooseBallInfo->mAnimType == LOOSEBALL_ANIM_KICK
-        && g_pBall->m_unk_0xA4 != 0
+        && g_pBall->meBallState != 0
         && m_pCurrentAnimController->m_fTime > 0.4f
         && m_pCurrentAnimController->m_fTime < 0.45f)
     {
@@ -6582,9 +6582,9 @@ void Goalie::InitActionMove(bool bParam)
     }
 
     mbIsDown = false;
-    if (g_pBall->m_tShotTimer.m_uPackedTime != 0)
+    if (g_pBall->m_tLightningTimer.m_uPackedTime != 0)
     {
-        if (!g_pBall->m_unk_0xA4 == true)
+        if (!g_pBall->meBallState == true)
         {
             mpSkillShooter = 0;
         }
@@ -6649,8 +6649,8 @@ void Goalie::fn_8008ED44(bool bParam)
         bool bMirrored = !m_pAnimInventory->GetMirrored(m_eAnimID);
         bool bUseSTSSpinMiss = false;
         bool bState8Shot = false;
-        if (g_pBall->m_tShotTimer.m_uPackedTime != 0
-            && g_pBall->m_unk_0xA4 == 8)
+        if (g_pBall->m_tLightningTimer.m_uPackedTime != 0
+            && g_pBall->meBallState == 8)
         {
             bState8Shot = true;
         }
@@ -6761,7 +6761,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         || mGoalieActionState == GOALIEACTION_UNIDENTIFIED_25)
     {
         cPlayer* pSkillShooter = g_pBall->m_pShooter;
-        if (pSkillShooter != 0 && g_pBall->m_unk_0xA4 == 8)
+        if (pSkillShooter != 0 && g_pBall->meBallState == 8)
         {
             mpSkillShooter = pSkillShooter;
             switch ((int)pSkillShooter->m_eCharacterClass)
@@ -6800,14 +6800,14 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         return;
     }
 
-    mUnidentified3E4 = g_pBall->mUnidentified008;
-    muBallDeflectCount = g_pBall->m_bBallDeflectCount;
+    mUnidentified3E4 = g_pBall->m_bBallDeflectCount;
+    muBallDeflectCount = g_pBall->m_bBallPathChangeCount;
     mbDoHeadTrack = true;
     mbBallImpacted = false;
     mbIsDown = false;
 
     cPlayer* pSkillShooter = g_pBall->m_pShooter;
-    if (pSkillShooter != 0 && g_pBall->m_unk_0xA4 == 8)
+    if (pSkillShooter != 0 && g_pBall->meBallState == 8)
     {
         mpSkillShooter = pSkillShooter;
         switch ((int)pSkillShooter->m_eCharacterClass)
@@ -6846,8 +6846,8 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
 
     if (mUnidentified254 == 0)
     {
-        bool bState7Shot = g_pBall->m_tShotTimer.m_uPackedTime != 0
-                        && g_pBall->m_unk_0xA4 == 7;
+        bool bState7Shot = g_pBall->m_tLightningTimer.m_uPackedTime != 0
+                        && g_pBall->meBallState == 7;
         if (bState7Shot)
         {
             uSaveType = 3;
@@ -6855,8 +6855,8 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         else
         {
             bool bState8Shot
-                = g_pBall->m_tShotTimer.m_uPackedTime != 0
-               && g_pBall->m_unk_0xA4 == 8;
+                = g_pBall->m_tLightningTimer.m_uPackedTime != 0
+               && g_pBall->meBallState == 8;
             if (!bState8Shot
                 && fTargetVelocitySq
                        < fUnidentifiedRange * fUnidentifiedRange)
@@ -6890,8 +6890,8 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
                 {
                     cBall* pBall = g_pBall;
                     bool bState7Shot
-                        = pBall->m_tShotTimer.m_uPackedTime != 0
-                       && pBall->m_unk_0xA4 == 7;
+                        = pBall->m_tLightningTimer.m_uPackedTime != 0
+                       && pBall->meBallState == 7;
                     if (bState7Shot)
                     {
                         nlVector2 v2ShotDistance;
@@ -7098,7 +7098,7 @@ void Goalie::InitActionChipShotStumble(float fTargetTime)
 {
     SetGoalieAction(GOALIEACTION_MISS_CHIP_SHOT, 0);
 
-    mUnidentified3E4 = g_pBall->mUnidentified008;
+    mUnidentified3E4 = g_pBall->m_bBallDeflectCount;
 
     nlVector2 v2Delta;
     v2Delta.x = m_v3Position.x - g_pBall->m_v3Position.x;

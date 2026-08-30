@@ -413,8 +413,8 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         }
 
         fn_8013F854("PhysChar IncrementBallDeflectCount\n");
-        ++ball->mUnidentified008;
         ++ball->m_bBallDeflectCount;
+        ++ball->m_bBallPathChangeCount;
         return ONE_WAY_CONTACT_OTHER;
     }
 
