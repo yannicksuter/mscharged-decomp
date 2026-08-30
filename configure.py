@@ -300,12 +300,23 @@ cflags_metrotrk_deferred_auto = [
     "-inline deferred,auto",
 ]
 
+# NHTTP_thread retains every intra-unit helper call (CheckHeaderEnd stays a
+# real call); auto-inlining collapses its single-caller helpers, unlike the
+# sibling NHTTP units whose retained bytes require auto-inlining.
+cflags_rvl_nhttp = [
+    *(flag for flag in cflags_rvl_sdk if flag != "-inline auto"),
+    "-inline on",
+]
+
 # DWC consumes the vendored GameSpy interfaces below the RVL SDK source root.
 cflags_rvl_dwc = [
     *cflags_rvl_sdk,
     "-i src/RVL_SDK",
     "-i src/RVL_SDK/gamespy/common",
     "-i src/RVL_SDK/gamespy/gstats",
+    "-i src/RVL_SDK/gamespy/natneg",
+    "-i src/RVL_SDK/gamespy/qr2",
+    "-i src/RVL_SDK/gamespy/serverbrowsing",
 ]
 
 # Home Button Menu library flags. R4QE01 links the HBM build dated
@@ -990,6 +1001,7 @@ config.libs = [
             Object(NonMatching, "RVL_SDK/dwc/dwc_friend.c", cflags=cflags_rvl_dwc),
             Object(NonMatching, "RVL_SDK/dwc/dwc_login.c", cflags=cflags_rvl_dwc),
             Object(NonMatching, "RVL_SDK/dwc/dwc_main.c", cflags=cflags_rvl_dwc),
+            Object(NonMatching, "RVL_SDK/dwc/dwc_match.c", cflags=cflags_rvl_dwc),
             Object(NonMatching, "RVL_SDK/dwc/dwc_transport.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_nonport.c", cflags=cflags_rvl_dwc),
             Object(NonMatching, "RVL_SDK/dwc/dwci_np_math.c", cflags=cflags_rvl_dwc),
@@ -1026,6 +1038,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Buffer.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Callback.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Connection.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/gt2/gt2Message.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Socket.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpCallbacks.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpBuffer.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
@@ -1033,6 +1046,7 @@ config.libs = [
             Object(NonMatching, "RVL_SDK/gamespy/ghttp/ghttpPost.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
             Object(NonMatching, "RVL_SDK/gamespy/ghttp/ghttpProcess.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
             Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpConnection.c", cflags=cflags_rvl_spy),
+            Object(NonMatching, "RVL_SDK/gamespy/ghttp/ghttpEncryption.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/GP/gpiUtility.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/GP/gp.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
             Object(Matching, "RVL_SDK/gamespy/GP/gpi.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
@@ -1127,7 +1141,7 @@ config.libs = [
             Object(NonMatching, "RVL_SDK/nhttp/NHTTP_response.c"),
             Object(NonMatching, "RVL_SDK/nhttp/NHTTP_socket_RVL.c"),
             Object(NonMatching, "RVL_SDK/nhttp/NHTTP_stdlib_RVL.c"),
-            Object(NonMatching, "RVL_SDK/nhttp/NHTTP_thread.c"),
+            Object(NonMatching, "RVL_SDK/nhttp/NHTTP_thread.c", cflags=cflags_rvl_nhttp),
             Object(NonMatching, "RVL_SDK/nhttp/d_nhttp_private.c"),
             Object(NonMatching, "RVL_SDK/nhttp/d_nhttp.c"),
             Object(NonMatching, "RVL_SDK/nhttp/d_nhttp_common.c"),

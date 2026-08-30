@@ -3245,6 +3245,9 @@ RVL_SDK/nhttp/NHTTP_stdlib_RVL.c:
 
 RVL_SDK/nhttp/NHTTP_thread.c:
 	.text       start:0x80419CF4 end:0x8041DDBC
+	.rodata     start:0x804ECDE8 end:0x804ECEC0
+	.data       start:0x805554B8 end:0x80555580
+	.sdata      start:0x806E0060 end:0x806E00B8
 
 RVL_SDK/nhttp/d_nhttp_private.c:
 	.text       start:0x8041DDBC end:0x8041E0CC
@@ -3943,6 +3946,13 @@ RVL_SDK/dwc/dwc_main.c:
 	.sdata      start:0x806E03A0 end:0x806E03C8
 	.sbss       start:0x806E2EE0 end:0x806E2EE8
 
+RVL_SDK/dwc/dwc_match.c:
+	.text       start:0x8048F554 end:0x8049AE0C
+	.data       start:0x80563478 end:0x80564D50
+	.bss        start:0x806C9920 end:0x806CA178
+	.sdata      start:0x806E03C8 end:0x806E0438
+	.sbss       start:0x806E2EE8 end:0x806E2F00
+
 RVL_SDK/dwc/dwc_transport.c:
 	.text       start:0x8049AE0C end:0x8049BB0C
 	.data       start:0x80564D50 end:0x80565038
@@ -4094,6 +4104,11 @@ RVL_SDK/gamespy/gt2/gt2Connection.c:
 RVL_SDK/gamespy/gt2/gt2Main.c:
 	.text       start:0x804B6140 end:0x804B64F8
 
+RVL_SDK/gamespy/gt2/gt2Message.c:
+	.text       start:0x804B64F8 end:0x804B95C0
+	.bss        start:0x806CA920 end:0x806DA920
+	.sdata      start:0x806E0908 end:0x806E0918
+
 RVL_SDK/gamespy/gt2/gt2Socket.c:
 	.text       start:0x804B95C0 end:0x804BA154
 
@@ -4123,8 +4138,13 @@ RVL_SDK/gamespy/ghttp/ghttpCommon.c:
 
 RVL_SDK/gamespy/ghttp/ghttpConnection.c:
 	.text       start:0x804BDB60 end:0x804BE2AC
-	.data       start:0x80567630 end:0x8056763C
+	.data       start:0x80567630 end:0x80567640
 	.sbss       start:0x806E2F68 end:0x806E2F78
+
+RVL_SDK/gamespy/ghttp/ghttpEncryption.c:
+	.text       start:0x804BE2AC end:0x804C0078
+	.data       start:0x80567640 end:0x805676B8
+	.sdata      start:0x806E09E0 end:0x806E0A00
 
 RVL_SDK/gamespy/ghttp/ghttpMain.c:
 	.text       start:0x804C0078 end:0x804C05DC
