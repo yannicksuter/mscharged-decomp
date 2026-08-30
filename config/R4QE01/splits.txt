@@ -732,6 +732,12 @@ Game/FE/feButtonComponent.cpp:
 	.sdata      start:0x806DE000 end:0x806DE038
 	.sdata2     start:0x806E58E0 end:0x806E5904
 
+Game/SH/SHSceneBase.cpp:
+	.text       start:0x80269078 end:0x8026B10C
+	.data       start:0x80520A68 end:0x80520CD8
+	.sdata      start:0x806DECB8 end:0x806DED40
+	.sdata2     start:0x806E5BD0 end:0x806E5BE0
+
 Game/Render/RLView.cpp:
 	.text       start:0x80271C48 end:0x80271DE0
 	.data       start:0x80520FC0 end:0x80520FE0

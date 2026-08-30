@@ -723,6 +723,7 @@ config.libs = [
             Object(Matching, "Game/FE/feTextureResource.cpp"),
             Object(NonMatching, "unclassified/tu_80209584.cpp"),
             Object(Matching, "Game/SH/SHGameResults.cpp"),
+            Object(NonMatching, "Game/SH/SHSceneBase.cpp"),
             Object(Matching, "unclassified/tu_80219248.cpp"),
             Object(NonMatching, "unclassified/tu_80300104.cpp"),
             Object(NonMatching, "Game/FE/tlComponent.cpp"),

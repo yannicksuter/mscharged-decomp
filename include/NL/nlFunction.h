@@ -496,14 +496,62 @@ class Function2
 public:
     struct FunctorBase
     {
+        void* operator new(unsigned long size) { return fn_802B1C4C(size); }
+        void operator delete(void* ptr, unsigned long size)
+        {
+            fn_802B1D4C(ptr, size);
+        }
+
         virtual ~FunctorBase() { }
         virtual ReturnType operator()(P1, P2) = 0;
         virtual FunctorBase* Clone() const = 0;
     };
 
+    template <typename Callable>
+    struct FunctorImpl : public FunctorBase
+    {
+    private:
+        Callable mFunctor;
+
+    public:
+        FunctorImpl(const Callable& callable)
+            : mFunctor(callable)
+        {
+        }
+
+        virtual ReturnType operator()(P1 p1, P2 p2)
+        {
+            return Call(p1, p2, BoolToType<IsVoid<ReturnType>::value>());
+        }
+
+        virtual FunctorBase* Clone() const
+        {
+            return new FunctorImpl(*this);
+        }
+
+    private:
+        ReturnType Call(P1 p1, P2 p2, BoolToType<false>)
+        {
+            return mFunctor(p1, p2);
+        }
+
+        void Call(P1 p1, P2 p2, BoolToType<true>)
+        {
+            mFunctor(p1, p2);
+        }
+    };
+
     Function2()
         : mTag(FUNCTION_EMPTY)
     {
+    }
+
+    template <typename Callable>
+    Function2(Callable callable)
+        : mTag(FUNCTION_FUNCTOR)
+    {
+        typedef FunctorImpl<Callable> Impl;
+        mFunctor = new Impl(callable);
     }
 
     Function2(ReturnType (*function)(P1, P2))
