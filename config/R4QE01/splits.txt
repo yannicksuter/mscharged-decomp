@@ -74,6 +74,14 @@ Game/GoalieTweaks.cpp:
 	.data       start:0x804F8F08 end:0x804F9370
 	.sdata2     start:0x806E32B0 end:0x806E3318
 
+Game/CrowdRiot.cpp:
+	.text       start:0x80028BDC end:0x80029F58
+	.ctors      start:0x804DB508 end:0x804DB50C
+	.data       start:0x804F9370 end:0x804F9578
+	.bss        start:0x8056B890 end:0x8056B908
+	.sdata      start:0x806DB6A0 end:0x806DB6D0
+	.sdata2     start:0x806E3318 end:0x806E3340
+
 Game/Field.cpp:
 	.text       start:0x8002D120 end:0x8002DB1C
 	.ctors      start:0x804DB510 end:0x804DB514
