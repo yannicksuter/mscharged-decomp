@@ -415,6 +415,7 @@ config.libs = [
             Object(NonMatching, "Game/AIPad.cpp"),
             Object(Matching, "Game/AI/AiUtil.cpp"),
             Object(Matching, "Game/AnimInventory.cpp", extra_cflags=["-ipa file"]),
+            Object(NonMatching, "Game/AI/AvoidController.cpp"),
             Object(NonMatching, "Game/Ball.cpp"),
             Object(NonMatching, "Game/Character.cpp", extra_cflags=["-inline deferred"]),
             Object(NonMatching, "Game/Field.cpp"),
