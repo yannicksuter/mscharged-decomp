@@ -442,6 +442,7 @@ config.libs = [
             Object(NonMatching, "Game/Player.cpp"),
             Object(NonMatching, "Game/AI/Powerups.cpp"),
             Object(NonMatching, "Game/AI/ShotMeter.cpp", cflags=cflags_game_deferred),
+            Object(NonMatching, "Game/AI/SkillTweaks.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "unclassified/tu_800A9140.cpp"),
             Object(NonMatching, "unclassified/tu_800A9588.cpp"),
             Object(NonMatching, "Game/AI/Desire.cpp"),

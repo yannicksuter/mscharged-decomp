@@ -253,6 +253,15 @@ Game/AI/ShotMeter.cpp:
 	.sbss       start:0x806E0DD0 end:0x806E0DE0
 	.sdata2     start:0x806E3CA8 end:0x806E3CD8
 
+Game/AI/SkillTweaks.cpp:
+	.text       start:0x800A07C0 end:0x800A3594
+	.ctors      start:0x804DB548 end:0x804DB54C
+	.data       start:0x804FFFC0 end:0x805008D0
+	.bss        start:0x8056D958 end:0x8056D988
+	.sdata      start:0x806DBE78 end:0x806DBED0
+	.sbss       start:0x806E0DE0 end:0x806E0DF0
+	.sdata2     start:0x806E3CD8 end:0x806E3D10
+
 unclassified/tu_800A9140.cpp:
 	.text       start:0x800A9140 end:0x800A9588
 	.ctors      start:0x804DB554 end:0x804DB558
