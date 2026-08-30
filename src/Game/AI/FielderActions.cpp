@@ -314,6 +314,7 @@ extern "C" void fn_801B0FA4(void* pMeter, float fValue);
 extern "C" void fn_801B0FC4(void* pMeter, float fValue);
 extern "C" void fn_801B0FE4(void* pMeter, float fValue);
 extern "C" float fn_800499EC(cFielder* pFielder, int nParam);
+extern "C" float fn_80049CC0(cFielder* pFielder, int nParam);
 extern "C" void fn_8005F434(cGame* pGame, void* pEvent);
 extern "C" void fn_8005F630(cGame* pGame, void* pEvent);
 extern "C" void fn_80111D7C(float fParam);
@@ -2077,22 +2078,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     lbl_80574148.mUnidentified2C = true;
     lbl_80574148.mUnidentified00 = lbl_80574148.mUnidentified0C;
 
-    float fNeedle = lbl_806E3604;
-    if (mUnidentified3B8)
-    {
-        float fDelta = (float)fabs(lbl_806DB93C - mUnidentified3A0);
-        float fHalfWidth = (float)fabs(mUnidentified3A4 * 0.5f);
-        if (fDelta
-            < InterpolateClamped(lbl_806DB940, lbl_806DB944,
-                  fn_8003E6E4(this)->fShooting)
-                * 0.5f)
-        {
-            fDelta = 0.0f;
-        }
-        fNeedle = InterpolateRangeClamped(
-            -1.0f, 1.0f, lbl_806E3570 * fHalfWidth, 0.0f, fDelta);
-    }
-    mUnidentified3C0 = fNeedle;
+    mUnidentified3C0 = fn_80049CC0(this, 0);
 
     for (int i = 0; i < 2; i++)
     {
@@ -2235,13 +2221,12 @@ extern "C" float fn_80049CC0(cFielder* pFielder, int nParam)
         {
             fTime = pFielder->mUnidentified3A8;
         }
-        float fDelta = (float)fabs(lbl_806DB93C - fTime);
-        float fHalfWidth
-            = (float)fabs(pFielder->mUnidentified3A4 * 0.5f);
+        float fDelta = fabsf(lbl_806DB93C - fTime);
+        float fHalfWidth = fabsf(pFielder->mUnidentified3A4 / 2.0f);
         if (fDelta
             < InterpolateClamped(lbl_806DB940, lbl_806DB944,
                   fn_8003E6E4(pFielder)->fShooting)
-                * 0.5f)
+                / 2.0f)
         {
             fDelta = 0.0f;
         }
