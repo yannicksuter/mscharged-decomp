@@ -271,6 +271,16 @@ Game/AI/SpaceSearch.cpp:
 	.sbss       start:0x806E0DF0 end:0x806E0DF8
 	.sdata2     start:0x806E3D10 end:0x806E3D90
 
+Game/Team.cpp:
+	.text       start:0x800A5D34 end:0x800A9140
+	.ctors      start:0x804DB550 end:0x804DB554
+	.rodata     start:0x804DC110 end:0x804DC180
+	.data       start:0x80500940 end:0x80500BE8
+	.bss        start:0x8056D988 end:0x8056D9A0
+	.sdata      start:0x806DBEF0 end:0x806DBF18
+	.sbss       start:0x806E0DF8 end:0x806E0E10
+	.sdata2     start:0x806E3D90 end:0x806E3DD8
+
 unclassified/tu_800A9140.cpp:
 	.text       start:0x800A9140 end:0x800A9588
 	.ctors      start:0x804DB554 end:0x804DB558
