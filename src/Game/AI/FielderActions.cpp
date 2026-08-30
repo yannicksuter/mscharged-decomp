@@ -2356,10 +2356,11 @@ bool cFielder::fn_8004A330(cFielder* pOther)
         float fOtherOpen = fn_800A0508(pOther, 0, 0);
         float fThisOpen = fn_800A0508(this, 0, 0);
 
-        float fDelta[2];
-        fDelta[1] = pOther->m_v3Position.y - m_v3Position.y;
-        fDelta[0] = pOther->m_v3Position.x - m_v3Position.x;
-        if (fDelta[0] * fDelta[0] + fDelta[1] * fDelta[1] > lbl_806E360C
+        nlVector2 v2Delta = {
+            pOther->m_v3Position.x - m_v3Position.x,
+            pOther->m_v3Position.y - m_v3Position.y,
+        };
+        if (nlVec2LengthSquared(v2Delta) > lbl_806E360C
             && fOtherScore > lbl_806DB890 && fOtherOpen > fThisOpen)
         {
             bResult = true;
