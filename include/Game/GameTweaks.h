@@ -2,6 +2,74 @@
 #define GAME_GAME_TWEAKS_H
 
 #include "Game/CharacterTweaks.h"
+#include "NL/nlAVLTree.h"
+
+class cPlayer;
+
+class SkillTweaks;
+
+class SkillTweak
+{
+public:
+    float fn_800A0D6C();
+
+public:
+    /* 0x00 */ char mNameInFile[0x20];
+    /* 0x20 */ unsigned long mUnidentified020;
+    /* 0x24 */ unsigned long mUnidentified024;
+    /* 0x28 */ SkillTweaks* mUnidentified028;
+    /* 0x2C */ float mUnidentified02C;
+    /* 0x30 */ bool mUnidentified030;
+    /* 0x31 */ u8 mPadding031[3];
+    /* 0x34 */ float* mUnidentified034;
+    /* 0x38 */ unsigned long mUnidentified038;
+    /* 0x3C */ float* mUnidentified03C;
+}; // total size: 0x40
+
+class SkillTweaks
+{
+public:
+    SkillTweaks(const char* category);
+    ~SkillTweaks();
+
+    float fn_800A327C(unsigned long param1, cPlayer* param2);
+    bool fn_800A3350(unsigned long param1, float* param2, cPlayer* param3);
+    float* fn_800A3404();
+    float fn_800A3474(cPlayer* param1);
+
+public:
+    /* 0x000 */ SkillTweak* mUnidentified000[4];
+    /* 0x010 */ SkillTweak* Def_Marking;
+    /* 0x014 */ SkillTweak* Off_Avoidance;
+    /* 0x018 */ SkillTweak* Def_SlideAttackChance;
+    /* 0x01C */ SkillTweak* Off_Reaction;
+    /* 0x020 */ SkillTweak* mUnidentified020;
+    /* 0x024 */ SkillTweak* mUnidentified024;
+    /* 0x028 */ SkillTweak* PowerupUsageChance[3][10];
+    /* 0x0A0 */ SkillTweak* mUnidentified0A0[4];
+    /* 0x0B0 */ SkillTweak* mUnidentified0B0[4];
+    /* 0x0C0 */ float mUnidentified0C0[14];
+    /* 0x0F8 */ TweakValue_804F4DC8 fShotValue1;
+    /* 0x108 */ TweakValue_804F4DC8 fShotValue2;
+    /* 0x118 */ TweakValue_804F4DC8 fShotValue3;
+    /* 0x128 */ TweakValue_804F4DC8 fShotChance0;
+    /* 0x138 */ TweakValue_804F4DC8 fShotChance1;
+    /* 0x148 */ TweakValue_804F4DC8 fShotChance2;
+    /* 0x158 */ TweakValue_804F4DC8 fShotChance3;
+    /* 0x168 */ TweakValue_804F4DC8 fShotChance4;
+    /* 0x178 */ TweakValue_804F4DC8 fAttackCarrierDistance;
+    /* 0x188 */ TweakValue_804F4DC8 fLooseBallChaseDistance;
+    /* 0x198 */ TweakValue_804F4DC8 fGoalieCanInterceptPass;
+    /* 0x1A8 */ TweakValue_804F4DC8 fGoalieDekeChance;
+    /* 0x1B8 */ TweakValue_804F4DC8 fGoalieDekeSpeed;
+    /* 0x1C8 */ const char* mUnidentified1C8;
+    /* 0x1CC */ char mszFileName[0x40];
+    /* 0x20C */ float mUnidentified20C[4];
+    /* 0x21C */ nlAVLTreeSlotPool<unsigned long, SkillTweak*,
+        DefaultKeyCompare<unsigned long> > mSkillTweaksList;
+    /* 0x240 */ cPlayer* mUnidentified240;
+    /* 0x244 */ float mUnidentified244;
+}; // total size: 0x248
 
 class UnidentifiedFormationTweakValue
 {

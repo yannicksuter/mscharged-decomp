@@ -184,7 +184,7 @@ void Goalie::PlayBlendedAnims(
     int nMainAnimID;
     int milestone;
 
-    if (mUnidentified254 != 0)
+    if (m_tFireTimer.m_uPackedTime != 0)
     {
         fn_80097648(0.1f);
     }

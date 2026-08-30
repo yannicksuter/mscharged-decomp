@@ -17,6 +17,12 @@ struct CollisionPlayerPlayerData;
 struct CollisionPlayerWallData;
 struct UnidentifiedPlayerEventData;
 
+enum eBallRotationMode
+{
+    BRM_ANIMATED = 0,
+    BRM_MATCH_VELOCITY = 1,
+};
+
 class cPlayer : public cCharacter
 {
 public:
@@ -24,6 +30,7 @@ public:
     virtual void PostPhysicsUpdate();
     virtual void PrePhysicsUpdate(float dt);
     virtual void PreUpdate(float dt);
+    virtual void SetAnimID(int animID);
     virtual bool CanPickupBall(cBall* pBall, bool bParam);
     virtual void CollideWithBallCallback(cBall* pBall);
     virtual void CollideWithCharacterCallback(
@@ -59,45 +66,39 @@ public:
     /* 0x1E4 */ int m_ID;
 
 protected:
-    /* 0x1E8 */ u8 mUnknown1E8[0x08];
-    /* 0x1F0 */ float mUnidentified1F0;
-    /* 0x1F4 */ u8 mUnknown1F4;
-    /* 0x1F5 */ bool mUnidentified1F5;
-    /* 0x1F6 */ bool mUnidentified1F6;
-    /* 0x1F7 */ u8 mUnknown1F7;
-    /* 0x1F8 */ u8 mUnknown1F8[0x24];
+    /* 0x1E8 */ int m_nFeatherAnimID;
+    /* 0x1EC */ bool m_bIsContactingWall;
+    /* 0x1ED */ u8 mPadding1ED[0x03];
+    /* 0x1F0 */ float m_fSkipTimer;
+    /* 0x1F4 */ bool m_bSkipActionUpdate;
+    /* 0x1F5 */ bool m_bSkipAnimUpdate;
+    /* 0x1F6 */ bool m_bForceFeatherUpdate;
+    /* 0x1F7 */ u8 mPadding1F7;
+    /* 0x1F8 */ nlVector3 m_v3AIPosition;
+    /* 0x204 */ eBallRotationMode m_eBallRotationMode;
+    /* 0x208 */ bool m_ResetBaseBallOrientation;
+    /* 0x209 */ u8 mPadding209[0x03];
+    /* 0x20C */ nlQuaternion m_BaseBallOrientation;
 
 public:
-    /* 0x21C */ Timer mUnidentified21C;
-
-protected:
-    /* 0x224 */ u8 mUnknown224[0x08];
-
-public:
+    /* 0x21C */ Timer m_tBallPossessionTimer;
+    /* 0x224 */ Timer m_tBallUnPossessionTimer;
     /* 0x22C */ Timer m_tNoPickupTimer;
-
-protected:
-    /* 0x234 */ u8 mUnknown234[0x04];
-
-public:
-    /* 0x238 */ Timer mUnidentified238;
-
-protected:
-    /* 0x240 */ u8 mUnknown240[0x10];
-
-public:
-    /* 0x250 */ u32 mUnidentified250;
-    /* 0x254 */ int mUnidentified254;
-    /* 0x258 */ bool mUnidentified258;
+    /* 0x234 */ float m_fShotStrengthTime;
+    /* 0x238 */ Timer m_tSlideAttackTimer;
+    /* 0x240 */ Timer m_tLooseBallPassTimer;
+    /* 0x248 */ Timer m_tInactivityTimer;
+    /* 0x250 */ Timer m_tFireTimer;
+    /* 0x258 */ bool m_bCanTestController;
     /* 0x259 */ u8 mUnknown259[0x03];
     /* 0x25C */ int m_eLastPadAction;
-    /* 0x260 */ u8 mUnknown260[0x04];
-
-public:
-    /* 0x264 */ Timer mUnidentified264;
+    /* 0x260 */ u16 m_aSwapFacingDirection;
+    /* 0x262 */ u8 mPadding262[0x02];
+    /* 0x264 */ Timer m_tSwapFacingTimer;
+    /* 0x26C */ float m_UserControlledTime;
+    /* 0x270 */ Timer m_tSwapControllerTimer[16];
 
 protected:
-    /* 0x26C */ u8 mUnknown26C[0x84];
     /* 0x2F0 */ cPN_Feather* mUnidentified2F0;
     /* 0x2F4 */ u8 mUnknown2F4[0x04];
 

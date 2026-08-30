@@ -314,6 +314,7 @@ extern "C" void fn_801B0FA4(void* pMeter, float fValue);
 extern "C" void fn_801B0FC4(void* pMeter, float fValue);
 extern "C" void fn_801B0FE4(void* pMeter, float fValue);
 extern "C" float fn_800499EC(cFielder* pFielder, int nParam);
+extern "C" float fn_80049CC0(cFielder* pFielder, int nParam);
 extern "C" void fn_8005F434(cGame* pGame, void* pEvent);
 extern "C" void fn_8005F630(cGame* pGame, void* pEvent);
 extern "C" void fn_80111D7C(float fParam);
@@ -570,7 +571,7 @@ extern float lbl_806DB99C;
 
 void cFielder::EndAction()
 {
-    if (mUnidentified254 == 0)
+    if (m_tFireTimer.m_uPackedTime == 0)
     {
         SetAction(ACTION_NEED_ACTION);
     }
@@ -739,7 +740,7 @@ void cFielder::fn_8004643C(float fDeltaT)
                             && (fn_800344B0(pOther) || fn_80038918(pOther)))
                         {
                             SetAIPad(pOther->m_pController);
-                            mUnidentified258 = false;
+                            m_bCanTestController = false;
                             pOther->SetAIPad(0);
                             bGiven = true;
                         }
@@ -1042,7 +1043,7 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
 bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     int nReact, bool bDoFrameLock, bool bBookPenalty)
 {
-    if (IsFallenDown() && mUnidentified254 == 0)
+    if (IsFallenDown() && m_tFireTimer.m_uPackedTime == 0)
     {
         return false;
     }
@@ -1564,7 +1565,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_LOOSE_BALL_PASS);
         mActionShotVars.bIsChipShot = bVolleyPass;
-        mUnidentified258 = false;
+        m_bCanTestController = false;
         SetNoPickUpTime(lbl_806E35E0);
     }
 }
@@ -2077,22 +2078,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     lbl_80574148.mUnidentified2C = true;
     lbl_80574148.mUnidentified00 = lbl_80574148.mUnidentified0C;
 
-    float fNeedle = lbl_806E3604;
-    if (mUnidentified3B8)
-    {
-        float fDelta = (float)fabs(lbl_806DB93C - mUnidentified3A0);
-        float fHalfWidth = (float)fabs(mUnidentified3A4 * 0.5f);
-        if (fDelta
-            < InterpolateClamped(lbl_806DB940, lbl_806DB944,
-                  fn_8003E6E4(this)->fShooting)
-                * 0.5f)
-        {
-            fDelta = 0.0f;
-        }
-        fNeedle = InterpolateRangeClamped(
-            -1.0f, 1.0f, lbl_806E3570 * fHalfWidth, 0.0f, fDelta);
-    }
-    mUnidentified3C0 = fNeedle;
+    mUnidentified3C0 = fn_80049CC0(this, 0);
 
     for (int i = 0; i < 2; i++)
     {
@@ -2235,13 +2221,12 @@ extern "C" float fn_80049CC0(cFielder* pFielder, int nParam)
         {
             fTime = pFielder->mUnidentified3A8;
         }
-        float fDelta = (float)fabs(lbl_806DB93C - fTime);
-        float fHalfWidth
-            = (float)fabs(pFielder->mUnidentified3A4 * 0.5f);
+        float fDelta = fabsf(lbl_806DB93C - fTime);
+        float fHalfWidth = fabsf(pFielder->mUnidentified3A4 / 2.0f);
         if (fDelta
             < InterpolateClamped(lbl_806DB940, lbl_806DB944,
                   fn_8003E6E4(pFielder)->fShooting)
-                * 0.5f)
+                / 2.0f)
         {
             fDelta = 0.0f;
         }
@@ -2371,10 +2356,11 @@ bool cFielder::fn_8004A330(cFielder* pOther)
         float fOtherOpen = fn_800A0508(pOther, 0, 0);
         float fThisOpen = fn_800A0508(this, 0, 0);
 
-        float fDelta[2];
-        fDelta[1] = pOther->m_v3Position.y - m_v3Position.y;
-        fDelta[0] = pOther->m_v3Position.x - m_v3Position.x;
-        if (fDelta[0] * fDelta[0] + fDelta[1] * fDelta[1] > lbl_806E360C
+        nlVector2 v2Delta = {
+            pOther->m_v3Position.x - m_v3Position.x,
+            pOther->m_v3Position.y - m_v3Position.y,
+        };
+        if (nlVec2LengthSquared(v2Delta) > lbl_806E360C
             && fOtherScore > lbl_806DB890 && fOtherOpen > fThisOpen)
         {
             bResult = true;
@@ -3050,7 +3036,7 @@ void cFielder::asmRunning()
                     {
                         fn_8003A2D0(this, -1);
                     }
-                    else if (mUnidentified264.GetSeconds() == 0.0f)
+                    else if (m_tSwapFacingTimer.GetSeconds() == 0.0f)
                     {
                         fn_8003ADAC(this);
                     }
@@ -3166,7 +3152,7 @@ void cFielder::asmRunning()
                     {
                         fn_8003A2D0(this, -1);
                     }
-                    else if (mUnidentified264.GetSeconds() == 0.0f)
+                    else if (m_tSwapFacingTimer.GetSeconds() == 0.0f)
                     {
                         fn_8003ADAC(this);
                     }
@@ -4101,7 +4087,7 @@ void cFielder::fn_80045C74(float fDeltaT)
                             && (fn_800344B0(pOther) || fn_80038918(pOther)))
                         {
                             SetAIPad(pOther->m_pController);
-                            mUnidentified258 = false;
+                            m_bCanTestController = false;
                             pOther->SetAIPad(0);
                             bGiven = true;
                         }
@@ -4708,7 +4694,7 @@ void cFielder::InitActionSlideAttack(
         SetAnimState(0x5E, true, 0.2f, false, false);
         InitMovementRunning(0.0f, 0.0f, fn_8002C180(fn_8003E6E4(this)),
             fn_8002CF24(fn_8003E6E4(this)));
-        mUnidentified238.SetSeconds(fn_8002C800(fn_8003E6E4(this)));
+        m_tSlideAttackTimer.SetSeconds(fn_8002C800(fn_8003E6E4(this)));
 
         mUnidentified388 = 0;
         mUnidentified38C = false;
@@ -4971,7 +4957,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
             }
             else
             {
-                if (mUnidentified21C.GetSeconds() < 0.1f
+                if (m_tBallPossessionTimer.GetSeconds() < 0.1f
                     || m_pShotMeter->m_fSpeedValue < 0.1f)
                 {
                     fn_801B75C8(this, 2, 0, 0, 1);
@@ -5131,17 +5117,17 @@ void cFielder::fn_8004C88C(float fDeltaT)
             }
         }
 
-        if (mUnidentified238.m_uPackedTime == 0 || bUnidentified)
+        if (m_tSlideAttackTimer.m_uPackedTime == 0 || bUnidentified)
         {
             fn_80139D1C(1, GetGlobalPad());
             mUnidentified388 = 1;
-            mUnidentified238.SetSeconds(fn_8002C8D4(fn_8003E6E4(this)));
+            m_tSlideAttackTimer.SetSeconds(fn_8002C8D4(fn_8003E6E4(this)));
         }
         break;
     }
     case 1:
     {
-        float fDecelTime = mUnidentified238.GetSeconds();
+        float fDecelTime = m_tSlideAttackTimer.GetSeconds();
         if (fDecelTime < 0.01f)
         {
             fDecelTime = 0.01f;
@@ -5157,7 +5143,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
             0.0f, (m_fActualSpeed - fTargetSpeed) / fDecelTime);
         m_fDesiredSpeed = fTargetSpeed;
 
-        if (mUnidentified238.m_uPackedTime == 0)
+        if (m_tSlideAttackTimer.m_uPackedTime == 0)
         {
             fn_8004D238();
         }
@@ -5295,7 +5281,7 @@ void cFielder::InitActionReceivePass(int animID, nlVector3& v3TargetPos,
 
 void cFielder::fn_8004E228()
 {
-    if (mUnidentified254 == 0)
+    if (m_tFireTimer.m_uPackedTime == 0)
     {
         mUnidentified3D8 = 0;
         mUnidentified3DA = 0;
