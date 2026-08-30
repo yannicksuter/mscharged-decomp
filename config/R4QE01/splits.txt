@@ -290,7 +290,8 @@ unclassified/tu_800A9140.cpp:
 	.sdata2     start:0x806E3DD8 end:0x806E3DE8
 
 unclassified/tu_800A9588.cpp:
-	.text       start:0x800A9588 end:0x800A9AC0
+	.text       start:0x800A9588 end:0x800A9AE0
+	.ctors      start:0x804DB558 end:0x804DB55C
 	.data       start:0x80500CC0 end:0x80500D18
 	.sdata      start:0x806DBF1C end:0x806DBF20
 	.sdata2     start:0x806E3DE8 end:0x806E3E00
