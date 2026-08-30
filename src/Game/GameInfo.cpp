@@ -1,5 +1,6 @@
 #include "Game/GameInfo.h"
 
+#include "Game/DB/UserOptions.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -12,13 +13,16 @@ inline void* operator new(unsigned long, void* memory)
 
 extern "C" void* memcpy(void* dst, const void* src, unsigned long size);
 
-extern "C" void fn_801098E4(void*);
+struct RFLCreateID;
+struct DWCstAccUserData;
+typedef DWCstAccUserData DWCAccUserData;
+
+extern "C" int RFLSearchOfficialData(const RFLCreateID*, u16*);
+extern "C" int DWC_CheckDirtyFlag(const DWCAccUserData*);
+extern "C" void DWC_ClearDirtyFlag(DWCAccUserData*);
 
 extern "C" void* fn_8010D668(void*);
-extern "C" int fn_804D7CEC(void*, u16*);
 extern "C" int fn_80338BF0(void*);
-extern "C" int fn_8049E320(void*);
-extern "C" void fn_8049E32C(void*);
 extern "C" void fn_80107D8C(int);
 extern "C" void fn_80108F14();
 extern "C" void fn_80108EE0();
@@ -399,7 +403,7 @@ const GameRules* GameInfoManager::GetActiveRules() const
 void GameInfoManager::ResetUnknown0xA0()
 {
     unknown_0x27C = 0;
-    fn_801098E4(unknown_0xA0);
+    ((AudioSettings*)unknown_0xA0)->ApplySettings();
 }
 
 static char kDefaultTeam[] = "mario";
@@ -732,7 +736,7 @@ int GameInfoManager::GetSaveSlotName(int index) const
 
     memcpy(&id, &mSaveSlots[index].mSaveId, sizeof(id));
     name = 0;
-    found = fn_804D7CEC(&id, &name);
+    found = RFLSearchOfficialData((const RFLCreateID*)&id, &name);
 
     if (found) {
         return name;
@@ -869,8 +873,8 @@ void GameInfoManager::ValidateSaveSlot(int index)
 {
     GameInfoSaveSlot* slot = &mSaveSlots[index];
 
-    if (fn_8049E320(slot)) {
-        fn_8049E32C(slot);
+    if (DWC_CheckDirtyFlag((const DWCAccUserData*)slot)) {
+        DWC_ClearDirtyFlag((DWCAccUserData*)slot);
         fn_80107D8C(1);
     }
 }

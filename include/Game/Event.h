@@ -97,30 +97,13 @@ public:
     {
         while (mListeners.m_Head != 0)
         {
-            ListenerEntry* listener = mListeners.Begin().CurrentEntry();
+            Listener* listener = &mListeners.Begin().CurrentEntry()->entry;
             Remove(listener);
         }
         fn_802B29C4(this);
     }
 
-    virtual void Disconnect()
-    {
-        UnidentifiedConnection* connection = (UnidentifiedConnection*)fn_802B28E0(this);
-        fn_802B2CC8(this, connection);
-
-        if (this->mCurrentConnection == connection)
-        {
-            connection->mFlags |= 0x20000000;
-        }
-        else
-        {
-            ListenerEntry* listener = mListeners.Begin((ListenerEntry*)((char*)connection - 8))
-                                          .CurrentEntry();
-            nlDLRingRemove(&mListeners.m_Head, listener);
-            listener->~ListenerEntry();
-            mListeners.m_Allocator.Free(listener);
-        }
-    }
+    virtual void Disconnect();
 
     virtual void Add(Function<T*>& callback, unsigned int value, int flags)
     {
@@ -172,27 +155,34 @@ public:
     }
 
 protected:
-    void Remove(ListenerEntry* listener)
-    {
-        if (listener == 0)
-        {
-            return;
-        }
-
-        fn_802B2CC8(this, &listener->entry);
-        if (this->mCurrentConnection == &listener->entry)
-        {
-            listener->entry.mFlags |= 0x20000000;
-            return;
-        }
-
-        nlDLRingRemove(&mListeners.m_Head, listener);
-        listener->~ListenerEntry();
-        mListeners.m_Allocator.Free(listener);
-    }
+    void Remove(Listener* listener);
 
     nlDLListSlotPool<Listener> mListeners;
 };
+
+template <typename T>
+void UnidentifiedEvent<T>::Remove(Listener* listener)
+{
+    fn_802B2CC8(this, listener);
+    if (this->mCurrentConnection == listener)
+    {
+        listener->mFlags |= 0x20000000;
+        return;
+    }
+
+    ListenerEntry* entry =
+        mListeners.Begin((ListenerEntry*)((char*)listener - 8)).CurrentEntry();
+    nlDLRingRemove(&mListeners.m_Head, entry);
+    entry->~ListenerEntry();
+    mListeners.m_Allocator.Free(entry);
+}
+
+template <typename T>
+void UnidentifiedEvent<T>::Disconnect()
+{
+    Listener* listener = (Listener*)fn_802B28E0(this);
+    Remove(listener);
+}
 
 template <typename T>
 class UnidentifiedQueuedEvent : public UnidentifiedEvent<T>

@@ -19,7 +19,7 @@ bool lbl_806DF0C9 = true;
 unsigned long lbl_806E1BE8 = glGetTexture("movie");
 unsigned long lbl_806E1BEC = glGetTexture("movie_u");
 unsigned long lbl_806E1BF0 = glGetTexture("movie_v");
-bool lbl_806E1BF4;
+unsigned char lbl_806E1BF4;
 
 void fn_802977EC()
 {
@@ -102,7 +102,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A01CC>::Activate(GLView*)
 {
     static_cast<GXMaterialProgram_802A01CC*>(this)->ConfigureVertexFormat(true);
 
-    bool loaded;
+    int loaded;
     if (lbl_806DF0C8)
     {
         loaded = false;

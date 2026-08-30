@@ -745,7 +745,7 @@ config.libs = [
             Object(Matching, "Game/Physics/PhysicsBox.cpp"),
             Object(Matching, "Game/Physics/PhysicsCapsule.cpp"),
             Object(NonMatching, "Game/Physics/PhysicsCharacter.cpp"),
-            Object(NonMatching, "Game/Physics/PhysicsEventQueue.cpp"),
+            Object(NonMatching, "Game/Physics/PhysicsEventQueue.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Physics/PhysicsCharacterBase.cpp"),
             Object(Matching, "Game/Physics/PhysicsCharacterBaseData.cpp"),
             Object(Matching, "Game/Physics/PhysicsColumn.cpp"),

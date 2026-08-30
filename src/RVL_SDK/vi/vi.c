@@ -1386,7 +1386,7 @@ VITimeToDIM VISetTimeToDimming(VITimeToDIM time) {
     return old_time;
 }
 
-bool fn_8009AA34(void) {
+bool __VIResetRFIdle(void) {
     __VIDimmingFlag_RF_IDLE = 0;
     return true;
 }
