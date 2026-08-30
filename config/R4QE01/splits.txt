@@ -68,6 +68,12 @@ Game/CharacterTemplate.cpp:
 	.sdata      start:0x806DB630 end:0x806DB6A0
 	.sbss       start:0x806E0C30 end:0x806E0C40
 
+Game/GoalieTweaks.cpp:
+	.text       start:0x80026F24 end:0x80028BDC
+	.ctors      start:0x804DB504 end:0x804DB508
+	.data       start:0x804F8F08 end:0x804F9370
+	.sdata2     start:0x806E32B0 end:0x806E3318
+
 Game/Field.cpp:
 	.text       start:0x8002D120 end:0x8002DB1C
 	.ctors      start:0x804DB510 end:0x804DB514

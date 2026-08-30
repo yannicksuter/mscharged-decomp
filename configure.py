@@ -419,6 +419,7 @@ config.libs = [
             Object(NonMatching, "Game/Ball.cpp"),
             Object(NonMatching, "Game/Character.cpp", extra_cflags=["-inline deferred"]),
             Object(NonMatching, "Game/CharacterTemplate.cpp"),
+            Object(NonMatching, "Game/GoalieTweaks.cpp"),
             Object(NonMatching, "Game/Field.cpp"),
             Object(NonMatching, "Game/AI/Fielder.cpp"),
             Object(NonMatching, "Game/AI/FielderActions.cpp", extra_cflags=["-ipa file"]),

@@ -2,6 +2,7 @@
 #define GAME_CHARACTER_TWEAKS_H
 
 #include "Game/TweakValue.h"
+#include "Game/TweaksBase.h"
 
 class unk_80029F58
 {
@@ -40,9 +41,13 @@ public:
     /* 0x0A4 */ TweakValue_804F4DC8 fShooting;
 };
 
-class GoalieTweaks : public PlayerTweaks
+class GoalieTweaks : public TweaksBase
 {
 public:
+    GoalieTweaks(const char* name, const char* category);
+    virtual ~GoalieTweaks();
+    virtual void Init();
+
     /* 0x044 */ TweakValue_804F4DC8 fJoggingSpeed;
     /* 0x054 */ TweakValue_804F4DC8 fRunningSpeed;
     /* 0x064 */ TweakValue_804F4DC8 fThrowingDirectionSeekSpeed;
@@ -62,29 +67,18 @@ public:
     /* 0x124 */ TweakValue_804F4DC8 fGetupEnergyLow;
     /* 0x134 */ TweakValue_804F4DC8 fGetupSpeedLow;
 
-private:
-    /* 0x144 */ u8 mUnidentified144[0x10];
-
-public:
+    /* 0x144 */ TweakValue_804F4DC8 fStrafeSpeedLow;
     /* 0x154 */ TweakValue_804F4DC8 fGoalieBallTime;
-
-private:
-    /* 0x164 */ u8 mUnidentified164[0x30];
-
-public:
+    /* 0x164 */ TweakValue_804F4DC8 fGoalieStunTimeMin;
+    /* 0x174 */ TweakValue_804F4DC8 fGoalieStunTimeMax;
+    /* 0x184 */ TweakValue_804F4DC8 fLooseBallShotDistance;
     /* 0x194 */ TweakValue_804F4DC8 fSaveDirectionSeekSpeed;
     /* 0x1A4 */ TweakValue_804F4DC8 fSaveDirectionSeekFalloff;
-
-private:
-    /* 0x1B4 */ u8 mUnidentified1B4[0x30];
-
-public:
+    /* 0x1B4 */ TweakValue_804F4DC8 fSaveBackRunTimeScale;
+    /* 0x1C4 */ TweakValue_804F4DC8 fSaveIgnoreMargin;
+    /* 0x1D4 */ TweakValue_804F4DC8 fSaveMissDelay;
     /* 0x1E4 */ TweakValue_804F4DC8 fLobShotStumbleChance;
-
-private:
-    /* 0x1F4 */ u8 mUnidentified1F4[0x10];
-
-public:
+    /* 0x1F4 */ TweakValue_804F4DC8 fInterceptSaveTolerance;
     /* 0x204 */ TweakValue_804F4DC8 fSaveCatchTolerance;
 
     /* 0x214 */ TweakValue_804F4DC8 fShotFatigueDefault;
@@ -94,20 +88,23 @@ public:
     /* 0x254 */ TweakValue_804F4DC8 fShotFatigueDiveDeflect;
     /* 0x264 */ TweakValue_804F4DC8 fShotFatigueStandPunch;
     /* 0x274 */ TweakValue_804F4DC8 fShotFatigueLegSave;
-
-private:
-    /* 0x284 */ u8 mUnidentified284[0x24];
-
-public:
+    /* 0x284 */ TweakValue_804F4DC8 fShotFatigueSTSSave;
+    /* 0x294 */ TweakValue_804F4DC8 fShotFatigueSTSStun;
+    /* 0x2A4 */ float fShotFatigueMax;
     /* 0x2A8 */ TweakValue_804F4DC8 mUnidentified2A8;
     /* 0x2B8 */ TweakValue_804F4DC8 mUnidentified2B8;
-
-private:
-    /* 0x2C8 */ u8 mUnidentified2C8[0x70];
-
-public:
+    /* 0x2C8 */ TweakValue_804F4DC8 fPounceRange;
+    /* 0x2D8 */ TweakValue_804F4DC8 fPhysCapsuleRadius;
+    /* 0x2E8 */ TweakValue_804F4DC8 fPhysCapsuleHeight;
+    /* 0x2F8 */ TweakValue_804F4DC8 fPassGroundSpeedMax;
+    /* 0x308 */ TweakValue_804F4DC8 fPassGroundSpeedMin;
+    /* 0x318 */ TweakValue_804F4DC8 fPassVolleySpeedMax;
+    /* 0x328 */ TweakValue_804F4DC8 fPassVolleySpeedMin;
     /* 0x338 */ TweakValue_804F4DC8 fRunningDirectionSeekSpeed;
     /* 0x348 */ TweakValue_804F4DC8 fRunningDirectionSeekFalloff;
+
+private:
+    /* 0x358 */ const char* mUnidentified358;
 };
 
 #endif // GAME_CHARACTER_TWEAKS_H
