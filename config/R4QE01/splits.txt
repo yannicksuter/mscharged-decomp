@@ -1762,8 +1762,8 @@ Game/SAnim/pnFeather.cpp:
 	.bss        start:0x80584178 end:0x805841A0
 	.sdata2     start:0x806E6808 end:0x806E6820
 
-unclassified/tu_8030E550.cpp:
-	.text       start:0x8030E550 end:0x8030E940
+Game/SAnim/tu_8030E550.cpp:
+	.text       start:0x8030E550 end:0x8030E8C8
 	.ctors      start:0x804DBAA4 end:0x804DBAA8
 	.data       start:0x805300A0 end:0x805300C8
 	.bss        start:0x805841A0 end:0x805841C8

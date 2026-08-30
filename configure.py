@@ -739,7 +739,7 @@ config.libs = [
             Object(Matching, "Game/SAnim/pnBlender.cpp"),
             Object(Matching, "Game/SAnim/pnSingleAxisBlender.cpp"),
             Object(Matching, "Game/SAnim/pnFeather.cpp", extra_cflags=["-inline auto,depth=3"]),
-            Object(NonMatching, "unclassified/tu_8030E550.cpp"),
+            Object(Matching, "Game/SAnim/tu_8030E550.cpp"),
             Object(NonMatching, "Game/SAnim/AnimRetargeter.cpp"),
             Object(Matching, "Game/Physics/CollisionSpace.cpp"),
             Object(Matching, "Game/Physics/PhysicsBox.cpp"),

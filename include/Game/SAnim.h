@@ -158,7 +158,7 @@ public:
         cPoseAccumulator* accumulator, bool mirror) const;
     void BlendScale(int accumulatorNode, int animNode, float time, float weight,
         cPoseAccumulator* accumulator, bool mirror) const;
-    void fn_80308E30(int accumulatorNode, int animNode, float time,
+    void BlendScaleMultiply(int accumulatorNode, int animNode, float time,
         float weight, cPoseAccumulator* accumulator) const;
     void BlendTrans(int accumulatorNode, int animNode, float time, float weight,
         cPoseAccumulator* accumulator, bool mirror) const;

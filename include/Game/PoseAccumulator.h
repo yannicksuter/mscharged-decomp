@@ -42,7 +42,7 @@ public:
         bool mirror);
     void BlendRotIdentity(int nodeIndex, float weight);
     void BlendScaleIdentity(int nodeIndex, float weight);
-    void fn_8030C1B0(int nodeIndex, const nlVector3* scale, float weight);
+    void MultiplyScale(int nodeIndex, const nlVector3* scale, float weight);
     void BlendTransIdentity(int nodeIndex, float weight);
     void Pose(const cPoseNode& poseNode, const nlMatrix4& matrix);
 

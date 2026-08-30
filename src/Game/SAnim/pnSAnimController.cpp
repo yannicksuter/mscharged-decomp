@@ -211,7 +211,7 @@ void cPN_SAnimController::BlendRootTrans(
     }
 }
 
-void cPN_SAnimController::fn_80307A08(
+void cPN_SAnimController::EvaluateScale(
     int nodeIndex, float weight, cPoseAccumulator* accumulator) const
 {
     int remappedNodeIndex;
@@ -233,7 +233,7 @@ void cPN_SAnimController::fn_80307A08(
 
     if (remappedNodeIndex != -1)
     {
-        m_pSAnim->fn_80308E30(
+        m_pSAnim->BlendScaleMultiply(
             nodeIndex, remappedNodeIndex, m_fTime, weight, accumulator);
     }
 }
