@@ -447,6 +447,7 @@ config.libs = [
             Object(NonMatching, "Game/Team.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "unclassified/tu_800A9140.cpp"),
             Object(NonMatching, "unclassified/tu_800A9588.cpp"),
+            Object(NonMatching, "unclassified/tu_800A9B78.cpp"),
             Object(NonMatching, "Game/AI/Desire.cpp"),
             Object(Matching, "Game/TweaksBase.cpp"),
             Object(Matching, "Game/AI/Scripts/ScriptDefines.cpp", cflags=cflags_game_deferred),
