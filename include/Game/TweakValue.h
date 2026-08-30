@@ -56,7 +56,7 @@ public:
 class TweakValue_804F4DC8
 {
 public:
-    void fn_8002D078(const char*, float, const char*, bool, float, float, float);
+    bool fn_8002D078(const char*, float, const char*, bool, float, float, float);
     void fn_802C4F94(const char* path);
     bool fn_802C4FEC(const char*, float, const char*, bool, float, float);
 
@@ -69,6 +69,11 @@ public:
     float GetDefaultValue()
     {
         return mValue.UnidentifiedVirtual3C();
+    }
+
+    const float& UnidentifiedGetValue() const
+    {
+        return *mValue.m_pValue;
     }
 
     operator float() const

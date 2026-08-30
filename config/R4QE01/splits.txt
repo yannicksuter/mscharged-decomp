@@ -82,6 +82,13 @@ Game/CrowdRiot.cpp:
 	.sdata      start:0x806DB6A0 end:0x806DB6D0
 	.sdata2     start:0x806E3318 end:0x806E3340
 
+Game/CharacterTweaks.cpp:
+	.text       start:0x80029F58 end:0x8002D120
+	.ctors      start:0x804DB50C end:0x804DB510
+	.data       start:0x804F9578 end:0x804F9CA8
+	.sdata      start:0x806DB6D0 end:0x806DB6E0
+	.sdata2     start:0x806E3340 end:0x806E3400
+
 Game/Field.cpp:
 	.text       start:0x8002D120 end:0x8002DB1C
 	.ctors      start:0x804DB510 end:0x804DB514

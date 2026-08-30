@@ -421,6 +421,7 @@ config.libs = [
             Object(NonMatching, "Game/CharacterTemplate.cpp"),
             Object(NonMatching, "Game/GoalieTweaks.cpp"),
             Object(NonMatching, "Game/CrowdRiot.cpp"),
+            Object(NonMatching, "Game/CharacterTweaks.cpp"),
             Object(NonMatching, "Game/Field.cpp"),
             Object(NonMatching, "Game/AI/Fielder.cpp"),
             Object(NonMatching, "Game/AI/FielderActions.cpp", extra_cflags=["-ipa file"]),

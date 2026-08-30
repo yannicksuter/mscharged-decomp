@@ -96,7 +96,7 @@ extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot,
 
     fRatingsValue = LikelyToScore(pFielder);
     fPlayerDistance = PlayerShotDistance(pFielder);
-    FielderTweaks* pTweaks = (FielderTweaks*)fn_8003E6E4(pFielder);
+    PlayerTweaks* pTweaks = fn_8003E6E4(pFielder);
     float fShooting = pTweaks->fShooting;
     fChargedValue = fn_800155A0(g_pBall, 0);
     fChargedValue *= 0.25f;
