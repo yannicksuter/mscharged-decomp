@@ -15,6 +15,7 @@
 #include "Game/NetworkSession.h"
 #include "Game/Physics/PhysicsBall.h"
 #include "Game/Player.h"
+#include "Game/Render/ShootToScoreArrow.h"
 #include "Game/Sys/clock.h"
 #include "Game/Task/DispatchEventsTask.h"
 #include "Game/Task/ParticleUpdateTask.h"
@@ -181,6 +182,8 @@ struct UnidentifiedModeState
 };
 
 extern "C" UnidentifiedSimulationTimeProvider* fn_8011166C();
+extern "C" EventDispatcher* fn_80111678();
+extern "C" EventDispatcher* fn_800721C4();
 extern "C" bool fn_802B6AF8(
     const UnidentifiedGameRegion* param1, const nlVector2* param2);
 extern "C" int fn_800A9210(void* param1, int param2);
@@ -222,8 +225,6 @@ extern "C" void* fn_801740D0(void* memory);
 extern "C" void* fn_800F9460(void* memory);
 extern "C" UnidentifiedSlowdownState* fn_801AE530(void* memory);
 extern "C" void fn_80115E60(bool param1);
-extern "C" void fn_801AF510();
-extern "C" void fn_801AF550();
 extern "C" void fn_80103198(
     void* tracker, float gameDuration, float param3, void* param4);
 extern "C" void fn_801742B8(void* object, int deleteObject);
@@ -355,8 +356,7 @@ void fn_80056CF4(void* param1, int param2, bool param3)
     FormationManager::LoadFormationSets();
     --lbl_806E2130;
     fn_80115E60(true);
-    fn_801AF510();
-    fn_801AF550();
+    WorldDarkening::Instance().fn_801AF550();
 }
 
 void fn_80056EA8()
@@ -366,8 +366,7 @@ void fn_80056EA8()
 
 void DestroyGame()
 {
-    bool bWriteStats =
-        GetConfigBool(Config::Global(), "save_stats", false);
+    bool bWriteStats = GetConfigBool(Config::Global(), "save_stats", false);
     if (bWriteStats)
     {
         fn_80103198(
@@ -922,8 +921,7 @@ void cGame::ChangeGameState(int state)
         char buffer[256];
         int frame = fn_8011166C()->GetFrame();
         nlSNPrintf(
-            buffer, sizeof(buffer), lbl_804FB66C, m_eGameState, state,
-            frame);
+            buffer, sizeof(buffer), lbl_804FB66C, m_eGameState, state, frame);
         fn_8033919C(output, buffer);
         fn_8004F594(16, buffer);
         if (fn_80323A58(6, buffer, sizeof(buffer)) != 0)
@@ -1132,6 +1130,85 @@ void cGame::fn_8005DF38()
     }
 }
 
+UnidentifiedGameEventQueue::UnidentifiedGameEventQueue()
+    : mEvent00(fn_800721C4(), "PauseGame", -1)
+    , mEvent01(fn_800721C4(), "ResumingGame", -1)
+    , mEvent02(fn_800721C4(), "GameOver", -1)
+    , mEvent03(fn_800721C4(), "GameIsWon", -1)
+    , mEvent04(fn_800721C4(), "PresentationBypass", -1)
+    , mEvent05(fn_800721C4(), "NIS", -1)
+    , mEvent06("GoalScored", -1)
+    , mEvent07(fn_80111678(), "EnterStartScreen", -1)
+    , mEvent08(fn_80111678(), "DirectionBegin", -1)
+    , mEvent09("CharacterDirectionEnd", -1)
+    , mEvent10("ResetEffects", -1)
+    , mEvent11(fn_80111678(), "GetReadyForKickoff", -1)
+    , mEvent12(fn_80111678(), "Kickoff", -1)
+    , mEvent13(fn_80111678(), "SuddenDeath", -1)
+    , mEvent14("BallStateChange", -1)
+    , mEvent15("ReceiveBall", -1)
+    , mEvent16("PassBall", -1)
+    , mEvent17("GoalieSave", -1)
+    , mEvent18("GoalieKick", -1)
+    , mEvent19("CollisionBallGoalie", -1)
+    , mEvent20("GoalieCatch", -1)
+    , mEvent21("GoalieExert", -1)
+    , mEvent22(fn_80111678(), "ShotAtGoal", -1)
+    , mEvent23("WindupShot", -1)
+    , mEvent24("GoalieDekeAttackAttempt", -1)
+    , mEvent25("GoalieDekeAttackSuccess", -1)
+    , mEvent26("GoalieSlamAttackAttempt", -1)
+    , mEvent27("GoalieSlamAttackSuccess", -1)
+    , mEvent28(fn_80111678(), "AttackAttempt", -1)
+    , mEvent29(fn_80111678(), "AttackSuccess", -1)
+    , mEvent30(fn_80111678(), "CharGetElectrocuted", -1)
+    , mEvent31(fn_80111678(), "PowerupStats", -1)
+    , mEvent32(fn_80111678(), "CollisionCrowd", -1)
+    , mEvent33(fn_80111678(), "CollisionChainPlayer", -1)
+    , mEvent34(fn_80111678(), "CollisionWindDebrisPlayer", -1)
+    , mEvent35(fn_80111678(), "CollisionExplosionFragmentPLayer", -1)
+    , mEvent36(fn_80111678(), "ChainNisStart", -1)
+    , mEvent37(fn_80111678(), "ChainNisEnd", -1)
+    , mEvent38(fn_80111678(), "Penalty", -1)
+    , mEvent39(fn_80111678(), "AwardPowerupStuff", -1)
+    , mEvent40("MegaStrikeMeterStart", -1)
+    , mEvent41("MegaStrikeMeterFirst", -1)
+    , mEvent42("MegaStrikeMeterSecond", -1)
+    , mEvent43("MegaStrikeMeterEnd", -1)
+    , mEvent44(fn_80111678(), "LightningStrike", -1)
+    , mEvent45(fn_80111678(), "MegastrikeStart", -1)
+    , mEvent46("MegaStrikeIntro", -1)
+    , mEvent47("MegastrikeEnd", -1)
+    , mEvent48("ShotPresentation", -1)
+    , mEvent49("ShotPresentationEnd", -1)
+    , mEvent50("CaptainClashPresentation", -1)
+    , mEvent51("CaptainClashPresentationEnd", -1)
+    , mEvent52("WindupPresentation", -1)
+    , mEvent53("WindupPresentationEnd", -1)
+    , mEvent54("PeachCameraFlash", -1)
+    , mEvent55("PeachFlash", -1)
+    , mEvent56("PeachCamerasDown", -1)
+    , mEvent57("PeachCamerasAway", -1)
+    , mEvent58("WaluigiWallStart", -1)
+    , mEvent59("WaluigiWallEnd", -1)
+    , mEvent60("WaluigiWallAbort", -1)
+    , mEvent61("WarioGasStart", -1)
+    , mEvent62("WarioGasEnd", -1)
+    , mEvent63("BulletBillExplode", -1)
+    , mEvent64("SuperPresentation", -1)
+    , mEvent65(fn_80111678(), "StatsPowerupHitData", -1)
+    , mEvent66(fn_80111678(), "CameraRumbleStart", -1)
+    , mEvent67(fn_80111678(), "CameraRumbleEnd", -1)
+    , mEvent68(fn_80111678(), "ExplodableExplode", -1)
+    , mEvent69(fn_80111678(), "ExplodableExplosionEnd", -1)
+    , mEvent70(fn_80111678(), "SilenceAllSounds", -1)
+    , mEvent71("MontyReappear", -1)
+    , mEvent72("HammerBroHammer", -1)
+    , mEvent73("WarioGroundPound", -1)
+    , mEvent74(fn_80111678(), "PowerupAquire", -1)
+{
+}
+
 extern "C" void fn_80061AF0()
 {
     fn_800EDB9C();
@@ -1190,7 +1267,7 @@ extern "C" void fn_800721AC(UnidentifiedRegistrationNode* node)
     lbl_80571348.mHead = node;
 }
 
-extern "C" void* fn_800721C4()
+extern "C" EventDispatcher* fn_800721C4()
 {
     return &gDispatchEventsTask->dispatcher;
 }

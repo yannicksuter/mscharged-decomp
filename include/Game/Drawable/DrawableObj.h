@@ -4,6 +4,15 @@
 #include "NL/nlMath.h"
 #include "NL/gl/glModel.h"
 
+class GLView;
+
+struct UnidentifiedDrawableViewState
+{
+    char _000[0x68];
+    /* 0x68 */ GLView* mView68;
+    /* 0x6C */ GLView* mView6C;
+};
+
 class DrawableObject
 {
 public:
@@ -21,7 +30,9 @@ public:
     unsigned long GetHashID() const { return m_uHashID; }
 
     /* 0x04 */ unsigned long m_uHashID;
-    /* 0x08 */ u8 mUnidentified08[0x5C];
+    /* 0x08 */ u8 mUnidentified08[0x08];
+    /* 0x10 */ UnidentifiedDrawableViewState* mUnidentified10;
+    /* 0x14 */ u8 mUnidentified14[0x50];
     /* 0x64 */ glModel* m_pModel;
     /* 0x68 */ u8 mUnidentified68[0x08];
     /* 0x70 */ unsigned long m_uObjectFlags;

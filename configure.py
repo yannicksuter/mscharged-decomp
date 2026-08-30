@@ -303,6 +303,11 @@ cflags_metrotrk_deferred_auto = [
 # NHTTP_thread retains every intra-unit helper call (CheckHeaderEnd stays a
 # real call); auto-inlining collapses its single-caller helpers, unlike the
 # sibling NHTTP units whose retained bytes require auto-inlining.
+cflags_game_inline2 = [
+    *cflags_game_common,
+    "-inline level=2",
+]
+
 cflags_rvl_nhttp = [
     *(flag for flag in cflags_rvl_sdk if flag != "-inline auto"),
     "-inline on",
@@ -498,6 +503,10 @@ config.libs = [
             Object(Matching, "Game/Core/mtRandom.cpp"),
             Object(Matching, "NL/nlLocalization.cpp"),
             Object(Matching, "NL/nlBundleFile.cpp"),
+            Object(NonMatching, "Game/TweakRegistry.cpp"),
+            Object(NonMatching, "Game/TweakNameRecycler.cpp"),
+            Object(NonMatching, "Game/TweakNode.cpp", cflags=cflags_game_inline2),
+            Object(NonMatching, "Game/TweakValue.cpp"),
             Object(NonMatching, "NL/nlFont.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "NL/nlTextBox.cpp"),
             Object(Matching, "NL/nlTextEscape.cpp", cflags=[*cflags_game_deferred, "-sym on"]),
@@ -628,11 +637,16 @@ config.libs = [
             Object(NonMatching, "Game/Drawable/DrawableBirdoEgg.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableYoshiEgg.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableFlyingCamera.cpp"),
+            Object(NonMatching, "unclassified/tu_8017FFCC.cpp"),
+            Object(NonMatching, "unclassified/tu_8018480C.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableKoopaShell.cpp"),
             Object(Matching, "Game/Drawable/DrawablePowerup.cpp"),
             Object(NonMatching, "unclassified/tu_80199E84.cpp"),
             Object(NonMatching, "unclassified/tu_8019A710.cpp"),
             Object(NonMatching, "Game/Render/depthoffield.cpp"),
+            Object(NonMatching, "unclassified/tu_801A4EC0.cpp"),
+            Object(NonMatching, "unclassified/tu_801A6824.cpp"),
+            Object(NonMatching, "Game/Render/ShootToScoreArrow.cpp"),
             Object(NonMatching, "unclassified/tu_801AC30C.cpp"),
             Object(NonMatching, "unclassified/tu_801B369C.cpp"),
             Object(NonMatching, "Game/Render/Presentation.cpp"),
@@ -665,6 +679,7 @@ config.libs = [
             Object(NonMatching, "Game/Task/TransitionTask.cpp"),
             Object(Matching, "Game/Task/LoadingTask.cpp"),
             Object(Matching, "Game/ResetTask.cpp"),
+            Object(NonMatching, "Game/NetworkSession.cpp"),
             Object(Matching, "Game/Task/SmokeTestUpdateTask.cpp"),
             Object(Matching, "Game/Task/TextWindowTask.cpp"),
             Object(Matching, "Game/Task/TweakerTask.cpp"),

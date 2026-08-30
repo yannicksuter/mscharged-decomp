@@ -24,7 +24,6 @@ extern s32 lbl_806E1188;
 extern u8 lbl_806E1008;
 
 extern "C" void fn_803740B8();
-extern "C" void fn_8011E384();
 extern "C" void fn_80338898();
 extern "C" void fn_80337F68();
 extern "C" void fn_8032C7D0();
@@ -42,7 +41,7 @@ extern "C" s32 fn_8011C19C();
 void NetworkUpdateTask::Initialize()
 {
     fn_803740B8();
-    fn_8011E384();
+    UnidentifiedNetworkSession::Create();
     fn_80338898();
     fn_80337F68();
     fn_8032C7D0();

@@ -5,6 +5,8 @@
 #include "types.h"
 
 class InterpreterCore;
+class TweakEntry_8052BF00;
+struct TweakPendingValue;
 
 class TweakValueBase_8052BF70
 {
@@ -17,11 +19,11 @@ public:
     virtual void UnidentifiedVirtual18();
     virtual void UnidentifiedVirtual1C();
     virtual void* UnidentifiedVirtual20();
-    virtual int UnidentifiedVirtual24(char*, unsigned long);
+    virtual void UnidentifiedVirtual24(char*, unsigned long);
     virtual void UnidentifiedVirtual28(const char*);
     virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
 
-protected:
+public:
     /* 0x04 */ const char* mName;
     /* 0x08 */ u8 mUnidentified008;
     /* 0x09 */ bool mUnidentified009;
@@ -31,9 +33,10 @@ class TweakValueImpl_804F4DC8 : public TweakValueBase_8052BF70
 {
 public:
     TweakValueImpl_804F4DC8(float* value = 0);
-    virtual void UnidentifiedVirtual30();
-    virtual void UnidentifiedVirtual34();
-    virtual void UnidentifiedVirtual38();
+    virtual int UnidentifiedVirtual30();
+    virtual TweakValueBase_8052BF70* UnidentifiedVirtual34(const char* name,
+        void* entry);
+    virtual void UnidentifiedVirtual38(void* value);
     virtual float UnidentifiedVirtual3C();
 
 public:
@@ -47,6 +50,7 @@ class TweakValue_804F4DC8
 {
 public:
     void fn_8002D078(const char*, float, const char*, bool, float, float, float);
+    void fn_802C4F94(const char* path);
     bool fn_802C4FEC(const char*, float, const char*, bool, float, float);
 
     TweakValue_804F4DC8& operator=(float value)
@@ -69,10 +73,45 @@ private:
     /* 0x00 */ TweakValueImpl_804F4DC8 mValue;
 }; // total size: 0x10
 
+extern "C"
+{
+    int fn_802C0F04(void);
+    TweakEntry_8052BF00* fn_802C0E30(void);
+    void fn_802C2DF4(TweakPendingValue*, TweakValueBase_8052BF70*, const char*);
+    TweakEntry_8052BF00* fn_802C4504(TweakEntry_8052BF00*, const char*, int);
+    void fn_802C5780(TweakEntry_8052BF00*, TweakValueBase_8052BF70*);
+}
+
+extern const char* lbl_806E1E90;
+
 class TweakValueIntImpl_804FD898 : public TweakValueBase_8052BF70
 {
 public:
     TweakValueIntImpl_804FD898(int* value = 0);
+    TweakValueIntImpl_804FD898(const char* name, const char* category, int* value)
+    {
+        m_pValue = value;
+        mName = name;
+        mUnidentified009 = false;
+        if (fn_802C0F04() == 0)
+        {
+            void* entry = nlMalloc(0x18, 8, true);
+            if (entry != 0)
+            {
+                fn_802C2DF4((TweakPendingValue*)entry, this, category);
+            }
+            lbl_806E1E90 = category;
+        }
+        else
+        {
+            TweakEntry_8052BF00* config = fn_802C0E30();
+            TweakEntry_8052BF00* entry = fn_802C4504(config, category, 0);
+            if (entry != 0)
+            {
+                fn_802C5780(entry, this);
+            }
+        }
+    }
     virtual void UnidentifiedVirtual30();
     virtual void UnidentifiedVirtual34();
     virtual void UnidentifiedVirtual38();
@@ -116,17 +155,6 @@ private:
     /* 0x00 */ TweakValueIntImpl_804FD898 mValue;
 }; // total size: 0x10
 
-extern "C"
-{
-    void* fn_802C0F04();
-    void* fn_802C0E30(void*);
-    void fn_802C2DF4(void*, TweakValueBase_8052BF70*, const char*);
-    void* fn_802C4504(void*, const char*, int);
-    void fn_802C5780(void*, TweakValueBase_8052BF70*);
-}
-
-extern const char* lbl_806E1E90;
-
 class TweakValueBool_804F4578 : public TweakValueBase_8052BF70
 {
 public:
@@ -135,25 +163,30 @@ public:
         mValue = value;
         mName = name;
         mUnidentified009 = true;
-        void* config = fn_802C0F04();
-        if (config == 0)
+        if (fn_802C0F04() == 0)
         {
             void* entry = nlMalloc(0x18, 8, true);
             if (entry != 0)
             {
-                fn_802C2DF4(entry, this, category);
+                fn_802C2DF4((TweakPendingValue*)entry, this, category);
             }
         }
         else
         {
-            config = fn_802C0E30(config);
-            void* entry = fn_802C4504(config, category, 0);
+            TweakEntry_8052BF00* config = fn_802C0E30();
+            TweakEntry_8052BF00* entry = fn_802C4504(config, category, 0);
             if (entry != 0)
             {
                 fn_802C5780(entry, this);
             }
         }
         lbl_806E1E90 = category;
+    }
+
+    TweakValueBool_804F4578(const char* name, bool value)
+    {
+        mValue = value;
+        mName = name;
     }
 
     bool GetValue() const

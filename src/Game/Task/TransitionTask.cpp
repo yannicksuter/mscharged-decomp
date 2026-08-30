@@ -3,7 +3,9 @@
 #include "Game/BasicStadium.h"
 #include "Game/Character.h"
 #include "Game/Drawable/DrawableCharacter.h"
+#include "Game/Event.h"
 #include "Game/NisPlayer.h"
+#include "Game/Render/ShootToScoreArrow.h"
 #include "NL/nlTask.h"
 #include "types.h"
 
@@ -57,7 +59,7 @@ struct PendingBinding
     /* 0x04 */ Invokable* mTarget;
 };
 
-struct PendingEntry
+struct PendingEntry : public UnidentifiedConnection
 {
     ~PendingEntry()
     {
@@ -66,12 +68,6 @@ struct PendingEntry
         }
     }
 
-    /* 0x00 */ u32 _000;
-    /* 0x04 */ u32 _004;
-    /* 0x08 */ u32 mInvoke : 1;
-    /* 0x08 */ u32 _bit1 : 1;
-    /* 0x08 */ u32 mRemove : 1;
-    /* 0x08 */ u32 _bits : 29;
     /* 0x0C */ PendingBinding mBinding;
 };
 
@@ -123,15 +119,12 @@ void* fn_80188C5C();
 void fn_80189F0C(void*);
 void fn_80188360();
 void fn_801882B4();
-void fn_801AF510();
-void fn_801AF550();
 void fn_800180AC(void*);
 void fn_801E23A4(void*, u32, u32);
 void fn_800A7998(void*);
 void fn_80059940(Game*, int);
 void fn_801ABF8C(void*);
 void fn_801745DC(void*);
-void fn_802B28E8(void*, int);
 void fn_800F23F4();
 void fn_800F2404();
 }
@@ -187,7 +180,7 @@ inline void ClearCharacterEffectsTexturing()
             PendingEntry* entry = &next->entry;
             pGame->mCurrentEntry = entry;
 
-            if (next->entry.mInvoke)
+            if ((next->entry.mFlags >> 31) != 0)
             {
                 if (entry->mBinding.mKind == 1)
                 {
@@ -217,7 +210,7 @@ inline void ClearCharacterEffectsTexturing()
                 next = next->next;
             }
 
-            if (entry->mRemove)
+            if (((entry->mFlags >> 29) & 1) != 0)
             {
                 PendingIter erase = MakeIterAt(pGame->mPendingList, (PendingNode*)((char*)entry - 8));
                 PendingNode* dead = erase.next;
@@ -239,7 +232,6 @@ inline void ClearCharacterEffectsTexturing()
                 if (dead != 0)
                 {
                     dead->entry.~PendingEntry();
-                    fn_802B28E8(&dead->entry, 0);
                 }
 
                 dead->next = pGame->mFreeList;
@@ -319,8 +311,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
                 fn_8027C86C();
                 fn_80188360();
                 fn_801882B4();
-                fn_801AF510();
-                fn_801AF550();
+                WorldDarkening::Instance().fn_801AF550();
             }
         }
         else

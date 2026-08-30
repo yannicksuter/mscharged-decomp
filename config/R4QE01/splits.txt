@@ -405,6 +405,15 @@ Game/ResetTask.cpp:
 	.sbss       start:0x806E1070 end:0x806E1088
 	.sdata2     start:0x806E46E0 end:0x806E46F8
 
+Game/NetworkSession.cpp:
+	.text       start:0x8011E384 end:0x801246E4
+	.ctors      start:0x804DB608 end:0x804DB60C
+	.data       start:0x80509780 end:0x8050A938
+	.bss        start:0x8056FA30 end:0x8056FA68
+	.sdata      start:0x806DC888 end:0x806DC8B0
+	.sbss       start:0x806E10D0 end:0x806E1100
+	.sdata2     start:0x806E4720 end:0x806E472C
+
 unclassified/tu_80139B18.cpp:
 	.text       start:0x80139B18 end:0x8013A25C
 	.ctors      start:0x804DB634 end:0x804DB638
@@ -562,6 +571,10 @@ Game/Drawable/DrawableFlyingCamera.cpp:
 	.sbss       start:0x806E1408 end:0x806E140C
 	.sdata2     start:0x806E4BD8 end:0x806E4BF8
 
+unclassified/tu_8017FFCC.cpp:
+	.text       start:0x8017FFCC end:0x801802D4
+	.sdata2     start:0x806E4BF8 end:0x806E4C18
+
 Game/Drawable/DrawableKoopaShell.cpp:
 	.text       start:0x80180678 end:0x80180C70
 	.data       start:0x805113D8 end:0x805113F0
@@ -586,6 +599,10 @@ Game/Drawable/DrawableYoshiEgg.cpp:
 	.data       start:0x80511438 end:0x80511450
 	.sdata      start:0x806DCC28 end:0x806DCC40
 	.sdata2     start:0x806E4CB0 end:0x806E4CD0
+
+unclassified/tu_8018480C.cpp:
+	.text       start:0x8018480C end:0x80184AAC
+	.sdata      start:0x806DCC98 end:0x806DCCA0
 
 Game/Blinker.cpp:
 	.text       start:0x80199B30 end:0x80199E84
@@ -615,6 +632,22 @@ Game/Render/depthoffield.cpp:
 	.sbss       start:0x806E1500 end:0x806E1504
 	.sdata2     start:0x806E4F98 end:0x806E4FB8
 
+unclassified/tu_801A4EC0.cpp:
+	.text       start:0x801A4EC0 end:0x801A5F10
+	.ctors      start:0x804DB710 end:0x804DB714
+	.data       start:0x80514140 end:0x805141C0
+	.bss        start:0x80572238 end:0x805722F8
+	.sdata      start:0x806DCF90 end:0x806DCF98
+	.sbss       start:0x806E15B8 end:0x806E15C0
+	.sdata2     start:0x806E5148 end:0x806E5178
+
+unclassified/tu_801A6824.cpp:
+	.text       start:0x801A6824 end:0x801A6AAC
+	.ctors      start:0x804DB718 end:0x804DB71C
+	.data       start:0x805141D8 end:0x80514210
+	.bss        start:0x805723F8 end:0x80572410
+	.sdata2     start:0x806E5188 end:0x806E51A0
+
 unclassified/tu_801AC30C.cpp:
 	.text       start:0x801AC30C end:0x801AD0EC
 	.ctors      start:0x804DB724 end:0x804DB728
@@ -627,6 +660,14 @@ Game/Effects/PhotoFlashEffect.cpp:
 	.text       start:0x801AE008 end:0x801AE0C4
 	.sdata      start:0x806DD030 end:0x806DD038
 	.sdata2     start:0x806E5280 end:0x806E528C
+
+Game/Render/ShootToScoreArrow.cpp:
+	.text       start:0x801AF510 end:0x801AF8EC
+	.ctors      start:0x804DB734 end:0x804DB738
+	.data       start:0x805144F0 end:0x80514524
+	.bss        start:0x80574128 end:0x80574138
+	.sbss       start:0x806E1650 end:0x806E1660
+	.sdata2     start:0x806E52C0 end:0x806E52D8
 
 unclassified/tu_801B369C.cpp:
 	.text       start:0x801B369C end:0x801B43F8
@@ -1366,6 +1407,33 @@ Game/Task/ProfilerTask.cpp:
 NL/nlBundleFile.cpp:
 	.text       start:0x802BDB70 end:0x802BE64C
 	.data       start:0x8052BA40 end:0x8052BA70
+
+Game/TweakRegistry.cpp:
+	.text       start:0x802C0CCC end:0x802C3888
+	.ctors      start:0x804DB9B8 end:0x804DB9BC
+	.data       start:0x8052BCD0 end:0x8052BE58
+	.bss        start:0x8057C4D8 end:0x8057C660
+	.sdata      start:0x806DF310 end:0x806DF350
+	.sbss       start:0x806E1E38 end:0x806E1E68
+	.sdata2     start:0x806E62C8 end:0x806E62D0
+
+Game/TweakNameRecycler.cpp:
+	.text       start:0x802C3888 end:0x802C3CF4
+	.ctors      start:0x804DB9BC end:0x804DB9C0
+	.data       start:0x8052BE58 end:0x8052BE78
+	.bss        start:0x8057C660 end:0x8057C6D8
+	.sbss       start:0x806E1E68 end:0x806E1E80
+
+Game/TweakNode.cpp:
+	.text       start:0x802C3CF4 end:0x802C4C5C
+	.ctors      start:0x804DB9C0 end:0x804DB9C4
+	.data       start:0x8052BE78 end:0x8052BED0
+	.bss        start:0x8057C6D8 end:0x8057C728
+	.sdata      start:0x806DF350 end:0x806DF360
+
+Game/TweakValue.cpp:
+	.text       start:0x802C4F94 end:0x802C5248
+	.ctors      start:0x804DB9C8 end:0x804DB9CC
 
 NL/gl/gl.cpp:
 	.text       start:0x802C7FD0 end:0x802C8290
