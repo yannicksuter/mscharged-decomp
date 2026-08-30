@@ -54,10 +54,19 @@ Game/Character.cpp:
 	.text       start:0x8001BA0C end:0x80025E9C
 	.ctors      start:0x804DB4FC end:0x804DB500
 	.rodata     start:0x804DBE58 end:0x804DBE68
-	.data       start:0x804F5078 end:0x804F7F18
+	.data       start:0x804F5078 end:0x804F59C0
 	.bss        start:0x8056B7B0 end:0x8056B800
 	.sdata      start:0x806DB5D8 end:0x806DB630
+	.sbss       start:0x806E0C18 end:0x806E0C30
 	.sdata2     start:0x806E3240 end:0x806E32B0
+
+Game/CharacterTemplate.cpp:
+	.text       start:0x80025E9C end:0x80026F24
+	.ctors      start:0x804DB500 end:0x804DB504
+	.data       start:0x804F59C0 end:0x804F8F08
+	.bss        start:0x8056B800 end:0x8056B890
+	.sdata      start:0x806DB630 end:0x806DB6A0
+	.sbss       start:0x806E0C30 end:0x806E0C40
 
 Game/Field.cpp:
 	.text       start:0x8002D120 end:0x8002DB1C

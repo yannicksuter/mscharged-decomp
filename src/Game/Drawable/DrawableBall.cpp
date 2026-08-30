@@ -1,6 +1,7 @@
 #include "Game/Drawable/DrawableCharacter.h"
 
 #include "Game/BallTrail.h"
+#include "Game/CharacterTemplate.h"
 #include "Game/Drawable/RenderObject.h"
 
 struct UnidentifiedStaticState
@@ -132,7 +133,6 @@ extern TaskManager* m_pInstance__13nlTaskManager;
 extern "C" float fn_800155A0(BallObject*, int);
 extern "C" LiveBallTrail* fn_8001B284(u32);
 extern "C" u32 fn_8001B30C(BallObject*);
-extern "C" int fn_80026C6C(void*);
 extern "C" BallScaleData* fn_80284A58(u32);
 
 static float g_fBallTrailScale = 2.25f;
@@ -162,10 +162,14 @@ void DrawableBall::Grab()
     mVelocity = g_pBall->velocity;
     mScale = fn_800155A0(g_pBall, 0);
 
-    mFlags.bits.ownerIndex = fn_80026C6C(g_pBall->owner);
-    mFlags.bits.previousOwnerIndex = fn_80026C6C(g_pBall->previousOwner);
-    mFlags.bits.passTargetIndex = fn_80026C6C(g_pBall->passTarget);
-    mFlags.bits.lastTouchIndex = fn_80026C6C(g_pBall->lastTouch);
+    mFlags.bits.ownerIndex
+        = GetCharacterIndex((cCharacter*)g_pBall->owner);
+    mFlags.bits.previousOwnerIndex
+        = GetCharacterIndex((cCharacter*)g_pBall->previousOwner);
+    mFlags.bits.passTargetIndex
+        = GetCharacterIndex((cCharacter*)g_pBall->passTarget);
+    mFlags.bits.lastTouchIndex
+        = GetCharacterIndex((cCharacter*)g_pBall->lastTouch);
     BallObject* ball = g_pBall;
     mFlags.bits.visible = ball->visible;
     mFlags.bits.transient = 0;
