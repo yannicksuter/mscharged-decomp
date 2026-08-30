@@ -2789,6 +2789,12 @@ RVL_SDK/os/__ppc_eabi_init.c:
 	.init       start:0x800063C8 end:0x80006420
 	.text       start:0x803BE868 end:0x803BE91C
 
+RVL_SDK/pad/Pad.c:
+	.text       start:0x803BE91C end:0x803BFB3C
+	.bss        start:0x805D5BC0 end:0x805D5C40
+	.sdata      start:0x806DFD40 end:0x806DFD60
+	.sbss       start:0x806E29A0 end:0x806E29C0
+
 RVL_SDK/si/SIBios.c:
 	.text       start:0x803BFB3C end:0x803C0F30
 	.data       start:0x8054A6F0 end:0x8054A760

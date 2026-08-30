@@ -1168,6 +1168,7 @@ config.libs = [
             Object(NonMatching, "RVL_SDK/nhttp/d_nhttp_common.c"),
             Object(Matching, "RVL_SDK/ssl/ssl_api.c"),
             Object(Matching, "RVL_SDK/ssl/ssl_mutex.c"),
+            Object(Matching, "RVL_SDK/pad/Pad.c", extra_cflags=["-inline noauto"]),
             Object(Matching, "RVL_SDK/si/SIBios.c"),
             Object(Matching, "RVL_SDK/si/SISamplingRate.c"),
             Object(Matching, "RVL_SDK/sp/sp.c"),
