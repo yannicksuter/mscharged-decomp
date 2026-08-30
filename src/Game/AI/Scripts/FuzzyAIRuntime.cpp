@@ -45,6 +45,7 @@ public:
     virtual void UnidentifiedVirtual14(void*, void*, void*);
     virtual void UnidentifiedVirtual15();
 
+    u32 mUnidentified028;
     Variant* mValue;
     void** mCollection;
     u8 mUnidentified034[0x24];

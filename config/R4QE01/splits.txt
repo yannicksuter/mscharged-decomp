@@ -649,6 +649,14 @@ Game/FE/Overlay/OverlayHandlerDemo.cpp:
 	.text       start:0x801F698C end:0x801F6A24
 	.data       start:0x8051A6D0 end:0x8051A6FC
 
+Game/Render/Presentation.cpp:
+	.text       start:0x801FEBEC end:0x80200360
+	.data       start:0x8051B0D0 end:0x8051B1F8
+	.bss        start:0x80578368 end:0x80578428
+	.sdata      start:0x806DDAF0 end:0x806DDB18
+	.sbss       start:0x806E1898 end:0x806E18A0
+	.sdata2     start:0x806E5800 end:0x806E5818
+
 unclassified/tu_80209584.cpp:
 	.text       start:0x80209584 end:0x8020A38C
 	.data       start:0x8051B970 end:0x8051BC98
@@ -1904,6 +1912,9 @@ NL/glx/glxSwap.cpp:
 NL/nlEndian.cpp:
 	.text       start:0x8036D6F0 end:0x8036D6F8
 
+unclassified/tu_8036D6F8.cpp:
+	.text       start:0x8036D6F8 end:0x8036D754
+
 NL/glx/glxMatrix.cpp:
 	.text       start:0x8036DF68 end:0x8036E430
 	.rodata     start:0x804EB450 end:0x804EB460
@@ -1916,6 +1927,15 @@ unclassified/tu_8036E430.cpp:
 
 NL/glx/glxFont.cpp:
 	.text       start:0x8036E4C4 end:0x8036E550
+
+NL/glx/glxSend.cpp:
+	.text       start:0x8036E550 end:0x8036F2E8
+	.ctors      start:0x804DBB54 end:0x804DBB58
+	.data       start:0x805355D8 end:0x805356A0
+	.bss        start:0x8059BD20 end:0x8059BF18
+	.sdata      start:0x806DFAA0 end:0x806DFAB8
+	.sbss       start:0x806E23E8 end:0x806E23F4
+	.sdata2     start:0x806E6D88 end:0x806E6DB0
 
 NL/glx/glxDisplayList.cpp:
 	.text       start:0x8036F2E8 end:0x8036F648
@@ -2111,6 +2131,11 @@ MSL/k_cos.c:
 MSL/k_sin.c:
 	.text       start:0x8038C370 end:0x8038C430
 	.sdata2     start:0x806E7190 end:0x806E71C8
+
+MSL/k_tan.c:
+	.text       start:0x8038C430 end:0x8038C688
+	.rodata     start:0x804EC4E0 end:0x804EC548
+	.sdata2     start:0x806E71C8 end:0x806E7200
 
 MSL/s_atan.c:
 	.text       start:0x8038C688 end:0x8038C8C8

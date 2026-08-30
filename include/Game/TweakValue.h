@@ -161,6 +161,11 @@ public:
         return mValue;
     }
 
+    operator bool() const
+    {
+        return mValue;
+    }
+
     /* 0x0A */ bool mValue;
 }; // total size: 0x0C
 

@@ -1,6 +1,8 @@
 #ifndef GAME_DB_BASICGAMEINFO_H
 #define GAME_DB_BASICGAMEINFO_H
 
+#include <mem.h>
+
 #include "types.h"
 
 enum eTeamID
@@ -17,8 +19,6 @@ enum eStadiumID
 {
     STAD_INVALID = -1,
 };
-
-extern "C" void* memset(void* dst, int value, unsigned long size);
 
 /**
  * The 0x70-byte per-side block BasicGameInfo constructs before it resets

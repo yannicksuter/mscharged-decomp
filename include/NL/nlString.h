@@ -122,6 +122,9 @@ template <typename CharT>
 CharT* nlStrNCat(CharT* dest, const CharT* a, const CharT* b, unsigned long maxsize);
 
 template <typename CharT>
+int nlStrCmp(const CharT* a, const CharT* b);
+
+template <typename CharT>
 int nlStrICmp(const CharT* lhs, const CharT* rhs);
 
 template <typename CharT>

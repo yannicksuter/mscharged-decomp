@@ -1,32 +1,18 @@
+#include "Game/GL/ModelWriter_802A1BF4.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
 #include "NL/glx/GXMaterialCrystalTweaks.h"
 #include "NL/glx/glxTexture.h"
+#include "NL/nlColour.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
+#include "NL/nlString.h"
 
 #include "types.h"
 
 extern "C" GLView* fn_8027267C(int);
-extern "C" void nlZeroMemory(void*, unsigned long);
-
-struct ModelWriter_802A1BF4
-{
-    int count;
-    glModel* model;
-    void* allocator;
-    float* positions;
-    short* textureCoordinates;
-    u32* colours;
-};
-
-extern "C" void fn_802A1BF4(ModelWriter_802A1BF4*);
-extern "C" void* fn_802A1C14(ModelWriter_802A1BF4*, int);
-extern "C" bool fn_802A1C54(
-    ModelWriter_802A1BF4*, int, int, void*);
-extern "C" bool fn_802A1E00(ModelWriter_802A1BF4*);
 
 struct WarbleConfiguration
 {
@@ -76,7 +62,7 @@ static int sWarbleInputExtent;
 bool lbl_806E16D4;
 static float sWarblePhase;
 static u32 sWarbleColourHandle;
-static bool sWarbleColourLoaded;
+static char sWarbleColourLoaded;
 
 static GXMaterialFloatTweak_804F4190 sWarbleFrequency(
     sWarbleFrequencyName, sWarbleTweakCategory, 60.0f);
@@ -123,7 +109,8 @@ extern "C" void fn_801B37AC(WarbleOwner* owner, float dt)
     if (instance == 0)
         return;
 
-    if (instance->elapsed >= instance->duration)
+    bool expired = instance->elapsed >= instance->duration;
+    if (expired)
     {
         delete instance;
         owner->instance = 0;
@@ -153,25 +140,21 @@ extern "C" void fn_801B3840(
     instance->active = false;
 }
 
-static int DecodeWarblePaletteValue(u16 colour)
+static inline u8 DecodeWarblePaletteValue(u16 colour)
 {
     if ((colour & 0x8000) != 0)
     {
-        const int first = (colour >> 10) & 0x1F;
-        const int second = (colour >> 5) & 0x1F;
-        return ((second - first) * 255) / 31;
+        const unsigned int value = (colour >> 10) & 0x1F;
+        return (value * 255) / 31;
     }
 
-    const int first = (colour >> 8) & 0xF;
-    const int second = (colour >> 4) & 0xF;
-    return ((second - first) * 255) / 15;
+    const unsigned int value = (colour >> 8) & 0xF;
+    return (value * 255) / 15;
 }
 
 extern "C" void fn_801B38C4()
 {
     PlatTexture* texture = glx_GetTex(glGetTexture(sWarbleBlobTexture));
-    const u8* indices = static_cast<const u8*>(texture->m_SwizzledData);
-    const u16* palette = texture->m_PaletteData;
 
     for (int y = 0; y < 64; ++y)
     {
@@ -179,21 +162,26 @@ extern "C" void fn_801B38C4()
         {
             const int tile = (y >> 2) * (texture->m_Width >> 3) + (x >> 3);
             const int offset = tile * 32 + (y & 3) * 8 + (x & 7);
-            const int value = DecodeWarblePaletteValue(palette[indices[offset]]);
+            const u8 value = DecodeWarblePaletteValue(
+                texture->m_PaletteData[static_cast<const u8*>(texture->m_SwizzledData)[offset]]);
             sWarbleBlob[y][x] = (float)value / 255.0f;
         }
     }
 
-    for (int y = 0; y < 64; ++y)
-        for (int x = 0; x < 64; ++x)
+    int y;
+    int x;
+    for (y = 0; y < 64; ++y)
+        for (x = 0; x < 64; ++x)
             sWarbleBlob[y][x] *= 127.0f;
 
-    sWarbleBlob[63][63] = 0.0f;
+    sWarbleBlob[y >> 1][x >> 1] = 0.0f;
 }
 
-static int SwizzledIA8Offset(int x, int y)
+static inline int SwizzledIA8Offset(int x, int y)
 {
-    return (((y >> 2) * 16 + (x >> 2)) * 16 + (y & 3) * 4 + (x & 3)) * 2;
+    const int yOffset = ((y << 6) & ~0xFF) | ((y & 3) << 2);
+    const int xOffset = ((x << 2) & ~0xF) | (x & 3);
+    return (yOffset | xOffset) << 1;
 }
 
 extern "C" void fn_801B3B0C(
@@ -204,23 +192,31 @@ extern "C" void fn_801B3B0C(
 
     for (int y = 0; y < 32; ++y)
     {
-        const float dy = 0.5f - (float)y * (1.0f / 64.0f);
+        const float dy = (float)y * (1.0f / 64.0f) - 0.5f;
         for (int x = 0; x < 32; ++x)
         {
             const float source = sWarbleBlob[y][x];
-            int displacement = 124;
-            if (source != 0.0f)
+            int displacement;
+            if (source == 0.0f)
             {
-                const float dx = 0.5f - (float)x * (1.0f / 64.0f);
+                displacement = 124;
+            }
+            else
+            {
+                const float dx = (float)x * (1.0f / 64.0f) - 0.5f;
                 const float radius = nlSqrt(dx * dx + dy * dy, false);
+                const float inverseRadius = 1.0f / radius;
+                const float radialY = dy * inverseRadius;
                 const float wave = nlSin(
                     (u16)((radius * frequency + phase) * 10430.378f));
-                displacement = (int)(128.0f + amplitude * (sWarbleDisplacementScale * (dy / radius) * wave));
+                float scaledWave = radialY * wave;
+                scaledWave = sWarbleDisplacementScale * scaledWave;
+                displacement = (int)(amplitude * scaledWave + 128.0f);
             }
 
+            const int offset = SwizzledIA8Offset(x, y);
             const float normalized = (float)(u8)(int)source / 255.0f;
             const int mapped = (int)((float)sWarbleInputExtent + normalized * (float)(sWarbleOutputExtent - sWarbleInputExtent));
-            const int offset = SwizzledIA8Offset(x, y);
             output[offset] = (u8)mapped;
             output[offset + 1] = (u8)displacement;
         }
@@ -258,15 +254,14 @@ extern "C" void fn_801B3F0C(float dt)
     sWarblePhase = phase - scaled;
 }
 
-static void WriteWarbleVertex(ModelWriter_802A1BF4& writer, int index,
+static inline void WriteWarbleVertex(ModelWriter_802A1BF4& writer,
     float x, float y, short u, short v)
 {
-    writer.colours[index] = 0xFFFFFFFF;
-    writer.textureCoordinates[index * 2] = u;
-    writer.textureCoordinates[index * 2 + 1] = v;
-    writer.positions[index * 3] = x;
-    writer.positions[index * 3 + 1] = y;
-    writer.positions[index * 3 + 2] = 0.0f;
+    nlColour colour;
+    nlColourSet(colour, 0xFF, 0xFF, 0xFF, 0xFF);
+    writer.Colour(colour);
+    writer.Texcoord(u, v);
+    writer.Vertex(x, y, 0.0f);
 }
 
 extern "C" void fn_801B3F2C()
@@ -283,19 +278,20 @@ extern "C" void fn_801B3F2C()
 
     const float left = sWarbleLeft;
     const float top = sWarbleTop;
-    const float right = left + glGetOrthographicWidth();
-    const float bottom = top + glGetOrthographicHeight();
+    const float right = sWarbleLeft + glGetOrthographicWidth();
+    const float bottom = sWarbleTop + glGetOrthographicHeight();
 
     if (fn_802A1C54(&writer, 4, 3, 0))
     {
-        WriteWarbleVertex(writer, 0, left, top, 0, 0);
-        WriteWarbleVertex(writer, 1, left, bottom, 0, 0x400);
-        WriteWarbleVertex(writer, 2, right, bottom, 0x400, 0x400);
-        WriteWarbleVertex(writer, 3, right, top, 0x400, 0);
+        WriteWarbleVertex(writer, left, top, 0, 0);
+        WriteWarbleVertex(writer, left, bottom, 0, 0x400);
+        const u32 colourHandle = sWarbleColourHandle;
+        WriteWarbleVertex(writer, right, bottom, 0x400, 0x400);
+        WriteWarbleVertex(writer, right, top, 0x400, 0);
 
         UnidentifiedTextureState* textureState = static_cast<UnidentifiedTextureState*>(
             writer.model->packets->unknown20);
-        textureState->texture = sWarbleColourHandle;
+        textureState->texture = colourHandle;
         textureState->textureIndex = 0xFFFF;
         textureState->SetWrapS(true);
         textureState->SetWrapT(true);

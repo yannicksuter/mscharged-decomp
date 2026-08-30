@@ -11,7 +11,6 @@ inline void* operator new(unsigned long, void* memory)
 }
 
 extern "C" void* memcpy(void* dst, const void* src, unsigned long size);
-extern "C" void* memset(void* dst, int value, unsigned long size);
 
 extern "C" void fn_801098E4(void*);
 

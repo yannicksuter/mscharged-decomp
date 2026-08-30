@@ -37,6 +37,10 @@ struct ByteCodeHeader
 };
 
 struct UnidentifiedInterpreterStorage;
+class InterpreterCore;
+
+extern "C" FunctionEntryPoint* fn_802DF3E4(
+    InterpreterCore* core, u32* hash);
 
 class InterpreterCore
 {
@@ -47,6 +51,11 @@ public:
     virtual bool UnidentifiedVirtual2(FunctionEntryPoint*, unsigned int, u32, u32, u32, u32);
 
     void LoadByteCode(void* data);
+    void CallFunction(u32 hash)
+    {
+        FunctionEntryPoint* fnc_ptr = fn_802DF3E4(this, &hash);
+        UnidentifiedVirtual2(fnc_ptr, 0, 0, 0, 0, 0);
+    }
     void Run();
     void StopWithoutUndo();
     void StopWithUndo();
@@ -70,7 +79,6 @@ public:
     /* 0x20 */ u32* m_SavedSP;
     /* 0x24 */ u32 m_Stop : 1;
     /* 0x24 */ u32 m_RunState : 2;
-    /* 0x28 */ u32 unknown_0x28;
-};
+}; // size: 0x28
 
 #endif // GAME_INTERPRETER_CORE_H
