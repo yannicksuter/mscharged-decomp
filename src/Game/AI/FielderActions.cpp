@@ -3709,35 +3709,31 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
 
 void cFielder::fn_80043ADC()
 {
-    if (m_eActionState == (eFielderActionState)0)
+    if (m_eActionState == (eFielderActionState)0
+        || m_eActionState == (eFielderActionState)0x23
+        || m_eActionState == ACTION_ELECTROCUTION)
     {
         return;
     }
-    if (m_eActionState == (eFielderActionState)0x23)
+
+    if (m_pBall != 0)
     {
-        return;
+        ReleaseBall(0);
+        nlVector3 v3Velocity = v3LaunchUp;
+        ShootBallDueToContact(v3Velocity);
     }
-    if (m_eActionState != ACTION_ELECTROCUTION)
-    {
-        if (m_pBall != 0)
-        {
-            ReleaseBall(0);
-            nlVector3 v3Velocity = v3LaunchUp;
-            ShootBallDueToContact(v3Velocity);
-        }
 
-        mUnidentified330 = UnidentifiedFielderPair330(false, -1.0f);
-        mUnidentified330.mUnidentified04 = 0.75f + nlRandomf(0.25f);
+    mUnidentified330 = UnidentifiedFielderPair330(false, -1.0f);
+    mUnidentified330.mUnidentified04 = 0.75f + nlRandomf(0.25f);
 
-        nlVector3 v3Position = GetJointPosition(m_nBip01JointIndex_0xA4);
-        SetPosition(v3Position);
+    nlVector3 v3Position = GetJointPosition(m_nBip01JointIndex_0xA4);
+    SetPosition(v3Position);
 
-        InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction((eFielderActionState)0);
-        SetAnimState(0x7C, true, 0.2f, false, false);
-        InitMovementCoast();
-    }
+    InitDesire(
+        FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    SetAction((eFielderActionState)0);
+    SetAnimState(0x7C, true, 0.2f, false, false);
+    InitMovementCoast();
 }
 
 void cFielder::fn_80044148(const nlVector3& v3Velocity)
