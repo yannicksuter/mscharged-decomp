@@ -246,7 +246,8 @@ Game/AI/Powerups.cpp:
 	.sdata2     start:0x806E3C28 end:0x806E3CA8
 
 Game/AI/ShotMeter.cpp:
-	.text       start:0x8009FF20 end:0x800A07A0
+	.text       start:0x8009FF20 end:0x800A07C0
+	.ctors      start:0x804DB544 end:0x804DB548
 	.rodata     start:0x804DC0F0 end:0x804DC100
 	.sdata      start:0x806DBE58 end:0x806DBE78
 	.sbss       start:0x806E0DD0 end:0x806E0DE0
