@@ -1537,6 +1537,29 @@ Game/GL/GLInventory.cpp:
 	.text       start:0x802D2B2C end:0x802D38A4
 	.data       start:0x8052E5C0 end:0x8052E758
 
+Game/Render/Impostor.cpp:
+	.text       start:0x802D5740 end:0x802D58E8
+	.ctors      start:0x804DB9FC end:0x804DBA00
+	.data       start:0x8052E818 end:0x8052E824
+	.sdata2     start:0x806E63D0 end:0x806E63D4
+
+Game/Render/ImpostorManager.cpp:
+	.text       start:0x802D58E8 end:0x802D6EA4
+	.ctors      start:0x804DBA00 end:0x804DBA04
+	.data       start:0x8052E828 end:0x8052E900
+	.bss        start:0x8057F2A8 end:0x8057F350
+	.sdata      start:0x806DF428 end:0x806DF438
+	.sbss       start:0x806E1F60 end:0x806E1F68
+	.sdata2     start:0x806E63D8 end:0x806E63F0
+
+Game/Render/ImpostorCharacter.cpp:
+	.text       start:0x802D6EA4 end:0x802D818C
+	.ctors      start:0x804DBA04 end:0x804DBA08
+	.data       start:0x8052E900 end:0x8052EA20
+	.sdata      start:0x806DF438 end:0x806DF440
+	.sbss       start:0x806E1F68 end:0x806E1F6C
+	.sdata2     start:0x806E63F0 end:0x806E642C
+
 Game/InterpreterCore.cpp:
 	.text       start:0x802DE284 end:0x802E0010
 	.ctors      start:0x804DBA1C end:0x804DBA20

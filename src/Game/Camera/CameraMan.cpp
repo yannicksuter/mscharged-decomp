@@ -8,6 +8,7 @@
 #include "Game/Camera/TopDownCamera.h"
 #include "Game/Camera/animcam.h"
 #include "Game/Camera/kickoffcam.h"
+#include "Game/Render/ImpostorManager.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
@@ -17,14 +18,6 @@
 
 extern float g_fSimulationTick;
 
-struct UnidentifiedCameraModeManager
-{
-    /* 0x00 */ u8 field_0x00[0x37];
-    /* 0x37 */ bool field_0x37;
-};
-
-extern "C" UnidentifiedCameraModeManager* fn_802D5F6C();
-extern "C" void fn_802D6CE0(UnidentifiedCameraModeManager*, int);
 extern "C" void fn_800F02DC(void*, unsigned long, void*);
 extern "C" cBaseCamera* fn_800F2510(void*, int);
 extern "C" cBaseCamera* fn_800F5974(void*);
@@ -598,9 +591,10 @@ void cCameraManager::Update(float fDeltaT)
     eCameraType cameraType = PeekCamera()->GetType();
     if (cameraType != lbl_806E0EE4)
     {
-        UnidentifiedCameraModeManager* pUnidentified = fn_802D5F6C();
-        pUnidentified->field_0x37 = cameraType != eCameraType_Gameplay;
-        fn_802D6CE0(fn_802D5F6C(), (cameraType == eCameraType_Gameplay) + 1);
+        ImpostorManager* pUnidentified = ImpostorManager::GetInstance();
+        pUnidentified->mUnidentified037 = cameraType != eCameraType_Gameplay;
+        ImpostorManager::GetInstance()->SetUpdatePeriod(
+            (cameraType == eCameraType_Gameplay) + 1);
     }
     lbl_806E0EE4 = cameraType;
 }

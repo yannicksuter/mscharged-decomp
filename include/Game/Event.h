@@ -157,7 +157,10 @@ public:
 protected:
     void Remove(Listener* listener);
 
-    nlDLListSlotPool<Listener> mListeners;
+    // The listener list runs a single Clear()/FreeBlocks() teardown, so it is
+    // the plain container over a slot-pool adapter rather than nlDLListSlotPool,
+    // whose destructor tears down twice (see Game/Render/ImpostorCharacter.cpp).
+    DLListContainerBase<Listener, BasicSlotPool<ListenerEntry> > mListeners;
 };
 
 template <typename T>
