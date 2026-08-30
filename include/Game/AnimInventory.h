@@ -22,6 +22,10 @@ public:
     {
         return m_pAnimProperties[i].mirror;
     }
+    int GetBallRotationMode(int i)
+    {
+        return m_pAnimProperties[i].ballRotationMode;
+    }
 
     /* 0x00 */ int m_nNumProperties;
     /* 0x04 */ cInventory<cSAnim>* m_pSAnimInventory;

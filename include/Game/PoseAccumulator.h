@@ -6,9 +6,12 @@
 
 class cSHierarchy;
 class cPoseNode;
+class cPoseAccumulator;
 class nlMatrix4;
 class nlQuaternion;
 struct RotAccum;
+typedef void (*BuildNodeMatrixFn)(unsigned int, unsigned int,
+    cPoseAccumulator*, unsigned int, int);
 struct VectorAccum
 {
     nlVector3 t;
@@ -45,6 +48,9 @@ public:
     void MultiplyScale(int nodeIndex, const nlVector3* scale, float weight);
     void BlendTransIdentity(int nodeIndex, float weight);
     void Pose(const cPoseNode& poseNode, const nlMatrix4& matrix);
+    void SetBuildNodeMatrixCallback(int nodeIndex,
+        BuildNodeMatrixFn funcCallback, unsigned int param1,
+        unsigned int param2);
 
     cSHierarchy* m_pHierarchy;
     nlMatrix4* m_pNodeMatrices;

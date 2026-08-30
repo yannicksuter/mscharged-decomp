@@ -439,6 +439,7 @@ config.libs = [
             Object(NonMatching, "Game/AI/GoalieSave.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/AI/HeadTrack.cpp"),
             Object(NonMatching, "Game/Net.cpp"),
+            Object(NonMatching, "Game/Player.cpp"),
             Object(NonMatching, "Game/AI/Powerups.cpp"),
             Object(NonMatching, "Game/AI/ShotMeter.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "unclassified/tu_800A9140.cpp"),

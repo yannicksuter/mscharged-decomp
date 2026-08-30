@@ -16,7 +16,7 @@ struct AnimProperties
             unsigned char mPadding11[3];
         };
     };
-    unsigned int flagsC;
+    int ballRotationMode;
     unsigned int flagsD;
     unsigned int flagsE;
 };

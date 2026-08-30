@@ -570,7 +570,7 @@ extern float lbl_806DB99C;
 
 void cFielder::EndAction()
 {
-    if (mUnidentified254 == 0)
+    if (m_tFireTimer.m_uPackedTime == 0)
     {
         SetAction(ACTION_NEED_ACTION);
     }
@@ -739,7 +739,7 @@ void cFielder::fn_8004643C(float fDeltaT)
                             && (fn_800344B0(pOther) || fn_80038918(pOther)))
                         {
                             SetAIPad(pOther->m_pController);
-                            mUnidentified258 = false;
+                            m_bCanTestController = false;
                             pOther->SetAIPad(0);
                             bGiven = true;
                         }
@@ -1042,7 +1042,7 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
 bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     int nReact, bool bDoFrameLock, bool bBookPenalty)
 {
-    if (IsFallenDown() && mUnidentified254 == 0)
+    if (IsFallenDown() && m_tFireTimer.m_uPackedTime == 0)
     {
         return false;
     }
@@ -1564,7 +1564,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_LOOSE_BALL_PASS);
         mActionShotVars.bIsChipShot = bVolleyPass;
-        mUnidentified258 = false;
+        m_bCanTestController = false;
         SetNoPickUpTime(lbl_806E35E0);
     }
 }
@@ -3050,7 +3050,7 @@ void cFielder::asmRunning()
                     {
                         fn_8003A2D0(this, -1);
                     }
-                    else if (mUnidentified264.GetSeconds() == 0.0f)
+                    else if (m_tSwapFacingTimer.GetSeconds() == 0.0f)
                     {
                         fn_8003ADAC(this);
                     }
@@ -3166,7 +3166,7 @@ void cFielder::asmRunning()
                     {
                         fn_8003A2D0(this, -1);
                     }
-                    else if (mUnidentified264.GetSeconds() == 0.0f)
+                    else if (m_tSwapFacingTimer.GetSeconds() == 0.0f)
                     {
                         fn_8003ADAC(this);
                     }
@@ -4101,7 +4101,7 @@ void cFielder::fn_80045C74(float fDeltaT)
                             && (fn_800344B0(pOther) || fn_80038918(pOther)))
                         {
                             SetAIPad(pOther->m_pController);
-                            mUnidentified258 = false;
+                            m_bCanTestController = false;
                             pOther->SetAIPad(0);
                             bGiven = true;
                         }
@@ -4708,7 +4708,7 @@ void cFielder::InitActionSlideAttack(
         SetAnimState(0x5E, true, 0.2f, false, false);
         InitMovementRunning(0.0f, 0.0f, fn_8002C180(fn_8003E6E4(this)),
             fn_8002CF24(fn_8003E6E4(this)));
-        mUnidentified238.SetSeconds(fn_8002C800(fn_8003E6E4(this)));
+        m_tSlideAttackTimer.SetSeconds(fn_8002C800(fn_8003E6E4(this)));
 
         mUnidentified388 = 0;
         mUnidentified38C = false;
@@ -4971,7 +4971,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
             }
             else
             {
-                if (mUnidentified21C.GetSeconds() < 0.1f
+                if (m_tBallPossessionTimer.GetSeconds() < 0.1f
                     || m_pShotMeter->m_fSpeedValue < 0.1f)
                 {
                     fn_801B75C8(this, 2, 0, 0, 1);
@@ -5131,17 +5131,17 @@ void cFielder::fn_8004C88C(float fDeltaT)
             }
         }
 
-        if (mUnidentified238.m_uPackedTime == 0 || bUnidentified)
+        if (m_tSlideAttackTimer.m_uPackedTime == 0 || bUnidentified)
         {
             fn_80139D1C(1, GetGlobalPad());
             mUnidentified388 = 1;
-            mUnidentified238.SetSeconds(fn_8002C8D4(fn_8003E6E4(this)));
+            m_tSlideAttackTimer.SetSeconds(fn_8002C8D4(fn_8003E6E4(this)));
         }
         break;
     }
     case 1:
     {
-        float fDecelTime = mUnidentified238.GetSeconds();
+        float fDecelTime = m_tSlideAttackTimer.GetSeconds();
         if (fDecelTime < 0.01f)
         {
             fDecelTime = 0.01f;
@@ -5157,7 +5157,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
             0.0f, (m_fActualSpeed - fTargetSpeed) / fDecelTime);
         m_fDesiredSpeed = fTargetSpeed;
 
-        if (mUnidentified238.m_uPackedTime == 0)
+        if (m_tSlideAttackTimer.m_uPackedTime == 0)
         {
             fn_8004D238();
         }
@@ -5295,7 +5295,7 @@ void cFielder::InitActionReceivePass(int animID, nlVector3& v3TargetPos,
 
 void cFielder::fn_8004E228()
 {
-    if (mUnidentified254 == 0)
+    if (m_tFireTimer.m_uPackedTime == 0)
     {
         mUnidentified3D8 = 0;
         mUnidentified3DA = 0;
