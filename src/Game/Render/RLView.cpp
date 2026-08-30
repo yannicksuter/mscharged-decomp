@@ -3,16 +3,15 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxSend.h"
 
-extern "C" void fn_8036EB90(bool enabled);
-
-static bool sZWriteState;
-static bool sZWriteChanged;
+static bool sFogState;
+static bool sFogChanged;
 
 RLView::RLView(GLViewInterface* viewInterface, const GLRenderPair& renderPair, GLViewSortMode sortMode)
     : GLView(viewInterface, renderPair, sortMode)
 {
-    mZWriteEnabled = true;
+    mFogEnabled = true;
     mCoPlanarEnabled = false;
 }
 
@@ -22,8 +21,8 @@ RLView::~RLView()
 
 void RLView::BeginRender()
 {
-    sZWriteState = mZWriteEnabled;
-    fn_8036EB90(mZWriteEnabled);
+    sFogState = mFogEnabled;
+    glx_Fog(mFogEnabled);
 }
 
 void RLView::EndRender()
@@ -37,15 +36,15 @@ void RLView::EndRender()
 void RLView::BeginPacket(const glModelPacket* packet)
 {
     unsigned long state = glGetRasterState(packet->rasterState, GLS_AlphaBlend);
-    bool zwrite = false;
-    if (mZWriteEnabled && state != 2 && state != 3)
+    bool fog = false;
+    if (mFogEnabled && state != 2 && state != 3)
     {
-        zwrite = true;
+        fog = true;
     }
-    sZWriteChanged = zwrite != sZWriteState;
-    if (sZWriteChanged)
+    sFogChanged = fog != sFogState;
+    if (sFogChanged)
     {
-        fn_8036EB90(zwrite);
+        glx_Fog(fog);
     }
     if (mCoPlanarEnabled && packet->indexBuffer != 0)
     {

@@ -21,6 +21,7 @@ public:
 
     static NisPlayer* sInstance;
 
+    /* 0x00028 */ u32 unknown_0x00028;
     /* 0x0002C */ bool mActive;
     /* 0x0002D */ u8 unknown_0x0002D[0x3400F];
     /* 0x3403C */ Nis* mPlaying[8];

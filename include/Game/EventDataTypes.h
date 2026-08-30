@@ -5,6 +5,51 @@
 
 class cPlayer;
 
+struct UnidentifiedEventData00;
+struct UnidentifiedEventData01;
+struct UnidentifiedEventData02;
+struct UnidentifiedEventData03;
+struct UnidentifiedEventData04;
+struct UnidentifiedEventData05;
+struct UnidentifiedEventData06;
+struct UnidentifiedEventData07;
+struct UnidentifiedEventData08;
+struct UnidentifiedEventData09;
+struct UnidentifiedEventData10;
+struct UnidentifiedEventData11;
+struct UnidentifiedEventData12;
+struct UnidentifiedEventData13;
+struct UnidentifiedEventData14;
+struct UnidentifiedEventData15;
+struct UnidentifiedEventData16;
+struct UnidentifiedEventData17;
+struct UnidentifiedEventData18;
+struct UnidentifiedEventData19;
+struct UnidentifiedEventData20;
+struct UnidentifiedEventData21;
+struct UnidentifiedEventData22;
+struct UnidentifiedEventData23;
+struct UnidentifiedEventData24;
+struct UnidentifiedEventData25;
+struct UnidentifiedEventData26;
+struct UnidentifiedEventData27;
+struct UnidentifiedEventData28;
+struct UnidentifiedEventData29;
+struct UnidentifiedEventData30;
+struct UnidentifiedEventData31;
+struct UnidentifiedEventData32
+{
+    void* source;
+    void* sourceValue;
+    void* target;
+};
+struct UnidentifiedEventData33;
+struct UnidentifiedEventData34;
+struct UnidentifiedEventData35;
+struct UnidentifiedEventData36;
+struct UnidentifiedEventData37;
+struct UnidentifiedEventData38;
+
 struct CollisionPlayerWallData
 {
     /* 0x00 */ cPlayer* pPlayer;

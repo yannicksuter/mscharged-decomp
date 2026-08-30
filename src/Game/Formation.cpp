@@ -47,7 +47,6 @@ extern "C" void fn_800180F4(cBall*, nlVector3*, float);
 extern "C" float fn_800DFF1C();
 extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void* memset(void*, int, unsigned long);
-extern "C" void* fn_802DF3E4(InterpreterCore*, unsigned int*);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(InterpreterCore*, void*, int, cTeam*, int);
 int nlPrintf(const char*, ...);
 

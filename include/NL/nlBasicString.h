@@ -221,7 +221,7 @@ public:
     BasicString& AppendInPlace(const CharT* str);
 
     template <typename OtherAllocator>
-    BasicString& AppendInPlace(const BasicString<CharT, OtherAllocator>& rhs);
+    inline BasicString& AppendInPlace(const BasicString<CharT, OtherAllocator>& rhs);
 
     BasicString Append(const CharT* rhs) const;
 
@@ -273,6 +273,98 @@ void BasicString<CharT, Allocator>::TrimInPlace(const CharT* chars)
         --i;
     }
     erase(begin() + i + 1, end());
+}
+
+template <typename CharT, typename Allocator>
+template <typename OtherAllocator>
+BasicString<CharT, Allocator>& BasicString<CharT, Allocator>::AppendInPlace(const BasicString<CharT, OtherAllocator>& rhs)
+{
+    (*this)[0];
+
+    CharT* at;
+    Data* currentData = mData;
+    if (currentData != 0)
+    {
+        at = currentData->mData.mData + currentData->mData.mSize - 1;
+    }
+    else
+    {
+        at = 0;
+    }
+
+    typename BasicString<CharT, OtherAllocator>::Data* rhsData = rhs.mData;
+    const CharT* begin;
+    if (rhsData != 0)
+    {
+        begin = rhsData->mData.mData;
+    }
+    else
+    {
+        begin = 0;
+    }
+
+    insert(at, begin, rhsData != 0 ? rhsData->mData.mData + rhsData->mData.mSize - 1 : 0);
+    return *this;
+}
+
+template <typename CharT, typename Allocator>
+inline BasicString<CharT, Allocator>& BasicString<CharT, Allocator>::AppendInPlace(const CharT* str)
+{
+    const CharT* rhsEnd = str;
+    while (*rhsEnd != 0)
+    {
+        rhsEnd++;
+    }
+
+    (*this)[0];
+
+    CharT* at;
+    if (mData != 0)
+    {
+        at = mData->mData.mData + mData->mData.mSize - 1;
+    }
+    else
+    {
+        at = 0;
+    }
+
+    insert(at, str, rhsEnd);
+    return *this;
+}
+
+template <typename CharT, typename Allocator>
+template <typename OtherAllocator>
+BasicString<CharT, Allocator> BasicString<CharT, Allocator>::Append(const BasicString<CharT, OtherAllocator>& rhs) const
+{
+    BasicString r(*this);
+    r.AppendInPlace(rhs);
+    Data* data = r.mData;
+    if (data != 0)
+    {
+        data->mRefCount++;
+    }
+    else
+    {
+        data = 0;
+    }
+    return BasicString(data);
+}
+
+template <typename CharT, typename Allocator>
+BasicString<CharT, Allocator> BasicString<CharT, Allocator>::Append(const CharT* rhs) const
+{
+    BasicString r(*this);
+    r.AppendInPlace(rhs);
+    Data* data = r.mData;
+    if (data != 0)
+    {
+        data->mRefCount++;
+    }
+    else
+    {
+        data = 0;
+    }
+    return BasicString(data);
 }
 
 template <typename CharT, typename Allocator>

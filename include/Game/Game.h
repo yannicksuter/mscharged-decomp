@@ -1,6 +1,7 @@
 #ifndef GAME_GAME_H
 #define GAME_GAME_H
 
+#include "Game/GameEventQueue.h"
 #include "types.h"
 
 class Clock;
@@ -123,7 +124,6 @@ public:
     /* 0x3C */ cFielder* mUnidentified03C;
 
 private:
-
 public:
     /* 0x40 */ bool mUnidentified040;
     /* 0x41 */ bool mUnidentified041;
@@ -166,7 +166,7 @@ public:
     /* 0x474 */ float m_fCachedBallPlayerDistances[10];
 
 private:
-    /* 0x49C */ u8 mUnidentified49C[0xC3C];
+    /* 0x49C */ UnidentifiedGameEventQueue mUnidentified49C;
 
 public:
     /* 0x10D8 */ void* mUnidentified10D8;

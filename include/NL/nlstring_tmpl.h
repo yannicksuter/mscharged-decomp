@@ -53,6 +53,21 @@ inline CharT nlToLower(CharT c)
 }
 
 template <typename CharT>
+inline int nlStrCmp(const CharT* a, const CharT* b)
+{
+    CharT c1;
+    CharT c2;
+
+    do
+    {
+        c1 = *a++;
+        c2 = *b++;
+    } while (c1 != 0 && c2 != 0 && c1 == c2);
+
+    return c1 - c2;
+}
+
+template <typename CharT>
 inline int nlStrICmp(const CharT* lhs, const CharT* rhs)
 {
     CharT left;

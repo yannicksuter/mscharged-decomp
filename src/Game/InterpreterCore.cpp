@@ -667,7 +667,7 @@ extern "C" bool fn_802DF314(InterpreterCore* core, FunctionEntryPoint* entry, un
     return true;
 }
 
-extern "C" FunctionEntryPoint* fn_802DF3E4(InterpreterCore* core, const unsigned long* hash)
+extern "C" FunctionEntryPoint* fn_802DF3E4(InterpreterCore* core, u32* hash)
 {
     unsigned long value = *hash;
     return nlBSearch<FunctionEntryPoint, unsigned long>(value, core->m_Header->m_FunctionTable, core->m_Header->numFunctions);

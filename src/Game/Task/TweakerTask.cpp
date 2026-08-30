@@ -31,7 +31,7 @@ void TweakerTask::Run(float)
 
     if (lbl_806E20E4 && lbl_806E20D8 != 0)
     {
-        lbl_806E20D8->UnidentifiedVirtual48();
+        lbl_806E20D8->BaseVirtual50();
     }
 
     if (lbl_806E2168 != 0)

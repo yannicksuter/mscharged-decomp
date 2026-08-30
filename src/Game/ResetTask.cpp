@@ -109,7 +109,7 @@ void ResetTask::Run(float dt)
 
         if (lbl_806E10EC)
         {
-            lbl_806E10EC->UnidentifiedVirtual84();
+            lbl_806E10EC->OnlineVirtual08();
         }
 
         float volume = 0.99f;

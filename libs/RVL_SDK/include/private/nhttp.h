@@ -60,7 +60,9 @@ typedef struct NHTTPHdrRecvBuf
 {
     s32 length;
     s32 _unk4;
-    u8 _unk8[0xC];
+    s32 _unk8;
+    s32 _unkC;
+    BOOL succeeded;
     BOOL hasResultCode;
     s32 resultCode;
     u32 bufferSize;
@@ -96,7 +98,8 @@ struct NHTTPRequestInfo
     NHTTPHeader* headers;
     NHTTPHeader* postData;
     char multipartBoundary[20];
-    u8 _unk4C[0x60];
+    char authorization[0x5C];
+    u32 authorizationLength;
     SSLId sslId;
     const char* clientCertData;
     u32 clientCertSize;
@@ -112,7 +115,8 @@ struct NHTTPRequestInfo
     char proxyAuthorization[0x5C];
     u32 proxyAuthorizationLength;
     u32 recvBufferSize;
-    u8 _unk23C[8];
+    const void* postBuffer;
+    u32 postBufferSize;
     void* _unk244;
 };
 

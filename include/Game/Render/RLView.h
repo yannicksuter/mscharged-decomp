@@ -70,7 +70,7 @@ public:
     virtual void BeginPacket(const glModelPacket* packet);
     virtual void EndPacket(const glModelPacket* packet);
 
-    /* 0x58 */ bool mZWriteEnabled;
+    /* 0x58 */ bool mFogEnabled;
     /* 0x59 */ bool mCoPlanarEnabled;
 }; // size 0x5C
 

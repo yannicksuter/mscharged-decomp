@@ -107,31 +107,6 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A73B0>::Draw(
         static_cast<GXMaterialProgram_802A73B0*>(this)->DrawDirect(packet);
 }
 
-inline GXMaterialColourTweak_804FC520::GXMaterialColourTweak_804FC520(
-    const char* name, const char* category)
-    : value(0)
-{
-    mName = name;
-    mUnidentified009 = false;
-
-    void* config = fn_802C0F04();
-    if (config == 0)
-    {
-        void* entry = nlMalloc(0x18, 8, true);
-        if (entry != 0)
-            fn_802C2DF4(entry, this, category);
-    }
-    else
-    {
-        config = fn_802C0E30(config);
-        void* entry = fn_802C4504(config, category, 0);
-        if (entry != 0)
-            fn_802C5780(entry, this);
-    }
-
-    lbl_806E1E90 = category;
-}
-
 GXMaterialColourTweak_804FC520 sShadowVolumeRed(
     "Red", "/Rendering/ShadowVolume");
 GXMaterialColourTweak_804FC520 sShadowVolumeGreen(

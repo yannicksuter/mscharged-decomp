@@ -33,6 +33,8 @@ private:
     bool mRenderEnabled;
     bool mUpdateEnabled;
     unsigned char mCallbackPadding[2];
+
+public:
     Function0<bool> mCanRender;
     Function0<bool> mCanUpdate;
     Function0<void> mBeforeUpdate;

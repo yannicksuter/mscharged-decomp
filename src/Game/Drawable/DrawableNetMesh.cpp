@@ -1,6 +1,7 @@
 #include "Game/Field.h"
 #include "Game/Net.h"
 #include "Game/Render/NetMesh.h"
+#include "Game/Render/ShootToScoreArrow.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
@@ -85,12 +86,6 @@ public:
     virtual void Unused();
     virtual ModelHandle* Acquire();
     virtual void Release(ModelHandle*);
-};
-
-struct WorldDarkening
-{
-    u32 unused;
-    float position;
 };
 
 struct LoadFrame
@@ -195,7 +190,6 @@ extern const StreamDefinition lbl_804DCCE0;
 extern "C" void* fn_8027267C(int);
 extern "C" void __dla__FPv(void*);
 extern "C" void fn_802CC02C(MeshResource*);
-extern "C" WorldDarkening* fn_801AF510();
 extern "C" void nlBreak__Fv();
 extern "C" void* memcpy(void*, const void*, u32);
 extern "C" MeshResource* fn_802CBFD8(const StreamDefinition*, int, const char*);
@@ -362,7 +356,7 @@ void DrawableNetMesh::Render() const
             lbl_80570948[(unsigned int)index][lbl_806E1370[(unsigned int)index]] = handle;
         }
 
-        float darkness = 1.0f - fn_801AF510()->position;
+        float darkness = 1.0f - WorldDarkening::Instance().mPos;
         float colour[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         colour[0] = darkness;
         colour[1] = darkness;

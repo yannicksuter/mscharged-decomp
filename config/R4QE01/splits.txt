@@ -13,13 +13,13 @@ Sections:
 	.sdata2     type:rodata align:8
 	.sbss2      type:bss align:16
 
-unclassified/tu_80007400.cpp:
-	.text       start:0x80007400 end:0x800080C0
+Game/AIPad.cpp:
+	.text       start:0x80007400 end:0x8000821C
 	.ctors      start:0x804DB4E4 end:0x804DB4E8
 	.rodata     start:0x804DBC00 end:0x804DBC10
 	.data       start:0x804F4120 end:0x804F41C0
-	.bss        start:0x80568460 end:0x8056B260
-	.sdata      start:0x806DB3C0 end:0x806DB3CC
+	.bss        start:0x80568400 end:0x8056B260
+	.sdata      start:0x806DB3C0 end:0x806DB3D8
 	.sdata2     start:0x806E3060 end:0x806E3080
 
 Game/AI/AiUtil.cpp:
@@ -405,6 +405,15 @@ Game/ResetTask.cpp:
 	.sbss       start:0x806E1070 end:0x806E1088
 	.sdata2     start:0x806E46E0 end:0x806E46F8
 
+Game/NetworkSession.cpp:
+	.text       start:0x8011E384 end:0x801246E4
+	.ctors      start:0x804DB608 end:0x804DB60C
+	.data       start:0x80509780 end:0x8050A938
+	.bss        start:0x8056FA30 end:0x8056FA68
+	.sdata      start:0x806DC888 end:0x806DC8B0
+	.sbss       start:0x806E10D0 end:0x806E1100
+	.sdata2     start:0x806E4720 end:0x806E472C
+
 unclassified/tu_80139B18.cpp:
 	.text       start:0x80139B18 end:0x8013A25C
 	.ctors      start:0x804DB634 end:0x804DB638
@@ -562,6 +571,10 @@ Game/Drawable/DrawableFlyingCamera.cpp:
 	.sbss       start:0x806E1408 end:0x806E140C
 	.sdata2     start:0x806E4BD8 end:0x806E4BF8
 
+unclassified/tu_8017FFCC.cpp:
+	.text       start:0x8017FFCC end:0x801802D4
+	.sdata2     start:0x806E4BF8 end:0x806E4C18
+
 Game/Drawable/DrawableKoopaShell.cpp:
 	.text       start:0x80180678 end:0x80180C70
 	.data       start:0x805113D8 end:0x805113F0
@@ -586,6 +599,10 @@ Game/Drawable/DrawableYoshiEgg.cpp:
 	.data       start:0x80511438 end:0x80511450
 	.sdata      start:0x806DCC28 end:0x806DCC40
 	.sdata2     start:0x806E4CB0 end:0x806E4CD0
+
+unclassified/tu_8018480C.cpp:
+	.text       start:0x8018480C end:0x80184AAC
+	.sdata      start:0x806DCC98 end:0x806DCCA0
 
 Game/Blinker.cpp:
 	.text       start:0x80199B30 end:0x80199E84
@@ -615,6 +632,22 @@ Game/Render/depthoffield.cpp:
 	.sbss       start:0x806E1500 end:0x806E1504
 	.sdata2     start:0x806E4F98 end:0x806E4FB8
 
+unclassified/tu_801A4EC0.cpp:
+	.text       start:0x801A4EC0 end:0x801A5F10
+	.ctors      start:0x804DB710 end:0x804DB714
+	.data       start:0x80514140 end:0x805141C0
+	.bss        start:0x80572238 end:0x805722F8
+	.sdata      start:0x806DCF90 end:0x806DCF98
+	.sbss       start:0x806E15B8 end:0x806E15C0
+	.sdata2     start:0x806E5148 end:0x806E5178
+
+unclassified/tu_801A6824.cpp:
+	.text       start:0x801A6824 end:0x801A6AAC
+	.ctors      start:0x804DB718 end:0x804DB71C
+	.data       start:0x805141D8 end:0x80514210
+	.bss        start:0x805723F8 end:0x80572410
+	.sdata2     start:0x806E5188 end:0x806E51A0
+
 unclassified/tu_801AC30C.cpp:
 	.text       start:0x801AC30C end:0x801AD0EC
 	.ctors      start:0x804DB724 end:0x804DB728
@@ -628,6 +661,14 @@ Game/Effects/PhotoFlashEffect.cpp:
 	.sdata      start:0x806DD030 end:0x806DD038
 	.sdata2     start:0x806E5280 end:0x806E528C
 
+Game/Render/ShootToScoreArrow.cpp:
+	.text       start:0x801AF510 end:0x801AF8EC
+	.ctors      start:0x804DB734 end:0x804DB738
+	.data       start:0x805144F0 end:0x80514524
+	.bss        start:0x80574128 end:0x80574138
+	.sbss       start:0x806E1650 end:0x806E1660
+	.sdata2     start:0x806E52C0 end:0x806E52D8
+
 unclassified/tu_801B369C.cpp:
 	.text       start:0x801B369C end:0x801B43F8
 	.ctors      start:0x804DB744 end:0x804DB748
@@ -637,6 +678,12 @@ unclassified/tu_801B369C.cpp:
 	.sbss       start:0x806E16C8 end:0x806E16E8
 	.sdata2     start:0x806E5388 end:0x806E53E8
 
+Game/WorldTriggers.cpp:
+	.text       start:0x801BE234 end:0x801BE408
+	.rodata     start:0x804DCFD8 end:0x804DCFE4
+	.data       start:0x80515CA8 end:0x80515CB8
+	.sdata2     start:0x806E5460 end:0x806E5464
+
 Game/FE/feManager.cpp:
 	.text       start:0x801C3920 end:0x801C4B7C
 	.ctors      start:0x804DB76C end:0x804DB770
@@ -645,15 +692,35 @@ Game/FE/GameSceneManager.cpp:
 	.text       start:0x801C6174 end:0x801C620C
 	.data       start:0x805170A8 end:0x805170C0
 
+Game/FE/Overlay/OverlayHandlerInGameText.cpp:
+	.text       start:0x801EBD10 end:0x801ED8FC
+	.rodata     start:0x804E83D8 end:0x804E8438
+	.data       start:0x8051A060 end:0x8051A100
+	.sdata      start:0x806DD780 end:0x806DD818
+	.sdata2     start:0x806E5710 end:0x806E5718
+
 Game/FE/Overlay/OverlayHandlerDemo.cpp:
 	.text       start:0x801F698C end:0x801F6A24
 	.data       start:0x8051A6D0 end:0x8051A6FC
+
+Game/Render/Presentation.cpp:
+	.text       start:0x801FEBEC end:0x80200360
+	.data       start:0x8051B0D0 end:0x8051B1F8
+	.bss        start:0x80578368 end:0x80578428
+	.sdata      start:0x806DDAF0 end:0x806DDB18
+	.sbss       start:0x806E1898 end:0x806E18A0
+	.sdata2     start:0x806E5800 end:0x806E5818
 
 unclassified/tu_80209584.cpp:
 	.text       start:0x80209584 end:0x8020A38C
 	.data       start:0x8051B970 end:0x8051BC98
 	.sdata      start:0x806DDC48 end:0x806DDC60
 	.sdata2     start:0x806E5848 end:0x806E5860
+
+Game/SH/SHGameResults.cpp:
+	.text       start:0x8020A38C end:0x8020A74C
+	.data       start:0x8051BC98 end:0x8051BD08
+	.sdata      start:0x806DDC60 end:0x806DDC80
 
 unclassified/tu_80219248.cpp:
 	.text       start:0x80219248 end:0x80219668
@@ -1359,6 +1426,33 @@ NL/nlBundleFile.cpp:
 	.text       start:0x802BDB70 end:0x802BE64C
 	.data       start:0x8052BA40 end:0x8052BA70
 
+Game/TweakRegistry.cpp:
+	.text       start:0x802C0CCC end:0x802C3888
+	.ctors      start:0x804DB9B8 end:0x804DB9BC
+	.data       start:0x8052BCD0 end:0x8052BE58
+	.bss        start:0x8057C4D8 end:0x8057C660
+	.sdata      start:0x806DF310 end:0x806DF350
+	.sbss       start:0x806E1E38 end:0x806E1E68
+	.sdata2     start:0x806E62C8 end:0x806E62D0
+
+Game/TweakNameRecycler.cpp:
+	.text       start:0x802C3888 end:0x802C3CF4
+	.ctors      start:0x804DB9BC end:0x804DB9C0
+	.data       start:0x8052BE58 end:0x8052BE78
+	.bss        start:0x8057C660 end:0x8057C6D8
+	.sbss       start:0x806E1E68 end:0x806E1E80
+
+Game/TweakNode.cpp:
+	.text       start:0x802C3CF4 end:0x802C4C5C
+	.ctors      start:0x804DB9C0 end:0x804DB9C4
+	.data       start:0x8052BE78 end:0x8052BED0
+	.bss        start:0x8057C6D8 end:0x8057C728
+	.sdata      start:0x806DF350 end:0x806DF360
+
+Game/TweakValue.cpp:
+	.text       start:0x802C4F94 end:0x802C5248
+	.ctors      start:0x804DB9C8 end:0x804DB9CC
+
 NL/gl/gl.cpp:
 	.text       start:0x802C7FD0 end:0x802C8290
 	.sbss       start:0x806E1EA0 end:0x806E1EAC
@@ -1383,6 +1477,13 @@ NL/gl/glFont.cpp:
 	.sdata      start:0x806DF3D0 end:0x806DF3F0
 	.sbss       start:0x806E1EB8 end:0x806E1ED0
 	.sdata2     start:0x806E6310 end:0x806E632C
+
+NL/gl/glLoadModel.cpp:
+	.text       start:0x802CA770 end:0x802CBE10
+	.ctors      start:0x804DB9E0 end:0x804DB9E4
+	.data       start:0x8052E220 end:0x8052E270
+	.bss        start:0x8057F1A8 end:0x8057F1C8
+	.sbss       start:0x806E1ED0 end:0x806E1ED8
 
 NL/gl/glMatrix.cpp:
 	.text       start:0x802CBE10 end:0x802CBEC4
@@ -1655,6 +1756,13 @@ Game/SAnim/pnFeather.cpp:
 	.bss        start:0x80584178 end:0x805841A0
 	.sdata2     start:0x806E6808 end:0x806E6820
 
+unclassified/tu_8030E550.cpp:
+	.text       start:0x8030E550 end:0x8030E940
+	.ctors      start:0x804DBAA4 end:0x804DBAA8
+	.data       start:0x805300A0 end:0x805300C8
+	.bss        start:0x805841A0 end:0x805841C8
+	.sdata2     start:0x806E6820 end:0x806E6830
+
 Game/SAnim/AnimRetargeter.cpp:
 	.text       start:0x8030E940 end:0x8030EC30
 
@@ -1904,6 +2012,9 @@ NL/glx/glxSwap.cpp:
 NL/nlEndian.cpp:
 	.text       start:0x8036D6F0 end:0x8036D6F8
 
+unclassified/tu_8036D6F8.cpp:
+	.text       start:0x8036D6F8 end:0x8036D754
+
 NL/glx/glxMatrix.cpp:
 	.text       start:0x8036DF68 end:0x8036E430
 	.rodata     start:0x804EB450 end:0x804EB460
@@ -1916,6 +2027,15 @@ unclassified/tu_8036E430.cpp:
 
 NL/glx/glxFont.cpp:
 	.text       start:0x8036E4C4 end:0x8036E550
+
+NL/glx/glxSend.cpp:
+	.text       start:0x8036E550 end:0x8036F2E8
+	.ctors      start:0x804DBB54 end:0x804DBB58
+	.data       start:0x805355D8 end:0x805356A0
+	.bss        start:0x8059BD20 end:0x8059BF18
+	.sdata      start:0x806DFAA0 end:0x806DFAB8
+	.sbss       start:0x806E23E8 end:0x806E23F4
+	.sdata2     start:0x806E6D88 end:0x806E6DB0
 
 NL/glx/glxDisplayList.cpp:
 	.text       start:0x8036F2E8 end:0x8036F648
@@ -2111,6 +2231,11 @@ MSL/k_cos.c:
 MSL/k_sin.c:
 	.text       start:0x8038C370 end:0x8038C430
 	.sdata2     start:0x806E7190 end:0x806E71C8
+
+MSL/k_tan.c:
+	.text       start:0x8038C430 end:0x8038C688
+	.rodata     start:0x804EC4E0 end:0x804EC548
+	.sdata2     start:0x806E71C8 end:0x806E7200
 
 MSL/s_atan.c:
 	.text       start:0x8038C688 end:0x8038C8C8
@@ -3220,6 +3345,9 @@ RVL_SDK/nhttp/NHTTP_stdlib_RVL.c:
 
 RVL_SDK/nhttp/NHTTP_thread.c:
 	.text       start:0x80419CF4 end:0x8041DDBC
+	.rodata     start:0x804ECDE8 end:0x804ECEC0
+	.data       start:0x805554B8 end:0x80555580
+	.sdata      start:0x806E0060 end:0x806E00B8
 
 RVL_SDK/nhttp/d_nhttp_private.c:
 	.text       start:0x8041DDBC end:0x8041E0CC
@@ -3918,6 +4046,13 @@ RVL_SDK/dwc/dwc_main.c:
 	.sdata      start:0x806E03A0 end:0x806E03C8
 	.sbss       start:0x806E2EE0 end:0x806E2EE8
 
+RVL_SDK/dwc/dwc_match.c:
+	.text       start:0x8048F554 end:0x8049AE0C
+	.data       start:0x80563478 end:0x80564D50
+	.bss        start:0x806C9920 end:0x806CA178
+	.sdata      start:0x806E03C8 end:0x806E0438
+	.sbss       start:0x806E2EE8 end:0x806E2F00
+
 RVL_SDK/dwc/dwc_transport.c:
 	.text       start:0x8049AE0C end:0x8049BB0C
 	.data       start:0x80564D50 end:0x80565038
@@ -4069,6 +4204,11 @@ RVL_SDK/gamespy/gt2/gt2Connection.c:
 RVL_SDK/gamespy/gt2/gt2Main.c:
 	.text       start:0x804B6140 end:0x804B64F8
 
+RVL_SDK/gamespy/gt2/gt2Message.c:
+	.text       start:0x804B64F8 end:0x804B95C0
+	.bss        start:0x806CA920 end:0x806DA920
+	.sdata      start:0x806E0908 end:0x806E0918
+
 RVL_SDK/gamespy/gt2/gt2Socket.c:
 	.text       start:0x804B95C0 end:0x804BA154
 
@@ -4098,8 +4238,13 @@ RVL_SDK/gamespy/ghttp/ghttpCommon.c:
 
 RVL_SDK/gamespy/ghttp/ghttpConnection.c:
 	.text       start:0x804BDB60 end:0x804BE2AC
-	.data       start:0x80567630 end:0x8056763C
+	.data       start:0x80567630 end:0x80567640
 	.sbss       start:0x806E2F68 end:0x806E2F78
+
+RVL_SDK/gamespy/ghttp/ghttpEncryption.c:
+	.text       start:0x804BE2AC end:0x804C0078
+	.data       start:0x80567640 end:0x805676B8
+	.sdata      start:0x806E09E0 end:0x806E0A00
 
 RVL_SDK/gamespy/ghttp/ghttpMain.c:
 	.text       start:0x804C0078 end:0x804C05DC

@@ -1,0 +1,113 @@
+#ifndef GAME_GAME_EVENT_QUEUE_H
+#define GAME_GAME_EVENT_QUEUE_H
+
+#include "Game/Event.h"
+#include "Game/EventDataTypes.h"
+
+struct UnidentifiedEventData_80065E10;
+struct UnidentifiedEventData_80065F14;
+struct UnidentifiedEventData_80066008;
+struct UnidentifiedEventData_800661C0;
+struct UnidentifiedEventData_800662B4;
+struct UnidentifiedEventData_800663A8;
+struct UnidentifiedEventData_8006649C;
+struct UnidentifiedEventData_80066590;
+struct UnidentifiedEventData_80066748;
+struct UnidentifiedEventData_80066A04;
+struct UnidentifiedEventData_80066B08;
+struct UnidentifiedEventData_80066C0C;
+struct UnidentifiedEventData_80066D10;
+struct UnidentifiedEventData_80066E14;
+struct UnidentifiedEventData_80066F18;
+struct UnidentifiedEventData_8006701C;
+struct UnidentifiedEventData_80067110;
+struct UnidentifiedEventData_80067214;
+struct UnidentifiedEventData_80067308;
+struct UnidentifiedEventData_800673FC;
+struct UnidentifiedEventData_800676D8;
+struct UnidentifiedEventData_800677DC;
+struct UnidentifiedEventData_800678D0;
+
+class UnidentifiedGameEventQueue
+{
+public:
+    UnidentifiedGameEventQueue();
+
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent00;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent01;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent02;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent03;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent04;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80065E10> mEvent05;
+    UnidentifiedEvent<UnidentifiedEventData_80065F14> mEvent06;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent07;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066008> mEvent08;
+    UnidentifiedEvent<UnidentifiedEventData00> mEvent09;
+    UnidentifiedEvent<UnidentifiedEventData00> mEvent10;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent11;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent12;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent13;
+    UnidentifiedEvent<UnidentifiedEventData_800661C0> mEvent14;
+    UnidentifiedEvent<UnidentifiedEventData_800662B4> mEvent15;
+    UnidentifiedEvent<UnidentifiedEventData_800663A8> mEvent16;
+    UnidentifiedEvent<UnidentifiedEventData_8006649C> mEvent17;
+    UnidentifiedEvent<UnidentifiedEventData_8006649C> mEvent18;
+    UnidentifiedEvent<UnidentifiedEventData_8006649C> mEvent19;
+    UnidentifiedEvent<UnidentifiedEventData_8006649C> mEvent20;
+    UnidentifiedEvent<UnidentifiedEventData_8006649C> mEvent21;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066590> mEvent22;
+    UnidentifiedEvent<UnidentifiedEventData_80066590> mEvent23;
+    UnidentifiedEvent<UnidentifiedEventData_80066748> mEvent24;
+    UnidentifiedEvent<UnidentifiedEventData_80066748> mEvent25;
+    UnidentifiedEvent<UnidentifiedEventData_80066748> mEvent26;
+    UnidentifiedEvent<UnidentifiedEventData_80066748> mEvent27;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066748> mEvent28;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066748> mEvent29;
+    UnidentifiedQueuedEvent<UnidentifiedEventData02> mEvent30;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066A04> mEvent31;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066B08> mEvent32;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066C0C> mEvent33;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066D10> mEvent34;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066E14> mEvent35;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066590> mEvent36;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066590> mEvent37;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80066F18> mEvent38;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent39;
+    UnidentifiedEvent<UnidentifiedEventData_8006701C> mEvent40;
+    UnidentifiedEvent<UnidentifiedEventData_8006701C> mEvent41;
+    UnidentifiedEvent<UnidentifiedEventData_8006701C> mEvent42;
+    UnidentifiedEvent<UnidentifiedEventData00> mEvent43;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_80067110> mEvent44;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent45;
+    UnidentifiedEvent<UnidentifiedEventData_80067214> mEvent46;
+    UnidentifiedEvent<UnidentifiedEventData_80067308> mEvent47;
+    UnidentifiedEvent<UnidentifiedEventData00> mEvent48;
+    UnidentifiedEvent<UnidentifiedEventData00> mEvent49;
+    UnidentifiedEvent<UnidentifiedEventData00> mEvent50;
+    UnidentifiedEvent<UnidentifiedEventData00> mEvent51;
+    UnidentifiedEvent<UnidentifiedEventData00> mEvent52;
+    UnidentifiedEvent<UnidentifiedEventData00> mEvent53;
+    UnidentifiedEvent<UnidentifiedEventData_800673FC> mEvent54;
+    UnidentifiedEvent<UnidentifiedEventData_800673FC> mEvent55;
+    UnidentifiedEvent<UnidentifiedEventData_800673FC> mEvent56;
+    UnidentifiedEvent<UnidentifiedEventData_800673FC> mEvent57;
+    UnidentifiedEvent<UnidentifiedEventData_80067214> mEvent58;
+    UnidentifiedEvent<UnidentifiedEventData_80067214> mEvent59;
+    UnidentifiedEvent<UnidentifiedEventData_80067214> mEvent60;
+    UnidentifiedEvent<UnidentifiedEventData_80067214> mEvent61;
+    UnidentifiedEvent<UnidentifiedEventData_80067214> mEvent62;
+    UnidentifiedEvent<UnidentifiedEventData23> mEvent63;
+    UnidentifiedEvent<UnidentifiedEventData36> mEvent64;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent65;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent66;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent67;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_800676D8> mEvent68;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent69;
+    UnidentifiedQueuedEvent<UnidentifiedEventData00> mEvent70;
+    UnidentifiedEvent<UnidentifiedEventData_800677DC> mEvent71;
+    UnidentifiedEvent<UnidentifiedEventData_800677DC> mEvent72;
+    UnidentifiedEvent<UnidentifiedEventData_800677DC> mEvent73;
+    UnidentifiedQueuedEvent<UnidentifiedEventData_800678D0> mEvent74;
+};
+
+#endif // GAME_GAME_EVENT_QUEUE_H

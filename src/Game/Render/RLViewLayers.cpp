@@ -528,11 +528,11 @@ void fn_80272AB4()
         }
     }
 
-    sLayerViews[eCLV_NoFog]->mZWriteEnabled = false;
-    sLayerViews[eCLV_HighRange3DNoFog]->mZWriteEnabled = false;
-    sLayerViews[eCLV_DepthOfField]->mZWriteEnabled = false;
-    sLayerViews[eCLV_BigBlackPolygon]->mZWriteEnabled = false;
-    sLayerViews[eCLV_MegastrikeBackground]->mZWriteEnabled = false;
+    sLayerViews[eCLV_NoFog]->mFogEnabled = false;
+    sLayerViews[eCLV_HighRange3DNoFog]->mFogEnabled = false;
+    sLayerViews[eCLV_DepthOfField]->mFogEnabled = false;
+    sLayerViews[eCLV_BigBlackPolygon]->mFogEnabled = false;
+    sLayerViews[eCLV_MegastrikeBackground]->mFogEnabled = false;
     sLayerViews[eCLV_CoPlanar]->mCoPlanarEnabled = true;
 
     fn_80272850();

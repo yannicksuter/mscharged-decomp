@@ -9,13 +9,6 @@ typedef struct NHTTPMutexInfo
     BOOL initialized;
 } NHTTPMutexInfo;
 
-typedef struct NHTTPThreadInfo
-{
-    OSMessageQueue messageQueue;
-    OSMessage messages[3];
-    OSThread thread;
-} NHTTPThreadInfo;
-
 typedef struct NHTTPBgnEndInfo
 {
     NCDIpConfig ipConfig;
@@ -28,6 +21,16 @@ typedef struct NHTTPBgnEndInfo
     u32 _unk7DC;
     void* threadStack;
 } NHTTPBgnEndInfo;
+
+typedef struct NHTTPThreadInfo
+{
+    OSMessageQueue messageQueue;
+    OSMessage messages[3];
+    OSThread thread;
+    BOOL createMessageQueue;
+    u8 _unk34C[0x14];
+    char sendBuffer[0x100];
+} NHTTPThreadInfo;
 
 BOOL NHTTPi_IsCreateCommThreadMessageQueue(NHTTPThreadInfo* info);
 void NHTTPi_IsCreateCommThreadMessageQueueOn(NHTTPThreadInfo* info);
