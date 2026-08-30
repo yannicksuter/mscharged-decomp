@@ -1,7 +1,19 @@
 #include "Game/AI/AIPad.h"
 
+#include "NL/glx/GXMaterialCrystalTweaks.h"
+#include "NL/nlConfig.h"
+#include "NL/nlFormat.h"
+
 static float g_fMovementDeadZone = 0.3f;
 static float g_fCStickDeadZone = 0.5f;
+float lbl_806DB3C8 = 0.5f;
+
+static GXMaterialFloatTweak_804F4190 sTweak_80568410(
+    "DPD_Sensitivity", "Controller Config/DPD", 1.8f);
+static GXMaterialFloatTweak_804F4190 sTweak_80568430(
+    "gfLeftShakeThreshold", "Controller Config", 2.5f);
+static GXMaterialFloatTweak_804F4190 sTweak_80568450(
+    "gfRightShakeThreshold", "Controller Config", 1.33f);
 
 cAIPad AIPadManager::mAIPads[16];
 
@@ -71,7 +83,9 @@ void AIPadManager::Startup()
     for (s8 groupIndex = 0; groupIndex < numGroups; ++groupIndex)
     {
         UnclassifiedControllerGroup* group = fn_80338BF8(lbl_806E20D8, groupIndex);
-        for (s8 controllerIndex = 0; controllerIndex < group->mNumControllers; ++controllerIndex)
+        for (s8 controllerIndex = 0;
+            controllerIndex < group->mNumControllers;
+            ++controllerIndex)
         {
             void* controller = fn_80336B6C(group, controllerIndex);
             s8 padIndex = fn_80336F68(controllerIndex, groupIndex);
@@ -89,4 +103,61 @@ void AIPadManager::Startup()
 extern "C" cAIPad* fn_80007C3C(int index)
 {
     return &AIPadManager::mAIPads[index];
+}
+
+GXMaterialFloatTweak_804F4190::~GXMaterialFloatTweak_804F4190()
+{
+}
+
+void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual2C(
+    TweakValueBase_8052BF70* other)
+{
+    switch (other->UnidentifiedVirtual10())
+    {
+    case 1:
+        value = *(float*)((u8*)other + 0x0C);
+        break;
+    case 2:
+        value = **(float**)((u8*)other + 0x0C);
+        break;
+    }
+}
+
+int GXMaterialFloatTweak_804F4190::UnidentifiedVirtual10()
+{
+    return 1;
+}
+
+int GXMaterialFloatTweak_804F4190::UnidentifiedVirtual0C()
+{
+    return 5;
+}
+
+void* GXMaterialFloatTweak_804F4190::UnidentifiedVirtual20()
+{
+    return &value;
+}
+
+void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual24(
+    char* buffer, unsigned long size)
+{
+    nlSNPrintf(buffer, size, "%.3f", value);
+}
+
+void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual28(
+    const char* string)
+{
+    value = (float)atof(string);
+}
+
+void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual14(
+    float* minimum, float* maximum, float* increment)
+{
+    *minimum = 0.0f;
+    *maximum = 0.0f;
+    *increment = 0.0f;
+}
+
+void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual18()
+{
 }

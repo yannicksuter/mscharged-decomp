@@ -3,7 +3,7 @@
 
 #include "NL/nlSlotPool.h"
 
-void nlPrintf(const char*, ...);
+int nlPrintf(const char*, ...);
 
 template <int kBlockSize>
 class nlSlotPoolFixed : public SlotPoolBase

@@ -23,9 +23,12 @@ public:
     /* 0x00 */ u8 unknown_0x00[0x0C];
     /* 0x0C */ Function1<void, EmissionController&> mUpdateCallback;
     /* 0x14 */ Function1<void, EmissionController&> mFinishedCallback;
-    /* 0x1C */ u8 unknown_0x1C[0x1C];
+    /* 0x1C */ u8 unknown_0x1C[0x0C];
+    /* 0x28 */ u8 m_GlView;
+    /* 0x29 */ u8 unknown_0x29[0x0F];
     /* 0x38 */ bool m_bLingering;
-    /* 0x39 */ u8 unknown_0x39[0x07];
+    /* 0x39 */ u8 unknown_0x39[0x03];
+    /* 0x3C */ float m_fGround;
     /* 0x40 */ u16 m_aFacing;
     /* 0x42 */ u8 unknown_0x42[0x02];
     /* 0x44 */ nlVector3 m_vPosition;

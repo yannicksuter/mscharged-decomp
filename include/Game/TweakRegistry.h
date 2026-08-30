@@ -21,7 +21,6 @@ class TweakNode_8052BEB0;
 struct TweakPendingValue;
 struct TweakRecycledName;
 
-typedef nlSmallBlockAllocator<0x10, 0x20, 0x40, 1> TweakValueAllocator3;
 typedef nlSmallBlockAllocator<0x10, 0x20, 1, 1> TweakValueAllocator2;
 
 extern "C"

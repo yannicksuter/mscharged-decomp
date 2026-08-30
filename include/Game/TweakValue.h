@@ -2,11 +2,15 @@
 #define GAME_TWEAK_VALUE_H
 
 #include "NL/nlMemory.h"
+#include "NL/nlSmallBlockAllocator.h"
 #include "types.h"
 
 class InterpreterCore;
 class TweakEntry_8052BF00;
 struct TweakPendingValue;
+
+typedef nlSmallBlockAllocator<0x10, 0x20, 0x40, 1> TweakValueAllocator3;
+extern TweakValueAllocator3* lbl_806E1E58;
 
 class TweakValueBase_8052BF70
 {
@@ -17,7 +21,10 @@ public:
     virtual int UnidentifiedVirtual10();
     virtual void UnidentifiedVirtual14(float*, float*, float*);
     virtual void UnidentifiedVirtual18();
-    virtual void UnidentifiedVirtual1C();
+    virtual void* UnidentifiedVirtual1C()
+    {
+        return 0;
+    }
     virtual void* UnidentifiedVirtual20();
     virtual void UnidentifiedVirtual24(char*, unsigned long);
     virtual void UnidentifiedVirtual28(const char*);

@@ -139,6 +139,20 @@ public:
         }
     }
 
+    template <typename CallbackType>
+    bool InorderWalk(Entry* curr, CallbackType* callback)
+    {
+        while (curr != 0)
+        {
+            if (!InorderWalk((Entry*)curr->node.left, callback))
+                return false;
+            if (!(*callback)(curr->key, curr->value))
+                return false;
+            curr = (Entry*)curr->node.right;
+        }
+        return true;
+    }
+
     nlAVLTreeIterator<KeyType, ValueType, CompareType>* GetIterator();
 
     static void DeleteEntry(AVLTreeUntemplated* tree, AVLTreeNode* entry)

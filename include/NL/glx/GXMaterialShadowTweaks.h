@@ -63,7 +63,6 @@ public:
     virtual int UnidentifiedVirtual10();
     virtual void UnidentifiedVirtual14(float*, float*, float*);
     virtual void UnidentifiedVirtual18();
-    virtual void UnidentifiedVirtual1C();
     virtual void* UnidentifiedVirtual20();
     virtual void UnidentifiedVirtual24(char*, unsigned long);
     virtual void UnidentifiedVirtual28(const char*);

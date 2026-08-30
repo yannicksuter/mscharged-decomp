@@ -13,13 +13,13 @@ Sections:
 	.sdata2     type:rodata align:8
 	.sbss2      type:bss align:16
 
-unclassified/tu_80007400.cpp:
-	.text       start:0x80007400 end:0x800080C0
+Game/AIPad.cpp:
+	.text       start:0x80007400 end:0x8000821C
 	.ctors      start:0x804DB4E4 end:0x804DB4E8
 	.rodata     start:0x804DBC00 end:0x804DBC10
 	.data       start:0x804F4120 end:0x804F41C0
-	.bss        start:0x80568460 end:0x8056B260
-	.sdata      start:0x806DB3C0 end:0x806DB3CC
+	.bss        start:0x80568400 end:0x8056B260
+	.sdata      start:0x806DB3C0 end:0x806DB3D8
 	.sdata2     start:0x806E3060 end:0x806E3080
 
 Game/AI/AiUtil.cpp:
@@ -678,6 +678,12 @@ unclassified/tu_801B369C.cpp:
 	.sbss       start:0x806E16C8 end:0x806E16E8
 	.sdata2     start:0x806E5388 end:0x806E53E8
 
+Game/WorldTriggers.cpp:
+	.text       start:0x801BE234 end:0x801BE408
+	.rodata     start:0x804DCFD8 end:0x804DCFE4
+	.data       start:0x80515CA8 end:0x80515CB8
+	.sdata2     start:0x806E5460 end:0x806E5464
+
 Game/FE/feManager.cpp:
 	.text       start:0x801C3920 end:0x801C4B7C
 	.ctors      start:0x804DB76C end:0x804DB770
@@ -685,6 +691,13 @@ Game/FE/feManager.cpp:
 Game/FE/GameSceneManager.cpp:
 	.text       start:0x801C6174 end:0x801C620C
 	.data       start:0x805170A8 end:0x805170C0
+
+Game/FE/Overlay/OverlayHandlerInGameText.cpp:
+	.text       start:0x801EBD10 end:0x801ED8FC
+	.rodata     start:0x804E83D8 end:0x804E8438
+	.data       start:0x8051A060 end:0x8051A100
+	.sdata      start:0x806DD780 end:0x806DD818
+	.sdata2     start:0x806E5710 end:0x806E5718
 
 Game/FE/Overlay/OverlayHandlerDemo.cpp:
 	.text       start:0x801F698C end:0x801F6A24
@@ -703,6 +716,11 @@ unclassified/tu_80209584.cpp:
 	.data       start:0x8051B970 end:0x8051BC98
 	.sdata      start:0x806DDC48 end:0x806DDC60
 	.sdata2     start:0x806E5848 end:0x806E5860
+
+Game/SH/SHGameResults.cpp:
+	.text       start:0x8020A38C end:0x8020A74C
+	.data       start:0x8051BC98 end:0x8051BD08
+	.sdata      start:0x806DDC60 end:0x806DDC80
 
 unclassified/tu_80219248.cpp:
 	.text       start:0x80219248 end:0x80219668
@@ -1460,6 +1478,13 @@ NL/gl/glFont.cpp:
 	.sbss       start:0x806E1EB8 end:0x806E1ED0
 	.sdata2     start:0x806E6310 end:0x806E632C
 
+NL/gl/glLoadModel.cpp:
+	.text       start:0x802CA770 end:0x802CBE10
+	.ctors      start:0x804DB9E0 end:0x804DB9E4
+	.data       start:0x8052E220 end:0x8052E270
+	.bss        start:0x8057F1A8 end:0x8057F1C8
+	.sbss       start:0x806E1ED0 end:0x806E1ED8
+
 NL/gl/glMatrix.cpp:
 	.text       start:0x802CBE10 end:0x802CBEC4
 	.sdata      start:0x806DF3F0 end:0x806DF3F4
@@ -1730,6 +1755,13 @@ Game/SAnim/pnFeather.cpp:
 	.data       start:0x80530078 end:0x805300A0
 	.bss        start:0x80584178 end:0x805841A0
 	.sdata2     start:0x806E6808 end:0x806E6820
+
+unclassified/tu_8030E550.cpp:
+	.text       start:0x8030E550 end:0x8030E940
+	.ctors      start:0x804DBAA4 end:0x804DBAA8
+	.data       start:0x805300A0 end:0x805300C8
+	.bss        start:0x805841A0 end:0x805841C8
+	.sdata2     start:0x806E6820 end:0x806E6830
 
 Game/SAnim/AnimRetargeter.cpp:
 	.text       start:0x8030E940 end:0x8030EC30
