@@ -74,7 +74,11 @@ protected:
     /* 0x1F5 */ bool m_bSkipAnimUpdate;
     /* 0x1F6 */ bool m_bForceFeatherUpdate;
     /* 0x1F7 */ u8 mPadding1F7;
+
+public:
     /* 0x1F8 */ nlVector3 m_v3AIPosition;
+
+protected:
     /* 0x204 */ eBallRotationMode m_eBallRotationMode;
     /* 0x208 */ bool m_ResetBaseBallOrientation;
     /* 0x209 */ u8 mPadding209[0x03];

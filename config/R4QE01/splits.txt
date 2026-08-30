@@ -262,6 +262,25 @@ Game/AI/SkillTweaks.cpp:
 	.sbss       start:0x806E0DE0 end:0x806E0DF0
 	.sdata2     start:0x806E3CD8 end:0x806E3D10
 
+Game/AI/SpaceSearch.cpp:
+	.text       start:0x800A3FC8 end:0x800A5D34
+	.ctors      start:0x804DB54C end:0x804DB550
+	.rodata     start:0x804DC100 end:0x804DC110
+	.data       start:0x805008D0 end:0x80500940
+	.sdata      start:0x806DBED0 end:0x806DBEF0
+	.sbss       start:0x806E0DF0 end:0x806E0DF8
+	.sdata2     start:0x806E3D10 end:0x806E3D90
+
+Game/Team.cpp:
+	.text       start:0x800A5D34 end:0x800A9140
+	.ctors      start:0x804DB550 end:0x804DB554
+	.rodata     start:0x804DC110 end:0x804DC180
+	.data       start:0x80500940 end:0x80500BE8
+	.bss        start:0x8056D988 end:0x8056D9A0
+	.sdata      start:0x806DBEF0 end:0x806DBF18
+	.sbss       start:0x806E0DF8 end:0x806E0E10
+	.sdata2     start:0x806E3D90 end:0x806E3DD8
+
 unclassified/tu_800A9140.cpp:
 	.text       start:0x800A9140 end:0x800A9588
 	.ctors      start:0x804DB554 end:0x804DB558
@@ -271,7 +290,8 @@ unclassified/tu_800A9140.cpp:
 	.sdata2     start:0x806E3DD8 end:0x806E3DE8
 
 unclassified/tu_800A9588.cpp:
-	.text       start:0x800A9588 end:0x800A9AC0
+	.text       start:0x800A9588 end:0x800A9AE0
+	.ctors      start:0x804DB558 end:0x804DB55C
 	.data       start:0x80500CC0 end:0x80500D18
 	.sdata      start:0x806DBF1C end:0x806DBF20
 	.sdata2     start:0x806E3DE8 end:0x806E3E00
@@ -279,6 +299,15 @@ unclassified/tu_800A9588.cpp:
 Game/TweaksBase.cpp:
 	.text       start:0x800A9AE0 end:0x800A9B78
 	.data       start:0x80500D18 end:0x80500D28
+
+unclassified/tu_800A9B78.cpp:
+	.text       start:0x800A9B78 end:0x800B0358
+	.ctors      start:0x804DB55C end:0x804DB560
+	.data       start:0x80500D28 end:0x805012B8
+	.bss        start:0x8056D9E8 end:0x8056DA00
+	.sdata      start:0x806DBF20 end:0x806DC04C
+	.sbss       start:0x806E0E10 end:0x806E0E68
+	.sdata2     start:0x806E3E00 end:0x806E3EA0
 
 Game/AI/Desire.cpp:
 	.text       start:0x800B0358 end:0x800B6DC0

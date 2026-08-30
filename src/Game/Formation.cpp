@@ -926,7 +926,7 @@ cPlayer* FormationEval::GetKeyPlayer()
         }
         else
         {
-            pKeyPlayer = team->m_pBallInterceptOrderedFielders[0];
+            pKeyPlayer = team->mpBestBallInterceptor;
         }
     }
 
