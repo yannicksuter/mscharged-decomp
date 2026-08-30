@@ -1317,7 +1317,7 @@ bool cFielder::DoCommonInitActionLooseBall(
     float fMaxCatchupSpeed = fn_8002E1B0(this);
     float fMinBallZ = lbl_806E35FC;
     bool bNoContactFound = true;
-    bool bBallState5 = g_pBall->m_unk_0xA4 == 5;
+    bool bBallState5 = g_pBall->meBallState == 5;
 
     while (fSimulatedTime < fMaxSimulatedTime)
     {
@@ -2013,7 +2013,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
         m_pTeam->GetGoalie()->fn_8008E2D0();
         m_pTeam->GetOtherTeam()->GetGoalie()->fn_8008E2D0();
 
-        g_pBall->mUnidentified4A = true;
+        g_pBall->mbBallFrozen = true;
         muInvincibleStatus |= 0x1F;
 
         m_pTeam->GetOtherTeam()->GetGoalie()->fn_8008EF58();
@@ -4954,7 +4954,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
         {
             fn_80037AC8(this, 0);
 
-            if (g_pBall->m_unk_0xA4 == 8)
+            if (g_pBall->meBallState == 8)
             {
                 if (m_eCharacterClass == (eCharacterClass)0x11)
                 {
@@ -5047,7 +5047,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
     }
 
     if (g_pBall->m_pOwner == 0 && !fn_80014E20(g_pBall)
-        && g_pBall->m_tShotTimer.m_uPackedTime == 0
+        && g_pBall->m_tLightningTimer.m_uPackedTime == 0
         && !(g_pBall->m_tNoPickupTimer.m_uPackedTime != 0
             && g_pBall->m_pPrevOwner != 0
             && g_pBall->m_pPrevOwner->m_eClassType == GOALIE))
@@ -5062,8 +5062,8 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
         if (bTouched && bCanPickup)
         {
-            bool bAirborne = g_pBall->m_unk_0xA4 == 5
-                || g_pBall->m_unk_0xA4 == 3;
+            bool bAirborne = g_pBall->meBallState == 5
+                || g_pBall->meBallState == 3;
             bool bStolen = bAirborne && g_pBall->m_pPassTarget != 0;
 
             if (bStolen && g_pBall->m_pPrevOwner != 0

@@ -9,6 +9,7 @@ class cBall;
 class PhysicsBall : public PhysicsSphere
 {
 public:
+    PhysicsBall(float radius);
     static float GetBallMaxVelocity();
 
 public:
@@ -24,9 +25,10 @@ public:
     /* 0x54 */ bool mUnidentified054;
 
 private:
-    /* 0x55 */ u8 mUnidentified055[0x0F];
+    /* 0x55 */ u8 mUnidentified055[0x0B];
 
 public:
+    /* 0x60 */ float mUnidentified060;
     /* 0x64 */ float mUnidentified064;
 
     /* 0x68 */ cBall* m_pBall;

@@ -1615,7 +1615,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
     case 0x10:
     {
         cBall* pBall = ((PhysicsBall*)pObjB)->m_pBall;
-        if (pBall->m_bBallPathChangeCount != 0)
+        if (pBall->m_bVisible != 0)
         {
             if (pBall->m_pOwner == 0)
             {
