@@ -31,6 +31,7 @@ public:
     static float GetPenaltyBoxY();
     static bool IsOnField(const nlVector3& location);
     static bool IsOnField(const nlVector2& location);
+    static bool FixOutOfBoundsPosition(nlVector3& v, float fMinDistanceFromWall, bool);
     static void SetFieldDimensions(float fX, float fY, float fZ);
 
     static const sSideLinePlane& GetSideline(int index)
