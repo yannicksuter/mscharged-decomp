@@ -1,3 +1,6 @@
+#include "Game/Render/Impostor.h"
+#include "Game/Render/ImpostorCharacter.h"
+#include "Game/Render/ImpostorManager.h"
 #include "NL/glx/GXMaterialCrystalTweaks.h"
 #include "NL/glx/GXMaterialShadowTweaks.h"
 #include "NL/glx/glxTexture.h"
@@ -33,16 +36,6 @@ struct MatrixOwner_801A4FC8
     nlMatrix4 matrix;
 };
 
-struct FloatReferences_801A505C
-{
-    char _000[0x48];
-    float* value48;
-    char _04C[0x0C];
-    float* value58;
-    char _05C[0x0C];
-    float* value68;
-};
-
 class Lookup_801A537C
 {
 public:
@@ -58,31 +51,10 @@ public:
     /* 0x08 */ int mHeight;
 }; // size: 0x0C
 
-struct ImpostorEntry_801A51D8
-{
-    char _000[0x0C];
-    nlVector2 lookupPosition;
-    char _014[0x0E];
-    nlColour colour;
-    char _026[0x0A];
-}; // size: 0x30
-
-struct ImpostorEntries_801A51D8
-{
-    char _000[4];
-    ImpostorEntry_801A51D8* entries;
-};
-
 extern GXMaterialFloatTweak_804F4190 lbl_80570968;
 extern GXMaterialFloatTweak_804F4190 lbl_80570988;
 extern GXMaterialFloatTweak_804F4190 lbl_805709A8;
 extern GXMaterialFloatTweak_804F4190 lbl_805709C8;
-
-extern "C"
-{
-    ImpostorEntries_801A51D8* fn_802D5F6C();
-    int fn_802D6118(ImpostorEntries_801A51D8* entries);
-}
 
 static GXMaterialColourTweak_804FC520 g_ShadowRed(
     "g_ShadowRed", "/Render/Impostor/Lookup/Tint");
@@ -121,28 +93,7 @@ extern "C" void fn_801A4FC8(
     owner->matrix = matrix;
 }
 
-extern "C" float fn_801A505C(FloatReferences_801A505C* references)
-{
-    return *references->value58;
-}
-
-extern "C" float fn_801A5068(FloatReferences_801A505C* references)
-{
-    return *references->value68;
-}
-
-extern "C" float fn_801A5074(FloatReferences_801A505C* references)
-{
-    return *references->value48;
-}
-
-extern "C" void fn_801A5080(
-    FloatReferences_801A505C* references, float value)
-{
-    *references->value48 = value;
-}
-
-extern "C" nlColour fn_801A508C(const nlVector2* position)
+extern "C" nlColour fn_801A508C(const nlVector3* position)
 {
     nlColour colour;
     if (lbl_806E15B8 == 0)
@@ -178,12 +129,12 @@ extern "C" void fn_801A51D8()
         return;
     }
 
-    ImpostorEntries_801A51D8* impostors = fn_802D5F6C();
-    int count = fn_802D6118(impostors);
-    ImpostorEntry_801A51D8* entry = fn_802D5F6C()->entries;
+    ImpostorManager* impostors = ImpostorManager::GetInstance();
+    int count = impostors->GetNumImpostors();
+    Impostor* entry = ImpostorManager::GetInstance()->mImpostors;
     for (int i = 0; i < count; ++i, ++entry)
     {
-        entry->colour = fn_801A508C(&entry->lookupPosition);
+        entry->mColour = fn_801A508C(&entry->mPosition);
     }
 }
 

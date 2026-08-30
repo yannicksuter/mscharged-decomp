@@ -1,6 +1,8 @@
 #ifndef NL_RING_H
 #define NL_RING_H
 
+#include "types.h"
+
 template <typename T>
 inline void nlRingAddStart(T** list, T* item)
 {
@@ -49,6 +51,31 @@ inline void nlDeleteRing(T** head)
         }
         *head = 0;
     }
+}
+
+template <typename T>
+inline u32 nlRingCountElements(T* head)
+{
+    T* current;
+    u32 count = 0;
+
+    if (head == 0)
+    {
+        return 0;
+    }
+
+    current = head->m_next;
+    while (true)
+    {
+        T* next = current->m_next;
+        count++;
+        if (current == head)
+        {
+            break;
+        }
+        current = next;
+    }
+    return count;
 }
 
 template <typename T, typename CallbackType>

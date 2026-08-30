@@ -8,6 +8,7 @@
 #include "Game/GameTweaks.h"
 #include "Game/InterpreterCore.h"
 #include "Game/MathHelpers.h"
+#include "Game/Player.h"
 #include "Game/Team.h"
 #include "NL/nlList.h"
 #include "NL/nlMemory.h"
@@ -42,7 +43,6 @@ extern "C" cPlayer* fn_800DF790(cTeam*);
 extern "C" cFielder* fn_800A8800(cTeam*);
 extern "C" cFielder* fn_800A8808(cTeam*);
 extern "C" cFielder* fn_800A8884(cTeam*);
-extern "C" nlVector3 fn_80098060(cFielder*, void*);
 extern "C" void fn_800180F4(cBall*, nlVector3*, float);
 extern "C" float fn_800DFF1C();
 extern "C" void fn_8004F594(int, const char*, ...);
@@ -1253,7 +1253,7 @@ float FormationDefensive::IsFielderInPosition(
         lbl_8056CF08.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
 
     nlVector3 v3FielderPos = pFielder->m_v3Position;
-    nlVector3 v3NetLocation = fn_80098060(pFielder, 0);
+    nlVector3 v3NetLocation = pFielder->GetAIOffNetLocation(0);
     const FormationPositionThresholds* pPositionThresholds
         = &g_aDefensiveFormationThresholds[pFielder->m_eRole];
 
@@ -1379,7 +1379,7 @@ float FormationOffensive::IsFielderInPosition(
         lbl_8056CF08.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
 
     nlVector3 v3FielderPos = pFielder->m_v3Position;
-    nlVector3 v3NetLocation = fn_80098060(pFielder, 0);
+    nlVector3 v3NetLocation = pFielder->GetAIOffNetLocation(0);
     const FormationPositionThresholds* pPositionThresholds
         = &g_aDefensiveFormationThresholds[pFielder->m_eRole];
 

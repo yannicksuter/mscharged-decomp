@@ -188,8 +188,9 @@ void cFielder::fn_8004FB04()
     event.pFielder = this;
     fn_80060014(lbl_806E0C94, &event);
 
-    fn_801A0500(lbl_806DBA0C, this,
-        FMAX(lbl_806DB9F4, lbl_806DB9F8) + 0.5f);
+    float fParam = FMAX(lbl_806DB9F4, lbl_806DB9F8);
+    fParam += 0.5f;
+    fn_801A0500(lbl_806DBA0C, this, fParam);
 }
 
 void cFielder::fn_8004FC90(float fDeltaT)

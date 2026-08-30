@@ -40,9 +40,6 @@ static DWCiFriendControl* sFriendControl;
 
 void* fn_8048C530(void);
 BOOL fn_8048CF50(void);
-int fn_8049E4CC(void* userData, const DWCFriendData* friendData);
-BOOL fn_804A9EE4(GPConnection* connection, int profileId);
-GPResult fn_804A9F5C(GPConnection* connection, int profileId);
 GPResult fn_8048AFCC(GPEnum status, const char* statusString,
     const char* locationString);
 
@@ -72,10 +69,10 @@ void DWC_DeleteBuddyFriendData(DWCFriendData* friendData)
 
     if (sFriendControl != NULL && fn_8048CF50() != FALSE && fn_8048C530() != NULL)
     {
-        profileId = fn_8049E4CC(fn_8048C530(), friendData);
-        if (profileId != 0 && profileId != -1 && fn_804A9EE4(sFriendControl->connection, profileId))
+        profileId = DWC_GetGsProfileId(fn_8048C530(), friendData);
+        if (profileId != 0 && profileId != -1 && gpIsBuddy(sFriendControl->connection, profileId))
         {
-            fn_804A9F5C(sFriendControl->connection, profileId);
+            gpDeleteBuddy(sFriendControl->connection, profileId);
             DWC_Printf(4, "DWC_DeleteBuddyFriendData : Deleted buddy.\n");
             goto clear_data;
         }

@@ -51,7 +51,6 @@ public:
     virtual bool fn_80219668();
     virtual bool fn_8030131C(nlVector2 position) const = 0;
 
-protected:
     /* 0x04 */ Callback mCallback0;
     /* 0x0C */ Callback mCallback1;
     /* 0x14 */ Callback mCallback2;

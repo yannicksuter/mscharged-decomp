@@ -262,7 +262,6 @@ extern "C" void fn_8009591C(cPlayer* pPlayer, bool bParam);
 extern "C" cFielder* fn_8009664C(
     Goalie* pGoalie, const nlVector3& v3Position, bool bParam);
 extern "C" UnidentifiedGoalieSkillTweaks* fn_800A636C(void* pTeam);
-extern "C" cPlayer* fn_800A6A84(cTeam* pTeam, int nIndex);
 extern "C" void fn_80139D1C(int nParam, void* pParam);
 extern "C" void fn_801BABEC(cPlayer* pPlayer);
 extern "C" void fn_801BAF0C(cPlayer* pPlayer);
@@ -3084,7 +3083,7 @@ void Goalie::InitActionPostWhistle()
 
     mnOffplayPending = GOALIE_OFFPLAY_NONE;
     mbPickedUp = false;
-    SetAnimState(5, false, 0.2f, false, false);
+    SetAnimState(5, false, 0.0f, false, false);
     InitActionMove(false);
 }
 
@@ -4408,7 +4407,7 @@ void Goalie::InitActionPreCrouch(eGoalieCrouchType crouchType)
     mbIsDown = false;
     SetGoalieAction(GOALIEACTION_PRE_CROUCH, 0);
     PlayNewAnim(0x2C);
-    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    InitMovementFromAnim(0, v3Zero, 0.0f, false);
 }
 
 void Goalie::fn_8008BBB0(
@@ -4779,8 +4778,7 @@ void Goalie::InitActionLooseBallSetup()
         for (int nPlayerIndex = 0; nPlayerIndex < 4;
             ++nPlayerIndex)
         {
-            cPlayer* pPlayer
-                = fn_800A6A84(m_pTeam, nPlayerIndex);
+            cPlayer* pPlayer = m_pTeam->GetPlayer(nPlayerIndex);
             if (pPlayer->GetGlobalPad() != 0)
             {
                 bDoGrab = true;
@@ -6712,7 +6710,7 @@ void Goalie::fn_8008EF58()
 
     for (int i = 0; i < 5; i++)
     {
-        cPlayer* pPlayer = fn_800A6A84(m_pTeam, i);
+        cPlayer* pPlayer = m_pTeam->GetPlayer(i);
         if (pPlayer->m_pController != 0)
         {
             mbMegaUserSave = true;

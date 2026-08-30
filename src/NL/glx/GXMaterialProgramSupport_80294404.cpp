@@ -39,8 +39,7 @@ nlMatrix4 lbl_8057B258;
 bool lbl_806E1B70;
 void* lbl_806E1B74;
 int lbl_806E1B78;
-float lbl_806E1B80;
-float lbl_806E1B84;
+float lbl_806E1B80[2];
 
 extern "C" void fn_80294404(int mode)
 {
@@ -88,8 +87,8 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029DE3C>::Activate(GLView* view)
 {
     lbl_806E1B78 = 4;
-    lbl_806E1B80 = 10000000000.0f;
-    lbl_806E1B84 = 10000000000.0f;
+    lbl_806E1B80[0] = 10000000000.0f;
+    lbl_806E1B80[1] = 10000000000.0f;
     static_cast<GXMaterialProgram_8029DE3C*>(this)->ConfigureVertexFormat(true);
     view->m_Interface->GetViewMatrix(lbl_8057B258);
     lbl_806E1B74 = fn_80182240(0, 1);

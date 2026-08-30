@@ -732,6 +732,12 @@ Game/FE/feButtonComponent.cpp:
 	.sdata      start:0x806DE000 end:0x806DE038
 	.sdata2     start:0x806E58E0 end:0x806E5904
 
+Game/SH/SHSceneBase.cpp:
+	.text       start:0x80269078 end:0x8026B10C
+	.data       start:0x80520A68 end:0x80520CD8
+	.sdata      start:0x806DECB8 end:0x806DED40
+	.sdata2     start:0x806E5BD0 end:0x806E5BE0
+
 Game/Render/RLView.cpp:
 	.text       start:0x80271C48 end:0x80271DE0
 	.data       start:0x80520FC0 end:0x80520FE0
@@ -1531,6 +1537,29 @@ Game/GL/GLInventory.cpp:
 	.text       start:0x802D2B2C end:0x802D38A4
 	.data       start:0x8052E5C0 end:0x8052E758
 
+Game/Render/Impostor.cpp:
+	.text       start:0x802D5740 end:0x802D58E8
+	.ctors      start:0x804DB9FC end:0x804DBA00
+	.data       start:0x8052E818 end:0x8052E824
+	.sdata2     start:0x806E63D0 end:0x806E63D4
+
+Game/Render/ImpostorManager.cpp:
+	.text       start:0x802D58E8 end:0x802D6EA4
+	.ctors      start:0x804DBA00 end:0x804DBA04
+	.data       start:0x8052E828 end:0x8052E900
+	.bss        start:0x8057F2A8 end:0x8057F350
+	.sdata      start:0x806DF428 end:0x806DF438
+	.sbss       start:0x806E1F60 end:0x806E1F68
+	.sdata2     start:0x806E63D8 end:0x806E63F0
+
+Game/Render/ImpostorCharacter.cpp:
+	.text       start:0x802D6EA4 end:0x802D818C
+	.ctors      start:0x804DBA04 end:0x804DBA08
+	.data       start:0x8052E900 end:0x8052EA20
+	.sdata      start:0x806DF438 end:0x806DF440
+	.sbss       start:0x806E1F68 end:0x806E1F6C
+	.sdata2     start:0x806E63F0 end:0x806E642C
+
 Game/InterpreterCore.cpp:
 	.text       start:0x802DE284 end:0x802E0010
 	.ctors      start:0x804DBA1C end:0x804DBA20
@@ -1756,8 +1785,8 @@ Game/SAnim/pnFeather.cpp:
 	.bss        start:0x80584178 end:0x805841A0
 	.sdata2     start:0x806E6808 end:0x806E6820
 
-unclassified/tu_8030E550.cpp:
-	.text       start:0x8030E550 end:0x8030E940
+Game/SAnim/tu_8030E550.cpp:
+	.text       start:0x8030E550 end:0x8030E8C8
 	.ctors      start:0x804DBAA4 end:0x804DBAA8
 	.data       start:0x805300A0 end:0x805300C8
 	.bss        start:0x805841A0 end:0x805841C8
@@ -2782,6 +2811,12 @@ RVL_SDK/os/OSNandbootInfo.c:
 RVL_SDK/os/__ppc_eabi_init.c:
 	.init       start:0x800063C8 end:0x80006420
 	.text       start:0x803BE868 end:0x803BE91C
+
+RVL_SDK/pad/Pad.c:
+	.text       start:0x803BE91C end:0x803BFB3C
+	.bss        start:0x805D5BC0 end:0x805D5C40
+	.sdata      start:0x806DFD40 end:0x806DFD60
+	.sbss       start:0x806E29A0 end:0x806E29C0
 
 RVL_SDK/si/SIBios.c:
 	.text       start:0x803BFB3C end:0x803C0F30
@@ -3827,7 +3862,7 @@ RVL_SDK/hbm/nw4hbm/snd/snd_SoundArchiveLoader.cpp:
 	.data       start:0x8055CF00 end:0x8055CF48
 
 RVL_SDK/hbm/nw4hbm/snd/snd_SoundArchivePlayer.cpp:
-	.text       start:0x80467210 end:0x8046A7AC
+	.text       start:0x80467210 end:0x8046A8DC
 
 RVL_SDK/hbm/nw4hbm/snd/snd_SoundHandle.cpp:
 	.text       start:0x8046A8DC end:0x8046A9A8
@@ -3921,7 +3956,7 @@ RVL_SDK/hbm/nw4hbm/snd/snd_WsdFile.cpp:
 	.sdata2     start:0x806E7990 end:0x806E7994
 
 RVL_SDK/hbm/nw4hbm/snd/snd_WsdPlayer.cpp:
-	.text       start:0x80472AA0 end:0x80473B70
+	.text       start:0x80472AA0 end:0x80473B88
 	.ctors      start:0x804DBBA0 end:0x804DBBA4
 
 RVL_SDK/hbm/nw4hbm/snd/snd_WsdTrack.cpp:

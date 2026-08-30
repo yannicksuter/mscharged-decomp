@@ -11,7 +11,7 @@ public:
     virtual ~cPoseNode();
     virtual void Evaluate(int nodeIndex, float weight, cPoseAccumulator* accumulator) const = 0;
     virtual void Evaluate(float weight, cPoseAccumulator* accumulator) const = 0;
-    virtual void fn_80307A08(
+    virtual void EvaluateScale(
         int nodeIndex, float weight, cPoseAccumulator* accumulator) const;
     virtual cPoseNode* Update(float dt) = 0;
     virtual int GetType() = 0;

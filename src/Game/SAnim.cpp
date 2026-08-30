@@ -190,7 +190,7 @@ void cSAnim::BlendTrans(int nAccumulatorNode, int nSAnimNode, float fTime,
     }
 }
 
-void cSAnim::fn_80308E30(int accumulatorNode, int animNode, float time,
+void cSAnim::BlendScaleMultiply(int accumulatorNode, int animNode, float time,
     float weight, cPoseAccumulator* accumulator) const
 {
     PackedScale* pKeys = m_pScaleKeys[animNode];
@@ -222,7 +222,7 @@ void cSAnim::fn_80308E30(int accumulatorNode, int animNode, float time,
             scale.z = (1.0f - fFrac) * scale1.z + fFrac * scale2.z;
         }
 
-        accumulator->fn_8030C1B0(accumulatorNode, &scale, weight);
+        accumulator->MultiplyScale(accumulatorNode, &scale, weight);
     }
 }
 

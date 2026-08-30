@@ -71,6 +71,13 @@ public:
         Deallocate(entry, outData);
     }
 
+    void Remove(nlDLListIterator<T>* position)
+    {
+        DLListEntry<T>* entry = position->next();
+        nlDLRingRemove(&m_Head, entry);
+        m_Allocator.DeleteEntry(entry);
+    }
+
     nlDLListIterator<T> Begin() const
     {
         return nlDLListIterator<T>(m_Head, nlDLRingGetStart(m_Head));
@@ -107,6 +114,12 @@ public:
         : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >()
     {
         this->m_Allocator.Initialize(16, 16);
+    }
+
+    ~nlDLListSlotPool()
+    {
+        this->Clear();
+        this->m_Allocator.FreeBlocks();
     }
 
     nlDLListSlotPool(const int initial)

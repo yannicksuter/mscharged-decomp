@@ -132,6 +132,12 @@ inline T* nlDLRingRemoveEnd(T** head)
 }
 
 template <typename T>
+inline u32 nlDLRingCountElements(T* head)
+{
+    return nlRingCountElements(head);
+}
+
+template <typename T>
 inline bool nlDLRingValidateContainsElement(T* head, const T* node)
 {
     if (head == 0)
