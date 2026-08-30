@@ -10,6 +10,10 @@ const static u8 InitialHistoryRange[10] = {
     3, 8, 0, 6, 7, 9, 7, 0, 3, 5
 };
 
+FilteredRandomRange::~FilteredRandomRange()
+{
+}
+
 int FilteredRandomRange::genrand(int range)
 {
     return nlRandom(range);
