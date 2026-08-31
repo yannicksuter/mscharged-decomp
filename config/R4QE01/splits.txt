@@ -1954,6 +1954,7 @@ unclassified/tu_802F076C.cpp:
 
 unclassified/tu_802F1758.cpp:
 	.text       start:0x802F1758 end:0x802F1FF8
+	.sdata2     start:0x806E6608 end:0x806E6614
 
 unclassified/tu_802F2110.cpp:
 	.text       start:0x802F2110 end:0x802F2B24

@@ -1,3 +1,4 @@
+#include "Game/Audio/XSoundHandle_802ED74C.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
 
@@ -85,7 +86,17 @@ struct CueHandle_802F1758
     SoundInstance_802F1758* instance;
     SliderState_802F1758* slider;
     float sliderValue;
-    u32 stateAndFlags;
+    union
+    {
+        u32 stateAndFlags;
+        struct
+        {
+            u32 savedState : 16;
+            u32 field_8000 : 1;
+            u32 field_4000 : 1;
+            u32 field_3FFF : 14;
+        } bits;
+    };
 };
 
 struct AudioResources_802F1758
@@ -280,7 +291,7 @@ extern "C" void fn_802F1BB4(CueHandle_802F1758* handle, u8 callbackEnabled, void
 
 extern "C" void fn_802F1C40(CueHandle_802F1758* handle)
 {
-    handle->stateAndFlags = (handle->stateAndFlags & 0xFFFF) | (handle->state << 16);
+    handle->bits.savedState = handle->state;
     handle->state = 5;
     fn_802F2640(handle->instance);
 }
@@ -316,7 +327,7 @@ extern "C" void fn_802F1C74(CueHandle_802F1758* handle, float dt)
                 if (handle->instance->state == 3)
                 {
                     handle->state = 3;
-                    if (handle->stateAndFlags & 0x4000)
+                    if (handle->bits.field_4000)
                     {
                         fn_802F2320(handle->instance, 0.0f);
                         handle->state = handle->instance->state;
@@ -331,10 +342,7 @@ extern "C" void fn_802F1C74(CueHandle_802F1758* handle, float dt)
     }
 
     if (handle->state == 8 && handle->callbackEnabled)
-    {
-        typedef void (*Method)(CueHandle_802F1758*);
-        ((Method)handle->vtable[10])(handle);
-    }
+        ((XSoundHandle_802ED74C*)handle)->fn_802ED74C_10();
 }
 
 extern "C" void fn_802F1DC4(CueHandle_802F1758* handle, float dt)
