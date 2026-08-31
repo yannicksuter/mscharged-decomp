@@ -783,6 +783,12 @@ Game/Drawable/DrawableYoshiEgg.cpp:
 	.sdata      start:0x806DCC28 end:0x806DCC40
 	.sdata2     start:0x806E4CB0 end:0x806E4CD0
 
+Game/GameObjectLighting.cpp:
+	.text       start:0x801826D0 end:0x80183DEC
+	.rodata     start:0x804DCCF0 end:0x804DCD00
+	.bss        start:0x80570C00 end:0x80570C18
+	.sdata2     start:0x806E4CE0 end:0x806E4D10
+
 unclassified/tu_8018480C.cpp:
 	.text       start:0x8018480C end:0x80184AAC
 	.sdata      start:0x806DCC98 end:0x806DCCA0

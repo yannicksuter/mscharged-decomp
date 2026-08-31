@@ -8,6 +8,7 @@
 #include "NL/nlColour.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
+#include "unclassified/Lookup_801A537C.h"
 
 class ArrayOwner_801A4EC0
 {
@@ -35,21 +36,6 @@ struct MatrixOwner_801A4FC8
     char _000[0x20];
     nlMatrix4 matrix;
 };
-
-class Lookup_801A537C
-{
-public:
-    Lookup_801A537C();
-    ~Lookup_801A537C();
-    void fn_801A53F0(u32 textureHandle);
-    nlColour fn_801A54D0(int x, int y, bool tint) const;
-    nlColour fn_801A5760(float x, float y, bool tint) const;
-    u8 fn_801A59EC(const PlatTexture* texture, int x, int y) const;
-
-    /* 0x00 */ u8* mValues;
-    /* 0x04 */ int mWidth;
-    /* 0x08 */ int mHeight;
-}; // size: 0x0C
 
 extern GXMaterialFloatTweak_804F4190 lbl_80570968;
 extern GXMaterialFloatTweak_804F4190 lbl_80570988;

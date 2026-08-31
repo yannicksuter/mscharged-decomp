@@ -1,4 +1,5 @@
 #include "Game/Drawable/DrawableCharacter.h"
+#include "Game/GameObjectLighting.h"
 
 #include "Game/BasicStadium.h"
 #include "Game/CharacterEffects.h"
@@ -264,7 +265,6 @@ extern "C" SkinMesh* fn_8001C550(Character*, int);
 extern "C" void fn_8001C574(Character*);
 extern "C" void fn_8001D6F4(Character*, cPoseAccumulator*, int);
 extern "C" void fn_8001EFCC(Character*, SkinMesh*, Model*);
-extern "C" bool fn_80182120();
 extern "C" void fn_80182EC8(int);
 extern "C" int fn_800FC748(int);
 extern "C" int fn_80183DEC(const nlVector3*);
@@ -346,7 +346,7 @@ u8 lbl_806E13B8;
 Character* DrawableCharacter::renderOnlyCharacter;
 bool DrawableCharacter::renderOpposingGoalie;
 u8 lbl_806E13C1;
-u8 lbl_806E13C2;
+bool DrawableCharacter::sCameraRelativeLighting;
 
 extern int lbl_806E0F54;
 extern int lbl_80573CA8[];
@@ -766,7 +766,7 @@ void DrawableCharacter::SendToGl(Character& source, int renderPass)
     {
         fn_80182EC8(2);
     }
-    else if (lbl_806E13C2 || fn_80182120())
+    else if (sCameraRelativeLighting || AlwaysUseCameraRelativeCharacterLighting())
     {
         fn_80182EC8(1);
     }

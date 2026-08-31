@@ -86,6 +86,7 @@ public:
 
     static Character* renderOnlyCharacter;
     static bool renderOpposingGoalie;
+    static bool sCameraRelativeLighting;
 };
 
 #endif // _DRAWABLECHARACTER_H_
