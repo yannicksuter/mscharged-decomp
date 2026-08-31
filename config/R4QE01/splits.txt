@@ -825,6 +825,37 @@ unclassified/tu_80188884.cpp:
 	.sbss       start:0x806E14B0 end:0x806E14B8
 	.sdata2     start:0x806E4DB8 end:0x806E4DC0
 
+Game/ReplayManager.cpp:
+	.text       start:0x80188C5C end:0x80194A0C
+	.ctors      start:0x804DB6CC end:0x804DB6D0
+	.data       start:0x805117A8 end:0x80511920
+	.bss        start:0x80570CA0 end:0x80570CC8
+	.sdata      start:0x806DCD08 end:0x806DCD10
+	.sbss       start:0x806E14B8 end:0x806E14D8
+	.sdata2     start:0x806E4DC0 end:0x806E4E60
+
+Game/ReplayChoreo.cpp:
+	.text       start:0x80194A0C end:0x80196644
+	.ctors      start:0x804DB6D0 end:0x804DB6D4
+	.rodata     start:0x804DCD60 end:0x804DCD80
+	.data       start:0x80511920 end:0x80511AD8
+	.bss        start:0x80570CC8 end:0x805710D0
+	.sdata      start:0x806DCD10 end:0x806DCD50
+	.sbss       start:0x806E14D8 end:0x806E14E0
+	.sdata2     start:0x806E4E60 end:0x806E4EA0
+
+Game/ExcitementSystem.cpp:
+	.text       start:0x80196644 end:0x80197100
+	.data       start:0x80511AD8 end:0x80511BB0
+	.bss        start:0x805710D0 end:0x80571248
+	.sbss       start:0x806E14E0 end:0x806E14E8
+	.sdata2     start:0x806E4EA0 end:0x806E4EB0
+
+unclassified/tu_80197120.cpp:
+	.text       start:0x80197120 end:0x801982A0
+	.ctors      start:0x804DB6D8 end:0x804DB6DC
+	.bss        start:0x80571248 end:0x80571A18
+
 Game/Blinker.cpp:
 	.text       start:0x80199B30 end:0x80199E84
 	.rodata     start:0x804DCD80 end:0x804DCD90

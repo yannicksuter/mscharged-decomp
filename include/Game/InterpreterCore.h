@@ -60,6 +60,11 @@ public:
     void StopWithoutUndo();
     void StopWithUndo();
     void Step();
+    bool FunctionExists(u32 hash)
+    {
+        return fn_802DF3E4(this, &hash) != 0;
+    }
+    bool IsFinished() const { return m_RunState == 2; }
 
 protected:
     u32 Pop()
