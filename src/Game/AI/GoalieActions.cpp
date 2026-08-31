@@ -5797,7 +5797,7 @@ void Goalie::fn_8008E130()
     switch (mGoalieActionState)
     {
     case GOALIEACTION_UNIDENTIFIED_26:
-        break;
+        return;
     default:
     {
         SetGoalieAction(GOALIEACTION_UNIDENTIFIED_27, 0);
@@ -5837,18 +5837,18 @@ void Goalie::fn_8008E130()
         if (m_pBall != 0)
         {
             fn_8007EB90(this);
-        }
 
-        switch (mGoalieActionState)
-        {
-        case GOALIEACTION_MOVE_WB:
-        case GOALIEACTION_LOOSEBALL_CATCH:
-        case GOALIEACTION_LOOSEBALL_PICKUP:
-        case GOALIEACTION_SNAP_BALL:
-            InitActionMove(false);
-            break;
-        default:
-            break;
+            switch (mGoalieActionState)
+            {
+            case GOALIEACTION_MOVE_WB:
+            case GOALIEACTION_LOOSEBALL_CATCH:
+            case GOALIEACTION_LOOSEBALL_PICKUP:
+            case GOALIEACTION_SNAP_BALL:
+                InitActionMove(false);
+                break;
+            default:
+                break;
+            }
         }
 
         bool bHasGlobalPad = GetGlobalPad() != 0;
@@ -5866,7 +5866,7 @@ void Goalie::fn_8008E2D0()
     switch (mGoalieActionState)
     {
     case GOALIEACTION_UNIDENTIFIED_26:
-        break;
+        return;
     default:
         CleanupStun();
         ChooseSwatAnim(1);
@@ -6241,15 +6241,15 @@ void Goalie::ActionChipShotStumble(float deltaTime)
         }
     }
 
-    float x = mv3NavTarget.x;
+    float absX = (float)fabs(mv3NavTarget.x);
 
-    if ((float)fabs(x) > (0.5f + (float)fabs(m_v3Position.x))
+    if (absX > (0.5f + (float)fabs(m_v3Position.x))
         && m_pCurrentAnimController->m_fTime < 0.5f)
     {
         m_aDesiredFacingDirection
             = (u16)(s32)(10430.378f
                          * nlATan2f(m_v3Position.y - mv3NavTarget.y,
-                             m_v3Position.x - x));
+                             m_v3Position.x - mv3NavTarget.x));
 
         GoalieTweaks* pTweaks = (GoalieTweaks*)m_pTweaks;
         float fThrowingDirectionSeekSpeed
@@ -6597,32 +6597,35 @@ void Goalie::InitActionMove(bool bParam)
 
 void Goalie::fn_8008EC2C()
 {
-    if (mGoalieActionState == GOALIEACTION_UNIDENTIFIED_31
-        || mGoalieActionState == GOALIEACTION_UNIDENTIFIED_26)
+    switch (mGoalieActionState)
     {
+    case GOALIEACTION_UNIDENTIFIED_31:
         return;
-    }
+    case GOALIEACTION_UNIDENTIFIED_26:
+        return;
+    default:
+        CleanupStun();
+        ChooseSwatAnim(0);
+        m_pPhysicsCharacter->m_CanCollideWithBall = false;
+        SetGoalieAction(GOALIEACTION_UNIDENTIFIED_29, 0);
+        mbIsDown = true;
+        m_fDesiredSpeed = 0.0f;
+        m_fActualSpeed = 0.0f;
+        SetVelocity(v3Zero);
+        PlayNewAnim(0xAC);
+        InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
-    CleanupStun();
-    ChooseSwatAnim(0);
-    m_pPhysicsCharacter->m_CanCollideWithBall = false;
-    SetGoalieAction(GOALIEACTION_UNIDENTIFIED_29, 0);
-    mbIsDown = true;
-    m_fDesiredSpeed = 0.0f;
-    m_fActualSpeed = 0.0f;
-    SetVelocity(v3Zero);
-    PlayNewAnim(0xAC);
-    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+        if (m_pBall != 0)
+        {
+            fn_80139D1C(1, GetGlobalPad());
+            ReleaseBall(0);
+        }
 
-    if (m_pBall != 0)
-    {
-        fn_80139D1C(1, GetGlobalPad());
-        ReleaseBall(0);
-    }
-
-    if (GetGlobalPad() != 0)
-    {
-        fn_8009591C(this, false);
+        if (GetGlobalPad() != 0)
+        {
+            fn_8009591C(this, false);
+        }
+        break;
     }
 }
 

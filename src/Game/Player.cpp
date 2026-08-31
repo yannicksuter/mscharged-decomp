@@ -152,8 +152,8 @@ void cPlayer::PostPhysicsUpdate()
         float scale = mUnidentified0A0;
         if (scale > 1.0f)
         {
-            jointPos.z -= (scale - 1.0f)
-                        * g_pBall->m_pPhysicsBall->GetRadius();
+            float radius = g_pBall->m_pPhysicsBall->GetRadius();
+            jointPos.z -= radius * (scale - 1.0f);
         }
         m_pPhysicsCharacter->m_SubObject.SetSubObjectPosition(
             jointPos, PhysicsObject::WORLD_COORDINATES);
