@@ -88,11 +88,29 @@ public:
         return nlDLListIterator<T>(m_Head, current);
     }
 
+    T* AllocateAtEnd(unsigned long* outEntry);
+
     void DeleteEntry(DLListEntry<T>* entry);
 
     /* 0x00 */ Adapter m_Allocator;
     /* 0x04 */ DLListEntry<T>* m_Head;
 }; // size: 0x08
+
+template <typename T, typename Adapter>
+inline T* DLListContainerBase<T, Adapter>::AllocateAtEnd(
+    unsigned long* outEntry)
+{
+    DLListEntry<T>* result;
+    m_Allocator.Allocate(result);
+    nlDLRingAddEnd(&m_Head, result);
+
+    if (outEntry != 0)
+    {
+        *outEntry = (unsigned long)result;
+    }
+
+    return &result->entry;
+}
 
 template <typename T>
 class nlDLListContainer

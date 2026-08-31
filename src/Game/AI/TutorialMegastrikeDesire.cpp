@@ -8,7 +8,7 @@ extern "C" Unidentified8002E1A4Result* fn_8002E1A4(cFielder*);
 char lbl_80504000[] = "TutorialMegastrikeDesire";
 
 void TutorialMegastrikeDesire::UnidentifiedUpdate(
-    UnidentifiedDesireUpdate*)
+    UnidentifiedDesireUpdate*, float)
 {
 }
 
@@ -28,8 +28,8 @@ bool TutorialMegastrikeDesire::UnidentifiedInitialize(void*)
     {
         Unidentified8002E1A4Result* state = fn_8002E1A4(m_pTeam->GetFielder(i));
         UnidentifiedStringHash value(name);
-        state->mUnidentified00C = value.mHash;
-        state->mUnidentified010 = value.mUnidentified004;
+        state->mUnidentified00C = value.mUnidentifiedHash;
+        state->mUnidentified010 = value.mUnidentifiedFunction;
     }
 
     return true;

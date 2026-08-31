@@ -70,7 +70,7 @@ public:
     }
 
     template <typename T, typename P1, typename P2, typename P3>
-    R operator()(T* object, P1 p1, P2 p2, P3 p3) const
+    R operator()(T* object, P1& p1, P2& p2, P3& p3) const
     {
         return (object->*mMemFun)(p1, p2, p3);
     }

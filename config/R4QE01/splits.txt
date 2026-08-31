@@ -306,7 +306,7 @@ unclassified/tu_800A9B78.cpp:
 	.data       start:0x80500D28 end:0x805012B8
 	.bss        start:0x8056D9E8 end:0x8056DA00
 	.sdata      start:0x806DBF20 end:0x806DC04C
-	.sbss       start:0x806E0E10 end:0x806E0E68
+	.sbss       start:0x806E0E10 end:0x806E0E48
 	.sdata2     start:0x806E3E00 end:0x806E3EA0
 
 Game/AI/Desire.cpp:
@@ -317,6 +317,93 @@ Game/AI/Desire.cpp:
 	.bss        start:0x8056DA00 end:0x8056DA60
 	.sdata      start:0x806DC04C end:0x806DC0B8
 	.sdata2     start:0x806E3EA0 end:0x806E3F58
+
+Game/AI/DesireMark.cpp:
+	.text       start:0x800B6DC0 end:0x800B93C4
+	.ctors      start:0x804DB564 end:0x804DB568
+	.data       start:0x80501B10 end:0x80501BB8
+	.sdata      start:0x806DC0B8 end:0x806DC118
+	.sdata2     start:0x806E3F58 end:0x806E3F78
+
+Game/AI/DesireMegaStrike.cpp:
+	.text       start:0x800B93C4 end:0x800BA57C
+	.ctors      start:0x804DB568 end:0x804DB56C
+	.data       start:0x80501BB8 end:0x80501C38
+	.sdata      start:0x806DC118 end:0x806DC130
+	.sdata2     start:0x806E3F78 end:0x806E3FC0
+
+Game/AI/DesirePass.cpp:
+	.text       start:0x800BA57C end:0x800BC0C4
+	.ctors      start:0x804DB56C end:0x804DB570
+	.data       start:0x80501C38 end:0x80501D18
+	.sdata      start:0x806DC130 end:0x806DC150
+	.sdata2     start:0x806E3FC0 end:0x806E3FD8
+
+Game/AI/tu_800BC0C4.cpp:
+	.text       start:0x800BC0C4 end:0x800BFCA0
+	.ctors      start:0x804DB570 end:0x804DB574
+	.data       start:0x80501D18 end:0x80502030
+	.sdata      start:0x806DC150 end:0x806DC190
+	.sdata2     start:0x806E3FD8 end:0x806E4008
+
+Game/AI/DesireReceivePass.cpp:
+	.text       start:0x800BFCA0 end:0x800C3D9C
+	.ctors      start:0x804DB574 end:0x804DB578
+	.rodata     start:0x804DC1B0 end:0x804DC328
+	.data       start:0x80502030 end:0x80502538
+	.bss        start:0x8056DA78 end:0x8056DAF8
+	.sdata      start:0x806DC190 end:0x806DC1F8
+	.sbss       start:0x806E0E48 end:0x806E0E50
+	.sdata2     start:0x806E4008 end:0x806E4060
+
+Game/AI/DesireRunToNet.cpp:
+	.text       start:0x800C3D9C end:0x800C4198
+	.ctors      start:0x804DB578 end:0x804DB57C
+	.data       start:0x80502538 end:0x80502578
+	.sdata      start:0x806DC1F8 end:0x806DC208
+	.sdata2     start:0x806E4060 end:0x806E4070
+
+Game/AI/DesireShoot.cpp:
+	.text       start:0x800C4198 end:0x800C53F4
+	.ctors      start:0x804DB57C end:0x804DB580
+	.data       start:0x80502578 end:0x80502648
+	.sdata      start:0x806DC208 end:0x806DC228
+	.sdata2     start:0x806E4070 end:0x806E4090
+
+Game/AI/DesireSteering.cpp:
+	.text       start:0x800C53F4 end:0x800C7DDC
+	.ctors      start:0x804DB580 end:0x804DB584
+	.rodata     start:0x804DC328 end:0x804DC338
+	.data       start:0x80502648 end:0x805027E8
+	.bss        start:0x8056DAF8 end:0x8056DB08
+	.sdata      start:0x806DC228 end:0x806DC238
+	.sbss       start:0x806E0E60 end:0x806E0E68
+	.sdata2     start:0x806E4090 end:0x806E40D8
+
+Game/AI/DesireSlideAttack.cpp:
+	.text       start:0x800C7DDC end:0x800C86FC
+	.data       start:0x805027E8 end:0x80502848
+	.sdata      start:0x806DC238 end:0x806DC240
+	.sdata2     start:0x806E40D8 end:0x806E40F8
+
+Game/AI/DesireSuperPower.cpp:
+	.text       start:0x800C86FC end:0x800D1F84
+	.rodata     start:0x804DC338 end:0x804DC398
+	.data       start:0x80502848 end:0x80502AF8
+	.sdata      start:0x806DC240 end:0x806DC398
+	.sdata2     start:0x806E40F8 end:0x806E4178
+
+Game/AI/DesireUsePowerup.cpp:
+	.text       start:0x800D2074 end:0x800D446C
+	.data       start:0x80502AF8 end:0x80502BE0
+	.sdata      start:0x806DC398 end:0x806DC3A8
+	.sdata2     start:0x806E4178 end:0x806E4190
+
+Game/AI/DesireUserControlled.cpp:
+	.text       start:0x800D448C end:0x800D4E0C
+	.data       start:0x80502BE0 end:0x80502C28
+	.sdata      start:0x806DC3A8 end:0x806DC3B0
+	.sdata2     start:0x806E4190 end:0x806E4198
 
 Game/AI/Scripts/ScriptDefines.cpp:
 	.text       start:0x800D645C end:0x800D6604

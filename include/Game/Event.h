@@ -107,13 +107,11 @@ public:
 
     virtual void Add(Function<T*>& callback, unsigned int value, int flags)
     {
-        ListenerEntry* listener = 0;
-        mListeners.m_Allocator.Allocate(listener);
-        nlDLRingAddEnd(&mListeners.m_Head, listener);
+        Listener* listener = mListeners.AllocateAtEnd(0);
 
         void* target = callback.UnidentifiedTarget();
-        listener->entry.callback.UnidentifiedTransfer(callback);
-        fn_802B2A04(this, &listener->entry, value, flags, target);
+        listener->callback.UnidentifiedTransfer(callback);
+        fn_802B2A04(this, listener, value, flags, target);
     }
 
     void Dispatch(T* data, Function<T*> disposer, bool deliver)

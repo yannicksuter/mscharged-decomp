@@ -97,7 +97,7 @@ void nlCartesianToPolar(nlPolar& out, float x, float y)
 
 extern "C" float fn_802B5DD0(const nlVector2& point, const nlVector4& plane)
 {
-    return point.x * plane.x + point.y * plane.y + plane.w;
+    return plane.x * point.x + plane.y * point.y + plane.w;
 }
 
 extern "C" void fn_802B5D74(nlVector3& out, const nlVector3& point, const nlVector4& plane)

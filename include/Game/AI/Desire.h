@@ -7,8 +7,13 @@
 
 class DebugWriteCache;
 class cFielder;
+class cPlayer;
+class Desire;
+class SpaceSearch;
 class Variant;
 struct UnidentifiedDesireUpdate;
+
+extern "C" Desire* fn_8002E08C(cFielder*, int);
 
 struct UnidentifiedStateTransition
 {
@@ -31,12 +36,14 @@ public:
     virtual bool UnidentifiedInitialize(void*) = 0;
     virtual bool UnidentifiedReinitialize(void*) = 0;
     virtual void UnidentifiedCleanup() = 0;
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*) = 0;
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float) = 0;
     virtual void UnidentifiedReset();
     virtual void UnidentifiedSetContext(UnidentifiedDesireContext*);
 
 protected:
-    u8 mUnidentified004[0x08];
+    int mUnidentifiedState;
+    bool mUnidentifiedActive;
+    u8 mPadding009[3];
     Timer mUnidentifiedTimer;
     u8 mUnidentified014[0x64];
     float mUnidentified078;
@@ -49,12 +56,14 @@ class Desire : public shdStateMachine
 {
 public:
     Desire(int, const UnidentifiedStateTransition&);
-    virtual ~Desire();
+    virtual ~Desire()
+    {
+    }
 
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedSetContext(UnidentifiedDesireContext*);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -72,7 +81,7 @@ public:
     virtual ~DesireFinishAction();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
 };
 
 class DesireWait : public Desire
@@ -81,7 +90,7 @@ public:
     virtual ~DesireWait();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
 };
 
 class DesireCutAndBreak : public Desire
@@ -91,7 +100,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -106,7 +115,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -120,7 +129,7 @@ public:
     virtual ~DesireHit();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -132,7 +141,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -147,7 +156,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -169,7 +178,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -188,7 +197,7 @@ public:
     virtual ~DesireRunDownfield();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -199,7 +208,7 @@ public:
     virtual ~DesireRunUpfield();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -210,9 +219,210 @@ public:
     virtual ~DesireGetInPosition();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+};
+
+class DesireMark : public Desire
+{
+public:
+    virtual ~DesireMark();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+};
+
+class DesireDefendPos : public Desire
+{
+public:
+    virtual ~DesireDefendPos();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+};
+
+class DesireMegaStrike : public Desire
+{
+public:
+    virtual ~DesireMegaStrike();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+
+private:
+    bool fn_800B9D84(UnidentifiedDesireUpdate*, float);
+
+    int mUnidentifiedA4;
+    float mUnidentifiedA8;
+    float mUnidentifiedAC;
+    float mUnidentifiedB0;
+    int mUnidentifiedB4;
+};
+
+class DesirePass : public Desire
+{
+public:
+    virtual ~DesirePass();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+
+private:
+    cPlayer* mpPassTarget;
+    bool mbVolleyPass;
+};
+
+class DesirePreparePass : public Desire
+{
+public:
+    virtual ~DesirePreparePass();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+
+private:
+    cPlayer* mpPassTarget;
+    bool mbVolleyPass;
+    float mfAbortThreshold;
+    SpaceSearch* m_pSpaceSearch;
+};
+
+class DesireStar : public Desire
+{
+public:
+    virtual ~DesireStar();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual bool UnidentifiedReinitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+};
+
+class DesireMushroom : public Desire
+{
+public:
+    virtual ~DesireMushroom();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual bool UnidentifiedReinitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+};
+
+class DesireSlippery : public Desire
+{
+public:
+    virtual ~DesireSlippery();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual bool UnidentifiedReinitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+};
+
+class DesireGooey : public Desire
+{
+public:
+    DesireGooey();
+    virtual ~DesireGooey();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual bool UnidentifiedReinitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+
+    float fn_800BD1F0();
+
+private:
+    float mfGooPercentage;
+    float mfMaxGooEffect;
+    float mUnidentifiedAC;
+    float mfGooTime;
+    float mf_NotRunning_SpeedScale;
+    float mf_NotRunning_MovementScale;
+};
+
+class DesireShrink : public Desire
+{
+public:
+    virtual ~DesireShrink();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+
+    float fn_800BD75C();
+
+private:
+    float mfSlowPercentage;
+};
+
+class DesireFrozen : public Desire
+{
+public:
+    virtual ~DesireFrozen();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual bool UnidentifiedReinitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+
+    void fn_800BE0BC(float, int);
+
+private:
+    void fn_800BE1AC(int);
+
+    int meFrozenState;
+    float mfPrevFrozenTime;
+    int mePrevFrozenState;
+    int mePrevActionState;
+    bool mbWasDazed;
+};
+
+class DesireConfused : public Desire
+{
+public:
+    virtual ~DesireConfused();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual bool UnidentifiedReinitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+
+    void fn_800BED24(unsigned short*);
+
+private:
+    float mfConfusedPercentage;
+    float mfConfusedDirection;
 };
 
 #endif // GAME_AI_DESIRE_H

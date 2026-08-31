@@ -1,6 +1,7 @@
 #include "Game/ObjectBlur.h"
 
 #include "Game/Camera/CameraMan.h"
+#include "Game/MathHelpers.h"
 #include "NL/nlDLRing.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
@@ -70,7 +71,6 @@ bool BlurHandler::ConstructViewOrientedPoints(
 void BlurHandler::AddViewOrientedPoint(
     const nlVector3& position, const nlVector3& forwardVector)
 {
-    nlVector3 delta;
     nlVector3 topPoint, bottomPoint;
 
     if (ConstructViewOrientedPoints(topPoint, bottomPoint, position, forwardVector))
@@ -80,9 +80,7 @@ void BlurHandler::AddViewOrientedPoint(
 
         if (m_pLastPoint != 0)
         {
-            nlVec3Set(delta, m_pLastPoint->v3Top.x - m_pointFinal.v3Top.x, m_pLastPoint->v3Top.y - m_pointFinal.v3Top.y, m_pLastPoint->v3Top.z - m_pointFinal.v3Top.z);
-
-            if ((delta.x * delta.x) + (delta.y * delta.y) + (delta.z * delta.z)
+            if (CalculateDistanceSquared(m_pLastPoint->v3Top, m_pointFinal.v3Top)
                 < 0.0025000002f)
             {
                 return;

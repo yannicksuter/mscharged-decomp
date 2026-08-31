@@ -89,13 +89,15 @@ static PlatTexture* glx_MakeGridTexture(int width, int height)
     memcpy(texture->m_Bits, bits, sizeof(texture->m_Bits));
 
     unsigned short gridColor = 0xFFFF;
+    int x;
+    int y;
     unsigned short* data = (unsigned short*)texture->m_LinearData;
-    for (int y = 0; y < height; ++y)
+    for (y = 0; y < height; ++y)
     {
-        for (int x = 0; x < width; ++x)
+        for (x = 0; x < width; ++x)
         {
-            int gridX = x / 4;
-            if ((y / 4) & 1)
+            int gridX = x / 8;
+            if ((y / 8) & 1)
             {
                 data[y * width + x] = (gridX & 1) == 0 ? 0 : gridColor;
             }

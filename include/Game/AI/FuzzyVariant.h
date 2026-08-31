@@ -5,6 +5,7 @@
 #include "NL/nlSlotPool.h"
 
 class cTeam;
+class cBall;
 class InterpreterCore;
 
 class FuzzyVariant : public Variant
@@ -35,6 +36,13 @@ public:
     {
         mType = FT_PLAYER;
         mData.pPlayer = value;
+    }
+
+    FuzzyVariant(cBall* value)
+        : Variant()
+    {
+        mType = FT_BALL;
+        mData.pointer = value;
     }
 
     template <typename T>
@@ -86,6 +94,13 @@ public:
 class UnidentifiedVariant_80054AB8 : public FuzzyVariant
 {
 public:
+    UnidentifiedVariant_80054AB8()
+        : FuzzyVariant()
+        , ExtraData()
+        , mTemporary(false)
+    {
+    }
+
     UnidentifiedVariant_80054AB8(cPlayer* value)
         : FuzzyVariant(value)
         , mTemporary(false)
@@ -109,6 +124,15 @@ public:
     static void operator delete(void* entry);
 
     UnidentifiedVariant_80054AB8& operator=(const UnidentifiedVariant_80054AB8& other);
+
+    UnidentifiedVariant_80054AB8& operator=(const FuzzyVariant& other)
+    {
+        Variant value(other);
+        Reset();
+        CopyFrom(value);
+        mTemporary = false;
+        return *this;
+    }
 
     int GetInt() const
     {

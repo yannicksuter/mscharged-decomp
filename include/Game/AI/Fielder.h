@@ -3,6 +3,14 @@
 
 #include "Game/Player.h"
 
+enum eTurboRequest
+{
+    TR_FAR_DISTANCE = 0,
+    TR_MOVING_TARGET = 1,
+    TR_FORCED_ON = 2,
+    TR_FORCED_OFF = 3,
+};
+
 enum eFielderActionState
 {
     ACTION_NEED_ACTION = -1,
@@ -38,6 +46,15 @@ enum eFielderActionState
 enum eFielderDesireState
 {
     FIELDERDESIRE_FINISH_ACTION = 0x15,
+};
+
+enum eStrafeDirection
+{
+    STRAFE_IDLE = 0,
+    STRAFE_RIGHT = 1,
+    STRAFE_LEFT = 2,
+    STRAFE_FORWARD = 3,
+    STRAFE_BACK = 4,
 };
 
 enum eRole
@@ -89,6 +106,11 @@ struct UnidentifiedFielderPair374
 }; // total size: 0x8
 
 class FuzzyVariant;
+class DesireSteering;
+class DesireUserControlled;
+class UnidentifiedDesire35;
+extern "C" void fn_800C5DBC(DesireSteering*, float);
+extern "C" void fn_800C6FDC(DesireSteering*, float);
 class PhysicsObject;
 class ShotMeter;
 struct UnidentifiedFielderInput;
@@ -104,6 +126,11 @@ struct UnidentifiedFielderSkillshot
 
 class cFielder : public cPlayer
 {
+    friend void fn_800C5DBC(DesireSteering*, float);
+    friend void fn_800C6FDC(DesireSteering*, float);
+    friend class UnidentifiedDesire35;
+    friend class DesireUserControlled;
+
 public:
     virtual ~cFielder();
     virtual void PreUpdate(float fTime);
@@ -121,6 +148,7 @@ public:
     bool CanDoCaptainShootToScore();
     bool CanReceivePass();
     cFielder* GetMark() const { return mUnidentified464[0]; }
+    cFielder* GetMark(int index) const { return mUnidentified464[index]; }
     void fn_8002FDC4(unsigned short aParam, bool bParam);
     void fn_8003057C(void* pParam);
     void fn_800305DC(float fParam);

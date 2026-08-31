@@ -2,6 +2,7 @@
 #define GAME_AI_TEAM_PLAY_MACHINE_H
 
 #include "Game/AI/Desire.h"
+#include "Game/AI/UnidentifiedStringHash.h"
 #include "Game/AI/Variant.h"
 
 class cTeam;
@@ -11,15 +12,7 @@ struct Unidentified8002E1A4Result
 {
     u8 mUnidentified000[0x0C];
     unsigned long mUnidentified00C;
-    unsigned long mUnidentified010;
-};
-
-struct UnidentifiedStringHash
-{
-    UnidentifiedStringHash(const char* name);
-
-    unsigned long mHash;
-    unsigned long mUnidentified004;
+    void* mUnidentified010;
 };
 
 class UnidentifiedScriptMachine
@@ -69,7 +62,7 @@ public:
     virtual bool UnidentifiedInitialize(void*) = 0;
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
     virtual void UnidentifiedSetContext(UnidentifiedDesireContext*);
 
 protected:
@@ -89,7 +82,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*);
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
 };
 
 #endif // GAME_AI_TEAM_PLAY_MACHINE_H

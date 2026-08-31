@@ -997,11 +997,14 @@ void cFielder::ActionHit(float fDeltaT)
 bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
 {
     nlVector3 v3Delta;
+    s16 nFacingDelta;
+    u16 aAngle;
+
     v3Delta.y = pFielder->m_v3Position.y - pAttacker->m_v3Position.y;
     v3Delta.x = pFielder->m_v3Position.x - pAttacker->m_v3Position.x;
     v3Delta.z = pFielder->m_v3Position.z - pAttacker->m_v3Position.z;
-    u16 aAngle = nlVector3ToAngle(v3Delta);
-    s16 nFacingDelta = aAngle - pAttacker->m_aActualFacingDirection;
+    aAngle = nlVector3ToAngle(v3Delta);
+    nFacingDelta = aAngle - pAttacker->m_aActualFacingDirection;
 
     float fIntensityA
         = fn_8003E6E4(pFielder)->mUnidentified064;
@@ -1030,14 +1033,13 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
         nReact = 2;
     }
 
-    u16 aFacing = aAngle;
     if (pAttacker->m_eCharacterClass == MYSTERY
         && ((cFielder*)pAttacker)->m_eActionState == 1)
     {
-        aFacing = pFielder->m_aActualFacingDirection;
+        aAngle = pFielder->m_aActualFacingDirection;
     }
 
-    return pFielder->fn_80047240(pAttacker, aFacing, nReact, false, false);
+    return pFielder->fn_80047240(pAttacker, aAngle, nReact, false, false);
 }
 
 bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
@@ -1195,13 +1197,14 @@ void cFielder::InitActionLateOneTimerFromVolley()
         m_pTeam->GetOtherNet()->m_v3NetLocation);
     int index = (u16)(facingDelta + 0x2000) >> 14;
 
+    int nAnimID;
     bool bMirror = false;
     if (index == 2)
     {
         bMirror = m_pCurrentAnimController->m_bMirror;
     }
 
-    int nAnimID = LateOneTimerFromVolleyAnims[index];
+    nAnimID = LateOneTimerFromVolleyAnims[index];
 
     s16 nTurnAdjust = 0;
     switch (nAnimID)
@@ -1532,14 +1535,19 @@ bool cFielder::DoCommonInitActionLooseBall(
 
 void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
 {
-    if (pPassTarget == 0)
+    cFielder* finalPassTarget;
+    if (pPassTarget != 0)
     {
-        pPassTarget = fn_80096F54(this, bVolleyPass);
+        finalPassTarget = pPassTarget;
+    }
+    else
+    {
+        finalPassTarget = fn_80096F54(this, bVolleyPass);
     }
 
-    mActionLooseBallPassVars.passTarget = pPassTarget;
+    mActionLooseBallPassVars.passTarget = finalPassTarget;
 
-    if (pPassTarget == 0)
+    if (finalPassTarget == 0)
     {
         if (DoCommonInitActionLooseBall(
                 m_pTeam->GetOtherNet()->m_v3NetLocation, false))
@@ -1548,7 +1556,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
                 fvNotSet);
             SetAction(ACTION_LOOSE_BALL_SHOT);
             mActionShotVars.bIsChipShot = false;
-            SetNoPickUpTime(lbl_806E35E0);
+            SetNoPickUpTime(3.0f);
 
             bool bUnidentified = fn_8001E168(this);
             unsigned long soundID = 0x1CEC5A02;
@@ -1559,14 +1567,14 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
             fn_800EBBFC(mUnidentified318, soundID, 0, 0);
         }
     }
-    else if (DoCommonInitActionLooseBall(pPassTarget->m_v3Position, true))
+    else if (DoCommonInitActionLooseBall(finalPassTarget->m_v3Position, true))
     {
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_LOOSE_BALL_PASS);
         mActionShotVars.bIsChipShot = bVolleyPass;
         m_bCanTestController = false;
-        SetNoPickUpTime(lbl_806E35E0);
+        SetNoPickUpTime(3.0f);
     }
 }
 
@@ -2168,10 +2176,10 @@ extern "C" float fn_800499EC(cFielder* pFielder, int nParam)
     float fSegmentD
         = InterpolateClamped(lbl_806E0C68, lbl_806E0C6C, fShooting);
 
-    float fHalfA = fSegmentA * 0.5f;
-    float fHalfB = fSegmentB * 0.5f;
-    float fHalfC = fSegmentC * 0.5f;
-    float fHalfD = fSegmentD * 0.5f;
+    float fHalfA = fSegmentA / 2.0f;
+    float fHalfB = fSegmentB / 2.0f;
+    float fHalfC = fSegmentC / 2.0f;
+    float fHalfD = fSegmentD / 2.0f;
 
     float fTime = pFielder->mUnidentified39C;
     if (nParam != 0)
@@ -2397,13 +2405,13 @@ bool cFielder::InitActionPass(
 
     if (bVolleyPass)
     {
-        nlVector3 v3Delta;
-        v3Delta.y = m_v3Position.y - pPassTarget->m_v3Position.y;
-        v3Delta.x = m_v3Position.x - pPassTarget->m_v3Position.x;
-        v3Delta.z = m_v3Position.z - pPassTarget->m_v3Position.z;
-        if (v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y
-                + v3Delta.z * v3Delta.z
-            < lbl_806E35C8 * lbl_806E35C8)
+        nlVector3 delta;
+        nlVec3Sub(delta, m_v3Position, pPassTarget->m_v3Position);
+        float minDistSq = lbl_806E35C8;
+        minDistSq *= minDistSq;
+        float distSq = delta.GetLengthSq3D();
+
+        if (distSq < minDistSq)
         {
             bVolleyPass = false;
         }
@@ -3738,41 +3746,39 @@ void cFielder::fn_80043ADC()
 
 void cFielder::fn_80044148(const nlVector3& v3Velocity)
 {
-    if (m_eActionState == (eFielderActionState)0)
+    if (m_eActionState == (eFielderActionState)0
+        || m_eActionState == (eFielderActionState)0x23)
     {
         return;
     }
-    if (m_eActionState != (eFielderActionState)0x23)
+    if (m_pBall != 0)
     {
-        if (m_pBall != 0)
-        {
-            ReleaseBall(0);
-            g_pBall->SetVelocity(m_v3Velocity, SPINTYPE_NONE, 0);
-        }
-
-        InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction((eFielderActionState)0x23);
-        SetAnimState(0x7C, false, 0.0333333f, false, false);
-        SetVelocity(v3Velocity);
-        InitMovementCoast();
-        fn_8003C560(this, 1, 0);
-        mUnidentified178 = 1.0f;
-
-        if (GameInfoManager::Instance()->GetStadium() == 0x0B)
-        {
-            m_pPhysicsCharacter->m_CanCollideWithGoalLine = 0;
-            m_pPhysicsCharacter->m_CanCollideWithWall = 0;
-        }
-
-        bool bUnidentified = fn_8001E168(this);
-        unsigned long soundID = 0x1CF82176;
-        if (bUnidentified)
-        {
-            soundID = 0xFDEC8E0F;
-        }
-        fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+        ReleaseBall(0);
+        g_pBall->SetVelocity(m_v3Velocity, SPINTYPE_NONE, 0);
     }
+
+    InitDesire(
+        FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    SetAction((eFielderActionState)0x23);
+    SetAnimState(0x7C, false, 0.0333333f, false, false);
+    SetVelocity(v3Velocity);
+    InitMovementCoast();
+    fn_8003C560(this, 1, 0);
+    mUnidentified178 = 1.0f;
+
+    if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+    {
+        m_pPhysicsCharacter->m_CanCollideWithGoalLine = 0;
+        m_pPhysicsCharacter->m_CanCollideWithWall = 0;
+    }
+
+    bool bUnidentified = fn_8001E168(this);
+    unsigned long soundID = 0x1CF82176;
+    if (bUnidentified)
+    {
+        soundID = 0xFDEC8E0F;
+    }
+    fn_800EBBFC(mUnidentified318, soundID, 0, 0);
 }
 
 void cFielder::ActionElectrocution(float dt)
@@ -4214,9 +4220,9 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
         ShootBallDueToContact((unsigned short)(s32)nlRandomf(lbl_806E3610));
     }
 
-    nlVector3 delta;
-    nlVec3Sub(delta, m_v3Position, v3BombPosition);
-    float fDistance = nlSqrt(delta.GetLengthSq3D(), true) - fRadius;
+    float fDistance
+        = nlSqrt(CalculateDistanceSquared(m_v3Position, v3BombPosition), true)
+        - fRadius;
 
     if (fDistance > 1.0f && !IsFallenDown())
     {
@@ -5460,8 +5466,7 @@ void cFielder::fn_8004EA9C()
 
 void cFielder::fn_8004E92C()
 {
-    bool bUnidentified = lbl_806E0C94->m_eGameState == 5
-        || lbl_806E0C94->m_eGameState == 6;
+    bool bUnidentified = g_pGame->IsGameplayOrOvertime();
     if (bUnidentified)
     {
         if (m_pBall != 0 && m_eActionState == ACTION_UNKNOWN_32)
@@ -5473,9 +5478,10 @@ void cFielder::fn_8004E92C()
             {
                 g_pBall->m_pPhysicsBall->m_bCollideWithGoalies = true;
 
-                float fBallY = (float)fabs(g_pBall->m_v3Position.y);
+                float fBallX = (float)fabs(g_pBall->m_v3Position.x);
                 float fRadius = g_pBall->m_pPhysicsBall->GetRadius();
-                if (fBallY < cField::GetGoalLineX(1U) + fRadius)
+                float fGoalLineX = cField::GetGoalLineX(1U);
+                if (fBallX < fGoalLineX + fRadius)
                 {
                     fn_80037AC8(this, 0);
                 }

@@ -15,6 +15,7 @@
 #include "Game/NetworkSession.h"
 #include "Game/Physics/PhysicsBall.h"
 #include "Game/Player.h"
+#include "Game/UnidentifiedPlayerRadius.h"
 #include "Game/Render/ShootToScoreArrow.h"
 #include "Game/Sys/clock.h"
 #include "Game/Task/DispatchEventsTask.h"
@@ -162,15 +163,6 @@ struct UnidentifiedRegistrationList
 {
     u8 mUnidentified000[0x0C];
     UnidentifiedRegistrationNode* mHead;
-};
-
-class UnidentifiedPlayerRadius
-{
-public:
-    virtual void UnidentifiedVirtual00();
-    virtual void UnidentifiedVirtual04();
-    virtual void UnidentifiedVirtual08();
-    virtual float GetRadius();
 };
 
 struct UnidentifiedModeState

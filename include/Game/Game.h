@@ -165,7 +165,7 @@ public:
     /* 0x2E4 */ float m_fCachedPlayerDistances[10][10];
     /* 0x474 */ float m_fCachedBallPlayerDistances[10];
 
-private:
+public:
     /* 0x49C */ UnidentifiedGameEventQueue mUnidentified49C;
 
 public:

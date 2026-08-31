@@ -98,10 +98,9 @@ extern "C" float fn_800AA94C()
 
 extern "C" void fn_800AA954(UnidentifiedWeatherExtendedStateA* state)
 {
-    u32 value = state->field14;
     state->field08 = 0;
     state->field0C = 0;
-    state->field10 = value != 0;
+    state->field10 = state->field14 != 0;
     state->field14 = 0;
     state->field18 = lbl_806DBF64;
 }
@@ -113,10 +112,9 @@ extern "C" float fn_800AB23C()
 
 extern "C" void fn_800AB244(UnidentifiedWeatherExtendedStateB* state)
 {
-    u32 value = state->field14;
     state->field08 = 0;
     state->field0C = 0;
-    state->field10 = value != 0;
+    state->field10 = state->field14 != 0;
     state->field14 = 0;
     state->field18 = 0;
     state->field1C = 0.0f;

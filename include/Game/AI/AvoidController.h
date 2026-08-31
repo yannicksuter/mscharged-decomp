@@ -3,11 +3,16 @@
 
 #include "NL/nlAVLTree.h"
 #include "NL/nlMath.h"
+#include "NL/nlMemory.h"
 #include "NL/nlTimer.h"
 #include "types.h"
+#include <math.h>
+#include <string.h>
 
 class DebugWriteCache;
 class cFielder;
+class cPlayer;
+class DesireSteering;
 class UnidentifiedAvoidanceObject;
 
 enum eAvoidableThings
@@ -27,10 +32,33 @@ enum eAvoidableThings
 class UnidentifiedAvoidanceHistoryBase
 {
 public:
-    UnidentifiedAvoidanceHistoryBase();
+    UnidentifiedAvoidanceHistoryBase()
+    {
+        mUnidentified004 = 0.3f;
+        mUnidentified008 = (int)ceil(60.0f * mUnidentified004) + 2;
+        mUnidentified014 = (nlVector3*)nlMalloc(
+            mUnidentified008 * sizeof(nlVector3), 8, false);
+        mUnidentified018 = (float*)nlMalloc(
+            mUnidentified008 * sizeof(float), 8, false);
+        memset(&mUnidentified02C, 0, sizeof(mUnidentified02C));
+        mUnidentified00C = 0;
+        mUnidentified010 = 0;
+        mUnidentified01C = mUnidentified02C;
+        mUnidentified028 = 0.0f;
+    }
     virtual ~UnidentifiedAvoidanceHistoryBase();
 
+    void UnidentifiedReset()
+    {
+        mUnidentified00C = 0;
+        mUnidentified010 = 0;
+        mUnidentified01C = mUnidentified02C;
+        mUnidentified028 = 0.0f;
+    }
+
 protected:
+    friend class DesireSteering;
+
     float mUnidentified004;
     int mUnidentified008;
     int mUnidentified00C;
@@ -45,7 +73,9 @@ protected:
 class UnidentifiedAvoidanceHistory : public UnidentifiedAvoidanceHistoryBase
 {
 public:
-    UnidentifiedAvoidanceHistory();
+    UnidentifiedAvoidanceHistory()
+    {
+    }
     virtual ~UnidentifiedAvoidanceHistory();
     virtual void UnidentifiedGetValue(
         nlVector3&, float, const nlVector3&) const;
@@ -84,6 +114,10 @@ public:
     ~AvoidController();
 
     void SetThingsToAvoid(int thingsToAvoid);
+    void UseMinimumAvoidance(cPlayer*)
+    {
+        m_fRepulsionMult = 0.5f;
+    }
     nlVector3& GetLastRepulsionVector(eAvoidableThings things);
     void Update(float fDeltaT);
 
