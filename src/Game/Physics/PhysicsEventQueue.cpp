@@ -795,8 +795,16 @@ extern "C" void fn_801440BC()
 {
     if (lbl_806E11F0 != 0)
     {
-        lbl_806E11F0->~PhysicsEventQueue();
-        nlFree(lbl_806E11F0);
+        EventDispatcher& dispatcher = lbl_806E11F0->mDispatcher;
+        dispatcher.Clear();
+
+        DeferredSlotPool<EventCallbackEntry<EventCallback> >* pool =
+            &dispatcher.callbacks.pool;
+        fn_802B467C(pool);
+        SlotPoolBase::BaseFreeBlocks(
+            pool, sizeof(EventCallbackEntry<EventCallback>));
+
+        delete lbl_806E11F0;
         lbl_806E11F0 = 0;
         fn_801761E0();
     }
