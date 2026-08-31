@@ -1,3 +1,4 @@
+#include "Game/Drawable/DrawableNetMesh.h"
 #include "Game/Field.h"
 #include "Game/Net.h"
 #include "Game/Render/NetMesh.h"
@@ -98,34 +99,6 @@ struct SaveFrame
 {
     char _000[8];
     u8* position;
-};
-
-class DrawableNetMesh
-{
-public:
-    DrawableNetMesh(bool);
-    ~DrawableNetMesh();
-
-    static void Reset();
-    void Initialize(int, int);
-    void Destroy();
-    void Grab(NetMesh&);
-    void Blend(float, const DrawableNetMesh&, const DrawableNetMesh&);
-    void Replay(LoadFrame&);
-    void Replay(SaveFrame&);
-    void Render() const;
-    void RenderInvisiblePlanes() const;
-
-    nlVector3* mPositions;
-    int mNetIndex;
-    int mDisplayList;
-    int mNumVertices;
-    int mNumTriIndices;
-    float mJoltCache;
-    NetMesh* mNetMesh;
-    bool mInitialized;
-    bool mVisible;
-    char _01E[2];
 };
 
 struct UnidentifiedStaticState

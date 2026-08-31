@@ -801,6 +801,30 @@ Game/Render/RenderShadow.cpp:
 	.sbss       start:0x806E1470 end:0x806E1488
 	.sdata2     start:0x806E4D50 end:0x806E4D8C
 
+Game/RenderSnapshot.cpp:
+	.text       start:0x80186D0C end:0x801882B4
+	.ctors      start:0x804DB6C4 end:0x804DB6C8
+	.data       start:0x805116A8 end:0x805116C8
+	.bss        start:0x80570C58 end:0x80570C68
+	.sdata      start:0x806DCCF0 end:0x806DCCF8
+	.sbss       start:0x806E1490 end:0x806E14A0
+	.sdata2     start:0x806E4D90 end:0x806E4DA0
+
+Game/Render/Wiper.cpp:
+	.text       start:0x801882B4 end:0x80188884
+	.ctors      start:0x804DB6C8 end:0x804DB6CC
+	.data       start:0x805116C8 end:0x80511770
+	.bss        start:0x80570C68 end:0x80570C88
+	.sdata      start:0x806DCCF8 end:0x806DCD08
+	.sbss       start:0x806E14A0 end:0x806E14B0
+	.sdata2     start:0x806E4DA0 end:0x806E4DB8
+
+unclassified/tu_80188884.cpp:
+	.text       start:0x80188884 end:0x80188C5C
+	.data       start:0x80511770 end:0x805117A8
+	.sbss       start:0x806E14B0 end:0x806E14B8
+	.sdata2     start:0x806E4DB8 end:0x806E4DC0
+
 Game/Blinker.cpp:
 	.text       start:0x80199B30 end:0x80199E84
 	.rodata     start:0x804DCD80 end:0x804DCD90

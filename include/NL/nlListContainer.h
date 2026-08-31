@@ -28,6 +28,46 @@ public:
 
     void DeleteEntry(ListEntry<T>* entry);
 
+    void RemoveEntry(const T& data)
+    {
+        ListEntry<T>* currentEntry = m_Head;
+        if (currentEntry != 0)
+        {
+            if (currentEntry->entry == data)
+            {
+                ListEntry<T>* newHead;
+                if (currentEntry == m_Tail)
+                {
+                    m_Tail = 0;
+                    newHead = 0;
+                }
+                else
+                    newHead = currentEntry->next;
+                DeleteEntry(m_Head);
+                m_Head = newHead;
+            }
+            else
+            {
+                ListEntry<T>* previousEntry = currentEntry;
+                nlListIterator<T> iterator(currentEntry->next);
+                while (iterator.IsValid())
+                {
+                    ListEntry<T>* nextEntry = iterator.CurrentEntry();
+                    if (iterator.Current() == data)
+                    {
+                        previousEntry->next = nextEntry->next;
+                        if (nextEntry == m_Tail)
+                            m_Tail = previousEntry;
+                        DeleteEntry(nextEntry);
+                        break;
+                    }
+                    previousEntry = nextEntry;
+                    iterator.Next();
+                }
+            }
+        }
+    }
+
     void AddEntry(const T& value)
     {
         ListEntry<T> local(value);

@@ -1,5 +1,6 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/BasicStadium.h"
+#include "Game/Drawable/DrawableKoopaShell.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Drawable/ShadowProp.h"
 #include "NL/gl/glState.h"
@@ -21,22 +22,6 @@ struct KoopaShellObjectFields
     /* 0x20 */ bool mVisible;
     char _021[7];
     /* 0x28 */ RenderObject* mDrawable;
-};
-
-class DrawableKoopaShell
-{
-public:
-    DrawableKoopaShell();
-    void Grab(const KoopaShellObject*);
-    void Render(const KoopaShellObject*) const;
-    void Blend(const float*, const DrawableKoopaShell&, const DrawableKoopaShell&);
-
-    /* 0x00 */ u16 mSpin;
-    char _002[2];
-    /* 0x04 */ nlVector3 mPosition;
-    /* 0x10 */ float mScale;
-    /* 0x14 */ bool mVisible;
-    char _015[3];
 };
 
 extern "C"

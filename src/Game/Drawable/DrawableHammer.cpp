@@ -1,3 +1,4 @@
+#include "Game/Drawable/DrawableHammer.h"
 #include "Game/Drawable/RenderObject.h"
 #include "NL/gl/glModel.h"
 #include "NL/nlMath.h"
@@ -12,21 +13,6 @@ struct HammerObjectFields
     /* 0x24 */ bool mVisible;
     char _025[7];
     /* 0x2C */ RenderObject* mDrawable;
-};
-
-class DrawableHammer
-{
-public:
-    DrawableHammer();
-    void Grab(const HammerObject*);
-    void Render(const HammerObject*) const;
-    void Blend(const float*, const DrawableHammer&, const DrawableHammer&);
-
-    /* 0x00 */ nlQuaternion mOrientation;
-    /* 0x10 */ nlVector3 mPosition;
-    /* 0x1C */ float mScale;
-    /* 0x20 */ bool mVisible;
-    char _021[3];
 };
 
 extern "C"

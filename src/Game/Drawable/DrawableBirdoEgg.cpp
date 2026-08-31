@@ -1,5 +1,6 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/BasicStadium.h"
+#include "Game/Drawable/DrawableBirdoEgg.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Drawable/ShadowProp.h"
 #include "NL/gl/glState.h"
@@ -22,21 +23,6 @@ struct BirdoEggObjectFields
     /* 0x30 */ bool mVisible;
     char _031[7];
     /* 0x38 */ RenderObject* mDrawable;
-};
-
-class DrawableBirdoEgg
-{
-public:
-    DrawableBirdoEgg();
-    void Grab(const BirdoEggObject*);
-    void Render(const BirdoEggObject*) const;
-    void Blend(const float*, const DrawableBirdoEgg&, const DrawableBirdoEgg&);
-
-    /* 0x00 */ nlQuaternion mOrientation;
-    /* 0x10 */ nlVector3 mPosition;
-    /* 0x1C */ float mScale;
-    /* 0x20 */ bool mVisible;
-    char _021[3];
 };
 
 extern "C"
