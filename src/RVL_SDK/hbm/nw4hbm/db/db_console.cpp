@@ -8,6 +8,7 @@ namespace nw4hbm {
 namespace db {
 
 static OSMutex sMutex;
+static ConsoleHandle sConsoleList;
 
 static inline u8* GetTextPtr_(ConsoleHandle console, u16 line, u16 xPos) {
     return console->textBuf + xPos + (console->width + 1) * line;
@@ -188,6 +189,99 @@ void Console_DrawDirect(ConsoleHandle console) {
     }
 }
 
+static ConsoleHandle FindInsertionPosition_(u16 priority) {
+    ConsoleHandle console = sConsoleList;
+
+    if (console == NULL || console->priority < priority) {
+        return NULL;
+    }
+
+    while (console->next != NULL) {
+        if (console->next->priority < priority) {
+            return console;
+        }
+
+        console = console->next;
+    }
+
+    return console;
+}
+
+static void AppendConsoleToList_(ConsoleHandle pConsole) {
+    NW4HBMAssertPointerNonnull_Line(pConsole, 640);
+
+    TryLockMutex_(&sMutex);
+
+    ConsoleHandle console = FindInsertionPosition_(pConsole->priority);
+
+    if (console == NULL) {
+        pConsole->next = sConsoleList;
+        sConsoleList = pConsole;
+    } else {
+        pConsole->next = console->next;
+        console->next = pConsole;
+    }
+
+    UnlockMutex_(&sMutex);
+}
+
+void RemoveConsoleFromList_(ConsoleHandle pConsole) {
+    NW4HBMAssertPointerNonnull_Line(pConsole, 668);
+
+    TryLockMutex_(&sMutex);
+
+    if (sConsoleList == pConsole) {
+        sConsoleList = pConsole->next;
+        pConsole->next = NULL;
+    } else {
+        ConsoleHandle console = sConsoleList;
+
+        while (console != NULL) {
+            if (console->next == pConsole) {
+                console->next = pConsole->next;
+                pConsole->next = NULL;
+                break;
+            }
+
+            console = console->next;
+        }
+
+        if (console == NULL) {
+            NW4HBMPanicMessage_Line(685, "illegal console handle");
+        }
+    }
+
+    UnlockMutex_(&sMutex);
+}
+
+ConsoleHandle Console_Create(void* buffer, u16 width, u16 height, u16 viewHeight, u16 prioriry, u16 attr) {
+    NW4HBMAssertPointerNonnull_Line(buffer, 701);
+    NW4HBMAssertAligned_Line(702, buffer, 4);
+
+    ConsoleHandle console = static_cast<ConsoleHandle>(buffer);
+
+    console->textBuf = reinterpret_cast<u8*>(console + 1);
+    console->width = width;
+    console->height = height;
+    console->priority = prioriry;
+    console->attr = attr;
+    console->printTop = 0;
+    console->printXPos = 0;
+    console->printTopUsed = 0;
+    console->ringTop = 0;
+    console->ringTopLineCnt = 0;
+    console->viewTopLine = 0;
+    console->viewPosX = 30;
+    console->viewPosY = 50;
+    console->viewLines = viewHeight;
+    console->isVisible = false;
+    console->writer = NULL;
+    console->next = NULL;
+
+    AppendConsoleToList_(console);
+
+    return console;
+}
 
 static void PrintToBuffer_(ConsoleHandle console, u8 const* str) {
     u8* storePtr;

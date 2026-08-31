@@ -38,6 +38,30 @@ extern "C"
 
 #ifdef __cplusplus
 }
+
+namespace std {
+
+using ::memchr;
+using ::memcmp;
+using ::memcpi;
+using ::memcpy;
+using ::memmove;
+
+using ::strcasecmp;
+using ::strcat;
+using ::strchr;
+using ::strcmp;
+using ::strcpy;
+using ::strcspn;
+using ::strlen;
+using ::strncat;
+using ::strncmp;
+using ::strncpy;
+using ::strrchr;
+using ::strstr;
+using ::strtok;
+
+} // namespace std
 #endif
 
 #endif // CSTRING_H

@@ -103,6 +103,8 @@ FontRefLink::FontRefLink() :
     mpFont(NULL) {}
 
 void FontRefLink::Set(const char* name, ut::Font* pFont) {
+    NW4HBMAssert_Line(std::strlen(name) < FONTNAMEBUF_MAX, 203);
+
     strcpy(mFontName, name);
     mpFont = pFont;
 }
