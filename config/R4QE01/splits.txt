@@ -953,6 +953,16 @@ Game/Render/Indicators.cpp:
 	.sbss       start:0x806E1570 end:0x806E1580
 	.sdata2     start:0x806E50C0 end:0x806E5108
 
+unclassified/tu_801A4188.cpp:
+	.text       start:0x801A4188 end:0x801A4EC0
+	.ctors      start:0x804DB70C end:0x804DB710
+	.rodata     start:0x804DCEC0 end:0x804DCF08
+	.data       start:0x80511FC0 end:0x80514140
+	.bss        start:0x805721B8 end:0x80572238
+	.sdata      start:0x806DCF08 end:0x806DCF90
+	.sbss       start:0x806E1580 end:0x806E15B8
+	.sdata2     start:0x806E5108 end:0x806E5148
+
 unclassified/tu_801A4EC0.cpp:
 	.text       start:0x801A4EC0 end:0x801A5F10
 	.ctors      start:0x804DB710 end:0x804DB714

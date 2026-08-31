@@ -418,7 +418,7 @@ void ImpostorManager::AddCharacter(ImpostorCharacter* character)
     }
 }
 
-void ImpostorManager::UpdateCharacters(float dt, int unidentified)
+void ImpostorManager::UpdateCharacters(float dt, const char* unidentified)
 {
     nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
     DLListEntry<ImpostorCharacter*>* head = it.m_Head;

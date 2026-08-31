@@ -45,7 +45,7 @@ public:
     int GetNumImpostors();
     void Render(void* target, bool skipCapture);
     void AddCharacter(ImpostorCharacter* character);
-    void UpdateCharacters(float dt, int unidentified);
+    void UpdateCharacters(float dt, const char* unidentified);
     void UpdateAnimations(float dt);
     void UpdateSprites();
     void UpdatePositions(void* unidentified0, void* unidentified1);

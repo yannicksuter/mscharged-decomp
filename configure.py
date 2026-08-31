@@ -688,6 +688,7 @@ config.libs = [
             Object(NonMatching, "unclassified/tu_801A0E64.cpp", cflags=cflags_game),
             Object(NonMatching, "unclassified/tu_801A2004.cpp", cflags=cflags_game),
             Object(NonMatching, "Game/Render/Indicators.cpp", cflags=cflags_game),
+            Object(NonMatching, "unclassified/tu_801A4188.cpp"),
             Object(NonMatching, "unclassified/tu_801A4EC0.cpp"),
             Object(NonMatching, "unclassified/tu_801A6824.cpp"),
             Object(NonMatching, "Game/Render/ShootToScoreArrow.cpp"),

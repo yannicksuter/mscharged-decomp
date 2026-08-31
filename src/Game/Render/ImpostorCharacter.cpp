@@ -394,7 +394,7 @@ void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual24(float dt)
 }
 
 void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual28(float dt,
-    int unidentified)
+    const char* unidentified)
 {
     for (int i = 0; i < mNumModels; ++i)
     {
