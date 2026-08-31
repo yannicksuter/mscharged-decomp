@@ -8,15 +8,14 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_801A2004.h"
 
 extern "C" void fn_8036EB44(float nearPlane, float farPlane);
 extern "C" u32 fn_80369D4C();
 extern "C" u32 fn_80369D54();
 extern "C" void fn_8037091C();
 extern "C" void fn_80370998(GLView*, GLView*);
-extern "C" void fn_801A2394(void*);
 extern "C" void fn_802DCDB4(nlMatrix4&, const nlMatrix4&, const nlMatrix4&);
-extern "C" u8 lbl_80572020[];
 
 void CopyShadowVolumeColour(const GXColor* colour);
 
@@ -559,7 +558,7 @@ void fn_80272AB4()
     sLayerViews[eCLV_HighRange3D]->m_Enabled = true;
     sLayerViews[eCLV_HighRange3DNoFog]->m_Enabled = true;
 
-    fn_801A2394(lbl_80572020);
+    fn_801A2394(&lbl_80572020);
 }
 
 float fn_8027313C()

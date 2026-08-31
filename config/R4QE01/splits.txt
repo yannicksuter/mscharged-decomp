@@ -907,6 +907,52 @@ Game/Render/ElectricFence.cpp:
 	.sbss       start:0x806E1508 end:0x806E1538
 	.sdata2     start:0x806E4FB8 end:0x806E5010
 
+Game/Render/FlareHandler.cpp:
+	.text       start:0x8019F6DC end:0x8019FE24
+	.ctors      start:0x804DB6F8 end:0x804DB6FC
+	.data       start:0x80511DC8 end:0x80511DF0
+	.bss        start:0x80571B98 end:0x80571C08
+	.sdata2     start:0x806E5010 end:0x806E5020
+
+unclassified/tu_8019FE24.cpp:
+	.text       start:0x8019FE24 end:0x801A0E64
+	.ctors      start:0x804DB6FC end:0x804DB700
+	.rodata     start:0x804DCE20 end:0x804DCE30
+	.data       start:0x80511DF0 end:0x80511E28
+	.bss        start:0x80571C08 end:0x80572008
+	.sdata      start:0x806DCE18 end:0x806DCE48
+	.sbss       start:0x806E1538 end:0x806E1560
+	.sdata2     start:0x806E5020 end:0x806E5058
+
+unclassified/tu_801A0E64.cpp:
+	.text       start:0x801A0E64 end:0x801A2004
+	.ctors      start:0x804DB700 end:0x804DB704
+	.rodata     start:0x804DCE30 end:0x804DCE48
+	.data       start:0x80511E28 end:0x80511E38
+	.bss        start:0x80572008 end:0x80572020
+	.sdata      start:0x806DCE48 end:0x806DCE58
+	.sdata2     start:0x806E5058 end:0x806E5078
+
+unclassified/tu_801A2004.cpp:
+	.text       start:0x801A2004 end:0x801A323C
+	.ctors      start:0x804DB704 end:0x804DB708
+	.rodata     start:0x804DCE48 end:0x804DCEB0
+	.data       start:0x80511E38 end:0x80511EC8
+	.bss        start:0x80572020 end:0x80572170
+	.sdata      start:0x806DCE58 end:0x806DCED0
+	.sbss       start:0x806E1560 end:0x806E1570
+	.sdata2     start:0x806E5078 end:0x806E50C0
+
+Game/Render/Indicators.cpp:
+	.text       start:0x801A323C end:0x801A4188
+	.ctors      start:0x804DB708 end:0x804DB70C
+	.rodata     start:0x804DCEB0 end:0x804DCEC0
+	.data       start:0x80511EC8 end:0x80511FC0
+	.bss        start:0x80572170 end:0x805721B8
+	.sdata      start:0x806DCED0 end:0x806DCF08
+	.sbss       start:0x806E1570 end:0x806E1580
+	.sdata2     start:0x806E50C0 end:0x806E5108
+
 unclassified/tu_801A4EC0.cpp:
 	.text       start:0x801A4EC0 end:0x801A5F10
 	.ctors      start:0x804DB710 end:0x804DB714

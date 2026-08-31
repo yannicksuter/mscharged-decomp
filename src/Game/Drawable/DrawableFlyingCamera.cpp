@@ -6,6 +6,7 @@
 #include "NL/gl/glState.h"
 #include "NL/nlString.h"
 #include "NL/platqmath.h"
+#include "unclassified/tu_8019FE24.h"
 
 // Charged-only shadow prop, sixth of the run described beside
 // DrawableBulletBill. This one carries the index of its live camera instead of
@@ -31,18 +32,9 @@ struct UnidentifiedStaticStorage
 
 struct UnidentifiedStaticTag;
 
-struct FlyingCameraObject
-{
-    /* 0x00 */ nlQuaternion orientation;
-    /* 0x10 */ nlVector3 position;
-    char _01C[0x3E];
-    /* 0x5A */ bool visible;
-};
-
 extern "C"
 {
     void* fn_8027267C(int);
-    FlyingCameraObject* fn_801A0C44(int);
     RenderObject* fn_80276360(int, int);
 }
 

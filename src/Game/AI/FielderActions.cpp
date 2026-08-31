@@ -33,32 +33,13 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "NL/utility.h"
+#include "unclassified/tu_801A0E64.h"
 #include "math.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 static const nlVector3 v3ElectrocutionLaunch = { -5.0f, 0.0f, 5.0f };
 static const nlVector3 v3Up = { 0.0f, 0.0f, 1.0f };
-
-struct UnidentifiedProjectileTweak806E1608
-{
-    /* 0x00 */ u8 mUnidentified00[0x10];
-    /* 0x10 */ float mUnidentified10;
-};
-
-struct UnidentifiedProjectileState806E1608
-{
-    /* 0x00 */ u8 mUnidentified00[0x08];
-    /* 0x08 */ float mUnidentified08;
-};
-
-struct UnidentifiedProjectile806E1608
-{
-    /* 0x00 */ u8 mUnidentified00[0x20];
-    /* 0x20 */ unsigned int mUnidentified20;
-    /* 0x24 */ u8 mUnidentified24[0x04];
-    /* 0x28 */ UnidentifiedProjectileTweak806E1608* mUnidentified28;
-};
 
 extern FuzzyVariant fvNotSet;
 
@@ -242,16 +223,8 @@ extern "C" UnidentifiedCaptainObject* fn_801792C4(void* pParam, int nIndex);
 extern "C" bool fn_802B6BC8(const nlVector3* v3Start,
     const nlVector3* v3End, const nlVector3* v3A, const nlVector3* v3B,
     float* fOut1, float* fOut2);
-extern "C" UnidentifiedProjectile806E1608* fn_801AA3AC(
+extern "C" HammerObject* fn_801AA3AC(
     void* pManager, int nParam);
-extern "C" void fn_801A1B54(
-    UnidentifiedProjectile806E1608* pParam, cFielder* pFielder);
-extern "C" void fn_801A1170(
-    UnidentifiedProjectile806E1608* pParam, const nlVector3* pPosition);
-extern "C" UnidentifiedProjectileState806E1608* fn_801A1168(
-    UnidentifiedProjectile806E1608* pParam);
-extern "C" void fn_801A117C(
-    UnidentifiedProjectile806E1608* pParam, const nlVector3* pVelocity);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern "C" void fn_80331F9C(void* pPad, int nParam, int nParam2);
 extern "C" bool fn_800EBC84(
@@ -5383,7 +5356,7 @@ void cFielder::fn_8004E6B4()
 {
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
-        UnidentifiedProjectile806E1608* pProjectile
+        HammerObject* pProjectile
             = fn_801AA3AC(lbl_806E1608, -1);
         if (pProjectile != 0)
         {
@@ -5393,7 +5366,7 @@ void cFielder::fn_8004E6B4()
 
             float fDistance = lbl_806DB89C
                 + lbl_806DB8A0
-                    * (float)(pProjectile->mUnidentified20 % 5);
+                    * (float)(pProjectile->_020 % 5);
 
             nlVector3 v3Target;
             v3Target.x = fDistance * m_m4WorldMatrix.e2[0][0]
@@ -5406,8 +5379,8 @@ void cFielder::fn_8004E6B4()
             nlVector3 v3Delta;
             nlVec3Sub(v3Delta, v3Target, m_v3Position);
 
-            float fSpeed = pProjectile->mUnidentified28->mUnidentified10;
-            float fGravity = fn_801A1168(pProjectile)->mUnidentified08;
+            float fSpeed = pProjectile->_028->m_gravity;
+            float fGravity = fn_801A1168(pProjectile)->z;
 
 
             float fHeight

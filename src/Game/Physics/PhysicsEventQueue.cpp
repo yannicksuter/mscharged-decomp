@@ -9,6 +9,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
+#include "unclassified/tu_801A0E64.h"
 
 extern "C" void fn_8017617C();
 extern "C" void fn_801761E0();
@@ -230,7 +231,6 @@ extern "C" void fn_80015B38(void*, int);
 extern "C" void fn_8002E5F4(void*, int);
 extern "C" void fn_8004AC68(void*, nlVector3*, void*);
 extern "C" void fn_8019A434(void*, int);
-extern "C" void fn_801A1CFC(void*, int);
 extern "C" void fn_801A64A4(void*, int);
 extern "C" void fn_80176A60(nlVector3*);
 
@@ -260,7 +260,7 @@ extern "C" void fn_80145370(void* object)
 {
     if (__ptmf_test(&lbl_8050F58C))
     {
-        fn_801A1CFC(object, 0);
+        fn_801A1CFC((HammerObject*)object, 0);
     }
 }
 
