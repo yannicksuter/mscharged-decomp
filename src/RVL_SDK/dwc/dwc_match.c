@@ -252,6 +252,7 @@ BOOL fn_80493C58(u8 command, u32 profileId, u32 ip, u16 port, u32* data,
     int count);
 int fn_80493434(int isRetry, int cookie, SBServer server);
 BOOL fn_80492D3C(void);
+static void DWCi_ClearGameMatchKeys(void);
 
 char* lbl_806E2EE8;
 DWCMatchOptMinCompleteView* lbl_806E2EEC;
@@ -570,8 +571,6 @@ int fn_8048FCD8(s64* elapsedOut)
 void fn_8048FD9C(DWCMatchControlView* control, void* p0, GT2Socket* socket,
     void* p2, const char* gamename, const char* secretKey, int p5, int p6)
 {
-    int i;
-
     lbl_806E2EF8 = control;
     lbl_806E2EF8->_00 = p0;
     lbl_806E2EF8->pGT2Socket = socket;
@@ -601,14 +600,7 @@ void fn_8048FD9C(DWCMatchControlView* control, void* p0, GT2Socket* socket,
     lbl_806E2EF8->_494 = NULL;
     lbl_806E2EF8->_178 = 0;
 
-    for (i = 0; i < 154; i++)
-    {
-        if (lbl_806C9A20[i].keyString != NULL)
-        {
-            DWC_Free(DWC_ALLOCTYPE_BASE, lbl_806C9A20[i].keyString, 0);
-        }
-    }
-    memset(lbl_806C9A20, 0, sizeof(lbl_806C9A20));
+    DWCi_ClearGameMatchKeys();
 
     lbl_806E2EFC.valid = 0;
     lbl_806E2EFC._01 = 0;
@@ -1808,8 +1800,6 @@ GPResult fn_80492BA0(void)
 
 void fn_80492C74(void)
 {
-    int i;
-
     lbl_806E2EF8 = NULL;
     if (lbl_806E2EE8 != NULL)
     {
@@ -1817,14 +1807,7 @@ void fn_80492C74(void)
         lbl_806E2EE8 = NULL;
     }
 
-    for (i = 0; i < 154; i++)
-    {
-        if (lbl_806C9A20[i].keyString != NULL)
-        {
-            DWC_Free(DWC_ALLOCTYPE_BASE, lbl_806C9A20[i].keyString, 0);
-        }
-    }
-    memset(lbl_806C9A20, 0, sizeof(lbl_806C9A20));
+    DWCi_ClearGameMatchKeys();
 
     if (lbl_806E2EEC != NULL)
     {
@@ -1929,8 +1912,6 @@ void fn_80492D4C(int mode)
 
 void DWCi_CloseMatching(void)
 {
-    int i;
-
     DWC_Printf(0x40, " Close Matching....\n");
     if (lbl_806E2EF8 == NULL)
     {
@@ -1959,14 +1940,7 @@ void DWCi_CloseMatching(void)
         lbl_806E2EE8 = NULL;
     }
 
-    for (i = 0; i < 154; i++)
-    {
-        if (lbl_806C9A20[i].keyString != NULL)
-        {
-            DWC_Free(DWC_ALLOCTYPE_BASE, lbl_806C9A20[i].keyString, 0);
-        }
-    }
-    memset(lbl_806C9A20, 0, sizeof(lbl_806C9A20));
+    DWCi_ClearGameMatchKeys();
 
     lbl_806E2EF8->_18 = 1;
 }
@@ -4846,6 +4820,20 @@ int fn_8049811C(void)
         break;
     }
     return 1;
+}
+
+static void DWCi_ClearGameMatchKeys(void)
+{
+    int i;
+
+    for (i = 0; i < 154; i++)
+    {
+        if (lbl_806C9A20[i].keyString != NULL)
+        {
+            DWC_Free(DWC_ALLOCTYPE_BASE, lbl_806C9A20[i].keyString, 0);
+        }
+    }
+    memset(lbl_806C9A20, 0, sizeof(lbl_806C9A20));
 }
 
 void fn_80498440(void)
