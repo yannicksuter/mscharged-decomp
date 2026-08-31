@@ -259,13 +259,7 @@ bool cAnimCamera::LoadCameraAnimation(nlChunk* begin, unsigned long, const char*
 
 void cAnimCamera::FreeCameraAnimations()
 {
-    cCameraData* next;
-    while (m_cameraDataList != NULL)
-    {
-        next = m_cameraDataList->next;
-        delete m_cameraDataList;
-        m_cameraDataList = next;
-    }
+    nlDeleteList(&m_cameraDataList);
     m_cameraDataList = NULL;
 }
 

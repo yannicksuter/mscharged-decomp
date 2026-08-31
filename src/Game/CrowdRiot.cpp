@@ -252,6 +252,8 @@ void CrowdRiot::fn_80029460(bool param1)
         return;
     }
 
+    EffectsGroup* group;
+    EmissionController* controller;
     bool resumeRiot = false;
     if (mfRiotTime > 0.0f && param1)
     {
@@ -282,7 +284,7 @@ void CrowdRiot::fn_80029460(bool param1)
     mv3Target.y = 0.0f;
     mv3Target.z = 0.0f;
 
-    EffectsGroup* group = fn_802E7CDC(
+    group = fn_802E7CDC(
         EmissionManager::Instance(), "generator_broken");
     EmissionManager::Instance()->Kill((unsigned long)this, group);
     group = fn_802E7CDC(
@@ -317,7 +319,7 @@ void CrowdRiot::fn_80029460(bool param1)
 
         group = fn_802E7CDC(
             EmissionManager::Instance(), "crowd_riot_with_fade");
-        EmissionController* controller = fn_802E7FE4(
+        controller = fn_802E7FE4(
             EmissionManager::Instance(), group, 3, true, false);
         controller->SetPosition(mv3Position);
         controller->SetVelocity(mv3Velocity);

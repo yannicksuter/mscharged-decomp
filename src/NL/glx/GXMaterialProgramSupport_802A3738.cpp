@@ -48,14 +48,7 @@ void CopyShadowVolumeColour(const GXColor* colour)
     sShadowVolumeAlpha.value = colour->a;
 }
 
-static inline GXColor GetShadowVolumeConstantColour()
-{
-    GXColor colour = { 4, 4, 4, 4 };
-    return colour;
-}
-
-template <>
-void GXMaterialProgramImpl<GXMaterialProgram_802A73B0>::Activate(GLView*)
+static inline void SetShadowVolumeColour()
 {
     GXColor colour;
     colour.r = sShadowVolumeRed.value;
@@ -63,8 +56,19 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A73B0>::Activate(GLView*)
     colour.b = sShadowVolumeBlue.value;
     colour.a = sShadowVolumeAlpha.value;
     GXSetTevColor(GX_TEVREG0, colour);
+}
 
-    GXSetTevColor(GX_TEVREG1, GetShadowVolumeConstantColour());
+static inline void SetShadowVolumeConstantColour()
+{
+    GXColor colour = { 4, 4, 4, 4 };
+    GXSetTevColor(GX_TEVREG1, colour);
+}
+
+template <>
+void GXMaterialProgramImpl<GXMaterialProgram_802A73B0>::Activate(GLView*)
+{
+    SetShadowVolumeColour();
+    SetShadowVolumeConstantColour();
 
     static_cast<GXMaterialProgram_802A73B0*>(this)->ConfigureVertexFormat(true);
     gxSetNumChans(0);
