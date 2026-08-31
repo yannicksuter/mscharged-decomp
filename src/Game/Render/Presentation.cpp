@@ -185,8 +185,8 @@ struct PresentationEmissionEvent
 extern "C" void fn_801FF2A8(PresentationEmissionEvent* event)
 {
     Presentation& presentation = Presentation::Instance();
-    if (*(unsigned int*)event->data
-        == nlStringLowerHash(presentation.mEmissionName))
+    unsigned int hash = nlStringLowerHash(presentation.mEmissionName);
+    if (hash == *(unsigned int*)event->data)
     {
         event->active = true;
     }
@@ -195,8 +195,8 @@ extern "C" void fn_801FF2A8(PresentationEmissionEvent* event)
 extern "C" void fn_801FF42C(PresentationEmissionEvent* event)
 {
     Presentation& presentation = Presentation::Instance();
-    if (*(unsigned int*)event->data
-        == nlStringLowerHash(presentation.mEmissionName))
+    unsigned int hash = nlStringLowerHash(presentation.mEmissionName);
+    if (hash == *(unsigned int*)event->data)
     {
         event->active = false;
     }

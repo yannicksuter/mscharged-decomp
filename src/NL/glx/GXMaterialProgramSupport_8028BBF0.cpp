@@ -98,8 +98,8 @@ extern "C" void fn_8028BBF0(bool enabled)
     gxSetTevOrder(4, 3, 3, 255);
     gxSetTevOrder(5, 5, 5, 255);
     gxSetTevOrder(6, 4, 4, 255);
-    GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX3x4, GX_TG_POS, GX_TEXMTX0, GX_TRUE, GX_PTTEXMTX0);
-    GXSetTexCoordGen2(GX_TEXCOORD5, GX_TG_MTX3x4, GX_TG_POS, GX_TEXMTX0, GX_TRUE, GX_PTTEXMTX3);
+    GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX3x4, GX_TG_NRM, GX_TEXMTX0, GX_TRUE, GX_PTTEXMTX0);
+    GXSetTexCoordGen2(GX_TEXCOORD5, GX_TG_MTX3x4, GX_TG_NRM, GX_TEXMTX0, GX_TRUE, GX_PTTEXMTX1);
     gxSetTevColourOp(2, 0, 0, 0, true, 1);
     if (enabled && fn_80182118() != 0)
         gxSetTevColourOp(1, 0, 0, 1, true, 0);

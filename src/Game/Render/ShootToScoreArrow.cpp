@@ -3,8 +3,8 @@
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
-#include "NL/nlMath.h"
 
+#include <math.h>
 #include <string.h>
 
 struct LoadFrame
@@ -59,7 +59,7 @@ void WorldDarkening::fn_801AF570(float deltaTime)
         mPos -= mRate * deltaTime;
     }
 
-    float distance = nlAbs(mPos - mTo);
+    float distance = (float)fabs(mPos - mTo);
     if (distance <= 2.0f * (mRate * deltaTime))
     {
         mPos = mTo;
