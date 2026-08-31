@@ -793,6 +793,14 @@ unclassified/tu_8018480C.cpp:
 	.text       start:0x8018480C end:0x80184AAC
 	.sdata      start:0x806DCC98 end:0x806DCCA0
 
+Game/Render/RenderShadow.cpp:
+	.text       start:0x80184ACC end:0x80186524
+	.rodata     start:0x804DCD48 end:0x804DCD60
+	.data       start:0x80511610 end:0x80511658
+	.sdata      start:0x806DCCB0 end:0x806DCCF0
+	.sbss       start:0x806E1470 end:0x806E1488
+	.sdata2     start:0x806E4D50 end:0x806E4D8C
+
 Game/Blinker.cpp:
 	.text       start:0x80199B30 end:0x80199E84
 	.rodata     start:0x804DCD80 end:0x804DCD90

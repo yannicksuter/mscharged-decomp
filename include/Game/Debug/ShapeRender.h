@@ -6,6 +6,8 @@
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
 
+class GLView;
+
 struct PrimitiveShape
 {
     /* 0x00 */ nlVector3* position;
@@ -18,20 +20,23 @@ struct PrimitiveShape
 class ShapeRender
 {
 public:
+    void DrawSpherePrimitive(const nlMatrix4& mat_world, float radius,
+        const nlColour& colour) const;
     void DrawLine3D(
         const nlVector3& p0,
         const nlVector3& p1,
         const nlColour& colour,
         bool bWithDepth) const;
 
-    /* 0x00 */ bool m_Initialized;
-    /* 0x04 */ PrimitiveShape m_Box;
-    /* 0x18 */ PrimitiveShape m_Hemisphere;
-    /* 0x2C */ PrimitiveShape m_FlatCylinderEnd;
-    /* 0x40 */ PrimitiveShape m_Cylinder;
-    /* 0x54 */ void* m_pLightUserData;
-    /* 0x58 */ eGLView m_eView;
-}; // total size: 0x5C
+    /* 0x00 */ void* m_Unknown00;
+    /* 0x04 */ bool m_Initialized;
+    /* 0x08 */ PrimitiveShape m_Box;
+    /* 0x1C */ PrimitiveShape m_Hemisphere;
+    /* 0x30 */ PrimitiveShape m_FlatCylinderEnd;
+    /* 0x44 */ PrimitiveShape m_Cylinder;
+    /* 0x58 */ void* m_pLightUserData;
+    /* 0x5C */ GLView* m_eView;
+}; // total size: 0x60
 
 extern ShapeRender g_ShapeRenderer;
 

@@ -5,8 +5,10 @@
 #include "Game/CharacterEffects.h"
 #include "Game/AI/HeadTrack.h"
 #include "Game/PoseAccumulator.h"
+#include "Game/Render/RenderShadow.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 #include "Game/Team.h"
+#include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 
 extern "C" void* fn_802CDF0C();
@@ -204,19 +206,6 @@ union Colour
     };
 };
 
-struct ProjectedShadowParams
-{
-    nlVector4 light;
-    nlVector3 position;
-    float radius;
-    Model* model;
-    float height;
-    float scalar;
-    int partitionIndex;
-    int visibleInterval;
-    int invisibleInterval;
-};
-
 struct Camera
 {
     virtual void Reserved0() = 0;
@@ -268,15 +257,10 @@ extern "C" void fn_8001EFCC(Character*, SkinMesh*, Model*);
 extern "C" void fn_80182EC8(int);
 extern "C" int fn_800FC748(int);
 extern "C" int fn_80183DEC(const nlVector3*);
-extern "C" int fn_80184AE8(int);
-extern "C" bool fn_80184B5C(ProjectedShadowParams*);
-extern "C" void fn_80185130(ProjectedShadowParams*);
-extern "C" void fn_8018595C(ProjectedShadowParams*);
 extern "C" CameraManager* fn_8027261C();
-extern "C" void fn_8027267C(int);
+extern "C" RLView* fn_8027267C(int);
 extern "C" void fn_80273A4C(int, Model*, int);
 extern "C" bool fn_80277238();
-extern "C" Model* fn_802CC360(void*, int, int);
 extern "C" void fn_802CC458(ModelPacket*, u32, u32);
 extern "C" void fn_802CC4FC(
     ModelPacket*, u32, const ResolvedTexture&);
@@ -815,7 +799,8 @@ void DrawableCharacter::SendToGl(Character& source, int renderPass)
     skinMesh->PrepareToRender();
     void* sourceModel = skinMesh->FinishPreparing();
 
-    Model* model = fn_802CC360(sourceModel, 0, 0);
+    Model* model
+        = (Model*)glModelDupNoStreams((const glModel*)sourceModel, false, 0);
     ApplyDamageEffects(source, model, renderPass);
     bool attachEffects = false;
     ApplyMaterialEffects(
@@ -864,7 +849,8 @@ void DrawableCharacter::SendToGl(Character& source, int renderPass)
         }
         shadowMesh->PrepareToRender();
         sourceModel = shadowMesh->FinishPreparing();
-        model = fn_802CC360(sourceModel, 0, 0);
+        model
+            = (Model*)glModelDupNoStreams((const glModel*)sourceModel, false, 0);
     }
     RenderCharacterShadow(source, model, view);
 }
@@ -1621,7 +1607,7 @@ void DrawableCharacter::RenderCharacterShadow(
         : drawable->blendAmount;
 
     static u32 blackHash = nlStringLowerHash(CharacterAlphaValueName);
-    params.scalar = 1.0f;
+    params.fScalar = 1.0f;
     light = source.shadowLight;
     float lightRadius = light->radius;
     float lightHeight = light->height;
@@ -1631,47 +1617,48 @@ void DrawableCharacter::RenderCharacterShadow(
     float one = 1.0f;
     float characterScale = source.scale;
     nlVec4Set(
-        params.light,
+        params.vLight,
         camera->position.x,
         camera->position.y,
         camera->position.z,
         one);
-    params.position = drawable->bip01Position;
-    params.radius = characterScale * radius;
-    params.height = characterScale * height;
-    params.model = 0;
-    params.scalar = currentShadowLevel;
-    params.partitionIndex = source.partitionIndex;
+    params.vPosition = drawable->bip01Position;
+    params.fRadius = characterScale * radius;
+    params.fHeight = characterScale * height;
+    params.pModel = 0;
+    params.fScalar = currentShadowLevel;
+    params.nPartitionIndex = source.partitionIndex;
 
     if (m_pInstance__13nlTaskManager->state == 2)
     {
-        params.visibleInterval = lbl_80511298[intervalIndex];
-        params.invisibleInterval = lbl_805112A4[intervalIndex];
+        params.nVisibleInterval = lbl_80511298[intervalIndex];
+        params.nInvisibleInterval = lbl_805112A4[intervalIndex];
     }
     else
     {
-        params.visibleInterval = 1;
-        params.invisibleInterval = 1;
+        params.nVisibleInterval = 1;
+        params.nInvisibleInterval = 1;
     }
 
-    if (fn_80184B5C(&params))
+    if (ShouldShadowBeUpdated(params))
     {
-        params.model = fn_802CC360(skinModel, 0, 0);
+        params.pModel
+            = glModelDupNoStreams((const glModel*)skinModel, false, 0);
         if (1.0f != blackAmount)
         {
-            for (ModelPacket* packet = params.model->packets;
-                 packet < params.model->packets + params.model->packetCount;
+            for (ModelPacket* packet = (ModelPacket*)params.pModel->packets;
+                 packet < (ModelPacket*)params.pModel->packets
+                         + params.pModel->numPackets;
                  ++packet)
             {
                 fn_802CC628(packet, blackHash, 1.0f);
             }
         }
-        fn_80185130(&params);
+        RenderCharacterIntoTexture(params);
     }
 
-    fn_8027267C(renderContext);
-    int oldContext = ((int (*)())fn_80184AE8)();
-    fn_8018595C(&params);
+    RLView* oldContext = fn_80184AE8(fn_8027267C(renderContext));
+    RenderProjectedShadow(params);
     fn_80184AE8(oldContext);
 }
 
