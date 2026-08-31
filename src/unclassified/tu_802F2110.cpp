@@ -5,7 +5,9 @@
 
 struct Transition_802F2110
 {
-    void** vtable;
+    virtual void fn_802EB634();
+    virtual void fn_802EB5BC(float target, float duration);
+
     float value;
     u8 valid;
     u8 pad_09[3];
@@ -135,13 +137,6 @@ extern "C" void fn_802F4278(VoiceNode_802F2110*);
 extern "C" void fn_802F4518(VoiceNode_802F2110*);
 extern "C" void fn_802F4640(VoiceNode_802F2110*, u32, void*);
 
-static inline void SetTransition_802F2110(Transition_802F2110* transition,
-    float target, float duration)
-{
-    typedef void (*SetFunc)(Transition_802F2110*, float, float);
-    ((SetFunc)transition->vtable[3])(transition, target, duration);
-}
-
 static inline VoiceNode_802F2110* AllocateVoice_802F2110()
 {
     VoiceNode_802F2110* voice = 0;
@@ -227,6 +222,7 @@ extern "C" SlotPoolBase* fn_802F2118(SlotPoolBase* pool, int destroy)
 extern "C" SoundInstance_802F2110* fn_802F2188(SoundInstance_802F2110* instance,
     CueHandle_802F2110* owner, VoiceDefinition_802F2110* definition)
 {
+    instance->previousTime = -1.0f;
     instance->volume.value = 0.0f;
     instance->volume.valid = true;
     instance->volume.target = 0.0f;
@@ -238,15 +234,14 @@ extern "C" SoundInstance_802F2110* fn_802F2188(SoundInstance_802F2110* instance,
     instance->rpcEntries = 0;
     instance->entryPool = &lbl_8057FA10;
     instance->state = 0;
-    instance->previousTime = -1.0f;
     instance->currentTime = 0.0f;
     instance->activeRpc = 0;
     instance->transitionTime = 0.0f;
-    instance->volume.vtable = lbl_8052F3C8;
+    *(void***)&instance->volume = lbl_8052F3C8;
     instance->volume.elapsed = -1.0f;
     instance->volume.duration = 1.0f;
     instance->volume.enabled = true;
-    instance->pitch.vtable = lbl_8052F3C8;
+    *(void***)&instance->pitch = lbl_8052F3C8;
     instance->pitch.elapsed = -1.0f;
     instance->pitch.duration = 1.0f;
     instance->pitch.enabled = true;
@@ -266,11 +261,11 @@ extern "C" SoundInstance_802F2110* fn_802F2188(SoundInstance_802F2110* instance,
     instance->pitch.valid = true;
 
     VoiceNode_802F2110* previous = 0;
-    for (u32 i = 0; i < definition->voiceCount; i++)
+    for (u32 i = 0; i < instance->definition->voiceCount; i++)
     {
         VoiceNode_802F2110* voice = AllocateVoice_802F2110();
         if (voice != 0)
-            voice = fn_802F3E20(voice, instance, definition->voiceIds[i]);
+            voice = fn_802F3E20(voice, instance, instance->definition->voiceIds[i]);
         if (previous == 0)
             instance->voices = voice;
         else
@@ -282,8 +277,8 @@ extern "C" SoundInstance_802F2110* fn_802F2188(SoundInstance_802F2110* instance,
 
 extern "C" void fn_802F2320(SoundInstance_802F2110* instance, float)
 {
-    SetTransition_802F2110(&instance->volume, 0.0f, 1.0f);
-    SetTransition_802F2110(&instance->pitch, 0.0f, 1.0f);
+    instance->volume.fn_802EB5BC(0.0f, 1.0f);
+    instance->pitch.fn_802EB5BC(0.0f, 1.0f);
     if (instance->voices != 0)
         fn_802F3F6C(instance->voices);
     instance->state = 4;
@@ -386,8 +381,8 @@ extern "C" void fn_802F26B0(SoundInstance_802F2110* instance, float dt)
 {
     if (instance->state == 4 || instance->state == 7)
     {
-        SetTransition_802F2110(&instance->volume, dt, 1.0f);
-        SetTransition_802F2110(&instance->pitch, dt, 1.0f);
+        instance->volume.fn_802EB5BC(dt, 1.0f);
+        instance->pitch.fn_802EB5BC(dt, 1.0f);
         instance->previousTime = instance->currentTime;
         instance->currentTime += dt;
     }

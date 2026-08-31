@@ -5,7 +5,7 @@
 
 extern void* lbl_806E201C;
 
-extern "C" void fn_802ECC54(void* audioSystem);
+extern "C" void fn_802ECC54(void* audioSystem, void* value);
 extern "C" void fn_8004F594(int category, const char* format, ...);
 
 static char sHitMarkerWarning[]
@@ -42,7 +42,7 @@ XSoundHandle_802ED74C::~XSoundHandle_802ED74C()
         m_Owner->count.references--;
         if ((m_Owner->m_ReferencesAndFlags >> 12) & 1)
         {
-            fn_802ECC54(lbl_806E201C);
+            fn_802ECC54(lbl_806E201C, m_Owner);
             m_Owner = 0;
         }
     }
@@ -50,7 +50,7 @@ XSoundHandle_802ED74C::~XSoundHandle_802ED74C()
 
 void XSoundHandle_802ED74C::fn_802ED88C(char* buffer, u32 size)
 {
-    nlSNPrintf(buffer, size, sStateFormat, **m_Slot, m_CueIndex, m_State, this);
+    nlSNPrintf(buffer, size, sStateFormat, **m_Slot, m_CueIndex, m_State);
 }
 
 void XSoundHandle_802ED74C::fn_802ED8BC(u32** slot, u32 cueIndex)

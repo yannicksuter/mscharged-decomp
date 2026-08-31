@@ -34,8 +34,7 @@ u32 SoundMap::fn_802EE178(
 
 void SoundMap::fn_802EE20C()
 {
-    if (m_CueTree != 0)
-        delete m_CueTree;
+    delete m_CueTree;
     m_CueTree = 0;
 }
 

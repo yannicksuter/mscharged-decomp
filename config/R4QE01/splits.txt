@@ -1798,6 +1798,7 @@ unclassified/tu_802F1758.cpp:
 
 unclassified/tu_802F2110.cpp:
 	.text       start:0x802F2110 end:0x802F2B24
+	.sdata2     start:0x806E6618 end:0x806E6638
 
 unclassified/tu_802F2C3C.cpp:
 	.text       start:0x802F2C3C end:0x802F39EC
