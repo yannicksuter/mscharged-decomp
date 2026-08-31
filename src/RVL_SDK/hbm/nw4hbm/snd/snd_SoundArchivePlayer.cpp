@@ -384,6 +384,10 @@ const SoundArchive& SoundArchivePlayer::GetSoundArchive() const {
     return *mSoundArchive;
 }
 
+// SoundPlayer& SoundArchivePlayer::GetSoundPlayer(const char*) lives here in the library source
+// ([R89JEL]:/bin/RVL/Debug/mainD.MAP:14216). It is unreferenced and dead-stripped from this link,
+// so only its assertion string survives, ahead of the group table messages in the literal pool.
+DECOMP_FORCEACTIVE(snd_SoundArchivePlayer_cpp, NW4HBMAssertPointerNonnull_String(mSoundArchive));
 
 SoundPlayer& SoundArchivePlayer::GetSoundPlayer(u32 playerId) {
     NW4HBMAssertHeaderClampedLValue_Line(playerId, 0, mSoundPlayerCount, 690);

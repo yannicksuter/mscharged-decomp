@@ -73,9 +73,9 @@ s32 NETiGetConnectionTypeFromConfigList(u32 list0, u32 list1, u32 list2)
 
 s32 NETGetStartupErrorCode(s32 error)
 {
-    u32 list0;
-    u32 list1;
     u32 list2;
+    u32 list1;
+    u32 list0;
     s32 connectionType = 99;
 
     if (NCDiGetEnabledConfigList(&list0, &list1, &list2) >= 0)

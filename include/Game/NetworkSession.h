@@ -101,6 +101,14 @@ public:
     virtual void OnStatsResult(bool success) = 0;
 };
 
+struct UnidentifiedTransportPlayer
+{
+    /* 0x00 */ char mName[12];
+    /* 0x0C */ u32 mUnidentified0C;
+    /* 0x10 */ u16 mUnidentified10;
+    /* 0x12 */ u16 mUnidentified12;
+};
+
 class UnidentifiedMachineRoster
 {
 public:
@@ -111,13 +119,13 @@ public:
     virtual void RosterVirtual10();
     virtual void RosterVirtual14();
     virtual int GetMachineCount();
-    virtual void RosterVirtual1C();
+    virtual UnidentifiedTransportPlayer* GetPlayerInfo(int index);
     virtual void RosterVirtual20();
     virtual void RosterVirtual24();
     virtual void RosterVirtual28();
     virtual void RosterVirtual2C();
-    virtual void RosterVirtual30();
-    virtual void RosterVirtual34();
+    virtual void Update(float dt);
+    virtual int GetPlayerCount();
     virtual void RosterVirtual38();
     virtual void OnConnected(u32 connection, int result);
     virtual int ShouldAcceptConnection(u32 connection, u8* address);
@@ -180,14 +188,6 @@ public:
     /* 0x004 */ u8 mUnidentified004[0xFFC - 0x4];
 }; // size: 0xFFC
 
-struct UnidentifiedTransportPlayer
-{
-    /* 0x00 */ char mName[12];
-    /* 0x0C */ u32 mUnidentified0C;
-    /* 0x10 */ u16 mUnidentified10;
-    /* 0x12 */ u16 mUnidentified12;
-};
-
 class NetworkTransport_8032CA4C : public UnidentifiedMachineRoster
 {
 public:
@@ -196,10 +196,6 @@ public:
     NetworkTransport_8032CA4C();
 
     virtual UnidentifiedTransportPlayer* GetPlayerInfo(int index);
-    virtual void TransportVirtual20();
-    virtual void TransportVirtual24();
-    virtual void TransportVirtual28();
-    virtual void TransportVirtual2C();
     virtual void Update(float dt);
     virtual int GetPlayerCount();
 
@@ -215,13 +211,7 @@ public:
 
     NetworkLobby_80133634();
 
-    virtual void LobbyVirtual1C();
-    virtual void LobbyVirtual20();
-    virtual void LobbyVirtual24();
-    virtual void LobbyVirtual28();
-    virtual void LobbyVirtual2C();
     virtual void Update(float dt);
-    virtual int LobbyVirtual34();
 
     /* 0x004 */ u8 mUnidentified004[0xE0 - 0x4];
     /* 0x0E0 */ int mUnidentified0E0;

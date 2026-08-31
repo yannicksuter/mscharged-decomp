@@ -9,6 +9,8 @@ typedef u8 GetCharFunc(u8 const* buf);
 
 namespace nw4hbm {
 namespace db {
+static void MapFile_Append_(MapFile* pMapFile);
+
 static u8 GetCharOnMem_(const u8* buf);
 static u8 GetCharOnDvd_(u8 const* buf);
 
@@ -35,9 +37,71 @@ static GetCharFunc* GetCharPtr_;
 } // namespace db
 } // namespace nw4hbm
 
+// R4QE01 dead-strips the map-file registration entries, but their assertion
+// strings still head this file's string data at 0x80556D10, ahead of every
+// string the retained routines use. The expressions are transcribed from that
+// retail data.
+DECOMP_FORCEACTIVE(db_mapFile_cpp, __FILE__, NW4HBMAssertPointerNonnull_String(buffer),
+                   NW4HBMAssertPointerNonnull_String(mapDataBuf), NW4HBMAssertPointerNonnull_String(pMapFile),
+                   NW4HBMAssert_String(sMapFileList->moduleInfo != NULL),
+                   NW4HBMAssertPointerNonnull_String(filePath), NW4HBMAssert_String(pMapFile->fileEntry >= 0));
 
 namespace nw4hbm {
 namespace db {
+MapFileHandle MapFile_Regist(void* buffer, void* mapDataBuf, OSModuleInfo* moduleInfo) {
+    MapFile* pMapFile = static_cast<MapFile*>(buffer);
+
+    NW4HBMAssertPointerNonnull(buffer);
+    NW4HBMAssertPointerNonnull(mapDataBuf);
+
+    pMapFile->mapBuf = static_cast<byte_t*>(mapDataBuf);
+    pMapFile->moduleInfo = moduleInfo;
+    pMapFile->fileEntry = -1;
+    pMapFile->next = NULL;
+
+    MapFile_Append_(pMapFile);
+
+    return pMapFile;
+}
+
+static void MapFile_Append_(MapFile* pMapFile) {
+    NW4HBMAssertPointerNonnull(pMapFile);
+
+    if (sMapFileList == NULL) {
+        sMapFileList = pMapFile;
+        return;
+    }
+
+    if (pMapFile->moduleInfo) {
+        pMapFile->next = sMapFileList->next;
+        sMapFileList->next = pMapFile;
+    } else {
+        NW4HBMAssert(sMapFileList->moduleInfo != NULL);
+
+        pMapFile->next = sMapFileList;
+        sMapFileList = pMapFile;
+    }
+}
+
+MapFileHandle MapFile_RegistOnDvd(void* buffer, char const* filePath, OSModuleInfo* moduleInfo) {
+    MapFile* pMapFile = static_cast<MapFile*>(buffer);
+
+    NW4HBMAssertPointerNonnull(buffer);
+    NW4HBMAssertPointerNonnull(filePath);
+
+    pMapFile->mapBuf = NULL;
+    pMapFile->moduleInfo = moduleInfo;
+    pMapFile->fileEntry = DVDConvertPathToEntrynum(filePath);
+
+    NW4HBMAssert(pMapFile->fileEntry >= 0);
+
+    pMapFile->next = NULL;
+
+    MapFile_Append_(pMapFile);
+
+    return pMapFile;
+}
+
 bool MapFile_Exists(void) { return sMapFileList ? true : false; }
 
 static u8 GetCharOnMem_(u8 const* buf) { return *buf; }

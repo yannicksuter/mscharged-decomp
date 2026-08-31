@@ -1686,7 +1686,7 @@ void HomeButton::calc(const HBMControllerData* pController)
         }
 
         setVolume(mVolumeNum);
-        bool result = WPADSaveConfig(NULL);
+        WPADSaveConfig(NULL);
         mpRemoteSpk->Stop();
 
         for (int i = 0; i < WPAD_MAX_CONTROLLERS; i++)
@@ -1696,8 +1696,6 @@ void HomeButton::calc(const HBMControllerData* pController)
                 mpController[i]->clearCallback();
             }
         }
-
-        NW4HBMAssert_Line(result, LN(1671, 1649));
 
         if (mSelectBtnNum != HBM_SELECT_BTN3 && mpHBInfo->sound_callback != NULL)
         {

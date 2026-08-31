@@ -699,13 +699,13 @@ void UnidentifiedNetworkSession::SendSidesChangedToHost(
 void UnidentifiedNetworkSession::SendCheckConnectionToEveryone()
 {
     NetMessageCheckConnection message;
-    for (int machine = 0; machine < mLobby->LobbyVirtual34(); ++machine)
+    for (int machine = 0; machine < mLobby->GetPlayerCount(); ++machine)
     {
         message.mUnidentified08[machine] =
             *(u32*)((u8*)fn_80135D5C(mLobby, machine) + 0x18);
     }
 
-    for (int machine = 0; machine < mLobby->LobbyVirtual34(); ++machine)
+    for (int machine = 0; machine < mLobby->GetPlayerCount(); ++machine)
     {
         u8 buffer[0xFF];
         u32 size = fn_8032C830(lbl_806E2100, &message, buffer, 0xFF);
@@ -776,6 +776,135 @@ void UnidentifiedNetworkSession::SendConnectionDecisionToHost(
     else
     {
         mDirectSocket->Send(aid, buffer, size, true);
+    }
+}
+
+static inline void PopupNetworkErrorOverlay(
+    UnidentifiedNetworkSession* session, int overlay)
+{
+    if (lbl_806E10E8 != 0)
+    {
+        return;
+    }
+    if (session->mPoppedOverlay != 3)
+    {
+        fn_8004F594(
+            0x10,
+            "Ignored overlayRequest %d because already popped overlay %d\n",
+            overlay, session->mPoppedOverlay);
+        return;
+    }
+    session->mPoppedOverlay = overlay;
+    if (fn_80127558()->mUnidentified008 != 0)
+    {
+        fn_80129104(fn_80127558(), overlay);
+    }
+}
+
+void UnidentifiedNetworkSession::Update()
+{
+    if (!fn_80374308())
+    {
+        return;
+    }
+
+    float dt;
+    if (mLastTicker == 0)
+    {
+        dt = lbl_806E4724;
+    }
+    else
+    {
+        dt = nlGetTickerDifference(mLastTicker, nlGetTicker()) / lbl_806E4728;
+    }
+
+    u32 ticker = nlGetTicker();
+    mElapsedTime += dt;
+    mLastTicker = ticker;
+    mUpdateCount++;
+
+    if (mSessionMode == 1)
+    {
+        mDirectSocket->Update(dt);
+        mTransport->Update(dt);
+        fn_80127558();
+        fn_801289CC(dt);
+        fn_8012B288();
+        fn_8012BCEC(dt);
+        mStatsReporter->ReporterVirtual14();
+
+        if (mTransport->mState == 3)
+        {
+            fn_8032E890();
+            if (mTransport->GetPlayerCount() >= 2)
+            {
+                UnidentifiedDraftEntry entries[8];
+                for (int player = 0;
+                     player < mTransport->GetPlayerCount(); ++player)
+                {
+                    UnidentifiedTransportPlayer* info =
+                        mTransport->GetPlayerInfo(player);
+                    nlStrToWcs(info->mName, entries[player].mName, 0xB);
+                    memset(entries[player].mUnidentified32, 0, 0x4C);
+                    entries[player].mIndex = player;
+                    entries[player].mHead.mUnidentified04[0] = 0;
+                    entries[player].mHead.mUnidentified04[1] = 0;
+                    entries[player].mHead.mUnidentified04[2] = 0;
+                    entries[player].mHead.mUnidentified04[3] = 0;
+                    entries[player].mHead.mUnidentified04[4] = 0;
+                    entries[player].mHead.mUnidentified04[1] =
+                        info->mUnidentified0C;
+                    entries[player].mHead.mUnidentified04[2] =
+                        info->mUnidentified10;
+                    entries[player].mHead.mUnidentified04[3] =
+                        info->mUnidentified12;
+                }
+                SendDraftToEveryone(mTransport->GetPlayerCount(), entries,
+                                    false, 0);
+            }
+        }
+    }
+    else if (mSessionMode == 2)
+    {
+        if (mUnidentified2448 != 0 && mUnidentified2494 == 0
+            && mLobby->mUnidentified2F4 == 0)
+        {
+            DWC_ProcessFriendsMatch();
+        }
+
+        mLobby->Update(dt);
+        mDirectSocket->Update(dt);
+        fn_80127558();
+        fn_801289CC(dt);
+        fn_8012B288();
+        fn_8012BCEC(dt);
+        fn_80136DFC(lbl_806E1194, dt);
+        mUnidentified2460->ObjectVirtual14();
+        fn_8012F8F8();
+        fn_8013202C(dt);
+
+        if (OnlineVirtual10() == 1)
+        {
+            fn_80120838();
+        }
+
+        if (mLobby->mUnidentified0E0 == 0 && mLobby->GetPlayerCount() > 0)
+        {
+            fn_80135D00(mLobby);
+            SendCheckConnectionToEveryone();
+        }
+    }
+
+    if (mOverlayRequest != 3 && mUnidentified2472 != 0)
+    {
+        fn_8004F594(
+            0x10,
+            "Finished pending load, now can popup network error overlay "
+            "%d\n",
+            mOverlayRequest);
+        fn_80132968(fn_8012F8F8(), 4);
+        PopupNetworkErrorOverlay(this, mOverlayRequest);
+        mOverlayRequest = 3;
     }
 }
 
@@ -1091,131 +1220,6 @@ bool UnidentifiedNetworkSession::fn_80120738()
         return true;
     }
     return false;
-}
-
-void UnidentifiedNetworkSession::Update()
-{
-    if (!fn_80374308())
-    {
-        return;
-    }
-
-    float dt;
-    if (mLastTicker == 0)
-    {
-        dt = lbl_806E4724;
-    }
-    else
-    {
-        dt = nlGetTickerDifference(mLastTicker, nlGetTicker()) / lbl_806E4728;
-    }
-
-    u32 ticker = nlGetTicker();
-    mElapsedTime += dt;
-    mLastTicker = ticker;
-    mUpdateCount++;
-
-    if (mSessionMode == 1)
-    {
-        mDirectSocket->Update(dt);
-        mTransport->Update(dt);
-        fn_80127558();
-        fn_801289CC(dt);
-        fn_8012B288();
-        fn_8012BCEC(dt);
-        mStatsReporter->ReporterVirtual14();
-
-        if (mTransport->mState == 3)
-        {
-            fn_8032E890();
-            if (mTransport->GetPlayerCount() >= 2)
-            {
-            UnidentifiedDraftEntry entries[8];
-            for (int player = 0; player < mTransport->GetPlayerCount();
-                 ++player)
-            {
-                UnidentifiedTransportPlayer* info =
-                    mTransport->GetPlayerInfo(player);
-                nlStrToWcs(info->mName, entries[player].mName, 0xB);
-                memset(entries[player].mUnidentified32, 0, 0x4C);
-                entries[player].mIndex = player;
-                entries[player].mHead.mUnidentified04[0] = 0;
-                entries[player].mHead.mUnidentified04[1] = 0;
-                entries[player].mHead.mUnidentified04[2] = 0;
-                entries[player].mHead.mUnidentified04[3] = 0;
-                entries[player].mHead.mUnidentified04[4] = 0;
-                entries[player].mHead.mUnidentified04[1] =
-                    info->mUnidentified0C;
-                entries[player].mHead.mUnidentified04[2] =
-                    info->mUnidentified10;
-                entries[player].mHead.mUnidentified04[3] =
-                    info->mUnidentified12;
-            }
-            SendDraftToEveryone(mTransport->GetPlayerCount(), entries, false,
-                                0);
-            }
-        }
-    }
-    else if (mSessionMode == 2)
-    {
-        if (mUnidentified2448 != 0 && mUnidentified2494 == 0
-            && mLobby->mUnidentified2F4 == 0)
-        {
-            DWC_ProcessFriendsMatch();
-        }
-
-        mLobby->Update(dt);
-        mDirectSocket->Update(dt);
-        fn_80127558();
-        fn_801289CC(dt);
-        fn_8012B288();
-        fn_8012BCEC(dt);
-        fn_80136DFC(lbl_806E1194, dt);
-        mUnidentified2460->ObjectVirtual14();
-        fn_8012F8F8();
-        fn_8013202C(dt);
-
-        if (OnlineVirtual10() == 1)
-        {
-            fn_80120838();
-        }
-
-        if (mLobby->mUnidentified0E0 == 0 && mLobby->LobbyVirtual34() > 0)
-        {
-            fn_80135D00(mLobby);
-            SendCheckConnectionToEveryone();
-        }
-    }
-
-    if (mOverlayRequest != 3 && mUnidentified2472 != 0)
-    {
-        fn_8004F594(
-            0x10,
-            "Finished pending load, now can popup network error overlay "
-            "%d\n");
-        fn_80132968(fn_8012F8F8(), 4);
-        int request = mOverlayRequest;
-        if (lbl_806E10E8 == 0)
-        {
-            if (mPoppedOverlay != 3)
-            {
-                fn_8004F594(
-                    0x10,
-                    "Ignored overlayRequest %d because already popped overlay "
-                    "%d\n",
-                    request, mPoppedOverlay);
-            }
-            else
-            {
-                mPoppedOverlay = request;
-                if (fn_80127558()->mUnidentified008 != 0)
-                {
-                    fn_80129104(fn_80127558(), request);
-                }
-            }
-        }
-        mOverlayRequest = 3;
-    }
 }
 
 void UnidentifiedNetworkSession::fn_80120838()
@@ -2884,23 +2888,7 @@ bool UnidentifiedNetworkSession::fn_80123E70(u32 connection)
 
 void UnidentifiedNetworkSession::fn_80123FBC(int overlay)
 {
-    if (lbl_806E10E8 != 0)
-    {
-        return;
-    }
-    if (mPoppedOverlay != 3)
-    {
-        fn_8004F594(
-            0x10,
-            "Ignored overlayRequest %d because already popped overlay %d\n",
-            overlay, mPoppedOverlay);
-        return;
-    }
-    mPoppedOverlay = overlay;
-    if (fn_80127558()->mUnidentified008 != 0)
-    {
-        fn_80129104(fn_80127558(), overlay);
-    }
+    PopupNetworkErrorOverlay(this, overlay);
 }
 
 void UnidentifiedNetworkSession::fn_80124038(u32 connection, int reason)
@@ -2927,25 +2915,7 @@ void UnidentifiedNetworkSession::fn_80124038(u32 connection, int reason)
         if (fn_80123E70(connection))
         {
             fn_80132968(fn_8012F8F8(), 4);
-            if (lbl_806E10E8 == 0)
-            {
-                if (mPoppedOverlay != 3)
-                {
-                    fn_8004F594(
-                        0x10,
-                        "Ignored overlayRequest %d because already popped "
-                        "overlay %d\n",
-                        0);
-                }
-                else
-                {
-                    mPoppedOverlay = 0;
-                    if (fn_80127558()->mUnidentified008 != 0)
-                    {
-                        fn_80129104(fn_80127558(), 0);
-                    }
-                }
-            }
+            PopupNetworkErrorOverlay(this, 0);
         }
         else
         {
@@ -2984,8 +2954,8 @@ void UnidentifiedNetworkSession::fn_801241C8()
         {
             fn_8013157C(fn_8012F8F8());
         }
+        fn_80134298(mSessionMode == 2 ? mLobby : 0);
     }
-    fn_80134298(mSessionMode == 2 ? mLobby : 0);
 }
 
 struct UnidentifiedDraftEntryBlock

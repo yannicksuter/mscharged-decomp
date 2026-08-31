@@ -13,6 +13,7 @@
 namespace nw4hbm {
 namespace lyt {
 
+static const int FONTNAMEBUF_MAX = 128;
 static const int RESOURCE_NAME_MAX = 128;
 
 class FontRefLink {
@@ -27,7 +28,7 @@ public:
     /* 0x00 */ ut::LinkListNode mLink;
 
 protected:
-    /* 0x08 */ char mFontName[RESOURCE_NAME_MAX];
+    /* 0x08 */ char mFontName[FONTNAMEBUF_MAX];
     /* 0x88 */ ut::Font* mpFont;
 };
 typedef ut::LinkList<FontRefLink, offsetof(FontRefLink, mLink)> FontRefLinkList;

@@ -373,10 +373,10 @@ int SOShutdown(int s, int how)
 
 int SOPoll(SOPollFD fds[], unsigned nfds, OSTime timeout)
 {
+    int bufferSize;
+    int fdsSize;
     int result;
     s32 rmId;
-    int fdsSize;
-    int bufferSize;
     OSTime* args;
     SOPollFD* fdBuffer;
 

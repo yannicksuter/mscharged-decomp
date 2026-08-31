@@ -247,7 +247,7 @@ void fn_804974BC(int arg0);
 void fn_804929E0(void);
 
 GPResult fn_80492BA0(void);
-int fn_80493B94(char* out, const char* message, int index);
+int fn_80493B94(char* dstMsg, const char* srcMsg, int index);
 BOOL fn_80493C58(u8 command, u32 profileId, u32 ip, u16 port, u32* data,
     int count);
 int fn_80493434(int isRetry, int cookie, SBServer server);
@@ -506,7 +506,7 @@ int DWC_SetMatchingOption(int option, const void* optval)
         }
         if (((const DWCMatchOptMinComplete*)optval)->valid != 0)
         {
-            if (((const DWCMatchOptMinComplete*)optval)->minEntry > 1)
+            if (((const DWCMatchOptMinComplete*)optval)->minEntry <= 1)
             {
                 return 3;
             }
@@ -1767,8 +1767,6 @@ int fn_80492ABC(u8** aidList)
 
 int fn_80492AE8(u8** aidList)
 {
-    const u8* src;
-    u8* dst;
     int i;
 
     if (lbl_806E2EF8 == NULL)
@@ -1777,15 +1775,14 @@ int fn_80492AE8(u8** aidList)
     }
 
     memset(lbl_806CA158, 0, sizeof(lbl_806CA158));
-    src = lbl_806E2EF8->aidList;
-    dst = lbl_806CA158;
     for (i = 0; i <= lbl_806E2EF8->_0E; i++)
     {
-        if (!(lbl_806E2EF8->aidBitmap & (1 << *src)))
+        if (!(lbl_806E2EF8->aidBitmap
+                & (1 << lbl_806E2EF8->aidList[i])))
         {
             break;
         }
-        *dst++ = *src++;
+        lbl_806CA158[i] = lbl_806E2EF8->aidList[i];
     }
     *aidList = lbl_806CA158;
     return lbl_806E2EF8->_0E + 1;
@@ -2322,35 +2319,38 @@ SBError fn_80493A54(u8 command, u32 ip, u16 port, const u32* data, int count)
     return error;
 }
 
-int fn_80493B94(char* out, const char* message, int index)
+int fn_80493B94(char* dstMsg, const char* srcMsg, int index)
 {
+    const char* pSrcBegin = srcMsg;
+    char* pSrcNext = NULL;
+    char* pSrcEnd;
     int len;
     int i;
-    const char* end = strchr(message, '\0');
-    const char* next;
+
+    pSrcEnd = strchr(pSrcBegin, '\0');
 
     for (i = 0; i < index; i++)
     {
-        message = strchr(message, '/');
-        if (message == NULL)
+        pSrcNext = strchr(pSrcBegin, '/');
+        if (pSrcNext == NULL)
         {
             return -1;
         }
-        message++;
+        pSrcBegin = pSrcNext + 1;
     }
 
-    next = strchr(message, '/');
-    if (next == NULL)
+    pSrcNext = strchr(pSrcBegin, '/');
+    if (pSrcNext == NULL)
     {
-        next = end;
+        pSrcNext = pSrcEnd;
     }
-    if (message == next)
+    if (pSrcBegin == pSrcNext)
     {
         return -1;
     }
-    len = next - message;
-    memcpy(out, message, len);
-    out[len] = '\0';
+    len = pSrcNext - pSrcBegin;
+    memcpy(dstMsg, pSrcBegin, len);
+    dstMsg[len] = '\0';
     return len;
 }
 

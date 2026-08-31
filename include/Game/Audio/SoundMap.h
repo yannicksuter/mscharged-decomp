@@ -40,10 +40,6 @@ public:
 
 typedef nlAVLTree<SoundCue*, SoundCue*, SoundCueCompare_802EE294>
     SoundCueTree_802EE294;
-typedef AVLTreeBase<SoundCue*, SoundCue*,
-    NewAdapter<AVLTreeEntry<SoundCue*, SoundCue*> >,
-    SoundCueCompare_802EE294>
-    SoundCueTreeBase_802EE294;
 typedef nlAVLTreeIterator<SoundCue*, SoundCue*, SoundCueCompare_802EE294>
     SoundCueTreeIterator_802EE294;
 
@@ -56,7 +52,7 @@ public:
 
     u32 m_CueCount;
     SoundCue* m_Cues;
-    SoundCueTreeBase_802EE294* m_CueTree;
+    SoundCueTree_802EE294* m_CueTree;
 };
 
 #endif // GAME_AUDIO_SOUND_MAP_H

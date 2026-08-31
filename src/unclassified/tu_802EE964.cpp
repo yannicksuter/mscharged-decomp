@@ -109,7 +109,9 @@ struct AudioSystem_802EE964
 
 struct AudioEngine_802EE964
 {
-    void** vtable;
+    virtual ~AudioEngine_802EE964();
+    virtual void fn_8035BBD8();
+    virtual void fn_8035BFDC();
 };
 
 struct SliderManager_802EFA14
@@ -484,8 +486,7 @@ extern "C" void fn_802EF8B0(SliderManager_802EFA14* manager)
     SlotPoolBase::BaseFreeBlocks(&lbl_8057F9E8, 0x10);
     fn_802F4958(manager->controller);
 
-    typedef void (*ShutdownFunc)(AudioEngine_802EE964*);
-    ((ShutdownFunc)manager->engine->vtable[4])(manager->engine);
+    manager->engine->fn_8035BFDC();
 }
 
 extern "C" void fn_802EF9BC(

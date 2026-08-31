@@ -150,10 +150,9 @@ s32 NHTTPi_encodeUrlChar(char* destination, char c)
 
 s32 NHTTPi_strToHex(const char* string, s32 length)
 {
-    s32 c;
     s32 result;
     BOOL foundDigit;
-    s32 parsedChar;
+    char c;
 
     if (length > 8)
     {
@@ -168,28 +167,25 @@ s32 NHTTPi_strToHex(const char* string, s32 length)
     foundDigit = FALSE;
     while (length-- > 0)
     {
-        c = *string;
-        if ((c >= 'A') & (c <= 'Z'))
-        {
-            c += 'a' - 'A';
-        }
-        parsedChar = (char)c;
+        c = ((*string >= 'A') & (*string <= 'Z'))
+            ? *string + ('a' - 'A')
+            : *string;
 
-        if (parsedChar >= '0' && parsedChar <= '9')
+        if (c >= '0' && c <= '9')
         {
-            result = result * 16 + parsedChar - '0';
+            result = result * 16 + c - '0';
             foundDigit = TRUE;
         }
-        else if (parsedChar >= 'a' && parsedChar <= 'f')
+        else if (c >= 'a' && c <= 'f')
         {
-            result = result * 16 + parsedChar - 'a' + 10;
+            result = result * 16 + c - 'a' + 10;
             foundDigit = TRUE;
         }
-        else if (foundDigit && (parsedChar == ' ' || parsedChar == '\0'))
+        else if (foundDigit && (c == ' ' || c == '\0'))
         {
             break;
         }
-        else if (!foundDigit && parsedChar == ' ')
+        else if (!foundDigit && c == ' ')
         {
         }
         else
