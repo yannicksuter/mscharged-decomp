@@ -5,12 +5,8 @@
 #include "Game/Physics/PhysicsWorld.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/SHierarchy.h"
+#include "NL/nlMemory.h"
 #include "NL/platvmath.h"
-
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
 
 void dBodySetUpdateMode(dBodyID, int, int);
 dJointID dJointCreateCharacter(dWorldID, dJointGroupID);

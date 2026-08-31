@@ -17,11 +17,6 @@ extern void nlPrintf(const char* format, ...);
 extern "C" void fn_802FC280();
 extern "C" void fn_802FEA20(FEScene* scene);
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 FESceneManager::FESceneManager()
     : m_sceneHandlerStack(0x14, 0)
     , m_topMostScene(0)

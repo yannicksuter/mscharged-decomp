@@ -13,11 +13,6 @@
 
 #include <string.h>
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 extern "C"
 {
     void* fn_802CC0A4(unsigned long size, int memoryType, void* allocator);

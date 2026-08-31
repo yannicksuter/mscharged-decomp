@@ -10,11 +10,6 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 extern "C" void fn_8017617C();
 extern "C" void fn_801761E0();
 extern "C" void fn_80144AB8();

@@ -6,7 +6,6 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
-extern "C" float fn_802B6654(unsigned int*, float, float);
 extern "C" int nlSNPrintf(char*, unsigned long, const char*, ...);
 extern "C" double floor(double);
 extern "C" void fn_802C8280(const char*);
@@ -100,7 +99,7 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     {
         // Retail computes this per-texture stagger value and discards it; the
         // integer conversion it forces is part of the retained object.
-        float stagger = fn_802B6654(&nlDefaultSeed, 0.0f, 5.0f) + (float)i;
+        float stagger = nlRandomf(0.0f, 5.0f, &nlDefaultSeed) + (float)i;
         u16 angle = 0;
         for (int j = 0; j < mNumAngles; ++j)
         {
@@ -164,7 +163,7 @@ extern "C" u16 fn_802D75AC(u16 target, int count)
 void ImpostorCharacter::Acquire(Impostor* impostor)
 {
     ImpostorSprite_802D4290* best = 0;
-    float pick = floor(fn_802B6654(&nlDefaultSeed, 0.0f, (float)mNumTextures));
+    float pick = floor(nlRandomf(0.0f, (float)mNumTextures, &nlDefaultSeed));
     int index = (int)pick;
     int current = 0;
     nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
@@ -399,7 +398,7 @@ void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual28(float dt,
 {
     for (int i = 0; i < mNumModels; ++i)
     {
-        float value = fn_802B6654(&nlDefaultSeed, 0.25f * dt, dt);
+        float value = nlRandomf(0.25f * dt, dt, &nlDefaultSeed);
         fn_802DB528(mModels[i], (void*)unidentified, value, 0);
     }
 }

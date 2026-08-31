@@ -1,4 +1,4 @@
-#include "NL/gl/glModel.h"
+#include "Game/GL/MeshWriter.h"
 
 #include "types.h"
 
@@ -9,21 +9,6 @@ extern "C" void fn_802D39CC(glModelStream* streams, int stream, void* address, i
 extern "C" void fn_8036E438(glModelPacket* packet, bool allocated);
 extern "C" void DCStoreRangeNoSync(const void* address, u32 size);
 extern "C" void PPCSync();
-
-class MeshWriter
-{
-public:
-    MeshWriter();
-    ~MeshWriter();
-    bool Begin(int count, int primitive, void* resource);
-    bool End();
-
-    int count;
-    glModel* model;
-    void* resource;
-    float* position;
-    short* texcoord;
-};
 
 MeshWriter::MeshWriter()
     : count(0)

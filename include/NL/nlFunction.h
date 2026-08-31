@@ -3,7 +3,6 @@
 
 #include "NL/nlMemory.h"
 
-void* operator new(unsigned long, void*);
 extern "C" void* fn_802B1C4C(unsigned long);
 extern "C" void fn_802B1D4C(void*, unsigned long);
 

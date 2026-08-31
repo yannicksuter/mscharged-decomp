@@ -7,7 +7,6 @@
 #include "NL/nlFile.h"
 #include "NL/nlFunction.h"
 #include "NL/nlMemory.h"
-#include "new.h"
 #include <stdio.h>
 #include <string.h>
 

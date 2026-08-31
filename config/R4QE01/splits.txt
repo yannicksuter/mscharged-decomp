@@ -837,7 +837,7 @@ Game/ReplayManager.cpp:
 Game/ReplayChoreo.cpp:
 	.text       start:0x80194A0C end:0x80196644
 	.ctors      start:0x804DB6D0 end:0x804DB6D4
-	.rodata     start:0x804DCD60 end:0x804DCD80
+	.rodata     start:0x804DCD60 end:0x804DCD70
 	.data       start:0x80511920 end:0x80511AD8
 	.bss        start:0x80570CC8 end:0x805710D0
 	.sdata      start:0x806DCD10 end:0x806DCD50
@@ -856,6 +856,14 @@ unclassified/tu_80197120.cpp:
 	.ctors      start:0x804DB6D8 end:0x804DB6DC
 	.bss        start:0x80571248 end:0x80571A18
 
+unclassified/tu_80199880.cpp:
+	.text       start:0x80199880 end:0x80199AEC
+	.rodata     start:0x804DCD70 end:0x804DCD7C
+	.data       start:0x80511BB0 end:0x80511BD8
+	.sdata      start:0x806DCD50 end:0x806DCD5A
+	.sbss       start:0x806E14E8 end:0x806E14EC
+	.sdata2     start:0x806E4EB0 end:0x806E4EB4
+
 Game/Blinker.cpp:
 	.text       start:0x80199B30 end:0x80199E84
 	.rodata     start:0x804DCD80 end:0x804DCD90
@@ -871,18 +879,33 @@ unclassified/tu_8019A710.cpp:
 	.ctors      start:0x804DB6E4 end:0x804DB6E8
 
 Game/Render/ChainChomp.cpp:
-	.text       start:0x8019CAC8 end:0x8019CE78
+	.text       start:0x8019C988 end:0x8019CF98
 	.sdata      start:0x806DCD94 end:0x806DCD9C
 	.sdata2     start:0x806E4F6C end:0x806E4F84
+
+unclassified/tu_8019D6B4.cpp:
+	.text       start:0x8019D6B4 end:0x8019DA98
+	.rodata     start:0x804DCDF8 end:0x804DCE04
+	.sdata      start:0x806DCDB8 end:0x806DCDE0
+	.sdata2     start:0x806E4F88 end:0x806E4F94
 
 Game/Render/depthoffield.cpp:
 	.text       start:0x8019DB88 end:0x8019DEA0
 	.ctors      start:0x804DB6F0 end:0x804DB6F4
 	.rodata     start:0x804DCE08 end:0x804DCE20
-	.data       start:0x80511D58 end:0x80511D74
+	.data       start:0x80511D58 end:0x80511D78
 	.bss        start:0x80571B38 end:0x80571B48
 	.sbss       start:0x806E1500 end:0x806E1504
 	.sdata2     start:0x806E4F98 end:0x806E4FB8
+
+Game/Render/ElectricFence.cpp:
+	.text       start:0x8019DEA0 end:0x8019F6DC
+	.ctors      start:0x804DB6F4 end:0x804DB6F8
+	.data       start:0x80511D78 end:0x80511DC8
+	.bss        start:0x80571B48 end:0x80571B98
+	.sdata      start:0x806DCDE8 end:0x806DCE18
+	.sbss       start:0x806E1508 end:0x806E1538
+	.sdata2     start:0x806E4FB8 end:0x806E5010
 
 unclassified/tu_801A4EC0.cpp:
 	.text       start:0x801A4EC0 end:0x801A5F10

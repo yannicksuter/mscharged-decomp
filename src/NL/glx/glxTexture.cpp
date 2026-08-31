@@ -9,11 +9,6 @@
 
 #include <string.h>
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 class TextureManager_802CDF0C;
 
 extern "C"

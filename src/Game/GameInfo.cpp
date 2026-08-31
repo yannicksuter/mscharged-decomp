@@ -6,11 +6,6 @@
 #include "NL/nlString.h"
 #include "types.h"
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 extern "C" void* memcpy(void* dst, const void* src, unsigned long size);
 
 struct RFLCreateID;

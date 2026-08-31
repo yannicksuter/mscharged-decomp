@@ -4,13 +4,9 @@
 #include "Game/SHierarchy.h"
 #include "NL/gl/glModel.h"
 #include "NL/glx/glxLoadModel.h"
+#include "NL/nlMemory.h"
 
 #include <string.h>
-
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
 
 extern "C" void fn_802D3C1C(GLTextureAnim*, float);
 extern "C" void fn_802D3F7C(glModel*, float);

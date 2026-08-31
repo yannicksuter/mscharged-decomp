@@ -5,7 +5,6 @@
 #include "Game/FixedUpdateTask.h"
 #include "NL/nlMemory.h"
 #include "NL/nlTask.h"
-#include "new.h"
 
 extern float g_fSimulationTick;
 extern float g_fFixedUpdateTick;

@@ -119,6 +119,22 @@ inline T* nlListRemoveStart(T** head, T** tail)
 }
 
 template <typename T>
+class nlList
+{
+public:
+    nlList(T* start, T* end)
+    {
+        m_pEnd = end;
+        m_pStart = start;
+    }
+
+    nlList() { }
+
+    T* m_pStart;
+    T* m_pEnd;
+};
+
+template <typename T>
 T* nlListRemoveElement(T** head, T* element, T** tail)
 {
     if (head == 0)

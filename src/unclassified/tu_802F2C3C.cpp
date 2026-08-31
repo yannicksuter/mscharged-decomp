@@ -123,7 +123,6 @@ extern SlotPoolBase lbl_8057FB10;
 extern SlotPoolBase lbl_8057FB38;
 extern void* lbl_806E2020;
 
-extern "C" float fn_802B6654(u32*, float, float);
 extern "C" void fn_802ED8D0(CueHandle_802F2C3C*, void*);
 extern "C" float fn_802F29F8(SoundInstance_802F2C3C*);
 extern "C" float fn_802F2A6C(SoundInstance_802F2C3C*);
@@ -147,7 +146,7 @@ static inline void* AllocateFromPool_802F2C3C(SlotPoolBase* pool, u32 size)
 
 static inline float RandomRange_802F2C3C(float minimum, float maximum)
 {
-    return fn_802B6654(&nlDefaultSeed, minimum, maximum);
+    return nlRandomf(minimum, maximum, &nlDefaultSeed);
 }
 
 static inline void BackendCall_802F2C3C(PlaybackBackend_802F2C3C* backend,
