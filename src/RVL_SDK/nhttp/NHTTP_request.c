@@ -315,10 +315,12 @@ error:
 
 void NHTTP_DestroyRequest(void* systemInfo, NHTTPRequestInfo* request)
 {
-    void* mutexInfo = NHTTPi_GetMutexInfoP(systemInfo);
     NHTTPConnectionInfo* connection;
-    NHTTPHeader* next;
     NHTTPHeader* header;
+    NHTTPHeader* next;
+    NHTTPHeader* post;
+    NHTTPHeader* nextPost;
+    void* mutexInfo = NHTTPi_GetMutexInfoP(systemInfo);
 
     connection = NHTTPi_Request2Connection(mutexInfo, request);
     if (connection != NULL)
@@ -349,19 +351,19 @@ void NHTTP_DestroyRequest(void* systemInfo, NHTTPRequestInfo* request)
         }
     }
 
-    header = request->postData;
-    while (header != NULL)
+    post = request->postData;
+    while (post != NULL)
     {
-        if (header != header->next)
+        if (post != post->next)
         {
-            next = header->next->next;
-            NHTTPi_free(header->next);
-            header->next = next;
+            nextPost = post->next->next;
+            NHTTPi_free(post->next);
+            post->next = nextPost;
         }
         else
         {
-            NHTTPi_free(header);
-            header = NULL;
+            NHTTPi_free(post);
+            post = NULL;
         }
     }
 
@@ -373,8 +375,10 @@ void NHTTP_DestroyRequest(void* systemInfo, NHTTPRequestInfo* request)
 BOOL NHTTPi_destroyRequestObject(void* mutexInfo, NHTTPRequestInfo* request)
 {
     NHTTPConnectionInfo* connection;
-    NHTTPHeader* next;
     NHTTPHeader* header;
+    NHTTPHeader* next;
+    NHTTPHeader* post;
+    NHTTPHeader* nextPost;
 
     connection = NHTTPi_Request2Connection(mutexInfo, request);
     if (connection != NULL)
@@ -398,19 +402,19 @@ BOOL NHTTPi_destroyRequestObject(void* mutexInfo, NHTTPRequestInfo* request)
         }
     }
 
-    header = request->postData;
-    while (header != NULL)
+    post = request->postData;
+    while (post != NULL)
     {
-        if (header != header->next)
+        if (post != post->next)
         {
-            next = header->next->next;
-            NHTTPi_free(header->next);
-            header->next = next;
+            nextPost = post->next->next;
+            NHTTPi_free(post->next);
+            post->next = nextPost;
         }
         else
         {
-            NHTTPi_free(header);
-            header = NULL;
+            NHTTPi_free(post);
+            post = NULL;
         }
     }
 

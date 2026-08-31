@@ -559,8 +559,7 @@ static gsi_bool gsiLargeIntDiv(const l_word* src, l_word len,
         GSLINT_EXITTIMER(GSLintTimerDiv);
         return gsi_false;
       }
-      quotient.mData[readIndex] =
-          (l_word)(quotient.mData[readIndex] + quotientTemp);
+      quotient.mData[readIndex] += quotientTemp;
       if (quotient.mLength < (l_word)(readIndex + readLength))
         quotient.mLength = (l_word)(readIndex + readLength);
       // remove new leading zeroes
