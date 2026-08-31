@@ -260,7 +260,7 @@ extern "C" unsigned short fn_800D1D10(short angle)
  */
 extern "C" int fn_800D1D24(int value)
 {
-    return abs(value);
+    return value < 0 ? -value : value;
 }
 
 /**

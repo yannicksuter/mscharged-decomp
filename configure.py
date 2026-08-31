@@ -461,6 +461,7 @@ config.libs = [
             Object(NonMatching, "Game/AI/DesireSuperPower.cpp"),
             Object(NonMatching, "Game/AI/DesireUsePowerup.cpp"),
             Object(NonMatching, "Game/AI/DesireUserControlled.cpp"),
+            Object(NonMatching, "Game/AI/tu_800D4E2C.cpp"),
             Object(Matching, "Game/TweaksBase.cpp"),
             Object(Matching, "Game/AI/Scripts/ScriptDefines.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/ScriptTuning.cpp"),

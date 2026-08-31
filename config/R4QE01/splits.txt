@@ -405,6 +405,12 @@ Game/AI/DesireUserControlled.cpp:
 	.sdata      start:0x806DC3A8 end:0x806DC3B0
 	.sdata2     start:0x806E4190 end:0x806E4198
 
+Game/AI/tu_800D4E2C.cpp:
+	.text       start:0x800D4E2C end:0x800D645C
+	.data       start:0x80502C28 end:0x80502D08
+	.sdata      start:0x806DC3B0 end:0x806DC3D8
+	.sdata2     start:0x806E4198 end:0x806E41B0
+
 Game/AI/Scripts/ScriptDefines.cpp:
 	.text       start:0x800D645C end:0x800D6604
 	.sbss       start:0x806E0E68 end:0x806E0E80

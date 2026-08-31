@@ -6,6 +6,11 @@
 class DesireShoot : public Desire
 {
 public:
+    DesireShoot(int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireShoot();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -20,6 +25,12 @@ private:
 class DesireWindupShot : public Desire
 {
 public:
+    DesireWindupShot(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireWindupShot();
 
     virtual bool UnidentifiedInitialize(void*);

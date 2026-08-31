@@ -860,12 +860,13 @@ void Goalie::fn_80083750(float)
         int nNodeIndex = m_nBip01JointIndex_0xA4;
         float fWeight
             = nlMinEquals(1.0f, pController->m_fTime / 0.2f);
-        do
+        while (nNodeIndex >= 0)
         {
             mUnidentified2F0->SetNodeWeight(nNodeIndex, fWeight);
-        } while ((nNodeIndex
-                     = m_pPoseAccumulator->m_pHierarchy->GetParent(nNodeIndex))
-                 >= 0);
+            nNodeIndex
+                = m_pPoseAccumulator->m_pHierarchy->GetParent(
+                    nNodeIndex);
+        }
 
         float fZ = mfTargetDist * (1.0f - fWeight);
         nlVector3 v3Position = m_v3Position;

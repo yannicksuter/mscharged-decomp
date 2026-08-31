@@ -30,6 +30,12 @@ enum eVariantType
 class Variant
 {
 public:
+    Variant(eVariantType type, const nlVector3& value)
+    {
+        mData.vector = value;
+        mType = type;
+    }
+
     template <typename T>
     Variant(eVariantType type, T value)
     {
