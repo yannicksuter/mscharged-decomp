@@ -35,6 +35,7 @@ extern void nlPrintf(const char*, ...);
 extern int nlSNPrintf(char*, unsigned long, const char*, ...);
 
 eCameraType g_eCurrentCameraType;
+
 cBaseCamera* cCameraManager::m_cameraStack;
 float cCameraManager::m_fTransitionSpeed;
 float cCameraManager::m_fPrevFOV;
@@ -70,6 +71,20 @@ struct UnidentifiedCameraAnimationLoadInfo
     const char* pUnidentified0;
     const char* pUnidentified1;
 };
+
+static void ApplyCameraFilters(nlMatrix4& matView)
+{
+    nlMatrix4 filteredView;
+
+    for (int i = 0; i < 2; i++)
+    {
+        if (cCameraManager::PeekCamera()->m_pFilter[i] != 0)
+        {
+            cCameraManager::PeekCamera()->m_pFilter[i]->Filter(matView, filteredView);
+            matView = filteredView;
+        }
+    }
+}
 
 /**
  * Offset/Address/Size: 0x21D0 | 0x800F2410 | size: 0xB0
@@ -159,15 +174,7 @@ cBaseCamera* cCameraManager::PopCameraWithTransition(float fDuration, eCameraTra
     m_matPrevView = PeekCamera()->GetViewMatrix();
     m_fPrevFOV = PeekCamera()->GetFOV();
 
-    for (int i = 0; i < 2; i++)
-    {
-        if (PeekCamera()->m_pFilter[i] != 0)
-        {
-            nlMatrix4 matView;
-            PeekCamera()->m_pFilter[i]->Filter(m_matPrevView, matView);
-            m_matPrevView = matView;
-        }
-    }
+    ApplyCameraFilters(m_matPrevView);
 
     float fTransitionTime = m_fTransitionTime;
     m_transition = transition;
@@ -204,15 +211,7 @@ void cCameraManager::PushCameraWithTransition(cBaseCamera* pCamera, float fDurat
     m_matPrevView = PeekCamera()->GetViewMatrix();
     m_fPrevFOV = PeekCamera()->GetFOV();
 
-    for (int i = 0; i < 2; i++)
-    {
-        if (PeekCamera()->m_pFilter[i] != 0)
-        {
-            nlMatrix4 matView;
-            PeekCamera()->m_pFilter[i]->Filter(m_matPrevView, matView);
-            m_matPrevView = matView;
-        }
-    }
+    ApplyCameraFilters(m_matPrevView);
 
     m_transition = transition;
     m_fTransitionSpeed = 1.0f / fDuration;
@@ -284,7 +283,6 @@ extern "C" cBaseCamera* fn_800F1AC8()
  */
 void cCameraManager::Remove(eCameraType type, bool bDeleteAfterRemoving)
 {
-    bool actuallyRemoved;
     cBaseCamera* pCamera = m_cameraStack;
 
     if (m_cameraStack != 0)
@@ -295,23 +293,7 @@ void cCameraManager::Remove(eCameraType type, bool bDeleteAfterRemoving)
             pCameraNext = pCamera->m_next;
             if (type == pCamera->GetType())
             {
-                actuallyRemoved = true;
-                while (actuallyRemoved)
-                {
-                    actuallyRemoved = nlDLRingRemoveSafely<cBaseCamera>(&m_cameraStack, pCamera);
-                    if (actuallyRemoved)
-                    {
-                        for (int i = 0; i < 2; i++)
-                        {
-                            if (PeekCamera()->m_pFilter[i] != 0)
-                            {
-                                PeekCamera()->m_pFilter[i]->Reset();
-                                PeekCamera()->Reactivate();
-                            }
-                        }
-                    }
-                }
-
+                Remove(*pCamera);
                 if (bDeleteAfterRemoving)
                 {
                     delete pCamera;
@@ -521,7 +503,6 @@ void cCameraManager::Update(float fDeltaT)
 {
     nlMatrix4 cameraToWorldMatrix;
     nlMatrix4 curViewCopy;
-    nlMatrix4 filteredViewNone;
     nlVector3 v3Unidentified;
 
     if (m_cameraStack == 0)
@@ -573,14 +554,7 @@ void cCameraManager::Update(float fDeltaT)
             m_fFOV = 1.0f;
 
         curViewCopy = m_matView;
-        for (int i = 0; i < 2; i++)
-        {
-            if (PeekCamera()->m_pFilter[i] != 0)
-            {
-                PeekCamera()->m_pFilter[i]->Filter(curViewCopy, filteredViewNone);
-                curViewCopy = filteredViewNone;
-            }
-        }
+        ApplyCameraFilters(curViewCopy);
         m_matView = curViewCopy;
     }
 
@@ -615,10 +589,8 @@ extern "C" void fn_800F0990(float fDeltaT)
     nlMatrix4 curViewCopy;
     nlMatrix4 cameraToWorldMatrix;
     nlMatrix4 matUnidentified1;
-    nlMatrix4 filteredViewEase;
-    int i;
 
-    cBaseCamera* pCamera = cCameraManager::PeekCamera();
+    cBaseCamera* pCamera = nlDLRingGetStart<cBaseCamera>(cCameraManager::m_cameraStack);
     if (pCamera == 0)
         return;
 
@@ -627,14 +599,7 @@ extern "C" void fn_800F0990(float fDeltaT)
     v3TransFrom = prevViewCopy.GetTranslation();
 
     curViewCopy = cCameraManager::PeekCamera()->GetViewMatrix();
-    for (i = 0; i < 2; i++)
-    {
-        if (cCameraManager::PeekCamera()->m_pFilter[i] != 0)
-        {
-            cCameraManager::PeekCamera()->m_pFilter[i]->Filter(curViewCopy, filteredViewEase);
-            curViewCopy = filteredViewEase;
-        }
-    }
+    ApplyCameraFilters(curViewCopy);
 
     nlInvertRotTransMatrix(matUnidentified0, curViewCopy);
     nlMatrixToQuat(qCur, matUnidentified0);

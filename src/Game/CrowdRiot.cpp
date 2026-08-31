@@ -422,8 +422,8 @@ void fn_80029B9C(void* param)
 {
     UnidentifiedEventData_80066B08* event
         = (UnidentifiedEventData_80066B08*)param;
-    PhysicsObject* object = event->mUnidentified0C;
     CrowdRiot* crowdRiot = event->mUnidentified10;
+    PhysicsObject* object = event->mUnidentified0C;
 
     switch (object->GetObjectType())
     {

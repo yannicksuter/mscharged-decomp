@@ -100,8 +100,7 @@ extern "C" void fn_8013D8DC()
     g_StaticPhysicsPrimitives.AddEnd(
         new (nlMalloc(sizeof(PhysicsGroundPlane), 8, false)) PhysicsGroundPlane(g_CollisionSpace));
 
-    int i;
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         const sSideLinePlane& sideline = cField::GetSideline(i);
         g_StaticPhysicsPrimitives.AddEnd(
@@ -109,7 +108,7 @@ extern "C" void fn_8013D8DC()
                 g_CollisionSpace, sideline.vNormal.x, sideline.vNormal.y, sideline.fDistance));
     }
 
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         const sCornerSegment& corner = cField::GetCorner(i);
         PhysicsRoundedCorner* roundedCorner

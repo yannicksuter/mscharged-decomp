@@ -131,10 +131,11 @@ void cSAnim::GetRootRot(float fTime, unsigned short* pRootRot) const
 void cSAnim::Destroy()
 {
     cSAnimCallback* pNext;
-    while (m_pCallbackList != 0)
+    cSAnimCallback* pCallback;
+    while ((pCallback = m_pCallbackList) != 0)
     {
-        pNext = m_pCallbackList->next;
-        lbl_805840D8.Free(m_pCallbackList);
+        pNext = pCallback->next;
+        lbl_805840D8.Free(pCallback);
         m_pCallbackList = pNext;
     }
     m_pCallbackList = 0;

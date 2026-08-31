@@ -452,8 +452,8 @@ InterpreterCore::~InterpreterCore()
 
 extern "C" void fn_802DEDE8(InterpreterCore* core)
 {
-    core->m_SP = core->m_StackSegment;
     core->m_RunState = 2;
+    core->m_SP = core->m_StackSegment;
     core->m_SavedSP = core->m_SP;
     core->m_BP = 0;
     core->m_IP = 0;
