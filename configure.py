@@ -664,6 +664,7 @@ config.libs = [
             Object(NonMatching, "Game/Drawable/DrawableYoshiEgg.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableFlyingCamera.cpp"),
             Object(NonMatching, "unclassified/tu_8017FFCC.cpp"),
+            Object(NonMatching, "Game/Drawable/DrawableHammer.cpp"),
             Object(NonMatching, "unclassified/tu_8018480C.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableKoopaShell.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Drawable/DrawablePowerup.cpp"),
