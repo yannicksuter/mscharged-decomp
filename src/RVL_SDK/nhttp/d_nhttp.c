@@ -416,10 +416,10 @@ proxy_ready:
 
 s32 NHTTPSetProxyDefault(NHTTPRequest* handle)
 {
+    NCDProxyServerProfile* proxy;
     void* systemInfo;
     NHTTPBgnEndInfo* bgnEndInfo;
     NHTTPRequestInfo* request;
-    NCDProxyServerProfile* proxy;
     const char* username;
     const char* password;
     s32 result;
@@ -427,9 +427,14 @@ s32 NHTTPSetProxyDefault(NHTTPRequest* handle)
     systemInfo = NHTTPi_GetSystemInfoP();
     request = NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(systemInfo), handle);
     bgnEndInfo = NHTTPi_GetBgnEndInfoP(systemInfo);
-    proxy = request->secure != FALSE
-              ? &bgnEndInfo->ipConfig.proxy.ssl
-              : &bgnEndInfo->ipConfig.proxy.http;
+    if (request->secure != FALSE)
+    {
+        proxy = &bgnEndInfo->ipConfig.proxy.ssl;
+    }
+    else
+    {
+        proxy = &bgnEndInfo->ipConfig.proxy.http;
+    }
 
     if (proxy->mode == 1 && proxy->port != 0 && strlen(proxy->server) >= 6)
     {

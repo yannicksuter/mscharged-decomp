@@ -3,8 +3,10 @@
 #include "Game/Drawable/DrawableBirdoEgg.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Drawable/ShadowProp.h"
+#include "Game/Field.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
+#include "math.h"
 
 // Charged-only shadow prop, fourth of the run described beside
 // DrawableBulletBill. The live object's translation unit spells
@@ -27,7 +29,6 @@ struct BirdoEggObjectFields
 
 extern "C"
 {
-    float fn_8002D194(int);
     float fn_8019A574(const BirdoEggObject*);
 }
 
@@ -66,8 +67,8 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
         value = 255;
     }
 
-    float distance = nlAbs(matrix.m42);
-    float edge = fn_8002D194(1);
+    float distance = (float)fabs(matrix.m42);
+    float edge = cField::GetSidelineY(1);
     if (distance > edge)
     {
         if (distance > 0.5f + edge)
@@ -88,9 +89,8 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
         groundHeight = ground->height;
     }
 
-    position.x = matrix.m41;
-    position.y = matrix.m42;
-    position.z = 0.015625f + groundHeight;
+    groundHeight = 0.015625f + groundHeight;
+    nlVec3Set(position, matrix.m41, matrix.m42, groundHeight);
     extent.x = size;
     extent.y = size;
     extent.z = 0.0f;

@@ -2509,12 +2509,8 @@ void cFielder::asmRunningWB(float fDeltaT)
         {
             if (mUnidentified385)
             {
-                bool bAnimFinished = false;
-                if (m_pCurrentAnimController->m_ePlayMode == PM_HOLD
-                    && m_pCurrentAnimController->m_fTime == 1.0f)
-                {
-                    bAnimFinished = true;
-                }
+                bool bAnimFinished = m_pCurrentAnimController->m_ePlayMode == PM_HOLD
+                    && m_pCurrentAnimController->m_fTime == 1.0f;
                 if (bAnimFinished
                     || m_fDesiredSpeed >= fIdleToRunWBDesiredSpeed)
                 {
@@ -2679,12 +2675,8 @@ void cFielder::asmRunningWB(float fDeltaT)
 
         case 0x18:
         {
-            bool bAnimFinished = false;
-            if (m_pCurrentAnimController->m_ePlayMode == PM_HOLD
-                && m_pCurrentAnimController->m_fTime == 1.0f)
-            {
-                bAnimFinished = true;
-            }
+            bool bAnimFinished = m_pCurrentAnimController->m_ePlayMode == PM_HOLD
+                && m_pCurrentAnimController->m_fTime == 1.0f;
 
             if (bAnimFinished)
             {
@@ -2842,12 +2834,8 @@ void cFielder::asmRunning()
 
         case 0x1E:
         {
-            bool bAnimFinished = false;
-            if (m_pCurrentAnimController->m_ePlayMode == PM_HOLD
-                && m_pCurrentAnimController->m_fTime == 1.0f)
-            {
-                bAnimFinished = true;
-            }
+            bool bAnimFinished = m_pCurrentAnimController->m_ePlayMode == PM_HOLD
+                && m_pCurrentAnimController->m_fTime == 1.0f;
 
             if (bAnimFinished)
             {
@@ -3017,7 +3005,7 @@ void cFielder::asmRunning()
                     {
                         fn_8003A2D0(this, -1);
                     }
-                    else if (m_tSwapFacingTimer.GetSeconds() == 0.0f)
+                    else if (!m_tSwapFacingTimer.GetSeconds())
                     {
                         fn_8003ADAC(this);
                     }
@@ -3133,7 +3121,7 @@ void cFielder::asmRunning()
                     {
                         fn_8003A2D0(this, -1);
                     }
-                    else if (m_tSwapFacingTimer.GetSeconds() == 0.0f)
+                    else if (!m_tSwapFacingTimer.GetSeconds())
                     {
                         fn_8003ADAC(this);
                     }
@@ -3173,12 +3161,8 @@ void cFielder::asmRunning()
 
         case 0xC:
         {
-            bool bAnimFinished = false;
-            if (m_pCurrentAnimController->m_ePlayMode == PM_HOLD
-                && m_pCurrentAnimController->m_fTime == 1.0f)
-            {
-                bAnimFinished = true;
-            }
+            bool bAnimFinished = m_pCurrentAnimController->m_ePlayMode == PM_HOLD
+                && m_pCurrentAnimController->m_fTime == 1.0f;
 
             if (bAnimFinished)
             {
@@ -5265,28 +5249,27 @@ void cFielder::fn_8004E228()
     else
     {
         int nTarget = 0x32;
-        s16 aWobble = mUnidentified3DA;
         int nLimit = lbl_806DB8AC;
-        if (aWobble < -nLimit)
+        if (mUnidentified3DA < -nLimit)
         {
             nTarget = 0x4B;
         }
-        else if (aWobble > nLimit)
+        else if (mUnidentified3DA > nLimit)
         {
             nTarget = 0x19;
         }
-        else if (aWobble * mUnidentified3D8 > 0)
+        else if (mUnidentified3DA * mUnidentified3D8 > 0)
         {
             int nSign = -0x19;
-            if (aWobble > 0)
+            if (mUnidentified3DA > 0)
             {
                 nSign = 0x19;
             }
             nTarget = nSign + 0x32;
         }
 
-        int nDelta = nTarget - (s16)nlRandom(0x64);
-        mUnidentified3D8 = mUnidentified3D8 + nDelta / 15;
+        s16 nRandom = (s16)nlRandom(0x64);
+        mUnidentified3D8 = mUnidentified3D8 + (nTarget - nRandom) / 15;
         if (mUnidentified3D8 > lbl_806DB8B0)
         {
             mUnidentified3D8 = lbl_806DB8B0;

@@ -26,8 +26,8 @@ void* NHTTPi_memclr(void* destination, u32 size)
 
 s32 NHTTPi_strnicmp(const char* left, const char* right, s32 size)
 {
-    s32 leftChar;
-    s32 rightChar;
+    char leftChar;
+    char rightChar;
 
     while (size > 0)
     {
@@ -43,16 +43,12 @@ s32 NHTTPi_strnicmp(const char* left, const char* right, s32 size)
             }
         }
 
-        if ((rightChar >= 'A') & (rightChar <= 'Z'))
-        {
-            rightChar += 'a' - 'A';
-        }
-        if ((leftChar >= 'A') & (leftChar <= 'Z'))
-        {
-            leftChar += 'a' - 'A';
-        }
-
-        if (leftChar != rightChar)
+        if ((((leftChar >= 'A') & (leftChar <= 'Z'))
+                    ? leftChar + ('a' - 'A')
+                    : leftChar)
+            != (((rightChar >= 'A') & (rightChar <= 'Z'))
+                    ? rightChar + ('a' - 'A')
+                    : rightChar))
         {
             break;
         }

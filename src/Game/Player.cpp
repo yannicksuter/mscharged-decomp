@@ -109,13 +109,13 @@ cPN_SingleAxisBlender* cPlayer::CreateSingleAxisBlender(
     cPN_SAnimController* pSynchingController,
     float fInitialWeight)
 {
-    cPN_SAnimController* pNewCurrentAnimController;
-    pNewCurrentAnimController = NULL;
+    const int* pAnims;
+    cPN_SAnimController* pNewCurrentAnimController = NULL;
 
     cPN_SingleAxisBlender* pSAB = new cPN_SingleAxisBlender(
         nNumSABAnims, fWeightCB, (unsigned int)this, fWeightSeek);
 
-    const int* pAnims = pSABAnims;
+    pAnims = pSABAnims;
     for (int i = 0; i < nNumSABAnims; i++)
     {
         cPN_SAnimController* pNewController

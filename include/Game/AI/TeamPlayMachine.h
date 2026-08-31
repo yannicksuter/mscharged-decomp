@@ -34,8 +34,12 @@ public:
 
     void UnidentifiedAddState(int, shdStateMachine*, bool);
 
-private:
-    u8 mUnidentified004[0xB4];
+protected:
+    shdStateMachine* mUnidentified004;
+    shdStateMachine* mUnidentified008;
+    u8 mUnidentified00C[0x58];
+    void* mUnidentified064;
+    u8 mUnidentified068[0x50];
 };
 
 class TeamPlayMachine : public UnidentifiedScriptMachine

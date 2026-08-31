@@ -45,6 +45,11 @@ public:
         mData.pointer = value;
     }
 
+    FuzzyVariant(eVariantType type, const nlVector3& value)
+        : Variant(type, value)
+    {
+    }
+
     template <typename T>
     FuzzyVariant(eVariantType type, T value)
         : Variant(type, value)

@@ -1468,11 +1468,9 @@ void FormationBallPosition::fn_80052978()
     }
 }
 
-void FormationBallPosition::Update(float fDeltaT)
+inline void FormationBallPosition::CalcBallPosition(nlVector2& v2DestAIBallPos)
 {
     nlVector3 v3AIBallLoc;
-
-    fn_80052978();
 
     if (g_pBall->m_pOwner != 0)
     {
@@ -1492,7 +1490,17 @@ void FormationBallPosition::Update(float fDeltaT)
     FieldLocToAILoc(v3AIBallLoc, v3AIBallLoc,
         m_pFormationManager->m_pTeam->m_nSide);
 
-    nlVector2 vAIBallLoc = *(const nlVector2*)&v3AIBallLoc;
+    v2DestAIBallPos = *(const nlVector2*)&v3AIBallLoc;
+}
+
+void FormationBallPosition::Update(float fDeltaT)
+{
+    nlVector2 vAIBallLoc;
+
+    fn_80052978();
+
+    CalcBallPosition(vAIBallLoc);
+
     if (cField::IsOnField(vAIBallLoc))
     {
         SelectClosestBallFormations(vAIBallLoc);
@@ -1611,39 +1619,23 @@ void FormationBallPosition::CalculateDesiredLocation(
         return;
     }
 
-    nlVector3 v3AIBallLoc;
-    if (g_pBall->m_pOwner != 0)
-    {
-        nlVec3ScaleAdd(v3AIBallLoc, 0.1f,
-            g_pBall->m_pOwner->m_v3Velocity,
-            g_pBall->m_pOwner->m_v3Position);
-    }
-    else if (g_pBall->m_pPassTarget != 0)
-    {
-        v3AIBallLoc = g_pBall->m_v3PassIntercept;
-    }
-    else
-    {
-        fn_800180F4(g_pBall, &v3AIBallLoc, 0.1f);
-    }
+    nlVector3 v3Position;
+    nlVector2 vAIBallPos;
 
-    FieldLocToAILoc(v3AIBallLoc, v3AIBallLoc,
-        m_pFormationManager->m_pTeam->m_nSide);
+    CalcBallPosition(vAIBallPos);
 
-    nlVector2 vAIBallLoc = *(const nlVector2*)&v3AIBallLoc;
     nlVector3 v3DesiredPosition = v3Zero;
     float fTotalWeight = 0.0f;
 
     FormationEval* pEval = field_0x34;
     while (pEval != 0)
     {
-        nlVector3 v3Position;
         pEval->CalculateDesiredLocation(
             v3Position, pFielder, bExtrapolate);
-        float fWeight = pEval->GetWeight(&vAIBallLoc);
+        float fWeight = pEval->GetWeight(&vAIBallPos);
         nlVec3ScaleAdd(
             v3DesiredPosition, fWeight, v3Position, v3DesiredPosition);
-        fTotalWeight += pEval->GetWeight(&vAIBallLoc);
+        fTotalWeight += pEval->GetWeight(&vAIBallPos);
         pEval = pEval->next;
     }
 
@@ -1660,31 +1652,14 @@ void FormationBallPosition::CalculateDesiredLocation(
 float FormationBallPosition::GetWeight(const nlVector2* v2AIBallLoc)
 {
     float fWeight = 0.0f;
-    nlVector3 v3AIBallLoc;
+    nlVector2 vAIBallPos;
 
-    if (g_pBall->m_pOwner != 0)
-    {
-        nlVec3ScaleAdd(v3AIBallLoc, 0.1f,
-            g_pBall->m_pOwner->m_v3Velocity,
-            g_pBall->m_pOwner->m_v3Position);
-    }
-    else if (g_pBall->m_pPassTarget != 0)
-    {
-        v3AIBallLoc = g_pBall->m_v3PassIntercept;
-    }
-    else
-    {
-        fn_800180F4(g_pBall, &v3AIBallLoc, 0.1f);
-    }
+    CalcBallPosition(vAIBallPos);
 
-    FieldLocToAILoc(v3AIBallLoc, v3AIBallLoc,
-        m_pFormationManager->m_pTeam->m_nSide);
-
-    nlVector2 vAIBallLoc = *(const nlVector2*)&v3AIBallLoc;
     FormationEval* pEval = field_0x34;
     while (pEval != 0)
     {
-        fWeight = nlMaxEquals(fWeight, pEval->GetWeight(&vAIBallLoc));
+        fWeight = nlMaxEquals(fWeight, pEval->GetWeight(&vAIBallPos));
         pEval = pEval->next;
     }
 

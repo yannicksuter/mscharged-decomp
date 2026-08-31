@@ -170,6 +170,19 @@ T* nlListRemoveElement(T** head, T* element, T** tail)
     return 0;
 }
 
+template <typename T>
+inline void nlDeleteList(T** head)
+{
+    T* next;
+    while (*head != 0)
+    {
+        next = (*head)->next;
+        delete *head;
+        *head = next;
+    }
+    *head = 0;
+}
+
 #include "NL/nlListContainer.h"
 
 #endif

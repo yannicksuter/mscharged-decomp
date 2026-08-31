@@ -40,6 +40,16 @@ public:
     virtual void UnidentifiedReset();
     virtual void UnidentifiedSetContext(UnidentifiedDesireContext*);
 
+    int UnidentifiedGetState() const
+    {
+        return mUnidentifiedState;
+    }
+
+    bool UnidentifiedIsActive() const
+    {
+        return mUnidentifiedActive;
+    }
+
 protected:
     int mUnidentifiedState;
     bool mUnidentifiedActive;
@@ -78,6 +88,12 @@ protected:
 class DesireFinishAction : public Desire
 {
 public:
+    DesireFinishAction(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireFinishAction();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -87,6 +103,11 @@ public:
 class DesireWait : public Desire
 {
 public:
+    DesireWait(int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireWait();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -96,6 +117,12 @@ public:
 class DesireCutAndBreak : public Desire
 {
 public:
+    DesireCutAndBreak(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireCutAndBreak();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -111,6 +138,11 @@ private:
 class DesireDeke : public Desire
 {
 public:
+    DesireDeke(int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireDeke();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -126,6 +158,11 @@ private:
 class DesireHit : public Desire
 {
 public:
+    DesireHit(int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireHit();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -134,9 +171,35 @@ public:
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
 
+class DesireInterceptBall : public Desire
+{
+public:
+    DesireInterceptBall(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
+    virtual ~DesireInterceptBall();
+
+    virtual bool UnidentifiedInitialize(void*);
+    virtual void UnidentifiedCleanup();
+    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+
+private:
+    u8 mUnidentifiedA4[0x08];
+};
+
 class DesireGetOpen : public Desire
 {
 public:
+    DesireGetOpen(int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireGetOpen();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -152,6 +215,12 @@ private:
 class DesireRunToTarget : public Desire
 {
 public:
+    DesireRunToTarget(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireRunToTarget();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -174,6 +243,12 @@ private:
 class DesireRunInDirection : public Desire
 {
 public:
+    DesireRunInDirection(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireRunInDirection();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -194,6 +269,12 @@ private:
 class DesireRunDownfield : public Desire
 {
 public:
+    DesireRunDownfield(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireRunDownfield();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -205,6 +286,12 @@ public:
 class DesireRunUpfield : public Desire
 {
 public:
+    DesireRunUpfield(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireRunUpfield();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -216,6 +303,12 @@ public:
 class DesireGetInPosition : public Desire
 {
 public:
+    DesireGetInPosition(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireGetInPosition();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -227,6 +320,11 @@ public:
 class DesireMark : public Desire
 {
 public:
+    DesireMark(int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireMark();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -238,6 +336,12 @@ public:
 class DesireDefendPos : public Desire
 {
 public:
+    DesireDefendPos(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireDefendPos();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -250,6 +354,12 @@ public:
 class DesireMegaStrike : public Desire
 {
 public:
+    DesireMegaStrike(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireMegaStrike();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -271,6 +381,11 @@ private:
 class DesirePass : public Desire
 {
 public:
+    DesirePass(int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesirePass();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -287,6 +402,12 @@ private:
 class DesirePreparePass : public Desire
 {
 public:
+    DesirePreparePass(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesirePreparePass();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -305,6 +426,11 @@ private:
 class DesireStar : public Desire
 {
 public:
+    DesireStar(int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireStar();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -318,6 +444,12 @@ public:
 class DesireMushroom : public Desire
 {
 public:
+    DesireMushroom(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireMushroom();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -331,6 +463,12 @@ public:
 class DesireSlippery : public Desire
 {
 public:
+    DesireSlippery(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireSlippery();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -368,6 +506,11 @@ private:
 class DesireShrink : public Desire
 {
 public:
+    DesireShrink(int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireShrink();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -385,6 +528,11 @@ private:
 class DesireFrozen : public Desire
 {
 public:
+    DesireFrozen(int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireFrozen();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -409,6 +557,12 @@ private:
 class DesireConfused : public Desire
 {
 public:
+    DesireConfused(
+        int state, const UnidentifiedStateTransition& transition)
+        : Desire(state, transition)
+    {
+    }
+
     virtual ~DesireConfused();
 
     virtual bool UnidentifiedInitialize(void*);

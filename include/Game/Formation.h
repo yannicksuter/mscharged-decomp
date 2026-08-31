@@ -148,6 +148,7 @@ public:
     virtual void Update(float fDeltaT);
 
     bool SelectClosestBallFormations(const nlVector2& v2AIBallLoc);
+    void CalcBallPosition(nlVector2& v2DestAIBallPos);
 
     /* 0x30 */ const FormationSet* m_pFormationSet;
     /* 0x34 */ FormationEval* field_0x34;

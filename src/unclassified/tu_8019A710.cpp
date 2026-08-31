@@ -90,10 +90,13 @@ extern "C" void fn_8019A854(State_8019A710* state, float deltaTime)
         return;
     }
 
+    const nlVector3& currentPosition = state->position;
+    const nlVector3& currentVelocity = state->velocity;
+
     nlVector3 position;
-    position.z = state->position.z + deltaTime * state->velocity.z;
-    position.y = state->position.y + deltaTime * state->velocity.y;
-    position.x = state->position.x + deltaTime * state->velocity.x;
+    position.z = currentPosition.z + deltaTime * currentVelocity.z;
+    position.y = currentPosition.y + deltaTime * currentVelocity.y;
+    position.x = currentPosition.x + deltaTime * currentVelocity.x;
     state->position = position;
     state->physics->SetPosition(
         state->position, PhysicsObject::WORLD_COORDINATES);
