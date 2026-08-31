@@ -370,7 +370,7 @@ extern "C" int THPSimpleClose()
 
         if (SimpleControl.readProgress == 0)
         {
-            ctrl->open = 0;
+            SimpleControl.open = 0;
             while (nlAsyncReadsPending(SimpleControl.fileInfo))
             {
                 nlServiceFileSystem();
@@ -391,8 +391,9 @@ extern "C" unsigned long THPSimpleCalcNeedMemory()
 
     if (ctrl->open)
     {
-        unsigned long pixels = ctrl->videoInfo.xSize * ctrl->videoInfo.ySize;
         size = ((ctrl->bufSize + 31) & ~31) * 10;
+
+        unsigned long pixels = ctrl->videoInfo.xSize * ctrl->videoInfo.ySize;
         size += (pixels + 31) & ~31;
         size += ((pixels / 4) + 31) & ~31;
         size += ((pixels / 4) + 31) & ~31;

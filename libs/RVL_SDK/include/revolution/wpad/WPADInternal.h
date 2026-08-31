@@ -225,7 +225,7 @@ typedef struct WPADCB {
     WPADCallback getInfoCB; // at 0x988
     u8 getInfoBusy;         // at 0x98C
     u8 UNK_0x98F[0x9A0 - 0x990];
-} WPADCB;
+} ALIGN(32) WPADCB;
 
 typedef WPADCB WPADControlBlock;
 
