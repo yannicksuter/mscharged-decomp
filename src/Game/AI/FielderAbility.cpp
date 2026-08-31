@@ -1,4 +1,5 @@
 #include "Game/AI/Fielder.h"
+#include "unclassified/tu_8019FE24.h"
 
 #include "Game/AI/Fuzzy.h"
 #include "Game/AI/FuzzyVariant.h"
@@ -83,8 +84,6 @@ extern "C" void fn_80139D1C(int nPreset, cGlobalPad* pPad);
 extern "C" void fn_801765C8(
     cFielder* pFielder, const nlVector3* v3Position, float fParam);
 extern "C" void fn_80178D0C(void* pParam);
-extern "C" void fn_801A0500(int nParam, cFielder* pFielder, float fParam);
-extern "C" void fn_801A0C58(int nParam);
 extern "C" void fn_801B897C(cFielder* pFielder);
 extern "C" void fn_801BAF98(cFielder* pFielder);
 extern "C" void fn_801BB0DC(cFielder* pFielder);

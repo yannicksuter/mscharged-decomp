@@ -92,7 +92,8 @@ public:
     virtual void UnidentifiedVirtual1C(int texture) = 0;
     virtual void UnidentifiedVirtual20(void* target, int texture) = 0;
     virtual void UnidentifiedVirtual24(float dt) = 0;
-    virtual void UnidentifiedVirtual28(float dt, int unidentified) = 0;
+    virtual void UnidentifiedVirtual28(
+        float dt, const char* unidentified) = 0;
     virtual void UnidentifiedVirtual2C(void* unidentified0, void* unidentified1);
 
     void Acquire(Impostor* impostor);
@@ -131,7 +132,7 @@ public:
     virtual void UnidentifiedVirtual1C(int texture);
     virtual void UnidentifiedVirtual20(void* target, int texture);
     virtual void UnidentifiedVirtual24(float dt);
-    virtual void UnidentifiedVirtual28(float dt, int unidentified);
+    virtual void UnidentifiedVirtual28(float dt, const char* unidentified);
 
     /* 0x6C */ ImpostorModel_802DAEE0** mModels;
     /* 0x70 */ int mNumModels;

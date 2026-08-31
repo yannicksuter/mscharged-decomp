@@ -18,11 +18,6 @@ typedef nlAVLTreeIterator<NetMeshEdge, int,
     DefaultKeyCompare<NetMeshEdge> >
     EdgeIterator;
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 extern "C" RenderObject* fn_8027725C(unsigned long);
 extern "C" unsigned long fn_802CC7E4(const glModelPacket*, unsigned long);
 extern unsigned long lbl_806E1F0C;

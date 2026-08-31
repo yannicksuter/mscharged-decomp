@@ -8,6 +8,16 @@ void* operator new[](unsigned long size);
 void operator delete(void* ptr);
 void operator delete[](void* ptr);
 
+inline void* operator new(unsigned long, void* ptr)
+{
+    return ptr;
+}
+
+inline void* operator new[](unsigned long, void* ptr)
+{
+    return ptr;
+}
+
 void* nlMalloc(unsigned long size);
 void* nlMalloc(unsigned long size, unsigned int alignment, bool fromEnd);
 void nlFree(void* ptr);

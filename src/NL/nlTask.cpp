@@ -6,11 +6,6 @@
 
 extern "C" void fn_80371264();
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 float g_fTaskTimeUpperBound = 0.1f;
 nlTaskManager* nlTaskManager::m_pInstance;
 float g_fTaskTimeLowerBound;

@@ -9,27 +9,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "unclassified/Lookup_801A537C.h"
-
-class ArrayOwner_801A4EC0
-{
-public:
-    ~ArrayOwner_801A4EC0();
-    u8* data;
-};
-
-class ArrayOwner_801A4F18
-{
-public:
-    ~ArrayOwner_801A4F18();
-    u8* data;
-};
-
-class ArrayOwner_801A4F70
-{
-public:
-    ~ArrayOwner_801A4F70();
-    u8* data;
-};
+#include "unclassified/tu_801A4188.h"
 
 struct MatrixOwner_801A4FC8
 {

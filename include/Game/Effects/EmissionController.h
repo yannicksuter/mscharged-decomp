@@ -16,6 +16,11 @@ public:
     void SetVelocity(const nlVector3& velocity);
     void SetPoseAccumulator(const cPoseAccumulator& pose);
     void SetAnimController(const cPN_SAnimController& animController);
+    const nlVector3& GetPosition() const
+    {
+        return m_vPosition;
+    }
+    float GetRemainingTime() const;
     bool IsLingering() const;
     void SetUpdateCallback(const Function1<void, EmissionController&>& callback);
     void SetFinishedCallback(const Function1<void, EmissionController&>& callback);

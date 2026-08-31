@@ -2,11 +2,6 @@
 
 #include "NL/nlMemory.h"
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 cInventory<cSAnim>* g_pDefaultSAnimInventory = 0;
 
 cAnimInventory::cAnimInventory(const AnimProperties* props, int count)

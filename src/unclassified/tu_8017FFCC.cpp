@@ -4,15 +4,6 @@
 #include "NL/nlMath.h"
 #include "NL/platvmath.h"
 
-struct Object_8017FFF4
-{
-    /* 0x00 */ u16 orientation;
-    /* 0x02 */ u16 _002;
-    /* 0x04 */ nlVector3 position;
-    /* 0x10 */ char _010[0x10];
-    /* 0x20 */ bool visible;
-};
-
 struct RenderEntry_8018006C
 {
     char _000[0x24];
@@ -21,7 +12,6 @@ struct RenderEntry_8018006C
 
 extern "C"
 {
-    float fn_8019DA04(const Object_8017FFF4* object);
     GLView* fn_8027267C(int index);
 }
 
@@ -48,7 +38,7 @@ void Drawable_8017FFCC::Grab(const Object_8017FFF4* object)
     {
         mPosition = object->position;
         mOrientation = object->orientation;
-        mScale = fn_8019DA04(object);
+        mScale = object->fn_8019DA04();
     }
 }
 

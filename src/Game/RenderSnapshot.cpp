@@ -3,7 +3,6 @@
 #include "Game/GameInfo.h"
 #include "Game/Player.h"
 #include "NL/nlMemory.h"
-#include "new.h"
 
 extern cPlayer* lbl_8056B800[10];
 

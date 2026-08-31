@@ -1,68 +1,11 @@
 #include "NL/gl/glDraw3.h"
 
+#include "Game/GL/GLMeshWriter.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
 
-struct MeshWriter_802A8218;
-
-extern "C" void fn_802A8218(MeshWriter_802A8218*);
-extern "C" void* fn_802A8238(MeshWriter_802A8218*, int);
-extern "C" bool fn_802A8278(MeshWriter_802A8218*, int, int, void*);
-extern "C" bool fn_802A8424(MeshWriter_802A8218*);
-
 extern u32 lbl_806E1F34;
-
-struct MeshWriter_802A8218
-{
-    int count;
-    glModel* model;
-    void* resource;
-    float* position;
-    short* texcoord;
-    u32* colour;
-
-    bool Begin(int count, int primitive, void* resource)
-    {
-        return fn_802A8278(this, count, primitive, resource);
-    }
-
-    bool End()
-    {
-        return fn_802A8424(this);
-    }
-
-    glModel* GetModel() const
-    {
-        return model;
-    }
-
-    void Colour(const nlColour& c)
-    {
-        *colour++ = *(const u32*)&c;
-    }
-
-    void Texcoord(const nlVector2& uv)
-    {
-        short u = (short)(uv.x * 1024.0f);
-        short v = (short)(uv.y * 1024.0f);
-        *texcoord++ = u;
-        *texcoord++ = v;
-    }
-
-    void Vertex(const nlVector3& pos)
-    {
-        float x;
-        float y;
-        float z;
-        z = pos.z;
-        y = pos.y;
-        x = pos.x;
-        *position++ = x;
-        *position++ = y;
-        *position++ = z;
-    }
-};
 
 bool glAttachQuad3(eGLView view, unsigned long count, glQuad3* quads)
 {
@@ -90,15 +33,13 @@ bool glAttachQuad3(
 const glModel* glQuad3::GetModel() const
 {
     glModel* newModel = 0;
-    MeshWriter_802A8218 writer;
-    fn_802A8218(&writer);
+    GLMeshWriter writer;
     unsigned long texconfig = gl_GetCurrentStateBundle()->texconfig;
 
     if (glHasQuads())
     {
         if (!writer.Begin(4, 3, 0))
         {
-            fn_802A8238(&writer, -1);
             return 0;
         }
 
@@ -113,7 +54,6 @@ const glModel* glQuad3::GetModel() const
     {
         if (!writer.Begin(4, 1, 0))
         {
-            fn_802A8238(&writer, -1);
             return 0;
         }
 
@@ -170,7 +110,6 @@ const glModel* glQuad3::GetModel() const
     {
         newModel = writer.GetModel();
     }
-    fn_802A8238(&writer, -1);
     return newModel;
 }
 

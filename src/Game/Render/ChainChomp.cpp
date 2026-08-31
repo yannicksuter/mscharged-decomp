@@ -2,9 +2,13 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Powerups.h"
+#include "Game/Ball.h"
 #include "Game/BasicStadium.h"
 #include "Game/Drawable/ShadowProp.h"
+#include "Game/Effects/EmissionManager.h"
+#include "Game/Game.h"
 #include "Game/GameTweaks.h"
+#include "Game/Physics/PhysicsObject.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "NL/gl/glState.h"
@@ -19,16 +23,87 @@ struct UnidentifiedChainCollisionData
 extern "C" void* fn_8027267C(int);
 
 extern const float lbl_806E4EF0;
+extern const float lbl_806E4EFC;
+extern const float lbl_806E4F00;
 extern const float lbl_806E4F04;
+extern const float lbl_806E4F08;
+extern const float lbl_806E4F24;
 extern const float lbl_806E4F2C;
 extern const float lbl_806E4F58;
+extern const float lbl_806E4F5C;
+extern const float lbl_806E4F60;
+extern const float lbl_806E4F64;
+extern const float lbl_806E4F68;
 extern unsigned char lbl_806E14F4;
 extern void* lbl_806E14F8;
 extern int lbl_80573CA8[];
+extern const nlVector3 lbl_804DCDD0;
+extern const nlVector3 lbl_804DCDDC;
+extern const char lbl_80511C5C[];
 extern const char lbl_80511CF0[];
+extern const char lbl_806DCDB0[7];
+extern "C" float fn_800A9274(void*);
+extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
 
 float lbl_806DCD94 = 100.0f;
 float lbl_806DCD98 = 100.0f;
+
+/**
+ * Offset/Address/Size: 0x0 | 0x8019C988 | size: 0x10
+ */
+bool ChainChomp::IsHidden() const
+{
+    return meChainChompState == CHAIN_STATE_HIDDEN;
+}
+
+extern "C" bool fn_8019C998(const ChainChomp* pChomp)
+{
+    return pChomp->meChainChompState == CHAIN_STATE_UNIDENTIFIED_5;
+}
+
+/**
+ * Offset/Address/Size: 0x0 | 0x8019C9AC | size: 0x11C
+ */
+void ChainChomp::Leave()
+{
+    meChainChompState = CHAIN_STATE_LEAVE;
+
+    float fSpeedScale = InterpolateRangeClamped(lbl_806E4EFC,
+        lbl_806E4F00, lbl_806E4EF0, lbl_806E4F04,
+        fn_800A9274(g_pGame->mUnidentified10D8));
+    mfDesiredSpeed = mUnidentifiedA0 * fSpeedScale;
+    SetAnimState(*mpIdleAnim, lbl_806E4EF0, PM_CYCLIC);
+
+    nlVector3 v3TargetPosition;
+    if (lbl_806E4F08 * g_pBall->m_v3Velocity.x
+            + g_pBall->m_v3Position.x
+        < lbl_806E4EF0)
+    {
+        v3TargetPosition.x = lbl_806E4F5C;
+    }
+    else
+    {
+        v3TargetPosition.x = lbl_806E4F60;
+    }
+
+    if (mv3Position.y < lbl_806E4EF0)
+    {
+        v3TargetPosition.y = lbl_806E4F64;
+    }
+    else
+    {
+        v3TargetPosition.y = lbl_806E4F68;
+    }
+    v3TargetPosition.z = lbl_806E4EF0;
+
+    float fTargetX = v3TargetPosition.x - mv3Position.x;
+    float fTargetY = v3TargetPosition.y - mv3Position.y;
+    float fAngle = nlATan2f(fTargetY, fTargetX);
+    maDesiredFacingDirection = (u16)(s32)(lbl_806E4F24 * fAngle);
+
+    PowerupBase::PlayPowerupSound(POWER_UP_CHAIN_CHOMP,
+        PowerupBase::PWRUP_SOUND_IN_EFFECT, mv3Position, lbl_806E4EF0, 0);
+}
 
 /**
  * Offset/Address/Size: 0x0 | 0x8019CAC8 | size: 0xE0
@@ -207,4 +282,40 @@ void ChainChomp::DrawShadow(
     case CHAIN_STATE_UNIDENTIFIED_5:
         return;
     }
+}
+
+/**
+ * Offset/Address/Size: 0x0 | 0x8019CE78 | size: 0x120
+ */
+void ChainChomp::Hide()
+{
+    if (mpInEffectSFX != 0)
+    {
+        mpInEffectSFX = 0;
+    }
+
+    EffectsGroup* pEffectsGroup =
+        fn_802E7CDC(EmissionManager::Instance(), lbl_80511C5C);
+    EmissionManager::Instance()->Destroy(
+        reinterpret_cast<unsigned long>(this), pEffectsGroup);
+
+    pEffectsGroup = fn_802E7CDC(EmissionManager::Instance(), lbl_806DCDB0);
+    EmissionManager::Instance()->Destroy(
+        reinterpret_cast<unsigned long>(this), pEffectsGroup);
+
+    meChainChompState = CHAIN_STATE_HIDDEN;
+    mfDesiredSpeed = lbl_806E4EF0;
+    SetAnimState(*mpIdleAnim, lbl_806E4EF0, PM_CYCLIC);
+    SetPosition(lbl_804DCDDC);
+    maFacingDirection = 0;
+    mv3Velocity = lbl_804DCDD0;
+    mpPhysObj->DisableCollisions();
+
+    mpThrower = 0;
+    mnThrowerPadID = -1;
+    mbIsVisible = false;
+    mpTarget = 0;
+    mtStateTimer.m_unk0 = mtStateTimer.m_uPackedTime != 0;
+    mtStateTimer.m_uPackedTime = 0;
+    mUnidentifiedA0 = lbl_806E4EF0;
 }

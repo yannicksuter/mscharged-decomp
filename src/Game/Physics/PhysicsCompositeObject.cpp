@@ -3,11 +3,6 @@
 #include "Game/Physics/PhysicsWorld.h"
 #include "NL/nlMemory.h"
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 PhysicsCompositeObject::PhysicsCompositeObject(PhysicsWorld* physicsWorld)
     : PhysicsObject(physicsWorld)
 {

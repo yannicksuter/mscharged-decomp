@@ -19,11 +19,6 @@
 #include "ode/ext/dRoundedCorner.h"
 #include "ode/memory.h"
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 extern "C" void* memcpy(void*, const void*, unsigned long);
 extern "C" bool fn_8013E2E4();
 extern "C" void fn_80144130(void*);

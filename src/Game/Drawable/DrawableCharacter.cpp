@@ -18,8 +18,6 @@ extern "C" void* fn_802CDF0C();
 
 #pragma cpp_extensions on
 
-void* operator new(unsigned long, void*);
-
 struct UnidentifiedStaticState
 {
     UnidentifiedStaticState()

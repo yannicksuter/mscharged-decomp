@@ -1,18 +1,9 @@
 #ifndef NL_BASIC_STRING_H
 #define NL_BASIC_STRING_H
 
+#include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlVector.h"
-
-inline void* operator new(unsigned long, void* ptr)
-{
-    return ptr;
-}
-
-inline void* operator new[](unsigned long, void* ptr)
-{
-    return ptr;
-}
 
 template <typename CharT, typename Allocator>
 class BasicString

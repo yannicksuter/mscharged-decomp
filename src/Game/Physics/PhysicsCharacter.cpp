@@ -56,11 +56,6 @@ static CollisionPlayerPlayerData* sPlayerPlayerCollisionData[100];
 static bool sbDoDKBallStuckHack = true;
 static float sfBallStuckHackShoveMagnitude = 10.0f;
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 static inline unsigned int& CharacterFlags(PhysicsCharacter* character)
 {
     return *(unsigned int*)((char*)character + 0x98);

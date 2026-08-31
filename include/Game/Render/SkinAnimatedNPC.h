@@ -1,11 +1,14 @@
 #ifndef _SKINANIMATEDNPC_H_
 #define _SKINANIMATEDNPC_H_
 
+#include "Game/SAnim.h"
 #include "NL/nlMath.h"
 
 class cPN_SAnimController;
 class cPoseAccumulator;
 class cPoseNode;
+class cSHierarchy;
+class cSAnim;
 class GLSkinMesh;
 struct glModel;
 
@@ -22,6 +25,7 @@ enum SkinAnimatedNPC_Type
 class SkinAnimatedNPC
 {
 public:
+    SkinAnimatedNPC(cSHierarchy& hierarchy, int modelID, void* resource);
     virtual ~SkinAnimatedNPC();
     virtual SkinAnimatedNPC_Type GetSkinAnimatedNPC_Type() const;
     virtual void Render();
@@ -34,6 +38,8 @@ public:
     virtual void DrawShadow(
         const cPoseAccumulator& poseAccumulator,
         const nlMatrix4& worldMatrix);
+
+    void SetAnimState(cSAnim& anim, float blendTime, ePlayMode playMode);
 
     /* 0x04 */ nlMatrix4 mWorldMatrix;
     /* 0x44 */ u16 maFacingDirection;

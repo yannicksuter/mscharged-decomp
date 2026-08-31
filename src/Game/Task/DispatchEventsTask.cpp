@@ -4,11 +4,6 @@
 
 extern "C" void fn_802B467C(void*);
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 DispatchEventsTask* gDispatchEventsTask;
 
 extern "C" void fn_80115F10()

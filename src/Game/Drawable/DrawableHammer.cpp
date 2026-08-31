@@ -2,23 +2,10 @@
 #include "Game/Drawable/RenderObject.h"
 #include "NL/gl/glModel.h"
 #include "NL/nlMath.h"
-
-struct HammerObject;
-
-struct HammerObjectFields
-{
-    char _000[0x14];
-    /* 0x14 */ float mScale;
-    char _018[0x0C];
-    /* 0x24 */ bool mVisible;
-    char _025[7];
-    /* 0x2C */ RenderObject* mDrawable;
-};
+#include "unclassified/tu_801A0E64.h"
 
 extern "C"
 {
-    const nlVector3* fn_801A1168(const HammerObject*);
-    const nlQuaternion* fn_801A1298(const HammerObject*);
     void fn_801869AC(void*, void*, int, int, const DrawableHammer*, float);
 }
 
@@ -45,10 +32,10 @@ void DrawableHammer::Grab(const HammerObject* object)
         return;
     }
 
-    mVisible = ((const HammerObjectFields*)object)->mVisible;
-    mScale = ((const HammerObjectFields*)object)->mScale;
+    mVisible = object->_024;
+    mScale = object->_014;
     mPosition = *fn_801A1168(object);
-    mOrientation = *fn_801A1298(object);
+    mOrientation = *fn_801A1298((HammerObject*)object);
 }
 
 void DrawableHammer::Render(const HammerObject* object) const
@@ -61,7 +48,7 @@ void DrawableHammer::Render(const HammerObject* object) const
         return;
     }
 
-    drawable = ((const HammerObjectFields*)object)->mDrawable;
+    drawable = object->_02C;
     if (drawable == 0)
     {
         return;

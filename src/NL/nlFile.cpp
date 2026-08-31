@@ -2,7 +2,6 @@
 
 #include "NL/MemAlloc.h"
 #include "NL/nlMemory.h"
-#include "new.h"
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;

@@ -5,11 +5,6 @@
 #include <math.h>
 #include <string.h>
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 struct FEPadData
 {
     /* 0x00 */ float fButtonInitialDelay[13];

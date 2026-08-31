@@ -1,9 +1,7 @@
 #ifndef NL_SLOT_POOL_H
 #define NL_SLOT_POOL_H
 
-#include "types.h"
-
-void* operator new(unsigned long, void*);
+#include "NL/nlMemory.h"
 
 typedef void* (*SlotPoolAllocatorFunc)(unsigned long size);
 typedef void (*SlotPoolFreeFunc)(void* data);

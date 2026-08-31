@@ -24,11 +24,6 @@ struct CollisionBallGoalpostData
 extern SlotPool<CollisionBallGoalpostData> lbl_80571758;
 extern "C" void fn_8014681C(CollisionBallGoalpostData*);
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 PhysicsNet* PhysicsNet::spPhysNetNegativeX = 0;
 PhysicsNet* PhysicsNet::spPhysNetPositiveX = 0;
 float PhysicsNet::sfPhysicsNetWidth = 0.0f;

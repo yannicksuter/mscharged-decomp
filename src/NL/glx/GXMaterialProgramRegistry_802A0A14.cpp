@@ -1,11 +1,6 @@
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/nlMemory.h"
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 extern "C" void fn_802A0A14()
 {
     new (nlMalloc(sizeof(GXMaterialProgram_802A4B28), 8, false))

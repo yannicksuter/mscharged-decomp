@@ -21,11 +21,6 @@
 #include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
 
-inline void* operator new(unsigned long, void* memory)
-{
-    return memory;
-}
-
 extern "C" DrawableObject* fn_8027725C(unsigned long);
 extern "C" void fn_802772A4(DrawableObject*);
 extern "C" bool fn_8003877C(cFielder*);
