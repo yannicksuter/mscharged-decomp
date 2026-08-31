@@ -1,5 +1,6 @@
 #include "Game/BasicStadium.h"
 #include "Game/AI/Powerups.h"
+#include "Game/Drawable/DrawablePowerup.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
@@ -26,23 +27,6 @@ struct UnidentifiedStaticTag;
 
 template <typename T>
 UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
-
-class DrawablePowerup
-{
-public:
-    void Grab(int);
-    void Render(int) const;
-    void Blend(const float*, const DrawablePowerup&, const DrawablePowerup&);
-
-    s8 mType;
-    char _01[3];
-    float mScale;
-    float mRadius;
-    bool mVisible;
-    char _0D[3];
-    nlVector3 mPosition;
-    u16 mOrientation;
-};
 
 class RenderObject
 {

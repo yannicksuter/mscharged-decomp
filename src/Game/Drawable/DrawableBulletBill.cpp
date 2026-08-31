@@ -1,6 +1,7 @@
 #include "Game/Drawable/DrawableCharacter.h"
 
 #include "Game/BasicStadium.h"
+#include "Game/Drawable/DrawableBulletBill.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Drawable/ShadowProp.h"
 #include "NL/gl/glState.h"
@@ -22,21 +23,6 @@ struct BulletBillObject
     /* 0x38 */ bool visible;
     char _039[7];
     /* 0x40 */ RenderObject* drawable;
-};
-
-class DrawableBulletBill
-{
-public:
-    DrawableBulletBill();
-    void Grab(const BulletBillObject*);
-    void Render(const BulletBillObject*) const;
-    void Blend(const float*, const DrawableBulletBill&, const DrawableBulletBill&);
-
-    /* 0x00 */ nlQuaternion mOrientation;
-    /* 0x10 */ nlVector3 mPosition;
-    /* 0x1C */ float mScale;
-    /* 0x20 */ bool mVisible;
-    char _021[3];
 };
 
 extern "C"

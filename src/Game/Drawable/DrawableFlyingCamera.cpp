@@ -1,4 +1,4 @@
-#include "Game/Drawable/DrawableCharacter.h"
+#include "Game/Drawable/DrawableFlyingCamera.h"
 
 #include "Game/BasicStadium.h"
 #include "Game/Drawable/RenderObject.h"
@@ -37,22 +37,6 @@ struct FlyingCameraObject
     /* 0x10 */ nlVector3 position;
     char _01C[0x3E];
     /* 0x5A */ bool visible;
-};
-
-class DrawableFlyingCamera
-{
-public:
-    DrawableFlyingCamera();
-    void Grab();
-    void Render() const;
-    void Blend(const float*, const DrawableFlyingCamera&, const DrawableFlyingCamera&);
-
-    /* 0x00 */ nlQuaternion mOrientation;
-    /* 0x10 */ nlVector3 mPosition;
-    /* 0x1C */ float mScale;
-    /* 0x20 */ int mIndex;
-    /* 0x24 */ bool mVisible;
-    char _025[3];
 };
 
 extern "C"

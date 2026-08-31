@@ -15,6 +15,7 @@ public:
 
     static eFEState m_feStateCurrent;
     static eFEState m_feStatePending;
+    static bool m_bGameOver;
 };
 
 #endif // _FEMANAGER_H_

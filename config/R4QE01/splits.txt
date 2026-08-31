@@ -753,6 +753,11 @@ unclassified/tu_8017FFCC.cpp:
 	.text       start:0x8017FFCC end:0x801802D4
 	.sdata2     start:0x806E4BF8 end:0x806E4C18
 
+Game/Drawable/DrawableHammer.cpp:
+	.text       start:0x801802F4 end:0x80180658
+	.sdata      start:0x806DCBE8 end:0x806DCBE9
+	.sdata2     start:0x806E4C18 end:0x806E4C24
+
 Game/Drawable/DrawableKoopaShell.cpp:
 	.text       start:0x80180678 end:0x80180C70
 	.data       start:0x805113D8 end:0x805113F0
@@ -778,9 +783,78 @@ Game/Drawable/DrawableYoshiEgg.cpp:
 	.sdata      start:0x806DCC28 end:0x806DCC40
 	.sdata2     start:0x806E4CB0 end:0x806E4CD0
 
+Game/GameObjectLighting.cpp:
+	.text       start:0x801826D0 end:0x80183DEC
+	.rodata     start:0x804DCCF0 end:0x804DCD00
+	.bss        start:0x80570C00 end:0x80570C18
+	.sdata2     start:0x806E4CE0 end:0x806E4D10
+
 unclassified/tu_8018480C.cpp:
 	.text       start:0x8018480C end:0x80184AAC
 	.sdata      start:0x806DCC98 end:0x806DCCA0
+
+Game/Render/RenderShadow.cpp:
+	.text       start:0x80184ACC end:0x80186524
+	.rodata     start:0x804DCD48 end:0x804DCD60
+	.data       start:0x80511610 end:0x80511658
+	.sdata      start:0x806DCCB0 end:0x806DCCF0
+	.sbss       start:0x806E1470 end:0x806E1488
+	.sdata2     start:0x806E4D50 end:0x806E4D8C
+
+Game/RenderSnapshot.cpp:
+	.text       start:0x80186D0C end:0x801882B4
+	.ctors      start:0x804DB6C4 end:0x804DB6C8
+	.data       start:0x805116A8 end:0x805116C8
+	.bss        start:0x80570C58 end:0x80570C68
+	.sdata      start:0x806DCCF0 end:0x806DCCF8
+	.sbss       start:0x806E1490 end:0x806E14A0
+	.sdata2     start:0x806E4D90 end:0x806E4DA0
+
+Game/Render/Wiper.cpp:
+	.text       start:0x801882B4 end:0x80188884
+	.ctors      start:0x804DB6C8 end:0x804DB6CC
+	.data       start:0x805116C8 end:0x80511770
+	.bss        start:0x80570C68 end:0x80570C88
+	.sdata      start:0x806DCCF8 end:0x806DCD08
+	.sbss       start:0x806E14A0 end:0x806E14B0
+	.sdata2     start:0x806E4DA0 end:0x806E4DB8
+
+unclassified/tu_80188884.cpp:
+	.text       start:0x80188884 end:0x80188C5C
+	.data       start:0x80511770 end:0x805117A8
+	.sbss       start:0x806E14B0 end:0x806E14B8
+	.sdata2     start:0x806E4DB8 end:0x806E4DC0
+
+Game/ReplayManager.cpp:
+	.text       start:0x80188C5C end:0x80194A0C
+	.ctors      start:0x804DB6CC end:0x804DB6D0
+	.data       start:0x805117A8 end:0x80511920
+	.bss        start:0x80570CA0 end:0x80570CC8
+	.sdata      start:0x806DCD08 end:0x806DCD10
+	.sbss       start:0x806E14B8 end:0x806E14D8
+	.sdata2     start:0x806E4DC0 end:0x806E4E60
+
+Game/ReplayChoreo.cpp:
+	.text       start:0x80194A0C end:0x80196644
+	.ctors      start:0x804DB6D0 end:0x804DB6D4
+	.rodata     start:0x804DCD60 end:0x804DCD80
+	.data       start:0x80511920 end:0x80511AD8
+	.bss        start:0x80570CC8 end:0x805710D0
+	.sdata      start:0x806DCD10 end:0x806DCD50
+	.sbss       start:0x806E14D8 end:0x806E14E0
+	.sdata2     start:0x806E4E60 end:0x806E4EA0
+
+Game/ExcitementSystem.cpp:
+	.text       start:0x80196644 end:0x80197100
+	.data       start:0x80511AD8 end:0x80511BB0
+	.bss        start:0x805710D0 end:0x80571248
+	.sbss       start:0x806E14E0 end:0x806E14E8
+	.sdata2     start:0x806E4EA0 end:0x806E4EB0
+
+unclassified/tu_80197120.cpp:
+	.text       start:0x80197120 end:0x801982A0
+	.ctors      start:0x804DB6D8 end:0x804DB6DC
+	.bss        start:0x80571248 end:0x80571A18
 
 Game/Blinker.cpp:
 	.text       start:0x80199B30 end:0x80199E84

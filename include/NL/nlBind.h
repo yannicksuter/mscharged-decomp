@@ -90,7 +90,7 @@ private:
 };
 
 template <typename R, typename F, typename A, typename B>
-BindExp2<R, F, A, B> Bind(F fn, const A& t0, const B& t1)
+inline BindExp2<R, F, A, B> Bind(F fn, const A& t0, const B& t1)
 {
     return BindExp2<R, F, A, B>(fn, t0, t1);
 }

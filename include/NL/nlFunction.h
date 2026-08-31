@@ -84,7 +84,7 @@ Detail::MemFunImpl<R, R (T::*)()> MemFun(R (T::*function)())
 }
 
 template <typename T, typename R, typename P1>
-Detail::MemFunImpl<R, R (T::*)(P1)> MemFun(R (T::*function)(P1))
+inline Detail::MemFunImpl<R, R (T::*)(P1)> MemFun(R (T::*function)(P1))
 {
     return Detail::MemFunImpl<R, R (T::*)(P1)>(function);
 }
@@ -269,20 +269,10 @@ public:
         Callable mFunctor;
 
     public:
-        FunctorImpl(const Callable& callable)
-            : mFunctor(callable)
-        {
-        }
+        FunctorImpl(const Callable& callable);
 
-        virtual ReturnType operator()(P1 p0)
-        {
-            return Call(BoolToType<IsVoid<ReturnType>::value>(), p0);
-        }
-
-        virtual FunctorBase* Clone() const
-        {
-            return new FunctorImpl(*this);
-        }
+        virtual ReturnType operator()(P1 p0);
+        virtual FunctorBase* Clone() const;
 
     private:
         ReturnType Call(BoolToType<false>, P1 p0)
@@ -392,6 +382,30 @@ private:
         FunctorBase* mFunctor;
     };
 };
+
+template <typename ReturnType, typename P1>
+template <typename Callable>
+inline Function1<ReturnType, P1>::FunctorImpl<Callable>::FunctorImpl(
+    const Callable& callable)
+    : mFunctor(callable)
+{
+}
+
+template <typename ReturnType, typename P1>
+template <typename Callable>
+inline ReturnType Function1<ReturnType, P1>::FunctorImpl<Callable>::operator()(
+    P1 p0)
+{
+    return Call(BoolToType<IsVoid<ReturnType>::value>(), p0);
+}
+
+template <typename ReturnType, typename P1>
+template <typename Callable>
+inline typename Function1<ReturnType, P1>::FunctorBase*
+Function1<ReturnType, P1>::FunctorImpl<Callable>::Clone() const
+{
+    return new FunctorImpl(*this);
+}
 
 template <typename P1>
 class Function : public Function1<void, P1>

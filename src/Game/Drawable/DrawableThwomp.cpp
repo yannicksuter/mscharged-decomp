@@ -1,4 +1,5 @@
 #include "Game/BasicStadium.h"
+#include "Game/Drawable/DrawableThwomp.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Drawable/ShadowProp.h"
 #include "Game/Physics/PhysicsObject.h"
@@ -12,20 +13,6 @@
 // object and the material services stay address-named.
 
 struct ThwompObject;
-
-class DrawableThwomp
-{
-public:
-    DrawableThwomp();
-    void Grab(const ThwompObject*);
-    void Render(ThwompObject*) const;
-    void Blend(const float*, const DrawableThwomp&, const DrawableThwomp&);
-
-    /* 0x00 */ nlVector3 mPosition;
-    /* 0x0C */ nlQuaternion mOrientation;
-    /* 0x1C */ bool mVisible;
-    char _01D[3];
-};
 
 struct ThwompObjectFields
 {

@@ -1,3 +1,4 @@
+#include "Game/Drawable/Drawable_8017FFCC.h"
 #include "Game/Drawable/RenderObject.h"
 #include "NL/gl/glView.h"
 #include "NL/nlMath.h"
@@ -17,22 +18,6 @@ struct RenderEntry_8018006C
     char _000[0x24];
     RenderObject* object;
 };
-
-class Drawable_8017FFCC
-{
-public:
-    Drawable_8017FFCC();
-    void Grab(const Object_8017FFF4* object);
-    void Render(const RenderEntry_8018006C* entry) const;
-    void Blend(const float* factors, const Drawable_8017FFCC& lhs,
-        const Drawable_8017FFCC& rhs);
-
-    /* 0x00 */ u16 mOrientation;
-    /* 0x02 */ u16 _002;
-    /* 0x04 */ nlVector3 mPosition;
-    /* 0x10 */ float mScale;
-    /* 0x14 */ bool mVisible;
-}; // size: 0x18
 
 extern "C"
 {
