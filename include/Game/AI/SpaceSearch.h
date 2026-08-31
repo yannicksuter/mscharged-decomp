@@ -121,4 +121,24 @@ public:
     /* 0x10 */ SSearchIdealShot m_SSearchIdealShot;
 }; // total size: 0x4C
 
+class SSearchBestPass : public SpaceSearch
+{
+public:
+    SSearchBestPass(cPlayer* pBallOwner, cPlayer* pPassTarget,
+        bool bAllowLeadPass, bool bIsPerfectPass, float fPassSpeed);
+    virtual ~SSearchBestPass() { }
+    virtual float EvaluatePosition(
+        const nlVector3& position,
+        const nlVector3& v3OtherPosition,
+        eFieldDirection eSearchDir,
+        unsigned short aDirection);
+
+    /* 0x10 */ nlVector3 m_v3PassDirection;
+    /* 0x1C */ float m_fPassSpeed;
+    /* 0x20 */ bool m_bAllowLeadPass;
+    /* 0x21 */ bool m_bIsPerfectPass;
+    /* 0x24 */ cPlayer* m_pBallOwner;
+    /* 0x28 */ cPlayer* m_pPassTarget;
+}; // total size: 0x2C
+
 #endif // _SPACESEARCH_H_

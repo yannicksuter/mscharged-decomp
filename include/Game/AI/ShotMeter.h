@@ -28,6 +28,10 @@ public:
     {
         return mfSShotAimValue;
     }
+    float GetTotalDuration() const
+    {
+        return mUnidentified00C;
+    }
     static bool IsActive(eShotMeterState state)
     {
         bool bShotMeterActive = false;

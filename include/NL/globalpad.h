@@ -41,7 +41,8 @@ public:
 
     /* 0x04 */ u8 mUnidentified004[0x14];
     /* 0x18 */ bool m_isLeftAnalogToDPadMapEnabled;
-    /* 0x19 */ u8 mUnidentified019[0x2B];
+    /* 0x19 */ u8 mUnidentified019[0x27];
+    /* 0x40 */ void* mUnidentified040;
     /* 0x44 */ nlPolar m_polarAnalogLeft;
     /* 0x4C */ nlPolar m_polarAnalogRight;
     /* 0x54 */ u8 mUnidentified054[0x34];

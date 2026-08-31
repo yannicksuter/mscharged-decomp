@@ -739,6 +739,6 @@ extern "C" void fn_800E92E4(
     Unidentified8002E1A4Result* state, const char* name)
 {
     UnidentifiedStringHash value(name);
-    state->mUnidentified00C = value.mHash;
-    state->mUnidentified010 = value.mUnidentified004;
+    state->mUnidentified00C = value.mUnidentifiedHash;
+    state->mUnidentified010 = value.mUnidentifiedFunction;
 }

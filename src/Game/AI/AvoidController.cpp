@@ -38,27 +38,10 @@ inline UnidentifiedAvoidanceMemory::UnidentifiedAvoidanceMemory()
     mTimer.SetSeconds(sUnidentifiedMemorySeconds);
 }
 
-UnidentifiedAvoidanceHistoryBase::UnidentifiedAvoidanceHistoryBase()
-    : mUnidentified004(0.3f)
-    , mUnidentified008(20)
-    , mUnidentified00C(0)
-    , mUnidentified010(0)
-    , mUnidentified014((nlVector3*)nlMalloc(20 * sizeof(nlVector3), 8, false))
-    , mUnidentified018((float*)nlMalloc(20 * sizeof(float), 8, false))
-    , mUnidentified028(0.0f)
-{
-    mUnidentified01C = v3Zero;
-    mUnidentified02C = v3Zero;
-}
-
 UnidentifiedAvoidanceHistoryBase::~UnidentifiedAvoidanceHistoryBase()
 {
     delete[] mUnidentified014;
     delete[] mUnidentified018;
-}
-
-UnidentifiedAvoidanceHistory::UnidentifiedAvoidanceHistory()
-{
 }
 
 UnidentifiedAvoidanceHistory::~UnidentifiedAvoidanceHistory()

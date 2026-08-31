@@ -100,8 +100,18 @@ public:
     /* 0x090 */ UnidentifiedFormationTweakVector2 vGetInPositionInRadius;
     /* 0x0B0 */ UnidentifiedFormationTweakVector2 vGetInPositionOutRadius;
 
+    /* 0x0D0 */ UnidentifiedFormationTweakValue nStrafeToRunInDirectionDelta;
+    /* 0x0E0 */ UnidentifiedFormationTweakValue nBackwardsToStrafeRunInDirectionDelta;
+    /* 0x0F0 */ UnidentifiedFormationTweakValue nStrafeToRunOutDirectionDelta;
+    /* 0x100 */ UnidentifiedFormationTweakValue nBackwardsToStrafeRunOutDirectionDelta;
+    /* 0x110 */ UnidentifiedFormationTweakValue fSlideAttackRadius;
+    /* 0x120 */ UnidentifiedFormationTweakValue fArrivalInRadius;
+    /* 0x130 */ UnidentifiedFormationTweakValue fArrivalOutRadius;
+    /* 0x140 */ UnidentifiedFormationTweakValue fNearSeekInRadius;
+    /* 0x150 */ UnidentifiedFormationTweakValue fNearSeekOutRadius;
+
 private:
-    /* 0x0D0 */ u8 mUnidentified0D0[0xB4];
+    /* 0x160 */ u8 mUnidentified160[0x24];
 
 public:
     /* 0x184 */ TweakValue_804F4DC8 fBananaActiveTime;

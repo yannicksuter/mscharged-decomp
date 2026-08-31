@@ -12,6 +12,7 @@ class cPN_SAnimController;
 class cPN_SingleAxisBlender;
 class cTeam;
 class PlayerTweaks;
+class SpaceSearch;
 class UnidentifiedPlayerRadius;
 struct CollisionPlayerPlayerData;
 struct CollisionPlayerWallData;
@@ -45,6 +46,7 @@ public:
     void SetNoPickUpTime(float NewNoPickUpTime);
     cGlobalPad* GetGlobalPad();
     void SetAIPad(cAIPad* pPad);
+    void SetSpaceSearch(SpaceSearch* pSpaceSearch);
     int GetBallJointIndex() const
     {
         return m_nBallJointIndex;
@@ -109,7 +111,7 @@ protected:
 public:
     /* 0x2F8 */ int m_nBallJointIndex;
 
-protected:
+public:
     /* 0x2FC */ int m_nRightFootJointIndex;
     /* 0x300 */ int m_nLeftFootJointIndex;
 
@@ -124,10 +126,8 @@ public:
     /* 0x314 */ cTeam* m_pTeam;
     /* 0x318 */ u32 mUnidentified318;
 
-protected:
-    /* 0x31C */ u8 mUnknown31C[0x04];
-
 public:
+    /* 0x31C */ SpaceSearch* m_pSpaceSearch;
     /* 0x320 */ UnidentifiedPlayerRadius* mUnidentified320;
 
 public:

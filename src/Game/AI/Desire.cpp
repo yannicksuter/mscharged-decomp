@@ -1,4 +1,5 @@
 #include "Game/AI/Desire.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/Variant.h"
 
 struct DebugFieldType
@@ -6,12 +7,6 @@ struct DebugFieldType
     unsigned short size;
     unsigned short unknown;
     void* writer;
-};
-
-struct UnidentifiedDesireUpdate
-{
-    u8 mUnidentified000[0x08];
-    int mUnidentifiedState;
 };
 
 extern "C" DebugFieldType lbl_80533C98[];
@@ -23,8 +18,6 @@ extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void fn_80098098(cFielder*);
 extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
 extern "C" void fn_80040368(cFielder*);
-extern "C" bool fn_8030F030(void*, int);
-extern "C" Variant* fn_8030F060(void*, int);
 
 float lbl_806DC04C = 60.0f;
 float lbl_806DC050 = 0.3f;
@@ -74,9 +67,9 @@ bool DesireFinishAction::UnidentifiedInitialize(void*)
     return true;
 }
 
-void DesireFinishAction::UnidentifiedUpdate(UnidentifiedDesireUpdate* update)
+void DesireFinishAction::UnidentifiedUpdate(UnidentifiedDesireUpdate* update, float)
 {
-    if (update->mUnidentifiedState == 2)
+    if (update->mData.i == 2)
     {
         fn_8004F594(4,
             "** WARNING! DesireFinishAction has expired after %f seconds, probably a bug!\n",
@@ -89,10 +82,6 @@ bool DesireWait::UnidentifiedInitialize(void*)
 {
     mUnidentified078 = lbl_806DC050;
     return true;
-}
-
-Desire::~Desire()
-{
 }
 
 DesireFinishAction::~DesireFinishAction()
@@ -114,7 +103,7 @@ void Desire::UnidentifiedVirtual8(void*, DebugWriteCache* cache)
     fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
 }
 
-void Desire::UnidentifiedUpdate(UnidentifiedDesireUpdate*)
+void Desire::UnidentifiedUpdate(UnidentifiedDesireUpdate*, float)
 {
 }
 
@@ -138,9 +127,10 @@ DesireDeke::~DesireDeke()
 bool DesireDeke::UnidentifiedInitialize(void* context)
 {
     mUnidentifiedA4 = 0;
-    if (fn_8030F030(context, 14))
+    if (fn_8030F030((UnidentifiedVariantCollection*)context, 14))
     {
-        mUnidentifiedA4 = fn_8030F060(context, 14)->mData.pointer;
+        mUnidentifiedA4 = fn_8030F060(
+            (UnidentifiedVariantCollection*)context, 14)->mData.pointer;
     }
     return true;
 }
@@ -154,7 +144,7 @@ void DesireDeke::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
     fn_80338F78(cache);
 }
 
-void DesireHit::UnidentifiedUpdate(UnidentifiedDesireUpdate*)
+void DesireHit::UnidentifiedUpdate(UnidentifiedDesireUpdate*, float)
 {
 }
 
@@ -171,7 +161,7 @@ void DesireHit::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
     fn_80338F78(cache);
 }
 
-void DesireGetOpen::UnidentifiedUpdate(UnidentifiedDesireUpdate*)
+void DesireGetOpen::UnidentifiedUpdate(UnidentifiedDesireUpdate*, float)
 {
     fn_800401C0(mUnidentifiedFielder, mvDesiredPosition, 1.2f, 1.0f);
 }
