@@ -1740,7 +1740,7 @@ void fn_804929E0(void)
 
     for (i = 0; i < 32; i++)
     {
-        if (lbl_806E2EF8->aidBitmap & (1 << i))
+        if ((1 << i) & lbl_806E2EF8->aidBitmap)
         {
             count++;
         }
@@ -5733,10 +5733,10 @@ int fn_80499CA8(int sort)
 
 void fn_80499E90(void)
 {
+    u32 rand;
     int maxEval = 0;
     int total = 0;
     int i;
-    u32 rand;
     int cumulative[6];
 
     if (ServerBrowserCount(lbl_806E2EF8->sb) <= 1)
