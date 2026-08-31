@@ -1,6 +1,7 @@
 #include "Game/TweakValue.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
+#include "NL/nlString.h"
 
 extern "C"
 {
@@ -50,29 +51,14 @@ bool TweakValue_804F4DC8::fn_802C4FEC(const char* name, float value,
             return fn_802C4FEC(resolved, value, group, false, min, max);
         }
     }
+    if (nlStrChr(name, '/') != 0)
     {
-        const char* p = name;
-        const char* slash;
-        while (*p != '\0')
-        {
-            if (*p == '/')
-            {
-                slash = p;
-                goto found;
-            }
-            p++;
-        }
-        slash = 0;
-    found:
-        if (slash != 0)
-        {
-            const char* leaf;
-            char path[0x100];
-            char combined[0x100];
-            fn_802C7480(name, &leaf, path);
-            fn_802C7534(group, path, combined);
-            return fn_802C4FEC(leaf, value, combined, false, min, max);
-        }
+        const char* leaf;
+        char path[0x100];
+        char combined[0x100];
+        fn_802C7480(name, &leaf, path);
+        fn_802C7534(group, path, combined);
+        return fn_802C4FEC(leaf, value, combined, false, min, max);
     }
     {
         void* entry = fn_802C4504(fn_802C0E30(), group, 0);

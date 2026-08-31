@@ -34,8 +34,7 @@ test:
         c = *(const unsigned char*)&str2[p];
     else
         c = str2[p];
-    str1[p] = c;
-    if ((CharT)c)
+    if ((str1[p] = c) != 0)
         goto loop;
 done:
     str1[p] = '\0';
@@ -99,6 +98,21 @@ inline int nlStrNCmp(const CharT* lhs, const CharT* rhs, unsigned long count)
         right = *rhs++;
     } while (--count != 0 && left != 0 && right != 0 && left == right);
     return left - right;
+}
+
+template <typename CharT>
+inline CharT* nlStrChr(const CharT* str, CharT c)
+{
+    const CharT* cp = str;
+    while (*cp != 0)
+    {
+        if (*cp == c)
+        {
+            return (CharT*)cp;
+        }
+        cp++;
+    }
+    return 0;
 }
 
 template <typename CharT>

@@ -136,6 +136,9 @@ CharT nlToUpper(CharT value);
 template <typename CharT>
 CharT nlToLower(CharT value);
 
+template <typename CharT>
+CharT* nlStrChr(const CharT* str, CharT c);
+
 #include "NL/nlstring_tmpl.h"
 
 #endif // NL_STRING_H
