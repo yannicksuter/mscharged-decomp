@@ -18,4 +18,6 @@ public:
     /* 0x20 */ float mElapsed;
 }; // size 0x24
 
+extern LoadingTask sLoadingTask;
+
 #endif // GAME_TASK_LOADING_TASK_H

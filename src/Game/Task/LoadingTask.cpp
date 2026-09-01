@@ -1,24 +1,9 @@
 #include "Game/Task/LoadingTask.h"
 
+#include "Game/AsyncLoading.h"
 #include "types.h"
 
-// The asynchronous loading manager driven by this task is a singleton in the
-// following, still unreconstructed translation unit. Only its address is known,
-// so it stays opaque here and its methods are referenced by address.
-class AsyncLoadingManager;
-
 extern "C" {
-AsyncLoadingManager* fn_80118A74();
-void fn_80118B50(AsyncLoadingManager*);
-u32 fn_80118B7C(AsyncLoadingManager*);
-void fn_80119054(AsyncLoadingManager*);
-void fn_801190A0(AsyncLoadingManager*);
-void fn_801190EC(AsyncLoadingManager*);
-void fn_80119138(AsyncLoadingManager*);
-void fn_80119184(AsyncLoadingManager*);
-void fn_801191D4(AsyncLoadingManager*);
-void fn_80119220(AsyncLoadingManager*);
-
 void fn_802C084C(void*, int);
 void fn_802C07AC(void*, float);
 void fn_8037537C(void*);

@@ -1,6 +1,7 @@
 #ifndef GAME_NETWORK_SESSION_H
 #define GAME_NETWORK_SESSION_H
 
+#include "Game/main.h"
 #include "NL/nlMemory.h"
 #include "types.h"
 
@@ -27,10 +28,8 @@ struct UnidentifiedGameStartInfo
     /* 0x14 */ int mPlayerCounts[4];
 };
 
-extern int lbl_806E10D0;
+extern int g_BuildNumber;
 extern int lbl_806E10F8;
-
-extern "C" int fn_8011C19C();
 
 class UnidentifiedNetworkConnectionListener;
 
@@ -308,7 +307,7 @@ public:
     u32 GetVersionWord()
     {
         int channel = 10;
-        switch (fn_8011C19C())
+        switch (GetRegion())
         {
         case 0:
             channel = 10;
@@ -321,7 +320,7 @@ public:
             break;
         }
 
-        u32 low = (u16)lbl_806E10D0;
+        u32 low = (u16)g_BuildNumber;
         if (lbl_806E10F8 != 0)
         {
             low = (u16)lbl_806E10F8;

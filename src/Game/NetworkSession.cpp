@@ -22,11 +22,6 @@ struct UnidentifiedTournamentState
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
 
-int lbl_806E10D0;
-int lbl_806E10D4;
-u8 lbl_806E10D8;
-int lbl_806E10DC;
-double lbl_806E10E0;
 bool lbl_806E10E8;
 UnidentifiedNetworkSession* lbl_806E10EC;
 int lbl_806E10F0;
@@ -366,7 +361,7 @@ void UnidentifiedNetworkSession::Initialize(bool first)
         mUnidentified2473 = 0;
 
         PushAllocator(&VirtualAllocator);
-        if (fn_8011C19C() == 0)
+        if (GetRegion() == 0)
         {
             u32 poolSize = 0xB0000 - 0x2A90;
             void* pool = nlMalloc(poolSize, 8, false);
@@ -988,11 +983,11 @@ void UnidentifiedNetworkSession::OnlineVirtual04()
     mUnidentified24A4 = 0;
 
     u32 gameCode = lbl_806DC88C;
-    if (fn_8011C19C() == 2)
+    if (GetRegion() == 2)
     {
         gameCode = lbl_806DC890;
     }
-    else if (fn_8011C19C() == 0)
+    else if (GetRegion() == 0)
     {
         gameCode = lbl_806DC894;
     }

@@ -13,7 +13,7 @@ extern "C"
     int fclose(FILE* stream);
 }
 
-bool lbl_806E1D88;
+bool g_bDisableWriteOut;
 
 void* nlOpenFileDebug(const char* fileName, bool bBinary, bool bAppend)
 {
@@ -41,7 +41,7 @@ void* nlOpenFileDebug(const char* fileName, bool bBinary, bool bAppend)
 
 void nlWriteBuffer(void* file, const char* buffer, int size)
 {
-    if (!lbl_806E1D88)
+    if (!g_bDisableWriteOut)
     {
         fwrite(buffer, 1, size, (FILE*)file);
     }
@@ -49,7 +49,7 @@ void nlWriteBuffer(void* file, const char* buffer, int size)
 
 void nlWriteLineDebug(void* file, const char* buffer, bool flush)
 {
-    if (!lbl_806E1D88)
+    if (!g_bDisableWriteOut)
     {
         fputs(buffer, (FILE*)file);
         if (flush != 0)

@@ -1,6 +1,7 @@
 #include "Game/Task/NetworkUpdateTask.h"
 
 #include "Game/NetworkSession.h"
+#include "Game/main.h"
 
 #include "NL/nlMemory.h"
 #include "types.h"
@@ -36,8 +37,6 @@ extern "C" void fn_801274A4();
 extern "C" void fn_8012AE4C();
 extern "C" void* fn_801360A4(void*);
 extern "C" void fn_8012F378();
-extern "C" s32 fn_8011C19C();
-
 void NetworkUpdateTask::Initialize()
 {
     fn_803740B8();
@@ -70,11 +69,11 @@ void NetworkUpdateTask::Initialize()
     }
 
     fn_8012F378();
-    if (fn_8011C19C() == 2)
+    if (GetRegion() == 2)
     {
         lbl_806E1188 = 9;
     }
-    else if (fn_8011C19C() == 0)
+    else if (GetRegion() == 0)
     {
         lbl_806E1188 = -8;
     }
