@@ -99,10 +99,11 @@ void fn_8019FE24(Object_8019FE24* object, float dt)
     targetPosition.y = sine * object->_04C + object->_034.y;
     targetPosition.z = object->_034.z + object->_050;
     nlVec3Sub(delta, targetPosition, object->position);
+    float rate = lbl_806E503C * dt;
+    float directScale = object->_040 * rate;
     nlVec3Add(object->_028, object->_028, delta);
 
-    float rate = lbl_806E503C * dt;
-    nlVec3Scale(directChange, delta, object->_040 * rate);
+    nlVec3Scale(directChange, delta, directScale);
 
     float minAccumulatedChange = lbl_806DCE24;
     float maxAccumulatedChange = lbl_806DCE28;

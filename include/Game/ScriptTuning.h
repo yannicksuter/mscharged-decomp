@@ -11,7 +11,7 @@ public:
     virtual ~FuzzyTweaks();
     virtual void Init();
 
-private:
+public:
     void fn_800E1C98(bool registerTweaks);
 
     /* 0x044 */ TweakValue_804F4DC8 mUnidentified044;

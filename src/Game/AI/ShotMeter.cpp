@@ -23,8 +23,6 @@ extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" void fn_80060A00(void*, cFielder*);
 extern "C" float fn_800A0508(cFielder*, bool, bool);
 
-extern void* lbl_806E0C94;
-
 float lbl_806DBE58 = 1.55f;
 float lbl_806DBE5C = 1.55f;
 float lbl_806DBE60 = 0.05f;

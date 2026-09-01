@@ -1410,10 +1410,8 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
     }
 
     pRoot->mv3GroupMaxCoords = v3TopRight;
-    float halfYInc = 0.51f * yInc;
-    float halfZInc = 0.51f * zInc;
-    v3TopRight.y += halfYInc;
-    v3TopRight.z += halfZInc;
+    v3TopRight.y += 0.51f * yInc;
+    v3TopRight.z += 0.51f * zInc;
 
     pCur = pRightCorner;
     v3BotLeft = pRightCorner->mv3SavePos;
@@ -1432,8 +1430,8 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
     }
 
     pRoot->mv3GroupMinCoords = v3BotLeft;
-    v3BotLeft.y -= halfYInc;
-    v3BotLeft.z -= halfZInc;
+    v3BotLeft.y -= 0.51f * yInc;
+    v3BotLeft.z -= 0.51f * zInc;
 
     pNextRight = pRightCorner;
     pCurBot = pNextRight;
@@ -1530,6 +1528,11 @@ static inline void Local2GridCoords(
         j = 3;
 }
 
+static inline int AbsInt(int value)
+{
+    return value < 0 ? -value : value;
+}
+
 void GoalieSave::AddSegmentToGrid(
     SaveData* pSaveData1, SaveData* pSaveData2)
 {
@@ -1544,7 +1547,7 @@ void GoalieSave::AddSegmentToGrid(
         pSaveData1->mv3SavePos.y, pSaveData1->mv3SavePos.z, i, j);
     Local2GridCoords(
         pSaveData2->mv3SavePos.y, pSaveData2->mv3SavePos.z, m, n);
-    divisions = abs(j - n) + abs(i - m);
+    divisions = AbsInt(i - m) + AbsInt(j - n);
     nlVec3Sub(v3Delta, pSaveData2->mv3SavePos, pSaveData1->mv3SavePos);
     if (divisions > 0)
     {
