@@ -734,6 +734,8 @@ config.libs = [
             Object(NonMatching, "Game/WorldTriggers.cpp"),
             Object(NonMatching, "unclassified/tu_801BE428.cpp"),
             Object(Matching, "Game/Triggers/SebringAnimScript.cpp", cflags=cflags_game_deferred),
+            Object(Matching, "Game/FE/feAsyncImage.cpp", cflags=cflags_game_deferred),
+            Object(Matching, "Game/FE/LidOpenMessage.cpp", cflags=cflags_game),
             Object(NonMatching, "Game/Physics.cpp"),
             Object(Equivalent, "Game/Physics/PhysicsBanana.cpp"),
             Object(NonMatching, "unclassified/tu_80141AB0.cpp"),

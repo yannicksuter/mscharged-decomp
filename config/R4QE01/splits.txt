@@ -1332,6 +1332,17 @@ Game/Triggers/SebringAnimScript.cpp:
 	.data       start:0x80515CB8 end:0x80515CD0
 	.sdata2     start:0x806E5478 end:0x806E5480
 
+Game/FE/feAsyncImage.cpp:
+	.text       start:0x801BF040 end:0x801BF4EC
+	.data       start:0x80515CD0 end:0x80515CE0
+
+Game/FE/LidOpenMessage.cpp:
+	.text       start:0x801BF4EC end:0x801BFB54
+	.rodata     start:0x804DCFF8 end:0x804E7310
+	.data       start:0x80515CE0 end:0x80515D18
+	.sdata      start:0x806DD238 end:0x806DD240
+	.sbss       start:0x806E17D8 end:0x806E17F0
+
 Game/FE/feManager.cpp:
 	.text       start:0x801C3920 end:0x801C4B7C
 	.ctors      start:0x804DB76C end:0x804DB770

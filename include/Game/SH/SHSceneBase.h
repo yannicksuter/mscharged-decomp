@@ -2,6 +2,7 @@
 #define GAME_SH_SH_SCENE_BASE_H
 
 #include "Game/BaseSceneHandler.h"
+#include "Game/FE/feAsyncImage.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlFunction.h"
 #include "unclassified/tu_80219248.h"
@@ -24,17 +25,6 @@ struct UnidentifiedTextFader
     /* 0x30 */ Function<FnVoidVoid> mUnidentified30;
     /* 0x38 */ u8 mUnidentified38[0x8];
 }; // size 0x40
-
-// StrikerTimes texture streamer owned by the 0x801BFxxx translation unit.
-struct UnidentifiedStrikerTimesImage
-{
-    UnidentifiedStrikerTimesImage(const char* resource, int value);
-    ~UnidentifiedStrikerTimesImage();
-
-    /* 0x00 */ u8 mUnidentified00[0x8];
-    /* 0x08 */ TLInstance* mUnidentified08;
-    /* 0x0C */ u8 mUnidentified0C[0x94];
-}; // size 0xA0
 
 // Scroll widget owned by the 0x8022Fxxx/0x80230xxx translation units.
 struct UnidentifiedScrollWidget
@@ -87,9 +77,9 @@ public:
     /* 0x10C */ TU80219248Component mComponent;
     /* 0x1C0 */ UnidentifiedTextFader mUnidentified1C0;
     /* 0x200 */ UnidentifiedTextFader mUnidentified200;
-    /* 0x240 */ UnidentifiedStrikerTimesImage mUnidentified240;
-    /* 0x2E0 */ UnidentifiedStrikerTimesImage mUnidentified2E0;
-    /* 0x380 */ UnidentifiedStrikerTimesImage mUnidentified380;
+    /* 0x240 */ AsyncImage mUnidentified240;
+    /* 0x2E0 */ AsyncImage mUnidentified2E0;
+    /* 0x380 */ AsyncImage mUnidentified380;
     /* 0x420 */ UnidentifiedScrollWidget mUnidentified420;
 
 private:
