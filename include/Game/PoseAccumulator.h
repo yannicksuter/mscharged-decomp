@@ -33,7 +33,11 @@ struct MorphWeightAccum
 class cPoseAccumulator
 {
 public:
+    cPoseAccumulator(cSHierarchy* pSHierarchy, bool bStorePrevNodeMatrices);
+    ~cPoseAccumulator();
+    void InitAccumulators();
     void InitAccumulators(float scale, float damage);
+    void BuildNodeMatrices(const nlMatrix4& pWorldMatrix);
     int GetNumNodes() const;
     nlMatrix4& GetNodeMatrix(int nodeIndex) const;
     void BlendRot(int nodeIndex, const nlQuaternion* rotation, float weight,

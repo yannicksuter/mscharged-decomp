@@ -1,4 +1,4 @@
-#include "NL/gl/glModel.h"
+#include "unclassified/tu_802A15D4.h"
 
 #include "types.h"
 
@@ -12,18 +12,6 @@ extern "C" void fn_802D39CC(glModelStream* streams, int stream,
 extern "C" void fn_8036E438(glModelPacket* packet, bool allocated);
 extern "C" void DCStoreRangeNoSync(const void* address, u32 size);
 extern "C" void PPCSync();
-
-struct State_802A15D4
-{
-    int count;
-    glModel* model;
-    void* resource;
-    float* value_0C;
-    float* value_10;
-    float* value_14;
-    float* value_18;
-    u32* value_1C;
-};
 
 extern "C" void fn_802A15D4(State_802A15D4* writer)
 {

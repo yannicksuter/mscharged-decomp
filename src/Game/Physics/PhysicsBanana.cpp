@@ -14,6 +14,7 @@
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Render/SkinAnimatedNPC.h"
 #include "NL/nlSlotPool.h"
+#include "unclassified/tu_801A5F10.h"
 #include "math.h"
 
 struct CollisionPowerupGroundData
@@ -223,8 +224,9 @@ ContactType PhysicsBanana::Contact(
             return NO_CONTACT;
         }
 
-        void* koopaShell = *(void**)((u8*)lbl_806E1608 + 0x2C);
-        if (koopaShell != 0 && *(bool*)((u8*)koopaShell + 0x20))
+        KoopaShellObject* koopaShell =
+            *(KoopaShellObject**)((u8*)lbl_806E1608 + 0x2C);
+        if (koopaShell != 0 && koopaShell->mVisible)
         {
             return NO_CONTACT;
         }

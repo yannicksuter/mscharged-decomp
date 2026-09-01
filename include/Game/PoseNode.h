@@ -21,6 +21,7 @@ public:
     void SetChild(int index, cPoseNode* child);
     cPoseNode* GetChild(int index) const;
     cPoseNode* GetChild(int index);
+    void GetRootRot(unsigned short* out);
     void GetRootTrans(nlVector3* out, unsigned short ang);
 
     cPoseNode* m_Children[3];

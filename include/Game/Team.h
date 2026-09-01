@@ -58,8 +58,10 @@ public:
 public:
     /* 0x08 */ float mfPowerupMeter;
 
+    /* 0x0C */ float mUnidentified00C;
+
 private:
-    /* 0x0C */ u8 mUnidentified00C[0x0C];
+    /* 0x10 */ u8 mUnidentified010[0x08];
 
 public:
     /* 0x18 */ u32 field_0x18;

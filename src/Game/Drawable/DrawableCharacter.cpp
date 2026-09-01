@@ -231,9 +231,6 @@ struct TaskManager
     u32 state;
 };
 
-extern "C" cPoseAccumulator* fn_8030A9D0(cPoseAccumulator*, cSHierarchy*, bool);
-extern "C" void fn_8030B1C0(cPoseAccumulator*);
-extern "C" void fn_8030B318(cPoseAccumulator*, const nlMatrix4*);
 extern "C" void fn_8030B9C8(cPoseAccumulator*, const nlMatrix4*);
 extern "C" void fn_8030BD18(cPoseAccumulator*, int, const nlQuaternion*, bool, float);
 extern "C" void fn_8030BE68(cPoseAccumulator*, int, u16, float);
@@ -242,7 +239,6 @@ extern "C" int fn_8030C374(cPoseAccumulator*);
 extern "C" void fn_8030C380(cPoseAccumulator*, int, void (*)(void*), void*, int);
 extern "C" int fn_8030CC1C(cSHierarchy*, u32);
 extern "C" void fn_8017BF84(void*);
-extern "C" void fn_8030AE14(cPoseAccumulator*, bool);
 extern "C" cPoseAccumulator* fn_8030ABF8(
     cPoseAccumulator*, cPoseAccumulator*);
 extern "C" cPoseAccumulator* fn_8030AD14(
@@ -451,7 +447,7 @@ static inline void BuildCharacterMatrices(DrawableCharacter* drawable, cPoseAccu
             accumulator, *(int*)((char*)drawable->character + 0xD8),
             fn_8017BF84, drawable, 0);
     }
-    fn_8030B318(accumulator, &matrix);
+    accumulator->BuildNodeMatrices(matrix);
     if (drawable->character != 0)
     {
         fn_8030C380(
@@ -518,12 +514,12 @@ DrawableCharacter::DrawableCharacter()
 
 DrawableCharacter::~DrawableCharacter()
 {
-    fn_8030AE14(poseAccumulator, true);
+    delete poseAccumulator;
 }
 
 void DrawableCharacter::Free()
 {
-    fn_8030AE14(poseAccumulator, true);
+    delete poseAccumulator;
     poseAccumulator = 0;
 }
 
@@ -636,7 +632,7 @@ void DrawableCharacter::BuildNodeMatrices(cPoseAccumulator* accumulator)
             accumulator, character->headJointIndex,
             fn_8017BF84, this, 0);
     }
-    fn_8030B318(accumulator, &matrix);
+    accumulator->BuildNodeMatrices(matrix);
     if (character != 0)
     {
         fn_8030C380(
@@ -994,18 +990,14 @@ void DrawableCharacter::Blend(
 
     if (poseAccumulator == 0)
     {
-        cPoseAccumulator* accumulator =
-            (cPoseAccumulator*)nlMalloc(sizeof(cPoseAccumulator), 8, false);
-        if (accumulator != 0)
-        {
-            accumulator = fn_8030A9D0(
-                accumulator, lhs.poseAccumulator->m_pHierarchy, false);
-        }
+        cPoseAccumulator* accumulator = new (
+            nlMalloc(sizeof(cPoseAccumulator), 8, false))
+            cPoseAccumulator(lhs.poseAccumulator->m_pHierarchy, false);
         poseAccumulator = accumulator;
     }
 
     poseAccumulator->m_Scale = scale;
-    fn_8030B1C0(poseAccumulator);
+    poseAccumulator->InitAccumulators();
 
     for (int morphIndex = 0; morphIndex < 20; ++morphIndex)
     {
@@ -1223,7 +1215,7 @@ void DrawableCharacter::EvaluateFrom(
             accumulator, character->headJointIndex,
             fn_8017BF84, this, 0);
     }
-    fn_8030B318(accumulator, &matrix);
+    accumulator->BuildNodeMatrices(matrix);
     if (character != 0)
     {
         fn_8030C380(

@@ -9,12 +9,6 @@
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
 
-struct UnidentifiedStadiumShadowData
-{
-    /* 0x00 */ u8 unknown00[0x98];
-    /* 0x98 */ float shadowHeight;
-};
-
 struct BallShadowParams
 {
     /* 0x00 */ float fReferenceHeight;

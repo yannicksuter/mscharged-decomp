@@ -36,6 +36,9 @@
 #include "NL/nlSlotPool.h"
 #include "NL/utility.h"
 #include "unclassified/tu_801A0E64.h"
+#include "unclassified/tu_801A5F10.h"
+#include "Game/Render/NPCManager.h"
+#include "Game/Render/ShootToScoreMeter.h"
 #include "math.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -106,7 +109,6 @@ extern "C" void fn_80015C38(cBall* pBall, int nParam);
 extern "C" void fn_800154FC(cBall* pBall, float fParam);
 extern "C" void fn_801B75C8(cFielder* pFielder, int, int, int, int);
 extern "C" void fn_800395C0(cFielder* pFielder);
-extern "C" void fn_801A6344(void* pParam, cFielder* pFielder);
 extern "C" void fn_8019A270(void* pParam, cFielder* pFielder);
 extern "C" float fn_8002C7E8(PlayerTweaks* pTweaks);
 extern "C" void fn_801BA034();
@@ -225,8 +227,6 @@ extern "C" UnidentifiedCaptainObject* fn_801792C4(void* pParam, int nIndex);
 extern "C" bool fn_802B6BC8(const nlVector3* v3Start,
     const nlVector3* v3End, const nlVector3* v3A, const nlVector3* v3B,
     float* fOut1, float* fOut2);
-extern "C" HammerObject* fn_801AA3AC(
-    void* pManager, int nParam);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern "C" void fn_80331F9C(void* pPad, int nParam, int nParam2);
 extern "C" bool fn_800EBC84(
@@ -271,23 +271,9 @@ extern "C" UnidentifiedHandler8011166C* fn_8011166C(void);
 extern "C" void fn_801BA4C8(const char* szName);
 extern "C" int fn_8001C5E4(cFielder* pFielder, unsigned short aFacing,
     unsigned short aTarget, int nAnimID, float fParam);
-extern "C" void fn_801AF94C(void);
 extern "C" void* fn_8027267C(int nParam);
 extern "C" void fn_802CE7F4(
     void* pParam, const nlVector3* v3Position, nlVector3* v3Out);
-extern "C" void fn_801B1004(void* pMeter, float fValue);
-extern "C" void fn_801B1024(void* pMeter, float fValue);
-extern "C" void fn_801B1044(void* pMeter, float fValue);
-extern "C" void fn_801B1064(void* pMeter, float fValue);
-extern "C" void fn_801B1084(void* pMeter, float fValue);
-extern "C" void fn_801B10A4(void* pMeter, float fValue);
-extern "C" void fn_801B10C4(void* pMeter, float fValue);
-extern "C" void fn_801B10E4(void* pMeter, float fValue);
-extern "C" void fn_801B0F5C(void* pMeter, float fValue);
-extern "C" void fn_801B0F84(void* pMeter, float fValue);
-extern "C" void fn_801B0FA4(void* pMeter, float fValue);
-extern "C" void fn_801B0FC4(void* pMeter, float fValue);
-extern "C" void fn_801B0FE4(void* pMeter, float fValue);
 extern "C" float fn_800499EC(cFielder* pFielder, int nParam);
 extern "C" float fn_80049CC0(cFielder* pFielder, int nParam);
 extern "C" void fn_8005F434(cGame* pGame, void* pEvent);
@@ -316,31 +302,12 @@ struct UnidentifiedMegaStrikeScene
 
 
 
-struct UnidentifiedMegaMeter80574148
-{
-    /* 0x00 */ nlVector3 mUnidentified00;
-    /* 0x0C */ nlVector3 mUnidentified0C;
-    /* 0x18 */ u8 mUnknown18[0x14];
-    /* 0x2C */ bool mUnidentified2C;
-    /* 0x2D */ bool mUnidentified2D;
-    /* 0x2E */ bool mUnidentified2E;
-};
-extern UnidentifiedMegaMeter80574148 lbl_80574148;
-
 struct UnidentifiedMegaStrikeEvent
 {
     /* 0x00 */ cFielder* pFielder;
     /* 0x04 */ float fMeterValue;
     /* 0x08 */ nlVector3 v3Position;
 };
-
-struct UnidentifiedManager806E1608
-{
-    /* 0x00 */ u8 mUnidentified00[0x28];
-    /* 0x28 */ void* mUnidentified28;
-    /* 0x2C */ void* mUnidentified2C;
-};
-extern UnidentifiedManager806E1608* lbl_806E1608;
 
 struct UnidentifiedSkillshotNode
 {
@@ -1721,9 +1688,10 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
         if (bParam)
         {
-            lbl_80574148.mUnidentified0C = m_v3Position;
-            lbl_80574148.mUnidentified00 = m_v3Position;
-            fn_801AF94C();
+            ShootToScoreMeter::instance.m_v3OriginalMeterPosition
+                = m_v3Position;
+            ShootToScoreMeter::instance.m_v3MeterPosition = m_v3Position;
+            ShootToScoreMeter::instance.TurnOnMeter();
             fn_800EBBFC(0, 0xC4534945, 0, 0);
         }
 
@@ -1768,20 +1736,20 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         float fHalfC = fSegmentC * 0.5f;
 
         mUnidentified3C4 = lbl_806DB970 + fHalfA;
-        fn_801B1004(&lbl_80574148, mUnidentified3C4);
-        fn_801B1024(&lbl_80574148, fSegmentA);
+        ShootToScoreMeter::instance.fn_801B1004(mUnidentified3C4);
+        ShootToScoreMeter::instance.fn_801B1024(fSegmentA);
 
         mUnidentified3C8 = fHalfB + (mUnidentified3C4 + fHalfA);
-        fn_801B1044(&lbl_80574148, mUnidentified3C8);
-        fn_801B1064(&lbl_80574148, fSegmentB);
+        ShootToScoreMeter::instance.fn_801B1044(mUnidentified3C8);
+        ShootToScoreMeter::instance.fn_801B1064(fSegmentB);
 
         mUnidentified3CC = fHalfC + (mUnidentified3C8 + fHalfB);
-        fn_801B1084(&lbl_80574148, mUnidentified3CC);
-        fn_801B10A4(&lbl_80574148, fSegmentC);
+        ShootToScoreMeter::instance.fn_801B1084(mUnidentified3CC);
+        ShootToScoreMeter::instance.fn_801B10A4(fSegmentC);
 
         mUnidentified3D0 = fHalfD + (mUnidentified3CC + fHalfC);
-        fn_801B10C4(&lbl_80574148, mUnidentified3D0);
-        fn_801B10E4(&lbl_80574148, fSegmentD);
+        ShootToScoreMeter::instance.fn_801B10C4(mUnidentified3D0);
+        ShootToScoreMeter::instance.fn_801B10E4(fSegmentD);
 
         mUnidentified3D4 = mUnidentified3D0;
 
@@ -1847,10 +1815,11 @@ void cFielder::fn_80048FB0(float fDeltaT, bool bButtonPressed, int nParam)
 
             mUnidentified3B8 = true;
             mUnidentified3AC = mUnidentified3B0;
-            fn_801B0FC4(&lbl_80574148, mUnidentified3A4);
-            fn_801B0FE4(&lbl_80574148, fSecondPhaseTime);
-            fn_801B0FA4(&lbl_80574148, lbl_806DB93C);
-            lbl_80574148.mUnidentified2E = true;
+            ShootToScoreMeter::instance.SetGreenRegionWidth(
+                mUnidentified3A4);
+            ShootToScoreMeter::instance.fn_801B0FE4(fSecondPhaseTime);
+            ShootToScoreMeter::instance.SetGreenBarPosition(lbl_806DB93C);
+            ShootToScoreMeter::instance.mUnidentified2E = true;
         }
         else if (mUnidentified3A0 < 0.0f)
         {
@@ -1871,14 +1840,14 @@ void cFielder::fn_80048FB0(float fDeltaT, bool bButtonPressed, int nParam)
 
     if (mUnidentified3A0 < 0.0f)
     {
-        fn_801B0F5C(&lbl_80574148, mUnidentified3A8);
+        ShootToScoreMeter::instance.SetWhiteBarPosition(mUnidentified3A8);
     }
     else
     {
-        fn_801B0F5C(&lbl_80574148, mUnidentified3A0);
+        ShootToScoreMeter::instance.SetWhiteBarPosition(mUnidentified3A0);
     }
 
-    fn_801B0F84(&lbl_80574148, mUnidentified39C);
+    ShootToScoreMeter::instance.SetSavedWhiteBarPosition(mUnidentified39C);
 }
 
 void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
@@ -1962,7 +1931,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
     fn_8004F594(0x10, "DoMegaMeterFirstButtonPressEvent at time %f\n",
         mUnidentified3AC);
 
-    lbl_80574148.mUnidentified2D = true;
+    ShootToScoreMeter::instance.mbShowSavedWhiteBar = true;
 
     mUnidentified3BC = (float)(s32)fn_800499EC(this, 0);
 
@@ -2006,8 +1975,9 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     fn_8004F594(0x10, "DoMegaMeterSecondButtonPressEvent at time %f\n",
         mUnidentified3AC);
 
-    lbl_80574148.mUnidentified2C = true;
-    lbl_80574148.mUnidentified00 = lbl_80574148.mUnidentified0C;
+    ShootToScoreMeter::instance.mUnidentified2C = true;
+    ShootToScoreMeter::instance.m_v3MeterPosition
+        = ShootToScoreMeter::instance.m_v3OriginalMeterPosition;
 
     mUnidentified3C0 = fn_80049CC0(this, 0);
 
@@ -4537,16 +4507,16 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
             }
             else if (m_eCharacterClass == (eCharacterClass)0x0E)
             {
-                if (lbl_806E1608->mUnidentified2C != 0)
+                if (lbl_806E1608->mUnidentified02C != 0)
                 {
-                    fn_801A6344(lbl_806E1608->mUnidentified2C, this);
+                    fn_801A6344(lbl_806E1608->mUnidentified02C, this);
                 }
             }
             else if (m_eCharacterClass == (eCharacterClass)0x0C)
             {
-                if (lbl_806E1608->mUnidentified28 != 0)
+                if (lbl_806E1608->mUnidentified028 != 0)
                 {
-                    fn_8019A270(lbl_806E1608->mUnidentified28, this);
+                    fn_8019A270(lbl_806E1608->mUnidentified028, this);
                 }
             }
         }
@@ -5289,8 +5259,7 @@ void cFielder::fn_8004E6B4()
 {
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
-        HammerObject* pProjectile
-            = fn_801AA3AC(lbl_806E1608, -1);
+        HammerObject* pProjectile = lbl_806E1608->fn_801AA3AC(-1);
         if (pProjectile != 0)
         {
             fn_801A1B54(pProjectile, this);

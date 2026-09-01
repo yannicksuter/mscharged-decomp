@@ -5,7 +5,9 @@
 #include "types.h"
 
 class cSHierarchy;
+class cPoseAccumulator;
 class GLMaterialList;
+struct glModel;
 
 class GLSkinMesh
 {
@@ -23,9 +25,9 @@ public:
 
     virtual ~GLSkinMesh();
     virtual void SetMaterialList(GLMaterialList* materialList);
-    virtual void fn_Unknown2() = 0;
-    virtual void fn_Unknown3() = 0;
-    virtual void fn_Unknown4() = 0;
+    virtual glModel* GetModel() = 0;
+    virtual void Pose(cPoseAccumulator* pPoseAccumulator) = 0;
+    virtual void PrepareToRender() = 0;
     virtual void fn_Unknown5() = 0;
 
     /* 0x04 */ GLMaterialList* m_pMaterialList;
@@ -66,9 +68,9 @@ public:
     }
 
     virtual ~ShaderSkinMesh();
-    virtual void fn_Unknown2();
-    virtual void fn_Unknown3();
-    virtual void fn_Unknown4();
+    virtual glModel* GetModel();
+    virtual void Pose(cPoseAccumulator* pPoseAccumulator);
+    virtual void PrepareToRender();
     virtual void fn_Unknown5();
 
     void fn_802D407C(unsigned long count);

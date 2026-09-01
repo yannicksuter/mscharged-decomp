@@ -1,19 +1,23 @@
 #ifndef _SKINANIMATEDMOVABLENPC_H_
 #define _SKINANIMATEDMOVABLENPC_H_
 
+#include "Game/Physics/PhysicsNPC.h"
 #include "Game/Render/SkinAnimatedNPC.h"
-
-class PhysicsObject;
 
 class SkinAnimatedMovableNPC : public SkinAnimatedNPC
 {
 public:
+    SkinAnimatedMovableNPC(cSHierarchy& pHierarchy, int nModelID,
+        PhysicsNPC& pPhysicsObj, void* resource);
     virtual ~SkinAnimatedMovableNPC();
-    virtual SkinAnimatedNPC_Type GetSkinAnimatedNPC_Type() const;
+    virtual SkinAnimatedNPC_Type GetSkinAnimatedNPC_Type() const
+    {
+        return SkinAnimatedNPC_MOVABLE;
+    }
     virtual void Render();
     virtual void RenderFromReplay(
-        const cPoseAccumulator& poseAccumulator,
-        const nlMatrix4* pWorldMatrix);
+        const cPoseAccumulator& poseAcc,
+        const nlMatrix4* pMatrix);
     virtual void SetPosition(const nlVector3& pos);
     virtual void Update(float dt);
     virtual void Move(float fDeltaT) = 0;
@@ -29,7 +33,7 @@ public:
     /* 0x78 */ u16 maDesiredFacingDirection;
     /* 0x7A */ u16 m_unk7A;
     /* 0x7C */ float mfDesiredSpeed;
-    /* 0x80 */ PhysicsObject* mpPhysObj;
+    /* 0x80 */ PhysicsNPC* mpPhysObj;
 }; // total size: 0x84
 
 #endif // _SKINANIMATEDMOVABLENPC_H_

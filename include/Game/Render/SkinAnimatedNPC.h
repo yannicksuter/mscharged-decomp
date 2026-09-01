@@ -25,7 +25,7 @@ enum SkinAnimatedNPC_Type
 class SkinAnimatedNPC
 {
 public:
-    SkinAnimatedNPC(cSHierarchy& hierarchy, int modelID, void* resource);
+    SkinAnimatedNPC(cSHierarchy& pHierarchy, int nModelID, void* resource);
     virtual ~SkinAnimatedNPC();
     virtual SkinAnimatedNPC_Type GetSkinAnimatedNPC_Type() const;
     virtual void Render();
@@ -39,7 +39,8 @@ public:
         const cPoseAccumulator& poseAccumulator,
         const nlMatrix4& worldMatrix);
 
-    void SetAnimState(cSAnim& anim, float blendTime, ePlayMode playMode);
+    void SendToGL() const;
+    void SetAnimState(cSAnim& pAnim, float fBlendTime, ePlayMode playMode);
 
     /* 0x04 */ nlMatrix4 mWorldMatrix;
     /* 0x44 */ u16 maFacingDirection;
