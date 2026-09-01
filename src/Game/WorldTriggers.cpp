@@ -1,5 +1,6 @@
 #include "Game/WorldTriggers.h"
 
+#include "Game/CharacterTriggers.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Game.h"
@@ -18,15 +19,14 @@ struct WorldTriggerState_80188C5C
     void* mUnidentified755C;
 };
 
-extern "C" void fn_801B66C0(const char* name);
 extern "C" WorldTriggerState_80188C5C* fn_80188C5C();
 extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
 extern "C" EmissionController* fn_802E7FE4(
     EmissionManager*, EffectsGroup*, int, bool, bool);
 
-void EmitGeneric(const char* name)
+extern "C" void fn_801BE234(cSAnim* arg0, unsigned int uParam)
 {
-    fn_801B66C0(name);
+    CharacterTriggerHandler(arg0, uParam);
 }
 
 static const nlVector3 sCameraFlashOffset = { -0.8f, 0.0f, 0.1f };

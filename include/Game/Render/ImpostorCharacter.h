@@ -3,8 +3,11 @@
 
 #include "Game/TweakValue.h"
 #include "NL/nlDLListContainer.h"
+#include "NL/nlMath.h"
 #include "types.h"
 
+class cPN_SAnimController;
+class cPoseAccumulator;
 class Impostor;
 class ImpostorCharacter;
 struct UnidentifiedMesh_802D7AEC;
@@ -41,6 +44,11 @@ class ImpostorModel_802DAEE0
 public:
     virtual ~ImpostorModel_802DAEE0();
     virtual void UnidentifiedVirtual0C(void*, int) = 0;
+
+    /* 0x04 */ nlMatrix4 mWorldMatrix;
+    /* 0x44 */ cPN_SAnimController* mAnimController;
+    /* 0x48 */ cPoseAccumulator* mPoseAccumulator;
+    /* 0x4C */ u8 mUnidentified04C[0x2C];
 };
 
 // Object referenced through the sprite's 0x68 pointer; only the registry

@@ -523,9 +523,9 @@ void DrawableCharacter::Free()
     poseAccumulator = 0;
 }
 
-void* DrawableCharacter::GetAnimController() const
+cPN_SAnimController& DrawableCharacter::GetAnimController() const
 {
-    return character->animationController;
+    return *(cPN_SAnimController*)character->animationController;
 }
 
 void DrawableCharacter::Grab(Character& source)
@@ -1289,9 +1289,9 @@ void DrawableCharacter::RenderAllCharacters()
     renderOpposingGoalie = false;
 }
 
-Character* DrawableCharacter::OnlyRenderingOneCharacter()
+cCharacter* DrawableCharacter::OnlyRenderingOneCharacter()
 {
-    return renderOnlyCharacter;
+    return (cCharacter*)renderOnlyCharacter;
 }
 
 static inline void ApplyTexture(

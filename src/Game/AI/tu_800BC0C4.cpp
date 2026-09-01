@@ -5,6 +5,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/CharacterTweaks.h"
+#include "Game/CharacterTriggers.h"
 #include "Game/Game.h"
 #include "Game/SAnim/pnSAnimController.h"
 
@@ -27,10 +28,6 @@ extern "C" void fn_8001EE74(cFielder*, float, float, float);
 extern "C" void fn_8001EF6C(cFielder*, float);
 extern "C" void fn_80038158(cFielder*, bool);
 extern "C" void fn_801B8164(cFielder*);
-extern "C" void fn_801BA668(cFielder*, bool);
-extern "C" void fn_801BA818(cFielder*);
-extern "C" void fn_801BA884(cFielder*, bool);
-extern "C" void fn_801BAA20(cFielder*);
 extern "C" void fn_801B7F8C(cFielder*);
 extern "C" void fn_801B865C(cFielder*);
 extern "C" void* fn_80316974(void*);
@@ -76,7 +73,7 @@ bool DesireStar::UnidentifiedInitialize(void* context)
     bool result = Desire::UnidentifiedInitialize(context);
     mUnidentified078 = fn_8002CFD8(fn_8003E6E4(mUnidentifiedFielder));
     mUnidentifiedFielder->muInvincibleStatus |= 0x1F;
-    fn_801BA884(mUnidentifiedFielder, false);
+    EmitStar(mUnidentifiedFielder, false);
     return result;
 }
 
@@ -89,7 +86,7 @@ bool DesireStar::UnidentifiedReinitialize(void* context)
     mUnidentifiedTimer.m_uPackedTime = 0;
     bool result = Desire::UnidentifiedInitialize(context);
     mUnidentified078 = fn_8002CFD8(fn_8003E6E4(mUnidentifiedFielder));
-    fn_801BA884(mUnidentifiedFielder, true);
+    EmitStar(mUnidentifiedFielder, true);
     return result;
 }
 
@@ -98,7 +95,7 @@ bool DesireStar::UnidentifiedReinitialize(void* context)
  */
 void DesireStar::UnidentifiedCleanup()
 {
-    fn_801BAA20(mUnidentifiedFielder);
+    KillStar(mUnidentifiedFielder);
     fn_80038158(mUnidentifiedFielder, true);
 }
 
@@ -115,7 +112,7 @@ bool DesireMushroom::UnidentifiedInitialize(void* context)
         fn_8001EE74(
             mUnidentifiedFielder, lbl_806DC17C, 0.2f, -1.0f);
     }
-    fn_801BA668(mUnidentifiedFielder, false);
+    EmitMushroom(mUnidentifiedFielder, false);
     return result;
 }
 
@@ -127,7 +124,7 @@ bool DesireMushroom::UnidentifiedReinitialize(void* context)
     mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     bool result = Desire::UnidentifiedInitialize(context);
-    fn_801BA668(mUnidentifiedFielder, true);
+    EmitMushroom(mUnidentifiedFielder, true);
     return result;
 }
 
@@ -136,7 +133,7 @@ bool DesireMushroom::UnidentifiedReinitialize(void* context)
  */
 void DesireMushroom::UnidentifiedCleanup()
 {
-    fn_801BA818(mUnidentifiedFielder);
+    KillMushroom(mUnidentifiedFielder);
     if (!fn_8003E74C(mUnidentifiedFielder)
         && !fn_8003E73C(mUnidentifiedFielder))
     {

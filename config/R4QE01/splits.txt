@@ -1305,11 +1305,32 @@ unclassified/tu_801B6188.cpp:
 	.data       start:0x805148A8 end:0x80515474
 	.sdata      start:0x806DD158 end:0x806DD1BC
 
+Game/Triggers/AnimTrigger.cpp:
+	.text       start:0x801B640C end:0x801B64E8
+	.ctors      start:0x804DB754 end:0x804DB758
+	.bss        start:0x80578270 end:0x80578298
+
+Game/CharacterTriggers.cpp:
+	.text       start:0x801B64E8 end:0x801BE144
+	.data       start:0x80515478 end:0x80515CA8
+	.sdata      start:0x806DD1C0 end:0x806DD238
+	.sdata2     start:0x806E5428 end:0x806E5460
+
 Game/WorldTriggers.cpp:
 	.text       start:0x801BE234 end:0x801BE408
 	.rodata     start:0x804DCFD8 end:0x804DCFE4
 	.data       start:0x80515CA8 end:0x80515CB8
 	.sdata2     start:0x806E5460 end:0x806E5464
+
+unclassified/tu_801BE428.cpp:
+	.text       start:0x801BE428 end:0x801BEF44
+	.rodata     start:0x804DCFE8 end:0x804DCFF4
+	.sdata2     start:0x806E5468 end:0x806E5474
+
+Game/Triggers/SebringAnimScript.cpp:
+	.text       start:0x801BEF64 end:0x801BF040
+	.data       start:0x80515CB8 end:0x80515CD0
+	.sdata2     start:0x806E5478 end:0x806E5480
 
 Game/FE/feManager.cpp:
 	.text       start:0x801C3920 end:0x801C4B7C
