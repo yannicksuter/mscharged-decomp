@@ -10,6 +10,7 @@
 #include "revolution/hbm/nw4hbm/snd/DisposeCallbackManager.h"
 #undef MAKE_DTOR_ZERO
 
+#include "revolution/hbm/nw4hbm/snd/SeqTrack.h"
 #include "revolution/hbm/nw4hbm/snd/SoundThread.h"
 
 namespace nw4hbm {
@@ -105,8 +106,20 @@ public:
     void SetLocalVariable(int trackNo, s16 value);
     static void SetGlobalVariable(int trackNo, s16 value);
 
+    void SetTrackMute(u32 trackFlags, SeqMute mute);
+    void SetTrackSilence(u32 trackFlags, bool silenceFlag, int fadeTimes);
     void SetTrackVolume(u32 trackFlags, f32 volume);
     void SetTrackPitch(u32 trackFlags, f32 pitch);
+    void SetTrackPan(u32 trackFlags, f32 pan);
+    void SetTrackSurroundPan(u32 trackFlags, f32 surroundPan);
+    void SetTrackLpfFreq(u32 trackFlags, f32 lpfFreq);
+    void SetTrackPanRange(u32 trackFlags, f32 panRange);
+    void SetTrackModDepth(u32 trackFlags, f32 modDepth);
+    void SetTrackModSpeed(u32 trackFlags, f32 modSpeed);
+    void SetTrackMainSend(u32 trackFlags, f32 send);
+    void SetTrackFxSend(u32 trackFlags, AuxBus bus, f32 send);
+    void SetTrackRemoteSend(u32 trackFlags, WPADChannel remoteIndex, f32 send);
+    void SetTrackRemoteFxSend(u32 trackFlags, WPADChannel remoteIndex, f32 send);
 
     SeqTrack* GetPlayerTrack(int trackNo);
     vs16* GetVariablePtr(int varNo);
@@ -127,6 +140,22 @@ public:
 
                 if (track != NULL) {
                     (track->*setter)(param);
+                }
+            }
+        }
+    }
+
+    template <typename T1, typename T2>
+    void SetTrackParam(u32 trackFlags, void (SeqTrack::*setter)(T1, T2), T1 param1, T2 param2) {
+        ut::AutoInterruptLock lock;
+
+        for (int i = 0; i < TRACK_NUM && trackFlags != 0; trackFlags >>= 1, i++) {
+
+            if (trackFlags & 1) {
+                SeqTrack* track = GetPlayerTrack(i);
+
+                if (track != NULL) {
+                    (track->*setter)(param1, param2);
                 }
             }
         }

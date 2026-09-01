@@ -418,6 +418,10 @@ void SeqTrack::SetRemoteFxSend(WPADChannel remoteIndex, f32 param2) {
     mExtRemoteFxSend[remoteIndex] = param2;
 }
 
+void SeqTrack::SetTrackVariable(int varNo, s16 value) {
+    NW4HBMAssertHeaderClampedLValue_Line(varNo, 0, VARIABLE_NUM, 740);
+    mTrackVariable[varNo] = value;
+}
 
 vs16* SeqTrack::GetVariablePtr(int varNo) {
     NW4HBMAssertHeaderClampedLRValue_Line(varNo, 0, 16, 747);

@@ -44,7 +44,7 @@ public:
     AudioBundleManager_802EDA7C();
 
     virtual bool fn_802EE170() { return m_Loaded; }
-    virtual bool fn_800ED8B8() { return m_Initialized; }
+    virtual bool fn_800ED8B8();
     virtual void fn_802EDEE4(const char* path);
     virtual bool fn_802EDB00();
     virtual void fn_802EDA7C_4() = 0;
@@ -52,6 +52,8 @@ public:
     virtual void fn_802EE16C() { }
     virtual void fn_802EDC34(nlChunk* chunk);
     virtual void fn_802EE160() { m_Loaded = true; }
+
+    void* GetSoundMap() const { return m_Chunk13500; }
 
 protected:
     static void fn_802EDB14(

@@ -29,7 +29,7 @@ public:
         void* callbackContext);
     virtual ~XSoundHandle_802ED74C();
 
-    virtual bool fn_802ED74C_3() = 0;
+    virtual bool fn_802ED74C_3(bool) = 0;
     virtual bool fn_802ED74C_4(u8) = 0;
     virtual void fn_802ED74C_5(u8, void*) = 0;
     virtual void fn_802ED74C_6() = 0;

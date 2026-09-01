@@ -161,6 +161,12 @@ void SeqPlayer::Pause(bool flag) {
     }
 }
 
+void SeqPlayer::SetTempoRatio(f32 tempoRatio) {
+    NW4HBMAssert_Line(tempoRatio >= 0.0f, 342);
+    ut::AutoInterruptLock lock;
+    mTempoRatio = tempoRatio;
+}
+
 void SeqPlayer::SetVolume(f32 volume) {
     NW4HBMAssert_Line(volume >= 0.0f, 349);
     ut::AutoInterruptLock lock;
@@ -267,6 +273,72 @@ void SeqPlayer::SetChannelPriority(int prio) {
     NW4HBMAssertHeaderClampedLRValue_Line(prio, 0, 127, 494);
     ut::AutoInterruptLock lock;
     mParserParam.priority = static_cast<u8>(prio);
+}
+
+void SeqPlayer::SetLocalVariable(int varNo, s16 value) {
+    NW4HBMAssertHeaderClampedLValue_Line(varNo, 0, LOCAL_VARIABLE_NUM, 508);
+    mLocalVariable[varNo] = value;
+}
+
+void SeqPlayer::SetGlobalVariable(int varNo, s16 value) {
+    NW4HBMAssertHeaderClampedLValue_Line(varNo, 0, GLOBAL_VARIABLE_NUM, 515);
+    mGlobalVariable[varNo] = value;
+}
+
+void SeqPlayer::SetTrackMute(u32 trackFlags, SeqMute mute) {
+    SetTrackParam(trackFlags, &SeqTrack::SetMute, mute);
+}
+
+void SeqPlayer::SetTrackSilence(u32 trackFlags, bool silenceFlag, int fadeTimes) {
+    SetTrackParam(trackFlags, &SeqTrack::SetSilence, silenceFlag, fadeTimes);
+}
+
+void SeqPlayer::SetTrackVolume(u32 trackFlags, f32 volume) {
+    SetTrackParam(trackFlags, &SeqTrack::SetVolume, volume);
+}
+
+void SeqPlayer::SetTrackPitch(u32 trackFlags, f32 pitch) {
+    SetTrackParam(trackFlags, &SeqTrack::SetPitch, pitch);
+}
+
+void SeqPlayer::SetTrackPan(u32 trackFlags, f32 pan) {
+    SetTrackParam(trackFlags, &SeqTrack::SetPan, pan);
+}
+
+void SeqPlayer::SetTrackSurroundPan(u32 trackFlags, f32 surroundPan) {
+    SetTrackParam(trackFlags, &SeqTrack::SetSurroundPan, surroundPan);
+}
+
+void SeqPlayer::SetTrackLpfFreq(u32 trackFlags, f32 lpfFreq) {
+    SetTrackParam(trackFlags, &SeqTrack::SetLpfFreq, lpfFreq);
+}
+
+void SeqPlayer::SetTrackPanRange(u32 trackFlags, f32 panRange) {
+    SetTrackParam(trackFlags, &SeqTrack::SetPanRange, panRange);
+}
+
+void SeqPlayer::SetTrackModDepth(u32 trackFlags, f32 modDepth) {
+    SetTrackParam(trackFlags, &SeqTrack::SetModDepth, modDepth);
+}
+
+void SeqPlayer::SetTrackModSpeed(u32 trackFlags, f32 modSpeed) {
+    SetTrackParam(trackFlags, &SeqTrack::SetModSpeed, modSpeed);
+}
+
+void SeqPlayer::SetTrackMainSend(u32 trackFlags, f32 send) {
+    SetTrackParam(trackFlags, &SeqTrack::SetMainSend, send);
+}
+
+void SeqPlayer::SetTrackFxSend(u32 trackFlags, AuxBus bus, f32 send) {
+    SetTrackParam(trackFlags, &SeqTrack::SetFxSend, bus, send);
+}
+
+void SeqPlayer::SetTrackRemoteSend(u32 trackFlags, WPADChannel remoteIndex, f32 send) {
+    SetTrackParam(trackFlags, &SeqTrack::SetRemoteSend, remoteIndex, send);
+}
+
+void SeqPlayer::SetTrackRemoteFxSend(u32 trackFlags, WPADChannel remoteIndex, f32 send) {
+    SetTrackParam(trackFlags, &SeqTrack::SetRemoteFxSend, remoteIndex, send);
 }
 
 
