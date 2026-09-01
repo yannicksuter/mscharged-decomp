@@ -2869,10 +2869,29 @@ MetroTRK/CircleBuffer.c:
 MetroTRK/MWCriticalSection_gc.c:
 	.text       start:0x8037CAE0 end:0x8037CB38
 
+MSL/arith.c:
+	.text       start:0x8037F5A0 end:0x8037F5B0
+
+MSL/mbstring.c:
+	extab       start:0x800065F8 end:0x80006608
+	extabindex  start:0x80006CA4 end:0x80006CBC
+	.text       start:0x80380C80 end:0x80380E78
+
+MSL/mem.c:
+	extab       start:0x80006608 end:0x80006610
+	extabindex  start:0x80006CBC end:0x80006CC8
+	.text       start:0x80380E78 end:0x80380FE8
+
+MSL/mem_funcs.c:
+	.text       start:0x80380FE8 end:0x803812B8
+
 MSL/math_api.c:
 	extab       start:0x80006610 end:0x80006628
 	extabindex  start:0x80006CC8 end:0x80006CEC
 	.text       start:0x803812B8 end:0x803813B4
+
+MSL/misc_io.c:
+	.text       start:0x803813B4 end:0x803813D4
 
 MSL/qsort.c:
 	extab       start:0x80006690 end:0x80006698
@@ -2916,6 +2935,12 @@ MSL/wprintf.c:
 	.rodata     start:0x804EC2D0 end:0x804EC2D1
 	.data       start:0x805369F0 end:0x80536C96
 	.sdata2     start:0x806E6EB8 end:0x806E6EC0
+
+MSL/wstring.c:
+	.text       start:0x80389600 end:0x803896A8
+
+MSL/wchar_io.c:
+	.text       start:0x803896A8 end:0x80389730
 
 MSL/math_sun.c:
 	extab       start:0x80006738 end:0x80006740

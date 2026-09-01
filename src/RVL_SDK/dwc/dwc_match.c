@@ -663,8 +663,9 @@ int fn_8048FF20(int type)
     return error;
 }
 
-void fn_804900B8(u8 a0, const char* filter, DWCMatchedSCCallbackView callback,
-    void* param, void* callback2, void* param2)
+void fn_804900B8(u8 numEntry, const char* addFilter,
+    DWCMatchedSCCallbackView matchedCallback, void* matchedParam,
+    void* evalCallback, void* evalParam)
 {
     int len;
     char buf[0x100];
@@ -675,7 +676,7 @@ void fn_804900B8(u8 a0, const char* filter, DWCMatchedSCCallbackView callback,
         lbl_806E2EE8 = NULL;
     }
 
-    if (filter != NULL)
+    if (addFilter != NULL)
     {
         len = snprintf(buf, sizeof(buf),
             "%s = %d and %s != %u and maxplayers = %d and numplayers < %d "
@@ -690,33 +691,34 @@ void fn_804900B8(u8 a0, const char* filter, DWCMatchedSCCallbackView callback,
                 DWC_ECODE_SEQ_MATCHING + DWC_ECODE_TYPE_ALLOC);
             return;
         }
-        memcpy(lbl_806E2EE8, filter, len);
+        memcpy(lbl_806E2EE8, addFilter, len);
         lbl_806E2EE8[len - 1] = '\0';
     }
 
     fn_80492D4C(0);
-    lbl_806E2EF8->matchType = 0;
-    lbl_806E2EF8->_16 = a0;
-    lbl_806E2EF8->matchedCallback = callback;
-    lbl_806E2EF8->matchedParam = param;
-    lbl_806E2EF8->_181 = 0;
-    lbl_806E2EF8->aidList[0] = 0;
+    DWCi_GetMatchCnt()->matchType = 0;
+    DWCi_GetMatchCnt()->_16 = numEntry;
+    DWCi_GetMatchCnt()->matchedCallback = matchedCallback;
+    DWCi_GetMatchCnt()->matchedParam = matchedParam;
+    DWCi_GetMatchCnt()->_181 = 0;
+    DWCi_GetMatchCnt()->aidList[0] = 0;
     qr2_register_keyA(0x32, "dwc_pid");
     qr2_register_keyA(0x33, "dwc_mtype");
     qr2_register_keyA(0x34, "dwc_mresv");
     qr2_register_keyA(0x35, "dwc_mver");
     qr2_register_keyA(0x36, "dwc_eval");
-    lbl_806E2EF8->_488 = callback2;
-    lbl_806E2EF8->_48C = param2;
-    lbl_806E2EF8->state = 2;
+    DWCi_GetMatchCnt()->_488 = evalCallback;
+    DWCi_GetMatchCnt()->_48C = evalParam;
+    DWCi_GetMatchCnt()->state = 2;
 
-    if (lbl_806E2EF8->sb == NULL)
+    if (DWCi_GetMatchCnt()->sb == NULL)
     {
-        lbl_806E2EF8->sb = ServerBrowserNewA(lbl_806E2EF8->gamename,
-            lbl_806E2EF8->gamename, lbl_806E2EF8->secretKey, 0, 20, 1, SBFalse,
-            fn_804993C8, NULL);
+        DWCi_GetMatchCnt()->sb = ServerBrowserNewA(
+            DWCi_GetMatchCnt()->gamename, DWCi_GetMatchCnt()->gamename,
+            DWCi_GetMatchCnt()->secretKey, 0, 20, 1, SBFalse, fn_804993C8,
+            NULL);
     }
-    if (lbl_806E2EF8->sb == NULL)
+    if (DWCi_GetMatchCnt()->sb == NULL)
     {
         if (fn_80498C78(5) != 0)
         {
@@ -725,13 +727,13 @@ void fn_804900B8(u8 a0, const char* filter, DWCMatchedSCCallbackView callback,
     }
 
     fn_8048AFCC(3, "", NULL);
-    if (fn_80498C78(fn_80493128(lbl_806E2EF8->_210)) != 0)
+    if (fn_80498C78(fn_80493128(DWCi_GetMatchCnt()->_210)) != 0)
     {
         return;
     }
-    if (lbl_806E2EF8->qr2 == NULL)
+    if (DWCi_GetMatchCnt()->qr2 == NULL)
     {
-        fn_8048FF20(lbl_806E2EF8->_210);
+        fn_8048FF20(DWCi_GetMatchCnt()->_210);
     }
 
     if (lbl_806E2EEC != NULL && lbl_806E2EEC->valid != 0)
@@ -776,35 +778,39 @@ void fn_804903EC(u8 a0, DWCMatchedSCCallbackView callback, void* param,
     }
 }
 
-void fn_804905D0(int profileId, DWCMatchedSCCallbackView callback,
-    void* param, void* callback2, void* param2)
+void fn_804905D0(int serverPid, DWCMatchedSCCallbackView matchedCallback,
+    void* matchedParam, void* newClientCallback, void* newClientParam)
 {
+    int result;
+    GPResult gpResult;
+
     fn_80492D4C(0);
-    lbl_806E2EF8->matchType = 3;
-    lbl_806E2EF8->_16 = 0;
-    lbl_806E2EF8->matchedCallback = callback;
-    lbl_806E2EF8->matchedParam = param;
-    lbl_806E2EF8->_181 = 0;
-    lbl_806E2EF8->aidList[0] = 0;
+    DWCi_GetMatchCnt()->matchType = 3;
+    DWCi_GetMatchCnt()->_16 = 0;
+    DWCi_GetMatchCnt()->matchedCallback = matchedCallback;
+    DWCi_GetMatchCnt()->matchedParam = matchedParam;
+    DWCi_GetMatchCnt()->_181 = 0;
+    DWCi_GetMatchCnt()->aidList[0] = 0;
     qr2_register_keyA(0x32, "dwc_pid");
     qr2_register_keyA(0x33, "dwc_mtype");
     qr2_register_keyA(0x34, "dwc_mresv");
     qr2_register_keyA(0x35, "dwc_mver");
     qr2_register_keyA(0x36, "dwc_eval");
-    lbl_806E2EF8->_480 = callback2;
-    lbl_806E2EF8->_484 = param2;
-    lbl_806E2EF8->_17 = 1;
-    lbl_806E2EF8->_20 = lbl_806E2EF8->_210;
-    lbl_806E2EF8->pidList[0] = profileId;
-    lbl_806E2EF8->state = 4;
+    DWCi_GetMatchCnt()->_480 = newClientCallback;
+    DWCi_GetMatchCnt()->_484 = newClientParam;
+    DWCi_GetMatchCnt()->_17 = 1;
+    DWCi_GetMatchCnt()->_20 = DWCi_GetMatchCnt()->_210;
+    DWCi_GetMatchCnt()->pidList[0] = serverPid;
+    DWCi_GetMatchCnt()->state = 4;
 
-    if (lbl_806E2EF8->sb == NULL)
+    if (DWCi_GetMatchCnt()->sb == NULL)
     {
-        lbl_806E2EF8->sb = ServerBrowserNewA(lbl_806E2EF8->gamename,
-            lbl_806E2EF8->gamename, lbl_806E2EF8->secretKey, 0, 20, 1, SBFalse,
-            fn_804993C8, NULL);
+        DWCi_GetMatchCnt()->sb = ServerBrowserNewA(
+            DWCi_GetMatchCnt()->gamename, DWCi_GetMatchCnt()->gamename,
+            DWCi_GetMatchCnt()->secretKey, 0, 20, 1, SBFalse, fn_804993C8,
+            NULL);
     }
-    if (lbl_806E2EF8->sb == NULL)
+    if (DWCi_GetMatchCnt()->sb == NULL)
     {
         if (fn_80498C78(5) != 0)
         {
@@ -812,26 +818,31 @@ void fn_804905D0(int profileId, DWCMatchedSCCallbackView callback,
         }
     }
 
-    fn_8048AFCC(5, "", NULL);
-    if (fn_80498B24(GP_NO_ERROR) != 0)
+    gpResult = fn_8048AFCC(5, "", NULL);
+    if (fn_80498B24(gpResult) != 0)
     {
         return;
     }
-    if (lbl_806E2EF8->qr2 == NULL)
+    if (DWCi_GetMatchCnt()->qr2 == NULL)
     {
-        if (fn_8048FF20(lbl_806E2EF8->_210) != 0)
+        if (fn_8048FF20(DWCi_GetMatchCnt()->_210) != 0)
         {
             return;
         }
     }
 
-    if (lbl_806E2EF8->matchType == 0)
+    result = fn_80495B90(DWCi_GetMatchCnt()->pidList[0], 0);
+    if (DWCi_GetMatchCnt()->matchType == 0)
     {
-        fn_80498C78(fn_80495B90(lbl_806E2EF8->pidList[0], 0));
+        result = fn_80498C78(result);
     }
     else
     {
-        fn_80498B24(fn_80495B90(lbl_806E2EF8->pidList[0], 0));
+        result = fn_80498B24(result);
+    }
+    if (result != 0)
+    {
+        return;
     }
 }
 
