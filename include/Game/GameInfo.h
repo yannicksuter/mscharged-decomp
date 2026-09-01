@@ -2,6 +2,7 @@
 #define GAME_GAMEINFO_H
 
 #include "Game/DB/BasicGameInfo.h"
+#include "Game/DB/UserOptions.h"
 #include "NL/nlSingleton.h"
 #include "types.h"
 
@@ -190,7 +191,7 @@ public:
     /* 0x0094 */ int mCurrentDifficulty[2];
     /* 0x009C */ void* unknown_0x9C;
     /* 0x00A0 */ u8 unknown_0xA0[0x18];
-    /* 0x00B8 */ u8 unknown_0xB8[0x8];
+    /* 0x00B8 */ VisualSettings mVisualOptions;
     /* 0x00C0 */ GameSettings mBaseSettings;
     /* 0x00DC */ GameRules mRulesB;
     /* 0x00E8 */ GameSettings unknown_0xE8;

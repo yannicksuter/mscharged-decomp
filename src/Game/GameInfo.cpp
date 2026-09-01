@@ -105,7 +105,7 @@ GameInfoManager::GameInfoManager()
     fn_80109C48(&mRulesA);
     unknown_0x9C = 0;
     fn_80109890(&unknown_0xA0);
-    fn_80109CA8(&unknown_0xB8);
+    fn_80109CA8(&mVisualOptions);
     fn_80109BC4(&mBaseSettings);
     fn_80109C48(&mRulesB);
     fn_80109BC4(&unknown_0xE8);
@@ -346,7 +346,7 @@ void* GameInfoManager::GetUnknown0xA0()
 
 void* GameInfoManager::GetUnknown0xB8()
 {
-    return unknown_0xB8;
+    return &mVisualOptions;
 }
 
 const GameSettings* GameInfoManager::GetCurrentSettings() const

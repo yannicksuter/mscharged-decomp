@@ -1,9 +1,12 @@
 #include "Game/Camera/CameraMan.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/Camera/AnimViewerCam.h"
+#include "Game/Camera/DebugCam.h"
 #include "Game/Camera/FaceCam.h"
 #include "Game/Camera/GoalCam.h"
+#include "Game/Camera/GameplayCam.h"
 #include "Game/Camera/MatrixEffectCam.h"
+#include "Game/Camera/ReplayCamera.h"
 #include "Game/Camera/ShootToScoreCam.h"
 #include "Game/Camera/TopDownCamera.h"
 #include "Game/Camera/animcam.h"
@@ -19,9 +22,6 @@
 extern float g_fSimulationTick;
 
 extern "C" void fn_800F02DC(void*, unsigned long, void*);
-extern "C" cBaseCamera* fn_800F2510(void*, int);
-extern "C" cBaseCamera* fn_800F5974(void*);
-extern "C" cBaseCamera* fn_800F447C(void*);
 extern "C" cRumbleFilter* fn_800EF5F8(void*);
 extern "C" UnidentifiedCameraFilter* fn_800EF9F0(void*);
 extern "C" const char* fn_801CBE80(int);
@@ -420,14 +420,12 @@ void cCameraManager::UpdateGameCameraType()
         {
         case eCameraType_Debug:
         {
-            void* pMemory = nlMalloc(0xA0, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800F2510(pMemory, 1) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((cDebugCamera*)nlMalloc(0xA0, 8, false)) cDebugCamera(true);
             break;
         }
         case eCameraType_Replay:
         {
-            void* pMemory = nlMalloc(0x100, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800F5974(pMemory) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((ReplayCamera*)nlMalloc(sizeof(ReplayCamera), 8, false)) ReplayCamera();
             break;
         }
         case eCameraType_TopDown:
@@ -460,8 +458,7 @@ void cCameraManager::UpdateGameCameraType()
         }
         case eCameraType_Gameplay:
         {
-            void* pMemory = nlMalloc(0x154, 8, false);
-            pBaseCamera = pMemory != 0 ? fn_800F447C(pMemory) : static_cast<cBaseCamera*>(pMemory);
+            pBaseCamera = new ((GameplayCamera*)nlMalloc(sizeof(GameplayCamera), 8, false)) GameplayCamera();
             break;
         }
         case eCameraType_MatrixEffect:
@@ -674,9 +671,7 @@ extern "C" bool fn_800F08A4()
  */
 extern "C" void fn_800F06D4()
 {
-    cBaseCamera* pBaseCamera = static_cast<cBaseCamera*>(nlMalloc(0xA0, 8, false));
-    if (pBaseCamera != 0)
-        pBaseCamera = fn_800F2510(pBaseCamera, 0);
+    cBaseCamera* pBaseCamera = new ((cDebugCamera*)nlMalloc(0xA0, 8, false)) cDebugCamera(false);
 
     cRumbleFilter* pRumbleFilter = static_cast<cRumbleFilter*>(nlMalloc(sizeof(cRumbleFilter), 8, false));
     if (pRumbleFilter != 0)
@@ -684,7 +679,7 @@ extern "C" void fn_800F06D4()
     lbl_806E0EDC = pRumbleFilter;
     pBaseCamera->m_pFilter[pRumbleFilter->vfunc_0x14()] = pRumbleFilter;
 
-    UnidentifiedCameraFilter* pFilter = static_cast<UnidentifiedCameraFilter*>(nlMalloc(0x60, 8, false));
+    UnidentifiedCameraFilter* pFilter = static_cast<UnidentifiedCameraFilter*>(nlMalloc(sizeof(UnidentifiedCameraFilter), 8, false));
     if (pFilter != 0)
         pFilter = fn_800EF9F0(pFilter);
     lbl_806E0EE0 = pFilter;
@@ -706,13 +701,11 @@ extern "C" void fn_800F030C(bool bUnidentified)
 
     if (bUnidentified)
     {
-        void* pMemory = nlMalloc(0xA0, 8, false);
-        pBaseCamera = pMemory != 0 ? fn_800F2510(pMemory, 0) : static_cast<cBaseCamera*>(pMemory);
+        pBaseCamera = new ((cDebugCamera*)nlMalloc(0xA0, 8, false)) cDebugCamera(false);
     }
     else
     {
-        void* pMemory = nlMalloc(0x154, 8, false);
-        pBaseCamera = pMemory != 0 ? fn_800F447C(pMemory) : static_cast<cBaseCamera*>(pMemory);
+        pBaseCamera = new ((GameplayCamera*)nlMalloc(sizeof(GameplayCamera), 8, false)) GameplayCamera();
     }
 
     cRumbleFilter* pRumbleFilter = static_cast<cRumbleFilter*>(nlMalloc(sizeof(cRumbleFilter), 8, false));
@@ -721,7 +714,7 @@ extern "C" void fn_800F030C(bool bUnidentified)
     lbl_806E0EDC = pRumbleFilter;
     pBaseCamera->m_pFilter[pRumbleFilter->vfunc_0x14()] = pRumbleFilter;
 
-    UnidentifiedCameraFilter* pFilter = static_cast<UnidentifiedCameraFilter*>(nlMalloc(0x60, 8, false));
+    UnidentifiedCameraFilter* pFilter = static_cast<UnidentifiedCameraFilter*>(nlMalloc(sizeof(UnidentifiedCameraFilter), 8, false));
     if (pFilter != 0)
         pFilter = fn_800EF9F0(pFilter);
     lbl_806E0EE0 = pFilter;
@@ -823,9 +816,9 @@ extern "C" void fn_800F026C(const nlVector3& v3Unidentified, float fUnidentified
 /**
  * Offset/Address/Size: 0x0 | 0x800F0240 | size: 0x2C
  */
-void FireCameraRumbleFilter(float fRumbleX, float fRumbleY)
+void FireCameraRumbleFilter(float fRumbleX, float fRumbleY, float fSpring, float fDamping)
 {
     cBaseCamera* pCamera = nlDLRingGetStart<cBaseCamera>(cCameraManager::m_cameraStack);
     if (pCamera->m_pFilter[0] != 0)
-        static_cast<cRumbleFilter*>(pCamera->m_pFilter[0])->Rumble(fRumbleX, fRumbleY);
+        static_cast<cRumbleFilter*>(pCamera->m_pFilter[0])->Rumble(fRumbleX, fRumbleY, fSpring, fDamping);
 }

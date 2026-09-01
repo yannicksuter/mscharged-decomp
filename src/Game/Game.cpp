@@ -7,6 +7,7 @@
 #include "Game/AI/Scripts/ScriptCaching.h"
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
+#include "Game/Camera/tu_800F9460.h"
 #include "Game/Field.h"
 #include "Game/Formation.h"
 #include "Game/GameInfo.h"
@@ -118,11 +119,6 @@ struct UnidentifiedSlowdownState
     bool mUnidentified004;
 };
 
-struct UnidentifiedSingleton_800F9460
-    : public nlSingleton<UnidentifiedSingleton_800F9460>
-{
-};
-
 struct UnidentifiedGameSnapshot
 {
     u8 mPlayerIndices[100];
@@ -214,7 +210,6 @@ extern "C" cGame* fn_800570B0(
     cGame* game, void* param1, int param2, bool param3);
 extern "C" cTeam* fn_800A5D4C(cTeam* team, int side);
 extern "C" void* fn_801740D0(void* memory);
-extern "C" void* fn_800F9460(void* memory);
 extern "C" UnidentifiedSlowdownState* fn_801AE530(void* memory);
 extern "C" void fn_80115E60(bool param1);
 extern "C" void fn_80103198(
@@ -240,7 +235,6 @@ extern void* lbl_806E12C8;
 extern void* lbl_806E2168;
 extern UnidentifiedSlowdownState* lbl_806E1628;
 extern AISandbox* lbl_806E0B88;
-extern UnidentifiedSingleton_800F9460* lbl_806E0F48;
 extern void* lbl_806E0F58;
 extern UnidentifiedRegistrationList lbl_805713E8;
 extern UnidentifiedRegistrationList lbl_80571820;
@@ -326,14 +320,12 @@ void fn_80056CF4(void* param1, int param2, bool param3)
         }
         lbl_806E12C8 = memory;
     }
-    if (lbl_806E0F48 == 0)
+    if (UnidentifiedCameraEffects::Instance() == 0)
     {
-        void* memory = nlMalloc(0x3C, 8, false);
-        if (memory != 0)
-        {
-            memory = fn_800F9460(memory);
-        }
-        lbl_806E0F48 = static_cast<UnidentifiedSingleton_800F9460*>(memory);
+        UnidentifiedCameraEffects* memory = new (nlMalloc(
+            sizeof(UnidentifiedCameraEffects), 8, false))
+            UnidentifiedCameraEffects;
+        UnidentifiedCameraEffects::s_pInstance = memory;
     }
     if (lbl_806E1628 == 0)
     {
@@ -375,10 +367,10 @@ void DestroyGame()
         fn_801742B8(lbl_806E12C8, 1);
         lbl_806E12C8 = 0;
     }
-    if (lbl_806E0F48 != 0)
+    if (UnidentifiedCameraEffects::Instance() != 0)
     {
-        delete lbl_806E0F48;
-        lbl_806E0F48 = 0;
+        delete UnidentifiedCameraEffects::Instance();
+        UnidentifiedCameraEffects::s_pInstance = 0;
     }
     if (lbl_806E1628 != 0)
     {

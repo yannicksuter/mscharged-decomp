@@ -8,6 +8,7 @@
 class cNet;
 class cFielder;
 class cPlayer;
+class cGlobalPad;
 class Goalie;
 class FormationManager;
 
@@ -31,6 +32,7 @@ public:
     cFielder* GetFielder(int nIndex);
     cFielder* GetBallInterceptFielder(int i) { return m_pBallInterceptOrderedFielders[i]; }
     cPlayer* GetPlayer(int nIndex);
+    cPlayer* GetControlledPlayer(cGlobalPad* pController);
     cFielder* GetCaptain();
     cFielder* GetStriker() const;
     cFielder* GetFrontMostFielder();

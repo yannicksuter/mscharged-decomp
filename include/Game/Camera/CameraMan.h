@@ -19,7 +19,7 @@ enum eCameraMessage
     eCM_COMPLETE = 2,
 };
 
-void FireCameraRumbleFilter(float fRumbleX, float fRumbleY);
+void FireCameraRumbleFilter(float fRumbleX, float fRumbleY, float fSpring, float fDamping);
 
 class cCameraManager
 {

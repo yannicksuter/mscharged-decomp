@@ -18,11 +18,16 @@ public:
     cFollowCamera(cFollowCamera::FollowTarget followTarget);
     virtual ~cFollowCamera() { }
 
-    virtual eCameraType GetType();
+    virtual eCameraType GetType()
+    {
+        if (m_FollowTarget == FOLLOW_BALL)
+            return eCameraType_FollowBall;
+        return eCameraType_FollowCharacter;
+    }
     virtual void Update(float fDeltaT);
-    virtual const nlMatrix4& GetViewMatrix() const;
-    virtual const nlVector3& GetTargetPosition() const;
-    virtual const nlVector3& GetCameraPosition() const;
+    virtual const nlMatrix4& GetViewMatrix() const { return m_matView; }
+    virtual const nlVector3& GetTargetPosition() const { return m_v3OOIDampened; }
+    virtual const nlVector3& GetCameraPosition() const { return m_v3CameraPosition; }
 
     /* 0x20 */ FollowTarget m_FollowTarget;
     /* 0x24 */ nlMatrix4 m_matView;
@@ -36,6 +41,6 @@ public:
     /* 0x9C */ float m_fOOIDistance;
     /* 0xA0 */ bool m_bPitchLimits;
     /* 0xA1 */ bool m_bControlsLocked;
-};
+}; // total size: 0xA4
 
 #endif // GAME_CAMERA_FOLLOW_CAM_H

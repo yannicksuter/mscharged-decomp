@@ -15,8 +15,36 @@ public:
 class UnidentifiedCameraFilter : public cCameraFilter
 {
 public:
-    virtual void vfunc_0x18(nlVector3, float, float) = 0;
-};
+    struct UnidentifiedSample
+    {
+        UnidentifiedSample()
+            : mUnidentified00(-1)
+        {
+        }
+
+        /* 0x00 */ int mUnidentified00;
+        /* 0x04 */ nlVector3 mUnidentified04;
+    }; // total size: 0x10
+
+    UnidentifiedCameraFilter();
+    virtual void Update(float);
+    virtual void Filter(const nlMatrix4&, nlMatrix4&);
+    virtual void Reset();
+    virtual int vfunc_0x14();
+    virtual void vfunc_0x18(nlVector3, float, float);
+
+    /* 0x04 */ bool mUnidentified04;
+    /* 0x05 */ u8 mPadding05[3];
+    /* 0x08 */ int mUnidentified08;
+    /* 0x0C */ float mUnidentified0C;
+    /* 0x10 */ float mUnidentified10;
+    /* 0x14 */ float mUnidentified14;
+    /* 0x18 */ float mUnidentified18;
+    /* 0x1C */ nlVector3 mUnidentified1C;
+    /* 0x28 */ nlVector3 mUnidentified28;
+    /* 0x34 */ nlVector3 mUnidentified34;
+    /* 0x40 */ UnidentifiedSample mUnidentified40[2];
+}; // total size: 0x60
 
 class cRumbleFilter : public cCameraFilter
 {
@@ -27,7 +55,7 @@ public:
     virtual void Reset();
     virtual int vfunc_0x14();
 
-    void Rumble(float x, float y);
+    void Rumble(float x, float y, float ks, float kd);
 
     /* 0x04 */ nlVector2 v2Pos0;
     /* 0x0C */ nlVector2 v2Pos1;
