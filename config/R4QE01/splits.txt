@@ -1283,6 +1283,14 @@ Game/Debug/TimeRegions.cpp:
 	.sbss       start:0x806E1698 end:0x806E16B8
 	.sdata2     start:0x806E5350 end:0x806E5358
 
+unclassified/tu_801B298C.cpp:
+	.text       start:0x801B298C end:0x801B35AC
+	.rodata     start:0x804DCF68 end:0x804DCFD8
+	.data       start:0x805146F8 end:0x80514750
+	.sdata      start:0x806DD0F8 end:0x806DD130
+	.sbss       start:0x806E16B8 end:0x806E16C0
+	.sdata2     start:0x806E5358 end:0x806E5388
+
 unclassified/tu_801B369C.cpp:
 	.text       start:0x801B369C end:0x801B43F8
 	.ctors      start:0x804DB744 end:0x804DB748

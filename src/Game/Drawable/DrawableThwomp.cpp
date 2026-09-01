@@ -6,30 +6,15 @@
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "NL/platqmath.h"
+#include "unclassified/tu_801B298C.h"
 
 // Charged-only shadow prop, second of the run described beside
 // DrawableBulletBill. This one is backed by a PhysicsObject rather than a
-// plain transform, and scales its shadow by a per-object factor. The live
-// object and the material services stay address-named.
-
-struct ThwompObject;
-
-struct ThwompObjectFields
-{
-    /* 0x00 */ int mState;
-    char _004[4];
-    /* 0x08 */ bool mVisible;
-    char _009[3];
-    /* 0x0C */ PhysicsObject* mPhysics;
-    /* 0x10 */ RenderObject* mDrawable;
-};
+// plain transform, and scales its shadow by a per-object factor.
 
 extern "C"
 {
     void* fn_8027267C(int);
-    const nlVector3* fn_801B327C(const ThwompObject*);
-    float fn_801B3364(ThwompObject*);
-    void fn_801B339C(ThwompObject*);
 }
 
 static float gShadowSizeLow = 1.7f;
@@ -155,9 +140,9 @@ void DrawableThwomp::Grab(const ThwompObject* object)
         return;
     }
 
-    mVisible = ((const ThwompObjectFields*)object)->mVisible;
+    mVisible = object->mVisible;
     mPosition = *fn_801B327C(object);
-    ((const ThwompObjectFields*)object)->mPhysics->GetRotation(&rotation);
+    object->mPhysics->GetRotation(&rotation);
     nlMatrixToQuat(mOrientation, rotation);
 }
 
@@ -178,7 +163,7 @@ void DrawableThwomp::Render(ThwompObject* object) const
 
     fn_801B339C(object);
 
-    drawable = ((ThwompObjectFields*)object)->mDrawable;
+    drawable = object->mDrawable;
     if (drawable == 0)
     {
         return;
@@ -193,7 +178,7 @@ void DrawableThwomp::Render(ThwompObject* object) const
         drawable->m_uObjectFlags &= ~1;
     }
 
-    int state = ((ThwompObjectFields*)object)->mState;
+    int state = object->mState;
     if (state == 1 || state == 0 || state == 6)
     {
         drawable->m_uObjectFlags &= ~1;

@@ -719,6 +719,7 @@ config.libs = [
             Object(NonMatching, "Game/Render/SkinAnimatedMovableNPC.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/Render/SkinAnimatedNPC.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Debug/TimeRegions.cpp", cflags=cflags_game),
+            Object(Matching, "unclassified/tu_801B298C.cpp", cflags=cflags_game),
             Object(NonMatching, "unclassified/tu_801B369C.cpp"),
             Object(NonMatching, "Game/Render/Presentation.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableThwomp.cpp"),

@@ -10,14 +10,9 @@
 #include "NL/nlString.h"
 #include "unclassified/tu_801A0E64.h"
 #include "unclassified/tu_80199880.h"
+#include "unclassified/tu_801B298C.h"
 
 #include <string.h>
-
-struct UnidentifiedObject_801B298C
-{
-    u8 mUnidentified000[8];
-    bool mUnidentified008;
-};
 
 struct UnidentifiedNPCConfig_801B532C
 {
@@ -67,15 +62,6 @@ extern "C"
         void* pPhysics, cInventory<cSAnim>* pInventory, void* pResource);
     void fn_801B4830();
     void fn_801B4B9C(SkinAnimatedNPC* pObject);
-
-    UnidentifiedObject_801B298C* fn_801B298C(
-        UnidentifiedObject_801B298C* pObject, int nIndex);
-    UnidentifiedObject_801B298C* fn_801B2B60(
-        UnidentifiedObject_801B298C* pObject, int bDelete);
-    void fn_801B2C00(
-        UnidentifiedObject_801B298C* pObject, float fDeltaT);
-    void fn_801B2E64(
-        UnidentifiedObject_801B298C* pObject, int bParam);
 
     void* fn_80276360(int nType, int nIndex);
     void fn_801A01F8();
@@ -404,8 +390,8 @@ void NPCManager::fn_801AA4C0()
 {
     for (unsigned int i = 0; i < 8; ++i)
     {
-        UnidentifiedObject_801B298C* pObject
-            = (UnidentifiedObject_801B298C*)nlMalloc(0x68, 8, false);
+        ThwompObject* pObject
+            = (ThwompObject*)nlMalloc(sizeof(ThwompObject), 8, false);
         if (pObject != 0)
         {
             pObject = fn_801B298C(pObject, i);
@@ -414,7 +400,7 @@ void NPCManager::fn_801AA4C0()
     }
 }
 
-UnidentifiedObject_801B298C* NPCManager::fn_801AA528(
+ThwompObject* NPCManager::fn_801AA528(
     int nIndex)
 {
     if (nIndex >= 0)
@@ -424,8 +410,8 @@ UnidentifiedObject_801B298C* NPCManager::fn_801AA528(
 
     for (int i = 0; i < 8; ++i)
     {
-        UnidentifiedObject_801B298C* pObject = mUnidentified0AC[i];
-        if (pObject != 0 && !pObject->mUnidentified008)
+        ThwompObject* pObject = mUnidentified0AC[i];
+        if (pObject != 0 && !pObject->mVisible)
         {
             return pObject;
         }
