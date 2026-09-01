@@ -4,6 +4,7 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
+#include "Game/DB/tu_8010A40C.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/GameTweaks.h"
@@ -61,7 +62,6 @@ struct cGame
 };
 
 extern cGame* lbl_806E0C94;
-extern void* lbl_806E0FA0;
 extern void* lbl_806E1608;
 
 u8 lbl_806DBDA0 = true;
@@ -1551,7 +1551,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
         if (lbl_806E0C94->m_eGameState == (eGameState)1
             && GameInfoManager::Instance()->IsInMode4())
         {
-            int mode = *(int*)((u8*)lbl_806E0FA0 + 0x34);
+            int mode = lbl_806E0FA0->mCurrentChallenge;
             if (!(mode != 6 && mode != 7))
             {
                 return powerUpType;

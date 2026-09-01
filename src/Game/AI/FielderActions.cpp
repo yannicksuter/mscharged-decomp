@@ -30,6 +30,7 @@
 #include "Game/Field.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
+#include "Game/DB/StatsTracker.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "NL/utility.h"
@@ -378,19 +379,6 @@ struct UnidentifiedManager806E1608
     /* 0x2C */ void* mUnidentified2C;
 };
 extern UnidentifiedManager806E1608* lbl_806E1608;
-
-enum ePlayerStats
-{
-    PLAYERSTATS_INVALID = -1,
-};
-
-class StatsTracker
-{
-public:
-    void TrackStat(ePlayerStats eStat, int nParam1, int nParam2, int nParam3,
-        int nParam4, int nParam5, int nParam6);
-};
-extern StatsTracker* lbl_806E0F58;
 
 struct UnidentifiedSkillshotNode
 {
@@ -1090,7 +1078,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     }
     if (bTrackStats)
     {
-        lbl_806E0F58->TrackStat((ePlayerStats)0x12,
+        StatsTracker::Instance()->TrackStat((ePlayerStats)0x12,
             pAttacker->m_pTeam->m_nSide, pAttacker->m_ID, 0, 0, 0, 0);
     }
 
@@ -3344,7 +3332,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
         || lbl_806E0C94->m_eGameState == 6;
     if (bUnidentified2)
     {
-        lbl_806E0F58->TrackStat(
+        StatsTracker::Instance()->TrackStat(
             (ePlayerStats)0x15, m_pTeam->m_nSide, m_ID, 0, 0, 0, 0);
     }
 
@@ -5322,7 +5310,7 @@ void cFielder::fn_8004E438()
         || lbl_806E0C94->m_eGameState == 6;
     if (bUnidentified)
     {
-        lbl_806E0F58->TrackStat(
+        StatsTracker::Instance()->TrackStat(
             (ePlayerStats)4, m_pTeam->m_nSide, m_ID, 1, 0, 0, 0);
     }
 }

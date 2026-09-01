@@ -1,6 +1,7 @@
 #include "Game/NetworkSession.h"
 
 #include "Game/AI/AIPad.h"
+#include "Game/DB/SaveLoad.h"
 #include "Game/GameInfo.h"
 #include "Game/ResetTask.h"
 #include "Game/NetworkMessages.h"
@@ -93,7 +94,6 @@ extern "C" void fn_8012FFB0(UnidentifiedStatsTracker* tracker, void* record);
 extern "C" void fn_801304D0(UnidentifiedStatsTracker* tracker, int category, int miiChanged);
 extern "C" void fn_80131464(UnidentifiedStatsTracker* tracker, int);
 extern "C" void fn_801314D0(UnidentifiedStatsTracker* tracker);
-extern "C" void fn_80107D8C(int);
 extern "C" void fn_80136140(void* tournament, int);
 extern "C" void fn_8012DA5C(NetworkObject_8012D8F4* object);
 extern "C" void fn_80133B74(NetworkLobby_80133634* lobby);
@@ -1701,7 +1701,7 @@ void UnidentifiedNetworkSession::fn_801214BC()
 {
     if (ResetTask::s_ResetState != RS_STARTRESET)
     {
-        fn_80107D8C(1);
+        SaveLoad::StartSave(true);
     }
     else if (mLobby->mUnidentified2F4 != 0)
     {

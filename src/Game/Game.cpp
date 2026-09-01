@@ -11,6 +11,8 @@
 #include "Game/Field.h"
 #include "Game/Formation.h"
 #include "Game/GameInfo.h"
+#include "Game/DB/StatsTracker.h"
+#include "Game/DB/tu_8010A40C.h"
 #include "Game/Goalie.h"
 #include "Game/Net.h"
 #include "Game/NetworkSession.h"
@@ -161,14 +163,6 @@ struct UnidentifiedRegistrationList
     UnidentifiedRegistrationNode* mHead;
 };
 
-struct UnidentifiedModeState
-{
-    u8 mUnidentified000[0x0C];
-    int mUnidentified00C;
-    u8 mUnidentified010[0x24];
-    int mUnidentified034;
-};
-
 extern "C" UnidentifiedSimulationTimeProvider* fn_8011166C();
 extern "C" EventDispatcher* fn_80111678();
 extern "C" EventDispatcher* fn_800721C4();
@@ -212,8 +206,6 @@ extern "C" cTeam* fn_800A5D4C(cTeam* team, int side);
 extern "C" void* fn_801740D0(void* memory);
 extern "C" UnidentifiedSlowdownState* fn_801AE530(void* memory);
 extern "C" void fn_80115E60(bool param1);
-extern "C" void fn_80103198(
-    void* tracker, float gameDuration, float param3, void* param4);
 extern "C" void fn_801742B8(void* object, int deleteObject);
 extern "C" void fn_801AE6DC(
     UnidentifiedSlowdownState* object, int deleteObject);
@@ -235,7 +227,6 @@ extern void* lbl_806E12C8;
 extern void* lbl_806E2168;
 extern UnidentifiedSlowdownState* lbl_806E1628;
 extern AISandbox* lbl_806E0B88;
-extern void* lbl_806E0F58;
 extern UnidentifiedRegistrationList lbl_805713E8;
 extern UnidentifiedRegistrationList lbl_80571820;
 extern UnidentifiedRegistrationList lbl_80571988;
@@ -243,8 +234,6 @@ extern UnidentifiedRegistrationList lbl_80571438;
 extern UnidentifiedRegistrationList lbl_80571960;
 extern UnidentifiedRegistrationList lbl_80571348;
 extern cPlayer* lbl_8056B800[10];
-extern UnidentifiedModeState* lbl_806E0FA0;
-
 extern "C" char lbl_804FB2F4[];
 extern "C" char lbl_804FB318[];
 extern "C" char lbl_804FB364[];
@@ -353,8 +342,8 @@ void DestroyGame()
     bool bWriteStats = GetConfigBool(Config::Global(), "save_stats", false);
     if (bWriteStats)
     {
-        fn_80103198(
-            lbl_806E0F58, g_pGame->m_fGameDuration, lbl_806E3740, 0);
+        StatsTracker::Instance()->WriteStats(
+            g_pGame->m_fGameDuration, lbl_806E3740, 0);
     }
 
     if (lbl_806E0B88 != 0)
@@ -924,9 +913,9 @@ void cGame::ChangeGameState(int state)
         if (state == 3)
         {
             if ((GameInfoManager::Instance()->IsInMode4()
-                    && lbl_806E0FA0->mUnidentified00C == 2
+                    && lbl_806E0FA0->mCondition == 2
                     && g_pTeams[1]->m_nScore > 0)
-                || (lbl_806E0FA0->mUnidentified034 == 2
+                || (lbl_806E0FA0->mCurrentChallenge == 2
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
             {
                 fn_800ED92C(0xEF3369E0);

@@ -2,6 +2,7 @@
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/DB/BasicGameInfo.h"
+#include "Game/DB/StatsTracker.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
@@ -28,12 +29,7 @@ extern "C" int fn_80273B00();
 extern "C" void fn_801E230C(
     BaseGameSceneManager* manager, SceneList scene, bool visibility,
     bool overrideStateSettings);
-extern "C" void fn_801037CC(
-    int stat, int homeaway, int playerindex, int param0, int param1,
-    int param2, int param3);
-
 extern BaseGameSceneManager* lbl_806E1860;
-extern u8* lbl_806E0F58;
 
 const char* GetLOCTeamName(eTeamID team);
 
@@ -258,16 +254,18 @@ void InGameTextOverlay::DisplayFinalScore()
         {
             if (g_pGame->m_eGameState == 6)
             {
-                fn_801037CC(0x20, winningSide, 0, scoreLeft, scoreRight, 0, 0);
+                StatsTracker::Track(STATS_LOSS, winningSide, 0,
+                    scoreLeft, scoreRight, 0, 0);
             }
             else
             {
-                fn_801037CC(0x1F, winningSide, 0, scoreLeft, scoreRight, 0, 0);
+                StatsTracker::Track(STATS_WIN, winningSide, 0,
+                    scoreLeft, scoreRight, 0, 0);
             }
         }
         else
         {
-            ((int*)(lbl_806E0F58 + 0xEB8))[winningSide]++;
+            StatsTracker::Instance()->mNumGamesWon[winningSide]++;
         }
     }
 

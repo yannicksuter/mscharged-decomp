@@ -1,6 +1,8 @@
 #include "Game/GameInfo.h"
 
+#include "Game/DB/SaveLoad.h"
 #include "Game/DB/UserOptions.h"
+#include "Game/DB/tu_8010A40C.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -18,9 +20,6 @@ extern "C" void DWC_ClearDirtyFlag(DWCAccUserData*);
 
 extern "C" void* fn_8010D668(void*);
 extern "C" int fn_80338BF0(void*);
-extern "C" void fn_80107D8C(int);
-extern "C" void fn_80108F14();
-extern "C" void fn_80108EE0();
 extern "C" void fn_80109890(void*);
 extern "C" void fn_80109BC4(void*);
 extern "C" void fn_80109C40(void*);
@@ -40,40 +39,6 @@ extern "C" int fn_801B61B8(int);
 extern "C" void nlBreak__Fv();
 extern "C" void* fn_8010D6F8(void*, void*);
 extern "C" void* fn_8010D794(void*, void*);
-extern "C" void fn_801114E8(void*, void*);
-extern "C" void fn_80111528(void*, void*);
-
-struct Unknown806E0F90Settings
-{
-    /* 0x00 */ u8 unknown_0x00[0x1C];
-    /* 0x1C */ GameSettings mSettings;
-};
-
-struct Unknown806E0F90
-{
-    /* 0x0000 */ u8 unknown_0x0000[0x8A20];
-    /* 0x8A20 */ Unknown806E0F90Settings* unknown_0x8A20;
-};
-
-struct Unknown806E0FA0
-{
-    /* 0x00 */ u8 unknown_0x00[0x4];
-    /* 0x04 */ int unknown_0x04;
-    /* 0x08 */ int unknown_0x08;
-    /* 0x0C */ u8 unknown_0x0C[0x1C];
-    /* 0x28 */ u8 unknown_0x28;
-    /* 0x29 */ u8 unknown_0x29;
-    /* 0x2A */ u8 unknown_0x2A;
-    /* 0x2B */ u8 unknown_0x2B;
-    /* 0x2C */ u8 unknown_0x2C;
-    /* 0x2D */ u8 unknown_0x2D;
-    /* 0x2E */ u8 unknown_0x2E[0x2];
-    /* 0x30 */ int unknown_0x30;
-    /* 0x34 */ int unknown_0x34;
-};
-
-extern Unknown806E0F90* lbl_806E0F90;
-extern Unknown806E0FA0* lbl_806E0FA0;
 extern void* lbl_806E20D8;
 extern void* lbl_806DF248;
 extern u8 lbl_806E1090;
@@ -186,7 +151,7 @@ GameInfoManager::GameInfoManager()
     }
 
     memset(mSaveSlots, 0, sizeof(mSaveSlots));
-    fn_80108EE0();
+    SaveLoad::AllocateBannerBuffer();
 }
 
 GameInfoManager::~GameInfoManager()
@@ -195,7 +160,7 @@ GameInfoManager::~GameInfoManager()
     delete mGameInfo[GM_MODE_2];
     delete mGameInfo[GM_MODE_1];
     sThis = 0;
-    fn_80108F14();
+    SaveLoad::FreeBannerBuffer();
 }
 
 static bool (GameInfoManager::*sModeCheck)() const = &GameInfoManager::IsInMode3;
@@ -283,7 +248,7 @@ void GameInfoManager::SerializeSettings(void* data) const
     memcpy(data, &unknown_0x9C, 0x80);
     data = (u8*)data + 0x80;
     memcpy(data, mRulesTable, sizeof(mRulesTable));
-    fn_801114E8(lbl_806E0FA0, fn_8010D6F8(lbl_806E0F90, (u8*)data + sizeof(mRulesTable)));
+    lbl_806E0FA0->SerializeData(fn_8010D6F8(lbl_806E0F90, (u8*)data + sizeof(mRulesTable)));
 }
 
 void GameInfoManager::GetMemoryCardData(void* data) const
@@ -296,7 +261,7 @@ void GameInfoManager::DeserializeSettings(void* data)
     memcpy(&unknown_0x9C, data, 0x80);
     data = (u8*)data + 0x80;
     memcpy(mRulesTable, data, sizeof(mRulesTable));
-    fn_80111528(lbl_806E0FA0, fn_8010D794(lbl_806E0F90, (u8*)data + sizeof(mRulesTable)));
+    lbl_806E0FA0->DeserializeData(fn_8010D794(lbl_806E0F90, (u8*)data + sizeof(mRulesTable)));
 }
 
 void GameInfoManager::SetMemoryCardData(const void* data)
@@ -376,7 +341,8 @@ const GameSettings* GameInfoManager::GetCurrentSettings() const
     }
 
     if (mCurrentMode == GM_MODE_3) {
-        const GameSettings* settings = &lbl_806E0F90->unknown_0x8A20->mSettings;
+        const GameSettings* settings =
+            (const GameSettings*)&lbl_806E0F90->mCurrentCup->mCupSettings;
 
         return settings;
     }
@@ -472,17 +438,17 @@ void GameInfoManager::SetupGameFromConfig()
         mCurGameSettings.unknown_0x08 = 0xB4;
         mCurGameSettings.unknown_0x00 = 1;
     } else if (mCurrentMode == GM_MODE_4) {
-        Unknown806E0FA0* other = lbl_806E0FA0;
+        UnidentifiedStrikerChallenge* other = lbl_806E0FA0;
 
-        mCurGameSettings.unknown_0x08 = other->unknown_0x04;
-        mCurGameSettings.unknown_0x14 = other->unknown_0x28;
-        mCurGameSettings.unknown_0x15 = other->unknown_0x29;
-        mCurGameSettings.unknown_0x16 = other->unknown_0x2A;
-        mCurGameSettings.unknown_0x17 = other->unknown_0x2B;
-        mCurGameSettings.unknown_0x18 = other->unknown_0x2C;
-        mCurGameSettings.unknown_0x19 = other->unknown_0x2D;
+        mCurGameSettings.unknown_0x08 = other->mRemainingTime;
+        mCurGameSettings.unknown_0x14 = other->mHomePowerupsDisabled;
+        mCurGameSettings.unknown_0x15 = other->mAwayPowerupsDisabled;
+        mCurGameSettings.unknown_0x16 = other->mHomeMegastrikeDisabled;
+        mCurGameSettings.unknown_0x17 = other->mAwayMegastrikeDisabled;
+        mCurGameSettings.unknown_0x18 = other->mHomeSkillshotDisabled;
+        mCurGameSettings.unknown_0x19 = other->mAwaySkillshotDisabled;
         mCurGameSettings.unknown_0x04 = 0;
-        mCurGameSettings.unknown_0x00 = other->unknown_0x08;
+        mCurGameSettings.unknown_0x00 = other->mAIDifficulty;
         mCurGameSettings.unknown_0x10 = 1;
     }
 
@@ -508,8 +474,8 @@ void GameInfoManager::SetupGameFromConfig()
     }
 
     if (!sModeCheck) {
-        GetCurrentGameInfo()->unknown_0x124 = 0;
-        GetCurrentGameInfo()->unknown_0x126 = 0;
+        GetCurrentGameInfo()->mFinalScore[0] = 0;
+        GetCurrentGameInfo()->mFinalScore[1] = 0;
     }
 }
 
@@ -573,7 +539,7 @@ bool GameInfoManager::IsRule0x0Equal10() const
     }
 
     if (mCurrentMode == GM_MODE_4) {
-        int value = lbl_806E0FA0->unknown_0x34;
+        int value = lbl_806E0FA0->mCurrentChallenge;
 
         switch (value) {
         case 6:
@@ -870,7 +836,7 @@ void GameInfoManager::ValidateSaveSlot(int index)
 
     if (DWC_CheckDirtyFlag((const DWCAccUserData*)slot)) {
         DWC_ClearDirtyFlag((DWCAccUserData*)slot);
-        fn_80107D8C(1);
+        SaveLoad::StartSave(true);
     }
 }
 
@@ -899,7 +865,7 @@ int GameInfoManager::GetRule0x0() const
     }
 
     if (mCurrentMode == GM_MODE_4) {
-        return lbl_806E0FA0->unknown_0x30;
+        return lbl_806E0FA0->mCustomPowerups;
     }
 
     return 0;

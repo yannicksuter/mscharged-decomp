@@ -1,6 +1,7 @@
 #include "Game/SH/SHSceneBase.h"
 
 #include "Game/DB/CharacterInfo.h"
+#include "Game/DB/tu_8010A40C.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
@@ -10,6 +11,7 @@
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
+#include "NL/globalpad.h"
 #include "NL/nlMath.h"
 #include "NL/nlPrint.h"
 #include "NL/nlLocalization.h"
@@ -35,8 +37,6 @@ extern "C" void fn_80230B90(UnidentifiedScrollWidget* widget, int mode);
 extern "C" void fn_80230DE0(UnidentifiedScrollWidget* widget, int value);
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" TLInstance* fn_8030677C(FEPresentation* pPresentation, unsigned long Level1, unsigned long Level2,
-    unsigned long Level3, unsigned long Level4, unsigned long Level5, unsigned long Level6);
 extern "C" void fn_801CC9B0(TU80219248Component* component, int value0, int value1);
 extern "C" bool fn_80253E18();
 extern "C" void fn_80253474();
@@ -44,35 +44,12 @@ extern "C" void fn_802534BC(int value0, int value1);
 
 extern "C" nlVector2 fn_802197FC(int pad, u8* valid);
 
-class UnidentifiedPadRumbleSource
-{
-public:
-    virtual void Virtual00();
-    virtual void Virtual04();
-    virtual void Virtual08();
-    virtual void Virtual0C();
-    virtual void Virtual10();
-    virtual void Virtual14();
-    virtual void Virtual18();
-    virtual void Virtual1C();
-    virtual void Virtual20();
-    virtual void Virtual24(int button, int value);
-};
-
 extern void* lbl_806E1E28;
-extern "C" UnidentifiedPadRumbleSource* fn_802C082C(void* owner, int pad);
-
-struct UnidentifiedHeadlineVariants
-{
-    /* 0x00 */ u8 mUnidentified00[0x6D];
-    /* 0x6D */ s8 mUnidentified6D;
-};
-
-extern UnidentifiedHeadlineVariants* lbl_806E0FA0;
+extern "C" cGlobalPad* fn_802C082C(void* owner, int pad);
 
 extern bool lbl_806DC704;
 extern bool lbl_806E0F8B;
-extern int lbl_806E18B0;
+extern unsigned int lbl_806E18B0;
 extern TLComponentInstance* lbl_80578450[4];
 extern TLComponentInstance lbl_80580030;
 extern TLInstance lbl_80580248;
@@ -155,7 +132,7 @@ inline TLComponentInstance* UnidentifiedSHSceneBase::FindCurrentComponent(const 
 {
     TLComponentInstance* result = (TLComponentInstance*)FindCurrentInstance(item);
     if (result == 0)
-        result = &lbl_80580030;
+        return &lbl_80580030;
     return result;
 }
 
@@ -443,13 +420,12 @@ void UnidentifiedSHSceneBase::Update(float dt)
     }
     if (mUnidentified2C == 0)
     {
-        FEPresentation* presentation = mPresentation;
-        TLSlide* slide = presentation->m_currentSlide;
+        TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->m_time >= slide->m_start + slide->m_duration)
         {
             mUnidentified2C = 1;
-            presentation->SetActiveSlide("headline pic", true);
-            presentation->Update(0.0f);
+            mPresentation->SetActiveSlide("headline pic", true);
+            mPresentation->Update(0.0f);
         }
         else
         {
@@ -466,8 +442,8 @@ void UnidentifiedSHSceneBase::Update(float dt)
     {
         FEPresentation* presentation = mPresentation;
         TLSlide* first = presentation->m_currentSlide;
-        fn_801CBCA0(0x2AB04562, 0, 0, 1);
         TLSlide* slide = first;
+        fn_801CBCA0(0x2AB04562, 0, 0, 1);
         do
         {
             TLComponentInstance* done = FindComponent(slide, "done");
@@ -492,7 +468,7 @@ void UnidentifiedSHSceneBase::Update(float dt)
             TU80300104Event event;
             event.mIndex = pad;
             event.mPosition = fn_802197FC(pad, &valid);
-            fn_802C082C(lbl_806E1E28, pad)->Virtual24(0x1E, 1);
+            fn_802C082C(lbl_806E1E28, pad)->Unidentified24(0x1E, true);
             event.mFlag0 = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
             event.mFlag1 = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
             mComponent.fn_80219608(&event);
@@ -515,13 +491,13 @@ void UnidentifiedSHSceneBase::fn_8026A63C()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
 
-    TLTextInstance* headlineText = CastFound<TLTextInstance>(fn_8030677C(presentation, nlStringLowerHash("headline pic"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("HEADLINE"), 0, 0, 0));
+    TLTextInstance* headlineText = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("headline pic"), nlStringLowerHash("Layer"),
+        nlStringLowerHash("HEADLINE"), 0, 0, 0);
     if (headlineText == 0)
         headlineText = &UnidentifiedFallbackTextInstance;
 
-    TLTextInstance* descriptionText = CastFound<TLTextInstance>(fn_8030677C(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("Description_clip"), 0, 0, 0));
+    TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
+        nlStringLowerHash("Description_clip"), 0, 0, 0);
     if (descriptionText == 0)
         descriptionText = &UnidentifiedFallbackTextInstance;
 
@@ -533,8 +509,8 @@ void UnidentifiedSHSceneBase::fn_8026A63C()
     fn_801E4460(&mUnidentified1C0, descriptionText);
     descriptionText->m_bVisible = false;
 
-    TLTextInstance* storyHeadline = CastFound<TLTextInstance>(fn_8030677C(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("HEADLINE"), 0, 0, 0));
+    TLTextInstance* storyHeadline = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
+        nlStringLowerHash("HEADLINE"), 0, 0, 0);
     if (storyHeadline == 0)
         storyHeadline = &UnidentifiedFallbackTextInstance;
     fn_801E2F50(&mUnidentified200, storyHeadline, -1, -1, -300);
@@ -544,8 +520,8 @@ void UnidentifiedSHSceneBase::fn_8026A63C()
         fn_801E3B60(&mUnidentified200, mUnidentified31);
     fn_801E4460(&mUnidentified200, descriptionText);
 
-    TLTextInstance* bodyText = CastFound<TLTextInstance>(fn_8030677C(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("BODY"), 0, 0, 0));
+    TLTextInstance* bodyText = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
+        nlStringLowerHash("BODY"), 0, 0, 0);
     if (bodyText == 0)
         bodyText = &UnidentifiedFallbackTextInstance;
     if (mUnidentifiedFC)
@@ -558,14 +534,14 @@ void UnidentifiedSHSceneBase::fn_8026A63C()
     mUnidentified1C0.mUnidentified2C = 2.0f;
     mUnidentified200.mUnidentified2C = 2.0f;
 
-    TLInstance* storyTexture = CastFound<TLInstance>(fn_8030677C(mPresentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("00_dummy_texture"), 0, 0, 0));
+    TLInstance* storyTexture = FEFinder<TLInstance, 2>::Find(mPresentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
+        nlStringLowerHash("00_dummy_texture"), 0, 0, 0);
     if (storyTexture == 0)
         storyTexture = &lbl_80580248;
     mUnidentified240.mUnidentified08 = storyTexture;
 
-    TLInstance* headlineTexture = CastFound<TLInstance>(fn_8030677C(mPresentation, nlStringLowerHash("headline pic"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("00_dummy_texture"), 0, 0, 0));
+    TLInstance* headlineTexture = FEFinder<TLInstance, 2>::Find(mPresentation, nlStringLowerHash("headline pic"), nlStringLowerHash("Layer"),
+        nlStringLowerHash("00_dummy_texture"), 0, 0, 0);
     if (headlineTexture == 0)
         headlineTexture = &lbl_80580248;
     mUnidentified2E0.mUnidentified08 = headlineTexture;
@@ -580,11 +556,11 @@ void UnidentifiedSHSceneBase::SHSceneVirtual38(int captain, int mood, int specia
     int variant = nlRandom(3, &nlDefaultSeed);
     if (mUnidentified28 == 8)
     {
-        s8 stored = lbl_806E0FA0->mUnidentified6D;
+        s8 stored = lbl_806E0FA0->mHeadlineVariant;
         if (stored != -1)
             variant = stored;
         else
-            lbl_806E0FA0->mUnidentified6D = variant;
+            lbl_806E0FA0->mHeadlineVariant = variant;
     }
     const CharacterInfo& info = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     char name[0x10];

@@ -90,8 +90,8 @@ BasicGameInfo::BasicGameInfo()
     mSidekickIndex[1][0] = 0;
     mSidekickIndex[1][1] = 0;
     mSidekickIndex[1][2] = 0;
-    unknown_0x126 = 0;
-    unknown_0x124 = 0;
+    mFinalScore[1] = 0;
+    mFinalScore[0] = 0;
 
     for (int pad = 0; pad < 16; pad++) {
         mPadSides[pad] = -1;
@@ -121,8 +121,8 @@ void BasicGameInfo::Reset(bool clearTeams)
     mSidekickIndex[1][0] = 0;
     mSidekickIndex[1][1] = 0;
     mSidekickIndex[1][2] = 0;
-    unknown_0x126 = 0;
-    unknown_0x124 = 0;
+    mFinalScore[1] = 0;
+    mFinalScore[0] = 0;
 
     for (int pad = 0; pad < 16; pad++) {
         mPadSides[pad] = -1;

@@ -121,6 +121,7 @@ TU80300104Component::~TU80300104Component()
 
 void TU80300104Component::fn_80300D74(TLInstance* instance, bool useRotation, float offsetX, float offsetY, float scaleX, float scaleY)
 {
+    nlVector2 size;
     nlVector2 measuredSize;
     switch (instance->m_type)
     {
@@ -132,8 +133,24 @@ void TU80300104Component::fn_80300D74(TLInstance* instance, bool useRotation, fl
         measuredSize.x = instance->GetScale().f.x * 100.0f;
         break;
     case TLAT_TEXT:
-        measuredSize = fn_80301518((TLTextInstance*)instance);
+    {
+        TLTextInstance* text = (TLTextInstance*)instance;
+        const FEFontResource* fontResource = ((const FEText*)text->m_component)->m_pFeFontResource;
+        nlFont* font = fontResource == 0 ? fn_80307260(lbl_806E2090, 0) : fontResource->m_pFontReference;
+
+        float width;
+        {
+            BasicString<unsigned short, Detail::TempStringAllocator> string(text->GetString());
+            FontCharString fontString(string.c_str(), font, (unsigned short*)0);
+            width = fn_80304CE4(font, &fontString, 0, 640, true);
+        }
+        nlTextBox::StringDrawInfo drawInfo = text->m_DrawInfo;
+        nlVector2 textSize;
+        textSize.x = width;
+        textSize.y = (float)(font->m_Metrics.Height * drawInfo.RowCount);
+        measuredSize = textSize;
         break;
+    }
     case TLAT_COMPONENT:
         measuredSize = fn_803018F0(((TLComponentInstance*)instance)->GetActiveSlide()->m_instances);
         break;
@@ -145,7 +162,7 @@ void TU80300104Component::fn_80300D74(TLInstance* instance, bool useRotation, fl
         break;
     }
 
-    nlVector2 size = measuredSize;
+    size = measuredSize;
     size.x *= scaleX;
     size.y *= scaleY;
 
@@ -204,7 +221,7 @@ nlVector2 fn_80301518(TLTextInstance* text)
         font = fontResource->m_pFontReference;
     }
 
-    unsigned int width;
+    float width;
     {
         BasicString<unsigned short, Detail::TempStringAllocator> string(text->GetString());
         FontCharString fontString(string.c_str(), font, (unsigned short*)0);
@@ -212,7 +229,7 @@ nlVector2 fn_80301518(TLTextInstance* text)
     }
     nlTextBox::StringDrawInfo drawInfo = text->m_DrawInfo;
     nlVector2 size;
-    size.x = (float)width;
+    size.x = width;
     size.y = (float)(font->m_Metrics.Height * drawInfo.RowCount);
     return size;
 }
