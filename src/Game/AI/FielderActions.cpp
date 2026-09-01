@@ -22,6 +22,7 @@
 #include "Game/FixedUpdateTask.h"
 #include "Game/MathHelpers.h"
 #include "Game/Net.h"
+#include "Game/NetworkMessages.h"
 #include "Game/SAnim.h"
 #include "Game/SHierarchy.h"
 #include "NL/nlString.h"
@@ -306,45 +307,6 @@ extern "C" void fn_800AA3E8(void* pParam, int nParam);
 extern "C" void fn_8005F82C(cGame* pGame, cFielder* pFielder);
 extern void* lbl_806E10EC;
 extern BaseGameSceneManager* lbl_806E1860;
-
-class UnidentifiedNetworkMessageBase
-{
-public:
-    UnidentifiedNetworkMessageBase()
-        : mUnidentified004(0)
-    {
-    }
-
-    virtual void Serialize(void* stream);
-    virtual void Destroy(int param1);
-    virtual u8 GetID();
-
-protected:
-    u32 mUnidentified004;
-};
-
-class UnidentifiedNetworkMessage_80126D84
-    : public UnidentifiedNetworkMessageBase
-{
-public:
-    UnidentifiedNetworkMessage_80126D84()
-    {
-        mCount = 0;
-        for (int i = 0; i < 8; i++)
-        {
-            mValues[i] = false;
-        }
-    }
-
-    ~UnidentifiedNetworkMessage_80126D84() { }
-
-    virtual void Serialize(void* stream);
-    virtual void Destroy(int param1);
-    virtual u8 GetID();
-
-    u8 mCount;
-    u8 mValues[8];
-};
 
 struct UnidentifiedMegaStrikeScene
 {

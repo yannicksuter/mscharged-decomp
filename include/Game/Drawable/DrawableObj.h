@@ -16,10 +16,10 @@ struct UnidentifiedDrawableViewState
 class DrawableObject
 {
 public:
-    virtual void V0();
+    virtual ~DrawableObject();
     virtual void V1();
     virtual nlMatrix4& GetWorldMatrix();
-    virtual void V3(const nlMatrix4*);
+    virtual void SetWorldMatrix(const nlMatrix4*);
     virtual void V4();
     virtual void Draw();
     virtual void V6();
@@ -32,7 +32,9 @@ public:
     /* 0x04 */ unsigned long m_uHashID;
     /* 0x08 */ u8 mUnidentified08[0x08];
     /* 0x10 */ UnidentifiedDrawableViewState* mUnidentified10;
-    /* 0x14 */ u8 mUnidentified14[0x50];
+    /* 0x14 */ u8 mUnidentified14[0x0C];
+    /* 0x20 */ nlMatrix4 mWorldMatrix;
+    /* 0x60 */ u8 mUnidentified60[0x04];
     /* 0x64 */ glModel* m_pModel;
     /* 0x68 */ u8 mUnidentified68[0x08];
     /* 0x70 */ unsigned long m_uObjectFlags;

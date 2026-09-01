@@ -80,7 +80,7 @@ void Drawable_8017FFCC::Render(const RenderEntry_8018006C* entry) const
     GLView* oldView6C = state->mView6C;
     state->mView68 = fn_8027267C(29);
     state->mView6C = state->mView68;
-    object->V3(&matrix);
+    object->SetWorldMatrix(&matrix);
     object->Draw();
     state->mView68 = oldView68;
     state->mView6C = oldView6C;

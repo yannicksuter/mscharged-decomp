@@ -184,7 +184,7 @@ void DrawableBulletBill::Render(const BulletBillObject* object) const
 
     matrix.SetRow4_(3, mPosition.x, mPosition.y, mPosition.z, 1.0f);
 
-    drawable->V3(&matrix);
+    drawable->SetWorldMatrix(&matrix);
     drawable->V8(fn_8027267C(13));
 
     DrawShadow(matrix, gShadowAlphaScale);

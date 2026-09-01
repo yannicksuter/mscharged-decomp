@@ -78,7 +78,7 @@ void DrawableHammer::Render(const HammerObject* object) const
     matrix.m43 = mPosition.z;
     matrix.m44 = 1.0f;
 
-    drawable->V3(&matrix);
+    drawable->SetWorldMatrix(&matrix);
     drawable->Draw();
 
     if (lbl_806DCBE8 != 0)

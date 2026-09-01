@@ -1,6 +1,9 @@
 #include "Game/Task/NetworkUpdateTask.h"
 
+#include "Game/NetTournManager.h"
+#include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkStatsManager.h"
 #include "Game/main.h"
 
 #include "NL/nlMemory.h"
@@ -21,22 +24,18 @@ struct NetworkStatus
 extern NetworkManager* lbl_806E2138;
 extern NetworkStatus* lbl_806E2168;
 extern void* lbl_806E1194;
-extern s32 lbl_806E1188;
 extern u8 lbl_806E1008;
 
 extern "C" void fn_803740B8();
 extern "C" void fn_80338898();
 extern "C" void fn_80337F68();
 extern "C" void fn_8032C7D0();
-extern "C" void fn_801258A8();
+void RegisterNetworkMessages_801258A8();
 extern "C" void fn_803327DC();
 extern "C" void* fn_8011166C();
 extern "C" void fn_803328AC(NetworkManager*, void*);
 extern "C" void fn_80332EDC();
-extern "C" void fn_801274A4();
-extern "C" void fn_8012AE4C();
 extern "C" void* fn_801360A4(void*);
-extern "C" void fn_8012F378();
 void NetworkUpdateTask::Initialize()
 {
     fn_803740B8();
@@ -44,7 +43,7 @@ void NetworkUpdateTask::Initialize()
     fn_80338898();
     fn_80337F68();
     fn_8032C7D0();
-    fn_801258A8();
+    RegisterNetworkMessages_801258A8();
     fn_803327DC();
 
     void* handler = fn_8011166C();
@@ -55,8 +54,8 @@ void NetworkUpdateTask::Initialize()
     fn_803328AC(lbl_806E2138, handler);
 
     fn_80332EDC();
-    fn_801274A4();
-    fn_8012AE4C();
+    NetTournManager::CreateInstance();
+    NetworkDraft::CreateInstance();
 
     if (lbl_806E1194 == 0)
     {
@@ -68,14 +67,14 @@ void NetworkUpdateTask::Initialize()
         lbl_806E1194 = instance;
     }
 
-    fn_8012F378();
+    NetworkStatsManager_8012F378::CreateInstance();
     if (GetRegion() == 2)
     {
-        lbl_806E1188 = 9;
+        g_nAddHoursTime = 9;
     }
     else if (GetRegion() == 0)
     {
-        lbl_806E1188 = -8;
+        g_nAddHoursTime = -8;
     }
 
     lbl_806E1008 = 0;
