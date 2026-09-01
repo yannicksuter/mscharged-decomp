@@ -4,6 +4,7 @@
 #include "Game/FE/fePopupMenu.h"
 #include "Game/GameInfo.h"
 #include "Game/ResetTask.h"
+#include "Game/main.h"
 
 #include <math.h>
 
@@ -76,7 +77,6 @@ extern "C" s32 fn_80376EB0(NANDResultCallback callback);
 extern "C" bool fn_80376F18();
 
 extern "C" bool fn_802C2C84(const char* path, bool create);
-extern "C" s32 fn_8011C19C();
 extern void nlPrintf(const char* format, ...);
 
 extern BaseGameSceneManager* lbl_806E1838;
@@ -845,7 +845,7 @@ void SaveLoad::IconLoadsComplete()
     }
 
     const char* region;
-    switch (fn_8011C19C())
+    switch (GetRegion())
     {
     case 1:
         region = "EU";

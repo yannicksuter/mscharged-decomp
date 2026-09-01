@@ -17,6 +17,11 @@ class ResetTask : public nlTask
 public:
     ResetTask();
 
+    void FSCheckForReset()
+    {
+        Run(1.0f / 60.0f);
+    }
+
     virtual void Run(float dt);
     virtual const char* GetName() { return "Reset"; }
 

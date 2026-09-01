@@ -150,24 +150,17 @@ nlColour fn_80183C9C(const nlVector2* arg0, bool arg1)
 bool fn_80183C54()
 {
     bool enabled;
-    if (lbl_806DCC58)
-    {
-        if (lbl_806DCC6C != (u32)-1)
-        {
-            if (lbl_806E1420 != 0)
-                enabled = lbl_806DC7D8;
-            else
-                enabled = false;
-        }
-        else
-        {
-            enabled = false;
-        }
-    }
-    else
-    {
-        enabled = false;
-    }
+
+    if (!lbl_806DCC58)
+        return false;
+
+    if (lbl_806DCC6C == (u32)-1)
+        return false;
+
+    enabled = false;
+    if (lbl_806E1420 != 0)
+        enabled = lbl_806DC7D8;
+
     return enabled;
 }
 

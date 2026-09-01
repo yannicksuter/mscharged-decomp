@@ -23,6 +23,14 @@
 typedef void (*DWCMatchedSCCallbackView)(int error, BOOL cancel, BOOL self,
     BOOL isServer, int index, void* param);
 
+typedef struct DWCstConnectionInfo
+{
+    u8 index;
+    u8 aid;
+    u16 reserve;
+    void* param;
+} DWCConnectionInfo;
+
 typedef struct DWCMatchControlView
 {
     GPConnection* _00;
@@ -33,7 +41,7 @@ typedef struct DWCMatchControlView
     u8 _0E;
     u8 _0F;
     qr2_t qr2;
-    u8 _14;
+    vu8 _14;
     u8 matchType;
     u8 _16;
     u8 _17;
@@ -229,7 +237,7 @@ void fn_8049A700(NegotiateResult result, SOCKET gamesocket,
 
 int fn_8048E27C(void);
 GT2Connection* fn_8048E320(int index);
-void* fn_8048E430(int index);
+DWCConnectionInfo* fn_8048E430(int index);
 u32 fn_8048A3BC(u32 max);
 void* fn_8048C530(void);
 GT2Connection* fn_8048E334(int index);
@@ -252,13 +260,15 @@ BOOL fn_80493C58(u8 command, u32 profileId, u32 ip, u16 port, u32* data,
     int count);
 int fn_80493434(int isRetry, int cookie, SBServer server);
 BOOL fn_80492D3C(void);
+static DWCMatchControlView* DWCi_GetMatchCnt(void);
+static void DWCi_CloseAllConnectionsByTimeout(void);
 static void DWCi_ClearGameMatchKeys(void);
 
 char* lbl_806E2EE8;
 DWCMatchOptMinCompleteView* lbl_806E2EEC;
 u32 lbl_806E2EF0;
 u32 lbl_806E2EF4;
-DWCMatchControlView* lbl_806E2EF8;
+static DWCMatchControlView* lbl_806E2EF8;
 DWCMatchOptSCBlockView lbl_806E2EFC;
 
 u8 lbl_806C9920[0x100];
@@ -1279,8 +1289,8 @@ void fn_804916EC(GT2Socket socket, GT2Connection connection, unsigned int ip,
     unsigned short port, int latency, GT2Byte* message, int len)
 {
     int index;
-    GT2Connection* slot;
-    u8* data;
+    GT2Connection* pGt2Con;
+    DWCConnectionInfo* pConInfo;
 
     if (lbl_806E2EF8 != NULL && lbl_806E2EF8->state == 6)
     {
@@ -1350,28 +1360,30 @@ void fn_804916EC(GT2Socket socket, GT2Connection connection, unsigned int ip,
         }
     }
 
-    slot = fn_8048E320(index);
-    data = fn_8048E430(index);
-    *slot = connection;
+    pGt2Con = fn_8048E320(index);
+    pConInfo = fn_8048E430(index);
+    *pGt2Con = connection;
     lbl_806E2EF8->_0D++;
-    data[0] = index;
-    data[1] = lbl_806E2EF8->aidList[lbl_806E2EF8->_0D - 1];
-    *(u16*)(data + 2) = 0;
-    *(u32*)(data + 4) = 0;
-    gt2SetConnectionData(connection, data);
+    pConInfo->index = index;
+    pConInfo->aid = lbl_806E2EF8->aidList[lbl_806E2EF8->_0D - 1];
+    pConInfo->reserve = 0;
+    pConInfo->param = NULL;
+    gt2SetConnectionData(connection, pConInfo);
     fn_80496740(2);
 }
 
 void fn_80491AE0(GT2Connection connection, GT2Result result, GT2Byte* message,
     int len)
 {
+    char pidStr[12];
     int index;
-    GT2Connection* slot;
-    u8* data;
-    char buf[12];
+    GT2Connection* pGt2Con;
+    GT2Result gt2Result;
+    DWCConnectionInfo* pConInfo;
 
-    if (lbl_806E2EF8 == NULL
-        || (lbl_806E2EF8->state != 7 && lbl_806E2EF8->state != 12))
+    if (DWCi_GetMatchCnt() == NULL
+        || (DWCi_GetMatchCnt()->state != 7
+            && DWCi_GetMatchCnt()->state != 12))
     {
         DWC_Printf(0x80, "gt2ConnectedCallback: Already cancel\n");
         return;
@@ -1384,69 +1396,81 @@ void fn_80491AE0(GT2Connection connection, GT2Result result, GT2Byte* message,
             message = (GT2Byte*)"";
         }
         DWC_Printf(0x80, "GT2 connect failed %d: %s\n", result, message);
-        if (result == GT2Rejected)
+        if (result == GT2DuplicateAddress)
         {
             return;
         }
-        if (result == GT2TimedOut)
+        else if (result == GT2TimedOut)
         {
-            lbl_806E2EF8->_0C++;
-            if (lbl_806E2EF8->_0C > 5)
+            DWCi_GetMatchCnt()->_0C++;
+            if (DWCi_GetMatchCnt()->_0C > 5)
             {
                 DWC_Printf(0x80, "gt2Connect() retry over.\n");
-                lbl_806E2EF8->_0C = 0;
-                fn_80496188(lbl_806E2EF8->pidList[lbl_806E2EF8->_14]);
+                DWCi_GetMatchCnt()->_0C = 0;
+                fn_80496188(DWCi_GetMatchCnt()->pidList[DWCi_GetMatchCnt()->_14]);
                 return;
             }
             DWC_Printf(0x80, "Retry to gt2Connect.\n");
-            snprintf(buf, sizeof(buf), "%u", lbl_806E2EF8->_210);
-            result = gt2Connect(*lbl_806E2EF8->pGT2Socket, NULL,
-                gt2AddressToString(lbl_806E2EF8->ipList[lbl_806E2EF8->_14],
-                    lbl_806E2EF8->portList[lbl_806E2EF8->_14], NULL),
-                (GT2Byte*)buf, -1, 5000, lbl_806E2EF8->_08, GT2False);
-            if (result == GT2OutOfMemory)
+            (void)snprintf(pidStr, sizeof(pidStr), "%u",
+                DWCi_GetMatchCnt()->_210);
+            gt2Result = gt2Connect(*DWCi_GetMatchCnt()->pGT2Socket, NULL,
+                gt2AddressToString(
+                    DWCi_GetMatchCnt()->ipList[DWCi_GetMatchCnt()->_14],
+                    DWCi_GetMatchCnt()->portList[DWCi_GetMatchCnt()->_14], NULL),
+                (GT2Byte*)pidStr, -1, 5000, DWCi_GetMatchCnt()->_08, GT2False);
+            if (gt2Result == GT2OutOfMemory)
             {
-                fn_8049925C(result);
+                fn_8049925C(gt2Result);
                 return;
             }
-            if (result != GT2Success)
+            else if (gt2Result == GT2Success)
             {
-                fn_80496188(lbl_806E2EF8->pidList[lbl_806E2EF8->_14]);
             }
+            else if (fn_80496188(
+                         DWCi_GetMatchCnt()->pidList[DWCi_GetMatchCnt()->_14])
+                == 0)
+            {
+                return;
+            }
+        }
+        else if (fn_80496188(DWCi_GetMatchCnt()->pidList[
+                     DWCi_GetMatchCnt()->_0D + 1])
+            == 0)
+        {
             return;
         }
-        fn_80496188(lbl_806E2EF8->pidList[lbl_806E2EF8->_0D + 1]);
-        return;
-    }
-
-    DWC_Printf(0x80, "GT2 connected.\n");
-    index = fn_8048E27C();
-    if (index == -1)
-    {
-        DWC_Printf(8,
-            "Don't continue matching without closing connections!!\n");
-        fn_80491EDC(DWC_ERROR_TYPE_6,
-            DWC_ECODE_SEQ_MATCHING + DWC_ECODE_GS_GT2 - 100);
-        return;
-    }
-
-    slot = fn_8048E320(index);
-    data = fn_8048E430(index);
-    *slot = connection;
-    lbl_806E2EF8->_0D++;
-    data[0] = index;
-    *(u16*)(data + 2) = 0;
-    *(u32*)(data + 4) = 0;
-    data[1] = lbl_806E2EF8->aidList[lbl_806E2EF8->_0D];
-    gt2SetConnectionData(connection, data);
-
-    if (lbl_806E2EF8->state == 12)
-    {
-        fn_80496740(0);
     }
     else
     {
-        fn_80496740(1);
+        DWC_Printf(0x80, "GT2 connected.\n");
+        index = fn_8048E27C();
+        if (index == -1)
+        {
+            DWC_Printf(8,
+                "Don't continue matching without closing connections!!\n");
+            fn_80491EDC(DWC_ERROR_TYPE_6,
+                DWC_ECODE_SEQ_MATCHING + DWC_ECODE_GS_GT2 - 100);
+            return;
+        }
+
+        pGt2Con = fn_8048E320(index);
+        pConInfo = fn_8048E430(index);
+        *pGt2Con = connection;
+        DWCi_GetMatchCnt()->_0D++;
+        pConInfo->index = index;
+        pConInfo->reserve = 0;
+        pConInfo->param = NULL;
+        pConInfo->aid = DWCi_GetMatchCnt()->aidList[DWCi_GetMatchCnt()->_0D];
+        gt2SetConnectionData(connection, pConInfo);
+
+        if (DWCi_GetMatchCnt()->state == 12)
+        {
+            fn_80496740(0);
+        }
+        else
+        {
+            fn_80496740(1);
+        }
     }
 }
 
@@ -1472,30 +1496,19 @@ void fn_80491E18(GPConnection* connection, u32 profileId, char* message)
 
 void fn_80491EDC(int error, int errorCode)
 {
-    BOOL isServer;
-    BOOL self;
+    if (DWCi_GetMatchCnt() == NULL || error == 0)
+    {
+        return;
+    }
 
-    if (lbl_806E2EF8 == NULL)
-    {
-        return;
-    }
-    if (error == 0)
-    {
-        return;
-    }
-    lbl_806E2EF8->closeState = 2;
-    gt2CloseAllConnectionsHard(*lbl_806E2EF8->pGT2Socket);
-    lbl_806E2EF8->closeState = 0;
+    DWCi_CloseAllConnectionsByTimeout();
     DWCi_SetError(error, errorCode);
     fn_8048AFCC(1, "", NULL);
-    {
-        DWCMatchControlView* control = lbl_806E2EF8;
-
-        isServer = control->matchType == 2;
-        self = control->_21C == 0;
-        control->matchedCallback(error, FALSE, self, isServer,
-            fn_8048AEC4(control->_21C), control->matchedParam);
-    }
+    DWCi_GetMatchCnt()->matchedCallback(error, FALSE,
+        DWCi_GetMatchCnt()->_21C ? FALSE : TRUE,
+        DWCi_GetMatchCnt()->matchType == 2 ? TRUE : FALSE,
+        fn_8048AEC4(DWCi_GetMatchCnt()->_21C),
+        DWCi_GetMatchCnt()->matchedParam);
     DWCi_CloseMatching();
 }
 
@@ -4822,6 +4835,13 @@ int fn_8049811C(void)
     return 1;
 }
 
+static void DWCi_CloseAllConnectionsByTimeout(void)
+{
+    DWCi_GetMatchCnt()->closeState = 2;
+    gt2CloseAllConnectionsHard(*DWCi_GetMatchCnt()->pGT2Socket);
+    DWCi_GetMatchCnt()->closeState = 0;
+}
+
 static void DWCi_ClearGameMatchKeys(void)
 {
     int i;
@@ -6217,4 +6237,9 @@ void fn_8049A700(NegotiateResult result, SOCKET gamesocket,
             }
         }
     }
+}
+
+static DWCMatchControlView* DWCi_GetMatchCnt(void)
+{
+    return lbl_806E2EF8;
 }

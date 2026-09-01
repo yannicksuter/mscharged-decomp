@@ -38,7 +38,6 @@ NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* info, const char* url,
     NHTTPResponseCallback responseCallback, NHTTPResponseCleanup cleanup)
 {
     char urlBuffer[0x100];
-    NHTTPRequestInfo* request = NULL;
     s32 urlLength;
     s32 prefixLength;
     s32 remaining;
@@ -52,6 +51,7 @@ NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* info, const char* url,
     s32 decodedChar;
     BOOL foundPath;
     s32 hostLength;
+    NHTTPRequestInfo* request = NULL;
     s32 separator;
     s32 portStart;
     s32 port;

@@ -16,10 +16,10 @@ extern "C" void fn_80115FB4()
 {
     gDispatchEventsTask->dispatcher.Clear();
 
-    DeferredSlotPool<EventCallbackEntry<EventCallback> >* pool =
-        &gDispatchEventsTask->dispatcher.callbacks.pool;
+    BasicSlotPool<DLListEntry<EventCallback> >* pool =
+        &gDispatchEventsTask->dispatcher.callbacks.m_Allocator;
     fn_802B467C(pool);
-    SlotPoolBase::BaseFreeBlocks(pool, sizeof(EventCallbackEntry<EventCallback>));
+    SlotPoolBase::BaseFreeBlocks(pool, sizeof(DLListEntry<EventCallback>));
 }
 
 void DispatchEventsTask::Run(float)

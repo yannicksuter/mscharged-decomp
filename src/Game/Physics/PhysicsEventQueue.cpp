@@ -798,11 +798,11 @@ extern "C" void fn_801440BC()
         EventDispatcher& dispatcher = lbl_806E11F0->mDispatcher;
         dispatcher.Clear();
 
-        DeferredSlotPool<EventCallbackEntry<EventCallback> >* pool =
-            &dispatcher.callbacks.pool;
+        BasicSlotPool<DLListEntry<EventCallback> >* pool =
+            &dispatcher.callbacks.m_Allocator;
         fn_802B467C(pool);
         SlotPoolBase::BaseFreeBlocks(
-            pool, sizeof(EventCallbackEntry<EventCallback>));
+            pool, sizeof(DLListEntry<EventCallback>));
 
         delete lbl_806E11F0;
         lbl_806E11F0 = 0;

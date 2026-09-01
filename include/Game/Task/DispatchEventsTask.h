@@ -3,67 +3,48 @@
 
 #include "types.h"
 
+#include "NL/nlDLListContainer.h"
+#include "NL/nlFunction.h"
 #include "NL/nlSlotPool.h"
 #include "NL/nlTask.h"
 
-#include "NL/nlFunction.h"
-
 typedef Function<bool> EventCallback;
+typedef DLListContainerBase<EventCallback,
+    BasicSlotPool<DLListEntry<EventCallback> > > EventCallbackList;
 
-template <typename T>
-struct EventCallbackEntry
+union EventDispatcherState
 {
-    EventCallbackEntry* next;
-    EventCallbackEntry* previous;
-    T callback;
-};
-
-template <typename T>
-class DeferredSlotPool : public SlotPoolBase
-{
-public:
-    DeferredSlotPool(int initial, int delta)
-        : SlotPoolBase()
+    struct
     {
-        m_Delta = delta;
-        m_Initial = initial;
-        if (m_Initial == 0)
-        {
-            BaseAddNewBlock(this, sizeof(T));
-        }
-    }
-};
+        u32 dispatching : 1;
+        u32 stopDispatch : 1;
+        u32 callbackCount : 16;
+        u32 unused : 14;
+    } fields;
+    u32 value;
 
-template <typename T>
-class EventCallbackList
-{
-public:
-    EventCallbackList()
-        : pool(16, 16)
-        , head(0)
+    EventDispatcherState()
+        : value(0)
     {
     }
-
-    DeferredSlotPool<EventCallbackEntry<T> > pool;
-    EventCallbackEntry<T>* head;
 };
 
 class EventDispatcherBase
 {
 public:
     EventDispatcherBase()
-        : callbacks()
-        , state(0)
+        : callbacks(16, 16)
+        , state()
     {
     }
 
-    virtual void Dispatch(bool) = 0;
-    virtual void Clear() = 0;
-    virtual ~EventDispatcherBase();
-    virtual void Add(const EventCallback&) = 0;
+    virtual void Dispatch(bool);
+    virtual void Clear();
+    virtual ~EventDispatcherBase() { }
+    virtual void Add(const EventCallback&);
 
-    EventCallbackList<EventCallback> callbacks;
-    u32 state;
+    EventCallbackList callbacks;
+    EventDispatcherState state;
 };
 
 class EventDispatcher : public EventDispatcherBase
@@ -72,10 +53,7 @@ public:
     EventDispatcher() { }
     EventDispatcher(const char*);
 
-    virtual void Dispatch(bool);
-    virtual void Clear();
     virtual ~EventDispatcher();
-    virtual void Add(const EventCallback&);
 };
 
 class DispatchEventsTask : public nlTask

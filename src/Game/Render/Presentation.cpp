@@ -7,6 +7,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/GameInfo.h"
+#include "Game/NetTournManager.h"
 #include "NL/nlDebug.h"
 #include "NL/nlFile.h"
 #include "NL/nlFunction.h"
@@ -23,9 +24,6 @@ static char sIdleFunctionName[] = "Idle";
 static const char* idleFun = sIdleFunctionName;
 static char sIdleAnimation[] = "fe_idle";
 
-extern "C" void fn_80127558();
-extern "C" void fn_80129BCC();
-extern "C" void fn_80129BD8();
 extern "C" void fn_8010E294(void*);
 extern "C" void fn_801C27C4(
     void*, int, unsigned int, int, bool, int, int, int);
@@ -212,8 +210,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     switch (function)
     {
     case 0:
-        fn_80127558();
-        fn_80129BCC();
+        NetTournManager::Instance()->DetachTournamentTrophy();
         break;
     case 1:
     {
@@ -238,8 +235,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         fn_801C3014(lbl_806E17F0);
         break;
     case 3:
-        fn_80127558();
-        fn_80129BD8();
+        NetTournManager::Instance()->DestroyTournamentTrophy();
         break;
     case 4:
         fn_8010E294(lbl_806E0F90);

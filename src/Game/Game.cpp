@@ -73,42 +73,6 @@ struct UnidentifiedNetworkManager
     UnidentifiedFrameProvider* mFrameProvider;
 };
 
-class UnidentifiedNetworkMessageBase
-{
-public:
-    UnidentifiedNetworkMessageBase()
-        : mUnidentified004(0)
-    {
-    }
-
-    virtual void Serialize(void* stream);
-    virtual void Destroy(int param1);
-    virtual u8 GetID();
-
-protected:
-    u32 mUnidentified004;
-};
-
-class UnidentifiedNetworkMessage_80126D84
-    : public UnidentifiedNetworkMessageBase
-{
-public:
-    UnidentifiedNetworkMessage_80126D84()
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            mValues[i] = false;
-        }
-    }
-
-    virtual void Serialize(void* stream);
-    virtual void Destroy(int param1);
-    virtual u8 GetID();
-
-    u8 mCount;
-    u8 mValues[8];
-};
-
 struct UnidentifiedOnlineState
 {
     u8 mUnidentified000[4];
@@ -397,35 +361,32 @@ void cGame::fn_80058180()
 {
     fn_8004F594(16, lbl_804FB238, mUnidentified134.mSize);
 
-    if (mUnidentified134.mSize > 0)
+    while (mUnidentified134.mSize > 0)
     {
-        while (mUnidentified134.mSize > 0)
+        int count = mUnidentified134.mSize;
+        if (count > 8)
         {
-            int count = mUnidentified134.mSize;
-            if (count > 8)
-            {
-                count = 8;
-            }
+            count = 8;
+        }
 
-            UnidentifiedNetworkMessage_80126D84 message;
-            message.mCount = count;
-            for (int i = 0; i < count; i++)
-            {
-                message.mValues[i]
-                    = mUnidentified134.UnidentifiedRemoveStart();
-            }
+        UnidentifiedNetworkMessage_80126D84 message;
+        message.mCount = count;
+        for (int i = 0; i < count; i++)
+        {
+            message.mValues[i]
+                = mUnidentified134.UnidentifiedRemoveStart();
+        }
 
-            char buffer[50];
-            s8 i;
-            int size = fn_8032C830(
-                lbl_806E2100, &message, buffer, sizeof(buffer));
-            int playerCount = fn_80338BF0(lbl_806E20D8);
-            for (i = 0; i < playerCount; i++)
+        char buffer[50];
+        s8 i;
+        int size = fn_8032C830(
+            lbl_806E2100, &message, buffer, sizeof(buffer));
+        int playerCount = fn_80338BF0(lbl_806E20D8);
+        for (i = 0; i < playerCount; i++)
+        {
+            if (i != fn_80338C20(lbl_806E20D8))
             {
-                if (i != fn_80338C20(lbl_806E20D8))
-                {
-                    lbl_806E20D8->Send(i, buffer, size, true);
-                }
+                lbl_806E20D8->Send(i, buffer, size, true);
             }
         }
     }

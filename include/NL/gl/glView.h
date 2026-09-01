@@ -40,6 +40,18 @@ public:
 
 typedef GLPacketSorter* (*GLPacketSorterFactory)();
 
+// GLView::m_Target selects the platform copy issued after the view is drawn.
+// glPlat only acts on 8, 9 and 10; any other value skips the copy entirely.
+// The stripped DOL preserves the values but not their names, so they stay
+// value-named.
+enum GLViewTargetMode
+{
+    GLViewTarget_None = 0,
+    GLViewTarget_Mode8 = 8,
+    GLViewTarget_Mode9 = 9,
+    GLViewTarget_Mode10 = 10
+};
+
 class GLView
 {
 public:

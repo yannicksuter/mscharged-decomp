@@ -8,12 +8,16 @@ class TransitionTask : public nlTask
 public:
     void Initialize();
 
-    virtual void Run(float dt);
+    virtual void Run(float)
+    {
+    }
     virtual const char* GetName()
     {
         return "Transition Manager";
     }
     virtual void StateTransition(u32 from, u32 to);
 }; // size 0x20
+
+extern TransitionTask gTransitionTask;
 
 #endif // GAME_TASK_TRANSITION_TASK_H

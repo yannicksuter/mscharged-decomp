@@ -290,7 +290,7 @@ static DWCiRankingSessionResult DWCi_RankingSessionEncrypt(u8* outbuf,
     u32 sum = 0;
     int i;
 
-    tmpbuf = DWC_Alloc(DWC_ALLOCTYPE_ENC, headerlen + srclen + 4);
+    tmpbuf = DWC_Alloc(DWC_ALLOCTYPE_ENC, srclen + headerlen + 4);
     if (tmpbuf == NULL)
     {
         return DWCi_RANKING_SESSION_ERROR_NOMEMORY;
@@ -306,13 +306,13 @@ static DWCiRankingSessionResult DWCi_RankingSessionEncrypt(u8* outbuf,
         tmpbuf[i + headerlen + 4] = srcbuf[i];
     }
 
-    for (i = 0; i < (int)(headerlen + srclen); i++)
+    for (i = 0; i < (int)(srclen + headerlen); i++)
     {
         sum += tmpbuf[i + 4];
     }
 
     my_randinit(sum);
-    for (i = 0; i < (int)(headerlen + srclen); i++)
+    for (i = 0; i < (int)(srclen + headerlen); i++)
     {
         tmpbuf[i + 4] ^= my_rand();
     }
@@ -323,9 +323,9 @@ static DWCiRankingSessionResult DWCi_RankingSessionEncrypt(u8* outbuf,
     tmpbuf[2] = sum >> 8;
     tmpbuf[3] = sum;
 
-    B64Encode((const char*)tmpbuf, (char*)outbuf, headerlen + srclen + 4, 2);
+    B64Encode((const char*)tmpbuf, (char*)outbuf, srclen + headerlen + 4, 2);
     DWC_Free(DWC_ALLOCTYPE_ENC, tmpbuf, 0);
-    outbuf[b64size(headerlen + srclen + 4)] = '\0';
+    outbuf[b64size(srclen + headerlen + 4)] = '\0';
 
     return DWCi_RANKING_SESSION_SUCCESS;
 }
