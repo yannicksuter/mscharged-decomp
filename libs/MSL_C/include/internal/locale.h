@@ -1,9 +1,15 @@
 #ifndef MSL_INTERNAL_LOCALE_H
 #define MSL_INTERNAL_LOCALE_H
 
+#include <size_t.h>
+#include <wchar_t.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef int (*__decode_mbyte)(wchar_t*, const char*, size_t);
+typedef int (*__encode_mbyte)(char*, wchar_t);
 
 struct _loc_ctype_cmpt
 {
@@ -12,10 +18,10 @@ struct _loc_ctype_cmpt
     const unsigned char* upper_map_ptr;
     const unsigned char* lower_map_ptr;
     const unsigned short* wctype_map_ptr;
-    const void* wupper_map_ptr;
-    const void* wlower_map_ptr;
-    void* decode_mb;
-    void* encode_wc;
+    const wchar_t* wupper_map_ptr;
+    const wchar_t* wlower_map_ptr;
+    __decode_mbyte decode_mb;
+    __encode_mbyte encode_wc;
 };
 
 struct __locale

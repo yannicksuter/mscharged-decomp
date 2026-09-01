@@ -1,6 +1,8 @@
 #ifndef MSL_LOCALE_H
 #define MSL_LOCALE_H
 
+#include <internal/locale.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

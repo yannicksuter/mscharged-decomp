@@ -32,6 +32,7 @@ extern "C"
     DSIOResult __close_console(__file_handle file);
     DSIOResult __TRK_write_console(__file_handle file, unsigned char* buffer, size_t* count, __idle_proc idle_fn);
     DSIOResult __read_console(__file_handle file, unsigned char* buffer, size_t* count, __idle_proc idle_fn);
+    void __close_all(void);
 
 #ifdef __cplusplus
 }
