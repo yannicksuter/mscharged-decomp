@@ -415,6 +415,14 @@ Game/AI/Scripts/ScriptDefines.cpp:
 	.text       start:0x800D645C end:0x800D6604
 	.sbss       start:0x806E0E68 end:0x806E0E80
 
+Game/AI/Scripts/ScriptQuestions.cpp:
+	.text       start:0x800D6624 end:0x800E0CF0
+	.ctors      start:0x804DB594 end:0x804DB598
+	.data       start:0x80502D08 end:0x80502DD8
+	.bss        start:0x8056DB08 end:0x8056DBA0
+	.sdata      start:0x806DC3D8 end:0x806DC3F0
+	.sdata2     start:0x806E41B0 end:0x806E42C0
+
 Game/ScriptTuning.cpp:
 	.text       start:0x800E0CF0 end:0x800E2F88
 	.data       start:0x80502DD8 end:0x80503A28
@@ -453,6 +461,21 @@ Game/AI/TutorialMegastrikeDesire.cpp:
 	.text       start:0x800EB5BC end:0x800EB6AC
 	.data       start:0x80504000 end:0x80504040
 
+Game/Audio/audio.cpp:
+	.text       start:0x800EB6AC end:0x800ED8B8
+	.ctors      start:0x804DB5A8 end:0x804DB5AC
+	.data       start:0x80504040 end:0x805041B0
+	.bss        start:0x8056DC00 end:0x8056DC90
+	.sdata      start:0x806DC450 end:0x806DC460
+	.sdata2     start:0x806E42E8 end:0x806E42F8
+
+Game/Audio/tu_800ED8B8.cpp:
+	.text       start:0x800ED8B8 end:0x800EDE54
+	.ctors      start:0x804DB5AC end:0x804DB5B0
+	.data       start:0x805041B0 end:0x80504228
+	.bss        start:0x8056DC90 end:0x8056DCD0
+	.sbss       start:0x806E0E80 end:0x806E0E90
+
 Game/Camera/animcam.cpp:
 	.text       start:0x800EDEC0 end:0x800EF2E8
 	.ctors      start:0x804DB5B4 end:0x804DB5B8
@@ -476,6 +499,17 @@ Game/Camera/kickoffcam.cpp:
 	.bss        start:0x8056DCD0 end:0x8056DCDC
 	.sdata2     start:0x806E4340 end:0x806E4348
 
+Game/Camera/rumblefilter.cpp:
+	.text       start:0x800EF5F8 end:0x800EF9F0
+	.data       start:0x80504310 end:0x80504328
+	.sbss       start:0x806E0EA8 end:0x806E0EB0
+	.sdata2     start:0x806E4348 end:0x806E4360
+
+unclassified/tu_800EF9F0.cpp:
+	.text       start:0x800EF9F0 end:0x800F0240
+	.data       start:0x80504328 end:0x80504348
+	.sdata2     start:0x806E4360 end:0x806E4398
+
 Game/Camera/CameraMan.cpp:
 	.text       start:0x800F0240 end:0x800F2504
 	.ctors      start:0x804DB5B8 end:0x804DB5BC
@@ -486,10 +520,35 @@ Game/Camera/CameraMan.cpp:
 	.sbss       start:0x806E0EB0 end:0x806E0EE8
 	.sdata2     start:0x806E4398 end:0x806E43C8
 
+Game/Camera/DebugCam.cpp:
+	.text       start:0x800F2504 end:0x800F3A10
+	.ctors      start:0x804DB5BC end:0x804DB5C0
+	.data       start:0x80504EC8 end:0x80504FD0
+	.bss        start:0x8056E220 end:0x8056E300
+	.sdata      start:0x806DC498 end:0x806DC4C8
+	.sbss       start:0x806E0EE8 end:0x806E0F08
+	.sdata2     start:0x806E43C8 end:0x806E4408
+
 Game/Camera/FaceCam.cpp:
 	.text       start:0x800F3A10 end:0x800F3C1C
 	.data       start:0x80504FD0 end:0x80504FF8
 	.sdata2     start:0x806E4408 end:0x806E4410
+
+Game/Camera/FollowCam.cpp:
+	.text       start:0x800F3C1C end:0x800F445C
+	.data       start:0x80504FF8 end:0x80505020
+	.sdata      start:0x806DC4C8 end:0x806DC4F0
+	.sbss       start:0x806E0F08 end:0x806E0F10
+	.sdata2     start:0x806E4410 end:0x806E4430
+
+Game/Camera/GameplayCam.cpp:
+	.text       start:0x800F447C end:0x800F5684
+	.ctors      start:0x804DB5C4 end:0x804DB5C8
+	.rodata     start:0x804DC4F0 end:0x804DC520
+	.data       start:0x80505020 end:0x80505168
+	.sdata      start:0x806DC4F0 end:0x806DC510
+	.sbss       start:0x806E0F10 end:0x806E0F18
+	.sdata2     start:0x806E4430 end:0x806E44B0
 
 Game/Camera/GoalCam.cpp:
 	.text       start:0x800F5684 end:0x800F5798
@@ -501,6 +560,14 @@ Game/Camera/MatrixEffectCam.cpp:
 	.data       start:0x80505190 end:0x805051B8
 	.sdata2     start:0x806E44B8 end:0x806E44D8
 
+Game/Camera/ReplayCamera.cpp:
+	.text       start:0x800F5970 end:0x800F9218
+	.rodata     start:0x804DC520 end:0x804DC548
+	.data       start:0x805051B8 end:0x80505480
+	.sdata      start:0x806DC510 end:0x806DC540
+	.sbss       start:0x806E0F18 end:0x806E0F20
+	.sdata2     start:0x806E44D8 end:0x806E4570
+
 Game/Camera/AnimViewerCam.cpp:
 	.text       start:0x800F9238 end:0x800F9300
 	.data       start:0x80505480 end:0x805054A8
@@ -509,6 +576,14 @@ Game/Camera/ShootToScoreCam.cpp:
 	.text       start:0x800F9300 end:0x800F9460
 	.data       start:0x805054A8 end:0x805054D0
 	.sdata2     start:0x806E4570 end:0x806E4590
+
+Game/Camera/tu_800F9460.cpp:
+	.text       start:0x800F9460 end:0x800FBB80
+	.rodata     start:0x804DC548 end:0x804DC558
+	.data       start:0x805054D0 end:0x80505748
+	.sdata      start:0x806DC540 end:0x806DC600
+	.sbss       start:0x806E0F20 end:0x806E0F50
+	.sdata2     start:0x806E4590 end:0x806E45B0
 
 Game/DB/BasicGameInfo.cpp:
 	.text       start:0x800FBBA0 end:0x800FC20C
@@ -523,15 +598,49 @@ Game/GameInfo.cpp:
 	.sdata      start:0x806DC690 end:0x806DC6B8
 	.sbss       start:0x806E0F50 end:0x806E0F58
 
+Game/DB/StatsTracker.cpp:
+	.text       start:0x800FDD54 end:0x80107114
+	.data       start:0x805065D8 end:0x80506E28
+	.sdata      start:0x806DC6B8 end:0x806DC6F0
+	.sbss       start:0x806E0F58 end:0x806E0F60
+	.sdata2     start:0x806E45B0 end:0x806E45D0
+
+Game/DB/SaveLoad.cpp:
+	.text       start:0x80107114 end:0x80109870
+	.data       start:0x80506E28 end:0x80506F48
+	.bss        start:0x8056E300 end:0x8056E310
+	.sdata      start:0x806DC6F0 end:0x806DC71C
+	.sbss       start:0x806E0F60 end:0x806E0F90
+	.sdata2     start:0x806E45D0 end:0x806E45E0
+
 Game/DB/UserOptions.cpp:
 	.text       start:0x80109890 end:0x80109CF0
 	.rodata     start:0x804DC630 end:0x804DC660
 	.sdata2     start:0x806E45E0 end:0x806E45E8
 
+Game/DB/Simmer.cpp:
+	.text       start:0x80109E30 end:0x8010A3F4
+
+Game/TrophyInfo.cpp:
+	.text       start:0x8010A3F4 end:0x8010A40C
+	.data       start:0x80506F48 end:0x80507140
+	.sdata      start:0x806DC720 end:0x806DC740
+
+Game/DB/tu_8010A40C.cpp:
+	.text       start:0x8010A40C end:0x80111634
+	.rodata     start:0x804DC660 end:0x804DCBF8
+	.data       start:0x80507140 end:0x80507BD8
+	.sdata      start:0x806DC740 end:0x806DC7B8
+	.sbss       start:0x806E0F90 end:0x806E0FA8
+
 Game/FixedUpdateTask.cpp:
-	.text       start:0x80111654 end:0x801123B4
+	.text       start:0x80111654 end:0x80112C70
 	.ctors      start:0x804DB5E0 end:0x804DB5E4
-	.data       start:0x80507C58 end:0x80507C6C
+	.data       start:0x80507BD8 end:0x80507EA8
+	.bss        start:0x8056E350 end:0x8056E3D0
+	.sdata      start:0x806DC7B8 end:0x806DC7C0
+	.sbss       start:0x806E0FA8 end:0x806E0FB0
+	.sdata2     start:0x806E45E8 end:0x806E45F8
 
 Game/Task/WorldUpdateTask.cpp:
 	.text       start:0x80112C70 end:0x80112C7C
@@ -542,14 +651,24 @@ Game/Task/EndFrameTask.cpp:
 	.text       start:0x80112C7C end:0x80112DEC
 	.data       start:0x80507EC0 end:0x80507EE0
 
-unclassified/tu_80112E0C.cpp:
-	.text       start:0x80112E0C end:0x80114458
+Game/BeginFrameTask.cpp:
+	.text       start:0x80112E0C end:0x80114614
+	.ctors      start:0x804DB5E8 end:0x804DB5EC
+	.data       start:0x80507EE0 end:0x80507F80
+	.bss        start:0x8056E3D0 end:0x8056E400
+	.sdata      start:0x806DC7C8 end:0x806DC7D8
+	.sbss       start:0x806E0FB8 end:0x806E0FF0
+	.sdata2     start:0x806E45F8 end:0x806E4648
 
 Game/FrontEndTask.cpp:
 	.text       start:0x80114614 end:0x80114FE0
 	.data       start:0x80507FD0 end:0x80507FF0
 	.sbss       start:0x806E0FF0 end:0x806E0FFC
 	.sdata2     start:0x806E4648 end:0x806E464C
+
+Game/ComUpdateTask.cpp:
+	.text       start:0x80115000 end:0x80115020
+	.data       start:0x80507FF0 end:0x80508038
 
 Game/Task/NetworkUpdateTask.cpp:
 	.text       start:0x80115020 end:0x80115118
@@ -562,6 +681,11 @@ Game/Task/PlatPadUpdateTask.cpp:
 Game/Task/GameRenderTask.cpp:
 	.text       start:0x80115128 end:0x80115EC4
 	.data       start:0x80508128 end:0x80508148
+	.sbss       start:0x806E1010 end:0x806E1014
+
+Game/Task/MovieRenderTask.cpp:
+	.text       start:0x80115EE4 end:0x80115F10
+	.data       start:0x80508148 end:0x80508170
 
 Game/Task/DispatchEventsTask.cpp:
 	.text       start:0x80115F10 end:0x80116028
@@ -569,17 +693,28 @@ Game/Task/DispatchEventsTask.cpp:
 	.sbss       start:0x806E1030 end:0x806E1034
 
 Game/Task/TransitionTask.cpp:
-	.text       start:0x80116028 end:0x80116740
+	.text       start:0x80116028 end:0x80116750
 	.ctors      start:0x804DB5F4 end:0x804DB5F8
+	.data       start:0x80508198 end:0x805081C0
 	.bss        start:0x8056E400 end:0x8056E420
 	.sdata2     start:0x806E46A0 end:0x806E46A4
 
 Game/Task/LoadingTask.cpp:
-	.text       start:0x80116750 end:0x8011697C
+	.text       start:0x80116750 end:0x80116988
 	.ctors      start:0x804DB5F8 end:0x804DB5FC
-	.data       start:0x805081C0 end:0x805081D4
+	.data       start:0x805081C0 end:0x805081E4
 	.bss        start:0x8056E420 end:0x8056E444
 	.sdata2     start:0x806E46A8 end:0x806E46AC
+
+Game/AsyncLoading.cpp:
+	.text       start:0x80116988 end:0x8011BD0C
+	.ctors      start:0x804DB5FC end:0x804DB600
+	.rodata     start:0x804DCBF8 end:0x804DCC30
+	.data       start:0x805081E4 end:0x80509528
+	.bss        start:0x8056E448 end:0x8056E548
+	.sdata      start:0x806DC7F8 end:0x806DC858
+	.sbss       start:0x806E1038 end:0x806E1070
+	.sdata2     start:0x806E46B0 end:0x806E46E0
 
 Game/ResetTask.cpp:
 	.text       start:0x8011BD0C end:0x8011C0AC
@@ -589,14 +724,79 @@ Game/ResetTask.cpp:
 	.sbss       start:0x806E1070 end:0x806E1088
 	.sdata2     start:0x806E46E0 end:0x806E46F8
 
+Game/main.cpp:
+	.text       start:0x8011C19C end:0x8011E384
+	.ctors      start:0x804DB604 end:0x804DB608
+	.data       start:0x8050953C end:0x80509780
+	.bss        start:0x8056E570 end:0x8056FA30
+	.sdata      start:0x806DC860 end:0x806DC888
+	.sbss       start:0x806E1088 end:0x806E10E8
+	.sdata2     start:0x806E46F8 end:0x806E4720
+
 Game/NetworkSession.cpp:
 	.text       start:0x8011E384 end:0x801246E4
 	.ctors      start:0x804DB608 end:0x804DB60C
 	.data       start:0x80509780 end:0x8050A938
 	.bss        start:0x8056FA30 end:0x8056FA68
-	.sdata      start:0x806DC888 end:0x806DC8B0
-	.sbss       start:0x806E10D0 end:0x806E1100
+	.sdata      start:0x806DC888 end:0x806DC8C0
+	.sbss       start:0x806E10E8 end:0x806E1100
 	.sdata2     start:0x806E4720 end:0x806E472C
+
+Game/NetworkSocket_801246E4.cpp:
+	.text       start:0x801246E4 end:0x80125254
+	.ctors      start:0x804DB60C end:0x804DB610
+	.data       start:0x8050A938 end:0x8050AC20
+	.bss        start:0x8056FA68 end:0x8056FAA0
+	.sdata      start:0x806DC8C0 end:0x806DC8D8
+	.sbss       start:0x806E1100 end:0x806E1108
+
+Game/NetworkMessages.cpp:
+	.text       start:0x80125254 end:0x801268E8
+	.ctors      start:0x804DB610 end:0x804DB614
+	.data       start:0x8050AC20 end:0x8050AD68
+	.sbss       start:0x806E1108 end:0x806E1160
+
+Game/NetTournManager.cpp:
+	.text       start:0x801268E8 end:0x8012A2F0
+	.ctors      start:0x804DB614 end:0x804DB618
+	.data       start:0x8050AD68 end:0x8050B750
+	.bss        start:0x8056FAA0 end:0x8056FB20
+	.sdata      start:0x806DC8D8 end:0x806DC8E8
+	.sbss       start:0x806E1160 end:0x806E1170
+	.sdata2     start:0x806E4730 end:0x806E4750
+
+Game/NetworkDraft.cpp:
+	.text       start:0x8012A2F0 end:0x8012CE20
+	.ctors      start:0x804DB618 end:0x804DB61C
+	.data       start:0x8050B750 end:0x8050BBC8
+	.bss        start:0x8056FB20 end:0x8056FBA0
+	.sdata      start:0x806DC8F0 end:0x806DC900
+	.sbss       start:0x806E1170 end:0x806E1178
+	.sdata2     start:0x806E4750 end:0x806E4758
+
+Game/NetworkStats.cpp:
+	.text       start:0x8012CE20 end:0x8012F33C
+	.ctors      start:0x804DB61C end:0x804DB620
+	.data       start:0x8050BBC8 end:0x8050C468
+	.bss        start:0x8056FBA0 end:0x8056FC20
+	.sdata      start:0x806DC900 end:0x806DC910
+
+Game/NetworkStatsManager.cpp:
+	.text       start:0x8012F33C end:0x80133634
+	.ctors      start:0x804DB620 end:0x804DB624
+	.data       start:0x8050C468 end:0x8050CD58
+	.bss        start:0x8056FC20 end:0x8056FC60
+	.sdata      start:0x806DC910 end:0x806DC920
+	.sbss       start:0x806E1178 end:0x806E1190
+	.sdata2     start:0x806E4758 end:0x806E4760
+
+Game/NetworkLobby.cpp:
+	.text       start:0x80133634 end:0x801360A4
+	.ctors      start:0x804DB624 end:0x804DB628
+	.data       start:0x8050CD58 end:0x8050D6B0
+	.bss        start:0x8056FC60 end:0x8056FC80
+	.sdata      start:0x806DC920 end:0x806DC948
+	.sdata2     start:0x806E4760 end:0x806E4778
 
 unclassified/tu_80139B18.cpp:
 	.text       start:0x80139B18 end:0x8013A25C
@@ -1068,6 +1268,18 @@ Game/FE/feButtonComponent.cpp:
 	.data       start:0x8051C8E0 end:0x8051C928
 	.sdata      start:0x806DE000 end:0x806DE038
 	.sdata2     start:0x806E58E0 end:0x806E5904
+
+Game/SH/SHChooseSides.cpp:
+	.text       start:0x8021B1EC end:0x8021F0F4
+	.data       start:0x8051C928 end:0x8051CB80
+	.sdata      start:0x806DE038 end:0x806DE0D8
+	.sdata2     start:0x806E5904 end:0x806E5910
+
+unclassified/tu_8022EF84.cpp:
+	.text       start:0x8022EF84 end:0x8022F710
+	.data       start:0x8051D5B0 end:0x8051D650
+	.sdata      start:0x806DE268 end:0x806DE288
+	.sdata2     start:0x806E5958 end:0x806E5960
 
 Game/SH/SHSceneBase.cpp:
 	.text       start:0x80269078 end:0x8026B10C
