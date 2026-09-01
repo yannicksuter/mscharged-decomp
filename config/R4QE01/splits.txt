@@ -2869,6 +2869,11 @@ MetroTRK/CircleBuffer.c:
 MetroTRK/MWCriticalSection_gc.c:
 	.text       start:0x8037CAE0 end:0x8037CB38
 
+MSL/math_api.c:
+	extab       start:0x80006610 end:0x80006628
+	extabindex  start:0x80006CC8 end:0x80006CEC
+	.text       start:0x803812B8 end:0x803813B4
+
 MSL/qsort.c:
 	extab       start:0x80006690 end:0x80006698
 	extabindex  start:0x80006D88 end:0x80006D94
@@ -2921,14 +2926,28 @@ MSL/e_acos.c:
 	.text       start:0x80389A40 end:0x80389D04
 	.sdata2     start:0x806E6EC0 end:0x806E6F48
 
+MSL/e_atan2.c:
+	.text       start:0x80389D04 end:0x80389F74
+	.sdata2     start:0x806E6F48 end:0x806E6FA0
+
 MSL/e_pow.c:
 	.text       start:0x80389F74 end:0x8038A7BC
 	.rodata     start:0x804EC2D8 end:0x804EC308
 	.sdata2     start:0x806E6FA0 end:0x806E70B0
 
+MSL/e_rem_pio2.c:
+	.text       start:0x8038A7BC end:0x8038AB54
+	.rodata     start:0x804EC308 end:0x804EC490
+	.sdata2     start:0x806E70B0 end:0x806E7108
+
 MSL/k_cos.c:
 	.text       start:0x8038AB54 end:0x8038AC64
 	.sdata2     start:0x806E7108 end:0x806E7150
+
+MSL/k_rem_pio2.c:
+	.text       start:0x8038AC64 end:0x8038C370
+	.rodata     start:0x804EC490 end:0x804EC4E0
+	.sdata2     start:0x806E7150 end:0x806E7190
 
 MSL/k_sin.c:
 	.text       start:0x8038C370 end:0x8038C430
@@ -2962,6 +2981,10 @@ MSL/s_floor.c:
 MSL/s_frexp.c:
 	.text       start:0x8038CC4C end:0x8038CCD4
 	.sdata2     start:0x806E7250 end:0x806E7258
+
+MSL/s_ldexp.c:
+	.text       start:0x8038CCD4 end:0x8038CE40
+	.sdata2     start:0x806E7258 end:0x806E7280
 
 MSL/s_sin.c:
 	.text       start:0x8038CE40 end:0x8038CF18
