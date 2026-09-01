@@ -16,6 +16,7 @@ public:
     void SetVelocity(const nlVector3& velocity);
     void SetPoseAccumulator(const cPoseAccumulator& pose);
     void SetAnimController(const cPN_SAnimController& animController);
+    void Die();
     const nlVector3& GetPosition() const
     {
         return m_vPosition;
@@ -35,7 +36,8 @@ public:
     /* 0x39 */ u8 unknown_0x39[0x03];
     /* 0x3C */ float m_fGround;
     /* 0x40 */ u16 m_aFacing;
-    /* 0x42 */ u8 unknown_0x42[0x02];
+    /* 0x42 */ bool m_bVisible;
+    /* 0x43 */ u8 unknown_0x43;
     /* 0x44 */ nlVector3 m_vPosition;
     /* 0x50 */ nlVector3 m_vDirection;
     /* 0x5C */ nlVector3 m_vVelocity;

@@ -7,6 +7,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "types.h"
+#include "unclassified/tu_801B6188.h"
 
 extern "C" void* memcpy(void* dst, const void* src, unsigned long size);
 
@@ -34,8 +35,6 @@ extern "C" const char* fn_802C2D20(const char*, const char*);
 extern "C" int fn_802C2BE8(const char*, int);
 extern "C" int fn_801CBED0(const char*);
 extern "C" int fn_801CBEF8(const char*);
-extern "C" const char* fn_801B6188(int);
-extern "C" int fn_801B61B8(int);
 extern "C" void nlBreak__Fv();
 extern "C" void* fn_8010D6F8(void*, void*);
 extern "C" void* fn_8010D794(void*, void*);

@@ -33,6 +33,7 @@
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
 #include "unclassified/tu_801AE530.h"
+#include "unclassified/tu_801B6188.h"
 
 extern PowerupBase* g_pPowerups[];
 
@@ -168,9 +169,7 @@ extern "C" void fn_801742B8(void* object, int deleteObject);
 extern "C" void fn_800A62E8(cTeam* team, int deleteObject);
 extern "C" void fn_8031A02C(ScriptQuestionCache* cache);
 extern "C" void fn_800ED92C(unsigned long soundID);
-extern "C" bool fn_801B6278(int stadium);
-extern "C" void* fn_801B6398(int stadium);
-extern "C" void fn_800EC2A4(void* object, cGame* game);
+extern "C" void fn_800EC2A4(unsigned long soundID, cGame* game);
 
 extern UnidentifiedGameStatic lbl_8056B9A0;
 extern cPlayer* lbl_806E0C9C;
@@ -894,9 +893,9 @@ void cGame::ChangeGameState(int state)
 
         if (m_eGameState == 5)
         {
-            void* object = fn_801B6398(
+            unsigned long soundID = fn_801B6398(
                 GameInfoManager::Instance()->GetStadium());
-            fn_800EC2A4(object, this);
+            fn_800EC2A4(soundID, this);
         }
 
         InitGameState(state);

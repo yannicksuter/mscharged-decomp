@@ -24,10 +24,6 @@ extern "C" void fn_801E3B60(UnidentifiedTextFader* fader, const char* text);
 extern "C" void fn_801E3DB4(UnidentifiedTextFader* fader, float dt);
 extern "C" void fn_801E4460(UnidentifiedTextFader* fader, TLInstance* instance);
 
-// StrikerTimes texture streamer owned by the 0x801BFxxx translation unit.
-extern "C" void fn_801BF1AC(UnidentifiedStrikerTimesImage* image, const char* name, int value);
-extern "C" bool fn_801BF218(UnidentifiedStrikerTimesImage* image, bool value);
-
 // Scroll widget owned by the 0x8022Fxxx/0x80230xxx translation units.
 extern "C" void fn_8022F858(UnidentifiedScrollWidget* widget);
 extern "C" bool fn_8022FD80(UnidentifiedScrollWidget* widget, int direction, int value);
@@ -339,8 +335,8 @@ void UnidentifiedSHSceneBase::SceneCreated()
         unsigned long itemHash = nlStringLowerHash("logo");
         TLInstance* logo = CastFound<TLInstance>(fn_8030677C(mPresentation, nlStringLowerHash("logo"),
             nlStringLowerHash("Layer"), itemHash, logoHash, 0, 0));
-        mUnidentified380.mUnidentified08 = logo;
-        fn_801BF1AC(&mUnidentified380, buffer, 0);
+        mUnidentified380.mImageInstance = (TLImageInstance*)logo;
+        mUnidentified380.QueueLoad(buffer, false);
     }
 
     mPresentation->SetActiveSlide("in", true);
@@ -353,7 +349,7 @@ void UnidentifiedSHSceneBase::Update(float dt)
         return;
     if (!mUnidentified109)
     {
-        mUnidentified109 = fn_801BF218(&mUnidentified380, true);
+        mUnidentified109 = mUnidentified380.Update(true);
         return;
     }
     BaseSceneHandler::Update(dt);
@@ -361,8 +357,8 @@ void UnidentifiedSHSceneBase::Update(float dt)
     {
         if (!mUnidentified107)
             fn_8026A63C();
-        fn_801BF218(&mUnidentified240, true);
-        fn_801BF218(&mUnidentified2E0, true);
+        mUnidentified240.Update(true);
+        mUnidentified2E0.Update(true);
     }
     if (!mUnidentified108)
     {
@@ -538,16 +534,16 @@ void UnidentifiedSHSceneBase::fn_8026A63C()
         nlStringLowerHash("00_dummy_texture"), 0, 0, 0);
     if (storyTexture == 0)
         storyTexture = &lbl_80580248;
-    mUnidentified240.mUnidentified08 = storyTexture;
+    mUnidentified240.mImageInstance = (TLImageInstance*)storyTexture;
 
     TLInstance* headlineTexture = FEFinder<TLInstance, 2>::Find(mPresentation, nlStringLowerHash("headline pic"), nlStringLowerHash("Layer"),
         nlStringLowerHash("00_dummy_texture"), 0, 0, 0);
     if (headlineTexture == 0)
         headlineTexture = &lbl_80580248;
-    mUnidentified2E0.mUnidentified08 = headlineTexture;
+    mUnidentified2E0.mImageInstance = (TLImageInstance*)headlineTexture;
 
-    fn_801BF1AC(&mUnidentified2E0, mUnidentifiedB1, 0);
-    fn_801BF1AC(&mUnidentified240, mUnidentifiedB1, 0);
+    mUnidentified2E0.QueueLoad(mUnidentifiedB1, false);
+    mUnidentified240.QueueLoad(mUnidentifiedB1, false);
     mUnidentified107 = true;
 }
 

@@ -37,6 +37,7 @@
 #include "NL/utility.h"
 #include "unclassified/tu_801A0E64.h"
 #include "unclassified/tu_801A5F10.h"
+#include "unclassified/tu_801B6188.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/ShootToScoreMeter.h"
 #include "math.h"
@@ -172,7 +173,6 @@ extern "C" void fn_8003B54C(cFielder* pFielder);
 extern "C" void fn_8003B020(cFielder* pFielder);
 extern "C" void fn_8003B0D8(cFielder* pFielder);
 extern "C" bool fn_8003E74C(cFielder* pFielder);
-extern "C" bool fn_801B6278(int nStadium);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" float fn_800E02B8(cTeam* pTeam);
 extern "C" bool fn_8003E99C(cFielder* pFielder);

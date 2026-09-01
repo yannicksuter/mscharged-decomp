@@ -5,6 +5,7 @@
 #include "Game/AI/FielderActions.h"
 #include "Game/AI/GoalieLooseBall.h"
 #include "Game/Ball.h"
+#include "Game/CharacterTriggers.h"
 #include "Game/Field.h"
 #include "Game/MathHelpers.h"
 #include "Game/Net.h"
@@ -15,7 +16,6 @@
 
 #include <math.h>
 
-extern void KillDaze(cPlayer* player);
 extern "C" bool fn_800EBBFC(
     int nParam0, unsigned int nParam1, void* pParam2, void* pParam3);
 extern "C" void fn_8005D948(

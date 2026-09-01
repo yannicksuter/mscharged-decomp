@@ -7,7 +7,9 @@
 struct Character;
 struct Model;
 struct PoseNode;
+class cCharacter;
 class cPoseAccumulator;
+class cPN_SAnimController;
 class SkinAnimatedMovableNPC;
 
 enum eCharacterRenderPass
@@ -24,7 +26,7 @@ public:
     ~DrawableCharacter();
 
     void Free();
-    void* GetAnimController() const;
+    cPN_SAnimController& GetAnimController() const;
     void Grab(Character&);
     static void HeadTrackCallback(u32, u32, cPoseAccumulator*, u32, int);
     void BuildNodeMatrices(cPoseAccumulator*);
@@ -40,7 +42,7 @@ public:
 
     static void RenderOnlyOneCharacter(Character&, bool);
     static void RenderAllCharacters();
-    static Character* OnlyRenderingOneCharacter();
+    static cCharacter* OnlyRenderingOneCharacter();
 
     void ApplyMaterialEffects(
         const Character&, Model*, eCharacterRenderPass, bool*);

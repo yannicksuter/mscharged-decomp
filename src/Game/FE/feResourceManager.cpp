@@ -10,6 +10,7 @@
 #include "NL/nlDebug.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/gl/glTexture.h"
 
 struct PendingResourceLoad
 {
@@ -42,7 +43,6 @@ extern void nlPrintf(const char* format, ...);
 
 extern "C" ResourceInterface_802CC094* fn_802CC094();
 extern "C" void fn_802C8284(unsigned long texture);
-extern "C" void* fn_802CDC8C(unsigned long texture, void* buffer, unsigned long size, ResourceInterface_802CC094* resourceInterface);
 extern "C" void fn_802C8288(void* texture);
 extern "C" unsigned int fn_802A95C4(AVLTreeNode* node, unsigned int count);
 extern "C" void fn_8030009C(FETextureResource* texture, const unsigned long* handle);
@@ -134,7 +134,7 @@ void FEResourceManager::fn_802FC9C4(void* buffer, unsigned long uReadSize, unsig
     s_pResourceLoadBuffer = (unsigned char*)buffer;
     ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
     fn_802C8284(pTextureResource->m_hashID);
-    void* texture = fn_802CDC8C(pTextureResource->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
+    void* texture = glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
     fn_802C8288(texture);
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;
@@ -291,7 +291,7 @@ void FEResourceManager::LoadPermanentTextures()
                 s_pPermanentBundle->ReadFileByIndex(i, s_pResourceLoadBuffer, uFileLength);
                 ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
                 fn_802C8284(pTextureResource->m_hashID);
-                void* texture = fn_802CDC8C(pTextureResource->m_hashID, s_pResourceLoadBuffer, uFileLength, resourceInterface);
+                void* texture = glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uFileLength, resourceInterface);
                 fn_802C8288(texture);
                 delete[] s_pResourceLoadBuffer;
                 s_pResourceLoadBuffer = 0;
@@ -424,7 +424,7 @@ void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSi
     FETextureResource* pHandle = (FETextureResource*)uParam;
     ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
     fn_802C8284(pHandle->m_hashID);
-    void* texture = fn_802CDC8C(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
+    void* texture = glTextureAdd(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
     fn_802C8288(texture);
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;

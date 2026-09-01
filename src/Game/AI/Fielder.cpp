@@ -11,6 +11,7 @@
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Team.h"
 #include "math.h"
+#include "unclassified/tu_801B6188.h"
 
 struct UnidentifiedFielderInput
 {
@@ -43,7 +44,6 @@ extern "C" void fn_8001DCCC(
     cFielder* pFielder, unsigned short aParam, bool bParam);
 extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
 extern "C" void fn_800ED92C(unsigned long soundID);
-extern "C" bool fn_801B6278(int stadium);
 extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 extern "C" void fn_800BED24(
     UnidentifiedPadAction* pAction, unsigned short* pParam);

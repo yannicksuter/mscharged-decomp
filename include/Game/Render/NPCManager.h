@@ -17,7 +17,7 @@ struct Object_8017FFF4;
 struct State_8019A710;
 struct State_80199E84;
 struct KoopaShellObject;
-struct UnidentifiedObject_801B298C;
+struct ThwompObject;
 struct UnidentifiedObject_801B535C;
 
 struct NPCTemplate
@@ -76,7 +76,7 @@ public:
     void fn_801AA348();
     HammerObject* fn_801AA3AC(int nIndex);
     void fn_801AA4C0();
-    UnidentifiedObject_801B298C* fn_801AA528(int nIndex);
+    ThwompObject* fn_801AA528(int nIndex);
     void fn_801AA9D8();
     bool fn_801AABB0();
     void fn_801AAD0C();
@@ -130,7 +130,7 @@ public:
     /* 0x54 */ unsigned int mUnidentified054;
     /* 0x58 */ State_8019A710* mUnidentified058[6];
     /* 0x70 */ HammerObject* mUnidentified070[15];
-    /* 0xAC */ UnidentifiedObject_801B298C* mUnidentified0AC[8];
+    /* 0xAC */ ThwompObject* mUnidentified0AC[8];
     /* 0xCC */ SkinAnimatedNPC* mUnidentified0CC[3];
     /* 0xD8 */ UnidentifiedSkinAnimatedNPC_80199880* mUnidentified0D8;
 }; // total size: 0xDC
