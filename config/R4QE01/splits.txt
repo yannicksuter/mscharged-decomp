@@ -1211,25 +1211,59 @@ Game/Render/NPCManager.cpp:
 	.sdata2     start:0x806E5210 end:0x806E5218
 
 unclassified/tu_801AC30C.cpp:
-	.text       start:0x801AC30C end:0x801AD0EC
+	.text       start:0x801AC30C end:0x801AD15C
 	.ctors      start:0x804DB724 end:0x804DB728
 	.bss        start:0x80573BE0 end:0x80573C08
 	.sdata      start:0x806DD008 end:0x806DD010
 	.sbss       start:0x806E1610 end:0x806E1618
 	.sdata2     start:0x806E5218 end:0x806E5248
 
+unclassified/tu_801AD15C.cpp:
+	.text       start:0x801AD15C end:0x801ADFE8
+	.data       start:0x80514430 end:0x80514480
+	.bss        start:0x80573C08 end:0x80574110
+	.sdata      start:0x806DD010 end:0x806DD030
+	.sbss       start:0x806E1618 end:0x806E1620
+	.sdata2     start:0x806E5248 end:0x806E5280
+
 Game/Effects/PhotoFlashEffect.cpp:
 	.text       start:0x801AE008 end:0x801AE0C4
 	.sdata      start:0x806DD030 end:0x806DD038
 	.sdata2     start:0x806E5280 end:0x806E528C
 
+unclassified/tu_801AE0C4.cpp:
+	.text       start:0x801AE0C4 end:0x801AE510
+	.data       start:0x80514480 end:0x805144A8
+	.sdata      start:0x806DD038 end:0x806DD040
+	.sbss       start:0x806E1620 end:0x806E1628
+	.sdata2     start:0x806E5290 end:0x806E52A0
+
+unclassified/tu_801AE530.cpp:
+	.text       start:0x801AE530 end:0x801AF510
+	.ctors      start:0x804DB730 end:0x804DB734
+	.rodata     start:0x804DCF08 end:0x804DCF68
+	.data       start:0x805144A8 end:0x805144F0
+	.bss        start:0x80574110 end:0x80574128
+	.sdata      start:0x806DD040 end:0x806DD0A0
+	.sbss       start:0x806E1628 end:0x806E1650
+	.sdata2     start:0x806E52A0 end:0x806E52C0
+
 Game/Render/ShootToScoreArrow.cpp:
 	.text       start:0x801AF510 end:0x801AF8EC
 	.ctors      start:0x804DB734 end:0x804DB738
-	.data       start:0x805144F0 end:0x80514524
+	.data       start:0x805144F0 end:0x80514528
 	.bss        start:0x80574128 end:0x80574138
 	.sbss       start:0x806E1650 end:0x806E1660
 	.sdata2     start:0x806E52C0 end:0x806E52D8
+
+Game/Render/ShootToScoreMeter.cpp:
+	.text       start:0x801AF8EC end:0x801B11D8
+	.ctors      start:0x804DB738 end:0x804DB73C
+	.data       start:0x80514528 end:0x805145E8
+	.bss        start:0x80574138 end:0x805741B8
+	.sdata      start:0x806DD0A0 end:0x806DD0E8
+	.sbss       start:0x806E1660 end:0x806E1678
+	.sdata2     start:0x806E52D8 end:0x806E5328
 
 unclassified/tu_801B369C.cpp:
 	.text       start:0x801B369C end:0x801B43F8

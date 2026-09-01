@@ -38,7 +38,7 @@ public:
     /* 0x64 */ glModel* m_pModel;
     /* 0x68 */ u8 mUnidentified68[0x08];
     /* 0x70 */ unsigned long m_uObjectFlags;
-    /* 0x74 */ char _074[4];
+    /* 0x74 */ int mUnidentified074;
     /* 0x78 */ u32 renderFlags;
     /* 0x7C */ nlQuaternion orientation;
     /* 0x8C */ nlVector3 translation;

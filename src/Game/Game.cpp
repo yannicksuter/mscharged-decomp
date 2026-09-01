@@ -32,6 +32,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
+#include "unclassified/tu_801AE530.h"
 
 extern PowerupBase* g_pPowerups[];
 
@@ -74,12 +75,6 @@ struct UnidentifiedNetworkManager
 };
 
 struct UnidentifiedOnlineState
-{
-    u8 mUnidentified000[4];
-    bool mUnidentified004;
-};
-
-struct UnidentifiedSlowdownState
 {
     u8 mUnidentified000[4];
     bool mUnidentified004;
@@ -168,11 +163,8 @@ extern "C" cGame* fn_800570B0(
     cGame* game, void* param1, int param2, bool param3);
 extern "C" cTeam* fn_800A5D4C(cTeam* team, int side);
 extern "C" void* fn_801740D0(void* memory);
-extern "C" UnidentifiedSlowdownState* fn_801AE530(void* memory);
 extern "C" void fn_80115E60(bool param1);
 extern "C" void fn_801742B8(void* object, int deleteObject);
-extern "C" void fn_801AE6DC(
-    UnidentifiedSlowdownState* object, int deleteObject);
 extern "C" void fn_800A62E8(cTeam* team, int deleteObject);
 extern "C" void fn_8031A02C(ScriptQuestionCache* cache);
 extern "C" void fn_800ED92C(unsigned long soundID);
@@ -189,7 +181,6 @@ extern UnidentifiedOnlineState* lbl_806E2164;
 extern BaseGameSceneManager* lbl_806E1860;
 extern void* lbl_806E12C8;
 extern void* lbl_806E2168;
-extern UnidentifiedSlowdownState* lbl_806E1628;
 extern AISandbox* lbl_806E0B88;
 extern UnidentifiedRegistrationList lbl_805713E8;
 extern UnidentifiedRegistrationList lbl_80571820;
@@ -282,12 +273,12 @@ void fn_80056CF4(void* param1, int param2, bool param3)
     }
     if (lbl_806E1628 == 0)
     {
-        void* memory = nlMalloc(0x28, 8, false);
-        if (memory != 0)
-        {
-            memory = fn_801AE530(memory);
-        }
-        lbl_806E1628 = static_cast<UnidentifiedSlowdownState*>(memory);
+        UnidentifiedNumberDisplay_801AE530* numberDisplay
+            = static_cast<UnidentifiedNumberDisplay_801AE530*>(
+                nlMalloc(0x28, 8, false));
+        numberDisplay
+            = new (numberDisplay) UnidentifiedNumberDisplay_801AE530();
+        lbl_806E1628 = numberDisplay;
     }
 
     FormationManager::LoadFormationSets();
@@ -327,7 +318,7 @@ void DestroyGame()
     }
     if (lbl_806E1628 != 0)
     {
-        fn_801AE6DC(lbl_806E1628, 1);
+        delete lbl_806E1628;
         lbl_806E1628 = 0;
     }
 
