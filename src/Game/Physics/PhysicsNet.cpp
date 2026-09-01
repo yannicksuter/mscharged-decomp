@@ -36,8 +36,9 @@ float PhysicsNet::sfWallSoftness = 0.01f;
 
 PhysicsNet::PhysicsNet(CollisionSpace* space, bool positive_x)
 {
-    float goalPostRadius;
     float physicsNetHeight;
+    float goalPostRadius;
+    float sideSign;
     float netHeight;
     float netWidth;
     float goalLineX;
@@ -74,7 +75,14 @@ PhysicsNet::PhysicsNet(CollisionSpace* space, bool positive_x)
     netWidth = cNet::m_fNetWidth;
     goalLineX = cField::GetGoalLineX((unsigned int)1);
     goalPostRadius = cNet::m_fNetPostRadius;
-    const float sideSign = positive_x ? 1.0f : -1.0f;
+    if (positive_x)
+    {
+        sideSign = 1.0f;
+    }
+    else
+    {
+        sideSign = -1.0f;
+    }
     zero = 0.0f;
 
     if (NetMesh::s_bAnimatedNetMeshEnabled)

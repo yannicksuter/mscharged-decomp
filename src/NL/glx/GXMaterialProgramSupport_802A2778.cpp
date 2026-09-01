@@ -69,7 +69,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A53B4>::Draw(
     values[0] = value;
     values[1] = value;
     values[2] = value;
-    unsigned char colour = makeColor(values[0], values[1], values[2], values[3]).r;
+    const unsigned char colour = makeColor(values[0], values[1], values[2], values[3]).r;
 
     if (packet->indexBuffer != 0)
         static_cast<GXMaterialProgram_802A53B4*>(this)->DrawIndexed(

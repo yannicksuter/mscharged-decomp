@@ -11,6 +11,23 @@
 
 class TextureManager_802CDF0C;
 
+enum GXTexWrapMode
+{
+    GX_CLAMP,
+    GX_REPEAT,
+    GX_MIRROR,
+    GX_MAX_TEXWRAPMODE
+};
+
+enum eGLTextureMode
+{
+    GLTM_WrapWrap = 0,
+    GLTM_WrapClamp = 1,
+    GLTM_ClampWrap = 2,
+    GLTM_ClampClamp = 3,
+    GLTM_Num = 4
+};
+
 extern "C"
 {
     MemoryAllocator* fn_802CC094();
@@ -41,7 +58,8 @@ extern "C"
     void GXInitTexObjLOD(void* object, int minFilter, int magFilter,
         float minLod, float maxLod, float lodBias, unsigned char biasClamp,
         unsigned char edgeLod, int maxAnisotropy);
-    void GXInitTexObjWrapMode(void* object, int wrapS, int wrapT);
+    void GXInitTexObjWrapMode(
+        void* object, GXTexWrapMode wrapS, GXTexWrapMode wrapT);
     void GXInitTexObjTlut(void* object, unsigned long tlutName);
     void GXLoadTlut(void* object, unsigned long tlutName);
     void GXLoadTexObj(void* object, unsigned long textureMap);
@@ -469,12 +487,13 @@ void glxInitTex()
 {
 }
 
-extern "C" void fn_8036BE88(int textureMap, void* textureData)
+extern "C" void fn_8036BE88(
+    int textureMap, UnidentifiedTextureState* textureState)
 {
-    UnidentifiedTextureState* textureState =
-        (UnidentifiedTextureState*)textureData;
     TextureManager_802CDF0C* textureManager;
     PlatTexture* pTex;
+    GXTexWrapMode mode[2];
+    eGLTextureMode tmode;
     static unsigned long missingTexture =
         glGetTexture("font/fixedWidthMedium");
 
@@ -497,13 +516,13 @@ extern "C" void fn_8036BE88(int textureMap, void* textureData)
         }
     }
 
-    unsigned char flags = textureState->flags;
-    bool wrapS = !(flags & 1);
-    bool wrapT = !(flags & 2);
+    tmode = (eGLTextureMode)(textureState->flags & 3);
+    mode[0] = (GXTexWrapMode)((tmode & 1) == 0);
+    mode[1] = (GXTexWrapMode)((tmode >> 1) != 1);
 
     unsigned long textureObject[8];
     memcpy(textureObject, pTex->m_TexObj, sizeof(textureObject));
-    GXInitTexObjWrapMode(textureObject, wrapS, wrapT);
+    GXInitTexObjWrapMode(textureObject, mode[0], mode[1]);
 
     if (pTex->m_nPaletteEntries != 0)
     {

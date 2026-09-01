@@ -113,12 +113,7 @@ int fn_802721BC()
 void fn_802721C4(int view, bool enabled)
 {
     GLView* v = sViews[view];
-    unsigned long target = 0;
-    if (enabled)
-    {
-        target = 8;
-    }
-    v->m_Target = target;
+    v->m_Target = enabled ? GLViewTarget_Mode8 : GLViewTarget_None;
 }
 
 GLView* fn_802721EC(int view)

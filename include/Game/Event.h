@@ -121,22 +121,22 @@ public:
             nlDLListIterator<Listener> iterator = mListeners.Begin();
             while (iterator.hasNext())
             {
-                UnidentifiedConnection* connection = &iterator.CurrentEntry()->entry;
-                Listener* listener = (Listener*)connection;
-                this->mCurrentConnection = connection;
+                Listener* listener = &*iterator;
+                ListenerEntry* currentEntry = iterator.CurrentEntry();
+                this->mCurrentConnection = listener;
 
-                if ((connection->mFlags >> 31) != 0)
+                if ((listener->mFlags >> 31) != 0)
                 {
                     listener->callback(data);
                     iterator = mListeners.Begin();
-                    iterator.m_Curr = (ListenerEntry*)((char*)connection - 8);
+                    iterator.m_Curr = currentEntry;
                 }
 
                 iterator.next();
-                if (((connection->mFlags >> 29) & 1) != 0)
+                if (((listener->mFlags >> 29) & 1) != 0)
                 {
                     ListenerEntry* entry = mListeners.Begin(
-                                                         (ListenerEntry*)((char*)connection - 8))
+                                                         (ListenerEntry*)((char*)listener - 8))
                                                .CurrentEntry();
                     nlDLRingRemove(&mListeners.m_Head, entry);
                     entry->~ListenerEntry();

@@ -24,12 +24,6 @@ extern "C"
 int lbl_806DF0B8 = 4;
 bool lbl_806DF0BC = true;
 
-const Mtx lbl_804E8850 = {
-    { 1.0f, 0.0f, 0.0f, 0.0f },
-    { 0.0f, 1.0f, 0.0f, 0.0f },
-    { 0.0f, 0.0f, 1.0f, 0.0f },
-};
-
 nlMatrix4 lbl_8057B370;
 void* lbl_806E1BC0;
 bool lbl_806E1BC4;
@@ -106,35 +100,24 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Prepare(
 
 static inline float WrapTextureOffset_802963B4(float value)
 {
-    int scaled = (int)(value * 1024.0f);
-    return (float)(scaled % 1024) * (1.0f / 1024.0f);
+    return (float)((int)(value * 1024.0f) % 1024) / 1024.0f;
 }
 
 static inline void LoadScrollingTextureMatrix_802963B4(
     unsigned int matrix, const nlVector2& speed)
 {
     float time = fn_80277DB0();
-    Mtx textureMatrix;
-    memcpy(textureMatrix, lbl_804E8850, sizeof(Mtx));
-    textureMatrix[0][3] = WrapTextureOffset_802963B4(time * speed.x);
-    textureMatrix[1][3] = WrapTextureOffset_802963B4(time * speed.y);
+    nlVector2 offset;
+    offset.x = WrapTextureOffset_802963B4(time * speed.x);
+    offset.y = WrapTextureOffset_802963B4(time * speed.y);
+    Mtx textureMatrix = {
+        { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f },
+    };
+    textureMatrix[0][3] = offset.x;
+    textureMatrix[1][3] = offset.y;
     GXLoadTexMtxImm(textureMatrix, matrix, GX_MTX3x4);
-}
-
-struct FloatColour_802963B4
-{
-    float c[4];
-};
-
-static inline GXColor ConvertColour_802963B4(
-    const FloatColour_802963B4& source)
-{
-    GXColor colour;
-    colour.r = (unsigned char)(source.c[0] * 255.0f);
-    colour.g = (unsigned char)(source.c[1] * 255.0f);
-    colour.b = (unsigned char)(source.c[2] * 255.0f);
-    colour.a = (unsigned char)(source.c[3] * 255.0f);
-    return colour;
 }
 
 template <>
@@ -145,32 +128,35 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Draw(
     static_cast<GXMaterialProgram_8029F5B0*>(this)->BindParameters(packet);
 
     const nlVector3& cameraPosition = cCameraManager::PeekCamera()->GetCameraPosition();
-    float reciprocal = 1.0f / *(float*)((unsigned char*)packet->unknown20 + 24);
     float scroll = *(float*)((unsigned char*)packet->unknown20 + 28);
+    float reciprocal = 1.0f / *(float*)((unsigned char*)packet->unknown20 + 24);
     Mtx cameraTextureMatrix;
-    cameraTextureMatrix[0][0] = reciprocal;
     cameraTextureMatrix[0][1] = 0.0f;
     cameraTextureMatrix[0][2] = 0.0f;
-    cameraTextureMatrix[0][3] = 0.5f - scroll * cameraPosition.x * reciprocal;
+    cameraTextureMatrix[0][3] = 0.0f;
     cameraTextureMatrix[1][0] = 0.0f;
-    cameraTextureMatrix[1][1] = reciprocal;
     cameraTextureMatrix[1][2] = 0.0f;
-    cameraTextureMatrix[1][3] = 0.5f - scroll * cameraPosition.y * reciprocal;
+    cameraTextureMatrix[1][3] = 0.0f;
     cameraTextureMatrix[2][0] = 0.0f;
     cameraTextureMatrix[2][1] = 0.0f;
-    cameraTextureMatrix[2][2] = 1.0f;
     cameraTextureMatrix[2][3] = 0.0f;
+    cameraTextureMatrix[0][0] = reciprocal;
+    cameraTextureMatrix[1][1] = reciprocal;
+    cameraTextureMatrix[2][2] = 1.0f;
+    cameraTextureMatrix[0][3] +=
+        0.5f - scroll * (cameraPosition.x * reciprocal);
+    cameraTextureMatrix[1][3] +=
+        0.5f - scroll * (cameraPosition.y * reciprocal);
     GXLoadTexMtxImm(cameraTextureMatrix, 33, GX_MTX3x4);
 
     nlVector2 parameterSpeed;
     parameterSpeed.x = *(float*)((unsigned char*)packet->unknown20 + 44);
     parameterSpeed.y = *(float*)((unsigned char*)packet->unknown20 + 48);
-    nlVector2 speed;
-    nlVec2Set(speed, 0.0f, 0.0f);
+    nlVector2 speed = { 0.0f, 0.0f };
     if ((unsigned char*)packet->unknown20 + 52 != 0)
         speed = parameterSpeed;
 
-    LoadScrollingTextureMatrix_802963B4(30, speed);
+    LoadScrollingTextureMatrix_802963B4(30, parameterSpeed);
     LoadScrollingTextureMatrix_802963B4(36, speed);
 
     if (*(int*)((unsigned char*)packet->unknown20 + 40) == 1)
@@ -218,9 +204,10 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Draw(
     }
 
     float value = *(float*)((unsigned char*)packet->unknown20 + 32);
-    FloatColour_802963B4 colour = { { value, value, value, value } };
-    GXColor gxColour = ConvertColour_802963B4(colour);
-    GXSetTevKColor(GX_KCOLOR0, gxColour);
+    nlFloatColour colour = { { value, value, value, value } };
+    nlColour gxColour;
+    ConvertColour(gxColour, colour);
+    GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&gxColour);
 
     if (packet->displayList != 0)
         GXCallDisplayList(packet->displayList->list, packet->displayList->size);

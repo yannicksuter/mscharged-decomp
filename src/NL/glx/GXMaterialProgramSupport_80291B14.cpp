@@ -163,22 +163,6 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029C2F8>::Prepare(
     fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
 }
 
-struct FloatColour_80291B14
-{
-    float c[4];
-};
-
-static inline GXColor ConvertColour_80291B14(
-    const FloatColour_80291B14& source)
-{
-    GXColor colour;
-    colour.r = (unsigned char)(source.c[0] * 255.0f);
-    colour.g = (unsigned char)(source.c[1] * 255.0f);
-    colour.b = (unsigned char)(source.c[2] * 255.0f);
-    colour.a = (unsigned char)(source.c[3] * 255.0f);
-    return colour;
-}
-
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029C2F8>::Draw(
     const glModelPacket* packet)
@@ -186,11 +170,12 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029C2F8>::Draw(
     if (!lbl_806DF070)
         return;
 
-    unsigned char* parameters = (unsigned char*)packet->unknown20;
-    float alpha = 1.0f - *(float*)(parameters + 32);
+    float alpha =
+        1.0f - *(float*)((unsigned char*)packet->unknown20 + 32);
 
     int mode;
-    if (*(int*)(parameters + 36) == 0 || fn_801820FC() == 0)
+    if (*(int*)((unsigned char*)packet->unknown20 + 36) == 0
+        || fn_801820FC() == 0)
     {
         mode = 0;
     }
@@ -207,21 +192,24 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029C2F8>::Draw(
         fn_80291B14(mode, static_cast<GXMaterialProgram_8029C2F8*>(this));
     }
 
-    FloatColour_80291B14 colour0 = { { alpha, alpha, alpha, alpha } };
-    GXColor gxColour0 = ConvertColour_80291B14(colour0);
-    GXSetTevKColor(GX_KCOLOR0, gxColour0);
+    nlFloatColour colour0 = { { alpha, alpha, alpha, alpha } };
+    nlColour gxColour0;
+    ConvertColour(gxColour0, colour0);
+    GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&gxColour0);
 
-    float value = *(float*)(parameters + 40);
-    FloatColour_80291B14 colour1 = { { value, value, value, value } };
-    GXColor gxColour1 = ConvertColour_80291B14(colour1);
-    GXSetTevKColor(GX_KCOLOR1, gxColour1);
+    float value = *(float*)((unsigned char*)packet->unknown20 + 40);
+    nlFloatColour colour1 = { { value, value, value, value } };
+    nlColour gxColour1;
+    ConvertColour(gxColour1, colour1);
+    GXSetTevKColor(GX_KCOLOR1, *(GXColor*)&gxColour1);
 
     static_cast<GXMaterialProgram_8029C2F8*>(this)->BindVertexArrays(packet);
     static_cast<GXMaterialProgram_8029C2F8*>(this)->BindParameters(packet);
     fn_80183B40(packet->matrix);
 
     bool enableState = false;
-    if (*(int*)(parameters + 44) == 1 && lbl_806DF071)
+    if (*(int*)((unsigned char*)packet->unknown20 + 44) == 1
+        && lbl_806DF071)
         enableState = true;
 
     if (enableState)
