@@ -1,6 +1,7 @@
 #include "Game/Camera/DebugCam.h"
 
 #include "Game/CharacterTemplate.h"
+#include "Game/MathHelpers.h"
 #include "Game/Task/ProfilerTask.h"
 #include "Game/TweakValue.h"
 #include "NL/gl/glMatrix.h"
@@ -77,6 +78,7 @@ static u32 sLightBlobTexture = nlStringLowerHash("global/light_blob");
 } // namespace
 
 extern void* lbl_806E1E28;
+extern bool lbl_806E1E08;
 extern "C" cGlobalPad* fn_802C082C(void* manager, int index);
 
 extern "C" void fn_800F2504()
@@ -210,10 +212,20 @@ void cDebugCamera::fn_800F2BD0(float dt, float controlSpeed)
         m_pTarget = 0;
     }
 
+    nlVector3 offset;
     float forward = dt * (x * controlSpeed);
+    nlVec3Set(offset,
+        forward * m_matView.m11,
+        forward * m_matView.m21,
+        0.0f);
+    nlVec3Add(m_vecTarget, m_vecTarget, offset);
+
     float side = dt * (-y * controlSpeed);
-    m_vecTarget.x += forward * m_matView.m11 + side * m_matView.m13;
-    m_vecTarget.y += forward * m_matView.m21 + side * m_matView.m23;
+    nlVec3Set(offset,
+        side * m_matView.m13,
+        side * m_matView.m23,
+        0.0f);
+    nlVec3Add(m_vecTarget, m_vecTarget, offset);
 }
 
 void cDebugCamera::fn_800F2DA8(float dt, float controlSpeed)
@@ -267,7 +279,7 @@ void cDebugCamera::Update(float dt)
     float controlSpeed = sfControlDistanceScale *
         (1.0f + sfControlHeightScale * (m_fRadius + m_fHeight));
 
-    if (!fn_802BDB20())
+    if (!lbl_806E1E08 && !fn_802BDB20())
     {
         m_pPad = fn_802C082C(lbl_806E1E28, 0);
 
@@ -313,19 +325,19 @@ void cDebugCamera::Update(float dt)
 
     if (m_pTarget != 0)
     {
-        nlVector3 delta;
-        nlVec3Sub(delta, m_pTarget->mPosition, m_vecTarget);
-        float distanceSquared = nlVec3LengthSquared(delta);
+        float distanceSquared = CalculateDistanceSquared(
+            m_vecTarget, m_pTarget->mPosition);
         if (distanceSquared < sfTargetFollowStep * sfTargetFollowStep)
         {
             m_vecTarget = m_pTarget->mPosition;
         }
         else
         {
+            nlVector3 delta;
+            nlVec3Sub(delta, m_pTarget->mPosition, m_vecTarget);
             float scale = sfTargetFollowStep / nlSqrt(distanceSquared, true);
-            m_vecTarget.x += scale * delta.x;
-            m_vecTarget.y += scale * delta.y;
-            m_vecTarget.z += scale * delta.z;
+            nlVec3Scale(delta, delta, scale);
+            nlVec3Add(m_vecTarget, m_vecTarget, delta);
         }
     }
 
@@ -341,10 +353,9 @@ void cDebugCamera::Update(float dt)
     nlSinCos(&sn, &cs,
         (u16)(10430.378f * ((3.1415927f * m_fAzimuth) / 180.0f)));
 
-    m_vecCamera.x = distance * cs + m_vecTarget.x;
-    m_vecCamera.y = distance * sn + m_vecTarget.y;
+    nlVec3Set(m_vecCamera, distance * cs, distance * sn, z);
     m_vecTarget.z = m_fHeight;
-    m_vecCamera.z = z + m_fHeight;
+    nlVec3Add(m_vecCamera, m_vecCamera, m_vecTarget);
 
     glMatrixLookAt(m_matView, m_vecCamera, m_vecTarget, vecUp);
 }

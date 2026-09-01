@@ -212,10 +212,21 @@ void SaveLoad::CheckSaveSpace()
     if (!BannerFileExists)
     {
         files = 2;
-        bannerBlocks = (u32)ceil((float)NAND_BANNER_SIZE(8) / 16384.0f);
+        bannerBlocks = NAND_BANNER_SIZE(8);
+        bannerBlocks = (u32)(float)ceil((float)bannerBlocks / 16384.0f);
     }
 
-    u32 saveBlocks = (u32)ceil((float)Align32(SaveDataSize() + sizeof(SaveFileHeader)) / 16384.0f);
+    u32 saveBlocks;
+    if (OnlineMode)
+    {
+        saveBlocks = GameInfoManager::GetInstance()->GetMemoryCardDataSize() + sizeof(SaveFileHeader);
+    }
+    else
+    {
+        saveBlocks = (u32)GameInfoManager::GetInstance()->GetUnknown806E0F90Block() + sizeof(SaveFileHeader);
+    }
+    saveBlocks = Align32(saveBlocks);
+    saveBlocks = (u32)(float)ceil((float)saveBlocks / 16384.0f);
     HandleNANDResult(fn_80376BC8(saveBlocks + bannerBlocks, files, &CheckAnswer, CheckSaveFileCallback));
 
     if (OnlineMode)
@@ -304,7 +315,16 @@ void SaveLoad::OpenSaveForReadCallback(s32 result)
     if (result == 0)
     {
         SaveBuffer = 0;
-        u32 size = Align32(SaveDataSize() + sizeof(SaveFileHeader));
+        u32 size;
+        if (OnlineMode)
+        {
+            size = GameInfoManager::GetInstance()->GetMemoryCardDataSize() + sizeof(SaveFileHeader);
+        }
+        else
+        {
+            size = (u32)GameInfoManager::GetInstance()->GetUnknown806E0F90Block() + sizeof(SaveFileHeader);
+        }
+        size = Align32(size);
         SaveBuffer = nlMalloc(size, 0x20, true);
         HandleNANDResult(fn_80376D6C(&SaveBuffer, &size, ReadSaveFileCallback, true));
         return;
@@ -312,19 +332,25 @@ void SaveLoad::OpenSaveForReadCallback(s32 result)
 
     if (result == -12)
     {
-        FEPopupMenu* popup = PushSavePopup();
         if (!OnlineMode)
         {
-            Function<FnVoidVoid> save(CheckSaveSpace);
-            Function<FnVoidVoid> cancel(CancelSave);
-            popup->Create((ePopupMenu)0x3E, save, cancel);
+            FEPopupMenu* popup = PushSavePopup();
+            popup->Create(
+                (ePopupMenu)0x3E,
+                Function<FnVoidVoid>(CheckSaveSpace),
+                Function<FnVoidVoid>(CancelSave));
+            RetryEnabled = false;
+        }
+        else if (OnlineMode && RetryEnabled)
+        {
+            FEPopupMenu* popup = PushSavePopup();
+            popup->Create((ePopupMenu)0x47, Function<FnVoidVoid>(CheckSaveSpace));
+            RetryEnabled = false;
         }
         else
         {
-            Function<FnVoidVoid> save(CheckSaveSpace);
-            popup->Create((ePopupMenu)0x47, save);
+            CheckSaveSpace();
         }
-        RetryEnabled = false;
         return;
     }
     HandleNANDResult(result);
