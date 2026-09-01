@@ -716,6 +716,8 @@ config.libs = [
             Object(NonMatching, "unclassified/tu_801AE0C4.cpp"),
             Object(NonMatching, "unclassified/tu_801AE530.cpp"),
             Object(NonMatching, "Game/Render/ShootToScoreMeter.cpp", cflags=cflags_game_deferred),
+            Object(NonMatching, "Game/Render/SkinAnimatedMovableNPC.cpp", cflags=cflags_game_deferred),
+            Object(NonMatching, "Game/Render/SkinAnimatedNPC.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "unclassified/tu_801B369C.cpp"),
             Object(NonMatching, "Game/Render/Presentation.cpp"),
             Object(NonMatching, "Game/Drawable/DrawableThwomp.cpp"),

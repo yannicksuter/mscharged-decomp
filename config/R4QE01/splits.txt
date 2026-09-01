@@ -1265,6 +1265,18 @@ Game/Render/ShootToScoreMeter.cpp:
 	.sbss       start:0x806E1660 end:0x806E1678
 	.sdata2     start:0x806E52D8 end:0x806E5328
 
+Game/Render/SkinAnimatedMovableNPC.cpp:
+	.text       start:0x801B11D8 end:0x801B15F8
+	.data       start:0x805145E8 end:0x80514620
+	.sdata2     start:0x806E5328 end:0x806E5340
+
+Game/Render/SkinAnimatedNPC.cpp:
+	.text       start:0x801B15F8 end:0x801B1F7C
+	.data       start:0x80514620 end:0x80514660
+	.sdata      start:0x806DD0E8 end:0x806DD0F8
+	.sbss       start:0x806E1678 end:0x806E1698
+	.sdata2     start:0x806E5340 end:0x806E5350
+
 unclassified/tu_801B369C.cpp:
 	.text       start:0x801B369C end:0x801B43F8
 	.ctors      start:0x804DB744 end:0x804DB748
