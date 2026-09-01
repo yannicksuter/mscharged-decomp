@@ -9,14 +9,18 @@
 
 #include <string.h>
 
-extern "C" void fn_802B9670(TimeRegionData* data, float value);
+extern "C" void fn_802B9670(
+    UnidentifiedTimeRegionData_802B9570* data, float value);
 extern "C" void* fn_802B77A0();
 extern "C" void fn_802BB11C(void* font, const nlColour& colour, float x, float y, float width, float height, float depth, int align, bool drawBackground, bool clip);
 extern "C" void* fn_802B9A3C();
-extern "C" void fn_802B9A6C(void* display, TimeRegionData* data);
+extern "C" void fn_802B9A6C(
+    void* display, UnidentifiedTimeRegionData_802B9570* data);
 extern "C" void fn_802B9A88(void* display);
-extern "C" int fn_802B974C(TimeRegionData* data, int index);
-extern "C" float fn_802B98C8(TimeRegionData* data, int index);
+extern "C" int fn_802B974C(
+    UnidentifiedTimeRegionData_802B9570* data, int index);
+extern "C" float fn_802B98C8(
+    UnidentifiedTimeRegionData_802B9570* data, int index);
 extern "C" void fn_802BD718(const char* name, bool enabled, float value);
 extern "C" const char lbl_8052B590[];
 extern "C" const char lbl_8052B5A0[];
@@ -197,7 +201,7 @@ void FrameCounter::fn_802B80C4()
     if (region != 0)
     {
         char name[128];
-        TimeRegionData* data = &region->m_unk14;
+        UnidentifiedTimeRegionData_802B9570* data = &region->m_unk14;
         for (int index = 0; index < data->m_unk08 - 1; ++index)
         {
             float threshold = fn_802B98C8(data, index);
