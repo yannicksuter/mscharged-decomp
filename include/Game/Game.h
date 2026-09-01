@@ -139,7 +139,14 @@ public:
     /* 0x54 */ cPlayer* m_pRandomPlayersArray[10];
 
 private:
-    /* 0x7C */ u8 mUnidentified07C[0x40];
+    /* 0x7C */ u8 mUnidentified07C[0x04];
+
+public:
+    /* 0x80 */ float mUnidentified080;
+    /* 0x84 */ float mUnidentified084;
+
+private:
+    /* 0x88 */ u8 mUnidentified088[0x34];
 
 public:
     /* 0xBC */ bool mUnidentified0BC;

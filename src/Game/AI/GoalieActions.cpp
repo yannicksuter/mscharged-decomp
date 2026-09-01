@@ -271,7 +271,6 @@ extern "C" int fn_80338BF0(void* pParam);
 extern "C" bool fn_8003E7F8(cFielder* pFielder);
 extern "C" bool fn_8003E84C(cFielder* pFielder);
 extern "C" void fn_8007EB5C(Goalie* pGoalie);
-extern "C" SaveData* fn_80093848(bool bParam);
 extern "C" float fn_8016D52C(float fHeight, float fEndTime,
     nlVector3& v3Position, nlVector3& v3Velocity, float& fTargetHeight,
     bool bParam);
@@ -4496,8 +4495,8 @@ void Goalie::InitActionSaveReposition()
     nlVec3Sub2D(v3Delta, m_v3Position, mv3NavTarget);
     mfTargetDist = nlGetLengthSquared2D(v3Delta.x, v3Delta.y);
 
-    float fBallDy = g_pBall->m_v3Position.y - m_v3Position.y;
     float fBallDx = g_pBall->m_v3Position.x - m_v3Position.x;
+    float fBallDy = g_pBall->m_v3Position.y - m_v3Position.y;
     m_aDesiredFacingDirection
         = (u16)(s32)(nlATan2f(fBallDy, fBallDx) * 10430.378f);
 
@@ -4520,8 +4519,8 @@ void Goalie::InitActionLooseBallPursueRolling()
         SetGoalieAction(GOALIEACTION_LOOSEBALL_PURSUE_ROLLING, 0);
     }
 
-    float fDy = mv3TargetPosition.y - m_v3Position.y;
     float fDx = mv3TargetPosition.x - m_v3Position.x;
+    float fDy = mv3TargetPosition.y - m_v3Position.y;
     m_aDesiredFacingDirection
         = (u16)(s32)(nlATan2f(fDy, fDx) * 10430.378f);
 
@@ -4742,10 +4741,10 @@ void Goalie::InitActionLooseBallSetup()
                 }
 
                 mv3NavTarget = mv3TargetPosition;
-                float fDyNav
-                    = v3BallPosition.y - m_v3Position.y;
                 float fDxNav
                     = v3BallPosition.x - m_v3Position.x;
+                float fDyNav
+                    = v3BallPosition.y - m_v3Position.y;
                 m_aDesiredFacingDirection
                     = (u16)(s32)(nlATan2f(fDyNav, fDxNav)
                                  * 10430.378f);
@@ -4774,10 +4773,10 @@ void Goalie::InitActionLooseBallSetup()
                 * (cField::GetGoalLineX(1U)
                     - cField::GetPenaltyBoxX(1U))
             + cField::GetPenaltyBoxX(1U);
+        int nPlayerIndex;
         bool bDoGrab = false;
 
-        for (int nPlayerIndex = 0; nPlayerIndex < 4;
-            ++nPlayerIndex)
+        for (nPlayerIndex = 0; nPlayerIndex < 4; ++nPlayerIndex)
         {
             cPlayer* pPlayer = m_pTeam->GetPlayer(nPlayerIndex);
             if (pPlayer->GetGlobalPad() != 0)
@@ -5041,10 +5040,10 @@ void Goalie::InitActionLooseBallSetup()
                         mfTargetDist = 1.4f;
                         mbIsDown = false;
 
-                        float fDyFace
-                            = v3IntPos.y - m_v3Position.y;
                         float fDxFace
                             = v3IntPos.x - m_v3Position.x;
+                        float fDyFace
+                            = v3IntPos.y - m_v3Position.y;
                         m_aDesiredFacingDirection
                             = (u16)(s32)(nlATan2f(
                                              fDyFace, fDxFace)
@@ -5080,8 +5079,8 @@ void Goalie::InitActionLooseBallSetup()
     }
 
     SetGoalieAction(GOALIEACTION_LOOSEBALL_SETUP, 0);
-    float fDyFace = v3BallPosition.y - m_v3Position.y;
     float fDxFace = v3BallPosition.x - m_v3Position.x;
+    float fDyFace = v3BallPosition.y - m_v3Position.y;
     m_aDesiredFacingDirection
         = (u16)(s32)(nlATan2f(fDyFace, fDxFace) * 10430.378f);
 
@@ -6632,73 +6631,79 @@ void Goalie::fn_8008EC2C()
 
 void Goalie::fn_8008ED44(bool bParam)
 {
-    if (mGoalieActionState == GOALIEACTION_UNIDENTIFIED_31
-        || mGoalieActionState == GOALIEACTION_UNIDENTIFIED_26)
+    switch (mGoalieActionState)
     {
+    case GOALIEACTION_UNIDENTIFIED_31:
         return;
-    }
+    case GOALIEACTION_UNIDENTIFIED_26:
+        return;
+    default:
+        CleanupStun();
+        ChooseSwatAnim(0);
 
-    CleanupStun();
-    ChooseSwatAnim(0);
-
-    if (bParam)
-    {
-        SetGoalieAction(GOALIEACTION_UNIDENTIFIED_30, 0);
-        PlayNewAnim(0xAB);
-    }
-    else
-    {
-        SetGoalieAction(GOALIEACTION_UNIDENTIFIED_25, 0);
-
-        bool bMirrored = !m_pAnimInventory->GetMirrored(m_eAnimID);
-        bool bUseSTSSpinMiss = false;
-        bool bState8Shot = false;
-        if (g_pBall->m_tLightningTimer.m_uPackedTime != 0
-            && g_pBall->meBallState == 8)
+        if (bParam)
         {
-            bState8Shot = true;
-        }
-
-        if (bState8Shot
-            || (mpShooter != 0
-                && (fn_8003E7F8(mpShooter)
-                    || fn_8003E84C(mpShooter))))
-        {
-            mpSaveData = GoalieSave::GetSTSSpinMissData(bMirrored);
-            bUseSTSSpinMiss = true;
+            SetGoalieAction(GOALIEACTION_UNIDENTIFIED_30, 0);
+            PlayNewAnim(0xAB);
         }
         else
         {
-            mpSaveData = fn_80093848(bMirrored);
+            SetGoalieAction(GOALIEACTION_UNIDENTIFIED_25, 0);
+
+            bool bMirrored = !m_pAnimInventory->GetMirrored(m_eAnimID);
+            bool bUseSTSSpinMiss = false;
+            bool bState8Shot;
+            cBall* pBall;
+            pBall = g_pBall;
+            bState8Shot = false;
+            if (pBall->m_tLightningTimer.m_uPackedTime != 0
+                && pBall->meBallState == 8)
+            {
+                bState8Shot = true;
+            }
+
+            if (bState8Shot
+                || (mpShooter != 0
+                    && (fn_8003E7F8(mpShooter)
+                        || fn_8003E84C(mpShooter))))
+            {
+                mpSaveData = GoalieSave::GetSTSSpinMissData(bMirrored);
+                bUseSTSSpinMiss = true;
+            }
+            else
+            {
+                mpSaveData = GoalieSave::GetRandomSTSMissData(bMirrored);
+            }
+
+            PlayNewAnim(mpSaveData->mnAnimID);
+            if (bUseSTSSpinMiss)
+            {
+                fn_8007EB5C(this);
+            }
         }
 
-        PlayNewAnim(mpSaveData->mnAnimID);
-        if (bUseSTSSpinMiss)
+        mbIsDown = true;
+        m_fDesiredSpeed = 0.0f;
+        m_fActualSpeed = 0.0f;
+        SetVelocity(v3Zero);
+        m_pPhysicsCharacter->m_CanCollideWithGoalLine = false;
+        m_pPhysicsCharacter->m_CanCollideWithBall = false;
+        InitMovementFromAnim(0, v3Zero, 1.0f, false);
+
+        if (m_pBall != 0)
         {
-            fn_8007EB5C(this);
+            fn_80139D1C(1, GetGlobalPad());
+            ReleaseBall(0);
         }
+
+        if (GetGlobalPad() != 0)
+        {
+            fn_8009591C(this, false);
+        }
+
+        SetNoPickUpTime(0.2f);
+        break;
     }
-
-    mbIsDown = true;
-    m_fDesiredSpeed = 0.0f;
-    m_fActualSpeed = 0.0f;
-    SetVelocity(v3Zero);
-    m_pPhysicsCharacter->m_CanCollideWithGoalLine = false;
-    m_pPhysicsCharacter->m_CanCollideWithBall = false;
-    InitMovementFromAnim(0, v3Zero, 1.0f, false);
-
-    if (m_pBall != 0)
-    {
-        fn_80139D1C(1, GetGlobalPad());
-        ReleaseBall(0);
-    }
-
-    if (GetGlobalPad() != 0)
-    {
-        fn_8009591C(this, false);
-    }
-
-    SetNoPickUpTime(0.2f);
 }
 
 void Goalie::fn_8008EF58()

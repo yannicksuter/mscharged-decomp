@@ -15,6 +15,11 @@ struct ChainOwner_802F076C
     ChainNode_802F076C* head;
 };
 
+struct SlotPoolEntry_802F07F0
+{
+    u8 data[0xC];
+};
+
 struct ResourceEntry_802F0860
 {
     void* value;
@@ -50,7 +55,7 @@ struct ResourceGroupB_802F0860
 
 struct ResourceReference_802F0860
 {
-    u32 kind;
+    s32 kind;
     void* value;
 };
 
@@ -158,14 +163,12 @@ extern "C" SlotPoolBase* fn_802F0780(
     return pool;
 }
 
-extern "C" SlotPoolBase* fn_802F07F0(
-    SlotPoolBase* pool, int destroy)
+extern "C" SlotPool<SlotPoolEntry_802F07F0>* fn_802F07F0(
+    SlotPool<SlotPoolEntry_802F07F0>* pool, int destroy)
 {
     if (pool != 0)
     {
-        fn_802B467C(pool);
-        SlotPoolBase::BaseFreeBlocks(pool, 0xC);
-        pool->~SlotPoolBase();
+        pool->BasicSlotPool<SlotPoolEntry_802F07F0>::~BasicSlotPool();
         if (destroy > 0)
             operator delete(pool);
     }
@@ -180,79 +183,84 @@ extern "C" ResourceBundle_802F0860* fn_802F0860(nlChunk* outer)
     ResourceGroupB_802F0860* oldGroupsB = bundle->groupsB;
     ResourceGroupC_802F0860* oldGroupsC = bundle->groupsC;
     ResourceGroupD_802F0860* oldGroupsD = bundle->groupsD;
-    void* oldField2C = bundle->field_2C;
     void* oldField34 = bundle->field_34;
+    void* oldField2C = bundle->field_2C;
 
     nlChunk* cursor = header->GetNextChunk();
     bundle->groupsA = (ResourceGroupA_802F0860*)cursor->GetData();
     cursor = cursor->GetNextChunk();
     bundle->groupsB = (ResourceGroupB_802F0860*)cursor->GetData();
+    s32 groupsBOffset = (u8*)bundle->groupsB - (u8*)oldGroupsB;
     cursor = cursor->GetNextChunk();
     bundle->groupsC = (ResourceGroupC_802F0860*)cursor->GetData();
+    s32 groupsCOffset = (u8*)bundle->groupsC - (u8*)oldGroupsC;
     cursor = cursor->GetNextChunk();
     bundle->groupsD = (ResourceGroupD_802F0860*)cursor->GetData();
+    s32 groupsDOffset = (u8*)bundle->groupsD - (u8*)oldGroupsD;
     cursor = cursor->GetNextChunk();
     bundle->field_2C = cursor->GetData();
+    s32 field2COffset = (u8*)bundle->field_2C - (u8*)oldField2C;
     cursor = cursor->GetNextChunk();
     bundle->field_34 = cursor->GetData();
+    s32 field34Offset = (u8*)bundle->field_34 - (u8*)oldField34;
 
+    ResourceGroupA_802F0860* groupA = bundle->groupsA;
     for (u32 groupIndex = 0; groupIndex < bundle->groupACount;
-        groupIndex++)
+        groupIndex++, groupA++)
     {
-        ResourceGroupA_802F0860* group = bundle->groupsA + groupIndex;
         cursor = cursor->GetNextChunk();
-        group->entries = (ResourceEntry_802F0860*)cursor->GetData();
-        for (u32 entryIndex = 0; entryIndex < group->entryCount;
-            entryIndex++)
+        ResourceEntry_802F0860* entry =
+            (ResourceEntry_802F0860*)cursor->GetData();
+        groupA->entries = entry;
+        for (u32 entryIndex = 0; entryIndex < groupA->entryCount;
+            entryIndex++, entry++)
         {
-            ResourceEntry_802F0860* entry = group->entries + entryIndex;
-            entry->value = (u8*)entry->value
-                         + ((u8*)bundle->groupsB - (u8*)oldGroupsB);
+            entry->value = (u8*)entry->value + groupsBOffset;
         }
     }
 
+    ResourceGroupB_802F0860* groupB = bundle->groupsB;
     for (u32 groupIndex = 0; groupIndex < bundle->groupBCount;
-        groupIndex++)
+        groupIndex++, groupB++)
     {
-        ResourceGroupB_802F0860* group = bundle->groupsB + groupIndex;
         cursor = cursor->GetNextChunk();
-        group->indices = (u32*)cursor->GetData();
-        for (u32 i = 0; i < group->indexCount; i++)
+        u32* index = (u32*)cursor->GetData();
+        groupB->indices = index;
+        for (u32 i = 0; i < groupB->indexCount; i++, index++)
         {
-            group->indices[i] += (u8*)bundle->groupsC - (u8*)oldGroupsC;
+            *index += groupsCOffset;
         }
         cursor = cursor->GetNextChunk();
-        group->references = (u32*)cursor->GetData();
+        groupB->references = (u32*)cursor->GetData();
     }
 
+    ResourceGroupC_802F0860* groupC = bundle->groupsC;
     for (u32 groupIndex = 0; groupIndex < bundle->groupCCount;
-        groupIndex++)
+        groupIndex++, groupC++)
     {
-        ResourceGroupC_802F0860* group = bundle->groupsC + groupIndex;
         cursor = cursor->GetNextChunk();
-        group->references = (ResourceReference_802F0860*)cursor->GetData();
+        ResourceReference_802F0860* reference =
+            (ResourceReference_802F0860*)cursor->GetData();
+        groupC->references = reference;
         for (u32 referenceIndex = 0;
-            referenceIndex < group->referenceCount;
-            referenceIndex++)
+            referenceIndex < groupC->referenceCount;
+            referenceIndex++, reference++)
         {
-            ResourceReference_802F0860* reference = group->references + referenceIndex;
             if (reference->kind == 1)
-                reference->value = (u8*)reference->value
-                                 + ((u8*)bundle->groupsD - (u8*)oldGroupsD);
+                reference->value = (u8*)reference->value + groupsDOffset;
             else if (reference->kind == 3)
-                reference->value = (u8*)reference->value
-                                 + ((u8*)bundle->field_2C - (u8*)oldField2C);
+                reference->value = (u8*)reference->value + field2COffset;
             else if (reference->kind == 2)
-                reference->value = (u8*)reference->value
-                                 + ((u8*)bundle->field_34 - (u8*)oldField34);
+                reference->value = (u8*)reference->value + field34Offset;
         }
     }
 
+    ResourceGroupD_802F0860* groupD = bundle->groupsD;
     for (u32 groupIndex = 0; groupIndex < bundle->groupDCount;
-        groupIndex++)
+        groupIndex++, groupD++)
     {
         cursor = cursor->GetNextChunk();
-        bundle->groupsD[groupIndex].data = cursor->GetData();
+        groupD->data = cursor->GetData();
     }
 
     for (u32 groupIndex = 0; groupIndex < bundle->groupBCount;

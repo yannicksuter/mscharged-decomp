@@ -95,6 +95,52 @@ inline BindExp2<R, F, A, B> Bind(F fn, const A& t0, const B& t1)
     return BindExp2<R, F, A, B>(fn, t0, t1);
 }
 
+template <typename R, typename F, typename A, typename B, typename C>
+struct BindExp3
+{
+private:
+    F mFunction;
+    A mT0;
+    B mT1;
+    C mT2;
+
+public:
+    BindExp3() { }
+    BindExp3(F function, const A& t0, const B& t1, const C& t2)
+        : mFunction(function)
+        , mT0(t0)
+        , mT1(t1)
+        , mT2(t2)
+    {
+    }
+
+    R operator()()
+    {
+        return mFunction(mT0, mT1, mT2);
+    }
+
+    template <typename P0, typename P1>
+    R operator()(P0 p0, P1 p1)
+    {
+        return DoCall(p0, p1, mT0, mT1, mT2);
+    }
+
+private:
+    template <typename P0, typename P1, typename A1>
+    R DoCall(P0 p0, P1 p1, const A1& t0, const Placeholder<0>&,
+        const Placeholder<1>&)
+    {
+        return mFunction(t0, p0, p1);
+    }
+};
+
+template <typename R, typename F, typename A, typename B, typename C>
+inline BindExp3<R, F, A, B, C> Bind(F fn, const A& t0, const B& t1,
+    const C& t2)
+{
+    return BindExp3<R, F, A, B, C>(fn, t0, t1, t2);
+}
+
 template <typename R, typename F, typename A, typename B, typename C, typename D>
 struct BindExp4
 {

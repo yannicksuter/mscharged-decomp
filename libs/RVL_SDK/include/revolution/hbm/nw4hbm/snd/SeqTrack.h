@@ -112,6 +112,7 @@ public:
 
     ParserTrackParam& GetParserTrackParam() { return mParserTrackParam; }
 
+    void SetTrackVariable(int varNo, s16 value);
     vs16* GetVariablePtr(int varNo);
 
     SeqPlayer* GetSeqPlayer() { return mSeqPlayer; }

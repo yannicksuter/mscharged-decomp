@@ -89,7 +89,7 @@ inline Detail::MemFunImpl<R, R (T::*)(P1)> MemFun(R (T::*function)(P1))
 }
 
 template <typename T, typename R, typename P1, typename P2>
-Detail::MemFunImpl<R, R (T::*)(P1, P2)> MemFun(R (T::*function)(P1, P2))
+inline Detail::MemFunImpl<R, R (T::*)(P1, P2)> MemFun(R (T::*function)(P1, P2))
 {
     return Detail::MemFunImpl<R, R (T::*)(P1, P2)>(function);
 }

@@ -1,6 +1,7 @@
 #include "Game/AI/TeamPlayMachine.h"
 
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/DB/tu_8010A40C.h"
 #include "Game/GameInfo.h"
 #include "NL/nlMemory.h"
 
@@ -10,14 +11,7 @@ struct UnidentifiedGameState
     int mUnidentified018;
 };
 
-struct UnidentifiedModeState
-{
-    u8 mUnidentified000[0x34];
-    int mUnidentified034;
-};
-
 extern UnidentifiedGameState* lbl_806E0C94;
-extern UnidentifiedModeState* lbl_806E0FA0;
 extern UnidentifiedStateTransition lbl_806E20B8;
 
 float lbl_806DC448 = 1.1f;
@@ -53,7 +47,7 @@ void TeamPlayMachine::UnidentifiedVirtual7()
         state = 1;
     }
     else if (GameInfoManager::Instance()->IsInMode4()
-        && lbl_806E0FA0->mUnidentified034 == 2)
+        && lbl_806E0FA0->mCurrentChallenge == 2)
     {
         state = 5;
     }

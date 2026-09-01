@@ -7,9 +7,12 @@
 #include "Game/AI/Scripts/ScriptCaching.h"
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
+#include "Game/Camera/tu_800F9460.h"
 #include "Game/Field.h"
 #include "Game/Formation.h"
 #include "Game/GameInfo.h"
+#include "Game/DB/StatsTracker.h"
+#include "Game/DB/tu_8010A40C.h"
 #include "Game/Goalie.h"
 #include "Game/Net.h"
 #include "Game/NetworkSession.h"
@@ -118,11 +121,6 @@ struct UnidentifiedSlowdownState
     bool mUnidentified004;
 };
 
-struct UnidentifiedSingleton_800F9460
-    : public nlSingleton<UnidentifiedSingleton_800F9460>
-{
-};
-
 struct UnidentifiedGameSnapshot
 {
     u8 mPlayerIndices[100];
@@ -163,14 +161,6 @@ struct UnidentifiedRegistrationList
 {
     u8 mUnidentified000[0x0C];
     UnidentifiedRegistrationNode* mHead;
-};
-
-struct UnidentifiedModeState
-{
-    u8 mUnidentified000[0x0C];
-    int mUnidentified00C;
-    u8 mUnidentified010[0x24];
-    int mUnidentified034;
 };
 
 extern "C" UnidentifiedSimulationTimeProvider* fn_8011166C();
@@ -214,11 +204,8 @@ extern "C" cGame* fn_800570B0(
     cGame* game, void* param1, int param2, bool param3);
 extern "C" cTeam* fn_800A5D4C(cTeam* team, int side);
 extern "C" void* fn_801740D0(void* memory);
-extern "C" void* fn_800F9460(void* memory);
 extern "C" UnidentifiedSlowdownState* fn_801AE530(void* memory);
 extern "C" void fn_80115E60(bool param1);
-extern "C" void fn_80103198(
-    void* tracker, float gameDuration, float param3, void* param4);
 extern "C" void fn_801742B8(void* object, int deleteObject);
 extern "C" void fn_801AE6DC(
     UnidentifiedSlowdownState* object, int deleteObject);
@@ -240,8 +227,6 @@ extern void* lbl_806E12C8;
 extern void* lbl_806E2168;
 extern UnidentifiedSlowdownState* lbl_806E1628;
 extern AISandbox* lbl_806E0B88;
-extern UnidentifiedSingleton_800F9460* lbl_806E0F48;
-extern void* lbl_806E0F58;
 extern UnidentifiedRegistrationList lbl_805713E8;
 extern UnidentifiedRegistrationList lbl_80571820;
 extern UnidentifiedRegistrationList lbl_80571988;
@@ -249,8 +234,6 @@ extern UnidentifiedRegistrationList lbl_80571438;
 extern UnidentifiedRegistrationList lbl_80571960;
 extern UnidentifiedRegistrationList lbl_80571348;
 extern cPlayer* lbl_8056B800[10];
-extern UnidentifiedModeState* lbl_806E0FA0;
-
 extern "C" char lbl_804FB2F4[];
 extern "C" char lbl_804FB318[];
 extern "C" char lbl_804FB364[];
@@ -326,14 +309,12 @@ void fn_80056CF4(void* param1, int param2, bool param3)
         }
         lbl_806E12C8 = memory;
     }
-    if (lbl_806E0F48 == 0)
+    if (UnidentifiedCameraEffects::Instance() == 0)
     {
-        void* memory = nlMalloc(0x3C, 8, false);
-        if (memory != 0)
-        {
-            memory = fn_800F9460(memory);
-        }
-        lbl_806E0F48 = static_cast<UnidentifiedSingleton_800F9460*>(memory);
+        UnidentifiedCameraEffects* memory = new (nlMalloc(
+            sizeof(UnidentifiedCameraEffects), 8, false))
+            UnidentifiedCameraEffects;
+        UnidentifiedCameraEffects::s_pInstance = memory;
     }
     if (lbl_806E1628 == 0)
     {
@@ -361,8 +342,8 @@ void DestroyGame()
     bool bWriteStats = GetConfigBool(Config::Global(), "save_stats", false);
     if (bWriteStats)
     {
-        fn_80103198(
-            lbl_806E0F58, g_pGame->m_fGameDuration, lbl_806E3740, 0);
+        StatsTracker::Instance()->WriteStats(
+            g_pGame->m_fGameDuration, lbl_806E3740, 0);
     }
 
     if (lbl_806E0B88 != 0)
@@ -375,10 +356,10 @@ void DestroyGame()
         fn_801742B8(lbl_806E12C8, 1);
         lbl_806E12C8 = 0;
     }
-    if (lbl_806E0F48 != 0)
+    if (UnidentifiedCameraEffects::Instance() != 0)
     {
-        delete lbl_806E0F48;
-        lbl_806E0F48 = 0;
+        delete UnidentifiedCameraEffects::Instance();
+        UnidentifiedCameraEffects::s_pInstance = 0;
     }
     if (lbl_806E1628 != 0)
     {
@@ -932,9 +913,9 @@ void cGame::ChangeGameState(int state)
         if (state == 3)
         {
             if ((GameInfoManager::Instance()->IsInMode4()
-                    && lbl_806E0FA0->mUnidentified00C == 2
+                    && lbl_806E0FA0->mCondition == 2
                     && g_pTeams[1]->m_nScore > 0)
-                || (lbl_806E0FA0->mUnidentified034 == 2
+                || (lbl_806E0FA0->mCurrentChallenge == 2
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
             {
                 fn_800ED92C(0xEF3369E0);

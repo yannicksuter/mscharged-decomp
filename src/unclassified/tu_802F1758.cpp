@@ -1,4 +1,5 @@
 #include "Game/Audio/XSoundHandle_802ED74C.h"
+#include "NL/nlDLListContainer.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
 
@@ -50,13 +51,23 @@ struct CueOwner_802F1758
     u32 referencesAndFlags;
 };
 
+struct RpcRuntimeNode_802F1758;
+struct SoundInstance_802F1758;
+
+extern "C" void fn_802F2A74(SoundInstance_802F1758*);
+
 struct SoundInstance_802F1758
 {
+    ~SoundInstance_802F1758()
+    {
+        fn_802F2A74(this);
+    }
+
     void* owner;
     void* definition;
     void* voices;
-    SlotPoolBase* entryPool;
-    void* entries;
+    DLListContainerBase<RpcRuntimeNode_802F1758*,
+        BasicSlotPool<DLListEntry<RpcRuntimeNode_802F1758*> >&> rpcEntries;
     s32 state;
     float previousTime;
     float currentTime;
@@ -122,8 +133,8 @@ extern "C" CueHandle_802F1758* fn_802ED74C(CueHandle_802F1758*, void*, CueOwner_
 extern "C" CueHandle_802F1758* fn_802ED7F0(CueHandle_802F1758*, int);
 extern "C" LocalSliderSet_802F1758* fn_802EED88(void*, CueHandle_802F1758*);
 extern "C" SliderState_802F1758* fn_802EED38(void*, u32, CueHandle_802F1758*);
-extern "C" void* fn_802F11A0(void*);
-extern "C" void* fn_802F1460(void*, float);
+extern "C" void* fn_802F11A0(CueDefinition_802F1758*);
+extern "C" void* fn_802F1460(CueDefinition_802F1758*, float);
 extern "C" SoundInstance_802F1758* fn_802F2188(SoundInstance_802F1758*, CueHandle_802F1758*, void*);
 extern "C" void fn_802F2320(SoundInstance_802F1758*, float);
 extern "C" void fn_802F2398(SoundInstance_802F1758*);
@@ -133,9 +144,8 @@ extern "C" void fn_802F2640(SoundInstance_802F1758*);
 extern "C" void fn_802F2648(SoundInstance_802F1758*);
 extern "C" void fn_802F2650(SoundInstance_802F1758*, u32, void*);
 extern "C" void fn_802F26B0(SoundInstance_802F1758*, float);
-extern "C" void fn_802F2A74(SoundInstance_802F1758*);
 extern "C" void fn_8004F594(int, const char*, ...);
-extern "C" const char* fn_802B9568(int, ...);
+extern "C" const char* fn_802B9568(int, const char*);
 extern "C" void fn_8035CA84();
 
 static inline SoundInstance_802F1758* AllocateInstance_802F1758()
@@ -153,8 +163,12 @@ static inline SoundInstance_802F1758* AllocateInstance_802F1758()
 
 static inline void FreeInstance_802F1758(SoundInstance_802F1758* instance)
 {
-    instance->owner = lbl_8057FAA8.m_FreeList;
-    lbl_8057FAA8.m_FreeList = (SlotPoolEntry*)instance;
+    if (instance != 0)
+    {
+        instance->~SoundInstance_802F1758();
+        instance->owner = lbl_8057FAA8.m_FreeList;
+        lbl_8057FAA8.m_FreeList = (SlotPoolEntry*)instance;
+    }
 }
 
 extern "C" CueHandle_802F1758* fn_802F1758(CueHandle_802F1758* handle,
@@ -193,8 +207,8 @@ extern "C" CueHandle_802F1758* fn_802F1758(CueHandle_802F1758* handle,
     }
 
     void* selected = handle->definition->useSlider
-                       ? fn_802F1460(handle->definition->field_24, handle->sliderValue)
-                       : fn_802F11A0(handle->definition->field_24);
+                       ? fn_802F1460(handle->definition, handle->sliderValue)
+                       : fn_802F11A0(handle->definition);
     fn_8004F594(10, lbl_8052F680, fn_802B9568(lbl_806E1DC8, *(const char**)selected), fn_802B9568(lbl_806E1DC8, handle->definition->name));
 
     SoundInstance_802F1758* instance = AllocateInstance_802F1758();
@@ -246,17 +260,14 @@ extern "C" void fn_802F1A84(CueHandle_802F1758* handle, u32 value, void** output
     fn_802F2650(handle->instance, value, output);
 }
 
-extern "C" bool fn_802F1A94(CueHandle_802F1758* handle)
+extern "C" bool fn_802F1A94(CueHandle_802F1758* handle, u8 callbackEnabled)
 {
     switch (handle->state)
     {
     case 1:
-    {
         handle->stateAndFlags |= 0x4000;
-        typedef void (*Method)(CueHandle_802F1758*);
-        ((Method)handle->vtable[4])(handle);
+        ((XSoundHandle_802ED74C*)handle)->fn_802ED74C_4(callbackEnabled);
         return false;
-    }
     case 2:
     case 5:
         handle->stateAndFlags |= 0x4000;
@@ -265,9 +276,14 @@ extern "C" bool fn_802F1A94(CueHandle_802F1758* handle)
         fn_802F2320(handle->instance, 0.0f);
         handle->state = handle->instance->state;
         return handle->state == 4;
-    default:
+    case 4:
+        break;
+    case 6:
         return false;
+    default:
+        break;
     }
+    return false;
 }
 
 extern "C" bool fn_802F1B60(CueHandle_802F1758* handle, u8 callbackEnabled)
@@ -282,8 +298,18 @@ extern "C" bool fn_802F1B60(CueHandle_802F1758* handle, u8 callbackEnabled)
 
 extern "C" void fn_802F1BB4(CueHandle_802F1758* handle, u8 callbackEnabled, void* value)
 {
-    if (handle->state != 8 && (handle->state != 7 || value != 0))
+    switch (handle->state)
+    {
+    case 7:
+        if (value != 0)
+            fn_802F25D4(handle->instance, value);
+        break;
+    case 8:
+        break;
+    default:
         fn_802F25D4(handle->instance, value);
+        break;
+    }
     handle->callbackEnabled = callbackEnabled;
     handle->state = 7;
     handle->stateAndFlags |= 0x8000;
@@ -350,14 +376,14 @@ extern "C" void fn_802F1DC4(CueHandle_802F1758* handle, float dt)
     if (handle->state != 4 && handle->state != 8)
         return;
 
+    float previousValue = handle->sliderValue;
     float value = handle->slider->value;
-    bool changed = handle->sliderValue != value;
     handle->sliderValue = value;
-    if (changed)
+    if (previousValue != value)
     {
         void* selected = handle->definition->useSlider
-                           ? fn_802F1460(handle->definition->field_24, value)
-                           : fn_802F11A0(handle->definition->field_24);
+                           ? fn_802F1460(handle->definition, value)
+                           : fn_802F11A0(handle->definition);
         SoundInstance_802F1758* oldInstance = handle->instance;
         if (selected != oldInstance->definition)
         {
@@ -371,7 +397,7 @@ extern "C" void fn_802F1DC4(CueHandle_802F1758* handle, float dt)
                 instance = fn_802F2188(instance, handle, selected);
             handle->instance = instance;
             fn_802F2594(instance, false, 1.0f, 0.5f);
-            instance->nextInstance = oldInstance;
+            handle->instance->nextInstance = oldInstance;
             handle->state = 4;
         }
     }
@@ -384,7 +410,6 @@ extern "C" void fn_802F1DC4(CueHandle_802F1758* handle, float dt)
         if (instance->state == 8 && instance->nextInstance == 0)
         {
             previous->nextInstance = 0;
-            fn_802F2A74(instance);
             FreeInstance_802F1758(instance);
             instance = 0;
         }
