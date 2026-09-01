@@ -12,6 +12,7 @@
 #include "NL/MemAlloc.h"
 #include "NL/nlMemory.h"
 #include "types.h"
+#include "unclassified/tu_801B6188.h"
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
@@ -39,7 +40,6 @@ extern "C" void fn_80338C2C(UnidentifiedNetworkSession* session, int, int);
 extern "C" u32 fn_803236CC();
 extern "C" int fn_8025BD88();
 extern "C" int fn_802C2C84(const char* path, int);
-extern "C" int fn_801B63C8(u8 stadium);
 extern u8 lbl_806E18D4;
 
 extern "C" void fn_80374174();
