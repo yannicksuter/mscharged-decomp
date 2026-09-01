@@ -36,6 +36,8 @@
 #include "NL/nlSlotPool.h"
 #include "NL/utility.h"
 #include "unclassified/tu_801A0E64.h"
+#include "unclassified/tu_801A5F10.h"
+#include "Game/Render/NPCManager.h"
 #include "math.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -106,7 +108,6 @@ extern "C" void fn_80015C38(cBall* pBall, int nParam);
 extern "C" void fn_800154FC(cBall* pBall, float fParam);
 extern "C" void fn_801B75C8(cFielder* pFielder, int, int, int, int);
 extern "C" void fn_800395C0(cFielder* pFielder);
-extern "C" void fn_801A6344(void* pParam, cFielder* pFielder);
 extern "C" void fn_8019A270(void* pParam, cFielder* pFielder);
 extern "C" float fn_8002C7E8(PlayerTweaks* pTweaks);
 extern "C" void fn_801BA034();
@@ -225,8 +226,6 @@ extern "C" UnidentifiedCaptainObject* fn_801792C4(void* pParam, int nIndex);
 extern "C" bool fn_802B6BC8(const nlVector3* v3Start,
     const nlVector3* v3End, const nlVector3* v3A, const nlVector3* v3B,
     float* fOut1, float* fOut2);
-extern "C" HammerObject* fn_801AA3AC(
-    void* pManager, int nParam);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern "C" void fn_80331F9C(void* pPad, int nParam, int nParam2);
 extern "C" bool fn_800EBC84(
@@ -333,14 +332,6 @@ struct UnidentifiedMegaStrikeEvent
     /* 0x04 */ float fMeterValue;
     /* 0x08 */ nlVector3 v3Position;
 };
-
-struct UnidentifiedManager806E1608
-{
-    /* 0x00 */ u8 mUnidentified00[0x28];
-    /* 0x28 */ void* mUnidentified28;
-    /* 0x2C */ void* mUnidentified2C;
-};
-extern UnidentifiedManager806E1608* lbl_806E1608;
 
 struct UnidentifiedSkillshotNode
 {
@@ -4537,16 +4528,16 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
             }
             else if (m_eCharacterClass == (eCharacterClass)0x0E)
             {
-                if (lbl_806E1608->mUnidentified2C != 0)
+                if (lbl_806E1608->mUnidentified02C != 0)
                 {
-                    fn_801A6344(lbl_806E1608->mUnidentified2C, this);
+                    fn_801A6344(lbl_806E1608->mUnidentified02C, this);
                 }
             }
             else if (m_eCharacterClass == (eCharacterClass)0x0C)
             {
-                if (lbl_806E1608->mUnidentified28 != 0)
+                if (lbl_806E1608->mUnidentified028 != 0)
                 {
-                    fn_8019A270(lbl_806E1608->mUnidentified28, this);
+                    fn_8019A270(lbl_806E1608->mUnidentified028, this);
                 }
             }
         }
@@ -5289,8 +5280,7 @@ void cFielder::fn_8004E6B4()
 {
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
-        HammerObject* pProjectile
-            = fn_801AA3AC(lbl_806E1608, -1);
+        HammerObject* pProjectile = lbl_806E1608->fn_801AA3AC(-1);
         if (pProjectile != 0)
         {
             fn_801A1B54(pProjectile, this);

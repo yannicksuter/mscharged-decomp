@@ -8,6 +8,7 @@
 #include "Game/Render/ShootToScoreArrow.h"
 #include "NL/nlTask.h"
 #include "types.h"
+#include "Game/Render/NPCManager.h"
 
 // Charged keeps the predecessor's transition-manager surface but replaces most
 // of its subsystem calls. Everything still address-named below lives in a
@@ -123,7 +124,6 @@ void fn_800180AC(void*);
 void fn_801E23A4(void*, u32, u32);
 void fn_800A7998(void*);
 void fn_80059940(Game*, int);
-void fn_801ABF8C(void*);
 void fn_801745DC(void*);
 void fn_800F23F4();
 void fn_800F2404();
@@ -134,7 +134,6 @@ extern u8 lbl_806E181D;
 extern void* g_pBall;
 extern void* lbl_806E0DF8[];
 extern void* lbl_806E1860;
-extern void* lbl_806E1608;
 extern void* lbl_806E12C8[2];
 extern Game* lbl_806E0C94;
 extern cCharacter* lbl_8056B800[10];
@@ -244,7 +243,7 @@ inline void ClearCharacterEffectsTexturing()
     }
 
     fn_80059940(lbl_806E0C94, 0);
-    fn_801ABF8C(lbl_806E1608);
+    lbl_806E1608->fn_801ABF8C();
     fn_801745DC(lbl_806E12C8[0]);
 }
 

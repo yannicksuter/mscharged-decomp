@@ -1178,12 +1178,37 @@ unclassified/tu_801A4EC0.cpp:
 	.sbss       start:0x806E15B8 end:0x806E15C0
 	.sdata2     start:0x806E5148 end:0x806E5178
 
+unclassified/tu_801A5F10.cpp:
+	.text       start:0x801A5F10 end:0x801A6824
+	.ctors      start:0x804DB714 end:0x804DB718
+	.data       start:0x805141C0 end:0x805141D8
+	.bss        start:0x805722F8 end:0x805723F8
+	.sdata      start:0x806DCF98 end:0x806DCFB0
+	.sdata2     start:0x806E5178 end:0x806E5188
+
 unclassified/tu_801A6824.cpp:
 	.text       start:0x801A6824 end:0x801A6AAC
 	.ctors      start:0x804DB718 end:0x804DB71C
 	.data       start:0x805141D8 end:0x80514210
 	.bss        start:0x805723F8 end:0x80572410
 	.sdata2     start:0x806E5188 end:0x806E51A0
+
+unclassified/tu_801A6AAC.cpp:
+	.text       start:0x801A6AAC end:0x801A9470
+	.ctors      start:0x804DB71C end:0x804DB720
+	.data       start:0x80514210 end:0x80514298
+	.bss        start:0x80572410 end:0x80573BE0
+	.sdata      start:0x806DCFB8 end:0x806DD000
+	.sbss       start:0x806E15C0 end:0x806E1608
+	.sdata2     start:0x806E51A0 end:0x806E5210
+
+Game/Render/NPCManager.cpp:
+	.text       start:0x801A9470 end:0x801AC30C
+	.ctors      start:0x804DB720 end:0x804DB724
+	.data       start:0x80514298 end:0x80514430
+	.sdata      start:0x806DD000 end:0x806DD008
+	.sbss       start:0x806E1608 end:0x806E1610
+	.sdata2     start:0x806E5210 end:0x806E5218
 
 unclassified/tu_801AC30C.cpp:
 	.text       start:0x801AC30C end:0x801AD0EC

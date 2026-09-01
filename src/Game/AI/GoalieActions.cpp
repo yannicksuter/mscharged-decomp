@@ -28,6 +28,9 @@
 #include "Game/SAnim/pnSingleAxisBlender.h"
 #include "Game/Team.h"
 #include "NL/globalpad.h"
+#include "unclassified/tu_801A5F10.h"
+#include "unclassified/tu_801A6AAC.h"
+#include "Game/Render/NPCManager.h"
 #include "math.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -54,29 +57,10 @@ struct UnidentifiedGoalieSkillTweaks
     float* mpLooseBallChaseDistance;
 };
 
-struct UnidentifiedPowerupManager
-{
-    u8 mUnidentified00[0x2C];
-    PowerupBase* mUnidentified2C;
-};
-
 struct UnidentifiedFESceneState
 {
     u8 mUnidentified000[0x74];
     int mUnidentified074;
-};
-
-struct UnidentifiedMegaBallState
-{
-    float mUnidentified000;
-    float mUnidentified004;
-    u8 mUnidentified008[0x14];
-    unsigned int mUnidentified01C;
-    u8 mUnidentified020[0x08];
-    bool mUnidentified028;
-    bool mUnidentified029;
-    u8 mUnidentified02A[0x3E];
-    bool mUnidentified068;
 };
 
 struct UnidentifiedWallSegment
@@ -173,7 +157,6 @@ extern void* lbl_806E0E00;
 extern nlVector4 lbl_8056D3B0;
 extern unsigned char lbl_806E0D20;
 extern unsigned char lbl_806E0D21;
-extern UnidentifiedPowerupManager* lbl_806E1608;
 extern BaseGameSceneManager* lbl_806E1860;
 extern void* lbl_806E20D8;
 
@@ -192,19 +175,6 @@ extern "C" EmissionController* fn_801B64E8(
 extern "C" void fn_8001AA0C(LiveBallTrail* pBallTrail, bool bParam);
 extern "C" void fn_8001AD24(
     LiveBallTrail* pBallTrail, cFielder* pFielder);
-extern "C" void fn_801A6DD8();
-extern "C" UnidentifiedMegaBallState* fn_801A75A8(
-    float fParam1, float fParam2, float fParam3);
-extern "C" UnidentifiedMegaBallState* fn_801A7620(unsigned int nIndex);
-extern "C" void fn_801A6B64(
-    UnidentifiedMegaBallState* pState, bool bParam);
-extern "C" void fn_801A6D44(UnidentifiedMegaBallState* pState,
-    bool bParam, float fParam1, float fParam2, float fParam3, float fParam4);
-extern "C" void fn_801A6DC4(UnidentifiedMegaBallState* pState);
-extern "C" UnidentifiedMegaBallState* fn_801A76BC(unsigned int nIndex);
-extern "C" void fn_801A7610(UnidentifiedMegaBallState* pState);
-extern "C" float fn_801A78B8(UnidentifiedMegaBallState* pState1,
-    UnidentifiedMegaBallState* pState2);
 extern "C" void fn_802779EC(
     nlVector3& v3Result, float fParam1, float fParam2, float fParam3);
 extern "C" void fn_800EDCE8(cPlayer* pPlayer);
@@ -1283,7 +1253,7 @@ bool Goalie::fn_80084724(unsigned int nParam, float* pScore)
             continue;
         }
 
-        if (!pCandidate->mUnidentified068)
+        if (!pCandidate->mUnidentified04C.mUnidentified01C)
         {
             fn_800EDCE8(this);
             fn_800EBBFC(0, 0xCC36B742, 0, 0);
@@ -1393,7 +1363,7 @@ void Goalie::fn_80084AE0(UnidentifiedMegaBallState* pState)
     {
         UnidentifiedMegaBallState* pCurrentState = fn_801A7620(i);
         if (pCurrentState->mUnidentified029
-            && pCurrentState->mUnidentified068)
+            && pCurrentState->mUnidentified04C.mUnidentified01C)
         {
             fn_801A6DC4(pCurrentState);
             pCurrentState->mUnidentified028 = false;
@@ -2968,8 +2938,8 @@ bool Goalie::fn_80090958(bool bParam)
             ReleaseBall(false);
         }
 
-        PowerupBase* pPowerup = lbl_806E1608->mUnidentified2C;
-        if (pPowerup != 0 && pPowerup->m_unk20)
+        KoopaShellObject* pPowerup = lbl_806E1608->mUnidentified02C;
+        if (pPowerup != 0 && pPowerup->mVisible)
         {
             fn_800156F8(g_pBall, mpSkillShooter);
         }

@@ -5,29 +5,16 @@
 #include "Game/Drawable/ShadowProp.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
+#include "unclassified/tu_801A5F10.h"
 
 // Charged-only shadow prop, third of the run described beside
 // DrawableBulletBill. The live object's translation unit spells
 // "koopa_shell_trail", and this snapshot spins the prop about Z from a 16-bit
-// angle unit. The live object and the material services stay address-named.
-
-struct KoopaShellObject;
-
-struct KoopaShellObjectFields
-{
-    /* 0x00 */ u16 mSpin;
-    char _002[2];
-    /* 0x04 */ nlVector3 mPosition;
-    char _010[0x10];
-    /* 0x20 */ bool mVisible;
-    char _021[7];
-    /* 0x28 */ RenderObject* mDrawable;
-};
+// angle unit. The remaining material services stay address-named.
 
 extern "C"
 {
     float fn_8002D194(int);
-    float fn_801A65C0(const KoopaShellObject*);
 }
 
 static float gShadowScaleIn = 0.125f;
@@ -149,14 +136,14 @@ void DrawableKoopaShell::Grab(const KoopaShellObject* object)
         return;
     }
 
-    mVisible = ((const KoopaShellObjectFields*)object)->mVisible;
+    mVisible = object->mVisible;
     if (!mVisible)
     {
         return;
     }
 
-    mPosition = ((const KoopaShellObjectFields*)object)->mPosition;
-    mSpin = ((const KoopaShellObjectFields*)object)->mSpin;
+    mPosition = object->mPosition;
+    mSpin = object->mSpin;
     mScale = fn_801A65C0(object);
 }
 
@@ -170,7 +157,7 @@ void DrawableKoopaShell::Render(const KoopaShellObject* object) const
         return;
     }
 
-    drawable = ((const KoopaShellObjectFields*)object)->mDrawable;
+    drawable = object->mDrawable;
     if (drawable == 0)
     {
         return;

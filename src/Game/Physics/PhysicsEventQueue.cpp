@@ -10,6 +10,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "unclassified/tu_801A0E64.h"
+#include "unclassified/tu_801A5F10.h"
 
 extern "C" void fn_8017617C();
 extern "C" void fn_801761E0();
@@ -231,7 +232,6 @@ extern "C" void fn_80015B38(void*, int);
 extern "C" void fn_8002E5F4(void*, int);
 extern "C" void fn_8004AC68(void*, nlVector3*, void*);
 extern "C" void fn_8019A434(void*, int);
-extern "C" void fn_801A64A4(void*, int);
 extern "C" void fn_80176A60(nlVector3*);
 
 extern "C" void fn_801452F4(void* object)
@@ -298,7 +298,7 @@ extern "C" void fn_801453FC(void* data)
     {
         fn_80015B38(g_pBall, 0);
     }
-    fn_801A64A4(*(void**)bytes, 0);
+    fn_801A64A4(*(KoopaShellObject**)bytes, false);
 }
 
 extern "C" void fn_8014545C(void* data)
