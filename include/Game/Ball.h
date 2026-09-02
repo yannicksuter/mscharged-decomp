@@ -4,6 +4,8 @@
 #include "NL/nlMath.h"
 #include "NL/nlTimer.h"
 
+#include "Game/CharacterTriggers.h"
+
 enum eSpinType
 {
     SPINTYPE_NONE = 0,
@@ -38,15 +40,21 @@ public:
     void SetPassTarget(cPlayer* passTargetPlayer, const nlVector3& pos,
         bool bVolley);
     void SetPassTargetTimer(float seconds);
+    float PredictLandingSpotAndTime(nlVector3& v3Dest,
+        int* pNumSolutions, float* pTimes, float fHeight);
     void KillBlurHandler();
     void ClearBallBlur();
     void SetOwner(cPlayer* pOwner);
     void SetPosition(const nlVector3& pos);
     void SetVelocity(const nlVector3& velocity, eSpinType spin,
         const nlVector3* pAngularVelocity);
+    void Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
+        const nlVector3& v3Spin, eSpinType spinType, int nBallState,
+        bool bParam6);
     void ShootRelease(const nlVector3& v3Velocity, eSpinType SpinType);
     void ShootAtFast(nlVector3& v3Vel, const nlVector3& v3Target,
         float fDesiredTime);
+    void Update(float fDeltaT);
     void SyncLog(void* context, DebugWriteCache* cache);
     void fn_8001A898(RunningChecksum* runningChecksum);
     nlVector3* GetAIVelocity() const;
@@ -55,6 +63,8 @@ public:
     cFielder* GetOwnerFielder();
     cPlayer* GetOwnerGoalie();
     cFielder* GetPassTargetFielder() const;
+    void InitiateBallBlur(
+        eBallShotEffectType effectType, cPlayer* pPlayer);
     bool GetInNet(int& nSide);
 
     /* 0x00 */ bool m_bVisible;

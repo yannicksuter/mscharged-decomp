@@ -37,6 +37,8 @@ public:
 class BlurManager
 {
 public:
+    static void DestroyHandler(
+        BlurHandler* handler, float timeToDie);
     static BlurHandler* GetNewHandler(
         const char* szTextureName, float fLineWidth, int maxPositionEntries, bool bAdditive);
 };
