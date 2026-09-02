@@ -1,5 +1,6 @@
 #include <revolution/os.h>
 #include <revolution/sc.h>
+#include <stdio.h>
 #include <string.h>
 
 #define XOR_KEY 0x73B5DBFA
@@ -91,4 +92,30 @@ s8 SCGetProductArea(void) {
     }
 
     return -1;
+}
+
+char* SCGetProductCode(void) {
+    static char buf[6];
+
+    if (__SCF1("CODE", buf, sizeof(buf))) {
+        return buf;
+    }
+
+    return NULL;
+}
+
+BOOL SCGetProductSNString(char* buf, u32 sz) {
+    return __SCF1("SERNO", buf, sz);
+}
+
+BOOL SCGetProductSN(u32* sn) {
+    char buf[11];
+
+    if (SCGetProductSNString(buf, sizeof(buf))) {
+        if (sscanf(buf, "%u", sn) == 1) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
 }

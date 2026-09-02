@@ -48,3 +48,40 @@ void ShaderSkinMesh::fn_8036FC4C(int nodeIndex, const nlMatrix4* matrix)
 {
     m_Unknown2C[nodeIndex] = *matrix;
 }
+
+UnidentifiedShaderSkinData_80370808::~UnidentifiedShaderSkinData_80370808()
+{
+    delete[] m_Unknown08;
+}
+
+UnidentifiedShaderSkinEntry_80370868::~UnidentifiedShaderSkinEntry_80370868()
+{
+    delete[] m_Unknown04;
+}
+
+UnidentifiedShaderSkinData_80370808::UnidentifiedShaderSkinData_80370808()
+    : m_Unknown00(0)
+    , m_Unknown04(0)
+    , m_Unknown08(0)
+{
+}
+
+UnidentifiedShaderSkinEntry_80370868::UnidentifiedShaderSkinEntry_80370868()
+    : m_Unknown00(0)
+    , m_Unknown04(0)
+{
+}
+
+glModel* ShaderSkinMesh::GetModel()
+{
+    bool unknown = false;
+    if (!m_Unknown45 && m_Unknown0C == 0)
+    {
+        unknown = true;
+    }
+    if (unknown)
+    {
+        return (glModel*)m_Unknown28;
+    }
+    return (glModel*)m_pMaterialList;
+}

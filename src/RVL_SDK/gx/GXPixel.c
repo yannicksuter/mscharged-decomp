@@ -86,29 +86,6 @@ void GXSetFog(GXFogType type, GXColor color, f32 start, f32 end, f32 near,
     gxdt->lastWriteWasXF = FALSE;
 }
 
-void GXInitFogAdjTable(GXFogAdjTable* table, u16 width, const Mtx44 proj) {
-    f32 f31, f30, f29, f28, f27;
-    u32 i;
-
-    if (proj[3][3] == 0.0l) {
-        f30 = proj[2][3] / (proj[2][2] - 1.0f);
-        f28 = f30 / proj[0][0];
-    } else {
-        f28 = 1.0f / proj[0][0];
-        f30 = M_SQRT3 * f28;
-    }
-
-    f29 = 2.0f / width;
-
-    for (i = 0; i < ARRAY_SIZE(table->r); i++) {
-        f31 = (i + 1) * 32;
-        f31 *= f29;
-        f31 *= f28;
-        f27 = sqrtf(1.0f + (f31 * f31) / (f30 * f30));
-        table->r[i] = (u32)(f27 * 256) & 0xFFF;
-    }
-}
-
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable* table) {
     u32 fogRangeReg;
     u32 fogRangeRegK;

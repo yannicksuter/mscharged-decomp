@@ -60,8 +60,12 @@ public:
     /* 0x10 */ virtual ut::Font* GetFont(const char* name);
 
     bool Attach(void* archiveStart, const char* resourceRootDirectory);
+    void* Detach();
 
     bool IsAttached(void) { return this->mArcBuf != NULL; }
+
+    void RegistFont(FontRefLink* pLink);
+    void UnregistFont(FontRefLink* pLink);
 
 private:
     /* 0x00 (base) */

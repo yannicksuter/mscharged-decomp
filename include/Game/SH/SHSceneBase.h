@@ -3,6 +3,7 @@
 
 #include "Game/BaseSceneHandler.h"
 #include "Game/FE/feAsyncImage.h"
+#include "Game/FE/feCaptainComponent.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlFunction.h"
 #include "unclassified/tu_80219248.h"
@@ -10,21 +11,6 @@
 class TLComponentInstance;
 class TLInstance;
 class TLTextInstance;
-
-// Text crossfade helper owned by the 0x801E2xxx translation unit.
-struct UnidentifiedTextFader
-{
-    UnidentifiedTextFader(int value);
-
-    /* 0x00 */ u8 mUnidentified00[0x4];
-    /* 0x04 */ BasicString<char, Detail::TempStringAllocator> mText;
-    /* 0x08 */ u8 mUnidentified08[0x1C];
-    /* 0x24 */ float mUnidentified24;
-    /* 0x28 */ float mUnidentified28;
-    /* 0x2C */ float mUnidentified2C;
-    /* 0x30 */ Function<FnVoidVoid> mUnidentified30;
-    /* 0x38 */ u8 mUnidentified38[0x8];
-}; // size 0x40
 
 // Scroll widget owned by the 0x8022Fxxx/0x80230xxx translation units.
 struct UnidentifiedScrollWidget

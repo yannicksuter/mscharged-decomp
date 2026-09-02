@@ -11,6 +11,12 @@ enum __ReadProcActions {
 };
 
 typedef struct {
+    char* CharStr;
+    size_t MaxCharCount;
+    size_t CharsWritten;
+} __OutStrCtrl;
+
+typedef struct {
     char* NextChar;
     int NullCharDetected;
 } __InStrCtrl;

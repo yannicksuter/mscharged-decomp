@@ -69,15 +69,69 @@ void SeqSound::Shutdown() {
     mManager->Free(this);
 }
 
+void SeqSound::SetTempoRatio(f32 tempoRatio) {
+    NW4HBMAssert(tempoRatio >= 0.0f);
+    mSeqPlayer.SetTempoRatio(tempoRatio);
+}
 
 void SeqSound::SetChannelPriority(int priority) {
     NW4HBMAssertHeaderClampedLRValue_Line(priority, 0, 127, 233);
     mSeqPlayer.SetChannelPriority(priority);
 }
 
+void SeqSound::SetReleasePriorityFix(bool flag) { mSeqPlayer.SetReleasePriorityFix(flag); }
+
 void SeqSound::SetPlayerPriority(int priority) {
     BasicSound::SetPlayerPriority(priority);
     mManager->UpdatePriority(this, CalcCurrentPlayerPriority());
+}
+
+void SeqSound::SetTrackVolume(u32 trackFlags, f32 volume) {
+    NW4HBMAssert(volume >= 0.0f);
+    mSeqPlayer.SetTrackVolume(trackFlags, volume);
+}
+
+void SeqSound::SetTrackPitch(u32 trackFlags, f32 pitch) {
+    NW4HBMAssert(pitch >= 0.0f);
+    mSeqPlayer.SetTrackPitch(trackFlags, pitch);
+}
+
+bool SeqSound::ReadVariable(int varNo, s16* var) {
+    NW4HBMAssertPointerNonnull(var);
+    NW4HBMAssertHeaderClampedLValue(varNo, 0, SeqPlayer::LOCAL_VARIABLE_NUM);
+
+    vs16* varPtr = mSeqPlayer.GetVariablePtr(varNo);
+    if (varPtr == NULL) {
+        return false;
+    }
+
+    *var = *varPtr;
+    return true;
+}
+
+bool SeqSound::WriteVariable(int varNo, s16 value) {
+    NW4HBMAssertHeaderClampedLValue(varNo, 0, SeqPlayer::LOCAL_VARIABLE_NUM);
+    mSeqPlayer.SetLocalVariable(varNo, value);
+    return true;
+}
+
+bool SeqSound::WriteGlobalVariable(int varNo, s16 value) {
+    NW4HBMAssertHeaderClampedLValue(varNo, 0, SeqPlayer::GLOBAL_VARIABLE_NUM);
+    SeqPlayer::SetGlobalVariable(varNo, value);
+    return true;
+}
+
+bool SeqSound::WriteTrackVariable(int trackNo, int varNo, s16 value) {
+    NW4HBMAssertHeaderClampedLValue(trackNo, 0, SeqPlayer::TRACK_NUM);
+    NW4HBMAssertHeaderClampedLValue(varNo, 0, SeqTrack::VARIABLE_NUM);
+
+    SeqTrack* track = mSeqPlayer.GetPlayerTrack(trackNo);
+    if (track == NULL) {
+        return false;
+    }
+
+    track->SetTrackVariable(varNo, value);
+    return true;
 }
 
 bool SeqSound::IsAttachedTempSpecialHandle() { return mTempSpecialHandle != NULL; }

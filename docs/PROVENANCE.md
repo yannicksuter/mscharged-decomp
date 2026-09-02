@@ -26,6 +26,9 @@ The project was built with or adapted source from the following projects:
 | [doldecomp/brawl at `ec22759`](https://github.com/doldecomp/brawl/tree/ec2275908c1b22af4e47cc57bee51e070aff2adb) | DWC time-helper code-shape and `DWC_GetDateTime` identity reference. |
 | [NitroDWC 1.2 patch-plus4 (2006-08-25)](https://twlsdk.randommeaninglesscharacters.com/download/NitroDWC/NitroDWC-1_2-patch-plus4-20060825.zip) | DWC account, NAS-time, and ranking API, structure, semantics, and donor naming reference. |
 | [zeldaret/oot-vc at `9c18537`](https://github.com/zeldaret/oot-vc/tree/9c1853710bcf6b598b0710022fdb87b9a8e99e2c) | MetroTRK, RVL SDK, Home Button Menu (`nw4hbm`), and Metrowerks Standard Library reconstructions. |
+| [zeldaret/ss at `9481f3a`](https://github.com/zeldaret/ss/tree/9481f3ab62d690bd6534cb0adf7e02db5579b333) | NintendoWare sound API, method-order, and debug-symbol references. |
+| [robojumper/sdk_2009-12-11 at `19e2ec4`](https://github.com/robojumper/sdk_2009-12-11/tree/19e2ec48d61a84ee072dc4fb5ac1db9bfd08c766) | Matched later Home Button Menu binary-file APIs and shared endian-helper reconstruction. |
+| [LoigiFan72/NW4C at `ad5d65b`](https://github.com/LoigiFan72/NW4C/tree/ad5d65b9600463dea25f66958874cf41acf3692f) | Independent NintendoWare binary-file API and assertion-ownership reference. |
 | [projectPiki/pik1wii at `96c1af6`](https://github.com/projectPiki/pik1wii/tree/96c1af63ed75996755e53bb85decce3c890e5ca4) | RVL SDK WPAD encryption and HID parser reconstructions. |
 | [conhlee/rhf at `4429cbc`](https://github.com/conhlee/rhf/tree/4429cbcb000abff644683d98701f6ab8c1671e10) | RVL SDK `DVDSetAutoInvalidation` reconstruction. |
 | [zeldaret/tp at `ecafc81`](https://github.com/zeldaret/tp/tree/ecafc81d53cadf3c29ac01b03170cbe9bc37c686) | RVL SDK reconstructions. |

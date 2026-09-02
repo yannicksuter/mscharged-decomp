@@ -3,10 +3,7 @@
 #include "revolution/hbm/nw4hbm/lyt/common.h"
 #include "revolution/hbm/nw4hbm/lyt/layout.h"
 
-#include "decomp.h"
-
 namespace {
-// pretend this is nw4hbm::lyt
 using namespace nw4hbm;
 using namespace nw4hbm::lyt;
 
@@ -97,10 +94,6 @@ void Pane::SetUserData(const char* userData) { strncpy(mUserData, userData, size
 
 void Pane::AppendChild(Pane* pChild) { InsertChild(mChildList.GetEndIter(), pChild); }
 
-// it requires a type that wasn't used before to generate the string and avoid having it stripped
-typedef nw4hbm::ut::LinkList<void**, 0> DummyLinkList;
-typedef nw4hbm::ut::LinkList<void***, 0> DummyLinkList2;
-
 void Pane::InsertChild(PaneList::Iterator next, Pane* pChild) {
     NW4HBMAssertPointerNonnull_Line(pChild, 253);
     NW4HBMAssert_Line(pChild->mpParent == 0, 254);
@@ -108,6 +101,20 @@ void Pane::InsertChild(PaneList::Iterator next, Pane* pChild) {
     pChild->mpParent = this;
 }
 
+void Pane::PrependChild(Pane* pChild) { InsertChild(mChildList.GetBeginIter(), pChild); }
+
+void Pane::InsertChild(Pane* pNext, Pane* pChild) {
+    NW4HBMAssertPointerNonnull(pNext);
+    NW4HBMAssert(pNext->mpParent == this);
+    InsertChild(mChildList.GetIteratorFromPointer(pNext), pChild);
+}
+
+void Pane::RemoveChild(Pane* pChild) {
+    NW4HBMAssertPointerNonnull(pChild);
+    NW4HBMAssert(pChild->mpParent == this);
+    mChildList.Erase(pChild);
+    pChild->mpParent = NULL;
+}
 
 #pragma ppc_iro_level 0
 
@@ -144,9 +151,6 @@ u8 Pane::GetColorElement(u32 idx) const {
             return GetVtxColorElement(idx);
     }
 }
-
-// it requires a type that wasn't used before to generate the string and avoid having it stripped
-typedef nw4hbm::ut::LinkList<void****, 0> DummyLinkList3;
 
 void Pane::SetColorElement(u32 idx, u8 value) {
     NW4HBMAssert_Line(idx < ANIMTARGET_PANE_COLOR_MAX, 334);

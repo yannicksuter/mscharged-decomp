@@ -9,6 +9,25 @@ class cPoseAccumulator;
 class GLMaterialList;
 struct glModel;
 
+struct UnidentifiedShaderSkinEntry_80370868
+{
+    UnidentifiedShaderSkinEntry_80370868();
+    ~UnidentifiedShaderSkinEntry_80370868();
+
+    /* 0x00 */ unsigned long m_Unknown00;
+    /* 0x04 */ unsigned char* m_Unknown04;
+};
+
+struct UnidentifiedShaderSkinData_80370808
+{
+    UnidentifiedShaderSkinData_80370808();
+    ~UnidentifiedShaderSkinData_80370808();
+
+    /* 0x00 */ unsigned long m_Unknown00;
+    /* 0x04 */ unsigned long m_Unknown04;
+    /* 0x08 */ UnidentifiedShaderSkinEntry_80370868* m_Unknown08;
+};
+
 class GLSkinMesh
 {
 public:
@@ -83,7 +102,7 @@ public:
     void fn_8036FC4C(int nodeIndex, const nlMatrix4* matrix);
 
     /* 0x20 */ BoneMapList* boneMaps;
-    /* 0x24 */ void* m_Unknown24;
+    /* 0x24 */ UnidentifiedShaderSkinData_80370808* m_Unknown24;
     /* 0x28 */ void* m_Unknown28;
     /* 0x2C */ nlMatrix4* m_Unknown2C;
     /* 0x30 */ nlMatrix4* m_Unknown30;

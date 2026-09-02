@@ -106,6 +106,18 @@ typedef struct SCIdleModeInfo {
     u8 slotLight;
 } SCIdleModeInfo;
 
+#define SC_SIMPLE_ADDRESS_ID_COUNTRY 24
+#define SC_SIMPLE_ADDRESS_ID_REGION 16
+#define SC_SIMPLE_ADDRESS_ID_CITY 0
+
+typedef struct SCSimpleAddress {
+    u32 id;
+    u16 countryName[16][64];
+    u16 regionName[16][64];
+    u16 latitude;
+    u16 longitude;
+} SCSimpleAddress;
+
 typedef struct SCDevInfo {
     char devName[20];
     char at_0x14[1];
@@ -167,6 +179,8 @@ BOOL SCSetWpadMotorMode(u8 mode);
 u8 SCGetWpadSensorBarPosition(void);
 u8 SCGetWpadSpeakerVolume(void);
 BOOL SCSetWpadSpeakerVolume(u8 vol);
+u32 SCGetSimpleAddressID(void);
+BOOL SCGetSimpleAddressData(SCSimpleAddress* address);
 
 typedef void (*SCFlushCallback)(SCStatus status);
 
@@ -184,6 +198,9 @@ BOOL SCReplaceU8Item(u8 data, SCItemID id);
 BOOL __SCF1(const char* type, char* buf, u32 sz);
 BOOL SCGetProductAreaString(char* buf, u32 sz);
 s8 SCGetProductArea(void);
+char* SCGetProductCode(void);
+BOOL SCGetProductSNString(char* buf, u32 sz);
+BOOL SCGetProductSN(u32* sn);
 
 #ifdef __cplusplus
 }

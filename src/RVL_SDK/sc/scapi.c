@@ -1,5 +1,13 @@
 #include <revolution/sc.h>
 
+#include <revolution/os.h>
+
+#include <string.h>
+
+static SCSimpleAddress TempSimpleAddress;
+
+#define MASK(x) (0xFF << (x))
+
 u8 SCGetAspectRatio(void) {
     u8 item;
 
@@ -171,4 +179,35 @@ u8 SCGetWpadSpeakerVolume(void) {
 
 BOOL SCSetWpadSpeakerVolume(u8 vol) {
     return SCReplaceU8Item(vol, SC_ITEM_BT_SPKV);
+}
+
+u32 SCGetSimpleAddressID(void) {
+    if (SCGetSimpleAddressData(&TempSimpleAddress)) {
+        return TempSimpleAddress.id;
+    }
+    return 0xFFFFFFFF;
+}
+
+BOOL SCGetSimpleAddressData(SCSimpleAddress* address) {
+    BOOL enabled;
+    u32 id;
+
+    if (SCFindByteArrayItem(address, sizeof(*address), SC_ITEM_IPL_SADR) &&
+        address->id != 0xFFFFFFFF &&
+        (address->id & MASK(SC_SIMPLE_ADDRESS_ID_COUNTRY)) != 0 &&
+        (address->id & MASK(SC_SIMPLE_ADDRESS_ID_COUNTRY)) != 0xFF000000 &&
+        (address->id & MASK(SC_SIMPLE_ADDRESS_ID_REGION)) != 0xFF0000) {
+        enabled = OSDisableInterrupts();
+        id = address->id;
+
+        if ((address->id & MASK(SC_SIMPLE_ADDRESS_ID_REGION)) == 0) {
+            memset(address, 0, sizeof(*address));
+            address->id = id;
+        }
+
+        OSRestoreInterrupts(enabled);
+        return TRUE;
+    } else {
+        return FALSE;
+    }
 }

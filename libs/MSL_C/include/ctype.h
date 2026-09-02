@@ -19,6 +19,19 @@ extern "C" {
 #define __MSL_ISUPPER_MAP  (1 << 9)
 #define __MSL_ISXDIGIT_MAP (1 << 10)
 
+#define ctype_alpha  __MSL_ISALPHA_MAP
+#define ctype_blank  __MSL_ISBLANK_MAP
+#define ctype_cntrl  __MSL_ISCNTRL_MAP
+#define ctype_digit  __MSL_ISDIGIT_MAP
+#define ctype_graph  __MSL_ISGRAPH_MAP
+#define ctype_lower  __MSL_ISLOWER_MAP
+#define ctype_print  __MSL_ISPRINT_MAP
+#define ctype_punct  __MSL_ISPUNCT_MAP
+#define ctype_space  __MSL_ISSPACE_MAP
+#define ctype_upper  __MSL_ISUPPER_MAP
+#define ctype_xdigit __MSL_ISXDIGIT_MAP
+#define ctype_alnum  (ctype_alpha | ctype_digit)
+
 inline int isalpha(int value)
 {
     return value < 0 || value >= 256
@@ -38,6 +51,13 @@ inline int isspace(int value)
     return value < 0 || value >= 256
         ? 0
         : _current_locale.ctype_cmpt_ptr->ctype_map_ptr[value] & __MSL_ISSPACE_MAP;
+}
+
+inline int isupper(int value)
+{
+    return value < 0 || value >= 256
+        ? 0
+        : _current_locale.ctype_cmpt_ptr->ctype_map_ptr[value] & __MSL_ISUPPER_MAP;
 }
 
 inline int isxdigit(int value)

@@ -311,9 +311,6 @@ PaneComponent* PaneManager::getPaneComponentByPane(nw4hbm::lyt::Pane* pPane) {
     return NULL;
 }
 
-#pragma push
-#pragma opt_propagation off // ???
-
 void PaneManager::setAllBoundingBoxComponentTriggerTarget(bool b) {
     for (u32 i = 0; i < nw4hbm::ut::List_GetSize(&mIDToComponent); i++) {
         PaneToComponent* p = static_cast<PaneToComponent*>(nw4hbm::ut::List_GetNth(&mPaneToComponent, i));
@@ -323,8 +320,6 @@ void PaneManager::setAllBoundingBoxComponentTriggerTarget(bool b) {
         }
     }
 }
-
-#pragma pop
 
 bool PaneComponent::contain(f32 x_, f32 y_) {
     if (!mpManager) {
@@ -360,8 +355,7 @@ void PaneComponent::draw() {
         return;
     }
 
-    // some stripped debug thing?
-    const nw4hbm::math::VEC3& translate = mpPane->GetTranslate();
+    (void)mpPane->GetTranslate();
 
     nw4hbm::lyt::Size size = mpPane->GetSize();
 
@@ -388,8 +382,6 @@ void PaneComponent::draw() {
               color);
 }
 
-#pragma global_optimizer off // ...ok!
-
 static bool is_visible(nw4hbm::lyt::Pane* pPane) {
     if (!pPane->IsVisible()) {
         return false;
@@ -399,12 +391,10 @@ static bool is_visible(nw4hbm::lyt::Pane* pPane) {
         return true;
     }
 
-    return is_visible(pPane->GetParent());
+    return is_visible(pPane->GetParent()) ? true : false;
 }
 
 bool PaneComponent::isVisible() { return is_visible(mpPane); }
-
-#pragma global_optimizer reset
 
 } // namespace gui
 } // namespace homebutton

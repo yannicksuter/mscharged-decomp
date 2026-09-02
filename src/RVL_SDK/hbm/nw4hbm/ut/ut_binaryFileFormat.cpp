@@ -1,6 +1,7 @@
 #include "revolution/hbm/nw4hbm/ut/binaryFileFormat.h"
 
 #include "revolution/hbm/nw4hbm/db.h"
+#include "revolution/hbm/nw4hbm/ut/inlines.h"
 
 namespace nw4hbm {
 namespace ut {
@@ -47,6 +48,51 @@ bool IsValidBinaryFile(const BinaryFileHeader* header, byte4_t signature, u16 ve
     }
 
     return true;
+}
+
+bool IsReverseEndianBinaryFile(const BinaryFileHeader* fileHeader) {
+    NW4HBMAssertPointerValid(fileHeader);
+
+    // U+FEFF * BYTE ORDER MARK
+    return fileHeader->byteOrder != 0xFEFF;
+}
+
+BinaryBlockHeader* GetNextBinaryBlockHeader(BinaryFileHeader* fileHeader, BinaryBlockHeader* blockHeader) {
+    NW4HBMAssertPointerValid(fileHeader);
+
+    void* ptr;
+
+    if (!IsReverseEndianBinaryFile(fileHeader)) {
+        if (blockHeader == NULL) {
+            if (fileHeader->dataBlocks == 0) {
+                return NULL;
+            }
+
+            ptr = AddOffsetToPtr(fileHeader, fileHeader->headerSize);
+        } else {
+            ptr = AddOffsetToPtr(blockHeader, blockHeader->size);
+        }
+
+        if (ptr >= AddOffsetToPtr(fileHeader, fileHeader->fileSize)) {
+            return NULL;
+        }
+    } else {
+        if (blockHeader == NULL) {
+            if (fileHeader->dataBlocks == 0) {
+                return NULL;
+            }
+
+            ptr = AddOffsetToPtr(fileHeader, ReverseEndian(fileHeader->headerSize));
+        } else {
+            ptr = AddOffsetToPtr(blockHeader, ReverseEndian(blockHeader->size));
+        }
+
+        if (ptr >= AddOffsetToPtr(fileHeader, ReverseEndian(fileHeader->fileSize))) {
+            return NULL;
+        }
+    }
+
+    return static_cast<BinaryBlockHeader*>(ptr);
 }
 
 } // namespace ut

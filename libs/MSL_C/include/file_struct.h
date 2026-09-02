@@ -61,4 +61,10 @@ struct _FILE {
     struct _FILE* next_file;
 };
 
+extern FILE __files[];
+
+#define stdin  (&__files[0])
+#define stdout (&__files[1])
+#define stderr (&__files[2])
+
 #endif

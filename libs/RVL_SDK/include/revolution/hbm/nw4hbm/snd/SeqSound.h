@@ -61,7 +61,17 @@ public:
     void Prepare(const void* seqBase, s32 seqOffset);
     void Prepare(const SeqLoadCallback* callback, u32 callbackData);
 
+    void SetTempoRatio(f32 tempoRatio);
     void SetChannelPriority(int priority);
+    void SetReleasePriorityFix(bool flag);
+
+    void SetTrackVolume(u32 trackFlags, f32 volume);
+    void SetTrackPitch(u32 trackFlags, f32 pitch);
+
+    bool ReadVariable(int varNo, s16* var);
+    bool WriteVariable(int varNo, s16 value);
+    static bool WriteGlobalVariable(int varNo, s16 value);
+    bool WriteTrackVariable(int trackNo, int varNo, s16 value);
 
 private:
     static void NotifyLoadAsyncEndSeqData(bool result, const void* seqBase, s32 seqOffset, void* userData);

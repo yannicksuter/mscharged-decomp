@@ -244,7 +244,6 @@ extern "C" int fn_80338284();
 extern "C" UnidentifiedNetworkPeer* fn_80338BF8(UnidentifiedNetworkSession*, int);
 extern "C" u32 fn_80111688(void*);
 extern "C" void* fn_8011166C();
-extern "C" void fn_801C5FB8(BaseGameSceneManager*, int);
 extern "C" void fn_801CBCE4(u32, int);
 extern "C" void fn_801FC2B4(int);
 extern "C" void fn_8026E338(BaseSceneHandler*, UnidentifiedNetworkMessage*);
@@ -1983,7 +1982,7 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
             BaseVirtual44((NetMessageGameStart*)message);
         }
         mUnidentified2448 = 4;
-        fn_801C5FB8(lbl_806E1838, 0x1D);
+        lbl_806E1838->fn_801C5FB8((SceneList)0x1D);
         for (int component = 0; component < 4; ++component)
         {
             lbl_80578450[component]->SetActiveSlide("waiting", true, false);

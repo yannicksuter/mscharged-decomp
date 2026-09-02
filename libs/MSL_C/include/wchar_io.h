@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+int __fwide(FILE*, int);
 int fwide(FILE*, int);
 
 #ifdef __cplusplus

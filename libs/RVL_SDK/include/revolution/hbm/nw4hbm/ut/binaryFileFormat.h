@@ -21,6 +21,8 @@ typedef struct BinaryBlockHeader {
 } BinaryBlockHeader;
 
 bool IsValidBinaryFile(const BinaryFileHeader* header, u32 signature, u16 version, u16 minBlocks);
+bool IsReverseEndianBinaryFile(const BinaryFileHeader* fileHeader);
+BinaryBlockHeader* GetNextBinaryBlockHeader(BinaryFileHeader* fileHeader, BinaryBlockHeader* blockHeader);
 
 } // namespace ut
 } // namespace nw4hbm

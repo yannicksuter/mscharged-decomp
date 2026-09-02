@@ -92,6 +92,15 @@ private:
     /* 0x9C */ float mPivotY;
 }; // size 0xA0
 
+inline void TU80300104Component::fn_801CD9D0(
+    float minX, float maxX, float maxY, float minY)
+{
+    mMinX = minX;
+    mMaxX = maxX;
+    mMaxY = maxY;
+    mMinY = minY;
+}
+
 inline void TU80300104Component::fn_802196A8(float value)
 {
     mMinX = value;

@@ -1090,14 +1090,14 @@ void SHChooseSides2::fn_8021E76C(int, void*)
         FEPopupMenu* popup = (FEPopupMenu*)lbl_806E1860->Push(
             (SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3B, Function<FnVoidVoid>(FEPopupMenu::Nothing));
-        popup->mMenuCreated = true;
+        popup->mUnidentified9A1 = true;
     }
     else
     {
         FEPopupMenu* popup = (FEPopupMenu*)lbl_806E1838->Push(
             (SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3B, Function<FnVoidVoid>(FEPopupMenu::Nothing));
-        popup->mMenuCreated = true;
+        popup->mUnidentified9A1 = true;
     }
 
     mUnidentified1F = true;
@@ -1269,7 +1269,7 @@ bool SHChooseSides2::fn_8021EED8(bool playSound)
         FEPopupMenu* popup = (FEPopupMenu*)lbl_806E1860->Push(
             (SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3C, Function<FnVoidVoid>(FEPopupMenu::Nothing));
-        popup->mMenuCreated = true;
+        popup->mUnidentified9A1 = true;
     }
     return removedController;
 }

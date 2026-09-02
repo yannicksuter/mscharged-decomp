@@ -131,6 +131,14 @@ bool ArcResourceAccessor::Attach(void* archiveStart, const char* resourceRootDir
     return true;
 }
 
+void* ArcResourceAccessor::Detach() {
+    NW4HBMAssert(IsAttached());
+
+    void* old = mArcBuf;
+    mArcBuf = NULL;
+    return old;
+}
+
 void* ArcResourceAccessor::GetResource(u32 resType, const char* name, u32* pSize) {
     return GetResourceSub(&mArcHandle, mResRootDir, resType, name, pSize);
 }
@@ -146,6 +154,16 @@ bool ArcResourceLink::Set(void* archiveStart, const char* resRootDirectory) {
     mResRootDir[ARRAY_COUNT(mResRootDir) - 1] = '\0';
 
     return true;
+}
+
+void ArcResourceAccessor::RegistFont(FontRefLink* pLink) {
+    NW4HBMAssertPointerNonnull(pLink);
+    mFontList.PushBack(pLink);
+}
+
+void ArcResourceAccessor::UnregistFont(FontRefLink* pLink) {
+    NW4HBMAssertPointerNonnull(pLink);
+    mFontList.Erase(pLink);
 }
 
 ut::Font* ArcResourceAccessor::GetFont(const char* name) { return detail::FindFont(&mFontList, name); }
