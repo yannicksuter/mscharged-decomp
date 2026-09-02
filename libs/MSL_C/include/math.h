@@ -156,6 +156,10 @@ long labs(long n);
         return pow(__x, __y);
     }
 
+    int __signbitd(double x);
+    int __fpclassifyf(float x);
+    int __fpclassifyd(double x);
+
 #ifdef __MWERKS__
 #pragma cplusplus on
 #endif
@@ -179,54 +183,6 @@ long labs(long n);
 #define FP_ZERO      3
 #define FP_NORMAL    4
 #define FP_SUBNORMAL 5
-
-    static inline int __fpclassifyf(float x)
-    {
-        switch ((*(_INT32*)&x) & 0x7f800000)
-        {
-        case 0x7f800000:
-        {
-            if ((*(_INT32*)&x) & 0x007fffff)
-                return FP_NAN;
-            else
-                return FP_INFINITE;
-            break;
-        }
-        case 0:
-        {
-            if ((*(_INT32*)&x) & 0x007fffff)
-                return FP_SUBNORMAL;
-            else
-                return FP_ZERO;
-            break;
-        }
-        }
-        return FP_NORMAL;
-    }
-
-    static inline int __fpclassifyd(double x)
-    {
-        switch (__HI(x) & 0x7ff00000)
-        {
-        case 0x7ff00000:
-        {
-            if ((__HI(x) & 0x000fffff) || (__LO(x) & 0xffffffff))
-                return FP_NAN;
-            else
-                return FP_INFINITE;
-            break;
-        }
-        case 0:
-        {
-            if ((__HI(x) & 0x000fffff) || (__LO(x) & 0xffffffff))
-                return FP_SUBNORMAL;
-            else
-                return FP_ZERO;
-            break;
-        }
-        }
-        return FP_NORMAL;
-    }
 
 #define fpclassify(x) \
     (sizeof(x) == sizeof(float) ? __fpclassifyf((float)(x)) : __fpclassifyd((double)(x)))

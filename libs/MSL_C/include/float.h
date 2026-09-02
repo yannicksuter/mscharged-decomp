@@ -5,7 +5,16 @@
 #define FLT_EPSILON 1.192092896e-07f
 #define FLT_MIN 1.175494351e-38f
 
-#define DBL_EPSILON 1.1920929e-07
+#define DBL_MANT_DIG 53
+#define DBL_DIG 15
+#define DBL_MIN_EXP (-1021)
+#define DBL_MIN_10_EXP (-308)
+#define DBL_MAX_EXP 1024
+#define DBL_MAX_10_EXP 308
+
+#define DBL_MAX 0x1.fffffffffffffP1023
+#define DBL_EPSILON 0x1.0000000000000P-52
+#define DBL_MIN 0x1.0000000000000P-1022
 
 #define LDBL_MANT_DIG 53
 #define LDBL_DIG 15

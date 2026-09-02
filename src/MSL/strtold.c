@@ -629,3 +629,28 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
         return result;
     }
 }
+
+inline double strtod(const char* str, char** end) {
+    __InStrCtrl isc;
+    double value, abs_value;
+    int count, overflow;
+
+    isc.NextChar = (char*)str;
+    isc.NullCharDetected = 0;
+    value = __strtold(INT_MAX, &__StringRead, (void*)&isc, &count, &overflow);
+
+    if (end) {
+        *end = (char*)str + count;
+    }
+
+    abs_value = fabs(value);
+    if (overflow || (value != 0.0 && (abs_value < DBL_MIN || abs_value > DBL_MAX))) {
+        errno = ERANGE;
+    }
+
+    return value;
+}
+
+double atof(const char* str) {
+    return strtod(str, NULL);
+}

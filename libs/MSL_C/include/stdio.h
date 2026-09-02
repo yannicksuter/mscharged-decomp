@@ -39,8 +39,14 @@ extern FILE* stderr;
 int remove(const char* filename);
 int rename(const char* old, const char* new_);
 FILE* fopen(const char* filename, const char* mode);
+FILE* freopen(const char* filename, const char* mode, FILE* stream);
 int fclose(FILE* stream);
 int fflush(FILE* stream);
+int setvbuf(FILE* stream, char* buf, int mode, size_t size);
+
+/* Character input/output (C89 4.9.7). */
+int fgetc(FILE* stream);
+int fputs(const char* s, FILE* stream);
 
 /* Formatted output (C89 4.9.6). */
 int fprintf(FILE* stream, const char* format, ...);
