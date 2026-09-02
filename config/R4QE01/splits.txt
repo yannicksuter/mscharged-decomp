@@ -1343,13 +1343,98 @@ Game/FE/LidOpenMessage.cpp:
 	.sdata      start:0x806DD238 end:0x806DD240
 	.sbss       start:0x806E17D8 end:0x806E17F0
 
+Game/FE/feModelManager.cpp:
+	.text       start:0x801BFC28 end:0x801C3920
+	.ctors      start:0x804DB768 end:0x804DB76C
+	.rodata     start:0x804E7310 end:0x804E7320
+	.data       start:0x80515D18 end:0x805160D0
+	.sdata      start:0x806DD240 end:0x806DD278
+	.sbss       start:0x806E17F0 end:0x806E1808
+	.sdata2     start:0x806E5480 end:0x806E54C0
+
 Game/FE/feManager.cpp:
 	.text       start:0x801C3920 end:0x801C4B7C
 	.ctors      start:0x804DB76C end:0x804DB770
+	.data       start:0x805160D0 end:0x80516170
+	.sbss       start:0x806E1808 end:0x806E1828
+
+Game/FE/BaseGameSceneManager.cpp:
+	.text       start:0x801C4B7C end:0x801C6174
+	.rodata     start:0x804E7320 end:0x804E7350
+	.data       start:0x80516170 end:0x805170A8
+	.sbss       start:0x806E1828 end:0x806E1834
 
 Game/FE/GameSceneManager.cpp:
 	.text       start:0x801C6174 end:0x801C620C
 	.data       start:0x805170A8 end:0x805170C0
+
+Game/FE/fePopupMenu.cpp:
+	.text       start:0x801C620C end:0x801CBC54
+	.rodata     start:0x804E7350 end:0x804E82F8
+	.data       start:0x805170C0 end:0x805183B8
+	.sdata      start:0x806DD2A8 end:0x806DD308
+	.sdata2     start:0x806E54F8 end:0x806E5578
+
+Game/FE/FEAudio.cpp:
+	.text       start:0x801CBC54 end:0x801CBE28
+	.ctors      start:0x804DB770 end:0x804DB774
+	.sdata      start:0x806DD308 end:0x806DD318
+
+Game/FE/feHelpFuncs.cpp:
+	.text       start:0x801CBE28 end:0x801CD9E4
+	.rodata     start:0x804E82F8 end:0x804E8368
+	.data       start:0x805183B8 end:0x80518A98
+	.sdata      start:0x806DD318 end:0x806DD340
+	.sbss       start:0x806E1848 end:0x806E1858
+	.sdata2     start:0x806E5578 end:0x806E55B8
+
+Game/SH/SHLoading.cpp:
+	.text       start:0x801CDA04 end:0x801D0F90
+	.data       start:0x80518A98 end:0x80518D90
+	.sdata      start:0x806DD340 end:0x806DD398
+
+Game/SH/SHTitleScreen.cpp:
+	.text       start:0x801D0F90 end:0x801D28AC
+	.rodata     start:0x804E8368 end:0x804E83D8
+	.data       start:0x80518D90 end:0x80518EF8
+	.sdata      start:0x806DD398 end:0x806DD3D0
+	.sbss       start:0x806E1858 end:0x806E1860
+	.sdata2     start:0x806E55B8 end:0x806E55E0
+
+Game/SH/SHOptions.cpp:
+	.text       start:0x801D28CC end:0x801D3674
+	.data       start:0x80518EF8 end:0x80518FA8
+	.sdata      start:0x806DD3D0 end:0x806DD418
+	.sdata2     start:0x806E55E0 end:0x806E55F0
+
+Game/FE/feOptionsSubMenus.cpp:
+	.text       start:0x801D3674 end:0x801D9DD8
+	.ctors      start:0x804DB77C end:0x804DB780
+	.data       start:0x80518FA8 end:0x805193D4
+	.bss        start:0x80578310 end:0x80578338
+	.sdata      start:0x806DD418 end:0x806DD4B0
+	.sdata2     start:0x806E55F0 end:0x806E5660
+
+Game/FE/feCaptainComponent.cpp:
+	.text       start:0x801DA134 end:0x801E72D0
+	.text       start:0x801E72D0 end:0x801E73A4
+	.ctors      start:0x804DB780 end:0x804DB784
+	.data       start:0x805194E8 end:0x80519CA8
+	.bss        start:0x80578338 end:0x80578350
+	.sdata      start:0x806DD4B0 end:0x806DD5D8
+	.sdata2     start:0x806E5660 end:0x806E56E8
+
+Game/SH/SHCupCheater.cpp:
+	.text       start:0x801E73A4 end:0x801E8764
+	.data       start:0x80519CA8 end:0x80519D58
+	.sdata      start:0x806DD5D8 end:0x806DD658
+
+Game/FE/Overlay/OverlayHandlerHUD.cpp:
+	.text       start:0x801E8764 end:0x801EBD10
+	.ctors      start:0x804DB784 end:0x804DB788
+	.data       start:0x80519D58 end:0x8051A060
+	.sdata      start:0x806DD658 end:0x806DD780
+	.sdata2     start:0x806E56E8 end:0x806E5710
 
 Game/FE/Overlay/OverlayHandlerInGameText.cpp:
 	.text       start:0x801EBD10 end:0x801ED8FC
@@ -1358,9 +1443,70 @@ Game/FE/Overlay/OverlayHandlerInGameText.cpp:
 	.sdata      start:0x806DD780 end:0x806DD818
 	.sdata2     start:0x806E5710 end:0x806E5718
 
+Game/SH/SHPausePostGame.cpp:
+	.text       start:0x801ED8FC end:0x801F0154
+	.data       start:0x8051A100 end:0x8051A270
+	.sdata      start:0x806DD818 end:0x806DD830
+	.sdata2     start:0x806E5718 end:0x806E5728
+
+Game/FE/OnlineRanking.cpp:
+	.text       start:0x801F0174 end:0x801F16FC
+	.data       start:0x8051A270 end:0x8051A3B0
+	.sdata      start:0x806DD830 end:0x806DD880
+	.sdata2     start:0x806E5728 end:0x806E5730
+
+Game/FE/Overlay/OverlayHandlerGoal.cpp:
+	.text       start:0x801F16FC end:0x801F698C
+	.ctors      start:0x804DB78C end:0x804DB790
+	.data       start:0x8051A3B0 end:0x8051A6D0
+	.sdata      start:0x806DD880 end:0x806DD8B8
+	.sdata2     start:0x806E5730 end:0x806E5748
+
 Game/FE/Overlay/OverlayHandlerDemo.cpp:
 	.text       start:0x801F698C end:0x801F6A24
 	.data       start:0x8051A6D0 end:0x8051A6FC
+
+unclassified/tu_801F6A24.cpp:
+	.text       start:0x801F6A24 end:0x801F6F60
+	.data       start:0x8051A700 end:0x8051A770
+	.sdata      start:0x806DD8B8 end:0x806DD900
+	.sdata2     start:0x806E5748 end:0x806E5760
+
+unclassified/tu_801F6F60.cpp:
+	.text       start:0x801F6F60 end:0x801F7258
+	.data       start:0x8051A770 end:0x8051A7B8
+	.sdata      start:0x806DD900 end:0x806DD928
+	.sdata2     start:0x806E5760 end:0x806E5768
+
+unclassified/tu_801F7258.cpp:
+	.text       start:0x801F7258 end:0x801F877C
+	.data       start:0x8051A7B8 end:0x8051A960
+	.sdata      start:0x806DD928 end:0x806DD958
+	.sdata2     start:0x806E5768 end:0x806E5778
+
+unclassified/tu_801F877C.cpp:
+	.text       start:0x801F877C end:0x801F8C90
+	.data       start:0x8051A960 end:0x8051A9E0
+	.sdata      start:0x806DD958 end:0x806DD980
+	.sdata2     start:0x806E5778 end:0x806E5780
+
+unclassified/tu_801F8CB0.cpp:
+	.text       start:0x801F8CB0 end:0x801FA28C
+	.data       start:0x8051A9E0 end:0x8051AB08
+	.sdata      start:0x806DD980 end:0x806DDA00
+	.sdata2     start:0x806E5780 end:0x806E5790
+
+unclassified/tu_801FA28C.cpp:
+	.text       start:0x801FA28C end:0x801FADB4
+	.data       start:0x8051AB08 end:0x8051ACC8
+	.sdata      start:0x806DDA00 end:0x806DDA30
+	.sdata2     start:0x806E5790 end:0x806E5798
+
+unclassified/tu_801FADB4.cpp:
+	.text       start:0x801FADB4 end:0x801FB200
+	.data       start:0x8051ACC8 end:0x8051AD18
+	.sdata      start:0x806DDA30 end:0x806DDA58
+	.sdata2     start:0x806E5798 end:0x806E57A8
 
 Game/Render/Presentation.cpp:
 	.text       start:0x801FEBEC end:0x80200360
@@ -2869,8 +3015,67 @@ MetroTRK/CircleBuffer.c:
 MetroTRK/MWCriticalSection_gc.c:
 	.text       start:0x8037CAE0 end:0x8037CB38
 
+MSL/alloc.c:
+	extab       start:0x800064E0 end:0x80006518
+	extabindex  start:0x80006B00 end:0x80006B54
+	.text       start:0x8037CB38 end:0x8037D938
+	.rodata     start:0x804EB668 end:0x804EB680
+	.bss        start:0x805A2F30 end:0x805A2F68
+	.sbss       start:0x806E24C0 end:0x806E24C8
+
+MSL/errno.c:
+	.sbss       start:0x806E24C8 end:0x806E24D0
+
+MSL/ansi_files.c:
+	extab       start:0x80006518 end:0x80006540
+	extabindex  start:0x80006B54 end:0x80006B90
+	.text       start:0x8037D938 end:0x8037DC30
+	.data       start:0x80536158 end:0x80536298
+	.bss        start:0x805A2F68 end:0x805A3268
+
+MSL/ansi_fp.c:
+	extab       start:0x80006540 end:0x80006578
+	extabindex  start:0x80006B90 end:0x80006BE4
+	.text       start:0x8037DC30 end:0x8037F5A0
+	.rodata     start:0x804EB680 end:0x804EB760
+	.data       start:0x80536298 end:0x80536400
+	.sdata2     start:0x806E6E20 end:0x806E6E58
+
+MSL/ctype.c:
+	.rodata     start:0x804EB760 end:0x804EBB60
+
+MSL/locale.c:
+	.rodata     start:0x804EBB60 end:0x804EBC68
+	.data       start:0x80536400 end:0x805365F8
+	.sdata2     start:0x806E6E58 end:0x806E6E70
+
 MSL/arith.c:
 	.text       start:0x8037F5A0 end:0x8037F5B0
+
+MSL/buffer_io.c:
+	extab       start:0x80006578 end:0x80006590
+	extabindex  start:0x80006BE4 end:0x80006C08
+	.text       start:0x8037F5B0 end:0x8037F8D0
+
+MSL/char_io.c:
+	extab       start:0x80006590 end:0x800065B0
+	extabindex  start:0x80006C08 end:0x80006C38
+	.text       start:0x8037F8D0 end:0x8037FCEC
+
+MSL/direct_io.c:
+	extab       start:0x800065B0 end:0x800065C0
+	extabindex  start:0x80006C38 end:0x80006C50
+	.text       start:0x8037FCEC end:0x8038033C
+
+MSL/file_io.c:
+	extab       start:0x800065C0 end:0x800065E8
+	extabindex  start:0x80006C50 end:0x80006C8C
+	.text       start:0x8038033C end:0x803809C4
+
+MSL/FILE_POS.c:
+	extab       start:0x800065E8 end:0x800065F8
+	extabindex  start:0x80006C8C end:0x80006CA4
+	.text       start:0x803809C4 end:0x80380C80
 
 MSL/mbstring.c:
 	extab       start:0x800065F8 end:0x80006608
@@ -2893,6 +3098,15 @@ MSL/math_api.c:
 MSL/misc_io.c:
 	.text       start:0x803813B4 end:0x803813D4
 
+MSL/printf.c:
+	extab       start:0x80006628 end:0x80006690
+	extabindex  start:0x80006CEC end:0x80006D88
+	.text       start:0x803813D4 end:0x80383864
+	.rodata     start:0x804EBC68 end:0x804EBC98
+	.data       start:0x805365F8 end:0x80536848
+	.sdata      start:0x806DFB40 end:0x806DFB48
+	.sdata2     start:0x806E6E70 end:0x806E6E78
+
 MSL/qsort.c:
 	extab       start:0x80006690 end:0x80006698
 	extabindex  start:0x80006D88 end:0x80006D94
@@ -2901,6 +3115,13 @@ MSL/qsort.c:
 MSL/rand.c:
 	.text       start:0x803839D4 end:0x803839FC
 	.sdata      start:0x806DFB48 end:0x806DFB50
+
+MSL/scanf.c:
+	extab       start:0x80006698 end:0x800066B0
+	extabindex  start:0x80006D94 end:0x80006DB8
+	.text       start:0x803839FC end:0x80384F68
+	.rodata     start:0x804EBC98 end:0x804EBCC0
+	.data       start:0x80536848 end:0x80536968
 
 MSL/string.c:
 	extab       start:0x800066B0 end:0x800066C0
@@ -2913,11 +3134,14 @@ MSL/float.c:
 	.sdata      start:0x806DFB58 end:0x806DFB68
 
 MSL/strtold.c:
-	extab       start:0x800066C0 end:0x800066C8
-	extabindex  start:0x80006DD0 end:0x80006DDC
-	.text       start:0x803854A4 end:0x80386898
+	extab       start:0x800066C0 end:0x800066D0
+	extabindex  start:0x80006DD0 end:0x80006DE8
+	.text       start:0x803854A4 end:0x8038691C
 	.rodata     start:0x804EBCC0 end:0x804EBCD0
-	.sdata2     start:0x806E6E80 end:0x806E6EA0
+	.sdata2     start:0x806E6E80 end:0x806E6EB8
+
+MSL/wctype.c:
+	.rodata     start:0x804EBCD0 end:0x804EC2D0
 
 MSL/strtoul.c:
 	extab       start:0x800066D0 end:0x800066F8
@@ -2942,10 +3166,22 @@ MSL/wstring.c:
 MSL/wchar_io.c:
 	.text       start:0x803896A8 end:0x80389730
 
+MSL/uart_console_io_gcn.c:
+	extab       start:0x80006730 end:0x80006738
+	extabindex  start:0x80006E78 end:0x80006E84
+	.text       start:0x80389730 end:0x80389800
+	.sbss       start:0x806E24D0 end:0x806E24D8
+
+MSL/abort_exit_ppc_eabi.c:
+	.sbss       start:0x806E24D8 end:0x806E24E0
+
 MSL/math_sun.c:
 	extab       start:0x80006738 end:0x80006740
 	extabindex  start:0x80006E84 end:0x80006E90
 	.text       start:0x80389800 end:0x80389840
+
+MSL/extras.c:
+	.text       start:0x80389840 end:0x80389A40
 
 MSL/e_acos.c:
 	.text       start:0x80389A40 end:0x80389D04
@@ -3268,6 +3504,10 @@ RVL_SDK/gx/GXAttr.c:
 	.data       start:0x8053BAD0 end:0x8053BC30
 	.sdata      start:0x806DFBF8 end:0x806DFC04
 
+RVL_SDK/gx/GXMisc.c:
+	.text       start:0x803A31D0 end:0x803A3AE8
+	.sbss       start:0x806E27F0 end:0x806E2808
+
 RVL_SDK/gx/GXGeometry.c:
 	.text       start:0x803A3AE8 end:0x803A4084
 
@@ -3332,6 +3572,11 @@ RVL_SDK/ipc/ipcProfile.c:
 
 RVL_SDK/kpad/KPAD.c:
 	.text       start:0x803AA0E8 end:0x803AD034
+	.data       start:0x8053C1C0 end:0x8053C218
+	.bss        start:0x805BEB18 end:0x805BFFA8
+	.sdata      start:0x806DFC50 end:0x806DFCC0
+	.sbss       start:0x806E2838 end:0x806E2858
+	.sdata2     start:0x806E7440 end:0x806E74A8
 
 RVL_SDK/mem/mem_heapCommon.c:
 	.text       start:0x803AD034 end:0x803AD4A0
@@ -3586,9 +3831,9 @@ RVL_SDK/vi/i2c.c:
 
 RVL_SDK/vi/vi3in1.c:
 	.text       start:0x803C8460 end:0x803C9B04
-	.data       start:0x8054ACF0 end:0x8054B27C
-	.bss        start:0x805D6120 end:0x805D613C
-	.sdata      start:0x806DFDA0 end:0x806DFDB4
+	.data       start:0x8054ACF0 end:0x8054B27A
+	.bss        start:0x805D6120 end:0x805D613A
+	.sdata      start:0x806DFDA0 end:0x806DFDB1
 	.sbss       start:0x806E2BC0 end:0x806E2BD4
 
 RVL_SDK/wenc/wenc.c:
@@ -3598,6 +3843,12 @@ RVL_SDK/wenc/wenc.c:
 
 RVL_SDK/wpad/WPAD.c:
 	.text       start:0x803C9DDC end:0x803D1408
+	.rodata     start:0x804EC758 end:0x804EC792
+	.data       start:0x8054B280 end:0x8054B568
+	.bss        start:0x805D6140 end:0x805D9820
+	.sdata      start:0x806DFDB8 end:0x806DFDC8
+	.sbss       start:0x806E2BD8 end:0x806E2C07
+	.sdata2     start:0x806E7578 end:0x806E757F
 
 RVL_SDK/wpad/WPADHIDParser.c:
 	.text       start:0x803D1408 end:0x803D5EBC
@@ -3944,12 +4195,14 @@ RVL_SDK/sc/scsystem.c:
 	.sbss       start:0x806E2C90 end:0x806E2CA8
 
 RVL_SDK/sc/scapi.c:
-	.text       start:0x8040C148 end:0x8040C5B4
+	.text       start:0x8040C148 end:0x8040C68C
+	.bss        start:0x80618420 end:0x80619440
 
 RVL_SDK/sc/scapi_prdinfo.c:
-	.text       start:0x8040C68C end:0x8040C87C
+	.text       start:0x8040C68C end:0x8040C920
 	.data       start:0x80554AD8 end:0x80554B20
-	.sdata      start:0x806DFF90 end:0x806DFF98
+	.sdata      start:0x806DFF90 end:0x806DFFB0
+	.sbss       start:0x806E2CA8 end:0x806E2CB0
 
 RVL_SDK/nand/nand.c:
 	.text       start:0x8040C920 end:0x8040D934
@@ -4321,7 +4574,7 @@ RVL_SDK/hbm/HBMFrameController.cpp:
 
 RVL_SDK/hbm/HBMGUIManager.cpp:
 	.text       start:0x80441A9C end:0x80443120
-	.data       start:0x805568D0 end:0x80556A28
+	.data       start:0x805568D0 end:0x80556A80
 	.sdata      start:0x806E0208 end:0x806E0210
 	.sbss       start:0x806E2D88 end:0x806E2D90
 	.sdata2     start:0x806E76A0 end:0x806E76AC
@@ -4344,10 +4597,13 @@ RVL_SDK/hbm/nw4hbm/db/db_assert.cpp:
 	.sbss       start:0x806E2DA0 end:0x806E2DB0
 
 RVL_SDK/hbm/nw4hbm/db/db_console.cpp:
-	.text       start:0x80444A48 end:0x80445388
+	.text       start:0x80444A48 end:0x80445348
 	.data       start:0x80556B40 end:0x80556C60
 	.bss        start:0x806AE828 end:0x806AEC40
 	.sdata      start:0x806E0218 end:0x806E0220
+
+RVL_SDK/hbm/nw4hbm/db/db_DbgPrintBase.cpp:
+	.text       start:0x80445348 end:0x80445388
 
 RVL_SDK/hbm/nw4hbm/db/db_directPrint.cpp:
 	.text       start:0x80445388 end:0x80445D98
@@ -4427,7 +4683,12 @@ RVL_SDK/hbm/nw4hbm/lyt/lyt_resourceAccessor.cpp:
 	.data       start:0x80558608 end:0x80558620
 
 RVL_SDK/hbm/nw4hbm/lyt/lyt_textBox.cpp:
-	.text       start:0x8044F3DC end:0x80452210
+	.text       start:0x8044F3DC end:0x80452224
+	.ctors      start:0x804DBB78 end:0x804DBB7C
+	.data       start:0x80558620 end:0x80558C98
+	.sdata      start:0x806E0238 end:0x806E0248
+	.sbss       start:0x806E2DF0 end:0x806E2DF8
+	.sdata2     start:0x806E7748 end:0x806E7760
 
 RVL_SDK/hbm/nw4hbm/lyt/lyt_window.cpp:
 	.text       start:0x80452224 end:0x80454AF8
@@ -4443,13 +4704,15 @@ RVL_SDK/hbm/nw4hbm/math/math_triangular.cpp:
 
 RVL_SDK/hbm/nw4hbm/snd/snd_AxManager.cpp:
 	.text       start:0x80454D68 end:0x80456B48
-	.data       start:0x8055A040 end:0x8055A268
+	.data       start:0x8055A040 end:0x8055A264
 	.bss        start:0x806AEEE0 end:0x806B92F8
-	.sbss       start:0x806E2E00 end:0x806E2E08
-	.sdata2     start:0x806E7798 end:0x806E77B0
+	.sbss       start:0x806E2E00 end:0x806E2E01
+	.sdata2     start:0x806E7798 end:0x806E77AC
 
 RVL_SDK/hbm/nw4hbm/snd/snd_AxVoice.cpp:
-	.text       start:0x80456B48 end:0x8045A744
+	.text       start:0x80456B48 end:0x8045A748
+	.data       start:0x8055A268 end:0x8055A5B0
+	.sdata2     start:0x806E77B0 end:0x806E77FC
 
 RVL_SDK/hbm/nw4hbm/snd/snd_Bank.cpp:
 	.text       start:0x8045A748 end:0x8045A970
@@ -4513,6 +4776,13 @@ RVL_SDK/hbm/nw4hbm/snd/snd_MemorySoundArchive.cpp:
 	.text       start:0x8045F17C end:0x8045F6E8
 	.data       start:0x8055B1A8 end:0x8055B318
 
+RVL_SDK/hbm/nw4hbm/snd/snd_MidiSeqPlayer.cpp:
+	.text       start:0x8045F6E8 end:0x8045F784
+
+RVL_SDK/hbm/nw4hbm/snd/snd_MidiSeqTrack.cpp:
+	.text       start:0x8045F784 end:0x8045F7C4
+	.data       start:0x8055B318 end:0x8055B328
+
 RVL_SDK/hbm/nw4hbm/snd/snd_MmlParser.cpp:
 	.text       start:0x8045F7C4 end:0x804608F8
 	.data       start:0x8055B328 end:0x8055B820
@@ -4564,8 +4834,8 @@ RVL_SDK/hbm/nw4hbm/snd/snd_SeqSoundHandle.cpp:
 
 RVL_SDK/hbm/nw4hbm/snd/snd_SeqTrack.cpp:
 	.text       start:0x80463534 end:0x80464D70
-	.rodata     start:0x804F1A88 end:0x804F1AB0
-	.data       start:0x8055C450 end:0x8055C8A0
+	.rodata     start:0x804F1A88 end:0x804F1AAC
+	.data       start:0x8055C450 end:0x8055C89A
 	.sdata2     start:0x806E78F0 end:0x806E7920
 
 RVL_SDK/hbm/nw4hbm/snd/snd_SoundArchive.cpp:
@@ -4745,6 +5015,11 @@ RVL_SDK/hbm/nw4hbm/ut/ut_TagProcessorBase.cpp:
 RVL_SDK/hbm/nw4hbm/ut/ut_TextWriterBase.cpp:
 	.text       start:0x80480088 end:0x80488D6C
 	.ctors      start:0x804DBBB0 end:0x804DBBB4
+	.data       start:0x805615F0 end:0x80561BE8
+	.bss        start:0x806C9870 end:0x806C9888
+	.sdata      start:0x806E0360 end:0x806E0368
+	.sbss       start:0x806E2E98 end:0x806E2EA8
+	.sdata2     start:0x806E79F0 end:0x806E7A08
 
 RVL_SDK/dwc/dwc_base64.c:
 	.text       start:0x80488D6C end:0x804890D4
@@ -4841,7 +5116,7 @@ RVL_SDK/dwc/dwc_auth_interface.c:
 	.sbss       start:0x806E2F20 end:0x806E2F30
 
 RVL_SDK/dwc/dwc_nastime.c:
-	.text       start:0x804A0B5C end:0x804A0C34
+	.text       start:0x804A0B58 end:0x804A0C34
 
 RVL_SDK/dwc/dwc_ranksession.c:
 	.text       start:0x804A0C34 end:0x804A2068
@@ -4888,6 +5163,9 @@ RVL_SDK/gamespy/common/gsLargeInt.c:
 RVL_SDK/gamespy/common/gsSHA1.c:
 	.text       start:0x804A8B80 end:0x804A952C
 	.rodata     start:0x804F3238 end:0x804F3248
+
+RVL_SDK/gamespy/common/gsXML.c:
+	.text       start:0x804A952C end:0x804A953C
 
 RVL_SDK/gamespy/GP/gp.c:
 	.text       start:0x804A953C end:0x804AA2A4
@@ -4991,6 +5269,8 @@ RVL_SDK/gamespy/ghttp/ghttpCallbacks.c:
 
 RVL_SDK/gamespy/ghttp/ghttpCommon.c:
 	.text       start:0x804BD6F0 end:0x804BDB60
+	.sdata      start:0x806E09D8 end:0x806E09E0
+	.sbss       start:0x806E2F60 end:0x806E2F68
 
 RVL_SDK/gamespy/ghttp/ghttpConnection.c:
 	.text       start:0x804BDB60 end:0x804BE2AC
@@ -5011,6 +5291,9 @@ RVL_SDK/gamespy/ghttp/ghttpPost.c:
 
 RVL_SDK/gamespy/ghttp/ghttpProcess.c:
 	.text       start:0x804C1CD8 end:0x804C3568
+	.rodata     start:0x804F3268 end:0x804F3278
+	.data       start:0x805678F8 end:0x805679C8
+	.sdata      start:0x806E0A20 end:0x806E0A78
 
 RVL_SDK/gamespy/gstats/gbucket.c:
 	.text       start:0x804C3568 end:0x804C4700
@@ -5019,6 +5302,10 @@ RVL_SDK/gamespy/gstats/gbucket.c:
 
 RVL_SDK/gamespy/gstats/gstats.c:
 	.text       start:0x804C4700 end:0x804C67E8
+	.data       start:0x805679C8 end:0x80567C20
+	.bss        start:0x806DAAA8 end:0x806DAEA8
+	.sdata      start:0x806E0A78 end:0x806E0AE0
+	.sbss       start:0x806E2FB0 end:0x806E2FD0
 
 RVL_SDK/gamespy/natneg/NATify.c:
 	.text       start:0x804C67E8 end:0x804C6F50
@@ -5063,7 +5350,7 @@ RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c:
 RVL_SDK/rfl/RFL_System.c:
 	extab       start:0x80006788 end:0x800067B0
 	extabindex  start:0x80006ECC end:0x80006F08
-	.text       start:0x804CE608 end:0x804CF024
+	.text       start:0x804CE5EC end:0x804CF024
 	.data       start:0x80567D00 end:0x80567D10
 	.sdata      start:0x806E0B60 end:0x806E0B64
 	.sbss       start:0x806E3038 end:0x806E3044
