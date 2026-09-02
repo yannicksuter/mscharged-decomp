@@ -67,7 +67,7 @@ extern BallObject* g_pBall;
 extern TaskManager* m_pInstance__13nlTaskManager;
 extern "C" float fn_800155A0(BallObject*, int);
 extern "C" LiveBallTrail* fn_8001B284(u32);
-extern "C" u32 fn_8001B30C(BallObject*);
+extern "C" u32 fn_8001B30C();
 extern "C" BallScaleData* fn_80284A58(u32);
 
 static float g_fBallTrailScale = 2.25f;
@@ -109,7 +109,7 @@ void DrawableBall::Grab()
     mFlags.bits.visible = ball->visible;
     mFlags.bits.transient = 0;
 
-    mTrailCount = fn_8001B30C(ball);
+    mTrailCount = fn_8001B30C();
     for (u32 i = 0; i < mTrailCount; ++i)
     {
         LiveBallTrail* trail = fn_8001B284(i);

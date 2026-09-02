@@ -4,6 +4,7 @@
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
 #include "Game/NetworkStatsManager.h"
+#include "Game/tu_801360A4.h"
 #include "Game/main.h"
 
 #include "NL/nlMemory.h"
@@ -23,7 +24,6 @@ struct NetworkStatus
 
 extern NetworkManager* lbl_806E2138;
 extern NetworkStatus* lbl_806E2168;
-extern void* lbl_806E1194;
 extern u8 lbl_806E1008;
 
 extern "C" void fn_803740B8();
@@ -35,7 +35,6 @@ extern "C" void fn_803327DC();
 extern "C" void* fn_8011166C();
 extern "C" void fn_803328AC(NetworkManager*, void*);
 extern "C" void fn_80332EDC();
-extern "C" void* fn_801360A4(void*);
 void NetworkUpdateTask::Initialize()
 {
     fn_803740B8();
@@ -59,12 +58,10 @@ void NetworkUpdateTask::Initialize()
 
     if (lbl_806E1194 == 0)
     {
-        void* instance = nlMalloc(0xEB0, 8, false);
-        if (instance != 0)
-        {
-            instance = fn_801360A4(instance);
-        }
-        lbl_806E1194 = instance;
+        void* instance
+            = nlMalloc(sizeof(UnidentifiedFriendManager_801360A4), 8, false);
+        lbl_806E1194
+            = new (instance) UnidentifiedFriendManager_801360A4();
     }
 
     NetworkStatsManager_8012F378::CreateInstance();

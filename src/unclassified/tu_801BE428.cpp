@@ -12,8 +12,6 @@
 #include "Game/Team.h"
 #include "NL/nlTask.h"
 
-extern "C" void fn_800181F4(
-    cBall*, nlVector3*, int*, float*, float);
 extern float lbl_806DB5A4;
 
 static const nlVector3 sZeroVelocity = { 0.0f, 0.0f, 0.0f };
@@ -187,8 +185,8 @@ extern "C" void fn_801BE9EC(EmissionController& controller)
             if (ball->m_v3Position.z > lbl_806DB5A4)
             {
                 nlVector3 position;
-                fn_800181F4(
-                    ball, &position, 0, 0, lbl_806DB5A4);
+                ball->PredictLandingSpotAndTime(
+                    position, 0, 0, lbl_806DB5A4);
                 controller.SetPosition(position);
                 controller.SetVelocity(sZeroVelocity);
             }

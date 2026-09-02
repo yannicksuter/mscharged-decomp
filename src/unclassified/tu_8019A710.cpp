@@ -1,48 +1,24 @@
 #include "Game/AI/AiUtil.h"
+#include "Game/AI/Fielder.h"
+#include "Game/BulletBill.h"
+#include "Game/Physics/PhysicsBulletBill.h"
 #include "Game/Physics/PhysicsObject.h"
 
 #include "NL/nlMemory.h"
 #include "types.h"
 
-struct Target_8019A710
-{
-    u8 pad_00[0x62];
-    u16 value_62;
-};
-
-struct State_8019A710
-{
-    float unknown_00;
-    float unknown_04;
-    float unknown_08;
-    float unknown_0C;
-    nlVector3 position;
-    nlVector3 velocity;
-    u32 unknown_28;
-    float unknown_2C;
-    float unknown_30;
-    float unknown_34;
-    bool active;
-    u8 pad_39[3];
-    PhysicsObject* physics;
-    void* unknown_40;
-    Target_8019A710* target;
-};
-
-extern "C" void fn_8019ABB8(State_8019A710*, bool);
-extern "C" PhysicsObject* fn_8014236C(
-    void*, State_8019A710*, float, float);
-extern "C" void fn_802B549C(State_8019A710*, u16);
+extern "C" void fn_8019ABB8(BulletBillObject*, bool);
+extern "C" void fn_802B549C(BulletBillObject*, u16);
 
 extern const float lbl_806E4EE0;
 extern const float lbl_806E4EE4;
 
-extern "C" State_8019A710* fn_8019A710(State_8019A710* state,
-    void* unknown, u32 value, float radius, float parameter)
+extern "C" BulletBillObject* fn_8019A710(BulletBillObject* state,
+    RenderObject* drawable, u32 value, float radius, float parameter)
 {
     state->unknown_28 = value;
-    state->unknown_40 = unknown;
-    state->unknown_2C = lbl_806E4EE0;
+    state->drawable = drawable;
+    state->scale = lbl_806E4EE0;
     state->unknown_30 = lbl_806E4EE0;
     state->unknown_34 = lbl_806E4EE4;
     state->active = false;
@@ -53,24 +29,20 @@ extern "C" State_8019A710* fn_8019A710(State_8019A710* state,
     state->velocity.x = lbl_806E4EE4;
     state->velocity.y = lbl_806E4EE4;
     state->velocity.z = lbl_806E4EE4;
-    state->unknown_08 = lbl_806E4EE4;
-    state->unknown_04 = lbl_806E4EE4;
-    state->unknown_00 = lbl_806E4EE4;
-    state->unknown_0C = lbl_806E4EE0;
+    state->orientation.z = lbl_806E4EE4;
+    state->orientation.y = lbl_806E4EE4;
+    state->orientation.x = lbl_806E4EE4;
+    state->orientation.w = lbl_806E4EE0;
 
-    PhysicsObject* physics =
-        (PhysicsObject*)nlMalloc(0x40, 8, false);
-    if (physics != 0)
-    {
-        physics = fn_8014236C(physics, state, radius, parameter);
-    }
+    PhysicsObject* physics = new (8, false)
+        PhysicsBulletBill(state, radius, parameter);
     state->physics = physics;
     physics->DisableCollisions();
     return state;
 }
 
-extern "C" State_8019A710* fn_8019A7E4(
-    State_8019A710* state, int shouldDelete)
+extern "C" BulletBillObject* fn_8019A7E4(
+    BulletBillObject* state, int shouldDelete)
 {
     if (state != 0)
     {
@@ -83,7 +55,7 @@ extern "C" State_8019A710* fn_8019A7E4(
     return state;
 }
 
-extern "C" void fn_8019A854(State_8019A710* state, float deltaTime)
+extern "C" void fn_8019A854(BulletBillObject* state, float deltaTime)
 {
     if (!state->active)
     {
@@ -107,7 +79,7 @@ extern "C" void fn_8019A854(State_8019A710* state, float deltaTime)
         if (state->unknown_34 <= lbl_806E4EE4)
         {
             state->unknown_34 = lbl_806E4EE4;
-            state->unknown_2C = state->unknown_30;
+            state->scale = state->unknown_30;
         }
         else
         {
@@ -116,18 +88,18 @@ extern "C" void fn_8019A854(State_8019A710* state, float deltaTime)
             {
                 percent = lbl_806E4EE0;
             }
-            state->unknown_2C =
-                Interpolate(state->unknown_2C, state->unknown_30, percent);
+            state->scale =
+                Interpolate(state->scale, state->unknown_30, percent);
         }
     }
 
     if (state->target != 0)
     {
-        fn_802B549C(state, state->target->value_62);
+        fn_802B549C(state, state->target->m_aActualFacingDirection);
     }
 }
 
-extern "C" void fn_8019AD18(State_8019A710* state)
+extern "C" void fn_8019AD18(BulletBillObject* state)
 {
     fn_8019ABB8(state, true);
 
@@ -137,11 +109,11 @@ extern "C" void fn_8019AD18(State_8019A710* state)
     state->velocity.x = lbl_806E4EE4;
     state->velocity.y = lbl_806E4EE4;
     state->velocity.z = lbl_806E4EE4;
-    state->unknown_08 = lbl_806E4EE4;
-    state->unknown_04 = lbl_806E4EE4;
-    state->unknown_00 = lbl_806E4EE4;
-    state->unknown_0C = lbl_806E4EE0;
-    state->unknown_2C = lbl_806E4EE0;
+    state->orientation.z = lbl_806E4EE4;
+    state->orientation.y = lbl_806E4EE4;
+    state->orientation.x = lbl_806E4EE4;
+    state->orientation.w = lbl_806E4EE0;
+    state->scale = lbl_806E4EE0;
     state->unknown_30 = lbl_806E4EE0;
     state->unknown_34 = lbl_806E4EE4;
     state->target = 0;

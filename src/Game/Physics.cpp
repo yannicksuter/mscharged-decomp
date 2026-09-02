@@ -5,7 +5,7 @@
 #include "Game/Inventory.h"
 #include "Game/Physics/CollisionSpace.h"
 #include "Game/Physics/LoadablePhysicsMesh.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsGroundPlane.h"
 #include "Game/Physics/PhysicsNet.h"
 #include "Game/Physics/PhysicsRoundedCorner.h"
@@ -193,8 +193,8 @@ void PhysicsUpdate(PhysicsWorld* world, float dt)
             }
         }
 
-        PhysicsBall* physicsBall = g_pBall->m_pPhysicsBall;
-        if (physicsBall->m_bInsideNet)
+        PhysicsAIBall* physicsBall = g_pBall->m_pPhysicsBall;
+        if (physicsBall->mbIsInsideNet)
         {
             dGeomComputeAABB(physicsBall->m_geomID);
             g_PhysicsWorld->DoCollisions(physicsBall, g_NetPhysicsObjects);

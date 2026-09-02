@@ -3,7 +3,7 @@
 #include "Game/FixedUpdateTask.h"
 #include "Game/Ball.h"
 #include "Game/Field.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Team.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
@@ -379,8 +379,8 @@ bool PhysicsNet::SweepTestForBallContact(const nlVector3& startPos, const nlVect
             g_pBall->SetVelocity(
                 ballLinVelocity, SPINTYPE_PARAMETER, &ballAngularVelocity);
             PhysicsBall* physicsBall = g_pBall->m_pPhysicsBall;
-            physicsBall->mUnidentified054 = false;
-            physicsBall->mUnidentified064 = 0.0f;
+            physicsBall->mbUseMagnusEffect = false;
+            physicsBall->mfChargeBonus = 0.0f;
             return false;
         }
     }

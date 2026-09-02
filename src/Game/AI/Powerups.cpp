@@ -10,7 +10,7 @@
 #include "Game/GameTweaks.h"
 #include "Game/GameInfo.h"
 #include "Game/ObjectBlur.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsShell.h"
@@ -1609,7 +1609,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
         break;
     case 0x10:
     {
-        cBall* pBall = ((PhysicsBall*)pObjB)->m_pBall;
+        cBall* pBall = ((PhysicsAIBall*)pObjB)->m_pAIBall;
         if (pBall->m_bVisible != 0)
         {
             if (pBall->m_pOwner == 0)

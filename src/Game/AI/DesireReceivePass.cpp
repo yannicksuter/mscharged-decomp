@@ -18,7 +18,7 @@
 #include "Game/MathHelpers.h"
 #include "Game/Net.h"
 #include "Game/PassBallData.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Player.h"
 #include "Game/SAnim/pnSAnimController.h"
@@ -100,8 +100,6 @@ extern "C" void fn_8003BA94(cFielder*, float);
 extern "C" void fn_80017EA0(cBall*, cFielder*, nlVector3*, bool);
 extern "C" void fn_80017EC0(cBall*, float);
 extern "C" void fn_800180F4(cBall*, nlVector3*, float);
-extern "C" void fn_800181F4(
-    cBall*, nlVector3*, int*, float*, float);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_80035F84(cFielder*, nlVector3*, float*, nlVector3*,
     float*, unsigned short, const LooseBallContactAnimInfo*);
@@ -589,7 +587,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     if (v3ContactOffsetWorld.z
         > lbl_806DC1CC * mv3PassIntercept.z)
     {
-        fn_800181F4(g_pBall, &estimated.v3BallContactPos,
+        g_pBall->PredictLandingSpotAndTime(estimated.v3BallContactPos,
             &nNumIntercepts, fInterceptTimes,
             v3ContactOffsetWorld.z);
         bUseGroundIntercept = false;
@@ -780,11 +778,11 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
     mEstimated.bLocked = bLocked;
 
     bool bCollideWithFielders =
-        g_pBall->m_pPhysicsBall->mUnidentified050;
+        g_pBall->m_pPhysicsBall->mbUseTiltForce;
     bool bCollideWithGoalies =
-        g_pBall->m_pPhysicsBall->mUnidentified051;
-    g_pBall->m_pPhysicsBall->mUnidentified050 = false;
-    g_pBall->m_pPhysicsBall->mUnidentified051 = false;
+        g_pBall->m_pPhysicsBall->mbUseWindForce;
+    g_pBall->m_pPhysicsBall->mbUseTiltForce = false;
+    g_pBall->m_pPhysicsBall->mbUseWindForce = false;
 
     bool result;
     if (fn_800C0E74())
@@ -805,9 +803,9 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
             mEstimated.mUnidentifiedAnimInfo);
     }
 
-    g_pBall->m_pPhysicsBall->mUnidentified050 =
+    g_pBall->m_pPhysicsBall->mbUseTiltForce =
         bCollideWithFielders;
-    g_pBall->m_pPhysicsBall->mUnidentified051 =
+    g_pBall->m_pPhysicsBall->mbUseWindForce =
         bCollideWithGoalies;
 
     if (result)
@@ -1338,8 +1336,8 @@ extern "C" void fn_800C22CC(DesireReceivePass* pDesire,
     if (g_pGame->m_eGameState == 3
         || g_pGame->m_eGameState == 2)
     {
-        g_pBall->m_pPhysicsBall->m_bCollideWithFielders = true;
-        g_pBall->m_pPhysicsBall->m_bCollideWithGoalies = true;
+        g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
+        g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
         g_pBall->m_tNoPickupTimer.SetSeconds(0.0f);
         fn_80015B38(g_pBall, false);
     }

@@ -1,30 +1,12 @@
-#include "Game/Physics/PhysicsSphere.h"
+#include "Game/Physics/PhysicsBirdoEgg.h"
+
+#include "unclassified/tu_80199E84.h"
 
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "types.h"
 
-struct State_80199E84
-{
-    nlQuaternion orientation;
-    float unknown_10;
-    nlVector3 position;
-    float unknown_20;
-    float unknown_24;
-    float unknown_28;
-    float unknown_2C;
-    bool visible;
-    u8 pad_31[3];
-    PhysicsSphere* physics;
-    void* drawable;
-    u32 unknown_3C;
-    nlVector3 unknown_40;
-};
-
 extern "C" void fn_8019A434(State_80199E84*, bool);
-extern "C" PhysicsSphere* fn_80141B3C(
-    void*, State_80199E84*, float);
-
 extern const nlVector3 lbl_804DCD90;
 extern const nlVector3 lbl_804DCD9C;
 extern const float lbl_806DCD7C;
@@ -50,12 +32,8 @@ extern "C" State_80199E84* fn_80199E84(
     state->orientation.x = lbl_806E4ED0;
     state->orientation.w = lbl_806E4ED4;
 
-    PhysicsSphere* physics =
-        (PhysicsSphere*)nlMalloc(0x40, 8, false);
-    if (physics != 0)
-    {
-        physics = fn_80141B3C(physics, state, lbl_806DCD7C);
-    }
+    PhysicsBirdoEgg* physics = new (8, false) PhysicsBirdoEgg(
+        (BirdoEggObject*)state, lbl_806DCD7C);
     state->physics = physics;
     physics->SetPosition(
         lbl_804DCD9C, PhysicsObject::WORLD_COORDINATES);

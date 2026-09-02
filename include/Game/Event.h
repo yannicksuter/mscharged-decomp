@@ -198,6 +198,110 @@ void UnidentifiedEvent<T>::Disconnect()
     Remove(listener);
 }
 
+template <typename T, int Count>
+class UnidentifiedStaticSlotPool
+{
+public:
+    UnidentifiedStaticSlotPool(int, int)
+        : mFreeList((T*)mStorage)
+        , mEntries((T*)mStorage)
+    {
+        for (int i = 0; i < Count - 1; ++i)
+        {
+            *(T**)&mEntries[i] = &mEntries[i + 1];
+        }
+        *(T**)&mEntries[Count - 1] = 0;
+    }
+
+    void Allocate(T*& out)
+    {
+        out = mFreeList;
+        if (mFreeList != 0)
+        {
+            mFreeList = *(T**)mFreeList;
+            new (out) T;
+        }
+    }
+
+    void DeleteEntry(T* entry)
+    {
+        *(T**)entry = mFreeList;
+        mFreeList = entry;
+    }
+
+    /* 0x00 */ T* mFreeList;
+    /* 0x04 */ T* mEntries;
+    /* 0x08 */ u8 mStorage[sizeof(T) * Count];
+};
+
+template <typename T, int Count>
+class UnidentifiedStaticEvent : public UnidentifiedTypedEvent<T>
+{
+    typedef UnidentifiedListener<T> Listener;
+    typedef DLListEntry<Listener> ListenerEntry;
+    typedef UnidentifiedStaticSlotPool<ListenerEntry, Count> ListenerPool;
+
+public:
+    UnidentifiedStaticEvent(const char* name, int length)
+        : UnidentifiedTypedEvent<T>(name, length)
+        , mListeners(Count, Count)
+    {
+        fn_802B2940(this, UnidentifiedTypedEvent<T>::sType);
+    }
+
+    virtual ~UnidentifiedStaticEvent()
+    {
+        while (mListeners.m_Head != 0)
+        {
+            Listener* listener = &mListeners.Begin().CurrentEntry()->entry;
+            Remove(listener);
+        }
+        fn_802B29C4(this);
+    }
+
+    virtual void Disconnect()
+    {
+        Listener* listener = (Listener*)fn_802B28E0(this);
+        Remove(listener);
+    }
+
+    virtual void Add(Function<T*>& callback, unsigned int value, int flags)
+    {
+        Listener* listener = mListeners.AllocateAtEnd(0);
+
+        void* target = callback.UnidentifiedTarget();
+        listener->callback.UnidentifiedTransfer(callback);
+        fn_802B2A04(this, listener, value, flags, target);
+    }
+
+protected:
+    void Remove(Listener* listener)
+    {
+        fn_802B2CC8(this, listener);
+        if (this->mCurrentConnection == listener)
+        {
+            listener->mFlags |= 0x20000000;
+            return;
+        }
+        UnidentifiedDeleteListener(listener);
+    }
+
+    ListenerEntry* UnidentifiedGetEntry(Listener* listener)
+    {
+        return mListeners.Begin(
+            (ListenerEntry*)((char*)listener - 8)).CurrentEntry();
+    }
+
+    void UnidentifiedDeleteListener(Listener* listener)
+    {
+        ListenerEntry* entry = UnidentifiedGetEntry(listener);
+        nlDLRingRemove(&mListeners.m_Head, entry);
+        mListeners.DeleteEntry(entry);
+    }
+
+    DLListContainerBase<Listener, ListenerPool> mListeners;
+};
+
 template <typename T>
 class UnidentifiedQueuedEvent : public UnidentifiedEvent<T>
 {

@@ -25,11 +25,10 @@ struct UnidentifiedNPCConfig_801B532C
 
 extern "C"
 {
-    void* fn_80172790(void* pObject, float fRadius);
-    void fn_8017280C(void* pObject, void* pCallback);
     void* fn_8019AE7C(void* pObject, cSHierarchy* pHierarchy, int nModel,
         void* pPhysics, cInventory<cSAnim>* pInventory, void* pResource);
-    void fn_8019BF40();
+    void fn_8019BF40(
+        PhysicsObject*, PhysicsObject*, const nlVector3&);
 
     UnidentifiedObject_801B535C* fn_801B535C(
         UnidentifiedObject_801B535C* pObject, void* pDrawable);
@@ -60,7 +59,8 @@ extern "C"
     SkinAnimatedNPC* fn_801B43F8(SkinAnimatedNPC* pObject,
         cSHierarchy* pHierarchy, int nModel, void* pParam1, void* pParam2,
         void* pPhysics, cInventory<cSAnim>* pInventory, void* pResource);
-    void fn_801B4830();
+    void fn_801B4830(
+        PhysicsObject*, PhysicsObject*, const nlVector3&);
     void fn_801B4B9C(SkinAnimatedNPC* pObject);
 
     void* fn_80276360(int nType, int nIndex);
@@ -188,11 +188,12 @@ void NPCManager::fn_801A9874()
     NPCTemplate* pTemplate
         = fn_801ABBDC_inline(lbl_805142BC);
 
-    void* chainPhysics = nlMalloc(0x4C, 8, false);
+    PhysicsNPC* chainPhysics
+        = (PhysicsNPC*)nlMalloc(sizeof(PhysicsNPC), 8, false);
     if (chainPhysics != 0)
     {
-        chainPhysics = fn_80172790(
-            chainPhysics, lbl_8056CF08.m_pGameTweaks->fChainChompRadius);
+        chainPhysics = new (chainPhysics) PhysicsNPC(
+            lbl_8056CF08.m_pGameTweaks->fChainChompRadius);
     }
 
     void* chainChomp = nlMalloc(0xB4, 8, false);
@@ -206,7 +207,7 @@ void NPCManager::fn_801A9874()
             pTemplate->mUnidentified010);
     }
     mpChainChomp = (ChainChomp*)chainChomp;
-    fn_8017280C(chainPhysics, (void*)fn_8019BF40);
+    chainPhysics->SetCallbackFunction(fn_8019BF40);
 }
 
 void NPCManager::fn_801A9AF8()
@@ -309,10 +310,12 @@ void NPCManager::fn_801A9DF0()
         NPCTemplate* pTemplate
             = fn_801ABBDC_inline(pConfig->mName);
 
-        void* pPhysics = nlMalloc(0x4C, 8, false);
+        PhysicsNPC* pPhysics
+            = (PhysicsNPC*)nlMalloc(sizeof(PhysicsNPC), 8, false);
         if (pPhysics != 0)
         {
-            pPhysics = fn_80172790(pPhysics, pConfig->mUnidentified008);
+            pPhysics = new (pPhysics) PhysicsNPC(
+                pConfig->mUnidentified008);
         }
 
         SkinAnimatedNPC* pObject
@@ -322,7 +325,7 @@ void NPCManager::fn_801A9DF0()
             pObject = fn_801B43F8(pObject, pTemplate->hierarchy, pTemplate->modelID, pConfig->mUnidentified00C, pConfig->mUnidentified010, pPhysics, &pTemplate->mUnidentified014, pTemplate->mUnidentified010);
         }
         mUnidentified0CC[i] = pObject;
-        fn_8017280C(pPhysics, (void*)fn_801B4830);
+        pPhysics->SetCallbackFunction(fn_801B4830);
     }
 }
 

@@ -1,6 +1,7 @@
 #include "Game/Drawable/DrawableCharacter.h"
 
 #include "Game/BasicStadium.h"
+#include "Game/BulletBill.h"
 #include "Game/Drawable/DrawableBulletBill.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Drawable/ShadowProp.h"
@@ -12,18 +13,6 @@
 // object, blended between snapshots, and rendered through the shared render
 // object. The live object and the material/texture services it calls are not
 // reconstructed yet and stay address-named.
-
-struct BulletBillObject
-{
-    /* 0x00 */ nlQuaternion orientation;
-    /* 0x10 */ nlVector3 position;
-    char _01C[0x10];
-    /* 0x2C */ float scale;
-    char _030[8];
-    /* 0x38 */ bool visible;
-    char _039[7];
-    /* 0x40 */ RenderObject* drawable;
-};
 
 extern "C"
 {
@@ -138,7 +127,7 @@ void DrawableBulletBill::Grab(const BulletBillObject* object)
         return;
     }
 
-    mVisible = object->visible;
+    mVisible = object->active;
     if (!mVisible)
     {
         return;

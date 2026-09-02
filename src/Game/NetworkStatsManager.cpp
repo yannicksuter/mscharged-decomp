@@ -1,6 +1,7 @@
 #include <dwc/dwc_nastime.h>
 
 #include "Game/NetworkStatsManager.h"
+#include "Game/tu_801360A4.h"
 
 #include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
@@ -13,12 +14,10 @@
 
 extern "C" int fn_8004F594(int channel, const char* format, ...);
 extern "C" bool fn_8011C1D0();
-extern "C" int fn_8013740C(void* object);
 extern "C" int fn_8025BD88();
 extern "C" s8 fn_80336F68(s8 player, s8 machine);
 
 extern int lbl_806E20E0;
-extern void* lbl_806E1194;
 
 static int sLeaderboardJobs[5] = { 6, 7, 8, 9, 10 };
 
@@ -557,7 +556,7 @@ void NetworkStatsManager_8012F378::SubmitJob(int job)
 
 void NetworkStatsManager_8012F378::RefreshSaveState_801314D0()
 {
-    mSaveState = fn_8013740C(lbl_806E1194);
+    mSaveState = lbl_806E1194->CountBuddies_8013740C();
 }
 
 void NetworkStatsManager_8012F378::ClearGameResultReported()

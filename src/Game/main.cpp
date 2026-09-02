@@ -23,6 +23,8 @@
 #include "Game/Task/TweakerTask.h"
 #include "Game/Task/WorldUpdateTask.h"
 #include "Game/TweakValue.h"
+#include "Game/PadActions.h"
+#include "Game/Pad/FlickDetection.h"
 
 #include "NL/MemAlloc.h"
 #include "NL/globalpad.h"
@@ -132,14 +134,12 @@ extern "C"
     void fn_801BFB08();
     void fn_8013D7A0();
     void fn_8013D7E0();
-    void fn_80137A74();
     void fn_802C0F24();
     void fn_80369574();
     void fn_802E75F4();
     void fn_802E9E0C();
     void fn_802E9E9C();
     void fn_80115504();
-    void fn_8013759C();
     void fn_803768F8();
     void fn_803730D8();
     void fn_80272AB4();
@@ -435,7 +435,7 @@ static void Initialize()
     fn_801BFB08();
     fn_8013D7A0();
     fn_8013D7E0();
-    fn_80137A74();
+    InitPads();
 
     if (!fn_802C7FD0(PreInitFS))
     {
@@ -486,7 +486,7 @@ static void Initialize()
     g_pGameAudio = new (nlMalloc(sizeof(GameAudio_800EB6AC), 8, false))
         GameAudio_800EB6AC;
     g_pGameAudio->Initialize();
-    fn_8013759C();
+    FlickDetection::Initialize();
     networkUpdateTask.Initialize();
     gTransitionTask.Initialize();
     nlLocalization::Initialize();

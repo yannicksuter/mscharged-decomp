@@ -10,7 +10,7 @@
 #include "Game/Field.h"
 #include "Game/Game.h"
 #include "Game/Physics/PhysicsObject.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsSphere.h"
@@ -444,7 +444,7 @@ void fn_80029B9C(void* param)
     }
     case 16:
     {
-        cBall* ball = ((PhysicsBall*)object)->m_pBall;
+        cBall* ball = ((PhysicsAIBall*)object)->m_pAIBall;
         cPlayer* player = ball->m_pOwner;
         if (player != 0)
         {

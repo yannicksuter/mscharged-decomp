@@ -42,6 +42,7 @@ public:
     virtual void fn_80099074(UnidentifiedPlayerEventData*);
 
     void ReleaseBall(int nParam);
+    void GetAnimatedBallOrientation(nlQuaternion& qRetval);
     void PickupBall(cBall* pBall);
     void SetNoPickUpTime(float NewNoPickUpTime);
     cGlobalPad* GetGlobalPad();
@@ -80,7 +81,7 @@ protected:
 public:
     /* 0x1F8 */ nlVector3 m_v3AIPosition;
 
-protected:
+public:
     /* 0x204 */ eBallRotationMode m_eBallRotationMode;
     /* 0x208 */ bool m_ResetBaseBallOrientation;
     /* 0x209 */ u8 mPadding209[0x03];
