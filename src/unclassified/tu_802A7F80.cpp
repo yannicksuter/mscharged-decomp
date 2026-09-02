@@ -87,22 +87,20 @@ bool MeshWriter::Begin(int vertexCount, int primitive, void* allocator)
 
 bool MeshWriter::End()
 {
-    u32 offset = 0;
-    u32 i = 0;
-    for (; i < model->numPackets; ++i)
+    unsigned long packetOffset;
+    int index;
+    for (index = 0, packetOffset = 0; index < model->numPackets;
+         packetOffset += sizeof(glModelPacket), ++index)
     {
-        glModelPacket* packet = (glModelPacket*)((u8*)model->packets + offset);
+        glModelPacket* packet = (glModelPacket*)((u8*)model->packets + packetOffset);
         fn_8036E438(packet, resource != 0);
-        offset += sizeof(glModelPacket);
     }
 
-    i = 0;
-    offset = 0;
-    for (; i < model->packets->numStreams; ++i)
+    for (index = 0, packetOffset = 0; index < model->packets->numStreams;
+         packetOffset += sizeof(glModelStream), ++index)
     {
-        glModelStream* stream = (glModelStream*)((u8*)model->packets->streams + offset);
+        glModelStream* stream = (glModelStream*)((u8*)model->packets->streams + packetOffset);
         DCStoreRangeNoSync(stream->address, count * stream->stride);
-        offset += sizeof(glModelStream);
     }
 
     PPCSync();

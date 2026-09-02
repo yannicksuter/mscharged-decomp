@@ -8,8 +8,10 @@
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Field.h"
+#include "Game/FixedUpdateTask.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
+#include "Game/MathHelpers.h"
 #include "Game/NetworkSession.h"
 #include "Game/ReplayManager.h"
 #include "Game/Team.h"
@@ -28,8 +30,7 @@ extern "C" bool fn_800344B0(cFielder*);
 extern "C" bool fn_8003C180(cPlayer*);
 extern "C" bool fn_8003E74C(cFielder*);
 extern "C" float fn_80111D3C();
-extern "C" float fn_80111D6C();
-extern "C" void* fn_8011166C();
+extern "C" FixedUpdateTask* fn_8011166C();
 
 extern "C" UnidentifiedTypedEvent<UnidentifiedEventData_80066748>*
     fn_80023350(const char*, int);
@@ -400,12 +401,11 @@ void UnidentifiedCameraEffects::AdjustCameraVectors(float deltaTime,
     if ((mCameraFlags & 0x40) != 0)
     {
         float gameX = g_pGame->mUnidentified080;
+        float clampedX = nlMinEquals(lbl_806DC5F4, gameX);
         float gameY = g_pGame->mUnidentified084;
-        float clampedX = gameX < lbl_806DC5F4 ? gameX : lbl_806DC5F4;
-        float clampedY = gameY < lbl_806DC5F4 ? gameY : lbl_806DC5F4;
-        float amount = nlAbs(clampedX) >= nlAbs(clampedY)
-                         ? nlAbs(clampedX)
-                         : nlAbs(clampedY);
+        float clampedY = nlMinEquals(lbl_806DC5F4, gameY);
+        float amount = nlAbs(clampedX);
+        amount = nlMaxEquals(amount, nlAbs(clampedY));
         target->y += lbl_806DC5F8 * (amount / lbl_806DC5F4);
     }
     else if (GameInfoManager::Instance()->GetStadium() == 10)
@@ -433,15 +433,14 @@ nlVector3 UnidentifiedCameraEffects::RotateCameraVector(
 bool UnidentifiedCameraEffects::IsTransitionActive() const
 {
     return (mTransitionInTime != 0.0f || mTransitionOutTime != 0.0f)
-        && mTransitionTime >= -mTransitionOutTime;
+        && mTransitionTime >= -1.0f * mTransitionOutTime;
 }
 
 void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
 {
-    if (mUseRealTime)
+    if (mUseRealTime == true)
     {
-        fn_8011166C();
-        mTransitionTime -= deltaTime * fn_80111D6C();
+        mTransitionTime -= deltaTime * fn_8011166C()->GetTimeScale();
     }
     else
     {
@@ -470,23 +469,19 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
         return;
     }
 
-    float inverseBlend = 1.0f
-                       - (mTransitionBlend < 0.0f
-                              ? 0.0f
-                              : (mTransitionBlend > 1.0f
-                                     ? 1.0f
-                                     : mTransitionBlend));
-    mTransitionBlend = nlAbs(inverseBlend);
+    mTransitionBlend = nlAbs(1.0f
+        - nlMinEquals(nlMaxEquals(mTransitionBlend, 0.0f), 1.0f));
     if (mTransitionBlend != 0.0f)
     {
         mTransitionScale = Interpolate(
             0.0f, mZoomStart, mTransitionBlend);
     }
 
-    if (mRestoreTimeScale && mOwnsTimeScale && mTransitionTime <= 0.0f)
+    if (mRestoreTimeScale == true && mOwnsTimeScale == true
+        && mTransitionTime <= 0.0f)
     {
         if (fn_80338C20(lbl_806E20D8) == 0
-            && (lbl_806E2164 == 0 || lbl_806E2164[4] == 0))
+            && lbl_806E2164[4] == 0)
         {
             g_pGame->fn_80059FC4();
         }
@@ -495,23 +490,15 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
 
     if (mZoomStart < 0.0f)
     {
-        float minimum = 0.6f * mZoomStart;
-        mTransitionScale = mTransitionScale >= mZoomStart
-                         ? mTransitionScale
-                         : mZoomStart;
-        mTransitionScale = mTransitionScale <= minimum
-                         ? mTransitionScale
-                         : minimum;
+        mTransitionScale = nlMinEquals(
+            nlMaxEquals(mTransitionScale, mZoomStart),
+            -1.0f * mZoomStart);
     }
     else
     {
-        float maximum = 0.6f * mZoomStart;
-        mTransitionScale = mTransitionScale >= maximum
-                         ? mTransitionScale
-                         : maximum;
-        mTransitionScale = mTransitionScale <= mZoomStart
-                         ? mTransitionScale
-                         : mZoomStart;
+        mTransitionScale = nlMinEquals(
+            nlMaxEquals(mTransitionScale, -1.0f * mZoomStart),
+            mZoomStart);
     }
 }
 
@@ -552,18 +539,21 @@ bool UnidentifiedCameraEffects::IsPassTargetClear() const
 {
     cPlayer* owner = g_pBall->m_pOwner;
     cPlayer* passTarget = g_pBall->m_pPassTarget;
+    float minimumDistanceSq = lbl_806DC558 * lbl_806DC558;
     if (owner != 0 || passTarget == 0
-        || fn_800155A0(g_pBall, 0) < lbl_806DC554
-        || g_pBall->m_tPassTargetTimer.GetSeconds() < lbl_806DC55C)
+        || fn_800155A0(g_pBall, 0) < lbl_806DC554)
+    {
+        return false;
+    }
+    if (g_pBall->m_tPassTargetTimer.GetSeconds() < lbl_806DC55C)
     {
         return false;
     }
 
-    cTeam* otherTeam = passTarget->m_pTeam->GetOtherTeam();
-    float minimumDistanceSq = lbl_806DC558 * lbl_806DC558;
+    int otherTeam = passTarget->m_pTeam->GetOtherTeam()->m_nSide;
     for (int i = 0; i < 4; ++i)
     {
-        cFielder* fielder = g_pTeams[otherTeam->m_nSide]->GetFielder(i);
+        cFielder* fielder = g_pTeams[otherTeam]->GetFielder(i);
         if (fielder->mUnidentified120 == passTarget->mUnidentified120)
             continue;
         nlVector3 delta;

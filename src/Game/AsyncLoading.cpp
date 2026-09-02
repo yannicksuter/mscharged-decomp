@@ -7,6 +7,7 @@
 #include "Game/Camera/CameraMan.h"
 #include "Game/DB/StatsTracker.h"
 #include "Game/Debug/FrameCounter.h"
+#include "Game/Debug/TimeRegions.h"
 #include "Game/FE/feManager.h"
 #include "Game/FE/feSceneManager.h"
 #include "Game/FixedUpdateTask.h"
@@ -96,9 +97,13 @@ struct FrameTimingStat
 };
 
 extern "C" int fn_8004F594(int category, const char* format, ...);
+extern "C" void fn_80114614(float value);
+extern "C" void fn_801CC114();
 extern "C" unsigned long long fn_802B4478();
 extern "C" void* fn_802C082C(void*, int);
 extern "C" void fn_801A95F0(void*, const char*, int);
+extern "C" GLView* fn_8027267C(int index);
+extern "C" bool fn_80332770();
 extern "C" u32 OSGetTick();
 extern "C" void OSYieldThread();
 
@@ -152,6 +157,7 @@ extern "C" void fn_802BDA28();
 extern "C" void fn_802C0CCC();
 extern "C" void fn_802C8180();
 extern "C" void fn_802B1AE4();
+extern "C" void fn_80370E20();
 extern "C" void fn_802CC02C(ResourceInterface_802CC094*);
 extern "C" void fn_802CC08C(void*);
 extern "C" void fn_80197120();
@@ -166,6 +172,7 @@ void DestroyCharacters();
 extern FrameTimingStat* lbl_806E1698;
 extern FrameTimingStat* lbl_806E169C;
 extern FrameTimingStat* lbl_806E16A0;
+extern BaseGameSceneManager* lbl_806E1838;
 extern BaseGameSceneManager* lbl_806E1860;
 extern void* lbl_806E2164;
 extern void* lbl_806E2168;
@@ -183,6 +190,8 @@ extern UnidentifiedDeletable* lbl_806E2090;
 extern SlotPool<cSAnimCallback> lbl_805840D8;
 extern SlotPoolBase lbl_8057AB80;
 extern bool lbl_806E1E08;
+extern bool lbl_806E1090;
+extern void* lbl_806E18C0;
 
 namespace Detail
 {
@@ -193,11 +202,11 @@ extern void* lbl_806E1E28;
 extern void* lbl_806E1608;
 
 bool g_VerboseAudio;
-bool g_bDumpMemoryStatsOnLoad;
 float g_fScriptBlockingWarningMS = 50.0f;
 float g_fYieldScriptBlockingTimeMS = 45.0f;
 
 static const char* lbl_806E103C;
+static BaseSceneHandler* lbl_806E1040;
 static u8 lbl_806E1044;
 static u32 lbl_806E1048;
 static float lbl_806E104C;
@@ -215,7 +224,7 @@ static TweakValueBoolImpl_804F4538 lbl_8056E458(
     "Audio", "g_VerboseAudio", &g_VerboseAudio, true);
 static TweakValueBoolImpl_804F4538 lbl_8056E478(
     "General/Memory", "g_bDumpMemoryStatsOnLoad",
-    &g_bDumpMemoryStatsOnLoad, true);
+    &lbl_806E1090, true);
 static TweakValueImpl_804F4DC8 lbl_8056E498(
     "g_fScriptBlockingWarningMS", "Loading",
     &g_fScriptBlockingWarningMS);
@@ -602,7 +611,41 @@ extern "C" void fn_8011A570(AsyncLoadingManager* manager)
 extern "C" void fn_8011A800(AsyncLoadingManager* manager)
 {
     manager->mLoadingComment = "GameStateFinalize";
+
+    lbl_806E18C0 = 0;
+    InitializeElectricFence(fn_8027267C(29));
+    BeginFrameTask::s_FramerateLocked = false;
+    fn_801CC114();
+    InitializeTimeRegions();
+    fn_80137824(fn_80332770());
+
     manager->mLoadingState = 1;
+    lbl_806E1040->SetVisible(false);
+    lbl_806E10EC->mUnidentified2472 = true;
+
+    float mem1Free = (float)StandardAllocator.TotalFreeMemory();
+    float mem2Free = (float)VirtualAllocator.TotalFreeMemory();
+    float totalMemFree = mem1Free + mem2Free;
+
+    fn_8004F594(9,
+        "MEM1 Free at end of InitializeGameState: %f bytes, or %f KB, or %f MB\n",
+        mem1Free, mem1Free / 1024.0f, mem1Free / 1048576.0f);
+    fn_8004F594(9,
+        "MEM2 Free at end of InitializeGameState: %f bytes, or %f KB, or %f MB\n",
+        mem2Free, mem2Free / 1024.0f, mem2Free / 1048576.0f);
+    fn_8004F594(9,
+        "Total Mem Free at end of InitializeGameState: %f bytes, or %f KB, or %f MB\n",
+        totalMemFree, totalMemFree / 1024.0f,
+        totalMemFree / 1048576.0f);
+
+    fn_802BD718(
+        "MEM1 Free at end of InitializeGameState", "bytes", mem1Free);
+    fn_802BD718(
+        "MEM2 Free at end of InitializeGameState", "bytes", mem2Free);
+    fn_802BD718(
+        "Total Free Memory at end of InitializeGameState", "bytes",
+        totalMemFree);
+
     FinishLoadingStep(manager);
 }
 
@@ -793,24 +836,29 @@ public:
 
 extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
 {
-    if (!g_bDumpMemoryStatsOnLoad)
+    if (lbl_806E1090)
     {
-        return;
+        for (int i = 0; i < 4; ++i)
+        {
+            UnidentifiedMemoryStatSource* source
+                = (UnidentifiedMemoryStatSource*)fn_802C082C(
+                    lbl_806E1E28, i);
+            if (source == 0)
+            {
+                return;
+            }
+            if (source->HasMemoryStats()
+                && source->ReadMemoryStats(0x200, 0)
+                && source->ReadMemoryStats(0x100, 0)
+                && source->ReadMemoryStats(0x8000, 0))
+            {
+                fn_80114614(5.0f);
+            }
+        }
     }
 
-    for (int i = 0; i < 32; ++i)
-    {
-        UnidentifiedMemoryStatSource* source
-            = (UnidentifiedMemoryStatSource*)fn_802C082C(lbl_806E1E28, i);
-        if (source == 0)
-        {
-            break;
-        }
-        if (source->HasMemoryStats())
-        {
-            source->ReadMemoryStats(0x200, 0);
-        }
-    }
+    lbl_806E1838->Push((SceneList)0x10, SCREEN_NOTHING, false);
+    fn_80370E20();
     FinishLoadingStep(manager);
 }
 

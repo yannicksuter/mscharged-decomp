@@ -1012,7 +1012,6 @@ static void StaticDWCLoginCallback(int error, int profileID, void* param)
 
 bool UnidentifiedNetworkSession::fn_80120440()
 {
-    void* friendList;
     GameInfoManager* gameInfo;
 
     OnlineVirtual14(true);
@@ -1030,18 +1029,19 @@ bool UnidentifiedNetworkSession::fn_80120440()
         GameInfoManager::GetInstance()->GetSaveSlot(lbl_806E20E0));
 
     gameInfo = GameInfoManager::GetInstance();
-    friendList = gameInfo->GetUnknown0x40(lbl_806E20E0, 0);
     DWC_InitFriendsMatch(
         &lbl_806E10F0, gameInfo->GetSaveSlot(lbl_806E20E0), 0x2AAF,
-        "mschargedwii", "B4LdGW", 0, 0, friendList, 0x40);
+        "mschargedwii", "B4LdGW", 0, 0,
+        gameInfo->GetUnknown0x40(lbl_806E20E0, 0), 0x40);
 
-    const u16* name = (const u16*)L"";
+    const u16* name = (const u16*)L"unnamed";
     if (lbl_8058436C[0] != 0)
     {
         name = lbl_8058436C;
     }
 
-    if (!DWC_LoginAsync(name, 0, StaticDWCLoginCallback, 0))
+    bool result = DWC_LoginAsync(name, 0, StaticDWCLoginCallback, 0);
+    if (!result)
     {
         fn_8004F594(0x10, "Initial fail in DWC_LoginAsync\n");
         int error = DWC_GetLastErrorEx(&mDWCErrorCode, &mDWCErrorType);

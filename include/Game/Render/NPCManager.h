@@ -92,17 +92,17 @@ public:
                          : mUnidentified014.Begin();
             while (iterator.hasNext())
             {
-                NPCTemplate* pTemplate = *iterator;
                 char name[40];
-                unsigned long length = nlStrLen(pTemplate->mName) + 1;
-                if (length > sizeof(name))
+                unsigned long length = nlStrLen((*iterator)->mName) + 1;
+                unsigned long copyLength = sizeof(name);
+                if (length <= sizeof(name))
                 {
-                    length = sizeof(name);
+                    copyLength = length;
                 }
-                nlStrNCpy(name, pName, length);
-                if (nlStrICmp(name, pTemplate->mName) == 0)
+                nlStrNCpy(name, pName, copyLength);
+                if (nlStrICmp(name, (*iterator)->mName) == 0)
                 {
-                    return pTemplate;
+                    return *iterator;
                 }
                 iterator.next();
             }

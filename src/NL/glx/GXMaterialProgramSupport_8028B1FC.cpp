@@ -10,6 +10,7 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxMatrix.h"
+#include "NL/nlColour.h"
 #include "NL/nlMath.h"
 
 extern "C"
@@ -55,12 +56,6 @@ static int lbl_806DEFF4 = -1;
 static float lbl_806DEFF8 = 1.0f;
 static float lbl_806DEFFC = 1.0f;
 static bool lbl_806DF000 = true;
-
-static const Mtx lbl_804E8700 = {
-    { 0.0f, 0.0f, 0.0f, 0.5f },
-    { 0.0f, 0.0f, 0.0f, 0.5f },
-    { 0.0f, 0.0f, 0.0f, 1.0f },
-};
 
 static Mtx lbl_80524110 = {
     { 0.0f, 0.0f, 1.0f, 0.0f },
@@ -161,22 +156,6 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Prepare(
     fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
 }
 
-struct FloatColour_8028B1FC
-{
-    float c[4];
-};
-
-static inline GXColor ConvertColour_8028B1FC(
-    const FloatColour_8028B1FC& source)
-{
-    GXColor colour;
-    colour.r = (unsigned char)(source.c[0] * 255.0f);
-    colour.g = (unsigned char)(source.c[1] * 255.0f);
-    colour.b = (unsigned char)(source.c[2] * 255.0f);
-    colour.a = (unsigned char)(source.c[3] * 255.0f);
-    return colour;
-}
-
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
     const glModelPacket* packet)
@@ -187,36 +166,39 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
     GXMaterialProgram_80298478* program = static_cast<GXMaterialProgram_80298478*>(this);
     program->BindVertexArrays(packet);
     program->BindParameters(packet);
-    GXMaterialProgramParameters_80298478* parameters = (GXMaterialProgramParameters_80298478*)packet->unknown20;
 
-    float value40 = lbl_806DEFF8;
-    if (value40 == 1.0f)
-        value40 = parameters->value40;
-    float value44 = lbl_806DEFFC;
-    if (value44 == 1.0f)
-        value44 = parameters->value44;
+    const float one = 1.0f;
+    float value40 = one != lbl_806DEFF8
+        ? lbl_806DEFF8
+        : ((GXMaterialProgramParameters_80298478*)packet->unknown20)->value40;
+    float value44 = one != lbl_806DEFFC
+        ? lbl_806DEFFC
+        : ((GXMaterialProgramParameters_80298478*)packet->unknown20)->value44;
     if (value44 == 0.0f)
         return;
 
-    int textureIndex = lbl_806DEFF4;
-    float value48 = parameters->value48;
-    float scaleX = parameters->scaleX;
-    float scaleY = parameters->scaleY;
-    if (textureIndex < 0)
-        textureIndex = parameters->textureIndex;
+    float value48 = ((GXMaterialProgramParameters_80298478*)packet->unknown20)->value48;
+    float scaleX = ((GXMaterialProgramParameters_80298478*)packet->unknown20)->scaleX;
+    float scaleY = ((GXMaterialProgramParameters_80298478*)packet->unknown20)->scaleY;
+    int textureIndex = lbl_806DEFF4 >= 0
+        ? lbl_806DEFF4
+        : ((GXMaterialProgramParameters_80298478*)packet->unknown20)->textureIndex;
 
-    FloatColour_8028B1FC source40 = { { value40, value40, value40, value40 } };
-    GXColor colour40 = ConvertColour_8028B1FC(source40);
-    GXSetTevKColor(GX_KCOLOR0, colour40);
-    FloatColour_8028B1FC source44 = { { value44, value44, value44, value44 } };
-    GXColor colour44 = ConvertColour_8028B1FC(source44);
-    GXSetTevKColor(GX_KCOLOR1, colour44);
-    FloatColour_8028B1FC source48 = { { value48, value48, value48, value48 } };
-    GXColor colour48 = ConvertColour_8028B1FC(source48);
-    GXSetTevKColor(GX_KCOLOR2, colour48);
+    nlFloatColour source40 = { { value40, value40, value40, value40 } };
+    nlColour colour40;
+    ConvertColour(colour40, source40);
+    GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&colour40);
+    nlFloatColour source44 = { { value44, value44, value44, value44 } };
+    nlColour colour44;
+    ConvertColour(colour44, source44);
+    GXSetTevKColor(GX_KCOLOR1, *(GXColor*)&colour44);
+    nlFloatColour source48 = { { value48, value48, value48, value48 } };
+    nlColour colour48;
+    ConvertColour(colour48, source48);
+    GXSetTevKColor(GX_KCOLOR2, *(GXColor*)&colour48);
 
-    bool enabled = parameters->value68 == 1;
-    if (enabled != lbl_806E1A74)
+    bool enabled = ((GXMaterialProgramParameters_80298478*)packet->unknown20)->value68 == 1;
+    if (lbl_806E1A74 != enabled)
     {
         lbl_806E1A74 = enabled;
         Deactivate();
@@ -225,8 +207,11 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
 
     if (lbl_806E1A68[0] != scaleX || lbl_806E1A68[1] != scaleY)
     {
-        Mtx textureMatrix;
-        memcpy(textureMatrix, lbl_804E8700, sizeof(Mtx));
+        Mtx textureMatrix = {
+            { 0.0f, 0.0f, 0.0f, 0.5f },
+            { 0.0f, 0.0f, 0.0f, 0.5f },
+            { 0.0f, 0.0f, 0.0f, 1.0f },
+        };
         textureMatrix[0][0] = 0.5f * scaleX;
         textureMatrix[1][1] = -0.5f * scaleY;
         GXLoadTexMtxImm(textureMatrix, 64, GX_MTX3x4);
@@ -239,11 +224,11 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
     {
         if (!lbl_806E1A75)
         {
-            lbl_8057ADDC[0] = -1;
-            lbl_8057ADDC[1] = -1;
-            lbl_8057ADDC[2] = -1;
-            lbl_8057ADDC[3] = -1;
-            lbl_8057ADDC[4] = -1;
+            lbl_8057ADDC[0] = 0xFFFF;
+            lbl_8057ADDC[1] = 0xFFFF;
+            lbl_8057ADDC[2] = 0xFFFF;
+            lbl_8057ADDC[3] = 0xFFFF;
+            lbl_8057ADDC[4] = 0xFFFF;
             lbl_806E1A75 = true;
         }
         if (lbl_8057ADDC[textureIndex] == 0xFFFF
@@ -253,24 +238,27 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
         }
         UnidentifiedTextureState textureState;
         textureState.texture = texture;
-        textureState.textureIndex = lbl_8057ADDC[textureIndex];
-        textureState.flags = 3;
+        textureState.flags = 0;
         textureState.unknown07 = 0;
+        textureState.SetWrapS(true);
+        textureState.SetWrapT(true);
+        textureState.textureIndex = lbl_8057ADDC[textureIndex];
         fn_8036BE88(4, &textureState);
         lbl_806E1A78 = texture;
     }
 
     nlMatrix4 model;
     nlMatrix4 modelview;
-    glGetMatrix(packet->matrix, model);
+    unsigned long matrix = packet->matrix;
+    glGetMatrix(matrix, model);
     nlMultMatrices(modelview, model, lbl_8057AD88);
-    fn_80183B40(packet->matrix);
+    fn_80183B40(matrix);
 
-    if (lbl_806E1A60 != packet->matrix)
+    if (matrix != lbl_806E1A60)
     {
         Mtx source;
         Mtx inverse;
-        lbl_806E1A60 = packet->matrix;
+        lbl_806E1A60 = matrix;
         glxCopyMatrix(source, modelview);
         PSMTXInvXpose(source, inverse);
         GXLoadTexMtxImm(inverse, 30, GX_MTX3x4);
@@ -278,14 +266,18 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
 
     if (packet->unknown28 == 0)
     {
-        fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
+        fn_8036D7EC(
+            ((GXMaterialProgramParameters_80298478*)packet->unknown20)->matrices,
+            ((GXMaterialProgramParameters_80298478*)packet->unknown20)->matricesSize / 48,
+            &modelview, 0);
     }
     else
     {
         fn_8036D774(&modelview);
     }
 
-    fn_801837DC(1, parameters->value64);
+    fn_801837DC(
+        1, ((GXMaterialProgramParameters_80298478*)packet->unknown20)->value64);
     if (lbl_806DEFF1 && value44 != 1.0f)
     {
         gxSaveZMode();

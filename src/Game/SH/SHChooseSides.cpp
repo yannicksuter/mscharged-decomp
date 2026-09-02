@@ -171,10 +171,15 @@ void SHChooseSides2::SceneCreated()
     const CharacterInfo& info0 = GetCharacterInfo(GetCharacterIndexFromCaptain(team0));
     const CharacterInfo& info1 = GetCharacterInfo(GetCharacterIndexFromCaptain(team1));
 
-    unsigned long colour = GetTeamColour(info0, info1, true);
-    nlColourSet(mUnidentified3F0[0], colour >> 24, colour >> 16, colour >> 8, colour);
-    colour = GetTeamColour(info1, info0, true);
-    nlColourSet(mUnidentified3F0[1], colour >> 24, colour >> 16, colour >> 8, colour);
+    unsigned long packedColour = GetTeamColour(info0, info1, true);
+    nlColour colour0;
+    nlColourSet(colour0, packedColour >> 24, packedColour >> 16, packedColour >> 8, packedColour);
+    mUnidentified3F0[0] = colour0;
+
+    packedColour = GetTeamColour(info1, info0, true);
+    nlColour colour1;
+    nlColourSet(colour1, packedColour >> 24, packedColour >> 16, packedColour >> 8, packedColour);
+    mUnidentified3F0[1] = colour1;
 
     TLComponentInstance* screen = 0;
     void* object = fn_80253E18();
@@ -209,9 +214,9 @@ void SHChooseSides2::SceneCreated()
         char controllerName[16];
         nlSNPrintf(controllerName, 16, "controller%d", i);
 
-        TLComponentInstance* homeController = (TLComponentInstance*)fn_803068F4(
+        TLComponentInstance* homeController = FEFinder<TLComponentInstance, 4>::Find(
             mSideGroups[0], nlStringLowerHash("controllers"), nlStringLowerHash(lbl_806DE038[0]), nlStringLowerHash(controllerName), 0, 0, 0);
-        TLComponentInstance* homeOver = (TLComponentInstance*)fn_803068F4(
+        TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find(
             mSideGroups[0], nlStringLowerHash("over"), nlStringLowerHash(lbl_806DE038[0]), nlStringLowerHash(controllerName), 0, 0, 0);
 
         FEFinder<TLInstance, 2>::_Find<TLSlide>(homeController->GetActiveSlide(),
@@ -229,9 +234,9 @@ void SHChooseSides2::SceneCreated()
             0,
             0);
 
-        TLComponentInstance* awayController = (TLComponentInstance*)fn_803068F4(
+        TLComponentInstance* awayController = FEFinder<TLComponentInstance, 4>::Find(
             mSideGroups[1], nlStringLowerHash("controllers"), nlStringLowerHash(lbl_806DE038[1]), nlStringLowerHash(controllerName), 0, 0, 0);
-        TLComponentInstance* awayOver = (TLComponentInstance*)fn_803068F4(
+        TLComponentInstance* awayOver = FEFinder<TLComponentInstance, 4>::Find(
             mSideGroups[1], nlStringLowerHash("over"), nlStringLowerHash(lbl_806DE038[1]), nlStringLowerHash(controllerName), 0, 0, 0);
 
         FEFinder<TLInstance, 2>::_Find<TLSlide>(awayController->GetActiveSlide(),
@@ -272,13 +277,13 @@ void SHChooseSides2::SceneCreated()
         }
     }
 
-    TLComponentInstance* homeCPU = (TLComponentInstance*)fn_803068F4(
+    TLComponentInstance* homeCPU = FEFinder<TLComponentInstance, 4>::Find(
         mSideGroups[0], nlStringLowerHash("controllers"), nlStringLowerHash("home_group"), nlStringLowerHash("CPU"), 0, 0, 0);
-    TLComponentInstance* awayCPU = (TLComponentInstance*)fn_803068F4(
+    TLComponentInstance* awayCPU = FEFinder<TLComponentInstance, 4>::Find(
         mSideGroups[1], nlStringLowerHash("controllers"), nlStringLowerHash("away_group"), nlStringLowerHash("CPU"), 0, 0, 0);
-    TLComponentInstance* homeCPUOver = (TLComponentInstance*)fn_803068F4(
+    TLComponentInstance* homeCPUOver = FEFinder<TLComponentInstance, 4>::Find(
         mSideGroups[0], nlStringLowerHash("over"), nlStringLowerHash("home_group"), nlStringLowerHash("CPU"), 0, 0, 0);
-    TLComponentInstance* awayCPUOver = (TLComponentInstance*)fn_803068F4(
+    TLComponentInstance* awayCPUOver = FEFinder<TLComponentInstance, 4>::Find(
         mSideGroups[1], nlStringLowerHash("over"), nlStringLowerHash("away_group"), nlStringLowerHash("CPU"), 0, 0, 0);
 
     if (GameInfoManager::Instance()->IsInMode3())
@@ -334,7 +339,7 @@ void SHChooseSides2::SceneCreated()
         mUnidentified2F0.fn_8022F194(screen);
     }
 
-    for (short team = 0; team < 2; ++team)
+    for (int team = 0; team < 2; ++team)
     {
         if (mContext != PAUSE)
         {
@@ -347,7 +352,7 @@ void SHChooseSides2::SceneCreated()
             }
 
             const char** sidekickName = lbl_8051CAFC;
-            for (short slot = 0; slot < 3; ++slot)
+            for (int slot = 0; slot < 3; ++slot)
             {
                 TLComponentInstance* sidekick = (TLComponentInstance*)FEFinder<TLComponentInstance, 2>::_Find<TLComponentInstance>(
                     component, nlStringLowerHash(*sidekickName), 0, 0, 0, 0, 0);
@@ -368,7 +373,7 @@ void SHChooseSides2::SceneCreated()
             }
         }
 
-        TLInstance* instance = (TLInstance*)fn_803068F4(mSideGroups[team],
+        TLInstance* instance = FEFinder<TLInstance, 2>::Find(mSideGroups[team],
             nlStringLowerHash("empty"),
             nlStringLowerHash(lbl_806DE038[team]),
             nlStringLowerHash("white_8x8"),
@@ -381,7 +386,7 @@ void SHChooseSides2::SceneCreated()
         }
         instance->SetAssetColour(mUnidentified3F0[team]);
 
-        instance = (TLInstance*)fn_803068F4(mSideGroups[team],
+        instance = FEFinder<TLInstance, 2>::Find(mSideGroups[team],
             nlStringLowerHash("over"),
             nlStringLowerHash(lbl_806DE038[team]),
             nlStringLowerHash("white_8x8"),
@@ -394,7 +399,7 @@ void SHChooseSides2::SceneCreated()
         }
         instance->SetAssetColour(mUnidentified3F0[team]);
 
-        instance = (TLInstance*)fn_803068F4(mSideGroups[team],
+        instance = FEFinder<TLInstance, 2>::Find(mSideGroups[team],
             nlStringLowerHash("controllers"),
             nlStringLowerHash(lbl_806DE038[team]),
             nlStringLowerHash("white_8x8"),

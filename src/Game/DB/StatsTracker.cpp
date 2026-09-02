@@ -84,8 +84,8 @@ public:
 extern StatsEventRegistry* lbl_806E1D90;
 extern BaseGameSceneManager* lbl_806E1860;
 
-extern "C" int fn_801CBE78(int captain);
-extern "C" int fn_801CBE7C(int sidekick);
+extern "C" eCharacterClass fn_801CBE78(eTeamID captain);
+extern "C" eCharacterClass fn_801CBE7C(eSidekickID sidekick);
 extern "C" const char* fn_801CBE80(int captain);
 extern "C" const char* fn_801CBEA8(int sidekick);
 extern "C" const char* fn_801B6188(int stadium);
@@ -221,9 +221,17 @@ StatsTracker::StatsTracker()
 void StatsTracker::SetBasicGameInfoPointer(
     BasicGameInfo* pGameInfo, bool initializeStats)
 {
+    eSidekickID homesk;
+    eSidekickID awaysk;
+    eTeamID homeid;
+    eTeamID awayid;
+    eCharacterClass characterClass;
+    u32 i;
+    int j;
+
     mBasicGameInfo = pGameInfo;
-    eTeamID homeid = (eTeamID)mBasicGameInfo->mTeamIndex[0];
-    eTeamID awayid = (eTeamID)mBasicGameInfo->mTeamIndex[1];
+    homeid = (eTeamID)mBasicGameInfo->mTeamIndex[0];
+    awayid = (eTeamID)mBasicGameInfo->mTeamIndex[1];
 
     mIsUserCupWinner = false;
     mIsOvertime = false;
@@ -244,26 +252,37 @@ void StatsTracker::SetBasicGameInfoPointer(
     InitializeTeamStats(mCurrentTeamStats[0], homeid);
     InitializeTeamStats(mCurrentTeamStats[1], awayid);
 
+    characterClass = (eCharacterClass)fn_801CBE78(homeid);
     InitializePlayerStats(
-        mCurrentPlayerStats[0][0], fn_801CBE78(homeid), TYPE_CHARACTER);
-    InitializePlayerStats(
-        mCurrentPlayerStats[1][0], fn_801CBE78(awayid), TYPE_CHARACTER);
+        mCurrentPlayerStats[0][0], characterClass, TYPE_CHARACTER);
 
-    int* homeSidekicks = &mBasicGameInfo->mSidekickIndex[0][0];
-    int* awaySidekicks = &mBasicGameInfo->mSidekickIndex[1][0];
-    for (int i = 1; i < 5; i++)
+    characterClass = (eCharacterClass)fn_801CBE78(awayid);
+    InitializePlayerStats(
+        mCurrentPlayerStats[1][0], characterClass, TYPE_CHARACTER);
+
+    i = 1;
+    do
     {
+        homesk =
+            (eSidekickID)mBasicGameInfo->mSidekickIndex[0][i - 1];
+        awaysk =
+            (eSidekickID)mBasicGameInfo->mSidekickIndex[1][i - 1];
+        characterClass = (eCharacterClass)fn_801CBE7C(homesk);
         InitializePlayerStats(mCurrentPlayerStats[0][i],
-            fn_801CBE7C(homeSidekicks[i - 1]), TYPE_CHARACTER);
+            characterClass, TYPE_CHARACTER);
+        characterClass = (eCharacterClass)fn_801CBE7C(awaysk);
         InitializePlayerStats(mCurrentPlayerStats[1][i],
-            fn_801CBE7C(awaySidekicks[i - 1]), TYPE_CHARACTER);
-    }
+            characterClass, TYPE_CHARACTER);
+        i++;
+    } while (i < 5);
 
-    for (int i = 0; i < 4; i++)
+    j = 0;
+    do
     {
-        InitializePlayerStats(mCurrentUserStats[i], i, TYPE_USER);
-        InitializePlayerStats(mCumulativeUserStats[i], i, TYPE_USER);
-    }
+        InitializePlayerStats(mCurrentUserStats[j], j, TYPE_USER);
+        InitializePlayerStats(mCumulativeUserStats[j], j, TYPE_USER);
+        j++;
+    } while (j < 4);
 }
 
 void StatsTracker::ResetCurrentStats()

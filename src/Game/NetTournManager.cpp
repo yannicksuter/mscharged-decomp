@@ -495,31 +495,35 @@ void NetTournManager::UpdateRoundGameRange()
     mLastGameInRound = -1;
     if (mLargeBracket)
     {
-        if (mCurrentRound == 0)
+        switch (mCurrentRound)
         {
+        case 0:
             mFirstGameInRound = 0;
             mLastGameInRound = 3;
-        }
-        else if (mCurrentRound == 1)
-        {
+            break;
+        case 1:
             mFirstGameInRound = 4;
             mLastGameInRound = 5;
-        }
-        else if (mCurrentRound == 2)
-        {
+            break;
+        case 2:
             mFirstGameInRound = 6;
             mLastGameInRound = 6;
+            break;
         }
     }
-    else if (mCurrentRound == 0)
+    else
     {
-        mFirstGameInRound = 0;
-        mLastGameInRound = 1;
-    }
-    else if (mCurrentRound == 1)
-    {
-        mFirstGameInRound = 2;
-        mLastGameInRound = 2;
+        switch (mCurrentRound)
+        {
+        case 0:
+            mFirstGameInRound = 0;
+            mLastGameInRound = 1;
+            break;
+        case 1:
+            mFirstGameInRound = 2;
+            mLastGameInRound = 2;
+            break;
+        }
     }
 }
 

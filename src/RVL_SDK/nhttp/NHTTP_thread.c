@@ -197,6 +197,8 @@ s32 NHTTPi_CheckHeaderEnd(char* buffer, s32 position)
 s32 NHTTPi_SaveBuf(NHTTPRequestInfo* request, char* buffer, s32 socket,
     s32* bufferedBytes, const char* data, s32 length)
 {
+    s32 chunk;
+    s32 room;
     s32 remain = length;
     while (remain > 0)
     {
@@ -204,26 +206,24 @@ s32 NHTTPi_SaveBuf(NHTTPRequestInfo* request, char* buffer, s32 socket,
         {
             return -1;
         }
+        chunk = remain;
+        room = 0x100 - *bufferedBytes;
+        if (remain > room)
         {
-            s32 chunk = remain;
-            s32 room = 0x100 - *bufferedBytes;
-            if (remain > room)
+            chunk = room;
+        }
+        NHTTPi_memcpy(buffer + *bufferedBytes, data, chunk);
+        data += chunk;
+        remain -= chunk;
+        *bufferedBytes += chunk;
+        if (*bufferedBytes == 0x100)
+        {
+            s32 sent = NHTTPi_SocSend(request, socket, buffer, 0x100, 0);
+            if (sent <= 0)
             {
-                chunk = room;
+                return sent;
             }
-            NHTTPi_memcpy(buffer + *bufferedBytes, data, chunk);
-            data += chunk;
-            remain -= chunk;
-            *bufferedBytes += chunk;
-            if (*bufferedBytes == 0x100)
-            {
-                s32 sent = NHTTPi_SocSend(request, socket, buffer, 0x100, 0);
-                if (sent <= 0)
-                {
-                    return sent;
-                }
-                *bufferedBytes -= sent;
-            }
+            *bufferedBytes -= sent;
         }
     }
     return length;

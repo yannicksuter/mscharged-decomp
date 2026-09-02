@@ -332,9 +332,10 @@ s32 NHTTPi_strtonum(const char* string, s32 length)
 s32 NHTTPi_memfind(const char* buffer, s32 bufferLength,
     const char* pattern, s32 patternLength)
 {
-    const char* current;
+    const char* bufferCursor;
     s32 positionCount;
     s32 position;
+    s32 matched;
 
     if (bufferLength < patternLength)
     {
@@ -342,23 +343,20 @@ s32 NHTTPi_memfind(const char* buffer, s32 bufferLength,
     }
 
     positionCount = bufferLength - patternLength + 1;
-    current = buffer;
     for (position = 0; position < positionCount; position++)
     {
-        if (pattern[0] == current[0])
+        if (pattern[0] == buffer[position])
         {
-            const char* bufferCursor = &buffer[position + 1];
-            const char* patternCursor = &pattern[1];
-            s32 matched = 1;
+            bufferCursor = &buffer[position + 1];
+            matched = 1;
 
             while (matched < patternLength)
             {
-                if (*bufferCursor != *patternCursor)
+                if (*bufferCursor != pattern[matched])
                 {
                     break;
                 }
                 matched++;
-                patternCursor++;
                 bufferCursor++;
             }
             if (matched == patternLength)
@@ -366,7 +364,6 @@ s32 NHTTPi_memfind(const char* buffer, s32 bufferLength,
                 return 0;
             }
         }
-        current++;
     }
 
     return -1;
@@ -377,13 +374,9 @@ s32 NHTTPi_Base64Encode(char* destination, const char* source)
     char* alphabet = sBase64Alphabet;
     char* current = destination;
     s32 length = strlen(source);
-    u32 groupCount = length + 2;
-    s32 encodedLength;
     s32 i;
 
-    groupCount /= 3;
-    encodedLength = groupCount * 3;
-    for (i = 0; i < groupCount; i++)
+    for (i = 0; i < length; i += 3)
     {
         current[0] = alphabet[source[0] >> 2];
         current[1] = alphabet[((source[0] & 3) << 4) + (source[1] >> 4)];
@@ -393,11 +386,11 @@ s32 NHTTPi_Base64Encode(char* destination, const char* source)
         current += 4;
     }
 
-    if (encodedLength == length + 1)
+    if (i == length + 1)
     {
         current[-1] = '=';
     }
-    else if (encodedLength == length + 2)
+    else if (i == length + 2)
     {
         current[-2] = '=';
         current[-1] = '=';
