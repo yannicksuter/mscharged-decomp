@@ -16,6 +16,7 @@
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Team.h"
 #include "Game/TweakValue.h"
+#include "unclassified/tu_80177498.h"
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/AI/AIPad.h"
@@ -104,7 +105,6 @@ extern "C" float fn_8002C5A4(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C180(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CF10(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C0AC(PlayerTweaks* pTweaks);
-extern "C" void fn_80015C38(cBall* pBall, int nParam);
 extern "C" void fn_800154FC(cBall* pBall, float fParam);
 extern "C" void fn_801B75C8(cFielder* pFielder, int, int, int, int);
 extern "C" void fn_800395C0(cFielder* pFielder);
@@ -200,14 +200,6 @@ extern "C" UnidentifiedTornado806E0C94* fn_800AA060(
 
 extern BasicSlotPool<PlayerAttackData> lbl_80571960;
 
-struct UnidentifiedCaptainObject
-{
-    /* 0x00 */ u8 mUnknown00[0x38];
-    /* 0x38 */ nlVector3 mUnidentified38;
-    /* 0x44 */ nlVector3 mUnidentified44;
-};
-
-extern "C" UnidentifiedCaptainObject* fn_801792C4(void* pParam, int nIndex);
 extern "C" bool fn_802B6BC8(const nlVector3* v3Start,
     const nlVector3* v3End, const nlVector3* v3A, const nlVector3* v3B,
     float* fOut1, float* fOut2);
@@ -833,12 +825,12 @@ void cFielder::ActionHit(float fDeltaT)
             float fT2;
             for (int i = 0; i < 0x14; i++)
             {
-                UnidentifiedCaptainObject* pObject
-                    = fn_801792C4(pCaptain->mUnidentified400, i);
+                PhysicsBox_80177498* pObject
+                    = pCaptain->mUnidentified400->fn_801792C4(i);
                 if (pObject != 0
                     && fn_802B6BC8(&rv3Position, &v3Target,
-                        &pObject->mUnidentified38,
-                        &pObject->mUnidentified44, &fT1, &fT2))
+                        &pObject->mUnidentified038,
+                        &pObject->mUnidentified044, &fT1, &fT2))
                 {
                     bBlocked = true;
                 }

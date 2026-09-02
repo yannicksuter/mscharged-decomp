@@ -7,22 +7,22 @@
 void NETHMACInit(NETHMACContext* context, const NETHashInterface* interface,
     const void* key, u32 keyLength)
 {
+    void* hashContext = context->hashContext;
     u8 innerPad[64];
     u32 i;
     u32 actualKeyLength;
-    void* hashContext = context->hashContext;
 
     context->interface = *interface;
 
-    if (interface->contextSize > sizeof(context->hashContext) || interface->blockSize > sizeof(context->key))
+    if (context->interface.contextSize > sizeof(context->hashContext) || context->interface.blockSize > sizeof(context->key))
     {
-        OSReport("%s(%d):[warning in %s]", "hmac.c", 100, "NETHMACInit");
-        OSReport("specified interface needs too large work memory.");
+        OSReport("%s(%d):[warning in %s]", "hmac.c", 100, __FUNCTION__);
+        OSReport("specified interface needs too large workmemory.");
         OSReport("\n");
         return;
     }
 
-    if (keyLength <= interface->blockSize)
+    if (keyLength <= context->interface.blockSize)
     {
         memcpy(context->key, key, keyLength);
         context->keyLength = keyLength;
@@ -35,6 +35,7 @@ void NETHMACInit(NETHMACContext* context, const NETHashInterface* interface,
         context->keyLength = context->interface.digestSize;
     }
 
+    hashContext = context->hashContext;
     actualKeyLength = context->keyLength;
     for (i = 0; i < actualKeyLength; i++)
     {

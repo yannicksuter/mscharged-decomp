@@ -22,6 +22,7 @@
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsFakeBall.h"
+#include "unclassified/tu_80177498.h"
 #include "Game/SAnim/pnBlender.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/SAnim/pnFeather.h"
@@ -61,13 +62,6 @@ struct UnidentifiedFESceneState
 {
     u8 mUnidentified000[0x74];
     int mUnidentified074;
-};
-
-struct UnidentifiedWallSegment
-{
-    u8 mUnidentified000[0x38];
-    nlVector3 mUnidentified038;
-    nlVector3 mUnidentified044;
 };
 
 extern UnidentifiedGoalieActionState* lbl_806E0C94;
@@ -201,16 +195,12 @@ extern "C" void fn_800809D0(
 extern "C" void fn_8001EF78(cCharacter* pCharacter, float fParam);
 extern "C" bool fn_8007EB10(Goalie* pGoalie);
 extern "C" float fn_800DF028(cFielder* pFielder);
-extern "C" UnidentifiedWallSegment* fn_801792D0(
-    void* pManager, unsigned int uWallID);
-extern "C" void fn_80015C38(cBall* pBall, int nParam);
 extern "C" bool fn_80016768(cBall* pBall);
 extern "C" float fn_800156A8(cBall* pBall);
 extern "C" void fn_8007DCD8(Goalie* pGoalie, bool bParam);
 extern "C" void fn_8007EB90(Goalie* pGoalie);
 extern "C" void fn_8003C5D8(
     cFielder* pFielder, bool bParam, unsigned short aParam);
-extern "C" bool fn_800976C4(Goalie* pGoalie);
 extern "C" void fn_80098098(Goalie* pGoalie);
 extern "C" void fn_8004F204(cFielder* pFielder);
 extern "C" void fn_8005E408(
@@ -229,8 +219,6 @@ extern "C" bool fn_80331C04(
 extern "C" void fn_80097574(
     cPlayer* pPlayer, int nNodeIndex, int nAnimID, float fParam);
 extern "C" void fn_8009591C(cPlayer* pPlayer, bool bParam);
-extern "C" cFielder* fn_8009664C(
-    Goalie* pGoalie, const nlVector3& v3Position, bool bParam);
 extern "C" UnidentifiedGoalieSkillTweaks* fn_800A636C(void* pTeam);
 extern "C" void fn_80139D1C(int nParam, void* pParam);
 extern "C" void fn_801BABEC(cPlayer* pPlayer);
@@ -799,7 +787,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
 void Goalie::fn_80083750(float)
 {
     cPN_SAnimController* pController
-        = (cPN_SAnimController*)mUnidentified2F0->GetChild(1);
+        = (cPN_SAnimController*)m_pPowerupLayer->GetChild(1);
     bool bAnimDone = false;
     if (pController == 0
         || (bAnimDone = (pController->m_ePlayMode == PM_HOLD
@@ -822,7 +810,7 @@ void Goalie::fn_80083750(float)
             = nlMinEquals(1.0f, pController->m_fTime / 0.2f);
         while (nNodeIndex >= 0)
         {
-            mUnidentified2F0->SetNodeWeight(nNodeIndex, fWeight);
+            m_pPowerupLayer->SetNodeWeight(nNodeIndex, fWeight);
             nNodeIndex
                 = m_pPoseAccumulator->m_pHierarchy->GetParent(
                     nNodeIndex);
@@ -1993,7 +1981,7 @@ void Goalie::ActionMove(float deltaTime)
             fn_80097648(0.1f);
         }
     }
-    else if (m_tFireTimer.m_uPackedTime != 0 && !fn_800976C4(this))
+    else if (m_tFireTimer.m_uPackedTime != 0 && !fn_800976C4())
     {
         fn_8007EA90(this);
     }
@@ -2070,19 +2058,17 @@ void Goalie::ActionMove(float deltaTime)
     if (bWallBlocked)
     {
         cFielder* pCaptain = m_pTeam->GetOtherTeam()->GetCaptain();
-        UnidentifiedWallSegment* pWall = 0;
+        PhysicsBox_80177498* pWall = 0;
         if (pCaptain->m_eCharacterClass == MARIO)
         {
-            pWall = fn_801792D0(
-                pCaptain->mUnidentified400, muWallID);
+            pWall = pCaptain->mUnidentified400->fn_801792D0(muWallID);
         }
         else
         {
             pCaptain = m_pTeam->GetCaptain();
             if (pCaptain->m_eCharacterClass == MARIO)
             {
-                pWall = fn_801792D0(
-                    pCaptain->mUnidentified400, muWallID);
+                pWall = pCaptain->mUnidentified400->fn_801792D0(muWallID);
             }
         }
 
@@ -2387,7 +2373,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
         {
             fn_8007EB90(this);
         }
-        if (!fn_800976C4(this))
+        if (!fn_800976C4())
         {
             fn_8007EA90(this);
         }
@@ -4002,19 +3988,21 @@ void Goalie::ActionOffplay(float fDeltaT)
 
 void Goalie::ActionLooseBallPursueBouncing(float deltaTime)
 {
-    if (IsPassThreat() || mnOffplayPending != GOALIE_OFFPLAY_NONE
-        || !IsLooseBallClose(0.0f) || g_pBall->m_pOwner != 0)
+    do
     {
-        InitActionMove(true);
-        return;
-    }
+        if (!IsPassThreat() && mnOffplayPending == GOALIE_OFFPLAY_NONE
+            && IsLooseBallClose(0.0f) && g_pBall->m_pOwner == 0)
+        {
+            bool bWallBlock = mfWallBlock > 0.0f;
+            if (!bWallBlock)
+            {
+                break;
+            }
+        }
 
-    bool bWallBlock = mfWallBlock > 0.0f;
-    if (bWallBlock)
-    {
         InitActionMove(true);
         return;
-    }
+    } while (false);
 
     if (muBallDeflectCount != g_pBall->m_bBallPathChangeCount)
     {
@@ -4750,7 +4738,7 @@ void Goalie::InitActionLooseBallSetup()
         if (!IsLooseBallClose(0.0f))
         {
             cFielder* pOpponent
-                = fn_8009664C(this, v3BallPosition, true);
+                = GetClosestOpponentFielder(&v3BallPosition, true);
             if (pOpponent != 0)
             {
                 nlVector2 v2OpponentDistance;
@@ -4839,8 +4827,8 @@ void Goalie::InitActionLooseBallSetup()
                         }
                         else
                         {
-                            cFielder* pOpp = fn_8009664C(
-                                this, v3BallPosition, true);
+                            cFielder* pOpp = GetClosestOpponentFielder(
+                                &v3BallPosition, true);
                             if (pOpp != 0)
                             {
                                 nlVector2 v2OpponentDistance;
@@ -5777,7 +5765,7 @@ void Goalie::fn_8008E130()
 
         while (nNodeIndex >= 0)
         {
-            mUnidentified2F0->SetNodeWeight(
+            m_pPowerupLayer->SetNodeWeight(
                 nNodeIndex, 0.0f);
             nNodeIndex
                 = m_pPoseAccumulator->m_pHierarchy->GetParent(

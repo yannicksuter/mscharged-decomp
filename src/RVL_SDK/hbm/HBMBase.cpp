@@ -1029,6 +1029,9 @@ void HomeButton::init()
     mForceSttFadeInProcFlag = false;
     mForceStopSyncFlag = false;
 
+    iReConnectTime = 3600.0f / getInstance()->getHBMDataInfo()->frameDelta;
+    iReConnectTime2 = 3570.0f / getInstance()->getHBMDataInfo()->frameDelta;
+
     if (mSelectBtnNum != HBM_SELECT_BTN3)
     {
         mEndInitSoundFlag = false;
@@ -1045,13 +1048,21 @@ void HomeButton::init()
     mSequence = eSeq_Normal;
     mReassignedFlag = false;
 
+    mpPaneManager->init();
     updateTrigPane();
 
-    mpPaneManager->init();
+    nw4hbm::ut::Rect layoutRect = mpLayout->GetLayoutRect();
+    mDrawInfo.SetViewRect(layoutRect);
+    mpLayout->CalculateMtx(mDrawInfo);
+
+    for (i = 0; i < (int)ARRAY_COUNT(mpCursorLayout); i++)
+    {
+        mpCursorLayout[i]->CalculateMtx(mDrawInfo);
+    }
 
     reset_guiManager(-1);
 
-    for (i = 0; i < WPAD_MAX_CONTROLLERS; i++)
+    for (int i = 0; i < WPAD_MAX_CONTROLLERS; i++)
     {
         if (i < WPAD_MAX_CONTROLLERS)
         {
@@ -1069,7 +1080,6 @@ void HomeButton::init()
         }
     }
 
-    mDrawInfo.SetViewRect(mpLayout->GetLayoutRect());
     mpLayout->GetRootPane()->FindPaneByName(scFuncPaneName[0], true)->SetVisible(false);
 
     // 2-6: "B_optnBtn_XX" entries in scFuncTouchPaneName
@@ -1087,6 +1097,8 @@ void HomeButton::init()
 
     if (mpSoundArchivePlayer != NULL)
     {
+        nw4hbm::ut::detail::AutoLock<OSMutex> lock(sMutex);
+
         for (i = 0; i < mpSoundArchivePlayer->GetSoundPlayerCount(); i++)
         {
             mpSoundArchivePlayer->GetSoundPlayer(i).SetVolume(1.0f);
@@ -1094,7 +1106,7 @@ void HomeButton::init()
     }
 
     calc(NULL);
-    mFader.init(30);
+    mFader.init(30.0f / getInstance()->getHBMDataInfo()->frameDelta);
 }
 
 void HomeButton::init_msg()

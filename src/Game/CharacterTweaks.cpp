@@ -381,7 +381,7 @@ extern "C" float fn_8002C678(PlayerTweaks* tweaks)
     float terrain = fn_800A9274(g_pGame->mUnidentified10D8);
     float scale = 0.25f * terrain + 0.75f;
     return Interpolate(
-        scale * (float)lbl_8056CF08.m_unk14->mUnidentified184,
+        scale * lbl_8056CF08.m_unk14->mUnidentified184.UnidentifiedGetValue(),
         scale * (float)lbl_8056CF08.m_unk14->mUnidentified194,
         tweaks->fPassing);
 }

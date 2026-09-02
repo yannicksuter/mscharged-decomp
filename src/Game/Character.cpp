@@ -116,7 +116,7 @@ void cCharacter::ResetEffects()
     m_pEffectsTexturing = 0;
 }
 
-void cCharacter::PrePhysicsUpdate(float dt)
+void cCharacter::PrePhysicsUpdate()
 {
 }
 

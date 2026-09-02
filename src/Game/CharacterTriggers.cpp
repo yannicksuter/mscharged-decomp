@@ -5,6 +5,7 @@
 #include "Game/Ball.h"
 #include "Game/Character.h"
 #include "Game/CharacterEffects.h"
+#include "Game/CharacterTemplate.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Game.h"
@@ -21,7 +22,6 @@ extern "C" EmissionController* fn_802E7FE4(EmissionManager* manager,
 
 void UpdateEmitterPoseFromCharacter(EmissionController& emitter);
 void UpdateEmitterFromCharacter(EmissionController& emitter);
-extern "C" void* fn_80025E9C();
 extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 extern "C" void fn_800EC12C(unsigned long soundID, void* pParam);
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);

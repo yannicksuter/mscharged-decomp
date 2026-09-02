@@ -478,44 +478,44 @@ void GameInfoManager::SetupGameFromConfig()
     }
 }
 
-static const int kDifficultyByPlayer[6][2] = {
-    { 7, 0 },
-    { 7, 1 },
-    { 7, 2 },
-    { 7, 3 },
-    { 7, 4 },
-    { 7, 5 },
-};
-
 void GameInfoManager::ApplyDifficultySettings()
 {
+    static const int DifficultyMap[6][2] = {
+        { 7, 0 },
+        { 7, 1 },
+        { 7, 2 },
+        { 7, 3 },
+        { 7, 4 },
+        { 7, 5 },
+    };
+
     if (fn_80338BF0(lbl_806E20D8) > 1) {
         mCurrentDifficulty[0] = 7;
         mCurrentDifficulty[1] = 7;
         return;
     }
 
-    bool sideUsed[2] = { false, false };
-    int value;
+    unsigned char humansOnSide[2] = { 0, 0 };
 
-    for (int pad = 0; pad < 4; pad++) {
-        short side = GetPlayingSide(pad);
+    for (int i = 0; i < 4; i++) {
+        short side = GetPlayingSide(i);
 
         if (side == 0) {
-            sideUsed[0] = true;
+            humansOnSide[0] = 1;
         } else if (side == 1) {
-            sideUsed[1] = true;
+            humansOnSide[1] = 1;
         }
     }
 
+    int skillLevel;
     if (unknown_0x122) {
-        value = 0;
+        skillLevel = 0;
     } else {
-        value = GetCurrentSettings()->unknown_0x00;
+        skillLevel = GetCurrentSettings()->unknown_0x00;
     }
 
-    mCurrentDifficulty[0] = kDifficultyByPlayer[value][!sideUsed[0]];
-    mCurrentDifficulty[1] = kDifficultyByPlayer[value][!sideUsed[1]];
+    mCurrentDifficulty[0] = DifficultyMap[skillLevel][humansOnSide[0] ? 0 : 1];
+    mCurrentDifficulty[1] = DifficultyMap[skillLevel][humansOnSide[1] ? 0 : 1];
 }
 
 bool GameInfoManager::IsRule0x8Equal4() const

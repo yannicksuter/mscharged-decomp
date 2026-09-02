@@ -272,6 +272,7 @@ static DWCMatchControlView* DWCi_GetMatchCnt(void);
 static void DWCi_FinishCancelMatching(void);
 static void DWCi_CloseAllConnectionsByTimeout(void);
 static void DWCi_ClearGameMatchKeys(void);
+static int DWCi_ChangeToClient(void);
 
 char* lbl_806E2EE8;
 DWCMatchOptMinCompleteView* lbl_806E2EEC;
@@ -5259,26 +5260,8 @@ int fn_804990FC(int result)
     }
     if (type != 0)
     {
-        if (lbl_806E2EF8 != NULL && type != 0)
-        {
-            BOOL isServer;
-            BOOL self;
-
-            lbl_806E2EF8->closeState = 2;
-            gt2CloseAllConnectionsHard(*lbl_806E2EF8->pGT2Socket);
-            lbl_806E2EF8->closeState = 0;
-            DWCi_SetError(type, code + DWC_ECODE_SEQ_MATCHING + DWC_ECODE_GS_NN);
-            fn_8048AFCC(1, "", NULL);
-            {
-                DWCMatchControlView* control = lbl_806E2EF8;
-
-                isServer = control->matchType == 2;
-                self = control->_21C == 0;
-                control->matchedCallback(type, FALSE, self, isServer,
-                    fn_8048AEC4(control->_21C), control->matchedParam);
-            }
-            DWCi_CloseMatching();
-        }
+        fn_80491EDC(type,
+            code + DWC_ECODE_SEQ_MATCHING + DWC_ECODE_GS_NN);
     }
     return result;
 }
@@ -5324,34 +5307,75 @@ int fn_8049925C(int error)
     }
     if (type != 0)
     {
-        if (lbl_806E2EF8 != NULL && type != 0)
-        {
-            BOOL isServer;
-            BOOL self;
-
-            lbl_806E2EF8->closeState = 2;
-            gt2CloseAllConnectionsHard(*lbl_806E2EF8->pGT2Socket);
-            lbl_806E2EF8->closeState = 0;
-            DWCi_SetError(type, code + DWC_ECODE_SEQ_MATCHING + DWC_ECODE_GS_GT2);
-            fn_8048AFCC(1, "", NULL);
-            {
-                DWCMatchControlView* control = lbl_806E2EF8;
-
-                isServer = control->matchType == 2;
-                self = control->_21C == 0;
-                control->matchedCallback(type, FALSE, self, isServer,
-                    fn_8048AEC4(control->_21C), control->matchedParam);
-            }
-            DWCi_CloseMatching();
-        }
+        fn_80491EDC(type,
+            code + DWC_ECODE_SEQ_MATCHING + DWC_ECODE_GS_GT2);
     }
     return error;
+}
+
+static int DWCi_ChangeToClient(void)
+{
+    int result;
+    int i;
+
+    for (i = 1; i <= lbl_806E2EF8->_0D; i++)
+    {
+        result = fn_8049382C(10, lbl_806E2EF8->pidList[i],
+            lbl_806E2EF8->_24[i], lbl_806E2EF8->_A4[i],
+            (const u32*)lbl_806E2EF8->_358,
+            *(const int*)lbl_806E2EF8->_358 + 1);
+        if (result != 0)
+        {
+            return result;
+        }
+    }
+
+    lbl_806E2EF8->_17 = 0;
+    lbl_806E2EF8->_20 = 0;
+    lbl_806E2EF8->closeState = 1;
+    gt2CloseAllConnectionsHard(*lbl_806E2EF8->pGT2Socket);
+    lbl_806E2EF8->closeState = 0;
+    DWC_Printf(0x40, "Closed all connections. Begin NN to %u\n",
+        lbl_806E2EF8->_214);
+
+    return 0;
+}
+
+static int DWCi_CheckDWCServer(SBServer server)
+{
+    if (SBServerGetIntValueA(server, "numplayers", -1) == -1)
+    {
+        return 0;
+    }
+    if (SBServerGetIntValueA(server, "maxplayers", -1) == -1)
+    {
+        return 0;
+    }
+    if (SBServerGetIntValueA(server, "dwc_mtype", -1) == -1)
+    {
+        return 0;
+    }
+    if (SBServerGetIntValueA(server, "dwc_mresv", -1) == -1)
+    {
+        if (SBServerGetIntValueA(server, "dwc_mresv", 0) == 0)
+        {
+            return 0;
+        }
+    }
+    if (SBServerGetIntValueA(server, "dwc_mver", -1) == -1)
+    {
+        return 0;
+    }
+    return SBServerGetIntValueA(server, "dwc_pid", 0);
 }
 
 void fn_804993C8(ServerBrowser sb, SBCallbackReason reason, SBServer server,
     void* instance)
 {
+    int profileID;
+    int result;
     int i;
+    NegotiateError nnError;
 
     DWC_Printf(0x40, "SBCallback : reason %d (state = %d)\n", reason,
         lbl_806E2EF8->state);
@@ -5359,27 +5383,18 @@ void fn_804993C8(ServerBrowser sb, SBCallbackReason reason, SBServer server,
 
     switch (reason)
     {
+    case sbc_serveradded:
+        fn_80499A30(server);
+        lbl_806E2EF8->_178 = OSGetTime()
+            + (u64)(OS_BUS_CLOCK_SPEED / 4 / 1000) * 30000;
+        break;
+
     case sbc_updatecomplete:
         lbl_806E2EF8->_178 = 0;
         for (i = 0; i < ServerBrowserCount(sb); i++)
         {
-            int value;
-
             server = ServerBrowserGetServer(sb, i);
-            value = (SBServerGetIntValueA(server, "numplayers", -1) == -1
-                        || SBServerGetIntValueA(server, "maxplayers", -1)
-                            == -1
-                        || SBServerGetIntValueA(server, "dwc_mtype", -1)
-                            == -1
-                        || (SBServerGetIntValueA(server, "dwc_mresv", -1)
-                                == -1
-                            && SBServerGetIntValueA(server, "dwc_mresv", 0)
-                                == 0)
-                        || SBServerGetIntValueA(server, "dwc_mver", -1)
-                            == -1)
-                ? 0
-                : SBServerGetIntValueA(server, "dwc_pid", 0);
-            if (value == 0)
+            if (!DWCi_CheckDWCServer(server))
             {
                 ServerBrowserRemoveServer(sb, server);
                 DWC_Printf(0x400, "Deleted server [%d].\n", i);
@@ -5393,12 +5408,12 @@ void fn_804993C8(ServerBrowser sb, SBCallbackReason reason, SBServer server,
             for (i = 0; i < ServerBrowserCount(sb); i++)
             {
                 server = ServerBrowserGetServer(sb, i);
-                if (lbl_806E2EF8->_1C != 0
-                    && lbl_806E2EF8->_1C
-                        == SBServerGetPublicInetAddress(server)
-                    && lbl_806E2EF8->_1A != 0
-                    && lbl_806E2EF8->_1A
-                        == SBServerGetPublicQueryPort(server))
+                if (DWCi_GetMatchCnt()->_1C
+                    && (DWCi_GetMatchCnt()->_1C
+                        == SBServerGetPublicInetAddress(server))
+                    && DWCi_GetMatchCnt()->_1A
+                    && (DWCi_GetMatchCnt()->_1A
+                        == SBServerGetPublicQueryPort(server)))
                 {
                     break;
                 }
@@ -5421,7 +5436,7 @@ void fn_804993C8(ServerBrowser sb, SBCallbackReason reason, SBServer server,
             fn_80499E90();
             if (ServerBrowserCount(sb) != 0)
             {
-                int result = fn_80495B90(0, 0);
+                result = fn_80495B90(0, 0);
 
                 if (lbl_806E2EF8->matchType == 0)
                 {
@@ -5447,65 +5462,55 @@ void fn_804993C8(ServerBrowser sb, SBCallbackReason reason, SBServer server,
 
         case 5:
         {
-            u32 pid;
-            GPResult result;
-
             DWC_Printf(4, "searchIP: %x, searchPort: %d\n",
                 lbl_806E2EF8->_1BC, lbl_806E2EF8->_1B8);
             while (ServerBrowserCount(sb) != 0)
             {
                 server = ServerBrowserGetServer(sb, 0);
-                if (SBServerGetPublicInetAddress(server)
-                        == lbl_806E2EF8->_1BC
-                    && SBServerGetPublicQueryPort(server)
-                        == lbl_806E2EF8->_1B8)
+                if ((SBServerGetPublicInetAddress(server)
+                        == DWCi_GetMatchCnt()->_1BC)
+                    && (SBServerGetPublicQueryPort(server)
+                        == DWCi_GetMatchCnt()->_1B8))
                 {
                     break;
                 }
-                ServerBrowserRemoveServer(sb, server);
-            }
-            if (ServerBrowserCount(sb) == 0)
-            {
-                lbl_806E2EF8->_E8 = 2;
-                lbl_806E2EF8->_F0 = OSGetTime();
-                break;
-            }
-
-            pid = SBServerGetIntValueA(ServerBrowserGetServer(sb, 0),
-                "dwc_pid", 0);
-            if (lbl_806E2EF8->matchType == 1
-                && pid == lbl_806E2EF8->pidList[0])
-            {
-                if (fn_80499CA8(0) != 0)
+                else
                 {
-                    if (lbl_806E2EF8->_0D != 0)
+                    ServerBrowserRemoveServer(sb, server);
+                }
+            }
+            if (ServerBrowserCount(sb) != 0)
+            {
+                profileID = SBServerGetIntValueA(
+                    ServerBrowserGetServer(sb, 0), "dwc_pid", 0);
+                if (lbl_806E2EF8->matchType == 1
+                    && profileID == lbl_806E2EF8->pidList[0])
+                {
+                    if (fn_80499CA8(0) != 0)
                     {
-                        result = GP_NO_ERROR;
-                        for (i = 1; i <= lbl_806E2EF8->_0D; i++)
+                        if (lbl_806E2EF8->_0D != 0)
                         {
-                            result = fn_8049382C(10,
-                                lbl_806E2EF8->pidList[i],
-                                lbl_806E2EF8->_24[i], lbl_806E2EF8->_A4[i],
-                                (const u32*)lbl_806E2EF8->_358,
-                                *(const int*)lbl_806E2EF8->_358 + 1);
+                            result = DWCi_ChangeToClient();
+                            if (lbl_806E2EF8->matchType == 0)
+                            {
+                                result = fn_80498C78(result);
+                            }
+                            else
+                            {
+                                result = fn_80498B24(result);
+                            }
                             if (result != 0)
                             {
                                 break;
                             }
                         }
-                        if (result == 0)
-                        {
-                            lbl_806E2EF8->_17 = 0;
-                            lbl_806E2EF8->_20 = 0;
-                            lbl_806E2EF8->closeState = 1;
-                            gt2CloseAllConnectionsHard(
-                                *lbl_806E2EF8->pGT2Socket);
-                            lbl_806E2EF8->closeState = 0;
-                            DWC_Printf(0x40,
-                                "Closed all connections. Begin NN to %u\n",
-                                lbl_806E2EF8->_214);
-                            result = GP_NO_ERROR;
-                        }
+                    }
+                    else
+                    {
+                        result = fn_8049382C(5, lbl_806E2EF8->pidList[0],
+                            lbl_806E2EF8->_24[0], lbl_806E2EF8->_A4[0],
+                            NULL, 0);
+                        lbl_806E2EF8->_214 = 0;
                         if (lbl_806E2EF8->matchType == 0)
                         {
                             result = fn_80498C78(result);
@@ -5518,56 +5523,40 @@ void fn_804993C8(ServerBrowser sb, SBCallbackReason reason, SBServer server,
                         {
                             break;
                         }
-                    }
-                }
-                else
-                {
-                    result = fn_8049382C(5, lbl_806E2EF8->pidList[0],
-                        lbl_806E2EF8->_24[0], lbl_806E2EF8->_A4[0], NULL,
-                        0);
-                    lbl_806E2EF8->_214 = 0;
-                    if (lbl_806E2EF8->matchType == 0)
-                    {
-                        result = fn_80498C78(result);
-                    }
-                    else
-                    {
-                        result = fn_80498B24(result);
-                    }
-                    if (result != 0)
-                    {
+                        lbl_806E2EF8->state = 4;
+                        result
+                            = fn_80495D7C(0, 0, lbl_806E2EF8->pidList[0]);
+                        if (lbl_806E2EF8->matchType == 0)
+                        {
+                            fn_80498C78(result);
+                        }
+                        else
+                        {
+                            fn_80498B24(result);
+                        }
                         break;
                     }
-                    lbl_806E2EF8->state = 4;
-                    result = fn_80495D7C(0, 0, lbl_806E2EF8->pidList[0]);
-                    if (lbl_806E2EF8->matchType == 0)
-                    {
-                        fn_80498C78(result);
-                    }
-                    else
-                    {
-                        fn_80498B24(result);
-                    }
-                    break;
                 }
+                lbl_806E2EF8->state = 6;
+                nnError = fn_80493434(0, 0, ServerBrowserGetServer(sb, 0));
+                fn_80498FB8(nnError);
             }
-            lbl_806E2EF8->state = 6;
-            fn_80498FB8(
-                fn_80493434(0, 0, ServerBrowserGetServer(sb, 0)));
+            else
+            {
+                lbl_806E2EF8->_E8 = 2;
+                lbl_806E2EF8->_F0 = OSGetTime();
+            }
             break;
         }
 
         default:
             lbl_806E2EF8->_178 = OSGetTime()
-                + (s64)(OS_BUS_CLOCK_SPEED / 4 / 1000) * 30000;
+                + (u64)(OS_BUS_CLOCK_SPEED / 4 / 1000) * 30000;
             break;
         }
         break;
 
-    case sbc_serveradded:
-        fn_80499A30(server);
-        lbl_806E2EF8->_178 = OSGetTime()
-            + (s64)(OS_BUS_CLOCK_SPEED / 4 / 1000) * 30000;
+    case sbc_queryerror:
         break;
 
     default:

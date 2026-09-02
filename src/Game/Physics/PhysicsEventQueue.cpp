@@ -227,12 +227,14 @@ extern "C" UnidentifiedMemberFunction lbl_8050F58C;
 extern "C" unsigned char lbl_804DCC60[];
 extern "C" void* g_pBall;
 
+class PhysicsSphere_80175F8C;
+
 extern "C" void fn_800156F8(void*, void*);
 extern "C" void fn_80015B38(void*, int);
 extern "C" void fn_8002E5F4(void*, int);
 extern "C" void fn_8004AC68(void*, nlVector3*, void*);
 extern "C" void fn_8019A434(void*, int);
-extern "C" void fn_80176A60(nlVector3*);
+extern "C" PhysicsSphere_80175F8C* fn_80176A60(const nlVector3*);
 
 extern "C" void fn_801452F4(void* object)
 {

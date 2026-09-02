@@ -181,7 +181,7 @@ void NetMessageTournamentGameUpdate::Serialize(
     serializer->Transfer(&mHasGameInfo, sizeof(mHasGameInfo));
     if (mHasGameInfo != 0)
     {
-        serializer->Transfer(mGameInfo, sizeof(mGameInfo));
+        serializer->Transfer(&mGameInfo, sizeof(mGameInfo));
     }
 }
 
@@ -436,12 +436,27 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
     mTournamentToMachine[0] = (s8)message->mUnidentified1C[1];
     mTournamentToMachine[1] = (s8)message->mUnidentified1C[2];
 
-    NetMessageTournamentLoadingState loading;
-    loading.mMachineIndex = mLocalMachineIndex;
-    loading.mFinishedLoadingToKnockout = false;
+    u8 gameBuffer[0xFF];
     u8 buffer[0xFF];
+    NetMessageTournamentLoadingState loading(mLocalMachineIndex, false);
+    fn_8004F594(16, "NotifyLoadingToGame called on machine %d\n",
+        mLocalMachineIndex);
     int size = fn_8032C830(lbl_806E2100, &loading, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
+
+    bool isHomeMachine = false;
+    if (mLocalMachineIndex == mTournamentToMachine[0])
+    {
+        isHomeMachine = true;
+    }
+    if (isHomeMachine)
+    {
+        NetMessageTournamentGameUpdate gameUpdate(
+            1, mCurrentGameIndex, isHomeMachine, 1, 0, false);
+        int gameSize = fn_8032C830(
+            lbl_806E2100, &gameUpdate, gameBuffer, sizeof(gameBuffer));
+        SendToAllTournamentMachines(gameBuffer, gameSize);
+    }
 }
 
 int NetTournManager::MachineIdxToTournamentIdx(int machine) const
@@ -451,13 +466,12 @@ int NetTournManager::MachineIdxToTournamentIdx(int machine) const
 
 int NetTournManager::TournamentIdxToMachineIdx(int machine) const
 {
-    if (machine == mTournamentToMachine[0])
+    for (int i = 0; i < 2; ++i)
     {
-        return 0;
-    }
-    if (machine == mTournamentToMachine[1])
-    {
-        return 1;
+        if (machine == mTournamentToMachine[i])
+        {
+            return i;
+        }
     }
     return -1;
 }
@@ -475,17 +489,32 @@ bool NetTournManager::SendTournamentGameStart(NetworkTournamentGame* game)
 
 void NetTournManager::SendToAllTournamentMachines(void* data, int size)
 {
-    if (lbl_806E20D8 == 0)
+    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    if (roster == 0)
     {
         fn_8004F594(16,
-            "No lobby found, cannot send message size %d to all machines in tournament\n",
+            "No lobby found, cannot send message of size %d to all machines in tournament\n",
             size);
         return;
     }
 
     for (int machine = 0; machine < mMachineCount; ++machine)
     {
-        lbl_806E20D8->Send((s8)machine, data, size, true);
+        u32 aid = roster->GetMachineAid(machine);
+        if (aid == 0xFFFFFFFF)
+        {
+            lbl_806E20D8->GetDirectSocket()->Receive(data, size);
+        }
+        else if (aid == 0)
+        {
+            fn_8004F594(16,
+                "Warning: Cannot send message to tournament midx %d of size %d - no connection\n",
+                machine, size);
+        }
+        else
+        {
+            lbl_806E20D8->GetDirectSocket()->Send(aid, data, size, true);
+        }
     }
 }
 
@@ -567,6 +596,12 @@ bool NetworkTournamentGame::IsFinished() const
     case NET_TOURN_GAME_STATE_4:
     case NET_TOURN_GAME_OVER:
         return true;
+    case NET_TOURN_GAME_NO_CONTEST:
+    case NET_TOURN_GAME_NO_PLAYERS:
+    case NET_TOURN_GAME_HOME_ADVANCES:
+    case NET_TOURN_GAME_AWAY_ADVANCES:
+    case NET_TOURN_GAME_STATE_10:
+    case NET_TOURN_GAME_STATE_11:
     default:
         return false;
     }
@@ -735,25 +770,24 @@ void NetTournManager::NotifyGameStarted()
 
 void NetTournManager::NotifyFinishedLoadingToKnockout()
 {
-    NetMessageTournamentLoadingState message;
-    message.mMachineIndex = mLocalMachineIndex;
-    message.mFinishedLoadingToKnockout = true;
     u8 buffer[0xFF];
+    NetMessageTournamentLoadingState message(mLocalMachineIndex, true);
+    fn_8004F594(16,
+        "NotifyFinishedLoadingToKnockout called on machine %d\n",
+        mLocalMachineIndex);
     int size = fn_8032C830(lbl_806E2100, &message, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
 }
 
 void NetTournManager::NotifyOverlayPopped(int)
 {
-    NetMessageTournamentGameUpdate message;
-    message.mUpdateType = 2;
-    message.mGameIndex = mCurrentGameIndex;
-    message.mIsHomeMachine
-        = mLocalMachineIndex == mTournamentToMachine[0];
-    message.mGameStatus = 0;
-    message.mGameTimeDelta = 0;
-    message.mHasGameInfo = false;
-    message.mUnidentified0F = 0;
+    bool isHomeMachine = false;
+    if (mLocalMachineIndex == mTournamentToMachine[0])
+    {
+        isHomeMachine = true;
+    }
+    NetMessageTournamentGameUpdate message(2, mCurrentGameIndex,
+        isHomeMachine, 0, 0, false);
     u8 buffer[0xFF];
     int size = fn_8032C830(lbl_806E2100, &message, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
@@ -761,17 +795,14 @@ void NetTournManager::NotifyOverlayPopped(int)
 
 void NetTournManager::NotifyGameOver()
 {
-    NetMessageTournamentGameUpdate message;
-    message.mUpdateType = 0;
-    message.mGameIndex = mCurrentGameIndex;
-    message.mIsHomeMachine
-        = mLocalMachineIndex == mTournamentToMachine[0];
-    message.mGameStatus = 1;
-    message.mGameTimeDelta = 0;
-    message.mHasGameInfo = true;
-    message.mUnidentified0F = 0;
-    memcpy(message.mGameInfo, GameInfoManager::Instance()->GetCurrentGameInfo(),
-        sizeof(message.mGameInfo));
+    bool isHomeMachine = false;
+    if (mLocalMachineIndex == mTournamentToMachine[0])
+    {
+        isHomeMachine = true;
+    }
+    NetMessageTournamentGameUpdate message(0, mCurrentGameIndex,
+        isHomeMachine, 1, 0, true);
+    message.mGameInfo = *GameInfoManager::Instance()->GetCurrentGameInfo();
     u8 buffer[0xFF];
     int size = fn_8032C830(lbl_806E2100, &message, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
@@ -785,7 +816,17 @@ void NetTournManager::ResetGameProgressUpdateTimer(int)
 
 int NetTournManager::ReceiverVirtual00(UnidentifiedNetworkMessage* message)
 {
-    switch (message->GetType())
+    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    s8 machine = roster->MachineIdxFromConnection(message->mUnidentified04);
+    if (machine < 0 || machine >= roster->GetMachineCount())
+    {
+        fn_8004F594(16,
+            "Discarded message type %d because from unknown connection %x\n",
+            (u8)message->GetType(), message->mUnidentified04);
+        return 1;
+    }
+
+    switch ((u8)message->GetType())
     {
     case 32:
         HandleTournamentGameUpdate(
@@ -795,17 +836,29 @@ int NetTournManager::ReceiverVirtual00(UnidentifiedNetworkMessage* message)
     {
         NetMessageTournamentLoadingState* loading
             = static_cast<NetMessageTournamentLoadingState*>(message);
-        int machine = (s8)loading->mMachineIndex;
-        if (machine >= 0 && machine < mMachineCount)
+        const char* destination = "Game";
+        if (loading->mFinishedLoadingToKnockout)
+        {
+            destination = "Knockout";
+        }
+        fn_8004F594(16, "Received Tournament Loaded to %s from %d\n",
+            destination, (s8)loading->mMachineIndex);
+        u8 machine = loading->mMachineIndex;
+        if ((s8)machine >= 0 && (s8)machine < mMachineCount)
         {
             if (loading->mFinishedLoadingToKnockout)
             {
-                mLoadedToKnockout[machine] = true;
+                mLoadedToKnockout[(s8)machine] = true;
             }
             else
             {
-                mLoadedToGame[machine] = true;
+                mLoadedToGame[(s8)machine] = true;
             }
+        }
+        else
+        {
+            fn_8004F594(16, "Loaded from machine %d out of range [0,%d)\n",
+                (s8)machine, mMachineCount);
         }
         break;
     }
@@ -853,7 +906,8 @@ void NetTournManager::HandleTournamentGameUpdate(
     }
     if (message->mHasGameInfo)
     {
-        memcpy(&game.mGameInfo, message->mGameInfo, sizeof(game.mGameInfo));
+        memcpy(
+            &game.mGameInfo, &message->mGameInfo, sizeof(game.mGameInfo));
     }
 }
 

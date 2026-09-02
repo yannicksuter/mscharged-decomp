@@ -13,7 +13,7 @@ class unk_8000CD44;
 struct UnidentifiedPhysicsPatchInfo_80510BF0
 {
     /* 0x00 */ int mUnidentified00;
-    /* 0x04 */ int mUnidentified04;
+    /* 0x04 */ const char* mUnidentified04;
     /* 0x08 */ const char* mUnidentified08;
     /* 0x0C */ unsigned int mUnidentified0C;
     /* 0x10 */ unsigned long mUnidentified10;

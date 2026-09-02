@@ -283,7 +283,10 @@ BOOL NHTTPi_GetPostContentlength(void* mutexInfo, NHTTPRequestInfo* request,
 s32 NHTTPi_SendPostData(void* mutexInfo, NHTTPRequestInfo* request,
     char* buffer, void* value, s32 socket, s32* bufferedBytes, s32 format)
 {
+    char* data;
     u32 total = 0;
+    u32 size;
+    u32 i;
     NHTTPConnectionInfo* connection =
         NHTTPi_Request2Connection(mutexInfo, request);
     if (connection == NULL)
@@ -303,8 +306,8 @@ s32 NHTTPi_SendPostData(void* mutexInfo, NHTTPRequestInfo* request,
             return 3;
         }
         {
-            u32 size = connection->_unk44;
-            char* data = (char*)connection->_unk40;
+            size = connection->_unk44;
+            data = (char*)connection->_unk40;
             if (size == 0)
             {
                 break;
@@ -333,16 +336,14 @@ s32 NHTTPi_SendPostData(void* mutexInfo, NHTTPRequestInfo* request,
             }
             case 2:
             {
-                char* p = data;
-                u32 i;
-                for (i = 0; i < size; i++, p++)
+                for (i = 0; i < size; i++)
                 {
                     char encoded[3];
                     s32 result;
                     NHTTPi_memclr(encoded, 3);
                     result = NHTTPi_SaveBuf(request, buffer, socket,
                         bufferedBytes, encoded,
-                        NHTTPi_encodeUrlChar(encoded, *p));
+                        NHTTPi_encodeUrlChar(encoded, data[i]));
                     if (result < 0)
                     {
                         return 1;

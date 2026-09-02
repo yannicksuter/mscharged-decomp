@@ -3,6 +3,7 @@
 
 #include <string.h>
 
+#include "Game/DB/BasicGameInfo.h"
 #include "types.h"
 
 class UnidentifiedMessageSerializer
@@ -333,6 +334,20 @@ public:
 class NetMessageTournamentGameUpdate : public UnidentifiedNetworkMessage
 {
 public:
+    NetMessageTournamentGameUpdate() { }
+    NetMessageTournamentGameUpdate(u8 updateType, u8 gameIndex,
+        bool isHomeMachine, u8 gameStatus, u16 gameTimeDelta,
+        bool hasGameInfo)
+        : mUpdateType(updateType)
+        , mGameIndex(gameIndex)
+        , mIsHomeMachine(isHomeMachine)
+        , mGameStatus(gameStatus)
+        , mGameTimeDelta(gameTimeDelta)
+        , mHasGameInfo(hasGameInfo)
+        , mUnidentified0F(0)
+    {
+    }
+
     virtual void Serialize(UnidentifiedMessageSerializer* serializer);
     virtual ~NetMessageTournamentGameUpdate();
     virtual int GetType();
@@ -344,7 +359,7 @@ public:
     /* 0x00C */ u16 mGameTimeDelta;
     /* 0x00E */ u8 mHasGameInfo;
     /* 0x00F */ u8 mUnidentified0F;
-    /* 0x010 */ u8 mGameInfo[0x128];
+    /* 0x010 */ BasicGameInfo mGameInfo;
 }; // size: 0x138
 
 // Per-machine loading notification used while moving between a tournament
@@ -352,6 +367,14 @@ public:
 class NetMessageTournamentLoadingState : public UnidentifiedNetworkMessage
 {
 public:
+    NetMessageTournamentLoadingState() { }
+    NetMessageTournamentLoadingState(
+        int machineIndex, bool finishedLoadingToKnockout)
+        : mMachineIndex(machineIndex)
+        , mFinishedLoadingToKnockout(finishedLoadingToKnockout)
+    {
+    }
+
     virtual void Serialize(UnidentifiedMessageSerializer* serializer);
     virtual ~NetMessageTournamentLoadingState();
     virtual int GetType();

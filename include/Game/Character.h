@@ -72,10 +72,10 @@ class cCharacter
 public:
     virtual ~cCharacter();
     virtual void PostPhysicsUpdate();
-    virtual void PrePhysicsUpdate(float dt);
+    virtual void PrePhysicsUpdate();
     virtual void Unknown7();
     virtual void PreUpdate(float dt);
-    virtual void Unknown5();
+    virtual void UnidentifiedVirtual1C();
     virtual void ResetEffects();
     virtual void SetAnimID(int animID);
     virtual void Unknown8(unsigned short aDirection, bool bParam);

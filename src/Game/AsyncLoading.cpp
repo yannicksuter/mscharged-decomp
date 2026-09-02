@@ -8,6 +8,7 @@
 #include "Game/DB/StatsTracker.h"
 #include "Game/Debug/FrameCounter.h"
 #include "Game/Debug/TimeRegions.h"
+#include "Game/Drawable/DrawableModel.h"
 #include "Game/FE/feManager.h"
 #include "Game/FE/feSceneManager.h"
 #include "Game/FixedUpdateTask.h"
@@ -149,7 +150,6 @@ extern "C" void fn_801ACFC4();
 extern "C" void fn_801A5328();
 extern "C" void fn_80183E4C();
 extern "C" void fn_802DB9C4(void*);
-extern "C" void fn_8017A450();
 extern "C" bool fn_801C4D40();
 extern "C" void fn_801C4CBC();
 extern "C" void fn_8033C4E4(ScreenTransitionManager*);
@@ -778,7 +778,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     fn_801A5328();
     fn_80183E4C();
     fn_802DB9C4(lbl_805721E8);
-    fn_8017A450();
+    CleanBoundingBoxCache();
     StatsTracker::Instance()->DestroyEventHandler();
     FEResourceManager::Instance()->UnloadPermanentResourceBundle();
     fn_801C4D40();

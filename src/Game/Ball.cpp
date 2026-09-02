@@ -81,6 +81,19 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
     UnidentifiedEventRegistry;
 
+class UnidentifiedTypedEvent0 : public UnidentifiedEventBase
+{
+public:
+    UnidentifiedTypedEvent0(const char* name, int length)
+        : UnidentifiedEventBase(name, length)
+    {
+    }
+
+    virtual ~UnidentifiedTypedEvent0() { }
+    virtual void Disconnect() = 0;
+    virtual void Add(Function<FnVoidVoid>&, unsigned int, int) = 0;
+};
+
 template <typename P1, typename P2>
 class UnidentifiedTypedEvent2 : public UnidentifiedEventBase
 {
@@ -95,11 +108,59 @@ public:
     virtual void Add(Function2<void, P1, P2>&, unsigned int, int) = 0;
 };
 
+template <typename P1, typename P2>
+struct UnidentifiedListener2 : public UnidentifiedConnection
+{
+    Function2<void, P1, P2> callback;
+};
+
+template <typename P1, typename P2>
+class UnidentifiedEvent2View : public UnidentifiedEventBase
+{
+    typedef UnidentifiedListener2<P1, P2> Listener;
+    typedef DLListEntry<Listener> ListenerEntry;
+
+public:
+    void UnidentifiedDeliver(P1 p1, P2 p2)
+    {
+        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        while (iterator.hasNext())
+        {
+            Listener* listener = &*iterator;
+            ListenerEntry* currentEntry = iterator.CurrentEntry();
+            this->mCurrentConnection = listener;
+
+            if ((listener->mFlags >> 31) != 0)
+            {
+                listener->callback(p1, p2);
+                iterator = mListeners.Begin();
+                iterator.m_Curr = currentEntry;
+            }
+
+            iterator.next();
+            if (((listener->mFlags >> 29) & 1) != 0)
+            {
+                ListenerEntry* entry = mListeners.Begin(
+                    (ListenerEntry*)((char*)listener - 8)).CurrentEntry();
+                nlDLRingRemove(&mListeners.m_Head, entry);
+                if (entry != NULL)
+                {
+                    entry->entry.~Listener();
+                }
+                mListeners.m_Allocator.DeleteEntry(entry);
+            }
+        }
+        this->mCurrentConnection = 0;
+    }
+
+private:
+    DLListContainerBase<Listener, BasicSlotPool<ListenerEntry> > mListeners;
+};
+
 extern "C" DebugFieldType lbl_80533C98[];
 extern "C" LiveBallTrail lbl_8056B518[];
 extern "C" unsigned int lbl_806E0C10;
 extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
-extern "C" void fn_80015C38(cBall*, int);
 extern "C" void fn_8001847C(cBall*, bool);
 extern "C" float fn_8002BE64(PlayerTweaks*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
@@ -117,10 +178,10 @@ extern "C" float fn_800DEFD4(cFielder*);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 extern "C" void fn_80017448(cBall*, float);
 extern "C" void fn_80017F18(cBall*);
-extern "C" void fn_8001929C(void*);
+extern "C" void fn_8001929C();
 extern "C" void fn_800193A0(void*);
 extern "C" void fn_800194A4(void*);
-extern "C" void fn_800195D8(void*);
+extern "C" void fn_800195D8();
 extern "C" void fn_800196FC(void*);
 extern "C" void fn_80019718(void*);
 extern "C" void fn_80019814(void*);
@@ -130,7 +191,8 @@ extern "C" void fn_8001A00C(void*);
 extern "C" void fn_8001A108(int, int);
 extern "C" void fn_8001AA0C(LiveBallTrail*, bool);
 extern "C" void fn_8019A434(State_80199E84*, bool);
-extern "C" void fn_80096CDC(cPlayer*, cBall*);
+extern "C" void fn_801BDDE4();
+extern "C" void fn_801BDF08(int);
 extern "C" void fn_80097358(cPlayer*, float);
 extern "C" void fn_801B79A4(const char*, int);
 extern "C" void fn_801B7A28(cBall*);
@@ -375,7 +437,7 @@ cBall::~cBall()
 void cBall::ClearOwner()
 {
     m_pPrevOwner = m_pOwner;
-    fn_80096CDC(m_pOwner, NULL);
+    m_pOwner->fn_80096CDC(NULL);
     m_pOwner = NULL;
     m_pPhysicsBall->EnableCollisions();
     m_v3PrevPosition = m_v3Position;
@@ -1529,6 +1591,247 @@ extern "C" void fn_80015B38(cBall* pBall, bool bParam)
     fn_80015B38Impl(pBall, bParam);
 }
 
+static inline void ClearBallStateTargets(cBall* pBall)
+{
+    pBall->m_tLightningTimer.m_unk0
+        = pBall->m_tLightningTimer.m_uPackedTime != 0;
+    pBall->m_tLightningTimer.m_uPackedTime = 0;
+    pBall->mpDamageTarget = NULL;
+    if (pBall->m_pPassTarget != NULL)
+    {
+        pBall->m_pPassTarget = NULL;
+    }
+
+    pBall->m_tPassTargetTimer.m_unk0
+        = pBall->m_tPassTargetTimer.m_uPackedTime != 0;
+    pBall->m_tPassTargetTimer.m_uPackedTime = 0;
+    pBall->m_v3PassIntercept.x = 0.0f;
+    pBall->m_v3PassIntercept.y = 0.0f;
+    pBall->m_v3PassIntercept.z = 0.0f;
+    pBall->m_fTotalPassTime = 0.0f;
+    if (pBall->m_uVoiceID != 0)
+    {
+        pBall->m_uVoiceID = 0;
+    }
+}
+
+static inline void UpdateBallShotClock(cBall* pBall)
+{
+    if (pBall->m_pOwner != NULL)
+    {
+        if (!pBall->m_pOwner->IsOnSameTeam(pBall->m_pPrevOwner))
+        {
+            pBall->mtShotClockTimer.SetSeconds(lbl_806DB558);
+            pBall->mnShotClockTeam = pBall->m_pOwner->m_pTeam->m_nSide;
+        }
+    }
+    else
+    {
+        pBall->mnShotClockTeam = -1;
+        pBall->mtShotClockTimer.SetSeconds(0.0f);
+    }
+}
+
+extern "C" void fn_80015C38(cBall* pBall, int nBallState)
+{
+    int previousState = pBall->meBallState;
+    UnidentifiedEvent2View<int, int>* event
+        = (UnidentifiedEvent2View<int, int>*)
+            &g_pGame->mUnidentified49C.mEvent14;
+    event->UnidentifiedDeliver(previousState, nBallState);
+
+    if (pBall->meBallState == 9)
+    {
+        pBall->m_pPhysicsBall->m_gravity = -22.5f;
+        fn_801BDF08(0);
+        pBall->m_tShotTimer.m_unk0
+            = pBall->m_tShotTimer.m_uPackedTime != 0;
+        pBall->m_tShotTimer.m_uPackedTime = 0;
+    }
+
+    if ((pBall->meBallState == 6 || pBall->meBallState == 7)
+        && nBallState != 6 && nBallState != 7 && nBallState != 10)
+    {
+        fn_800152B4(pBall);
+        pBall->m_pPhysicsBall->fn_80140C30();
+    }
+    else if (pBall->meBallState == 1 && nBallState != 10)
+    {
+        pBall->m_pPhysicsBall->fn_80140C30();
+    }
+    else if (pBall->meBallState == 10)
+    {
+        pBall->m_pPhysicsBall->fn_80140C30();
+    }
+
+    switch (nBallState)
+    {
+    case 2:
+        UpdateBallShotClock(pBall);
+        ClearBallStateTargets(pBall);
+        if (pBall->m_pBlurHandler != NULL)
+        {
+            pBall->m_pBlurHandler->Die(0.25f);
+            pBall->m_pBlurHandler = NULL;
+        }
+        break;
+    case 10:
+        UpdateBallShotClock(pBall);
+        ClearBallStateTargets(pBall);
+        break;
+    case 9:
+    {
+        fn_801BDDE4();
+        pBall->SetVelocity(v3Zero, SPINTYPE_NONE, NULL);
+        pBall->m_pPhysicsBall->m_gravity = 0.0f;
+        pBall->m_tShotTimer.SetSeconds(0.5f);
+
+        fn_800154FC(pBall, 4.0f);
+
+        if (pBall->m_pBlurHandler != NULL)
+        {
+            pBall->m_pBlurHandler->Die(0.25f);
+            pBall->m_pBlurHandler = NULL;
+        }
+    }
+    case 0:
+        UpdateBallShotClock(pBall);
+        ClearBallStateTargets(pBall);
+        break;
+    case 4:
+        ClearBallStateTargets(pBall);
+        pBall->InitiateBallBlur((eBallShotEffectType)0, NULL);
+        break;
+    case 1:
+        UpdateBallShotClock(pBall);
+        if (pBall->m_pPrevOwner != NULL
+            && pBall->m_pPrevOwner->m_eClassType == FIELDER)
+        {
+            pBall->m_pPhysicsBall->mfBallAirResistance
+                = pBall->m_pPhysicsBall->fn_80140C3C() * 15.0f;
+        }
+        break;
+    case 6:
+        UpdateBallShotClock(pBall);
+        if (pBall->m_pPrevOwner != NULL
+            && pBall->m_pPrevOwner->m_eClassType == FIELDER)
+        {
+            float resistance = pBall->m_pPhysicsBall->fn_80140C3C();
+            PlayerTweaks* tweaks
+                = fn_8003E6E4((cFielder*)pBall->m_pPrevOwner);
+            pBall->m_pPhysicsBall->mfBallAirResistance
+                = resistance * Interpolate(24.0f, 1.0f,
+                    (float)tweaks->fShooting);
+        }
+        break;
+    case 7:
+        UpdateBallShotClock(pBall);
+        break;
+    case 3:
+    case 5:
+    case 8:
+    default:
+        break;
+    }
+
+    if (nBallState == 2 || nBallState == 4)
+    {
+        fn_800EBC84(0, 0xBF92BBAF,
+            (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL, NULL);
+    }
+
+    if (pBall->m_pPrevOwner != NULL
+        && pBall->m_pPrevOwner->m_eClassType == FIELDER)
+    {
+        fn_800EC12C(0x65321E47, pBall);
+        if (nBallState == 7)
+        {
+            fn_800EBC84(0, 0xDE8FC45D,
+                (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL, NULL);
+        }
+        else if (nBallState == 6)
+        {
+            fn_800EBC84(0, 0xDE8FC45D,
+                (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL, NULL);
+            if (pBall->mfChargeValue >= 1.0f
+                && pBall->mfChargeValue < 2.0f)
+            {
+                fn_800EBC84(0, 0xDE8FC45E,
+                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                    NULL);
+            }
+            else if (pBall->mfChargeValue >= 2.0f
+                && pBall->mfChargeValue < 3.0f)
+            {
+                fn_800EBC84(0, 0xDE8FC45F,
+                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                    NULL);
+            }
+            else if (pBall->mfChargeValue >= 3.0f
+                && pBall->mfChargeValue < 4.0f)
+            {
+                fn_800EBC84(0, 0xDE8FC460,
+                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                    NULL);
+            }
+            else if (pBall->mfChargeValue >= 4.0f)
+            {
+                fn_800EBC84(0, 0xDE8FC461,
+                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                    NULL);
+            }
+        }
+        else if (nBallState == 5 || nBallState == 3 || nBallState == 1)
+        {
+            fn_800EBC84(0, 0x875086F2,
+                (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL, NULL);
+            if (pBall->mfChargeValue >= 1.0f
+                && pBall->mfChargeValue < 2.0f)
+            {
+                fn_800EBC84(0, 0x71406564,
+                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                    NULL);
+            }
+            else if (pBall->mfChargeValue >= 2.0f
+                && pBall->mfChargeValue < 3.0f)
+            {
+                fn_800EBC84(0, 0x71406565,
+                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                    NULL);
+            }
+            else if (pBall->mfChargeValue >= 3.0f
+                && pBall->mfChargeValue < 4.0f)
+            {
+                fn_800EBC84(0, 0x71406566,
+                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                    NULL);
+            }
+            else if (pBall->mfChargeValue >= 4.0f)
+            {
+                fn_800EBC84(0, 0x71406567,
+                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                    NULL);
+            }
+
+            if (nBallState == 5)
+            {
+                fn_800EBC84(0, 0x65321E47,
+                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC,
+                    "Volley Pass", pBall);
+            }
+        }
+        else if (nBallState == 8)
+        {
+            fn_800EBC84(pBall->m_pPrevOwner->mUnidentified318,
+                0x3D267BDF,
+                (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL, NULL);
+        }
+    }
+
+    pBall->mePrevBallState = pBall->meBallState;
+    pBall->meBallState = nBallState;
+}
+
 void cBall::ClearBallBlur()
 {
     if (m_pBlurHandler != NULL)
@@ -1562,7 +1865,7 @@ extern "C" bool fn_800167E8(cBall* pBall)
 void cBall::SetOwner(cPlayer* pOwner)
 {
     m_pOwner = pOwner;
-    fn_80096CDC(pOwner, this);
+    pOwner->fn_80096CDC(this);
     m_pLastTouch = pOwner;
     fn_80015C38(this, 2);
 
@@ -1571,8 +1874,9 @@ void cBall::SetOwner(cPlayer* pOwner)
         g_pGame->SetPotentialScorer(pOwner);
     }
 
-    m_pPhysicsBall->mbUseMagnusEffect = false;
-    m_pPhysicsBall->mfChargeBonus = 0.0f;
+    PhysicsBall* pPhysicsBall = m_pPhysicsBall;
+    pPhysicsBall->mbUseMagnusEffect = false;
+    pPhysicsBall->mfChargeBonus = 0.0f;
 }
 
 void cBall::SetPosition(const nlVector3& pos)
@@ -2624,6 +2928,18 @@ static inline void UnidentifiedRegisterEventCallback(
     ((UnidentifiedTypedEvent<T>*)event)->Add(function, 0, -1);
 }
 
+static inline void UnidentifiedRegisterEventCallback(
+    const char* name, void (*callback)())
+{
+    Function<FnVoidVoid> function(callback);
+    unsigned int hash = fn_802B289C(name, -1);
+    UnidentifiedEventBase** foundEvent = 0;
+    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    UnidentifiedEventBase* event
+        = foundEvent != 0 ? *foundEvent : 0;
+    ((UnidentifiedTypedEvent0*)event)->Add(function, 0, -1);
+}
+
 template <typename P1, typename P2>
 static inline void UnidentifiedRegisterEventCallback(
     const char* name, void (*callback)(P1, P2))
@@ -2678,7 +2994,7 @@ extern "C" void fn_80018A00()
     }
 }
 
-extern "C" void fn_8001929C(void*)
+extern "C" void fn_8001929C()
 {
     cBall* pBall = g_pBall;
     if (pBall == NULL)
@@ -2811,7 +3127,7 @@ extern "C" void fn_800194A4(void*)
     }
 }
 
-extern "C" void fn_800195D8(void*)
+extern "C" void fn_800195D8()
 {
     if (g_pBall == NULL)
     {

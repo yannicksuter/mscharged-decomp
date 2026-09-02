@@ -13,7 +13,7 @@
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsCharacter.h"
-#include "Game/Physics/PhysicsSphere.h"
+#include "Game/Physics/PhysicsShell.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
 #include "NL/nlMemory.h"
@@ -33,17 +33,6 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     UnidentifiedEventRegistry;
 
 class Goalie;
-
-class PhysicsSphere_80174F04 : public PhysicsSphere
-{
-public:
-    PhysicsSphere_80174F04(float radius);
-    virtual int GetObjectType() const;
-
-    /* 0x38 */ void (*mUnidentified38)(PhysicsObject*, PhysicsObject*,
-        nlVector3&, void*);
-    /* 0x3C */ void* mUnidentified3C;
-}; // total size: 0x40
 
 extern "C" DebugFieldType lbl_80533C98[];
 extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
@@ -74,7 +63,7 @@ extern "C" void fn_80029AB0(void*);
 extern "C" void fn_80029B9C(void*);
 extern "C" void fn_800297B8(cBall*, CrowdRiot*);
 extern "C" void fn_80029C80(
-    PhysicsObject*, PhysicsObject*, nlVector3&, void*);
+    PhysicsObject*, PhysicsObject*, const nlVector3&, void*);
 
 static float sUnidentifiedFloat0 = 2.45f;
 static float sUnidentifiedFloat1 = 4.0f;
@@ -228,7 +217,7 @@ void CrowdRiot::fn_80029320()
             position.x = sUnidentifiedFloat4
                        * AIsgn(generator->v2Location.x);
             position.y = sUnidentifiedFloat5
-                       + (float)fabs(generator->v2Location.y);
+                       + fabsf(generator->v2Location.y);
             position.y *= AIsgn(generator->v2Location.y);
             position.z = 0.0f;
             mv3Position = position;
@@ -310,8 +299,9 @@ void CrowdRiot::fn_80029460(bool param1)
                 = new (8, false) PhysicsSphere_80174F04(
                     sUnidentifiedFloat0);
             mUnidentified30 = physicsObject;
-            physicsObject->mUnidentified38 = fn_80029C80;
-            physicsObject->mUnidentified3C = this;
+            physicsObject->m_pTriggerCallbackFunc
+                = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))fn_80029C80;
+            physicsObject->m_pCallbackParam = this;
             mUnidentified30->SetPosition(
                 mv3Position, PhysicsObject::WORLD_COORDINATES);
             mUnidentified30->EnableCollisions();
@@ -475,7 +465,7 @@ void fn_80029B9C(void* param)
 }
 
 void fn_80029C80(PhysicsObject*, PhysicsObject* other,
-    nlVector3& position, void* context)
+    const nlVector3& position, void* context)
 {
     switch (other->GetObjectType())
     {

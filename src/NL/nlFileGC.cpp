@@ -82,10 +82,11 @@ public:
     DolphinFile* Allocate()
     {
         DolphinFile* entry = m_pFree;
-        if (entry != 0)
+        if (entry == 0)
         {
-            m_pFree = *(DolphinFile**)entry;
+            return 0;
         }
+        m_pFree = *(DolphinFile**)entry;
         return entry;
     }
 
@@ -270,12 +271,19 @@ void nlRegCheckForResetFromFSCB(const Function<FnVoidVoid>& cb)
 
 nlFile* nlOpen(const char* fileName)
 {
-    long FileEntrynum = DVDConvertPathToEntrynum(fileName);
+    long FileEntrynum;
+    nlFile* file;
+
+    FileEntrynum = DVDConvertPathToEntrynum(fileName);
     if (FileEntrynum == -1)
     {
-        return 0;
+        file = 0;
     }
-    return new DolphinFile(FileEntrynum);
+    else
+    {
+        file = new DolphinFile(FileEntrynum);
+    }
+    return file;
 }
 
 DolphinFile::~DolphinFile()
