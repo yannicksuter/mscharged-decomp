@@ -18,6 +18,7 @@ class cAnimInventory;
 class cPoseAccumulator;
 class cPoseNode;
 class glModel;
+struct CharacterInfo;
 
 enum eCharacterClass
 {
@@ -184,7 +185,8 @@ public:
     /* 0x0E0 */ u8 unknown_0x0E0[0x10];
     /* 0x0F0 */ eClassTypes m_eClassType;
     /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;
-    /* 0x0F5 */ u8 unknown_0x0F5[0x2B];
+    /* 0x0F5 */ u8 unknown_0x0F5[0x27];
+    /* 0x11C */ const CharacterInfo* mUnidentified11C;
     /* 0x120 */ int mUnidentified120;
     /* 0x124 */ nlMatrix4 m_m4WorldMatrix;
     /* 0x164 */ u8 unknown_0x164[0x0C];

@@ -120,22 +120,27 @@ GetGoalieSaveEvent(const char* name, int length)
 void UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess(
     UnidentifiedEventData_80066748*)
 {
-    if (g_pGame->m_eGameState == 3 || fn_80111D3C() != 1.0f)
+    if (g_pGame->m_eGameState == 3)
+    {
+        return;
+    }
+
+    if (FixedUpdateTask::GetTargetTimeScale() != 1.0f)
     {
         return;
     }
 
     Reset();
-    g_pGame->fn_80058528(lbl_806DC5D8, 0.0f);
-    g_pGame->fn_80058528(lbl_806DC5DC, lbl_806DC5D0);
+    g_pGame->fn_80058528(lbl_806DC5A0, 0.0f);
+    g_pGame->fn_80058528(lbl_806DC5A4, lbl_806DC598);
     mOwnsTimeScale = true;
     mRestoreTimeScale = true;
-    mTransitionTime = lbl_806DC5D0;
-    mTransitionInTime = lbl_806DC5D0;
-    mTransitionOutTime = lbl_806DC5D4;
-    mZoomStart = lbl_806DC5C8;
-    mRotationDegrees = lbl_806DC5CC;
-    mRotateCamera = lbl_806DC5C4;
+    mTransitionTime = lbl_806DC598;
+    mTransitionInTime = lbl_806DC598;
+    mTransitionOutTime = lbl_806DC59C;
+    mZoomStart = lbl_806DC590;
+    mRotationDegrees = lbl_806DC594;
+    mRotateCamera = lbl_806DC5A8;
 
     if (g_pBall->m_pLastTouch != 0
         && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
@@ -153,7 +158,12 @@ void UnidentifiedCameraEffects::OnGoalieSlamAttackAttempt(
 void UnidentifiedCameraEffects::OnGoalieDekeAttackSuccess(
     UnidentifiedEventData_80066748*)
 {
-    if (g_pGame->m_eGameState == 3 || fn_80111D3C() != 1.0f)
+    if (g_pGame->m_eGameState == 3)
+    {
+        return;
+    }
+
+    if (FixedUpdateTask::GetTargetTimeScale() != 1.0f)
     {
         return;
     }
@@ -170,7 +180,7 @@ void UnidentifiedCameraEffects::OnGoalieDekeAttackSuccess(
     mTransitionOutTime = lbl_806DC5B8;
     mZoomStart = lbl_806DC5AC;
     mRotationDegrees = lbl_806DC5B0;
-    mRotateCamera = lbl_806DC5A8;
+    mRotateCamera = lbl_806DC5C4;
 
     if (g_pBall->m_pLastTouch != 0
         && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
@@ -615,9 +625,10 @@ void UnidentifiedCameraEffects::UpdateCameraFlags()
     {
         float goalLineX = cField::GetGoalLineX((unsigned int)
             owner->m_pTeam->GetOtherTeam()->m_nSide);
-        facingGoal = goalLineX > 0.0f
-                   ? owner->m_v3Position.x > 0.0f
-                   : owner->m_v3Position.x < 0.0f;
+        facingGoal = (goalLineX > 0.0
+                         && owner->m_v3Position.x > 0.0f)
+                  || (goalLineX < 0.0
+                         && owner->m_v3Position.x < 0.0f);
     }
     if (facingGoal)
         mCameraFlags |= 1;

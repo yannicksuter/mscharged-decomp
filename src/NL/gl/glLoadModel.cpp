@@ -162,73 +162,74 @@ static void FixupModelData(RLGReader* reader)
 
 void RLGReader::fn_802CADC4(void* data)
 {
-    nlChunk* outerChunk = (nlChunk*)data;
     nlChunk* outerEnd = 0;
+    nlChunk* chunk;
+    nlChunk* outerChunk = (nlChunk*)data;
 
     if (outerChunk->GetID() == 0x8001B100)
     {
-        outerEnd = outerChunk->GetNextChunk();
-        outerChunk = outerChunk->GetFirstChunk();
+        nlChunk* header = outerChunk;
+        outerChunk = header->GetFirstChunk();
+        outerEnd = header->GetNextChunk();
     }
 
-    for (;;)
+    while (outerChunk != outerEnd)
     {
         nlChunk* chunkEnd = outerChunk->GetNextChunk();
-        nlChunk* chunk = outerChunk->GetFirstChunk();
+        chunk = outerChunk->GetFirstChunk();
         while (chunk != chunkEnd)
         {
             switch (chunk->GetID())
             {
-            case 0x1B008:
+            case 0x8001B008:
                 fn_802CA778(chunk);
                 break;
             case 0x1B016:
                 fn_802CAA00(chunk->GetData(),
                     chunk->GetSize()
-                        - ((unsigned char*)chunk->GetData()
+                        - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B006:
                 fn_80369E5C(chunk->GetData(),
                     chunk->GetSize()
-                        - ((unsigned char*)chunk->GetData()
+                        - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B007:
                 fn_80369EC8(chunk->GetData(),
                     chunk->GetSize()
-                        - ((unsigned char*)chunk->GetData()
+                        - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B005:
                 fn_802CAA60(chunk->GetData(),
                     chunk->GetSize()
-                        - ((unsigned char*)chunk->GetData()
+                        - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B004:
                 fn_802CAAC0(chunk->GetData(),
                     chunk->GetSize()
-                        - ((unsigned char*)chunk->GetData()
+                        - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B002:
                 fn_802CAB34(chunk->GetData(),
                     chunk->GetSize()
-                        - ((unsigned char*)chunk->GetData()
+                        - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B003:
                 fn_802CABBC(chunk->GetData(),
                     chunk->GetSize()
-                        - ((unsigned char*)chunk->GetData()
+                        - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
-            case 0x1B200:
+            case 0x8001B200:
             {
                 nlChunk* subChunk = chunk->GetFirstChunk();
-                nlChunk* subEnd = chunk->GetNextChunk();
-                while (subChunk != subEnd)
+                while (subChunk != chunk->GetNextChunk())
                 {
                     fn_80369F34(subChunk);
                     subChunk = subChunk->GetNextChunk();
@@ -253,8 +254,6 @@ void RLGReader::fn_802CADC4(void* data)
         m_pModels = 0;
         m_nModels = 0;
         outerChunk = outerChunk->GetNextChunk();
-        if (outerChunk == outerEnd)
-            return;
     }
 }
 
