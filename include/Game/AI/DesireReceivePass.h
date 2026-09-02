@@ -93,7 +93,11 @@ private:
     nlVector3 mv3PassIntercept;
     float mUnidentifiedB4;
     int meReceiveAnimType;
+
+public:
     int meDesireSubState;
+
+private:
     SpaceSearch* m_pSpaceSearch;
     bool mbOneTouchVolley;
     bool mbOneTouchShot;

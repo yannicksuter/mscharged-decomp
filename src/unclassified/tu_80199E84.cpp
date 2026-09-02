@@ -1,25 +1,10 @@
 #include "Game/Physics/PhysicsBirdoEgg.h"
 
+#include "unclassified/tu_80199E84.h"
+
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "types.h"
-
-struct State_80199E84
-{
-    nlQuaternion orientation;
-    float unknown_10;
-    nlVector3 position;
-    float unknown_20;
-    float unknown_24;
-    float unknown_28;
-    float unknown_2C;
-    bool visible;
-    u8 pad_31[3];
-    PhysicsSphere* physics;
-    void* drawable;
-    u32 unknown_3C;
-    nlVector3 unknown_40;
-};
 
 extern "C" void fn_8019A434(State_80199E84*, bool);
 extern const nlVector3 lbl_804DCD90;

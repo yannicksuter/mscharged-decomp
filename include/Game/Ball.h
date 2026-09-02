@@ -30,11 +30,21 @@ public:
 
     void ClearOwner();
     void ClearBallEffects();
+    void CollideWithCharacterCallback(
+        cPlayer* pCharacter, const nlVector3& v3PreBallVelocity);
+    void PostPhysicsUpdate(float fDeltaT);
+    void UpdateOrientation(float fDeltaT);
+    void WarpTo(const nlVector3& toPos);
+    void SetPassTarget(cPlayer* passTargetPlayer, const nlVector3& pos,
+        bool bVolley);
+    void SetPassTargetTimer(float seconds);
+    void KillBlurHandler();
     void ClearBallBlur();
     void SetOwner(cPlayer* pOwner);
     void SetPosition(const nlVector3& pos);
     void SetVelocity(const nlVector3& velocity, eSpinType spin,
         const nlVector3* pAngularVelocity);
+    void ShootRelease(const nlVector3& v3Velocity, eSpinType SpinType);
     void ShootAtFast(nlVector3& v3Vel, const nlVector3& v3Target,
         float fDesiredTime);
     void SyncLog(void* context, DebugWriteCache* cache);

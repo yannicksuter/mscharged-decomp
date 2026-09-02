@@ -72,8 +72,6 @@ extern "C" float fn_8002CD2C(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CC44(PlayerTweaks* pTweaks);
 extern "C" PlayerTweaks* fn_8003E6E4(cFielder* pFielder);
 extern "C" float fn_8002BFA8(PlayerTweaks* pTweaks, float fParam);
-extern "C" void fn_80016FBC(
-    cBall* pBall, const nlVector3* pVelocity, int nParam);
 extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 extern "C" void fn_800EDCE8(cPlayer* pPlayer);
 extern "C" cFielder* fn_80096F54(cPlayer* pPlayer, bool bParam);
@@ -3446,7 +3444,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
             nlVector3 v3BallVelocity;
             nlVec3Set(v3BallVelocity, 0.4f * m_v3Velocity.x,
                 0.5f * -m_v3Position.y, 6.0f);
-            fn_80016FBC(g_pBall, &v3BallVelocity, 0);
+            g_pBall->ShootRelease(v3BallVelocity, SPINTYPE_NONE);
             SetNoPickUpTime(0.5f);
         }
 
@@ -3528,7 +3526,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
             v3BallVelocity.x = nlRandomf(fSpread) - 0.5f * fSpread;
             v3BallVelocity.y = nlRandomf(fSpread) - 0.5f * fSpread;
             v3BallVelocity.z = nlRandomf(fSpread);
-            fn_80016FBC(g_pBall, &v3BallVelocity, 0);
+            g_pBall->ShootRelease(v3BallVelocity, SPINTYPE_NONE);
         }
 
         fn_8002E3F8(this);
@@ -3814,7 +3812,7 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
         if (m_pBall != 0)
         {
             ReleaseBall(0);
-            fn_80016FBC(g_pBall, &m_v3Velocity, 0);
+            g_pBall->ShootRelease(m_v3Velocity, SPINTYPE_NONE);
         }
 
         fn_8002E718(this);
@@ -4005,7 +4003,7 @@ void cFielder::fn_80046244()
         if (m_pBall != 0)
         {
             ReleaseBall(0);
-            fn_80016FBC(g_pBall, &m_v3Velocity, 0);
+            g_pBall->ShootRelease(m_v3Velocity, SPINTYPE_NONE);
             fn_8001458C(g_pBall);
         }
 
