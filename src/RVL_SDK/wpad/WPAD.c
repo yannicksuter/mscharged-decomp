@@ -967,6 +967,18 @@ WPADLibStatus WPADGetStatus(void) {
     return (WPADLibStatus)WUDGetStatus();
 }
 
+u8 WPADGetRadioSensitivity(s32 chan) {
+    WPADCB* p_wpd = _wpdcb[chan];
+    BOOL enabled;
+    u8 sensitivity;
+
+    enabled = OSDisableInterrupts();
+    sensitivity = p_wpd->radioSensitivity;
+    OSRestoreInterrupts(enabled);
+
+    return sensitivity;
+}
+
 void WPADGetAddress(s32 chan, BD_ADDR_PTR pAddr) {
     WPADCB* p = _wpdcb[chan];
     BD_ADDR_PTR pDevAddr;

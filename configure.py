@@ -818,6 +818,7 @@ config.libs = [
             Object(NonMatching, "unclassified/tu_801F8CB0.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "unclassified/tu_801FA28C.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "unclassified/tu_801FADB4.cpp", cflags=cflags_game_deferred),
+            Object(NonMatching, "Game/SH/SHCredits.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/FE/BaseSceneHandler.cpp"),
             Object(NonMatching, "Game/FE/feAnimation.cpp"),
             Object(Matching, "Game/FE/feButtonComponent.cpp"),

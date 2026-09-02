@@ -15,6 +15,9 @@ class BasicStadium
 {
 public:
     static BasicStadium* GetCurrentStadium();
+
+    /* 0x00 */ u8 mUnidentified000[0x70];
+    /* 0x70 */ bool mUnidentified070;
 };
 
 #endif // GAME_BASIC_STADIUM_H

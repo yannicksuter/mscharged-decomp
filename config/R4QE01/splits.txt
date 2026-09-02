@@ -1508,6 +1508,12 @@ unclassified/tu_801FADB4.cpp:
 	.sdata      start:0x806DDA30 end:0x806DDA58
 	.sdata2     start:0x806E5798 end:0x806E57A8
 
+Game/SH/SHCredits.cpp:
+	.text       start:0x801FB2D4 end:0x801FC29C
+	.data       start:0x8051AD18 end:0x8051AE18
+	.sdata      start:0x806DDA58 end:0x806DDA98
+	.sdata2     start:0x806E57A8 end:0x806E57E0
+
 Game/Render/Presentation.cpp:
 	.text       start:0x801FEBEC end:0x80200360
 	.data       start:0x8051B0D0 end:0x8051B1F8
@@ -2892,7 +2898,7 @@ NL/glx/glxDisplayList.cpp:
 	.sbss       start:0x806E23F4 end:0x806E2400
 
 Game/GL/ShaderSkinMesh.cpp:
-	.text       start:0x8036F648 end:0x80370808
+	.text       start:0x8036F648 end:0x8037091C
 	.ctors      start:0x804DBB58 end:0x804DBB5C
 
 RVL_SDK/thp/THPSimple.cpp:
