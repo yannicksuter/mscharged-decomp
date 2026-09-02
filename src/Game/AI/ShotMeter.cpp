@@ -117,12 +117,15 @@ extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot,
     else
     {
         float fChipWeight = lbl_806DBE6C;
-        float fGoalieVal = fGoalieOut;
+        float fGoalieVal;
+        float fRemainder;
+        fGoalieVal = fGoalieOut;
         fGoalieVal *= fChipWeight;
         fShooting *= lbl_806E0DD8;
         float fChipOpenWeight = lbl_806DBE70;
         fNetOpeness *= fChipOpenWeight;
-        fChargedValue *= lbl_806DBE74;
+        fRemainder = lbl_806DBE74;
+        fChargedValue *= fRemainder;
         fScoreValue = fShooting
                     + (fChargedValue + (fGoalieVal + fNetOpeness));
     }

@@ -9,12 +9,11 @@
 #include "Game/Team.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
-#include "NL/nlSlotPool.h"
 #include "ode/objects.h"
+#include "unclassified/tu_80176EF4.h"
 
 extern "C"
 {
-    extern SlotPoolEntry* lbl_806E12E0;
     extern unsigned long lbl_806E1F0C;
     extern unsigned long lbl_806E1F28;
 
@@ -50,8 +49,6 @@ extern "C"
     extern const nlVector3 lbl_804DCFBC = { 0.0f, 0.0f, 1.0f };
     extern const nlVector4 lbl_804DCFC8 = { 0.1f, 0.08f, 0.0f, 0.0f };
 
-    PhysicsObject* fn_80176EF4(
-        void*, ThwompObject*, float, float, float);
     RenderObject* fn_80276360(int, int);
     void* fn_802CDF0C();
     unsigned long fn_802CE1B8(void*, unsigned long);
@@ -112,21 +109,8 @@ extern "C" ThwompObject* fn_801B298C(
     object->mTexture60 = glGetTexture(lbl_80514720);
     object->mDrawable = fn_80276360(8, index);
 
-    PhysicsObject* physics;
-    if (lbl_806E12E0 == 0)
-    {
-        physics = 0;
-    }
-    else
-    {
-        physics = (PhysicsObject*)lbl_806E12E0;
-        lbl_806E12E0 = lbl_806E12E0->next;
-    }
-    if (physics != 0)
-    {
-        physics = fn_80176EF4(
-            physics, object, 3.14f, 2.88f, 3.5f);
-    }
+    PhysicsObject* physics
+        = new PhysicsBox_80176EF4(object, 3.14f, 2.88f, 3.5f);
     object->mPhysics = physics;
     physics->SetPosition(
         lbl_804DCF74, PhysicsObject::WORLD_COORDINATES);

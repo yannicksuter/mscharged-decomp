@@ -1,5 +1,6 @@
 #include "Game/AI/Fielder.h"
 #include "unclassified/tu_8019FE24.h"
+#include "unclassified/tu_80177498.h"
 
 #include "Game/AI/Fuzzy.h"
 #include "Game/AI/FuzzyVariant.h"
@@ -58,6 +59,8 @@ struct UnidentifiedAbilityEffect
     /* 0x08 */ void* mUnidentified08;
 };
 
+class PhysicsSphere_80175F8C;
+
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
 extern "C" void fn_8002FE54(cFielder* pFielder);
@@ -81,9 +84,8 @@ extern "C" void fn_800F026C(float* pParams, float fParam1, float fParam2);
 extern "C" void fn_80061B1C(int nParam, float fParam1, float fParam2);
 extern "C" void fn_80111D7C(float fParam);
 extern "C" void fn_80139D1C(int nPreset, cGlobalPad* pPad);
-extern "C" void fn_801765C8(
+extern "C" PhysicsSphere_80175F8C* fn_801765C8(
     cFielder* pFielder, const nlVector3* v3Position, float fParam);
-extern "C" void fn_80178D0C(void* pParam);
 extern "C" void fn_801B897C(cFielder* pFielder);
 extern "C" void fn_801BAF98(cFielder* pFielder);
 extern "C" void fn_801BB0DC(cFielder* pFielder);
@@ -490,7 +492,8 @@ extern "C" void fn_800504A8(UnidentifiedAbilityEffect* pParam)
 {
     if (pParam->mUnidentified08 != 0)
     {
-        fn_80178D0C(pParam->mUnidentified08);
+        ((WaluigiWallManager_80178400*)pParam->mUnidentified08)
+            ->fn_80178D0C();
     }
 }
 

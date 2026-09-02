@@ -183,6 +183,32 @@ void FESceneManager::QueueScenePush(
     m_pushPopMessageQueue.AddEnd(msg);
 }
 
+static inline void FindSceneForPop(
+    PackagePushPopMessage* msg,
+    DLListEntry<BaseSceneHandler*>* headEntry,
+    DLListEntry<BaseSceneHandler*>* sceneEntry)
+{
+    while (sceneEntry != 0)
+    {
+        BaseSceneHandler* pSceneHandler = sceneEntry->entry;
+
+        if (!FESceneManager::IsObjectQueuedForPop(pSceneHandler))
+        {
+            msg->m_pSceneHandler = sceneEntry->entry;
+            break;
+        }
+
+        if (nlDLRingIsEnd(headEntry, sceneEntry) || sceneEntry == 0)
+        {
+            sceneEntry = 0;
+        }
+        else
+        {
+            sceneEntry = sceneEntry->m_next;
+        }
+    }
+}
+
 void FESceneManager::QueueScenePop()
 {
     PackagePushPopMessage* msg = 0;
@@ -194,16 +220,7 @@ void FESceneManager::QueueScenePop()
     msg->m_bPush = false;
 
     nlDLListIterator<BaseSceneHandler*> sceneIterator = m_sceneHandlerStack.Begin();
-    while (sceneIterator.hasNext())
-    {
-        BaseSceneHandler* pSceneHandler = *sceneIterator;
-        if (!IsObjectQueuedForPop(pSceneHandler))
-        {
-            msg->m_pSceneHandler = pSceneHandler;
-            break;
-        }
-        sceneIterator.next();
-    }
+    FindSceneForPop(msg, sceneIterator.m_Head, sceneIterator.m_Curr);
 
     m_pushPopMessageQueue.AddEnd(msg);
 }

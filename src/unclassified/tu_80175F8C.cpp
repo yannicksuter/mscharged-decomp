@@ -1,3 +1,4 @@
+#include "Game/BulletBill.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Game.h"
@@ -28,14 +29,6 @@ struct PhysicsEvent_8014A2BC
 
 extern "C" SlotPool<PhysicsEvent_8014A2BC> lbl_805701B0;
 extern "C" void fn_8014A2BC(PhysicsEvent_8014A2BC*);
-
-struct PhysicsSource_80176754
-{
-    u8 unknown00[0x10];
-    nlVector3 position;
-    u8 unknown1C[0x28];
-    void* owner;
-};
 
 struct PhysicsObjectType28_80510968 : PhysicsObject
 {
@@ -285,16 +278,17 @@ extern "C" PhysicsSphere_80175F8C* fn_8017642C(
 }
 
 extern "C" PhysicsSphere_80175F8C* fn_801765C8(
-    void* owner, const nlVector3* position, float maximumRadius)
+    cFielder* owner, const nlVector3* position, float maximumRadius)
 {
     return CreateSphere(
         owner, *position, 1, maximumRadius, lbl_806DCAEC);
 }
 
 extern "C" PhysicsSphere_80175F8C* fn_80176754(
-    PhysicsSource_80176754* source)
+    BulletBillObject* bulletBill)
 {
-    return CreateSphere(source->owner, source->position, 4, lbl_806DCAD8, lbl_806DCADC);
+    return CreateSphere(bulletBill->target, bulletBill->position, 4,
+        lbl_806DCAD8, lbl_806DCADC);
 }
 
 extern "C" PhysicsSphere_80175F8C* fn_801768E0(
@@ -328,7 +322,7 @@ extern "C" PhysicsSphere_80175F8C* fn_80176A60(
 }
 
 extern "C" PhysicsSphere_80175F8C* fn_80176C18(
-    const nlVector3* position, void* owner)
+    const nlVector3* position, cCharacter* owner)
 {
     EmitSphereEffect(sDaisyFistExitEffect, *position);
     fn_800F026C(sDaisyCameraShake, lbl_806DCAFC, lbl_806DCB00);

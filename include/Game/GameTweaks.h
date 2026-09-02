@@ -130,9 +130,7 @@ private:
 public:
     /* 0x204 */ TweakValue_804F4DC8 fBananaResistance;
     /* 0x214 */ TweakValue_804F4DC8 fShellBounceGround;
-
-private:
-    /* 0x224 */ u8 mUnidentified224[0x10];
+    /* 0x224 */ TweakValue_804F4DC8 fShellBounce;
 
 public:
     /* 0x234 */ TweakValue_804F4DC8 fShellSmallRadius;

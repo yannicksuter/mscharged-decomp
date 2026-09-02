@@ -112,6 +112,7 @@ public:
     /* 0xF0 */ unsigned long mUnidentifiedF0;
 }; // total size: 0xF4
 
+extern "C" void fn_80015C38(cBall* pBall, int nBallState);
 extern cBall* g_pBall;
 
 #endif // GAME_BALL_H

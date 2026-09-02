@@ -66,7 +66,6 @@ extern "C"
     bool fn_8001E184(cPlayer* pCharacter);
     bool fn_800387CC(cPlayer* pCharacter);
     IndicatorPlayerTweaks* fn_8003E6E4(cPlayer* pCharacter);
-    IndicatorControllerInfo* fn_800972CC(cPlayer* pCharacter);
     GLView* fn_8027267C(int index);
     void fn_802CE528(GLView* view, const nlVector3* world, nlVector3* projected);
     void fn_802CE6DC(GLView* view, const nlVector3* normalized, nlVector3* screen);
@@ -241,7 +240,8 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
         return index;
     }
 
-    IndicatorControllerInfo* pInfo = fn_800972CC(pCharacter);
+    IndicatorControllerInfo* pInfo
+        = (IndicatorControllerInfo*)pCharacter->fn_800972CC();
     int index = -1;
     if (pInfo != 0)
     {

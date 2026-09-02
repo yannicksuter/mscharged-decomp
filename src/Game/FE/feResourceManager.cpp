@@ -45,7 +45,6 @@ extern "C" ResourceInterface_802CC094* fn_802CC094();
 extern "C" void fn_802C8284(unsigned long texture);
 extern "C" void fn_802C8288(void* texture);
 extern "C" unsigned int fn_802A95C4(AVLTreeNode* node, unsigned int count);
-extern "C" void fn_8030009C(FETextureResource* texture, const unsigned long* handle);
 extern "C" void* fn_80307260(void* manager, unsigned long hashID);
 
 static nlAVLTreeSlotPool<unsigned long, FEResourceHandle*, DefaultKeyCompare<unsigned long> > s_loadedResourceList(0x200, 0);
@@ -97,11 +96,11 @@ void FEResourceManager::RemoveResourceFromResourceList(FEResourceHandle* pFEReso
 FEResourceHandle* FEResourceManager::FindExistingResourceInResourceList(FEResourceHandle* pFEResourceHandle)
 {
     FEResourceHandle** pPreExistingResourceHandle;
-    if (s_loadedResourceList.FindGet(pFEResourceHandle->GetHashID(), &pPreExistingResourceHandle))
+    if (!s_loadedResourceList.FindGet(pFEResourceHandle->GetHashID(), &pPreExistingResourceHandle))
     {
-        return *pPreExistingResourceHandle;
+        return 0;
     }
-    return 0;
+    return *pPreExistingResourceHandle;
 }
 
 ResourceResult FEResourceManager::IssueSceneContextSwitch(FESceneResource* pFeSceneResource)
@@ -139,8 +138,8 @@ void FEResourceManager::fn_802FC9C4(void* buffer, unsigned long uReadSize, unsig
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;
     unsigned long textureHandle = pTextureResource->m_hashID;
-    fn_8030009C(pTextureResource, &textureHandle);
-    s_loadedResourceList.Add(pTextureResource->GetHashID(), pTextureResource);
+    pTextureResource->fn_8030009C(textureHandle);
+    FEResourceManager::Instance()->AddResourceToResourceList(pTextureResource);
     pTextureResource->m_bValid = true;
     fn_802FC858(state);
 }
@@ -296,7 +295,7 @@ void FEResourceManager::LoadPermanentTextures()
                 delete[] s_pResourceLoadBuffer;
                 s_pResourceLoadBuffer = 0;
                 unsigned long textureHandle = pTextureResource->m_hashID;
-                fn_8030009C(pTextureResource, &textureHandle);
+                pTextureResource->fn_8030009C(textureHandle);
                 AddResourceToResourceList(pTextureResource);
                 pTextureResource->m_bValid = true;
                 delete[] s_pResourceLoadBuffer;
@@ -429,7 +428,7 @@ void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSi
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;
     unsigned long textureHandle = pHandle->m_hashID;
-    fn_8030009C(pHandle, &textureHandle);
+    pHandle->fn_8030009C(textureHandle);
     FEResourceManager::Instance()->AddResourceToResourceList(pHandle);
     pHandle->m_bValid = true;
 }
@@ -493,7 +492,7 @@ ResourceResult FEResourceManager::IssueTextureLoadRequest(FETextureResource* pFe
         && pFeExistingTextureResource->GetResourceType() == pFeTextureResource->GetResourceType())
     {
         unsigned long textureHandle = pFeExistingTextureResource->GetTextureHandle();
-        fn_8030009C(pFeTextureResource, &textureHandle);
+        pFeTextureResource->fn_8030009C(textureHandle);
         pFeTextureResource->m_bValid = pFeExistingTextureResource->m_bValid;
         return FERR_AlreadyLoaded;
     }

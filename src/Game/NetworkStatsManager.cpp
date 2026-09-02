@@ -13,7 +13,9 @@
 #include <string.h>
 
 extern "C" int fn_8004F594(int channel, const char* format, ...);
+extern "C" int fn_8011C1B4();
 extern "C" bool fn_8011C1D0();
+extern "C" bool fn_801EDC10();
 extern "C" int fn_8025BD88();
 extern "C" s8 fn_80336F68(s8 player, s8 machine);
 
@@ -506,29 +508,181 @@ void NetworkStatsManager_8012F378::ReportGameResult(int result,
     bool reportHome, int homeScore, int awayScore,
     const NetworkScoreSubmission* fallback)
 {
-    NetworkStatsInterface* stats = lbl_806E10EC->fn_8012170C();
-    stats->SetListener(this);
-    if (mOperation != 0)
+    if (lbl_806E10EC->fn_80121754() != 0)
     {
-        fn_8004F594(
-            16, "Already did CalculateAndReportGameResult..ignoring\n");
-        return;
-    }
+        int points = 0;
+        bool won = false;
+        bool tied = false;
+        int resultPoints = 0;
+        int scorePoints = 0;
+        int bonusPoints = 0;
 
-    NetworkScoreSubmission submission;
-    memset(&submission, 0, sizeof(submission));
-    submission.mScore = result;
-    if (stats->ReportGameResult(mPersistentCategories[0], &submission, home, away, reportHome, homeScore, awayScore, fallback))
-    {
-        mOperation = 2;
-        mOperationStartTime = mCurrentTime;
+        if (fallback == 0)
+        {
+            if (!mGameResultReported)
+            {
+                points = CalculateResultPoints_80130684(result, reportHome,
+                    homeScore, awayScore, &won, &tied, &resultPoints,
+                    &scorePoints, &bonusPoints);
+                mCurrentJob = points;
+                mUnidentifiedC430 = won;
+                mUnidentifiedC431 = tied;
+                mUnidentifiedC434 = resultPoints;
+                mUnidentifiedC438 = scorePoints;
+                mUnidentifiedC43C = bonusPoints;
+            }
+            else if (result == 0)
+            {
+                fn_8004F594(16,
+                    "Already did CalculateAndReportGameResult..ignoring\n");
+                return;
+            }
+        }
+        else
+        {
+            mCurrentJob = 0;
+            mUnidentifiedC430 = false;
+            mUnidentifiedC431 = false;
+            mUnidentifiedC434 = 0;
+            mUnidentifiedC438 = 0;
+            mUnidentifiedC43C = 0;
+        }
+
+        bool restoreDisconnectLoss = result == 0 ? fn_801EDC10() : true;
+        if (fallback != 0)
+        {
+            restoreDisconnectLoss = true;
+        }
+
+        int categoryCount = UsesEuropeanRankings() ? 3 : 2;
+        int* disconnectPoints = &mUnidentifiedC41C;
+        for (int category = 0; category < categoryCount; ++category)
+        {
+            int oldPoints = mLocalStats[category].mScore;
+            int pointsScored = points;
+            bool startFresh = false;
+
+            if (category == 1)
+            {
+                if (IsNewNetworkDay(&mLocalStats[category]))
+                {
+                    fn_8004F594(16, "New day starting score fresh\n");
+                    startFresh = true;
+                }
+            }
+            else if (IsNewNetworkSeason(&mLocalStats[category]))
+            {
+                fn_8004F594(16, "New season starting score fresh\n");
+                startFresh = true;
+            }
+
+            if (startFresh)
+            {
+                mLocalStats[category].mScore = pointsScored;
+                mLocalStats[category].mWins = 0;
+                mLocalStats[category].mLosses = 0;
+                if (result != 4 && result != 3 && result != 2)
+                {
+                    if (won)
+                    {
+                        ++mLocalStats[category].mWins;
+                    }
+                    else
+                    {
+                        ++mLocalStats[category].mLosses;
+                    }
+                }
+                disconnectPoints[category] = 0;
+                mDisconnectLossPending[category] = false;
+            }
+            else if (mDisconnectLossPending[category]
+                && restoreDisconnectLoss)
+            {
+                mLocalStats[category].mScore +=
+                    pointsScored + disconnectPoints[category];
+                fn_8004F594(16, "Returning Default Disconnect Loss\n");
+                disconnectPoints[category] = 0;
+                mDisconnectLossPending[category] = false;
+                if (result == 2)
+                {
+                    --mLocalStats[category].mLosses;
+                }
+                if (result == 3 || result == 4)
+                {
+                    --mLocalStats[category].mLosses;
+                }
+                else if (won)
+                {
+                    ++mLocalStats[category].mWins;
+                    --mLocalStats[category].mLosses;
+                }
+            }
+            else
+            {
+                mLocalStats[category].mScore += pointsScored;
+                if (result != 4 && result != 3 && result != 2)
+                {
+                    if (won)
+                    {
+                        ++mLocalStats[category].mWins;
+                    }
+                    else
+                    {
+                        ++mLocalStats[category].mLosses;
+                    }
+                }
+            }
+
+            if (mLocalStats[category].mScore > 999999)
+            {
+                mLocalStats[category].mScore = 999999;
+            }
+            if (mLocalStats[category].mWins > 9999)
+            {
+                mLocalStats[category].mWins = 9999;
+            }
+            if (mLocalStats[category].mLosses > 9999)
+            {
+                mLocalStats[category].mLosses = 9999;
+            }
+            mLocalStats[category].mUnidentified14 = fn_8011C1B4();
+
+            fn_8004F594(16,
+                "ReportGameResult: pers cat %d oldPoints %d + points scored %d = new points %d IWon: %d New W:L %d:%d OneBasedRegion:%d\n",
+                category,
+                oldPoints,
+                pointsScored,
+                mLocalStats[category].mScore,
+                won,
+                mLocalStats[category].mWins,
+                mLocalStats[category].mLosses,
+                mLocalStats[category].mUnidentified14);
+
+            NetworkRankingIdentity* identity =
+                reinterpret_cast<NetworkRankingIdentity*>(
+                    &mLocalStats[category]);
+            identity->LoadLocal();
+        }
+
+        if (categoryCount == 2)
+        {
+            SubmitJob(0);
+            SubmitJob(1);
+        }
+        else if (categoryCount == 3)
+        {
+            SubmitJob(0);
+            SubmitJob(1);
+            SubmitJob(2);
+        }
     }
-    else
+    else if (lbl_806E10EC->fn_80121738() != 0)
     {
-        fn_8004F594(16,
-            "FinishedReportGameResult returned error cat %d\n",
-            mPersistentCategories[0]);
-        mStatsError = true;
+        NetworkStatsReporter_8012CE20* stats =
+            lbl_806E10EC->fn_80121738();
+        stats->ReportGameResult(0,
+            reinterpret_cast<const NetworkScoreSubmission*>(result), home,
+            away, reportHome, homeScore, awayScore, 0);
     }
 }
 

@@ -1,15 +1,30 @@
-#include "Game/Physics/PhysicsObject.h"
+#include "Game/Physics/PhysicsSphere.h"
+
+struct KoopaShellObject;
+
+class PhysicsSphere_801709D0 : public PhysicsSphere
+{
+public:
+    virtual ~PhysicsSphere_801709D0();
+    virtual int GetObjectType() const;
+    virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
+    virtual void PreCollide();
+    virtual ContactType Contact(PhysicsObject*, dContact*, int);
+
+    /* 0x38 */ void* mUnidentified038;
+    /* 0x3C */ KoopaShellObject* mObject;
+};
 
 extern const float lbl_806E49B0;
 extern const float lbl_806E49B4;
 extern const float lbl_806E49B8;
 
-extern "C" bool fn_801711C0(PhysicsObject* object, dContact* contact,
+bool PhysicsSphere_801709D0::SetContactInfo(dContact* contact,
     PhysicsObject*, bool setDefault)
 {
     if (setDefault)
     {
-        object->SetDefaultContactInfo(contact);
+        SetDefaultContactInfo(contact);
     }
 
     contact->surface.bounce = lbl_806E49B4;
@@ -18,25 +33,15 @@ extern "C" bool fn_801711C0(PhysicsObject* object, dContact* contact,
     return true;
 }
 
-extern "C" void fn_80171210(PhysicsObject*)
+void PhysicsSphere_801709D0::PreCollide()
 {
 }
 
-extern "C" int fn_80171214(const PhysicsObject*)
+int PhysicsSphere_801709D0::GetObjectType() const
 {
     return 0x22;
 }
 
-extern "C" PhysicsObject* fn_8017121C(
-    PhysicsObject* object, int shouldDelete)
+PhysicsSphere_801709D0::~PhysicsSphere_801709D0()
 {
-    if (object != 0)
-    {
-        object->PhysicsObject::~PhysicsObject();
-        if (shouldDelete > 0)
-        {
-            ::operator delete(object);
-        }
-    }
-    return object;
 }

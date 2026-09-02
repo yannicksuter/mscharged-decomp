@@ -103,6 +103,7 @@ struct GoalieSaveData
 class Goalie : public cPlayer
 {
 public:
+    virtual void UnidentifiedVirtual1C();
     virtual void CollideWithBallCallback(cBall* pBall);
     virtual void CollideWithCharacterCallback(
         CollisionPlayerPlayerData* pData);

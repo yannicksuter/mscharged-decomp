@@ -75,6 +75,7 @@ struct LooseBallContactAnimInfo
 }; // total size: 0xC
 
 class cFielder;
+class WaluigiWallManager_80178400;
 void fn_80048870(cFielder* pFielder);
 const LooseBallContactAnimInfo* GetOneTimerIdleGroundContactAnims();
 int GetNumOneTimerIdleGroundContactAnims();
@@ -133,7 +134,9 @@ class cFielder : public cPlayer
 
 public:
     virtual ~cFielder();
+    virtual void PrePhysicsUpdate();
     virtual void PreUpdate(float fTime);
+    virtual void UnidentifiedVirtual1C();
     virtual bool CanPickupBall(cBall* pBall, bool bParam);
     virtual void CollideWithCharacterCallback(
         CollisionPlayerPlayerData* pData);
@@ -414,7 +417,7 @@ public:
     /* 0x3FC */ float mUnidentified3FC;
 
 public:
-    /* 0x400 */ void* mUnidentified400;
+    /* 0x400 */ WaluigiWallManager_80178400* mUnidentified400;
 
 private:
     /* 0x404 */ u8 mUnknown404[0x04];

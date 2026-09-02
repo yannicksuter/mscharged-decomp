@@ -25,7 +25,7 @@ static GPResult gpiProcessPeerInitiatingConnection(GPConnection* connection,
   GPIConnection* iconnection = (GPIConnection*)*connection;
   // int state;
   char* str = NULL;
-  // int len;
+  int len;
   GPIBool connClosed;
   GPIProfile* pProfile;
   GPResult result;
@@ -112,8 +112,8 @@ static GPResult gpiProcessPeerInitiatingConnection(GPConnection* connection,
   case GPI_PEER_WAITING: {
     // Check for a response.
     ////////////////////////
-    // CHECK_RESULT(gpiRecvToBuffer(connection, peer->sock, &peer->inputBuffer,
-    // &len, &connClosed, "PR"));
+    CHECK_RESULT(gpiRecvToBuffer(connection, peer->sock, &peer->inputBuffer,
+                                 &len, &connClosed, "PR"));
 
     // Check for a final.
     /////////////////////
@@ -128,6 +128,20 @@ static GPResult gpiProcessPeerInitiatingConnection(GPConnection* connection,
       if (strncmp(peer->inputBuffer.buffer, "\\anack\\", 7) == 0) {
         // Rejected.
         ////////////
+        peer->nackCount++;
+
+        // Is this more than once?
+        //////////////////////////
+        if (peer->nackCount > 1) {
+          // we shouldn't reach this case unless there is a problem with
+          // the server when getting a buddy's signature
+
+          // Give up already.
+          ///////////////////
+          Error(connection, GP_NETWORK_ERROR,
+                "Error getting buddy authorization.");
+        }
+
         // Try getting the latest sig.
         //////////////////////////////
         CHECK_RESULT(gpiPeerGetSig(connection, peer));
@@ -153,10 +167,8 @@ static GPResult gpiProcessPeerInitiatingConnection(GPConnection* connection,
   // Send stuff that needs to be sent.
   ////////////////////////////////////
   if (peer->outputBuffer.len > 0) {
-    // result = gpiSendFromBuffer(connection, peer->sock, &peer->outputBuffer,
-    // &connClosed, GPITrue, "PR");
-    result = gpiSendBufferToPeer(connection, peer->ip, peer->port,
-                                 &peer->outputBuffer, &connClosed, GPITrue);
+    result = gpiSendFromBuffer(connection, peer->sock, &peer->outputBuffer,
+                               &connClosed, GPITrue, "PR");
     if (connClosed || (result != GP_NO_ERROR))
       peer->state = GPI_PEER_DISCONNECTED;
   }
@@ -244,8 +256,6 @@ static GPResult gpiProcessPeerAcceptingConnection(GPConnection* connection,
         gpiAppendStringToBuffer(connection, &peer->outputBuffer, "\\anack\\");
         gpiAppendStringToBuffer(connection, &peer->outputBuffer, "\\final\\");
 
-        gpiSendBufferToPeer(connection, peer->ip, peer->port,
-                            &peer->outputBuffer, &connClosed, GPITrue);
         peer->state = GPI_PEER_DISCONNECTED;
         return GP_NO_ERROR;
       }
@@ -294,10 +304,8 @@ GPResult gpiPeerSendMessages(GPConnection* connection, GPIPeer* peer) {
 
     // Send as much as possible.
     ////////////////////////////
-    // result = gpiSendFromBuffer(connection, peer->sock, &message->buffer,
-    // &connClosed, GPIFalse, "PR");
-    result = gpiSendBufferToPeer(connection, peer->ip, peer->port,
-                                 &message->buffer, &connClosed, GPIFalse);
+    result = gpiSendFromBuffer(connection, peer->sock, &message->buffer,
+                               &connClosed, GPIFalse, "PR");
     if (connClosed || (result != GP_NO_ERROR)) {
       peer->state = GPI_PEER_DISCONNECTED;
       return GP_NO_ERROR;
@@ -333,10 +341,8 @@ static GPResult gpiProcessPeerConnected(GPConnection* connection,
   // Send stuff.
   //////////////
   if (peer->outputBuffer.len) {
-    // result = gpiSendFromBuffer(connection, peer->sock, &peer->outputBuffer,
-    // &connClosed, GPITrue, "PR");
-    result = gpiSendBufferToPeer(connection, peer->ip, peer->port,
-                                 &peer->outputBuffer, &connClosed, GPITrue);
+    result = gpiSendFromBuffer(connection, peer->sock, &peer->outputBuffer,
+                               &connClosed, GPITrue, "PR");
     if (connClosed || (result != GP_NO_ERROR)) {
       peer->state = GPI_PEER_DISCONNECTED;
       return GP_NO_ERROR;
@@ -473,8 +479,6 @@ static GPResult gpiProcessPeer(GPConnection* connection, GPIPeer* peer) {
   // This state should never get out of initialization.
   /////////////////////////////////////////////////////
   GS_ASSERT(peer->state != GPI_PEER_NOT_CONNECTED);
-  if (peer->state == GPI_PEER_NOT_CONNECTED)
-    return GP_NETWORK_ERROR;
 
   // If we're not connected yet.
   //////////////////////////////
@@ -489,7 +493,6 @@ static GPResult gpiProcessPeer(GPConnection* connection, GPIPeer* peer) {
   //////////////////////
   if ((result == GP_NO_ERROR) && (peer->state == GPI_PEER_CONNECTED)) {
     result = gpiProcessPeerConnected(connection, peer);
-    gpiCheckTimedOutPeerOperations(connection, peer);
   }
 
   return result;
@@ -502,8 +505,8 @@ void gpiDestroyPeer(GPConnection* connection, GPIPeer* peer) {
   gpiTransferPeerDestroyed(connection, peer);
 #endif
 
-  // shutdown(peer->sock, 2);
-  // closesocket(peer->sock);
+  shutdown(peer->sock, 2);
+  closesocket(peer->sock);
   freeclear(peer->inputBuffer.buffer);
   freeclear(peer->outputBuffer.buffer);
   if (peer->messages) {
@@ -569,72 +572,72 @@ void gpiRemovePeer(GPConnection* connection, GPIPeer* peer) {
   gpiDestroyPeer(connection, peer);
 }
 
+static void gpiSetPeerSocketSizes(SOCKET sock) {
+  SetReceiveBufferSize(sock, 0x4000);
+  SetReceiveBufferSize(sock, 0x8000);
+  SetReceiveBufferSize(sock, 0x10000);
+  SetReceiveBufferSize(sock, 0x20000);
+  SetReceiveBufferSize(sock, 0x40000);
+
+  SetSendBufferSize(sock, 0x4000);
+  SetSendBufferSize(sock, 0x8000);
+  SetSendBufferSize(sock, 0x10000);
+
+  GetReceiveBufferSize(sock);
+
+  GetSendBufferSize(sock);
+}
+
 GPResult gpiProcessPeers(GPConnection* connection) {
   GPIConnection* iconnection = (GPIConnection*)*connection;
   GPIPeer* nextPeer;
   GPIPeer* peer;
-  // SOCKET incoming;
+  SOCKET incoming;
   GPResult result;
 
-  /*
   // Check for incoming peer connections.
   ///////////////////////////////////////
-  if(iconnection->peerSocket != INVALID_SOCKET)
-  {
-          // Have to manually check if accept is possible since
-          // PS2 Insock only supports blocking sockets.
-          if (CanReceiveOnSocket(iconnection->peerSocket))
-          {
-                  incoming = accept(iconnection->peerSocket, NULL, NULL);
-                  if(incoming != INVALID_SOCKET)
-                  {
-                          // This is a new peer.
-                          //////////////////////
-                          peer = gpiAddPeer(connection, -1, GPIFalse);
-                          if(peer)
-                          {
-                                  peer->state = GPI_PEER_WAITING;
-                                  peer->sock = incoming;
-                                  SetSockBlocking(incoming, 0);
-                                  gpiSetPeerSocketSizes(peer->sock);
-                          }
-                          else
-                          {
-                                  closesocket(incoming);
-                          }
-                  }
-          }
+  if (iconnection->peerSocket != INVALID_SOCKET) {
+    // Have to manually check if accept is possible since
+    // PS2 Insock only supports blocking sockets.
+    if (CanReceiveOnSocket(iconnection->peerSocket)) {
+      incoming = accept(iconnection->peerSocket, NULL, NULL);
+      if (incoming != INVALID_SOCKET) {
+        // This is a new peer.
+        //////////////////////
+        peer = gpiAddPeer(connection, -1, GPIFalse);
+        if (peer) {
+          peer->state = GPI_PEER_WAITING;
+          peer->sock = incoming;
+          SetSockBlocking(incoming, 0);
+          gpiSetPeerSocketSizes(peer->sock);
+        } else {
+          closesocket(incoming);
+        }
+      }
+    }
   }
-  */
-  gsUdpEngineThink();
+
   // Got through the list of peers.
   /////////////////////////////////
   for (peer = iconnection->peerList; peer != NULL; peer = nextPeer) {
     // Store the next peer.
     ///////////////////////
     nextPeer = peer->pnext;
-    if (peer->state == GPI_PEER_DISCONNECTED) {
+
+    // Process the peer.
+    ////////////////////
+    result = gpiProcessPeer(connection, peer);
+
+    // Check for a disconnection or a timeout.
+    //////////////////////////////////////////
+    if ((peer->state == GPI_PEER_DISCONNECTED) || (result != GP_NO_ERROR) ||
+        (time(NULL) > peer->timeout)) {
       // Remove it.
       /////////////
-      // gsDebug
       gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_Notice,
                     "Peer disconnected, pid: %d", peer->profile);
       gpiRemovePeer(connection, peer);
-    } else {
-      // Process the peer.
-      ////////////////////
-      result = gpiProcessPeer(connection, peer);
-
-      // Check for a disconnection or a timeout.
-      //////////////////////////////////////////
-      if ((peer->state == GPI_PEER_DISCONNECTED) || (result != GP_NO_ERROR) ||
-          (time(NULL) > peer->timeout)) {
-        // Remove it.
-        /////////////
-        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_Notice,
-                      "Peer disconnected, pid: %d", peer->profile);
-        gpiRemovePeer(connection, peer);
-      }
     }
   }
 
@@ -652,31 +655,6 @@ GPIPeer* gpiGetPeerByProfile(const GPConnection* connection, int profileid) {
     // Check for a match.
     /////////////////////
     if (pcurr->profile == profileid) {
-      // Got it.
-      //////////
-      return pcurr;
-    }
-  }
-
-  return NULL;
-}
-
-// NOTE: use this function only when in a UDP layer callback
-GPIPeer* gpiGetPeerByAddr(const GPConnection* connection, unsigned int ip,
-                          unsigned short port) {
-  GPIConnection* iconnection = (GPIConnection*)*connection;
-  GPIPeer* pcurr;
-
-  GS_ASSERT(ip);
-  GS_ASSERT(port);
-  if (!ip && !port)
-    return NULL;
-  // Go through the list of peers.
-  ////////////////////////////////
-  for (pcurr = iconnection->peerList; pcurr != NULL; pcurr = pcurr->pnext) {
-    // Check for a match.
-    /////////////////////
-    if (pcurr->ip == ip && pcurr->port == port) {
       // Got it.
       //////////
       return pcurr;
@@ -715,7 +693,7 @@ GPIPeer* gpiAddPeer(GPConnection* connection, int profileid, GPIBool initiate) {
   memset(peer, 0, sizeof(GPIPeer));
   peer->state = GPI_PEER_NOT_CONNECTED;
   peer->initiated = initiate;
-  // peer->sock = INVALID_SOCKET;
+  peer->sock = INVALID_SOCKET;
   peer->profile = profileid;
   peer->timeout = (time(NULL) + GPI_PEER_TIMEOUT);
   peer->pnext = iconnection->peerList;
@@ -753,15 +731,30 @@ GPResult gpiPeerStartConnect(GPConnection* connection, GPIPeer* peer) {
   if (!gpiGetProfile(connection, peer->profile, &profile))
     Error(connection, GP_NETWORK_ERROR, "Error connecting to a peer.");
 
-  // Setup the address.
-  /////////////////////
-  memset(&address, 0, sizeof(struct sockaddr_in));
-  address.sin_family = AF_INET;
-  address.sin_addr.s_addr = peer->ip;
-  address.sin_port = peer->port;
-
   // Create the socket.
   /////////////////////
+  peer->sock = socket(AF_INET, SOCK_STREAM, 0);
+  if (peer->sock == INVALID_SOCKET)
+    CallbackError(connection, GP_NETWORK_ERROR, GP_NETWORK,
+                  "There was an error creating a socket.");
+
+  // Make it non-blocking.
+  ////////////////////////
+  rcode = SetSockBlocking(peer->sock, 0);
+  if (rcode == 0)
+    CallbackError(connection, GP_NETWORK_ERROR, GP_NETWORK,
+                  "There was an error making a socket non-blocking.");
+
+  // Set the socket sizes.
+  ////////////////////////
+  gpiSetPeerSocketSizes(peer->sock);
+
+  // Connect the socket.
+  //////////////////////
+  memset(&address, 0, sizeof(address));
+  address.sin_family = AF_INET;
+  address.sin_addr.s_addr = profile->buddyStatus->ip;
+  address.sin_port = (gsi_u16)profile->buddyStatus->port;
   rcode = connect(peer->sock, (struct sockaddr*)&address,
                   sizeof(struct sockaddr_in));
   if (gsiSocketIsError(rcode)) {

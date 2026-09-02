@@ -225,8 +225,10 @@ extern "C" nlVector3* fn_800D1C4C(
 extern "C" float fn_800D1C80(
     const nlVector2* first, const nlVector2* second)
 {
-    nlVector2 delta;
-    nlVec2Sub(delta, *first, *second);
+    nlVector2 delta = {
+        first->x - second->x,
+        first->y - second->y,
+    };
     return nlVec2Length(delta);
 }
 
@@ -314,8 +316,9 @@ void DesireSuperPower::UnidentifiedVirtual7(
         DesireSuperPower* copy
             = (DesireSuperPower*)((u8*)data - offset);
         *(int*)&copy->mpDKShockAvoidable = -1;
+        cFielder* target = mpTarget;
         *(int*)&copy->mpTarget
-            = mpTarget == NULL ? -1 : mpTarget->mUnidentified120;
+            = target == NULL ? -1 : target->mUnidentified120;
         fn_80339450(cache, sDesireSuperPowerType, data, context);
     }
 }

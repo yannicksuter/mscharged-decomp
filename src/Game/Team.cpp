@@ -68,9 +68,9 @@ int cTeam::SetCurrentPowerUp(
         if (m_ePowerupList[a].eType == POWER_UP_NONE && !bGivenNewPowerup)
         {
             m_ePowerupList[a].eType = eNewPowerUpType;
-            bGivenNewPowerup = 1;
             m_ePowerupList[a].nnumOfPowerups = nnumOfPowerups;
             m_ePowerupList[a].bIsNew = 1;
+            bGivenNewPowerup = 1;
         }
     }
     return bGivenNewPowerup;

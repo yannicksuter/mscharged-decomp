@@ -816,14 +816,24 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
     for (i = 0; i < 4; i++)
     {
         cFielder* pFielder = team->GetFielder(i);
-        if (fn_800DEFD4(pFielder)
-            && (g_pBall->meBallState == 5 || g_pBall->meBallState == 3)
-            && g_pBall->m_pPassTarget != 0)
+        do
         {
-            av3FielderAILocs[i] = g_pBall->m_v3PassIntercept;
-        }
-        else
-        {
+            if (fn_800DEFD4(pFielder))
+            {
+                bool bStolen = false;
+                bool bAirborne = g_pBall->meBallState == 5
+                    || g_pBall->meBallState == 3;
+                if (bAirborne && g_pBall->m_pPassTarget != 0)
+                {
+                    bStolen = true;
+                }
+                if (bStolen)
+                {
+                    av3FielderAILocs[i] = g_pBall->m_v3PassIntercept;
+                    break;
+                }
+            }
+
             bool bHasGlobalPad = pFielder->GetGlobalPad() != 0;
             if (bHasGlobalPad)
             {
@@ -835,7 +845,7 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
                 nlVec3ScaleAdd(av3FielderAILocs[i], 0.1f,
                     pFielder->m_v3Velocity, pFielder->m_v3Position);
             }
-        }
+        } while (false);
 
         FieldLocToAILoc(av3FielderAILocs[i], av3FielderAILocs[i], team->m_nSide);
     }

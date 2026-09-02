@@ -14,6 +14,7 @@ void FEAnimation::AnimateTargetAtTimeWithFloat(float fCurrentTime)
 {
     fAnimationKeyframe* currentFrame;
     float fAnimatedResult;
+    float fMu;
 
     currentFrame = nlDLRingGetStart<fAnimationKeyframe>((fAnimationKeyframe*)m_DLRingHead);
     if (currentFrame != currentFrame->m_next)
@@ -29,20 +30,21 @@ void FEAnimation::AnimateTargetAtTimeWithFloat(float fCurrentTime)
                 }
             }
 
-            float fTime = currentFrame->pKeyFrameData.m_fTime;
-            if (fCurrentTime == fTime)
+            if (fCurrentTime == currentFrame->pKeyFrameData.m_fTime)
             {
                 fAnimatedResult = currentFrame->pKeyFrameData.m_fPoint;
             }
-            else if (!(fCurrentTime > fTime) || currentFrame->pKeyFrameData.m_fControl1 != -1.0f)
+            else if (!(fCurrentTime > currentFrame->pKeyFrameData.m_fTime)
+                     || currentFrame->pKeyFrameData.m_fControl1 != -1.0f)
             {
                 float fPrevTime = currentFrame->m_prev->pKeyFrameData.m_fTime;
+                fMu = (fCurrentTime - fPrevTime) / (currentFrame->pKeyFrameData.m_fTime - fPrevTime);
                 float controlPoints[4];
                 controlPoints[0] = currentFrame->m_prev->pKeyFrameData.m_fPoint;
                 controlPoints[1] = currentFrame->m_prev->pKeyFrameData.m_fControl1;
                 controlPoints[2] = currentFrame->m_prev->pKeyFrameData.m_fControl2;
                 controlPoints[3] = currentFrame->pKeyFrameData.m_fPoint;
-                fAnimatedResult = nlBezier(controlPoints, 3, (fCurrentTime - fPrevTime) / (fTime - fPrevTime));
+                fAnimatedResult = nlBezier(controlPoints, 3, fMu);
             }
             else
             {
@@ -100,16 +102,17 @@ void FEAnimation::AnimateTargetAtTimeWithVector3(float fCurrentTime)
         }
     }
 
-    float currentTime = currentFrame->pKeyFrameDataX.m_fTime;
-    if (fCurrentTime == currentTime)
+    if (fCurrentTime == currentFrame->pKeyFrameDataX.m_fTime)
     {
         result[0] = currentFrame->pKeyFrameDataX.m_fPoint;
         result[1] = currentFrame->pKeyFrameDataY.m_fPoint;
         result[2] = currentFrame->pKeyFrameDataZ.m_fPoint;
     }
-    else if (!(fCurrentTime > currentTime) || currentFrame->pKeyFrameDataX.m_fControl1 != -1.0f)
+    else if (!(fCurrentTime > currentFrame->pKeyFrameDataX.m_fTime)
+             || currentFrame->pKeyFrameDataX.m_fControl1 != -1.0f)
     {
         float prevTime = currentFrame->m_prev->pKeyFrameDataX.m_fTime;
+        fMu = (fCurrentTime - prevTime) / (currentFrame->pKeyFrameDataX.m_fTime - prevTime);
 
         float controlPointsX[4];
         controlPointsX[0] = currentFrame->m_prev->pKeyFrameDataX.m_fPoint;
@@ -129,7 +132,6 @@ void FEAnimation::AnimateTargetAtTimeWithVector3(float fCurrentTime)
         controlPointsZ[2] = currentFrame->m_prev->pKeyFrameDataZ.m_fControl2;
         controlPointsZ[3] = currentFrame->pKeyFrameDataZ.m_fPoint;
 
-        fMu = (fCurrentTime - prevTime) / (currentTime - prevTime);
         result[0] = nlBezier(controlPointsX, 3, fMu);
         result[1] = nlBezier(controlPointsY, 3, fMu);
         result[2] = nlBezier(controlPointsZ, 3, fMu);
@@ -158,10 +160,7 @@ void FEAnimation::AnimateTargetAtTimeWithVector3(float fCurrentTime)
     case eAnimColor:
     {
         nlColour newColour;
-        newColour.c[2] = (u8)result[2];
-        newColour.c[1] = (u8)result[1];
-        newColour.c[0] = (u8)result[0];
-        newColour.c[3] = 255;
+        nlColourSet(newColour, (u8)result[0], (u8)result[1], (u8)result[2], 255);
         m_pTLInstanceTarget->SetAssetColour(newColour);
         break;
     }

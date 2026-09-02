@@ -135,6 +135,7 @@ class GoalieTweaks : public TweaksBase
 public:
     GoalieTweaks(const char* name, const char* category);
     virtual ~GoalieTweaks();
+    void fn_800277A0();
     virtual void Init();
 
     /* 0x044 */ TweakValue_804F4DC8 fJoggingSpeed;

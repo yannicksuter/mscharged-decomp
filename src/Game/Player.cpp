@@ -3,16 +3,42 @@
 #include "Game/Player.h"
 
 #include "Game/AI/AIPad.h"
+#include "Game/AI/DesireSteering.h"
+#include "Game/AI/SpaceSearch.h"
 #include "Game/AnimInventory.h"
 #include "Game/Ball.h"
+#include "Game/EventDataTypes.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsCharacter.h"
+#include "Game/Render/NPCManager.h"
+#include "Game/SAnim/pnFeather.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/SAnim/pnSingleAxisBlender.h"
+#include "Game/Sys/audio.h"
 #include "NL/globalpad.h"
 
-extern "C" void fn_80015C38(cBall*, int);
+extern "C" cPlayer* fn_80096514(
+    cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
+    nlVector3* pPosition, bool bParam);
+extern "C" nlVector3 fn_800A6AC8(
+    cTeam* pTeam, const nlVector3* v3ReferencePos);
+extern "C" nlVector3 fn_800A6B84(
+    cTeam* pTeam, const nlVector3* v3ReferencePos);
+extern "C" void* fn_80336D90(void* pData);
+extern "C" void fn_801B59DC(
+    UnidentifiedObject_801B535C* pObject, bool bParam);
+extern "C" void fn_801BCC38(cCharacter*);
+extern "C" void fn_801BCE2C(cCharacter*);
+
+void cPlayer::SetSpaceSearch(SpaceSearch* pSpaceSearch)
+{
+    if (m_pSpaceSearch != NULL)
+    {
+        delete m_pSpaceSearch;
+    }
+    m_pSpaceSearch = pSpaceSearch;
+}
 
 void cPlayer::SetAnimID(int animID)
 {
@@ -64,6 +90,18 @@ cGlobalPad* cPlayer::GetGlobalPad()
     return NULL;
 }
 
+void* cPlayer::fn_800972CC()
+{
+    cGlobalPad* pGlobalPad
+        = m_pController != NULL ? m_pController->m_pGlobalPad : NULL;
+    void* pResult = NULL;
+    if (pGlobalPad != NULL)
+    {
+        pResult = fn_80336D90(pGlobalPad->mUnidentified040);
+    }
+    return pResult;
+}
+
 void cPlayer::ReleaseBall(int nParam)
 {
     m_pPhysicsCharacter->ReleaseObject();
@@ -73,6 +111,77 @@ void cPlayer::ReleaseBall(int nParam)
     {
         g_pBall->m_bVisible = true;
     }
+}
+
+void cPlayer::PlayAttackReactionSounds(float fScale)
+{
+}
+
+void cPlayer::fn_80096CDC(cBall* pBall)
+{
+    if (m_pBall == NULL && pBall != NULL && m_eClassType == FIELDER)
+    {
+        DesireSteering* pDesire
+            = (DesireSteering*)fn_8002E08C((cFielder*)this, 34);
+        fn_800C574C(pDesire);
+    }
+    m_pBall = pBall;
+}
+
+void cPlayer::ClearPowerupAnimState(bool bIsEndGame)
+{
+    m_pPowerupLayer->BeginBlendOut(0.25f);
+}
+
+void cPlayer::fn_800974B0()
+{
+    if (m_eClassType == GOALIE)
+    {
+        fn_801BCC38(this);
+    }
+    else
+    {
+        fn_801BCE2C(this);
+    }
+    m_tFireTimer.m_unk0 = m_tFireTimer.m_uPackedTime != 0;
+    m_tFireTimer.m_uPackedTime = 0;
+}
+
+bool cPlayer::fn_800976C4()
+{
+    return m_pPowerupLayer->GetChild(1) != NULL;
+}
+
+cFielder* cPlayer::GetClosestOpponentFielder(
+    nlVector3* pPosition, bool bParam)
+{
+    return (cFielder*)::fn_80096514(
+        this, m_pTeam->GetOtherTeam(), 4, pPosition, bParam);
+}
+
+cPlayer* cPlayer::fn_800966AC(nlVector3* pPosition, bool bParam)
+{
+    return ::fn_80096514(
+        this, m_pTeam->GetOtherTeam(), 5, pPosition, bParam);
+}
+
+cPlayer* cPlayer::fn_8009670C(nlVector3* pPosition, bool bParam)
+{
+    return ::fn_80096514(this, m_pTeam, 5, pPosition, bParam);
+}
+
+nlVector3 cPlayer::GetAIOffNetLocation(const nlVector3* v3ReferencePos)
+{
+    return ::fn_800A6AC8(
+        m_pTeam,
+        v3ReferencePos != NULL ? v3ReferencePos : &m_v3Position);
+}
+
+nlVector3 cPlayer::GetAIDefNetLocation(const nlVector3* v3ReferencePos)
+{
+    return ::fn_800A6B84(
+        m_pTeam,
+        v3ReferencePos != NULL ? v3ReferencePos : &m_v3Position);
 }
 
 void cPlayer::CollideWithWallCallback(const CollisionPlayerWallData* pData)
@@ -85,18 +194,18 @@ void cPlayer::CollideWithWallCallback(const CollisionPlayerWallData* pData)
     {
         return;
     }
-    if (m_eCharacterClass == MYSTERY)
-    {
-        m_ResetBaseBallOrientation = true;
-        m_eBallRotationMode = BRM_ANIMATED;
-    }
-    else
+    if (m_eCharacterClass != MYSTERY)
     {
         m_eBallRotationMode = BRM_MATCH_VELOCITY;
         if (m_pBall != NULL)
         {
             m_ResetBaseBallOrientation = true;
         }
+    }
+    else
+    {
+        m_ResetBaseBallOrientation = true;
+        m_eBallRotationMode = BRM_ANIMATED;
     }
 }
 
@@ -166,15 +275,50 @@ void cPlayer::PreUpdate(float dt)
     m_bCanTestController = true;
 }
 
-void cPlayer::PrePhysicsUpdate(float dt)
+void cPlayer::PrePhysicsUpdate()
 {
     m_pPoseAccumulator->SetBuildNodeMatrixCallback(
         m_nHeadJointIndex, NULL, 0, 0);
-    cCharacter::PrePhysicsUpdate(dt);
+    cCharacter::PrePhysicsUpdate();
 }
 
 void cPlayer::SetNoPickUpTime(float NewNoPickUpTime)
 {
     m_pPhysicsCharacter->m_CanCollideWithBall = (NewNoPickUpTime <= 0.0f);
     m_tNoPickupTimer.SetSeconds(NewNoPickUpTime);
+}
+
+void cPlayer::UnidentifiedVirtual1C()
+{
+    cCharacter::UnidentifiedVirtual1C();
+    if (m_pPowerupLayer->GetChild(1) != NULL)
+    {
+        m_pPowerupLayer->BeginBlendOut(-1.0f);
+    }
+}
+
+extern "C" void fn_80098A68(UnidentifiedEventData_800673FC* pData)
+{
+    fn_800EBBFC(
+        pData->mUnidentified00->mUnidentified318,
+        0x9F35CA0F, NULL, NULL);
+}
+
+extern "C" void fn_80098A84(UnidentifiedEventData_800673FC* pData)
+{
+    fn_800EBBFC(
+        pData->mUnidentified00->mUnidentified318,
+        0x85EF26D0, NULL, NULL);
+}
+
+extern "C" void fn_80099030(UnidentifiedEventData00*)
+{
+    if (lbl_806E1608 != NULL)
+    {
+        lbl_806E1608->fn_801AA348();
+        if (lbl_806E1608->mUnidentified024 != NULL)
+        {
+            fn_801B59DC(lbl_806E1608->mUnidentified024, true);
+        }
+    }
 }

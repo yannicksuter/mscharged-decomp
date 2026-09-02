@@ -332,8 +332,8 @@ extern "C" void fn_802EF130(SliderState_802EE964* slider)
 
 extern "C" void fn_802EF17C(LocalSliderSet_802EE964* set)
 {
-    set->sliders = 0;
     set->field_00 = 0xFFFF;
+    set->sliders = 0;
     set->owner = 0;
 }
 

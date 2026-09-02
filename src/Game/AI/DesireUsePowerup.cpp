@@ -32,7 +32,14 @@ static unsigned short sDesireUsePowerupType = 0xFFFF;
  */
 bool DesireUsePowerup::UnidentifiedInitialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    cFielder* pTarget;
+    cTeam* pTeam;
+    bool result;
+    ePowerUpType ePowerup;
+    UnidentifiedVariantCollection* params;
+
+    result = Desire::UnidentifiedInitialize(context);
+    params = (UnidentifiedVariantCollection*)context;
 
     mbThrowingPowerup = false;
     mePowerup = POWER_UP_NONE;
@@ -44,18 +51,14 @@ bool DesireUsePowerup::UnidentifiedInitialize(void* context)
     mUnidentifiedFielder->m_nPowerupAnimID = -1;
     mUnidentified078 = -1.0f;
 
-    UnidentifiedVariantCollection* params
-        = (UnidentifiedVariantCollection*)context;
     if (params->IsSet(15))
     {
-        ePowerUpType ePowerup
-            = (ePowerUpType)params->Get(15)->mData.i;
-        cFielder* pTarget
-            = (cFielder*)params->Get(14)->mData.pPlayer;
+        ePowerup = (ePowerUpType)params->Get(15)->mData.i;
+        pTarget = (cFielder*)params->Get(14)->mData.pPlayer;
 
         if (fn_8002EDC8(mUnidentifiedFielder, -1))
         {
-            cTeam* pTeam = mUnidentifiedFielder->m_pTeam;
+            pTeam = mUnidentifiedFielder->m_pTeam;
             if (ePowerup != POWER_UP_NONE
                 && ePowerup != pTeam->GetCurrentPowerUp().eType)
             {

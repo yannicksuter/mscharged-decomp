@@ -290,9 +290,10 @@ void SaveLoad::OpenSaveForWriteCallback(s32 result)
         if (RetryEnabled && !OnlineMode)
         {
             FEPopupMenu* popup = PushSavePopup();
-            Function<FnVoidVoid> save(CheckSaveSpace);
-            Function<FnVoidVoid> cancel(CancelSave);
-            popup->Create((ePopupMenu)0x3D, save, cancel);
+            popup->Create(
+                (ePopupMenu)0x3D,
+                Function<FnVoidVoid>(CheckSaveSpace),
+                Function<FnVoidVoid>(CancelSave));
             RetryEnabled = false;
         }
         else

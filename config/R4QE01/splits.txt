@@ -934,6 +934,7 @@ unclassified/tu_801700D8.cpp:
 
 unclassified/tu_801709D0.cpp:
 	.text       start:0x801709D0 end:0x80171278
+	.data       start:0x80510818 end:0x80510848
 
 Game/Physics/PhysicsNet.cpp:
 	.text       start:0x80171298 end:0x80172790
@@ -948,13 +949,20 @@ Game/Physics/PhysicsNPC.cpp:
 	.sdata2     start:0x806E4A08 end:0x806E4A20
 
 Game/Physics/PhysicsPatch.cpp:
-	.text       start:0x80172D60 end:0x80174B38
+	.text       start:0x80172D60 end:0x80174ED4
 	.ctors      start:0x804DB668 end:0x804DB66C
 	.rodata     start:0x804DCCA0 end:0x804DCCB8
-	.data       start:0x80510888 end:0x8051099C
+	.data       start:0x80510888 end:0x80510AB8
 	.bss        start:0x805705C0 end:0x80570600
-	.sdata      start:0x806DCAB8 end:0x806DCAC0
+	.sdata      start:0x806DCAB8 end:0x806DCAD0
 	.sdata2     start:0x806E4A20 end:0x806E4A48
+
+Game/Physics/PhysicsShell.cpp:
+	.text       start:0x80174ED4 end:0x80175F6C
+	.rodata     start:0x804DCCB8 end:0x804DCCD0
+	.data       start:0x80510AB8 end:0x80510E68
+	.sdata      start:0x806DCAD0 end:0x806DCAD8
+	.sdata2     start:0x806E4A48 end:0x806E4A78
 
 unclassified/tu_80175F8C.cpp:
 	.text       start:0x80175F8C end:0x80176EF4
@@ -968,6 +976,16 @@ unclassified/tu_80175F8C.cpp:
 unclassified/tu_80176EF4.cpp:
 	.text       start:0x80176EF4 end:0x80177498
 	.ctors      start:0x804DB674 end:0x804DB678
+	.sdata2     start:0x806E4A80 end:0x806E4A98
+
+unclassified/tu_80177498.cpp:
+	.text       start:0x80177498 end:0x80179858
+	.ctors      start:0x804DB678 end:0x804DB67C
+	.data       start:0x80510FD8 end:0x805110E8
+	.bss        start:0x805708A0 end:0x805708C8
+	.sdata      start:0x806DCB10 end:0x806DCB38
+	.sbss       start:0x806E12E8 end:0x806E12F4
+	.sdata2     start:0x806E4A98 end:0x806E4AE8
 
 unclassified/tu_80179858.cpp:
 	.text       start:0x80179858 end:0x801798A8
@@ -976,6 +994,13 @@ unclassified/tu_80179858.cpp:
 
 unclassified/tu_801798A8.cpp:
 	.text       start:0x801798A8 end:0x8017A0D0
+
+unclassified/tu_8017A0F0.cpp:
+	.text       start:0x8017A0F0 end:0x8017A9EC
+	.ctors      start:0x804DB680 end:0x804DB684
+	.data       start:0x805111D0 end:0x805111F8
+	.bss        start:0x805708C8 end:0x805708F8
+	.sdata2     start:0x806E4B00 end:0x806E4B18
 
 Game/CharacterEffects.cpp:
 	.text       start:0x8017A9EC end:0x8017AB34

@@ -6,6 +6,7 @@
 
 class cBall;
 class cAIPad;
+class cFielder;
 class cGlobalPad;
 class cPN_Feather;
 class cPN_SAnimController;
@@ -29,8 +30,9 @@ class cPlayer : public cCharacter
 public:
     virtual ~cPlayer();
     virtual void PostPhysicsUpdate();
-    virtual void PrePhysicsUpdate(float dt);
+    virtual void PrePhysicsUpdate();
     virtual void PreUpdate(float dt);
+    virtual void UnidentifiedVirtual1C();
     virtual void SetAnimID(int animID);
     virtual bool CanPickupBall(cBall* pBall, bool bParam);
     virtual void CollideWithBallCallback(cBall* pBall);
@@ -46,7 +48,15 @@ public:
     void PickupBall(cBall* pBall);
     void SetNoPickUpTime(float NewNoPickUpTime);
     cGlobalPad* GetGlobalPad();
+    void* fn_800972CC();
     void SetAIPad(cAIPad* pPad);
+    void fn_80096CDC(cBall* pBall);
+    void PlayAttackReactionSounds(float fScale);
+    void ClearPowerupAnimState(bool bIsEndGame);
+    cPlayer* fn_8009670C(nlVector3* pPosition, bool bParam);
+    cFielder* GetClosestOpponentFielder(
+        nlVector3* pPosition, bool bParam);
+    cPlayer* fn_800966AC(nlVector3* pPosition, bool bParam);
     void SetSpaceSearch(SpaceSearch* pSpaceSearch);
     int GetBallJointIndex() const
     {
@@ -56,9 +66,12 @@ public:
     float DoFlashLight(const nlVector3& Position, unsigned short aDirection,
         float fAngleWeighting, float fIgnoreObjectCloserThanThis,
         float fIgnoreObjectFartherThanThis);
+    nlVector3 GetAIDefNetLocation(const nlVector3* v3ReferencePos);
     nlVector3 GetAIOffNetLocation(const nlVector3* v3ReferencePos);
+    void fn_800974B0();
     void fn_8009750C();
     void fn_80097648(float fParam);
+    bool fn_800976C4();
     cPN_SingleAxisBlender* CreateSingleAxisBlender(
         const int* pSABAnims, int nNumSABAnims, int nPrimaryAnim,
         void (*fWeightCB)(unsigned int, cPN_SingleAxisBlender*),
@@ -106,7 +119,7 @@ public:
     /* 0x270 */ Timer m_tSwapControllerTimer[16];
 
 protected:
-    /* 0x2F0 */ cPN_Feather* mUnidentified2F0;
+    /* 0x2F0 */ cPN_Feather* m_pPowerupLayer;
     /* 0x2F4 */ u8 mUnknown2F4[0x04];
 
 public:

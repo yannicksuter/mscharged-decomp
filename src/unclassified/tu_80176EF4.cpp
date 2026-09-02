@@ -1,35 +1,46 @@
-#include "Game/Physics/PhysicsObject.h"
+#include "Game/Physics/Physics.h"
+#include "unclassified/tu_80176EF4.h"
+
+PhysicsBox_80176EF4::PhysicsBox_80176EF4(
+    ThwompObject* object, float lx, float ly, float lz)
+    : PhysicsBox(g_CollisionSpace, g_PhysicsWorld, lx, ly, lz)
+    , mUnidentified038(lz)
+    , mUnidentified03C(object)
+{
+    SetCollide(0x1F062);
+    SetCategory(0x18000);
+    m_gravity = 0.0f;
+}
+
+PhysicsBox_80176EF4::~PhysicsBox_80176EF4()
+{
+}
 
 extern const float lbl_806DCB08;
 extern float lbl_806E12D8;
 extern const float lbl_806E4A80;
 
-extern "C" void fn_80177280(PhysicsObject*)
+void PhysicsBox_80176EF4::PreCollide()
 {
 }
 
-extern "C" void fn_80177284(PhysicsObject* object)
+void PhysicsBox_80176EF4::PostUpdate()
 {
-    object->PhysicsObject::PostUpdate();
+    PhysicsObject::PostUpdate();
 }
 
-extern "C" bool fn_80177288(PhysicsObject* object, dContact* contact,
-    PhysicsObject*, bool setDefault)
+bool PhysicsBox_80176EF4::SetContactInfo(dContact* contact,
+    PhysicsObject* otherObject, bool first)
 {
-    if (setDefault)
+    if (first)
     {
-        object->SetDefaultContactInfo(contact);
+        SetDefaultContactInfo(contact);
     }
 
     contact->surface.bounce = lbl_806DCB08;
     contact->surface.mu = lbl_806E12D8;
     contact->surface.bounce_vel = lbl_806E4A80;
     return true;
-}
-
-extern "C" int fn_80177450(const PhysicsObject*)
-{
-    return 0x24;
 }
 
 extern "C" void* fn_80177458(void* object, int shouldDelete)

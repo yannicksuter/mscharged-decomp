@@ -171,10 +171,9 @@ bool NPCManager::fn_801A977C()
                      : mUnidentified014.Begin();
         while (iterator.hasNext())
         {
-            NPCTemplate* pTemplate = *iterator;
-            if (!pTemplate->loaded)
+            if (!(*iterator)->loaded)
             {
-                mUnidentified01C = pTemplate;
+                mUnidentified01C = *iterator;
                 return true;
             }
             iterator.next();
@@ -188,13 +187,9 @@ void NPCManager::fn_801A9874()
     NPCTemplate* pTemplate
         = fn_801ABBDC_inline(lbl_805142BC);
 
-    PhysicsNPC* chainPhysics
-        = (PhysicsNPC*)nlMalloc(sizeof(PhysicsNPC), 8, false);
-    if (chainPhysics != 0)
-    {
-        chainPhysics = new (chainPhysics) PhysicsNPC(
-            lbl_8056CF08.m_pGameTweaks->fChainChompRadius);
-    }
+    PhysicsNPC* chainPhysics = new (nlMalloc(
+        sizeof(PhysicsNPC), 8, false)) PhysicsNPC(
+        lbl_8056CF08.m_pGameTweaks->fChainChompRadius);
 
     void* chainChomp = nlMalloc(0xB4, 8, false);
     if (chainChomp != 0)

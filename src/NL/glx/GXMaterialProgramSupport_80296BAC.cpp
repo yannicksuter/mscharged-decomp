@@ -1,7 +1,5 @@
 #include <revolution/gx.h>
 
-#include <string.h>
-
 #include "NL/gl/glView.h"
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
@@ -32,11 +30,27 @@ bool lbl_806DF0C1 = true;
 bool lbl_806DF0C2 = true;
 bool lbl_806DF0C3 = true;
 
-const Mtx lbl_804E8880 = {
-    { 1.0f, 0.0f, 0.0f, 0.0f },
-    { 0.0f, 1.0f, 0.0f, 0.0f },
-    { 0.0f, 0.0f, 1.0f, 0.0f },
+enum MaterialMode_80296BAC
+{
+    MATERIAL_MODE_0_80296BAC = 0,
+    MATERIAL_MODE_1_80296BAC = 1,
+    MATERIAL_MODE_2_80296BAC = 2,
+    MATERIAL_MODE_3_80296BAC = 3,
 };
+
+struct GXMaterialProgramParameters_8029FC0C
+{
+    /* 0x00 */ UnidentifiedTextureState texture0;
+    /* 0x08 */ UnidentifiedTextureState texture1;
+    /* 0x10 */ float value16;
+    /* 0x14 */ float value20;
+    /* 0x18 */ nlFloatColour colour24;
+    /* 0x28 */ float value40;
+    /* 0x2C */ float value44;
+    /* 0x30 */ int value48;
+    /* 0x34 */ int value52;
+    /* 0x38 */ int value56;
+}; // size: 0x3C
 
 nlMatrix4 lbl_8057B3B0;
 bool lbl_806E1BC8;
@@ -181,26 +195,26 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Prepare(
     fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
 }
 
-struct FloatColour_80296BAC
-{
-    float c[4];
-};
-
-static inline GXColor ConvertColour_80296BAC(
-    const FloatColour_80296BAC& source)
-{
-    GXColor colour;
-    colour.r = (unsigned char)(source.c[0] * 255.0f);
-    colour.g = (unsigned char)(source.c[1] * 255.0f);
-    colour.b = (unsigned char)(source.c[2] * 255.0f);
-    colour.a = (unsigned char)(source.c[3] * 255.0f);
-    return colour;
-}
-
 static inline float WrapTextureOffset_80296BAC(float value)
 {
-    int scaled = (int)(value * 1024.0f);
-    return (float)(scaled % 1024) * (1.0f / 1024.0f);
+    return (float)((int)(value * 1024.0f) % 1024) / 1024.0f;
+}
+
+static inline void LoadScrollingTextureMatrix_80296BAC(
+    unsigned int matrix, const nlVector2& speed)
+{
+    float time = fn_80277DB0();
+    nlVector2 offset;
+    offset.x = WrapTextureOffset_80296BAC(time * speed.x);
+    offset.y = WrapTextureOffset_80296BAC(time * speed.y);
+    Mtx textureMatrix = {
+        { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f },
+    };
+    textureMatrix[0][3] = offset.x;
+    textureMatrix[1][3] = offset.y;
+    GXLoadTexMtxImm(textureMatrix, matrix, GX_MTX3x4);
 }
 
 template <>
@@ -213,25 +227,25 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Draw(
     GXMaterialProgram_8029FC0C* program = static_cast<GXMaterialProgram_8029FC0C*>(this);
     program->BindVertexArrays(packet);
     program->BindParameters(packet);
-    unsigned char* parameters = (unsigned char*)packet->unknown20;
 
-    int mode;
-    if (*(int*)(parameters + 52) == 0 || fn_801820FC() == 0)
+    MaterialMode_80296BAC mode;
+    if (((GXMaterialProgramParameters_8029FC0C*)packet->unknown20)->value52 == 0
+        || fn_801820FC() == 0)
     {
-        mode = 0;
+        mode = MATERIAL_MODE_0_80296BAC;
     }
     else if (fn_80182104(1) != 0)
     {
-        mode = 3;
+        mode = MATERIAL_MODE_3_80296BAC;
     }
     else
     {
-        mode = 1;
-        if (fn_80182118() != 0)
-            mode = 2;
+        mode = (fn_80182118() != 0)
+            ? MATERIAL_MODE_2_80296BAC
+            : MATERIAL_MODE_1_80296BAC;
     }
 
-    if (lbl_806E1BE0[0] != mode)
+    if (mode != lbl_806E1BE0[0])
     {
         Deactivate();
         fn_80296BAC(mode);
@@ -240,35 +254,44 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Draw(
     if (lbl_806E1BE0[0] == 3)
     {
         UnidentifiedTextureState texture;
+        texture.texture = 0;
+        texture.textureIndex = 0xFFFF;
+        texture.flags = 0;
+        texture.unknown07 = 0;
         texture.texture = fn_80182EB8();
         texture.textureIndex = 0xFFFF;
-        texture.flags = 3;
+        texture.SetWrapS(true);
+        texture.SetWrapT(true);
         texture.unknown07 = 0;
         fn_8036BE88(2, &texture);
     }
 
-    float alpha = lbl_806DF0C1 ? *(float*)(parameters + 16) : 0.0f;
-    float lighting = *(float*)(parameters + 20);
-    int useTextureMatrix = *(int*)(parameters + 48);
+    float alpha = lbl_806DF0C1
+        ? ((GXMaterialProgramParameters_8029FC0C*)packet->unknown20)->value16
+        : 0.0f;
+    GXMaterialProgramParameters_8029FC0C* parameters =
+        (GXMaterialProgramParameters_8029FC0C*)packet->unknown20;
+    float lighting = parameters->value20;
+    int useTextureMatrix = parameters->value48;
 
-    FloatColour_80296BAC colour0 = { { alpha, alpha, alpha, alpha } };
-    GXColor gxColour0 = ConvertColour_80296BAC(colour0);
-    GXSetTevKColor(GX_KCOLOR0, gxColour0);
+    nlFloatColour colour0 = { { alpha, alpha, alpha, alpha } };
+    nlColour gxColour0;
+    ConvertColour(gxColour0, colour0);
+    GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&gxColour0);
 
-    FloatColour_80296BAC& colour1 = *(FloatColour_80296BAC*)(parameters + 24);
-    GXColor gxColour1 = ConvertColour_80296BAC(colour1);
-    GXSetTevKColor(GX_KCOLOR1, gxColour1);
+    nlFloatColour& colour1 = parameters->colour24;
+    nlColour gxColour1;
+    ConvertColour(gxColour1, colour1);
+    GXSetTevKColor(GX_KCOLOR1, *(GXColor*)&gxColour1);
 
-    float speedX = lbl_806DF0C2 ? *(float*)(parameters + 40) : 0.0f;
-    float speedY = lbl_806DF0C2 ? *(float*)(parameters + 44) : 0.0f;
-    float time = fn_80277DB0();
-    float offsetX = WrapTextureOffset_80296BAC(time * speedX);
-    float offsetY = WrapTextureOffset_80296BAC(time * speedY);
-    Mtx textureMatrix;
-    memcpy(textureMatrix, lbl_804E8880, sizeof(Mtx));
-    textureMatrix[0][3] = offsetX;
-    textureMatrix[1][3] = offsetY;
-    GXLoadTexMtxImm(textureMatrix, 30, GX_MTX3x4);
+    nlVector2 speed;
+    speed.x = lbl_806DF0C2
+        ? parameters->value40
+        : 0.0f;
+    speed.y = lbl_806DF0C2
+        ? parameters->value44
+        : 0.0f;
+    LoadScrollingTextureMatrix_80296BAC(30, speed);
 
     if (useTextureMatrix == 1)
         gxSetTexCoordGen(1, 0, 5, 30);
@@ -288,7 +311,8 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Draw(
     fn_80183B40(packet->matrix);
 
     bool enableState = false;
-    if (*(int*)(parameters + 56) == 1 && lbl_806DF0C3)
+    if (((GXMaterialProgramParameters_8029FC0C*)packet->unknown20)->value56 == 1
+        && lbl_806DF0C3)
         enableState = true;
 
     if (enableState)

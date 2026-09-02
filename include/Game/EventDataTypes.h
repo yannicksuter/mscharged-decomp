@@ -7,6 +7,11 @@ class cPlayer;
 class CrowdRiot;
 class PhysicsObject;
 
+struct UnidentifiedEventData_800673FC
+{
+    /* 0x00 */ cPlayer* mUnidentified00;
+}; // total size: 0x4
+
 struct UnidentifiedEventData_80066B08
 {
     /* 0x00 */ nlVector3 mUnidentified00;

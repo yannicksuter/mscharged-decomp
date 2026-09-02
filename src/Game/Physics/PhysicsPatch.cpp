@@ -18,6 +18,13 @@
 
 class EffectsGroup;
 
+struct DebugFieldType
+{
+    unsigned short size;
+    unsigned short unknown;
+    void* writer;
+};
+
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
     UnidentifiedEventRegistry;
@@ -33,7 +40,11 @@ extern "C" bool fn_800EBBFC(
 extern "C" void* fn_80338950(void*);
 extern "C" void fn_8033919C(void*, const char*);
 extern "C" void* lbl_806E2488;
+extern "C" DebugFieldType lbl_80533C98[];
 extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
+extern "C" void fn_80338F78(DebugWriteCache*);
+extern "C" void fn_80338F88(
+    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
 extern "C" void* fn_8033930C(
     DebugWriteCache*, unsigned short, void*, unsigned int);
 extern "C" void fn_80339450(
@@ -648,4 +659,37 @@ void PhysicsPatchManager_801740D0::fn_801748A0(
             fn_80339450(cache, lbl_806DCAB8, copy, context);
         }
     }
+}
+
+void PhysicsPatch::SyncLog(void* context, DebugWriteCache* cache)
+{
+    *(unsigned short*)context = fn_80338EBC(cache, "PhysicsPatch");
+
+#define REGISTER_FIELD(kind, field) \
+    fn_80338F88(cache, kind, lbl_80533C98[kind].size, (unsigned char*)&field - (unsigned char*)&m_Type, #field)
+
+    REGISTER_FIELD(14, m_Type);
+    REGISTER_FIELD(15, m_pOwner);
+    REGISTER_FIELD(17, m_fStartRadius);
+    REGISTER_FIELD(17, m_fEndRadius);
+    REGISTER_FIELD(17, m_fLifetime);
+    REGISTER_FIELD(17, m_fCurtime);
+    REGISTER_FIELD(8, m_Index);
+    REGISTER_FIELD(16, m_bVisible);
+    REGISTER_FIELD(16, m_bKillMe);
+    REGISTER_FIELD(22, m_Velocity);
+    REGISTER_FIELD(17, m_Gravity);
+    REGISTER_FIELD(15, m_pTarget);
+    REGISTER_FIELD(17, m_TargetSeekSpeed);
+    REGISTER_FIELD(17, m_fStartRadiusTime);
+    REGISTER_FIELD(17, m_fEndRadiusTime);
+    REGISTER_FIELD(16, m_bFrozen);
+    REGISTER_FIELD(17, m_FreezeTimer);
+    REGISTER_FIELD(17, m_PathSpeed);
+    REGISTER_FIELD(8, m_CurrentPathPoint);
+    REGISTER_FIELD(8, m_PathPointCount);
+
+#undef REGISTER_FIELD
+
+    fn_80338F78(cache);
 }

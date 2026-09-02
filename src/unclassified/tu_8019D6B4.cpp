@@ -6,7 +6,7 @@ class PhysicsSphere_80175F8C;
 
 extern "C" RenderObject* fn_80276360(int type, int index);
 extern "C" PhysicsSphere_80175F8C* fn_80176C18(
-    const nlVector3* position, void* owner);
+    const nlVector3* position, cCharacter* owner);
 
 static float lbl_806DCDB8 = 0.5f;
 static float lbl_806DCDBC = 1.25f;

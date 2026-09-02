@@ -147,13 +147,13 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A01CC>::Prepare(
     fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
 }
 
-static inline GXColor makeColor(const float* values)
+static inline GXColor makeColor(float r, float g, float b, float a)
 {
     GXColor colour;
-    colour.r = (unsigned char)(values[0] * 255.0f);
-    colour.g = (unsigned char)(values[1] * 255.0f);
-    colour.b = (unsigned char)(values[2] * 255.0f);
-    colour.a = (unsigned char)(values[3] * 255.0f);
+    colour.r = (unsigned char)(r * 255.0f);
+    colour.g = (unsigned char)(g * 255.0f);
+    colour.b = (unsigned char)(b * 255.0f);
+    colour.a = (unsigned char)(a * 255.0f);
     return colour;
 }
 
@@ -168,9 +168,9 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A01CC>::Draw(
     {
         UnidentifiedTextureState textureU;
         textureU.texture = lbl_806E1BEC;
+        textureU.unknown07 = 0;
         textureU.textureIndex = 0xFFFF;
         textureU.flags = 0;
-        textureU.unknown07 = 0;
         textureU.SetWrapS(true);
         textureU.SetWrapT(true);
         fn_8036BE88(1, &textureU);
@@ -179,15 +179,19 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A01CC>::Draw(
         textureV.texture = lbl_806E1BF0;
         textureV.textureIndex = 0xFFFF;
         textureV.flags = 0;
-        textureV.unknown07 = 0;
         textureV.SetWrapS(true);
         textureV.SetWrapT(true);
+        textureV.unknown07 = 0;
         fn_8036BE88(2, &textureV);
     }
     else if (lbl_806DF0C9)
     {
-        float* colour = (float*)((unsigned char*)packet->unknown20 + 8);
-        GXSetTevKColor(GX_KCOLOR0, makeColor(colour));
+        float* values = (float*)((unsigned char*)packet->unknown20 + 8);
+        float r = values[0];
+        float g = values[1];
+        float b = values[2];
+        float a = values[3];
+        GXSetTevKColor(GX_KCOLOR0, makeColor(r, g, b, a));
     }
 
     static_cast<GXMaterialProgram_802A01CC*>(this)->BindVertexArrays(packet);
