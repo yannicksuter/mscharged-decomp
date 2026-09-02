@@ -21,6 +21,7 @@ public:
 
     /* 0x78 */ TLSlide* pChildren;
     /* 0x7C */ TLSlide* m_pActiveSlide;
+    /* 0x80 */ nlVector2 m_BoxSize;
 };
 
 #endif // _TLCOMPONENT_H_

@@ -12,6 +12,7 @@ enum SceneList
     SCENE_CHOOSE_SIDEKICKS_DOMINATION = 3,
     SCENE_CHOOSE_CAPTAINS_STRIKER_CUP = 6,
     SCENE_CHOOSE_SIDEKICKS_STRIKER_CUP = 7,
+    SCENE_SUPER_LOADING = 17,
 };
 
 enum ScreenMovement
@@ -23,8 +24,8 @@ enum ScreenMovement
 
 struct SceneEntry
 {
-    u32 sceneId;
-    const char* filename;
+    SceneList mSceneID;
+    const char* mFenFileName;
 }; // size 0x8
 
 extern SceneEntry SceneEntryTable[];
@@ -34,19 +35,25 @@ class BaseGameSceneManager
 public:
     BaseGameSceneManager();
     virtual ~BaseGameSceneManager();
-    virtual BaseSceneHandler* Push(SceneList scene, ScreenMovement movement, bool popFirst);
+    virtual BaseSceneHandler* Push(SceneList newscene, ScreenMovement movement, bool popfirst);
     BaseSceneHandler* GetScene(SceneList scene);
+    BaseSceneHandler* GetCurrentScene()
+    {
+        return mCurrentStackDepth != 0 ? mBaseSceneHandlerStack[mCurrentStackDepth - 1] : 0;
+    }
     virtual void Pop();
     void PopEntireStack();
-    int GetSceneType(BaseSceneHandler* handler);
+    void fn_801C5FB8(SceneList scene);
+    SceneList GetSceneType(BaseSceneHandler* scene);
     bool IsOnStack(SceneList scene);
-    void PushLoadingScene(bool push);
+    const char* GetFileName(SceneList scene);
+    void PushLoadingScene(bool popfirst);
 
     static const u32 MAX_SCENE_DEPTH = 32;
 
     /* 0x04 */ u32 mCurrentStackDepth;
-    /* 0x08 */ SceneList mSceneStack[MAX_SCENE_DEPTH];
-    /* 0x88 */ BaseSceneHandler* mSceneHandlerStack[MAX_SCENE_DEPTH];
+    /* 0x08 */ SceneList m_sceneStack[MAX_SCENE_DEPTH];
+    /* 0x88 */ BaseSceneHandler* mBaseSceneHandlerStack[MAX_SCENE_DEPTH];
 }; // size 0x108
 
 #endif // GAME_BASE_GAME_SCENE_MANAGER_H

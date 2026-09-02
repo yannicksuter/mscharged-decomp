@@ -2030,7 +2030,7 @@ extern "C"
     void GXCopyDisp(void*, unsigned char);
     void GXPokeColorUpdate(unsigned char);
     void GXPokeBlendMode(int, int, int, int);
-    void fn_803A38E4(unsigned short, unsigned short, unsigned long);
+    void GXPokeARGB(unsigned short, unsigned short, unsigned long);
     void VIWaitForRetrace();
     void VISetBlack(unsigned char);
     void VIFlush();
@@ -2198,7 +2198,7 @@ static void DisplayMessage(int imagewidth, int imageheight, const unsigned char*
             j = 0;
             while (j < 0x280)
             {
-                fn_803A38E4((unsigned short)j, (unsigned short)i, 0);
+                GXPokeARGB((unsigned short)j, (unsigned short)i, 0);
                 j++;
             }
             i++;
@@ -2216,7 +2216,7 @@ static void DisplayMessage(int imagewidth, int imageheight, const unsigned char*
                 int pixel = x - xStart;
                 if ((row[pixel / 8] & (1 << (pixel % 8))) != 0)
                 {
-                    fn_803A38E4((unsigned short)x, (unsigned short)y, color);
+                    GXPokeARGB((unsigned short)x, (unsigned short)y, color);
                 }
                 x++;
             }
