@@ -780,7 +780,7 @@ bool AxVoice::UpdateAxVe() {
             }
 
             pbVe.currentVolume = initVol;
-            pbVe.currentDelta = (targetVol - initVol) / (AX_VOICE_MAX + 32);
+            pbVe.currentDelta = (targetVol - initVol) / AX_VOICE_MAX;
             AXSetVoiceVe(mVpb[j][i], &pbVe);
 
             if (targetVol != initVol) {

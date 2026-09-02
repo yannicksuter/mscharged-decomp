@@ -30,6 +30,13 @@ template <typename T> inline T BitExtract(T bits, int pos, int len) {
     return (bits >> pos) & mask;
 }
 
+inline byte4_t ReverseEndian(byte4_t x) {
+    return BitExtract(x, 0, 8) << 24 | BitExtract(x, 8, 8) << 16 | BitExtract(x, 16, 8) << 8 |
+           BitExtract(x, 24, 8);
+}
+
+inline byte2_t ReverseEndian(byte2_t x) { return BitExtract(x, 0, 8) << 8 | BitExtract(x, 8, 8); }
+
 inline u32 GetIntPtr(const void* pPtr) { return reinterpret_cast<u32>(pPtr); }
 
 template <typename T> inline const void* AddOffsetToPtr(const void* base, T offset) {
