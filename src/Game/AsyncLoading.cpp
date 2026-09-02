@@ -17,6 +17,7 @@
 #include "Game/Render/FlareHandler.h"
 #include "Game/ReplayChoreo.h"
 #include "Game/ReplayManager.h"
+#include "Game/ResourceInterface_802CC094.h"
 #include "Game/SAnim.h"
 #include "Game/SAnim/pnBlender.h"
 #include "Game/SAnim/pnFeather.h"
@@ -42,15 +43,6 @@
 #define OS_BUS_CLOCK_SPEED           (*(volatile u32*)0x800000F8)
 #define OS_TIME_SPEED                (OS_BUS_CLOCK_SPEED / 4)
 #define OSTicksToMilliseconds(ticks) ((ticks) / (OS_TIME_SPEED / 1000))
-
-class ResourceInterface_802CC094
-{
-public:
-    virtual void fn_08();
-    virtual unsigned long MarkResource();
-    virtual void ReleaseResource(unsigned long marker);
-    virtual unsigned long GetFreeMemory();
-};
 
 class FEResourceManager : public nlTask,
                           public nlSingleton<FEResourceManager>
@@ -152,7 +144,7 @@ extern "C" void fn_801A5328();
 extern "C" void fn_80183E4C();
 extern "C" void fn_802DB9C4(void*);
 extern "C" void fn_8017A450();
-extern "C" void fn_801C4D40();
+extern "C" bool fn_801C4D40();
 extern "C" void fn_801C4CBC();
 extern "C" void fn_8033C4E4(ScreenTransitionManager*);
 extern "C" void fn_801379AC();

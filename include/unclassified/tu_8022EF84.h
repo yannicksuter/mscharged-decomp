@@ -20,8 +20,8 @@ public:
     virtual void fn_801E6CB4(int value);
     virtual void fn_8022F194(TLComponentInstance* instance);
     virtual bool fn_8022F2E0(TU80300104Event event, float fDeltaT);
-    virtual void fn_801D2BE8(bool value);
-    virtual void fn_801D2BE0(bool value);
+    virtual void fn_801D2BE8(bool value) { mUnidentifiedCF = value; }
+    virtual void fn_801D2BE0(bool value) { mUnidentifiedD0 = value; }
 
     /* 0x0B4 */ int mUnidentifiedB4;
     /* 0x0B8 */ float mUnidentifiedB8;

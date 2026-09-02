@@ -27,7 +27,7 @@ extern "C" void fn_801B3EF4(u8* enabled);
 extern "C" void fn_801B3F2C(u8* enabled);
 extern "C" int fn_8024891C();
 extern "C" void fn_802C80FC();
-extern "C" void fn_803A38E4(u16 x, u16 y, u32 colour);
+extern "C" void GXPokeARGB(u16 x, u16 y, u32 colour);
 
 void EndFrameTask::Run(float)
 {
@@ -74,14 +74,14 @@ void EndFrameTask::Run(float)
         {
             for (int x = 0; x < 640; ++x)
             {
-                fn_803A38E4(x, 0, -1);
-                fn_803A38E4(x, 479, -1);
+                GXPokeARGB(x, 0, -1);
+                GXPokeARGB(x, 479, -1);
             }
 
             for (int y = 0; y < 480; ++y)
             {
-                fn_803A38E4(0, y, -1);
-                fn_803A38E4(639, y, -1);
+                GXPokeARGB(0, y, -1);
+                GXPokeARGB(639, y, -1);
             }
         }
     }

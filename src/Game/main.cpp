@@ -4,6 +4,7 @@
 #include "Game/ComUpdateTask.h"
 #include "Game/Debug/FrameCounter.h"
 #include "Game/FrontEndTask.h"
+#include "Game/FE/feHelpFuncs.h"
 #include "Game/ResetTask.h"
 #include "Game/Render/Wiper.h"
 #include "Game/Sys/audio.h"
@@ -115,12 +116,11 @@ struct UnidentifiedWarbleVertexList
 
 extern "C"
 {
-    u32 fn_8040C5B4();
+    u32 SCGetSimpleAddressID();
     bool fn_80368E00(const PlatformFileSystemConfig*);
     bool fn_802C7FD0(void (*)());
     void fn_801BF87C(int);
     void fn_801BFA84(int);
-    void fn_801CC008();
     void fn_801FC2A4(bool);
     void fn_802C7018(void*, const void*, u32);
     void fn_802E22D8(void*, float*, void*, void*, int, int, int);
@@ -282,7 +282,7 @@ extern "C" bool fn_8011C1D0()
     }
     else
     {
-        country = fn_8040C5B4();
+        country = SCGetSimpleAddressID();
         country &= 0xFF000000;
         if (country == 0 || country == 0xFF000000)
         {
@@ -360,7 +360,7 @@ extern "C" void fn_8011C4E8()
     const u32 state = nlTaskManager::m_pInstance->mCurrentState;
     if (state == 4 || state == 1)
     {
-        fn_801CC008();
+        EnableAutoPressed();
     }
 }
 
