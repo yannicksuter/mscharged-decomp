@@ -2,6 +2,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/NetworkSession.h"
+#include "Game/Pad/FlickDetection.h"
 #include "types.h"
 
 float g_fFixedUpdateTick = 0.02f;
@@ -15,7 +16,6 @@ extern "C" bool fn_80287AB0(void*);
 extern "C" void fn_802C084C(void*, int);
 extern "C" void fn_802C07AC(void*, float);
 extern "C" void fn_8037537C(void*);
-extern "C" void fn_80137668();
 extern "C" int fn_803328B4(void*);
 extern "C" void fn_803328FC(void*);
 extern "C" bool fn_80332A00(void*);
@@ -179,7 +179,7 @@ void FixedUpdateTask::Run(float dt)
             fn_802C084C(lbl_806E1E28, 1);
             fn_8037537C(lbl_806E2478);
             fn_802C07AC(lbl_806E1E28, g_fFixedUpdateTick);
-            fn_80137668();
+            FlickDetection::Update();
 
             mAccumulatedDeltaT -= g_fFixedUpdateTick;
             if (g_bRunSimAndRenderInLockStep)
@@ -217,7 +217,7 @@ void FixedUpdateTask::Run(float dt)
     fn_802C084C(lbl_806E1E28, 0);
     fn_8037537C(lbl_806E2478);
     fn_802C07AC(lbl_806E1E28, dt);
-    fn_80137668();
+    FlickDetection::Update();
 }
 
 EventDispatcher::~EventDispatcher()

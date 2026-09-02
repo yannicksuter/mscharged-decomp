@@ -7,7 +7,7 @@
 #include "Game/Net.h"
 #include "Game/Physics/Physics.h"
 #include "Game/Physics/PhysicsBanana.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Physics/PhysicsNPC.h"
@@ -91,13 +91,13 @@ void PhysicsBanana::PreUpdate()
             }
         }
 
-        if (g_pBall->m_pPhysicsBall->mUnidentified050)
+        if (g_pBall->m_pPhysicsBall->mbUseTiltForce)
         {
-            AddForceAtCentreOfMass(g_pBall->m_pPhysicsBall->mUnidentified038);
+            AddForceAtCentreOfMass(g_pBall->m_pPhysicsBall->mv3TiltForce);
         }
-        if (g_pBall->m_pPhysicsBall->mUnidentified051)
+        if (g_pBall->m_pPhysicsBall->mbUseWindForce)
         {
-            AddForceAtCentreOfMass(g_pBall->m_pPhysicsBall->mUnidentified044);
+            AddForceAtCentreOfMass(g_pBall->m_pPhysicsBall->mv3WindForce);
         }
     }
 }
@@ -200,7 +200,7 @@ ContactType PhysicsBanana::Contact(
     }
     case 0x10:
     {
-        cBall* ball = ((PhysicsBall*)other)->m_pBall;
+        cBall* ball = ((PhysicsAIBall*)other)->m_pAIBall;
         if (ball->m_pOwner != 0 && ball->m_pOwner->m_eClassType == FIELDER)
         {
             cFielder* fielder = (cFielder*)ball->m_pOwner;

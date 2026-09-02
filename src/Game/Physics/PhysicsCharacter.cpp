@@ -6,7 +6,7 @@
 #include "Game/Field.h"
 #include "Game/GameInfo.h"
 #include "Game/Physics/CollisionSpace.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsColumn.h"
 #include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Player.h"
@@ -287,7 +287,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 m_bInsideNet = true;
                 cFielder* fielder = (cFielder*)m_pAICharacter;
                 if (fielder->m_pBall != 0)
-                    g_pBall->m_pPhysicsBall->m_bInsideNet = true;
+                    g_pBall->m_pPhysicsBall->mbIsInsideNet = true;
                 return NO_CONTACT;
             }
         }
@@ -320,12 +320,12 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             m_bSupportingBallThisFrame = true;
         }
 
-        PhysicsBall* physicsBall = (PhysicsBall*)other;
-        cBall* ball = physicsBall->m_pBall;
+        PhysicsAIBall* physicsBall = (PhysicsAIBall*)other;
+        cBall* ball = physicsBall->m_pAIBall;
         cCharacter* character = m_pAICharacter;
-        if ((!physicsBall->m_bCollideWithFielders
+        if ((!physicsBall->mbCanCollidePlayer
                 && character->m_eClassType == FIELDER)
-            || (!physicsBall->m_bCollideWithGoalies
+            || (!physicsBall->mbCanCollideGoalie
                 && character->m_eClassType == GOALIE))
         {
             fn_8013F854("PhysChar Ball NoContactS2S\n");

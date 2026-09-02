@@ -4,6 +4,8 @@
 #include "NL/nlMath.h"
 #include "types.h"
 
+class PadBackend;
+
 class cGlobalPad
 {
 public:
@@ -41,7 +43,9 @@ public:
 
     /* 0x04 */ u8 mUnidentified004[0x14];
     /* 0x18 */ bool m_isLeftAnalogToDPadMapEnabled;
-    /* 0x19 */ u8 mUnidentified019[0x27];
+    /* 0x19 */ u8 mUnidentified019[3];
+    /* 0x1C */ PadBackend* mBackend;
+    /* 0x20 */ u8 mUnidentified020[0x20];
     /* 0x40 */ void* mUnidentified040;
     /* 0x44 */ nlPolar m_polarAnalogLeft;
     /* 0x4C */ nlPolar m_polarAnalogRight;

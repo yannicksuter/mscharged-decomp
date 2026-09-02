@@ -16,7 +16,8 @@
 #include "Game/Goalie.h"
 #include "Game/Net.h"
 #include "Game/NetworkSession.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
+#include "Game/Physics/PhysicsPatch.h"
 #include "Game/Player.h"
 #include "Game/UnidentifiedPlayerRadius.h"
 #include "Game/Render/ShootToScoreArrow.h"
@@ -141,7 +142,6 @@ extern "C" void* fn_800AA060(void* param1, int param2);
 extern "C" void fn_800AF404(void* param1);
 extern "C" void fn_800EDB9C();
 extern "C" void fn_800EDCAC();
-extern "C" void fn_801745DC(void* param1);
 extern "C" void* fn_803330AC();
 extern "C" void fn_80333908(void* param1, const void* param2, u32 size);
 extern "C" bool fn_8001E184(cPlayer* pPlayer);
@@ -163,9 +163,7 @@ extern "C" void fn_802F4E84(unsigned long* hash, int param2, int param3);
 extern "C" cGame* fn_800570B0(
     cGame* game, void* param1, int param2, bool param3);
 extern "C" cTeam* fn_800A5D4C(cTeam* team, int side);
-extern "C" void* fn_801740D0(void* memory);
 extern "C" void fn_80115E60(bool param1);
-extern "C" void fn_801742B8(void* object, int deleteObject);
 extern "C" void fn_800A62E8(cTeam* team, int deleteObject);
 extern "C" void fn_8031A02C(ScriptQuestionCache* cache);
 extern "C" void fn_800ED92C(unsigned long soundID);
@@ -178,7 +176,6 @@ extern void* lbl_806E2100;
 extern int lbl_806E2130;
 extern UnidentifiedOnlineState* lbl_806E2164;
 extern BaseGameSceneManager* lbl_806E1860;
-extern void* lbl_806E12C8;
 extern void* lbl_806E2168;
 extern AISandbox* lbl_806E0B88;
 extern UnidentifiedRegistrationList lbl_805713E8;
@@ -256,11 +253,9 @@ void fn_80056CF4(void* param1, int param2, bool param3)
     }
     if (lbl_806E12C8 == 0)
     {
-        void* memory = nlMalloc(0xF8, 8, false);
-        if (memory != 0)
-        {
-            memory = fn_801740D0(memory);
-        }
+        PhysicsPatchManager_801740D0* memory
+            = new (nlMalloc(sizeof(PhysicsPatchManager_801740D0), 8, false))
+                PhysicsPatchManager_801740D0();
         lbl_806E12C8 = memory;
     }
     if (UnidentifiedCameraEffects::Instance() == 0)
@@ -307,7 +302,7 @@ void DestroyGame()
     }
     if (lbl_806E12C8 != 0)
     {
-        fn_801742B8(lbl_806E12C8, 1);
+        delete lbl_806E12C8;
         lbl_806E12C8 = 0;
     }
     if (UnidentifiedCameraEffects::Instance() != 0)
@@ -1140,7 +1135,7 @@ extern "C" void fn_80061AF0()
 
 extern "C" void fn_80061AF4()
 {
-    fn_801745DC(lbl_806E12C8);
+    lbl_806E12C8->ResetEffects();
     fn_800EDCAC();
 }
 

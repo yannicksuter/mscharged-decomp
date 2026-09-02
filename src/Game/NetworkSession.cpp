@@ -1,4 +1,5 @@
 #include "Game/NetworkSession.h"
+#include "Game/tu_801360A4.h"
 
 #include "Game/AI/AIPad.h"
 #include "Game/DB/SaveLoad.h"
@@ -50,7 +51,6 @@ extern "C" void fn_8032CBC8(NetworkTransport_8032CA4C* transport);
 extern "C" void fn_8032C8CC(
     void* codec, int source, void* buffer, int size);
 extern "C" void fn_8032CEAC(NetworkTransport_8032CA4C* transport);
-extern "C" void fn_80136140(void* tournament, int);
 extern "C" void DWC_ShutdownFriendsMatch();
 extern "C" void DWC_Shutdown();
 extern "C" void fn_803742D0();
@@ -78,11 +78,9 @@ extern "C" int DWC_GetIngamesnCheckResult();
 u32 nlGetTicker();
 float nlGetTickerDifference(u32 older, u32 newer);
 extern "C" void fn_8032E890();
-extern "C" void fn_80136DFC(void* tournament, float dt);
 extern "C" void DWC_ProcessFriendsMatch();
 void nlStrToWcs(const char* source, u16* dest, unsigned long max);
 #include <string.h>
-extern void* lbl_806E1194;
 extern float lbl_806E4724;
 extern float lbl_806E4728;
 
@@ -801,7 +799,7 @@ void UnidentifiedNetworkSession::Update()
         mDirectSocket->Update(dt);
         NetTournManager::Instance()->Update(dt);
         NetworkDraft::Instance()->Update(dt);
-        fn_80136DFC(lbl_806E1194, dt);
+        lbl_806E1194->Update(dt);
         mRankingReporter->Update();
         NetworkStatsManager_8012F378::Instance()->Update(dt);
 
@@ -1633,7 +1631,7 @@ void UnidentifiedNetworkSession::fn_801214BC()
     mUnidentified2494 = 0;
     DWC_ShutdownFriendsMatch();
     NetworkDraft::Instance()->Reset(false);
-    fn_80136140(lbl_806E1194, 0);
+    lbl_806E1194->Reset(false);
     mRankingReporter->ShutdownRanking();
     NetworkStatsManager_8012F378::Instance()->Reset(false);
     mLobby->UnregisterMessageReceiver();

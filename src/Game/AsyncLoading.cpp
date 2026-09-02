@@ -13,6 +13,9 @@
 #include "Game/Game.h"
 #include "Game/NetworkSession.h"
 #include "Game/NisPlayer.h"
+#include "Game/PadActions.h"
+#include "Game/Physics/PhysicsFakeBall.h"
+#include "Game/Physics/PhysicsPatch.h"
 #include "Game/Render/ElectricFence.h"
 #include "Game/Render/FlareHandler.h"
 #include "Game/ReplayChoreo.h"
@@ -115,11 +118,9 @@ extern "C" void fn_80338900(void*, int);
 extern "C" UnidentifiedInputRouter* fn_803330AC();
 extern "C" void fn_8033288C(void*);
 extern "C" void fn_800A6EDC(void*);
-extern "C" void fn_801745DC(void*);
 extern "C" void fn_800AA3E8(void*, int);
 extern "C" void fn_801AF97C(void*);
 extern "C" void fn_80013660(void*, int);
-extern "C" void fn_8016C184();
 extern "C" void fn_801AB9D4(void*);
 extern "C" void fn_801A01F8();
 extern "C" void fn_801AAD0C(void*);
@@ -147,7 +148,6 @@ extern "C" void fn_8017A450();
 extern "C" bool fn_801C4D40();
 extern "C" void fn_801C4CBC();
 extern "C" void fn_8033C4E4(ScreenTransitionManager*);
-extern "C" void fn_801379AC();
 extern "C" void fn_802BDA28();
 extern "C" void fn_802C0CCC();
 extern "C" void fn_802C8180();
@@ -171,8 +171,7 @@ extern void* lbl_806E2164;
 extern void* lbl_806E2168;
 extern void* lbl_806E2138;
 extern void* g_pTeams[];
-extern void* lbl_806E12C8;
-extern void* g_pBall;
+extern cBall* g_pBall;
 extern u8 lbl_80574148[];
 extern u8 lbl_805722F8[];
 extern u8 lbl_80573C08[];
@@ -670,13 +669,13 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     fn_800A6EDC(g_pTeams[0]);
     fn_800A6EDC(g_pTeams[1]);
     DestroyPowerups();
-    fn_801745DC(lbl_806E12C8);
+    lbl_806E12C8->ResetEffects();
     DestroyCharacters();
     fn_800AA3E8(lbl_806E0C94->mUnidentified10DC, 1);
     fn_801AF97C(lbl_80574148);
     fn_80013660(g_pBall, 1);
     g_pBall = 0;
-    fn_8016C184();
+    FakeBallWorld::Destroy();
     cCameraManager::Shutdown();
     fn_801AB9D4(lbl_806E1608);
     fn_801A01F8();

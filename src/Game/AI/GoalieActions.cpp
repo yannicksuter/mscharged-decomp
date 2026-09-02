@@ -20,7 +20,7 @@
 #include "Game/MathHelpers.h"
 #include "Game/Net.h"
 #include "Game/Physics/PhysicsCharacter.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/SAnim/pnBlender.h"
 #include "Game/SAnim/pnSAnimController.h"
@@ -241,13 +241,6 @@ extern "C" int fn_80338BF0(void* pParam);
 extern "C" bool fn_8003E7F8(cFielder* pFielder);
 extern "C" bool fn_8003E84C(cFielder* pFielder);
 extern "C" void fn_8007EB5C(Goalie* pGoalie);
-extern "C" float fn_8016D52C(float fHeight, float fEndTime,
-    nlVector3& v3Position, nlVector3& v3Velocity, float& fTargetHeight,
-    bool bParam);
-extern "C" bool fn_8016EA10(const nlVector3& v3Position,
-    float fSpeed1, float fSpeed2, nlVector3& v3TargetPosition,
-    nlVector3& v3TargetVelocity, float& fInterceptTime,
-    float& fClosestDistance, float fMaxTime);
 extern "C" SaveData* fn_800925C0(
     SaveBlendInfo* pBlendInfo, const nlVector3* pLocalPosition);
 extern "C" SaveData* fn_80092644(SaveData* pSaveData,
@@ -256,8 +249,6 @@ extern "C" SaveData* fn_80093780(int nAnimID);
 extern "C" void fn_800156F8(cBall* pBall, cPlayer* pPlayer);
 extern "C" void fn_80097358(cPlayer* pPlayer, float fParam);
 extern "C" float fn_800DEB04(cFielder* pFielder);
-extern "C" void fn_8016EEC8();
-extern "C" void fn_8016F06C();
 extern "C" void fn_801B968C(cCharacter* pCharacter);
 extern "C" void fn_8008CED8(Goalie* pGoalie, float fTargetTime,
     const nlVector3& v3TargetPosition,
@@ -1381,13 +1372,13 @@ void Goalie::fn_80084C3C(bool bParam)
 
     g_pBall->m_bVisible = true;
     g_pBall->SetVelocity(v3Zero, SPINTYPE_NONE, 0);
-    g_pBall->m_pPhysicsBall->m_bCollideWithGoalies = true;
-    g_pBall->m_pPhysicsBall->m_bCollideWithFielders = true;
+    g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
+    g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
     g_pBall->m_pPhysicsBall->EnableCollisions();
     g_pBall->m_pPhysicsBall->m_gravity = lbl_806E3A3C;
     PhysicsBall* pPhysicsBall = g_pBall->m_pPhysicsBall;
-    pPhysicsBall->mUnidentified054 = false;
-    pPhysicsBall->mUnidentified064 = 0.0f;
+    pPhysicsBall->mbUseMagnusEffect = false;
+    pPhysicsBall->mfChargeBonus = 0.0f;
 }
 
 void Goalie::fn_80084CE0()
@@ -4660,7 +4651,7 @@ void Goalie::InitActionLooseBallSetup()
 
             float fInterceptTime;
             float fClosestDist;
-            bool bFound = fn_8016EA10(m_v3Position,
+            bool bFound = FakeBallWorld::FindBallIntercept(m_v3Position,
                 1.0f,
                 6.0f,
                 mv3TargetPosition,
@@ -4919,7 +4910,7 @@ void Goalie::InitActionLooseBallSetup()
 
         float fInterceptTime;
         float fClosestDist;
-        bool bFound = fn_8016EA10(m_v3Position,
+        bool bFound = FakeBallWorld::FindBallIntercept(m_v3Position,
             1.0f,
             6.0f,
             mv3TargetPosition,
@@ -4993,7 +4984,7 @@ void Goalie::InitActionLooseBallSetup()
             nlVector3 v3IntPos;
             nlVector3 v3IntVel;
             float fTargetHeight;
-            float fHeightTime = fn_8016D52C(
+            float fHeightTime = FakeBallWorld::GetPredictedHeightLimitTime(
                 3.0f, fBestTime, v3IntPos, v3IntVel, fTargetHeight, false);
 
             if (fHeightTime >= 0.0f)
@@ -5181,12 +5172,13 @@ void Goalie::fn_8008CED8(float fTargetTime,
     nlVector3 v3PredictedPosition;
     nlVector3 v3PredictedVelocity;
     float fTargetHeight;
-    float fPredictedTime = fn_8016D52C(fPredictionHeight,
-        0.2f,
-        v3PredictedPosition,
-        v3PredictedVelocity,
-        fTargetHeight,
-        true);
+    float fPredictedTime
+        = FakeBallWorld::GetPredictedHeightLimitTime(fPredictionHeight,
+            0.2f,
+            v3PredictedPosition,
+            v3PredictedVelocity,
+            fTargetHeight,
+            true);
     fn_8016F06C();
 
     if (fPredictedTime > 0.0f)
@@ -5245,7 +5237,7 @@ void Goalie::fn_8008D210(float fDeltaT)
     nlVector3 v3ObservedPosition;
     nlVector3 v3ObservedVelocity;
     float fTargetHeight;
-    fn_8016D52C(mv3TargetPosition.z,
+    FakeBallWorld::GetPredictedHeightLimitTime(mv3TargetPosition.z,
         0.04f,
         v3ObservedPosition,
         v3ObservedVelocity,
@@ -5299,12 +5291,14 @@ void Goalie::fn_8008D210(float fDeltaT)
         {
             nlVector3 v3PredictedPosition;
             nlVector3 v3PredictedVelocity;
-            float fPredictedTime = fn_8016D52C(fPredictionHeight,
-                0.08f,
-                v3PredictedPosition,
-                v3PredictedVelocity,
-                fTargetHeight,
-                true);
+            float fPredictedTime
+                = FakeBallWorld::GetPredictedHeightLimitTime(
+                    fPredictionHeight,
+                    0.08f,
+                    v3PredictedPosition,
+                    v3PredictedVelocity,
+                    fTargetHeight,
+                    true);
             if (fPredictedTime > 0.0f)
             {
                 mfWaitTime = fPredictedTime;
@@ -5449,7 +5443,7 @@ void Goalie::fn_8008D210(float fDeltaT)
         SaveData* pNearSave = fn_80093780(0x47);
         nlVector3 v3PredictedPosition;
         nlVector3 v3PredictedVelocity;
-        float fPredictedTime = fn_8016D52C(
+        float fPredictedTime = FakeBallWorld::GetPredictedHeightLimitTime(
             pNearSave->mv3SavePos.z - 0.2f,
             0.08f,
             v3PredictedPosition,

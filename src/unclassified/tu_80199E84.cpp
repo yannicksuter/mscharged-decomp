@@ -1,4 +1,4 @@
-#include "Game/Physics/PhysicsSphere.h"
+#include "Game/Physics/PhysicsBirdoEgg.h"
 
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
@@ -22,9 +22,6 @@ struct State_80199E84
 };
 
 extern "C" void fn_8019A434(State_80199E84*, bool);
-extern "C" PhysicsSphere* fn_80141B3C(
-    void*, State_80199E84*, float);
-
 extern const nlVector3 lbl_804DCD90;
 extern const nlVector3 lbl_804DCD9C;
 extern const float lbl_806DCD7C;
@@ -50,12 +47,8 @@ extern "C" State_80199E84* fn_80199E84(
     state->orientation.x = lbl_806E4ED0;
     state->orientation.w = lbl_806E4ED4;
 
-    PhysicsSphere* physics =
-        (PhysicsSphere*)nlMalloc(0x40, 8, false);
-    if (physics != 0)
-    {
-        physics = fn_80141B3C(physics, state, lbl_806DCD7C);
-    }
+    PhysicsBirdoEgg* physics = new (8, false) PhysicsBirdoEgg(
+        (BirdoEggObject*)state, lbl_806DCD7C);
     state->physics = physics;
     physics->SetPosition(
         lbl_804DCD9C, PhysicsObject::WORLD_COORDINATES);

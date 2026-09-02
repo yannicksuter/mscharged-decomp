@@ -1,13 +1,13 @@
 #include "Game/Task/LoadingTask.h"
 
 #include "Game/AsyncLoading.h"
+#include "Game/Pad/FlickDetection.h"
 #include "types.h"
 
 extern "C" {
 void fn_802C084C(void*, int);
 void fn_802C07AC(void*, float);
 void fn_8037537C(void*);
-void fn_80137668();
 }
 
 extern void* lbl_806E1E28;
@@ -28,7 +28,7 @@ void LoadingTask::Run(float dt)
     fn_802C084C(lbl_806E1E28, 0);
     fn_8037537C(lbl_806E2478);
     fn_802C07AC(lbl_806E1E28, dt);
-    fn_80137668();
+    FlickDetection::Update();
 
     switch (fn_80118B7C(fn_80118A74()))
     {

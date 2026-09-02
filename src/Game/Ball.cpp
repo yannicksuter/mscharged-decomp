@@ -6,7 +6,7 @@
 #include "Game/Game.h"
 #include "Game/Net.h"
 #include "Game/ObjectBlur.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Player.h"
 #include "Game/Team.h"
@@ -137,8 +137,8 @@ cBall::cBall()
     mUnidentifiedF0 = 0;
     m_pDrawableBall = fn_8027725C(nlStringHash("gameplay/ball"));
 
-    m_pPhysicsBall = new (8, false) PhysicsBall(0.18f);
-    m_pPhysicsBall->m_pBall = this;
+    m_pPhysicsBall = new (8, false) PhysicsAIBall(0.18f);
+    m_pPhysicsBall->m_pAIBall = this;
     m_pPhysicsBall->SetPosition(
         m_v3Position, PhysicsObject::WORLD_COORDINATES);
     m_v3ShotOrigin = m_v3Position;
@@ -196,8 +196,8 @@ void cBall::SetOwner(cPlayer* pOwner)
         g_pGame->SetPotentialScorer(pOwner);
     }
 
-    m_pPhysicsBall->mUnidentified054 = false;
-    m_pPhysicsBall->mUnidentified064 = 0.0f;
+    m_pPhysicsBall->mbUseMagnusEffect = false;
+    m_pPhysicsBall->mfChargeBonus = 0.0f;
 }
 
 void cBall::SetPosition(const nlVector3& pos)
@@ -212,7 +212,7 @@ void cBall::SetPosition(const nlVector3& pos)
 void cBall::ShootAtFast(nlVector3& v3Vel, const nlVector3& v3Target,
     float fDesiredTime)
 {
-    float k = lbl_806DB584 * m_pPhysicsBall->mUnidentified060;
+    float k = lbl_806DB584 * m_pPhysicsBall->mfBallAirResistance;
     float g = lbl_806DB588 * m_pPhysicsBall->m_gravity;
     float eToTheNegativeKT = Exp(-k * fDesiredTime);
     float kSquaredOverOneMinusEToTheNegativeKT
@@ -408,7 +408,7 @@ bool cBall::GetInNet(int& nSide)
         = (UnidentifiedGameState*)lbl_806E0C94;
     if (gameState->mUnidentified40 == 0)
     {
-        if (m_pPhysicsBall->m_bInsideNet)
+        if (m_pPhysicsBall->mbIsInsideNet)
         {
             float fDirection = g_pTeams[0]->m_pNet->m_fDirection;
             nSide = !(m_v3Position.x * fDirection > 1.0f);

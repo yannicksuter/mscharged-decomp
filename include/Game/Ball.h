@@ -18,7 +18,7 @@ class cPlayer;
 class BlurHandler;
 class DebugWriteCache;
 class DrawableObject;
-class PhysicsBall;
+class PhysicsAIBall;
 class RunningChecksum;
 struct UnidentifiedBallRuntime;
 
@@ -87,7 +87,7 @@ public:
     /* 0xDC */ cPlayer* mpDamageTarget;
     /* 0xE0 */ BlurHandler* m_pBlurHandler;
     /* 0xE4 */ DrawableObject* m_pDrawableBall;
-    /* 0xE8 */ PhysicsBall* m_pPhysicsBall;
+    /* 0xE8 */ PhysicsAIBall* m_pPhysicsBall;
     /* 0xEC */ UnidentifiedBallRuntime* mUnidentifiedEC;
     /* 0xF0 */ unsigned long mUnidentifiedF0;
 }; // total size: 0xF4

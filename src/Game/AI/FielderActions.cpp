@@ -8,10 +8,12 @@
 #include "Game/AI/ShotMeter.h"
 #include "Game/Goalie.h"
 #include "Game/PoseAccumulator.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsColumn.h"
+#include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Physics/PhysicsObject.h"
+#include "Game/Physics/PhysicsPatch.h"
 #include "Game/Team.h"
 #include "Game/TweakValue.h"
 #include "Game/Ball.h"
@@ -80,8 +82,6 @@ extern "C" bool fn_8003881C(cFielder* pFielder);
 extern "C" void* fn_8002E1A4(cFielder* pFielder);
 extern "C" void* fn_80319FC0(void* pParam, int nParam);
 extern "C" void fn_80316968(void* pParam);
-extern "C" void fn_8016E668(void);
-extern "C" void fn_8016E784(nlVector3* v3Position);
 extern "C" float fn_8002E1B0(cFielder* pFielder);
 extern "C" bool fn_8002D2C4(nlVector3* v3Position, float fParam, int nParam);
 extern "C" const LooseBallContactAnimInfo* fn_80038230(cFielder* pFielder,
@@ -129,11 +129,6 @@ extern "C" float fn_80030750(cFielder* pFielder);
 extern "C" cFielder* fn_8003703C(cFielder* pFielder);
 extern "C" float fn_8002D020(PlayerTweaks* pTweaks);
 extern "C" float fn_8002D050(PlayerTweaks* pTweaks);
-extern "C" void* fn_801743A8(void* pManager, int nParam, cFielder* pFielder,
-    const nlVector3* v3Position, const nlVector3* v3Direction, float fParam1,
-    float fParam2, float fParam3);
-extern "C" void fn_80173B08(void* pEffect, float fParam);
-extern void* lbl_806E12C8;
 extern "C" bool fn_8003C180(cFielder* pFielder);
 extern "C" float fn_800DBAB0(cFielder* pFielder);
 extern "C" float fn_800A0508(cPlayer* pPlayer, int nParam1, int nParam2);
@@ -207,12 +202,6 @@ extern "C" UnidentifiedTornado806E0C94* fn_800AA060(
 
 extern BasicSlotPool<PlayerAttackData> lbl_80571960;
 
-struct UnidentifiedHitEffect
-{
-    /* 0x00 */ u8 mUnknown00[0x48];
-    /* 0x48 */ int mUnidentified48;
-};
-
 struct UnidentifiedCaptainObject
 {
     /* 0x00 */ u8 mUnknown00[0x38];
@@ -220,9 +209,6 @@ struct UnidentifiedCaptainObject
     /* 0x44 */ nlVector3 mUnidentified44;
 };
 
-extern "C" UnidentifiedHitEffect* fn_801745B8(void* pManager, int nIndex);
-extern "C" void fn_801739A4(
-    UnidentifiedHitEffect* pEffect, const nlVector3* v3Position);
 extern "C" UnidentifiedCaptainObject* fn_801792C4(void* pParam, int nIndex);
 extern "C" bool fn_802B6BC8(const nlVector3* v3Start,
     const nlVector3* v3End, const nlVector3* v3A, const nlVector3* v3B,
@@ -793,10 +779,10 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
         if (m_eCharacterClass == TOAD)
         {
-            fn_80173B08(fn_801743A8(lbl_806E12C8, 6, this, &m_v3Position,
-                            &v3Zero, lbl_806DB8FC, lbl_806DB900,
-                            lbl_806DB904),
-                lbl_806E3578);
+            lbl_806E12C8
+                ->fn_801743A8(6, this, m_v3Position, v3Zero,
+                    lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
+                ->fn_80173B08(lbl_806E3578);
             fn_800EBBFC(mUnidentified318, 0xA9AF871E, 0, 0);
         }
     }
@@ -808,14 +794,14 @@ void cFielder::ActionHit(float fDeltaT)
     {
         for (int i = 0; i < 0x3C; i++)
         {
-            UnidentifiedHitEffect* pEffect = fn_801745B8(lbl_806E12C8, i);
-            if (pEffect != 0 && pEffect->mUnidentified48 == 6)
+            PhysicsPatch* pEffect = lbl_806E12C8->fn_801745B8(i);
+            if (pEffect != 0 && pEffect->m_Type == 6)
             {
                 cSHierarchy* pHierarchy = m_pPoseAccumulator->m_pHierarchy;
                 nlVector3 jointPos = GetJointPosition(
                     pHierarchy->GetNodeIndexByID(
                         nlStringLowerHash("bip01 Ponytail12")));
-                fn_801739A4(pEffect, &jointPos);
+                pEffect->fn_801739A4(jointPos);
             }
         }
     }
@@ -1178,7 +1164,7 @@ bool cFielder::DoCommonInitActionLooseBall(
 
     float fSimulatedTime = 0.0f;
 
-    fn_8016E668();
+    FakeBallWorld::ResetBallIterator();
 
     const LooseBallContactAnimInfo* pAnimInfoList
         = GetOneTimerIdleGroundContactAnims();
@@ -1215,7 +1201,7 @@ bool cFielder::DoCommonInitActionLooseBall(
 
     while (fSimulatedTime < fMaxSimulatedTime)
     {
-        fn_8016E784(&v3SimulatedBallPos);
+        FakeBallWorld::GetNextBallPosition(v3SimulatedBallPos);
         fSimulatedTime += FixedUpdateTask::GetPhysicsUpdateTick();
 
         if (v3SimulatedBallPos.z < fMinBallZ)
@@ -3788,14 +3774,14 @@ void cFielder::fn_80045930()
     m_v3Velocity.z = 0.0f;
 
     nlVector3 v3Direction;
-    if (!g_pBall->m_pPhysicsBall->mUnidentified051)
+    if (!g_pBall->m_pPhysicsBall->mbUseWindForce)
     {
         UnidentifiedTornado806E0C94* pObject
             = fn_800AA060(lbl_806E0C94->mUnidentified10DC, 2);
         if (pObject != 0 && !pObject->mUnidentified0C)
         {
             pObject->UnidentifiedVirtual0C();
-            v3Direction = g_pBall->m_pPhysicsBall->mUnidentified044;
+            v3Direction = g_pBall->m_pPhysicsBall->mv3WindForce;
         }
         else
         {
@@ -3804,7 +3790,7 @@ void cFielder::fn_80045930()
     }
     else
     {
-        v3Direction = g_pBall->m_pPhysicsBall->mUnidentified044;
+        v3Direction = g_pBall->m_pPhysicsBall->mv3WindForce;
     }
 
     nlVector3 v3Position = { 0.0f, 0.0f, 0.0f };
@@ -5351,7 +5337,7 @@ void cFielder::fn_8004E92C()
 
             if (m_eCharacterClass == (eCharacterClass)0x12)
             {
-                g_pBall->m_pPhysicsBall->m_bCollideWithGoalies = true;
+                g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
 
                 float fBallX = (float)fabs(g_pBall->m_v3Position.x);
                 float fRadius = g_pBall->m_pPhysicsBall->GetRadius();
@@ -5406,7 +5392,7 @@ void cFielder::fn_8004EC40()
     if (m_eCharacterClass == (eCharacterClass)0x12)
     {
         fn_80038158(this, 0);
-        g_pBall->m_pPhysicsBall->m_bCollideWithGoalies = true;
+        g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
     }
     else if (m_eCharacterClass == (eCharacterClass)0x13)
     {
@@ -5445,8 +5431,8 @@ void cFielder::fn_8004ED64()
     pGoalie->m_pPhysicsCharacter->m_CanCollideWithBall = 0;
     fn_8003C560(this, 0, 1);
 
-    g_pBall->m_pPhysicsBall->m_bCollideWithFielders = false;
-    g_pBall->m_pPhysicsBall->m_bCollideWithGoalies = false;
+    g_pBall->m_pPhysicsBall->mbCanCollidePlayer = false;
+    g_pBall->m_pPhysicsBall->mbCanCollideGoalie = false;
 }
 
 void cFielder::fn_8004EE48(float fDeltaT)
@@ -5480,8 +5466,8 @@ void cFielder::fn_8004EE48(float fDeltaT)
         Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
         pGoalie->m_pPhysicsCharacter->m_CanCollideWithBall = 1;
 
-        g_pBall->m_pPhysicsBall->m_bCollideWithGoalies = true;
-        g_pBall->m_pPhysicsBall->m_bCollideWithFielders = true;
+        g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
+        g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
     }
     else
     {

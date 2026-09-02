@@ -798,14 +798,38 @@ Game/NetworkLobby.cpp:
 	.sdata      start:0x806DC920 end:0x806DC948
 	.sdata2     start:0x806E4760 end:0x806E4778
 
+Game/tu_801360A4.cpp:
+	.text       start:0x801360A4 end:0x8013757C
+	.data       start:0x8050D6B0 end:0x8050DA60
+	.sdata      start:0x806DC948 end:0x806DC978
+	.sbss       start:0x806E1190 end:0x806E1198
+	.sdata2     start:0x806E4778 end:0x806E4780
+
+Game/Pad/FlickDetection.cpp:
+	.text       start:0x8013759C end:0x80137824
+	.ctors      start:0x804DB62C end:0x804DB630
+	.bss        start:0x8056FC80 end:0x8056FE80
+	.sdata2     start:0x806E4780 end:0x806E4784
+
+Game/PadActions.cpp:
+	.text       start:0x80137824 end:0x80139B18
+	.ctors      start:0x804DB630 end:0x804DB634
+	.data       start:0x8050DA60 end:0x8050DFB8
+	.bss        start:0x8056FE80 end:0x8056FEA0
+	.sbss       start:0x806E1198 end:0x806E11A0
+	.sdata2     start:0x806E4788 end:0x806E4790
+
 unclassified/tu_80139B18.cpp:
 	.text       start:0x80139B18 end:0x8013A25C
 	.ctors      start:0x804DB634 end:0x804DB638
 	.data       start:0x8050DFB8 end:0x8050E040
 	.bss        start:0x8056FEA0 end:0x8056FF08
-	.sdata      start:0x806DC970 end:0x806DC988
+	.sdata      start:0x806DC978 end:0x806DC988
 	.sbss       start:0x806E11A0 end:0x806E11A8
 	.sdata2     start:0x806E4790 end:0x806E47A0
+
+Game/Physics/LoadablePhysicsMesh.cpp:
+	.text       start:0x8013A25C end:0x8013A27C
 
 Game/Render/NetMesh.cpp:
 	.text       start:0x8013A284 end:0x8013BB34
@@ -835,6 +859,20 @@ Game/Physics.cpp:
 	.sbss       start:0x806E11C8 end:0x806E11D8
 	.sdata2     start:0x806E47F8 end:0x806E4810
 
+Game/PhysicsAIBall.cpp:
+	.text       start:0x8013E354 end:0x8013FCDC
+	.ctors      start:0x804DB640 end:0x804DB644
+	.data       start:0x8050E2B8 end:0x8050E4C8
+	.sdata      start:0x806DCA08 end:0x806DCA60
+	.sdata2     start:0x806E4810 end:0x806E4840
+
+Game/Physics/PhysicsBall.cpp:
+	.text       start:0x8013FCDC end:0x80140FE0
+	.rodata     start:0x804DCC40 end:0x804DCC50
+	.data       start:0x8050E4C8 end:0x8050E5E8
+	.sdata      start:0x806DCA60 end:0x806DCA88
+	.sdata2     start:0x806E4840 end:0x806E4890
+
 Game/Physics/PhysicsBanana.cpp:
 	.text       start:0x80141000 end:0x80141AB0
 	.rodata     start:0x804DCC50 end:0x804DCC5C
@@ -843,6 +881,16 @@ Game/Physics/PhysicsBanana.cpp:
 
 unclassified/tu_80141AB0.cpp:
 	.text       start:0x80141AB0 end:0x80141B1C
+
+Game/Physics/PhysicsBirdoEgg.cpp:
+	.text       start:0x80141B3C end:0x8014234C
+	.data       start:0x8050E680 end:0x8050E758
+	.sdata2     start:0x806E48C0 end:0x806E48CC
+
+Game/Physics/PhysicsBulletBill.cpp:
+	.text       start:0x8014236C end:0x801429FC
+	.data       start:0x8050E758 end:0x8050E810
+	.sdata2     start:0x806E48D0 end:0x806E48E0
 
 Game/Physics/PhysicsCharacter.cpp:
 	.text       start:0x80142A1C end:0x80143FD4
@@ -855,13 +903,23 @@ Game/Physics/PhysicsEventQueue.cpp:
 	.text       start:0x80143FD4 end:0x8016BE70
 	.ctors      start:0x804DB654 end:0x804DB658
 	.data       start:0x8050EE30 end:0x80510590
-	.bss        start:0x80570100 end:0x805701D8
+	.bss        start:0x80570100 end:0x805701C8
 	.sdata      start:0x806DCA90 end:0x806DCA98
 	.sbss       start:0x806E11D8 end:0x806E1280
 	.sdata2     start:0x806E4900 end:0x806E4928
 
+Game/Physics/PhysicsFakeBall.cpp:
+	.text       start:0x8016BE70 end:0x8016F520
+	.ctors      start:0x804DB658 end:0x804DB65C
+	.rodata     start:0x804DCC70 end:0x804DCC80
+	.data       start:0x80510590 end:0x80510670
+	.bss        start:0x805701C8 end:0x80570218
+	.sdata      start:0x806DCA98 end:0x806DCAA0
+	.sbss       start:0x806E1280 end:0x806E1298
+	.sdata2     start:0x806E4928 end:0x806E4968
+
 unclassified/tu_8016F34C.cpp:
-	.text       start:0x8016F34C end:0x80170028
+	.text       start:0x8016F520 end:0x80170028
 	.ctors      start:0x804DB65C end:0x804DB660
 	.data       start:0x80510670 end:0x805106A8
 
@@ -883,6 +941,20 @@ Game/Physics/PhysicsNet.cpp:
 	.sdata      start:0x806DCAA8 end:0x806DCAB0
 	.sbss       start:0x806E12A8 end:0x806E12C8
 	.sdata2     start:0x806E49C0 end:0x806E4A08
+
+Game/Physics/PhysicsNPC.cpp:
+	.text       start:0x80172790 end:0x80172D60
+	.data       start:0x80510858 end:0x80510888
+	.sdata2     start:0x806E4A08 end:0x806E4A20
+
+Game/Physics/PhysicsPatch.cpp:
+	.text       start:0x80172D60 end:0x80174B38
+	.ctors      start:0x804DB668 end:0x804DB66C
+	.rodata     start:0x804DCCA0 end:0x804DCCB8
+	.data       start:0x80510888 end:0x8051099C
+	.bss        start:0x805705C0 end:0x80570600
+	.sdata      start:0x806DCAB8 end:0x806DCAC0
+	.sdata2     start:0x806E4A20 end:0x806E4A48
 
 unclassified/tu_80175F8C.cpp:
 	.text       start:0x80175F8C end:0x80176EF4

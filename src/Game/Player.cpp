@@ -6,7 +6,7 @@
 #include "Game/AnimInventory.h"
 #include "Game/Ball.h"
 #include "Game/PoseAccumulator.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/SAnim/pnSingleAxisBlender.h"

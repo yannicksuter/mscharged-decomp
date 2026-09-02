@@ -5,6 +5,8 @@
 #include "Game/Drawable/DrawableCharacter.h"
 #include "Game/Event.h"
 #include "Game/NisPlayer.h"
+#include "Game/PadActions.h"
+#include "Game/Physics/PhysicsPatch.h"
 #include "Game/Render/ShootToScoreArrow.h"
 #include "NL/nlTask.h"
 #include "types.h"
@@ -110,7 +112,6 @@ static PendingIter MakeIter(PendingNode* head);
 static PendingIter MakeIterAt(PendingNode* head, PendingNode* node);
 
 extern "C" {
-void fn_80137CB8(int);
 void fn_8027C86C();
 void fn_8027D11C();
 void fn_80278A00(void*, int, int);
@@ -124,7 +125,6 @@ void fn_800180AC(void*);
 void fn_801E23A4(void*, u32, u32);
 void fn_800A7998(void*);
 void fn_80059940(Game*, int);
-void fn_801745DC(void*);
 void fn_800F23F4();
 void fn_800F2404();
 }
@@ -134,7 +134,6 @@ extern u8 lbl_806E181D;
 extern void* g_pBall;
 extern void* lbl_806E0DF8[];
 extern void* lbl_806E1860;
-extern void* lbl_806E12C8[2];
 extern Game* lbl_806E0C94;
 extern cCharacter* lbl_8056B800[10];
 
@@ -244,7 +243,7 @@ inline void ClearCharacterEffectsTexturing()
 
     fn_80059940(lbl_806E0C94, 0);
     lbl_806E1608->fn_801ABF8C();
-    fn_801745DC(lbl_806E12C8[0]);
+    lbl_806E12C8->ResetEffects();
 }
 
 void TransitionTask::StateTransition(u32 from, u32 to)
@@ -270,7 +269,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (to == 4)
     {
-        fn_80137CB8(1);
+        UpdateMonkeyState(1);
     }
 
     if (to == 0x10)
@@ -295,7 +294,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (to == 2)
     {
-        fn_80137CB8(0);
+        UpdateMonkeyState(0);
 
         if (from != 1 && from != 0x20)
         {

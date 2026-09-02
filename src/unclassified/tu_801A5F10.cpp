@@ -8,7 +8,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
-#include "Game/Physics/PhysicsBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsSphere.h"
 #include "Game/ReplayManager.h"
 #include "Game/RenderSnapshot.h"
