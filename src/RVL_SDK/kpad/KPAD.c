@@ -1,7 +1,8 @@
 #include <revolution/kpad.h>
-#include <math.h>
 
-static const char* __KPADVersion = "<< RVL_SDK - KPAD \trelease build: Aug  8 2007 02:05:53 (0x4199_60831) >>";
+double sqrt(double x);
+
+static const char* __KPADVersion = "<< RVL_SDK - KPAD \trelease build: May 17 2007 15:52:00 (0x4199_60831) >>";
 
 static Vec2 icenter_org = {0.000f, 0.000f};
 static f32 idist_org = 1.000f;
@@ -37,19 +38,11 @@ static s32 kp_cl_stick_min = 60;
 static s32 kp_cl_stick_max = 308;
 static s32 kp_cl_trigger_min = 30;
 static s32 kp_cl_trigger_max = 180;
-static s32 kp_gc_mstick_min = 15;
-static s32 kp_gc_mstick_max = 77;
-static s32 kp_gc_cstick_min = 15;
-static s32 kp_gc_cstick_max = 64;
-static s32 kp_gc_trigger_min = 30;
-static s32 kp_gc_trigger_max = 180;
 static f32 kp_rm_acc_max = 3.4f;
 static f32 kp_fs_acc_max = 2.1f;
 
 KPADInsideStatus inside_kpads[4];
 static Vec2 Vec2_0 = {0.0f, 0.0f};
-static Mtx kp_fs_rot;
-static f32 kp_fs_revise_deg = 24.0f;
 
 
 void KPADSetBtnRepeat(KPADChannel chan, f32 delay_sec, f32 pulse_sec) {
@@ -86,11 +79,6 @@ void KPADSetDistParam(KPADChannel chan, f32 play_radius, f32 sensitivity) {
 void KPADSetAccParam(KPADChannel chan, f32 play_radius, f32 sensitivity) {
     inside_kpads[chan].acc_play_radius = play_radius;
     inside_kpads[chan].acc_sensitivity = sensitivity;
-}
-
-void KPADEnableAimingMode(KPADChannel chan) {
-    inside_kpads[chan].aimReq = TRUE;
-    inside_kpads[chan].aimEnabled = TRUE;
 }
 
 void KPADSetObjInterval(f32 interval) {
@@ -195,10 +183,17 @@ void reset_kpad(KPADInsideStatus* kp) {
 
 void KPADSetSensorHeight(KPADChannel chan, f32 level) {
     KPADInsideStatus* kp = &inside_kpads[chan];
-
     kp->center_org.x = 0.0f;
     kp->center_org.y = -level;
     calc_dpd2pos_scale(kp);
+}
+
+void KPADCalibrateDPD(KPADChannel controller) {
+    if (WPADGetSensorBarPosition() == WPAD_SENSOR_BAR_TOP) {
+        KPADSetSensorHeight(controller, 0.2f);
+    } else {
+        KPADSetSensorHeight(controller, -0.2f);
+    }
 }
 
 void calc_button_repeat(KPADInsideStatus* kp, u32 dev_type, u32 count) {
@@ -257,29 +252,21 @@ void calc_acc(KPADInsideStatus* kp, f32* acc, f32 acc2) {
 
     f2 = acc2 - *acc;
 
-    if (kp->acc_play_mode == KPAD_PLAY_MODE_LOOSE) {
-        if (f2 < 0.0f) {
-            f1 = -f2;
-        } else {
-            f1 = f2;
-        }
-
-        if (f1 >= kp->acc_play_radius) {
-            f1 = 1.0f;
-        } else {
-            f1 /= kp->acc_play_radius;
-            f1 *= f1;
-            f1 *= f1;
-        }
-        f1 *= kp->acc_sensitivity;
-        *acc += f1 * f2;
+    if (f2 < 0.0f) {
+        f1 = -f2;
     } else {
-        if (f2 < -kp->acc_play_radius) {
-            *acc += (f2 + kp->acc_play_radius) * kp->acc_sensitivity;
-        } else if (f2 > kp->acc_play_radius) {
-            *acc += (f2 - kp->acc_play_radius) * kp->acc_sensitivity;
-        }
+        f1 = f2;
     }
+
+    if (f1 >= kp->acc_play_radius) {
+        f1 = 1.0f;
+    } else {
+        f1 /= kp->acc_play_radius;
+        f1 *= f1;
+        f1 *= f1;
+    }
+    f1 *= kp->acc_sensitivity;
+    *acc += f1 * f2;
 }
 
 void calc_acc_horizon(KPADInsideStatus* kp) {
@@ -341,7 +328,7 @@ void calc_acc_vertical(KPADInsideStatus* kp) {
     if (f1 == 0.0f || f1 >= 2.0f) {
         return;
     }
-    ax /= f1;
+    f2 = ax / f1;
     ay /= f1;
 
     if (f1 > 1.0f) {
@@ -349,7 +336,7 @@ void calc_acc_vertical(KPADInsideStatus* kp) {
     }
     f1 *= f1 * kp_acc_horizon_pw;
 
-    ax = (ax - sp->acc_vertical.x) * f1 + sp->acc_vertical.x;
+    ax = (f2 - sp->acc_vertical.x) * f1 + sp->acc_vertical.x;
     ay = (ay - sp->acc_vertical.y) * f1 + sp->acc_vertical.y;
 
     f1 = sqrt(ax * ax + ay * ay);
@@ -373,7 +360,6 @@ static f32 clamp_acc(f32 acc, f32 clamp) {
 
 void read_kpad_acc(KPADInsideStatus* kp, KPADUnifiedWpadStatus* uwp) {
     KPADStatus* sp = &kp->status;
-    Vec fsrc;
     Vec vec;
 
     switch (uwp->fmt) {
@@ -411,19 +397,17 @@ void read_kpad_acc(KPADInsideStatus* kp, KPADUnifiedWpadStatus* uwp) {
         return;
     }
 
-    fsrc.x = clamp_acc((f32)(s32)-uwp->u.fs.fsAccX * kp->fs_acc_scale_x, kp_fs_acc_max);
-    fsrc.y = clamp_acc((f32)(s32)-uwp->u.fs.fsAccZ * kp->fs_acc_scale_z, kp_fs_acc_max);
-    fsrc.z = clamp_acc((f32)(s32)uwp->u.fs.fsAccY * kp->fs_acc_scale_y, kp_fs_acc_max);
-
-    if (kp->fsAccRevise) {
-        PSMTXMultVec(kp_fs_rot, &fsrc, &fsrc);
-    }
-
     vec = sp->ex_status.fs.acc;
 
-    calc_acc(kp, &sp->ex_status.fs.acc.x, fsrc.x);
-    calc_acc(kp, &sp->ex_status.fs.acc.y, fsrc.y);
-    calc_acc(kp, &sp->ex_status.fs.acc.z, fsrc.z);
+    calc_acc(kp, &sp->ex_status.fs.acc.x,
+             clamp_acc((f32)(s32)-uwp->u.fs.fsAccX * kp->fs_acc_scale_x,
+                       kp_fs_acc_max));
+    calc_acc(kp, &sp->ex_status.fs.acc.y,
+             clamp_acc((f32)(s32)-uwp->u.fs.fsAccZ * kp->fs_acc_scale_z,
+                       kp_fs_acc_max));
+    calc_acc(kp, &sp->ex_status.fs.acc.z,
+             clamp_acc((f32)(s32)uwp->u.fs.fsAccY * kp->fs_acc_scale_y,
+                       kp_fs_acc_max));
     sp->ex_status.fs.acc_value = sqrt(sp->ex_status.fs.acc.x * sp->ex_status.fs.acc.x + sp->ex_status.fs.acc.y * sp->ex_status.fs.acc.y +
                                       sp->ex_status.fs.acc.z * sp->ex_status.fs.acc.z);
 
@@ -701,47 +685,27 @@ void calc_dpd_variable(KPADInsideStatus* kp, s8 valid_fg_next) {
     } else {
         vec.x = pos.x - sp->horizon.x;
         vec.y = pos.y - sp->horizon.y;
-        f1 = sqrt(vec.x * vec.x + vec.y * vec.y);
+        dist = sqrt(vec.x * vec.x + vec.y * vec.y);
 
-        if (kp->hori_play_mode == KPAD_PLAY_MODE_LOOSE) {
-            if (f1 >= kp->hori_play_radius) {
-                f1 = 1.0f;
-            } else {
-                f1 /= kp->hori_play_radius;
-                f1 *= f1;
-                f1 *= f1;
-            }
-            f1 *= kp->hori_sensitivity;
-            vec.x = f1 * vec.x + sp->horizon.x;
-            vec.y = f1 * vec.y + sp->horizon.y;
-            f1 = sqrt(vec.x * vec.x + vec.y * vec.y);
-            vec.x /= f1;
-            vec.y /= f1;
-
-            sp->hori_vec.x = vec.x - sp->horizon.x;
-            sp->hori_vec.y = vec.y - sp->horizon.y;
-            sp->hori_speed = sqrt(sp->hori_vec.x * sp->hori_vec.x + sp->hori_vec.y * sp->hori_vec.y);
-
-            sp->horizon = vec;
+        if (dist >= kp->hori_play_radius) {
+            f1 = 1.0f;
         } else {
-            if (f1 > kp->hori_play_radius) {
-                f1 = (f1 - kp->hori_play_radius) / f1 * kp->hori_sensitivity;
-                vec.x = vec.x * f1 + sp->horizon.x;
-                vec.y = vec.y * f1 + sp->horizon.y;
-                f1 = sqrt(vec.x * vec.x + vec.y * vec.y);
-                vec.x /= f1;
-                vec.y /= f1;
-
-                sp->hori_vec.x = vec.x - sp->horizon.x;
-                sp->hori_vec.y = vec.y - sp->horizon.y;
-                sp->hori_speed = sqrt(sp->hori_vec.x * sp->hori_vec.x + sp->hori_vec.y * sp->hori_vec.y);
-
-                sp->horizon = vec;
-            } else {
-                sp->hori_vec = Vec2_0;
-                sp->hori_speed = 0.0f;
-            }
+            f1 = dist / kp->hori_play_radius;
+            f1 *= f1;
+            f1 *= f1;
         }
+        f1 *= kp->hori_sensitivity;
+        vec.x = f1 * vec.x + sp->horizon.x;
+        vec.y = f1 * vec.y + sp->horizon.y;
+        f1 = sqrt(vec.x * vec.x + vec.y * vec.y);
+        vec.x /= f1;
+        vec.y /= f1;
+
+        sp->hori_vec.x = vec.x - sp->horizon.x;
+        sp->hori_vec.y = vec.y - sp->horizon.y;
+        sp->hori_speed = sqrt(sp->hori_vec.x * sp->hori_vec.x + sp->hori_vec.y * sp->hori_vec.y);
+
+        sp->horizon = vec;
     }
 
     dist = kp->dist_vv1 / kp->sec_length;
@@ -758,40 +722,23 @@ void calc_dpd_variable(KPADInsideStatus* kp, s8 valid_fg_next) {
             f1 = f2;
         }
 
-        if (kp->dist_play_mode == KPAD_PLAY_MODE_LOOSE) {
-            if (f1 >= kp->dist_play_radius) {
-                f1 = 1.0f;
-            } else {
-                f1 /= kp->dist_play_radius;
-                f1 *= f1;
-                f1 *= f1;
-            }
-            f1 *= kp->dist_sensitivity;
-
-            sp->dist_vec = f1 * f2;
-            if (sp->dist_vec < 0.0f) {
-                sp->dist_speed = -sp->dist_vec;
-            } else {
-                sp->dist_speed = sp->dist_vec;
-            }
-
-            sp->dist += sp->dist_vec;
+        if (f1 >= kp->dist_play_radius) {
+            f1 = 1.0f;
         } else {
-            if (f1 > kp->dist_play_radius) {
-                f1 = (f1 - kp->dist_play_radius) / f1 * kp->dist_sensitivity;
-                sp->dist_vec = f1 * f2;
-                if (sp->dist_vec < 0.0f) {
-                    sp->dist_speed = -sp->dist_vec;
-                } else {
-                    sp->dist_speed = sp->dist_vec;
-                }
-
-                sp->dist += sp->dist_vec;
-            } else {
-                sp->dist_vec = 0.0f;
-                sp->dist_speed = 0.0f;
-            }
+            f1 /= kp->dist_play_radius;
+            f1 *= f1;
+            f1 *= f1;
         }
+        f1 *= kp->dist_sensitivity;
+
+        sp->dist_vec = f1 * f2;
+        if (sp->dist_vec < 0.0f) {
+            sp->dist_speed = -sp->dist_vec;
+        } else {
+            sp->dist_speed = sp->dist_vec;
+        }
+
+        sp->dist += sp->dist_vec;
     }
 
     pos.x = (kp->kobj_regular[0].center.x + kp->kobj_regular[1].center.x) * 0.5f;
@@ -814,55 +761,43 @@ void calc_dpd_variable(KPADInsideStatus* kp, s8 valid_fg_next) {
     } else {
         vec.x = pos.x - sp->pos.x;
         vec.y = pos.y - sp->pos.y;
-        f1 = sqrt(vec.x * vec.x + vec.y * vec.y);
+        dist = sqrt(vec.x * vec.x + vec.y * vec.y);
 
-        if (kp->pos_play_mode == KPAD_PLAY_MODE_LOOSE) {
-            if (f1 >= kp->pos_play_radius) {
-                f1 = 1.0f;
-            } else {
-                f1 /= kp->pos_play_radius;
-                f1 *= f1;
-                f1 *= f1;
-            }
-            f1 *= kp->pos_sensitivity;
-
-            sp->vec.x = f1 * vec.x;
-            sp->vec.y = f1 * vec.y;
-            sp->speed = sqrt(sp->vec.x * sp->vec.x + sp->vec.y * sp->vec.y);
-
-            sp->pos.x += sp->vec.x;
-            sp->pos.y += sp->vec.y;
+        if (dist >= kp->pos_play_radius) {
+            f1 = 1.0f;
         } else {
-            if (f1 > kp->pos_play_radius) {
-                f1 = (f1 - kp->pos_play_radius) / f1 * kp->pos_sensitivity;
-                sp->vec.x = f1 * vec.x;
-                sp->vec.y = f1 * vec.y;
-                sp->speed = sqrt(sp->vec.x * sp->vec.x + sp->vec.y * sp->vec.y);
-
-                sp->pos.x += sp->vec.x;
-                sp->pos.y += sp->vec.y;
-            } else {
-                sp->vec = Vec2_0;
-                sp->speed = 0.0f;
-            }
+            f1 = dist / kp->pos_play_radius;
+            f1 *= f1;
+            f1 *= f1;
         }
+        f1 *= kp->pos_sensitivity;
+
+        sp->vec.x = f1 * vec.x;
+        sp->vec.y = f1 * vec.y;
+        sp->speed = sqrt(sp->vec.x * sp->vec.x + sp->vec.y * sp->vec.y);
+
+        sp->pos.x += sp->vec.x;
+        sp->pos.y += sp->vec.y;
     }
 
     sp->dpd_valid_fg = valid_fg_next;
 }
 
 void calc_obj_horizon(KPADInsideStatus* kp) {
-    f32 f1, vx, vy;
+    f32 f1, f2, vx, vy;
 
     vx = kp->kobj_regular[1].center.x - kp->kobj_regular[0].center.x;
     vy = kp->kobj_regular[1].center.y - kp->kobj_regular[0].center.y;
-    kp->sec_length = sqrt(vx * vx + vy * vy);
+    f1 = sqrt(vx * vx + vy * vy);
+    kp->sec_length = f1;
 
-    f1 = 1.0f / kp->sec_length;
-    kp->sec_dist = kp->dist_vv1 * f1;
+    f2 = 1.0f / f1;
+    kp->sec_dist = kp->dist_vv1 * f2;
 
-    kp->sec_nrm.x = (vx *= f1);
-    kp->sec_nrm.y = (vy *= f1);
+    vx *= f2;
+    vy *= f2;
+    kp->sec_nrm.x = vx;
+    kp->sec_nrm.y = vy;
 
     kp->obj_horizon.x = kp->sec_nrm_hori.x * vx + kp->sec_nrm_hori.y * vy;
     kp->obj_horizon.y = kp->sec_nrm_hori.y * vx - kp->sec_nrm_hori.x * vy;
@@ -1137,6 +1072,7 @@ void read_kpad_button(KPADInsideStatus* kp, u32 dev_type, u32 count, u32 core, u
 
 static void KPADiSamplingCallback(s32 chan);
 static void KPADiControlDpdCallback(WPADChannel chan, WPADResult result);
+void KPADReset(void);
 
 s32 KPADRead(KPADChannel chan, KPADStatus samplingBufs[], u32 length) {
     KPADTmpStatus* tp = (KPADTmpStatus*)samplingBufs;
@@ -1153,10 +1089,6 @@ s32 KPADRead(KPADChannel chan, KPADStatus samplingBufs[], u32 length) {
     u32 lastFsButton;
     u32 lastClButton;
     u32 lastDev;
-
-    if (WPADGetStatus() != WPAD_LIB_STATUS_3) {
-        return 0;
-    }
 
     enabled = OSDisableInterrupts();
     if (kp->readLocked) {
@@ -1195,7 +1127,7 @@ s32 KPADRead(KPADChannel chan, KPADStatus samplingBufs[], u32 length) {
 
         idx = (s32)(kp->bufIdx - copy_ct);
         if (idx < 0) {
-            idx += 120;
+            idx += KPAD_MAX_SAMPLES;
         }
 
         --tp;
@@ -1203,7 +1135,7 @@ s32 KPADRead(KPADChannel chan, KPADStatus samplingBufs[], u32 length) {
             --tp;
             tp->w = kp->uniRingBuf[idx];
             idx++;
-            if (idx >= 120) {
+            if (idx >= KPAD_MAX_SAMPLES) {
                 idx = 0;
             }
         }
@@ -1324,11 +1256,11 @@ finish:
 void KPADInit(void) {
     s32 i;
     KPADInsideStatus* kp;
-    //GXColor black = {0, 0, 0, 0};
-    //GXColor white = {255, 255, 255, 255};
     u32 idx;
 
     WPADInit();
+    while (WPADGetStatus() != WPAD_LIB_STATUS_3) {
+    }
     memset(&inside_kpads, 0, sizeof(inside_kpads));
     kp_err_dist_max = (f32)(1.0f + (f32)WPADGetDpdSensitivity());
 
@@ -1346,24 +1278,10 @@ void KPADInit(void) {
         calc_dpd2pos_scale(kp);
         kp->pos_play_radius = kp->hori_play_radius = kp->dist_play_radius = kp->acc_play_radius = 0.0f;
         kp->pos_sensitivity = kp->hori_sensitivity = kp->dist_sensitivity = kp->acc_sensitivity = 1.0f;
-        kp->pos_play_mode = kp->hori_play_mode = kp->dist_play_mode = kp->acc_play_mode = KPAD_PLAY_MODE_LOOSE;
 
         KPADSetBtnRepeat(i, 0.0f, 0.0f);
-        KPADEnableAimingMode(i);
-        kp->fsAccRevise = 0;
 
-        MTXRowCol(kp_fs_rot, 0, 0) = 1;
-        MTXRowCol(kp_fs_rot, 0, 1) = 0;
-        MTXRowCol(kp_fs_rot, 0, 2) = 0;
-        MTXRowCol(kp_fs_rot, 0, 3) = 0;
-        MTXRowCol(kp_fs_rot, 1, 0) = 0;
-        MTXRowCol(kp_fs_rot, 1, 1) = (f32)cos(MTXDegToRad(kp_fs_revise_deg));
-        MTXRowCol(kp_fs_rot, 1, 2) = (f32)-sin(MTXDegToRad(kp_fs_revise_deg));
-        MTXRowCol(kp_fs_rot, 1, 3) = 0;
-        MTXRowCol(kp_fs_rot, 2, 0) = 0;
-        MTXRowCol(kp_fs_rot, 2, 1) = (f32)sin(MTXDegToRad(kp_fs_revise_deg));
-        MTXRowCol(kp_fs_rot, 2, 2) = (f32)cos(MTXDegToRad(kp_fs_revise_deg));
-        MTXRowCol(kp_fs_rot, 2, 3) = 0;
+        KPADCalibrateDPD(i);
 
         idx = 0;
         do {
@@ -1373,50 +1291,45 @@ void KPADInit(void) {
     } while (++i < WPAD_MAX_CONTROLLERS);
 
     KPADReset();
+
     OSRegisterVersion(__KPADVersion);
 }
 
 void KPADReset(void) {
     s32 chan;
+
     KPADSetObjInterval(kp_obj_interval);
 
     chan = WPAD_MAX_CONTROLLERS - 1;
     do {
-        if (WPADGetStatus() == WPAD_LIB_STATUS_3) {
-            WPADStopMotor(chan);
-        }
+        WPADControlMotor(chan, 0);
         inside_kpads[chan].resetReq = TRUE;
     } while (--chan >= 0);
 }
 
-void KPADDisableDPD(KPADChannel chan)
-{
-	inside_kpads[chan].dpdEnabled = FALSE;
+void KPADDisableDPD(KPADChannel chan) {
+    inside_kpads[chan].dpdEnabled = FALSE;
 }
 
-void KPADEnableDPD(KPADChannel chan)
-{
-	inside_kpads[chan].dpdEnabled = TRUE;
+void KPADEnableDPD(KPADChannel chan) {
+    inside_kpads[chan].dpdEnabled = TRUE;
 }
 
-void KPADSetControlDpdCallback(KPADChannel chan, KPADCallback *cb)
-{
-	// ERRATUM: uses chan before assertion
-	KPADInsideStatus *kp = &inside_kpads[chan];
+void KPADSetControlDpdCallback(KPADChannel chan, KPADCallback cb) {
+    KPADInsideStatus* kp = &inside_kpads[chan];
+    BOOL enabled = OSDisableInterrupts();
 
-	BOOL intrStatus = OSDisableInterrupts();
+    kp->dpd_ctrl_callback = cb;
 
-	kp->dpd_ctrl_callback = cb;
-
-	OSRestoreInterrupts(intrStatus);
+    OSRestoreInterrupts(enabled);
 }
+
 static void KPADiSamplingCallback(s32 chan) {
     KPADInsideStatus* kp = &inside_kpads[chan];
     KPADUnifiedWpadStatus* uwp;
     u32 idx;
     u32 type;
     u32 curDpd;
-    f32 aimClbr;
     static struct {
         u8 dpd;
         u8 fmt;
@@ -1439,21 +1352,6 @@ static void KPADiSamplingCallback(s32 chan) {
     kp->bufIdx = (u8)(idx + 1);
     if (kp->bufCount < 16) {
         kp->bufCount++;
-    }
-
-    if (kp->aimReq) {
-        if (kp->aimEnabled) {
-            if (WPAD_SENSOR_BAR_TOP == WPADGetSensorBarPosition()) {
-                aimClbr = 0.2f;
-            } else {
-                aimClbr = -0.2f;
-            }
-        } else {
-            aimClbr = 0.0f;
-        }
-        KPADSetSensorHeight(chan, aimClbr);
-
-        kp->aimReq = FALSE;
     }
 
     switch (type) {

@@ -4,6 +4,11 @@
 
 #include <time.h>
 
+DWCIngamesnCheckResult DWC_GetIngamesnCheckResult(void)
+{
+    return (DWCIngamesnCheckResult)DWCi_Auth_GetIngamesnCheckResult();
+}
+
 BOOL DWC_GetDateTime(DWCDate* date, DWCTime* time)
 {
     s64 diff;

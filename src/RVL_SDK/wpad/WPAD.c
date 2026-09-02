@@ -9,6 +9,8 @@
 
 #include <string.h>
 
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+
 #define DPD_CONFIG1_SIZE 9
 #define DPD_CONFIG2_SIZE 2
 #define SPK_CONFIG_SIZE 7
@@ -36,6 +38,7 @@ u8 _chan_active_state[WPAD_MAX_CONTROLLERS];
 static u8 _scSetting;
 static u8 _shutdown;
 static s8 _afhChannel;
+static s8 _wpadInfoResult[WPAD_MAX_CONTROLLERS];
 static BOOL _initialized;
 static u8 _rumbleCnt[WPAD_MAX_CONTROLLERS];
 static u8 _extCnt[WPAD_MAX_CONTROLLERS];
@@ -52,6 +55,8 @@ static u16 __WPAD_dpd_hyst_count_threshold = 30;
 static void WPADiConnCallback(UINT8 devHandle, u8 open);
 static void WPADiRecvCallback(UINT8 devHandle, UINT8* pReport, UINT16 len);
 
+static void __wpadSyncCallback(WPADChannel chan, WPADResult result);
+static WPADResult __wpadSync(WPADChannel chan);
 static DECOMP_INLINE void WPADiDisconnect(s32 chan, BOOL sleep);
 static void __SendData(s32 chan, WPADCommand command);
 
@@ -132,6 +137,18 @@ _end:
     return result;
 }
 
+static void __wpadSyncCallback(WPADChannel chan, WPADResult result) {
+    _wpadInfoResult[chan] = result;
+
+    OSWakeupThread(&_wpdcb[chan]->threadQueue);
+}
+
+static WPADResult __wpadSync(WPADChannel chan) {
+    OSSleepThread(&_wpdcb[chan]->threadQueue);
+
+    return _wpadInfoResult[chan];
+}
+
 static OSShutdownFunctionInfo ShutdownFunctionInfo = {OnShutdown, 127};
 
 static s32 WPADiSendData(s32 chan, WPADCommand command) {
@@ -184,7 +201,7 @@ static s32 WPADiSendData(s32 chan, WPADCommand command) {
 
 static void WPADiRadioSensitivity(s32 chan) {
     WPADCB* p = _wpdcb[chan];
-    u32 two = 2; // some define?
+    u32 two = 2;
     u16 a;
 
     a = p->radioSensitivity * 9;
@@ -1390,6 +1407,16 @@ s32 WPADSetDataFormat(s32 chan, u32 format) {
 
 _end:
     return status;
+}
+
+WPADResult WPADGetInfo(WPADChannel chan, WPADInfo* pInfo) {
+    WPADResult result = WPADGetInfoAsync(chan, pInfo, __wpadSyncCallback);
+
+    if (result == WPAD_ERR_BUSY) {
+        return result;
+    }
+
+    return __wpadSync(chan);
 }
 
 static void __infoCallback(WPADChannel chan, WPADResult result) {

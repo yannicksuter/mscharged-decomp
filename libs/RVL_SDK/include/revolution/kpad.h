@@ -28,8 +28,6 @@ extern "C" {
 #define KPAD_USE_OBJECTS 2
 #define KPAD_MAX_SAMPLES 16
 
-typedef enum KPADPlayMode { KPAD_PLAY_MODE_LOOSE = 0, KPAD_PLAY_MODE_TIGHT } KPADPlayMode;
-
 typedef union KPADEXStatus {
     struct {
         Vec2 stick;
@@ -141,7 +139,7 @@ typedef struct {
     u16 btn_repeat_pulse;
     u16 btn_cl_repeat_time;
     u16 btn_cl_repeat_next;
-    WPADCallback *dpd_ctrl_callback;
+    WPADCallback dpd_ctrl_callback;
     f32 acc_scale_x;
     f32 acc_scale_y;
     f32 acc_scale_z;
@@ -164,32 +162,23 @@ typedef struct {
     u8 dpdCmd;
     u8 dpdPreCallbackDone;
     u8 dpdPostCallbackDone;
-    u8 aimReq;
-    u8 aimEnabled;
-    u8 fsAccRevise;
-    u8 padding;
-    KPADPlayMode pos_play_mode;
-    KPADPlayMode hori_play_mode;
-    KPADPlayMode dist_play_mode;
-    KPADPlayMode acc_play_mode;
-
 } KPADInsideStatus;
 
 void KPADInit();
 
 void KPADSetBtnRepeat(KPADChannel, f32, f32);
-void KPADSetSensorHeight(KPADChannel, f32);
 void KPADSetPosParam(KPADChannel, f32, f32);
 void KPADSetHoriParam(KPADChannel, f32, f32);
 void KPADSetDistParam(KPADChannel, f32, f32);
 void KPADSetAccParam(KPADChannel, f32, f32);
+void KPADSetSensorHeight(KPADChannel, f32);
+void KPADCalibrateDPD(KPADChannel);
 
-void KPADReset(void);
 s32 KPADRead(KPADChannel, KPADStatus[], u32);
-
-void KPADDisableDPD(KPADChannel chan);
-void KPADEnableDPD(KPADChannel chan);
-void KPADSetControlDpdCallback(KPADChannel chan, KPADCallback *cb);
+void KPADReset(void);
+void KPADDisableDPD(KPADChannel);
+void KPADEnableDPD(KPADChannel);
+void KPADSetControlDpdCallback(KPADChannel, KPADCallback);
 
 extern KPADInsideStatus inside_kpads[];
 

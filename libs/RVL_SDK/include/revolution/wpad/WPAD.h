@@ -334,6 +334,7 @@ WPADExtensionCallback* WPADSetExtensionCallback(s32 chan,
 u32 WPADGetDataFormat(s32 chan);
 s32 WPADSetDataFormat(s32 chan, u32 format);
 
+WPADResult WPADGetInfo(WPADChannel chan, WPADInfo* pInfo);
 s32 WPADGetInfoAsync(s32 chan, WPADInfo* pInfo, WPADCallback pCallback);
 
 void WPADControlMotor(s32 chan, u32 command);
