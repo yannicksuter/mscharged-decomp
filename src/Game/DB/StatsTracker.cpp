@@ -6,6 +6,7 @@
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/DB/BasicGameInfo.h"
+#include "Game/DB/StadiumInfo.h"
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
 #include "Game/GameInfo.h"
@@ -77,7 +78,7 @@ public:
     }
 
     virtual ~StatsTypedEvent2() { }
-    virtual void Disconnect() = 0;
+    virtual void Disconnect(void*) = 0;
     virtual void Add(Function2<void, P1, P2>&, unsigned int, int) = 0;
 };
 
@@ -88,7 +89,6 @@ extern "C" eCharacterClass fn_801CBE78(eTeamID captain);
 extern "C" eCharacterClass fn_801CBE7C(eSidekickID sidekick);
 extern "C" const char* fn_801CBE80(int captain);
 extern "C" const char* fn_801CBEA8(int sidekick);
-extern "C" const char* fn_801B6188(int stadium);
 extern "C" void fn_801E2A14(BaseGameSceneManager* manager);
 extern "C" int fn_80380C34(FILE* file, long offset, int origin);
 extern "C" int fn_8037FA00(FILE* file);
@@ -884,7 +884,7 @@ void StatsTracker::WriteCurrentlyPlaying() const
         fn_801CBEA8(GameInfoManager::Instance()->GetSidekick(0, 0)),
         fn_801CBE80(GameInfoManager::Instance()->GetTeam(1)),
         fn_801CBEA8(GameInfoManager::Instance()->GetSidekick(1, 0)),
-        fn_801B6188(GameInfoManager::Instance()->GetStadium()));
+        GetStadiumName(GameInfoManager::Instance()->GetStadium()));
 
     fwrite(text.c_str(), 1, text.size(), file);
     fclose(file);

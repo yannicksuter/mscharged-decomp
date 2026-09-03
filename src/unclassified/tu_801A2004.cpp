@@ -40,9 +40,8 @@ extern "C" void fn_801A2004(
     HighRangeTweakValues_801A2004* values, const char* group)
 {
     bool registered
-        = ((TweakValue_804F4DC8*)&values->miHighRangeIndex)
-              ->fn_802C4FEC(
-                  "miHighRangeIndex", 0.0f, group, true, 6.0f, 1.0f);
+        = values->miHighRangeIndex.fn_802C4FEC(
+            "miHighRangeIndex", 0.0f, group, true, 6.0f, 1.0f);
     if (!registered)
     {
         *values->miHighRangeIndex.m_pValue
@@ -78,9 +77,8 @@ extern "C" void fn_801A2004(
     }
 
     registered
-        = ((TweakValue_804F4DC8*)&values->miHighRangeGray)
-              ->fn_802C4FEC(
-                  "miHighRangeGray", 0.0f, group, true, 255.0f, 1.0f);
+        = values->miHighRangeGray.fn_802C4FEC(
+            "miHighRangeGray", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
         *values->miHighRangeGray.m_pValue
@@ -92,9 +90,8 @@ extern "C" void fn_801A2004(
     }
 
     registered
-        = ((TweakValue_804F4DC8*)&values->mbFineHighRange)
-              ->fn_802C4FEC(
-                  "mbFineHighRange", 0.0f, group, true, 0.0f, 0.0f);
+        = values->mbFineHighRange.fn_802C4FEC(
+            "mbFineHighRange", 0.0f, group, true, 0.0f, 0.0f);
     if (!registered)
     {
         *values->mbFineHighRange.m_pValue
@@ -105,9 +102,8 @@ extern "C" void fn_801A2004(
         *values->mbFineHighRange.m_pValue = true;
     }
 
-    registered = ((TweakValue_804F4DC8*)&values->miRed)
-                     ->fn_802C4FEC(
-                         "miRed", 0.0f, group, true, 255.0f, 1.0f);
+    registered = values->miRed.fn_802C4FEC(
+            "miRed", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
         *values->miRed.m_pValue = values->miRed.UnidentifiedVirtual3C();
@@ -117,9 +113,8 @@ extern "C" void fn_801A2004(
         *values->miRed.m_pValue = 255;
     }
 
-    registered = ((TweakValue_804F4DC8*)&values->miGreen)
-                     ->fn_802C4FEC(
-                         "miGreen", 0.0f, group, true, 255.0f, 1.0f);
+    registered = values->miGreen.fn_802C4FEC(
+            "miGreen", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
         *values->miGreen.m_pValue
@@ -130,9 +125,8 @@ extern "C" void fn_801A2004(
         *values->miGreen.m_pValue = 255;
     }
 
-    registered = ((TweakValue_804F4DC8*)&values->miBlue)
-                     ->fn_802C4FEC(
-                         "miBlue", 0.0f, group, true, 255.0f, 1.0f);
+    registered = values->miBlue.fn_802C4FEC(
+            "miBlue", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
         *values->miBlue.m_pValue
@@ -143,9 +137,8 @@ extern "C" void fn_801A2004(
         *values->miBlue.m_pValue = 255;
     }
 
-    registered = ((TweakValue_804F4DC8*)&values->miAlpha)
-                     ->fn_802C4FEC(
-                         "miAlpha", 0.0f, group, true, 255.0f, 1.0f);
+    registered = values->miAlpha.fn_802C4FEC(
+            "miAlpha", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
         *values->miAlpha.m_pValue

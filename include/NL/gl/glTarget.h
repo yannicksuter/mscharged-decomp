@@ -33,6 +33,6 @@ void gl_TargetStartup();
 extern "C" GLRenderPair fn_802CD82C();
 extern "C" GLRenderPair fn_802CD884(const char* name, void* targetInfo);
 extern "C" void fn_802CDA14(GLRenderPair* target);
-extern "C" unsigned long fn_802CDAA8(const GLRenderPair* target);
+extern "C" unsigned long fn_802CDAA8(GLRenderPair target);
 
 #endif // NL_GL_GLTARGET_H

@@ -40,7 +40,7 @@
 #include "NL/utility.h"
 #include "unclassified/tu_801A0E64.h"
 #include "unclassified/tu_801A5F10.h"
-#include "unclassified/tu_801B6188.h"
+#include "Game/DB/StadiumInfo.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/ShootToScoreMeter.h"
 #include "math.h"
@@ -2370,7 +2370,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
             fn_8005ED64(lbl_806E0C94, pNode);
 
             if (pAttacker->m_pBall != 0
-                && fn_801B6278(GameInfoManager::Instance()->GetStadium()))
+                && GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
             {
                 unsigned long soundID = 0xDCA472D;
                 if (pAttacker->m_pTeam->m_nSide == 0)
@@ -4926,7 +4926,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
                 if (m_pBall != 0)
                 {
-                    if (fn_801B6278(
+                    if (GetStadiumUnknown0x10(
                             GameInfoManager::Instance()->GetStadium()))
                     {
                         unsigned long soundID = 0x0DCA472D;
@@ -5606,33 +5606,6 @@ extern "C" void fn_8004F594(int category, const char* format, ...)
 bool gbUseTurboCharging = true;
 
 extern const char* lbl_806E1E90;
-
-inline TweakValueBoolImpl_804F4538::TweakValueBoolImpl_804F4538(
-    const char* group, const char* name, bool* value, bool defaultValue)
-    : m_pValue(value)
-{
-    mName = name;
-    mUnidentified009 = defaultValue;
-
-    if (fn_802C0F04() == 0)
-    {
-        void* entry = nlMalloc(0x18, 8, true);
-        if (entry != 0)
-        {
-            fn_802C2DF4((TweakPendingValue*)entry, this, group);
-        }
-        lbl_806E1E90 = group;
-    }
-    else
-    {
-        TweakEntry_8052BF00* config = fn_802C0E30();
-        TweakEntry_8052BF00* entry = fn_802C4504(config, group, 0);
-        if (entry != 0)
-        {
-            fn_802C5780(entry, this);
-        }
-    }
-}
 
 static TweakValueBoolImpl_804F4538 s_UseTurboChargingTweak(
     "Game/Gameplay/Charging/Turbo", "gbUseTurboCharging",

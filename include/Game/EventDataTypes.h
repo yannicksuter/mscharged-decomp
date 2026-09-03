@@ -6,6 +6,7 @@
 class cPlayer;
 class CrowdRiot;
 class PhysicsObject;
+class PhysicsSphere_80175F8C;
 
 struct UnidentifiedEventData_800673FC
 {
@@ -18,6 +19,14 @@ struct UnidentifiedEventData_80066B08
     /* 0x0C */ PhysicsObject* mUnidentified0C;
     /* 0x10 */ CrowdRiot* mUnidentified10;
 }; // total size: 0x14
+
+struct UnidentifiedEventData_80066A04
+{
+    /* 0x00 */ cPlayer* mUnidentified00;
+    /* 0x04 */ int mUnidentified04;
+    /* 0x08 */ void* mUnidentified08;
+    /* 0x0C */ int mUnidentified0C;
+}; // total size: 0x10
 
 struct UnidentifiedEventData00;
 struct UnidentifiedEventData01;
@@ -62,7 +71,13 @@ struct UnidentifiedEventData34;
 struct UnidentifiedEventData35;
 struct UnidentifiedEventData36;
 struct UnidentifiedEventData37;
-struct UnidentifiedEventData38;
+
+struct UnidentifiedEventData38
+{
+    /* 0x00 */ PhysicsSphere_80175F8C* mUnidentified00;
+    /* 0x04 */ PhysicsObject* mUnidentified04;
+    /* 0x08 */ unsigned int mUnidentified08;
+}; // total size: 0xC
 
 struct CollisionPlayerWallData
 {

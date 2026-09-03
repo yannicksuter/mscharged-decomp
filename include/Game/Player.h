@@ -34,6 +34,7 @@ public:
     virtual void PreUpdate(float dt);
     virtual void UnidentifiedVirtual1C();
     virtual void SetAnimID(int animID);
+    virtual void Update(float fDeltaT);
     virtual bool CanPickupBall(cBall* pBall, bool bParam);
     virtual void CollideWithBallCallback(cBall* pBall);
     virtual void CollideWithCharacterCallback(

@@ -80,12 +80,12 @@ public:
     /* 0x74 */ bool mEnabled;
     /* 0x75 */ u8 mPadding75[3];
     /* 0x78 */ int mModelType;
-    /* 0x7C */ TweakValue_804F4DC8 mfScaleInitialCup;
-    /* 0x8C */ TweakValue_804F4DC8 mfScaleCup;
-    /* 0x9C */ TweakValue_804F4DC8 mfCameraLookatZInitialCup;
-    /* 0xAC */ TweakValue_804F4DC8 mfCameraLookatZCup;
-    /* 0xBC */ TweakValue_804F4DC8 mfCameraDistanceInitialCup;
-    /* 0xCC */ TweakValue_804F4DC8 mfCameraDistanceCup;
+    /* 0x7C */ TweakValueImpl_804F4DC8 mfScaleInitialCup;
+    /* 0x8C */ TweakValueImpl_804F4DC8 mfScaleCup;
+    /* 0x9C */ TweakValueImpl_804F4DC8 mfCameraLookatZInitialCup;
+    /* 0xAC */ TweakValueImpl_804F4DC8 mfCameraLookatZCup;
+    /* 0xBC */ TweakValueImpl_804F4DC8 mfCameraDistanceInitialCup;
+    /* 0xCC */ TweakValueImpl_804F4DC8 mfCameraDistanceCup;
 }; // size: 0xDC
 
 extern "C"

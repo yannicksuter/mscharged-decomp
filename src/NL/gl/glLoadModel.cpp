@@ -1,6 +1,7 @@
 #include "NL/gl/glLoadModel.h"
 
 #include "Game/GL/GLInventory.h"
+#include "Game/GL/GLVertexAnim.h"
 #include "Game/SAnim.h"
 #include "NL/gl/glModel.h"
 #include "NL/nlAVLTree.h"
@@ -14,17 +15,8 @@ extern "C"
     void* fn_802CC0A4(unsigned long size, int memoryType, void* allocator);
     void fn_802C8284(unsigned long resource);
     void fn_802C8288();
-    void* fn_802D3D48(void* model, void* header, void* extraData);
     int nlPrintf(const char* format, ...);
 }
-
-struct LoadedModel_802CA870
-{
-    glModel m_Model;
-    unsigned char m_Unknown0C[0x24];
-    void* m_pVertexData;
-    void* m_pMaterialList;
-};
 
 typedef nlAVLTree<unsigned long, void*, DefaultKeyCompare<unsigned long> >
     MaterialProgramTree;
@@ -56,19 +48,17 @@ void RLGReader::fn_802CA870(nlChunk* chunk)
     unsigned long* extraData = (unsigned long*)((unsigned char*)chunk->GetData() + 0x18);
     unsigned char* vertexData = (unsigned char*)(extraData + *(unsigned long*)(data + 0x14));
 
-    LoadedModel_802CA870* model = (LoadedModel_802CA870*)nlMalloc(
-        sizeof(LoadedModel_802CA870), 8, false);
-    if (model != 0)
-    {
-        model = (LoadedModel_802CA870*)fn_802D3D48(model, data, extraData);
-    }
+    GLVertexAnim* model = new (nlMalloc(sizeof(GLVertexAnim), 8, false))
+        GLVertexAnim(data, extraData);
 
     unsigned long vertexDataSize = *(unsigned long*)(data + 4)
                                  * *(unsigned long*)(data + 8) * *(unsigned long*)(data + 0x0C);
-    model->m_pVertexData = fn_802CC0A4(vertexDataSize, 3, m_pContext);
-    memcpy(model->m_pVertexData, vertexData, vertexDataSize);
-    model->m_pMaterialList = m_pContext->m_pInventory->GetMaterialList(*(unsigned long*)data);
-    m_pContext->m_pInventory->AddModel(*(unsigned long*)data, &model->m_Model);
+    model->m_pVertices = (u8*)fn_802CC0A4(vertexDataSize, 3, m_pContext);
+    memcpy(model->m_pVertices, vertexData, vertexDataSize);
+    model->m_pModel = (glModel*)m_pContext->m_pInventory->GetMaterialList(
+        *(unsigned long*)data);
+    m_pContext->m_pInventory->AddModel(
+        *(unsigned long*)data, (glModel*)model);
 }
 
 void RLGReader::fn_802CAA00(void* data, unsigned long size)

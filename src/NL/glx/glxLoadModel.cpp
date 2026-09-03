@@ -205,7 +205,7 @@ glModel* glplatLoadModel(
 }
 
 GLSkinMesh* glx_MakeSkinMesh(
-    nlChunk* outerChunk, GLMaterialList* materialList, cSHierarchy* hierarchy)
+    nlChunk* outerChunk, glModel* models, cSHierarchy* hierarchy)
 {
     unsigned long i;
     unsigned long count;
@@ -216,7 +216,7 @@ GLSkinMesh* glx_MakeSkinMesh(
     ShaderSkinMesh* mesh =
         new (nlMalloc(sizeof(ShaderSkinMesh), 8, false)) ShaderSkinMesh();
 
-    mesh->SetMaterialList(materialList);
+    mesh->fn_802D4268(models);
     mesh->fn_8036FB74(hierarchy);
 
     nlChunk* chunk = outerChunk->GetFirstChunk();

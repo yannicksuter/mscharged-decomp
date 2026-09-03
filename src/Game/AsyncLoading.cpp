@@ -44,6 +44,7 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "NL/nlTicker.h"
+#include "NL/nlTime.h"
 #include "types.h"
 
 #define OS_BUS_CLOCK_SPEED           (*(volatile u32*)0x800000F8)
@@ -101,7 +102,6 @@ struct FrameTimingStat
 extern "C" int fn_8004F594(int category, const char* format, ...);
 extern "C" void fn_80114614(float value);
 extern "C" void fn_801CC114();
-extern "C" unsigned long long fn_802B4478();
 extern "C" void* fn_802C082C(void*, int);
 extern "C" void fn_801A95F0(void*, const char*, int);
 extern "C" GLView* fn_8027267C(int index);
@@ -508,7 +508,7 @@ static inline void BeginLoadingSequence(AsyncLoadingManager* manager, u32 state)
     manager->mSequenceState = state;
     lbl_806E103C = 0;
     manager->mPreviousStageTick = nlGetTicker();
-    manager->mStartingFreeMemory = fn_802B4478();
+    manager->mSequenceStartTime = nlGetTime();
 }
 
 extern "C" void fn_80119054(AsyncLoadingManager* manager)

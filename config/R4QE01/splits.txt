@@ -1052,7 +1052,7 @@ Game/Drawable/DrawableFlyingCamera.cpp:
 	.sbss       start:0x806E1408 end:0x806E140C
 	.sdata2     start:0x806E4BD8 end:0x806E4BF8
 
-unclassified/tu_8017FFCC.cpp:
+Game/Drawable/DrawableDaisyFist.cpp:
 	.text       start:0x8017FFCC end:0x801802D4
 	.sdata2     start:0x806E4BF8 end:0x806E4C18
 
@@ -1328,7 +1328,7 @@ Game/Effects/PhotoFlashEffect.cpp:
 	.sdata      start:0x806DD030 end:0x806DD038
 	.sdata2     start:0x806E5280 end:0x806E528C
 
-unclassified/tu_801AE0C4.cpp:
+Game/Render/AttackSideIndicators_801AE0C4.cpp:
 	.text       start:0x801AE0C4 end:0x801AE510
 	.data       start:0x80514480 end:0x805144A8
 	.sdata      start:0x806DD038 end:0x806DD040
@@ -1397,7 +1397,7 @@ unclassified/tu_801B369C.cpp:
 	.sbss       start:0x806E16C8 end:0x806E16E8
 	.sdata2     start:0x806E5388 end:0x806E53E8
 
-unclassified/tu_801B6188.cpp:
+Game/DB/StadiumInfo.cpp:
 	.text       start:0x801B6188 end:0x801B640C
 	.data       start:0x805148A8 end:0x80515474
 	.sdata      start:0x806DD158 end:0x806DD1BC
@@ -2391,9 +2391,36 @@ NL/nlDebugFile.cpp:
 	.sdata      start:0x806DF228 end:0x806DF238
 	.sbss       start:0x806E1D88 end:0x806E1D90
 
+NL/tu_802B1A30.cpp:
+	.text       start:0x802B1A30 end:0x802B2518
+	.ctors      start:0x804DB980 end:0x804DB984
+	.bss        start:0x8057B570 end:0x8057B660
+
+NL/tu_802B2518.cpp:
+	.text       start:0x802B2518 end:0x802B36B8
+	.ctors      start:0x804DB984 end:0x804DB988
+	.data       start:0x8052B4C8 end:0x8052B538
+	.bss        start:0x8057B660 end:0x8057B6C0
+	.sdata      start:0x806DF238 end:0x806DF240
+	.sbss       start:0x806E1D90 end:0x806E1D98
+
 NL/nlFile.cpp:
 	.text       start:0x802B36B8 end:0x802B3B38
 	.data       start:0x8052B538 end:0x8052B54C
+
+NL/tu_802B3C28.cpp:
+	.text       start:0x802B3C28 end:0x802B41B4
+	.sbss       start:0x806E1D9C end:0x806E1DA0
+
+NL/tu_802B41B4.cpp:
+	.text       start:0x802B41B4 end:0x802B4474
+
+NL/nlTime.cpp:
+	.text       start:0x802B4474 end:0x802B44DC
+	.sdata2     start:0x806E60B0 end:0x806E60B8
+
+NL/nlInit.cpp:
+	.text       start:0x802B44DC end:0x802B4514
 
 NL/nlSlotPool.cpp:
 	.text       start:0x802B4514 end:0x802B4834
@@ -2417,10 +2444,23 @@ NL/utility.cpp:
 	.text       start:0x802B6234 end:0x802B6568
 	.sdata2     start:0x806E6108 end:0x806E6128
 
+NL/tu_802B6568.cpp:
+	.text       start:0x802B6568 end:0x802B66D8
+	.sdata      start:0x806DF248 end:0x806DF24C
+	.sdata2     start:0x806E6128 end:0x806E6138
+
 Game/Core/mtRandom.cpp:
 	.text       start:0x802B66D8 end:0x802B68E8
 	.bss        start:0x8057B730 end:0x8057C0F0
 	.sdata      start:0x806DF250 end:0x806DF254
+
+unclassified/tu_802B68E8.cpp:
+	.text       start:0x802B68E8 end:0x802B6BC8
+	.sdata2     start:0x806E6138 end:0x806E6148
+
+unclassified/tu_802B6BC8.cpp:
+	.text       start:0x802B6BC8 end:0x802B6CD8
+	.sdata2     start:0x806E6148 end:0x806E6154
 
 Game/Sys/clock.cpp:
 	.text       start:0x802B6CD8 end:0x802B75BC
@@ -2432,6 +2472,13 @@ NL/nlTimer.cpp:
 	.text       start:0x802B75BC end:0x802B7798
 	.sdata2     start:0x806E6160 end:0x806E6178
 
+unclassified/tu_802B7798.cpp:
+	.text       start:0x802B7798 end:0x802B77B0
+	.sbss       start:0x806E1DB8 end:0x806E1DC0
+
+unclassified/tu_802B77B0.cpp:
+	.text       start:0x802B77B0 end:0x802B7BDC
+
 Game/Debug/FrameCounter.cpp:
 	.text       start:0x802B7BDC end:0x802B94B4
 	.ctors      start:0x804DB990 end:0x804DB994
@@ -2440,6 +2487,24 @@ Game/Debug/FrameCounter.cpp:
 	.sdata      start:0x806DF258 end:0x806DF290
 	.sbss       start:0x806E1DC0 end:0x806E1DC8
 	.sdata2     start:0x806E6180 end:0x806E61F0
+
+unclassified/tu_802BAE84.cpp:
+	.text       start:0x802BAE84 end:0x802BB668
+	.ctors      start:0x804DB998 end:0x804DB99C
+	.data       start:0x8052B640 end:0x8052B668
+	.bss        start:0x8057C1A8 end:0x8057C200
+	.sdata      start:0x806DF2C8 end:0x806DF2D8
+	.sbss       start:0x806E1DE0 end:0x806E1DE8
+	.sdata2     start:0x806E6238 end:0x806E6248
+
+Game/Debug/ShapeRender.cpp:
+	.text       start:0x802BB668 end:0x802BD4E4
+	.ctors      start:0x804DB99C end:0x804DB9A0
+	.rodata     start:0x804EB2A8 end:0x804EB2B8
+	.data       start:0x8052B668 end:0x8052B900
+	.bss        start:0x8057C200 end:0x8057C260
+	.sbss       start:0x806E1DE8 end:0x806E1DF0
+	.sdata2     start:0x806E6248 end:0x806E6298
 
 Game/Task/SmokeTestUpdateTask.cpp:
 	.text       start:0x802BD4E4 end:0x802BD814
@@ -2469,6 +2534,12 @@ NL/nlBundleFile.cpp:
 	.text       start:0x802BDB70 end:0x802BE64C
 	.data       start:0x8052BA40 end:0x8052BA70
 
+Game/PadMonkey.cpp:
+	.text       start:0x802C0854 end:0x802C0C84
+	.ctors      start:0x804DB9B4 end:0x804DB9B8
+	.sbss       start:0x806E1E30 end:0x806E1E38
+	.sdata2     start:0x806E62B0 end:0x806E62C8
+
 Game/TweakRegistry.cpp:
 	.text       start:0x802C0CCC end:0x802C3888
 	.ctors      start:0x804DB9B8 end:0x804DB9BC
@@ -2495,6 +2566,27 @@ Game/TweakNode.cpp:
 Game/TweakValue.cpp:
 	.text       start:0x802C4F94 end:0x802C5248
 	.ctors      start:0x804DB9C8 end:0x804DB9CC
+
+Game/TweakEntry.cpp:
+	.text       start:0x802C5248 end:0x802C6124
+	.ctors      start:0x804DB9CC end:0x804DB9D0
+	.data       start:0x8052BF00 end:0x8052BF20
+	.bss        start:0x8057C728 end:0x8057C778
+
+Game/tu_802C6224.cpp:
+	.text       start:0x802C6224 end:0x802C7480
+	.ctors      start:0x804DB9D0 end:0x804DB9D4
+	.data       start:0x8052BF20 end:0x8052BF70
+	.bss        start:0x8057C778 end:0x8057C798
+	.sdata      start:0x806DF368 end:0x806DF3A0
+	.sbss       start:0x806E1E88 end:0x806E1E98
+	.sdata2     start:0x806E62D8 end:0x806E62E0
+
+Game/Replay.cpp:
+	.text       start:0x802C76F8 end:0x802C7FD0
+	.data       start:0x8052BFA0 end:0x8052BFB8
+	.sbss       start:0x806E1E98 end:0x806E1EA0
+	.sdata2     start:0x806E62E0 end:0x806E62E8
 
 NL/gl/gl.cpp:
 	.text       start:0x802C7FD0 end:0x802C8290
@@ -2539,6 +2631,9 @@ NL/gl/glMemory.cpp:
 NL/gl/glModel.cpp:
 	.text       start:0x802CC0EC end:0x802CC370
 
+NL/gl/tu_802CC370.cpp:
+	.text       start:0x802CC370 end:0x802CCA58
+
 NL/gl/glStat.cpp:
 	.text       start:0x802CCDFC end:0x802CCE00
 
@@ -2578,6 +2673,29 @@ Game/GL/GLInventory.cpp:
 	.text       start:0x802D2B2C end:0x802D38A4
 	.data       start:0x8052E5C0 end:0x8052E758
 
+Game/GL/tu_802D38A4.cpp:
+	.text       start:0x802D38A4 end:0x802D3A08
+
+Game/GL/GLTextureAnim.cpp:
+	.text       start:0x802D3A08 end:0x802D3D48
+	.sdata2     start:0x806E6368 end:0x806E6370
+
+Game/GL/GLVertexAnim.cpp:
+	.text       start:0x802D3D48 end:0x802D400C
+	.sdata2     start:0x806E6370 end:0x806E6388
+
+Game/GL/GLSkinMesh.cpp:
+	.text       start:0x802D400C end:0x802D4270
+	.data       start:0x8052E758 end:0x8052E778
+	.sdata2     start:0x806E6388 end:0x806E6390
+
+Game/Render/tu_802D4290.cpp:
+	.text       start:0x802D4290 end:0x802D5720
+	.data       start:0x8052E778 end:0x8052E818
+	.sdata      start:0x806DF410 end:0x806DF428
+	.sbss       start:0x806E1F48 end:0x806E1F60
+	.sdata2     start:0x806E6390 end:0x806E63D0
+
 Game/Render/Impostor.cpp:
 	.text       start:0x802D5740 end:0x802D58E8
 	.ctors      start:0x804DB9FC end:0x804DBA00
@@ -2600,6 +2718,24 @@ Game/Render/ImpostorCharacter.cpp:
 	.sdata      start:0x806DF438 end:0x806DF440
 	.sbss       start:0x806E1F68 end:0x806E1F6C
 	.sdata2     start:0x806E63F0 end:0x806E642C
+
+Game/Render/tu_802D818C.cpp:
+	.text       start:0x802D818C end:0x802D88F4
+	.ctors      start:0x804DBA08 end:0x804DBA0C
+	.rodata     start:0x804EB2F8 end:0x804EB310
+	.data       start:0x8052EA20 end:0x8052EAE8
+	.bss        start:0x8057F350 end:0x8057F410
+	.sdata2     start:0x806E6430 end:0x806E6448
+
+Game/Render/tu_802D88F4.cpp:
+	.text       start:0x802D88F4 end:0x802DAEE0
+	.ctors      start:0x804DBA0C end:0x804DBA10
+	.rodata     start:0x804EB310 end:0x804EB320
+	.data       start:0x8052EAE8 end:0x8052EC78
+	.bss        start:0x8057F410 end:0x8057F580
+	.sdata      start:0x806DF440 end:0x806DF448
+	.sbss       start:0x806E1F70 end:0x806E1F80
+	.sdata2     start:0x806E6448 end:0x806E6478
 
 Game/InterpreterCore.cpp:
 	.text       start:0x802DE284 end:0x802E0010

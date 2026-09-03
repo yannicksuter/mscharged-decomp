@@ -1,33 +1,11 @@
-#include "unclassified/tu_801B6188.h"
+#include "Game/DB/StadiumInfo.h"
 
-struct UnidentifiedStadiumData
+enum
 {
-    /* 0x00 */ int unknown_0x00;
-    /* 0x04 */ const char* unknown_0x04;
-    /* 0x08 */ int unknown_0x08;
-    /* 0x0C */ int unknown_0x0C;
-    /* 0x10 */ bool unknown_0x10;
-    /* 0x11 */ bool unknown_0x11;
-    /* 0x12 */ bool unknown_0x12;
-    /* 0x13 */ bool unknown_0x13;
-    /* 0x14 */ int unknown_0x14;
-    /* 0x18 */ const char* unknown_0x18;
-    /* 0x1C */ const char* unknown_0x1C;
-    /* 0x20 */ const char* unknown_0x20;
-    /* 0x24 */ const char* unknown_0x24;
-    /* 0x28 */ int unknown_0x28;
-    /* 0x2C */ bool unknown_0x2C;
-    /* 0x2D */ bool unknown_0x2D;
-    /* 0x2E */ bool unknown_0x2E;
-    /* 0x2F */ bool unknown_0x2F;
-    /* 0x30 */ unsigned long unknown_0x30;
-    /* 0x34 */ bool unknown_0x34;
-    /* 0x35 */ bool unknown_0x35;
-    /* 0x36 */ bool unknown_0x36;
-    /* 0x37 */ bool unknown_0x37;
+    NUM_STADIUMS = 18,
 };
 
-static UnidentifiedStadiumData sStadiumData[18] = {
+static StadiumInfo sStadiumInfo[NUM_STADIUMS] = {
     { 0, "battledome", 1, 0, true, false, false, false, 0x2F,
         "cement", "STADIUM_TICKER_BATTLEDOME",
         "art/movies/stad_battledome.thp",
@@ -146,80 +124,80 @@ extern "C" bool fn_801103D4();
 extern "C" bool fn_80110470();
 extern "C" int fn_803693B4();
 
-extern "C" const char* fn_801B6188(int stadium)
+const char* GetStadiumName(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x04;
+    return sStadiumInfo[stadium].mName;
 }
 
-extern "C" int fn_801B61A0(int stadium)
+int GetStadiumUnknown0x14(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x14;
+    return sStadiumInfo[stadium].unknown_0x14;
 }
 
-extern "C" bool fn_801B61B8(int stadium)
+bool IsStadiumEnabled(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x2D;
+    return sStadiumInfo[stadium].mEnabled;
 }
 
-extern "C" void fn_801B61D0()
+void EnableAllStadiums()
 {
     for (int i = 0; i < 17; ++i)
     {
-        sStadiumData[i].unknown_0x2D = true;
+        sStadiumInfo[i].mEnabled = true;
     }
 }
 
-extern "C" int fn_801B6230(int stadium)
+int GetStadiumUnknown0x08(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x08;
+    return sStadiumInfo[stadium].unknown_0x08;
 }
 
-extern "C" int fn_801B6248(int stadium)
+int GetStadiumUnknown0x0C(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x0C;
+    return sStadiumInfo[stadium].unknown_0x0C;
 }
 
-extern "C" bool fn_801B6260(int stadium)
+bool GetStadiumUnknown0x11(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x11;
+    return sStadiumInfo[stadium].unknown_0x11;
 }
 
-extern "C" bool fn_801B6278(int stadium)
+bool GetStadiumUnknown0x10(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x10;
+    return sStadiumInfo[stadium].unknown_0x10;
 }
 
-extern "C" const char* fn_801B6290(int stadium)
+const char* GetStadiumTerrain(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x18;
+    return sStadiumInfo[stadium].mTerrain;
 }
 
-extern "C" bool fn_801B62A8(int stadium)
+bool GetStadiumUnknown0x2C(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x2C;
+    return sStadiumInfo[stadium].unknown_0x2C;
 }
 
-extern "C" bool fn_801B62C0(int stadium, bool value)
+bool SetStadiumUnknown0x2C(int stadium, bool value)
 {
-    bool previous = sStadiumData[stadium].unknown_0x2C;
-    sStadiumData[stadium].unknown_0x2C = value;
+    bool previous = sStadiumInfo[stadium].unknown_0x2C;
+    sStadiumInfo[stadium].unknown_0x2C = value;
     return previous;
 }
 
-extern "C" const char* fn_801B62DC(int stadium)
+const char* GetStadiumTickerStringID(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x1C;
+    return sStadiumInfo[stadium].mTickerStringID;
 }
 
-extern "C" const char* fn_801B62F4(int stadium)
+const char* GetStadiumMoviePath(int stadium)
 {
-    if (fn_801B63C8(stadium))
+    if (IsStadiumUnlocked(stadium))
     {
         if (fn_803693B4() == 1)
         {
-            return sStadiumData[stadium].unknown_0x24;
+            return sStadiumInfo[stadium].mMoviePathPAL;
         }
-        return sStadiumData[stadium].unknown_0x20;
+        return sStadiumInfo[stadium].mMoviePath;
     }
 
     if (fn_803693B4() == 1)
@@ -229,22 +207,22 @@ extern "C" const char* fn_801B62F4(int stadium)
     return "art/movies/stad_locked.thp";
 }
 
-extern "C" int fn_801B6380(int stadium)
+int GetStadiumUnknown0x28(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x28;
+    return sStadiumInfo[stadium].unknown_0x28;
 }
 
-extern "C" unsigned long fn_801B6398(int stadium)
+unsigned long GetStadiumSoundID(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x30;
+    return sStadiumInfo[stadium].mSoundID;
 }
 
-extern "C" bool fn_801B63B0(int stadium)
+bool GetStadiumUnknown0x34(int stadium)
 {
-    return sStadiumData[stadium].unknown_0x34;
+    return sStadiumInfo[stadium].unknown_0x34;
 }
 
-extern "C" bool fn_801B63C8(int stadium)
+bool IsStadiumUnlocked(int stadium)
 {
     switch (stadium)
     {

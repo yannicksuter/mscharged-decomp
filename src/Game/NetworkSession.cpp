@@ -14,7 +14,7 @@
 #include "NL/MemAlloc.h"
 #include "NL/nlMemory.h"
 #include "types.h"
-#include "unclassified/tu_801B6188.h"
+#include "Game/DB/StadiumInfo.h"
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
@@ -440,7 +440,7 @@ void UnidentifiedNetworkSession::SendGameStartToEveryone()
         message.mStadium = fn_803236CC() & 0xF;
         if (fn_802C2C84("/user/media_build", 0))
         {
-            while (!fn_801B63C8(message.mStadium))
+            while (!IsStadiumUnlocked(message.mStadium))
             {
                 message.mStadium = fn_803236CC() & 0xF;
             }
@@ -2940,33 +2940,6 @@ struct UnidentifiedStaticStorage
 };
 
 struct UnidentifiedStaticTag;
-
-inline TweakValueBoolImpl_804F4538::TweakValueBoolImpl_804F4538(
-    const char* group, const char* name, bool* value, bool defaultValue)
-    : m_pValue(value)
-{
-    mName = name;
-    mUnidentified009 = defaultValue;
-
-    if (fn_802C0F04() == 0)
-    {
-        void* entry = nlMalloc(0x18, 8, true);
-        if (entry != 0)
-        {
-            fn_802C2DF4((TweakPendingValue*)entry, this, group);
-        }
-        lbl_806E1E90 = group;
-    }
-    else
-    {
-        TweakEntry_8052BF00* config = fn_802C0E30();
-        TweakEntry_8052BF00* entry = fn_802C4504(config, group, 0);
-        if (entry != 0)
-        {
-            fn_802C5780(entry, this);
-        }
-    }
-}
 
 static TweakValueBoolImpl_804F4538 s_NoPopupNetworkErrorTweak(
     "Network", "g_bNoPopupNetworkError", &lbl_806E10E8, true);

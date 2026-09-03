@@ -2,6 +2,7 @@
 
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "unclassified/tu_802BAE84.h"
 
 #include <string.h>
 
@@ -14,7 +15,6 @@ struct NetworkSocketInitializeInfo
 extern "C"
 {
     int fn_8004F594(int channel, const char* format, ...);
-    void fn_802BB048(int row, int column, void*, int, const char*, ...);
     int DWC_SendUnreliable(u8 aid, const void* buffer, int size);
     long SOGetHostID();
 

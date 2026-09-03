@@ -6,8 +6,13 @@
 
 class cSHierarchy;
 class cPoseAccumulator;
-class GLMaterialList;
 struct glModel;
+
+struct UnidentifiedGLSkinMeshEntry
+{
+    /* 0x00 */ unsigned long morphID;
+    /* 0x04 */ float morphWeight;
+};
 
 struct UnidentifiedShaderSkinEntry_80370868
 {
@@ -32,28 +37,33 @@ class GLSkinMesh
 {
 public:
     GLSkinMesh()
-        : m_pMaterialList(0)
+        : pModel(0)
         , m_Unknown08(0)
         , m_Unknown0C(0)
         , m_Unknown10(0)
-        , m_Unknown14(0)
+        , numMorphs(0)
         , m_Unknown18(0)
         , m_Unknown1C(true)
     {
     }
 
     virtual ~GLSkinMesh();
-    virtual void SetMaterialList(GLMaterialList* materialList);
-    virtual glModel* GetModel() = 0;
+    virtual void fn_802D4268(glModel* model);
+    virtual glModel* GetModel() { return pModel; }
     virtual void Pose(cPoseAccumulator* pPoseAccumulator) = 0;
     virtual void PrepareToRender() = 0;
     virtual void fn_Unknown5() = 0;
 
-    /* 0x04 */ GLMaterialList* m_pMaterialList;
+    void fn_802D407C(unsigned long count);
+    void fn_802D40F4(unsigned long index, unsigned long id);
+    void fn_802D4104(cPoseAccumulator* pPoseAccumulator);
+    void fn_802D41D4();
+
+    /* 0x04 */ glModel* pModel;
     /* 0x08 */ unsigned long m_Unknown08;
     /* 0x0C */ void* m_Unknown0C;
-    /* 0x10 */ void* m_Unknown10;
-    /* 0x14 */ unsigned long m_Unknown14;
+    /* 0x10 */ UnidentifiedGLSkinMeshEntry* m_Unknown10;
+    /* 0x14 */ unsigned long numMorphs;
     /* 0x18 */ unsigned long m_Unknown18;
     /* 0x1C */ bool m_Unknown1C;
 };
@@ -92,8 +102,6 @@ public:
     virtual void PrepareToRender();
     virtual void fn_Unknown5();
 
-    void fn_802D407C(unsigned long count);
-    void fn_802D40F4(unsigned long index, unsigned long id);
     void fn_8036F768(unsigned long count);
     void fn_8036F7B0(unsigned long firstIndex, unsigned long secondIndex,
         unsigned long count, const void* data);

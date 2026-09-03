@@ -1,6 +1,7 @@
 #include "Game/FE/feHelpFuncs.h"
 
 #include "Game/DB/CharacterInfo.h"
+#include "Game/DB/StadiumInfo.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feModelManager.h"
 #include "Game/FE/tlComponent.h"
@@ -63,14 +64,12 @@ extern "C" int fn_801CBEF8(const char* name)
     return GetCharacterInfo(GetCharacterIndexFromName(name)).mSidekickId;
 }
 
-extern "C" const char* fn_801B6188(int stadium);
-
 extern "C" int fn_801CBF20(const char* name)
 {
     int stadium = -1;
     for (int i = 0; i < 18; ++i)
     {
-        if (nlStrICmp(fn_801B6188(i), name) == 0)
+        if (nlStrICmp(GetStadiumName(i), name) == 0)
         {
             stadium = i;
             break;

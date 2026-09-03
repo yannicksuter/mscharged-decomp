@@ -21,8 +21,6 @@ class TweakNode_8052BEB0;
 struct TweakPendingValue;
 struct TweakRecycledName;
 
-typedef nlSmallBlockAllocator<0x10, 0x20, 1, 1> TweakValueAllocator2;
-
 extern "C"
 {
     extern nlSlotPoolFixed<0x10> lbl_8057C66C;
@@ -51,7 +49,7 @@ extern "C"
     int fn_802C269C(const char* str, unsigned int count, int index);
     int fn_802C278C(const char* name, int* outLength);
     const char* fn_802C2914(const char* name, int kind);
-    void* fn_802C2B38(const char* name);
+    void fn_802C2B38(TweakValueBase_8052BF70* value);
     float fn_802C2B48(const char* path, float defaultValue);
     int fn_802C2BE8(const char* path, int defaultValue);
     u8 fn_802C2C84(const char* path, u8 defaultValue);
@@ -60,13 +58,17 @@ extern "C"
 
     // TU3: node and path management.
     TweakEntry_8052BF00* fn_802C3FF8(TweakEntry_8052BF00* entry, const char* name, int noCreate);
+    const char* fn_802C3FDC(TweakNode_8052BEB0* node);
     TweakEntry_8052BF00* fn_802C41B4(TweakEntry_8052BF00* entry, const char* path);
     void fn_802C47E4(TweakNode_8052BEB0* node);
 
-    // Config-file TU.
-    void fn_802C56E8(TweakEntry_8052BF00* entry, TweakEntry_8052BF00* child);
+    // Entry TU.
+    void fn_802C54CC(TweakEntry_8052BF00* entry, TweakNode_8052BEB0* child);
+    void fn_802C56E8(TweakEntry_8052BF00* entry, TweakNode_8052BEB0* child);
     void fn_802C5D74(TweakEntry_8052BF00* entry);
-    void* fn_802C595C(TweakEntry_8052BF00* entry, const char* name);
+    TweakNode_8052BEB0* fn_802C5884(TweakEntry_8052BF00* entry, const char* name);
+    void fn_802C595C(TweakEntry_8052BF00* entry, TweakValueBase_8052BF70* value);
+    void fn_802C5B84(TweakEntry_8052BF00* entry);
     void fn_802C7480(const char* path, const char** name, char* dir);
     void fn_802C7534(const char* a, const char* b, char* out);
 
@@ -86,7 +88,6 @@ public:
     virtual int UnidentifiedVirtual10() { return 1; }
     virtual int UnidentifiedVirtual14() { return 0; }
     virtual TweakEntry_8052BF00* UnidentifiedVirtual18();
-    virtual void UnidentifiedVirtual1C() = 0;
 
     static void operator delete(void* ptr);
 
@@ -109,15 +110,14 @@ public:
     virtual TweakEntry_8052BF00* UnidentifiedVirtual18();
     virtual void UnidentifiedVirtual1C();
 
+    static void operator delete(void* ptr) { lbl_8057C734.Free(ptr); }
+
     /* 0x20 */ TweakNode_8052BEB0* m_ChildHead;
     /* 0x24 */ TweakNode_8052BEB0* m_ChildTail;
-    /* 0x28 */ int m_Unk28;
+    /* 0x28 */ bool m_Unk28;
+    /* 0x29 */ bool m_Unk29;
+    /* 0x2A */ u8 m_Pad2A[2];
 }; // size: 0x2C
-
-inline const char* fn_802C3FDC(TweakNode_8052BEB0* node)
-{
-    return node->m_Value != 0 ? node->m_Value->mName : "ROOT";
-}
 
 struct TweakPendingValue
 {

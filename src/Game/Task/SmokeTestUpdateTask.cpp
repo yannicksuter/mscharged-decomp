@@ -2,6 +2,7 @@
 #include "NL/nlDebugFile.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_802BAE84.h"
 
 #include "types.h"
 
@@ -65,7 +66,6 @@ extern "C" bool fn_802BD63C();
 extern "C" void fn_802BD644(const char* format, ...);
 extern "C" void fn_802BD718(const char* name, const char* units, float value);
 
-extern "C" void fn_802BB048(void*, void*, void*, int, const char*, ...);
 extern "C" const char* fn_802C2D20(const char*, const char*);
 
 bool lbl_806E1DF0;

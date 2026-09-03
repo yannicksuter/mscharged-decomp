@@ -200,8 +200,8 @@ void fn_802C0F24(int fromEnd, u8 flag, unsigned int* sizes)
         lbl_806E1E58->m_Pool3.PushState();
         lbl_806E1E5C->m_Pool1.PushState();
         lbl_806E1E5C->m_Pool2.PushState();
-        lbl_806E1E42 = 1;
         lbl_8057C66C.PushState();
+        lbl_806E1E42 = 1;
     }
 }
 
@@ -215,13 +215,14 @@ void fn_802C1B98(void)
 
 void fn_802C1BB0(void)
 {
+    TweakValueBase_8052BF70* value;
     TweakPendingValue* pending = lbl_806E1E60;
     while (pending != 0)
     {
-        TweakValueBase_8052BF70* value = pending->m_Value;
+        value = pending->m_Value;
         value->UnidentifiedVirtual0C();
         int kind = value->UnidentifiedVirtual10();
-        if ((!pending->m_Registered && kind == 1) || (kind == 2 && ((TweakValueImpl_804F4DC8*)value)->UnidentifiedVirtual30()))
+        if ((!pending->m_Registered && kind == 1) || (kind == 2 && ((UnidentifiedTweakValueImplBase*)value)->UnidentifiedVirtual30()))
         {
             if (value->mUnidentified009)
             {
@@ -230,21 +231,8 @@ void fn_802C1BB0(void)
                     value->mName = fn_802C2914(value->mName, kTweakStringStatic);
                 }
             }
-            const char* slash;
-            const char* p = value->mName;
-            while (*p != '\0')
-            {
-                if (*p == '/')
-                {
-                    slash = p;
-                    goto found;
-                }
-                p++;
-            }
-            slash = 0;
-        found:
             TweakEntry_8052BF00* entry;
-            if (slash != 0)
+            if (nlStrChr(value->mName, '/') != 0)
             {
                 const char* name;
                 char dir[0x100];
@@ -285,7 +273,7 @@ void fn_802C1D30(void)
                     value->mName = fn_802C2914(value->mName, kTweakStringStatic);
                 }
             }
-            if (!((TweakValue_804F4DC8*)value)
+            if (!((UnidentifiedTweakValueImplBase*)value)
                     ->fn_802C4FEC(value->mName, 0.0f, pending->m_Category, false, 0.0f, 0.0f))
             {
                 TweakValueImpl_804F4DC8* impl = (TweakValueImpl_804F4DC8*)value;
@@ -348,10 +336,22 @@ const char* fn_802C1EBC(const char* str, int kind)
     return start;
 }
 
+// Interns the name, allocates the value from the shared pool and registers it
+// under the entry. Retail evaluates the value argument before the interning
+// call in every branch, which only a call boundary reproduces.
+template <typename T, typename V>
+static T* UnidentifiedCreateValue(TweakEntry_8052BF00* entry, const char* name, V value)
+{
+    const char* interned = fn_802C1EBC(name, kTweakStringCurrent);
+    T* created = new (lbl_806E1E58->Allocate(sizeof(T))) T(interned, value);
+    fn_802C5780(entry, created);
+    return created;
+}
+
 void fn_802C2080(TweakEntry_8052BF00* entry, const char* name, const char* valueStr)
 {
-    TweakValueBase_8052BF70* value;
     int intValue = 0;
+    TweakValueBase_8052BF70* value;
     bool boolValue = 0;
     const char* scan;
     float floatValue = 0.0f;
@@ -370,12 +370,7 @@ void fn_802C2080(TweakEntry_8052BF00* entry, const char* name, const char* value
 scannedInt:
     if (isInt)
     {
-        const char* interned = fn_802C1EBC(name, kTweakStringCurrent);
-        GXMaterialColourTweak_804FC520* colour = new (
-            lbl_806E1E58->Allocate(sizeof(GXMaterialColourTweak_804FC520)))
-            GXMaterialColourTweak_804FC520(interned, intValue);
-        value = colour;
-        fn_802C5780(entry, colour);
+        value = UnidentifiedCreateValue<GXMaterialColourTweak_804FC520>(entry, name, intValue);
     }
     else
     {
@@ -396,30 +391,15 @@ scannedInt:
     scannedFloat:
         if (isFloat)
         {
-            const char* interned = fn_802C1EBC(name, kTweakStringCurrent);
-            GXMaterialFloatTweak_804F4190* flt = new (
-                lbl_806E1E58->Allocate(sizeof(GXMaterialFloatTweak_804F4190)))
-                GXMaterialFloatTweak_804F4190(interned, floatValue);
-            value = flt;
-            fn_802C5780(entry, flt);
+                value = UnidentifiedCreateValue<GXMaterialFloatTweak_804F4190>(entry, name, floatValue);
         }
         else if (fn_802C250C(valueStr, &boolValue))
         {
-            const char* interned = fn_802C1EBC(name, kTweakStringCurrent);
-            TweakValueBool_804F4578* boolean = new (
-                lbl_806E1E58->Allocate(sizeof(TweakValueBool_804F4578)))
-                TweakValueBool_804F4578(interned, boolValue);
-            value = boolean;
-            fn_802C5780(entry, boolean);
+                value = UnidentifiedCreateValue<TweakValueBool_804F4578>(entry, name, boolValue);
         }
         else
         {
-            const char* interned = fn_802C1EBC(name, kTweakStringCurrent);
-            TweakValueString_8052BD48* string = new (
-                lbl_806E1E58->Allocate(sizeof(TweakValueString_8052BD48)))
-                TweakValueString_8052BD48(interned, "");
-            value = string;
-            fn_802C5780(entry, string);
+                value = UnidentifiedCreateValue<TweakValueString_8052BD48>(entry, name, "");
         }
     }
     value->UnidentifiedVirtual28(valueStr);
@@ -598,9 +578,9 @@ const char* fn_802C2914(const char* name, int kind)
     return fn_802C1EBC(buffer, kind);
 }
 
-void* fn_802C2B38(const char* name)
+void fn_802C2B38(TweakValueBase_8052BF70* value)
 {
-    return fn_802C595C(&lbl_8057C4E4, name);
+    fn_802C595C(&lbl_8057C4E4, value);
 }
 
 float fn_802C2B48(const char* path, float defaultValue)

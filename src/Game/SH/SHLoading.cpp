@@ -1,6 +1,7 @@
 #include "Game/SH/SHLoading.h"
 
 #include "Game/BaseGameSceneManager.h"
+#include "Game/DB/StadiumInfo.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"
@@ -18,7 +19,6 @@ extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int valu
 extern "C" Presentation* fn_801FEEAC();
 extern "C" bool fn_801FF168(Presentation* presentation);
 extern "C" bool fn_80273B00();
-extern "C" const char* fn_801B62DC(int stadium);
 
 extern BaseGameSceneManager* lbl_806E1860;
 
@@ -129,7 +129,7 @@ void LoadingScene_801CDC2C::Update(float dt)
 
 extern "C" void fn_801CDFC8(void*, TLTextInstance* stadiumText)
 {
-    const char* stringID = fn_801B62DC(GameInfoManager::Instance()->GetStadium());
+    const char* stringID = GetStadiumTickerStringID(GameInfoManager::Instance()->GetStadium());
     stadiumText->SetStringId(stringID);
 }
 

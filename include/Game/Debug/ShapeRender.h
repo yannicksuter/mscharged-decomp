@@ -20,6 +20,16 @@ struct PrimitiveShape
 class ShapeRender
 {
 public:
+    ShapeRender()
+        : m_Unknown00(0)
+        , m_Initialized(false)
+    {
+    }
+
+    void CreateBoxGeometry(PrimitiveShape& prim);
+    void CreateHemisphereGeometry(PrimitiveShape& prim);
+    void CreateFlatCylinderEndGeometry(PrimitiveShape& prim);
+    void CreateCylinderGeometry(PrimitiveShape& prim);
     void DrawSpherePrimitive(const nlMatrix4& mat_world, float radius,
         const nlColour& colour) const;
     void DrawLine3D(
@@ -27,6 +37,9 @@ public:
         const nlVector3& p1,
         const nlColour& colour,
         bool bWithDepth) const;
+    void DrawRectangle2D(float x, float y, float w, float h, float z,
+        const nlColour& colour, int view) const;
+    void Initialize(void* resource);
 
     /* 0x00 */ void* m_Unknown00;
     /* 0x04 */ bool m_Initialized;

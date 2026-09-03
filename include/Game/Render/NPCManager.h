@@ -13,7 +13,7 @@ class ChainChomp;
 class SkinAnimatedNPC;
 class UnidentifiedSkinAnimatedNPC_80199880;
 struct HammerObject;
-struct Object_8017FFF4;
+struct DaisyFistObject;
 struct State_8019A710;
 struct State_80199E84;
 struct KoopaShellObject;
@@ -65,7 +65,7 @@ public:
     void fn_801A9B64();
     void fn_801A9BD0();
     void fn_801A9C3C();
-    Object_8017FFF4* fn_801A9CA4(int nIndex);
+    DaisyFistObject* fn_801A9CA4(int nIndex);
     State_8019A710* fn_801A9D10(int nIndex);
     State_8019A710* fn_801A9D20();
     SkinAnimatedNPC* fn_801A9DE0(int nIndex);
@@ -126,7 +126,7 @@ public:
     /* 0x28 */ State_80199E84* mUnidentified028;
     /* 0x2C */ KoopaShellObject* mUnidentified02C;
     /* 0x30 */ unsigned int mUnidentified030;
-    /* 0x34 */ Object_8017FFF4* mUnidentified034[8];
+    /* 0x34 */ DaisyFistObject* mDaisyFists[8];
     /* 0x54 */ unsigned int mUnidentified054;
     /* 0x58 */ State_8019A710* mUnidentified058[6];
     /* 0x70 */ HammerObject* mUnidentified070[15];

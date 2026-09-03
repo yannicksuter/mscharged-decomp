@@ -49,19 +49,19 @@ public:
     /* 0x0A0 */ SkillTweak* mUnidentified0A0[4];
     /* 0x0B0 */ SkillTweak* mUnidentified0B0[4];
     /* 0x0C0 */ float mUnidentified0C0[14];
-    /* 0x0F8 */ TweakValue_804F4DC8 fShotValue1;
-    /* 0x108 */ TweakValue_804F4DC8 fShotValue2;
-    /* 0x118 */ TweakValue_804F4DC8 fShotValue3;
-    /* 0x128 */ TweakValue_804F4DC8 fShotChance0;
-    /* 0x138 */ TweakValue_804F4DC8 fShotChance1;
-    /* 0x148 */ TweakValue_804F4DC8 fShotChance2;
-    /* 0x158 */ TweakValue_804F4DC8 fShotChance3;
-    /* 0x168 */ TweakValue_804F4DC8 fShotChance4;
-    /* 0x178 */ TweakValue_804F4DC8 fAttackCarrierDistance;
-    /* 0x188 */ TweakValue_804F4DC8 fLooseBallChaseDistance;
-    /* 0x198 */ TweakValue_804F4DC8 fGoalieCanInterceptPass;
-    /* 0x1A8 */ TweakValue_804F4DC8 fGoalieDekeChance;
-    /* 0x1B8 */ TweakValue_804F4DC8 fGoalieDekeSpeed;
+    /* 0x0F8 */ TweakValueImpl_804F4DC8 fShotValue1;
+    /* 0x108 */ TweakValueImpl_804F4DC8 fShotValue2;
+    /* 0x118 */ TweakValueImpl_804F4DC8 fShotValue3;
+    /* 0x128 */ TweakValueImpl_804F4DC8 fShotChance0;
+    /* 0x138 */ TweakValueImpl_804F4DC8 fShotChance1;
+    /* 0x148 */ TweakValueImpl_804F4DC8 fShotChance2;
+    /* 0x158 */ TweakValueImpl_804F4DC8 fShotChance3;
+    /* 0x168 */ TweakValueImpl_804F4DC8 fShotChance4;
+    /* 0x178 */ TweakValueImpl_804F4DC8 fAttackCarrierDistance;
+    /* 0x188 */ TweakValueImpl_804F4DC8 fLooseBallChaseDistance;
+    /* 0x198 */ TweakValueImpl_804F4DC8 fGoalieCanInterceptPass;
+    /* 0x1A8 */ TweakValueImpl_804F4DC8 fGoalieDekeChance;
+    /* 0x1B8 */ TweakValueImpl_804F4DC8 fGoalieDekeSpeed;
     /* 0x1C8 */ const char* mUnidentified1C8;
     /* 0x1CC */ char mszFileName[0x40];
     /* 0x20C */ float mUnidentified20C[4];
@@ -111,65 +111,66 @@ public:
     /* 0x150 */ UnidentifiedFormationTweakValue fNearSeekOutRadius;
 
 private:
-    /* 0x160 */ u8 mUnidentified160[0x24];
+    /* 0x160 */ u8 mUnidentified160[0x14];
 
 public:
-    /* 0x184 */ TweakValue_804F4DC8 fBananaActiveTime;
-    /* 0x194 */ TweakValue_804F4DC8 fBobombActiveTime;
+    /* 0x174 */ TweakValueImpl_804F4DC8 mUnidentified174;
+    /* 0x184 */ TweakValueImpl_804F4DC8 fBananaActiveTime;
+    /* 0x194 */ TweakValueImpl_804F4DC8 fBobombActiveTime;
 
 private:
     /* 0x1A4 */ u8 mUnidentified1A4[0x30];
 
 public:
-    /* 0x1D4 */ TweakValueInt_804F4DC8 nScoreDifferenceMaximum;
-    /* 0x1E4 */ TweakValueInt_804F4DC8 nScoreDifferenceMinimum;
+    /* 0x1D4 */ TweakValueIntImpl_804FD898 nScoreDifferenceMaximum;
+    /* 0x1E4 */ TweakValueIntImpl_804FD898 nScoreDifferenceMinimum;
 
 private:
     /* 0x1F4 */ u8 mUnidentified1F4[0x10];
 
 public:
-    /* 0x204 */ TweakValue_804F4DC8 fBananaResistance;
-    /* 0x214 */ TweakValue_804F4DC8 fShellBounceGround;
-    /* 0x224 */ TweakValue_804F4DC8 fShellBounce;
+    /* 0x204 */ TweakValueImpl_804F4DC8 fBananaResistance;
+    /* 0x214 */ TweakValueImpl_804F4DC8 fShellBounceGround;
+    /* 0x224 */ TweakValueImpl_804F4DC8 fShellBounce;
 
 public:
-    /* 0x234 */ TweakValue_804F4DC8 fShellSmallRadius;
-    /* 0x244 */ TweakValue_804F4DC8 fShellMediumRadius;
-    /* 0x254 */ TweakValue_804F4DC8 fShellBigRadius;
-    /* 0x264 */ TweakValue_804F4DC8 fShellMediumChance;
-    /* 0x274 */ TweakValue_804F4DC8 fShellBigChance;
-    /* 0x284 */ TweakValue_804F4DC8 fShellFiveChance;
-    /* 0x294 */ TweakValue_804F4DC8 fShellThreeChance;
+    /* 0x234 */ TweakValueImpl_804F4DC8 fShellSmallRadius;
+    /* 0x244 */ TweakValueImpl_804F4DC8 fShellMediumRadius;
+    /* 0x254 */ TweakValueImpl_804F4DC8 fShellBigRadius;
+    /* 0x264 */ TweakValueImpl_804F4DC8 fShellMediumChance;
+    /* 0x274 */ TweakValueImpl_804F4DC8 fShellBigChance;
+    /* 0x284 */ TweakValueImpl_804F4DC8 fShellFiveChance;
+    /* 0x294 */ TweakValueImpl_804F4DC8 fShellThreeChance;
 
 public:
-    /* 0x2A4 */ TweakValue_804F4DC8 fShellExplodeChance;
+    /* 0x2A4 */ TweakValueImpl_804F4DC8 fShellExplodeChance;
 
 public:
-    /* 0x2B4 */ TweakValue_804F4DC8 fBananaSmallRadius;
-    /* 0x2C4 */ TweakValue_804F4DC8 fBananaMediumRadius;
-    /* 0x2D4 */ TweakValue_804F4DC8 fBananaBigRadius;
-    /* 0x2E4 */ TweakValue_804F4DC8 fBananaMediumChance;
-    /* 0x2F4 */ TweakValue_804F4DC8 fBananaBigChance;
-    /* 0x304 */ TweakValue_804F4DC8 fBananaFiveChance;
-    /* 0x314 */ TweakValue_804F4DC8 fBananaThreeChance;
+    /* 0x2B4 */ TweakValueImpl_804F4DC8 fBananaSmallRadius;
+    /* 0x2C4 */ TweakValueImpl_804F4DC8 fBananaMediumRadius;
+    /* 0x2D4 */ TweakValueImpl_804F4DC8 fBananaBigRadius;
+    /* 0x2E4 */ TweakValueImpl_804F4DC8 fBananaMediumChance;
+    /* 0x2F4 */ TweakValueImpl_804F4DC8 fBananaBigChance;
+    /* 0x304 */ TweakValueImpl_804F4DC8 fBananaFiveChance;
+    /* 0x314 */ TweakValueImpl_804F4DC8 fBananaThreeChance;
 
 public:
-    /* 0x324 */ TweakValue_804F4DC8 fBananaExplodeChance;
+    /* 0x324 */ TweakValueImpl_804F4DC8 fBananaExplodeChance;
 
 public:
-    /* 0x334 */ TweakValue_804F4DC8 fBobombSmallRadius;
-    /* 0x344 */ TweakValue_804F4DC8 fBobombMediumRadius;
-    /* 0x354 */ TweakValue_804F4DC8 fBobombBigRadius;
-    /* 0x364 */ TweakValue_804F4DC8 fBobombMediumChance;
-    /* 0x374 */ TweakValue_804F4DC8 fBobombBigChance;
-    /* 0x384 */ TweakValue_804F4DC8 fBobombFiveChance;
-    /* 0x394 */ TweakValue_804F4DC8 fBobombThreeChance;
+    /* 0x334 */ TweakValueImpl_804F4DC8 fBobombSmallRadius;
+    /* 0x344 */ TweakValueImpl_804F4DC8 fBobombMediumRadius;
+    /* 0x354 */ TweakValueImpl_804F4DC8 fBobombBigRadius;
+    /* 0x364 */ TweakValueImpl_804F4DC8 fBobombMediumChance;
+    /* 0x374 */ TweakValueImpl_804F4DC8 fBobombBigChance;
+    /* 0x384 */ TweakValueImpl_804F4DC8 fBobombFiveChance;
+    /* 0x394 */ TweakValueImpl_804F4DC8 fBobombThreeChance;
 
 private:
     /* 0x3A4 */ u8 mUnidentified3A4[0x1A0];
 
 public:
-    /* 0x544 */ TweakValue_804F4DC8 fChainChompRadius;
+    /* 0x544 */ TweakValueImpl_804F4DC8 fChainChompRadius;
 };
 
 struct unk_800A9274;

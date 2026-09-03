@@ -11,6 +11,11 @@ extern "C"
 
 nlSlotPoolFixed<0x20> lbl_8057C6E4(0x20);
 
+inline const char* fn_802C3FDC(TweakNode_8052BEB0* node)
+{
+    return node->m_Value != 0 ? node->m_Value->mName : "ROOT";
+}
+
 TweakNode_8052BEB0::TweakNode_8052BEB0()
 {
     m_Next = 0;

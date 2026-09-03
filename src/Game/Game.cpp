@@ -34,7 +34,7 @@
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
 #include "unclassified/tu_801AE530.h"
-#include "unclassified/tu_801B6188.h"
+#include "Game/DB/StadiumInfo.h"
 
 extern PowerupBase* g_pPowerups[];
 
@@ -871,7 +871,7 @@ void cGame::ChangeGameState(int state)
                 cTeam* pTeam = g_pTeams[0];
                 bool useAlternateMusic = false;
                 if (pTeam->m_nScore - pTeam->GetOtherTeam()->m_nScore > 0
-                    && fn_801B6278(
+                    && GetStadiumUnknown0x10(
                         GameInfoManager::Instance()->GetStadium()))
                 {
                     useAlternateMusic = true;
@@ -888,7 +888,7 @@ void cGame::ChangeGameState(int state)
 
         if (m_eGameState == 5)
         {
-            unsigned long soundID = fn_801B6398(
+            unsigned long soundID = GetStadiumSoundID(
                 GameInfoManager::Instance()->GetStadium());
             fn_800EC2A4(soundID, this);
         }

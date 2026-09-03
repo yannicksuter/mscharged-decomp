@@ -1,6 +1,6 @@
 #include "Game/Render/NPCManager.h"
 
-#include "Game/Drawable/Drawable_8017FFCC.h"
+#include "unclassified/tu_8019D6B4.h"
 #include "Game/GameTweaks.h"
 #include "Game/Render/ChainChomp.h"
 #include "Game/Render/SkinAnimatedNPC.h"
@@ -71,8 +71,8 @@ extern "C"
     void* fn_8011B850(void* pObject);
     bool fn_802B3E94(const char* pPath, LoadAsyncCallback pCallback,
         void* pUserData, unsigned int nAlignment, int nAllocType,
-        unsigned int nUncompressedSize, void* pBuffer,
-        unsigned long nBufferSize, void* pParam, unsigned long nParam,
+        unsigned int nChunkSize, void* pReadBuffer0,
+        void* pReadBuffer1, void* pParam, unsigned long nParam,
         MemoryAllocator* pAllocator);
     bool fn_802C8200(const char* pPath, LoadAsyncCallback pCallback,
         void* pUserData, void* pContext);
@@ -132,7 +132,7 @@ NPCManager::NPCManager()
     }
     for (i = 0; i < 8; ++i)
     {
-        mUnidentified034[i] = 0;
+        mDaisyFists[i] = 0;
     }
     for (i = 0; i < 3; ++i)
     {
@@ -241,27 +241,27 @@ void NPCManager::fn_801A9C3C()
 {
     for (unsigned int i = 0; i < 8; ++i)
     {
-        Object_8017FFF4* pObject
-            = (Object_8017FFF4*)nlMalloc(sizeof(Object_8017FFF4), 8, false);
-        pObject = new (pObject) Object_8017FFF4(i);
-        mUnidentified034[i] = pObject;
+        DaisyFistObject* pObject
+            = (DaisyFistObject*)nlMalloc(sizeof(DaisyFistObject), 8, false);
+        pObject = new (pObject) DaisyFistObject(i);
+        mDaisyFists[i] = pObject;
     }
 }
 
-Object_8017FFF4* NPCManager::fn_801A9CA4(int nIndex)
+DaisyFistObject* NPCManager::fn_801A9CA4(int nIndex)
 {
     if (nIndex >= 0)
     {
-        return mUnidentified034[nIndex];
+        return mDaisyFists[nIndex];
     }
 
     for (unsigned int i = 0; i < 8; ++i)
     {
-        Object_8017FFF4* pObject = mUnidentified034[i];
-        if (pObject != 0 && !pObject->visible)
+        DaisyFistObject* pObject = mDaisyFists[i];
+        if (pObject != 0 && !pObject->mVisible)
         {
             mUnidentified030 = 8;
-            return mUnidentified034[i];
+            return mDaisyFists[i];
         }
     }
     return 0;
@@ -582,8 +582,8 @@ NPCManager::~NPCManager()
     unsigned int i;
     for (i = 0; i < 8; ++i)
     {
-        delete mUnidentified034[i];
-        mUnidentified034[i] = 0;
+        delete mDaisyFists[i];
+        mDaisyFists[i] = 0;
     }
     for (i = 0; i < 6; ++i)
     {
@@ -648,8 +648,8 @@ void NPCManager::fn_801AB9D4()
     unsigned int i;
     for (i = 0; i < 8; ++i)
     {
-        delete mUnidentified034[i];
-        mUnidentified034[i] = 0;
+        delete mDaisyFists[i];
+        mDaisyFists[i] = 0;
     }
     for (i = 0; i < 6; ++i)
     {
@@ -721,11 +721,11 @@ void NPCManager::UpdateAINPCs(float dt)
     unsigned int i;
     for (i = 0; i < 8; ++i)
     {
-        Object_8017FFF4* pObject = mUnidentified034[i];
+        DaisyFistObject* pObject = mDaisyFists[i];
         if (pObject != 0)
         {
-            pObject->fn_8019D778(dt);
-            if (pObject->visible)
+            pObject->Update(dt);
+            if (pObject->mVisible)
             {
                 ++mUnidentified030;
             }
@@ -786,9 +786,9 @@ void NPCManager::fn_801ABF8C()
     unsigned int i;
     for (i = 0; i < 8; ++i)
     {
-        if (mUnidentified034[i] != 0)
+        if (mDaisyFists[i] != 0)
         {
-            mUnidentified034[i]->fn_8019DA14();
+            mDaisyFists[i]->Reset();
         }
         mUnidentified030 = 0;
     }

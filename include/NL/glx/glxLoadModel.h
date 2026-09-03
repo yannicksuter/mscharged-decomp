@@ -2,7 +2,6 @@
 #define NL_GLX_GLXLOADMODEL_H
 
 class cSHierarchy;
-class GLMaterialList;
 class GLSkinMesh;
 struct glModel;
 class nlChunk;
@@ -15,6 +14,6 @@ bool glplatBeginLoadModel(
 glModel* glplatLoadModel(
     const char* filename, unsigned long* pNumModels, void* context);
 GLSkinMesh* glx_MakeSkinMesh(
-    nlChunk* outerChunk, GLMaterialList* materialList, cSHierarchy* hierarchy);
+    nlChunk* outerChunk, glModel* models, cSHierarchy* hierarchy);
 
 #endif // NL_GLX_GLXLOADMODEL_H

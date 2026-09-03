@@ -128,6 +128,9 @@ template <typename CharT>
 int nlStrICmp(const CharT* lhs, const CharT* rhs);
 
 template <typename CharT>
+int nlStrNICmp(const CharT* lhs, const CharT* rhs, unsigned long count);
+
+template <typename CharT>
 int nlStrNCmp(const CharT* lhs, const CharT* rhs, unsigned long count);
 
 template <typename CharT>

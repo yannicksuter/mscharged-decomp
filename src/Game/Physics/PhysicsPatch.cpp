@@ -513,7 +513,8 @@ PhysicsPatchManager_801740D0::~PhysicsPatchManager_801740D0()
         = (UnidentifiedConnection*)mUnidentified0F0;
     if (connection != 0 && ((connection->mFlags >> 30) & 1) != 0)
     {
-        ((UnidentifiedEventBase*)connection->mTarget)->Disconnect();
+        ((UnidentifiedEventBase*)connection->mTarget)
+            ->Disconnect(&mUnidentified0F0);
     }
 }
 

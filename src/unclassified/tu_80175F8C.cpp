@@ -1,11 +1,13 @@
 #include "Game/BulletBill.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
+#include "Game/EventDataTypes.h"
 #include "Game/Game.h"
 #include "Game/Physics/Physics.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsSphere.h"
 #include "NL/nlSlotPool.h"
+#include "unclassified/tu_80175F8C.h"
 
 #include "types.h"
 
@@ -20,15 +22,8 @@ extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
 extern "C" EmissionController* fn_802E7FE4(
     EmissionManager*, EffectsGroup*, int, bool, bool);
 
-struct PhysicsEvent_8014A2BC
-{
-    PhysicsObject* source;
-    PhysicsObject* target;
-    u32 unknown08;
-};
-
-extern "C" SlotPool<PhysicsEvent_8014A2BC> lbl_805701B0;
-extern "C" void fn_8014A2BC(PhysicsEvent_8014A2BC*);
+extern "C" SlotPool<UnidentifiedEventData38> lbl_805701B0;
+extern "C" void fn_8014A2BC(UnidentifiedEventData38*);
 
 struct PhysicsObjectType28_80510968 : PhysicsObject
 {
@@ -39,54 +34,23 @@ struct PhysicsObjectType28_80510968 : PhysicsObject
 static const float sInitialRadius = 0.5f;
 static const float sRadiusOvershoot = 0.01f;
 
-class PhysicsSphere_80175F8C : public PhysicsSphere
+inline PhysicsSphere_80175F8C::PhysicsSphere_80175F8C(void* owner,
+    const nlVector3& position, int effectType, float maximumRadius,
+    float growthRate)
+    : PhysicsSphere(g_CollisionSpace, 0, sInitialRadius)
+    , owner(owner)
+    , effectType(effectType)
+    , currentRadius(sInitialRadius)
+    , maximumRadius(maximumRadius)
+    , growthRate(growthRate)
+    , sourceIndex(-1)
+    , finished(false)
 {
-public:
-    PhysicsSphere_80175F8C(void* owner, const nlVector3& position,
-        int effectType, float maximumRadius, float growthRate)
-        : PhysicsSphere(g_CollisionSpace, 0, sInitialRadius)
-        , owner(owner)
-        , effectType(effectType)
-        , currentRadius(sInitialRadius)
-        , maximumRadius(maximumRadius)
-        , growthRate(growthRate)
-        , sourceIndex(-1)
-        , finished(false)
-    {
-        SetCategory(0x10000);
-        SetCollide(0xF060);
-        this->position = position;
-        SetPosition(this->position, WORLD_COORDINATES);
-    }
-
-    virtual ~PhysicsSphere_80175F8C();
-    virtual int GetObjectType() const { return 0x23; }
-    virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
-    virtual ContactType Contact(PhysicsObject*, dContact*, int);
-
-    static void* operator new(unsigned long)
-    {
-        PhysicsSphere_80175F8C* object = 0;
-        pool.Allocate(object);
-        return object;
-    }
-
-    static void operator delete(void* object)
-    {
-        pool.Free((PhysicsSphere_80175F8C*)object);
-    }
-
-    static SlotPool<PhysicsSphere_80175F8C> pool;
-
-    /* 0x38 */ void* owner;
-    /* 0x3C */ nlVector3 position;
-    /* 0x48 */ int effectType;
-    /* 0x4C */ float currentRadius;
-    /* 0x50 */ float maximumRadius;
-    /* 0x54 */ float growthRate;
-    /* 0x58 */ int sourceIndex;
-    /* 0x5C */ bool finished;
-};
+    SetCategory(0x10000);
+    SetCollide(0xF060);
+    this->position = position;
+    SetPosition(this->position, WORLD_COORDINATES);
+}
 
 static nlVector3 sDaisyCameraShake = { 0.15f, 0.4f, 0.0f };
 
@@ -108,10 +72,10 @@ float lbl_806DCB00 = 1.0f;
 static inline void QueuePhysicsEvent(
     PhysicsSphere_80175F8C* source, PhysicsObject* target)
 {
-    PhysicsEvent_8014A2BC* event = 0;
+    UnidentifiedEventData38* event = 0;
     lbl_805701B0.Allocate(event);
-    event->source = source;
-    event->target = target;
+    event->mUnidentified00 = source;
+    event->mUnidentified04 = target;
     fn_8014A2BC(event);
 }
 

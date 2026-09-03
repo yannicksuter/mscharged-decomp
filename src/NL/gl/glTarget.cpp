@@ -95,7 +95,7 @@ extern "C" void fn_802CDA14(GLRenderPair* target)
     target->target = 0;
 }
 
-extern "C" unsigned long fn_802CDAA8(const GLRenderPair* target)
+extern "C" unsigned long fn_802CDAA8(GLRenderPair target)
 {
-    return target->hash;
+    return target.hash;
 }

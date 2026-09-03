@@ -12,11 +12,11 @@ GXMaterialParameter GXMaterialProgram_80299CA0::Parameters[3] = {
     { 0x8099480F, 0x01010103, 16 },
 };
 
-TweakValue_804F4DC8 sCrystalTweak_8057B400;
-TweakValue_804F4DC8 sCrystalTweak_8057B420;
+TweakValueImpl_804F4DC8 sCrystalTweak_8057B400;
+TweakValueImpl_804F4DC8 sCrystalTweak_8057B420;
 
 static inline void UnidentifiedInitCrystalTweak(
-    TweakValue_804F4DC8& tweak, const char* name, float defaultValue,
+    TweakValueImpl_804F4DC8& tweak, const char* name, float defaultValue,
     const char* category, float value, float min, float max)
 {
     bool registered = tweak.fn_802C4FEC(
