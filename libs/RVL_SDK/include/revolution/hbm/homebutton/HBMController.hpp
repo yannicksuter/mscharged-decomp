@@ -35,6 +35,7 @@ public:
     RemoteSpk* getRemoteSpk() const { return remotespk; }
     bool isRumbling() { return mHBController.rumble; }
     bool getBatteryFlag() const;
+    void setEnableRumble(bool flag) { mRumbleFlag = flag; }
 
     void setSpeakerVol(f32 vol);
     void setRumble() { mHBController.rumble = true; }

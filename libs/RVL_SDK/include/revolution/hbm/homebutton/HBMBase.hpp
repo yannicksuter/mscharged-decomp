@@ -190,6 +190,7 @@ public:
 
     void PlaySeq(int num) {
         if (mpSoundArchivePlayer != NULL && mpSoundHandle != NULL) {
+            nw4hbm::ut::detail::AutoLock<OSMutex> lock(sMutex);
             mpSoundHandle->DetachSound();
             mpSoundArchivePlayer->StartSound(mpSoundHandle, num);
         }
