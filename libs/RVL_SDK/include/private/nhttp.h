@@ -9,8 +9,18 @@ typedef struct NHTTPBgnEndInfo NHTTPBgnEndInfo;
 typedef struct NHTTPRequestInfo NHTTPRequestInfo;
 typedef struct NHTTPConnectionInfo NHTTPConnectionInfo;
 
+typedef enum NHTTPConnectionEvent
+{
+    NHTTP_EVENT_NONE,
+    NHTTP_EVENT_POST_SEND,
+    NHTTP_EVENT_BODY_RECV_FULL,
+    NHTTP_EVENT_BODY_RECV_DONE,
+    NHTTP_EVENT_COMPLETE,
+    NHTTP_CALLBACK_EVENT_MAX,
+} NHTTPConnectionEvent;
+
 typedef s32 (*NHTTPConnectionCallback)(NHTTPConnectionInfo* connection,
-    s32 state, void* param);
+    NHTTPConnectionEvent event, void* arg);
 
 typedef struct NHTTPConnectionCallbackParam
 {
@@ -19,6 +29,21 @@ typedef struct NHTTPConnectionCallbackParam
     u32 _unk8;
     u32 _unkC;
 } NHTTPConnectionCallbackParam;
+
+typedef struct NHTTPPostSendArg
+{
+    const char* label;
+    char* buf;
+    u32 size;
+    u32 offset;
+} NHTTPPostSendArg;
+
+typedef struct NHTTPBodyBufArg
+{
+    char* buf;
+    u32 size;
+    u32 offset;
+} NHTTPBodyBufArg;
 
 typedef struct NHTTPHeader
 {
@@ -50,35 +75,30 @@ typedef struct NHTTPReqInfo
     NHTTPReqQueue* reqQueue;
 } NHTTPReqInfo;
 
-typedef struct NHTTPRecvBufBlock
+typedef struct NHTTPi_HDRBUFLIST
 {
-    struct NHTTPRecvBufBlock* next;
-    s8 data[0x200];
-} NHTTPRecvBufBlock;
-
-typedef struct NHTTPHdrRecvBuf
-{
-    s32 length;
-    s32 _unk4;
-    s32 _unk8;
-    s32 _unkC;
-    BOOL succeeded;
-    BOOL hasResultCode;
-    s32 resultCode;
-    u32 bufferSize;
-    void* _unk20;
-    void* _unk24;
-    void* buffer;
-    NHTTPResponseCallback callback;
-    NHTTPResponseCleanup cleanup;
-    NHTTPRecvBufBlock* blocks;
-    s8 data[0x400];
-} NHTTPHdrRecvBuf;
+    struct NHTTPi_HDRBUFLIST* next_p;
+    u8 block[0x200];
+} NHTTPi_HDRBUFLIST;
 
 typedef struct NHTTPResponseInfo
 {
-    NHTTPHdrRecvBuf recvBuf;
-    void* userParam;
+    volatile s32 headerLen;
+    volatile s32 bodyLen;
+    volatile s32 totalBodyLen;
+    volatile s32 contentLength;
+    s32 isSuccess;
+    s32 isHeaderParse;
+    s32 httpStatus;
+    u32 recvBufLen;
+    char* allHeader_p;
+    char* foundHeader_p;
+    char* recvBuf_p;
+    NHTTPResponseCallback bufFull;
+    NHTTPResponseCleanup freeBuf;
+    NHTTPi_HDRBUFLIST* hdrBufBlock_p;
+    u8 hdrBufFirst[0x400];
+    void* param_p;
 } NHTTPResponseInfo;
 
 struct NHTTPRequestInfo
@@ -87,7 +107,7 @@ struct NHTTPRequestInfo
     s32 state;
     BOOL secure;
     BOOL proxyEnabled;
-    void* _unk10;
+    BOOL isRawData;
     s32 hostEnd;
     s32 pathStart;
     s32 method;
@@ -99,7 +119,7 @@ struct NHTTPRequestInfo
     NHTTPHeader* postData;
     char multipartBoundary[20];
     char authorization[0x5C];
-    u32 authorizationLength;
+    s32 authorizationLength;
     SSLId sslId;
     const char* clientCertData;
     u32 clientCertSize;
@@ -109,11 +129,11 @@ struct NHTTPRequestInfo
     u32 rootCASize;
     BOOL clientCertDefault;
     u32 verifyOption;
-    u32 _unkD0;
+    NHTTPEncodingType encodingType;
     char proxyServer[0x100];
     u32 proxyPort;
     char proxyAuthorization[0x5C];
-    u32 proxyAuthorizationLength;
+    s32 proxyAuthorizationLength;
     u32 recvBufferSize;
     const void* postBuffer;
     u32 postBufferSize;

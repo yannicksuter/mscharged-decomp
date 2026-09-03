@@ -27,9 +27,9 @@ typedef struct NHTTPThreadInfo
     OSMessageQueue messageQueue;
     OSMessage messages[3];
     OSThread thread;
-    BOOL createMessageQueue;
+    BOOL isCreateCommThreadMessageQueue;
     u8 _unk34C[0x14];
-    char sendBuffer[0x100];
+    char commBuf[0x100];
 } NHTTPThreadInfo;
 
 BOOL NHTTPi_IsCreateCommThreadMessageQueue(NHTTPThreadInfo* info);

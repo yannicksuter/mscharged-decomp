@@ -1,17 +1,17 @@
 #include <private/nhttp.h>
 
-typedef struct NHTTPSystemInfo
+typedef struct NHTTPSysInfo
 {
     u8 bgnEndInfo[0x800];
     NHTTPListInfo listInfo;
     NHTTPReqInfo reqInfo;
     u8 mutexInfo[0x34];
     u8 threadInfo[0x460];
-} NHTTPSystemInfo;
+} NHTTPSysInfo;
 
 static NHTTPConnectionInfo* sConnectionList;
-static NHTTPSystemInfo* spSystemInfo;
-static NHTTPSystemInfo sSystemInfo;
+static NHTTPSysInfo sysInfo;
+static NHTTPSysInfo* sysInfo_p = NULL;
 
 void NHTTPi_lockReqList(void* mutexInfo);
 void NHTTPi_unlockReqList(void* mutexInfo);
@@ -20,6 +20,11 @@ void NHTTPi_InitListInfo(NHTTPListInfo* info);
 void NHTTPi_InitRequestInfo(NHTTPReqInfo* info);
 void NHTTPi_InitMutexInfo(void* info);
 void NHTTPi_InitThreadInfo(void* info);
+NHTTPBgnEndInfo* NHTTPi_GetBgnEndInfoP(NHTTPSysInfo* sysInfo_p);
+NHTTPListInfo* NHTTPi_GetListInfoP(NHTTPSysInfo* sysInfo_p);
+NHTTPReqInfo* NHTTPi_GetReqInfoP(NHTTPSysInfo* sysInfo_p);
+void* NHTTPi_GetThreadInfoP(NHTTPSysInfo* sysInfo_p);
+void* NHTTPi_GetMutexInfoP(NHTTPSysInfo* sysInfo_p);
 
 NHTTPConnectionInfo* NHTTPi_ControlConnectionList(void* mutexInfo,
     void* handle, u32 mode)
@@ -83,22 +88,22 @@ NHTTPConnectionInfo* NHTTPi_ControlConnectionList(void* mutexInfo,
     return result;
 }
 
-s32 NHTTPi_CommitConnectionList(void* mutexInfo,
-    NHTTPConnectionInfo* connection)
+s32 NHTTPi_CommitConnectionList(void* mutexInfo_p,
+    NHTTPConnectionInfo* connection_p)
 {
-    NHTTPConnectionInfo* result;
-
-    result = NHTTPi_ControlConnectionList(mutexInfo, connection, 3);
-    return result != NULL ? 0 : -1;
+    return ((NHTTPi_ControlConnectionList(mutexInfo_p, connection_p, 3)
+                != NULL)
+            ? 0
+            : -1);
 }
 
-s32 NHTTPi_OmitConnectionList(void* mutexInfo,
-    NHTTPConnectionInfo* connection)
+s32 NHTTPi_OmitConnectionList(void* mutexInfo_p,
+    NHTTPConnectionInfo* connection_p)
 {
-    NHTTPConnectionInfo* result;
-
-    result = NHTTPi_ControlConnectionList(mutexInfo, connection, 4);
-    return result != NULL ? 0 : -1;
+    return ((NHTTPi_ControlConnectionList(mutexInfo_p, connection_p, 4)
+                != NULL)
+            ? 0
+            : -1);
 }
 
 NHTTPRequestInfo* NHTTPi_Connection2Request(void* mutexInfo,
@@ -218,9 +223,9 @@ void NHTTPi_BufferFullCallback(void* mutexInfo,
         response = NHTTPi_Connection2Response(mutexInfo, connection);
         if (response != NULL && connection->callback != NULL)
         {
-            param.value = response->recvBuf.buffer;
-            param._unk4 = response->recvBuf.bufferSize;
-            param._unk8 = response->recvBuf._unk4;
+            param.value = response->recvBuf_p;
+            param._unk4 = response->recvBufLen;
+            param._unk8 = response->bodyLen;
             connection->callback(connection, 2, &param);
             responseResult = param._unk8;
             bufferSize = param._unk4;
@@ -232,9 +237,9 @@ void NHTTPi_BufferFullCallback(void* mutexInfo,
                 response = NHTTPi_Connection2Response(mutexInfo, connection);
                 if (response != NULL)
                 {
-                    response->recvBuf.buffer = buffer;
-                    response->recvBuf.bufferSize = bufferSize;
-                    response->recvBuf._unk4 = responseResult;
+                    response->recvBuf_p = buffer;
+                    response->recvBufLen = bufferSize;
+                    response->bodyLen = responseResult;
                 }
             }
         }
@@ -255,9 +260,9 @@ void NHTTPi_ReceivedCallback(void* mutexInfo,
         response = NHTTPi_Connection2Response(mutexInfo, connection);
         if (response != NULL && connection->callback != NULL)
         {
-            param.value = response->recvBuf.buffer;
-            param._unk4 = response->recvBuf.bufferSize;
-            param._unk8 = response->recvBuf._unk4;
+            param.value = response->recvBuf_p;
+            param._unk4 = response->recvBufLen;
+            param._unk8 = response->bodyLen;
             connection->callback(connection, 3, &param);
             responseResult = param._unk8;
             bufferSize = param._unk4;
@@ -269,9 +274,9 @@ void NHTTPi_ReceivedCallback(void* mutexInfo,
                 response = NHTTPi_Connection2Response(mutexInfo, connection);
                 if (response != NULL)
                 {
-                    response->recvBuf.buffer = buffer;
-                    response->recvBuf.bufferSize = bufferSize;
-                    response->recvBuf._unk4 = responseResult;
+                    response->recvBuf_p = buffer;
+                    response->recvBufLen = bufferSize;
+                    response->bodyLen = responseResult;
                 }
             }
         }
@@ -288,46 +293,48 @@ void NHTTPi_CompleteCallback(void* mutexInfo,
     }
 }
 
-NHTTPSystemInfo* NHTTPi_GetSystemInfoP(void)
+static void NHTTPi_InitSystemInfo(NHTTPSysInfo* sysInfo_p)
 {
-    if (spSystemInfo == NULL)
+    NHTTPi_InitBgnEndInfo(NHTTPi_GetBgnEndInfoP(sysInfo_p));
+    NHTTPi_InitListInfo(NHTTPi_GetListInfoP(sysInfo_p));
+    NHTTPi_InitRequestInfo(NHTTPi_GetReqInfoP(sysInfo_p));
+    NHTTPi_InitMutexInfo(NHTTPi_GetMutexInfoP(sysInfo_p));
+    NHTTPi_InitThreadInfo(NHTTPi_GetThreadInfoP(sysInfo_p));
+}
+
+NHTTPSysInfo* NHTTPi_GetSystemInfoP(void)
+{
+    if (sysInfo_p == NULL)
     {
-        NHTTPSystemInfo* systemInfo;
-
-        systemInfo = &sSystemInfo;
-        spSystemInfo = systemInfo;
-        NHTTPi_InitBgnEndInfo((NHTTPBgnEndInfo*)systemInfo->bgnEndInfo);
-        NHTTPi_InitListInfo(&systemInfo->listInfo);
-        NHTTPi_InitRequestInfo(&systemInfo->reqInfo);
-        NHTTPi_InitMutexInfo(systemInfo->mutexInfo);
-        NHTTPi_InitThreadInfo(systemInfo->threadInfo);
+        sysInfo_p = &sysInfo;
+        NHTTPi_InitSystemInfo(sysInfo_p);
     }
-    return spSystemInfo;
+    return sysInfo_p;
 }
 
-NHTTPBgnEndInfo* NHTTPi_GetBgnEndInfoP(NHTTPSystemInfo* systemInfo)
+NHTTPBgnEndInfo* NHTTPi_GetBgnEndInfoP(NHTTPSysInfo* sysInfo_p)
 {
-    return (NHTTPBgnEndInfo*)systemInfo->bgnEndInfo;
+    return (NHTTPBgnEndInfo*)sysInfo_p->bgnEndInfo;
 }
 
-NHTTPListInfo* NHTTPi_GetListInfoP(NHTTPSystemInfo* systemInfo)
+NHTTPListInfo* NHTTPi_GetListInfoP(NHTTPSysInfo* sysInfo_p)
 {
-    return &systemInfo->listInfo;
+    return &sysInfo_p->listInfo;
 }
 
-NHTTPReqInfo* NHTTPi_GetReqInfoP(NHTTPSystemInfo* systemInfo)
+NHTTPReqInfo* NHTTPi_GetReqInfoP(NHTTPSysInfo* sysInfo_p)
 {
-    return &systemInfo->reqInfo;
+    return &sysInfo_p->reqInfo;
 }
 
-void* NHTTPi_GetThreadInfoP(NHTTPSystemInfo* systemInfo)
+void* NHTTPi_GetThreadInfoP(NHTTPSysInfo* sysInfo_p)
 {
-    return systemInfo->threadInfo;
+    return sysInfo_p->threadInfo;
 }
 
-void* NHTTPi_GetMutexInfoP(NHTTPSystemInfo* systemInfo)
+void* NHTTPi_GetMutexInfoP(NHTTPSysInfo* sysInfo_p)
 {
-    return systemInfo->mutexInfo;
+    return sysInfo_p->mutexInfo;
 }
 
 void NHTTPi_SetVirtualContentLength(NHTTPConnectionInfo* connection,

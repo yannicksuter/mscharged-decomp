@@ -251,7 +251,6 @@ s32 NHTTPi_intToStr(char* destination, u32 value)
         100,
         10,
     };
-    char* current = destination;
     s32 length = 0;
     BOOL started = FALSE;
     s32 i;
@@ -262,17 +261,15 @@ s32 NHTTPi_intToStr(char* destination, u32 value)
         if (value >= powers[i])
         {
             digit = value / powers[i];
-            started = TRUE;
-            length++;
-            *current = digit + '0';
-            current++;
             value -= digit * powers[i];
+            started = TRUE;
+            destination[length] = digit + '0';
+            length++;
         }
         else if (started)
         {
-            *current = '0';
+            destination[length] = '0';
             length++;
-            current++;
         }
     }
     destination[length] = value + '0';

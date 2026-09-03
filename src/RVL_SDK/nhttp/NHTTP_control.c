@@ -106,19 +106,22 @@ BOOL NHTTP_AddHeaderField(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
 BOOL NHTTP_AddPostDataAscii(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
     char* name, char* value)
 {
-    BOOL result = FALSE;
-    s32 valueLength = 0;
     BOOL boundaryFound;
-    const char* initial;
     s32 index;
+    const char* initial;
     char initialChar;
     char nextChar;
+    BOOL result;
+    s32 valueLength;
+
+    result = FALSE;
+    valueLength = 0;
 
     if (request->state != 0)
     {
         return FALSE;
     }
-    if (request->_unk10 != NULL)
+    if (request->isRawData)
     {
         return FALSE;
     }
@@ -141,44 +144,46 @@ BOOL NHTTP_AddPostDataAscii(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
         {
             initialChar = *initial;
             nextChar = request->multipartBoundary[index];
-            nextChar++;
+            do
+            {
+                int next;
 
-            if ((u8)nextChar == '{')
-            {
-                nextChar = '0';
-            }
-            else if ((u8)nextChar == '[')
-            {
-                nextChar = 'a';
-            }
-            else if ((u8)nextChar == ':')
-            {
-                nextChar = 'A';
-            }
+                next = (u8)nextChar + 1;
+                if ((u8)next == '{')
+                {
+                    next = '0';
+                }
+                else if ((u8)next == '[')
+                {
+                    next = 'a';
+                }
+                else if ((u8)next == ':')
+                {
+                    next = 'A';
+                }
 
-            request->multipartBoundary[index] = nextChar;
-            if (nextChar != initialChar)
-            {
+                nextChar = next;
+                request->multipartBoundary[index] = nextChar;
+                if (nextChar == initialChar)
+                {
+                    break;
+                }
                 if (NHTTPi_memfind(value, valueLength, request->multipartBoundary + 2, 18)
                     < 0)
                 {
                     boundaryFound = TRUE;
-                    break;
+                    goto boundary_done;
                 }
-            }
-            else
-            {
-                index--;
-                initial--;
-            }
+            } while (TRUE);
+
+            index--;
+            initial--;
         } while (index >= 2);
 
-        if (index < 2)
-        {
-            boundaryFound = FALSE;
-        }
+        boundaryFound = FALSE;
     }
 
+boundary_done:
     if (boundaryFound)
     {
         result = addHdrList(&request->postData, info, name, value);

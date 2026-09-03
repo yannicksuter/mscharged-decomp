@@ -9,8 +9,8 @@ struct NHTTPBgnEndInfo
     NCDIpConfig ipConfig;
 };
 
-typedef s32 (*NHTTPProgressCallback)(void* value, u32* arg4, u32* arg8,
-    u32 argC, void* userParam);
+typedef s32 (*NHTTPPostSend)(const char* label, char** value_p,
+    u32* length_p, s32 offset, void* userParam);
 
 void* NHTTPi_GetSystemInfoP(void);
 NHTTPBgnEndInfo* NHTTPi_GetBgnEndInfoP(void* systemInfo);
@@ -75,106 +75,107 @@ s32 NHTTPSSLGetError(void)
     return NHTTPi_GetSSLError(NHTTPi_GetSystemInfoP());
 }
 
-s32 NHTTPi_TemplateConnectionCallback(NHTTPConnectionInfo* handle, s32 state,
-    void* param)
+static s32 NHTTPi_PostSendCallbackWrap(void* mutexInfo_p,
+    NHTTPConnectionInfo* connection_p, void* arg_p)
 {
-    void* mutexInfo;
-    NHTTPRequestInfo* request;
-    NHTTPResponseInfo* response;
-    NHTTPConnectionCallbackParam* callbackParam;
-    s32 result;
-
-    callbackParam = param;
-    mutexInfo = NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP());
-    handle = NHTTPi_GetConnection(mutexInfo, handle);
-    result = 0;
-
-    switch (state)
+    if (connection_p != NULL)
     {
-    case 1:
-    {
-        NHTTPProgressCallback callback;
-        s32 callbackResult;
-
-        if (handle != NULL)
+        NHTTPRequestInfo* req_p =
+            NHTTPi_Connection2Request(mutexInfo_p, connection_p);
+        if (req_p != NULL)
         {
-            request = NHTTPi_Connection2Request(mutexInfo, handle);
-            if (request == NULL)
-                goto progress_error;
-            callback = (NHTTPProgressCallback)request->_unk244;
-            if (callback == NULL)
-                goto progress_error;
-            callbackResult = callback(callbackParam->value,
-                &callbackParam->_unk4,
-                &callbackParam->_unk8,
-                callbackParam->_unkC,
-                NHTTPGetUserParam(handle));
-            goto progress_done;
-        }
-    progress_error:
-        callbackResult = -1;
-    progress_done:
-        result = callbackResult;
-        break;
-    }
-    case 2:
-    {
-        NHTTPResponseCallback callback;
-        void* buffer;
-        u32 contentLength;
-
-        if (handle != NULL)
-        {
-            response = NHTTPi_Connection2Response(mutexInfo, handle);
-            if (response != NULL)
+            NHTTPPostSend postSend = (NHTTPPostSend)req_p->_unk244;
+            if (postSend != NULL)
             {
-                callback = response->recvBuf.callback;
-                if (callback != NULL)
+                NHTTPPostSendArg* postSendArg_p = arg_p;
+                return postSend(postSendArg_p->label,
+                    &postSendArg_p->buf, &postSendArg_p->size,
+                    postSendArg_p->offset,
+                    NHTTPGetUserParam(connection_p));
+            }
+        }
+    }
+    return -1;
+}
+
+static s32 NHTTPi_BufFullCallbackWrap(void* mutexInfo_p,
+    NHTTPConnectionInfo* connection_p, void* arg_p)
+{
+    if (connection_p != NULL)
+    {
+        NHTTPResponseInfo* res_p =
+            NHTTPi_Connection2Response(mutexInfo_p, connection_p);
+        if (res_p != NULL)
+        {
+            NHTTPResponseCallback bufFull = res_p->bufFull;
+            if (bufFull != NULL)
+            {
+                NHTTPBodyBufArg* bodyBufArg_p = arg_p;
+                char* oldBuf_p = bodyBufArg_p->buf;
+                u32 contentLength =
+                    NHTTPi_GetVirtualContentLength(connection_p);
+                bodyBufArg_p->buf = bufFull((void**)&oldBuf_p,
+                    &bodyBufArg_p->size, contentLength, NHTTPi_alloc,
+                    NHTTPi_free, NHTTPGetUserParam(connection_p));
+                if (bodyBufArg_p->buf != NULL && oldBuf_p != NULL)
                 {
-                    buffer = callbackParam->value;
-                    contentLength = NHTTPi_GetVirtualContentLength(handle);
-                    callbackParam->value = callback(&buffer,
-                        &callbackParam->_unk4,
-                        contentLength,
-                        NHTTPi_alloc,
-                        NHTTPi_free,
-                        NHTTPGetUserParam(handle));
-                    if (callbackParam->value != NULL && buffer != NULL)
-                    {
-                        callbackParam->_unk8 = 0;
-                    }
+                    bodyBufArg_p->offset = 0;
                 }
             }
         }
-        result = 0;
-        break;
     }
-    case 4:
-    {
-        NHTTPReqCallback callback;
-        void* userParam;
-        s32 error;
+    return 0;
+}
 
-        if (handle != NULL)
+static s32 NHTTPi_CompleteCallbackWrap(void* mutexInfo_p,
+    NHTTPConnectionInfo* connection_p)
+{
+    if (connection_p != NULL)
+    {
+        NHTTPReqCallback reqCallback = connection_p->requestCallback;
+        if (reqCallback != NULL)
         {
-            callback = handle->requestCallback;
-            if (callback != NULL)
+            NHTTPResponseInfo* res_p =
+                NHTTPi_Connection2Response(mutexInfo_p, connection_p);
+            if (res_p != NULL)
             {
-                response = NHTTPi_Connection2Response(mutexInfo, handle);
-                if (response != NULL)
-                {
-                    error = NHTTPGetConnectionError(handle);
-                    userParam = NHTTPGetUserParam(handle);
-                    callback((NHTTPErr)error, response, userParam);
-                }
+                NHTTPErr result = NHTTPGetConnectionError(connection_p);
+                reqCallback(
+                    result, res_p, NHTTPGetUserParam(connection_p));
             }
         }
-        result = 0;
+    }
+    return 0;
+}
+
+s32 NHTTPi_TemplateConnectionCallback(NHTTPConnectionInfo* handle,
+    NHTTPConnectionEvent event, void* arg_p)
+{
+    void* sysInfo_p = NHTTPi_GetSystemInfoP();
+    void* mutexInfo_p = NHTTPi_GetMutexInfoP(sysInfo_p);
+    NHTTPConnectionInfo* connection_p =
+        NHTTPi_GetConnection(mutexInfo_p, handle);
+    s32 ret = 0;
+
+    switch (event)
+    {
+    case NHTTP_EVENT_POST_SEND:
+        ret = NHTTPi_PostSendCallbackWrap(
+            mutexInfo_p, connection_p, arg_p);
+        break;
+    case NHTTP_EVENT_BODY_RECV_FULL:
+        ret = NHTTPi_BufFullCallbackWrap(
+            mutexInfo_p, connection_p, arg_p);
+        break;
+    case NHTTP_EVENT_BODY_RECV_DONE:
+        break;
+    case NHTTP_EVENT_COMPLETE:
+        ret = NHTTPi_CompleteCallbackWrap(mutexInfo_p, connection_p);
+        break;
+    default:
         break;
     }
-    }
-
-    return result;
+    return ret;
 }
 
 NHTTPRequest* NHTTPCreateRequest(const char* url, NHTTPReqMethod method,
@@ -205,8 +206,8 @@ NHTTPRequest* NHTTPCreateRequestEx(const char* url, NHTTPReqMethod method,
             if (request->response != NULL)
             {
                 connection->requestCallback = callback;
-                request->response->recvBuf.callback = responseCallback;
-                request->response->recvBuf.cleanup = cleanup;
+                request->response->bufFull = responseCallback;
+                request->response->freeBuf = cleanup;
                 return request;
             }
             else
@@ -341,8 +342,8 @@ s32 NHTTPGetResultCode(NHTTPResponse* handle)
         NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), handle);
     if (response == NULL)
         return -1;
-    if (response->recvBuf.hasResultCode != FALSE)
-        return response->recvBuf.resultCode;
+    if (response->isHeaderParse != FALSE)
+        return response->httpStatus;
     return -1;
 }
 
@@ -365,52 +366,52 @@ s32 NHTTPSetVerifyOption(NHTTPRequest* handle, u32 option)
     return result;
 }
 
-s32 NHTTPSetProxy(NHTTPRequest* handle, const char* server, u16 port,
-    const char* username, const char* password)
+s32 NHTTPSetProxy(NHTTPRequest* handle, const char* proxy_p, u16 port,
+    const char* username_p, const char* password_p)
 {
-    NHTTPRequestInfo* request;
-    char authorization[0x41];
-    s32 serverLength;
-    s32 usernameLength;
-    s32 passwordLength;
+    void* sysInfo_p = NHTTPi_GetSystemInfoP();
+    void* mutexInfo_p = NHTTPi_GetMutexInfoP(sysInfo_p);
+    NHTTPRequestInfo* req_p = NHTTPi_GetRequest(mutexInfo_p, handle);
+    s32 proxyLen = 0;
 
-    request = NHTTPi_GetRequest(
-        NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), handle);
-    if (request == NULL || server == NULL)
+    if (req_p == NULL || proxy_p == NULL)
     {
         return -1;
     }
 
-    serverLength = NHTTPi_strlen(server);
-    if (serverLength > 0x100)
+    proxyLen = NHTTPi_strlen(proxy_p);
+    if (proxyLen > 0x100)
     {
         return -1;
     }
-    NHTTPi_memcpy(request->proxyServer, server, serverLength);
-    request->proxyPort = port;
+    NHTTPi_memcpy(req_p->proxyServer, proxy_p, proxyLen);
+    req_p->proxyPort = port;
 
-    if (username != NULL && password != NULL)
+    if (username_p != NULL && password_p != NULL)
     {
-        usernameLength = NHTTPi_strlen(username);
-        passwordLength = NHTTPi_strlen(password);
-        if (usernameLength > 0x20)
-            goto authorization_error;
-        if (passwordLength > 0x20)
-            goto authorization_error;
-        NHTTPi_memclr(authorization, sizeof(authorization));
-        NHTTPi_memcpy(authorization, username, usernameLength);
-        NHTTPi_memcpy(authorization + usernameLength, ":", 1);
-        NHTTPi_memcpy(authorization + usernameLength + 1, password, passwordLength);
-        request->proxyAuthorizationLength = NHTTPi_Base64Encode(
-            request->proxyAuthorization, authorization);
+        s32 username_len = 0;
+        s32 password_len = 0;
+
+        username_len = NHTTPi_strlen(username_p);
+        password_len = NHTTPi_strlen(password_p);
+        if (username_len <= 0x20 && password_len <= 0x20)
+        {
+            char tmpbuf[0x41];
+            NHTTPi_memclr(tmpbuf, sizeof(tmpbuf));
+            NHTTPi_memcpy(tmpbuf, username_p, username_len);
+            NHTTPi_memcpy(&(tmpbuf[username_len]), ":", 1);
+            NHTTPi_memcpy(
+                &(tmpbuf[(username_len + 1)]), password_p, password_len);
+            req_p->proxyAuthorizationLength =
+                NHTTPi_Base64Encode(req_p->proxyAuthorization, tmpbuf);
+        }
+        else
+        {
+            return -1;
+        }
     }
-    goto proxy_ready;
 
-authorization_error:
-    return -1;
-
-proxy_ready:
-    request->proxyEnabled = TRUE;
+    req_p->proxyEnabled = TRUE;
     return 0;
 }
 

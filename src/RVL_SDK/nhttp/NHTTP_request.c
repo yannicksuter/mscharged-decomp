@@ -77,10 +77,10 @@ NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* info, const char* url,
         goto error;
     }
     NHTTPi_memclr(request->response, sizeof(NHTTPResponseInfo));
-    request->response->recvBuf.buffer = buffer;
-    request->response->recvBuf.bufferSize = bufferSize;
-    request->response->recvBuf.callback = responseCallback;
-    request->response->recvBuf.cleanup = cleanup;
+    request->response->recvBuf_p = buffer;
+    request->response->recvBufLen = bufferSize;
+    request->response->bufFull = responseCallback;
+    request->response->freeBuf = cleanup;
 
     urlLength = NHTTPi_strlen(url);
     if (urlLength <= 7)
@@ -288,7 +288,7 @@ NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* info, const char* url,
     request->rootCASize = 0;
     request->clientCertDefault = FALSE;
     request->verifyOption = 0;
-    request->response->userParam = userParam;
+    request->response->param_p = userParam;
     request->proxyEnabled = FALSE;
     request->recvBufferSize = 0;
     return request;

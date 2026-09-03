@@ -3,37 +3,38 @@
 void NHTTPi_free(void* ptr);
 NHTTPConnectionInfo* NHTTPi_Response2Connection(void* systemInfo,
     NHTTPResponseInfo* response);
-s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
+s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPResponseInfo* recvBuf, s32 start,
     s32 end, s32* separator, s32* lineBreakLength);
-s32 NHTTPi_compareTokenN_HdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
+s32 NHTTPi_compareTokenN_HdrRecvBuf(NHTTPResponseInfo* recvBuf, s32 start,
     s32 end, const char* token, s8 terminal);
-s32 NHTTPi_skipSpaceHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start, s32 end);
+s32 NHTTPi_skipSpaceHdrRecvBuf(
+    NHTTPResponseInfo* recvBuf, s32 start, s32 end);
 
 void NHTTP_DestroyResponse(void* systemInfo, NHTTPResponseInfo* response)
 {
-    NHTTPRecvBufBlock* next;
+    NHTTPi_HDRBUFLIST* next_p;
     NHTTPConnectionInfo* connection;
 
-    while (response->recvBuf.blocks != NULL)
+    while (response->hdrBufBlock_p != NULL)
     {
-        next = response->recvBuf.blocks->next;
-        NHTTPi_free(response->recvBuf.blocks);
-        response->recvBuf.blocks = next;
+        next_p = response->hdrBufBlock_p->next_p;
+        NHTTPi_free(response->hdrBufBlock_p);
+        response->hdrBufBlock_p = next_p;
     }
 
-    if (response->recvBuf._unk20 != NULL)
+    if (response->allHeader_p != NULL)
     {
-        NHTTPi_free(response->recvBuf._unk20);
+        NHTTPi_free(response->allHeader_p);
     }
-    if (response->recvBuf._unk24 != NULL)
+    if (response->foundHeader_p != NULL)
     {
-        NHTTPi_free(response->recvBuf._unk24);
+        NHTTPi_free(response->foundHeader_p);
     }
-    if (response->recvBuf.cleanup != NULL)
+    if (response->freeBuf != NULL)
     {
-        response->recvBuf.cleanup(response->recvBuf.buffer, NHTTPi_free, response->userParam);
-        response->recvBuf.buffer = NULL;
-        response->recvBuf.bufferSize = 0;
+        response->freeBuf(response->recvBuf_p, NHTTPi_free, response->param_p);
+        response->recvBuf_p = NULL;
+        response->recvBufLen = 0;
     }
 
     connection = NHTTPi_Response2Connection(systemInfo, response);
@@ -44,7 +45,7 @@ void NHTTP_DestroyResponse(void* systemInfo, NHTTPResponseInfo* response)
     NHTTPi_free(response);
 }
 
-s32 NHTTPi_getHeaderValue(NHTTPHdrRecvBuf* recvBuf, const char* name,
+s32 NHTTPi_getHeaderValue(NHTTPResponseInfo* recvBuf, const char* name,
     s32* valueOffset)
 {
     s32 separator;
@@ -54,22 +55,26 @@ s32 NHTTPi_getHeaderValue(NHTTPHdrRecvBuf* recvBuf, const char* name,
     s32 end;
     s32 valueStart;
 
-    current = NHTTPi_findNextLineHdrRecvBuf(recvBuf, 12, recvBuf->length, &separator, &lineBreakLength);
+    current = NHTTPi_findNextLineHdrRecvBuf(
+        recvBuf, 12, recvBuf->headerLen, &separator, &lineBreakLength);
 
     while (current > 0)
     {
-        next = NHTTPi_findNextLineHdrRecvBuf(recvBuf, current, recvBuf->length, &separator, &lineBreakLength);
+        next = NHTTPi_findNextLineHdrRecvBuf(recvBuf, current,
+            recvBuf->headerLen, &separator, &lineBreakLength);
         if (separator > 0)
         {
             if (NHTTPi_compareTokenN_HdrRecvBuf(recvBuf, current, separator, name, 0)
                 == 0)
             {
-                if (separator + 1 < recvBuf->length)
+                if (separator + 1 < recvBuf->headerLen)
                 {
-                    end = NHTTPi_findNextLineHdrRecvBuf(recvBuf, separator + 1, recvBuf->length, NULL, &lineBreakLength);
+                    end = NHTTPi_findNextLineHdrRecvBuf(recvBuf,
+                        separator + 1, recvBuf->headerLen, NULL,
+                        &lineBreakLength);
                     if (end <= 0)
                     {
-                        end = recvBuf->length;
+                        end = recvBuf->headerLen;
                     }
                     else
                     {

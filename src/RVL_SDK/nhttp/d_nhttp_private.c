@@ -19,45 +19,43 @@ s32 NHTTP_SendRequestAsync(void* systemInfo, NHTTPRequestInfo* request);
 NHTTPResponseInfo* NHTTPi_Connection2Response(void* mutexInfo,
     NHTTPConnectionInfo* connection);
 
-NHTTPConnectionInfo* NHTTPCreateConnection(const char* url, s32 method,
-    void* buffer, u32 bufferSize, NHTTPConnectionCallback callback,
-    void* userParam)
+NHTTPConnectionInfo* NHTTPCreateConnection(const char* url_p, s32 method,
+    void* buf_p, u32 len, NHTTPConnectionCallback callback,
+    void* userParam_p)
 {
-    void* systemInfo;
-    NHTTPBgnEndInfo* bgnEndInfo;
-    void* mutexInfo;
-    NHTTPConnectionInfo* connection;
+    NHTTPConnectionInfo* connection_p = NULL;
+    void* sysInfo_p = NHTTPi_GetSystemInfoP();
+    NHTTPBgnEndInfo* bgnEndInfo_p = NHTTPi_GetBgnEndInfoP(sysInfo_p);
+    void* mutexInfo_p = NHTTPi_GetMutexInfoP(sysInfo_p);
 
-    systemInfo = NHTTPi_GetSystemInfoP();
-    bgnEndInfo = NHTTPi_GetBgnEndInfoP(systemInfo);
-    mutexInfo = NHTTPi_GetMutexInfoP(systemInfo);
-    connection = NHTTPi_alloc(sizeof(NHTTPConnectionInfo), 4);
-    if (connection == NULL)
+    connection_p = NHTTPi_alloc(sizeof(NHTTPConnectionInfo), 4);
+    if (connection_p == NULL)
     {
-        NHTTPi_SetError(bgnEndInfo, NHTTP_ERROR_ALLOC);
+        NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_ALLOC);
         return NULL;
     }
 
-    connection->request = NHTTP_CreateRequest(bgnEndInfo, url, method, buffer, bufferSize, userParam, NULL, NULL);
-    if (connection->request == NULL)
+    connection_p->request = NHTTP_CreateRequest(bgnEndInfo_p, url_p, method,
+        buf_p, len, userParam_p, NULL, NULL);
+    if (connection_p->request == NULL)
     {
-        NHTTPi_free(connection);
+        NHTTPi_free(connection_p);
         return NULL;
     }
 
-    connection->response = connection->request->response;
-    connection->started = FALSE;
-    connection->callback = callback;
-    connection->_unk40 = 0;
-    connection->_unk44 = 0;
-    connection->requestId = -1;
-    NHTTPi_CommitConnectionList(mutexInfo, connection);
-    connection->state = NHTTP_ERROR_BUSY;
-    OSInitCond(&connection->cond);
-    OSInitMutex(&connection->mutex);
-    NHTTPi_SetVirtualContentLength(connection, 0);
-    connection->requestCallback = NULL;
-    return connection;
+    connection_p->response = connection_p->request->response;
+    connection_p->started = FALSE;
+    connection_p->callback = callback;
+    connection_p->_unk40 = 0;
+    connection_p->_unk44 = 0;
+    connection_p->requestId = -1;
+    NHTTPi_CommitConnectionList(mutexInfo_p, connection_p);
+    connection_p->state = NHTTP_ERROR_BUSY;
+    OSInitCond(&connection_p->cond);
+    OSInitMutex(&connection_p->mutex);
+    NHTTPi_SetVirtualContentLength(connection_p, 0);
+    connection_p->requestCallback = NULL;
+    return connection_p;
 }
 
 s32 NHTTPStartConnection(NHTTPConnectionInfo* handle)
@@ -103,9 +101,9 @@ s32 NHTTPGetBodyBuffer(NHTTPConnectionInfo* handle, void** buffer,
         response = NHTTPi_Connection2Response(mutexInfo, connection);
         if (response != NULL)
         {
-            *buffer = response->recvBuf.buffer;
-            *bufferSize = response->recvBuf.bufferSize;
-            result = response->recvBuf._unk4;
+            *buffer = response->recvBuf_p;
+            *bufferSize = response->recvBufLen;
+            result = response->bodyLen;
         }
         else
         {
@@ -134,7 +132,7 @@ void* NHTTPGetUserParam(NHTTPConnectionInfo* handle)
         response = NHTTPi_Connection2Response(mutexInfo, connection);
         if (response != NULL)
         {
-            result = response->userParam;
+            result = response->param_p;
         }
         else
         {
