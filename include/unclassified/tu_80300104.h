@@ -40,6 +40,7 @@ public:
     void fn_80300908(const Callback& callback);
     void fn_803009AC(const Callback& callback);
     void fn_80300A50(const Callback& callback);
+    void fn_80206B54();
 
     virtual void fn_80301BE8(int index, void* context);
     virtual void fn_80301BA8(int index, void* context);

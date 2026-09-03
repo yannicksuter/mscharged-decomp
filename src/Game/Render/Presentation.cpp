@@ -1,6 +1,7 @@
 #include "Game/Render/Presentation.h"
 
 #include "Game/BasicStadium.h"
+#include "Game/FE/feMusic.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Camera/animcam.h"
 #include "Game/DB/CharacterInfo.h"
@@ -41,7 +42,6 @@ extern "C" void fn_801C0898(void*, void (*)(void*));
 extern "C" void fn_801C0704(
     void*, const char*, unsigned int, float, float, unsigned int);
 extern "C" void fn_801CBCA0(unsigned int, int, int, bool);
-extern "C" void fn_801FC2B4(bool);
 extern "C" void fn_801FEA18(const char*, void (*)(), float, bool);
 extern "C" void fn_801FEB74(void (*)(), float);
 extern "C" void fn_802081C0();
@@ -531,7 +531,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     case 42:
-        fn_801FC2B4(true);
+        FEMusic::StartStreamIfDifferent(1);
         if (fn_80253E18())
         {
             fn_80253474();

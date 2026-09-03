@@ -2,16 +2,16 @@
 
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
+#include "Game/FE/feMusic.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/Render/Presentation.h"
 #include "NL/nlBind.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_802196B0.h"
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" Presentation* fn_801FEEAC();
-extern "C" void fn_801FC2B4(int value);
-extern "C" nlVector2 fn_802197FC(int pad, u8* valid);
 extern "C" void fn_80253474(void* object);
 extern "C" void fn_802534BC(void* object, int value, bool enabled);
 extern "C" TLComponentInstance* fn_80253D70(void* object, int index);
@@ -124,7 +124,7 @@ void OptionsScene::SceneCreated()
     {
         lbl_80578450[i]->SetActiveSlide("waiting", true, false);
     }
-    fn_801FC2B4(1);
+    FEMusic::StartStreamIfDifferent(1);
 }
 
 void OptionsScene::Update(float fDeltaT)

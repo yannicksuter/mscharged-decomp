@@ -5,6 +5,7 @@
 #include "Game/DB/tu_8010A40C.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
+#include "Game/FE/feMusic.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/fePresentation.h"
@@ -17,6 +18,7 @@
 #include "NL/nlBind.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_802196B0.h"
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" void* fn_80253E18();
@@ -25,20 +27,15 @@ extern "C" void fn_80253474(void* object);
 extern "C" void fn_802534BC(void* object, int value, bool enabled);
 extern "C" TLComponentInstance* fn_80253D70(void* object, int index);
 extern "C" void fn_80254310(void* object, bool enabled);
-extern "C" bool fn_80219E0C(int index);
-extern "C" void fn_80219E08(int index, nlColour colour);
 extern "C" void fn_800A71A8(cTeam* team);
 extern "C" void fn_801CC888(float dt);
 extern "C" void fn_801CC988(TU80219248Component* component, TLComponentInstance* instance);
 extern "C" void fn_801CC9B0(TU80219248Component* component, TLComponentInstance* instance, int value);
 extern "C" void fn_801C3BEC();
-extern "C" void fn_801FC2B4(int value);
 extern "C" Presentation* fn_801FEEAC();
 extern "C" bool fn_80273B00();
 extern "C" TLInstance* fn_8030677C(FEPresentation* presentation, unsigned long level1, unsigned long level2,
     unsigned long level3, unsigned long level4, unsigned long level5, unsigned long level6);
-extern "C" nlVector2 fn_802197FC(int pad, u8* valid);
-
 extern TLComponentInstance* lbl_80578450[4];
 extern BaseGameSceneManager* lbl_806E1838;
 extern BaseGameSceneManager* lbl_806E1860;
@@ -330,7 +327,7 @@ void SHChooseSides2::SceneCreated()
         awayCPUOver->m_bVisible = false;
         if (mContext != PAUSE)
         {
-            fn_801FC2B4(2);
+            FEMusic::StartStreamIfDifferent(2);
         }
     }
 
@@ -1014,8 +1011,8 @@ void SHChooseSides2::Proceed()
         fn_801CBCA0(0xF8350154, 0, 0, 1);
         lbl_806E0F90->mUnidentified869C = 1;
         UnidentifiedCupManager* info = lbl_806E0F90;
-        info->mUnidentified8694 = GameInfoManager::Instance()->GetTeam(0);
-        info->mUnidentified8698 = GameInfoManager::Instance()->GetTeam(1);
+        info->mUnidentified8694[0] = GameInfoManager::Instance()->GetTeam(0);
+        info->mUnidentified8694[1] = GameInfoManager::Instance()->GetTeam(1);
         lbl_806E1838->PushLoadingScene(true);
         SaveLoad::StartSave(false);
         fn_802534BC(object, 0, true);

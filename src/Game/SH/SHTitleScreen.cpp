@@ -4,6 +4,7 @@
 #include "Game/DB/SaveLoad.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
+#include "Game/FE/feMusic.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/GameInfo.h"
@@ -15,7 +16,6 @@
 #include "NL/nlMath.h"
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" void fn_801FC2B4(int value);
 extern "C" Presentation* fn_801FEEAC();
 extern "C" void fn_80253284(int value);
 extern "C" void* fn_80253E18();
@@ -96,7 +96,7 @@ void TitleScene::SceneCreated()
     mTextPressStart = FEFinder<TLComponentInstance, 2>::Find<TLSlide>(
         mPresentation->GetActiveSlide(), InlineHasher("Layer2"), InlineHasher("Component2"));
 
-    fn_801FC2B4(0);
+    FEMusic::StartStreamIfDifferent(0);
     fn_80253284(0);
     void* object = fn_80253E18();
     if (object != 0)

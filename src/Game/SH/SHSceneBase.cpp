@@ -16,6 +16,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_802196B0.h"
 
 // Text crossfade helpers owned by the 0x801E2xxx translation unit.
 extern "C" void fn_801E2F50(UnidentifiedTextFader* fader, TLInstance* instance, int value0, int value1, int value2);
@@ -37,8 +38,6 @@ extern "C" void fn_801CC9B0(TU80219248Component* component, int value0, int valu
 extern "C" bool fn_80253E18();
 extern "C" void fn_80253474();
 extern "C" void fn_802534BC(int value0, int value1);
-
-extern "C" nlVector2 fn_802197FC(int pad, u8* valid);
 
 extern void* lbl_806E1E28;
 extern "C" cGlobalPad* fn_802C082C(void* owner, int pad);

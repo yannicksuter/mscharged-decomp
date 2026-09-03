@@ -4,6 +4,7 @@
 #include "Game/ComUpdateTask.h"
 #include "Game/Debug/FrameCounter.h"
 #include "Game/FrontEndTask.h"
+#include "Game/FE/feMusic.h"
 #include "Game/FE/feHelpFuncs.h"
 #include "Game/ResetTask.h"
 #include "Game/Render/Wiper.h"
@@ -38,11 +39,10 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "NL/gl/glState.h"
+#include "unclassified/tu_802196B0.h"
+#include "unclassified/tu_80376888.h"
 
 #include <string.h>
-
-extern "C" void fn_802196B0(void*);
-extern "C" void fn_80376888(void*);
 
 class AudioUpdateTask : public nlTask
 {
@@ -67,30 +67,6 @@ private:
     u32 mAccumulatedDelta;
     u32 mSampleCount;
 }; // size 0x28
-
-class UnidentifiedTask_802196B0
-{
-public:
-    UnidentifiedTask_802196B0() { fn_802196B0(this); }
-    ~UnidentifiedTask_802196B0();
-
-    nlTask* AsTask() { return reinterpret_cast<nlTask*>(this); }
-
-private:
-    u8 mStorage[0x20];
-};
-
-class UnidentifiedTask_80376888
-{
-public:
-    UnidentifiedTask_80376888() { fn_80376888(this); }
-    ~UnidentifiedTask_80376888() { }
-
-    nlTask* AsTask() { return reinterpret_cast<nlTask*>(this); }
-
-private:
-    u8 mStorage[0x20];
-};
 
 struct PlatformFileSystemConfig
 {
@@ -123,7 +99,6 @@ extern "C"
     bool fn_802C7FD0(void (*)());
     void fn_801BF87C(int);
     void fn_801BFA84(int);
-    void fn_801FC2A4(bool);
     void fn_802C7018(void*, const void*, u32);
     void fn_802E22D8(void*, float*, void*, void*, int, int, int);
     void fn_802A8278(void*, int, int, void*);
@@ -516,9 +491,9 @@ static void AddTasks()
     nlTaskManager::AddTask(&endFrameTask, 16, (u32)-1);
     nlTaskManager::AddTask(&gTransitionTask, 1, (u32)-1);
     nlTaskManager::AddTask(&networkUpdateTask, 17, (u32)-1);
-    nlTaskManager::AddTask(unidentifiedTask_802196B0.AsTask(), 13, 5);
+    nlTaskManager::AddTask(&unidentifiedTask_802196B0, 13, 5);
     nlTaskManager::AddTask(
-        unidentifiedTask_80376888.AsTask(), 13, (u32)-1);
+        &unidentifiedTask_80376888, 13, (u32)-1);
     nlTaskManager::AddTask(fn_803733D4(), 3, (u32)-1);
     nlTaskManager::AddTask(&Wiper::Instance(), 13, (u32)-1);
 }
@@ -607,7 +582,7 @@ int main()
     }
 
     nlTaskManager::SetNextState(0x00100000);
-    fn_801FC2A4(true);
+    FEMusic::SetEnabled_801FC2A4(true);
 
     for (;;)
     {
