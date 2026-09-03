@@ -1611,6 +1611,20 @@ Game/SH/SHCredits.cpp:
 	.sdata      start:0x806DDA58 end:0x806DDA98
 	.sdata2     start:0x806E57A8 end:0x806E57E0
 
+Game/FE/feMusic.cpp:
+	.text       start:0x801FC29C end:0x801FC444
+	.rodata     start:0x804E8438 end:0x804E84A8
+	.data       start:0x8051AE18 end:0x8051AE40
+	.sdata      start:0x806DDA98 end:0x806DDAA0
+	.sbss       start:0x806E1878 end:0x806E1888
+
+Game/SH/SHNetworkStart.cpp:
+	.text       start:0x801FC444 end:0x801FEBCC
+	.data       start:0x8051AE40 end:0x8051B0D0
+	.sdata      start:0x806DDAA0 end:0x806DDAF0
+	.sbss       start:0x806E1888 end:0x806E1898
+	.sdata2     start:0x806E57E0 end:0x806E5800
+
 Game/Render/Presentation.cpp:
 	.text       start:0x801FEBEC end:0x80200360
 	.data       start:0x8051B0D0 end:0x8051B1F8
@@ -1618,6 +1632,33 @@ Game/Render/Presentation.cpp:
 	.sdata      start:0x806DDAF0 end:0x806DDB18
 	.sbss       start:0x806E1898 end:0x806E18A0
 	.sdata2     start:0x806E5800 end:0x806E5818
+
+unclassified/tu_80200380.cpp:
+	.text       start:0x80200380 end:0x802007B0
+	.data       start:0x8051B1F8 end:0x8051B3B0
+	.sdata      start:0x806DDB18 end:0x806DDB28
+
+Game/SH/SHCupHub.cpp:
+	.text       start:0x802007B0 end:0x80203D70
+	.data       start:0x8051B3B0 end:0x8051B550
+	.sdata      start:0x806DDB28 end:0x806DDB90
+	.sdata2     start:0x806E5818 end:0x806E5828
+
+unclassified/tu_80203D70.cpp:
+	.text       start:0x80203D70 end:0x80206CE4
+	.data       start:0x8051B550 end:0x8051B770
+	.sdata      start:0x806DDB90 end:0x806DDBF8
+	.sdata2     start:0x806E5828 end:0x806E5838
+
+unclassified/tu_80206CE4.cpp:
+	.text       start:0x80206CE4 end:0x80209584
+	.ctors      start:0x804DB7A0 end:0x804DB7A4
+	.rodata     start:0x804E84A8 end:0x804E84C0
+	.data       start:0x8051B770 end:0x8051B970
+	.bss        start:0x80578428 end:0x80578450
+	.sdata      start:0x806DDBF8 end:0x806DDC48
+	.sbss       start:0x806E18A8 end:0x806E18B4
+	.sdata2     start:0x806E5838 end:0x806E5848
 
 unclassified/tu_80209584.cpp:
 	.text       start:0x80209584 end:0x8020A38C
@@ -1630,9 +1671,59 @@ Game/SH/SHGameResults.cpp:
 	.data       start:0x8051BC98 end:0x8051BD08
 	.sdata      start:0x806DDC60 end:0x806DDC80
 
+unclassified/tu_8020A74C.cpp:
+	.text       start:0x8020A74C end:0x8020E1B0
+	.data       start:0x8051BD08 end:0x8051BE58
+	.sdata      start:0x806DDC80 end:0x806DDD40
+	.sdata2     start:0x806E5860 end:0x806E5870
+
+unclassified/tu_8020E1B0.cpp:
+	.text       start:0x8020E1B0 end:0x80210600
+	.data       start:0x8051BE58 end:0x8051BF38
+	.sdata      start:0x806DDD40 end:0x806DDDD0
+	.sdata2     start:0x806E5870 end:0x806E5880
+
+unclassified/tu_80210600.cpp:
+	.text       start:0x80210600 end:0x802126F8
+	.data       start:0x8051BF38 end:0x8051C088
+	.sdata      start:0x806DDDD0 end:0x806DDE48
+	.sdata2     start:0x806E5880 end:0x806E5898
+
+unclassified/tu_802126F8.cpp:
+	.text       start:0x802126F8 end:0x802141FC
+	.data       start:0x8051C088 end:0x8051C168
+	.sdata      start:0x806DDE48 end:0x806DDEA8
+	.sdata2     start:0x806E5898 end:0x806E58A8
+
+unclassified/tu_802141FC.cpp:
+	.text       start:0x802141FC end:0x80214DF8
+	.rodata     start:0x804E84C0 end:0x804E8520
+	.data       start:0x8051C168 end:0x8051C448
+	.sdata      start:0x806DDEA8 end:0x806DDEC8
+
+unclassified/tu_80214DF8.cpp:
+	.text       start:0x80214DF8 end:0x80216CB0
+	.data       start:0x8051C448 end:0x8051C5A8
+	.sdata      start:0x806DDEC8 end:0x806DDFA0
+	.sdata2     start:0x806E58A8 end:0x806E58B0
+
+unclassified/tu_80216CB0.cpp:
+	.text       start:0x80216CB0 end:0x80219228
+	.data       start:0x8051C5A8 end:0x8051C840
+	.sdata      start:0x806DDFA0 end:0x806DDFF8
+	.sdata2     start:0x806E58B0 end:0x806E58C0
+
 unclassified/tu_80219248.cpp:
 	.text       start:0x80219248 end:0x80219668
 	.data       start:0x8051C840 end:0x8051C8B0
+
+unclassified/tu_802196B0.cpp:
+	.text       start:0x802196B0 end:0x80219E60
+	.data       start:0x8051C8B0 end:0x8051C8DC
+	.bss        start:0x80578450 end:0x80578480
+	.sdata      start:0x806DDFF8 end:0x806DDFFF
+	.sbss       start:0x806E18B4 end:0x806E18B8 align:4
+	.sdata2     start:0x806E58C0 end:0x806E58E0
 
 Game/FE/feButtonComponent.cpp:
 	.text       start:0x80219E80 end:0x8021B124
@@ -1651,6 +1742,32 @@ unclassified/tu_8022EF84.cpp:
 	.data       start:0x8051D5B0 end:0x8051D650
 	.sdata      start:0x806DE268 end:0x806DE288
 	.sdata2     start:0x806E5958 end:0x806E5960
+
+unclassified/tu_80245F04.cpp:
+	.text       start:0x80245F04 end:0x80247350
+	.data       start:0x8051E4A8 end:0x8051E548
+	.sdata      start:0x806DE6B0 end:0x806DE6E8
+
+Game/FE/feSlideMenu.cpp:
+	.text       start:0x80247350 end:0x8024795C
+	.sdata2     start:0x806E5A50 end:0x806E5A58
+
+Game/HBMManager_8024795C.cpp:
+	.text       start:0x8024795C end:0x802492E4
+	.ctors      start:0x804DB7B0 end:0x804DB7B4
+	.data       start:0x8051E548 end:0x8051E6A0
+	.bss        start:0x805784A8 end:0x805785B0
+	.sdata      start:0x806DE6E8 end:0x806DE6F8
+	.sbss       start:0x806E18D8 end:0x806E18DC
+	.sdata2     start:0x806E5A58 end:0x806E5A88
+
+unclassified/tu_802492E4.cpp:
+	.text       start:0x802492E4 end:0x8024BED8
+	.rodata     start:0x804E85D8 end:0x804E8680
+	.data       start:0x8051E6A0 end:0x8051ED44
+	.bss        start:0x805785C8 end:0x805785F8
+	.sdata      start:0x806DE6F8 end:0x806DE740
+	.sbss       start:0x806E18E0 end:0x806E18F0
 
 Game/SH/SHSceneBase.cpp:
 	.text       start:0x80269078 end:0x8026B10C
@@ -2415,6 +2532,10 @@ NL/gl/glMatrix.cpp:
 	.text       start:0x802CBE10 end:0x802CBEC4
 	.sdata      start:0x806DF3F0 end:0x806DF3F4
 
+NL/gl/glMemory.cpp:
+	.text       start:0x802CBEC4 end:0x802CC0AC
+	.sbss       start:0x806E1ED8 end:0x806E1EE0
+
 NL/gl/glModel.cpp:
 	.text       start:0x802CC0EC end:0x802CC370
 
@@ -2998,13 +3119,50 @@ Game/GL/ShaderSkinMesh.cpp:
 	.text       start:0x8036F648 end:0x8037091C
 	.ctors      start:0x804DBB58 end:0x804DBB5C
 
+unclassified/tu_8037091C.cpp:
+	.text       start:0x8037091C end:0x80370E20
+	.ctors      start:0x804DBB5C end:0x804DBB60
+	.data       start:0x805356E0 end:0x80535704
+	.sbss       start:0x806E2408 end:0x806E2418
+	.sdata2     start:0x806E6DB8 end:0x806E6DC0
+
+Game/Sys/movie.cpp:
+	.text       start:0x80370E20 end:0x803713E8
+	.data       start:0x80535708 end:0x80535728
+	.bss        start:0x8059BF18 end:0x8059BF38
+	.sdata      start:0x806DFAC0 end:0x806DFAE0
+	.sbss       start:0x806E2418 end:0x806E2448
+
 RVL_SDK/thp/THPSimple.cpp:
 	.text       start:0x803713E8 end:0x80372980
 	.data       start:0x80535728 end:0x80535828
-	.bss        start:0x8059BF40 end:0x8059C400
+	.bss        start:0x8059BF40 end:0x8059C400 align:32
 	.sdata      start:0x806DFAE0 end:0x806DFB00
 	.sbss       start:0x806E2448 end:0x806E2460
 	.sdata2     start:0x806E6DC0 end:0x806E6DD0
+
+unclassified/tu_80372980.cpp:
+	.text       start:0x80372980 end:0x80372B30
+	.data       start:0x80535828 end:0x80535880
+
+unclassified/tu_80374D68.cpp:
+	.text       start:0x80374D68 end:0x803751D4
+	.data       start:0x80535E20 end:0x80535EB0
+	.sdata2     start:0x806E6DD8 end:0x806E6E00
+
+NL/glx/glxMemory.cpp:
+	.text       start:0x80376054 end:0x80376868
+	.data       start:0x80535F08 end:0x80535FF0
+	.bss        start:0x805A0908 end:0x805A0928
+	.sdata      start:0x806DFB10 end:0x806DFB28
+	.sbss       start:0x806E2480 end:0x806E24A0
+
+unclassified/tu_80376888.cpp:
+	.text       start:0x80376888 end:0x80376F3C
+	.data       start:0x80535FF0 end:0x80536018
+	.bss        start:0x805A0928 end:0x805A0A70
+	.sdata      start:0x806DFB28 end:0x806DFB40
+	.sbss       start:0x806E24A0 end:0x806E24B0
 
 MetroTRK/mainloop.c:
 	.text       start:0x80376F3C end:0x80377034
