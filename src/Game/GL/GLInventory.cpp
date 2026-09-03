@@ -1,5 +1,7 @@
 #include "Game/GL/GLInventory.h"
 
+#include "Game/GL/GLTextureAnim.h"
+#include "Game/GL/GLVertexAnim.h"
 #include "Game/SAnim.h"
 #include "Game/SHierarchy.h"
 #include "NL/gl/glModel.h"
@@ -7,9 +9,6 @@
 #include "NL/nlMemory.h"
 
 #include <string.h>
-
-extern "C" void fn_802D3C1C(GLTextureAnim*, float);
-extern "C" void fn_802D3F7C(glModel*, float);
 
 GLInventory::GLInventory()
 {
@@ -242,7 +241,7 @@ public:
 void Callback_802D254C::fn_802D254C(
     const unsigned long&, GLTextureAnim** anim)
 {
-    fn_802D3C1C(*anim, m_Unknown00);
+    (*anim)->Update(m_Unknown00);
 }
 
 void GLInventory::AddModel(unsigned long key, glModel* model)
@@ -282,7 +281,7 @@ public:
 void Callback_802D2670::fn_802D2670(
     const unsigned long&, glModel** model)
 {
-    fn_802D3F7C(*model, m_Unknown00);
+    ((GLVertexAnim*)*model)->Update(m_Unknown00);
 }
 
 void GLInventory::AddSkinData(unsigned long key, nlChunk* skinData)
@@ -345,10 +344,9 @@ GLSkinMesh* GLInventory::MakeSkinMesh(
 
     nlChunk* foundChunk = SkinDataHelper::Get(this, hashID);
     nlChunk* pChunk = foundChunk;
-    GLMaterialList* pMaterialList =
-        MaterialListHelper::Get(this, hashID);
+    glModel* pModel = (glModel*)MaterialListHelper::Get(this, hashID);
 
-    return glx_MakeSkinMesh(pChunk, pMaterialList, hierarchy);
+    return glx_MakeSkinMesh(pChunk, pModel, hierarchy);
 }
 
 void GLInventory::Update(float deltaTime)

@@ -1,21 +1,20 @@
-#include "Game/Drawable/Drawable_8017FFCC.h"
+#include "Game/Drawable/DrawableDaisyFist.h"
 #include "Game/Drawable/RenderObject.h"
 #include "NL/gl/glView.h"
 #include "NL/nlMath.h"
 #include "NL/platvmath.h"
+#include "unclassified/tu_8019D6B4.h"
 
-struct RenderEntry_8018006C
-{
-    char _000[0x24];
-    RenderObject* object;
-};
+// Charged-only render snapshot of one Daisy crystal fist. Like the other
+// gameplay-object snapshots it spins the prop about Z from a 16-bit angle unit,
+// but it draws through a dedicated view instead of the default one.
 
 extern "C"
 {
     GLView* fn_8027267C(int index);
 }
 
-Drawable_8017FFCC::Drawable_8017FFCC()
+DrawableDaisyFist::DrawableDaisyFist()
 {
     mVisible = false;
     mScale = 1.0f;
@@ -25,7 +24,7 @@ Drawable_8017FFCC::Drawable_8017FFCC()
     mOrientation = 0;
 }
 
-void Drawable_8017FFCC::Grab(const Object_8017FFF4* object)
+void DrawableDaisyFist::Grab(const DaisyFistObject* object)
 {
     if (object == 0)
     {
@@ -33,31 +32,31 @@ void Drawable_8017FFCC::Grab(const Object_8017FFF4* object)
         return;
     }
 
-    mVisible = object->visible;
+    mVisible = object->mVisible;
     if (mVisible)
     {
-        mPosition = object->position;
-        mOrientation = object->orientation;
-        mScale = object->fn_8019DA04();
+        mPosition = object->mPosition;
+        mOrientation = object->mOrientation;
+        mScale = object->GetScale();
     }
 }
 
-void Drawable_8017FFCC::Render(const RenderEntry_8018006C* entry) const
+void DrawableDaisyFist::Render(const DaisyFistObject* object) const
 {
     nlMatrix4 matrix;
-    RenderObject* object = entry->object;
-    if (object == 0)
+    RenderObject* drawable = object->mDrawable;
+    if (drawable == 0)
     {
         return;
     }
 
     if (mVisible)
     {
-        object->m_uObjectFlags |= 1;
+        drawable->m_uObjectFlags |= 1;
     }
     else
     {
-        object->m_uObjectFlags &= ~1;
+        drawable->m_uObjectFlags &= ~1;
     }
 
     if (!mVisible)
@@ -75,19 +74,19 @@ void Drawable_8017FFCC::Render(const RenderEntry_8018006C* entry) const
     matrix.m43 = mPosition.z;
     matrix.m44 = 1.0f;
 
-    UnidentifiedDrawableViewState* state = object->mUnidentified10;
+    UnidentifiedDrawableViewState* state = drawable->mUnidentified10;
     GLView* oldView68 = state->mView68;
     GLView* oldView6C = state->mView6C;
     state->mView68 = fn_8027267C(29);
     state->mView6C = state->mView68;
-    object->SetWorldMatrix(&matrix);
-    object->Draw();
+    drawable->SetWorldMatrix(&matrix);
+    drawable->Draw();
     state->mView68 = oldView68;
     state->mView6C = oldView6C;
 }
 
-void Drawable_8017FFCC::Blend(const float* factors,
-    const Drawable_8017FFCC& lhs, const Drawable_8017FFCC& rhs)
+void DrawableDaisyFist::Blend(const float* factors,
+    const DrawableDaisyFist& lhs, const DrawableDaisyFist& rhs)
 {
     mVisible = lhs.mVisible && rhs.mVisible;
     if (!mVisible)

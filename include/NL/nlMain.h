@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+void nlInit();
 u32 nlChecksum32(const void* data, unsigned long size);
 
 class RunningChecksum

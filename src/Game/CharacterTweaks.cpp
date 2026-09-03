@@ -144,7 +144,7 @@ PlayerTweaks::~PlayerTweaks()
 {
 }
 
-static inline void UnidentifiedInitPlayerTweak(TweakValue_804F4DC8& tweak,
+static inline void UnidentifiedInitPlayerTweak(TweakValueImpl_804F4DC8& tweak,
     const char* tweakName, float defaultValue, const char* category,
     float value, float min, float max)
 {
@@ -628,17 +628,17 @@ extern "C" float fn_8002D050(PlayerTweaks* tweaks)
         tweaks->mUnidentified074);
 }
 
-bool TweakValue_804F4DC8::fn_8002D078(const char* name, float defaultValue,
+bool TweakValueImpl_804F4DC8::fn_8002D078(const char* name, float defaultValue,
     const char* group, bool reload, float value, float min, float max)
 {
     bool found = fn_802C4FEC(name, value, group, reload, min, max);
     if (!found)
     {
-        *mValue.m_pValue = GetDefaultValue();
+        *m_pValue = GetDefaultValue();
     }
     if (!found)
     {
-        *mValue.m_pValue = defaultValue;
+        *m_pValue = defaultValue;
     }
     return found;
 }

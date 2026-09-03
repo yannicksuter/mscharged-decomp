@@ -125,7 +125,7 @@ void fn_80137890()
             for (int padIndex = 0; padIndex < 4; ++padIndex)
             {
                 PadMonkey* monkey = new (nlMalloc(0xFC, 8, false))
-                    PadMonkey(padIndex);
+                    PadMonkey_80375EEC(padIndex);
                 fn_802C082C(lbl_806E1E28, padIndex)->mBackend = monkey;
             }
         }

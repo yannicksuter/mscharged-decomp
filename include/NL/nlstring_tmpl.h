@@ -100,6 +100,27 @@ inline int nlStrICmp(const CharT* lhs, const CharT* rhs)
 }
 
 template <typename CharT>
+inline int nlStrNICmp(const CharT* a, const CharT* b, unsigned long maxsize)
+{
+    CharT c1;
+    CharT c2;
+    do
+    {
+        c1 = *a++;
+        if (c1 >= 0x61 && c1 <= 0x7A)
+        {
+            c1 = (CharT)(c1 & 0x5F);
+        }
+        c2 = *b++;
+        if (c2 >= 0x61 && c2 <= 0x7A)
+        {
+            c2 = (CharT)(c2 & 0x5F);
+        }
+    } while (--maxsize != 0 && c1 != 0 && c2 != 0 && c1 == c2);
+    return c1 - c2;
+}
+
+template <typename CharT>
 inline int nlStrNCmp(const CharT* lhs, const CharT* rhs, unsigned long count)
 {
     CharT left;

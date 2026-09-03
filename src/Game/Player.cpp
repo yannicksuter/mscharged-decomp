@@ -8,6 +8,7 @@
 #include "Game/AnimInventory.h"
 #include "Game/Ball.h"
 #include "Game/EventDataTypes.h"
+#include "Game/FormationDefines.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsCharacter.h"
@@ -30,6 +31,7 @@ extern "C" void fn_801B59DC(
     UnidentifiedObject_801B535C* pObject, bool bParam);
 extern "C" void fn_801BCC38(cCharacter*);
 extern "C" void fn_801BCE2C(cCharacter*);
+extern "C" void fn_80095DF4(cPlayer* self, float fDeltaT);
 
 void cPlayer::SetSpaceSearch(SpaceSearch* pSpaceSearch)
 {
@@ -38,6 +40,23 @@ void cPlayer::SetSpaceSearch(SpaceSearch* pSpaceSearch)
         delete m_pSpaceSearch;
     }
     m_pSpaceSearch = pSpaceSearch;
+}
+
+void cPlayer::Update(float fDeltaT)
+{
+    if (m_pController != NULL)
+    {
+        m_UserControlledTime += fDeltaT;
+    }
+    else
+    {
+        m_UserControlledTime = 0.0f;
+    }
+
+    fn_80095DF4(this, fDeltaT);
+
+    FieldLocToAILoc(
+        m_v3AIPosition, m_v3Position, (eTeamSide)m_pTeam->m_nSide);
 }
 
 void cPlayer::SetAnimID(int animID)

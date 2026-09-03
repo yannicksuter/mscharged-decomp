@@ -9,7 +9,7 @@ extern "C" unsigned int fn_802B289C(const char*, int);
 extern "C" void fn_802B2940(void*, void*);
 extern "C" void fn_802B29C4(void*);
 extern "C" void fn_802B2A04(void*, void*, unsigned int, int, void*);
-extern "C" void* fn_802B28E0(void*);
+extern "C" void* fn_802B28E0(void*, void*);
 extern "C" void fn_802B2CC8(void*, void*);
 
 class UnidentifiedEventBase
@@ -21,7 +21,10 @@ public:
     }
 
     virtual ~UnidentifiedEventBase() { }
-    virtual void Disconnect() = 0;
+    virtual void Disconnect(void* owner) = 0;
+
+    friend void fn_802B2940(void*, void*);
+    friend void fn_802B29C4(void*);
 
 protected:
     unsigned int mHash;
@@ -42,7 +45,15 @@ struct UnidentifiedConnection
 
     void* mEvent;
     void* mTarget;
-    unsigned int mFlags;
+    union
+    {
+        unsigned int mFlags;
+        struct
+        {
+            unsigned short mUnidentified08;
+            unsigned short mGroupCount;
+        };
+    };
 };
 
 template <typename T>
@@ -69,7 +80,7 @@ public:
     }
 
     virtual ~UnidentifiedTypedEvent() { }
-    virtual void Disconnect() = 0;
+    virtual void Disconnect(void* owner) = 0;
     virtual void Add(Function<T*>&, unsigned int, int) = 0;
 
 protected:
@@ -103,7 +114,7 @@ public:
         fn_802B29C4(this);
     }
 
-    virtual void Disconnect();
+    virtual void Disconnect(void* owner);
 
     virtual void Add(Function<T*>& callback, unsigned int value, int flags)
     {
@@ -192,9 +203,9 @@ void UnidentifiedEvent<T>::UnidentifiedDeleteListener(Listener* listener)
 }
 
 template <typename T>
-void UnidentifiedEvent<T>::Disconnect()
+void UnidentifiedEvent<T>::Disconnect(void* owner)
 {
-    Listener* listener = (Listener*)fn_802B28E0(this);
+    Listener* listener = (Listener*)fn_802B28E0(this, owner);
     Remove(listener);
 }
 
@@ -259,9 +270,9 @@ public:
         fn_802B29C4(this);
     }
 
-    virtual void Disconnect()
+    virtual void Disconnect(void* owner)
     {
-        Listener* listener = (Listener*)fn_802B28E0(this);
+        Listener* listener = (Listener*)fn_802B28E0(this, owner);
         Remove(listener);
     }
 

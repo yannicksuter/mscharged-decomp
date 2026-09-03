@@ -7,7 +7,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "types.h"
-#include "unclassified/tu_801B6188.h"
+#include "Game/DB/StadiumInfo.h"
 
 extern "C" void* memcpy(void* dst, const void* src, unsigned long size);
 
@@ -461,8 +461,8 @@ void GameInfoManager::SetupGameFromConfig()
         SetStadium(-1);
 
         for (int stadium = 0; stadium < 18; stadium++) {
-            if (nlStrICmp(fn_801B6188(stadium), value) == 0) {
-                if (fn_801B61B8(stadium) == 0) {
+            if (nlStrICmp(GetStadiumName(stadium), value) == 0) {
+                if (IsStadiumEnabled(stadium) == 0) {
                     nlBreak__Fv();
                 }
 

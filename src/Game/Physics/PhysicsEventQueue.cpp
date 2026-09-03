@@ -1,14 +1,33 @@
 #include "Game/Task/DispatchEventsTask.h"
 
+#include "Game/AI/Fielder.h"
+#include "Game/AI/Powerups.h"
+#include "Game/Ball.h"
+#include "Game/DB/StadiumInfo.h"
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
+#include "Game/Game.h"
+#include "Game/GameInfo.h"
+#include "Game/GameTweaks.h"
+#include "Game/Goalie.h"
+#include "Game/Physics/PhysicsAIBall.h"
+#include "Game/Physics/PhysicsBanana.h"
+#include "Game/Physics/PhysicsBulletBill.h"
+#include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsObject.h"
+#include "Game/Physics/PhysicsPatch.h"
+#include "Game/Physics/PhysicsShell.h"
+#include "Game/Physics/PhysicsSphere.h"
+#include "Game/Team.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
 #include "NL/nlDLListContainer.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
+#include "NL/globalpad.h"
+#include "unclassified/tu_80175F8C.h"
+#include "unclassified/tu_80177498.h"
 #include "unclassified/tu_801A0E64.h"
 #include "unclassified/tu_801A5F10.h"
 
@@ -225,9 +244,19 @@ extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
 extern "C" long __ptmf_test(UnidentifiedMemberFunction*);
 extern "C" UnidentifiedMemberFunction lbl_8050F58C;
 extern "C" unsigned char lbl_804DCC60[];
-extern "C" void* g_pBall;
 
-class PhysicsSphere_80175F8C;
+struct UnidentifiedObject_801B54AC
+{
+    /* 0x00 */ u8 mUnidentified00[0x34];
+    /* 0x34 */ cFielder* mUnidentified34;
+};
+
+class PhysicsSphere_801798A8 : public PhysicsSphere
+{
+public:
+    /* 0x38 */ void* mUnidentified38;
+    /* 0x3C */ UnidentifiedObject_801B54AC* mUnidentified3C;
+};
 
 extern "C" void fn_800156F8(void*, void*);
 extern "C" void fn_80015B38(void*, int);
@@ -318,7 +347,296 @@ extern "C" void fn_8014545C(void* data)
     fn_8019A434(*(void**)bytes, 0);
 }
 
-extern "C" void fn_801454BC(void*);
+extern "C" SlotPool<UnidentifiedEventData_80066A04> lbl_80571730;
+extern "C" void fn_80025A14(void*);
+extern "C" bool fn_8003886C(cFielder*);
+extern "C" void fn_80032534(cFielder*, const nlVector3&);
+extern "C" void fn_80031FBC(cFielder*);
+extern "C" bool fn_80032360(cFielder*, const nlVector3&, float);
+extern "C" bool fn_800167A8(cBall*);
+extern "C" void fn_80080EFC(cPlayer*);
+extern "C" void fn_800ED92C(unsigned long soundID);
+extern "C" void fn_8019ABB8(BulletBillObject*, bool);
+extern "C" void fn_801B54AC(UnidentifiedObject_801B54AC*, bool, float);
+
+float lbl_806DCA90 = 1.0f;
+
+extern "C" void fn_801454BC(UnidentifiedEventData38* data)
+{
+    if (g_pGame == 0)
+    {
+        return;
+    }
+    if (!g_pGame->IsGameplayOrOvertime())
+    {
+        switch (g_pGame->m_eGameState)
+        {
+        case 3:
+            break;
+        default:
+            return;
+        }
+    }
+
+    UnidentifiedEventData_80066A04* pStats;
+    bool bInvincible;
+    cBall* pBall;
+    PhysicsObject* pObject = data->mUnidentified04;
+    PhysicsSphere_80175F8C* pShockwave = data->mUnidentified00;
+    int effectType = pShockwave->effectType;
+
+    switch (pObject->GetObjectType())
+    {
+    case 4:
+    {
+        cCharacter* pCharacter =
+            ((PhysicsCharacter*)pObject->m_parentObject)->m_pAICharacter;
+        if (pCharacter->m_eClassType == FIELDER)
+        {
+            cFielder* pFielder = (cFielder*)pCharacter;
+            switch (effectType)
+            {
+            case 1:
+                if (pShockwave->owner == pFielder)
+                {
+                    break;
+                }
+                if (!pFielder->mbTangible)
+                {
+                    break;
+                }
+                if (pFielder->m_eActionState == ACTION_HIT_REACT)
+                {
+                    break;
+                }
+                fn_80032534(pFielder, pShockwave->position);
+                break;
+            case 3:
+                fn_80031FBC(pFielder);
+                break;
+            case 0:
+            case 4:
+            case 5:
+                if (pShockwave->owner == pFielder)
+                {
+                    break;
+                }
+                if (pFielder->m_eActionState == ACTION_BOMB_REACT
+                    || pFielder->m_eActionState == ACTION_HIT_REACT)
+                {
+                    break;
+                }
+                if (fn_80032360(pFielder, pShockwave->position,
+                        pShockwave->GetRadius())
+                    && pShockwave->owner != 0 && effectType != 4)
+                {
+                    pStats = 0;
+                    lbl_80571730.Allocate(pStats);
+                    pStats->mUnidentified08 = pShockwave->owner;
+                    pStats->mUnidentified0C = pShockwave->sourceIndex;
+                    pStats->mUnidentified00 = pFielder;
+                    bool bHasPad = pFielder->GetGlobalPad() != 0;
+                    pStats->mUnidentified04 =
+                        bHasPad ? pFielder->GetGlobalPad()->fn_80332748() : -1;
+                    g_pGame->mUnidentified49C.mEvent31.Queue(pStats,
+                        Function<UnidentifiedEventData_80066A04*>(
+                            (void (*)(UnidentifiedEventData_80066A04*))fn_80025A14));
+                }
+                break;
+            case 2:
+                if (!pFielder->mbTangible)
+                {
+                    break;
+                }
+                bInvincible = false;
+                if (!fn_8003886C(pFielder)
+                    && (pFielder->muInvincibleStatus & 0x1F) == 0x1F)
+                {
+                    bInvincible = true;
+                }
+                if (bInvincible)
+                {
+                    break;
+                }
+                if (pFielder->m_eActionState == ACTION_ELECTROCUTION)
+                {
+                    break;
+                }
+                pFielder->fn_800451B0(pShockwave->position);
+                if (GetStadiumUnknown0x10(
+                        GameInfoManager::Instance()->GetStadium()))
+                {
+                    unsigned long soundID = 0x70A628D8;
+                    if (pFielder->m_pTeam->m_nSide == 0)
+                    {
+                        soundID = 0xF68B3F0F;
+                    }
+                    fn_800ED92C(soundID);
+                }
+                break;
+            }
+        }
+        else if (pCharacter->m_eClassType == GOALIE)
+        {
+            Goalie* pGoalie = (Goalie*)pCharacter;
+            switch (effectType)
+            {
+            case 4:
+                if (pGoalie->mGoalieActionState
+                    != GOALIEACTION_UNIDENTIFIED_29)
+                {
+                    pGoalie->fn_8008EC2C();
+                }
+                break;
+            case 2:
+                if (pGoalie->mGoalieActionState
+                    != GOALIEACTION_UNIDENTIFIED_27)
+                {
+                    pGoalie->fn_8008E130();
+                }
+                break;
+            }
+        }
+        break;
+    }
+    case 16:
+    {
+        pBall = ((PhysicsAIBall*)pObject)->m_pAIBall;
+        if (effectType == 2)
+        {
+            break;
+        }
+        if (effectType == 4)
+        {
+            cCharacter* pOwner = (cCharacter*)pShockwave->owner;
+            if (pOwner != 0 && pOwner->m_eClassType == FIELDER)
+            {
+                fn_800156F8(pBall, pOwner);
+            }
+            break;
+        }
+
+        if (pBall->GetOwnerFielder() != 0)
+        {
+            cFielder* pOwner = (cFielder*)pShockwave->owner;
+            if (pBall->GetOwnerFielder() == pOwner)
+            {
+                break;
+            }
+        }
+        else
+        {
+            if (fn_800167A8(pBall))
+            {
+                break;
+            }
+            if (pBall->GetOwnerGoalie() != 0)
+            {
+                cPlayer* pGoalie = pBall->GetOwnerGoalie();
+                pGoalie->ReleaseBall(0);
+                fn_80080EFC(pGoalie);
+            }
+        }
+
+        eSpinType spinType =
+            nlRandom(2) != 0 ? SPINTYPE_FORWARD : SPINTYPE_BACK;
+        nlVector3 v3Velocity;
+        if (effectType == 5)
+        {
+            pBall->ShootAtFast(v3Velocity,
+                ((cCharacter*)pShockwave->owner)->m_v3Position, lbl_806DCA90);
+            nlRandom(2);
+        }
+        else
+        {
+            nlVec3Sub(v3Velocity, pBall->m_v3Position, pShockwave->position);
+            v3Velocity.z = 0.0f;
+            float fLengthSquared = v3Velocity.GetLengthSq3D();
+            if (fLengthSquared > 0.001f)
+            {
+                nlVec3Scale(v3Velocity, v3Velocity,
+                    nlRecipSqrt(fLengthSquared, true));
+                nlVec3Scale(v3Velocity, 6.0f + nlRandomf(6.0f));
+            }
+            else
+            {
+                v3Velocity.x = nlRandomf(6.0f) - 3.0f;
+                v3Velocity.y = nlRandomf(6.0f) - 3.0f;
+                v3Velocity.x += v3Velocity.x > 0.0f ? 6.0f : -6.0f;
+                v3Velocity.y += v3Velocity.y > 0.0f ? 6.0f : -6.0f;
+            }
+            v3Velocity.z = 8.0f + nlRandomf(5.0f);
+        }
+        pBall->ShootRelease(v3Velocity, spinType);
+        fn_80015B38(pBall, false);
+        break;
+    }
+    case 21:
+        if (effectType == 1)
+        {
+            ((PhysicsBanana*)pObject)->m_pPowerupObject->fn_8009CEBC(
+                pShockwave->position);
+            break;
+        }
+        if (effectType == 0
+            && ((PhysicsBanana*)pObject)->m_pPowerupObject->m_eType
+                == POWER_UP_BOBOMB)
+        {
+            break;
+        }
+        ((PhysicsBanana*)pObject)->m_pPowerupObject->m_bShouldDestroy = true;
+        break;
+    case 20:
+        if (effectType == 1)
+        {
+            ((PhysicsShell*)pObject)->m_pPowerupObject->fn_8009CEBC(
+                pShockwave->position);
+            break;
+        }
+        ((PhysicsShell*)pObject)->m_pPowerupObject->m_bShouldDestroy = true;
+        break;
+    case 31:
+        fn_801A1ED0(((PhysicsSphere_801700D8*)pObject)->_038, true);
+        break;
+    case 29:
+        ((PhysicsBox_80177498*)pObject)->fn_80178170(0.35f);
+        break;
+    case 32:
+        if (((PhysicsSphere_801798A8*)pObject)->mUnidentified3C->mUnidentified34
+            == pShockwave->owner)
+        {
+            break;
+        }
+        if (effectType == 3)
+        {
+            fn_801B54AC(((PhysicsSphere_801798A8*)pObject)->mUnidentified3C, true,
+                lbl_8056CF08.m_pGameTweaks->mUnidentified174);
+        }
+        if (effectType != 2)
+        {
+            fn_8002E5F4(
+                ((PhysicsSphere_801798A8*)pObject)->mUnidentified3C->mUnidentified34,
+                0);
+        }
+        break;
+    case 30:
+        fn_8019ABB8(((PhysicsBulletBill*)pObject)->mBulletBill, false);
+        break;
+    case 28:
+        if (((PhysicsPatch*)pObject)->m_Type == 0
+            && !((PhysicsPatch*)pObject)->m_bKillMe)
+        {
+            fn_80176A60(&pObject->GetPosition());
+            pObject->Unknown0();
+        }
+        break;
+    case 33:
+    case 34:
+        break;
+    default:
+        break;
+    }
+}
 
 extern "C" void fn_80145C3C(void* data)
 {
@@ -355,7 +673,8 @@ extern "C" void fn_80144AB8()
     UnidentifiedRegisterEventCallback("CollisionHammerPowerup", fn_801453B8);
     UnidentifiedRegisterEventCallback("CollisionFireballPowerup", fn_801452F4);
     UnidentifiedRegisterEventCallback("CollisionCrackEgg", fn_801453E0);
-    UnidentifiedRegisterEventCallback("CollisionShockwave", fn_801454BC);
+    UnidentifiedRegisterEventCallback(
+        "CollisionShockwave", (void (*)(void*))fn_801454BC);
     UnidentifiedRegisterEventCallback("CollisionKoopaShellEnd", fn_801453FC);
     UnidentifiedRegisterEventCallback("CollisionBirdoEggEnd", fn_8014545C);
     UnidentifiedRegisterEventCallback("CollisionPatchPatch", fn_80145C3C);

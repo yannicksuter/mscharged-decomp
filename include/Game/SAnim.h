@@ -201,4 +201,6 @@ public:
     unsigned long m_nHierarchySignature;
 };
 
+void SAnimInitGQR();
+
 #endif // GAME_SANIM_H

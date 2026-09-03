@@ -11,7 +11,7 @@
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Team.h"
 #include "math.h"
-#include "unclassified/tu_801B6188.h"
+#include "Game/DB/StadiumInfo.h"
 
 struct UnidentifiedFielderInput
 {
@@ -592,7 +592,7 @@ void cFielder::CollideWithWallCallback(
             eventData->contactPoint, eventData->wallNormal, true);
 
         int stadium = GameInfoManager::Instance()->GetStadium();
-        if (fn_801B6278(stadium))
+        if (GetStadiumUnknown0x10(stadium))
         {
             unsigned long soundID = 0xCE269987;
             if (m_pTeam->m_nSide == 0)

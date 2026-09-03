@@ -1,157 +1,159 @@
+#include "unclassified/tu_8019D6B4.h"
+
 #include "Game/AI/AiUtil.h"
 #include "Game/Character.h"
-#include "Game/Drawable/Drawable_8017FFCC.h"
 
 class PhysicsSphere_80175F8C;
 
+// Render object table type 6 is "art/objects/gameplay/daisy_fist".
 extern "C" RenderObject* fn_80276360(int type, int index);
 extern "C" PhysicsSphere_80175F8C* fn_80176C18(
     const nlVector3* position, cCharacter* owner);
 
-static float lbl_806DCDB8 = 0.5f;
-static float lbl_806DCDBC = 1.25f;
-static float lbl_806DCDC0 = 0.22f;
-static float lbl_806DCDC4 = 2.5f;
-static float lbl_806DCDC8 = 3.2f;
-static float lbl_806DCDCC = -3.5f;
-static float lbl_806DCDD0 = -0.6f;
-static float lbl_806DCDD4 = -2.0f;
-static float lbl_806DCDD8 = 0.3f;
-static float lbl_806DCDDC = 0.15f;
+static float sSpawnScale = 0.5f;
+static float sFullScale = 1.25f;
+static float sBaseScale = 0.22f;
+static float sImpactHeightOffset = 2.5f;
+static float sForwardOffset = 3.2f;
+static float sHiddenHeight = -3.5f;
+static float sRaisedHeight = -0.6f;
+static float sImpactHeight = -2.0f;
+static float sRiseTime = 0.3f;
+static float sScaleTime = 0.15f;
 
-static const nlVector3 lbl_804DCDF8 = { 0.0f, -20.0f, -18.0f };
+static const nlVector3 sHiddenPosition = { 0.0f, -20.0f, -18.0f };
 
-Object_8017FFF4::Object_8017FFF4(int index)
+DaisyFistObject::DaisyFistObject(int index)
 {
-    _010 = lbl_806DCDC0;
-    _014 = lbl_806DCDC0;
-    _018 = 0.0f;
-    _01C = 0.0f;
-    visible = false;
-    _028 = 0;
-    _02C = 0.0f;
-    position = lbl_804DCDF8;
-    orientation = 0;
-    _024 = fn_80276360(6, index);
+    mScale = sBaseScale;
+    mTargetScale = sBaseScale;
+    mScaleTimer = 0.0f;
+    mRiseTimer = 0.0f;
+    mVisible = false;
+    mOwner = 0;
+    mDelayTimer = 0.0f;
+    mPosition = sHiddenPosition;
+    mOrientation = 0;
+    mDrawable = fn_80276360(6, index);
 }
 
-Object_8017FFF4::~Object_8017FFF4()
+DaisyFistObject::~DaisyFistObject()
 {
 }
 
-void Object_8017FFF4::fn_8019D778(float dt)
+void DaisyFistObject::Update(float dt)
 {
-    if (!visible)
+    if (!mVisible)
     {
         return;
     }
 
-    if (_02C > 0.0f)
+    if (mDelayTimer > 0.0f)
     {
-        _02C -= dt;
-        if (!(_02C <= 0.0f))
+        mDelayTimer -= dt;
+        if (!(mDelayTimer <= 0.0f))
         {
             return;
         }
     }
 
-    if (_01C > 0.0f)
+    if (mRiseTimer > 0.0f)
     {
-        float oldZ = position.z;
-        _01C -= dt;
-        position.z += dt * (lbl_806DCDD0 - lbl_806DCDCC) / lbl_806DCDD8;
-        if (oldZ < lbl_806DCDD4 && position.z >= lbl_806DCDD4)
+        float oldZ = mPosition.z;
+        mRiseTimer -= dt;
+        mPosition.z += dt * (sRaisedHeight - sHiddenHeight) / sRiseTime;
+        if (oldZ < sImpactHeight && mPosition.z >= sImpactHeight)
         {
-            nlVector3 effectPosition = position;
-            effectPosition.z += lbl_806DCDC4;
-            fn_80176C18(&effectPosition, _028);
+            nlVector3 impactPosition = mPosition;
+            impactPosition.z += sImpactHeightOffset;
+            fn_80176C18(&impactPosition, mOwner);
         }
     }
-    else if (position.z > lbl_806DCDCC)
+    else if (mPosition.z > sHiddenHeight)
     {
-        position.z -= 0.5f * dt * (lbl_806DCDD0 - lbl_806DCDCC) / lbl_806DCDD8;
+        mPosition.z -= 0.5f * dt * (sRaisedHeight - sHiddenHeight) / sRiseTime;
     }
     else
     {
-        if (visible)
+        if (mVisible)
         {
-            visible = false;
-            position = lbl_804DCDF8;
+            mVisible = false;
+            mPosition = sHiddenPosition;
         }
-        _018 = 0.0f;
-        _01C = 0.0f;
-        _02C = 0.0f;
+        mScaleTimer = 0.0f;
+        mRiseTimer = 0.0f;
+        mDelayTimer = 0.0f;
     }
 
-    if (_018 > 0.0f)
+    if (mScaleTimer > 0.0f)
     {
-        _018 -= dt;
-        if (_018 <= 0.0f)
+        mScaleTimer -= dt;
+        if (mScaleTimer <= 0.0f)
         {
-            _018 = 0.0f;
-            _010 = _014;
+            mScaleTimer = 0.0f;
+            mScale = mTargetScale;
             return;
         }
 
-        float percent = dt / _018;
+        float percent = dt / mScaleTimer;
         if (percent > 1.0f)
         {
             percent = 1.0f;
         }
-        _010 = Interpolate(_010, _014, percent);
+        mScale = Interpolate(mScale, mTargetScale, percent);
     }
 }
 
-void Object_8017FFF4::fn_8019D940(cCharacter* owner, u16 angle)
+void DaisyFistObject::Spawn(cCharacter* owner, u16 orientation)
 {
-    _028 = owner;
+    mOwner = owner;
 
-    float targetScale = lbl_806DCDB8;
-    _014 = targetScale;
-    _018 = 0.0f;
-    _010 = targetScale;
+    float targetScale = sSpawnScale;
+    mTargetScale = targetScale;
+    mScaleTimer = 0.0f;
+    mScale = targetScale;
 
-    targetScale = lbl_806DCDBC;
-    float scaleTime = lbl_806DCDDC;
-    _014 = targetScale;
-    _018 = scaleTime;
+    targetScale = sFullScale;
+    float scaleTime = sScaleTime;
+    mTargetScale = targetScale;
+    mScaleTimer = scaleTime;
     if (scaleTime <= 0.0f)
     {
-        _010 = targetScale;
+        mScale = targetScale;
     }
 
-    _01C = lbl_806DCDD8;
-    orientation = angle;
+    mRiseTimer = sRiseTime;
+    mOrientation = orientation;
 
-    nlVector3 local = { lbl_806DCDC8, 0.0f, lbl_806DCDCC };
+    nlVector3 local = { sForwardOffset, 0.0f, sHiddenHeight };
     nlVector3 world;
-    GetWorldPoint(world, local, owner->m_v3Position, angle);
-    position = world;
-    visible = true;
+    GetWorldPoint(world, local, owner->m_v3Position, orientation);
+    mPosition = world;
+    mVisible = true;
 }
 
-float Object_8017FFF4::fn_8019DA04() const
+float DaisyFistObject::GetScale() const
 {
-    return _010 / lbl_806DCDC0;
+    return mScale / sBaseScale;
 }
 
-void Object_8017FFF4::fn_8019DA14()
+void DaisyFistObject::Reset()
 {
-    if (visible)
+    if (mVisible)
     {
-        visible = false;
-        position = lbl_804DCDF8;
+        mVisible = false;
+        mPosition = sHiddenPosition;
     }
 
-    _018 = 0.0f;
-    _01C = 0.0f;
-    _02C = 0.0f;
-    position = lbl_804DCDF8;
-    orientation = 0;
-    _010 = 1.0f;
-    _014 = 1.0f;
-    _018 = 0.0f;
-    _028 = 0;
-    _02C = 0.0f;
-    _01C = 0.0f;
+    mScaleTimer = 0.0f;
+    mRiseTimer = 0.0f;
+    mDelayTimer = 0.0f;
+    mPosition = sHiddenPosition;
+    mOrientation = 0;
+    mScale = 1.0f;
+    mTargetScale = 1.0f;
+    mScaleTimer = 0.0f;
+    mOwner = 0;
+    mDelayTimer = 0.0f;
+    mRiseTimer = 0.0f;
 }

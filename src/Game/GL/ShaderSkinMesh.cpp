@@ -6,7 +6,7 @@
 void ShaderSkinMesh::fn_8036F768(unsigned long count)
 {
     m_Unknown38 = count;
-    m_Unknown3C = nlMalloc(count * m_Unknown14 * 8, 8, false);
+    m_Unknown3C = nlMalloc(count * numMorphs * 8, 8, false);
 }
 
 void ShaderSkinMesh::fn_8036F7B0(unsigned long firstIndex,
@@ -15,7 +15,7 @@ void ShaderSkinMesh::fn_8036F7B0(unsigned long firstIndex,
     unsigned long* entry = m_Unknown3C == 0
                              ? 0
                              : (unsigned long*)m_Unknown3C
-                                   + (firstIndex * m_Unknown14 + secondIndex) * 2;
+                                   + (firstIndex * numMorphs + secondIndex) * 2;
 
     entry[0] = count;
     entry[1] = (unsigned long)data;
@@ -83,5 +83,5 @@ glModel* ShaderSkinMesh::GetModel()
     {
         return (glModel*)m_Unknown28;
     }
-    return (glModel*)m_pMaterialList;
+    return pModel;
 }

@@ -6,13 +6,13 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
+#include "unclassified/tu_802BAE84.h"
 
 #include <string.h>
 
 extern "C" void fn_802B9670(
     UnidentifiedTimeRegionData_802B9570* data, float value);
-extern "C" void* fn_802B77A0();
-extern "C" void fn_802BB11C(void* font, const nlColour& colour, float x, float y, float width, float height, float depth, int align, bool drawBackground, bool clip);
+extern "C" GLView* fn_802B77A0();
 extern "C" void* fn_802B9A3C();
 extern "C" void fn_802B9A6C(
     void* display, UnidentifiedTimeRegionData_802B9570* data);

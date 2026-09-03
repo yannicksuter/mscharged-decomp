@@ -2,6 +2,7 @@
 
 #include "Game/BeginFrameTask.h"
 #include "Game/ComUpdateTask.h"
+#include "Game/DB/StadiumInfo.h"
 #include "Game/Debug/FrameCounter.h"
 #include "Game/FrontEndTask.h"
 #include "Game/FE/feMusic.h"
@@ -99,7 +100,7 @@ extern "C"
     bool fn_802C7FD0(void (*)());
     void fn_801BF87C(int);
     void fn_801BFA84(int);
-    void fn_802C7018(void*, const void*, u32);
+    void fn_802C7018(void*, char*, u32, const char*);
     void fn_802E22D8(void*, float*, void*, void*, int, int, int);
     void fn_802A8278(void*, int, int, void*);
     void fn_802A1344(void*, int, int, void*);
@@ -122,7 +123,6 @@ extern "C"
     void OSYieldThread();
     void* fn_802CC094();
     bool fn_802C820C(const char*, void*);
-    void fn_801B61D0();
     const char* fn_802C2D20(const char*, const char*);
 }
 
@@ -395,7 +395,8 @@ extern "C" void fn_8011C70C(
     void* destinationCopy = destination;
     unsigned long sizeCopy = size;
     void* dataCopy = data;
-    fn_802C7018(destinationCopy, dataCopy, sizeCopy);
+    fn_802C7018(destinationCopy, static_cast<char*>(dataCopy), sizeCopy,
+        static_cast<const char*>(destinationCopy));
     sDateTimeLoaded = true;
 }
 
@@ -443,7 +444,7 @@ static void Initialize()
         OSYieldThread();
     }
 
-    fn_801B61D0();
+    EnableAllStadiums();
     const char* buildInfo =
         fn_802C2D20("/General/Build Info/BuildNumber", 0);
     if (buildInfo != 0)

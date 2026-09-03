@@ -11,7 +11,6 @@ extern "C"
     const char* fn_802C1EBC(const char* name, int mode);
     void* fn_802C278C(const char* name, int arg);
     const char* fn_802C2914(const char* name, int arg);
-    void* fn_802C5884(void* entry, const char* name);
 }
 
 typedef struct TweakEntryValue
@@ -24,15 +23,15 @@ typedef struct TweakEntryValue
 
 extern bool lbl_806E1E42;
 
-void TweakValue_804F4DC8::fn_802C4F94(const char* path)
+bool UnidentifiedTweakValueImplBase::fn_802C4F94(const char* path)
 {
     const char* name;
     char group[0x100];
     fn_802C7480(path, &name, group);
-    fn_802C4FEC(name, 0.0f, group, false, 0.0f, 0.0f);
+    return fn_802C4FEC(name, 0.0f, group, false, 0.0f, 0.0f);
 }
 
-bool TweakValue_804F4DC8::fn_802C4FEC(const char* name, float value,
+bool UnidentifiedTweakValueImplBase::fn_802C4FEC(const char* name, float value,
     const char* group, bool reload, float min, float max)
 {
     if (reload)
@@ -61,7 +60,7 @@ bool TweakValue_804F4DC8::fn_802C4FEC(const char* name, float value,
         return fn_802C4FEC(leaf, value, combined, false, min, max);
     }
     {
-        void* entry = fn_802C4504(fn_802C0E30(), group, 0);
+        TweakEntry_8052BF00* entry = fn_802C4504(fn_802C0E30(), group, 0);
         TweakEntryValue* found = (TweakEntryValue*)fn_802C5884(entry, name);
         lbl_806E1E90 = group;
         if (found == 0)
@@ -71,16 +70,16 @@ bool TweakValue_804F4DC8::fn_802C4FEC(const char* name, float value,
             {
                 name = fn_802C1EBC(name, 5);
             }
-            created = mValue.UnidentifiedVirtual34(name, entry);
-            mValue.UnidentifiedVirtual38(created->UnidentifiedVirtual20());
+            created = UnidentifiedVirtual34(name, entry);
+            UnidentifiedVirtual38(created->UnidentifiedVirtual20());
             return false;
         }
         else
         {
             TweakValueBase_8052BF70* existing = found->value;
-            mValue.UnidentifiedVirtual0C();
+            UnidentifiedVirtual0C();
             existing->UnidentifiedVirtual0C();
-            mValue.UnidentifiedVirtual38(existing->UnidentifiedVirtual20());
+            UnidentifiedVirtual38(existing->UnidentifiedVirtual20());
             return true;
         }
     }

@@ -3,6 +3,7 @@
 #include "Game/DB/CharacterInfo.h"
 #include "Game/GameInfo.h"
 #include "Game/Render/ImpostorManager.h"
+#include "Game/Render/tu_802D88F4.h"
 #include "Game/TweakRegistry.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -157,22 +158,6 @@ static CrowdCharacterDefinition_801A4188 lbl_80513C80[36] = {
         "Art/Characters/Crowdmonkey/crowdmonkey.rlg" },
 };
 
-class UnidentifiedRenderObject_801A4188
-{
-public:
-    virtual ~UnidentifiedRenderObject_801A4188();
-    virtual void UnidentifiedVirtual0C();
-    virtual void UnidentifiedVirtual10();
-    virtual void SetTransform(const nlMatrix4& transform);
-
-    u8 mUnidentified004[0x5C];
-    float mUnidentified060;
-    float mUnidentified064;
-    float mUnidentified068;
-    float mUnidentified06C;
-    u8 mUnidentified070[0x10];
-};
-
 struct UnidentifiedStadiumOwner_801A4188
 {
     UnidentifiedStadiumOwner_801A4188(BasicStadium* stadium)
@@ -189,12 +174,6 @@ struct UnidentifiedStadiumOwner_801A4188
     void* mUnidentified00C;
 };
 
-class UnidentifiedCrowdCharacter_801A4188 : public ImpostorCharacter
-{
-public:
-    u32 mUnidentified06C;
-};
-
 class ImpostorCharacterImpl_801A4188
     : public ImpostorCharacterImpl_8052E9B8
 {
@@ -208,14 +187,6 @@ public:
     {
     }
     virtual ~ImpostorCharacterImpl_801A4188();
-};
-
-class CrowdTweak_801A4188
-{
-public:
-    virtual bool UnidentifiedVirtual08(const Impostor* impostor);
-
-    TweakValue_804F4DC8 value;
 };
 
 struct CrowdModelCollection_801A4188
@@ -269,7 +240,7 @@ static bool lbl_806E15A4;
 static CrowdTweak_801A4188* lbl_806E15A8;
 static bool lbl_806E15AC;
 static bool lbl_806E15AD;
-static UnidentifiedCrowdCharacter_801A4188* lbl_806E15B0;
+static ImpostorCluster_8052EA20* lbl_806E15B0;
 static bool lbl_806E15B4;
 static CrowdModelCollection_801A4188 lbl_805721E8;
 
@@ -278,15 +249,7 @@ extern "C" void fn_802C6CAC(
 extern "C" void fn_802DBDA0(
     void* object, CrowdCharacterDefinition_801A4188* definitions, int count);
 extern "C" void* fn_8027267C(int index);
-extern "C" void fn_802D932C(void* manager, ImpostorCharacter* character);
-extern "C" UnidentifiedCrowdCharacter_801A4188* fn_802D818C(
-    void* memory, const char* name, int budget,
-    const ImpostorCharacterParams* params);
-extern "C" void* fn_802D81EC(
-    UnidentifiedCrowdCharacter_801A4188* character);
-extern "C" void fn_802D93E8(void* manager, int value);
-extern "C" void fn_802D9CD8(void* manager, CrowdTweak_801A4188* tweak);
-extern "C" void fn_801A49E4(u32 hash, void* object);
+extern "C" void fn_801A49E4(u32 hash, unsigned long texture);
 extern "C" void fn_801A51D8();
 
 extern "C" void fn_801A4188()
@@ -341,7 +304,6 @@ extern "C" void fn_801A421C()
     fn_802DBDA0(&lbl_805721E8, lbl_806E1598.data, lbl_806E15A0);
 }
 
-extern "C" void* fn_802D8BB4();
 extern "C" void fn_801A48A8();
 
 extern "C" void fn_801A43E0(bool alternateView)
@@ -404,16 +366,16 @@ extern "C" void fn_801A43E0(bool alternateView)
     clusterParams.mUnidentified009 = false;
     clusterParams.mBaseAngle = 0;
     void* clusterMemory = nlMalloc(0x70, 8, false);
-    UnidentifiedCrowdCharacter_801A4188* clusterCharacter
-        = (UnidentifiedCrowdCharacter_801A4188*)clusterMemory;
+    ImpostorCluster_8052EA20* clusterCharacter
+        = (ImpostorCluster_8052EA20*)clusterMemory;
     if (clusterCharacter != 0)
     {
-        clusterCharacter = fn_802D818C(
-            clusterCharacter, lbl_80514058, 10, &clusterParams);
+        clusterCharacter = new (clusterCharacter) ImpostorCluster_8052EA20(
+            lbl_80514058, 10, &clusterParams);
     }
     lbl_806E15B0 = clusterCharacter;
     u32 firstHash = nlStringLowerHash(lbl_80514068);
-    void* cluster = fn_802D81EC(lbl_806E15B0);
+    unsigned long cluster = fn_802D81EC(lbl_806E15B0);
     fn_801A49E4(firstHash, cluster);
     fn_801A49E4(nlStringLowerHash(lbl_80514080), cluster);
     fn_801A49E4(nlStringLowerHash(lbl_8051409C), cluster);
@@ -424,11 +386,6 @@ extern "C" void fn_801A43E0(bool alternateView)
     fn_801A51D8();
     ImpostorManager::GetInstance()->StaggerAnimations();
 }
-
-extern "C" void fn_802D9708();
-extern "C" void fn_802D8930(UnidentifiedRenderObject_801A4188* object);
-extern "C" void fn_802D911C(void* manager,
-    UnidentifiedRenderObject_801A4188* object, int enabled);
 
 extern "C" void fn_801A4734()
 {
@@ -441,8 +398,7 @@ extern "C" void fn_801A4734()
     lbl_806E15A0 = 0;
 
     delete lbl_806E15B0;
-    fn_802D8BB4();
-    fn_802D9708();
+    fn_802D9708(fn_802D8BB4());
     ImpostorManager::GetInstance()->Uninitialize();
 
     if (lbl_806E1580 != 0)

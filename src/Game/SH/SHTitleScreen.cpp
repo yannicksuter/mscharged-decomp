@@ -2,6 +2,7 @@
 
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/SaveLoad.h"
+#include "Game/DB/StadiumInfo.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feMusic.h"
@@ -22,7 +23,6 @@ extern "C" void* fn_80253E18();
 extern "C" void fn_802534BC(void* object, int value, bool enabled);
 extern "C" bool fn_80273B00();
 extern "C" cGlobalPad* fn_802C082C(void* owner, int pad);
-extern "C" bool fn_801B61B8(int stadium);
 extern "C" int VISetTimeToDimming(int time);
 
 extern TLComponentInstance* lbl_80578450[4];
@@ -216,7 +216,7 @@ void TitleScene::fn_801D1F6C()
     do
     {
         stadium = nlRandom(17, &nlDefaultSeed);
-    } while (!fn_801B61B8(stadium));
+    } while (!IsStadiumEnabled(stadium));
 
     gameInfo->SetStadium(stadium);
     gameInfo->SetTeam(0, homeCaptain);

@@ -19,7 +19,7 @@ typedef struct DWCMainControlView
     DWCConnectionClosedCallback connectionClosedCallback;
     void* connectionClosedParam;
     u8 _98[0x2DD];
-    u8 matchType;
+    volatile u8 matchType;
     u8 _376[0x2CA];
     u8 aidList[0x20];
     u32 aidBitmap;
@@ -38,14 +38,15 @@ static s32 lbl_806E2EE4;
 
 int fn_804929A8(void);
 int fn_804929C4(void);
-int fn_80492ABC(void);
-int fn_80492AE8(void);
+int fn_80492ABC(u8** aidList);
+int fn_80492AE8(u8** aidList);
 BOOL fn_8048E638(GT2Result result);
 GT2Bool fn_80491578(GT2Socket socket, unsigned int ip, unsigned short port,
     GT2Byte* message, int len);
 void fn_804916EC(GT2Socket socket, GT2Connection connection, unsigned int ip,
     unsigned short port, int latency, GT2Byte* message, int len);
 BOOL DWC_isValidAid(u8 aid);
+GT2Connection* fn_8048E320(int index);
 static void fn_8048F4F8(GT2Socket socket);
 
 BOOL DWC_SetConnectionClosedCallback(DWCConnectionClosedCallback callback,
@@ -66,14 +67,11 @@ int DWC_GetNumConnectionHost(void)
     {
         return 0;
     }
-    if (sMainControl->matchType != 2)
+    if (sMainControl->matchType == 2 || sMainControl->matchType == 3)
     {
-        if (sMainControl->matchType != 3)
-        {
-            return fn_804929A8() + 1;
-        }
+        return fn_804929C4() + 1;
     }
-    return fn_804929C4() + 1;
+    return fn_804929A8() + 1;
 }
 
 u8 DWC_GetMyAID(void)
@@ -92,14 +90,11 @@ int DWC_GetAIDList(u8** aidList)
         return 0;
     }
     *aidList = sMainControl->aidList;
-    if (sMainControl->matchType != 2)
+    if (sMainControl->matchType == 2 || sMainControl->matchType == 3)
     {
-        if (sMainControl->matchType != 3)
-        {
-            return fn_80492ABC();
-        }
+        return fn_80492AE8(aidList);
     }
-    return fn_80492AE8();
+    return fn_80492ABC(aidList);
 }
 
 BOOL DWC_IsValidAID(u8 aid)
@@ -195,4 +190,9 @@ static void fn_8048F4F8(GT2Socket socket)
     DWCi_SetError(DWC_ERROR_FATAL,
         DWC_ECODE_SEQ_ETC + DWC_ECODE_GS_GT2 + DWC_ECODE_TYPE_SO_SOCKET);
     sMainControl->_00 = 0;
+}
+
+GT2Connection* fn_8048E320(int index)
+{
+    return &lbl_806C98A0[index];
 }

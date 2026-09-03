@@ -33,6 +33,15 @@ public:
         }
     }
 
+    nlSlotPoolFixed(int initial, int delta)
+        : SlotPoolBase()
+    {
+        m_Depth = 0;
+        m_Initial = initial;
+        SlotPoolBase::BaseAddNewBlock(this, kBlockSize);
+        m_Delta = delta;
+    }
+
     ~nlSlotPoolFixed()
     {
         while (m_Depth > 0)
@@ -51,8 +60,9 @@ public:
 
     void PushState()
     {
-        m_States[m_Depth].block = m_BlockList;
-        m_States[m_Depth].free = m_FreeList;
+        SavedState& state = m_States[m_Depth];
+        state.block = m_BlockList;
+        state.free = m_FreeList;
         m_Depth++;
         m_BlockList = 0;
         m_FreeList = 0;

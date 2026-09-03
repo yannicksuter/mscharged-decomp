@@ -2,19 +2,21 @@
 #define GAME_RENDER_IMPOSTOR_CHARACTER_H
 
 #include "Game/TweakValue.h"
+#include "NL/gl/glTarget.h"
 #include "NL/nlDLListContainer.h"
 #include "NL/nlMath.h"
 #include "types.h"
 
 class cPN_SAnimController;
 class cPoseAccumulator;
+class GLView;
 class Impostor;
 class ImpostorCharacter;
-struct UnidentifiedMesh_802D7AEC;
+class UnidentifiedImpostorView_802D4290;
+struct State_802A7C90;
 
-// Sprite-mesh unit at 0x802D4290; its own translation unit is not yet
-// reconstructed, so it stays an address-named placeholder with the members
-// the impostor units are proven to touch.
+// Sprite-mesh unit at 0x802D4290. The retail binary does not preserve the
+// original class name, so the address-qualified placeholder is retained.
 class ImpostorSprite_802D4290
 {
 public:
@@ -22,21 +24,49 @@ public:
         int budget, int width, int height);
     ~ImpostorSprite_802D4290();
 
-    /* 0x00 */ u8 mUnidentified000[0x44];
+    /* 0x00 */ bool mUnidentified000;
+    /* 0x01 */ char mName[0x40];
+    /* 0x41 */ u8 mUnidentified041[3];
     /* 0x44 */ int mUnidentified044;
     /* 0x48 */ int mUnidentified048;
-    /* 0x4C */ u8 mUnidentified04C[0x8];
-    /* 0x54 */ void* mUnidentified054;
-    /* 0x58 */ u8 mUnidentified058[0x10];
-    /* 0x68 */ UnidentifiedMesh_802D7AEC* mUnidentified068;
-    /* 0x6C */ u8 mUnidentified06C[0xC];
+    /* 0x4C */ ImpostorCharacter* mUnidentified04C;
+    /* 0x50 */ int mUnidentified050;
+    /* 0x54 */ int mUnidentified054;
+    /* 0x58 */ int* mUnidentified058;
+    /* 0x5C */ int mUnidentified05C;
+    /* 0x60 */ int mUnidentified060;
+    /* 0x64 */ UnidentifiedImpostorView_802D4290* mUnidentified064;
+    /* 0x68 */ GLView* mUnidentified068;
+    /* 0x6C */ GLRenderPair mUnidentified06C;
+    /* 0x74 */ State_802A7C90* mUnidentified074;
     /* 0x78 */ u8 mUnidentified078;
     /* 0x79 */ u8 mUnidentified079;
     /* 0x7A */ u16 mAngle;
-    /* 0x7C */ u8 mUnidentified07C[0x8];
+    /* 0x7C */ float mUnidentified07C;
+    /* 0x80 */ int* mUnidentified080;
     /* 0x84 */ int mUnidentified084;
     /* 0x88 */ u8 mUnidentified088;
+    /* 0x89 */ u8 mUnidentified089[3];
 }; // size: 0x8C
+
+extern "C" void fn_802D4480(
+    ImpostorSprite_802D4290* sprite, const char* name);
+extern "C" void fn_802D4484(ImpostorSprite_802D4290* sprite,
+    const nlVector3* direction, const nlVector3* up);
+extern "C" void fn_802D47F8(ImpostorSprite_802D4290* sprite);
+extern "C" void fn_802D4874(ImpostorSprite_802D4290* sprite);
+extern "C" void fn_802D4898(ImpostorSprite_802D4290* sprite);
+extern "C" void fn_802D48E4(
+    ImpostorSprite_802D4290* sprite, const char* name);
+extern "C" int fn_802D4AEC(ImpostorSprite_802D4290* sprite,
+    GLView* target, Impostor* impostors, bool cached, bool skipCapture);
+extern "C" void fn_802D5034(ImpostorSprite_802D4290* sprite);
+extern "C" void fn_802D5040(ImpostorSprite_802D4290* sprite);
+extern "C" void fn_802D5078(ImpostorSprite_802D4290* sprite, int slot);
+extern "C" unsigned long fn_802D50A4(ImpostorSprite_802D4290* sprite);
+extern "C" bool fn_802D50D8(ImpostorSprite_802D4290* sprite, int slot);
+extern "C" void fn_802D5110(ImpostorSprite_802D4290* sprite);
+extern "C" int fn_802D536C(ImpostorSprite_802D4290* sprite);
 
 // Per-view animated model instance owned by the 0x802DAEE0 unit.
 class ImpostorModel_802DAEE0
@@ -49,14 +79,6 @@ public:
     /* 0x44 */ cPN_SAnimController* mAnimController;
     /* 0x48 */ cPoseAccumulator* mPoseAccumulator;
     /* 0x4C */ u8 mUnidentified04C[0x2C];
-};
-
-// Object referenced through the sprite's 0x68 pointer; only the registry
-// back-pointer at 0x54 is proven.
-struct UnidentifiedMesh_802D7AEC
-{
-    /* 0x00 */ u8 mUnidentified000[0x54];
-    /* 0x54 */ void* mUnidentified054;
 };
 
 struct UnidentifiedRegistryNode_802D7AEC
@@ -121,9 +143,9 @@ public:
     /* 0x35 */ u8 mUnidentified035;
     /* 0x36 */ u16 mBaseAngle;
     /* 0x38 */ const char* mName;
-    /* 0x3C */ TweakValue_804F4DC8 mfScale;
-    /* 0x4C */ TweakValue_804F4DC8 mfCameraLookatZ;
-    /* 0x5C */ TweakValue_804F4DC8 mfCameraDistance;
+    /* 0x3C */ TweakValueImpl_804F4DC8 mfScale;
+    /* 0x4C */ TweakValueImpl_804F4DC8 mfCameraLookatZ;
+    /* 0x5C */ TweakValueImpl_804F4DC8 mfCameraDistance;
 }; // size: 0x6C
 
 // Concrete implementation backed by one animated model per texture set; the
@@ -145,5 +167,29 @@ public:
     /* 0x6C */ ImpostorModel_802DAEE0** mModels;
     /* 0x70 */ int mNumModels;
 }; // size: 0x74
+
+// Single-sprite crowd cluster implementation at 0x802D818C. The descriptive
+// portion of this placeholder follows the retained Cluster tweak namespace;
+// the stripped binary does not preserve the original C++ class name.
+class ImpostorCluster_8052EA20 : public ImpostorCharacter
+{
+public:
+    ImpostorCluster_8052EA20(const char* name, int budget,
+        const ImpostorCharacterParams* params);
+
+    virtual void UnidentifiedVirtual18(int index, float phase);
+    virtual void UnidentifiedVirtual1C(int texture);
+    virtual void UnidentifiedVirtual20(void* target, int texture);
+    virtual void UnidentifiedVirtual24(float dt);
+    virtual void UnidentifiedVirtual28(
+        float dt, const char* unidentified);
+    virtual void UnidentifiedVirtual2C(
+        void* unidentified0, void* unidentified1);
+
+    /* 0x6C */ const char* mUnidentified06C;
+}; // size: 0x70
+
+extern "C" unsigned long fn_802D81EC(
+    ImpostorCluster_8052EA20* character);
 
 #endif // GAME_RENDER_IMPOSTOR_CHARACTER_H

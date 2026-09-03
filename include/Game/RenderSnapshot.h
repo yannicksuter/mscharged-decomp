@@ -15,7 +15,7 @@
 #include "Game/Drawable/DrawablePowerup.h"
 #include "Game/Drawable/DrawableThwomp.h"
 #include "Game/Drawable/DrawableYoshiEgg.h"
-#include "Game/Drawable/Drawable_8017FFCC.h"
+#include "Game/Drawable/DrawableDaisyFist.h"
 
 class RenderSnapshot
 {
@@ -50,7 +50,7 @@ public:
     DrawableBirdoEgg _1BC4;
     DrawableKoopaShell _1BE8;
     u32 _1C00;
-    Drawable_8017FFCC _1C04[8];
+    DrawableDaisyFist mDaisyFists[8];
     u32 _1CC4;
     DrawableBulletBill _1CC8[6];
     bool _1DA0;

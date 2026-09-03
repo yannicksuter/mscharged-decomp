@@ -3,6 +3,7 @@
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorManager.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "NL/gl/glView.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
@@ -11,13 +12,6 @@ extern "C" double floor(double);
 extern "C" void fn_802C8280(const char*);
 extern "C" void fn_802C8288();
 extern "C" void* fn_802CC094();
-extern "C" void fn_802D4480(ImpostorSprite_802D4290*, const char*);
-extern "C" void fn_802D4484(ImpostorSprite_802D4290*, void*, void*);
-extern "C" void fn_802D47F8(ImpostorSprite_802D4290*);
-extern "C" void fn_802D4874(ImpostorSprite_802D4290*);
-extern "C" void fn_802D4898(ImpostorSprite_802D4290*);
-extern "C" void fn_802D50D8(ImpostorSprite_802D4290*, int);
-extern "C" void fn_802D5110(ImpostorSprite_802D4290*);
 extern "C" ImpostorModel_802DAEE0* fn_802DB0AC(
     ImpostorModel_802DAEE0*, void*);
 extern "C" void fn_802DB22C(ImpostorModel_802DAEE0*, float);
@@ -222,7 +216,8 @@ void ImpostorCharacter::UnidentifiedVirtual2C(void* unidentified0,
     DLListEntry<ImpostorSprite_802D4290*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        fn_802D4484(entry->entry, unidentified0, unidentified1);
+        fn_802D4484(entry->entry, (const nlVector3*)unidentified0,
+            (const nlVector3*)unidentified1);
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
@@ -300,7 +295,7 @@ void ImpostorCharacter::RegisterSprites(void* registry)
     DLListEntry<ImpostorSprite_802D4290*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        UnidentifiedMesh_802D7AEC* target = entry->entry->mUnidentified068;
+        GLView* target = entry->entry->mUnidentified068;
         UnidentifiedRegistryNode_802D7AEC* node =
             (UnidentifiedRegistryNode_802D7AEC*)nlMalloc(8, 8, false);
         if (node != 0)
@@ -322,7 +317,7 @@ void ImpostorCharacter::RegisterSprites(void* registry)
             list->mTail = node;
             list->mHead = node;
         }
-        target->mUnidentified054 = registry;
+        target->m_Parent = registry;
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;

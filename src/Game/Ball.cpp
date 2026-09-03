@@ -39,7 +39,7 @@
 #include "NL/utility.h"
 #include "unclassified/tu_80199E84.h"
 #include "unclassified/tu_801A5F10.h"
-#include "unclassified/tu_801B6188.h"
+#include "Game/DB/StadiumInfo.h"
 
 struct DebugFieldType
 {
@@ -90,7 +90,7 @@ public:
     }
 
     virtual ~UnidentifiedTypedEvent0() { }
-    virtual void Disconnect() = 0;
+    virtual void Disconnect(void*) = 0;
     virtual void Add(Function<FnVoidVoid>&, unsigned int, int) = 0;
 };
 
@@ -104,7 +104,7 @@ public:
     }
 
     virtual ~UnidentifiedTypedEvent2() { }
-    virtual void Disconnect() = 0;
+    virtual void Disconnect(void*) = 0;
     virtual void Add(Function2<void, P1, P2>&, unsigned int, int) = 0;
 };
 
@@ -510,7 +510,7 @@ void cBall::CollideWithCharacterCallback(
             {
                 fn_800156F8(this, pShooter);
                 pCharacterFielder->fn_800451B0(pShooter->m_v3Position);
-                if (fn_801B6278(
+                if (GetStadiumUnknown0x10(
                         GameInfoManager::Instance()->GetStadium()))
                 {
                     unsigned long soundID = 0xCE269987;

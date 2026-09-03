@@ -13,11 +13,6 @@ extern "C" UnidentifiedView_802CBEC4* fn_802CBFD8(
 extern "C" void fn_802CC02C(UnidentifiedView_802CBEC4* view);
 extern "C" void fn_802C6CAC(const char* fileName, const char* category,
     bool unidentified);
-extern "C" int fn_802D536C(ImpostorSprite_802D4290* sprite);
-extern "C" void fn_802D5034(ImpostorSprite_802D4290* sprite);
-extern "C" void fn_802D5040(ImpostorSprite_802D4290* sprite);
-extern "C" int fn_802D4AEC(ImpostorSprite_802D4290* sprite, void* target,
-    Impostor* impostors, int cached, int skipCapture);
 
 u8 lbl_806E1F60;
 u8 lbl_806E1F61;
@@ -370,7 +365,7 @@ void ImpostorManager::Render(void* target, bool skipCapture)
         while (spriteEntry != 0)
         {
             sNumImpostorsRendered.value += fn_802D4AEC(spriteEntry->entry,
-                target, mImpostors, cached, skipCapture);
+                (GLView*)target, mImpostors, cached, skipCapture);
             if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
             {
                 spriteEntry = 0;

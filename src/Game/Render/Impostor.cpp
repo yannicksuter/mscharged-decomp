@@ -1,10 +1,9 @@
 #include "Game/Render/Impostor.h"
 
+#include "Game/Render/ImpostorCharacter.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" void fn_802D7664(ImpostorCharacter*, Impostor*);
-extern "C" void fn_802D5078(ImpostorSprite_802D4290*, int);
-
 Impostor::Impostor()
 {
     mpCharacter = 0;

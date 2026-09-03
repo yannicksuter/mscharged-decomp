@@ -46,8 +46,6 @@ struct UnidentifiedInterpreterStorage
 extern "C" void fn_802DEE14(InterpreterCore*);
 extern "C" void fn_802DFA1C(InterpreterCore*, unsigned int);
 extern "C" void fn_802DFC40(InterpreterCore*, unsigned int, unsigned int, const char*, u8, u32, u32, u32, u32);
-extern "C" bool fn_802C4FEC(TweakValueBase_8052BF70*, const char*, const void*, bool, float, float, float);
-extern "C" bool fn_802C4F94(TweakValueBase_8052BF70*, const char*);
 extern "C" u32 lbl_806DF460[2];
 extern "C" const float lbl_806E64A0;
 
@@ -986,7 +984,7 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
         if (flags & 1)
         {
             TweakValueIntImpl_804FD898* intTarget = &storage->unknown_0x0C[index];
-            bool result = fn_802C4FEC(intTarget, name, lbl_806DF460, false, float1, float2, float3);
+            bool result = intTarget->fn_802C4FEC(name, float1, (const char*)lbl_806DF460, false, float2, float3);
             if (result == 0)
             {
                 *intTarget->m_pValue = intTarget->UnidentifiedVirtual3C();
@@ -999,7 +997,7 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
         else
         {
             TweakValueIntImpl_804FD898* target = &storage->unknown_0x0C[index];
-            if (fn_802C4FEC(target, name, lbl_806DF460, false, float1, float2, float3) == 0)
+            if (target->fn_802C4FEC(name, float1, (const char*)lbl_806DF460, false, float2, float3) == 0)
             {
                 *target->m_pValue = target->UnidentifiedVirtual3C();
             }
@@ -1026,7 +1024,7 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
         {
             TweakValueImpl_804F4DC8& target = storage->unknown_0x10[index - storage->unknown_0x00];
             float defaultValue = *(float*)&value0;
-            bool result = fn_802C4FEC(&target, name, lbl_806DF460, false, float1, float2, float3);
+            bool result = target.fn_802C4FEC(name, float1, (const char*)lbl_806DF460, false, float2, float3);
             if (result == 0)
             {
                 *target.m_pValue = target.UnidentifiedVirtual3C();
@@ -1039,7 +1037,7 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
         else
         {
             TweakValueImpl_804F4DC8* target = &storage->unknown_0x10[index - storage->unknown_0x00];
-            if (fn_802C4FEC(target, name, lbl_806DF460, false, float1, float2, float3) == 0)
+            if (target->fn_802C4FEC(name, float1, (const char*)lbl_806DF460, false, float2, float3) == 0)
             {
                 *target->m_pValue = target->UnidentifiedVirtual3C();
             }
@@ -1055,7 +1053,7 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
             TweakValueBoolImpl_804F4538* target;
             bool defaultValue = value0 != 0;
             target = &storage->unknown_0x14[storageIndex];
-            if (fn_802C4F94(target, name) == 0)
+            if (target->fn_802C4F94(name) == 0)
             {
                 *target->m_pValue = defaultValue;
             }
@@ -1063,7 +1061,7 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
         else
         {
             TweakValueBoolImpl_804F4538* target = &storage->unknown_0x14[storageIndex];
-            if (fn_802C4F94(target, name) == 0)
+            if (target->fn_802C4F94(name) == 0)
             {
                 *target->m_pValue = target->UnidentifiedVirtual3C();
             }

@@ -1,14 +1,15 @@
 #ifndef NL_PLATPAD_H
 #define NL_PLATPAD_H
 
+#include "NL/nlMath.h"
 #include "types.h"
 
 class PadBackend
 {
 public:
     PadBackend(int padIndex)
-        : mPadIndex(padIndex)
-        , mUnidentified018(false)
+        : m_padIndex(padIndex)
+        , m_isLeftAnalogToDPadMapEnabled(false)
     {
     }
 
@@ -30,11 +31,12 @@ public:
     virtual void StartRumble(float duration, float intensity, float frequency);
     virtual void StopRumble();
     virtual void Update(float dt);
+    virtual int UnidentifiedClassID();
 
-    /* 0x04 */ int mPadIndex;
-    /* 0x08 */ u8 mUnidentified008[0x10];
-    /* 0x18 */ bool mUnidentified018;
-    /* 0x19 */ u8 mUnidentified019[3];
+    /* 0x04 */ int m_padIndex;
+    /* 0x08 */ nlPolar m_polarAnalogLeft;
+    /* 0x10 */ nlPolar m_polarAnalogRight;
+    /* 0x18 */ bool m_isLeftAnalogToDPadMapEnabled;
 }; // size 0x1C
 
 class cPlatPad;
@@ -66,6 +68,7 @@ public:
     virtual void StartRumble(float duration, float intensity, float frequency);
     virtual void StopRumble();
     virtual void Update(float dt);
+    virtual int UnidentifiedClassID();
 
     static void* operator new(unsigned long)
     {
