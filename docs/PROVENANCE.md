@@ -18,7 +18,9 @@ The project was built with or adapted source from the following projects:
 | [doldecomp/Rhae at `35929a0`](https://github.com/doldecomp/Rhae/tree/35929a0bfcca6c55c6305a72cc86caef54203c1f) | Expanded RVL SDK AXFX reverb reconstructions. |
 | [doldecomp/mkw at `94585b8`](https://github.com/doldecomp/mkw/tree/94585b8a8fd7a2a52f30640ccff316e57880b6c1) | DWC allocator and initialization reconstructions, plus DWC GHTTP, common-utility, friend-unit, login-unit, main-unit, and transport-unit symbol and boundary references. |
 | [DarkRTA/rb3 at `ababaa9`](https://github.com/DarkRTA/rb3/tree/ababaa9bb6a669af06aa7def7dd735c4f5265061) | DWC report and initialization structural references. |
-| [pret/pokerevo at `ae02670`](https://github.com/pret/pokerevo/tree/ae02670ef33650e44313443dd95180f485150d84) | PowerPC DWC non-port, digest, and account function identities and code-shape references. |
+| [pret/pokerevo at `ae02670`](https://github.com/pret/pokerevo/tree/ae02670ef33650e44313443dd95180f485150d84) | PowerPC DWC non-port, digest, and account function identities, plus NHTTP code-shape references. |
+| [e-minence/black_white at `9699f2e`](https://github.com/e-minence/black_white/tree/9699f2e44036b044fc6f271becbaff979cee8679) | Later Nintendo NHTTP source used as a naming, constant, and revision-lineage reference. |
+| RevoEX 1.0 patch-plus2 (2007-05-10) | Nintendo NET release/debug objects used to recover helper boundaries, names, source order, and compiler inlining behavior. |
 | [pret/pokediamond at `038ccca`](https://github.com/pret/pokediamond/tree/038cccaed5de8f013875bc5d734f912d1de08e0f) | Nitro SDK CRC API, structure, and source reconstruction. |
 | [RushRE/SonicRushAdventure-Decomp at `94de7ce`](https://github.com/RushRE/SonicRushAdventure-Decomp/tree/94de7ce8e95c1136f8d14e93f1dc3c07d10f20b9) | Nitro SDK random-number API and inline implementation reference. |
 | [NicholasMoser/Naruto-GNT-Modding at `a16d1c0`](https://github.com/NicholasMoser/Naruto-GNT-Modding/tree/a16d1c03572832d168d096c405fa085b04d86050) | DWC `dwci_np_math.c` retail-map ownership and retained-function reference. |
