@@ -132,12 +132,12 @@ int SOListen(int s, int backlog)
 
 int SOAccept(int s, void* sockAddr)
 {
-    SOSockAddr* addr = sockAddr;
+    int bufferSize;
     int result;
     s32 rmId;
-    int bufferSize;
     int* args;
     SOSockAddr* addrBuffer;
+    SOSockAddr* addr = sockAddr;
 
     result = SOiPrepare(NULL, &rmId);
     if (result == SO_SUCCESS)
@@ -253,12 +253,12 @@ int SOConnect(int s, const void* sockAddr)
 
 int SOGetSockName(int s, void* sockAddr)
 {
-    SOSockAddr* addr = sockAddr;
+    int bufferSize;
     int result;
     s32 rmId;
-    int bufferSize;
     int* args;
     SOSockAddr* addrBuffer;
+    SOSockAddr* addr = sockAddr;
 
     result = SOiPrepare(NULL, &rmId);
     if (result == SO_SUCCESS)
@@ -423,10 +423,10 @@ int SOPoll(SOPollFD fds[], unsigned nfds, OSTime timeout)
 
 int SOInetAtoN(const char* cp, SOInAddr* inp)
 {
+    int bufferSize;
     int result;
     s32 rmId;
     int isTempRm;
-    int bufferSize;
     u8* args;
     char* stringBuffer;
 
@@ -499,18 +499,17 @@ static int RecvFrom(const char* funcName, int s, void* buf, int len, int flags,
     BOOL valid;
     BOOL direct;
     SOSockAddr* from = sockFrom;
+    void* dataBuffer;
+    int bufferSize;
+    IPCIOVector* vectors;
+    int* args;
     int result;
+    SOSockAddr* addrBuffer;
     s32 rmId;
 
     result = SOiPrepare(funcName, &rmId);
     if (result == SO_SUCCESS)
     {
-        int bufferSize;
-        void* dataBuffer;
-        IPCIOVector* vectors;
-        int* args;
-        SOSockAddr* addrBuffer;
-
         if (from != NULL && (sizeof(SOSockAddr) < from->len || from->len < sizeof(SOSockAddr)))
         {
             result = SO_EINVAL;
@@ -525,8 +524,7 @@ static int RecvFrom(const char* funcName, int s, void* buf, int len, int flags,
         direct = TRUE;
         if (len != 0)
         {
-            BOOL aligned = FALSE;
-            canUseBuffer = FALSE;
+            BOOL aligned = (canUseBuffer = FALSE);
             if ((u32)buf % 32 == 0 && len % 32 == 0)
             {
                 aligned = TRUE;
@@ -555,13 +553,13 @@ static int RecvFrom(const char* funcName, int s, void* buf, int len, int flags,
 
         bufferSize = ROUND_UP((from == NULL ? 0 : from->len) + 64, 32);
         vectors = SOiAlloc(12, bufferSize);
-        if (direct)
+        if (direct == FALSE)
         {
-            dataBuffer = buf;
+            dataBuffer = SOiAlloc(13, ROUND_UP(len, 32));
         }
         else
         {
-            dataBuffer = SOiAlloc(13, ROUND_UP(len, 32));
+            dataBuffer = buf;
         }
 
         if (vectors == NULL || dataBuffer == NULL)
@@ -592,7 +590,7 @@ static int RecvFrom(const char* funcName, int s, void* buf, int len, int flags,
             result = IOS_Ioctlv(rmId, NET_SO_RECVFROM, 1, 2, vectors);
             if (result >= 0)
             {
-                memcpy(from, addrBuffer, from->len <= addrBuffer->len ? from->len : addrBuffer->len);
+                memcpy(from, addrBuffer, from->len > addrBuffer->len ? addrBuffer->len : from->len);
             }
         }
         if (result >= 0 && !direct)
@@ -644,8 +642,7 @@ static int SendTo(const char* funcName, int s, const void* buf, int len,
         direct = TRUE;
         if (len != 0)
         {
-            BOOL aligned = FALSE;
-            canUseBuffer = FALSE;
+            BOOL aligned = (canUseBuffer = FALSE);
             if ((u32)buf % 32 == 0 && len % 32 == 0)
             {
                 aligned = TRUE;
@@ -673,7 +670,7 @@ static int SendTo(const char* funcName, int s, const void* buf, int len,
         }
 
         vectors = SOiAlloc(12, 96);
-        if (!direct)
+        if (direct == FALSE)
         {
             dataBuffer = SOiAlloc(14, ROUND_UP(len, 32));
         }

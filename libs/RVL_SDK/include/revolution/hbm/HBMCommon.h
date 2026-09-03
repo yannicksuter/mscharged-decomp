@@ -22,6 +22,15 @@ typedef enum HBMSelectBtnNum {
     /* 5 */ HBM_SELECT_MAX
 } HBMSelectBtnNum;
 
+typedef enum HBMSoundEvent {
+    HBM_SOUND_INIT,
+    HBM_SOUND_POST_INIT,
+    HBM_SOUND_GOTO_MENU,
+    HBM_SOUND_RETURN_APP,
+    HBM_SOUND_STOP,
+    HBM_SOUND_PLAY,
+} HBMSoundEvent;
+
 typedef bool (*HBMSoundCallback)(s32 evt, s32 num);
 
 typedef struct HBMDataInfo {

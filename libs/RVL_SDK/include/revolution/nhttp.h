@@ -25,6 +25,14 @@ extern "C"
         NHTTP_REQMETHOD_HEAD,
     } NHTTPReqMethod;
 
+    typedef enum NHTTPEncodingType
+    {
+        NHTTP_ENCODING_TYPE_AUTO,
+        NHTTP_ENCODING_TYPE_URL,
+        NHTTP_ENCODING_TYPE_MULTIPART,
+        NHTTP_ENCODING_TYPE_MAX,
+    } NHTTPEncodingType;
+
     typedef void (*NHTTPReqCallback)(NHTTPErr error, NHTTPResponse* response,
         void* userParam);
     typedef void* (*NHTTPResponseCallback)(void** buffer, void* data,

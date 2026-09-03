@@ -58,19 +58,21 @@ void NETHMACGetDigest(NETHMACContext* context, void* digest)
     u8 outerPad[64];
     u32 i;
     u32 actualKeyLength;
+    void* outerHashContext;
     void* hashContext = context->hashContext;
 
     context->interface.getDigest(hashContext, innerDigest);
 
     actualKeyLength = context->keyLength;
+    outerHashContext = context->hashContext;
     for (i = 0; i < actualKeyLength; i++)
     {
         outerPad[i] = context->key[i] ^ 0x5C;
     }
     memset(&outerPad[actualKeyLength], 0x5C, context->interface.blockSize - actualKeyLength);
 
-    context->interface.init(hashContext);
-    context->interface.update(hashContext, outerPad, context->interface.blockSize);
+    context->interface.init(outerHashContext);
+    context->interface.update(outerHashContext, outerPad, context->interface.blockSize);
     context->interface.update(hashContext, innerDigest, context->interface.digestSize);
     context->interface.getDigest(hashContext, digest);
 }

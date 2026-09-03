@@ -109,20 +109,20 @@ int SOSetSockOpt(int s, int level, int optname, const void* optval, int optlen)
     return result;
 }
 
-int SOGetInterfaceOpt(IPInterface* unk, int level, int optname,
+int SOGetInterfaceOpt(IPInterface* interface, int level, int optname,
     void* optval, int* optlen)
 {
+    int bufferSize;
     int result;
     s32 rmId;
     int isTempRm;
     int length;
-    int bufferSize;
     IPCIOVector* vectors;
     s32* option;
     s32* returnedLength;
     u8* value;
 
-    (void)unk;
+    (void)interface;
 
     result = SOiPrepareTempRm(NULL, &rmId, &isTempRm);
     if (result == SO_SUCCESS)

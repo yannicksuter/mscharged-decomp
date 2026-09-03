@@ -1,6 +1,7 @@
 #include "Game/Task/EndFrameTask.h"
 
 #include "Game/Debug/FrameCounter.h"
+#include "Game/HBMManager_8024795C.h"
 #include "NL/gl/gl.h"
 #include "types.h"
 
@@ -11,27 +12,18 @@ struct RenderContext
     u32 flags;
 };
 
-struct FrameControl
-{
-    u8 padding[0x90];
-    bool flag90;
-    bool flag91;
-};
-
-extern FrameControl* lbl_806E18D8;
 extern u8 lbl_806E16D4;
 extern u8 lbl_806E0FB0;
 
 extern "C" RenderContext* fn_8027267C(int index);
 extern "C" void fn_801B3EF4(u8* enabled);
 extern "C" void fn_801B3F2C(u8* enabled);
-extern "C" int fn_8024891C();
 extern "C" void fn_802C80FC();
 extern "C" void GXPokeARGB(u16 x, u16 y, u32 colour);
 
 void EndFrameTask::Run(float)
 {
-    if (lbl_806E18D8 == 0 || !lbl_806E18D8->flag91 || !lbl_806E18D8->flag90)
+    if (lbl_806E18D8 == 0 || !lbl_806E18D8->mActive || !lbl_806E18D8->mReady)
     {
         u8 useFrameContexts = lbl_806E16D4;
 
@@ -62,9 +54,9 @@ void EndFrameTask::Run(float)
         g_FrameCounter.StartTimer(1);
         glSendFrame();
 
-        if (lbl_806E18D8 != 0 && lbl_806E18D8->flag90 && lbl_806E18D8->flag91)
+        if (lbl_806E18D8 != 0 && lbl_806E18D8->mReady && lbl_806E18D8->mActive)
         {
-            fn_8024891C();
+            UnidentifiedHBMManager::fn_8024891C();
             fn_802C80FC();
         }
 

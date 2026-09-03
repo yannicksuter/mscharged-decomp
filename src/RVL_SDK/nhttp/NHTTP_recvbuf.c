@@ -4,15 +4,15 @@ void* NHTTPi_memcpy(void* destination, const void* source, u32 size);
 s32 NHTTPi_SocRecv(NHTTPRequestInfo* request, s32 socket, void* buffer,
     s32 length, s32 flags);
 
-s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
+s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPResponseInfo* recvBuf, s32 start,
     s32 end, s32* separator, s32* lineBreakLength)
 {
-    NHTTPRecvBufBlock* block;
+    s32 c;
+    NHTTPi_HDRBUFLIST* block;
     s32 blockOffset;
     s32 i;
     s32 result;
     BOOL foundCR;
-    s8 c;
 
     if (separator != NULL)
     {
@@ -30,11 +30,11 @@ s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
         }
         else
         {
-            block = recvBuf->blocks;
+            block = recvBuf->hdrBufBlock_p;
             i = (start - 0x400) >> 9;
             while (i-- != 0)
             {
-                block = block->next;
+                block = block->next_p;
             }
             blockOffset = (start - 0x400) & 0x1FF;
         }
@@ -45,33 +45,29 @@ s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
             {
                 if (blockOffset < 0x400)
                 {
-                    c = recvBuf->data[blockOffset++];
+                    c = (s8)recvBuf->hdrBufFirst[blockOffset++];
+                    goto check_character;
                 }
-                else
-                {
-                    block = recvBuf->blocks;
-                    blockOffset = 0;
-                    c = block->data[blockOffset++];
-                }
-            }
-            else
-            {
-                if (blockOffset == 0x200)
-                {
-                    blockOffset = 0;
-                    block = block->next;
-                }
-                c = block->data[blockOffset++];
-            }
 
-            if (c == ':' && separator != NULL && *separator < 0)
+                block = recvBuf->hdrBufBlock_p;
+                blockOffset = 0;
+            }
+            else if (blockOffset == 0x200)
+            {
+                blockOffset = 0;
+                block = block->next_p;
+            }
+            c = block->block[blockOffset++];
+
+        check_character:
+            if ((s8)c == ':' && separator != NULL && *separator < 0)
             {
                 *separator = i;
             }
 
             if (foundCR)
             {
-                if (c == '\n')
+                if ((s8)c == '\n')
                 {
                     result = i == end - 1 ? 0 : i + 1;
                     if (lineBreakLength != NULL)
@@ -82,7 +78,7 @@ s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
                 return result;
             }
 
-            if (c == '\r')
+            if ((s8)c == '\r')
             {
                 result = i == end - 1 ? 0 : i + 1;
                 foundCR = TRUE;
@@ -92,7 +88,7 @@ s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
                 }
             }
 
-            if (c == '\n')
+            if ((s8)c == '\n')
             {
                 result = i == end - 1 ? 0 : i + 1;
                 if (lineBreakLength != NULL)
@@ -107,12 +103,13 @@ s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
     return -1;
 }
 
-s32 NHTTPi_skipSpaceHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start, s32 end)
+s32 NHTTPi_skipSpaceHdrRecvBuf(
+    NHTTPResponseInfo* recvBuf, s32 start, s32 end)
 {
-    NHTTPRecvBufBlock* block;
     s32 blockOffset;
+    NHTTPi_HDRBUFLIST* block;
     s32 i;
-    s8 c;
+    s32 c;
 
     if (start < end)
     {
@@ -123,11 +120,11 @@ s32 NHTTPi_skipSpaceHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start, s32 end)
         }
         else
         {
-            block = recvBuf->blocks;
+            block = recvBuf->hdrBufBlock_p;
             i = (start - 0x400) >> 9;
             while (i-- != 0)
             {
-                block = block->next;
+                block = block->next_p;
             }
             blockOffset = (start - 0x400) & 0x1FF;
         }
@@ -138,26 +135,22 @@ s32 NHTTPi_skipSpaceHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start, s32 end)
             {
                 if (blockOffset < 0x400)
                 {
-                    c = recvBuf->data[blockOffset++];
+                    c = (s8)recvBuf->hdrBufFirst[blockOffset++];
+                    goto check_space;
                 }
-                else
-                {
-                    block = recvBuf->blocks;
-                    blockOffset = 0;
-                    c = block->data[blockOffset++];
-                }
-            }
-            else
-            {
-                if (blockOffset == 0x200)
-                {
-                    blockOffset = 0;
-                    block = block->next;
-                }
-                c = block->data[blockOffset++];
-            }
 
-            if (c != ' ')
+                block = recvBuf->hdrBufBlock_p;
+                blockOffset = 0;
+            }
+            else if (blockOffset == 0x200)
+            {
+                blockOffset = 0;
+                block = block->next_p;
+            }
+            c = block->block[blockOffset++];
+
+        check_space:
+            if ((s8)c != ' ')
             {
                 return i;
             }
@@ -167,10 +160,10 @@ s32 NHTTPi_skipSpaceHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start, s32 end)
     return -1;
 }
 
-s32 NHTTPi_compareTokenN_HdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
+s32 NHTTPi_compareTokenN_HdrRecvBuf(NHTTPResponseInfo* recvBuf, s32 start,
     s32 end, const char* token, s8 terminal)
 {
-    NHTTPRecvBufBlock* block;
+    NHTTPi_HDRBUFLIST* block;
     s32 blockOffset;
     s32 i;
     s32 tokenChar;
@@ -185,11 +178,11 @@ s32 NHTTPi_compareTokenN_HdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
         }
         else
         {
-            block = recvBuf->blocks;
+            block = recvBuf->hdrBufBlock_p;
             i = (start - 0x400) >> 9;
             while (i-- != 0)
             {
-                block = block->next;
+                block = block->next_p;
             }
             blockOffset = (start - 0x400) & 0x1FF;
         }
@@ -198,29 +191,25 @@ s32 NHTTPi_compareTokenN_HdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
         {
             if (blockOffset < 0x400)
             {
-                recvChar = recvBuf->data[blockOffset++];
+                recvChar = (s8)recvBuf->hdrBufFirst[blockOffset++];
+                goto compare_characters;
             }
-            else
-            {
-                block = recvBuf->blocks;
-                blockOffset = 0;
-                recvChar = block->data[blockOffset++];
-            }
-        }
-        else
-        {
-            if (blockOffset == 0x200)
-            {
-                blockOffset = 0;
-                block = block->next;
-            }
-            recvChar = block->data[blockOffset++];
-        }
 
+            block = recvBuf->hdrBufBlock_p;
+            blockOffset = 0;
+        }
+        else if (blockOffset == 0x200)
+        {
+            blockOffset = 0;
+            block = block->next_p;
+        }
+        recvChar = block->block[blockOffset++];
+
+    compare_characters:
         i = start;
-        while ((((recvChar >= 'A') & (recvChar <= 'Z'))
-                       ? recvChar + ('a' - 'A')
-                       : recvChar)
+        while (((((s8)recvChar >= 'A') & ((s8)recvChar <= 'Z'))
+                       ? (s8)recvChar + ('a' - 'A')
+                       : (s8)recvChar)
                == (((((s8)*token >= 'A') & ((s8)*token <= 'Z'))
                         ? (s8)*token + ('a' - 'A')
                         : (s8)*token)))
@@ -236,25 +225,21 @@ s32 NHTTPi_compareTokenN_HdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
             {
                 if (blockOffset < 0x400)
                 {
-                    recvChar = recvBuf->data[blockOffset++];
+                    recvChar = (s8)recvBuf->hdrBufFirst[blockOffset++];
+                    goto advance_token;
                 }
-                else
-                {
-                    block = recvBuf->blocks;
-                    blockOffset = 0;
-                    recvChar = block->data[blockOffset++];
-                }
-            }
-            else
-            {
-                if (blockOffset == 0x200)
-                {
-                    blockOffset = 0;
-                    block = block->next;
-                }
-                recvChar = block->data[blockOffset++];
-            }
 
+                block = recvBuf->hdrBufBlock_p;
+                blockOffset = 0;
+            }
+            else if (blockOffset == 0x200)
+            {
+                blockOffset = 0;
+                block = block->next_p;
+            }
+            recvChar = block->block[blockOffset++];
+
+        advance_token:
             i++;
             token++;
         }
@@ -263,15 +248,15 @@ s32 NHTTPi_compareTokenN_HdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, s32 start,
     return -1;
 }
 
-BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, u8* destination,
+BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPResponseInfo* recvBuf, u8* destination,
     s32 offset, s32 length)
 {
-    NHTTPRecvBufBlock* block;
+    s32 copyLength;
+    NHTTPi_HDRBUFLIST* block;
     s32 blockOffset;
     s32 blockCount;
-    s32 copyLength;
 
-    if (offset + length <= recvBuf->length)
+    if (offset + length <= recvBuf->headerLen)
     {
         if (length != 0)
         {
@@ -282,7 +267,8 @@ BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, u8* destination,
                 {
                     copyLength = 0x400 - offset;
                 }
-                NHTTPi_memcpy(destination, &recvBuf->data[offset], copyLength);
+                NHTTPi_memcpy(
+                    destination, &recvBuf->hdrBufFirst[offset], copyLength);
                 offset += copyLength;
                 length -= copyLength;
                 destination += copyLength;
@@ -291,12 +277,12 @@ BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, u8* destination,
             if (length != 0)
             {
                 blockOffset = offset - 0x400;
-                block = recvBuf->blocks;
+                block = recvBuf->hdrBufBlock_p;
                 blockCount = blockOffset >> 9;
                 blockOffset &= 0x1FF;
                 while (blockCount-- != 0)
                 {
-                    block = block->next;
+                    block = block->next_p;
                 }
 
                 while (length != 0)
@@ -306,9 +292,10 @@ BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, u8* destination,
                     {
                         copyLength = 0x200 - blockOffset;
                     }
-                    NHTTPi_memcpy(destination, &block->data[blockOffset], copyLength);
+                    NHTTPi_memcpy(
+                        destination, &block->block[blockOffset], copyLength);
                     blockOffset += copyLength;
-                    block = block->next;
+                    block = block->next_p;
                     blockOffset &= 0x1FF;
                     length -= copyLength;
                     destination += copyLength;
@@ -323,14 +310,15 @@ BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPHdrRecvBuf* recvBuf, u8* destination,
 
 BOOL NHTTPi_isRecvBufFull(NHTTPResponseInfo* response, u32 received)
 {
-    return response->recvBuf.bufferSize <= received;
+    return response->recvBufLen <= received;
 }
 
 s32 NHTTPi_RecvBuf(NHTTPRequestInfo* request, s32 socket, s32 offset,
     s32 flags)
 {
     NHTTPResponseInfo* response = request->response;
-    return NHTTPi_SocRecv(request, socket, (u8*)response->recvBuf.buffer + offset, response->recvBuf.bufferSize - offset, flags);
+    return NHTTPi_SocRecv(request, socket, (u8*)response->recvBuf_p + offset,
+        response->recvBufLen - offset, flags);
 }
 
 s32 NHTTPi_RecvBufN(NHTTPRequestInfo* request, s32 socket, u32 offset,
@@ -343,10 +331,8 @@ s32 NHTTPi_RecvBufN(NHTTPRequestInfo* request, s32 socket, u32 offset,
         return -1003;
     }
 
-    remaining = request->response->recvBuf.bufferSize - offset;
-    if (length > remaining)
-    {
-        length = remaining;
-    }
-    return NHTTPi_SocRecv(request, socket, (u8*)request->response->recvBuf.buffer + offset, length, flags);
+    remaining = request->response->recvBufLen - offset;
+    return NHTTPi_SocRecv(request, socket,
+        (u8*)request->response->recvBuf_p + offset,
+        length > remaining ? remaining : length, flags);
 }

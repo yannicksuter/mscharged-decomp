@@ -2,103 +2,64 @@
 
 extern s32 NCDiGetEnabledConfigList(u32* list0, u32* list1, u32* list2);
 
-s32 GetStartupErrorCode(s32 error, s32 connectionType);
+s32 GetStartupErrorCode(s32 soErr, s32 connType);
 
-s32 NETiGetConnectionTypeFromConfigList(u32 list0, u32 list1, u32 list2)
+static inline s32 CountTrailingZeros(u32 val);
+
+s32 NETiGetConnectionTypeFromConfigList(u32 wired, u32 wireless, u32 usbap)
 {
     s32 result = 99;
-    s32 i;
-    u32 bit;
 
-    if (list0 != 0)
+    if (wired != 0)
     {
-        if (list1 == 0 && list2 == 0)
+        if (wireless == 0 && usbap == 0)
         {
-            bit = 1;
-            for (i = 0; i < 32; i++)
-            {
-                if (list0 & bit)
-                {
-                    break;
-                }
-                bit <<= 1;
-            }
-            if (i == 32)
-            {
-                i = -1;
-            }
-            result = i + 20;
+            result = CountTrailingZeros(wired) + 20;
         }
     }
-    else if (list1 != 0)
+    else if (wireless != 0)
     {
-        if (list2 == 0)
+        if (usbap == 0)
         {
-            bit = 1;
-            for (i = 0; i < 32; i++)
-            {
-                if (list1 & bit)
-                {
-                    break;
-                }
-                bit <<= 1;
-            }
-            if (i == 32)
-            {
-                i = -1;
-            }
-            result = i + 30;
+            result = CountTrailingZeros(wireless) + 30;
         }
     }
-    else if (list2 != 0)
+    else if (usbap != 0)
     {
-        bit = 1;
-        for (i = 0; i < 32; i++)
-        {
-            if (list2 & bit)
-            {
-                break;
-            }
-            bit <<= 1;
-        }
-        if (i == 32)
-        {
-            i = -1;
-        }
-        result = i + 40;
+        result = CountTrailingZeros(usbap) + 40;
     }
 
     return result;
 }
 
-s32 NETGetStartupErrorCode(s32 error)
+s32 NETGetStartupErrorCode(s32 soErr)
 {
     u32 list2;
     u32 list1;
     u32 list0;
-    s32 connectionType = 99;
+    s32 connType = 99;
 
     if (NCDiGetEnabledConfigList(&list0, &list1, &list2) >= 0)
     {
-        connectionType = NETiGetConnectionTypeFromConfigList(list0, list1, list2);
+        connType = NETiGetConnectionTypeFromConfigList(list0, list1, list2);
     }
-    if (connectionType < 0)
+    if (connType < 0)
     {
-        error = 0x80000000;
-        connectionType = 99;
+        soErr = 0x80000000;
+        connType = 99;
     }
 
-    return GetStartupErrorCode(error, connectionType) - connectionType;
+    return GetStartupErrorCode(soErr, connType) - connType;
 }
 
-s32 GetStartupErrorCode(s32 error, s32 connectionType)
+s32 GetStartupErrorCode(s32 soErr, s32 connType)
 {
-    if (error >= 0)
+    if (soErr >= 0)
     {
         return 0;
     }
 
-    switch (error)
+    switch (soErr)
     {
     case -45:
         return -50200;
@@ -109,7 +70,7 @@ s32 GetStartupErrorCode(s32 error, s32 connectionType)
     case -111:
         return -52700;
     case -121:
-        if (connectionType >= 20 && connectionType < 30)
+        if (connType >= 20 && connType < 30)
         {
             return -51400;
         }
@@ -118,7 +79,7 @@ s32 GetStartupErrorCode(s32 error, s32 connectionType)
     case -76:
     case -48:
     case -39:
-        if (connectionType >= 20 && connectionType < 30)
+        if (connType >= 20 && connType < 30)
         {
             return -51400;
         }
@@ -130,7 +91,23 @@ s32 GetStartupErrorCode(s32 error, s32 connectionType)
     case (s32)0x80000000:
         return -50100;
     default:
-        OSReport("Unknown SOStartup Error: %d\n", error);
+        OSReport("Unknown SOStartup Error: %d\n", soErr);
         return -50100;
     }
+}
+
+static inline s32 CountTrailingZeros(u32 val)
+{
+    s32 i;
+    u32 b;
+
+    for (i = 0, b = 1; i < 32; i++, b <<= 1)
+    {
+        if (val & b)
+        {
+            return i;
+        }
+    }
+
+    return -1;
 }

@@ -1,6 +1,7 @@
 #include <revolution/so.h>
 
 #include <revolution/ipc.h>
+#include <revolution/os.h>
 
 #include <string.h>
 
@@ -25,8 +26,6 @@ SOHostEnt* SOGetHostByName(const char* name)
     s32 rmId;
     int nameLength;
     int bufferSize;
-    char* nameBuffer;
-    SOHostEnt* host;
     SOHostEnt* resultHost = NULL;
     u32* alias;
     s32 offset;
@@ -42,31 +41,34 @@ SOHostEnt* SOGetHostByName(const char* name)
         {
             nameLength = strlen(name);
             bufferSize = OSRoundUp32B(nameLength + 1);
-            nameBuffer = SOiAlloc(12, bufferSize);
-            host = (SOHostEnt*)SOiGetSysWork()->_unk10;
-            if (nameBuffer == NULL)
             {
-                result = SO_ENOMEM;
-            }
-            else
-            {
-                strcpy(nameBuffer, name);
-                result = IOS_Ioctl(rmId, 17, nameBuffer, nameLength + 1, host, 0x460);
-                if (result >= 0)
+                char* nameBuffer = SOiAlloc(12, bufferSize);
+                SOHostEnt* host = (SOHostEnt*)SOiGetSysWork()->_unk10;
+
+                if (nameBuffer == NULL)
                 {
-                    offset = (s32)((u8*)host + sizeof(SOHostEnt)) - (s32)host->name;
-                    alias = (u32*)((u8*)host + 0x340);
-                    while (*alias != 0)
-                    {
-                        *alias += offset;
-                        alias++;
-                    }
-                    host->aliases = (char**)((u8*)host->aliases + offset);
-                    resultHost = host;
-                    host->name = (char*)((u8*)host->name + offset);
-                    host->addrList = (u8**)((u8*)host->addrList + offset);
+                    result = SO_ENOMEM;
                 }
-                SOiFree(12, nameBuffer, bufferSize);
+                else
+                {
+                    strcpy(nameBuffer, name);
+                    result = IOS_Ioctl(rmId, 17, nameBuffer, nameLength + 1, host, 0x460);
+                    if (result >= 0)
+                    {
+                        offset = (s32)((u8*)host + sizeof(SOHostEnt)) - (s32)host->name;
+                        alias = (u32*)((u8*)host + 0x340);
+                        while (*alias != 0)
+                        {
+                            *alias += offset;
+                            alias++;
+                        }
+                        host->aliases = (char**)((u8*)host->aliases + offset);
+                        resultHost = host;
+                        host->name = (char*)((u8*)host->name + offset);
+                        host->addrList = (u8**)((u8*)host->addrList + offset);
+                    }
+                    SOiFree(12, nameBuffer, bufferSize);
+                }
             }
         }
         SOiConclude(NULL, result);
@@ -79,10 +81,9 @@ int SOGetAddrInfo(const char* nodeName, const char* servName,
 {
     int result;
     s32 rmId;
+    int nodeNameLength;
     int servNameLength;
     int bufferSize;
-    IPCIOVector* vectors;
-    SOAddrInfo* resultBuffer;
     char* nodeNameBuffer;
     char* servNameBuffer;
     SOAddrInfo* hintsBuffer;
@@ -92,8 +93,12 @@ int SOGetAddrInfo(const char* nodeName, const char* servName,
     result = SOiPrepare(NULL, &rmId);
     if (result == SO_SUCCESS)
     {
+        SOAddrInfo* resultBuffer;
+        IPCIOVector* vectors;
+
         servNameLength = servName == NULL ? 0 : strlen(nodeName) + 1;
-        bufferSize = OSRoundUp32B(OSRoundUp32B(nodeName == NULL ? 0 : strlen(nodeName) + 1)
+        nodeNameLength = nodeName == NULL ? 0 : strlen(nodeName) + 1;
+        bufferSize = OSRoundUp32B(OSRoundUp32B(nodeNameLength)
                                   + OSRoundUp32B(servNameLength) + 64);
         vectors = SOiAlloc(12, bufferSize);
         if (vectors == NULL)

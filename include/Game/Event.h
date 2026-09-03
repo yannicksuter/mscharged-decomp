@@ -274,6 +274,31 @@ public:
         fn_802B2A04(this, listener, value, flags, target);
     }
 
+    void UnidentifiedDeliver(T* data)
+    {
+        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        while (iterator.hasNext())
+        {
+            Listener* listener = &*iterator;
+            ListenerEntry* currentEntry = iterator.CurrentEntry();
+            this->mCurrentConnection = listener;
+
+            if ((listener->mFlags >> 31) != 0)
+            {
+                listener->callback(data);
+                iterator = mListeners.Begin();
+                iterator.m_Curr = currentEntry;
+            }
+
+            iterator.next();
+            if (((listener->mFlags >> 29) & 1) != 0)
+            {
+                UnidentifiedDeleteListener(listener);
+            }
+        }
+        this->mCurrentConnection = 0;
+    }
+
 protected:
     void Remove(Listener* listener)
     {

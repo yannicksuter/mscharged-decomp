@@ -7,11 +7,19 @@
 #define H(x, y, z)        ((x) ^ (y) ^ (z))
 #define I(x, y, z)        ((y) ^ ((x) | ~(z)))
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
-#define STEP(f, a, b, c, d, x, s, t) \
-    ((a) = (b) + ROTATE_LEFT((t) + (x) + (a) + f((b), (c), (d)), (s)))
+#define STEP(f, a, b, c, d, x, s, t)                                      \
+    do                                                                     \
+    {                                                                      \
+        u32 step_t = (t);                                                  \
+        (a) = (b) +                                                        \
+              ROTATE_LEFT((a) + f((b), (c), (d)) + (x) + step_t, (s));    \
+    } while (0)
 #define SWAP32(x) \
     (((x) >> 24) | (((x) >> 8) & 0xFF00) | (((x) << 8) & 0xFF0000) | ((x) << 24))
-#define LOAD32(address, offset) __lwbrx((address), (offset))
+static inline u32 LOAD32(u32* address)
+{
+    return __lwbrx(address, 0);
+}
 
 static u8 sPadding = 0x80;
 
@@ -245,48 +253,61 @@ static void ProcessBlock(NETMD5Context* context)
     u32* data = buffer;
     u32* constants = sRoundConstants;
     u32* indices;
+    u32* address;
     u32 i;
 
-    for (i = 0; i < 4; i++)
+    for (i = 4; i != 0; i--)
     {
-        STEP(F, a, b, c, d, LOAD32(data, 0), 7, constants[0]);
-        data++;
-        STEP(F, d, a, b, c, LOAD32(data, 0), 12, constants[1]);
-        data++;
-        STEP(F, c, d, a, b, LOAD32(data, 0), 17, constants[2]);
-        data++;
-        STEP(F, b, c, d, a, LOAD32(data, 0), 22, constants[3]);
-        data++;
+        address = buffer++;
+        STEP(F, a, b, c, d, LOAD32(address), 7, constants[0]);
+        address = buffer++;
+        STEP(F, d, a, b, c, LOAD32(address), 12, constants[1]);
+        address = buffer++;
+        STEP(F, c, d, a, b, LOAD32(address), 17, constants[2]);
+        address = buffer++;
+        STEP(F, b, c, d, a, LOAD32(address), 22, constants[3]);
         constants += 4;
     }
 
     indices = sRoundIndices;
-    for (i = 0; i < 4; i++)
+    for (i = 4; i != 0; i--)
     {
-        STEP(G, a, b, c, d, LOAD32(buffer, indices[0] * 4), 5, constants[0]);
-        STEP(G, d, a, b, c, LOAD32(buffer, indices[1] * 4), 9, constants[1]);
-        STEP(G, c, d, a, b, LOAD32(buffer, indices[2] * 4), 14, constants[2]);
-        STEP(G, b, c, d, a, LOAD32(buffer, indices[3] * 4), 20, constants[3]);
+        address = &data[indices[0]];
+        STEP(G, a, b, c, d, LOAD32(address), 5, constants[0]);
+        address = &data[indices[1]];
+        STEP(G, d, a, b, c, LOAD32(address), 9, constants[1]);
+        address = &data[indices[2]];
+        STEP(G, c, d, a, b, LOAD32(address), 14, constants[2]);
+        address = &data[indices[3]];
+        STEP(G, b, c, d, a, LOAD32(address), 20, constants[3]);
         indices += 4;
         constants += 4;
     }
 
-    for (i = 0; i < 4; i++)
+    for (i = 4; i != 0; i--)
     {
-        STEP(H, a, b, c, d, LOAD32(buffer, indices[0] * 4), 4, constants[0]);
-        STEP(H, d, a, b, c, LOAD32(buffer, indices[1] * 4), 11, constants[1]);
-        STEP(H, c, d, a, b, LOAD32(buffer, indices[2] * 4), 16, constants[2]);
-        STEP(H, b, c, d, a, LOAD32(buffer, indices[3] * 4), 23, constants[3]);
+        address = &data[indices[0]];
+        STEP(H, a, b, c, d, LOAD32(address), 4, constants[0]);
+        address = &data[indices[1]];
+        STEP(H, d, a, b, c, LOAD32(address), 11, constants[1]);
+        address = &data[indices[2]];
+        STEP(H, c, d, a, b, LOAD32(address), 16, constants[2]);
+        address = &data[indices[3]];
+        STEP(H, b, c, d, a, LOAD32(address), 23, constants[3]);
         indices += 4;
         constants += 4;
     }
 
-    for (i = 0; i < 4; i++)
+    for (i = 4; i != 0; i--)
     {
-        STEP(I, a, b, c, d, LOAD32(buffer, indices[0] * 4), 6, constants[0]);
-        STEP(I, d, a, b, c, LOAD32(buffer, indices[1] * 4), 10, constants[1]);
-        STEP(I, c, d, a, b, LOAD32(buffer, indices[2] * 4), 15, constants[2]);
-        STEP(I, b, c, d, a, LOAD32(buffer, indices[3] * 4), 21, constants[3]);
+        address = &data[indices[0]];
+        STEP(I, a, b, c, d, LOAD32(address), 6, constants[0]);
+        address = &data[indices[1]];
+        STEP(I, d, a, b, c, LOAD32(address), 10, constants[1]);
+        address = &data[indices[2]];
+        STEP(I, c, d, a, b, LOAD32(address), 15, constants[2]);
+        address = &data[indices[3]];
+        STEP(I, b, c, d, a, LOAD32(address), 21, constants[3]);
         indices += 4;
         constants += 4;
     }
