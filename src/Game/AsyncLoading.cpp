@@ -1,4 +1,5 @@
 #include "Game/AsyncLoading.h"
+#include "Game/FE/feMusic.h"
 
 #include "Game/Audio/AudioBundleManager_802EDA7C.h"
 #include "Game/Audio/AudioLoadMode_806E201C.h"
@@ -117,7 +118,6 @@ extern "C" void fn_8027ED18();
 extern "C" void fn_8027C86C();
 extern "C" void fn_8027E5D4();
 extern "C" void fn_802B2E8C(UnidentifiedOwnerHandle* handle);
-extern "C" void fn_801FC3F0();
 extern "C" void fn_80332EC8();
 extern "C" void fn_80337FF0(void*, int);
 extern "C" void fn_80338900(void*, int);
@@ -159,7 +159,7 @@ extern "C" void fn_802C8180();
 extern "C" void fn_802B1AE4();
 extern "C" void fn_80370E20();
 extern "C" void fn_802CC02C(ResourceInterface_802CC094*);
-extern "C" void fn_802CC08C(void*);
+extern "C" void fn_802CC08C(ResourceInterface_802CC094*);
 extern "C" void fn_80197120();
 extern "C" void fn_80143FD4();
 extern "C" void fn_80111658(bool);
@@ -699,7 +699,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     }
 
     fn_802B2E8C(&manager->mLoadingHandle);
-    fn_801FC3F0();
+    FEMusic::StopStream();
     BeginFrameTask::s_FramerateLocked = false;
     fn_80332EC8();
     fn_80337FF0(lbl_806E2164, 0);

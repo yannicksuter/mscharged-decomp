@@ -26,18 +26,21 @@ public:
     TeamStats* pGetTeamStatsByIndex(u16 index) const;
     BasicGameInfo* GetMatchupInfo(int phase, short round, int matchup) const;
     int GetUserSelectedCupTeam() const;
+    int fn_80206B28(int index) const;
+    bool fn_80206B3C() const;
+    void fn_80206B48(bool value);
 
     /* 0x0004 */ Cup<4, 8> mFireCupSeries;
     /* 0x14F0 */ Cup<6, 12> mCrystalCupSeries;
     /* 0x41DC */ Cup<10, 11> mStrikerCupSeries;
-    /* 0x8680 */ u8 unknown_0x8680[0x14];
-    /* 0x8694 */ int mUnidentified8694;
-    /* 0x8698 */ int mUnidentified8698;
+    /* 0x8680 */ int mUnidentified8680;
+    /* 0x8684 */ u8 unknown_0x8684[0x10];
+    /* 0x8694 */ int mUnidentified8694[2];
     /* 0x869C */ bool mUnidentified869C;
     /* 0x869D */ u8 unknown_0x869D[0x37F];
     /* 0x8A1C */ int mCurrentMode;
     /* 0x8A20 */ BaseCup* mCurrentCup;
-    /* 0x8A24 */ u8 unknown_0x8A24;
+    /* 0x8A24 */ bool unknown_0x8A24;
     /* 0x8A25 */ u8 unknown_0x8A25[3];
     /* 0x8A28 */ int unknown_0x8A28;
     /* 0x8A2C */ int unknown_0x8A2C;

@@ -4,8 +4,8 @@
 #include <revolution/vf/d_vf_sys.h>
 #include <revolution/vf/nand_drv.h>
 
-s32 VF_nand_retry_max;
 s32 VF_nand_sleep_msec;
+s32 VF_nand_retry_max;
 
 static struct {
     s32 (*create)(const char*, u8, u8);
@@ -13,6 +13,63 @@ static struct {
     s32 (*createDir)(const char*, u8, u8);
     s32 (*delete)(const char*);
 } l_nandFunc[26];
+
+static inline void _SleepAfewMiliSec(void) {
+    OSSleepTicks(
+        (s64)VF_nand_sleep_msec * ((*(u32*)0x800000F8 / 4) / 1000));
+}
+
+s32 VFi_NandClose(struct NANDFileInfo* info) {
+    s32 challenge;
+    s32 error;
+
+    challenge = VF_nand_retry_max;
+    error = 0;
+    while (challenge-- > 0) {
+        error = NANDClose(info);
+        if (error != NAND_RESULT_BUSY) {
+            return error;
+        } else {
+            _SleepAfewMiliSec();
+        }
+    }
+    return error;
+}
+
+s32 VFi_NandOpen(const char* path, struct NANDFileInfo* info, u8 accType) {
+    s32 challenge;
+    s32 error;
+
+    challenge = VF_nand_retry_max;
+    error = 0;
+    while (challenge-- > 0) {
+        error = NANDOpen(path, info, accType);
+        if (error != NAND_RESULT_BUSY) {
+            return error;
+        } else {
+            _SleepAfewMiliSec();
+        }
+    }
+    return error;
+}
+
+s32 VFi_NandPrivateOpen(
+    const char* path, struct NANDFileInfo* info, u8 accType) {
+    s32 challenge;
+    s32 error;
+
+    challenge = VF_nand_retry_max;
+    error = 0;
+    while (challenge-- > 0) {
+        error = NANDPrivateOpen(path, info, accType);
+        if (error != NAND_RESULT_BUSY) {
+            return error;
+        } else {
+            _SleepAfewMiliSec();
+        }
+    }
+    return error;
+}
 
 s32 VFi_NandFlushNANDFromHandleIdx(s32 i_handleIdx, int i_setLastDeviceError) {
     s32 NANDError;

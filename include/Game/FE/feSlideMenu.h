@@ -1,6 +1,7 @@
 #ifndef _FESLIDEMENU_H_
 #define _FESLIDEMENU_H_
 
+#include "Game/FE/feMenu.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "NL/nlFunction.h"
 
@@ -20,6 +21,24 @@ public:
     bool PrevItem();
     bool NextItem();
     void SetSlideByIndex(unsigned char index);
+    bool OnHighlight()
+    {
+        MenuItem* item = &m_menuItems[m_currentSlide];
+        if (!item->ItemCBFuncs[ON_HIGHLIGHT])
+        {
+            return false;
+        }
+        item->ItemCBFuncs[ON_HIGHLIGHT]();
+        return true;
+    }
+    void runCallBack()
+    {
+        MenuItem* item = &m_menuItems[m_currentSlide];
+        if (item->ItemCBFuncs[ON_APPLY])
+        {
+            item->ItemCBFuncs[ON_APPLY]();
+        }
+    }
     bool ApplyFunction();
     MenuItem* AddMenuItem(const char* name);
     MenuItem* AddMenuItem(const char* name, const Function<FnVoidVoid>& func);

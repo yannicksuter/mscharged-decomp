@@ -3,10 +3,12 @@
 #include "Game/BasicStadium.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
+#include "Game/FE/feMusic.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/feScene.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
+#include "Game/Sys/movie.h"
 #include "NL/nlFile.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -15,12 +17,9 @@ extern BaseGameSceneManager* lbl_806E1838;
 extern TLComponentInstance lbl_80580030;
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" void fn_801FC2B4(int value);
-extern "C" void fn_801FC3F0();
 extern "C" void fn_80253284(int value);
 extern "C" bool fn_80273B00();
 extern "C" int fn_803693B4();
-extern "C" void fn_80371198();
 
 SceneList CreditScene::mNextScene = (SceneList)13;
 
@@ -100,7 +99,7 @@ CreditScene::~CreditScene()
 void CreditScene::SceneCreated()
 {
     SetupForPhase();
-    fn_801FC3F0();
+    FEMusic::StopStream();
 }
 
 void CreditScene::Update(float fDeltaT)
@@ -170,11 +169,11 @@ void CreditScene::SetupForPhase()
         lbl_806E1838->Push(mNextScene, SCREEN_NOTHING, true);
         if (mNextScene == (SceneList)13)
         {
-            fn_801FC2B4(1);
+            FEMusic::StartStreamIfDifferent(1);
         }
         else
         {
-            fn_801FC2B4(0);
+            FEMusic::StartStreamIfDifferent(0);
         }
         mNextScene = (SceneList)13;
         BasicStadium::GetCurrentStadium()->mUnidentified070 = true;
@@ -401,6 +400,6 @@ void CreditScene::UpdateForCredits(float fDeltaT)
         }
         ++mPhase;
         SetupForPhase();
-        fn_80371198();
+        MovieStop();
     }
 }

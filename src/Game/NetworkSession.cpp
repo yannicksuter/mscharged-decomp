@@ -1,4 +1,5 @@
 #include "Game/NetworkSession.h"
+#include "Game/FE/feMusic.h"
 #include "Game/tu_801360A4.h"
 
 #include "Game/AI/AIPad.h"
@@ -243,7 +244,6 @@ extern "C" UnidentifiedNetworkPeer* fn_80338BF8(UnidentifiedNetworkSession*, int
 extern "C" u32 fn_80111688(void*);
 extern "C" void* fn_8011166C();
 extern "C" void fn_801CBCE4(u32, int);
-extern "C" void fn_801FC2B4(int);
 extern "C" void fn_8026E338(BaseSceneHandler*, UnidentifiedNetworkMessage*);
 extern "C" void fn_8026F7F8(BaseSceneHandler*, UnidentifiedNetworkMessage*);
 extern "C" void fn_8026FF28(BaseSceneHandler*, UnidentifiedNetworkMessage*);
@@ -2034,7 +2034,7 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
         {
             fn_801CBCE4(0x89B1FC93, 0x2A);
         }
-        fn_801FC2B4(8);
+        FEMusic::StartStreamIfDifferent(8);
         lbl_806E1838->Push((SceneList)0x39, SCREEN_FORWARD, true);
         fn_8026F7F8(0, message);
         break;

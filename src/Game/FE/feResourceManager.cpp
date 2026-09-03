@@ -4,6 +4,7 @@
 #include "Game/FE/feScene.h"
 #include "Game/FE/feSceneResource.h"
 #include "Game/FE/feTextureResource.h"
+#include "NL/gl/glMemory.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlDLListContainer.h"
@@ -16,14 +17,6 @@ struct PendingResourceLoad
 {
     FEResourceHandle* pHandle;
     MemoryAllocator* pAllocator;
-};
-
-class ResourceInterface_802CC094
-{
-public:
-    virtual void fn_08();
-    virtual unsigned long MarkResource();
-    virtual void ReleaseResource(unsigned long marker);
 };
 
 struct PermanentBundleLoadState

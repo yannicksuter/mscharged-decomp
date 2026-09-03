@@ -1,6 +1,7 @@
 #include "NL/gl/glModel.h"
 
 #include "NL/gl/glMatrix.h"
+#include "NL/gl/glMemory.h"
 
 #include <string.h>
 
@@ -14,8 +15,6 @@ extern "C"
 {
     void fn_802C8284(unsigned long value);
     void fn_802C8288();
-    void* fn_802CC0A4(unsigned long size, int memoryType, void* allocator);
-    void* fn_802CC0A8(unsigned long size, int memoryType);
     void fn_8036E4C0(glModelPacket* packet, void* allocator);
 }
 
@@ -96,12 +95,12 @@ glModel* glModelDupArrayNoStreams(
     if (bPermanent)
     {
         size = nModels * sizeof(glModel);
-        result = (glModel*)fn_802CC0A4(size, 0, pAllocator);
+        result = (glModel*)glResourceAlloc(size, GLM_Header, pAllocator);
     }
     else
     {
         size = nModels * sizeof(glModel);
-        result = (glModel*)fn_802CC0A8(size, 0);
+        result = (glModel*)glFrameAlloc(size, GLM_Header);
     }
 
     memcpy(result, pModelArray, size);
@@ -115,13 +114,14 @@ glModel* glModelDupArrayNoStreams(
         if (bPermanent)
         {
             packetSize = numPackets * sizeof(glModelPacket);
-            new_packets = (glModelPacket*)fn_802CC0A4(
-                packetSize, 0, pAllocator);
+            new_packets = (glModelPacket*)glResourceAlloc(
+                packetSize, GLM_Header, pAllocator);
         }
         else
         {
             packetSize = numPackets * sizeof(glModelPacket);
-            new_packets = (glModelPacket*)fn_802CC0A8(packetSize, 0);
+            new_packets = (glModelPacket*)glFrameAlloc(
+                packetSize, GLM_Header);
         }
 
         memcpy(new_packets, sourcePackets, packetSize);
@@ -137,11 +137,11 @@ glModel* glModelDupArrayNoStreams(
             dataSize = info->size;
             if (bPermanent)
             {
-                data = fn_802CC0A4(dataSize, 0, pAllocator);
+                data = glResourceAlloc(dataSize, GLM_Header, pAllocator);
             }
             else
             {
-                data = fn_802CC0A8(dataSize, 0);
+                data = glFrameAlloc(dataSize, GLM_Header);
             }
 
             memcpy(data, source, dataSize);
