@@ -2,6 +2,7 @@
 #include "NL/gl/glView.h"
 
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxMemory.h"
 #include "NL/glx/glxSend.h"
 #include "NL/glx/glxSwap.h"
 #include "NL/glx/glxTexture.h"
@@ -101,7 +102,6 @@ extern "C"
     void* fn_80372B30(u32 size, s32 arena);
     void fn_8004F594(s32 category, const char* format, ...);
     void fn_8036D89C();
-    void fn_80376150();
 
     void fn_802CB848(Function2<bool, PlatformStartupEntry&, PlatformStartupEntry&>* callback);
     void* fn_80364020();
@@ -468,12 +468,12 @@ void glplatSendFrame()
     glxSwapPost(true);
     glx_SendViews();
     glxSwapPre(true);
-    fn_80376150();
+    glplatFrameAllocNextFrame();
 }
 
 void glplatAbortFrame()
 {
-    fn_80376150();
+    glplatFrameAllocNextFrame();
     glxSwapWaitDrawDone();
     VIWaitForRetrace();
 }

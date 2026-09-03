@@ -1,5 +1,6 @@
 #include "NL/glx/glxDisplayList.h"
 
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -8,8 +9,6 @@
 
 extern "C"
 {
-    void* fn_802CC0A4(unsigned long size, int memoryType, void* allocator);
-    void* fn_802CC0A8(unsigned long size, int memoryType);
     void DCFlushRangeNoSync(void* address, unsigned long size);
     void PPCSync();
 
@@ -75,11 +74,12 @@ DisplayList* dlMakeDisplayList(
 
     if (permanent)
     {
-        p = (unsigned char*)fn_802CC0A4(size, 3, allocator);
+        p = (unsigned char*)glResourceAlloc(
+            size, GLM_VertexData, allocator);
     }
     else
     {
-        p = (unsigned char*)fn_802CC0A8(size, 3);
+        p = (unsigned char*)glFrameAlloc(size, GLM_VertexData);
     }
 
     nlZeroMemory(p + actualSize, size - actualSize);
@@ -127,12 +127,13 @@ DisplayList* dlMakeDisplayList(
 
     if (permanent)
     {
-        pList = (DisplayList*)fn_802CC0A4(
-            sizeof(DisplayList), 0, allocator);
+        pList = (DisplayList*)glResourceAlloc(
+            sizeof(DisplayList), GLM_Header, allocator);
     }
     else
     {
-        pList = (DisplayList*)fn_802CC0A8(sizeof(DisplayList), 0);
+        pList = (DisplayList*)glFrameAlloc(
+            sizeof(DisplayList), GLM_Header);
     }
 
     pList->magic = DISPLAY_LIST_HEADER;

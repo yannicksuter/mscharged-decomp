@@ -1,12 +1,10 @@
 #include "NL/gl/glMatrix.h"
 
+#include "NL/gl/glMemory.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/glx/glxMemory.h"
 
 #include <string.h>
-
-extern "C" void* fn_802CC094();
-extern "C" void* fn_802CC0A4(unsigned long size, int memoryType, void* allocator);
 
 static unsigned long gl_IdentityMatrix = 0xFFFFFFFF;
 
@@ -24,7 +22,8 @@ void gl_MatrixStartup()
 {
     nlMatrix4 m;
     m.SetIdentity();
-    gl_IdentityMatrix = (unsigned long)fn_802CC0A4(sizeof(nlMatrix4), GLM_Matrix, fn_802CC094());
+    gl_IdentityMatrix = (unsigned long)glResourceAlloc(
+        sizeof(nlMatrix4), GLM_Matrix, fn_802CC094());
     glplatSetMatrix(gl_IdentityMatrix, m);
 }
 

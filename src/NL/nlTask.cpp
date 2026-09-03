@@ -4,7 +4,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlTicker.h"
 
-extern "C" void fn_80371264();
+#include "Game/Sys/movie.h"
 
 float g_fTaskTimeUpperBound = 0.1f;
 nlTaskManager* nlTaskManager::m_pInstance;
@@ -97,7 +97,7 @@ void nlTaskManager::RunAllTasks()
             taskIterator->Run(deltaTime);
             taskIterator->mExecutionTime =
                 nlGetTickerDifference(taskIterator->mPreviousTicker, nlGetTicker());
-            fn_80371264();
+            MoviePlay();
         }
         if (taskIterator != m_pInstance->mTaskList)
         {
