@@ -4,6 +4,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
 #include "Game/Ball.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Event.h"
@@ -21,29 +22,13 @@
 
 #include <math.h>
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
     UnidentifiedEventRegistry;
 
 class Goalie;
 
-extern "C" DebugFieldType lbl_80533C98[];
 extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
 extern "C" float lbl_806E0C40;
 extern "C" float lbl_806E0C44;
 extern "C" EffectsGroup* fn_802E7CDC(

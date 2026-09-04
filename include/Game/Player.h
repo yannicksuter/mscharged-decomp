@@ -3,11 +3,11 @@
 
 #include "Game/Character.h"
 #include "NL/nlTimer.h"
+#include "unclassified/tu_80331BE4.h"
 
 class cBall;
 class cAIPad;
 class cFielder;
-class cGlobalPad;
 class cPN_Feather;
 class cPN_SAnimController;
 class cPN_SingleAxisBlender;
@@ -48,7 +48,7 @@ public:
     void GetAnimatedBallOrientation(nlQuaternion& qRetval);
     void PickupBall(cBall* pBall);
     void SetNoPickUpTime(float NewNoPickUpTime);
-    cGlobalPad* GetGlobalPad();
+    DetInput* GetGlobalPad();
     void* fn_800972CC();
     void SetAIPad(cAIPad* pPad);
     void fn_80096CDC(cBall* pBall);

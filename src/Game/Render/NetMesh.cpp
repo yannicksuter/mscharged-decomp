@@ -1,6 +1,7 @@
 #include "Game/Render/NetMesh.h"
 
 #include "Game/Ball.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Physics/NetMeshModelLoader.h"
 #include "Game/Physics/PhysicsAIBall.h"
@@ -10,16 +11,10 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
+#include "unclassified/tu_80338898.h"
 
 #include <math.h>
 #include <string.h>
-
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
 
 struct DebugTypeState
 {
@@ -58,24 +53,12 @@ struct BallNetmeshEventData
     nlVector3 collisionVelocity;
 };
 
-extern "C" DebugFieldType lbl_80533C98[];
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
 extern "C" unsigned int fn_802AAC88(const void*, unsigned int);
-extern "C" void* fn_80338950(void*);
-extern "C" void fn_8033919C(void*, const char*);
-extern "C" NetMeshFrameProvider* fn_8011166C();
+NetMeshFrameProvider* GetFixedUpdateTask();
 extern "C" RenderObject* fn_8027725C(unsigned long);
 extern "C" void fn_80146424(BallNetmeshEventData*, bool);
 extern "C" PlatTexture* fn_802D064C(unsigned long);
 
-extern void* lbl_806E2168;
 extern NetMeshGameState* lbl_806E0C94;
 extern float lbl_806DC7B8;
 extern SlotPool<BallNetmeshEventData> lbl_80571780;
@@ -257,10 +240,10 @@ void NetMesh::Reset(bool usePhysicsBall)
         mfMotion = 0.0f;
         mJolt = 0.0f;
 
-        void* output = fn_80338950(lbl_806E2168);
+        DebugWriteCache* output = fn_80338950(lbl_806E2168);
         if (output != 0)
         {
-            NetMeshFrameProvider* frameProvider = fn_8011166C();
+            NetMeshFrameProvider* frameProvider = GetFixedUpdateTask();
             unsigned int frame = frameProvider->GetFrame();
             char buffer[256];
             nlSNPrintf(buffer, sizeof(buffer), sResetFormat, mbPositiveEnd, mbUsePhysicsBall, frame);
@@ -440,10 +423,10 @@ void NetMesh::Update(float dt, const nlVector3& ballPosition,
 
     if (!mbRelaxing && !noSphere)
     {
-        void* output = fn_80338950(lbl_806E2168);
+        DebugWriteCache* output = fn_80338950(lbl_806E2168);
         if (output != 0)
         {
-            NetMeshFrameProvider* frameProvider = fn_8011166C();
+            NetMeshFrameProvider* frameProvider = GetFixedUpdateTask();
             unsigned int frame = frameProvider->GetFrame();
             char buffer[256];
             nlSNPrintf(buffer, sizeof(buffer), sUpdateFormat, mbPositiveEnd, logTimeScale, appliedForces, mbFirstUpdate, frame);

@@ -20,6 +20,10 @@
 #include "NL/platvmath.h"
 #include "unclassified/Lookup_801A537C.h"
 
+// GameRenderTask defines this flag as u8; this unit only matches closer when
+// it reads the byte as a bool.
+extern bool g_bRenderWorldEffects;
+
 struct StadiumLightingParams
 {
     /* 0x00 */ u32 lightRamp;
@@ -78,7 +82,6 @@ extern bool lbl_806DCC5A;
 extern u32 lbl_806DCC70;
 extern s32 lbl_806DCC74;
 extern f32 lbl_806DCC44;
-extern bool lbl_806DC7D8;
 extern GLView* lbl_806E143C;
 extern Lookup_801A537C* lbl_806E1420;
 extern bool lbl_806E1413;
@@ -159,7 +162,7 @@ bool fn_80183C54()
 
     enabled = false;
     if (lbl_806E1420 != 0)
-        enabled = lbl_806DC7D8;
+        enabled = g_bRenderWorldEffects;
 
     return enabled;
 }

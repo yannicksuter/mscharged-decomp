@@ -47,26 +47,6 @@ int NetworkMessageType17_8050AC4C::GetType()
     return 17;
 }
 
-class UnidentifiedNetworkMessageFactory
-{
-public:
-    virtual UnidentifiedNetworkMessage* Create(
-        UnidentifiedMessageSerializer* serializer) = 0;
-};
-
-template <class T>
-class NetworkMessageFactory : public UnidentifiedNetworkMessageFactory
-{
-public:
-    virtual UnidentifiedNetworkMessage* Create(
-        UnidentifiedMessageSerializer* serializer)
-    {
-        T* message = new T;
-        message->Serialize(serializer);
-        return message;
-    }
-};
-
 static NetworkMessageFactory<NetMessageGameStart> sFactoryType13;
 static NetworkMessageFactory<NetMessageLoadedGame> sFactoryType15;
 static NetworkMessageFactory<NetworkMessageType16_8050AC38> sFactoryType16;

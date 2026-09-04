@@ -1,4 +1,5 @@
 #include "Game/GL/ModelWriter_802A1BF4.h"
+#include "Game/Render/RLView.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
@@ -12,26 +13,8 @@
 
 #include "types.h"
 
-extern "C" GLView* fn_8027267C(int);
+#include "unclassified/tu_801B369C.h"
 
-struct WarbleConfiguration
-{
-    u32 values[4];
-    float blobScale;
-    float duration;
-    float values18[6];
-}; // size: 0x30
-
-struct WarbleInstance : public WarbleConfiguration
-{
-    float elapsed;
-    int active;
-}; // size: 0x38
-
-struct WarbleOwner
-{
-    WarbleInstance* instance;
-};
 
 struct WarbleState
 {
@@ -69,11 +52,11 @@ static GXMaterialFloatTweak_804F4190 sWarbleFrequency(
 static GXMaterialFloatTweak_804F4190 sWarbleRate(
     sWarbleRateName, sWarbleTweakCategory, 10.0f);
 
-extern "C" void fn_801B369C(WarbleOwner* owner)
+void InitializeWarble(WarbleOwner* owner)
 {
     owner->instance = 0;
     nlZeroMemory(&sWarbleState, sizeof(sWarbleState));
-    sWarbleState.view = fn_8027267C(0x1F);
+    sWarbleState.view = GetLayerView(eCLV_Warble);
     sWarbleState.blobScale = 5.0f;
     sWarbleState.duration = 2.0f;
     sWarbleState.values18[0] = 3.0f;
@@ -93,17 +76,17 @@ static void ClearWarble(WarbleOwner* owner)
     }
 }
 
-extern "C" void fn_801B3724(WarbleOwner* owner)
+void ShutdownWarble(WarbleOwner* owner)
 {
     ClearWarble(owner);
 }
 
-extern "C" void fn_801B3768(WarbleOwner* owner)
+void ResetWarble(WarbleOwner* owner)
 {
     ClearWarble(owner);
 }
 
-extern "C" void fn_801B37AC(WarbleOwner* owner, float dt)
+void UpdateWarble(WarbleOwner* owner, float dt)
 {
     WarbleInstance* instance = owner->instance;
     if (instance == 0)
@@ -122,22 +105,21 @@ extern "C" void fn_801B37AC(WarbleOwner* owner, float dt)
         instance->active = true;
 }
 
-extern "C" void fn_801B3834()
+void RenderWarble(WarbleOwner* owner)
 {
 }
 
-extern "C" void fn_801B3838(
+void SetWarbleInstance(
     WarbleOwner* owner, WarbleInstance* instance)
 {
     owner->instance = instance;
 }
 
-extern "C" void fn_801B3840(
-    WarbleInstance* instance, const WarbleConfiguration* configuration)
+WarbleInstance::WarbleInstance(const WarbleConfiguration& configuration)
 {
-    *static_cast<WarbleConfiguration*>(instance) = *configuration;
-    instance->elapsed = 0.0f;
-    instance->active = false;
+    *static_cast<WarbleConfiguration*>(this) = configuration;
+    elapsed = 0.0f;
+    active = false;
 }
 
 static inline u8 DecodeWarblePaletteValue(u16 colour)
@@ -298,7 +280,7 @@ extern "C" void fn_801B3F2C()
         textureState->unknown07 = 0;
 
         if (fn_802A1E00(&writer))
-            fn_8027267C(0x20)->AttachModel(writer.model, 0);
+            GetLayerView(eCLV_WarbleBlend)->AttachModel(writer.model, 0);
     }
 
     fn_802A1C14(&writer, -1);

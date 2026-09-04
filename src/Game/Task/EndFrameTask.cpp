@@ -1,5 +1,7 @@
 #include "Game/Task/EndFrameTask.h"
 
+#include "Game/Render/RLView.h"
+
 #include "Game/Debug/FrameCounter.h"
 #include "Game/HBMManager_8024795C.h"
 #include "NL/gl/gl.h"
@@ -15,7 +17,6 @@ struct RenderContext
 extern u8 lbl_806E16D4;
 extern u8 lbl_806E0FB0;
 
-extern "C" RenderContext* fn_8027267C(int index);
 extern "C" void fn_801B3EF4(u8* enabled);
 extern "C" void fn_801B3F2C(u8* enabled);
 extern "C" void fn_802C80FC();
@@ -23,11 +24,11 @@ extern "C" void GXPokeARGB(u16 x, u16 y, u32 colour);
 
 void EndFrameTask::Run(float)
 {
-    if (lbl_806E18D8 == 0 || !lbl_806E18D8->mActive || !lbl_806E18D8->mReady)
+    if (gpHBMManager == 0 || !gpHBMManager->mActive || !gpHBMManager->mReady)
     {
         u8 useFrameContexts = lbl_806E16D4;
 
-        RenderContext* context = fn_8027267C(30);
+        RenderContext* context = (RenderContext*)GetLayerView(eCLV_PreWarble);
         u32 contextFlags = 0;
         if (useFrameContexts)
         {
@@ -35,14 +36,14 @@ void EndFrameTask::Run(float)
         }
         context->flags = contextFlags;
 
-        context = fn_8027267C(31);
+        context = (RenderContext*)GetLayerView(eCLV_Warble);
         contextFlags = 0;
         if (useFrameContexts)
         {
             contextFlags = 8;
         }
         context->flags = contextFlags;
-        fn_8027267C(31)->enabled = useFrameContexts;
+        ((RenderContext*)GetLayerView(eCLV_Warble))->enabled = useFrameContexts;
 
         if (useFrameContexts)
         {
@@ -54,7 +55,7 @@ void EndFrameTask::Run(float)
         g_FrameCounter.StartTimer(1);
         glSendFrame();
 
-        if (lbl_806E18D8 != 0 && lbl_806E18D8->mReady && lbl_806E18D8->mActive)
+        if (gpHBMManager != 0 && gpHBMManager->mReady && gpHBMManager->mActive)
         {
             UnidentifiedHBMManager::fn_8024891C();
             fn_802C80FC();

@@ -16,8 +16,14 @@ class BasicStadium
 public:
     static BasicStadium* GetCurrentStadium();
 
-    /* 0x00 */ u8 mUnidentified000[0x70];
+    /* 0x00 */ u8 mUnidentified000[0x68];
+    /* 0x68 */ void* mUnidentified068;
+    /* 0x6C */ void* mUnidentified06C;
     /* 0x70 */ bool mUnidentified070;
 };
+
+
+void UpdateHighRange();
+void RenderWorldNPCs();
 
 #endif // GAME_BASIC_STADIUM_H

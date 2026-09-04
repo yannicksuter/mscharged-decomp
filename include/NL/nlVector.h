@@ -1,6 +1,39 @@
 #ifndef NL_VECTOR_H
 #define NL_VECTOR_H
 
+#include "NL/nlMemory.h"
+
+class DefaultAllocator
+{
+public:
+    enum
+    {
+        kAtEnd = false
+    };
+
+    template <typename T>
+    static T* New(int count, const char* name)
+    {
+        return new (8, kAtEnd, name) T[count];
+    }
+
+    template <typename T>
+    static void Delete(T* ptr)
+    {
+        delete[] ptr;
+    }
+
+    static void* Alloc(int size)
+    {
+        return nlMalloc(size, 8, false);
+    }
+
+    static void Free(void* ptr)
+    {
+        nlFree(ptr);
+    }
+};
+
 template <typename T, typename Allocator>
 class Vector
 {
@@ -59,6 +92,32 @@ public:
     ~Vector()
     {
         Allocator::template Delete<T>(mData);
+    }
+
+    void push_back(const T& value)
+    {
+        insert(mData + mSize, &value, &value + 1);
+    }
+
+    void insert(T* at, const T* begin, const T* end)
+    {
+        int size = end - begin;
+        int offset = at - mData;
+        reserve(mSize + size);
+        at = mData + offset;
+        T* t = mData + mSize - 1;
+        while (t >= at)
+        {
+            *(t + size) = *t;
+            --t;
+        }
+        while (begin != end)
+        {
+            *at = *begin;
+            ++begin;
+            ++at;
+        }
+        mSize += size;
     }
 
     void reserve(int capacity)

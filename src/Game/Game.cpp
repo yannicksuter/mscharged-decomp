@@ -1,5 +1,7 @@
 #include "Game/Game.h"
 
+#include "Game/Task/GameRenderTask.h"
+
 #include "Game/AI/FilteredRandom.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AISandbox.h"
@@ -8,6 +10,7 @@
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/Camera/tu_800F9460.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Field.h"
 #include "Game/Formation.h"
 #include "Game/GameInfo.h"
@@ -23,6 +26,7 @@
 #include "Game/Render/ShootToScoreArrow.h"
 #include "Game/Sys/clock.h"
 #include "Game/Task/DispatchEventsTask.h"
+#include "Game/Task/FixedUpdateTask.h"
 #include "Game/Task/ParticleUpdateTask.h"
 #include "Game/Team.h"
 #include "NL/nlAlgorithm.h"
@@ -34,46 +38,16 @@
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
 #include "unclassified/tu_801AE530.h"
+#include "unclassified/tu_80332DC0.h"
+#include "unclassified/tu_80338898.h"
 #include "Game/DB/StadiumInfo.h"
 
 extern PowerupBase* g_pPowerups[];
-
-struct UnidentifiedSimulationTimeProvider
-{
-    virtual void UnidentifiedVirtual00();
-    virtual void UnidentifiedVirtual04();
-    virtual void UnidentifiedVirtual08();
-    virtual void UnidentifiedVirtual0C();
-    virtual void UnidentifiedVirtual10();
-    virtual void UnidentifiedVirtual14();
-    virtual void UnidentifiedVirtual18();
-    virtual void UnidentifiedVirtual1C();
-    virtual void UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24();
-    virtual void UnidentifiedVirtual28();
-    virtual void UnidentifiedVirtual2C();
-    virtual void UnidentifiedVirtual30();
-    virtual int GetFrame();
-
-    u8 mUnidentified004[0x28];
-    float mSimulationTime;
-};
 
 struct UnidentifiedGameStatic
 {
     u8 mUnidentified000[0x0C];
     int mUnidentified00C;
-};
-
-class UnidentifiedFrameProvider
-{
-public:
-    virtual int GetFrame();
-};
-
-struct UnidentifiedNetworkManager
-{
-    UnidentifiedFrameProvider* mFrameProvider;
 };
 
 struct UnidentifiedOnlineState
@@ -124,7 +98,6 @@ struct UnidentifiedRegistrationList
     UnidentifiedRegistrationNode* mHead;
 };
 
-extern "C" UnidentifiedSimulationTimeProvider* fn_8011166C();
 extern "C" EventDispatcher* fn_80111678();
 extern "C" EventDispatcher* fn_800721C4();
 extern "C" bool fn_802B6AF8(
@@ -142,11 +115,7 @@ extern "C" void* fn_800AA060(void* param1, int param2);
 extern "C" void fn_800AF404(void* param1);
 extern "C" void fn_800EDB9C();
 extern "C" void fn_800EDCAC();
-extern "C" void* fn_803330AC();
-extern "C" void fn_80333908(void* param1, const void* param2, u32 size);
 extern "C" bool fn_8001E184(cPlayer* pPlayer);
-extern "C" void* fn_80338950(void* param1);
-extern "C" void fn_8033919C(void* param1, const char* param2);
 extern "C" int fn_80323A58(int param1, char* buffer, u32 size);
 extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
 extern "C" void fn_80038158(cFielder* pFielder, int param2);
@@ -163,7 +132,6 @@ extern "C" void fn_802F4E84(unsigned long* hash, int param2, int param3);
 extern "C" cGame* fn_800570B0(
     cGame* game, void* param1, int param2, bool param3);
 extern "C" cTeam* fn_800A5D4C(cTeam* team, int side);
-extern "C" void fn_80115E60(bool param1);
 extern "C" void fn_800A62E8(cTeam* team, int deleteObject);
 extern "C" void fn_8031A02C(ScriptQuestionCache* cache);
 extern "C" void fn_800ED92C(unsigned long soundID);
@@ -171,12 +139,10 @@ extern "C" void fn_800EC2A4(unsigned long soundID, cGame* game);
 
 extern UnidentifiedGameStatic lbl_8056B9A0;
 extern cPlayer* lbl_806E0C9C;
-extern UnidentifiedNetworkManager* lbl_806E2138;
 extern void* lbl_806E2100;
 extern int lbl_806E2130;
 extern UnidentifiedOnlineState* lbl_806E2164;
 extern BaseGameSceneManager* lbl_806E1860;
-extern void* lbl_806E2168;
 extern AISandbox* lbl_806E0B88;
 extern UnidentifiedRegistrationList lbl_805713E8;
 extern UnidentifiedRegistrationList lbl_80571820;
@@ -212,7 +178,7 @@ static inline int GetUnidentifiedPlayerIndex(cPlayer* pPlayer)
 
 float fn_80056CA4()
 {
-    return 1000.0f * fn_8011166C()->mSimulationTime;
+    return 1000.0f * GetFixedUpdateTask()->mSimulationTime;
 }
 
 float fn_80056CD0()
@@ -265,19 +231,19 @@ void fn_80056CF4(void* param1, int param2, bool param3)
             UnidentifiedCameraEffects;
         UnidentifiedCameraEffects::s_pInstance = memory;
     }
-    if (lbl_806E1628 == 0)
+    if (gpNumberDisplay == 0)
     {
         UnidentifiedNumberDisplay_801AE530* numberDisplay
             = static_cast<UnidentifiedNumberDisplay_801AE530*>(
                 nlMalloc(0x28, 8, false));
         numberDisplay
             = new (numberDisplay) UnidentifiedNumberDisplay_801AE530();
-        lbl_806E1628 = numberDisplay;
+        gpNumberDisplay = numberDisplay;
     }
 
     FormationManager::LoadFormationSets();
     --lbl_806E2130;
-    fn_80115E60(true);
+    SetRenderWorldEffects(true);
     WorldDarkening::Instance().fn_801AF550();
 }
 
@@ -310,10 +276,10 @@ void DestroyGame()
         delete UnidentifiedCameraEffects::Instance();
         UnidentifiedCameraEffects::s_pInstance = 0;
     }
-    if (lbl_806E1628 != 0)
+    if (gpNumberDisplay != 0)
     {
-        delete lbl_806E1628;
-        lbl_806E1628 = 0;
+        delete gpNumberDisplay;
+        gpNumberDisplay = 0;
     }
 
     fn_800A62E8(g_pTeams[0], 1);
@@ -325,7 +291,7 @@ void DestroyGame()
     g_pGame = 0;
 
     FormationManager::UnloadFormationSets();
-    fn_80115E60(true);
+    SetRenderWorldEffects(true);
 }
 
 void DestroyPowerups()
@@ -379,11 +345,11 @@ void cGame::fn_80058180()
 
 void cGame::fn_8005830C()
 {
-    void* output = fn_80338950(lbl_806E2168);
+    DebugWriteCache* output = fn_80338950(lbl_806E2168);
     if (output != 0)
     {
         char buffer[256];
-        int frame = fn_8011166C()->GetFrame();
+        int frame = GetFixedUpdateTask()->GetFrame();
         nlSNPrintf(buffer, sizeof(buffer), lbl_804FB25C, frame);
         fn_8033919C(output, buffer);
         fn_8004F594(16, buffer);
@@ -480,7 +446,7 @@ void cGame::fn_80058528(float timeScale, float transitionTime)
             }
 
             lbl_806E1860->GetScene((SceneList)89)->SetVisible(false);
-            lbl_806E1628->mUnidentified004 = false;
+            gpNumberDisplay->mUnidentified004 = false;
 
             if (transitionTime <= lbl_806E373C)
             {
@@ -834,11 +800,11 @@ void cGame::fn_8005BF50(RunningChecksum* runningChecksum)
 
 void cGame::ChangeGameState(int state)
 {
-    void* output = fn_80338950(lbl_806E2168);
+    DebugWriteCache* output = fn_80338950(lbl_806E2168);
     if (output != 0)
     {
         char buffer[256];
-        int frame = fn_8011166C()->GetFrame();
+        int frame = GetFixedUpdateTask()->GetFrame();
         nlSNPrintf(
             buffer, sizeof(buffer), lbl_804FB66C, m_eGameState, state, frame);
         fn_8033919C(output, buffer);

@@ -121,7 +121,7 @@ extern "C" int fn_802D9950(UnidentifiedRenderObject_801A4188* object,
 extern "C" void fn_802D88F4(
     UnidentifiedRenderObject_801A4188* object)
 {
-    fn_802D911C(fn_802D8BB4(), object, false);
+    fn_802D911C(GetCrowdImpostorManager(), object, false);
 }
 
 extern "C" void fn_802D892C(UnidentifiedRenderObject_801A4188*)
@@ -202,7 +202,7 @@ extern "C" nlMatrix4* fn_802D8BAC(
     return &object->mTransform;
 }
 
-extern "C" UnidentifiedCrowdManager_802D88F4* fn_802D8BB4()
+UnidentifiedCrowdManager_802D88F4* GetCrowdImpostorManager()
 {
     static UnidentifiedCrowdManager_802D88F4 manager;
     return &manager;
@@ -276,7 +276,7 @@ extern "C" void fn_802D93E8(
     {
         UnidentifiedRenderObject_801A4188* object = objectIt.m_Curr->entry;
         UnidentifiedCrowdPointCallback_802D9F64 callback(object);
-        callback.mLayout = fn_802D8BB4()->AllocateLayout();
+        callback.mLayout = GetCrowdImpostorManager()->AllocateLayout();
         callback.mLayout->mObject = object;
         sNumGeneratedCrowdMembers += fn_802D9950(object, &callback,
             sfDistanceBetweenCrowdRows.value,
@@ -382,7 +382,7 @@ extern "C" void fn_802D9CD8(
     ++manager->mNumTweaks;
 }
 
-extern "C" void fn_802D9D00(
+void UpdateCrowdVisibility(
     UnidentifiedCrowdManager_802D88F4* manager, void* view)
 {
     Impostor* impostors = ImpostorManager::GetInstance()->mImpostors;
@@ -428,7 +428,7 @@ extern "C" void fn_802D9D00(
     }
 }
 
-extern "C" void fn_802D9E34(
+void ReleaseCrowdImpostors(
     UnidentifiedCrowdManager_802D88F4* manager)
 {
     Impostor* impostors = ImpostorManager::GetInstance()->mImpostors;
@@ -481,7 +481,7 @@ void UnidentifiedCrowdPointCallback_802D9F64::Place(
     nlMultVectorMatrix(
         worldPoint, localPoint, *mObject->UnidentifiedVirtual10());
 
-    UnidentifiedCrowdManager_802D88F4* manager = fn_802D8BB4();
+    UnidentifiedCrowdManager_802D88F4* manager = GetCrowdImpostorManager();
     nlDLListIterator<UnidentifiedRenderObject_801A4188*> occlusionIt
         = manager->mOcclusionObjects.Begin();
     while (occlusionIt.m_Curr != 0)
@@ -526,7 +526,7 @@ void UnidentifiedCrowdPointCallback_802D9F64::Place(
         sfImpostorWidth.value, sfImpostorHeight.value);
 
     nlDLListIterator<UnidentifiedRenderObject_801A4188*> enabledIt
-        = fn_802D8BB4()->mEnabledObjects.Begin();
+        = GetCrowdImpostorManager()->mEnabledObjects.Begin();
     while (enabledIt.m_Curr != 0)
     {
         if (mObject == enabledIt.m_Curr->entry)

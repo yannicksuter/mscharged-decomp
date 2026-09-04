@@ -6,13 +6,12 @@
 #include "NL/nlDLListContainer.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_802B7798.h"
 #include "unclassified/tu_802BAE84.h"
 
 #include <stdarg.h>
 #include <string.h>
 
-extern "C" GLView* fn_802B77A0();
-extern "C" int fn_802C9CAC(int font);
 extern "C" int fn_802C9CC8(GLView* view);
 
 static nlColour lbl_806DF2C8 = { 0xFF, 0xFF, 0xFF, 0xFF };
@@ -29,10 +28,10 @@ extern "C" int fn_802BAE84(eGLView view, int x, int y, bool flipY,
     char string[128];
     glStateBundle state;
 
-    fn_802C9CAC(font);
+    glFontSetFont(font);
     if (!flipY)
     {
-        y = fn_802C9CC8(fn_802B77A0()) - y;
+        y = fn_802C9CC8(GetDebugFontView()) - y;
     }
 
     nlVSNPrintf(string, sizeof(string), format, args);
@@ -45,7 +44,7 @@ extern "C" int fn_802BAE84(eGLView view, int x, int y, bool flipY,
         float y0 = (float)y;
         float x1 = (float)(x + length);
         float y1 = (float)(y + 1);
-        GLView* renderView = fn_802B77A0();
+        GLView* renderView = GetDebugFontView();
         fn_802BB11C(renderView, backgroundColour,
             x0, y0, x1, y1, 0.0f,
             view - 1, true, true);
@@ -54,7 +53,7 @@ extern "C" int fn_802BAE84(eGLView view, int x, int y, bool flipY,
     glFontBegin(false);
     bool oldVirtualCoordinates = glFontVirtualCoordinates(true);
     int result = glFontPrintf(
-        fn_802B77A0(), view, x, y, textColour, string);
+        GetDebugFontView(), view, x, y, textColour, string);
     glFontEnd();
     glFontVirtualCoordinates(oldVirtualCoordinates);
     glStateRestore(state);

@@ -1,6 +1,7 @@
 #include "Game/Task/TweakerTask.h"
 
 #include "Game/NetworkSession.h"
+#include "unclassified/tu_80338898.h"
 
 #include "types.h"
 
@@ -12,9 +13,6 @@ extern s32 lbl_806DF2F4;
 extern s32 lbl_806DF2F8;
 extern s32 lbl_806DF2FC;
 extern u8 lbl_806E20E4;
-extern void* lbl_806E2168;
-
-extern "C" void fn_80338AE4(void*);
 
 void TweakerTask::Run(float)
 {

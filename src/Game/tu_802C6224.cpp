@@ -196,7 +196,7 @@ extern "C" char* fn_802C6BB0(
         nlClose(file);
     }
 
-    bufferSize += (dataSize == bufferSize) << 5;
+    bufferSize += bufferSize == dataSize ? 0x20 : 0;
     *outSize = dataSize;
 
     if (dataSize != 0)
@@ -250,4 +250,4 @@ bool g_bSupportReloading;
 const char* lbl_806E1E90;
 
 static TweakValueBoolImpl_804F4538 sSupportReloading(
-    "General", "g_bSupportReloading", &g_bSupportReloading, true);
+    "g_bSupportReloading", "General", &g_bSupportReloading, true);

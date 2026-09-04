@@ -5,6 +5,7 @@
 #include "NL/gl/glView.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_802A8A90.h"
+#include "unclassified/tu_8037091C.h"
 
 struct UnidentifiedTargetInfo_8037091C
 {
@@ -73,7 +74,7 @@ extern "C" void fn_803709C4(
     view->AttachModel(secondModel, 0);
 }
 
-extern "C" void fn_80370ADC(GLView* view)
+void RenderShadowVolumeBlend(GLView* view)
 {
     static u32 texture_806E2410 = glGetTexture(sString_805356F0);
 

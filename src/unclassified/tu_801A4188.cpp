@@ -3,6 +3,7 @@
 #include "Game/DB/CharacterInfo.h"
 #include "Game/GameInfo.h"
 #include "Game/Render/ImpostorManager.h"
+#include "Game/Render/RLView.h"
 #include "Game/Render/tu_802D88F4.h"
 #include "Game/TweakRegistry.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -236,11 +237,10 @@ static CrowdModelCollection_801A4188 lbl_805721E8;
 
 extern "C" void fn_802C6CAC(
     const char* fileName, const char* category, bool reload);
-extern "C" void* fn_8027267C(int index);
 extern "C" void fn_801A49E4(u32 hash, unsigned long texture);
 extern "C" void fn_801A51D8();
 
-extern "C" void fn_801A4188()
+void UpdateImpostorPositions()
 {
     nlVector3 viewVector;
     nlVector3 upVector = { 0.0f, 0.0f, 1.0f };
@@ -322,7 +322,7 @@ extern "C" void fn_801A43E0(bool alternateView)
         viewConfig = &lbl_80514028;
     }
     ImpostorManager::GetInstance()->Initialize(
-        fn_8027267C(0), crowdMax, viewConfig, 2, false);
+        GetLayerView(eCLV_ImpostorTexture), crowdMax, viewConfig, 2, false);
     ImpostorManager::GetInstance()->SetImpostorSizeScale(lbl_806E5124);
 
     int budget = 20000 / lbl_806E15A0;
@@ -341,7 +341,7 @@ extern "C" void fn_801A43E0(bool alternateView)
                 lbl_806E1588.data[i],
                 (void*)lbl_806DCF74, budget, 4, 2, &params);
         lbl_806E1590.data[i] = character;
-        fn_802D932C(fn_802D8BB4(), character);
+        fn_802D932C(GetCrowdImpostorManager(), character);
     }
 
     lbl_806E15AD = false;
@@ -369,8 +369,8 @@ extern "C" void fn_801A43E0(bool alternateView)
     fn_801A49E4(nlStringLowerHash(lbl_8051409C), cluster);
     fn_801A49E4(nlStringLowerHash(lbl_805140B8), cluster);
 
-    fn_802D93E8(fn_802D8BB4(), 0);
-    fn_802D9CD8(fn_802D8BB4(), lbl_806E15A8);
+    fn_802D93E8(GetCrowdImpostorManager(), 0);
+    fn_802D9CD8(GetCrowdImpostorManager(), lbl_806E15A8);
     fn_801A51D8();
     ImpostorManager::GetInstance()->StaggerAnimations();
 }
@@ -386,7 +386,7 @@ extern "C" void fn_801A4734()
     lbl_806E15A0 = 0;
 
     delete lbl_806E15B0;
-    fn_802D9708(fn_802D8BB4());
+    fn_802D9708(GetCrowdImpostorManager());
     ImpostorManager::GetInstance()->Uninitialize();
 
     if (lbl_806E1580 != 0)
@@ -424,7 +424,7 @@ extern "C" void fn_801A48A8()
     lbl_806E1580->mUnidentified068 = distance;
     lbl_806E1580->mUnidentified06C = zero;
     lbl_806E1580->SetTransform(transform);
-    fn_802D911C(fn_802D8BB4(), lbl_806E1580, 1);
+    fn_802D911C(GetCrowdImpostorManager(), lbl_806E1580, 1);
     delete stadiumOwner;
 }
 

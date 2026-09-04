@@ -30,7 +30,6 @@ extern "C" bool fn_800344B0(cFielder*);
 extern "C" bool fn_8003C180(cPlayer*);
 extern "C" bool fn_8003E74C(cFielder*);
 extern "C" float fn_80111D3C();
-extern "C" FixedUpdateTask* fn_8011166C();
 
 extern "C" UnidentifiedTypedEvent<UnidentifiedEventData_80066748>*
     fn_80023350(const char*, int);
@@ -450,7 +449,7 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
 {
     if (mUseRealTime == true)
     {
-        mTransitionTime -= deltaTime * fn_8011166C()->GetTimeScale();
+        mTransitionTime -= deltaTime * GetFixedUpdateTask()->GetTimeScale();
     }
     else
     {

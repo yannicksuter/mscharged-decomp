@@ -11,6 +11,8 @@ extern "C"
 
 #define DWC_GP_PROCESS_INTERVAL 300
 #define DWC_FRIEND_UPDATE_WAIT_COUNT 7
+#define DWC_GP_SSTR_KEY_MATCH_SC_MAX "SCM"
+#define DWC_GP_SSTR_KEY_MATCH_SC_NUM "SCN"
 #define DWC_GP_STATUS_NO_CHANGE -1
 
     typedef void (*DWCBuddyFriendCallback)(int index, void* param);
@@ -47,6 +49,21 @@ extern "C"
         DWC_PERS_STATE_NUM
     };
 
+    enum
+    {
+        DWC_STATUS_OFFLINE,
+        DWC_STATUS_ONLINE,
+        DWC_STATUS_PLAYING,
+        DWC_STATUS_MATCH_ANYBODY,
+        DWC_STATUS_MATCH_FRIEND,
+        DWC_STATUS_MATCH_SC_CL,
+        DWC_STATUS_MATCH_SC_SV,
+        DWC_STATUS_NUM
+    };
+
+    u8 DWC_GetFriendStatus(const DWCFriendData* friendData, char* statusString);
+    u8 DWC_GetFriendStatusSC(const DWCFriendData* friendData, u8* maxEntry,
+        u8* numEntry, char* statusString);
     BOOL DWC_SetOwnStatusData(const char* statusData, u32 size);
     void DWC_DeleteBuddyFriendData(DWCFriendData* friendData);
     BOOL DWC_SetBuddyFriendCallback(DWCBuddyFriendCallback callback, void* param);

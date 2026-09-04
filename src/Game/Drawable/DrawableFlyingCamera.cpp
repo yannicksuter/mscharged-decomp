@@ -34,7 +34,6 @@ struct UnidentifiedStaticTag;
 
 extern "C"
 {
-    void* fn_8027267C(int);
     RenderObject* fn_80276360(int, int);
 }
 

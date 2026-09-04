@@ -1,5 +1,7 @@
 #include "Game/main.h"
 
+#include "Game/Task/FixedUpdateTask.h"
+
 #include "Game/Task/BeginFrameTask.h"
 #include "Game/Task/ComUpdateTask.h"
 #include "Game/DB/StadiumInfo.h"
@@ -105,7 +107,6 @@ extern "C"
     void fn_802E22D8(void*, float*, void*, void*, int, int, int);
     void fn_802A8278(void*, int, int, void*);
     void fn_802A1344(void*, int, int, void*);
-    nlTask* fn_8011166C();
     nlTask* fn_803733D4();
 
     void fn_801BFB08();
@@ -113,7 +114,6 @@ extern "C"
     void fn_8013D7E0();
     void fn_802C0F24();
     void fn_80369574();
-    void fn_80115504();
     void fn_803768F8();
     void fn_803730D8();
     void fn_80272AB4();
@@ -156,7 +156,7 @@ static u32 sPlatformFileSystemConfig[6] = { 4, 0, 3, 0, 0, 0 };
 
 static u32 sCountryCode;
 GameAudio_800EB6AC* g_pGameAudio;
-bool lbl_806E1090;
+bool g_e3_Build;
 bool lbl_806E1091;
 nlLocalization::nlLanguage g_Language;
 static u32 sLastVirtualFreeDelta;
@@ -182,12 +182,12 @@ static bool sWarbleTextureCached;
 FrameCounter g_FrameCounter("frame", "send");
 
 static TweakValueBoolImpl_804F4538 sDisableWriteOutTweak(
-    "/General", "g_bDisableWriteOut", &g_bDisableWriteOut, false);
+    "g_bDisableWriteOut", "/General", &g_bDisableWriteOut, false);
 static TweakValueBoolImpl_804F4538 sMemoryLowWaterMarkCheckingTweak(
-    "/General", "g_bActivateMemoryLowWaterMarkChecking",
+    "g_bActivateMemoryLowWaterMarkChecking", "/General",
     &g_bActivateMemoryLowWaterMarkChecking, false);
 static TweakValueBoolImpl_804F4538 sPrintMemoryLowWaterMarksTweak(
-    "/General", "g_bPrintMemoryNewLowWaterMarks",
+    "g_bPrintMemoryNewLowWaterMarks", "/General",
     &g_bPrintMemoryNewLowWaterMarks, false);
 
 static ComUpdateTask comUpdateTask;
@@ -449,14 +449,14 @@ static void Initialize()
         fn_8011C610(buildInfo);
     }
 
-    fn_802E75F4();
+    GetEmissionManager();
     fn_802E9E0C(1, 250);
     fn_802E9E9C(3, "Character", 250);
     fn_802E9E9C(2, "StadiumEffects", 250);
 
     nlTaskManager::Startup(0x10000);
     sLoadingTask.Start();
-    fn_80115504();
+    InstallImageRenderCallback();
     g_pGameAudio = new (nlMalloc(sizeof(GameAudio_800EB6AC), 8, false))
         GameAudio_800EB6AC;
     g_pGameAudio->Initialize();
@@ -480,7 +480,7 @@ static void AddTasks()
     nlTaskManager::AddTask(&sLoadingTask, 2, 0x01F80000);
     nlTaskManager::AddTask(gDispatchEventsTask, 0x18, 0xFE07FFFF);
     nlTaskManager::AddTask(&platPadUpdateTask, 5, (u32)-1);
-    nlTaskManager::AddTask(fn_8011166C(), 8, 0xFE07FFDF);
+    nlTaskManager::AddTask(GetFixedUpdateTask(), 8, 0xFE07FFDF);
     nlTaskManager::AddTask(&worldUpdateTask, 9, 0x0002001B);
     nlTaskManager::AddTask(&gameRenderTask, 11, 0x0002001B);
     nlTaskManager::AddTask(&movieRenderTask, 11, (u32)-1);

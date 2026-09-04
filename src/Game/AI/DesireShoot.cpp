@@ -5,16 +5,10 @@
 #include "Game/AI/ShotMeter.h"
 #include "Game/Ball.h"
 #include "Game/CharacterTweaks.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Player.h"
 #include "NL/nlString.h"
 #include <stddef.h>
-
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
 
 struct UnidentifiedDesireMachine
 {
@@ -22,16 +16,6 @@ struct UnidentifiedDesireMachine
     void* mUnidentified018;
 };
 
-extern "C" DebugFieldType lbl_80533C98[];
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" unsigned short fn_80338EBC(
-    DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
 extern "C" int fn_8002E9D0(cFielder*);
 extern "C" bool fn_8002F858(cFielder*, bool);
 extern "C" bool fn_8003C180(cFielder*);

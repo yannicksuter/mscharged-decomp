@@ -28,6 +28,7 @@ bool ShouldShadowBeUpdated(const ProjectedShadowParams& params);
 void RenderCharacterIntoTexture(const ProjectedShadowParams& params);
 void RenderProjectedShadow(const ProjectedShadowParams& params);
 
-extern "C" RLView* fn_80184AE8(RLView* view);
+RLView* SetCharacterShadowView(RLView* view);
+void ClearCharacterShadowsUpdated();
 
 #endif // GAME_RENDER_RENDERSHADOW_H

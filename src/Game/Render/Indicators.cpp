@@ -1,5 +1,7 @@
 #include "Game/Render/Indicators.h"
 
+#include "Game/Render/RLView.h"
+
 #include "Game/AI/AiUtil.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/DB/CharacterInfo.h"
@@ -18,18 +20,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
 #include "types.h"
-
-struct IndicatorPadOwner
-{
-    /* 0x00 */ UnidentifiedNetworkPeer* mPeer;
-    /* 0x04 */ s8 mPadIndex;
-};
-
-struct IndicatorGlobalPadState
-{
-    /* 0x00 */ u8 mUnidentified00[0x40];
-    /* 0x40 */ IndicatorPadOwner* mOwner;
-};
+#include "unclassified/tu_80336B2C.h"
 
 struct IndicatorControllerInfo
 {
@@ -66,14 +57,10 @@ extern "C"
     bool fn_8001E184(cPlayer* pCharacter);
     bool fn_800387CC(cPlayer* pCharacter);
     IndicatorPlayerTweaks* fn_8003E6E4(cPlayer* pCharacter);
-    GLView* fn_8027267C(int index);
     void fn_802CE528(GLView* view, const nlVector3* world, nlVector3* projected);
     void fn_802CE6DC(GLView* view, const nlVector3* normalized, nlVector3* screen);
     float fn_802CE76C(GLView* view);
     void fn_802CEA40(GLView* source, GLView* destination, const nlVector3* world, nlVector3* projected);
-    IndicatorPadOwner* fn_80336B6C(UnidentifiedNetworkPeer* peer, int index);
-    IndicatorControllerInfo* fn_80336D90(IndicatorPadOwner* owner);
-    UnidentifiedNetworkPeer* fn_80338C0C(UnidentifiedNetworkSession* session);
 }
 
 static float s_fOverheadSize = 35.0f;
@@ -175,7 +162,7 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
 {
     if (fn_80338BF0(lbl_806E20D8) > 1)
     {
-        cGlobalPad* pGlobalPad = pCharacter->GetGlobalPad();
+        DetInput* pGlobalPad = pCharacter->GetGlobalPad();
         if (pGlobalPad == 0)
         {
             *pSameMachine = false;
@@ -183,14 +170,14 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
         }
 
         UnidentifiedNetworkPeer* pPeer = fn_80338C0C(lbl_806E20D8);
-        IndicatorPadOwner* pOwner
-            = ((IndicatorGlobalPadState*)pGlobalPad)->mOwner;
+        UnidentifiedNetworkPeerChannel* pOwner
+            = (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser;
         int index = -1;
 
         if (pOwner->mPeer == pPeer)
         {
             *pSameMachine = true;
-            index = fn_80336D90(pOwner)->mPadIndex;
+            index = ((IndicatorControllerInfo*)fn_80336D90(pOwner))->mPadIndex;
         }
         else
         {
@@ -198,7 +185,10 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
             bool used[4] = { false, false, false, false };
             for (int i = 0; i < (int)pPeer->mUnidentified004; ++i)
             {
-                used[fn_80336D90(fn_80336B6C(pPeer, i))->mPadIndex] = true;
+                used[((IndicatorControllerInfo*)fn_80336D90(
+                    fn_80336B6C(pPeer, i)))
+                         ->mPadIndex]
+                    = true;
             }
 
             int available[4] = { -1, -1, -1, -1 };
@@ -220,19 +210,19 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
                 available[3] = next;
             }
 
-            if (pOwner->mPadIndex == available[0])
+            if (pOwner->mChannelIndex == available[0])
             {
                 index = 0;
             }
-            else if (pOwner->mPadIndex == available[1])
+            else if (pOwner->mChannelIndex == available[1])
             {
                 index = 1;
             }
-            else if (pOwner->mPadIndex == available[2])
+            else if (pOwner->mChannelIndex == available[2])
             {
                 index = 2;
             }
-            else if (pOwner->mPadIndex == available[3])
+            else if (pOwner->mChannelIndex == available[3])
             {
                 index = 3;
             }
@@ -289,7 +279,7 @@ static void DrawIndicator(int xCentre, int yCentre, float fPixelWidth,
         }
 
         poly.depth = -0.5f;
-        poly.Attach(fn_8027267C(39), 0, 0);
+        poly.Attach(GetLayerView(eCLV_UnsortedSquareOrtho), 0, 0);
     }
 }
 
@@ -308,7 +298,7 @@ static inline unsigned long GetCharacterGlowTexID(
 static void DrawOffscreenIndicator(const nlVector3& v3NormalizedScreenPos,
     IndicatorInfo* pInfo, cPlayer* pCharacter)
 {
-    GLView* pView = fn_8027267C(39);
+    GLView* pView = GetLayerView(eCLV_UnsortedSquareOrtho);
     float screenLimitX = fn_802CE76C(pView);
     float screenLimitY = fn_802CE76C(pView);
     float screenPosX = v3NormalizedScreenPos.x;
@@ -377,7 +367,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
         }
 
         nlVector3 projectedPos;
-        fn_802CE528(fn_8027267C(8), &worldPos, &projectedPos);
+        fn_802CE528(GetLayerView(eCLV_Unshadowed), &worldPos, &projectedPos);
         ((IndicatorPlayerState*)pCharacter)->mScreenPosition = projectedPos;
 
         bool sameMachine = false;
@@ -414,7 +404,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
             }
 
             fn_802CE6DC(
-                fn_8027267C(39), &projectedPos, &projectedPos);
+                GetLayerView(eCLV_UnsortedSquareOrtho), &projectedPos, &projectedPos);
             DrawOffscreenIndicator(
                 projectedPos, &indicatorInfo[i], pCharacter);
         }
@@ -479,7 +469,7 @@ static void UpdateAndRenderPlayerIndicators(float)
 
         nlColour colour = GetIndicatorColour(pCharacter);
         nlVector3 v3ScreenPosition;
-        fn_802CEA40(fn_8027267C(8), fn_8027267C(39), &v3Position,
+        fn_802CEA40(GetLayerView(eCLV_Unshadowed), GetLayerView(eCLV_UnsortedSquareOrtho), &v3Position,
             &v3ScreenPosition);
         v3ScreenPosition.y -= lbl_806DCEF0;
 

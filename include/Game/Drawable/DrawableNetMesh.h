@@ -36,4 +36,10 @@ public:
     char _01E[2];
 };
 
+
+class GLView;
+
+extern GLView* g_pNetMeshView;
+extern u32 g_NetMeshInvisiblePlaneView;
+
 #endif // _DRAWABLENETMESH_H_

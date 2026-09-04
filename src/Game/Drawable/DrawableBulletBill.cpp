@@ -1,5 +1,7 @@
 #include "Game/Drawable/DrawableCharacter.h"
 
+#include "Game/Render/RLView.h"
+
 #include "Game/BasicStadium.h"
 #include "Game/BulletBill.h"
 #include "Game/Drawable/DrawableBulletBill.h"
@@ -16,7 +18,6 @@
 
 extern "C"
 {
-    void* fn_8027267C(int);
 }
 
 static float gShadowAlphaScale = 0.4f;
@@ -174,7 +175,7 @@ void DrawableBulletBill::Render(const BulletBillObject* object) const
     matrix.SetRow4_(3, mPosition.x, mPosition.y, mPosition.z, 1.0f);
 
     drawable->SetWorldMatrix(&matrix);
-    drawable->V8(fn_8027267C(13));
+    drawable->V8(GetLayerView(eCLV_MoreCharacters));
 
     DrawShadow(matrix, gShadowAlphaScale);
 }

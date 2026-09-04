@@ -3,29 +3,13 @@
 #include "Game/AI/Fielder.h"
 #include <stddef.h>
 #include "Game/AI/SpaceSearch.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Field.h"
 #include "Game/Player.h"
 #include "NL/nlMemory.h"
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-extern "C" DebugFieldType lbl_80533C98[];
 extern "C" void fn_800401C0(
     cFielder*, const nlVector3&, float, float);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" unsigned short fn_80338EBC(
-    DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
 
 extern bool lbl_806E0E50;
 

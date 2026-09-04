@@ -12,8 +12,8 @@ void fn_8037537C(void*);
 
 extern void* lbl_806E1E28;
 extern void* lbl_806E2478;
-extern u8 lbl_806E1090;
-extern u8 lbl_806E0FFC;
+extern bool g_e3_Build;
+extern bool g_bE3IdleReset;
 
 void LoadingTask::Start()
 {
@@ -74,7 +74,7 @@ void LoadingTask::StateTransition(u32 from, u32 to)
 
     if (to == 0x00400000 && from != 0x02000000)
     {
-        if (lbl_806E1090 && lbl_806E0FFC)
+        if (g_e3_Build && g_bE3IdleReset)
         {
             fn_80119184(fn_80118A74());
         }

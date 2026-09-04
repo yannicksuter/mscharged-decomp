@@ -27,6 +27,7 @@ struct AudioParameter_802F1A70
     u8 m_Unknown00[0xC];
     float m_Value;
     float m_Time;
+    u8 m_Unknown14[0x4];
     float m_Min;
     float m_Max;
 };

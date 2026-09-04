@@ -15,6 +15,9 @@
 #include "NL/nlMemory.h"
 #include "types.h"
 #include "Game/DB/StadiumInfo.h"
+#include "unclassified/tu_80332DC0.h"
+#include "unclassified/tu_80336B2C.h"
+#include "unclassified/tu_80338898.h"
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
@@ -38,7 +41,6 @@ static MemoryAllocator s_NetworkAllocator;
 
 extern "C" u32 fn_8032C830(void* codec, void* message, void* buffer, int size);
 extern "C" int fn_8004F594(int channel, const char* format, ...);
-extern "C" void fn_80338C2C(UnidentifiedNetworkSession* session, int, int);
 extern "C" u32 fn_803236CC();
 extern "C" int fn_8025BD88();
 extern "C" int fn_802C2C84(const char* path, int);
@@ -102,34 +104,6 @@ extern int lbl_80507070[][2];
 #include "Game/BaseGameSceneManager.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/Game.h"
-
-// Networked game bookkeeping owned by the 0x80336xxx translation unit.
-struct UnidentifiedNetGameState
-{
-    /* 0x00 */ u8 mUnidentified00;
-    /* 0x01 */ u8 mUnidentified01[0x2];
-    /* 0x03 */ u8 mUnidentified03;
-    /* 0x04 */ u8 mUnidentified04;
-    /* 0x05 */ u8 mUnidentified05[0xC7];
-    /* 0xCC */ u8 mUnidentifiedCC[0x4];
-    /* 0xD0 */ void* mUnidentifiedD0;
-    /* 0xD4 */ u32 mUnidentifiedD4;
-};
-
-class UnidentifiedInputRouter
-{
-public:
-    virtual void RouterVirtual00();
-    virtual void RouterVirtual04(int);
-    virtual void RouterVirtual08();
-    virtual void RouterVirtual0C();
-    virtual void RouterVirtual10();
-    virtual void RouterVirtual14();
-    virtual void RouterVirtual18();
-    virtual void RouterVirtual1C();
-    virtual void RouterVirtual20(int machine, void* data);
-    virtual void RouterVirtual24(int machine, void* data);
-};
 
 extern "C" void* fn_802B1C4C(unsigned long size);
 extern "C" void fn_802B1D4C(void* p, unsigned long size);
@@ -223,34 +197,16 @@ static inline void RegisterNetworkAction(
     registry->Register(handle, slot, -1);
 }
 
-extern UnidentifiedNetGameState* lbl_806E2164;
-extern void* lbl_806E2168;
-extern void* lbl_806E2138;
 extern BaseGameSceneManager* lbl_806E1838;
 extern TLComponentInstance* lbl_80578450[4];
 
 extern "C" void fn_802B2E8C(u32* handle);
-extern "C" void fn_80332EC0(u32 seed);
-extern "C" void fn_80332EC8(u32);
-extern "C" UnidentifiedInputRouter* fn_803330AC();
-extern "C" s8 fn_80336F68(s8 player, s8 machine);
-extern "C" void fn_80337FF0(UnidentifiedNetGameState*, int);
-extern "C" void fn_80338900(void*, int);
-extern "C" void fn_8033288C(void*);
-extern "C" void fn_80338AD8(void*, s8 machine, int count);
-extern "C" void fn_803380F4(UnidentifiedNetGameState*, s8 machine, int count, u32 seed, void* config, int size);
-extern "C" int fn_80338284();
-extern "C" UnidentifiedNetworkPeer* fn_80338BF8(UnidentifiedNetworkSession*, int);
 extern "C" u32 fn_80111688(void*);
-extern "C" void* fn_8011166C();
+void* GetFixedUpdateTask();
 extern "C" void fn_801CBCE4(u32, int);
 extern "C" void fn_8026E338(BaseSceneHandler*, UnidentifiedNetworkMessage*);
 extern "C" void fn_8026F7F8(BaseSceneHandler*, UnidentifiedNetworkMessage*);
 extern "C" void fn_8026FF28(BaseSceneHandler*, UnidentifiedNetworkMessage*);
-extern "C" int fn_80336B6C(UnidentifiedNetworkPeer*, int);
-extern "C" void fn_80336BE0(UnidentifiedNetworkPeer*);
-extern "C" void fn_80336D50(int, UnidentifiedNetworkPeer*, s8, int);
-
 static inline void PushAllocator(MemoryAllocator* pAllocator)
 {
     CurrentAllocator = pAllocator;
@@ -1847,7 +1803,7 @@ extern int lbl_806DE668[2];
 
 static inline void NotifyGameStarted(UnidentifiedNetworkSession* session)
 {
-    void* state = lbl_806E2168;
+    UnidentifiedNetworkSyncState* state = lbl_806E2168;
     int count = fn_80338BF0(session);
     fn_80338AD8(state, (s8)fn_80338C20(session), count);
 }
@@ -1857,7 +1813,7 @@ static inline void RecordGameConfig(
     UnidentifiedGameConfig* config)
 {
     UnidentifiedNetGameState* state = lbl_806E2164;
-    if (state->mUnidentified00 != 0)
+    if (state->mRecordingEnabled != 0)
     {
         int count = fn_80338BF0(session);
         fn_803380F4(
@@ -1940,15 +1896,16 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
     switch ((u8)message->GetType())
     {
     case 0xD:
-        if (lbl_806E2164->mUnidentified03 != 0)
+        if (lbl_806E2164->mPlaybackEnabled != 0)
         {
             // Retail re-evaluates the playback flag inside the branch,
             // matching an inlined predicate called twice.
-            if (lbl_806E2164->mUnidentified03 != 0 && fn_80338284())
+            if (lbl_806E2164->mPlaybackEnabled != 0
+                && fn_80338284(lbl_806E2164))
             {
             UnidentifiedGameStartInfo* info =
-                (UnidentifiedGameStartInfo*)lbl_806E2164->mUnidentifiedCC;
-            fn_80332EC0(lbl_806E2164->mUnidentifiedD4);
+                (UnidentifiedGameStartInfo*)&lbl_806E2164->mConfigSize;
+            fn_80332EC0(lbl_806E2164->mRandomSeed);
             UnidentifiedGameConfig* config = info->mConfig;
             fn_80122748(config);
             fn_8004F594(
@@ -1968,9 +1925,9 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
                 config->mSettings[1] == 0 ? "Timed" : "Goals",
                 config->mSettings[2], config->mSettings[3],
                 config->mSettings[4]);
-            fn_803330AC()->RouterVirtual04(0);
+            fn_803330AC()->Reset(0);
             lbl_806E20D8->BaseVirtual3C(info);
-            void* state = lbl_806E2168;
+            UnidentifiedNetworkSyncState* state = lbl_806E2168;
             int count = fn_80338BF0(lbl_806E20D8);
             fn_80338AD8(state, (s8)fn_80338C20(lbl_806E20D8), count);
             }
@@ -2076,7 +2033,7 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
 
     case 0x0:
     case 0x1:
-        if (lbl_806E2164->mUnidentified03 != 0)
+        if (lbl_806E2164->mPlaybackEnabled != 0)
         {
             break;
         }
@@ -2098,18 +2055,21 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
         }
         if ((u8)message->GetType() == 0)
         {
-            fn_803330AC()->RouterVirtual20(machine, message);
+            fn_803330AC()->RouterVirtual28(
+                machine, (NetworkMessageType0_80533B7C*)message);
         }
         else
         {
-            fn_803330AC()->RouterVirtual20(machine, (u8*)message + 0x8);
-            fn_803330AC()->RouterVirtual20(machine, (u8*)message + 0xF8);
+            NetworkMessageType1_80533B68* bundled =
+                (NetworkMessageType1_80533B68*)message;
+            fn_803330AC()->RouterVirtual28(machine, &bundled->mMessage0);
+            fn_803330AC()->RouterVirtual28(machine, &bundled->mMessage1);
         }
         break;
 
     case 0x8:
     case 0x9:
-        if (lbl_806E2164->mUnidentified03 != 0)
+        if (lbl_806E2164->mPlaybackEnabled != 0)
         {
             break;
         }
@@ -2131,12 +2091,15 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
         }
         if ((u8)message->GetType() == 8)
         {
-            fn_803330AC()->RouterVirtual24(machine, message);
+            fn_803330AC()->RouterVirtual2C(
+                machine, (NetworkMessageType8_80533BA4*)message);
         }
         else
         {
-            fn_803330AC()->RouterVirtual24(machine, (u8*)message + 0x8);
-            fn_803330AC()->RouterVirtual24(machine, (u8*)message + 0x3E0);
+            NetworkMessageType9_80533B90* bundled =
+                (NetworkMessageType9_80533B90*)message;
+            fn_803330AC()->RouterVirtual2C(machine, &bundled->mMessage0);
+            fn_803330AC()->RouterVirtual2C(machine, &bundled->mMessage1);
         }
         break;
 
@@ -2399,7 +2362,7 @@ void UnidentifiedNetworkSession::BaseVirtual44(NetMessageGameStart* message)
         0x10, "StartNetworkedGame: Random seed %x NumMachines:%d "
               "MyMachineID:%d\n",
         seed, mUnidentified0000, mUnidentified2424);
-    fn_803330AC()->RouterVirtual04(0);
+    fn_803330AC()->Reset(0);
     NotifyGameStarted(this);
 
     UnidentifiedGameConfig config;
@@ -2430,12 +2393,13 @@ void UnidentifiedNetworkSession::fn_80122C84()
 {
     fn_8004F594(
         0x10, "Rematching network game.  End Frame is %d\n",
-        ((UnidentifiedFrameController*)fn_8011166C())->GetEndFrame());
-    fn_80332EC8(fn_80111688(fn_8011166C()));
+        ((UnidentifiedFrameController*)GetFixedUpdateTask())->GetEndFrame());
+    fn_80111688(GetFixedUpdateTask());
+    fn_80332EC8();
     fn_80337FF0(lbl_806E2164, 0);
     fn_80338900(lbl_806E2168, 0);
-    fn_803330AC()->RouterVirtual04(0);
-    fn_8033288C(lbl_806E2138);
+    fn_803330AC()->Reset(0);
+    lbl_806E2138->fn_8033288C();
 
     mUnidentified247C = mUnidentified247C + 1;
     u32 seed;
@@ -2458,23 +2422,24 @@ void UnidentifiedNetworkSession::fn_80122C84()
 
 extern "C" void fn_80122DCC()
 {
-    fn_80332EC8(fn_80111688(fn_8011166C()));
+    fn_80111688(GetFixedUpdateTask());
+    fn_80332EC8();
     fn_80337FF0(lbl_806E2164, 0);
     fn_80338900(lbl_806E2168, 0);
-    fn_803330AC()->RouterVirtual04(0);
-    fn_8033288C(lbl_806E2138);
+    fn_803330AC()->Reset(0);
+    lbl_806E2138->fn_8033288C();
 
     u32 seed = fn_803236CC();
     fn_80332EC0(seed);
 
-    void* state = lbl_806E2168;
+    UnidentifiedNetworkSyncState* state = lbl_806E2168;
     int count = fn_80338BF0(lbl_806E20D8);
     fn_80338AD8(state, (s8)fn_80338C20(lbl_806E20D8), count);
 
     UnidentifiedGameConfig config;
     fn_80122650(&config);
     UnidentifiedNetGameState* record = lbl_806E2164;
-    if (record->mUnidentified00 != 0)
+    if (record->mRecordingEnabled != 0)
     {
         int machines = fn_80338BF0(lbl_806E20D8);
         fn_803380F4(
@@ -2500,16 +2465,16 @@ extern "C" void fn_80122EC0()
     fn_80332EC0(seed);
     fn_8004F594(
         0x10, "StartSinglePlayerGame: Set random seed to %x\n", seed);
-    fn_803330AC()->RouterVirtual04(0);
+    fn_803330AC()->Reset(0);
 
-    void* state = lbl_806E2168;
+    UnidentifiedNetworkSyncState* state = lbl_806E2168;
     int count = fn_80338BF0(lbl_806E20D8);
     fn_80338AD8(state, (s8)fn_80338C20(lbl_806E20D8), count);
 
     UnidentifiedGameConfig config;
     fn_80122650(&config);
     UnidentifiedNetGameState* record = lbl_806E2164;
-    if (record->mUnidentified00 != 0)
+    if (record->mRecordingEnabled != 0)
     {
         int machines = fn_80338BF0(lbl_806E20D8);
         fn_803380F4(
@@ -2520,18 +2485,18 @@ extern "C" void fn_80122EC0()
 
 extern "C" void fn_8012300C()
 {
-    if (lbl_806E2164->mUnidentified03 == 0)
+    if (lbl_806E2164->mPlaybackEnabled == 0)
     {
         return;
     }
-    if (!fn_80338284())
+    if (!fn_80338284(lbl_806E2164))
     {
         return;
     }
 
     UnidentifiedGameStartInfo* info =
-        (UnidentifiedGameStartInfo*)lbl_806E2164->mUnidentifiedCC;
-    fn_80332EC0(lbl_806E2164->mUnidentifiedD4);
+        (UnidentifiedGameStartInfo*)&lbl_806E2164->mConfigSize;
+    fn_80332EC0(lbl_806E2164->mRandomSeed);
     UnidentifiedGameConfig* config = info->mConfig;
     fn_80122748(config);
     fn_8004F594(
@@ -2550,9 +2515,9 @@ extern "C" void fn_8012300C()
         config->mSettings[0],
         config->mSettings[1] == 0 ? "Timed" : "Goals",
         config->mSettings[2], config->mSettings[3], config->mSettings[4]);
-    fn_803330AC()->RouterVirtual04(0);
+    fn_803330AC()->Reset(0);
     lbl_806E20D8->BaseVirtual3C(info);
-    void* state = lbl_806E2168;
+    UnidentifiedNetworkSyncState* state = lbl_806E2168;
     int count = fn_80338BF0(lbl_806E20D8);
     fn_80338AD8(state, (s8)fn_80338C20(lbl_806E20D8), count);
 }
@@ -2622,7 +2587,7 @@ int UnidentifiedNetworkSession::fn_80123314()
     {
         return 0;
     }
-    return lbl_806E2164->mUnidentified04 == 0;
+    return lbl_806E2164->mPlaybackReady == 0;
 }
 
 int UnidentifiedNetworkSession::fn_80123360()
@@ -2730,7 +2695,7 @@ void UnidentifiedNetworkSession::fn_80123A08()
     }
     else
     {
-        ready = lbl_806E2164->mUnidentified04 == 0;
+        ready = lbl_806E2164->mPlaybackReady == 0;
     }
 
     if (ready == 0)
@@ -2942,7 +2907,7 @@ struct UnidentifiedStaticStorage
 struct UnidentifiedStaticTag;
 
 static TweakValueBoolImpl_804F4538 s_NoPopupNetworkErrorTweak(
-    "Network", "g_bNoPopupNetworkError", &lbl_806E10E8, true);
+    "g_bNoPopupNetworkError", "Network", &lbl_806E10E8, true);
 
 template <typename T>
 UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;

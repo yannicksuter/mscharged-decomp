@@ -1,17 +1,12 @@
 #include <dwc/dwc_common.h>
 
-#include <gamespy/GP/gp.h>
 #include <revolution/os/OSTime.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-
-#define DWC_STATUS_MATCH_SC_SV 6
 
 u64 lbl_806C9888[3];
 
 int NETGetWirelessMacAddress(void* data);
-BOOL fn_8048B76C(const DWCFriendData* friendData, GPBuddyStatus* buddyStatus);
 
 int DWC_SetCommonKeyValueString(const char* key, const char* value,
     char* string, char separator)
@@ -115,72 +110,4 @@ int fn_8048A504(const u16* string)
         length++;
     }
     return length;
-}
-
-u8 DWC_GetFriendStatus(const DWCFriendData* friendData, char* statusString)
-{
-    return DWC_GetFriendStatusSC(friendData, NULL, NULL, statusString);
-}
-
-u8 DWC_GetFriendStatusSC(const DWCFriendData* friendData, u8* maxEntry,
-    u8* numEntry, char* statusString)
-{
-    char value[8];
-    GPBuddyStatus buddyStatus;
-
-    if (fn_8048B76C(friendData, &buddyStatus))
-    {
-        if (buddyStatus.status == DWC_STATUS_MATCH_SC_SV)
-        {
-            if (maxEntry != NULL)
-            {
-                if (DWC_GetCommonValueString("SCM", value, buddyStatus.statusString, '/') > 0)
-                {
-                    *maxEntry = strtol(value, NULL, 10);
-                }
-                else
-                {
-                    *maxEntry = 0;
-                }
-            }
-            if (numEntry != NULL)
-            {
-                if (DWC_GetCommonValueString("SCN", value, buddyStatus.statusString, '/') > 0)
-                {
-                    *numEntry = strtol(value, NULL, 10);
-                }
-                else
-                {
-                    *numEntry = 0;
-                }
-            }
-        }
-        else
-        {
-            if (maxEntry != NULL)
-            {
-                *maxEntry = 0;
-            }
-            if (numEntry != NULL)
-            {
-                *numEntry = 0;
-            }
-        }
-
-        if (statusString != NULL)
-        {
-            strcpy(statusString, buddyStatus.locationString);
-        }
-        return buddyStatus.status;
-    }
-
-    if (maxEntry != NULL)
-    {
-        *maxEntry = 0;
-    }
-    if (numEntry != NULL)
-    {
-        *numEntry = 0;
-    }
-    return 0;
 }

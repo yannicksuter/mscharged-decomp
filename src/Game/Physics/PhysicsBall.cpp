@@ -2,6 +2,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/Ball.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Field.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Game.h"
@@ -26,17 +27,6 @@ extern "C" float fn_800A92A4(void*, float);
 extern "C" float fn_800A92C8(void*, float);
 extern "C" void fn_8013F854(const char*, ...);
 extern float lbl_806E11E8;
-
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-extern "C" DebugFieldType lbl_80533C98[];
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
 
 PhysicsBall::PhysicsBall(
     CollisionSpace* space, PhysicsWorld* world, float radius)

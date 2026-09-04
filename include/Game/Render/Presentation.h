@@ -23,4 +23,7 @@ public:
     /* 0x0B1 */ bool mPresentationFinished;
 }; // size: 0xB4
 
+// Lazily constructed singleton accessor; the retail name is not recoverable.
+extern "C" Presentation* fn_801FEEAC();
+
 #endif // GAME_RENDER_PRESENTATION_H

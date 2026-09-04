@@ -19,6 +19,8 @@ public:
     void fn_8027D11C();
     void SetExtraNameFilter(const char* filter);
     bool WorldIsFrozen() const;
+    void Render(int pass);
+    void fn_8027E5D0();
     static NisPlayer* Instance();
 
     static NisPlayer* sInstance;
@@ -32,7 +34,9 @@ public:
     /* 0x3409C */ bool mAsyncStarted[8];
     /* 0x340A4 */ u8 unknown_0x340A4[0x210];
     /* 0x342B4 */ char mExtraNameFilter[128];
-    /* 0x34334 */ u8 unknown_0x34334[0x138];
+    /* 0x34334 */ u8 unknown_0x34334[0x04];
+    /* 0x34338 */ int mUnidentified34338;
+    /* 0x3433C */ u8 unknown_0x3433C[0x130];
 };
 
 #endif // GAME_NIS_PLAYER_H

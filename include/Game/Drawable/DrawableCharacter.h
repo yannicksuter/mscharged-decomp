@@ -91,4 +91,7 @@ public:
     static bool sCameraRelativeLighting;
 };
 
+
+extern int g_nCharacterView;
+
 #endif // _DRAWABLECHARACTER_H_

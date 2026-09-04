@@ -1,5 +1,6 @@
 #include "Game/Debug/FrameCounter.h"
 #include "NL/gl/glFont.h"
+#include "unclassified/tu_802B7798.h"
 
 #include "Game/Debug/TimeRegions.h"
 #include "NL/nlColour.h"
@@ -12,7 +13,6 @@
 
 extern "C" void fn_802B9670(
     UnidentifiedTimeRegionData_802B9570* data, float value);
-extern "C" GLView* fn_802B77A0();
 extern "C" void* fn_802B9A3C();
 extern "C" void fn_802B9A6C(
     void* display, UnidentifiedTimeRegionData_802B9570* data);
@@ -149,10 +149,10 @@ void FrameCounter::DisplayFrameRate()
         m_LastFrame[0], m_FirstName, m_LastFrame[1], m_SecondName);
 
     unsigned long length = nlStrLen(str);
-    fn_802BB11C(fn_802B77A0(), FrameBackgroundColour, 0.0f, 0.0f,
+    fn_802BB11C(GetDebugFontView(), FrameBackgroundColour, 0.0f, 0.0f,
         (float)length, 1.0f, 0.0f, 0, true, true);
     glFontBegin(false);
-    glFontPrint(fn_802B77A0(), (eGLView)0, 0, 0, str);
+    glFontPrint(GetDebugFontView(), (eGLView)0, 0, 0, str);
     glFontEnd();
 }
 

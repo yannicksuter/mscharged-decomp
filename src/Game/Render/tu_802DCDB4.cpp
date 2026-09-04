@@ -9,62 +9,6 @@
 #include "NL/platvmath.h"
 #include "unclassified/tu_801A4188.h"
 
-class WorldNPCManager_802DD4F0;
-
-class WorldNPCModelList_802DE138
-    : public ListContainerBase<ImpostorModel_802DAEE0*,
-          NewAdapter<ListEntry<ImpostorModel_802DAEE0*> > >
-{
-public:
-    typedef void (WorldNPCModelList_802DE138::*EntryCallback)(
-        ListEntry<ImpostorModel_802DAEE0*>*);
-
-    void UnidentifiedClear()
-    {
-        EntryCallback callback = &WorldNPCModelList_802DE138::fn_802DE138;
-        nlWalkList(m_Head, this, callback);
-        m_Head = 0;
-        m_Tail = 0;
-    }
-
-    void fn_802DE138(ListEntry<ImpostorModel_802DAEE0*>* entry);
-};
-
-class WorldNPCManager_802DD4F0
-{
-public:
-    WorldNPCManager_802DD4F0();
-    virtual ~WorldNPCManager_802DD4F0();
-    virtual ImpostorModel_802DAEE0* fn_802DDD88(
-        unsigned long templateHash, const nlMatrix4& transform);
-
-    void fn_802DD790();
-    void fn_802DD818(TweakNode_8052BEB0* entry, const char* name);
-    void fn_802DDB54();
-    bool fn_802DDC1C();
-    void fn_802DDF3C(GLView* view);
-    void fn_802DDFE8(float dt);
-
-    /* 0x004 */ bool mUnidentified004;
-    /* 0x005 */ u8 mPadding005[3];
-    /* 0x008 */ CrowdModelCollection_801A4188* mModelCollection;
-    /* 0x00C */ CrowdCharacterDefinition_801A4188 mTemplates[50];
-    /* 0x4BC */ bool mSelectedTemplates[50];
-    /* 0x4EE */ u8 mPadding4EE[2];
-    /* 0x4F0 */ CrowdCharacterDefinition_801A4188 mLoadTemplates[50];
-    /* 0x9A0 */ ImpostorModel_802DAEE0* mLoadedModels[50];
-    /* 0xA68 */ int mNumTemplates;
-    /* 0xA6C */ int mNumLoadTemplates;
-    /* 0xA70 */ int mNumLoadedModels;
-    /* 0xA74 */ WorldNPCModelList_802DE138 mWorldNPCs;
-    /* 0xA80 */ nlListContainer<WorldNPC_802DE058*> mPendingWorldNPCs;
-    /* 0xA8C */ bool mTemplatesLoaded;
-    /* 0xA8D */ bool mModelsLoaded;
-    /* 0xA8E */ u8 mPaddingA8E[2];
-    /* 0xA90 */ void (*mModelCallback)(ImpostorModel_802DAEE0*, glModel*);
-    /* 0xA94 */ bool (*mRenderFilter)(ImpostorModel_802DAEE0*);
-}; // size: 0xA98
-
 // Serialized world-NPC record used by the stadium/world object stream. The
 // retail binary does not preserve the original class name.
 class WorldNPC_802DE058
@@ -87,7 +31,7 @@ extern "C"
 {
     void fn_802C6CAC(const char* fileName, const char* category, bool reload);
     bool lbl_806E1F90;
-    WorldNPCManager_802DD4F0* lbl_806E1F94;
+    WorldNPCManager_802DD4F0* gpWorldNPCManager;
 }
 
 static const char* lbl_806DF450 = "/Render/WorldNPCs";
@@ -319,7 +263,7 @@ WorldNPCManager_802DD4F0::WorldNPCManager_802DD4F0()
     , mModelCallback(0)
 {
     mModelCollection = new (8, false) CrowdModelCollection_801A4188;
-    lbl_806E1F94 = this;
+    gpWorldNPCManager = this;
 }
 
 WorldNPCManager_802DD4F0::~WorldNPCManager_802DD4F0()
@@ -333,7 +277,7 @@ WorldNPCManager_802DD4F0::~WorldNPCManager_802DD4F0()
 
     mWorldNPCs.UnidentifiedClear();
     mPendingWorldNPCs.Clear();
-    lbl_806E1F94 = 0;
+    gpWorldNPCManager = 0;
 }
 
 void WorldNPCManager_802DD4F0::fn_802DD790()
@@ -489,7 +433,7 @@ ImpostorModel_802DAEE0* WorldNPCManager_802DD4F0::fn_802DDD88(
     return model;
 }
 
-void WorldNPCManager_802DD4F0::fn_802DDF3C(GLView* view)
+void WorldNPCManager_802DD4F0::Render(GLView* view)
 {
     if (lbl_806E1F90)
     {
@@ -521,7 +465,7 @@ void WorldNPCManager_802DD4F0::fn_802DDFE8(float dt)
 
 void WorldNPC_802DE058::fn_802DE058()
 {
-    WorldNPCManager_802DD4F0* manager = lbl_806E1F94;
+    WorldNPCManager_802DD4F0* manager = gpWorldNPCManager;
     bool found = false;
     int index = 0;
     for (; index < manager->mNumTemplates; ++index)

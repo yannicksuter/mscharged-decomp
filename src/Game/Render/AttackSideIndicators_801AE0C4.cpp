@@ -1,3 +1,5 @@
+#include "Game/Render/AttackSideIndicators.h"
+
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/Net.h"
 #include "Game/Team.h"

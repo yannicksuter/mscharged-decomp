@@ -2,6 +2,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Powerups.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Event.h"
@@ -13,17 +14,11 @@
 #include "NL/nlAVLTree.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
+#include "unclassified/tu_80338898.h"
 
 #include <math.h>
 
 class EffectsGroup;
-
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
@@ -31,24 +26,12 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 
 extern CollisionSpace* g_CollisionSpace;
 extern UnidentifiedEventRegistry* lbl_806E1D90;
-extern "C" FixedUpdateTask* fn_8011166C();
 extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
 extern "C" EmissionController* fn_802E7FE4(
     EmissionManager*, EffectsGroup*, int, bool, bool);
 extern "C" bool fn_800EBBFC(
     int, unsigned long, const char*, void*);
-extern "C" void* fn_80338950(void*);
-extern "C" void fn_8033919C(void*, const char*);
-extern "C" void* lbl_806E2488;
-extern "C" DebugFieldType lbl_80533C98[];
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
+extern "C" UnidentifiedNetworkSyncState* lbl_806E2488;
 
 extern "C" void fn_8017472C(void*);
 
@@ -523,12 +506,12 @@ PhysicsPatch* PhysicsPatchManager_801740D0::fn_801743A8(
     const nlVector3& velocity, float startRadius, float endRadius,
     float lifetime)
 {
-    void* log = fn_80338950(lbl_806E2488);
+    DebugWriteCache* log = fn_80338950(lbl_806E2488);
     if (log != 0)
     {
         int ownerID = owner != 0 ? owner->mUnidentified120 : -1;
         char buffer[200];
-        nlSNPrintf(buffer, sizeof(buffer), "Creating patch %d owner %d r1 %f r2 %f life %f at frame %d\n", type, ownerID, startRadius, endRadius, lifetime, fn_8011166C()->GetFrame());
+        nlSNPrintf(buffer, sizeof(buffer), "Creating patch %d owner %d r1 %f r2 %f life %f at frame %d\n", type, ownerID, startRadius, endRadius, lifetime, GetFixedUpdateTask()->GetFrame());
         fn_8033919C(log, buffer);
     }
 

@@ -267,10 +267,9 @@ void SaveLoad::ContinueWithoutSaving()
 void SaveLoad::BeginReset()
 {
     ResetTask::s_ResetMode = 3;
-    if (ResetTask::s_ResetState == RS_RUNNING)
-    {
-        ResetTask::s_ResetState = RS_STARTRESET;
-    }
+    ResetTask::s_ResetState = ResetTask::s_ResetState == RS_RUNNING
+        ? RS_STARTRESET
+        : ResetTask::s_ResetState;
 }
 
 void SaveLoad::DeleteSaveFile()

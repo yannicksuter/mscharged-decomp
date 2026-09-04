@@ -90,7 +90,7 @@ extern "C" void fn_801A86D8(float fDeltaT);
 extern "C" void fn_801A8908(unsigned int nCount);
 extern "C" void fn_801A8C8C(unsigned int nIndex, int nValue);
 extern "C" void fn_801A8CA0(float fDeltaT);
-extern "C" void fn_801A8EE0(float fDeltaT);
+void UpdateAndRenderMegaBallIndicators(float fDeltaT);
 extern "C" void fn_801A9074(void* pMessage);
 
 #endif // UNCLASSIFIED_TU_801A6AAC_H

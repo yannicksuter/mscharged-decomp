@@ -1,10 +1,11 @@
 #include "Game/Effects/PhotoFlashEffect.h"
 
+#include "Game/Render/RLView.h"
+
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glState.h"
 #include "NL/nlColour.h"
 
-extern "C" GLView* fn_8027267C(int index);
 
 static s32 sNumFlashFadeFrames = 8;
 
@@ -30,7 +31,7 @@ void PhotoFlash::Render(float dt)
 
         poly.SetColour(c);
         poly.SetupRectangle(0.0f, 0.0f, 640.0f, 480.0f, 0.0f);
-        glAttachPoly2(fn_8027267C(0x25), 1, &poly, 0);
+        glAttachPoly2(GetLayerView(eCLV_FrontEnd), 1, &poly, 0);
     }
 
     ++sNumFramesSinceFlash;

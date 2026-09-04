@@ -1,5 +1,7 @@
 #include "Game/AI/Fielder.h"
 
+#include "Game/Render/RLView.h"
+
 #include "Game/AI/FielderActions.h"
 #include "Game/AI/Fuzzy.h"
 #include "Game/AnimInventory.h"
@@ -243,11 +245,9 @@ public:
     /* 0x04 */ u8 mUnknown04[0x28];
     /* 0x2C */ float mUnidentified2C;
 };
-extern "C" UnidentifiedHandler8011166C* fn_8011166C(void);
 extern "C" void fn_801BA4C8(const char* szName);
 extern "C" int fn_8001C5E4(cFielder* pFielder, unsigned short aFacing,
     unsigned short aTarget, int nAnimID, float fParam);
-extern "C" void* fn_8027267C(int nParam);
 extern "C" void fn_802CE7F4(
     void* pParam, const nlVector3* v3Position, nlVector3* v3Out);
 extern "C" float fn_800499EC(cFielder* pFielder, int nParam);
@@ -1573,7 +1573,7 @@ float cFielder::fn_80048A08()
 void cFielder::InitActionMegaStrikeMeter(bool bParam)
 {
     fn_8004F594(0x10, "InitActionMegaStrikeMeter at frame %d\n",
-        fn_8011166C()->UnidentifiedVirtual34());
+        ((UnidentifiedHandler8011166C*)GetFixedUpdateTask())->UnidentifiedVirtual34());
 
     mUnidentified390 = 0.0f;
     mUnidentified394 = 0.0f;
@@ -1676,7 +1676,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         event.pFielder = this;
         event.fMeterValue = mUnidentified3BC;
         nlVector3 v3Column;
-        fn_802CE7F4(fn_8027267C(8), &m_v3Position, &v3Column);
+        fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &m_v3Position, &v3Column);
         event.v3Position = v3Column;
         fn_8005F238(lbl_806E0C94, &event);
 
@@ -1873,7 +1873,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
         else
         {
             float fEndTime = mUnidentified398 + lbl_806DB974;
-            if (fn_8011166C()->mUnidentified2C >= fEndTime)
+            if (GetFixedUpdateTask()->mSimulationTime >= fEndTime)
             {
                 mUnidentified478 = 3;
             }
@@ -1918,7 +1918,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
     event.pFielder = this;
     event.fMeterValue = mUnidentified3BC;
     nlVector3 v3Column;
-    fn_802CE7F4(fn_8027267C(8), &m_v3Position, &v3Column);
+    fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &m_v3Position, &v3Column);
     event.v3Position = v3Column;
     fn_8005F434(lbl_806E0C94, &event);
 
@@ -1992,7 +1992,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     event.pFielder = this;
     event.fMeterValue = mUnidentified3C0;
     nlVector3 v3Column;
-    fn_802CE7F4(fn_8027267C(8), &m_v3Position, &v3Column);
+    fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &m_v3Position, &v3Column);
     event.v3Position = v3Column;
     fn_8005F630(lbl_806E0C94, &event);
 
@@ -5608,7 +5608,7 @@ bool gbUseTurboCharging = true;
 extern const char* lbl_806E1E90;
 
 static TweakValueBoolImpl_804F4538 s_UseTurboChargingTweak(
-    "Game/Gameplay/Charging/Turbo", "gbUseTurboCharging",
+    "gbUseTurboCharging", "Game/Gameplay/Charging/Turbo",
     &gbUseTurboCharging, true);
 
 u16 g_IdleTurnCompletionDelta = (u16)(65536.0f / 36.0f);

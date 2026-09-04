@@ -45,7 +45,7 @@ struct NPCTemplate
     /* 0x04 */ bool loaded;
     /* 0x05 */ bool mUnidentified005;
     /* 0x06 */ u8 mPadding006[2];
-    /* 0x08 */ int modelID;
+    /* 0x08 */ unsigned long modelID;
     /* 0x0C */ cSHierarchy* hierarchy;
     /* 0x10 */ void* mUnidentified010;
     /* 0x14 */ cInventory<cSAnim> mUnidentified014;

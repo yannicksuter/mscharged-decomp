@@ -15,10 +15,6 @@ extern "C"
     int DWC_GetCommonValueString(const char* key, char* value, const char* string,
         char separator);
 
-    u8 DWC_GetFriendStatus(const DWCFriendData* friendData, char* statusString);
-    u8 DWC_GetFriendStatusSC(const DWCFriendData* friendData, u8* maxEntry,
-        u8* numEntry, char* statusString);
-
 #ifdef __cplusplus
 }
 #endif

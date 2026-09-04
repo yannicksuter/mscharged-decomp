@@ -12,6 +12,8 @@ public:
     static bool Initialize();
     static void Destroy();
     static void Reset();
+    static void Update(float fTimeDelta);
+    static void ReturnToFE();
 
     static eFEState m_feStateCurrent;
     static eFEState m_feStatePending;

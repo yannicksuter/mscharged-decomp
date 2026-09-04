@@ -40,7 +40,7 @@ public:
 class UnidentifiedCrowdManager_802D88F4;
 
 extern "C" void fn_802D8930(UnidentifiedRenderObject_801A4188* object);
-extern "C" UnidentifiedCrowdManager_802D88F4* fn_802D8BB4();
+UnidentifiedCrowdManager_802D88F4* GetCrowdImpostorManager();
 extern "C" void fn_802D911C(UnidentifiedCrowdManager_802D88F4* manager,
     UnidentifiedRenderObject_801A4188* object, bool enabled);
 extern "C" void fn_802D932C(UnidentifiedCrowdManager_802D88F4* manager,
@@ -50,8 +50,8 @@ extern "C" void fn_802D93E8(
 extern "C" void fn_802D9708(UnidentifiedCrowdManager_802D88F4* manager);
 extern "C" void fn_802D9CD8(UnidentifiedCrowdManager_802D88F4* manager,
     CrowdTweak_801A4188* tweak);
-extern "C" void fn_802D9D00(
+void UpdateCrowdVisibility(
     UnidentifiedCrowdManager_802D88F4* manager, void* view);
-extern "C" void fn_802D9E34(UnidentifiedCrowdManager_802D88F4* manager);
+void ReleaseCrowdImpostors(UnidentifiedCrowdManager_802D88F4* manager);
 
 #endif // GAME_RENDER_TU_802D88F4_H

@@ -41,6 +41,8 @@ class InterpreterCore;
 
 extern "C" FunctionEntryPoint* fn_802DF3E4(
     InterpreterCore* core, u32* hash);
+extern "C" FunctionEntryPoint* fn_802DF41C(
+    InterpreterCore* core, unsigned int index);
 
 class InterpreterCore
 {
@@ -54,6 +56,11 @@ public:
     void CallFunction(u32 hash)
     {
         FunctionEntryPoint* fnc_ptr = fn_802DF3E4(this, &hash);
+        UnidentifiedVirtual2(fnc_ptr, 0, 0, 0, 0, 0);
+    }
+    void CallFunctionAt(unsigned long offset)
+    {
+        FunctionEntryPoint* fnc_ptr = fn_802DF41C(this, offset);
         UnidentifiedVirtual2(fnc_ptr, 0, 0, 0, 0, 0);
     }
     void Run();

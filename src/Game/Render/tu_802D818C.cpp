@@ -64,7 +64,7 @@ void ImpostorCluster_8052EA20::UnidentifiedVirtual2C(
 void ImpostorCluster_8052EA20::UnidentifiedVirtual20(void* target, int)
 {
     ImpostorManager::GetInstance()->ResetSpriteSlots();
-    fn_802D9E34(fn_802D8BB4());
+    ReleaseCrowdImpostors(GetCrowdImpostorManager());
     ImpostorManager::GetInstance()->Render(target, true);
 
     glSetCurrentTexture(lbl_806E1F34, GLTT_Diffuse);

@@ -39,6 +39,8 @@ public:
         bool bWithDepth) const;
     void DrawRectangle2D(float x, float y, float w, float h, float z,
         const nlColour& colour, int view) const;
+    void DrawSphere(const nlVector3& position, const nlColour& colour,
+        float radius) const;
     void Initialize(void* resource);
 
     /* 0x00 */ void* m_Unknown00;

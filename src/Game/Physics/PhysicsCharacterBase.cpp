@@ -1,5 +1,6 @@
 #include "Game/Physics/PhysicsCharacterBase.h"
 
+#include "Game/DebugWriteCache.h"
 #include "Game/Physics/CharacterPhysicsElement.h"
 #include "Game/Physics/CollisionSpace.h"
 #include "Game/Physics/PhysicsWorld.h"
@@ -12,26 +13,11 @@ void dBodySetUpdateMode(dBodyID, int, int);
 dJointID dJointCreateCharacter(dWorldID, dJointGroupID);
 void dJointSetCharacterNoMotionDirection(dJointID, float*);
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
 struct BoneVolumeTypeState
 {
     unsigned short type;
     unsigned short padding;
 };
-
-extern "C" DebugFieldType lbl_80533C98[];
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void fn_8033930C(DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(DebugWriteCache*, unsigned short, void*, void*);
 
 extern BoneVolumeTypeState s_BoneVolumeType;
 extern char s_BoneIDName[5];

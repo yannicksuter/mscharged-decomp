@@ -1,5 +1,7 @@
 #include "Game/Render/ShootToScoreArrow.h"
 
+#include "Game/Render/RLView.h"
+
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
@@ -21,7 +23,6 @@ struct SaveFrame
     u8* position;
 };
 
-extern "C" GLView* fn_8027267C(int index);
 
 const unsigned long LightTexture = glGetTexture("global/lightramp");
 const unsigned long BlackTexture = glGetTexture("global/black");
@@ -48,7 +49,7 @@ void WorldDarkening::Fade(float rate, float to)
     mTo = to;
 }
 
-void WorldDarkening::fn_801AF570(float deltaTime)
+void WorldDarkening::Update(float deltaTime)
 {
     if (mPos < mTo)
     {
@@ -72,7 +73,7 @@ void WorldDarkening::fn_801AF570(float deltaTime)
     }
 }
 
-void WorldDarkening::fn_801AF5F4()
+void WorldDarkening::Render()
 {
     const int darkenAmount = (int)(255.0f * mPos);
     if ((u8)darkenAmount == 0)
@@ -106,7 +107,7 @@ void WorldDarkening::fn_801AF5F4()
     {
         SetPolyColour(poly, 0, 0, 0, darkenAmount);
     }
-    poly.Attach(fn_8027267C(19), 0, 0);
+    poly.Attach(GetLayerView(eCLV_BigBlackPolygon), 0, 0);
     glSetDefaultState(false);
 }
 
@@ -129,6 +130,6 @@ void WorldDarkening::fn_801AF7A8(LoadFrame& frame)
     {
         memcpy(&mPos, frame.position, sizeof(mPos));
         frame.position += sizeof(mPos);
-        fn_801AF570(frame.deltaTime);
+        Update(frame.deltaTime);
     }
 }

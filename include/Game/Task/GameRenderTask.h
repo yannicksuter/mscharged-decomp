@@ -23,9 +23,16 @@ public:
     static GameRenderTask* sInstance;
 
 private:
+    void RenderFrame(float fDeltaT, bool bPictureInPicture);
+
     float mValue_20;
 };
 
 extern bool g_bRenderWorld;
+extern u8 g_bRenderWorldEffects;
+
+void SetRenderWorldEffects(unsigned int enabled);
+bool fn_80115EB0();
+void InstallImageRenderCallback();
 
 #endif // GAME_TASK_GAME_RENDER_TASK_H

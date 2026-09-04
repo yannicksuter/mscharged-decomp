@@ -28,18 +28,18 @@ struct LoadingFlowState
     bool mLoading;
 };
 
-extern LoadingFlowState* lbl_806E18D8;
+extern LoadingFlowState* gpHBMManager;
 extern TLComponentInstance lbl_80580030;
 
 SuperLoadingScene::SuperLoadingScene()
     : mType(TT_INVALID)
 {
-    lbl_806E18D8->mLoading = true;
+    gpHBMManager->mLoading = true;
 }
 
 SuperLoadingScene::~SuperLoadingScene()
 {
-    lbl_806E18D8->mLoading = false;
+    gpHBMManager->mLoading = false;
 }
 
 void SuperLoadingScene::Update(float fDeltaT)
@@ -197,7 +197,7 @@ void LoadingScene_801CDB4C::SceneCreated()
         mTransitionComponent->SetActiveSlide("widescreen", true, false);
     }
 
-    lbl_806E18D8->mLoading = false;
+    gpHBMManager->mLoading = false;
 }
 
 void LoadingScene_801CDB4C::fn_801CE274()

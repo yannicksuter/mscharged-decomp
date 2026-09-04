@@ -1,20 +1,7 @@
 #include "objects.h"
 
-class DebugWriteCache;
+#include "Game/DebugWriteCache.h"
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-extern "C" DebugFieldType lbl_80533C98[];
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void* fn_8033930C(DebugWriteCache*, unsigned short, void*, unsigned int);
 extern "C" void fn_802AADE8(void*, void*, unsigned int);
 
 extern unsigned short s_dxBodyType;

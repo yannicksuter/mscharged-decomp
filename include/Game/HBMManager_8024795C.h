@@ -64,6 +64,6 @@ public:
     /* 0x094 */ unsigned int mPreviousTaskState;
 }; // size 0x98
 
-extern UnidentifiedHBMManager* lbl_806E18D8;
+extern UnidentifiedHBMManager* gpHBMManager;
 
 #endif // GAME_HBM_MANAGER_8024795C_H

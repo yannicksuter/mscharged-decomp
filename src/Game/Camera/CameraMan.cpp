@@ -30,7 +30,6 @@ extern "C" float fn_80112E0C();
 extern "C" float fn_80112E14();
 extern "C" void fn_80277BB0();
 extern "C" void fn_800F0990(float);
-extern const char lbl_806DBA60[5];
 extern void nlPrintf(const char*, ...);
 extern int nlSNPrintf(char*, unsigned long, const char*, ...);
 
@@ -399,7 +398,8 @@ void cCameraManager::UpdateGameCameraType()
         }
         else if (tvp.type == CONFIG_STRING)
         {
-            noCameraTweakCrash = strcmp(lbl_806DBA60, tvp.value.stringValue) == 0;
+            noCameraTweakCrash
+                = Detail::LexicalCastImpl<bool, const char*>::Do(tvp.value.stringValue);
         }
         else
         {

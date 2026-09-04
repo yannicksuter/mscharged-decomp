@@ -171,7 +171,7 @@ void gl_FontStartup()
     fn_802C8288();
 }
 
-extern "C" int fn_802C9CAC(int font)
+int glFontSetFont(int font)
 {
     int previous = lbl_806E1EC4;
     if (font == 4)

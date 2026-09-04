@@ -1,5 +1,6 @@
 #include "Game/Drawable/DrawableDaisyFist.h"
 #include "Game/Drawable/RenderObject.h"
+#include "Game/Render/RLView.h"
 #include "NL/gl/glView.h"
 #include "NL/nlMath.h"
 #include "NL/platvmath.h"
@@ -11,7 +12,6 @@
 
 extern "C"
 {
-    GLView* fn_8027267C(int index);
 }
 
 DrawableDaisyFist::DrawableDaisyFist()
@@ -77,7 +77,7 @@ void DrawableDaisyFist::Render(const DaisyFistObject* object) const
     UnidentifiedDrawableViewState* state = drawable->mUnidentified10;
     GLView* oldView68 = state->mView68;
     GLView* oldView6C = state->mView6C;
-    state->mView68 = fn_8027267C(29);
+    state->mView68 = GetLayerView(eCLV_ElectricFence);
     state->mView6C = state->mView68;
     drawable->SetWorldMatrix(&matrix);
     drawable->Draw();

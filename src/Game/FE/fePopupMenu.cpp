@@ -4,7 +4,7 @@
 #include "Game/FE/feInput.h"
 #include "NL/nlMemory.h"
 
-extern unsigned char* lbl_806E18D8;
+extern unsigned char* gpHBMManager;
 extern "C" bool fn_80253E18();
 extern "C" void fn_802533F0();
 
@@ -80,7 +80,7 @@ FEPopupMenu::~FEPopupMenu()
 
     if (!mUnidentified9A3)
     {
-        lbl_806E18D8[0x92] = false;
+        gpHBMManager[0x92] = false;
     }
 
     if (fn_80253E18())

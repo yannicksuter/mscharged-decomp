@@ -2,7 +2,9 @@
 #include "Game/Field.h"
 #include "Game/Net.h"
 #include "Game/Render/NetMesh.h"
+#include "Game/Render/RLView.h"
 #include "Game/Render/ShootToScoreArrow.h"
+#include "Game/Task/GameRenderTask.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
@@ -136,8 +138,8 @@ bool lbl_806DCB38[2] = { true, true };
 u8 lbl_806DCB3A = 1;
 char lbl_806DCB40[8] = "NetMesh";
 
-GLView* lbl_806E132C;
-u32 lbl_806E1330;
+GLView* g_pNetMeshView;
+u32 g_NetMeshInvisiblePlaneView;
 shortVector2* lbl_806E1338[2];
 u32* lbl_806E1340[2];
 u16* lbl_806E1348[2];
@@ -157,10 +159,8 @@ UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
 
-extern u8 lbl_806DC7D8;
 extern const StreamDefinition lbl_804DCCE0;
 
-extern "C" void* fn_8027267C(int);
 extern "C" void __dla__FPv(void*);
 extern "C" void fn_802CC02C(MeshResource*);
 extern "C" void nlBreak__Fv();
@@ -192,8 +192,8 @@ DrawableNetMesh::DrawableNetMesh(bool isPositiveXNet)
     , mInitialized(false)
     , mVisible(false)
 {
-    lbl_806E132C = (GLView*)fn_8027267C(0x16);
-    lbl_806E1330 = (u32)fn_8027267C(0x1C);
+    g_pNetMeshView = GetLayerView(eCLV_UnsortedPerspective);
+    g_NetMeshInvisiblePlaneView = (u32)GetLayerView(eCLV_InvisiblePlane);
 }
 
 DrawableNetMesh::~DrawableNetMesh()
@@ -229,7 +229,7 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
     matrix.e2[3][3] = 1.0f;
     quad.SetupRotatedRectangle(netHeight, netWidth, matrix, false, false);
     quad.SetColour(colour);
-    glAttachQuad3((eGLView)lbl_806E1330, 1, &quad);
+    glAttachQuad3((eGLView)g_NetMeshInvisiblePlaneView, 1, &quad);
 
     matrix.e2[3][0] = goalLineX + 0.05f;
     matrix.e2[3][1] = 0.0f;
@@ -237,7 +237,7 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
     matrix.e2[3][3] = 1.0f;
     quad.SetupRotatedRectangle(netHeight, netWidth, matrix, false, false);
     quad.SetColour(colour);
-    glAttachQuad3((eGLView)lbl_806E1330, 1, &quad);
+    glAttachQuad3((eGLView)g_NetMeshInvisiblePlaneView, 1, &quad);
 
     matrix.e2[3][0] = -goalLineX - 0.05f;
     matrix.e2[3][1] = 0.0f;
@@ -245,7 +245,7 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
     matrix.e2[3][3] = 1.0f;
     quad.SetupRotatedRectangle(netHeight, netWidth, matrix, false, false);
     quad.SetColour(colour);
-    glAttachQuad3((eGLView)lbl_806E1330, 1, &quad);
+    glAttachQuad3((eGLView)g_NetMeshInvisiblePlaneView, 1, &quad);
 
     matrix.e2[3][0] = 0.05f + -goalLineX;
     matrix.e2[3][1] = 0.0f;
@@ -253,7 +253,7 @@ void DrawableNetMesh::RenderInvisiblePlanes() const
     matrix.e2[3][3] = 1.0f;
     quad.SetupRotatedRectangle(netHeight, netWidth, matrix, false, false);
     quad.SetColour(colour);
-    glAttachQuad3((eGLView)lbl_806E1330, 1, &quad);
+    glAttachQuad3((eGLView)g_NetMeshInvisiblePlaneView, 1, &quad);
 }
 
 void DrawableNetMesh::Render() const
@@ -263,7 +263,7 @@ void DrawableNetMesh::Render() const
         return;
     }
 
-    if (!lbl_806DC7D8)
+    if (!g_bRenderWorldEffects)
     {
         return;
     }
@@ -364,7 +364,7 @@ void DrawableNetMesh::Render() const
 
     if (lbl_806E1368[mNetIndex] && lbl_806E1360[mNetIndex])
     {
-        lbl_806E132C->AttachModel(
+        g_pNetMeshView->AttachModel(
             (glModel*)lbl_806E1360[mNetIndex], false);
     }
 

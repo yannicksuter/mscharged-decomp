@@ -74,4 +74,7 @@ public:
     /* 0x59 */ bool mCoPlanarEnabled;
 }; // size 0x5C
 
+
+RLView* GetLayerView(eCLV layer);
+
 #endif // GAME_RENDER_RL_VIEW_H

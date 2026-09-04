@@ -1,10 +1,15 @@
 #include "Game/AsyncLoading.h"
 #include "Game/FE/feMusic.h"
+#include "Game/Render/CrowdManager.h"
+#include "Game/Render/Jumbotron.h"
+#include "Game/Render/RLView.h"
+#include "unclassified/tu_801B369C.h"
 
 #include "Game/Audio/AudioBundleManager_802EDA7C.h"
 #include "Game/Audio/AudioLoadMode_806E201C.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/Task/BeginFrameTask.h"
+#include "Game/Task/FrontEndTask.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/DB/StatsTracker.h"
 #include "Game/Debug/FrameCounter.h"
@@ -34,6 +39,7 @@
 #include "Game/Transitions/ScreenTransitionManager.h"
 #include "Game/TweakValue.h"
 #include "Game/Task/TweakerTask.h"
+#include "unclassified/tu_80332DC0.h"
 #include "NL/nlConfig.h"
 #include "NL/nlDebug.h"
 #include "NL/nlFile.h"
@@ -47,6 +53,10 @@
 #include "NL/nlTicker.h"
 #include "NL/nlTime.h"
 #include "types.h"
+#include "unclassified/tu_80188884.h"
+#include "unclassified/tu_80332770.h"
+#include "unclassified/tu_80336B2C.h"
+#include "unclassified/tu_80338898.h"
 
 #define OS_BUS_CLOCK_SPEED           (*(volatile u32*)0x800000F8)
 #define OS_TIME_SPEED                (OS_BUS_CLOCK_SPEED / 4)
@@ -73,24 +83,10 @@ public:
     void Update(float deltaTime);
 };
 
-class UnidentifiedInputRouter
-{
-public:
-    virtual void RouterVirtual00();
-    virtual void RouterVirtual04(int);
-};
-
 class UnidentifiedDeletable
 {
 public:
     virtual ~UnidentifiedDeletable();
-};
-
-class UnidentifiedManager_80188928
-    : public nlSingleton<UnidentifiedManager_80188928>
-{
-public:
-    virtual ~UnidentifiedManager_80188928();
 };
 
 struct FrameTimingStat
@@ -101,11 +97,9 @@ struct FrameTimingStat
 };
 
 extern "C" int fn_8004F594(int category, const char* format, ...);
-extern "C" void fn_80114614(float value);
 extern "C" void fn_801CC114();
 extern "C" void* fn_802C082C(void*, int);
 extern "C" void fn_801A95F0(void*, const char*, int);
-extern "C" GLView* fn_8027267C(int index);
 extern "C" bool fn_80332770();
 extern "C" u32 OSGetTick();
 extern "C" void OSYieldThread();
@@ -118,11 +112,6 @@ extern "C" void fn_801B2770();
 extern "C" void fn_8027ED18();
 extern "C" void fn_8027E5D4();
 extern "C" void fn_802B2E8C(UnidentifiedOwnerHandle* handle);
-extern "C" void fn_80332EC8();
-extern "C" void fn_80337FF0(void*, int);
-extern "C" void fn_80338900(void*, int);
-extern "C" UnidentifiedInputRouter* fn_803330AC();
-extern "C" void fn_8033288C(void*);
 extern "C" void fn_800A6EDC(void*);
 extern "C" void fn_800AA3E8(void*, int);
 extern "C" void fn_801AF97C(void*);
@@ -132,12 +121,8 @@ extern "C" void fn_801A01F8();
 extern "C" void fn_801AAD0C(void*);
 extern "C" void fn_80276F5C();
 extern "C" void fn_80115FB4();
-extern "C" FixedUpdateTask* fn_8011166C();
 extern "C" void fn_801440BC();
 extern "C" void fn_8013DB18();
-extern "C" void fn_801A5F14(void*);
-extern "C" void fn_801AD160(void*);
-extern "C" void fn_801B3724(void*);
 extern "C" void fn_801B4238(void*);
 extern "C" void fn_800741A4(void*);
 extern "C" void fn_8013DDD4();
@@ -152,7 +137,6 @@ extern "C" void fn_80183E4C();
 extern "C" void fn_802DB9C4(void*);
 extern "C" bool fn_801C4D40();
 extern "C" void fn_801C4CBC();
-extern "C" void fn_8033C4E4(ScreenTransitionManager*);
 extern "C" void fn_802BDA28();
 extern "C" void fn_802C0CCC();
 extern "C" void fn_802C8180();
@@ -174,22 +158,16 @@ extern FrameTimingStat* lbl_806E169C;
 extern FrameTimingStat* lbl_806E16A0;
 extern BaseGameSceneManager* lbl_806E1838;
 extern BaseGameSceneManager* lbl_806E1860;
-extern void* lbl_806E2164;
-extern void* lbl_806E2168;
-extern void* lbl_806E2138;
 extern void* g_pTeams[];
 extern cBall* g_pBall;
 extern u8 lbl_80574148[];
-extern u8 lbl_805722F8[];
-extern u8 lbl_80573C08[];
-extern u8 lbl_806E16C0;
 extern u8 lbl_806E16D4;
 extern u8 lbl_8056CF08[];
 extern u8 lbl_805721E8[];
 extern UnidentifiedDeletable* lbl_806E2090;
 extern SlotPool<cSAnimCallback> lbl_805840D8;
 extern SlotPoolBase lbl_8057AB80;
-extern bool lbl_806E1090;
+extern bool g_e3_Build;
 extern void* lbl_806E18C0;
 
 namespace Detail
@@ -220,10 +198,10 @@ static bool lbl_806E1069;
 static bool lbl_806E106A;
 
 static TweakValueBoolImpl_804F4538 lbl_8056E458(
-    "Audio", "g_VerboseAudio", &g_VerboseAudio, true);
+    "g_VerboseAudio", "Audio", &g_VerboseAudio, true);
 static TweakValueBoolImpl_804F4538 lbl_8056E478(
-    "General/Memory", "g_bDumpMemoryStatsOnLoad",
-    &lbl_806E1090, true);
+    "g_bDumpMemoryStatsOnLoad", "General/Memory",
+    &g_e3_Build, true);
 static TweakValueImpl_804F4DC8 lbl_8056E498(
     "g_fScriptBlockingWarningMS", "Loading",
     &g_fScriptBlockingWarningMS);
@@ -235,7 +213,7 @@ static AsyncLoadingManager lbl_8056E4D8;
 static inline void ReleaseUnidentifiedOwner(UnidentifiedOwnerHandle* handle)
 {
     if (handle != 0 && handle->mOwner != 0
-        && (handle->mOwner->mFlags & 0x40000000) != 0)
+        && ((handle->mOwner->mFlags >> 30) & 1) != 0)
     {
         handle->mOwner->mTarget->Release(handle);
     }
@@ -612,7 +590,7 @@ extern "C" void fn_8011A800(AsyncLoadingManager* manager)
     manager->mLoadingComment = "GameStateFinalize";
 
     lbl_806E18C0 = 0;
-    InitializeElectricFence(fn_8027267C(29));
+    InitializeElectricFence(GetLayerView(eCLV_ElectricFence));
     BeginFrameTask::s_FramerateLocked = false;
     fn_801CC114();
     InitializeTimeRegions();
@@ -703,8 +681,8 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     fn_80337FF0(lbl_806E2164, 0);
     fn_80338900(lbl_806E2168, 0);
     lbl_806E20D8->BaseVirtual48(5);
-    fn_803330AC()->RouterVirtual04(0);
-    fn_8033288C(lbl_806E2138);
+    fn_803330AC()->Reset(0);
+    lbl_806E2138->fn_8033288C();
     lbl_806E20D8->Initialize(false);
 
     fn_800A6EDC(g_pTeams[0]);
@@ -724,13 +702,13 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     ParticleUpdateTask::sInstance->Shutdown();
     fn_80276F5C();
     fn_80115FB4();
-    fn_8011166C()->Reset();
+    GetFixedUpdateTask()->Reset();
     fn_801440BC();
     fn_8013DB18();
     FrontEnd::Destroy();
-    fn_801A5F14(lbl_805722F8);
-    fn_801AD160(lbl_80573C08);
-    fn_801B3724(&lbl_806E16C0);
+    Jumbotron::instance.Uninitialize();
+    CrowdManager::instance.Uninitialize();
+    ShutdownWarble(&gWarble);
     fn_801B4238(&lbl_806E16D4);
 
     if (nlSingleton<UnidentifiedManager_80188928>::s_pInstance != 0)
@@ -782,7 +760,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     fn_801C4D40();
     FEResourceManager::Instance()->Cleanup();
     fn_801C4CBC();
-    fn_8033C4E4(ScreenTransitionManager::Instance());
+    ScreenTransitionManager::Instance()->CancelAllTransitions();
     fn_802CC094()->ReleaseResource((unsigned long)manager->mUnidentified50);
 
     if (lbl_806E2090 != 0)
@@ -834,7 +812,7 @@ public:
 
 extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
 {
-    if (lbl_806E1090)
+    if (g_e3_Build)
     {
         for (int i = 0; i < 4; ++i)
         {
@@ -850,7 +828,7 @@ extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
                 && source->ReadMemoryStats(0x100, 0)
                 && source->ReadMemoryStats(0x8000, 0))
             {
-                fn_80114614(5.0f);
+                SetE3DebugTime(5.0f);
             }
         }
     }

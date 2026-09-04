@@ -4,26 +4,19 @@
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
 #include "Game/Player.h"
 #include "Game/Team.h"
 #include "NL/globalpad.h"
+#include "unclassified/tu_80336B2C.h"
 #include <stdlib.h>
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-extern "C" DebugFieldType lbl_80533C98[];
 extern "C" SkillTweaks* fn_800A636C(cTeam*);
 extern "C" cTeam* fn_800D6670(cFielder*);
 extern "C" float fn_800E02B8(cTeam*);
-extern "C" cGlobalPad* fn_80336D90(void*);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E39C(cFielder*);
 extern "C" float fn_8002E058(cFielder*);
@@ -33,15 +26,6 @@ extern "C" float fn_800499EC(cFielder*, int);
 extern "C" float fn_80049CC0(cFielder*, int);
 extern "C" void fn_8005FA2C(cGame*);
 extern "C" void fn_80098098(cFielder*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
-
 extern cTeam* lbl_806E0E00;
 extern bool lbl_806E0E30;
 extern bool lbl_806E0E31;
@@ -58,10 +42,11 @@ static unsigned short sDesireMegaStrikeType = 0xFFFF;
 bool DesireMegaStrike::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    cGlobalPad* pGlobalPad = mUnidentifiedFielder->GetGlobalPad();
+    DetInput* pGlobalPad = mUnidentifiedFielder->GetGlobalPad();
     if (pGlobalPad != 0)
     {
-        fn_80336D90(pGlobalPad->mUnidentified040);
+        fn_80336D90(
+            (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser);
     }
     else
     {
@@ -214,11 +199,12 @@ void DesireMegaStrike::UnidentifiedUpdate(
         bool bHasGlobalPad = mUnidentifiedFielder->GetGlobalPad() != 0;
         if (bHasGlobalPad)
         {
-            cGlobalPad* pGlobalPad = mUnidentifiedFielder->GetGlobalPad();
+            DetInput* pGlobalPad = mUnidentifiedFielder->GetGlobalPad();
             cGlobalPad* pInputPad = 0;
             if (pGlobalPad != 0)
             {
-                pInputPad = fn_80336D90(pGlobalPad->mUnidentified040);
+                pInputPad = fn_80336D90(
+                    (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser);
             }
             if (pInputPad != 0)
             {

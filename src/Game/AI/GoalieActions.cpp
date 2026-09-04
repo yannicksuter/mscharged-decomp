@@ -19,6 +19,7 @@
 #include "Game/Effects/EmissionController.h"
 #include "Game/MathHelpers.h"
 #include "Game/Net.h"
+#include "Game/NetworkSession.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsFakeBall.h"
@@ -152,8 +153,6 @@ extern nlVector4 lbl_8056D3B0;
 extern unsigned char lbl_806E0D20;
 extern unsigned char lbl_806E0D21;
 extern BaseGameSceneManager* lbl_806E1860;
-extern void* lbl_806E20D8;
-
 extern "C" void fn_800797DC(
     Goalie* pGoalie, int nParam, float fDeltaT, float fParam);
 extern "C" void fn_8007B680(Goalie* pGoalie, bool bParam);
@@ -215,7 +214,7 @@ extern "C" void fn_80080BFC(Goalie* pGoalie, float fDeltaT);
 extern "C" void fn_800EBBFC(
     unsigned int nParam0, unsigned int nParam1, int nParam2, int nParam3);
 extern "C" bool fn_80331C04(
-    cGlobalPad* pGlobalPad, int nButton, bool bRemap);
+    DetInput* pGlobalPad, int nButton, bool bRemap);
 extern "C" void fn_80097574(
     cPlayer* pPlayer, int nNodeIndex, int nAnimID, float fParam);
 extern "C" void fn_8009591C(cPlayer* pPlayer, bool bParam);
@@ -225,7 +224,6 @@ extern "C" void fn_801BABEC(cPlayer* pPlayer);
 extern "C" void fn_801BAF0C(cPlayer* pPlayer);
 extern "C" void fn_801B8B38(cPlayer* pPlayer);
 extern "C" void fn_801B8E5C(cPlayer* pPlayer);
-extern "C" int fn_80338BF0(void* pParam);
 extern "C" bool fn_8003E7F8(cFielder* pFielder);
 extern "C" bool fn_8003E84C(cFielder* pFielder);
 extern "C" void fn_8007EB5C(Goalie* pGoalie);
@@ -2170,7 +2168,7 @@ void Goalie::ActionMove(float deltaTime)
         SetVelocity(v3Zero);
         if (m_pBall != 0)
         {
-            cGlobalPad* pGlobalPad = GetGlobalPad();
+            DetInput* pGlobalPad = GetGlobalPad();
             fn_80139D1C(1, pGlobalPad);
             ReleaseBall(0);
         }
