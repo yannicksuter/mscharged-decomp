@@ -170,4 +170,21 @@ class nlListContainer
 {
 };
 
+template <typename T>
+class nlListSlotPool
+    : public ListContainerBase<T, BasicSlotPool<ListEntry<T> > >
+{
+public:
+    nlListSlotPool()
+        : ListContainerBase<T, BasicSlotPool<ListEntry<T> > >()
+    {
+    }
+
+    nlListSlotPool(int initial, int delta)
+        : ListContainerBase<T, BasicSlotPool<ListEntry<T> > >()
+    {
+        this->m_Allocator.Initialize(initial, delta);
+    }
+};
+
 #endif // NL_NL_LIST_CONTAINER_H

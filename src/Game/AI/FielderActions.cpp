@@ -22,7 +22,7 @@
 #include "Game/AI/AIPad.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/CharacterTweaks.h"
-#include "Game/FixedUpdateTask.h"
+#include "Game/Task/FixedUpdateTask.h"
 #include "Game/MathHelpers.h"
 #include "Game/Net.h"
 #include "Game/NetworkMessages.h"

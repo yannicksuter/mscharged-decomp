@@ -5,11 +5,11 @@
 #include "Game/Player.h"
 #include "Game/ReplayManager.h"
 #include "Game/Task/ProfilerTask.h"
+#include "Game/Task/TweakerTask.h"
 #include "Game/Team.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/globalpad.h"
 
-extern bool lbl_806E1E08;
 extern void* lbl_806E1E28;
 extern "C" cGlobalPad* fn_802C082C(void* manager, int index);
 
@@ -93,13 +93,13 @@ void cFollowCamera::Update(float fDeltaT)
 
         const int numAvailableObjs = snap->NumDrawableObjects();
 
-        if (!lbl_806E1E08 && fDeltaT > 0.0f)
+        if (!g_bTweaking && fDeltaT > 0.0f)
         {
-            if (pController->PlatJustPressed(0xB, true) && !lbl_806E1E08)
+            if (pController->PlatJustPressed(0xB, true) && !g_bTweaking)
             {
                 currentlySelectedTarget = (currentlySelectedTarget - 1 + numAvailableObjs) % numAvailableObjs;
             }
-            if (pController->PlatJustPressed(0xC, true) && !lbl_806E1E08)
+            if (pController->PlatJustPressed(0xC, true) && !g_bTweaking)
             {
                 currentlySelectedTarget = (currentlySelectedTarget + 1) % numAvailableObjs;
             }
@@ -127,7 +127,7 @@ void cFollowCamera::Update(float fDeltaT)
         m_bControlsLocked = !m_bControlsLocked;
     }
 
-    if (!lbl_806E1E08 && !fn_802BDB20() && !m_bControlsLocked
+    if (!g_bTweaking && !IsProfiling() && !m_bControlsLocked
         && !pController->IsPressed(0xF, true) && !pController->IsPressed(0x10, true))
     {
         m_fOOIDistance -= InterpolateRange(

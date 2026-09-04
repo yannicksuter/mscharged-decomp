@@ -7,7 +7,7 @@
 #include "Game/GameInfo.h"
 #include "Game/NetworkDraft.h"
 #include "Game/NetTournManager.h"
-#include "Game/ResetTask.h"
+#include "Game/Task/ResetTask.h"
 #include "Game/NetworkMessages.h"
 #include "Game/NetworkStatsManager.h"
 

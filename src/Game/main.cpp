@@ -1,14 +1,14 @@
 #include "Game/main.h"
 
-#include "Game/BeginFrameTask.h"
-#include "Game/ComUpdateTask.h"
+#include "Game/Task/BeginFrameTask.h"
+#include "Game/Task/ComUpdateTask.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Debug/FrameCounter.h"
 #include "Game/Effects/EmissionManager.h"
-#include "Game/FrontEndTask.h"
+#include "Game/Task/FrontEndTask.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/feHelpFuncs.h"
-#include "Game/ResetTask.h"
+#include "Game/Task/ResetTask.h"
 #include "Game/Render/Wiper.h"
 #include "Game/Sys/audio.h"
 #include "Game/Sys/simpleparser.h"
@@ -132,7 +132,6 @@ void nlRegCheckForResetFromFSCB(const Function<FnVoidVoid>&);
 extern bool g_bDisableWriteOut;
 extern bool g_bActivateMemoryLowWaterMarkChecking;
 extern bool g_bPrintMemoryNewLowWaterMarks;
-extern bool lbl_806E1E08;
 extern void* lbl_806E1C20;
 extern void* lbl_806E1E28;
 
@@ -303,7 +302,7 @@ void UnidentifiedMemCheckTask::Run(float)
         (subsystemAllocator->m_14 - subsystemAllocator->m_10) / bytesPerMiB;
 
     if (nlTaskManager::m_pInstance->mCurrentState == 2 &&
-        sPreviousTaskState == 2 && !lbl_806E1E08)
+        sPreviousTaskState == 2 && !g_bTweaking)
     {
         mAccumulatedDelta += sLastVirtualFreeDelta;
         ++mSampleCount;

@@ -1,4 +1,4 @@
-#include "Game/BeginFrameTask.h"
+#include "Game/Task/BeginFrameTask.h"
 
 #include "Game/TweakValue.h"
 #include "NL/glx/glxSwap.h"

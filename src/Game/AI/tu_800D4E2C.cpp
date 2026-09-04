@@ -94,8 +94,8 @@ public:
 
     virtual void UnidentifiedVirtual2();
     virtual void UnidentifiedVirtual3(float deltaTime);
-    virtual void UnidentifiedVirtual4(void* context);
-    virtual void* UnidentifiedVirtual5(
+    virtual void UnidentifiedVirtual4(bool param);
+    virtual shdStateMachine* UnidentifiedVirtual5(
         int state, UnidentifiedVariantCollection* params, bool force);
     virtual void UnidentifiedVirtual6();
     virtual void UnidentifiedVirtual7();
@@ -324,10 +324,10 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 /**
  * Offset/Address/Size: 0xCB8 | 0x800D5AE4 | size: 0x54
  */
-void UnidentifiedFielderDesireMachine::UnidentifiedVirtual4(void* context)
+void UnidentifiedFielderDesireMachine::UnidentifiedVirtual4(bool param)
 {
-    UnidentifiedScriptMachine::UnidentifiedVirtual4(context);
-    if (context == 0)
+    UnidentifiedScriptMachine::UnidentifiedVirtual4(param);
+    if (!param)
     {
         fn_80319E84(this, 34, 0, false);
     }
@@ -485,7 +485,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
 /**
  * Offset/Address/Size: 0x1390 | 0x800D61BC | size: 0x18
  */
-void* UnidentifiedFielderDesireMachine::UnidentifiedVirtual5(
+shdStateMachine* UnidentifiedFielderDesireMachine::UnidentifiedVirtual5(
     int state, UnidentifiedVariantCollection* params, bool force)
 {
     if (state == 17)

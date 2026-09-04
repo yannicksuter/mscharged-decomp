@@ -3,7 +3,7 @@
 #include "Game/BaseGameSceneManager.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/GameInfo.h"
-#include "Game/ResetTask.h"
+#include "Game/Task/ResetTask.h"
 #include "Game/main.h"
 
 #include <math.h>

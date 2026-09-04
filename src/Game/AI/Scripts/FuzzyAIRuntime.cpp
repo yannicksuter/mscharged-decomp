@@ -1,5 +1,6 @@
 #include "Game/Ball.h"
 #include "Game/AI/Fielder.h"
+#include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/Variant.h"
@@ -23,36 +24,6 @@ struct UnidentifiedRuntimeCollection
     UnidentifiedVariantCollection mCollection;
 };
 
-class UnidentifiedFuzzyRuntimeBase : public InterpreterCore
-{
-public:
-    UnidentifiedFuzzyRuntimeBase(void*);
-    virtual ~UnidentifiedFuzzyRuntimeBase();
-    virtual void DoFunctionCall(unsigned int) = 0;
-    virtual bool UnidentifiedVirtual2(FunctionEntryPoint*, unsigned int, u32, u32, u32, u32);
-    virtual float UnidentifiedVirtual3(float, float);
-    virtual float UnidentifiedVirtual4(float, float);
-    virtual float UnidentifiedVirtual5(float);
-    virtual float UnidentifiedVirtual6(float);
-    virtual float UnidentifiedVirtual7(float, float, float);
-    virtual float UnidentifiedVirtual8();
-    virtual void UnidentifiedVirtual9();
-    virtual float UnidentifiedVirtual10(float);
-    virtual float UnidentifiedVirtual11();
-    virtual void UnidentifiedVirtual12();
-    virtual UnidentifiedVariant_80054AB8* UnidentifiedReturn(
-        UnidentifiedVariant_80054AB8*, float);
-    virtual void UnidentifiedVirtual14(void*, void*, void*);
-    virtual void UnidentifiedVirtual15();
-
-    u32 mUnidentified028;
-    Variant* mValue;
-    UnidentifiedActionQueue** mCollection;
-    u8 mUnidentified034[0x24];
-    int mUnidentified058;
-    u8 mUnidentified05C[0x0C];
-};
-
 class UnidentifiedFuzzyRuntime : public UnidentifiedFuzzyRuntimeBase
 {
 public:
@@ -60,8 +31,8 @@ public:
     virtual ~UnidentifiedFuzzyRuntime();
     virtual void DoFunctionCall(unsigned int);
     virtual float UnidentifiedVirtual8();
-    virtual void UnidentifiedVirtual9();
-    virtual void UnidentifiedVirtual12();
+    virtual UnidentifiedVariant_80054AB8* UnidentifiedVirtual9();
+    virtual void UnidentifiedVirtual12(UnidentifiedVariant_80054AB8*);
     virtual void UnidentifiedVirtual15();
 };
 
@@ -80,30 +51,6 @@ struct UnidentifiedRuntimeFielderReference
     cTeam* mTeam;
 };
 
-struct UnidentifiedRuntimeTypeEntry
-{
-    UnidentifiedRuntimeTypeEntry(const char* name, int type)
-        : mType(type)
-        , mHash(nlStringLowerHash(name))
-    {
-    }
-
-    int mType;
-    unsigned long mHash;
-    UnidentifiedRuntimeTypeEntry* next;
-};
-
-struct UnidentifiedRuntimeTypeList
-{
-    UnidentifiedRuntimeTypeEntry* mHead;
-    UnidentifiedRuntimeTypeEntry* mTail;
-
-    void AddEnd(UnidentifiedRuntimeTypeEntry* entry)
-    {
-        nlListAddEnd(&mHead, &mTail, entry);
-    }
-};
-
 extern "C" void fn_8002E198();
 extern "C" void fn_800A695C();
 extern "C" void fn_80314444();
@@ -112,13 +59,11 @@ extern "C" bool fn_800A3350(
     void*, unsigned long, float*, cFielder*);
 extern "C" void* fn_800A636C(cTeam*);
 extern "C" float* fn_800A3404(void*);
-extern "C" int fn_80312208(void*);
 extern "C" void* fn_80312E0C(void*, const Variant&);
 extern "C" int fn_802DF9FC(InterpreterCore*);
 extern "C" void fn_800B6A1C(
     UnidentifiedVariant_80054AB8*, int, const Variant&);
 extern "C" void* lbl_806E0C94;
-extern "C" UnidentifiedRuntimeTypeList lbl_806E20B0;
 
 char lbl_80503EEC[] = "art/Scripts/FuzzyAI.byte_code";
 char lbl_80503F0C[] = "Direction";
@@ -203,21 +148,23 @@ float UnidentifiedFuzzyRuntime::UnidentifiedVirtual8()
 
     if (value != 0)
     {
-        UnidentifiedActionQueue* collection = *mCollection;
+        UnidentifiedActionQueue* collection = mCollection.mHead->mQueue;
         collection->fn_80310034(fn_800A3404(value), 4);
     }
 
     return result;
 }
 
-void UnidentifiedFuzzyRuntime::UnidentifiedVirtual9()
+UnidentifiedVariant_80054AB8*
+UnidentifiedFuzzyRuntime::UnidentifiedVirtual9()
 {
-    UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual9();
+    return UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual9();
 }
 
-void UnidentifiedFuzzyRuntime::UnidentifiedVirtual12()
+void UnidentifiedFuzzyRuntime::UnidentifiedVirtual12(
+    UnidentifiedVariant_80054AB8* action)
 {
-    UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual12();
+    UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual12(action);
 }
 
 extern "C" cPlayer* fn_800E34D8()
@@ -312,7 +259,7 @@ extern "C" void fn_800E3958(
 }
 
 extern "C" void fn_800E3A84(
-    void*, cPlayer* value, void* descriptor,
+    void*, cPlayer* value, unsigned long descriptor,
     UnidentifiedRuntimeCollection* runtime)
 {
     int index = fn_80312208(descriptor);
@@ -323,7 +270,7 @@ extern "C" void fn_800E3A84(
 }
 
 extern "C" void fn_800E3B34(
-    void*, cBall* value, void* descriptor,
+    void*, cBall* value, unsigned long descriptor,
     UnidentifiedRuntimeCollection* runtime)
 {
     int index = fn_80312208(descriptor);
@@ -639,7 +586,7 @@ extern "C" unsigned long fn_800E8CB0(void*, Variant* value)
 }
 
 extern "C" void fn_800E8CB8(
-    void*, cPlayer* value, void* descriptor,
+    void*, cPlayer* value, unsigned long descriptor,
     UnidentifiedRuntimeCollection* runtime)
 {
     int index = fn_80312208(descriptor);
@@ -676,7 +623,7 @@ extern "C" void fn_800E8D74()
 
 extern "C" void fn_800E8D78(
     void*, UnidentifiedRuntimeFielderReference* value,
-    void* descriptor, UnidentifiedRuntimeCollection* runtime)
+    unsigned long descriptor, UnidentifiedRuntimeCollection* runtime)
 {
     cFielder* fielder = value->mTeam->GetFielder(value->mIndex);
     int index = fn_80312208(descriptor);

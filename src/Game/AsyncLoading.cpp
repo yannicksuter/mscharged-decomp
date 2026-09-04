@@ -4,7 +4,7 @@
 #include "Game/Audio/AudioBundleManager_802EDA7C.h"
 #include "Game/Audio/AudioLoadMode_806E201C.h"
 #include "Game/BaseGameSceneManager.h"
-#include "Game/BeginFrameTask.h"
+#include "Game/Task/BeginFrameTask.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/DB/StatsTracker.h"
 #include "Game/Debug/FrameCounter.h"
@@ -12,7 +12,7 @@
 #include "Game/Drawable/DrawableModel.h"
 #include "Game/FE/feManager.h"
 #include "Game/FE/feSceneManager.h"
-#include "Game/FixedUpdateTask.h"
+#include "Game/Task/FixedUpdateTask.h"
 #include "Game/Game.h"
 #include "Game/NetworkSession.h"
 #include "Game/NisPlayer.h"
@@ -33,6 +33,7 @@
 #include "Game/Task/ParticleUpdateTask.h"
 #include "Game/Transitions/ScreenTransitionManager.h"
 #include "Game/TweakValue.h"
+#include "Game/Task/TweakerTask.h"
 #include "NL/nlConfig.h"
 #include "NL/nlDebug.h"
 #include "NL/nlFile.h"
@@ -188,7 +189,6 @@ extern u8 lbl_805721E8[];
 extern UnidentifiedDeletable* lbl_806E2090;
 extern SlotPool<cSAnimCallback> lbl_805840D8;
 extern SlotPoolBase lbl_8057AB80;
-extern bool lbl_806E1E08;
 extern bool lbl_806E1090;
 extern void* lbl_806E18C0;
 
@@ -802,7 +802,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     cPN_8030E550::mSlotPool.FreeBlocks();
     lbl_805840D8.FreeBlocks();
 
-    if (lbl_806E1E08)
+    if (g_bTweaking)
     {
         fn_802BDA28();
     }

@@ -4,7 +4,7 @@
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
 #include "Game/GameInfo.h"
-#include "Game/ResetTask.h"
+#include "Game/Task/ResetTask.h"
 #include "Game/Sys/audio.h"
 #include "Game/Sys/movie.h"
 #include "NL/MemAlloc.h"

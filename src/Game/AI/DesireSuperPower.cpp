@@ -98,7 +98,7 @@ DesireSuperPower::DesireSuperPower()
  * Offset/Address/Size: 0x60 | 0x800C875C | size: 0x274
  */
 void DesireSuperPower::UnidentifiedSetContext(
-    UnidentifiedDesireContext* context)
+    UnidentifiedScriptMachine* context)
 {
     Desire::UnidentifiedSetContext(context);
 

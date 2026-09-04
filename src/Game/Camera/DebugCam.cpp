@@ -3,6 +3,7 @@
 #include "Game/CharacterTemplate.h"
 #include "Game/MathHelpers.h"
 #include "Game/Task/ProfilerTask.h"
+#include "Game/Task/TweakerTask.h"
 #include "Game/TweakValue.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
@@ -78,7 +79,6 @@ static u32 sLightBlobTexture = nlStringLowerHash("global/light_blob");
 } // namespace
 
 extern void* lbl_806E1E28;
-extern bool lbl_806E1E08;
 extern "C" cGlobalPad* fn_802C082C(void* manager, int index);
 
 extern "C" void fn_800F2504()
@@ -279,7 +279,7 @@ void cDebugCamera::Update(float dt)
     float controlSpeed = sfControlDistanceScale *
         (1.0f + sfControlHeightScale * (m_fRadius + m_fHeight));
 
-    if (!lbl_806E1E08 && !fn_802BDB20())
+    if (!g_bTweaking && !IsProfiling())
     {
         m_pPad = fn_802C082C(lbl_806E1E28, 0);
 

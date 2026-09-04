@@ -13,4 +13,6 @@ public:
     }
 };
 
+extern bool g_bTweaking;
+
 #endif // GAME_TWEAKER_TASK_H

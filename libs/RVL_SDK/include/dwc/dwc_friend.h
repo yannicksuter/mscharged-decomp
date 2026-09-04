@@ -1,12 +1,17 @@
 #pragma once
 
 #include <dwc/dwc_common.h>
+#include <dwc/dwc_error.h>
 #include <revolution/types.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+#define DWC_GP_PROCESS_INTERVAL 300
+#define DWC_FRIEND_UPDATE_WAIT_COUNT 7
+#define DWC_GP_STATUS_NO_CHANGE -1
 
     typedef void (*DWCBuddyFriendCallback)(int index, void* param);
     typedef void (*DWCFriendStatusCallback)(int index, u8 status,
@@ -15,6 +20,7 @@ extern "C"
         void* param);
     typedef void (*DWCDeleteFriendListCallback)(int deletedIndex,
         int sourceIndex, void* param);
+    typedef void (*DWCStorageLoginCallback)(DWCError error, void* param);
 
     typedef enum DWCFriendState
     {
@@ -33,6 +39,14 @@ extern "C"
         DWC_BUDDY_UPDATE_STATE_NUM
     };
 
+    enum
+    {
+        DWC_PERS_STATE_INIT,
+        DWC_PERS_STATE_LOGIN,
+        DWC_PERS_STATE_CONNECTED,
+        DWC_PERS_STATE_NUM
+    };
+
     BOOL DWC_SetOwnStatusData(const char* statusData, u32 size);
     void DWC_DeleteBuddyFriendData(DWCFriendData* friendData);
     BOOL DWC_SetBuddyFriendCallback(DWCBuddyFriendCallback callback, void* param);
@@ -42,6 +56,7 @@ extern "C"
         DWCFriendStatusCallback statusCallback, void* statusParam,
         DWCDeleteFriendListCallback deleteCallback, void* deleteParam);
     void DWCi_StopFriendProcess(int error, int errorCode);
+    void DWCi_FriendProcess(void);
     void DWCi_UpdateServersAsync(const char* authToken,
         const char* partnerChallenge, DWCUpdateServersCallback updateCallback,
         void* updateParam, DWCFriendStatusCallback statusCallback,
