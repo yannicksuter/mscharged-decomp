@@ -1,8 +1,11 @@
 #include "Game/Task/FixedUpdateTask.h"
 
+#include "unclassified/tu_801AD15C.h"
+
 #include "Game/AI/AiUtil.h"
 #include "Game/Ball.h"
 #include "Game/CharacterTemplate.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
 #include "Game/Goalie.h"
@@ -22,47 +25,14 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "types.h"
+#include "unclassified/tu_80331BE4.h"
+#include "unclassified/tu_80332DC0.h"
+#include "unclassified/tu_80336B2C.h"
+#include "unclassified/tu_80338898.h"
 
 #include <math.h>
 
-class DebugWriteCache;
 struct UnidentifiedPeachPhotoState;
-
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-struct UnclassifiedControllerGroup
-{
-    void* mUnidentified000;
-    int mNumControllers;
-};
-
-// Deterministic input record logged for every controller.
-struct DetInput
-{
-    /* 0x00 */ float m_AnalogLeftX;
-    /* 0x04 */ float m_AnalogLeftY;
-    /* 0x08 */ float m_AnalogRightX;
-    /* 0x0C */ float m_AnalogRightY;
-    /* 0x10 */ u8 m_nConnected;
-    /* 0x12 */ u16 m_ButtonBitfield;
-    /* 0x14 */ u8 m_LeftTrigger;
-    /* 0x15 */ u8 m_RightTrigger;
-    /* 0x18 */ nlVector3 m_v3RevRemoteAccel;
-    /* 0x24 */ nlVector3 m_v3RevFreeStyleAccel;
-    /* 0x30 */ int m_nRevDPDNumTargets;
-    /* 0x34 */ nlVector2 m_v2RevDPDCoord;
-    /* 0x3C */ void* m_pPrevInput;
-    /* 0x40 */ void* m_pMyUser;
-    /* 0x44 */ nlPolar m_PolarAnalogLeft;
-    /* 0x4C */ nlPolar m_PolarAnalogRight;
-    /* 0x54 */ int m_buttonStateTicks[13];
-    /* 0x88 */ u16 m_aRemapAngle;
-}; // size: 0x8C
 
 extern u16 m_aJoystickRemap__14cCameraManager;
 extern "C" bool lbl_806E180D;
@@ -71,39 +41,17 @@ extern "C" bool fn_80287AB0(void*);
 extern "C" void fn_802C084C(void*, int);
 extern "C" void fn_802C07AC(void*, float);
 extern "C" void fn_8037537C(void*);
-extern "C" int fn_803328B4(void*);
-extern "C" void fn_803328FC(void*);
-extern "C" bool fn_80332A00(void*);
-extern "C" void* fn_803330AC();
-extern "C" void fn_80333A18();
 extern "C" void fn_8005A8FC(cGame*, float);
 extern "C" void fn_80142A1C();
 extern "C" void fn_801AD7E4(UnidentifiedPeachPhotoState*, float, int);
 extern "C" void fn_800A8DE8(cTeam*, RunningChecksum*);
 extern "C" void fn_8005B840(cGame*, void*, DebugWriteCache*);
 extern "C" void fn_800A8900(cTeam*, void*, DebugWriteCache*);
-extern "C" DebugWriteCache* fn_80338950(void*);
-extern "C" void fn_80339544(DebugWriteCache*, u32 frame);
-extern "C" void fn_80338D04(DebugWriteCache*, u16* type, const char* name, RunningChecksum*, float value);
-extern "C" UnclassifiedControllerGroup* fn_80338BF8(void*, s8);
-extern "C" void* fn_80336B6C(UnclassifiedControllerGroup*, int);
-extern "C" cGlobalPad* fn_80336D68(void*);
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void fn_80339090(DebugWriteCache*, int, unsigned short, unsigned int, unsigned int, const char*);
-extern "C" void* fn_8033930C(DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(DebugWriteCache*, unsigned short, void*, void*);
-extern "C" void fn_8033919C(DebugWriteCache*, const char*);
-extern "C" DebugFieldType lbl_80533C98[];
 extern "C" u16 lbl_806DF740;
 extern "C" int lbl_806E2130;
-extern "C" UnidentifiedPeachPhotoState lbl_80573CA8;
 
 extern void* lbl_806E1E28;
 extern void* lbl_806E2478;
-extern void* lbl_806E2138;
-extern void* lbl_806E2168;
 
 float g_fFixedUpdateTick = 0.02f;
 bool g_bRunSimAndRenderInLockStep;
@@ -135,7 +83,7 @@ extern "C" bool fn_80111664()
 static FixedUpdateTask fixedUpdateTask;
 float g_fSimulationTick = g_fFixedUpdateTick;
 
-extern "C" FixedUpdateTask* fn_8011166C()
+FixedUpdateTask* GetFixedUpdateTask()
 {
     return &fixedUpdateTask;
 }
@@ -222,12 +170,11 @@ u32 FixedUpdateTask::WriteSyncLog()
     int numGroups = fn_80338BF0(lbl_806E20D8);
     for (int groupIndex = 0; groupIndex < numGroups; groupIndex++)
     {
-        UnclassifiedControllerGroup* group = fn_80338BF8(lbl_806E20D8, (s8)groupIndex);
-        int numControllers = group->mNumControllers;
+        UnidentifiedNetworkPeer* group = fn_80338BF8(lbl_806E20D8, (s8)groupIndex);
+        int numControllers = group->mUnidentified004;
         for (int controllerIndex = 0; controllerIndex < numControllers; controllerIndex++)
         {
-            DetInput* pad =
-                (DetInput*)fn_80336D68(fn_80336B6C(group, controllerIndex));
+            DetInput* pad = fn_80336D68(fn_80336B6C(group, controllerIndex));
             if (lbl_806DF740 == 0xFFFF)
             {
                 lbl_806DF740 = fn_80338EBC(cache, sDetInputName);
@@ -259,7 +206,7 @@ u32 FixedUpdateTask::WriteSyncLog()
             if (copy != 0)
             {
                 copy->m_pPrevInput = 0;
-                copy->m_pMyUser = (void*)((cGlobalPad*)pad)->fn_80332748();
+                copy->m_pMyUser = (void*)pad->fn_80332748();
                 fn_80339450(cache, lbl_806DF740, copy, &checksum);
             }
         }
@@ -412,13 +359,13 @@ void FixedUpdateTask::Run(float dt)
                 mAccumulatedDeltaT = 0.0f;
             }
 
-            int updateCount = fn_803328B4(lbl_806E2138);
-            fn_803328FC(lbl_806E2138);
+            int updateCount = lbl_806E2138->fn_803328B4();
+            lbl_806E2138->fn_803328FC();
 
             bool updated = false;
             for (int i = 0; i < updateCount; ++i)
             {
-                if (fn_80332A00(lbl_806E2138))
+                if (lbl_806E2138->fn_80332A00())
                 {
                     CallFixedUpdateTasks();
                     updated = true;
@@ -521,7 +468,7 @@ void FixedUpdateTask::CallFixedUpdateTasks()
     }
 
     mEventDispatcher.Dispatch(true);
-    fn_801AD7E4(&lbl_80573CA8, g_fSimulationTick, lbl_806E2130--);
+    fn_801AD7E4(&gPeachPhotoState, g_fSimulationTick, lbl_806E2130--);
     ReplayManager::Instance()->GrabSnapshot();
 }
 

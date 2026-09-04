@@ -6,17 +6,10 @@
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/CharacterTriggers.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
 #include "Game/SAnim/pnSAnimController.h"
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-extern "C" DebugFieldType lbl_80533C98[];
 extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002C7D0(PlayerTweaks*);
 extern "C" float fn_8002CFD8(PlayerTweaks*);
@@ -31,15 +24,6 @@ extern "C" void fn_801B8164(cFielder*);
 extern "C" void fn_801B7F8C(cFielder*);
 extern "C" void fn_801B865C(cFielder*);
 extern "C" UnidentifiedFielderInput* fn_80316974(void*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
-
 extern float lbl_806E0E40;
 extern const nlVector3 lbl_804DC1A0;
 extern UnidentifiedStateTransition lbl_806E20B8;

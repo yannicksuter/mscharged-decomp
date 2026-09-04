@@ -65,7 +65,7 @@ extern "C" void fn_802DEDE8(InterpreterCore*);
 
 extern "C" void* lbl_806E17F0;
 extern "C" void* lbl_806E0F90;
-extern "C" bool lbl_806E1090;
+extern bool g_e3_Build;
 extern "C" bool lbl_806DC704;
 extern "C" bool lbl_806E0F8B;
 extern "C" TLComponentInstance* lbl_80578450[4];
@@ -267,7 +267,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         StopWithUndo();
         break;
     case 9:
-        *m_SP++ = lbl_806E1090;
+        *m_SP++ = g_e3_Build;
         break;
     case 10:
     {

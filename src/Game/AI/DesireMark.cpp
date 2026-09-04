@@ -2,20 +2,13 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
 #include "Game/Net.h"
 #include "Game/Player.h"
 #include "Game/Team.h"
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-extern "C" DebugFieldType lbl_80533C98[];
 extern "C" SkillTweaks* fn_800A636C(cTeam*);
 extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
 extern "C" nlVector3* fn_80040234(cFielder*);
@@ -25,15 +18,6 @@ extern "C" float fn_800D9070(cFielder*);
 extern "C" float fn_800DEFD4(cFielder*);
 extern "C" float fn_800DEAB4(cFielder*);
 extern "C" cPlayer* fn_800DF790(cTeam*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
-
 extern cTeam* lbl_806E0E00;
 
 static float lbl_806DC0B8 = 0.1f;

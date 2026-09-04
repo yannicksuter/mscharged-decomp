@@ -32,7 +32,7 @@ struct PermanentBundleLoadState
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
 extern void* lbl_806E2090;
-extern void nlPrintf(const char* format, ...);
+extern int nlPrintf(const char* format, ...);
 
 extern "C" ResourceInterface_802CC094* fn_802CC094();
 extern "C" void fn_802C8284(unsigned long texture);

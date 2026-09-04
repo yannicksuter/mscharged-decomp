@@ -18,7 +18,6 @@ nlDLListSlotPool<BallCacheInfo*> FakeBallWorld::mBallCacheList;
 float FakeBallWorld::mfLastCacheTime = -1.0f;
 nlDLListIterator<BallCacheInfo*>* FakeBallWorld::mpCacheIterator;
 
-extern "C" FixedUpdateTask* fn_8011166C();
 
 class SimpleCollisionSpace : public CollisionSpace
 {
@@ -162,7 +161,7 @@ bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
     }
 
     float fPhysicsTick = FixedUpdateTask::GetPhysicsUpdateTick();
-    float fSimTime = fn_8011166C()->mSimulationTime;
+    float fSimTime = GetFixedUpdateTask()->mSimulationTime;
     if (mfLastCacheTime < fSimTime)
     {
         ClearBallCache();
@@ -310,7 +309,7 @@ float FakeBallWorld::GetPredictedPlaneIntersectTime(
         return -2.5f;
     }
 
-    float fSimulationTime = fn_8011166C()->mSimulationTime;
+    float fSimulationTime = GetFixedUpdateTask()->mSimulationTime;
     float fPhysicsTick = FixedUpdateTask::GetPhysicsUpdateTick();
     nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
     BallCacheInfo* pNext = *iter;
@@ -421,7 +420,7 @@ float FakeBallWorld::GetPredictedHeightLimitTime(float fHeight,
     }
 
     float fPhysicsTick = FixedUpdateTask::GetPhysicsUpdateTick();
-    float fSimulationTime = fn_8011166C()->mSimulationTime;
+    float fSimulationTime = GetFixedUpdateTask()->mSimulationTime;
     float fTestTime = fSimulationTime + fMinTime;
     float fLastZVel = 0.0f;
     nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
@@ -490,7 +489,7 @@ float FakeBallWorld::GetPredictedPosAtDistance(float fDistance,
     }
 
     float fPhysicsTick = FixedUpdateTask::GetPhysicsUpdateTick();
-    float fSimulationTime = fn_8011166C()->mSimulationTime;
+    float fSimulationTime = GetFixedUpdateTask()->mSimulationTime;
     float fDistanceTargetSq = fDistance * fDistance;
     nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
     BallCacheInfo* pNext = *iter;

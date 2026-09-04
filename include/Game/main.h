@@ -5,6 +5,7 @@
 
 extern nlLocalization::nlLanguage g_Language;
 extern int g_BuildNumber;
+extern bool g_e3_Build;
 
 int GetRegion();
 

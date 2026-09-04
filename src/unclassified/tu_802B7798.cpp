@@ -1,14 +1,14 @@
-class GLView;
+#include "unclassified/tu_802B7798.h"
 
 static GLView* lbl_806E1DB8;
 static GLView* lbl_806E1DBC;
 
-extern "C" void fn_802B7798(GLView* pView)
+void SetDebugFontView(GLView* pView)
 {
     lbl_806E1DB8 = pView;
 }
 
-extern "C" GLView* fn_802B77A0()
+GLView* GetDebugFontView()
 {
     return lbl_806E1DB8;
 }

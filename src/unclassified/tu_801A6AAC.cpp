@@ -1,5 +1,7 @@
 #include "unclassified/tu_801A6AAC.h"
 
+#include "Game/Render/RLView.h"
+
 #include "Game/AI/AiUtil.h"
 #include "Game/NetworkSession.h"
 #include "NL/gl/glDraw2.h"
@@ -29,7 +31,6 @@ struct UnidentifiedMegaBallMessage
 extern "C"
 {
     int fn_802C2C84(const char* pPath, int nDefault);
-    GLView* fn_8027267C(int nIndex);
     bool fn_80273B00();
     int fn_80364630(void* pData, nlVector2* pPosition, u16* pAngle);
     u32 fn_8032C830(void* pCodec, void* pMessage, void* pBuffer, int nSize);
@@ -505,7 +506,7 @@ extern "C" void fn_801A7A3C(int nX, int nY, unsigned int nTexture,
     nlColourSet(colour, 0xFF, 0xFF, 0xFF, (u8)(int)(255.0f * fOpacity));
     poly.SetColour(colour);
     poly.depth = -0.5f;
-    poly.Attach(fn_8027267C(0x26), 0, 0);
+    poly.Attach(GetLayerView(eCLV_UnsortedOrtho640), 0, 0);
 }
 
 extern "C" void fn_801A7C40(void* pControllerInfo)
@@ -909,7 +910,7 @@ extern "C" void fn_801A8CA0(float)
     }
 }
 
-extern "C" void fn_801A8EE0(float fDeltaT)
+void UpdateAndRenderMegaBallIndicators(float fDeltaT)
 {
     fn_801A8504();
     fn_801A8CA0(fDeltaT);

@@ -2,24 +2,17 @@
 
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/Fielder.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Event.h"
 #include "Game/Game.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlMath.h"
 #include <stdlib.h>
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
     UnidentifiedEventRegistry;
 
-extern "C" DebugFieldType lbl_80533C98[];
 extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
 extern "C" cGame* lbl_806E0C94;
 extern "C" void fn_800C2C18(UnidentifiedDesireUpdate*, int);
@@ -53,16 +46,6 @@ extern "C" eCharacterClass fn_800D1440(const cCharacter*);
 extern "C" unsigned short fn_800D1448(const cCharacter*);
 extern "C" const nlVector3* fn_800D1450(const cCharacter*);
 extern "C" bool fn_800D1458(const cGame*);
-extern "C" unsigned short fn_80338EBC(
-    DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
-
 static unsigned short sDesireSuperPowerType = 0xFFFF;
 
 static inline void UnidentifiedRegisterEventCallback(

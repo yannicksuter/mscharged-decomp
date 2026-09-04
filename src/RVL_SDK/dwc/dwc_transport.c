@@ -17,7 +17,7 @@ typedef struct DWCTransportEntryView
     int _14;
     int _18;
     s8 _1C;
-    char recvState;
+    u8 recvState;
     s8 _1E;
     u8 _1F[3];
     u16 _22;
@@ -170,8 +170,9 @@ BOOL DWC_SendUnreliable(u8 aid, const void* buffer, int size)
 BOOL DWC_SetRecvBuffer(u8 aid, void* buffer, int size)
 {
     DWCTransportEntryView* entry = &lbl_806E2F00->entries[aid];
+    int recvState = entry->recvState;
 
-    if (entry->recvState == 2)
+    if (recvState == 2)
     {
         DWC_Printf(0x10000, "+++ Cannot set recv buffer\n");
         return FALSE;

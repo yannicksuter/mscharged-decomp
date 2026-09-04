@@ -8,6 +8,7 @@
 #include <gamespy/gstats/gpersist.h>
 #include <gpi.h>
 #include <revolution/os/OSTime.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef struct DWCFriendControl
@@ -51,6 +52,8 @@ static void DWCi_DeleteFriendFromList(DWCFriendData friendData[],
 static BOOL DWCi_RefreshFriendListForth(DWCFriendData friendList[], int index,
     int profileID);
 static GPResult DWCi_GPSendBuddyRequest(int profileID);
+static BOOL DWCi_GetFriendBuddyStatus(const DWCFriendData* friendData,
+    GPBuddyStatus* status);
 static GPResult DWCi_HandleGPError(GPResult result);
 int DWCi_HandlePersError(int error);
 static void DWCi_StopPersLogin(DWCError error, int errorCode);
@@ -68,6 +71,82 @@ static void DWCi_GPGetInfoCallback_RecvAuthMessage(GPConnection* connection,
     void* param);
 int DWCi_GetFriendListIndex(int profileID);
 static void DWCi_CallBuddyFriendCallback(int index);
+u8 DWC_GetFriendStatus(const DWCFriendData* friendData, char* statusString)
+{
+    return DWC_GetFriendStatusSC(friendData, NULL, NULL, statusString);
+}
+
+u8 DWC_GetFriendStatusSC(const DWCFriendData* friendData, u8* maxEntry,
+    u8* numEntry, char* statusString)
+{
+    char valueStr[4];
+    int len;
+    GPBuddyStatus status;
+
+    if (DWCi_GetFriendBuddyStatus(friendData, &status))
+    {
+        if (status.status == DWC_STATUS_MATCH_SC_SV)
+        {
+            if (maxEntry)
+            {
+                len = DWC_GetCommonValueString(DWC_GP_SSTR_KEY_MATCH_SC_MAX,
+                    valueStr, status.statusString, '/');
+                if (len > 0)
+                {
+                    *maxEntry = (u8)strtoul(valueStr, NULL, 10);
+                }
+                else
+                {
+                    *maxEntry = 0;
+                }
+            }
+
+            if (numEntry)
+            {
+                len = DWC_GetCommonValueString(DWC_GP_SSTR_KEY_MATCH_SC_NUM,
+                    valueStr, status.statusString, '/');
+                if (len > 0)
+                {
+                    *numEntry = (u8)strtoul(valueStr, NULL, 10);
+                }
+                else
+                {
+                    *numEntry = 0;
+                }
+            }
+        }
+        else
+        {
+            if (maxEntry)
+            {
+                *maxEntry = 0;
+            }
+            if (numEntry)
+            {
+                *numEntry = 0;
+            }
+        }
+
+        if (statusString)
+        {
+            strcpy(statusString, status.locationString);
+        }
+
+        return status.status;
+    }
+    else
+    {
+        if (maxEntry)
+        {
+            *maxEntry = 0;
+        }
+        if (numEntry)
+        {
+            *numEntry = 0;
+        }
+        return DWC_STATUS_OFFLINE;
+    }
+}
 
 BOOL DWC_SetOwnStatusData(const char* statusData, u32 size)
 {
@@ -657,7 +736,7 @@ static GPResult DWCi_GPProcess(void)
     return result;
 }
 
-BOOL DWCi_GetFriendBuddyStatus(const DWCFriendData* friendData,
+static BOOL DWCi_GetFriendBuddyStatus(const DWCFriendData* friendData,
     GPBuddyStatus* status)
 {
     u8 ret;
@@ -769,7 +848,7 @@ static void DWCi_CallBuddyFriendCallback(int index)
 int DWCi_HandlePersError(int error)
 {
     int errorCode;
-    DWCErrorType dwcError;
+    DWCError dwcError;
 
     if (error == GE_NOERROR)
     {
@@ -989,7 +1068,7 @@ static void DWCi_GPGetInfoCallback_RecvAuthMessage(GPConnection* connection,
     int index;
     int i;
     BOOL listChanged = FALSE;
-    BOOL alreadyBuddy = FALSE;
+    BOOL alreadyBuddy = TRUE;
 
     if (arg->result != GP_NO_ERROR)
     {
@@ -1027,30 +1106,26 @@ static void DWCi_GPGetInfoCallback_RecvAuthMessage(GPConnection* connection,
             || DWC_GetFriendDataType(&stpFriendCnt->friendList[i])
                 == DWC_FRIENDDATA_FRIEND_KEY)
         {
-            if (DWC_GetGsProfileId(fn_8048C530(),
-                    &stpFriendCnt->friendList[i])
+            if (DWC_IsBuddyFriendData(&stpFriendCnt->friendList[i])
+                == TRUE)
+            {
+                DWC_Printf(DWC_REPORTFLAG_UPDATE_SV,
+                    "This profile is already my buddy.\n");
+                alreadyBuddy = FALSE;
+            }
+            else if (DWC_GetGsProfileId(fn_8048C530(),
+                         &stpFriendCnt->friendList[i])
                 == arg->profile)
             {
-                if (DWC_IsBuddyFriendData(&stpFriendCnt->friendList[i])
-                    == TRUE)
-                {
-                    DWC_Printf(DWC_REPORTFLAG_UPDATE_SV,
-                        "This profile is already my friend[%d].\n", i);
-                    alreadyBuddy = TRUE;
-                }
-                else
-                {
-                    DWC_SetGsProfileId(
-                        &stpFriendCnt->friendList[i], arg->profile);
-                    DWCi_SetBuddyFriendData(&stpFriendCnt->friendList[i]);
-                    listChanged = TRUE;
+                DWC_SetGsProfileId(
+                    &stpFriendCnt->friendList[i], arg->profile);
+                DWCi_SetBuddyFriendData(&stpFriendCnt->friendList[i]);
+                listChanged = TRUE;
 
-                    DWC_Printf(DWC_REPORTFLAG_UPDATE_SV,
-                        "Established buddy with %u, friend[%d]gs.\n",
-                        arg->profile, i);
-                }
+                DWC_Printf(DWC_REPORTFLAG_UPDATE_SV,
+                    "Established buddy with %u, friend[%d]gs.\n",
+                    arg->profile, i);
             }
-
         }
     }
 
@@ -1059,7 +1134,7 @@ static void DWCi_GPGetInfoCallback_RecvAuthMessage(GPConnection* connection,
         index = DWCi_RefreshFriendListAll(stpFriendCnt->friendList,
             stpFriendCnt->friendListLen, arg->profile);
 
-        if (!alreadyBuddy)
+        if (alreadyBuddy)
         {
             DWCi_CallBuddyFriendCallback(index);
         }
@@ -1068,11 +1143,8 @@ static void DWCi_GPGetInfoCallback_RecvAuthMessage(GPConnection* connection,
     }
     else
     {
-        if (!alreadyBuddy)
-        {
-            DWC_Printf(DWC_REPORTFLAG_UPDATE_SV,
-                "Not Established buddy with %u.\n", arg->profile);
-        }
+        DWC_Printf(DWC_REPORTFLAG_UPDATE_SV,
+            "Not Established buddy with %u.\n", arg->profile);
     }
 }
 

@@ -12,7 +12,7 @@
 #include "NL/nlString.h"
 
 extern nlDLListSlotPool<PackagePushPopMessage*> m_pushPopMessageQueue;
-extern void nlPrintf(const char* format, ...);
+extern int nlPrintf(const char* format, ...);
 
 extern "C" void fn_802FC280();
 extern "C" void fn_802FEA20(FEScene* scene);

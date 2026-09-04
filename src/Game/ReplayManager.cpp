@@ -11,7 +11,6 @@ extern float g_fFixedUpdateTick;
 extern float lbl_806E14CC;
 extern bool lbl_806E14D1;
 
-extern "C" FixedUpdateTask* fn_8011166C();
 
 ReplayManager::ReplayManager()
     : mCurrent(mSnapshots)
@@ -198,9 +197,9 @@ void ReplayManager::RenderSnapshotAt(float deltaTime)
 {
     for (int i = 0; i < 3; i++)
     {
-        mBlend[i] = fn_8011166C()->mUnidentified28 / g_fFixedUpdateTick;
+        mBlend[i] = GetFixedUpdateTask()->mUnidentified28 / g_fFixedUpdateTick;
     }
-    mDeltaTime = fn_8011166C()->mUnidentified28;
+    mDeltaTime = GetFixedUpdateTask()->mUnidentified28;
 
     DoPotentialDebugReplay(deltaTime);
     DoPotentialAutoReplay(deltaTime);

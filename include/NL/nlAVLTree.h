@@ -79,6 +79,15 @@ public:
         }
     }
 
+    void DeleteValues()
+    {
+        if (m_Root != 0)
+        {
+            DestroyTree((AVLTreeNode*)m_Root, DeleteValue);
+            m_Root = 0;
+        }
+    }
+
     bool FindGet(const KeyType& key, ValueType** foundValue) const
     {
         Entry* node = (Entry*)FindAVLNode((AVLTreeNode*)m_Root, (void*)&key);
@@ -158,6 +167,13 @@ public:
     static void DeleteEntry(AVLTreeUntemplated* tree, AVLTreeNode* entry)
     {
         AVLTreeBase* self = (AVLTreeBase*)tree;
+        self->m_Allocator.Free((Entry*)entry);
+    }
+
+    static void DeleteValue(AVLTreeUntemplated* tree, AVLTreeNode* entry)
+    {
+        AVLTreeBase* self = (AVLTreeBase*)tree;
+        delete ((Entry*)entry)->value;
         self->m_Allocator.Free((Entry*)entry);
     }
 

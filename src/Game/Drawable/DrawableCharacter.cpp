@@ -1,5 +1,6 @@
 #include "Game/Drawable/DrawableCharacter.h"
 #include "Game/GameObjectLighting.h"
+#include "unclassified/tu_801AD15C.h"
 
 #include "Game/BasicStadium.h"
 #include "Game/CharacterEffects.h"
@@ -233,7 +234,6 @@ extern "C" void fn_80182EC8(int);
 extern "C" int fn_800FC748(int);
 extern "C" int fn_80183DEC(const nlVector3*);
 extern "C" RLView* fn_8027261C();
-extern "C" RLView* fn_8027267C(int);
 extern "C" void fn_80273A4C(int, Model*, int);
 extern "C" bool fn_80277238();
 extern "C" void fn_802CC458(ModelPacket*, u32, u32);
@@ -278,7 +278,7 @@ float lbl_806DCB74 = 60.0f;
 float lbl_806DCB78 = 130.0f;
 float lbl_806DCB7C = 28.0f;
 int lbl_806DCB80 = 8;
-int lbl_806DCB84 = 11;
+int g_nCharacterView = eCLV_Characters;
 float lbl_806DCB88 = 0.25f;
 float lbl_806DCB8C = 1.175f;
 float lbl_806DCB90 = 1.125f;
@@ -307,7 +307,6 @@ u8 lbl_806E13C1;
 bool DrawableCharacter::sCameraRelativeLighting;
 
 extern int lbl_806E0F54;
-extern int lbl_80573CA8[];
 extern TaskManager* m_pInstance__13nlTaskManager;
 extern u32 lbl_806E1F0C;
 extern u32 lbl_806E1F10;
@@ -687,8 +686,8 @@ void DrawableCharacter::SendToGl(Character& source, int renderPass)
 {
     SkinMesh* skinMesh;
     int characterClass = source.characterClass;
-    int view = lbl_806DCB84;
-    if (lbl_80573CA8[0] == 1)
+    int view = g_nCharacterView;
+    if (gPeachPhotoState.state == 1)
     {
         view = 13;
         if (source.alternateView)
@@ -1623,9 +1622,9 @@ void DrawableCharacter::RenderCharacterShadow(
         RenderCharacterIntoTexture(params);
     }
 
-    RLView* oldContext = fn_80184AE8(fn_8027267C(renderContext));
+    RLView* oldContext = SetCharacterShadowView(GetLayerView((eCLV)renderContext));
     RenderProjectedShadow(params);
-    fn_80184AE8(oldContext);
+    SetCharacterShadowView(oldContext);
 }
 
 bool DrawableCharacter::NoShadowCallback()

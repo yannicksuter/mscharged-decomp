@@ -11,6 +11,7 @@
 #include "Game/AI/SpaceSearch.h"
 #include "Game/AnimInventory.h"
 #include "Game/Ball.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Field.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Game.h"
@@ -29,13 +30,6 @@
 #include "NL/nlString.h"
 
 #include <math.h>
-
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
 
 static const LooseBallContactAnimInfo lbl_804DC1B0[5] = {
     { 0x29, 3.0f, 0x0000, 0xFFFF },
@@ -86,15 +80,6 @@ static const LooseBallContactAnimInfo lbl_804DC310[2] = {
     { 0x30, 4.0f, 0xE000, 0x2000 },
 };
 
-extern "C" DebugFieldType lbl_80533C98[];
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
 extern "C" void fn_80034438(cFielder*);
 extern "C" void fn_8003BA94(cFielder*, float);
 extern "C" void fn_80017EA0(cBall*, cFielder*, nlVector3*, bool);
@@ -134,7 +119,7 @@ extern "C" float fn_8002C6E8(PlayerTweaks*);
 extern "C" float fn_8002C678(PlayerTweaks*);
 extern "C" void fn_80097858(cPlayer*, cPlayer*, int,
     int, int, int, float, float);
-extern "C" bool fn_80331C04(cGlobalPad*, int, bool);
+extern "C" bool fn_80331C04(DetInput*, int, bool);
 extern "C" void* fn_80311734(void*);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     InterpreterCore*, void*, int, cPlayer*, cPlayer*);

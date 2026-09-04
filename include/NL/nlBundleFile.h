@@ -88,7 +88,7 @@ public:
                 return i;
             }
         }
-        extern void nlPrintf(const char*, ...);
+        extern int nlPrintf(const char*, ...);
         nlPrintf(lbl_8052BA40, hash);
         return -1U;
     }
@@ -104,7 +104,7 @@ public:
         }
         if (printError)
         {
-            extern void nlPrintf(const char*, ...);
+            extern int nlPrintf(const char*, ...);
             nlPrintf(lbl_8052BA40, hash);
         }
         return -1U;

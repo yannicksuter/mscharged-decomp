@@ -234,7 +234,7 @@ static void DrawPrimitive(const ElectricFenceGeometry& prim,
 }
 
 static void RenderElectricFenceFlat(const nlVector3& position,
-    const nlVector3& normal, float intensity)
+    nlVector3 normal, float intensity)
 {
     glSetDefaultState(true);
     glSetRasterState(GLS_AlphaBlend, 2);
@@ -342,7 +342,7 @@ static void RenderElectricFence(EmissionController& ec)
     if (pElectricFenceData->mbIsFlat)
     {
         RenderElectricFenceFlat(pElectricFenceData->mPosition,
-            nlVector3(pElectricFenceData->mNormal), intensity);
+            pElectricFenceData->mNormal, intensity);
         return;
     }
 

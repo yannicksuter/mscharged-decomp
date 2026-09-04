@@ -259,7 +259,7 @@ static void DrawBallShadow(
     fn_80273A4C(eCLV_Particles, pModel, 0);
 }
 
-extern "C" void fn_801860A8()
+void ClearCharacterShadowsUpdated()
 {
     int shadowIndex;
     for (shadowIndex = 0; shadowIndex < fn_802721BC(); shadowIndex++)
@@ -789,7 +789,7 @@ extern "C" float fn_80184AF8(float antiFlimmer)
     return previous;
 }
 
-RLView* fn_80184AE8(RLView* view)
+RLView* SetCharacterShadowView(RLView* view)
 {
     RLView* previous = g_CharacterShadowView;
     g_CharacterShadowView = view;

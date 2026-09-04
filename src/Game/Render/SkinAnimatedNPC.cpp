@@ -21,7 +21,6 @@
 
 extern "C"
 {
-    RLView* fn_8027267C(eCLV view);
     void fn_802CC628(glModelPacket* packet, u32 hash, float value);
     void fn_802CC6C0(glModelPacket* packet, u32 hash, u32 value);
 }
@@ -36,7 +35,7 @@ static float SidelineShadowMargin = 2.5f;
 void SkinAnimatedNPC::DrawShadow(
     const glModel* pModel, const nlMatrix4& matrix)
 {
-    RLView* pView = fn_8027267C(eCLV_Characters);
+    RLView* pView = GetLayerView(eCLV_Characters);
     float shadowLevel = 0.75f;
     UnidentifiedStadiumShadowData* pStadium =
         reinterpret_cast<UnidentifiedStadiumShadowData*>(
@@ -72,9 +71,9 @@ void SkinAnimatedNPC::DrawShadow(
         RenderCharacterIntoTexture(params);
     }
 
-    RLView* pOldView = fn_80184AE8(pView);
+    RLView* pOldView = SetCharacterShadowView(pView);
     RenderProjectedShadow(params);
-    fn_80184AE8(pOldView);
+    SetCharacterShadowView(pOldView);
 }
 
 void SkinAnimatedNPC::SetAnimState(
@@ -102,7 +101,7 @@ void SkinAnimatedNPC::DrawShadow(
     const cPoseAccumulator& poseAccumulator,
     const nlMatrix4& worldMatrix)
 {
-    RLView* pView = fn_8027267C(eCLV_Characters);
+    RLView* pView = GetLayerView(eCLV_Characters);
     glModel* pModel = glModelDupNoStreams(
         mpSkinMesh->GetModel(), false, 0);
     float shadowLevel = 0.5f;
@@ -140,9 +139,9 @@ void SkinAnimatedNPC::DrawShadow(
         RenderCharacterIntoTexture(params);
     }
 
-    RLView* pOldView = fn_80184AE8(pView);
+    RLView* pOldView = SetCharacterShadowView(pView);
     RenderProjectedShadow(params);
-    fn_80184AE8(pOldView);
+    SetCharacterShadowView(pOldView);
 }
 
 void SkinAnimatedNPC::SendToGL() const
@@ -197,7 +196,7 @@ void SkinAnimatedNPC::SendToGL() const
         }
     }
 
-    fn_8027267C(view)->AttachModel(pModel, 0);
+    GetLayerView(view)->AttachModel(pModel, 0);
     const_cast<SkinAnimatedNPC*>(this)->mpLastModel = pModel;
 }
 

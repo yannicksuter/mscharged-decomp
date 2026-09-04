@@ -63,6 +63,7 @@ public:
     void Replay(LoadFrame& frame);
     void Replay(SaveFrame& frame);
     void KillOldest(int num, bool lingeringOnly);
+    void SetContext(void* context);
 
     /* 0x000 */ EmissionResourceStats mResourceStats[8];
     /* 0x1A0 */ void* mMemoryContext;
@@ -87,7 +88,7 @@ public:
 };
 
 extern "C" void fn_802E6C20(EmissionManager*, void*, int, int);
-extern "C" EmissionManager* fn_802E75F4();
+EmissionManager* GetEmissionManager();
 extern "C" void fn_802E6620(bool, bool, bool, bool);
 extern "C" bool fn_802E6774(void*);
 extern "C" void fn_802E9E0C(int resource, int budget);

@@ -1,8 +1,10 @@
 #include "Game/AI/AIPad.h"
 
+#include "Game/NetworkSession.h"
 #include "NL/glx/GXMaterialCrystalTweaks.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFormat.h"
+#include "unclassified/tu_80336B2C.h"
 
 static float g_fMovementDeadZone = 0.3f;
 static float g_fCStickDeadZone = 0.5f;
@@ -36,41 +38,27 @@ cAIPad::cAIPad()
 
 float cAIPad::GetMovementStickMagnitude()
 {
-    float mag = m_pGlobalPad->m_polarAnalogLeft.r;
+    float mag = m_pGlobalPad->m_PolarAnalogLeft.r;
     float dz = g_fMovementDeadZone;
     return (mag - dz) / (1.0f - dz);
 }
 
 u16 cAIPad::GetMovementStickDirection()
 {
-    return m_pGlobalPad->mUnidentified088 + m_pGlobalPad->m_polarAnalogLeft.a;
+    return m_pGlobalPad->m_aRemapAngle + m_pGlobalPad->m_PolarAnalogLeft.a;
 }
 
 float cAIPad::GetCStickMovementStickMagnitude()
 {
-    float mag = m_pGlobalPad->m_polarAnalogRight.r;
+    float mag = m_pGlobalPad->m_PolarAnalogRight.r;
     float dz = g_fCStickDeadZone;
     return (mag - dz) / (1.0f - dz);
 }
 
 u16 cAIPad::GetCStickMovementStickDirection()
 {
-    return m_pGlobalPad->mUnidentified088 + m_pGlobalPad->m_polarAnalogRight.a;
+    return m_pGlobalPad->m_aRemapAngle + m_pGlobalPad->m_PolarAnalogRight.a;
 }
-
-struct UnclassifiedControllerGroup
-{
-    void* mUnidentified000;
-    int mNumControllers;
-};
-
-extern "C" void* lbl_806E20D8;
-extern "C" int fn_80338BF0(void*);
-extern "C" UnclassifiedControllerGroup* fn_80338BF8(void*, s8);
-extern "C" void* fn_80336B6C(UnclassifiedControllerGroup*, s8);
-extern "C" s8 fn_80336F68(s8, s8);
-extern "C" cGlobalPad* fn_80336D68(void*);
-extern "C" s8 fn_80338C20(void*);
 
 void AIPadManager::Startup()
 {
@@ -82,12 +70,13 @@ void AIPadManager::Startup()
     int numGroups = fn_80338BF0(lbl_806E20D8);
     for (s8 groupIndex = 0; groupIndex < numGroups; ++groupIndex)
     {
-        UnclassifiedControllerGroup* group = fn_80338BF8(lbl_806E20D8, groupIndex);
+        UnidentifiedNetworkPeer* group = fn_80338BF8(lbl_806E20D8, groupIndex);
         for (s8 controllerIndex = 0;
-            controllerIndex < group->mNumControllers;
+            controllerIndex < (int)group->mUnidentified004;
             ++controllerIndex)
         {
-            void* controller = fn_80336B6C(group, controllerIndex);
+            UnidentifiedNetworkPeerChannel* controller
+                = fn_80336B6C(group, controllerIndex);
             s8 padIndex = fn_80336F68(controllerIndex, groupIndex);
             cAIPad& pad = mAIPads[padIndex];
             pad.m_pGlobalPad = fn_80336D68(controller);

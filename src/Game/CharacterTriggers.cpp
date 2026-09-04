@@ -25,7 +25,7 @@ void UpdateEmitterFromCharacter(EmissionController& emitter);
 extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 extern "C" void fn_800EC12C(unsigned long soundID, void* pParam);
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
-extern "C" void fn_80139D1C(int nPreset, cGlobalPad* pPad);
+extern "C" void fn_80139D1C(int nPreset, DetInput* pPad);
 extern "C" int fn_8004F594(int category, const char* format, ...);
 
 static inline void SetDefaultVelocity(EmissionController* pController)

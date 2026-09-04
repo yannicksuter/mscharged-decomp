@@ -1,6 +1,4 @@
-#include "NL/gl/glModel.h"
-
-#include "types.h"
+#include "unclassified/tu_802A87F8.h"
 
 extern "C" void* fn_802CC0A4(
     unsigned long size, int memoryType, void* allocator);
@@ -12,15 +10,6 @@ extern "C" void fn_802D39CC(glModelStream* streams, int stream,
 extern "C" void fn_8036E438(glModelPacket* packet, bool allocated);
 extern "C" void DCStoreRangeNoSync(const void* address, u32 size);
 extern "C" void PPCSync();
-
-struct State_802A87F8
-{
-    int count;
-    glModel* model;
-    void* resource;
-    float* position;
-    u32* colour;
-};
 
 extern "C" void fn_802A87F8(State_802A87F8* writer)
 {

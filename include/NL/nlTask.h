@@ -13,7 +13,9 @@ public:
 
     virtual void Run(float) = 0;
     virtual const char* GetName() = 0;
-    virtual void StateTransition(u32, u32);
+    // Spelled out so the mangled name stays ...FUiUi even in translation
+    // units that pull in <revolution/types.h>, where u32 is unsigned long.
+    virtual void StateTransition(unsigned int, unsigned int);
 
     /* 0x04 */ nlTask* m_next;
     /* 0x08 */ nlTask* m_prev;

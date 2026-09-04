@@ -1,5 +1,9 @@
 #include "unclassified/tu_801A2004.h"
 
+#include "unclassified/tu_802B7798.h"
+
+#include "Game/Render/RLView.h"
+
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
@@ -32,8 +36,6 @@ extern "C"
 
     HighRangeTweakValues_801A2004* fn_80277DC8();
     GLViewInterface* fn_802726A0();
-    GLView* fn_8027267C(int);
-    GLView* fn_802B77A0();
 }
 
 extern "C" void fn_801A2004(
@@ -241,7 +243,7 @@ extern "C" void fn_801A2394(HighRangeState_801A2394* state)
     {
         GLView* view = state->mViews[i];
         view->m_Enabled = true;
-        GLView* parent = fn_8027267C(17);
+        GLView* parent = GetLayerView(eCLV_HighRangeChain);
         parent->m_Children.AddEnd(view);
         view->m_Parent = parent;
     }
@@ -283,7 +285,7 @@ extern "C" void fn_801A28F0(HighRangeState_801A2394*)
     nlColour colour;
     nlColourSet(colour, *values->miRed.m_pValue, *values->miGreen.m_pValue, *values->miBlue.m_pValue, *values->miAlpha.m_pValue);
     poly.FullCoverage(colour, 0.0f);
-    poly.Attach(fn_8027267C(18), 0, 0);
+    poly.Attach(GetLayerView(eCLV_HighRange2D), 0, 0);
 
     int debugIndex = lbl_806DCE58;
     if (debugIndex >= 0)
@@ -305,7 +307,7 @@ extern "C" void fn_801A28F0(HighRangeState_801A2394*)
         debugPoly.SetColour(white);
         debugPoly.SetupRectangle(
             32.0f, 24.0f, 200.0f, 200.0f, 10000000000.0f);
-        debugPoly.Attach(fn_802B77A0(), 2, 0);
+        debugPoly.Attach(GetDebugFontView(), 2, 0);
     }
 }
 

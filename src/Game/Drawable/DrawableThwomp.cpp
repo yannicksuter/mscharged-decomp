@@ -3,6 +3,7 @@
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Drawable/ShadowProp.h"
 #include "Game/Physics/PhysicsObject.h"
+#include "Game/Render/RLView.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "NL/platqmath.h"
@@ -14,7 +15,6 @@
 
 extern "C"
 {
-    void* fn_8027267C(int);
 }
 
 static float gShadowSizeLow = 1.7f;
@@ -196,7 +196,7 @@ void DrawableThwomp::Render(ThwompObject* object) const
     matrix.m44 = 1.0f;
 
     drawable->SetWorldMatrix(&matrix);
-    material = fn_8027267C(13);
+    material = GetLayerView(eCLV_MoreCharacters);
     drawable->V8(material);
 
     DrawShadow(object, matrix, material);

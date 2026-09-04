@@ -1,5 +1,7 @@
 #include "Game/Render/depthoffield.h"
 
+#include "Game/Render/RLView.h"
+
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
@@ -11,7 +13,6 @@ typedef float Mtx44[4][4];
 
 extern "C"
 {
-    GLView* fn_8027267C(int index);
     void GXGetProjectionv(float* projection);
     void GXSetProjection(const Mtx44 projection, int type);
     void GXSetProjectionv(const float* projection);
@@ -59,7 +60,7 @@ void DepthOfFieldManager::Update()
     float screenX;
     nlVector3 position;
 
-    GLView* view = fn_8027267C(22);
+    GLView* view = GetLayerView(eCLV_UnsortedPerspective);
     view->m_Target = 8;
 
     if (!m_bOn)
@@ -92,7 +93,7 @@ void DepthOfFieldManager::Update()
     GXGetProjectionv(savedProjection);
 
     memcpy(&projectionMatrix,
-        fn_8027267C(6)->m_Interface->GetProjectionMatrix(),
+        GetLayerView(eCLV_Shadowed)->m_Interface->GetProjectionMatrix(),
         sizeof(projectionMatrix));
     GXSetProjection(projectionMatrix.e2, 0);
 
@@ -146,5 +147,5 @@ void DepthOfFieldManager::Update()
 
     poly.SetupRectangle(0.0f, 0.0f, 640.0f, 480.0f, depth);
     poly.SetColour(colour);
-    poly.Attach(fn_8027267C(23), 0, 0);
+    poly.Attach(GetLayerView(eCLV_DepthOfField), 0, 0);
 }

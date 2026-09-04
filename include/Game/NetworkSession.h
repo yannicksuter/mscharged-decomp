@@ -6,6 +6,7 @@
 #include "Game/NetworkStats.h"
 #include "NL/nlMemory.h"
 #include "types.h"
+#include "unclassified/tu_80331BE4.h"
 
 class NetMessageDraft;
 struct UnidentifiedDraftEntry;
@@ -31,6 +32,7 @@ extern int g_BuildNumber;
 extern int lbl_806E10F8;
 
 class UnidentifiedNetworkConnectionListener;
+class UnidentifiedNetworkPeer;
 
 class UnidentifiedNetworkPeerChannel
 {
@@ -38,7 +40,13 @@ public:
     UnidentifiedNetworkPeerChannel();
     ~UnidentifiedNetworkPeerChannel() { }
 
-    /* 0x000 */ u8 mData[0x240];
+    /* 0x000 */ UnidentifiedNetworkPeer* mPeer;
+    /* 0x004 */ s8 mChannelIndex;
+    /* 0x005 */ u8 mPadding005[3];
+    /* 0x008 */ int mGlobalPadIndex;
+    /* 0x00C */ bool mUnidentified00C;
+    /* 0x00D */ u8 mPadding00D[3];
+    /* 0x010 */ DetInput mInputs[4];
 };
 
 class UnidentifiedNetworkPeer
@@ -147,8 +155,8 @@ struct UnidentifiedTransportPlayer
     /* 0x10 */ u16 mUnidentified10;
     /* 0x12 */ u16 mUnidentified12;
     /* 0x14 */ u32 mConnection;
-    /* 0x18 */ int mConnectionState;
-    /* 0x1C */ u8 mUnidentified1C[4];
+    /* 0x18 */ u8 mUnidentified18[4];
+    /* 0x1C */ int mConnectionState;
 }; // size: 0x20
 
 class UnidentifiedMachineRoster
@@ -200,6 +208,8 @@ public:
 
 struct UnidentifiedReliableSocketState
 {
+    UnidentifiedReliableSocketState();
+
     u8 mData[0xA1C];
 };
 
@@ -522,7 +532,13 @@ public:
 extern UnidentifiedNetworkSession* lbl_806E20D8;
 extern UnidentifiedNetworkSession* lbl_806E10EC;
 
-extern "C" int fn_80338BF0(UnidentifiedNetworkSession* session);
-extern "C" s8 fn_80338C20(UnidentifiedNetworkSession* session);
+extern "C" int fn_80338BF0(UnidentifiedNetworkSessionData* session);
+extern "C" UnidentifiedNetworkPeer* fn_80338BF8(
+    UnidentifiedNetworkSessionData* session, s8 machine);
+extern "C" UnidentifiedNetworkPeer* fn_80338C0C(
+    UnidentifiedNetworkSessionData* session);
+extern "C" s8 fn_80338C20(UnidentifiedNetworkSessionData* session);
+extern "C" void fn_80338C2C(UnidentifiedNetworkSessionData* session,
+    int machineCount, int playerCount);
 
 #endif // GAME_NETWORK_SESSION_H

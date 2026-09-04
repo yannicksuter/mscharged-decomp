@@ -189,8 +189,8 @@ void cDebugCamera::fn_800F2A8C(float dt)
         y = m_pPad->AnalogLeftY();
     }
 
-    m_fAzimuth += dt * (sfControlSpeedScale * x);
-    m_fTheta += dt * (sfControlSpeedScale * y);
+    m_fAzimuth += dt * (x * sfControlSpeedScale);
+    m_fTheta += dt * (y * sfControlSpeedScale);
 
     if (m_fTheta > 89.0f)
     {

@@ -239,7 +239,7 @@ EmissionManager* EmissionManager::Instance()
 /**
  * Offset/Address/Size: 0x0 | 0x802E75F4 | size: 0x64
  */
-extern "C" EmissionManager* fn_802E75F4()
+EmissionManager* GetEmissionManager()
 {
     return EmissionManager::Instance();
 }
@@ -684,12 +684,11 @@ extern "C" void fn_802E987C(EmissionManager* manager)
 /**
  * Offset/Address/Size: 0x0 | 0x802E9938 | size: 0x8C
  */
-extern "C" void fn_802E9938(
-    EmissionManager* manager, void* context)
+void EmissionManager::SetContext(void* context)
 {
-    manager->mContext = context;
+    mContext = context;
     nlDLListIterator<EmissionController*> iterator
-        = manager->mControllers.Begin();
+        = mControllers.Begin();
     while (iterator.hasNext())
     {
         EmissionController* current = *iterator;

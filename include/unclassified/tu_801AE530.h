@@ -23,7 +23,7 @@ public:
 
     void fn_801AE71C();
     void fn_801AE728(float deltaTime);
-    void fn_801AE960();
+    void Render();
     void fn_801AEA90();
     void fn_801AEE80(
         int modelIndex, float scale, float opacity, const nlVector2& position);
@@ -52,6 +52,6 @@ public:
     /* 0x26 */ u8 mUnidentified026[0x02];
 }; // total size: 0x28
 
-extern UnidentifiedNumberDisplay_801AE530* lbl_806E1628;
+extern UnidentifiedNumberDisplay_801AE530* gpNumberDisplay;
 
 #endif // UNCLASSIFIED_TU_801AE530_H

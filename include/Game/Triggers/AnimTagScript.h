@@ -5,7 +5,10 @@
 #include "NL/nlSlotPool.h"
 
 class AnimTagScriptInterpreter;
+class BinaryTriggerFile;
 class cSAnim;
+template <typename T>
+class cInventory;
 
 struct AnimTagInfo
 {
@@ -39,6 +42,22 @@ public:
     }
     virtual void DoFunctionCall(unsigned int) = 0;
     virtual void TriggerFired(cSAnim*, unsigned long) { }
+
+    static void AnimControllerCB(cSAnim* arg0, unsigned int ref)
+    {
+        AnimTagCBInfo* pInfo = (AnimTagCBInfo*)ref;
+        unsigned long address = pInfo->ScriptInfo.ScriptFuncOffset;
+        AnimTagScriptInterpreter* pScript = pInfo->pAnimTagScript;
+        if ((address + 0x10000) != 0xFFFF)
+        {
+            pScript->CallFunctionAt(address);
+        }
+        pScript->TriggerFired(arg0, pInfo->ScriptInfo.Trigger);
+    }
+    u8 SetupAnimationTriggers(void* pFileData, unsigned long FileSize,
+        cInventory<cSAnim>* pAnimInventory);
+    u8 SetupAnimationTriggers(BinaryTriggerFile& file,
+        cInventory<cSAnim>* pAnimInventory);
 
 protected:
     /* 0x28 */ SlotPool<AnimTagCBInfo> m_AnimTagSlotPool;

@@ -2,7 +2,7 @@
 #define GAME_AI_AIPAD_H
 
 #include "types.h"
-#include "NL/globalpad.h"
+#include "unclassified/tu_80331BE4.h"
 
 class cAIPad
 {
@@ -24,7 +24,7 @@ private:
     /* 0x2D8 */ int mUnidentified2D8;
 
 public:
-    /* 0x2DC */ cGlobalPad* m_pGlobalPad;
+    /* 0x2DC */ DetInput* m_pGlobalPad;
 }; // total size: 0x2E0
 
 struct AIPadManager

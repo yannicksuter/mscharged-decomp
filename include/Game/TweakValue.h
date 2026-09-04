@@ -197,7 +197,7 @@ class TweakValueBoolImpl_804F4538 : public UnidentifiedTweakValueImplBase
 {
 public:
     TweakValueBoolImpl_804F4538(bool* value = 0);
-    TweakValueBoolImpl_804F4538(const char* group, const char* name,
+    TweakValueBoolImpl_804F4538(const char* name, const char* category,
         bool* value, bool defaultValue)
         : m_pValue(value)
     {
@@ -209,14 +209,14 @@ public:
             void* entry = nlMalloc(0x18, 8, true);
             if (entry != 0)
             {
-                fn_802C2DF4((TweakPendingValue*)entry, this, group);
+                fn_802C2DF4((TweakPendingValue*)entry, this, category);
             }
-            lbl_806E1E90 = group;
+            lbl_806E1E90 = category;
         }
         else
         {
             TweakEntry_8052BF00* config = fn_802C0E30();
-            TweakEntry_8052BF00* entry = fn_802C4504(config, group, 0);
+            TweakEntry_8052BF00* entry = fn_802C4504(config, category, 0);
             if (entry != 0)
             {
                 fn_802C5780(entry, this);

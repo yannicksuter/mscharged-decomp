@@ -94,4 +94,7 @@ public:
     int capacity;
 };
 
+
+void UpdateImpostorPositions();
+
 #endif // UNCLASSIFIED_TU_801A4188_H

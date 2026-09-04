@@ -6,6 +6,8 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/nlColour.h"
 #include "NL/nlMath.h"
+#include "Game/Render/CrowdManager.h"
+#include "unclassified/tu_801AD15C.h"
 #include "unclassified/tu_802A15D4.h"
 
 #include <string.h>
@@ -24,41 +26,9 @@ struct SaveFrame
     u8* position;
 };
 
-struct UnidentifiedReplayState_801AD15C
-{
-    int value;
-    u8 _004[0x9C];
-};
-
-struct UnidentifiedPeachPhotoCell
-{
-    nlVector3 world[4];
-    nlVector2 projected[4];
-    nlVector2 texture[4];
-};
-
-struct UnidentifiedPeachPhotoState
-{
-    int state;
-    nlVector3 centre;
-    nlVector3 corners[4];
-    float displacement;
-    bool firstFrameSeen;
-    bool textureReady;
-    u8 _046[2];
-    unsigned int lastFrame;
-    bool projected;
-    u8 _04D[3];
-    nlVector2 projectedCorners[4];
-    float fadeTime;
-    float delay;
-    UnidentifiedPeachPhotoCell cells[3][3];
-};
 
 extern "C"
 {
-    UnidentifiedReplayState_801AD15C lbl_80573C08;
-    UnidentifiedPeachPhotoState lbl_80573CA8;
 
     char lbl_80514430[] = "target/grayscale";
     char lbl_80514444[] = "global/white";
@@ -80,44 +50,42 @@ extern "C"
 
     extern const nlVector2 lbl_804DCEE8[4];
 
-    GLView* fn_8027267C(int index);
     void fn_802CE528(
         GLView* view, const nlVector3* world, nlVector3* projected);
 }
 
-extern "C" void fn_801AD15C(
-    UnidentifiedReplayState_801AD15C*, void*)
+CrowdManager CrowdManager::instance;
+UnidentifiedPeachPhotoState gPeachPhotoState;
+
+extern "C" void fn_801AD15C(CrowdManager*, void*)
 {
 }
 
-extern "C" void fn_801AD160(UnidentifiedReplayState_801AD15C*)
+void CrowdManager::Uninitialize()
 {
 }
 
-extern "C" void fn_801AD164(
-    UnidentifiedReplayState_801AD15C*, LoadFrame* frame)
+void CrowdManager::Replay(LoadFrame& frame)
 {
     int value = 0;
-    if (frame->type == 1)
+    if (frame.type == 1)
     {
-        memcpy(&value, frame->position, sizeof(value));
-        frame->position += sizeof(value);
+        memcpy(&value, frame.position, sizeof(value));
+        frame.position += sizeof(value);
     }
 }
 
-extern "C" void fn_801AD1C0(
-    UnidentifiedReplayState_801AD15C* replay, SaveFrame* frame)
+void CrowdManager::Replay(SaveFrame& frame)
 {
-    int value = replay->value;
-    if (frame->type == 1)
+    int value = m_State;
+    if (frame.type == 1)
     {
-        memcpy(frame->position, &value, sizeof(value));
-        frame->position += sizeof(value);
+        memcpy(frame.position, &value, sizeof(value));
+        frame.position += sizeof(value);
     }
 }
 
-extern "C" void fn_801AD21C(
-    UnidentifiedReplayState_801AD15C*, float)
+void CrowdManager::Update(float)
 {
 }
 
@@ -165,18 +133,17 @@ extern "C" void fn_801AD220(UnidentifiedPeachPhotoState* photo,
     photo->projected = false;
     photo->fadeTime = 0.0f;
     photo->delay = delay;
-    fn_8027267C(eCLV_Characters)->m_Target = 8;
+    GetLayerView(eCLV_Characters)->m_Target = 8;
 }
 
-extern "C" void fn_801AD484(
-    UnidentifiedPeachPhotoState* photo, bool immediate)
+void EndPeachPhoto(UnidentifiedPeachPhotoState* photo, bool immediate)
 {
     if (photo->state != 0)
     {
         if (immediate)
         {
             photo->state = 0;
-            fn_8027267C(eCLV_Characters)->m_Target = 0;
+            GetLayerView(eCLV_Characters)->m_Target = 0;
         }
         else
         {
@@ -244,7 +211,7 @@ extern "C" void fn_801AD7E4(
             {
                 photo->lastFrame = currentFrame;
                 photo->textureReady = true;
-                fn_8027267C(eCLV_Characters)->m_Target = 0;
+                GetLayerView(eCLV_Characters)->m_Target = 0;
             }
             else
             {
@@ -264,7 +231,7 @@ extern "C" void fn_801AD7E4(
     }
 }
 
-extern "C" void fn_801AD914(UnidentifiedPeachPhotoState* photo)
+void RenderPeachPhoto(UnidentifiedPeachPhotoState* photo)
 {
     if (photo->state == 0)
     {
@@ -307,7 +274,7 @@ extern "C" void fn_801AD914(UnidentifiedPeachPhotoState* photo)
         for (int i = 0; i < 4; ++i)
         {
             nlVector3 projected;
-            fn_802CE528(fn_8027267C(eCLV_Characters),
+            fn_802CE528(GetLayerView(eCLV_Characters),
                 &photo->corners[i], &projected);
             photo->projectedCorners[i].x = 0.5f * (1.0f + projected.x);
             photo->projectedCorners[i].y = 0.5f * (1.0f + projected.y);
@@ -321,7 +288,7 @@ extern "C" void fn_801AD914(UnidentifiedPeachPhotoState* photo)
                 for (int i = 0; i < 4; ++i)
                 {
                     nlVector3 projected;
-                    fn_802CE528(fn_8027267C(eCLV_Characters),
+                    fn_802CE528(GetLayerView(eCLV_Characters),
                         &cell.world[i], &projected);
                     cell.projected[i].x = 0.5f * (1.0f + projected.x);
                     cell.projected[i].y = 0.5f * (1.0f + projected.y);
@@ -406,7 +373,7 @@ extern "C" void fn_801AD914(UnidentifiedPeachPhotoState* photo)
                     packet->rasterState, GLS_AlphaTestRef, 0);
             }
 
-            fn_8027267C(eCLV_PeachPhoto3D)->AttachModel(
+            GetLayerView(eCLV_PeachPhoto3D)->AttachModel(
                 writer.model, 0);
         }
     }

@@ -8,16 +8,10 @@
 #include <stddef.h>
 #include "Game/AI/SpaceSearch.h"
 #include "Game/Ball.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/GameTweaks.h"
 #include "Game/Player.h"
 #include "Game/Team.h"
-
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
 
 struct UnidentifiedPassCallbackValue
 {
@@ -27,7 +21,6 @@ struct UnidentifiedPassCallbackValue
     UnidentifiedVariantCollection mExtraData;
 };
 
-extern "C" DebugFieldType lbl_80533C98[];
 extern "C" SkillTweaks* fn_800A636C(cTeam*);
 extern "C" float fn_800D9EC4(cPlayer*);
 extern "C" void fn_800401C0(
@@ -42,16 +35,6 @@ extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002C328(PlayerTweaks*);
 extern "C" bool fn_8002F858(cFielder*, bool);
 extern "C" bool fn_80035F34(cFielder*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" unsigned short fn_80338EBC(
-    DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
-
 extern cTeam* lbl_806E0E00;
 extern bool lbl_806E0E38;
 extern cFielder* g_pScriptCurrentFielder;

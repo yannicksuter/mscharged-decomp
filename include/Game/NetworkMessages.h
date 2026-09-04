@@ -55,6 +55,26 @@ public:
     /* 0x04 */ u32 mUnidentified04;
 };
 
+class UnidentifiedNetworkMessageFactory
+{
+public:
+    virtual UnidentifiedNetworkMessage* Create(
+        UnidentifiedMessageSerializer* serializer) = 0;
+};
+
+template <class T>
+class NetworkMessageFactory : public UnidentifiedNetworkMessageFactory
+{
+public:
+    virtual UnidentifiedNetworkMessage* Create(
+        UnidentifiedMessageSerializer* serializer)
+    {
+        T* message = new T;
+        message->Serialize(serializer);
+        return message;
+    }
+};
+
 class UnidentifiedNetworkMessageReceiver
 {
 public:

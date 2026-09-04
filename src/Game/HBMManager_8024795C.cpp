@@ -131,14 +131,14 @@ public:
 
 static UnidentifiedHBMHideEvent sHBMHideEvent;
 
-UnidentifiedHBMManager* lbl_806E18D8;
+UnidentifiedHBMManager* gpHBMManager;
 
 void UnidentifiedHBMManager::fn_8024795C(
     void* data, unsigned long, void* userData)
 {
     *(void**)userData = data;
 
-    UnidentifiedHBMManager* manager = lbl_806E18D8;
+    UnidentifiedHBMManager* manager = gpHBMManager;
     ++manager->mLoadedFileCount;
     if (manager->mLoadedFileCount >= 6)
     {
@@ -389,11 +389,11 @@ void UnidentifiedHBMManager::fn_802480EC()
     case HBM_SELECTION_HOME:
         HBMDeleteSound();
         HBMDelete();
-        if (lbl_806E18D8->mActive)
+        if (gpHBMManager->mActive)
         {
-            lbl_806E18D8->mActive = false;
+            gpHBMManager->mActive = false;
             fn_8035BE74(lbl_806E2020);
-            if (lbl_806E18D8->mPreviousTaskState != 1)
+            if (gpHBMManager->mPreviousTaskState != 1)
             {
                 fn_800ECB50();
             }
@@ -413,9 +413,9 @@ void UnidentifiedHBMManager::fn_802480EC()
     case HBM_SELECTION_BTN1:
         HBMDeleteSound();
         HBMDelete();
-        if (lbl_806E18D8->mActive)
+        if (gpHBMManager->mActive)
         {
-            lbl_806E18D8->mActive = false;
+            gpHBMManager->mActive = false;
             fn_80271A00(fn_80271960());
             gxInit();
             GXSetChanCtrl(4, false, 0, 1, 0xFF, 2, 1);
@@ -432,9 +432,9 @@ void UnidentifiedHBMManager::fn_802480EC()
     case HBM_SELECTION_BTN2:
         HBMDeleteSound();
         HBMDelete();
-        if (lbl_806E18D8->mActive)
+        if (gpHBMManager->mActive)
         {
-            lbl_806E18D8->mActive = false;
+            gpHBMManager->mActive = false;
             fn_80271A00(fn_80271960());
             gxInit();
             GXSetChanCtrl(4, false, 0, 1, 0xFF, 2, 1);

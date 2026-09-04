@@ -1,5 +1,7 @@
 #include "Game/Debug/ShapeRender.h"
 
+#include "unclassified/tu_802B7798.h"
+
 #include "Game/UnidentifiedStaticStorage.h"
 
 #include "NL/gl/glDraw2.h"
@@ -11,7 +13,6 @@ ShapeRender g_ShapeRenderer;
 static unsigned char g_bWire;
 const u32 WhiteTexture = glGetTexture("global/white");
 
-extern "C" GLView* fn_802B77A0();
 extern "C" void fn_802BC83C(const ShapeRender*, const PrimitiveShape&,
     const nlMatrix4&, bool, const nlColour&);
 extern "C" void fn_802BD2C8(PrimitiveShape*, int, void*);
@@ -510,7 +511,7 @@ void ShapeRender::DrawRectangle2D(float x, float y, float w, float h,
     GLView* v;
     if (view == -1)
     {
-        v = fn_802B77A0();
+        v = GetDebugFontView();
     }
     else
     {

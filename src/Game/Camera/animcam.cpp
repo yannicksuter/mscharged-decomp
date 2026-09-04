@@ -33,7 +33,7 @@ struct UnidentifiedSimulationTimeProvider
     float mSimulationTime;
 };
 
-extern "C" UnidentifiedSimulationTimeProvider* fn_8011166C();
+UnidentifiedSimulationTimeProvider* GetFixedUpdateTask();
 
 static void EnableDofDebug()
 {
@@ -443,11 +443,11 @@ float cAnimCamera::ManualUpdate(float dt)
     {
         if (m_fLastSimulationTime < 0.0f)
         {
-            m_fLastSimulationTime = fn_8011166C()->mSimulationTime;
+            m_fLastSimulationTime = GetFixedUpdateTask()->mSimulationTime;
         }
         else
         {
-            UnidentifiedSimulationTimeProvider* provider = fn_8011166C();
+            UnidentifiedSimulationTimeProvider* provider = GetFixedUpdateTask();
             cCameraData* pData = m_pActiveCameraData;
             float simTime = provider->mSimulationTime;
             float delta = simTime - m_fLastSimulationTime;

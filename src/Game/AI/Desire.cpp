@@ -2,19 +2,8 @@
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/Variant.h"
+#include "Game/DebugWriteCache.h"
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-extern "C" DebugFieldType lbl_80533C98[];
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
 extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void fn_80098098(cFielder*);
 extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);

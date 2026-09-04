@@ -11,6 +11,7 @@
 #include "Game/AI/DesireUserControlled.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Formation.h"
 #include "Game/Game.h"
 #include "Game/Team.h"
@@ -33,7 +34,6 @@ extern "C" void fn_80319DA0(UnidentifiedScriptMachine*);
 extern "C" void fn_80319E84(
     UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
 extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
-extern "C" float fn_800D6758(cFielder*);
 extern "C" float fn_800D85F8(cFielder*);
 extern "C" float fn_800D9EC4(cPlayer*);
 extern "C" float fn_800DF74C(cTeam*);
@@ -533,7 +533,7 @@ UnidentifiedDesire33::~UnidentifiedDesire33()
 extern "C" UnidentifiedVariant_80054AB8 fn_800D6298(
     UnidentifiedFielderContext* context)
 {
-    if (fn_800D6758(context->mFielder) != 0.0f)
+    if (BallOwner(context->mFielder))
     {
         return UnidentifiedVariant_80054AB8(FT_INT, lbl_806DC3C0);
     }
@@ -546,7 +546,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800D6298(
 extern "C" UnidentifiedVariant_80054AB8 fn_800D6330(
     UnidentifiedFielderContext* context)
 {
-    if (fn_800D6758(context->mFielder) == 0.0f)
+    if (!BallOwner(context->mFielder))
     {
         return UnidentifiedVariant_80054AB8(FT_INT, lbl_806DC3C8);
     }

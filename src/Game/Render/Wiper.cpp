@@ -14,10 +14,8 @@
 class MemoryAllocator;
 
 extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
-extern "C" RLView* fn_8027267C(eCLV);
 extern "C" bool fn_802C820C(const char*, MemoryAllocator*);
 extern "C" MemoryAllocator* fn_802CC094();
-extern "C" FixedUpdateTask* fn_8011166C();
 
 extern bool g_ForceDoubleBallTransition;
 
@@ -43,7 +41,7 @@ void Wiper::Reset()
 
 void Wiper::Initialize()
 {
-    GLView* view = fn_8027267C(eCLV_Transitions);
+    GLView* view = GetLayerView(eCLV_Transitions);
     ScreenTransitionManager::Instance()->m_eView = view;
     fn_802C820C("art/transitions/transitions.rlt", fn_802CC094());
 
@@ -106,19 +104,19 @@ void Wiper::DoWipe(const char* wipe)
 
 void Wiper::Run(float dt)
 {
-    if (!FrontEnd::m_bGameOver && fn_8011166C()->mfFrameLockTime <= 0.0f
+    if (!FrontEnd::m_bGameOver && GetFixedUpdateTask()->mfFrameLockTime <= 0.0f
         && nlTaskManager::m_pInstance->mCurrentState == 1)
     {
         dt = 0.0f;
     }
 
     dt = dt * GetConfigFloat(Config::Global(), "transitions/speed", 1.0f);
-    ScreenTransitionManager::Instance()->fn_8033C31C(dt);
+    ScreenTransitionManager::Instance()->Update(dt);
 }
 
 void Wiper::Render()
 {
-    fn_8027267C(eCLV_Transitions3D)->m_ClearColour = wiperCallback.mTransitionActive;
+    GetLayerView(eCLV_Transitions3D)->m_ClearColour = wiperCallback.mTransitionActive;
     ScreenTransitionManager::Instance()->Render();
 }
 

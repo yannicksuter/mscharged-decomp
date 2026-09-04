@@ -9,6 +9,7 @@ void glFontBegin(bool drop);
 void glFontEnd();
 void glFontVirtualPosToScreenCoordPos(float x, float y, float& outX, float& outY);
 bool glFontVirtualCoordinates(bool virtualCoordinates);
+int glFontSetFont(int font);
 
 int glFontPrint(void* renderView, eGLView view, int x, int y, const nlColour& colour, const char* str);
 int glFontPrint(void* renderView, eGLView view, int x, int y, const char* str);

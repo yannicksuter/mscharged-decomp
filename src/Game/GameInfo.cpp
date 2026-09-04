@@ -3,6 +3,7 @@
 #include "Game/DB/SaveLoad.h"
 #include "Game/DB/UserOptions.h"
 #include "Game/DB/tu_8010A40C.h"
+#include "Game/NetworkSession.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -20,7 +21,6 @@ extern "C" int DWC_CheckDirtyFlag(const DWCAccUserData*);
 extern "C" void DWC_ClearDirtyFlag(DWCAccUserData*);
 
 extern "C" void* fn_8010D668(void*);
-extern "C" int fn_80338BF0(void*);
 extern "C" void fn_80109890(void*);
 extern "C" void fn_80109BC4(void*);
 extern "C" void fn_80109C40(void*);
@@ -38,9 +38,8 @@ extern "C" int fn_801CBEF8(const char*);
 extern "C" void nlBreak__Fv();
 extern "C" void* fn_8010D6F8(void*, void*);
 extern "C" void* fn_8010D794(void*, void*);
-extern void* lbl_806E20D8;
 extern void* lbl_806DF248;
-extern u8 lbl_806E1090;
+extern bool g_e3_Build;
 
 static const GameRules kDefaultRules[12] = {
     { 1, 1, 7 },
@@ -433,7 +432,7 @@ void GameInfoManager::SetupGameFromConfig()
         mCurGameSettings.unknown_0x00 = 2;
     } else if (unknown_0x122) {
         mCurGameSettings.unknown_0x08 = 0xEA24;
-    } else if (lbl_806E1090) {
+    } else if (g_e3_Build) {
         mCurGameSettings.unknown_0x08 = 0xB4;
         mCurGameSettings.unknown_0x00 = 1;
     } else if (mCurrentMode == GM_MODE_4) {

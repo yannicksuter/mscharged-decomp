@@ -1,6 +1,6 @@
 #include "Game/Task/ParticleUpdateTask.h"
 
-extern u8 lbl_806DC7F4;
+#include "Game/Task/GameRenderTask.h"
 
 u8 lbl_806DCC98 = 1;
 
@@ -22,7 +22,7 @@ extern "C" bool fn_8018482C()
     {
         result = false;
     }
-    if (!lbl_806DC7F4)
+    if (!g_bRenderWorld)
     {
         result = false;
     }

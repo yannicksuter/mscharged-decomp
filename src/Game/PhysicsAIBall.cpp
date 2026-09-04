@@ -2,6 +2,7 @@
 
 #include "Game/Ball.h"
 #include "Game/CharacterTemplate.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Field.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Goalie.h"
@@ -18,23 +19,6 @@ extern PhysicsWorld* g_PhysicsWorld;
 extern "C" void fn_8013F854(const char*, ...)
 {
 }
-
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-extern "C" DebugFieldType lbl_80533C98[];
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
 
 static unsigned short sPhysicsAIBallType = 0xFFFF;
 static float sfMaxBallBounceSpeed = 20.0f;

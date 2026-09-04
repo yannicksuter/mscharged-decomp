@@ -5,8 +5,10 @@
 #include "NL/nlMath.h"
 
 class FEScene;
+class GLView;
 class TLImageInstance;
 class TLInstance;
+struct UnidentifiedTextureState;
 
 class FERender
 {
@@ -19,5 +21,13 @@ public:
 
     static FEScene* m_pRenderScene;
 };
+
+
+// Image-instance model callback installed by GameRenderTask and invoked from
+// FERender::RenderImageInstance.
+typedef void (*RenderImageCallback)(GLView* view, unsigned long texture,
+    const UnidentifiedTextureState* pExtraTextureStates,
+    const nlVector2* positions, const nlVector2* texcoords);
+extern RenderImageCallback g_pfnRenderImage;
 
 #endif // GAME_FE_RENDER_H

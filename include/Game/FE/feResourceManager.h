@@ -66,15 +66,9 @@ class FEResourceManager : public nlTask, public nlSingleton<FEResourceManager>
 public:
     FEResourceManager();
 
-    void Run(float dt)
-    {
-        Update(dt);
-    }
+    virtual const char* GetName();
 
-    virtual const char* GetName()
-    {
-        return "FEResource Manager";
-    }
+    void Run(float dt);
 
     void Cleanup();
     void LoadPermanentResourceBundle(const char* szBundleFileName);
@@ -107,5 +101,10 @@ protected:
     /* 0x3D */ char m_szOnDemandBundleFileName[32];
     /* 0x5D */ bool m_bPermanentBundleLoadInProgress;
 }; // size 0x60
+
+inline const char* FEResourceManager::GetName()
+{
+    return "FEResource Manager";
+}
 
 #endif // GAME_FE_RESOURCE_MANAGER_H

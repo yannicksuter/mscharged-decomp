@@ -83,7 +83,7 @@ extern "C" void fn_800EBBFC(
 extern "C" void fn_800F026C(float* pParams, float fParam1, float fParam2);
 extern "C" void fn_80061B1C(int nParam, float fParam1, float fParam2);
 extern "C" void fn_80111D7C(float fParam);
-extern "C" void fn_80139D1C(int nPreset, cGlobalPad* pPad);
+extern "C" void fn_80139D1C(int nPreset, DetInput* pPad);
 extern "C" PhysicsSphere_80175F8C* fn_801765C8(
     cFielder* pFielder, const nlVector3* v3Position, float fParam);
 extern "C" void fn_801B897C(cFielder* pFielder);

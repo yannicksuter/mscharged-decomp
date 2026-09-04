@@ -8,8 +8,23 @@
 #include "NL/nlString.h"
 #include "NL/nlVector.h"
 
-class ScreenTransition;
 class DefaultAllocator;
+
+class ScreenTransition
+{
+public:
+    virtual ~ScreenTransition() { }
+    virtual void Update(float) = 0;
+    virtual void Render(GLView*) = 0;
+    virtual bool IsFinished() = 0;
+    virtual float Time() const = 0;
+    virtual float CutTime() const { return 0.0f; }
+    virtual void Reset() = 0;
+    virtual void Cancel() = 0;
+    virtual float GetTransitionLength() = 0;
+    virtual void DoSanityCheck() { }
+    virtual bool UnidentifiedVirtual30() { return false; }
+};
 
 class ScreenTransitionCallback
 {
@@ -27,10 +42,9 @@ public:
     ScreenTransitionManager();
     virtual ~ScreenTransitionManager();
 
-    void fn_8033C31C(float);
+    void Update(float dt);
     void Render();
     void CancelAllTransitions();
-    void DeleteAllTransitions();
     void AddTransitionToMap(char*, ScreenTransition*);
     void EnableRandomTransition(const char*);
     void SelectRandomTransition(const char*);

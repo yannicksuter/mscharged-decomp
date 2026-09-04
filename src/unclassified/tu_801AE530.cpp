@@ -1,5 +1,7 @@
 #include "unclassified/tu_801AE530.h"
 
+#include "Game/Render/RLView.h"
+
 #include "Game/Event.h"
 #include "Game/Game.h"
 #include "Game/Team.h"
@@ -18,7 +20,6 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 extern "C"
 {
     UnidentifiedNumberModel_801AE530** fn_80276380();
-    GLView* fn_8027267C(int index);
     bool fn_80273B00();
     bool fn_802CC8FC(glModelPacket* packet, unsigned long hash);
     void fn_802CC3C8(glModelPacket* packet, unsigned long hash,
@@ -67,7 +68,7 @@ extern "C"
     float lbl_806DD094 = 0.6f;
     float lbl_806DD098[2] = { 90.0f, 0.0f };
 
-    UnidentifiedNumberDisplay_801AE530* lbl_806E1628;
+    UnidentifiedNumberDisplay_801AE530* gpNumberDisplay;
     bool lbl_806E162C;
     bool lbl_806E162D;
     float lbl_806E1630;
@@ -216,7 +217,7 @@ void UnidentifiedNumberDisplay_801AE530::fn_801AE728(float deltaTime)
     }
 }
 
-void UnidentifiedNumberDisplay_801AE530::fn_801AE960()
+void UnidentifiedNumberDisplay_801AE530::Render()
 {
     mModels = fn_80276380();
     if (mModels == 0)
@@ -439,7 +440,7 @@ void UnidentifiedNumberDisplay_801AE530::fn_801AEE80(
         glSetRasterState(packet->rasterState, GLS_AlphaTestRef, 3);
         ++packet;
     }
-    fn_8027267C(0x26)->AttachModel(model, 0);
+    GetLayerView(eCLV_UnsortedOrtho640)->AttachModel(model, 0);
 }
 
 void UnidentifiedNumberDisplay_801AE530::fn_801AF250(

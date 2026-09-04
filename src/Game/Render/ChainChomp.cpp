@@ -1,5 +1,9 @@
 #include "Game/Render/ChainChomp.h"
 
+#include "unclassified/tu_801AD15C.h"
+
+#include "Game/Render/RLView.h"
+
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Powerups.h"
 #include "Game/Ball.h"
@@ -20,7 +24,6 @@ struct UnidentifiedChainCollisionData
     PowerupBase* pPowerup;
 };
 
-extern "C" void* fn_8027267C(int);
 
 extern const float lbl_806E4EF0;
 extern const float lbl_806E4EFC;
@@ -36,7 +39,6 @@ extern const float lbl_806E4F64;
 extern const float lbl_806E4F68;
 extern unsigned char lbl_806E14F4;
 extern void* lbl_806E14F8;
-extern int lbl_80573CA8[];
 extern const nlVector3 lbl_804DCDD0;
 extern const nlVector3 lbl_804DCDDC;
 extern const char lbl_80511C5C[];
@@ -267,9 +269,9 @@ void ChainChomp::DrawShadow(
         glSetCurrentTextureState(glHandleizeTextureState());
 
         void* renderContext;
-        if (lbl_80573CA8[0] == 1)
+        if (gPeachPhotoState.state == 1)
         {
-            renderContext = fn_8027267C(13);
+            renderContext = GetLayerView(eCLV_MoreCharacters);
         }
         else
         {

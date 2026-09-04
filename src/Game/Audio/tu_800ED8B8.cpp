@@ -5,6 +5,7 @@
 #include "Game/TweakRegistry.h"
 #include "NL/globalpad.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_80336B2C.h"
 
 extern "C" long long OSGetTime();
 extern "C" void fn_802F49AC(unsigned long*, int);
@@ -20,8 +21,6 @@ struct RestrictedStreamSlot_800ED92C
     unsigned long m_CueId;
     unsigned long m_LastPlayedMilliseconds;
 };
-
-extern "C" AudioControllerOwner_800EDCE8* fn_80336D90(void*);
 
 void* lbl_806E0E80;
 XSoundHandle_802ED74C* lbl_806E0E84;
@@ -206,7 +205,7 @@ extern "C" void fn_800EDCAC()
 
 extern "C" void fn_800EDCE8(cPlayer* player)
 {
-    cGlobalPad* globalPad = 0;
+    DetInput* globalPad = 0;
     if (player != 0)
     {
         globalPad = player->GetGlobalPad();
@@ -215,7 +214,8 @@ extern "C" void fn_800EDCE8(cPlayer* player)
     AudioControllerOwner_800EDCE8* owner = 0;
     if (globalPad != 0)
     {
-        owner = fn_80336D90(globalPad->mUnidentified040);
+        owner = (AudioControllerOwner_800EDCE8*)fn_80336D90(
+            (UnidentifiedNetworkPeerChannel*)globalPad->m_pMyUser);
     }
 
     if (owner != 0)

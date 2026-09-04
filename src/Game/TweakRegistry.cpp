@@ -621,7 +621,7 @@ int fn_802C2BE8(const char* path, int defaultValue)
     return defaultValue;
 }
 
-u8 fn_802C2C84(const char* path, u8 defaultValue)
+bool fn_802C2C84(const char* path, bool defaultValue)
 {
     TweakEntry_8052BF00* entry = fn_802C41B4(&lbl_8057C4E4, path);
     if (entry == 0)
@@ -635,7 +635,7 @@ u8 fn_802C2C84(const char* path, u8 defaultValue)
     }
     if (kind == 2)
     {
-        return *(u8*)((TweakValueImpl_804F4DC8*)entry->m_Value)->m_pValue;
+        return *(bool*)((TweakValueImpl_804F4DC8*)entry->m_Value)->m_pValue;
     }
     return defaultValue;
 }

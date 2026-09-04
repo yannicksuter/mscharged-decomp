@@ -663,10 +663,11 @@ Game/Task/BeginFrameTask.cpp:
 	.sdata2     start:0x806E45F8 end:0x806E4648
 
 Game/Task/FrontEndTask.cpp:
-	.text       start:0x80114614 end:0x80114FE0
-	.data       start:0x80507FD0 end:0x80507FF0
-	.sbss       start:0x806E0FF0 end:0x806E0FFC
-	.sdata2     start:0x806E4648 end:0x806E464C
+	.text       start:0x80114614 end:0x80115000
+	.ctors      start:0x804DB5EC end:0x804DB5F0
+	.data       start:0x80507F80 end:0x80507FF0
+	.sbss       start:0x806E0FF0 end:0x806E1000
+	.sdata2     start:0x806E4648 end:0x806E4658
 
 Game/Task/ComUpdateTask.cpp:
 	.text       start:0x80115000 end:0x80115020
@@ -681,9 +682,12 @@ Game/Task/PlatPadUpdateTask.cpp:
 	.data       start:0x80508060 end:0x80508080
 
 Game/Task/GameRenderTask.cpp:
-	.text       start:0x80115128 end:0x80115EC4
-	.data       start:0x80508128 end:0x80508148
-	.sbss       start:0x806E1010 end:0x806E1014
+	.text       start:0x80115128 end:0x80115EE4
+	.ctors      start:0x804DB5F0 end:0x804DB5F4
+	.data       start:0x80508080 end:0x80508148
+	.sdata      start:0x806DC7D8 end:0x806DC7F8
+	.sbss       start:0x806E1010 end:0x806E1030
+	.sdata2     start:0x806E4658 end:0x806E46A0
 
 Game/Task/MovieRenderTask.cpp:
 	.text       start:0x80115EE4 end:0x80115F10
@@ -3148,6 +3152,102 @@ Game/Physics/PhysicsWorld.cpp:
 	.data       start:0x805306F8 end:0x8053077C
 	.sdata      start:0x806DF608 end:0x806DF628
 
+Game/Triggers/AnimTagScript.cpp:
+	.text       start:0x80322588 end:0x803228F4
+	.sdata2     start:0x806E6918 end:0x806E6920
+
+Game/Triggers/BinaryTriggerFile.cpp:
+	.text       start:0x803228F4 end:0x80322924
+
+unclassified/tu_8032452C.cpp:
+	.text       start:0x8032452C end:0x803263E4
+	.ctors      start:0x804DBAC4 end:0x804DBAC8
+
+unclassified/tu_803263E4.cpp:
+	.text       start:0x803263E4 end:0x80326844
+	.ctors      start:0x804DBAC8 end:0x804DBACC
+	.bss        start:0x805847E0 end:0x80584808
+
+unclassified/tu_8032B6D4.cpp:
+	.text       start:0x8032B6D4 end:0x8032C7D0
+	.ctors      start:0x804DBAD0 end:0x804DBAD4
+	.bss        start:0x80584830 end:0x80584858
+	.sbss       start:0x806E20F8 end:0x806E2100
+
+unclassified/tu_80330430.cpp:
+	.text       start:0x80330430 end:0x80330978
+	.ctors      start:0x804DBAD8 end:0x804DBADC
+	.data       start:0x80533358 end:0x805333C8
+	.sbss       start:0x806E2108 end:0x806E212C
+
+unclassified/tu_80331BE4.cpp:
+	.text       start:0x80331BE4 end:0x80332770
+
+unclassified/tu_80332770.cpp:
+	.text       start:0x80332770 end:0x80332DC0
+	.ctors      start:0x804DBAE0 end:0x804DBAE4
+	.data       start:0x80533480 end:0x80533508
+	.sbss       start:0x806E2138 end:0x806E214C
+	.sdata2     start:0x806E6970 end:0x806E6978
+
+unclassified/tu_80332DC0.cpp:
+	.text       start:0x80332DC0 end:0x80336B6C
+	.ctors      start:0x804DBAE4 end:0x804DBAE8
+	.data       start:0x80533508 end:0x80533BB8
+	.bss        start:0x8058490C end:0x80584B68
+	.sdata      start:0x806DF748 end:0x806DF7A8
+	.sbss       start:0x806E2150 end:0x806E2160
+
+unclassified/tu_80336B2C.cpp:
+	.text       start:0x80336B6C end:0x80338898
+	.ctors      start:0x804DBAE8 end:0x804DBAEC
+	.data       start:0x80533BB8 end:0x80533C00
+	.bss        start:0x80584B68 end:0x80584B88
+	.sdata      start:0x806DF7A8 end:0x806DF7B0
+	.sbss       start:0x806E2160 end:0x806E2168
+
+unclassified/tu_80338898.cpp:
+	.text       start:0x80338898 end:0x80338AE8
+	.data       start:0x80533C00 end:0x80533C18
+	.bss        start:0x80584B88 end:0x80584BA8
+	.sdata      start:0x806DF7B0 end:0x806DF7B8
+	.sbss       start:0x806E2168 end:0x806E2170
+
+unclassified/tu_80338BF0.cpp:
+	.text       start:0x80338BF0 end:0x80338CC4
+
+Game/DebugWriteCache.cpp:
+	.text       start:0x80338CC4 end:0x80339B84
+	.data       start:0x80533C18 end:0x80533D98
+	.sdata      start:0x806DF7B8 end:0x806DF7D8
+
+Game/Transitions/ColourBlendScreenTransition.cpp:
+	.text       start:0x80339B84 end:0x80339F74
+	.data       start:0x80533D98 end:0x80533DE0
+	.sbss       start:0x806E2170 end:0x806E2178
+	.sdata2     start:0x806E6978 end:0x806E6988
+
+Game/Transitions/ModelTransition.cpp:
+	.text       start:0x80339F74 end:0x8033BC74
+	.data       start:0x80533DE0 end:0x80533E80
+	.bss        start:0x80584BA8 end:0x80584BC8
+	.sdata      start:0x806DF7D8 end:0x806DF800
+	.sbss       start:0x806E2178 end:0x806E2180
+	.sdata2     start:0x806E6988 end:0x806E69A0
+
+Game/Transitions/ScreenTransitionManager.cpp:
+	.text       start:0x8033BE3C end:0x8033DDC8
+	.data       start:0x80533EA8 end:0x80534010
+	.sdata      start:0x806DF800 end:0x806DF810
+	.sbss       start:0x806E2180 end:0x806E2188
+	.sdata2     start:0x806E69A0 end:0x806E69A8
+
+Game/Transitions/ScriptedTransition.cpp:
+	.text       start:0x8033DDC8 end:0x8033F900
+	.data       start:0x80534010 end:0x80534208
+	.sdata      start:0x806DF810 end:0x806DF840
+	.sdata2     start:0x806E69A8 end:0x806E69D8
+
 ode/collision_kernel.cpp:
 	.text       start:0x80344814 end:0x80345C44
 	.data       start:0x805344D8 end:0x80534548
@@ -5546,15 +5646,14 @@ RVL_SDK/dwc/dwc_ghttp.c:
 	.sbss       start:0x806E2EC8 end:0x806E2ED0
 
 RVL_SDK/dwc/dwc_common.c:
-	.text       start:0x8048A17C end:0x8048A684
+	.text       start:0x8048A17C end:0x8048A528
 	.data       start:0x80562140 end:0x80562150
 	.bss        start:0x806C9888 end:0x806C98A0
-	.sdata      start:0x806E0388 end:0x806E0390
 
 RVL_SDK/dwc/dwc_friend.c:
-	.text       start:0x8048A684 end:0x8048C214
+	.text       start:0x8048A528 end:0x8048C214
 	.data       start:0x80562150 end:0x805626E0
-	.sdata      start:0x806E0390 end:0x806E0398
+	.sdata      start:0x806E0388 end:0x806E0398
 	.sbss       start:0x806E2ED0 end:0x806E2ED8
 
 RVL_SDK/dwc/dwc_login.c:

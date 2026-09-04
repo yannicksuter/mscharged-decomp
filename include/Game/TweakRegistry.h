@@ -52,7 +52,7 @@ extern "C"
     void fn_802C2B38(TweakValueBase_8052BF70* value);
     float fn_802C2B48(const char* path, float defaultValue);
     int fn_802C2BE8(const char* path, int defaultValue);
-    u8 fn_802C2C84(const char* path, u8 defaultValue);
+    bool fn_802C2C84(const char* path, bool defaultValue);
     const char* fn_802C2D20(const char* path, const char* defaultValue);
     int fn_802C2DBC(const char* path);
 

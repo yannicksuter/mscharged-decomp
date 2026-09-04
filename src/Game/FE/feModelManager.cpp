@@ -1,5 +1,9 @@
 #include "Game/FE/feModelManager.h"
 
+#include "unclassified/tu_801A4188.h"
+
+#include "Game/Render/RLView.h"
+
 #include "Game/Render/ImpostorCharacter.h"
 #include "Game/Render/ImpostorManager.h"
 #include "Game/ResourceInterface_802CC094.h"
@@ -93,8 +97,6 @@ extern "C"
     ResourceInterface_802CC094* fn_802CBFD8(
         const void* configuration, int count, const char* name);
     void fn_802CC02C(ResourceInterface_802CC094* loader);
-    void fn_801A4188();
-    void* fn_8027267C(int index);
     void* fn_8002600C(int characterIndex);
     int GetCharacterIndexFromCaptain__Fi(int captain);
 }
@@ -473,14 +475,14 @@ void FEModelManager::Render()
         entry = entry->mNext;
     }
 
-    fn_801A4188();
+    UpdateImpostorPositions();
     ImpostorManager* impostorManager = ImpostorManager::GetInstance();
     if (impostorManager->mInitialized)
     {
         ImpostorManager::GetInstance()->SetSpritesInvalid();
         ImpostorManager::GetInstance()->ResetSpriteSlots();
         ImpostorManager::GetInstance()->UpdateSprites();
-        ImpostorManager::GetInstance()->Render(fn_8027267C(10), false);
+        ImpostorManager::GetInstance()->Render(GetLayerView(eCLV_ImpostorOut), false);
     }
 }
 

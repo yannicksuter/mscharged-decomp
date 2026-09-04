@@ -37,6 +37,7 @@ public:
 class BlurManager
 {
 public:
+    static void Update(float fDeltaT);
     static void DestroyHandler(
         BlurHandler* handler, float timeToDie);
     static BlurHandler* GetNewHandler(

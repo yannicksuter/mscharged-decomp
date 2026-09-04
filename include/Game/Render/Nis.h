@@ -5,6 +5,7 @@
 #include "NL/nlMath.h"
 #include "types.h"
 
+class GLView;
 class cAnimCamera;
 
 enum NisTriggerType
@@ -113,5 +114,8 @@ public:
     /* 0x188 */ Trigger mTriggers[MAX_NUM_TRIGGERS];
     /* 0x848 */ u8 unknown_0x848[0x368];
 };
+
+
+extern GLView* g_pNisRenderView;
 
 #endif // GAME_RENDER_NIS_H

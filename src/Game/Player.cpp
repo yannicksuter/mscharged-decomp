@@ -17,7 +17,7 @@
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/SAnim/pnSingleAxisBlender.h"
 #include "Game/Sys/audio.h"
-#include "NL/globalpad.h"
+#include "unclassified/tu_80336B2C.h"
 
 extern "C" cPlayer* fn_80096514(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
@@ -26,7 +26,6 @@ extern "C" nlVector3 fn_800A6AC8(
     cTeam* pTeam, const nlVector3* v3ReferencePos);
 extern "C" nlVector3 fn_800A6B84(
     cTeam* pTeam, const nlVector3* v3ReferencePos);
-extern "C" void* fn_80336D90(void* pData);
 extern "C" void fn_801B59DC(
     UnidentifiedObject_801B535C* pObject, bool bParam);
 extern "C" void fn_801BCC38(cCharacter*);
@@ -100,7 +99,7 @@ bool cPlayer::IsOnSameTeam(cPlayer* other)
     return false;
 }
 
-cGlobalPad* cPlayer::GetGlobalPad()
+DetInput* cPlayer::GetGlobalPad()
 {
     if (m_pController != NULL)
     {
@@ -111,12 +110,13 @@ cGlobalPad* cPlayer::GetGlobalPad()
 
 void* cPlayer::fn_800972CC()
 {
-    cGlobalPad* pGlobalPad
+    DetInput* pGlobalPad
         = m_pController != NULL ? m_pController->m_pGlobalPad : NULL;
     void* pResult = NULL;
     if (pGlobalPad != NULL)
     {
-        pResult = fn_80336D90(pGlobalPad->mUnidentified040);
+        pResult = fn_80336D90(
+            (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser);
     }
     return pResult;
 }

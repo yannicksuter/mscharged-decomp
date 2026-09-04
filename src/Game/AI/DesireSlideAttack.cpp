@@ -6,33 +6,16 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/Ball.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Team.h"
 #include "NL/nlMath.h"
 #include <stddef.h>
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-extern "C" DebugFieldType lbl_80533C98[];
 extern "C" AvoidController* fn_8002E144(cFielder*);
 extern "C" void fn_800401C0(
     cFielder*, const nlVector3&, float, float);
 extern "C" float fn_800D7B00(cFielder*);
 extern "C" float fn_800DF74C(cTeam*);
-extern "C" unsigned short fn_80338EBC(
-    DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
-
 static float lbl_806DC238 = 0.25f;
 static unsigned short sDesireSlideAttackType = 0xFFFF;
 

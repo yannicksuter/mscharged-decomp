@@ -28,7 +28,7 @@ extern "C" int VISetTimeToDimming(int time);
 extern TLComponentInstance* lbl_80578450[4];
 extern BaseGameSceneManager* lbl_806E1838;
 extern void* lbl_806E1E28;
-extern bool lbl_806E1090;
+extern bool g_e3_Build;
 
 extern const int lbl_804E8368[10] = {
     13, 14, 13, 14, 11, 12, 0, 1, 2, 0,
@@ -176,7 +176,7 @@ void TitleScene::fn_801D1F6C()
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     gameInfo->SetMode(GameInfoManager::GM_MODE_2, false);
 
-    bool filterCharacters = lbl_806E1090;
+    bool filterCharacters = g_e3_Build;
     int homeCaptain;
     do
     {

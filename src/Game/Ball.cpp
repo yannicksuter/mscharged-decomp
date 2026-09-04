@@ -10,6 +10,7 @@
 #include "Game/BallTrail.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/DB/CharacterInfo.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
@@ -40,13 +41,6 @@
 #include "unclassified/tu_80199E84.h"
 #include "unclassified/tu_801A5F10.h"
 #include "Game/DB/StadiumInfo.h"
-
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
 
 struct UnidentifiedBallRuntime
 {
@@ -157,7 +151,6 @@ private:
     DLListContainerBase<Listener, BasicSlotPool<ListenerEntry> > mListeners;
 };
 
-extern "C" DebugFieldType lbl_80533C98[];
 extern "C" LiveBallTrail lbl_8056B518[];
 extern "C" unsigned int lbl_806E0C10;
 extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
@@ -199,22 +192,13 @@ extern "C" void fn_801B7A28(cBall*);
 extern "C" void fn_801B9904(unsigned long);
 extern "C" void fn_801B9EAC(cBall*, nlVector3*, bool);
 extern "C" void fn_801B9FD0(cBall*, bool);
-extern "C" void fn_80139D1C(int, cGlobalPad*);
+extern "C" void fn_80139D1C(int, DetInput*);
 extern "C" void fn_802ECC54(void*, void*);
 extern "C" void fn_802B5370(
     nlQuaternion&, const nlVector3&, unsigned short);
 extern "C" DrawableObject* fn_8027638C(unsigned int);
 extern "C" DrawableObject* fn_8027725C(unsigned long);
 extern "C" UnidentifiedBallRuntime* fn_802ECB68(void*);
-extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
-
 float Exp(float);
 
 cBall* g_pBall = NULL;

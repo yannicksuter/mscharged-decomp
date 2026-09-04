@@ -26,10 +26,8 @@ public:
     virtual bool RumbleActive() = 0;
     virtual void StartRumble(float fDuration, float fIntensity, float fFrequency) = 0;
     virtual void StopRumble() = 0;
-
-    bool JustPressed(int button, bool remap);
-    bool JustReleased(int button, bool remap);
-    int fn_80332748();
+    virtual void Update(float deltaTime) = 0;
+    virtual int UnidentifiedClassID() = 0;
 
     void DisableLeftAnalogToDPadMap()
     {
@@ -45,12 +43,6 @@ public:
     /* 0x18 */ bool m_isLeftAnalogToDPadMapEnabled;
     /* 0x19 */ u8 mUnidentified019[3];
     /* 0x1C */ PadBackend* mBackend;
-    /* 0x20 */ u8 mUnidentified020[0x20];
-    /* 0x40 */ void* mUnidentified040;
-    /* 0x44 */ nlPolar m_polarAnalogLeft;
-    /* 0x4C */ nlPolar m_polarAnalogRight;
-    /* 0x54 */ u8 mUnidentified054[0x34];
-    /* 0x88 */ u16 mUnidentified088;
-};
+}; // size: 0x20
 
 #endif // NL_GLOBALPAD_H

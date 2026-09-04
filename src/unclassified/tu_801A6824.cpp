@@ -1,3 +1,7 @@
+#include "unclassified/tu_801A6824.h"
+
+#include "Game/Render/RLView.h"
+
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glTexture.h"
@@ -15,31 +19,8 @@ struct Player_801A6834
     PlayerPresentationName_801A6834* presentationName;
 };
 
-class ScreenOverlay_801A6824
-{
-public:
-    ScreenOverlay_801A6824()
-        : mRate(0.0f)
-        , mValue(0.0f)
-        , mTarget(0.0f)
-        , mMode(-1)
-        , mActive(false)
-    {
-    }
-
-    void fn_801A6824(float rate, float target, int mode);
-    void fn_801A6834(float deltaTime);
-
-    /* 0x00 */ float mRate;
-    /* 0x04 */ float mValue;
-    /* 0x08 */ float mTarget;
-    /* 0x0C */ int mMode;
-    /* 0x10 */ bool mActive;
-}; // size: 0x14
-
 extern "C"
 {
-    GLView* fn_8027267C(int index);
     extern Player_801A6834* lbl_8056B800[10];
     extern int lbl_806DCFB0;
 }
@@ -50,7 +31,7 @@ static char sBlackTexture[] = "global/black";
 
 ScreenOverlay_801A6824 gScreenOverlay_801A6824;
 
-void ScreenOverlay_801A6824::fn_801A6824(
+void ScreenOverlay_801A6824::Start(
     float rate, float target, int mode)
 {
     mRate = rate;
@@ -58,7 +39,7 @@ void ScreenOverlay_801A6824::fn_801A6824(
     mMode = mode;
 }
 
-void ScreenOverlay_801A6824::fn_801A6834(float deltaTime)
+void ScreenOverlay_801A6824::UpdateAndRender(float deltaTime)
 {
     mValue += mRate * deltaTime;
     if (mRate == 0.0f)
@@ -96,7 +77,7 @@ void ScreenOverlay_801A6824::fn_801A6834(float deltaTime)
     colour.c[1] = shade;
     colour.c[2] = shade;
     poly.FullCoverage(colour, -1.0f);
-    poly.Attach(fn_8027267C(9), 0, 0);
+    poly.Attach(GetLayerView(eCLV_MegastrikeBackground), 0, 0);
 
     glSetDefaultState(false);
     glSetRasterState(GLS_AlphaBlend, 1);
@@ -120,5 +101,5 @@ void ScreenOverlay_801A6824::fn_801A6834(float deltaTime)
 
     nlColourSet(colour, 0xFF, 0xFF, 0xFF, (int)(255.0f * mValue));
     poly.FullCoverage(colour, 0.0f);
-    poly.Attach(fn_8027267C(9), 0, 0);
+    poly.Attach(GetLayerView(eCLV_MegastrikeBackground), 0, 0);
 }

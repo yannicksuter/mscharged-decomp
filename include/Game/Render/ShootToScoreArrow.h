@@ -22,8 +22,8 @@ public:
     static WorldDarkening& Instance();
     void fn_801AF550();
     void Fade(float rate, float to);
-    void fn_801AF570(float deltaTime);
-    void fn_801AF5F4();
+    void Update(float deltaTime);
+    void Render();
     void fn_801AF734(SaveFrame& frame);
     void fn_801AF7A8(LoadFrame& frame);
 
@@ -33,6 +33,8 @@ public:
     /* 0x0C */ bool mActive;
 
 private:
+    friend class GameRenderTask;
+
     static inline void SetPolyColour(glPoly2& poly, u8 r, u8 g, u8 b, u8 a)
     {
         nlColour color;

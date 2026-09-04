@@ -2,24 +2,12 @@
 #define GAME_FIXED_UPDATE_TASK_H
 
 #include "Game/Task/DispatchEventsTask.h"
+#include "Game/Task/FixedUpdateTaskBase.h"
 #include "NL/nlTask.h"
 
 extern float g_fFixedUpdateTick;
 extern float g_fSimulationTick;
 extern bool g_bRunSimAndRenderInLockStep;
-
-class UnidentifiedFixedUpdateTaskBase
-{
-public:
-    virtual u32 GetFrame() = 0;
-    virtual float GetFixedUpdateMilliseconds() = 0;
-    virtual u32 CalculateChecksum() = 0;
-    virtual u32 WriteSyncLog() = 0;
-    virtual void UnidentifiedVirtual10() = 0;
-    virtual void UnidentifiedVirtual14() = 0;
-    virtual u16 UnidentifiedVirtual18() = 0;
-    virtual bool UnidentifiedVirtual1C() = 0;
-};
 
 class FixedUpdateTask : public nlTask, public UnidentifiedFixedUpdateTaskBase
 {
@@ -44,7 +32,7 @@ public:
         return "Game Fixed Update";
     }
 
-    virtual u32 GetFrame()
+    virtual int GetFrame()
     {
         return mFrame;
     }
@@ -81,5 +69,8 @@ public:
     /* 0x6C */ float mTimeScaleTransitionStart;
     /* 0x70 */ float mTargetTimeScale;
 };
+
+
+FixedUpdateTask* GetFixedUpdateTask();
 
 #endif // GAME_FIXED_UPDATE_TASK_H

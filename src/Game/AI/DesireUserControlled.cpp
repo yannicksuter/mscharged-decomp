@@ -5,26 +5,10 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/Ball.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
 #include <stddef.h>
 
-struct DebugFieldType
-{
-    unsigned short size;
-    unsigned short unknown;
-    void* writer;
-};
-
-extern "C" DebugFieldType lbl_80533C98[];
-extern "C" unsigned short fn_80338EBC(
-    DebugWriteCache*, const char*);
-extern "C" void fn_80338F78(DebugWriteCache*);
-extern "C" void fn_80338F88(
-    DebugWriteCache*, int, unsigned short, unsigned int, const char*);
-extern "C" void* fn_8033930C(
-    DebugWriteCache*, unsigned short, void*, unsigned int);
-extern "C" void fn_80339450(
-    DebugWriteCache*, unsigned short, void*, void*);
 extern "C" void fn_80098098(cFielder*);
 extern "C" void fn_80040368(cFielder*);
 extern "C" void fn_80095870(cFielder*);
@@ -38,7 +22,7 @@ extern "C" bool fn_8003E948(cFielder*);
 extern "C" void fn_800368E4(cFielder*);
 extern "C" void fn_8003E0A8(cFielder*);
 extern "C" bool fn_80035F34(cFielder*);
-extern "C" bool fn_80331C04(cGlobalPad*, int, bool);
+extern "C" bool fn_80331C04(DetInput*, int, bool);
 extern "C" void fn_800B6A1C(void*, int, const Variant&);
 extern "C" void fn_8003E168(cFielder*, float);
 

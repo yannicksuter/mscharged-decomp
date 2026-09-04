@@ -9,6 +9,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/main.h"
 #include "NL/nlMemory.h"
+#include "unclassified/tu_80336B2C.h"
 
 #include <string.h>
 
@@ -17,8 +18,6 @@ extern "C" int fn_8011C1B4();
 extern "C" bool fn_8011C1D0();
 extern "C" bool fn_801EDC10();
 extern "C" int fn_8025BD88();
-extern "C" s8 fn_80336F68(s8 player, s8 machine);
-
 extern int lbl_806E20E0;
 
 static int sLeaderboardJobs[5] = { 6, 7, 8, 9, 10 };

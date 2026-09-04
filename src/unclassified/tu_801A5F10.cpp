@@ -1,5 +1,7 @@
 #include "unclassified/tu_801A5F10.h"
 
+#include "Game/Render/Jumbotron.h"
+
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
@@ -37,35 +39,37 @@ static float sRadiusTransitionTime = 0.25f;
 static float sActiveRadius = 1.33f;
 static float sDefaultRadius = 0.35f;
 
-extern "C" void fn_801A5F10()
+Jumbotron Jumbotron::instance;
+
+void Jumbotron::Initialize()
 {
 }
 
-extern "C" void fn_801A5F14()
+void Jumbotron::Uninitialize()
 {
 }
 
-extern "C" void fn_801A5F18()
+void Jumbotron::Reset()
 {
 }
 
-extern "C" void fn_801A5F1C()
+void Jumbotron::BeginLoad()
 {
 }
 
-extern "C" void fn_801A5F20()
+void Jumbotron::WaitForLoad()
 {
 }
 
-extern "C" void fn_801A5F24()
+void Jumbotron::BeginPlaying()
 {
 }
 
-extern "C" void fn_801A5F28()
+void Jumbotron::StopPlaying()
 {
 }
 
-extern "C" void fn_801A5F2C()
+void Jumbotron::Update(float)
 {
 }
 

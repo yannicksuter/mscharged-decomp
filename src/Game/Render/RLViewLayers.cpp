@@ -285,7 +285,7 @@ glModelStream* fn_8027263C(const glModelPacket* packet, int id)
     return 0;
 }
 
-extern "C" RLView* fn_8027267C(eCLV layer)
+RLView* GetLayerView(eCLV layer)
 {
     if (layer < eCLV_Num)
     {

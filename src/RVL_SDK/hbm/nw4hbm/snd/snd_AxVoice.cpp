@@ -465,6 +465,11 @@ void AxVoice::SetFxSend(AuxBus bus, f32 send) {
 }
 
 
+// R4QE01 dead-strips the voice-out range check between SetFxSend and
+// SetRemoteSend, but its assertion string survives at 0x8055A430, ahead of
+// SetPriority's. The expression is transcribed from that retail data.
+DECOMP_FORCEACTIVE(snd_AxVoice_cpp, NW4HBMAssertHeaderClampedLRValue_String(voiceOutIndex));
+
 void AxVoice::SetRemoteSend(int remoteIndex, f32 send) {
     NW4HBMAssertHeaderClampedLValue_Line(remoteIndex, 0, 4, 741);
     send += 1.0f;
@@ -523,6 +528,11 @@ void AxVoice::SetBaseAddress(int channelIndex, const void* baseAddress) {
     mVoiceChannelParam[channelIndex].waveData = (void*)baseAddress;
 }
 
+
+// The channel-index assertion string heads this group at 0x8055A4C0, ahead of
+// IsPlayFinished's "Invalid format" string, so a stripped routine here
+// emitted it before the retained SetAxAddr/SetAxAdpcm uses.
+DECOMP_FORCEACTIVE(snd_AxVoice_cpp, NW4HBMAssert_String(channelIndex < CHANNEL_MAX));
 
 bool AxVoice::IsPlayFinished() const {
     ut::AutoInterruptLock lock;
