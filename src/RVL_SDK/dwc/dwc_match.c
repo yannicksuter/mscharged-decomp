@@ -2,6 +2,7 @@
 
 #include <dwc/dwc_common.h>
 #include <dwc/dwc_error.h>
+#include <dwc/dwc_friend.h>
 #include <dwc/dwc_main.h>
 #include <dwc/dwc_memfunc.h>
 #include <dwc/dwc_report.h>
@@ -195,7 +196,6 @@ typedef struct DWCMatchOptSCBlockView
 GPResult fn_8048AFCC(GPEnum status, const char* statusString,
     const char* locationString);
 int fn_8048AEC4(int profileId);
-void fn_8048AB90(int error, int errorCode);
 void fn_8048C54C(int error, int errorCode);
 void fn_8049AE0C(int type, int aid, const void* data, int size);
 void fn_80499A30(SBServer server);
@@ -5152,7 +5152,7 @@ int fn_80498DF0(int error)
             code + DWC_ECODE_SEQ_LOGIN + DWC_ECODE_GS_QR2);
         break;
     case DWC_STATE_UPDATE_SERVERS:
-        fn_8048AB90(type,
+        DWCi_StopFriendProcess(type,
             code + DWC_ECODE_SEQ_UPDATE_SVR + DWC_ECODE_GS_QR2);
         break;
     case DWC_STATE_MATCHING:

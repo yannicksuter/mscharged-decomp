@@ -118,11 +118,11 @@ public:
 };
 
 class UnidentifiedHBMHideEvent
-    : public UnidentifiedStaticEvent<UnidentifiedEventData00, 8>
+    : public UnidentifiedStaticEvent<UnidentifiedEventNoData, 8>
 {
 public:
     UnidentifiedHBMHideEvent()
-        : UnidentifiedStaticEvent<UnidentifiedEventData00, 8>("HBMHide", -1)
+        : UnidentifiedStaticEvent<UnidentifiedEventNoData, 8>("HBMHide", -1)
     {
     }
 
@@ -405,8 +405,7 @@ void UnidentifiedHBMManager::fn_802480EC()
             gxInit();
             GXSetChanCtrl(4, false, 0, 1, 0xFF, 2, 1);
             GXSetChanCtrl(5, false, 0, 1, 0xFF, 2, 1);
-            sHBMHideEvent.UnidentifiedDeliver(
-                (UnidentifiedEventData00*)&sHBMHideEvent);
+            sHBMHideEvent.UnidentifiedDeliver();
         }
         nlTaskManager::SetNextState(mPreviousTaskState);
         break;
@@ -421,8 +420,7 @@ void UnidentifiedHBMManager::fn_802480EC()
             gxInit();
             GXSetChanCtrl(4, false, 0, 1, 0xFF, 2, 1);
             GXSetChanCtrl(5, false, 0, 1, 0xFF, 2, 1);
-            sHBMHideEvent.UnidentifiedDeliver(
-                (UnidentifiedEventData00*)&sHBMHideEvent);
+            sHBMHideEvent.UnidentifiedDeliver();
         }
         ResetTask::s_ResetMode = 3;
         if (ResetTask::s_ResetState == RS_RUNNING)
@@ -441,8 +439,7 @@ void UnidentifiedHBMManager::fn_802480EC()
             gxInit();
             GXSetChanCtrl(4, false, 0, 1, 0xFF, 2, 1);
             GXSetChanCtrl(5, false, 0, 1, 0xFF, 2, 1);
-            sHBMHideEvent.UnidentifiedDeliver(
-                (UnidentifiedEventData00*)&sHBMHideEvent);
+            sHBMHideEvent.UnidentifiedDeliver();
         }
         ResetTask::s_ResetMode = 0;
         if (ResetTask::s_ResetState == RS_RUNNING)

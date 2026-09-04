@@ -812,7 +812,7 @@ void Goalie::fn_80083750(float)
         {
             m_pPowerupLayer->SetNodeWeight(nNodeIndex, fWeight);
             nNodeIndex
-                = m_pPoseAccumulator->m_pHierarchy->GetParent(
+                = m_pPoseAccumulator->m_BaseSHierarchy->GetParent(
                     nNodeIndex);
         }
 
@@ -5768,7 +5768,7 @@ void Goalie::fn_8008E130()
             m_pPowerupLayer->SetNodeWeight(
                 nNodeIndex, 0.0f);
             nNodeIndex
-                = m_pPoseAccumulator->m_pHierarchy->GetParent(
+                = m_pPoseAccumulator->m_BaseSHierarchy->GetParent(
                     nNodeIndex);
         }
 

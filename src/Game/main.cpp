@@ -4,6 +4,7 @@
 #include "Game/ComUpdateTask.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Debug/FrameCounter.h"
+#include "Game/Effects/EmissionManager.h"
 #include "Game/FrontEndTask.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/feHelpFuncs.h"
@@ -112,9 +113,6 @@ extern "C"
     void fn_8013D7E0();
     void fn_802C0F24();
     void fn_80369574();
-    void fn_802E75F4();
-    void fn_802E9E0C();
-    void fn_802E9E9C();
     void fn_80115504();
     void fn_803768F8();
     void fn_803730D8();
@@ -453,8 +451,9 @@ static void Initialize()
     }
 
     fn_802E75F4();
-    fn_802E9E0C();
-    fn_802E9E9C();
+    fn_802E9E0C(1, 250);
+    fn_802E9E9C(3, "Character", 250);
+    fn_802E9E9C(2, "StadiumEffects", 250);
 
     nlTaskManager::Startup(0x10000);
     sLoadingTask.Start();

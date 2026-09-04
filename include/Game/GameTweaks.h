@@ -90,10 +90,15 @@ struct UnidentifiedFormationTweakVector2
     UnidentifiedFormationTweakValue y;
 }; // total size: 0x20
 
-class GameTweaks
+class GameTweaks : public TweaksBase
 {
+public:
+    GameTweaks(const char* name, const char* category);
+    virtual ~GameTweaks();
+    virtual void Init();
+
 private:
-    /* 0x000 */ u8 mUnidentified000[0x70];
+    /* 0x044 */ u8 mUnidentified044[0x2C];
 
 public:
     /* 0x070 */ UnidentifiedFormationTweakVector2 vGetInPositionKeyFielderDist;
@@ -171,9 +176,20 @@ private:
 
 public:
     /* 0x544 */ TweakValueImpl_804F4DC8 fChainChompRadius;
-};
 
-struct unk_800A9274;
+private:
+    /* 0x554 */ u8 mUnidentified554[0x464];
+}; // total size: 0x9B8
+
+struct unk_800A9274
+{
+    virtual ~unk_800A9274();
+
+    /* 0x04 */ TweakValueImpl_804F4DC8 mUnidentified04;
+    /* 0x14 */ TweakValueImpl_804F4DC8 mUnidentified14;
+    /* 0x24 */ TweakValueImpl_804F4DC8 mUnidentified24;
+    /* 0x34 */ TweakValueImpl_804F4DC8 mUnidentified34;
+}; // total size: 0x44
 
 struct unk_8056CF08
 {
@@ -189,22 +205,19 @@ struct unk_8056CF08
     {
     }
 
-private:
+public:
     /* 0x00 */ u32 mUnidentified00;
 
-public:
     /* 0x04 */ unk_800A9274* mUnidentified04;
 
-private:
-    /* 0x08 */ void* mUnidentified08;
+    /* 0x08 */ int mUnidentified08;
     /* 0x0C */ bool mUnidentified0C;
     /* 0x0D */ u8 mPadding0D[3];
 
-public:
     /* 0x10 */ GameTweaks* m_pGameTweaks;
     /* 0x14 */ FielderTweaks* m_unk14;
 
-private:
+public:
     /* 0x18 */ SkillTweaks* mUnidentified18;
     /* 0x1C */ SkillTweaks* mUnidentified1C;
 }; // total size: 0x20

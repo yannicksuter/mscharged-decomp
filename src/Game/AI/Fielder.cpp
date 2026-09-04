@@ -1,5 +1,6 @@
 #include "Game/AI/Fielder.h"
 
+#include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/Ball.h"
 #include "Game/CharacterTweaks.h"
@@ -12,12 +13,6 @@
 #include "Game/Team.h"
 #include "math.h"
 #include "Game/DB/StadiumInfo.h"
-
-struct UnidentifiedFielderInput
-{
-    u8 mUnidentified00[0x18];
-    void* mUnidentified18;
-};
 
 struct UnidentifiedPadAction
 {

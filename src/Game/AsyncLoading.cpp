@@ -115,7 +115,6 @@ extern "C" void fn_802BD718(
     const char* name, const char* units, float value);
 extern "C" void fn_801B2770();
 extern "C" void fn_8027ED18();
-extern "C" void fn_8027C86C();
 extern "C" void fn_8027E5D4();
 extern "C" void fn_802B2E8C(UnidentifiedOwnerHandle* handle);
 extern "C" void fn_80332EC8();
@@ -684,8 +683,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FlareHandler::instance.Cleanup();
     NisPlayer::Instance();
     fn_8027ED18();
-    NisPlayer::Instance();
-    fn_8027C86C();
+    NisPlayer::Instance()->Reset();
     NisPlayer::Instance();
     fn_8027E5D4();
     ReplayChoreo::Instance().Reset();

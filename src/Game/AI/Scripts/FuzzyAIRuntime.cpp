@@ -47,7 +47,7 @@ public:
 
     u32 mUnidentified028;
     Variant* mValue;
-    void** mCollection;
+    UnidentifiedActionQueue** mCollection;
     u8 mUnidentified034[0x24];
     int mUnidentified058;
     u8 mUnidentified05C[0x0C];
@@ -111,8 +111,7 @@ extern "C" void fn_803140CC();
 extern "C" bool fn_800A3350(
     void*, unsigned long, float*, cFielder*);
 extern "C" void* fn_800A636C(cTeam*);
-extern "C" void* fn_800A3404(void*);
-extern "C" void fn_80310034(void*, void*, int);
+extern "C" float* fn_800A3404(void*);
 extern "C" int fn_80312208(void*);
 extern "C" void* fn_80312E0C(void*, const Variant&);
 extern "C" int fn_802DF9FC(InterpreterCore*);
@@ -204,8 +203,8 @@ float UnidentifiedFuzzyRuntime::UnidentifiedVirtual8()
 
     if (value != 0)
     {
-        void* collection = *mCollection;
-        fn_80310034(collection, fn_800A3404(value), 4);
+        UnidentifiedActionQueue* collection = *mCollection;
+        collection->fn_80310034(fn_800A3404(value), 4);
     }
 
     return result;

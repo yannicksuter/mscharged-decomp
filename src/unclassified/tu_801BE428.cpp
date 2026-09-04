@@ -278,7 +278,7 @@ extern "C" void fn_801BED5C(EmissionController& controller)
             controller.SetPoseAccumulator(
                 *drawableCharacter->poseAccumulator);
 
-            drawableCharacter->poseAccumulator->m_pHierarchy
+            drawableCharacter->poseAccumulator->m_BaseSHierarchy
                 ->GetNodeIndexByID(character->m_nHeadJointIndex);
             nlMatrix4& matrix
                 = drawableCharacter->poseAccumulator->GetNodeMatrix(0);

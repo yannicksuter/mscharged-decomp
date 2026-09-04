@@ -287,7 +287,7 @@ void PhysicsCharacterBase::AddBoneVolumes(PhysicsWorld* world,
         object->SetCategory(categoryBits);
         object->SetCollide(collideBits);
 
-        unsigned int parentNodeIndex = pose->m_pHierarchy->GetNodeIndexByID(element->m_ParentHashID);
+        unsigned int parentNodeIndex = pose->m_BaseSHierarchy->GetNodeIndexByID(element->m_ParentHashID);
         int transformHandle = AddObject(object);
         PhysicsBoneID id = ResolvePhysicsBoneIDFromName(element->m_Name);
         PhysicsBoneVolume* volume = AddBoneVolume(object, parentNodeIndex, transformHandle, element->m_LocalToParent, id);

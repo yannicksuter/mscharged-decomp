@@ -41,8 +41,8 @@ void ParticleUpdateTask::Run(float dt)
     }
     if (mUpdateEnabled && update)
     {
-        void* manager = EmissionManager::Instance();
-        fn_802E7720(manager, dt * mTimeScale);
+        EmissionManager* manager = EmissionManager::Instance();
+        manager->Update(dt * mTimeScale);
     }
 
     bool render = true;
@@ -52,8 +52,8 @@ void ParticleUpdateTask::Run(float dt)
     }
     if (mRenderEnabled && render)
     {
-        void* manager = EmissionManager::Instance();
-        fn_802E7B30(manager);
+        EmissionManager* manager = EmissionManager::Instance();
+        manager->Render();
     }
 }
 
@@ -61,7 +61,7 @@ void ParticleUpdateTask::Shutdown()
 {
     if (EmissionManager::Instance() != 0)
     {
-        fn_802E6DF8(EmissionManager::Instance());
+        EmissionManager::Instance()->Shutdown();
     }
 }
 

@@ -144,7 +144,7 @@ void cSAnim::Destroy()
 void cSAnim::BlendTrans(int nAccumulatorNode, int nSAnimNode, float fTime,
     float fWeight, cPoseAccumulator* pAccumulator, bool bMirror) const
 {
-    if (pAccumulator->m_pHierarchy->PreserveBoneLength(nAccumulatorNode))
+    if (pAccumulator->m_BaseSHierarchy->PreserveBoneLength(nAccumulatorNode))
     {
         return;
     }

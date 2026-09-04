@@ -30,8 +30,7 @@ extern "C" void fn_80038158(cFielder*, bool);
 extern "C" void fn_801B8164(cFielder*);
 extern "C" void fn_801B7F8C(cFielder*);
 extern "C" void fn_801B865C(cFielder*);
-extern "C" void* fn_80316974(void*);
-extern "C" void fn_8030FA10(void*, int, float);
+extern "C" UnidentifiedFielderInput* fn_80316974(void*);
 extern "C" void fn_80338F88(
     DebugWriteCache*, int, unsigned short, unsigned int, const char*);
 extern "C" unsigned short fn_80338EBC(DebugWriteCache*, const char*);
@@ -351,7 +350,7 @@ bool DesireConfused::UnidentifiedInitialize(void* context)
 
     mvDesiredPosition = lbl_804DC1A0;
     mvDesiredPosition.x = 1.0f;
-    fn_8030FA10(fn_80316974(this), 0xFF, 0.0f);
+    fn_80316974(this)->fn_8030FA10(0xFF, 0.0f);
     return result;
 }
 

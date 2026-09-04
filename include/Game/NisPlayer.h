@@ -15,6 +15,8 @@ public:
     void Load(char* buffer, unsigned int size, NisHeader& nisHeader);
     void LoadTriggers(Nis& nis);
     void ResetEffects();
+    void Reset();
+    void fn_8027D11C();
     void SetExtraNameFilter(const char* filter);
     bool WorldIsFrozen() const;
     static NisPlayer* Instance();

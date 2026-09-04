@@ -122,7 +122,8 @@ float EffectsTemplate::fn_802E04CC() const
         float value4 = mUnidentified058[4]->fn_802E0108();
         float value1 = mUnidentified058[1]->fn_802E0108();
         result = value4 + value1 * mUnidentified058[2]->fn_802E0108();
-        float duration = 0.5f * mUnidentified014 + mUnidentified010;
+        float duration
+            = 0.5f * m_rParticleLife.range + m_rParticleLife.base;
         result += duration * mUnidentified058[5]->fn_802E0108();
         break;
     }

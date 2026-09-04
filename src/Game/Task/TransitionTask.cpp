@@ -1,249 +1,75 @@
 #include "Game/Task/TransitionTask.h"
 
+#include "Game/Ball.h"
 #include "Game/BasicStadium.h"
+#include "Game/Camera/CameraMan.h"
 #include "Game/Character.h"
+#include "Game/CharacterTemplate.h"
 #include "Game/Drawable/DrawableCharacter.h"
-#include "Game/Event.h"
+#include "Game/Game.h"
 #include "Game/NisPlayer.h"
 #include "Game/PadActions.h"
 #include "Game/Physics/PhysicsPatch.h"
+#include "Game/Render/NPCManager.h"
 #include "Game/Render/ShootToScoreArrow.h"
+#include "Game/Render/Wiper.h"
+#include "Game/ReplayManager.h"
+#include "Game/Team.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlTask.h"
 #include "types.h"
-#include "Game/Render/NPCManager.h"
 
-// Charged keeps the predecessor's transition-manager surface but replaces most
-// of its subsystem calls. Everything still address-named below lives in a
-// translation unit that has not been reconstructed yet.
+class BaseGameSceneManager;
 
-// The original type identity of this common weak static is not yet known.
-struct UnidentifiedStaticState
+// Charged keeps the predecessor's transition-manager surface but replaces
+// several of its subsystem calls. Everything still address-named below lives
+// in a translation unit that has not been reconstructed yet.
+
+// Singleton returned by fn_80284A58. Only the fields this unit reads are
+// modelled; the letter-box names come from the predecessor's Presentation.
+struct UnidentifiedPresentationState
 {
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
-
-// The pending-callback list walked below belongs to the game object and is not
-// reconstructed yet. Only the offsets and the flag bits the target reads are
-// modelled here; these names are descriptive, not recovered.
-struct Invokable
-{
-    virtual void Release(bool);
-    virtual void Invoke();
-};
-
-struct PendingBinding
-{
-    ~PendingBinding()
-    {
-        if (this != 0)
-        {
-            if (mKind == 2 && mTarget != 0)
-            {
-                mTarget->Release(true);
-            }
-            mKind = 0;
-        }
-    }
-
-    /* 0x00 */ int mKind;
-    /* 0x04 */ Invokable* mTarget;
-};
-
-struct PendingEntry : public UnidentifiedConnection
-{
-    ~PendingEntry()
-    {
-        if (this != 0)
-        {
-        }
-    }
-
-    /* 0x0C */ PendingBinding mBinding;
-};
-
-struct PendingNode
-{
-    /* 0x00 */ PendingNode* next;
-    /* 0x04 */ PendingNode* prev;
-    /* 0x08 */ PendingEntry entry;
-};
-
-struct PendingIter
-{
-    PendingNode* cur;
-    PendingNode* next;
-};
-
-struct Presentation
-{
-    char _000[0xC0];
+    char mUnidentified000[0xC0];
     /* 0xC0 */ float mLetterBoxDuration;
     /* 0xC4 */ bool mLetterBoxEnabled;
-    char _0C5[0x9F];
-    /* 0x164 */ bool mUnknown164;
+    char mUnidentified0C5[0x9F];
+    /* 0x164 */ bool mUnidentified164;
 };
-
-struct Game
-{
-    char _000[0x18];
-    /* 0x18 */ int mState;
-    char _01C[0x638];
-    /* 0x654 */ PendingEntry* mCurrentEntry;
-    char _658[0xC];
-    /* 0x664 */ PendingNode* mFreeList;
-    char _668[0x8];
-    /* 0x670 */ PendingNode* mPendingList;
-};
-
-static PendingIter MakeIter(PendingNode* head);
-static PendingIter MakeIterAt(PendingNode* head, PendingNode* node);
 
 extern "C" {
-void fn_8027C86C();
-void fn_8027D11C();
-void fn_80278A00(void*, int, int);
-Presentation* fn_80284A58();
-void fn_80285714(Presentation*, u32, u32);
-void* fn_80188C5C();
-void fn_80189F0C(void*);
-void fn_80188360();
-void fn_801882B4();
-void fn_800180AC(void*);
-void fn_801E23A4(void*, u32, u32);
-void fn_800A7998(void*);
-void fn_80059940(Game*, int);
-void fn_800F23F4();
-void fn_800F2404();
+void fn_80278A00(BasicStadium*, int, int);
+UnidentifiedPresentationState* fn_80284A58();
+void fn_80285714(UnidentifiedPresentationState*, u32, u32);
+void fn_800A7998(cTeam*);
+void fn_801E23A4(BaseGameSceneManager*, u32, u32);
 }
 
-extern u8 lbl_806E13C2;
-extern u8 lbl_806E181D;
-extern void* g_pBall;
-extern void* lbl_806E0DF8[];
-extern void* lbl_806E1860;
-extern Game* lbl_806E0C94;
-extern cCharacter* lbl_8056B800[10];
+extern unsigned char g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause;
+extern BaseGameSceneManager* lbl_806E1860;
 
 void TransitionTask::Initialize()
 {
 }
 
-static PendingIter MakeIter(PendingNode* head)
+static inline void ClearCharacterEffectsTexturing()
 {
-    PendingIter it;
+    int i;
+    cGame* pGame;
 
-    it.next = (head == 0) ? 0 : head->next;
-    it.cur = head;
-    return it;
-}
-
-static PendingIter MakeIterAt(PendingNode* head, PendingNode* node)
-{
-    PendingIter it;
-
-    it.next = node;
-    it.cur = head;
-    return it;
-}
-
-inline void ClearCharacterEffectsTexturing()
-{
-    PendingNode* next;
-    PendingNode* cur;
-    bool atEnd;
-    Game* pGame;
-    pGame = lbl_806E0C94;
-
-    if (pGame != 0)
+    for (i = 0; i < 10; i++)
     {
-        PendingIter begin = MakeIter(pGame->mPendingList);
-        cur = begin.cur;
-        next = begin.next;
-
-        while (next != 0)
+        if (g_pCharacters[i] != NULL)
         {
-            PendingEntry* entry = &next->entry;
-            pGame->mCurrentEntry = entry;
-
-            if ((next->entry.mFlags >> 31) != 0)
-            {
-                if (entry->mBinding.mKind == 1)
-                {
-                    ((void (*)())entry->mBinding.mTarget)();
-                }
-                else
-                {
-                    entry->mBinding.mTarget->Invoke();
-                }
-                cur = MakeIter(pGame->mPendingList).cur;
-            }
-
-            if (cur == 0)
-            {
-                atEnd = true;
-            }
-            else
-            {
-                atEnd = (cur == next);
-            }
-            if (atEnd || next == 0)
-            {
-                next = 0;
-            }
-            else
-            {
-                next = next->next;
-            }
-
-            if (((entry->mFlags >> 29) & 1) != 0)
-            {
-                PendingIter erase = MakeIterAt(pGame->mPendingList, (PendingNode*)((char*)entry - 8));
-                PendingNode* dead = erase.next;
-
-                if (dead->next == dead)
-                {
-                    pGame->mPendingList = 0;
-                }
-                else
-                {
-                    dead->prev->next = dead->next;
-                    dead->next->prev = dead->prev;
-                    if (pGame->mPendingList == dead)
-                    {
-                        pGame->mPendingList = dead->prev;
-                    }
-                }
-
-                if (dead != 0)
-                {
-                    dead->entry.~PendingEntry();
-                }
-
-                dead->next = pGame->mFreeList;
-                pGame->mFreeList = dead;
-            }
+            g_pCharacters[i]->ResetEffects();
         }
-
-        pGame->mCurrentEntry = 0;
-        DrawableCharacter::RenderAllCharacters();
     }
 
-    fn_80059940(lbl_806E0C94, 0);
-    lbl_806E1608->fn_801ABF8C();
-    lbl_806E12C8->ResetEffects();
+    pGame = g_pGame;
+    if (pGame != NULL)
+    {
+        pGame->mUnidentified49C.mEvent10.UnidentifiedDeliver();
+        DrawableCharacter::RenderAllCharacters();
+    }
 }
 
 void TransitionTask::StateTransition(u32 from, u32 to)
@@ -265,7 +91,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
     {
         bNISLighting = false;
     }
-    lbl_806E13C2 = bNISLighting;
+    DrawableCharacter::sCameraRelativeLighting = bNISLighting;
 
     if (to == 4)
     {
@@ -274,13 +100,12 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (to == 0x10)
     {
-        NisPlayer::Instance();
-        fn_8027D11C();
+        NisPlayer::Instance()->fn_8027D11C();
     }
 
-    if (BasicStadium::GetCurrentStadium() != 0)
+    if (BasicStadium::GetCurrentStadium() != NULL)
     {
-        if (to == 0x10 && fn_80284A58()->mUnknown164)
+        if (to == 0x10 && fn_80284A58()->mUnidentified164)
         {
             fn_80278A00(BasicStadium::GetCurrentStadium(), 0x37, 1);
         }
@@ -298,35 +123,33 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
         if (from != 1 && from != 0x20)
         {
-            fn_80189F0C(fn_80188C5C());
+            ReplayManager::Instance()->PrepareForRecording();
         }
 
-        if (!lbl_806E181D)
+        if (!g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause)
         {
             if ((from & 0x18) || (from == 1 && (nlTaskManager::m_pInstance->mPreviousState & 0x18)))
             {
-                NisPlayer::Instance();
-                fn_8027C86C();
-                fn_80188360();
-                fn_801882B4();
+                NisPlayer::Instance()->Reset();
+                Wiper::Instance().Reset();
                 WorldDarkening::Instance().fn_801AF550();
             }
         }
         else
         {
-            lbl_806E181D = false;
+            g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause = false;
         }
     }
 
     if ((from == 2 && to != 1) || (from == 1 && to != 2))
     {
-        if (g_pBall != 0)
+        if (g_pBall != NULL)
         {
-            fn_800180AC(g_pBall);
+            g_pBall->KillBlurHandler();
         }
     }
 
-    if (lbl_806E1860 != 0)
+    if (lbl_806E1860 != NULL)
     {
         fn_801E23A4(lbl_806E1860, from, to);
     }
@@ -335,48 +158,42 @@ void TransitionTask::StateTransition(u32 from, u32 to)
     {
         if (from != 1 && to != 0x20000)
         {
-            Presentation* presentation = fn_80284A58();
-            presentation->mLetterBoxEnabled = true;
+            {
+                UnidentifiedPresentationState* presentation = fn_80284A58();
+                presentation->mLetterBoxEnabled = true;
+            }
 
             for (i = 0; i < 2; i++)
             {
-                fn_800A7998(lbl_806E0DF8[i]);
-            }
-
-            for (i = 0; i < 10; i++)
-            {
-                if (lbl_8056B800[i] != 0)
-                {
-                    lbl_8056B800[i]->ResetEffects();
-                }
+                fn_800A7998(g_pTeams[i]);
             }
 
             ClearCharacterEffectsTexturing();
+
+            g_pGame->ResetPowerups(false);
+            lbl_806E1608->fn_801ABF8C();
+            lbl_806E12C8->ResetEffects();
         }
     }
     else if ((from & 0x18) || (from == 1 && (nlTaskManager::m_pInstance->mPreviousState & 0x18)))
     {
         if (to != 1 && to != 4)
         {
-            Presentation* presentation = fn_80284A58();
+            UnidentifiedPresentationState* presentation = fn_80284A58();
             presentation->mLetterBoxEnabled = false;
             presentation->mLetterBoxDuration = 0.0f;
 
-            for (i = 0; i < 10; i++)
-            {
-                if (lbl_8056B800[i] != 0)
-                {
-                    lbl_8056B800[i]->ResetEffects();
-                }
-            }
-
             ClearCharacterEffectsTexturing();
+
+            g_pGame->ResetPowerups(false);
+            lbl_806E1608->fn_801ABF8C();
+            lbl_806E12C8->ResetEffects();
         }
         else if (to == 1)
         {
-            if (lbl_806E0C94 != 0 && lbl_806E0C94->mState == 3)
+            if (g_pGame != NULL && g_pGame->m_eGameState == 3)
             {
-                Presentation* presentation = fn_80284A58();
+                UnidentifiedPresentationState* presentation = fn_80284A58();
                 presentation->mLetterBoxEnabled = false;
                 presentation->mLetterBoxDuration = 0.0f;
             }
@@ -385,20 +202,17 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (to == 8)
     {
-        fn_800F23F4();
+        cCameraManager::PushWorldUpVector();
     }
 
     if (from == 8)
     {
-        fn_800F2404();
+        cCameraManager::PopWorldUpVector();
     }
 
     nlTaskManager::m_pInstance->mLocked = false;
 }
 
 TransitionTask gTransitionTask;
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

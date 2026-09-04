@@ -8,15 +8,19 @@ class TransitionTask : public nlTask
 public:
     void Initialize();
 
-    virtual void Run(float)
-    {
-    }
-    virtual const char* GetName()
-    {
-        return "Transition Manager";
-    }
+    virtual const char* GetName();
+    virtual void Run(float);
     virtual void StateTransition(u32 from, u32 to);
 }; // size 0x20
+
+inline const char* TransitionTask::GetName()
+{
+    return "Transition Manager";
+}
+
+inline void TransitionTask::Run(float)
+{
+}
 
 extern TransitionTask gTransitionTask;
 

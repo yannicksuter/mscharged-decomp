@@ -9,15 +9,43 @@ class cPoseNode;
 class cPoseAccumulator;
 class nlMatrix4;
 class nlQuaternion;
-struct RotAccum;
 typedef void (*BuildNodeMatrixFn)(unsigned int, unsigned int,
     cPoseAccumulator*, unsigned int, int);
-struct VectorAccum
+
+class cBuildNodeMatrixCallbackInfo
+{
+public:
+    cBuildNodeMatrixCallbackInfo()
+    {
+        funcCallback = 0;
+    }
+
+    BuildNodeMatrixFn funcCallback;
+    unsigned int nParam1;
+    unsigned int nParam2;
+};
+
+struct RotAccum
+{
+    nlQuaternion q;
+    float quatAccumulatedWeight;
+    u16 rotAroundZ;
+    float rotAroundZAccumulatedWeight;
+    bool bIdentity;
+};
+
+struct ScaleAccum
+{
+    nlVector3 s;
+    float fAccumulatedWeight;
+    bool bIdentity;
+};
+
+struct TransAccum
 {
     nlVector3 t;
-    float accumulatedWeight;
-    bool identity;
-    u8 padding[3];
+    float fAccumulatedWeight;
+    bool bIdentity;
 };
 
 struct MorphWeightAccum
@@ -34,36 +62,38 @@ class cPoseAccumulator
 {
 public:
     cPoseAccumulator(cSHierarchy* pSHierarchy, bool bStorePrevNodeMatrices);
+    cPoseAccumulator(const cPoseAccumulator& other);
     ~cPoseAccumulator();
+    cPoseAccumulator& operator=(const cPoseAccumulator& other);
     void InitAccumulators();
-    void InitAccumulators(float scale, float damage);
     void BuildNodeMatrices(const nlMatrix4& pWorldMatrix);
-    int GetNumNodes() const;
-    nlMatrix4& GetNodeMatrix(int nodeIndex) const;
-    void BlendRot(int nodeIndex, const nlQuaternion* rotation, float weight,
-        bool additive);
-    void BlendRotAroundZ(int nodeIndex, unsigned short rotation, float weight);
-    void BlendScale(int nodeIndex, const nlVector3* scale, float weight,
-        bool additive);
-    void BlendTrans(int nodeIndex, const nlVector3* translation, float weight,
-        bool mirror);
-    void BlendRotIdentity(int nodeIndex, float weight);
-    void BlendScaleIdentity(int nodeIndex, float weight);
-    void MultiplyScale(int nodeIndex, const nlVector3* scale, float weight);
-    void BlendTransIdentity(int nodeIndex, float weight);
-    void Pose(const cPoseNode& poseNode, const nlMatrix4& matrix);
-    void SetBuildNodeMatrixCallback(int nodeIndex,
-        BuildNodeMatrixFn funcCallback, unsigned int param1,
-        unsigned int param2);
+    void BlendRot(int nNode, const nlQuaternion* pRot, float fWeight,
+        bool bMirror);
+    void BlendRotAroundZ(int nNode, unsigned short rot, float fWeight);
+    void BlendScale(int nNode, const nlVector3* pScale, float fWeight,
+        bool bMirror);
+    void BlendTrans(int nNode, const nlVector3* pTrans, float fWeight,
+        bool bMirror);
+    void BlendRotIdentity(int nNode, float fWeight);
+    void BlendScaleIdentity(int nNode, float fWeight);
+    void MultiplyScale(int nNode, const nlVector3* pScale, float fWeight);
+    void BlendTransIdentity(int nNode, float fWeight);
+    nlMatrix4& GetNodeMatrix(int nNode) const;
+    nlMatrix4& GetNodeMatrixByHashID(unsigned int nHashID) const;
+    s32 GetNumNodes() const;
+    void Pose(const cPoseNode& pPoseTree, const nlMatrix4& pWorldMatrix);
+    void SetBuildNodeMatrixCallback(int nNode,
+        BuildNodeMatrixFn funcCallback, unsigned int nParam1,
+        unsigned int nParam2);
 
-    cSHierarchy* m_pHierarchy;
-    nlMatrix4* m_pNodeMatrices;
+    cSHierarchy* m_BaseSHierarchy;
+    nlMatrix4* m_NodeMatrices;
     nlMatrix4* m_PrevNodeMatrices;
     nlQuaternion* m_pQuaternions;
-    RotAccum* m_pRotations;
-    VectorAccum* m_pScales;
-    VectorAccum* m_pTranslations;
-    u32 m_Unknown1C;
+    RotAccum* m_rot;
+    ScaleAccum* m_scale;
+    TransAccum* m_trans;
+    cBuildNodeMatrixCallbackInfo* m_cb;
     MorphWeightAccum m_MorphWeights;
     u32 m_Unknown70;
     float m_Scale;

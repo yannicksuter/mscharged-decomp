@@ -188,5 +188,5 @@ void CalcHeadTrackMatrix(unsigned short spin, unsigned short tilt,
         m4NewHeadMatrix, m4RotMatrix, m4AnimatedHeadMatrix);
 
     cPoseAccumulator->m_pQuaternions[headNodeIndex] = qNewHead;
-    cPoseAccumulator->m_pNodeMatrices[headNodeIndex] = m4NewHeadMatrix;
+    cPoseAccumulator->m_NodeMatrices[headNodeIndex] = m4NewHeadMatrix;
 }

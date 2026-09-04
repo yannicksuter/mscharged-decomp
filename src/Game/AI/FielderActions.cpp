@@ -788,7 +788,7 @@ void cFielder::ActionHit(float fDeltaT)
             PhysicsPatch* pEffect = lbl_806E12C8->fn_801745B8(i);
             if (pEffect != 0 && pEffect->m_Type == 6)
             {
-                cSHierarchy* pHierarchy = m_pPoseAccumulator->m_pHierarchy;
+                cSHierarchy* pHierarchy = m_pPoseAccumulator->m_BaseSHierarchy;
                 nlVector3 jointPos = GetJointPosition(
                     pHierarchy->GetNodeIndexByID(
                         nlStringLowerHash("bip01 Ponytail12")));
