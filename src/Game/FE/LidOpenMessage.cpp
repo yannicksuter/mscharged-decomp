@@ -1,7 +1,7 @@
 #include "Game/FE/LidOpenMessage.h"
 
 #include "Game/NetworkSession.h"
-#include "Game/ResetTask.h"
+#include "Game/Task/ResetTask.h"
 #include "Game/main.h"
 #include "NL/gl/glPlat.h"
 #include "NL/globalpad.h"

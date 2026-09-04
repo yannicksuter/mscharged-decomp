@@ -3,22 +3,22 @@
 
 #include "NL/nlTask.h"
 
-class UnidentifiedPingerUpdateTask : public nlTask
-{
-public:
-    virtual const char* GetName()
-    {
-        return "Pinger Update";
-    }
-    virtual void Run(float dt);
-};
-
 class ComUpdateTask : public nlTask
 {
 public:
     virtual const char* GetName()
     {
         return "Com Update";
+    }
+    virtual void Run(float dt);
+};
+
+class UnidentifiedPingerUpdateTask : public nlTask
+{
+public:
+    virtual const char* GetName()
+    {
+        return "Pinger Update";
     }
     virtual void Run(float dt);
 };

@@ -2,7 +2,7 @@
 
 #include "Game/Effects/EmissionController.h"
 #include "Game/FE/feManager.h"
-#include "Game/FixedUpdateTask.h"
+#include "Game/Task/FixedUpdateTask.h"
 #include "Game/Render/RLView.h"
 #include "NL/gl/gl.h"
 #include "NL/nlConfig.h"

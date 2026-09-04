@@ -1,5 +1,6 @@
 #include "Game/AI/Desire.h"
 #include "Game/AI/DesireUpdate.h"
+#include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/Variant.h"
 
 struct DebugFieldType
@@ -36,12 +37,13 @@ Desire::Desire(int state, const UnidentifiedStateTransition& transition)
     mUnidentified084 = 1.0f;
 }
 
-void Desire::UnidentifiedSetContext(UnidentifiedDesireContext* context)
+void Desire::UnidentifiedSetContext(UnidentifiedScriptMachine* context)
 {
     shdStateMachine::UnidentifiedSetContext(context);
     if (context != 0)
     {
-        mUnidentifiedFielder = (cFielder*)context->mUnidentifiedValue->mData.pointer;
+        mUnidentifiedFielder
+            = (cFielder*)context->mUnidentified064->mData.pointer;
     }
     else
     {

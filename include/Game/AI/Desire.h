@@ -1,6 +1,7 @@
 #ifndef GAME_AI_DESIRE_H
 #define GAME_AI_DESIRE_H
 
+#include "Game/AI/FuzzyVariant.h"
 #include "NL/nlMath.h"
 #include "NL/nlTimer.h"
 #include "types.h"
@@ -10,7 +11,7 @@ class cFielder;
 class cPlayer;
 class Desire;
 class SpaceSearch;
-class Variant;
+class UnidentifiedScriptMachine;
 struct UnidentifiedDesireUpdate;
 
 extern "C" Desire* fn_8002E08C(cFielder*, int);
@@ -19,12 +20,6 @@ struct UnidentifiedStateTransition
 {
     int mUnidentifiedHash;
     void* mUnidentifiedFunction;
-};
-
-struct UnidentifiedDesireContext
-{
-    u8 mUnidentified000[0x64];
-    Variant* mUnidentifiedValue;
 };
 
 class shdStateMachine
@@ -37,8 +32,8 @@ public:
     virtual bool UnidentifiedReinitialize(void*) = 0;
     virtual void UnidentifiedCleanup() = 0;
     virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float) = 0;
-    virtual void UnidentifiedReset();
-    virtual void UnidentifiedSetContext(UnidentifiedDesireContext*);
+    virtual void UnidentifiedReset(bool);
+    virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
 
     int UnidentifiedGetState() const
     {
@@ -50,12 +45,16 @@ public:
         return mUnidentifiedActive;
     }
 
-protected:
+public:
     int mUnidentifiedState;
     bool mUnidentifiedActive;
     u8 mPadding009[3];
     Timer mUnidentifiedTimer;
-    u8 mUnidentified014[0x64];
+    float mUnidentified014;
+    UnidentifiedScriptMachine* mUnidentified018;
+    UnidentifiedVariantCollection mUnidentified01C;
+    UnidentifiedStateTransition mUnidentified068;
+    UnidentifiedStateTransition mUnidentified070;
     float mUnidentified078;
     float mUnidentified07C;
     float mUnidentified080;
@@ -74,7 +73,7 @@ public:
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
     virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
-    virtual void UnidentifiedSetContext(UnidentifiedDesireContext*);
+    virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 

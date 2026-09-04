@@ -2,6 +2,7 @@
 #define NL_NL_LIST_H
 
 #include "NL/nlMemory.h"
+#include "NL/nlSlotPool.h"
 
 template <typename T>
 class ListEntry

@@ -2,7 +2,7 @@
 
 #include "Game/Camera/CameraMan.h"
 #include "Game/ExcitementSystem.h"
-#include "Game/FixedUpdateTask.h"
+#include "Game/Task/FixedUpdateTask.h"
 #include "NL/nlMemory.h"
 #include "NL/nlTask.h"
 

@@ -1,17 +1,15 @@
 #include "Game/Task/ProfilerTask.h"
 
-#include "types.h"
-
-bool lbl_806E1E10;
-bool lbl_806E1E11;
-u32 lbl_806E1E14;
+bool g_bProfiling;
+bool g_bShowProfiler;
+u32 g_nProfilerFrame;
 
 void ProfilerTask::Run(float)
 {
-    ++lbl_806E1E14;
+    ++g_nProfilerFrame;
 }
 
-extern "C" bool fn_802BDB20()
+bool IsProfiling()
 {
-    return lbl_806E1E10 || lbl_806E1E11;
+    return g_bProfiling || g_bShowProfiler;
 }

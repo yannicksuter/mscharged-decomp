@@ -9,12 +9,12 @@ UnidentifiedTeamDesire::UnidentifiedTeamDesire(
 }
 
 void UnidentifiedTeamDesire::UnidentifiedSetContext(
-    UnidentifiedDesireContext* context)
+    UnidentifiedScriptMachine* context)
 {
     shdStateMachine::UnidentifiedSetContext(context);
     if (context != 0)
     {
-        m_pTeam = (cTeam*)context->mUnidentifiedValue->mData.pointer;
+        m_pTeam = (cTeam*)context->mUnidentified064->mData.pointer;
     }
     else
     {

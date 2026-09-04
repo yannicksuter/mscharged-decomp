@@ -14,7 +14,7 @@ public:
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
     virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
-    virtual void UnidentifiedSetContext(UnidentifiedDesireContext*);
+    virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 

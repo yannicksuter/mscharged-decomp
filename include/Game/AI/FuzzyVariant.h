@@ -10,21 +10,12 @@
 class cTeam;
 class cBall;
 class InterpreterCore;
+class UnidentifiedScriptMachine;
 
 class UnidentifiedFielderInputOwner
 {
 public:
     virtual ~UnidentifiedFielderInputOwner();
-};
-
-class UnidentifiedFielderInputController
-{
-public:
-    virtual ~UnidentifiedFielderInputController();
-    virtual void UnidentifiedVirtual1();
-    virtual void UnidentifiedVirtual2();
-    virtual void UnidentifiedVirtual3(float dt);
-    virtual void UnidentifiedVirtual4(bool force);
 };
 
 class FuzzyVariant : public Variant
@@ -93,7 +84,7 @@ public:
     bool fn_8030FB7C(unsigned long key);
 
     UnidentifiedFielderInputOwner* mUnidentified14;
-    UnidentifiedFielderInputController* mUnidentified18;
+    UnidentifiedScriptMachine* mUnidentified18;
     nlAVLTreeSlotPool<unsigned long, Timer,
         DefaultKeyCompare<unsigned long> > mTimers;
 };
@@ -141,6 +132,8 @@ public:
     Variant* Get(int index);
     void Remove(int index);
     void Set(int index, const Variant& value);
+    UnidentifiedVariantCollection& operator=(
+        const UnidentifiedVariantCollection& other);
 
     UnidentifiedFuzzyVariantData* mData[19];
 };
@@ -240,6 +233,32 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80054AB8(InterpreterCore*, const char
 inline void UnidentifiedFuzzyVariantData::operator delete(void* entry)
 {
     lbl_80584200.DeleteEntry((UnidentifiedFuzzyVariantData*)entry);
+}
+
+inline UnidentifiedVariantCollection& UnidentifiedVariantCollection::operator=(
+    const UnidentifiedVariantCollection& other)
+{
+    for (int i = 0; i < 19; i++)
+    {
+        if (other.IsSet(i))
+        {
+            if (mData[i] == 0)
+            {
+                mData[i] = new (lbl_80584200.Allocate())
+                    UnidentifiedFuzzyVariantData(
+                        i, FuzzyVariant(*other.mData[i]));
+            }
+            else
+            {
+                *mData[i] = *other.mData[i];
+            }
+        }
+        else if (IsSet(i))
+        {
+            Remove(i);
+        }
+    }
+    return *this;
 }
 
 inline void UnidentifiedVariant_80054AB8::operator delete(void* entry)

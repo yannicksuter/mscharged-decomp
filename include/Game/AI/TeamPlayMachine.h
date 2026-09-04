@@ -19,27 +19,38 @@ class UnidentifiedScriptMachine
 {
 public:
     UnidentifiedScriptMachine(
-        int, bool, bool, const char*);
+        int, bool, UnidentifiedFielderInput*, const char*);
     virtual ~UnidentifiedScriptMachine();
 
-    virtual bool UnidentifiedVirtual1() const;
+    virtual bool UnidentifiedVirtual1() const
+    {
+        return mUnidentified004 == 0;
+    }
     virtual void UnidentifiedVirtual2();
     virtual void UnidentifiedVirtual3(float deltaTime);
-    virtual void UnidentifiedVirtual4(void* context);
-    virtual void* UnidentifiedVirtual5(
+    virtual void UnidentifiedVirtual4(bool);
+    virtual shdStateMachine* UnidentifiedVirtual5(
         int, UnidentifiedVariantCollection*, bool);
     virtual void UnidentifiedVirtual6();
     virtual void UnidentifiedVirtual7();
-    virtual void UnidentifiedVirtual8();
+    virtual void UnidentifiedVirtual8()
+    {
+    }
 
     void UnidentifiedAddState(int, shdStateMachine*, bool);
 
-protected:
     shdStateMachine* mUnidentified004;
     shdStateMachine* mUnidentified008;
-    u8 mUnidentified00C[0x58];
-    void* mUnidentified064;
-    u8 mUnidentified068[0x50];
+    UnidentifiedStateTransition mUnidentified00C;
+    int mUnidentified014;
+    UnidentifiedVariantCollection mUnidentified018;
+    UnidentifiedFielderInput* mUnidentified064;
+    bool mUnidentified068;
+    u8 mPadding069[3];
+    shdStateMachine** mUnidentified06C;
+    shdStateMachine** mUnidentified070;
+    int mUnidentified074;
+    char mUnidentified078[0x40];
 };
 
 class TeamPlayMachine : public UnidentifiedScriptMachine
@@ -67,7 +78,7 @@ public:
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
     virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
-    virtual void UnidentifiedSetContext(UnidentifiedDesireContext*);
+    virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
 
 protected:
     cTeam* m_pTeam;
