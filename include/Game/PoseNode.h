@@ -7,7 +7,8 @@
 class cPoseNode
 {
 public:
-    cPoseNode(int numChildren);
+    cPoseNode();
+    cPoseNode(int nNumChildren);
     virtual ~cPoseNode();
     virtual void Evaluate(int nodeIndex, float weight, cPoseAccumulator* accumulator) const = 0;
     virtual void Evaluate(float weight, cPoseAccumulator* accumulator) const = 0;
@@ -18,14 +19,16 @@ public:
     virtual void BlendRootTrans(nlVector3* outBase, float weight, float* scratch) = 0;
     virtual void BlendRootRot(u16* outRot, float weight, float* scratch) = 0;
 
-    void SetChild(int index, cPoseNode* child);
-    cPoseNode* GetChild(int index) const;
-    cPoseNode* GetChild(int index);
+    void SetChild(int idx, cPoseNode* child);
+    int GetNumChildren() const;
+    cPoseNode** GetChildPtr(int idx);
+    cPoseNode* GetChild(int idx) const;
+    cPoseNode* GetChild(int idx);
     void GetRootRot(unsigned short* out);
-    void GetRootTrans(nlVector3* out, unsigned short ang);
+    void GetRootTrans(nlVector3* out, unsigned short ang, float scale = 1.0f);
 
-    cPoseNode* m_Children[3];
-    int m_NumChildren;
+    cPoseNode* m_children[3];
+    int m_numChildren;
 };
 
 #endif // GAME_POSE_NODE_H

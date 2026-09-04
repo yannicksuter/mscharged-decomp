@@ -219,7 +219,7 @@ void cPN_SAnimController::EvaluateScale(
     if (m_bMirror)
     {
         actualNodeIndex
-            = accumulator->m_pHierarchy->GetMirroredNode(nodeIndex);
+            = accumulator->m_BaseSHierarchy->GetMirroredNode(nodeIndex);
     }
 
     if (m_pAnimRetarget != 0)
@@ -259,7 +259,7 @@ void cPN_SAnimController::Evaluate(
     if (mirror)
     {
         actualNodeIndex
-            = accumulator->m_pHierarchy->GetMirroredNode(nodeIndex);
+            = accumulator->m_BaseSHierarchy->GetMirroredNode(nodeIndex);
     }
 
     if (m_pAnimRetarget != 0)
@@ -280,10 +280,10 @@ void cPN_SAnimController::Evaluate(
     }
 
     nlVector3& translationOffset
-        = accumulator->m_pHierarchy->GetTranslationOffset(nodeIndex);
+        = accumulator->m_BaseSHierarchy->GetTranslationOffset(nodeIndex);
     accumulator->BlendRotIdentity(nodeIndex, weight);
     accumulator->BlendScaleIdentity(nodeIndex, weight);
-    accumulator->m_pTranslations[nodeIndex].t = translationOffset;
+    accumulator->m_trans[nodeIndex].t = translationOffset;
 }
 
 void cPN_SAnimController::Evaluate(

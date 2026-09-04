@@ -219,6 +219,14 @@ public:
         mTag = FUNCTION_EMPTY;
     }
 
+    void UnidentifiedTransfer(Function0& other)
+    {
+        mTag = other.mTag;
+        mFreeFunction = other.mFreeFunction;
+        other.mTag = FUNCTION_EMPTY;
+        other.mFreeFunction = 0;
+    }
+
     operator bool() const
     {
         return mTag != FUNCTION_EMPTY;
@@ -231,6 +239,11 @@ public:
             return mFreeFunction();
         }
         return (*mFunctor)();
+    }
+
+    void* UnidentifiedTarget() const
+    {
+        return (void*)mFreeFunction;
     }
 
 private:

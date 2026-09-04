@@ -138,6 +138,8 @@ template <typename T>
 class SlotPool : public BasicSlotPool<T>
 {
 public:
+    using BasicSlotPool<T>::Allocate;
+
     SlotPool(int initial, int delta)
         : BasicSlotPool<T>()
     {

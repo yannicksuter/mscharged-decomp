@@ -126,8 +126,6 @@ extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" void fn_8003C268(cFielder*, float, float);
 extern "C" void fn_80316968(void*);
 extern "C" cFielder* fn_80096F54(cPlayer*, bool);
-extern "C" int fn_8030F9B4(void*, int, bool);
-extern "C" void fn_8030FA10(void*, int, float);
 extern "C" float fn_8004028C(cFielder*);
 extern "C" void fn_8005C650(cGame*);
 extern "C" float fn_8002CFC4(PlayerTweaks*);

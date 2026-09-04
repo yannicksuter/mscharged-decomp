@@ -14,7 +14,7 @@ cPN_SingleAxisBlender::cPN_SingleAxisBlender(int numChildren,
     m_fDesiredWeight = 0.0f;
     m_fWeightSeek = weightSeek;
 
-    for (int i = 0; i < m_NumChildren; ++i)
+    for (int i = 0; i < m_numChildren; ++i)
     {
         SetChild(i, 0);
     }
@@ -28,7 +28,7 @@ cPN_SingleAxisBlender::cPN_SingleAxisBlender(int numChildren,
 
 cPoseNode* cPN_SingleAxisBlender::Update(float dt)
 {
-    for (int i = 0; i < m_NumChildren; ++i)
+    for (int i = 0; i < m_numChildren; ++i)
     {
         SetChild(i, GetChild(i)->Update(dt));
     }
@@ -48,11 +48,11 @@ void cPN_SingleAxisBlender::Evaluate(
 {
     if (m_fSmoothedWeight >= 1.0f)
     {
-        GetChild(m_NumChildren - 1)->Evaluate(nodeIndex, weight, accumulator);
+        GetChild(m_numChildren - 1)->Evaluate(nodeIndex, weight, accumulator);
         return;
     }
 
-    float scaledWeight = m_fSmoothedWeight * (float)(m_NumChildren - 1);
+    float scaledWeight = m_fSmoothedWeight * (float)(m_numChildren - 1);
     int childIndex = (int)scaledWeight;
     float fraction = scaledWeight - (float)childIndex;
 
@@ -65,11 +65,11 @@ void cPN_SingleAxisBlender::Evaluate(
 {
     if (m_fSmoothedWeight >= 1.0f)
     {
-        GetChild(m_NumChildren - 1)->Evaluate(weight, accumulator);
+        GetChild(m_numChildren - 1)->Evaluate(weight, accumulator);
         return;
     }
 
-    float scaledWeight = m_fSmoothedWeight * (float)(m_NumChildren - 1);
+    float scaledWeight = m_fSmoothedWeight * (float)(m_numChildren - 1);
     int childIndex = (int)scaledWeight;
     float fraction = scaledWeight - (float)childIndex;
 
@@ -82,11 +82,11 @@ void cPN_SingleAxisBlender::BlendRootTrans(
 {
     if (m_fSmoothedWeight >= 1.0f)
     {
-        GetChild(m_NumChildren - 1)->BlendRootTrans(outBase, weight, scratch);
+        GetChild(m_numChildren - 1)->BlendRootTrans(outBase, weight, scratch);
         return;
     }
 
-    float scaledWeight = m_fSmoothedWeight * (float)(m_NumChildren - 1);
+    float scaledWeight = m_fSmoothedWeight * (float)(m_numChildren - 1);
     int childIndex = (int)scaledWeight;
     float fraction = scaledWeight - (float)childIndex;
 
@@ -99,11 +99,11 @@ void cPN_SingleAxisBlender::BlendRootRot(
 {
     if (m_fSmoothedWeight >= 1.0f)
     {
-        GetChild(m_NumChildren - 1)->BlendRootRot(outRot, weight, scratch);
+        GetChild(m_numChildren - 1)->BlendRootRot(outRot, weight, scratch);
         return;
     }
 
-    float scaledWeight = m_fSmoothedWeight * (float)(m_NumChildren - 1);
+    float scaledWeight = m_fSmoothedWeight * (float)(m_numChildren - 1);
     int childIndex = (int)scaledWeight;
     float fraction = scaledWeight - (float)childIndex;
 

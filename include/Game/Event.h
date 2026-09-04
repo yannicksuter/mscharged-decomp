@@ -56,22 +56,44 @@ struct UnidentifiedConnection
     };
 };
 
+// An event carrying data delivers a pointer to it. The game and HBM queues
+// also construct events whose listeners are invoked with no argument at all;
+// the original spelling of that no-data type is unknown, so it is a
+// placeholder marker here.
+struct UnidentifiedEventNoData;
+
+template <typename T>
+struct UnidentifiedEventCallback
+{
+    typedef Function<T*> Type;
+};
+
+template <>
+struct UnidentifiedEventCallback<UnidentifiedEventNoData>
+{
+    typedef Function<FnVoidVoid> Type;
+};
+
 template <typename T>
 struct UnidentifiedListener : public UnidentifiedConnection
 {
+    typedef typename UnidentifiedEventCallback<T>::Type Callback;
+
     UnidentifiedListener(int = 0)
         : UnidentifiedConnection()
         , callback()
     {
     }
 
-    Function<T*> callback;
+    Callback callback;
 };
 
 template <typename T>
 class UnidentifiedTypedEvent : public UnidentifiedEventBase
 {
 public:
+    typedef typename UnidentifiedEventCallback<T>::Type Callback;
+
     UnidentifiedTypedEvent(const char* name, int length)
         : UnidentifiedEventBase(name, length)
     {
@@ -81,7 +103,7 @@ public:
 
     virtual ~UnidentifiedTypedEvent() { }
     virtual void Disconnect(void* owner) = 0;
-    virtual void Add(Function<T*>&, unsigned int, int) = 0;
+    virtual void Add(Callback&, unsigned int, int) = 0;
 
 protected:
     static void* sType;
@@ -97,6 +119,8 @@ class UnidentifiedEvent : public UnidentifiedTypedEvent<T>
     typedef DLListEntry<Listener> ListenerEntry;
 
 public:
+    typedef typename UnidentifiedTypedEvent<T>::Callback Callback;
+
     UnidentifiedEvent(const char* name, int length)
         : UnidentifiedTypedEvent<T>(name, length)
         , mListeners(16, 16)
@@ -116,7 +140,7 @@ public:
 
     virtual void Disconnect(void* owner);
 
-    virtual void Add(Function<T*>& callback, unsigned int value, int flags)
+    virtual void Add(Callback& callback, unsigned int value, int flags)
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
@@ -137,14 +161,45 @@ public:
             if ((listener->mFlags >> 31) != 0)
             {
                 listener->callback(data);
-                iterator = mListeners.Begin();
-                iterator.m_Curr = currentEntry;
+                UnidentifiedRestartAt(iterator, currentEntry);
             }
 
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                UnidentifiedDeleteListener(listener);
+                nlDLListIterator<Listener> position = mListeners.Begin(
+                    (ListenerEntry*)((char*)listener - 8));
+                ListenerEntry* entry = position.CurrentEntry();
+                nlDLRingRemove(&mListeners.m_Head, entry);
+                mListeners.DeleteEntry(entry);
+            }
+        }
+        this->mCurrentConnection = 0;
+    }
+
+    void UnidentifiedDeliver()
+    {
+        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        while (iterator.hasNext())
+        {
+            Listener* listener = &*iterator;
+            ListenerEntry* currentEntry = iterator.CurrentEntry();
+            this->mCurrentConnection = listener;
+
+            if ((listener->mFlags >> 31) != 0)
+            {
+                listener->callback();
+                UnidentifiedRestartAt(iterator, currentEntry);
+            }
+
+            iterator.next();
+            if (((listener->mFlags >> 29) & 1) != 0)
+            {
+                nlDLListIterator<Listener> position = mListeners.Begin(
+                    (ListenerEntry*)((char*)listener - 8));
+                ListenerEntry* entry = position.CurrentEntry();
+                nlDLRingRemove(&mListeners.m_Head, entry);
+                mListeners.DeleteEntry(entry);
             }
         }
         this->mCurrentConnection = 0;
@@ -167,12 +222,24 @@ protected:
     void Remove(Listener* listener);
     ListenerEntry* UnidentifiedGetEntry(Listener* listener);
     void UnidentifiedDeleteListener(Listener* listener);
+    void UnidentifiedRestartAt(nlDLListIterator<Listener>& iterator, ListenerEntry* current);
 
     // The listener list runs a single Clear()/FreeBlocks() teardown, so it is
     // the plain container over a slot-pool adapter rather than nlDLListSlotPool,
     // whose destructor tears down twice (see Game/Render/ImpostorCharacter.cpp).
     DLListContainerBase<Listener, BasicSlotPool<ListenerEntry> > mListeners;
 };
+
+// The callback may have changed the list while it ran, so the walk is
+// re-anchored on the current list head before it continues past the entry
+// that was just delivered.
+template <typename T>
+void UnidentifiedEvent<T>::UnidentifiedRestartAt(
+    nlDLListIterator<Listener>& iterator, ListenerEntry* current)
+{
+    iterator = mListeners.Begin();
+    iterator.m_Curr = current;
+}
 
 template <typename T>
 void UnidentifiedEvent<T>::Remove(Listener* listener)
@@ -253,6 +320,8 @@ class UnidentifiedStaticEvent : public UnidentifiedTypedEvent<T>
     typedef UnidentifiedStaticSlotPool<ListenerEntry, Count> ListenerPool;
 
 public:
+    typedef typename UnidentifiedTypedEvent<T>::Callback Callback;
+
     UnidentifiedStaticEvent(const char* name, int length)
         : UnidentifiedTypedEvent<T>(name, length)
         , mListeners(Count, Count)
@@ -276,7 +345,7 @@ public:
         Remove(listener);
     }
 
-    virtual void Add(Function<T*>& callback, unsigned int value, int flags)
+    virtual void Add(Callback& callback, unsigned int value, int flags)
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
@@ -304,7 +373,40 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                UnidentifiedDeleteListener(listener);
+                nlDLListIterator<Listener> position = mListeners.Begin(
+                    (ListenerEntry*)((char*)listener - 8));
+                ListenerEntry* entry = position.CurrentEntry();
+                nlDLRingRemove(&mListeners.m_Head, entry);
+                mListeners.DeleteEntry(entry);
+            }
+        }
+        this->mCurrentConnection = 0;
+    }
+
+    void UnidentifiedDeliver()
+    {
+        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        while (iterator.hasNext())
+        {
+            Listener* listener = &*iterator;
+            ListenerEntry* currentEntry = iterator.CurrentEntry();
+            this->mCurrentConnection = listener;
+
+            if ((listener->mFlags >> 31) != 0)
+            {
+                listener->callback();
+                iterator = mListeners.Begin();
+                iterator.m_Curr = currentEntry;
+            }
+
+            iterator.next();
+            if (((listener->mFlags >> 29) & 1) != 0)
+            {
+                nlDLListIterator<Listener> position = mListeners.Begin(
+                    (ListenerEntry*)((char*)listener - 8));
+                ListenerEntry* entry = position.CurrentEntry();
+                nlDLRingRemove(&mListeners.m_Head, entry);
+                mListeners.DeleteEntry(entry);
             }
         }
         this->mCurrentConnection = 0;
@@ -346,7 +448,8 @@ public:
 
     virtual ~UnidentifiedQueuedEvent();
 
-    virtual void Add(Function<T*>& callback, unsigned int value, int flags)
+    virtual void Add(typename UnidentifiedEvent<T>::Callback& callback,
+        unsigned int value, int flags)
     {
         UnidentifiedEvent<T>::Add(callback, value, flags);
     }

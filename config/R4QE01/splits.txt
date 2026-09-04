@@ -159,18 +159,20 @@ Game/Game.cpp:
 	.sdata2     start:0x806E3738 end:0x806E37A0
 
 unclassified/tu_80073898.cpp:
-	.text       start:0x80073898 end:0x800742DC
+	.text       start:0x80073898 end:0x80073C98
+	.sdata2     start:0x806E37A0 end:0x806E37A8
+
+unclassified/tu_80073C98.cpp:
+	.text       start:0x80073C98 end:0x800742DC
 	.ctors      start:0x804DB528 end:0x804DB52C
 	.data       start:0x804FC7F0 end:0x804FC8C0
-	.bss        start:0x8056BA00 end:0x8056CF08
+	.bss        start:0x8056BA00 end:0x8056CF28
 	.sdata      start:0x806DBAE8 end:0x806DBB00
-	.sdata2     start:0x806E37A0 end:0x806E37A8
 
 Game/GameTweaks.cpp:
 	.text       start:0x800742DC end:0x80077224
 	.ctors      start:0x804DB52C end:0x804DB530
 	.data       start:0x804FC8C0 end:0x804FD8D8
-	.bss        start:0x8056CF08 end:0x8056CF28
 	.sdata      start:0x806DBB00 end:0x806DBB08
 	.sdata2     start:0x806E37A8 end:0x806E3858
 
@@ -2771,6 +2773,15 @@ Game/Effects/EffectsTemplate.cpp:
 	.sdata      start:0x806DF468 end:0x806DF46C
 	.sdata2     start:0x806E64B0 end:0x806E64BC
 
+Game/Effects/ParticleSystem.cpp:
+	.text       start:0x802E0598 end:0x802E3D4C
+	.ctors      start:0x804DBA24 end:0x804DBA28
+	.data       start:0x8052EEE8 end:0x8052F068
+	.bss        start:0x8057F5A8 end:0x8057F698
+	.sdata      start:0x806DF470 end:0x806DF480
+	.sbss       start:0x806E1F98 end:0x806E1FC8
+	.sdata2     start:0x806E64C0 end:0x806E6550
+
 unclassified/tu_802E3D4C.cpp:
 	.text       start:0x802E3D4C end:0x802E4338
 
@@ -2779,6 +2790,15 @@ Game/Effects/EmissionController.cpp:
 	.data       start:0x8052F098 end:0x8052F0E8
 	.sbss       start:0x806E1FD0 end:0x806E1FD4
 	.sdata2     start:0x806E6558 end:0x806E6570
+
+Game/Effects/EmissionManager.cpp:
+	.text       start:0x802E5B60 end:0x802EB324
+	.ctors      start:0x804DBA30 end:0x804DBA34
+	.data       start:0x8052F0E8 end:0x8052F3A0
+	.bss        start:0x8057F698 end:0x8057F928
+	.sdata      start:0x806DF480 end:0x806DF4C8
+	.sbss       start:0x806E1FD4 end:0x806E2010
+	.sdata2     start:0x806E6570 end:0x806E65A0
 
 Game/Task/ParticleUpdateTask.cpp:
 	.text       start:0x802EB344 end:0x802EB59C
@@ -2954,6 +2974,11 @@ Game/Font/fontmanager.cpp:
 	.sbss       start:0x806E2090 end:0x806E2098
 	.sdata2     start:0x806E6768 end:0x806E6770
 
+Game/PoseNode.cpp:
+	.text       start:0x803077B4 end:0x80307A0C
+	.data       start:0x8052FFB8 end:0x8052FFE0
+	.sdata2     start:0x806E6770 end:0x806E6778
+
 Game/SAnim.cpp:
 	.text       start:0x80307A0C end:0x80309788
 	.ctors      start:0x804DBA90 end:0x804DBA94
@@ -2966,6 +2991,12 @@ Game/SAnim/pnSAnimController.cpp:
 	.data       start:0x8052FFE0 end:0x80530008
 	.bss        start:0x805840F0 end:0x80584118
 	.sdata2     start:0x806E6798 end:0x806E67C8
+
+Game/PoseAccumulator.cpp:
+	.text       start:0x8030A9D0 end:0x8030C3B4
+	.data       start:0x80530008 end:0x80530028
+	.bss        start:0x80584118 end:0x80584128
+	.sdata2     start:0x806E67C8 end:0x806E67E8
 
 Game/SHierarchy.cpp:
 	.text       start:0x8030C3B4 end:0x8030CCD8
@@ -3000,6 +3031,23 @@ Game/SAnim/tu_8030E550.cpp:
 
 Game/SAnim/AnimRetargeter.cpp:
 	.text       start:0x8030E940 end:0x8030EC30
+
+Game/AI/tu_8030EDB0.cpp:
+	.text       start:0x8030EDB0 end:0x8030F5DC
+	.ctors      start:0x804DBAA8 end:0x804DBAAC
+	.bss        start:0x805841C8 end:0x80584218
+
+Game/AI/tu_8030F5DC.cpp:
+	.text       start:0x8030F5DC end:0x803115F4
+	.ctors      start:0x804DBAAC end:0x804DBAB0
+	.data       start:0x805300C8 end:0x80530148
+	.bss        start:0x80584218 end:0x80584240
+	.sdata2     start:0x806E6848 end:0x806E6870
+
+Game/AI/tu_803115F4.cpp:
+	.text       start:0x803115F4 end:0x80311734
+	.ctors      start:0x804DBAB0 end:0x804DBAB4
+	.bss        start:0x80584240 end:0x805842E0
 
 Game/AI/Variant.cpp:
 	.text       start:0x8031A104 end:0x8031B570

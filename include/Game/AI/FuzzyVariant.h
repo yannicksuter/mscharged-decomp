@@ -2,11 +2,30 @@
 #define GAME_AI_FUZZYVARIANT_H
 
 #include "Game/AI/Variant.h"
+#include "NL/nlAVLTree.h"
+#include "NL/nlList.h"
 #include "NL/nlSlotPool.h"
+#include "NL/nlTimer.h"
 
 class cTeam;
 class cBall;
 class InterpreterCore;
+
+class UnidentifiedFielderInputOwner
+{
+public:
+    virtual ~UnidentifiedFielderInputOwner();
+};
+
+class UnidentifiedFielderInputController
+{
+public:
+    virtual ~UnidentifiedFielderInputController();
+    virtual void UnidentifiedVirtual1();
+    virtual void UnidentifiedVirtual2();
+    virtual void UnidentifiedVirtual3(float dt);
+    virtual void UnidentifiedVirtual4(bool force);
+};
 
 class FuzzyVariant : public Variant
 {
@@ -61,11 +80,41 @@ public:
     virtual bool IsPointerType() const;
 };
 
+class UnidentifiedFielderInput : public FuzzyVariant
+{
+public:
+    ~UnidentifiedFielderInput();
+
+    void fn_8030F74C(bool deleteOwner, bool deleteController);
+    void fn_8030F800(bool updateController, float dt);
+    unsigned long fn_8030F9B4(unsigned long key, bool concurrent) const;
+    Timer* fn_8030F9BC(unsigned long key);
+    Timer* fn_8030FA10(unsigned long key, float seconds);
+    bool fn_8030FB7C(unsigned long key);
+
+    UnidentifiedFielderInputOwner* mUnidentified14;
+    UnidentifiedFielderInputController* mUnidentified18;
+    nlAVLTreeSlotPool<unsigned long, Timer,
+        DefaultKeyCompare<unsigned long> > mTimers;
+};
+
 class UnidentifiedFuzzyVariantData : public FuzzyVariant
 {
 public:
+    UnidentifiedFuzzyVariantData()
+        : FuzzyVariant()
+        , mIndex(-1)
+    {
+    }
+
     UnidentifiedFuzzyVariantData(
         int index, const FuzzyVariant& value);
+
+    ~UnidentifiedFuzzyVariantData()
+    {
+    }
+
+    static void operator delete(void* entry);
 
     UnidentifiedFuzzyVariantData& operator=(
         const UnidentifiedFuzzyVariantData& other)
@@ -152,38 +201,55 @@ public:
         return -1;
     }
 
-    float Confidence;
+    UnidentifiedVariant_80054AB8* next;
     UnidentifiedVariantCollection ExtraData;
     bool mTemporary;
 };
 
+class UnidentifiedActionQueue
+{
+public:
+    UnidentifiedActionQueue();
+    ~UnidentifiedActionQueue();
+
+    static void operator delete(void* entry);
+
+    void fn_8030FF6C(bool preserveSelected);
+    void fn_8031002C(int actionSelection);
+    void fn_80310034(float* weights, int count);
+    UnidentifiedVariant_80054AB8* fn_80310040(
+        UnidentifiedVariant_80054AB8* pNewAction);
+    UnidentifiedVariant_80054AB8* fn_80310B80(
+        UnidentifiedVariant_80054AB8* pAction);
+    UnidentifiedVariant_80054AB8* SelectAction();
+
+    UnidentifiedVariant_80054AB8* m_pLastQueuedAction;
+    UnidentifiedVariant_80054AB8* m_pSelectedAction;
+    nlList<UnidentifiedVariant_80054AB8> m_lQueuedActions;
+    int mActionSelection;
+    float* m_pSelectionWeights;
+    int mNumSelectionWeights;
+};
+
 extern BasicSlotPool<UnidentifiedFuzzyVariantData> lbl_80584200;
+extern BasicSlotPool<UnidentifiedActionQueue> lbl_80584228;
 extern BasicSlotPool<UnidentifiedVariant_80054AB8> lbl_805842C8;
 
-extern "C" void fn_8030EEB8(UnidentifiedVariantCollection*, int);
-extern "C" bool fn_8030F030(
-    const UnidentifiedVariantCollection*, int);
-extern "C" Variant* fn_8030F060(UnidentifiedVariantCollection*, int);
 extern "C" UnidentifiedVariant_80054AB8 fn_80054AB8(InterpreterCore*, const char*, cTeam*);
 
-inline bool UnidentifiedVariantCollection::IsSet(int index) const
+inline void UnidentifiedFuzzyVariantData::operator delete(void* entry)
 {
-    return fn_8030F030(this, index);
-}
-
-inline Variant* UnidentifiedVariantCollection::Get(int index)
-{
-    return fn_8030F060(this, index);
-}
-
-inline void UnidentifiedVariantCollection::Remove(int index)
-{
-    fn_8030EEB8(this, index);
+    lbl_80584200.DeleteEntry((UnidentifiedFuzzyVariantData*)entry);
 }
 
 inline void UnidentifiedVariant_80054AB8::operator delete(void* entry)
 {
     lbl_805842C8.DeleteEntry((UnidentifiedVariant_80054AB8*)entry);
+}
+
+inline void UnidentifiedActionQueue::operator delete(void* entry)
+{
+    lbl_80584228.DeleteEntry((UnidentifiedActionQueue*)entry);
 }
 
 inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
@@ -277,6 +343,7 @@ inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
         }
     }
 
+    next = other.next;
     mTemporary = false;
     return *this;
 }

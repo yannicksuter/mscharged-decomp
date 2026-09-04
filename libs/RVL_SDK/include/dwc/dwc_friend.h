@@ -16,6 +16,23 @@ extern "C"
     typedef void (*DWCDeleteFriendListCallback)(int deletedIndex,
         int sourceIndex, void* param);
 
+    typedef enum DWCFriendState
+    {
+        DWC_FRIEND_STATE_INIT,
+        DWC_FRIEND_STATE_PERS_LOGIN,
+        DWC_FRIEND_STATE_LOGON,
+        DWC_FRIEND_STATE_NUM
+    } DWCFriendState;
+
+    enum
+    {
+        DWC_BUDDY_UPDATE_STATE_WAIT,
+        DWC_BUDDY_UPDATE_STATE_CHECK,
+        DWC_BUDDY_UPDATE_STATE_PSEARCH,
+        DWC_BUDDY_UPDATE_STATE_COMPLETE,
+        DWC_BUDDY_UPDATE_STATE_NUM
+    };
+
     BOOL DWC_SetOwnStatusData(const char* statusData, u32 size);
     void DWC_DeleteBuddyFriendData(DWCFriendData* friendData);
     BOOL DWC_SetBuddyFriendCallback(DWCBuddyFriendCallback callback, void* param);
@@ -24,6 +41,12 @@ extern "C"
         DWCUpdateServersCallback updateCallback, void* updateParam,
         DWCFriendStatusCallback statusCallback, void* statusParam,
         DWCDeleteFriendListCallback deleteCallback, void* deleteParam);
+    void DWCi_StopFriendProcess(int error, int errorCode);
+    void DWCi_UpdateServersAsync(const char* authToken,
+        const char* partnerChallenge, DWCUpdateServersCallback updateCallback,
+        void* updateParam, DWCFriendStatusCallback statusCallback,
+        void* statusParam, DWCDeleteFriendListCallback deleteCallback,
+        void* deleteParam);
 
 #ifdef __cplusplus
 }

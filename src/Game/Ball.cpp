@@ -1039,7 +1039,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
         float fPrevZVel;
 
         v3HitSpot = mpDamageTarget->GetJointPosition(
-            mpDamageTarget->m_pPoseAccumulator->m_pHierarchy
+            mpDamageTarget->m_pPoseAccumulator->m_BaseSHierarchy
                 ->m_nPelvisNodeIndex);
         v3HitSpot.z = clampAbove(0.3f, v3HitSpot.z + 0.05f);
 

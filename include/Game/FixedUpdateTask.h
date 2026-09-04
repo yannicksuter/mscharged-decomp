@@ -4,6 +4,10 @@
 #include "Game/Task/DispatchEventsTask.h"
 #include "NL/nlTask.h"
 
+extern float g_fFixedUpdateTick;
+extern float g_fSimulationTick;
+extern bool g_bRunSimAndRenderInLockStep;
+
 class UnidentifiedFixedUpdateTaskBase
 {
 public:
@@ -22,13 +26,28 @@ class FixedUpdateTask : public nlTask, public UnidentifiedFixedUpdateTaskBase
 public:
     FixedUpdateTask()
     {
-        Reset();
+        mUnidentified28 = mAccumulatedDeltaT = g_fFixedUpdateTick;
+        mSimulationTime = 0.0f;
+        mTimeScale = 1.0f;
+        mfFrameLockTime = 0.0f;
+        mFrame = 0;
+        mUnidentified38 = false;
+
+        mEventDispatcher.Clear();
+        BasicSlotPool<DLListEntry<EventCallback> >* pool = &mEventDispatcher.callbacks.m_Allocator;
+        pool->FreeBlocks();
     }
 
     virtual void Run(float dt);
-    virtual const char* GetName();
+    virtual const char* GetName()
+    {
+        return "Game Fixed Update";
+    }
 
-    virtual u32 GetFrame();
+    virtual u32 GetFrame()
+    {
+        return mFrame;
+    }
     virtual float GetFixedUpdateMilliseconds();
     virtual u32 CalculateChecksum();
     virtual u32 WriteSyncLog();
@@ -46,6 +65,7 @@ public:
     static void SetFrameLock(float frameLockTime);
     static void DecrementFrameLock(float fDeltaT);
     static float GetPhysicsUpdateTick();
+
     void CallFixedUpdateTasks();
 
     /* 0x24 */ float mAccumulatedDeltaT;
@@ -61,9 +81,5 @@ public:
     /* 0x6C */ float mTimeScaleTransitionStart;
     /* 0x70 */ float mTargetTimeScale;
 };
-
-extern float g_fFixedUpdateTick;
-extern float g_fSimulationTick;
-extern bool g_bRunSimAndRenderInLockStep;
 
 #endif // GAME_FIXED_UPDATE_TASK_H

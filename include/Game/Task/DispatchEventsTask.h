@@ -10,7 +10,7 @@
 
 typedef Function<bool> EventCallback;
 typedef DLListContainerBase<EventCallback,
-    BasicSlotPool<DLListEntry<EventCallback> > > EventCallbackList;
+    SlotPool<DLListEntry<EventCallback> > > EventCallbackList;
 
 union EventDispatcherState
 {

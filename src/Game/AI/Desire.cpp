@@ -127,10 +127,10 @@ DesireDeke::~DesireDeke()
 bool DesireDeke::UnidentifiedInitialize(void* context)
 {
     mUnidentifiedA4 = 0;
-    if (fn_8030F030((UnidentifiedVariantCollection*)context, 14))
+    if (((UnidentifiedVariantCollection*)context)->IsSet(14))
     {
-        mUnidentifiedA4 = fn_8030F060(
-            (UnidentifiedVariantCollection*)context, 14)->mData.pointer;
+        mUnidentifiedA4
+            = ((UnidentifiedVariantCollection*)context)->Get(14)->mData.pointer;
     }
     return true;
 }

@@ -73,7 +73,7 @@ public:
     virtual ~cCharacter();
     virtual void PostPhysicsUpdate();
     virtual void PrePhysicsUpdate();
-    virtual void Unknown7();
+    virtual void Unknown7(float dt);
     virtual void PreUpdate(float dt);
     virtual void UnidentifiedVirtual1C();
     virtual void ResetEffects();

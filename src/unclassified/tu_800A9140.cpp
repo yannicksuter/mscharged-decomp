@@ -8,18 +8,6 @@ struct UnclassifiedTerrainName
     int mIndex;
 };
 
-struct unk_800A9274
-{
-    u8 mUnidentified000[0x10];
-    float* mValue10;
-    u8 mUnidentified014[0x0C];
-    float* mValue20;
-    u8 mUnidentified024[0x0C];
-    float* mValue30;
-    u8 mUnidentified034[0x0C];
-    float* mValue40;
-};
-
 extern "C" const char* lbl_80500BE8[6];
 extern "C" const char lbl_80500C00[];
 
@@ -37,20 +25,20 @@ extern "C" UnclassifiedTerrainName* fn_800A917C(UnclassifiedTerrainName* terrain
 
 extern "C" float fn_800A9274()
 {
-    return *lbl_8056CF08.mUnidentified04->mValue10;
+    return lbl_8056CF08.mUnidentified04->mUnidentified04;
 }
 
 extern "C" float fn_800A928C()
 {
-    return *lbl_8056CF08.mUnidentified04->mValue20;
+    return lbl_8056CF08.mUnidentified04->mUnidentified14;
 }
 
 extern "C" float fn_800A92A4(float value)
 {
-    return Interpolate(0.25f, 0.008f * value, *lbl_8056CF08.mUnidentified04->mValue30);
+    return Interpolate(0.25f, 0.008f * value, lbl_8056CF08.mUnidentified04->mUnidentified24);
 }
 
 extern "C" float fn_800A92C8(float value)
 {
-    return Interpolate(0.07f, 2.0f * value, *lbl_8056CF08.mUnidentified04->mValue40);
+    return Interpolate(0.07f, 2.0f * value, lbl_8056CF08.mUnidentified04->mUnidentified34);
 }

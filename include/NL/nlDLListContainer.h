@@ -37,10 +37,7 @@ public:
     {
         DLListEntry<T> value(data);
         DLListEntry<T>* entry = m_Allocator.Allocate();
-        if (entry != 0)
-        {
-            *entry = value;
-        }
+        new (entry) DLListEntry<T>(value);
         return entry;
     }
 
