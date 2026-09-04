@@ -2737,12 +2737,39 @@ Game/Render/tu_802D88F4.cpp:
 	.sbss       start:0x806E1F70 end:0x806E1F80
 	.sdata2     start:0x806E6448 end:0x806E6478
 
+Game/Render/tu_802DAEE0.cpp:
+	.text       start:0x802DAEE0 end:0x802DB930
+	.ctors      start:0x804DBA10 end:0x804DBA14
+	.data       start:0x8052EC78 end:0x8052ECA8
+	.bss        start:0x8057F580 end:0x8057F5A8
+	.sdata2     start:0x806E6478 end:0x806E6480
+
+Game/Render/tu_802DB930.cpp:
+	.text       start:0x802DB930 end:0x802DCD94
+	.data       start:0x8052ECA8 end:0x8052ECF0
+	.sdata      start:0x806DF448 end:0x806DF450
+	.sbss       start:0x806E1F80 end:0x806E1F90
+
+Game/Render/tu_802DCDB4.cpp:
+	.text       start:0x802DCDB4 end:0x802DE264
+	.rodata     start:0x804EB320 end:0x804EB350
+	.data       start:0x8052ECF0 end:0x8052EDC8
+	.sdata      start:0x806DF450 end:0x806DF460
+	.sbss       start:0x806E1F90 end:0x806E1F98
+	.sdata2     start:0x806E6480 end:0x806E6490
+
 Game/InterpreterCore.cpp:
 	.text       start:0x802DE284 end:0x802E0010
 	.ctors      start:0x804DBA1C end:0x804DBA20
 	.data       start:0x8052EDC8 end:0x8052EED4
 	.sdata      start:0x806DF460 end:0x806DF468
 	.sdata2     start:0x806E6490 end:0x806E64B0
+
+Game/Effects/EffectsTemplate.cpp:
+	.text       start:0x802E0010 end:0x802E0578
+	.data       start:0x8052EED8 end:0x8052EEE8
+	.sdata      start:0x806DF468 end:0x806DF46C
+	.sdata2     start:0x806E64B0 end:0x806E64BC
 
 unclassified/tu_802E3D4C.cpp:
 	.text       start:0x802E3D4C end:0x802E4338

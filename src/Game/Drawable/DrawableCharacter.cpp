@@ -5,8 +5,10 @@
 #include "Game/CharacterEffects.h"
 #include "Game/AI/HeadTrack.h"
 #include "Game/PoseAccumulator.h"
+#include "Game/Render/RLView.h"
 #include "Game/Render/RenderShadow.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
+#include "Game/Render/tu_802DCDB4.h"
 #include "Game/Team.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
@@ -218,12 +220,6 @@ struct Camera
     nlVector3 position;
 };
 
-struct CameraManager
-{
-    char _000[0x50];
-    Camera* camera;
-};
-
 struct TaskManager
 {
     void* vtable;
@@ -251,7 +247,7 @@ extern "C" void fn_8001EFCC(Character*, SkinMesh*, Model*);
 extern "C" void fn_80182EC8(int);
 extern "C" int fn_800FC748(int);
 extern "C" int fn_80183DEC(const nlVector3*);
-extern "C" CameraManager* fn_8027261C();
+extern "C" RLView* fn_8027261C();
 extern "C" RLView* fn_8027267C(int);
 extern "C" void fn_80273A4C(int, Model*, int);
 extern "C" bool fn_80277238();
@@ -264,7 +260,6 @@ extern "C" float fn_802CC758(ModelPacket*, u32);
 extern "C" u32 fn_802CC7E4(ModelPacket*, u32);
 extern "C" bool fn_802CC8FC(ModelPacket*, u32);
 extern "C" ResolvedTexture fn_802CE1B8(void*, u32);
-extern "C" int fn_802DD1EC(void*, const nlVector3*, float);
 
 int lbl_80511298[3] = { 2, 2, 2 };
 int lbl_805112A4[3] = { 4, 4, 4 };
@@ -769,8 +764,9 @@ void DrawableCharacter::SendToGl(Character& source, int renderPass)
         {
             radius = 2.5f;
         }
-        void* viewObject = fn_8027261C()->camera->GetView();
-        isVisible = fn_802DD1EC(viewObject, &bip01Position, radius) != 0;
+        const nlVector4* pPlanes
+            = fn_8027261C()->m_Interface->GetShadowMatrix();
+        isVisible = fn_802DD1EC(pPlanes, &bip01Position, radius) != 0;
     }
     else
     {

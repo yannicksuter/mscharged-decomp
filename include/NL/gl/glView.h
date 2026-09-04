@@ -32,7 +32,7 @@ public:
     virtual void GetViewProjectionMatrix(nlMatrix4&);
     virtual const nlMatrix4* GetViewMatrix() const;
     virtual const nlMatrix4* GetProjectionMatrix() const;
-    virtual const nlMatrix4* GetShadowMatrix()
+    virtual const nlVector4* GetShadowMatrix()
     {
         return 0;
     }

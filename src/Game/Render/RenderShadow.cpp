@@ -4,6 +4,7 @@
 #include "Game/Debug/ShapeRender.h"
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/Render/RLView.h"
+#include "Game/Render/tu_802DCDB4.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMatrix.h"
@@ -25,7 +26,6 @@ extern float lbl_806DCCA8;
 extern float lbl_806DCCAC;
 
 RLView* fn_8027261C();
-int fn_802DD1EC(const nlMatrix4*, const nlVector3*, float);
 void fn_80273A4C(eCLV, const glModel*, unsigned long);
 }
 

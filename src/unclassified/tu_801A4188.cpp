@@ -189,16 +189,6 @@ public:
     virtual ~ImpostorCharacterImpl_801A4188();
 };
 
-struct CrowdModelCollection_801A4188
-{
-    CrowdModelCollection_801A4188();
-    ~CrowdModelCollection_801A4188();
-
-    u8 mUnidentified000[0x48];
-    ImpostorModel_802DAEE0** models;
-    u32 mUnidentified04C;
-}; // size: 0x50
-
 static const char* lbl_806DCF68 = "/Render/Crowd/CharactersToLoad";
 static const char lbl_806DCF6C[] = "Alt";
 static const char lbl_806DCF70[] = "";
@@ -246,8 +236,6 @@ static CrowdModelCollection_801A4188 lbl_805721E8;
 
 extern "C" void fn_802C6CAC(
     const char* fileName, const char* category, bool reload);
-extern "C" void fn_802DBDA0(
-    void* object, CrowdCharacterDefinition_801A4188* definitions, int count);
 extern "C" void* fn_8027267C(int index);
 extern "C" void fn_801A49E4(u32 hash, unsigned long texture);
 extern "C" void fn_801A51D8();

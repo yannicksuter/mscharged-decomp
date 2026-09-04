@@ -19,7 +19,7 @@ public:
     virtual void GetViewProjectionMatrix(nlMatrix4&);
     virtual const nlMatrix4* GetViewMatrix() const;
     virtual const nlMatrix4* GetProjectionMatrix() const;
-    virtual const nlMatrix4* GetShadowMatrix();
+    virtual const nlVector4* GetShadowMatrix();
 
     void Set(const nlMatrix4& view, const nlMatrix4& projection)
     {
@@ -34,8 +34,7 @@ public:
     /* 0x044 */ nlMatrix4 mProjection;
     /* 0x084 */ nlMatrix4 mViewInverse;
     /* 0x0C4 */ nlMatrix4 mViewProjection;
-    /* 0x104 */ nlMatrix4 mShadowMatrix;
-    /* 0x144 */ u8 mUnidentified144[0x20];
+    /* 0x104 */ nlVector4 mShadowPlanes[6];
     /* 0x164 */ bool mShadowDirty;
 }; // total size: 0x168
 

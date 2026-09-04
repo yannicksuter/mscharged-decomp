@@ -32,6 +32,16 @@ typedef struct DWCConnectionDataView
     u8 aid;
 } DWCConnectionDataView;
 
+typedef struct DWCConnectionInfo
+{
+    u8 index;
+    u8 aid;
+    u16 reserve;
+    void* param;
+} DWCConnectionInfo;
+
+extern DWCConnectionInfo lbl_806C9920[32];
+
 static GT2Connection lbl_806C98A0[32];
 static DWCMainControlView* sMainControl;
 static s32 lbl_806E2EE4;
@@ -47,6 +57,7 @@ void fn_804916EC(GT2Socket socket, GT2Connection connection, unsigned int ip,
     unsigned short port, int latency, GT2Byte* message, int len);
 BOOL DWC_isValidAid(u8 aid);
 GT2Connection* fn_8048E320(int index);
+DWCConnectionInfo* fn_8048E430(int index);
 static void fn_8048F4F8(GT2Socket socket);
 
 BOOL DWC_SetConnectionClosedCallback(DWCConnectionClosedCallback callback,
@@ -195,4 +206,9 @@ static void fn_8048F4F8(GT2Socket socket)
 GT2Connection* fn_8048E320(int index)
 {
     return &lbl_806C98A0[index];
+}
+
+DWCConnectionInfo* fn_8048E430(int index)
+{
+    return &lbl_806C9920[index];
 }

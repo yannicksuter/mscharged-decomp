@@ -177,21 +177,36 @@ struct unk_800A9274;
 
 struct unk_8056CF08
 {
+    unk_8056CF08()
+        : mUnidentified00(1)
+        , mUnidentified04(0)
+        , mUnidentified08(0)
+        , mUnidentified0C(false)
+        , m_pGameTweaks(0)
+        , m_unk14(0)
+        , mUnidentified18(0)
+        , mUnidentified1C(0)
+    {
+    }
+
 private:
-    /* 0x00 */ u8 mUnidentified00[0x04];
+    /* 0x00 */ u32 mUnidentified00;
 
 public:
     /* 0x04 */ unk_800A9274* mUnidentified04;
 
 private:
-    /* 0x08 */ u8 mUnidentified08[0x08];
+    /* 0x08 */ void* mUnidentified08;
+    /* 0x0C */ bool mUnidentified0C;
+    /* 0x0D */ u8 mPadding0D[3];
 
 public:
     /* 0x10 */ GameTweaks* m_pGameTweaks;
     /* 0x14 */ FielderTweaks* m_unk14;
 
 private:
-    /* 0x18 */ u8 mUnidentified18[0x08];
+    /* 0x18 */ SkillTweaks* mUnidentified18;
+    /* 0x1C */ SkillTweaks* mUnidentified1C;
 }; // total size: 0x20
 
 extern unk_8056CF08 lbl_8056CF08;
