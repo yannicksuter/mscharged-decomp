@@ -1,4 +1,5 @@
 #include "Game/Render/tu_802D88F4.h"
+#include "Game/Render/tu_802DCDB4.h"
 
 #include <math.h>
 
@@ -97,7 +98,7 @@ public:
     virtual void UnidentifiedVirtual14() = 0;
     virtual void UnidentifiedVirtual18() = 0;
     virtual void UnidentifiedVirtual1C() = 0;
-    virtual void* UnidentifiedVirtual20() = 0;
+    virtual const nlVector4* UnidentifiedVirtual20() = 0;
 };
 
 struct UnidentifiedCrowdView_802D9D00
@@ -109,10 +110,6 @@ struct UnidentifiedCrowdView_802D9D00
 extern "C" void fn_802C6CAC(
     const char* fileName, const char* category, bool reload);
 extern "C" u16 fn_802D75AC(u16 target, int count);
-extern "C" bool fn_802DD05C(
-    void* view, const nlVector3* boundsMin, const nlVector3* boundsMax,
-    bool unidentified);
-
 extern "C" void fn_802D8950(
     UnidentifiedRenderObject_801A4188* object, nlVector4* corners);
 extern "C" bool fn_802D8A94(
@@ -399,10 +396,10 @@ extern "C" void fn_802D9D00(
     {
         UnidentifiedCrowdLayoutRecord_802D88F4& layout
             = manager->mLayouts[layoutIndex];
-        void* visibilityView
+        const nlVector4* visibilityView
             = crowdView->mProvider->UnidentifiedVirtual20();
         if (!fn_802DD05C(visibilityView, &layout.mBoundsMin,
-                &layout.mBoundsMax, false))
+                &layout.mBoundsMax, 0))
         {
             continue;
         }

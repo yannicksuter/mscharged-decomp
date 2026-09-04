@@ -11,13 +11,7 @@ extern "C" int nlSNPrintf(char*, unsigned long, const char*, ...);
 extern "C" double floor(double);
 extern "C" void fn_802C8280(const char*);
 extern "C" void fn_802C8288();
-extern "C" void* fn_802CC094();
-extern "C" ImpostorModel_802DAEE0* fn_802DB0AC(
-    ImpostorModel_802DAEE0*, void*);
-extern "C" void fn_802DB22C(ImpostorModel_802DAEE0*, float);
-extern "C" void fn_802DB26C(ImpostorModel_802DAEE0*);
-extern "C" void fn_802DB2B8(ImpostorModel_802DAEE0*, float);
-extern "C" void fn_802DB528(ImpostorModel_802DAEE0*, void*, float, int);
+extern "C" ResourceInterface_802CC094* fn_802CC094();
 
 // The tweak-value constructor is inlined here, matching the pattern already
 // used by Game/InterpreterCore.cpp; the retained out-of-line copy at
@@ -98,13 +92,11 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
         for (int j = 0; j < mNumAngles; ++j)
         {
             ImpostorSprite_802D4290* sprite = new ImpostorSprite_802D4290(
-                this, i, budget / (mNumAngles * mNumTextures), mWidth,
-                mHeight);
+                this, i, budget / (mNumAngles * mNumTextures), mWidth, mHeight);
             sprite->mUnidentified088 = mUnidentified035;
 
             char nameBuffer[0x40];
-            nlSNPrintf(nameBuffer, 0x40, "Impostor-%s%d", mName,
-                i * mNumAngles + j);
+            nlSNPrintf(nameBuffer, 0x40, "Impostor-%s%d", mName, i * mNumAngles + j);
             fn_802D4480(sprite, nameBuffer);
 
             sprite->mAngle = mBaseAngle + angle;
@@ -131,7 +123,6 @@ ImpostorCharacter::~ImpostorCharacter()
     mSprites.Clear();
     mSprites.m_Allocator.FreeBlocks();
 }
-
 
 extern "C" u16 fn_802D75AC(u16 target, int count)
 {
@@ -216,8 +207,7 @@ void ImpostorCharacter::UnidentifiedVirtual2C(void* unidentified0,
     DLListEntry<ImpostorSprite_802D4290*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        fn_802D4484(entry->entry, (const nlVector3*)unidentified0,
-            (const nlVector3*)unidentified1);
+        fn_802D4484(entry->entry, (const nlVector3*)unidentified0, (const nlVector3*)unidentified1);
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
@@ -296,8 +286,7 @@ void ImpostorCharacter::RegisterSprites(void* registry)
     while (entry != 0)
     {
         GLView* target = entry->entry->mUnidentified068;
-        UnidentifiedRegistryNode_802D7AEC* node =
-            (UnidentifiedRegistryNode_802D7AEC*)nlMalloc(8, 8, false);
+        UnidentifiedRegistryNode_802D7AEC* node = (UnidentifiedRegistryNode_802D7AEC*)nlMalloc(8, 8, false);
         if (node != 0)
         {
             node->mNext = 0;
@@ -305,8 +294,7 @@ void ImpostorCharacter::RegisterSprites(void* registry)
         }
         node->mNext = 0;
 
-        UnidentifiedRegistry_802D7AEC* list =
-            (UnidentifiedRegistry_802D7AEC*)registry;
+        UnidentifiedRegistry_802D7AEC* list = (UnidentifiedRegistry_802D7AEC*)registry;
         if (list->mTail != 0)
         {
             list->mTail->mNext = node;
@@ -343,7 +331,7 @@ void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual18(int index,
 void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual20(void* target,
     int texture)
 {
-    mModels[texture]->UnidentifiedVirtual0C(target, 0);
+    mModels[texture]->UnidentifiedVirtual0C((GLView*)target, 0);
 }
 
 ImpostorCharacterImpl_8052E9B8::ImpostorCharacterImpl_8052E9B8(
@@ -361,7 +349,7 @@ ImpostorCharacterImpl_8052E9B8::ImpostorCharacterImpl_8052E9B8(
     }
     for (int i = 0; i < numTextures; ++i)
     {
-        fn_802DB528(mModels[i], animations, 0.0f, 0);
+        fn_802DB528(mModels[i], (const char*)animations, 0.0f, PM_CYCLIC);
     }
 }
 
@@ -377,9 +365,6 @@ ImpostorCharacterImpl_8052E9B8::~ImpostorCharacterImpl_8052E9B8()
     delete[] mModels;
 }
 
-
-
-
 void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual24(float dt)
 {
     for (int i = 0; i < mNumModels; ++i)
@@ -394,7 +379,7 @@ void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual28(float dt,
     for (int i = 0; i < mNumModels; ++i)
     {
         float value = nlRandomf(0.25f * dt, dt, &nlDefaultSeed);
-        fn_802DB528(mModels[i], (void*)unidentified, value, 0);
+        fn_802DB528(mModels[i], unidentified, value, PM_CYCLIC);
     }
 }
 

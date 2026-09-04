@@ -49,7 +49,7 @@ public:
 
     virtual ~GLSkinMesh();
     virtual void fn_802D4268(glModel* model);
-    virtual glModel* GetModel() { return pModel; }
+    virtual glModel* GetModel() = 0;
     virtual void Pose(cPoseAccumulator* pPoseAccumulator) = 0;
     virtual void PrepareToRender() = 0;
     virtual void fn_Unknown5() = 0;

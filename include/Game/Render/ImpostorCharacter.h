@@ -1,18 +1,29 @@
 #ifndef GAME_RENDER_IMPOSTOR_CHARACTER_H
 #define GAME_RENDER_IMPOSTOR_CHARACTER_H
 
+#include "Game/SAnim.h"
 #include "Game/TweakValue.h"
 #include "NL/gl/glTarget.h"
 #include "NL/nlDLListContainer.h"
+#include "NL/nlList.h"
 #include "NL/nlMath.h"
 #include "types.h"
 
+class AnimRetarget;
 class cPN_SAnimController;
 class cPoseAccumulator;
+class cPoseNode;
+class cSAnim;
+class cSHierarchy;
+template <typename T>
+class cInventory;
 class GLView;
+class GLSkinMesh;
 class Impostor;
 class ImpostorCharacter;
+class ResourceInterface_802CC094;
 class UnidentifiedImpostorView_802D4290;
+struct glModel;
 struct State_802A7C90;
 
 // Sprite-mesh unit at 0x802D4290. The retail binary does not preserve the
@@ -72,14 +83,53 @@ extern "C" int fn_802D536C(ImpostorSprite_802D4290* sprite);
 class ImpostorModel_802DAEE0
 {
 public:
+    ImpostorModel_802DAEE0(cSHierarchy& hierarchy, unsigned long modelID,
+        cInventory<cSAnim>* animations,
+        ResourceInterface_802CC094* resource);
+    ImpostorModel_802DAEE0(cSHierarchy& hierarchy, unsigned long modelID,
+        ResourceInterface_802CC094* resource);
     virtual ~ImpostorModel_802DAEE0();
-    virtual void UnidentifiedVirtual0C(void*, int) = 0;
+    virtual void UnidentifiedVirtual0C(
+        GLView* opaqueView, GLView* translucentView);
+    virtual void UnidentifiedVirtual10(float dt);
+    virtual void UnidentifiedVirtual14(GLView* opaqueView,
+        GLView* translucentView, const cPoseAccumulator& poseAccumulator,
+        const nlMatrix4* worldMatrix);
 
     /* 0x04 */ nlMatrix4 mWorldMatrix;
     /* 0x44 */ cPN_SAnimController* mAnimController;
     /* 0x48 */ cPoseAccumulator* mPoseAccumulator;
-    /* 0x4C */ u8 mUnidentified04C[0x2C];
-};
+    /* 0x4C */ GLSkinMesh* mSkinMesh;
+    /* 0x50 */ cPoseNode* mPoseTree;
+    /* 0x54 */ unsigned long mModelID;
+    /* 0x58 */ cSHierarchy* mHierarchy;
+    /* 0x5C */ bool mVisible;
+    /* 0x5D */ bool mTexturesResolved;
+    /* 0x5E */ u8 mPadding05E[2];
+    /* 0x60 */ glModel* mLastModel;
+    /* 0x64 */ cInventory<cSAnim>* mAnimations;
+    /* 0x68 */ unsigned long mOriginalTexture;
+    /* 0x6C */ unsigned long mReplacementTexture;
+    /* 0x70 */ unsigned long mResolvedTexture;
+    /* 0x74 */ void (*mModelCallback)(
+        ImpostorModel_802DAEE0*, glModel*);
+}; // size: 0x78
+
+extern "C" ImpostorModel_802DAEE0* fn_802DB0AC(
+    const ImpostorModel_802DAEE0* model,
+    ResourceInterface_802CC094* resource);
+extern "C" void fn_802DB22C(
+    ImpostorModel_802DAEE0* model, float dt);
+extern "C" void fn_802DB26C(ImpostorModel_802DAEE0* model);
+extern "C" void fn_802DB2B8(
+    ImpostorModel_802DAEE0* model, float time);
+extern "C" void fn_802DB4EC(
+    ImpostorModel_802DAEE0* model, unsigned long texture);
+extern "C" void fn_802DB528(ImpostorModel_802DAEE0* model,
+    const char* name, float blendTime, ePlayMode playMode);
+extern "C" void fn_802DB6CC(ImpostorModel_802DAEE0* model,
+    cSAnim& anim, ePlayMode playMode, const AnimRetarget* retarget);
+extern "C" void fn_802DB79C(ImpostorModel_802DAEE0* model);
 
 struct UnidentifiedRegistryNode_802D7AEC
 {

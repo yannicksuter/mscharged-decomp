@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "Game/Render/RLViewLayers.h"
+#include "Game/Render/tu_802DCDB4.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
@@ -15,8 +16,6 @@ extern "C" u32 fn_80369D4C();
 extern "C" u32 fn_80369D54();
 extern "C" void fn_8037091C();
 extern "C" void fn_80370998(GLView*, GLView*);
-extern "C" void fn_802DCDB4(nlMatrix4&, const nlMatrix4&, const nlMatrix4&);
-
 void CopyShadowVolumeColour(const GXColor* colour);
 
 struct RLViewTargetInfo
@@ -655,14 +654,14 @@ extern "C" bool fn_80273B00()
     return sWidescreen;
 }
 
-const nlMatrix4* RLViewCamera::GetShadowMatrix()
+const nlVector4* RLViewCamera::GetShadowMatrix()
 {
     if (mShadowDirty)
     {
-        fn_802DCDB4(mShadowMatrix, mProjection, mView);
+        fn_802DCDB4(mShadowPlanes, mProjection, mView);
         mShadowDirty = false;
     }
-    return &mShadowMatrix;
+    return mShadowPlanes;
 }
 
 void RLViewCamera::GetViewProjectionMatrix(nlMatrix4& matrix)

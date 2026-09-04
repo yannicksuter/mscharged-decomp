@@ -68,6 +68,11 @@ public:
     virtual void UnidentifiedVirtual28(const char*);
     virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
 
+    static void operator delete(void* pointer)
+    {
+        lbl_806E1E58->m_Pool1.Free(pointer);
+    }
+
     /* 0x0C */ int value;
 }; // size: 0x10
 
