@@ -1,7 +1,8 @@
 #include "NL/glx/GXMaterialProgram.h"
+#include "NL/glx/GXMaterialProgramRegistry_802A0A14.h"
 #include "NL/nlMemory.h"
 
-extern "C" void fn_802A0A14()
+void fn_802A0A14()
 {
     new (nlMalloc(sizeof(GXMaterialProgram_802A4B28), 8, false))
         GXMaterialProgram_802A4B28;

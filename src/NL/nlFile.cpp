@@ -126,7 +126,7 @@ unsigned int nlLoadEntireFileAsync(const char* filename, LoadAsyncCallback callb
     nlFile* file;
     AsyncFileLoadData* asyncData;
     void* alloc_data;
-    bool result;
+    unsigned int result;
 
     file = nlOpen(filename);
     if (file == 0)
@@ -168,7 +168,7 @@ unsigned int nlLoadEntireFileAsync(const char* filename, LoadAsyncCallback callb
         CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 
         asyncData = new (nlMalloc(sizeof(AsyncFileLoadData), 8, true)) AsyncFileLoadData(file, alloc_data, datasize, callback, user_data);
-        result = nlReadAsync(file, alloc_data, datasize, nlLoadEntireFileAsyncCallback, (unsigned long)asyncData, filesize);
+        result = (unsigned int)nlReadAsync(file, alloc_data, datasize, nlLoadEntireFileAsyncCallback, (unsigned long)asyncData, filesize);
     }
     else
     {

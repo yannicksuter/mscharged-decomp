@@ -1,6 +1,6 @@
 #include "Game/Task/MovieRenderTask.h"
 
-extern "C" void fn_80371254();
+#include "Game/Sys/movie.h"
 
 UnidentifiedMovieRenderTask::UnidentifiedMovieRenderTask()
 {

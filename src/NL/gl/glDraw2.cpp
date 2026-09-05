@@ -10,6 +10,7 @@
 #include "NL/gl/glState.h"
 #include "NL/gl/glStruct.h"
 #include "NL/gl/glView.h"
+#include "NL/gl/tu_802CC370.h"
 
 #include <string.h>
 
@@ -26,7 +27,6 @@ extern "C"
     bool fn_802A8714(MeshWriter_802A8508*);
 
     void* fn_802CC0A8(unsigned long, int);
-    void fn_802CC3C8(glModelPacket*, unsigned long, const void*, unsigned long);
 }
 
 extern u32 lbl_806E1F34;

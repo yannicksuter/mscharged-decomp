@@ -11,8 +11,6 @@ static nlQuaternion qRotIdentity = { 0.0f, 0.0f, 0.0f, 1.0f };
 static nlVector3 v3ScaleIdentity = { 1.0f, 1.0f, 1.0f };
 static nlVector3 v3TransIdentity = { 0.0f, 0.0f, 0.0f };
 
-extern "C" void fn_802B549C(nlQuaternion& out, unsigned short angle);
-
 /**
  * Offset/Address/Size: 0x0 | 0x8030A9D0 | size: 0x228
  */

@@ -97,12 +97,13 @@ public:
 class AudioListener_802EBD54
 {
 public:
-    virtual ~AudioListener_802EBD54();
-    virtual void fn_802ECD24();
-    virtual void fn_802ECD14();
+    virtual void fn_802ECD2C(bool);
+    virtual bool fn_802ECD24();
+    virtual bool fn_802ECD14();
     virtual void SetTransformValid(bool valid);
     virtual void SetEnabled(bool enabled);
-    virtual void fn_802ECD1C();
+    virtual bool fn_802ECD1C();
+    virtual void fn_8035DAD4(float) = 0;
 
     /* 0x04 */ nlVector3 m_Position;
     /* 0x10 */ nlVector3 m_View;
@@ -110,9 +111,12 @@ public:
     /* 0x28 */ bool m_HasTransform;
     /* 0x29 */ bool m_Enabled;
     /* 0x2A */ bool m_TransformValid;
-    /* 0x2B */ u8 m_Unknown2B[0x25];
+    /* 0x2B */ u8 m_Unknown2B;
 };
 
 extern AudioLoadMode_806E201C* lbl_806E201C;
+
+
+void fn_802EC8A0(AudioLoadMode_806E201C* audio, bool param2, bool param3);
 
 #endif // GAME_AUDIO_AUDIO_LOAD_MODE_806E201C_H

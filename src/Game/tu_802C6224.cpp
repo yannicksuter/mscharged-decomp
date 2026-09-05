@@ -2,6 +2,7 @@
 #include "Game/TweakRegistry.h"
 #include "Game/TweakValue.h"
 
+#include "Game/tu_802C6224.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
@@ -213,7 +214,7 @@ extern "C" char* fn_802C6BB0(
     return 0;
 }
 
-extern "C" void fn_802C6CAC(
+void fn_802C6CAC(
     const char* filename, const char* category, bool reload)
 {
     unsigned long size;

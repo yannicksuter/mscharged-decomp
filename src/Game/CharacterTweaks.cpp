@@ -6,13 +6,12 @@
 #include "Game/Game.h"
 #include "Game/GameTweaks.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/tu_802C6224.h"
+#include "unclassified/tu_80073898.h"
 
 extern "C" void fn_8002B934(PlayerTweaks*, const char*, const char*, bool);
-extern "C" void fn_80073A48(void*, const char*, const char*);
-extern "C" void fn_802C6CAC(const char*, const char*, bool);
 extern "C" float fn_800A9274(void*);
 extern "C" float fn_800A928C(void*);
-extern "C" u8 lbl_8056BA00[];
 
 float g_pTweaks[2] = {
     10.0f,
@@ -29,7 +28,7 @@ FielderTweaks::FielderTweaks(const char* name, const char* category)
     , mUnidentified4E0(category)
 {
     Init();
-    fn_80073A48(lbl_8056BA00, mszFileName, mUnidentified4E0);
+    fn_80073A48(&lbl_8056BA00, mszFileName, mUnidentified4E0);
 }
 
 FielderTweaks::~FielderTweaks()
@@ -177,7 +176,7 @@ void fn_8002B934(PlayerTweaks* tweaks, const char* name,
 
     if (registerTweaks)
     {
-        fn_80073A48(lbl_8056BA00, name, category);
+        fn_80073A48(&lbl_8056BA00, name, category);
     }
     else
     {

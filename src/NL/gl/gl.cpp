@@ -2,28 +2,23 @@
 #include "NL/gl/glFont.h"
 
 #include "NL/gl/glMatrix.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
 #include "NL/gl/glStat.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glStruct.h"
 #include "NL/gl/glTarget.h"
 #include "NL/gl/glView.h"
+#include "NL/glx/GXMaterialProgramRegistry_802A0A14.h"
 #include "NL/glx/glxLoadModel.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/nlString.h"
-
-extern "C" void fn_802A0A14();
-extern "C" void fn_802CBEC8();
-extern "C" void fn_802CEC68();
-extern "C" void fn_802CEF18();
-extern "C" unsigned long fn_80369D5C();
-extern "C" unsigned long fn_80369D64();
 
 static int gl_frameCounter;
 static int gl_nDiscard;
 static int gl_state;
 
-extern "C" bool fn_802C7FD0(void (*startupCallback)())
+bool fn_802C7FD0(void (*startupCallback)())
 {
     gl_frameCounter = 0;
     gl_nDiscard = 0;
@@ -83,7 +78,7 @@ void glEndFrame()
     gl_state = 2;
 }
 
-extern "C" bool fn_802C80FC()
+bool fn_802C80FC()
 {
     return gl_state == 1;
 }
@@ -116,7 +111,7 @@ void glFinish()
     glplatFinish();
 }
 
-extern "C" void fn_802C8180()
+void fn_802C8180()
 {
     glViewCompact();
 }
@@ -142,29 +137,33 @@ unsigned long glGetNumTriangles(eGLPrimitive primitive, unsigned long count)
     }
 }
 
-extern "C" void* fn_802C81FC(
+void* fn_802C81FC(
     void* data, unsigned long size, unsigned long* pNumModels, void* context)
 {
     return glplatEndLoadModel(data, size, pNumModels, context);
 }
 
-extern "C" bool fn_802C8200(const char* filename, void (*callback)(void*, unsigned long, void*), void* userData)
+bool fn_802C8200(const char* filename,
+    void (*callback)(void*, unsigned long, void*), void* userData,
+    void* context)
 {
     return glplatBeginLoadModel(filename, callback, userData);
 }
 
-extern "C" bool fn_802C8204(const char* filename, void (*callback)(void*, unsigned long, void*), void* param)
+bool fn_802C8204(const char* filename,
+    void (*callback)(void*, unsigned long, void*), void* param,
+    void* context)
 {
     return glplatBeginLoadTextureBundle(filename, callback, param);
 }
 
-extern "C" void* fn_802C8208(
+void* fn_802C8208(
     const char* filename, unsigned long* pNumModels, void* context)
 {
     return glplatLoadModel(filename, pNumModels, context);
 }
 
-extern "C" bool fn_802C820C(
+bool fn_802C820C(
     const char* filename, MemoryAllocator* allocator)
 {
     return glplatLoadTextureBundle(filename, allocator);
@@ -180,18 +179,18 @@ float glGetOrthographicHeight()
     return fn_80369D64();
 }
 
-extern "C" void fn_802C8280(const char*)
+void fn_802C8280(const char*)
 {
 }
 
-extern "C" void fn_802C8284()
+void fn_802C8284(unsigned long)
 {
 }
 
-extern "C" void fn_802C8288()
+void fn_802C8288()
 {
 }
 
-extern "C" void fn_802C828C()
+void fn_802C828C(const char* name, void* allocator)
 {
 }

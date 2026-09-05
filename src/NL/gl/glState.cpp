@@ -3,7 +3,7 @@
 #include "NL/gl/gl.h"
 #include "NL/gl/glMatrix.h"
 
-extern "C" void* memcpy(void* dest, const void* src, unsigned long size);
+#include <string.h>
 
 class glRasterState
 {

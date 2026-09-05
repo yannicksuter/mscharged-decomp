@@ -1,5 +1,7 @@
 #include "Game/FE/feInput.h"
 
+#include "NL/globalpad.h"
+
 #include "NL/nlMemory.h"
 
 #include <math.h>
@@ -13,8 +15,6 @@ struct FEPadData
     /* 0x9C */ bool bIsPressed[13];
 }; // size 0xAC
 
-extern void* lbl_806E1E28;
-extern "C" cGlobalPad* fn_802C082C(void* manager, int index);
 
 FEInput* g_pFEInput = 0;
 FEPadData g_aFEPadData[4];

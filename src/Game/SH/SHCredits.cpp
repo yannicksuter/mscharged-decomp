@@ -9,6 +9,7 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/Sys/movie.h"
+#include "NL/gl/glPlat.h"
 #include "NL/nlFile.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -19,7 +20,6 @@ extern TLComponentInstance lbl_80580030;
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" void fn_80253284(bool value);
 extern "C" bool fn_80273B00();
-extern "C" int fn_803693B4();
 
 SceneList CreditScene::mNextScene = (SceneList)13;
 

@@ -1,4 +1,7 @@
+#include "NL/plat/PlatPadManager.h"
 #include "Game/HBMManager_8024795C.h"
+
+#include "unclassified/tu_80284A58.h"
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/Event.h"
@@ -16,8 +19,6 @@
 #include "NL/nlTask.h"
 
 #include <string.h>
-
-typedef float Mtx44[4][4];
 
 enum UnidentifiedHBMSelectBtnNum
 {
@@ -41,28 +42,6 @@ extern "C"
     void HBMCreateSound(const char* soundData, void* work, unsigned int size);
     void HBMDeleteSound();
     void HBMUpdateSound();
-    void GXClearVtxDesc();
-    void GXSetVtxAttrFmt(int format, int attribute, int componentCount,
-        int componentType, unsigned char fractionalBits);
-    void GXSetVtxDesc(int attribute, int type);
-    void GXSetViewport(float x, float y, float width, float height,
-        float nearZ, float farZ);
-    void GXSetScissor(unsigned int x, unsigned int y, unsigned int width,
-        unsigned int height);
-    void GXSetNumChans(unsigned char count);
-    void GXSetNumTexGens(unsigned char count);
-    void GXSetNumTevStages(unsigned char count);
-    void GXSetTevOrder(int stage, int coord, int map, int colour);
-    void GXSetTevOp(int stage, int mode);
-    void GXSetBlendMode(int mode, int source, int destination, int operation);
-    void GXSetZMode(bool enable, int function, bool updateEnable);
-    void GXSetCurrentMtx(unsigned int matrix);
-    void GXSetProjection(const Mtx44 projection, int type);
-    void GXSetChanCtrl(int channel, bool enable, int ambientSource,
-        int materialSource, unsigned int lights, int diffuse,
-        int attenuation);
-    void C_MTXOrtho(Mtx44 projection, float top, float bottom, float left,
-        float right, float nearZ, float farZ);
 }
 
 extern MemoryAllocator* AllocatorStack[16];
@@ -74,41 +53,21 @@ struct UnidentifiedHBMGameState
     bool mBlocked;
 };
 
-struct UnidentifiedHBMDisplayState
-{
-    u8 mPad00[0x0C];
-    bool mEnabled;
-};
-
-struct UnidentifiedPadUpdateState
-{
-    u8 mPad00[0x2F4];
-    int mControllerTypes[4];
-};
-
 class TU80252180Scene;
 
 extern UnidentifiedHBMGameState* lbl_806E0C94;
-extern BaseGameSceneManager* lbl_806E1838;
-extern BaseGameSceneManager* lbl_806E1860;
 extern void* lbl_806E2020;
-extern UnidentifiedPadUpdateState* lbl_806E2478;
 
 extern "C"
 {
-    UnidentifiedHBMDisplayState* fn_80271960();
     void fn_802719A0(UnidentifiedHBMDisplayState* state);
     void fn_80271A00(UnidentifiedHBMDisplayState* state);
     bool fn_80273B00();
-    void* fn_80284A58();
     bool fn_80285E20(void* presentation);
     void fn_801FC444();
     void fn_801FC454();
     void fn_8035BE04(void* audio);
     void fn_8035BE74(void* audio);
-    void* fn_80375EC8(UnidentifiedPadUpdateState* state, int index);
-    void* fn_80375ED4(UnidentifiedPadUpdateState* state, int index);
-    void* fn_80375EE0(UnidentifiedPadUpdateState* state, int index);
     TU80252180Scene* fn_80253E18();
     void fn_80253E24(TU80252180Scene* scene);
 }
@@ -286,19 +245,19 @@ void UnidentifiedHBMManager::fn_80247EB0()
     Mtx44 projection;
 
     GXClearVtxDesc();
-    GXSetVtxAttrFmt(4, 9, 0, 4, 0);
-    GXSetVtxAttrFmt(4, 11, 0, 1, 0);
-    GXSetVtxDesc(9, 1);
-    GXSetVtxDesc(11, 1);
+    GXSetVtxAttrFmt(GX_VTXFMT4, GX_VA_POS, GX_POS_XY, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT4, GX_VA_CLR0, GX_CLR_RGB, GX_RGB8, 0);
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
     GXSetViewport(0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 1.0f);
     GXSetScissor(0, 0, 640, 480);
     GXSetNumChans(1);
     GXSetNumTexGens(0);
     GXSetNumTevStages(1);
-    GXSetTevOrder(0, 255, 255, 4);
-    GXSetTevOp(0, 4);
-    GXSetBlendMode(0, 0, 0, 0);
-    GXSetZMode(true, 3, true);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_CLEAR);
+    GXSetZMode(true, GX_LEQUAL, true);
     GXSetCurrentMtx(3);
 
     if (fn_80273B00())
@@ -311,7 +270,7 @@ void UnidentifiedHBMManager::fn_80247EB0()
         C_MTXOrtho(projection, 228.0f, -228.0f, -304.0f, 304.0f,
             0.0f, 500.0f);
     }
-    GXSetProjection(projection, 1);
+    GXSetProjection(projection, GX_ORTHOGRAPHIC);
 }
 
 void UnidentifiedHBMManager::fn_80248008()
@@ -358,22 +317,22 @@ void UnidentifiedHBMManager::fn_802480EC()
 {
     for (int i = 0; i < 4; ++i)
     {
-        switch (lbl_806E2478->mControllerTypes[i])
+        switch (lbl_806E2478->type[i])
         {
         case 0:
             mControllerData.wiiCon[i].kpad = 0;
             break;
         case 1:
             mControllerData.wiiCon[i].kpad
-                = (KPADStatus*)((u8*)fn_80375EC8(lbl_806E2478, i) + 0x2C);
+                = &fn_80375EC8(lbl_806E2478, i)->kpad;
             break;
         case 2:
             mControllerData.wiiCon[i].kpad
-                = (KPADStatus*)((u8*)fn_80375ED4(lbl_806E2478, i) + 0x34);
+                = &fn_80375ED4(lbl_806E2478, i)->kpad;
             break;
         case 3:
             mControllerData.wiiCon[i].kpad
-                = (KPADStatus*)((u8*)fn_80375EE0(lbl_806E2478, i) + 0x38);
+                = &fn_80375EE0(lbl_806E2478, i)->kpad;
             break;
         }
     }
@@ -405,8 +364,8 @@ void UnidentifiedHBMManager::fn_802480EC()
             }
             fn_80271A00(fn_80271960());
             gxInit();
-            GXSetChanCtrl(4, false, 0, 1, 0xFF, 2, 1);
-            GXSetChanCtrl(5, false, 0, 1, 0xFF, 2, 1);
+            GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
+            GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
             sHBMHideEvent.UnidentifiedDeliver();
         }
         nlTaskManager::SetNextState(mPreviousTaskState);
@@ -420,8 +379,8 @@ void UnidentifiedHBMManager::fn_802480EC()
             gpHBMManager->mActive = false;
             fn_80271A00(fn_80271960());
             gxInit();
-            GXSetChanCtrl(4, false, 0, 1, 0xFF, 2, 1);
-            GXSetChanCtrl(5, false, 0, 1, 0xFF, 2, 1);
+            GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
+            GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
             sHBMHideEvent.UnidentifiedDeliver();
         }
         ResetTask::s_ResetMode = 3;
@@ -439,8 +398,8 @@ void UnidentifiedHBMManager::fn_802480EC()
             gpHBMManager->mActive = false;
             fn_80271A00(fn_80271960());
             gxInit();
-            GXSetChanCtrl(4, false, 0, 1, 0xFF, 2, 1);
-            GXSetChanCtrl(5, false, 0, 1, 0xFF, 2, 1);
+            GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
+            GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
             sHBMHideEvent.UnidentifiedDeliver();
         }
         ResetTask::s_ResetMode = 0;

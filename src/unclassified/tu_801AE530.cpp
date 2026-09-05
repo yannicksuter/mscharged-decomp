@@ -8,6 +8,7 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
@@ -21,9 +22,6 @@ extern "C"
 {
     UnidentifiedNumberModel_801AE530** fn_80276380();
     bool fn_80273B00();
-    bool fn_802CC8FC(glModelPacket* packet, unsigned long hash);
-    void fn_802CC3C8(glModelPacket* packet, unsigned long hash,
-        const void* value, unsigned long count);
 
     extern UnidentifiedEventRegistry_801AE530* lbl_806E1D90;
 

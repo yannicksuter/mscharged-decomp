@@ -546,7 +546,7 @@ void nlServiceFileSystem()
     s_pAsyncManager->Service();
 }
 
-bool nlReadAsync(nlFile* file, void* buffer, unsigned int size,
+AsyncEntry* nlReadAsync(nlFile* file, void* buffer, unsigned int size,
     ReadAsyncCallback callback, unsigned long uParam, unsigned long bufferSize)
 {
     DolphinFile* pFile = (DolphinFile*)file;
@@ -580,7 +580,7 @@ bool nlReadAsync(nlFile* file, void* buffer, unsigned int size,
     }
 
     pFile->m_Position += size;
-    return firstEntry != 0;
+    return firstEntry;
 }
 
 void nlSeek(nlFile* file, unsigned int offset, unsigned long origin)

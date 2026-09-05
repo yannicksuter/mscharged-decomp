@@ -1,5 +1,6 @@
 #include "Game/Drawable/DrawableBall.h"
 
+#include "Game/Ball.h"
 #include "Game/BallTrail.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/Drawable/DrawableCharacter.h"
@@ -33,24 +34,6 @@ struct CharacterState
     int type;
 };
 
-struct BallObject
-{
-    u8 visible;
-    char _001[0x53];
-    nlVector3 position;
-    char _060[0x0C];
-    nlVector3 velocity;
-    char _078[0x0C];
-    nlQuaternion orientation;
-    char _094[0x34];
-    void* owner;
-    void* previousOwner;
-    void* lastTouch;
-    void* passTarget;
-    char _0D8[0x0C];
-    RenderObject* drawable;
-};
-
 struct TaskManager
 {
     char _000[8];
@@ -63,12 +46,8 @@ struct BallScaleData
     float scale;
 };
 
-extern BallObject* g_pBall;
 extern TaskManager* m_pInstance__13nlTaskManager;
-extern "C" float fn_800155A0(BallObject*, int);
-extern "C" LiveBallTrail* fn_8001B284(u32);
-extern "C" u32 fn_8001B30C();
-extern "C" BallScaleData* fn_80284A58(u32);
+BallScaleData* fn_80284A58();
 
 static float g_fBallTrailScale = 2.25f;
 
@@ -92,21 +71,21 @@ DrawableBall::DrawableBall(RenderSnapshot* renderSnapshot)
 
 void DrawableBall::Grab()
 {
-    mOrientation = g_pBall->orientation;
-    mPosition = g_pBall->position;
-    mVelocity = g_pBall->velocity;
+    mOrientation = g_pBall->m_qOrientation;
+    mPosition = g_pBall->m_v3Position;
+    mVelocity = g_pBall->m_v3Velocity;
     mScale = fn_800155A0(g_pBall, 0);
 
     mFlags.bits.ownerIndex
-        = GetCharacterIndex((cCharacter*)g_pBall->owner);
+        = GetCharacterIndex((cCharacter*)g_pBall->m_pOwner);
     mFlags.bits.previousOwnerIndex
-        = GetCharacterIndex((cCharacter*)g_pBall->previousOwner);
+        = GetCharacterIndex((cCharacter*)g_pBall->m_pPrevOwner);
     mFlags.bits.passTargetIndex
-        = GetCharacterIndex((cCharacter*)g_pBall->passTarget);
+        = GetCharacterIndex((cCharacter*)g_pBall->m_pPassTarget);
     mFlags.bits.lastTouchIndex
-        = GetCharacterIndex((cCharacter*)g_pBall->lastTouch);
-    BallObject* ball = g_pBall;
-    mFlags.bits.visible = ball->visible;
+        = GetCharacterIndex((cCharacter*)g_pBall->m_pLastTouch);
+    cBall* ball = g_pBall;
+    mFlags.bits.visible = ball->m_bVisible;
     mFlags.bits.transient = 0;
 
     mTrailCount = fn_8001B30C();
@@ -121,7 +100,7 @@ void DrawableBall::Grab()
 
 void DrawableBall::Render() const
 {
-    RenderObject* drawable = g_pBall->drawable;
+    RenderObject* drawable = g_pBall->m_pDrawableBall;
     if (mFlags.bits.visible)
     {
         drawable->m_uObjectFlags |= 1;
@@ -140,7 +119,7 @@ void DrawableBall::Render() const
 
         if ((m_pInstance__13nlTaskManager->flags & 0x20018) == 0)
         {
-            if (g_pBall->owner == 0)
+            if (g_pBall->m_pOwner == 0)
             {
                 drawable->modelScale = 1.5f;
             }
@@ -253,7 +232,7 @@ void DrawableBall::EvaluateFrom(DrawableCharacter& character)
 {
     mPosition = character.GetBallPosition();
     mOrientation = character.GetBallOrientation();
-    mScale = fn_80284A58(mOrientation.as_u32[2])->scale;
+    mScale = fn_80284A58()->scale;
 }
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

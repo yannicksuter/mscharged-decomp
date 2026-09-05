@@ -119,7 +119,7 @@ void DesireUserControlled::UnidentifiedUpdate(
                 return;
             }
 
-            mUnidentifiedFielder->mActionShotVars.bIsChipShot
+            mUnidentifiedFielder->bIsModified
                 = fn_80035F34(mUnidentifiedFielder);
             u8 bIsShotActive = true;
             ShotMeter* pShotMeter = mUnidentifiedFielder->m_pShotMeter;
@@ -135,7 +135,7 @@ void DesireUserControlled::UnidentifiedUpdate(
                         mUnidentifiedFielder->GetGlobalPad(), 0x1C, true))
                 {
                     mUnidentifiedFielder->fn_8004B86C(
-                        mUnidentifiedFielder->mActionShotVars.bIsChipShot,
+                        mUnidentifiedFielder->bIsModified,
                         false);
                 }
                 return;
@@ -146,7 +146,7 @@ void DesireUserControlled::UnidentifiedUpdate(
                     == SHOT_METER_STS_RELEASED)
             {
                 mUnidentifiedFielder->fn_8004B86C(
-                    mUnidentifiedFielder->mActionShotVars.bIsChipShot,
+                    mUnidentifiedFielder->bIsModified,
                     false);
                 return;
             }

@@ -3,6 +3,7 @@
 #include "Game/PadMonkey.h"
 #include "NL/globalpad.h"
 #include "NL/platpad.h"
+#include "NL/plat/tu_80364118.h"
 #include "unclassified/tu_80336B2C.h"
 
 extern int* lbl_806E2278;
@@ -14,8 +15,6 @@ extern int lbl_806E22AC;
 
 extern "C" int fn_802C03FC(int button);
 extern "C" int fn_802C06C8(int buttonIndex);
-extern "C" int fn_80364298(int button);
-extern "C" int fn_803643A8(int buttonIndex);
 
 u8 DetInput::fn_80331BE4()
 {

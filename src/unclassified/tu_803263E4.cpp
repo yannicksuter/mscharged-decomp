@@ -3,7 +3,8 @@
 
 SlotPool<UnidentifiedTransportPacket_803263E4> lbl_805847F0(400, 0);
 
-extern "C" void* fn_803263E4(unsigned long, unsigned int, bool)
+void* UnidentifiedTransportPacket_803263E4::operator new(
+    unsigned long, unsigned int, bool)
 {
     return lbl_805847F0.Allocate();
 }

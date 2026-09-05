@@ -1,5 +1,6 @@
 #include "NL/gl/glModel.h"
 
+#include "NL/gl/gl.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glMemory.h"
 
@@ -10,13 +11,6 @@ struct glModelPacketDataInfo
     /* 0x00 */ u8 unknown00[8];
     /* 0x08 */ u32 size;
 }; // size: 0xC
-
-extern "C"
-{
-    void fn_802C8284(unsigned long value);
-    void fn_802C8288();
-    void fn_8036E4C0(glModelPacket* packet, void* allocator);
-}
 
 void glModelSetMatrix(glModel* model, const nlMatrix4& value)
 {

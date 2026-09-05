@@ -69,6 +69,9 @@ struct tCharacterTemplateInfo
 extern "C" SebringAnimTagScriptInterpreter* fn_80025E9C();
 extern "C" tGoalieTemplateInfo* fn_80025F48(int goalieIdx);
 extern "C" tCharacterTemplateInfo* fn_8002600C(eCharacterClass cc);
+extern "C" tCharacterTemplate* fn_80025F5C(int nIndex, bool* pbCreated);
+cAnimInventory* FindDuplicateAnimInventory(int nCurIndex, unsigned long uHashID);
+unsigned long GetHashFromTextureFile(const char* szTextureFileName);
 void DestroyCharacters();
 int GetCharacterIndex(const cCharacter* character);
 

@@ -1,4 +1,5 @@
 #include "Game/AI/FuzzyAIRuntime.h"
+#include "Game/AI/FielderInput.h"
 
 #include "Game/AI/Desire.h"
 #include "Game/AI/UnidentifiedStringHash.h"
@@ -110,8 +111,7 @@ UnidentifiedFuzzyRuntimeBase::UnidentifiedFuzzyRuntimeBase(
 
     if (mValue != 0)
     {
-        mValue->mUnidentified14 =
-            (UnidentifiedFielderInputOwner*)this;
+        mValue->mUnidentified14 = this;
     }
 
     if (lbl_806E20A0 != 0)
@@ -219,18 +219,17 @@ extern "C" void fn_80311C54(
 
 extern "C" bool fn_80311C5C()
 {
-    if (lbl_806E20A0 == 0)
+    if (lbl_806E20A0 != 0)
     {
-        return false;
+        UnidentifiedFuzzyRuntimeBase* runtime = lbl_806E20A8.mHead;
+        while (runtime != 0)
+        {
+            runtime->LoadByteCode(lbl_806E20A0);
+            runtime = runtime->next;
+        }
+        return true;
     }
-
-    UnidentifiedFuzzyRuntimeBase* runtime = lbl_806E20A8.mHead;
-    while (runtime != 0)
-    {
-        runtime->LoadByteCode(lbl_806E20A0);
-        runtime = runtime->next;
-    }
-    return true;
+    return false;
 }
 
 void UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual15()
@@ -363,27 +362,27 @@ extern "C" UnidentifiedVariant_80054AB8* fn_8031243C(
     UnidentifiedFuzzyRuntimeBase* runtime, u32 hash,
     UnidentifiedFuzzyRuntimeValue* action)
 {
-    if (!runtime->mValue->IsPointerType())
+    if (runtime->mValue->IsPointerType())
     {
-        return 0;
-    }
+        runtime->mUnidentified064 = action;
+        void* value = runtime->mValue->mData.pointer;
+        u32 localHash = hash;
+        FunctionEntryPoint* function = fn_802DF3E4(runtime, &localHash);
+        runtime->mUnidentified060 = true;
+        runtime->UnidentifiedVirtual2(
+            function, 1, (u32)value, 0, 0, 0);
 
-    runtime->mUnidentified064 = action;
-    void* value = runtime->mValue->mData.pointer;
-    FunctionEntryPoint* function = fn_802DF3E4(runtime, &hash);
-    runtime->mUnidentified060 = true;
-    runtime->UnidentifiedVirtual2(
-        function, 1, (u32)value, 0, 0, 0);
-
-    UnidentifiedVariant_80054AB8* result =
-        *(UnidentifiedVariant_80054AB8**)runtime->m_SP;
-    if (result != 0)
-    {
-        result->mTemporary = true;
+        UnidentifiedVariant_80054AB8* result =
+            *(UnidentifiedVariant_80054AB8**)runtime->m_SP;
+        if (result != 0)
+        {
+            result->mTemporary = true;
+        }
+        runtime->mUnidentified060 = false;
+        runtime->mUnidentified064 = 0;
+        return result;
     }
-    runtime->mUnidentified060 = false;
-    runtime->mUnidentified064 = 0;
-    return result;
+    return 0;
 }
 
 float UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual3(

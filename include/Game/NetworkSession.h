@@ -96,6 +96,8 @@ public:
 
 // Interface presented by the reliable connection manager embedded in the
 // direct socket layer.
+class UnidentifiedTransportConnection;
+
 class UnidentifiedReliableSocketCallback
 {
 public:
@@ -103,9 +105,11 @@ public:
     virtual void OnConnectionClosed(u32 connection, int reason) = 0;
     virtual void ReliableCallbackVirtual08() = 0;
     virtual void ReliableCallbackVirtual0C(
-        int source, void* buffer, int size, bool reliable) = 0;
-    virtual void ReliableCallbackVirtual10() = 0;
-    virtual void ReliableCallbackVirtual14(u32 connection, u8* address) = 0;
+        u32 connection, void* buffer, int size, bool reliable) = 0;
+    virtual void ReliableCallbackVirtual10(
+        u32 connection, void* buffer, int size) = 0;
+    virtual void ReliableCallbackVirtual14(
+        u32 connection, u8* address, int a, int b, int c) = 0;
     virtual int SendDatagram(
         void* buffer, int size, const u8* address, u16 port) = 0;
 };
@@ -124,7 +128,8 @@ public:
     virtual bool Connect(void* connection, const u8* address, u16 port) = 0;
     virtual void AcceptConnection(u32 connection) = 0;
     virtual void RejectConnection(u32 connection) = 0;
-    virtual void SocketVirtual24(void* a, void* b) = 0;
+    virtual void SocketVirtual24(
+        UnidentifiedTransportConnection* connection, bool immediate) = 0;
     virtual void* FindConnection(const u8* address) = 0;
     virtual void Send(int aid, void* buffer, int size, bool reliable) = 0;
     virtual void Receive(void* buffer, int size) = 0;
@@ -237,7 +242,8 @@ public:
     virtual bool Connect(void* connection, const u8* address, u16 port);
     virtual void AcceptConnection(u32 connection);
     virtual void RejectConnection(u32 connection);
-    virtual void SocketVirtual24(void* a, void* b);
+    virtual void SocketVirtual24(
+        UnidentifiedTransportConnection* connection, bool immediate);
     virtual void* FindConnection(const u8* address);
     virtual void Send(int aid, void* buffer, int size, bool reliable);
     virtual void Receive(void* buffer, int size);
@@ -252,9 +258,11 @@ public:
     virtual void OnConnectionClosed(u32 connection, int reason);
     virtual void ReliableCallbackVirtual08();
     virtual void ReliableCallbackVirtual0C(
-        int source, void* buffer, int size, bool reliable);
-    virtual void ReliableCallbackVirtual10();
-    virtual void ReliableCallbackVirtual14(u32 connection, u8* address);
+        u32 connection, void* buffer, int size, bool reliable);
+    virtual void ReliableCallbackVirtual10(
+        u32 connection, void* buffer, int size);
+    virtual void ReliableCallbackVirtual14(
+        u32 connection, u8* address, int a, int b, int c);
     virtual int SendDatagram(
         void* buffer, int size, const u8* address, u16 port);
 
@@ -540,5 +548,8 @@ extern "C" UnidentifiedNetworkPeer* fn_80338C0C(
 extern "C" s8 fn_80338C20(UnidentifiedNetworkSessionData* session);
 extern "C" void fn_80338C2C(UnidentifiedNetworkSessionData* session,
     int machineCount, int playerCount);
+
+
+void fn_8032C7D0();
 
 #endif // GAME_NETWORK_SESSION_H

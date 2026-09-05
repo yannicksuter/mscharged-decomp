@@ -180,7 +180,7 @@ extern "C" void fn_801AD4E4(
     }
 }
 
-extern "C" void fn_801AD7E4(
+void fn_801AD7E4(
     UnidentifiedPeachPhotoState* photo, float dt, int)
 {
     if (photo->state == 1)

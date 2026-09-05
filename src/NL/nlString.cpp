@@ -1,8 +1,8 @@
+#include <revolution/os/OSCache.h>
+
 #include "NL/nlString.h"
 
 #include <mem.h>
-
-extern "C" void DCZeroRange(void* address, u32 length);
 
 u32 nlStringHash(const char* str)
 {

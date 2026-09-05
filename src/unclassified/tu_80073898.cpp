@@ -86,7 +86,7 @@ extern "C" void fn_800739F0(
     entry->mState = 1;
 }
 
-extern "C" void fn_80073A48(UnidentifiedTweakLoadState* state,
+void fn_80073A48(UnidentifiedTweakLoadState* state,
     const char* fileName, const char* category)
 {
     UnidentifiedTweakLoadEntry_8056BA04* entry =

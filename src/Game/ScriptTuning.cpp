@@ -1,10 +1,8 @@
 #include "Game/ScriptTuning.h"
 
+#include "Game/tu_802C6224.h"
 #include "types.h"
-
-extern "C" void fn_80073A48(void*, const char*, const char*);
-extern "C" void fn_802C6CAC(const char*, const char*, bool);
-extern "C" u8 lbl_8056BA00[];
+#include "unclassified/tu_80073898.h"
 
 FuzzyTweaks::FuzzyTweaks(const char* name, const char* category)
     : TweaksBase(name)
@@ -22,7 +20,7 @@ void FuzzyTweaks::fn_800E1C98(bool registerTweaks)
 {
     if (registerTweaks)
     {
-        fn_80073A48(lbl_8056BA00, mszFileName, mUnidentified7B4);
+        fn_80073A48(&lbl_8056BA00, mszFileName, mUnidentified7B4);
     }
     else
     {

@@ -3,6 +3,7 @@
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EffectsGroup.h"
 #include "Game/TweakValue.h"
+#include "NL/gl/glMemory.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -21,7 +22,6 @@ extern void* lbl_806E1FF4;
 extern void* lbl_806E1FF8;
 extern void* lbl_806E1FFC;
 
-extern "C" void* fn_802CC094();
 extern "C" void fn_802E6444(
     void* data, unsigned long size, void* userData);
 extern "C" bool fn_802CDD78(

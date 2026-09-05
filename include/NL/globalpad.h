@@ -45,4 +45,11 @@ public:
     /* 0x1C */ PadBackend* mBackend;
 }; // size: 0x20
 
+
+extern void* lbl_806E1E28;
+
+cGlobalPad* fn_802C082C(void* manager, int index);
+void fn_802C084C(void* manager, int padSet);
+void fn_802C07AC(void* manager, float fDeltaT);
+
 #endif // NL_GLOBALPAD_H

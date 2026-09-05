@@ -2,6 +2,7 @@
 
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/TweakRegistry.h"
+#include "Game/tu_802C6224.h"
 #include "NL/gl/glMemory.h"
 #include "NL/nlList.h"
 #include "NL/nlMemory.h"
@@ -29,7 +30,6 @@ public:
 
 extern "C"
 {
-    void fn_802C6CAC(const char* fileName, const char* category, bool reload);
     bool lbl_806E1F90;
     WorldNPCManager_802DD4F0* gpWorldNPCManager;
 }
@@ -440,15 +440,17 @@ void WorldNPCManager_802DD4F0::Render(GLView* view)
         return;
     }
 
-    for (ListEntry<ImpostorModel_802DAEE0*>* entry = mWorldNPCs.m_Head;
-        entry != 0; entry = entry->next)
+    ListEntry<ImpostorModel_802DAEE0*>* entry = mWorldNPCs.m_Head;
+    while (entry != 0)
     {
         ImpostorModel_802DAEE0* model = entry->entry;
         if (mRenderFilter != 0 && !mRenderFilter(model))
         {
+            entry = entry->next;
             continue;
         }
         model->UnidentifiedVirtual0C(view, 0);
+        entry = entry->next;
     }
 }
 

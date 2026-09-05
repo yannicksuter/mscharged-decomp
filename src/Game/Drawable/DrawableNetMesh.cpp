@@ -7,10 +7,14 @@
 #include "Game/Task/GameRenderTask.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMatrix.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
+#include "NL/nlDebug.h"
 #include "NL/nlMemory.h"
 #include "NL/nlMath.h"
+
+#include <string.h>
 
 struct StreamDefinition
 {
@@ -161,13 +165,6 @@ template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
 
 extern const StreamDefinition lbl_804DCCE0;
 
-extern "C" void __dla__FPv(void*);
-extern "C" void fn_802CC02C(MeshResource*);
-extern "C" void nlBreak__Fv();
-extern "C" void* memcpy(void*, const void*, u32);
-extern "C" MeshResource* fn_802CBFD8(const StreamDefinition*, int, const char*);
-extern "C" void* memset(void*, int, u32);
-
 static inline u8 KeepPacketFlagBit1(u8 value)
 {
     return value & 2;
@@ -315,7 +312,7 @@ void DrawableNetMesh::Render() const
                 if (lbl_80570948[index][lbl_806E1370[index]]->first
                     || lbl_80570948[index][lbl_806E1370[index]]->second)
                 {
-                    nlBreak__Fv();
+                    nlBreak();
                 }
             }
         }
@@ -400,7 +397,8 @@ void DrawableNetMesh::Initialize(int numVertices, int numTriIndices)
 
         for (int i = 0; i < 2; ++i)
         {
-            lbl_80570938[mNetIndex][i] = fn_802CBFD8(&streams, 2, lbl_806DCB40);
+            lbl_80570938[mNetIndex][i] =
+                (MeshResource*)fn_802CBFD8(&streams, 2, lbl_806DCB40);
             lbl_80570948[mNetIndex][i] = lbl_80570938[mNetIndex][i]->Acquire();
         }
     }
@@ -410,19 +408,20 @@ void DrawableNetMesh::Destroy()
 {
     if (mInitialized)
     {
-        __dla__FPv(mPositions);
+        operator delete[](mPositions);
     }
 
     if (lbl_806E1350[mNetIndex])
     {
-        __dla__FPv(lbl_806E1338[mNetIndex]);
-        __dla__FPv(lbl_806E1348[mNetIndex]);
-        __dla__FPv(lbl_806E1340[mNetIndex]);
+        operator delete[](lbl_806E1338[mNetIndex]);
+        operator delete[](lbl_806E1348[mNetIndex]);
+        operator delete[](lbl_806E1340[mNetIndex]);
         lbl_806E1350[mNetIndex] = false;
 
         for (int i = 0; i < 2; ++i)
         {
-            fn_802CC02C(lbl_80570938[mNetIndex][i]);
+            fn_802CC02C(
+                (ResourceInterface_802CC094*)lbl_80570938[mNetIndex][i]);
             lbl_80570938[mNetIndex][i] = 0;
         }
 

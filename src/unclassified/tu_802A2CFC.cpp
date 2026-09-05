@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlColour.h"
 
@@ -17,7 +18,6 @@ extern "C" void fn_802A5ED8(void*, const glModelPacket*);
 extern "C" void fn_802A5F30(void*, const glModelPacket*);
 extern "C" void fn_802A611C(void*, const glModelPacket*);
 extern "C" void fn_802A6190(void*, const glModelPacket*);
-extern "C" void fn_802CC978(void*, const glModelPacket*, u32);
 extern "C" void fn_8036A800(int, void*, void*);
 extern "C" void fn_8036A938(void*);
 

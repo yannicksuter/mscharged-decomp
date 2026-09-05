@@ -8,7 +8,7 @@
 class DebugWriteCache;
 class PhysicsPatch;
 class cPlayer;
-class unk_8000CD44;
+class UnidentifiedAvoidanceObject;
 
 struct UnidentifiedPhysicsPatchInfo_80510BF0
 {
@@ -57,7 +57,7 @@ public:
 
     /* 0x38 */ Function<PhysicsPatch*> mUnidentified38;
     /* 0x40 */ nlVector3* mUnidentified40;
-    /* 0x44 */ unk_8000CD44* mUnidentified44;
+    /* 0x44 */ UnidentifiedAvoidanceObject* mUnidentified44;
     /* 0x48 */ int m_Type;
     /* 0x4C */ cPlayer* m_pOwner;
     /* 0x50 */ float m_fStartRadius;

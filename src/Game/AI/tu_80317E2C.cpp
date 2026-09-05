@@ -1,4 +1,5 @@
 #include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/FielderInput.h"
 
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/FuzzyAIRuntime.h"
@@ -169,11 +170,14 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual2()
     nlSNPrintf(functionName, 63, lbl_806DF5B8, mUnidentified078);
     u32 hash = nlStringHash(functionName);
     runtime = fn_80311744(this);
-    if (fn_802DF3E4(runtime, &hash) != 0)
+    u32 localHash = hash;
+    bool hasFunction = fn_802DF3E4(runtime, &localHash) != 0;
+    if (hasFunction)
     {
         runtime = fn_80311744(this);
+        u32 callHash = hash;
         runtime->UnidentifiedVirtual2(
-            fn_802DF3E4(runtime, &hash), 1, (u32)this, 0, 0, 0);
+            fn_802DF3E4(runtime, &callHash), 1, (u32)this, 0, 0, 0);
     }
 }
 
@@ -479,8 +483,11 @@ extern "C" shdStateMachine* fn_80319E84(
     UnidentifiedScriptMachine* machine, int state,
     UnidentifiedVariantCollection* parameters, bool reinitialize)
 {
-    if ((u32)state == 0xA5A5A5A5 || state < 0
-        || state >= machine->mUnidentified074)
+    if ((u32)state == 0xA5A5A5A5)
+    {
+        return 0;
+    }
+    if (state < 0 || state >= machine->mUnidentified074)
     {
         return 0;
     }
@@ -499,17 +506,24 @@ extern "C" shdStateMachine* fn_80319E84(
     bool active;
     if (value->UnidentifiedIsActive())
     {
-        if (!reinitialize)
+        if (reinitialize)
+        {
+            active = fn_803169DC(value, parameters, true);
+        }
+        else
         {
             return value;
         }
-        active = fn_803169DC(value, parameters, true);
     }
     else
     {
         active = fn_80316A84(value, parameters, true);
     }
-    return active ? value : 0;
+    if (!active)
+    {
+        value = 0;
+    }
+    return value;
 }
 
 extern "C" shdStateMachine* fn_80319F94(

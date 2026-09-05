@@ -6,7 +6,7 @@
 typedef void* (*SlotPoolAllocatorFunc)(unsigned long size);
 typedef void (*SlotPoolFreeFunc)(void* data);
 
-extern "C" void fn_802B467C(void* pool);
+void fn_802B467C(void* pool);
 
 struct SlotPoolBlock;
 struct SlotPoolEntry;
@@ -145,7 +145,7 @@ public:
     {
         this->m_Delta = delta;
         this->m_Initial = initial;
-        if (this->m_Initial == 0)
+        if (this->m_Delta == 0)
         {
             SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
         }

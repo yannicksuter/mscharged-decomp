@@ -18,7 +18,6 @@
 
 extern "C"
 {
-    int fn_8004F594(int channel, const char* format, ...);
 
     void fn_80374D68(NetworkStatsSocket* socket);
     bool fn_80374D74(NetworkStatsSocket* socket, bool stream);

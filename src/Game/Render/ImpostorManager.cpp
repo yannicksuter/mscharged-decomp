@@ -3,16 +3,12 @@
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorCharacter.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/tu_802C6224.h"
+#include "NL/gl/glMemory.h"
 #include "NL/glx/GXMaterialCrystalTweaks.h"
 #include "NL/glx/GXMaterialShadowTweaks.h"
 #include "NL/gl/glState.h"
 #include "NL/nlDebug.h"
-
-extern "C" UnidentifiedView_802CBEC4* fn_802CBFD8(
-    const void* config, int layer, const char* name);
-extern "C" void fn_802CC02C(UnidentifiedView_802CBEC4* view);
-extern "C" void fn_802C6CAC(const char* fileName, const char* category,
-    bool unidentified);
 
 u8 lbl_806E1F60;
 u8 lbl_806E1F61;
@@ -85,11 +81,13 @@ void ImpostorManager::Initialize(void* registry, int capacity,
     {
         if (config == 0)
         {
-            mViews[i] = fn_802CBFD8(&sImpostorViewConfig, 2, "Impostors");
+            mViews[i] = (UnidentifiedView_802CBEC4*)fn_802CBFD8(
+                &sImpostorViewConfig, 2, "Impostors");
         }
         else
         {
-            mViews[i] = fn_802CBFD8(config, layer, "Impostors");
+            mViews[i] = (UnidentifiedView_802CBEC4*)fn_802CBFD8(
+                config, layer, "Impostors");
         }
         mCameras[i] = mViews[i]->UnidentifiedVirtual0C();
     }
@@ -186,8 +184,8 @@ void ImpostorManager::Uninitialize()
         &mCharacters.m_Allocator;
     pool->FreeBlocks();
 
-    fn_802CC02C(mViews[0]);
-    fn_802CC02C(mViews[1]);
+    fn_802CC02C((ResourceInterface_802CC094*)mViews[0]);
+    fn_802CC02C((ResourceInterface_802CC094*)mViews[1]);
     mInitialized = false;
 }
 

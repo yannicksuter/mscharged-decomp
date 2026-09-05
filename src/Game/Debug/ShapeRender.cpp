@@ -4,6 +4,7 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
+#include "NL/gl/gl.h"
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"
@@ -16,8 +17,6 @@ const u32 WhiteTexture = glGetTexture("global/white");
 extern "C" void fn_802BC83C(const ShapeRender*, const PrimitiveShape&,
     const nlMatrix4&, bool, const nlColour&);
 extern "C" void fn_802BD2C8(PrimitiveShape*, int, void*);
-extern "C" void fn_802C8280(const char* name);
-extern "C" void fn_802C8288();
 
 void ShapeRender::CreateBoxGeometry(PrimitiveShape& prim)
 {

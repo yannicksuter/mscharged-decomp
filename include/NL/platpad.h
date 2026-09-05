@@ -2,6 +2,7 @@
 #define NL_PLATPAD_H
 
 #include "NL/nlMath.h"
+#include "NL/nlArrayAllocator.h"
 #include "types.h"
 
 class PadBackend
@@ -40,7 +41,9 @@ public:
 }; // size 0x1C
 
 class cPlatPad;
-extern cPlatPad* lbl_806E2260;
+extern nlArrayAllocator<cPlatPad> lbl_806E2260;
+
+extern "C" bool fn_80365E84(PadBackend* pad);
 
 class cPlatPad : public PadBackend
 {
@@ -65,20 +68,19 @@ public:
     virtual float AnalogRightX();
     virtual float AnalogRightY();
     virtual bool RumbleActive();
-    virtual void StartRumble(float duration, float intensity, float frequency);
+    virtual void StartRumble(float fDuration, float fIntensity, float fFrequency);
     virtual void StopRumble();
     virtual void Update(float dt);
     virtual int UnidentifiedClassID();
 
     static void* operator new(unsigned long)
     {
-        cPlatPad* pad = lbl_806E2260;
-        if (pad == 0)
-        {
-            return 0;
-        }
-        lbl_806E2260 = *(cPlatPad**)pad;
-        return pad;
+        return lbl_806E2260.Allocate();
+    }
+
+    static void operator delete(void* ptr)
+    {
+        lbl_806E2260.DeleteEntry(static_cast<cPlatPad*>(ptr));
     }
 }; // size 0x1C
 

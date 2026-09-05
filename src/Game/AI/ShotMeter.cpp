@@ -10,7 +10,6 @@
 #include "NL/nlMath.h"
 
 extern "C" void fn_800154FC(cBall*, float);
-extern "C" float fn_800155A0(cBall*, int);
 extern "C" float fn_800156A8(cBall*);
 extern "C" float fn_8002BE18(PlayerTweaks*);
 extern "C" float fn_8002C7A8(PlayerTweaks*);
@@ -68,7 +67,7 @@ void ShotMeter::ShotReleased(cFielder* pFielder)
         m_fSTSValue = fn_800156A8(g_pBall);
     }
     m_fScoreValue = fn_800A0508(pFielder,
-        pFielder->mActionShotVars.bIsChipShot,
+        pFielder->bIsModified,
         false);
     CalcShotAim(pFielder);
 }
@@ -235,7 +234,7 @@ void ShotMeter::CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass)
         1.0f,
         fCombinedValue);
     m_fScoreValue = fn_800A0508(pFielder,
-        pFielder->mActionShotVars.bIsChipShot,
+        pFielder->bIsModified,
         bWasPerfectPass);
     CalcShotAim(pFielder);
 }

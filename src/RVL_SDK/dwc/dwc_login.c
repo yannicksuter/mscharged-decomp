@@ -85,21 +85,20 @@ void* fn_8048C530(void)
 
 void fn_8048C54C(int arg0, int arg1)
 {
+    if (sLoginControl == NULL || arg0 == 0)
+    {
+        return;
+    }
+
+    DWCi_SetError(arg0, arg1);
+    if (sLoginControl->_14 != NULL)
+    {
+        sLoginControl->_14(arg0, 0, sLoginControl->_18);
+    }
     if (sLoginControl != NULL)
     {
-        if (arg0 != 0)
-        {
-            DWCi_SetError(arg0, arg1);
-            if (sLoginControl->_14 != NULL)
-            {
-                sLoginControl->_14(arg0, 0, sLoginControl->_18);
-            }
-            if (sLoginControl != NULL)
-            {
-                sLoginControl->_04 = 0;
-                sLoginControl->_30 = 0;
-            }
-        }
+        sLoginControl->_04 = 0;
+        sLoginControl->_30 = 0;
     }
 }
 

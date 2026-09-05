@@ -63,7 +63,7 @@ extern "C" void fn_8019A248(
         state->position, PhysicsObject::WORLD_COORDINATES);
 }
 
-extern "C" float fn_8019A574(const State_80199E84* state)
+float fn_8019A574(const State_80199E84* state)
 {
     return state->unknown_20 / lbl_806DCD7C;
 }

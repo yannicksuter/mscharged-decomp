@@ -75,6 +75,9 @@ struct LooseBallContactAnimInfo
 }; // total size: 0xC
 
 class cFielder;
+class cSHierarchy;
+class AnimRetargetList;
+class CharacterPhysicsData;
 class WaluigiWallManager_80178400;
 void fn_80048870(cFielder* pFielder);
 const LooseBallContactAnimInfo* GetOneTimerIdleGroundContactAnims();
@@ -106,6 +109,40 @@ struct UnidentifiedFielderPair374
     /* 0x4 */ float mUnidentified04;
 }; // total size: 0x8
 
+struct UnidentifiedFielderAction364
+{
+    UnidentifiedFielderAction364()
+        : passTarget(0)
+    {
+    }
+
+    cFielder* passTarget;
+};
+
+struct UnidentifiedFielderAction384
+{
+    UnidentifiedFielderAction384()
+    {
+        bWaitForAnimToFinish = false;
+        bCuePitch = false;
+    }
+
+    bool bCuePitch;
+    bool bWaitForAnimToFinish;
+};
+
+struct UnidentifiedFielderAction410
+{
+    UnidentifiedFielderAction410()
+    {
+        nlVec3Set(mUnidentified00, 0.0f, 0.0f, 0.0f);
+        mUnidentified0C = false;
+    }
+
+    nlVector3 mUnidentified00;
+    bool mUnidentified0C;
+};
+
 class FuzzyVariant;
 class DesireSteering;
 class DesireUserControlled;
@@ -114,16 +151,8 @@ extern "C" void fn_800C5DBC(DesireSteering*, float);
 extern "C" void fn_800C6FDC(DesireSteering*, float);
 class PhysicsObject;
 class ShotMeter;
-struct UnidentifiedFielderInput;
-
-struct UnidentifiedFielderSkillshot
-{
-    /* 0x00 */ u8 mUnidentified00[0x10];
-    /* 0x10 */ nlVector3 mUnidentified10;
-    /* 0x1C */ nlVector3 mUnidentified1C;
-    /* 0x28 */ u8 mUnidentified28[0x10];
-    /* 0x38 */ bool mUnidentified38;
-};
+class UnidentifiedFielderInput;
+struct BulletBillObject;
 
 class cFielder : public cPlayer
 {
@@ -133,10 +162,23 @@ class cFielder : public cPlayer
     friend class DesireUserControlled;
 
 public:
+    cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
+        const int* nModelID, cSHierarchy* pHierarchy,
+        cAnimInventory* pAnimInventory,
+        const CharacterPhysicsData* pCharacterPhysicsData, PlayerTweaks* pCharTweaks,
+        PlayerTweaks* pUnidentifiedTweaks,
+        AnimRetargetList* pAnimRetargetList, int nIndex);
     virtual ~cFielder();
     virtual void PrePhysicsUpdate();
     virtual void PreUpdate(float fTime);
     virtual void UnidentifiedVirtual1C();
+    virtual void ResetEffects();
+    virtual void Unknown8(unsigned short aParam, bool bParam);
+    virtual void SetPosition(const nlVector3& position);
+    virtual void Update(float fDeltaT);
+    virtual void Unknown10();
+    virtual void Unknown11(void* pParam, void* pParam2);
+    virtual void Unknown12(RunningChecksum* pChecksum);
     virtual bool CanPickupBall(cBall* pBall, bool bParam);
     virtual void CollideWithCharacterCallback(
         CollisionPlayerPlayerData* pData);
@@ -150,9 +192,10 @@ public:
         const CollisionPlayerWallData* eventData);
     bool CanDoCaptainShootToScore();
     bool CanReceivePass();
-    cFielder* GetMark() const { return mUnidentified464[0]; }
-    cFielder* GetMark(int index) const { return mUnidentified464[index]; }
-    void fn_8002FDC4(unsigned short aParam, bool bParam);
+    bool fn_8003E8F4() const;
+    bool fn_8003EA6C() const;
+    cFielder* GetMark() const { return m_pMark[0]; }
+    cFielder* GetMark(int index) const { return m_pMark[index]; }
     void fn_8003057C(void* pParam);
     void fn_800305DC(float fParam);
     void fn_8003063C(PlayerTweaks* pParam);
@@ -162,6 +205,13 @@ public:
     void DoResetShotMeter(float fTime);
     bool IsActionDone() const;
     bool IsFallenDown() const;
+    const LooseBallContactAnimInfo* fn_80038230(
+        const LooseBallContactAnimInfo* pBallContactAnimInfo,
+        int nNumContactAnims, unsigned short aFutureFacingDirection,
+        const nlVector3& v3FuturePosition, const nlVector3& v3OneTimerTarget,
+        float fAngle);
+    bool IsHitting() const;
+    bool fn_80038918() const;
     eFielderDesireState fn_8002E060();
     bool fn_8003E6FC() const;
     bool fn_800470B4(cFielder* pFielder, cPlayer* pAttacker);
@@ -314,26 +364,20 @@ public:
     /* 0x350 */ nlVector3 mUnidentified350;
 
 private:
-    /* 0x35C */ u8 mUnknown35C[0x04];
+    /* 0x35C */ float mUnidentified35C;
 
 public:
     /* 0x360 */ bool mUnidentified360;
 
 public:
-    struct
-    {
-        /* 0x00 */ bool bIsShootToScore;
-        /* 0x01 */ bool bIsChipShot;
-    } mActionShotVars; // offset 0x361, size 0x2
+    /* 0x361 */ bool bYoshiInWindup;
+    /* 0x362 */ bool bIsModified;
 
 private:
     /* 0x363 */ u8 mUnknown363[0x01];
 
 public:
-    struct
-    {
-        /* 0x00 */ cFielder* passTarget;
-    } mActionLooseBallPassVars; // offset 0x364, size 0x4
+    /* 0x364 */ UnidentifiedFielderAction364 mActionLooseBallPassVars;
 
 public:
     /* 0x368 */ float mUnidentified368;
@@ -356,8 +400,7 @@ private:
     /* 0x381 */ u8 mUnknown381[0x03];
 
 public:
-    /* 0x384 */ bool mUnidentified384;
-    /* 0x385 */ bool mUnidentified385;
+    /* 0x384 */ UnidentifiedFielderAction384 mActionRunningWBVars;
 
 private:
     /* 0x386 */ u8 mUnknown386[0x02];
@@ -420,23 +463,19 @@ public:
     /* 0x400 */ WaluigiWallManager_80178400* mUnidentified400;
 
 private:
-    /* 0x404 */ u8 mUnknown404[0x04];
+    /* 0x404 */ float mUnidentified404;
 
 public:
     /* 0x408 */ float mUnidentified408;
 
 private:
-    /* 0x40C */ u8 mUnknown40C[0x04];
+    /* 0x40C */ float mUnidentified40C;
 
 public:
-    /* 0x410 */ nlVector3 mUnidentified410;
-    /* 0x41C */ bool mUnidentified41C;
-
-private:
-    /* 0x41D */ u8 mUnknown41D[0x03];
+    /* 0x410 */ UnidentifiedFielderAction410 mUnidentified410;
 
 public:
-    /* 0x420 */ UnidentifiedFielderSkillshot* mUnidentified420;
+    /* 0x420 */ BulletBillObject* mUnidentified420;
 
 public:
     /* 0x424 */ bool mUnidentified424;
@@ -455,35 +494,38 @@ public:
     /* 0x430 */ eFielderActionState m_eActionState;
 
 private:
-    /* 0x434 */ u8 mUnknown434[0x10];
+    /* 0x434 */ bool m_bInPosition;
+    /* 0x435 */ u8 mUnknown435[3];
+    /* 0x438 */ Timer m_tMoveToTurboTimer;
 
 public:
-    /* 0x444 */ int mUnidentified444;
+    /* 0x440 */ Timer mtPostDekeTimer;
 
 public:
     /* 0x448 */ int m_nPowerupAnimID;
 
 private:
-    /* 0x44C */ u8 mUnknown44C[0x08];
+    /* 0x44C */ Timer mtPowerupThrowTime;
 
 public:
     /* 0x454 */ u32 muInvincibleStatus;
 
 private:
-    /* 0x458 */ u8 mUnknown458[0x08];
+    /* 0x458 */ float mfAirInterceptHeight[2];
 
 public:
     /* 0x460 */ eRole m_eRole;
 
 private:
-    /* 0x464 */ cFielder* mUnidentified464[4];
+    /* 0x464 */ cFielder* m_pMark[4];
 
 public:
     /* 0x474 */ bool mbWasHitByPowerupThisFrame;
     /* 0x475 */ bool mbTangible;
 
 private:
-    /* 0x476 */ u8 mUnknown476[2];
+    /* 0x476 */ bool mbIgnorePadSwitchRelease;
+    /* 0x477 */ u8 mUnknown477;
 
 public:
     /* 0x478 */ int mUnidentified478;

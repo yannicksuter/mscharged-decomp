@@ -113,6 +113,12 @@ public:
 }; // total size: 0xF4
 
 extern "C" void fn_80015C38(cBall* pBall, int nBallState);
+
+struct LiveBallTrail;
+float fn_800155A0(cBall* pBall, int nParam);
+LiveBallTrail* fn_8001B284(unsigned int nIndex);
+unsigned int fn_8001B30C();
+
 extern cBall* g_pBall;
 
 #endif // GAME_BALL_H

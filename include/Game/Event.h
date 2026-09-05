@@ -79,12 +79,21 @@ template <typename T>
 struct UnidentifiedEventCallback
 {
     typedef Function<T*> Type;
+    typedef T* Parameter;
+};
+
+template <typename P1>
+struct UnidentifiedEventCallback<void(P1)>
+{
+    typedef Function<void(P1)> Type;
+    typedef P1 Parameter;
 };
 
 template <>
 struct UnidentifiedEventCallback<UnidentifiedEventNoData>
 {
     typedef Function<FnVoidVoid> Type;
+    typedef UnidentifiedEventNoData* Parameter;
 };
 
 template <typename T>
@@ -372,7 +381,7 @@ public:
         fn_802B2A04(this, listener, value, flags, target);
     }
 
-    void UnidentifiedDeliver(T* data)
+    void UnidentifiedDeliver(typename UnidentifiedEventCallback<T>::Parameter data)
     {
         nlDLListIterator<Listener> iterator = mListeners.Begin();
         while (iterator.hasNext())

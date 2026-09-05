@@ -2,16 +2,7 @@
 
 #include "NL/nlString.h"
 
-extern "C"
-{
-    typedef struct _FILE FILE;
-
-    FILE* fopen(const char* filename, const char* mode);
-    unsigned long fwrite(const void* buffer, unsigned long size, unsigned long count, FILE* stream);
-    int fputs(const char* string, FILE* stream);
-    int fflush(FILE* stream);
-    int fclose(FILE* stream);
-}
+#include <stdio.h>
 
 bool g_bDisableWriteOut;
 

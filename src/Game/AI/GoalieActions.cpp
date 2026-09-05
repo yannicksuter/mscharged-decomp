@@ -17,6 +17,7 @@
 #include "Game/Camera/CameraMan.h"
 #include "Game/Field.h"
 #include "Game/Effects/EmissionController.h"
+#include "Game/GameTweaks.h"
 #include "Game/MathHelpers.h"
 #include "Game/Net.h"
 #include "Game/NetworkSession.h"
@@ -51,12 +52,6 @@ struct UnidentifiedGoalieActionState
     unsigned int mUnidentified28;
     unsigned int mUnidentified2C;
     unsigned int mUnidentified30;
-};
-
-struct UnidentifiedGoalieSkillTweaks
-{
-    u8 mUnidentified000[0x194];
-    float* mpLooseBallChaseDistance;
 };
 
 struct UnidentifiedFESceneState
@@ -148,7 +143,7 @@ extern unsigned char lbl_806E0D18;
 extern unsigned char lbl_806E0D19;
 extern unsigned char lbl_806E0D1A;
 extern unsigned char lbl_806E0D22;
-extern void* lbl_806E0E00;
+extern cTeam* lbl_806E0E00;
 extern nlVector4 lbl_8056D3B0;
 extern unsigned char lbl_806E0D20;
 extern unsigned char lbl_806E0D21;
@@ -162,7 +157,6 @@ extern "C" float fn_800776B4();
 extern "C" float fn_800E02B8(cTeam* pTeam);
 extern "C" void fn_8005DB44(
     UnidentifiedGoalieActionState* pState, unsigned int nParam, bool bParam);
-extern "C" LiveBallTrail* fn_8001B284(unsigned int nIndex);
 extern "C" EmissionController* fn_801B64E8(
     Goalie* pGoalie, const char* szEffectName, int nParam);
 extern "C" void fn_8001AA0C(LiveBallTrail* pBallTrail, bool bParam);
@@ -175,7 +169,6 @@ extern "C" void fn_801B93E8(cCharacter* pCharacter);
 extern "C" bool fn_8007BF68(Goalie* pGoalie, bool bParam);
 extern "C" bool fn_8007C590(Goalie* pGoalie);
 extern "C" bool fn_8007D644(Goalie* pGoalie);
-extern "C" bool fn_8003EA6C(cFielder* pFielder);
 extern "C" void fn_8007EA90(Goalie* pGoalie);
 extern "C" void fn_8007E940(Goalie* pGoalie, float fFudgeDist);
 extern "C" float fn_8007ECB4(Goalie* pGoalie, float fTimeToContact,
@@ -218,7 +211,6 @@ extern "C" bool fn_80331C04(
 extern "C" void fn_80097574(
     cPlayer* pPlayer, int nNodeIndex, int nAnimID, float fParam);
 extern "C" void fn_8009591C(cPlayer* pPlayer, bool bParam);
-extern "C" UnidentifiedGoalieSkillTweaks* fn_800A636C(void* pTeam);
 extern "C" void fn_80139D1C(int nParam, void* pParam);
 extern "C" void fn_801BABEC(cPlayer* pPlayer);
 extern "C" void fn_801BAF0C(cPlayer* pPlayer);
@@ -1879,7 +1871,7 @@ void Goalie::ActionLooseBallPursueRolling(float deltaTime)
     bool bWallBlocked = mfWallBlock > 0.0f;
     if (bWallBlocked || (mnOffplayPending)
         || (!IsLooseBallClose(*fn_800A636C(lbl_806E0E00)
-                ->mpLooseBallChaseDistance))
+                ->fLooseBallChaseDistance.m_pValue))
         || ((g_pBall->m_pOwner != 0)
             && (g_pBall->m_pOwner != this)))
     {
@@ -1895,7 +1887,7 @@ void Goalie::ActionLooseBallSetup(float fDeltaT)
     bool bWallBlocked = mfWallBlock > 0.0f;
     if (bWallBlocked || (mnOffplayPending)
         || (!IsLooseBallClose(*fn_800A636C(lbl_806E0E00)
-                ->mpLooseBallChaseDistance))
+                ->fLooseBallChaseDistance.m_pValue))
         || ((g_pBall->m_pOwner != 0)
             && (g_pBall->m_pOwner != this)))
     {
@@ -2280,7 +2272,7 @@ void Goalie::ActionMove(float deltaTime)
 
     if (!isPassThreat && !fn_8007BF68(this, true)
         && IsLooseBallClose(*fn_800A636C(lbl_806E0E00)
-                ->mpLooseBallChaseDistance))
+                ->fLooseBallChaseDistance.m_pValue))
     {
         InitActionLooseBallSetup();
     }
@@ -2979,7 +2971,7 @@ bool Goalie::IsTeammateHoardingBall()
     {
         cBall* pBall;
         cFielder* pOwner = g_pBall->GetOwnerFielder();
-        if (pOwner != 0 && !fn_8003EA6C(pOwner)
+        if (pOwner != 0 && !pOwner->fn_8003EA6C()
             && IsOnSameTeam(pOwner))
         {
             float ownerX;
@@ -4484,7 +4476,7 @@ void Goalie::InitActionLooseBallSetup()
     }
 
     if (!IsLooseBallClose(*fn_800A636C(lbl_806E0E00)
-                ->mpLooseBallChaseDistance))
+                ->fLooseBallChaseDistance.m_pValue))
     {
         InitActionMove(true);
         return;

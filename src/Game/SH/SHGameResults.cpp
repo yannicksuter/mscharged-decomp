@@ -1,6 +1,7 @@
 #include "Game/SH/SHGameResults.h"
 
 #include "Game/BaseGameSceneManager.h"
+#include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/feScene.h"
@@ -8,8 +9,6 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 
-extern "C" TLInstance* fn_8030677C(FEPresentation* pPresentation, unsigned long Level1, unsigned long Level2,
-    unsigned long Level3, unsigned long Level4, unsigned long Level5, unsigned long Level6);
 class TU80252180Scene;
 extern "C" TU80252180Scene* fn_80253E18();
 extern "C" void fn_802533F0(TU80252180Scene* scene);

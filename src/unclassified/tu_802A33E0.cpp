@@ -1,6 +1,8 @@
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
+#include "NL/gl/glPlat.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
 
@@ -16,14 +18,11 @@ struct ScissorParameters_802A34F8
 
 extern float lbl_806E5FB8;
 
-extern "C" u32 fn_80369394();
-extern "C" u32 fn_803693A4();
 extern "C" void fn_802A6C24(void*, bool);
 extern "C" void fn_802A6CEC(void*, const glModelPacket*);
 extern "C" void fn_802A6D44(void*, const glModelPacket*);
 extern "C" void fn_802A6F30(void*, const glModelPacket*);
 extern "C" void fn_802A6FA4(void*, const glModelPacket*);
-extern "C" void fn_802CC978(void*, const glModelPacket*, u32);
 
 extern "C" void fn_802A33E0(void* renderer)
 {

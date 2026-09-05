@@ -1,3 +1,4 @@
+#include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Ball.h"
 #include "Game/BallTrail.h"
 #include "Game/Character.h"
@@ -16,7 +17,7 @@ extern float lbl_806DB5A4;
 
 static const nlVector3 sZeroVelocity = { 0.0f, 0.0f, 0.0f };
 
-extern "C" DrawableCharacter* fn_801BE428(cCharacter* character)
+DrawableCharacter* GetReplayDrawableCharacter(cCharacter* character)
 {
     if (character->m_eClassType == FIELDER)
     {
@@ -35,7 +36,7 @@ extern "C" DrawableCharacter* fn_801BE428(cCharacter* character)
     }
 }
 
-extern "C" void fn_801BE4A4(EmissionController& controller)
+void UpdateEmitterFromCharacterUnculled(EmissionController& controller)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
@@ -45,7 +46,7 @@ extern "C" void fn_801BE4A4(EmissionController& controller)
     if (ReplayManager::Instance()->mRender != 0)
     {
         cCharacter* character = (cCharacter*)controller.m_uUserData;
-        DrawableCharacter* drawableCharacter = fn_801BE428(character);
+        DrawableCharacter* drawableCharacter = GetReplayDrawableCharacter(character);
         controller.SetPosition(drawableCharacter->position);
         controller.SetVelocity(drawableCharacter->velocity);
         controller.SetPoseAccumulator(
@@ -55,7 +56,7 @@ extern "C" void fn_801BE4A4(EmissionController& controller)
     }
 }
 
-extern "C" void fn_801BE594(
+void UpdateEmitterFromCharacterWithoutAnimController(
     EmissionController& controller, cCharacter* character)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
@@ -65,7 +66,7 @@ extern "C" void fn_801BE594(
 
     if (ReplayManager::Instance()->mRender != 0)
     {
-        DrawableCharacter* drawableCharacter = fn_801BE428(character);
+        DrawableCharacter* drawableCharacter = GetReplayDrawableCharacter(character);
         controller.SetPosition(drawableCharacter->position);
         controller.SetVelocity(drawableCharacter->velocity);
         controller.SetPoseAccumulator(
@@ -73,7 +74,7 @@ extern "C" void fn_801BE594(
     }
 }
 
-void UpdateEmitterFromCharacter(EmissionController& controller)
+void UpdateEmitterFromCharacter(EmissionController& ec)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
@@ -82,19 +83,19 @@ void UpdateEmitterFromCharacter(EmissionController& controller)
 
     if (ReplayManager::Instance()->mRender != 0)
     {
-        fn_801BE4A4(controller);
+        UpdateEmitterFromCharacterUnculled(ec);
 
-        cCharacter* character
+        cCharacter* pCharacter
             = DrawableCharacter::OnlyRenderingOneCharacter();
-        if (character != 0
-            && (cCharacter*)controller.m_uUserData != character)
+        if (pCharacter != 0
+            && (cCharacter*)ec.m_uUserData != pCharacter)
         {
-            controller.Die();
+            ec.Die();
         }
     }
 }
 
-void UpdateEmitterPoseFromCharacter(EmissionController& controller)
+void UpdateEmitterPoseFromCharacter(EmissionController& emitter)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
@@ -103,16 +104,16 @@ void UpdateEmitterPoseFromCharacter(EmissionController& controller)
 
     if (ReplayManager::Instance()->mRender != 0)
     {
-        cCharacter* character = (cCharacter*)controller.m_uUserData;
-        DrawableCharacter* drawableCharacter = fn_801BE428(character);
-        controller.SetPoseAccumulator(
-            *drawableCharacter->poseAccumulator);
-        controller.SetAnimController(
-            drawableCharacter->GetAnimController());
+        cCharacter* character = (cCharacter*)emitter.m_uUserData;
+        DrawableCharacter* pChar = GetReplayDrawableCharacter(character);
+        emitter.SetPoseAccumulator(
+            *pChar->poseAccumulator);
+        emitter.SetAnimController(
+            pChar->GetAnimController());
     }
 }
 
-void UpdateEmitterFromBall(EmissionController& controller)
+void UpdateEmitterFromBall(EmissionController& emitter)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
@@ -124,18 +125,18 @@ void UpdateEmitterFromBall(EmissionController& controller)
         if (!g_pGame->IsGameplayOrOvertime()
             && nlTaskManager::m_pInstance->mCurrentState != 8)
         {
-            controller.m_bVisible = ReplayManager::Instance()
-                                            ->mRender->mBall.mFlags.bits.visible;
+            emitter.m_bVisible = ReplayManager::Instance()
+                                     ->mRender->mBall.mFlags.bits.visible;
         }
 
         ReplayManager* manager = ReplayManager::Instance();
-        controller.SetPosition(manager->mRender->mBall.mPosition);
+        emitter.SetPosition(manager->mRender->mBall.mPosition);
         manager = ReplayManager::Instance();
-        controller.SetVelocity(manager->mRender->mBall.mVelocity);
+        emitter.SetVelocity(manager->mRender->mBall.mVelocity);
     }
 }
 
-extern "C" void fn_801BE950(EmissionController& controller)
+void UpdateEmitterFromBallTrail(EmissionController& controller)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
@@ -159,7 +160,7 @@ extern "C" void fn_801BE950(EmissionController& controller)
     }
 }
 
-extern "C" void fn_801BE9EC(EmissionController& controller)
+void UpdateEmitterFromBallLandingSpot(EmissionController& controller)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
@@ -180,7 +181,7 @@ extern "C" void fn_801BE9EC(EmissionController& controller)
     }
 }
 
-extern "C" void fn_801BEA7C(EmissionController& controller)
+void UpdateEmitterFromCharacterHead(EmissionController& controller)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
@@ -191,7 +192,7 @@ extern "C" void fn_801BEA7C(EmissionController& controller)
         && ReplayManager::Instance()->mRender != 0)
     {
         cCharacter* character = (cCharacter*)controller.m_uUserData;
-        DrawableCharacter* drawableCharacter = fn_801BE428(character);
+        DrawableCharacter* drawableCharacter = GetReplayDrawableCharacter(character);
         controller.SetPosition(drawableCharacter->position);
         controller.SetVelocity(drawableCharacter->velocity);
         controller.SetPoseAccumulator(
@@ -216,7 +217,7 @@ extern "C" void fn_801BEA7C(EmissionController& controller)
     }
 }
 
-extern "C" void fn_801BEC38(EmissionController& controller)
+void UpdateEmitterFromCharacterBackward(EmissionController& controller)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
@@ -227,7 +228,7 @@ extern "C" void fn_801BEC38(EmissionController& controller)
         && ReplayManager::Instance()->mRender != 0)
     {
         cCharacter* character = (cCharacter*)controller.m_uUserData;
-        DrawableCharacter* drawableCharacter = fn_801BE428(character);
+        DrawableCharacter* drawableCharacter = GetReplayDrawableCharacter(character);
         controller.SetPosition(drawableCharacter->position);
         controller.SetVelocity(drawableCharacter->velocity);
         controller.SetPoseAccumulator(
@@ -236,13 +237,14 @@ extern "C" void fn_801BEC38(EmissionController& controller)
         nlMatrix4& matrix
             = drawableCharacter->poseAccumulator->GetNodeMatrix(0);
         nlVector3 direction;
-        nlVec3Set(direction, matrix.m11 * -1.0f,
-            matrix.m12 * -1.0f, matrix.m13);
+        nlVec3Set(direction, matrix.m11, matrix.m12, matrix.m13);
+        direction.x *= -1.0f;
+        direction.y *= -1.0f;
         controller.SetDirection(direction);
     }
 }
 
-extern "C" void fn_801BED5C(EmissionController& controller)
+void UpdateEmitterFromCharacterForward(EmissionController& controller)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
@@ -253,7 +255,7 @@ extern "C" void fn_801BED5C(EmissionController& controller)
         && ReplayManager::Instance()->mRender != 0)
     {
         cCharacter* character = (cCharacter*)controller.m_uUserData;
-        DrawableCharacter* drawableCharacter = fn_801BE428(character);
+        DrawableCharacter* drawableCharacter = GetReplayDrawableCharacter(character);
         controller.SetPosition(drawableCharacter->position);
         controller.SetVelocity(drawableCharacter->velocity);
         controller.SetPoseAccumulator(
@@ -269,7 +271,7 @@ extern "C" void fn_801BED5C(EmissionController& controller)
     }
 }
 
-extern "C" void fn_801BEE8C(EmissionController& controller,
+void UpdateEmitterFromImpostorModel(EmissionController& controller,
     ImpostorModel_802DAEE0* model)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
@@ -284,8 +286,7 @@ extern "C" void fn_801BEE8C(EmissionController& controller,
         controller.SetPosition(model->mWorldMatrix.GetTranslation());
         controller.SetVelocity(velocity);
         controller.SetPoseAccumulator(*model->mPoseAccumulator);
-        nlVec3Set(direction, model->mWorldMatrix.m11,
-            model->mWorldMatrix.m12, model->mWorldMatrix.m13);
+        nlVec3Set(direction, model->mWorldMatrix.m11, model->mWorldMatrix.m12, model->mWorldMatrix.m13);
         controller.SetDirection(direction);
     }
 }

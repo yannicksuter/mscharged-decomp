@@ -4,11 +4,6 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 
-extern "C"
-{
-    void fn_80297F70(bool enabled);
-}
-
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A05A4>::Activate(GLView*)
 {

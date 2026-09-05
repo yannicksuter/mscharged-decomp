@@ -5,12 +5,6 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlColour.h"
 
-extern "C"
-{
-    void fn_8036A800(unsigned int index, const void* first, const void* second);
-    void fn_8036A938(const void* value);
-}
-
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A5D58>::Activate(
     GLView*)

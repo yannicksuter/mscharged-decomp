@@ -6,6 +6,7 @@
 
 class Clock;
 class FuzzyTweaks;
+class DebugWriteCache;
 class RunningChecksum;
 class UnidentifiedGameRegion;
 class cFielder;
@@ -79,6 +80,8 @@ public:
     cPlayer* fn_8005B780(int param1, int param2, int param3);
     void SetPotentialScorer(cPlayer* pPlayer);
     void fn_8005BF50(RunningChecksum* runningChecksum);
+    void fn_8005A8FC(float fDeltaT);
+    void fn_8005B840(void* checksum, DebugWriteCache* cache);
     void ChangeGameState(int state);
     void InitGameState(int state);
     void SetDifficulty(int diff0, int diff1, int diff2, bool param4);

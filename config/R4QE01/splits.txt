@@ -33,6 +33,25 @@ Game/AnimInventory.cpp:
 	.data       start:0x804F42A0 end:0x804F4330
 	.sbss       start:0x806E0B90 end:0x806E0B98
 
+Game/tu_80009B88.cpp:
+	.text       start:0x80009B88 end:0x8000CD44
+	.ctors      start:0x804DB4EC end:0x804DB4F0
+	.data       start:0x804F4330 end:0x804F4688
+	.bss        start:0x8056B260 end:0x8056B468
+	.sdata      start:0x806DB470 end:0x806DB4D8
+	.sbss       start:0x806E0B98 end:0x806E0BA8
+	.sdata2     start:0x806E30D0 end:0x806E30D8
+
+Game/AI/tu_8000CD44.cpp:
+	.text       start:0x8000CD44 end:0x8000EF9C
+	.ctors      start:0x804DB4F0 end:0x804DB4F4
+	.rodata     start:0x804DBC10 end:0x804DBC20
+	.data       start:0x804F4688 end:0x804F48A0
+	.sdata      start:0x806DB4D8 end:0x806DB4E0
+	.sbss       start:0x806E0BA8 end:0x806E0BB4
+	.sdata2     start:0x806E30D8 end:0x806E3140
+	.sbss2      start:0x806E7BA0 end:0x806E7BA8
+
 Game/AI/AvoidController.cpp:
 	.text       start:0x8000EF9C end:0x800133B8
 	.rodata     start:0x804DBC20 end:0x804DBC30
@@ -45,7 +64,7 @@ Game/Ball.cpp:
 	.ctors      start:0x804DB4F8 end:0x804DB4FC
 	.rodata     start:0x804DBC30 end:0x804DBE58
 	.data       start:0x804F4A50 end:0x804F5078
-	.bss        start:0x8056B260 end:0x8056B7B0
+	.bss        start:0x8056B468 end:0x8056B7B0
 	.sdata      start:0x806DB500 end:0x806DB5D8
 	.sbss       start:0x806E0BC0 end:0x806E0C18
 	.sdata2     start:0x806E31B0 end:0x806E3240
@@ -1425,7 +1444,7 @@ Game/WorldTriggers.cpp:
 	.data       start:0x80515CA8 end:0x80515CB8
 	.sdata2     start:0x806E5460 end:0x806E5464
 
-unclassified/tu_801BE428.cpp:
+Game/Effects/EmitterCallbacks.cpp:
 	.text       start:0x801BE428 end:0x801BEF44
 	.rodata     start:0x804DCFE8 end:0x804DCFF4
 	.sdata2     start:0x806E5468 end:0x806E5474
@@ -2342,7 +2361,7 @@ NL/glx/GXMaterialProgram_802A7820.cpp:
 	.data       start:0x8052AC48 end:0x8052AC80
 	.sbss       start:0x806E1D58 end:0x806E1D60
 
-unclassified/tu_802A7C90.cpp:
+Game/GL/GLCompactColourMeshWriter.cpp:
 	.text       start:0x802A7C90 end:0x802A7F60
 
 unclassified/tu_802A7F80.cpp:
@@ -3207,6 +3226,13 @@ unclassified/tu_803263E4.cpp:
 	.ctors      start:0x804DBAC8 end:0x804DBACC
 	.bss        start:0x805847E0 end:0x80584808
 
+unclassified/tu_80326844.cpp:
+	.text       start:0x80326844 end:0x8032B6D4
+	.ctors      start:0x804DBACC end:0x804DBAD0
+	.data       start:0x80531DE0 end:0x80532378
+	.bss        start:0x80584808 end:0x80584830
+	.sdata      start:0x806DF6F8 end:0x806DF708
+
 unclassified/tu_8032B6D4.cpp:
 	.text       start:0x8032B6D4 end:0x8032C7D0
 	.ctors      start:0x804DBAD0 end:0x804DBAD4
@@ -3286,6 +3312,26 @@ Game/Transitions/ScriptedTransition.cpp:
 	.data       start:0x80534010 end:0x80534208
 	.sdata      start:0x806DF810 end:0x806DF840
 	.sdata2     start:0x806E69A8 end:0x806E69D8
+
+Game/Transitions/TransitionSequence.cpp:
+	.text       start:0x8033F900 end:0x80340550
+	.data       start:0x80534208 end:0x80534268
+	.sdata      start:0x806DF840 end:0x806DF868
+	.sdata2     start:0x806E69D8 end:0x806E69E8
+
+Game/world.cpp:
+	.text       start:0x8034056C end:0x80341EC8
+	.data       start:0x80534268 end:0x80534340
+	.sdata2     start:0x806E69E8 end:0x806E69F0
+
+Game/World/worldanim.cpp:
+	.text       start:0x80341EE8 end:0x80344814
+	.ctors      start:0x804DBAF8 end:0x804DBAFC
+	.data       start:0x80534340 end:0x805344D8
+	.bss        start:0x80584BC8 end:0x80584C08
+	.sdata      start:0x806DF868 end:0x806DF870
+	.sbss       start:0x806E2188 end:0x806E2198
+	.sdata2     start:0x806E69F0 end:0x806E6A20
 
 ode/collision_kernel.cpp:
 	.text       start:0x80344814 end:0x80345C44
@@ -3389,6 +3435,57 @@ ode/NLGAdditions.cpp:
 	.data       start:0x80534738 end:0x80534750
 	.sdata2     start:0x806E6B88 end:0x806E6BA0
 
+Game/Audio/tu_8035952C.cpp:
+	.text       start:0x8035952C end:0x80359D74
+	.ctors      start:0x804DBAFC end:0x804DBB00
+	.data       start:0x80534750 end:0x805347C0
+	.bss        start:0x80585360 end:0x805853F0
+	.sdata      start:0x806DF910 end:0x806DF918
+	.sbss       start:0x806E21C0 end:0x806E21C8
+	.sdata2     start:0x806E6BA0 end:0x806E6BB8
+
+Game/Audio/tu_80359D74.cpp:
+	.text       start:0x80359D74 end:0x8035A9E0
+	.ctors      start:0x804DBB00 end:0x804DBB04
+	.data       start:0x805347C0 end:0x80534848
+	.bss        start:0x80585400 end:0x80585450
+	.sdata      start:0x806DF918 end:0x806DF988
+	.sbss       start:0x806E21C8 end:0x806E21D0
+	.sdata2     start:0x806E6BB8 end:0x806E6BC8
+
+Game/Audio/tu_8035A9E0.cpp:
+	.text       start:0x8035A9E0 end:0x8035B220
+	.ctors      start:0x804DBB04 end:0x804DBB08
+	.data       start:0x80534848 end:0x805348A8
+	.bss        start:0x80585450 end:0x80585490
+	.sdata      start:0x806DF988 end:0x806DF9A0
+	.sbss       start:0x806E21D0 end:0x806E21D8
+	.sdata2     start:0x806E6BC8 end:0x806E6BE0
+
+Game/Audio/tu_8035B220.cpp:
+	.text       start:0x8035B220 end:0x8035B8E8
+	.ctors      start:0x804DBB08 end:0x804DBB0C
+	.data       start:0x805348A8 end:0x80534918
+	.bss        start:0x80585490 end:0x805854E0
+	.sdata      start:0x806DF9A0 end:0x806DF9A8
+	.sbss       start:0x806E21D8 end:0x806E21E0
+	.sdata2     start:0x806E6BE0 end:0x806E6BF8
+
+Game/Audio/AudioBackend_8035B8E8.cpp:
+	.text       start:0x8035B8E8 end:0x8035D578
+	.data       start:0x80534918 end:0x80534B08
+	.sdata      start:0x806DF9A8 end:0x806DF9C0
+	.sbss       start:0x806E21E0 end:0x806E21F0
+
+Game/Audio/Plat3dSoundSrc.cpp:
+	.text       start:0x8035D668 end:0x8035DE28
+	.ctors      start:0x804DBB10 end:0x804DBB14
+	.data       start:0x80534B08 end:0x80534BA0
+	.bss        start:0x805854F8 end:0x80585558
+	.sdata      start:0x806DF9C0 end:0x806DF9D8
+	.sbss       start:0x806E21F0 end:0x806E2200
+	.sdata2     start:0x806E6BF8 end:0x806E6C18
+
 Game/Audio/AudioResourcePlatform_8035DE28.cpp:
 	.text       start:0x8035DE28 end:0x8035EA28
 	.ctors      start:0x804DBB14 end:0x804DBB18
@@ -3397,10 +3494,94 @@ Game/Audio/AudioResourcePlatform_8035DE28.cpp:
 	.sdata      start:0x806DF9D8 end:0x806DF9E0
 	.sbss       start:0x806E2200 end:0x806E2210
 
+Game/Audio/AudioSource_8035EF08.cpp:
+	.text       start:0x8035EF08 end:0x803622F0
+	.ctors      start:0x804DBB18 end:0x804DBB1C
+	.data       start:0x80534CD0 end:0x80534E88
+	.bss        start:0x80585C10 end:0x80585D80
+	.sbss       start:0x806E2210 end:0x806E2238
+	.sdata2     start:0x806E6C18 end:0x806E6C50
+
+Game/Audio/AudioEffects_803622F0.cpp:
+	.text       start:0x803622F0 end:0x803632F8
+	.ctors      start:0x804DBB1C end:0x804DBB20
+	.data       start:0x80534E88 end:0x80534FB8
+	.bss        start:0x80585D80 end:0x80585F78
+	.sdata      start:0x806DF9E0 end:0x806DF9F8
+	.sbss       start:0x806E2238 end:0x806E2250
+	.sdata2     start:0x806E6C50 end:0x806E6C60
+
+Game/Audio/Reverb.cpp:
+	.text       start:0x803632F8 end:0x80364020
+	.ctors      start:0x804DBB20 end:0x804DBB24
+	.data       start:0x80534FB8 end:0x80535050
+	.bss        start:0x80585F78 end:0x80585FC8
+	.sdata      start:0x806DF9F8 end:0x806DFA40
+	.sbss       start:0x806E2250 end:0x806E2258
+	.sdata2     start:0x806E6C60 end:0x806E6C78
+
+NL/gl/tu_80364020.cpp:
+	.text       start:0x80364020 end:0x80364118
+	.ctors      start:0x804DBB24 end:0x804DBB28
+	.data       start:0x80535050 end:0x80535060
+	.bss        start:0x80585FC8 end:0x80585FF0
+	.sdata      start:0x806DFA40 end:0x806DFA48
+	.sbss       start:0x806E2258 end:0x806E2260
+
+NL/plat/tu_80364118.cpp:
+	.text       start:0x80364118 end:0x80364604
+	.data       start:0x80535060 end:0x80535098
+	.sdata2     start:0x806E6C78 end:0x806E6CA0
+
+NL/plat/tu_80364604.cpp:
+	.text       start:0x80364604 end:0x8036470C
+	.ctors      start:0x804DBB28 end:0x804DBB2C
+	.sdata2     start:0x806E6CA0 end:0x806E6CA8
+
+NL/plat/cPlatPad.cpp:
+	.text       start:0x8036470C end:0x803648EC
+	.ctors      start:0x804DBB2C end:0x804DBB30
+	.data       start:0x80535098 end:0x805350F0
+	.bss        start:0x80585FF0 end:0x805860E0
+	.sbss       start:0x806E2260 end:0x806E2270
+	.sdata2     start:0x806E6CA8 end:0x806E6CB0
+
+NL/plat/tu_803648EC.cpp:
+	.text       start:0x803648EC end:0x80364E5C
+	.ctors      start:0x804DBB30 end:0x804DBB34
+	.data       start:0x805350F0 end:0x80535148
+	.bss        start:0x805860E0 end:0x80586F70
+	.sbss       start:0x806E2270 end:0x806E2280
+	.sdata2     start:0x806E6CB0 end:0x806E6CB8
+
+NL/plat/tu_80364E5C.cpp:
+	.text       start:0x80364E5C end:0x80365488
+	.ctors      start:0x804DBB34 end:0x804DBB38
+	.data       start:0x80535148 end:0x805351A0
+	.bss        start:0x80586F70 end:0x80587F00
+	.sbss       start:0x806E2280 end:0x806E2290
+	.sdata2     start:0x806E6CB8 end:0x806E6CD0
+
+NL/plat/tu_80365488.cpp:
+	.text       start:0x80365488 end:0x80365D90
+	.ctors      start:0x804DBB38 end:0x804DBB3C
+	.data       start:0x805351A0 end:0x80535238
+	.bss        start:0x80587F00 end:0x80588F70
+	.sbss       start:0x806E2290 end:0x806E22A0
+	.sdata2     start:0x806E6CD0 end:0x806E6CE8
+
+NL/plat/tu_80365E84.cpp:
+	.text       start:0x80365E84 end:0x80366994
+	.ctors      start:0x804DBB40 end:0x804DBB44
+	.data       start:0x80535238 end:0x805352A0
+	.bss        start:0x80589360 end:0x80589410
+	.sdata      start:0x806DFA48 end:0x806DFA50
+	.sbss       start:0x806E22B0 end:0x806E22B8
+
 NL/nlFileGC.cpp:
-	.text       start:0x803663C8 end:0x80368360
+	.text       start:0x80366994 end:0x80368360
 	.ctors      start:0x804DBB44 end:0x804DBB48
-	.data       start:0x8053524C end:0x805352E8
+	.data       start:0x805352A0 end:0x805352E8
 	.bss        start:0x80589410 end:0x80589DA8
 	.sdata      start:0x806DFA50 end:0x806DFA58
 	.sbss       start:0x806E22B8 end:0x806E22E0
@@ -3413,6 +3594,10 @@ NL/plat/platqmath.cpp:
 NL/plat/platvmath.cpp:
 	.text       start:0x80368784 end:0x80368E00
 	.sdata2     start:0x806E6D08 end:0x806E6D14
+
+NL/gl/tu_80368E00.cpp:
+	.text       start:0x80368E00 end:0x80368E64
+	.sdata      start:0x806DFA58 end:0x806DFA60
 
 NL/gc/gcSwizzler.cpp:
 	.text       start:0x80368E64 end:0x80369394

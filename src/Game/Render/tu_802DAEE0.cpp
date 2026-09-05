@@ -12,6 +12,8 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
+#include "NL/gl/tu_802CC370.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 
@@ -19,15 +21,6 @@ extern "C"
 {
     extern unsigned long lbl_806E1F0C;
 
-    void* fn_802CDF0C();
-    unsigned long fn_802CE1B8(void*, unsigned long);
-    bool fn_802CC8FC(const glModelPacket*, unsigned long);
-    unsigned long fn_802CC7E4(
-        const glModelPacket*, unsigned long);
-    void fn_802CC458(
-        glModelPacket*, unsigned long, unsigned long);
-    void fn_802CC4FC(
-        glModelPacket*, unsigned long, const unsigned long*);
 }
 
 static unsigned long sTextureParameterHashes[10] = {

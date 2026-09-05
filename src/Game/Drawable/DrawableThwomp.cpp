@@ -13,10 +13,6 @@
 // DrawableBulletBill. This one is backed by a PhysicsObject rather than a
 // plain transform, and scales its shadow by a per-object factor.
 
-extern "C"
-{
-}
-
 static float gShadowSizeLow = 1.7f;
 static float gShadowSizeHigh = 0.8f;
 static int gShadowAlphaLow = 175;
@@ -152,11 +148,7 @@ void DrawableThwomp::Render(ThwompObject* object) const
     RenderObject* drawable;
     void* material;
 
-    if (object == 0)
-    {
-        return;
-    }
-    if (!mVisible)
+    if (object == 0 || !mVisible)
     {
         return;
     }

@@ -11,6 +11,7 @@
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/glx/GXMaterialCrystalTweaks.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -51,10 +52,6 @@ extern GLInventory* lbl_806E1FFC;
 extern const nlVector3 lbl_804EB340;
 
 extern "C" unsigned long fn_802CDFCC(unsigned long texture);
-extern "C" void fn_802CC3C8(glModelPacket* packet, unsigned long hash,
-    const void* value, unsigned long count);
-extern "C" bool fn_802CC8FC(
-    const glModelPacket* packet, unsigned long hash);
 extern "C" void fn_8004F594(int channel, const char* format, ...);
 
 ParticleSystem::ParticleSystem(EffectsTemplate* pTemplate,

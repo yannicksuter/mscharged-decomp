@@ -10,6 +10,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
+#include "NL/plat/tu_80364604.h"
 
 struct UnidentifiedControllerInfo_801A7C48
 {
@@ -32,7 +33,6 @@ extern "C"
 {
     int fn_802C2C84(const char* pPath, int nDefault);
     bool fn_80273B00();
-    int fn_80364630(void* pData, nlVector2* pPosition, u16* pAngle);
     u32 fn_8032C830(void* pCodec, void* pMessage, void* pBuffer, int nSize);
     void fn_801A8F1C(u16 nAngle, u32 nTextureIndex, u32 nStatus,
         float fX, float fY);
@@ -673,7 +673,7 @@ extern "C" void fn_801A7C48(float fDeltaT)
 
         nlVector2 v2Position;
         u16 nAngle;
-        int nStatus = fn_80364630(pData, &v2Position, &nAngle);
+        int nStatus = fn_80364630(static_cast<UnidentifiedPointerData*>(pData), &v2Position, &nAngle);
         float fX = 320.0f - 400.0f * v2Position.x;
         if (fX < 30.0f)
         {

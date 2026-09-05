@@ -1,5 +1,7 @@
 #include "Game/Sys/audio.h"
 
+#include "Game/Task/TextWindowTask.h"
+
 #include "Game/Audio/AudioBundleManager_802EDA7C.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/TweakRegistry.h"
@@ -18,7 +20,6 @@ extern "C" void fn_802EBCCC(void*, unsigned long);
 extern "C" XSoundHandle_802ED74C* fn_802EC030(
     AudioLoadMode_806E201C*, int, XSoundOwner_802ED74C*, unsigned long,
     int, int, int, int, int);
-extern "C" void fn_802BD820(const char*, ...);
 extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void* fn_800F1C14();
 

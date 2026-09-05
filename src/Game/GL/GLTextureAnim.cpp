@@ -2,6 +2,7 @@
 
 #include "Game/GL/GLInventory.h"
 #include "NL/gl/glMemory.h"
+#include "NL/glx/glxTexture.h"
 
 #include <string.h>
 
@@ -13,16 +14,8 @@ struct TextureIndexQueue_802D3B68
     u32 m_0C;
 };
 
-struct TextureManager_802CDF0C
-{
-    u32 m_00;
-    void** m_04;
-    TextureIndexQueue_802D3B68* m_08;
-};
-
 extern "C"
 {
-    TextureManager_802CDF0C* fn_802CDF0C();
     u32 fn_802CDFCC(u32 textureHandle);
     void fn_802CE3E0(TextureManager_802CDF0C*, GLTextureAnim*);
     void fn_802CE4B8(TextureManager_802CDF0C*, GLTextureAnim*);

@@ -3,7 +3,9 @@
 #include "Game/GL/GLInventory.h"
 #include "Game/GL/GLVertexAnim.h"
 #include "Game/SAnim.h"
+#include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
+#include "NL/glx/glxLoadModel.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlFunction.h"
 #include "NL/nlMemory.h"
@@ -13,8 +15,6 @@
 extern "C"
 {
     void* fn_802CC0A4(unsigned long size, int memoryType, void* allocator);
-    void fn_802C8284(unsigned long resource);
-    void fn_802C8288();
     int nlPrintf(const char* format, ...);
 }
 
@@ -252,7 +252,7 @@ extern "C" void fn_802CB790(void* program, unsigned long hash)
     sMaterialPrograms.Add(hash, program);
 }
 
-extern "C" void* fn_802CB7D0(unsigned long hash)
+void* fn_802CB7D0(unsigned long hash)
 {
     void** program = 0;
     if (sMaterialPrograms.FindGet(hash, &program))

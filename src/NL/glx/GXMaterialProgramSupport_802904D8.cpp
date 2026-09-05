@@ -1,15 +1,9 @@
 #include <revolution/gx.h>
 
+#include "Game/GameObjectLighting.h"
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
-
-extern "C"
-{
-    void fn_801837DC(int, int);
-    void fn_80183A98();
-    void fn_80183B40(unsigned long matrix);
-}
 
 static bool sStateEnabled_806E1B18;
 

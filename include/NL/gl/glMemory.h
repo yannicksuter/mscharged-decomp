@@ -4,6 +4,7 @@
 #include "NL/glx/glxMemory.h"
 
 class GLInventory;
+struct glModelPacket;
 
 class ResourceInterface_802CC094
 {
@@ -29,8 +30,6 @@ public:
     int m_level;
 }; // size: 0x14
 
-extern "C"
-{
 void fn_802CBEC4();
 void fn_802CBEC8();
 ResourceInterface_802CC094* fn_802CBFD8(
@@ -39,7 +38,9 @@ void fn_802CC02C(ResourceInterface_802CC094* resource);
 void fn_802CC08C(ResourceInterface_802CC094* resource);
 ResourceInterface_802CC094* fn_802CC094();
 ResourceInterface_802CC094* fn_802CC09C();
-}
+
+// Packet resource release retained in the automatic range after glPlat.
+void fn_8036E4C0(glModelPacket* packet, void* allocator);
 
 void* glResourceAlloc(
     unsigned long size, eGLMemory memType, void* resource);

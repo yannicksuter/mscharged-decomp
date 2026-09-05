@@ -139,7 +139,15 @@ void NetworkLobby_80133634::UnregisterMessageReceiver()
 
 u32 NetworkLobby_80133634::GetMachineAid(int index)
 {
-    if (mMachineCount == 0 || index < 0 || index >= mMachineCount)
+    if (mMachineCount == 0)
+    {
+        return 0;
+    }
+    if (index < 0)
+    {
+        return 0;
+    }
+    if (mMachineCount <= index)
     {
         return 0;
     }
@@ -152,7 +160,11 @@ u32 NetworkLobby_80133634::GetMachineAid(int index)
 
 int NetworkLobby_80133634::MachineIdxFromConnection(u32 connection)
 {
-    if (mMachineCount == 0 || connection == 0 || connection == (u32)-2)
+    if (mMachineCount == 0)
+    {
+        return -1;
+    }
+    if (connection == 0 || connection == (u32)-2)
     {
         return -1;
     }
@@ -356,7 +368,8 @@ void NetworkLobby_80133634::CloseConnections()
         u32 connection = mPlayers[i].mConnection;
         if (connection != (u32)-1 && connection != 0)
         {
-            socket->SocketVirtual24((void*)connection, (void*)1);
+            socket->SocketVirtual24(
+                (UnidentifiedTransportConnection*)connection, true);
         }
     }
 
@@ -425,7 +438,8 @@ static void ConnectionClosedCallback_801346D8(
     void* connection = socket->FindConnection(address);
     if (connection != 0 && connection != (void*)-1)
     {
-        socket->SocketVirtual24(connection, (void*)1);
+        socket->SocketVirtual24(
+            (UnidentifiedTransportConnection*)connection, true);
     }
 }
 
@@ -564,13 +578,17 @@ bool NetworkLobby_80133634::StartFriendServer()
     mMatchFailed = false;
 
     int maxPlayers = lbl_806E1009 ? 4 : 2;
-    if (!DWC_SetupGameServer(maxPlayers, FriendMatchCallback_80134F68, 0, ServerBrowserCallback_80134F20, 0))
+    bool started = DWC_SetupGameServer(maxPlayers, FriendMatchCallback_80134F68, 0, ServerBrowserCallback_80134F20, 0);
+    if (!started)
     {
+        fn_8004F594(0x10, "Initial failure of DWC_SetupGameServer\n");
+        lbl_806E10EC->fn_801203C0();
         mState = 0;
         mMatchFailed = true;
         return false;
     }
 
+    fn_8004F594(0x10, "Started DWC_SetupGameServer\n");
     mState = 1;
     lbl_806E10EC->GetDirectSocket()->SocketVirtual10(true);
     return true;
@@ -599,17 +617,21 @@ bool NetworkLobby_80133634::ConnectToFriendServer(int profileId)
     mFriendHostInviting = false;
     mMatchFailed = false;
 
-    if (!DWC_ConnectToGameServerAsync(profileId,
-            FriendMatchCallback_80134F68,
-            0,
-            ServerBrowserCallback_80134F20,
-            0))
+    bool started = DWC_ConnectToGameServerAsync(profileId,
+        FriendMatchCallback_80134F68,
+        0,
+        ServerBrowserCallback_80134F20,
+        0);
+    if (!started)
     {
+        fn_8004F594(0x10, "Initial failure of DWC_ConnectToGameServerAsync\n");
+        lbl_806E10EC->fn_801203C0();
         mState = 0;
         mMatchFailed = true;
         return false;
     }
 
+    fn_8004F594(0x10, "Started DWC_ConnectToGameServerAsync\n");
     mState = 1;
     lbl_806E10EC->GetDirectSocket()->SocketVirtual10(true);
     return true;

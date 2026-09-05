@@ -10,6 +10,7 @@
 #include "Game/Render/SkinAnimatedNPC.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/TweakValue.h"
+#include "NL/gl/glMemory.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -94,9 +95,6 @@ public:
 
 extern "C"
 {
-    ResourceInterface_802CC094* fn_802CBFD8(
-        const void* configuration, int count, const char* name);
-    void fn_802CC02C(ResourceInterface_802CC094* loader);
     void* fn_8002600C(int characterIndex);
     int GetCharacterIndexFromCaptain__Fi(int captain);
 }

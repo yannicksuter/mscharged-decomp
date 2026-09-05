@@ -3,56 +3,13 @@
 #include "NL/nlSlotPool.h"
 #include "NL/nlTicker.h"
 #include "unclassified/tu_803263E4.h"
-
-struct UnidentifiedTransportMessage_8032B6D4
-{
-    /* 0x000 */ void* mVTable;
-    /* 0x004 */ u32 mUnidentified04;
-    /* 0x008 */ u8 mFlags;
-    /* 0x009 */ u8 mPadding09;
-    /* 0x00A */ u16 mUnidentified0A;
-    /* 0x00C */ u16 mUnidentified0C;
-    /* 0x00E */ u8 mUnidentified0E;
-    /* 0x00F */ u8 mPadding0F;
-    /* 0x010 */ u32 mTimestamp;
-    /* 0x014 */ u32 mUnidentified14;
-    /* 0x018 */ u16 mUnidentified18;
-    /* 0x01A */ u8 mUnreliableCount;
-    /* 0x01B */ u8 mPadding1B;
-    /* 0x01C */ UnidentifiedTransportPacket_803263E4* mUnreliable[16];
-    /* 0x05C */ u8 mVoiceCount;
-    /* 0x05D */ u8 mPadding5D[3];
-    /* 0x060 */ UnidentifiedTransportPacket_803263E4* mVoice[16];
-    /* 0x0A0 */ u8 mReliableCount;
-    /* 0x0A1 */ u8 mPaddingA1[3];
-    /* 0x0A4 */ UnidentifiedTransportPacket_803263E4* mReliable[16];
-    /* 0x0E4 */ int mSize;
-}; // size: 0xE8
-
-struct UnidentifiedPayload32_8032C294
-{
-    void* mVTable;
-    u8 mPayload[0x20];
-};
-
-struct UnidentifiedPayload64_8032C308
-{
-    void* mVTable;
-    u8 mPayload[0x40];
-};
-
-struct UnidentifiedPayloadByte_8032C440
-{
-    void* mVTable;
-    u8 mPayload;
-};
+#include "unclassified/tu_8032B6D4.h"
 
 struct UnidentifiedNetworkMessageStorage_8032C66C
 {
     u8 mStorage[0x800];
 };
 
-extern void* lbl_805324BC[];
 extern const char lbl_80532378[];
 extern const char lbl_805323B8[];
 extern const char lbl_805323F4[];
@@ -70,83 +27,75 @@ extern "C"
     void* fn_80322924(void* memory);
     void fn_80322D40(void* codec, const void* key, unsigned int size);
     void fn_803232BC(
-        void* codec, void* output, const void* input, unsigned int size);
+        void* codec, const void* input, void* output, unsigned int size);
 }
 
-extern "C" UnidentifiedTransportMessage_8032B6D4* fn_8032B6D4(
-    UnidentifiedTransportMessage_8032B6D4* message)
+UnidentifiedTransportMessage_8032B6D4::UnidentifiedTransportMessage_8032B6D4()
 {
-    message->mUnidentified04 = 0;
-    message->mVTable = lbl_805324BC;
-    message->mFlags = 0;
-    message->mUnidentified0A = 0;
-    message->mUnidentified0C = 0;
-    message->mUnidentified0E = 0;
-    message->mTimestamp = 0;
-    message->mUnidentified14 = 0;
-    message->mUnidentified18 = 0;
-    message->mUnreliableCount = 0;
-    message->mVoiceCount = 0;
-    message->mReliableCount = 0;
-    message->mReliable[0] = 0;
-    message->mReliable[1] = 0;
-    message->mReliable[2] = 0;
-    message->mReliable[3] = 0;
-    message->mReliable[4] = 0;
-    message->mReliable[5] = 0;
-    message->mReliable[6] = 0;
-    message->mReliable[7] = 0;
-    message->mReliable[8] = 0;
-    message->mReliable[9] = 0;
-    message->mReliable[10] = 0;
-    message->mReliable[11] = 0;
-    message->mReliable[12] = 0;
-    message->mReliable[13] = 0;
-    message->mReliable[14] = 0;
-    message->mReliable[15] = 0;
-    message->mUnreliable[0] = 0;
-    message->mUnreliable[1] = 0;
-    message->mUnreliable[2] = 0;
-    message->mUnreliable[3] = 0;
-    message->mUnreliable[4] = 0;
-    message->mUnreliable[5] = 0;
-    message->mUnreliable[6] = 0;
-    message->mUnreliable[7] = 0;
-    message->mUnreliable[8] = 0;
-    message->mUnreliable[9] = 0;
-    message->mUnreliable[10] = 0;
-    message->mUnreliable[11] = 0;
-    message->mUnreliable[12] = 0;
-    message->mUnreliable[13] = 0;
-    message->mUnreliable[14] = 0;
-    message->mUnreliable[15] = 0;
-    message->mVoice[0] = 0;
-    message->mVoice[1] = 0;
-    message->mVoice[2] = 0;
-    message->mVoice[3] = 0;
-    message->mVoice[4] = 0;
-    message->mVoice[5] = 0;
-    message->mVoice[6] = 0;
-    message->mVoice[7] = 0;
-    message->mVoice[8] = 0;
-    message->mVoice[9] = 0;
-    message->mVoice[10] = 0;
-    message->mVoice[11] = 0;
-    message->mVoice[12] = 0;
-    message->mVoice[13] = 0;
-    message->mVoice[14] = 0;
-    message->mVoice[15] = 0;
-    message->mSize = 6;
-    return message;
+    mUnidentified04 = 0;
+    mFlags = 0;
+    mUnidentified0A = 0;
+    mUnidentified0C = 0;
+    mUnidentified0E = 0;
+    mTimestamp = 0;
+    mUnidentified14 = 0;
+    mUnidentified18 = 0;
+    mUnreliableCount = 0;
+    mVoiceCount = 0;
+    mReliableCount = 0;
+    mReliable[0] = 0;
+    mReliable[1] = 0;
+    mReliable[2] = 0;
+    mReliable[3] = 0;
+    mReliable[4] = 0;
+    mReliable[5] = 0;
+    mReliable[6] = 0;
+    mReliable[7] = 0;
+    mReliable[8] = 0;
+    mReliable[9] = 0;
+    mReliable[10] = 0;
+    mReliable[11] = 0;
+    mReliable[12] = 0;
+    mReliable[13] = 0;
+    mReliable[14] = 0;
+    mReliable[15] = 0;
+    mUnreliable[0] = 0;
+    mUnreliable[1] = 0;
+    mUnreliable[2] = 0;
+    mUnreliable[3] = 0;
+    mUnreliable[4] = 0;
+    mUnreliable[5] = 0;
+    mUnreliable[6] = 0;
+    mUnreliable[7] = 0;
+    mUnreliable[8] = 0;
+    mUnreliable[9] = 0;
+    mUnreliable[10] = 0;
+    mUnreliable[11] = 0;
+    mUnreliable[12] = 0;
+    mUnreliable[13] = 0;
+    mUnreliable[14] = 0;
+    mUnreliable[15] = 0;
+    mVoice[0] = 0;
+    mVoice[1] = 0;
+    mVoice[2] = 0;
+    mVoice[3] = 0;
+    mVoice[4] = 0;
+    mVoice[5] = 0;
+    mVoice[6] = 0;
+    mVoice[7] = 0;
+    mVoice[8] = 0;
+    mVoice[9] = 0;
+    mVoice[10] = 0;
+    mVoice[11] = 0;
+    mVoice[12] = 0;
+    mVoice[13] = 0;
+    mVoice[14] = 0;
+    mVoice[15] = 0;
+    mSize = 6;
 }
 
-extern "C" void* fn_8032B7DC(void* message, int shouldDelete)
+UnidentifiedTransportMessage_8032B6D4::~UnidentifiedTransportMessage_8032B6D4()
 {
-    if (message != 0 && shouldDelete > 0)
-    {
-        ::operator delete(message);
-    }
-    return message;
 }
 
 extern "C" void fn_8032B81C(UnidentifiedTransportMessage_8032B6D4* message)
@@ -316,7 +265,7 @@ extern "C" bool fn_8032BC60(
     return false;
 }
 
-extern "C" u8 fn_8032BC8C(
+extern "C" int fn_8032BC8C(
     const UnidentifiedTransportMessage_8032B6D4* message)
 {
     return message->mReliableCount;
@@ -328,7 +277,7 @@ extern "C" UnidentifiedTransportPacket_803263E4* fn_8032BC94(
     return message->mReliable[index];
 }
 
-extern "C" u8 fn_8032BCA4(
+extern "C" int fn_8032BCA4(
     const UnidentifiedTransportMessage_8032B6D4* message)
 {
     if ((message->mFlags & 0x20) != 0)
@@ -344,7 +293,7 @@ extern "C" UnidentifiedTransportPacket_803263E4* fn_8032BCC0(
     return message->mUnreliable[index];
 }
 
-extern "C" u8 fn_8032BCD0(
+extern "C" int fn_8032BCD0(
     const UnidentifiedTransportMessage_8032B6D4* message)
 {
     if ((message->mFlags & 2) != 0)
@@ -379,9 +328,10 @@ extern "C" u32 fn_8032BD10(
     return message->mUnidentified14;
 }
 
-extern "C" void fn_8032BD20(UnidentifiedTransportMessage_8032B6D4* message,
+void UnidentifiedTransportMessage_8032B6D4::Serialize(
     UnidentifiedMessageSerializer* serializer)
 {
+    UnidentifiedTransportMessage_8032B6D4* message = this;
     serializer->Transfer(&message->mUnidentified04,
         sizeof(message->mUnidentified04));
     serializer->Transfer(&message->mFlags, sizeof(message->mFlags));
@@ -420,13 +370,7 @@ extern "C" void fn_8032BD20(UnidentifiedTransportMessage_8032B6D4* message,
             for (i = 0; i < message->mUnreliableCount; ++i)
             {
                 UnidentifiedTransportPacket_803263E4* packet =
-                    (UnidentifiedTransportPacket_803263E4*)fn_803263E4(
-                        sizeof(UnidentifiedTransportPacket_803263E4), 8,
-                        false);
-                if (packet != 0)
-                {
-                    packet->mUnidentified06 = 0;
-                }
+                    new (8, false) UnidentifiedTransportPacket_803263E4;
                 message->mUnreliable[i] = packet;
                 fn_80326684(packet, serializer);
                 message->mUnreliable[i]->mUnidentified00 = 0;
@@ -450,12 +394,7 @@ extern "C" void fn_8032BD20(UnidentifiedTransportMessage_8032B6D4* message,
         for (i = 0; i < message->mReliableCount; ++i)
         {
             UnidentifiedTransportPacket_803263E4* packet =
-                (UnidentifiedTransportPacket_803263E4*)fn_803263E4(
-                    sizeof(UnidentifiedTransportPacket_803263E4), 8, false);
-            if (packet != 0)
-            {
-                packet->mUnidentified06 = 0;
-            }
+                new (8, false) UnidentifiedTransportPacket_803263E4;
             message->mReliable[i] = packet;
             fn_80326464(packet, serializer);
             message->mReliable[i]->mUnidentified00 = 0;
@@ -480,12 +419,7 @@ extern "C" void fn_8032C184(UnidentifiedTransportMessage_8032B6D4* message,
         for (i = 0; i < message->mVoiceCount; ++i)
         {
             UnidentifiedTransportPacket_803263E4* packet =
-                (UnidentifiedTransportPacket_803263E4*)fn_803263E4(
-                    sizeof(UnidentifiedTransportPacket_803263E4), 8, false);
-            if (packet != 0)
-            {
-                packet->mUnidentified06 = 0;
-            }
+                new (8, false) UnidentifiedTransportPacket_803263E4;
             message->mVoice[i] = packet;
             fn_80326684(packet, serializer);
             message->mVoice[i]->mUnidentified00 = 0;
@@ -501,47 +435,41 @@ extern "C" void fn_8032C184(UnidentifiedTransportMessage_8032B6D4* message,
     }
 }
 
-extern "C" void fn_8032C294(
-    UnidentifiedPayload32_8032C294* payload,
+void UnidentifiedClientChallenge_8032C294::Serialize(
     UnidentifiedMessageSerializer* serializer)
 {
-    serializer->Transfer(payload->mPayload, sizeof(payload->mPayload));
+    serializer->Transfer(mPayload, sizeof(mPayload));
 }
 
-extern "C" void fn_8032C308(
-    UnidentifiedPayload64_8032C308* payload,
+void UnidentifiedServerChallenge_8032C308::Serialize(
     UnidentifiedMessageSerializer* serializer)
 {
-    serializer->Transfer(payload->mPayload, 0x20);
-    serializer->Transfer(payload->mPayload + 0x20, 0x20);
+    serializer->Transfer(mUnidentified04, sizeof(mUnidentified04));
+    serializer->Transfer(mUnidentified24, sizeof(mUnidentified24));
 }
 
-extern "C" void fn_8032C3CC(
-    UnidentifiedPayload32_8032C294* payload,
+void UnidentifiedClientResponse_8032C3CC::Serialize(
     UnidentifiedMessageSerializer* serializer)
 {
-    serializer->Transfer(payload->mPayload, sizeof(payload->mPayload));
+    serializer->Transfer(mPayload, sizeof(mPayload));
 }
 
-extern "C" void fn_8032C440(
-    UnidentifiedPayloadByte_8032C440* payload,
+void UnidentifiedServerResponse_8032C440::Serialize(
     UnidentifiedMessageSerializer* serializer)
 {
-    serializer->Transfer(&payload->mPayload, sizeof(payload->mPayload));
+    serializer->Transfer(&mAccepted, sizeof(mAccepted));
 }
 
-extern "C" void fn_8032C4B4(
-    UnidentifiedPayloadByte_8032C440* payload,
+void UnidentifiedClosing_8032C4B4::Serialize(
     UnidentifiedMessageSerializer* serializer)
 {
-    serializer->Transfer(&payload->mPayload, sizeof(payload->mPayload));
+    serializer->Transfer(&mUnidentified04, sizeof(mUnidentified04));
 }
 
-extern "C" void fn_8032C528(
-    UnidentifiedPayloadByte_8032C440* payload,
+void UnidentifiedKeepAlive_8032C528::Serialize(
     UnidentifiedMessageSerializer* serializer)
 {
-    serializer->Transfer(&payload->mPayload, sizeof(payload->mPayload));
+    serializer->Transfer(&mUnidentified04, sizeof(mUnidentified04));
 }
 
 extern "C" void fn_8032C59C()
@@ -567,9 +495,9 @@ extern "C" void fn_8032C5E4(u32* values)
     } while (byteOffset < 0x20);
 }
 
-extern "C" void fn_8032C630(const void* input, void* output)
+extern "C" void fn_8032C630(void* output, const void* input)
 {
-    fn_803232BC(lbl_806E20F8, output, input, 0x20);
+    fn_803232BC(lbl_806E20F8, input, output, 0x20);
 }
 
 extern "C" bool fn_8032C640(const void* first, const void* second)

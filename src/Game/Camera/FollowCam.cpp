@@ -10,8 +10,6 @@
 #include "NL/gl/glMatrix.h"
 #include "NL/globalpad.h"
 
-extern void* lbl_806E1E28;
-extern "C" cGlobalPad* fn_802C082C(void* manager, int index);
 
 static float g_fDistanceSeek = 0.4f;
 static float lbl_806DC4CC = 1.5f;

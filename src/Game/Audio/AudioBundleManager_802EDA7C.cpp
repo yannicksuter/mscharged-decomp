@@ -1,3 +1,4 @@
+#include "Game/Audio/AudioBackend_8035B8E8.h"
 #include "Game/Audio/AudioBundleManager_802EDA7C.h"
 
 #include "Game/Audio/AudioLoadMode_806E201C.h"

@@ -14,7 +14,7 @@ class SkinAnimatedNPC;
 class UnidentifiedSkinAnimatedNPC_80199880;
 struct HammerObject;
 struct DaisyFistObject;
-struct State_8019A710;
+struct BulletBillObject;
 struct State_80199E84;
 struct KoopaShellObject;
 struct ThwompObject;
@@ -66,8 +66,8 @@ public:
     void fn_801A9BD0();
     void fn_801A9C3C();
     DaisyFistObject* fn_801A9CA4(int nIndex);
-    State_8019A710* fn_801A9D10(int nIndex);
-    State_8019A710* fn_801A9D20();
+    BulletBillObject* fn_801A9D10(int nIndex);
+    BulletBillObject* fn_801A9D20();
     SkinAnimatedNPC* fn_801A9DE0(int nIndex);
     void fn_801A9DF0();
     void fn_801AA088();
@@ -128,7 +128,7 @@ public:
     /* 0x30 */ unsigned int mUnidentified030;
     /* 0x34 */ DaisyFistObject* mDaisyFists[8];
     /* 0x54 */ unsigned int mUnidentified054;
-    /* 0x58 */ State_8019A710* mUnidentified058[6];
+    /* 0x58 */ BulletBillObject* mUnidentified058[6];
     /* 0x70 */ HammerObject* mUnidentified070[15];
     /* 0xAC */ ThwompObject* mUnidentified0AC[8];
     /* 0xCC */ SkinAnimatedNPC* mUnidentified0CC[3];

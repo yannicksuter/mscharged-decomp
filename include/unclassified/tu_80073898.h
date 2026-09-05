@@ -33,4 +33,7 @@ struct UnidentifiedTweakLoadState
 
 extern UnidentifiedTweakLoadState lbl_8056BA00;
 
+void fn_80073A48(
+    UnidentifiedTweakLoadState* state, const char* name, const char* category);
+
 #endif // UNCLASSIFIED_TU_80073898_H

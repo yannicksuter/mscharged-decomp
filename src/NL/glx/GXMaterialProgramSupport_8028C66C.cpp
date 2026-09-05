@@ -10,6 +10,7 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxMatrix.h"
+#include "NL/glx/glxTexture.h"
 
 extern "C"
 {
@@ -25,8 +26,6 @@ extern "C"
     void fn_801B5EE8(const bool* flags, int stageCount, int texGenCount,
         int texture4, int texture5, int texCoord3, int texCoord4,
         int texCoord5, int finalTexture, float value);
-    void* fn_802CDF0C();
-    unsigned long fn_802CE1B8(void*, unsigned long texture);
     void fn_8036D774(const nlMatrix4* matrix);
     void fn_8036D7EC(
         const void* matrices, unsigned long count, const nlMatrix4* matrix,

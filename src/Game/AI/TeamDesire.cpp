@@ -1,4 +1,5 @@
 #include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/FielderInput.h"
 
 UnidentifiedTeamDesire::UnidentifiedTeamDesire(
     int state, const UnidentifiedStateTransition& transition)

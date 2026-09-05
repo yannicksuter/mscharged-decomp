@@ -10,6 +10,7 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxMatrix.h"
+#include "NL/glx/glxTexture.h"
 
 extern "C"
 {
@@ -22,8 +23,6 @@ extern "C"
     void fn_80183A98();
     void fn_80183B40(unsigned long matrix);
     void fn_80183BF4(const nlMatrix4* matrix);
-    void* fn_802CDF0C();
-    unsigned long fn_802CE1B8(void*, unsigned long texture);
     void fn_8036D774(const nlMatrix4* matrix);
     void fn_8036D7EC(
         const void* matrices, unsigned long count, const nlMatrix4* matrix,

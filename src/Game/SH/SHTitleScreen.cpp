@@ -23,12 +23,10 @@ class TU80252180Scene;
 extern "C" TU80252180Scene* fn_80253E18();
 extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
 extern "C" bool fn_80273B00();
-extern "C" cGlobalPad* fn_802C082C(void* owner, int pad);
 extern "C" int VISetTimeToDimming(int time);
 
 extern TLComponentInstance* lbl_80578450[4];
 extern BaseGameSceneManager* lbl_806E1838;
-extern void* lbl_806E1E28;
 extern bool g_e3_Build;
 
 extern const int lbl_804E8368[10] = {

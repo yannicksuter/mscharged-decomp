@@ -12,6 +12,7 @@
 #include "Game/Camera/animcam.h"
 #include "Game/Camera/kickoffcam.h"
 #include "Game/Render/ImpostorManager.h"
+#include "Game/Task/BeginFrameTask.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
@@ -26,8 +27,6 @@ extern "C" cRumbleFilter* fn_800EF5F8(void*);
 extern "C" UnidentifiedCameraFilter* fn_800EF9F0(void*);
 extern "C" const char* fn_801CBE80(int);
 extern "C" void fn_8005B330(nlVector3*, float, float);
-extern "C" float fn_80112E0C();
-extern "C" float fn_80112E14();
 extern "C" void fn_80277BB0();
 extern "C" void fn_800F0990(float);
 extern void nlPrintf(const char*, ...);

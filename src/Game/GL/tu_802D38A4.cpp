@@ -1,6 +1,8 @@
+#include "Game/GL/tu_802D38A4.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
+#include "NL/glx/glxLoadModel.h"
 
 struct UnidentifiedMaterialProgram_802D38A4
 {
@@ -8,9 +10,7 @@ struct UnidentifiedMaterialProgram_802D38A4
     unsigned long dataSize;
 };
 
-extern "C" void* fn_802CB7D0(unsigned long hash);
-
-extern "C" void fn_802D38A4(glModel* pModel, int numVerts, int prim,
+void fn_802D38A4(glModel* pModel, int numVerts, int prim,
     void* pResource, int numStreams, unsigned long programHash)
 {
     glModelPacket* pPacket;
@@ -74,7 +74,7 @@ extern "C" void fn_802D38A4(glModel* pModel, int numVerts, int prim,
     pPacket->unknown20 = data;
 }
 
-extern "C" void fn_802D39CC(glModelStream* pStream, int stream,
+void fn_802D39CC(glModelStream* pStream, int stream,
     void* address, int stride, int type)
 {
     pStream->address = address;
@@ -84,21 +84,21 @@ extern "C" void fn_802D39CC(glModelStream* pStream, int stream,
     pStream->unknown04 = stream;
 }
 
-extern "C" void fn_802D39E8(
+void fn_802D39E8(
     glModel* pModel, glModelPacket* pPackets, unsigned long numPackets)
 {
     pModel->packets = pPackets;
     pModel->numPackets = numPackets;
 }
 
-extern "C" void fn_802D39F4(
+void fn_802D39F4(
     glModelPacket* pPacket, glModelStream* pStreams, int numStreams)
 {
     pPacket->streams = pStreams;
     pPacket->numStreams = numStreams;
 }
 
-extern "C" void fn_802D3A00(glModelStream* pStream, void* address)
+void fn_802D3A00(glModelStream* pStream, void* address)
 {
     pStream->address = address;
 }

@@ -32,9 +32,7 @@ struct UnidentifiedGameRecordHeader
     int mPlayerCounts[4];
 };
 
-extern void* lbl_806E1E28;
 
-extern "C" cGlobalPad* fn_802C082C(void* manager, int index);
 extern "C" void fn_80331668(
     InputRouterRecord* record, const DetInput* input);
 extern "C" void fn_803317E0(

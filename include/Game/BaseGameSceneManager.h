@@ -56,4 +56,8 @@ public:
     /* 0x88 */ BaseSceneHandler* mBaseSceneHandlerStack[MAX_SCENE_DEPTH];
 }; // size 0x108
 
+
+extern BaseGameSceneManager* lbl_806E1838;
+extern BaseGameSceneManager* lbl_806E1860;
+
 #endif // GAME_BASE_GAME_SCENE_MANAGER_H

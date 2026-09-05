@@ -9,13 +9,12 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 
+#include "NL/gl/glMemory.h"
 #include "string.h"
 
 class MemoryAllocator;
 
 extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
-extern "C" bool fn_802C820C(const char*, MemoryAllocator*);
-extern "C" MemoryAllocator* fn_802CC094();
 
 extern bool g_ForceDoubleBallTransition;
 
@@ -43,7 +42,8 @@ void Wiper::Initialize()
 {
     GLView* view = GetLayerView(eCLV_Transitions);
     ScreenTransitionManager::Instance()->m_eView = view;
-    fn_802C820C("art/transitions/transitions.rlt", fn_802CC094());
+    fn_802C820C("art/transitions/transitions.rlt",
+        (MemoryAllocator*)fn_802CC094());
 
     unsigned long fileSize = 0;
     char* loadedData = (char*)fxLoadEntireFileHigh("art/transitions/transitions.fx", &fileSize);

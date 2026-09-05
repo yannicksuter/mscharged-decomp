@@ -1,5 +1,6 @@
 #include "Game/Render/ImpostorCharacter.h"
 
+#include "Game/GL/GLCompactColourMeshWriter.h"
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorManager.h"
 #include "NL/gl/gl.h"
@@ -13,22 +14,6 @@
 
 extern "C" int nlSNPrintf(char*, unsigned long, const char*, ...);
 extern "C" void fn_8004F594(int category, const char* format, ...);
-
-struct State_802A7C90
-{
-    int count;
-    glModel* model;
-    void* resource;
-    short* position;
-    short* texcoord;
-    u32* colour;
-};
-
-extern "C" void fn_802A7C90(State_802A7C90* writer);
-extern "C" void* fn_802A7CB0(State_802A7C90* writer, int shouldDelete);
-extern "C" bool fn_802A7CF0(
-    State_802A7C90* writer, int vertexCount, int primitive, void* allocator);
-extern "C" bool fn_802A7E9C(State_802A7C90* writer);
 
 static int lbl_8052E778[6] = { 0, 1, 2, 0, 2, 3 };
 static char lbl_8052E790[] = "global/checkers";
@@ -157,7 +142,7 @@ ImpostorSprite_802D4290::~ImpostorSprite_802D4290()
     fn_802CDA14(&mUnidentified06C);
     if (mUnidentified074 != 0)
     {
-        fn_802A7CB0(mUnidentified074, 1);
+        delete mUnidentified074;
     }
 
     mUnidentified064 = 0;
@@ -309,18 +294,7 @@ extern "C" void fn_802D48E4(
         enabled ? GLViewTarget_Mode9 : GLViewTarget_None;
 }
 
-static inline State_802A7C90* AllocateWriter_802D4290()
-{
-    State_802A7C90* writer =
-        (State_802A7C90*)nlMalloc(sizeof(State_802A7C90), 8, false);
-    if (writer != 0)
-    {
-        fn_802A7C90(writer);
-    }
-    return writer;
-}
-
-static inline void WriteVertex_802D4290(State_802A7C90* writer,
+static inline void WriteVertex_802D4290(GLCompactColourMeshWriter* writer,
     const UnidentifiedImpostorQuad_802D511C& quad, int index,
     const Impostor& impostor)
 {
@@ -342,7 +316,7 @@ extern "C" int fn_802D4AEC(ImpostorSprite_802D4290* sprite,
     if (cached)
     {
         if (sprite->mUnidentified074 != 0
-            && fn_802A7E9C(sprite->mUnidentified074))
+            && sprite->mUnidentified074->End())
         {
             target->AttachModel(
                 sprite->mUnidentified074->model, lbl_806DF414);
@@ -352,7 +326,7 @@ extern "C" int fn_802D4AEC(ImpostorSprite_802D4290* sprite,
 
     if (sprite->mUnidentified074 != 0 && !skipCapture)
     {
-        fn_802A7CB0(sprite->mUnidentified074, 1);
+        delete sprite->mUnidentified074;
         sprite->mUnidentified074 = 0;
     }
 
@@ -363,14 +337,14 @@ extern "C" int fn_802D4AEC(ImpostorSprite_802D4290* sprite,
         return 0;
     }
 
-    State_802A7C90* writer;
+    GLCompactColourMeshWriter* writer;
     if (skipCapture)
     {
-        writer = AllocateWriter_802D4290();
+        writer = new (8, false) GLCompactColourMeshWriter;
     }
     else
     {
-        sprite->mUnidentified074 = AllocateWriter_802D4290();
+        sprite->mUnidentified074 = new (8, false) GLCompactColourMeshWriter;
         writer = sprite->mUnidentified074;
     }
 
@@ -391,11 +365,11 @@ extern "C" int fn_802D4AEC(ImpostorSprite_802D4290* sprite,
     bool began;
     if (hasQuads)
     {
-        began = fn_802A7CF0(writer, count * 4, 3, allocator);
+        began = writer->Begin( count * 4, 3, allocator);
     }
     else
     {
-        began = fn_802A7CF0(writer, count * 6, 0, allocator);
+        began = writer->Begin( count * 6, 0, allocator);
     }
 
     if (began)
@@ -457,7 +431,7 @@ extern "C" int fn_802D4AEC(ImpostorSprite_802D4290* sprite,
         textureState->SetWrapT(true);
         textureState->unknown07 = 0;
 
-        if (fn_802A7E9C(writer))
+        if (writer->End())
         {
             target->AttachModel(writer->model, lbl_806DF414);
         }
@@ -473,7 +447,7 @@ extern "C" int fn_802D4AEC(ImpostorSprite_802D4290* sprite,
 
     if (skipCapture)
     {
-        fn_802A7CB0(writer, 1);
+        delete writer;
     }
     return rendered;
 }

@@ -55,22 +55,22 @@ feVector3& FELibObject::GetScale() const
     return const_cast<feVector3&>(m_attributes.v3Scale);
 }
 
-extern "C" float fn_803020BC(FELibObject* object)
+float fn_803020BC(FELibObject* object)
 {
     return object->m_attributes.field_0x38;
 }
 
-extern "C" float fn_803020C4(FELibObject* object)
+float fn_803020C4(FELibObject* object)
 {
     return object->m_attributes.field_0x3C;
 }
 
-extern "C" float fn_803020CC(FELibObject* object)
+float fn_803020CC(FELibObject* object)
 {
     return object->m_attributes.field_0x40;
 }
 
-extern "C" float fn_803020D4(FELibObject* object)
+float fn_803020D4(FELibObject* object)
 {
     return object->m_attributes.field_0x44;
 }

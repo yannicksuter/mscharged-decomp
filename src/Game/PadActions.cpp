@@ -12,7 +12,6 @@
 #include "types.h"
 
 extern bool g_bEnableGamecubePadMonkey;
-extern void* lbl_806E1E28;
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
 extern s32* lbl_806E2278;
@@ -23,8 +22,6 @@ extern "C"
 {
     void* fn_802C06D4(void* manager);
     void fn_802C06D8(void* manager, int padCount, int padSetCount);
-    cGlobalPad* fn_802C082C(void* manager, int padIndex);
-    void fn_802C084C(void* manager, int padSet);
     void fn_80375288(void* state);
 }
 

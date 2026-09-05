@@ -59,7 +59,7 @@ void KPADSetHoriParam(s32 chan, f32 playRadius, f32 sensitivity);
 void KPADSetDistParam(s32 chan, f32 playRadius, f32 sensitivity);
 void KPADSetAccParam(s32 chan, f32 playRadius, f32 sensitivity);
 
-s32 KPADRead(s32 chan, KPADStatus* pSamples, s32 numSamples);
+s32 KPADRead(s32 chan, KPADStatus* pSamples, u32 numSamples);
 
 void KPADInit(void);
 

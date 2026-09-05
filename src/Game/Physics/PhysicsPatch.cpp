@@ -1,3 +1,4 @@
+#include "Game/AI/UnidentifiedAvoidanceObject.h"
 #include "Game/Physics/PhysicsPatch.h"
 
 #include "Game/AI/AiUtil.h"
@@ -35,21 +36,6 @@ extern "C" UnidentifiedNetworkSyncState* lbl_806E2488;
 
 extern "C" void fn_8017472C(void*);
 
-class Unidentified_804F4780 : public unk_8000CD44
-{
-public:
-    Unidentified_804F4780(PhysicsPatch* patch)
-        : unk_8000CD44(0x20)
-        , mUnidentified14(patch)
-    {
-    }
-    virtual ~Unidentified_804F4780();
-
-    /* 0x14 */ PhysicsPatch* mUnidentified14;
-    /* 0x18 */ unsigned char mUnidentified18[0x0C];
-}; // total size: 0x24
-
-static const nlVector3 lbl_804DCCA0 = { 0.0f, 0.0f, 0.0f };
 static const nlVector3 lbl_804DCCAC = { -2.0f, 0.0f, -5.0f };
 
 unsigned short lbl_806DCAB8 = 0xFFFF;
@@ -59,21 +45,18 @@ SlotPool<PhysicsPatch> PhysicsPatch::lbl_805705D0(16, 16);
 
 static void fn_8017498C(EmissionController& controller)
 {
-    if (g_pGame != 0)
+    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
-        if (g_pGame->m_eGameState == 4)
+        return;
+    }
+
+    if (controller.m_GlView == 0)
+    {
+        PhysicsPatch* patch = (PhysicsPatch*)controller.m_uUserData;
+        if (patch->m_bVisible == true)
         {
-            return;
-        }
-        if (controller.m_GlView == 0)
-        {
-            PhysicsPatch* patch
-                = (PhysicsPatch*)controller.m_uUserData;
-            if (patch->m_bVisible == true)
-            {
-                controller.SetPosition(patch->mUnidentified9C);
-                controller.SetVelocity(patch->m_Velocity);
-            }
+            controller.SetPosition(patch->mUnidentified9C);
+            controller.SetVelocity(patch->m_Velocity);
         }
     }
 }
@@ -156,8 +139,8 @@ void PhysicsPatch::fn_80172EE0(const int* type)
     case 9:
     case 10:
         mUnidentified44
-            = new (nlMalloc(sizeof(Unidentified_804F4780), 8, false))
-                Unidentified_804F4780(this);
+            = new (nlMalloc(sizeof(UnidentifiedAvoidancePatch_804F4780), 8, false))
+                UnidentifiedAvoidancePatch_804F4780(this);
         break;
     default:
         mUnidentified44 = 0;
@@ -191,7 +174,7 @@ void PhysicsPatch::Unknown0()
     SetRadius(0.5f);
     DisableCollisions();
     SetPosition(lbl_804DCCAC, WORLD_COORDINATES);
-    m_Velocity = lbl_804DCCA0;
+    m_Velocity = v3Zero;
     mUnidentified40 = 0;
     m_PathSpeed = 0.0f;
     m_PathPointCount = 0;
@@ -452,7 +435,7 @@ void PhysicsPatch::fn_80173DA4(float dt)
         || __fpclassifyf(position.y) == 1
         || __fpclassifyf(position.z) == 1)
     {
-        position = lbl_804DCCA0;
+        position = v3Zero;
     }
     SetPosition(position, WORLD_COORDINATES);
 

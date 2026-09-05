@@ -49,6 +49,26 @@ types and entry points the SDK's WPAD and WUD headers refer to (`BD_ADDR`,
 `BT_HDR`, `GKI_getbuf`, and the `BTA_Hh*` calls). Their names and widths follow
 Broadcom's published BTE/Bluedroid headers.
 
+`Game/Effects/EmitterCallbacks.cpp` contains the emitter updates at
+`0x801BE428..0x801BEF44`. The predecessor's `Game/CharacterTriggers.cpp`
+supplies the names `UpdateEmitterFromCharacter`,
+`UpdateEmitterPoseFromCharacter`, and `UpdateEmitterFromBall`. The filename
+and other callback names are descriptive reconstructions from R4QE01 behavior
+and callers, rather than recovered retail symbols. These callbacks follow
+replay characters, ball trails, ball landing positions, character joints, and
+impostor models. The backward and forward character callbacks are used by
+`wario_ignition` and `bowserjr_shriek_mouth`, respectively; the head callback
+updates `bowser_smoke`.
+
+`Game/GL/GLCompactColourMeshWriter.cpp` contains the mesh writer at
+`0x802A7C90..0x802A7F60`. Its class and filename describe the vertex format:
+signed 16-bit XYZ with six fractional bits, signed 16-bit UV with ten
+fractional bits, and RGBA8 colour. The material program `0x4ED6C66F` and
+impostor sprite callers establish that format. These are inferred names,
+not recovered retail symbols. Packet finalization takes the allocator as
+its third argument, as confirmed by the implementation at `0x8036E438`
+and the model loader.
+
 `src/RVL_SDK/bte/` and `libs/RVL_SDK/include/private/bte/` do vendor Broadcom
 source. Both trees carry Broadcom's original copyright notice and its
 Apache-2.0 licence header, and each file records the Bluedroid path it came

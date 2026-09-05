@@ -305,6 +305,8 @@ public:
     };
 }; // total size: 0x10
 
+extern "C" void fn_802B5D74(nlVector3& out, const nlVector3& point, const nlVector4& plane);
+
 inline void nlVec4Set(nlVector4& v0, float _x, float _y, float _z, float _w)
 {
     v0.x = _x;
@@ -497,5 +499,7 @@ void nlAddPolarToCartesian(nlVector3& result, const nlPolar& polar);
 void nlPolarToCartesian(nlVector3& v, const nlPolar& polar);
 void nlPolarToCartesian(float& x, float& y, unsigned short angle, float radius);
 void nlCartesianToPolar(nlPolar& out, float x, float y);
+
+void fn_802B549C(nlQuaternion& out, unsigned short angle);
 
 #endif

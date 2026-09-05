@@ -3,15 +3,14 @@
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorManager.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "NL/gl/gl.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glView.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
 extern "C" int nlSNPrintf(char*, unsigned long, const char*, ...);
 extern "C" double floor(double);
-extern "C" void fn_802C8280(const char*);
-extern "C" void fn_802C8288();
-extern "C" ResourceInterface_802CC094* fn_802CC094();
 
 // The tweak-value constructor is inlined here, matching the pattern already
 // used by Game/InterpreterCore.cpp; the retained out-of-line copy at

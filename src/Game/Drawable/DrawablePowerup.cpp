@@ -1,11 +1,14 @@
 #include "Game/BasicStadium.h"
 #include "Game/AI/Powerups.h"
 #include "Game/Drawable/DrawablePowerup.h"
+#include "Game/Render/RLView.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_80186524.h"
+#include "unclassified/tu_80276264.h"
 
 struct UnidentifiedStaticState
 {
@@ -49,11 +52,6 @@ struct ShadowHeight
     char _00[0x98];
     float height;
 };
-
-extern "C" RenderObject* fn_8027725C(u32);
-extern "C" void fn_802B549C(nlQuaternion*, u16);
-extern "C" void fn_801869AC(void*, void*, int, int, const DrawablePowerup*, float);
-extern "C" u32 fn_8027262C();
 
 u8 sDrawPowerupShadows = 1;
 u8 sUseModelPowerupShadows = 1;
@@ -180,7 +178,7 @@ static void DrawShadow(float radius, float x, float y, float z)
     glSetTextureState((eGLTextureState)0, 3);
     glSetCurrentTextureState(glHandleizeTextureState());
 
-    quad.Attach((eGLView)fn_8027262C(), 0);
+    quad.Attach((eGLView)(u32)fn_8027262C(), 0);
 }
 
 void DrawablePowerup::Grab(int idx)
@@ -204,7 +202,8 @@ void DrawablePowerup::Grab(int idx)
 void DrawablePowerup::Render(int idx) const
 {
     FindPowerUp(nlStringLowerHash(GetName(idx)));
-    RenderObject* object = fn_8027725C(nlStringLowerHash(GetName(idx)));
+    RenderObject* object =
+        (RenderObject*)fn_8027725C(nlStringLowerHash(GetName(idx)));
 
     if (object == 0)
     {
@@ -213,7 +212,7 @@ void DrawablePowerup::Render(int idx) const
 
     nlQuaternion orientation;
     float angle = 0.0000958738f * (float)mOrientation;
-    fn_802B549C(&orientation, (u16)(int)(10430.378f * angle));
+    fn_802B549C(orientation, (u16)(int)(10430.378f * angle));
 
     if (mVisible)
     {

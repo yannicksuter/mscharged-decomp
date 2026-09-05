@@ -40,8 +40,6 @@ extern "C" TU80252180Scene* fn_80253E18();
 extern "C" void fn_80253474(TU80252180Scene* scene);
 extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
 
-extern void* lbl_806E1E28;
-extern "C" cGlobalPad* fn_802C082C(void* owner, int pad);
 
 extern bool lbl_806DC704;
 extern bool lbl_806E0F8B;

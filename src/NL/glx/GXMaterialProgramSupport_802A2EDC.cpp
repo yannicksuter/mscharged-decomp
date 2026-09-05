@@ -6,6 +6,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/platvmath.h"
+#include "unclassified/tu_8036D6F8.h"
 
 struct GXMaterialProgramParameters_802A61C8
 {
@@ -16,14 +17,6 @@ struct GXMaterialProgramParameters_802A61C8
 }; // size: 0x10
 
 static nlMatrix4 mview;
-
-extern "C"
-{
-    void fn_8036D774(const nlMatrix4* matrix);
-    void fn_8036D7EC(
-        void* matrices, unsigned long count, const nlMatrix4* matrix,
-        bool unknown);
-}
 
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A61C8>::Activate(GLView* view)

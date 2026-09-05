@@ -1,6 +1,6 @@
 #include "unclassified/tu_80199880.h"
 
-extern "C" void* fn_8027262C();
+#include "Game/Render/RLView.h"
 
 static void* sUnidentifiedView;
 static const nlVector3 sHiddenPosition = { 0.0f, 0.0f, -15.0f };

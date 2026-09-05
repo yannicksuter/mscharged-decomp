@@ -89,7 +89,7 @@ void AIPadManager::Startup()
     }
 }
 
-extern "C" cAIPad* fn_80007C3C(int index)
+cAIPad* fn_80007C3C(int index)
 {
     return &AIPadManager::mAIPads[index];
 }

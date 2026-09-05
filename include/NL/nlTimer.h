@@ -16,6 +16,11 @@ public:
     bool Countdown(float dt, float thresh);
     f32 GetSeconds() const;
     void SetSeconds(float seconds);
+    void UnidentifiedClear()
+    {
+        m_unk0 = m_uPackedTime != 0;
+        m_uPackedTime = 0;
+    }
 
     u32 m_unk0;
     u32 m_uPackedTime;

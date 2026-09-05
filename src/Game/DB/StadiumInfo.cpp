@@ -1,5 +1,8 @@
 #include "Game/DB/StadiumInfo.h"
 
+#include "Game/DB/tu_8010A40C.h"
+#include "NL/gl/glPlat.h"
+
 enum
 {
     NUM_STADIUMS = 18,
@@ -115,14 +118,6 @@ static StadiumInfo sStadiumInfo[NUM_STADIUMS] = {
         false, false, false, false, 0,
         true, false, false, false },
 };
-
-extern "C" bool fn_801100E0();
-extern "C" bool fn_80110188();
-extern "C" bool fn_80110230();
-extern "C" bool fn_80110338();
-extern "C" bool fn_801103D4();
-extern "C" bool fn_80110470();
-extern "C" int fn_803693B4();
 
 const char* GetStadiumName(int stadium)
 {

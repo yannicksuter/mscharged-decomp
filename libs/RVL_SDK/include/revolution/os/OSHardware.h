@@ -6,6 +6,10 @@
 #include <revolution/types.h>
 #include <revolution/dvd/dvd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define OS_PHYS_WIFI_AFH_CHANNEL 0x000031A2
 #define OS_PHYS_BOOT_INFO 0x00000000
 #define OS_PHYS_TV_FORMAT 0x000000CC
@@ -185,5 +189,9 @@ typedef struct OSDebugInterface {
 OSBootInfo OS_BOOT_INFO AT_ADDRESS(0x80000000);
 OSDebugInterface OS_DEBUG_INTERFACE AT_ADDRESS(0x80000040);
 OSBI2* OS_DVD_BI2 AT_ADDRESS(0x800000F4);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // REVOLUTION_OS_HARDWARE_H

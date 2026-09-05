@@ -1,3 +1,6 @@
+#include <revolution/os/OSCache.h>
+#include <revolution/base/PPCArch.h>
+
 #include "NL/glx/glxDisplayList.h"
 
 #include "NL/gl/glMemory.h"
@@ -7,13 +10,7 @@
 
 #define DISPLAY_LIST_HEADER 0xBA7EF00D
 
-extern "C"
-{
-    void DCFlushRangeNoSync(void* address, unsigned long size);
-    void PPCSync();
-
-    extern const unsigned long lbl_80535588[];
-}
+extern const unsigned long lbl_80535588[];
 
 static unsigned char opcodes[6] = {
     0x90,

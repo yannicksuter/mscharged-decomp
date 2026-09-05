@@ -225,25 +225,18 @@ extern "C" void fn_801A6074(
 
 extern "C" void fn_801A62C4(EmissionController& controller)
 {
-    if (g_pGame != 0)
+    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
-        switch (g_pGame->m_eGameState)
+        return;
+    }
+
+    if (controller.m_GlView == 0
+        && ReplayManager::Instance()->mRender != 0)
+    {
+        RenderSnapshot* snapshot = ReplayManager::Instance()->mRender;
+        if (snapshot->_1BE8.mVisible)
         {
-        case 4:
-            break;
-        default:
-            if (controller.m_GlView == 0
-                && ReplayManager::Instance()->mRender != 0)
-            {
-                RenderSnapshot* snapshot =
-                    ReplayManager::Instance()->mRender;
-                if (snapshot->_1BE8.mVisible)
-                {
-                    controller.SetPosition(
-                        snapshot->_1BE8.mPosition);
-                }
-            }
-            break;
+            controller.SetPosition(snapshot->_1BE8.mPosition);
         }
     }
 }

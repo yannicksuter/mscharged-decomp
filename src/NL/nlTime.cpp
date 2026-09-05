@@ -1,10 +1,8 @@
+#include <revolution/os/OSTime.h>
+
 #include "NL/nlTime.h"
 
 #include "decomp.h"
-
-typedef long long OSTime;
-
-extern "C" OSTime OSGetTime();
 
 u32 __OSBusClock AT_ADDRESS(0x800000F8);
 

@@ -2,6 +2,8 @@
 
 #include "Game/Effects/EffectsTemplate.h"
 #include "Game/NisPlayer.h"
+#include "NL/gl/tu_802CC370.h"
+#include "NL/glx/glxTexture.h"
 
 #include <string.h>
 
@@ -11,14 +13,6 @@ extern "C"
     extern unsigned long lbl_806E1F0C;
 
     bool fn_8027C12C(const NisPlayer* player);
-    void* fn_802CDF0C();
-    unsigned long fn_802CE1B8(void* manager, unsigned long texture);
-    unsigned long fn_802CC7E4(
-        glModelPacket* packet, unsigned long textureType);
-    void fn_802CC458(glModelPacket* packet, unsigned long textureType,
-        unsigned long texture);
-    void fn_802CC4FC(glModelPacket* packet, unsigned long textureType,
-        const unsigned long* texture);
 }
 
 const float BlinkTimes[4] = {

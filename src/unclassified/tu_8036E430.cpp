@@ -1,5 +1,7 @@
 #include "NL/gl/glMatrix.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
+#include "NL/gl/glPlat.h"
 #include "NL/glx/glxDisplayList.h"
 
 void glplatGetMatrix(unsigned long matrix, nlMatrix4& m)
@@ -27,6 +29,6 @@ extern "C" void fn_8036E438(
     packet->unknown28 = 0;
 }
 
-extern "C" void fn_8036E4C0(glModelPacket*, void*)
+void fn_8036E4C0(glModelPacket*, void*)
 {
 }

@@ -36,4 +36,10 @@ void UpdateWarble(WarbleOwner* owner, float dt);
 void RenderWarble(WarbleOwner* owner);
 void SetWarbleInstance(WarbleOwner* owner, WarbleInstance* instance);
 
+
+extern bool lbl_806E16D4;
+
+void fn_801B3EF4(bool* enabled);
+void fn_801B3F2C(bool* enabled);
+
 #endif // UNCLASSIFIED_TU_801B369C_H

@@ -5,6 +5,7 @@
 
 class MemoryAllocator;
 class nlFile;
+struct AsyncEntry;
 
 typedef void (*ReadAsyncCallback)(nlFile*, void*, unsigned int, unsigned long);
 typedef void (*LoadAsyncCallback)(void*, unsigned long, void*);
@@ -26,7 +27,7 @@ public:
 };
 
 nlFile* nlOpen(const char* filename);
-bool nlReadAsync(nlFile* file, void* buffer, unsigned int size, ReadAsyncCallback callback, unsigned long userParam, unsigned long bufferSize);
+AsyncEntry* nlReadAsync(nlFile* file, void* buffer, unsigned int size, ReadAsyncCallback callback, unsigned long userParam, unsigned long bufferSize);
 
 unsigned int nlFileSize(nlFile* file, unsigned int* size);
 void nlRead(nlFile* file, void* buffer, unsigned int size, unsigned long bufferSize);

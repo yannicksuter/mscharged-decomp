@@ -1,5 +1,6 @@
 #include "NL/gl/glPlat.h"
 #include "NL/gl/glView.h"
+#include "NL/gl/tu_80364020.h"
 
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxMemory.h"
@@ -104,9 +105,6 @@ extern "C"
     void fn_8036D89C();
 
     void fn_802CB848(Function2<bool, PlatformStartupEntry&, PlatformStartupEntry&>* callback);
-    void* fn_80364020();
-    void fn_803640E4(void* owner, u32 name);
-    void fn_803640DC();
     void fn_8036DF24(PlatformRenderTarget* target, bool flag0, bool flag1);
 
     extern GXRenderModeObj GXNtsc480IntDf;
@@ -164,17 +162,17 @@ static inline void ClearXFBInline(void* framebuffer)
     DCFlushRange(framebuffer, glx_FBSize);
 }
 
-extern "C" u32 fn_80369394()
+u32 fn_80369394()
 {
     return glx_rmode.fbWidth;
 }
 
-extern "C" u32 fn_803693A4()
+u32 fn_803693A4()
 {
     return glx_rmode.efbHeight;
 }
 
-extern "C" s32 fn_803693B4()
+s32 fn_803693B4()
 {
     return glx_VideoMode;
 }
@@ -421,7 +419,7 @@ static void glx_SendViews()
             const s32 viewportX = view->m_ViewportX;
             fn_803A7828((f32)viewportX, (f32)viewportY, (f32)viewportWidth, (f32)viewportHeight, 0.0f, 1.0f);
             fn_803A78A4(viewportX, viewportY, viewportWidth, viewportHeight);
-            fn_803640E4(fn_80364020(), (u32)view->m_Name);
+            fn_80364020()->fn_803640E4(view->m_Name);
 
             if (view->m_ClearColour || view->m_Unknown33 || view->m_ClearDepth)
             {
@@ -458,8 +456,7 @@ static void glx_SendViews()
         }
     }
 
-    fn_80364020();
-    fn_803640DC();
+    fn_80364020()->fn_803640DC();
     glx_SendEnd();
 }
 
@@ -493,12 +490,12 @@ extern "C" u32 fn_80369D54()
     return 448;
 }
 
-extern "C" u32 fn_80369D5C()
+u32 fn_80369D5C()
 {
     return 640;
 }
 
-extern "C" u32 fn_80369D64()
+u32 fn_80369D64()
 {
     return 480;
 }

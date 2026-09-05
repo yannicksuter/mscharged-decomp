@@ -1,3 +1,4 @@
+#include "Game/AI/UnidentifiedAvoidanceObject.h"
 #include "Game/AI/Powerups.h"
 
 #include "Game/AI/AIPad.h"
@@ -21,8 +22,8 @@
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_80276264.h"
 
-extern "C" DrawableObject* fn_8027725C(unsigned long);
 extern "C" void fn_802772A4(DrawableObject*);
 extern "C" bool fn_8003877C(cFielder*);
 extern "C" unsigned int fn_800387CC(cFielder*);
@@ -151,7 +152,6 @@ extern SlotPool<PowerupHitPlayerEventData> lbl_805719D8;
 
 static int lbl_806E0DA8;
 
-static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 unsigned long uPowerupTexID[NUM_POWER_UPS] = {
     nlStringLowerHash("fe/shell_green"),
@@ -907,7 +907,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     , m_eType(eType)
     , m_unk20(true)
 {
-    unk_804F47E0* pUnidentified = 0;
+    UnidentifiedAvoidancePowerup_804F47E0* pUnidentified = 0;
 
     m_aOrientation = 0;
     m_scale = 1.0f;
@@ -1047,8 +1047,8 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     m_pPhysicsObject->SetLinearVelocity(m_v3Velocity);
     m_pPhysicsObject->EnableCollisions();
 
-    pUnidentified = (unk_804F47E0*)nlMalloc(sizeof(unk_804F47E0), 8, false);
-    pUnidentified = new (pUnidentified) unk_804F47E0(this);
+    pUnidentified = (UnidentifiedAvoidancePowerup_804F47E0*)nlMalloc(sizeof(UnidentifiedAvoidancePowerup_804F47E0), 8, false);
+    pUnidentified = new (pUnidentified) UnidentifiedAvoidancePowerup_804F47E0(this);
     m_unk18 = pUnidentified;
 
     if (eType == POWER_UP_RED_SHELL)

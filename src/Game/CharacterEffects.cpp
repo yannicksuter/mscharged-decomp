@@ -1,9 +1,7 @@
 #include "Game/CharacterEffects.h"
 
 #include "NL/gl/glState.h"
-
-extern "C" void* fn_802CDF0C();
-extern "C" ResolvedTexture fn_802CE1B8(void* textureManager, u32 texture);
+#include "NL/glx/glxTexture.h"
 
 static EffectsTexturing fxTexturing[] = {
     EffectsTexturing(0xFFFFFFFF, GLB_None, false, false),
@@ -19,7 +17,8 @@ EffectsTexturing* fxGetTexturing(eEffectsTextureType type)
     if (texture != 0xFFFFFFFF
         && texturing->m_ResolvedTexture.value == 0xFFFF)
     {
-        texturing->m_ResolvedTexture = fn_802CE1B8(fn_802CDF0C(), texture);
+        texturing->m_ResolvedTexture.value =
+            fn_802CE1B8(fn_802CDF0C(), texture);
     }
     return texturing;
 }

@@ -4,14 +4,8 @@
 #include "Game/FE/feSceneManager.h"
 #include "Game/ResourceInterface_802CC094.h"
 #include "Game/SH/SHLoading.h"
+#include "NL/gl/glMemory.h"
 #include "NL/nlLocalization.h"
-
-extern "C"
-{
-    ResourceInterface_802CC094* fn_802CBFD8(
-        const void* configuration, int count, const char* name);
-    void fn_802CC02C(ResourceInterface_802CC094* resourceInterface);
-}
 
 FEMiniBundle* lbl_806E1828;
 ResourceInterface_802CC094* lbl_806E182C;

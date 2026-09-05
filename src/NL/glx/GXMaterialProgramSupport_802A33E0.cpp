@@ -1,14 +1,9 @@
 #include <revolution/gx.h>
 
+#include "NL/gl/glPlat.h"
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
-
-extern "C"
-{
-    unsigned long fn_80369394();
-    unsigned long fn_803693A4();
-}
 
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>::Activate(

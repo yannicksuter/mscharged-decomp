@@ -34,10 +34,8 @@ extern "C" void fn_8003C7B0(cFielder*);
 extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" bool fn_8003E70C(cFielder*);
 extern "C" bool fn_8003E8A0(cFielder*);
-extern "C" bool fn_8003E8F4(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" bool fn_8003E9F0(cFielder*);
-extern "C" bool fn_8003EA6C(cFielder*);
 extern "C" void fn_8006040C(cGame*, cFielder*);
 extern "C" void fn_80060608(cGame*, cFielder*);
 extern "C" void fn_80060804(cGame*, cFielder*);
@@ -631,10 +629,10 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
                      && pFielder->GetGlobalPad() == NULL
                      && !(fn_8003E948(pFielder)
                           && pFielder->mUnidentified3DC)
-                     && !fn_8003EA6C(pFielder)
+                     && !pFielder->fn_8003EA6C()
                      && !fn_8003E948(pFielder)
                      && !fn_8003E8A0(pFielder)
-                     && !fn_8003E8F4(pFielder)
+                     && !pFielder->fn_8003E8F4()
                      && fn_800DEFD4(pFielder) == 0.0f
                      && fn_800DED80(pFielder) < 0.2f;
 
@@ -730,7 +728,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
         fRepulsionMult = 1.0f;
     }
 
-    if (pFielder->GetGlobalPad() == NULL && fn_8003EA6C(pFielder))
+    if (pFielder->GetGlobalPad() == NULL && pFielder->fn_8003EA6C())
     {
         nThingsToAvoid &= ~(AVOID_FIELDERS | AVOID_GOALIES);
     }

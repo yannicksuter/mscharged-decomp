@@ -1,21 +1,15 @@
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glFont.h"
+#include "NL/gl/glMemory.h"
 #include "NL/glx/glxFont.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glState.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 
 #include <stdarg.h>
-
-extern "C" void fn_802C8280(const char* name);
-extern "C" void fn_802C8288();
-extern "C" MemoryAllocator* fn_802CC094();
-extern "C" void fn_802CDF14(
-    unsigned long texture, unsigned long platformTexture,
-    MemoryAllocator* allocator);
-extern "C" float fn_802CE7B0(void* renderView);
 
 enum eGLFont
 {
@@ -25,46 +19,40 @@ enum eGLFont
     GLFONT_Count,
 };
 
-extern "C"
-{
-    char sLargeFontName[] __attribute__((aligned(4))) = "font/fixedWidthLarge";
-    char sMediumFontName[] __attribute__((aligned(4))) = "font/fixedWidthMedium";
-    char sSmallFontName[] __attribute__((aligned(4))) = "font/fixedWidthSmall";
+char sLargeFontName[] __attribute__((aligned(4))) = "font/fixedWidthLarge";
+char sMediumFontName[] __attribute__((aligned(4))) = "font/fixedWidthMedium";
+char sSmallFontName[] __attribute__((aligned(4))) = "font/fixedWidthSmall";
 
-    const char* lbl_806DF3D0 = sLargeFontName;
-    const char* lbl_806DF3D4 = sMediumFontName;
-    const char* lbl_806DF3D8 = sSmallFontName;
-}
+const char* lbl_806DF3D0 = sLargeFontName;
+const char* lbl_806DF3D4 = sMediumFontName;
+const char* lbl_806DF3D8 = sSmallFontName;
 
 #include "NL/gl/font_data.h"
 
-extern "C"
-{
-    int lbl_8052E1C8[3] = { 8, 9, 11 };
-    int lbl_8052E1D4[3] = { 12, 15, 18 };
-    int lbl_8052E1E0[3] = { 9, 10, 12 };
-    int lbl_8052E1EC[3] = { 13, 16, 20 };
-    int lbl_8052E1F8[3] = { 128, 128, 128 };
-    int lbl_8052E204[3] = { 256, 256, 256 };
-    int lbl_8052E210[4] = { 14, 12, 10, 0 };
+int lbl_8052E1C8[3] = { 8, 9, 11 };
+int lbl_8052E1D4[3] = { 12, 15, 18 };
+int lbl_8052E1E0[3] = { 9, 10, 12 };
+int lbl_8052E1EC[3] = { 13, 16, 20 };
+int lbl_8052E1F8[3] = { 128, 128, 128 };
+int lbl_8052E204[3] = { 256, 256, 256 };
+int lbl_8052E210[4] = { 14, 12, 10, 0 };
 
-    const char* lbl_8057C798[4] = { lbl_806DF3D8, lbl_806DF3D4, lbl_806DF3D0 };
-    glPoly2 lbl_8057C7A8[128];
+const char* lbl_8057C798[4] = { lbl_806DF3D8, lbl_806DF3D4, lbl_806DF3D0 };
+glPoly2 lbl_8057C7A8[128];
 
-    float lbl_806DF3DC = 0.5f;
-    float lbl_806DF3E0 = 0.5f;
-    char lbl_806DF3E4[] = "RLFont";
+float lbl_806DF3DC = 0.5f;
+float lbl_806DF3E0 = 0.5f;
+char lbl_806DF3E4[] = "RLFont";
 
-    int lbl_806E1EB8;
-    float lbl_806E1EBC;
-    float lbl_806E1EC0;
-    int lbl_806E1EC4;
-    float lbl_806E1EC8;
-    bool lbl_806E1ECC;
-    bool lbl_806E1ECD;
-    bool lbl_806E1ECE;
-    bool lbl_806E1ECF;
-}
+int lbl_806E1EB8;
+float lbl_806E1EBC;
+float lbl_806E1EC0;
+int lbl_806E1EC4;
+float lbl_806E1EC8;
+bool lbl_806E1ECC;
+bool lbl_806E1ECD;
+bool lbl_806E1ECE;
+bool lbl_806E1ECF;
 
 // The original type identity of this common weak static is not yet known.
 struct UnidentifiedStaticState
@@ -85,7 +73,7 @@ struct UnidentifiedStaticStorage
 
 struct UnidentifiedStaticTag;
 
-extern "C" void fn_802C9A0C(int x, int y, char character, unsigned short* image, int imageWidth, int font)
+void fn_802C9A0C(int x, int y, char character, unsigned short* image, int imageWidth, int font)
 {
     unsigned short* characterData;
 
@@ -159,8 +147,10 @@ void gl_FontStartup()
             }
         }
 
-        unsigned long platformTexture = glplatCreateFont(width, height, image, texture, fn_802CC094());
-        fn_802CDF14(texture, platformTexture, fn_802CC094());
+        unsigned long platformTexture = glplatCreateFont(width, height, image,
+            texture, (MemoryAllocator*)fn_802CC094());
+        fn_802CDF14(texture, (PlatTexture*)platformTexture,
+            (MemoryAllocator*)fn_802CC094());
         delete[] image;
     }
 
@@ -182,7 +172,7 @@ int glFontSetFont(int font)
     return previous;
 }
 
-extern "C" int fn_802C9CC8(void* renderView)
+int fn_802C9CC8(GLView* renderView)
 {
     return ((int)fn_802CE7B0(renderView) - 100) / lbl_8052E1EC[lbl_806E1EC4];
 }

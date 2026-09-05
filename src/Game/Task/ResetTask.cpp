@@ -1,35 +1,15 @@
+#include <revolution/ax.h>
+#include <revolution/dvd.h>
+#include <revolution/os.h>
+#include <revolution/vi.h>
+
 #include "Game/Task/ResetTask.h"
 
+#include "Game/Audio/AudioLoadMode_806E201C.h"
 #include "Game/NetworkSession.h"
-
 #include "NL/globalpad.h"
 
-typedef long long OSTime;
-typedef void (*OSStateCallback)(void);
-
-#define OS_BUS_CLOCK_SPEED           (*(volatile u32*)0x800000F8)
-#define OS_TIME_SPEED                (OS_BUS_CLOCK_SPEED / 4)
-#define OSTicksToMilliseconds(ticks) ((ticks) / (OS_TIME_SPEED / 1000))
-#define OSMillisecondsToTicks(msec)  ((msec) * (OS_TIME_SPEED / 1000))
-#define OSSleepMilliseconds(msec)    OSSleepTicks(OSMillisecondsToTicks((OSTime)msec))
-
-extern "C"
-{
-    s32 DVDGetDriveStatus();
-    s32 OSGetResetButtonState();
-    OSStateCallback OSSetPowerCallback(OSStateCallback callback);
-    OSTime OSGetTime();
-    void OSYieldThread();
-    void OSSleepTicks(OSTime ticks);
-    void OSRestart(u32 resetCode);
-    void OSRebootSystem();
-    void OSShutdownSystem();
-    void OSReturnToMenu();
-    void AXSetMasterVolume(u16 volume);
-    void VISetBlack(bool black);
-    void VIFlush();
-    void VIWaitForRetrace();
-}
+#define OSSleepMilliseconds(msec) OSSleepTicks(OSMillisecondsToTicks((OSTime)msec))
 
 s32 ResetTask::s_ResetMode = 0;
 RESET_STATE ResetTask::s_ResetState = RS_RUNNING;
@@ -41,17 +21,10 @@ bool ResetTask::s_checkCardRemoved = false;
 u32 softResetTime[4] = { 0, 0, 0, 0 };
 
 extern bool g_bEnableGamecubePadMonkey;
-extern void* lbl_806E1E28;
-extern void* lbl_806E201C;
-
-extern UnidentifiedNetworkSession* lbl_806E10EC;
-
-extern "C" cGlobalPad* fn_802C082C(void* manager, int index);
-extern "C" void fn_802EC8A0(void* audioSystem, bool, bool);
 
 bool lbl_806E107C;
 
-extern "C" void fn_8011BD0C()
+void fn_8011BD0C()
 {
     lbl_806E107C = true;
 }

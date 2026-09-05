@@ -5,8 +5,7 @@
 #include "Game/Physics/PhysicsObject.h"
 #include "ode/NLGAdditions.h"
 
-extern "C" void fn_80358B08(dBodyID, void*, DebugWriteCache*);
-extern "C" void* memset(void*, int, unsigned long);
+#include <string.h>
 
 PhysicsWorld::PhysicsWorld()
 {

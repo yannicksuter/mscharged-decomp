@@ -1,14 +1,10 @@
 #include "Game/FE/tlInstance.h"
 
+#include "Game/FE/feLibObject.h"
 #include "Game/FE/tlComponent.h"
 #include "NL/nlString.h"
 
 #include <math.h>
-
-extern "C" float fn_803020BC(FELibObject* object);
-extern "C" float fn_803020C4(FELibObject* object);
-extern "C" float fn_803020CC(FELibObject* object);
-extern "C" float fn_803020D4(FELibObject* object);
 
 feVector3& TLInstance::GetAssetPosition() const
 {

@@ -452,17 +452,15 @@ void NetworkStatsManager_8012F378::UpdateOnlineResultTotals(
 
 bool NetworkStatsManager_8012F378::ShouldRestoreDefaultDisconnectLoss()
 {
-    if (lbl_806E10EC->fn_80121754() == 0)
+    if (lbl_806E10EC->fn_80121754() != 0)
     {
-        return false;
-    }
-
-    int count = UsesEuropeanRankings() ? 3 : 2;
-    for (int i = 0; i < count; ++i)
-    {
-        if (mDisconnectLossPending[i])
+        int count = UsesEuropeanRankings() ? 3 : 2;
+        for (int i = 0; i < count; ++i)
         {
-            return true;
+            if (mDisconnectLossPending[i])
+            {
+                return true;
+            }
         }
     }
     return false;

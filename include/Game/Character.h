@@ -19,6 +19,7 @@ class cPoseAccumulator;
 class cPoseNode;
 class glModel;
 struct CharacterInfo;
+class RunningChecksum;
 
 enum eCharacterClass
 {
@@ -82,8 +83,8 @@ public:
     virtual void SetPosition(const nlVector3& position);
     virtual void Update(float fDeltaT);
     virtual void Unknown10();
-    virtual void Unknown11();
-    virtual void Unknown12();
+    virtual void Unknown11(void* pParam, void* pParam2);
+    virtual void Unknown12(RunningChecksum* pChecksum);
 
     void SetAnimState(int animID, bool useBlendTime, float nonDefaultBlendTime,
         bool restartCyclic, bool forceMirrorSwap);
@@ -182,7 +183,8 @@ public:
     /* 0x0D4 */ cHeadTrack* m_pHeadTrack;
     /* 0x0D8 */ int m_nHeadJointIndex;
     /* 0x0DC */ int m_nBip01JointIndex_0xA4;
-    /* 0x0E0 */ u8 unknown_0x0E0[0x10];
+    /* 0x0E0 */ u8 unknown_0x0E0[0xC];
+    /* 0x0EC */ const char* m_szEffectsName;
     /* 0x0F0 */ eClassTypes m_eClassType;
     /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;
     /* 0x0F5 */ u8 unknown_0x0F5[0x27];

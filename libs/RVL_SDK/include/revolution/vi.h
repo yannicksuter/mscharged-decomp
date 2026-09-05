@@ -57,13 +57,12 @@ void VIConfigurePan(u16 x, u16 y, u16 width, u16 height);
 void VIFlush(void);
 void VISetNextFrameBuffer(void* frameBuffer);
 void VISetBlack(BOOL black);
+void VIWaitForRetrace(void);
 s32 VIGetRetraceCount(void);
 VITVFormat VIGetTvFormat(void);
 
 #ifdef __cplusplus
 }
 #endif
-
-void VIWaitForRetrace(void);
 
 #endif // REVOLUTION_VI_H

@@ -1,5 +1,11 @@
 #include "Game/Task/FixedUpdateTask.h"
 
+#include "Game/FE/feManager.h"
+
+#include "Game/Physics/PhysicsCharacter.h"
+
+#include "unclassified/tu_80284A58.h"
+
 #include "unclassified/tu_801AD15C.h"
 
 #include "Game/AI/AiUtil.h"
@@ -32,25 +38,11 @@
 
 #include <math.h>
 
-struct UnidentifiedPeachPhotoState;
-
 extern u16 m_aJoystickRemap__14cCameraManager;
-extern "C" bool lbl_806E180D;
-extern "C" void* fn_80284A58();
-extern "C" bool fn_80287AB0(void*);
-extern "C" void fn_802C084C(void*, int);
-extern "C" void fn_802C07AC(void*, float);
 extern "C" void fn_8037537C(void*);
-extern "C" void fn_8005A8FC(cGame*, float);
-extern "C" void fn_80142A1C();
-extern "C" void fn_801AD7E4(UnidentifiedPeachPhotoState*, float, int);
-extern "C" void fn_800A8DE8(cTeam*, RunningChecksum*);
-extern "C" void fn_8005B840(cGame*, void*, DebugWriteCache*);
-extern "C" void fn_800A8900(cTeam*, void*, DebugWriteCache*);
-extern "C" u16 lbl_806DF740;
-extern "C" int lbl_806E2130;
+extern u16 lbl_806DF740;
+extern int lbl_806E2130;
 
-extern void* lbl_806E1E28;
 extern void* lbl_806E2478;
 
 float g_fFixedUpdateTick = 0.02f;
@@ -59,23 +51,23 @@ bool g_bRunSimAndRenderInLockStep;
 static u16 sSimulationTimeType = 0xFFFF;
 static u16 sTimeScaleType = 0xFFFF;
 
-extern "C" void fn_80111654()
+void fn_80111654()
 {
 }
 
-extern "C" void fn_80111658()
+void fn_80111658(bool)
 {
 }
 
-extern "C" void fn_8011165C()
+void fn_8011165C()
 {
 }
 
-extern "C" void fn_80111660()
+void fn_80111660()
 {
 }
 
-extern "C" bool fn_80111664()
+bool fn_80111664()
 {
     return false;
 }
@@ -88,7 +80,7 @@ FixedUpdateTask* GetFixedUpdateTask()
     return &fixedUpdateTask;
 }
 
-extern "C" EventDispatcher* fn_80111678()
+EventDispatcher* fn_80111678()
 {
     return &fixedUpdateTask.mEventDispatcher;
 }
@@ -121,7 +113,7 @@ u32 FixedUpdateTask::CalculateChecksum()
     g_pBall->fn_8001A898(&checksum);
     for (int i = 0; i < 2; i++)
     {
-        fn_800A8DE8(g_pTeams[i], &checksum);
+        g_pTeams[i]->fn_800A8DE8(&checksum);
     }
     return ~checksum.m_nChecksum;
 }
@@ -212,11 +204,11 @@ u32 FixedUpdateTask::WriteSyncLog()
         }
     }
 
-    fn_8005B840(g_pGame, &checksum, cache);
+    g_pGame->fn_8005B840(&checksum, cache);
     g_pBall->SyncLog(&checksum, cache);
     for (int i = 0; i < 2; i++)
     {
-        fn_800A8900(g_pTeams[i], &checksum, cache);
+        g_pTeams[i]->fn_800A8900(&checksum, cache);
     }
     g_PhysicsWorld->SyncLog(&checksum, cache);
 
@@ -405,7 +397,7 @@ void FixedUpdateTask::Run(float dt)
 static void AIUpdateTask(float fDeltaT)
 {
     g_pGame->PreUpdate(fDeltaT);
-    fn_8005A8FC(g_pGame, fDeltaT);
+    g_pGame->fn_8005A8FC(fDeltaT);
 }
 
 static void PrePhysicsAITask(float fDeltaT)

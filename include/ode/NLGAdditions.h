@@ -27,4 +27,7 @@ dxBody* dBodyGetNextBody(dxBody*);
 dxBody* dWorldGetFirstBody(dxWorld*);
 void dBodySetUpdateMode(dxBody*, int, int);
 
+class DebugWriteCache;
+void fn_80358B08(dBodyID body, void* context, DebugWriteCache* cache);
+
 #endif

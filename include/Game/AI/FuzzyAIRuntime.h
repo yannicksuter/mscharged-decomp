@@ -105,6 +105,18 @@ public:
     UnidentifiedFuzzyRuntimeValue* mUnidentified064;
 };
 
+class UnidentifiedFuzzyRuntime : public UnidentifiedFuzzyRuntimeBase
+{
+public:
+    UnidentifiedFuzzyRuntime();
+    virtual ~UnidentifiedFuzzyRuntime();
+    virtual void DoFunctionCall(unsigned int);
+    virtual float UnidentifiedVirtual8();
+    virtual UnidentifiedVariant_80054AB8* UnidentifiedVirtual9();
+    virtual void UnidentifiedVirtual12(UnidentifiedVariant_80054AB8*);
+    virtual void UnidentifiedVirtual15();
+};
+
 extern UnidentifiedRuntimeTypeList lbl_806E20B0;
 
 extern "C" int fn_80312208(unsigned long hash);

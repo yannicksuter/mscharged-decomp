@@ -13,6 +13,9 @@ class cPN_SAnimController;
 class cPN_SingleAxisBlender;
 class cTeam;
 class PlayerTweaks;
+class cSHierarchy;
+class AnimRetargetList;
+class CharacterPhysicsData;
 class SpaceSearch;
 class UnidentifiedPlayerRadius;
 struct CollisionPlayerPlayerData;
@@ -28,9 +31,15 @@ enum eBallRotationMode
 class cPlayer : public cCharacter
 {
 public:
+    cPlayer(int nPlayerID, eCharacterClass characterClass,
+        const int* nModelID, cSHierarchy* hierarchy,
+        cAnimInventory* animInventory, const CharacterPhysicsData* physData,
+        float fPhysCapsuleHeight, float fPhysCapsuleRadius,
+        AnimRetargetList* animRetargetList, int nIndex, eClassTypes classType);
     virtual ~cPlayer();
     virtual void PostPhysicsUpdate();
     virtual void PrePhysicsUpdate();
+    virtual void Unknown7(float dt);
     virtual void PreUpdate(float dt);
     virtual void UnidentifiedVirtual1C();
     virtual void SetAnimID(int animID);

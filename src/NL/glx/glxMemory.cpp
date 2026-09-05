@@ -1,21 +1,16 @@
+#include <revolution/gx.h>
+#include <revolution/os.h>
+
 #include "NL/glx/glxMemory.h"
 
 #include "Game/GL/GLInventory.h"
 #include "NL/MemAlloc.h"
+#include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"
 #include "NL/nlDebug.h"
 #include "NL/nlMemory.h"
+#include "NL/nlPrint.h"
 #include "NL/nlString.h"
-
-extern "C"
-{
-void GXInvalidateVtxCache();
-void GXInvalidateTexAll();
-void OSReport(const char*, ...);
-void fn_8004F594(int, const char*, ...);
-void fn_802CBEC4();
-void fn_802C828C(const char*, void*);
-}
 
 class UnidentifiedResourceAllocator_80376234;
 
@@ -24,12 +19,6 @@ struct UnidentifiedResourceMarker_803764E0
     unsigned long m_00[2];
     int m_08;
     UnidentifiedResourceAllocator_80376234* m_0C;
-};
-
-struct UnidentifiedMemoryRequirement_80376664
-{
-    eGLMemory m_00;
-    unsigned long m_04;
 };
 
 class UnidentifiedResourceAllocator_80376234
@@ -271,7 +260,7 @@ bool UnidentifiedResourceAllocator_80376234::fn_2C(
     return true;
 }
 
-extern "C" ResourceInterface_802CC094* fn_80376664(
+ResourceInterface_802CC094* fn_80376664(
     const UnidentifiedMemoryRequirement_80376664* requirements,
     unsigned long count, const char* name)
 {

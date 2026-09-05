@@ -7,6 +7,11 @@
 #include "NL/nlMath.h"
 #include "NL/nlTimer.h"
 
+class AnimRetargetList;
+class GoalieTweaks;
+class cSHierarchy;
+class CharacterPhysicsData;
+
 class PhysicsGoalie;
 class LooseBallInfo;
 class cFielder;
@@ -103,6 +108,10 @@ struct GoalieSaveData
 class Goalie : public cPlayer
 {
 public:
+    Goalie(eCharacterClass gcc, const int* pTemplate, cSHierarchy* pHierarchy,
+        cAnimInventory* pAnimInventory,
+        const CharacterPhysicsData* pPhysicsData, GoalieTweaks* pTweaks,
+        AnimRetargetList* pAnimRetargetList, int nIndex);
     virtual void UnidentifiedVirtual1C();
     virtual void CollideWithBallCallback(cBall* pBall);
     virtual void CollideWithCharacterCallback(

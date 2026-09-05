@@ -2,6 +2,7 @@
 
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glModel.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/glx/glxDisplayList.h"
 
 unsigned int gxSetNumChans(unsigned int);
@@ -31,7 +32,6 @@ extern "C" void fn_802A5A68(void*, const glModelPacket*);
 extern "C" void fn_802A5AC0(void*, const glModelPacket*);
 extern "C" void fn_802A5CAC(void*, const glModelPacket*);
 extern "C" void fn_802A5D20(void*, const glModelPacket*);
-extern "C" void fn_802CC978(void*, const glModelPacket*, u32);
 
 extern "C" void fn_802A2A94(void* renderer, SetupContext_802A2A94* context)
 {

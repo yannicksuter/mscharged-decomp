@@ -14,8 +14,8 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 
-extern "C" void* fn_802CDF0C();
-
+#include "NL/gl/tu_802CC370.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 
@@ -235,16 +235,6 @@ extern "C" int fn_800FC748(int);
 extern "C" int fn_80183DEC(const nlVector3*);
 extern "C" RLView* fn_8027261C();
 extern "C" void fn_80273A4C(int, Model*, int);
-extern "C" bool fn_80277238();
-extern "C" void fn_802CC458(ModelPacket*, u32, u32);
-extern "C" void fn_802CC4FC(
-    ModelPacket*, u32, const ResolvedTexture&);
-extern "C" void fn_802CC628(ModelPacket*, u32, float);
-extern "C" void fn_802CC6C0(ModelPacket*, u32, u32);
-extern "C" float fn_802CC758(ModelPacket*, u32);
-extern "C" u32 fn_802CC7E4(ModelPacket*, u32);
-extern "C" bool fn_802CC8FC(ModelPacket*, u32);
-extern "C" ResolvedTexture fn_802CE1B8(void*, u32);
 
 int lbl_80511298[3] = { 2, 2, 2 };
 int lbl_805112A4[3] = { 4, 4, 4 };
@@ -788,15 +778,13 @@ void DrawableCharacter::SendToGl(Character& source, int renderPass)
         if ((lbl_806E13B1 || !flag5)
             && lbl_806E13B4 < packetCount)
         {
-            fn_802CC628(
-                model->packets + lbl_806E13B4,
+            fn_802CC628((glModelPacket*)(model->packets + lbl_806E13B4),
                 alphaValueHash, 0.0f);
         }
         if ((lbl_806E13B2 || !flag6)
             && lbl_806DCB80 < packetCount)
         {
-            fn_802CC628(
-                model->packets + lbl_806DCB80,
+            fn_802CC628((glModelPacket*)(model->packets + lbl_806DCB80),
                 alphaValueHash, 0.0f);
         }
     }
@@ -1276,11 +1264,12 @@ static inline void ApplyTexture(
          packet < model->packets + model->packetCount;
          ++packet)
     {
-        if (texture != fn_802CC7E4(packet, lbl_806E1F0C))
+        if (texture != fn_802CC7E4((glModelPacket*)packet, lbl_806E1F0C))
         {
-            fn_802CC458(packet, lbl_806E1F0C, texture);
+            fn_802CC458((glModelPacket*)packet, lbl_806E1F0C, texture);
             ResolvedTexture packetTexture = resolvedTexture;
-            fn_802CC4FC(packet, lbl_806E1F0C, packetTexture);
+            fn_802CC4FC((glModelPacket*)packet, lbl_806E1F0C,
+                (const unsigned long*)&packetTexture.value);
         }
     }
 }
@@ -1320,19 +1309,21 @@ void DrawableCharacter::ApplyMaterialEffects(
 
             if (texturing->m_bDetail)
             {
-                fn_802CC458(
-                    packet, lbl_806E1F10, texturing->m_uTexture);
+                fn_802CC458((glModelPacket*)packet, lbl_806E1F10,
+                    texturing->m_uTexture);
                 ResolvedTexture texture = texturing->m_ResolvedTexture;
-                fn_802CC4FC(packet, lbl_806E1F10, texture);
+                fn_802CC4FC((glModelPacket*)packet, lbl_806E1F10,
+                    (const unsigned long*)&texture.value);
                 fn_802CC628(
-                    packet, blendAmountHash, lbl_806DCB88);
+                    (glModelPacket*)packet, blendAmountHash, lbl_806DCB88);
             }
             else
             {
-                fn_802CC458(
-                    packet, lbl_806E1F0C, texturing->m_uTexture);
+                fn_802CC458((glModelPacket*)packet, lbl_806E1F0C,
+                    texturing->m_uTexture);
                 ResolvedTexture texture = texturing->m_ResolvedTexture;
-                fn_802CC4FC(packet, lbl_806E1F0C, texture);
+                fn_802CC4FC((glModelPacket*)packet, lbl_806E1F0C,
+                    (const unsigned long*)&texture.value);
             }
         }
     }
@@ -1348,15 +1339,14 @@ void DrawableCharacter::ApplyMaterialEffects(
                      ++packet)
                 {
                     if (texture
-                        == fn_802CC7E4(packet, lbl_806E1F0C))
+                        == fn_802CC7E4((glModelPacket*)packet, lbl_806E1F0C))
                     {
-                        fn_802CC458(
-                            packet, lbl_806E1F0C,
+                        fn_802CC458((glModelPacket*)packet, lbl_806E1F0C,
                             source.swapTexture);
                         ResolvedTexture packetTexture =
                             source.resolvedSwapTexture;
-                        fn_802CC4FC(
-                            packet, lbl_806E1F0C, packetTexture);
+                        fn_802CC4FC((glModelPacket*)packet, lbl_806E1F0C,
+                            (const unsigned long*)&packetTexture.value);
                     }
                 }
             }
@@ -1367,8 +1357,8 @@ void DrawableCharacter::ApplyMaterialEffects(
             if (scorchTexture == 0)
             {
                 scorchTexture = glGetTexture(CharacterBlackTextureName);
-                void* textureManager = fn_802CDF0C();
-                resolvedScorchTexture =
+                TextureManager_802CDF0C* textureManager = fn_802CDF0C();
+                resolvedScorchTexture.value =
                     fn_802CE1B8(textureManager, scorchTexture);
             }
             ApplyTexture(
@@ -1422,7 +1412,7 @@ void DrawableCharacter::ApplyDamageEffects(
     packet = model->packets;
     while (packet < model->packets + model->packetCount)
     {
-        fn_802CC6C0(packet, shadowLevelHash, shadowColourValue);
+        fn_802CC6C0((glModelPacket*)packet, shadowLevelHash, shadowColourValue);
         packet = (ModelPacket*)((char*)packet + 0x30);
     }
 
@@ -1436,7 +1426,7 @@ void DrawableCharacter::ApplyDamageEffects(
              packet < model->packets + model->packetCount;
              packet = (ModelPacket*)((char*)packet + 0x30))
         {
-            fn_802CC628(packet, blackHash, blackAmount);
+            fn_802CC628((glModelPacket*)packet, blackHash, blackAmount);
         }
     }
 
@@ -1450,10 +1440,10 @@ void DrawableCharacter::ApplyDamageEffects(
              packet < model->packets + model->packetCount;
              packet = (ModelPacket*)((char*)packet + 0x30))
         {
-            if (fn_802CC8FC(packet, megaBlendHash)
-                && fn_802CC758(packet, megaBlendHash) >= zero)
+            if (fn_802CC8FC((glModelPacket*)packet, megaBlendHash)
+                && fn_802CC758((glModelPacket*)packet, megaBlendHash) >= zero)
             {
-                fn_802CC628(packet, megaBlendHash, megaAmount);
+                fn_802CC628((glModelPacket*)packet, megaBlendHash, megaAmount);
             }
         }
     }
@@ -1504,9 +1494,9 @@ void DrawableCharacter::ApplyDamageEffects(
              packet < model->packets + model->packetCount;
              packet = (ModelPacket*)((char*)packet + 0x30))
         {
-            if (fn_802CC8FC(packet, damage1EnabledHash))
+            if (fn_802CC8FC((glModelPacket*)packet, damage1EnabledHash))
             {
-                fn_802CC6C0(packet, damage1EnabledHash, 1);
+                fn_802CC6C0((glModelPacket*)packet, damage1EnabledHash, 1);
                 if (useDamageTexture)
                 {
                     PacketUserData* userData = packet->userData;
@@ -1539,9 +1529,9 @@ void DrawableCharacter::ApplyDamageEffects(
              packet < model->packets + model->packetCount;
              packet = (ModelPacket*)((char*)packet + 0x30))
         {
-            if (fn_802CC8FC(packet, damage2EnabledHash))
+            if (fn_802CC8FC((glModelPacket*)packet, damage2EnabledHash))
             {
-                fn_802CC6C0(packet, damage2EnabledHash, 1);
+                fn_802CC6C0((glModelPacket*)packet, damage2EnabledHash, 1);
             }
         }
     }
@@ -1616,7 +1606,7 @@ void DrawableCharacter::RenderCharacterShadow(
                          + params.pModel->numPackets;
                  ++packet)
             {
-                fn_802CC628(packet, blackHash, 1.0f);
+                fn_802CC628((glModelPacket*)packet, blackHash, 1.0f);
             }
         }
         RenderCharacterIntoTexture(params);

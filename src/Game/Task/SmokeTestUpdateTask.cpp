@@ -1,72 +1,14 @@
-#include "NL/nlTask.h"
+#include "Game/Task/SmokeTestUpdateTask.h"
+
+#include "Game/TweakRegistry.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "types.h"
 #include "unclassified/tu_802BAE84.h"
 
-#include "types.h"
-
-typedef struct __va_list_struct
-{
-    char gpr;
-    char fpr;
-    char reserved[2];
-    char* input_arg_area;
-    char* reg_save_area;
-} __va_list[1];
-
-typedef __va_list va_list;
-
-extern void __builtin_va_info(void*);
-#define va_start(ap, fmt) ((void)fmt, __builtin_va_info(&ap))
-#define va_end(ap)        ((void)0)
-
-class SmokeTestUpdateTask : public nlTask
-{
-public:
-    SmokeTestUpdateTask()
-        : mComplete(false)
-        , mElapsed(0.0f)
-        , mDuration(1.0f)
-    {
-    }
-
-    virtual void Run(float dt);
-    virtual const char* GetName()
-    {
-        return "SmokeTest Update";
-    }
-
-private:
-    bool mComplete;
-    float mElapsed;
-    float mDuration;
-};
-
-// The original type identity of this common weak static is not yet known.
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
-
-extern "C" bool fn_802BD63C();
-extern "C" void fn_802BD644(const char* format, ...);
-extern "C" void fn_802BD718(const char* name, const char* units, float value);
-
-extern "C" const char* fn_802C2D20(const char*, const char*);
+#include <stdarg.h>
 
 bool lbl_806E1DF0;
 void (*lbl_806E1DF4)();
@@ -124,12 +66,12 @@ void SmokeTestUpdateTask::Run(float dt)
     }
 }
 
-extern "C" bool fn_802BD63C()
+bool fn_802BD63C()
 {
     return lbl_806E1DF0;
 }
 
-extern "C" void fn_802BD644(const char* format, ...)
+void fn_802BD644(const char* format, ...)
 {
     va_list args;
 
@@ -145,7 +87,7 @@ extern "C" void fn_802BD644(const char* format, ...)
     }
 }
 
-extern "C" void fn_802BD718(const char* name, const char* units, float value)
+void fn_802BD718(const char* name, const char* units, float value)
 {
     char output[0x400];
     char unitsOutput[0x100];
@@ -174,9 +116,6 @@ char sGraphValueFormat[] = "\nGRAPHVALUE \"%s\"=%f";
 char sGraphUnitsFormat[] = " UNITS=\"%s\"";
 
 static SmokeTestUpdateTask sSmokeTestUpdateTask;
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
 

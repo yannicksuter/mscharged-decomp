@@ -5,6 +5,7 @@
 
 #include <string.h>
 
+class GLView;
 class MemoryAllocator;
 
 typedef unsigned long (*glxTextureLoadCallback_t)(unsigned long);
@@ -116,5 +117,29 @@ u32 glplatTextureGetWidth();
 void glxInitTex();
 glxTextureLoadCallback_t glx_SetLoadCallback(
     glxTextureLoadCallback_t callback);
+
+// Texture manager retained in the automatic ranges after glTexture.cpp.
+struct TextureIndexQueue_802D3B68;
+
+struct TextureManager_802CDF0C
+{
+    u32 m_00;
+    void** m_04;
+    TextureIndexQueue_802D3B68* m_08;
+};
+
+extern TextureManager_802CDF0C* lbl_806E1F08;
+
+extern "C" void fn_802CDEC0(unsigned long);
+TextureManager_802CDF0C* fn_802CDF0C();
+PlatTexture* fn_802CE294(
+    TextureManager_802CDF0C* manager, const unsigned long* texture);
+unsigned long fn_802CE1B8(
+    TextureManager_802CDF0C* manager, unsigned long texture);
+void fn_802CDF14(unsigned long texture, PlatTexture* platformTexture,
+    MemoryAllocator* allocator);
+float fn_802CE7B0(GLView* renderView);
+void fn_802CEC68();
+void fn_802CEF18();
 
 #endif // _GLXTEXTURE_H_

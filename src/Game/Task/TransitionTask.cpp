@@ -1,11 +1,13 @@
 #include "Game/Task/TransitionTask.h"
 
 #include "Game/Ball.h"
+#include "Game/BaseGameSceneManager.h"
 #include "Game/BasicStadium.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Character.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/Drawable/DrawableCharacter.h"
+#include "Game/FE/feCaptainComponent.h"
 #include "Game/Game.h"
 #include "Game/NisPlayer.h"
 #include "Game/PadActions.h"
@@ -18,34 +20,13 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlTask.h"
 #include "types.h"
-
-class BaseGameSceneManager;
+#include "unclassified/tu_80284A58.h"
 
 // Charged keeps the predecessor's transition-manager surface but replaces
 // several of its subsystem calls. Everything still address-named below lives
 // in a translation unit that has not been reconstructed yet.
 
-// Singleton returned by fn_80284A58. Only the fields this unit reads are
-// modelled; the letter-box names come from the predecessor's Presentation.
-struct UnidentifiedPresentationState
-{
-    char mUnidentified000[0xC0];
-    /* 0xC0 */ float mLetterBoxDuration;
-    /* 0xC4 */ bool mLetterBoxEnabled;
-    char mUnidentified0C5[0x9F];
-    /* 0x164 */ bool mUnidentified164;
-};
-
-extern "C" {
-void fn_80278A00(BasicStadium*, int, int);
-UnidentifiedPresentationState* fn_80284A58();
-void fn_80285714(UnidentifiedPresentationState*, u32, u32);
-void fn_800A7998(cTeam*);
-void fn_801E23A4(BaseGameSceneManager*, u32, u32);
-}
-
 extern unsigned char g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause;
-extern BaseGameSceneManager* lbl_806E1860;
 
 void TransitionTask::Initialize()
 {
@@ -165,7 +146,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
             for (i = 0; i < 2; i++)
             {
-                fn_800A7998(g_pTeams[i]);
+                g_pTeams[i]->fn_800A7998();
             }
 
             ClearCharacterEffectsTexturing();

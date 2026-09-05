@@ -13,6 +13,7 @@
 #include "Game/DebugWriteCache.h"
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/Effects/EmissionController.h"
+#include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Event.h"
 #include "Game/Field.h"
@@ -41,6 +42,7 @@
 #include "unclassified/tu_80199E84.h"
 #include "unclassified/tu_801A5F10.h"
 #include "Game/DB/StadiumInfo.h"
+#include "unclassified/tu_80276264.h"
 
 struct UnidentifiedBallRuntime
 {
@@ -161,7 +163,6 @@ extern "C" bool fn_8002D92C(nlVector3*, bool, float);
 extern "C" void fn_80031A30(cFielder*, int, float);
 extern "C" void fn_80035544(cFielder*);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
-extern "C" bool fn_80038538(cFielder*);
 extern "C" bool fn_80038660(cFielder*);
 extern "C" bool fn_8003886C(cFielder*);
 extern "C" void fn_8003CAA8(cFielder*, cPlayer*);
@@ -197,7 +198,6 @@ extern "C" void fn_802ECC54(void*, void*);
 extern "C" void fn_802B5370(
     nlQuaternion&, const nlVector3&, unsigned short);
 extern "C" DrawableObject* fn_8027638C(unsigned int);
-extern "C" DrawableObject* fn_8027725C(unsigned long);
 extern "C" UnidentifiedBallRuntime* fn_802ECB68(void*);
 float Exp(float);
 
@@ -295,7 +295,6 @@ extern "C" EffectsGroup* fn_802E7CDC(
     EmissionManager*, const char*);
 extern "C" EmissionController* fn_802E7FE4(
     EmissionManager*, EffectsGroup*, int, bool, bool);
-extern "C" void fn_801BE950(EmissionController&);
 extern float lbl_806E31C0;
 extern float lbl_806E31C4;
 extern float lbl_806E31C8;
@@ -816,7 +815,7 @@ void cBall::CollideWithCharacterCallback(
                 }
             }
             else if (fn_80038660(pOwnerFielder)
-                && !fn_80038538(pCharacterFielder))
+                && !pCharacterFielder->IsHitting())
             {
                 pCharacterFielder->InitActionSlideAttackReact(
                     pOwnerFielder, false);
@@ -1107,7 +1106,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
     {
         cFielder* pFielder = (cFielder*)m_pShooter;
         if (pFielder->m_eActionState == (eFielderActionState)0x21
-            && pFielder->mUnidentified41C)
+            && pFielder->mUnidentified410.mUnidentified0C)
         {
             nlVector3 v3JointPosition = pFielder->GetJointPosition(
                 pFielder->m_nBip01JointIndex_0xA4);
@@ -2833,7 +2832,7 @@ extern "C" void fn_80017F18(cBall* pBall)
     fn_801B7A28(pBall);
 }
 
-extern "C" float fn_800155A0(cBall* pBall, int nParam)
+float fn_800155A0(cBall* pBall, int nParam)
 {
     if (nParam != 0)
     {
@@ -3529,7 +3528,7 @@ LiveBallTrail::~LiveBallTrail()
     }
 }
 
-extern "C" LiveBallTrail* fn_8001B284(unsigned int nIndex)
+LiveBallTrail* fn_8001B284(unsigned int nIndex)
 {
     return &lbl_8056B518[nIndex];
 }
@@ -3633,7 +3632,7 @@ extern "C" void fn_8001AD24(
     pController->SetPosition(pBallTrail->position);
     pController->m_uUserData = (u32)pBallTrail;
     pController->SetUpdateCallback(
-        Function1<void, EmissionController&>(fn_801BE950));
+        Function1<void, EmissionController&>(UpdateEmitterFromBallTrail));
 
     pEffectsGroup = fn_802E7CDC(
         EmissionManager::Instance(), "megastrike_ball_launch");
@@ -3732,7 +3731,7 @@ extern "C" void fn_8001B298(float fParam)
     }
 }
 
-extern "C" unsigned int fn_8001B30C()
+unsigned int fn_8001B30C()
 {
     return lbl_806E0C10;
 }

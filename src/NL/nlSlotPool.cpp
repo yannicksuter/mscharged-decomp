@@ -48,7 +48,7 @@ SlotPoolBase::~SlotPoolBase()
 {
 }
 
-extern "C" void fn_802B467C(void*)
+void fn_802B467C(void*)
 {
 }
 

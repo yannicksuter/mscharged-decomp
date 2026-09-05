@@ -1,4 +1,5 @@
 #include "Game/Drawable/DrawableDaisyFist.h"
+#include "Game/World.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Render/RLView.h"
 #include "NL/gl/glView.h"
@@ -74,15 +75,15 @@ void DrawableDaisyFist::Render(const DaisyFistObject* object) const
     matrix.m43 = mPosition.z;
     matrix.m44 = 1.0f;
 
-    UnidentifiedDrawableViewState* state = drawable->mUnidentified10;
-    GLView* oldView68 = state->mView68;
-    GLView* oldView6C = state->mView6C;
-    state->mView68 = GetLayerView(eCLV_ElectricFence);
-    state->mView6C = state->mView68;
+    World* pWorld = drawable->m_pWorldContext;
+    GLView* oldView68 = pWorld->m_pView68;
+    GLView* oldView6C = pWorld->m_pView6C;
+    pWorld->m_pView68 = GetLayerView(eCLV_ElectricFence);
+    pWorld->m_pView6C = pWorld->m_pView68;
     drawable->SetWorldMatrix(&matrix);
     drawable->Draw();
-    state->mView68 = oldView68;
-    state->mView6C = oldView6C;
+    pWorld->m_pView68 = oldView68;
+    pWorld->m_pView6C = oldView6C;
 }
 
 void DrawableDaisyFist::Blend(const float* factors,

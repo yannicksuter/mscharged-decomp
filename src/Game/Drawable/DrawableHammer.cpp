@@ -2,12 +2,8 @@
 #include "Game/Drawable/RenderObject.h"
 #include "NL/gl/glModel.h"
 #include "NL/nlMath.h"
+#include "unclassified/tu_80186524.h"
 #include "unclassified/tu_801A0E64.h"
-
-extern "C"
-{
-    void fn_801869AC(void*, void*, int, int, const DrawableHammer*, float);
-}
 
 u8 lbl_806DCBE8 = 1;
 

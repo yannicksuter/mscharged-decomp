@@ -1,11 +1,13 @@
 #include "NL/glx/glxSwap.h"
 
 #include "NL/gl/glPlat.h"
+#include "NL/gl/tu_80364020.h"
 #include "NL/glx/glxGX.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlEndian.h"
 #include "NL/nlPrint.h"
 #include "NL/nlTicker.h"
+#include "unclassified/tu_8036D6F8.h"
 
 // Revolution SDK and neighbouring renderer entry points retained as automatic
 // objects in R4QE01. The SDK's own <revolution/gx.h> cannot be included from
@@ -36,14 +38,7 @@ extern "C"
     void GXCopyDisp(void* dest, u8 clear);
     void nlBreak__Fv();
 
-    // View/token name lookups owned by an unsplit debug TU.
     void VIWaitForRetrace();
-    void* fn_80364020();
-    const char* fn_803640E8(void* view, u16 token);
-    const char* fn_803640F0(void* view, u16 token);
-    // Allocator-state helpers retained in the following automatic range.
-    void fn_8036D6F8(MemoryAllocator* allocator);
-    void fn_8036D71C();
     // C stdio entry points retained in the MSL region.
     typedef struct _FILE FILE;
     FILE* fopen(const char* path, const char* mode);
@@ -379,8 +374,8 @@ static void ReportGPStatus()
     OSReport("brkpt = %s\n", brkpt ? "true" : "false");
 
     u16 token = GXReadDrawSync();
-    const char* view = fn_803640E8(fn_80364020(), token);
-    const char* name = fn_803640F0(fn_80364020(), token);
+    const char* view = fn_80364020()->fn_803640E8(token);
+    const char* name = fn_80364020()->fn_803640F0(token);
     OSReport("current view = %s\n", view);
     OSReport("token string = %s\n", name);
 }

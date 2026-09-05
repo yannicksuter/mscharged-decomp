@@ -222,7 +222,7 @@ extern "C" void fn_801B3B0C(
     }
 }
 
-extern "C" void fn_801B3EF4()
+void fn_801B3EF4(bool*)
 {
     fn_801B3B0C(
         sWarblePhase, sWarbleFrequency.value, sWarbleAmplitude);
@@ -246,7 +246,7 @@ static inline void WriteWarbleVertex(ModelWriter_802A1BF4& writer,
     writer.Vertex(x, y, 0.0f);
 }
 
-extern "C" void fn_801B3F2C()
+void fn_801B3F2C(bool*)
 {
     if (!sWarbleColourLoaded)
     {

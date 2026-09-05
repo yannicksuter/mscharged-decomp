@@ -1,4 +1,5 @@
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/FielderDesireMachine.h"
+#include "Game/AI/FielderInput.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireReceivePass.h"
@@ -86,27 +87,10 @@ public:
     virtual ~UnidentifiedDesire33();
 };
 
-class UnidentifiedFielderDesireMachine : public UnidentifiedScriptMachine
+inline cFielder* UnidentifiedFielderDesireMachine::GetFielder() const
 {
-public:
-    UnidentifiedFielderDesireMachine();
-    virtual ~UnidentifiedFielderDesireMachine();
-
-    virtual void UnidentifiedVirtual2();
-    virtual void UnidentifiedVirtual3(float deltaTime);
-    virtual void UnidentifiedVirtual4(bool param);
-    virtual shdStateMachine* UnidentifiedVirtual5(
-        int state, UnidentifiedVariantCollection* params, bool force);
-    virtual void UnidentifiedVirtual6();
-    virtual void UnidentifiedVirtual7();
-    virtual void UnidentifiedVirtual8();
-
-private:
-    cFielder* GetFielder() const
-    {
-        return ((UnidentifiedFielderContext*)mUnidentified064)->mFielder;
-    }
-};
+    return static_cast<cFielder*>(mUnidentified064->mData.pPlayer);
+}
 
 /**
  * Offset/Address/Size: 0x0 | 0x800D4E2C | size: 0x4C

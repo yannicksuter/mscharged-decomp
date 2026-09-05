@@ -21,7 +21,6 @@ struct UnidentifiedPassCallbackValue
     UnidentifiedVariantCollection mExtraData;
 };
 
-extern "C" SkillTweaks* fn_800A636C(cTeam*);
 extern "C" float fn_800D9EC4(cPlayer*);
 extern "C" void fn_800401C0(
     cFielder*, const nlVector3&, float, float);

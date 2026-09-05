@@ -94,7 +94,6 @@ extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" bool fn_8003E74C(cFielder*);
 extern "C" bool fn_8003E7F8(cFielder*);
 extern "C" bool fn_8003E84C(cFielder*);
-extern "C" float fn_800155A0(cBall*, int);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" void fn_80016DF8(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);

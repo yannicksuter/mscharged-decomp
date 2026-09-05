@@ -10,6 +10,8 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
+#include "NL/gl/tu_802CC370.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
@@ -24,13 +26,6 @@ extern "C"
 {
     extern unsigned long lbl_806E1F0C;
 
-    void* fn_802CDF0C();
-    unsigned long fn_802CE1B8(void*, unsigned long);
-    void fn_802CC458(glModelPacket*, unsigned long, unsigned long);
-    void fn_802CC4FC(glModelPacket*, unsigned long, const unsigned long*);
-    ResourceInterface_802CC094* fn_802CC094();
-    glModel* fn_802C8208(
-        const char*, unsigned long*, ResourceInterface_802CC094*);
     EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
     EmissionController* fn_802E7FE4(
         EmissionManager*, EffectsGroup*, int, bool, bool);
@@ -562,7 +557,7 @@ void ModeledScreenTransition::Load(const char* szName)
         glSetIgnoreDuplicateModels(true);
 
         nlSNPrintf(buf, 128, "art/transitions/%s.rlg", szName);
-        m_pModels = fn_802C8208(buf, &m_nModels, fn_802CC094());
+        m_pModels = (glModel*)fn_802C8208(buf, &m_nModels, fn_802CC094());
 
         glSetIgnoreDuplicateModels(false);
 

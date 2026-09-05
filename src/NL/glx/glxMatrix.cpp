@@ -7,7 +7,6 @@ extern "C"
     void* memcpy(void* dest, const void* src, size_t num);
     void C_MTXPerspective(float m[4][4], float fovY, float aspect, float near, float far);
     void C_MTXOrtho(float m[4][4], float top, float bottom, float left, float right, float near, float far);
-    void fn_802B5D74(nlVector3& out, const nlVector3& point, const nlVector4& plane);
 }
 
 void glplatMatrixOrthographic(nlMatrix4& matrix, float width, float height)

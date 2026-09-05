@@ -4,6 +4,7 @@
 #include "Game/Render/tu_802DCDB4.h"
 #include "Game/SHierarchy.h"
 #include "NL/MemAlloc.h"
+#include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
@@ -19,15 +20,6 @@ extern "C"
         void* userData, unsigned int alignment, int allocType,
         unsigned int chunkSize, void* readBuffer0, void* readBuffer1,
         void* param, unsigned long value, MemoryAllocator* allocator);
-    unsigned int* fn_802C81FC(void* data, unsigned long size,
-        unsigned long* numModels, void* context);
-    bool fn_802C8200(const char* path, LoadAsyncCallback callback,
-        void* userData, void* context);
-    bool fn_802C8204(const char* path, LoadAsyncCallback callback,
-        void* userData, void* context);
-    unsigned int* fn_802C8208(
-        const char* path, unsigned long* numModels, void* context);
-    bool fn_802C820C(const char* path, void* context);
     bool fn_802CDD78(void* data, unsigned long size,
         void* context, int value);
 }
@@ -160,7 +152,8 @@ extern "C" void fn_802DBF7C(
     collection->mUnidentified01C = 0;
     if (lbl_806E1F80)
     {
-        fn_802C820C(definition.mUnidentified10, fn_802CC094());
+        fn_802C820C(
+            definition.mUnidentified10, (MemoryAllocator*)fn_802CC094());
         collection->mUnidentified018 = (void*)-1;
     }
     else
@@ -175,7 +168,7 @@ extern "C" void fn_802DBF7C(
     if (lbl_806E1F80)
     {
         unsigned long numModels;
-        unsigned int* models = fn_802C8208(
+        unsigned int* models = (unsigned int*)fn_802C8208(
             definition.mUnidentified14, &numModels, fn_802CC094());
         collection->mUnidentified040 = *models;
     }
@@ -245,7 +238,8 @@ extern "C" bool fn_802DC2A4(
         else
         {
             fn_802CDD78(collection->mUnidentified018,
-                collection->mUnidentified01C, fn_802CC094(), 0);
+                collection->mUnidentified01C,
+                (MemoryAllocator*)fn_802CC094(), 0);
             nlFree(collection->mUnidentified018);
             collection->mUnidentified018 = 0;
             collection->mUnidentified000 = true;
@@ -265,8 +259,9 @@ extern "C" bool fn_802DC2A4(
         else
         {
             unsigned long numModels = 0;
-            unsigned int* models = fn_802C81FC(collection->mUnidentified030,
-                collection->mUnidentified034, &numModels, fn_802CC094());
+            unsigned int* models = (unsigned int*)fn_802C81FC(
+                collection->mUnidentified030, collection->mUnidentified034,
+                &numModels, fn_802CC094());
             nlFree(collection->mUnidentified030);
             collection->mUnidentified030 = 0;
             collection->mUnidentified040 = *models;

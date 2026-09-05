@@ -72,5 +72,11 @@ public:
 
 
 FixedUpdateTask* GetFixedUpdateTask();
+EventDispatcher* fn_80111678();
+void fn_80111654();
+void fn_80111658(bool);
+void fn_8011165C();
+void fn_80111660();
+bool fn_80111664();
 
 #endif // GAME_FIXED_UPDATE_TASK_H

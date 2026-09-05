@@ -1,6 +1,7 @@
 #include "Game/FE/LidOpenMessage.h"
 
 #include "Game/NetworkSession.h"
+#include "Game/Sys/audio.h"
 #include "Game/Task/ResetTask.h"
 #include "Game/main.h"
 #include "NL/gl/glPlat.h"
@@ -9,6 +10,7 @@
 #include "NL/nlFileGC.h"
 #include "NL/nlMemory.h"
 #include "types.h"
+#include "unclassified/tu_80139B18.h"
 
 struct LoadingTextEntry
 {
@@ -2018,8 +2020,6 @@ static bool ResetWasPaused;
 static bool lbl_806E17ED;
 static bool CanGetResetPauseState = true;
 
-extern void* lbl_806E1E28;
-extern void* lbl_806E201C;
 extern UnidentifiedNetworkSession* lbl_806E10EC;
 
 extern "C"
@@ -2035,10 +2035,6 @@ extern "C"
     void VISetBlack(unsigned char);
     void VIFlush();
     void VISetNextFrameBuffer(void*);
-    void fn_800EC868();
-    void fn_800ECB50();
-    cGlobalPad* fn_802C082C(void* manager, int index);
-    void fn_8013A0A8(cGlobalPad* pad);
 }
 
 static int fn_801BF4EC()

@@ -19,7 +19,7 @@ public:
     virtual void Render(GLView* glView);
     virtual bool IsFinished();
     virtual float Time() const;
-    virtual float CutTime() const;
+    virtual float CutTime() const { return m_CutAt; }
     virtual void Reset();
     virtual void Cancel();
     virtual float GetTransitionLength();

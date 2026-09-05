@@ -1,6 +1,8 @@
 #ifndef GAME_FE_FE_CAPTAIN_COMPONENT_H
 #define GAME_FE_FE_CAPTAIN_COMPONENT_H
 
+class BaseGameSceneManager;
+
 #include "NL/nlBasicString.h"
 #include "NL/nlFunction.h"
 
@@ -49,5 +51,8 @@ public:
     /* 0x18 */ int mSidekicks[3];
     /* 0x24 */ int mUnidentified24;
 }; // size 0x28
+
+
+void fn_801E23A4(BaseGameSceneManager* manager, u32 from, u32 to);
 
 #endif // GAME_FE_FE_CAPTAIN_COMPONENT_H

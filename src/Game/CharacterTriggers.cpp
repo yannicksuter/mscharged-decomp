@@ -7,6 +7,7 @@
 #include "Game/CharacterEffects.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/Effects/EmissionController.h"
+#include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Game.h"
 #include "Game/Goalie.h"
@@ -20,8 +21,6 @@ extern "C" EffectsGroup* fn_802E7CDC(
 extern "C" EmissionController* fn_802E7FE4(EmissionManager* manager,
     EffectsGroup* group, int view, bool persistent, bool unknown);
 
-void UpdateEmitterPoseFromCharacter(EmissionController& emitter);
-void UpdateEmitterFromCharacter(EmissionController& emitter);
 extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 extern "C" void fn_800EC12C(unsigned long soundID, void* pParam);
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);

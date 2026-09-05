@@ -26,4 +26,6 @@ struct State_80199E84
 extern "C" void fn_8019A248(
     State_80199E84*, const nlVector3& position);
 
+float fn_8019A574(const State_80199E84* state);
+
 #endif // UNCLASSIFIED_TU_80199E84_H

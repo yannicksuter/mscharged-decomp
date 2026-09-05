@@ -5,6 +5,7 @@
 
 #include "Game/MathHelpers.h"
 #include "Game/Render/ImpostorManager.h"
+#include "Game/tu_802C6224.h"
 #include "NL/glx/GXMaterialCrystalTweaks.h"
 #include "NL/nlDLListContainer.h"
 #include "NL/nlMemory.h"
@@ -107,8 +108,6 @@ struct UnidentifiedCrowdView_802D9D00
     /* 0x50 */ UnidentifiedCrowdViewProvider_802D9D00* mProvider;
 };
 
-extern "C" void fn_802C6CAC(
-    const char* fileName, const char* category, bool reload);
 extern "C" u16 fn_802D75AC(u16 target, int count);
 extern "C" void fn_802D8950(
     UnidentifiedRenderObject_801A4188* object, nlVector4* corners);

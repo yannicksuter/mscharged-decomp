@@ -3,11 +3,15 @@
 #include "Game/Render/CrowdManager.h"
 #include "Game/Render/Jumbotron.h"
 #include "Game/Render/RLView.h"
+#include "Game/Task/DispatchEventsTask.h"
+#include "Game/Task/SmokeTestUpdateTask.h"
+#include "NL/globalpad.h"
 #include "unclassified/tu_801B369C.h"
 
 #include "Game/Audio/AudioBundleManager_802EDA7C.h"
 #include "Game/Audio/AudioLoadMode_806E201C.h"
 #include "Game/BaseGameSceneManager.h"
+#include "Game/Sys/movie.h"
 #include "Game/Task/BeginFrameTask.h"
 #include "Game/Task/FrontEndTask.h"
 #include "Game/Camera/CameraMan.h"
@@ -39,6 +43,9 @@
 #include "Game/Transitions/ScreenTransitionManager.h"
 #include "Game/TweakValue.h"
 #include "Game/Task/TweakerTask.h"
+#include "NL/gl/gl.h"
+#include "NL/gl/glMemory.h"
+#include "NL/nlPrint.h"
 #include "unclassified/tu_80332DC0.h"
 #include "NL/nlConfig.h"
 #include "NL/nlDebug.h"
@@ -96,18 +103,12 @@ struct FrameTimingStat
     /* 0x10 */ int mCount;
 };
 
-extern "C" int fn_8004F594(int category, const char* format, ...);
 extern "C" void fn_801CC114();
-extern "C" void* fn_802C082C(void*, int);
 extern "C" void fn_801A95F0(void*, const char*, int);
 extern "C" bool fn_80332770();
 extern "C" u32 OSGetTick();
 extern "C" void OSYieldThread();
 
-extern "C" ResourceInterface_802CC094* fn_802CC094();
-extern "C" bool fn_802BD63C();
-extern "C" void fn_802BD718(
-    const char* name, const char* units, float value);
 extern "C" void fn_801B2770();
 extern "C" void fn_8027ED18();
 extern "C" void fn_8027E5D4();
@@ -120,13 +121,11 @@ extern "C" void fn_801AB9D4(void*);
 extern "C" void fn_801A01F8();
 extern "C" void fn_801AAD0C(void*);
 extern "C" void fn_80276F5C();
-extern "C" void fn_80115FB4();
 extern "C" void fn_801440BC();
 extern "C" void fn_8013DB18();
 extern "C" void fn_801B4238(void*);
 extern "C" void fn_800741A4(void*);
 extern "C" void fn_8013DDD4();
-extern "C" void fn_802EC8A0(void*, bool, bool);
 extern "C" void fn_802EC9D0(void*);
 extern "C" void fn_800EBBD8(GameAudio_800EB6AC*);
 extern "C" void fn_802EBBBC(void*);
@@ -139,14 +138,9 @@ extern "C" bool fn_801C4D40();
 extern "C" void fn_801C4CBC();
 extern "C" void fn_802BDA28();
 extern "C" void fn_802C0CCC();
-extern "C" void fn_802C8180();
 extern "C" void fn_802B1AE4();
-extern "C" void fn_80370E20();
-extern "C" void fn_802CC02C(ResourceInterface_802CC094*);
-extern "C" void fn_802CC08C(ResourceInterface_802CC094*);
 extern "C" void fn_80197120();
 extern "C" void fn_80143FD4();
-extern "C" void fn_80111658(bool);
 extern "C" void fn_802B1B50();
 extern "C" void fn_802B26D4();
 
@@ -156,12 +150,9 @@ void DestroyCharacters();
 extern FrameTimingStat* lbl_806E1698;
 extern FrameTimingStat* lbl_806E169C;
 extern FrameTimingStat* lbl_806E16A0;
-extern BaseGameSceneManager* lbl_806E1838;
-extern BaseGameSceneManager* lbl_806E1860;
 extern void* g_pTeams[];
 extern cBall* g_pBall;
 extern u8 lbl_80574148[];
-extern u8 lbl_806E16D4;
 extern u8 lbl_8056CF08[];
 extern u8 lbl_805721E8[];
 extern UnidentifiedDeletable* lbl_806E2090;
@@ -175,7 +166,6 @@ namespace Detail
 extern SlotPoolBase sTempStringAllocatorPool;
 }
 
-extern void* lbl_806E1E28;
 extern void* lbl_806E1608;
 
 bool g_VerboseAudio;

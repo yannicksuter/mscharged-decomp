@@ -1,11 +1,13 @@
-#include "Game/Task/EndFrameTask.h"
+#include <revolution/gx.h>
 
-#include "Game/Render/RLView.h"
+#include "Game/Task/EndFrameTask.h"
 
 #include "Game/Debug/FrameCounter.h"
 #include "Game/HBMManager_8024795C.h"
+#include "Game/Render/RLView.h"
 #include "NL/gl/gl.h"
 #include "types.h"
+#include "unclassified/tu_801B369C.h"
 
 struct RenderContext
 {
@@ -14,13 +16,7 @@ struct RenderContext
     u32 flags;
 };
 
-extern u8 lbl_806E16D4;
 extern u8 lbl_806E0FB0;
-
-extern "C" void fn_801B3EF4(u8* enabled);
-extern "C" void fn_801B3F2C(u8* enabled);
-extern "C" void fn_802C80FC();
-extern "C" void GXPokeARGB(u16 x, u16 y, u32 colour);
 
 void EndFrameTask::Run(float)
 {

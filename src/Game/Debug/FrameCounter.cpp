@@ -1,4 +1,5 @@
 #include "Game/Debug/FrameCounter.h"
+#include "Game/Task/SmokeTestUpdateTask.h"
 #include "NL/gl/glFont.h"
 #include "unclassified/tu_802B7798.h"
 
@@ -21,7 +22,6 @@ extern "C" int fn_802B974C(
     UnidentifiedTimeRegionData_802B9570* data, int index);
 extern "C" float fn_802B98C8(
     UnidentifiedTimeRegionData_802B9570* data, int index);
-extern "C" void fn_802BD718(const char* name, bool enabled, float value);
 extern "C" const char lbl_8052B590[];
 extern "C" const char lbl_8052B5A0[];
 
@@ -207,7 +207,7 @@ void FrameCounter::fn_802B80C4()
             float threshold = fn_802B98C8(data, index);
             int count = fn_802B974C(data, index);
             nlSNPrintf(name, sizeof(name), lbl_8052B5A0, threshold);
-            fn_802BD718(name, false, (float)count);
+            fn_802BD718(name, 0, (float)count);
         }
     }
 }

@@ -98,7 +98,6 @@ struct UnidentifiedRegistrationList
     UnidentifiedRegistrationNode* mHead;
 };
 
-extern "C" EventDispatcher* fn_80111678();
 extern "C" EventDispatcher* fn_800721C4();
 extern "C" bool fn_802B6AF8(
     const UnidentifiedGameRegion* param1, const nlVector2* param2);

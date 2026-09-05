@@ -1,4 +1,4 @@
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/FielderInput.h"
 #include "Game/AI/TeamPlayMachine.h"
 
 #include "Game/MathHelpers.h"

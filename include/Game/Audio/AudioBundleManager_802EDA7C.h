@@ -4,6 +4,7 @@
 #include "types.h"
 
 class nlChunk;
+class AudioBackend_8035B8E8;
 
 class AudioResourceRuntime_802F479C
 {
@@ -11,11 +12,11 @@ public:
     AudioResourceRuntime_802F479C();
 
     virtual void fn_802F479C_0();
-    virtual bool fn_802F479C_1(void* data, u32 size, bool unknown);
+    virtual bool fn_802F479C_1(void* data, unsigned int size, bool unknown);
     virtual void fn_802F479C_2();
     virtual void* fn_802F479C_3();
 
-    void fn_802F48FC(void* data, u32 size);
+    void fn_802F48FC(void* data, unsigned int size);
 
 private:
     friend class AudioBundleManager_802EDA7C;
@@ -24,18 +25,6 @@ private:
     void* m_Unknown20;
     void* m_Unknown24;
     void* m_Unknown28;
-};
-
-class AudioBackend_8035B8E8
-{
-public:
-    AudioBackend_8035B8E8();
-
-    virtual void fn_8035B8E8_0();
-    virtual bool fn_8035B8E8_1();
-
-private:
-    u8 m_Unknown04[0x724];
 };
 
 class AudioBundleManager_802EDA7C

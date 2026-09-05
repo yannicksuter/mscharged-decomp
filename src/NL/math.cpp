@@ -355,7 +355,7 @@ void nlQuatNormalize(nlQuaternion& out, const nlQuaternion& in)
     nlQuatScale(out, in, fOneOverSqrt);
 }
 
-extern "C" void fn_802B549C(nlQuaternion& out, unsigned short angle)
+void fn_802B549C(nlQuaternion& out, unsigned short angle)
 {
     float fSin;
     float fCos;

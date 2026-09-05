@@ -2,16 +2,9 @@
 
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
+#include "Game/GameTweaks.h"
 #include "Game/Team.h"
 #include "types.h"
-
-struct Unidentified800A636CResult
-{
-    u8 mUnidentified000[0x240];
-    cFielder* m_pCurrentFielder;
-};
-
-extern "C" Unidentified800A636CResult* fn_800A636C(cTeam* pTeam);
 
 cFielder* g_pScriptCurrentFielder;
 cFielder* g_pScriptCurrentMark;
@@ -24,9 +17,8 @@ void FuzzyScriptClearGlobals()
 {
     if (g_pScriptCurrentTeam != 0)
     {
-        Unidentified800A636CResult* pTeamContext =
-            fn_800A636C(g_pScriptCurrentTeam);
-        pTeamContext->m_pCurrentFielder = 0;
+        SkillTweaks* pTeamContext = fn_800A636C(g_pScriptCurrentTeam);
+        pTeamContext->mUnidentified240 = 0;
     }
 
     g_pScriptCurrentFielder = 0;
@@ -69,5 +61,5 @@ void FuzzyScriptSetCurrentFielder(cFielder* pCurrentFielder)
     g_pScriptCurrentTeam = pCurrentFielder->m_pTeam;
     g_pScriptOtherTeam =
         (g_pTeams[0] == g_pScriptCurrentTeam) ? g_pTeams[1] : g_pTeams[0];
-    fn_800A636C(g_pScriptCurrentTeam)->m_pCurrentFielder = pCurrentFielder;
+    fn_800A636C(g_pScriptCurrentTeam)->mUnidentified240 = pCurrentFielder;
 }

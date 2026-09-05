@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMemory.h"
 
@@ -54,7 +55,6 @@ extern "C" void fn_802A7530(void*, const glModelPacket*);
 extern "C" void fn_802A7588(void*, const glModelPacket*);
 extern "C" void fn_802A7774(void*, const glModelPacket*);
 extern "C" void fn_802A77E8(void*, const glModelPacket*);
-extern "C" void fn_802CC978(void*, const glModelPacket*, u32);
 extern "C" void fn_802C764C(TweakState_802A38A0*);
 extern "C" bool fn_802C0F04();
 extern "C" void* fn_802C0E30();

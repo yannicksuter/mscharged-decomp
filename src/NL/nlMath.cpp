@@ -2,9 +2,7 @@
 
 #include "types.h"
 
-extern "C" int __fpclassifyf(float);
-extern "C" double floor(double);
-extern "C" double tan(double);
+#include <math.h>
 
 extern int __float_nan[];
 extern int __float_huge[];

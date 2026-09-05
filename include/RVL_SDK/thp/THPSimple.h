@@ -10,6 +10,7 @@ extern "C"
 #endif
 
     int THPSimpleInit(long audioSystem);
+    void fn_80372970(bool mono);
     void THPSimpleQuit(void);
     int THPSimpleOpen(const char* fileName);
     int THPSimpleClose(void);

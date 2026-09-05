@@ -162,7 +162,6 @@ void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
 }
 
 extern "C" void fn_802B53EC(nlQuaternion&, unsigned short);
-extern "C" void fn_802B549C(nlQuaternion&, unsigned short);
 
 void CalcHeadTrackMatrix(unsigned short spin, unsigned short tilt,
     cPoseAccumulator* cPoseAccumulator, int headNodeIndex)

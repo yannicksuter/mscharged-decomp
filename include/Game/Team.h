@@ -20,6 +20,9 @@ enum eTeamSide
     HOME_AWAY = 2,
 };
 
+class DebugWriteCache;
+class RunningChecksum;
+
 class cTeam
 {
 public:
@@ -50,6 +53,9 @@ public:
         ePowerUpType eNewPowerUpType, int nnumOfPowerups);
     void SetDifficulty(int difficulty, int param2, bool param3);
     void fn_800A607C();
+    void fn_800A7998();
+    void fn_800A8900(void* checksum, DebugWriteCache* cache);
+    void fn_800A8DE8(RunningChecksum* runningChecksum);
 
 public:
     /* 0x00 */ int m_nSide;
@@ -82,5 +88,8 @@ public:
 };
 
 extern cTeam* g_pTeams[];
+
+class SkillTweaks;
+SkillTweaks* fn_800A636C(cTeam* pTeam);
 
 #endif // GAME_TEAM_H

@@ -26,4 +26,9 @@ public:
 void UpdateHighRange();
 void RenderWorldNPCs();
 
+
+void fn_80276FB8(float fDeltaT);
+bool fn_80277238();
+void fn_80278A00(BasicStadium* stadium, int param2, int param3);
+
 #endif // GAME_BASIC_STADIUM_H

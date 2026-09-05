@@ -6,6 +6,7 @@
 #include "Game/ReplayManager.h"
 #include "Game/WorldTriggers.h"
 #include "NL/nlAVLTree.h"
+#include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
@@ -88,7 +89,6 @@ extern "C"
     char lbl_80511E14[] = "MegaStrikeMeterEnd";
 
     bool fn_8003877C(cFielder* fielder);
-    void fn_802B549C(nlQuaternion& quaternion, u16 angle);
     void fn_801A0C84(void*);
     void fn_801A0CD4(void*);
 }

@@ -1,21 +1,14 @@
 #include <revolution/gx.h>
 
+#include "Game/GameObjectLighting.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glView.h"
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
-
-extern "C"
-{
-    void* fn_80182240(int, int);
-    void fn_80182ED0(void*, GLView*, int);
-    void fn_801832F4(int, void*, int);
-    void fn_8036D774(const nlMatrix4* matrix);
-    void fn_8036D7EC(
-        const void* matrices, unsigned long count, const nlMatrix4*, int);
-}
+#include "unclassified/tu_801820FC.h"
+#include "unclassified/tu_8036D6F8.h"
 
 extern bool lbl_806DF050;
 
@@ -28,8 +21,8 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Activate(GLView* view)
     static_cast<GXMaterialProgram_80299A90*>(this)->ConfigureVertexFormat(true);
     view->m_Interface->GetViewMatrix(sViewMatrix);
     sUnidentifiedState = fn_80182240(0, 1);
-    fn_80182ED0(sUnidentifiedState, view, 0);
-    fn_801832F4(1, sUnidentifiedState, 0);
+    fn_80182ED0((s32)sUnidentifiedState, view, 0);
+    fn_801832F4(1, (s32)sUnidentifiedState, 0);
     GXSetVtxDesc(GX_VA_PNMTXIDX, GX_DIRECT);
     gxSetNumChans(1);
     gxSetNumTexGens(1);
@@ -42,7 +35,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Activate(GLView* view)
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Deactivate()
 {
-    fn_801832F4(0, sUnidentifiedState, 1);
+    fn_801832F4(0, (s32)sUnidentifiedState, 1);
     gxSetCurrentMtx(0, true);
 }
 

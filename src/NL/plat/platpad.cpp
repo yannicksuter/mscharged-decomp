@@ -1,230 +1,18 @@
-#include "Game/PadActions.h"
+#include "NL/plat/PlatPadManager.h"
 #include "Game/PadMonkey.h"
 #include "NL/nlMemory.h"
 
 #include <string.h>
 
-#define KPAD_MAX_SAMPLES 16
-#define WPAD_MAX_CONTROLLERS 4
-
-enum WPADResult
-{
-    WPAD_ERR_CORRUPTED = -7,
-    WPAD_ERR_INVALID = -4,
-    WPAD_ERR_TRANSFER = -3,
-    WPAD_ERR_COMMUNICATION_ERROR = -2,
-    WPAD_ERR_NO_CONTROLLER = -1,
-    WPAD_ERR_OK = 0,
-};
-
-enum WPADDeviceType
-{
-    WPAD_DEV_CORE = 0,
-    WPAD_DEV_FREESTYLE = 1,
-    WPAD_DEV_CLASSIC = 2,
-    WPAD_DEV_FUTURE = 251,
-    WPAD_DEV_NOT_SUPPORTED = 252,
-    WPAD_DEV_UNKNOWN = 255,
-};
-
-enum WPADDataFormat
-{
-    WPAD_FMT_CORE_BTN_ACC_DPD = 2,
-    WPAD_FMT_FS_BTN_ACC_DPD = 5,
-    WPAD_FMT_CLASSIC_BTN_ACC_DPD = 8,
-};
-
-enum WPADDpdCommand
-{
-    WPAD_DPD_DISABLE = 0,
-    WPAD_DPD_BASIC = 1,
-    WPAD_DPD_STANDARD = 3,
-};
-
-struct Vec
-{
-    float x, y, z;
-};
-
-struct Vec2
-{
-    float x, y;
-};
-
-union KPADEXStatus
-{
-    struct
-    {
-        Vec2 stick;
-        Vec acc;
-        float accValue;
-        float accSpeed;
-    } fs;
-
-    struct
-    {
-        unsigned int hold;
-        unsigned int trig;
-        unsigned int release;
-        Vec2 leftStick;
-        Vec2 rightStick;
-        float leftTrigger;
-        float rightTrigger;
-    } classic;
-};
-
-struct KPADStatus
-{
-    unsigned int hold;
-    unsigned int trig;
-    unsigned int release;
-    Vec acc;
-    float accValue;
-    float accSpeed;
-    Vec2 pos;
-    Vec2 vec;
-    float speed;
-    Vec2 horizon;
-    Vec2 horizonVec;
-    float horizonSpeed;
-    float dist;
-    float distVec;
-    float distSpeed;
-    Vec2 accVertical;
-    unsigned char deviceType;
-    signed char wpadError;
-    signed char dpdValid;
-    unsigned char dataFormat;
-    KPADEXStatus extension;
-};
-
-struct DPDObject
-{
-    short x;
-    short y;
-    unsigned short size;
-    unsigned char traceId;
-};
-
-struct WPADStatus
-{
-    unsigned short button;
-    short accX;
-    short accY;
-    short accZ;
-    DPDObject object[4];
-    unsigned char device;
-    signed char err;
-};
-
-struct WPADFSStatus
-{
-    unsigned short button;
-    short accX;
-    short accY;
-    short accZ;
-    DPDObject object[4];
-    unsigned char device;
-    signed char err;
-    short fsAccX;
-    short fsAccY;
-    short fsAccZ;
-    signed char fsStickX;
-    signed char fsStickY;
-};
-
-struct WPADCLStatus
-{
-    unsigned short button;
-    short accX;
-    short accY;
-    short accZ;
-    DPDObject object[4];
-    unsigned char device;
-    signed char err;
-    unsigned short clButton;
-    short clLeftStickX;
-    short clLeftStickY;
-    short clRightStickX;
-    short clRightStickY;
-    unsigned char clTriggerL;
-    unsigned char clTriggerR;
-};
-
-typedef void WPADCallback(int, WPADResult);
-typedef void WPADConnectCallback(int, WPADResult);
-typedef void WPADExtensionCallback(int, int);
-
-extern "C" {
-void KPADSetBtnRepeat(int, float, float);
-void KPADSetPosParam(int, float, float);
-void KPADSetHoriParam(int, float, float);
-void KPADSetDistParam(int, float, float);
-void KPADSetAccParam(int, float, float);
-int KPADRead(int, KPADStatus*, int);
-void KPADInit();
-
-void WPADRegisterAllocator(void* (*)(unsigned long), int (*)(void*));
-int WPADGetStatus();
-WPADResult WPADProbe(int, WPADDeviceType*);
-WPADConnectCallback* WPADSetConnectCallback(int, WPADConnectCallback*);
-WPADExtensionCallback*
-WPADSetExtensionCallback(int, WPADExtensionCallback*);
-int WPADSetDataFormat(int, unsigned int);
-void WPADRead(int, WPADStatus*);
-int WPADControlDpd(int, unsigned int, WPADCallback*);
-}
-
-enum
-{
-    WPAD_LIB_STATUS_3 = 3,
-};
-
-union PlatPadStatus
-{
-    struct
-    {
-        WPADStatus wpad;
-        KPADStatus kpad;
-    } core;
-
-    struct
-    {
-        WPADFSStatus wpad;
-        KPADStatus kpad;
-    } freestyle;
-
-    struct
-    {
-        WPADCLStatus wpad;
-        KPADStatus kpad;
-    } classic;
-};
-
-struct PlatPadManager
-{
-    PlatPadStatus status[WPAD_MAX_CONTROLLERS];
-    bool connected[WPAD_MAX_CONTROLLERS];
-    int type[WPAD_MAX_CONTROLLERS];
-    bool disableFreestyle;
-    bool disableClassic;
-    bool dpdEnabled[WPAD_MAX_CONTROLLERS];
-    bool dpdActive[WPAD_MAX_CONTROLLERS];
-    bool dataFormatSet[WPAD_MAX_CONTROLLERS];
-    unsigned char padding[2];
-    DeviceChangedEvent_80137B40 deviceChanged;
-};
-
-extern "C" PlatPadManager* lbl_806E2478;
 PlatPadManager* lbl_806E2478;
 
-extern "C" void fn_803751D4(int channel, int)
+extern "C" void fn_803751D4(WPADChannel channel, s32)
 {
     lbl_806E2478->dpdActive[channel] = false;
     lbl_806E2478->dataFormatSet[channel] = false;
 }
 
-extern "C" void fn_803751F4(int channel, WPADResult result)
+extern "C" void fn_803751F4(WPADChannel channel, WPADResult result)
 {
     PlatPadManager* manager = lbl_806E2478;
 
@@ -461,21 +249,21 @@ extern "C" void fn_80375E10(
     }
 }
 
-extern "C" WPADStatus* fn_80375EC8(PlatPadManager* manager, int channel)
+extern "C" PlatPadStatus_80375EC8* fn_80375EC8(PlatPadManager* manager, int channel)
 {
-    return &manager->status[channel].core.wpad;
+    return &manager->status[channel].core;
 }
 
-extern "C" WPADFSStatus* fn_80375ED4(
+extern "C" PlatPadStatus_80375ED4* fn_80375ED4(
     PlatPadManager* manager, int channel)
 {
-    return &manager->status[channel].freestyle.wpad;
+    return &manager->status[channel].freestyle;
 }
 
-extern "C" WPADCLStatus* fn_80375EE0(
+extern "C" PlatPadStatus_80375EE0* fn_80375EE0(
     PlatPadManager* manager, int channel)
 {
-    return &manager->status[channel].classic.wpad;
+    return &manager->status[channel].classic;
 }
 
 PadMonkey_80375EEC::PadMonkey_80375EEC(int padIndex)

@@ -39,12 +39,14 @@ void cNet::GetPostLocation(
     nlVector3& v3PostPosition, unsigned int uPostNum, float fYAdjust) const
 {
     float fAdjust;
+    float fNetWidth;
 
     v3PostPosition = m_v3NetLocation;
     v3PostPosition.x
         = -((m_fNetPostRadius * m_fDirection) - v3PostPosition.x);
     v3PostPosition.x += m_fNetPostOffsetFromGoalLine * m_fDirection;
-    fAdjust = (m_fNetWidth / 2.0f) + fYAdjust;
+    fNetWidth = m_fNetWidth;
+    fAdjust = (0.5f * fNetWidth) + fYAdjust;
 
     if (uPostNum == 0)
     {

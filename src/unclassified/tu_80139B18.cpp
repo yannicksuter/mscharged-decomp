@@ -23,9 +23,7 @@ struct RumbleActionState
 extern unsigned char lbl_8056FEAC[];
 extern RumbleActionState lbl_8056FEB8[4];
 extern bool lbl_806E11A0;
-extern void* lbl_806E1E28;
 
-extern "C" cGlobalPad* fn_802C082C(void* manager, int index);
 
 void UpdateRumbleActions(float dt)
 {

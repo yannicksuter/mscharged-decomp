@@ -1,17 +1,13 @@
 #include "Game/Task/LoadingTask.h"
 
+#include "NL/globalpad.h"
+
 #include "Game/AsyncLoading.h"
 #include "Game/Pad/FlickDetection.h"
 #include "types.h"
 
-extern "C" {
-void fn_802C084C(void*, int);
-void fn_802C07AC(void*, float);
-void fn_8037537C(void*);
-}
-
-extern void* lbl_806E1E28;
 extern void* lbl_806E2478;
+extern "C" void fn_8037537C(void*);
 extern bool g_e3_Build;
 extern bool g_bE3IdleReset;
 

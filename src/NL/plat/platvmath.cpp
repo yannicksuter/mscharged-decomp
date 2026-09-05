@@ -1,17 +1,10 @@
+#include <revolution/mtx.h>
+
 #include "NL/platvmath.h"
 
 #define qr0 0
 
 #define RAD_TO_FIXED16 10430.378f
-
-extern "C"
-{
-    void PSMTX44Identity(float m[4][4]);
-    void PSMTX44Concat(const float a[4][4], const float b[4][4], float out[4][4]);
-    void PSMTX44Transpose(const float src[4][4], float out[4][4]);
-    u32 C_MTX44Inverse(const float src[4][4], float out[4][4]);
-    void PSMTX44Scale(float m[4][4], float sx, float sy, float sz);
-}
 
 void nlMatrix4::SetIdentity()
 {

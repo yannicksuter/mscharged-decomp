@@ -1,4 +1,5 @@
 #include "NL/gl/glModel.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/glx/glxGX.h"
 
 extern "C" void GXSetChanCtrl(int, int, int, int, int, int, int);
@@ -7,7 +8,6 @@ extern "C" void fn_802A5564(void*, const glModelPacket*);
 extern "C" void fn_802A55CC(void*, const glModelPacket*);
 extern "C" void fn_802A5800(void*, const glModelPacket*);
 extern "C" void fn_802A5878(void*, const glModelPacket*);
-extern "C" void fn_802CC978(void*, const glModelPacket*, u32);
 
 extern "C" void fn_802A2778()
 {

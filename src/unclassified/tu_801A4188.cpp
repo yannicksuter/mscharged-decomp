@@ -8,6 +8,7 @@
 #include "Game/TweakRegistry.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
+#include "Game/tu_802C6224.h"
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_801A4188.h"
@@ -235,8 +236,6 @@ static ImpostorCluster_8052EA20* lbl_806E15B0;
 static bool lbl_806E15B4;
 static CrowdModelCollection_801A4188 lbl_805721E8;
 
-extern "C" void fn_802C6CAC(
-    const char* fileName, const char* category, bool reload);
 extern "C" void fn_801A49E4(u32 hash, unsigned long texture);
 extern "C" void fn_801A51D8();
 

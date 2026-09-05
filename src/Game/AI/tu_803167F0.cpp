@@ -1,4 +1,5 @@
 #include "Game/AI/Desire.h"
+#include "Game/AI/FielderInput.h"
 #include "Game/AI/TeamPlayMachine.h"
 
 #include "Game/AI/DesireUpdate.h"
@@ -300,16 +301,17 @@ UnidentifiedStateMachine_803171D0::UnidentifiedStateMachine_803171D0(
 
 bool UnidentifiedStateMachine_803171D0::UnidentifiedInitialize(void*)
 {
-    if (mUnidentified088 == 0)
+    bool initialized = true;
+    if (mUnidentified088 != 0)
     {
-        return true;
+        float start = lbl_806DF560();
+        void* context = mUnidentified018->mUnidentified064->mData.pointer;
+        u32 hash = mUnidentified088;
+        UnidentifiedVariant_80054AB8 result
+            = fn_80317EFC(fn_80311734(this), &hash, context);
+        initialized = result.mData.b;
+        fn_8031A0C8(start, lbl_806DF560());
     }
-
-    float start = lbl_806DF560();
-    void* context = mUnidentified018->mUnidentified064->mData.pointer;
-    UnidentifiedVariant_80054AB8 result = fn_80317EFC(fn_80311734(this), &mUnidentified088, context);
-    bool initialized = result.mData.b;
-    fn_8031A0C8(start, lbl_806DF560());
     return initialized;
 }
 

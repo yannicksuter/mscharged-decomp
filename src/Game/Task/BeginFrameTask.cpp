@@ -33,17 +33,17 @@ static TweakValueBool_804F4578 g_bDisplayFrameTicker(
 extern const f32 lbl_806E45F8;
 extern const f32 lbl_806E45FC;
 
-extern "C" float fn_80112E0C()
+float fn_80112E0C()
 {
     return lbl_806E45F8;
 }
 
-extern "C" float fn_80112E14()
+float fn_80112E14()
 {
     return lbl_806E45FC;
 }
 
-extern "C" bool fn_80112E1C()
+bool fn_80112E1C()
 {
     return false;
 }

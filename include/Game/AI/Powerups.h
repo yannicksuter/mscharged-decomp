@@ -12,33 +12,8 @@ class cTeam;
 class PhysicsObject;
 class SFXEmitter;
 
-class unk_8000CD44
-{
-public:
-    unk_8000CD44(int);
-    virtual ~unk_8000CD44();
-
-private:
-    /* 0x04 */ u8 mUnidentified004[0x10];
-};
-
 class PowerupBase;
-
-class unk_804F47E0 : public unk_8000CD44
-{
-public:
-    unk_804F47E0(PowerupBase* pPowerup)
-        : unk_8000CD44(2)
-        , m_pPowerup(pPowerup)
-        , mUnidentified018(0)
-    {
-    }
-    virtual ~unk_804F47E0();
-
-private:
-    /* 0x14 */ PowerupBase* m_pPowerup;
-    /* 0x18 */ void* mUnidentified018;
-};
+class UnidentifiedAvoidanceObject;
 
 struct PowerupSounds
 {
@@ -158,7 +133,7 @@ public:
     /* 0x0C */ PhysicsObject* m_pPhysicsObject;
     /* 0x10 */ cFielder* m_pTarget;
     /* 0x14 */ cFielder* m_pThrower;
-    /* 0x18 */ unk_8000CD44* m_unk18;
+    /* 0x18 */ UnidentifiedAvoidanceObject* m_unk18;
     /* 0x1C */ ePowerUpType m_eType;
     /* 0x20 */ bool m_unk20;
     /* 0x24 */ Timer mtActiveTimer;

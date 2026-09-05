@@ -33,6 +33,6 @@ private:
     u32 mHeld;
 };
 
-extern "C" void fn_802BD820(const char* format, ...);
+void fn_802BD820(const char* format, ...);
 
 #endif // GAME_TEXT_WINDOW_TASK_H

@@ -1,4 +1,5 @@
 #include "Game/AI/Desire.h"
+#include "Game/AI/FielderInput.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireUpdate.h"

@@ -1,5 +1,7 @@
 #include "Game/Render/NPCManager.h"
 
+#include "NL/gl/gl.h"
+#include "NL/gl/glMemory.h"
 #include "unclassified/tu_8019D6B4.h"
 #include "Game/GameTweaks.h"
 #include "Game/Render/ChainChomp.h"
@@ -49,11 +51,11 @@ extern "C"
     void fn_801A6074(KoopaShellObject* pObject, float fDeltaT);
     void fn_801A65F8(KoopaShellObject* pObject);
 
-    State_8019A710* fn_8019A710(State_8019A710* pObject,
+    BulletBillObject* fn_8019A710(BulletBillObject* pObject,
         void* pDrawable, unsigned int nIndex, float fRadius, float fParam);
-    State_8019A710* fn_8019A7E4(State_8019A710* pObject, int bDelete);
-    void fn_8019A854(State_8019A710* pObject, float fDeltaT);
-    void fn_8019AD18(State_8019A710* pObject);
+    BulletBillObject* fn_8019A7E4(BulletBillObject* pObject, int bDelete);
+    void fn_8019A854(BulletBillObject* pObject, float fDeltaT);
+    void fn_8019AD18(BulletBillObject* pObject);
 
     UnidentifiedNPCConfig_801B532C* fn_801B532C(int* pIndex);
     SkinAnimatedNPC* fn_801B43F8(SkinAnimatedNPC* pObject,
@@ -74,15 +76,8 @@ extern "C"
         unsigned int nChunkSize, void* pReadBuffer0,
         void* pReadBuffer1, void* pParam, unsigned long nParam,
         MemoryAllocator* pAllocator);
-    bool fn_802C8200(const char* pPath, LoadAsyncCallback pCallback,
-        void* pUserData, void* pContext);
-    bool fn_802C8204(const char* pPath, LoadAsyncCallback pCallback,
-        void* pUserData, void* pContext);
-    MemoryAllocator* fn_802CC094();
     bool fn_802CDD78(void* pData, unsigned long nSize,
         MemoryAllocator* pAllocator, int nParam);
-    unsigned int* fn_802C81FC(void* pData, unsigned long nSize,
-        unsigned long* pNumModels, void* pContext);
 }
 
 extern MemoryAllocator* AllocatorStack[16];
@@ -267,19 +262,19 @@ DaisyFistObject* NPCManager::fn_801A9CA4(int nIndex)
     return 0;
 }
 
-State_8019A710* NPCManager::fn_801A9D10(int nIndex)
+BulletBillObject* NPCManager::fn_801A9D10(int nIndex)
 {
     return mUnidentified058[nIndex];
 }
 
-State_8019A710* NPCManager::fn_801A9D20()
+BulletBillObject* NPCManager::fn_801A9D20()
 {
-    State_8019A710* pObject = 0;
+    BulletBillObject* pObject = 0;
     for (unsigned int i = 0; i < 6; ++i)
     {
         if (mUnidentified058[i] == 0)
         {
-            pObject = (State_8019A710*)nlMalloc(0x48, 8, false);
+            pObject = (BulletBillObject*)nlMalloc(0x48, 8, false);
             if (pObject != 0)
             {
                 pObject = fn_8019A710(pObject, fn_80276360(1, i), i, lbl_806E5210, lbl_806E5214);
@@ -439,7 +434,7 @@ extern "C" void fn_801AA8E0(
         = (NPCTemplate*)pUserData;
     pTemplate->mUnidentified010 = fn_802CC094();
     pManager->mUnidentified01C->mUnidentified003 = true;
-    fn_802CDD78(pData, nSize, fn_802CC094(), 0);
+    fn_802CDD78(pData, nSize, (MemoryAllocator*)fn_802CC094(), 0);
     nlFree(pData);
 }
 
@@ -450,7 +445,7 @@ extern "C" void fn_801AA960(
         = (NPCTemplate*)pUserData;
     pTemplate->mUnidentified010 = fn_802CC094();
     unsigned long nNumModels = 0;
-    unsigned int* pModel = fn_802C81FC(
+    unsigned int* pModel = (unsigned int*)fn_802C81FC(
         pData, nSize, &nNumModels, fn_802CC094());
     pTemplate->modelID = *pModel;
     nlFree(pData);

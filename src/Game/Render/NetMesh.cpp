@@ -11,6 +11,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
+#include "unclassified/tu_80276264.h"
 #include "unclassified/tu_80338898.h"
 
 #include <math.h>
@@ -55,7 +56,6 @@ struct BallNetmeshEventData
 
 extern "C" unsigned int fn_802AAC88(const void*, unsigned int);
 NetMeshFrameProvider* GetFixedUpdateTask();
-extern "C" RenderObject* fn_8027725C(unsigned long);
 extern "C" void fn_80146424(BallNetmeshEventData*, bool);
 extern "C" PlatTexture* fn_802D064C(unsigned long);
 

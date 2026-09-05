@@ -72,4 +72,9 @@ public:
     /* 0x74 */ eFELibObjectType m_type;
 };
 
+float fn_803020BC(FELibObject* object);
+float fn_803020C4(FELibObject* object);
+float fn_803020CC(FELibObject* object);
+float fn_803020D4(FELibObject* object);
+
 #endif // _FELIBOBJECT_H_

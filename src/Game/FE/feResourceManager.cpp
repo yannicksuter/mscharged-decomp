@@ -4,6 +4,7 @@
 #include "Game/FE/feScene.h"
 #include "Game/FE/feSceneResource.h"
 #include "Game/FE/feTextureResource.h"
+#include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlAVLTree.h"
@@ -34,9 +35,6 @@ extern unsigned int AllocatorStackDepth;
 extern void* lbl_806E2090;
 extern int nlPrintf(const char* format, ...);
 
-extern "C" ResourceInterface_802CC094* fn_802CC094();
-extern "C" void fn_802C8284(unsigned long texture);
-extern "C" void fn_802C8288(void* texture);
 extern "C" unsigned int fn_802A95C4(AVLTreeNode* node, unsigned int count);
 extern "C" void* fn_80307260(void* manager, unsigned long hashID);
 
@@ -127,7 +125,7 @@ void FEResourceManager::fn_802FC9C4(void* buffer, unsigned long uReadSize, unsig
     ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
     fn_802C8284(pTextureResource->m_hashID);
     void* texture = glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
-    fn_802C8288(texture);
+    fn_802C8288();
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;
     unsigned long textureHandle = pTextureResource->m_hashID;
@@ -284,7 +282,7 @@ void FEResourceManager::LoadPermanentTextures()
                 ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
                 fn_802C8284(pTextureResource->m_hashID);
                 void* texture = glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uFileLength, resourceInterface);
-                fn_802C8288(texture);
+                fn_802C8288();
                 delete[] s_pResourceLoadBuffer;
                 s_pResourceLoadBuffer = 0;
                 unsigned long textureHandle = pTextureResource->m_hashID;
@@ -417,7 +415,7 @@ void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSi
     ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
     fn_802C8284(pHandle->m_hashID);
     void* texture = glTextureAdd(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
-    fn_802C8288(texture);
+    fn_802C8288();
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;
     unsigned long textureHandle = pHandle->m_hashID;

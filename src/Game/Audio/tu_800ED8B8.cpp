@@ -60,9 +60,8 @@ extern "C" void fn_800ED8D4()
 
 static inline unsigned long GetAudioMilliseconds_800ED92C()
 {
-    unsigned long ticksPerMillisecond
-        = (*(unsigned long*)0x800000F8 >> 2) / 1000;
-    return (unsigned long)(OSGetTime() / ticksPerMillisecond);
+    return (unsigned long)(OSGetTime()
+        / ((*(unsigned long*)0x800000F8 >> 2) / 1000));
 }
 
 extern "C" void fn_800ED8D8()
@@ -77,7 +76,11 @@ extern "C" void fn_800ED8D8()
 
 extern "C" void fn_800ED92C(unsigned long cueId)
 {
-    if (fn_802C2C84(lbl_805041B0, false) || lbl_806E0E8B)
+    if (fn_802C2C84(lbl_805041B0, false))
+    {
+        return;
+    }
+    if (lbl_806E0E8B)
     {
         return;
     }
@@ -107,10 +110,11 @@ extern "C" void fn_800ED92C(unsigned long cueId)
     if (slot == 0)
     {
         slot = &lbl_8056DCA8[0];
-        if (lbl_8056DCA8[1].m_LastPlayedMilliseconds
+        RestrictedStreamSlot_800ED92C* other = &lbl_8056DCA8[1];
+        if (other->m_LastPlayedMilliseconds
             < slot->m_LastPlayedMilliseconds)
         {
-            slot = &lbl_8056DCA8[1];
+            slot = other;
         }
     }
 

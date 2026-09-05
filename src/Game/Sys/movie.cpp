@@ -4,11 +4,13 @@
 
 #include "Game/ResourceInterface_802CC094.h"
 #include "NL/gc/gcSwizzler.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"
 #include "NL/glx/glxSwap.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/nlFileGC.h"
 #include "NL/nlMemory.h"
+#include "NL/nlPrint.h"
 #include "NL/nlString.h"
 
 #include <revolution/gx/GXMisc.h>
@@ -16,13 +18,6 @@
 #include <revolution/os/OSThread.h>
 
 #include <string.h>
-
-extern "C" ResourceInterface_802CC094* fn_802CC094();
-extern "C" void fn_802CDF14(
-    unsigned long texture, PlatTexture* platformTexture,
-    MemoryAllocator* allocator);
-extern "C" void fn_8004F594(int category, const char* format, ...);
-extern "C" void fn_80372970(bool mono);
 
 static THPVideoInfo videoInfo;
 static PlatTexture* pTex[4];
@@ -45,7 +40,7 @@ static bool g_bMovieMustStop;
 static unsigned long resourceMarker;
 static unsigned int lbl_806E2444;
 
-extern "C" bool fn_80370E20()
+bool fn_80370E20()
 {
     if (lbl_806E241A)
     {
@@ -57,14 +52,14 @@ extern "C" bool fn_80370E20()
     return true;
 }
 
-extern "C" bool fn_80370E64()
+bool fn_80370E64()
 {
     THPSimpleQuit();
     lbl_806E241A = false;
     return true;
 }
 
-extern "C" void fn_80370E90(bool value)
+void fn_80370E90(bool value)
 {
     lbl_806DFAC4 = value;
 }
@@ -186,7 +181,7 @@ bool MovieStop()
     return true;
 }
 
-extern "C" void fn_80371254()
+void fn_80371254()
 {
     ++lbl_806E2430;
 }
@@ -270,22 +265,22 @@ bool MoviePlay()
     return true;
 }
 
-extern "C" bool fn_803713C4()
+bool fn_803713C4()
 {
     return g_bActive;
 }
 
-extern "C" bool fn_803713CC()
+bool fn_803713CC()
 {
     return lbl_806E2434;
 }
 
-extern "C" void fn_803713D4()
+void fn_803713D4()
 {
     lbl_806E2434 = false;
 }
 
-extern "C" unsigned int fn_803713E0()
+unsigned int fn_803713E0()
 {
     return lbl_806E2424;
 }

@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/glx/glxDisplayList.h"
 
 unsigned int gxSetNumChans(unsigned int);
@@ -23,7 +24,6 @@ extern "C" void fn_802A79A0(void*, const glModelPacket*);
 extern "C" void fn_802A79F8(void*, const glModelPacket*);
 extern "C" void fn_802A7BE4(void*, const glModelPacket*);
 extern "C" void fn_802A7C58(void*, const glModelPacket*);
-extern "C" void fn_802CC978(void*, const glModelPacket*, u32);
 
 extern "C" void fn_802A3D9C(void* renderer)
 {

@@ -14,8 +14,6 @@ public:
     virtual void fn_8036DBAC(unsigned long hash) = 0;
 };
 
-extern "C" void fn_802C8280(const char* name);
-extern "C" void fn_802C8288();
 extern "C" TargetPlatform_8036DE50* fn_8036D894();
 extern "C" TargetPlatform_8036DE50* fn_8036DE50(void* targetInfo);
 

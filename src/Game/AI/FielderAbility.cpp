@@ -4,6 +4,7 @@
 
 #include "Game/AI/Fuzzy.h"
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/TeamPlayMachine.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/Game.h"
 #include "Game/MathHelpers.h"
@@ -68,7 +69,6 @@ extern "C" void fn_800301E8(cFielder* pFielder);
 extern "C" bool fn_80034964(cFielder* pFielder);
 extern "C" void fn_80038158(cFielder* pFielder, int nParam);
 extern "C" void fn_80040368(cFielder* pFielder);
-extern "C" void* fn_8002E1A4(cFielder* pFielder);
 extern "C" bool fn_80319FEC(void* pParam, int nAction);
 extern "C" void fn_80319E58(void* pParam, int nAction);
 extern "C" void fn_80319E84(void* pParam, int nAction, int nParam1, int nParam2);

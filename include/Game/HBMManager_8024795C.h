@@ -66,4 +66,15 @@ public:
 
 extern UnidentifiedHBMManager* gpHBMManager;
 
+
+struct UnidentifiedHBMDisplayState
+{
+    u8 mPad00[0x0C];
+    bool mEnabled;
+};
+
+UnidentifiedHBMDisplayState* fn_80271960();
+void fn_80271A64(UnidentifiedHBMDisplayState* state, float fDeltaT);
+void fn_80271AEC(UnidentifiedHBMDisplayState* state);
+
 #endif // GAME_HBM_MANAGER_8024795C_H

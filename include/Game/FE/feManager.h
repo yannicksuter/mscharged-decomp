@@ -20,4 +20,7 @@ public:
     static bool m_bGameOver;
 };
 
+
+extern bool lbl_806E180D;
+
 #endif // _FEMANAGER_H_

@@ -1,14 +1,11 @@
 #include "Game/GL/ModelWriter_802A1BF4.h"
 
+#include "Game/GL/tu_802D38A4.h"
 #include "types.h"
 
 extern "C" void* fn_802CC0A4(
     unsigned long size, int memoryType, void* allocator);
 extern "C" void* fn_802CC0A8(unsigned long size, int memoryType);
-extern "C" void fn_802D38A4(glModel* model, int count, int primitive,
-    void* allocator, int numStreams, unsigned long format);
-extern "C" void fn_802D39CC(glModelStream* streams, int stream,
-    void* address, int stride, int type);
 extern "C" void fn_8036E438(glModelPacket* packet, bool allocated);
 extern "C" void DCStoreRangeNoSync(const void* address, u32 size);
 extern "C" void PPCSync();

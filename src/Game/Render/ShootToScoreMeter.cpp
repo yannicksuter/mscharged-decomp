@@ -7,6 +7,7 @@
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
 
@@ -19,7 +20,6 @@ extern "C"
     void fn_802CE6DC(
         GLView* view, const nlVector3* normalized, nlVector3* screen);
     float fn_802CE76C(GLView* view);
-    float fn_802CE7B0(GLView* view);
     void fn_802CEA40(GLView* source, GLView* destination,
         const nlVector3* world, nlVector3* projected);
     extern BaseGameSceneManager* lbl_806E1860;

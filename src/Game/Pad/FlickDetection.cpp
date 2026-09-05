@@ -12,8 +12,6 @@ StaticRing<char> history[16];
 
 } // namespace
 
-extern "C" cAIPad* fn_80007C3C(int);
-
 void FlickDetection::Update()
 {
     for (int i = 0; i < 16; i++)

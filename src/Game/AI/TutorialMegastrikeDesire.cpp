@@ -3,8 +3,6 @@
 #include "Game/AI/Fielder.h"
 #include "Game/Team.h"
 
-extern "C" Unidentified8002E1A4Result* fn_8002E1A4(cFielder*);
-
 char lbl_80504000[] = "TutorialMegastrikeDesire";
 
 void TutorialMegastrikeDesire::UnidentifiedUpdate(

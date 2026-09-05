@@ -2,6 +2,7 @@
 
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glView.h"
+#include "NL/gl/tu_80364020.h"
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
@@ -19,8 +20,6 @@ extern "C"
     void fn_80183A98();
     void fn_80183B40(unsigned long matrix);
     void fn_80183BF4(const nlMatrix4* matrix);
-    void* fn_80364020();
-    void fn_803640E0(void*, const char*);
     void fn_8036D774(const nlMatrix4* matrix);
     void fn_8036D7EC(
         const void* matrices, unsigned long count, const nlMatrix4* matrix,
@@ -228,11 +227,9 @@ void GXMaterialProgramImpl<GXMaterialProgram_802981F0>::Draw(
 
     if (packet->unknown28 == 0)
     {
-        fn_803640E0(
-            fn_80364020(), "CharacterSkinCustom - RLXLoadSkinMatrices");
+        fn_80364020()->fn_803640E0("CharacterSkinCustom - RLXLoadSkinMatrices");
         fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 1);
-        fn_803640E0(fn_80364020(),
-            "CharacterSkinCustom - After RLXLoadSkinMatrices");
+        fn_80364020()->fn_803640E0("CharacterSkinCustom - After RLXLoadSkinMatrices");
     }
     else
     {

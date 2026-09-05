@@ -18,6 +18,18 @@ enum eShotMeterState
 class ShotMeter
 {
 public:
+    ShotMeter()
+        : m_eShotMeterState(SHOT_METER_INACTIVE)
+        , m_fTime(0.0f)
+        , mUnidentified008(0.0f)
+        , mUnidentified00C(0.0f)
+        , m_fScoreValue(0.0f)
+        , m_fSpeedValue(0.0f)
+        , m_fSTSValue(0.0f)
+        , mfSShotAimValue(0.0f)
+    {
+    }
+
     void Update(float fDeltaT);
     void Abort();
     void CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass);

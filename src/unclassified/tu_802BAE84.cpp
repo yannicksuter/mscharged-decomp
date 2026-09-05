@@ -12,8 +12,6 @@
 #include <stdarg.h>
 #include <string.h>
 
-extern "C" int fn_802C9CC8(GLView* view);
-
 static nlColour lbl_806DF2C8 = { 0xFF, 0xFF, 0xFF, 0xFF };
 static bool lbl_806DF2CC = true;
 static nlColour lbl_806DF2D0 = { 0, 0, 0, 150 };

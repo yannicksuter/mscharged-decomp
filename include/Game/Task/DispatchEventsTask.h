@@ -70,4 +70,8 @@ public:
 
 extern DispatchEventsTask* gDispatchEventsTask;
 
+
+void fn_80115F10();
+void fn_80115FB4();
+
 #endif // GAME_TASK_DISPATCH_EVENTS_TASK_H

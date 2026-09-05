@@ -5,6 +5,14 @@
 
 struct UnidentifiedTransportPacket_803263E4
 {
+    static void* operator new(
+        unsigned long size, unsigned int alignment, bool fromEnd);
+
+    UnidentifiedTransportPacket_803263E4()
+        : mUnidentified06(0)
+    {
+    }
+
     /* 0x000 */ u32 mUnidentified00;
     /* 0x004 */ u8 mUnidentified04;
     /* 0x005 */ u8 mUnidentified05;
@@ -15,7 +23,6 @@ struct UnidentifiedTransportPacket_803263E4
 
 extern "C"
 {
-    void* fn_803263E4(unsigned long size, unsigned int alignment, bool fromEnd);
     void fn_8032644C(void* packet);
     void fn_80326464(UnidentifiedTransportPacket_803263E4* packet,
         UnidentifiedMessageSerializer* serializer);

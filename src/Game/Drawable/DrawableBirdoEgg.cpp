@@ -7,6 +7,7 @@
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "math.h"
+#include "unclassified/tu_80199E84.h"
 
 // Charged-only shadow prop, fourth of the run described beside
 // DrawableBulletBill. The live object's translation unit spells
@@ -26,11 +27,6 @@ struct BirdoEggObjectFields
     char _031[7];
     /* 0x38 */ RenderObject* mDrawable;
 };
-
-extern "C"
-{
-    float fn_8019A574(const BirdoEggObject*);
-}
 
 static float gShadowScaleIn = 0.125f;
 static float gShadowScaleHigh = 0.125f;
@@ -161,7 +157,7 @@ void DrawableBirdoEgg::Grab(const BirdoEggObject* object)
 
     mPosition = ((const BirdoEggObjectFields*)object)->mPosition;
     mOrientation = ((const BirdoEggObjectFields*)object)->mOrientation;
-    mScale = fn_8019A574(object);
+    mScale = fn_8019A574((const State_80199E84*)object);
 }
 
 void DrawableBirdoEgg::Render(const BirdoEggObject* object) const

@@ -25,11 +25,9 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 
 extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
 extern "C" unsigned char* lbl_806E2164;
-extern "C" float fn_800155A0(cBall*, int);
 extern "C" bool fn_800344B0(cFielder*);
 extern "C" bool fn_8003C180(cPlayer*);
 extern "C" bool fn_8003E74C(cFielder*);
-extern "C" float fn_80111D3C();
 
 extern "C" UnidentifiedTypedEvent<UnidentifiedEventData_80066748>*
     fn_80023350(const char*, int);
@@ -197,9 +195,23 @@ void UnidentifiedCameraEffects::OnGoalieDekeAttackAttempt(
 void UnidentifiedCameraEffects::OnCollisionThwompPlayer(
     UnidentifiedEventData32* eventData)
 {
-    if (g_pGame->m_eGameState == 3 || eventData == 0
-        || eventData->source == 0 || eventData->sourceValue != (void*)3
-        || eventData->target == 0)
+    if (g_pGame->m_eGameState == 3)
+    {
+        return;
+    }
+    if (eventData == 0)
+    {
+        return;
+    }
+    if (eventData->source == 0)
+    {
+        return;
+    }
+    if ((int)eventData->sourceValue != 3)
+    {
+        return;
+    }
+    if (eventData->target == 0)
     {
         return;
     }
@@ -222,7 +234,7 @@ void UnidentifiedCameraEffects::OnGoalieSave(
 
     if (g_pBall->m_v3Velocity.GetLengthSq3D()
             < lbl_806DC588 * lbl_806DC588
-        || fn_80111D3C() != 1.0f
+        || FixedUpdateTask::GetTargetTimeScale() != 1.0f
         || fn_800155A0(g_pBall, 0) <= lbl_806DC58C)
     {
         return;
@@ -294,7 +306,7 @@ void UnidentifiedCameraEffects::OnCaptainClashPresentationEnd(
 void UnidentifiedCameraEffects::OnCaptainClashPresentation(
     UnidentifiedEventData00*)
 {
-    if (g_pGame->m_eGameState == 3 || fn_80111D3C() != 1.0f)
+    if (g_pGame->m_eGameState == 3 || FixedUpdateTask::GetTargetTimeScale() != 1.0f)
     {
         return;
     }
@@ -336,8 +348,15 @@ void UnidentifiedCameraEffects::OnShotPresentationEnd(
 void UnidentifiedCameraEffects::OnShotPresentation(
     UnidentifiedEventData00*)
 {
-    if (g_pGame->m_eGameState == 3 || fn_80111D3C() != 1.0f
-        || !IsPassTargetClear())
+    if (g_pGame->m_eGameState == 3)
+    {
+        return;
+    }
+    if (FixedUpdateTask::GetTargetTimeScale() != 1.0f)
+    {
+        return;
+    }
+    if (!IsPassTargetClear())
     {
         return;
     }

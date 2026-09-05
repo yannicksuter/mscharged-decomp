@@ -30,18 +30,6 @@
 
 #include <math.h>
 
-extern "C"
-{
-    void* fn_80271960();
-    void fn_80271A64(void*, float);
-    void fn_80271AEC(void*);
-    void fn_80276FB8(float);
-    bool fn_80277238();
-    cGlobalPad* fn_802C082C(void* padManager, int padIndex);
-}
-
-extern void* lbl_806E1E28;
-extern BaseGameSceneManager* lbl_806E1838;
 
 float g_fE3DebugTime;
 float g_fUpTime;

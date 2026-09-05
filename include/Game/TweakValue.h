@@ -3,7 +3,10 @@
 
 #include "NL/nlMemory.h"
 #include "NL/nlSmallBlockAllocator.h"
+#include "NL/nlString.h"
 #include "types.h"
+
+int nlSNPrintf(char* buffer, unsigned long size, const char* format, ...);
 
 class InterpreterCore;
 class TweakEntry_8052BF00;
@@ -35,15 +38,28 @@ public:
     virtual ~TweakValueBase_8052BF70();
     virtual int UnidentifiedVirtual0C();
     virtual int UnidentifiedVirtual10();
-    virtual void UnidentifiedVirtual14(float*, float*, float*);
-    virtual void UnidentifiedVirtual18();
+    virtual void UnidentifiedVirtual14(
+        float* minimum, float* maximum, float* increment)
+    {
+        *minimum = 0.0f;
+        *maximum = 0.0f;
+        *increment = 0.0f;
+    }
+    virtual void UnidentifiedVirtual18()
+    {
+    }
     virtual void* UnidentifiedVirtual1C()
     {
         return 0;
     }
     virtual void* UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24(char*, unsigned long);
-    virtual void UnidentifiedVirtual28(const char*);
+    virtual void UnidentifiedVirtual24(char* buffer, unsigned long size)
+    {
+        buffer[0] = '\0';
+    }
+    virtual void UnidentifiedVirtual28(const char* value)
+    {
+    }
     virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
 
 public:
@@ -78,11 +94,12 @@ class TweakValueImpl_804F4DC8 : public UnidentifiedTweakValueImplBase
 {
 public:
     TweakValueImpl_804F4DC8(float* value = 0);
-    TweakValueImpl_804F4DC8(const char* name, const char* category, float* value)
+    TweakValueImpl_804F4DC8(const char* name, const char* category, float* value,
+        bool unidentified = false)
     {
         m_pValue = value;
         mName = name;
-        mUnidentified009 = false;
+        mUnidentified009 = unidentified;
 
         if (fn_802C0F04() == 0)
         {
@@ -224,11 +241,18 @@ public:
             }
         }
     }
-    virtual int UnidentifiedVirtual30();
+    virtual int UnidentifiedVirtual0C();
+    virtual int UnidentifiedVirtual10();
+    virtual bool UnidentifiedVirtual3C();
     virtual TweakValueBase_8052BF70* UnidentifiedVirtual34(const char* name,
         void* entry);
+    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
+    virtual void* UnidentifiedVirtual20();
+    virtual void UnidentifiedVirtual24(char*, unsigned long);
+    virtual void UnidentifiedVirtual28(const char*);
+    virtual int UnidentifiedVirtual30();
+    virtual void UnidentifiedVirtual14(float*, float*, float*);
     virtual void UnidentifiedVirtual38(void* value);
-    virtual bool UnidentifiedVirtual3C();
 
 public:
     /* 0x0C */ bool* m_pValue;
@@ -239,6 +263,21 @@ public:
 class TweakValueBool_804F4578 : public TweakValueBase_8052BF70
 {
 public:
+    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
+    virtual int UnidentifiedVirtual10();
+    virtual int UnidentifiedVirtual0C();
+    virtual void* UnidentifiedVirtual20();
+    virtual void UnidentifiedVirtual24(char*, unsigned long);
+    virtual void UnidentifiedVirtual28(const char*);
+    virtual ~TweakValueBool_804F4578();
+    virtual void UnidentifiedVirtual14(float*, float*, float*);
+    virtual void UnidentifiedVirtual18();
+
+    static void operator delete(void* pointer)
+    {
+        lbl_806E1E58->m_Pool1.Free(pointer);
+    }
+
     TweakValueBool_804F4578(const char* name, const char* category, bool value)
     {
         mValue = value;
@@ -282,5 +321,153 @@ public:
 
     /* 0x0A */ bool mValue;
 }; // total size: 0x0C
+
+// Retail Game/tu_80009B88.cpp keeps the bool family's virtual bodies as a
+// weak block behind its static initializer, in the order below, and no unit
+// defines them out of line.
+
+inline int TweakValueBoolImpl_804F4538::UnidentifiedVirtual0C()
+{
+    return 2;
+}
+
+inline int TweakValueBoolImpl_804F4538::UnidentifiedVirtual10()
+{
+    return 2;
+}
+
+inline bool TweakValueBoolImpl_804F4538::UnidentifiedVirtual3C()
+{
+    return false;
+}
+
+inline TweakValueBase_8052BF70* TweakValueBoolImpl_804F4538::UnidentifiedVirtual34(
+    const char* name, void* entry)
+{
+    TweakValueBool_804F4578* created = new (
+        lbl_806E1E58->Allocate(sizeof(TweakValueBool_804F4578)))
+        TweakValueBool_804F4578(name, false);
+    fn_802C5780((TweakEntry_8052BF00*)entry, created);
+    return created;
+}
+
+inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual2C(
+    TweakValueBase_8052BF70* other)
+{
+    switch (other->UnidentifiedVirtual10())
+    {
+    case 1:
+        *m_pValue = ((TweakValueBool_804F4578*)other)->mValue;
+        break;
+    case 2:
+        *m_pValue = *((TweakValueBoolImpl_804F4538*)other)->m_pValue;
+        break;
+    }
+}
+
+inline void* TweakValueBoolImpl_804F4538::UnidentifiedVirtual20()
+{
+    return m_pValue;
+}
+
+inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual24(
+    char* buffer, unsigned long size)
+{
+    nlSNPrintf(buffer, size, *m_pValue ? "true" : "false");
+}
+
+inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual28(const char* value)
+{
+    if (nlStrICmp(value, "true") == 0)
+    {
+        *m_pValue = true;
+    }
+    if (nlStrICmp(value, "false") == 0)
+    {
+        *m_pValue = false;
+    }
+}
+
+inline int TweakValueBoolImpl_804F4538::UnidentifiedVirtual30()
+{
+    return m_pValue != 0;
+}
+
+inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual14(
+    float* minimum, float* maximum, float* increment)
+{
+    *minimum = 0.0f;
+    *maximum = 0.0f;
+    *increment = 0.0f;
+}
+
+inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual38(void* value)
+{
+    m_pValue = (bool*)value;
+}
+
+inline void TweakValueBool_804F4578::UnidentifiedVirtual2C(
+    TweakValueBase_8052BF70* other)
+{
+    switch (other->UnidentifiedVirtual10())
+    {
+    case 1:
+        mValue = ((TweakValueBool_804F4578*)other)->mValue;
+        break;
+    case 2:
+        mValue = *((TweakValueBoolImpl_804F4538*)other)->m_pValue;
+        break;
+    }
+}
+
+inline int TweakValueBool_804F4578::UnidentifiedVirtual10()
+{
+    return 1;
+}
+
+inline int TweakValueBool_804F4578::UnidentifiedVirtual0C()
+{
+    return 2;
+}
+
+inline void* TweakValueBool_804F4578::UnidentifiedVirtual20()
+{
+    return &mValue;
+}
+
+inline void TweakValueBool_804F4578::UnidentifiedVirtual24(
+    char* buffer, unsigned long size)
+{
+    nlSNPrintf(buffer, size, mValue ? "true" : "false");
+}
+
+inline void TweakValueBool_804F4578::UnidentifiedVirtual28(const char* value)
+{
+    if (nlStrICmp(value, "true") == 0 || nlStrICmp(value, "triggered") == 0
+        || nlStrICmp(value, "on") == 0)
+    {
+        mValue = true;
+    }
+    if (nlStrICmp(value, "false") == 0 || nlStrICmp(value, "off") == 0)
+    {
+        mValue = false;
+    }
+}
+
+inline TweakValueBool_804F4578::~TweakValueBool_804F4578()
+{
+}
+
+inline void TweakValueBool_804F4578::UnidentifiedVirtual14(
+    float* minimum, float* maximum, float* increment)
+{
+    *minimum = 0.0f;
+    *maximum = 0.0f;
+    *increment = 0.0f;
+}
+
+inline void TweakValueBool_804F4578::UnidentifiedVirtual18()
+{
+}
 
 #endif // GAME_TWEAK_VALUE_H

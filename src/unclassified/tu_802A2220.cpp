@@ -1,4 +1,5 @@
 #include "NL/gl/glModel.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
 
@@ -30,7 +31,6 @@ extern "C" void fn_802A44B0(void*, const glModelPacket*);
 extern "C" void fn_802A44F8(void*, const glModelPacket*);
 extern "C" void fn_802A469C(void*, const glModelPacket*);
 extern "C" void fn_802A470C(void*, const glModelPacket*);
-extern "C" void fn_802CC978(void*, const glModelPacket*, u32);
 
 extern "C" void fn_802A2220(void* renderer)
 {

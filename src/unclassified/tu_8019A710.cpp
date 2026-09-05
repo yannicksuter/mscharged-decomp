@@ -4,11 +4,11 @@
 #include "Game/Physics/PhysicsBulletBill.h"
 #include "Game/Physics/PhysicsObject.h"
 
+#include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "types.h"
 
 extern "C" void fn_8019ABB8(BulletBillObject*, bool);
-extern "C" void fn_802B549C(BulletBillObject*, u16);
 
 extern const float lbl_806E4EE0;
 extern const float lbl_806E4EE4;
@@ -95,7 +95,8 @@ extern "C" void fn_8019A854(BulletBillObject* state, float deltaTime)
 
     if (state->target != 0)
     {
-        fn_802B549C(state, state->target->m_aActualFacingDirection);
+        fn_802B549C(
+            state->orientation, state->target->m_aActualFacingDirection);
     }
 }
 

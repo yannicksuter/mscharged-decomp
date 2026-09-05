@@ -2,6 +2,7 @@
 
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glModel.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/platvmath.h"
 
@@ -40,7 +41,6 @@ extern nlMatrix4 lbl_8057B470;
 extern "C" void fn_802A6280(void*, bool);
 extern "C" void fn_802A6348(void*, const glModelPacket*);
 extern "C" void fn_802A63A0(void*, const glModelPacket*);
-extern "C" void fn_802CC978(void*, const glModelPacket*, u32);
 extern "C" void fn_8036D774(const nlMatrix4*);
 extern "C" void fn_8036D7EC(void*, u32, const nlMatrix4*, int);
 

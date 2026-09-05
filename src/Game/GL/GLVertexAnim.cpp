@@ -1,10 +1,9 @@
 #include "Game/GL/GLVertexAnim.h"
 
+#include "Game/GL/tu_802D38A4.h"
 #include "NL/nlMemory.h"
 
 #include <string.h>
-
-extern "C" void fn_802D3A00(glModelStream* pStream, void* address);
 
 struct UnidentifiedGLVertexAnimHeader_802D3D48
 {

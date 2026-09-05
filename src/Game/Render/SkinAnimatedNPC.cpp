@@ -15,15 +15,10 @@
 #include "NL/MemAlloc.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/nlColour.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-
-extern "C"
-{
-    void fn_802CC628(glModelPacket* packet, u32 hash, float value);
-    void fn_802CC6C0(glModelPacket* packet, u32 hash, u32 value);
-}
 
 static char ShadowLevelName[] = "shadowLevel";
 static char AlphaValueName[] = "alphaValue";

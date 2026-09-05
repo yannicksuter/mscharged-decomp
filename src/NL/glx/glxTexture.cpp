@@ -1,15 +1,15 @@
 #include "NL/glx/glxTexture.h"
 
 #include "NL/gc/gcSwizzler.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/nlFile.h"
 #include "NL/nlList.h"
 #include "NL/nlMemory.h"
+#include "NL/nlPrint.h"
 
 #include <string.h>
-
-class TextureManager_802CDF0C;
 
 enum GXTexWrapMode
 {
@@ -30,21 +30,14 @@ enum eGLTextureMode
 
 extern "C"
 {
-    MemoryAllocator* fn_802CC094();
     void* fn_802CC0A4(
         unsigned long size, int memoryType, MemoryAllocator* allocator);
     bool fn_802CDD78(
         void* data, unsigned long size, MemoryAllocator* allocator, int);
-    TextureManager_802CDF0C* fn_802CDF0C();
-    unsigned long fn_802CE1B8(
-        TextureManager_802CDF0C* manager, unsigned long texture);
-    PlatTexture* fn_802CE294(
-        TextureManager_802CDF0C* manager, const unsigned long* texture);
     PlatTexture* fn_802CE2B8(
         TextureManager_802CDF0C* manager,
         UnidentifiedTextureState* texture);
     int fn_80383478(const char* format, ...);
-    void fn_8004F594(int category, const char* format, ...);
 
     void DCStoreRange(void* address, unsigned long length);
     void GXInitTlutObj(
@@ -98,7 +91,8 @@ static PlatTexture* glx_MakeGridTexture(int width, int height)
 
     unsigned char bits[4] = { 5, 6, 5, 0 };
     PlatTexture* texture = new (nlMalloc(sizeof(PlatTexture), 8, false)) PlatTexture();
-    texture->Create(width, height, GXTex_RGB565, fn_802CC094(), 1, true, true);
+    texture->Create(width, height, GXTex_RGB565,
+        (MemoryAllocator*)fn_802CC094(), 1, true, true);
     memcpy(texture->m_Bits, bits, sizeof(texture->m_Bits));
 
     unsigned short gridColor = 0xFFFF;

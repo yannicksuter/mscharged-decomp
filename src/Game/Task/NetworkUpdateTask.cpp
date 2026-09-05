@@ -1,5 +1,7 @@
 #include "Game/Task/NetworkUpdateTask.h"
 
+#include "unclassified/tu_80332DC0.h"
+
 #include "Game/Task/FixedUpdateTask.h"
 #include "unclassified/tu_80332770.h"
 
@@ -16,11 +18,9 @@
 #include "types.h"
 
 extern u8 lbl_806E1008;
-
 extern "C" void fn_803740B8();
-extern "C" void fn_8032C7D0();
+
 void RegisterNetworkMessages_801258A8();
-extern "C" void fn_80332EDC();
 void NetworkUpdateTask::Initialize()
 {
     fn_803740B8();

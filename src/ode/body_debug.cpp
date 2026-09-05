@@ -1,6 +1,7 @@
 #include "objects.h"
 
 #include "Game/DebugWriteCache.h"
+#include "ode/NLGAdditions.h"
 
 extern "C" void fn_802AADE8(void*, void*, unsigned int);
 
@@ -31,7 +32,7 @@ extern char s_BodyStepsLeftName[15];
 #define BODY_FIELD_OFFSET(body, field) \
     ((unsigned char*)&(body)->field - (unsigned char*)&(body)->flags)
 
-extern "C" void fn_80358B08(dBodyID body, void* context, DebugWriteCache* cache)
+void fn_80358B08(dBodyID body, void* context, DebugWriteCache* cache)
 {
     if (s_dxBodyType == 0xFFFF)
     {

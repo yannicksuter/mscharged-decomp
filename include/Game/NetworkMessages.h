@@ -9,6 +9,11 @@
 class UnidentifiedMessageSerializer
 {
 public:
+    UnidentifiedMessageSerializer(int direction, u8* buffer, unsigned long size);
+    ~UnidentifiedMessageSerializer();
+
+    int UnidentifiedGetLength() const { return mPosition - mBuffer; }
+
     void Transfer(void* value, unsigned long size)
     {
         if (mDirection == 0)
@@ -23,9 +28,12 @@ public:
         }
     }
 
-    /* 0x0 */ int mDirection;
-    /* 0x4 */ u8* mPosition;
-};
+    /* 0x00 */ int mDirection;
+    /* 0x04 */ u8* mPosition;
+    /* 0x08 */ u8* mBuffer;
+    /* 0x0C */ u8* mEnd;
+    /* 0x10 */ bool mOwnsBuffer;
+}; // size: 0x14
 
 extern "C" void* fn_8032C66C(unsigned long size, unsigned int alignment, bool);
 

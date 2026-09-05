@@ -1,3 +1,4 @@
+#include "Game/AI/UnidentifiedAvoidanceObject.h"
 #include "unclassified/tu_80177498.h"
 
 #include "Game/AI/Fielder.h"
@@ -20,8 +21,6 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 extern "C" UnidentifiedEventRegistry_80177498* lbl_806E1D90;
 extern "C" bool fn_802B6BC8(const nlVector3*, const nlVector3*,
     const nlVector3*, const nlVector3*, float*, float*);
-extern "C" WaluigiWallGeometry_80177498* fn_8000DDE8(void*, int,
-    const nlVector3*, const nlVector3*, float);
 extern "C" void fn_8014A180(void*);
 extern "C" void fn_802E8A2C(EmissionManager*, EffectsGroup*);
 extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
@@ -100,12 +99,10 @@ inline PhysicsBox_80177498::PhysicsBox_80177498(
     SetCategory(0x4000);
     SetCollide(0x1B062);
 
-    void* pStorage = nlMalloc(0x68, 8, false);
-    if (pStorage != 0)
-    {
-        mUnidentified068 = fn_8000DDE8(pStorage, 4,
-            &mUnidentified038, &mUnidentified044, lbl_806DCB18);
-    }
+    mUnidentified068 = new (nlMalloc(
+        sizeof(UnidentifiedAvoidancePolygon_804F4750), 8, false))
+        UnidentifiedAvoidancePolygon_804F4750(
+            4, mUnidentified038, mUnidentified044, lbl_806DCB18);
 }
 
 PhysicsBox_80177498::~PhysicsBox_80177498()

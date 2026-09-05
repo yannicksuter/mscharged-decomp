@@ -14,7 +14,6 @@
 #include "unclassified/tu_80336B2C.h"
 #include <stdlib.h>
 
-extern "C" SkillTweaks* fn_800A636C(cTeam*);
 extern "C" cTeam* fn_800D6670(cFielder*);
 extern "C" float fn_800E02B8(cTeam*);
 extern "C" void fn_8002E340(cFielder*);

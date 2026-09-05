@@ -34,4 +34,7 @@ extern UnidentifiedPeachPhotoState gPeachPhotoState;
 void EndPeachPhoto(UnidentifiedPeachPhotoState* photo, bool immediate);
 void RenderPeachPhoto(UnidentifiedPeachPhotoState* photo);
 
+
+void fn_801AD7E4(UnidentifiedPeachPhotoState* photo, float fSimulationTick, int frame);
+
 #endif // UNCLASSIFIED_TU_801AD15C_H

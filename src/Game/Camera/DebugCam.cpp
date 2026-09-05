@@ -78,8 +78,6 @@ static u32 sSightTexture = nlStringLowerHash("global/sight");
 static u32 sLightBlobTexture = nlStringLowerHash("global/light_blob");
 } // namespace
 
-extern void* lbl_806E1E28;
-extern "C" cGlobalPad* fn_802C082C(void* manager, int index);
 
 extern "C" void fn_800F2504()
 {

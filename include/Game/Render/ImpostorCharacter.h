@@ -24,7 +24,7 @@ class ImpostorCharacter;
 class ResourceInterface_802CC094;
 class UnidentifiedImpostorView_802D4290;
 struct glModel;
-struct State_802A7C90;
+class GLCompactColourMeshWriter;
 
 // Sprite-mesh unit at 0x802D4290. The retail binary does not preserve the
 // original class name, so the address-qualified placeholder is retained.
@@ -49,7 +49,7 @@ public:
     /* 0x64 */ UnidentifiedImpostorView_802D4290* mUnidentified064;
     /* 0x68 */ GLView* mUnidentified068;
     /* 0x6C */ GLRenderPair mUnidentified06C;
-    /* 0x74 */ State_802A7C90* mUnidentified074;
+    /* 0x74 */ GLCompactColourMeshWriter* mUnidentified074;
     /* 0x78 */ u8 mUnidentified078;
     /* 0x79 */ u8 mUnidentified079;
     /* 0x7A */ u16 mAngle;

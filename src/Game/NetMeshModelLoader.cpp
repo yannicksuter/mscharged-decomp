@@ -2,8 +2,10 @@
 
 #include "Game/Drawable/DrawableModel.h"
 #include "Game/MathHelpers.h"
+#include "NL/gl/tu_802CC370.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMemory.h"
+#include "unclassified/tu_80276264.h"
 
 typedef NetMeshModelLoader::NetMeshVertex NetMeshVertex;
 typedef NetMeshModelLoader::NetMeshEdge NetMeshEdge;
@@ -18,8 +20,6 @@ typedef nlAVLTreeIterator<NetMeshEdge, int,
     DefaultKeyCompare<NetMeshEdge> >
     EdgeIterator;
 
-extern "C" RenderObject* fn_8027725C(unsigned long);
-extern "C" unsigned long fn_802CC7E4(const glModelPacket*, unsigned long);
 extern unsigned long lbl_806E1F0C;
 
 static int s_initialEdgeCount = 1;

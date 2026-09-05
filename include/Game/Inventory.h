@@ -64,6 +64,21 @@ public:
         return Find(nlStringHash(name));
     }
 
+    T* Find(int index)
+    {
+        int i = 0;
+        for (nlListIterator<T*> iterator = Begin(); iterator.IsValid();
+            iterator.Next())
+        {
+            if (i == index)
+            {
+                return iterator.Current();
+            }
+            ++i;
+        }
+        return 0;
+    }
+
     ~cInventory();
 
     void Clear();

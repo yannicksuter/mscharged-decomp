@@ -101,4 +101,11 @@ extern UnidentifiedStrikerChallenge* lbl_806E0FA0;
 
 int fn_8011162C();
 
+bool fn_801100E0();
+bool fn_80110188();
+bool fn_80110230();
+bool fn_80110338();
+bool fn_801103D4();
+bool fn_80110470();
+
 #endif // GAME_DB_TU_8010A40C_H

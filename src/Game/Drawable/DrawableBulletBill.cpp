@@ -16,10 +16,6 @@
 // object. The live object and the material/texture services it calls are not
 // reconstructed yet and stay address-named.
 
-extern "C"
-{
-}
-
 static float gShadowAlphaScale = 0.4f;
 static float gShadowScaleHigh = 0.5f;
 static int gShadowAlphaLow = 130;

@@ -33,4 +33,9 @@ public:
     static bool s_FramerateLocked;
 };
 
+
+float fn_80112E0C();
+float fn_80112E14();
+bool fn_80112E1C();
+
 #endif // GAME_BEGIN_FRAME_TASK_H

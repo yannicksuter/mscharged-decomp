@@ -24,7 +24,7 @@ struct UnidentifiedCameraDisplayState
     bool field_0xC4;
 };
 
-extern "C" UnidentifiedCameraDisplayState* fn_80284A58();
+UnidentifiedCameraDisplayState* fn_80284A58();
 extern "C" float fn_800F2410(float fFOV);
 
 struct UnidentifiedSimulationTimeProvider

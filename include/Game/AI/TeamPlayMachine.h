@@ -100,4 +100,7 @@ public:
     virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
 };
 
+class cFielder;
+Unidentified8002E1A4Result* fn_8002E1A4(cFielder* pFielder);
+
 #endif // GAME_AI_TEAM_PLAY_MACHINE_H
