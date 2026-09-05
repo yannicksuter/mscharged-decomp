@@ -6,7 +6,27 @@
 class cPlayer;
 class CrowdRiot;
 class PhysicsObject;
+class PhysicsPatch;
 class PhysicsSphere_80175F8C;
+
+struct CollisionPlayerPlayerData
+{
+    /* 0x00 */ cPlayer* player1;
+    /* 0x04 */ cPlayer* player2;
+    /* 0x08 */ nlVector3 velocity1;
+    /* 0x14 */ nlVector3 velocity2;
+}; // total size: 0x20
+
+template <typename T>
+class SlotPool;
+extern "C" SlotPool<CollisionPlayerPlayerData> lbl_80571258;
+
+struct UnidentifiedEventData_80066590
+{
+    /* 0x00 */ cPlayer* pShooter;
+}; // total size: 0x4
+typedef UnidentifiedEventData_80066590 ShotAtGoalData;
+extern "C" SlotPool<ShotAtGoalData> lbl_80571820;
 
 struct UnidentifiedEventData_800673FC
 {
@@ -29,7 +49,6 @@ struct UnidentifiedEventData_80066A04
 }; // total size: 0x10
 
 struct UnidentifiedEventData00;
-struct UnidentifiedEventData01;
 struct UnidentifiedEventData02;
 struct UnidentifiedEventData03;
 struct UnidentifiedEventData04;
@@ -52,7 +71,14 @@ struct UnidentifiedEventData20;
 struct UnidentifiedEventData21;
 struct UnidentifiedEventData22;
 struct UnidentifiedEventData23;
-struct UnidentifiedEventData24;
+struct UnidentifiedEventData24
+{
+    /* 0x00 */ unsigned char mUnidentified00[0x0C];
+    /* 0x0C */ cPlayer* mUnidentified0C;
+    /* 0x10 */ PhysicsPatch* mUnidentified10;
+}; // total size: 0x14
+extern "C" SlotPool<UnidentifiedEventData24> lbl_80570138;
+
 struct UnidentifiedEventData25;
 struct UnidentifiedEventData26;
 struct UnidentifiedEventData27;

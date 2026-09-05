@@ -1,5 +1,6 @@
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glFont.h"
+#include "NL/gl/glView.h"
 #include "NL/gl/glMemory.h"
 #include "NL/glx/glxFont.h"
 #include "NL/gl/gl.h"

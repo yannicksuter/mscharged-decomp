@@ -5,8 +5,6 @@
 #include "types.h"
 
 extern s32* lbl_806E2288;
-extern "C" int fn_802C03FC(int button);
-extern "C" int fn_802C06C8(int buttonIndex);
 
 class PadMonkey : public PadBackend
 {

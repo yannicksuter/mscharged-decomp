@@ -1,3 +1,4 @@
+#include "Game/AI/Fielder.h"
 #include "Game/BulletBill.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
@@ -14,7 +15,6 @@
 class cFielder;
 class EffectsGroup;
 
-extern "C" bool fn_800976F8(cFielder*, float);
 extern "C" bool fn_800977A4(cFielder*, float);
 extern "C" void fn_800F026C(
     const nlVector3&, float, float);
@@ -92,7 +92,7 @@ ContactType PhysicsSphere_80175F8C::Contact(
         cFielder* fielder =
             (cFielder*)((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
         float radius = GetRadius();
-        if (fn_800976F8(fielder, GetPosition().z + radius))
+        if (fielder->IsCharacterInAir(GetPosition().z + radius))
         {
             return NO_CONTACT;
         }

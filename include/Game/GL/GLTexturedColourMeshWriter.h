@@ -1,15 +1,15 @@
-#ifndef GAME_GL_GL_MESH_WRITER_H
-#define GAME_GL_GL_MESH_WRITER_H
+#ifndef GAME_GL_GL_TEXTURED_COLOUR_MESH_WRITER_H
+#define GAME_GL_GL_TEXTURED_COLOUR_MESH_WRITER_H
 
 #include "NL/gl/glModel.h"
 #include "NL/nlColour.h"
 #include "NL/nlMath.h"
 
-class GLMeshWriter
+class GLTexturedColourMeshWriter
 {
 public:
-    GLMeshWriter();
-    ~GLMeshWriter();
+    GLTexturedColourMeshWriter();
+    ~GLTexturedColourMeshWriter();
 
     bool Begin(int numVerts, int prim, void* pResource);
     bool End();
@@ -46,15 +46,7 @@ public:
 
     void Vertex(const nlVector3& pos)
     {
-        float x;
-        float y;
-        float z;
-        z = pos.z;
-        y = pos.y;
-        x = pos.x;
-        *position++ = x;
-        *position++ = y;
-        *position++ = z;
+        Vertex(pos.x, pos.y, pos.z);
     }
 
     void Vertex(float x, float y, float z)
@@ -72,4 +64,4 @@ public:
     u32* colour;
 }; // size 0x18
 
-#endif // GAME_GL_GL_MESH_WRITER_H
+#endif // GAME_GL_GL_TEXTURED_COLOUR_MESH_WRITER_H

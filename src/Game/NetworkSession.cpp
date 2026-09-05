@@ -1,4 +1,5 @@
 #include "Game/NetworkSession.h"
+#include "Game/NetworkRandom_803236CC.h"
 #include "Game/FE/feMusic.h"
 #include "Game/tu_801360A4.h"
 
@@ -35,25 +36,16 @@ u32 lbl_806DC890 = 0x5234514A;
 u32 lbl_806DC894 = 0x52345145;
 
 extern UnidentifiedNetworkSession* lbl_806E20D8;
-extern void* lbl_806E2100;
 
 static MemoryAllocator s_NetworkAllocator;
 
-extern "C" u32 fn_8032C830(void* codec, void* message, void* buffer, int size);
 extern "C" int fn_8004F594(int channel, const char* format, ...);
-extern "C" u32 fn_803236CC();
 extern "C" bool fn_8025BD88();
 extern "C" int fn_802C2C84(const char* path, int);
 extern u8 lbl_806E18D4;
 
 extern "C" void fn_80374174();
 extern "C" int fn_80374308();
-extern "C" void fn_8032CA1C(void* codec, int type, UnidentifiedNetworkMessageReceiver* receiver);
-extern "C" void fn_8032CA2C(void* codec, int type);
-extern "C" void fn_8032CBC8(NetworkTransport_8032CA4C* transport);
-extern "C" void fn_8032C8CC(
-    void* codec, int source, void* buffer, int size);
-extern "C" void fn_8032CEAC(NetworkTransport_8032CA4C* transport);
 extern "C" void DWC_ShutdownFriendsMatch();
 extern "C" void DWC_Shutdown();
 extern "C" void fn_803742D0();
@@ -80,7 +72,6 @@ extern "C" int DWC_GetIngamesnCheckResult();
 
 u32 nlGetTicker();
 float nlGetTickerDifference(u32 older, u32 newer);
-extern "C" void fn_8032E890();
 extern "C" void DWC_ProcessFriendsMatch();
 void nlStrToWcs(const char* source, u16* dest, unsigned long max);
 #include <string.h>
@@ -344,7 +335,7 @@ void UnidentifiedNetworkSession::SendTournamentStartToEveryone()
     {
         u8 buffer[0x64];
         message.mMachineIndex = machine;
-        u32 size = fn_8032C830(lbl_806E2100, &message, buffer, 0x64);
+        u32 size = lbl_806E2100->fn_8032C830(&message, buffer, 0x64);
         u32 aid = GetMachineRoster()->GetMachineAid(machine);
         if (aid == 0xFFFFFFFF)
         {
@@ -436,7 +427,7 @@ void UnidentifiedNetworkSession::SendGameStartToEveryone()
     {
         u8 buffer[0x64];
         message.mMachineIndex = machine;
-        u32 size = fn_8032C830(lbl_806E2100, &message, buffer, 0x64);
+        u32 size = lbl_806E2100->fn_8032C830(&message, buffer, 0x64);
         u32 aid = GetMachineRoster()->GetMachineAid(machine);
         if (aid == 0xFFFFFFFF)
         {
@@ -481,7 +472,7 @@ void UnidentifiedNetworkSession::SendDraftToEveryone(
     {
         u8 buffer[0x200];
         message.mMachineIndex = machine;
-        u32 size = fn_8032C830(lbl_806E2100, &message, buffer, 0x200);
+        u32 size = lbl_806E2100->fn_8032C830(&message, buffer, 0x200);
         u32 aid = GetMachineRoster()->GetMachineAid(machine);
         if (aid == 0xFFFFFFFF)
         {
@@ -507,7 +498,7 @@ void UnidentifiedNetworkSession::SendDraftToEveryone(NetMessageDraft* message)
     {
         u8 buffer[0x200];
         message->mMachineIndex = machine;
-        u32 size = fn_8032C830(lbl_806E2100, message, buffer, 0x200);
+        u32 size = lbl_806E2100->fn_8032C830(message, buffer, 0x200);
         u32 aid = GetMachineRoster()->GetMachineAid(machine);
         if (aid == 0xFFFFFFFF)
         {
@@ -534,7 +525,7 @@ void UnidentifiedNetworkSession::SendSidesChangedToEveryone(
     for (int machine = 0; machine < machineCount; ++machine)
     {
         u8 buffer[0xFF];
-        u32 size = fn_8032C830(lbl_806E2100, message, buffer, 0xFF);
+        u32 size = lbl_806E2100->fn_8032C830(message, buffer, 0xFF);
         u32 aid = GetMachineRoster()->GetMachineAid(machine);
         if (aid == 0xFFFFFFFF)
         {
@@ -559,7 +550,7 @@ void UnidentifiedNetworkSession::SendSidesChangedToHost(
     UnidentifiedNetworkMessage* message)
 {
     u8 buffer[0xFF];
-    u32 size = fn_8032C830(lbl_806E2100, message, buffer, 0xFF);
+    u32 size = lbl_806E2100->fn_8032C830(message, buffer, 0xFF);
     u32 aid = GetMachineRoster()->GetMachineAid(0);
     if (aid == 0xFFFFFFFF)
     {
@@ -589,7 +580,7 @@ void UnidentifiedNetworkSession::SendCheckConnectionToEveryone()
     for (int machine = 0; machine < mLobby->GetPlayerCount(); ++machine)
     {
         u8 buffer[0xFF];
-        u32 size = fn_8032C830(lbl_806E2100, &message, buffer, 0xFF);
+        u32 size = lbl_806E2100->fn_8032C830(&message, buffer, 0xFF);
         u32 aid = GetMachineRoster()->GetMachineAid(machine);
         if (aid == 0xFFFFFFFF)
         {
@@ -617,7 +608,7 @@ void UnidentifiedNetworkSession::SendConnectionDecisionToEveryone(
          ++machine)
     {
         u8 buffer[0xFF];
-        u32 size = fn_8032C830(lbl_806E2100, message, buffer, 0xFF);
+        u32 size = lbl_806E2100->fn_8032C830(message, buffer, 0xFF);
         u32 aid = GetMachineRoster()->GetMachineAid(machine);
         if (aid == 0xFFFFFFFF)
         {
@@ -642,7 +633,7 @@ void UnidentifiedNetworkSession::SendConnectionDecisionToHost(
     UnidentifiedNetworkMessage* message)
 {
     u8 buffer[0xFF];
-    u32 size = fn_8032C830(lbl_806E2100, message, buffer, 0xFF);
+    u32 size = lbl_806E2100->fn_8032C830(message, buffer, 0xFF);
     u32 aid = GetMachineRoster()->GetMachineAid(0);
     if (aid == 0xFFFFFFFF)
     {
@@ -714,7 +705,7 @@ void UnidentifiedNetworkSession::Update()
 
         if (mTransport->mState == 3)
         {
-            fn_8032E890();
+            mTransport->fn_8032E890();
             if (mTransport->GetPlayerCount() >= 2)
             {
                 UnidentifiedDraftEntry entries[8];
@@ -807,18 +798,18 @@ void UnidentifiedNetworkSession::OnlineVirtual00()
     }
 
     mSessionMode = 1;
-    fn_8032CA1C(lbl_806E2100, 0xD, this);
-    fn_8032CA1C(lbl_806E2100, 0xF, this);
-    fn_8032CA1C(lbl_806E2100, 0x12, this);
-    fn_8032CA1C(lbl_806E2100, 0x13, this);
-    fn_8032CA1C(lbl_806E2100, 0x14, this);
-    fn_8032CA1C(lbl_806E2100, 0x15, this);
-    fn_8032CA1C(lbl_806E2100, 0x0, this);
-    fn_8032CA1C(lbl_806E2100, 0x1, this);
-    fn_8032CA1C(lbl_806E2100, 0x8, this);
-    fn_8032CA1C(lbl_806E2100, 0x9, this);
-    fn_8032CA1C(lbl_806E2100, 0x1C, this);
-    fn_8032CA1C(lbl_806E2100, 0x1D, this);
+    lbl_806E2100->fn_8032CA1C(0xD, this);
+    lbl_806E2100->fn_8032CA1C(0xF, this);
+    lbl_806E2100->fn_8032CA1C(0x12, this);
+    lbl_806E2100->fn_8032CA1C(0x13, this);
+    lbl_806E2100->fn_8032CA1C(0x14, this);
+    lbl_806E2100->fn_8032CA1C(0x15, this);
+    lbl_806E2100->fn_8032CA1C(0x0, this);
+    lbl_806E2100->fn_8032CA1C(0x1, this);
+    lbl_806E2100->fn_8032CA1C(0x8, this);
+    lbl_806E2100->fn_8032CA1C(0x9, this);
+    lbl_806E2100->fn_8032CA1C(0x1C, this);
+    lbl_806E2100->fn_8032CA1C(0x1D, this);
 
     UnidentifiedVersionInfo info;
     info.mVersionWord = GetVersionWord();
@@ -826,7 +817,7 @@ void UnidentifiedNetworkSession::OnlineVirtual00()
     mDirectSocket->Initialize(&info, this);
     mDirectSocket->SetBroadcastEnabled(true);
 
-    fn_8032CBC8(mTransport);
+    mTransport->fn_8032CBC8();
     mStatsReporter->Reset();
 }
 
@@ -835,21 +826,21 @@ void UnidentifiedNetworkSession::fn_8011FE40()
     NetworkDraft::Instance()->Reset(false);
     mStatsReporter->Close();
     NetworkStatsManager_8012F378::Instance()->Reset(false);
-    fn_8032CEAC(mTransport);
+    mTransport->fn_8032CEAC();
     mDirectSocket->Shutdown();
 
-    fn_8032CA2C(lbl_806E2100, 0xD);
-    fn_8032CA2C(lbl_806E2100, 0xF);
-    fn_8032CA2C(lbl_806E2100, 0x12);
-    fn_8032CA2C(lbl_806E2100, 0x13);
-    fn_8032CA2C(lbl_806E2100, 0x14);
-    fn_8032CA2C(lbl_806E2100, 0x15);
-    fn_8032CA2C(lbl_806E2100, 0x0);
-    fn_8032CA2C(lbl_806E2100, 0x1);
-    fn_8032CA2C(lbl_806E2100, 0x8);
-    fn_8032CA2C(lbl_806E2100, 0x9);
-    fn_8032CA2C(lbl_806E2100, 0x1C);
-    fn_8032CA2C(lbl_806E2100, 0x1D);
+    lbl_806E2100->fn_8032CA2C(0xD);
+    lbl_806E2100->fn_8032CA2C(0xF);
+    lbl_806E2100->fn_8032CA2C(0x12);
+    lbl_806E2100->fn_8032CA2C(0x13);
+    lbl_806E2100->fn_8032CA2C(0x14);
+    lbl_806E2100->fn_8032CA2C(0x15);
+    lbl_806E2100->fn_8032CA2C(0x0);
+    lbl_806E2100->fn_8032CA2C(0x1);
+    lbl_806E2100->fn_8032CA2C(0x8);
+    lbl_806E2100->fn_8032CA2C(0x9);
+    lbl_806E2100->fn_8032CA2C(0x1C);
+    lbl_806E2100->fn_8032CA2C(0x1D);
 
     mSessionMode = 0;
 }
@@ -878,21 +869,21 @@ void UnidentifiedNetworkSession::OnlineVirtual04()
     mUnidentified24A5 = 1;
     mSessionMode = 2;
 
-    fn_8032CA1C(lbl_806E2100, 0xD, this);
-    fn_8032CA1C(lbl_806E2100, 0xF, this);
-    fn_8032CA1C(lbl_806E2100, 0x12, this);
-    fn_8032CA1C(lbl_806E2100, 0x13, this);
-    fn_8032CA1C(lbl_806E2100, 0x14, this);
-    fn_8032CA1C(lbl_806E2100, 0x15, this);
-    fn_8032CA1C(lbl_806E2100, 0x19, this);
-    fn_8032CA1C(lbl_806E2100, 0x1A, this);
-    fn_8032CA1C(lbl_806E2100, 0x1B, this);
-    fn_8032CA1C(lbl_806E2100, 0x0, this);
-    fn_8032CA1C(lbl_806E2100, 0x1, this);
-    fn_8032CA1C(lbl_806E2100, 0x8, this);
-    fn_8032CA1C(lbl_806E2100, 0x9, this);
-    fn_8032CA1C(lbl_806E2100, 0x1C, this);
-    fn_8032CA1C(lbl_806E2100, 0x1D, this);
+    lbl_806E2100->fn_8032CA1C(0xD, this);
+    lbl_806E2100->fn_8032CA1C(0xF, this);
+    lbl_806E2100->fn_8032CA1C(0x12, this);
+    lbl_806E2100->fn_8032CA1C(0x13, this);
+    lbl_806E2100->fn_8032CA1C(0x14, this);
+    lbl_806E2100->fn_8032CA1C(0x15, this);
+    lbl_806E2100->fn_8032CA1C(0x19, this);
+    lbl_806E2100->fn_8032CA1C(0x1A, this);
+    lbl_806E2100->fn_8032CA1C(0x1B, this);
+    lbl_806E2100->fn_8032CA1C(0x0, this);
+    lbl_806E2100->fn_8032CA1C(0x1, this);
+    lbl_806E2100->fn_8032CA1C(0x8, this);
+    lbl_806E2100->fn_8032CA1C(0x9, this);
+    lbl_806E2100->fn_8032CA1C(0x1C, this);
+    lbl_806E2100->fn_8032CA1C(0x1D, this);
 
     UnidentifiedVersionInfo info;
     info.mVersionWord = GetVersionWord();
@@ -1596,21 +1587,21 @@ void UnidentifiedNetworkSession::fn_801214BC()
     mUnidentified24A5 = 0;
     fn_803742D0();
 
-    fn_8032CA2C(lbl_806E2100, 0xD);
-    fn_8032CA2C(lbl_806E2100, 0xF);
-    fn_8032CA2C(lbl_806E2100, 0x12);
-    fn_8032CA2C(lbl_806E2100, 0x13);
-    fn_8032CA2C(lbl_806E2100, 0x14);
-    fn_8032CA2C(lbl_806E2100, 0x15);
-    fn_8032CA2C(lbl_806E2100, 0x19);
-    fn_8032CA2C(lbl_806E2100, 0x1A);
-    fn_8032CA2C(lbl_806E2100, 0x1B);
-    fn_8032CA2C(lbl_806E2100, 0x0);
-    fn_8032CA2C(lbl_806E2100, 0x1);
-    fn_8032CA2C(lbl_806E2100, 0x8);
-    fn_8032CA2C(lbl_806E2100, 0x9);
-    fn_8032CA2C(lbl_806E2100, 0x1C);
-    fn_8032CA2C(lbl_806E2100, 0x1D);
+    lbl_806E2100->fn_8032CA2C(0xD);
+    lbl_806E2100->fn_8032CA2C(0xF);
+    lbl_806E2100->fn_8032CA2C(0x12);
+    lbl_806E2100->fn_8032CA2C(0x13);
+    lbl_806E2100->fn_8032CA2C(0x14);
+    lbl_806E2100->fn_8032CA2C(0x15);
+    lbl_806E2100->fn_8032CA2C(0x19);
+    lbl_806E2100->fn_8032CA2C(0x1A);
+    lbl_806E2100->fn_8032CA2C(0x1B);
+    lbl_806E2100->fn_8032CA2C(0x0);
+    lbl_806E2100->fn_8032CA2C(0x1);
+    lbl_806E2100->fn_8032CA2C(0x8);
+    lbl_806E2100->fn_8032CA2C(0x9);
+    lbl_806E2100->fn_8032CA2C(0x1C);
+    lbl_806E2100->fn_8032CA2C(0x1D);
     mSessionMode = 0;
 }
 
@@ -1715,13 +1706,13 @@ NetworkRanking_8012D8F4* UnidentifiedNetworkSession::fn_80121754()
 
 void UnidentifiedNetworkSession::ListenerVirtual00(void* buffer, int size)
 {
-    fn_8032C8CC(lbl_806E2100, -2, buffer, size);
+    lbl_806E2100->fn_8032C8CC(-2, static_cast<u8*>(buffer), size);
 }
 
 void UnidentifiedNetworkSession::ListenerVirtual04(
     int source, void* buffer, int size, bool)
 {
-    fn_8032C8CC(lbl_806E2100, source, buffer, size);
+    lbl_806E2100->fn_8032C8CC(source, static_cast<u8*>(buffer), size);
 }
 
 void UnidentifiedNetworkSession::ListenerVirtual08(u32 connection, u8* address)
@@ -2123,7 +2114,7 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
         NetMessagePauseResponse_8050AD68 response;
         response.mMachineMask = mUnidentified246C;
         u8 buffer[0x32];
-        u32 size = fn_8032C830(lbl_806E2100, &response, buffer, 0x32);
+        u32 size = lbl_806E2100->fn_8032C830(&response, buffer, 0x32);
         fn_8004F594(
             0x10, "HOST sending Pause Response to all clients and myself\n");
         int count = fn_80338BF0(this);
@@ -2658,7 +2649,7 @@ int UnidentifiedNetworkSession::fn_80123360()
     {
         NetMessageLoadedGameEveryone message;
         u8 buffer[0xC8];
-        u32 size = fn_8032C830(lbl_806E2100, &message, buffer, 0xC8);
+        u32 size = lbl_806E2100->fn_8032C830(&message, buffer, 0xC8);
         fn_8004F594(
             0x10,
             "HOST sending Loaded Game Everyone message to all clients\n");
@@ -2709,7 +2700,7 @@ void UnidentifiedNetworkSession::fn_80123A08()
     {
         NetMessageLoadedGame message;
         u8 buffer[0xC8];
-        u32 size = fn_8032C830(lbl_806E2100, &message, buffer, 0xC8);
+        u32 size = lbl_806E2100->fn_8032C830(&message, buffer, 0xC8);
         fn_8004F594(
             0x10, "Machine %d sending Loaded Game message\n",
             (s8)fn_80338C20(this));
@@ -2727,7 +2718,7 @@ void UnidentifiedNetworkSession::fn_80123A08()
     {
         NetMessageLoadedGameClient message;
         u8 buffer[0xC8];
-        u32 size = fn_8032C830(lbl_806E2100, &message, buffer, 0xC8);
+        u32 size = lbl_806E2100->fn_8032C830(&message, buffer, 0xC8);
         fn_8004F594(
             0x10, "Machine %d sending Loaded Game CLIENT message to HOST\n",
             (s8)fn_80338C20(this));

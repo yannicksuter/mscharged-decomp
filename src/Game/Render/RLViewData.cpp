@@ -102,17 +102,17 @@ RLViewCamera::RLViewCamera()
     mShadowDirty = true;
 }
 
-void RLViewOrthoCamera::GetViewProjectionMatrix(nlMatrix4& matrix)
+void RLViewOrthoCamera::GetViewProjectionMatrix(nlMatrix4& matrix) const
 {
     matrix = mMatrix;
 }
 
-void RLViewOrthoCamera::GetInverseViewMatrix(nlMatrix4& matrix)
+void RLViewOrthoCamera::GetInverseViewMatrix(nlMatrix4& matrix) const
 {
     matrix.SetIdentity();
 }
 
-void RLViewOrthoCamera::GetProjectionMatrix(nlMatrix4& matrix)
+void RLViewOrthoCamera::GetProjectionMatrix(nlMatrix4& matrix) const
 {
     matrix = mMatrix;
 }
@@ -122,7 +122,7 @@ const nlMatrix4* RLViewOrthoCamera::GetProjectionMatrix() const
     return &mMatrix;
 }
 
-void RLViewOrthoCamera::GetViewMatrix(nlMatrix4& matrix)
+void RLViewOrthoCamera::GetViewMatrix(nlMatrix4& matrix) const
 {
     matrix.SetIdentity();
 }

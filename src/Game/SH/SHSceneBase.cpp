@@ -463,7 +463,7 @@ void UnidentifiedSHSceneBase::Update(float dt)
             TU80300104Event event;
             event.mIndex = pad;
             event.mPosition = fn_802197FC(pad, &valid);
-            fn_802C082C(lbl_806E1E28, pad)->Unidentified24(0x1E, true);
+            lbl_806E1E28->GetPad(pad)->GetButtonIndex(0x1E, true);
             event.mFlag0 = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
             event.mFlag1 = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
             mComponent.fn_80219608(&event);

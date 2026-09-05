@@ -1,9 +1,11 @@
 #include "Game/Game.h"
+#include "Game/NetworkDiagnostics_803239A8.h"
 
 #include "Game/Task/GameRenderTask.h"
 
 #include "Game/AI/FilteredRandom.h"
 #include "Game/AI/Fielder.h"
+#include "Game/AI/FielderActions.h"
 #include "Game/AI/AISandbox.h"
 #include "Game/AI/Powerups.h"
 #include "Game/AI/Scripts/ScriptCaching.h"
@@ -115,12 +117,8 @@ extern "C" void fn_800AF404(void* param1);
 extern "C" void fn_800EDB9C();
 extern "C" void fn_800EDCAC();
 extern "C" bool fn_8001E184(cPlayer* pPlayer);
-extern "C" int fn_80323A58(int param1, char* buffer, u32 size);
 extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
 extern "C" void fn_80038158(cFielder* pFielder, int param2);
-extern "C" int fn_8032C830(
-    void* param1, UnidentifiedNetworkMessage_80126D84* message,
-    void* buffer, u32 size);
 extern "C" float fn_80111D3C();
 extern "C" void fn_80111D28(float timeScale);
 extern "C" void fn_80111D4C(float timeScale, float transitionTime);
@@ -138,16 +136,13 @@ extern "C" void fn_800EC2A4(unsigned long soundID, cGame* game);
 
 extern UnidentifiedGameStatic lbl_8056B9A0;
 extern cPlayer* lbl_806E0C9C;
-extern void* lbl_806E2100;
 extern int lbl_806E2130;
 extern UnidentifiedOnlineState* lbl_806E2164;
 extern BaseGameSceneManager* lbl_806E1860;
 extern AISandbox* lbl_806E0B88;
 extern UnidentifiedRegistrationList lbl_805713E8;
-extern UnidentifiedRegistrationList lbl_80571820;
 extern UnidentifiedRegistrationList lbl_80571988;
 extern UnidentifiedRegistrationList lbl_80571438;
-extern UnidentifiedRegistrationList lbl_80571960;
 extern UnidentifiedRegistrationList lbl_80571348;
 extern cPlayer* lbl_8056B800[10];
 extern "C" char lbl_804FB2F4[];
@@ -327,10 +322,9 @@ void cGame::fn_80058180()
                 = mUnidentified134.UnidentifiedRemoveStart();
         }
 
-        char buffer[50];
+        u8 buffer[50];
         s8 i;
-        int size = fn_8032C830(
-            lbl_806E2100, &message, buffer, sizeof(buffer));
+        int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
         int playerCount = fn_80338BF0(lbl_806E20D8);
         for (i = 0; i < playerCount; i++)
         {
@@ -1121,10 +1115,9 @@ extern "C" void fn_80072134(UnidentifiedRegistrationNode* node)
     lbl_805713E8.mHead = node;
 }
 
-extern "C" void fn_8007214C(UnidentifiedRegistrationNode* node)
+extern "C" void fn_8007214C(ShotAtGoalData* node)
 {
-    node->mNext = lbl_80571820.mHead;
-    lbl_80571820.mHead = node;
+    lbl_80571820.Free(node);
 }
 
 extern "C" void fn_80072164(UnidentifiedRegistrationNode* node)
@@ -1139,10 +1132,9 @@ extern "C" void fn_8007217C(UnidentifiedRegistrationNode* node)
     lbl_80571438.mHead = node;
 }
 
-extern "C" void fn_80072194(UnidentifiedRegistrationNode* node)
+extern "C" void fn_80072194(PlayerAttackData* node)
 {
-    node->mNext = lbl_80571960.mHead;
-    lbl_80571960.mHead = node;
+    lbl_80571960.Free(node);
 }
 
 extern "C" void fn_800721AC(UnidentifiedRegistrationNode* node)

@@ -178,7 +178,14 @@ public:
     /* 0x544 */ TweakValueImpl_804F4DC8 fChainChompRadius;
 
 private:
-    /* 0x554 */ u8 mUnidentified554[0x464];
+    /* 0x554 */ u8 mUnidentified554[0x420];
+
+public:
+    /* 0x974 */ TweakValueImpl_804F4DC8 fShotPostOffset;
+    /* 0x984 */ TweakValueImpl_804F4DC8 mUnidentified984;
+
+private:
+    /* 0x994 */ u8 mUnidentified994[0x24];
 }; // total size: 0x9B8
 
 struct unk_800A9274

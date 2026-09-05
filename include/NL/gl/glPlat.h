@@ -23,9 +23,23 @@ struct GXRenderModeObj
 #endif
 
 struct glModelPacket;
+class GLView;
+class nlVector3;
+
+extern "C" void fn_80369D6C(GLView* view, const nlVector3& world, nlVector3& ndc);
+
+struct PlatformViewport
+{
+    int x;
+    int y;
+    int width;
+    int height;
+};
+
+extern "C" PlatformViewport* fn_80369A30();
 
 extern GXRenderModeObj glx_rmode;
-extern "C" void fn_8036E438(glModelPacket* packet, bool permanent, void* allocator);
+extern "C" void glplatFinalizePacket(glModelPacket* packet, bool permanent, void* allocator);
 
 bool glplatPreStartup();
 bool glplatStartup(gl_ScreenInfo* screenInfo);

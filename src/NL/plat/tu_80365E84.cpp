@@ -66,7 +66,7 @@ extern "C" bool fn_80365E84(PadBackend* pad)
             break;
         }
 
-        cGlobalPad* globalPad = fn_802C082C(lbl_806E1E28, pad->m_padIndex);
+        cGlobalPad* globalPad = lbl_806E1E28->GetPad(pad->m_padIndex);
         delete globalPad->mBackend;
         globalPad->mBackend = backend;
         OSEnableInterrupts();

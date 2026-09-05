@@ -1,14 +1,18 @@
 #include "Game/Character.h"
 
+#include "Game/AI/HeadTrack.h"
 #include "Game/Blinker.h"
 #include "Game/CharacterEffects.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/ObjectBlur.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/SAnim/pnSAnimController.h"
+#include "NL/nlMain.h"
 #include "math.h"
+#include <stddef.h>
 
 void cCharacter::SetElectrocutionTextureEnabled(bool isEnabled)
 {
@@ -261,4 +265,174 @@ GLSkinMesh* cCharacter::GetSkinMesh(int modelType) const
         return skinMesh;
     }
     return m_pSkinMesh[0];
+}
+
+u16 lbl_806DB602 = 0xFFFF;
+u16 lbl_806DB604 = 0xFFFF;
+extern u16 lbl_806DBD68;
+
+struct UnidentifiedCharacterAnimState
+{
+    float m_fFrame;
+    float m_fTotalFrames;
+    float m_fPlaybackSpeedScale;
+    float m_fTime;
+    unsigned int m_nHashID;
+    u32 m_nHS;
+    float m_fDuration;
+    unsigned int m_nNumRootKeys;
+    float m_fLinearSpeed;
+};
+
+#define REGISTER_CHARACTER_FIELD(type, base, field, name) \
+    fn_80338F88(cache, type, lbl_80533C98[type].size, \
+        (u8*)&(field) - (u8*)&(base), name)
+
+void cCharacter::Unknown11(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DB604 == 0xFFFF)
+    {
+        lbl_806DB604 = fn_80338EBC(cache, "DetChar");
+        REGISTER_CHARACTER_FIELD(14, m_eCharacterClass,
+            m_eCharacterClass, "m_eCharacterClass");
+        REGISTER_CHARACTER_FIELD(14, m_eCharacterClass,
+            m_eMovementState, "m_eMovementState");
+        REGISTER_CHARACTER_FIELD(16, m_eCharacterClass,
+            m_bFromAnimBlended, "m_bFromAnimBlended");
+        REGISTER_CHARACTER_FIELD(16, m_eCharacterClass,
+            m_bOnScreen, "m_bOnScreen");
+        REGISTER_CHARACTER_FIELD(22, m_eCharacterClass,
+            m_v3Position, "m_v3Position");
+        REGISTER_CHARACTER_FIELD(22, m_eCharacterClass,
+            m_v3PrevPosition, "m_v3PrevPosition");
+        REGISTER_CHARACTER_FIELD(22, m_eCharacterClass,
+            m_v3Velocity, "m_v3Velocity");
+        REGISTER_CHARACTER_FIELD(22, m_eCharacterClass,
+            m_v3PrevVelocity, "m_v3PrevVelocity");
+        REGISTER_CHARACTER_FIELD(19, m_eCharacterClass,
+            m_aDesiredFacingDirection, "m_aDesiredFacingDirection");
+        REGISTER_CHARACTER_FIELD(19, m_eCharacterClass,
+            m_aActualFacingDirection, "m_aActualFacingDirection");
+        REGISTER_CHARACTER_FIELD(19, m_eCharacterClass,
+            m_aPrevFacingDirection, "m_aPrevFacingDirection");
+        REGISTER_CHARACTER_FIELD(19, m_eCharacterClass,
+            m_aDesiredMovementDirection, "m_aDesiredMovementDirection");
+        REGISTER_CHARACTER_FIELD(19, m_eCharacterClass,
+            m_aActualMovementDirection, "m_aActualMovementDirection");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fAnimAdjustBeginTime, "m_fAnimAdjustBeginTime");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fAnimAdjustEndTime, "m_fAnimAdjustEndTime");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fDirectionSeekSpeed, "m_fDirectionSeekSpeed");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fDirectionSeekFalloff, "m_fDirectionSeekFalloff");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fAccel, "m_fAccel");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fDecel, "m_fDecel");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fDesiredSpeed, "m_fDesiredSpeed");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fActualSpeed, "m_fActualSpeed");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fLeanAmount, "m_fLeanAmount");
+        REGISTER_CHARACTER_FIELD(10, m_eCharacterClass,
+            m_nAnimTurnAdjust, "m_nAnimTurnAdjust");
+        REGISTER_CHARACTER_FIELD(22, m_eCharacterClass,
+            m_v3AnimMoveAdjust, "m_v3AnimMoveAdjust");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fPlayerScale, "m_fPlayerScale");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fMovementScale, "m_fMovementScale");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fDesiredPlayerScale, "m_fDesiredPlayerScale");
+        REGISTER_CHARACTER_FIELD(17, m_eCharacterClass,
+            m_fDesiredMovementScale, "m_fDesiredMovementScale");
+        REGISTER_CHARACTER_FIELD(20, m_eCharacterClass,
+            m_tScaleTimer, "m_tScaleTimer");
+        fn_80338F78(cache);
+    }
+    fn_80339450(cache, lbl_806DB604, &m_eCharacterClass, context);
+    fn_8033930C(cache, lbl_806DB604, &m_eCharacterClass,
+        offsetof(cCharacter, m_pAnimInventory) - offsetof(cCharacter, m_eCharacterClass));
+
+    UnidentifiedCharacterAnimState state;
+    state.m_fFrame = m_pCurrentAnimController->m_fTime
+        * (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
+    state.m_fTotalFrames = (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
+    state.m_fPlaybackSpeedScale = m_pCurrentAnimController->m_fPlaybackSpeedScale;
+    state.m_fTime = m_pCurrentAnimController->m_fTime;
+    cSAnim* anim = m_pCurrentAnimController->m_pSAnim;
+    state.m_nHashID = anim->GetHashID();
+    state.m_nHS = anim->m_nHierarchySignature;
+    state.m_fDuration = anim->GetDuration();
+    state.m_nNumRootKeys = (unsigned int)(float)anim->m_nNumKeys;
+    state.m_fLinearSpeed = anim->m_fLinearSpeed;
+
+    if (lbl_806DB602 == 0xFFFF)
+    {
+        lbl_806DB602 = fn_80338EBC(cache, "CharAnim");
+        REGISTER_CHARACTER_FIELD(17, state, state.m_fFrame, "m_fFrame");
+        REGISTER_CHARACTER_FIELD(17, state, state.m_fTotalFrames, "m_fTotalFrames");
+        REGISTER_CHARACTER_FIELD(17, state, state.m_fPlaybackSpeedScale, "m_fPlaybackSpeedScale");
+        REGISTER_CHARACTER_FIELD(17, state, state.m_fTime, "m_fTime");
+        REGISTER_CHARACTER_FIELD(9, state, state.m_nHashID, "m_nHashID");
+        REGISTER_CHARACTER_FIELD(2, state, state.m_nHS, "m_nHS");
+        REGISTER_CHARACTER_FIELD(17, state, state.m_fDuration, "m_fDuration");
+        REGISTER_CHARACTER_FIELD(9, state, state.m_nNumRootKeys, "m_nNumRootKeys");
+        REGISTER_CHARACTER_FIELD(17, state, state.m_fLinearSpeed, "m_fLinearSpeed");
+        fn_80338F78(cache);
+    }
+    fn_80339450(cache, lbl_806DB602, &state, context);
+    fn_8033930C(cache, lbl_806DB602, &state, sizeof(state));
+
+    cHeadTrack* headTrack = m_pHeadTrack;
+    if (lbl_806DBD68 == 0xFFFF)
+    {
+        lbl_806DBD68 = fn_80338EBC(cache, "HeadTrack");
+        REGISTER_CHARACTER_FIELD(26, *headTrack,
+            headTrack->m_m4HeadMatrix, "m_m4HeadMatrix");
+        REGISTER_CHARACTER_FIELD(22, *headTrack,
+            headTrack->m_v3OOI, "m_v3OOI");
+        REGISTER_CHARACTER_FIELD(16, *headTrack,
+            headTrack->m_bTrackOOI, "m_bTrackOOI");
+        REGISTER_CHARACTER_FIELD(17, *headTrack,
+            headTrack->m_fHeadSpin, "m_fHeadSpin");
+        REGISTER_CHARACTER_FIELD(17, *headTrack,
+            headTrack->m_fHeadTilt, "m_fHeadTilt");
+        REGISTER_CHARACTER_FIELD(17, *headTrack,
+            headTrack->m_fDesiredHeadSpin, "m_fDesiredHeadSpin");
+        REGISTER_CHARACTER_FIELD(17, *headTrack,
+            headTrack->m_fDesiredHeadTilt, "m_fDesiredHeadTilt");
+        REGISTER_CHARACTER_FIELD(17, *headTrack,
+            headTrack->m_fHeadSpinSeekVel, "m_fHeadSpinSeekVel");
+        REGISTER_CHARACTER_FIELD(17, *headTrack,
+            headTrack->m_fHeadTiltSeekVel, "m_fHeadTiltSeekVel");
+        REGISTER_CHARACTER_FIELD(17, *headTrack,
+            headTrack->m_fSmoothTime, "mfSmoothTime");
+        fn_80338F78(cache);
+    }
+    fn_80339450(cache, lbl_806DBD68, headTrack, context);
+    fn_8033930C(cache, lbl_806DBD68, headTrack, sizeof(cHeadTrack));
+}
+
+#undef REGISTER_CHARACTER_FIELD
+
+void cCharacter::Unknown12(RunningChecksum* pChecksum)
+{
+    pChecksum->ChecksumData(&m_eCharacterClass, sizeof(m_eCharacterClass));
+    pChecksum->ChecksumData(&m_eMovementState, sizeof(m_eMovementState));
+    pChecksum->ChecksumData(&m_bOnScreen, sizeof(m_bOnScreen));
+    pChecksum->ChecksumData(&m_v3Position, sizeof(m_v3Position));
+    pChecksum->ChecksumData(&m_v3Velocity, sizeof(m_v3Velocity));
+    pChecksum->ChecksumData(&m_aDesiredFacingDirection, sizeof(m_aDesiredFacingDirection));
+    pChecksum->ChecksumData(&m_aActualFacingDirection, sizeof(m_aActualFacingDirection));
+    pChecksum->ChecksumData(&m_aDesiredMovementDirection, sizeof(m_aDesiredMovementDirection));
+    pChecksum->ChecksumData(&m_aActualMovementDirection, sizeof(m_aActualMovementDirection));
+    pChecksum->ChecksumData(&m_fAccel, sizeof(m_fAccel));
+    pChecksum->ChecksumData(&m_fDecel, sizeof(m_fDecel));
+    pChecksum->ChecksumData(&m_fDesiredSpeed, sizeof(m_fDesiredSpeed));
+    pChecksum->ChecksumData(&m_fActualSpeed, sizeof(m_fActualSpeed));
+    pChecksum->ChecksumData(&m_nAnimTurnAdjust, sizeof(m_nAnimTurnAdjust));
 }

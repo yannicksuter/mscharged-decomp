@@ -19,9 +19,9 @@ extern "C" void fn_802FEA20(FEScene* scene);
 
 FESceneManager::FESceneManager()
     : m_sceneHandlerStack(0x14, 0)
-    , m_topMostScene(0)
-    , m_uDefaultRenderView(0)
 {
+    m_uDefaultRenderView = 0;
+    m_topMostScene = 0;
     FERender::Initialize();
 }
 

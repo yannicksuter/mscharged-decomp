@@ -1,26 +1,12 @@
+#include <string.h>
+
+#include "NL/nlBufferedWriter.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_80376888.h"
+#include "NL/plat/nlFlash.h"
 
-extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
-extern "C" void* memset(void* dest, int value, unsigned long count);
-
-struct UnidentifiedBufferedWriter
-{
-    void* mFile;
-    bool mBuffered;
-    bool mWriteToNAND;
-    unsigned char mPadding[2];
-    unsigned int mBufferSize;
-    unsigned int mFlushThreshold;
-    char* mBuffer;
-    char* mCurrent;
-};
-
-extern "C" void fn_802B7AE4(UnidentifiedBufferedWriter* writer);
-
-extern "C" void fn_802B77B0(UnidentifiedBufferedWriter* writer)
+extern "C" void nlBufferedWriterInitialize(nlBufferedWriter* writer)
 {
     writer->mFile = 0;
     writer->mBuffered = false;
@@ -31,7 +17,7 @@ extern "C" void fn_802B77B0(UnidentifiedBufferedWriter* writer)
     writer->mCurrent = 0;
 }
 
-extern "C" void fn_802B77D4(UnidentifiedBufferedWriter* writer, void* file,
+extern "C" void nlBufferedWriterAttach(nlBufferedWriter* writer, void* file,
     bool buffered, unsigned int bufferSize, unsigned int flushThreshold)
 {
     writer->mFile = file;
@@ -53,9 +39,9 @@ extern "C" void fn_802B77D4(UnidentifiedBufferedWriter* writer, void* file,
     }
 }
 
-extern "C" void fn_802B7848(UnidentifiedBufferedWriter* writer)
+extern "C" void nlBufferedWriterFinish(nlBufferedWriter* writer)
 {
-    fn_802B7AE4(writer);
+    nlBufferedWriterFlush(writer);
 
     if (writer->mWriteToNAND && writer->mCurrent > writer->mBuffer)
     {
@@ -67,7 +53,7 @@ extern "C" void fn_802B7848(UnidentifiedBufferedWriter* writer)
             memset(writer->mCurrent, 0, padding);
             writer->mCurrent += padding;
         }
-        fn_80376C78(writer->mBuffer,
+        nlFlashWrite(writer->mBuffer,
             (unsigned int)(writer->mCurrent - writer->mBuffer), 0);
     }
 
@@ -83,8 +69,8 @@ extern "C" void fn_802B7848(UnidentifiedBufferedWriter* writer)
     writer->mCurrent = 0;
 }
 
-extern "C" void fn_802B7904(
-    UnidentifiedBufferedWriter* writer, const char* text)
+extern "C" void nlBufferedWriterWriteText(
+    nlBufferedWriter* writer, const char* text)
 {
     if (!writer->mBuffered)
     {
@@ -98,7 +84,7 @@ extern "C" void fn_802B7904(
             if (writer->mCurrent + length
                 >= writer->mBuffer + writer->mBufferSize)
             {
-                fn_802B7AE4(writer);
+                nlBufferedWriterFlush(writer);
             }
             memcpy(writer->mCurrent, text, length);
             writer->mCurrent += length;
@@ -106,26 +92,26 @@ extern "C" void fn_802B7904(
     }
 }
 
-extern "C" void fn_802B79C8(UnidentifiedBufferedWriter* writer,
-    const char* data, int size)
+extern "C" void nlBufferedWriterWrite(nlBufferedWriter* writer,
+    const void* data, int size)
 {
     if (!writer->mBuffered)
     {
-        nlWriteBuffer(writer->mFile, data, size);
+        nlWriteBuffer(writer->mFile, static_cast<const char*>(data), size);
     }
     else if (size > 0)
     {
         if (writer->mCurrent + size
             >= writer->mBuffer + writer->mBufferSize)
         {
-            fn_802B7AE4(writer);
+            nlBufferedWriterFlush(writer);
         }
         memcpy(writer->mCurrent, data, size);
         writer->mCurrent += size;
     }
 }
 
-extern "C" void fn_802B7A64(UnidentifiedBufferedWriter* writer)
+extern "C" void nlBufferedWriterFlushIfNeeded(nlBufferedWriter* writer)
 {
     if (writer->mWriteToNAND)
     {
@@ -146,7 +132,7 @@ extern "C" void fn_802B7A64(UnidentifiedBufferedWriter* writer)
     }
 }
 
-extern "C" void fn_802B7AE4(UnidentifiedBufferedWriter* writer)
+extern "C" void nlBufferedWriterFlush(nlBufferedWriter* writer)
 {
     if (writer->mWriteToNAND)
     {
@@ -156,7 +142,7 @@ extern "C" void fn_802B7AE4(UnidentifiedBufferedWriter* writer)
             unsigned int remainder = size & 0x1F;
             if (remainder == 0)
             {
-                fn_80376C78(writer->mBuffer, size, 0);
+                nlFlashWrite(writer->mBuffer, size, 0);
                 writer->mCurrent = writer->mBuffer;
             }
             else
@@ -164,7 +150,7 @@ extern "C" void fn_802B7AE4(UnidentifiedBufferedWriter* writer)
                 int alignedSize = size - remainder;
                 if (alignedSize >= 0x20)
                 {
-                    fn_80376C78(writer->mBuffer, alignedSize, 0);
+                    nlFlashWrite(writer->mBuffer, alignedSize, 0);
                     memcpy(writer->mBuffer,
                         writer->mBuffer + alignedSize, remainder);
                     writer->mCurrent = writer->mBuffer + remainder;

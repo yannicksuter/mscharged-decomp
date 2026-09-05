@@ -42,6 +42,7 @@ The project was built with or adapted source from the following projects:
 | [zcanann/FFCC-Decomp at `ff63985`](https://github.com/zcanann/FFCC-Decomp/tree/ff63985d02f959457ca7812e56c817ac61c72493) | Metrowerks Standard Library tokenizer structure and donor identifiers. |
 | [yannicksuter/smstrikers-decomp at `6123c35`](https://github.com/yannicksuter/smstrikers-decomp/tree/6123c3546baf59aa5d564e98fdd76cf16443c80f) | Predecessor game code, Dolphin SDK lineage, and Next Level Games' ODE extensions. |
 | Open Dynamics Engine 0.5 (`ode-040529`) | Baseline for ODE-derived source. |
+| [Jim Conger's C++ Blowfish, June 1996 archive](https://www.schneier.com/wp-content/uploads/2015/12/bfsh-con.zip) | Retained CBlowFish implementation, original names and P/S tables in `NL/blowfish.cpp`. |
 | [zlib 1.2.2](https://zlib.net/fossils/zlib-1.2.2.tar.gz) | Pristine upstream decompression and checksum sources. |
 
 `libs/RVL_SDK/include/revolution/bte.h` declares the handful of Broadcom BTE
@@ -69,6 +70,75 @@ not recovered retail symbols. Packet finalization takes the allocator as
 its third argument, as confirmed by the implementation at `0x8036E438`
 and the model loader.
 
+`Game/GL/MeshWriter.cpp` contains the writer at
+`0x802A7F80..0x802A81F8` for its float XYZ and signed 16-bit UV streams.
+Material `0xEE9D919D` uses twelve fractional UV bits and a uniform colour
+parameter. The net mesh and electric fence callers confirm those formats.
+The existing semantic API name `MeshWriter` is retained.
+
+`Game/GL/GLTexturedColourMeshWriter.cpp` names the writer at
+`0x802A8218..0x802A84E8` for float XYZ, signed 16-bit UV with ten
+fractional bits, and RGBA8 colour. Material `0xD3E572DA`, flare rendering,
+particle rendering and polygon drawing establish those formats. The class
+and filename are descriptive inferences; the predecessor supplies the
+`Begin`, `End`, `Colour`, `Texcoord` and `Vertex` API ancestry.
+
+`Game/GL/GLFloatTexturedColourMeshWriter.cpp` names the writer at
+`0x802A8508..0x802A87D8` for float XYZ, float UV and RGBA8 colour.
+Material `0x0027BCF6` and the polygon drawing caller establish those formats.
+The class and filename are descriptive inferences.
+
+`Game/GL/GLColourMeshWriter.cpp` names the writer at
+`0x802A87F8..0x802A8A70` for float XYZ and RGBA8 colour without UVs.
+Material `0xD701656B` and the modeled transition outline caller establish
+those formats. The class and filename are descriptive inferences.
+
+`Game/GL/GLShadowBlendMeshWriter.cpp` contains the writer at
+`0x802A8A90..0x802A8D60`. The name describes its use by
+`RenderShadowVolumeBlend` with material program `0x386ECBDD`, float XYZ,
+RGBA8 colour, and float UV streams. The class and filename are descriptive
+inferences; the predecessor supplies the mesh-writer API ancestry.
+
+`NL/plat/TransportSocket.cpp` contains the NLG socket wrapper at
+`0x80374D68..0x803751D4`. Retail error messages identify `TransportSocket`;
+the descriptive function names follow its open, bind, close, nonblocking,
+connect, send, broadcast, and receive operations. The session and statistics
+clients share the same four-byte socket state. Original function spellings
+and C/C++ linkage are not recoverable from the stripped binary.
+
+`NL/plat/nlFlash.cpp` contains the Wii NAND wrapper and `FlashMemoryTask`
+at `0x80376888..0x80376F3C`. The retail task name is "Flash Memory".
+Its task update defers completed NAND callbacks; the save/load and buffered
+writer callers establish the file operations. The class, function, and file
+names describe that behavior and are inferred. The shared task base and the
+canonical RVL NAND types retain their existing definitions.
+
+`NL/nlBufferedWriter.cpp` contains the buffered writer at
+`0x802B77B0..0x802B7BDC`. It writes to debug files or NAND, retains incomplete
+32-byte NAND blocks, and pads the final block when finishing. Transport logs
+and recorded network sessions share its 24-byte state. The type, operation,
+and file names are descriptive inferences; finishing the writer does not
+close its caller-owned file handle.
+
+`NL/glx/glxModel.cpp` contains the platform model hooks at
+`0x8036E430..0x8036E4C4`. The predecessor supplies the matrix-access names
+and expressions. `glplatFinalizePacket` prepares material state and creates
+a display list for permanent packets using the supplied allocator. The
+empty `glplatOnPacketCloned` hook is called after duplicating packet and
+material data. These hook and file names are inferred from their callers;
+the latter is not a resource-release operation.
+
+`NL/gl/glView.cpp` retains the predecessor's `glViewProjectPoint`,
+`gl_ViewReset`, and `gl_ViewStartup` names. Charged replaces the indexed view
+array with a view hierarchy, adds the orthographic projection path, and resets
+the per-view sorter trees each frame. Retail callers establish the additional
+projection helper parameters; those functions retain address-based names.
+
+`NL/tu_802A99D8.cpp` contains the incremental inflate wrapper used by the
+chunked asynchronous file loader. Its stream layout and allocator callbacks
+use the existing zlib 1.2.2 declarations. The stripped executable does not
+preserve the wrapper's original file, class, or method names.
+
 `src/RVL_SDK/bte/` and `libs/RVL_SDK/include/private/bte/` do vendor Broadcom
 source. Both trees carry Broadcom's original copyright notice and its
 Apache-2.0 licence header, and each file records the Bluedroid path it came
@@ -94,6 +164,16 @@ retains its respective upstream terms.
 External source is accepted only after comparison against R4QE01. A unit is
 marked `Matching` only when its code and owned data agree and the complete
 build reproduces the original `main.dol` hash.
+
+`NL/blowfish.cpp` retains the constructor, block encipher, key initialization
+and padded encoding paths from Jim Conger's C++ conversion, including its
+output-length helper. The source archive SHA-256 is
+`62cb58180760d91bbf8876c66ca7e41150d0bc054dbaf8bfeb1fd1596df4b2f3`.
+R4QE01 uses the project's aligned allocator and retains the donor's DCBA
+bitfield order on PowerPC. The key packing, S-box byte selection and padding
+behavior follow the game; they are not changed to a different Blowfish
+implementation's byte order. Unretained decryption/destruction bodies are
+not imported. The original source attribution is preserved.
 
 The repository's [CC0 license](../LICENSE) applies only to contributions whose
 authors have the right to make that dedication. Nintendo, Next Level Games,

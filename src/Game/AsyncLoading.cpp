@@ -792,31 +792,21 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-class UnidentifiedMemoryStatSource
-{
-public:
-    virtual ~UnidentifiedMemoryStatSource();
-    virtual bool HasMemoryStats() = 0;
-    virtual bool ReadMemoryStats(u32 size, void* output) = 0;
-};
-
 extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
 {
     if (g_e3_Build)
     {
         for (int i = 0; i < 4; ++i)
         {
-            UnidentifiedMemoryStatSource* source
-                = (UnidentifiedMemoryStatSource*)fn_802C082C(
-                    lbl_806E1E28, i);
+            cGlobalPad* source = lbl_806E1E28->GetPad(i);
             if (source == 0)
             {
                 return;
             }
-            if (source->HasMemoryStats()
-                && source->ReadMemoryStats(0x200, 0)
-                && source->ReadMemoryStats(0x100, 0)
-                && source->ReadMemoryStats(0x8000, 0))
+            if (source->IsConnected()
+                && source->IsPressed(0x200, false)
+                && source->IsPressed(0x100, false)
+                && source->IsPressed(0x8000, false))
             {
                 SetE3DebugTime(5.0f);
             }

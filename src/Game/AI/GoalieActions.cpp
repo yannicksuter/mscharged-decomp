@@ -165,7 +165,6 @@ extern "C" void fn_8001AD24(
 extern "C" void fn_802779EC(
     nlVector3& v3Result, float fParam1, float fParam2, float fParam3);
 extern "C" void fn_800EDCE8(cPlayer* pPlayer);
-extern "C" void fn_801B93E8(cCharacter* pCharacter);
 extern "C" bool fn_8007BF68(Goalie* pGoalie, bool bParam);
 extern "C" bool fn_8007C590(Goalie* pGoalie);
 extern "C" bool fn_8007D644(Goalie* pGoalie);
@@ -210,14 +209,11 @@ extern "C" bool fn_80331C04(
     DetInput* pGlobalPad, int nButton, bool bRemap);
 extern "C" void fn_80097574(
     cPlayer* pPlayer, int nNodeIndex, int nAnimID, float fParam);
-extern "C" void fn_8009591C(cPlayer* pPlayer, bool bParam);
 extern "C" void fn_80139D1C(int nParam, void* pParam);
 extern "C" void fn_801BABEC(cPlayer* pPlayer);
 extern "C" void fn_801BAF0C(cPlayer* pPlayer);
 extern "C" void fn_801B8B38(cPlayer* pPlayer);
 extern "C" void fn_801B8E5C(cPlayer* pPlayer);
-extern "C" bool fn_8003E7F8(cFielder* pFielder);
-extern "C" bool fn_8003E84C(cFielder* pFielder);
 extern "C" void fn_8007EB5C(Goalie* pGoalie);
 extern "C" SaveData* fn_800925C0(
     SaveBlendInfo* pBlendInfo, const nlVector3* pLocalPosition);
@@ -1978,7 +1974,7 @@ void Goalie::ActionMove(float deltaTime)
 
     if (g_pBall->m_pOwner != this && GetGlobalPad() != 0)
     {
-        fn_8009591C(this, false);
+        SwapController(false);
     }
 
     bool isPassThreat = IsPassThreat();
@@ -2051,14 +2047,14 @@ void Goalie::ActionMove(float deltaTime)
         PhysicsBox_80177498* pWall = 0;
         if (pCaptain->m_eCharacterClass == MARIO)
         {
-            pWall = pCaptain->mUnidentified400->fn_801792D0(muWallID);
+            pWall = pCaptain->mUnidentified3F8.mUnidentified08->fn_801792D0(muWallID);
         }
         else
         {
             pCaptain = m_pTeam->GetCaptain();
             if (pCaptain->m_eCharacterClass == MARIO)
             {
-                pWall = pCaptain->mUnidentified400->fn_801792D0(muWallID);
+                pWall = pCaptain->mUnidentified3F8.mUnidentified08->fn_801792D0(muWallID);
             }
         }
 
@@ -2167,7 +2163,7 @@ void Goalie::ActionMove(float deltaTime)
         SetNoPickUpTime(0.2f);
         if (GetGlobalPad() != 0)
         {
-            fn_8009591C(this, false);
+            SwapController(false);
         }
         mbGrabMonty = false;
         return;
@@ -3321,7 +3317,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
             SetNoPickUpTime(0.2f);
             if (GetGlobalPad() != 0)
             {
-                fn_8009591C(this, false);
+                SwapController(false);
             }
             mbGrabMonty = false;
         }
@@ -3512,7 +3508,7 @@ void Goalie::ActionPursueBallPounce(float fDeltaT)
         SetNoPickUpTime(0.2f);
         if (GetGlobalPad() != 0)
         {
-            fn_8009591C(this, false);
+            SwapController(false);
         }
         mbGrabMonty = false;
         return;
@@ -5796,7 +5792,7 @@ void Goalie::fn_8008E130()
         bool bHasGlobalPad = GetGlobalPad() != 0;
         if (bHasGlobalPad)
         {
-            fn_8009591C(this, false);
+            SwapController(false);
         }
         break;
     }
@@ -5823,7 +5819,7 @@ void Goalie::fn_8008E2D0()
         m_fSkipTimer = 0.0f;
         if (GetGlobalPad() != 0)
         {
-            fn_8009591C(this, false);
+            SwapController(false);
         }
         break;
     }
@@ -5947,7 +5943,7 @@ void Goalie::fn_8008E69C(float fDeltaT)
         SetNoPickUpTime(0.1f);
         if (GetGlobalPad() != 0)
         {
-            fn_8009591C(this, false);
+            SwapController(false);
         }
         mbGrabMonty = false;
         return;
@@ -6377,7 +6373,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
         SetNoPickUpTime(0.1f);
         if (GetGlobalPad() != 0)
         {
-            fn_8009591C(this, false);
+            SwapController(false);
         }
         mbGrabMonty = false;
         return;
@@ -6565,7 +6561,7 @@ void Goalie::fn_8008EC2C()
 
         if (GetGlobalPad() != 0)
         {
-            fn_8009591C(this, false);
+            SwapController(false);
         }
         break;
     }
@@ -6606,8 +6602,8 @@ void Goalie::fn_8008ED44(bool bParam)
 
             if (bState8Shot
                 || (mpShooter != 0
-                    && (fn_8003E7F8(mpShooter)
-                        || fn_8003E84C(mpShooter))))
+                    && (mpShooter->fn_8003E7F8()
+                        || mpShooter->fn_8003E84C())))
             {
                 mpSaveData = GoalieSave::GetSTSSpinMissData(bMirrored);
                 bUseSTSSpinMiss = true;
@@ -6640,7 +6636,7 @@ void Goalie::fn_8008ED44(bool bParam)
 
         if (GetGlobalPad() != 0)
         {
-            fn_8009591C(this, false);
+            SwapController(false);
         }
 
         SetNoPickUpTime(0.2f);

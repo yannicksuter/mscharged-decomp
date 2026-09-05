@@ -4,6 +4,7 @@
 #include "Game/Effects/EffectsGroup.h"
 #include "Game/TweakValue.h"
 #include "NL/gl/glMemory.h"
+#include "NL/gl/glTexture.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -24,8 +25,6 @@ extern void* lbl_806E1FFC;
 
 extern "C" void fn_802E6444(
     void* data, unsigned long size, void* userData);
-extern "C" bool fn_802CDD78(
-    void* data, unsigned long size, void* allocator, int unknown);
 extern "C" bool fn_802E3D4C(EffectsGroup* group);
 extern "C" void fn_802E4358(EmissionController* controller);
 extern "C" bool fn_802E5348(EmissionController* controller, float dt);

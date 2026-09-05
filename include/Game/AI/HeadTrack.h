@@ -13,6 +13,20 @@ public:
     cHeadTrack();
     virtual ~cHeadTrack();
 
+    void UnidentifiedReset()
+    {
+        m_m4HeadMatrix.SetIdentity();
+        nlVec3Set(m_v3OOI, 0.0f, 0.0f, 0.0f);
+        m_bTrackOOI = true;
+        m_fHeadSpin = 0.0f;
+        m_fHeadTilt = 0.0f;
+        m_fDesiredHeadSpin = 0.0f;
+        m_fDesiredHeadTilt = 0.0f;
+        m_fHeadSpinSeekVel = 0.0f;
+        m_fHeadTiltSeekVel = 0.0f;
+        m_fSmoothTime = 0.0f;
+    }
+
     void Update(const nlMatrix4& m4HeadMatrix,
         const nlMatrix4& m4ConstraintMatrix, float fDeltaT,
         unsigned short aOOIConstraint, int nHeadSpinMax,

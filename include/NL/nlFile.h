@@ -35,5 +35,6 @@ void nlClose(nlFile* file);
 bool nlFileExists(const char* filename);
 void* nlLoadEntireFile(const char* filename, unsigned long* outSize, unsigned int alignment, eAllocType type, void* buffer, unsigned long bufferSize, MemoryAllocator* allocator);
 unsigned int nlLoadEntireFileAsync(const char* filename, LoadAsyncCallback callback, void* userData, unsigned int alignment, eAllocType type, void* buffer, unsigned long bufferSize, MemoryAllocator* allocator);
+extern "C" bool fn_802B3B38(unsigned int handle, void (*callback)(void*, unsigned long, void*, LoadAsyncCallback));
 
 #endif // NL_FILE_H

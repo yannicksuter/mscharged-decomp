@@ -1,6 +1,11 @@
 #include "Game/Debug/FrameCounter.h"
+#include "Game/Debug/ProfilerDisplay_802B9A3C.h"
+#include "Game/GL/GLColourMeshWriter.h"
 #include "Game/Task/SmokeTestUpdateTask.h"
 #include "NL/gl/glFont.h"
+#include "NL/gl/glMatrix.h"
+#include "NL/gl/glState.h"
+#include "NL/gl/glView.h"
 #include "unclassified/tu_802B7798.h"
 
 #include "Game/Debug/TimeRegions.h"
@@ -12,16 +17,6 @@
 
 #include <string.h>
 
-extern "C" void fn_802B9670(
-    UnidentifiedTimeRegionData_802B9570* data, float value);
-extern "C" void* fn_802B9A3C();
-extern "C" void fn_802B9A6C(
-    void* display, UnidentifiedTimeRegionData_802B9570* data);
-extern "C" void fn_802B9A88(void* display);
-extern "C" int fn_802B974C(
-    UnidentifiedTimeRegionData_802B9570* data, int index);
-extern "C" float fn_802B98C8(
-    UnidentifiedTimeRegionData_802B9570* data, int index);
 extern "C" const char lbl_8052B590[];
 extern "C" const char lbl_8052B5A0[];
 
@@ -210,4 +205,281 @@ void FrameCounter::fn_802B80C4()
             fn_802BD718(name, 0, (float)count);
         }
     }
+}
+
+void FrameCounter::DisplayFrameTicker()
+{
+    GLColourMeshWriter m0;
+    GLColourMeshWriter m1;
+
+    glSetDefaultState(false);
+
+    if (m0.Begin(8, GLP_LineList, 0))
+    {
+        m0.Colour(255, 255, 0, 255);
+        m0.Vertex(0.0f, 32.0f, 0.0f);
+        m0.Colour(255, 255, 0, 255);
+        m0.Vertex(640.0f, 32.0f, 0.0f);
+        m0.Colour(64, 64, 64, 255);
+        m0.Vertex(0.0f, 1.25f * 8.333f + 32.0f, 0.0f);
+        m0.Colour(64, 64, 64, 255);
+        m0.Vertex(640.0f, 1.25f * 8.333f + 32.0f, 0.0f);
+        m0.Colour(255, 0, 0, 255);
+        m0.Vertex(0.0f, 1.25f * 16.666f + 32.0f, 0.0f);
+        m0.Colour(255, 0, 0, 255);
+        m0.Vertex(640.0f, 1.25f * 16.666f + 32.0f, 0.0f);
+        m0.Colour(0, 255, 0, 255);
+        m0.Vertex(0.0f, 1.25f * 33.333f + 32.0f, 0.0f);
+        m0.Colour(0, 255, 0, 255);
+        m0.Vertex(640.0f, 1.25f * 33.333f + 32.0f, 0.0f);
+
+        if (m0.End())
+        {
+            if (GetDebugFontView() != 0)
+            {
+                GetDebugFontView()->AttachModel(m0.GetModel(), 0);
+            }
+        }
+    }
+
+    if (m1.Begin(640, GLP_LineStrip, 0))
+    {
+        for (unsigned int i = 0; i < 640; i++)
+        {
+            unsigned int historyLoc = (m_NextHistoryPos + i) % 640;
+            m1.Colour(255, 255, 255, 255);
+            m1.Vertex((float)i, 1.25f * m_FrameHistory[historyLoc] + 32.0f, 0.0f);
+        }
+
+        if (m1.End())
+        {
+            if (GetDebugFontView() != 0)
+            {
+                GetDebugFontView()->AttachModel(m1.GetModel(), 0);
+            }
+        }
+    }
+}
+
+static void DrawCircle(nlVector3 p0, float fRadius, float fScaleX, nlColour colour)
+{
+    GLColourMeshWriter mesh;
+
+    glSetDefaultState(true);
+    glSetCurrentMatrix(glGetIdentityMatrix());
+
+    int numVerts = 30;
+    if (mesh.Begin(numVerts + 1, GLP_TriFan, 0))
+    {
+        nlVector3 v3point;
+
+        v3point.z = p0.z;
+        v3point.x = p0.x;
+        v3point.y = p0.y;
+
+        float fRadians = 0.0f;
+
+        mesh.Colour(colour);
+        mesh.Vertex(v3point.x, v3point.y, v3point.z);
+
+        const float angleScale = 10430.378f;
+        int i = 0;
+
+        while (i < numVerts)
+        {
+            nlSinCos(&v3point.x, &v3point.y, (unsigned short)(int)(angleScale * fRadians));
+            v3point.x = p0.x + fScaleX * (v3point.x * fRadius);
+            v3point.y = p0.y + v3point.y * fRadius;
+
+            mesh.Colour(colour);
+            mesh.Vertex(v3point.x, v3point.y, v3point.z);
+
+            i++;
+            fRadians += 6.2831855f / (numVerts - 1);
+        }
+
+        if (!mesh.End())
+        {
+            return;
+        }
+
+        GetDebugFontView()->AttachModel(mesh.GetModel(), 2);
+    }
+}
+
+static void DrawSmile(nlVector3 p0, float fRadius, float fScaleX, nlColour colour, float fLineThickness)
+{
+    GLColourMeshWriter mesh;
+    float degrees = sfSmileAngle;
+
+    glSetDefaultState(true);
+    glSetCurrentMatrix(glGetIdentityMatrix());
+
+    float yScale = (2.0f * sfHappiness) + -1.0f;
+
+    int numVerts = 10;
+    if (mesh.Begin(numVerts * 2, GLP_TriStrip, 0))
+    {
+        nlVector3 v3point;
+
+        float fRadians = -((3.1415927f * (0.5f * degrees)) / 180.0f);
+        v3point.z = p0.z;
+        nlSinCos(&v3point.x, &v3point.y, (u16)(int)(10430.378f * fRadians));
+
+        float fXFromAngle = v3point.x * fRadius;
+        v3point.x = (fScaleX * fXFromAngle) + p0.x;
+        v3point.y = (v3point.y * fRadius) + p0.y;
+        float fYFromAngle = v3point.y;
+        float fYTop = p0.y + fRadius;
+        float middleY = 0.5f * (fYFromAngle + fYTop);
+
+        int i = 0;
+        while (i < numVerts)
+        {
+            nlSinCos(&v3point.x, &v3point.y, (u16)(int)(10430.378f * fRadians));
+
+            v3point.x = p0.x + fScaleX * (v3point.x * fRadius);
+            v3point.y = p0.y + v3point.y * fRadius;
+
+            v3point.y = v3point.y - middleY;
+            v3point.y = v3point.y * yScale;
+            v3point.y = v3point.y + middleY;
+
+            mesh.Colour(colour);
+            mesh.Vertex(v3point.x, v3point.y, v3point.z);
+
+            v3point.y += fLineThickness;
+
+            mesh.Colour(colour);
+            mesh.Vertex(v3point.x, v3point.y, v3point.z);
+
+            i++;
+            fRadians += ((3.1415927f * degrees) / 180.0f) / (numVerts - 1);
+        }
+
+        if (mesh.End() == 0)
+        {
+            return;
+        }
+
+        GetDebugFontView()->AttachModel(mesh.GetModel(), 2);
+    }
+}
+
+static void DrawBrow(const nlVector3& leftEyeCentre, const nlVector3& rightEyeCentre, float distanceAboveEye, float width, float height)
+{
+    GLColourMeshWriter m0;
+
+    glSetDefaultState(false);
+
+    float yScale = (2.0f * sfHappiness) + -1.0f;
+
+    if (m0.Begin(4, GLP_LineList, 0))
+    {
+        nlVector3 p1;
+        nlVector3 p2;
+
+        p1 = leftEyeCentre;
+        p2 = leftEyeCentre;
+
+        p1.x = p1.x - width;
+        p2.x = p2.x + width;
+        p1.y += -distanceAboveEye + (height * yScale);
+        p2.y += -distanceAboveEye - (height * yScale);
+
+        m0.Colour(0, 0, 0, 255);
+        m0.Vertex(p1.x, p1.y, p1.z);
+        m0.Colour(0, 0, 0, 255);
+        m0.Vertex(p2.x, p2.y, p2.z);
+
+        p1 = rightEyeCentre;
+        p2 = rightEyeCentre;
+
+        p1.x = p1.x + width;
+        p2.x = p2.x - width;
+        p1.y += -distanceAboveEye + (height * yScale);
+        p2.y += -distanceAboveEye - (height * yScale);
+
+        m0.Colour(0, 0, 0, 255);
+        m0.Vertex(p1.x, p1.y, p1.z);
+        m0.Colour(0, 0, 0, 255);
+        m0.Vertex(p2.x, p2.y, p2.z);
+
+        if (m0.End())
+        {
+            if (GetDebugFontView() != 0)
+            {
+                GetDebugFontView()->AttachModel(m0.GetModel(), 0);
+            }
+        }
+    }
+}
+
+void FrameCounter::DisplayFrameSmiler()
+{
+    float happiness = 0.0f;
+    int i;
+    for (i = 0; i < siHappinessLookback; i++)
+    {
+        float fps = m_FrameHistory[(m_NextHistoryPos - i + 640) % 640] == 0.0f
+                      ? 60.0f
+                      : 1000.0f / m_FrameHistory[(m_NextHistoryPos - i + 640) % 640];
+        happiness += (fps - 30.0f) / 30.0f;
+    }
+    happiness /= (float)siHappinessLookback;
+    if (happiness > 1.0f)
+        happiness = 1.0f;
+    if (happiness < 0.0f)
+        happiness = 0.0f;
+
+    sfHappiness = happiness;
+
+    float circleRadius = sfSmileyRadius;
+    float smileRadius = sfSmileRadius * sfSmileyRadius;
+    float eyeRadius = sfEyeRadius * sfSmileyRadius;
+
+    nlVector3 circleCentre = { 0, 0, 0 };
+    circleCentre.x = 2.0f * sfSmileyRadius;
+    circleCentre.y = 480.0f - 3.0f * sfSmileyRadius;
+
+    nlColour black = { 0, 0, 0, 255 };
+
+    nlColour colour;
+    if (happiness < 0.5f)
+    {
+        float alpha = 2.0f * happiness;
+        nlColourSet(colour,
+            (int)((float)sMediumColour.c[0] * alpha + (float)sMadColour.c[0] * (1.0f - alpha)),
+            (int)((float)sMediumColour.c[1] * alpha + (float)sMadColour.c[1] * (1.0f - alpha)),
+            (int)((float)sMediumColour.c[2] * alpha + (float)sMadColour.c[2] * (1.0f - alpha)),
+            (int)((float)sMediumColour.c[3] * alpha + (float)sMadColour.c[3] * (1.0f - alpha)));
+    }
+    else
+    {
+        float alpha = 2.0f * (happiness - 0.5f);
+        nlColourSet(colour,
+            (int)((float)sHappyColour.c[0] * alpha + (float)sMediumColour.c[0] * (1.0f - alpha)),
+            (int)((float)sHappyColour.c[1] * alpha + (float)sMediumColour.c[1] * (1.0f - alpha)),
+            (int)((float)sHappyColour.c[2] * alpha + (float)sMediumColour.c[2] * (1.0f - alpha)),
+            (int)((float)sHappyColour.c[3] * alpha + (float)sMediumColour.c[3] * (1.0f - alpha)));
+    }
+
+    nlVector3 leftEyeCentre = { 0, 0, 0 };
+    nlVector3 rightEyeCentre = { 0, 0, 0 };
+
+    leftEyeCentre.x = -circleRadius * sfEyeSeparation;
+    leftEyeCentre.y = -circleRadius * sfEyeHeight;
+
+    rightEyeCentre.x = circleRadius * sfEyeSeparation;
+    rightEyeCentre.y = -circleRadius * sfEyeHeight;
+
+    nlVec3Add(leftEyeCentre, leftEyeCentre, circleCentre);
+    nlVec3Add(rightEyeCentre, rightEyeCentre, circleCentre);
+
+    DrawCircle(circleCentre, 3.0f + circleRadius, 1.2f, black);
+    DrawCircle(circleCentre, circleRadius, 1.2f, colour);
+    DrawCircle(leftEyeCentre, eyeRadius, 1.2f, black);
+    DrawCircle(rightEyeCentre, eyeRadius, 1.2f, black);
+    DrawSmile(circleCentre, smileRadius, 1.2f, black, 3.0f);
+    DrawBrow(leftEyeCentre, rightEyeCentre, 3.0f * eyeRadius, 2.0f * eyeRadius, 1.5f * eyeRadius);
 }

@@ -113,11 +113,13 @@ public:
         const CharacterPhysicsData* pPhysicsData, GoalieTweaks* pTweaks,
         AnimRetargetList* pAnimRetargetList, int nIndex);
     virtual void UnidentifiedVirtual1C();
+    virtual void Unknown10(
+        const nlVector3& v3Position, unsigned short aDirection);
     virtual void CollideWithBallCallback(cBall* pBall);
     virtual void CollideWithCharacterCallback(
         CollisionPlayerPlayerData* pData);
     virtual void InitActionPostWhistle();
-    virtual void fn_80099074(UnidentifiedPlayerEventData*);
+    virtual void fn_80099074(UnidentifiedEventData24*);
 
     void SetGoalieAction(eGoalieActionState newGoalieState, int newSubstate);
     static void SaveBlendCallback(

@@ -112,11 +112,11 @@ extern "C" ThwompObject* fn_801B298C(
     object->mPacket48 = 0;
     object->mPacket4C = 0;
     object->mResolvedTexture54
-        = fn_802CE1B8(fn_802CDF0C(), object->mTexture50);
+        = fn_802CDF0C()->fn_802CE1B8(object->mTexture50);
     object->mResolvedTexture5C
-        = fn_802CE1B8(fn_802CDF0C(), object->mTexture58);
+        = fn_802CDF0C()->fn_802CE1B8(object->mTexture58);
     object->mResolvedTexture64
-        = fn_802CE1B8(fn_802CDF0C(), object->mTexture60);
+        = fn_802CDF0C()->fn_802CE1B8(object->mTexture60);
 
     for (glModelPacket* packet = object->mDrawable->m_pModel->packets;
          packet < object->mDrawable->m_pModel->packets

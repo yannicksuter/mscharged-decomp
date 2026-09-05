@@ -12,20 +12,6 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 
-struct HighRangeTargetInfo_801A2394
-{
-    /* 0x00 */ u32 height;
-    /* 0x04 */ u32 width;
-    /* 0x08 */ u32 unknown08;
-    /* 0x0C */ u32 unknown0C;
-    /* 0x10 */ u32 unknown10;
-    /* 0x14 */ u32 format;
-    /* 0x18 */ u32 unknown18;
-    /* 0x1C */ u32 unknown1C;
-    /* 0x20 */ u32 unknown20;
-    /* 0x24 */ u8 colour[4];
-};
-
 extern "C"
 {
     int lbl_806DCE58 = -1;
@@ -162,6 +148,7 @@ extern "C" void fn_801A2394(HighRangeState_801A2394* state)
     u32 widths[7] = { 320, 160, 80, 40, 80, 160, 320 };
     u32 heights[7] = { 224, 112, 56, 28, 56, 112, 224 };
     int i;
+    TargetInfo_8036DE50 info;
 
     for (i = 0; i < 7; ++i)
     {
@@ -212,7 +199,6 @@ extern "C" void fn_801A2394(HighRangeState_801A2394* state)
     nlSNPrintf(targetName6, sizeof(targetName6), "target/%s", name6);
     state->mTextures[6] = glGetTexture(targetName6);
 
-    HighRangeTargetInfo_801A2394 info;
     for (i = 0; i < 7; ++i)
     {
         nlZeroMemory(&info, sizeof(info));

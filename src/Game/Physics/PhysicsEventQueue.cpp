@@ -1,4 +1,5 @@
 #include "Game/Task/DispatchEventsTask.h"
+#include "Game/EventDispatcher.inl"
 
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
@@ -90,7 +91,7 @@ public:
 public:
     EventDispatcher mDispatcher;
     UnidentifiedExternalEvent00 mEvent00;
-    UnidentifiedQueuedEvent<UnidentifiedEventData01> mEvent01;
+    UnidentifiedQueuedEvent<CollisionPlayerPlayerData> mEvent01;
     UnidentifiedExternalEvent02 mEvent02;
     UnidentifiedQueuedEvent<UnidentifiedEventData03> mEvent03;
     UnidentifiedQueuedEvent<UnidentifiedEventData04> mEvent04;
@@ -349,7 +350,6 @@ extern "C" void fn_8014545C(void* data)
 
 extern "C" SlotPool<UnidentifiedEventData_80066A04> lbl_80571730;
 extern "C" void fn_80025A14(void*);
-extern "C" bool fn_8003886C(cFielder*);
 extern "C" void fn_80032534(cFielder*, const nlVector3&);
 extern "C" void fn_80031FBC(cFielder*);
 extern "C" bool fn_80032360(cFielder*, const nlVector3&, float);
@@ -449,7 +449,7 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
                     break;
                 }
                 bInvincible = false;
-                if (!fn_8003886C(pFielder)
+                if (!pFielder->IsStuck()
                     && (pFielder->muInvincibleStatus & 0x1F) == 0x1F)
                 {
                     bInvincible = true;
@@ -723,10 +723,10 @@ extern "C" void fn_80145C9C()
             Function<UnidentifiedEventData00*>());
 }
 
-extern "C" void fn_80145DD0(UnidentifiedEventData01* data)
+extern "C" void fn_80145DD0(CollisionPlayerPlayerData* data)
 {
-    Function<UnidentifiedEventData01*> disposer(
-        (void (*)(UnidentifiedEventData01*))fn_8016A658);
+    Function<CollisionPlayerPlayerData*> disposer(
+        (void (*)(CollisionPlayerPlayerData*))fn_8016A658);
     lbl_806E11F0->mEvent01.Queue(data, disposer);
 }
 
@@ -1065,11 +1065,6 @@ struct UnidentifiedPooledData20
     unsigned char data[0x20];
 };
 
-struct UnidentifiedPooledData14A
-{
-    unsigned char data[0x14];
-};
-
 struct UnidentifiedPooledData08
 {
     unsigned char data[0x08];
@@ -1086,7 +1081,7 @@ struct UnidentifiedPooledData0C
 };
 
 static SlotPool<UnidentifiedPooledData20> lbl_80570110(16, 16);
-static SlotPool<UnidentifiedPooledData14A> lbl_80570138(16, 16);
+SlotPool<UnidentifiedEventData24> lbl_80570138(16, 16);
 static SlotPool<UnidentifiedPooledData08> lbl_80570160(16, 16);
 static SlotPool<UnidentifiedPooledData14B> lbl_80570188(16, 16);
 static SlotPool<UnidentifiedPooledData0C> lbl_805701B0(16, 16);
@@ -1136,7 +1131,6 @@ extern "C" void fn_80144130(EventDispatcher* dispatcher)
     dispatcher->Dispatch(true);
 }
 
-extern "C" SlotPool<UnidentifiedEventData01> lbl_80571258;
 extern "C" SlotPool<UnidentifiedEventData03> lbl_805714D8;
 extern "C" SlotPool<UnidentifiedEventData05> lbl_80571488;
 extern "C" SlotPool<UnidentifiedEventData06> lbl_80571410;
@@ -1166,12 +1160,12 @@ extern "C" unsigned char fn_8016A650(void* object)
 
 extern "C" void fn_8016A658(void* data)
 {
-    lbl_80571258.Free((UnidentifiedEventData01*)data);
+    lbl_80571258.Free((CollisionPlayerPlayerData*)data);
 }
 
 extern "C" void fn_8016A670(void* data)
 {
-    lbl_80570138.Free((UnidentifiedPooledData14A*)data);
+    lbl_80570138.Free((UnidentifiedEventData24*)data);
 }
 
 extern "C" void fn_8016A688(void* data)

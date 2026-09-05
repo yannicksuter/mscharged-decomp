@@ -98,7 +98,7 @@ EffectsTemplate* EffectsTemplate::fn_802E01C8(nlChunk* chunk)
     }
 
     if (result->m_uModelID != 0xFFFFFFFF
-        && lbl_806E1FFC->GetMaterialList(result->m_uModelID) == 0)
+        && lbl_806E1FFC->GetModel(result->m_uModelID) == 0)
     {
         result->m_uModelID = 0xFFFFFFFF;
     }

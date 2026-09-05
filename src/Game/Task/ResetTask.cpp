@@ -72,7 +72,7 @@ void ResetTask::Run(float dt)
     {
         for (s32 i = 0; i < 4; ++i)
         {
-            fn_802C082C(lbl_806E1E28, i)->StopRumble();
+            lbl_806E1E28->GetPad(i)->StopRumble();
         }
 
         while (s_AudioInInit)
@@ -145,7 +145,7 @@ void HandleSoftReset()
 
     for (s32 i = 0; i < 4; ++i)
     {
-        cGlobalPad* pad = fn_802C082C(lbl_806E1E28, i);
+        cGlobalPad* pad = lbl_806E1E28->GetPad(i);
         if (!pad)
         {
             break;

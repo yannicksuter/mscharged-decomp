@@ -2,6 +2,7 @@
 
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/GameInfo.h"
+#include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
 #include "Game/Render/Presentation.h"
 #include "Game/TweakValue.h"
@@ -11,14 +12,8 @@
 #include <string.h>
 
 extern "C" int fn_8004F594(int channel, const char* format, ...);
-extern "C" u32 fn_8032C830(void* codec, void* message, void* buffer, int size);
-extern "C" void fn_8032CA1C(
-    void* codec, int type, UnidentifiedNetworkMessageReceiver* receiver);
-extern "C" void fn_8032CA2C(void* codec, int type);
 extern "C" void* fn_802B1C4C(unsigned long size);
 extern "C" void fn_802B1D4C(void* p, unsigned long size);
-
-extern void* lbl_806E2100;
 
 static NetTournManager* sNetTournManager;
 static bool sCupPersonaOverrideActive;
@@ -154,10 +149,6 @@ int UnidentifiedNetworkMessage_80126D84::GetType()
 int NetworkMessageType34_8050ADCC::GetType()
 {
     return 34;
-}
-
-NetworkMessageType34_8050ADCC::~NetworkMessageType34_8050ADCC()
-{
 }
 
 void NetMessageTournamentStart::Serialize(
@@ -298,8 +289,8 @@ void NetTournManager::TransitionOnlineMenuToTournament(
     NetMessageTournamentStart* message)
 {
     UnidentifiedNetworkMessageReceiver* receiver = this;
-    fn_8032CA1C(lbl_806E2100, 32, receiver);
-    fn_8032CA1C(lbl_806E2100, 33, receiver);
+    lbl_806E2100->fn_8032CA1C(32, receiver);
+    lbl_806E2100->fn_8032CA1C(33, receiver);
 
     mMachineCount = (s8)message->mMachineCount;
     mLocalMachineIndex = (s8)message->mMachineIndex;
@@ -442,7 +433,7 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
     NetMessageTournamentLoadingState loading(mLocalMachineIndex, false);
     fn_8004F594(16, "NotifyLoadingToGame called on machine %d\n",
         mLocalMachineIndex);
-    int size = fn_8032C830(lbl_806E2100, &loading, buffer, sizeof(buffer));
+    int size = lbl_806E2100->fn_8032C830(&loading, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
 
     bool isHomeMachine = false;
@@ -454,8 +445,7 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
     {
         NetMessageTournamentGameUpdate gameUpdate(
             1, mCurrentGameIndex, isHomeMachine, 1, 0, false);
-        int gameSize = fn_8032C830(
-            lbl_806E2100, &gameUpdate, gameBuffer, sizeof(gameBuffer));
+        int gameSize = lbl_806E2100->fn_8032C830(&gameUpdate, gameBuffer, sizeof(gameBuffer));
         SendToAllTournamentMachines(gameBuffer, gameSize);
     }
 }
@@ -714,9 +704,28 @@ bool NetTournManager::AreRoundGamesFinished()
          ++gameIndex)
     {
         int winner = -1;
-        if (!mGames[gameIndex].GetWinnerAndLoser(&winner, 0))
+        NetworkTournamentGame& game = mGames[gameIndex];
+        if (!game.GetWinnerAndLoser(&winner, 0))
         {
             return false;
+        }
+        if (winner != -1)
+        {
+            int homeMachine = game.mHomeMachine;
+            int awayMachine = game.mAwayMachine;
+            if (homeMachine != -1 && awayMachine != -1)
+            {
+                if (!NetworkDraft::Instance()->FindDraftTeamByPeerIndex(homeMachine)->mPlayers[0].mDisconnected
+                    && mLoadedToGame[homeMachine] && !mLoadedToKnockout[homeMachine])
+                {
+                    return false;
+                }
+                if (!NetworkDraft::Instance()->FindDraftTeamByPeerIndex(awayMachine)->mPlayers[0].mDisconnected
+                    && mLoadedToGame[awayMachine] && !mLoadedToKnockout[awayMachine])
+                {
+                    return false;
+                }
+            }
         }
     }
     return true;
@@ -749,8 +758,8 @@ void NetTournManager::Update(float dt)
             int winnerSide = -1;
             mGames[mFirstGameInRound].GetWinnerAndLoser(
                 &winnerSide, &mWinningMachine);
-            fn_8032CA2C(lbl_806E2100, 32);
-            fn_8032CA2C(lbl_806E2100, 33);
+            lbl_806E2100->fn_8032CA2C(32);
+            lbl_806E2100->fn_8032CA2C(33);
             mState = 2;
         }
         else
@@ -776,7 +785,7 @@ void NetTournManager::NotifyFinishedLoadingToKnockout()
     fn_8004F594(16,
         "NotifyFinishedLoadingToKnockout called on machine %d\n",
         mLocalMachineIndex);
-    int size = fn_8032C830(lbl_806E2100, &message, buffer, sizeof(buffer));
+    int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
 }
 
@@ -790,7 +799,7 @@ void NetTournManager::NotifyOverlayPopped(int)
     NetMessageTournamentGameUpdate message(2, mCurrentGameIndex,
         isHomeMachine, 0, 0, false);
     u8 buffer[0xFF];
-    int size = fn_8032C830(lbl_806E2100, &message, buffer, sizeof(buffer));
+    int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
 }
 
@@ -805,7 +814,7 @@ void NetTournManager::NotifyGameOver()
         isHomeMachine, 1, 0, true);
     message.mGameInfo = *GameInfoManager::Instance()->GetCurrentGameInfo();
     u8 buffer[0xFF];
-    int size = fn_8032C830(lbl_806E2100, &message, buffer, sizeof(buffer));
+    int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
 }
 
@@ -974,28 +983,36 @@ void NetTournManager::DestroyTournamentTrophy()
 
 const char* NetTournManager::GetTournamentTrophyResource() const
 {
-    static const char* paths[10] = {
-        "art/characters/npcs/trophymushroom/trophymushroom",
-        "art/characters/npcs/trophyflower/trophyflower",
-        "art/characters/npcs/trophystar/trophystar",
-        "art/characters/npcs/trophysunshine/trophysunshine",
-        "art/characters/npcs/trophybanana/trophybanana",
-        "art/characters/npcs/trophynextlevelcup/trophynextlevelcup",
-        "art/characters/npcs/trophykonga/trophykonga",
-        "art/characters/npcs/trophysand/trophysand",
-        "art/characters/npcs/trophylava/trophylava",
-        "art/characters/npcs/trophynintendo/trophynintendo",
-    };
     int stadium = GetStadium();
     if (sCupPersonaOverrideActive)
     {
         stadium = sCupPersonaOverride;
     }
-    if (stadium < 0 || stadium >= 10)
+    switch (stadium)
     {
-        stadium = 0;
+    case 0:
+        return "art/characters/npcs/trophymushroom/trophymushroom";
+    case 1:
+        return "art/characters/npcs/trophyflower/trophyflower";
+    case 2:
+        return "art/characters/npcs/trophystar/trophystar";
+    case 3:
+        return "art/characters/npcs/trophysunshine/trophysunshine";
+    case 4:
+        return "art/characters/npcs/trophybanana/trophybanana";
+    case 5:
+        return "art/characters/npcs/trophynextlevelcup/trophynextlevelcup";
+    case 6:
+        return "art/characters/npcs/trophykonga/trophykonga";
+    case 7:
+        return "art/characters/npcs/trophysand/trophysand";
+    case 8:
+        return "art/characters/npcs/trophylava/trophylava";
+    case 9:
+        return "art/characters/npcs/trophynintendo/trophynintendo";
+    default:
+        return "art/characters/npcs/trophymushroom/trophymushroom";
     }
-    return paths[stadium];
 }
 
 int NetTournManager::GetNumRounds() const

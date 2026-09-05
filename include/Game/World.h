@@ -8,7 +8,7 @@
 #include "types.h"
 
 class DrawableObject;
-class GLMaterialList;
+struct glModel;
 class GLView;
 class ResourceInterface_802CC094;
 class World;
@@ -51,7 +51,7 @@ public:
         void* pData, unsigned long uSize, bool bKeepData);
     DrawableObject* fn_803415E8(
         unsigned long uType, WorldObjectLoadContext_8034136C* pContext);
-    bool fn_803418C4(GLMaterialList*& pMaterial);
+    bool fn_803418C4(glModel*& pMaterial);
     DrawableObject* FindDrawableObject(unsigned long uHashID);
     void fn_80341D40(WorldEffect_80341D40* pEffect);
     void fn_80341DBC(float fDeltaT);

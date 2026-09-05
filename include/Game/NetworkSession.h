@@ -5,6 +5,7 @@
 #include "Game/NetworkMessages.h"
 #include "Game/NetworkStats.h"
 #include "NL/nlMemory.h"
+#include "NL/plat/TransportSocket.h"
 #include "types.h"
 #include "unclassified/tu_80331BE4.h"
 
@@ -135,7 +136,7 @@ public:
     virtual void Receive(void* buffer, int size) = 0;
     virtual void SocketVirtual34(u8 aid, void* buffer, int size) = 0;
     virtual void Update(float dt) = 0;
-    virtual void SocketVirtual44(void* a, void* b, bool c) = 0;
+    virtual void SocketVirtual44(int a, int* b, bool c) = 0;
     virtual void SocketVirtual48() = 0;
     virtual u8* GetLocalAddress() = 0;
     virtual u16 GetLocalPort() = 0;
@@ -152,13 +153,18 @@ struct UnidentifiedTransportPlayer
 {
     UnidentifiedTransportPlayer()
     {
-        mName[11] = '\0';
+        mUnidentified0B = 0;
     }
 
-    /* 0x00 */ char mName[12];
+    /* 0x00 */ char mName[11];
+    /* 0x0B */ u8 mUnidentified0B;
     /* 0x0C */ u32 mUnidentified0C;
     /* 0x10 */ u16 mUnidentified10;
     /* 0x12 */ u16 mUnidentified12;
+}; // size: 0x14
+
+struct UnidentifiedLobbyPlayer_80133634 : public UnidentifiedTransportPlayer
+{
     /* 0x14 */ u32 mConnection;
     /* 0x18 */ u8 mUnidentified18[4];
     /* 0x1C */ int mConnectionState;
@@ -170,9 +176,9 @@ public:
     virtual u32 GetMachineAid(int index);
     virtual int MachineIdxFromConnection(u32 connection);
     virtual int RosterVirtual08();
-    virtual void RosterVirtual0C();
+    virtual void RosterVirtual0C(int);
     virtual int GetMaxMachineCount();
-    virtual void RosterVirtual14();
+    virtual void RosterVirtual14(int);
     virtual int GetMachineCount();
     virtual UnidentifiedTransportPlayer* GetPlayerInfo(int index);
     virtual int GetLocalMachineIndex();
@@ -218,11 +224,6 @@ struct UnidentifiedReliableSocketState
     u8 mData[0xA1C];
 };
 
-struct UnidentifiedDatagramSocket
-{
-    int mSocket;
-};
-
 // Reliable UDP direct/broadcast socket layer owned by the session.
 class NetworkSocket_801246E4 : public UnidentifiedNetworkSocketInterface,
                               public UnidentifiedReliableSocketCallback
@@ -249,7 +250,7 @@ public:
     virtual void Receive(void* buffer, int size);
     virtual void SocketVirtual34(u8 aid, void* buffer, int size);
     virtual void Update(float dt);
-    virtual void SocketVirtual44(void* a, void* b, bool c);
+    virtual void SocketVirtual44(int a, int* b, bool c);
     virtual void SocketVirtual48();
     virtual u8* GetLocalAddress();
     virtual u16 GetLocalPort();
@@ -278,28 +279,177 @@ public:
     /* 0xA29 */ u8 mPaddingA29[3];
     /* 0xA2C */ u32 mVersionWord;
     /* 0xA30 */ UnidentifiedNetworkConnectionListener* mListener;
-    /* 0xA34 */ UnidentifiedDatagramSocket mBroadcastSocket;
-    /* 0xA38 */ UnidentifiedDatagramSocket mDirectSocket;
+    /* 0xA34 */ TransportSocket mBroadcastSocket;
+    /* 0xA38 */ TransportSocket mDirectSocket;
     /* 0xA3C */ u8 mPacketBuffer[0x5B9];
     /* 0xFF5 */ bool mHasLocalAddress;
     /* 0xFF6 */ u8 mPaddingFF6[2];
     /* 0xFF8 */ u8 mLocalAddress[4];
 }; // size: 0xFFC
 
-class NetworkTransport_8032CA4C : public UnidentifiedMachineRoster
+struct UnidentifiedTransportGame_8032CA4C
+{
+    /* 0x00 */ char mUnidentified00[12];
+    /* 0x0C */ u8 mUnidentified0C[4];
+    /* 0x10 */ int mUnidentified10;
+    /* 0x14 */ float mUnidentified14;
+    /* 0x18 */ u16 mUnidentified18;
+}; // size: 0x1C
+
+struct UnidentifiedTransportPeer_8032CA4C : public UnidentifiedTransportPlayer
+{
+    /* 0x14 */ u8 mUnidentified14[4];
+    /* 0x18 */ int mUnidentified18;
+    /* 0x1C */ int mUnidentified1C;
+    /* 0x20 */ u16 mUnidentified20;
+    /* 0x22 */ u8 mUnidentified22;
+}; // size: 0x24
+
+struct UnidentifiedTransportPoolEntry_8032CA4C
+{
+    UnidentifiedTransportConnection* m_Connection;
+    int mUnidentified04;
+};
+
+class UnidentifiedTransportListener_8032CA4C
+{
+public:
+    virtual void UnidentifiedVirtual00(int result) = 0;
+    virtual void UnidentifiedVirtual04(int result) = 0;
+    virtual void UnidentifiedVirtual08(int result) = 0;
+    virtual void UnidentifiedVirtual0C(UnidentifiedTransportGame_8032CA4C*) = 0;
+    virtual void UnidentifiedVirtual10() = 0;
+    virtual void UnidentifiedVirtual14(UnidentifiedTransportGame_8032CA4C*) = 0;
+    virtual void UnidentifiedVirtual18() = 0;
+};
+
+class UnidentifiedTransportListener_8032D954
+{
+public:
+    virtual void UnidentifiedVirtual00() = 0;
+};
+
+class NetworkMessageType3_805333C8;
+class NetworkMessageType4_80533468;
+class NetworkMessageType5_80533454;
+class NetworkMessageType7_80533440;
+
+class UnidentifiedTransportRoster_8032CA4C : public UnidentifiedMachineRoster
+{
+public:
+    virtual int fn_8032CF60(int value) = 0;
+    virtual int fn_8032D0EC() = 0;
+    virtual int fn_8032D220(UnidentifiedTransportGame_8032CA4C* game, int value) = 0;
+    virtual int fn_8032E84C() = 0;
+    virtual void fn_8032EB0C() = 0;
+    virtual void fn_8032D94C(UnidentifiedTransportListener_8032CA4C* listener) = 0;
+    virtual void fn_8032D954(UnidentifiedTransportListener_8032D954* listener) = 0;
+};
+
+class NetworkTransport_8032CA4C : public UnidentifiedTransportRoster_8032CA4C,
+                                  public UnidentifiedNetworkMessageReceiver
 {
 public:
     void* operator new(unsigned long size) { return nlMalloc(size, 8, false); }
 
     NetworkTransport_8032CA4C();
 
+    void fn_8032CBC8();
+    void fn_8032CBD0(bool initialize);
+    void fn_8032CEAC();
+    int fn_8032D0F4(int result);
+    void fn_8032D5E0();
+    void fn_8032E31C(const void* data);
+    void fn_8032E890();
+    void fn_8032E8C0();
+    bool fn_8032EA20();
+    void fn_8032EB88(NetworkMessageType3_805333C8* message);
+    void fn_8032ED28(int index);
+    void fn_8032EE7C(UnidentifiedTransportConnection* connection, bool accepted);
+    void fn_8032F084(int index, NetworkMessageType4_80533468* message);
+    void fn_8032F2AC(int index, NetworkMessageType5_80533454* message);
+    void fn_8032F6B4(NetworkMessageType7_80533440* message);
+
+    virtual u32 GetMachineAid(int index);
+    virtual int MachineIdxFromConnection(u32 connection);
+    virtual int RosterVirtual08();
+    virtual void RosterVirtual0C(int value);
+    virtual int GetMaxMachineCount();
+    virtual void RosterVirtual14(int value);
+    virtual int GetMachineCount();
     virtual UnidentifiedTransportPlayer* GetPlayerInfo(int index);
+    virtual int GetLocalMachineIndex();
+    virtual UnidentifiedTransportPlayer* GetLocalPlayerInfo();
+    virtual void SetUserMatchData(u8 size, const void* data);
+    virtual void* GetUserMatchData(u8* size);
     virtual void Update(float dt);
     virtual int GetPlayerCount();
+    virtual void DebugDraw(int column, int* row);
+    virtual void OnConnected(u32 connection, int result);
+    virtual int ShouldAcceptConnection(u32 connection, u8* address);
+    virtual void OnConnectionClosed(u32 connection, int reason);
+    virtual void OnGameStarted();
+    virtual void Shutdown(bool reset);
+    virtual int fn_8032CF60(int value);
+    virtual int fn_8032D0EC();
+    virtual int fn_8032D220(UnidentifiedTransportGame_8032CA4C* game, int value);
+    virtual int fn_8032E84C();
+    virtual void fn_8032EB0C();
+    virtual void fn_8032D94C(UnidentifiedTransportListener_8032CA4C* listener);
+    virtual void fn_8032D954(UnidentifiedTransportListener_8032D954* listener);
+    virtual int ReceiverVirtual00(UnidentifiedNetworkMessage* message);
 
-    /* 0x004 */ u8 mUnidentified004[0x88 - 0x4];
+private:
+    int UnidentifiedConnectionIndex(UnidentifiedTransportConnection* connection)
+    {
+        if (connection != 0)
+        {
+            for (int index = 0; index < 8; ++index)
+            {
+                if (m_ConnectionPool[index].m_Connection == connection)
+                    return index;
+            }
+        }
+        return -1;
+    }
+
+    int UnidentifiedFreeConnectionIndex()
+    {
+        for (int index = 0; index < 8; ++index)
+        {
+            if (m_ConnectionPool[index].mUnidentified04 == 0)
+                return index;
+        }
+        return -1;
+    }
+
+public:
+    /* 0x008 */ bool mUnidentified008;
+    /* 0x00C */ int mUnidentified00C;
+    /* 0x010 */ int mUnidentified010;
+    /* 0x014 */ UnidentifiedTransportPoolEntry_8032CA4C m_ConnectionPool[8];
+    /* 0x054 */ UnidentifiedTransportListener_8032CA4C* mUnidentified054;
+    /* 0x058 */ UnidentifiedTransportListener_8032D954* mUnidentified058;
+    /* 0x05C */ UnidentifiedTransportGame_8032CA4C* mUnidentified05C;
+    /* 0x060 */ int mUnidentified060;
+    /* 0x064 */ char mUnidentified064[12];
+    /* 0x070 */ int mUnidentified070;
+    /* 0x074 */ u8 mUnidentified074;
+    /* 0x075 */ u8 mUnidentified075[8];
+    /* 0x07D */ bool mUnidentified07D;
+    /* 0x080 */ int mUnidentified080;
+    /* 0x084 */ int mUnidentified084;
     /* 0x088 */ int mState;
-    /* 0x08C */ u8 mUnidentified08C[0x1D0 - 0x8C];
+    /* 0x08C */ u32 mUnidentified08C;
+    /* 0x090 */ int mUnidentified090;
+    /* 0x094 */ bool mUnidentified094;
+    /* 0x095 */ bool mUnidentified095;
+    /* 0x098 */ float mUnidentified098;
+    /* 0x09C */ bool mUnidentified09C;
+    /* 0x0A0 */ UnidentifiedTransportPeer_8032CA4C mUnidentified0A0[8];
+    /* 0x1C0 */ int mUnidentified1C0;
+    /* 0x1C4 */ u8 mUnidentified1C4[8];
+    /* 0x1CC */ NetworkSocket_801246E4* mUnidentified1CC;
 }; // size: 0x1D0
 
 class NetworkLobby_80133634 : public UnidentifiedMachineRoster,
@@ -317,9 +467,9 @@ public:
     virtual u32 GetMachineAid(int index);
     virtual int MachineIdxFromConnection(u32 connection);
     virtual int RosterVirtual08();
-    virtual void RosterVirtual0C();
+    virtual void RosterVirtual0C(int);
     virtual int GetMaxMachineCount();
-    virtual void RosterVirtual14();
+    virtual void RosterVirtual14(int);
     virtual int GetMachineCount();
     virtual UnidentifiedTransportPlayer* GetPlayerInfo(int index);
     virtual int GetLocalMachineIndex();
@@ -383,7 +533,7 @@ public:
     /* 0x0053 */ u8 mPadding053;
     /* 0x0054 */ float mElapsedTime;
     /* 0x0058 */ float mConnectionDeadline;
-    /* 0x005C */ UnidentifiedTransportPlayer mPlayers[4];
+    /* 0x005C */ UnidentifiedLobbyPlayer_80133634 mPlayers[4];
     /* 0x00DC */ int mMachineCount;
     /* 0x00E0 */ int mGameStarted;
     /* 0x00E4 */ u8 mUserMatchDataSize;
@@ -548,8 +698,5 @@ extern "C" UnidentifiedNetworkPeer* fn_80338C0C(
 extern "C" s8 fn_80338C20(UnidentifiedNetworkSessionData* session);
 extern "C" void fn_80338C2C(UnidentifiedNetworkSessionData* session,
     int machineCount, int playerCount);
-
-
-void fn_8032C7D0();
 
 #endif // GAME_NETWORK_SESSION_H

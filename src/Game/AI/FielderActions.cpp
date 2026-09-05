@@ -1,5 +1,6 @@
 #include "Game/AI/UnidentifiedAvoidanceObject.h"
 #include "Game/AI/Fielder.h"
+#include "NL/gl/glView.h"
 #include "Game/AI/FielderInput.h"
 #include "Game/BulletBill.h"
 
@@ -89,7 +90,6 @@ extern "C" float fn_8002E1B0(cFielder* pFielder);
 extern "C" bool fn_8002D2C4(nlVector3* v3Position, float fParam, int nParam);
 extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern "C" void fn_80097358(cPlayer* pPlayer, float fParam);
-extern "C" void fn_8009591C(cPlayer* pPlayer, bool bParam);
 extern "C" void fn_800978E8(cPlayer* pPlayer, int nParam);
 extern "C" void fn_80031A30(cFielder* pFielder, int nParam, float fParam);
 extern bool lbl_806DB5A8;
@@ -121,16 +121,12 @@ extern "C" void fn_80097858(cPlayer* pPlayer, cPlayer* pPassTarget,
     int nParam1, int nParam2, int nParam3, int nParam4, float fParam1,
     float fParam2);
 extern "C" float fn_8002CF88(PlayerTweaks* pTweaks);
-extern "C" bool fn_8003886C(cFielder* pFielder);
 extern "C" float fn_80030750(cFielder* pFielder);
-extern "C" cFielder* fn_8003703C(cFielder* pFielder);
 extern "C" float fn_8002D020(PlayerTweaks* pTweaks);
 extern "C" float fn_8002D050(PlayerTweaks* pTweaks);
 extern "C" bool fn_8003C180(cFielder* pFielder);
 extern "C" float fn_800DBAB0(cFielder* pFielder);
 extern "C" float fn_800A0508(cPlayer* pPlayer, int nParam1, int nParam2);
-extern "C" void fn_80037AC8(cFielder* pFielder, int nParam);
-extern "C" void fn_80035700(cFielder* pFielder);
 extern "C" bool fn_8003D9BC(cFielder* pFielder);
 extern "C" bool fn_8003E8A0(cFielder* pFielder);
 extern "C" void fn_801B98A0(cFielder* pFielder);
@@ -164,22 +160,17 @@ extern "C" void fn_8003ADAC(cFielder* pFielder);
 extern "C" void fn_8003B54C(cFielder* pFielder);
 extern "C" void fn_8003B020(cFielder* pFielder);
 extern "C" void fn_8003B0D8(cFielder* pFielder);
-extern "C" bool fn_8003E74C(cFielder* pFielder);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" float fn_800E02B8(cTeam* pTeam);
 extern "C" bool fn_8003E99C(cFielder* pFielder);
-extern "C" bool fn_8003E9F0(cFielder* pFielder);
 extern "C" void fn_801B8FF4(cFielder* pFielder);
 extern "C" float fn_800A9274(void* pParam);
 extern "C" void fn_80080BFC(Goalie* pGoalie, float fDeltaT);
 extern "C" void fn_801B7E4C(const char* pName, cFielder* pFielder);
-extern "C" void fn_801B93E8(cFielder* pFielder);
-extern "C" bool fn_800344B0(cFielder* pFielder);
 extern "C" void fn_8002E718(cFielder* pFielder);
 extern "C" void fn_8002E798(cFielder* pFielder);
 extern "C" void fn_8002E39C(cFielder* pFielder);
 extern "C" void fn_8002E2E4(cFielder* pFielder);
-extern "C" void fn_801BB5DC(cFielder* pFielder, int nParam);
 extern "C" void fn_801BB640(cFielder* pFielder, int nParam);
 extern "C" void fn_8001458C(cBall* pBall);
 extern "C" float fn_800A6388(cTeam* pTeam);
@@ -194,8 +185,6 @@ struct UnidentifiedTornado806E0C94
 };
 extern "C" UnidentifiedTornado806E0C94* fn_800AA060(
     void* pParam, int nParam);
-
-extern BasicSlotPool<PlayerAttackData> lbl_80571960;
 
 extern "C" bool fn_802B6BC8(const nlVector3* v3Start,
     const nlVector3* v3End, const nlVector3* v3A, const nlVector3* v3B,
@@ -243,8 +232,6 @@ public:
 extern "C" void fn_801BA4C8(const char* szName);
 extern "C" int fn_8001C5E4(cFielder* pFielder, unsigned short aFacing,
     unsigned short aTarget, int nAnimID, float fParam);
-extern "C" void fn_802CE7F4(
-    void* pParam, const nlVector3* v3Position, nlVector3* v3Out);
 extern "C" float fn_800499EC(cFielder* pFielder, int nParam);
 extern "C" float fn_80049CC0(cFielder* pFielder, int nParam);
 extern "C" void fn_8005F434(cGame* pGame, void* pEvent);
@@ -587,7 +574,7 @@ void cFielder::fn_8004643C(float fDeltaT)
                     {
                         bool bOtherHasPad = pOther->GetGlobalPad() != 0;
                         if (bOtherHasPad
-                            && (fn_800344B0(pOther) || pOther->fn_80038918()))
+                            && (pOther->fn_800344B0() || pOther->fn_80038918()))
                         {
                             SetAIPad(pOther->m_pController);
                             m_bCanTestController = false;
@@ -641,7 +628,7 @@ void cFielder::fn_8004643C(float fDeltaT)
 
 void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 {
-    if (!fn_8003886C(this))
+    if (!IsStuck())
     {
         float fSpeedScale = InterpolateRangeClamped(lbl_806DB894,
             lbl_806DB898, lbl_806E35B0, lbl_806E3560,
@@ -655,7 +642,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
         if (pTarget == 0)
         {
-            pTarget = fn_8003703C(this);
+            pTarget = DoFindBestHitTarget();
         }
 
         if (pTarget != 0 && !fn_8003E70C(this))
@@ -682,8 +669,8 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
             interceptPos.x
                 = fMidTime * targetVelocity.x + pTarget->m_v3Position.x;
 
-            float fThisRadius = mUnidentified0A0;
-            float fTargetRadius = pTarget->mUnidentified0A0;
+            float fThisRadius = m_fPlayerScale;
+            float fTargetRadius = pTarget->m_fPlayerScale;
             float fInterceptTimes[2];
             float combinedRadius
                 = fn_8002BFA8(fn_8003E6E4(this), fThisRadius)
@@ -742,8 +729,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
         m_pCurrentAnimController->m_fPlaybackSpeedScale = fSpeedScale;
 
-        PlayerAttackData* pData;
-        lbl_80571960.Allocate(pData);
+        PlayerAttackData* pData = lbl_80571960.Allocate();
         pData->pAttacker = this;
         bool bHasGlobalPad = GetGlobalPad() != 0;
         pData->nAttackerPadID
@@ -810,7 +796,7 @@ void cFielder::ActionHit(float fDeltaT)
             for (int i = 0; i < 0x14; i++)
             {
                 PhysicsBox_80177498* pObject
-                    = pCaptain->mUnidentified400->fn_801792C4(i);
+                    = pCaptain->mUnidentified3F8.mUnidentified08->fn_801792C4(i);
                 if (pObject != 0
                     && fn_802B6BC8(&rv3Position, &v3Target,
                         &pObject->mUnidentified038,
@@ -1082,12 +1068,12 @@ void cFielder::InitActionLateOneTimerFromVolley()
     bool bShotNormally = true;
     if (fn_8003C180(this))
     {
-        fn_80035700(this);
+        DoClearBall();
         bShotNormally = false;
     }
     else
     {
-        fn_80037AC8(this, 0);
+        DoRegularShooting(false);
         fn_8005C830(lbl_806E0C94);
     }
 
@@ -1193,7 +1179,7 @@ bool cFielder::DoCommonInitActionLooseBall(
         if (!bBallState5)
         {
             if (v3SimulatedBallPos.z
-                < g_pBall->fn_80014F38(mUnidentified0A0))
+                < g_pBall->fn_80014F38(m_fPlayerScale))
             {
                 float fAnimTime
                     = (pAnimInfoList->fAnimContactFrame / 30.0f)
@@ -1221,7 +1207,7 @@ bool cFielder::DoCommonInitActionLooseBall(
 
             float fVolleyZDelta = (float)fabs(
                 v3SimulatedBallPos.z - v3IdleVolleyContactOffset.z);
-            if (fVolleyZDelta < g_pBall->fn_80014F38(mUnidentified0A0))
+            if (fVolleyZDelta < g_pBall->fn_80014F38(m_fPlayerScale))
             {
                 float fAnimTime
                     = (GetOneTimerIdleVolleyContactAnims()->fAnimContactFrame
@@ -1253,7 +1239,7 @@ bool cFielder::DoCommonInitActionLooseBall(
 
         float fLeadZDelta = (float)fabs(
             v3SimulatedBallPos.z - v3LeadGroundContactOffset.z);
-        if (fLeadZDelta < g_pBall->fn_80014F38(mUnidentified0A0))
+        if (fLeadZDelta < g_pBall->fn_80014F38(m_fPlayerScale))
         {
             float fAnimTime
                 = (GetOneTimerLeadGroundContactAnims()->fAnimContactFrame
@@ -1588,10 +1574,10 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
         if (m_eActionState != 0x12)
         {
-            mUnidentified37C = 0;
+            mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
             m_aActualMovementDirection = m_aActualFacingDirection;
             Unknown8(m_aActualFacingDirection, false);
-            mUnidentified380 = false;
+            mActionRunningVars.bFirstCycleOfTurbo = false;
             m_fDesiredSpeed = m_fActualSpeed;
         }
 
@@ -2343,8 +2329,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
         if (pAttacker->m_eClassType == FIELDER && !bSkipEvent
             && pAttacker != this && bHadBall)
         {
-            PlayerAttackData* pNode;
-            lbl_80571960.Allocate(pNode);
+            PlayerAttackData* pNode = lbl_80571960.Allocate();
             pNode->pAttacker = pAttacker;
             bool bHasPad = pAttacker->GetGlobalPad() != 0;
             pNode->nAttackerPadID
@@ -2510,7 +2495,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 return;
             }
 
-            if (fn_8003E9F0(this) && mUnidentified3DC)
+            if (fn_8003E9F0() && mUnidentified3DC)
             {
                 return;
             }
@@ -2546,8 +2531,8 @@ void cFielder::asmRunningWB(float fDeltaT)
                 break;
             }
 
-            if ((m_eAnimID != 9 && fn_8003E74C(this))
-                || (m_eAnimID == 9 && !fn_8003E74C(this)))
+            if ((m_eAnimID != 9 && fn_8003E74C())
+                || (m_eAnimID == 9 && !fn_8003E74C()))
             {
                 fn_8003BE14(this, 0.1f);
             }
@@ -2661,7 +2646,7 @@ void cFielder::asmRunning()
 
         case 0x1B:
         {
-            switch (mUnidentified37C)
+            switch (mActionRunningVars.eLastStrafeDirection)
             {
             case 1:
                 fn_8003B790(this);
@@ -2720,7 +2705,7 @@ void cFielder::asmRunning()
 
             if (bAnimFinished)
             {
-                switch (mUnidentified37C)
+                switch (mActionRunningVars.eLastStrafeDirection)
                 {
                 case 0:
                 case 1:
@@ -2752,7 +2737,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(4))
             {
-                switch (mUnidentified37C)
+                switch (mActionRunningVars.eLastStrafeDirection)
                 {
                 case 1:
                 case 2:
@@ -2774,7 +2759,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(4))
             {
-                switch (mUnidentified37C)
+                switch (mActionRunningVars.eLastStrafeDirection)
                 {
                 case 4:
                     fn_8003B190(this);
@@ -2798,7 +2783,7 @@ void cFielder::asmRunning()
 
         case 0x1C:
         {
-            switch (mUnidentified37C)
+            switch (mActionRunningVars.eLastStrafeDirection)
             {
             case 0:
             case 1:
@@ -2827,7 +2812,7 @@ void cFielder::asmRunning()
 
         case 0x1D:
         {
-            switch (mUnidentified37C)
+            switch (mActionRunningVars.eLastStrafeDirection)
             {
             case 0:
             case 2:
@@ -2858,7 +2843,7 @@ void cFielder::asmRunning()
         {
             m_aActualMovementDirection = m_aActualFacingDirection;
 
-            switch (mUnidentified37C)
+            switch (mActionRunningVars.eLastStrafeDirection)
             {
             case 0:
                 if (ShouldStartCrossBlend(0))
@@ -2919,7 +2904,7 @@ void cFielder::asmRunning()
 
         case 0:
         {
-            switch (mUnidentified37C)
+            switch (mActionRunningVars.eLastStrafeDirection)
             {
             case 0:
                 m_fDesiredSpeed = 0.0f;
@@ -2973,7 +2958,7 @@ void cFielder::asmRunning()
                 return;
             }
 
-            if (fn_8003E9F0(this) && mUnidentified3DC)
+            if (fn_8003E9F0() && mUnidentified3DC)
             {
                 return;
             }
@@ -2981,7 +2966,7 @@ void cFielder::asmRunning()
 
         case 4:
         {
-            switch (mUnidentified37C)
+            switch (mActionRunningVars.eLastStrafeDirection)
             {
             case 0:
                 if (m_fActualSpeed
@@ -3007,8 +2992,8 @@ void cFielder::asmRunning()
                         fn_8003ADAC(this);
                     }
                 }
-                else if ((m_eAnimID != 9 && fn_8003E74C(this))
-                    || (m_eAnimID == 9 && !fn_8003E74C(this)))
+                else if ((m_eAnimID != 9 && fn_8003E74C())
+                    || (m_eAnimID == 9 && !fn_8003E74C()))
                 {
                     fn_8003BA94(this, 0.1f);
                 }
@@ -3108,7 +3093,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
             fn_8005001C(false);
         }
     }
-    else if (fn_8003E9F0(this))
+    else if (fn_8003E9F0())
     {
         if (mUnidentified3DC)
         {
@@ -3442,7 +3427,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
         float fNetWidth = cNet::m_fNetWidth;
         if ((float)fabs(jointPos.y) < 0.5f * fNetWidth)
         {
-            float fAdjust = mUnidentified0A0;
+            float fAdjust = m_fPlayerScale;
             float fMaxY
                 = fn_8002BFA8(fn_8003E6E4(this), fAdjust) + 0.5f * fNetWidth;
             float fMinY = -fMaxY;
@@ -3784,7 +3769,7 @@ void cFielder::fn_80045930()
 
 void cFielder::fn_80045AEC(PhysicsObject* pObject)
 {
-    if (!fn_800344B0(this))
+    if (!fn_800344B0())
     {
         if (m_pBall != 0)
         {
@@ -3815,7 +3800,7 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
         bool bHasPad = GetGlobalPad() != 0;
         if (bHasPad)
         {
-            fn_8009591C(this, false);
+            SwapController(false);
         }
 
         bool bUnidentified = fn_8001E168(this);
@@ -3925,7 +3910,7 @@ void cFielder::fn_80045C74(float fDeltaT)
                     {
                         bool bOtherHasPad = pOther->GetGlobalPad() != 0;
                         if (bOtherHasPad
-                            && (fn_800344B0(pOther) || pOther->fn_80038918()))
+                            && (pOther->fn_800344B0() || pOther->fn_80038918()))
                         {
                             SetAIPad(pOther->m_pController);
                             m_bCanTestController = false;
@@ -3977,7 +3962,7 @@ void cFielder::fn_80045C74(float fDeltaT)
 
 void cFielder::fn_80046244()
 {
-    if (!fn_800344B0(this))
+    if (!fn_800344B0())
     {
         if (m_pBall != 0)
         {
@@ -4015,7 +4000,7 @@ void cFielder::fn_80046244()
         bool bHasPad = GetGlobalPad() != 0;
         if (bHasPad)
         {
-            fn_8009591C(this, false);
+            SwapController(false);
         }
 
         if (GameInfoManager::Instance()->GetStadium() == 0x0B)
@@ -4207,11 +4192,11 @@ void cFielder::InitActionRunning()
 
     if (m_eActionState != ACTION_RUNNING)
     {
-        mUnidentified37C = 0;
+        mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
         m_aActualMovementDirection = m_aActualFacingDirection;
         Unknown8(m_aActualFacingDirection, false);
         m_fDesiredSpeed = m_fActualSpeed;
-        mUnidentified380 = false;
+        mActionRunningVars.bFirstCycleOfTurbo = false;
     }
 
     SetAction(ACTION_RUNNING);
@@ -4224,7 +4209,7 @@ void cFielder::ActionRunning(float dt)
         SetAction(ACTION_RUNNING_WB);
         mActionRunningWBVars.bWaitForAnimToFinish = false;
         mActionRunningWBVars.bCuePitch = false;
-        mUnidentified37C = 0;
+        mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
         m_aActualMovementDirection = m_aActualFacingDirection;
         bIsModified = false;
         mUnidentified374 = UnidentifiedFielderPair374();
@@ -4249,7 +4234,7 @@ void cFielder::ActionRunning(float dt)
             SetAction(ACTION_RUNNING_WB);
             mActionRunningWBVars.bWaitForAnimToFinish = false;
             mActionRunningWBVars.bCuePitch = false;
-            mUnidentified37C = 0;
+            mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
             m_aActualMovementDirection = m_aActualFacingDirection;
             bIsModified = false;
             mUnidentified374 = UnidentifiedFielderPair374();
@@ -4262,7 +4247,7 @@ void cFielder::InitActionRunningWB(bool bWaitForAnimToFinish)
     SetAction(ACTION_RUNNING_WB);
     mActionRunningWBVars.bWaitForAnimToFinish = bWaitForAnimToFinish;
     mActionRunningWBVars.bCuePitch = false;
-    mUnidentified37C = 0;
+    mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
     m_aActualMovementDirection = m_aActualFacingDirection;
     bIsModified = false;
     mUnidentified374 = UnidentifiedFielderPair374();
@@ -4528,7 +4513,7 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
 void cFielder::InitActionSlideAttack(
     cFielder* pTarget, int nParam, float fTime)
 {
-    if (!fn_8003886C(this))
+    if (!IsStuck())
     {
         nlVector3 v3Velocity = m_v3Velocity;
 
@@ -4539,7 +4524,7 @@ void cFielder::InitActionSlideAttack(
         m_tSlideAttackTimer.SetSeconds(fn_8002C800(fn_8003E6E4(this)));
 
         mUnidentified388 = 0;
-        mUnidentified38C = false;
+        bAttackSucceeded = false;
         mUnidentified38D = false;
 
         nlVector3 v3Target;
@@ -4577,7 +4562,7 @@ void cFielder::InitActionSlideAttack(
         {
             nlVector3 v3BallDelta;
             nlVec3Sub(v3BallDelta, m_v3Position, g_pBall->m_v3Position);
-            float fAdjust = mUnidentified0A0;
+            float fAdjust = m_fPlayerScale;
             float fBallDistance
                 = nlSqrt(v3BallDelta.GetLengthSq3D(), true);
 
@@ -4642,8 +4627,7 @@ void cFielder::InitActionSlideAttack(
         fn_800EC12C(0x2AE03886, this);
         fn_800EBBFC(0, 0x2AE03886, "SlideAttack", this);
 
-        PlayerAttackData* pNode;
-        lbl_80571960.Allocate(pNode);
+        PlayerAttackData* pNode = lbl_80571960.Allocate();
         pNode->pAttacker = this;
         bool bHasPad = GetGlobalPad() != 0;
         pNode->nAttackerPadID = bHasPad ? GetGlobalPad()->fn_80332748() : -1;
@@ -4730,7 +4714,7 @@ void cFielder::fn_8004BB80(float fDeltaT)
         }
     }
 
-    if (!fn_8003886C(this))
+    if (!IsStuck())
     {
         m_pShotMeter->Update(fDeltaT);
     }
@@ -4776,7 +4760,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
     {
         if (!fn_8003C180(this))
         {
-            fn_80037AC8(this, 0);
+            DoRegularShooting(false);
 
             if (g_pBall->meBallState == 8)
             {
@@ -4808,7 +4792,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
         }
         else
         {
-            fn_80035700(this);
+            DoClearBall();
             fn_801B75C8(this, 1, 0, 0, 0);
         }
 
@@ -4824,7 +4808,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
 
 void cFielder::fn_8004C88C(float fDeltaT)
 {
-    if (!mUnidentified38C && mUnidentified388 == 0 && fn_8003E6FC())
+    if (!bAttackSucceeded && mUnidentified388 == 0 && fn_8003E6FC())
     {
         nlVector3 v3Delta;
         v3Delta.y = g_pBall->m_v3Position.y - m_v3Position.y;
@@ -4878,11 +4862,11 @@ void cFielder::fn_8004C88C(float fDeltaT)
     {
         bool bCanPickup = CanPickupBall(g_pBall, true);
         bool bTouched = false;
-        if (mUnidentified38C || bCanPickup)
+        if (bAttackSucceeded || bCanPickup)
         {
             bTouched = true;
         }
-        mUnidentified38C = bTouched;
+        bAttackSucceeded = bTouched;
 
         if (bTouched && bCanPickup)
         {
@@ -4894,8 +4878,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
                 && g_pBall->m_pPrevOwner->m_eClassType == FIELDER
                 && !IsOnSameTeam(g_pBall->m_pPrevOwner))
             {
-                PlayerAttackData* pNode;
-                lbl_80571960.Allocate(pNode);
+                PlayerAttackData* pNode = lbl_80571960.Allocate();
                 pNode->pAttacker = this;
                 bool bHasPad = GetGlobalPad() != 0;
                 pNode->nAttackerPadID
@@ -4923,7 +4906,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
         }
     }
 
-    if (mUnidentified38C)
+    if (bAttackSucceeded)
     {
         if (GetGlobalPad() != 0 && !mUnidentified38D)
         {
@@ -5317,7 +5300,7 @@ void cFielder::fn_8004E92C()
                 float fGoalLineX = cField::GetGoalLineX(1U);
                 if (fBallX < fGoalLineX + fRadius)
                 {
-                    fn_80037AC8(this, 0);
+                    DoRegularShooting(false);
                 }
                 else
                 {
@@ -5327,7 +5310,7 @@ void cFielder::fn_8004E92C()
             }
             else if (m_eCharacterClass == (eCharacterClass)0x0D)
             {
-                fn_80037AC8(this, 0);
+                DoRegularShooting(false);
                 fn_801B75C8(this, 1, 0, 0, 0);
             }
         }
@@ -5381,7 +5364,7 @@ void cFielder::fn_8004EC40()
         }
 
         SetVelocity(v3Zero);
-        mUnidentified054 = v3Zero;
+        m_v3PrevVelocity = v3Zero;
     }
 
     fn_800EC12C(0x3D267BDF, this);
@@ -5570,7 +5553,7 @@ void cFielder::fn_8004E11C(float fParam)
     bool bHasPad = GetGlobalPad() != 0;
     if (bHasPad == true)
     {
-        fn_8009591C(this, false);
+        SwapController(false);
     }
 }
 

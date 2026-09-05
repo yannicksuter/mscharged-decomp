@@ -3,6 +3,7 @@
 #include "Game/Event.h"
 #include "Game/PadMonkey.h"
 #include "Game/TweakRegistry.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/MemAlloc.h"
 #include "NL/glx/GXMaterialShadowTweaks.h"
 #include "NL/globalpad.h"
@@ -20,8 +21,6 @@ extern s32* lbl_806E22A8;
 
 extern "C"
 {
-    void* fn_802C06D4(void* manager);
-    void fn_802C06D8(void* manager, int padCount, int padSetCount);
     void fn_80375288(void* state);
 }
 
@@ -101,12 +100,12 @@ void fn_80137890()
     {
         for (int padSet = 0; padSet < 2; ++padSet)
         {
-            fn_802C084C(lbl_806E1E28, padSet);
+            lbl_806E1E28->fn_802C084C(padSet);
             for (int padIndex = 0; padIndex < 4; ++padIndex)
             {
                 PadMonkey* monkey = new (nlMalloc(0xFC, 8, false))
                     PadMonkey_80375EEC(padIndex);
-                fn_802C082C(lbl_806E1E28, padIndex)->mBackend = monkey;
+                lbl_806E1E28->GetPad(padIndex)->mBackend = monkey;
             }
         }
     }
@@ -114,46 +113,41 @@ void fn_80137890()
     {
         for (int padSet = 0; padSet < 2; ++padSet)
         {
-            fn_802C084C(lbl_806E1E28, padSet);
+            lbl_806E1E28->fn_802C084C(padSet);
             for (int padIndex = 0; padIndex < 4; ++padIndex)
             {
                 cPlatPad* pad = new cPlatPad(padIndex);
-                fn_802C082C(lbl_806E1E28, padIndex)->mBackend = pad;
+                lbl_806E1E28->GetPad(padIndex)->mBackend = pad;
             }
         }
     }
-    fn_802C084C(lbl_806E1E28, 0);
+    lbl_806E1E28->fn_802C084C(0);
 }
 
 void fn_801379AC()
 {
     for (int padSet = 0; padSet < 2; ++padSet)
     {
-        fn_802C084C(lbl_806E1E28, padSet);
+        lbl_806E1E28->fn_802C084C(padSet);
         for (int padIndex = 0; padIndex < 4; ++padIndex)
         {
-            fn_802C082C(lbl_806E1E28, padIndex)->StopRumble();
-            delete fn_802C082C(lbl_806E1E28, padIndex)->mBackend;
-            fn_802C082C(lbl_806E1E28, padIndex)->mBackend = 0;
+            lbl_806E1E28->GetPad(padIndex)->StopRumble();
+            delete lbl_806E1E28->GetPad(padIndex)->mBackend;
+            lbl_806E1E28->GetPad(padIndex)->mBackend = 0;
         }
     }
-    fn_802C084C(lbl_806E1E28, 0);
+    lbl_806E1E28->fn_802C084C(0);
 }
 
 void InitPads()
 {
     if (lbl_806E1E28 == 0)
     {
-        void* manager = nlMalloc(0x10, 8, false);
-        if (manager != 0)
-        {
-            manager = fn_802C06D4(manager);
-        }
-        lbl_806E1E28 = manager;
+        lbl_806E1E28 = new (8, false) PadManager_802C06D4;
     }
 
-    fn_802C06D8(lbl_806E1E28, 4, 2);
-    fn_802C084C(lbl_806E1E28, 0);
+    lbl_806E1E28->fn_802C06D8(4, 2);
+    lbl_806E1E28->fn_802C084C(0);
     lbl_806E22A8 = g_pPadRemapArray;
     lbl_806E2278 = remapArray_8050DB2C;
 
@@ -201,7 +195,7 @@ void UpdateMonkeyState(int monkeySet)
     for (int j = 0; j < 4; ++j)
     {
         PadMonkey* monkey
-            = (PadMonkey*)fn_802C082C(lbl_806E1E28, j)->mBackend;
+            = (PadMonkey*)lbl_806E1E28->GetPad(j)->mBackend;
         NLString monkeyPad = Format<NLString, int, int>(
             NLString("user/{0}_pad_monkey_{1}_"), monkeySet, j);
 
@@ -237,3 +231,5 @@ void UpdateMonkeyState(int monkeySet)
         monkey->Update(0.0f);
     }
 }
+
+template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

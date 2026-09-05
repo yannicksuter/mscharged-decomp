@@ -26,4 +26,6 @@ struct BulletBillObject
     /* 0x44 */ cFielder* target;
 }; // total size: 0x48
 
+extern "C" void fn_8019ABB8(BulletBillObject*, bool);
+
 #endif // GAME_BULLET_BILL_H

@@ -2,6 +2,7 @@
 #include "unclassified/tu_80326844.h"
 
 #include "Game/NetworkSession.h"
+#include "Game/NetworkDiagnostics_803239A8.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlPrint.h"
 #include "NL/nlTicker.h"
@@ -14,12 +15,6 @@ extern char lbl_805319F8[];
 
 extern "C"
 {
-    void fn_802B77B0(UnidentifiedTransportLogWriter* writer);
-    void fn_802B77D4(UnidentifiedTransportLogWriter* writer, void* file,
-        bool buffered, unsigned int bufferSize,
-        unsigned int flushThreshold);
-    void fn_802B7848(UnidentifiedTransportLogWriter* writer);
-    void fn_803239A8(char* text, unsigned long size, bool arg2);
     void fn_80324BE0(UnidentifiedTransportDisplayEntry* entries,
         const char* format, ...);
     void fn_8032C59C();
@@ -29,7 +24,7 @@ UnidentifiedReliableSocketState::UnidentifiedReliableSocketState()
 {
     UnidentifiedReliableSocketLayout* self =
         (UnidentifiedReliableSocketLayout*)this;
-    fn_802B77B0(&self->mLogWriter);
+    nlBufferedWriterInitialize(&self->mLogWriter);
     self->mDisplayEntries[0].mActive = false;
     self->mDisplayEntries[1].mActive = false;
     self->mDisplayEntries[2].mActive = false;
@@ -80,7 +75,7 @@ extern "C" int fn_80324778(UnidentifiedReliableSocketState* socket,
         self->mDebugFile = nlOpenFileDebug(path, false, false);
         if (nlDebugFileIsValid(self->mDebugFile))
         {
-            fn_802B77D4(&self->mLogWriter, self->mDebugFile,
+            nlBufferedWriterAttach(&self->mLogWriter, self->mDebugFile,
                 s_bLogTLUseCache, 20000, 14000);
         }
     }
@@ -101,7 +96,7 @@ extern "C" void fn_80324828(UnidentifiedReliableSocketState* socket)
     }
     self->mConnectionCount = 0;
 
-    fn_802B7848(&self->mLogWriter);
+    nlBufferedWriterFinish(&self->mLogWriter);
     if (nlDebugFileIsValid(self->mDebugFile))
     {
         nlCloseFileDebug(self->mDebugFile);

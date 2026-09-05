@@ -5,6 +5,8 @@
 
 #include "NL/gl/glModel.h"
 #include "NL/gl/tu_802CC370.h"
+#include "NL/glx/tu_8036A800.h"
+#include "NL/glx/tu_8036D774.h"
 
 class GLView;
 
@@ -22,8 +24,6 @@ extern "C"
     // Program state helpers retained in automatic ranges; their parameter
     // types are not established, so they keep C linkage.
     void fn_80297F70(bool enabled);
-    void fn_8036A800(unsigned int index, const void* first, const void* second);
-    void fn_8036A938(const void* value);
 }
 
 extern GXPrimitive lbl_80524470[6];

@@ -18,29 +18,15 @@ struct UnidentifiedControllerInfo_801A7C48
     void* mUnidentified01C;
 };
 
-struct UnidentifiedMegaBallMessage
-{
-    void* mVTable;
-    u32 mUnidentified004;
-    s16 mX;
-    s16 mY;
-    u8 mAngle;
-    u8 mTextureIndex;
-    u8 mStatus;
-};
-
 extern "C"
 {
     int fn_802C2C84(const char* pPath, int nDefault);
     bool fn_80273B00();
-    u32 fn_8032C830(void* pCodec, void* pMessage, void* pBuffer, int nSize);
     void fn_801A8F1C(u16 nAngle, u32 nTextureIndex, u32 nStatus,
         float fX, float fY);
 
-    extern void* lbl_806E2100;
     extern int lbl_806E227C;
     extern int lbl_806E228C;
-    extern u8 lbl_8050ADCC[];
 }
 
 static char lbl_80514210[] = "/Rendering/Engine/Reduce Textures";
@@ -931,18 +917,15 @@ extern "C" void fn_801A8F1C(u16 nAngle, u32 nTextureIndex,
     }
     lbl_806E15F0 = nTicker;
 
-    UnidentifiedMegaBallMessage message;
-    message.mUnidentified004 = 0;
-    message.mVTable = lbl_8050ADCC;
-    message.mX = (s16)(int)fX;
-    message.mY = (s16)(int)fY;
-    message.mAngle = (u8)(nAngle >> 8);
-    message.mTextureIndex = (u8)nTextureIndex;
-    message.mStatus = (u8)nStatus;
+    NetworkMessageType34_8050ADCC message;
+    message.mUnidentified08 = (s16)(int)fX;
+    message.mUnidentified0A = (s16)(int)fY;
+    message.mUnidentified0C = (u8)(nAngle >> 8);
+    message.mUnidentified0D = (u8)nTextureIndex;
+    message.mUnidentified0E = (u8)nStatus;
 
     u8 buffer[50];
-    int nSize = fn_8032C830(
-        lbl_806E2100, &message, buffer, sizeof(buffer));
+    int nSize = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
     int nPlayerCount = fn_80338BF0(lbl_806E20D8);
     for (s8 i = 0; i < nPlayerCount; i++)
     {

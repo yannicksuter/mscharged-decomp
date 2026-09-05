@@ -25,9 +25,7 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 
 extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
 extern "C" unsigned char* lbl_806E2164;
-extern "C" bool fn_800344B0(cFielder*);
 extern "C" bool fn_8003C180(cPlayer*);
-extern "C" bool fn_8003E74C(cFielder*);
 
 extern "C" UnidentifiedTypedEvent<UnidentifiedEventData_80066748>*
     fn_80023350(const char*, int);
@@ -613,7 +611,7 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
         bool beyondOwner = goalLineX > 0.0f
                          ? fielder->m_v3Position.x > owner->m_v3Position.x
                          : fielder->m_v3Position.x < owner->m_v3Position.x;
-        if (beyondOwner && !fn_800344B0(fielder)
+        if (beyondOwner && !fielder->fn_800344B0()
             && !fielder->IsFallenDown()
             && fielder->m_eActionState != (eFielderActionState)0x23)
         {
@@ -653,8 +651,8 @@ void UnidentifiedCameraEffects::UpdateCameraFlags()
     else
         mCameraFlags &= ~1;
 
-    if (fn_8003E74C(g_pTeams[0]->GetCaptain())
-        || fn_8003E74C(g_pTeams[1]->GetCaptain()))
+    if (g_pTeams[0]->GetCaptain()->fn_8003E74C()
+        || g_pTeams[1]->GetCaptain()->fn_8003E74C())
         mCameraFlags |= 0x20;
     else
         mCameraFlags &= ~0x20;

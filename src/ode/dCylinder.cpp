@@ -2,8 +2,9 @@
 #include <ode/odemath.h>
 
 #include "collision_kernel.h"
+#include <math.h>
 
-#define dFabs(x) ((float)__fabs(float(x)))
+#define dFabs(x) ((float)fabsf(float(x)))
 #define dInfinity (3.402823466e+38F)
 #define M_SQRT1_2 REAL(0.7071067811865475244008443621048490)
 #define dDOT44(a, b) dDOTpq(a, b, 4, 4)
@@ -1166,10 +1167,10 @@ int dCollideCylPlane
  const dReal *R	=	dGeomGetRotation(o1);// rotation of cylinder
  const dReal* p	=	dGeomGetPosition(o1);
  dVector4 n;		// normal vector
+ dReal cos1,sin1;
  dReal pp;
  dGeomPlaneGetParams (o2, n);
  pp=n[3];
- dReal cos1,sin1;
   cos1=dFabs(dDOT14(n,R+1));
 
 cos1=cos1<REAL(1.) ? cos1 : REAL(1.); //cos1 may slightly exeed 1.f

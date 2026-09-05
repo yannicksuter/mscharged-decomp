@@ -291,7 +291,7 @@ void HealthWarningSceneV2::Update(float dt)
         {
             for (int pad = 0; pad < 4; ++pad)
             {
-                cGlobalPad* controller = fn_802C082C(lbl_806E1E28, pad);
+                cGlobalPad* controller = lbl_806E1E28->GetPad(pad);
                 if (controller != 0 && controller->IsConnected()
                     && controller->IsPressed(0x1E, true)
                     && controller->IsPressed(0x1F, true))

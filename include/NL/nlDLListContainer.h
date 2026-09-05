@@ -144,8 +144,9 @@ public:
     }
 
     nlDLListSlotPool(const int initial, const int delta)
-        : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >(initial, delta)
+        : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >()
     {
+        this->m_Allocator.Initialize(initial, delta);
     }
 };
 

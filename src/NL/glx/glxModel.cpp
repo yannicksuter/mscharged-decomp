@@ -16,7 +16,7 @@ void glplatSetMatrix(unsigned long matrix, const nlMatrix4& m)
     matrixPtr->Set(m);
 }
 
-extern "C" void fn_8036E438(
+extern "C" void glplatFinalizePacket(
     glModelPacket* packet, bool permanent, void* allocator)
 {
     ((UnidentifiedPacketResource*)packet->unknown10)->fn_Unknown2(packet);
@@ -29,6 +29,6 @@ extern "C" void fn_8036E438(
     packet->unknown28 = 0;
 }
 
-void fn_8036E4C0(glModelPacket*, void*)
+void glplatOnPacketCloned(glModelPacket*, void*)
 {
 }

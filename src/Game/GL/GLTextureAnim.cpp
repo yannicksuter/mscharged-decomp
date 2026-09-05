@@ -2,24 +2,10 @@
 
 #include "Game/GL/GLInventory.h"
 #include "NL/gl/glMemory.h"
+#include "NL/gl/glTexture.h"
 #include "NL/glx/glxTexture.h"
 
 #include <string.h>
-
-struct TextureIndexQueue_802D3B68
-{
-    u16* m_00;
-    u32 m_04;
-    u32 m_08;
-    u32 m_0C;
-};
-
-extern "C"
-{
-    u32 fn_802CDFCC(u32 textureHandle);
-    void fn_802CE3E0(TextureManager_802CDF0C*, GLTextureAnim*);
-    void fn_802CE4B8(TextureManager_802CDF0C*, GLTextureAnim*);
-}
 
 extern "C" bool fn_802D3A08(const void* data, unsigned long size)
 {
@@ -58,33 +44,14 @@ extern "C" void fn_802D3A34(const void* data, unsigned long size,
     }
 
     resource->m_inventory->AddTextureAnim(anim->m_unk_0x04, anim);
-    fn_802CE3E0(fn_802CDF0C(), anim);
+    fn_802CDF0C()->fn_802CE3E0(anim);
 }
 
 extern "C" void fn_802D3B68(GLTextureAnim* anim)
 {
     TextureManager_802CDF0C* manager = fn_802CDF0C();
-    TextureIndexQueue_802D3B68* queue = manager->m_08;
     u32 textureHandle = anim->m_unk_0x18;
-    u32 capacity = queue->m_0C;
-    u32 count = queue->m_08;
-    u16 textureIndex = (u16)textureHandle;
-
-    u16* entry;
-    if (count >= capacity)
-    {
-        entry = 0;
-    }
-    else
-    {
-        u32 position = queue->m_04;
-        u32 newCount = count + 1;
-        u16* data = queue->m_00;
-        u32 index = (position + count) % capacity;
-        queue->m_08 = newCount;
-        entry = data + index;
-    }
-    *entry = textureIndex;
+    manager->m_08->UnidentifiedAddEnd((u16)textureHandle);
 
     manager->m_04[textureHandle] = 0;
     anim->m_unk_0x18 = 0xFFFF;
@@ -163,5 +130,5 @@ void GLTextureAnim::Update(float dt)
         }
     }
 
-    fn_802CE4B8(fn_802CDF0C(), this);
+    fn_802CDF0C()->fn_802CE4B8(this);
 }

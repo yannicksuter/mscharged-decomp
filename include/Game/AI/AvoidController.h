@@ -138,4 +138,8 @@ public:
     /* 0x198 */ int mUnidentified198;
 };
 
+class DebugWriteCache;
+extern "C" void fn_8000F324(AvoidController* controller,
+    void* context, DebugWriteCache* cache);
+
 #endif // GAME_AI_AVOID_CONTROLLER_H

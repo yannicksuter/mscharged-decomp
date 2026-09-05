@@ -2,6 +2,8 @@
 #define GAME_AI_FIELDER_H
 
 #include "Game/Player.h"
+#include "Game/AI/Powerups.h"
+#include "Game/AI/FielderAbility.h"
 
 enum eTurboRequest
 {
@@ -75,6 +77,7 @@ struct LooseBallContactAnimInfo
 }; // total size: 0xC
 
 class cFielder;
+extern "C" bool fn_800344DC(cFielder*, const nlVector3*);
 class cSHierarchy;
 class AnimRetargetList;
 class CharacterPhysicsData;
@@ -117,6 +120,18 @@ struct UnidentifiedFielderAction364
     }
 
     cFielder* passTarget;
+};
+
+struct UnidentifiedFielderAction37C
+{
+    UnidentifiedFielderAction37C()
+        : eLastStrafeDirection(STRAFE_IDLE)
+        , bFirstCycleOfTurbo(false)
+    {
+    }
+
+    eStrafeDirection eLastStrafeDirection;
+    bool bFirstCycleOfTurbo;
 };
 
 struct UnidentifiedFielderAction384
@@ -176,8 +191,9 @@ public:
     virtual void Unknown8(unsigned short aParam, bool bParam);
     virtual void SetPosition(const nlVector3& position);
     virtual void Update(float fDeltaT);
-    virtual void Unknown10();
-    virtual void Unknown11(void* pParam, void* pParam2);
+    virtual void Unknown10(
+        const nlVector3& v3Position, unsigned short aDirection);
+    virtual void Unknown11(void* context, DebugWriteCache* cache);
     virtual void Unknown12(RunningChecksum* pChecksum);
     virtual bool CanPickupBall(cBall* pBall, bool bParam);
     virtual void CollideWithCharacterCallback(
@@ -185,18 +201,36 @@ public:
     virtual void CollideWithWallCallback(
         const CollisionPlayerWallData* pData);
     virtual void InitActionPostWhistle();
-    virtual void fn_80099074(UnidentifiedPlayerEventData*);
+    virtual void fn_80099074(UnidentifiedEventData24*);
 
-    void CleanUpAction();
+    void ClearPassTargetIfAmThePassTarget();
+    void CleanUpAction(eFielderActionState actionState);
+    ePowerUpType GetPowerupType() const;
+    void UseTeamPowerup(cFielder* pTarget);
+    void UpdateActionState(float dt);
+    void UpdateHeadTracking(float fDeltaT);
+    cFielder* DoFindBestHitTarget();
+    void UpdateController(float fDeltaT);
+    bool IsRunning() const;
+    bool fn_800345EC(cFielder* pOtherFielder) const;
+    bool fn_80034894(cFielder* pOtherFielder) const;
+    bool fn_800344B0() const;
+    bool IsRunningWithBall() const;
+    void StartRunning();
     bool CanGetElectrocuted(
         const CollisionPlayerWallData* eventData);
     bool CanDoCaptainShootToScore();
     bool CanReceivePass();
     bool fn_8003E8F4() const;
+    bool fn_8003E74C() const;
+    bool fn_8003E7F8() const;
+    bool fn_8003E84C() const;
+    bool fn_8003E9F0() const;
+    bool fn_8003EA44() const;
     bool fn_8003EA6C() const;
     cFielder* GetMark() const { return m_pMark[0]; }
     cFielder* GetMark(int index) const { return m_pMark[index]; }
-    void fn_8003057C(void* pParam);
+    void fn_8003057C(int nParam);
     void fn_800305DC(float fParam);
     void fn_8003063C(PlayerTweaks* pParam);
     void fn_800306A0(cFielder* pParam);
@@ -205,12 +239,29 @@ public:
     void DoResetShotMeter(float fTime);
     bool IsActionDone() const;
     bool IsFallenDown() const;
+    bool IsStuck() const;
+    bool IsInvincible() const
+    {
+        bool result = false;
+        if (!IsStuck() && (muInvincibleStatus & 0x1F) == 0x1F)
+            result = true;
+        return result;
+    }
+    bool IsInvincibleChars() const
+    {
+        bool result = false;
+        if (!IsStuck() && (muInvincibleStatus & 1))
+            result = true;
+        return result;
+    }
+    void TestCollisionForInvicibility(cFielder* pOpponent);
     const LooseBallContactAnimInfo* fn_80038230(
         const LooseBallContactAnimInfo* pBallContactAnimInfo,
         int nNumContactAnims, unsigned short aFutureFacingDirection,
         const nlVector3& v3FuturePosition, const nlVector3& v3OneTimerTarget,
         float fAngle);
     bool IsHitting() const;
+    bool fn_80038660() const;
     bool fn_80038918() const;
     eFielderDesireState fn_8002E060();
     bool fn_8003E6FC() const;
@@ -278,6 +329,9 @@ public:
     void ActionPostWhistle(float fDeltaT);
     void ShootBallDueToContact(const nlVector3& v3IncomingVelocity);
     void ShootBallDueToContact(unsigned short aShootDirection);
+    void DoClearBall();
+    void DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed, int nParam);
+    void DoRegularShooting(bool bParam);
     void InitActionBombReact(const nlVector3& v3BombPosition, float fRadius);
     void InitActionBombHitReact(const nlVector3& v3BombPosition);
     void InitActionBananaReact(const nlVector3& fDeltaT);
@@ -393,11 +447,7 @@ private:
 
 public:
     /* 0x374 */ UnidentifiedFielderPair374 mUnidentified374;
-    /* 0x37C */ int mUnidentified37C;
-    /* 0x380 */ bool mUnidentified380;
-
-private:
-    /* 0x381 */ u8 mUnknown381[0x03];
+    /* 0x37C */ UnidentifiedFielderAction37C mActionRunningVars;
 
 public:
     /* 0x384 */ UnidentifiedFielderAction384 mActionRunningWBVars;
@@ -407,7 +457,7 @@ private:
 
 public:
     /* 0x388 */ int mUnidentified388;
-    /* 0x38C */ bool mUnidentified38C;
+    /* 0x38C */ bool bAttackSucceeded;
     /* 0x38D */ bool mUnidentified38D;
 
 private:
@@ -452,15 +502,9 @@ private:
 public:
     /* 0x3E0 */ float mUnidentified3E0;
     /* 0x3E4 */ float mUnidentified3E4;
-    /* 0x3E8 */ float mUnidentified3E8;
-    /* 0x3EC */ float mUnidentified3EC;
-    /* 0x3F0 */ int mUnidentified3F0;
+    /* 0x3E8 */ UnidentifiedFielderAbility3E8 mUnidentified3E8;
     /* 0x3F4 */ float mUnidentified3F4;
-    /* 0x3F8 */ float mUnidentified3F8;
-    /* 0x3FC */ float mUnidentified3FC;
-
-public:
-    /* 0x400 */ WaluigiWallManager_80178400* mUnidentified400;
+    /* 0x3F8 */ UnidentifiedAbilityEffect mUnidentified3F8;
 
 private:
     /* 0x404 */ float mUnidentified404;

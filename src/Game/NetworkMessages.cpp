@@ -71,32 +71,28 @@ static NetworkMessageFactory<NetworkMessageType34_8050ADCC> sFactoryType34;
 static NetworkMessageFactory<UnidentifiedNetworkMessage_80126D84>
     sFactoryType35;
 
-extern void* lbl_806E2100;
-extern "C" void fn_8032CA40(
-    void* codec, int type, UnidentifiedNetworkMessageFactory* factory);
-
 void RegisterNetworkMessages_801258A8()
 {
-    fn_8032CA40(lbl_806E2100, 13, &sFactoryType13);
-    fn_8032CA40(lbl_806E2100, 15, &sFactoryType15);
-    fn_8032CA40(lbl_806E2100, 16, &sFactoryType16);
-    fn_8032CA40(lbl_806E2100, 17, &sFactoryType17);
-    fn_8032CA40(lbl_806E2100, 18, &sFactoryType18);
-    fn_8032CA40(lbl_806E2100, 19, &sFactoryType19);
-    fn_8032CA40(lbl_806E2100, 20, &sFactoryType20);
-    fn_8032CA40(lbl_806E2100, 21, &sFactoryType21);
-    fn_8032CA40(lbl_806E2100, 22, &sFactoryType22);
-    fn_8032CA40(lbl_806E2100, 23, &sFactoryType23);
-    fn_8032CA40(lbl_806E2100, 24, &sFactoryType24);
-    fn_8032CA40(lbl_806E2100, 25, &sFactoryType25);
-    fn_8032CA40(lbl_806E2100, 26, &sFactoryType26);
-    fn_8032CA40(lbl_806E2100, 27, &sFactoryType27);
-    fn_8032CA40(lbl_806E2100, 28, &sFactoryType28);
-    fn_8032CA40(lbl_806E2100, 29, &sFactoryType29);
-    fn_8032CA40(lbl_806E2100, 30, &sFactoryType30);
-    fn_8032CA40(lbl_806E2100, 31, &sFactoryType31);
-    fn_8032CA40(lbl_806E2100, 32, &sFactoryType32);
-    fn_8032CA40(lbl_806E2100, 33, &sFactoryType33);
-    fn_8032CA40(lbl_806E2100, 34, &sFactoryType34);
-    fn_8032CA40(lbl_806E2100, 35, &sFactoryType35);
+    lbl_806E2100->fn_8032CA40(13, &sFactoryType13);
+    lbl_806E2100->fn_8032CA40(15, &sFactoryType15);
+    lbl_806E2100->fn_8032CA40(16, &sFactoryType16);
+    lbl_806E2100->fn_8032CA40(17, &sFactoryType17);
+    lbl_806E2100->fn_8032CA40(18, &sFactoryType18);
+    lbl_806E2100->fn_8032CA40(19, &sFactoryType19);
+    lbl_806E2100->fn_8032CA40(20, &sFactoryType20);
+    lbl_806E2100->fn_8032CA40(21, &sFactoryType21);
+    lbl_806E2100->fn_8032CA40(22, &sFactoryType22);
+    lbl_806E2100->fn_8032CA40(23, &sFactoryType23);
+    lbl_806E2100->fn_8032CA40(24, &sFactoryType24);
+    lbl_806E2100->fn_8032CA40(25, &sFactoryType25);
+    lbl_806E2100->fn_8032CA40(26, &sFactoryType26);
+    lbl_806E2100->fn_8032CA40(27, &sFactoryType27);
+    lbl_806E2100->fn_8032CA40(28, &sFactoryType28);
+    lbl_806E2100->fn_8032CA40(29, &sFactoryType29);
+    lbl_806E2100->fn_8032CA40(30, &sFactoryType30);
+    lbl_806E2100->fn_8032CA40(31, &sFactoryType31);
+    lbl_806E2100->fn_8032CA40(32, &sFactoryType32);
+    lbl_806E2100->fn_8032CA40(33, &sFactoryType33);
+    lbl_806E2100->fn_8032CA40(34, &sFactoryType34);
+    lbl_806E2100->fn_8032CA40(35, &sFactoryType35);
 }

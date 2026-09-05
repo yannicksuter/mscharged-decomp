@@ -17,7 +17,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlVector.h"
-#include "unclassified/tu_802A87F8.h"
+#include "Game/GL/GLColourMeshWriter.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -356,13 +356,12 @@ void ModeledScreenTransition::RenderOutline() const
 
             ShuffleIntoOutline(outline);
 
-            State_802A87F8 mesh;
-            fn_802A87F8(&mesh);
+            GLColourMeshWriter mesh;
             glSetDefaultState(true);
             glSetCurrentMatrix(glGetIdentityMatrix());
             glSetRasterState(GLS_AlphaBlend, 1);
             glSetCurrentRasterState(glHandleizeRasterState());
-            fn_802A8854(&mesh, outline.mSize + 1, GLP_LineStrip, NULL);
+            mesh.Begin(outline.mSize + 1, GLP_LineStrip, NULL);
 
             for (int k = 0; k < outline.mSize; k++)
             {
@@ -383,13 +382,12 @@ void ModeledScreenTransition::RenderOutline() const
             *mesh.position++ = y;
             *mesh.position++ = z;
 
-            if (fn_802A89AC(&mesh))
+            if (mesh.End())
             {
                 s_3DView->AttachModel(mesh.model, 2);
             }
 
             ClearOutline(outline);
-            fn_802A8814(&mesh, -1);
         }
     }
 }
@@ -484,7 +482,7 @@ ModeledScreenTransition* ModeledScreenTransition::LoadFromParser(
         {
             m_nTexture = glHash(parser->NextTokenOnLine(true));
             m_Unknown20
-                = fn_802CE1B8(fn_802CDF0C(), m_nTexture);
+                = fn_802CDF0C()->fn_802CE1B8(m_nTexture);
         }
         else if (nlStrCmp(pToken, "name") == 0)
         {

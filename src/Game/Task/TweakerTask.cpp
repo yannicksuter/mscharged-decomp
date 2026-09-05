@@ -1,6 +1,7 @@
 #include "Game/Task/TweakerTask.h"
 
 #include "Game/NetworkSession.h"
+#include "Game/NetworkDebug_80323B2C.h"
 #include "unclassified/tu_80338898.h"
 
 #include "types.h"
@@ -12,7 +13,6 @@ extern s32 lbl_806DF2F0;
 extern s32 lbl_806DF2F4;
 extern s32 lbl_806DF2F8;
 extern s32 lbl_806DF2FC;
-extern u8 lbl_806E20E4;
 
 void TweakerTask::Run(float)
 {
@@ -27,7 +27,7 @@ void TweakerTask::Run(float)
         return;
     }
 
-    if (lbl_806E20E4 && lbl_806E20D8 != 0)
+    if (g_bDisplayNetwork && lbl_806E20D8 != 0)
     {
         lbl_806E20D8->BaseVirtual50();
     }

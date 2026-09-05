@@ -114,15 +114,19 @@ void Volume::fn_802F9B60(AudioEffectParameter_802F69A8* destination,
         amount = amount >= 0.0f ? amount : 0.0f;
         amount = amount <= 1.0f ? amount : 1.0f;
     }
-    else if (sourceParameter->m_State.m_Target.scalar != 0.0f)
-    {
-        amount = sourceParameter->m_State.m_Current.scalar / sourceParameter->m_State.m_Target.scalar;
-        amount = amount >= 0.0f ? amount : 0.0f;
-        amount = amount <= 1.0f ? amount : 1.0f;
-    }
     else
     {
-        amount = 1.0f;
+        amount = sourceParameter->m_State.m_Target.scalar;
+        if (amount)
+        {
+            amount = sourceParameter->m_State.m_Current.scalar / amount;
+            amount = amount >= 0.0f ? amount : 0.0f;
+            amount = amount <= 1.0f ? amount : 1.0f;
+        }
+        else
+        {
+            amount = 1.0f;
+        }
     }
     destinationParameter->m_Unknown10 += sourceParameter->m_Unknown10 * amount;
     destinationParameter->m_Unknown14_00 |= sourceParameter->m_Unknown14_00;

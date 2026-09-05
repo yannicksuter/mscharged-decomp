@@ -220,8 +220,7 @@ extern "C" void fn_802DB4EC(
     ImpostorModel_802DAEE0* model, unsigned long texture)
 {
     model->mReplacementTexture = texture;
-    model->mResolvedTexture = fn_802CE1B8(
-        fn_802CDF0C(), model->mReplacementTexture);
+    model->mResolvedTexture = fn_802CDF0C()->fn_802CE1B8(model->mReplacementTexture);
 }
 
 extern "C" void fn_802DB528(ImpostorModel_802DAEE0* model,
@@ -286,7 +285,7 @@ extern "C" void fn_802DB79C(ImpostorModel_802DAEE0* model)
                         if (fn_802CC8FC(packet, parameter))
                         {
                             unsigned long texture = fn_802CC7E4(packet, parameter);
-                            unsigned long resolvedTexture = fn_802CE1B8(fn_802CDF0C(), texture);
+                            unsigned long resolvedTexture = fn_802CDF0C()->fn_802CE1B8(texture);
                             fn_802CC4FC(packet, parameter, &resolvedTexture);
                         }
                     }

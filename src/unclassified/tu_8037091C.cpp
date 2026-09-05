@@ -4,28 +4,8 @@
 #include "NL/gl/glTarget.h"
 #include "NL/gl/glView.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_802A8A90.h"
+#include "Game/GL/GLShadowBlendMeshWriter.h"
 #include "unclassified/tu_8037091C.h"
-
-struct UnidentifiedTargetInfo_8037091C
-{
-    UnidentifiedTargetInfo_8037091C()
-        : unknown08(0)
-        , unknown0C(0)
-    {
-    }
-
-    /* 0x00 */ u32 height;
-    /* 0x04 */ u32 width;
-    /* 0x08 */ u32 unknown08;
-    /* 0x0C */ u32 unknown0C;
-    /* 0x10 */ u32 unknown10;
-    /* 0x14 */ u32 format;
-    /* 0x18 */ u32 unknown18;
-    /* 0x1C */ u32 unknown1C;
-    /* 0x20 */ u32 unknown20;
-    /* 0x24 */ u8 colour[4];
-}; // size: 0x28
 
 extern "C" u32 fn_80369D4C();
 extern "C" u32 fn_80369D54();
@@ -36,7 +16,7 @@ static GLRenderPair sRenderPair_806E2408;
 
 extern "C" void fn_8037091C()
 {
-    UnidentifiedTargetInfo_8037091C info;
+    TargetInfo_8036DE50 info;
     nlZeroMemory(&info, sizeof(info));
     info.width = fn_80369D4C();
     info.height = fn_80369D54();
@@ -78,7 +58,7 @@ void RenderShadowVolumeBlend(GLView* view)
 {
     static u32 texture_806E2410 = glGetTexture(sString_805356F0);
 
-    UnidentifiedMeshWriter_802A8A90 writer;
+    GLShadowBlendMeshWriter writer;
     nlColour colour = { 0, 0, 0, 0 };
     glSetDefaultState(false);
     glSetRasterState(GLS_DepthTest, 0);

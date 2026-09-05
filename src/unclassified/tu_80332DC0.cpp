@@ -1,4 +1,5 @@
 #include "unclassified/tu_80332DC0.h"
+#include "Game/EventDispatcher.inl"
 #include "unclassified/tu_80336B2C.h"
 
 #include <string.h>
@@ -176,18 +177,7 @@ void UnidentifiedInputRouter::RouterVirtual3C()
 extern "C" void fn_80333908(
     UnidentifiedInputRouter* router, const void* data, u32 size)
 {
-    DetermDataEvent* event = 0;
-    if (lbl_805848E8.m_FreeList == 0)
-    {
-        SlotPoolBase::BaseAddNewBlock(&lbl_805848E8, sizeof(DetermDataEvent));
-    }
-    if (lbl_805848E8.m_FreeList != 0)
-    {
-        event = (DetermDataEvent*)lbl_805848E8.m_FreeList;
-        lbl_805848E8.m_FreeList = lbl_805848E8.m_FreeList->next;
-        event->mSize = size;
-        memcpy(event->mData, data, size);
-    }
+    DetermDataEvent* event = new DetermDataEvent(data, size);
 
     if (router->mOutgoingCount < router->mOutgoingCapacity)
     {
@@ -278,13 +268,13 @@ void NetworkInputRouter::RouterVirtual24()
 
 bool NetworkInputRouter::RouterVirtual14()
 {
-    if (mQueueCursor > mQueueLimit)
+    if (mQueueLimit > mQueueCursor)
     {
         return true;
     }
 
     int machineCount = fn_80338BF0(mSession);
-    for (int machine = 0; machine < machineCount; ++machine)
+    for (s8 machine = 0; machine < machineCount; ++machine)
     {
         if (mInputQueues[machine].mCount == 0)
         {
@@ -329,7 +319,7 @@ void NetworkInputRouter::RouterVirtual28(
     }
 }
 
-void NetworkInputRouter::RouterVirtual30()
+void NetworkInputRouter::RouterVirtual30(int column, int* row)
 {
     if (mStarvedForInput)
     {
@@ -372,7 +362,7 @@ int NetworkInputRouter::RouterVirtual10()
     return 1;
 }
 
-void SimpleInputRouter::RouterVirtual30()
+void SimpleInputRouter::RouterVirtual30(int column, int* row)
 {
 }
 

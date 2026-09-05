@@ -25,9 +25,6 @@ extern "C"
     u32 fn_80124238();
     u32 fn_8011C1D0();
     bool fn_8025BDA0();
-    int fn_8032CA1C(
-        void* registry, int type, UnidentifiedNetworkMessageReceiver* receiver);
-    void fn_8032CA2C(void* registry, int type);
     int fn_8048FACC(void* server, const char* key, int defaultValue);
     void fn_8048F648(int key, int value);
 
@@ -58,7 +55,6 @@ extern "C"
     void DWC_ShutdownFriendsMatch();
 }
 
-extern void* lbl_806E2100;
 extern u8 lbl_806E18D4;
 extern u8 lbl_806E1009;
 
@@ -88,7 +84,7 @@ NetworkLobby_80133634::NetworkLobby_80133634()
 
 void NetworkLobby_80133634::RegisterMessageReceiver()
 {
-    fn_8032CA1C(lbl_806E2100, 0x16, static_cast<UnidentifiedNetworkMessageReceiver*>(this));
+    lbl_806E2100->fn_8032CA1C(0x16, static_cast<UnidentifiedNetworkMessageReceiver*>(this));
     mReceiverRegistered = true;
     Reset();
 }
@@ -132,7 +128,7 @@ void NetworkLobby_80133634::Reset()
 
 void NetworkLobby_80133634::UnregisterMessageReceiver()
 {
-    fn_8032CA2C(lbl_806E2100, 0x16);
+    lbl_806E2100->fn_8032CA2C(0x16);
     Reset();
     mReceiverRegistered = false;
 }
@@ -180,7 +176,7 @@ int NetworkLobby_80133634::RosterVirtual08()
     return 0;
 }
 
-void NetworkLobby_80133634::RosterVirtual0C()
+void NetworkLobby_80133634::RosterVirtual0C(int)
 {
 }
 
@@ -189,7 +185,7 @@ int NetworkLobby_80133634::GetMaxMachineCount()
     return 4;
 }
 
-void NetworkLobby_80133634::RosterVirtual14()
+void NetworkLobby_80133634::RosterVirtual14(int)
 {
 }
 

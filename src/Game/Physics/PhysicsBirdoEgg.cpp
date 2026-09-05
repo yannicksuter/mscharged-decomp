@@ -48,9 +48,7 @@ extern SlotPool<CollisionBirdoEggGoalieData> lbl_805715A0;
 extern SlotPool<CollisionBirdoEggEndData> lbl_805715F0;
 extern SlotPool<CollisionCrackEggData> lbl_80570188;
 
-extern "C" bool fn_8003886C(cFielder*);
 extern "C" bool fn_8003E73C(cFielder*);
-extern "C" bool fn_800976F8(cFielder*, float);
 extern "C" void fn_80146FCC(CollisionBirdoShotBallPlayerData*);
 extern "C" void fn_80147114(CollisionBirdoEggGoalieData*);
 extern "C" void fn_8014725C(CollisionBirdoEggEndData*);
@@ -98,7 +96,7 @@ ContactType PhysicsBirdoEgg::Contact(
             }
 
             float radius = GetRadius();
-            if (fn_800976F8(fielder, GetPosition().z + radius))
+            if (fielder->IsCharacterInAir(GetPosition().z + radius))
             {
                 return NO_CONTACT;
             }
@@ -182,7 +180,7 @@ ContactType PhysicsBirdoEgg::Contact(
         {
             cFielder* fielder = *(cFielder**)(object + 0x4C);
             bool protectedFromEgg = false;
-            if (!fn_8003886C(fielder)
+            if (!fielder->IsStuck()
                 && (*(u32*)((u8*)fielder + 0x454) & 0x1F) == 0x1F)
             {
                 protectedFromEgg = true;

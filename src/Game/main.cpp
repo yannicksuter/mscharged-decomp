@@ -47,7 +47,7 @@
 #include "NL/nlTask.h"
 #include "NL/gl/glState.h"
 #include "unclassified/tu_802196B0.h"
-#include "unclassified/tu_80376888.h"
+#include "NL/plat/nlFlash.h"
 
 #include <string.h>
 
@@ -110,7 +110,6 @@ extern "C"
     void fn_8013D7E0();
     void fn_802C0F24();
     void fn_80369574();
-    void fn_803768F8();
     void fn_803730D8();
     void fn_80272AB4();
     void fn_80184858();
@@ -204,7 +203,7 @@ static ResetTask resetTask;
 static UnidentifiedMemCheckTask memCheckTask;
 static TextWindowTask textWindowTask;
 static UnidentifiedTask_802196B0 unidentifiedTask_802196B0;
-static UnidentifiedTask_80376888 unidentifiedTask_80376888;
+static FlashMemoryTask flashMemoryTask;
 
 static TweakValueBool_804F4578 sAllowWarble(
     "sbAllowWarble", "/Rendering/Effects/Warble", true);
@@ -337,7 +336,7 @@ extern "C" void fn_8011C508()
     cGlobalPad* pad = 0;
     for (int i = 0; i < 4; ++i)
     {
-        pad = fn_802C082C(lbl_806E1E28, i);
+        pad = lbl_806E1E28->GetPad(i);
         if (pad->IsConnected())
         {
             break;
@@ -462,7 +461,7 @@ static void Initialize()
     nlLocalization::Initialize();
 
     AddTasks();
-    fn_803768F8();
+    nlFlashInitialize();
     fn_803730D8();
     fn_80272AB4();
     Wiper::Instance().Initialize();
@@ -488,7 +487,7 @@ static void AddTasks()
     nlTaskManager::AddTask(&networkUpdateTask, 17, (u32)-1);
     nlTaskManager::AddTask(&unidentifiedTask_802196B0, 13, 5);
     nlTaskManager::AddTask(
-        &unidentifiedTask_80376888, 13, (u32)-1);
+        &flashMemoryTask, 13, (u32)-1);
     nlTaskManager::AddTask(fn_803733D4(), 3, (u32)-1);
     nlTaskManager::AddTask(&Wiper::Instance(), 13, (u32)-1);
 }

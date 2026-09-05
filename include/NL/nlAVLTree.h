@@ -23,8 +23,9 @@ public:
 
     AVLTreeNode* AddAVLNode(AVLTreeNode** rootNode, void* key, void* value, AVLTreeNode** existingNode);
     AVLTreeNode* RemoveAVLNode(AVLTreeNode** root, void* key);
-    AVLTreeNode* FindAVLNode(AVLTreeNode* root, void* key) const;
-    void DestroyTree(AVLTreeNode* root, DeleteCallback callback);
+    AVLTreeNode* FindAVLNode(AVLTreeNode* node, void* key) const;
+    unsigned int fn_802A95C4(AVLTreeNode* root, unsigned int count);
+    void DestroyTree(AVLTreeNode* curr, DeleteCallback cb);
 };
 
 template <typename KeyType, typename ValueType>

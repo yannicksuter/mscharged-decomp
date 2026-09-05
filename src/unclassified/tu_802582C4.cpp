@@ -36,8 +36,6 @@ extern "C" const char* fn_801CCC80(int cheat);
 extern TLComponentInstance* lbl_80578450[4];
 extern BaseGameSceneManager* lbl_806E1838;
 extern unsigned int lbl_806E18B0;
-extern void* lbl_806E1E28;
-extern "C" cGlobalPad* fn_802C082C(void* owner, int pad);
 
 template <typename T>
 static inline T* CastFound(TLInstance* found)
@@ -273,7 +271,7 @@ void TU802582C4Scene::Update(float fDeltaT)
         TU80300104Event event;
         event.mIndex = pad;
         event.mPosition = fn_802197FC(pad, &valid);
-        fn_802C082C(lbl_806E1E28, pad)->Unidentified24(0x1E, true);
+        lbl_806E1E28->GetPad(pad)->GetButtonIndex(0x1E, true);
         event.mFlag0 = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
         event.mFlag1 = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
 

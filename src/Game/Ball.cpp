@@ -164,10 +164,7 @@ extern "C" void fn_80031A30(cFielder*, int, float);
 extern "C" void fn_80035544(cFielder*);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" bool fn_80038660(cFielder*);
-extern "C" bool fn_8003886C(cFielder*);
-extern "C" void fn_8003CAA8(cFielder*, cPlayer*);
 extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
-extern "C" bool fn_8003E74C(cFielder*);
 extern "C" float fn_800DEFD4(cFielder*);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 extern "C" void fn_80017448(cBall*, float);
@@ -471,7 +468,7 @@ void cBall::CollideWithCharacterCallback(
         bool bReactToHit = true;
         bool bDeflectBall = true;
 
-        bool bInvincible = !fn_8003886C(pCharacterFielder)
+        bool bInvincible = !pCharacterFielder->IsStuck()
             && (pCharacterFielder->muInvincibleStatus & 4) != 0;
         if (!bInvincible)
         {
@@ -710,7 +707,7 @@ void cBall::CollideWithCharacterCallback(
         && pCharacter->m_eClassType == FIELDER)
     {
         cFielder* pCharacterFielder = (cFielder*)pCharacter;
-        fn_8003CAA8(pOwnerFielder, pCharacter);
+        pOwnerFielder->TestCollisionForInvicibility(pCharacterFielder);
 
         if (!pCharacterFielder->IsOnSameTeam(pOwnerFielder))
         {
@@ -721,7 +718,7 @@ void cBall::CollideWithCharacterCallback(
                 nlVector3 v3PhysicsRadialSpot;
                 float fRadius = fn_8002BFA8(
                     fn_8003E6E4(pCharacterFielder),
-                    pCharacter->mUnidentified0A0);
+                    pCharacter->m_fPlayerScale);
                 nlPolarToCartesian(v3PhysicsRadialSpot.x,
                     v3PhysicsRadialSpot.y,
                     pCharacter->m_aActualFacingDirection, fRadius);
@@ -825,9 +822,9 @@ void cBall::CollideWithCharacterCallback(
         else
         {
             if (fn_80038660(pOwnerFielder)
-                && !fn_8003E74C(pOwnerFielder))
+                && !pOwnerFielder->fn_8003E74C())
             {
-                bool bInvincible = !fn_8003886C(pOwnerFielder)
+                bool bInvincible = !pOwnerFielder->IsStuck()
                     && (pOwnerFielder->muInvincibleStatus & 1) != 0;
                 if (!bInvincible)
                 {
@@ -835,9 +832,9 @@ void cBall::CollideWithCharacterCallback(
                 }
             }
             if (fn_80038660(pCharacterFielder)
-                && !fn_8003E74C(pCharacterFielder))
+                && !pCharacterFielder->fn_8003E74C())
             {
-                bool bInvincible = !fn_8003886C(pCharacterFielder)
+                bool bInvincible = !pCharacterFielder->IsStuck()
                     && (pCharacterFielder->muInvincibleStatus & 1) != 0;
                 if (!bInvincible)
                 {

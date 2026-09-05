@@ -4,7 +4,7 @@
 
 #include "Game/Effects/EmissionManager.h"
 #include "Game/GL/GLInventory.h"
-#include "Game/GL/GLMeshWriter.h"
+#include "Game/GL/GLTexturedColourMeshWriter.h"
 #include "Game/GL/GLVertexAnim.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glDraw3.h"
@@ -812,16 +812,22 @@ int ParticleSystem::RenderAllParticles(GLView* view)
     }
     else if (m_pTemplate->m_uModelID != 0xFFFFFFFF)
     {
-        glModel* baseModel = lbl_806E1FFC->GetModel(m_pTemplate->m_uModelID);
+        GLVertexAnim* pAnim = lbl_806E1FFC->GetVertexAnim(m_pTemplate->m_uModelID);
         nlDLListIterator<Particle*> iterator = m_Particles.Begin();
         while (iterator.hasNext())
         {
             Particle* pPart = *iterator;
             iterator.Step();
+            glModel* pModel;
+            if (pAnim == 0)
+            {
+                pModel = glModelDupNoStreams(
+                    lbl_806E1FFC->GetModel(m_pTemplate->m_uModelID),
+                    false,
+                    0);
+            }
             ParticleReturn ret;
-            UpdateParticle(&ret, pPart, m_pTemplate, viewRight, viewUp,
-                pCoord);
-            glModel* pModel = glModelDupNoStreams(baseModel, true, 0);
+            UpdateParticle(&ret, pPart, m_pTemplate, viewRight, viewUp, pCoord);
             nlMatrix4 mRot;
             nlMatrix4 mScale;
             nlMatrix4 m;
@@ -831,6 +837,25 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                 ret.position[1].x, ret.position[1].x);
             nlMultMatrices(m, mScale, mRot);
             m.SetTranslation(ret.position[0]);
+            if (pAnim != 0)
+            {
+                if ((m_pTemplate->mUnidentified037 & 8) != 0)
+                {
+                    float frameFrac = pPart->timeElapsed / pPart->lifeSpan;
+                    float frame = frameFrac * (float)((int)pAnim->m_nNumFrames - 1);
+                    pModel = pAnim->GetModel((int)frame);
+                }
+                else
+                {
+                    float frame = pPart->FPS * pPart->timeElapsed;
+                    float numFrames = (float)(int)pAnim->m_nNumFrames;
+                    while (frame >= numFrames)
+                    {
+                        frame -= numFrames;
+                    }
+                    pModel = pAnim->GetModel((int)frame);
+                }
+            }
             if (m_pTemplate->IsLit() && m_LightingCallback != 0)
                 pModel = m_LightingCallback(pModel);
 
@@ -870,11 +895,17 @@ int ParticleSystem::RenderAllParticles(GLView* view)
     }
     else if (m_Callback == 0)
     {
-        GLMeshWriter mesh;
         bool bQuads = glHasQuads();
-        bool began = mesh.Begin(
-            mUnidentified0BC * (bQuads ? 4 : 6),
-            bQuads ? GLP_QuadList : GLP_TriList, 0);
+        GLTexturedColourMeshWriter mesh;
+        bool began;
+        if (bQuads)
+        {
+            began = mesh.Begin(mUnidentified0BC * 4, GLP_QuadList, 0);
+        }
+        else
+        {
+            began = mesh.Begin(mUnidentified0BC * 6, GLP_TriList, 0);
+        }
         if (began)
         {
             nlDLListIterator<Particle*> iterator = m_Particles.Begin();
@@ -885,13 +916,24 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                 ParticleReturn ret;
                 UpdateParticle(&ret, pPart, m_pTemplate, viewRight,
                     viewUp, pCoord);
-                int count = bQuads ? 4 : 6;
-                for (int i = 0; i < count; ++i)
+                int i;
+                if (bQuads)
                 {
-                    int index = bQuads ? i : _tris[i];
-                    mesh.Texcoord(ret.texcoord[index]);
-                    mesh.Colour(ret.c);
-                    mesh.Vertex(ret.position[index]);
+                    for (i = 0; i < 4; i++)
+                    {
+                        mesh.Texcoord(ret.texcoord[i]);
+                        mesh.Colour(ret.c);
+                        mesh.Vertex(ret.position[i]);
+                    }
+                }
+                else
+                {
+                    for (i = 0; i < 6; i++)
+                    {
+                        mesh.Texcoord(ret.texcoord[_tris[i]]);
+                        mesh.Colour(ret.c);
+                        mesh.Vertex(ret.position[_tris[i]]);
+                    }
                 }
             }
             if (mesh.End())

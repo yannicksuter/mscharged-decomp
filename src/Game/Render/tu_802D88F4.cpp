@@ -5,6 +5,7 @@
 
 #include "Game/MathHelpers.h"
 #include "Game/Render/ImpostorManager.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "Game/tu_802C6224.h"
 #include "NL/glx/GXMaterialCrystalTweaks.h"
 #include "NL/nlDLListContainer.h"
@@ -570,3 +571,5 @@ void UnidentifiedCrowdPointCallback_802D9F64::Place(
     if (boundsMax.z > mLayout->mBoundsMax.z)
         mLayout->mBoundsMax.z = boundsMax.z;
 }
+
+template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

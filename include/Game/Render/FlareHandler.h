@@ -1,7 +1,7 @@
 #ifndef GAME_RENDER_FLARE_HANDLER_H
 #define GAME_RENDER_FLARE_HANDLER_H
 
-#include "Game/GL/GLMeshWriter.h"
+#include "Game/GL/GLTexturedColourMeshWriter.h"
 #include "NL/nlColour.h"
 #include "NL/nlList.h"
 #include "NL/nlMath.h"
@@ -41,7 +41,7 @@ public:
 
     void Initialize(GLView* view);
     void Cleanup();
-    void AddFace(const FlareStruct* pFlare, GLMeshWriter* pMeshWriter);
+    void AddFace(const FlareStruct* pFlare, GLTexturedColourMeshWriter* pMeshWriter);
     void Render();
 
     /* 0x00 */ nlMatrix4 viewMatrix;

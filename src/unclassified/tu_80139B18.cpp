@@ -34,7 +34,7 @@ void UpdateRumbleActions(float dt)
             RumbleActionState* state = &lbl_8056FEB8[padIndex];
             if (state->active != 0)
             {
-                cGlobalPad* pad = fn_802C082C(lbl_806E1E28, padIndex);
+                cGlobalPad* pad = lbl_806E1E28->GetPad(padIndex);
 
                 if (state->pending != 0)
                 {

@@ -1,54 +1,15 @@
-#include <revolution/types.h>
+#include <revolution/so.h>
 
-#define SO_PF_INET 2
-#define SO_SOCK_STREAM 1
-#define SO_SOCK_DGRAM 2
-#define SO_F_GETFL 3
-#define SO_F_SETFL 4
-#define SO_O_NONBLOCK 4
-
-struct SOInAddr
-{
-    u32 addr;
-};
-
-struct SOSockAddrIn
-{
-    u8 len;
-    u8 family;
-    u16 port;
-    SOInAddr addr;
-};
-
-extern "C"
-{
-    int SOSocket2(int pf, int type, int protocol);
-    int SOClose(int socket);
-    int SOBind(int socket, const void* address);
-    int SOConnect(int socket, const void* address);
-    int SORecvFrom(
-        int socket, void* data, int size, int flags, void* address);
-    int SOSendTo(int socket, const void* data, int size, int flags,
-        const void* address);
-    int SOSend(int socket, const void* data, int size, int flags);
-    int SOFcntl(int socket, int command, ...);
-    u16 SONtoHs(u16 value);
-    u16 SOHtoNs(u16 value);
-}
-
-struct TransportSocket
-{
-    int socket;
-};
+#include "NL/plat/TransportSocket.h"
 
 extern "C" void fn_8004F594(int category, const char* format, ...);
 
-extern "C" void fn_80374D68(TransportSocket* transport)
+extern "C" void TransportSocketInitialize(TransportSocket* transport)
 {
     transport->socket = -1;
 }
 
-extern "C" bool fn_80374D74(TransportSocket* transport, bool stream)
+extern "C" bool TransportSocketOpen(TransportSocket* transport, bool stream)
 {
     transport->socket = SOSocket2(
         SO_PF_INET, stream ? SO_SOCK_STREAM : SO_SOCK_DGRAM, 0);
@@ -62,7 +23,7 @@ extern "C" bool fn_80374D74(TransportSocket* transport, bool stream)
     return true;
 }
 
-extern "C" bool fn_80374DF0(TransportSocket* transport, u16 port)
+extern "C" bool TransportSocketBind(TransportSocket* transport, u16 port)
 {
     if (transport->socket == -1)
     {
@@ -90,7 +51,7 @@ extern "C" bool fn_80374DF0(TransportSocket* transport, u16 port)
     return false;
 }
 
-extern "C" void fn_80374EA8(TransportSocket* transport)
+extern "C" void TransportSocketClose(TransportSocket* transport)
 {
     if (transport->socket != -1)
     {
@@ -99,12 +60,12 @@ extern "C" void fn_80374EA8(TransportSocket* transport)
     }
 }
 
-extern "C" bool fn_80374EEC(TransportSocket* transport)
+extern "C" bool TransportSocketIsOpen(TransportSocket* transport)
 {
     return transport->socket != -1;
 }
 
-extern "C" void fn_80374F04(TransportSocket* transport)
+extern "C" void TransportSocketSetNonBlocking(TransportSocket* transport, bool)
 {
     if (transport->socket != -1)
     {
@@ -119,7 +80,7 @@ extern "C" void fn_80374F04(TransportSocket* transport)
     }
 }
 
-extern "C" int fn_80374F84(
+extern "C" int TransportSocketConnect(
     TransportSocket* transport, const u8* host, u16 port)
 {
     if (transport->socket == -1)
@@ -134,7 +95,7 @@ extern "C" int fn_80374F84(
     return SOConnect(transport->socket, &address);
 }
 
-extern "C" int fn_80374FF8(
+extern "C" int TransportSocketSend(
     TransportSocket* transport, const void* data, int size)
 {
     if (transport->socket == -1)
@@ -144,7 +105,7 @@ extern "C" int fn_80374FF8(
     return SOSend(transport->socket, data, size, 0);
 }
 
-extern "C" int fn_80375018(
+extern "C" int TransportSocketBroadcast(
     TransportSocket* transport, const void* data, int size, u16 port)
 {
     if (transport->socket == -1)
@@ -159,7 +120,7 @@ extern "C" int fn_80375018(
     return SOSendTo(transport->socket, data, size, 0, &address);
 }
 
-extern "C" int fn_803750A0(TransportSocket* transport, const void* data,
+extern "C" int TransportSocketSendTo(TransportSocket* transport, const void* data,
     int size, const u8* host, u16 port)
 {
     if (transport->socket == -1)
@@ -174,7 +135,7 @@ extern "C" int fn_803750A0(TransportSocket* transport, const void* data,
     return SOSendTo(transport->socket, data, size, 0, &address);
 }
 
-extern "C" int fn_80375138(TransportSocket* transport, void* data, int size,
+extern "C" int TransportSocketReceiveFrom(TransportSocket* transport, void* data, int size,
     u32* host, u16* port)
 {
     if (transport->socket == -1)

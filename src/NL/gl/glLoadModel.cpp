@@ -55,10 +55,10 @@ void RLGReader::fn_802CA870(nlChunk* chunk)
                                  * *(unsigned long*)(data + 8) * *(unsigned long*)(data + 0x0C);
     model->m_pVertices = (u8*)fn_802CC0A4(vertexDataSize, 3, m_pContext);
     memcpy(model->m_pVertices, vertexData, vertexDataSize);
-    model->m_pModel = (glModel*)m_pContext->m_pInventory->GetMaterialList(
+    model->m_pModel = m_pContext->m_pInventory->GetModel(
         *(unsigned long*)data);
-    m_pContext->m_pInventory->AddModel(
-        *(unsigned long*)data, (glModel*)model);
+    m_pContext->m_pInventory->AddVertexAnim(
+        *(unsigned long*)data, model);
 }
 
 void RLGReader::fn_802CAA00(void* data, unsigned long size)
@@ -103,10 +103,9 @@ void RLGReader::fn_802CAC1C()
     {
         glModel* model = &m_pModels[i];
         if (!glIgnoreDuplicateModels
-            || m_pContext->m_pInventory->GetMaterialList(model->unknown00) == 0)
+            || m_pContext->m_pInventory->GetModel(model->unknown00) == 0)
         {
-            m_pContext->m_pInventory->AddMaterialList(
-                model->unknown00, (GLMaterialList*)model);
+            m_pContext->m_pInventory->AddModel(model->unknown00, model);
         }
     }
 }

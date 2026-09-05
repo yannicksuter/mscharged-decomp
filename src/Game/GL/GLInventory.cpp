@@ -6,6 +6,7 @@
 #include "Game/SHierarchy.h"
 #include "NL/gl/glModel.h"
 #include "NL/glx/glxLoadModel.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/nlMemory.h"
 
 #include <string.h>
@@ -18,7 +19,7 @@ GLInventory::GLInventory()
         m_pFileData[i] = 0;
         m_pSkinData[i] = 0;
         m_pTextureAnims[i] = 0;
-        m_pModels[i] = 0;
+        m_pVertexAnims[i] = 0;
     }
     m_nLevel = 0;
     memset(&m_Unknown000, 0, sizeof(m_Unknown000));
@@ -38,10 +39,10 @@ void GLInventory::ReleaseLevel(int nLevel)
     DeleteFileEntries(m_pFileData[nLevel]->m_Head);
     m_pFileData[nLevel]->Clear();
     m_pSkinData[nLevel]->Release();
-    m_pMaterialLists[nLevel]->Release();
-    m_pTextureAnims[nLevel]->Release();
-    m_pModels[nLevel]->Release();
+    m_pModels[nLevel]->Release(m_Unknown000);
+    m_pTextureAnims[nLevel]->Release(fn_802D3B68);
     m_pVertexAnims[nLevel]->Release();
+    m_Unidentified144[nLevel]->Release(fn_802CDF5C);
 }
 
 GLInventory::~GLInventory()
@@ -52,10 +53,10 @@ GLInventory::~GLInventory()
         ReleaseLevel(i);
         delete m_pFileData[i];
         delete m_pSkinData[i];
-        delete m_pMaterialLists[i];
         delete m_pTextureAnims[i];
-        delete m_pModels[i];
         delete m_pVertexAnims[i];
+        delete m_pModels[i];
+        delete m_Unidentified144[i];
     }
 }
 
@@ -83,38 +84,25 @@ void GLInventory::Create()
         }
         m_pSkinData[i] = pSkinData;
 
-        deleting_GLInventory<GLMaterialList>* pMaterialLists =
-            (deleting_GLInventory<GLMaterialList>*)nlMalloc(
-                sizeof(deleting_GLInventory<GLMaterialList>), 8, false);
-        if (pMaterialLists != 0)
-        {
-            pMaterialLists->m_pItems = new (nlMalloc(
-                sizeof(deleting_GLInventory<GLMaterialList>::Tree), 8, false))
-                deleting_GLInventory<GLMaterialList>::Tree();
-        }
-        m_pMaterialLists[i] = pMaterialLists;
-
-        deleting_GLInventory<GLTextureAnim>* pTextureAnims =
-            (deleting_GLInventory<GLTextureAnim>*)nlMalloc(
-                sizeof(deleting_GLInventory<GLTextureAnim>), 8, false);
-        if (pTextureAnims != 0)
-        {
-            pTextureAnims->m_pItems = new (nlMalloc(
-                sizeof(deleting_GLInventory<GLTextureAnim>::Tree), 8, false))
-                deleting_GLInventory<GLTextureAnim>::Tree();
-        }
-        m_pTextureAnims[i] = pTextureAnims;
-
-        deleting_GLInventory<glModel>* pModels =
-            (deleting_GLInventory<glModel>*)nlMalloc(
-                sizeof(deleting_GLInventory<glModel>), 8, false);
+        UnidentifiedInventory_802D3854<glModel>* pModels = (UnidentifiedInventory_802D3854<glModel>*)nlMalloc(
+            sizeof(UnidentifiedInventory_802D3854<glModel>), 8, false);
         if (pModels != 0)
         {
             pModels->m_pItems = new (nlMalloc(
-                sizeof(deleting_GLInventory<glModel>::Tree), 8, false))
-                deleting_GLInventory<glModel>::Tree();
+                sizeof(UnidentifiedInventory_802D3854<glModel>::Tree), 8, false))
+                UnidentifiedInventory_802D3854<glModel>::Tree();
         }
         m_pModels[i] = pModels;
+
+        UnidentifiedInventory_802D3854<GLTextureAnim>* pTextureAnims = (UnidentifiedInventory_802D3854<GLTextureAnim>*)nlMalloc(
+            sizeof(UnidentifiedInventory_802D3854<GLTextureAnim>), 8, false);
+        if (pTextureAnims != 0)
+        {
+            pTextureAnims->m_pItems = new (nlMalloc(
+                sizeof(UnidentifiedInventory_802D3854<GLTextureAnim>::Tree), 8, false))
+                UnidentifiedInventory_802D3854<GLTextureAnim>::Tree();
+        }
+        m_pTextureAnims[i] = pTextureAnims;
 
         deleting_GLInventory<GLVertexAnim>* pVertexAnims =
             (deleting_GLInventory<GLVertexAnim>*)nlMalloc(
@@ -126,12 +114,22 @@ void GLInventory::Create()
                 deleting_GLInventory<GLVertexAnim>::Tree();
         }
         m_pVertexAnims[i] = pVertexAnims;
+
+        UnidentifiedInventory_802D3854<PlatTexture>* pUnidentified144 = (UnidentifiedInventory_802D3854<PlatTexture>*)nlMalloc(
+            sizeof(UnidentifiedInventory_802D3854<PlatTexture>), 8, false);
+        if (pUnidentified144 != 0)
+        {
+            pUnidentified144->m_pItems = new (nlMalloc(
+                sizeof(UnidentifiedInventory_802D3854<PlatTexture>::Tree), 8, false))
+                UnidentifiedInventory_802D3854<PlatTexture>::Tree();
+        }
+        m_Unidentified144[i] = pUnidentified144;
     }
 }
 
 void GLInventory::fn_802D19C4(void* value)
 {
-    m_Unknown000 = *(void**)value;
+    m_Unknown000 = *(void (**)(glModel*))value;
 }
 
 void GLInventory::ResourceMark()
@@ -148,24 +146,23 @@ void GLInventory::ResourceRelease(int nLevel)
     }
 }
 
-void GLInventory::AddMaterialList(
-    unsigned long key, GLMaterialList* materialList)
+void GLInventory::AddModel(
+    unsigned long key, glModel* model)
 {
     unsigned long k = key;
-    GLMaterialList* value = materialList;
-    deleting_GLInventory<GLMaterialList>::Tree* pItems =
-        m_pMaterialLists[m_nLevel]->m_pItems;
-    pItems->Add(k, value);
+    glModel* value = model;
+    UnidentifiedInventory_802D3854<glModel>::Tree* pTree = m_pModels[m_nLevel]->m_pItems;
+    pTree->Add(k, value);
 }
 
-GLMaterialList* GLInventory::GetMaterialList(unsigned long id)
+glModel* GLInventory::GetModel(unsigned long id)
 {
     for (int i = m_nLevel; i >= 0; i--)
     {
         unsigned long key = id;
-        GLMaterialList** pResult;
-        bool found = m_pMaterialLists[i]->m_pItems->FindGet(key, &pResult);
-        GLMaterialList* result;
+        glModel** pResult;
+        bool found = m_pModels[i]->m_pItems->FindGet(key, &pResult);
+        glModel* result;
         if (found)
             result = *pResult;
         else
@@ -176,23 +173,22 @@ GLMaterialList* GLInventory::GetMaterialList(unsigned long id)
     return 0;
 }
 
-void GLInventory::AddVertexAnim(unsigned long key, GLVertexAnim* vertexAnim)
+void GLInventory::fn_802D2324(unsigned long key, PlatTexture* texture)
 {
     unsigned long k = key;
-    GLVertexAnim* value = vertexAnim;
-    deleting_GLInventory<GLVertexAnim>::Tree* pTree =
-        m_pVertexAnims[m_nLevel]->m_pItems;
+    PlatTexture* value = texture;
+    UnidentifiedInventory_802D3854<PlatTexture>::Tree* pTree = m_Unidentified144[m_nLevel]->m_pItems;
     pTree->Add(k, value);
 }
 
-GLVertexAnim* GLInventory::GetVertexAnim(unsigned long id)
+PlatTexture* GLInventory::fn_802D2370(unsigned long id)
 {
     for (int i = m_nLevel; i >= 0; i--)
     {
         unsigned long key = id;
-        GLVertexAnim** pResult;
-        bool found = m_pVertexAnims[i]->m_pItems->FindGet(key, &pResult);
-        GLVertexAnim* result;
+        PlatTexture** pResult;
+        bool found = m_Unidentified144[i]->m_pItems->FindGet(key, &pResult);
+        PlatTexture* result;
         if (found)
             result = *pResult;
         else
@@ -207,8 +203,7 @@ void GLInventory::AddTextureAnim(unsigned long key, GLTextureAnim* anim)
 {
     unsigned long k = key;
     GLTextureAnim* value = anim;
-    deleting_GLInventory<GLTextureAnim>::Tree* pTree =
-        m_pTextureAnims[m_nLevel]->m_pItems;
+    UnidentifiedInventory_802D3854<GLTextureAnim>::Tree* pTree = m_pTextureAnims[m_nLevel]->m_pItems;
     pTree->Add(k, value);
 }
 
@@ -244,23 +239,22 @@ void Callback_802D254C::fn_802D254C(
     (*anim)->Update(m_Unknown00);
 }
 
-void GLInventory::AddModel(unsigned long key, glModel* model)
+void GLInventory::AddVertexAnim(unsigned long key, GLVertexAnim* vertexAnim)
 {
     unsigned long k = key;
-    glModel* value = model;
-    deleting_GLInventory<glModel>::Tree* pTree =
-        m_pModels[m_nLevel]->m_pItems;
+    GLVertexAnim* value = vertexAnim;
+    deleting_GLInventory<GLVertexAnim>::Tree* pTree = m_pVertexAnims[m_nLevel]->m_pItems;
     pTree->Add(k, value);
 }
 
-glModel* GLInventory::GetModel(unsigned long id)
+GLVertexAnim* GLInventory::GetVertexAnim(unsigned long id)
 {
     for (int i = m_nLevel; i >= 0; i--)
     {
         unsigned long key = id;
-        glModel** pResult;
-        bool found = m_pModels[i]->m_pItems->FindGet(key, &pResult);
-        glModel* result;
+        GLVertexAnim** pResult;
+        bool found = m_pVertexAnims[i]->m_pItems->FindGet(key, &pResult);
+        GLVertexAnim* result;
         if (found)
             result = *pResult;
         else
@@ -274,14 +268,14 @@ glModel* GLInventory::GetModel(unsigned long id)
 class Callback_802D2670
 {
 public:
-    void fn_802D2670(const unsigned long&, glModel** model);
+    void fn_802D2670(const unsigned long&, GLVertexAnim** vertexAnim);
     float m_Unknown00;
 };
 
 void Callback_802D2670::fn_802D2670(
-    const unsigned long&, glModel** model)
+    const unsigned long&, GLVertexAnim** vertexAnim)
 {
-    ((GLVertexAnim*)*model)->Update(m_Unknown00);
+    (*vertexAnim)->Update(m_Unknown00);
 }
 
 void GLInventory::AddSkinData(unsigned long key, nlChunk* skinData)
@@ -319,32 +313,9 @@ GLSkinMesh* GLInventory::MakeSkinMesh(
         }
     };
 
-    struct MaterialListHelper
-    {
-        static inline GLMaterialList* Get(
-            GLInventory* self, unsigned long id)
-        {
-            for (int i = self->m_nLevel; i >= 0; i--)
-            {
-                unsigned long key = id;
-                GLMaterialList** pResult;
-                bool found = self->m_pMaterialLists[i]->m_pItems->FindGet(
-                    key, &pResult);
-                GLMaterialList* result;
-                if (found)
-                    result = *pResult;
-                else
-                    result = 0;
-                if (result != 0)
-                    return result;
-            }
-            return 0;
-        }
-    };
-
     nlChunk* foundChunk = SkinDataHelper::Get(this, hashID);
     nlChunk* pChunk = foundChunk;
-    glModel* pModel = (glModel*)MaterialListHelper::Get(this, hashID);
+    glModel* pModel = GetModel(hashID);
 
     return glx_MakeSkinMesh(pChunk, pModel, hierarchy);
 }
@@ -355,8 +326,7 @@ void GLInventory::Update(float deltaTime)
     callback_802D254C.m_Unknown00 = deltaTime;
     for (int i = m_nLevel; i >= 0; i--)
     {
-        deleting_GLInventory<GLTextureAnim>::Tree* tree =
-            m_pTextureAnims[i]->m_pItems;
+        UnidentifiedInventory_802D3854<GLTextureAnim>::Tree* tree = m_pTextureAnims[i]->m_pItems;
         tree->InorderWalk(tree->m_Root, &callback_802D254C,
             &Callback_802D254C::fn_802D254C);
     }
@@ -365,8 +335,7 @@ void GLInventory::Update(float deltaTime)
     callback_802D2670.m_Unknown00 = deltaTime;
     for (int i = m_nLevel; i >= 0; i--)
     {
-        deleting_GLInventory<glModel>::Tree* tree =
-            m_pModels[i]->m_pItems;
+        deleting_GLInventory<GLVertexAnim>::Tree* tree = m_pVertexAnims[i]->m_pItems;
         tree->InorderWalk(tree->m_Root, &callback_802D2670,
             &Callback_802D2670::fn_802D2670);
     }

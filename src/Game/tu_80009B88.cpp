@@ -42,12 +42,8 @@ extern "C" bool fn_802B3E94(const char* path, LoadAsyncCallback callback,
     void* userData, unsigned int alignment, int allocType,
     unsigned int chunkSize, void* readBuffer0, void* readBuffer1, void*,
     unsigned long param, MemoryAllocator* allocator);
-extern "C" bool fn_802CDD78(void* data, unsigned long size,
-    ResourceInterface_802CC094* allocator, bool);
 extern "C" void fn_802E67E0(void* data, void* nonResidentData,
     ResourceInterface_802CC094* allocator, bool);
-extern "C" void fn_8031B570(void* data, unsigned long size,
-    CharacterPhysicsData* pPhysicsData, bool);
 extern "C" bool fn_80372B4C(const char* filename, LoadAsyncCallback callback,
     void* userData, unsigned int alignment, eAllocType type, void* buffer,
     unsigned long bufferSize, MemoryAllocator* allocator);
@@ -727,7 +723,7 @@ bool CharacterLoader_8056B290::fn_8000AD4C()
 
     CharacterPhysicsData* pPhys = new (nlMalloc(sizeof(CharacterPhysicsData), 8, false)) CharacterPhysicsData();
     mTemplate->pPhysicsData = pPhys;
-    fn_8031B570(mPhysicsData, mPhysicsSize, (CharacterPhysicsData*)mTemplate->pPhysicsData, true);
+    LoadCharacterPhysicsElements(mPhysicsData, mPhysicsSize, (CharacterPhysicsData*)mTemplate->pPhysicsData, true);
     mPhysicsData = 0;
 
     --AllocatorStackDepth;

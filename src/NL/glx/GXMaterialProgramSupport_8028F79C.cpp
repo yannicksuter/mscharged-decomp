@@ -8,7 +8,13 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
 #include "unclassified/tu_801820FC.h"
-#include "unclassified/tu_8036D6F8.h"
+
+struct GXMaterialProgramParameters_80299A90
+{
+    /* 0x00 */ UnidentifiedTextureState texture0;
+    /* 0x08 */ const float (*matrices)[3][4];
+    /* 0x0C */ unsigned long matricesSize;
+}; // size: 0x10
 
 extern bool lbl_806DF050;
 
@@ -43,7 +49,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    fn_802CC978(this, packet, static_cast<const GXMaterialProgramParameters_80299A90*>(packet->unknown20)->texture0.texture);
 }
 
 template <>
@@ -64,9 +70,9 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Draw(
 
     if (packet->unknown28 == 0)
     {
-        const unsigned char* parameters = (const unsigned char*)packet->unknown20;
-        fn_8036D7EC(*(const void**)(parameters + 8),
-            *(const unsigned long*)(parameters + 12) / 48,
+        const GXMaterialProgramParameters_80299A90* parameters = static_cast<const GXMaterialProgramParameters_80299A90*>(packet->unknown20);
+        fn_8036D7EC(parameters->matrices,
+            parameters->matricesSize / 48,
             &modelview,
             0);
     }

@@ -1359,7 +1359,7 @@ void DrawableCharacter::ApplyMaterialEffects(
                 scorchTexture = glGetTexture(CharacterBlackTextureName);
                 TextureManager_802CDF0C* textureManager = fn_802CDF0C();
                 resolvedScorchTexture.value =
-                    fn_802CE1B8(textureManager, scorchTexture);
+                    textureManager->fn_802CE1B8(scorchTexture);
             }
             ApplyTexture(
                 model, scorchTexture, resolvedScorchTexture);

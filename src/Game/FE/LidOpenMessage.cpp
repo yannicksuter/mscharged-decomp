@@ -2285,7 +2285,7 @@ void DisplayDVDMessageSebring(int arg)
 
     for (int i = 0; i < 4; i++)
     {
-        cGlobalPad* pad = fn_802C082C(lbl_806E1E28, i);
+        cGlobalPad* pad = lbl_806E1E28->GetPad(i);
         if (pad != 0)
         {
             fn_8013A0A8(pad);

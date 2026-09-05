@@ -80,7 +80,6 @@ static const LooseBallContactAnimInfo lbl_804DC310[2] = {
     { 0x30, 4.0f, 0xE000, 0x2000 },
 };
 
-extern "C" void fn_80034438(cFielder*);
 extern "C" void fn_8003BA94(cFielder*, float);
 extern "C" void fn_80017EA0(cBall*, cFielder*, nlVector3*, bool);
 extern "C" void fn_80017EC0(cBall*, float);
@@ -91,9 +90,6 @@ extern "C" bool fn_80035F84(cFielder*, nlVector3*, float*, nlVector3*,
 extern "C" bool fn_80036234(cFielder*, nlVector3*, float*, nlVector3*,
     float*, const LooseBallContactAnimInfo*, nlVector3*, unsigned short);
 extern "C" void fn_8004F594(int, const char*, ...);
-extern "C" bool fn_8003E74C(cFielder*);
-extern "C" bool fn_8003E7F8(cFielder*);
-extern "C" bool fn_8003E84C(cFielder*);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" void fn_80016DF8(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);
@@ -304,8 +300,8 @@ extern "C" void fn_800C089C(
     }
 
     bool bSpecialReceive =
-        fn_8003E7F8(pDesire->mUnidentifiedFielder)
-        || fn_8003E84C(pDesire->mUnidentifiedFielder);
+        pDesire->mUnidentifiedFielder->fn_8003E7F8()
+        || pDesire->mUnidentifiedFielder->fn_8003E84C();
     bool bCanOneTouch =
         !(bSpecialReceive
                 && pDesire->mUnidentifiedFielder->m_pBall != 0)
@@ -324,8 +320,8 @@ extern "C" void fn_800C089C(
     pDesire->mbOneTouchShot = true;
     pDesire->mbOneTouchVolley = bVolleyPass;
     bSpecialReceive =
-        fn_8003E7F8(pDesire->mUnidentifiedFielder)
-        || fn_8003E84C(pDesire->mUnidentifiedFielder);
+        pDesire->mUnidentifiedFielder->fn_8003E7F8()
+        || pDesire->mUnidentifiedFielder->fn_8003E84C();
     if (pDesire->meDesireSubState == 4 && !bSpecialReceive)
     {
         pDesire->mbOneTouchShotLate = true;
@@ -383,8 +379,8 @@ extern "C" void fn_800C0AE8(DesireReceivePass* pDesire,
     }
 
     bool bSpecialReceive =
-        fn_8003E7F8(pDesire->mUnidentifiedFielder)
-        || fn_8003E84C(pDesire->mUnidentifiedFielder);
+        pDesire->mUnidentifiedFielder->fn_8003E7F8()
+        || pDesire->mUnidentifiedFielder->fn_8003E84C();
     bool bCanOneTouch =
         !(bSpecialReceive
                 && pDesire->mUnidentifiedFielder->m_pBall != 0)
@@ -417,8 +413,8 @@ extern "C" void fn_800C0AE8(DesireReceivePass* pDesire,
     pDesire->mbOneTouchPass = true;
     pDesire->mpOneTouchPassTarget = pPassTarget;
     bSpecialReceive =
-        fn_8003E7F8(pDesire->mUnidentifiedFielder)
-        || fn_8003E84C(pDesire->mUnidentifiedFielder);
+        pDesire->mUnidentifiedFielder->fn_8003E7F8()
+        || pDesire->mUnidentifiedFielder->fn_8003E84C();
     if (pDesire->meDesireSubState == 4 && !bSpecialReceive)
     {
         return;
@@ -466,7 +462,7 @@ void DesireReceivePass::UnidentifiedCleanup()
 {
     if (mUnidentifiedFielder->m_pBall == 0)
     {
-        fn_80034438(mUnidentifiedFielder);
+        mUnidentifiedFielder->ClearPassTargetIfAmThePassTarget();
     }
 
     mEstimated.Reset();
@@ -1130,8 +1126,8 @@ extern "C" void fn_800C22CC(DesireReceivePass* pDesire,
     int eReceiveAnimType = 2;
     if (bVolleyPass)
     {
-        if (fn_8003E7F8(pPassTarget)
-            || fn_8003E84C(pPassTarget))
+        if (pPassTarget->fn_8003E7F8()
+            || pPassTarget->fn_8003E84C())
         {
             eReceiveAnimType = 16;
         }
@@ -1248,7 +1244,7 @@ extern "C" void fn_800C22CC(DesireReceivePass* pDesire,
         v3PassPosition.z = v3ContactOffsetWorld.z;
         g_pBall->ShootAtFast(
             v3BallVelocity, v3PassPosition, fPassTime);
-        if (!fn_8003E74C(pPassTarget)
+        if (!pPassTarget->fn_8003E74C()
             && v3BallVelocity.z > lbl_806DC19C)
         {
             v3BallVelocity.z = lbl_806DC19C;

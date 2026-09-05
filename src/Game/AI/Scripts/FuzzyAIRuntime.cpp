@@ -40,7 +40,7 @@ struct UnidentifiedRuntimeFielderReference
     cTeam* mTeam;
 };
 
-extern "C" void fn_8002E198();
+extern "C" UnidentifiedFuzzyRuntimeBase* fn_8002E198(cFielder*);
 extern "C" void fn_800A695C();
 extern "C" void fn_80314444();
 extern "C" void fn_803140CC();
@@ -78,9 +78,9 @@ UnidentifiedFuzzyRuntime::~UnidentifiedFuzzyRuntime()
     lbl_8056DBB0.FreeBlocks();
 }
 
-extern "C" void fn_800E30A8()
+extern "C" UnidentifiedFuzzyRuntimeBase* fn_800E30A8(cFielder* pFielder)
 {
-    fn_8002E198();
+    return fn_8002E198(pFielder);
 }
 
 extern "C" void fn_800E30AC()

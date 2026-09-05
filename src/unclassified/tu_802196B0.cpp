@@ -1,3 +1,6 @@
+#include "NL/plat/tu_803648EC.h"
+#include "NL/plat/tu_80364E5C.h"
+
 #include "unclassified/tu_802196B0.h"
 
 #include "Game/FE/feInput.h"
@@ -21,22 +24,19 @@ public:
     /* 0x54 */ int mUnidentified054;
 }; // size 0x58
 
-typedef int (*GetDeviceType)(void* device);
-
 extern TU802FA1C4* lbl_806E2030;
 TLComponentInstance* lbl_80578450[4];
 nlVector2 lbl_80578460[4];
 bool lbl_806E18B4[4];
 extern bool lbl_806E18B8;
 extern bool g_bEnableGamecubePadMonkey;
-extern void* lbl_806E2478;
 extern int lbl_806E227C;
 extern int lbl_806E228C;
 extern unsigned int nlDefaultSeed;
 
 extern "C" bool fn_80273B00();
-extern "C" void fn_80375DF8(void* owner, int index, bool value);
-extern "C" bool fn_80375E04(void* owner, int index);
+extern "C" void fn_80375DF8(PlatPadManager* owner, int index, bool value);
+extern "C" bool fn_80375E04(PlatPadManager* owner, int index);
 
 UnidentifiedTask_802196B0::UnidentifiedTask_802196B0()
 {
@@ -73,9 +73,8 @@ extern "C" nlVector2 fn_802197FC(int pad, u8* valid)
 
 extern "C" nlVector2 fn_80219824(int pad, u16* angle, u8* valid)
 {
-    cGlobalPad* globalPad = fn_802C082C(lbl_806E1E28, pad);
-    void* device = *reinterpret_cast<void**>(
-        reinterpret_cast<u8*>(globalPad) + 0x1C);
+    cGlobalPad* globalPad = lbl_806E1E28->GetPad(pad);
+    PadBackend* device = globalPad->mBackend;
     nlVector2 position;
     nlVec2Set(position, 0.0f, 0.0f);
 
@@ -103,22 +102,14 @@ extern "C" nlVector2 fn_80219824(int pad, u16* angle, u8* valid)
     }
 
     UnidentifiedPointerData* data = 0;
-    if (reinterpret_cast<GetDeviceType>(
-            (*reinterpret_cast<void***>(device))[0x50 / sizeof(void*)])(device)
-        == lbl_806E228C)
+    if (device->UnidentifiedClassID() == lbl_806E228C)
     {
-        data = reinterpret_cast<UnidentifiedPointerData*>(
-            *reinterpret_cast<u8**>(reinterpret_cast<u8*>(globalPad) + 0x1C)
-            + 0x1D0);
+        data = &static_cast<Class_80364E5C*>(globalPad->mBackend)->mUnidentified1D0;
     }
     else if (!lbl_806E18B8
-             && reinterpret_cast<GetDeviceType>(
-                    (*reinterpret_cast<void***>(device))[0x50 / sizeof(void*)])(device)
-                    == lbl_806E227C)
+             && device->UnidentifiedClassID() == lbl_806E227C)
     {
-        data = reinterpret_cast<UnidentifiedPointerData*>(
-            *reinterpret_cast<u8**>(reinterpret_cast<u8*>(globalPad) + 0x1C)
-            + 0x1B0);
+        data = &static_cast<Class_803648EC*>(globalPad->mBackend)->mUnidentified1B0;
     }
 
     if (data != 0 && g_pFEInput->IsConnected((eFEINPUT_PAD)pad))
@@ -159,7 +150,7 @@ void UnidentifiedTask_802196B0::Run(float)
 {
     for (int i = 0; i < 4; ++i)
     {
-        if (fn_802C082C(lbl_806E1E28, i) != 0
+        if (lbl_806E1E28->GetPad(i) != 0
             && !fn_80375E04(lbl_806E2478, i))
         {
             fn_80375DF8(lbl_806E2478, i, true);
@@ -173,10 +164,8 @@ extern "C" void fn_80219E08(int, nlColour)
 
 extern "C" bool fn_80219E0C(int index)
 {
-    cGlobalPad* globalPad = fn_802C082C(lbl_806E1E28, index);
-    void* device = *reinterpret_cast<void**>(
-        reinterpret_cast<u8*>(globalPad) + 0x1C);
-    int type = reinterpret_cast<GetDeviceType>(
-        (*reinterpret_cast<void***>(device))[0x50 / sizeof(void*)])(device);
+    cGlobalPad* globalPad = lbl_806E1E28->GetPad(index);
+    PadBackend* device = globalPad->mBackend;
+    int type = device->UnidentifiedClassID();
     return type == lbl_806E228C;
 }

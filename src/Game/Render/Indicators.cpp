@@ -57,10 +57,6 @@ extern "C"
     bool fn_8001E184(cPlayer* pCharacter);
     bool fn_800387CC(cPlayer* pCharacter);
     IndicatorPlayerTweaks* fn_8003E6E4(cPlayer* pCharacter);
-    void fn_802CE528(GLView* view, const nlVector3* world, nlVector3* projected);
-    void fn_802CE6DC(GLView* view, const nlVector3* normalized, nlVector3* screen);
-    float fn_802CE76C(GLView* view);
-    void fn_802CEA40(GLView* source, GLView* destination, const nlVector3* world, nlVector3* projected);
 }
 
 static float s_fOverheadSize = 35.0f;
@@ -367,7 +363,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
         }
 
         nlVector3 projectedPos;
-        fn_802CE528(GetLayerView(eCLV_Unshadowed), &worldPos, &projectedPos);
+        glViewProjectPoint(GetLayerView(eCLV_Unshadowed), worldPos, projectedPos);
         ((IndicatorPlayerState*)pCharacter)->mScreenPosition = projectedPos;
 
         bool sameMachine = false;
@@ -457,7 +453,7 @@ static void UpdateAndRenderPlayerIndicators(float)
             }
             fVerticalOffset
                 = *fn_8003E6E4(pCharacter)->fPhysCapsuleHeight * 0.5f
-                * pCharacter->mUnidentified0A0;
+                * pCharacter->m_fPlayerScale;
         }
         else
         {

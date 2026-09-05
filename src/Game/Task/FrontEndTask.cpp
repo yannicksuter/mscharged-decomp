@@ -185,7 +185,7 @@ void FrontEndTask::HandleE3IdleReset(float fDeltaT)
 
     for (int i = 0; i < 4; i++)
     {
-        cGlobalPad* pad = fn_802C082C(lbl_806E1E28, i);
+        cGlobalPad* pad = lbl_806E1E28->GetPad(i);
         if (!pad->IsConnected())
         {
             continue;
@@ -257,7 +257,7 @@ void FrontEndTask::HandleSoftReset(float fDeltaT)
 
     for (int i = 0; i < 4; i++)
     {
-        cGlobalPad* pad = fn_802C082C(lbl_806E1E28, i);
+        cGlobalPad* pad = lbl_806E1E28->GetPad(i);
         if (!pad->IsConnected())
         {
             continue;

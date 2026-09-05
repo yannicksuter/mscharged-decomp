@@ -10,7 +10,6 @@
 #include <stddef.h>
 
 extern "C" void fn_80098098(cFielder*);
-extern "C" void fn_80040368(cFielder*);
 extern "C" void fn_80095870(cFielder*);
 extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002C254(PlayerTweaks*);
@@ -85,7 +84,7 @@ void DesireUserControlled::UnidentifiedUpdate(
         if (mUnidentifiedFielder->m_eActionState == ACTION_NEED_ACTION
             || mUnidentifiedFielder->m_eActionState == ACTION_WAIT)
         {
-            fn_80040368(mUnidentifiedFielder);
+            mUnidentifiedFielder->StartRunning();
         }
 
         fn_80095870(mUnidentifiedFielder);

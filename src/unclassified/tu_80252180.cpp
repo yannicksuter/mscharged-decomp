@@ -11,6 +11,7 @@
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
 #include "Game/Render/Presentation.h"
+#include "NL/globalpad.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlColour.h"
 #include "NL/nlPrint.h"
@@ -20,7 +21,6 @@
 
 struct PlatPadManager;
 
-extern void* lbl_806E1E28;
 extern PlatPadManager* lbl_806E2478;
 extern TLComponentInstance* lbl_80578450[4];
 extern TLComponentInstance lbl_80580030;
@@ -59,7 +59,6 @@ extern "C"
         InlineHasher level2 = InlineHasher(0UL), InlineHasher level3 = InlineHasher(0UL),
         InlineHasher level4 = InlineHasher(0UL), InlineHasher level5 = InlineHasher(0UL),
         InlineHasher level6 = InlineHasher(0UL));
-    void* fn_802C082C(void* manager, int index);
     void fn_80375DF8(PlatPadManager* manager, int channel, bool enabled);
     void fn_802547E8(TU80252180Scene* scene, int value);
     void fn_80254084(int index, TLComponentInstance* component);
@@ -89,7 +88,7 @@ TU80252180Scene::TU80252180Scene()
 
     for (int channel = 0; channel < 4; ++channel)
     {
-        if (fn_802C082C(lbl_806E1E28, channel) != 0)
+        if (lbl_806E1E28->GetPad(channel) != 0)
         {
             fn_80375DF8(lbl_806E2478, channel, true);
         }
@@ -100,7 +99,7 @@ TU80252180Scene::~TU80252180Scene()
 {
     for (int channel = 0; channel < 4; ++channel)
     {
-        if (fn_802C082C(lbl_806E1E28, channel) != 0)
+        if (lbl_806E1E28->GetPad(channel) != 0)
         {
             fn_80375DF8(lbl_806E2478, channel, false);
         }
@@ -239,7 +238,7 @@ extern "C" void fn_80253284(bool value)
         {
             for (int channel = 0; channel < 4; ++channel)
             {
-                if (fn_802C082C(lbl_806E1E28, channel) != 0)
+                if (lbl_806E1E28->GetPad(channel) != 0)
                 {
                     fn_80375DF8(lbl_806E2478, channel, true);
                 }
@@ -249,7 +248,7 @@ extern "C" void fn_80253284(bool value)
         {
             for (int channel = 0; channel < 4; ++channel)
             {
-                if (fn_802C082C(lbl_806E1E28, channel) != 0)
+                if (lbl_806E1E28->GetPad(channel) != 0)
                 {
                     fn_80375DF8(lbl_806E2478, channel, false);
                 }

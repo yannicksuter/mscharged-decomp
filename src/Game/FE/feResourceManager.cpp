@@ -35,7 +35,6 @@ extern unsigned int AllocatorStackDepth;
 extern void* lbl_806E2090;
 extern int nlPrintf(const char* format, ...);
 
-extern "C" unsigned int fn_802A95C4(AVLTreeNode* node, unsigned int count);
 extern "C" void* fn_80307260(void* manager, unsigned long hashID);
 
 static nlAVLTreeSlotPool<unsigned long, FEResourceHandle*, DefaultKeyCompare<unsigned long> > s_loadedResourceList(0x200, 0);
@@ -124,7 +123,7 @@ void FEResourceManager::fn_802FC9C4(void* buffer, unsigned long uReadSize, unsig
     s_pResourceLoadBuffer = (unsigned char*)buffer;
     ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
     fn_802C8284(pTextureResource->m_hashID);
-    void* texture = glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
+    glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
     fn_802C8288();
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;
@@ -188,7 +187,7 @@ void FEResourceManager::Cleanup()
         s_pOnDemandBundle = 0;
     }
 
-    if (fn_802A95C4((AVLTreeNode*)s_loadedResourceList.m_Root, 0) != 0)
+    if (s_loadedResourceList.fn_802A95C4((AVLTreeNode*)s_loadedResourceList.m_Root, 0) != 0)
     {
         nlPrintf("FEResourceManager: Warning! Manager being destroyed while resources are still loaded!\n");
         nlPrintf("                   Did all the scenes get popped before destroying the FEResourceManager?\n");
@@ -281,7 +280,7 @@ void FEResourceManager::LoadPermanentTextures()
                 s_pPermanentBundle->ReadFileByIndex(i, s_pResourceLoadBuffer, uFileLength);
                 ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
                 fn_802C8284(pTextureResource->m_hashID);
-                void* texture = glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uFileLength, resourceInterface);
+                glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uFileLength, resourceInterface);
                 fn_802C8288();
                 delete[] s_pResourceLoadBuffer;
                 s_pResourceLoadBuffer = 0;
@@ -414,7 +413,7 @@ void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSi
     FETextureResource* pHandle = (FETextureResource*)uParam;
     ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
     fn_802C8284(pHandle->m_hashID);
-    void* texture = glTextureAdd(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
+    glTextureAdd(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
     fn_802C8288();
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;

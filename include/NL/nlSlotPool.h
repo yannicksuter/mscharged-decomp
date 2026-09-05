@@ -73,7 +73,7 @@ public:
     {
         m_Delta = delta;
         m_Initial = initial;
-        if (m_Initial == 0)
+        if (m_Delta == 0)
         {
             SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
         }

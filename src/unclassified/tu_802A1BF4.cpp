@@ -1,3 +1,5 @@
+#include "NL/gl/glPlat.h"
+
 #include "Game/GL/ModelWriter_802A1BF4.h"
 
 #include "Game/GL/tu_802D38A4.h"
@@ -6,7 +8,6 @@
 extern "C" void* fn_802CC0A4(
     unsigned long size, int memoryType, void* allocator);
 extern "C" void* fn_802CC0A8(unsigned long size, int memoryType);
-extern "C" void fn_8036E438(glModelPacket* packet, bool allocated);
 extern "C" void DCStoreRangeNoSync(const void* address, u32 size);
 extern "C" void PPCSync();
 
@@ -124,7 +125,7 @@ extern "C" bool fn_802A1E00(ModelWriter_802A1BF4* writer)
     for (; i < writer->model->numPackets; ++i)
     {
         glModelPacket* packet = writer->model->packets + i;
-        fn_8036E438(packet, writer->allocator != 0);
+        glplatFinalizePacket(packet, writer->allocator != 0, writer->allocator);
     }
 
     i = 0;

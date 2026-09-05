@@ -5,6 +5,9 @@
 #include "NL/nlArrayAllocator.h"
 #include "types.h"
 
+extern "C" int fn_802C03FC(int button);
+extern "C" int fn_802C06C8(int buttonIndex);
+
 class PadBackend
 {
 public:
@@ -31,8 +34,18 @@ public:
     virtual bool RumbleActive();
     virtual void StartRumble(float duration, float intensity, float frequency);
     virtual void StopRumble();
-    virtual void Update(float dt);
+    virtual void Update(float deltaTime);
     virtual int UnidentifiedClassID();
+
+    void DisableLeftAnalogToDPadMap()
+    {
+        m_isLeftAnalogToDPadMapEnabled = false;
+    }
+
+    void EnableLeftAnalogToDPadMap()
+    {
+        m_isLeftAnalogToDPadMapEnabled = true;
+    }
 
     /* 0x04 */ int m_padIndex;
     /* 0x08 */ nlPolar m_polarAnalogLeft;

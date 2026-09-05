@@ -1,5 +1,6 @@
 #include "Game/Render/FlareHandler.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
 
@@ -28,7 +29,7 @@ void FlareHandler::Cleanup()
 }
 
 void FlareHandler::AddFace(
-    const FlareStruct* pFlare, GLMeshWriter* pMeshWriter)
+    const FlareStruct* pFlare, GLTexturedColourMeshWriter* pMeshWriter)
 {
     float sn;
     float cs;
@@ -107,7 +108,7 @@ void FlareHandler::Render()
 
         if (halos.m_pStart != 0)
         {
-            GLMeshWriter writer;
+            GLTexturedColourMeshWriter writer;
             int count = 0;
             FlareStruct* halo = halos.m_pStart;
             while (halo != 0)
@@ -144,7 +145,7 @@ void FlareHandler::Render()
 
         if (glows.m_pStart != 0)
         {
-            GLMeshWriter writer;
+            GLTexturedColourMeshWriter writer;
             int count = 0;
             FlareStruct* glow = glows.m_pStart;
             while (glow != 0)
@@ -180,3 +181,5 @@ void FlareHandler::Render()
         }
     }
 }
+
+template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

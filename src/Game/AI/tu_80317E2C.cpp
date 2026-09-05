@@ -70,8 +70,7 @@ extern "C" UnidentifiedFielderInput* fn_80317E2C(
 extern "C" bool fn_80317E34(
     const UnidentifiedStateTransition* transition)
 {
-    return transition->mUnidentifiedFunction != 0
-        || (u32)(transition->mUnidentifiedHash + 0x10000) != 0xFFFF;
+    return !transition->UnidentifiedIsUnset();
 }
 
 extern "C" bool fn_80317E60(

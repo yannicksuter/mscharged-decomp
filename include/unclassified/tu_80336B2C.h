@@ -2,6 +2,7 @@
 #define UNCLASSIFIED_TU_80336B2C_H
 
 #include "types.h"
+#include "NL/nlBufferedWriter.h"
 
 class cGlobalPad;
 class DetInput;
@@ -21,7 +22,7 @@ struct UnidentifiedNetGameState
     /* 0x05 */ char mFileName[0x64];
     /* 0x69 */ u8 mPadding069[3];
     /* 0x6C */ void* mDebugFile;
-    /* 0x70 */ u8 mWriter[0x18];
+    /* 0x70 */ nlBufferedWriter mWriter;
     /* 0x88 */ void* mFile;
     /* 0x8C */ u8 mReader[0x40];
     /* 0xCC */ u32 mConfigSize;

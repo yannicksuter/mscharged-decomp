@@ -18,19 +18,6 @@ extern "C"
     int fn_8004F594(int channel, const char* format, ...);
     int DWC_SendUnreliable(u8 aid, const void* buffer, int size);
     long SOGetHostID();
-
-    void fn_80374D68(UnidentifiedDatagramSocket* socket);
-    bool fn_80374D74(UnidentifiedDatagramSocket* socket, bool stream);
-    bool fn_80374DF0(UnidentifiedDatagramSocket* socket, u16 port);
-    void fn_80374EA8(UnidentifiedDatagramSocket* socket);
-    bool fn_80374EEC(UnidentifiedDatagramSocket* socket);
-    void fn_80374F04(UnidentifiedDatagramSocket* socket, bool blocking);
-    int fn_80375018(UnidentifiedDatagramSocket* socket, void* buffer,
-        int size, u16 port);
-    int fn_803750A0(UnidentifiedDatagramSocket* socket, void* buffer,
-        int size, const u8* address, u16 port);
-    int fn_80375138(UnidentifiedDatagramSocket* socket, void* buffer,
-        int size, u32* address, u16* port);
 }
 
 int g_nLocalDirectPort = 1000;
@@ -48,8 +35,8 @@ NetworkSocket_801246E4::NetworkSocket_801246E4()
     mConnectionEnabled = false;
     mVersionWord = 0;
     mListener = 0;
-    fn_80374D68(&mBroadcastSocket);
-    fn_80374D68(&mDirectSocket);
+    TransportSocketInitialize(&mBroadcastSocket);
+    TransportSocketInitialize(&mDirectSocket);
     mHasLocalAddress = false;
     sInstance = this;
 }
@@ -122,7 +109,7 @@ int NetworkSocket_801246E4::SendDatagram(
 {
     if (mDirectMode)
     {
-        return fn_803750A0(&mDirectSocket, buffer, size, address, port);
+        return TransportSocketSendTo(&mDirectSocket, buffer, size, address, port);
     }
 
     int aid = address[3];
@@ -148,17 +135,17 @@ void NetworkSocket_801246E4::Initialize(
     if (mDirectMode)
     {
         bool started = false;
-        if (!fn_80374D74(&mDirectSocket, false))
+        if (!TransportSocketOpen(&mDirectSocket, false))
         {
             fn_8004F594(0x10, "Direct socket open error\n");
         }
-        else if (!fn_80374DF0(&mDirectSocket, (u16)g_nLocalDirectPort))
+        else if (!TransportSocketBind(&mDirectSocket, (u16)g_nLocalDirectPort))
         {
             fn_8004F594(0x10, "Direct sock bind failed\n");
         }
         else
         {
-            fn_80374F04(&mDirectSocket, false);
+            TransportSocketSetNonBlocking(&mDirectSocket, false);
             started = true;
         }
 
@@ -187,7 +174,7 @@ void NetworkSocket_801246E4::Shutdown()
         fn_80324828(&mReliableSocket);
         if (mDirectMode)
         {
-            fn_80374EA8(&mDirectSocket);
+            TransportSocketClose(&mDirectSocket);
         }
         mInitialized = false;
     }
@@ -199,31 +186,31 @@ void NetworkSocket_801246E4::Shutdown()
 
 void NetworkSocket_801246E4::SetBroadcastEnabled(bool enabled)
 {
-    if (!enabled && fn_80374EEC(&mBroadcastSocket))
+    if (!enabled && TransportSocketIsOpen(&mBroadcastSocket))
     {
-        fn_80374EA8(&mBroadcastSocket);
+        TransportSocketClose(&mBroadcastSocket);
     }
 
-    if (enabled && !fn_80374EEC(&mBroadcastSocket))
+    if (enabled && !TransportSocketIsOpen(&mBroadcastSocket))
     {
-        if (!fn_80374D74(&mBroadcastSocket, false))
+        if (!TransportSocketOpen(&mBroadcastSocket, false))
         {
             fn_8004F594(0x10, "Broadcast socket open error\n");
         }
-        else if (!fn_80374DF0(&mBroadcastSocket, 1001))
+        else if (!TransportSocketBind(&mBroadcastSocket, 1001))
         {
             fn_8004F594(0x10, "Broadcast socket bind failed\n");
         }
         else
         {
-            fn_80374F04(&mBroadcastSocket, false);
+            TransportSocketSetNonBlocking(&mBroadcastSocket, false);
         }
     }
 }
 
 void NetworkSocket_801246E4::SendBroadcast(void* buffer, int size)
 {
-    if (!fn_80374EEC(&mBroadcastSocket))
+    if (!TransportSocketIsOpen(&mBroadcastSocket))
     {
         fn_8004F594(0x10,
             "Broadcast ignored because broadcast is currently turned off.\n");
@@ -232,7 +219,7 @@ void NetworkSocket_801246E4::SendBroadcast(void* buffer, int size)
 
     memcpy(mPacketBuffer, &mVersionWord, sizeof(mVersionWord));
     memcpy(mPacketBuffer + sizeof(mVersionWord), buffer, size);
-    fn_80375018(&mBroadcastSocket, mPacketBuffer,
+    TransportSocketBroadcast(&mBroadcastSocket, mPacketBuffer,
         size + sizeof(mVersionWord), 1001);
 }
 
@@ -305,9 +292,9 @@ void NetworkSocket_801246E4::Update(float)
 
     if (mDirectMode)
     {
-        if (fn_80374EEC(&mBroadcastSocket))
+        if (TransportSocketIsOpen(&mBroadcastSocket))
         {
-            int received = fn_80375138(
+            int received = TransportSocketReceiveFrom(
                 &mBroadcastSocket, mPacketBuffer, sizeof(mPacketBuffer), 0, 0);
             if (received > 0 && (u32)received >= sizeof(mVersionWord)
                 && memcmp(mPacketBuffer, &mVersionWord,
@@ -320,14 +307,14 @@ void NetworkSocket_801246E4::Update(float)
             }
         }
 
-        if (fn_80374EEC(&mDirectSocket))
+        if (TransportSocketIsOpen(&mDirectSocket))
         {
             int received;
             do
             {
                 u32 address;
                 u16 port;
-                received = fn_80375138(&mDirectSocket, mPacketBuffer,
+                received = TransportSocketReceiveFrom(&mDirectSocket, mPacketBuffer,
                     sizeof(mPacketBuffer), &address, &port);
                 if (received > 0)
                 {
@@ -352,7 +339,7 @@ void NetworkSocket_801246E4::ReceiveUnreliable(
     fn_80325264(&mReliableSocket, buffer, size, address, 0);
 }
 
-void NetworkSocket_801246E4::SocketVirtual44(void* a, void* b, bool c)
+void NetworkSocket_801246E4::SocketVirtual44(int a, int* b, bool c)
 {
     if (mInitialized)
     {

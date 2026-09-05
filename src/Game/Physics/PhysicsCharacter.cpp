@@ -19,13 +19,7 @@ extern PhysicsWorld* g_PhysicsWorld;
 
 extern "C" void fn_8013F854(const char*, ...);
 extern "C" int strcmpi(const char*, const char*);
-extern "C" bool fn_800344DC(cFielder*, const nlVector3*);
-extern "C" bool fn_800345EC(cFielder*, cFielder*);
-extern "C" bool fn_80034894(cFielder*, cFielder*);
-extern "C" bool fn_8003886C(cFielder*);
-extern "C" bool fn_8003E74C(cCharacter*);
 extern "C" bool fn_8003E948(cFielder*);
-extern "C" bool fn_800976F8(cFielder*, float);
 extern void* lbl_806E1608;
 
 struct CollisionPlayerBallData
@@ -36,17 +30,8 @@ struct CollisionPlayerBallData
     PhysicsBoneID boneID;
 };
 
-struct CollisionPlayerPlayerData
-{
-    cPlayer* player1;
-    cPlayer* player2;
-    nlVector3 velocity1;
-    nlVector3 velocity2;
-};
-
 extern SlotPool<CollisionPlayerWallData> lbl_80571348;
 extern SlotPool<CollisionPlayerBallData> lbl_805714D8;
-extern SlotPool<CollisionPlayerPlayerData> lbl_80571258;
 extern "C" void fn_80145F18(CollisionPlayerWallData*);
 extern "C" void fn_801462DC(CollisionPlayerBallData*);
 extern "C" void fn_80145DD0(CollisionPlayerPlayerData*);
@@ -343,7 +328,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 && *(void**)((char*)fielder + 0x254) == 0)
             {
                 fn_8013F854("PhysChar Fallen down not on fire\n");
-                if (fn_800345EC(ball->GetOwnerFielder(), fielder)
+                if (ball->GetOwnerFielder()->fn_800345EC(fielder)
                     || fielder->m_eAnimID == 0x76)
                 {
                     fn_8013F854("PhysChar Electro1200\n");
@@ -359,7 +344,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 return ONE_WAY_CONTACT_OTHER;
             }
 
-            bool invincible = !fn_8003886C(fielder)
+            bool invincible = !fielder->IsStuck()
                            && (fielder->muInvincibleStatus & 1) != 0;
             if (invincible)
             {
@@ -371,7 +356,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 fn_8013F854("PhysChar IsInvincibleCharsDirect\n");
                 return ONE_WAY_CONTACT_THIS;
             }
-            if (fn_8003886C(fielder))
+            if (fielder->IsStuck())
             {
                 fn_8013F854("PhysChar IsStuck\n");
                 return ONE_WAY_CONTACT_OTHER;
@@ -429,7 +414,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                                ->GetJointPosition(ReadS32(thisPlayer, 0xD8))
                                .z
                          + 0.25f;
-            if (fn_800976F8((cFielder*)otherPlayer, height))
+            if (((cFielder*)otherPlayer)->IsCharacterInAir(height))
                 return NO_CONTACT;
         }
         else if (thisPlayer->m_eClassType == FIELDER
@@ -440,7 +425,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                                ->GetJointPosition(ReadS32(otherPlayer, 0xD8))
                                .z
                          + 0.25f;
-            if (fn_800976F8((cFielder*)thisPlayer, height))
+            if (((cFielder*)thisPlayer)->IsCharacterInAir(height))
                 return NO_CONTACT;
         }
         else if (thisPlayer->m_eClassType == FIELDER
@@ -450,36 +435,36 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             cFielder* fielder = (cFielder*)thisPlayer;
             cFielder* otherFielder = (cFielder*)otherPlayer;
 
-            if (fn_800345EC(fielder, otherFielder)
-                || fn_800345EC(otherFielder, fielder))
+            if (fielder->fn_800345EC(otherFielder)
+                || otherFielder->fn_800345EC(fielder))
             {
                 return NO_CONTACT;
             }
 
-            bool invincible = !fn_8003886C(fielder)
+            bool invincible = !fielder->IsStuck()
                            && (fielder->muInvincibleStatus & 1) != 0;
             if (invincible
                 || fn_800344DC(fielder, &otherFielder->m_v3Position)
-                || fn_8003886C(fielder)
+                || fielder->IsStuck()
                 || (fn_8003E948(fielder) && ReadBool(fielder, 0x3DC)))
             {
                 contactType = ONE_WAY_CONTACT_OTHER;
             }
             else
             {
-                invincible = !fn_8003886C(otherFielder)
+                invincible = !otherFielder->IsStuck()
                           && (otherFielder->muInvincibleStatus & 1) != 0;
                 if (invincible
                     || fn_800344DC(otherFielder, &fielder->m_v3Position)
-                    || fn_8003886C(otherFielder))
+                    || otherFielder->IsStuck())
                 {
                     contactType = ONE_WAY_CONTACT_THIS;
                 }
-                else if (fn_80034894(fielder, otherFielder))
+                else if (fielder->fn_80034894(otherFielder))
                 {
                     contactType = ONE_WAY_CONTACT_OTHER;
                 }
-                else if (fn_80034894(otherFielder, fielder))
+                else if (otherFielder->fn_80034894(fielder))
                 {
                     contactType = ONE_WAY_CONTACT_THIS;
                 }
@@ -639,7 +624,7 @@ void PhysicsCharacter::PostUpdate()
     }
 
     if (m_pAICharacter->m_eClassType == FIELDER
-        && fn_8003E74C(m_pAICharacter))
+        && ((cFielder*)m_pAICharacter)->fn_8003E74C())
     {
         float goalLine = cField::GetGoalLineX(1U) - radius;
         position.x = Clamp(position.x, -goalLine, goalLine);

@@ -34,13 +34,6 @@ struct UnidentifiedInterpreterStorage
     /* 0x0C */ TweakValueIntImpl_804FD898* unknown_0x0C;
     /* 0x10 */ TweakValueImpl_804F4DC8* unknown_0x10;
     /* 0x14 */ TweakValueBoolImpl_804F4538* unknown_0x14;
-
-    ~UnidentifiedInterpreterStorage()
-    {
-        delete[] unknown_0x0C;
-        delete[] unknown_0x10;
-        delete[] unknown_0x14;
-    }
 };
 
 extern "C" void fn_802DEE14(InterpreterCore*);
@@ -443,8 +436,15 @@ InterpreterCore::~InterpreterCore()
         unknown_0x10 = 0;
     }
 
-    delete unknown_0x14;
-    unknown_0x14 = 0;
+    if (unknown_0x14 != 0)
+    {
+        UnidentifiedInterpreterStorage* storage = unknown_0x14;
+        delete[] storage->unknown_0x0C;
+        delete[] storage->unknown_0x10;
+        delete[] storage->unknown_0x14;
+        delete storage;
+        unknown_0x14 = 0;
+    }
     nlFree(m_StackSegment);
 }
 
@@ -516,6 +516,21 @@ extern "C" void fn_802DEE14(InterpreterCore* core)
     }
 }
 
+static void RelocateStringReferences(InterpreterCore* core)
+{
+    if (core->m_Header->unknown_0x0C != 0)
+    {
+        core->unknown_0x10 = (u32*)nlMalloc(core->m_Header->unknown_0x0C, 8, false);
+        memcpy(core->unknown_0x10, core->m_Header->unknown_0x38, core->m_Header->unknown_0x0C);
+
+        u32* relocatedValue = core->unknown_0x10;
+        for (unsigned int i = 0; i < core->m_Header->unknown_0x2C; i++)
+        {
+            *relocatedValue += (u32)core->m_Header->m_StringSegment;
+        }
+    }
+}
+
 void InterpreterCore::LoadByteCode(void* data)
 {
     if (unknown_0x10 != 0)
@@ -524,49 +539,34 @@ void InterpreterCore::LoadByteCode(void* data)
         unknown_0x10 = 0;
     }
 
-    delete unknown_0x14;
-    unknown_0x14 = 0;
-
-    ByteCodeHeader* header = (ByteCodeHeader*)data;
-    m_Header = header;
-    if (header->m_CodeSegment == 0)
+    if (unknown_0x14 != 0)
     {
-        u32 numFunctions = header->numFunctions;
-        u32 size08 = header->unknown_0x08;
-        u32 size0C = header->unknown_0x0C;
-        u32 size10 = header->unknown_0x10;
-        u32 size14 = header->unknown_0x14;
-        FunctionEntryPoint* functionTable = (FunctionEntryPoint*)(header + 1);
-        u8* segment34 = (u8*)(functionTable + numFunctions);
-        u8* segment38 = segment34 + size08;
-        u32* dataSegment = (u32*)(segment38 + size0C);
-        u16* codeSegment = (u16*)((u8*)dataSegment + size10);
-        u8* stringSegment = (u8*)codeSegment + size14;
+        UnidentifiedInterpreterStorage* storage = unknown_0x14;
+        delete[] storage->unknown_0x0C;
+        delete[] storage->unknown_0x10;
+        delete[] storage->unknown_0x14;
+        delete storage;
+        unknown_0x14 = 0;
+    }
 
-        header->m_FunctionTable = functionTable;
-        header->unknown_0x34 = segment34;
-        header->unknown_0x38 = segment38;
-        header->m_DataSegment = dataSegment;
-        header->m_CodeSegment = codeSegment;
-        header->m_StringSegment = stringSegment;
+    m_Header = (ByteCodeHeader*)data;
+    if (m_Header->m_CodeSegment == 0)
+    {
+        ByteCodeHeader* header = m_Header;
+        header->m_FunctionTable = (FunctionEntryPoint*)(header + 1);
+        header->unknown_0x34 = (u8*)(header->m_FunctionTable + header->numFunctions);
+        header->unknown_0x38 = header->unknown_0x34 + header->unknown_0x08;
+        header->m_DataSegment = (u32*)(header->unknown_0x38 + header->unknown_0x0C);
+        header->m_CodeSegment = (u16*)((u8*)header->m_DataSegment + header->unknown_0x10);
+        header->m_StringSegment = (u8*)header->m_CodeSegment + header->unknown_0x14;
 
         for (unsigned int i = 0; i < m_Header->numFunctions; i++)
         {
-            m_Header->m_FunctionTable[i].offset += (u32)m_Header->m_CodeSegment;
+            m_Header->m_FunctionTable[i].offset = (u32)((u8*)m_Header->m_CodeSegment + m_Header->m_FunctionTable[i].offset);
         }
     }
 
-    if (header->unknown_0x0C != 0)
-    {
-        unknown_0x10 = (u32*)nlMalloc(header->unknown_0x0C, 8, false);
-        memcpy(unknown_0x10, m_Header->unknown_0x38, m_Header->unknown_0x0C);
-
-        u32* relocatedValue = unknown_0x10;
-        for (unsigned int i = 0; i < m_Header->unknown_0x2C; i++)
-        {
-            *relocatedValue += (u32)m_Header->m_StringSegment;
-        }
-    }
+    RelocateStringReferences(this);
 
     fn_802DEE14(this);
     fn_802DEDE8(this);

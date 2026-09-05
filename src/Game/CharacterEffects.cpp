@@ -18,7 +18,7 @@ EffectsTexturing* fxGetTexturing(eEffectsTextureType type)
         && texturing->m_ResolvedTexture.value == 0xFFFF)
     {
         texturing->m_ResolvedTexture.value =
-            fn_802CE1B8(fn_802CDF0C(), texture);
+            fn_802CDF0C()->fn_802CE1B8(texture);
     }
     return texturing;
 }

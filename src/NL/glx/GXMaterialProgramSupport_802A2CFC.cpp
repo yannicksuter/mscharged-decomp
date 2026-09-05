@@ -4,6 +4,15 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlColour.h"
+#include "NL/nlMath.h"
+
+struct GXMaterialProgramParameters_802A5D58
+{
+    /* 0x00 */ UnidentifiedTextureState texture0;
+    /* 0x08 */ nlVector3 values8[3];
+    /* 0x2C */ nlFloatColour values44[3];
+    /* 0x5C */ nlFloatColour value92;
+}; // size: 0x6C
 
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A5D58>::Activate(
@@ -30,17 +39,17 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A5D58>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    fn_802CC978(this, packet, static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->texture0.texture);
 }
 
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A5D58>::Draw(
     const glModelPacket* packet)
 {
-    fn_8036A800(0, (unsigned char*)packet->unknown20 + 8, (unsigned char*)packet->unknown20 + 44);
-    fn_8036A800(1, (unsigned char*)packet->unknown20 + 20, (unsigned char*)packet->unknown20 + 60);
-    fn_8036A800(2, (unsigned char*)packet->unknown20 + 32, (unsigned char*)packet->unknown20 + 76);
-    fn_8036A938((unsigned char*)packet->unknown20 + 92);
+    fn_8036A800(0, &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values8[0], &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values44[0]);
+    fn_8036A800(1, &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values8[1], &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values44[1]);
+    fn_8036A800(2, &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values8[2], &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values44[2]);
+    fn_8036A938(&static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->value92);
 
     static_cast<GXMaterialProgram_802A5D58*>(this)->BindVertexArrays(packet);
     static_cast<GXMaterialProgram_802A5D58*>(this)->BindParameters(packet);

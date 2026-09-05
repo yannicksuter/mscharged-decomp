@@ -201,6 +201,7 @@ extern "C"
     void fn_8035F180(AXVPB*, int);
     void fn_8035F1AC(AXVPB*, bool, unsigned int, bool);
     void fn_8035F24C(AXVPB*, int, int);
+    void fn_8035FC48(nlFile*, void*, unsigned int, unsigned long);
     void fn_80361258(AudioReadState_80361258*, AsyncEntry*);
     void fn_80361308(AudioReadState_80361258*);
     void fn_80361778(nlFile*, void*, unsigned int, unsigned long, ReadAsyncCallback);

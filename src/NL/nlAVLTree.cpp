@@ -499,3 +499,38 @@ AVLTreeNode* AVLTreeUntemplated::RemoveAVLNode(AVLTreeNode** root, void* key)
 
     return deleted;
 }
+
+AVLTreeNode* AVLTreeUntemplated::FindAVLNode(AVLTreeNode* node, void* key) const
+{
+    while (node != 0)
+    {
+        int cmpResult = ((AVLTreeUntemplated*)this)->CompareKey(key, node);
+        if (cmpResult == 0)
+            return node;
+        else if (cmpResult < 0)
+            node = node->left;
+        else
+            node = node->right;
+    }
+    return 0;
+}
+
+unsigned int AVLTreeUntemplated::fn_802A95C4(AVLTreeNode* root, unsigned int count)
+{
+    while (root != 0)
+    {
+        count = fn_802A95C4(root->left, count);
+        ++count;
+        root = root->right;
+    }
+    return count;
+}
+
+void AVLTreeUntemplated::DestroyTree(AVLTreeNode* curr, DeleteCallback cb)
+{
+    if (curr->left != 0)
+        DestroyTree(curr->left, cb);
+    if (curr->right != 0)
+        DestroyTree(curr->right, cb);
+    cb(this, curr);
+}

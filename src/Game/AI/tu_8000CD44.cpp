@@ -19,16 +19,11 @@ extern cTeam* lbl_806E0E00;
 
 extern "C" void fn_8000F594(UnidentifiedAvoidanceObject* pObject);
 extern "C" float fn_80030750(cFielder*);
-extern "C" bool fn_800344B0(cFielder*);
-extern "C" bool fn_8003886C(cFielder*);
 extern "C" unsigned int fn_800387CC(cFielder*);
 extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
-extern "C" bool fn_8003E7F8(cFielder*);
-extern "C" bool fn_8003E84C(cFielder*);
 extern "C" bool fn_8003E8A0(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" bool fn_8003E99C(cFielder*);
-extern "C" bool fn_8003E9F0(cFielder*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
 extern "C" float fn_800D6E54(cFielder*);
 extern "C" float fn_800D9EC4(cPlayer*);
@@ -211,13 +206,13 @@ float UnidentifiedAvoidanceFielder_804F4840::UnidentifiedVirtual18()
     {
         fRadius = 11.0f;
     }
-    else if (fn_8003E9F0(m_pFielder))
+    else if (m_pFielder->fn_8003E9F0())
     {
         fRadius = 11.0f;
     }
     else
     {
-        float fTime = m_pFielder->mUnidentified0A0;
+        float fTime = m_pFielder->m_fPlayerScale;
         float fValue = fn_8002BFA8(fn_8003E6E4(m_pFielder), fTime);
         fRadius = fn_80030750(m_pFielder) - fValue;
     }
@@ -341,7 +336,7 @@ float UnidentifiedAvoidanceFielder_804F4840::UnidentifiedVirtual28(
                 fStrength *= 2.0f;
             }
         }
-        if (fn_8003E8A0(m_pFielder) || fn_8003E9F0(m_pFielder)
+        if (fn_8003E8A0(m_pFielder) || m_pFielder->fn_8003E9F0()
             || fn_8003E99C(m_pFielder))
         {
             cFielder* pTarget = 0;
@@ -400,13 +395,13 @@ float UnidentifiedAvoidanceFielder_804F4840::UnidentifiedVirtual24(
         cFielder* pFielder = m_pFielder;
         cFielder* pOther
             = ((UnidentifiedAvoidanceFielder_804F4840*)other)->m_pFielder;
-        if (!fn_8003886C(pFielder) && (pFielder->muInvincibleStatus & 1))
+        if (!pFielder->IsStuck() && (pFielder->muInvincibleStatus & 1))
         {
             bIgnore = true;
         }
-        if (bIgnore || fn_800344B0(pOther) || fn_800387CC(pOther)
+        if (bIgnore || pOther->fn_800344B0() || fn_800387CC(pOther)
             || (!m_pFielder->IsOnSameTeam(pOther)
-                && (fn_8003E7F8(m_pFielder) || fn_8003E84C(m_pFielder))))
+                && (m_pFielder->fn_8003E7F8() || m_pFielder->fn_8003E84C())))
         {
             return 0.0f;
         }
@@ -418,7 +413,7 @@ float UnidentifiedAvoidanceFielder_804F4840::UnidentifiedVirtual24(
             = ((UnidentifiedAvoidancePowerup_804F47E0*)other)->m_pPowerup;
         cFielder* pFielder = m_pFielder;
         bool bIgnore = false;
-        if (!fn_8003886C(pFielder) && (pFielder->muInvincibleStatus & 8))
+        if (!pFielder->IsStuck() && (pFielder->muInvincibleStatus & 8))
         {
             bIgnore = true;
         }
@@ -442,7 +437,7 @@ float UnidentifiedAvoidanceFielder_804F4840::UnidentifiedVirtual24(
     {
         cFielder* pOther
             = ((UnidentifiedAvoidanceFielder_804F4840*)other)->m_pFielder;
-        if (fn_8003E8A0(pOther) || fn_8003E9F0(pOther))
+        if (fn_8003E8A0(pOther) || pOther->fn_8003E9F0())
         {
             fWeight *= 2.5f;
         }

@@ -16,23 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern "C"
-{
-
-    void fn_80374D68(NetworkStatsSocket* socket);
-    bool fn_80374D74(NetworkStatsSocket* socket, bool stream);
-    bool fn_80374DF0(NetworkStatsSocket* socket, u16 port);
-    void fn_80374EA8(NetworkStatsSocket* socket);
-    bool fn_80374EEC(NetworkStatsSocket* socket);
-    void fn_80374F04(NetworkStatsSocket* socket, bool blocking);
-    int fn_80374F84(
-        NetworkStatsSocket* socket, const u8* address, u16 port);
-    int fn_80374FF8(NetworkStatsSocket* socket, const void* data, int size);
-    int fn_80375138(NetworkStatsSocket* socket, void* data, int size,
-        u32* address, u16* port);
-
-    int fn_8011C1B4();
-}
+extern "C" int fn_8011C1B4();
 
 extern int lbl_806E20E0;
 extern u16 lbl_8058436C[];
@@ -46,7 +30,7 @@ static char sStatsSeparators[] = " \t\r\n:,";
 
 NetworkStatsReporter_8012CE20::NetworkStatsReporter_8012CE20()
 {
-    fn_80374D68(&mSocket);
+    TransportSocketInitialize(&mSocket);
     Reset();
 }
 
@@ -88,7 +72,7 @@ void NetworkStatsReporter_8012CE20::Reset()
 
 void NetworkStatsReporter_8012CE20::Close()
 {
-    fn_80374EA8(&mSocket);
+    TransportSocketClose(&mSocket);
 }
 
 void NetworkStatsReporter_8012CE20::SetListener(
@@ -109,20 +93,20 @@ bool NetworkStatsReporter_8012CE20::ReportGameResult(int,
         return true;
     }
 
-    if (!fn_80374D74(&mSocket, true))
+    if (!TransportSocketOpen(&mSocket, true))
     {
         fn_8004F594(16, "Failed to open Stats TCP Socket");
     }
-    else if (!fn_80374DF0(&mSocket, 1002))
+    else if (!TransportSocketBind(&mSocket, 1002))
     {
         fn_8004F594(16, "Failed to bind Stats TCP Socket");
     }
     else
     {
-        fn_80374F04(&mSocket, false);
+        TransportSocketSetNonBlocking(&mSocket, false);
     }
 
-    if (!fn_80374EEC(&mSocket))
+    if (!TransportSocketIsOpen(&mSocket))
     {
         fn_8004F594(
             16, "Failed to ReportGameResult, TCP Socket not open\n");
@@ -134,7 +118,7 @@ bool NetworkStatsReporter_8012CE20::ReportGameResult(int,
     address[1] = (u8)g_nConnectToStatsAddress[1];
     address[2] = (u8)g_nConnectToStatsAddress[2];
     address[3] = (u8)g_nConnectToStatsAddress[3];
-    int result = fn_80374F84(
+    int result = TransportSocketConnect(
         &mSocket, address, (u16)g_nConnectToStatsPort);
     if (result != -26)
     {
@@ -170,20 +154,20 @@ bool NetworkStatsReporter_8012CE20::GetLeaderboardStats(int category,
     int filter, int limit, NetworkStatsPlayer* players,
     NetworkRankingMeta* metadata)
 {
-    if (!fn_80374D74(&mSocket, true))
+    if (!TransportSocketOpen(&mSocket, true))
     {
         fn_8004F594(16, "Failed to open Stats TCP Socket");
     }
-    else if (!fn_80374DF0(&mSocket, 1002))
+    else if (!TransportSocketBind(&mSocket, 1002))
     {
         fn_8004F594(16, "Failed to bind Stats TCP Socket");
     }
     else
     {
-        fn_80374F04(&mSocket, false);
+        TransportSocketSetNonBlocking(&mSocket, false);
     }
 
-    if (!fn_80374EEC(&mSocket))
+    if (!TransportSocketIsOpen(&mSocket))
     {
         fn_8004F594(
             16, "Failed to Get Leaderboard stats, TCP Socket not open\n");
@@ -200,7 +184,7 @@ bool NetworkStatsReporter_8012CE20::GetLeaderboardStats(int category,
     address[1] = (u8)g_nConnectToStatsAddress[1];
     address[2] = (u8)g_nConnectToStatsAddress[2];
     address[3] = (u8)g_nConnectToStatsAddress[3];
-    int result = fn_80374F84(
+    int result = TransportSocketConnect(
         &mSocket, address, (u16)g_nConnectToStatsPort);
     if (result != -26)
     {
@@ -290,7 +274,7 @@ void NetworkStatsReporter_8012CE20::Update()
         char request[256];
         nlSNPrintf(request, 255,
             "GET /OnlineRankingSimulator/Rankings.py?SimpleFormat=true\r\n\r\n");
-        int result = fn_80374FF8(&mSocket, request, strlen(request));
+        int result = TransportSocketSend(&mSocket, request, strlen(request));
         fn_8004F594(16, "Send Result to Stats Server %d\n", result);
         if (result > 0)
         {
@@ -310,7 +294,7 @@ void NetworkStatsReporter_8012CE20::Update()
     else if (mState == 2)
     {
         char response[1000];
-        int result = fn_80375138(&mSocket, response, 999, 0, 0);
+        int result = TransportSocketReceiveFrom(&mSocket, response, 999, 0, 0);
         if (result <= 0)
         {
             if (result != -6)
@@ -347,7 +331,7 @@ void NetworkStatsReporter_8012CE20::Update()
         nlSNPrintf(request, 255,
             "GET /OnlineRankingSimulator/Rankings.py?yourname=%s&opponentsname=%s&yourscore=%d&opponentsscore=%d HTTP/1.0\r\n\r\n",
             homeName, awayName, mHomeScore, mAwayScore);
-        int result = fn_80374FF8(&mSocket, request, strlen(request));
+        int result = TransportSocketSend(&mSocket, request, strlen(request));
         if (result > 0)
         {
             fn_8004F594(16,

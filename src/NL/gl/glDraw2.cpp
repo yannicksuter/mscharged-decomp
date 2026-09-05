@@ -1,12 +1,14 @@
 #include "NL/gl/glDraw2.h"
 
-#include "Game/GL/GLMeshWriter.h"
+#include "Game/GL/GLTexturedColourMeshWriter.h"
+#include "Game/GL/GLFloatTexturedColourMeshWriter.h"
 #include "NL/platvmath.h"
 #include "NL/nlString.h"
 
 #include "NL/gl/gl.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glModel.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glStruct.h"
 #include "NL/gl/glView.h"
@@ -17,72 +19,7 @@
 static int QuadMap[4] = { 0, 1, 2, 3 };
 static int TriListMap[6] = { 0, 1, 2, 3, 0, 2 };
 
-struct MeshWriter_802A8508;
-
-extern "C"
-{
-    void fn_802A8508(MeshWriter_802A8508*);
-    void* fn_802A8528(MeshWriter_802A8508*, int);
-    bool fn_802A8568(MeshWriter_802A8508*, int, int, void*);
-    bool fn_802A8714(MeshWriter_802A8508*);
-
-    void* fn_802CC0A8(unsigned long, int);
-}
-
 extern u32 lbl_806E1F34;
-
-struct MeshWriter_802A8508
-{
-    int count;
-    glModel* model;
-    void* resource;
-    float* position;
-    float* texcoord;
-    u32* colour;
-
-    bool Begin(int count, int primitive, void* resource)
-    {
-        return fn_802A8568(this, count, primitive, resource);
-    }
-
-    bool End()
-    {
-        return fn_802A8714(this);
-    }
-
-    glModel* GetModel() const
-    {
-        return model;
-    }
-
-    void Colour(const nlColour& c)
-    {
-        *colour++ = *(const u32*)&c;
-    }
-
-    void Texcoord(const nlVector2& uv)
-    {
-        float u;
-        float v;
-        v = uv.y;
-        u = uv.x;
-        *texcoord++ = u;
-        *texcoord++ = v;
-    }
-
-    void TexcoordZero()
-    {
-        *texcoord++ = 0.0f;
-        *texcoord++ = 0.0f;
-    }
-
-    void Vertex(float x, float y, float z)
-    {
-        *position++ = x;
-        *position++ = y;
-        *position++ = z;
-    }
-};
 
 extern "C" glModel* fn_802C834C(glPoly2* pPolys,
     unsigned long numPolys, unsigned long* pMatrixHandle, bool textured);
@@ -95,7 +32,7 @@ bool glPoly2::Attach(
     if (view == 0)
         return false;
 
-    GLMeshWriter writer;
+    GLTexturedColourMeshWriter writer;
     glModel* model = fn_802C834C(this, 1, pMatrixHandle, gl_GetCurrentStateBundle()->texconfig != 0);
     if (model != 0)
         view->AttachModel(model, layer);
@@ -105,7 +42,7 @@ bool glPoly2::Attach(
 extern "C" glModel* fn_802C834C(glPoly2* pPolys,
     unsigned long numPolys, unsigned long* pMatrixHandle, bool textured)
 {
-    GLMeshWriter writer;
+    GLTexturedColourMeshWriter writer;
 
     unsigned long oldMatrix;
     unsigned long numVerts;
@@ -225,7 +162,7 @@ bool glAttachPoly2(GLView* view, int layer, unsigned long numPolys,
     if (model == 0)
         return false;
 
-    void* data = fn_802CC0A8(16, 0);
+    void* data = glFrameAlloc(16, GLM_Header);
     memcpy(data, pUserData, 16);
     glModelPacket* packet = model->packets;
     while (packet < model->packets + model->numPackets)
@@ -240,8 +177,7 @@ bool glAttachPoly2(GLView* view, int layer, unsigned long numPolys,
 extern "C" glModel* fn_802C89F4(glPoly2* pPolys,
     unsigned long numPolys, unsigned long* pMatrixHandle, bool textured)
 {
-    MeshWriter_802A8508 writer;
-    fn_802A8508(&writer);
+    GLFloatTexturedColourMeshWriter writer;
 
     unsigned long oldMatrix;
     unsigned long numVerts;
@@ -325,13 +261,11 @@ extern "C" glModel* fn_802C89F4(glPoly2* pPolys,
 
     if (!writer.End())
     {
-        fn_802A8528(&writer, -1);
         return 0;
     }
 
     glSetCurrentMatrix(oldMatrix);
     glModel* model = writer.GetModel();
-    fn_802A8528(&writer, -1);
     return model;
 }
 

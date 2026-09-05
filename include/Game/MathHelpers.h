@@ -41,4 +41,9 @@ inline float CalculateDistanceSquared(
     return nlGetLengthSquared3D(delta.x, delta.y, delta.z);
 }
 
+static inline u16 abs_ang16(s16 x)
+{
+    return (u16)(x < 0 ? -x : x);
+}
+
 #endif // GAME_MATH_HELPERS_H

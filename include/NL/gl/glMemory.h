@@ -39,8 +39,8 @@ void fn_802CC08C(ResourceInterface_802CC094* resource);
 ResourceInterface_802CC094* fn_802CC094();
 ResourceInterface_802CC094* fn_802CC09C();
 
-// Packet resource release retained in the automatic range after glPlat.
-void fn_8036E4C0(glModelPacket* packet, void* allocator);
+// Platform hook applied after a packet and its material data have been cloned.
+void glplatOnPacketCloned(glModelPacket* packet, void* allocator);
 
 void* glResourceAlloc(
     unsigned long size, eGLMemory memType, void* resource);

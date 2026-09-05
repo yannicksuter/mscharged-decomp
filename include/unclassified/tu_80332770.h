@@ -1,31 +1,11 @@
 #ifndef UNCLASSIFIED_TU_80332770_H
 #define UNCLASSIFIED_TU_80332770_H
 
+#include "Game/DetermDataEvent.h"
 #include "Game/NetworkMessages.h"
 #include "Game/Task/FixedUpdateTaskBase.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
-
-extern SlotPoolBase lbl_805848E8;
-
-// Variable-length deterministic data packet. The first byte is the payload
-// size; the remaining 32 bytes are copied to and from network messages.
-struct DetermDataEvent
-{
-    DetermDataEvent();
-    DetermDataEvent(const void* data, u32 size);
-    ~DetermDataEvent();
-    void operator delete(void* data)
-    {
-        SlotPoolEntry* entry = (SlotPoolEntry*)data;
-        entry->next = lbl_805848E8.m_FreeList;
-        lbl_805848E8.m_FreeList = entry;
-    }
-
-    /* 0x00 */ u8 mSize;
-    /* 0x01 */ u8 mPadding01[3];
-    /* 0x04 */ u8 mData[0x20];
-}; // size: 0x24
 
 struct NetworkMessageInputRecord
 {

@@ -1,21 +1,9 @@
 #include "NL/gl/glTarget.h"
+#include "NL/glx/tu_8036D894.h"
 
 #include "NL/gl/gl.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlString.h"
-
-class TargetPlatform_8036DE50
-{
-public:
-    virtual ~TargetPlatform_8036DE50();
-    virtual void fn_8036D9A0() = 0;
-    virtual void fn_8036D9A8() = 0;
-    virtual void fn_8036D9AC(unsigned long hash) = 0;
-    virtual void fn_8036DBAC(unsigned long hash) = 0;
-};
-
-extern "C" TargetPlatform_8036DE50* fn_8036D894();
-extern "C" TargetPlatform_8036DE50* fn_8036DE50(void* targetInfo);
 
 typedef nlAVLTree<unsigned long, TargetPlatform_8036DE50*, DefaultKeyCompare<unsigned long> > TargetTree;
 
@@ -35,7 +23,7 @@ static inline GLRenderPair FindTarget(unsigned long hash)
     return GLRenderPair(0, 0);
 }
 
-static inline GLRenderPair CreateTarget(unsigned long& hash, void* targetInfo)
+static inline GLRenderPair CreateTarget(unsigned long& hash, const TargetInfo_8036DE50* targetInfo)
 {
     TargetPlatform_8036DE50* platformTarget = fn_8036DE50(targetInfo);
     if (platformTarget != 0)
@@ -63,7 +51,7 @@ extern "C" GLRenderPair fn_802CD82C()
     return GetBackBufferTarget();
 }
 
-extern "C" GLRenderPair fn_802CD884(const char* name, void* targetInfo)
+extern "C" GLRenderPair fn_802CD884(const char* name, const TargetInfo_8036DE50* targetInfo)
 {
     fn_802C8280(name);
 

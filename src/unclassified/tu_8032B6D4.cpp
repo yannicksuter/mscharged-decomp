@@ -1,4 +1,6 @@
 #include "Game/NetworkMessages.h"
+#include "Game/NetworkRandom_803236CC.h"
+#include "NL/blowfish.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "NL/nlTicker.h"
@@ -17,17 +19,12 @@ extern const char lbl_8053241C[];
 extern const char lbl_80532454[];
 extern const char lbl_80532480[];
 SlotPool<UnidentifiedNetworkMessageStorage_8032C66C> lbl_80584840(15, 0);
-void* lbl_806E20F8;
+CBlowFish* lbl_806E20F8;
 extern u8 lbl_806DF708[8];
 
 extern "C"
 {
     int fn_8004F594(int channel, const char* format, ...);
-    u32 fn_803236CC();
-    void* fn_80322924(void* memory);
-    void fn_80322D40(void* codec, const void* key, unsigned int size);
-    void fn_803232BC(
-        void* codec, const void* input, void* output, unsigned int size);
 }
 
 UnidentifiedTransportMessage_8032B6D4::UnidentifiedTransportMessage_8032B6D4()
@@ -474,13 +471,9 @@ void UnidentifiedKeepAlive_8032C528::Serialize(
 
 extern "C" void fn_8032C59C()
 {
-    void* codec = nlMalloc(8, 8, false);
-    if (codec != 0)
-    {
-        codec = fn_80322924(codec);
-    }
+    CBlowFish* codec = new (8, false) CBlowFish;
     lbl_806E20F8 = codec;
-    fn_80322D40(codec, lbl_806DF708, 8);
+    codec->Initialize(lbl_806DF708, 8);
 }
 
 extern "C" void fn_8032C5E4(u32* values)
@@ -495,9 +488,9 @@ extern "C" void fn_8032C5E4(u32* values)
     } while (byteOffset < 0x20);
 }
 
-extern "C" void fn_8032C630(void* output, const void* input)
+extern "C" void fn_8032C630(unsigned char* output, unsigned char* input)
 {
-    fn_803232BC(lbl_806E20F8, input, output, 0x20);
+    lbl_806E20F8->Encode(input, output, 0x20);
 }
 
 extern "C" bool fn_8032C640(const void* first, const void* second)

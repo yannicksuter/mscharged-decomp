@@ -17,6 +17,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "NL/plat/nlFlash.h"
 
 #include <string.h>
 #include <wchar.h>
@@ -62,19 +63,6 @@ struct TPLPalette
 
 extern "C" void TPLBind(TPLPalette* palette);
 
-typedef void (*NANDResultCallback)(s32 result);
-
-extern "C" s32 fn_80376934(s32 directory, NANDResultCallback callback);
-extern "C" s32 fn_80376B08(const char* name, u8 permissions, NANDResultCallback callback);
-extern "C" s32 fn_80376B68(const char* name, u8 permissions, NANDResultCallback callback);
-extern "C" s32 fn_80376BC8(u32 blocks, u32 files, u32* answer, NANDResultCallback callback);
-extern "C" s32 fn_80376C20(const char* name, NANDResultCallback callback);
-extern "C" s32 fn_80376C78(const void* data, u32 size, NANDResultCallback callback);
-extern "C" s32 fn_80376CF8(u32* size, NANDResultCallback callback);
-extern "C" s32 fn_80376D6C(void** data, u32* size, NANDResultCallback callback, bool allocate);
-extern "C" s32 fn_80376E3C(const char* name, s32 mode, NANDResultCallback callback);
-extern "C" s32 fn_80376EB0(NANDResultCallback callback);
-extern "C" bool fn_80376F18();
 
 extern "C" bool fn_802C2C84(const char* path, bool create);
 extern void nlPrintf(const char* format, ...);
@@ -197,7 +185,7 @@ static inline void WriteLocalizedBanner(NANDResultCallback callback)
     memcpy(BannerBuffer->subtitle, comment, wcslen((const wchar_t*)comment) * sizeof(unsigned short));
 
     ResetTask::s_resetPaused = true;
-    SaveLoad::HandleNANDResult(fn_80376C78(BannerBuffer, NAND_BANNER_SIZE(8), callback));
+    SaveLoad::HandleNANDResult(nlFlashWrite(BannerBuffer, NAND_BANNER_SIZE(8), callback));
 }
 
 void SaveLoad::CheckSaveSpace()
@@ -227,7 +215,7 @@ void SaveLoad::CheckSaveSpace()
     }
     saveBlocks = Align32(saveBlocks);
     saveBlocks = (u32)(float)ceil((float)saveBlocks / 16384.0f);
-    HandleNANDResult(fn_80376BC8(saveBlocks + bannerBlocks, files, &CheckAnswer, CheckSaveFileCallback));
+    HandleNANDResult(nlFlashCheck(saveBlocks + bannerBlocks, files, &CheckAnswer, CheckSaveFileCallback));
 
     if (OnlineMode)
     {
@@ -275,7 +263,7 @@ void SaveLoad::BeginReset()
 void SaveLoad::DeleteSaveFile()
 {
     const char* filename = OnlineMode ? OnlineSaveFileName : SaveFileName;
-    s32 result = fn_80376C20(filename, DeleteSaveFileCallback);
+    s32 result = nlFlashDelete(filename, DeleteSaveFileCallback);
     if (result != 0)
     {
         HandleNANDResult(result);
@@ -326,7 +314,7 @@ void SaveLoad::OpenSaveForReadCallback(s32 result)
         }
         size = Align32(size);
         SaveBuffer = nlMalloc(size, 0x20, true);
-        HandleNANDResult(fn_80376D6C(&SaveBuffer, &size, ReadSaveFileCallback, true));
+        HandleNANDResult(nlFlashRead(&SaveBuffer, &size, ReadSaveFileCallback, true));
         return;
     }
 
@@ -364,7 +352,7 @@ void SaveLoad::CheckSaveFileCallback(s32 result)
         {
             ResetTask::s_resetPaused = true;
             const char* filename = OnlineMode ? OnlineSaveFileName : SaveFileName;
-            HandleNANDResult(fn_80376B68(filename, 0x30, CreateSaveFileCallback));
+            HandleNANDResult(nlFlashCreate(filename, 0x30, CreateSaveFileCallback));
         }
         else
         {
@@ -383,7 +371,7 @@ void SaveLoad::CreateSaveFileCallback(s32 result)
     if (result == -6 || result == 0)
     {
         const char* filename = OnlineMode ? OnlineSaveFileName : SaveFileName;
-        HandleNANDResult(fn_80376E3C(filename, 2, OpenSaveForWriteCallback));
+        HandleNANDResult(nlFlashOpen(filename, 2, OpenSaveForWriteCallback));
     }
     else
     {
@@ -400,11 +388,11 @@ void SaveLoad::WriteSaveFileCallback(s32 result)
     u32 expectedSize = Align32(SaveDataSize() + sizeof(SaveFileHeader));
     if ((u32)result == expectedSize)
     {
-        HandleNANDResult(fn_80376EB0(ContinueAfterCloseCallback));
+        HandleNANDResult(nlFlashClose(ContinueAfterCloseCallback));
     }
     else
     {
-        fn_80376EB0(CloseCallback);
+        nlFlashClose(CloseCallback);
         HandleNANDResult(result);
     }
     ResetTask::s_resetPaused = false;
@@ -420,7 +408,7 @@ void SaveLoad::ReadSaveFileCallback(s32 result)
         {
             GameInfoManager::GetInstance()->GetUnknown0xA0();
         }
-        fn_80376EB0(valid ? ContinueAfterCloseCallback : CloseCallback);
+        nlFlashClose(valid ? ContinueAfterCloseCallback : CloseCallback);
         if (OnlineMode)
         {
             OnlineSaveLoaded = true;
@@ -440,7 +428,7 @@ void SaveLoad::ReadSaveFileCallback(s32 result)
         FEPopupMenu* popup = PushSavePopup();
         Function<FnVoidVoid> remove(DeleteSaveFile);
         popup->Create((ePopupMenu)0x45, remove);
-        fn_80376EB0(CloseCallback);
+        nlFlashClose(CloseCallback);
         HandleNANDResult(0);
     }
     else
@@ -453,7 +441,7 @@ void SaveLoad::ReadSaveFileCallback(s32 result)
         {
             NormalSaveLoaded = true;
         }
-        fn_80376EB0(CloseCallback);
+        nlFlashClose(CloseCallback);
         HandleNANDResult(result);
     }
 }
@@ -490,11 +478,11 @@ void SaveLoad::ContinueAfterCloseCallback(s32)
 {
     if (OnlineMode)
     {
-        HandleNANDResult(fn_80376934(0, OpenBannerDirectoryCallback));
+        HandleNANDResult(nlFlashChangeDirectory(0, OpenBannerDirectoryCallback));
     }
     else
     {
-        HandleNANDResult(fn_80376E3C(BannerFileName, 2, OpenBannerCallback));
+        HandleNANDResult(nlFlashOpen(BannerFileName, 2, OpenBannerCallback));
     }
 }
 
@@ -504,7 +492,7 @@ void SaveLoad::StartSaveDirectoryCallback(s32 result)
     {
         BannerOpenMode = 1;
         InOperation = true;
-        HandleNANDResult(fn_80376E3C(BannerFileName, 1, BannerLengthCallback));
+        HandleNANDResult(nlFlashOpen(BannerFileName, 1, BannerLengthCallback));
     }
     else
     {
@@ -518,7 +506,7 @@ void SaveLoad::StartLoadDirectoryCallback(s32 result)
     {
         BannerOpenMode = 0;
         InOperation = true;
-        HandleNANDResult(fn_80376E3C(BannerFileName, 1, BannerLengthCallback));
+        HandleNANDResult(nlFlashOpen(BannerFileName, 1, BannerLengthCallback));
     }
     else
     {
@@ -538,7 +526,7 @@ void SaveLoad::CheckSaveAndBannerSpace()
     u32 saveBlocks = (u32)ceil((float)Align32(
                                    GameInfoManager::GetInstance()->GetMemoryCardDataSize() + sizeof(SaveFileHeader))
                                / 16384.0f);
-    HandleNANDResult(fn_80376BC8(saveBlocks + bannerBlocks, files, &CheckAnswer, CheckNoCopyDirectoryCallback));
+    HandleNANDResult(nlFlashCheck(saveBlocks + bannerBlocks, files, &CheckAnswer, CheckNoCopyDirectoryCallback));
 }
 
 void SaveLoad::ChangeDirectoryCallback(s32 result)
@@ -555,11 +543,11 @@ void SaveLoad::ChangeDirectoryCallback(s32 result)
         const char* filename = OnlineSaveFileName;
         if (BannerOpenMode == 0)
         {
-            HandleNANDResult(fn_80376E3C(filename, 1, OpenSaveForReadCallback));
+            HandleNANDResult(nlFlashOpen(filename, 1, OpenSaveForReadCallback));
         }
         else
         {
-            HandleNANDResult(fn_80376E3C(filename, 2, OpenSaveForWriteCallback));
+            HandleNANDResult(nlFlashOpen(filename, 2, OpenSaveForWriteCallback));
         }
     }
     else
@@ -578,10 +566,10 @@ void SaveLoad::StartSave(bool online)
 
     OnlineMode = online;
     SaveSceneManager = lbl_806E1838 != 0 ? lbl_806E1838 : lbl_806E1860;
-    if (SaveEnabled && !fn_80376F18())
+    if (SaveEnabled && !nlFlashCallbackPending())
     {
         BannerFileExists = false;
-        HandleNANDResult(fn_80376934(0, StartSaveDirectoryCallback));
+        HandleNANDResult(nlFlashChangeDirectory(0, StartSaveDirectoryCallback));
     }
 }
 
@@ -596,11 +584,11 @@ void SaveLoad::StartLoad(bool online)
     OnlineMode = online;
     bool loaded = online ? OnlineSaveLoaded : NormalSaveLoaded;
     SaveSceneManager = lbl_806E1838 != 0 ? lbl_806E1838 : lbl_806E1860;
-    if (SaveEnabled && !loaded && !fn_80376F18())
+    if (SaveEnabled && !loaded && !nlFlashCallbackPending())
     {
         BannerFileExists = false;
         RetryEnabled = true;
-        HandleNANDResult(fn_80376934(0, StartLoadDirectoryCallback));
+        HandleNANDResult(nlFlashChangeDirectory(0, StartLoadDirectoryCallback));
     }
 }
 
@@ -640,7 +628,7 @@ void SaveLoad::WriteSaveData()
     SaveFileHeader* header = (SaveFileHeader*)SaveBuffer;
     header->Size = dataSize;
     header->CRC = nlChecksum32((u8*)SaveBuffer + sizeof(SaveFileHeader), alignedSize - sizeof(SaveFileHeader));
-    HandleNANDResult(fn_80376C78(SaveBuffer, alignedSize, WriteSaveFileCallback));
+    HandleNANDResult(nlFlashWrite(SaveBuffer, alignedSize, WriteSaveFileCallback));
 }
 
 bool SaveLoad::ReadSaveData(u32 size)
@@ -714,7 +702,7 @@ void SaveLoad::OpenBannerCallback(s32 result)
     else
     {
         u32 blocks = (u32)ceil((float)NAND_BANNER_SIZE(8) / 16384.0f);
-        HandleNANDResult(fn_80376BC8(blocks, 1, &CheckAnswer, CheckBannerSpaceCallback));
+        HandleNANDResult(nlFlashCheck(blocks, 1, &CheckAnswer, CheckBannerSpaceCallback));
     }
 }
 
@@ -723,22 +711,22 @@ void SaveLoad::BannerLengthCallback(s32 result)
     if (result == 0 || result == -6)
     {
         BannerFileLength = 0;
-        HandleNANDResult(fn_80376CF8(&BannerFileLength, BannerFileLengthCallback));
+        HandleNANDResult(nlFlashGetLength(&BannerFileLength, BannerFileLengthCallback));
     }
     else
     {
         BannerFileExists = false;
         if (OnlineMode)
         {
-            result = fn_80376934(1, ChangeDirectoryCallback);
+            result = nlFlashChangeDirectory(1, ChangeDirectoryCallback);
         }
         else if (BannerOpenMode == 0)
         {
-            result = fn_80376E3C(SaveFileName, 1, OpenSaveForReadCallback);
+            result = nlFlashOpen(SaveFileName, 1, OpenSaveForReadCallback);
         }
         else
         {
-            result = fn_80376E3C(SaveFileName, 2, OpenSaveForWriteCallback);
+            result = nlFlashOpen(SaveFileName, 2, OpenSaveForWriteCallback);
         }
         HandleNANDResult(result);
     }
@@ -748,16 +736,18 @@ void SaveLoad::BannerFileLengthCallback(s32 result)
 {
     if (result == 0)
     {
+        s32 closeResult;
         if (BannerFileLength == NAND_BANNER_SIZE(8))
         {
+            closeResult = nlFlashClose(BannerCloseCallback);
             BannerFileExists = true;
-            HandleNANDResult(fn_80376EB0(BannerCloseCallback));
         }
         else
         {
             BannerFileExists = false;
-            HandleNANDResult(fn_80376EB0(DeleteInvalidBannerCallback));
+            closeResult = nlFlashClose(DeleteInvalidBannerCallback);
         }
+        HandleNANDResult(closeResult);
     }
     else
     {
@@ -769,7 +759,7 @@ void SaveLoad::DeleteInvalidBannerCallback(s32 result)
 {
     if (result == 0)
     {
-        fn_80376C20(BannerFileName, BannerCloseCallback);
+        nlFlashDelete(BannerFileName, BannerCloseCallback);
     }
     HandleNANDResult(result);
 }
@@ -781,7 +771,7 @@ void SaveLoad::CheckBannerSpaceCallback(s32 result)
         if (CheckAnswer == 0)
         {
             ResetTask::s_resetPaused = true;
-            HandleNANDResult(fn_80376B68(BannerFileName, 0x30, CreateBannerCallback));
+            HandleNANDResult(nlFlashCreate(BannerFileName, 0x30, CreateBannerCallback));
         }
         else
         {
@@ -799,7 +789,7 @@ void SaveLoad::CreateBannerCallback(s32 result)
 {
     if (result == -6 || result == 0)
     {
-        HandleNANDResult(fn_80376E3C(BannerFileName, 2, WriteBannerCallback));
+        HandleNANDResult(nlFlashOpen(BannerFileName, 2, WriteBannerCallback));
     }
     else
     {
@@ -917,7 +907,7 @@ void SaveLoad::RegionBannerLoadedCallback(void* data, unsigned long, void* userD
 void SaveLoad::BannerWriteFinishedCallback(s32)
 {
     ResetTask::s_resetPaused = false;
-    HandleNANDResult(fn_80376EB0(FinishOperation));
+    HandleNANDResult(nlFlashClose(FinishOperation));
 }
 
 void SaveLoad::FinishOperation(s32)
@@ -931,15 +921,15 @@ void SaveLoad::BannerCloseCallback(s32 result)
     {
         if (OnlineMode)
         {
-            result = fn_80376934(1, ChangeDirectoryCallback);
+            result = nlFlashChangeDirectory(1, ChangeDirectoryCallback);
         }
         else if (BannerOpenMode == 0)
         {
-            result = fn_80376E3C(SaveFileName, 1, OpenSaveForReadCallback);
+            result = nlFlashOpen(SaveFileName, 1, OpenSaveForReadCallback);
         }
         else
         {
-            result = fn_80376E3C(SaveFileName, 2, OpenSaveForWriteCallback);
+            result = nlFlashOpen(SaveFileName, 2, OpenSaveForWriteCallback);
         }
     }
     HandleNANDResult(result);
@@ -1002,7 +992,7 @@ void SaveLoad::CheckNoCopyDirectoryCallback(s32 result)
     {
         if (CheckAnswer == 0)
         {
-            HandleNANDResult(fn_80376B08("nocopy", 0x30, CreateNoCopyDirectoryCallback));
+            HandleNANDResult(nlFlashCreateDirectory("nocopy", 0x30, CreateNoCopyDirectoryCallback));
         }
         else
         {
@@ -1020,7 +1010,7 @@ void SaveLoad::CreateNoCopyDirectoryCallback(s32 result)
 {
     if (result == 0)
     {
-        HandleNANDResult(fn_80376934(1, ChangeDirectoryCallback));
+        HandleNANDResult(nlFlashChangeDirectory(1, ChangeDirectoryCallback));
     }
     else
     {
@@ -1032,7 +1022,7 @@ void SaveLoad::OpenBannerDirectoryCallback(s32 result)
 {
     if (result == 0)
     {
-        HandleNANDResult(fn_80376E3C(BannerFileName, 2, OpenBannerCallback));
+        HandleNANDResult(nlFlashOpen(BannerFileName, 2, OpenBannerCallback));
     }
     else
     {

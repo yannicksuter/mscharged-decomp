@@ -2,6 +2,7 @@
 #define GAME_CHARACTER_H
 
 #include "NL/nlMath.h"
+#include "NL/nlTimer.h"
 #include "types.h"
 
 class Blinker;
@@ -20,6 +21,7 @@ class cPoseNode;
 class glModel;
 struct CharacterInfo;
 class RunningChecksum;
+class DebugWriteCache;
 
 enum eCharacterClass
 {
@@ -82,8 +84,9 @@ public:
     virtual void Unknown8(unsigned short aDirection, bool bParam);
     virtual void SetPosition(const nlVector3& position);
     virtual void Update(float fDeltaT);
-    virtual void Unknown10();
-    virtual void Unknown11(void* pParam, void* pParam2);
+    virtual void Unknown10(
+        const nlVector3& v3Position, unsigned short aDirection);
+    virtual void Unknown11(void* context, DebugWriteCache* cache);
     virtual void Unknown12(RunningChecksum* pChecksum);
 
     void SetAnimState(int animID, bool useBlendTime, float nonDefaultBlendTime,
@@ -148,11 +151,12 @@ public:
     /* 0x024 */ eCharacterClass m_eCharacterClass;
     /* 0x028 */ eMovementState m_eMovementState;
     /* 0x02C */ bool m_bFromAnimBlended;
-    /* 0x02D */ u8 unknown_0x02D[0x03];
+    /* 0x02D */ bool m_bOnScreen;
+    /* 0x02E */ u8 unknown_0x02E[0x02];
     /* 0x030 */ nlVector3 m_v3Position;
     /* 0x03C */ nlVector3 m_v3PrevPosition;
     /* 0x048 */ nlVector3 m_v3Velocity;
-    /* 0x054 */ nlVector3 mUnidentified054;
+    /* 0x054 */ nlVector3 m_v3PrevVelocity;
     /* 0x060 */ u16 m_aDesiredFacingDirection;
     /* 0x062 */ u16 m_aActualFacingDirection;
     /* 0x064 */ u16 m_aPrevFacingDirection;
@@ -171,8 +175,11 @@ public:
     /* 0x090 */ s16 m_nAnimTurnAdjust;
     /* 0x092 */ u8 unknown_0x092[0x02];
     /* 0x094 */ nlVector3 m_v3AnimMoveAdjust;
-    /* 0x0A0 */ float mUnidentified0A0;
-    /* 0x0A4 */ u8 unknown_0x0A4[0x14];
+    /* 0x0A0 */ float m_fPlayerScale;
+    /* 0x0A4 */ float m_fMovementScale;
+    /* 0x0A8 */ float m_fDesiredMovementScale;
+    /* 0x0AC */ float m_fDesiredPlayerScale;
+    /* 0x0B0 */ Timer m_tScaleTimer;
     /* 0x0B8 */ cAnimInventory* m_pAnimInventory;
     /* 0x0BC */ cPoseAccumulator* m_pPoseAccumulator;
     /* 0x0C0 */ cPoseNode* m_pPoseTree;

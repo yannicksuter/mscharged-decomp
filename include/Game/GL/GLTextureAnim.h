@@ -5,9 +5,11 @@
 
 struct GLAnimTex
 {
-    /* 0x00 */ u32 textureHandle;
+    /* 0x00 */ unsigned long textureHandle;
     /* 0x04 */ f32 time;
 };
+
+class ResourceInterface_802CC094;
 
 class GLTextureAnim
 {
@@ -36,5 +38,11 @@ public:
     /* 0x1C */ f32 m_currentTime;
     /* 0x20 */ GLAnimTex* m_frames;
 };
+
+extern "C" GLTextureAnim* fn_802D0758(unsigned long texture);
+extern "C" bool fn_802D3A08(const void* data, unsigned long size);
+extern "C" void fn_802D3A34(const void* data, unsigned long size,
+    ResourceInterface_802CC094* resource);
+extern "C" void fn_802D3B68(GLTextureAnim* anim);
 
 #endif // GAME_GL_GLTEXTUREANIM_H

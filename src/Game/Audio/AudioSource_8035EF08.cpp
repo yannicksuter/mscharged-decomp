@@ -2,6 +2,7 @@
 
 #include "Game/Audio/AudioBackend_8035B8E8.h"
 #include "Game/Audio/Plat3dSoundSrc.h"
+#include "NL/nlFileGC.h"
 #include "NL/nlMath.h"
 #include "NL/nlRing.h"
 #include "revolution/mix.h"
@@ -20,9 +21,6 @@ SlotPool<AudioReadQueueEntry_80361258> lbl_80585C98(32, 16);
 
 extern void* lbl_806E21E8;
 extern "C" void fn_8035CA84();
-extern "C" bool fn_80367B70(AsyncEntry*);
-extern "C" bool fn_80367DAC(AsyncEntry*,
-    void (*)(nlFile*, void*, unsigned int, unsigned long, ReadAsyncCallback));
 
 extern "C" void fn_8035EF08(AXVPB* voice, float value)
 {
@@ -321,6 +319,19 @@ void AudioStreamChannel_8035FA38::fn_8035FAE0(AudioStreamHeader_8035FAE0* header
     AXSetVoiceType(m_Unknown04, AX_VOICE_STREAM);
     AXSetVoiceAddr(m_Unknown04, &addr);
     AXSetVoiceAdpcm(m_Unknown04, &adpcm);
+}
+
+extern "C" void fn_8035FC48(nlFile*, void*, unsigned int, unsigned long userParam)
+{
+    AudioReadState_80361258* state = ((AudioStreamChannel_8035FA38*)userParam)->m_Unknown00;
+    --state->m_Unknown20_00;
+
+    AudioReadQueueEntry_80361258* entry = state->m_Unknown24->m_next;
+    if (entry == state->m_Unknown24)
+        state->m_Unknown24 = 0;
+    else
+        state->m_Unknown24->m_next = entry->m_next;
+    lbl_80585C98.Free(entry);
 }
 
 void AudioStreamChannel_8035FA38::fn_8035FCC0(void* pointer)

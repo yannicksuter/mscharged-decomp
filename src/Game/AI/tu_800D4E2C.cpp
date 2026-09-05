@@ -38,9 +38,7 @@ extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
 extern "C" float fn_800D85F8(cFielder*);
 extern "C" float fn_800D9EC4(cPlayer*);
 extern "C" float fn_800DF74C(cTeam*);
-extern "C" bool fn_800344B0(cFielder*);
 extern "C" unsigned int fn_800387CC(cFielder*);
-extern "C" void fn_80040368(cFielder*);
 extern "C" void fn_800D2074();
 
 extern bool lbl_806E0C50;
@@ -364,7 +362,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual3(float deltaTime)
     UnidentifiedScriptMachine::UnidentifiedVirtual3(deltaTime);
     if (GetFielder()->m_eActionState == ACTION_NEED_ACTION)
     {
-        fn_80040368(GetFielder());
+        GetFielder()->StartRunning();
     }
 }
 
@@ -410,7 +408,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
             if ((outOfBoundsFielder->m_v3Position.x > 20.6f
                     || outOfBoundsFielder->m_v3Position.x < -20.6f)
                 && !fn_800D9EC4(outOfBoundsFielder)
-                && !fn_800344B0(outOfBoundsFielder)
+                && !outOfBoundsFielder->fn_800344B0()
                 && !fn_800387CC(outOfBoundsFielder))
             {
                 shouldRunToTarget = true;
@@ -501,7 +499,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual6()
  */
 void UnidentifiedFielderDesireMachine::UnidentifiedVirtual8()
 {
-    fn_80040368(GetFielder());
+    GetFielder()->StartRunning();
 }
 
 /**

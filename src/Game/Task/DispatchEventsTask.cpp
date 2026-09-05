@@ -1,4 +1,5 @@
 #include "Game/Task/DispatchEventsTask.h"
+#include "Game/EventDispatcher.inl"
 
 #include "NL/nlMemory.h"
 

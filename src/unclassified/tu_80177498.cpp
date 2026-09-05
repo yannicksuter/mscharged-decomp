@@ -540,13 +540,13 @@ extern "C" void fn_801793D8(EmissionController& rController)
 
 extern "C" void fn_80179490(cFielder* pParam)
 {
-    pParam->mUnidentified400->fn_80178968(
+    pParam->mUnidentified3F8.mUnidentified08->fn_80178968(
         pParam, lbl_806DCB10, lbl_806DCB14);
 }
 
 extern "C" void fn_801794A4(cFielder* pParam)
 {
-    WaluigiWallManager_80178400* pManager = pParam->mUnidentified400;
+    WaluigiWallManager_80178400* pManager = pParam->mUnidentified3F8.mUnidentified08;
     PhysicsBox_80177498* pObject = pManager->mUnidentified050;
     if (pObject != 0)
     {
@@ -578,7 +578,7 @@ extern "C" void fn_801794A4(cFielder* pParam)
 
 extern "C" void fn_80179580(cFielder* pParam)
 {
-    WaluigiWallManager_80178400* pManager = pParam->mUnidentified400;
+    WaluigiWallManager_80178400* pManager = pParam->mUnidentified3F8.mUnidentified08;
     PhysicsBox_80177498* pObject = pManager->mUnidentified050;
     if (pObject != 0)
     {
@@ -621,9 +621,9 @@ extern "C" void fn_80179670(void*)
         for (int nFielder = 0; nFielder < 4; ++nFielder)
         {
             cFielder* pFielder = pTeam->GetFielder(nFielder);
-            if (pFielder != 0 && pFielder->mUnidentified400 != 0)
+            if (pFielder != 0 && pFielder->mUnidentified3F8.mUnidentified08 != 0)
             {
-                pFielder->mUnidentified400->fn_80178D0C();
+                pFielder->mUnidentified3F8.mUnidentified08->fn_80178D0C();
             }
         }
     }

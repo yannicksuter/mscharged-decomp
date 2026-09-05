@@ -26,13 +26,13 @@ enum GLViewSortMode
 class GLViewInterface
 {
 public:
-    virtual void GetViewMatrix(nlMatrix4&);
-    virtual void GetProjectionMatrix(nlMatrix4&);
-    virtual void GetInverseViewMatrix(nlMatrix4&);
-    virtual void GetViewProjectionMatrix(nlMatrix4&);
+    virtual void GetViewMatrix(nlMatrix4&) const;
+    virtual void GetProjectionMatrix(nlMatrix4&) const;
+    virtual void GetInverseViewMatrix(nlMatrix4&) const;
+    virtual void GetViewProjectionMatrix(nlMatrix4&) const;
     virtual const nlMatrix4* GetViewMatrix() const;
     virtual const nlMatrix4* GetProjectionMatrix() const;
-    virtual const nlVector4* GetShadowMatrix()
+    virtual const nlVector4* GetShadowMatrix() const
     {
         return 0;
     }
@@ -128,5 +128,13 @@ extern "C" GLViewInterface lbl_806E1F38;
 extern "C" GLView lbl_8057F250;
 
 void glViewCompact();
+void glViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v3NDC);
+extern "C" void fn_802CE6DC(GLView* view, const nlVector3* normalized, nlVector3* screen);
+extern "C" float fn_802CE76C(GLView* view);
+float fn_802CE7B0(GLView* view);
+extern "C" void fn_802CE7F4(GLView* view, const nlVector3* world, nlVector3* screen);
+extern "C" void fn_802CEA40(GLView* source, GLView* destination, const nlVector3* world, nlVector3* projected);
+void gl_ViewReset();
+void gl_ViewStartup();
 
 #endif // NL_GL_GLVIEW_H

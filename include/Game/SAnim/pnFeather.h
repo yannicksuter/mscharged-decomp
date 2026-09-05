@@ -16,14 +16,17 @@ class cPN_Feather : public cPoseNode
 public:
     cPN_Feather(
         cSHierarchy* hierarchy,
-        void (*weightTableCallback)(unsigned int, cPN_Feather*),
+        void (*callback)(unsigned int, cPN_Feather*),
         unsigned int callbackParam);
     virtual ~cPN_Feather();
     virtual void Evaluate(
         int nodeIndex, float weight, cPoseAccumulator* accumulator) const;
     virtual void Evaluate(float weight, cPoseAccumulator* accumulator) const;
     virtual cPoseNode* Update(float dt);
-    virtual int GetType();
+    virtual int GetType()
+    {
+        return 1;
+    }
     virtual void BlendRootTrans(nlVector3* outBase, float weight, float* scratch);
     virtual void BlendRootRot(u16* outRot, float weight, float* scratch);
 

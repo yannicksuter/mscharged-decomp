@@ -1,4 +1,5 @@
 #include "Game/AI/Desire.h"
+#include "Game/AI/Fielder.h"
 #include "Game/AI/FielderInput.h"
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/TeamPlayMachine.h"
@@ -8,7 +9,6 @@
 extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void fn_80098098(cFielder*);
 extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
-extern "C" void fn_80040368(cFielder*);
 
 float lbl_806DC04C = 60.0f;
 float lbl_806DC050 = 0.3f;
@@ -174,7 +174,7 @@ void DesireGetOpen::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 bool DesireGetInPosition::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    fn_80040368(mUnidentifiedFielder);
+    mUnidentifiedFielder->StartRunning();
     return result;
 }
 
@@ -194,7 +194,7 @@ void DesireGetInPosition::UnidentifiedVirtual8(void* field, DebugWriteCache* cac
 bool DesireRunUpfield::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    fn_80040368(mUnidentifiedFielder);
+    mUnidentifiedFielder->StartRunning();
     return result;
 }
 
@@ -214,7 +214,7 @@ void DesireRunUpfield::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 bool DesireRunDownfield::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    fn_80040368(mUnidentifiedFielder);
+    mUnidentifiedFielder->StartRunning();
     return result;
 }
 

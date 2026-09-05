@@ -103,7 +103,7 @@ cDebugCamera::cDebugCamera(bool bUnidentified)
     m_matView.SetIdentity();
     Update(0.0f);
 
-    m_pPad = fn_802C082C(lbl_806E1E28, 0);
+    m_pPad = lbl_806E1E28->GetPad(0);
     mUnidentified8E = true;
 }
 
@@ -279,7 +279,7 @@ void cDebugCamera::Update(float dt)
 
     if (!g_bTweaking && !IsProfiling())
     {
-        m_pPad = fn_802C082C(lbl_806E1E28, 0);
+        m_pPad = lbl_806E1E28->GetPad(0);
 
         float yPressure = m_pPad->GetPressure(3, true);
         float xPressure = m_pPad->GetPressure(2, true);

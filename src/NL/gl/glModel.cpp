@@ -140,7 +140,7 @@ glModel* glModelDupArrayNoStreams(
 
             memcpy(data, source, dataSize);
             packet->unknown20 = data;
-            fn_8036E4C0(
+            glplatOnPacketCloned(
                 (glModelPacket*)((u8*)dst_model->packets + packetOffset),
                 pAllocator);
 

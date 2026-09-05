@@ -14,6 +14,8 @@ public:
         Init(mem, count);
     }
 
+    ~nlArrayAllocator() { }
+
     void Init(T* mem, unsigned long count)
     {
         m_pFree = mem;

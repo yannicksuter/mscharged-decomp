@@ -9,6 +9,7 @@
 
 class cTeam;
 class cBall;
+class cFielder;
 class InterpreterCore;
 class UnidentifiedScriptMachine;
 class UnidentifiedFielderInput;
@@ -206,6 +207,7 @@ extern BasicSlotPool<UnidentifiedActionQueue> lbl_80584228;
 extern BasicSlotPool<UnidentifiedVariant_80054AB8> lbl_805842C8;
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80054AB8(InterpreterCore*, const char*, cTeam*);
+extern "C" UnidentifiedVariant_80054AB8 fn_80041AFC(InterpreterCore*, const char*, cFielder*);
 
 inline void UnidentifiedFuzzyVariantData::operator delete(void* entry)
 {

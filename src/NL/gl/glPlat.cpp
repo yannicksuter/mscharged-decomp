@@ -3,6 +3,7 @@
 #include "NL/gl/tu_80364020.h"
 
 #include "NL/glx/glxGX.h"
+#include "NL/glx/tu_8036D894.h"
 #include "NL/glx/glxMemory.h"
 #include "NL/glx/glxSend.h"
 #include "NL/glx/glxSwap.h"
@@ -10,26 +11,6 @@
 #include "NL/nlFunction.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
-
-struct PlatformViewport
-{
-    s32 x;
-    s32 y;
-    s32 width;
-    s32 height;
-};
-
-class PlatformRenderTarget
-{
-public:
-    virtual void Reserved0() = 0;
-    virtual void Begin(unsigned long mode) = 0;
-    virtual void Reserved2() = 0;
-    virtual void Reserved3() = 0;
-    virtual void Reserved4() = 0;
-    virtual void Reserved5() = 0;
-    virtual void Configure(bool flag0, bool flag1, bool flag2) = 0;
-};
 
 class PlatformStartupObject
 {
@@ -102,10 +83,8 @@ extern "C"
     void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
     void* fn_80372B30(u32 size, s32 arena);
     void fn_8004F594(s32 category, const char* format, ...);
-    void fn_8036D89C();
 
     void fn_802CB848(Function2<bool, PlatformStartupEntry&, PlatformStartupEntry&>* callback);
-    void fn_8036DF24(PlatformRenderTarget* target, bool flag0, bool flag1);
 
     extern GXRenderModeObj GXNtsc480IntDf;
     extern GXRenderModeObj lbl_8053BC6C;
@@ -384,7 +363,7 @@ extern "C" PlatformViewport* fn_80369A30()
 
 static void glx_SendViews()
 {
-    PlatformRenderTarget* target;
+    TargetPlatform_8036DE50* target;
     GLView* view;
 
     glx_viewport.x = 0;
@@ -406,8 +385,8 @@ static void glx_SendViews()
         if (view->m_ViewportWidth != 0 && view->m_ViewportHeight != 0)
         {
             GLRenderPair renderPair = view->GetRenderPair();
-            target = (PlatformRenderTarget*)renderPair.target;
-            target->Begin(0);
+            target = renderPair.target;
+            target->fn_8036D9A0(0);
 
             glx_viewport.x = view->m_ViewportX;
             glx_viewport.y = view->m_ViewportY;
@@ -433,7 +412,7 @@ static void glx_SendViews()
                 }
                 if (hasRenderTarget)
                 {
-                    target->Configure(view->m_Unknown33, view->m_ClearColour, view->m_ClearDepth);
+                    target->fn_8036DBCC(view->m_Unknown33, view->m_ClearColour, view->m_ClearDepth);
                 }
             }
 

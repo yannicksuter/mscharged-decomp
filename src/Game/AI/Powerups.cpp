@@ -27,14 +27,12 @@
 extern "C" void fn_802772A4(DrawableObject*);
 extern "C" bool fn_8003877C(cFielder*);
 extern "C" unsigned int fn_800387CC(cFielder*);
-extern "C" bool fn_8003886C(cFielder*);
 extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
 extern "C" void fn_800EBF78(int, unsigned long, const void*, void*, int);
 extern "C" void fn_800EC12C(unsigned long, void*);
 extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
 extern "C" float fn_8002CFF0(PlayerTweaks*);
-extern "C" bool fn_800344B0(cFielder*);
 extern "C" bool fn_800A6764(cTeam*);
 extern "C" void fn_800EDCE8(cPlayer*);
 extern "C" bool fn_8019C988(void*);
@@ -328,7 +326,7 @@ cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)
         pCandidate = pTeam->GetFielder(i);
 
         if (!pCandidate->IsFallenDown()
-            && !fn_8003886C(pCandidate)
+            && !pCandidate->IsStuck()
             && !fn_800387CC(pCandidate))
         {
             fTempScore = pThrower->DoFlashLight(
@@ -1821,7 +1819,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                 }
             }
 
-            bool bInvincible = !fn_8003886C((cFielder*)pCharacter)
+            bool bInvincible = !((cFielder*)pCharacter)->IsStuck()
                             && (((cFielder*)pCharacter)->muInvincibleStatus & 8) != 0;
             if (bInvincible)
             {
@@ -2699,7 +2697,7 @@ void RedShell::SeekTarget()
         return;
     }
 
-    if (!target->mbTangible || fn_800344B0(target))
+    if (!target->mbTangible || target->fn_800344B0())
     {
         m_pTarget = 0;
         return;
@@ -2765,7 +2763,7 @@ void Banana::ThrowAt(cFielder* pThrower)
 {
     nlVector3 v3Unidentified = { 0.0f, 0.0f, 0.0f };
     unsigned short aDirection = pThrower->m_aActualFacingDirection;
-    float fUnidentified = pThrower->mUnidentified0A0;
+    float fUnidentified = pThrower->m_fPlayerScale;
     float fRadius = GetRadius();
     float fUnidentified2 = fn_8002BFA8(
         fn_8003E6E4(pThrower), fUnidentified);

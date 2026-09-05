@@ -16,4 +16,8 @@ struct PlayerAttackData
     /* 0x11 */ u8 mUnidentified11[3];
 }; // total size: 0x14
 
+template <typename T>
+class SlotPool;
+extern "C" SlotPool<PlayerAttackData> lbl_80571960;
+
 #endif // GAME_AI_FIELDERACTIONS_H

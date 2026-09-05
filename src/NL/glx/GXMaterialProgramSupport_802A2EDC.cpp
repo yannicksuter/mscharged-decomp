@@ -6,13 +6,12 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/platvmath.h"
-#include "unclassified/tu_8036D6F8.h"
 
 struct GXMaterialProgramParameters_802A61C8
 {
     /* 0x00 */ unsigned long texture;
     /* 0x04 */ unsigned long padding;
-    /* 0x08 */ void* matrices;
+    /* 0x08 */ const float (*matrices)[3][4];
     /* 0x0C */ unsigned long matricesSize;
 }; // size: 0x10
 

@@ -247,24 +247,24 @@ void PhysicsCharacterBase::AddBoneVolumes(PhysicsWorld* world,
     const CharacterPhysicsData* data, unsigned long categoryBits,
     unsigned long collideBits)
 {
-    for (unsigned int i = 0; i < data->m_ElementCount; ++i)
+    for (unsigned int i = 0; i < data->physicsElementCount; ++i)
     {
-        CharacterPhysicsElement* element = &data->m_Elements[i];
+        CharacterPhysicsElement* element = &data->pPhysicsElements[i];
         PhysicsObject* object = 0;
 
-        switch (element->m_PrimitiveType)
+        switch (element->uPrimitiveType)
         {
         case 1:
             object = new (nlMalloc(sizeof(PhysicsSphereBone), 8, false))
-                PhysicsSphereBone(collisionSpace, world, element->m_Radius);
+                PhysicsSphereBone(collisionSpace, world, element->fRadius);
             break;
         case 2:
             object = new (nlMalloc(sizeof(PhysicsCapsuleBone), 8, false))
-                PhysicsCapsuleBone(collisionSpace, world, element->m_Radius, element->m_Height);
+                PhysicsCapsuleBone(collisionSpace, world, element->fRadius, element->fHeight);
             break;
         case 3:
             object = new (nlMalloc(sizeof(PhysicsCylinderBone), 8, false))
-                PhysicsCylinderBone(collisionSpace, world, element->m_Radius, element->m_Height);
+                PhysicsCylinderBone(collisionSpace, world, element->fRadius, element->fHeight);
             break;
         default:
             continue;
@@ -273,13 +273,13 @@ void PhysicsCharacterBase::AddBoneVolumes(PhysicsWorld* world,
         object->SetCategory(categoryBits);
         object->SetCollide(collideBits);
 
-        unsigned int parentNodeIndex = pose->m_BaseSHierarchy->GetNodeIndexByID(element->m_ParentHashID);
+        unsigned int parentNodeIndex = pose->m_BaseSHierarchy->GetNodeIndexByID(element->uParentHashID);
         int transformHandle = AddObject(object);
-        PhysicsBoneID id = ResolvePhysicsBoneIDFromName(element->m_Name);
-        PhysicsBoneVolume* volume = AddBoneVolume(object, parentNodeIndex, transformHandle, element->m_LocalToParent, id);
+        PhysicsBoneID id = ResolvePhysicsBoneIDFromName(element->szName);
+        PhysicsBoneVolume* volume = AddBoneVolume(object, parentNodeIndex, transformHandle, element->matLocalToParent, id);
         m_BoneVolumes.AddEntry(volume);
 
-        switch (element->m_PrimitiveType)
+        switch (element->uPrimitiveType)
         {
         case 1:
             ((PhysicsSphereBone*)object)->m_pBoneVolume = volume;

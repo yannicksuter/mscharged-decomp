@@ -5,6 +5,7 @@
 #include "Game/GL/GLInventory.h"
 #include "Game/SAnim.h"
 #include "NL/gl/glMemory.h"
+#include "NL/gl/glTexture.h"
 #include "NL/gl/glView.h"
 #include "NL/nlPrint.h"
 
@@ -35,8 +36,6 @@ public:
 
 extern "C" void fn_802C81FC(
     nlChunk*, unsigned long, unsigned long, ResourceInterface_802CC094*);
-extern "C" void fn_802CDD78(
-    void*, unsigned long, ResourceInterface_802CC094*, bool);
 extern "C" void* fn_802DC9EC(nlChunk*);
 extern "C" void fn_802DCD18(void*, const nlVector4*, bool);
 extern "C" void fn_80343DE4(
@@ -334,10 +333,10 @@ DrawableObject* World::fn_803415E8(
     return pObject;
 }
 
-bool World::fn_803418C4(GLMaterialList*& pMaterial)
+bool World::fn_803418C4(glModel*& pMaterial)
 {
     unsigned long uHashID = (unsigned long)pMaterial;
-    pMaterial = m_pResource->m_inventory->GetMaterialList(uHashID);
+    pMaterial = m_pResource->m_inventory->GetModel(uHashID);
     if (pMaterial == 0)
     {
         nlPrintf(

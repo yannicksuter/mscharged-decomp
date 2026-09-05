@@ -7,6 +7,7 @@
 #include "Game/AI/SpaceSearch.h"
 #include "Game/AnimInventory.h"
 #include "Game/Ball.h"
+#include "Game/DebugWriteCache.h"
 #include "Game/EventDataTypes.h"
 #include "Game/FormationDefines.h"
 #include "Game/PoseAccumulator.h"
@@ -17,6 +18,7 @@
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/SAnim/pnSingleAxisBlender.h"
 #include "Game/Sys/audio.h"
+#include "NL/nlMain.h"
 #include "unclassified/tu_80336B2C.h"
 
 extern "C" cPlayer* fn_80096514(
@@ -171,6 +173,19 @@ bool cPlayer::fn_800976C4()
     return m_pPowerupLayer->GetChild(1) != NULL;
 }
 
+bool cPlayer::IsCharacterInAir(float fParam) const
+{
+    float leftFootZ = GetJointPosition(m_nLeftFootJointIndex).z;
+    float rightFootZ = GetJointPosition(m_nRightFootJointIndex).z;
+    float headZ = GetJointPosition(m_nHeadJointIndex).z;
+
+    if (leftFootZ > fParam && rightFootZ > fParam && headZ > fParam)
+    {
+        return true;
+    }
+    return false;
+}
+
 cFielder* cPlayer::GetClosestOpponentFielder(
     nlVector3* pPosition, bool bParam)
 {
@@ -277,7 +292,7 @@ void cPlayer::PostPhysicsUpdate()
     if (m_pBall != NULL)
     {
         nlVector3 jointPos = GetJointPosition(m_nBallJointIndex);
-        float scale = mUnidentified0A0;
+        float scale = m_fPlayerScale;
         if (scale > 1.0f)
         {
             float radius = g_pBall->m_pPhysicsBall->GetRadius();
@@ -340,4 +355,61 @@ extern "C" void fn_80099030(UnidentifiedEventData00*)
             fn_801B59DC(lbl_806E1608->mUnidentified024, true);
         }
     }
+}
+
+u16 lbl_806DBD96 = 0xFFFF;
+
+#define REGISTER_PLAYER_FIELD(type, field) \
+    fn_80338F88(cache, type, lbl_80533C98[type].size, \
+        (u8*)&field - (u8*)&m_ID, #field)
+
+void cPlayer::Unknown11(void* context, DebugWriteCache* cache)
+{
+    cCharacter::Unknown11(context, cache);
+    if (lbl_806DBD96 == 0xFFFF)
+    {
+        lbl_806DBD96 = fn_80338EBC(cache, "DetPlayer");
+        REGISTER_PLAYER_FIELD(8, m_ID);
+        REGISTER_PLAYER_FIELD(8, m_nFeatherAnimID);
+        REGISTER_PLAYER_FIELD(16, m_bIsContactingWall);
+        REGISTER_PLAYER_FIELD(17, m_fSkipTimer);
+        REGISTER_PLAYER_FIELD(16, m_bSkipActionUpdate);
+        REGISTER_PLAYER_FIELD(16, m_bSkipAnimUpdate);
+        REGISTER_PLAYER_FIELD(16, m_bForceFeatherUpdate);
+        REGISTER_PLAYER_FIELD(22, m_v3AIPosition);
+        REGISTER_PLAYER_FIELD(14, m_eBallRotationMode);
+        REGISTER_PLAYER_FIELD(16, m_ResetBaseBallOrientation);
+        REGISTER_PLAYER_FIELD(24, m_BaseBallOrientation);
+        REGISTER_PLAYER_FIELD(20, m_tBallPossessionTimer);
+        REGISTER_PLAYER_FIELD(20, m_tBallUnPossessionTimer);
+        REGISTER_PLAYER_FIELD(20, m_tNoPickupTimer);
+        REGISTER_PLAYER_FIELD(17, m_fShotStrengthTime);
+        REGISTER_PLAYER_FIELD(20, m_tSlideAttackTimer);
+        REGISTER_PLAYER_FIELD(20, m_tLooseBallPassTimer);
+        REGISTER_PLAYER_FIELD(20, m_tInactivityTimer);
+        REGISTER_PLAYER_FIELD(20, m_tFireTimer);
+        REGISTER_PLAYER_FIELD(16, m_bCanTestController);
+        REGISTER_PLAYER_FIELD(14, m_eLastPadAction);
+        REGISTER_PLAYER_FIELD(19, m_aSwapFacingDirection);
+        REGISTER_PLAYER_FIELD(20, m_tSwapFacingTimer);
+        REGISTER_PLAYER_FIELD(17, m_UserControlledTime);
+        fn_80338F78(cache);
+    }
+    fn_80339450(cache, lbl_806DBD96, &m_ID, context);
+    fn_8033930C(cache, lbl_806DBD96, &m_ID,
+        offsetof(cPlayer, m_tSwapControllerTimer) - offsetof(cPlayer, m_ID));
+}
+
+#undef REGISTER_PLAYER_FIELD
+
+void cPlayer::Unknown12(RunningChecksum* pChecksum)
+{
+    cCharacter::Unknown12(pChecksum);
+    pChecksum->ChecksumData(&m_v3AIPosition, sizeof(m_v3AIPosition));
+    pChecksum->ChecksumData(&m_eBallRotationMode, sizeof(m_eBallRotationMode));
+    pChecksum->ChecksumData(&m_BaseBallOrientation, sizeof(m_BaseBallOrientation));
+    pChecksum->ChecksumData(&m_tBallPossessionTimer, sizeof(m_tBallPossessionTimer));
+    pChecksum->ChecksumData(&m_fShotStrengthTime, sizeof(m_fShotStrengthTime));
+    pChecksum->ChecksumData(&m_tSlideAttackTimer, sizeof(m_tSlideAttackTimer));
+    pChecksum->ChecksumData(&m_UserControlledTime, sizeof(m_UserControlledTime));
 }

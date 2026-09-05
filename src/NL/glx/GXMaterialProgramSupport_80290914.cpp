@@ -11,24 +11,12 @@
 #include "NL/nlMath.h"
 #include "NL/platvmath.h"
 
-extern "C"
-{
-    void fn_8036A800(unsigned int index, const void* first, const void* second);
-    void fn_8036A9C4(
-        unsigned int index, const void* first, const void* second, float value);
-    void fn_8036AB40(
-        unsigned int index, const void* first, const void* second, float value);
-    void fn_8036D774(const nlMatrix4* matrix);
-    void fn_8036D7EC(
-        const void* matrices, unsigned long count, const nlMatrix4*, int);
-}
-
 struct GXMaterialProgramParameters_8029BA04
 {
     /* 0x000 */ UnidentifiedTextureState texture0;
     /* 0x008 */ UnidentifiedTextureState texture1;
     /* 0x010 */ UnidentifiedTextureState texture2;
-    /* 0x018 */ void* matrices;
+    /* 0x018 */ const float (*matrices)[3][4];
     /* 0x01C */ unsigned long matricesSize;
     /* 0x020 */ float value32;
     /* 0x024 */ int value36;
@@ -40,8 +28,8 @@ struct GXMaterialProgramParameters_8029BA04
     };
     /* 0x058 */ Value_80290914 values88[4];
     /* 0x098 */ Value_80290914 values152[4];
-    /* 0x0D8 */ nlVector4 values216[4];
-    /* 0x118 */ nlVector4 values280[4];
+    /* 0x0D8 */ nlFloatColour values216[4];
+    /* 0x118 */ nlFloatColour values280[4];
     /* 0x158 */ int value344;
     /* 0x15C */ unsigned char padding348[12];
     /* 0x168 */ int count360;
@@ -156,7 +144,7 @@ static inline void LoadValue2_80290914(unsigned int index,
     const nlMatrix4& viewMatrix)
 {
     nlVector3 source = parameters->values152[index].vector;
-    nlVector4 value = parameters->values280[index];
+    nlFloatColour value = parameters->values280[index];
     nlVector3 transformed;
     nlMultDirVectorMatrix(transformed, source, viewMatrix);
     fn_8036AB40(index + 4, &transformed, &value, parameters->values152[index].value);

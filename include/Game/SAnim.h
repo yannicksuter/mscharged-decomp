@@ -25,9 +25,9 @@ public:
 
 struct PackedScale
 {
-    signed short x;
-    signed short y;
-    signed short z;
+    unsigned short x;
+    unsigned short y;
+    unsigned short z;
 };
 
 struct PackedTrans
@@ -200,7 +200,5 @@ public:
     float m_fLinearSpeed;
     unsigned long m_nHierarchySignature;
 };
-
-void SAnimInitGQR();
 
 #endif // GAME_SANIM_H

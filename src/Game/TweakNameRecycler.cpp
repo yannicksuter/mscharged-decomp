@@ -1,5 +1,6 @@
 #include "Game/TweakRegistry.h"
 
+#include "NL/UnknownHashTable_80307620.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSmallBlockAllocator.h"
 
@@ -10,15 +11,6 @@ public:
     virtual void UnidentifiedVirtual0C(void* ptr);
 };
 
-class UnknownHashTable_80307620
-{
-public:
-    UnknownHashTable_80307620(int capacity, TweakNameAllocator_8052BE68* allocator);
-    virtual ~UnknownHashTable_80307620();
-
-    /* 0x04 */ u8 m_Unk4[0x14];
-}; // size: 0x18
-
 class TweakNameTable_8052BE58 : public UnknownHashTable_80307620
 {
 public:
@@ -28,8 +20,6 @@ public:
     }
     virtual ~TweakNameTable_8052BE58();
 };
-
-extern "C" void fn_80307748(void* table, TweakRecycledName* entry);
 
 nlSlotPoolFixed<0x10> lbl_8057C66C;
 
@@ -59,7 +49,7 @@ void fn_802C3970(void)
     {
         static TweakNameAllocator_8052BE68 sRecycledNameAllocator;
         static TweakNameTable_8052BE58 sRecycledNameTable(2000, &sRecycledNameAllocator);
-        fn_80307748(&sRecycledNameTable, entry);
+        sRecycledNameTable.fn_80307748(entry);
         lbl_8057C66C.Free(entry);
         entry = next;
         next = entry == 0 ? 0 : entry->m_Next;

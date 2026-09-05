@@ -19,11 +19,6 @@ struct FEPadData
 FEInput* g_pFEInput = 0;
 FEPadData g_aFEPadData[4];
 
-static cGlobalPad* GetPad(int pad)
-{
-    return fn_802C082C(lbl_806E1E28, pad);
-}
-
 void FEInput::Initialize()
 {
     g_pFEInput = new ((u8*)nlMalloc(sizeof(FEInput), 8, false)) FEInput();
@@ -59,7 +54,7 @@ cGlobalPad* FEInput::GetGlobalPad(eFEINPUT_PAD pad) const
     }
     if (m_bEnableInput[pad])
     {
-        return GetPad(pad);
+        return lbl_806E1E28->GetPad(pad);
     }
     return 0;
 }
@@ -68,12 +63,12 @@ bool FEInput::IsConnected(eFEINPUT_PAD pad)
 {
     if (pad != FE_ALL_PADS)
     {
-        return GetPad(pad)->IsConnected();
+        return lbl_806E1E28->GetPad(pad)->IsConnected();
     }
 
     for (int i = 0; i < 4; i++)
     {
-        if (GetPad(i)->IsConnected())
+        if (lbl_806E1E28->GetPad(i)->IsConnected())
         {
             return true;
         }
@@ -92,7 +87,7 @@ bool FEInput::IsButtonDisabled(eFEINPUT_PAD pad, int button, bool remap) const
     {
         for (int i = 0; i < 4; i++)
         {
-            int buttonIndex = GetPad(i)->Unidentified24(button, remap);
+            int buttonIndex = lbl_806E1E28->GetPad(i)->GetButtonIndex(button, remap);
             if ((mUnidentified024[i] & (1 << buttonIndex)) != 0)
             {
                 return true;
@@ -101,7 +96,7 @@ bool FEInput::IsButtonDisabled(eFEINPUT_PAD pad, int button, bool remap) const
         return false;
     }
 
-    int buttonIndex = GetPad(pad)->Unidentified24(button, remap);
+    int buttonIndex = lbl_806E1E28->GetPad(pad)->GetButtonIndex(button, remap);
     return (mUnidentified024[pad] & (1 << buttonIndex)) != 0;
 }
 
@@ -119,7 +114,7 @@ bool FEInput::IsPressed(eFEINPUT_PAD pad, int button, bool remap, eFEINPUT_PAD* 
             {
                 return false;
             }
-            return GetPad(pad)->IsPressed(button, remap);
+            return lbl_806E1E28->GetPad(pad)->IsPressed(button, remap);
         }
 
         for (int i = 0; i < 4; i++)
@@ -149,9 +144,9 @@ bool FEInput::IsAutoPressed(eFEINPUT_PAD pad, int button, bool remap, eFEINPUT_P
                 return false;
             }
 
-            cGlobalPad* pPad = GetPad(pad);
+            cGlobalPad* pPad = lbl_806E1E28->GetPad(pad);
             bool ispressed = pPad->IsPressed(button, remap);
-            int buttonIndex = pPad->Unidentified24(button, remap);
+            int buttonIndex = pPad->GetButtonIndex(button, remap);
             if (ispressed && !g_aFEPadData[pad].bIsPressed[buttonIndex])
             {
                 ispressed = false;
@@ -193,12 +188,12 @@ bool FEInput::JustPressed(eFEINPUT_PAD pad, int button, bool remap, eFEINPUT_PAD
             {
                 return false;
             }
-            return GetPad(pad)->PlatJustPressed(button, remap);
+            return lbl_806E1E28->GetPad(pad)->PlatJustPressed(button, remap);
         }
 
         for (int i = 0; i < 4; i++)
         {
-            if (m_bEnableInput[i] && GetPad(i)->PlatJustPressed(button, remap)
+            if (m_bEnableInput[i] && lbl_806E1E28->GetPad(i)->PlatJustPressed(button, remap)
                 && !IsButtonDisabled(pad, button, remap))
             {
                 if (pOutPad)
@@ -220,12 +215,12 @@ bool FEInput::PlatJustPressed(eFEINPUT_PAD pad, int button, bool remap, eFEINPUT
         {
             return false;
         }
-        return GetPad(pad)->PlatJustPressed(button, remap);
+        return lbl_806E1E28->GetPad(pad)->PlatJustPressed(button, remap);
     }
 
     for (int i = 0; i < 4; i++)
     {
-        if (GetPad(i)->PlatJustPressed(button, remap)
+        if (lbl_806E1E28->GetPad(i)->PlatJustPressed(button, remap)
             && !IsButtonDisabled(pad, button, remap))
         {
             if (pOutPad)
@@ -252,12 +247,12 @@ bool FEInput::JustReleased(eFEINPUT_PAD pad, int button, bool remap, eFEINPUT_PA
             {
                 return false;
             }
-            return GetPad(pad)->PlatJustReleased(button, remap);
+            return lbl_806E1E28->GetPad(pad)->PlatJustReleased(button, remap);
         }
 
         for (int i = 0; i < 4; i++)
         {
-            if (m_bEnableInput[i] && GetPad(i)->PlatJustReleased(button, remap)
+            if (m_bEnableInput[i] && lbl_806E1E28->GetPad(i)->PlatJustReleased(button, remap)
                 && !IsButtonDisabled(pad, button, remap))
             {
                 if (pOutPad)
@@ -315,8 +310,8 @@ void FEInput::Update(float)
         for (int buttonIndex = 0; buttonIndex < 13; buttonIndex++)
         {
             FEPadData& data = g_aFEPadData[padIndex];
-            cGlobalPad* pPad = GetPad(padIndex);
-            int button = pPad->Unidentified28(buttonIndex);
+            cGlobalPad* pPad = lbl_806E1E28->GetPad(padIndex);
+            int button = pPad->GetButtonMask(buttonIndex);
             data.bIsPressed[buttonIndex] = false;
 
             if (pPad->IsPressed(button, false))
@@ -374,7 +369,7 @@ void FEInput::SetAutoRepeatParams(
     }
     else
     {
-        int buttonIndex = GetPad(pad)->Unidentified24(button, true);
+        int buttonIndex = lbl_806E1E28->GetPad(pad)->GetButtonIndex(button, true);
         g_aFEPadData[pad].fButtonInitialDelay[buttonIndex] = initialdelay;
         g_aFEPadData[pad].fButtonRepeatRate[buttonIndex] = repeatrate;
     }
@@ -391,11 +386,11 @@ void FEInput::EnableAnalogToDPadMapping(eFEINPUT_PAD pad, bool enable)
     }
     else if (enable)
     {
-        GetPad(pad)->EnableLeftAnalogToDPadMap();
+        lbl_806E1E28->GetPad(pad)->EnableLeftAnalogToDPadMap();
     }
     else
     {
-        GetPad(pad)->DisableLeftAnalogToDPadMap();
+        lbl_806E1E28->GetPad(pad)->DisableLeftAnalogToDPadMap();
     }
 }
 

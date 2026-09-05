@@ -37,7 +37,7 @@ int lbl_806E1F50;
 class UnidentifiedImpostorView_802D4290 : public GLViewInterface
 {
 public:
-    void UpdateMatrices()
+    void UpdateMatrices() const
     {
         if (mDirty)
         {
@@ -46,39 +46,19 @@ public:
         }
     }
 
-    virtual void GetViewMatrix(nlMatrix4& matrix);
-    virtual void GetProjectionMatrix(nlMatrix4& matrix);
-    virtual void GetInverseViewMatrix(nlMatrix4& matrix);
-    virtual void GetViewProjectionMatrix(nlMatrix4& matrix);
+    virtual void GetViewMatrix(nlMatrix4& matrix) const;
+    virtual void GetProjectionMatrix(nlMatrix4& matrix) const;
+    virtual void GetInverseViewMatrix(nlMatrix4& matrix) const;
+    virtual void GetViewProjectionMatrix(nlMatrix4& matrix) const;
     virtual const nlMatrix4* GetViewMatrix() const;
     virtual const nlMatrix4* GetProjectionMatrix() const;
 
     /* 0x004 */ nlMatrix4 mView;
     /* 0x044 */ nlMatrix4 mProjection;
-    /* 0x084 */ nlMatrix4 mInverseView;
-    /* 0x0C4 */ nlMatrix4 mViewProjection;
+    /* 0x084 */ mutable nlMatrix4 mInverseView;
+    /* 0x0C4 */ mutable nlMatrix4 mViewProjection;
     /* 0x104 */ bool mDirty;
 }; // size: 0x108
-
-struct UnidentifiedTargetInfo_802D48E4
-{
-    UnidentifiedTargetInfo_802D48E4()
-        : unknown08(0)
-        , unknown0C(0)
-    {
-    }
-
-    /* 0x00 */ u32 height;
-    /* 0x04 */ u32 width;
-    /* 0x08 */ u32 unknown08;
-    /* 0x0C */ u32 unknown0C;
-    /* 0x10 */ u32 unknown10;
-    /* 0x14 */ u32 format;
-    /* 0x18 */ u32 unknown18;
-    /* 0x1C */ u32 unknown1C;
-    /* 0x20 */ u32 unknown20;
-    /* 0x24 */ u8 colour[4];
-}; // size: 0x28
 
 struct UnidentifiedImpostorQuad_802D511C
 {
@@ -249,7 +229,7 @@ extern "C" void fn_802D4898(ImpostorSprite_802D4290* sprite)
 extern "C" void fn_802D48E4(
     ImpostorSprite_802D4290* sprite, const char* name)
 {
-    UnidentifiedTargetInfo_802D48E4 info;
+    TargetInfo_8036DE50 info;
     nlZeroMemory(&info, sizeof(info));
     info.width = sprite->mUnidentified050;
     info.height = sprite->mUnidentified054;
@@ -556,21 +536,21 @@ extern "C" int fn_802D536C(ImpostorSprite_802D4290* sprite)
 }
 
 void UnidentifiedImpostorView_802D4290::GetViewProjectionMatrix(
-    nlMatrix4& matrix)
+    nlMatrix4& matrix) const
 {
     UpdateMatrices();
     matrix = mViewProjection;
 }
 
 void UnidentifiedImpostorView_802D4290::GetInverseViewMatrix(
-    nlMatrix4& matrix)
+    nlMatrix4& matrix) const
 {
     UpdateMatrices();
     matrix = mInverseView;
 }
 
 void UnidentifiedImpostorView_802D4290::GetProjectionMatrix(
-    nlMatrix4& matrix)
+    nlMatrix4& matrix) const
 {
     matrix = mProjection;
 }
@@ -581,7 +561,7 @@ UnidentifiedImpostorView_802D4290::GetProjectionMatrix() const
     return &mProjection;
 }
 
-void UnidentifiedImpostorView_802D4290::GetViewMatrix(nlMatrix4& matrix)
+void UnidentifiedImpostorView_802D4290::GetViewMatrix(nlMatrix4& matrix) const
 {
     matrix = mView;
 }

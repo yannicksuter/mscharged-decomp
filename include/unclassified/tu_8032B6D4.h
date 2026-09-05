@@ -141,7 +141,7 @@ extern "C"
         UnidentifiedMessageSerializer* serializer);
     void fn_8032C59C();
     void fn_8032C5E4(u32* values);
-    void fn_8032C630(void* output, const void* input);
+    void fn_8032C630(unsigned char* output, unsigned char* input);
     bool fn_8032C640(const void* first, const void* second);
 }
 

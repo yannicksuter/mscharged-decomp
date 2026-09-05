@@ -13,9 +13,6 @@ extern int lbl_806E228C;
 extern int* lbl_806E22A8;
 extern int lbl_806E22AC;
 
-extern "C" int fn_802C03FC(int button);
-extern "C" int fn_802C06C8(int buttonIndex);
-
 u8 DetInput::fn_80331BE4()
 {
     return m_nConnected;

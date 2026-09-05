@@ -49,6 +49,8 @@ extern "C" eStrafeDirection fn_800C7348(
 
 class DesireSteering : public Desire
 {
+    friend class cFielder;
+
 public:
     DesireSteering();
     virtual ~DesireSteering();

@@ -11,14 +11,9 @@
 #include <string.h>
 
 extern "C" int fn_8004F594(int channel, const char* format, ...);
-extern "C" u32 fn_8032C830(void* codec, void* message, void* buffer, int size);
-extern "C" void fn_8032CA1C(
-    void* codec, int type, UnidentifiedNetworkMessageReceiver* receiver);
-extern "C" void fn_8032CA2C(void* codec, int type);
 extern "C" bool fn_8025BD88();
 
 extern int lbl_80519920[12];
-extern void* lbl_806E2100;
 
 static NetworkDraft* sNetworkDraft;
 
@@ -164,8 +159,8 @@ void NetworkDraft::Reset(bool)
 
 void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
 {
-    fn_8032CA1C(lbl_806E2100, 23, this);
-    fn_8032CA1C(lbl_806E2100, 24, this);
+    lbl_806E2100->fn_8032CA1C(23, this);
+    lbl_806E2100->fn_8032CA1C(24, this);
     mDraftMessage = *message;
     mTeamCount = message->mMachineCount;
     mLocalMachineIndex = message->mMachineIndex;
@@ -230,8 +225,8 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
 
 void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
 {
-    fn_8032CA1C(lbl_806E2100, 23, this);
-    fn_8032CA1C(lbl_806E2100, 24, this);
+    lbl_806E2100->fn_8032CA1C(23, this);
+    lbl_806E2100->fn_8032CA1C(24, this);
     mDraftMessage = *message;
     mTeamCount = 2;
     mLocalMachineIndex = message->mMachineIndex;
@@ -395,8 +390,8 @@ void NetworkDraft::AdvanceDraftTeam()
 
 void NetworkDraft::UnregisterMessageReceivers()
 {
-    fn_8032CA2C(lbl_806E2100, 23);
-    fn_8032CA2C(lbl_806E2100, 24);
+    lbl_806E2100->fn_8032CA2C(23);
+    lbl_806E2100->fn_8032CA2C(24);
 }
 
 int NetworkDraft::GetCurrentDraftingTeam() const
@@ -432,7 +427,7 @@ void NetworkDraft::SendCaptainChoice()
     message.mTeamIndex = mCurrentDraftingTeam;
     message.mCaptain = mTeams[mCurrentDraftingTeam].mCaptain;
     u8 buffer[0x20];
-    int size = fn_8032C830(lbl_806E2100, &message, buffer, sizeof(buffer));
+    int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
     fn_8004F594(16,
         "Sending NetworkDraftPickedCaptain team %d captain %d\n",
         (s8)message.mTeamIndex, message.mCaptain);
@@ -448,7 +443,7 @@ void NetworkDraft::SendSidekickChoice()
     message.mSidekick1 = team.mSidekick1;
     message.mSidekick2 = team.mSidekick2;
     u8 buffer[0x20];
-    int size = fn_8032C830(lbl_806E2100, &message, buffer, sizeof(buffer));
+    int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
     SendToAllDraftPlayers(buffer, size);
 }
 

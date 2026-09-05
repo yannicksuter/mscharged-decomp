@@ -24,7 +24,6 @@ struct CollisionBulletBillData
 
 extern SlotPool<CollisionBulletBillData> lbl_805712F8;
 
-extern "C" bool fn_8003886C(cFielder*);
 extern "C" void fn_80147C9C(CollisionBulletBillData*);
 extern "C" void fn_80147DE4(CollisionBulletBillData*);
 extern "C" void fn_80147F2C(CollisionBulletBillData*);
@@ -60,7 +59,7 @@ ContactType PhysicsBulletBill::Contact(
         if (character->m_eClassType == FIELDER)
         {
             bool canHit = false;
-            if (!fn_8003886C(target)
+            if (!target->IsStuck()
                 && (target->muInvincibleStatus & 1) != 0)
             {
                 canHit = true;
@@ -101,7 +100,7 @@ ContactType PhysicsBulletBill::Contact(
         if (owner->m_eClassType == FIELDER)
         {
             bool canHit = false;
-            if (!fn_8003886C(target)
+            if (!target->IsStuck()
                 && (target->muInvincibleStatus & 1) != 0)
             {
                 canHit = true;

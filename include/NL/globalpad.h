@@ -1,55 +1,52 @@
 #ifndef NL_GLOBALPAD_H
 #define NL_GLOBALPAD_H
 
-#include "NL/nlMath.h"
-#include "types.h"
+#include "NL/platpad.h"
 
-class PadBackend;
-
-class cGlobalPad
+class cGlobalPad : public PadBackend
 {
 public:
+    cGlobalPad(int padIndex);
     virtual ~cGlobalPad();
-    virtual bool IsConnected() = 0;
-    virtual bool IsPressed(int button, bool remap) = 0;
-    virtual float GetPressure(int button, bool remap) = 0;
-    virtual float GetPressureDerivative(int button, bool remap) = 0;
-    virtual bool PlatJustPressed(int button, bool remap) = 0;
-    virtual bool PlatJustReleased(int button, bool remap) = 0;
-    virtual int Unidentified24(int button, bool remap) = 0;
-    virtual int Unidentified28(int buttonIndex) = 0;
-    virtual float GetButtonStateTime(int button, bool remap) = 0;
-    virtual float AnalogLeftX() = 0;
-    virtual float AnalogLeftY() = 0;
-    virtual float AnalogRightX() = 0;
-    virtual float AnalogRightY() = 0;
-    virtual bool RumbleActive() = 0;
-    virtual void StartRumble(float fDuration, float fIntensity, float fFrequency) = 0;
-    virtual void StopRumble() = 0;
-    virtual void Update(float deltaTime) = 0;
-    virtual int UnidentifiedClassID() = 0;
+    virtual bool IsConnected();
+    virtual bool IsPressed(int button, bool remap);
+    virtual float GetPressure(int button, bool remap);
+    virtual float GetPressureDerivative(int button, bool remap);
+    virtual bool PlatJustPressed(int button, bool remap);
+    virtual bool PlatJustReleased(int button, bool remap);
+    virtual int GetButtonIndex(int button, bool remap);
+    virtual int GetButtonMask(int buttonIndex);
+    virtual float GetButtonStateTime(int button, bool remap);
+    virtual float AnalogLeftX();
+    virtual float AnalogLeftY();
+    virtual float AnalogRightX();
+    virtual float AnalogRightY();
+    virtual bool RumbleActive();
+    virtual void StartRumble(float fDuration, float fIntensity, float fFrequency);
+    virtual void StopRumble();
+    virtual void Update(float deltaTime);
+    virtual int UnidentifiedClassID() { return sUnidentifiedClassID; }
 
-    void DisableLeftAnalogToDPadMap()
-    {
-        m_isLeftAnalogToDPadMapEnabled = false;
-    }
+    static int sUnidentifiedClassID;
 
-    void EnableLeftAnalogToDPadMap()
-    {
-        m_isLeftAnalogToDPadMapEnabled = true;
-    }
-
-    /* 0x04 */ u8 mUnidentified004[0x14];
-    /* 0x18 */ bool m_isLeftAnalogToDPadMapEnabled;
-    /* 0x19 */ u8 mUnidentified019[3];
     /* 0x1C */ PadBackend* mBackend;
 }; // size: 0x20
 
+class PadManager_802C06D4
+{
+public:
+    PadManager_802C06D4();
+    void fn_802C06D8(int padCount, int padSetCount);
+    void Update(float deltaTime);
+    cGlobalPad* GetPad(int idx);
+    void fn_802C084C(int padSet);
 
-extern void* lbl_806E1E28;
+    /* 0x00 */ int mUnidentified000;
+    /* 0x04 */ int mUnidentified004;
+    /* 0x08 */ int mUnidentified008;
+    /* 0x0C */ cGlobalPad** m_aPads;
+}; // size: 0x10
 
-cGlobalPad* fn_802C082C(void* manager, int index);
-void fn_802C084C(void* manager, int padSet);
-void fn_802C07AC(void* manager, float fDeltaT);
+extern PadManager_802C06D4* lbl_806E1E28;
 
 #endif // NL_GLOBALPAD_H

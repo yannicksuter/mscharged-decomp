@@ -120,5 +120,6 @@ public:
 extern UnidentifiedRuntimeTypeList lbl_806E20B0;
 
 extern "C" int fn_80312208(unsigned long hash);
+extern "C" UnidentifiedFuzzyRuntimeBase* fn_800E30A8(cFielder*);
 
 #endif // GAME_AI_FUZZY_AI_RUNTIME_H

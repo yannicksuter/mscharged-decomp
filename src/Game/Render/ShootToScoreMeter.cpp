@@ -15,13 +15,6 @@ class BaseGameSceneManager;
 
 extern "C"
 {
-    void fn_802CE528(
-        GLView* view, const nlVector3* world, nlVector3* projected);
-    void fn_802CE6DC(
-        GLView* view, const nlVector3* normalized, nlVector3* screen);
-    float fn_802CE76C(GLView* view);
-    void fn_802CEA40(GLView* source, GLView* destination,
-        const nlVector3* world, nlVector3* projected);
     extern BaseGameSceneManager* lbl_806E1860;
     void fn_801E29C0(BaseGameSceneManager* manager, nlVector3 position);
     u32 fn_80369D4C();
@@ -395,8 +388,7 @@ void ShootToScoreMeter::DrawMeter()
     matrix.e2[3][3] = 1.0f;
 
     nlVector3 projectedPosition = { 0.0f, 0.0f, 0.0f };
-    fn_802CE528(GetLayerView(eCLV_UnsortedSquareOrtho), &screenPosition,
-        &projectedPosition);
+    glViewProjectPoint(GetLayerView(eCLV_UnsortedSquareOrtho), screenPosition, projectedPosition);
     fn_802CE6DC(GetLayerView(eCLV_Anark), &projectedPosition,
         &projectedPosition);
     fn_801E29C0(lbl_806E1860, projectedPosition);

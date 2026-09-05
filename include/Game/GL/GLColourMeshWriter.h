@@ -1,17 +1,14 @@
-#ifndef UNCLASSIFIED_TU_802A8A90_H
-#define UNCLASSIFIED_TU_802A8A90_H
+#ifndef GAME_GL_GL_COLOUR_MESH_WRITER_H
+#define GAME_GL_GL_COLOUR_MESH_WRITER_H
 
 #include "NL/gl/glModel.h"
 #include "NL/nlColour.h"
 
-#include "types.h"
-
-class UnidentifiedMeshWriter_802A8A90
+class GLColourMeshWriter
 {
 public:
-    UnidentifiedMeshWriter_802A8A90();
-    ~UnidentifiedMeshWriter_802A8A90();
-
+    GLColourMeshWriter();
+    ~GLColourMeshWriter();
     bool Begin(int vertexCount, int primitive, void* allocator);
     bool End();
 
@@ -20,15 +17,16 @@ public:
         return model;
     }
 
-    void Colour(const nlColour& value)
+    void Colour(const nlColour& c)
     {
-        *colour++ = *(const u32*)&value;
+        *colour++ = *(const u32*)&c;
     }
 
-    void Texcoord(float u, float v)
+    void Colour(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
     {
-        *texcoord++ = u;
-        *texcoord++ = v;
+        nlColour colour;
+        nlColourSet(colour, r, g, b, a);
+        Colour(colour);
     }
 
     void Vertex(float x, float y, float z)
@@ -43,7 +41,6 @@ public:
     void* resource;
     float* position;
     u32* colour;
-    float* texcoord;
-}; // size: 0x18
+}; // size 0x14
 
-#endif // UNCLASSIFIED_TU_802A8A90_H
+#endif // GAME_GL_GL_COLOUR_MESH_WRITER_H

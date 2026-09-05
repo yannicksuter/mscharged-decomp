@@ -23,6 +23,9 @@ public:
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
+    ePowerUpType GetPowerupType() const { return mePowerup; }
+    void fn_800D3968(cFielder*, ePowerUpType, bool);
+
 private:
     void fn_800D3A50(ePowerUpType, int, cFielder*);
 

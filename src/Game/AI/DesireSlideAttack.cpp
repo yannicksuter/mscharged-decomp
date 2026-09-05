@@ -89,7 +89,7 @@ void DesireSlideAttack::UnidentifiedUpdate(
         mUnidentified078 = 5.0f;
         if (pFielder->m_tSlideAttackTimer.m_uPackedTime != 0)
         {
-            if (!pFielder->mUnidentified38C)
+            if (!pFielder->bAttackSucceeded)
             {
                 float fBallSpeed = nlSqrt(
                     g_pBall->m_v3Velocity.x * g_pBall->m_v3Velocity.x

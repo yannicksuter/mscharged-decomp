@@ -20,17 +20,13 @@ extern "C"
     void fn_80183A98();
     void fn_80183B40(unsigned long matrix);
     void fn_80183BF4(const nlMatrix4* matrix);
-    void fn_8036D774(const nlMatrix4* matrix);
-    void fn_8036D7EC(
-        const void* matrices, unsigned long count, const nlMatrix4* matrix,
-        int unknown);
 }
 
 struct GXMaterialProgramParameters_802981F0
 {
     /* 0x00 */ UnidentifiedTextureState texture0;
     /* 0x08 */ UnidentifiedTextureState texture1;
-    /* 0x10 */ const void* matrices;
+    /* 0x10 */ const float (*matrices)[3][4];
     /* 0x14 */ unsigned long matricesSize;
     /* 0x18 */ float value24;
     /* 0x1C */ float value28;

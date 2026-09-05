@@ -54,21 +54,13 @@ struct UnidentifiedAbilityEvent
     /* 0x14 */ float fParam2;
 };
 
-struct UnidentifiedAbilityEffect
-{
-    /* 0x00 */ u8 mUnknown00[0x08];
-    /* 0x08 */ void* mUnidentified08;
-};
-
 class PhysicsSphere_80175F8C;
 
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
 extern "C" void fn_8002FE54(cFielder* pFielder);
 extern "C" void fn_800301E8(cFielder* pFielder);
-extern "C" bool fn_80034964(cFielder* pFielder);
 extern "C" void fn_80038158(cFielder* pFielder, int nParam);
-extern "C" void fn_80040368(cFielder* pFielder);
 extern "C" bool fn_80319FEC(void* pParam, int nAction);
 extern "C" void fn_80319E58(void* pParam, int nAction);
 extern "C" void fn_80319E84(void* pParam, int nAction, int nParam1, int nParam2);
@@ -155,7 +147,7 @@ void cFielder::fn_8004FA34()
 
     if (!lbl_806E0C94->IsGameplayOrOvertime())
     {
-        fn_80040368(this);
+        StartRunning();
     }
 }
 
@@ -327,7 +319,7 @@ void cFielder::fn_8005001C(bool bForce)
                     mUnidentified3E0 = lbl_806E3658;
                 }
             }
-            mUnidentified3E8 = 0.0f;
+            mUnidentified3E8.nextFireballTime = 0.0f;
             fn_8002FE54(this);
             fn_800EC12C(0x8A9FCF66, this);
         }
@@ -336,7 +328,7 @@ void cFielder::fn_8005001C(bool bForce)
     {
         if (mUnidentified3DC)
         {
-            if (mUnidentified3F8 <= 0.0f || bForce)
+            if (mUnidentified3F8.mUnidentified00 <= 0.0f || bForce)
             {
                 mUnidentified3DC = false;
                 mUnidentified3DD = false;
@@ -344,9 +336,9 @@ void cFielder::fn_8005001C(bool bForce)
                 bool bRunning = mUnidentified3E0 > 0.0f;
                 if (bRunning)
                 {
-                    if (mUnidentified3E0 < mUnidentified3FC)
+                    if (mUnidentified3E0 < mUnidentified3F8.mUnidentified04)
                     {
-                        mUnidentified3E0 = mUnidentified3FC;
+                        mUnidentified3E0 = mUnidentified3F8.mUnidentified04;
                     }
                 }
                 fn_8002FE54(this);
@@ -387,11 +379,12 @@ void cFielder::fn_800501F0(bool bParam)
     {
     case DAISY:
         mUnidentified3E4 = lbl_806DB9E4;
-        mUnidentified3E8 = 0.0f;
+        mUnidentified3E8.nextFireballTime = 0.0f;
         break;
     case MARIO:
         mUnidentified3E4 = lbl_806DB9DC;
-        mUnidentified3F8 = mUnidentified3FC = lbl_806DB9E0;
+        mUnidentified3F8.mUnidentified00
+            = mUnidentified3F8.mUnidentified04 = lbl_806DB9E0;
         break;
     case PEACH:
         mUnidentified3E4 = lbl_806DB9EC;
@@ -436,8 +429,8 @@ bool cFielder::fn_80050284()
         bool bRunning = mUnidentified3E0 > 0.0f;
         if (bRunning)
         {
-            mUnidentified3EC = 0.0f;
-            mUnidentified3F0 = 0;
+            mUnidentified3E8.fireballStageTime = 0.0f;
+            mUnidentified3E8.fireballStageNum = 0;
             fn_800301E8(this);
         }
     }
@@ -465,7 +458,7 @@ bool cFielder::fn_80050284()
     }
     else if (m_eCharacterClass == PEACH)
     {
-        if (m_eAnimID != 0x68 && fn_80034964(this)
+        if (m_eAnimID != 0x68 && IsRunning()
             && fn_8002E060() != (eFielderDesireState)0x16)
         {
             SetAction((eFielderActionState)0x1D);
@@ -484,16 +477,15 @@ bool cFielder::fn_80050284()
     return true;
 }
 
-extern "C" void fn_800504A4(void)
+void UnidentifiedFielderAbility3E8::fn_800504A4()
 {
 }
 
-extern "C" void fn_800504A8(UnidentifiedAbilityEffect* pParam)
+void UnidentifiedAbilityEffect::fn_800504A8()
 {
-    if (pParam->mUnidentified08 != 0)
+    if (mUnidentified08 != 0)
     {
-        ((WaluigiWallManager_80178400*)pParam->mUnidentified08)
-            ->fn_80178D0C();
+        mUnidentified08->fn_80178D0C();
     }
 }
 

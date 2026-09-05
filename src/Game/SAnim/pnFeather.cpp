@@ -6,12 +6,12 @@ SlotPool<cPN_Feather> cPN_Feather::m_FeatherSlotPool(16, 16);
 
 cPN_Feather::cPN_Feather(
     cSHierarchy* hierarchy,
-    void (*weightTableCallback)(unsigned int, cPN_Feather*),
+    void (*callback)(unsigned int, cPN_Feather*),
     unsigned int callbackParam)
     : cPoseNode(2)
 {
     m_fBlendTime = 0.0f;
-    m_fWeightTableCallback = weightTableCallback;
+    m_fWeightTableCallback = callback;
     m_nCallbackParam1 = callbackParam;
     m_fBlendDuration = 0.0f;
     m_eFeatherBlendMode = FEATHER_BLEND_OUT;
@@ -19,14 +19,8 @@ cPN_Feather::cPN_Feather(
 
     m_pFeatherWeights = (float*)nlMalloc(hierarchy->m_nNumNodes * sizeof(float), 8, false);
 
-    int i = 0;
-    int offset = 0;
-    while (i < m_pBaseHierarchy->m_nNumNodes)
-    {
-        *(float*)((u8*)m_pFeatherWeights + offset) = 0.0f;
-        ++i;
-        offset += sizeof(float);
-    }
+    ClearNodeWeights();
+
     SetChild(0, 0);
     SetChild(1, 0);
 }
@@ -46,37 +40,7 @@ void cPN_Feather::ClearNodeWeights()
 
 void cPN_Feather::SetNodeWeight(int nodeIndex, float weight, float decayFactor)
 {
-    int l;
-    int greatGrandchild;
-    int k;
-    int grandchild;
-    int j;
-    int i;
-    int child;
-
-    for (i = 0; i < m_pBaseHierarchy->GetNumChildren(nodeIndex); ++i)
-    {
-        child = m_pBaseHierarchy->GetChild(nodeIndex, i);
-        m_pFeatherWeights[child] = weight;
-        for (j = 0; j < m_pBaseHierarchy->GetNumChildren(child); ++j)
-        {
-            grandchild = m_pBaseHierarchy->GetChild(child, j);
-            m_pFeatherWeights[grandchild] = weight;
-            for (k = 0; k < m_pBaseHierarchy->GetNumChildren(grandchild); ++k)
-            {
-                greatGrandchild = m_pBaseHierarchy->GetChild(grandchild, k);
-                m_pFeatherWeights[greatGrandchild] = weight;
-                for (l = 0;
-                    l < m_pBaseHierarchy->GetNumChildren(greatGrandchild);
-                    ++l)
-                {
-                    int descendant = m_pBaseHierarchy->GetChild(greatGrandchild, l);
-                    m_pFeatherWeights[descendant] = weight;
-                    SetChildFeatherWeight(descendant, weight);
-                }
-            }
-        }
-    }
+    SetChildFeatherWeight(nodeIndex, weight);
 
     while (nodeIndex != -1 && weight > 0.001f)
     {
@@ -241,9 +205,4 @@ void cPN_Feather::BlendRootTrans(nlVector3*, float, float*)
 
 void cPN_Feather::BlendRootRot(u16*, float, float*)
 {
-}
-
-inline int cPN_Feather::GetType()
-{
-    return 1;
 }

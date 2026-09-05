@@ -1,4 +1,8 @@
+#include <string.h>
+
 #include "Game/Debug/ShapeRender.h"
+#include "Game/GL/GLColourMeshWriter.h"
+#include "Game/GL/MeshWriter.h"
 
 #include "unclassified/tu_802B7798.h"
 
@@ -6,6 +10,7 @@
 
 #include "NL/gl/gl.h"
 #include "NL/gl/glDraw2.h"
+#include "NL/gl/glMatrix.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
@@ -455,6 +460,85 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
     }
 }
 
+extern "C" void fn_802BC678(const ShapeRender* arg0,
+    const nlVector3& arg1, const nlVector3& arg2, const nlColour& colour)
+{
+    nlVector3 points[8];
+    nlVec3Set(points[0], arg1.x, arg1.y, arg1.z);
+    nlVec3Set(points[1], arg1.x, arg2.y, arg1.z);
+    nlVec3Set(points[2], arg2.x, arg2.y, arg1.z);
+    nlVec3Set(points[3], arg2.x, arg1.y, arg1.z);
+    nlVec3Set(points[4], arg1.x, arg1.y, arg2.z);
+    nlVec3Set(points[5], arg1.x, arg2.y, arg2.z);
+    nlVec3Set(points[6], arg2.x, arg2.y, arg2.z);
+    nlVec3Set(points[7], arg2.x, arg1.y, arg2.z);
+
+    arg0->DrawLine3D(points[0], points[1], colour, true);
+    arg0->DrawLine3D(points[1], points[2], colour, true);
+    arg0->DrawLine3D(points[2], points[3], colour, true);
+    arg0->DrawLine3D(points[3], points[0], colour, true);
+    arg0->DrawLine3D(points[4], points[5], colour, true);
+    arg0->DrawLine3D(points[5], points[6], colour, true);
+    arg0->DrawLine3D(points[6], points[7], colour, true);
+    arg0->DrawLine3D(points[7], points[4], colour, true);
+    arg0->DrawLine3D(points[0], points[4], colour, true);
+    arg0->DrawLine3D(points[1], points[5], colour, true);
+    arg0->DrawLine3D(points[2], points[6], colour, true);
+    arg0->DrawLine3D(points[3], points[7], colour, true);
+}
+
+extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
+    const nlMatrix4& mat_world, bool, const nlColour& colour)
+{
+    unsigned long matrix = glAllocMatrix();
+    if (matrix != (unsigned long)-1)
+    {
+        glSetMatrix(matrix, mat_world);
+    }
+
+    glModel* pModel = glModelDupNoStreams(prim.model, false, 0);
+    nlFloatColour local_08;
+    local_08.c[0] = (float)colour.c[0] * (1.0f / 255.0f);
+    local_08.c[1] = (float)colour.c[1] * (1.0f / 255.0f);
+    local_08.c[2] = (float)colour.c[2] * (1.0f / 255.0f);
+    local_08.c[3] = (float)colour.c[3] * (1.0f / 255.0f);
+
+    for (u32 index = 0; index < pModel->numPackets; index++)
+    {
+        glModelPacket* packet = &pModel->packets[index];
+        packet->matrix = matrix;
+        memcpy((u8*)packet->unknown20 + sizeof(UnidentifiedTextureState),
+            &local_08,
+            sizeof(local_08));
+
+        if (colour.c[3] != 255)
+        {
+            glSetRasterState(packet->rasterState, GLS_AlphaBlend, 1);
+            glSetRasterState(packet->rasterState, GLS_DepthWrite, 0);
+        }
+
+        if (g_bWire)
+        {
+            glSetRasterState(packet->rasterState, GLS_FillMode, 1);
+            glSetRasterState(packet->rasterState, GLS_Culling, 0);
+        }
+    }
+
+    if (arg0->m_eView != 0)
+    {
+        arg0->m_eView->AttachModel(pModel, 1);
+    }
+}
+
+void ShapeRender::DrawSphere(const nlVector3& position, const nlColour& colour,
+    float radius) const
+{
+    nlMatrix4 mat_world;
+    mat_world.SetIdentity();
+    mat_world.SetRow_(3, position);
+    DrawSpherePrimitive(mat_world, radius, colour);
+}
+
 void ShapeRender::DrawSpherePrimitive(const nlMatrix4& mat_world,
     float radius, const nlColour& colour) const
 {
@@ -472,6 +556,76 @@ void ShapeRender::DrawSpherePrimitive(const nlMatrix4& mat_world,
 
     fn_802BC83C(this, m_Hemisphere, mat_hemiTop, true, colour);
     fn_802BC83C(this, m_Hemisphere, mat_hemiBottom, true, colour);
+}
+
+void ShapeRender::DrawLine3D(const nlVector3& p0, const nlVector3& p1,
+    const nlColour& colour, bool bWithDepth) const
+{
+    GLColourMeshWriter writer;
+
+    glSetDefaultState(bWithDepth);
+    glSetCurrentMatrix(glGetIdentityMatrix());
+
+    if (writer.Begin(2, GLP_LineList, 0))
+    {
+        writer.Colour(colour);
+        writer.Vertex(p0.x, p0.y, p0.z);
+        writer.Colour(colour);
+        writer.Vertex(p1.x, p1.y, p1.z);
+
+        if (!writer.End())
+        {
+            return;
+        }
+
+        if (m_eView != 0)
+        {
+            m_eView->AttachModel(writer.GetModel(), 2);
+        }
+    }
+}
+
+extern "C" void fn_802BCE50(const ShapeRender* arg0, const nlVector3& p0,
+    float fRadius, float fScaleX, float fScaleY,
+    const nlColour& colour, bool bWithDepth)
+{
+    GLColourMeshWriter mesh;
+    glSetDefaultState(bWithDepth);
+    glSetCurrentMatrix(glGetIdentityMatrix());
+
+    if (g_bWire)
+    {
+        glSetRasterState(GLS_FillMode, 1);
+        glSetCurrentRasterState(glHandleizeRasterState());
+    }
+
+    int numVerts = 12;
+    if (mesh.Begin(numVerts, GLP_LineStrip, 0))
+    {
+        nlVector3 v3point;
+        v3point.z = p0.z;
+        float fRadians = 0.0f;
+
+        for (int i = 0; i < numVerts; i++)
+        {
+            nlSinCos(&v3point.x, &v3point.y, (unsigned short)(int)(10430.378f * fRadians));
+            v3point.x = p0.x + fScaleX * (v3point.x * fRadius);
+            v3point.y = p0.y + fScaleY * (v3point.y * fRadius);
+            mesh.Colour(colour);
+            mesh.Vertex(v3point.x, v3point.y, v3point.z);
+            fRadians += 6.2831855f / (numVerts - 1);
+        }
+
+        if (!mesh.End())
+        {
+            return;
+        }
+
+        if (arg0->m_eView != 0)
+        {
+            arg0->m_eView->AttachModel(mesh.GetModel(), 2);
+        }
+    }
 }
 
 void ShapeRender::DrawRectangle2D(float x, float y, float w, float h,
@@ -537,6 +691,46 @@ void ShapeRender::Initialize(void* resource)
         m_pLightUserData = 0;
         fn_802C8288();
         m_eView = 0;
+    }
+}
+
+extern "C" void fn_802BD2C8(PrimitiveShape* shape, int arg1, void* arg2)
+{
+    MeshWriter mesh;
+    shape->model = 0;
+    nlFloatColour colour = { { 1.0f, 1.0f, 1.0f, 1.0f } };
+    nlVector3* pPosition = shape->position;
+    nlVector2* pTexcoord = shape->texcoord;
+
+    glSetDefaultState(true);
+
+    if (mesh.Begin(shape->vertCount, arg1, arg2))
+    {
+        int index = 0;
+        while (index < shape->vertCount)
+        {
+            mesh.Texcoord(*pTexcoord);
+            mesh.Vertex(*pPosition);
+            pTexcoord++;
+            pPosition++;
+            index++;
+        }
+
+        UnidentifiedTextureState* textureState = (UnidentifiedTextureState*)mesh.GetModel()->packets->unknown20;
+        textureState->texture = WhiteTexture;
+        textureState->textureIndex = 0xFFFF;
+        textureState->SetWrapS(true);
+        textureState->SetWrapT(true);
+        textureState->unknown07 = 0;
+        memcpy((u8*)mesh.GetModel()->packets->unknown20
+                   + sizeof(UnidentifiedTextureState),
+            &colour,
+            sizeof(colour));
+
+        if (mesh.End())
+        {
+            shape->model = mesh.GetModel();
+        }
     }
 }
 

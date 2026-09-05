@@ -851,7 +851,7 @@ void NetworkStatsManager_8012F378::Update(float dt)
 int GetLocalPlayingSide_801323F4()
 {
     int machine = (s8)fn_80338C20(lbl_806E20D8);
-    int player = (s8)fn_80336F68(0, machine);
+    s8 player = fn_80336F68(0, machine);
     return (s16)GameInfoManager::GetInstance()->GetPlayingSide((u16)player);
 }
 

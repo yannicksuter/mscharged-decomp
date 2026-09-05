@@ -49,9 +49,6 @@ extern "C"
     bool lbl_806E161E;
 
     extern const nlVector2 lbl_804DCEE8[4];
-
-    void fn_802CE528(
-        GLView* view, const nlVector3* world, nlVector3* projected);
 }
 
 CrowdManager CrowdManager::instance;
@@ -274,8 +271,9 @@ void RenderPeachPhoto(UnidentifiedPeachPhotoState* photo)
         for (int i = 0; i < 4; ++i)
         {
             nlVector3 projected;
-            fn_802CE528(GetLayerView(eCLV_Characters),
-                &photo->corners[i], &projected);
+            glViewProjectPoint(GetLayerView(eCLV_Characters),
+                photo->corners[i],
+                projected);
             photo->projectedCorners[i].x = 0.5f * (1.0f + projected.x);
             photo->projectedCorners[i].y = 0.5f * (1.0f + projected.y);
         }
@@ -288,8 +286,9 @@ void RenderPeachPhoto(UnidentifiedPeachPhotoState* photo)
                 for (int i = 0; i < 4; ++i)
                 {
                     nlVector3 projected;
-                    fn_802CE528(GetLayerView(eCLV_Characters),
-                        &cell.world[i], &projected);
+                    glViewProjectPoint(GetLayerView(eCLV_Characters),
+                        cell.world[i],
+                        projected);
                     cell.projected[i].x = 0.5f * (1.0f + projected.x);
                     cell.projected[i].y = 0.5f * (1.0f + projected.y);
                 }

@@ -34,7 +34,6 @@ struct cGame
 extern cGame* lbl_806E0C94;
 #define g_pGame lbl_806E0C94
 
-extern "C" bool fn_800344B0(cFielder*);
 extern "C" unsigned int fn_800387CC(cFielder*);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" float fn_800DEFD4(cFielder*);
@@ -265,7 +264,7 @@ void FormationManager::Update(float dt)
     for (i = 0; i < 4; ++i)
     {
         pFielder = m_pTeam->mUnidentified0D8[i];
-        bool bIgnoreFielder = fn_800344B0(pFielder) || fn_800387CC(pFielder);
+        bool bIgnoreFielder = pFielder->fn_800344B0() || fn_800387CC(pFielder);
         if (!bIgnoreFielder)
         {
             float newY = field_0x18.y + *pWeight * pFielder->m_v3Position.y;
@@ -383,7 +382,7 @@ void FormationManager::fn_80051F00(nlVector2* pCenter)
     for (int i = 0; i < 4; i++)
     {
         cFielder* pFielder = m_pTeam->GetFielder(i);
-        bool bIgnoreFielder = fn_800344B0(pFielder) || fn_800387CC(pFielder);
+        bool bIgnoreFielder = pFielder->fn_800344B0() || fn_800387CC(pFielder);
         if (!bIgnoreFielder)
         {
             numFielders++;
@@ -876,7 +875,7 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
     for (i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         cFielder* pFielder = team->GetFielder(i_fielder);
-        bool bApplyFielderOrder = fn_800344B0(pFielder) || fn_800387CC(pFielder);
+        bool bApplyFielderOrder = pFielder->fn_800344B0() || fn_800387CC(pFielder);
 
         for (i_pos = 0; i_pos < 4; i_pos++)
         {

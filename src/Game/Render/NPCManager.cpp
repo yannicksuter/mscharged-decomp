@@ -2,6 +2,7 @@
 
 #include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"
+#include "NL/gl/glTexture.h"
 #include "unclassified/tu_8019D6B4.h"
 #include "Game/GameTweaks.h"
 #include "Game/Render/ChainChomp.h"
@@ -76,8 +77,6 @@ extern "C"
         unsigned int nChunkSize, void* pReadBuffer0,
         void* pReadBuffer1, void* pParam, unsigned long nParam,
         MemoryAllocator* pAllocator);
-    bool fn_802CDD78(void* pData, unsigned long nSize,
-        MemoryAllocator* pAllocator, int nParam);
 }
 
 extern MemoryAllocator* AllocatorStack[16];

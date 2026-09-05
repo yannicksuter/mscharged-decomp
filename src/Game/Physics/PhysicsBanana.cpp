@@ -38,7 +38,6 @@ extern SlotPool<CollisionPowerupWallData> lbl_805714B0;
 extern void* lbl_806E1608;
 
 extern "C" bool fn_800167A8(cBall*);
-extern "C" bool fn_800976F8(cFielder*, float);
 extern "C" bool fn_800977A4(cFielder*, float);
 extern "C" void fn_801473A4(CollisionPowerupGroundData*);
 extern "C" void fn_80147634(CollisionPowerupWallData*);
@@ -175,7 +174,7 @@ ContactType PhysicsBanana::Contact(
             float lowerHeight = powerup->m_v3Position.z - powerup->GetRadius();
             if ((m_pPowerupObject->mtNoHitTimer.m_uPackedTime != 0
                     && m_pPowerupObject->m_pThrower == (cFielder*)character)
-                || fn_800976F8((cFielder*)character, upperHeight)
+                || ((cFielder*)character)->IsCharacterInAir(upperHeight)
                 || fn_800977A4((cFielder*)character, lowerHeight))
             {
                 return NO_CONTACT;

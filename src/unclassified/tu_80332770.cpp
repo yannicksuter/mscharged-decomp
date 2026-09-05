@@ -13,10 +13,6 @@ static NetworkMessageFactory<NetworkMessageType1_80533B68> sFactoryType1;
 static NetworkMessageFactory<NetworkMessageType8_80533BA4> sFactoryType8;
 static NetworkMessageFactory<NetworkMessageType9_80533B90> sFactoryType9;
 
-extern void* lbl_806E2100;
-
-extern "C" void fn_8032CA40(
-    void* registry, int type, UnidentifiedNetworkMessageFactory* factory);
 extern "C" void fn_8004F594(int category, const char* format, ...);
 
 extern "C" bool fn_80332770()
@@ -46,10 +42,10 @@ extern "C" void fn_803327DC()
         manager->mFrameProvider = 0;
         manager->mEnabled = false;
 
-        fn_8032CA40(lbl_806E2100, 0, &sFactoryType0);
-        fn_8032CA40(lbl_806E2100, 1, &sFactoryType1);
-        fn_8032CA40(lbl_806E2100, 8, &sFactoryType8);
-        fn_8032CA40(lbl_806E2100, 9, &sFactoryType9);
+        lbl_806E2100->fn_8032CA40(0, &sFactoryType0);
+        lbl_806E2100->fn_8032CA40(1, &sFactoryType1);
+        lbl_806E2100->fn_8032CA40(8, &sFactoryType8);
+        lbl_806E2100->fn_8032CA40(9, &sFactoryType9);
 
         manager->mUnidentified08 = 0;
         manager->mUnidentified0C = 0.0f;

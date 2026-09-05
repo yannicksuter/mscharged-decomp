@@ -6,6 +6,7 @@
 #include "NL/MemAlloc.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"
+#include "NL/gl/glTexture.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 
@@ -20,8 +21,6 @@ extern "C"
         void* userData, unsigned int alignment, int allocType,
         unsigned int chunkSize, void* readBuffer0, void* readBuffer1,
         void* param, unsigned long value, MemoryAllocator* allocator);
-    bool fn_802CDD78(void* data, unsigned long size,
-        void* context, int value);
 }
 
 struct UnidentifiedChunkTree_802DC800

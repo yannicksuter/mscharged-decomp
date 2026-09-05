@@ -1,15 +1,9 @@
 #include "Game/SAnim.h"
+#include "Game/SAnimDecode_8030EC30.h"
 
 #include "Game/PoseAccumulator.h"
 #include "Game/SHierarchy.h"
 #include "NL/nlSlotPool.h"
-
-extern "C" void fn_8030EC4C(nlQuaternion*, const void*);
-extern "C" void fn_8030EC60(nlQuaternion*, const void*);
-extern "C" void fn_8030ECC8(nlQuaternion*, const void*);
-extern "C" void fn_8030ECDC(nlVector3*, const PackedScale*);
-extern "C" void fn_8030ED48(float*, const unsigned char*);
-extern "C" void fn_8030ED7C(float*, const unsigned char*);
 
 SlotPool<cSAnimCallback> lbl_805840D8(16, 16);
 

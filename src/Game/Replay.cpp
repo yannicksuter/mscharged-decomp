@@ -23,6 +23,10 @@ public:
         Reset();
     }
 
+    ~UnidentifiedReplayFramePool()
+    {
+    }
+
     Replay::Frame* Allocate()
     {
         Entry* entry = mFree;
@@ -44,10 +48,9 @@ public:
     {
         for (int i = 0; i < kFrameCount - 1; ++i)
         {
-            mEntries[i].next = &mEntries[i + 1];
+            mEntries[i].next = &mEntries[i] + 1;
         }
         mEntries[kFrameCount - 1].next = 0;
-        mFree = mEntries;
     }
 
     Entry* mFree;

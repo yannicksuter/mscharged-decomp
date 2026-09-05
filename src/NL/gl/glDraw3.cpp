@@ -1,6 +1,6 @@
 #include "NL/gl/glDraw3.h"
 
-#include "Game/GL/GLMeshWriter.h"
+#include "Game/GL/GLTexturedColourMeshWriter.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
@@ -33,7 +33,7 @@ bool glAttachQuad3(
 const glModel* glQuad3::GetModel() const
 {
     glModel* newModel = 0;
-    GLMeshWriter writer;
+    GLTexturedColourMeshWriter writer;
     unsigned long texconfig = gl_GetCurrentStateBundle()->texconfig;
 
     if (glHasQuads())

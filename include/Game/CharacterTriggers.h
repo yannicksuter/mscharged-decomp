@@ -28,6 +28,9 @@ void KillMushroom(cFielder* pFielder);
 void EmitStar(cFielder* pFielder, bool bParam);
 void KillStar(cFielder* pFielder);
 bool KillDaze(cPlayer* player);
+extern "C" void fn_801B93E8(cCharacter*);
+extern "C" void fn_801B97DC(cFielder*);
+extern "C" void fn_801BB5DC(cFielder*, int);
 EmissionController* EmitGeneric(cCharacter* pCharacter, const char* baseName, const char* characterName);
 
 #endif // GAME_CHARACTERTRIGGERS_H

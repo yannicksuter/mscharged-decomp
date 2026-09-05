@@ -3,15 +3,11 @@
 
 #include <string.h>
 
+#include "Game/NetworkInput_80331668.h"
 #include "Game/NetworkSession.h"
 #include "NL/nlMemory.h"
 #include "types.h"
 #include "unclassified/tu_80332770.h"
-
-struct InputRouterRecord
-{
-    u8 mData[0x10];
-};
 
 class UnidentifiedInputRouter
 {
@@ -45,7 +41,7 @@ public:
         s8 machine, NetworkMessageType0_80533B7C* message) = 0;
     virtual void RouterVirtual2C(
         s8 machine, NetworkMessageType8_80533BA4* message) = 0;
-    virtual void RouterVirtual30() = 0;
+    virtual void RouterVirtual30(int column, int* row) = 0;
     virtual bool RouterVirtual34();
     virtual void RouterVirtual38();
     virtual void RouterVirtual3C();
@@ -104,7 +100,7 @@ public:
         s8 machine, NetworkMessageType0_80533B7C* message);
     virtual void RouterVirtual2C(
         s8 machine, NetworkMessageType8_80533BA4* message);
-    virtual void RouterVirtual30();
+    virtual void RouterVirtual30(int column, int* row);
 };
 
 class NetworkInputRouter : public UnidentifiedInputRouter
@@ -126,7 +122,7 @@ public:
         s8 machine, NetworkMessageType0_80533B7C* message);
     virtual void RouterVirtual2C(
         s8 machine, NetworkMessageType8_80533BA4* message);
-    virtual void RouterVirtual30();
+    virtual void RouterVirtual30(int column, int* row);
 
     /* 0x0198 */ bool mCongested;
     /* 0x0199 */ bool mWasCongested;

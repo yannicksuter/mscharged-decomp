@@ -20,12 +20,17 @@ class SpaceSearch;
 class UnidentifiedPlayerRadius;
 struct CollisionPlayerPlayerData;
 struct CollisionPlayerWallData;
-struct UnidentifiedPlayerEventData;
+struct UnidentifiedEventData24;
 
 enum eBallRotationMode
 {
     BRM_ANIMATED = 0,
     BRM_MATCH_VELOCITY = 1,
+};
+
+enum ePadActions
+{
+    PAD_SWITCH = 26,
 };
 
 class cPlayer : public cCharacter
@@ -44,6 +49,10 @@ public:
     virtual void UnidentifiedVirtual1C();
     virtual void SetAnimID(int animID);
     virtual void Update(float fDeltaT);
+    virtual void Unknown10(
+        const nlVector3& v3Position, unsigned short aDirection);
+    virtual void Unknown11(void* context, DebugWriteCache* cache);
+    virtual void Unknown12(RunningChecksum* pChecksum);
     virtual bool CanPickupBall(cBall* pBall, bool bParam);
     virtual void CollideWithBallCallback(cBall* pBall);
     virtual void CollideWithCharacterCallback(
@@ -51,13 +60,14 @@ public:
     virtual void CollideWithWallCallback(
         const CollisionPlayerWallData* pData);
     virtual void InitActionPostWhistle();
-    virtual void fn_80099074(UnidentifiedPlayerEventData*);
+    virtual void fn_80099074(UnidentifiedEventData24*);
 
     void ReleaseBall(int nParam);
     void GetAnimatedBallOrientation(nlQuaternion& qRetval);
     void PickupBall(cBall* pBall);
     void SetNoPickUpTime(float NewNoPickUpTime);
     DetInput* GetGlobalPad();
+    u8 SwapController(bool bParam);
     void* fn_800972CC();
     void SetAIPad(cAIPad* pPad);
     void fn_80096CDC(cBall* pBall);
@@ -82,6 +92,7 @@ public:
     void fn_8009750C();
     void fn_80097648(float fParam);
     bool fn_800976C4();
+    bool IsCharacterInAir(float fParam) const;
     cPN_SingleAxisBlender* CreateSingleAxisBlender(
         const int* pSABAnims, int nNumSABAnims, int nPrimaryAnim,
         void (*fWeightCB)(unsigned int, cPN_SingleAxisBlender*),

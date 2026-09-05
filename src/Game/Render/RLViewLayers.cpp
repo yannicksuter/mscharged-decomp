@@ -18,20 +18,6 @@ extern "C" void fn_8037091C();
 extern "C" void fn_80370998(GLView*, GLView*);
 void CopyShadowVolumeColour(const GXColor* colour);
 
-struct RLViewTargetInfo
-{
-    /* 0x00 */ u32 height;
-    /* 0x04 */ u32 width;
-    /* 0x08 */ u32 unknown08;
-    /* 0x0C */ u32 unknown0C;
-    /* 0x10 */ u32 unknown10;
-    /* 0x14 */ u32 format;
-    /* 0x18 */ u32 unknown18;
-    /* 0x1C */ u32 unknown1C;
-    /* 0x20 */ u32 unknown20;
-    /* 0x24 */ u8 colour[4];
-};
-
 struct RLViewLayerDesc
 {
     /* 0x00 */ eCLV layer;
@@ -132,11 +118,8 @@ void fn_80272214(int view, const nlMatrix4& viewMatrix, const nlMatrix4& project
 
 void fn_80272388()
 {
-    RLViewTargetInfo info;
+    TargetInfo_8036DE50 info;
     int i;
-
-    info.unknown08 = 0;
-    info.unknown0C = 0;
 
     for (i = 0; i < 11; i++)
     {
@@ -154,7 +137,7 @@ void fn_80272388()
 
     for (i = 0; i < 11; i++)
     {
-        nlZeroMemory(&info, sizeof(RLViewTargetInfo));
+        nlZeroMemory(&info, sizeof(TargetInfo_8036DE50));
         info.width = 0x48;
         info.height = 0x48;
         info.format = 6;
@@ -301,9 +284,7 @@ GLViewInterface* fn_802726A0()
 
 void fn_802726AC()
 {
-    RLViewTargetInfo info;
-    info.unknown08 = 0;
-    info.unknown0C = 0;
+    TargetInfo_8036DE50 info;
     info.width = 0x40;
     info.height = 0x40;
     info.format = 7;
@@ -352,10 +333,8 @@ void fn_802726AC()
 
 void fn_80272850()
 {
-    RLViewTargetInfo info;
-    info.unknown08 = 0;
-    info.unknown0C = 0;
-    nlZeroMemory(&info, sizeof(RLViewTargetInfo));
+    TargetInfo_8036DE50 info;
+    nlZeroMemory(&info, sizeof(TargetInfo_8036DE50));
     info.width = fn_80369D4C() >> 1;
     info.height = fn_80369D54() >> 1;
     info.format = 1;
@@ -382,7 +361,7 @@ void fn_80272850()
     sLayerViews[eCLV_ScreenGrab]->m_Unknown33 = false;
     sLayerViews[eCLV_ScreenGrab]->m_ClearColour = false;
 
-    nlZeroMemory(&info, sizeof(RLViewTargetInfo));
+    nlZeroMemory(&info, sizeof(TargetInfo_8036DE50));
     info.width = 0x100;
     info.height = 0x80;
     info.format = 1;
@@ -654,7 +633,7 @@ extern "C" bool fn_80273B00()
     return sWidescreen;
 }
 
-const nlVector4* RLViewCamera::GetShadowMatrix()
+const nlVector4* RLViewCamera::GetShadowMatrix() const
 {
     if (mShadowDirty)
     {
@@ -664,17 +643,17 @@ const nlVector4* RLViewCamera::GetShadowMatrix()
     return mShadowPlanes;
 }
 
-void RLViewCamera::GetViewProjectionMatrix(nlMatrix4& matrix)
+void RLViewCamera::GetViewProjectionMatrix(nlMatrix4& matrix) const
 {
     matrix = mViewProjection;
 }
 
-void RLViewCamera::GetInverseViewMatrix(nlMatrix4& matrix)
+void RLViewCamera::GetInverseViewMatrix(nlMatrix4& matrix) const
 {
     matrix = mViewInverse;
 }
 
-void RLViewCamera::GetProjectionMatrix(nlMatrix4& matrix)
+void RLViewCamera::GetProjectionMatrix(nlMatrix4& matrix) const
 {
     matrix = mProjection;
 }
@@ -684,7 +663,7 @@ const nlMatrix4* RLViewCamera::GetProjectionMatrix() const
     return &mProjection;
 }
 
-void RLViewCamera::GetViewMatrix(nlMatrix4& matrix)
+void RLViewCamera::GetViewMatrix(nlMatrix4& matrix) const
 {
     matrix = mView;
 }

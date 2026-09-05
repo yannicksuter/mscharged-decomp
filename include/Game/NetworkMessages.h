@@ -89,6 +89,29 @@ public:
     virtual int ReceiverVirtual00(UnidentifiedNetworkMessage* message) = 0;
 };
 
+class UnidentifiedMessageRegistry_8032C7D0
+{
+public:
+    UnidentifiedMessageRegistry_8032C7D0()
+    {
+        memset(mUnidentified000, 0, sizeof(mUnidentified000));
+        memset(mUnidentified400, 0, sizeof(mUnidentified400));
+    }
+
+    int fn_8032C830(UnidentifiedNetworkMessage* message, u8* buffer,
+        unsigned long size);
+    void fn_8032C8CC(int source, u8* buffer, unsigned long size);
+    void fn_8032CA1C(u8 type, UnidentifiedNetworkMessageReceiver* receiver);
+    void fn_8032CA2C(u8 type);
+    void fn_8032CA40(u8 type, UnidentifiedNetworkMessageFactory* factory);
+
+    /* 0x000 */ UnidentifiedNetworkMessageFactory* mUnidentified000[256];
+    /* 0x400 */ UnidentifiedNetworkMessageReceiver* mUnidentified400[256];
+}; // size: 0x800
+
+extern UnidentifiedMessageRegistry_8032C7D0* lbl_806E2100;
+void fn_8032C7D0();
+
 // "Failed to SendTournamentStartToEveryone to %d because no connection".
 class NetMessageTournamentStart : public UnidentifiedNetworkMessage
 {
@@ -415,7 +438,7 @@ class NetworkMessageType34_8050ADCC : public UnidentifiedNetworkMessage
 {
 public:
     virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetworkMessageType34_8050ADCC();
+    virtual ~NetworkMessageType34_8050ADCC() { }
     virtual int GetType();
 
     /* 0x08 */ u16 mUnidentified08;

@@ -61,7 +61,7 @@ struct WorldAnimDrawable_80343A40
     u8 m_pad1C[0x04];
     nlMatrix4 m_transform;
     float m_fRadius;
-    void* m_pModel;
+    glModel* m_pModel;
     u8 m_pad68[0x0C];
     void* m_pEmissionController;
     u8 m_pad78[0x08];
@@ -395,8 +395,7 @@ extern "C" void fn_80343C14(
     unsigned long uAnimationHash
         = *(unsigned long*)pObject->m_pModel;
     GLVertexAnim* pVertexAnim
-        = (GLVertexAnim*)fn_802CC094()->m_inventory
-              ->GetModel(uAnimationHash);
+        = fn_802CC094()->m_inventory->GetVertexAnim(uAnimationHash);
     glModel* pModel = (glModel*)pObject->m_pModel;
     if (pVertexAnim != 0)
     {
@@ -455,8 +454,7 @@ extern "C" void fn_80343C14(
 extern "C" void fn_80343DE4(WorldAnimDrawable_80343A40* pObject,
     WorldObjectLoadContext_8034136C* pContext)
 {
-    GLMaterialList*& pMaterial
-        = *(GLMaterialList**)&pObject->m_pModel;
+    glModel*& pMaterial = pObject->m_pModel;
     pContext->m_pWorld->fn_803418C4(pMaterial);
     pObject->m_pModel = glModelDupNoStreams(
         (glModel*)pObject->m_pModel, true,
@@ -467,8 +465,7 @@ extern "C" void fn_80343E3C(
     WorldVertexAnimDrawable_80343E3C* pObject,
     WorldObjectLoadContext_8034136C* pContext)
 {
-    GLMaterialList*& pMaterial
-        = *(GLMaterialList**)&pObject->m_pModel;
+    glModel*& pMaterial = pObject->m_pModel;
     pContext->m_pWorld->fn_803418C4(pMaterial);
     pObject->m_pModel = glModelDupNoStreams(pObject->m_pModel,
         true, pContext->m_pWorld->m_pResource);

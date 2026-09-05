@@ -94,10 +94,10 @@ Blinker::Blinker(unsigned long texture0, unsigned long texture1,
     m_Textures[2] = texture2;
     m_Textures[3] = texture1;
 
-    m_ResolvedTextures[0] = fn_802CE1B8(fn_802CDF0C(), m_Textures[0]);
-    m_ResolvedTextures[1] = fn_802CE1B8(fn_802CDF0C(), m_Textures[1]);
-    m_ResolvedTextures[2] = fn_802CE1B8(fn_802CDF0C(), m_Textures[2]);
-    m_ResolvedTextures[3] = fn_802CE1B8(fn_802CDF0C(), m_Textures[3]);
+    m_ResolvedTextures[0] = fn_802CDF0C()->fn_802CE1B8(m_Textures[0]);
+    m_ResolvedTextures[1] = fn_802CDF0C()->fn_802CE1B8(m_Textures[1]);
+    m_ResolvedTextures[2] = fn_802CDF0C()->fn_802CE1B8(m_Textures[2]);
+    m_ResolvedTextures[3] = fn_802CDF0C()->fn_802CE1B8(m_Textures[3]);
 
     memcpy(m_fBlinkTimes, BlinkTimes, sizeof(m_fBlinkTimes));
     m_State = Blink_Open;

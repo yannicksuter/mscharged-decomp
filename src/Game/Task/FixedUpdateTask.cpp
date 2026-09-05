@@ -1,4 +1,5 @@
 #include "Game/Task/FixedUpdateTask.h"
+#include "Game/EventDispatcher.inl"
 
 #include "Game/FE/feManager.h"
 
@@ -339,10 +340,10 @@ void FixedUpdateTask::Run(float dt)
         while (g_bRunSimAndRenderInLockStep
             || mAccumulatedDeltaT >= g_fFixedUpdateTick)
         {
-            fn_802C084C(lbl_806E1E28, 1);
+            lbl_806E1E28->fn_802C084C(1);
             simulationTick = g_fFixedUpdateTick;
             fn_8037537C(lbl_806E2478);
-            fn_802C07AC(lbl_806E1E28, simulationTick);
+            lbl_806E1E28->Update(simulationTick);
             FlickDetection::Update();
 
             mAccumulatedDeltaT -= g_fFixedUpdateTick;
@@ -388,9 +389,9 @@ void FixedUpdateTask::Run(float dt)
         }
     }
 
-    fn_802C084C(lbl_806E1E28, 0);
+    lbl_806E1E28->fn_802C084C(0);
     fn_8037537C(lbl_806E2478);
-    fn_802C07AC(lbl_806E1E28, dt);
+    lbl_806E1E28->Update(dt);
     FlickDetection::Update();
 }
 

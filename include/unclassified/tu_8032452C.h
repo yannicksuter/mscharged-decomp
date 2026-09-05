@@ -2,23 +2,12 @@
 #define UNCLASSIFIED_TU_8032452C_H
 
 #include "types.h"
+#include "NL/nlBufferedWriter.h"
 
 class UnidentifiedReliableSocketCallback;
 class UnidentifiedTransportConnection;
 class UnidentifiedTransportMessage_8032B6D4;
 struct UnidentifiedReliableSocketState;
-
-struct UnidentifiedTransportLogWriter
-{
-    /* 0x00 */ void* mFile;
-    /* 0x04 */ bool mBuffered;
-    /* 0x05 */ bool mWriteToNAND;
-    /* 0x06 */ u8 mPadding[2];
-    /* 0x08 */ u32 mBufferSize;
-    /* 0x0C */ u32 mFlushThreshold;
-    /* 0x10 */ char* mBuffer;
-    /* 0x14 */ char* mCurrent;
-}; // size: 0x18
 
 struct UnidentifiedTransportDisplayEntry
 {
@@ -37,7 +26,7 @@ struct UnidentifiedReliableSocketLayout
     /* 0x605 */ bool mEnabled;
     /* 0x606 */ u8 mPadding606[2];
     /* 0x608 */ void* mDebugFile;
-    /* 0x60C */ UnidentifiedTransportLogWriter mLogWriter;
+    /* 0x60C */ nlBufferedWriter mLogWriter;
     /* 0x624 */ u32 mLastUpdateTick;
     /* 0x628 */ u32 mReceivedBytes;
     /* 0x62C */ u32 mSentBytes;
@@ -86,8 +75,8 @@ extern "C"
         void* buffer, int size, bool reliable);
     void fn_80324A4C(UnidentifiedReliableSocketState* socket, u8 aid,
         void* buffer, int size);
-    void fn_80324A5C(UnidentifiedReliableSocketState* socket, void* a,
-        void* b, bool c);
+    void fn_80324A5C(UnidentifiedReliableSocketState* socket, int a,
+        int* b, bool c);
     void fn_80324B54(UnidentifiedReliableSocketState* socket);
     void fn_80324CB4(
         UnidentifiedTransportDisplayEntry* entries, const char* text);

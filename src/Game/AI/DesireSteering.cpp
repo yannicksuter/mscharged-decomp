@@ -29,13 +29,11 @@ extern "C" float fn_8002C328(PlayerTweaks*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" void fn_80040368(cFielder*);
 extern "C" void fn_8003C7B0(cFielder*);
 extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" bool fn_8003E70C(cFielder*);
 extern "C" bool fn_8003E8A0(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
-extern "C" bool fn_8003E9F0(cFielder*);
 extern "C" void fn_8006040C(cGame*, cFielder*);
 extern "C" void fn_80060608(cGame*, cFielder*);
 extern "C" void fn_80060804(cGame*, cFielder*);
@@ -278,7 +276,7 @@ extern "C" void fn_800C6390(DesireSteering* desire,
 {
     nlVector3 v3FixedPos = v3Position;
     float fRadius = fn_8002BFA8(fn_8003E6E4(desire->mUnidentifiedFielder),
-        desire->mUnidentifiedFielder->mUnidentified0A0);
+        desire->mUnidentifiedFielder->m_fPlayerScale);
     cField::FixOutOfBoundsPosition(v3FixedPos, fRadius, false);
 
     float fDeltaX
@@ -353,7 +351,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
     nlVector3 v3FixedPos = v3Pos;
     cFielder* pFielder = desire->mUnidentifiedFielder;
     float fRadius = fn_8002BFA8(
-        fn_8003E6E4(pFielder), pFielder->mUnidentified0A0);
+        fn_8003E6E4(pFielder), pFielder->m_fPlayerScale);
     cField::FixOutOfBoundsPosition(v3FixedPos, fRadius, false);
 
     float fDeltaX = v3FixedPos.x - pFielder->m_v3Position.x;
@@ -572,8 +570,8 @@ extern "C" eStrafeDirection fn_800C7348(DesireSteering* desire,
 
     float fTransitionToForwardDelta;
     float fTransitionToBackWardsDelta;
-    if (pFielder->mUnidentified37C == 1
-        || pFielder->mUnidentified37C == 2)
+    if (pFielder->mActionRunningVars.eLastStrafeDirection == 1
+        || pFielder->mActionRunningVars.eLastStrafeDirection == 2)
     {
         fTransitionToForwardDelta
             = lbl_8056CF08.m_pGameTweaks->nStrafeToRunOutDirectionDelta;
@@ -654,9 +652,9 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
             cFielder* pMark = fn_800D6734(pFielder);
             float fMarkWeight = fn_800DBC5C(pFielder, pMark);
             float fTotalWeight = fFacingWeight + fMarkWeight;
-            bool bTurning = pFielder->mUnidentified37C == 1
-                         || pFielder->mUnidentified37C == 2
-                         || pFielder->mUnidentified37C == 4;
+            bool bTurning = pFielder->mActionRunningVars.eLastStrafeDirection == 1
+                         || pFielder->mActionRunningVars.eLastStrafeDirection == 2
+                         || pFielder->mActionRunningVars.eLastStrafeDirection == 4;
             float fThreshold = bTurning ? 0.5f : 0.75f;
             if (fTotalWeight > fThreshold)
             {
@@ -688,7 +686,7 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
         eMovement = pFielder->m_fDesiredSpeed < 0.1f
                   ? STRAFE_IDLE : STRAFE_FORWARD;
     }
-    pFielder->mUnidentified37C = eMovement;
+    pFielder->mActionRunningVars.eLastStrafeDirection = eMovement;
 }
 
 extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
@@ -704,7 +702,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
     else if (pFielder->GetGlobalPad() != NULL)
     {
         if ((fn_8003E8A0(pFielder) && pFielder->mUnidentified3DC)
-            || (fn_8003E9F0(pFielder) && !pFielder->mUnidentified3DC))
+            || (pFielder->fn_8003E9F0() && !pFielder->mUnidentified3DC))
         {
             nThingsToAvoid = AVOID_NOTHING;
         }
@@ -862,7 +860,7 @@ void DesireSteering::UnidentifiedUpdate(
     if (mUnidentifiedFielder->m_eActionState == ACTION_WAIT
         || mUnidentifiedFielder->m_eActionState == ACTION_NEED_ACTION)
     {
-        fn_80040368(mUnidentifiedFielder);
+        mUnidentifiedFielder->StartRunning();
     }
     if (sUseAvoidance && bUseAvoidance)
     {
@@ -950,8 +948,8 @@ bool UnidentifiedDesire35::UnidentifiedInitialize(void*)
 {
     mUnidentified078 = 10.0f;
     fn_8006040C(g_pGame, mUnidentifiedFielder);
-    mUnidentifiedFielder->mUnidentified3F8
-        = mUnidentifiedFielder->mUnidentified3FC;
+    mUnidentifiedFielder->mUnidentified3F8.mUnidentified00
+        = mUnidentifiedFielder->mUnidentified3F8.mUnidentified04;
     return true;
 }
 
@@ -982,10 +980,10 @@ void UnidentifiedDesire35::UnidentifiedUpdate(
         return;
     }
 
-    pFielder->mUnidentified3F8 -= fDeltaT;
+    pFielder->mUnidentified3F8.mUnidentified00 -= fDeltaT;
     short nFacingDelta = (short)(pFielder->m_aActualFacingDirection
         - pFielder->m_aDesiredFacingDirection);
-    if (pFielder->mUnidentified3F8 <= 0.0f)
+    if (pFielder->mUnidentified3F8.mUnidentified00 <= 0.0f)
     {
         if (pFielder->mUnidentified3DD)
         {
@@ -1000,10 +998,10 @@ void UnidentifiedDesire35::UnidentifiedUpdate(
             fn_80060608(g_pGame, pFielder);
             if (pFielder->mUnidentified3E0 > 0.0f
                 && pFielder->mUnidentified3E0
-                    < pFielder->mUnidentified3FC)
+                    < pFielder->mUnidentified3F8.mUnidentified04)
             {
                 pFielder->mUnidentified3E0
-                    = pFielder->mUnidentified3FC;
+                    = pFielder->mUnidentified3F8.mUnidentified04;
             }
             if (nFacingDelta < 0)
             {
@@ -1016,7 +1014,7 @@ void UnidentifiedDesire35::UnidentifiedUpdate(
                     pFielder->m_aActualFacingDirection - 0x4000, true);
             }
             fn_8006040C(g_pGame, pFielder);
-            pFielder->mUnidentified3F8 = pFielder->mUnidentified3FC;
+            pFielder->mUnidentified3F8.mUnidentified00 = pFielder->mUnidentified3F8.mUnidentified04;
         }
     }
 

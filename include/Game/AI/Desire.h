@@ -18,7 +18,12 @@ extern "C" Desire* fn_8002E08C(cFielder*, int);
 
 struct UnidentifiedStateTransition
 {
-    int mUnidentifiedHash;
+    bool UnidentifiedIsUnset() const
+    {
+        return mUnidentifiedFunction == 0 && mUnidentifiedHash == (u32)-1;
+    }
+
+    u32 mUnidentifiedHash;
     void* mUnidentifiedFunction;
 };
 
@@ -526,6 +531,8 @@ private:
 
 class DesireFrozen : public Desire
 {
+    friend class cFielder;
+
 public:
     DesireFrozen(int state, const UnidentifiedStateTransition& transition)
         : Desire(state, transition)
@@ -542,6 +549,11 @@ public:
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
     void fn_800BE0BC(float, int);
+
+    bool IsUnidentifiedState(int nState) const
+    {
+        return mUnidentifiedActive && meFrozenState == nState;
+    }
 
 private:
     void fn_800BE1AC(int);

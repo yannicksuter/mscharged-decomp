@@ -116,7 +116,7 @@ bool GLCompactColourMeshWriter::End()
 {
     for (int i = 0; i < model->numPackets; ++i)
     {
-        fn_8036E438(&model->packets[i], resource != 0, resource);
+        glplatFinalizePacket(&model->packets[i], resource != 0, resource);
     }
     for (int i = 0; i < model->packets->numStreams; ++i)
     {

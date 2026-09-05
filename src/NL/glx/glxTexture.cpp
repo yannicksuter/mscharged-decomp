@@ -4,6 +4,7 @@
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
+#include "NL/gl/glTexture.h"
 #include "NL/nlFile.h"
 #include "NL/nlList.h"
 #include "NL/nlMemory.h"
@@ -31,12 +32,7 @@ enum eGLTextureMode
 extern "C"
 {
     void* fn_802CC0A4(
-        unsigned long size, int memoryType, MemoryAllocator* allocator);
-    bool fn_802CDD78(
-        void* data, unsigned long size, MemoryAllocator* allocator, int);
-    PlatTexture* fn_802CE2B8(
-        TextureManager_802CDF0C* manager,
-        UnidentifiedTextureState* texture);
+        unsigned long size, int memoryType, void* allocator);
     int fn_80383478(const char* format, ...);
 
     void DCStoreRange(void* address, unsigned long length);
@@ -232,7 +228,7 @@ int glplatTextureGetNumBits(int component)
     return texobj.m_Bits[component];
 }
 
-PlatTexture* glx_CreatePlatTexture(MemoryAllocator* allocator)
+PlatTexture* glx_CreatePlatTexture(void* allocator)
 {
     return new (fn_802CC0A4(sizeof(PlatTexture), 0, allocator)) PlatTexture();
 }
@@ -268,7 +264,7 @@ void PlatTexture::CreateWithMemory(int width, int height,
 }
 
 void PlatTexture::Create(int width, int height, eGXTextureFormat format,
-    MemoryAllocator* allocator, int numLevels, bool linearData,
+    void* allocator, int numLevels, bool linearData,
     bool newResourceMemory)
 {
     if (m_LinearData != 0)
@@ -342,7 +338,7 @@ void PlatTexture::Prepare()
 }
 
 PlatTexture* glx_MakeTexture(GXTextureHeader* header,
-    MemoryAllocator* allocator, unsigned long texhandle)
+    void* allocator, unsigned long texhandle)
 {
     PlatTexture* pTex;
     unsigned char* textureData;
@@ -410,7 +406,7 @@ bool glplatBeginLoadTextureBundle(const char* filename,
 }
 
 bool glplatLoadTextureBundle(
-    const char* filename, MemoryAllocator* allocator)
+    const char* filename, void* allocator)
 {
     bool result;
     void* data;
@@ -422,20 +418,24 @@ bool glplatLoadTextureBundle(
 }
 
 extern "C" PlatTexture* fn_8036BBC0(glTexBundleDict* entry,
-    GXTextureHeader* header, MemoryAllocator* allocator)
+    GXTextureHeader* header, void* allocator)
 {
     return glx_MakeTexture(header, allocator, entry->hash);
 }
 
-extern "C" void fn_8036BBD8()
+extern "C" void fn_8036BBD4(void*, void*)
+{
+}
+
+extern "C" void fn_8036BBD8(void*)
 {
     GXInvalidateTexAll();
 }
 
 extern "C" PlatTexture* fn_8036BBDC(unsigned long handle,
-    GXTextureHeader* header, unsigned long, MemoryAllocator* allocator)
+    const void* textureData, unsigned long, void* allocator)
 {
-    return glx_MakeTexture(header, allocator, handle);
+    return glx_MakeTexture((GXTextureHeader*)textureData, allocator, handle);
 }
 
 void glplatTextureReplace(PlatTexture* pTex, const void* textureData,
@@ -492,12 +492,12 @@ extern "C" void fn_8036BE88(
         glGetTexture("font/fixedWidthMedium");
 
     textureManager = fn_802CDF0C();
-    pTex = fn_802CE2B8(textureManager, textureState);
+    pTex = textureManager->fn_802CE2B8(textureState);
     if (pTex == 0)
     {
         unsigned long texture =
-            fn_802CE1B8(textureManager, missingTexture);
-        pTex = fn_802CE294(textureManager, &texture);
+            textureManager->fn_802CE1B8(missingTexture);
+        pTex = textureManager->fn_802CE294(&texture);
     }
 
     if (glx_bGridMode)

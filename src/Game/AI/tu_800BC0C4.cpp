@@ -16,8 +16,6 @@ extern "C" float fn_8002C7D0(PlayerTweaks*);
 extern "C" float fn_8002CFD8(PlayerTweaks*);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" bool fn_8003E73C(cFielder*);
-extern "C" bool fn_8003E74C(cFielder*);
-extern "C" bool fn_80034964(cFielder*);
 extern "C" void fn_8001EE74(cFielder*, float, float, float);
 extern "C" void fn_8001EF6C(cFielder*, float);
 extern "C" void fn_80038158(cFielder*, bool);
@@ -91,7 +89,7 @@ bool DesireMushroom::UnidentifiedInitialize(void* context)
     bool result = Desire::UnidentifiedInitialize(context);
     mUnidentified078 = fn_8002C7D0(fn_8003E6E4(mUnidentifiedFielder));
     fn_8002E340(mUnidentifiedFielder);
-    if (!fn_8003E74C(mUnidentifiedFielder))
+    if (!mUnidentifiedFielder->fn_8003E74C())
     {
         fn_8001EE74(
             mUnidentifiedFielder, lbl_806DC17C, 0.2f, -1.0f);
@@ -118,7 +116,7 @@ bool DesireMushroom::UnidentifiedReinitialize(void* context)
 void DesireMushroom::UnidentifiedCleanup()
 {
     KillMushroom(mUnidentifiedFielder);
-    if (!fn_8003E74C(mUnidentifiedFielder)
+    if (!mUnidentifiedFielder->fn_8003E74C()
         && !fn_8003E73C(mUnidentifiedFielder))
     {
         fn_8001EE74(mUnidentifiedFielder, 1.0f, 0.2f, -1.0f);
@@ -224,7 +222,7 @@ void DesireGooey::UnidentifiedUpdate(
 
     mfGooPercentage = 1.0f
                     - (mUnidentifiedTimer.GetSeconds() / mUnidentified078);
-    if (!fn_80034964(mUnidentifiedFielder))
+    if (!mUnidentifiedFielder->IsRunning())
     {
         mUnidentifiedFielder->m_pCurrentAnimController
             ->m_fPlaybackSpeedScale = InterpolateRangeClamped(

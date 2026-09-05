@@ -1,23 +1,10 @@
 #include "NL/MemAlloc.h"
+#include "NL/UnidentifiedInflateStream_802A99E8.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
-
-typedef void* (*InflateAllocCallback)(void*, unsigned int, unsigned int);
-typedef void (*InflateFreeCallback)(void*, void*);
-
-struct InflateState_802B3C28
-{
-    unsigned int sourceSize;
-    void* output;
-    unsigned int outputSize;
-    unsigned int sourceRemaining;
-    bool complete;
-    unsigned char padding[3];
-    unsigned char state[0x38];
-};
 
 struct AsyncLoadState_802B3C28
 {
@@ -39,17 +26,11 @@ struct AsyncLoadState_802B3C28
     int readCount;
     int fullChunkCount;
     unsigned int finalChunkSize;
-    InflateState_802B3C28 inflateState;
+    UnidentifiedInflateStream_802A99E8 inflateState;
 };
 
 extern "C"
 {
-    void fn_802A99D8(InflateAllocCallback, InflateFreeCallback, void*);
-    void fn_802A99E8(InflateState_802B3C28*, unsigned int, void*, void*);
-    bool fn_802A9A04(InflateState_802B3C28*);
-    bool fn_802A9A58(InflateState_802B3C28*, void*, unsigned int);
-    void fn_802A9B84(InflateState_802B3C28*);
-
     void fn_802B3D30(nlFile*, void*, unsigned int, unsigned long);
 
     unsigned int lbl_806E1D9C;
@@ -103,7 +84,7 @@ extern "C" void fn_802B3D30(nlFile* file, void* buffer, unsigned int size, unsig
     AsyncLoadState_802B3C28* state = (AsyncLoadState_802B3C28*)userParam;
 
     ++state->completedReads;
-    fn_802A9A58(&state->inflateState, buffer, size);
+    state->inflateState.fn_802A9A58(buffer, size);
 
     if (state->nextRead < state->fullChunkCount)
     {
@@ -122,7 +103,7 @@ extern "C" void fn_802B3D30(nlFile* file, void* buffer, unsigned int size, unsig
 
     if (state->completedReads == state->readCount)
     {
-        fn_802A9B84(&state->inflateState);
+        state->inflateState.fn_802A9B84();
         state->callback(state->output, state->uncompressedSize, state->userData);
         delete state->file;
 
@@ -182,7 +163,7 @@ extern "C" bool fn_802B3E94(const char* path, LoadAsyncCallback callback,
         state->fullChunkCount = 0;
         state->finalChunkSize = 0;
 
-        fn_802A99E8(&state->inflateState, compressedSize, 0, 0);
+        new (&state->inflateState) UnidentifiedInflateStream_802A99E8(compressedSize, 0, 0);
 
         if (readBuffer0 != 0)
         {
@@ -197,7 +178,7 @@ extern "C" bool fn_802B3E94(const char* path, LoadAsyncCallback callback,
             state->ownsReadBuffers = true;
         }
 
-        fn_802A9A04(&state->inflateState);
+        state->inflateState.fn_802A9A04();
     }
 
     nlReadAsync(file, state, 4, fn_802B3C40, (unsigned long)state, 0);

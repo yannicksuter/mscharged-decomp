@@ -8,8 +8,6 @@
 #include "NL/nlMemory.h"
 #include "types.h"
 
-extern "C" void fn_8019ABB8(BulletBillObject*, bool);
-
 extern const float lbl_806E4EE0;
 extern const float lbl_806E4EE4;
 

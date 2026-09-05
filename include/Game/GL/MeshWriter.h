@@ -19,18 +19,19 @@ public:
 
     void Texcoord(const nlVector2& value)
     {
-        *texcoord++ = (short)(value.x * 4096.0f);
-        *texcoord++ = (short)(value.y * 4096.0f);
+        short u = (short)(value.x * 4096.0f);
+        short v = (short)(value.y * 4096.0f);
+        *texcoord++ = u;
+        *texcoord++ = v;
     }
 
     void Vertex(const nlVector3& value)
     {
-        float x;
-        float y;
-        float z;
-        z = value.z;
-        y = value.y;
-        x = value.x;
+        Vertex(value.x, value.y, value.z);
+    }
+
+    void Vertex(float x, float y, float z)
+    {
         *position++ = x;
         *position++ = y;
         *position++ = z;

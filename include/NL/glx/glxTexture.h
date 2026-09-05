@@ -2,11 +2,11 @@
 #define _GLXTEXTURE_H_
 
 #include "types.h"
+#include "NL/gl/TextureManager_802CDF0C.h"
 
 #include <string.h>
 
 class GLView;
-class MemoryAllocator;
 
 typedef unsigned long (*glxTextureLoadCallback_t)(unsigned long);
 
@@ -50,6 +50,14 @@ struct glTexBundleDict : public BundleEntry
 {
 };
 
+struct BundleHeader
+{
+    unsigned long magic;
+    unsigned long numTextures;
+    unsigned long pad1;
+    unsigned long pad2;
+};
+
 class PlatTexture
 {
 public:
@@ -77,7 +85,7 @@ public:
     void Prepare();
     void Swizzle(bool bDeleteLinear);
     void Create(int width, int height, eGXTextureFormat format,
-        MemoryAllocator* allocator, int numLevels, bool bLinearData,
+        void* allocator, int numLevels, bool bLinearData,
         bool bNewResourceMemory);
     void CreateWithMemory(int width, int height, eGXTextureFormat format,
         int numLevels, const void* pTextureData);
@@ -101,15 +109,15 @@ public:
 };
 
 PlatTexture* glx_GetTex(unsigned long handle);
-PlatTexture* glx_CreatePlatTexture(MemoryAllocator* allocator);
+PlatTexture* glx_CreatePlatTexture(void* allocator);
 PlatTexture* glx_MakeTexture(GXTextureHeader* header,
-    MemoryAllocator* allocator, unsigned long handle);
+    void* allocator, unsigned long handle);
 void glplatTextureReplace(PlatTexture* pTex, const void* textureData,
     unsigned long size);
 bool glplatBeginLoadTextureBundle(const char* filename,
     void (*callback)(void*, unsigned long, void*), void* param);
 bool glplatLoadTextureBundle(
-    const char* filename, MemoryAllocator* allocator);
+    const char* filename, void* allocator);
 bool glplatTextureLoad(PlatTexture* texture);
 int glplatTextureGetNumBits(int component);
 u32 glplatTextureGetHeight();
@@ -118,28 +126,18 @@ void glxInitTex();
 glxTextureLoadCallback_t glx_SetLoadCallback(
     glxTextureLoadCallback_t callback);
 
-// Texture manager retained in the automatic ranges after glTexture.cpp.
-struct TextureIndexQueue_802D3B68;
-
-struct TextureManager_802CDF0C
-{
-    u32 m_00;
-    void** m_04;
-    TextureIndexQueue_802D3B68* m_08;
-};
-
 extern TextureManager_802CDF0C* lbl_806E1F08;
 
 extern "C" void fn_802CDEC0(unsigned long);
 TextureManager_802CDF0C* fn_802CDF0C();
-PlatTexture* fn_802CE294(
-    TextureManager_802CDF0C* manager, const unsigned long* texture);
-unsigned long fn_802CE1B8(
-    TextureManager_802CDF0C* manager, unsigned long texture);
 void fn_802CDF14(unsigned long texture, PlatTexture* platformTexture,
-    MemoryAllocator* allocator);
-float fn_802CE7B0(GLView* renderView);
-void fn_802CEC68();
-void fn_802CEF18();
+    void* allocator);
+extern "C" void fn_802CDF5C(PlatTexture* texture);
+extern "C" PlatTexture* fn_8036BBC0(glTexBundleDict* entry,
+    GXTextureHeader* header, void* allocator);
+extern "C" void fn_8036BBD4(void* data, void* allocator);
+extern "C" void fn_8036BBD8(void* data);
+extern "C" PlatTexture* fn_8036BBDC(unsigned long handle,
+    const void* textureData, unsigned long size, void* allocator);
 
 #endif // _GLXTEXTURE_H_

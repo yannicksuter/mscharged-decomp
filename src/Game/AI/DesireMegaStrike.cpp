@@ -19,7 +19,6 @@ extern "C" float fn_800E02B8(cTeam*);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E39C(cFielder*);
 extern "C" float fn_8002E058(cFielder*);
-extern "C" bool fn_8003886C(cFielder*);
 extern "C" void fn_8003A0E4(cFielder*);
 extern "C" float fn_800499EC(cFielder*, int);
 extern "C" float fn_80049CC0(cFielder*, int);
@@ -165,7 +164,7 @@ void DesireMegaStrike::UnidentifiedUpdate(
         update->mTemporary = false;
     }
 
-    if (fn_8003886C(mUnidentifiedFielder))
+    if (mUnidentifiedFielder->IsStuck())
     {
         *update = FuzzyVariant(FT_INT, 1);
         update->mTemporary = false;
@@ -180,7 +179,7 @@ void DesireMegaStrike::UnidentifiedUpdate(
     {
         cFielder* pFielder = mUnidentifiedFielder;
         bool bAlreadySet = false;
-        if (!fn_8003886C(pFielder)
+        if (!pFielder->IsStuck()
             && (pFielder->muInvincibleStatus & 0x1F) == 0x1F)
         {
             bAlreadySet = true;

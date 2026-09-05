@@ -13,13 +13,13 @@ class RLViewCamera : public GLViewInterface
 public:
     RLViewCamera();
 
-    virtual void GetViewMatrix(nlMatrix4&);
-    virtual void GetProjectionMatrix(nlMatrix4&);
-    virtual void GetInverseViewMatrix(nlMatrix4&);
-    virtual void GetViewProjectionMatrix(nlMatrix4&);
+    virtual void GetViewMatrix(nlMatrix4&) const;
+    virtual void GetProjectionMatrix(nlMatrix4&) const;
+    virtual void GetInverseViewMatrix(nlMatrix4&) const;
+    virtual void GetViewProjectionMatrix(nlMatrix4&) const;
     virtual const nlMatrix4* GetViewMatrix() const;
     virtual const nlMatrix4* GetProjectionMatrix() const;
-    virtual const nlVector4* GetShadowMatrix();
+    virtual const nlVector4* GetShadowMatrix() const;
 
     void Set(const nlMatrix4& view, const nlMatrix4& projection)
     {
@@ -34,17 +34,17 @@ public:
     /* 0x044 */ nlMatrix4 mProjection;
     /* 0x084 */ nlMatrix4 mViewInverse;
     /* 0x0C4 */ nlMatrix4 mViewProjection;
-    /* 0x104 */ nlVector4 mShadowPlanes[6];
-    /* 0x164 */ bool mShadowDirty;
+    /* 0x104 */ mutable nlVector4 mShadowPlanes[6];
+    /* 0x164 */ mutable bool mShadowDirty;
 }; // total size: 0x168
 
 class RLViewOrthoCamera : public GLViewInterface
 {
 public:
-    virtual void GetViewMatrix(nlMatrix4&);
-    virtual void GetProjectionMatrix(nlMatrix4&);
-    virtual void GetInverseViewMatrix(nlMatrix4&);
-    virtual void GetViewProjectionMatrix(nlMatrix4&);
+    virtual void GetViewMatrix(nlMatrix4&) const;
+    virtual void GetProjectionMatrix(nlMatrix4&) const;
+    virtual void GetInverseViewMatrix(nlMatrix4&) const;
+    virtual void GetViewProjectionMatrix(nlMatrix4&) const;
     virtual const nlMatrix4* GetViewMatrix() const;
     virtual const nlMatrix4* GetProjectionMatrix() const;
 

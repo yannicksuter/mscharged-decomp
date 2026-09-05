@@ -373,8 +373,9 @@ void UnidentifiedTransportConnection::UnidentifiedUpdateConnected()
         UnidentifiedMessageSerializer serializer(1, buffer, sizeof(buffer));
         UnidentifiedKeepAlive_8032C528 payload;
         payload.Serialize(&serializer);
-        UnidentifiedSubmitReliable(
-            0xE5, serializer.mBuffer, serializer.UnidentifiedGetLength());
+        u8* data = serializer.mBuffer;
+        int length = serializer.UnidentifiedGetLength();
+        UnidentifiedSubmitReliable(0xE5, data, length);
         if (g_TransportLayerLog >= 2)
         {
             fn_8004F594(0x10,
@@ -1113,8 +1114,9 @@ void UnidentifiedTransportConnection::UnidentifiedSendClientChallenge()
     fn_8032C5E4((u32*)payload.mPayload);
     fn_8032C630(mUnidentified000, payload.mPayload);
     payload.Serialize(&serializer);
-    UnidentifiedSubmitReliable(
-            0xE0, serializer.mBuffer, serializer.UnidentifiedGetLength());
+    u8* data = serializer.mBuffer;
+    int length = serializer.UnidentifiedGetLength();
+    UnidentifiedSubmitReliable(0xE0, data, length);
     mUnidentified7D4 = 1;
 }
 
@@ -1137,8 +1139,9 @@ void UnidentifiedTransportConnection::UnidentifiedHandleClientChallenge(
         u8 buffer[200];
         UnidentifiedMessageSerializer serializer(1, buffer, sizeof(buffer));
         payload.Serialize(&serializer);
-        UnidentifiedSubmitReliable(
-            0xE1, serializer.mBuffer, serializer.UnidentifiedGetLength());
+        u8* data = serializer.mBuffer;
+        int length = serializer.UnidentifiedGetLength();
+        UnidentifiedSubmitReliable(0xE1, data, length);
         mUnidentified7D4 = 4;
     }
 }
@@ -1164,8 +1167,9 @@ void UnidentifiedTransportConnection::UnidentifiedHandleServerChallenge(
         u8 buffer[200];
         UnidentifiedMessageSerializer serializer(1, buffer, sizeof(buffer));
         payload.Serialize(&serializer);
-        UnidentifiedSubmitReliable(
-            0xE2, serializer.mBuffer, serializer.UnidentifiedGetLength());
+        u8* data = serializer.mBuffer;
+        int length = serializer.UnidentifiedGetLength();
+        UnidentifiedSubmitReliable(0xE2, data, length);
         mUnidentified7D4 = 2;
     }
 }
@@ -1185,8 +1189,9 @@ bool UnidentifiedTransportConnection::UnidentifiedAccept()
     u8 buffer[50];
     UnidentifiedMessageSerializer serializer(1, buffer, sizeof(buffer));
     payload.Serialize(&serializer);
-    UnidentifiedSubmitReliable(
-            0xE3, serializer.mBuffer, serializer.UnidentifiedGetLength());
+    u8* data = serializer.mBuffer;
+    int length = serializer.UnidentifiedGetLength();
+    UnidentifiedSubmitReliable(0xE3, data, length);
     mUnidentified7D4 = 6;
     return true;
 }
@@ -1204,8 +1209,9 @@ void UnidentifiedTransportConnection::UnidentifiedReject()
         u8 buffer[50];
         UnidentifiedMessageSerializer serializer(1, buffer, sizeof(buffer));
         payload.Serialize(&serializer);
-        UnidentifiedSubmitReliable(
-            0xE3, serializer.mBuffer, serializer.UnidentifiedGetLength());
+        u8* data = serializer.mBuffer;
+        int length = serializer.UnidentifiedGetLength();
+        UnidentifiedSubmitReliable(0xE3, data, length);
         mUnidentified7D4 = 7;
         mUnidentified048 = nlGetTicker();
     }
@@ -1231,8 +1237,9 @@ void UnidentifiedTransportConnection::UnidentifiedDisconnect(bool immediate)
         UnidentifiedMessageSerializer serializer(1, buffer, sizeof(buffer));
         UnidentifiedClosing_8032C4B4 payload;
         payload.Serialize(&serializer);
-        UnidentifiedSubmitReliable(
-            0xE4, serializer.mBuffer, serializer.UnidentifiedGetLength());
+        u8* data = serializer.mBuffer;
+        int length = serializer.UnidentifiedGetLength();
+        UnidentifiedSubmitReliable(0xE4, data, length);
     }
 }
 

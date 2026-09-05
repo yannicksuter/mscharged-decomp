@@ -23,10 +23,6 @@ extern "C"
     void fn_80183A98();
     void fn_80183B40(unsigned long matrix);
     void fn_80183BF4(const nlMatrix4* matrix);
-    void fn_8036D774(const nlMatrix4* matrix);
-    void fn_8036D7EC(
-        const void* matrices, unsigned long count, const nlMatrix4* matrix,
-        int unknown);
 }
 
 struct GXMaterialProgramParameters_802987A0
@@ -36,7 +32,7 @@ struct GXMaterialProgramParameters_802987A0
     /* 0x10 */ UnidentifiedTextureState texture2;
     /* 0x18 */ UnidentifiedTextureState texture3;
     /* 0x20 */ UnidentifiedTextureState texture4;
-    /* 0x28 */ const void* matrices;
+    /* 0x28 */ const float (*matrices)[3][4];
     /* 0x2C */ unsigned long matricesSize;
     /* 0x30 */ float value48;
     /* 0x34 */ float value52;
@@ -238,7 +234,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802987A0>::Draw(
         if (lbl_8057AE44[textureIndex] == 0xFFFF
             || lbl_8057AE44[textureIndex] == 0)
         {
-            lbl_8057AE44[textureIndex] = fn_802CE1B8(fn_802CDF0C(), texture);
+            lbl_8057AE44[textureIndex] = fn_802CDF0C()->fn_802CE1B8(texture);
         }
         UnidentifiedTextureState textureState;
         textureState.texture = texture;

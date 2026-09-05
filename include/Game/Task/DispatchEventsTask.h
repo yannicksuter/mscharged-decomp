@@ -32,15 +32,11 @@ union EventDispatcherState
 class EventDispatcherBase
 {
 public:
-    EventDispatcherBase()
-        : callbacks(16, 16)
-        , state()
-    {
-    }
+    EventDispatcherBase();
 
     virtual void Dispatch(bool);
     virtual void Clear();
-    virtual ~EventDispatcherBase() { }
+    virtual ~EventDispatcherBase();
     virtual void Add(const EventCallback&);
 
     EventCallbackList callbacks;
@@ -50,7 +46,7 @@ public:
 class EventDispatcher : public EventDispatcherBase
 {
 public:
-    EventDispatcher() { }
+    EventDispatcher();
     EventDispatcher(const char*);
 
     virtual ~EventDispatcher();

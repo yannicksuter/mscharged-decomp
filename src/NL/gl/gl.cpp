@@ -42,7 +42,7 @@ bool fn_802C7FD0(void (*startupCallback)())
     glSetCurrentTextureState(glHandleizeTextureState());
     gl_MatrixStartup();
     gl_TargetStartup();
-    fn_802CEF18();
+    gl_ViewStartup();
 
     if (!glplatPostStartup())
         return false;
@@ -95,7 +95,7 @@ void glSendFrame()
         glplatSendFrame();
     }
 
-    fn_802CEC68();
+    gl_ViewReset();
     gl_state = 0;
     gl_frameCounter += 1;
 }

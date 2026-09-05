@@ -278,11 +278,12 @@ public:
         lbl_806E1E58->m_Pool1.Free(pointer);
     }
 
-    TweakValueBool_804F4578(const char* name, const char* category, bool value)
+    TweakValueBool_804F4578(const char* name, const char* category, bool value,
+        bool unidentified = true)
     {
         mValue = value;
         mName = name;
-        mUnidentified009 = true;
+        mUnidentified009 = unidentified;
         if (fn_802C0F04() == 0)
         {
             void* entry = nlMalloc(0x18, 8, true);

@@ -1,4 +1,5 @@
 #include "unclassified/tu_80336B2C.h"
+#include "Game/NetworkDiagnostics_803239A8.h"
 
 #include <string.h>
 
@@ -32,24 +33,10 @@ struct UnidentifiedGameRecordHeader
     int mPlayerCounts[4];
 };
 
-
-extern "C" void fn_80331668(
-    InputRouterRecord* record, const DetInput* input);
-extern "C" void fn_803317E0(
-    InputRouterRecord* record, DetInput* input);
-extern "C" void fn_80331A34(
-    DetermDataEvent* event, UnidentifiedMessageSerializer* serializer);
-extern "C" void fn_802B77B0(void* writer);
-extern "C" void fn_802B77D4(void* writer, void* file, bool buffered,
-    unsigned int bufferSize, unsigned int flushThreshold);
-extern "C" void fn_802B7848(void* writer);
-extern "C" void fn_802B79C8(void* writer, const void* data, int size);
-extern "C" void fn_802B7A64(void* writer);
 extern "C" void* fn_802B41E4(void* reader);
 extern "C" void fn_802B4218(void* reader);
 extern "C" int fn_802B42B4(void* reader);
 extern "C" void fn_802B42C4(void* reader, void* data, u32 size);
-extern "C" void fn_803239A8(char* text, unsigned long size, int value);
 int g_numPacketPlaybackTurbo;
 UnidentifiedNetGameState* lbl_806E2164;
 
@@ -136,7 +123,7 @@ extern "C" cGlobalPad* fn_80336D90(UnidentifiedNetworkPeerChannel* channel)
     }
     cGlobalPad* pad;
     if (channel->mPeer == fn_80338C0C(lbl_806E20D8))
-        pad = fn_802C082C(lbl_806E1E28, channel->mGlobalPadIndex);
+        pad = lbl_806E1E28->GetPad(channel->mGlobalPadIndex);
     else
         pad = 0;
     return pad;
@@ -263,7 +250,7 @@ extern "C" u8 fn_803371B8(
 extern "C" void fn_803371CC(NetworkMessageType0_80533B7C* message,
     s8 player, const InputRouterRecord* record)
 {
-    const u8* source = record->mData;
+    const u8* source = (const u8*)record;
     u8* previous = message->mUnidentified01C[player].mData;
     u8& changes = message->mUnidentified018[player];
 
@@ -292,7 +279,7 @@ extern "C" void fn_803371CC(NetworkMessageType0_80533B7C* message,
 extern "C" void fn_80337380(NetworkMessageType0_80533B7C* message,
     s8 player, InputRouterRecord* record)
 {
-    u8* output = record->mData;
+    u8* output = (u8*)record;
     const u8* previous = message->mUnidentified01C[player].mData;
     u8 changes = message->mUnidentified018[player];
     if (changes & 2)
@@ -392,7 +379,7 @@ void NetworkMessageType0_80533B7C::Serialize(
     }
     serializer->Transfer(&mUnidentified05C, 1);
     for (int i = 0; i < mUnidentified05C; ++i)
-        fn_80331A34(&mDetermData[i], serializer);
+        mDetermData[i].fn_80331A34(serializer);
     for (s8 i = 0; i < 4; ++i)
     {
         if (mUnidentified008 & (0x10 << i))
@@ -485,7 +472,7 @@ extern "C" void fn_80337F68()
             sizeof(UnidentifiedNetGameState), 8, false);
     if (state != 0)
     {
-        fn_802B77B0(state->mWriter);
+        nlBufferedWriterInitialize(&state->mWriter);
         fn_802B41E4(state->mReader);
         state->mConfigSize = 0;
         state->mConfig = 0;
@@ -517,7 +504,7 @@ extern "C" void fn_80337FF0(
     }
     else
     {
-        fn_802B7848(state->mWriter);
+        nlBufferedWriterFinish(&state->mWriter);
         if (nlDebugFileIsValid(state->mDebugFile))
         {
             nlCloseFileDebug(state->mDebugFile);
@@ -569,7 +556,7 @@ extern "C" void fn_803380F4(UnidentifiedNetGameState* state,
     nlStrNCpy(path, "GameLog/", sizeof(path));
     nlStrNCat(path, path, state->mFileName, sizeof(path));
     state->mDebugFile = nlOpenFileDebug(path, true, false);
-    fn_802B77D4(state->mWriter, state->mDebugFile,
+    nlBufferedWriterAttach(&state->mWriter, state->mDebugFile,
         state->mUnidentified02, 2000, 1800);
 
     UnidentifiedGameRecordHeader header;
@@ -586,9 +573,9 @@ extern "C" void fn_803380F4(UnidentifiedNetGameState* state,
         else
             header.mPlayerCounts[machine] = 0;
     }
-    fn_802B79C8(state->mWriter, &header, sizeof(header));
-    fn_802B79C8(state->mWriter, config, configSize);
-    fn_802B7A64(state->mWriter);
+    nlBufferedWriterWrite(&state->mWriter, &header, sizeof(header));
+    nlBufferedWriterWrite(&state->mWriter, config, configSize);
+    nlBufferedWriterFlushIfNeeded(&state->mWriter);
 }
 
 extern "C" bool fn_80338284(UnidentifiedNetGameState* state)
@@ -626,21 +613,21 @@ extern "C" void fn_8033835C(UnidentifiedNetGameState* state, s8,
     header.mTick = tick;
     header.mEventCount = eventCount;
     header.mValue = value;
-    fn_802B79C8(state->mWriter, &header, sizeof(header));
+    nlBufferedWriterWrite(&state->mWriter, &header, sizeof(header));
 }
 
 extern "C" void fn_803383A0(
     UnidentifiedNetGameState* state, const DetermDataEvent* event)
 {
-    fn_802B79C8(state->mWriter, &event->mSize, 1);
-    fn_802B79C8(state->mWriter, event->mData, event->mSize);
+    nlBufferedWriterWrite(&state->mWriter, &event->mSize, 1);
+    nlBufferedWriterWrite(&state->mWriter, event->mData, event->mSize);
 }
 
 extern "C" void fn_803383F0(
     UnidentifiedNetGameState* state, const void* data, int size)
 {
     if (size > 0)
-        fn_802B79C8(state->mWriter, data, size);
+        nlBufferedWriterWrite(&state->mWriter, data, size);
 }
 
 extern "C" void fn_80338404(UnidentifiedNetGameState* state, s8,
@@ -653,14 +640,14 @@ extern "C" void fn_80338404(UnidentifiedNetGameState* state, s8,
         u8 mPadding[3];
     } input;
     memset(&input, 0, sizeof(input));
-    memcpy(input.mRecord, record->mData, sizeof(input.mRecord));
+    memcpy(input.mRecord, record, sizeof(input.mRecord));
     input.mConnected = connected;
-    fn_802B79C8(state->mWriter, &input, sizeof(input));
+    nlBufferedWriterWrite(&state->mWriter, &input, sizeof(input));
 }
 
 extern "C" void fn_803384E0(UnidentifiedNetGameState* state)
 {
-    fn_802B7A64(state->mWriter);
+    nlBufferedWriterFlushIfNeeded(&state->mWriter);
 }
 
 extern "C" bool fn_803384E8(UnidentifiedNetGameState* state, s8,
@@ -716,7 +703,7 @@ extern "C" bool fn_80338694(UnidentifiedNetGameState* state, s8,
     if (fn_802B42B4(state->mReader) < sizeof(input))
         return false;
     fn_802B42C4(state->mReader, &input, sizeof(input));
-    memcpy(record->mData, input.mRecord, sizeof(input.mRecord));
+    memcpy(record, input.mRecord, sizeof(input.mRecord));
     *connected = input.mConnected;
     return true;
 }

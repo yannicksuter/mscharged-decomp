@@ -1,6 +1,7 @@
 #include "NL/glx/glxLoadModel.h"
 
 #include "Game/GL/GLInventory.h"
+#include "Game/GL/GLVertexAnim.h"
 #include "Game/GL/ShaderSkinMesh.h"
 #include "Game/SAnim.h"
 #include "Game/SHierarchy.h"
@@ -19,13 +20,6 @@ extern "C"
     void* fn_802CC0A4(unsigned long size, int memoryType, void* allocator);
     void DCFlushRange(void* address, unsigned long size);
 }
-
-struct UnidentifiedLoadedModel
-{
-    glModel m_Model;
-    unsigned char m_Unknown0C[0x28];
-    glModel* m_pSourceModel;
-};
 
 class RLGReader_80369E5C : public RLGReader
 {
@@ -151,15 +145,14 @@ void RLGReader_80369E5C::fn_8036A138()
                 fn_8036A038(packet);
             }
 
-            fn_8036E438(packet, true, m_pContext);
+            glplatFinalizePacket(packet, true, m_pContext);
             ((UnidentifiedPacketResource*)packet->unknown10)->fn_Unknown3(packet);
         }
 
-        UnidentifiedLoadedModel* loaded = (UnidentifiedLoadedModel*)
-            m_pContext->m_pInventory->GetModel(model->unknown00);
+        GLVertexAnim* loaded = m_pContext->m_pInventory->GetVertexAnim(model->unknown00);
         if (loaded != 0)
         {
-            loaded->m_pSourceModel = model;
+            loaded->m_pModel = model;
         }
     }
 }
