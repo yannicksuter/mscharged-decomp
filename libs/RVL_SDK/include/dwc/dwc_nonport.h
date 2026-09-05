@@ -2,6 +2,7 @@
 
 #include <revolution/types.h>
 
+#include <string.h>
 #include <time.h>
 
 #ifdef __cplusplus
@@ -12,11 +13,32 @@ s64 DWCi_Np_GetTimeInSeconds(void);
 struct tm* fn_8049BB54(s64* theTime);
 u64 DWCi_Np_GetConsoleId(void);
 
+static inline void DWCi_Np_CpuCopy8(
+    register const void* srcp, register void* dstp, register u32 size)
+{
+    memcpy(dstp, srcp, size);
+}
+
+static inline u16 DWCi_HtoLEs(u16 data)
+{
+    return (u16)((data >> 8) | (data << 8));
+}
+
 static inline u32 DWCi_HtoLEl(u32 data)
 {
     u32 tmp;
     tmp = ((data >> 8) & 0x00ff00ff) | ((data << 8) & 0xff00ff00);
     return (tmp >> 16) | (tmp << 16);
+}
+
+static inline u16 DWCi_LEtoHs(u16 data)
+{
+    return DWCi_HtoLEs(data);
+}
+
+static inline u32 DWCi_LEtoHl(u32 data)
+{
+    return DWCi_HtoLEl(data);
 }
 
 static inline void DWCi_Np_ToLE(const void* srcp, void* dstp, u32 size)

@@ -5,6 +5,7 @@
 #include <dwc/dwc_friend.h>
 #include <dwc/dwc_main.h>
 #include <dwc/dwc_memfunc.h>
+#include <dwc/dwc_nonport.h>
 #include <dwc/dwc_report.h>
 #include <gamespy/GP/gp.h>
 #include <gamespy/gt2/gt2.h>
@@ -145,15 +146,6 @@ typedef struct DWCMatchControlView
     void* _494;
 } DWCMatchControlView;
 
-typedef struct DWCMatchKeyDataView
-{
-    u8 keyID;
-    u8 _01;
-    u16 _02;
-    char* keyString;
-    const void* value;
-} DWCMatchKeyDataView;
-
 typedef struct DWCMatchNNInfoView
 {
     u8 isClient;
@@ -162,17 +154,6 @@ typedef struct DWCMatchNNInfoView
     u32 ip;
     int cookie;
 } DWCMatchNNInfoView;
-
-typedef struct DWCMatchSBMessageView
-{
-    char magic[4];
-    u32 version;
-    u8 command;
-    u8 length;
-    u16 port;
-    u32 ip;
-    u32 pid;
-} DWCMatchSBMessageView;
 
 typedef struct DWCMatchOptMinCompleteView
 {
@@ -227,16 +208,18 @@ GPResult fn_8049382C(int command, u32 profileId, u32 ip, u16 port,
     const u32* data, int count);
 SBError fn_80493A54(u8 command, u32 ip, u16 port, const u32* data,
     int count);
-void fn_8049A048(int keyid, qr2_buffer_t outbuf, void* userdata);
+static void DWCi_QR2ServerKeyCallback(
+    int keyid, qr2_buffer_t outbuf, void* userdata);
 void fn_8049A27C(int keyid, int index, qr2_buffer_t outbuf, void* userdata);
 void fn_8049A280(int keyid, int index, qr2_buffer_t outbuf, void* userdata);
-void fn_8049A284(qr2_key_type keytype, qr2_keybuffer_t keybuffer,
-    void* userdata);
+static void DWCi_QR2KeyListCallback(
+    qr2_key_type keytype, qr2_keybuffer_t keybuffer, void* userdata);
 int fn_8049A374(qr2_key_type keytype, void* userdata);
 void fn_8049A37C(qr2_error_t error, gsi_char* errmsg, void* userdata);
 void fn_8049A3E4(unsigned int ip, unsigned short port, void* userdata);
 void fn_8049A444(int cookie, void* userdata);
-void fn_8049A530(gsi_char* data, int len, void* userdata);
+static void DWCi_QR2ClientMsgCallback(
+    gsi_char* data, int len, void* userdata);
 
 void fn_804993C8(ServerBrowser sb, SBCallbackReason reason,
     SBServer server, void* instance);
@@ -284,7 +267,7 @@ static DWCMatchControlView* lbl_806E2EF8;
 DWCMatchOptSCBlockView lbl_806E2EFC;
 
 u8 lbl_806C9920[0x100];
-DWCMatchKeyDataView lbl_806C9A20[154];
+static DWCGameMatchKeyData stGameMatchKeys[DWC_QR2_GAME_RESERVED_KEYS];
 u8 lbl_806CA158[0x20];
 
 static u32 fn_ByteSwap32(u32 value)
@@ -376,10 +359,10 @@ u8 DWC_AddMatchKeyInt(u8 keyID, const char* keyString, const int* value)
         return 0;
     }
 
-    if (keyID >= 0x64 && lbl_806C9A20[keyID - 0x64].keyID != 0)
+    if (keyID >= 0x64 && stGameMatchKeys[keyID - 0x64].keyID != 0)
     {
-        if (lbl_806C9A20[keyID - 0x64].keyString != NULL
-            && strcmp(lbl_806C9A20[keyID - 0x64].keyString, keyString) != 0)
+        if (stGameMatchKeys[keyID - 0x64].keyStr != NULL
+            && strcmp(stGameMatchKeys[keyID - 0x64].keyStr, keyString) != 0)
         {
             return 0;
         }
@@ -388,7 +371,7 @@ u8 DWC_AddMatchKeyInt(u8 keyID, const char* keyString, const int* value)
     {
         for (i = 0; i < 154; i++)
         {
-            if (lbl_806C9A20[(u8)i].keyID == 0)
+            if (stGameMatchKeys[(u8)i].keyID == 0)
             {
                 key = (u8)(i + 0x64);
                 break;
@@ -404,27 +387,27 @@ u8 DWC_AddMatchKeyInt(u8 keyID, const char* keyString, const int* value)
         }
     }
 
-    lbl_806C9A20[(u8)key - 0x64].keyID = key;
-    lbl_806C9A20[(u8)key - 0x64]._01 = 0;
-    lbl_806C9A20[(u8)key - 0x64]._02 = 0;
-    if (lbl_806C9A20[(u8)key - 0x64].keyString != NULL)
+    stGameMatchKeys[(u8)key - 0x64].keyID = key;
+    stGameMatchKeys[(u8)key - 0x64].isStr = 0;
+    stGameMatchKeys[(u8)key - 0x64].pad = 0;
+    if (stGameMatchKeys[(u8)key - 0x64].keyStr != NULL)
     {
-        DWC_Free(DWC_ALLOCTYPE_BASE, lbl_806C9A20[(u8)key - 0x64].keyString,
+        DWC_Free(DWC_ALLOCTYPE_BASE, stGameMatchKeys[(u8)key - 0x64].keyStr,
             0);
     }
-    lbl_806C9A20[(u8)key - 0x64].keyString
+    stGameMatchKeys[(u8)key - 0x64].keyStr
         = DWC_Alloc(DWC_ALLOCTYPE_BASE, strlen(keyString) + 1);
-    if (lbl_806C9A20[(u8)key - 0x64].keyString == NULL)
+    if (stGameMatchKeys[(u8)key - 0x64].keyStr == NULL)
     {
         fn_80491EDC(DWC_ERROR_FATAL,
             DWC_ECODE_SEQ_MATCHING + DWC_ECODE_TYPE_ALLOC);
         return 0;
     }
-    strcpy(lbl_806C9A20[(u8)key - 0x64].keyString, keyString);
+    strcpy(stGameMatchKeys[(u8)key - 0x64].keyStr, keyString);
     DWC_Printf(4, "DWC_AddMatchKeyInt: key='%s', value=%d\n", keyString,
         *value);
-    lbl_806C9A20[(u8)key - 0x64].value = value;
-    qr2_register_keyA((u8)key, lbl_806C9A20[(u8)key - 0x64].keyString);
+    stGameMatchKeys[(u8)key - 0x64].value = value;
+    qr2_register_keyA((u8)key, stGameMatchKeys[(u8)key - 0x64].keyStr);
     return key;
 }
 
@@ -439,10 +422,10 @@ u8 DWC_AddMatchKeyString(u8 keyID, const char* keyString,
         return 0;
     }
 
-    if (keyID >= 0x64 && lbl_806C9A20[keyID - 0x64].keyID != 0)
+    if (keyID >= 0x64 && stGameMatchKeys[keyID - 0x64].keyID != 0)
     {
-        if (lbl_806C9A20[keyID - 0x64].keyString != NULL
-            && strcmp(lbl_806C9A20[keyID - 0x64].keyString, keyString) != 0)
+        if (stGameMatchKeys[keyID - 0x64].keyStr != NULL
+            && strcmp(stGameMatchKeys[keyID - 0x64].keyStr, keyString) != 0)
         {
             return 0;
         }
@@ -451,7 +434,7 @@ u8 DWC_AddMatchKeyString(u8 keyID, const char* keyString,
     {
         for (i = 0; i < 154; i++)
         {
-            if (lbl_806C9A20[(u8)i].keyID == 0)
+            if (stGameMatchKeys[(u8)i].keyID == 0)
             {
                 key = (u8)(i + 0x64);
                 break;
@@ -467,27 +450,27 @@ u8 DWC_AddMatchKeyString(u8 keyID, const char* keyString,
         }
     }
 
-    lbl_806C9A20[(u8)key - 0x64].keyID = key;
-    lbl_806C9A20[(u8)key - 0x64]._01 = 1;
-    lbl_806C9A20[(u8)key - 0x64]._02 = 0;
-    if (lbl_806C9A20[(u8)key - 0x64].keyString != NULL)
+    stGameMatchKeys[(u8)key - 0x64].keyID = key;
+    stGameMatchKeys[(u8)key - 0x64].isStr = 1;
+    stGameMatchKeys[(u8)key - 0x64].pad = 0;
+    if (stGameMatchKeys[(u8)key - 0x64].keyStr != NULL)
     {
-        DWC_Free(DWC_ALLOCTYPE_BASE, lbl_806C9A20[(u8)key - 0x64].keyString,
+        DWC_Free(DWC_ALLOCTYPE_BASE, stGameMatchKeys[(u8)key - 0x64].keyStr,
             0);
     }
-    lbl_806C9A20[(u8)key - 0x64].keyString
+    stGameMatchKeys[(u8)key - 0x64].keyStr
         = DWC_Alloc(DWC_ALLOCTYPE_BASE, strlen(keyString) + 1);
-    if (lbl_806C9A20[(u8)key - 0x64].keyString == NULL)
+    if (stGameMatchKeys[(u8)key - 0x64].keyStr == NULL)
     {
         fn_80491EDC(DWC_ERROR_FATAL,
             DWC_ECODE_SEQ_MATCHING + DWC_ECODE_TYPE_ALLOC);
         return 0;
     }
-    strcpy(lbl_806C9A20[(u8)key - 0x64].keyString, keyString);
+    strcpy(stGameMatchKeys[(u8)key - 0x64].keyStr, keyString);
     DWC_Printf(4, "DWC_AddMatchKeyString: key='%s' value='%s'\n", keyString,
         *value);
-    lbl_806C9A20[(u8)key - 0x64].value = value;
-    qr2_register_keyA((u8)key, lbl_806C9A20[(u8)key - 0x64].keyString);
+    stGameMatchKeys[(u8)key - 0x64].value = value;
+    qr2_register_keyA((u8)key, stGameMatchKeys[(u8)key - 0x64].keyStr);
     return key;
 }
 
@@ -651,7 +634,8 @@ int fn_8048FF20(int type)
         sock = gt2GetSocketSOCKET(*lbl_806E2EF8->pGT2Socket);
         error = qr2_init_socketA(&lbl_806E2EF8->qr2, sock, port,
             lbl_806E2EF8->gamename, lbl_806E2EF8->secretKey, 1, 1,
-            fn_8049A048, fn_8049A27C, fn_8049A280, fn_8049A284, fn_8049A374,
+            DWCi_QR2ServerKeyCallback, fn_8049A27C, fn_8049A280,
+            DWCi_QR2KeyListCallback, fn_8049A374,
             fn_8049A37C, NULL);
         if (error == e_qrnoerror)
         {
@@ -670,7 +654,8 @@ int fn_8048FF20(int type)
     lbl_806E2EF8->_1A = 0;
     qr2_register_publicaddress_callback(lbl_806E2EF8->qr2, fn_8049A3E4);
     qr2_register_natneg_callback(lbl_806E2EF8->qr2, fn_8049A444);
-    qr2_register_clientmessage_callback(lbl_806E2EF8->qr2, fn_8049A530);
+    qr2_register_clientmessage_callback(
+        lbl_806E2EF8->qr2, DWCi_QR2ClientMsgCallback);
     qr2_send_statechanged(lbl_806E2EF8->qr2);
     return error;
 }
@@ -1998,9 +1983,9 @@ int fn_80493128(int profileId)
     {
         for (i = 0; i < 154; i++)
         {
-            if (lbl_806C9A20[i].keyID != 0)
+            if (stGameMatchKeys[i].keyID != 0)
             {
-                keys[numKeys++] = lbl_806C9A20[i].keyID;
+                keys[numKeys++] = stGameMatchKeys[i].keyID;
             }
         }
     }
@@ -4821,12 +4806,12 @@ static void DWCi_ClearGameMatchKeys(void)
 
     for (i = 0; i < 154; i++)
     {
-        if (lbl_806C9A20[i].keyString != NULL)
+        if (stGameMatchKeys[i].keyStr != NULL)
         {
-            DWC_Free(DWC_ALLOCTYPE_BASE, lbl_806C9A20[i].keyString, 0);
+            DWC_Free(DWC_ALLOCTYPE_BASE, stGameMatchKeys[i].keyStr, 0);
         }
     }
-    memset(lbl_806C9A20, 0, sizeof(lbl_806C9A20));
+    memset(stGameMatchKeys, 0, sizeof(stGameMatchKeys));
 }
 
 void fn_80498440(void)
@@ -5608,18 +5593,18 @@ void fn_80499A30(SBServer server)
 
     for (i = 0; i < 154; i++)
     {
-        if (lbl_806C9A20[i].keyID != 0)
+        if (stGameMatchKeys[i].keyID != 0)
         {
-            if (lbl_806C9A20[i]._01 != 0)
+            if (stGameMatchKeys[i].isStr != 0)
             {
-                DWC_Printf(0x400, "%s  = %s\n", lbl_806C9A20[i].keyString,
+                DWC_Printf(0x400, "%s  = %s\n", stGameMatchKeys[i].keyStr,
                     SBServerGetStringValueA(server,
-                        lbl_806C9A20[i].keyString, "NONE"));
+                        stGameMatchKeys[i].keyStr, "NONE"));
             }
             else
             {
-                DWC_Printf(0x400, "%s  = %d\n", lbl_806C9A20[i].keyString,
-                    SBServerGetIntValueA(server, lbl_806C9A20[i].keyString,
+                DWC_Printf(0x400, "%s  = %d\n", stGameMatchKeys[i].keyStr,
+                    SBServerGetIntValueA(server, stGameMatchKeys[i].keyStr,
                         -1));
             }
         }
@@ -5754,61 +5739,69 @@ void fn_80499E90(void)
     ServerBrowserSortA(lbl_806E2EF8->sb, SBFalse, "dwc_eval", sbcm_int);
 }
 
-void fn_8049A048(int keyid, qr2_buffer_t outbuf, void* userdata)
+static void DWCi_QR2ServerKeyCallback(
+    int keyid, qr2_buffer_t outbuf, void* userdata)
 {
+#pragma unused(userdata)
+    int index;
+
     switch (keyid)
     {
     case NUMPLAYERS_KEY:
-        qr2_buffer_add_int(outbuf, lbl_806E2EF8->_14);
-        DWC_Printf(0x200, "QR2, Received ServerKeyReq : keyID %d - %d\n",
-            keyid, lbl_806E2EF8->_14);
+        qr2_buffer_add_int(outbuf, DWCi_GetMatchCnt()->_14);
+        DWC_Printf(DWC_REPORTFLAG_QR2_REQ,
+            "QR2, Received ServerKeyReq : keyID %d - %d\n", keyid,
+            DWCi_GetMatchCnt()->_14);
         break;
     case MAXPLAYERS_KEY:
-        qr2_buffer_add_int(outbuf, lbl_806E2EF8->_16);
-        DWC_Printf(0x200, "QR2, Received ServerKeyReq : keyID %d - %d\n",
-            keyid, lbl_806E2EF8->_16);
+        qr2_buffer_add_int(outbuf, DWCi_GetMatchCnt()->_16);
+        DWC_Printf(DWC_REPORTFLAG_QR2_REQ,
+            "QR2, Received ServerKeyReq : keyID %d - %d\n", keyid,
+            DWCi_GetMatchCnt()->_16);
         break;
-    case 0x32:
-        qr2_buffer_add_int(outbuf, lbl_806E2EF8->_210);
-        DWC_Printf(0x200, "QR2, Received ServerKeyReq : keyID %d - %d\n",
-            keyid, lbl_806E2EF8->_210);
+    case DWC_QR2_PID_KEY:
+        qr2_buffer_add_int(outbuf, DWCi_GetMatchCnt()->_210);
+        DWC_Printf(DWC_REPORTFLAG_QR2_REQ,
+            "QR2, Received ServerKeyReq : keyID %d - %d\n", keyid,
+            DWCi_GetMatchCnt()->_210);
         break;
-    case 0x33:
-        qr2_buffer_add_int(outbuf, lbl_806E2EF8->matchType);
-        DWC_Printf(0x200, "QR2, Received ServerKeyReq : keyID %d - %d\n",
-            keyid, lbl_806E2EF8->matchType);
+    case DWC_QR2_MATCH_TYPE_KEY:
+        qr2_buffer_add_int(outbuf, DWCi_GetMatchCnt()->matchType);
+        DWC_Printf(DWC_REPORTFLAG_QR2_REQ,
+            "QR2, Received ServerKeyReq : keyID %d - %d\n", keyid,
+            DWCi_GetMatchCnt()->matchType);
         break;
-    case 0x34:
-        qr2_buffer_add_int(outbuf, lbl_806E2EF8->_20);
-        DWC_Printf(0x200, "QR2, Received ServerKeyReq : keyID %d - %d\n",
-            keyid, lbl_806E2EF8->_20);
+    case DWC_QR2_MATCH_RESV_KEY:
+        qr2_buffer_add_int(outbuf, DWCi_GetMatchCnt()->_20);
+        DWC_Printf(DWC_REPORTFLAG_QR2_REQ,
+            "QR2, Received ServerKeyReq : keyID %d - %d\n", keyid,
+            DWCi_GetMatchCnt()->_20);
         break;
-    case 0x35:
-        qr2_buffer_add_int(outbuf, 3);
-        DWC_Printf(0x200, "QR2, Received ServerKeyReq : keyID %d - %d\n",
-            keyid, 3);
+    case DWC_QR2_MATCH_VER_KEY:
+        qr2_buffer_add_int(outbuf, DWC_MATCHING_VERSION);
+        DWC_Printf(DWC_REPORTFLAG_QR2_REQ,
+            "QR2, Received ServerKeyReq : keyID %d - %d\n", keyid,
+            DWC_MATCHING_VERSION);
         break;
-    case 0x36:
+    case DWC_QR2_MATCH_EVAL_KEY:
         qr2_buffer_add_int(outbuf, 1);
-        DWC_Printf(0x200, "QR2, Received ServerKeyReq : keyID %d - %d\n",
-            keyid, 1);
+        DWC_Printf(DWC_REPORTFLAG_QR2_REQ,
+            "QR2, Received ServerKeyReq : keyID %d - %d\n", keyid, 1);
         break;
     default:
-        if (keyid - 0x64 >= 0 && keyid - 0x64 < 154)
+        index = keyid - DWC_QR2_GAME_KEY_START;
+        if ((index >= 0 && index < DWC_QR2_GAME_RESERVED_KEYS)
+            && stGameMatchKeys[index].keyID)
         {
-            DWCMatchKeyDataView* key = &lbl_806C9A20[keyid - 0x64];
-
-            if (key->keyID == 0)
+            if (stGameMatchKeys[index].isStr)
             {
-                break;
-            }
-            if (key->_01 != 0)
-            {
-                qr2_buffer_addA(outbuf, (char*)key->value);
+                qr2_buffer_addA(
+                    outbuf, (char*)stGameMatchKeys[index].value);
             }
             else
             {
-                qr2_buffer_add_int(outbuf, *(const int*)key->value);
+                qr2_buffer_add_int(
+                    outbuf, *(const int*)stGameMatchKeys[index].value);
             }
         }
         break;
@@ -5823,35 +5816,39 @@ void fn_8049A280(int keyid, int index, qr2_buffer_t outbuf, void* userdata)
 {
 }
 
-void fn_8049A284(qr2_key_type keytype, qr2_keybuffer_t keybuffer,
-    void* userdata)
+static void DWCi_QR2KeyListCallback(
+    qr2_key_type keytype, qr2_keybuffer_t keybuffer, void* userdata)
 {
+#pragma unused(userdata)
+    int i;
+
     switch (keytype)
     {
     case key_server:
-    {
-        int i;
-
         qr2_keybuffer_add(keybuffer, NUMPLAYERS_KEY);
         qr2_keybuffer_add(keybuffer, MAXPLAYERS_KEY);
-        qr2_keybuffer_add(keybuffer, 0x32);
-        qr2_keybuffer_add(keybuffer, 0x33);
-        qr2_keybuffer_add(keybuffer, 0x34);
-        qr2_keybuffer_add(keybuffer, 0x35);
-        qr2_keybuffer_add(keybuffer, 0x36);
-        for (i = 0; i < 154; i++)
+        qr2_keybuffer_add(keybuffer, DWC_QR2_PID_KEY);
+        qr2_keybuffer_add(keybuffer, DWC_QR2_MATCH_TYPE_KEY);
+        qr2_keybuffer_add(keybuffer, DWC_QR2_MATCH_RESV_KEY);
+        qr2_keybuffer_add(keybuffer, DWC_QR2_MATCH_VER_KEY);
+        qr2_keybuffer_add(keybuffer, DWC_QR2_MATCH_EVAL_KEY);
+
+        for (i = 0; i < DWC_QR2_GAME_RESERVED_KEYS; i++)
         {
-            if (lbl_806C9A20[i].keyID != 0)
+            if (stGameMatchKeys[i].keyID)
             {
-                qr2_keybuffer_add(keybuffer, lbl_806C9A20[i].keyID);
+                qr2_keybuffer_add(keybuffer, stGameMatchKeys[i].keyID);
             }
         }
         break;
-    }
-    default:
+    case key_player:
+        break;
+    case key_team:
         break;
     }
-    DWC_Printf(0x200, "QR2, Received KeyListReq : keytype %d\n", keytype);
+
+    DWC_Printf(DWC_REPORTFLAG_QR2_REQ,
+        "QR2, Received KeyListReq : keytype %d\n", keytype);
 }
 
 int fn_8049A374(qr2_key_type keytype, void* userdata)
@@ -5902,50 +5899,54 @@ void fn_8049A444(int cookie, void* userdata)
     }
 }
 
-void fn_8049A530(gsi_char* data, int len, void* userdata)
+static void DWCi_QR2ClientMsgCallback(
+    gsi_char* data, int len, void* userdata)
 {
+#pragma unused(userdata)
     int offset = 0;
+    BOOL boolResult;
+    DWCSBMessage sbMsg;
 
     if (DWC_GetState() != DWC_STATE_MATCHING)
     {
         if (DWC_GetState() != DWC_STATE_CONNECTED
-            || (lbl_806E2EF8->matchType != 2
-                && lbl_806E2EF8->matchType != 3))
+            || (DWCi_GetMatchCnt()->matchType != 2
+                && DWCi_GetMatchCnt()->matchType != 3))
         {
             DWC_Printf(4, "Ignore delayed SB matching command.\n");
             return;
         }
     }
 
-    while (offset + 0x14 <= len)
+    while (offset + (int)sizeof(DWCSBMessageHeader) <= len)
     {
-        DWCMatchSBMessageView msg;
-        u32 payload[0x21];
-
-        memcpy(&msg, data, sizeof(msg));
-        msg.version = fn_ByteSwap32(msg.version);
-        msg.pid = fn_ByteSwap32(msg.pid);
-        msg.port = (msg.port >> 8) | (msg.port << 8);
-        if (strncmp((char*)&msg, "SBCM", 4) != 0)
+        DWCi_Np_CpuCopy8(data, &sbMsg, sizeof(DWCSBMessageHeader));
+        sbMsg.header.version = DWCi_LEtoHl(sbMsg.header.version);
+        sbMsg.header.qr2Port = DWCi_LEtoHs(sbMsg.header.qr2Port);
+        sbMsg.header.profileID = DWCi_LEtoHl(sbMsg.header.profileID);
+        if (strncmp(sbMsg.header.identifier, DWC_SB_COMMAND_STRING, 4) != 0)
         {
             DWC_Printf(8, "Got undefined SBcommand.\n");
             return;
         }
-        if (msg.version != 3)
+        if (sbMsg.header.version != DWC_MATCHING_VERSION)
         {
             DWC_Printf(8, "Got different version SBcommand.\n");
             return;
         }
-        memcpy(payload, data + 0x14, msg.length);
+        DWCi_Np_CpuCopy8(data + sizeof(DWCSBMessageHeader), sbMsg.data,
+            sbMsg.header.size);
         DWC_Printf(0x40, "<SB> RECV-0x%02x <- [%08x:%d] [pid=%u]\n",
-            msg.command, msg.ip, msg.port, msg.pid);
-        if (fn_80493C58(msg.command, msg.pid, msg.ip, msg.port, payload,
-                msg.length >> 2)
-            == 0)
+            sbMsg.header.command, sbMsg.header.qr2IP, sbMsg.header.qr2Port,
+            sbMsg.header.profileID);
+        boolResult = fn_80493C58(sbMsg.header.command, sbMsg.header.profileID,
+            sbMsg.header.qr2IP, sbMsg.header.qr2Port, sbMsg.data,
+            sbMsg.header.size >> 2);
+        if (!boolResult)
         {
             return;
         }
-        offset += msg.length + 0x14;
+        offset += sizeof(DWCSBMessageHeader) + sbMsg.header.size;
     }
 }
 

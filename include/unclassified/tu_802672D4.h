@@ -24,7 +24,7 @@ public:
     void fn_80267E20();
     void fn_80267E40(unsigned short* name);
     void fn_80268ED0(int index, void* context);
-    void fn_80268F94(int, void*);
+    void fn_80268F94(int index, void* context);
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 

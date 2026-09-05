@@ -512,3 +512,12 @@ void TU802672D4Scene::fn_80268ED0(int index, void* context)
         fn_801CBCA0(0xDE912775, 0, 0, 1);
     }
 }
+
+void TU802672D4Scene::fn_80268F94(int index, void* context)
+{
+    unsigned int item = (unsigned int)context;
+    unsigned int which = index;
+    --mUnidentified20[index];
+    mUnidentified448[item]->SetActiveSlide("off", true, false);
+    mComponents[item].mValues[which] = 0;
+}
