@@ -86,6 +86,8 @@ struct UnidentifiedPadUpdateState
     int mControllerTypes[4];
 };
 
+class TU80252180Scene;
+
 extern UnidentifiedHBMGameState* lbl_806E0C94;
 extern BaseGameSceneManager* lbl_806E1838;
 extern BaseGameSceneManager* lbl_806E1860;
@@ -107,8 +109,8 @@ extern "C"
     void* fn_80375EC8(UnidentifiedPadUpdateState* state, int index);
     void* fn_80375ED4(UnidentifiedPadUpdateState* state, int index);
     void* fn_80375EE0(UnidentifiedPadUpdateState* state, int index);
-    void* fn_80253E18();
-    void fn_80253E24(void* manager);
+    TU80252180Scene* fn_80253E18();
+    void fn_80253E24(TU80252180Scene* scene);
 }
 
 class UnidentifiedHBMScene : public BaseSceneHandler
@@ -535,10 +537,10 @@ void UnidentifiedHBMManager::fn_802489F8()
     }
     else
     {
-        void* manager = fn_80253E18();
-        if (manager != 0)
+        TU80252180Scene* scene = fn_80253E18();
+        if (scene != 0)
         {
-            fn_80253E24(manager);
+            fn_80253E24(scene);
         }
     }
 }

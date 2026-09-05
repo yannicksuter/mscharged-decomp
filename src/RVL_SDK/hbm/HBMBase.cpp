@@ -101,11 +101,6 @@ void HBMUpdateSoundArchivePlayer(void)
     gpHomeButton->updateSoundArchivePlayer();
 }
 
-void HBMSetSoundVolume(f32 volume)
-{
-    gpHomeButton->setSoundVolume(volume);
-}
-
 void HBMStopSound(void)
 {
     gpHomeButton->stopSound(false);
@@ -553,42 +548,6 @@ void HomeButton::updateSoundArchivePlayer()
     {
         nw4hbm::ut::detail::AutoLock<OSMutex> lock(sMutex);
         mpSoundArchivePlayer->Update();
-    }
-}
-
-void HomeButton::fadeout_sound(f32 gain)
-{
-    if (mSelectBtnNum == HBM_SELECT_BTN3)
-    {
-        return;
-    }
-
-    if (mEndInitSoundFlag)
-    {
-        AXSetAuxAReturnVolume(gain * 32768.0f);
-    }
-
-    if (mpSoundArchivePlayer != NULL)
-    {
-        nw4hbm::ut::detail::AutoLock<OSMutex> lock(sMutex);
-
-        for (int i = 0; i < mpSoundArchivePlayer->GetSoundPlayerCount(); i++)
-        {
-            mpSoundArchivePlayer->GetSoundPlayer(i).SetVolume(gain);
-        }
-    }
-}
-
-void HomeButton::setSoundVolume(f32 volume)
-{
-    AXSetMasterVolume(volume * 32768.0f);
-
-    if (mpSoundArchivePlayer != NULL)
-    {
-        for (int i = 0; i < mpSoundArchivePlayer->GetSoundPlayerCount(); i++)
-        {
-            mpSoundArchivePlayer->GetSoundPlayer(i).SetVolume(volume);
-        }
     }
 }
 
@@ -1195,9 +1154,9 @@ void HomeButton::init_sound()
         mpHBInfo->sound_callback(0, 0);
     }
 
-    mAppVolume[0] = AXGetMasterVolume();
-    mAppVolume[1] = AXGetAuxAReturnVolume();
-    mAppVolume[2] = AXGetAuxBReturnVolume();
+    mAppVolume[0] = AXGetAuxAReturnVolume();
+    mAppVolume[1] = AXGetAuxBReturnVolume();
+    mAppVolume[2] = AXGetAuxCReturnVolume();
 
     AXFXGetHooks(&mAxFxAlloc, &mAxFxFree);
     AXGetAuxACallback(&mAuxCallback, &mpAuxContext);
@@ -1212,9 +1171,9 @@ void HomeButton::init_sound()
 
     AXFXReverbHiInit(&mAxFxReverb);
     AXRegisterAuxACallback(&AXFXReverbHiCallback, &mAxFxReverb);
-    AXSetMasterVolume(0x8000);
-    AXSetAuxAReturnVolume(0);
+    AXSetAuxAReturnVolume(0x8000);
     AXSetAuxBReturnVolume(0);
+    AXSetAuxCReturnVolume(0);
 
     if (mpHBInfo->sound_callback != NULL)
     {
@@ -3579,6 +3538,29 @@ void HomeButton::deleteSound()
     }
 
     nw4hbm::snd::SoundSystem::ShutdownSoundSystem();
+}
+
+void HomeButton::fadeout_sound(f32 gain)
+{
+    if (mSelectBtnNum == HBM_SELECT_BTN3)
+    {
+        return;
+    }
+
+    if (mEndInitSoundFlag)
+    {
+        AXSetAuxAReturnVolume(gain * 32768.0f);
+    }
+
+    if (mpSoundArchivePlayer != NULL)
+    {
+        nw4hbm::ut::detail::AutoLock<OSMutex> lock(sMutex);
+
+        for (int i = 0; i < mpSoundArchivePlayer->GetSoundPlayerCount(); i++)
+        {
+            mpSoundArchivePlayer->GetSoundPlayer(i).SetVolume(gain);
+        }
+    }
 }
 
 } // namespace homebutton

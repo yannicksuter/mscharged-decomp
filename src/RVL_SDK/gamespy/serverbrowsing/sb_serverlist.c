@@ -496,10 +496,7 @@ static SBError SendWithRetry(SBServerList* slist, char* data, int len) {
     ret = send(slist->slsocket, data, len, 0);
     if (ret <= 0 && retryCount >= 0) // error! try to reconnect
     {
-      if (slist->inbufferlen > 0)
-        break;
-      else
-        SBServerListDisconnect(slist);
+      SBServerListDisconnect(slist);
       err = SBServerListConnectAndQuery(slist, NULL, NULL, NO_SERVER_LIST, 0);
       if (err != sbe_noerror) {
         ErrorDisconnect(slist);

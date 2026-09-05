@@ -38,9 +38,10 @@ extern "C" const unsigned short* fn_801CF604(
     const BasicString<unsigned short, Detail::TempStringAllocator>* string);
 extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
 void fn_802172C4();
-extern "C" void fn_802534BC(void* object, int value, bool enabled);
-extern "C" TLComponentInstance* fn_80253D70(void* object, int index);
-extern "C" void* fn_80253E18();
+class TU80252180Scene;
+extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
+extern "C" TLComponentInstance* fn_80253D70(TU80252180Scene* scene, int value);
+extern "C" TU80252180Scene* fn_80253E18();
 extern "C" void fn_8024DE5C(TU8024D92CScene* scene);
 extern "C" void fn_8024EBCC(TU8024D92CScene* scene);
 
@@ -78,7 +79,7 @@ void TU8024D92CScene::SceneCreated()
 {
     fn_802172C4();
 
-    void* object = fn_80253E18();
+    TU80252180Scene* object = fn_80253E18();
     TLComponentInstance* screen = 0;
     if (object != 0)
     {

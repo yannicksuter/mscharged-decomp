@@ -36,6 +36,7 @@
 
 // NW4HBMPanic family
 #define NW4HBMPanicMessage_Line(line_, ...) NW4HBMAssertMessage_FileLine(__FILE__, line_, false, __VA_ARGS__)
+#define NW4HBMPanicMessage(...) NW4HBMAssertMessage_FileLine(__FILE__, __LINE__, false, __VA_ARGS__)
 #define NW4HBMPanic_Line(line_) NW4HBMAssert_FileLine(false, __FILE__, line_)
 #define NW4HBMPanic() NW4HBMAssert_FileLine(false, __FILE__, __LINE__)
 

@@ -2,6 +2,7 @@
 #include <dwc/dwc_account.h>
 #include <dwc/dwc_auth_interface.h>
 #include <dwc/dwc_init.h>
+#include <dwc/dwc_nonport.h>
 #include <dwc/dwc_report.h>
 #include <nitro/math/crc.h>
 #include <nitro/math/rand.h>
@@ -10,28 +11,6 @@
 #include <string.h>
 
 #define DWCi_CHECK_FLAG(flag, mask) (((flag) & (mask)) == (mask))
-
-static inline u32 DWCi_Acc_ByteSwap32(u32 data)
-{
-    data = ((data >> 8) & 0x00FF00FF) | ((data << 8) & 0xFF00FF00);
-    return (data << 16) | (data >> 16);
-}
-
-static inline u32 DWCi_Acc_CalcCRC32(const DWCAccUserData* userdata)
-{
-    MATHCRC32Table table;
-    DWCAccUserData data;
-    u32 i;
-
-    MATH_CRC32InitTable(&table);
-
-    for (i = 0; i < sizeof(DWCAccUserData) / sizeof(u32); ++i)
-    {
-        ((u32*)&data)[i] = DWCi_Acc_ByteSwap32(((const u32*)userdata)[i]);
-    }
-
-    return MATH_CalcCRC32(&table, &data, sizeof(DWCAccUserData) - 4);
-}
 
 static inline u32
 DWCi_Acc_GetMaskBits(u32 data,
@@ -197,11 +176,13 @@ u64 DWC_Acc_CreateFriendKey(int gs_profile_id,
     MATHCRC8Table table;
     u32 code[2];
     int crc;
+    u32 reversed[2];
 
+    code[0] = (u32)gs_profile_id;
+    code[1] = gamecode;
     MATH_CRC8InitTable(&table);
-    code[0] = DWCi_Acc_ByteSwap32((u32)gs_profile_id);
-    code[1] = DWCi_Acc_ByteSwap32(gamecode);
-    crc = MATH_CalcCRC8(&table, code, sizeof(code)) & 0x7f; // Only 7 bits valid.
+    DWCi_Np_ToLE(code, reversed, sizeof(code));
+    crc = MATH_CalcCRC8(&table, reversed, sizeof(reversed)) & 0x7f; // Only 7 bits valid.
 
     return (((u64)crc << 32) | (u32)gs_profile_id);
 }
@@ -217,15 +198,17 @@ BOOL DWC_Acc_CheckFriendKey(u64 friendkey,
     MATHCRC8Table table;
     u32 code[2];
     int crc;
+    u32 reversed[2];
 
     // negative GS profile IDs are invalid
     if (friendkey & 0x80000000)
         return FALSE;
 
+    code[0] = (u32)friendkey;
+    code[1] = gamecode;
     MATH_CRC8InitTable(&table);
-    code[0] = DWCi_Acc_ByteSwap32((u32)friendkey);
-    code[1] = DWCi_Acc_ByteSwap32(gamecode);
-    crc = MATH_CalcCRC8(&table, code, sizeof(code)) & 0x7f; // Only 7 bits valid.
+    DWCi_Np_ToLE(code, reversed, sizeof(code));
+    crc = MATH_CalcCRC8(&table, reversed, sizeof(reversed)) & 0x7f; // Only 7 bits valid.
 
     if (crc != (friendkey >> 32))
     {
@@ -303,6 +286,9 @@ void DWCi_Acc_LoginIdToUserName(const DWCAccLoginId* loginid,
 
 void DWCi_Acc_CreateUserData(DWCAccUserData* userdata, u32 gamecode)
 {
+    MATHCRC32Table table;
+    DWCAccUserData reversed;
+
     memset(userdata, 0, DWC_ACC_USERDATA_BUFSIZE);
 
     // Sets user data
@@ -317,7 +303,9 @@ void DWCi_Acc_CreateUserData(DWCAccUserData* userdata, u32 gamecode)
     DWCi_Acc_SetFlag_DataType((DWCAccFlag*)&userdata->authentic, DWC_ACC_FRIENDDATA_NODATA);
 
     // CRC calculation
-    userdata->crc32 = DWCi_Acc_CalcCRC32(userdata);
+    MATH_CRC32InitTable(&table);
+    DWCi_Np_ToLE(userdata, &reversed, sizeof(DWCAccUserData));
+    userdata->crc32 = MATH_CalcCRC32(&table, &reversed, sizeof(DWCAccUserData) - 4);
 
     // Enable the dirty flag.
     userdata->flag |= DWC_ACC_USERDATA_DIRTY;
@@ -374,8 +362,12 @@ void DWC_CreateUserData(DWCAccUserData* userdata)
 BOOL DWC_CheckUserData(const DWCAccUserData* userdata)
 {
     u32 crc32;
+    MATHCRC32Table table;
+    DWCAccUserData reversed;
 
-    crc32 = DWCi_Acc_CalcCRC32(userdata);
+    MATH_CRC32InitTable(&table);
+    DWCi_Np_ToLE(userdata, &reversed, sizeof(DWCAccUserData));
+    crc32 = MATH_CalcCRC32(&table, &reversed, sizeof(DWCAccUserData) - 4);
 
     return (crc32 == userdata->crc32) ? TRUE : FALSE;
 }
@@ -400,6 +392,9 @@ void DWCi_Acc_SetLoginIdToUserData(DWCAccUserData* userdata,
     const DWCAccLoginId* loginid,
     int gs_profile_id)
 {
+    MATHCRC32Table table;
+    DWCAccUserData reversed;
+
     // Set the LoginID.
     userdata->authentic = *loginid;
 
@@ -407,7 +402,9 @@ void DWCi_Acc_SetLoginIdToUserData(DWCAccUserData* userdata,
     userdata->gs_profile_id = gs_profile_id;
 
     // CRC calculation
-    userdata->crc32 = DWCi_Acc_CalcCRC32(userdata);
+    MATH_CRC32InitTable(&table);
+    DWCi_Np_ToLE(userdata, &reversed, sizeof(DWCAccUserData));
+    userdata->crc32 = MATH_CalcCRC32(&table, &reversed, sizeof(DWCAccUserData) - 4);
 
     // Enable the dirty flag.
     userdata->flag |= DWC_ACC_USERDATA_DIRTY;
@@ -430,10 +427,15 @@ void DWC_ClearDirtyFlag(DWCAccUserData* userdata)
 
 void DWCi_Acc_ClearDirty(DWCAccUserData* userdata)
 {
+    MATHCRC32Table table;
+    DWCAccUserData reversed;
+
     userdata->flag &= ~DWC_ACC_USERDATA_DIRTY;
 
     // CRC calculation
-    userdata->crc32 = DWCi_Acc_CalcCRC32(userdata);
+    MATH_CRC32InitTable(&table);
+    DWCi_Np_ToLE(userdata, &reversed, sizeof(DWCAccUserData));
+    userdata->crc32 = MATH_CalcCRC32(&table, &reversed, sizeof(DWCAccUserData) - 4);
 }
 
 void DWCi_Acc_TestFlagFunc(void)

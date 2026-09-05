@@ -42,7 +42,7 @@ static MemoryAllocator s_NetworkAllocator;
 extern "C" u32 fn_8032C830(void* codec, void* message, void* buffer, int size);
 extern "C" int fn_8004F594(int channel, const char* format, ...);
 extern "C" u32 fn_803236CC();
-extern "C" int fn_8025BD88();
+extern "C" bool fn_8025BD88();
 extern "C" int fn_802C2C84(const char* path, int);
 extern u8 lbl_806E18D4;
 

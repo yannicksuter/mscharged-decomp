@@ -128,46 +128,35 @@ int CanSendOnSocket(SOCKET sock) {
 }
 
 HOSTENT* getlocalhost(void) {
-#define MAX_IPS 5
+#define MAX_IPS 16
   static HOSTENT aLocalHost;
   static char* aliases = NULL;
+  static u8* ips[MAX_IPS];
+  static IPAddrEntry aAddrs[MAX_IPS];
   int aNumOfIps, i;
   int aSizeNumOfIps;
-  static IPAddrEntry aAddrs[MAX_IPS];
-  int aAddrsSize, aAddrsSizeInitial;
-  static u8* ipPtrs[MAX_IPS + 1];
-  static unsigned int ips[MAX_IPS];
-  int ret;
+  int aSizeAddrList;
+
   aSizeNumOfIps = sizeof(aNumOfIps);
-  ret = SOGetInterfaceOpt(NULL, SO_SOL_CONFIG, SO_CONFIG_IP_ADDR_NUMBER,
-                          &aNumOfIps, &aSizeNumOfIps);
-  if (ret != 0)
-    return NULL;
+  SOGetInterfaceOpt(NULL, SO_SOL_CONFIG, SO_CONFIG_IP_ADDR_NUMBER, &aNumOfIps,
+                    &aSizeNumOfIps);
 
-  aAddrsSize = (int)(MAX_IPS * sizeof(IPAddrEntry));
-  aAddrsSizeInitial = aAddrsSize;
-  ret = SOGetInterfaceOpt(NULL, SO_SOL_CONFIG, SO_CONFIG_IP_ADDR_TABLE, &aAddrs,
-                          &aAddrsSize);
-  if (ret != 0)
-    return NULL;
+  memset(aAddrs, 0xBE, aNumOfIps * sizeof(IPAddrEntry));
 
-  if (aAddrsSize != aAddrsSizeInitial) {
-    aNumOfIps = aAddrsSize / (int)sizeof(IPAddrEntry);
-  }
+  aSizeAddrList = (int)(aNumOfIps * sizeof(IPAddrEntry));
+  SOGetInterfaceOpt(NULL, SO_SOL_CONFIG, SO_CONFIG_IP_ADDR_TABLE, aAddrs,
+                    &aSizeAddrList);
 
   aLocalHost.h_name = "localhost";
   aLocalHost.h_aliases = &aliases;
   aLocalHost.h_addrtype = AF_INET;
-  aLocalHost.h_length = 4;
+  aLocalHost.h_length = aNumOfIps;
 
-  for (i = 0; i < MAX_IPS; i++) {
-    if (i < aNumOfIps) {
-      memcpy(&ips[i], &aAddrs[i].addr, sizeof(aAddrs[i].addr));
-      ipPtrs[i] = (u8*)&ips[i];
-    } else
-      ipPtrs[i] = NULL;
+  for (i = 0; i < aNumOfIps; i++) {
+    ips[i] = aAddrs[i].addr;
   }
-  aLocalHost.h_addr_list = ipPtrs;
+  ips[i] = NULL;
+  aLocalHost.h_addr_list = ips;
 
   return &aLocalHost;
 }

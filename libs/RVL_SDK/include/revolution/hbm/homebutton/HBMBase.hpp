@@ -183,7 +183,6 @@ public:
     void deleteSound();
     void draw_impl();
     void updateSoundArchivePlayer();
-    void setSoundVolume(f32 volume);
     inline void stopSound(bool checkFlag);
     void initSound(const char* path);
     void updateSound();

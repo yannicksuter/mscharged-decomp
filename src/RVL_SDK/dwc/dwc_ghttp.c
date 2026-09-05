@@ -6,51 +6,40 @@
 #include <gamespy/ghttp/ghttp.h>
 #include <string.h>
 
-typedef struct DWCGHTTPParam {
-  void* _00;
-  DWCGHTTPCompletedCallback _04;
-  DWCGHTTPProgressCallback _08;
-  BOOL _0C;
-  char* _10;
-  int _14;
-  struct DWCGHTTPParam* _18;
-} DWCGHTTPParam;
+typedef struct DWCGHTTPParamEntry {
+  DWCGHTTPParam param;
+  char* buf;
+  int req;
+  struct DWCGHTTPParamEntry* nextentry;
+} DWCGHTTPParamEntry;
 
-DWCGHTTPParam* lbl_806E2EC8;
-int lbl_806E2ECC;
+static DWCGHTTPParamEntry* paramhead = NULL;
+static int ghttpinitcount = 0;
 
-int DWCi_HandleGHTTPError(int result);
-void DWCi_RemoveDWCGHTTPParamEntry(DWCGHTTPParam* paramEntry);
+static DWCGHTTPResult DWCi_HandleGHTTPError(DWCGHTTPResult result);
+static DWCGHTTPParamEntry* DWCi_AppendDWCGHTTPParam(
+    const DWCGHTTPParam* param);
+static void DWCi_RemoveDWCGHTTPParamEntry(DWCGHTTPParamEntry* entry);
+static void DWCi_RemoveAllDWCGHTTPParamEntry(void);
+static DWCGHTTPParamEntry* DWCi_FindDWCGHTTPParamEntryByReq(int req);
 
 BOOL DWC_InitGHTTP(const char* gamename) {
   DWC_Printf(4, "DWC_InitGHTTP\n");
   ghttpStartup();
-  lbl_806E2ECC++;
+  ghttpinitcount++;
   return TRUE;
 }
 
 BOOL DWC_ShutdownGHTTP(void) {
-  DWCGHTTPParam* paramEntry;
-  DWCGHTTPParam* current;
-
   DWC_Printf(4, "DWC_ShutdownGHTTP\n");
-  if (lbl_806E2ECC <= 0) {
+  if (ghttpinitcount <= 0) {
     return TRUE;
   }
 
   ghttpCleanup();
-  lbl_806E2ECC--;
-  if (lbl_806E2ECC == 0) {
-    current = lbl_806E2EC8;
-    while (current != NULL) {
-      paramEntry = current;
-      current = current->_18;
-      if (paramEntry->_10 != NULL) {
-        DWC_Free(DWC_ALLOCTYPE_GHTTP, paramEntry->_10, 0);
-      }
-      DWC_Free(DWC_ALLOCTYPE_GHTTP, paramEntry, 0);
-    }
-    lbl_806E2EC8 = NULL;
+  ghttpinitcount--;
+  if (ghttpinitcount == 0) {
+    DWCi_RemoveAllDWCGHTTPParamEntry();
   }
 
   return TRUE;
@@ -65,17 +54,18 @@ BOOL DWC_ProcessGHTTP(void) {
   return TRUE;
 }
 
-GHTTPBool GHTTPCompletedCallback(GHTTPRequest request, GHTTPResult result,
-                                 char* buffer, GHTTPByteCount bufferLen,
-                                 void* param) {
-  DWCGHTTPParam* paramEntry = param;
-  DWCGHTTPCompletedCallback completedCallback = paramEntry->_04;
-  BOOL buffer_clear = paramEntry->_0C;
+static GHTTPBool GHTTPCompletedCallback(GHTTPRequest request,
+                                        GHTTPResult result, char* buffer,
+                                        GHTTPByteCount bufferLen, void* param) {
+  DWCGHTTPParamEntry* entry = (DWCGHTTPParamEntry*)param;
+  DWCGHTTPParam* parameter = &entry->param;
+  DWCGHTTPCompletedCallback callback = parameter->completedCallback;
+  BOOL buffer_clear = parameter->buffer_clear;
 
   DWC_Printf(4, "GHTTPCompleteCallback result : %d\n", result);
-  if (completedCallback != NULL) {
+  if (callback != NULL) {
     if (result == DWC_GHTTP_SUCCESS) {
-      completedCallback(buffer, bufferLen, result, paramEntry->_00);
+      callback(buffer, bufferLen, result, parameter->param);
     } else {
       if (bufferLen > 0) {
         char* temp = DWC_Alloc(DWC_ALLOCTYPE_GHTTP, bufferLen + 1);
@@ -85,34 +75,137 @@ GHTTPBool GHTTPCompletedCallback(GHTTPRequest request, GHTTPResult result,
         DWC_Free(DWC_ALLOCTYPE_GHTTP, temp, 0);
       }
       DWCi_HandleGHTTPError(result);
-      completedCallback(NULL, 0, result, paramEntry->_00);
+      callback(NULL, 0, result, parameter->param);
     }
   } else {
     DWC_Printf(4, "Callback is NULL\n");
   }
 
   if (result != DWC_GHTTP_SUCCESS || buffer_clear == TRUE) {
-    if (paramEntry->_10 != NULL) {
-      DWC_Free(DWC_ALLOCTYPE_GHTTP, paramEntry->_10, 0);
+    if (entry->buf != NULL) {
+      DWC_Free(DWC_ALLOCTYPE_GHTTP, entry->buf, 0);
     } else {
       buffer_clear = TRUE;
     }
   }
 
-  DWCi_RemoveDWCGHTTPParamEntry(paramEntry);
+  DWCi_RemoveDWCGHTTPParamEntry(entry);
   return !!buffer_clear;
 }
 
-void GHTTPProgressCallback(GHTTPRequest request, GHTTPState state,
-                           const char* buffer, GHTTPByteCount bufferLen,
-                           GHTTPByteCount bytesReceived,
-                           GHTTPByteCount totalSize, void* param) {
-  DWCGHTTPParam* paramEntry = param;
+static void GHTTPProgressCallback(GHTTPRequest request, GHTTPState state,
+                                  const char* buffer,
+                                  GHTTPByteCount bufferLen,
+                                  GHTTPByteCount bytesReceived,
+                                  GHTTPByteCount totalSize, void* param) {
+  DWCGHTTPParam* parameter = &((DWCGHTTPParamEntry*)param)->param;
+  DWCGHTTPProgressCallback callback = parameter->progressCallback;
 
-  if (paramEntry->_08 != NULL) {
-    paramEntry->_08(state, buffer, bufferLen, bytesReceived, totalSize,
-                    paramEntry->_00);
+  if (callback != NULL) {
+    callback(state, buffer, bufferLen, bytesReceived, totalSize,
+             parameter->param);
   }
+}
+
+void DWC_GHTTPNewPost(DWCGHTTPPost* post) {
+  DWC_Printf(4, "DWC_GHTTPNewPost\n");
+
+  *post = ghttpNewPost();
+
+  if (post == NULL) {
+    DWCi_HandleGHTTPError(DWC_GHTTP_INSUFFICIENT_MEMORY);
+    DWC_Printf(4, "DWC_Alloc Error\n");
+  }
+}
+
+BOOL DWC_GHTTPPostAddString(DWCGHTTPPost* post, const char* key,
+                            const char* value) {
+  if (!ghttpPostAddString(*post, key, value)) {
+    DWC_Printf(2, "DWC_GHTTPPostAddString FALSE\n");
+    return FALSE;
+  } else {
+    return TRUE;
+  }
+}
+
+int DWC_PostGHTTPData(const char* url, GHTTPPost* post,
+                      DWCGHTTPCompletedCallback completedCallback,
+                      void* param) {
+  GHTTPRequest req;
+  DWCGHTTPParamEntry* entry = NULL;
+  DWCGHTTPParam parameter_instance;
+
+  DWC_Printf(4, "DWC_PostGHTTPData\n");
+
+  if (DWCi_IsError()) {
+    return DWC_GHTTP_IN_ERROR;
+  }
+
+  parameter_instance.param = param;
+  parameter_instance.completedCallback = completedCallback;
+  parameter_instance.progressCallback = NULL;
+  parameter_instance.buffer_clear = TRUE;
+
+  entry = DWCi_AppendDWCGHTTPParam(&parameter_instance);
+
+  if (entry == NULL) {
+    DWCi_HandleGHTTPError(DWC_GHTTP_INSUFFICIENT_MEMORY);
+    DWC_Printf(4, "DWC_Alloc Error\n");
+    completedCallback(NULL, 0, DWC_GHTTP_INSUFFICIENT_MEMORY, param);
+    return DWC_GHTTP_INSUFFICIENT_MEMORY;
+  }
+
+  req = ghttpPost(url, *post, GHTTPFalse, GHTTPCompletedCallback, entry);
+
+  if (req < 0) {
+    DWCi_HandleGHTTPError(req);
+    completedCallback(NULL, 0, req, param);
+    DWCi_RemoveDWCGHTTPParamEntry(entry);
+  }
+
+  entry->req = req;
+  ghttpSetMaxRecvTime(req, 1);
+  return req;
+}
+
+int DWC_GetGHTTPData(const char* url,
+                     DWCGHTTPCompletedCallback completedCallback,
+                     void* param) {
+  GHTTPRequest req;
+  DWCGHTTPParamEntry* entry = NULL;
+  DWCGHTTPParam parameter_instance;
+
+  DWC_Printf(4, "DWC_GetGHTTPData\n");
+
+  if (DWCi_IsError()) {
+    return DWC_GHTTP_IN_ERROR;
+  }
+
+  parameter_instance.param = param;
+  parameter_instance.completedCallback = completedCallback;
+  parameter_instance.progressCallback = NULL;
+  parameter_instance.buffer_clear = TRUE;
+
+  entry = DWCi_AppendDWCGHTTPParam(&parameter_instance);
+
+  if (entry == NULL) {
+    DWCi_HandleGHTTPError(DWC_GHTTP_INSUFFICIENT_MEMORY);
+    DWC_Printf(4, "DWC_Alloc Error\n");
+    completedCallback(NULL, 0, DWC_GHTTP_INSUFFICIENT_MEMORY, param);
+    return DWC_GHTTP_INSUFFICIENT_MEMORY;
+  }
+
+  req = ghttpGet(url, GHTTPFalse, GHTTPCompletedCallback, entry);
+
+  if (req < 0) {
+    DWCi_HandleGHTTPError(req);
+    completedCallback(NULL, 0, req, param);
+    DWCi_RemoveDWCGHTTPParamEntry(entry);
+  }
+
+  entry->req = req;
+  ghttpSetMaxRecvTime(req, 1);
+  return req;
 }
 
 int DWC_GetGHTTPDataEx(const char* url, int bufferlen, BOOL buffer_clear,
@@ -120,31 +213,23 @@ int DWC_GetGHTTPDataEx(const char* url, int bufferlen, BOOL buffer_clear,
                        DWCGHTTPCompletedCallback completedCallback,
                        void* param) {
   char* buffer = NULL;
-  DWCGHTTPParam* paramEntry;
-  int request;
+  GHTTPRequest req;
+  DWCGHTTPParamEntry* entry = NULL;
+  DWCGHTTPParam parameter_instance;
 
   DWC_Printf(4, "DWC_GetGHTTPDataEx\n");
   if (DWCi_IsError()) {
     return DWC_GHTTP_IN_ERROR;
   }
 
-  paramEntry = DWC_Alloc(DWC_ALLOCTYPE_GHTTP, sizeof(DWCGHTTPParam));
-  if (paramEntry != NULL) {
-    paramEntry->_00 = param;
-    paramEntry->_04 = completedCallback;
-    paramEntry->_08 = progressCallback;
-    paramEntry->_0C = buffer_clear;
-    paramEntry->_18 = NULL;
-    paramEntry->_10 = NULL;
-    if (lbl_806E2EC8 == NULL) {
-      lbl_806E2EC8 = paramEntry;
-    } else {
-      paramEntry->_18 = lbl_806E2EC8;
-      lbl_806E2EC8 = paramEntry;
-    }
-  }
+  parameter_instance.param = param;
+  parameter_instance.completedCallback = completedCallback;
+  parameter_instance.progressCallback = progressCallback;
+  parameter_instance.buffer_clear = buffer_clear;
 
-  if (paramEntry == NULL) {
+  entry = DWCi_AppendDWCGHTTPParam(&parameter_instance);
+
+  if (entry == NULL) {
     DWCi_HandleGHTTPError(DWC_GHTTP_INSUFFICIENT_MEMORY);
     DWC_Printf(4, "DWC_Alloc Error\n");
     completedCallback(NULL, 0, DWC_GHTTP_INSUFFICIENT_MEMORY, param);
@@ -157,38 +242,60 @@ int DWC_GetGHTTPDataEx(const char* url, int bufferlen, BOOL buffer_clear,
       DWCi_HandleGHTTPError(DWC_GHTTP_INSUFFICIENT_MEMORY);
       DWC_Printf(4, "DWC_Alloc Error\n");
       completedCallback(NULL, 0, DWC_GHTTP_INSUFFICIENT_MEMORY, param);
-      DWCi_RemoveDWCGHTTPParamEntry(paramEntry);
+      DWCi_RemoveDWCGHTTPParamEntry(entry);
       return DWC_GHTTP_INSUFFICIENT_MEMORY;
     }
-    paramEntry->_10 = buffer;
+    entry->buf = buffer;
   }
 
   if (progressCallback != NULL) {
-    request = ghttpGetEx(url, NULL, buffer, bufferlen, NULL, GHTTPFalse,
-                         GHTTPFalse, GHTTPProgressCallback,
-                         GHTTPCompletedCallback, paramEntry);
+    req = ghttpGetEx(url, NULL, buffer, bufferlen, NULL, GHTTPFalse, GHTTPFalse,
+                     GHTTPProgressCallback, GHTTPCompletedCallback, entry);
   } else {
-    request = ghttpGetEx(url, NULL, buffer, bufferlen, NULL, GHTTPFalse,
-                         GHTTPFalse, NULL, GHTTPCompletedCallback, paramEntry);
+    req = ghttpGetEx(url, NULL, buffer, bufferlen, NULL, GHTTPFalse, GHTTPFalse,
+                     NULL, GHTTPCompletedCallback, entry);
   }
 
-  if (request < 0) {
-    DWCi_HandleGHTTPError(request);
-    completedCallback(NULL, 0, request, param);
-    if (paramEntry->_10 != NULL) {
-      DWC_Free(DWC_ALLOCTYPE_GHTTP, paramEntry->_10, 0);
+  if (req < 0) {
+    DWCi_HandleGHTTPError(req);
+    completedCallback(NULL, 0, req, param);
+    if (entry->buf != NULL) {
+      DWC_Free(DWC_ALLOCTYPE_GHTTP, entry->buf, 0);
     }
-    DWCi_RemoveDWCGHTTPParamEntry(paramEntry);
+    DWCi_RemoveDWCGHTTPParamEntry(entry);
   }
 
-  paramEntry->_14 = request;
-  ghttpSetMaxRecvTime(request, 1);
-  return request;
+  entry->req = req;
+  ghttpSetMaxRecvTime(req, 1);
+  return req;
 }
 
-int DWCi_HandleGHTTPError(int result) {
+void DWC_CancelGHTTPRequest(int req) {
+  DWCGHTTPParamEntry* entry;
+
+  ghttpCancelRequest(req);
+
+  entry = DWCi_FindDWCGHTTPParamEntryByReq(req);
+  if (entry == NULL) {
+    return;
+  }
+  if (entry->buf != NULL) {
+    DWC_Free(DWC_ALLOCTYPE_GHTTP, entry->buf, 0);
+  }
+  DWCi_RemoveDWCGHTTPParamEntry(entry);
+}
+
+DWCGHTTPState DWC_GetGHTTPState(int req) {
+  if (req < 0) {
+    return DWC_GHTTP_FALSE;
+  } else {
+    return ghttpGetState(req);
+  }
+}
+
+static DWCGHTTPResult DWCi_HandleGHTTPError(DWCGHTTPResult result) {
   int errorCode = -98000;
-  int errorType = DWC_ERROR_TYPE_7;
+  DWCErrorType dwcError = DWC_ERROR_TYPE_7;
 
   if (result == DWC_GHTTP_SUCCESS) {
     return DWC_GHTTP_SUCCESS;
@@ -215,7 +322,7 @@ int DWCi_HandleGHTTPError(int result) {
       break;
     case DWC_GHTTP_OUT_OF_MEMORY:
     case 20:
-      errorType = DWC_ERROR_FATAL;
+      dwcError = DWC_ERROR_FATAL;
       errorCode -= 1;
       break;
     case DWC_GHTTP_BUFFER_OVERFLOW:
@@ -258,31 +365,87 @@ int DWCi_HandleGHTTPError(int result) {
       break;
   }
 
-  DWCi_SetError(errorType, errorCode);
+  DWCi_SetError(dwcError, errorCode);
   return result;
 }
 
-void DWCi_RemoveDWCGHTTPParamEntry(DWCGHTTPParam* paramEntry) {
-  DWCGHTTPParam* current = lbl_806E2EC8;
+static DWCGHTTPParamEntry* DWCi_AppendDWCGHTTPParam(
+    const DWCGHTTPParam* param) {
+  DWCGHTTPParamEntry* entry;
 
-  if (current == NULL) {
+  entry = DWC_Alloc(DWC_ALLOCTYPE_GHTTP, sizeof(DWCGHTTPParamEntry));
+  if (entry == NULL) {
+    return NULL;
+  }
+
+  entry->param = *param;
+  entry->nextentry = NULL;
+  entry->buf = NULL;
+
+  if (paramhead == NULL) {
+    paramhead = entry;
+    return entry;
+  }
+
+  entry->nextentry = paramhead;
+  paramhead = entry;
+  return entry;
+}
+
+static void DWCi_RemoveDWCGHTTPParamEntry(DWCGHTTPParamEntry* entry) {
+  DWCGHTTPParamEntry* cursor;
+  DWCGHTTPParamEntry* target;
+
+  if (paramhead == NULL) {
     return;
   }
 
-  if (current == paramEntry) {
-    DWCGHTTPParam* next = current->_18;
-    DWC_Free(DWC_ALLOCTYPE_GHTTP, current, 0);
-    lbl_806E2EC8 = next;
-  } else {
-    DWCGHTTPParam* previous = current;
-    while ((current = previous->_18) != NULL) {
-      if (current != paramEntry) {
-        previous = current;
-      } else {
-        previous->_18 = current->_18;
-        DWC_Free(DWC_ALLOCTYPE_GHTTP, current, 0);
-        break;
-      }
-    }
+  if (paramhead == entry) {
+    cursor = paramhead->nextentry;
+    DWC_Free(DWC_ALLOCTYPE_GHTTP, paramhead, 0);
+    paramhead = cursor;
+    return;
   }
+
+  cursor = paramhead;
+  while (cursor->nextentry != NULL) {
+    if (cursor->nextentry != entry) {
+      cursor = cursor->nextentry;
+      continue;
+    }
+
+    target = cursor->nextentry;
+    cursor->nextentry = cursor->nextentry->nextentry;
+    DWC_Free(DWC_ALLOCTYPE_GHTTP, target, 0);
+    return;
+  }
+}
+
+static DWCGHTTPParamEntry* DWCi_FindDWCGHTTPParamEntryByReq(int req) {
+  DWCGHTTPParamEntry* cursor;
+
+  cursor = paramhead;
+  while (cursor != NULL && cursor->req != req) {
+    cursor = cursor->nextentry;
+  }
+
+  return cursor;
+}
+
+static void DWCi_RemoveAllDWCGHTTPParamEntry(void) {
+  DWCGHTTPParamEntry* cursor;
+  DWCGHTTPParamEntry* target;
+
+  cursor = paramhead;
+  while (cursor != NULL) {
+    target = cursor;
+    cursor = cursor->nextentry;
+
+    if (target->buf != NULL) {
+      DWC_Free(DWC_ALLOCTYPE_GHTTP, target->buf, 0);
+    }
+    DWC_Free(DWC_ALLOCTYPE_GHTTP, target, 0);
+  }
+
+  paramhead = NULL;
 }

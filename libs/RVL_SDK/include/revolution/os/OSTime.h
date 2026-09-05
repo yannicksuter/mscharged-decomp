@@ -35,6 +35,7 @@ typedef struct OSCalendarTime {
 #define OS_USEC_TO_TICKS(x) ((x) * (OS_TIME_SPEED / 125000) / 8)
 #define OS_NSEC_TO_TICKS(x) ((x) * (OS_TIME_SPEED / 125000) / 8000)
 
+#define OSTicksToSeconds(ticks) ((ticks) / OS_TIME_SPEED)
 #define OSTicksToMilliseconds(ticks) ((ticks) / (OS_TIME_SPEED / 1000))
 #define OSTicksToMicroseconds(ticks) (((ticks) * 8) / (OS_TIME_SPEED / 125000))
 #define OSSecondsToTicks(sec) OS_SEC_TO_TICKS(sec)

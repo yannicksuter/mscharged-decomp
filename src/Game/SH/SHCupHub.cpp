@@ -5,8 +5,9 @@
 #include "Game/FE/tlComponentInstance.h"
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" void fn_80253474(void* object);
-extern "C" void* fn_80253E18();
+class TU80252180Scene;
+extern "C" void fn_80253474(TU80252180Scene* scene);
+extern "C" TU80252180Scene* fn_80253E18();
 
 extern TLComponentInstance* lbl_80578450[4];
 
@@ -86,7 +87,7 @@ void CupHubScene::fn_80203A88(int, void* context)
         fn_801CBCA0(0x2ECB0035, 0, 0, 1);
         mUnidentified894 = 2;
 
-        void* object = fn_80253E18();
+        TU80252180Scene* object = fn_80253E18();
         if (object != 0)
         {
             fn_80253474(object);

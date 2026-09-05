@@ -49,9 +49,10 @@ extern "C" void fn_80208458();
 extern "C" void fn_80208518();
 extern "C" void fn_80208594();
 extern "C" void fn_802092D0(bool);
-extern "C" void fn_80253474();
-extern "C" bool fn_80253E18();
-extern "C" void fn_80254E3C();
+class TU80252180Scene;
+extern "C" void fn_80253474(TU80252180Scene* scene);
+extern "C" TU80252180Scene* fn_80253E18();
+extern "C" void fn_80254E3C(TU80252180Scene* scene);
 extern "C" unsigned int fn_80273B00();
 extern "C" void fn_80276D10();
 extern "C" bool fn_80276DE0();
@@ -525,16 +526,16 @@ void Presentation::DoFunctionCall(unsigned int function)
         fn_80208518();
         break;
     case 41:
-        if (fn_80253E18())
+        if (TU80252180Scene* scene = fn_80253E18())
         {
-            fn_80254E3C();
+            fn_80254E3C(scene);
         }
         break;
     case 42:
         FEMusic::StartStreamIfDifferent(1);
-        if (fn_80253E18())
+        if (TU80252180Scene* scene = fn_80253E18())
         {
-            fn_80253474();
+            fn_80253474(scene);
         }
         for (int i = 0; i < 4; ++i)
         {

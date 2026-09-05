@@ -15,7 +15,7 @@ extern "C" u32 fn_8032C830(void* codec, void* message, void* buffer, int size);
 extern "C" void fn_8032CA1C(
     void* codec, int type, UnidentifiedNetworkMessageReceiver* receiver);
 extern "C" void fn_8032CA2C(void* codec, int type);
-extern "C" int fn_8025BD88();
+extern "C" bool fn_8025BD88();
 
 extern int lbl_80519920[12];
 extern void* lbl_806E2100;

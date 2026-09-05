@@ -23,6 +23,7 @@ public:
     void fn_80250100(int index, void* context);
     void fn_8025018C();
     void fn_802505E8();
+    void fn_80250718();
     void fn_80251328(int index, void* context);
 
     /* 0x001C */ int mUnidentified001C;

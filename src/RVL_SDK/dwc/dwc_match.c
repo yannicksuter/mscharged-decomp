@@ -246,7 +246,6 @@ void fn_8049A700(NegotiateResult result, SOCKET gamesocket,
 int fn_8048E27C(void);
 GT2Connection* fn_8048E320(int index);
 DWCConnectionInfo* fn_8048E430(int index);
-u32 fn_8048A3BC(u32 max);
 void* fn_8048C530(void);
 GT2Connection* fn_8048E334(int index);
 int fn_8048AE58(u8 friendIndex);
@@ -1862,7 +1861,7 @@ void fn_80492D4C(int mode)
 {
     lbl_806E2EF8->_0C = 0;
     lbl_806E2EF8->_180 = 0;
-    lbl_806E2EF8->_182 = fn_8048A3BC(0x10000);
+    lbl_806E2EF8->_182 = DWCi_GetMathRand32(0x10000);
     lbl_806E2EF8->_184 = 0;
     lbl_806E2EF8->_188 = 0;
     lbl_806E2EF8->_190 = 0;
@@ -2134,7 +2133,7 @@ int fn_80493434(int isRetry, int cookie, SBServer server)
 
         if (needNN)
         {
-            lbl_806E2EF8->_182 = fn_8048A3BC(0x10000);
+            lbl_806E2EF8->_182 = DWCi_GetMathRand32(0x10000);
             lbl_806E2EF8->_1A0 = cookie;
         }
         else
@@ -5661,7 +5660,7 @@ int fn_80499CA8(int sort)
                     point = 0x800000 - 1;
                 }
                 SBServerAddIntKeyValue(server, "dwc_eval",
-                    (point << 8) | fn_8048A3BC(0x100));
+                    (point << 8) | DWCi_GetMathRand32(0x100));
             }
             else
             {
@@ -5674,7 +5673,7 @@ int fn_80499CA8(int sort)
         }
         else
         {
-            SBServerAddIntKeyValue(server, "dwc_eval", fn_8048A3BC(0x80));
+            SBServerAddIntKeyValue(server, "dwc_eval", DWCi_GetMathRand32(0x80));
         }
     }
 
@@ -5716,7 +5715,7 @@ void fn_80499E90(void)
         total += lbl_804F31F8[i];
     }
 
-    rand = fn_8048A3BC(0x64);
+    rand = DWCi_GetMathRand32(0x64);
     for (i = 0; i < ServerBrowserCount(lbl_806E2EF8->sb); i++)
     {
         if (i == ServerBrowserCount(lbl_806E2EF8->sb) - 1)

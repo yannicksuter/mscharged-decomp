@@ -5,6 +5,11 @@
 
 #include <revolution/nhttp/nhttp_err.h>
 
+#define NHTTP_HDRRECVBUF_INILEN 1024
+#define NHTTP_HDRRECVBUF_BLOCKSHIFT 9
+#define NHTTP_HDRRECVBUF_BLOCKLEN (1 << NHTTP_HDRRECVBUF_BLOCKSHIFT)
+#define NHTTP_HDRRECVBUF_BLOCKMASK (NHTTP_HDRRECVBUF_BLOCKLEN - 1)
+
 #ifdef __cplusplus
 extern "C"
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+#define GHTTP_EXTENDEDERROR
+#include <gamespy/ghttp/ghttp.h>
 #include <revolution/types.h>
 
 #ifdef __cplusplus
@@ -51,6 +53,8 @@ extern "C" {
 
 typedef int DWCGHTTPState;
 typedef int DWCGHTTPResult;
+typedef GHTTPRequest DWCGHTTPRequest;
+typedef GHTTPPost DWCGHTTPPost;
 
 typedef void (*DWCGHTTPProgressCallback)(DWCGHTTPState state, const char* buf,
                                          int len, int bytesReceived,
@@ -58,13 +62,31 @@ typedef void (*DWCGHTTPProgressCallback)(DWCGHTTPState state, const char* buf,
 typedef void (*DWCGHTTPCompletedCallback)(const char* buf, int len,
                                           DWCGHTTPResult result, void* param);
 
+typedef struct {
+  void* param;
+  DWCGHTTPCompletedCallback completedCallback;
+  DWCGHTTPProgressCallback progressCallback;
+  BOOL buffer_clear;
+} DWCGHTTPParam;
+
 BOOL DWC_InitGHTTP(const char* gamename);
 BOOL DWC_ShutdownGHTTP(void);
 BOOL DWC_ProcessGHTTP(void);
+void DWC_GHTTPNewPost(DWCGHTTPPost* post);
+BOOL DWC_GHTTPPostAddString(DWCGHTTPPost* post, const char* key,
+                            const char* value);
+int DWC_PostGHTTPData(const char* url, DWCGHTTPPost* post,
+                      DWCGHTTPCompletedCallback completedCallback,
+                      void* param);
+int DWC_GetGHTTPData(const char* url,
+                     DWCGHTTPCompletedCallback completedCallback,
+                     void* param);
 int DWC_GetGHTTPDataEx(const char* url, int bufferlen, BOOL buffer_clear,
                        DWCGHTTPProgressCallback progressCallback,
                        DWCGHTTPCompletedCallback completedCallback,
                        void* param);
+void DWC_CancelGHTTPRequest(int req);
+DWCGHTTPState DWC_GetGHTTPState(int req);
 
 #ifdef __cplusplus
 }

@@ -1780,8 +1780,31 @@ unclassified/tu_8024D92C.cpp:
 	.data       start:0x8051F658 end:0x8051F684
 
 unclassified/tu_8024F4E0.cpp:
-	.text       start:0x8024F4E0 end:0x80250718
-	.data       start:0x8051F780 end:0x8051F7AC
+	.text       start:0x8024F4E0 end:0x80252180
+	.data       start:0x8051F758 end:0x8051F7AC
+
+unclassified/tu_80252180.cpp:
+	.text       start:0x80252180 end:0x80254084
+	.ctors      start:0x804DB7B4 end:0x804DB7B8
+	.bss        start:0x805785F8 end:0x80578604
+	.sdata      start:0x806DE828 end:0x806DE878
+	.sbss       start:0x806E18F4 end:0x806E18F8
+	.sdata2     start:0x806E5AC0 end:0x806E5AD8
+
+unclassified/tu_80254084.cpp:
+	.text       start:0x80254084 end:0x802582C4
+	.ctors      start:0x804DB7B8 end:0x804DB7BC
+	.bss        start:0x80578608 end:0x80578648
+	.sdata      start:0x806DE970 end:0x806DE978
+
+unclassified/tu_802582C4.cpp:
+	.text       start:0x802582C4 end:0x80259B88
+
+unclassified/tu_80259B88.cpp:
+	.text       start:0x80259B88 end:0x8025C758
+
+unclassified/tu_80264E98.cpp:
+	.text       start:0x80264E98 end:0x80265078
 
 Game/SH/SHSceneBase.cpp:
 	.text       start:0x80269078 end:0x8026B10C
@@ -5178,8 +5201,8 @@ RVL_SDK/hbm/HBMBase.cpp:
 	.data       start:0x80555918 end:0x805568C0
 	.bss        start:0x806AE630 end:0x806AE668
 	.sdata      start:0x806E0138 end:0x806E0208
-	.sbss       start:0x806E2D80 end:0x806E2D88
-	.sdata2     start:0x806E7630 end:0x806E7698
+	.sbss       start:0x806E2D80 end:0x806E2D84
+	.sdata2     start:0x806E7618 end:0x806E7694
 
 RVL_SDK/hbm/HBMAnmController.cpp:
 	.text       start:0x804417DC end:0x804418FC
@@ -5437,7 +5460,7 @@ RVL_SDK/hbm/nw4hbm/snd/snd_SeqPlayer.cpp:
 	.text       start:0x8046151C end:0x80462E84
 	.ctors      start:0x804DBB88 end:0x804DBB8C
 	.data       start:0x8055BBE8 end:0x8055C120
-	.bss        start:0x806BEDE0 end:0x806BEE20
+	.bss        start:0x806BEDE0 end:0x806BEE18
 	.sdata2     start:0x806E78E0 end:0x806E78F0
 
 RVL_SDK/hbm/nw4hbm/snd/snd_SeqSound.cpp:
@@ -5547,6 +5570,9 @@ RVL_SDK/hbm/nw4hbm/snd/snd_WaveFile.cpp:
 RVL_SDK/hbm/nw4hbm/snd/snd_WavePlayer.cpp:
 	.text       start:0x804714E8 end:0x804720AC
 	.ctors      start:0x804DBB98 end:0x804DBB9C
+	.data       start:0x8055F100 end:0x8055F5BB
+	.bss        start:0x806C9820 end:0x806C9838
+	.sdata2     start:0x806E7988 end:0x806E7990
 
 RVL_SDK/hbm/nw4hbm/snd/snd_WaveSound.cpp:
 	.text       start:0x804720AC end:0x80472530
@@ -5566,6 +5592,7 @@ RVL_SDK/hbm/nw4hbm/snd/snd_WsdFile.cpp:
 RVL_SDK/hbm/nw4hbm/snd/snd_WsdPlayer.cpp:
 	.text       start:0x80472AA0 end:0x80473B88
 	.ctors      start:0x804DBBA0 end:0x804DBBA4
+	.bss        start:0x806C9838 end:0x806C9850
 
 RVL_SDK/hbm/nw4hbm/snd/snd_WsdTrack.cpp:
 	.text       start:0x80473B88 end:0x80474710
@@ -5734,14 +5761,14 @@ RVL_SDK/dwc/dwc_auth_interface.c:
 RVL_SDK/dwc/dwc_nastime.c:
 	.text       start:0x804A0B58 end:0x804A0C34
 
-RVL_SDK/dwc/dwc_ranksession.c:
+RVL_SDK/dwc/dwc_encsession.c:
 	.text       start:0x804A0C34 end:0x804A2068
 	.rodata     start:0x804F3210 end:0x804F3238
 	.data       start:0x80565878 end:0x80565A40
 	.sdata      start:0x806E0540 end:0x806E0568
 	.sbss       start:0x806E2F30 end:0x806E2F38
 
-RVL_SDK/dwc/unknown_804A2068.c:
+RVL_SDK/dwc/dwc_ranksession.c:
 	.text       start:0x804A2068 end:0x804A2508
 	.data       start:0x80565A40 end:0x80565AA0
 
@@ -5758,6 +5785,7 @@ RVL_SDK/gamespy/md5c.c:
 
 RVL_SDK/gamespy/common/gsPlatformSocket.c:
 	.text       start:0x804A4314 end:0x804A5258
+	.data       start:0x80565AE0 end:0x80565AEA
 
 RVL_SDK/gamespy/common/gsPlatformUtil.c:
 	.text       start:0x804A5258 end:0x804A5A48
@@ -5773,8 +5801,15 @@ RVL_SDK/gamespy/common/gsAvailable.c:
 	.sdata      start:0x806E0580 end:0x806E0584
 	.sbss       start:0x806E2F48 end:0x806E2F4C
 
+RVL_SDK/gamespy/common/gsCrypt.c:
+	.text       start:0x804A5DE4 end:0x804A5F00
+
 RVL_SDK/gamespy/common/gsLargeInt.c:
-	.text       start:0x804A5DE4 end:0x804A8B80
+	.text       start:0x804A5F00 end:0x804A86B0
+	.bss        start:0x806CA890 end:0x806CA920
+
+RVL_SDK/gamespy/common/gsRC4.c:
+	.text       start:0x804A86B0 end:0x804A8B80
 
 RVL_SDK/gamespy/common/gsSHA1.c:
 	.text       start:0x804A8B80 end:0x804A952C

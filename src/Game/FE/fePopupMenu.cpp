@@ -5,8 +5,9 @@
 #include "NL/nlMemory.h"
 
 extern unsigned char* gpHBMManager;
-extern "C" bool fn_80253E18();
-extern "C" void fn_802533F0();
+class TU80252180Scene;
+extern "C" TU80252180Scene* fn_80253E18();
+extern "C" void fn_802533F0(TU80252180Scene* scene);
 
 char* optionNames[3] = { "button_1", "button_2", "button_3" };
 
@@ -83,9 +84,10 @@ FEPopupMenu::~FEPopupMenu()
         gpHBMManager[0x92] = false;
     }
 
-    if (fn_80253E18())
+    TU80252180Scene* scene = fn_80253E18();
+    if (scene != 0)
     {
-        fn_802533F0();
+        fn_802533F0(scene);
     }
 
     if (mRunCallBack == true)

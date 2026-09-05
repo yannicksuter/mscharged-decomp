@@ -219,9 +219,9 @@ typedef struct SOInAddr {
 } SOInAddr;
 
 typedef struct IPAddrEntry {
-  SOInAddr addr;
-  SOInAddr netmask;
-  SOInAddr broadcast;
+  u8 addr[4];
+  u8 netMask[4];
+  u8 bcastAddr[4];
 } IPAddrEntry;
 
 typedef struct SOSockAddr {

@@ -840,17 +840,16 @@ gsi_bool gsLargeIntSquareMod(const gsLargeInt_t* lint, const gsLargeInt_t* mod,
                              gsLargeInt_t* dest) {
   int i = 0;
   int k = 0;
-  int len = (int)lint->mLength; // signed version
-  l_dword carry = 0;
+  int len = (gsi_i32)lint->mLength; // signed version
+  gsi_u64 carry = 0;
   int oldShiftBit = 0;
   int newShiftBit = 0;
   gsi_bool result = gsi_false;
-  unsigned int mask = (unsigned int)1 << (GS_LARGEINT_DIGIT_SIZE_BITS - 1);
 
-  l_word squareSums[GS_LARGEINT_MAX_DIGITS * 2]; // temp dest for square sums
-  l_word otherSums[GS_LARGEINT_MAX_DIGITS * 2];  // temp dest for other sums
-  l_word squareLen = 0;
-  l_word otherLen = 0;
+  gsi_u32 squareSums[GS_LARGEINT_INT_SIZE * 2]; // temp dest for square sums
+  gsi_u32 otherSums[GS_LARGEINT_INT_SIZE * 2];  // temp dest for other sums
+  gsi_u32 squareLen = 0;
+  gsi_u32 otherLen = 0;
 
   GSLINT_ENTERTIMER(GSLintTimerSquareMod);
 
@@ -862,21 +861,22 @@ gsi_bool gsLargeIntSquareMod(const gsLargeInt_t* lint, const gsLargeInt_t* mod,
   // Ex: ABC * ABC, we want AB,AC,BC only
   for (i = 1; i < len; i++) {
     for (k = 0; k < i; k++) {
-      carry += (l_dword)lint->mData[i] * lint->mData[k] + otherSums[i + k];
-      otherSums[i + k] = (l_word)carry;
-      carry = carry >> GS_LARGEINT_DIGIT_SIZE_BITS;
+      carry += (gsi_u64)lint->mData[i] * lint->mData[k] + otherSums[i + k];
+      otherSums[i + k] = (gsi_u32)carry;
+      carry = carry >> 32;
     }
     if (carry) {
-      otherSums[i + k] = (l_word)carry;
-      carry = carry >> GS_LARGEINT_DIGIT_SIZE_BITS;
+      otherSums[i + k] = (gsi_u32)carry;
+      carry = carry >> 32;
     }
   }
 
   // Multiply by 2 (because each internal pair appears twice)
   for (i = 0; i < (2 * len); i++) {
-    newShiftBit =
-        (otherSums[i] & mask) == mask ? 1 : 0; // calc next carry 1 or 0
-    otherSums[i] = (l_word)((otherSums[i] << 1) + oldShiftBit); // do the shift
+    newShiftBit = (otherSums[i] & 0x80000000) == 0x80000000
+                      ? 1
+                      : 0; // calc next carry 1 or 0
+    otherSums[i] = (otherSums[i] << 1) + oldShiftBit; // do the shift
     oldShiftBit = newShiftBit;
   }
   // don't worry about left-overy carry because this can't overflow
@@ -884,16 +884,16 @@ gsi_bool gsLargeIntSquareMod(const gsLargeInt_t* lint, const gsLargeInt_t* mod,
 
   // Go through each digit, multiplying with itself
   for (i = 0; i < len; i++) {
-    carry = (l_dword)lint->mData[i] * lint->mData[i];
-    squareSums[i * 2] = (l_word)carry;
-    squareSums[i * 2 + 1] = (l_word)(carry >> GS_LARGEINT_DIGIT_SIZE_BITS);
+    carry = (gsi_u64)lint->mData[i] * lint->mData[i];
+    squareSums[i * 2] = (gsi_u32)carry;
+    squareSums[i * 2 + 1] = (gsi_u32)(carry >> 32);
   }
-  squareLen = (l_word)(2 * len);
-  otherLen = (l_word)(2 * len);
+  squareLen = (gsi_u32)2 * len;
+  otherLen = (gsi_u32)2 * len;
 
   // Add the two together
   result = gsiLargeIntAdd(otherSums, otherLen, squareSums, squareLen,
-                          squareSums, &squareLen, GS_LARGEINT_MAX_DIGITS * 2);
+                          squareSums, &squareLen, GS_LARGEINT_INT_SIZE * 2);
   result = gsiLargeIntDiv(squareSums, squareLen, mod, NULL, dest);
 
   GSLINT_EXITTIMER(GSLintTimerSquareMod);
@@ -1249,9 +1249,8 @@ gsi_bool gsLargeIntPowerMod(const gsLargeInt_t* b, const gsLargeInt_t* p,
 //    (below 65535 is a security risk, so don't go too small)
 gsi_bool gsLargeIntPowerMod(const gsLargeInt_t* b, const gsLargeInt_t* p,
                             const gsLargeInt_t* m, gsLargeInt_t* dest) {
-  int i = 0;        // temp/counter
-  int digitNum = 0; // temp/counter
-  int digitBit = 0;
+  int i = 0; // temp/counter
+  int k = 0; // temp/counter
 
   l_word modPrime;
 
@@ -1377,25 +1376,9 @@ gsi_bool gsLargeIntPowerMod(const gsLargeInt_t* b, const gsLargeInt_t* p,
   for (i = (int)(expHighBit - 1); i >= 0; i--) {
     // mont square the current total
     gsiLargeIntMultM(dest, dest, &mod, modPrime, dest);
-    digitNum =
-        (gsi_i32)(i / GS_LARGEINT_DIGIT_SIZE_BITS); // which digit to extract a
-                                                    // bit from?
-    digitBit =
-        (gsi_i32)(i % GS_LARGEINT_DIGIT_SIZE_BITS); // which bit to extract from
-                                                    // that digit?
-    // if ((power.mData[k] & (1<<i))==((l_word)1<<i))
-
-    // HACKED DUE TO COMPILER CRASH
-    // THE REPEATED 1<<digitbit caused the optimizer to 'splode
-    {
-      GS_LARGEINT_DIGIT_TYPE digit = power.mData[digitNum];
-      GS_LARGEINT_DIGIT_TYPE mask = (GS_LARGEINT_DIGIT_TYPE)(1 << digitBit);
-      GS_LARGEINT_DIGIT_TYPE masked = digit & mask; //(1<<digitBit);
-
-      // FORCE COMPILER TO NOT OPTIMIZE THIS
-      if (mask == masked)
-        gsiLargeIntMultM(dest, &xwiggle, &mod, modPrime, dest);
-    }
+    k = (i / GS_LARGEINT_BYTE_SIZE);
+    if ((power.mData[k] & (1 << i)) == ((l_word)1 << i))
+      gsiLargeIntMultM(dest, &xwiggle, &mod, modPrime, dest);
   }
 
   // Since we're working with Montgomery values (x*R2mod)
@@ -1410,7 +1393,7 @@ gsi_bool gsLargeIntPowerMod(const gsLargeInt_t* b, const gsLargeInt_t* p,
 
 #endif
 
-#define NEWMULTM
+//#define NEWMULTM
 #ifdef NEWMULTM
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1740,18 +1723,15 @@ gsi_bool gsLargeIntSetFromHexString(gsLargeInt_t* lint, const char* hexstream) {
 //     ex: Packing an RSA message of which the first bytes are 0x00 0x02
 //         The first bytes of the packet must become the MSD of the LINT
 gsi_bool gsLargeIntReverseBytes(gsLargeInt_t* lint) {
-#if defined(GSI_LITTLE_ENDIAN)
-  char* left = (char*)&lint->mData[0];
-  char* right = ((char*)&lint->mData[lint->mLength]) - 1;
-  char temp;
-#else
-  l_word* left = lint->mData;
-  l_word* right = lint->mData + (lint->mLength - 1);
-  l_word temp;
-#endif
+  char* left = NULL;
+  char* right = NULL;
+  char temp = '\0';
 
   if (lint->mLength == 0)
     return gsi_true;
+
+  left = (char*)&lint->mData[0];
+  right = ((char*)&lint->mData[lint->mLength]) - 1;
 
   while (left < right) {
     temp = *left;
@@ -1816,33 +1796,4 @@ gsi_u32 gsLargeIntGetByteLength(const gsLargeInt_t* lint) {
   }
 
   return (gsi_u32)byteSize;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// Creates a large int from a byte buffer
-//		Essentially, constructs the array of digits in appropriate byte
-// order
-gsi_bool gsLargeIntSetFromMemoryStream(gsLargeInt_t* lint, const gsi_u8* data,
-                                       gsi_u32 len) {
-  lint->mData[0] = 0;
-  memcpy(((char*)lint->mData) + (4 - len % 4) % 4, data, len);
-
-  // Set length to ceiling of len/digit_size
-  lint->mLength = (unsigned int)((len + (GS_LARGEINT_DIGIT_SIZE_BYTES - 1)) /
-                                 GS_LARGEINT_DIGIT_SIZE_BYTES);
-
-  return gsLargeIntReverseBytes(lint);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-gsi_bool gsLargeIntWriteToMemoryStream(const gsLargeInt_t* lint, gsi_u8* data) {
-  gsLargeInt_t copy;
-  memcpy(&copy, lint, sizeof(gsLargeInt_t));
-
-  gsLargeIntReverseBytes(&copy);
-
-  memcpy(data, copy.mData, copy.mLength * GS_LARGEINT_DIGIT_SIZE_BYTES);
-  return gsi_true;
 }

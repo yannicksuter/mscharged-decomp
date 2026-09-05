@@ -2,11 +2,7 @@
 #define GAME_FE_ONLINE_RANKING_H
 
 #include "Game/FE/BaseOverlayHandler.h"
-
-struct UnidentifiedTimer_8030616C
-{
-    u32 mUnidentified00[7];
-}; // size 0x1C
+#include "unclassified/tu_8030616C.h"
 
 class UnidentifiedOnlineRankingScene : public BaseOverlayHandler
 {

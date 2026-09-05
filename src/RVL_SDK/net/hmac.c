@@ -4,75 +4,73 @@
 
 #include <string.h>
 
-void NETHMACInit(NETHMACContext* context, const NETHashInterface* interface,
-    const void* key, u32 keyLength)
+static void NETHMACiInitPad(NETHMACContext* context, u8 pad)
 {
-    void* hashContext = context->hashContext;
-    u8 innerPad[64];
+    NETHashInterface* hif = context->hashInterface;
+    void* ctx = context->hashContext.buffer;
+    u32 keylen = context->keyLength;
+    u8 padkey[64];
     u32 i;
-    u32 actualKeyLength;
 
-    context->interface = *interface;
-
-    if (context->interface.contextSize > sizeof(context->hashContext) || context->interface.blockSize > sizeof(context->key))
+    for (i = 0; i < keylen; i++)
     {
-        OSReport("%s(%d):[warning in %s]", "hmac.c", 100, __FUNCTION__);
+        padkey[i] = context->key.buffer[i] ^ pad;
+    }
+    memset(&padkey[keylen], pad, hif->blockLength - keylen);
+
+    hif->Init(ctx);
+    hif->Update(ctx, padkey, hif->blockLength);
+}
+
+void NETHMACInit(NETHMACContext* context, const NETHashInterface* hashInterface,
+    void* key, u32 keyLength)
+{
+    NETHashInterface* hif = context->hashInterface;
+    void* ctx = context->hashContext.buffer;
+
+    *hif = *hashInterface;
+
+    if (hif->workLength > sizeof(context->hashContext) || hif->blockLength > sizeof(context->key))
+    {
+        OSReport("%s(%d):[warning in %s]", "hmac.c", 100, __func__);
         OSReport("specified interface needs too large workmemory.");
         OSReport("\n");
         return;
     }
 
-    if (keyLength <= context->interface.blockSize)
+    if (keyLength <= hif->blockLength)
     {
-        memcpy(context->key, key, keyLength);
+        memcpy(context->key.buffer, key, keyLength);
         context->keyLength = keyLength;
     }
     else
     {
-        context->interface.init(hashContext);
-        context->interface.update(hashContext, key, keyLength);
-        context->interface.getDigest(hashContext, context->key);
-        context->keyLength = context->interface.digestSize;
+        hif->Init(ctx);
+        hif->Update(ctx, key, keyLength);
+        hif->GetDigest(ctx, context->key.buffer);
+        context->keyLength = hif->hashLength;
     }
 
-    hashContext = context->hashContext;
-    actualKeyLength = context->keyLength;
-    for (i = 0; i < actualKeyLength; i++)
-    {
-        innerPad[i] = context->key[i] ^ 0x36;
-    }
-    memset(&innerPad[actualKeyLength], 0x36, context->interface.blockSize - actualKeyLength);
-
-    context->interface.init(hashContext);
-    context->interface.update(hashContext, innerPad, context->interface.blockSize);
+    NETHMACiInitPad(context, 0x36);
 }
 
-void NETHMACUpdate(NETHMACContext* context, const void* input, u32 length)
+void NETHMACUpdate(NETHMACContext* context, void* message, u32 length)
 {
-    context->interface.update(context->hashContext, input, length);
+    NETHashInterface* hif = context->hashInterface;
+    void* ctx = context->hashContext.buffer;
+
+    hif->Update(ctx, message, length);
 }
 
 void NETHMACGetDigest(NETHMACContext* context, void* digest)
 {
-    u8 innerDigest[64];
-    u8 outerPad[64];
-    u32 i;
-    u32 actualKeyLength;
-    void* outerHashContext;
-    void* hashContext = context->hashContext;
+    NETHashInterface* hif = context->hashInterface;
+    void* ctx = context->hashContext.buffer;
+    u8 ihash[64];
 
-    context->interface.getDigest(hashContext, innerDigest);
+    hif->GetDigest(ctx, ihash);
 
-    actualKeyLength = context->keyLength;
-    outerHashContext = context->hashContext;
-    for (i = 0; i < actualKeyLength; i++)
-    {
-        outerPad[i] = context->key[i] ^ 0x5C;
-    }
-    memset(&outerPad[actualKeyLength], 0x5C, context->interface.blockSize - actualKeyLength);
-
-    context->interface.init(outerHashContext);
-    context->interface.update(outerHashContext, outerPad, context->interface.blockSize);
-    context->interface.update(hashContext, innerDigest, context->interface.digestSize);
-    context->interface.getDigest(hashContext, digest);
+    NETHMACiInitPad(context, 0x5C);
+    hif->Update(ctx, ihash, hif->hashLength);
+    hif->GetDigest(ctx, digest);
 }

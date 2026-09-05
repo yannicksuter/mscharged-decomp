@@ -95,23 +95,23 @@ s32 NHTTPi_SocConnect(NHTTPBgnEndInfo* info, void* mutexInfo,
     NHTTPRequestInfo* request, s32 socket, u32 address, u32 port);
 s32 NHTTPi_SocSSLConnect(NHTTPBgnEndInfo* info, void* mutexInfo,
     NHTTPRequestInfo* request, s32 socket);
-s32 NHTTPi_SocSend(NHTTPRequestInfo* request, s32 socket, const char* buffer,
-    s32 length, s32 flags);
-s32 NHTTPi_SocRecv(NHTTPRequestInfo* request, s32 socket, char* buffer,
-    s32 length, s32 flags);
+int NHTTPi_SocSend(const NHTTPRequestInfo* req_p, const int socket,
+    const char* buf_p, const int len, const int flags);
+int NHTTPi_SocRecv(const NHTTPRequestInfo* req_p, const int socket,
+    char* buf_p, const int len, const int flags);
 
 NHTTPHeader* NHTTPi_getHdrFromList(NHTTPHeader** list);
-BOOL NHTTPi_isRecvBufFull(NHTTPResponseInfo* response, u32 received);
+int NHTTPi_isRecvBufFull(const NHTTPResponseInfo* res_p, const int pos);
 s32 NHTTPi_RecvBuf(NHTTPRequestInfo* request, s32 socket, s32 offset,
     s32 flags);
-s32 NHTTPi_RecvBufN(NHTTPRequestInfo* request, s32 socket, u32 offset,
-    s32 length, s32 flags);
+int NHTTPi_RecvBufN(NHTTPRequestInfo* req_p, const int socket, const int pos,
+    int len, const int flags);
 s32 NHTTPi_getHeaderValue(NHTTPResponseInfo* recvBuf, const char* name,
     s32* position);
 s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPResponseInfo* recvBuf, s32 start,
     s32 end, s32* separator, s32* lineBreakLength);
-BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPResponseInfo* recvBuf, char* destination,
-    s32 start, s32 length);
+int NHTTPi_loadFromHdrRecvBuf(const NHTTPResponseInfo* res_p, char* dst_p,
+    int pos, int len);
 s32 NHTTPi_compareTokenN_HdrRecvBuf(NHTTPResponseInfo* recvBuf, s32 start,
     s32 end, const char* token, s8 terminal);
 
@@ -125,7 +125,7 @@ s32 NHTTPi_SendPostData(void* mutexInfo, NHTTPRequestInfo* request,
 BOOL NHTTPi_BufFull(void* mutexInfo, NHTTPResponseInfo* response);
 s32 NHTTPi_SendProxyConnectMethod(NHTTPThreadData* threadData_p);
 BOOL NHTTPi_RecvProxyConnectHeader(NHTTPThreadData* threadData_p);
-s32 NHTTPi_SendHeaderList(NHTTPThreadData* threadData_p);
+static int NHTTPi_SendHeaderList(NHTTPThreadData* threadData_p);
 s32 NHTTPi_SendProcPostDataRaw(NHTTPThreadData* threadData_p);
 s32 NHTTPi_SendProcPostDataBinary(NHTTPThreadData* threadData_p);
 s32 NHTTPi_SendProcPostDataAscii(NHTTPThreadData* threadData_p);
@@ -594,38 +594,43 @@ BOOL NHTTPi_RecvProxyConnectHeader(NHTTPThreadData* threadData_p)
     }
 }
 
-s32 NHTTPi_SendHeaderList(NHTTPThreadData* threadData_p)
+static int NHTTPi_SendHeaderList(NHTTPThreadData* threadData_p)
 {
-    s32 err;
-    void* system = NHTTPi_GetSystemInfoP();
-    NHTTPRequestInfo* request =
-        NHTTPi_GetReqInfoP(system)->reqQueue->request;
-    NHTTPHeader* header = NHTTPi_getHdrFromList(&request->headers);
-    while (header != NULL)
+    void* sysInfo_p = NHTTPi_GetSystemInfoP();
+    NHTTPReqInfo* reqInfo_p = NHTTPi_GetReqInfoP(sysInfo_p);
+    NHTTPRequestInfo* req_p = reqInfo_p->reqQueue->request;
+    NHTTPHeader* datalist_p;
+    s32 sendStatus;
+
+    for (datalist_p = NHTTPi_getHdrFromList(&req_p->headers); datalist_p;
+         datalist_p = NHTTPi_getHdrFromList(&req_p->headers))
     {
-        NHTTPi_SEND(threadData_p, header->name, NHTTPi_strlen(header->name), err);
-        if (err != 0)
+        NHTTPi_SEND(threadData_p, datalist_p->name,
+            NHTTPi_strlen(datalist_p->name), sendStatus);
+        if (sendStatus != 0)
         {
-            return err;
+            return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, ": ", 2, err);
-        if (err != 0)
+        NHTTPi_SEND(threadData_p, ": ", 2, sendStatus);
+        if (sendStatus != 0)
         {
-            return err;
+            return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, header->value, NHTTPi_strlen(header->value), err);
-        if (err != 0)
+        NHTTPi_SEND(threadData_p, datalist_p->value,
+            NHTTPi_strlen(datalist_p->value), sendStatus);
+        if (sendStatus != 0)
         {
-            return err;
+            return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, "\r\n", 2, err);
-        if (err != 0)
+        NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+        if (sendStatus != 0)
         {
-            return err;
+            return sendStatus;
         }
-        NHTTPi_free(header);
-        header = NHTTPi_getHdrFromList(&request->headers);
+
+        NHTTPi_free(datalist_p);
     }
+
     return 0;
 }
 
@@ -708,8 +713,6 @@ static const char NHTTPi_strContentTypeMultipart[] =
 
 #define TMP_CONTENT_LENGTH_BUF_SIZE (12)
 #define TMP_HEADER_BUF_SIZE (14)
-#define NHTTP_HDRRECVBUF_INILEN (1024)
-#define NHTTP_HDRRECVBUF_BLOCKMASK (511)
 
 s32 NHTTPi_SendProcPostDataBinary(NHTTPThreadData* threadData_p)
 {

@@ -18,9 +18,10 @@
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" Presentation* fn_801FEEAC();
-extern "C" void fn_80253284(int value);
-extern "C" void* fn_80253E18();
-extern "C" void fn_802534BC(void* object, int value, bool enabled);
+extern "C" void fn_80253284(bool value);
+class TU80252180Scene;
+extern "C" TU80252180Scene* fn_80253E18();
+extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
 extern "C" bool fn_80273B00();
 extern "C" cGlobalPad* fn_802C082C(void* owner, int pad);
 extern "C" int VISetTimeToDimming(int time);
@@ -98,7 +99,7 @@ void TitleScene::SceneCreated()
 
     FEMusic::StartStreamIfDifferent(0);
     fn_80253284(0);
-    void* object = fn_80253E18();
+    TU80252180Scene* object = fn_80253E18();
     if (object != 0)
     {
         fn_802534BC(object, 0, true);

@@ -61,10 +61,33 @@ public:
     void InitParam();
     bool Setup(const SetupParam& setupParam, WavePacketCallback callback, void* callbackArg);
 
-    bool AppendWavePacket(WavePacket* packet);
+    bool AppendWavePacket(WavePacket* wavePacket);
 
     void Start();
     void Stop();
+
+    void SetVolume(f32 newVolume);
+    void SetPitch(f32 pitch);
+    void SetPan(f32 pan);
+    void SetSurroundPan(f32 surroundPan);
+    void SetLpfFreq(f32 lpfFreq);
+
+    void SetOutputLine(int lineFlag);
+    void SetMainOutVolume(f32 volume);
+    void SetMainSend(f32 send);
+    void SetFxSend(AuxBus bus, f32 send);
+    void SetRemoteOutVolume(int remoteIndex, f32 volume);
+    void SetRemoteSend(int remoteIndex, f32 send);
+    void SetRemoteFxSend(int remoteIndex, f32 send);
+
+    int GetOutputLine() const;
+    f32 GetMainOutVolume() const;
+    f32 GetMainSend() const;
+    f32 GetFxSend(AuxBus bus) const;
+    f32 GetRemoteOutVolume(int remoteIndex) const;
+    f32 GetRemoteSend(int remoteIndex) const;
+    f32 GetRemoteFxSend(int remoteIndex) const;
+
     void Pause(bool flag);
 
     void Shutdown();

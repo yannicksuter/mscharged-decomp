@@ -1,5 +1,6 @@
 #include <dwc/dwc_main.h>
 
+#include <dwc/dwc_common.h>
 #include <dwc/dwc_error.h>
 #include <dwc/dwc_friend.h>
 #include <dwc/dwc_report.h>
@@ -205,7 +206,7 @@ GT2Result fn_8048E0C4(void)
         return GT2Success;
     }
 
-    port = fn_8048A3BC(0x4000) + 0xC000;
+    port = DWCi_GetMathRand32(0x4000) + 0xC000;
     DWC_Printf(0x40, "--- Private port = %d ---\n", port);
     result = gt2CreateSocket(&sMainControl->_00,
         gt2AddressToString(0, port, NULL),

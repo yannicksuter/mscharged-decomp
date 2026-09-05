@@ -51,10 +51,11 @@ extern "C" void fn_80230468(UnidentifiedScrollWidget* widget, TU80300104Event ev
 extern "C" void fn_802308D0(UnidentifiedScrollWidget* widget, TLInstance* instance);
 extern "C" void fn_80230B90(UnidentifiedScrollWidget* widget, int mode);
 extern "C" void fn_80230DE0(UnidentifiedScrollWidget* widget, int value);
-extern "C" void fn_80253474(void* object);
-extern "C" void fn_802534BC(void* object, int value, bool enabled);
-extern "C" TLComponentInstance* fn_80253D70(void* object, int index);
-extern "C" void* fn_80253E18();
+class TU80252180Scene;
+extern "C" void fn_80253474(TU80252180Scene* scene);
+extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
+extern "C" TLComponentInstance* fn_80253D70(TU80252180Scene* scene, int value);
+extern "C" TU80252180Scene* fn_80253E18();
 extern "C" bool fn_80273B00();
 extern "C" void fn_8024AF04(TU8024A368Scene* scene);
 extern "C" void fn_8024BED8(TU8024A368Scene* scene);
@@ -809,7 +810,7 @@ extern "C" void fn_8024A7DC(TU8024A368Scene* scene)
 {
     fn_802172C4();
 
-    void* object = fn_80253E18();
+    TU80252180Scene* object = fn_80253E18();
     TLComponentInstance* screen = 0;
     if (object != 0)
     {
@@ -949,7 +950,7 @@ extern "C" void fn_8024A990(TU8024A368Scene* scene, float fDeltaT)
             {
                 fn_801CBCA0(0x80BA0C86, 0, 0, 1);
                 scene->mUnidentified328 = 3;
-                void* object = fn_80253E18();
+                TU80252180Scene* object = fn_80253E18();
                 if (object != 0)
                 {
                     fn_80253474(object);

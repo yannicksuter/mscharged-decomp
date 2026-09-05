@@ -12,10 +12,11 @@
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" Presentation* fn_801FEEAC();
-extern "C" void fn_80253474(void* object);
-extern "C" void fn_802534BC(void* object, int value, bool enabled);
-extern "C" TLComponentInstance* fn_80253D70(void* object, int index);
-extern "C" void* fn_80253E18();
+class TU80252180Scene;
+extern "C" void fn_80253474(TU80252180Scene* scene);
+extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
+extern "C" TLComponentInstance* fn_80253D70(TU80252180Scene* scene, int value);
+extern "C" TU80252180Scene* fn_80253E18();
 
 extern TLComponentInstance* lbl_80578450[4];
 extern BaseGameSceneManager* lbl_806E1838;
@@ -73,7 +74,7 @@ void OptionsScene::fn_801D2A08(int, void* context)
 
     mUnidentified320 = 2;
 
-    void* object = fn_80253E18();
+    TU80252180Scene* object = fn_80253E18();
     if (object != 0)
     {
         fn_80253474(object);
@@ -111,7 +112,7 @@ void OptionsScene::SceneCreated()
         0);
 
     TLComponentInstance* screen = 0;
-    void* object = fn_80253E18();
+    TU80252180Scene* object = fn_80253E18();
     if (object != 0)
     {
         fn_80253474(object);
@@ -145,7 +146,7 @@ void OptionsScene::Update(float fDeltaT)
 
         if (mUnidentified320 == 0)
         {
-            void* object = fn_80253E18();
+            TU80252180Scene* object = fn_80253E18();
             if (object != 0)
             {
                 fn_802534BC(object, 4, true);
@@ -191,7 +192,7 @@ void OptionsScene::Update(float fDeltaT)
         if (mUnidentified244.fn_8022F2E0(event, fDeltaT))
         {
             mUnidentified320 = 3;
-            void* object = fn_80253E18();
+            TU80252180Scene* object = fn_80253E18();
             if (object != 0)
             {
                 fn_80253474(object);

@@ -1,10 +1,11 @@
 #include <dwc/dwc_common.h>
 
+#include <nitro/math/rand.h>
 #include <revolution/os/OSTime.h>
 #include <stdio.h>
 #include <string.h>
 
-u64 lbl_806C9888[3];
+static MATHRandContext32 stRandContext32 = { 0, 0, 0 };
 
 int NETGetWirelessMacAddress(void* data);
 
@@ -79,34 +80,28 @@ int DWC_GetCommonValueString(const char* key, char* value, const char* string,
     return length;
 }
 
-u32 fn_8048A3BC(u32 max)
+u32 DWCi_GetMathRand32(u32 max)
 {
-    u64 macAddress;
+    u64 seed;
+    OSTime time;
 
-    if (lbl_806C9888[0] == 0 && lbl_806C9888[1] == 0 && lbl_806C9888[2] == 0)
+    if (!stRandContext32.x && !stRandContext32.mul && !stRandContext32.add)
     {
-        NETGetWirelessMacAddress(&macAddress);
-        macAddress = ((u64)OSGetTime() << 24) | ((macAddress >> 24) & 0xFFFFFF);
-        lbl_806C9888[0] = macAddress;
-        lbl_806C9888[1] = 0x5D588B656C078965ULL;
-        lbl_806C9888[2] = 0x269EC3;
+        NETGetWirelessMacAddress((u8*)&seed);
+        time = OSGetTime();
+        seed = ((seed >> 24) & 0xFFFFFF) | (time << 24);
+        MATH_InitRand32(&stRandContext32, seed);
     }
 
-    lbl_806C9888[0] = lbl_806C9888[1] * lbl_806C9888[0] + lbl_806C9888[2];
-    if (max == 0)
-    {
-        return lbl_806C9888[0] >> 32;
-    }
-    return ((lbl_806C9888[0] >> 32) * max) >> 32;
+    return MATH_Rand32(&stRandContext32, max);
 }
 
-int fn_8048A504(const u16* string)
+u32 DWCi_WStrLen(const u16* string)
 {
-    int length = 0;
+    u32 length = 0;
 
-    while (*string != 0)
+    while (string[length] != 0)
     {
-        string++;
         length++;
     }
     return length;

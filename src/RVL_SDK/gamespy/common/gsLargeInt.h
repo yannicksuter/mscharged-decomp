@@ -31,9 +31,9 @@ extern "C" {
 #define l_word GS_LARGEINT_DIGIT_TYPE
 #define l_dword GS_LARGEINT_DIGIT_LONG_TYPE
 
-//#define GS_LARGEINT_BYTE_SIZE       32     // binary size of system data type
-//#define GS_LARGEINT_INT_SIZE (GS_LARGEINT_BINARY_SIZE/GS_LARGEINT_BYTE_SIZE)
-//// size in values
+#define GS_LARGEINT_BYTE_SIZE 32 // binary size of system data type
+#define GS_LARGEINT_INT_SIZE                                                 \
+  (GS_LARGEINT_BINARY_SIZE / GS_LARGEINT_BYTE_SIZE) // size in values
 #define GS_LARGEINT_MAX_DIGITS                                                 \
   (GS_LARGEINT_BINARY_SIZE / GS_LARGEINT_DIGIT_SIZE_BITS)
 
@@ -78,12 +78,6 @@ gsi_bool gsLargeIntKMult(const gsLargeInt_t* src1, const gsLargeInt_t* src2,
 // lint buffer.
 gsi_bool gsLargeIntReverseBytes(gsLargeInt_t* lint);
 gsi_bool gsLargeIntSetValue(gsLargeInt_t* lint, l_word value);
-
-// These are necessary to preserve byte order when copying from array-of-int to
-// char*
-gsi_bool gsLargeIntSetFromMemoryStream(gsLargeInt_t* lint, const gsi_u8* data,
-                                       gsi_u32 len);
-gsi_bool gsLargeIntWriteToMemoryStream(const gsLargeInt_t* lint, gsi_u8* data);
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
