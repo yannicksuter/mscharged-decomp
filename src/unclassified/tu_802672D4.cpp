@@ -8,6 +8,7 @@
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePopupMenu.h"
+#include "Game/FE/feTextureResource.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlTextInstance.h"
@@ -17,8 +18,10 @@
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_802196B0.h"
 #include "unclassified/tu_80252180.h"
 #include "unclassified/tu_80264E98.h"
+#include "unclassified/tu_806E1908.h"
 
 #include <string.h>
 
@@ -30,6 +33,8 @@ extern RFLStoreData lbl_80584384;
 extern unsigned char lbl_806E20DC;
 extern int lbl_806E20E0;
 extern const char* lbl_806DEC78[2];
+extern unsigned int lbl_806E18B0;
+extern TLImageInstance lbl_80580248;
 
 extern "C" void fn_801CBCA0(
     unsigned long hash, int value0, int value1, int value2);
@@ -414,5 +419,83 @@ void TU802672D4Scene::SceneCreated()
     for (int i = 0; i < 4; ++i)
     {
         lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+    }
+}
+
+void TU802672D4Scene::Update(float fDeltaT)
+{
+    BaseSceneHandler::Update(fDeltaT);
+
+    if (!mUnidentified30)
+    {
+        TLSlide* slide = mPresentation->GetActiveSlide();
+        if (slide->GetCurrentTime() < slide->m_start + slide->m_duration)
+        {
+            return;
+        }
+
+        fn_8026748C();
+        mUnidentified30 = true;
+
+        TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(
+            mPresentation->GetActiveSlide(),
+            nlStringLowerHash("Layer"),
+            nlStringLowerHash("PLAYER_BOX"),
+            nlStringLowerHash("Mii"),
+            0,
+            0,
+            0);
+        if (image == 0)
+        {
+            image = &lbl_80580248;
+        }
+
+        unsigned long textureReference = lbl_806E1908->mUnidentified3C[mUnidentified74];
+        image->m_pTextureResource->fn_8030009C(textureReference);
+        fn_80302420(image, true);
+
+        for (int i = 0; i < 4; ++i)
+        {
+            lbl_80578450[i]->SetActiveSlide("cursor", true, false);
+        }
+    }
+
+    if (mUnidentified31)
+    {
+        if (SaveEnabled && SaveLoad::CardBusy())
+        {
+            return;
+        }
+        lbl_806E1838->Pop();
+        lbl_806E1838->Push((SceneList)0x33, SCREEN_FORWARD, true);
+    }
+
+    for (unsigned int pad = 0; pad < 4; ++pad)
+    {
+        TLComponentInstance* controller = lbl_80578450[pad];
+        if (pad != lbl_806E18B0)
+        {
+            controller->SetActiveSlide("waiting", true, false);
+        }
+        else
+        {
+            unsigned char valid = 1;
+            TU80300104Event event;
+            event.mIndex = pad;
+            event.mPosition = fn_802197FC(pad, &valid);
+            event.mFlag0 = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
+            event.mFlag1 = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
+
+            for (int i = 0; i < 2; ++i)
+            {
+                mComponents[i].fn_80219608(&event);
+            }
+
+            if (mNavigation.fn_8022F2E0(event, fDeltaT))
+            {
+                TU80264E98Scene* scene = (TU80264E98Scene*)lbl_806E1838->GetScene((SceneList)0x36);
+                scene->fn_80266014();
+            }
+        }
     }
 }

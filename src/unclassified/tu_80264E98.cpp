@@ -24,6 +24,7 @@
 #include "unclassified/tu_802196B0.h"
 #include "unclassified/tu_80252180.h"
 #include "unclassified/tu_802672D4.h"
+#include "unclassified/tu_806E1908.h"
 
 #include <string.h>
 
@@ -37,21 +38,12 @@ extern "C" void fn_80238A1C(TU802384AC* object, int index, bool enabled, bool vi
 extern "C" void fn_802392D4(TU802384AC* object, int index);
 extern "C" void fn_80302420(TLInstance* instance, bool visible);
 
-struct TU806E1908
-{
-    /* 0x00 */ unsigned char mPadding00[0x3C];
-    /* 0x3C */ unsigned long mUnidentified3C[10];
-};
-
-extern "C" bool fn_8026F280(TU806E1908* object, int index, int slot, bool value);
-
 extern BaseGameSceneManager* lbl_806E1838;
 extern TLComponentInstance* lbl_80578450[4];
 extern unsigned int lbl_806E18B0;
 extern TLComponentInstance lbl_80580030;
 extern TLComponentInstance lbl_80580138;
 extern TLImageInstance lbl_80580248;
-extern TU806E1908* lbl_806E1908;
 extern char lbl_80520808[];
 extern char lbl_80520814[];
 extern char lbl_80520838[];
