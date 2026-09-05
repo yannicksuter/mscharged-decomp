@@ -29,8 +29,9 @@ typedef enum
     DWC_MATCH_RESET_NUM
 } DWCMatchResetLevel;
 
-typedef void (*DWCMatchedSCCallbackView)(int error, BOOL cancel, BOOL self,
+typedef void (*DWCMatchedSCCallback)(int error, BOOL cancel, BOOL self,
     BOOL isServer, int index, void* param);
+typedef int (*DWCEvalPlayerCallback)(int index, void* param);
 
 typedef struct DWCstConnectionInfo
 {
@@ -134,11 +135,11 @@ typedef struct DWCMatchControlView
     int _468;
     int _46C;
     s64 _470;
-    DWCMatchedSCCallbackView matchedCallback;
+    DWCMatchedSCCallback matchedCallback;
     void* matchedParam;
     void* _480;
     void* _484;
-    void* _488;
+    DWCEvalPlayerCallback _488;
     void* _48C;
     void (*_490)(void* param);
     void* _494;
@@ -272,8 +273,10 @@ static void DWCi_FinishCancelMatching(void);
 static void DWCi_CloseAllConnectionsByTimeout(void);
 static void DWCi_ClearGameMatchKeys(void);
 static int DWCi_ChangeToClient(void);
+static int DWCi_GetDefaultMatchFilter(
+    char* filter, int profileID, u8 numEntry, u8 matchType);
 
-char* lbl_806E2EE8;
+static char* stpAddFilter;
 DWCMatchOptMinCompleteView* lbl_806E2EEC;
 u32 lbl_806E2EF0;
 u32 lbl_806E2EF4;
@@ -672,36 +675,33 @@ int fn_8048FF20(int type)
     return error;
 }
 
-void fn_804900B8(u8 numEntry, const char* addFilter,
-    DWCMatchedSCCallbackView matchedCallback, void* matchedParam,
-    void* evalCallback, void* evalParam)
+void DWCi_ConnectToAnybodyAsync(u8 numEntry, const char* addFilter,
+    DWCMatchedSCCallback matchedCallback, void* matchedParam,
+    DWCEvalPlayerCallback evalCallback, void* evalParam)
 {
-    int len;
-    char buf[0x100];
+    char filter[0x100];
+    unsigned long addFilterLenMax;
 
-    if (lbl_806E2EE8 != NULL)
+    if (stpAddFilter != NULL)
     {
-        DWC_Free(DWC_ALLOCTYPE_BASE, lbl_806E2EE8, 0);
-        lbl_806E2EE8 = NULL;
+        DWC_Free(DWC_ALLOCTYPE_BASE, stpAddFilter, 0);
+        stpAddFilter = NULL;
     }
 
     if (addFilter != NULL)
     {
-        len = snprintf(buf, sizeof(buf),
-            "%s = %d and %s != %u and maxplayers = %d and numplayers < %d "
-            "and %s = %d and %s != %s",
-            "dwc_mver", 3, "dwc_pid", -1, 32, 32, "dwc_mtype", 3, "dwc_mresv",
-            "dwc_pid");
-        len = 0x100 - len - strlen(" and ()");
-        lbl_806E2EE8 = DWC_Alloc(DWC_ALLOCTYPE_BASE, len);
-        if (lbl_806E2EE8 == NULL)
+        addFilterLenMax = 0x100
+            - DWCi_GetDefaultMatchFilter(filter, -1, 32, 3)
+            - strlen(" and ()");
+        stpAddFilter = DWC_Alloc(DWC_ALLOCTYPE_BASE, addFilterLenMax);
+        if (stpAddFilter == NULL)
         {
             fn_80491EDC(DWC_ERROR_FATAL,
                 DWC_ECODE_SEQ_MATCHING + DWC_ECODE_TYPE_ALLOC);
             return;
         }
-        memcpy(lbl_806E2EE8, addFilter, len);
-        lbl_806E2EE8[len - 1] = '\0';
+        memcpy(stpAddFilter, addFilter, addFilterLenMax);
+        stpAddFilter[addFilterLenMax - 1] = '\0';
     }
 
     fn_80492D4C(0);
@@ -755,7 +755,7 @@ void fn_804900B8(u8 numEntry, const char* addFilter,
     }
 }
 
-void fn_804903EC(u8 a0, DWCMatchedSCCallbackView callback, void* param,
+void fn_804903EC(u8 a0, DWCMatchedSCCallback callback, void* param,
     void* callback2, void* param2)
 {
     fn_80492D4C(0);
@@ -787,7 +787,7 @@ void fn_804903EC(u8 a0, DWCMatchedSCCallbackView callback, void* param,
     }
 }
 
-void fn_804905D0(int serverPid, DWCMatchedSCCallbackView matchedCallback,
+void fn_804905D0(int serverPid, DWCMatchedSCCallback matchedCallback,
     void* matchedParam, void* newClientCallback, void* newClientParam)
 {
     int result;
@@ -1834,10 +1834,10 @@ GPResult fn_80492BA0(void)
 void fn_80492C74(void)
 {
     lbl_806E2EF8 = NULL;
-    if (lbl_806E2EE8 != NULL)
+    if (stpAddFilter != NULL)
     {
-        DWC_Free(DWC_ALLOCTYPE_BASE, lbl_806E2EE8, 0);
-        lbl_806E2EE8 = NULL;
+        DWC_Free(DWC_ALLOCTYPE_BASE, stpAddFilter, 0);
+        stpAddFilter = NULL;
     }
 
     DWCi_ClearGameMatchKeys();
@@ -1967,10 +1967,10 @@ void DWCi_CloseMatching(void)
     NNFreeNegotiateList();
     lbl_806E2EF8->state = 0;
 
-    if (lbl_806E2EE8 != NULL)
+    if (stpAddFilter != NULL)
     {
-        DWC_Free(DWC_ALLOCTYPE_BASE, lbl_806E2EE8, 0);
-        lbl_806E2EE8 = NULL;
+        DWC_Free(DWC_ALLOCTYPE_BASE, stpAddFilter, 0);
+        stpAddFilter = NULL;
     }
 
     DWCi_ClearGameMatchKeys();
@@ -2017,10 +2017,10 @@ int fn_80493128(int profileId)
                 "dwc_mver", 3, "dwc_pid", lbl_806E2EF8->_210,
                 lbl_806E2EF8->_16, lbl_806E2EF8->_16, "dwc_mtype",
                 lbl_806E2EF8->matchType, "dwc_mresv", "dwc_pid");
-            if (lbl_806E2EE8 != NULL)
+            if (stpAddFilter != NULL)
             {
                 snprintf(filter, sizeof(filter), "%s and (%s)", filter,
-                    lbl_806E2EE8);
+                    stpAddFilter);
             }
             break;
         }
@@ -2057,6 +2057,16 @@ int fn_80493128(int profileId)
             = OSGetTime() + (s64)(OS_BUS_CLOCK_SPEED / 4 / 1000) * 30000;
     }
     return error;
+}
+
+static int DWCi_GetDefaultMatchFilter(
+    char* filter, int profileID, u8 numEntry, u8 matchType)
+{
+    return snprintf(filter, 0x100,
+        "%s = %d and %s != %u and maxplayers = %d and numplayers < %d and %s "
+        "= %d and %s != %s",
+        "dwc_mver", 3, "dwc_pid", profileID, numEntry, numEntry, "dwc_mtype",
+        matchType, "dwc_mresv", "dwc_pid");
 }
 
 int fn_80493434(int isRetry, int cookie, SBServer server)
