@@ -7,7 +7,7 @@
 #include "unclassified/tu_80219248.h"
 #include "unclassified/tu_8022EF84.h"
 
-class TLInstance;
+class TLComponentInstance;
 struct TU802384AC;
 
 class TU802672D4Scene : public BaseSceneHandler
@@ -23,7 +23,7 @@ public:
     void fn_80267DE0();
     void fn_80267E20();
     void fn_80267E40(unsigned short* name);
-    void fn_80268ED0(int, void*);
+    void fn_80268ED0(int index, void* context);
     void fn_80268F94(int, void*);
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
@@ -44,7 +44,7 @@ public:
     /* 0x204 */ TU80219248Component mComponents[2];
     /* 0x36C */ TU8022EF84Component mNavigation;
     /* 0x444 */ TU802384AC* mUnidentified444;
-    /* 0x448 */ TLInstance* mUnidentified448[2];
+    /* 0x448 */ TLComponentInstance* mUnidentified448[2];
 }; // size 0x450
 
 #endif // UNCLASSIFIED_TU_802672D4_H

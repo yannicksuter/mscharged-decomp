@@ -38,7 +38,7 @@ extern TLImageInstance lbl_80580248;
 
 extern "C" void fn_801CBCA0(
     unsigned long hash, int value0, int value1, int value2);
-extern "C" TLInstance* fn_801CA76C(TLSlide* pTopLevel, InlineHasher Level1,
+extern "C" TLComponentInstance* fn_801CA76C(TLSlide* pTopLevel, InlineHasher Level1,
     InlineHasher Level2 = InlineHasher(0UL), InlineHasher Level3 = InlineHasher(0UL),
     InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL),
     InlineHasher Level6 = InlineHasher(0UL));
@@ -497,5 +497,18 @@ void TU802672D4Scene::Update(float fDeltaT)
                 scene->fn_80266014();
             }
         }
+    }
+}
+
+void TU802672D4Scene::fn_80268ED0(int index, void* context)
+{
+    unsigned int item = (unsigned int)context;
+    unsigned int which = index;
+    ++mUnidentified20[index];
+    if (!mComponents[item].fn_802192FC(1, which))
+    {
+        mUnidentified448[item]->SetActiveSlide("over", true, false);
+        mComponents[item].mValues[which] = 1;
+        fn_801CBCA0(0xDE912775, 0, 0, 1);
     }
 }

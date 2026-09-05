@@ -1809,7 +1809,7 @@ unclassified/tu_80264E98.cpp:
 	.sdata2     start:0x806E5BB0 end:0x806E5BBC
 
 unclassified/tu_802672D4.cpp:
-	.text       start:0x802672D4 end:0x80268ED0
+	.text       start:0x802672D4 end:0x80268F94
 	.data       start:0x80520A14 end:0x80520A68
 
 Game/SH/SHSceneBase.cpp:
