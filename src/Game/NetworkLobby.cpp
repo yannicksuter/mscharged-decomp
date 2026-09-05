@@ -749,6 +749,6 @@ int NetworkLobby_80133634::ReceiverVirtual00(
 
 static TweakValueIntImpl_804FD898 sTimeoutFindingMaxPlayersAcceptMinTweak(
     "s_nTimeoutFindingMaxPlayersAcceptMin", "Network/DWCLobby",
-    &s_nTimeoutFindingMaxPlayersAcceptMin);
+    &s_nTimeoutFindingMaxPlayersAcceptMin, true);
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

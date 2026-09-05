@@ -1082,8 +1082,8 @@ int g_nAddHoursTime;
 int g_nAddMinsTime;
 
 static TweakValueIntImpl_804FD898 sAddHoursTimeTweak(
-    "g_nAddHoursTime", "Network", &g_nAddHoursTime);
+    "g_nAddHoursTime", "Network", &g_nAddHoursTime, true);
 static TweakValueIntImpl_804FD898 sAddMinsTimeTweak(
-    "g_nAddMinsTime", "Network", &g_nAddMinsTime);
+    "g_nAddMinsTime", "Network", &g_nAddMinsTime, true);
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

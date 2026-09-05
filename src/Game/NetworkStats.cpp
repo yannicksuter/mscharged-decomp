@@ -956,15 +956,15 @@ void NetworkRanking_8012D8F4::Update()
 
 static TweakValueIntImpl_804FD898 sConnectToStatsAddress0Tweak(
     "g_nConnectToStatsAddress0", "Network/Stats",
-    &g_nConnectToStatsAddress[0]);
+    &g_nConnectToStatsAddress[0], true);
 static TweakValueIntImpl_804FD898 sConnectToStatsAddress1Tweak(
     "g_nConnectToStatsAddress1", "Network/Stats",
-    &g_nConnectToStatsAddress[1]);
+    &g_nConnectToStatsAddress[1], true);
 static TweakValueIntImpl_804FD898 sConnectToStatsAddress2Tweak(
     "g_nConnectToStatsAddress2", "Network/Stats",
-    &g_nConnectToStatsAddress[2]);
+    &g_nConnectToStatsAddress[2], true);
 static TweakValueIntImpl_804FD898 sConnectToStatsAddress3Tweak(
     "g_nConnectToStatsAddress3", "Network/Stats",
-    &g_nConnectToStatsAddress[3]);
+    &g_nConnectToStatsAddress[3], true);
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

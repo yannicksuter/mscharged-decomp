@@ -1776,8 +1776,12 @@ unclassified/tu_802492E4.cpp:
 	.sbss       start:0x806E18E0 end:0x806E18F0
 
 unclassified/tu_8024D92C.cpp:
-	.text       start:0x8024D92C end:0x8024DE5C
+	.text       start:0x8024D92C end:0x8024EF24
 	.data       start:0x8051F658 end:0x8051F684
+
+unclassified/tu_8024F4E0.cpp:
+	.text       start:0x8024F4E0 end:0x80250718
+	.data       start:0x8051F780 end:0x8051F7AC
 
 Game/SH/SHSceneBase.cpp:
 	.text       start:0x80269078 end:0x8026B10C
@@ -2546,7 +2550,9 @@ NL/nlBundleFile.cpp:
 
 Game/PadMonkey.cpp:
 	.text       start:0x802C0854 end:0x802C0C84
+	.text       start:0x802C0C84 end:0x802C0CCC
 	.ctors      start:0x804DB9B4 end:0x804DB9B8
+	.data       start:0x8052BC78 end:0x8052BCD0
 	.sbss       start:0x806E1E30 end:0x806E1E38
 	.sdata2     start:0x806E62B0 end:0x806E62C8
 
@@ -3481,10 +3487,24 @@ unclassified/tu_80372980.cpp:
 	.text       start:0x80372980 end:0x80372B30
 	.data       start:0x80535828 end:0x80535880
 
+unclassified/tu_80374098.cpp:
+	.text       start:0x80374098 end:0x80374D68
+	.ctors      start:0x804DBB64 end:0x804DBB68
+	.data       start:0x80535C98 end:0x80535E20
+	.bss        start:0x8059C438 end:0x805A0908
+	.sdata      start:0x806DFB08 end:0x806DFB10
+	.sbss       start:0x806E2468 end:0x806E2478
+
 unclassified/tu_80374D68.cpp:
 	.text       start:0x80374D68 end:0x803751D4
 	.data       start:0x80535E20 end:0x80535EB0
 	.sdata2     start:0x806E6DD8 end:0x806E6E00
+
+NL/plat/platpad.cpp:
+	.text       start:0x803751D4 end:0x80376054
+	.data       start:0x80535EB0 end:0x80535F08
+	.sbss       start:0x806E2478 end:0x806E2480
+	.sdata2     start:0x806E6E00 end:0x806E6E20
 
 NL/glx/glxMemory.cpp:
 	.text       start:0x80376054 end:0x80376868

@@ -28,23 +28,6 @@ extern "C"
     void fn_80375288(void* state);
 }
 
-struct DeviceChangedData_80137B40
-{
-};
-
-class DeviceChangedEvent_80137B40
-    : public UnidentifiedStaticEvent<DeviceChangedData_80137B40, 5>
-{
-public:
-    DeviceChangedEvent_80137B40()
-        : UnidentifiedStaticEvent<DeviceChangedData_80137B40, 5>(
-              "DeviceChanged", -1)
-    {
-    }
-
-    virtual ~DeviceChangedEvent_80137B40() { }
-};
-
 struct PadUpdateState_80137B40
 {
     PadUpdateState_80137B40()

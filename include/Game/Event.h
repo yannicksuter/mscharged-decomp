@@ -303,6 +303,11 @@ public:
 
     void DeleteEntry(T* entry)
     {
+        Free(entry);
+    }
+
+    void Free(T* entry)
+    {
         *(T**)entry = mFreeList;
         mFreeList = entry;
     }
@@ -407,6 +412,141 @@ public:
                 ListenerEntry* entry = position.CurrentEntry();
                 nlDLRingRemove(&mListeners.m_Head, entry);
                 mListeners.DeleteEntry(entry);
+            }
+        }
+        this->mCurrentConnection = 0;
+    }
+
+protected:
+    void Remove(Listener* listener)
+    {
+        fn_802B2CC8(this, listener);
+        if (this->mCurrentConnection == listener)
+        {
+            listener->mFlags |= 0x20000000;
+            return;
+        }
+        UnidentifiedDeleteListener(listener);
+    }
+
+    ListenerEntry* UnidentifiedGetEntry(Listener* listener)
+    {
+        return mListeners.Begin(
+            (ListenerEntry*)((char*)listener - 8)).CurrentEntry();
+    }
+
+    void UnidentifiedDeleteListener(Listener* listener)
+    {
+        ListenerEntry* entry = UnidentifiedGetEntry(listener);
+        nlDLRingRemove(&mListeners.m_Head, entry);
+        mListeners.DeleteEntry(entry);
+    }
+
+    DLListContainerBase<Listener, ListenerPool> mListeners;
+};
+
+template <typename P1, typename P2, typename P3>
+struct UnidentifiedListener3 : public UnidentifiedConnection
+{
+    UnidentifiedListener3(int = 0)
+        : UnidentifiedConnection()
+        , callback()
+    {
+    }
+
+    Function<void(P1, P2, P3)> callback;
+};
+
+template <typename P1, typename P2, typename P3>
+class UnidentifiedTypedEvent3 : public UnidentifiedEventBase
+{
+public:
+    typedef Function<void(P1, P2, P3)> Callback;
+
+    UnidentifiedTypedEvent3(const char* name, int length)
+        : UnidentifiedEventBase(name, length)
+    {
+        this->mCurrentConnection = 0;
+        sType = *(void**)this;
+    }
+
+    virtual ~UnidentifiedTypedEvent3() { }
+    virtual void Disconnect(void* owner) = 0;
+    virtual void Add(Callback&, unsigned int, int) = 0;
+
+protected:
+    static void* sType;
+};
+
+template <typename P1, typename P2, typename P3>
+void* UnidentifiedTypedEvent3<P1, P2, P3>::sType;
+
+template <typename P1, typename P2, typename P3, int Count>
+class UnidentifiedStaticEvent3
+    : public UnidentifiedTypedEvent3<P1, P2, P3>
+{
+    typedef UnidentifiedListener3<P1, P2, P3> Listener;
+    typedef DLListEntry<Listener> ListenerEntry;
+    typedef UnidentifiedStaticSlotPool<ListenerEntry, Count> ListenerPool;
+    typedef Function<void(P1, P2, P3)> Callback;
+
+public:
+    UnidentifiedStaticEvent3(const char* name, int length)
+        : UnidentifiedTypedEvent3<P1, P2, P3>(name, length)
+        , mListeners(Count, Count)
+    {
+        fn_802B2940(
+            this, UnidentifiedTypedEvent3<P1, P2, P3>::sType);
+    }
+
+    virtual ~UnidentifiedStaticEvent3()
+    {
+        while (mListeners.m_Head != 0)
+        {
+            Listener* listener = &mListeners.Begin().CurrentEntry()->entry;
+            Remove(listener);
+        }
+        fn_802B29C4(this);
+    }
+
+    virtual void Disconnect(void* owner)
+    {
+        Listener* listener = (Listener*)fn_802B28E0(this, owner);
+        Remove(listener);
+    }
+
+    virtual void Add(Callback& callback, unsigned int value, int flags)
+    {
+        Listener* listener = mListeners.AllocateAtEnd(0);
+
+        void* target = callback.UnidentifiedTarget();
+        listener->callback.UnidentifiedTransfer(callback);
+        fn_802B2A04(this, listener, value, flags, target);
+    }
+
+    void UnidentifiedDeliver(P1 p1, P2 p2, P3 p3)
+    {
+        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        while (iterator.hasNext())
+        {
+            Listener* listener = &*iterator;
+            ListenerEntry* currentEntry = iterator.CurrentEntry();
+            this->mCurrentConnection = listener;
+
+            if ((listener->mFlags >> 31) != 0)
+            {
+                listener->callback(p1, p2, p3);
+                iterator = mListeners.Begin();
+                iterator.m_Curr = currentEntry;
+            }
+
+            iterator.next();
+            if (((listener->mFlags >> 29) & 1) != 0)
+            {
+                ListenerEntry* entry = UnidentifiedGetEntry(listener);
+                nlDLRingRemove(&mListeners.m_Head, entry);
+                entry->~ListenerEntry();
+                mListeners.m_Allocator.Free(entry);
             }
         }
         this->mCurrentConnection = 0;

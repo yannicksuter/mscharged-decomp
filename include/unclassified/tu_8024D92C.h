@@ -19,7 +19,10 @@ public:
     /* 0x0FC */ int mUnidentified0FC[4];
     /* 0x10C */ bool mUnidentified10C;
     /* 0x10D */ bool mUnidentified10D;
-    /* 0x10E */ unsigned char mPadding10E[0x282];
+    /* 0x10E */ unsigned short mUnidentified10E[0x20];
+    /* 0x14E */ unsigned short mUnidentified14E[0x100];
+    /* 0x34E */ unsigned short mUnidentified34E[0x20];
+    /* 0x38E */ unsigned char mPadding38E[2];
     /* 0x390 */ AsyncImage mUnidentified390;
     /* 0x430 */ AsyncImage mUnidentified430;
     /* 0x4D0 */ bool mUnidentified4D0;

@@ -143,11 +143,12 @@ class TweakValueIntImpl_804FD898 : public UnidentifiedTweakValueImplBase
 {
 public:
     TweakValueIntImpl_804FD898(int* value = 0);
-    TweakValueIntImpl_804FD898(const char* name, const char* category, int* value)
+    TweakValueIntImpl_804FD898(const char* name, const char* category, int* value,
+        bool unidentified = false)
     {
         m_pValue = value;
         mName = name;
-        mUnidentified009 = false;
+        mUnidentified009 = unidentified;
         if (fn_802C0F04() == 0)
         {
             void* entry = nlMalloc(0x18, 8, true);

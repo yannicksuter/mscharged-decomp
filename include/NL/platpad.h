@@ -13,7 +13,7 @@ public:
     {
     }
 
-    virtual ~PadBackend();
+    virtual ~PadBackend() { }
     virtual bool IsConnected();
     virtual bool IsPressed(int button, bool remap);
     virtual float GetPressure(int button, bool remap);
