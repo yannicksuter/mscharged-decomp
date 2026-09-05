@@ -12,6 +12,8 @@
 extern "C" void fn_802C7018(
     void*, char*, unsigned long, const char*);
 
+extern "C" const float lbl_806E373C;
+
 GXMaterialColourTweak_804FC520::~GXMaterialColourTweak_804FC520()
 {
 }
@@ -60,9 +62,9 @@ void GXMaterialColourTweak_804FC520::UnidentifiedVirtual28(
 void GXMaterialColourTweak_804FC520::UnidentifiedVirtual14(
     float* minimum, float* maximum, float* increment)
 {
-    *minimum = 0.0f;
-    *maximum = 0.0f;
-    *increment = 0.0f;
+    *minimum = lbl_806E373C;
+    *maximum = lbl_806E373C;
+    *increment = lbl_806E373C;
 }
 
 void GXMaterialColourTweak_804FC520::UnidentifiedVirtual18()

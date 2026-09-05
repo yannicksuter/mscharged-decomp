@@ -362,7 +362,6 @@ inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
         }
     }
 
-    next = other.next;
     mTemporary = false;
     return *this;
 }

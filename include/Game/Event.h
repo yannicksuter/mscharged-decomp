@@ -56,6 +56,19 @@ struct UnidentifiedConnection
     };
 };
 
+static inline void UnidentifiedDisconnectOwner(void* owner)
+{
+    if (owner != 0)
+    {
+        UnidentifiedConnection* connection
+            = *(UnidentifiedConnection**)owner;
+        if (connection != 0 && ((connection->mFlags >> 30) & 1) != 0)
+        {
+            ((UnidentifiedEventBase*)connection->mTarget)->Disconnect(owner);
+        }
+    }
+}
+
 // An event carrying data delivers a pointer to it. The game and HBM queues
 // also construct events whose listeners are invoked with no argument at all;
 // the original spelling of that no-data type is unknown, so it is a

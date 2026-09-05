@@ -363,31 +363,10 @@ WaluigiWallManager_80178400::~WaluigiWallManager_80178400()
         lbl_806E12EC = 0;
     }
 
-    UnidentifiedConnection* pListener
-        = (UnidentifiedConnection*)mUnidentified070;
-    if (pListener != 0 && ((pListener->mFlags >> 30) & 1) != 0)
-    {
-        ((UnidentifiedEventBase*)pListener->mTarget)
-            ->Disconnect(&mUnidentified070);
-    }
-    pListener = (UnidentifiedConnection*)mUnidentified06C;
-    if (pListener != 0 && ((pListener->mFlags >> 30) & 1) != 0)
-    {
-        ((UnidentifiedEventBase*)pListener->mTarget)
-            ->Disconnect(&mUnidentified06C);
-    }
-    pListener = (UnidentifiedConnection*)mUnidentified068;
-    if (pListener != 0 && ((pListener->mFlags >> 30) & 1) != 0)
-    {
-        ((UnidentifiedEventBase*)pListener->mTarget)
-            ->Disconnect(&mUnidentified068);
-    }
-    pListener = (UnidentifiedConnection*)mUnidentified064;
-    if (pListener != 0 && ((pListener->mFlags >> 30) & 1) != 0)
-    {
-        ((UnidentifiedEventBase*)pListener->mTarget)
-            ->Disconnect(&mUnidentified064);
-    }
+    UnidentifiedDisconnectOwner(&mUnidentified070);
+    UnidentifiedDisconnectOwner(&mUnidentified06C);
+    UnidentifiedDisconnectOwner(&mUnidentified068);
+    UnidentifiedDisconnectOwner(&mUnidentified064);
 }
 
 PhysicsBox_80177498* WaluigiWallManager_80178400::fn_80178968(

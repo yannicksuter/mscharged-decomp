@@ -492,13 +492,7 @@ PhysicsPatchManager_801740D0::~PhysicsPatchManager_801740D0()
     }
     PhysicsPatch::lbl_805705D0.FreeBlocks();
 
-    UnidentifiedConnection* connection
-        = (UnidentifiedConnection*)mUnidentified0F0;
-    if (connection != 0 && ((connection->mFlags >> 30) & 1) != 0)
-    {
-        ((UnidentifiedEventBase*)connection->mTarget)
-            ->Disconnect(&mUnidentified0F0);
-    }
+    UnidentifiedDisconnectOwner(&mUnidentified0F0);
 }
 
 PhysicsPatch* PhysicsPatchManager_801740D0::fn_801743A8(
