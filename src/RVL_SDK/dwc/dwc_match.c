@@ -5,6 +5,7 @@
 #include <dwc/dwc_friend.h>
 #include <dwc/dwc_main.h>
 #include <dwc/dwc_memfunc.h>
+#include <dwc/dwc_nonport.h>
 #include <dwc/dwc_report.h>
 #include <gamespy/GP/gp.h>
 #include <gamespy/gt2/gt2.h>
@@ -163,17 +164,6 @@ typedef struct DWCMatchNNInfoView
     int cookie;
 } DWCMatchNNInfoView;
 
-typedef struct DWCMatchSBMessageView
-{
-    char magic[4];
-    u32 version;
-    u8 command;
-    u8 length;
-    u16 port;
-    u32 ip;
-    u32 pid;
-} DWCMatchSBMessageView;
-
 typedef struct DWCMatchOptMinCompleteView
 {
     u8 valid;
@@ -236,7 +226,8 @@ int fn_8049A374(qr2_key_type keytype, void* userdata);
 void fn_8049A37C(qr2_error_t error, gsi_char* errmsg, void* userdata);
 void fn_8049A3E4(unsigned int ip, unsigned short port, void* userdata);
 void fn_8049A444(int cookie, void* userdata);
-void fn_8049A530(gsi_char* data, int len, void* userdata);
+static void DWCi_QR2ClientMsgCallback(
+    gsi_char* data, int len, void* userdata);
 
 void fn_804993C8(ServerBrowser sb, SBCallbackReason reason,
     SBServer server, void* instance);
@@ -670,7 +661,8 @@ int fn_8048FF20(int type)
     lbl_806E2EF8->_1A = 0;
     qr2_register_publicaddress_callback(lbl_806E2EF8->qr2, fn_8049A3E4);
     qr2_register_natneg_callback(lbl_806E2EF8->qr2, fn_8049A444);
-    qr2_register_clientmessage_callback(lbl_806E2EF8->qr2, fn_8049A530);
+    qr2_register_clientmessage_callback(
+        lbl_806E2EF8->qr2, DWCi_QR2ClientMsgCallback);
     qr2_send_statechanged(lbl_806E2EF8->qr2);
     return error;
 }
@@ -5902,50 +5894,54 @@ void fn_8049A444(int cookie, void* userdata)
     }
 }
 
-void fn_8049A530(gsi_char* data, int len, void* userdata)
+static void DWCi_QR2ClientMsgCallback(
+    gsi_char* data, int len, void* userdata)
 {
+#pragma unused(userdata)
     int offset = 0;
+    BOOL boolResult;
+    DWCSBMessage sbMsg;
 
     if (DWC_GetState() != DWC_STATE_MATCHING)
     {
         if (DWC_GetState() != DWC_STATE_CONNECTED
-            || (lbl_806E2EF8->matchType != 2
-                && lbl_806E2EF8->matchType != 3))
+            || (DWCi_GetMatchCnt()->matchType != 2
+                && DWCi_GetMatchCnt()->matchType != 3))
         {
             DWC_Printf(4, "Ignore delayed SB matching command.\n");
             return;
         }
     }
 
-    while (offset + 0x14 <= len)
+    while (offset + (int)sizeof(DWCSBMessageHeader) <= len)
     {
-        DWCMatchSBMessageView msg;
-        u32 payload[0x21];
-
-        memcpy(&msg, data, sizeof(msg));
-        msg.version = fn_ByteSwap32(msg.version);
-        msg.pid = fn_ByteSwap32(msg.pid);
-        msg.port = (msg.port >> 8) | (msg.port << 8);
-        if (strncmp((char*)&msg, "SBCM", 4) != 0)
+        DWCi_Np_CpuCopy8(data, &sbMsg, sizeof(DWCSBMessageHeader));
+        sbMsg.header.version = DWCi_LEtoHl(sbMsg.header.version);
+        sbMsg.header.qr2Port = DWCi_LEtoHs(sbMsg.header.qr2Port);
+        sbMsg.header.profileID = DWCi_LEtoHl(sbMsg.header.profileID);
+        if (strncmp(sbMsg.header.identifier, DWC_SB_COMMAND_STRING, 4) != 0)
         {
             DWC_Printf(8, "Got undefined SBcommand.\n");
             return;
         }
-        if (msg.version != 3)
+        if (sbMsg.header.version != DWC_MATCHING_VERSION)
         {
             DWC_Printf(8, "Got different version SBcommand.\n");
             return;
         }
-        memcpy(payload, data + 0x14, msg.length);
+        DWCi_Np_CpuCopy8(data + sizeof(DWCSBMessageHeader), sbMsg.data,
+            sbMsg.header.size);
         DWC_Printf(0x40, "<SB> RECV-0x%02x <- [%08x:%d] [pid=%u]\n",
-            msg.command, msg.ip, msg.port, msg.pid);
-        if (fn_80493C58(msg.command, msg.pid, msg.ip, msg.port, payload,
-                msg.length >> 2)
-            == 0)
+            sbMsg.header.command, sbMsg.header.qr2IP, sbMsg.header.qr2Port,
+            sbMsg.header.profileID);
+        boolResult = fn_80493C58(sbMsg.header.command, sbMsg.header.profileID,
+            sbMsg.header.qr2IP, sbMsg.header.qr2Port, sbMsg.data,
+            sbMsg.header.size >> 2);
+        if (!boolResult)
         {
             return;
         }
-        offset += msg.length + 0x14;
+        offset += sizeof(DWCSBMessageHeader) + sbMsg.header.size;
     }
 }
 

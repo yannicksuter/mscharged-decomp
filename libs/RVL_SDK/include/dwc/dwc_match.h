@@ -7,6 +7,27 @@ extern "C"
 {
 #endif
 
+#define DWC_MATCHING_VERSION 3U
+#define DWC_MAX_CONNECTIONS  32
+#define DWC_SB_COMMAND_STRING "SBCM"
+
+    typedef struct DWCstSBMessageHeader
+    {
+        char identifier[4];
+        u32 version;
+        u8 command;
+        u8 size;
+        u16 qr2Port;
+        u32 qr2IP;
+        int profileID;
+    } DWCSBMessageHeader;
+
+    typedef struct DWCstSBMessage
+    {
+        DWCSBMessageHeader header;
+        u32 data[DWC_MAX_CONNECTIONS];
+    } DWCSBMessage;
+
     typedef enum DWCMatchOptionType
     {
         DWC_MATCH_OPTION_MIN_COMPLETE,
