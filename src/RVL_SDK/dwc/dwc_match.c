@@ -212,8 +212,8 @@ static void DWCi_QR2ServerKeyCallback(
     int keyid, qr2_buffer_t outbuf, void* userdata);
 void fn_8049A27C(int keyid, int index, qr2_buffer_t outbuf, void* userdata);
 void fn_8049A280(int keyid, int index, qr2_buffer_t outbuf, void* userdata);
-void fn_8049A284(qr2_key_type keytype, qr2_keybuffer_t keybuffer,
-    void* userdata);
+static void DWCi_QR2KeyListCallback(
+    qr2_key_type keytype, qr2_keybuffer_t keybuffer, void* userdata);
 int fn_8049A374(qr2_key_type keytype, void* userdata);
 void fn_8049A37C(qr2_error_t error, gsi_char* errmsg, void* userdata);
 void fn_8049A3E4(unsigned int ip, unsigned short port, void* userdata);
@@ -634,8 +634,8 @@ int fn_8048FF20(int type)
         sock = gt2GetSocketSOCKET(*lbl_806E2EF8->pGT2Socket);
         error = qr2_init_socketA(&lbl_806E2EF8->qr2, sock, port,
             lbl_806E2EF8->gamename, lbl_806E2EF8->secretKey, 1, 1,
-            DWCi_QR2ServerKeyCallback, fn_8049A27C, fn_8049A280, fn_8049A284,
-            fn_8049A374,
+            DWCi_QR2ServerKeyCallback, fn_8049A27C, fn_8049A280,
+            DWCi_QR2KeyListCallback, fn_8049A374,
             fn_8049A37C, NULL);
         if (error == e_qrnoerror)
         {
@@ -5816,35 +5816,39 @@ void fn_8049A280(int keyid, int index, qr2_buffer_t outbuf, void* userdata)
 {
 }
 
-void fn_8049A284(qr2_key_type keytype, qr2_keybuffer_t keybuffer,
-    void* userdata)
+static void DWCi_QR2KeyListCallback(
+    qr2_key_type keytype, qr2_keybuffer_t keybuffer, void* userdata)
 {
+#pragma unused(userdata)
+    int i;
+
     switch (keytype)
     {
     case key_server:
-    {
-        int i;
-
         qr2_keybuffer_add(keybuffer, NUMPLAYERS_KEY);
         qr2_keybuffer_add(keybuffer, MAXPLAYERS_KEY);
-        qr2_keybuffer_add(keybuffer, 0x32);
-        qr2_keybuffer_add(keybuffer, 0x33);
-        qr2_keybuffer_add(keybuffer, 0x34);
-        qr2_keybuffer_add(keybuffer, 0x35);
-        qr2_keybuffer_add(keybuffer, 0x36);
-        for (i = 0; i < 154; i++)
+        qr2_keybuffer_add(keybuffer, DWC_QR2_PID_KEY);
+        qr2_keybuffer_add(keybuffer, DWC_QR2_MATCH_TYPE_KEY);
+        qr2_keybuffer_add(keybuffer, DWC_QR2_MATCH_RESV_KEY);
+        qr2_keybuffer_add(keybuffer, DWC_QR2_MATCH_VER_KEY);
+        qr2_keybuffer_add(keybuffer, DWC_QR2_MATCH_EVAL_KEY);
+
+        for (i = 0; i < DWC_QR2_GAME_RESERVED_KEYS; i++)
         {
-            if (stGameMatchKeys[i].keyID != 0)
+            if (stGameMatchKeys[i].keyID)
             {
                 qr2_keybuffer_add(keybuffer, stGameMatchKeys[i].keyID);
             }
         }
         break;
-    }
-    default:
+    case key_player:
+        break;
+    case key_team:
         break;
     }
-    DWC_Printf(0x200, "QR2, Received KeyListReq : keytype %d\n", keytype);
+
+    DWC_Printf(DWC_REPORTFLAG_QR2_REQ,
+        "QR2, Received KeyListReq : keytype %d\n", keytype);
 }
 
 int fn_8049A374(qr2_key_type keytype, void* userdata)
