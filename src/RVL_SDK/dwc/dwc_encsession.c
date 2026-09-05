@@ -13,7 +13,7 @@
 extern char* itoa(int value, char* buffer, int radix);
 
 const char* DWCi_ENC_URL_BASE = NULL;
-static u32 s_local_seed;
+static int s_local_seed;
 
 static struct
 {
@@ -36,17 +36,15 @@ static struct
     BOOL (*callback)(u32* data, int size);
 } g_session = { DWCi_ENC_SESSION_STATE_INITIAL };
 
-static u32 DWCi_RankingByteSwap32(u32 value)
-{
-    return ((value >> 24) & 0x000000FF) | ((value >> 8) & 0x0000FF00)
-         | ((value << 8) & 0x00FF0000) | ((value << 24) & 0xFF000000);
-}
+#define DWCi_RankingByteSwap32(value) \
+    ((((u32)(value) << 24) & 0xFF000000) | (((u32)(value) << 8) & 0x00FF0000) \
+        | (((u32)(value) >> 8) & 0x0000FF00) | (((u32)(value) >> 24) & 0x000000FF))
 
 static u32 b64size(u32 len)
 {
     u32 i;
 
-    i = (len % 3 != 0);
+    i = (len % 3 != 0) ? 1 : 0;
     return ((len / 3) + i) * 4;
 }
 
@@ -120,11 +118,11 @@ static BOOL DWCi_EncValidateKey(const char* gamename,
 
 static BOOL DWCi_EncSessionValidateResponse(const char* buf, int len)
 {
-    u8 digest[20];
-    char hextbl[] = "0123456789abcdef";
-    char hmac[41];
-    char* tmpbuf;
     int i;
+    u8* tmpbuf;
+    char hashhex[41];
+    u8 hash[20];
+    char hextbl[] = "0123456789abcdef";
 
     if (len <= 40)
     {
@@ -142,7 +140,7 @@ static BOOL DWCi_EncSessionValidateResponse(const char* buf, int len)
 
     memcpy(tmpbuf, g_session.secretkey, sizeof(g_session.secretkey));
     B64Encode(buf,
-        tmpbuf + sizeof(g_session.secretkey),
+        (char*)tmpbuf + sizeof(g_session.secretkey),
         len - strlen("0000000000000000000000000000000000000000"),
         2);
     memcpy(tmpbuf + sizeof(g_session.secretkey)
@@ -150,7 +148,7 @@ static BOOL DWCi_EncSessionValidateResponse(const char* buf, int len)
         g_session.secretkey,
         sizeof(g_session.secretkey));
 
-    MATH_CalcSHA1(digest,
+    MATH_CalcSHA1(hash,
         tmpbuf,
         b64size(len - strlen("0000000000000000000000000000000000000000"))
             + sizeof(g_session.secretkey) * 2);
@@ -158,12 +156,12 @@ static BOOL DWCi_EncSessionValidateResponse(const char* buf, int len)
 
     for (i = 0; i < 20; i++)
     {
-        hmac[i * 2] = hextbl[digest[i] >> 4];
-        hmac[i * 2 + 1] = hextbl[digest[i] & 0xF];
+        hashhex[i * 2] = hextbl[hash[i] >> 4];
+        hashhex[i * 2 + 1] = hextbl[hash[i] & 0xF];
     }
-    hmac[40] = '\0';
+    hashhex[40] = '\0';
 
-    if (strncmp(buf + len - 40, hmac, 40) != 0)
+    if (strncmp(buf + (len - 40), hashhex, 40) != 0)
     {
         DWC_Printf(DWC_REPORTFLAG_WARNING, "invalid HMAC\n");
         return FALSE;
@@ -470,16 +468,15 @@ DWCiRankingSessionResult DWCi_EncSessionGetAsync(const char* url,
     s32 pid,
     void* data,
     u32 size,
-    BOOL (*callback)(u32* data, int size))
+    BOOL (*cb)(u32* data, int size))
 {
     struct
     {
         s32 pid;
         u32 size;
     } putheader;
+    char buf[16];
     DWCiRankingSessionResult res;
-    char pidbuf[16];
-    u32 requestsize;
 
     if (g_session.validated != TRUE)
     {
@@ -492,18 +489,17 @@ DWCiRankingSessionResult DWCi_EncSessionGetAsync(const char* url,
         g_session.request = NULL;
     }
 
-    requestsize = b64size(size + 12)
-                + strlen(g_session.gamename)
-                + strlen(DWCi_ENC_URL_BASE)
-                + strlen(url)
-                + strlen("?pid=")
-                + strlen(itoa(pid, pidbuf, 10))
-                + strlen("&hash=")
-                + strlen("0000000000000000000000000000000000000000")
-                + strlen("&data=")
-                + 1;
-
-    g_session.request = DWC_Alloc(DWC_ALLOCTYPE_ENC, requestsize);
+    g_session.request = DWC_Alloc(DWC_ALLOCTYPE_ENC,
+        strlen(DWCi_ENC_URL_BASE)
+            + strlen(g_session.gamename)
+            + strlen(url)
+            + strlen("?pid=")
+            + strlen(itoa(pid, buf, 10))
+            + strlen("&hash=")
+            + strlen("0000000000000000000000000000000000000000")
+            + strlen("&data=")
+            + b64size(size + sizeof(putheader) + 4)
+            + 1);
     if (g_session.request == NULL)
     {
         return DWCi_ENC_SESSION_ERROR_NOMEMORY;
@@ -538,8 +534,8 @@ DWCiRankingSessionResult DWCi_EncSessionGetAsync(const char* url,
         return DWCi_ENC_SESSION_ERROR_NOMEMORY;
     }
 
-    g_session.hash[-(int)strlen("&hash=")] = '\0';
+    *(g_session.hash - strlen("&hash=")) = '\0';
     g_session.state = DWCi_ENC_SESSION_STATE_REQUEST;
-    g_session.callback = callback;
+    g_session.callback = cb;
     return DWCi_ENC_SESSION_SUCCESS;
 }

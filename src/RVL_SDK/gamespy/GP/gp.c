@@ -1290,9 +1290,9 @@ int gpIsBuddyConnectionOpen(GPConnection* connection, GPProfile profile) {
   if (iconnection->simulation)
     return 0;
 
-  aPeer = gpiGetPeerByProfile(connection, profile);
+  aPeer = gpiGetConnectedPeer(connection, profile);
 
-  if (aPeer == NULL || !gpiIsPeerConnected(aPeer))
+  if (aPeer == NULL)
     return 0; // not connected
   else
     return 1; // connected

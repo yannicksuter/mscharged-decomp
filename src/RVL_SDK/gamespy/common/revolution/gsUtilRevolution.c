@@ -8,8 +8,6 @@
 #include <revolution/os/OSAlarm.h>
 #include <revolution/so.h>
 
-#include "gsThreadRevolution.c"
-
 void gsiRevolutionSleep(u32 msec);
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,7 +17,6 @@ static int gQueueInitialized;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-/*
 static const char * GOAGetUniqueID_Internal(void)
 {
         static char keyval[17];
@@ -45,15 +42,14 @@ static const char * GOAGetUniqueID_Internal(void)
 
         return keyval;
 }
-*/
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // Time Functions
-// static char GSIMonthNames[12][3] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-//                                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-// static char GSIWeekDayNames[7][3] = {"Sun", "Mon", "Tue", "Wed",
-//                                     "Thu", "Fri", "Sat"};
+static char GSIMonthNames[12][3] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+static char GSIWeekDayNames[7][3] = {"Sun", "Mon", "Tue", "Wed",
+                                    "Thu", "Fri", "Sat"};
 
 time_t gsiTimeInSec(time_t* timer) {
   time_t t = 0;
@@ -65,7 +61,6 @@ time_t gsiTimeInSec(time_t* timer) {
   return t;
 }
 
-/*
 struct tm* gsiGetGmTime(time_t* theTime) {
   static struct tm aTimeStruct;
   static struct tm* aRetVal = &aTimeStruct;
@@ -77,7 +72,7 @@ struct tm* gsiGetGmTime(time_t* theTime) {
   aRetVal->tm_min = aCalTimeStruct.min;
   aRetVal->tm_hour = aCalTimeStruct.hour;
   aRetVal->tm_mday = aCalTimeStruct.mday;
-  aRetVal->tm_mon = aCalTimeStruct.mon;
+  aRetVal->tm_mon = aCalTimeStruct.month;
   aRetVal->tm_year = aCalTimeStruct.year - 1900;
   aRetVal->tm_wday = aCalTimeStruct.wday;
   aRetVal->tm_yday = 0;
@@ -99,16 +94,12 @@ char *gsiCTime(time_t *theTime)
 
         return str;
 }
-*/
 
-/*
 gsi_i64 gsiStringToInt64(const char *theNumberStr)
 {
         return atoll(theNumberStr);
 }
-*/
 
-/*
 void gsiInt64ToString(char theNumberStr[33], gsi_i64 theNumber)
 {
         // you want to fit the number!
@@ -117,4 +108,3 @@ void gsiInt64ToString(char theNumberStr[33], gsi_i64 theNumber)
 
         sprintf(theNumberStr, "%lld", theNumber);
 }
-*/

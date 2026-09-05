@@ -94,9 +94,7 @@ GPResult gpiPeerGetSig(GPConnection* connection, GPIPeer* peer);
 GPResult gpiPeerStartConnect(GPConnection* connection, GPIPeer* peer);
 
 // NOTE: use this function when in a gp function
-GPIPeer* gpiGetPeerByProfile(const GPConnection* connection, int profileid);
-
-gsi_bool gpiIsPeerConnected(GPIPeer* peer);
+GPIPeer* gpiGetConnectedPeer(const GPConnection* connection, int profileid);
 
 GPIPeer* gpiAddPeer(GPConnection* connection, int profileid, GPIBool initiate);
 

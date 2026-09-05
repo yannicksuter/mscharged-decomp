@@ -101,10 +101,8 @@ void gsiCancelResolvingHostname(GSIResolveHostnameHandle handle) {
   // cancel the thread
   gsiCancelThread(handle->threadID);
 
-  if (handle->hostname) {
-    gsifree(handle->hostname);
-    handle->hostname = NULL;
-  }
+  gsifree(handle->hostname);
+  handle->hostname = NULL;
   gsifree(handle);
   handle = NULL;
 }
@@ -193,275 +191,95 @@ gsi_time current_time() // returns current time in milliseconds
   return aMilliseconds;
 }
 
+gsi_time current_time_hires() // returns current time in microseconds
+{
+#ifdef _WIN32
+#if (!defined(_M_IX86) ||                                                     \
+     (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 64))
+  static LARGE_INTEGER counterFrequency;
+  static BOOL haveCounterFrequency = FALSE;
+  static BOOL haveCounter = FALSE;
+  LARGE_INTEGER count;
+
+  if (!haveCounterFrequency) {
+    haveCounter = QueryPerformanceFrequency(&counterFrequency);
+    haveCounterFrequency = TRUE;
+  }
+
+  if (haveCounter) {
+    if (QueryPerformanceCounter(&count)) {
+      return (gsi_time)(count.QuadPart * 1000000 / counterFrequency.QuadPart);
+    }
+  }
+#endif
+
+  return (current_time() / 1000);
+#endif
+
+#ifdef _PS2
+  unsigned int ticks;
+  static unsigned int msec = 0;
+  static unsigned int lastticks = 0;
+  sceCdCLOCK lasttimecalled; /* defined in libcdvd.h */
+
+  if (!msec) {
+    sceCdReadClock(&lasttimecalled); /* libcdvd.a */
+    msec = (unsigned int)(DEC(lasttimecalled.day) * 86400000) +
+           (unsigned int)(DEC(lasttimecalled.hour) * 3600000) +
+           (unsigned int)(DEC(lasttimecalled.minute) * 60000) +
+           (unsigned int)(DEC(lasttimecalled.second) * 1000);
+    msec *= 1000;
+  }
+
+  ticks = (unsigned int)GetTicks();
+  if (lastticks > ticks)
+    msec += ((sizeof(unsigned int) - lastticks) + ticks) / 300;
+  else
+    msec += (unsigned int)(ticks - lastticks) / 300;
+  lastticks = ticks;
+
+  return msec;
+#endif
+
+#ifdef _PSP
+  struct SceRtcTick ticks;
+  int result = 0;
+
+  result = sceRtcGetCurrentTick(&ticks);
+  if (result < 0) {
+    ScePspDateTime time;
+    result = sceRtcGetCurrentClock(&time, 0);
+    if (result < 0)
+      return 0; // um...error handling? //Nope, should return zero since time
+                // cannot be zero
+    result = sceRtcGetTick(&time, &ticks);
+    if (result < 0)
+      return 0; // Nope, should return zero since time cannot be zero
+  }
+
+  return (gsi_time)(ticks.tick);
+#endif
+
+#ifdef _UNIX
+  struct timeval time;
+
+  gettimeofday(&time, NULL);
+  return (time.tv_sec * 1000000 + time.tv_usec);
+#endif
+
+#ifdef _NITRO
+  assert(OS_IsTickAvailable() == TRUE);
+  return (gsi_time)OS_TicksToMicroSeconds(OS_GetTick());
+#endif
+
+#ifdef _PS3
+  return (gsi_time)sys_time_get_system_time();
+#endif
+}
+
 // PAL: 0x800f2510
 void msleep(gsi_time msec) {
   OSSleepTicks((((s64)msec) * ((OS_BUS_CLOCK / 4) / 1000)));
-}
-
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-// Cross-platform GSI wrapper time conversion functions
-//
-// NOTE: some portions of this copied from standard C library
-
-// if an error occurs when calling mktime, return -1
-#define MKTIME_ERROR (time_t)(-1)
-
-// define common conversions for mktime
-#define DAY_SEC (24L * 60L * 60L)       /* secs in a day */
-#define YEAR_SEC (365L * DAY_SEC)       /* secs in a year */
-#define FOUR_YEAR_SEC (1461L * DAY_SEC) /* secs in a 4 year interval */
-#define DEC_SEC 315532800L              /* secs in 1970-1979 */
-#define BASE_DOW 4                      /* 01-01-70 was a Thursday */
-#define BASE_YEAR 70L                   /* 1970 is the base year */
-#define LEAP_YEAR_ADJUST 17L            /* Leap years 1900 - 1970 */
-#define MAX_YEAR 138L                   /* 2038 is the max year */
-
-// ChkAdd evaluates to TRUE if dest = src1 + src2 has overflowed
-#define ChkAdd(dest, src1, src2)                                               \
-  (((src1 >= 0L) && (src2 >= 0L) && (dest < 0L)) ||                            \
-   ((src1 < 0L) && (src2 < 0L) && (dest >= 0L)))
-
-// ChkMul evaluates to TRUE if dest = src1 * src2 has overflowed
-#define ChkMul(dest, src1, src2) (src1 ? (dest / src1 != src2) : 0)
-
-int _lpdays[] = {-1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
-int _days[] = {-1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364};
-
-const char _dnames[] = {"SunMonTueWedThuFriSat"};
-/*  Month names must be Three character abbreviations strung together */
-const char _mnames[] = {"JanFebMarAprMayJunJulAugSepOctNovDec"};
-
-static struct tm tb = {0}; /* time block used in SecondsToDate */
-
-static char buf[26]; /* buffer used to store string in SecondsToString */
-
-#define _T(a) a
-static char* store_dt(char*, int);
-static char* store_dt(char* p, int val) {
-  *p++ = (char)(_T('0') + val / 10);
-  *p++ = (char)(_T('0') + val % 10);
-  return (p);
-}
-
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-// GSI equivalent of Standard C-lib "gmtime function"
-struct tm* gsiSecondsToDate(const time_t* timp) {
-  time_t caltim = *timp; /* calendar time to convert */
-  int islpyr = 0;        /* is-current-year-a-leap-year flag */
-  int tmptim;
-  int* mdays; /* pointer to days or lpdays */
-  struct tm* ptb = &tb;
-
-  if (caltim < 0L)
-    return (NULL);
-
-  /*
-   * Determine years since 1970. First, identify the four-year interval
-   * since this makes handling leap-years easy (note that 2000 IS a
-   * leap year and 2100 is out-of-range).
-   */
-  tmptim = (int)(caltim / FOUR_YEAR_SEC);
-  caltim -= ((long)tmptim * FOUR_YEAR_SEC);
-
-  /*
-   * Determine which year of the interval
-   */
-  tmptim = (tmptim * 4) + 70; /* 1970, 1974, 1978,...,etc. */
-
-  if (caltim >= YEAR_SEC) {
-    tmptim++; /* 1971, 1975, 1979,...,etc. */
-    caltim -= YEAR_SEC;
-
-    if (caltim >= YEAR_SEC) {
-      tmptim++; /* 1972, 1976, 1980,...,etc. */
-      caltim -= YEAR_SEC;
-
-      /*
-       * Note, it takes 366 days-worth of seconds to get past a leap
-       * year.
-       */
-      if (caltim >= (YEAR_SEC + DAY_SEC)) {
-        tmptim++; /* 1973, 1977, 1981,...,etc. */
-        caltim -= (YEAR_SEC + DAY_SEC);
-      } else {
-        /*
-         * In a leap year after all, set the flag.
-         */
-        islpyr++;
-      }
-    }
-  }
-
-  /*
-   * tmptim now holds the value for tm_year. caltim now holds the
-   * number of elapsed seconds since the beginning of that year.
-   */
-  ptb->tm_year = tmptim;
-
-  /*
-   * Determine days since January 1 (0 - 365). This is the tm_yday value.
-   * Leave caltim with number of elapsed seconds in that day.
-   */
-  ptb->tm_yday = (int)(caltim / DAY_SEC);
-  caltim -= (long)(ptb->tm_yday) * DAY_SEC;
-
-  /*
-   * Determine months since January (0 - 11) and day of month (1 - 31)
-   */
-  if (islpyr)
-    mdays = _lpdays;
-  else
-    mdays = _days;
-
-  for (tmptim = 1; mdays[tmptim] < ptb->tm_yday; tmptim++)
-    ;
-
-  ptb->tm_mon = --tmptim;
-
-  ptb->tm_mday = ptb->tm_yday - mdays[tmptim];
-
-  /*
-   * Determine days since Sunday (0 - 6)
-   */
-  ptb->tm_wday = ((int)(*timp / DAY_SEC) + BASE_DOW) % 7;
-
-  /*
-   *  Determine hours since midnight (0 - 23), minutes after the hour
-   *  (0 - 59), and seconds after the minute (0 - 59).
-   */
-  ptb->tm_hour = (int)(caltim / 3600);
-  caltim -= (long)ptb->tm_hour * 3600L;
-
-  ptb->tm_min = (int)(caltim / 60);
-  ptb->tm_sec = (int)(caltim - (ptb->tm_min) * 60);
-
-  ptb->tm_isdst = 0;
-  return ((struct tm*)ptb);
-}
-
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-// GSI equivalent of Standard C-lib "mktime function"
-// PAL: 0x800f27b4
-time_t gsiDateToSeconds(struct tm* tb) {
-  time_t tmptm1, tmptm2, tmptm3;
-  struct tm* tbtemp;
-  /*
-   * First, make sure tm_year is reasonably close to being in range.
-   */
-  if (((tmptm1 = tb->tm_year) < BASE_YEAR - 1) || (tmptm1 > MAX_YEAR + 1))
-    return MKTIME_ERROR;
-
-  /*
-   * Adjust month value so it is in the range 0 - 11.  This is because
-   * we don't know how many days are in months 12, 13, 14, etc.
-   */
-
-  if ((tb->tm_mon < 0) || (tb->tm_mon > 11)) {
-
-    /*
-     * no danger of overflow because the range check above.
-     */
-    tmptm1 += (tb->tm_mon / 12);
-
-    if ((tb->tm_mon %= 12) < 0) {
-      tb->tm_mon += 12;
-      tmptm1--;
-    }
-
-    /*
-     * Make sure year count is still in range.
-     */
-    if ((tmptm1 < BASE_YEAR - 1) || (tmptm1 > MAX_YEAR + 1))
-      return MKTIME_ERROR;
-  }
-
-  /***** HERE: tmptm1 holds number of elapsed years *****/
-
-  /*
-   * Calculate days elapsed minus one, in the given year, to the given
-   * month. Check for leap year and adjust if necessary.
-   */
-  tmptm2 = _days[tb->tm_mon];
-  if (!(tmptm1 & 3) && (tb->tm_mon > 1))
-    tmptm2++;
-
-  /*
-   * Calculate elapsed days since base date (midnight, 1/1/70, UTC)
-   *
-   *
-   * 365 days for each elapsed year since 1970, plus one more day for
-   * each elapsed leap year. no danger of overflow because of the range
-   * check (above) on tmptm1.
-   */
-  tmptm3 =
-      (tmptm1 - BASE_YEAR) * 365L + ((tmptm1 - 1L) >> 2) - LEAP_YEAR_ADJUST;
-
-  /*
-   * elapsed days to current month (still no possible overflow)
-   */
-  tmptm3 += tmptm2;
-
-  /*
-   * elapsed days to current date. overflow is now possible.
-   */
-  tmptm1 = tmptm3 + (tmptm2 = (long)(tb->tm_mday));
-  if (ChkAdd(tmptm1, tmptm3, tmptm2))
-    return MKTIME_ERROR;
-
-  /***** HERE: tmptm1 holds number of elapsed days *****/
-
-  /*
-   * Calculate elapsed hours since base date
-   */
-  tmptm2 = tmptm1 * 24L;
-  if (ChkMul(tmptm2, tmptm1, 24L))
-    return MKTIME_ERROR;
-
-  tmptm1 = tmptm2 + (tmptm3 = (long)tb->tm_hour);
-  if (ChkAdd(tmptm1, tmptm2, tmptm3))
-    return MKTIME_ERROR;
-
-  /***** HERE: tmptm1 holds number of elapsed hours *****/
-
-  /*
-   * Calculate elapsed minutes since base date
-   */
-
-  tmptm2 = tmptm1 * 60L;
-  if (ChkMul(tmptm2, tmptm1, 60L))
-    return MKTIME_ERROR;
-
-  tmptm1 = tmptm2 + (tmptm3 = (long)tb->tm_min);
-  if (ChkAdd(tmptm1, tmptm2, tmptm3))
-    return MKTIME_ERROR;
-
-  /***** HERE: tmptm1 holds number of elapsed minutes *****/
-
-  /*
-   * Calculate elapsed seconds since base date
-   */
-
-  tmptm2 = tmptm1 * 60L;
-  if (ChkMul(tmptm2, tmptm1, 60L))
-    return MKTIME_ERROR;
-
-  tmptm1 = tmptm2 + (tmptm3 = (long)tb->tm_sec);
-  if (ChkAdd(tmptm1, tmptm2, tmptm3))
-    return MKTIME_ERROR;
-
-  /***** HERE: tmptm1 holds number of elapsed seconds *****/
-
-  if ((tbtemp = gsiSecondsToDate(&tmptm1)) == NULL)
-    return MKTIME_ERROR;
-
-  /***** HERE: tmptm1 holds number of elapsed seconds, adjusted *****/
-  /*****       for local time if requested                      *****/
-
-  *tb = *tbtemp;
-  return (time_t)tmptm1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -911,6 +729,12 @@ char* gsXxteaDecrypt(const char* iStr, int iLength, char key[XXTEA_KEY_SIZE],
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 */
+
+#if (!defined(_PS2) && !defined(_PS3) && !defined(_XBOX) &&                 \
+     !defined(_PSP)) ||                                                     \
+    defined(UNIQUEID)
+GetUniqueIDFunction GOAGetUniqueID = GOAGetUniqueID_Internal;
+#endif
 
 #if defined(__cplusplus)
 }

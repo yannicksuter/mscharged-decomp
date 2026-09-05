@@ -49,7 +49,6 @@ int SetSockBlocking(SOCKET sock, int isblocking) {
   return 0;
 }
 
-/*
 int SetSockBroadcast(SOCKET sock) {
   GSI_UNUSED(sock);
   return 1;
@@ -59,7 +58,6 @@ int DisableNagle(SOCKET sock) {
   GSI_UNUSED(sock);
   return 0;
 }
-*/
 
 int SetReceiveBufferSize(SOCKET sock, int size) {
   int rcode;
@@ -68,7 +66,6 @@ int SetReceiveBufferSize(SOCKET sock, int size) {
   return gsiSocketIsNotError(rcode);
 }
 
-/*
 int SetSendBufferSize(SOCKET sock, int size) {
   int rcode;
   rcode =
@@ -105,7 +102,6 @@ int GetSendBufferSize(SOCKET sock) {
 
   return size;
 }
-*/
 
 // Return 1 for immediate recv, otherwise 0
 int CanReceiveOnSocket(SOCKET sock) {

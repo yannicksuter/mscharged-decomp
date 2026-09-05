@@ -130,6 +130,7 @@ enum {
 
 #define SO_SOL_CONFIG 0xfffe
 
+#define SO_SO_SNDBUF 0x1001
 #define SO_SO_RCVBUF 0x1002
 
 #define SO_IPPROTO_ICMP 1

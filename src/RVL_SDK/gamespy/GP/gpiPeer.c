@@ -23,23 +23,16 @@ Please see the GameSpy Presence SDK documentation for more information
 static GPResult gpiProcessPeerInitiatingConnection(GPConnection* connection,
                                                    GPIPeer* peer) {
   GPIConnection* iconnection = (GPIConnection*)*connection;
-  // int state;
+  int state;
   char* str = NULL;
   int len;
   GPIBool connClosed;
   GPIProfile* pProfile;
   GPResult result;
-  int state;
 
   GS_ASSERT(peer);
-  if (!peer)
-    return GP_NETWORK_ERROR;
-
   GS_ASSERT(peer->state != GPI_PEER_DISCONNECTED &&
             peer->state != GPI_PEER_NOT_CONNECTED);
-  if (peer->state == GPI_PEER_DISCONNECTED ||
-      peer->state == GPI_PEER_NOT_CONNECTED)
-    return GP_NETWORK_ERROR;
   // Check the state.
   ///////////////////
   switch (peer->state) {
@@ -117,8 +110,7 @@ static GPResult gpiProcessPeerInitiatingConnection(GPConnection* connection,
 
     // Check for a final.
     /////////////////////
-    if (peer->inputBuffer.buffer)
-      str = strstr(peer->inputBuffer.buffer, "\\final\\");
+    str = strstr(peer->inputBuffer.buffer, "\\final\\");
     if (str != NULL) {
       str[0] = '\0';
       str += 7;
@@ -192,8 +184,6 @@ static GPResult gpiProcessPeerAcceptingConnection(GPConnection* connection,
   // Check the state.
   ///////////////////
   GS_ASSERT(peer->state == GPI_PEER_WAITING);
-  if (peer->state != GPI_PEER_WAITING)
-    return GP_NETWORK_ERROR;
 
   // Read any pending info.
   /////////////////////////
@@ -288,8 +278,6 @@ GPResult gpiPeerSendMessages(GPConnection* connection, GPIPeer* peer) {
   GPResult result;
 
   GS_ASSERT(peer);
-  if (!peer)
-    return GP_NETWORK_ERROR;
   // Only send messages if there's nothing waiting in the output buffer.
   //////////////////////////////////////////////////////////////////////
   if (peer->outputBuffer.len)
@@ -336,8 +324,6 @@ static GPResult gpiProcessPeerConnected(GPConnection* connection,
   GPResult result;
 
   GS_ASSERT(peer);
-  if (!peer)
-    return GP_NETWORK_ERROR;
   // Send stuff.
   //////////////
   if (peer->outputBuffer.len) {
@@ -359,15 +345,14 @@ static GPResult gpiProcessPeerConnected(GPConnection* connection,
 
   // Read messages.
   /////////////////
-  /*
   result = gpiRecvToBuffer(connection, peer->sock, &peer->inputBuffer, &len,
-  &connClosed, "PR"); if(result != GP_NO_ERROR)
-  {
-          peer->state = GPI_PEER_DISCONNECTED;
-          return GP_NO_ERROR;
+                               &connClosed, "PR");
+  if (result != GP_NO_ERROR) {
+    peer->state = GPI_PEER_DISCONNECTED;
+    return GP_NO_ERROR;
   }
-  */
-  if (peer->inputBuffer.len > 0) {
+
+  if (len > 0) {
     peer->timeout = (time(NULL) + GPI_PEER_TIMEOUT);
   }
 
@@ -429,14 +414,6 @@ static GPResult gpiProcessPeerConnected(GPConnection* connection,
         gpiTransfersHandlePong(connection, peer->profile, peer);
         break;
 #endif
-      case GPI_BM_KEYS_REQUEST:
-        CHECK_RESULT(gpiBuddyHandleKeyRequest(connection, peer));
-        break;
-      case GPI_BM_KEYS_REPLY:
-        CHECK_RESULT(gpiBuddyHandleKeyReply(connection, peer, buffer));
-        // Let the keys request reply handler take care of this.
-        ////////////////////////////////////////////////////////
-        break;
       case GPI_BM_FILE_SEND_REQUEST:
       case GPI_BM_FILE_SEND_REPLY:
       case GPI_BM_FILE_BEGIN:
@@ -524,12 +501,6 @@ void gpiRemovePeer(GPConnection* connection, GPIPeer* peer) {
   GPIMessage* message;
 
   GS_ASSERT(peer != NULL);
-  if (peer == NULL)
-    return;
-
-  GS_ASSERT(iconnection->peerList);
-  if (iconnection->peerList == NULL)
-    return;
   // Check if this is the first peer.
   ///////////////////////////////////
   if (iconnection->peerList == peer) {
@@ -645,7 +616,7 @@ GPResult gpiProcessPeers(GPConnection* connection) {
 }
 
 // NOTE: use this function when in a gp function
-GPIPeer* gpiGetPeerByProfile(const GPConnection* connection, int profileid) {
+GPIPeer* gpiGetConnectedPeer(const GPConnection* connection, int profileid) {
   GPIConnection* iconnection = (GPIConnection*)*connection;
   GPIPeer* pcurr;
 
@@ -654,7 +625,8 @@ GPIPeer* gpiGetPeerByProfile(const GPConnection* connection, int profileid) {
   for (pcurr = iconnection->peerList; pcurr != NULL; pcurr = pcurr->pnext) {
     // Check for a match.
     /////////////////////
-    if (pcurr->profile == profileid) {
+    if (pcurr->profile == profileid &&
+        pcurr->state == GPI_PEER_CONNECTED) {
       // Got it.
       //////////
       return pcurr;
@@ -662,17 +634,6 @@ GPIPeer* gpiGetPeerByProfile(const GPConnection* connection, int profileid) {
   }
 
   return NULL;
-}
-
-gsi_bool gpiIsPeerConnected(GPIPeer* peer) {
-  GS_ASSERT(peer);
-  if (!peer)
-    return gsi_false;
-
-  if (peer && peer->state != GPI_PEER_CONNECTED)
-    return gsi_false;
-
-  return gsi_true;
 }
 
 static void gpiFreeMessage(void* elem) {
@@ -781,11 +742,6 @@ GPResult gpiPeerAddMessage(GPConnection* connection, GPIPeer* peer, int type,
   GS_ASSERT(peer != NULL);
   GS_ASSERT(message != NULL);
 
-  if (peer == NULL)
-    return GP_NETWORK_ERROR;
-  if (message == NULL)
-    return GP_NETWORK_ERROR;
-
   // Get the length.
   //////////////////
   len = (int)strlen(message);
@@ -837,8 +793,6 @@ GPResult gpiPeerStartTransferMessage(GPConnection* connection, GPIPeer* peer,
   tid.time = transferID->time;
 
   GS_ASSERT(transferID);
-  if (!transferID)
-    return GP_NETWORK_ERROR;
   // Start the message.
   /////////////////////
   sprintf(buffer, "\\m\\%d\\xfer\\%d %u %u", type, tid.profileid, tid.count,
@@ -851,8 +805,6 @@ GPResult gpiPeerFinishTransferMessage(GPConnection* connection, GPIPeer* peer,
                                       const char* message, int len) {
   char buffer[32];
   GS_ASSERT(peer != NULL);
-  if (!peer)
-    return GP_NETWORK_ERROR;
 
   // Check the message.
   /////////////////////

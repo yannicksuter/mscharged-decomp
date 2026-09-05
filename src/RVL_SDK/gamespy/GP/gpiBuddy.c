@@ -500,7 +500,7 @@ GPResult gpiSendBuddyMessage(GPConnection* connection, int profileid, int type,
   GPIPeer* peer;
   GPIProfile* profile;
   // GPIConnection *iconnection = (GPIConnection *)*connection;
-  peer = gpiGetPeerByProfile(connection, profileid);
+  peer = gpiGetConnectedPeer(connection, profileid);
   if (!peer) {
     // Check if we should send this through the server.
     ////////////////////////////////////////////////////
