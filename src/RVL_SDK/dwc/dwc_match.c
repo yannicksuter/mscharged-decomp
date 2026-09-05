@@ -200,7 +200,7 @@ int fn_8048AEC4(int profileId);
 void fn_8048C54C(int error, int errorCode);
 void fn_8049AE0C(int type, int aid, const void* data, int size);
 void fn_80499A30(SBServer server);
-int fn_80499CA8(int sort);
+static int DWCi_EvaluateServers(int sort);
 void fn_80499E90(void);
 
 extern const int lbl_804F31F8[];
@@ -5441,7 +5441,7 @@ void fn_804993C8(ServerBrowser sb, SBCallbackReason reason, SBServer server,
             break;
 
         case 3:
-            fn_80499CA8(1);
+            DWCi_EvaluateServers(1);
             fn_80499E90();
             if (ServerBrowserCount(sb) != 0)
             {
@@ -5495,7 +5495,7 @@ void fn_804993C8(ServerBrowser sb, SBCallbackReason reason, SBServer server,
                 if (lbl_806E2EF8->matchType == 1
                     && profileID == lbl_806E2EF8->pidList[0])
                 {
-                    if (fn_80499CA8(0) != 0)
+                    if (DWCi_EvaluateServers(0) != 0)
                     {
                         if (lbl_806E2EF8->_0D != 0)
                         {
@@ -5626,58 +5626,60 @@ void fn_80499A30(SBServer server)
     }
 }
 
-int fn_80499CA8(int sort)
+static int DWCi_EvaluateServers(int sort)
 {
-    BOOL deleted = FALSE;
-    int i = 0;
+    int eval;
+    int deleteFlag = FALSE;
+    int localDelete;
+    int profileID;
+    int i;
+    int j;
+    SBServer server;
 
-    for (i = 0; i < ServerBrowserCount(lbl_806E2EF8->sb); i++)
+    for (i = 0; i < ServerBrowserCount(DWCi_GetMatchCnt()->sb); i++)
     {
-        SBServer server
-            = ServerBrowserGetServer(lbl_806E2EF8->sb, i);
+        server = ServerBrowserGetServer(DWCi_GetMatchCnt()->sb, i);
 
-        if (lbl_806E2EF8->matchType == 0)
+        if (DWCi_GetMatchCnt()->matchType == 0)
         {
-            int pid = SBServerGetIntValueA(server, "dwc_pid", 0);
-            BOOL removed = FALSE;
-            int j;
+            profileID = SBServerGetIntValueA(server, "dwc_pid", 0);
+            localDelete = FALSE;
 
-            for (j = 1; j <= lbl_806E2EF8->_0D; j++)
+            for (j = 1; j <= DWCi_GetMatchCnt()->_0D; j++)
             {
-                if (lbl_806E2EF8->pidList[j] == pid)
+                if (DWCi_GetMatchCnt()->pidList[j] == profileID)
                 {
-                    ServerBrowserRemoveServer(lbl_806E2EF8->sb, server);
-                    removed = TRUE;
+                    ServerBrowserRemoveServer(DWCi_GetMatchCnt()->sb, server);
+                    localDelete = TRUE;
                     i--;
                     break;
                 }
             }
-            if (removed)
+            if (localDelete)
             {
                 continue;
             }
         }
 
-        if (lbl_806E2EF8->_488 != 0)
+        if (DWCi_GetMatchCnt()->_488 != NULL)
         {
-            int point = ((int (*)(int, void*))lbl_806E2EF8->_488)(i,
-                lbl_806E2EF8->_48C);
+            eval = DWCi_GetMatchCnt()->_488(i, DWCi_GetMatchCnt()->_48C);
 
-            if (point > 0)
+            if (eval > 0)
             {
-                if (point > 0x800000 - 1)
+                if (eval > 0x800000 - 1)
                 {
-                    point = 0x800000 - 1;
+                    eval = 0x800000 - 1;
                 }
                 SBServerAddIntKeyValue(server, "dwc_eval",
-                    (point << 8) | DWCi_GetMathRand32(0x100));
+                    (eval << 8) | DWCi_GetMathRand32(0x100));
             }
             else
             {
-                ServerBrowserRemoveServer(lbl_806E2EF8->sb, server);
+                ServerBrowserRemoveServer(DWCi_GetMatchCnt()->sb, server);
                 DWC_Printf(0x400,
-                    "Deleted server [%d] (eval point is %d).\n", i, point);
-                deleted = TRUE;
+                    "Deleted server [%d] (eval point is %d).\n", i, eval);
+                deleteFlag = TRUE;
                 i--;
             }
         }
@@ -5687,13 +5689,13 @@ int fn_80499CA8(int sort)
         }
     }
 
-    if (sort != 0 && ServerBrowserCount(lbl_806E2EF8->sb) != 0)
+    if (sort != 0 && ServerBrowserCount(DWCi_GetMatchCnt()->sb) != 0)
     {
-        ServerBrowserSortA(lbl_806E2EF8->sb, SBFalse, "dwc_eval",
+        ServerBrowserSortA(DWCi_GetMatchCnt()->sb, SBFalse, "dwc_eval",
             sbcm_int);
     }
 
-    if (deleted && ServerBrowserCount(lbl_806E2EF8->sb) == 0)
+    if (deleteFlag && ServerBrowserCount(DWCi_GetMatchCnt()->sb) == 0)
     {
         return 0;
     }
