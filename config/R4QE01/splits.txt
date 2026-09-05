@@ -1768,12 +1768,16 @@ Game/HBMManager_8024795C.cpp:
 	.sdata2     start:0x806E5A58 end:0x806E5A88
 
 unclassified/tu_802492E4.cpp:
-	.text       start:0x802492E4 end:0x8024BED8
+	.text       start:0x802492E4 end:0x8024D074
 	.rodata     start:0x804E85D8 end:0x804E8680
-	.data       start:0x8051E6A0 end:0x8051ED44
+	.data       start:0x8051E6A0 end:0x8051EDAC
 	.bss        start:0x805785C8 end:0x805785F8
-	.sdata      start:0x806DE6F8 end:0x806DE740
+	.sdata      start:0x806DE6F8 end:0x806DE768
 	.sbss       start:0x806E18E0 end:0x806E18F0
+
+unclassified/tu_8024D92C.cpp:
+	.text       start:0x8024D92C end:0x8024DE5C
+	.data       start:0x8051F658 end:0x8051F684
 
 Game/SH/SHSceneBase.cpp:
 	.text       start:0x80269078 end:0x8026B10C

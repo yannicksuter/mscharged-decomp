@@ -2040,7 +2040,7 @@ void HomeButton::update(const HBMControllerData* pController)
         {
             if (pController->wiiCon[i].kpad->wpad_err != WPAD_ENODEV)
             {
-                if (mPadDrawTime[i] > 5)
+                if (mPadDrawTime[i] > static_cast<int>(5.0f / getInstance()->getHBMDataInfo()->frameDelta + 0.5f))
                 {
                     if (pController->wiiCon[i].kpad->wpad_err == WPAD_ESUCCESS)
                     {
@@ -2237,10 +2237,7 @@ void HomeButton::update_controller(int id)
             {
                 mpPaneManager->update(id, 0.0f, -180.0f, 0, 0, 0, 0);
 
-#if HBM_REVISION > 1
-                mSelectAnmNum = 4;
-                mpPairGroupAnmController[mSelectAnmNum]->start();
-#endif
+                mpPairGroupAnmController[4]->start();
 
                 mSelectAnmNum = 2;
                 mpPairGroupAnmController[mSelectAnmNum]->start();
@@ -2363,7 +2360,7 @@ void HomeButton::update_controller(int id)
         HBController* pCon = mpController[id]->getController();
         if (pCon->trig)
         {
-            mMsgCount = 0xE10;
+            mMsgCount = iReConnectTime;
         }
     }
 }
@@ -2886,15 +2883,11 @@ void HomeButton::startTrigEvent(const char* pPane)
             case 9:
                 if (mSequence == eSeq_Control)
                 {
-#if HBM_REVISION > 1
-                    mSelectAnmNum = 4;
-                    mpPairGroupAnmController[mSelectAnmNum]->start();
-#endif
+                    mpPairGroupAnmController[4]->start();
+                    mpPairGroupAnmController[11]->start();
 
                     mSelectAnmNum = 2;
                     mpPairGroupAnmController[mSelectAnmNum]->start();
-
-                    mpPairGroupAnmController[11]->start();
 
                     mState = 10;
                     mSequence = eSeq_Normal;
@@ -3072,9 +3065,10 @@ void HomeButton::startTrigEvent(const char* pPane)
                     mOnPaneVibFrame[i] = 0.0f;
                     mOnPaneVibWaitFrame[i] = 0.0f;
                     getController(i)->stopMotor();
+                    getController(i)->setEnableRumble(false);
                 }
 
-                mWaitStopMotorCount = 30;
+                mWaitStopMotorCount = 30.0f / getInstance()->getHBMDataInfo()->frameDelta;
 
                 mpLayout->GetRootPane()->FindPaneByName(scFuncTextPaneName[0], true)->SetVisible(true);
 

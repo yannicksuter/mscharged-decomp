@@ -16,8 +16,10 @@
 #include "NL/gl/glState.h"
 #include "NL/nlAlgorithm.h"
 #include "NL/nlBasicString.h"
+#include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlMemory.h"
+#include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_80216CB0.h"
 #include "unclassified/tu_802196B0.h"
@@ -109,6 +111,19 @@ static inline T* CastFound(TLInstance* found)
 }
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
+
+extern "C" WideBasicString fn_8024EF24(const WideBasicString& string,
+    const unsigned short (&t0)[5], const unsigned short (&t1)[5],
+    const unsigned short (&t2)[5]);
+
+template <>
+WideBasicString Format<WideBasicString, unsigned short[4], unsigned short[4],
+    unsigned short[4]>(const WideBasicString& string, const unsigned short (&t0)[4],
+    const unsigned short (&t1)[4], const unsigned short (&t2)[4]);
+
+template <>
+WideBasicString Format<WideBasicString, unsigned short[4]>(
+    const WideBasicString& string, const unsigned short (&t0)[4]);
 
 static inline const unsigned short* LookupLocString(const char* id)
 {
@@ -675,7 +690,9 @@ struct TU8024A368Scene
     /* 0x325 */ unsigned char mPadding325[3];
     /* 0x328 */ int mUnidentified328;
     /* 0x32C */ unsigned short mUnidentified32C[0x40];
-    /* 0x3AC */ unsigned char mUnidentified3AC[0x180];
+    /* 0x3AC */ unsigned short mUnidentified3AC[0x80];
+    /* 0x4AC */ unsigned short mUnidentified4AC[0x20];
+    /* 0x4EC */ unsigned short mUnidentified4EC[0x20];
     /* 0x52C */ AsyncImage* mImages[5];
     /* 0x540 */ bool mImageReady[5];
     /* 0x545 */ unsigned char mPadding545[3];
@@ -1038,4 +1055,166 @@ extern "C" void fn_8024AF04(TU8024A368Scene* scene)
 
     memcpy(scene->mUnidentified32C, title.c_str(), sizeof(scene->mUnidentified32C));
     titleText->SetString(scene->mUnidentified32C);
+}
+
+extern "C" void fn_8024BED8(TU8024A368Scene* scene)
+{
+    FEPresentation* presentation = scene->mFEScene->m_pFEPackage->GetPresentation();
+    unsigned long recordHash = nlStringLowerHash("RECORD");
+    unsigned long historyHash = nlStringLowerHash("HISTORY");
+    TLTextInstance* recordText = CastFound<TLTextInstance>(
+        FEFinder<TLTextInstance, 3>::_Find<TLSlide>(presentation->GetActiveSlide(),
+            nlStringLowerHash("Layer"), historyHash, recordHash, 0, 0, 0));
+    if (recordText == 0)
+    {
+        recordText = &UnidentifiedFallbackTextInstance;
+    }
+
+    char monthString[4];
+    char dayString[4];
+    char yearString[4];
+    unsigned short monthWideString[4];
+    unsigned short dayWideString[4];
+    unsigned short yearWideString[4];
+    WideBasicString unformatted;
+    WideBasicString formatted;
+
+    TU8024A368HistoryRecord& record = scene->mHistory[scene->mUnidentified30C];
+    int month = record.mUnidentified2B;
+    int day = record.mUnidentified32;
+    int year = record.mUnidentified39;
+
+    nlSNPrintf(monthString, 4, "%d", month);
+    nlStrToWcs(monthString, monthWideString, 4);
+    nlSNPrintf(dayString, 4, "%d", day);
+    nlStrToWcs(dayString, dayWideString, 4);
+    nlSNPrintf(yearString, 4, "%d", year);
+    nlStrToWcs(yearString, yearWideString, 4);
+
+    unformatted = WideBasicString(LookupLocString("ROAD_HUB_TEAM_RECORD_STATS"));
+    formatted = Format(unformatted, monthWideString, dayWideString, yearWideString);
+
+    memcpy(scene->mUnidentified3AC, formatted.c_str(), sizeof(scene->mUnidentified3AC));
+    recordText->SetString(scene->mUnidentified3AC);
+}
+
+extern "C" void fn_8024C368(TU8024A368Scene* scene)
+{
+    char goalsString[4];
+    unsigned short goalsWideString[4];
+    WideBasicString unformatted;
+    WideBasicString formatted;
+
+    TU8024A368HistoryRecord& record = scene->mHistory[scene->mUnidentified30C];
+    int goals = record.mUnidentified20;
+    nlSNPrintf(goalsString, 4, "%d", goals);
+    nlStrToWcs(goalsString, goalsWideString, 4);
+
+    FEPresentation* presentation = scene->mFEScene->m_pFEPackage->GetPresentation();
+    TLTextInstance* goalsText = 0;
+    switch (scene->mMode)
+    {
+    case 7:
+    case 9:
+    case 11:
+    {
+        unformatted = WideBasicString(LookupLocString("HOF_GOALS_AGAINST"));
+
+        unsigned long goalsForHash = nlStringLowerHash("GOALS FOR");
+        unsigned long historyHash = nlStringLowerHash("HISTORY");
+        goalsText = CastFound<TLTextInstance>(
+            FEFinder<TLTextInstance, 3>::_Find<TLSlide>(presentation->GetActiveSlide(),
+                nlStringLowerHash("Layer"), historyHash, goalsForHash, 0, 0, 0));
+        if (goalsText == 0)
+        {
+            goalsText = &UnidentifiedFallbackTextInstance;
+        }
+        goalsText->m_bVisible = false;
+
+        unsigned long goalsAgainstHash = nlStringLowerHash("GOALS AGAINST");
+        historyHash = nlStringLowerHash("HISTORY");
+        goalsText = CastFound<TLTextInstance>(
+            FEFinder<TLTextInstance, 3>::_Find<TLSlide>(presentation->GetActiveSlide(),
+                nlStringLowerHash("Layer"), historyHash, goalsAgainstHash, 0, 0, 0));
+        if (goalsText == 0)
+        {
+            goalsText = &UnidentifiedFallbackTextInstance;
+        }
+        break;
+    }
+    case 8:
+    case 10:
+    case 12:
+    {
+        unformatted = WideBasicString(LookupLocString("HOF_GOALS_FOR"));
+
+        unsigned long goalsAgainstHash = nlStringLowerHash("GOALS AGAINST");
+        unsigned long historyHash = nlStringLowerHash("HISTORY");
+        goalsText = CastFound<TLTextInstance>(
+            FEFinder<TLTextInstance, 3>::_Find<TLSlide>(presentation->GetActiveSlide(),
+                nlStringLowerHash("Layer"), historyHash, goalsAgainstHash, 0, 0, 0));
+        if (goalsText == 0)
+        {
+            goalsText = &UnidentifiedFallbackTextInstance;
+        }
+        goalsText->m_bVisible = false;
+
+        unsigned long goalsForHash = nlStringLowerHash("GOALS FOR");
+        historyHash = nlStringLowerHash("HISTORY");
+        goalsText = CastFound<TLTextInstance>(
+            FEFinder<TLTextInstance, 3>::_Find<TLSlide>(presentation->GetActiveSlide(),
+                nlStringLowerHash("Layer"), historyHash, goalsForHash, 0, 0, 0));
+        if (goalsText == 0)
+        {
+            goalsText = &UnidentifiedFallbackTextInstance;
+        }
+        break;
+    }
+    }
+
+    formatted = Format(unformatted, goalsWideString);
+    memcpy(scene->mUnidentified3AC, formatted.c_str(), sizeof(scene->mUnidentified3AC));
+    goalsText->SetString(scene->mUnidentified3AC);
+}
+
+extern "C" void fn_8024CBD8(TU8024A368Scene* scene)
+{
+    char yearString[5];
+    char monthString[5];
+    char dayString[5];
+    unsigned short yearWideString[5];
+    unsigned short monthWideString[5];
+    unsigned short dayWideString[5];
+
+    FEPresentation* presentation = scene->mFEScene->m_pFEPackage->GetPresentation();
+    unsigned long dateHash = nlStringLowerHash("DATE");
+    unsigned long historyHash = nlStringLowerHash("HISTORY");
+    TLTextInstance* dateText = CastFound<TLTextInstance>(
+        FEFinder<TLTextInstance, 3>::_Find<TLSlide>(presentation->GetActiveSlide(),
+            nlStringLowerHash("Layer"), historyHash, dateHash, 0, 0, 0));
+    if (dateText == 0)
+    {
+        dateText = &UnidentifiedFallbackTextInstance;
+    }
+
+    WideBasicString unformatted;
+    WideBasicString formatted;
+
+    TU8024A368HistoryRecord& record = scene->mHistory[scene->mUnidentified30C];
+    int month = record.mUnidentified12 + 1;
+    int day = record.mUnidentified0D + 1;
+    int year = record.mUnidentified16 + 2000;
+
+    nlSNPrintf(yearString, 5, "%.4d", year);
+    nlStrToWcs(yearString, yearWideString, 5);
+    nlSNPrintf(monthString, 5, "%.2d", month);
+    nlStrToWcs(monthString, monthWideString, 5);
+    nlSNPrintf(dayString, 5, "%.2d", day);
+    nlStrToWcs(dayString, dayWideString, 5);
+
+    unformatted = WideBasicString(LookupLocString("DATE_STAMP"));
+    formatted
+        = fn_8024EF24(unformatted, dayWideString, monthWideString, yearWideString);
+    memcpy(scene->mUnidentified4AC, formatted.c_str(), sizeof(scene->mUnidentified4AC));
+    dateText->SetString(scene->mUnidentified4AC);
 }
