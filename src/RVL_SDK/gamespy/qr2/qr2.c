@@ -122,7 +122,7 @@ VARS
 ********/
 struct qr2_implementation_s static_qr2_rec = {INVALID_SOCKET};
 static qr2_t current_rec = &static_qr2_rec;
-char qr2_hostname[64 + 8];
+char qr2_hostname[64];
 
 static int num_local_ips = 0;
 static struct in_addr local_ip_list[MAX_LOCAL_IP];
@@ -134,7 +134,7 @@ static void send_heartbeat(qr2_t qrec, int statechanged);
 static void send_keepalive(qr2_t qrec);
 static int get_sockaddrin(const char* host, int port, struct sockaddr_in* saddr,
                           struct hostent** savehent);
-void qr2_check_queries(qr2_t qrec);
+static void qr2_check_queries(qr2_t qrec);
 static void qr2_check_send_heartbeat(qr2_t qrec);
 static void enum_local_ips();
 static void qr2_expire_ip_verify(qr2_t qrec);
@@ -442,7 +442,11 @@ void qr2_check_queries(qr2_t qrec) {
   struct sockaddr_in saddr;
   int error;
 
+#if defined(_LINUX)
+  unsigned int saddrlen = sizeof(struct sockaddr_in);
+#else
   int saddrlen = sizeof(struct sockaddr_in);
+#endif
 
   if (!qrec->read_socket)
     return; // not our job
@@ -454,8 +458,26 @@ void qr2_check_queries(qr2_t qrec) {
                       0, (struct sockaddr*)&saddr, &saddrlen);
     if (gsiSocketIsNotError(error)) {
       indata[error] = '\0';
+
+      gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Network,
+                    GSIDebugLevel_Comment,
+                    "Received %d bytes on query socket\r\n", error);
+      gsDebugBinary(GSIDebugCat_QR2, GSIDebugType_Network,
+                    GSIDebugLevel_RawDump, indata, error);
+
       qr2_parse_queryA(qrec, indata, error,
                        (struct sockaddr*)&saddr);
+    } else if (error == 0) {
+      // socket closed?
+      gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Network,
+                    GSIDebugLevel_Comment,
+                    "CanReceiveOnSocket() returned true, but recvfrom return 0!\r\n",
+                    error);
+    } else {
+      gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Network,
+                    GSIDebugLevel_Comment,
+                    "CanReceiveOnSocket() returned true, but recvfrom failed!\r\n",
+                    error);
     }
   }
 }
@@ -1195,8 +1217,6 @@ static gsi_bool qr2_process_ip_verify(qr2_t qrec, struct qr2_buffer_s* buf,
                                       struct sockaddr_in* sender) {
   int i = 0;
   gsi_time now = current_time();
-  int firstFreeIndex = -1;
-  int numDuplicates = 0;
 
   // if the query challenge is disabled, return 0 as the challenge
   if ((qrec->backendoptions & QR2_OPTION_USE_QUERY_CHALLENGE) == 0) {
@@ -1204,31 +1224,18 @@ static gsi_bool qr2_process_ip_verify(qr2_t qrec, struct qr2_buffer_s* buf,
     return gsi_true;
   }
 
-  // check if this ip/port combo is already in the list
   for (; i < QR2_IPVERIFY_ARRAY_SIZE; i++) {
-    // Mark the first free index when/if found
-    if (firstFreeIndex == -1 && qrec->ipverify[i].addr.sin_addr.s_addr == 0)
-      firstFreeIndex = i;
-    // Count any indexes that match this IP/port
-    if (qrec->ipverify[i].addr.sin_addr.s_addr == sender->sin_addr.s_addr &&
-        qrec->ipverify[i].addr.sin_port == sender->sin_port) {
-      numDuplicates++;
+    if (qrec->ipverify[i].addr.sin_addr.s_addr == 0) {
+      qrec->ipverify[i].addr = *sender;
+      qrec->ipverify[i].challenge = htonl((rand() << 16) | rand());
+      qrec->ipverify[i].createtime = now;
+
+      qr2_buffer_add_int(buf, (int)qrec->ipverify[i].challenge);
+      return gsi_true;
     }
   }
 
-  // discard if too many duplicates or no index found
-  if (numDuplicates > QR2_IPVERIFY_MAXDUPLICATES)
-    return gsi_false;
-  if (firstFreeIndex == -1)
-    return gsi_false; // no free indexes
-
-  // create a random challenge for this ip/port combo
-  qrec->ipverify[firstFreeIndex].addr = *sender;
-  qrec->ipverify[firstFreeIndex].challenge = htonl((rand() << 16) | rand());
-  qrec->ipverify[firstFreeIndex].createtime = now;
-
-  qr2_buffer_add_int(buf, (int)qrec->ipverify[firstFreeIndex].challenge);
-  return gsi_true; // buffer ready to be sent
+  return gsi_false;
 }
 
 // Check if the returned ipverify value matches the random we sent earlier
@@ -1244,10 +1251,13 @@ static gsi_bool qr2_check_ip_verify(qr2_t qrec, struct sockaddr_in* sender,
         qrec->ipverify[i].addr.sin_addr.s_addr = 0;
         qrec->ipverify[i].addr.sin_port = 0;
         return gsi_true;
+      } else {
+        gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Network,
+                      GSIDebugLevel_Warning,
+                      "Received incorrect IP verify info from %s\r\n",
+                      inet_ntoa(sender->sin_addr));
+        return gsi_false;
       }
-      // else
-      //   keep searching...a single IP may have multiple outstanding
-      //   challenges.
     }
   }
   return gsi_false;

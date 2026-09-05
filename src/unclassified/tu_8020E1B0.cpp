@@ -6,8 +6,9 @@
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" void fn_801CC988(TU80219248Component* component, TLComponentInstance* instance);
-extern "C" void* fn_80253E18();
-extern "C" void fn_80253474(void* object);
+class TU80252180Scene;
+extern "C" TU80252180Scene* fn_80253E18();
+extern "C" void fn_80253474(TU80252180Scene* scene);
 
 extern TLComponentInstance* lbl_80578450[4];
 
@@ -79,7 +80,7 @@ void TU8020E1B0Scene::fn_8020E8FC(int, void* context)
         fn_801CBCA0(0x2ECB0035, 0, 0, 1);
         mState = 2;
 
-        void* object = fn_80253E18();
+        TU80252180Scene* object = fn_80253E18();
         if (object != 0)
         {
             fn_80253474(object);

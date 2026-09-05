@@ -1,6 +1,6 @@
 #include <private/nhttp.h>
 
-const char NHTTPi_strMultipartBound[] = "--t9Sf4yfjf1RtvDu3AA";
+const char NHTTPi_strMultipartBound[] = STR_POSTBOUND;
 
 void* NHTTPi_alloc(u32 size, int align);
 void NHTTPi_free(void* ptr);
@@ -33,282 +33,258 @@ void NHTTPi_InitRequestInfo(NHTTPReqInfo* info)
     info->reqQueue = NULL;
 }
 
-NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* info, const char* url,
-    s32 method, void* buffer, u32 bufferSize, void* userParam,
-    NHTTPResponseCallback responseCallback, NHTTPResponseCleanup cleanup)
+NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* bgnEndInfo_p,
+    const char* url_p, s32 method, void* buf_p, u32 len, void* param_p,
+    NHTTPResponseCallback bufFull, NHTTPResponseCleanup freeBuf)
 {
-    char urlBuffer[0x100];
-    s32 urlLength;
-    s32 prefixLength;
-    s32 remaining;
-    char* hostStart;
-    char* current;
-    s32 index;
-    s32 decodedLength;
-    char* decodedHost;
-    s32 escapeCount;
-    s32 escapeRemaining;
-    s32 decodedChar;
-    BOOL foundPath;
-    s32 hostLength;
-    NHTTPRequestInfo* request = NULL;
-    s32 separator;
-    s32 portStart;
-    s32 port;
+    int i;
+    int suflen, urllen, prelen;
+    int nhostenc, deccount;
+    int declen, hostend;
+    int port;
+    int decode_urllen;
+
+    char a_url[LEN_URLBUF];
+    char* prefix_p;
+    NHTTPRequestInfo* req_p = NULL;
 
     if (method >= 3 || method < 0)
     {
-        NHTTPi_SetError(info, NHTTP_ERROR_UNKNOWN);
-        goto error;
+        NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_UNKNOWN);
+        goto errend;
     }
 
-    request = NHTTPi_alloc(sizeof(NHTTPRequestInfo), 4);
-    if (request == NULL)
+    req_p = NHTTPi_alloc(sizeof(NHTTPRequestInfo), 4);
+    if (!req_p)
     {
-        NHTTPi_SetError(info, NHTTP_ERROR_ALLOC);
-        goto error;
+        NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_ALLOC);
+        goto errend;
     }
-    NHTTPi_memclr(request, sizeof(NHTTPRequestInfo));
+    NHTTPi_memclr(req_p, sizeof(NHTTPRequestInfo));
 
-    request->response = NHTTPi_alloc(sizeof(NHTTPResponseInfo), 4);
-    if (request->response == NULL)
+    req_p->response = NHTTPi_alloc(sizeof(NHTTPResponseInfo), 4);
+    if (!req_p->response)
     {
-        NHTTPi_SetError(info, NHTTP_ERROR_ALLOC);
-        goto error;
+        NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_ALLOC);
+        goto errend;
     }
-    NHTTPi_memclr(request->response, sizeof(NHTTPResponseInfo));
-    request->response->recvBuf_p = buffer;
-    request->response->recvBufLen = bufferSize;
-    request->response->bufFull = responseCallback;
-    request->response->freeBuf = cleanup;
+    NHTTPi_memclr(req_p->response, sizeof(NHTTPResponseInfo));
+    req_p->response->recvBuf_p = buf_p;
+    req_p->response->recvBufLen = len;
+    req_p->response->bufFull = bufFull;
+    req_p->response->freeBuf = freeBuf;
 
-    urlLength = NHTTPi_strlen(url);
-    if (urlLength <= 7)
+    urllen = NHTTPi_strlen(url_p);
+    if (urllen <= 7)
     {
-        NHTTPi_SetError(info, NHTTP_ERROR_DNS);
-        goto error;
+        NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_DNS);
+        goto errend;
     }
 
-    NHTTPi_memclr(urlBuffer, urlLength);
-    NHTTPi_memcpy(urlBuffer, url, urlLength);
+    NHTTPi_memclr(a_url, urllen);
+    NHTTPi_memcpy(a_url, url_p, urllen);
 
-    request->port = 80;
-    prefixLength = 7;
-    if (NHTTPi_strnicmp(urlBuffer, "http://", 7) != 0)
+    req_p->port = 80;
+    suflen = 7;
+    if (NHTTPi_strnicmp(a_url, "http://", 7) != 0)
     {
-        if (NHTTPi_strnicmp(urlBuffer, "https://", 8) != 0)
+        if (NHTTPi_strnicmp(a_url, "https://", 8) != 0)
         {
-            NHTTPi_SetError(info, NHTTP_ERROR_DNS);
-            goto error;
+            NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_DNS);
+            goto errend;
         }
-        request->secure = TRUE;
-        prefixLength = 8;
-        request->port = 443;
+        req_p->secure = TRUE;
+        req_p->port = 443;
+        suflen = 8;
     }
 
-    remaining = urlLength - prefixLength;
-    hostStart = &urlBuffer[prefixLength];
-    if (remaining <= 0)
+    prefix_p = a_url + suflen;
+    prelen = urllen - suflen;
+    if (prelen <= 0)
     {
-        NHTTPi_SetError(info, NHTTP_ERROR_DNS);
-        goto error;
+        NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_DNS);
+        goto errend;
     }
 
-    current = hostStart;
-    index = 0;
-    escapeCount = 0;
-    escapeRemaining = 0;
-    while (index < remaining && *current != '/')
+    for (i = 0, nhostenc = 0, deccount = 0;
+         (i < prelen) && (prefix_p[i] != '/'); i++)
     {
-        if (escapeRemaining == 2)
+        if (deccount == 2)
         {
-            escapeRemaining--;
+            deccount--;
         }
-        else if (escapeRemaining == 1)
+        else if (deccount == 1)
         {
-            decodedChar = NHTTPi_strToHex(&hostStart[index - 1], 2);
-            escapeRemaining--;
-            if ((s8)decodedChar < 0)
+            s8 c = (s8)NHTTPi_strToHex(&prefix_p[i - 1], 2);
+            deccount--;
+            if (c < 0)
             {
-                NHTTPi_SetError(info, NHTTP_ERROR_DNS);
-                goto error;
+                NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_DNS);
+                goto errend;
             }
-            if ((s8)decodedChar == '/')
+            if (c == '/')
             {
-                escapeCount--;
+                nhostenc--;
                 break;
             }
         }
-        else if (*current == '%')
+        else if (prefix_p[i] == '%')
         {
-            escapeRemaining = 2;
-            escapeCount++;
+            deccount = 2;
+            nhostenc++;
         }
-        index++;
-        current++;
     }
 
-    if (escapeRemaining != 0)
+    if (deccount)
     {
-        NHTTPi_SetError(info, NHTTP_ERROR_DNS);
-        goto error;
+        NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_DNS);
+        goto errend;
     }
 
-    decodedLength = prefixLength + remaining - escapeCount * 2 + 1;
-    request->url = NHTTPi_alloc(decodedLength, 4);
-    if (request->url == NULL)
+    decode_urllen = suflen + prelen - nhostenc * 2 + 1;
+    req_p->url = NHTTPi_alloc(decode_urllen, 4);
+    if (!req_p->url)
     {
-        NHTTPi_SetError(info, NHTTP_ERROR_ALLOC);
-        goto error;
+        NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_ALLOC);
+        goto errend;
     }
-    NHTTPi_memclr(request->url, decodedLength);
-    NHTTPi_memcpy(request->url, urlBuffer, prefixLength);
+    NHTTPi_memclr(req_p->url, decode_urllen);
+    NHTTPi_memcpy(req_p->url, a_url, suflen);
 
-    current = hostStart;
-    index = 0;
-    separator = 0;
-    escapeRemaining = 0;
-    foundPath = FALSE;
-    while (index < remaining)
+    for (i = 0, declen = 0, deccount = 0, hostend = FALSE;
+         i < prelen; i++)
     {
-        if (escapeRemaining == 2)
+        if (deccount == 2)
         {
-            escapeRemaining--;
+            deccount--;
         }
-        else if (escapeRemaining == 1)
+        else if (deccount == 1)
         {
-            decodedChar = NHTTPi_strToHex(&hostStart[index - 1], 2);
-            request->url[prefixLength + separator - 1] = decodedChar;
-            escapeRemaining--;
-            if ((s8)decodedChar == '/')
+            char c = (char)NHTTPi_strToHex(&prefix_p[i - 1], 2);
+            deccount--;
+            req_p->url[suflen + declen - 1] = c;
+            if (c == '/')
             {
-                foundPath = TRUE;
+                hostend = TRUE;
             }
         }
         else
         {
-            if (*current == '/')
+            if (prefix_p[i] == '/')
             {
-                foundPath = TRUE;
+                hostend = TRUE;
             }
-            if ((!foundPath) & (*current == '%'))
+            if (!hostend & (prefix_p[i] == '%'))
             {
-                escapeRemaining = 2;
+                deccount = 2;
             }
             else
             {
-                request->url[prefixLength + separator] = *current;
+                req_p->url[suflen + declen] = prefix_p[i];
             }
-            separator++;
+            declen++;
         }
-        index++;
-        current++;
     }
-    request->url[prefixLength + separator] = '\0';
+    req_p->url[suflen + declen] = 0;
 
-    index = 0;
-    decodedHost = request->url + prefixLength;
-    current = decodedHost;
-    while (index < separator)
+    prefix_p = &req_p->url[suflen];
+    prelen = declen;
+
+    for (i = 0; i < prelen; i++)
     {
-        if (*current == '/' || *current == ':')
+        if ((prefix_p[i] == '/') || (prefix_p[i] == ':'))
         {
-            request->hostEnd = prefixLength + index;
+            req_p->hostEnd = i + suflen;
             break;
         }
-        index++;
-        current++;
     }
 
-    if (index == separator)
+    if (i == prelen)
     {
-        request->hostEnd = prefixLength + index;
-        request->pathStart = prefixLength + index;
+        req_p->pathStart = req_p->hostEnd = i + suflen;
     }
-    else if (decodedHost[index] == '/')
+    else if (prefix_p[i] == '/')
     {
-        request->pathStart = request->hostEnd;
+        req_p->pathStart = req_p->hostEnd;
     }
-    else if (decodedHost[index] == ':')
+    else if (prefix_p[i] == ':')
     {
-        current = decodedHost + index;
-        while (index < separator)
+        for (; i < prelen; i++)
         {
-            if (*current == '/')
+            if (prefix_p[i] == '/')
             {
-                request->pathStart = prefixLength + index;
+                req_p->pathStart = i + suflen;
                 break;
             }
-            index++;
-            current++;
         }
 
-        if (index == separator)
+        if (i == prelen)
         {
-            request->pathStart = prefixLength + index;
+            req_p->pathStart = i + suflen;
         }
         else
         {
-            portStart = request->hostEnd + 1;
-            port = NHTTPi_strtonum(request->url + portStart,
-                request->pathStart - portStart);
+            port = NHTTPi_strtonum(&req_p->url[req_p->hostEnd + 1],
+                (int)(req_p->pathStart - (req_p->hostEnd + 1)));
             if (port < 0)
             {
-                port = request->port;
+                port = req_p->port;
             }
-            else if (port > 0xFFFF)
+            else if (port > 65535)
             {
-                NHTTPi_SetError(info, NHTTP_ERROR_DNS);
-                goto error;
+                NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_DNS);
+                goto errend;
             }
-            request->port = (u16)port;
+            req_p->port = (u16)port;
         }
     }
 
-    hostLength = request->hostEnd - (7 + (request->secure != FALSE));
-    request->host = NHTTPi_alloc(hostLength + 1, 4);
-    if (request->host == NULL)
     {
-        NHTTPi_SetError(info, NHTTP_ERROR_ALLOC);
-        goto error;
+        u32 a_hostnameLen = (u32)(req_p->hostEnd - (req_p->secure ? 8 : 7));
+        req_p->host = NHTTPi_alloc(a_hostnameLen + 1, 4);
+        if (!req_p->host)
+        {
+            NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_ALLOC);
+            goto errend;
+        }
+        NHTTPi_memclr(req_p->host, (int)(a_hostnameLen + 1));
+        NHTTPi_memcpy(req_p->host,
+            req_p->url + (req_p->secure ? 8 : 7), (int)a_hostnameLen);
     }
-    NHTTPi_memclr(request->host, hostLength + 1);
-    NHTTPi_memcpy(request->host,
-        request->url + 7 + (request->secure != FALSE),
-        hostLength);
-    NHTTPi_memcpy(request->multipartBoundary, NHTTPi_strMultipartBound, sizeof(request->multipartBoundary));
 
-    request->method = method;
-    request->sslId = 0;
-    request->clientCertData = NULL;
-    request->clientCertSize = 0;
-    request->privateKeyData = NULL;
-    request->privateKeySize = 0;
-    request->rootCAData = NULL;
-    request->rootCASize = 0;
-    request->clientCertDefault = FALSE;
-    request->verifyOption = 0;
-    request->response->param_p = userParam;
-    request->proxyEnabled = FALSE;
-    request->recvBufferSize = 0;
-    return request;
+    NHTTPi_memcpy(req_p->multipartBoundary, NHTTPi_strMultipartBound,
+        sizeof(req_p->multipartBoundary));
+    req_p->method = method;
+    req_p->sslId = 0;
+    req_p->clientCertData = NULL;
+    req_p->clientCertSize = 0;
+    req_p->privateKeyData = NULL;
+    req_p->privateKeySize = 0;
+    req_p->rootCAData = NULL;
+    req_p->rootCASize = 0;
+    req_p->clientCertDefault = FALSE;
+    req_p->verifyOption = 0;
+    req_p->response->param_p = param_p;
+    req_p->proxyEnabled = FALSE;
+    req_p->recvBufferSize = 0;
+    return req_p;
 
-error:
-    if (request != NULL)
+errend:
+    if (req_p)
     {
-        if (request->url != NULL)
+        if (req_p->url)
         {
-            NHTTPi_free(request->url);
+            NHTTPi_free(req_p->url);
         }
-        if (request->host != NULL)
+        if (req_p->host)
         {
-            NHTTPi_free(request->host);
+            NHTTPi_free(req_p->host);
         }
-        if (request->response != NULL)
+        if (req_p->response)
         {
-            NHTTPi_free(request->response);
+            NHTTPi_free(req_p->response);
         }
-        NHTTPi_free(request);
+        NHTTPi_free(req_p);
     }
     return NULL;
 }
@@ -452,44 +428,59 @@ s32 NHTTP_SendRequestAsync(void* systemInfo, NHTTPRequestInfo* request)
     return requestId;
 }
 
-BOOL NHTTP_CancelRequestAsync(void* systemInfo, s32 requestId)
+BOOL NHTTP_CancelRequestAsync(void* sysInfo_p, s32 id)
 {
-    BOOL result = FALSE;
-    NHTTPReqInfo* reqInfo = NHTTPi_GetReqInfoP(systemInfo);
-    void* mutexInfo = NHTTPi_GetMutexInfoP(systemInfo);
-    NHTTPReqQueue* queue = reqInfo->reqQueue;
+    BOOL rc = FALSE;
+    NHTTPReqInfo* reqInfo_p = NHTTPi_GetReqInfoP(sysInfo_p);
+    void* mutexInfo_p = NHTTPi_GetMutexInfoP(sysInfo_p);
+    volatile NHTTPReqQueue* reqCurrent_p = reqInfo_p->reqQueue;
 
-    NHTTPi_lockReqList(mutexInfo);
-    if (queue != NULL && queue->requestId == requestId
-        && queue->request->cancel == 0)
+    NHTTPi_lockReqList(mutexInfo_p);
+
+    if (reqCurrent_p)
     {
-        queue->request->cancel = 1;
-        NHTTPi_SocCancel(mutexInfo, queue->request, queue->_unk10);
-        result = TRUE;
+        if (reqCurrent_p->requestId == id)
+        {
+            if (!reqCurrent_p->request->cancel)
+            {
+                reqCurrent_p->request->cancel = TRUE;
+                NHTTPi_SocCancel(mutexInfo_p, reqCurrent_p->request,
+                    reqCurrent_p->_unk10);
+                rc = TRUE;
+            }
+        }
     }
 
-    if (!result)
+    if (!rc)
     {
-        result = NHTTPi_freeReqQueue(
-            NHTTPi_GetListInfoP(systemInfo), mutexInfo, requestId);
+        NHTTPListInfo* listInfo_p = NHTTPi_GetListInfoP(sysInfo_p);
+        rc = NHTTPi_freeReqQueue(listInfo_p, mutexInfo_p, id);
     }
-    NHTTPi_unlockReqList(mutexInfo);
-    return result;
+
+    NHTTPi_unlockReqList(mutexInfo_p);
+
+    return rc;
 }
 
-void NHTTPi_cancelAllRequests(void* systemInfo)
+void NHTTPi_cancelAllRequests(void* sysInfo_p)
 {
-    NHTTPReqInfo* reqInfo = NHTTPi_GetReqInfoP(systemInfo);
-    NHTTPListInfo* listInfo = NHTTPi_GetListInfoP(systemInfo);
-    void* mutexInfo = NHTTPi_GetMutexInfoP(systemInfo);
-    NHTTPReqQueue* queue = reqInfo->reqQueue;
+    NHTTPReqInfo* reqInfo_p = NHTTPi_GetReqInfoP(sysInfo_p);
+    NHTTPListInfo* listInfo_p = NHTTPi_GetListInfoP(sysInfo_p);
+    void* mutexInfo_p = NHTTPi_GetMutexInfoP(sysInfo_p);
+    volatile NHTTPReqQueue* reqCurrent_p = reqInfo_p->reqQueue;
 
-    NHTTPi_lockReqList(mutexInfo);
-    if (queue != NULL && queue->request->cancel == 0)
+    NHTTPi_lockReqList(mutexInfo_p);
+
+    if (reqCurrent_p)
     {
-        queue->request->cancel = 1;
-        NHTTPi_SocCancel(mutexInfo, queue->request, queue->_unk10);
+        if (!reqCurrent_p->request->cancel)
+        {
+            reqCurrent_p->request->cancel = TRUE;
+            NHTTPi_SocCancel(mutexInfo_p, reqCurrent_p->request,
+                reqCurrent_p->_unk10);
+        }
     }
-    NHTTPi_allFreeReqQueue(listInfo, mutexInfo);
-    NHTTPi_unlockReqList(mutexInfo);
+
+    NHTTPi_allFreeReqQueue(listInfo_p, mutexInfo_p);
+    NHTTPi_unlockReqList(mutexInfo_p);
 }

@@ -4,13 +4,16 @@
 #include "NL/platpad.h"
 #include "types.h"
 
+extern s32* lbl_806E2288;
+extern "C" int fn_802C03FC(int button);
 extern "C" int fn_802C06C8(int buttonIndex);
 
 class PadMonkey : public PadBackend
 {
 public:
     PadMonkey(int padIndex);
-    virtual ~PadMonkey();
+    virtual int UnidentifiedClassID() { return sClassID; }
+    virtual ~PadMonkey() { }
 
     virtual bool IsConnected();
     virtual bool IsPressed(int button, bool remap);
@@ -29,7 +32,6 @@ public:
     virtual void StartRumble(float duration, float intensity, float frequency);
     virtual void StopRumble();
     virtual void Update(float dt);
-    virtual int UnidentifiedClassID();
     virtual int GetButtonCount() = 0;
 
     void SetButtonChance(int button, float pct);
@@ -51,11 +53,17 @@ class PadMonkey_80375EEC : public PadMonkey
 {
 public:
     PadMonkey_80375EEC(int padIndex);
-    virtual ~PadMonkey_80375EEC();
+    virtual ~PadMonkey_80375EEC() { }
 
-    virtual int GetButtonIndex(int button, bool remap);
-    virtual int GetButtonMask(int buttonIndex);
-    virtual int GetButtonCount();
+    virtual int GetButtonIndex(int button, bool remap)
+    {
+        return fn_802C03FC(remap ? lbl_806E2288[button] : button);
+    }
+    virtual int GetButtonMask(int buttonIndex)
+    {
+        return fn_802C06C8(buttonIndex);
+    }
+    virtual int GetButtonCount() { return 16; }
 
     /* 0x3C */ float m_prevPressure[16];
     /* 0x7C */ float m_currPressure[16];

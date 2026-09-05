@@ -101,11 +101,6 @@ void HBMUpdateSoundArchivePlayer(void)
     gpHomeButton->updateSoundArchivePlayer();
 }
 
-void HBMSetSoundVolume(f32 volume)
-{
-    gpHomeButton->setSoundVolume(volume);
-}
-
 void HBMStopSound(void)
 {
     gpHomeButton->stopSound(false);
@@ -553,42 +548,6 @@ void HomeButton::updateSoundArchivePlayer()
     {
         nw4hbm::ut::detail::AutoLock<OSMutex> lock(sMutex);
         mpSoundArchivePlayer->Update();
-    }
-}
-
-void HomeButton::fadeout_sound(f32 gain)
-{
-    if (mSelectBtnNum == HBM_SELECT_BTN3)
-    {
-        return;
-    }
-
-    if (mEndInitSoundFlag)
-    {
-        AXSetAuxAReturnVolume(gain * 32768.0f);
-    }
-
-    if (mpSoundArchivePlayer != NULL)
-    {
-        nw4hbm::ut::detail::AutoLock<OSMutex> lock(sMutex);
-
-        for (int i = 0; i < mpSoundArchivePlayer->GetSoundPlayerCount(); i++)
-        {
-            mpSoundArchivePlayer->GetSoundPlayer(i).SetVolume(gain);
-        }
-    }
-}
-
-void HomeButton::setSoundVolume(f32 volume)
-{
-    AXSetMasterVolume(volume * 32768.0f);
-
-    if (mpSoundArchivePlayer != NULL)
-    {
-        for (int i = 0; i < mpSoundArchivePlayer->GetSoundPlayerCount(); i++)
-        {
-            mpSoundArchivePlayer->GetSoundPlayer(i).SetVolume(volume);
-        }
     }
 }
 
@@ -1195,9 +1154,9 @@ void HomeButton::init_sound()
         mpHBInfo->sound_callback(0, 0);
     }
 
-    mAppVolume[0] = AXGetMasterVolume();
-    mAppVolume[1] = AXGetAuxAReturnVolume();
-    mAppVolume[2] = AXGetAuxBReturnVolume();
+    mAppVolume[0] = AXGetAuxAReturnVolume();
+    mAppVolume[1] = AXGetAuxBReturnVolume();
+    mAppVolume[2] = AXGetAuxCReturnVolume();
 
     AXFXGetHooks(&mAxFxAlloc, &mAxFxFree);
     AXGetAuxACallback(&mAuxCallback, &mpAuxContext);
@@ -1212,9 +1171,9 @@ void HomeButton::init_sound()
 
     AXFXReverbHiInit(&mAxFxReverb);
     AXRegisterAuxACallback(&AXFXReverbHiCallback, &mAxFxReverb);
-    AXSetMasterVolume(0x8000);
-    AXSetAuxAReturnVolume(0);
+    AXSetAuxAReturnVolume(0x8000);
     AXSetAuxBReturnVolume(0);
+    AXSetAuxCReturnVolume(0);
 
     if (mpHBInfo->sound_callback != NULL)
     {
@@ -2040,7 +1999,7 @@ void HomeButton::update(const HBMControllerData* pController)
         {
             if (pController->wiiCon[i].kpad->wpad_err != WPAD_ENODEV)
             {
-                if (mPadDrawTime[i] > 5)
+                if (mPadDrawTime[i] > static_cast<int>(5.0f / getInstance()->getHBMDataInfo()->frameDelta + 0.5f))
                 {
                     if (pController->wiiCon[i].kpad->wpad_err == WPAD_ESUCCESS)
                     {
@@ -2237,10 +2196,7 @@ void HomeButton::update_controller(int id)
             {
                 mpPaneManager->update(id, 0.0f, -180.0f, 0, 0, 0, 0);
 
-#if HBM_REVISION > 1
-                mSelectAnmNum = 4;
-                mpPairGroupAnmController[mSelectAnmNum]->start();
-#endif
+                mpPairGroupAnmController[4]->start();
 
                 mSelectAnmNum = 2;
                 mpPairGroupAnmController[mSelectAnmNum]->start();
@@ -2363,7 +2319,7 @@ void HomeButton::update_controller(int id)
         HBController* pCon = mpController[id]->getController();
         if (pCon->trig)
         {
-            mMsgCount = 0xE10;
+            mMsgCount = iReConnectTime;
         }
     }
 }
@@ -2886,15 +2842,11 @@ void HomeButton::startTrigEvent(const char* pPane)
             case 9:
                 if (mSequence == eSeq_Control)
                 {
-#if HBM_REVISION > 1
-                    mSelectAnmNum = 4;
-                    mpPairGroupAnmController[mSelectAnmNum]->start();
-#endif
+                    mpPairGroupAnmController[4]->start();
+                    mpPairGroupAnmController[11]->start();
 
                     mSelectAnmNum = 2;
                     mpPairGroupAnmController[mSelectAnmNum]->start();
-
-                    mpPairGroupAnmController[11]->start();
 
                     mState = 10;
                     mSequence = eSeq_Normal;
@@ -3072,9 +3024,10 @@ void HomeButton::startTrigEvent(const char* pPane)
                     mOnPaneVibFrame[i] = 0.0f;
                     mOnPaneVibWaitFrame[i] = 0.0f;
                     getController(i)->stopMotor();
+                    getController(i)->setEnableRumble(false);
                 }
 
-                mWaitStopMotorCount = 30;
+                mWaitStopMotorCount = 30.0f / getInstance()->getHBMDataInfo()->frameDelta;
 
                 mpLayout->GetRootPane()->FindPaneByName(scFuncTextPaneName[0], true)->SetVisible(true);
 
@@ -3585,6 +3538,29 @@ void HomeButton::deleteSound()
     }
 
     nw4hbm::snd::SoundSystem::ShutdownSoundSystem();
+}
+
+void HomeButton::fadeout_sound(f32 gain)
+{
+    if (mSelectBtnNum == HBM_SELECT_BTN3)
+    {
+        return;
+    }
+
+    if (mEndInitSoundFlag)
+    {
+        AXSetAuxAReturnVolume(gain * 32768.0f);
+    }
+
+    if (mpSoundArchivePlayer != NULL)
+    {
+        nw4hbm::ut::detail::AutoLock<OSMutex> lock(sMutex);
+
+        for (int i = 0; i < mpSoundArchivePlayer->GetSoundPlayerCount(); i++)
+        {
+            mpSoundArchivePlayer->GetSoundPlayer(i).SetVolume(gain);
+        }
+    }
 }
 
 } // namespace homebutton

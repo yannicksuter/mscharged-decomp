@@ -10,9 +10,10 @@
 
 extern "C" TLInstance* fn_8030677C(FEPresentation* pPresentation, unsigned long Level1, unsigned long Level2,
     unsigned long Level3, unsigned long Level4, unsigned long Level5, unsigned long Level6);
-extern "C" bool fn_80253E18();
-extern "C" void fn_802533F0();
-extern "C" void fn_80253474();
+class TU80252180Scene;
+extern "C" TU80252180Scene* fn_80253E18();
+extern "C" void fn_802533F0(TU80252180Scene* scene);
+extern "C" void fn_80253474(TU80252180Scene* scene);
 
 extern BaseGameSceneManager* lbl_806E1838;
 
@@ -44,8 +45,9 @@ GameResultsScene::GameResultsScene()
 GameResultsScene::~GameResultsScene()
 {
     g_pFEInput->PopExclusiveInputLock(this);
-    if (fn_80253E18())
-        fn_802533F0();
+    TU80252180Scene* scene = fn_80253E18();
+    if (scene != 0)
+        fn_802533F0(scene);
 }
 
 void GameResultsScene::fn_8020A494(UnidentifiedGameResultsData* data, UnidentifiedResultsListener* listener, UnidentifiedGameClock* clock)
@@ -78,8 +80,9 @@ void GameResultsScene::SceneCreated()
         text = &UnidentifiedFallbackTextInstance;
     mTitleText = text;
     mTitleText->SetStringId("CUP_GAME_RESULTS");
-    if (fn_80253E18())
-        fn_80253474();
+    TU80252180Scene* scene = fn_80253E18();
+    if (scene != 0)
+        fn_80253474(scene);
 }
 
 void GameResultsScene::Update(float dt)

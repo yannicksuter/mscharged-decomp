@@ -130,6 +130,7 @@ enum {
 
 #define SO_SOL_CONFIG 0xfffe
 
+#define SO_SO_SNDBUF 0x1001
 #define SO_SO_RCVBUF 0x1002
 
 #define SO_IPPROTO_ICMP 1
@@ -219,9 +220,9 @@ typedef struct SOInAddr {
 } SOInAddr;
 
 typedef struct IPAddrEntry {
-  SOInAddr addr;
-  SOInAddr netmask;
-  SOInAddr broadcast;
+  u8 addr[4];
+  u8 netMask[4];
+  u8 bcastAddr[4];
 } IPAddrEntry;
 
 typedef struct SOSockAddr {

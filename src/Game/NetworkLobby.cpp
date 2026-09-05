@@ -24,7 +24,7 @@ extern "C"
     int fn_8004F594(int channel, const char* format, ...);
     u32 fn_80124238();
     u32 fn_8011C1D0();
-    int fn_8025BDA0();
+    bool fn_8025BDA0();
     int fn_8032CA1C(
         void* registry, int type, UnidentifiedNetworkMessageReceiver* receiver);
     void fn_8032CA2C(void* registry, int type);
@@ -749,6 +749,6 @@ int NetworkLobby_80133634::ReceiverVirtual00(
 
 static TweakValueIntImpl_804FD898 sTimeoutFindingMaxPlayersAcceptMinTweak(
     "s_nTimeoutFindingMaxPlayersAcceptMin", "Network/DWCLobby",
-    &s_nTimeoutFindingMaxPlayersAcceptMin);
+    &s_nTimeoutFindingMaxPlayersAcceptMin, true);
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

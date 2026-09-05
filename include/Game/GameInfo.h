@@ -203,9 +203,10 @@ public:
     /* 0x0121 */ u8 unknown_0x121;
     /* 0x0122 */ u8 unknown_0x122;
     /* 0x0123 */ u8 unknown_0x123;
-    /* 0x0124 */ u8 unknown_0x124;
-    /* 0x0125 */ u8 unknown_0x125;
-    /* 0x0126 */ u8 unknown_0x126[2];
+    /* 0x0124 */ bool unknown_0x124;
+    /* 0x0125 */ bool unknown_0x125;
+    /* 0x0126 */ bool unknown_0x126;
+    /* 0x0127 */ u8 unknown_0x127;
     /* 0x0128 */ GameInfoSlotEntry unknown_0x128[4];
     /* 0x0278 */ int unknown_0x278;
     /* 0x027C */ u8 unknown_0x27C;

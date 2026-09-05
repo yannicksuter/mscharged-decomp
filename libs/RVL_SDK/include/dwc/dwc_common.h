@@ -14,6 +14,8 @@ extern "C"
         char* string, char separator);
     int DWC_GetCommonValueString(const char* key, char* value, const char* string,
         char separator);
+    u32 DWCi_GetMathRand32(u32 max);
+    u32 DWCi_WStrLen(const u16* string);
 
 #ifdef __cplusplus
 }

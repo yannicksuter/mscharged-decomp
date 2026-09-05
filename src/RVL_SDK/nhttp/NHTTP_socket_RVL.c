@@ -11,8 +11,8 @@ void NHTTPi_SetSSLError(NHTTPBgnEndInfo* info, s32 error);
 void* NHTTPi_memcpy(void* destination, const void* source, u32 size);
 void* NHTTPi_memclr(void* destination, u32 size);
 
-s32 NHTTPi_SocSSLConnect(NHTTPBgnEndInfo* info, void* mutexInfo,
-    NHTTPRequestInfo* request, s32 socket);
+s32 NHTTPi_SocSSLConnect(NHTTPBgnEndInfo* bgnEndInfo_p, void* mutexInfo_p,
+    NHTTPRequestInfo* req_p, const s32 socket);
 
 s32 NHTTPi_SocOpen(NHTTPRequestInfo* request)
 {
@@ -74,41 +74,41 @@ s32 NHTTPi_SocConnect(NHTTPBgnEndInfo* info, void* mutexInfo,
     return result;
 }
 
-s32 NHTTPi_SocSSLConnect(NHTTPBgnEndInfo* info, void* mutexInfo,
-    NHTTPRequestInfo* request, s32 socket)
+s32 NHTTPi_SocSSLConnect(NHTTPBgnEndInfo* bgnEndInfo_p, void* mutexInfo_p,
+    NHTTPRequestInfo* req_p, const s32 socket)
 {
-    BOOL complete = FALSE;
-    NHTTPConnectionInfo* connection;
-    s32 result;
+    BOOL done = FALSE;
 
-    request->sslId = SSLNew(request->verifyOption, request->host);
-    if (request->clientCertDefault == TRUE)
+    req_p->sslId = SSLNew(req_p->verifyOption, req_p->host);
+    if (req_p->clientCertDefault == TRUE)
     {
-        SSLSetClientCertDefault(request->sslId);
+        SSLSetClientCertDefault(req_p->sslId);
     }
-    else if (request->clientCertData != NULL && request->privateKeyData != NULL)
+    else if (req_p->clientCertData != NULL && req_p->privateKeyData != NULL)
     {
-        SSLSetClientCert(request->sslId, request->clientCertData, request->clientCertSize, request->privateKeyData, request->privateKeySize);
+        SSLSetClientCert(req_p->sslId, req_p->clientCertData,
+            req_p->clientCertSize, req_p->privateKeyData,
+            req_p->privateKeySize);
     }
-    if (request->rootCAData != NULL)
+    if (req_p->rootCAData != NULL)
     {
-        SSLSetRootCA(request->sslId, request->rootCAData, request->rootCASize);
+        SSLSetRootCA(req_p->sslId, req_p->rootCAData, req_p->rootCASize);
     }
     else
     {
-        SSLSetRootCADefault(request->sslId);
+        SSLSetRootCADefault(req_p->sslId);
     }
-    result = SSLConnect(request->sslId, socket);
-    if (result < -1)
+    if (SSLConnect(req_p->sslId, socket) < -1)
     {
         return -1001;
     }
 
-    while (!complete)
+    while (!done)
     {
-        connection = NHTTPi_Request2Connection(mutexInfo, request);
-        result = SSLDoHandshake(request->sslId);
-        NHTTPi_SetSSLError(info, result);
+        NHTTPConnectionInfo* connection =
+            NHTTPi_Request2Connection(mutexInfo_p, req_p);
+        s32 result = SSLDoHandshake(req_p->sslId);
+        NHTTPi_SetSSLError(bgnEndInfo_p, result);
         if (connection != NULL)
         {
             connection->sslError = result;
@@ -117,7 +117,7 @@ s32 NHTTPi_SocSSLConnect(NHTTPBgnEndInfo* info, void* mutexInfo,
         switch (result)
         {
         case 0:
-            complete = TRUE;
+            done = TRUE;
             break;
         case -7:
         case -3:
@@ -231,39 +231,39 @@ s32 NHTTPi_SocRecv_sub(s32 socket, char* o_buf, u32 i_bufSize, s32 flags)
     return total_read;
 }
 
-s32 NHTTPi_SocRecv(NHTTPRequestInfo* request, s32 socket, char* buffer,
-    u32 bufferSize, s32 flags)
+int NHTTPi_SocRecv(const NHTTPRequestInfo* req_p, const int socket, char* buf_p,
+    const int len, const int flags)
 {
-    s32 result;
+    int error;
 
-    if (request->sslId > 0)
+    if (req_p->sslId > 0)
     {
-        result = SSLRead(request->sslId, buffer, bufferSize);
+        error = SSLRead(req_p->sslId, buf_p, len);
     }
     else
     {
-        result = NHTTPi_SocRecv_sub(socket, buffer, bufferSize, flags);
+        error = NHTTPi_SocRecv_sub(socket, buf_p, len, flags);
     }
-    if (result < 0)
+    if (error < 0)
     {
-        if (request->cancel != FALSE)
+        if (req_p->cancel != FALSE)
         {
             return -1002;
         }
-        if (request->sslId > 0)
+        if (req_p->sslId > 0)
         {
-            if (result == -7 || result == -6)
+            if (error == -7 || error == -6)
             {
                 return 0;
             }
         }
-        else if (result == SO_ENOTCONN)
+        else if (error == SO_ENOTCONN)
         {
             return 0;
         }
         return -1001;
     }
-    return result;
+    return error;
 }
 
 s32 NHTTPi_SocSend_sub(s32 socket, const char* i_buf, u32 i_bufSize,
@@ -367,39 +367,39 @@ s32 NHTTPi_SocSend_sub(s32 socket, const char* i_buf, u32 i_bufSize,
     return total_write;
 }
 
-s32 NHTTPi_SocSend(NHTTPRequestInfo* request, s32 socket,
-    const char* buffer, u32 bufferSize, s32 flags)
+int NHTTPi_SocSend(const NHTTPRequestInfo* req_p, const int socket,
+    const char* buf_p, const int len, const int flags)
 {
-    s32 result;
+    int error;
 
-    if (request->sslId > 0)
+    if (req_p->sslId > 0)
     {
-        result = SSLWrite(request->sslId, buffer, bufferSize);
+        error = SSLWrite(req_p->sslId, buf_p, len);
     }
     else
     {
-        result = NHTTPi_SocSend_sub(socket, buffer, bufferSize, flags);
+        error = NHTTPi_SocSend_sub(socket, buf_p, len, flags);
     }
-    if (result < 0)
+    if (error < 0)
     {
-        if (request->cancel != FALSE)
+        if (req_p->cancel != FALSE)
         {
             return -1002;
         }
-        if (request->sslId > 0)
+        if (req_p->sslId > 0)
         {
-            if (result == -7 || result == -6)
+            if (error == -7 || error == -6)
             {
                 return 0;
             }
         }
-        else if (result == SO_ENOTCONN)
+        else if (error == SO_ENOTCONN)
         {
             return 0;
         }
         return -1001;
     }
-    return result;
+    return error;
 }
 
 void NHTTPi_SocCancel(void* mutexInfo, NHTTPRequestInfo* request, s32 socket)

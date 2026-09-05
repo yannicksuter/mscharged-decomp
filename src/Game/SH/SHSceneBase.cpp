@@ -35,9 +35,10 @@ extern "C" void fn_80230DE0(UnidentifiedScrollWidget* widget, int value);
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" void fn_801CC9B0(TU80219248Component* component, int value0, int value1);
-extern "C" bool fn_80253E18();
-extern "C" void fn_80253474();
-extern "C" void fn_802534BC(int value0, int value1);
+class TU80252180Scene;
+extern "C" TU80252180Scene* fn_80253E18();
+extern "C" void fn_80253474(TU80252180Scene* scene);
+extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
 
 extern void* lbl_806E1E28;
 extern "C" cGlobalPad* fn_802C082C(void* owner, int pad);
@@ -302,8 +303,9 @@ void UnidentifiedSHSceneBase::SceneCreated()
 
     if (mUnidentified28 != 8 && mUnidentified28 != 0xD)
     {
-        if (fn_80253E18())
-            fn_802534BC(0, 1);
+        TU80252180Scene* scene = fn_80253E18();
+        if (scene != 0)
+            fn_802534BC(scene, 0, true);
     }
 
     char buffer[0x40];
@@ -633,8 +635,7 @@ void UnidentifiedSHSceneBase::fn_8026AE98(int index, void* context)
     mPresentation->Update(0.0f);
     if (mUnidentified28 != 0xD)
     {
-        fn_80253E18();
-        fn_80253474();
+        fn_80253474(fn_80253E18());
     }
     if (mUnidentified28 == 8)
     {

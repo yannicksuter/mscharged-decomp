@@ -50,19 +50,19 @@ void Console_VFPrintf(ConsoleOutputType type, ConsoleHandle console, const char*
 void Console_Printf(ConsoleHandle console, const char* format, ...);
 s32 Console_GetTotalLines(ConsoleHandle console);
 
-inline u16 Console_GetViewHeight(ConsoleHandle console) {
+static inline u16 Console_GetViewHeight(ConsoleHandle console) {
     NW4HBMAssertHeaderPointerNonnull_FileLine(console, "console.h", 434);
     return console->viewLines;
 }
 
-inline bool Console_SetVisible(ConsoleHandle console, bool isVisible) {
+static inline bool Console_SetVisible(ConsoleHandle console, bool isVisible) {
     NW4HBMAssertHeaderPointerNonnull_FileLine(console, "console.h", 497);
     bool before = console->isVisible;
     console->isVisible = isVisible;
     return before;
 }
 
-inline s32 Console_SetViewBaseLine(ConsoleHandle console, s32 line) {
+static inline s32 Console_SetViewBaseLine(ConsoleHandle console, s32 line) {
     NW4HBMAssertHeaderPointerNonnull_FileLine(console, "console.h", 557);
     s32 before = console->viewTopLine;
     console->viewTopLine = line;

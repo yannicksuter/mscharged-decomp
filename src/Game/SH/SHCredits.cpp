@@ -17,7 +17,7 @@ extern BaseGameSceneManager* lbl_806E1838;
 extern TLComponentInstance lbl_80580030;
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" void fn_80253284(int value);
+extern "C" void fn_80253284(bool value);
 extern "C" bool fn_80273B00();
 extern "C" int fn_803693B4();
 

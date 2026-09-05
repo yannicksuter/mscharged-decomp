@@ -6,8 +6,9 @@
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" void fn_802081C0();
-extern "C" void fn_80253474(void* object);
-extern "C" void* fn_80253E18();
+class TU80252180Scene;
+extern "C" void fn_80253474(TU80252180Scene* scene);
+extern "C" TU80252180Scene* fn_80253E18();
 
 extern TLComponentInstance* lbl_80578450[4];
 
@@ -140,7 +141,7 @@ void TU80203D70Scene::fn_802069F0(int, void* context)
         fn_801CBCA0(0x6E5C794C, 0, 0, 1);
         mUnidentified5EC = 2;
 
-        void* object = fn_80253E18();
+        TU80252180Scene* object = fn_80253E18();
         if (object != 0)
         {
             fn_80253474(object);

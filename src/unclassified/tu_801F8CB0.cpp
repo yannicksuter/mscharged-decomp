@@ -4,8 +4,9 @@
 #include "Game/FE/tlComponentInstance.h"
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" void* fn_80253E18();
-extern "C" void fn_802534BC(void* object, int value, bool enabled);
+class TU80252180Scene;
+extern "C" TU80252180Scene* fn_80253E18();
+extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
 
 extern TLComponentInstance* lbl_80578450[4];
 
@@ -17,7 +18,7 @@ TU801F8CB0Overlay::TU801F8CB0Overlay(ScreenMovement movement)
     , mUnidentified0E5(false)
     , mState(0)
 {
-    void* object = fn_80253E18();
+    TU80252180Scene* object = fn_80253E18();
     if (object != 0)
     {
         fn_802534BC(object, 0, true);

@@ -28,6 +28,7 @@ struct UnidentifiedTweakLoadState
 
     int mCount;
     UnidentifiedTweakLoadEntry_8056BA04 mEntries[32];
+    u32 mUnidentified1504;
 };
 
 extern UnidentifiedTweakLoadState lbl_8056BA00;

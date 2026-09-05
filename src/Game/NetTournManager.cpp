@@ -34,12 +34,13 @@ static TweakValueImpl_804F4DC8 sDefaultTimeToStartGamesTweak(
     &s_fDefaultTimeToStartGames);
 static TweakValueIntImpl_804FD898 sSendGameInProgressUpdateEveryTweak(
     "s_nSendGameInProgressUpdateEvery", "Network/Tournament",
-    &s_nSendGameInProgressUpdateEvery);
+    &s_nSendGameInProgressUpdateEvery, true);
 static TweakValueIntImpl_804FD898 sSendGameInProgressMajorUpdateTweak(
     "s_nSendGameInProgressMajorUpdate", "Network/Tournament",
-    &s_nSendGameInProgressMajorUpdate);
+    &s_nSendGameInProgressMajorUpdate, true);
 static TweakValueIntImpl_804FD898 sOverrideCupPersonaTweak(
-    "s_nOverrideCupPersona", "Network/Tournament", &s_nOverrideCupPersona);
+    "s_nOverrideCupPersona", "Network/Tournament", &s_nOverrideCupPersona,
+    true);
 
 void NetMessagePauseRequest_8050AD7C::Serialize(
     UnidentifiedMessageSerializer* serializer)

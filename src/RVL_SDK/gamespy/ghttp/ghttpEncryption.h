@@ -99,13 +99,6 @@ GHIEncryptionResult ghiEncryptorSslDecryptFunc(
     struct GHIConnection* connection, struct GHIEncryptor* theEncryptor,
     const char* theEncryptedBuffer, int* theEncryptedLength,
     char* theDecryptedBuffer, int* theDecryptedLength);
-GHIEncryptionResult ghiEncryptorSslEncryptSend(
-    struct GHIConnection* connection, struct GHIEncryptor* theEncryptor,
-    const char* thePlainTextBuffer, int thePlainTextLength, int* theBytesSent);
-GHIEncryptionResult
-ghiEncryptorSslDecryptRecv(struct GHIConnection* connection,
-                           struct GHIEncryptor* theEncryptor,
-                           char* theDecryptedBuffer, int* theDecryptedLength);
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////

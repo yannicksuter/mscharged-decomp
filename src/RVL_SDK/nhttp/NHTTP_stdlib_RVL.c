@@ -238,9 +238,11 @@ s32 NHTTPi_strToInt(const char* string, s32 length)
     return result;
 }
 
-s32 NHTTPi_intToStr(char* destination, u32 value)
+s32 NHTTPi_intToStr(char* p_p, u32 n)
 {
-    u32 powers[9] = {
+    int i, b;
+    unsigned int x;
+    const unsigned int rdx[9] = {
         1000000000,
         100000000,
         10000000,
@@ -251,29 +253,27 @@ s32 NHTTPi_intToStr(char* destination, u32 value)
         100,
         10,
     };
-    s32 length = 0;
-    BOOL started = FALSE;
-    s32 i;
-    u32 digit;
+    int len = 0;
+
+    b = FALSE;
 
     for (i = 0; i < 9; i++)
     {
-        if (value >= powers[i])
+        if (n >= rdx[i])
         {
-            digit = value / powers[i];
-            value -= digit * powers[i];
-            started = TRUE;
-            destination[length] = digit + '0';
-            length++;
+            x = n / rdx[i];
+            n -= x * rdx[i];
+            b = TRUE;
+            p_p[len++] = (char)(x + '0');
         }
-        else if (started)
+        else if (b)
         {
-            destination[length] = '0';
-            length++;
+            p_p[len++] = '0';
         }
     }
-    destination[length] = value + '0';
-    return length + 1;
+    p_p[len++] = (char)(n + '0');
+
+    return len;
 }
 
 s32 NHTTPi_compareToken(const char* string, const char* token)
@@ -326,37 +326,32 @@ s32 NHTTPi_strtonum(const char* string, s32 length)
     return digitCount == 0 ? -1 : result;
 }
 
-s32 NHTTPi_memfind(const char* buffer, s32 bufferLength,
-    const char* pattern, s32 patternLength)
+int NHTTPi_memfind(
+    const char* p_p, int size, const char* pattern_p, int patternsize)
 {
-    const char* bufferCursor;
-    s32 positionCount;
-    s32 position;
-    s32 matched;
+    int i, j;
+    char const* m;
 
-    if (bufferLength < patternLength)
+    if (size < patternsize)
     {
         return -1;
     }
 
-    positionCount = bufferLength - patternLength + 1;
-    for (position = 0; position < positionCount; position++)
+    for (i = 0; i < size - patternsize + 1; i++)
     {
-        if (pattern[0] == buffer[position])
+        if (p_p[i] == pattern_p[0])
         {
-            bufferCursor = &buffer[position + 1];
-            matched = 1;
+            m = &p_p[i];
 
-            while (matched < patternLength)
+            for (j = 1; j < patternsize; j++)
             {
-                if (*bufferCursor != pattern[matched])
+                if (m[j] != pattern_p[j])
                 {
                     break;
                 }
-                matched++;
-                bufferCursor++;
             }
-            if (matched == patternLength)
+
+            if (j == patternsize)
             {
                 return 0;
             }

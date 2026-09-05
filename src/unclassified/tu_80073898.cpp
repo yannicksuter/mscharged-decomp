@@ -2,6 +2,7 @@
 #include "NL/glx/GXMaterialShadowTweaks.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
+#include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
 #include "unclassified/tu_80073898.h"
@@ -10,6 +11,8 @@
 
 extern "C" void fn_802C7018(
     void*, char*, unsigned long, const char*);
+
+extern "C" const float lbl_806E373C;
 
 GXMaterialColourTweak_804FC520::~GXMaterialColourTweak_804FC520()
 {
@@ -44,14 +47,28 @@ void* GXMaterialColourTweak_804FC520::UnidentifiedVirtual20()
     return &value;
 }
 
-void GXMaterialColourTweak_804FC520::UnidentifiedVirtual18()
+void GXMaterialColourTweak_804FC520::UnidentifiedVirtual24(
+    char* buffer, unsigned long size)
 {
+    nlSNPrintf(buffer, size, "%d", value);
 }
 
 void GXMaterialColourTweak_804FC520::UnidentifiedVirtual28(
     const char* string)
 {
     value = atoi(string);
+}
+
+void GXMaterialColourTweak_804FC520::UnidentifiedVirtual14(
+    float* minimum, float* maximum, float* increment)
+{
+    *minimum = lbl_806E373C;
+    *maximum = lbl_806E373C;
+    *increment = lbl_806E373C;
+}
+
+void GXMaterialColourTweak_804FC520::UnidentifiedVirtual18()
+{
 }
 
 extern "C" void fn_800739F0(

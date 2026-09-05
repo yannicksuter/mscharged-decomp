@@ -72,6 +72,60 @@ static BOOL addHdrList(NHTTPHeader** list, NHTTPBgnEndInfo* info, char* name,
     return TRUE;
 }
 
+static char incAscii(u8 c)
+{
+    c++;
+    if (c == 'z' + 1)
+    {
+        c = '0';
+    }
+    else if (c == 'Z' + 1)
+    {
+        c = 'a';
+    }
+    else if (c == '9' + 1)
+    {
+        c = 'A';
+    }
+
+    return (char)c;
+}
+
+static BOOL checkTagPost(NHTTPRequestInfo* req_p, const char* value_p, u32 length)
+{
+    int n;
+    char c;
+
+    if (NHTTPi_memfind(value_p, (int)length,
+            &req_p->multipartBoundary[2], LEN_POSTBOUND)
+        < 0)
+    {
+        return TRUE;
+    }
+
+    for (n = 2 + LEN_POSTBOUND - 1; n >= 2; n--)
+    {
+        for (c = req_p->multipartBoundary[n];;)
+        {
+            c = incAscii((u8)c);
+            req_p->multipartBoundary[n] = c;
+
+            if (c == NHTTPi_strMultipartBound[n])
+            {
+                break;
+            }
+            if (NHTTPi_memfind(value_p, (int)length,
+                    &req_p->multipartBoundary[2], LEN_POSTBOUND)
+                < 0)
+            {
+                return TRUE;
+            }
+        }
+    }
+
+    return FALSE;
+}
+
 NHTTPHeader* NHTTPi_getHdrFromList(NHTTPHeader** list)
 {
     NHTTPHeader* header = *list;
@@ -103,95 +157,33 @@ BOOL NHTTP_AddHeaderField(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
     return addHdrList(&request->headers, info, name, value);
 }
 
-BOOL NHTTP_AddPostDataAscii(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
-    char* name, char* value)
+BOOL NHTTP_AddPostDataAscii(NHTTPRequestInfo* req_p,
+    NHTTPBgnEndInfo* bgnEndInfo_p, char* label_p, char* value_p)
 {
-    BOOL boundaryFound;
-    s32 index;
-    const char* initial;
-    char initialChar;
-    char nextChar;
-    BOOL result;
-    s32 valueLength;
+    int rc = FALSE;
+    u32 length = 0;
 
-    result = FALSE;
-    valueLength = 0;
-
-    if (request->state != 0)
+    if (req_p->state != 0)
     {
         return FALSE;
     }
-    if (request->isRawData)
+    if (req_p->isRawData)
     {
         return FALSE;
     }
 
-    if (value != NULL)
+    if (value_p)
     {
-        valueLength = NHTTPi_strlen(value);
+        length = (u32)NHTTPi_strlen(value_p);
     }
-
-    if (NHTTPi_memfind(value, valueLength, request->multipartBoundary + 2, 18) < 0)
+    if (checkTagPost(req_p, value_p, length))
     {
-        boundaryFound = TRUE;
-    }
-    else
-    {
-        initial = NHTTPi_strMultipartBound + 19;
-        index = 19;
-
-        do
+        rc = addHdrList(&req_p->postData, bgnEndInfo_p, label_p, value_p);
+        if (rc)
         {
-            initialChar = *initial;
-            nextChar = request->multipartBoundary[index];
-            do
-            {
-                int next;
-
-                next = (u8)nextChar + 1;
-                if ((u8)next == '{')
-                {
-                    next = '0';
-                }
-                else if ((u8)next == '[')
-                {
-                    next = 'a';
-                }
-                else if ((u8)next == ':')
-                {
-                    next = 'A';
-                }
-
-                nextChar = next;
-                request->multipartBoundary[index] = nextChar;
-                if (nextChar == initialChar)
-                {
-                    break;
-                }
-                if (NHTTPi_memfind(value, valueLength, request->multipartBoundary + 2, 18)
-                    < 0)
-                {
-                    boundaryFound = TRUE;
-                    goto boundary_done;
-                }
-            } while (TRUE);
-
-            index--;
-            initial--;
-        } while (index >= 2);
-
-        boundaryFound = FALSE;
-    }
-
-boundary_done:
-    if (boundaryFound)
-    {
-        result = addHdrList(&request->postData, info, name, value);
-        if (result)
-        {
-            request->postData->next->length = valueLength;
+            req_p->postData->next->length = length;
         }
     }
 
-    return result;
+    return rc;
 }

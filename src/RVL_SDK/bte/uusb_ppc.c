@@ -62,13 +62,13 @@ typedef struct
 
 static void uusb_ReleaseCmdBufferPool(void);
 static void uusb_ReleaseAclBufferPool(void);
-static void uusb_CloseDeviceCB(IPCResult result, void* p_data);
-static void uusb_ReadIntrDataCB(IPCResult result, void* p_data);
-static void uusb_ReadBulkDataCB(IPCResult result, void* p_data);
+static void uusb_CloseDeviceCB(long result, void* p_data);
+static void uusb_ReadIntrDataCB(long ret, void* p_args);
+static void uusb_ReadBulkDataCB(long ret, void* p_args);
 static void uusb_issue_bulk_read(void);
 static void uusb_issue_intr_read(void);
-static void uusb_WriteCtrlDataCB(IPCResult result, void* p_data);
-static void uusb_WriteBulkDataCB(IPCResult result, void* p_data);
+static void uusb_WriteCtrlDataCB(long result, void* p_data);
+static void uusb_WriteBulkDataCB(long result, void* p_data);
 static long uusb_get_devId(int vid, int pid);
 
 static tUUSB_CB usb;
@@ -149,7 +149,7 @@ static void uusb_ReleaseAclBufferPool(void)
     usb.acl_buffer_pool = GKI_INVALID_POOL;
 }
 
-static void uusb_CloseDeviceCB(IPCResult result, void* p_data)
+static void uusb_CloseDeviceCB(long result, void* p_data)
 {
     usb.bulkEndpoint1 = 0;
     usb.bulkEndpoint2 = 0;
@@ -166,13 +166,16 @@ static void uusb_CloseDeviceCB(IPCResult result, void* p_data)
         (*usb.cback)(4, result);
 }
 
-static void uusb_ReadIntrDataCB(IPCResult result, void* p_data)
+static void uusb_ReadIntrDataCB(long ret, void* p_args)
 {
-    int sp14 = 0;
-    UINT32 len;
-    void* p_buffer = NULL;
-    HC_BT_HDR* p_buf = p_data;
+    HC_BT_HDR* p_buf = NULL;
+    HC_BT_HDR* p_buf1 = NULL;
+    HC_BT_HDR* p_recv_buf = p_args;
+    char* p_data = NULL;
     UINT8* p;
+    int i;
+    int len = 0;
+    unsigned long cp_len = 0;
 
     UUSBDBG0("HCISU_LOG: uusb_ReadIntrDataCB called\n");
     usb.reading_intr_data = FALSE;
@@ -181,125 +184,123 @@ static void uusb_ReadIntrDataCB(IPCResult result, void* p_data)
     {
         UUSBDBG0("HCISU_ERR: uusb_ReadIntrDataCB: usb_state != UUSB_PPC_OPENED_ST\n");
         UUSBDBG0("HCISU_ERR: ************\n* uusb_ReadIntrDataCB(): usb_state != UUSB_PPC_OPENED_ST - stop reading\n************\n");
-        GKI_freebuf(p_buf);
-        p_buf = NULL;
+        GKI_freebuf(p_recv_buf);
+        p_recv_buf = NULL;
         uusb_ReleaseCmdBufferPool();
 
         return;
     }
 
-    if (p_buf == NULL)
+    if (p_recv_buf == NULL)
         goto end;
 
-    if (result <= 0)
+    if (ret <= 0)
     {
-        UUSBDBG("HCISU_ERR: uusb_ReadIntrDataCB(): Got Error code %d\n", result);
-        GKI_freebuf(p_buf);
-        p_buf = NULL;
+        UUSBDBG("HCISU_ERR: uusb_ReadIntrDataCB(): Got Error code %d\n", ret);
+        GKI_freebuf(p_recv_buf);
+        p_recv_buf = NULL;
         goto end;
     }
 
-    p_buffer = GKI_getpoolbuf(GKI_POOL_ID_2);
-    if (!p_buffer)
+    p_buf1 = GKI_getpoolbuf(GKI_POOL_ID_2);
+    if (!p_buf1)
     {
-        GKI_freebuf(p_buf);
-        p_buf = NULL;
+        GKI_freebuf(p_recv_buf);
+        p_recv_buf = NULL;
         goto end;
     }
 
-    p_buf->event = 0x1000;
-    p_buf->len = result;
+    p_recv_buf->event = 0x1000;
+    p_recv_buf->len = ret;
 
-    len = sizeof *p_buf + p_buf->len + p_buf->offset;
-    len = (len >> 2 << 2) + 4; // round up to 4
-    memcpy(p_buffer, p_buf, len);
+    cp_len = sizeof *p_recv_buf + p_recv_buf->len + p_recv_buf->offset;
+    cp_len = (cp_len >> 2 << 2) + 4; // round up to 4
+    memcpy(p_buf1, p_recv_buf, cp_len);
 
     UUSBDBG("HCISU_LOG: uusb_ReadIntrDataCB: len(%d) offset (%d) cp_len(%d) data = ",
-        ((HC_BT_HDR*)p_buffer)->len,
-        ((HC_BT_HDR*)p_buffer)->offset,
-        len);
-    p = (UINT8*)((HC_BT_HDR*)p_buffer + 1)
-      + ((HC_BT_HDR*)p_buffer)->offset;
-    for (sp14 = 0; sp14 < result; ++sp14)
+        p_buf1->len,
+        p_buf1->offset,
+        cp_len);
+    p = (UINT8*)(p_buf1 + 1) + p_buf1->offset;
+    for (i = 0; i < ret; ++i)
     {
-        UUSBDBG("%02x ", *p);
-        ++p;
+        UUSBDBG("%02x ", p[i]);
     }
     UUSBDBG0("\n");
 
-    OSSwitchFiberEx((unsigned long)p_buffer, 0, 0, 0, &bta_ci_hci_msg_handler, __uusb_ppc_stack1 + sizeof __uusb_ppc_stack1);
+    OSSwitchFiberEx((unsigned long)p_buf1, 0, 0, 0, &bta_ci_hci_msg_handler, __uusb_ppc_stack1 + sizeof __uusb_ppc_stack1);
 
-    GKI_freebuf(p_buf);
-    p_buf = NULL;
+    GKI_freebuf(p_recv_buf);
+    p_recv_buf = NULL;
 
 end:
     uusb_issue_intr_read();
 }
 
-static void uusb_ReadBulkDataCB(IPCResult result, void* p_data)
+static void uusb_ReadBulkDataCB(long ret, void* p_args)
 {
-    int sp14 = 0;
-    UINT32 len;
-    void* p_buffer = NULL;
-    HC_BT_HDR* p_buf = p_data;
+    HC_BT_HDR* p_buf = NULL;
+    HC_BT_HDR* p_buf1 = NULL;
+    HC_BT_HDR* p_recv_buf = p_args;
+    int i;
+    int len = 0;
+    unsigned long cp_len = 0;
     UINT8* p;
 
     if (usb.state != 2)
     {
         UUSBDBG0("HCISU_ERR: uusb_readBulkDataCB: usb_state != UUSB_PPC_OPENED_ST\n");
         UUSBDBG0("HCISU_ERR: ****\n* uusb_readBulkDataCB(): usb_state != UUSB_PPC_OPENED_ST - stop reading\n****\n");
-        GKI_freebuf(p_buf);
-        p_buf = NULL;
+        GKI_freebuf(p_recv_buf);
+        p_recv_buf = NULL;
         uusb_ReleaseAclBufferPool();
 
         return;
     }
 
-    if (result <= 0)
+    if (ret <= 0)
     {
-        UUSBDBG("HCISU_ERR: uusb_ReadBulkDataCB(): Got Error code %d\n", result);
-        GKI_freebuf(p_buf);
-        p_buf = NULL;
+        UUSBDBG("HCISU_ERR: uusb_ReadBulkDataCB(): Got Error code %d\n", ret);
+        GKI_freebuf(p_recv_buf);
+        p_recv_buf = NULL;
         goto end;
     }
 
-    p_buf->len = result;
+    p_recv_buf->len = ret;
 
-    p_buffer = GKI_getpoolbuf(GKI_POOL_ID_3);
-    if (!p_buffer)
+    p_buf1 = GKI_getpoolbuf(GKI_POOL_ID_3);
+    if (!p_buf1)
     {
-        GKI_freebuf(p_buf);
-        p_buf = NULL;
+        GKI_freebuf(p_recv_buf);
+        p_recv_buf = NULL;
         goto end;
     }
 
-    len = sizeof *p_buf + p_buf->len + p_buf->offset;
-    len = (len >> 2 << 2) + 4;
-    memcpy(p_buffer, p_buf, len);
+    cp_len = sizeof *p_recv_buf + p_recv_buf->len + p_recv_buf->offset;
+    cp_len = (cp_len >> 2 << 2) + 4;
+    memcpy(p_buf1, p_recv_buf, cp_len);
 
     UUSBDBG("HCISU_LOG: uusb_ReadBulkDataCB: len(%d) offset(%d) cp_len(%d) data = ",
-        ((HC_BT_HDR*)p_buffer)->len,
-        ((HC_BT_HDR*)p_buffer)->offset,
-        len);
-    p = (UINT8*)((HC_BT_HDR*)p_buffer + 1)
-      + ((HC_BT_HDR*)p_buffer)->offset;
-    for (sp14 = 0; sp14 < ((HC_BT_HDR*)p_buffer)->len; ++sp14)
+        p_buf1->len,
+        p_buf1->offset,
+        cp_len);
+    p = (UINT8*)(p_buf1 + 1) + p_buf1->offset;
+    for (i = 0; i < p_buf1->len; ++i)
     {
-        UUSBDBG("%02x ", *p);
-        ++p;
+        UUSBDBG("%02x ", p[i]);
     }
     UUSBDBG0("\n");
 
-    p_buffer = l2cap_link_chk_pkt_start((BT_HDR*)p_buffer);
+    p_buf1 = (HC_BT_HDR*)l2cap_link_chk_pkt_start((BT_HDR*)p_buf1);
 
-    if (p_buffer != NULL && l2cap_link_chk_pkt_end())
+    if (p_buf1 != NULL && l2cap_link_chk_pkt_end())
     {
-        OSSwitchFiberEx((unsigned long)p_buffer, 0, 0, 0, &bta_ci_hci_msg_handler, __uusb_ppc_stack2 + sizeof __uusb_ppc_stack2);
-        p_buffer = 0;
+        OSSwitchFiberEx((unsigned long)p_buf1, 0, 0, 0, &bta_ci_hci_msg_handler, __uusb_ppc_stack2 + sizeof __uusb_ppc_stack2);
+        p_buf1 = 0;
     }
 
-    GKI_freebuf(p_buf);
-    p_buf = NULL;
+    GKI_freebuf(p_recv_buf);
+    p_recv_buf = NULL;
 
 end:
     uusb_issue_bulk_read();
@@ -369,7 +370,7 @@ static void uusb_issue_intr_read(void)
     usb.reading_intr_data = TRUE;
 }
 
-static void uusb_WriteCtrlDataCB(IPCResult result, void* p_data)
+static void uusb_WriteCtrlDataCB(long result, void* p_data)
 {
     HC_BT_HDR* p_buf = NULL;
     void* p_buffer = NULL;
@@ -417,7 +418,7 @@ static void uusb_WriteCtrlDataCB(IPCResult result, void* p_data)
     }
 }
 
-static void uusb_WriteBulkDataCB(IPCResult result, void* p_data)
+static void uusb_WriteBulkDataCB(long result, void* p_data)
 {
     HC_BT_HDR* p_buf = NULL;
     void* p_buffer = NULL;

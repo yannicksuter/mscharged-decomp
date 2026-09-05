@@ -5,6 +5,11 @@
 #include <revolution/os.h>
 #include <revolution/ssl.h>
 
+#define STR_POSTBOUND "--t9Sf4yfjf1RtvDu3AA"
+#define LEN_POSTBOUND 18
+#define LEN_URLBUF 256
+#define MIN(AA, BB) (((AA) > (BB)) ? (BB) : (AA))
+
 typedef struct NHTTPBgnEndInfo NHTTPBgnEndInfo;
 typedef struct NHTTPRequestInfo NHTTPRequestInfo;
 typedef struct NHTTPConnectionInfo NHTTPConnectionInfo;
@@ -78,7 +83,7 @@ typedef struct NHTTPReqInfo
 typedef struct NHTTPi_HDRBUFLIST
 {
     struct NHTTPi_HDRBUFLIST* next_p;
-    u8 block[0x200];
+    u8 block[NHTTP_HDRRECVBUF_BLOCKLEN];
 } NHTTPi_HDRBUFLIST;
 
 typedef struct NHTTPResponseInfo
@@ -97,7 +102,7 @@ typedef struct NHTTPResponseInfo
     NHTTPResponseCallback bufFull;
     NHTTPResponseCleanup freeBuf;
     NHTTPi_HDRBUFLIST* hdrBufBlock_p;
-    u8 hdrBufFirst[0x400];
+    u8 hdrBufFirst[NHTTP_HDRRECVBUF_INILEN];
     void* param_p;
 } NHTTPResponseInfo;
 
@@ -117,7 +122,7 @@ struct NHTTPRequestInfo
     NHTTPResponseInfo* response;
     NHTTPHeader* headers;
     NHTTPHeader* postData;
-    char multipartBoundary[20];
+    char multipartBoundary[LEN_POSTBOUND + 2];
     char authorization[0x5C];
     s32 authorizationLength;
     SSLId sslId;

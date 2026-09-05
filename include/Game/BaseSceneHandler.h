@@ -43,7 +43,7 @@ public:
     virtual void SceneCreated() { }
     virtual void SetVisible(bool visible) { mVisible = visible; }
 
-    FEPresentation* GetPresentation() { return mPresentation; }
+    FEPresentation* GetPresentation();
 
     /* 0x04 */ u32 mHashID;
     /* 0x08 */ bool mVisible;

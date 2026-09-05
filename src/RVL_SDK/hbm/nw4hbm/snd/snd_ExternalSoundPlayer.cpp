@@ -1,11 +1,27 @@
-#include "decomp.h"
 #include "revolution/hbm/nw4hbm/snd/ExternalSoundPlayer.h"
 
 namespace nw4hbm {
 namespace snd {
 namespace detail {
 
-// not sure which one uses this exactly, maybe StopAllSound?
+ExternalSoundPlayer::ExternalSoundPlayer() : mPlayableCount(1), mVolume(1.0f) {}
+
+ExternalSoundPlayer::~ExternalSoundPlayer() {
+    BasicSoundExtPlayList::Iterator it = mSoundList.GetBeginIter();
+
+    while (it != mSoundList.GetEndIter()) {
+        BasicSoundExtPlayList::Iterator curr = it++;
+        curr->SetExternalSoundPlayer(NULL);
+    }
+}
+
+void ExternalSoundPlayer::SetPlayableSoundCount(int count) {
+    mPlayableCount = count;
+
+    while (GetPlayingSoundCount() > GetPlayableSoundCount()) {
+        GetLowestPrioritySound()->Shutdown();
+    }
+}
 
 void ExternalSoundPlayer::InsertSoundList(BasicSound* sound) {
     mSoundList.PushBack(sound);

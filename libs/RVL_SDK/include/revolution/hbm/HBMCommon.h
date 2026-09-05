@@ -75,7 +75,6 @@ void HBMDeleteSound(void);
 void HBMUpdateSound(void);
 
 void HBMUpdateSoundArchivePlayer(void);
-void HBMSetSoundVolume(f32 volume);
 void HBMPlaySound(int num);
 void HBMStopSound(void);
 

@@ -300,6 +300,10 @@ GHIEncryptionResult ghiEncryptorSslInitFunc(struct GHIConnection* connection,
   assert(theEncryptor->mInitialized == GHTTPFalse);
   assert(theEncryptor->mInterface == NULL);
 
+  if ((connection->sendBuffer.size - connection->sendBuffer.len) <
+      sizeof(gsSSLClientHelloMsg))
+    return GHIEncryptionResult_BufferTooSmall;
+
   // allocate the interface (need one per connection)
   theEncryptor->mInterface = gsimalloc(sizeof(gsSSL));
   if (theEncryptor->mInterface == NULL) {
@@ -877,13 +881,11 @@ ghiEncryptorProcessSSLHandshake(struct GHIConnection* connection,
           if (temp - 1 > GS_LARGEINT_BINARY_SIZE / sizeof(char))
             return GHIEncryptionResult_Error;
           sslInterface->serverpub.modulus.mLength =
-              (unsigned int)((temp - 1) /
-                             GS_LARGEINT_DIGIT_SIZE_BYTES); //-1 to subtract
-                                                            //the previous
-                                                            //0x00 byte
-          gsLargeIntSetFromMemoryStream(&sslInterface->serverpub.modulus,
-                                        (const gsi_u8*)&data->data[data->pos],
-                                        (gsi_u32)temp - 1);
+              (unsigned int)((temp - 1) / (GS_LARGEINT_BYTE_SIZE / 8));
+          memcpy(((char*)sslInterface->serverpub.modulus.mData) +
+                     (4 - (temp - 1) % 4) % 4,
+                 &data->data[data->pos], (size_t)(temp - 1));
+          gsLargeIntReverseBytes(&sslInterface->serverpub.modulus);
           data->pos += temp - 1;
 
           // Read out the public key exponent
@@ -906,11 +908,11 @@ ghiEncryptorProcessSSLHandshake(struct GHIConnection* connection,
           if (temp > GS_LARGEINT_BINARY_SIZE / sizeof(char))
             return GHIEncryptionResult_Error;
           sslInterface->serverpub.exponent.mLength =
-              (unsigned int)(((temp - 1) / GS_LARGEINT_DIGIT_SIZE_BYTES) +
-                             1); // ceiling of temp/4
-          gsLargeIntSetFromMemoryStream(&sslInterface->serverpub.exponent,
-                                        (const gsi_u8*)&data->data[data->pos],
-                                        (gsi_u32)temp);
+              (unsigned int)(((temp - 1) / (GS_LARGEINT_BYTE_SIZE / 8)) + 1);
+          memcpy(((char*)sslInterface->serverpub.exponent.mData) +
+                     (4 - temp % 4) % 4,
+                 &data->data[data->pos], (size_t)temp);
+          gsLargeIntReverseBytes(&sslInterface->serverpub.exponent);
           data->pos += temp;
         }
 
@@ -1188,37 +1190,6 @@ ghiEncryptorProcessSSLHandshake(struct GHIConnection* connection,
   else
     return GHIEncryptionResult_Error; // too many or too few bytes, protocol
                                       // error!
-}
-
-GHIEncryptionResult ghiEncryptorSslEncryptSend(
-    struct GHIConnection* connection, struct GHIEncryptor* theEncryptor,
-    const char* thePlainTextBuffer, int thePlainTextLength,
-    int* theBytesSentOut) {
-  GS_FAIL(); // Should never call this for GameSpy SSL!  It uses encrypt on
-             // buffer
-
-  GSI_UNUSED(connection);
-  GSI_UNUSED(theEncryptor);
-  GSI_UNUSED(thePlainTextBuffer);
-  GSI_UNUSED(thePlainTextLength);
-  GSI_UNUSED(theBytesSentOut);
-
-  return GHIEncryptionResult_Error;
-}
-
-GHIEncryptionResult
-ghiEncryptorSslDecryptRecv(struct GHIConnection* connection,
-                           struct GHIEncryptor* theEncryptor,
-                           char* theDecryptedBuffer, int* theDecryptedLength) {
-  GS_FAIL(); // Should never call this for GameSpy SSL!  It uses decrypt on
-             // buffer
-
-  GSI_UNUSED(connection);
-  GSI_UNUSED(theEncryptor);
-  GSI_UNUSED(theDecryptedBuffer);
-  GSI_UNUSED(theDecryptedLength);
-
-  return GHIEncryptionResult_Error;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

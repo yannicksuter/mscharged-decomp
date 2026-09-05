@@ -407,6 +407,6 @@ u16 NetworkSocket_801246E4::GetLocalPort()
 TweakValueBool_804F4578 g_bDisplayLocAddr(
     "g_bDisplayLocAddr", "Network", true);
 static TweakValueIntImpl_804FD898 sLocalDirectPortTweak(
-    "g_nLocalDirectPort", "Network", &g_nLocalDirectPort);
+    "g_nLocalDirectPort", "Network", &g_nLocalDirectPort, true);
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

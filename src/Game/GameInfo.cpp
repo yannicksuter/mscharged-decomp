@@ -85,7 +85,7 @@ GameInfoManager::GameInfoManager()
     unknown_0x123 = 0;
     unknown_0x124 = 0;
     unknown_0x125 = 0;
-    unknown_0x126[0] = 0;
+    unknown_0x126 = 0;
     unknown_0x278 = 0;
     fn_80109890(&unknown_0x280);
 

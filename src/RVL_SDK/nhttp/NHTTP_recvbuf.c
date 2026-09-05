@@ -1,8 +1,8 @@
 #include <private/nhttp.h>
 
 void* NHTTPi_memcpy(void* destination, const void* source, u32 size);
-s32 NHTTPi_SocRecv(NHTTPRequestInfo* request, s32 socket, void* buffer,
-    s32 length, s32 flags);
+int NHTTPi_SocRecv(const NHTTPRequestInfo* req_p, const int socket,
+    char* buf_p, const int len, const int flags);
 
 s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPResponseInfo* recvBuf, s32 start,
     s32 end, s32* separator, s32* lineBreakLength)
@@ -248,57 +248,46 @@ s32 NHTTPi_compareTokenN_HdrRecvBuf(NHTTPResponseInfo* recvBuf, s32 start,
     return -1;
 }
 
-BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPResponseInfo* recvBuf, u8* destination,
-    s32 offset, s32 length)
+int NHTTPi_loadFromHdrRecvBuf(const NHTTPResponseInfo* res_p, char* dst_p,
+    int pos, int len)
 {
-    s32 copyLength;
-    NHTTPi_HDRBUFLIST* block;
-    s32 blockOffset;
-    s32 blockCount;
+    NHTTPi_HDRBUFLIST* hdrbuf_p;
+    int blockidx;
+    int blocklen;
 
-    if (offset + length <= recvBuf->headerLen)
+    if ((pos + len) <= (int)(res_p->headerLen))
     {
-        if (length != 0)
+        if (len)
         {
-            if (offset < 0x400)
+            if (pos < NHTTP_HDRRECVBUF_INILEN)
             {
-                copyLength = length;
-                if (copyLength > 0x400 - offset)
-                {
-                    copyLength = 0x400 - offset;
-                }
-                NHTTPi_memcpy(
-                    destination, &recvBuf->hdrBufFirst[offset], copyLength);
-                offset += copyLength;
-                length -= copyLength;
-                destination += copyLength;
+                blocklen = MIN(len, NHTTP_HDRRECVBUF_INILEN - pos);
+                NHTTPi_memcpy(dst_p, &res_p->hdrBufFirst[pos], blocklen);
+                pos += blocklen;
+                len -= blocklen;
+                dst_p += blocklen;
             }
 
-            if (length != 0)
+            if (len)
             {
-                blockOffset = offset - 0x400;
-                block = recvBuf->hdrBufBlock_p;
-                blockCount = blockOffset >> 9;
-                blockOffset &= 0x1FF;
-                while (blockCount-- != 0)
+                pos -= NHTTP_HDRRECVBUF_INILEN;
+                blockidx = pos >> NHTTP_HDRRECVBUF_BLOCKSHIFT;
+                pos &= NHTTP_HDRRECVBUF_BLOCKMASK;
+
+                for (hdrbuf_p = res_p->hdrBufBlock_p; blockidx--;)
                 {
-                    block = block->next_p;
+                    hdrbuf_p = hdrbuf_p->next_p;
                 }
 
-                while (length != 0)
+                while (len)
                 {
-                    copyLength = length;
-                    if (copyLength > 0x200 - blockOffset)
-                    {
-                        copyLength = 0x200 - blockOffset;
-                    }
-                    NHTTPi_memcpy(
-                        destination, &block->block[blockOffset], copyLength);
-                    blockOffset += copyLength;
-                    block = block->next_p;
-                    blockOffset &= 0x1FF;
-                    length -= copyLength;
-                    destination += copyLength;
+                    blocklen = MIN(len, NHTTP_HDRRECVBUF_BLOCKLEN - pos);
+                    NHTTPi_memcpy(dst_p, &hdrbuf_p->block[pos], blocklen);
+                    hdrbuf_p = hdrbuf_p->next_p;
+                    pos += blocklen;
+                    pos &= NHTTP_HDRRECVBUF_BLOCKMASK;
+                    len -= blocklen;
+                    dst_p += blocklen;
                 }
             }
         }
@@ -308,31 +297,33 @@ BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPResponseInfo* recvBuf, u8* destination,
     return FALSE;
 }
 
-BOOL NHTTPi_isRecvBufFull(NHTTPResponseInfo* response, u32 received)
+int NHTTPi_isRecvBufFull(const NHTTPResponseInfo* res_p, const int pos)
 {
-    return response->recvBufLen <= received;
+    return res_p->recvBufLen <= (unsigned long)pos;
 }
 
 s32 NHTTPi_RecvBuf(NHTTPRequestInfo* request, s32 socket, s32 offset,
     s32 flags)
 {
     NHTTPResponseInfo* response = request->response;
-    return NHTTPi_SocRecv(request, socket, (u8*)response->recvBuf_p + offset,
+    return NHTTPi_SocRecv(request, socket, &response->recvBuf_p[offset],
         response->recvBufLen - offset, flags);
 }
 
-s32 NHTTPi_RecvBufN(NHTTPRequestInfo* request, s32 socket, u32 offset,
-    s32 length, s32 flags)
+int NHTTPi_RecvBufN(NHTTPRequestInfo* req_p, const int socket, const int pos,
+    int len, const int flags)
 {
-    s32 remaining;
+    NHTTPResponseInfo* res_p = req_p->response;
 
-    if (NHTTPi_isRecvBufFull(request->response, offset))
+    if (NHTTPi_isRecvBufFull(res_p, pos))
     {
         return -1003;
     }
 
-    remaining = request->response->recvBufLen - offset;
-    return NHTTPi_SocRecv(request, socket,
-        (u8*)request->response->recvBuf_p + offset,
-        length > remaining ? remaining : length, flags);
+    len = len > (int)(res_p->recvBufLen - pos)
+        ? (int)(res_p->recvBufLen - pos)
+        : len;
+
+    return NHTTPi_SocRecv(
+        req_p, socket, &res_p->recvBuf_p[pos], len, flags);
 }

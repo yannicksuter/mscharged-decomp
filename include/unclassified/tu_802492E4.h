@@ -23,5 +23,9 @@ extern "C" TU8024A368Scene* fn_8024A368(TU8024A368Scene* scene, int mode);
 extern "C" TU8024A368Scene* fn_8024A6B0(TU8024A368Scene* scene, int deleteFlag);
 extern "C" void fn_8024A7DC(TU8024A368Scene* scene);
 extern "C" void fn_8024A990(TU8024A368Scene* scene, float fDeltaT);
+extern "C" void fn_8024AF04(TU8024A368Scene* scene);
+extern "C" void fn_8024BED8(TU8024A368Scene* scene);
+extern "C" void fn_8024C368(TU8024A368Scene* scene);
+extern "C" void fn_8024CBD8(TU8024A368Scene* scene);
 
 #endif // UNCLASSIFIED_TU_802492E4_H

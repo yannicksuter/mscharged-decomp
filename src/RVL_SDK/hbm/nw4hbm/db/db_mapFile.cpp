@@ -22,7 +22,7 @@ static u32 XStrToU32_(u8 const* str);
 static u32 CopySymbol_(u8 const* buf, u8* str, u32 strLenMax, u8 splitter);
 
 static bool QuerySymbolToMapFile_(u8* buf, OSModuleInfo const* moduleInfo, u32 address, u8* strBuf, u32 strBufSize);
-static bool QuerySymbolToSingleMapFile_(MapFile* pMapFile, u32 address, u8* strBuf, u32 strBufSize);
+static bool QuerySymbolToSingleMapFile_(MapFile* pMapFile, u32 address, u8* strBuf, u32 strBufSize) NO_INLINE;
 } // namespace db
 } // namespace nw4hbm
 
@@ -36,15 +36,6 @@ static MapFile* sMapFileList;
 static GetCharFunc* GetCharPtr_;
 } // namespace db
 } // namespace nw4hbm
-
-// R4QE01 dead-strips the map-file registration entries, but their assertion
-// strings still head this file's string data at 0x80556D10, ahead of every
-// string the retained routines use. The expressions are transcribed from that
-// retail data.
-DECOMP_FORCEACTIVE(db_mapFile_cpp, __FILE__, NW4HBMAssertPointerNonnull_String(buffer),
-                   NW4HBMAssertPointerNonnull_String(mapDataBuf), NW4HBMAssertPointerNonnull_String(pMapFile),
-                   NW4HBMAssert_String(sMapFileList->moduleInfo != NULL),
-                   NW4HBMAssertPointerNonnull_String(filePath), NW4HBMAssert_String(pMapFile->fileEntry >= 0));
 
 namespace nw4hbm {
 namespace db {

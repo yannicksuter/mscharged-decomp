@@ -2,28 +2,23 @@
 
 #include <string.h>
 
-#define F(x, y, z)        (((x) & (y)) | (~(x) & (z)))
-#define G(x, y, z)        (((x) & (z)) | ((y) & ~(z)))
-#define H(x, y, z)        ((x) ^ (y) ^ (z))
-#define I(x, y, z)        ((y) ^ ((x) | ~(z)))
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
-#define STEP(f, a, b, c, d, x, s, t)                                      \
-    do                                                                     \
-    {                                                                      \
-        u32 step_t = (t);                                                  \
-        (a) = (b) +                                                        \
-              ROTATE_LEFT((a) + f((b), (c), (d)) + (x) + step_t, (s));    \
-    } while (0)
-#define SWAP32(x) \
-    (((x) >> 24) | (((x) >> 8) & 0xFF00) | (((x) << 8) & 0xFF0000) | ((x) << 24))
-static inline u32 LOAD32(u32* address)
-{
-    return __lwbrx(address, 0);
-}
 
-static u8 sPadding = 0x80;
+static void ProcessBlock(NETMD5Context* context);
 
-static u32 sRoundConstants[64] = {
+static u8 padding = 0x80;
+
+static const NETHashInterface md5template = {
+    NET_MD5_DIGEST_SIZE,
+    64,
+    sizeof(NETMD5Context),
+    0,
+    (NETHashInitFunc)NETMD5Init,
+    (NETHashUpdateFunc)NETMD5Update,
+    (NETHashGetDigestFunc)NETMD5GetDigest,
+};
+
+static u32 t[64] = {
     0xd76aa478,
     0xe8c7b756,
     0x242070db,
@@ -90,7 +85,7 @@ static u32 sRoundConstants[64] = {
     0xeb86d391,
 };
 
-static u32 sRoundIndices[48] = {
+static u32 k[48] = {
     1,
     6,
     11,
@@ -139,18 +134,6 @@ static u32 sRoundIndices[48] = {
     11,
     2,
     9,
-};
-
-static void ProcessBlock(NETMD5Context* context);
-
-static const NETHashInterface sMD5Interface = {
-    NET_MD5_DIGEST_SIZE,
-    64,
-    sizeof(NETMD5Context),
-    0,
-    (NETHashInitFunc)NETMD5Init,
-    (NETHashUpdateFunc)NETMD5Update,
-    (NETHashGetDigestFunc)NETMD5GetDigest,
 };
 
 void NETMD5Init(NETMD5Context* context)
@@ -162,154 +145,149 @@ void NETMD5Init(NETMD5Context* context)
     context->length = 0;
 }
 
-void NETMD5Update(NETMD5Context* context, const void* input, u32 length)
+void NETMD5Update(NETMD5Context* context, void* input, u32 length)
 {
-    u32 index = (u32)context->length;
-    u32 fill;
-    s32 blocks;
-    const u8* data = input;
+    u32 buffer_index = (u32)context->length;
+    u32 buffer_space;
+    s32 i;
+    u8* p = input;
 
     context->length += length;
-    index &= 0x3F;
-    fill = 64 - index;
+    buffer_index &= 0x3F;
+    buffer_space = 64 - buffer_index;
 
-    if (fill > length)
+    if (buffer_space > length)
     {
         if (length != 0)
         {
-            memcpy(&context->buffer8[index], data, length);
+            memcpy(&context->buffer8[buffer_index], p, length);
         }
         return;
     }
 
-    memcpy(&context->buffer8[index], data, fill);
+    memcpy(&context->buffer8[buffer_index], p, buffer_space);
     ProcessBlock(context);
-    data += fill;
-    length -= fill;
+    p += buffer_space;
+    length -= buffer_space;
 
-    blocks = length >> 6;
-    while (blocks > 0)
+    i = length >> 6;
+    while (i > 0)
     {
-        memcpy(context->buffer8, data, 64);
-        data += 64;
+        memcpy(context->buffer8, p, 64);
+        p += 64;
         ProcessBlock(context);
-        blocks--;
+        i--;
     }
 
     length &= 0x3F;
     if (length != 0)
     {
-        memcpy(context->buffer8, data, length);
+        memcpy(context->buffer8, p, length);
     }
 }
 
 void NETMD5GetDigest(NETMD5Context* context, void* digest)
 {
-    u64 length = context->length << 3;
-    u32 high = (u32)(length >> 32);
-    u32 low = (u32)length;
-    u32 index;
-    u32 fill;
+    u64 total_length = context->length << 3;
+    u32 buffer_index;
+    u32 buffer_space;
+    u32* p = digest;
 
-    NETMD5Update(context, &sPadding, 1);
+    NETMD5Update(context, &padding, 1);
 
-    index = (u32)context->length & 0x3F;
-    fill = 64 - index;
-    if (fill < 8)
+    buffer_index = (u32)context->length & 0x3F;
+    buffer_space = 64 - buffer_index;
+    if (buffer_space < 8)
     {
-        memset(&context->buffer8[index], 0, fill);
+        memset(&context->buffer8[buffer_index], 0, buffer_space);
         ProcessBlock(context);
-        index = 0;
-        fill = 64;
+        buffer_index = 0;
+        buffer_space = 64;
     }
-    if (fill > 8)
+    if (buffer_space > 8)
     {
-        memset(&context->buffer8[index], 0, fill - 8);
+        memset(&context->buffer8[buffer_index], 0, buffer_space - 8);
     }
 
-    context->buffer32[14] = SWAP32(low);
-    context->buffer32[15] = SWAP32(high);
+    context->buffer32[14] = NETSwapBytes32((u32)total_length);
+    context->buffer32[15] = NETSwapBytes32((u32)(total_length >> 32));
     ProcessBlock(context);
 
-    __stwbrx(context->state[0], digest, 0);
-    __stwbrx(context->state[1], (u8*)digest + 4, 0);
-    __stwbrx(context->state[2], (u8*)digest + 8, 0);
-    __stwbrx(context->state[3], (u8*)digest + 12, 0);
+    NETWriteSwappedBytes32(p, context->state[0]);
+    NETWriteSwappedBytes32(p + 1, context->state[1]);
+    NETWriteSwappedBytes32(p + 2, context->state[2]);
+    NETWriteSwappedBytes32(p + 3, context->state[3]);
     memset(context, 0, sizeof(*context));
 }
 
 const NETHashInterface* NETGetMD5Interface(void)
 {
-    return &sMD5Interface;
+    return &md5template;
+}
+
+static inline u32 CalcRound1(u32 a, u32 b, u32 c, u32 d, u32* xp, u32 s, u32 t)
+{
+    return b + ROTATE_LEFT(a + ((b & c) | (~b & d)) + NETReadSwappedBytes32(xp) + t, s);
+}
+
+static inline u32 CalcRound2(u32 a, u32 b, u32 c, u32 d, u32* xp, u32 s, u32 t)
+{
+    return b + ROTATE_LEFT(a + ((b & d) | (c & ~d)) + NETReadSwappedBytes32(xp) + t, s);
+}
+
+static inline u32 CalcRound3(u32 a, u32 b, u32 c, u32 d, u32* xp, u32 s, u32 t)
+{
+    return b + ROTATE_LEFT(a + (b ^ c ^ d) + NETReadSwappedBytes32(xp) + t, s);
+}
+
+static inline u32 CalcRound4(u32 a, u32 b, u32 c, u32 d, u32* xp, u32 s, u32 t)
+{
+    return b + ROTATE_LEFT(a + (c ^ (b | ~d)) + NETReadSwappedBytes32(xp) + t, s);
 }
 
 static void ProcessBlock(NETMD5Context* context)
 {
+    u32* kp;
     u32 a = context->a;
-    u32* buffer = context->buffer32;
     u32 b = context->b;
     u32 c = context->c;
     u32 d = context->d;
-    u32* data = buffer;
-    u32* constants = sRoundConstants;
-    u32* indices;
-    u32* address;
-    u32 i;
+    u32* x = context->buffer32;
+    u32* xp = x;
+    u32* tp = t;
+    int j;
 
-    for (i = 4; i != 0; i--)
+    for (j = 0; j < 4; j++)
     {
-        address = buffer++;
-        STEP(F, a, b, c, d, LOAD32(address), 7, constants[0]);
-        address = buffer++;
-        STEP(F, d, a, b, c, LOAD32(address), 12, constants[1]);
-        address = buffer++;
-        STEP(F, c, d, a, b, LOAD32(address), 17, constants[2]);
-        address = buffer++;
-        STEP(F, b, c, d, a, LOAD32(address), 22, constants[3]);
-        constants += 4;
+        a = CalcRound1(a, b, c, d, xp++, 7, *tp++);
+        d = CalcRound1(d, a, b, c, xp++, 12, *tp++);
+        c = CalcRound1(c, d, a, b, xp++, 17, *tp++);
+        b = CalcRound1(b, c, d, a, xp++, 22, *tp++);
     }
 
-    indices = sRoundIndices;
-    for (i = 4; i != 0; i--)
+    kp = k;
+    for (j = 0; j < 4; j++)
     {
-        address = &data[indices[0]];
-        STEP(G, a, b, c, d, LOAD32(address), 5, constants[0]);
-        address = &data[indices[1]];
-        STEP(G, d, a, b, c, LOAD32(address), 9, constants[1]);
-        address = &data[indices[2]];
-        STEP(G, c, d, a, b, LOAD32(address), 14, constants[2]);
-        address = &data[indices[3]];
-        STEP(G, b, c, d, a, LOAD32(address), 20, constants[3]);
-        indices += 4;
-        constants += 4;
+        a = CalcRound2(a, b, c, d, &x[*kp++], 5, *tp++);
+        d = CalcRound2(d, a, b, c, &x[*kp++], 9, *tp++);
+        c = CalcRound2(c, d, a, b, &x[*kp++], 14, *tp++);
+        b = CalcRound2(b, c, d, a, &x[*kp++], 20, *tp++);
     }
 
-    for (i = 4; i != 0; i--)
+    for (j = 0; j < 4; j++)
     {
-        address = &data[indices[0]];
-        STEP(H, a, b, c, d, LOAD32(address), 4, constants[0]);
-        address = &data[indices[1]];
-        STEP(H, d, a, b, c, LOAD32(address), 11, constants[1]);
-        address = &data[indices[2]];
-        STEP(H, c, d, a, b, LOAD32(address), 16, constants[2]);
-        address = &data[indices[3]];
-        STEP(H, b, c, d, a, LOAD32(address), 23, constants[3]);
-        indices += 4;
-        constants += 4;
+        a = CalcRound3(a, b, c, d, &x[*kp++], 4, *tp++);
+        d = CalcRound3(d, a, b, c, &x[*kp++], 11, *tp++);
+        c = CalcRound3(c, d, a, b, &x[*kp++], 16, *tp++);
+        b = CalcRound3(b, c, d, a, &x[*kp++], 23, *tp++);
     }
 
-    for (i = 4; i != 0; i--)
+    for (j = 0; j < 4; j++)
     {
-        address = &data[indices[0]];
-        STEP(I, a, b, c, d, LOAD32(address), 6, constants[0]);
-        address = &data[indices[1]];
-        STEP(I, d, a, b, c, LOAD32(address), 10, constants[1]);
-        address = &data[indices[2]];
-        STEP(I, c, d, a, b, LOAD32(address), 15, constants[2]);
-        address = &data[indices[3]];
-        STEP(I, b, c, d, a, LOAD32(address), 21, constants[3]);
-        indices += 4;
-        constants += 4;
+        a = CalcRound4(a, b, c, d, &x[*kp++], 6, *tp++);
+        d = CalcRound4(d, a, b, c, &x[*kp++], 10, *tp++);
+        c = CalcRound4(c, d, a, b, &x[*kp++], 15, *tp++);
+        b = CalcRound4(b, c, d, a, &x[*kp++], 21, *tp++);
     }
 
     context->a += a;

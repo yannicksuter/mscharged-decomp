@@ -90,39 +90,44 @@ void WavePlayer::Shutdown() {
     mChannelCount = 0;
 }
 
-bool WavePlayer::AppendWavePacket(WavePacket* packet) {
-    if (packet->mAppendFlag) {
-        return false;
-    }
-
-    if (packet->mWaveBuffer.channelCount < mChannelCount) {
-        return false;
-    }
-
-    u32 bufSize = packet->mWaveBuffer.bufferSize;
+bool WavePlayer::AppendWavePacket(WavePacket* wavePacket) {
     switch (mSampleFormat) {
-        case SAMPLE_FORMAT_PCM_S16: {
-            bufSize >>= 1;
+        case SAMPLE_FORMAT_PCM_S16:
+        case SAMPLE_FORMAT_PCM_S8:
             break;
-        }
-        case SAMPLE_FORMAT_PCM_S8: {
-            break;
-        }
         default: {
             NW4HBMPanic();
             return false;
         }
     }
 
+    NW4HBMAssertPointerNonnull(wavePacket);
+
+    if (wavePacket->mAppendFlag) {
+        NW4HBMWarningMessage("WavePacket is busy.");
+        return false;
+    }
+
+    if (wavePacket->mWaveBuffer.channelCount < mChannelCount) {
+        NW4HBMWarningMessage("not enough buffer count in WavePacket.");
+        return false;
+    }
+
+    u32 bufSize = wavePacket->mWaveBuffer.bufferSize;
+    if (mSampleFormat == SAMPLE_FORMAT_PCM_S16) {
+        bufSize >>= 1;
+    }
+
     f32 val = ((bufSize * 1000) / mSampleRate);
     if (val < (6.0f * mPitchMax)) {
+        NW4HBMWarningMessage("Too small wave buffer.");
         return false;
     }
 
     ut::AutoInterruptLock lock;
 
-    mWavePacketList.PushBack(packet);
-    packet->mAppendFlag = true;
+    mWavePacketList.PushBack(wavePacket);
+    wavePacket->mAppendFlag = true;
 
     return true;
 }
@@ -172,6 +177,100 @@ void WavePlayer::Stop() {
     mPauseFlag = false;
 }
 
+void WavePlayer::SetVolume(f32 newVolume) {
+    ut::AutoInterruptLock lock;
+    mVolume = newVolume;
+}
+
+void WavePlayer::SetPitch(f32 pitch) {
+    if (pitch > mPitchMax) {
+        NW4HBMWarningMessage("Too large pitch.");
+        return;
+    }
+
+    ut::AutoInterruptLock lock;
+    mPitch = pitch;
+}
+
+void WavePlayer::SetPan(f32 pan) {
+    ut::AutoInterruptLock lock;
+    mPan = pan;
+}
+
+void WavePlayer::SetSurroundPan(f32 surroundPan) {
+    ut::AutoInterruptLock lock;
+    mSurroundPan = surroundPan;
+}
+
+void WavePlayer::SetLpfFreq(f32 lpfFreq) {
+    ut::AutoInterruptLock lock;
+    mLpfFreq = lpfFreq;
+}
+
+void WavePlayer::SetMainOutVolume(f32 volume) {
+    ut::AutoInterruptLock lock;
+    mMainOutVolume = volume;
+}
+
+f32 WavePlayer::GetMainOutVolume() const { return mMainOutVolume; }
+
+void WavePlayer::SetMainSend(f32 send) {
+    ut::AutoInterruptLock lock;
+    mMainSend = send;
+}
+
+f32 WavePlayer::GetMainSend() const { return mMainSend; }
+
+void WavePlayer::SetFxSend(AuxBus bus, f32 send) {
+    NW4HBMAssertHeaderClampedLValue(bus, 0, 3);
+    ut::AutoInterruptLock lock;
+    mFxSend[bus] = send;
+}
+
+f32 WavePlayer::GetFxSend(AuxBus bus) const {
+    NW4HBMAssertHeaderClampedLValue(bus, 0, 3);
+    return mFxSend[bus];
+}
+
+void WavePlayer::SetOutputLine(int lineFlag) {
+    ut::AutoInterruptLock lock;
+    mOutputLineFlag = lineFlag;
+}
+
+int WavePlayer::GetOutputLine() const { return mOutputLineFlag; }
+
+void WavePlayer::SetRemoteOutVolume(int remoteIndex, f32 volume) {
+    NW4HBMAssertHeaderClampedLValue(remoteIndex, 0, 4);
+    ut::AutoInterruptLock lock;
+    mRemoteOutVolume[remoteIndex] = volume;
+}
+
+f32 WavePlayer::GetRemoteOutVolume(int remoteIndex) const {
+    NW4HBMAssertHeaderClampedLValue(remoteIndex, 0, 4);
+    return mRemoteOutVolume[remoteIndex];
+}
+
+void WavePlayer::SetRemoteSend(int remoteIndex, f32 send) {
+    NW4HBMAssertHeaderClampedLValue(remoteIndex, 0, 4);
+    ut::AutoInterruptLock lock;
+    mRemoteSend[remoteIndex] = send;
+}
+
+f32 WavePlayer::GetRemoteSend(int remoteIndex) const {
+    NW4HBMAssertHeaderClampedLValue(remoteIndex, 0, 4);
+    return mRemoteSend[remoteIndex];
+}
+
+void WavePlayer::SetRemoteFxSend(int remoteIndex, f32 send) {
+    NW4HBMAssertHeaderClampedLValue(remoteIndex, 0, 4);
+    ut::AutoInterruptLock lock;
+    mRemoteFxSend[remoteIndex] = send;
+}
+
+f32 WavePlayer::GetRemoteFxSend(int remoteIndex) const {
+    NW4HBMAssertHeaderClampedLValue(remoteIndex, 0, 4);
+    return mRemoteFxSend[remoteIndex];
+}
 
 void WavePlayer::Pause(bool flag) {
     ut::AutoInterruptLock lock;
@@ -272,6 +371,7 @@ void WavePlayer::VoiceCallbackFunc(detail::AxVoice* voice, detail::AxVoice::Call
             break;
         }
         default: {
+            NW4HBMPanicMessage("Unknown AxVoice callback status %d", status);
             break;
         }
     }

@@ -10,8 +10,9 @@
 #include "NL/nlConfig.h"
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" void* fn_80253E18();
-extern "C" void fn_802534BC(void* object, int value, bool enabled);
+class TU80252180Scene;
+extern "C" TU80252180Scene* fn_80253E18();
+extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
 
 static Config lbl_80578320(Config::ALLOCATE_HIGH, 0x2800, 0x400);
 
@@ -189,7 +190,7 @@ void OptionsAudioMenuV2::fn_801D57D8(int index)
 void OptionsAudioMenuV2::fn_801D583C()
 {
     mState = 3;
-    void* object = fn_80253E18();
+    TU80252180Scene* object = fn_80253E18();
     if (object != 0)
     {
         fn_802534BC(object, 0, true);
@@ -317,7 +318,7 @@ void OptionsVisualMenuV2::fn_801D84D4(int index)
 void OptionsVisualMenuV2::fn_801D8538()
 {
     mState = 3;
-    void* object = fn_80253E18();
+    TU80252180Scene* object = fn_80253E18();
     if (object != 0)
     {
         fn_802534BC(object, 0, true);
