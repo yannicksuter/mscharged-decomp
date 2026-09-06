@@ -81,7 +81,7 @@ extern "C"
     void GXSetDispCopyGamma(s32 gamma);
     void fn_803A6FE8(u8 fieldMode, u8 halfAspectRatio);
     void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
-    void* fn_80372B30(u32 size, s32 arena);
+    void* fn_80372B30(unsigned long size, bool fromEnd);
     void fn_8004F594(s32 category, const char* format, ...);
 
     void fn_802CB848(Function2<bool, PlatformStartupEntry&, PlatformStartupEntry&>* callback);

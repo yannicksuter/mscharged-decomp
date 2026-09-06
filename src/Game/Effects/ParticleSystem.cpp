@@ -701,8 +701,8 @@ static void RenderLightOnField(GLView* view, const EffectsLight& light)
     glSetRasterState(GLS_DepthWrite, 0);
     glSetCurrentRasterState(glHandleizeRasterState());
 
-    float dim = 1.4f * (2.0f * light.m_fRadius)
-        * (heightFrac * heightFrac);
+    float dim = (2.0f * light.m_fRadius) * (heightFrac * heightFrac);
+    dim = 1.4f * dim;
     nlMatrix4 mRot;
     mRot.SetIdentity();
     glQuad3 q;

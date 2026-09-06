@@ -12,7 +12,7 @@ public:
     virtual void Update(float dt);
     virtual void SceneCreated();
 
-    void fn_801F048C();
+    void fn_801F048C(UnidentifiedTimer_8030616C* timer);
 
     /* 0x028 */ u32 mUnidentified028[0x58];
     /* 0x188 */ UnidentifiedTimer_8030616C mUnidentified188;

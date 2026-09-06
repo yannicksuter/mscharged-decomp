@@ -295,7 +295,7 @@ DWCGHTTPState DWC_GetGHTTPState(int req) {
 
 static DWCGHTTPResult DWCi_HandleGHTTPError(DWCGHTTPResult result) {
   int errorCode = -98000;
-  DWCErrorType dwcError = DWC_ERROR_TYPE_7;
+  DWCErrorType dwcError = DWC_ERROR_GHTTP_ANY;
 
   if (result == DWC_GHTTP_SUCCESS) {
     return DWC_GHTTP_SUCCESS;

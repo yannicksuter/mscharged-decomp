@@ -949,14 +949,19 @@ static int DaysInMonth(int month, int year)
 {
     if (month == 2)
     {
-        return (year % 4 == 0) ? 29 : 28;
+        if (year % 4 == 0)
+        {
+            return 29;
+        }
+        return 28;
     }
     return sMonthDays[month - 1];
 }
 
 bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time)
 {
-    if (!DWC_GetDateTime(date, time))
+    bool valid = DWC_GetDateTime(date, time);
+    if (!valid)
     {
         memset(time, 0, sizeof(*time));
         date->mday = 1;
@@ -967,49 +972,47 @@ bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time)
     }
 
     ++date->month;
-    if (g_nAddHoursTime == 0 && g_nAddMinsTime == 0)
+    if (g_nAddHoursTime != 0 || g_nAddMinsTime != 0)
     {
-        return true;
-    }
-
-    time->min += g_nAddMinsTime;
-    if (time->min > 59)
-    {
-        time->min -= 60;
-        ++time->hour;
-    }
-    else if (time->min < 0)
-    {
-        time->min += 60;
-        --time->hour;
-    }
-
-    time->hour += g_nAddHoursTime;
-    if (time->hour > 23)
-    {
-        time->hour -= 24;
-        ++date->mday;
-        if (date->mday > DaysInMonth(date->month, date->year))
+        time->min += g_nAddMinsTime;
+        if (time->min > 59)
         {
-            date->mday = 1;
-            if (++date->month > 12)
+            time->min -= 60;
+            ++time->hour;
+        }
+        else if (time->min < 0)
+        {
+            time->min += 60;
+            --time->hour;
+        }
+
+        time->hour += g_nAddHoursTime;
+        if (time->hour > 23)
+        {
+            time->hour -= 24;
+            ++date->mday;
+            if (date->mday > DaysInMonth(date->month, date->year))
             {
-                date->month = 1;
-                ++date->year;
+                date->mday -= DaysInMonth(date->month, date->year);
+                if (++date->month > 12)
+                {
+                    date->month = 1;
+                    ++date->year;
+                }
             }
         }
-    }
-    else if (time->hour < 0)
-    {
-        time->hour += 24;
-        if (--date->mday < 1)
+        else if (time->hour < 0)
         {
-            if (--date->month < 1)
+            time->hour += 24;
+            if (--date->mday < 1)
             {
-                date->month = 12;
-                --date->year;
+                if (--date->month < 1)
+                {
+                    date->month = 12;
+                    --date->year;
+                }
+                date->mday = DaysInMonth(date->month, date->year);
             }
-            date->mday = DaysInMonth(date->month, date->year);
         }
     }
     return true;

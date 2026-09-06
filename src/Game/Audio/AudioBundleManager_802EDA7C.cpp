@@ -1,5 +1,6 @@
 #include "Game/Audio/AudioBackend_8035B8E8.h"
 #include "Game/Audio/AudioBundleManager_802EDA7C.h"
+#include "Game/Audio/AudioBankTable_802EB644.h"
 
 #include "Game/Audio/AudioLoadMode_806E201C.h"
 
@@ -8,8 +9,6 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 
-extern "C" void* fn_802EB644(nlChunk* chunk);
-extern "C" void fn_802EBADC(void* data);
 extern "C" void* fn_802EE964(nlChunk* chunk);
 extern "C" void* fn_802EF218(nlChunk* chunk);
 
@@ -54,8 +53,8 @@ void AudioBundleManager_802EDA7C::fn_802EDC34(nlChunk* chunk)
     case 0x23800:
         break;
     case 0x13500:
-        m_Chunk13500 = fn_802EB644(chunk);
-        fn_802EBADC(m_Chunk13500);
+        m_Chunk13500 = AudioBankTable_802EB644::fn_802EB644(chunk);
+        m_Chunk13500->fn_802EBADC();
         break;
     case 0x13400:
         m_Chunk13400 = fn_802EF218(chunk);

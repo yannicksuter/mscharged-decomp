@@ -108,6 +108,7 @@ public:
             {
                 fn_802C2DF4((TweakPendingValue*)entry, this, category);
             }
+            lbl_806E1E90 = category;
         }
         else
         {
@@ -118,8 +119,6 @@ public:
                 fn_802C5780(entry, this);
             }
         }
-
-        lbl_806E1E90 = category;
     }
     virtual int UnidentifiedVirtual30();
     virtual TweakValueBase_8052BF70* UnidentifiedVirtual34(const char* name,

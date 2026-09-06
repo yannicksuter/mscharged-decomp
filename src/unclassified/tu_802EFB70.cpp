@@ -133,7 +133,6 @@ static inline RpcListEntry_802EFB70* AllocateListEntry_802EFB70(
     {
         entry->next = 0;
         entry->previous = 0;
-        entry->node = 0;
     }
     return entry;
 }
@@ -274,11 +273,11 @@ extern "C" RpcRuntimeNode_802EFB70* fn_802F0394(
     }
     else
     {
-        RpcListEntry_802EFB70* tail = list->head->previous;
-        tail->next = entry;
-        entry->next = list->head;
-        entry->previous = tail;
-        list->head->previous = entry;
+        RpcListEntry_802EFB70* head = list->head;
+        head->next->previous = entry;
+        entry->next = head->next;
+        entry->previous = head;
+        head->next = entry;
     }
     list->head = entry;
     return node;

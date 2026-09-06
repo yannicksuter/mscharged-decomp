@@ -280,11 +280,12 @@ void ImpostorCharacter::EnableSprites(bool enable)
 void ImpostorCharacter::RegisterSprites(void* registry)
 {
     nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
+    GLView* target;
     DLListEntry<ImpostorSprite_802D4290*>* head = it.m_Head;
     DLListEntry<ImpostorSprite_802D4290*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        GLView* target = entry->entry->mUnidentified068;
+        target = entry->entry->mUnidentified068;
         UnidentifiedRegistryNode_802D7AEC* node = (UnidentifiedRegistryNode_802D7AEC*)nlMalloc(8, 8, false);
         if (node != 0)
         {

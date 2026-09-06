@@ -2,6 +2,7 @@
 #define GAME_SYS_AUDIO_H
 
 #include "Game/Audio/AudioLoadMode_806E201C.h"
+#include "Game/Audio/AudioResourceLoader_802EDA38.h"
 #include "Game/Audio/XSoundHandle_802ED74C.h"
 #include "types.h"
 
@@ -26,15 +27,14 @@ public:
     unsigned long m_PlayRequestCount;
 };
 
-typedef void (*AudioPlayCallback_800EBB04)(
-    XSoundHandle_802ED74C*, void* context);
+typedef AudioResourceLoadCallback_802EDA54 AudioPlayCallback_800EBB04;
 
 extern "C"
 {
     void fn_800EBB04(GameAudio_800EB6AC* audio, int slotId,
         unsigned long cueId, AudioPlayCallback_800EBB04 callback,
         void* context);
-    void fn_800EBBD8(GameAudio_800EB6AC* audio, unsigned long value);
+    void fn_800EBBD8(GameAudio_800EB6AC* audio);
     bool fn_800EBBFC(int slotId, unsigned long cueId,
         const void* debugName, void* context);
     bool fn_800EBC84(int slotId, unsigned long cueId,

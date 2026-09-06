@@ -825,16 +825,18 @@ int NetworkRanking_8012D8F4::CompareLeaderboardRows(
 void NetworkRanking_8012D8F4::AssignDisplayRanks(
     int count, NetworkRankingMeta* metadata, int firstRank)
 {
-    int previousScore = -1;
     int rank = firstRank;
+    int nextRank = firstRank;
+    int previousScore = -1;
     for (int i = 0; i < count; ++i)
     {
         if (previousScore != metadata[i].mScore)
         {
-            rank = firstRank + i;
+            rank = nextRank;
             previousScore = metadata[i].mScore;
         }
         metadata[i].mDisplayRank = rank;
+        ++nextRank;
     }
 }
 

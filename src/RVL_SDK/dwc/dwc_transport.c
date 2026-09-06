@@ -1,139 +1,195 @@
 #include <dwc/dwc_transport.h>
 
+#include <dwc/dwc_error.h>
 #include <dwc/dwc_main.h>
+#include <dwc/dwc_nonport.h>
 #include <dwc/dwc_report.h>
 #include <dwc/dwci_error.h>
 #include <gamespy/gt2/gt2.h>
-#include <revolution/os/OSTime.h>
 #include <string.h>
 
-typedef struct DWCTransportEntryView
+static DWCTransportInfo* sTransInfo;
+
+static DWCTransportConnection* DWCs_GetTransConnection(u8 aid);
+static int DWCs_GetSendState(u8 aid);
+static int DWCs_GetRecvState(u8 aid);
+static void DWCs_Send(
+    u8 aid, const u8* buffer, int size, BOOL reliable);
+static void DWCs_EncodeHeader(
+    DWCTransportHeader* header, u16 type, int size);
+static u16 DWCs_DecodeHeader(const DWCTransportHeader* message);
+static s32 DWCs_GetRequiredHeaderSize(u16 type);
+static int DWCs_GetOutgoingBufferFreeSize(u8 aid);
+static void DWCs_HandleReliableMessage(
+    GT2Connection connection, u8* message, int size);
+static void DWCs_RecvDataHeader(
+    u8 aid, DWCTransportHeader* message, int size);
+static void DWCs_RecvDataBody(u8 aid, void* message, int size);
+static void DWCs_RecvSystemDataBody(u8 aid, void* message, int size);
+
+static DWCTransportConnection* DWCs_GetTransConnection(u8 aid)
 {
-    const void* _00;
-    void* recvBuffer;
-    int recvBufferSize;
-    int _0C;
-    int _10;
-    int _14;
-    int _18;
-    s8 _1C;
-    u8 recvState;
-    s8 _1E;
-    u8 _1F[3];
-    u16 _22;
-    u8 _24[4];
-    u64 _28;
-    int _30;
-    u8 _34[4];
-} DWCTransportEntryView;
+    return &sTransInfo->connections[aid];
+}
 
-typedef struct DWCTransportControlView
+static int DWCs_GetSendState(u8 aid)
 {
-    DWCTransportEntryView entries[32];
-    DWCUserSendCallback sendCallback;
-    DWCUserRecvCallback recvCallback;
-    void* recvTimeoutCallback;
-    DWCUserPingCallback pingCallback;
-    u16 maxSplit;
-    u8 _712[6];
-} DWCTransportControlView;
+    return sTransInfo->connections[aid].sendState;
+}
 
-static DWCTransportControlView* lbl_806E2F00;
-
-GT2Connection DWCi_GetGT2Connection(u8 aid);
-u8 DWCi_GetConnectionAid(GT2Connection connection);
-BOOL DWC_isValidAid(u8 aid);
-void fn_8049B674(GT2Connection connection, GT2Byte* message, int len);
-
-typedef struct DWCTransportHeaderView
+static int DWCs_GetRecvState(u8 aid)
 {
-    u32 size;
-    u16 type;
-    char magic[2];
-} DWCTransportHeaderView;
+    return sTransInfo->connections[aid].recvState;
+}
 
-BOOL fn_8049AE0C(int type, u8 aid, const void* buffer, int size)
+static void DWCs_Send(u8 aid, const u8* buffer, int size, BOOL reliable)
 {
-    DWCTransportEntryView* entry = &lbl_806E2F00->entries[aid];
-    DWCTransportHeaderView header;
-    int freeSpace;
-    BOOL sendable;
+    GT2Connection connection = DWCi_GetGT2Connection(aid);
+
+    gt2Send(connection, buffer, size, reliable);
+}
+
+static void DWCs_EncodeHeader(
+    DWCTransportHeader* header, u16 type, int size)
+{
+    strncpy(header->magicStrings, DWC_MAGIC_STRINGS, DWC_MAGIC_STRINGS_LEN);
+
+    header->type = DWCi_HtoLEs(type);
+    header->size = (int)DWCi_HtoLEl((u32)size);
+}
+
+static u16 DWCs_DecodeHeader(const DWCTransportHeader* message)
+{
+    DWCTransportHeader header;
+
+    DWCi_Np_CpuCopy8(message, &header, sizeof(DWCTransportHeader));
+
+    if (memcmp(header.magicStrings, DWC_MAGIC_STRINGS,
+            DWC_MAGIC_STRINGS_LEN)
+        == 0)
+    {
+        return DWCi_LEtoHs(header.type);
+    }
+
+    return DWC_SEND_TYPE_INVALID;
+}
+
+static s32 DWCs_GetRequiredHeaderSize(u16 type)
+{
+    s32 size;
+
+    switch (type)
+    {
+    case DWC_SEND_TYPE_MATCH_SYN:
+    case DWC_SEND_TYPE_MATCH_SYN_ACK:
+    case DWC_SEND_TYPE_MATCH_ACK:
+        size = sizeof(DWCTransportHeader) + DWC_MATCH_SYN_DATA_BODY_SIZE;
+        break;
+    default:
+        size = sizeof(DWCTransportHeader);
+        break;
+    }
+
+    return size;
+}
+
+static int DWCs_GetOutgoingBufferFreeSize(u8 aid)
+{
+    static const int gamespyUseSize = 512;
+    GT2Connection connection = DWCi_GetGT2Connection(aid);
+    int free;
+
+    free = gt2GetOutgoingBufferFreeSpace(connection)
+        - DWC_TRANSPORT_GT2HEADER_SIZE - gamespyUseSize;
+
+    return free > 0 ? free : 0;
+}
+
+BOOL DWCi_IsSendableReliable(u8 aid, u16 type)
+{
+    s32 freeSpace;
 
     if (DWCi_IsError()
-        || (type == 1 && !DWC_IsValidAID(aid))
-        || !DWC_isValidAid(aid))
+        || (type == DWC_SEND_TYPE_USERDATA && !DWC_IsValidAID(aid))
+        || !DWCi_IsValidAID(aid))
     {
-        DWC_Printf(8, "aid %d is unavailable.\n", aid);
-        sendable = FALSE;
+        DWC_Printf(DWC_REPORTFLAG_WARNING, "aid %d is unavailable.\n", aid);
+        return FALSE;
     }
-    else if (entry->_1C == 1)
+
+    if (DWCs_GetSendState(aid) == DWC_TRANSPORT_SEND_BUSY)
     {
-        DWC_Printf(0x8000,
+        DWC_Printf(DWC_REPORTFLAG_SEND_INFO,
             "+++ Cannot send to %d from %d (busy)\n",
             aid,
             DWC_GetMyAID());
-        sendable = FALSE;
-    }
-    else
-    {
-        freeSpace = gt2GetOutgoingBufferFreeSpace(DWCi_GetGT2Connection(aid)) - 519;
-        freeSpace = freeSpace > 0 ? freeSpace : 0;
-        if (freeSpace < (type < 5 && type >= 2 ? 12 : 8))
-        {
-            DWC_Printf(0x8000,
-                "+++ Cannot send to %d from %d (outgoing buffer is not enough) %d < %d\n",
-                aid,
-                DWC_GetMyAID(),
-                freeSpace,
-                type < 5 && type >= 2 ? 12 : 8);
-            sendable = FALSE;
-        }
-        else
-        {
-            sendable = TRUE;
-        }
+        return FALSE;
     }
 
-    if (!sendable)
+    freeSpace = DWCs_GetOutgoingBufferFreeSize(aid);
+
+    if (freeSpace < DWCs_GetRequiredHeaderSize(type))
+    {
+        DWC_Printf(DWC_REPORTFLAG_SEND_INFO,
+            "+++ Cannot send to %d from %d (outgoing buffer is not enough) %d < %d\n",
+            aid, DWC_GetMyAID(), freeSpace,
+            DWCs_GetRequiredHeaderSize(type));
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+BOOL DWCi_SendReliable(u16 type, u8 aid, const void* buffer, int size)
+{
+    DWCTransportConnection* transConnection = DWCs_GetTransConnection(aid);
+    DWCTransportHeader header;
+    int sendSize;
+    int freeSpace;
+
+    if (!DWCi_IsSendableReliable(aid, type))
     {
         return FALSE;
     }
 
-    entry->_1C = 1;
-    entry->_00 = buffer;
-    entry->_0C = 0;
-    entry->_14 = size;
+    transConnection->sendState = DWC_TRANSPORT_SEND_BUSY;
+    transConnection->sendBuffer = buffer;
+    transConnection->sendingSize = 0;
+    transConnection->requestSendSize = size;
 
-    strncpy(header.magic, "DT", 2);
-    header.size = (((u32)size & 0xFF000000) >> 24)
-                | (((u32)size & 0x00FF0000) >> 8)
-                | (((u32)size & 0x0000FF00) << 8)
-                | (((u32)size & 0x000000FF) << 24);
-    header.type = (u16)(((u16)type >> 8) | ((u16)type << 8));
-    gt2Send(DWCi_GetGT2Connection(aid),
-        (const GT2Byte*)&header,
-        sizeof(header),
-        GT2True);
+    DWCs_EncodeHeader(&header, type, size);
+    DWCs_Send(aid, (const u8*)&header, sizeof(DWCTransportHeader), TRUE);
 
-    if (size > lbl_806E2F00->maxSplit)
+    if (size > sTransInfo->sendSplitMax)
     {
-        size = lbl_806E2F00->maxSplit;
+        sendSize = sTransInfo->sendSplitMax;
     }
-    gt2Send(DWCi_GetGT2Connection(aid), buffer, size, GT2True);
-    entry->_0C += size;
-
-    size = entry->_14;
-    if (entry->_0C == size)
+    else
     {
-        entry->_1C = 0;
-        entry->_00 = NULL;
-        entry->_0C = 0;
-        entry->_14 = 0;
-        if (lbl_806E2F00->sendCallback != NULL && type == 1)
+        sendSize = size;
+    }
+
+    freeSpace = DWCs_GetOutgoingBufferFreeSize(aid);
+
+    DWCs_Send(aid, buffer, sendSize, TRUE);
+
+    transConnection->sendingSize += sendSize;
+
+    if (transConnection->sendingSize == transConnection->requestSendSize)
+    {
+        int reqSendSize = transConnection->requestSendSize;
+
+        transConnection->sendState = DWC_TRANSPORT_SEND_READY;
+        transConnection->sendBuffer = NULL;
+        transConnection->sendingSize = 0;
+        transConnection->requestSendSize = 0;
+
+        if (sTransInfo->sendCallback && type == DWC_SEND_TYPE_USERDATA)
         {
-            lbl_806E2F00->sendCallback(size, aid);
+            sTransInfo->sendCallback(reqSendSize, aid);
         }
     }
+
     return TRUE;
 }
 
@@ -150,26 +206,26 @@ BOOL DWC_SendUnreliable(u8 aid, const void* buffer, int size)
         return FALSE;
     }
 
-    if (size > lbl_806E2F00->maxSplit)
+    if (size > sTransInfo->sendSplitMax)
     {
         DWC_Printf(0x8000,
-            "+++ SendUnreliable size is too large ( %d > %d ) \n",
+            "+++ SendUnreliable size is too large ( %d > %d )\n",
             size,
-            lbl_806E2F00->maxSplit);
+            sTransInfo->sendSplitMax);
         return FALSE;
     }
 
     gt2Send(DWCi_GetGT2Connection(aid), buffer, size, GT2False);
-    if (lbl_806E2F00->sendCallback != NULL)
+    if (sTransInfo->sendCallback != NULL)
     {
-        lbl_806E2F00->sendCallback(size, aid);
+        sTransInfo->sendCallback(size, aid);
     }
     return TRUE;
 }
 
 BOOL DWC_SetRecvBuffer(u8 aid, void* buffer, int size)
 {
-    DWCTransportEntryView* entry = &lbl_806E2F00->entries[aid];
+    DWCTransportConnection* entry = &sTransInfo->connections[aid];
     int recvState = entry->recvState;
 
     if (recvState == 2)
@@ -181,35 +237,59 @@ BOOL DWC_SetRecvBuffer(u8 aid, void* buffer, int size)
     entry->recvBuffer = buffer;
     entry->recvBufferSize = size;
     entry->recvState = 1;
-    entry->_10 = 0;
-    entry->_18 = 0;
+    entry->recvingSize = 0;
+    entry->requestRecvSize = 0;
+    return TRUE;
+}
+
+BOOL DWC_Ping(u8 aid)
+{
+    GT2Connection connection;
+
+    if (DWCi_IsError())
+    {
+        return FALSE;
+    }
+
+    connection = DWCi_GetGT2Connection(aid);
+
+    if (aid == DWC_GetMyAID() || !connection
+        || gt2GetConnectionState(connection) != GT2Connected)
+    {
+        DWC_Printf(DWC_REPORTFLAG_SEND_INFO,
+            "DWC_Ping:not connected yet:%d\n", aid);
+        return FALSE;
+    }
+
+    gt2Ping(connection);
+
     return TRUE;
 }
 
 BOOL DWC_SetUserRecvCallback(DWCUserRecvCallback callback)
 {
-    if (lbl_806E2F00 == NULL)
+    if (sTransInfo == NULL)
     {
         return FALSE;
     }
-    lbl_806E2F00->recvCallback = callback;
+    sTransInfo->recvCallback = callback;
     return TRUE;
 }
 
-void DWCi_InitTransport(void* control)
+void DWCi_InitTransport(DWCTransportInfo* info)
 {
-    lbl_806E2F00 = control;
-    memset(lbl_806E2F00, 0, sizeof(DWCTransportControlView));
-    lbl_806E2F00->maxSplit = 1465;
+    sTransInfo = info;
+    memset(sTransInfo, 0, sizeof(DWCTransportInfo));
+    sTransInfo->sendSplitMax = DWC_TRANSPORT_SEND_MAX;
 }
 
-void fn_8049B244(GT2Connection connection, GT2Byte* message, int len,
+void DWCi_RecvCallback(GT2Connection connection, GT2Byte* message, int len,
     GT2Bool reliable)
 {
-    DWCTransportEntryView* entry;
+    DWCTransportConnection* entry;
     u8 aid;
 
-    if (lbl_806E2F00 == NULL)
+    if (sTransInfo == NULL)
     {
         return;
     }
@@ -220,12 +300,12 @@ void fn_8049B244(GT2Connection connection, GT2Byte* message, int len,
     }
     if (reliable)
     {
-        fn_8049B674(connection, message, len);
+        DWCs_HandleReliableMessage(connection, message, len);
         return;
     }
 
-    aid = DWCi_GetConnectionAid(connection);
-    entry = &lbl_806E2F00->entries[aid];
+    aid = DWCi_GetConnectionAID(connection);
+    entry = &sTransInfo->connections[aid];
     if (entry->recvBuffer != NULL && entry->recvBufferSize >= len)
     {
         memcpy(entry->recvBuffer, message, len);
@@ -239,44 +319,313 @@ void fn_8049B244(GT2Connection connection, GT2Byte* message, int len,
         return;
     }
 
-    if (lbl_806E2F00->recvCallback != NULL)
+    if (sTransInfo->recvCallback != NULL)
     {
-        lbl_806E2F00->recvCallback(aid, entry->recvBuffer, len);
+        sTransInfo->recvCallback(aid, entry->recvBuffer, len);
     }
-    if (lbl_806E2F00->recvTimeoutCallback != NULL && entry->_30 != 0)
+    if (sTransInfo->recvTimeoutCallback != NULL && entry->recvTimeoutTime != 0)
     {
-        entry->_28 = OSGetTime();
-    }
-}
-
-void fn_8049B380(GT2Connection connection, int latency)
-{
-    if (lbl_806E2F00->pingCallback != NULL)
-    {
-        u8 aid = DWCi_GetConnectionAid(connection);
-        lbl_806E2F00->pingCallback(latency, aid);
+        entry->previousRecvTick = DWCi_Np_GetTick();
     }
 }
 
-void fn_8049B5EC(u8 aid)
+void DWCi_PingCallback(GT2Connection connection, int latency)
 {
-    if (lbl_806E2F00 == NULL)
+    if (sTransInfo->pingCallback != NULL)
+    {
+        u8 aid = DWCi_GetConnectionAID(connection);
+        sTransInfo->pingCallback(latency, aid);
+    }
+}
+
+void DWCi_TransportProcess(void)
+{
+    u8* aidList;
+    s32 hostCount;
+    s32 i;
+
+    if (!sTransInfo)
     {
         return;
     }
-    lbl_806E2F00->entries[aid]._0C = 0;
-    lbl_806E2F00->entries[aid]._10 = 0;
-    lbl_806E2F00->entries[aid]._14 = 0;
-    lbl_806E2F00->entries[aid]._18 = 0;
-    lbl_806E2F00->entries[aid]._1C = 0;
-    if (lbl_806E2F00->entries[aid].recvState)
+
+    hostCount = DWC_GetAIDList(&aidList);
+
+    for (i = 0; i < hostCount; i++)
     {
-        lbl_806E2F00->entries[aid].recvState = 1;
+        u8 aid;
+
+        aid = aidList[i];
+
+        if (DWC_IsValidAID(aid))
+        {
+            DWCTransportConnection* transConnection;
+            transConnection = DWCs_GetTransConnection(aid);
+
+            if (sTransInfo->recvTimeoutCallback
+                && transConnection->recvTimeoutTime > 0)
+            {
+                u32 time;
+                DWCTick currentTick;
+
+                currentTick = DWCi_Np_GetTick();
+                time = (u32)DWCi_Np_TicksToMilliSeconds(
+                    currentTick - transConnection->previousRecvTick);
+                if (time > transConnection->recvTimeoutTime)
+                {
+                    DWC_Printf(DWC_REPORTFLAG_RECV_INFO,
+                        "DWCi_TransportProcess:timeout aid=%d,time=%d[ms],timeout time=%d[ms]\n",
+                        aid, time, transConnection->recvTimeoutTime);
+                    sTransInfo->recvTimeoutCallback(aid);
+                    transConnection->previousRecvTick = currentTick;
+                }
+            }
+        }
+
+        if (aid != DWC_GetMyAID()
+            && DWCs_GetSendState(aid) == DWC_TRANSPORT_SEND_BUSY)
+        {
+            s32 restSize;
+            s32 sendSize;
+            s32 freeSpace;
+            DWCTransportConnection* transConnection;
+
+            transConnection = DWCs_GetTransConnection(aid);
+            restSize = transConnection->requestSendSize
+                - transConnection->sendingSize;
+
+            if (restSize > sTransInfo->sendSplitMax)
+            {
+                sendSize = sTransInfo->sendSplitMax;
+            }
+            else
+            {
+                sendSize = restSize;
+            }
+
+            freeSpace = DWCs_GetOutgoingBufferFreeSize(aid);
+            if (freeSpace < sendSize)
+            {
+                DWC_Printf(DWC_REPORTFLAG_SEND_INFO,
+                    "DWCi_TransportProcess:freeSpace < sendSize:aid:%d, %d < %d\n",
+                    aid, freeSpace, sendSize);
+                continue;
+            }
+
+            DWCs_Send(aid,
+                (u8*)transConnection->sendBuffer
+                    + transConnection->sendingSize,
+                sendSize, TRUE);
+
+            transConnection->sendingSize += sendSize;
+
+            if (transConnection->sendingSize
+                == transConnection->requestSendSize)
+            {
+                int reqSendSize = transConnection->requestSendSize;
+
+                transConnection->sendState = DWC_TRANSPORT_SEND_READY;
+                transConnection->sendBuffer = NULL;
+                transConnection->sendingSize = 0;
+                transConnection->requestSendSize = 0;
+
+                if (sTransInfo->sendCallback)
+                {
+                    sTransInfo->sendCallback(reqSendSize, aid);
+                }
+            }
+        }
     }
-    lbl_806E2F00->entries[aid]._22 = 0;
 }
 
-void fn_8049B668(void)
+void DWCi_ClearTransConnection(u8 aid)
 {
-    lbl_806E2F00 = NULL;
+    if (sTransInfo == NULL)
+    {
+        return;
+    }
+    sTransInfo->connections[aid].sendingSize = 0;
+    sTransInfo->connections[aid].recvingSize = 0;
+    sTransInfo->connections[aid].requestSendSize = 0;
+    sTransInfo->connections[aid].requestRecvSize = 0;
+    sTransInfo->connections[aid].sendState = 0;
+    if (sTransInfo->connections[aid].recvState)
+    {
+        sTransInfo->connections[aid].recvState = 1;
+    }
+    sTransInfo->connections[aid].lastRecvType = 0;
+}
+
+void DWCi_ShutdownTransport(void)
+{
+    sTransInfo = NULL;
+}
+
+static void DWCs_HandleReliableMessage(
+    GT2Connection connection, u8* message, int size)
+{
+    u8 aid = DWCi_GetConnectionAID(connection);
+    u16 type;
+
+    switch (DWCs_GetRecvState(aid))
+    {
+    case DWC_TRANSPORT_RECV_NOBUF:
+        type = DWCs_DecodeHeader((DWCTransportHeader*)message);
+        if (type >= DWC_SEND_TYPE_MATCH_SYN
+            && type <= DWC_SEND_TYPE_MATCH_ACK)
+        {
+            DWCs_RecvDataHeader(aid, (DWCTransportHeader*)message, size);
+        }
+        else
+        {
+            DWC_Printf(DWC_REPORTFLAG_RECV_INFO,
+                "+++ Recv buffer is not set\n");
+        }
+        break;
+    case DWC_TRANSPORT_RECV_HEADER:
+        DWCs_RecvDataHeader(aid, (DWCTransportHeader*)message, size);
+        break;
+    case DWC_TRANSPORT_RECV_BODY:
+        DWCs_RecvDataBody(aid, message, size);
+        break;
+    case DWC_TRANSPORT_RECV_SYSTEM_DATA:
+        DWCs_RecvSystemDataBody(aid, message, size);
+        break;
+    case DWC_TRANSPORT_RECV_ERROR:
+        DWC_Printf(DWC_REPORTFLAG_RECV_INFO,
+            "+++ Recv size is too large ( buffer size = %d < %d )\n",
+            sTransInfo->connections[aid].recvBufferSize, size);
+        sTransInfo->connections[aid].recvState = DWC_TRANSPORT_RECV_HEADER;
+        sTransInfo->connections[aid].recvingSize = 0;
+        sTransInfo->connections[aid].requestRecvSize = 0;
+        break;
+    default:
+        DWC_Printf(DWC_REPORTFLAG_ERROR, "Recv error (state is %d).\n",
+            DWCs_GetRecvState(aid));
+        DWCi_SetError(DWC_ERROR_NETWORK,
+            DWC_ECODE_SEQ_ETC + DWC_ECODE_GS_GT2
+                + DWC_ECODE_TYPE_TRANS_HEADER);
+        break;
+    }
+}
+
+static void DWCs_RecvDataHeader(
+    u8 aid, DWCTransportHeader* message, int size)
+{
+    u16 type;
+    DWCTransportConnection* connection = &sTransInfo->connections[aid];
+    DWCTransportHeader header;
+
+    connection->lastRecvState = (u8)DWCs_GetRecvState(aid);
+
+    switch (type = DWCs_DecodeHeader(message))
+    {
+    case DWC_SEND_TYPE_USERDATA:
+        if (size != sizeof(DWCTransportHeader))
+        {
+            DWC_Printf(DWC_REPORTFLAG_RECV_INFO,
+                "+++ Invalid header from aid %d\n", aid);
+            return;
+        }
+
+        DWCi_Np_CpuCopy8(message, &header, sizeof(DWCTransportHeader));
+        header.size = (int)DWCi_LEtoHl((u32)header.size);
+        header.type = DWCi_LEtoHs(header.type);
+
+        connection->requestRecvSize = header.size;
+        connection->recvingSize = 0;
+
+        if (connection->recvBuffer
+            && connection->recvBufferSize >= connection->requestRecvSize)
+        {
+            connection->recvState = DWC_TRANSPORT_RECV_BODY;
+        }
+        else
+        {
+            connection->recvState = DWC_TRANSPORT_RECV_ERROR;
+        }
+        break;
+
+    case DWC_SEND_TYPE_MATCH_SYN:
+    case DWC_SEND_TYPE_MATCH_SYN_ACK:
+    case DWC_SEND_TYPE_MATCH_ACK:
+        DWC_Printf(DWC_REPORTFLAG_RECV_INFO, "Received system header.\n");
+        connection->recvState = DWC_TRANSPORT_RECV_SYSTEM_DATA;
+        break;
+
+    default:
+        DWC_Printf(DWC_REPORTFLAG_RECV_INFO,
+            "+++ Invalid header from aid %d\n", aid);
+        break;
+    }
+
+    connection->lastRecvType = type;
+}
+
+static void DWCs_RecvDataBody(u8 aid, void* message, int size)
+{
+    DWCTransportConnection* connection;
+    int requestSize;
+
+    connection = &sTransInfo->connections[aid];
+
+    if (DWCs_GetRecvState(aid) == DWC_TRANSPORT_RECV_BODY)
+    {
+        if (connection->recvingSize + size > connection->recvBufferSize)
+        {
+            DWC_Printf(DWC_REPORTFLAG_ERROR, "Recv buffer over flow.\n");
+            DWCi_SetError(DWC_ERROR_NETWORK,
+                DWC_ECODE_SEQ_ETC + DWC_ECODE_GS_GT2
+                    + DWC_ECODE_TYPE_TRANS_BODY);
+            return;
+        }
+
+        DWCi_Np_CpuCopy8(message,
+            (u8*)connection->recvBuffer + connection->recvingSize,
+            (u32)size);
+    }
+
+    connection->recvingSize += size;
+
+    DWC_Printf(DWC_REPORTFLAG_RECV_INFO,
+        "aid = %d size = %d/%d state = %d incoming buffer = %d\n", aid,
+        connection->recvingSize, connection->requestRecvSize,
+        DWCs_GetRecvState(aid),
+        gt2GetIncomingBufferFreeSpace(DWCi_GetGT2Connection(aid)));
+
+    if (connection->recvingSize == connection->requestRecvSize)
+    {
+        requestSize = connection->requestRecvSize;
+        connection->recvState = DWC_TRANSPORT_RECV_HEADER;
+        connection->recvingSize = 0;
+        connection->requestRecvSize = 0;
+
+        if (sTransInfo->recvCallback)
+        {
+            sTransInfo->recvCallback(aid, connection->recvBuffer, requestSize);
+        }
+    }
+
+    if (sTransInfo->recvTimeoutCallback && connection->recvTimeoutTime > 0)
+    {
+        connection->previousRecvTick = DWCi_Np_GetTick();
+    }
+}
+
+static void DWCs_RecvSystemDataBody(u8 aid, void* message, int size)
+{
+#pragma unused(size)
+    DWCTransportConnection* transConnection = DWCs_GetTransConnection(aid);
+
+    transConnection->recvState = transConnection->lastRecvState;
+
+    switch (transConnection->lastRecvType)
+    {
+    case DWC_SEND_TYPE_MATCH_SYN:
+    case DWC_SEND_TYPE_MATCH_SYN_ACK:
+    case DWC_SEND_TYPE_MATCH_ACK:
+        DWCi_ProcessMatchSynPacket(
+            aid, transConnection->lastRecvType, (u8*)message);
+        break;
+    }
 }

@@ -286,7 +286,7 @@ void UnidentifiedCameraEffects::OnWindupPresentation(
         return;
     }
 
-    if (fn_8003C180(g_pBall->m_pOwner))
+    if (fn_8003C180(g_pBall->m_pOwner) == true)
     {
         mCameraFlags |= 4;
     }
@@ -304,30 +304,33 @@ void UnidentifiedCameraEffects::OnCaptainClashPresentationEnd(
 void UnidentifiedCameraEffects::OnCaptainClashPresentation(
     UnidentifiedEventData00*)
 {
-    if (g_pGame->m_eGameState == 3 || FixedUpdateTask::GetTargetTimeScale() != 1.0f)
+    if (g_pGame->m_eGameState == 3)
     {
         return;
     }
 
-    Reset();
-    FireCameraRumbleFilter(
-        lbl_806DC5C8, lbl_806DC5CC, lbl_806DC5D0, lbl_806DC5D4);
-    g_pGame->fn_80058528(lbl_806DC578, 0.0f);
-    g_pGame->fn_80058528(lbl_806DC57C, lbl_806DC570);
-    mOwnsTimeScale = true;
-    mRestoreTimeScale = true;
-    mTransitionTime = lbl_806DC570;
-    mTransitionInTime = lbl_806DC570;
-    mTransitionOutTime = lbl_806DC574;
-    mZoomStart = lbl_806DC568;
-    mRotationDegrees = lbl_806DC56C;
-    mRotateCamera = lbl_806DC560;
-
-    if (g_pBall->m_pLastTouch != 0
-        && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
-               ->m_v3Velocity.x < 0.0f)
+    if (FixedUpdateTask::GetTargetTimeScale() == 1.0f)
     {
-        mRotationDegrees *= -1.0f;
+        Reset();
+        FireCameraRumbleFilter(
+            lbl_806DC5C8, lbl_806DC5CC, lbl_806DC5D0, lbl_806DC5D4);
+        g_pGame->fn_80058528(lbl_806DC578, 0.0f);
+        g_pGame->fn_80058528(lbl_806DC57C, lbl_806DC570);
+        mOwnsTimeScale = true;
+        mRestoreTimeScale = true;
+        mTransitionTime = lbl_806DC570;
+        mTransitionInTime = lbl_806DC570;
+        mTransitionOutTime = lbl_806DC574;
+        mZoomStart = lbl_806DC568;
+        mRotationDegrees = lbl_806DC56C;
+        mRotateCamera = lbl_806DC580;
+
+        if (g_pBall->m_pLastTouch != 0
+            && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
+                   ->m_v3Velocity.x < 0.0f)
+        {
+            mRotationDegrees *= -1.0f;
+        }
     }
 }
 
@@ -665,7 +668,7 @@ void UnidentifiedCameraEffects::UpdateCameraFlags()
 void UnidentifiedCameraEffects::Reset()
 {
     if (mOwnsTimeScale && fn_80338C20(lbl_806E20D8) == 0
-        && (lbl_806E2164 == 0 || lbl_806E2164[4] == 0))
+        && lbl_806E2164[4] == 0)
     {
         g_pGame->fn_80059FC4();
     }

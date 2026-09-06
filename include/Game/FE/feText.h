@@ -8,6 +8,8 @@
 class FEText : public FELibObject
 {
 public:
+    FEText();
+
     /* 0x78 */ const FEFontResource* m_pFeFontResource;
     /* 0x7C */ FETextLibObjectAttributes m_TextAttributes;
 }; // size 0x88

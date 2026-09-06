@@ -500,7 +500,7 @@ void TU80264E98Scene::fn_80266014()
 
         unsigned long textureReference = lbl_806E1908->mUnidentified3C[i];
         bool imageReady
-            = fn_8026F280(lbl_806E1908, officialIndex, i, false);
+            = fn_8026F280(lbl_806E1908, officialIndex, i, RFLExp_Normal);
 
         TLImageInstance* image
             = (TLImageInstance*)FEFinder<TLImageInstance, 2>::_Find<TLInstance>(

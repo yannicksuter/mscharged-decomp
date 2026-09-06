@@ -64,7 +64,14 @@ extern "C" void fn_80296BAC(int mode)
     lbl_806E1BE0[0] = mode;
     gxSetTexCoordGen(0, 0, 4, 30);
     fn_80183654(1, lbl_806E1BCC);
-    fn_801832F4(mode != 0, lbl_806E1BCC, 1);
+    if (mode == 0)
+    {
+        fn_801832F4(0, lbl_806E1BCC, 1);
+    }
+    else
+    {
+        fn_801832F4(1, lbl_806E1BCC, 1);
+    }
 
     if (mode == 3)
     {

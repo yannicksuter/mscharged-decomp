@@ -12,7 +12,7 @@
 class UnidentifiedRenderObject_801A4188
 {
 public:
-    virtual ~UnidentifiedRenderObject_801A4188();
+    virtual ~UnidentifiedRenderObject_801A4188() {}
     virtual void UnidentifiedVirtual0C();
     virtual nlMatrix4* UnidentifiedVirtual10();
     virtual void SetTransform(const nlMatrix4& transform);

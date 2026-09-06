@@ -249,9 +249,10 @@ DaisyFistObject* NPCManager::fn_801A9CA4(int nIndex)
         return mDaisyFists[nIndex];
     }
 
+    DaisyFistObject* pObject;
     for (unsigned int i = 0; i < 8; ++i)
     {
-        DaisyFistObject* pObject = mDaisyFists[i];
+        pObject = mDaisyFists[i];
         if (pObject != 0 && !pObject->mVisible)
         {
             mUnidentified030 = 8;
@@ -402,10 +403,9 @@ ThwompObject* NPCManager::fn_801AA528(
 
     for (int i = 0; i < 8; ++i)
     {
-        ThwompObject* pObject = mUnidentified0AC[i];
-        if (pObject != 0 && !pObject->mVisible)
+        if (mUnidentified0AC[i] != 0 && !mUnidentified0AC[i]->mVisible)
         {
-            return pObject;
+            return mUnidentified0AC[i];
         }
     }
     return 0;
@@ -776,7 +776,6 @@ void NPCManager::fn_801ABF8C()
         mUnidentified0D8->fn_80199A88();
     }
 
-    mUnidentified030 = 0;
     unsigned int i;
     for (i = 0; i < 8; ++i)
     {

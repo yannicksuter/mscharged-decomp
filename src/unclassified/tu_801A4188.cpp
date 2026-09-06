@@ -1,5 +1,6 @@
 #include "Game/Camera/CameraMan.h"
 #include "Game/BasicStadium.h"
+#include "Game/Drawable/DrawableObj.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/GameInfo.h"
 #include "Game/Render/ImpostorManager.h"
@@ -10,6 +11,7 @@
 
 #include "Game/tu_802C6224.h"
 #include "NL/nlMath.h"
+#include "NL/nlDLRing.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_801A4188.h"
 
@@ -239,6 +241,19 @@ static CrowdModelCollection_801A4188 lbl_805721E8;
 extern "C" void fn_801A49E4(u32 hash, unsigned long texture);
 extern "C" void fn_801A51D8();
 
+extern "C"
+{
+    extern unsigned long lbl_806E1F0C;
+    void* fn_802CDF0C();
+    unsigned long fn_802CE1B8(void* manager, unsigned long texture);
+    unsigned long fn_802CC7E4(
+        const glModelPacket* packet, unsigned long hash);
+    void fn_802CC458(glModelPacket* packet, unsigned long hash,
+        unsigned long texture);
+    void fn_802CC4FC(glModelPacket* packet, unsigned long hash,
+        const unsigned long* textureIndex);
+}
+
 void UpdateImpostorPositions()
 {
     nlVector3 viewVector;
@@ -258,13 +273,14 @@ extern "C" void fn_801A421C()
     lbl_806E15A0 = 0;
 
     int captain = GameInfoManager::Instance()->GetTeam(0);
+    const char* teamName;
     const CharacterInfo& team
         = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     int opponentCaptain = GameInfoManager::Instance()->GetTeam(1);
     const CharacterInfo& opponent
         = GetCharacterInfo(GetCharacterIndexFromCaptain(opponentCaptain));
 
-    const char* teamName = team.mName;
+    teamName = team.mName;
     bool alternateColour = NeedsAlternateColour(team, opponent);
     char fileName[256];
     nlSNPrintf(fileName, sizeof(fileName), lbl_80514000, teamName,
@@ -425,6 +441,34 @@ extern "C" void fn_801A48A8()
     lbl_806E1580->SetTransform(transform);
     fn_802D911C(GetCrowdImpostorManager(), lbl_806E1580, 1);
     delete stadiumOwner;
+}
+
+extern "C" void fn_801A49E4(u32 hash, unsigned long texture)
+{
+    DLListEntry<DrawableObject*>* head
+        = BasicStadium::GetCurrentStadium()->mUnidentified008;
+    nlDLListIterator<DrawableObject*> iterator(head, nlDLRingGetStart(head));
+    unsigned long textureIndex = fn_802CE1B8(fn_802CDF0C(), texture);
+
+    for (; iterator.hasNext(); iterator.next())
+    {
+        DrawableObject* pObject = *iterator;
+        if (pObject->mUnidentified08 == 0x10002)
+        {
+            glModel* pGlModel = pObject->m_pModel;
+            for (glModelPacket* pPacket = pGlModel->packets;
+                 pPacket < pGlModel->packets + pGlModel->numPackets;
+                 ++pPacket)
+            {
+                if (fn_802CC7E4(pPacket, lbl_806E1F0C) == hash)
+                {
+                    fn_802CC458(pPacket, lbl_806E1F0C, texture);
+                    unsigned long resolvedTexture = textureIndex;
+                    fn_802CC4FC(pPacket, lbl_806E1F0C, &resolvedTexture);
+                }
+            }
+        }
+    }
 }
 
 extern "C" void fn_801A4B0C()

@@ -28,6 +28,7 @@ public:
     bool AreAllScenesValid();
     void ForceImmediateStackProcessing();
     BaseSceneHandler* GetSceneHandler(unsigned long hashID);
+    BaseSceneHandler* fn_802FECB0();
     void ProcessPushPopQueue();
     void QueueScenePush(BaseSceneHandler* pSceneHandler, const char* szFilename, MemoryAllocator* pAllocator);
     void QueueScenePop();

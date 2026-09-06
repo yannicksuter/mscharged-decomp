@@ -69,6 +69,7 @@ void FERender::PushTransformMatrix(const TLInstance* instance, const nlMatrix4& 
     }
 
     nlMatrix4 scalePivotMatrix;
+    nlMatrix4 localMatrix;
     if ((flags & 1) == 0 || (flags & 8) == 0)
     {
         nlMatrix4 scaleMatrix;
@@ -82,7 +83,6 @@ void FERender::PushTransformMatrix(const TLInstance* instance, const nlMatrix4& 
         scalePivotMatrix.SetIdentity();
     }
 
-    nlMatrix4 localMatrix;
     if ((flags & 4) == 0)
     {
         nlMatrix4 rotationMatrix;

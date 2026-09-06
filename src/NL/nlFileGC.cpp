@@ -161,7 +161,7 @@ static bool sServicingReads;
 static unsigned long AlignUp32(unsigned long value)
 {
     unsigned long remainder = value & 31;
-    return value + (remainder != 0 ? 32 - remainder : 0);
+    return value + (remainder != 0) * (32 - remainder);
 }
 
 static bool EntryIsBusy(AsyncEntry* entry)
@@ -292,12 +292,11 @@ DolphinFile::~DolphinFile()
 
 u32 DolphinFile::FileSize(unsigned int* size)
 {
-    u32 s = mLength;
     if (size != 0)
     {
-        *size = AlignUp32(s);
+        *size = AlignUp32(mLength);
     }
-    return s;
+    return mLength;
 }
 
 void DolphinFile::Read(void* buffer, unsigned int size, unsigned long bufferSize)

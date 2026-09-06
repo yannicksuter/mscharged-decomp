@@ -4,6 +4,7 @@
 #include "unclassified/tu_802196B0.h"
 
 #include "Game/FE/feInput.h"
+#include "Game/FE/tu_802FA1C4.h"
 #include "Game/TweakRegistry.h"
 #include "NL/gl/glStruct.h"
 #include "NL/globalpad.h"
@@ -14,17 +15,6 @@
 
 class TLComponentInstance;
 
-class TU802FA1C4
-{
-public:
-    TU802FA1C4();
-    ~TU802FA1C4();
-
-    /* 0x00 */ u8 mUnidentified000[0x54];
-    /* 0x54 */ int mUnidentified054;
-}; // size 0x58
-
-extern TU802FA1C4* lbl_806E2030;
 TLComponentInstance* lbl_80578450[4];
 nlVector2 lbl_80578460[4];
 bool lbl_806E18B4[4];

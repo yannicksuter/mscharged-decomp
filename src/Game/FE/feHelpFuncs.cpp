@@ -4,6 +4,7 @@
 #include "Game/DB/StadiumInfo.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feModelManager.h"
+#include "Game/FE/feText.h"
 #include "Game/FE/tlComponent.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
@@ -446,7 +447,7 @@ void MakeTextBoxReallyWide(TLTextInstance& textInstance)
 {
     nlVector2& boxSize = ((textInstance.m_OverloadFlags & 0x4) != 0)
         ? textInstance.m_OverloadedAttributes.BoxSize
-        : textInstance.m_component->m_BoxSize;
+        : ((FEText*)textInstance.m_component)->m_TextAttributes.BoxSize;
     nlVector2 bb = boxSize;
     bb.x = 999.9f;
     textInstance.m_OverloadedAttributes.BoxSize = bb;

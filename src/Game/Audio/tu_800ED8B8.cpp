@@ -39,11 +39,6 @@ static bool lbl_806E0E89;
 static bool lbl_806E0E8A;
 static bool lbl_806E0E8B;
 
-inline bool AudioBundleManager_802EDA7C::fn_800ED8B8()
-{
-    return m_Initialized;
-}
-
 void XSoundHandle_802ED74C::fn_800ED8C0(unsigned char enabled)
 {
     m_CallbackEnabled = enabled;

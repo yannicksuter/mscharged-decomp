@@ -1,8 +1,52 @@
 #include <revolution/gx.h>
 
+#include "NL/gl/glState.h"
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
+
+static float lbl_80524420[2][3] = {
+    { 0.0f, 0.0f, 0.0625f },
+    { 0.0f, 0.0625f, 0.0f },
+};
+
+bool lbl_806E1BF8;
+bool lbl_806E1BF9;
+
+void fn_80297F70(bool enabled)
+{
+    unsigned long texture = glGetTexture("target/warbleoffset");
+    if (lbl_806E1BF8)
+    {
+        if (lbl_806E1BF9)
+            texture = glGetTexture("global/black");
+        else
+            texture = glGetTexture("global/white");
+    }
+
+    if (enabled)
+    {
+        UnidentifiedTextureState textureState;
+        textureState.texture = texture;
+        textureState.textureIndex = 0xFFFF;
+        textureState.flags = 0;
+        textureState.SetWrapS(true);
+        textureState.SetWrapT(true);
+        textureState.unknown07 = 0;
+        fn_8036BE88(1, &textureState);
+
+        GXSetNumIndStages(1);
+        GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD0, GX_TEXMAP1);
+        GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_4, GX_ITS_4);
+        GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, true, false, GX_ITM_0);
+        GXSetIndTexMtx(GX_ITM_0, lbl_80524420, 1);
+    }
+    else
+    {
+        GXSetNumIndStages(0);
+        GXSetTevDirect(GX_TEVSTAGE0);
+    }
+}
 
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A05A4>::Activate(GLView*)

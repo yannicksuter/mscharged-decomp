@@ -5,6 +5,8 @@
 
 #include <NMWException.h>
 
+class PlaybackBackend_802F2C3C;
+
 struct SliderState_802F1758
 {
     void** vtable;
@@ -142,7 +144,7 @@ extern "C" void fn_802F2594(SoundInstance_802F1758*, bool, float, float);
 extern "C" void fn_802F25D4(SoundInstance_802F1758*, void*);
 extern "C" void fn_802F2640(SoundInstance_802F1758*);
 extern "C" void fn_802F2648(SoundInstance_802F1758*);
-extern "C" void fn_802F2650(SoundInstance_802F1758*, u32, void*);
+extern "C" void fn_802F2650(SoundInstance_802F1758*, PlaybackBackend_802F2C3C**, u32*);
 extern "C" void fn_802F26B0(SoundInstance_802F1758*, float);
 extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" const char* fn_802B9568(int, const char*);
@@ -254,7 +256,7 @@ extern "C" SliderState_802F1758* fn_802F1A70(CueHandle_802F1758* handle, u32 ind
     return handle->localSliders->sliders + index;
 }
 
-extern "C" void fn_802F1A84(CueHandle_802F1758* handle, u32 value, void** output)
+extern "C" void fn_802F1A84(CueHandle_802F1758* handle, PlaybackBackend_802F2C3C** value, u32* output)
 {
     *output = 0;
     fn_802F2650(handle->instance, value, output);

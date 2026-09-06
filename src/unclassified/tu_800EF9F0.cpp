@@ -133,17 +133,19 @@ void UnidentifiedCameraFilter::vfunc_0x18(
 {
     Reset();
 
-    if (fUnidentified0 >= 0.0001f)
+    if (fUnidentified0 < 0.0001f)
     {
-        mUnidentified28.x = (float)nlRandom(5000, &nlDefaultSeed);
-        mUnidentified28.y = (float)nlRandom(5000, &nlDefaultSeed);
-        mUnidentified28.z = (float)nlRandom(5000, &nlDefaultSeed);
-        mUnidentified1C = v3Unidentified;
-        mUnidentified0C = fUnidentified0;
-        mUnidentified10 = 1.0f / fUnidentified0;
-        mUnidentified18 = fUnidentified1;
-        mUnidentified04 = true;
+        return;
     }
+
+    mUnidentified28.x = (float)nlRandom(5000, &nlDefaultSeed);
+    mUnidentified28.y = (float)nlRandom(5000, &nlDefaultSeed);
+    mUnidentified28.z = (float)nlRandom(5000, &nlDefaultSeed);
+    mUnidentified1C = v3Unidentified;
+    mUnidentified0C = fUnidentified0;
+    mUnidentified10 = 1.0f / mUnidentified0C;
+    mUnidentified18 = fUnidentified1;
+    mUnidentified04 = true;
 }
 
 UnidentifiedCameraFilter::UnidentifiedCameraFilter()

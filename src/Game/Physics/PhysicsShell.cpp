@@ -400,8 +400,12 @@ ContactType PhysicsShell::Contact(
 
     default:
     {
-        if (obj->GetObjectType() == 0x12 && !mUnidentified046)
+        if (obj->GetObjectType() == 0x12)
         {
+            if (mUnidentified046)
+            {
+                return NO_CONTACT;
+            }
             for (int i = 0; i < numContacts; i++)
             {
                 if (info[i].geom.pos[2] <= myPos.z
@@ -529,30 +533,31 @@ ContactType PhysicsShell::Contact(
                 }
             }
 
-            if (!bWasRicochet
+            if (bWasRicochet
                 && GameInfoManager::Instance()->GetStadium() == 0x0B)
             {
                 nlVector3 contactPos;
                 nlVec3Set(contactPos, info->geom.pos[0], info->geom.pos[1], info->geom.pos[2]);
                 float height
                     = contactPos.z - m_pPowerupObject->GetRadius();
-                bool aboveGroundAndSmall
-                    = height > 0.36f
-                   && m_pPowerupObject->meSize == POWERUPSIZE_SMALL;
+                bool belowGroundAndSmall = height < 0.36f;
+                belowGroundAndSmall = belowGroundAndSmall
+                    && m_pPowerupObject->meSize == POWERUPSIZE_SMALL;
                 float sidelineDistance
                     = fabsf(contactPos.y) - m_pPowerupObject->GetRadius();
                 bool beyondSideline
                     = sidelineDistance > cField::GetSidelineY(1U);
                 bool insideGoalLine
                     = fabsf(contactPos.x) < cField::GetGoalLineX(1U) - 0.5f;
-                if (insideGoalLine && aboveGroundAndSmall)
+                if (insideGoalLine && !belowGroundAndSmall)
                 {
                     if (beyondSideline
                         && m_pPowerupObject->mtNoHitTimer.m_uPackedTime == 0)
                     {
-                        if (height <= 0.72f)
+                        if (height < 0.72f)
                         {
-                            AddForceAtCentreOfMass(v3Unidentified);
+                            nlVector3 v3Force = v3Unidentified;
+                            AddForceAtCentreOfMass(v3Force);
                         }
                         mUnidentified046 = true;
                     }
@@ -602,11 +607,12 @@ ContactType PhysicsShell::Contact(
 
                 nlVector3 v3Position;
                 nlVector3 v3Velocity;
+                nlVector3 v3DirectionCopy = v3Direction;
                 GetPosition(&v3Position);
                 GetLinearVelocity(&v3Velocity);
 
                 pControl->SetPosition(v3Position);
-                pControl->SetDirection(v3Direction);
+                pControl->SetDirection(v3DirectionCopy);
                 pControl->SetVelocity(v3Velocity);
             }
 

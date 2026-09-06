@@ -141,14 +141,15 @@ static inline u32 Align32(u32 size)
     return (size + 0x1F) & ~0x1F;
 }
 
-static inline u32 SaveDataSize()
+static inline u32 SaveFileSize()
 {
-    GameInfoManager* gameInfo = GameInfoManager::GetInstance();
     if (OnlineMode)
     {
-        return gameInfo->GetMemoryCardDataSize();
+        return GameInfoManager::GetInstance()->GetMemoryCardDataSize()
+            + sizeof(SaveFileHeader);
     }
-    return (u32)gameInfo->GetUnknown806E0F90Block();
+    return (u32)GameInfoManager::GetInstance()->GetUnknown806E0F90Block()
+        + sizeof(SaveFileHeader);
 }
 
 static inline const unsigned short* LocalizedString(const char* name)
@@ -385,7 +386,7 @@ void SaveLoad::WriteSaveFileCallback(s32 result)
     nlFree(SaveBuffer);
     SaveBuffer = 0;
 
-    u32 expectedSize = Align32(SaveDataSize() + sizeof(SaveFileHeader));
+    u32 expectedSize = Align32(SaveFileSize());
     if ((u32)result == expectedSize)
     {
         HandleNANDResult(nlFlashClose(ContinueAfterCloseCallback));
@@ -400,7 +401,7 @@ void SaveLoad::WriteSaveFileCallback(s32 result)
 
 void SaveLoad::ReadSaveFileCallback(s32 result)
 {
-    u32 expectedSize = Align32(SaveDataSize() + sizeof(SaveFileHeader));
+    u32 expectedSize = Align32(SaveFileSize());
     if ((u32)result == expectedSize)
     {
         bool valid = ReadSaveData(result);
@@ -514,6 +515,11 @@ void SaveLoad::StartLoadDirectoryCallback(s32 result)
     }
 }
 
+static u32 NANDBlocksForBytes(u32 bytes)
+{
+    return (u32)(float)ceil((float)bytes / 16384.0f);
+}
+
 void SaveLoad::CheckSaveAndBannerSpace()
 {
     u32 files = 2;
@@ -521,11 +527,11 @@ void SaveLoad::CheckSaveAndBannerSpace()
     if (!BannerFileExists)
     {
         files = 3;
-        bannerBlocks = (u32)ceil((float)NAND_BANNER_SIZE(8) / 16384.0f);
+        u32 bannerBytes = NAND_BANNER_SIZE(8);
+        bannerBlocks = NANDBlocksForBytes(bannerBytes);
     }
-    u32 saveBlocks = (u32)ceil((float)Align32(
-                                   GameInfoManager::GetInstance()->GetMemoryCardDataSize() + sizeof(SaveFileHeader))
-                               / 16384.0f);
+    u32 saveBlocks = NANDBlocksForBytes(Align32(
+        GameInfoManager::GetInstance()->GetMemoryCardDataSize() + sizeof(SaveFileHeader)));
     HandleNANDResult(nlFlashCheck(saveBlocks + bannerBlocks, files, &CheckAnswer, CheckNoCopyDirectoryCallback));
 }
 
@@ -610,7 +616,7 @@ u32 SaveLoad::GetSaveBlockSize()
 void SaveLoad::WriteSaveData()
 {
     ResetTask::s_resetPaused = true;
-    u32 dataSize = SaveDataSize() + sizeof(SaveFileHeader);
+    u32 dataSize = SaveFileSize();
     u32 alignedSize = Align32(dataSize);
     SaveBuffer = nlMalloc(alignedSize, 0x20, true);
 
@@ -759,7 +765,7 @@ void SaveLoad::DeleteInvalidBannerCallback(s32 result)
 {
     if (result == 0)
     {
-        nlFlashDelete(BannerFileName, BannerCloseCallback);
+        result = nlFlashDelete(BannerFileName, BannerCloseCallback);
     }
     HandleNANDResult(result);
 }

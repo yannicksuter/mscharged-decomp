@@ -60,7 +60,7 @@ public:
     virtual bool IsFinalRound() const = 0;
     virtual s16 GetCurrentRoundNumber() const = 0;
     virtual int IsTournamentMode() const = 0;
-    virtual int GetNumRounds() const = 0;
+    virtual u16 GetNumRounds() const = 0;
 };
 
 class NetTournManager : public NetworkTournamentCupInterface,
@@ -110,7 +110,7 @@ public:
     virtual bool IsFinalRound() const;
     virtual s16 GetCurrentRoundNumber() const;
     virtual int IsTournamentMode() const;
-    virtual int GetNumRounds() const;
+    virtual u16 GetNumRounds() const;
 
     void AttachTournamentTrophy(void* presentation);
     void DetachTournamentTrophy();

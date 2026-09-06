@@ -28,6 +28,8 @@ public:
 
     nlEscapeSequence(const unsigned short* str);
 
+    ESCAPE_TYPE GetType() const { return m_Type; }
+
     /* 0x00 */ ESCAPE_TYPE m_Type;
     /* 0x04 */ unsigned short m_Extended[16];
     /* 0x24 */ const unsigned short* m_pEnd;

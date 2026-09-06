@@ -17,6 +17,7 @@
 #include "Game/GameObjectLighting.h"
 #include "Game/HBMManager_8024795C.h"
 #include "Game/Render/Presentation.h"
+#include "Game/Render/tu_80271960.h"
 #include "Game/TweakRegistry.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/main.h"
@@ -102,11 +103,11 @@ static void DrawFrontEndElements(float fDeltaT)
         UpdateHighRange();
     }
 
-    fn_80271A64(fn_80271960(), fDeltaT);
+    fn_80271960()->fn_80271A64(fDeltaT);
 
     if (!(gpHBMManager != 0 && gpHBMManager->mActive && gpHBMManager->mReady))
     {
-        fn_80271AEC(fn_80271960());
+        fn_80271960()->fn_80271AEC();
     }
 }
 

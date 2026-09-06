@@ -943,16 +943,17 @@ BasicGameInfo* NetTournManager::GetCurrentGameInfo()
 
 int NetTournManager::GetRoundMask(int, int round) const
 {
+    u16 numRounds = GetNumRounds();
     int mask = 0;
-    if (round == GetNumRounds() - 1)
+    if (round == numRounds - 1)
     {
         mask = 1;
     }
-    else if (round == GetNumRounds() - 2)
+    else if (round == numRounds - 2)
     {
         mask = 2;
     }
-    else if (round == GetNumRounds() - 3)
+    else if (round == numRounds - 3)
     {
         mask = 4;
     }
@@ -1015,14 +1016,14 @@ const char* NetTournManager::GetTournamentTrophyResource() const
     }
 }
 
-int NetTournManager::GetNumRounds() const
+u16 NetTournManager::GetNumRounds() const
 {
     return mLargeBracket ? 3 : 2;
 }
 
 bool NetTournManager::IsFinalRound() const
 {
-    return mCurrentRound == GetNumRounds() - 1;
+    return GetCurrentRoundNumber() == GetNumRounds() - 1;
 }
 
 s16 NetTournManager::GetCurrentRoundNumber() const

@@ -2,6 +2,7 @@
 #include "unclassified/tu_80177498.h"
 
 #include "Game/AI/Fielder.h"
+#include "Game/Game.h"
 #include "Game/Ball.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
@@ -516,6 +517,11 @@ PhysicsBox_80177498* WaluigiWallManager_80178400::fn_801792D0(
 extern "C" void fn_80179390(
     EmissionController& rController, int nParam)
 {
+    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+
     if (!rController.m_GlView && nParam == 2)
     {
         PhysicsBox_80177498* pObject

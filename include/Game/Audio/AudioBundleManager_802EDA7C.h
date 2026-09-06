@@ -5,6 +5,7 @@
 
 class nlChunk;
 class AudioBackend_8035B8E8;
+struct AudioBankTable_802EB644;
 
 class AudioResourceRuntime_802F479C
 {
@@ -33,7 +34,7 @@ public:
     AudioBundleManager_802EDA7C();
 
     virtual bool fn_802EE170() { return m_Loaded; }
-    virtual bool fn_800ED8B8();
+    virtual bool fn_800ED8B8() { return m_Initialized; }
     virtual void fn_802EDEE4(const char* path);
     virtual bool fn_802EDB00();
     virtual void fn_802EDA7C_4() = 0;
@@ -42,7 +43,7 @@ public:
     virtual void fn_802EDC34(nlChunk* chunk);
     virtual void fn_802EE160() { m_Loaded = true; }
 
-    void* GetSoundMap() const { return m_Chunk13500; }
+    AudioBankTable_802EB644* GetSoundMap() const { return m_Chunk13500; }
 
 protected:
     static void fn_802EDB14(
@@ -53,7 +54,7 @@ protected:
     u8 m_Unknown09[3];
     void* m_Chunk13100;
     void* m_Chunk13400;
-    void* m_Chunk13500;
+    AudioBankTable_802EB644* m_Chunk13500;
     AudioResourceRuntime_802F479C m_Runtime;
     bool m_Loaded;
     u8 m_Unknown45[3];

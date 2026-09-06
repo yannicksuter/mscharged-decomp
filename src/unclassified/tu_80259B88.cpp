@@ -13,6 +13,7 @@
 #include "NL/nlBind.h"
 #include "NL/nlFunction.h"
 #include "NL/nlLocalization.h"
+#include "NL/nlLocalizationLookup.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_802196B0.h"
 #include "unclassified/tu_80252180.h"
@@ -40,42 +41,6 @@ extern int lbl_806DE668[2];
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
-typedef void (TU8025BE74Scene::*TU8025BE74Callback)();
-
-struct TU8025BE74CallbackRef
-{
-    TU8025BE74CallbackRef(TU8025BE74Callback callback)
-        : mCallback(callback)
-    {
-    }
-
-    TU8025BE74Callback mCallback;
-};
-
-struct TU8025BE74Binding
-{
-    TU8025BE74Callback mCallback;
-    TU8025BE74Scene* mTarget;
-    bool mUnidentified10;
-
-    TU8025BE74Binding(TU8025BE74CallbackRef callback, TU8025BE74Scene* target)
-        : mCallback(callback.mCallback)
-        , mTarget(target)
-    {
-    }
-
-    void operator()()
-    {
-        (mTarget->*mCallback)();
-    }
-};
-
-static inline TU8025BE74Binding BindTU8025BE74Callback(
-    TU8025BE74CallbackRef callback, TU8025BE74Scene* target)
-{
-    return TU8025BE74Binding(callback, target);
-}
-
 class UnidentifiedScene_8025AF0C : public BaseSceneHandler
 {
 public:
@@ -91,26 +56,6 @@ static inline T* CastFound(TLInstance* found)
         return 0;
     }
     return (T*)found;
-}
-
-static inline const unsigned short* LookupLocString(const char* id)
-{
-    nlLocalization* localization = g_pLocalization;
-    unsigned long hash = nlStringLowerHash(id);
-    if (localization->m_LookupTable == 0)
-    {
-        return LocalizationTableNotFound;
-    }
-
-    nlLocalization::StringLookup* lookup
-        = nlBSearch<nlLocalization::StringLookup, unsigned long>(
-            hash, localization->m_LookupTable, (int)localization->m_pFile->StringCount);
-    if (lookup != 0)
-    {
-        return localization->m_FirstString + lookup->StringOffset;
-    }
-
-    return MissingLocString;
 }
 
 TU80259B88Scene::TU80259B88Scene()
@@ -731,8 +676,8 @@ TU8025BE74Scene::TU8025BE74Scene()
     , mUnidentifiedD4(false)
     , mUnidentified3D6(false)
     , mUnidentified3D8(1.0f,
-          Function<FnVoidVoid>(BindTU8025BE74Callback(
-              TU8025BE74CallbackRef(&TU8025BE74Scene::fn_8025C084), this)))
+          Function<UnidentifiedTimer_8030616C*>(Bind<void>(
+              MemFun(&TU8025BE74Scene::fn_8025C084), this, Placeholder<0>())))
 {
     mUnidentified3F4 = 0;
 
@@ -747,7 +692,7 @@ TU8025BE74Scene::~TU8025BE74Scene()
 {
 }
 
-void TU8025BE74Scene::fn_8025C084()
+void TU8025BE74Scene::fn_8025C084(UnidentifiedTimer_8030616C* timer)
 {
     mUnidentified3D6 = true;
     fn_80306208(&mUnidentified3D8, false);

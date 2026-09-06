@@ -2,6 +2,11 @@
 
 #include "math.h"
 
+// Pooled 1.0f owned by NL/math.cpp (retail sdata2 0x806E60F8). Retail
+// SolveQuadratic loads this shared slot for the p/q/r identities instead of
+// emitting a private literal; referencing it keeps this TU's pool identical.
+extern const float lbl_806E60F8;
+
 static const f32 CANT_COLLIDE = 3.402823466e+38F;
 
 void SolveQuadratic(float a, float b, float c, int& numRoots, float& x1,
@@ -23,19 +28,19 @@ void SolveQuadratic(float a, float b, float c, int& numRoots, float& x1,
     if (absA > absB && absA > absC)
     {
         q = b / a;
-        p = 1.0f;
+        p = lbl_806E60F8;
         r = c / a;
     }
     else if (absB > absA && absB > absC)
     {
         p = a / b;
-        q = 1.0f;
+        q = lbl_806E60F8;
         r = c / b;
     }
     else
     {
         p = a / c;
-        r = 1.0f;
+        r = lbl_806E60F8;
         q = b / c;
     }
 

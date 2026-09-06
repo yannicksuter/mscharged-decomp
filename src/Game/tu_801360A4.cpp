@@ -396,7 +396,7 @@ bool UnidentifiedFriendManager_801360A4::ValidateHostInvitation_80136BC0()
             GameInfoManager::GetInstance()->GetUnknown0x40(
                 lbl_806E20E0, index));
         if (DWC_IsValidFriendData(friendData)
-            && mFriendStatus[index].mStatus == 2)
+            && (int)mFriendStatus[index].mStatus == 2)
         {
             DWCUserData* userData = reinterpret_cast<DWCUserData*>(
                 GameInfoManager::GetInstance()->GetSaveSlot(lbl_806E20E0));

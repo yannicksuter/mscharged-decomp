@@ -1,168 +1,489 @@
 #include <dwc/dwc_main.h>
 
+#include <dwc/dwc_account.h>
 #include <dwc/dwc_auth_interface.h>
 #include <dwc/dwc_error.h>
+#include <dwc/dwc_login.h>
+#include <dwc/dwc_nonport.h>
 #include <dwc/dwc_report.h>
+#include <nitro/math/rand.h>
 #include <revolution/types.h>
 #include <string.h>
 
-typedef struct DWCLoginControlView
-{
-    void* _00;
-    s32 _04;
-    u32 _08;
-    u32 _0C;
-    u32 _10;
-    DWCLoginCallback _14;
-    void* _18;
-    void* _1C;
-    u8 _20[0x10];
-    u32 _30;
-    u8 _34[0x234];
-} DWCLoginControlView;
+static DWCLoginControl* stpLoginCnt;
 
-typedef struct DWCLoginIdView
-{
-    u32 _00[3];
-} DWCLoginIdView;
+static void DWCi_CloseLogin(void);
+static GPResult DWCi_HandleGPError(GPResult result);
+static void DWCi_GPConnectCallback(
+    GPConnection* pconnection, GPConnectResponseArg* arg);
+static void DWCi_GPConnect(GPCallback callback, DWCLoginState next_state);
+static BOOL DWCi_RemoteLogin(void);
+static void DWCi_RemoteLoginProcess(void);
+static void DWCi_GPGetInfoCallback(
+    GPConnection* pconnection, GPGetInfoResponseArg* arg);
 
-typedef struct DWCUserDataView
-{
-    u32 _00;
-    DWCLoginIdView _04;
-    DWCLoginIdView _10;
-} DWCUserDataView;
+GPResult DWCi_SetGPStatus(
+    int status, const char* statusString, const char* locationString);
 
-static DWCLoginControlView* sLoginControl;
-
-u64 fn_8049D8E8(DWCLoginIdView* arg0);
-u32 fn_8049D8F8(DWCLoginIdView* arg0);
-BOOL fn_8048C8D0(void);
-
-void fn_8048C214(DWCLoginControlView* arg0, DWCUserDataView* arg1, void* arg2, u32 arg3,
-    u32 arg4, u32 arg5, DWCLoginCallback arg6, void* arg7)
+void DWCi_LoginInit(DWCLoginControl* logcnt, DWCUserData* userdata,
+    GPConnection* pGpObj, int productID, u32 gamecode, const u16* playerName,
+    DWCLoginCallback callback, void* param)
 {
     DWC_Printf(0x20, "Login Init\n");
 
-    sLoginControl = arg0;
-    memset(sLoginControl, 0, sizeof(DWCLoginControlView));
-    sLoginControl->_00 = arg2;
-    sLoginControl->_04 = 0;
-    sLoginControl->_08 = arg3;
-    sLoginControl->_0C = arg4;
-    sLoginControl->_10 = arg5;
-    sLoginControl->_14 = arg6;
-    sLoginControl->_18 = arg7;
-    sLoginControl->_1C = arg1;
+    stpLoginCnt = logcnt;
+    memset(stpLoginCnt, 0, sizeof(DWCLoginControl));
+    stpLoginCnt->pGpObj = pGpObj;
+    stpLoginCnt->state = DWC_LOGIN_STATE_INIT;
+    stpLoginCnt->productID = productID;
+    stpLoginCnt->gamecode = gamecode;
+    stpLoginCnt->playerName = playerName;
+    stpLoginCnt->callback = callback;
+    stpLoginCnt->param = param;
+    stpLoginCnt->userdata = userdata;
 
     DWC_Printf(0x20, "******************************************\n");
-    DWC_Printf(0x20, "  pseudo    UserID   : %016llx\n", fn_8049D8E8(&arg1->_04));
-    DWC_Printf(0x20, "  pseudo    PlayerID : %08x\n", fn_8049D8F8(&arg1->_04));
-    DWC_Printf(0x20, "  authentic UserID   : %016llx\n", fn_8049D8E8(&arg1->_10));
-    DWC_Printf(0x20, "  authentic PlayerID : %08x\n", fn_8049D8F8(&arg1->_10));
+    DWC_Printf(0x20, "  pseudo    UserID   : %016llx\n",
+        DWCi_Acc_GetUserId(&userdata->pseudo));
+    DWC_Printf(0x20, "  pseudo    PlayerID : %08x\n",
+        DWCi_Acc_GetPlayerId(&userdata->pseudo));
+    DWC_Printf(0x20, "  authentic UserID   : %016llx\n",
+        DWCi_Acc_GetUserId(&userdata->authentic));
+    DWC_Printf(0x20, "  authentic PlayerID : %08x\n",
+        DWCi_Acc_GetPlayerId(&userdata->authentic));
     DWC_Printf(0x20, "******************************************\n");
 }
 
-BOOL fn_8048C368(void)
+BOOL DWCi_LoginAsync(void)
 {
-    if (fn_8048C8D0())
+    if (DWCi_RemoteLogin())
     {
-        sLoginControl->_04 = 1;
-        sLoginControl->_30 = 0;
+        stpLoginCnt->state = DWC_LOGIN_STATE_REMOTE_AUTH;
+        stpLoginCnt->connectFlag = 0;
         return TRUE;
     }
     return FALSE;
 }
 
-void* fn_8048C530(void)
+void DWCi_LoginProcess(void)
 {
-    if (sLoginControl != NULL)
-    {
-        return sLoginControl->_1C;
-    }
-    return NULL;
-}
-
-void fn_8048C54C(int arg0, int arg1)
-{
-    if (sLoginControl == NULL || arg0 == 0)
+    if (!stpLoginCnt || DWCi_IsError())
     {
         return;
     }
 
-    DWCi_SetError(arg0, arg1);
-    if (sLoginControl->_14 != NULL)
+    switch (stpLoginCnt->state)
     {
-        sLoginControl->_14(arg0, 0, sLoginControl->_18);
-    }
-    if (sLoginControl != NULL)
-    {
-        sLoginControl->_04 = 0;
-        sLoginControl->_30 = 0;
+    case DWC_LOGIN_STATE_REMOTE_AUTH:
+        DWCi_RemoteLoginProcess();
+        break;
+    case DWC_LOGIN_STATE_CONNECTING:
+    case DWC_LOGIN_STATE_GPGETINFO:
+    case DWC_LOGIN_STATE_GPSETINFO:
+        if (stpLoginCnt->pGpObj && *stpLoginCnt->pGpObj)
+        {
+            gpProcess(stpLoginCnt->pGpObj);
+        }
+        if (stpLoginCnt->connectFlag
+            && DWCi_Np_TicksToMilliSeconds(
+                   DWCi_Np_GetTick() - stpLoginCnt->connectTick)
+                > DWC_LOGIN_GPCONNECT_TIMEOUT)
+        {
+            DWCi_StopLogin(DWC_ERROR_NETWORK,
+                DWC_ECODE_SEQ_LOGIN + DWC_ECODE_GS_GP
+                    + DWC_ECODE_TYPE_TIMEOUT);
+            stpLoginCnt->connectFlag = FALSE;
+        }
+        break;
+    case DWC_LOGIN_STATE_INIT:
+    case DWC_LOGIN_STATE_CONNECTED:
+    default:
+        DWC_Printf(DWC_REPORTFLAG_DEBUG, "Ignore invalid login state.\n");
+        break;
     }
 }
 
-void fn_8048C5D0(void)
+DWCAccUserData* DWCi_GetUserData(void)
+{
+    if (stpLoginCnt != NULL)
+    {
+        return stpLoginCnt->userdata;
+    }
+    return NULL;
+}
+
+void DWCi_StopLogin(DWCError error, int errorCode)
+{
+    if (!stpLoginCnt || error == DWC_ERROR_NONE)
+    {
+        return;
+    }
+
+    DWCi_SetError(error, errorCode);
+    if (stpLoginCnt->callback != NULL)
+    {
+        stpLoginCnt->callback(error, 0, stpLoginCnt->param);
+    }
+    DWCi_CloseLogin();
+}
+
+void DWCi_ShutdownLogin(void)
 {
     if (!DWCi_Auth_IsFinished())
     {
         DWCi_Auth_AbortAuthentication();
     }
-    sLoginControl = NULL;
+    stpLoginCnt = NULL;
 }
 
-int fn_8048C604(int arg0)
+static void DWCi_CloseLogin(void)
 {
-    int error;
-    int errorCode;
-
-    if (arg0 == 0)
+    if (!stpLoginCnt)
     {
-        return 0;
+        return;
     }
 
-    DWC_Printf(2, "Login, GP error %d\n", arg0);
-    switch (arg0)
+    stpLoginCnt->state = DWC_LOGIN_STATE_INIT;
+    stpLoginCnt->connectFlag = FALSE;
+}
+
+static GPResult DWCi_HandleGPError(GPResult result)
+{
+    int errorCode;
+    DWCError dwcError;
+
+    if (result == GP_NO_ERROR)
+    {
+        return GP_NO_ERROR;
+    }
+
+    DWC_Printf(2, "Login, GP error %d\n", result);
+    switch (result)
     {
     case 1:
-        error = DWC_ERROR_FATAL;
+        dwcError = DWC_ERROR_FATAL;
         errorCode = DWC_ECODE_TYPE_ALLOC;
         break;
     case 2:
-        error = DWC_ERROR_FATAL;
+        dwcError = DWC_ERROR_FATAL;
         errorCode = DWC_ECODE_TYPE_PARAM;
         break;
     case 3:
-        error = 6;
+        dwcError = DWC_ERROR_NETWORK;
         errorCode = DWC_ECODE_TYPE_NETWORK;
         break;
     case 4:
-        error = 6;
+        dwcError = DWC_ERROR_NETWORK;
         errorCode = DWC_ECODE_TYPE_SERVER;
         break;
     }
 
-    if (sLoginControl != NULL && error != 0)
-    {
-        DWCi_SetError(error, DWC_ECODE_SEQ_LOGIN + DWC_ECODE_GS_GP + errorCode);
-        if (sLoginControl->_14 != NULL)
-        {
-            sLoginControl->_14(error, 0, sLoginControl->_18);
-        }
-        if (sLoginControl != NULL)
-        {
-            sLoginControl->_04 = 0;
-            sLoginControl->_30 = 0;
-        }
-    }
-    return arg0;
+    errorCode += DWC_ECODE_SEQ_LOGIN + DWC_ECODE_GS_GP;
+    DWCi_StopLogin(dwcError, errorCode);
+    return result;
 }
 
-BOOL fn_8048CF50(void)
+static void DWCi_GPConnectCallback(
+    GPConnection* pconnection, GPConnectResponseArg* arg)
 {
-    if (sLoginControl != NULL && sLoginControl->_04 == 5)
+    GPResult gpResult;
+
+    DWC_Printf(DWC_REPORTFLAG_LOGIN,
+        "Finished connecting to GP server, result = %d\n", arg->result);
+    stpLoginCnt->connectFlag = FALSE;
+
+    if (arg->result == GP_NO_ERROR)
+    {
+        if (stpLoginCnt->state == DWC_LOGIN_STATE_CONNECTING)
+        {
+            if (stpLoginCnt->userdata->gs_profile_id == arg->profile)
+            {
+                DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                    "  gs profile id is valid.\n");
+                stpLoginCnt->state = DWC_LOGIN_STATE_CONNECTED;
+
+                gpResult = DWCi_SetGPStatus(DWC_STATUS_ONLINE, "", NULL);
+                if (DWCi_HandleGPError(gpResult))
+                {
+                    return;
+                }
+
+                stpLoginCnt->callback(
+                    DWC_ERROR_NONE, arg->profile, stpLoginCnt->param);
+
+                if (!DWCi_GT2Startup())
+                {
+                    if (DWCi_QR2Startup(arg->profile))
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                    "  gs profile id is invalid.\n");
+                DWCi_StopLogin(DWC_ERROR_NETWORK, DWC_ECODE_SEQ_LOGIN);
+            }
+        }
+        else if (stpLoginCnt->state == DWC_LOGIN_STATE_GPGETINFO)
+        {
+            gpResult = gpGetInfo(pconnection, arg->profile,
+                GP_DONT_CHECK_CACHE, GP_NON_BLOCKING,
+                (GPCallback)DWCi_GPGetInfoCallback, NULL);
+            if (DWCi_HandleGPError(gpResult))
+            {
+                return;
+            }
+        }
+    }
+    else
+    {
+        (void)DWCi_HandleGPError(arg->result);
+    }
+}
+
+static void DWCi_GPConnect(GPCallback callback, DWCLoginState next_state)
+{
+    GPResult gpResult;
+
+    DWC_Printf(
+        DWC_REPORTFLAG_LOGIN, "Succeeded to remote authentication.\n");
+
+    stpLoginCnt->connectTick = DWCi_Np_GetTick();
+    stpLoginCnt->connectFlag = TRUE;
+
+    gpResult = gpConnectPreAuthenticated(stpLoginCnt->pGpObj,
+        stpLoginCnt->authToken, stpLoginCnt->partnerChallenge, GP_FIREWALL,
+        GP_NON_BLOCKING, callback, NULL);
+    if (DWCi_HandleGPError(gpResult))
+    {
+        return;
+    }
+
+    stpLoginCnt->state = next_state;
+}
+
+static BOOL DWCi_RemoteLogin(void)
+{
+    u64 userid;
+
+    DWC_Printf(DWC_REPORTFLAG_LOGIN, "Start Remote Auth\n");
+
+    if (DWCi_Acc_IsAuthentic(stpLoginCnt->userdata))
+    {
+        DWC_Printf(DWC_REPORTFLAG_LOGIN,
+            "  Hmm.. you already have authentic login id.\n");
+        DWCi_Acc_LoginIdToUserName(&stpLoginCnt->userdata->authentic,
+            stpLoginCnt->userdata->gamecode, stpLoginCnt->username);
+        userid = DWCi_Acc_GetUserId(&stpLoginCnt->userdata->authentic);
+    }
+    else
+    {
+        DWC_Printf(DWC_REPORTFLAG_LOGIN,
+            "  Hmm.. you need to create authentic login id.\n");
+
+        if (!DWCi_Acc_IsValidLoginId(&stpLoginCnt->tempLoginId))
+        {
+            DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                "    Hmm.. you are the first time to get authentic login id.");
+            if (DWCi_Acc_CheckConsoleUserId(&stpLoginCnt->userdata->pseudo))
+            {
+                DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                    "- copy temp loginid from pseudo login id\n");
+                stpLoginCnt->tempLoginId = stpLoginCnt->userdata->pseudo;
+            }
+            else
+            {
+                DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                    "- create temp loginid from console user id\n");
+                DWCi_Acc_CreateTempLoginId(&stpLoginCnt->tempLoginId);
+            }
+        }
+        else
+        {
+            MATHRandContext32 randcontext;
+
+            DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                "    Hmm.. you are NOT the first times to get authentic login id.\n");
+            MATH_InitRand32(&randcontext, DWCi_Np_GetTick());
+            DWCi_Acc_SetPlayerId(&stpLoginCnt->tempLoginId,
+                MATH_Rand32(&randcontext, 0));
+        }
+
+        DWCi_Acc_LoginIdToUserName(&stpLoginCnt->tempLoginId,
+            stpLoginCnt->gamecode, stpLoginCnt->username);
+        userid = 0;
+    }
+
+    return DWCi_Auth_StartAuthentication(stpLoginCnt->playerName,
+        &stpLoginCnt->username[DWC_ACC_USERNAME_GSBRCD_OFFSET], userid,
+        DWC_Alloc, DWC_Free);
+}
+
+static void DWCi_RemoteLoginProcess(void)
+{
+    s32 errorcode;
+
+    DWCi_Auth_ProcessAuthentication();
+    if (DWCi_Auth_IsFinished())
+    {
+        if (DWCi_Auth_IsSucceeded())
+        {
+            DWC_Printf(DWC_REPORTFLAG_LOGIN, " *** Auth Done\n");
+            DWCi_Auth_GetGameSpyToken(
+                stpLoginCnt->authToken, stpLoginCnt->partnerChallenge);
+
+            if (DWCi_Acc_IsAuthentic(stpLoginCnt->userdata))
+            {
+                DWCi_GPConnect((GPCallback)DWCi_GPConnectCallback,
+                    DWC_LOGIN_STATE_CONNECTING);
+            }
+            else
+            {
+                DWCi_Acc_SetUserId(&stpLoginCnt->tempLoginId,
+                    DWCi_Auth_GetConsoleUserId());
+                DWCi_GPConnect((GPCallback)DWCi_GPConnectCallback,
+                    DWC_LOGIN_STATE_GPGETINFO);
+            }
+        }
+        else
+        {
+            errorcode = DWCi_Auth_GetErrorCode();
+            DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                " *** Auth Error [%d]\n", errorcode);
+            if (errorcode <= -29000)
+            {
+                DWCi_StopLogin(DWC_ERROR_FATAL, errorcode);
+            }
+            else
+            {
+                DWCi_StopLogin(DWC_ERROR_AUTH_ANY, errorcode);
+            }
+        }
+    }
+}
+
+static void DWCi_GPGetInfoCallback(
+    GPConnection* pconnection, GPGetInfoResponseArg* arg)
+{
+    if (arg->result == GP_NO_ERROR)
+    {
+        if (stpLoginCnt->state == DWC_LOGIN_STATE_GPGETINFO)
+        {
+            if (arg->lastname[0] == 0)
+            {
+                GPResult gpResult;
+                char pseudo_name[DWC_ACC_USERNAME_STRING_BUFSIZE];
+
+                DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                    "    login id is authenticated. set lastname field.\n");
+                DWCi_Acc_LoginIdToUserName(&stpLoginCnt->userdata->pseudo,
+                    stpLoginCnt->gamecode, pseudo_name);
+                gpResult = gpSetInfos(pconnection, GP_LASTNAME, pseudo_name);
+                if (DWCi_HandleGPError(gpResult))
+                {
+                    return;
+                }
+
+                stpLoginCnt->state = DWC_LOGIN_STATE_GPSETINFO;
+                gpResult = gpGetInfo(pconnection, arg->profile,
+                    GP_DONT_CHECK_CACHE, GP_NON_BLOCKING,
+                    (GPCallback)DWCi_GPGetInfoCallback, NULL);
+                if (DWCi_HandleGPError(gpResult))
+                {
+                    return;
+                }
+
+                DWC_Printf(
+                    DWC_REPORTFLAG_LOGIN, "    call gpSetInfos\n");
+            }
+            else
+            {
+                DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                    "    this login id is used by anybody.... retry.\n");
+                gpDisconnect(pconnection);
+                DWCi_RemoteLogin();
+                stpLoginCnt->state = DWC_LOGIN_STATE_REMOTE_AUTH;
+            }
+        }
+        else if (stpLoginCnt->state == DWC_LOGIN_STATE_GPSETINFO)
+        {
+            char pseudo_name[DWC_ACC_USERNAME_STRING_BUFSIZE];
+
+            DWCi_Acc_LoginIdToUserName(&stpLoginCnt->userdata->pseudo,
+                stpLoginCnt->gamecode, pseudo_name);
+            if (strcmp(arg->lastname, pseudo_name) == 0)
+            {
+                char username[DWC_ACC_USERNAME_STRING_BUFSIZE];
+
+                DWCi_Acc_LoginIdToUserName(&stpLoginCnt->tempLoginId,
+                    stpLoginCnt->gamecode, username);
+                DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                    "    Account is created : %s(%s) - %d.\n", username,
+                    pseudo_name, arg->profile);
+
+                DWCi_Acc_SetLoginIdToUserData(stpLoginCnt->userdata,
+                    &stpLoginCnt->tempLoginId, arg->profile);
+                gpDisconnect(pconnection);
+                DWCi_GPConnect((GPCallback)DWCi_GPConnectCallback,
+                    DWC_LOGIN_STATE_CONNECTING);
+            }
+            else
+            {
+                GPResult gpResult;
+
+                DWC_Printf(DWC_REPORTFLAG_LOGIN,
+                    "    Login but gpSetInfo failed... %s : %d retry gpGetInfo.\n",
+                    arg->lastname, arg->profile);
+                gpResult = gpGetInfo(pconnection, arg->profile,
+                    GP_DONT_CHECK_CACHE, GP_NON_BLOCKING,
+                    (GPCallback)DWCi_GPGetInfoCallback, NULL);
+                if (DWCi_HandleGPError(gpResult))
+                {
+                    return;
+                }
+            }
+        }
+    }
+    else
+    {
+        DWC_Printf(DWC_REPORTFLAG_LOGIN,
+            " ERROR: gpGetInfo. why??? : %d\n", arg->result);
+    }
+}
+
+BOOL DWCi_CheckLogin(void)
+{
+    if (stpLoginCnt != NULL && stpLoginCnt->state == DWC_LOGIN_STATE_CONNECTED)
     {
         return TRUE;
     }
     return FALSE;
+}
+
+BOOL DWCi_GetAuthInfo(char** authToken, char** partnerChallenge)
+{
+    if (!DWCi_CheckLogin())
+    {
+        return FALSE;
+    }
+
+    *authToken = stpLoginCnt->authToken;
+    *partnerChallenge = stpLoginCnt->partnerChallenge;
+    return TRUE;
+}
+
+BOOL DWCi_GetLoginTicket(char* loginTicket)
+{
+    if (!DWCi_CheckLogin())
+    {
+        return FALSE;
+    }
+
+    return gpGetLoginTicket(stpLoginCnt->pGpObj, loginTicket) == GP_NO_ERROR;
 }

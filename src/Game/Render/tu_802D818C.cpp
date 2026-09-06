@@ -73,8 +73,9 @@ void ImpostorCluster_8052EA20::UnidentifiedVirtual20(void* target, int)
 
     nlMatrix4 matrix;
     nlMakeRotationMatrixX(matrix, 1.5707964f);
+    float yValue = sfBackgroundY.value;
     matrix.m41 = 0.0f;
-    matrix.m42 = sfBackgroundY.value;
+    matrix.m42 = yValue;
     matrix.m43 = 0.0f;
     matrix.m44 = 1.0f;
 
@@ -82,14 +83,11 @@ void ImpostorCluster_8052EA20::UnidentifiedVirtual20(void* target, int)
     quad.SetupRotatedRectangle(sfBackgroundSize.value,
         sfBackgroundSize.value, matrix, false, false);
 
-    unsigned char red = (unsigned char)siBackgroundRed.value;
-    unsigned char green = (unsigned char)siBackgroundGreen.value;
-    unsigned char blue = (unsigned char)siBackgroundBlue.value;
     for (int i = 0; i < 4; ++i)
     {
-        quad.m_colour[i].c[0] = red;
-        quad.m_colour[i].c[1] = green;
-        quad.m_colour[i].c[2] = blue;
+        quad.m_colour[i].c[0] = (unsigned char)siBackgroundRed.value;
+        quad.m_colour[i].c[1] = (unsigned char)siBackgroundGreen.value;
+        quad.m_colour[i].c[2] = (unsigned char)siBackgroundBlue.value;
         quad.m_colour[i].c[3] = 0xFF;
     }
     quad.Attach((eGLView)target, siBackgroundQuadLayer.value);

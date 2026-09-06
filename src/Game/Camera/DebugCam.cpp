@@ -266,7 +266,7 @@ void cDebugCamera::fn_800F2DA8(float dt, float controlSpeed)
     {
         m_fHeight = 0.0f;
     }
-    if (m_fRadius < 0.001f)
+    if (m_fRadius < 0.001)
     {
         m_fRadius = 0.001f;
     }

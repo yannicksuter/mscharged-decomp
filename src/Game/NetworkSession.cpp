@@ -19,6 +19,8 @@
 #include "unclassified/tu_80332DC0.h"
 #include "unclassified/tu_80336B2C.h"
 #include "unclassified/tu_80338898.h"
+#include "unclassified/tu_8026B10C.h"
+#include "unclassified/tu_8026F444.h"
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
@@ -195,9 +197,6 @@ extern "C" void fn_802B2E8C(u32* handle);
 extern "C" u32 fn_80111688(void*);
 void* GetFixedUpdateTask();
 extern "C" void fn_801CBCE4(u32, int);
-extern "C" void fn_8026E338(BaseSceneHandler*, UnidentifiedNetworkMessage*);
-extern "C" void fn_8026F7F8(BaseSceneHandler*, UnidentifiedNetworkMessage*);
-extern "C" void fn_8026FF28(BaseSceneHandler*, UnidentifiedNetworkMessage*);
 static inline void PushAllocator(MemoryAllocator* pAllocator)
 {
     CurrentAllocator = pAllocator;
@@ -453,14 +452,6 @@ void UnidentifiedNetworkSession::SendDraftToEveryone(
 {
     NetMessageDraft message;
     message.mMachineCount = count;
-    message.mUnidentified0B.mData[0] = -1;
-    message.mUnidentified0B.mData[1] = -1;
-    message.mUnidentified0B.mData[2] = -1;
-    message.mUnidentified0B.mData[3] = -1;
-    message.mUnidentified0B.mData[4] = -1;
-    message.mUnidentified0B.mData[5] = -1;
-    message.mUnidentified0B.mData[6] = -1;
-    message.mUnidentified0B.mData[7] = -1;
     message.mUnidentified0A = flag;
 
     for (int entry = 0; entry < count; ++entry)
@@ -1967,15 +1958,16 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
     case 0x19:
     {
         BaseSceneHandler* scene = lbl_806E1838->GetScene((SceneList)0x38);
-        BaseSceneHandler* handler = scene != 0 ? scene : 0;
+        TU8026B10CScene* handler = static_cast<TU8026B10CScene*>(scene);
         if (handler != 0)
         {
-            fn_8026E338(handler, message);
+            handler->fn_8026E338(static_cast<NetworkMessageType25_8050B778*>(message));
         }
         break;
     }
 
     case 0x1A:
+    {
         mUnidentified2448 = 3;
         GetMachineRoster()->OnGameStarted();
         if (fn_8025BD88())
@@ -1983,16 +1975,19 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
             fn_801CBCE4(0x89B1FC93, 0x2A);
         }
         FEMusic::StartStreamIfDifferent(8);
-        lbl_806E1838->Push((SceneList)0x39, SCREEN_FORWARD, true);
-        fn_8026F7F8(0, message);
+        TU8026F444Scene* scene = static_cast<TU8026F444Scene*>(
+            lbl_806E1838->Push((SceneList)0x39, SCREEN_FORWARD, true));
+        scene->fn_8026F7F8(static_cast<NetMessageCheckConnection*>(message));
         break;
+    }
 
     case 0x1B:
     {
-        BaseSceneHandler* scene = lbl_806E1838->GetScene((SceneList)0x39);
+        TU8026F444Scene* scene = static_cast<TU8026F444Scene*>(
+            lbl_806E1838->GetScene((SceneList)0x39));
         if (scene != 0)
         {
-            fn_8026FF28(scene, message);
+            scene->fn_8026FF28(static_cast<NetworkMessageType27_8050B750*>(message));
         }
         break;
     }

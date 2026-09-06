@@ -37,7 +37,7 @@ public:
     virtual ~BaseGameSceneManager();
     virtual BaseSceneHandler* Push(SceneList newscene, ScreenMovement movement, bool popfirst);
     BaseSceneHandler* GetScene(SceneList scene);
-    BaseSceneHandler* GetCurrentScene()
+    BaseSceneHandler* GetCurrentScene() const
     {
         return mCurrentStackDepth != 0 ? mBaseSceneHandlerStack[mCurrentStackDepth - 1] : 0;
     }

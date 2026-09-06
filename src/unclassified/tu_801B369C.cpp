@@ -255,7 +255,6 @@ void fn_801B3F2C(bool*)
     }
 
     ModelWriter_802A1BF4 writer;
-    fn_802A1BF4(&writer);
     glSetDefaultState(false);
 
     const float left = sWarbleLeft;
@@ -263,7 +262,7 @@ void fn_801B3F2C(bool*)
     const float right = sWarbleLeft + glGetOrthographicWidth();
     const float bottom = sWarbleTop + glGetOrthographicHeight();
 
-    if (fn_802A1C54(&writer, 4, 3, 0))
+    if (writer.fn_802A1C54(4, 3, 0))
     {
         WriteWarbleVertex(writer, left, top, 0, 0);
         WriteWarbleVertex(writer, left, bottom, 0, 0x400);
@@ -279,11 +278,9 @@ void fn_801B3F2C(bool*)
         textureState->SetWrapT(true);
         textureState->unknown07 = 0;
 
-        if (fn_802A1E00(&writer))
+        if (writer.fn_802A1E00())
             GetLayerView(eCLV_WarbleBlend)->AttachModel(writer.model, 0);
     }
-
-    fn_802A1C14(&writer, -1);
 }
 
 extern "C" void fn_801B4234()

@@ -1837,6 +1837,32 @@ Game/SH/SHSceneBase.cpp:
 	.sdata      start:0x806DECB8 end:0x806DED40
 	.sdata2     start:0x806E5BD0 end:0x806E5BE0
 
+unclassified/tu_8026B10C.cpp:
+	.text       start:0x8026B10C end:0x8026EF60
+	.data       start:0x80520CD8 end:0x80520E48
+	.sdata      start:0x806DED40 end:0x806DEDA0
+	.sdata2     start:0x806E5BE0 end:0x806E5BF0
+
+unclassified/tu_806E1908.cpp:
+	.text       start:0x8026EF60 end:0x8026F444
+	.data       start:0x80520E48 end:0x80520E70
+	.sdata      start:0x806DEDA0 end:0x806DEDA8
+	.sbss       start:0x806E1908 end:0x806E1910
+
+unclassified/tu_8026F444.cpp:
+	.text       start:0x8026F444 end:0x80271960
+	.data       start:0x80520E70 end:0x80520F88
+	.sdata      start:0x806DEDA8 end:0x806DEE20
+	.sdata2     start:0x806E5BF0 end:0x806E5BF4
+
+Game/Render/tu_80271960.cpp:
+	.text       start:0x80271960 end:0x80271BE0
+	.data       start:0x80520F88 end:0x80520F98
+	.bss        start:0x80578660 end:0x80578670
+	.sdata      start:0x806DEE20 end:0x806DEE28
+	.sbss       start:0x806E191C end:0x806E1920
+	.sdata2     start:0x806E5C00 end:0x806E5C18
+
 Game/Render/RLView.cpp:
 	.text       start:0x80271C48 end:0x80271DE0
 	.data       start:0x80520FC0 end:0x80520FE0
@@ -1855,6 +1881,24 @@ Game/Render/RLViewData.cpp:
 	.data       start:0x80521734 end:0x80521CA0
 	.bss        start:0x80578670 end:0x8057A698
 	.sbss       start:0x806E1928 end:0x806E1960
+
+Game/Render/tu_80276264.cpp:
+	.text       start:0x80276724 end:0x80276D10
+	.data       start:0x8052220C end:0x805222A0
+	.bss        start:0x8057A7B8 end:0x8057A9C8
+	.sdata      start:0x806DEE38 end:0x806DEE60
+	.sbss       start:0x806E1970 end:0x806E19A8
+
+Game/Render/tu_80278EA4.cpp:
+	.text       start:0x80278EA4 end:0x8027942C
+	.data       start:0x80522428 end:0x80522528
+	.sdata      start:0x806DEE70 end:0x806DEE78
+	.sdata2     start:0x806E5C70 end:0x806E5C80
+
+Game/Render/tu_8027AE14.cpp:
+	.text       start:0x8027AE14 end:0x8027B0D8
+	.data       start:0x805231F0 end:0x80523200
+	.sdata      start:0x806DEE88 end:0x806DEE98
 
 Game/NisPlayer.cpp:
 	.text       start:0x8027B138 end:0x80280C84
@@ -2067,7 +2111,9 @@ NL/glx/GXMaterialProgramSupport_802977EC.cpp:
 	.sdata2     start:0x806E5F58 end:0x806E5F70
 
 NL/glx/GXMaterialProgramSupport_80298074.cpp:
-	.text       start:0x80298074 end:0x802981D0
+	.text       start:0x80297F70 end:0x802981D0
+	.data       start:0x80524420 end:0x80524470
+	.sbss       start:0x806E1BF8 end:0x806E1C00
 
 NL/glx/GXMaterialProgram_802981F0.cpp:
 	.text       start:0x802981F0 end:0x80298458
@@ -2222,6 +2268,18 @@ Game/AnimProps/goalieanimproperties.cpp:
 
 NL/glx/GXMaterialProgramRegistry_802A0A14.cpp:
 	.text       start:0x802A0A14 end:0x802A0EE4
+
+NL/gl/tu_802A0F04.cpp:
+	.text       start:0x802A0F04 end:0x802A12C4
+
+NL/gl/tu_802A12E4.cpp:
+	.text       start:0x802A12E4 end:0x802A15B4
+
+NL/gl/tu_802A15D4.cpp:
+	.text       start:0x802A15D4 end:0x802A193C
+
+Game/GL/ModelWriter_802A1BF4.cpp:
+	.text       start:0x802A1BF4 end:0x802A1EC4
 
 NL/glx/GXMaterialProgramSupport_802A1EE4.cpp:
 	.text       start:0x802A1EE4 end:0x802A2034
@@ -2930,6 +2988,13 @@ Game/Task/ParticleUpdateTask.cpp:
 	.sbss       start:0x806E2010 end:0x806E2018
 	.sdata2     start:0x806E65A0 end:0x806E65A8
 
+Game/Audio/Transition_802F2110.cpp:
+	.text       start:0x802EB5BC end:0x802EB644
+
+Game/Audio/AudioBankTable_802EB644.cpp:
+	.text       start:0x802EB644 end:0x802EBD54
+	.data       start:0x8052F3D8 end:0x8052F400
+
 Game/Audio/AudioResourceLoadOwner_802ED144.cpp:
 	.text       start:0x802ED144 end:0x802ED678
 	.data       start:0x8052F490 end:0x8052F49C
@@ -2974,9 +3039,21 @@ unclassified/tu_802F2110.cpp:
 unclassified/tu_802F2C3C.cpp:
 	.text       start:0x802F2C3C end:0x802F39EC
 
+Game/Audio/AudioRuntimeGroup_802F98F4.cpp:
+	.text       start:0x802F98F4 end:0x802F9CD8
+	.data       start:0x8052F9F0 end:0x8052FA40
+
 Game/FE/feAnimation.cpp:
 	.text       start:0x802F9CD8 end:0x802FA1C4
 	.sdata2     start:0x806E6660 end:0x806E6664
+
+Game/FE/tu_802FA1C4.cpp:
+	.text       start:0x802FA1C4 end:0x802FA614
+	.ctors      start:0x804DBA74 end:0x804DBA78
+	.data       start:0x8052FA40 end:0x8052FA68
+	.bss        start:0x8057FBF0 end:0x8057FC30
+	.sdata      start:0x806DF4F8 end:0x806DF503
+	.sdata2     start:0x806E6668 end:0x806E666C
 
 Game/FE/feFontResource.cpp:
 	.text       start:0x802FA614 end:0x802FA61C
@@ -3018,8 +3095,11 @@ Game/FE/feScene.cpp:
 	.sdata2     start:0x806E66A8 end:0x806E66B8
 
 Game/FE/feSceneManager.cpp:
-	.text       start:0x802FEB04 end:0x802FF854
-	.data       start:0x8052FD28 end:0x8052FD48
+	.text       start:0x802FEB04 end:0x802FFAD8
+	.ctors      start:0x804DBA80 end:0x804DBA84
+	.data       start:0x8052FD28 end:0x8052FD60
+	.bss        start:0x8057FF60 end:0x8057FFB0
+	.sbss       start:0x806E2070 end:0x806E2074
 
 Game/FE/feSceneResource.cpp:
 	.text       start:0x802FFAD8 end:0x802FFAFC
@@ -3039,10 +3119,19 @@ unclassified/tu_80300104.cpp:
 Game/FE/tlComponent.cpp:
 	.text       start:0x80301D68 end:0x80301F3C
 
+Game/FE/tu_80301F3C.cpp:
+	.text       start:0x80301F3C end:0x80301F74
+
+Game/FE/tu_80301FAC.cpp:
+	.text       start:0x80301FAC end:0x80301FE4
+
 Game/FE/feLibObject.cpp:
 	.text       start:0x80301FE4 end:0x803020DC
 	.data       start:0x8052FE00 end:0x8052FE10
 	.sdata2     start:0x806E66F8 end:0x806E6700
+
+Game/FE/feText.cpp:
+	.text       start:0x803020DC end:0x80302114
 
 Game/FE/tlComponentInstance.cpp:
 	.text       start:0x80302114 end:0x80302150
@@ -3844,8 +3933,12 @@ RVL_SDK/thp/THPSimple.cpp:
 	.sdata2     start:0x806E6DC0 end:0x806E6DD0
 
 unclassified/tu_80372980.cpp:
-	.text       start:0x80372980 end:0x80372B30
+	.text       start:0x80372980 end:0x80372B4C
 	.data       start:0x80535828 end:0x80535880
+
+NL/tu_80372B4C.cpp:
+	.text       start:0x80372B4C end:0x803730D8
+	.data       start:0x80535880 end:0x80535928
 
 unclassified/tu_80374098.cpp:
 	.text       start:0x80374098 end:0x80374D68
@@ -6053,14 +6146,15 @@ RVL_SDK/dwc/dwc_login.c:
 RVL_SDK/dwc/dwc_main.c:
 	.text       start:0x8048CF78 end:0x8048F554
 	.data       start:0x80562AE0 end:0x80563478
-	.bss        start:0x806C98A0 end:0x806C9920
+	.bss        start:0x806C98A0 end:0x806C9A20
 	.sdata      start:0x806E03A0 end:0x806E03C8
 	.sbss       start:0x806E2EE0 end:0x806E2EE8
 
 RVL_SDK/dwc/dwc_match.c:
 	.text       start:0x8048F554 end:0x8049AE0C
+	.rodata     start:0x804F31F8 end:0x804F3210
 	.data       start:0x80563478 end:0x80564D50
-	.bss        start:0x806C9920 end:0x806CA178
+	.bss        start:0x806C9A20 end:0x806CA178
 	.sdata      start:0x806E03C8 end:0x806E0438
 	.sbss       start:0x806E2EE8 end:0x806E2F00
 

@@ -10,7 +10,7 @@ class UnidentifiedObject_80188884
 {
 public:
     UnidentifiedObject_80188884(float param1);
-    virtual ~UnidentifiedObject_80188884();
+    virtual ~UnidentifiedObject_80188884() { }
     virtual void UnidentifiedVirtual0C(float param1) = 0;
 
     bool UnidentifiedCondition() const

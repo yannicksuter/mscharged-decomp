@@ -377,29 +377,29 @@ bool WorldNPCManager_802DD4F0::fn_802DDC1C()
     {
         return true;
     }
-    if (!fn_802DC2A4(mModelCollection))
+    if (fn_802DC2A4(mModelCollection))
     {
-        return false;
-    }
+        fn_802DC6F8(mModelCollection);
+        mLoadedModels[mNumLoadedModels] = mModelCollection->models[mNumLoadedModels];
+        ++mNumLoadedModels;
 
-    fn_802DC6F8(mModelCollection);
-    mLoadedModels[mNumLoadedModels] = mModelCollection->models[mNumLoadedModels];
-    ++mNumLoadedModels;
+        if (fn_802DBF5C(mModelCollection))
+        {
+            fn_802DBF7C(mModelCollection);
+            return false;
+        }
 
-    if (fn_802DBF5C(mModelCollection))
-    {
-        fn_802DBF7C(mModelCollection);
-        return false;
+        mModelsLoaded = true;
+        for (ListEntry<WorldNPC_802DE058*>* entry = mPendingWorldNPCs.m_Head;
+            entry != 0; entry = entry->next)
+        {
+            WorldNPC_802DE058* npc = entry->entry;
+            nlMatrix4 transform = npc->mTransform;
+            fn_802DDD88(npc->mTemplateHash, transform);
+        }
+        return true;
     }
-
-    mModelsLoaded = true;
-    for (ListEntry<WorldNPC_802DE058*>* entry = mPendingWorldNPCs.m_Head;
-        entry != 0; entry = entry->next)
-    {
-        nlMatrix4 transform = entry->entry->mTransform;
-        fn_802DDD88(entry->entry->mTemplateHash, transform);
-    }
-    return true;
+    return false;
 }
 
 ImpostorModel_802DAEE0* WorldNPCManager_802DD4F0::fn_802DDD88(

@@ -361,10 +361,9 @@ void UnidentifiedTransportMessage_8032B6D4::Serialize(
     {
         serializer->Transfer(
             &message->mUnreliableCount, sizeof(message->mUnreliableCount));
-        int i;
         if (serializer->mDirection == 0)
         {
-            for (i = 0; i < message->mUnreliableCount; ++i)
+            for (int i = 0; i < message->mUnreliableCount; ++i)
             {
                 UnidentifiedTransportPacket_803263E4* packet =
                     new (8, false) UnidentifiedTransportPacket_803263E4;
@@ -376,7 +375,7 @@ void UnidentifiedTransportMessage_8032B6D4::Serialize(
         }
         else
         {
-            for (i = 0; i < message->mUnreliableCount; ++i)
+            for (int i = 0; i < message->mUnreliableCount; ++i)
             {
                 fn_80326684(message->mUnreliable[i], serializer);
             }
@@ -385,10 +384,9 @@ void UnidentifiedTransportMessage_8032B6D4::Serialize(
 
     serializer->Transfer(&message->mReliableCount,
         sizeof(message->mReliableCount));
-    int i;
     if (serializer->mDirection == 0)
     {
-        for (i = 0; i < message->mReliableCount; ++i)
+        for (int i = 0; i < message->mReliableCount; ++i)
         {
             UnidentifiedTransportPacket_803263E4* packet =
                 new (8, false) UnidentifiedTransportPacket_803263E4;
@@ -399,7 +397,7 @@ void UnidentifiedTransportMessage_8032B6D4::Serialize(
     }
     else
     {
-        for (i = 0; i < message->mReliableCount; ++i)
+        for (int i = 0; i < message->mReliableCount; ++i)
         {
             fn_80326464(message->mReliable[i], serializer);
         }
@@ -410,10 +408,9 @@ extern "C" void fn_8032C184(UnidentifiedTransportMessage_8032B6D4* message,
     UnidentifiedMessageSerializer* serializer)
 {
     serializer->Transfer(&message->mVoiceCount, sizeof(message->mVoiceCount));
-    int i;
     if (serializer->mDirection == 0)
     {
-        for (i = 0; i < message->mVoiceCount; ++i)
+        for (int i = 0; i < message->mVoiceCount; ++i)
         {
             UnidentifiedTransportPacket_803263E4* packet =
                 new (8, false) UnidentifiedTransportPacket_803263E4;
@@ -425,7 +422,7 @@ extern "C" void fn_8032C184(UnidentifiedTransportMessage_8032B6D4* message,
     }
     else
     {
-        for (i = 0; i < message->mVoiceCount; ++i)
+        for (int i = 0; i < message->mVoiceCount; ++i)
         {
             fn_80326684(message->mVoice[i], serializer);
         }

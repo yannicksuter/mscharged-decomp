@@ -6,12 +6,17 @@
 
 struct ModelWriter_802A1BF4
 {
-    int count;
-    glModel* model;
-    void* allocator;
-    float* position;
-    short* texcoord;
-    u32* colour;
+    ModelWriter_802A1BF4();
+    ~ModelWriter_802A1BF4();
+    bool fn_802A1C54(int vertexCount, int primitive, void* allocator);
+    bool fn_802A1E00();
+
+    /* 0x00 */ int count;
+    /* 0x04 */ glModel* model;
+    /* 0x08 */ void* allocator;
+    /* 0x0C */ float* position;
+    /* 0x10 */ short* texcoord;
+    /* 0x14 */ u32* colour;
 
     void Colour(const nlColour& c)
     {
@@ -31,12 +36,5 @@ struct ModelWriter_802A1BF4
         *position++ = z;
     }
 }; // size: 0x18
-
-extern "C" void fn_802A1BF4(ModelWriter_802A1BF4* writer);
-extern "C" void* fn_802A1C14(
-    ModelWriter_802A1BF4* writer, int shouldDelete);
-extern "C" bool fn_802A1C54(ModelWriter_802A1BF4* writer,
-    int vertexCount, int primitive, void* allocator);
-extern "C" bool fn_802A1E00(ModelWriter_802A1BF4* writer);
 
 #endif // GAME_GL_MODEL_WRITER_802A1BF4_H

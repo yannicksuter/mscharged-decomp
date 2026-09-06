@@ -6,18 +6,14 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
+#include "Game/FE/tu_802FA1C4.h"
 #include "Game/MathHelpers.h"
 #include "NL/gl/glStruct.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlFont.h"
 
-struct TU802FA1C4;
-
-extern TU802FA1C4* lbl_806E2030;
 extern void* lbl_806E2090;
 
-extern "C" void fn_802FA2FC(TU802FA1C4* owner, TU80300104Base* listener);
-extern "C" void fn_802FA388(TU802FA1C4* owner, TU80300104Base* listener);
 extern "C" nlFont* fn_80307260(void* owner, int index);
 extern "C" unsigned int fn_80304CE4(nlFont* font, const FontCharString* text, int start, int width, bool includeTrailingSpace);
 
@@ -29,12 +25,12 @@ TU80300104Base::TU80300104Base(void* context)
     , mDisabled(false)
     , mIgnoreInputLock(false)
 {
-    fn_802FA2FC(lbl_806E2030, this);
+    lbl_806E2030->fn_802FA2FC(this);
 }
 
 TU80300104Base::~TU80300104Base()
 {
-    fn_802FA388(lbl_806E2030, this);
+    lbl_806E2030->fn_802FA388(this);
 }
 
 void TU80300104Base::fn_80300594(const TU80300104Event* event)

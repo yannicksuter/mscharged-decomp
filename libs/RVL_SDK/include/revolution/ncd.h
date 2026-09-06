@@ -16,6 +16,7 @@ NCDErr NCDSetIpConfig(NCDIpConfig* ipConfig);
 NCDErr NCDSetIfConfig(NCDIfConfig* ifConfig);
 
 NCDErr NCDGetCurrentIpConfig(NCDIpConfig* ipConfig);
+NCDErr NCDGetCurrentIfConfig(NCDIfConfig* ifConfig);
 
 NCDErr NCDGetLinkStatus();
 BOOL NCDIsInterfaceDecided();

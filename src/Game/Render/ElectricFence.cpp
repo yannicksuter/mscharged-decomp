@@ -249,7 +249,9 @@ static void RenderElectricFenceFlat(const nlVector3& position,
     nlMatrix4 matrix;
     nlMakeRotationMatrixX(matrix, 1.5707964f);
 
-    float angle = nlATan2f(normal.y, normal.x);
+    float fNormalX = normal.x;
+    float fNormalY = normal.y;
+    float angle = nlATan2f(fNormalY, fNormalX);
     nlMatrix4 matrix2;
     nlMakeRotationMatrixZ(matrix2,
         0.0000958738f * (float)(u16)(s32)(10430.378f * angle));
@@ -479,12 +481,12 @@ ElectricFenceData::ElectricFenceData(
 
     mPosition = pEmissionController->GetPosition();
 
-    f32 absY = (f32)__fabs(mPosition.y);
-    f32 diffY = (f32)__fabs(absY - cField::GetSidelineY(1U));
+    f32 absY = fabsf(mPosition.y);
+    f32 diffY = fabsf(absY - cField::GetSidelineY(1U));
     f32 distanceFromSideline = diffY;
 
-    f32 absX = (f32)__fabs(mPosition.x);
-    f32 diffX = (f32)__fabs(absX - cField::GetGoalLineX(1U));
+    f32 absX = fabsf(mPosition.x);
+    f32 diffX = fabsf(absX - cField::GetGoalLineX(1U));
     f32 distanceFromGoal = diffX;
 
     float increment = sfGridTextureSize / sfNumGridSquares;

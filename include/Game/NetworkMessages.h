@@ -198,6 +198,10 @@ public:
         , mMachineCount(-1)
         , mUnidentified0A(0)
     {
+        for (int i = 0; i < 8; ++i)
+        {
+            mUnidentified0B.mData[i] = -1;
+        }
     }
 
     virtual void Serialize(UnidentifiedMessageSerializer* serializer);
@@ -325,7 +329,7 @@ public:
     virtual int GetType();
 
     /* 0x08 */ u8 mUnidentified08;
-    /* 0x09 */ u8 mUnidentified09;
+    /* 0x09 */ s8 mUnidentified09;
 };
 
 class NetMessagePauseRequest_8050AD7C : public UnidentifiedNetworkMessage

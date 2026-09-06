@@ -11,7 +11,12 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 
-extern nlDLListSlotPool<PackagePushPopMessage*> m_pushPopMessageQueue;
+template <>
+FESceneManager* nlSingleton<FESceneManager>::s_pInstance = 0;
+
+SlotPool<PackagePushPopMessage> PackagePushPopMessage::m_PushPopMessageSlotPool(0x14, 0);
+nlDLListSlotPool<PackagePushPopMessage*> m_pushPopMessageQueue(0x14, 0);
+
 extern int nlPrintf(const char* format, ...);
 
 extern "C" void fn_802FC280();
@@ -97,6 +102,15 @@ BaseSceneHandler* FESceneManager::GetSceneHandler(unsigned long hashID)
     }
 
     return 0;
+}
+
+BaseSceneHandler* FESceneManager::fn_802FECB0()
+{
+    if (m_sceneHandlerStack.m_Head == 0)
+    {
+        return 0;
+    }
+    return *m_sceneHandlerStack.Begin();
 }
 
 void FESceneManager::ProcessPushPopQueue()

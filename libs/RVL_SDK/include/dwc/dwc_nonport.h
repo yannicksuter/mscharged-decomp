@@ -1,5 +1,6 @@
 #pragma once
 
+#include <revolution/os/OSTime.h>
 #include <revolution/types.h>
 
 #include <string.h>
@@ -12,11 +13,55 @@ extern "C" {
 s64 DWCi_Np_GetTimeInSeconds(void);
 struct tm* fn_8049BB54(s64* theTime);
 u64 DWCi_Np_GetConsoleId(void);
+int NETGetWirelessMacAddress(void* data);
+
+#define DWCi_Np_TicksToMilliSeconds OSTicksToMilliseconds
+#define DWCi_Np_MilliSecondsToTicks(a) OSMillisecondsToTicks((u64)(a))
+#define SO_NtoHs SONtoHs
+
+typedef OSTime DWCTick;
+
+static inline DWCTick DWCi_Np_GetTick(void)
+{
+    return OSGetTime();
+}
+
+static inline void DWCi_Np_GetMacAddress(u8* macAddress)
+{
+    NETGetWirelessMacAddress(macAddress);
+}
 
 static inline void DWCi_Np_CpuCopy8(
     register const void* srcp, register void* dstp, register u32 size)
 {
     memcpy(dstp, srcp, size);
+}
+
+static inline void DWCi_Np_CpuCopy16(
+    register const void* srcp, register void* dstp, register u32 size)
+{
+    memcpy(dstp, srcp, size);
+}
+
+static inline void DWCi_Np_CpuCopy32(
+    register const void* srcp, register void* dstp, register u32 size)
+{
+    memcpy(dstp, srcp, size);
+}
+
+static inline void DWCi_Np_CpuClear8(void* dest, u32 size)
+{
+    memset(dest, 0, size);
+}
+
+static inline void DWCi_Np_CpuClear16(void* dest, u32 size)
+{
+    memset(dest, 0, size);
+}
+
+static inline void DWCi_Np_CpuClear32(void* dest, u32 size)
+{
+    memset(dest, 0, size);
 }
 
 static inline u16 DWCi_HtoLEs(u16 data)

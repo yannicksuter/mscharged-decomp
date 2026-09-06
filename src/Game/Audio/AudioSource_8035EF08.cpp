@@ -42,8 +42,8 @@ extern "C" void fn_8035EF3C(AXVPB* voice, float value)
 
 extern "C" void fn_8035F06C(AXVPB* voice, float ratio, float value)
 {
-    AXSetVoiceSrcRatio(voice,
-        nlFastExp2(value * nlFastLog2(1.0594631f)) * ratio);
+    float pitch = nlFastExp2(value * nlFastLog2(1.0594631f));
+    AXSetVoiceSrcRatio(voice, pitch * ratio);
 }
 
 extern "C" void fn_8035F0D8(AXVPB* voice, float value)
@@ -104,7 +104,14 @@ void AudioSource_8035C234::fn_3C(Plat3dSoundSrc* source)
 
 void AudioSource_8035C234::fn_0C()
 {
-    m_Unknown04 = m_Unknown10 == 5 ? 3 : m_Unknown10;
+    if (m_Unknown10 == 5)
+    {
+        m_Unknown04 = 3;
+    }
+    else
+    {
+        m_Unknown04 = m_Unknown10;
+    }
     if (m_Unknown04 == 6 && fn_64() && !fn_60())
         fn_6C(true);
 }

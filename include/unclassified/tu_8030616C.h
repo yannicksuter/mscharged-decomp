@@ -7,9 +7,9 @@ class UnidentifiedTimer_8030616C
 {
 public:
     UnidentifiedTimer_8030616C(
-        float duration, const Function<FnVoidVoid>& callback);
+        float duration, const Function<UnidentifiedTimer_8030616C*>& callback);
 
-    /* 0x00 */ Function<FnVoidVoid> mCallback;
+    /* 0x00 */ Function<UnidentifiedTimer_8030616C*> mCallback;
     /* 0x08 */ bool mEnabled;
     /* 0x09 */ u8 mPadding09[3];
     /* 0x0C */ float mDuration;

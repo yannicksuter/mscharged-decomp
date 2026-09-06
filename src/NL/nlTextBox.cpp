@@ -32,12 +32,12 @@ void nlTextBox::ProcessString(const FontCharString* pString, const nlFont* pFont
         {
             nlEscapeSequence esc(pCurrentChar);
 
-            if (esc.m_Type == ESC_NON_BREAKING_SPACE)
+            if (esc.GetType() == ESC_NON_BREAKING_SPACE)
             {
                 unsigned long prevChar = FirstChar ? 0 : (pLastNonEsc != 0 ? (unsigned long)*pLastNonEsc : 0);
                 CharWidth = pFont->GetCharWidth(' ', (unsigned short)prevChar);
             }
-            else if (esc.m_Type == ESC_PARAGRAPH)
+            else if (esc.GetType() == ESC_PARAGRAPH)
             {
                 CharWidth = (unsigned long)BoxSize.x + 1;
                 WidthAtLastSpace = CurrentRowWidth;

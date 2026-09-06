@@ -1,24 +1,11 @@
+#include "Game/Audio/Transition_802F2110.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
 
 #include <NMWException.h>
 
-struct Transition_802F2110
-{
-    virtual void fn_802EB634();
-    virtual void fn_802EB5BC(float target, float duration);
-
-    float value;
-    u8 valid;
-    u8 pad_09[3];
-    float target;
-    float elapsed;
-    float duration;
-    float minimum;
-    float maximum;
-    u8 enabled;
-    u8 pad_21[3];
-};
+class PlaybackBackend_802F2C3C;
+struct VoiceDefinition_802F3E20;
 
 struct VoiceDefinition_802F2110
 {
@@ -27,7 +14,7 @@ struct VoiceDefinition_802F2110
     float pitch;
     u32 sliderIndex;
     u32 voiceCount;
-    u32* voiceIds;
+    VoiceDefinition_802F3E20** voiceIds;
     u32 rpcGroupCount;
     u32* rpcGroupIndices;
 };
@@ -127,7 +114,7 @@ extern AudioSystem_802F2110* lbl_806E201C;
 extern "C" void* fn_802F0394(RpcController_802F2110*, RpcDefinition_802F2110*, SoundInstance_802F2110*);
 extern "C" void fn_802F04D4(RpcController_802F2110*, SoundInstance_802F2110*);
 extern "C" void* fn_802F1A70(CueHandle_802F2110*, u32);
-extern "C" VoiceNode_802F2110* fn_802F3E20(VoiceNode_802F2110*, SoundInstance_802F2110*, u32);
+extern "C" VoiceNode_802F2110* fn_802F3E20(VoiceNode_802F2110*, SoundInstance_802F2110*, VoiceDefinition_802F3E20*);
 extern "C" void fn_802F3ECC(VoiceNode_802F2110*, int);
 extern "C" void fn_802F3F6C(VoiceNode_802F2110*);
 extern "C" void fn_802F4070(VoiceNode_802F2110*);
@@ -135,7 +122,7 @@ extern "C" int fn_802F437C(VoiceNode_802F2110*, float);
 extern "C" void fn_802F4174(VoiceNode_802F2110*);
 extern "C" void fn_802F4278(VoiceNode_802F2110*);
 extern "C" void fn_802F4518(VoiceNode_802F2110*);
-extern "C" void fn_802F4640(VoiceNode_802F2110*, u32, void*);
+extern "C" void fn_802F4640(VoiceNode_802F2110*, PlaybackBackend_802F2C3C**, u32*);
 
 static inline VoiceNode_802F2110* AllocateVoice_802F2110()
 {
@@ -367,7 +354,7 @@ extern "C" void fn_802F2648(SoundInstance_802F2110* instance)
 }
 
 extern "C" void fn_802F2650(SoundInstance_802F2110* instance,
-    u32 value, void* output)
+    PlaybackBackend_802F2C3C** value, u32* output)
 {
     for (VoiceNode_802F2110* voice = instance->voices;
         voice != 0;

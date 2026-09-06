@@ -80,10 +80,10 @@ public:
 
     void fn_8035F3AC(bool, unsigned int);
 
-    /* 0x04 */ unsigned int m_Unknown04;
+    /* 0x04 */ int m_Unknown04;
     /* 0x08 */ AudioSourceInfo_8035C298* m_Unknown08;
     /* 0x0C */ float m_Unknown0C;
-    /* 0x10 */ unsigned int m_Unknown10;
+    /* 0x10 */ int m_Unknown10;
     /* 0x14 */ unsigned int m_Unknown14_00 : 12;
     unsigned int m_Unknown14_0C : 12;
     unsigned int m_Unknown14_18 : 1;

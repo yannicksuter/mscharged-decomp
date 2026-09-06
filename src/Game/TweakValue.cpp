@@ -21,6 +21,12 @@ typedef struct TweakEntryValue
     /* 0x0C */ TweakValueBase_8052BF70* value;
 } TweakEntryValue;
 
+// Pooled 0.0f owned by the neighbouring small-data gap object
+// (retail sdata2 0x806E62D0, always linked via the auto object). Retail
+// TweakValue loads this shared slot for the passthrough call instead of
+// emitting a private literal; referencing it keeps this TU free of .sdata2.
+extern const float lbl_806E62D0;
+
 extern bool lbl_806E1E42;
 
 bool UnidentifiedTweakValueImplBase::fn_802C4F94(const char* path)
@@ -28,7 +34,7 @@ bool UnidentifiedTweakValueImplBase::fn_802C4F94(const char* path)
     const char* name;
     char group[0x100];
     fn_802C7480(path, &name, group);
-    return fn_802C4FEC(name, 0.0f, group, false, 0.0f, 0.0f);
+    return fn_802C4FEC(name, lbl_806E62D0, group, false, lbl_806E62D0, lbl_806E62D0);
 }
 
 bool UnidentifiedTweakValueImplBase::fn_802C4FEC(const char* name, float value,

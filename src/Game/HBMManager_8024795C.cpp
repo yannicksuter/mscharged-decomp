@@ -7,6 +7,7 @@
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
 #include "Game/GameInfo.h"
+#include "Game/Render/tu_80271960.h"
 #include "Game/Task/ResetTask.h"
 #include "Game/Sys/audio.h"
 #include "Game/Sys/movie.h"
@@ -60,8 +61,6 @@ extern void* lbl_806E2020;
 
 extern "C"
 {
-    void fn_802719A0(UnidentifiedHBMDisplayState* state);
-    void fn_80271A00(UnidentifiedHBMDisplayState* state);
     bool fn_80273B00();
     bool fn_80285E20(void* presentation);
     void fn_801FC444();
@@ -288,7 +287,7 @@ void UnidentifiedHBMManager::fn_80248008()
 
     if (!fn_80271960()->mEnabled)
     {
-        fn_802719A0(fn_80271960());
+        fn_80271960()->fn_802719A0();
     }
 
     HBMCreate(&mDataInfo);
@@ -362,7 +361,7 @@ void UnidentifiedHBMManager::fn_802480EC()
             {
                 fn_801FC454();
             }
-            fn_80271A00(fn_80271960());
+            fn_80271960()->fn_80271A00();
             gxInit();
             GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
             GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
@@ -377,7 +376,7 @@ void UnidentifiedHBMManager::fn_802480EC()
         if (gpHBMManager->mActive)
         {
             gpHBMManager->mActive = false;
-            fn_80271A00(fn_80271960());
+            fn_80271960()->fn_80271A00();
             gxInit();
             GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
             GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
@@ -396,7 +395,7 @@ void UnidentifiedHBMManager::fn_802480EC()
         if (gpHBMManager->mActive)
         {
             gpHBMManager->mActive = false;
-            fn_80271A00(fn_80271960());
+            fn_80271960()->fn_80271A00();
             gxInit();
             GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
             GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);

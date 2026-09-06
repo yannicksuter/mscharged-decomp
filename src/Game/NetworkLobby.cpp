@@ -196,11 +196,11 @@ int NetworkLobby_80133634::GetMachineCount()
 
 UnidentifiedTransportPlayer* NetworkLobby_80133634::GetPlayerInfo(int index)
 {
-    if (index < 0 || index >= mMachineCount)
+    if (index >= 0 && index < mMachineCount)
     {
-        return 0;
+        return &mPlayers[index];
     }
-    return &mPlayers[index];
+    return 0;
 }
 
 int NetworkLobby_80133634::GetLocalMachineIndex()

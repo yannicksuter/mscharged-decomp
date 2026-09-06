@@ -2,6 +2,7 @@
 
 #include "Game/Task/TextWindowTask.h"
 
+#include "Game/Audio/AudioBankTable_802EB644.h"
 #include "Game/Audio/AudioBundleManager_802EDA7C.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/TweakRegistry.h"
@@ -14,9 +15,6 @@ extern "C" unsigned char SCGetSoundMode();
 extern "C" void fn_8035C818(void*, int);
 extern "C" void fn_803622F0(bool);
 extern "C" void fn_802EC1F4(AudioLoadMode_806E201C*, float);
-extern "C" void fn_802EBBF0(void*, int, unsigned long,
-    AudioPlayCallback_800EBB04, void*, int);
-extern "C" void fn_802EBCCC(void*, unsigned long);
 extern "C" XSoundHandle_802ED74C* fn_802EC030(
     AudioLoadMode_806E201C*, int, XSoundOwner_802ED74C*, unsigned long,
     int, int, int, int, int);
@@ -195,17 +193,16 @@ extern "C" void fn_800EBB04(GameAudio_800EB6AC* audio, int slotId,
     }
 
     ++audio->m_PlayRequestCount;
-    fn_802EBBF0(audio->GetBundleManager()->GetSoundMap(), slotId,
+    audio->GetBundleManager()->GetSoundMap()->fn_802EBBF0(slotId,
         cueId, callback, context, 0);
 }
 
-extern "C" void fn_800EBBD8(
-    GameAudio_800EB6AC* audio, unsigned long value)
+extern "C" void fn_800EBBD8(GameAudio_800EB6AC* audio)
 {
     if (lbl_806DC450
         && audio->GetBundleManager()->GetSoundMap() != 0)
     {
-        fn_802EBCCC(audio->GetBundleManager()->GetSoundMap(), value);
+        audio->GetBundleManager()->GetSoundMap()->fn_802EBCCC();
     }
 }
 

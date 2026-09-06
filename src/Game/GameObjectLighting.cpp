@@ -152,19 +152,19 @@ nlColour fn_80183C9C(const nlVector2* arg0, bool arg1)
 
 bool fn_80183C54()
 {
-    bool enabled;
-
     if (!lbl_806DCC58)
         return false;
 
     if (lbl_806DCC6C == (u32)-1)
         return false;
 
-    enabled = false;
-    if (lbl_806E1420 != 0)
-        enabled = g_bRenderWorldEffects;
+    if (lbl_806E1420 == 0)
+        return false;
 
-    return enabled;
+    if (g_bRenderWorldEffects)
+        return true;
+
+    return false;
 }
 
 void fn_80183BF4(const nlMatrix4* matrix)

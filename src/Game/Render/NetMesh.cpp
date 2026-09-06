@@ -349,9 +349,9 @@ inline static void ComputeMotion(NetMesh* self)
     {
         nlVector3& v3Pos = self->m_v3Position[i];
         nlVector3& v3PrevPos = self->m_v3PrevPosition[i];
-        float motion = ((float)fabs(v3PrevPos.x - v3Pos.x)
-                           + (float)fabs(v3PrevPos.y - v3Pos.y))
-                     + (float)fabs(v3PrevPos.z - v3Pos.z);
+        float motion = (fabsf(v3PrevPos.x - v3Pos.x)
+                           + fabsf(v3PrevPos.y - v3Pos.y))
+                     + fabsf(v3PrevPos.z - v3Pos.z);
         if (motion > self->mfMotion)
         {
             self->mfMotion = motion;

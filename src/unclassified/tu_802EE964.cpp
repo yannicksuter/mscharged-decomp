@@ -14,7 +14,7 @@ struct SliderDefinition_802EE964
     float minimumValue;
     float maximumValue;
     u32 field_14;
-    u32 kind;
+    s32 kind;
     u32 index;
 };
 

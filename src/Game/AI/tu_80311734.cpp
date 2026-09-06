@@ -769,8 +769,12 @@ extern "C" bool fn_803147C0(
     UnidentifiedFuzzyRuntimeBase* runtime, unsigned long hash)
 {
     int index = fn_80312208(hash);
-    return runtime->mUnidentified064 != 0
-        && runtime->mUnidentified064->ExtraData.IsSet(index);
+    if (runtime->mUnidentified064 != 0
+        && runtime->mUnidentified064->ExtraData.IsSet(index))
+    {
+        return true;
+    }
+    return false;
 }
 
 extern "C" Variant* fn_80314830(

@@ -23,19 +23,11 @@
 #include "NL/nlString.h"
 #include "unclassified/tu_802196B0.h"
 #include "unclassified/tu_8022EF84.h"
+#include "unclassified/tu_80245DB4.h"
 #include "unclassified/tu_802492E4.h"
 #include "unclassified/tu_80252180.h"
 
-struct TU80257D0CState
-{
-    void* mUnidentified00;
-    int mUnidentified04;
-    int mUnidentified08;
-    int mUnidentified0C;
-};
-
 extern TLComponentInstance* lbl_80578450[4];
-extern TU80257D0CState lbl_8057848C;
 extern TLComponentInstance lbl_80580030;
 extern TLSlide lbl_80580358;
 extern char lbl_8051F810[];

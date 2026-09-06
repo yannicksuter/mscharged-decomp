@@ -9,6 +9,7 @@
 #include "unclassified/tu_801B369C.h"
 
 #include "Game/Audio/AudioBundleManager_802EDA7C.h"
+#include "Game/Audio/AudioBankTable_802EB644.h"
 #include "Game/Audio/AudioLoadMode_806E201C.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/Sys/movie.h"
@@ -128,7 +129,6 @@ extern "C" void fn_800741A4(void*);
 extern "C" void fn_8013DDD4();
 extern "C" void fn_802EC9D0(void*);
 extern "C" void fn_800EBBD8(GameAudio_800EB6AC*);
-extern "C" void fn_802EBBBC(void*);
 extern "C" void fn_800ED8D8();
 extern "C" void fn_801ACFC4();
 extern "C" void fn_801A5328();
@@ -732,10 +732,10 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     }
 
     fn_800EBBD8(static_cast<GameAudio_800EB6AC*>(lbl_806E201C));
-    void* soundMap = lbl_806E201C->GetBundleManager()->GetSoundMap();
+    AudioBankTable_802EB644* soundMap = lbl_806E201C->GetBundleManager()->GetSoundMap();
     if (soundMap != 0)
     {
-        fn_802EBBBC(soundMap);
+        soundMap->fn_802EBBBC();
     }
     lbl_806E201C->Shutdown();
 

@@ -32,6 +32,8 @@ The project was built with or adapted source from the following projects:
 | [MelgMKW/Pulsar at `820ad92`](https://github.com/MelgMKW/Pulsar/tree/820ad929c3c7141a0396692d8b0896d1546240fd) | Mario Kart Wii retail-map identities and ordering for DWC non-port and authentication helpers. |
 | [doldecomp/brawl at `ec22759`](https://github.com/doldecomp/brawl/tree/ec2275908c1b22af4e47cc57bee51e070aff2adb) | DWC time-helper code-shape and `DWC_GetDateTime` identity reference. |
 | [NitroDWC 1.2 patch-plus4 (2006-08-25)](https://twlsdk.randommeaninglesscharacters.com/download/NitroDWC/NitroDWC-1_2-patch-plus4-20060825.zip) | DWC account, NAS-time, and ranking API, structure, semantics, and donor naming reference. |
+| RVL DWC 1.4.1 final and debug libraries (2007-05-11) | `dwc_match.c` identity, retained surface, data layout, compiler revision, and symbol and type evidence. No original SDK binary or source is distributed. |
+| [NitroDWC 2.2 patch-plus8 (2008-06-30)](https://twlsdk.randommeaninglesscharacters.com/download/NitroDWC/NitroDWC-2_2plus8-080630.zip) | `dwc_match.c` structural donor and later-version comparison. |
 | [zeldaret/oot-vc at `9c18537`](https://github.com/zeldaret/oot-vc/tree/9c1853710bcf6b598b0710022fdb87b9a8e99e2c) | MetroTRK, RVL SDK, Home Button Menu (`nw4hbm`), and Metrowerks Standard Library reconstructions. |
 | [zeldaret/ss at `9481f3a`](https://github.com/zeldaret/ss/tree/9481f3ab62d690bd6534cb0adf7e02db5579b333) | NintendoWare sound API, method-order, and debug-symbol references. |
 | [robojumper/sdk_2009-12-11 at `19e2ec4`](https://github.com/robojumper/sdk_2009-12-11/tree/19e2ec48d61a84ee072dc4fb5ac1db9bfd08c766) | Matched later Home Button Menu binary-file APIs and shared endian-helper reconstruction. |

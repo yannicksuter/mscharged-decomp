@@ -8,7 +8,7 @@
 #include "NL/nlMath.h"
 #include "Game/Render/CrowdManager.h"
 #include "unclassified/tu_801AD15C.h"
-#include "unclassified/tu_802A15D4.h"
+#include "NL/gl/tu_802A15D4.h"
 
 #include <string.h>
 
@@ -312,11 +312,10 @@ void RenderPeachPhoto(UnidentifiedPeachPhotoState* photo)
     } };
 
     State_802A15D4 writer;
-    fn_802A15D4(&writer);
     nlVector2 texture[4];
     memcpy(texture, lbl_804DCEE8, sizeof(texture));
 
-    if (fn_802A163C(&writer, 4, 3, 0))
+    if (writer.fn_802A163C(4, 3, 0))
     {
         for (int i = 0; i < 4; ++i)
         {
@@ -335,7 +334,7 @@ void RenderPeachPhoto(UnidentifiedPeachPhotoState* photo)
             *writer.value_0C++ = photo->corners[i].z + lbl_806DD028;
         }
 
-        if (fn_802A1878(&writer))
+        if (writer.fn_802A1878())
         {
             UnidentifiedTextureState* states =
                 static_cast<UnidentifiedTextureState*>(
@@ -376,6 +375,4 @@ void RenderPeachPhoto(UnidentifiedPeachPhotoState* photo)
                 writer.model, 0);
         }
     }
-
-    fn_802A15FC(&writer, -1);
 }

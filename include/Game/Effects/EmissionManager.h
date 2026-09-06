@@ -91,6 +91,8 @@ extern "C" void fn_802E6C20(EmissionManager*, void*, int, int);
 EmissionManager* GetEmissionManager();
 extern "C" void fn_802E6620(bool, bool, bool, bool);
 extern "C" bool fn_802E6774(void*);
+extern "C" void fn_802E67E0(
+    void* data, void* allocated, void* context, int value);
 extern "C" void fn_802E9E0C(int resource, int budget);
 extern "C" void fn_802E9E9C(
     int resource, const char* name, int budget);

@@ -66,10 +66,10 @@ public:
         mUnidentifiedC434 = 0;
         mUnidentifiedC438 = 0;
         mUnidentifiedC43C = 0;
-        mJobs = mJobStorage;
         mJobReadIndex = 0;
         mJobCount = 0;
         mJobCapacity = 10;
+        mJobs = mJobStorage;
         Reset(true);
     }
 

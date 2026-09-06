@@ -283,8 +283,7 @@ void NetworkTransport_8032CA4C::fn_8032D5E0()
     fn_8004F594(16, "Dumping %d entries in PeerInfoList\n", mUnidentified1C0);
     for (int index = 0; index < mUnidentified1C0; ++index)
     {
-        UnidentifiedTransportPeer_8032CA4C& peer = mUnidentified0A0[index];
-        fn_8004F594(16, "Peer %d address %d.%d.%d.%d port %d hoststate %d connInd %d connConf %d\n", index, peer.mUnidentified14[0], peer.mUnidentified14[1], peer.mUnidentified14[2], peer.mUnidentified14[3], peer.mUnidentified20, peer.mUnidentified18, peer.mUnidentified1C, peer.mUnidentified22);
+        fn_8004F594(16, "Peer %d address %d.%d.%d.%d port %d hoststate %d connInd %d connConf %d\n", index, mUnidentified0A0[index].mUnidentified14[0], mUnidentified0A0[index].mUnidentified14[1], mUnidentified0A0[index].mUnidentified14[2], mUnidentified0A0[index].mUnidentified14[3], mUnidentified0A0[index].mUnidentified20, mUnidentified0A0[index].mUnidentified18, mUnidentified0A0[index].mUnidentified1C, mUnidentified0A0[index].mUnidentified22);
     }
     fn_8004F594(16, "Dumping ConnectionPool contents\n");
     for (int index = 0; index < 8; ++index)
@@ -450,9 +449,10 @@ int NetworkTransport_8032CA4C::ShouldAcceptConnection(u32 connection, u8* addres
         }
         fn_8004F594(16, "Rejected client-client connection attempt from %d.%d.%d.%d because from unknown client\n", address[0], address[1], address[2], address[3]);
         fn_8032D5E0();
+        return 0;
     }
-    else
-        fn_8004F594(16, "Rejected connection attempt from %d.%d.%d.%d because I am not a host and am not in peer-peer topology\n", address[0], address[1], address[2], address[3]);
+
+    fn_8004F594(16, "Rejected connection attempt from %d.%d.%d.%d because I am not a host and am not in peer-peer topology\n", address[0], address[1], address[2], address[3]);
     return 0;
 }
 

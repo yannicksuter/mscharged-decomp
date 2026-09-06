@@ -1,3 +1,4 @@
+#include "Game/Audio/AudioBankTable_802EB644.h"
 #include "Game/Audio/AudioLoadMode_806E201C.h"
 #include "Game/Audio/AudioResourcePlatform_8035DE28.h"
 #include "Game/Audio/SoundMap.h"
@@ -7,20 +8,6 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "types.h"
-
-struct AudioResourceName_802ED144
-{
-    u32 field_00;
-    const char* name;
-};
-
-struct AudioResourceSource_802ED144
-{
-    u8 pad_00[8];
-    AudioResourceName_802ED144* resource;
-    u8 pad_0C[9];
-    u8 useCompactCallback;
-};
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
@@ -111,7 +98,7 @@ extern "C" u32 fn_802ED478(AudioResourceLoadOwner_802EDA54* state,
 }
 
 extern "C" void fn_802ED498(AudioResourceLoadOwner_802EDA54* state,
-    const char* name, u32 field18, u32 field1C,
+    const char* name, AudioResourceLoadCallback_802EDA54 field18, void* field1C,
     MemoryAllocator* allocator)
 {
     if (allocator != 0)
@@ -135,8 +122,8 @@ extern "C" void fn_802ED498(AudioResourceLoadOwner_802EDA54* state,
     }
     PopAllocator_802ED144();
 
-    state->m_Callback = (AudioResourceLoadCallback_802EDA54)field18;
-    state->m_CallbackParam = (void*)field1C;
+    state->m_Callback = field18;
+    state->m_CallbackParam = field1C;
 
     char path[0x80];
     nlSNPrintf(path, sizeof(path), "%s%s.resbun", (char*)lbl_806E201C + 0x4A, name);

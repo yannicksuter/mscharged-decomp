@@ -30,7 +30,7 @@ extern "C" void fn_802E4358(EmissionController* controller);
 extern "C" bool fn_802E5348(EmissionController* controller, float dt);
 extern "C" int fn_802E57B8(EmissionController* controller);
 extern "C" void fn_802E5BA0(void* parser, void* data, void* allocated,
-    unsigned long size, void* context);
+    void* context, int value);
 extern "C" void fxParticleStartup(int numParticles);
 extern "C" void fn_802E3AC0(int parameter);
 extern "C" void fn_802E99C4(EmissionResourceStats* stats);
@@ -127,7 +127,7 @@ extern "C" bool fn_802E6774(void* context)
     }
 
     fn_802E5BA0(lbl_8057F6D4, lbl_806E1FE8, lbl_806E1FEC,
-        (unsigned long)context, 0);
+        context, 0);
     nlFree(lbl_806E1FEC);
     lbl_806E1FEC = 0;
     return true;
@@ -137,12 +137,12 @@ extern "C" bool fn_802E6774(void* context)
  * Offset/Address/Size: 0x504 | 0x802E67E0 | size: 0x64
  */
 extern "C" void fn_802E67E0(void* data, void* allocated,
-    unsigned long size, void* context)
+    void* context, int value)
 {
     if (data != 0 || allocated != 0)
     {
         fn_802E5BA0(
-            lbl_8057F6D4, data, allocated, size, context);
+            lbl_8057F6D4, data, allocated, context, value);
     }
     ::operator delete(allocated);
 }
@@ -653,12 +653,21 @@ extern "C" void fn_802E97C0(EmissionManager* manager)
 {
     nlDLListIterator<EmissionController*> iterator
         = manager->mControllers.Begin();
-    while (iterator.hasNext())
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
     {
-        EmissionController* current = *iterator;
-        fn_802E4358(current);
-        current->Die();
-        iterator.Step();
+        EmissionController* controller = current->entry;
+        fn_802E4358(controller);
+        controller->Die();
+        if (nlDLRingIsEnd(head, current) || current == 0)
+        {
+            current = 0;
+        }
+        else
+        {
+            current = current->m_next;
+        }
     }
 }
 
@@ -688,11 +697,19 @@ void EmissionManager::SetContext(void* context)
     mContext = context;
     nlDLListIterator<EmissionController*> iterator
         = mControllers.Begin();
-    while (iterator.hasNext())
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
     {
-        EmissionController* current = *iterator;
-        current->m_pContext = context;
-        iterator.Step();
+        current->entry->m_pContext = context;
+        if (nlDLRingIsEnd(head, current) || current == 0)
+        {
+            current = 0;
+        }
+        else
+        {
+            current = current->m_next;
+        }
     }
 }
 

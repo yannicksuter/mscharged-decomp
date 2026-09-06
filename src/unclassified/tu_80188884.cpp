@@ -56,7 +56,3 @@ inline void UnidentifiedList_80188884::DeleteEntry(
     delete entry->entry;
     delete entry;
 }
-
-UnidentifiedObject_80188884::~UnidentifiedObject_80188884()
-{
-}

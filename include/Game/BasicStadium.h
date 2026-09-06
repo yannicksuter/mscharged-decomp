@@ -4,6 +4,9 @@
 #include "NL/nlMath.h"
 #include "types.h"
 
+class DrawableObject;
+template <typename T> class DLListEntry;
+
 struct UnidentifiedStadiumShadowData
 {
     /* 0x00 */ u8 unknown00[0x8C];
@@ -16,7 +19,9 @@ class BasicStadium
 public:
     static BasicStadium* GetCurrentStadium();
 
-    /* 0x00 */ u8 mUnidentified000[0x68];
+    /* 0x00 */ u8 mUnidentified000[0x08];
+    /* 0x08 */ DLListEntry<DrawableObject*>* mUnidentified008;
+    /* 0x0C */ u8 mUnidentified00C[0x5C];
     /* 0x68 */ void* mUnidentified068;
     /* 0x6C */ void* mUnidentified06C;
     /* 0x70 */ bool mUnidentified070;

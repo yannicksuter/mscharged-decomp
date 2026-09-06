@@ -1275,9 +1275,9 @@ int dCollideBoxPlane(dxGeom* o1, dxGeom* o2,
 
     // find deepest point
     dVector3 p;
-    p[0] = o1->pos[0];
-    p[1] = o1->pos[1];
-    p[2] = o1->pos[2];
+    p[0] = box->pos[0];
+    p[1] = box->pos[1];
+    p[2] = box->pos[2];
 #define FOO(i, op)                               \
     p[0] op REAL(0.5) * box->side[i] * R[0 + i]; \
     p[1] op REAL(0.5) * box->side[i] * R[4 + i]; \

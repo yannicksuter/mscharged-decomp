@@ -46,6 +46,7 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "NL/gl/glState.h"
+#include "NL/gl/tu_802A12E4.h"
 #include "unclassified/tu_802196B0.h"
 #include "NL/plat/nlFlash.h"
 
@@ -102,7 +103,6 @@ extern "C"
     void fn_802C7018(void*, char*, u32, const char*);
     void fn_802E22D8(void*, float*, void*, void*, int, int, int);
     void fn_802A8278(void*, int, int, void*);
-    void fn_802A1344(void*, int, int, void*);
     nlTask* fn_803733D4();
 
     void fn_801BFB08();
@@ -549,7 +549,8 @@ extern "C" void fn_8011D5B0(void* writer, void* source,
 {
     UnidentifiedWarbleSource* warbleSource =
         static_cast<UnidentifiedWarbleSource*>(source);
-    fn_802A1344(writer, warbleSource->mVertexCount * 4, 3, 0);
+    static_cast<State_802A12E4*>(writer)->fn_802A1344(
+        warbleSource->mVertexCount * 4, 3, 0);
 
     UnidentifiedWarbleVertex* vertex = vertices->first;
     while (vertex != 0)

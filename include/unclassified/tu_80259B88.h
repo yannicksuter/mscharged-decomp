@@ -53,7 +53,7 @@ public:
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
-    void fn_8025C084();
+    void fn_8025C084(UnidentifiedTimer_8030616C* timer);
     void fn_8025CFC0(int index, void* context);
     void fn_8025D04C(int index, void* context);
     void fn_8025D0C0(int index, void* context);
