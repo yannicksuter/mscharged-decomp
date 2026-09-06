@@ -34,7 +34,7 @@ static inline void DeleteFileEntries(ListEntry<void*>* current)
     }
 }
 
-void GLInventory::ReleaseLevel(int nLevel)
+inline void GLInventory::ReleaseLevel(int nLevel)
 {
     DeleteFileEntries(m_pFileData[nLevel]->m_Head);
     m_pFileData[nLevel]->Clear();

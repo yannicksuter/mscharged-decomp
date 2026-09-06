@@ -8,6 +8,41 @@ extern unsigned int AllocatorStackDepth;
 
 struct AsyncLoadState_802B3C28
 {
+    AsyncLoadState_802B3C28(nlFile* file, unsigned long param,
+        unsigned int compressedSize, LoadAsyncCallback callback, void* userData,
+        MemoryAllocator* allocator, int allocType, unsigned int chunkSize,
+        void* readBuffer0, void* readBuffer1)
+        : file(file)
+        , output(0)
+        , param(param)
+        , compressedSize(compressedSize)
+        , callback(callback)
+        , userData(userData)
+        , allocator(allocator)
+        , allocType(allocType)
+        , chunkSize(chunkSize)
+        , nextRead(0)
+        , completedReads(0)
+        , readCount(0)
+        , fullChunkCount(0)
+        , finalChunkSize(0)
+        , inflateState(compressedSize, 0, 0)
+    {
+        if (readBuffer0 != 0)
+        {
+            readBuffers[0] = readBuffer0;
+            readBuffers[1] = readBuffer1;
+            ownsReadBuffers = false;
+        }
+        else
+        {
+            readBuffers[0] = nlMalloc(chunkSize * 2, 32, true);
+            readBuffers[1] = (unsigned char*)readBuffers[0] + chunkSize;
+            ownsReadBuffers = true;
+        }
+        inflateState.fn_802A9A04();
+    }
+
     unsigned int uncompressedSize;
     nlFile* file;
     void* output;
@@ -144,42 +179,10 @@ extern "C" bool fn_802B3E94(const char* path, LoadAsyncCallback callback,
 
     fn_802A99D8(fn_802B3C28, fn_802B3C38, 0);
 
-    AsyncLoadState_802B3C28* state =
-        (AsyncLoadState_802B3C28*)nlMalloc(sizeof(AsyncLoadState_802B3C28), 32, true);
-    if (state != 0)
-    {
-        state->file = file;
-        state->output = 0;
-        state->param = param;
-        state->compressedSize = compressedSize;
-        state->callback = callback;
-        state->userData = userData;
-        state->allocator = allocator;
-        state->allocType = allocType;
-        state->chunkSize = chunkSize;
-        state->nextRead = 0;
-        state->completedReads = 0;
-        state->readCount = 0;
-        state->fullChunkCount = 0;
-        state->finalChunkSize = 0;
-
-        new (&state->inflateState) UnidentifiedInflateStream_802A99E8(compressedSize, 0, 0);
-
-        if (readBuffer0 != 0)
-        {
-            state->readBuffers[0] = readBuffer0;
-            state->readBuffers[1] = readBuffer1;
-            state->ownsReadBuffers = false;
-        }
-        else
-        {
-            state->readBuffers[0] = nlMalloc(chunkSize * 2, 32, true);
-            state->readBuffers[1] = (unsigned char*)state->readBuffers[0] + chunkSize;
-            state->ownsReadBuffers = true;
-        }
-
-        state->inflateState.fn_802A9A04();
-    }
+    AsyncLoadState_802B3C28* state = new (
+        nlMalloc(sizeof(AsyncLoadState_802B3C28), 32, true))
+        AsyncLoadState_802B3C28(file, param, compressedSize, callback, userData,
+            allocator, allocType, chunkSize, readBuffer0, readBuffer1);
 
     nlReadAsync(file, state, 4, fn_802B3C40, (unsigned long)state, 0);
 

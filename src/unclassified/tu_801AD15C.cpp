@@ -1,4 +1,5 @@
 #include "Game/Debug/ShapeRender.h"
+#include "Game/Replay.h"
 #include "Game/Render/RLView.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glState.h"
@@ -11,21 +12,6 @@
 #include "NL/gl/tu_802A15D4.h"
 
 #include <string.h>
-
-struct LoadFrame
-{
-    int type;
-    char _004[4];
-    u8* position;
-};
-
-struct SaveFrame
-{
-    int type;
-    char _004[4];
-    u8* position;
-};
-
 
 extern "C"
 {
@@ -64,22 +50,14 @@ void CrowdManager::Uninitialize()
 
 void CrowdManager::Replay(LoadFrame& frame)
 {
-    int value = 0;
-    if (frame.type == 1)
-    {
-        memcpy(&value, frame.position, sizeof(value));
-        frame.position += sizeof(value);
-    }
+    int replayState = 0;
+    Replayable<1, LoadFrame, int>(frame, replayState);
 }
 
 void CrowdManager::Replay(SaveFrame& frame)
 {
-    int value = m_State;
-    if (frame.type == 1)
-    {
-        memcpy(frame.position, &value, sizeof(value));
-        frame.position += sizeof(value);
-    }
+    int state = m_State;
+    Replayable<1, SaveFrame, int>(frame, state);
 }
 
 void CrowdManager::Update(float)

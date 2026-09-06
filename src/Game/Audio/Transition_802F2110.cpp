@@ -20,8 +20,8 @@ void Transition_802F2110::fn_802EB5BC(float dt, float multiplier)
     }
 
     float t = dt / elapsed;
-    elapsed -= dt;
     float delta = t * (target - value);
+    elapsed -= dt;
     value += delta;
 }
 

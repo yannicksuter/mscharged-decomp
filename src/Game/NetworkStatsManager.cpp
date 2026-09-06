@@ -686,7 +686,7 @@ void NetworkStatsManager_8012F378::ReportGameResult(int result,
 void NetworkStatsManager_8012F378::OnReportGameResult(bool success, int category)
 {
     mOperation = 0;
-    if (!success)
+    if ((int)success != 1)
     {
         fn_8004F594(16,
             "FinishedReportGameResult returned error cat %d\n",
@@ -850,9 +850,9 @@ void NetworkStatsManager_8012F378::Update(float dt)
 
 int GetLocalPlayingSide_801323F4()
 {
-    int machine = (s8)fn_80338C20(lbl_806E20D8);
+    s8 machine = fn_80338C20(lbl_806E20D8);
     s8 player = fn_80336F68(0, machine);
-    return (s16)GameInfoManager::GetInstance()->GetPlayingSide((u16)player);
+    return GameInfoManager::GetInstance()->GetPlayingSide(player);
 }
 
 void NetworkStatsManager_8012F378::HandleDisconnect_8013243C(int result)
@@ -1037,35 +1037,37 @@ int FindNetworkSeasonBoundary(
     return index - 1;
 }
 
-static int DayOfYear(int month, int day, int year)
+static int DayOfYear(NetworkSeasonDate date, int year)
 {
-    int result = day - 1;
-    for (int i = 1; i < month; ++i)
+    int result = 0;
+    for (int i = 1; i < date.mMonth; ++i)
     {
         result += DaysInMonth(i, year);
     }
-    return result;
+    return result + date.mDay;
 }
 
 int GetDaysUntilNextSeasonBoundary(
     const NetworkSeasonDateTable* dates, int index, int year)
 {
-    const NetworkSeasonDate& current = dates->mDates[index];
+    NetworkSeasonDate current = dates->mDates[index];
     if (index == dates->mCount - 1)
     {
         const NetworkSeasonDate& next = dates->mDates[0];
+        int currentDay = DayOfYear(current, year);
+        int nextDay = DayOfYear(next, year + 1);
         int remaining = (year % 4 == 0) ? 366 : 365;
-        return remaining - DayOfYear(current.mMonth, current.mDay, year) + DayOfYear(next.mMonth, next.mDay, year + 1);
+        return remaining - currentDay + nextDay;
     }
     const NetworkSeasonDate& next = dates->mDates[index + 1];
-    return DayOfYear(next.mMonth, next.mDay, year) - DayOfYear(current.mMonth, current.mDay, year);
+    return DayOfYear(next, year) - DayOfYear(current, year);
 }
 
 int GetDaysSinceSeasonBoundary(const NetworkSeasonDateTable* dates, int index,
     const NetworkSeasonDate* date, int year)
 {
     const NetworkSeasonDate& boundary = dates->mDates[index];
-    return DayOfYear(date->mMonth, date->mDay, year) - DayOfYear(boundary.mMonth, boundary.mDay, year);
+    return DayOfYear(*date, year) - DayOfYear(boundary, year);
 }
 
 NetworkSeasonDate sNetworkSeasonDates[52] = {

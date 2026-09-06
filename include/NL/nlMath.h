@@ -432,7 +432,13 @@ public:
     {
         return *(nlVector3*)&e2[3][0];
     }
-    void SetTranslation(const nlVector3& trans);
+    void SetTranslation(const nlVector3& trans)
+    {
+        e2[3][0] = trans.x;
+        e2[3][1] = trans.y;
+        e2[3][2] = trans.z;
+        e2[3][3] = 1.0f;
+    }
 
     inline nlVector4 operator*(const nlVector4& v_in) const
     {

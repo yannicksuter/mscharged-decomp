@@ -3,12 +3,9 @@
 
 #include "Game/GL/ModelWriter_802A1BF4.h"
 #include "NL/gl/glMemory.h"
+#include "NL/gl/glPlat.h"
+#include "Game/GL/tu_802D38A4.h"
 
-extern "C" void fn_802D38A4(glModel* model, int count, int primitive,
-    void* allocator, int numStreams, unsigned long format);
-extern "C" void fn_802D39CC(glModelStream* streams, int stream,
-    void* address, int stride, int type);
-extern "C" void fn_8036E438(glModelPacket* packet, bool permanent, void* allocator);
 
 ModelWriter_802A1BF4::ModelWriter_802A1BF4()
     : count(0)
@@ -116,7 +113,7 @@ bool ModelWriter_802A1BF4::fn_802A1E00()
 {
     for (u32 i = 0; i < model->numPackets; ++i)
     {
-        fn_8036E438(&model->packets[i], allocator != 0, allocator);
+        glplatFinalizePacket(&model->packets[i], allocator != 0, allocator);
     }
 
     for (int i = 0; i < model->packets->numStreams; ++i)

@@ -85,6 +85,11 @@ public:
         return nlDLListIterator<T>(m_Head, current);
     }
 
+    bool IsEmpty() const
+    {
+        return m_Head == 0;
+    }
+
     T* AllocateAtEnd(unsigned long* outEntry);
 
     void DeleteEntry(DLListEntry<T>* entry);

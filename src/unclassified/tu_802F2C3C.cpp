@@ -174,13 +174,17 @@ static inline float RandomRange_802F2C3C(float minimum, float maximum)
     return nlRandomf(minimum, maximum, &nlDefaultSeed);
 }
 
-extern "C" SlotPoolBase* fn_802F2C3C(SlotPoolBase* pool, int destroy)
+struct SlotPoolEntry_802F2C3C
+{
+    u8 data[0x7C];
+};
+
+extern "C" SlotPool<SlotPoolEntry_802F2C3C>* fn_802F2C3C(
+    SlotPool<SlotPoolEntry_802F2C3C>* pool, int destroy)
 {
     if (pool != 0)
     {
-        fn_802B467C(pool);
-        SlotPoolBase::BaseFreeBlocks(pool, 0x7C);
-        pool->~SlotPoolBase();
+        pool->BasicSlotPool<SlotPoolEntry_802F2C3C>::~BasicSlotPool();
         if (destroy > 0)
             operator delete(pool);
     }

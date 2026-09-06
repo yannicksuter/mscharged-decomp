@@ -8,6 +8,7 @@
 #include "Game/TweakRegistry.h"
 #include "NL/gl/glStruct.h"
 #include "NL/globalpad.h"
+#include "NL/platpad.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/plat/tu_80364604.h"

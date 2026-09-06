@@ -193,13 +193,17 @@ extern "C" bool fn_802F2110()
     return true;
 }
 
-extern "C" SlotPoolBase* fn_802F2118(SlotPoolBase* pool, int destroy)
+struct SlotPoolEntry_802F2118
+{
+    u8 data[0x40];
+};
+
+extern "C" SlotPool<SlotPoolEntry_802F2118>* fn_802F2118(
+    SlotPool<SlotPoolEntry_802F2118>* pool, int destroy)
 {
     if (pool != 0)
     {
-        fn_802B467C(pool);
-        SlotPoolBase::BaseFreeBlocks(pool, 0x40);
-        pool->~SlotPoolBase();
+        pool->BasicSlotPool<SlotPoolEntry_802F2118>::~BasicSlotPool();
         if (destroy > 0)
             operator delete(pool);
     }

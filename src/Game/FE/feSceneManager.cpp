@@ -106,7 +106,7 @@ BaseSceneHandler* FESceneManager::GetSceneHandler(unsigned long hashID)
 
 BaseSceneHandler* FESceneManager::fn_802FECB0()
 {
-    if (m_sceneHandlerStack.m_Head == 0)
+    if (m_sceneHandlerStack.IsEmpty())
     {
         return 0;
     }

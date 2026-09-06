@@ -234,7 +234,7 @@ extern "C" void fn_803370F0(NetworkMessageType0_80533B7C* destination,
 extern "C" void fn_8033718C(
     NetworkMessageType0_80533B7C* message, s8 player, u8 state)
 {
-    int shift = (player & 0x7F) * 2;
+    u8 shift = (player & 0x7F) * 2;
     u32 mask = 3 << shift;
     u8 inverse = ~mask;
     u8 value = message->mUnidentified00A & inverse;

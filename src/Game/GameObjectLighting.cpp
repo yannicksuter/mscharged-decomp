@@ -161,10 +161,10 @@ bool fn_80183C54()
     if (lbl_806E1420 == 0)
         return false;
 
-    if (g_bRenderWorldEffects)
-        return true;
+    if (!g_bRenderWorldEffects)
+        return false;
 
-    return false;
+    return true;
 }
 
 void fn_80183BF4(const nlMatrix4* matrix)

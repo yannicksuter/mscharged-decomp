@@ -213,13 +213,17 @@ static void EmitSphericalPosition(nlVector3& pos, nlVector3& dir,
     nlSinCos(&sinVal, &cosVal,
         (unsigned short)(int)(10430.378f * randomAngleValue));
 
+    nlVector3 localPos;
     nlVector3 localDir;
-    nlVec3Set(localDir, xyRadius * cosVal, xyRadius * sinVal, randomZ);
+    float x = xyRadius * cosVal;
+    float y = xyRadius * sinVal;
+    float z = randomZ;
     float radius
         = pSystem->m_pTemplate->mUnidentified058[4]->fn_802E0010(
             pSystem->mUnidentified014);
-    nlVector3 localPos;
-    nlVec3Scale(localPos, localDir, radius);
+    nlVec3Set(localDir, x, y, z);
+    nlVec3Set(localPos, radius * localDir.x, radius * localDir.y,
+        radius * localDir.z);
 
     if (pSpec != 0)
         nlVec3Add(localPos, localPos, pSpec->m_vLocalOffset);
@@ -249,13 +253,17 @@ static void EmitHemisphericalPosition(nlVector3& pos, nlVector3& dir,
     nlSinCos(&sinVal, &cosVal,
         (unsigned short)(int)(10430.378f * randomAngleValue));
 
+    nlVector3 localPos;
     nlVector3 localDir;
-    nlVec3Set(localDir, xyRadius * cosVal, xyRadius * sinVal, randomZ);
+    float x = xyRadius * cosVal;
+    float y = xyRadius * sinVal;
+    float z = randomZ;
     float radius
         = pSystem->m_pTemplate->mUnidentified058[4]->fn_802E0010(
             pSystem->mUnidentified014);
-    nlVector3 localPos;
-    nlVec3Scale(localPos, localDir, radius);
+    nlVec3Set(localDir, x, y, z);
+    nlVec3Set(localPos, radius * localDir.x, radius * localDir.y,
+        radius * localDir.z);
 
     if (pSpec != 0)
         nlVec3Add(localPos, localPos, pSpec->m_vLocalOffset);

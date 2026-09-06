@@ -203,7 +203,7 @@ public:
 };
 
 extern BasicSlotPool<UnidentifiedFuzzyVariantData> lbl_80584200;
-extern BasicSlotPool<UnidentifiedActionQueue> lbl_80584228;
+extern SlotPool<UnidentifiedActionQueue> lbl_80584228;
 extern BasicSlotPool<UnidentifiedVariant_80054AB8> lbl_805842C8;
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80054AB8(InterpreterCore*, const char*, cTeam*);

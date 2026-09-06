@@ -3,12 +3,9 @@
 
 #include "NL/gl/tu_802A12E4.h"
 #include "NL/gl/glMemory.h"
+#include "NL/gl/glPlat.h"
+#include "Game/GL/tu_802D38A4.h"
 
-extern "C" void fn_802D38A4(glModel* model, int count, int primitive,
-    void* allocator, int numStreams, unsigned long format);
-extern "C" void fn_802D39CC(glModelStream* streams, int stream,
-    void* address, int stride, int type);
-extern "C" void fn_8036E438(glModelPacket* packet, bool permanent, void* allocator);
 
 State_802A12E4::State_802A12E4()
     : count(0)
@@ -120,7 +117,7 @@ bool State_802A12E4::fn_802A14F0()
 {
     for (u32 i = 0; i < model->numPackets; ++i)
     {
-        fn_8036E438(&model->packets[i], resource != 0, resource);
+        glplatFinalizePacket(&model->packets[i], resource != 0, resource);
     }
 
     for (int i = 0; i < model->packets->numStreams; ++i)

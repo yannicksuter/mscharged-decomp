@@ -48,6 +48,7 @@ static bool lbl_806E1A58;
 
 extern "C" void fn_8028A98C(bool enabled)
 {
+    bool subtract;
     unsigned int numChans;
     unsigned int numTexGens;
     unsigned int numTevStages;
@@ -60,7 +61,7 @@ extern "C" void fn_8028A98C(bool enabled)
         numChans = 1;
         numTexGens = 3;
         numTevStages = 3;
-        bool subtract = lbl_806DEFE2;
+        subtract = lbl_806DEFE2 != 0;
 
         gxSetTevOrder(0, 1, 1, 255);
         gxSetTevOrder(1, 0, 0, 255);

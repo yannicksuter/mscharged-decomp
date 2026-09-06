@@ -136,7 +136,7 @@ int fn_8030FD40(
     return 1;
 }
 
-BasicSlotPool<UnidentifiedActionQueue> lbl_80584228(16, 16);
+SlotPool<UnidentifiedActionQueue> lbl_80584228(16, 16);
 
 UnidentifiedActionQueue::UnidentifiedActionQueue()
 {

@@ -559,9 +559,11 @@ void GLView::RemoveChild(GLView* child)
 
 GLRenderPair GLView::GetRenderPair() const
 {
-    return m_RenderPair.hash != 0 && m_RenderPair.target != 0
-             ? m_RenderPair
-             : fn_802CD82C();
+    if (m_RenderPair)
+    {
+        return m_RenderPair;
+    }
+    return fn_802CD82C();
 }
 
 void GLView::BeginRender()

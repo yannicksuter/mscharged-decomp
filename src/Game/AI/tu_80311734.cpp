@@ -801,12 +801,11 @@ extern "C" void fn_803148D0(void*, const char* value)
 
 extern "C" UnidentifiedVariant_80054AB8* fn_803152F0(
     UnidentifiedFuzzyRuntimeBase* runtime,
-    const FuzzyVariant& value, float confidence)
+    const UnidentifiedVariant_80054AB8& value, float confidence)
 {
     UnidentifiedVariant_80054AB8* result =
         new (lbl_805842C8.Allocate())
-            UnidentifiedVariant_80054AB8;
-    *result = value;
+            UnidentifiedVariant_80054AB8(value);
     fn_800B6A1C(result, 4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = fn_802DF9FC(runtime) + 1;
     return runtime->UnidentifiedReturn(result, confidence);
@@ -826,7 +825,7 @@ UnidentifiedStringHash::UnidentifiedStringHash(const char* name)
     mUnidentifiedHash = nlStringHash(name);
 }
 
-typedef FuzzyVariant (*UnidentifiedTransitionFunction)(
+typedef UnidentifiedVariant_80054AB8 (*UnidentifiedTransitionFunction)(
     UnidentifiedFuzzyRuntimeValue*, UnidentifiedFuzzyRuntimeValue*);
 
 extern "C" void fn_80315A64(
@@ -837,24 +836,21 @@ extern "C" void fn_80315A64(
 {
     if (transition->mUnidentifiedFunction != 0)
     {
-        FuzzyVariant transitionValue =
+        UnidentifiedVariant_80054AB8 transitionValue =
             ((UnidentifiedTransitionFunction)
                 transition->mUnidentifiedFunction)(value, context);
         *result = transitionValue;
     }
-    else if (value != 0 && value->mRuntime != 0)
+    else if (value->mRuntime != 0)
     {
         UnidentifiedVariant_80054AB8* transitionValue =
             fn_8031243C(
                 value->mRuntime,
                 transition->mUnidentifiedHash, context);
-        if (transitionValue != 0)
+        *result = *transitionValue;
+        if (transitionValue->mTemporary)
         {
-            *result = *transitionValue;
-            if (transitionValue->mTemporary)
-            {
-                delete transitionValue;
-            }
+            delete transitionValue;
         }
     }
 }

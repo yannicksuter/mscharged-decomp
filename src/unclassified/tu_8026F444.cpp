@@ -27,7 +27,6 @@ extern BaseGameSceneManager* lbl_806E1838;
 extern "C" void fn_80306208(UnidentifiedTimer_8030616C* timer, bool enabled);
 extern "C" void fn_80306224(UnidentifiedTimer_8030616C* timer, float dt);
 extern "C" bool fn_8025BD88();
-extern "C" int fn_8004F594(int channel, const char* format, ...);
 extern "C" void fn_801CBCA0(
     unsigned long cueId, const void* debugName, void* context, bool restartable);
 

@@ -72,6 +72,7 @@ public:
     const SoundArchive& GetSoundArchive() const;
 
     SoundPlayer& GetSoundPlayer(u32 playerId);
+    SoundPlayer& GetSoundPlayer(const char* label);
     SoundPlayer& GetSoundPlayer(int playerId) { return GetSoundPlayer(static_cast<u32>(playerId)); }
 
     const void* detail_GetFileAddress(u32 id) const;
@@ -194,7 +195,7 @@ private:
     public:
         StrmDataLoadTask(void* addr, u32 size, s32 offset, int numChannels, u32 blockSize, s32 blockHeaderOffset,
                          bool needUpdateAdpcmLoop, detail::StrmPlayer::LoadCommand& callback, const SoundArchive& arc,
-                         u32 fileId, u32 taskId, OSMutex& mutex) DECOMP_DONT_INLINE;
+                         u32 fileId, u32 taskId, OSMutex& mutex);
         virtual void Execute();
         virtual void Cancel();
 

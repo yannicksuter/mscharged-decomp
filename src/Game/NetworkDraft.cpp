@@ -143,14 +143,14 @@ void NetworkDraft::Reset(bool)
     mState = NET_DRAFT_IDLE;
     mLocalMachineIndex = -1;
     mMyTeamIndex = -1;
+    mTeamCount = 0;
     mCurrentDraftingTeam = -1;
     mCurrentDraftingPeer = -1;
     mCurrentDrafterIsLocal = false;
     mSideToTeam[0] = -1;
-    mSideToTeam[1] = -1;
     mSideDrafted[0] = false;
+    mSideToTeam[1] = -1;
     mSideDrafted[1] = false;
-    mTeamCount = 0;
     mNextDraftingTeam = -1;
     mTimeBeforeDrafting = s_fDefaultTimeToWaitBeforeDrafting;
     mTimeToChangeDrafters = s_fDefaultTimeToChooseSidekicks;

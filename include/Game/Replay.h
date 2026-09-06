@@ -1,7 +1,114 @@
 #ifndef _REPLAY_H_
 #define _REPLAY_H_
 
+#include <string.h>
+
 #include "types.h"
+
+class LoadFrame;
+
+struct ReplayablePod
+{
+};
+
+struct NotReplayablePod
+{
+};
+
+template <typename T>
+struct ReplayableCategory
+{
+    typedef NotReplayablePod Type;
+};
+
+template <>
+struct ReplayableCategory<int>
+{
+    typedef ReplayablePod Type;
+};
+
+template <typename T>
+inline typename ReplayableCategory<T>::Type ReplayableCategoryOf(const T& current)
+{
+    typename ReplayableCategory<T>::Type category;
+    return category;
+}
+
+class WriteByteStream
+{
+public:
+    /* 0x0 */ char mCount;
+    /* 0x4 */ char* mStorage;
+}; // total size: 0x8
+
+class ReadByteStream
+{
+public:
+    /* 0x0 */ char mCount;
+    /* 0x4 */ const char* mStorage;
+}; // total size: 0x8
+
+enum ReplayNonBlendables
+{
+    REPLAY_NON_BLENDABLES = 0,
+    DO_NOT_REPLAY_NON_BLENDABLES = 1,
+};
+
+class SaveFrame
+{
+public:
+    template <int N, typename T>
+    void Replayable(T& current);
+
+    template <int N, typename T>
+    void Replayable(T& current, ReplayablePod);
+
+    template <int N, typename T>
+    void Replayable(T& current, NotReplayablePod);
+
+    /* 0x0 */ int mInterval;
+    /* 0x4 */ WriteByteStream mStream;
+}; // total size: 0xC
+
+template <int N, typename T>
+inline void SaveFrame::Replayable(T& current)
+{
+    typename ReplayableCategory<T>::Type category = ReplayableCategoryOf(current);
+    Replayable<N>(current, category);
+}
+
+template <int N, typename T>
+inline void SaveFrame::Replayable(T& current, ReplayablePod)
+{
+    if (N == 0 || mInterval == N)
+    {
+        memcpy(mStream.mStorage, &current, sizeof(T));
+        mStream.mStorage += sizeof(T);
+    }
+}
+
+template <int N, typename T>
+inline void SaveFrame::Replayable(T& current, NotReplayablePod)
+{
+    if (N == 0 || mInterval == N)
+    {
+        current.Replay(*this);
+    }
+}
+
+template <int N, typename FrameType, typename T>
+void Replayable(FrameType& frame, T& current);
+
+#include "Game/LoadFrame.h"
+
+template <int N, typename FrameType, typename T>
+inline void Replayable(FrameType& frame, T& current)
+{
+    if (N == 0 || frame.mInterval == N)
+    {
+        frame.template Replayable<N>(current);
+    }
+}
 
 class Replay
 {

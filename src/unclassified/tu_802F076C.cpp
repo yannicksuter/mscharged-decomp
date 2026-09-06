@@ -15,6 +15,11 @@ struct ChainOwner_802F076C
     ChainNode_802F076C* head;
 };
 
+struct SlotPoolEntry_802F0780
+{
+    u8 data[0x10];
+};
+
 struct SlotPoolEntry_802F07F0
 {
     u8 data[0xC];
@@ -149,14 +154,12 @@ extern "C" void fn_802F076C(
     chain->head = node;
 }
 
-extern "C" SlotPoolBase* fn_802F0780(
-    SlotPoolBase* pool, int destroy)
+extern "C" SlotPool<SlotPoolEntry_802F0780>* fn_802F0780(
+    SlotPool<SlotPoolEntry_802F0780>* pool, int destroy)
 {
     if (pool != 0)
     {
-        fn_802B467C(pool);
-        SlotPoolBase::BaseFreeBlocks(pool, 0x10);
-        pool->~SlotPoolBase();
+        pool->BasicSlotPool<SlotPoolEntry_802F0780>::~BasicSlotPool();
         if (destroy > 0)
             operator delete(pool);
     }

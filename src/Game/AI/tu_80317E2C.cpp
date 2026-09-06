@@ -80,7 +80,7 @@ extern "C" bool fn_80317E60(
         || transition->mUnidentifiedHash != 0;
 }
 
-extern "C" bool fn_80317E88(shdStateMachine* machine)
+extern "C" bool fn_80317E88(const shdStateMachine* machine)
 {
     bool result = false;
     if (machine->mUnidentified078 >= 0.0f)

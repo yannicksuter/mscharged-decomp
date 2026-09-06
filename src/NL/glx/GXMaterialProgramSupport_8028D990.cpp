@@ -53,6 +53,7 @@ static bool lbl_806E1AE0;
 
 extern "C" void fn_8028D990(bool enabled)
 {
+    bool subtract;
     unsigned int numChans;
     unsigned int numTexGens;
     unsigned int numTevStages;
@@ -62,7 +63,7 @@ extern "C" void fn_8028D990(bool enabled)
     {
         fn_801836FC(1);
         fn_801832F4(enabled, lbl_806E1AD8, 0);
-        bool subtract = fn_80182118() != 0;
+        subtract = fn_80182118() != 0;
         numChans = 2;
         numTexGens = 3;
         numTevStages = 5;

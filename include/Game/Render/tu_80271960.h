@@ -40,6 +40,6 @@ private:
     }
 }; // size: 0x10
 
-extern "C" UnidentifiedHBMDisplayState* fn_80271960();
+UnidentifiedHBMDisplayState* fn_80271960();
 
 #endif // GAME_RENDER_TU_80271960_H

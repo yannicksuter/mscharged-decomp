@@ -84,8 +84,7 @@ extern "C" unsigned int fn_802B289C(const char* name, int length)
     unsigned int value = (unsigned int)length;
     unsigned int middleHigh = (value << 8) & 0x00FF0000;
     unsigned int high = value << 24;
-    unsigned int swapped = (value >> 8) & 0x0000FF00;
-    swapped |= value >> 24;
+    unsigned int swapped = (value >> 24) | ((value >> 8) & 0x0000FF00);
     swapped |= middleHigh;
     swapped |= high;
     unsigned int hash = nlStringLowerHash(name);

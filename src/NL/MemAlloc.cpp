@@ -433,7 +433,8 @@ unsigned int MemoryAllocator::TotalFreeMemory()
     stats.total = 0;
     stats.largest = 0;
     stats.count = 0;
-    nlWalkDLRing(m_free_block_list, &callback, &MemoryStatsCallback_802AF2E4::Callback);
+    FreeBlockList* head = m_free_block_list;
+    nlWalkDLRing(head, &callback, &MemoryStatsCallback_802AF2E4::Callback);
     return stats.total;
 }
 
@@ -445,7 +446,8 @@ unsigned int MemoryAllocator::LargestFreeBlock()
     stats.total = 0;
     stats.largest = 0;
     stats.count = 0;
-    nlWalkDLRing(m_free_block_list, &callback, &MemoryStatsCallback_802AF2E4::Callback);
+    FreeBlockList* head = m_free_block_list;
+    nlWalkDLRing(head, &callback, &MemoryStatsCallback_802AF2E4::Callback);
     return stats.largest;
 }
 

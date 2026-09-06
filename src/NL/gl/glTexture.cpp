@@ -72,17 +72,18 @@ void glTextureReplace(unsigned long texture, const void* buffer,
 extern "C" bool fn_802CDD78(
     void* data, unsigned long size, void* allocator, int nParam)
 {
-    fn_8036BBD4(data, allocator);
+    ResourceInterface_802CC094* resource = (ResourceInterface_802CC094*)allocator;
     BundleHeader* header = (BundleHeader*)data;
+    fn_8036BBD4(header, resource);
     int numTextures = header->numTextures;
     glTexBundleDict* dict = (glTexBundleDict*)(header + 1);
     unsigned char* textureData = (unsigned char*)(dict + numTextures);
-    ResourceInterface_802CC094* resource = (ResourceInterface_802CC094*)allocator;
     GLInventory* inventory = resource->m_inventory;
 
-    glTexBundleDict* entry = dict;
-    for (int i = 0; i < numTextures; ++i, ++entry)
+    int i;
+    for (i = 0; i < numTextures; ++i)
     {
+        glTexBundleDict* entry = dict + i;
         GXTextureHeader* texture = (GXTextureHeader*)(textureData + entry->offset);
         if (!fn_802D3A08(texture, entry->fileSize))
         {
@@ -91,6 +92,9 @@ extern "C" bool fn_802CDD78(
             {
                 switch (nParam)
                 {
+                case 0:
+                case 1:
+                    break;
                 case 2:
                     glplatTextureReplace(pTex, texture, entry->fileSize);
                     break;
@@ -108,17 +112,16 @@ extern "C" bool fn_802CDD78(
         }
     }
 
-    entry = dict;
-    for (int i = 0; i < numTextures; ++i, ++entry)
+    for (i = 0; i < numTextures; ++dict, ++i)
     {
-        const void* texture = textureData + entry->offset;
-        if (fn_802D3A08(texture, entry->fileSize))
+        const void* texture = textureData + dict->offset;
+        if (fn_802D3A08(texture, dict->fileSize))
         {
-            fn_802D3A34(texture, entry->fileSize, resource);
+            fn_802D3A34(texture, dict->fileSize, resource);
         }
     }
 
-    fn_8036BBD8(data);
+    fn_8036BBD8(header);
     return true;
 }
 

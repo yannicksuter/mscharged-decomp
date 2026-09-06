@@ -145,7 +145,7 @@ extern "C" bool fn_80374398()
 }
 
 static TweakValueBoolImpl_804F4538 lbl_8059C448(
-    "Network", "g_bHardcodeIP", &g_bHardcodeIP, true);
+    "g_bHardcodeIP", "Network", &g_bHardcodeIP, true);
 static TweakValueIntImpl_804FD898 lbl_8059C468(
     "g_nHardcodeIPAddr0", "Network", &g_nHardcodeIPAddr[0], true);
 static TweakValueIntImpl_804FD898 lbl_8059C488(

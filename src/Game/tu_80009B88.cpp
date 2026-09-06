@@ -1210,7 +1210,7 @@ bool CharacterLoader_8056B290::fn_8000BFA0()
     return true;
 }
 
-static void fn_8000C0EC(XSoundHandle_802ED74C* handle, void* context)
+static void fn_8000C0EC(AudioResourceLoadOwner_802EDA54* handle, void* context)
 {
     CharacterLoader_8056B290::sUnidentifiedInstance.mAudioCompletedCount = (int)context;
 }

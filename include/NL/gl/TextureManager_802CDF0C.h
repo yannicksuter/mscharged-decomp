@@ -26,9 +26,8 @@ struct TextureIndexQueue_802D3B68
         }
         else
         {
-            u32 index = (m_04 + m_08) % m_0C;
+            entry = m_00 + (m_04 + m_08) % m_0C;
             ++m_08;
-            entry = m_00 + index;
         }
         *entry = value;
     }
