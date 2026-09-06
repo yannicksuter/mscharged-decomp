@@ -62,8 +62,11 @@ extern "C" bool fn_80372B4C(const char* filename, LoadAsyncCallback callback, vo
     unsigned int filesize = 0;
     unsigned long datasize;
     bool cached = false;
-    UnidentifiedCacheEntry_80373588* entry = 0;
-    if (lbl_806E2460->field20.FindGet(nlStringLowerHash(filename), &entry))
+    UnidentifiedTask_803730D8* cache = lbl_806E2460;
+    UnidentifiedCacheEntry_80373588* entry;
+    unsigned int filenameHash = nlStringLowerHash(filename);
+    entry = 0;
+    if (cache->field20.FindGet(filenameHash, &entry))
     {
         filesize = entry->field00;
         datasize = entry->field04;
