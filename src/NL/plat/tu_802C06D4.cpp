@@ -13,9 +13,10 @@ void PadManager_802C06D4::fn_802C06D8(int padCount, int padSetCount)
     mUnidentified004 = padSetCount;
     mUnidentified008 = 0;
     m_aPads = new (8, false) cGlobalPad*[padSetCount * padCount];
+    cGlobalPad** pPads;
     for (int i = 0; i < mUnidentified004; ++i)
     {
-        cGlobalPad** pPads = &m_aPads[i * mUnidentified000];
+        pPads = &m_aPads[i * mUnidentified000];
         for (int j = 0; j < mUnidentified000; ++j)
         {
             *pPads++ = new (8, false) cGlobalPad(j);

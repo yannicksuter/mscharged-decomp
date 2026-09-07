@@ -1,6 +1,7 @@
 #include "Game/SH/SHLoading.h"
 
 #include "Game/BaseGameSceneManager.h"
+#include "Game/BaseSceneHandler.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/fePackage.h"
@@ -230,4 +231,9 @@ void LoadingScene_801CDC2C::SceneCreated()
     mTextInstances[3] = FindLoadingText(presentation, "HOME_STATS2");
     mTextInstances[4] = FindLoadingText(presentation, "AWAY_STATS1");
     mTextInstances[5] = FindLoadingText(presentation, "AWAY_STATS2");
+}
+
+FEPresentation* BaseSceneHandler::GetPresentation()
+{
+    return mPresentation;
 }

@@ -3769,3 +3769,24 @@ void cFielder::Unknown12(RunningChecksum* pChecksum)
     pChecksum->ChecksumData(&m_eActionState, sizeof(m_eActionState));
     pChecksum->ChecksumData(&m_eRole, sizeof(m_eRole));
 }
+
+void cFielder::SetPosition(const nlVector3& position)
+{
+    for (;;)
+    {
+    }
+}
+
+float cNet::GetNetHeight()
+{
+    return m_fNetHeight;
+}
+
+float cNet::GetNetWidth()
+{
+    return m_fNetWidth;
+}
+
+void Desire::UnidentifiedVirtual7(void*, DebugWriteCache*)
+{
+}

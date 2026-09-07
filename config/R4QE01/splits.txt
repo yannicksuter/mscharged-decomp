@@ -1856,11 +1856,12 @@ unclassified/tu_8026F444.cpp:
 	.sdata2     start:0x806E5BF0 end:0x806E5BF4
 
 Game/Render/tu_80271960.cpp:
-	.text       start:0x80271960 end:0x80271BE0
-	.data       start:0x80520F88 end:0x80520F98
+	.text       start:0x80271960 end:0x80271C48
+	.ctors      start:0x804DB7C4 end:0x804DB7C8
+	.data       start:0x80520F88 end:0x80520FC0
 	.bss        start:0x80578660 end:0x80578670
 	.sdata      start:0x806DEE20 end:0x806DEE28
-	.sbss       start:0x806E191C end:0x806E1920
+	.sbss       start:0x806E1910 end:0x806E1920
 	.sdata2     start:0x806E5C00 end:0x806E5C18
 
 Game/Render/RLView.cpp:

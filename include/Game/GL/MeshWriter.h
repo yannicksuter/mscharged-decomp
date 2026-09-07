@@ -27,7 +27,14 @@ public:
 
     void Vertex(const nlVector3& value)
     {
-        Vertex(value.x, value.y, value.z);
+        float x;
+        float y;
+        float z;
+
+        z = value.z;
+        y = value.y;
+        x = value.x;
+        Vertex(x, y, z);
     }
 
     void Vertex(float x, float y, float z)

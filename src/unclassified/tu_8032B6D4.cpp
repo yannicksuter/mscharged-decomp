@@ -40,54 +40,18 @@ UnidentifiedTransportMessage_8032B6D4::UnidentifiedTransportMessage_8032B6D4()
     mUnreliableCount = 0;
     mVoiceCount = 0;
     mReliableCount = 0;
-    mReliable[0] = 0;
-    mReliable[1] = 0;
-    mReliable[2] = 0;
-    mReliable[3] = 0;
-    mReliable[4] = 0;
-    mReliable[5] = 0;
-    mReliable[6] = 0;
-    mReliable[7] = 0;
-    mReliable[8] = 0;
-    mReliable[9] = 0;
-    mReliable[10] = 0;
-    mReliable[11] = 0;
-    mReliable[12] = 0;
-    mReliable[13] = 0;
-    mReliable[14] = 0;
-    mReliable[15] = 0;
-    mUnreliable[0] = 0;
-    mUnreliable[1] = 0;
-    mUnreliable[2] = 0;
-    mUnreliable[3] = 0;
-    mUnreliable[4] = 0;
-    mUnreliable[5] = 0;
-    mUnreliable[6] = 0;
-    mUnreliable[7] = 0;
-    mUnreliable[8] = 0;
-    mUnreliable[9] = 0;
-    mUnreliable[10] = 0;
-    mUnreliable[11] = 0;
-    mUnreliable[12] = 0;
-    mUnreliable[13] = 0;
-    mUnreliable[14] = 0;
-    mUnreliable[15] = 0;
-    mVoice[0] = 0;
-    mVoice[1] = 0;
-    mVoice[2] = 0;
-    mVoice[3] = 0;
-    mVoice[4] = 0;
-    mVoice[5] = 0;
-    mVoice[6] = 0;
-    mVoice[7] = 0;
-    mVoice[8] = 0;
-    mVoice[9] = 0;
-    mVoice[10] = 0;
-    mVoice[11] = 0;
-    mVoice[12] = 0;
-    mVoice[13] = 0;
-    mVoice[14] = 0;
-    mVoice[15] = 0;
+    for (int i = 0; i < 16; ++i)
+    {
+        mReliable[i] = 0;
+    }
+    for (int i = 0; i < 16; ++i)
+    {
+        mUnreliable[i] = 0;
+    }
+    for (int i = 0; i < 16; ++i)
+    {
+        mVoice[i] = 0;
+    }
     mSize = 6;
 }
 

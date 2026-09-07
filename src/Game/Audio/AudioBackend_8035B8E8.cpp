@@ -287,3 +287,13 @@ extern "C" void fn_8035CA84()
     fn_8035DEC4("BankUsage.txt");
     fn_802ECA78(lbl_806E201C, "AudioDump.txt");
 }
+
+bool AudioSource_8035C234::fn_14()
+{
+    return true;
+}
+
+bool AudioSource_8035C234::fn_18()
+{
+    return false;
+}

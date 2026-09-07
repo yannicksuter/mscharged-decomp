@@ -141,6 +141,17 @@ chunked asynchronous file loader. Its stream layout and allocator callbacks
 use the existing zlib 1.2.2 declarations. The stripped executable does not
 preserve the wrapper's original file, class, or method names.
 
+`Game/Render/tu_80271960.cpp` includes the static initializer at
+`0x80271BE0`, its constructor-table entry, texture handles and pooled strings.
+The initializer and fade renderer share the `"global/white"` literal at
+`0x80520F88`; the compiler reproduces that sharing, string order and small-data
+layout when they occupy one translation unit. The texture declarations retain
+the `LightTexture`, `BlackTexture` and `WhiteTexture` names and source form
+from the predecessor's `Game/Render/ShootToScoreArrow.cpp`, which also supplies
+the renderer's ancestry. The original Charged filename and class name remain
+unidentified. The initializer's shared guarded object at `0x806E0B80` still
+lacks an identified type and header, so the unit remains `NonMatching`.
+
 `src/RVL_SDK/bte/` and `libs/RVL_SDK/include/private/bte/` do vendor Broadcom
 source. Both trees carry Broadcom's original copyright notice and its
 Apache-2.0 licence header, and each file records the Bluedroid path it came

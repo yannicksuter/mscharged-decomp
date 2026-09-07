@@ -39,18 +39,19 @@ void GLSkinMesh::fn_802D40F4(unsigned long index, unsigned long id)
 
 void GLSkinMesh::fn_802D4104(cPoseAccumulator* pPoseAccumulator)
 {
+    UnidentifiedGLSkinMeshEntry* morph;
     bool changed = false;
 
     if (!lbl_806E1F40)
     {
         for (unsigned long i = 0; i < numMorphs; ++i)
         {
-            UnidentifiedGLSkinMeshEntry& morph = m_Unknown10[i];
+            morph = &m_Unknown10[i];
             float morphWeight =
-                pPoseAccumulator->m_MorphWeights.mData[morph.morphID];
-            if (morphWeight != morph.morphWeight)
+                pPoseAccumulator->m_MorphWeights.mData[morph->morphID];
+            if (morphWeight != morph->morphWeight)
             {
-                morph.morphWeight = morphWeight;
+                morph->morphWeight = morphWeight;
                 changed = true;
             }
         }

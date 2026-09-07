@@ -12,6 +12,9 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 
+extern "C" void fn_802B5370(
+    nlQuaternion& out, const nlVector3& v3RotationAxis, unsigned short angle);
+
 inline float parseFloat(const char* str, float defaultValue = 0.0f)
 {
     if (str != NULL)
@@ -345,7 +348,12 @@ public:
         nlMatrix3 m3;
         nlQuaternion quat;
 
-        nlMakeQuat(quat, m_v3Axis, (3.1415927f * ((m_angleStart * (1.0f - time)) + (time * m_angleEnd))) / 180.0f);
+        fn_802B5370(quat, m_v3Axis,
+            (unsigned short)(int)(10430.378f
+                * ((3.1415927f
+                       * ((m_angleStart * (1.0f - time))
+                           + (time * m_angleEnd)))
+                    / 180.0f)));
         nlQuatToMatrix(m4, quat, true);
 
         m3.e[0] = m4.m11;
@@ -409,7 +417,12 @@ public:
         nlMatrix3 m3;
         nlQuaternion quat;
 
-        nlMakeQuat(quat, m_v3Axis, (3.1415927f * ((m_angleStart * (1.0f - time)) + (time * m_angleEnd))) / 180.0f);
+        fn_802B5370(quat, m_v3Axis,
+            (unsigned short)(int)(10430.378f
+                * ((3.1415927f
+                       * ((m_angleStart * (1.0f - time))
+                           + (time * m_angleEnd)))
+                    / 180.0f)));
         nlQuatToMatrix(m4, quat, true);
 
         m3.e[0] = m4.m11;

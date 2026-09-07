@@ -3,6 +3,13 @@
 #include "Game/Render/RLView.h"
 #include "NL/gl/glState.h"
 
+const unsigned long LightTexture = glGetTexture("global/lightramp");
+const unsigned long BlackTexture = glGetTexture("global/black");
+const unsigned long WhiteTexture = glGetTexture("global/white");
+
+// The retail initializer also constructs the shared object at 0x806E0B80.
+// Its original type and header have not been identified.
+
 float lbl_806DEE20 = 0.75f;
 float lbl_806DEE24 = 2.0f;
 

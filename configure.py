@@ -453,7 +453,7 @@ config.libs = [
             Object(NonMatching, "unclassified/tu_800A9140.cpp"),
             Object(NonMatching, "unclassified/tu_800A9588.cpp"),
             Object(NonMatching, "unclassified/tu_800A9B78.cpp"),
-            Object(NonMatching, "Game/AI/Desire.cpp"),
+            Object(NonMatching, "Game/AI/Desire.cpp", extra_cflags=["-inline noauto"]),
             Object(NonMatching, "Game/AI/DesireMark.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/AI/DesireMegaStrike.cpp"),
             Object(NonMatching, "Game/AI/DesirePass.cpp"),
