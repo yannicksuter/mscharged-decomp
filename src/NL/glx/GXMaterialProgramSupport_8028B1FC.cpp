@@ -229,7 +229,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
         if (lbl_8057ADDC[textureIndex] == 0xFFFF
             || lbl_8057ADDC[textureIndex] == 0)
         {
-            lbl_8057ADDC[textureIndex] = fn_802CDF0C()->fn_802CE1B8(texture);
+            lbl_8057ADDC[textureIndex] = glGetTextureManager()->GetTextureIndex(texture);
         }
         UnidentifiedTextureState textureState;
         textureState.texture = texture;

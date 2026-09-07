@@ -100,7 +100,7 @@ void fn_80137890()
     {
         for (int padSet = 0; padSet < 2; ++padSet)
         {
-            g_pPadManager->fn_802C084C(padSet);
+            g_pPadManager->SetActivePadSet(padSet);
             for (int padIndex = 0; padIndex < 4; ++padIndex)
             {
                 PadMonkey* monkey = new (nlMalloc(0xFC, 8, false))
@@ -113,7 +113,7 @@ void fn_80137890()
     {
         for (int padSet = 0; padSet < 2; ++padSet)
         {
-            g_pPadManager->fn_802C084C(padSet);
+            g_pPadManager->SetActivePadSet(padSet);
             for (int padIndex = 0; padIndex < 4; ++padIndex)
             {
                 cPlatPad* pad = new cPlatPad(padIndex);
@@ -121,14 +121,14 @@ void fn_80137890()
             }
         }
     }
-    g_pPadManager->fn_802C084C(0);
+    g_pPadManager->SetActivePadSet(0);
 }
 
 void fn_801379AC()
 {
     for (int padSet = 0; padSet < 2; ++padSet)
     {
-        g_pPadManager->fn_802C084C(padSet);
+        g_pPadManager->SetActivePadSet(padSet);
         for (int padIndex = 0; padIndex < 4; ++padIndex)
         {
             g_pPadManager->GetPad(padIndex)->StopRumble();
@@ -136,18 +136,18 @@ void fn_801379AC()
             g_pPadManager->GetPad(padIndex)->mBackend = 0;
         }
     }
-    g_pPadManager->fn_802C084C(0);
+    g_pPadManager->SetActivePadSet(0);
 }
 
 void InitPads()
 {
     if (g_pPadManager == 0)
     {
-        g_pPadManager = new (8, false) PadManager_802C06D4;
+        g_pPadManager = new (8, false) PadManager;
     }
 
-    g_pPadManager->fn_802C06D8(4, 2);
-    g_pPadManager->fn_802C084C(0);
+    g_pPadManager->Initialize(4, 2);
+    g_pPadManager->SetActivePadSet(0);
     lbl_806E22A8 = g_pPadRemapArray;
     lbl_806E2278 = remapArray_8050DB2C;
 

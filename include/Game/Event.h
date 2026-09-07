@@ -5,12 +5,16 @@
 #include "NL/nlBind.h"
 #include "NL/nlDLListContainer.h"
 
-extern "C" unsigned int HashEventName(const char*, int);
-extern "C" void fn_802B2940(void*, void*);
-extern "C" void fn_802B29C4(void*);
-extern "C" void fn_802B2A04(void*, void*, unsigned int, int, void*);
-extern "C" void* fn_802B28E0(void*, void*);
-extern "C" void fn_802B2CC8(void*, void*);
+unsigned int HashEventName(const char*, int);
+void RegisterEvent(void*, void*);
+void UnregisterEvent(void*);
+void RegisterEventConnection(void*, void*, unsigned int, int, void*);
+void* FindEventConnection(void*, void*);
+void UnregisterEventConnection(void*, void*);
+
+void PushEventConnectionState();
+void PopEventConnectionState();
+void DisconnectEventOwner(void* owner);
 
 class UnidentifiedEventBase
 {
@@ -23,8 +27,8 @@ public:
     virtual ~UnidentifiedEventBase() { }
     virtual void Disconnect(void* owner) = 0;
 
-    friend void fn_802B2940(void*, void*);
-    friend void fn_802B29C4(void*);
+    friend void RegisterEvent(void*, void*);
+    friend void UnregisterEvent(void*);
 
 protected:
     unsigned int mHash;
@@ -147,7 +151,7 @@ public:
         : UnidentifiedTypedEvent<T>(name, length)
         , mListeners(16, 16)
     {
-        fn_802B2940(this, UnidentifiedTypedEvent<T>::sType);
+        RegisterEvent(this, UnidentifiedTypedEvent<T>::sType);
     }
 
     virtual ~UnidentifiedEvent()
@@ -157,7 +161,7 @@ public:
             Listener* listener = &mListeners.Begin().CurrentEntry()->entry;
             Remove(listener);
         }
-        fn_802B29C4(this);
+        UnregisterEvent(this);
     }
 
     virtual void Disconnect(void* owner);
@@ -168,7 +172,7 @@ public:
 
         void* target = callback.UnidentifiedTarget();
         listener->callback.UnidentifiedTransfer(callback);
-        fn_802B2A04(this, listener, value, flags, target);
+        RegisterEventConnection(this, listener, value, flags, target);
     }
 
     void UnidentifiedDeliver(T* data)
@@ -266,7 +270,7 @@ void UnidentifiedEvent<T>::UnidentifiedRestartAt(
 template <typename T>
 void UnidentifiedEvent<T>::Remove(Listener* listener)
 {
-    fn_802B2CC8(this, listener);
+    UnregisterEventConnection(this, listener);
     if (this->mCurrentConnection == listener)
     {
         listener->mFlags |= 0x20000000;
@@ -294,7 +298,7 @@ void UnidentifiedEvent<T>::UnidentifiedDeleteListener(Listener* listener)
 template <typename T>
 void UnidentifiedEvent<T>::Disconnect(void* owner)
 {
-    Listener* listener = (Listener*)fn_802B28E0(this, owner);
+    Listener* listener = (Listener*)FindEventConnection(this, owner);
     Remove(listener);
 }
 
@@ -353,7 +357,7 @@ public:
         : UnidentifiedTypedEvent<T>(name, length)
         , mListeners(Count, Count)
     {
-        fn_802B2940(this, UnidentifiedTypedEvent<T>::sType);
+        RegisterEvent(this, UnidentifiedTypedEvent<T>::sType);
     }
 
     virtual ~UnidentifiedStaticEvent()
@@ -363,12 +367,12 @@ public:
             Listener* listener = &mListeners.Begin().CurrentEntry()->entry;
             Remove(listener);
         }
-        fn_802B29C4(this);
+        UnregisterEvent(this);
     }
 
     virtual void Disconnect(void* owner)
     {
-        Listener* listener = (Listener*)fn_802B28E0(this, owner);
+        Listener* listener = (Listener*)FindEventConnection(this, owner);
         Remove(listener);
     }
 
@@ -378,7 +382,7 @@ public:
 
         void* target = callback.UnidentifiedTarget();
         listener->callback.UnidentifiedTransfer(callback);
-        fn_802B2A04(this, listener, value, flags, target);
+        RegisterEventConnection(this, listener, value, flags, target);
     }
 
     void UnidentifiedDeliver(typename UnidentifiedEventCallback<T>::Parameter data)
@@ -442,7 +446,7 @@ public:
 protected:
     void Remove(Listener* listener)
     {
-        fn_802B2CC8(this, listener);
+        UnregisterEventConnection(this, listener);
         if (this->mCurrentConnection == listener)
         {
             listener->mFlags |= 0x20000000;
@@ -517,7 +521,7 @@ public:
         : UnidentifiedTypedEvent3<P1, P2, P3>(name, length)
         , mListeners(Count, Count)
     {
-        fn_802B2940(
+        RegisterEvent(
             this, UnidentifiedTypedEvent3<P1, P2, P3>::sType);
     }
 
@@ -528,12 +532,12 @@ public:
             Listener* listener = &mListeners.Begin().CurrentEntry()->entry;
             Remove(listener);
         }
-        fn_802B29C4(this);
+        UnregisterEvent(this);
     }
 
     virtual void Disconnect(void* owner)
     {
-        Listener* listener = (Listener*)fn_802B28E0(this, owner);
+        Listener* listener = (Listener*)FindEventConnection(this, owner);
         Remove(listener);
     }
 
@@ -543,7 +547,7 @@ public:
 
         void* target = callback.UnidentifiedTarget();
         listener->callback.UnidentifiedTransfer(callback);
-        fn_802B2A04(this, listener, value, flags, target);
+        RegisterEventConnection(this, listener, value, flags, target);
     }
 
     void UnidentifiedDeliver(P1 p1, P2 p2, P3 p3)
@@ -577,7 +581,7 @@ public:
 protected:
     void Remove(Listener* listener)
     {
-        fn_802B2CC8(this, listener);
+        UnregisterEventConnection(this, listener);
         if (this->mCurrentConnection == listener)
         {
             listener->mFlags |= 0x20000000;

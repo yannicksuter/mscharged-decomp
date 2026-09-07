@@ -11,7 +11,6 @@
 
 extern "C" void fn_80098098(cFielder*);
 extern "C" void fn_80095870(cFielder*);
-extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002C254(PlayerTweaks*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" float fn_8002C328(PlayerTweaks*);
@@ -91,9 +90,9 @@ void DesireUserControlled::UnidentifiedUpdate(
         if (mUnidentifiedFielder->m_eActionState == ACTION_RUNNING)
         {
             float fMaxSpeed = fn_8002C254(
-                fn_8003E6E4(mUnidentifiedFielder));
+                mUnidentifiedFielder->GetTweaks());
             float fMinSpeed = fn_8002CE14(
-                fn_8003E6E4(mUnidentifiedFielder));
+                mUnidentifiedFielder->GetTweaks());
             fn_8003C268(mUnidentifiedFielder, fMinSpeed, fMaxSpeed);
             fn_8003DA94(mUnidentifiedFielder, false);
 
@@ -164,9 +163,9 @@ void DesireUserControlled::UnidentifiedUpdate(
         if (mUnidentifiedFielder->m_eActionState == ACTION_RUNNING_WB)
         {
             float fMaxSpeed = fn_8002C328(
-                fn_8003E6E4(mUnidentifiedFielder));
+                mUnidentifiedFielder->GetTweaks());
             float fMinSpeed = fn_8002CE14(
-                fn_8003E6E4(mUnidentifiedFielder));
+                mUnidentifiedFielder->GetTweaks());
             fn_8003C268(mUnidentifiedFielder, fMinSpeed, fMaxSpeed);
             fn_8003E168(mUnidentifiedFielder, fDeltaT);
         }

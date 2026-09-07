@@ -158,7 +158,7 @@ public:
     bool IsRule0x4Equal5() const;
     bool IsRule0x0Equal11() const;
 
-    void* GetUnknown0xA0();
+    AudioSettings* GetAudioSettings();
     void* GetUnknown0xB8();
     void ResetUnknown0xA0();
 

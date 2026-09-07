@@ -1,7 +1,7 @@
 #include <revolution/os.h>
 #include <revolution/sp.h>
 
-void SPInitSoundTable(SPSoundTable* table, u32 aramBase) {
+void SPInitSoundTable(SPSoundTable* table, u32 aramBase, u32 zeroBase) {
     int i;
     SPSoundEntry* sound;
     SPADPCM* adpcm;

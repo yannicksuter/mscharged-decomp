@@ -8,7 +8,7 @@
 class cFielder;
 class EmissionController;
 
-class UnidentifiedAvoidancePolygon_804F4750;
+class AvoidablePolygon;
 
 class PhysicsBox_80177498 : public PhysicsBox
 {
@@ -48,7 +48,7 @@ public:
     /* 0x60 */ unsigned int mUnidentified060;
     /* 0x64 */ bool mUnidentified064;
     /* 0x65 */ unsigned char mPadding065[3];
-    /* 0x68 */ UnidentifiedAvoidancePolygon_804F4750* mUnidentified068;
+    /* 0x68 */ AvoidablePolygon* mUnidentified068;
 }; // size: 0x6C
 
 class WaluigiWallManager_80178400

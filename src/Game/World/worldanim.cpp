@@ -31,8 +31,6 @@ extern "C" void fn_802E4358(EmissionController*);
 extern "C" float fn_802E5A68(EmissionController*);
 extern "C" EffectsGroup* fn_802E7D54(
     EmissionManager*, unsigned long);
-extern "C" EmissionController* fn_802E7FE4(EmissionManager*,
-    EffectsGroup*, int, bool, bool);
 extern "C" bool fn_802DD1EC(
     const void*, const nlVector3&, float);
 
@@ -703,8 +701,8 @@ extern "C" void fn_80344404(WorldAnimEffect_803441C8* pEffect)
     if (pGroup != 0)
     {
         EmissionController* pController
-            = fn_802E7FE4(EmissionManager::Instance(), pGroup,
-                1, true, false);
+            = EmissionManager::Instance()->Create(pGroup,
+                1, true, 0);
         pEffect->m_fEmissionRadius = fn_802E5A68(pController);
 
         nlVector3 velocity = { 0.0f, 0.0f, 0.0f };

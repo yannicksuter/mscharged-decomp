@@ -251,7 +251,7 @@ extern "C" void fn_802CB790(void* program, unsigned long hash)
     sMaterialPrograms.Add(hash, program);
 }
 
-void* fn_802CB7D0(unsigned long hash)
+void* glGetMaterialProgram(unsigned long hash)
 {
     void** program = 0;
     if (sMaterialPrograms.FindGet(hash, &program))

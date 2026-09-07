@@ -12,6 +12,11 @@ void nlSinCos(float* presult_sin, float* presult_cos, unsigned short angle);
 float nlSin(unsigned short angle);
 float nlRecipSqrt(float x, bool bAccurate);
 float nlSqrt(float x, bool bAccurate);
+inline int nlMin(int a, int b)
+{
+    return a <= b ? a : b;
+}
+
 float nlRandomf(float fMin, float fMax, unsigned int* pSeed);
 float nlRandomf(float fMax, unsigned int* pSeed);
 float nlRandomf(float fMax);
@@ -305,7 +310,7 @@ public:
     };
 }; // total size: 0x10
 
-extern "C" void fn_802B5D74(nlVector3& out, const nlVector3& point, const nlVector4& plane);
+void nlProjectPointOntoPlane(nlVector3& out, const nlVector3& point, const nlVector4& plane);
 
 inline void nlVec4Set(nlVector4& v0, float _x, float _y, float _z, float _w)
 {

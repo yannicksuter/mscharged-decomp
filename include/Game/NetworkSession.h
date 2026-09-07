@@ -7,7 +7,7 @@
 #include "NL/nlMemory.h"
 #include "NL/plat/TransportSocket.h"
 #include "types.h"
-#include "unclassified/tu_80331BE4.h"
+#include "Game/DetInput.h"
 
 class NetMessageDraft;
 struct UnidentifiedDraftEntry;
@@ -289,6 +289,8 @@ public:
 
 struct UnidentifiedTransportGame_8032CA4C
 {
+    UnidentifiedTransportGame_8032CA4C() { }
+
     /* 0x00 */ char mUnidentified00[12];
     /* 0x0C */ u8 mUnidentified0C[4];
     /* 0x10 */ int mUnidentified10;
@@ -402,13 +404,12 @@ public:
 private:
     int UnidentifiedConnectionIndex(UnidentifiedTransportConnection* connection)
     {
-        if (connection != 0)
+        if (connection == 0)
+            return -1;
+        for (int index = 0; index < 8; ++index)
         {
-            for (int index = 0; index < 8; ++index)
-            {
-                if (m_ConnectionPool[index].m_Connection == connection)
-                    return index;
-            }
+            if (m_ConnectionPool[index].m_Connection == connection)
+                return index;
         }
         return -1;
     }

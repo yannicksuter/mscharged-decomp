@@ -177,6 +177,11 @@ class cFielder : public cPlayer
     friend class DesireUserControlled;
 
 public:
+    PlayerTweaks* GetTweaks() const;
+
+    unsigned int IsFrozen();
+    unsigned int IsShattered();
+
     cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
         const int* nModelID, cSHierarchy* pHierarchy,
         cAnimInventory* pAnimInventory,

@@ -70,12 +70,7 @@ void ScreenTransitionManager::Update(float dt)
 
             if (m_pCallback != 0)
             {
-                float curProgress = m_fCurrentLength;
-                float progress = 0.0f;
-                if (curProgress > 0.0f)
-                {
-                    progress = m_fCurrentTime / curProgress;
-                }
+                float progress = (m_fCurrentLength > 0.0f) ? m_fCurrentTime / m_fCurrentLength : 0.0f;
 
                 m_pCallback->TransitionProgressed(progress);
             }

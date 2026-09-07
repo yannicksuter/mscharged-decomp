@@ -1,3 +1,4 @@
+#include "Game/Sys/audio.h"
 #include "Game/Goalie.h"
 
 #include "Game/AI/AiUtil.h"
@@ -16,8 +17,6 @@
 
 #include <math.h>
 
-extern "C" bool fn_800EBBFC(
-    int nParam0, unsigned int nParam1, void* pParam2, void* pParam3);
 extern "C" void fn_8005D948(
     void* pGame, const GoalieSaveData* pData);
 extern "C" void fn_8005E9FC(
@@ -587,7 +586,7 @@ void Goalie::TacklePlayer(cPlayer* pPlayer)
     if (pPlayer != 0 && pPlayer->m_eClassType == FIELDER
         && !pFielder->IsFallenDown() && !pFielder->fn_8003E6FC())
     {
-        fn_800EBBFC(9, 0x06024E5D, 0, 0);
+        PlaySound(9, 0x06024E5D, 0, 0);
 
         bool bHadBall = false;
         if (pPlayer->m_pBall != 0)
@@ -650,7 +649,7 @@ void Goalie::WhackSTSPlayer(cFielder* pFielder)
 
     pFielder->fn_80047240(
         pFielder, m_aActualFacingDirection, 2, true, false);
-    fn_800EBBFC(pFielder->mUnidentified318, 0x3642C41B, 0, 0);
+    PlaySound(pFielder->mUnidentified318, 0x3642C41B, 0, 0);
 
     mbDoHeadTrack = false;
 

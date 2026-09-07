@@ -14,9 +14,6 @@ struct WorldTriggerTransform_801BE238
     nlVector3 mUnidentified10;
 };
 
-extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
-extern "C" EmissionController* fn_802E7FE4(
-    EmissionManager*, EffectsGroup*, int, bool, bool);
 
 extern "C" void fn_801BE234(cSAnim* arg0, unsigned int uParam)
 {
@@ -46,8 +43,8 @@ static void UpdateCameraFlash(EmissionController& controller)
 void EmitCameraFlash(const nlVector3& position, void* transform)
 {
     const char* groupName = "camera_flashes";
-    EffectsGroup* group = fn_802E7CDC(EmissionManager::Instance(), groupName);
-    EmissionController* controller = fn_802E7FE4(EmissionManager::Instance(), group, 2, true, false);
+    EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(groupName);
+    EmissionController* controller = EmissionManager::Instance()->Create(group, 2, true, 0);
     nlVector3 velocity = { 0.0f, 0.0f, 0.0f };
     controller->SetVelocity(velocity);
     controller->m_fGround = 0.02f;

@@ -210,9 +210,6 @@ private:
 };
 
 template <typename R, typename F, typename A, typename B, typename C, typename D>
-BindExp4<R, F, A, B, C, D> Bind(F fn, const A& t0, const B& t1, const C& t2, const D& t3)
-{
-    return BindExp4<R, F, A, B, C, D>(fn, t0, t1, t2, t3);
-}
+BindExp4<R, F, A, B, C, D> Bind(F fn, const A& t0, const B& t1, const C& t2, const D& t3);
 
 #endif // NL_BIND_H

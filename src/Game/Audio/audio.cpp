@@ -1,44 +1,28 @@
+#include "Game/Audio/AudioBackend.h"
+#include "Game/Audio/AudioGlobals.h"
 #include "Game/Sys/audio.h"
 #include "Game/Sys/debug.h"
 
 #include "Game/Task/TextWindowTask.h"
 
-#include "Game/Audio/AudioBankTable_802EB644.h"
-#include "Game/Audio/AudioBundleManager_802EDA7C.h"
+#include "Game/Audio/AudioBankTable.h"
+#include "revolution/sc.h"
+#include "Game/Audio/AudioBundleManager.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/TweakRegistry.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlPrint.h"
 #include "NL/nlTask.h"
 
-extern "C" unsigned char SCGetSoundMode();
-
-extern "C" void fn_8035C818(void*, int);
-extern "C" void fn_803622F0(bool);
-extern "C" void fn_802EC1F4(AudioLoadMode_806E201C*, float);
-extern "C" XSoundHandle_802ED74C* fn_802EC030(
-    AudioLoadMode_806E201C*, int, XSoundOwner_802ED74C*, unsigned long,
+void UpdateAudioSystem(AudioSystem*, float);
+XSoundHandle* CreateAudioSoundHandle(
+    AudioSystem*, int, XSoundOwner*, unsigned long,
     int, int, int, int, int);
-extern "C" void* fn_800F1C14();
 
-struct AudioParameter_802F1A70
-{
-    u8 m_Unknown00[0xC];
-    float m_Value;
-    float m_Time;
-    u8 m_Unknown14[0x4];
-    float m_Min;
-    float m_Max;
-};
-
-extern "C" AudioParameter_802F1A70* fn_802F1A70(
-    XSoundHandle_802ED74C*, unsigned long);
-
-extern void* lbl_806E0E80;
-extern XSoundHandle_802ED74C* lbl_806E0E84;
-extern void* lbl_806E2020;
-extern unsigned long lbl_806E2210;
-extern unsigned long lbl_806E2214;
+extern void* gExclusiveAudioContext;
+extern XSoundHandle* g_pLastAudioHandle;
+extern unsigned long gResidentVoiceDropCount;
+extern unsigned long gStreamVoiceDropCount;
 extern bool s_AudioInInit__9ResetTask;
 
 static char sNoAudio[] = "user/NoAudio";
@@ -49,13 +33,13 @@ static char sMissingSlot[] = "SafePlay: No slot id %d";
 static char sMissingCue[] = "SafePlay: No Cue \"%s\" (%d)";
 static char sResumedCue[] = "Resumed cue";
 
-bool lbl_806DC450 = true;
+bool gAudioEnabled = true;
 unsigned long sAudioPauseDepth = 1;
-char lbl_806DC458[8] = "audio/";
+char gAudioResourcePath[8] = "audio/";
 
-typedef nlAVLTreeSlotPool<unsigned long, XSoundHandle_802ED74C*,
+typedef nlAVLTreeSlotPool<unsigned long, XSoundHandle*,
     DefaultKeyCompare<unsigned long> > AudioHandleMap;
-typedef nlAVLTreeSlotPool<unsigned long, AudioHandleState_800EBF78,
+typedef nlAVLTreeSlotPool<unsigned long, AudioHandleState,
     DefaultKeyCompare<unsigned long> > AudioHandleStateMap;
 typedef nlAVLTreeSlotPool<unsigned long, bool,
     DefaultKeyCompare<unsigned long> > PausedAudioHandleMap;
@@ -70,19 +54,19 @@ static inline unsigned long MakeAudioHandleKey(
     return cueId ^ (unsigned long)context;
 }
 
-static inline XSoundHandle_802ED74C** FindAudioHandleSlot(
+static inline XSoundHandle** FindAudioHandleSlot(
     unsigned long cueId, void* context)
 {
-    XSoundHandle_802ED74C** slot = 0;
+    XSoundHandle** slot = 0;
     unsigned long key = MakeAudioHandleKey(cueId, context);
     sAudioHandles.FindGet(key, &slot);
     return slot;
 }
 
-static inline AudioHandleState_800EBF78* FindAudioHandleState(
+static inline AudioHandleState* FindAudioHandleState(
     unsigned long key)
 {
-    AudioHandleState_800EBF78* state = 0;
+    AudioHandleState* state = 0;
     sAudioHandleStates.FindGet(key, &state);
     return state;
 }
@@ -90,7 +74,7 @@ static inline AudioHandleState_800EBF78* FindAudioHandleState(
 static inline void AddAudioHandleState(int slotId, unsigned long cueId,
     void* context, bool restartable)
 {
-    AudioHandleState_800EBF78 state;
+    AudioHandleState state;
     state.m_CueId = cueId;
     state.m_Context = context;
     state.m_Flags = ((unsigned long)slotId << 16)
@@ -99,50 +83,50 @@ static inline void AddAudioHandleState(int slotId, unsigned long cueId,
     sAudioHandleStates.Add(key, state);
 }
 
-GameAudio_800EB6AC::GameAudio_800EB6AC()
-    : AudioLoadMode_806E201C()
+GameAudio::GameAudio()
+    : AudioSystem()
     , m_PlayRequestCount(0)
 {
 }
 
-bool GameAudio_800EB6AC::Initialize()
+bool GameAudio::Initialize()
 {
     s_AudioInInit__9ResetTask = true;
-    SetResourcePath(lbl_806DC458);
+    SetResourcePath(gAudioResourcePath);
     s_AudioInInit__9ResetTask = false;
 
     if (SCGetSoundMode() == 0)
     {
-        fn_8035C818(lbl_806E2020, 0);
+        g_pAudioBackend->SetOutputMode(0);
     }
 
-    lbl_806DC450 = !GetTweakBool(sNoAudio, !lbl_806DC450);
-    fn_803622F0(!GetTweakBool(sDisableControllerSpeaker, false));
+    gAudioEnabled = !GetTweakBool(sNoAudio, !gAudioEnabled);
+    SetControllerSpeakerEnabled(!GetTweakBool(sDisableControllerSpeaker, false));
     m_Listener->SetEnabled(true);
     return true;
 }
 
-void GameAudio_800EB6AC::Shutdown()
+void GameAudio::Shutdown()
 {
-    AudioLoadMode_806E201C::Shutdown();
+    AudioSystem::Shutdown();
 
     sAudioHandles.Clear();
     sAudioHandles.m_Allocator.FreeBlocks();
     sAudioHandleStates.Clear();
     sAudioHandleStates.m_Allocator.FreeBlocks();
 
-    tDebugPrintManager::Print(DC_SOUND, sResidentVoiceDrops, lbl_806E2210);
-    tDebugPrintManager::Print(DC_SOUND, sStreamVoiceDrops, lbl_806E2214);
-    lbl_806E2210 = 0;
-    lbl_806E2214 = 0;
+    tDebugPrintManager::Print(DC_SOUND, sResidentVoiceDrops, gResidentVoiceDropCount);
+    tDebugPrintManager::Print(DC_SOUND, sStreamVoiceDrops, gStreamVoiceDropCount);
+    gResidentVoiceDropCount = 0;
+    gStreamVoiceDropCount = 0;
 }
 
-void GameAudio_800EB6AC::Update(float deltaTime)
+void GameAudio::Update(float deltaTime)
 {
     bool transformValid = false;
 
     if (nlTaskManager::m_pInstance->mCurrentState == 2
-        && fn_800F1C14() != 0)
+        && GetNextCamera() != 0)
     {
         cCameraManager::GetUpVector(m_Listener->m_Up);
         cCameraManager::GetViewVector(m_Listener->m_View);
@@ -169,44 +153,44 @@ void GameAudio_800EB6AC::Update(float deltaTime)
     }
 
     m_Listener->SetTransformValid(transformValid);
-    fn_802EC1F4(this, deltaTime);
+    UpdateAudioSystem(this, deltaTime);
 }
 
-extern "C" void fn_800EBB04(GameAudio_800EB6AC* audio, int slotId,
-    unsigned long cueId, AudioPlayCallback_800EBB04 callback,
+void LoadSoundBank(GameAudio* audio, int slotId,
+    unsigned long cueId, AudioPlayCallback callback,
     void* context)
 {
-    if (!lbl_806DC450)
+    if (!gAudioEnabled)
     {
         return;
     }
 
-    if (lbl_806E0E80 != 0 && context != lbl_806E0E80)
+    if (gExclusiveAudioContext != 0 && context != gExclusiveAudioContext)
     {
         callback(0, context);
         return;
     }
 
-    if (!audio->fn_800ED85C())
+    if (!audio->IsInitialized())
     {
         return;
     }
 
     ++audio->m_PlayRequestCount;
-    audio->GetBundleManager()->GetSoundMap()->fn_802EBBF0(slotId,
+    audio->GetBundleManager()->GetSoundMap()->LoadBank(slotId,
         cueId, callback, context, 0);
 }
 
-extern "C" void fn_800EBBD8(GameAudio_800EB6AC* audio)
+void UnloadSoundBanks(GameAudio* audio)
 {
-    if (lbl_806DC450
+    if (gAudioEnabled
         && audio->GetBundleManager()->GetSoundMap() != 0)
     {
-        audio->GetBundleManager()->GetSoundMap()->fn_802EBCCC();
+        audio->GetBundleManager()->GetSoundMap()->UnloadAllBanks();
     }
 }
 
-extern "C" bool fn_800EBBFC(int slotId, unsigned long cueId,
+bool PlaySound(int slotId, unsigned long cueId,
     const void* debugName, void* context)
 {
     if (cueId == 0xFFFFFFFF)
@@ -214,56 +198,56 @@ extern "C" bool fn_800EBBFC(int slotId, unsigned long cueId,
         return true;
     }
 
-    XSoundHandle_802ED74C* handle = fn_800EBD00(
+    XSoundHandle* handle = CreateSoundHandle(
         slotId, cueId, 0, debugName, context, false);
     if (handle != 0)
     {
-        handle->fn_802ED74C_3(context == 0);
+        handle->Play(context == 0);
     }
     return handle != 0;
 }
 
-extern "C" bool fn_800EBC84(int slotId, unsigned long cueId,
-    XSoundOwner_802ED74C* owner, const void* debugName, void* context)
+bool PlayOwnedSound(int slotId, unsigned long cueId,
+    XSoundOwner* owner, const void* debugName, void* context)
 {
     if (cueId == 0xFFFFFFFF)
     {
         return true;
     }
 
-    XSoundHandle_802ED74C* handle = fn_800EBD00(
+    XSoundHandle* handle = CreateSoundHandle(
         slotId, cueId, owner, debugName, context, false);
     if (handle != 0)
     {
-        handle->fn_802ED74C_3(context == 0);
+        handle->Play(context == 0);
     }
     return handle != 0;
 }
 
-extern "C" XSoundHandle_802ED74C* fn_800EBD00(int slotId,
-    unsigned long cueId, XSoundOwner_802ED74C* owner,
+XSoundHandle* CreateSoundHandle(int slotId,
+    unsigned long cueId, XSoundOwner* owner,
     const void* debugName, void* context, bool findExisting)
 {
-    if (lbl_806E0E80 != 0 || !lbl_806DC450)
+    if (gExclusiveAudioContext != 0 || !gAudioEnabled)
     {
         return 0;
     }
 
-    lbl_806E0E84 = 0;
+    g_pLastAudioHandle = 0;
     if (slotId < 0)
     {
-        fn_802BD820(sMissingSlot, slotId);
+        PrintTextWindowMessage(sMissingSlot, slotId);
         return 0;
     }
     if (cueId == 0xFFFFFFFF)
     {
-        fn_802BD820(sMissingCue, (const char*)debugName, cueId);
+        PrintTextWindowMessage(sMissingCue, (const char*)debugName, cueId);
         return 0;
     }
 
-    XSoundHandle_802ED74C* handle = fn_802EC030(lbl_806E201C,
+    XSoundHandle* handle = CreateAudioSoundHandle(g_pAudioSystem,
         slotId, owner, cueId, 0, 0, 0, 0, 0);
-    lbl_806E0E84 = handle;
+    g_pLastAudioHandle = handle;
 
     if (context != 0 && handle != 0)
     {
@@ -274,30 +258,30 @@ extern "C" XSoundHandle_802ED74C* fn_800EBD00(int slotId,
         }
         else
         {
-            XSoundHandle_802ED74C** existing = 0;
+            XSoundHandle** existing = 0;
             sAudioHandles.FindGet(key, &existing);
         }
     }
     return handle;
 }
 
-extern "C" bool fn_800EBE90(unsigned long cueId, void* context)
+bool IsSoundTracked(unsigned long cueId, void* context)
 {
     return FindAudioHandleSlot(cueId, context) != 0;
 }
 
-extern "C" XSoundHandle_802ED74C* fn_800EBEF4(
+XSoundHandle* FindSoundHandle(
     unsigned long cueId, void* context)
 {
-    if (!lbl_806DC450)
+    if (!gAudioEnabled)
     {
         return 0;
     }
-    XSoundHandle_802ED74C** slot = FindAudioHandleSlot(cueId, context);
+    XSoundHandle** slot = FindAudioHandleSlot(cueId, context);
     return slot != 0 ? *slot : 0;
 }
 
-extern "C" bool fn_800EBF78(int slotId, unsigned long cueId,
+bool PlayTrackedSound(int slotId, unsigned long cueId,
     const void* debugName, void* context, bool restartable)
 {
     bool played;
@@ -307,11 +291,11 @@ extern "C" bool fn_800EBF78(int slotId, unsigned long cueId,
     }
     else
     {
-        XSoundHandle_802ED74C* handle = fn_800EBD00(
+        XSoundHandle* handle = CreateSoundHandle(
             slotId, cueId, 0, debugName, context, false);
         if (handle != 0)
         {
-            handle->fn_802ED74C_3(context == 0);
+            handle->Play(context == 0);
         }
         played = handle != 0;
     }
@@ -323,8 +307,8 @@ extern "C" bool fn_800EBF78(int slotId, unsigned long cueId,
     return played;
 }
 
-extern "C" bool fn_800EC058(int slotId, unsigned long cueId,
-    XSoundOwner_802ED74C* owner, const void* debugName,
+bool PlayTrackedOwnedSound(int slotId, unsigned long cueId,
+    XSoundOwner* owner, const void* debugName,
     void* context, bool restartable)
 {
     bool played;
@@ -334,11 +318,11 @@ extern "C" bool fn_800EC058(int slotId, unsigned long cueId,
     }
     else
     {
-        XSoundHandle_802ED74C* handle = fn_800EBD00(
+        XSoundHandle* handle = CreateSoundHandle(
             slotId, cueId, owner, debugName, context, false);
         if (handle != 0)
         {
-            handle->fn_802ED74C_3(context == 0);
+            handle->Play(context == 0);
         }
         played = handle != 0;
     }
@@ -350,23 +334,23 @@ extern "C" bool fn_800EC058(int slotId, unsigned long cueId,
     return played;
 }
 
-extern "C" void fn_800EC12C(unsigned long cueId, void* context)
+void StopSound(unsigned long cueId, void* context)
 {
-    if (lbl_806E0E80 != 0 || !lbl_806DC450
+    if (gExclusiveAudioContext != 0 || !gAudioEnabled
         || cueId == 0xFFFFFFFF)
     {
         return;
     }
 
     unsigned long key = MakeAudioHandleKey(cueId, context);
-    XSoundHandle_802ED74C** slot = FindAudioHandleSlot(cueId, context);
+    XSoundHandle** slot = FindAudioHandleSlot(cueId, context);
     if (slot == 0)
     {
         return;
     }
 
     sAudioHandleStates.Remove(key);
-    XSoundHandle_802ED74C* handle = *slot;
+    XSoundHandle* handle = *slot;
     if (handle != 0)
     {
         switch (handle->m_State)
@@ -375,20 +359,20 @@ extern "C" void fn_800EC12C(unsigned long cueId, void* context)
         case 3:
         case 4:
         case 5:
-            handle->fn_802ED74C_5(1, 0);
+            handle->Stop(1, 0);
             break;
         case 7:
-            handle->fn_800ED8C0(1);
+            handle->SetCallbackEnabled(1);
             break;
         case 8:
-            handle->fn_802ED74C_10();
+            handle->Release();
             break;
         }
     }
     sAudioHandles.Remove(key);
 }
 
-extern "C" void fn_800EC2A4(unsigned long cueId, void* context)
+void PauseSound(unsigned long cueId, void* context)
 {
     if (cueId == 0xFFFFFFFF)
     {
@@ -396,29 +380,29 @@ extern "C" void fn_800EC2A4(unsigned long cueId, void* context)
     }
 
     unsigned long key = MakeAudioHandleKey(cueId, context);
-    XSoundHandle_802ED74C** slot = FindAudioHandleSlot(cueId, context);
-    AudioHandleState_800EBF78* state = FindAudioHandleState(key);
+    XSoundHandle** slot = FindAudioHandleSlot(cueId, context);
+    AudioHandleState* state = FindAudioHandleState(key);
     if (slot == 0 || state == 0)
     {
         return;
     }
 
-    XSoundHandle_802ED74C* handle = *slot;
+    XSoundHandle* handle = *slot;
     if ((state->m_Flags & 0x8000) != 0)
     {
         if (handle != 0 && handle->m_State == 8)
         {
-            handle->fn_802ED74C_10();
+            handle->Release();
             *slot = 0;
         }
         else if (handle != 0 && handle->m_State != 5)
         {
-            handle->fn_802ED74C_6();
+            handle->Pause();
         }
     }
     else if (handle != 0)
     {
-        handle->fn_802ED74C_5(1, 0);
+        handle->Stop(1, 0);
         *slot = 0;
     }
 
@@ -428,7 +412,7 @@ extern "C" void fn_800EC2A4(unsigned long cueId, void* context)
     }
 }
 
-extern "C" void fn_800EC400(unsigned long cueId, void* context)
+void ResumeSound(unsigned long cueId, void* context)
 {
     if (cueId == 0xFFFFFFFF)
     {
@@ -436,8 +420,8 @@ extern "C" void fn_800EC400(unsigned long cueId, void* context)
     }
 
     unsigned long key = MakeAudioHandleKey(cueId, context);
-    XSoundHandle_802ED74C** slot = FindAudioHandleSlot(cueId, context);
-    AudioHandleState_800EBF78* state = FindAudioHandleState(key);
+    XSoundHandle** slot = FindAudioHandleSlot(cueId, context);
+    AudioHandleState* state = FindAudioHandleState(key);
     if (slot == 0 || state == 0
         || ((state->m_Flags >> 12) & 7) < sAudioPauseDepth)
     {
@@ -448,30 +432,30 @@ extern "C" void fn_800EC400(unsigned long cueId, void* context)
     {
         if (*slot != 0)
         {
-            (*slot)->fn_802ED74C_7();
+            (*slot)->Resume();
         }
     }
     else
     {
-        *slot = fn_800EBD00((int)(state->m_Flags >> 16),
+        *slot = CreateSoundHandle((int)(state->m_Flags >> 16),
             state->m_CueId, 0, sResumedCue, context, true);
         if (*slot != 0)
         {
-            (*slot)->fn_802ED74C_3(false);
+            (*slot)->Play(false);
         }
     }
     state->m_Flags &= ~0x7000;
 }
 
-extern "C" void fn_800EC548(unsigned long parameter, float value)
+void SetLastSoundParameter(unsigned long parameter, float value)
 {
-    if (lbl_806E0E84 == 0)
+    if (g_pLastAudioHandle == 0)
     {
         return;
     }
 
-    AudioParameter_802F1A70* audioParameter
-        = fn_802F1A70(lbl_806E0E84, parameter);
+    AudioParameter* audioParameter
+        = GetSoundParameter(g_pLastAudioHandle, parameter);
     if (value < audioParameter->m_Min)
     {
         audioParameter->m_Value = audioParameter->m_Min;
@@ -487,110 +471,110 @@ extern "C" void fn_800EC548(unsigned long parameter, float value)
     audioParameter->m_Time = 0.0f;
 }
 
-extern "C" unsigned long fn_800EC5C4(
+unsigned long GetSoundState(
     unsigned long cueId, void* context)
 {
-    XSoundHandle_802ED74C* handle = fn_800EBEF4(cueId, context);
+    XSoundHandle* handle = FindSoundHandle(cueId, context);
     return handle != 0 ? handle->m_State : 8;
 }
 
-extern "C" void fn_800EC65C(unsigned long cueId, void* context,
+void SetSoundCallbackEnabled(unsigned long cueId, void* context,
     unsigned char enabled)
 {
-    XSoundHandle_802ED74C* handle = fn_800EBEF4(cueId, context);
+    XSoundHandle* handle = FindSoundHandle(cueId, context);
     if (handle != 0)
     {
-        handle->fn_800ED8C0(enabled);
+        handle->SetCallbackEnabled(enabled);
     }
 }
 
-extern "C" bool fn_800EC708(int slotId, unsigned long cueId,
-    XSoundOwner_802ED74C* owner, const void* debugName,
+bool PrepareTrackedSound(int slotId, unsigned long cueId,
+    XSoundOwner* owner, const void* debugName,
     void* context, bool restartable)
 {
-    XSoundHandle_802ED74C* handle = fn_800EBD00(
+    XSoundHandle* handle = CreateSoundHandle(
         slotId, cueId, owner, debugName, context, false);
     if (handle != 0)
     {
         AddAudioHandleState(slotId, cueId, context, restartable);
-        handle->fn_802ED74C_4(false);
+        handle->Prepare(false);
     }
     return handle != 0;
 }
 
-extern "C" bool fn_800EC7BC(unsigned long cueId, void* context)
+bool StartTrackedSound(unsigned long cueId, void* context)
 {
-    XSoundHandle_802ED74C* handle = fn_800EBEF4(cueId, context);
+    XSoundHandle* handle = FindSoundHandle(cueId, context);
     if (handle == 0)
     {
         return false;
     }
-    handle->fn_802ED74C_3(false);
+    handle->Play(false);
     return true;
 }
 
-extern "C" void PauseAllAudio()
+void PauseAllAudio()
 {
     ++sAudioPauseDepth;
     sAudioHandles.Walk(
-        lbl_806E201C, &AudioLoadMode_806E201C::PauseTrackedSound);
+        g_pAudioSystem, &AudioSystem::PauseTrackedSound);
     sPausedAudioHandles.Clear();
 }
 
-extern "C" void ResumeAllAudio()
+void ResumeAllAudio()
 {
     sAudioHandleStates.Walk(
-        lbl_806E201C, &AudioLoadMode_806E201C::ResumeTrackedSound);
+        g_pAudioSystem, &AudioSystem::ResumeTrackedSound);
     --sAudioPauseDepth;
 }
 
-extern "C" unsigned int GetAudioPauseDepth()
+int GetAudioPauseDepth()
 {
     return sAudioPauseDepth;
 }
 
-void AudioLoadMode_806E201C::PauseTrackedSound(
-    const unsigned long& key, XSoundHandle_802ED74C** handle)
+void AudioSystem::PauseTrackedSound(
+    const unsigned long& key, XSoundHandle** handle)
 {
-    AudioHandleState_800EBF78* state = FindAudioHandleState(key);
+    AudioHandleState* state = FindAudioHandleState(key);
     if (state != 0)
     {
-        fn_800EC2A4(state->m_CueId, state->m_Context);
+        PauseSound(state->m_CueId, state->m_Context);
     }
     else if (*handle != 0)
     {
-        (*handle)->fn_802ED74C_5(0, 0);
+        (*handle)->Stop(0, 0);
     }
 
     if (*handle != 0)
     {
         unsigned long handleKey = (unsigned long)*handle;
-        sPausedAudioHandles.Add(handleKey, lbl_806DC458[7]);
+        sPausedAudioHandles.Add(handleKey, gAudioResourcePath[7]);
     }
 }
 
-void AudioLoadMode_806E201C::ResumeTrackedSound(
-    const unsigned long&, AudioHandleState_800EBF78* state)
+void AudioSystem::ResumeTrackedSound(
+    const unsigned long&, AudioHandleState* state)
 {
-    fn_800EC400(state->m_CueId, state->m_Context);
+    ResumeSound(state->m_CueId, state->m_Context);
 }
 
-void AudioListener_802EBD54::SetEnabled(bool enabled)
+void AudioListener::SetEnabled(bool enabled)
 {
     m_Enabled = enabled;
 }
 
-void AudioListener_802EBD54::SetTransformValid(bool valid)
+void AudioListener::SetTransformValid(bool valid)
 {
     m_TransformValid = valid;
 }
 
-bool AudioLoadMode_806E201C::fn_800ED85C()
+bool AudioSystem::IsInitialized()
 {
-    return m_BundleManager != 0 && m_BundleManager->fn_800ED8B8();
+    return m_BundleManager != 0 && m_BundleManager->IsInitialized();
 }
 
-bool AudioLoadMode_806E201C::fn_806E201C_0()
+bool AudioSystem::IsAsyncLoading()
 {
     return m_AsyncLoading;
 }

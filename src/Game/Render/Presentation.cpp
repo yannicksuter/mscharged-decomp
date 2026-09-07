@@ -58,7 +58,6 @@ extern "C" void fn_80276D10();
 extern "C" bool fn_80276DE0();
 extern "C" void fn_80276E0C();
 extern "C" void fn_80277BB4(unsigned int, unsigned int, unsigned int);
-extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
 extern "C" void fn_802E8A2C(EmissionManager*, EffectsGroup*);
 extern "C" void fn_802E8B78(EmissionManager*, Function<void*>*);
 extern "C" void fn_80341E68(BasicStadium*, unsigned int);
@@ -290,7 +289,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         const char* name = (const char*)Pop();
         EmissionManager* manager = EmissionManager::Instance();
-        EffectsGroup* group = fn_802E7CDC(manager, name);
+        EffectsGroup* group = manager->GetEffectsGroup(name);
         if (group != 0)
         {
             fn_802E8A2C(manager, group);

@@ -117,7 +117,7 @@ void* cPlayer::fn_800972CC()
     void* pResult = NULL;
     if (pGlobalPad != NULL)
     {
-        pResult = fn_80336D90(
+        pResult = GetLocalChannelPad(
             (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser);
     }
     return pResult;
@@ -333,14 +333,14 @@ void cPlayer::UnidentifiedVirtual1C()
 
 extern "C" void fn_80098A68(UnidentifiedEventData_800673FC* pData)
 {
-    fn_800EBBFC(
+    PlaySound(
         pData->mUnidentified00->mUnidentified318,
         0x9F35CA0F, NULL, NULL);
 }
 
 extern "C" void fn_80098A84(UnidentifiedEventData_800673FC* pData)
 {
-    fn_800EBBFC(
+    PlaySound(
         pData->mUnidentified00->mUnidentified318,
         0x85EF26D0, NULL, NULL);
 }

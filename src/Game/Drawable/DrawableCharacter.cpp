@@ -1,6 +1,6 @@
 #include "Game/Drawable/DrawableCharacter.h"
 #include "Game/GameObjectLighting.h"
-#include "unclassified/tu_801AD15C.h"
+#include "Game/Render/PeachPhoto.h"
 
 #include "Game/BasicStadium.h"
 #include "Game/CharacterEffects.h"
@@ -1357,9 +1357,9 @@ void DrawableCharacter::ApplyMaterialEffects(
             if (scorchTexture == 0)
             {
                 scorchTexture = glGetTexture(CharacterBlackTextureName);
-                TextureManager_802CDF0C* textureManager = fn_802CDF0C();
+                glTextureManager* textureManager = glGetTextureManager();
                 resolvedScorchTexture.value =
-                    textureManager->fn_802CE1B8(scorchTexture);
+                    textureManager->GetTextureIndex(scorchTexture);
             }
             ApplyTexture(
                 model, scorchTexture, resolvedScorchTexture);

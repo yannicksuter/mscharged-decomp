@@ -1,24 +1,25 @@
 #ifndef GAME_SYS_AUDIO_H
 #define GAME_SYS_AUDIO_H
 
-#include "Game/Audio/AudioLoadMode_806E201C.h"
-#include "Game/Audio/AudioResourceLoader_802EDA38.h"
-#include "Game/Audio/XSoundHandle_802ED74C.h"
+#include "Game/Audio/AudioSystem.h"
+#include "Game/Audio/GameStreams.h"
+#include "Game/Audio/AudioResourceLoader.h"
+#include "Game/Audio/XSoundHandle.h"
 #include "types.h"
 
 class cPlayer;
 
-struct AudioHandleState_800EBF78
+struct AudioHandleState
 {
     unsigned long m_CueId;
     void* m_Context;
     unsigned long m_Flags;
 };
 
-class GameAudio_800EB6AC : public AudioLoadMode_806E201C
+class GameAudio : public AudioSystem
 {
 public:
-    GameAudio_800EB6AC();
+    GameAudio();
 
     bool Initialize();
     virtual void Shutdown();
@@ -27,57 +28,53 @@ public:
     unsigned long m_PlayRequestCount;
 };
 
-typedef AudioResourceLoadCallback_802EDA54 AudioPlayCallback_800EBB04;
+typedef AudioResourceLoadCallback AudioPlayCallback;
 
-extern "C"
-{
-    void fn_800EBB04(GameAudio_800EB6AC* audio, int slotId,
-        unsigned long cueId, AudioPlayCallback_800EBB04 callback,
-        void* context);
-    void fn_800EBBD8(GameAudio_800EB6AC* audio);
-    bool fn_800EBBFC(int slotId, unsigned long cueId,
-        const void* debugName, void* context);
-    bool fn_800EBC84(int slotId, unsigned long cueId,
-        XSoundOwner_802ED74C* owner, const void* debugName,
-        void* context);
-    XSoundHandle_802ED74C* fn_800EBD00(int slotId,
-        unsigned long cueId, XSoundOwner_802ED74C* owner,
-        const void* debugName, void* context, bool findExisting);
-    bool fn_800EBE90(unsigned long cueId, void* context);
-    XSoundHandle_802ED74C* fn_800EBEF4(
-        unsigned long cueId, void* context);
-    bool fn_800EBF78(int slotId, unsigned long cueId,
-        const void* debugName, void* context, bool restartable);
-    bool fn_800EC058(int slotId, unsigned long cueId,
-        XSoundOwner_802ED74C* owner, const void* debugName,
-        void* context, bool restartable);
-    void fn_800EC12C(unsigned long cueId, void* context);
-    void fn_800EC2A4(unsigned long cueId, void* context);
-    void fn_800EC400(unsigned long cueId, void* context);
-    void fn_800EC548(unsigned long parameter, float value);
-    unsigned long fn_800EC5C4(unsigned long cueId, void* context);
-    void fn_800EC65C(
-        unsigned long cueId, void* context, unsigned char enabled);
-    bool fn_800EC708(int slotId, unsigned long cueId,
-        XSoundOwner_802ED74C* owner, const void* debugName,
-        void* context, bool restartable);
-    bool fn_800EC7BC(unsigned long cueId, void* context);
-    void PauseAllAudio();
-    void ResumeAllAudio();
-    unsigned int GetAudioPauseDepth();
-    void fn_800ED8C8(XSoundHandle_802ED74C* handle);
-    void fn_800ED8D4();
-    void fn_800ED8D8();
-    void fn_800ED92C(unsigned long cueId);
-    void fn_800EDA84(int slotId, unsigned long cueId, void* context);
-    void fn_800EDB04(unsigned long cueId, void* context);
-    void fn_800EDB10(int slotId, unsigned long cueId, void* context);
-    void fn_800EDB90(unsigned long cueId, void* context);
-    void fn_800EDB9C();
-    void fn_800EDBF8();
-    void fn_800EDC2C();
-    void fn_800EDCAC();
-    void fn_800EDCE8(cPlayer* player);
-}
+void LoadSoundBank(GameAudio* audio, int slotId,
+    unsigned long cueId, AudioPlayCallback callback,
+    void* context);
+void UnloadSoundBanks(GameAudio* audio);
+bool PlaySound(int slotId, unsigned long cueId,
+    const void* debugName, void* context);
+bool PlayOwnedSound(int slotId, unsigned long cueId,
+    XSoundOwner* owner, const void* debugName,
+    void* context);
+XSoundHandle* CreateSoundHandle(int slotId,
+    unsigned long cueId, XSoundOwner* owner,
+    const void* debugName, void* context, bool findExisting);
+bool IsSoundTracked(unsigned long cueId, void* context);
+XSoundHandle* FindSoundHandle(
+    unsigned long cueId, void* context);
+bool PlayTrackedSound(int slotId, unsigned long cueId,
+    const void* debugName, void* context, bool restartable);
+bool PlayTrackedOwnedSound(int slotId, unsigned long cueId,
+    XSoundOwner* owner, const void* debugName,
+    void* context, bool restartable);
+void StopSound(unsigned long cueId, void* context);
+void PauseSound(unsigned long cueId, void* context);
+void ResumeSound(unsigned long cueId, void* context);
+void SetLastSoundParameter(unsigned long parameter, float value);
+unsigned long GetSoundState(unsigned long cueId, void* context);
+void SetSoundCallbackEnabled(
+    unsigned long cueId, void* context, unsigned char enabled);
+bool PrepareTrackedSound(int slotId, unsigned long cueId,
+    XSoundOwner* owner, const void* debugName,
+    void* context, bool restartable);
+bool StartTrackedSound(unsigned long cueId, void* context);
+void PauseAllAudio();
+void ResumeAllAudio();
+int GetAudioPauseDepth();
+void InvalidateSoundHandle(XSoundHandle* handle);
+void InitializeGameStreams();
+void StopCrowdReactions();
+void PlayCaptainChant(int slotId, unsigned long cueId, void* context);
+void StopCaptainChant(unsigned long cueId, void* context);
+void PlayCaptainPowerupStream(int slotId, unsigned long cueId, void* context);
+void StopCaptainPowerupStream(unsigned long cueId, void* context);
+void PlaySuddenDeathMusic();
+void PauseSuddenDeathMusic();
+void ResumeSuddenDeathMusic();
+void StopSuddenDeathMusic();
+void SetPlayerAudioController(cPlayer* player);
 
 #endif // GAME_SYS_AUDIO_H

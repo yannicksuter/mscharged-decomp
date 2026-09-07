@@ -32,21 +32,21 @@ public:
     /* 0x1C */ PadBackend* mBackend;
 }; // size: 0x20
 
-class PadManager_802C06D4
+class PadManager
 {
 public:
-    PadManager_802C06D4();
-    void fn_802C06D8(int padCount, int padSetCount);
+    PadManager();
+    void Initialize(int padCount, int padSetCount);
     void Update(float deltaTime);
     cGlobalPad* GetPad(int idx);
-    void fn_802C084C(int padSet);
+    void SetActivePadSet(int padSet);
 
-    /* 0x00 */ int mUnidentified000;
-    /* 0x04 */ int mUnidentified004;
-    /* 0x08 */ int mUnidentified008;
+    /* 0x00 */ int mPadCount;
+    /* 0x04 */ int mPadSetCount;
+    /* 0x08 */ int mActivePadSet;
     /* 0x0C */ cGlobalPad** m_aPads;
 }; // size: 0x10
 
-extern PadManager_802C06D4* g_pPadManager;
+extern PadManager* g_pPadManager;
 
 #endif // NL_GLOBALPAD_H

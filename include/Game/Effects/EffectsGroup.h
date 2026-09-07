@@ -22,4 +22,7 @@ struct EffectsSpec
     /* 0x44 */ unsigned char mPadding044[0x14];
 }; // size: 0x58
 
+class EffectsGroup;
+void SetEffectsGroupFountainLife(EffectsGroup* group, float life);
+
 #endif // GAME_EFFECTS_EFFECTS_GROUP_H

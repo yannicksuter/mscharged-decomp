@@ -4,6 +4,7 @@
 #include "Game/AI/AvoidController.h"
 #include "Game/AI/Desire.h"
 #include "Game/AI/Fielder.h"
+#include "NL/nlPiecewiseLinearCurve.h"
 
 enum ePositionSeekState
 {
@@ -12,20 +13,6 @@ enum ePositionSeekState
     PSS_FAR_SEEKING = 2,
     PSS_UNIDENTIFIED_3 = 3,
     PSS_UNIDENTIFIED_4 = 4,
-};
-
-class UnidentifiedVector2Array
-{
-public:
-    UnidentifiedVector2Array(nlVector2* data, int count)
-        : mData(data)
-        , mCount(count)
-    {
-    }
-    ~UnidentifiedVector2Array();
-
-    nlVector2* mData;
-    int mCount;
 };
 
 class DesireSteering;

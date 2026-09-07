@@ -1,10 +1,13 @@
-#include "Game/Audio/Transition_802F2110.h"
+#include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/XSoundHandle.h"
+#include "Game/Audio/AudioSystem.h"
+#include "Game/Audio/Transition.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
 
 #include <NMWException.h>
 
-class PlaybackBackend_802F2C3C;
+class AudioSource;
 struct VoiceDefinition_802F3E20;
 
 struct VoiceDefinition_802F2110
@@ -74,8 +77,8 @@ struct SoundInstance_802F2110
     float currentTime;
     RpcRuntimeNode_802F2110* activeRpc;
     float transitionTime;
-    Transition_802F2110 volume;
-    Transition_802F2110 pitch;
+    Transition volume;
+    Transition pitch;
     float field_70;
     float releaseTime;
     SoundInstance_802F2110* nextInstance;
@@ -108,20 +111,12 @@ struct CalculationEntry_802F2110
     u8 pad_04[0x24];
 };
 
-struct AudioSystem_802F2110
-{
-    u8 pad_00[0xCC];
-    AudioResources_802F2110* resources;
-};
-
 extern void* lbl_8052F3C8[];
 extern SlotPoolBase lbl_8057FA10;
 extern SlotPoolBase lbl_8057FB78;
-extern AudioSystem_802F2110* lbl_806E201C;
 
 extern "C" void* fn_802F0394(RpcController_802F2110*, RpcDefinition_802F2110*, SoundInstance_802F2110*);
 extern "C" void fn_802F04D4(RpcController_802F2110*, SoundInstance_802F2110*);
-extern "C" void* fn_802F1A70(CueHandle_802F2110*, u32);
 extern "C" VoiceNode_802F2110* fn_802F3E20(VoiceNode_802F2110*, SoundInstance_802F2110*, VoiceDefinition_802F3E20*);
 extern "C" void fn_802F3ECC(VoiceNode_802F2110*, int);
 extern "C" void fn_802F3F6C(VoiceNode_802F2110*);
@@ -130,7 +125,7 @@ extern "C" int fn_802F437C(VoiceNode_802F2110*, float);
 extern "C" void fn_802F4174(VoiceNode_802F2110*);
 extern "C" void fn_802F4278(VoiceNode_802F2110*);
 extern "C" void fn_802F4518(VoiceNode_802F2110*);
-extern "C" void fn_802F4640(VoiceNode_802F2110*, PlaybackBackend_802F2C3C**, u32*);
+extern "C" void fn_802F4640(VoiceNode_802F2110*, AudioSource**, u32*);
 
 static inline VoiceNode_802F2110* AllocateVoice_802F2110()
 {
@@ -196,7 +191,7 @@ static inline void DestroyVoices_802F2110(SoundInstance_802F2110* instance)
     instance->voices = 0;
 }
 
-extern "C" bool fn_802F2110()
+bool IsSoundHandleValid()
 {
     return true;
 }
@@ -276,8 +271,8 @@ extern "C" SoundInstance_802F2110* fn_802F2188(SoundInstance_802F2110* instance,
 
 extern "C" void fn_802F2320(SoundInstance_802F2110* instance, float)
 {
-    instance->volume.fn_802EB5BC(0.0f, 1.0f);
-    instance->pitch.fn_802EB5BC(0.0f, 1.0f);
+    instance->volume.Update(0.0f, 1.0f);
+    instance->pitch.Update(0.0f, 1.0f);
     if (instance->voices != 0)
         fn_802F3F6C(instance->voices);
     instance->state = 4;
@@ -301,7 +296,7 @@ extern "C" void fn_802F2398(SoundInstance_802F2110* instance)
     instance->pitch.target = value;
     instance->pitch.elapsed = 0.0f;
 
-    RpcController_802F2110* controller = lbl_806E201C->resources->rpcController;
+    RpcController_802F2110* controller = ((AudioResources_802F2110*)g_pAudioSystem->GetBundleManager())->rpcController;
     for (u32 groupIndex = 0; groupIndex < instance->definition->rpcGroupCount;
         groupIndex++)
     {
@@ -366,7 +361,7 @@ extern "C" void fn_802F2648(SoundInstance_802F2110* instance)
 }
 
 extern "C" void fn_802F2650(SoundInstance_802F2110* instance,
-    PlaybackBackend_802F2C3C** value, u32* output)
+    AudioSource** value, u32* output)
 {
     for (VoiceNode_802F2110* voice = instance->voices;
         voice != 0;
@@ -380,8 +375,8 @@ extern "C" void fn_802F26B0(SoundInstance_802F2110* instance, float dt)
 {
     if (instance->state == 4 || instance->state == 7)
     {
-        instance->volume.fn_802EB5BC(dt, 1.0f);
-        instance->pitch.fn_802EB5BC(dt, 1.0f);
+        instance->volume.Update(dt, 1.0f);
+        instance->pitch.Update(dt, 1.0f);
         instance->previousTime = instance->currentTime;
         instance->currentTime += dt;
     }
@@ -389,7 +384,7 @@ extern "C" void fn_802F26B0(SoundInstance_802F2110* instance, float dt)
     if (instance->activeRpc != 0 && instance->state == 7)
     {
         instance->transitionTime += dt;
-        Transition_802F2110* slider = (Transition_802F2110*)fn_802F1A70(instance->owner, 2);
+        Transition* slider = (Transition*)GetSoundParameter((XSoundHandle*)instance->owner, 2);
         float value = instance->transitionTime;
         if (value < slider->minimum)
             slider->target = slider->minimum;
@@ -419,7 +414,7 @@ extern "C" void fn_802F26B0(SoundInstance_802F2110* instance, float dt)
     case 7:
         if (voiceState == 8)
         {
-            fn_802F04D4(lbl_806E201C->resources->rpcController, instance);
+            fn_802F04D4(((AudioResources_802F2110*)g_pAudioSystem->GetBundleManager())->rpcController, instance);
             instance->rpcEntries = 0;
             DestroyVoices_802F2110(instance);
             instance->state = 8;
@@ -451,12 +446,12 @@ extern "C" void fn_802F26B0(SoundInstance_802F2110* instance, float dt)
 extern "C" float fn_802F29F8(SoundInstance_802F2110* instance)
 {
     float volume = instance->volume.value;
-    void* table = lbl_806E201C->resources->calculationTable;
+    void* table = g_pAudioSystem->GetBundleManager()->GetCalculationTable();
     CalculationEntry_802F2110* entry
         = (CalculationEntry_802F2110*)*(void**)((u8*)table + 8)
         + instance->definition->sliderIndex;
     float value = entry->UnidentifiedVirtual0(
-        table, lbl_806E201C->resources);
+        table, (AudioResources_802F2110*)g_pAudioSystem->GetBundleManager());
     return instance->field_70 + (value + volume);
 }
 
@@ -467,7 +462,7 @@ extern "C" float fn_802F2A6C(SoundInstance_802F2110* instance)
 
 extern "C" void fn_802F2A74(SoundInstance_802F2110* instance)
 {
-    fn_802F04D4(lbl_806E201C->resources->rpcController, instance);
+    fn_802F04D4(((AudioResources_802F2110*)g_pAudioSystem->GetBundleManager())->rpcController, instance);
     RpcListEntry_802F2110* start = instance->rpcEntries;
     RpcListEntry_802F2110* entry = start;
     while (entry != 0)

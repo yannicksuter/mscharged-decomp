@@ -100,7 +100,7 @@ extern "C" float fn_802B5DD0(const nlVector2& point, const nlVector4& plane)
     return plane.x * point.x + plane.y * point.y + plane.w;
 }
 
-extern "C" void fn_802B5D74(nlVector3& out, const nlVector3& point, const nlVector4& plane)
+void nlProjectPointOntoPlane(nlVector3& out, const nlVector3& point, const nlVector4& plane)
 {
     float scale = -nlPlaneDot(plane, point)
         / (plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);

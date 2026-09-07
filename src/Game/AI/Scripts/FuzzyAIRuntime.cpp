@@ -44,9 +44,9 @@ extern "C" UnidentifiedFuzzyRuntimeBase* fn_8002E198(cFielder*);
 extern "C" void fn_800A695C();
 extern "C" void fn_80314444();
 extern "C" void fn_803140CC();
-extern "C" bool fn_800A3350(
+extern "C" bool GetSkillValue(
     void*, unsigned long, float*, cFielder*);
-extern "C" float* fn_800A3404(void*);
+extern "C" float* GetShotChance(void*);
 extern "C" void* fn_80312E0C(void*, const Variant&);
 extern "C" int fn_802DF9FC(InterpreterCore*);
 extern "C" void fn_800B6A1C(
@@ -137,7 +137,7 @@ float UnidentifiedFuzzyRuntime::UnidentifiedVirtual8()
     if (value != 0)
     {
         UnidentifiedActionQueue* collection = mCollection.mHead->mQueue;
-        collection->fn_80310034(fn_800A3404(value), 4);
+        collection->fn_80310034(GetShotChance(value), 4);
     }
 
     return result;
@@ -198,7 +198,7 @@ extern "C" float fn_800E34F4(
     }
 
     float result = 1.0f;
-    fn_800A3350(teamContext, hash, &result, fielder);
+    GetSkillValue(teamContext, hash, &result, fielder);
     return result;
 }
 

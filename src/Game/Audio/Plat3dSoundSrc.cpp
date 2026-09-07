@@ -2,17 +2,17 @@
 
 #include "Game/TweakValue.h"
 
-static float lbl_806DF9C0 = 343.5f;
+static float sSpeedOfSound = 343.5f;
 
 float g_Pan;
 float g_Dist;
 float g_RelVel;
 
-static TweakValueImpl_804F4DC8 lbl_80585508("g_Pan", "audio/Stats", &g_Pan, true);
-static TweakValueImpl_804F4DC8 lbl_80585528("g_Dist", "audio/Stats", &g_Dist, true);
-static TweakValueImpl_804F4DC8 lbl_80585548("g_RelVel", "audio/Stats", &g_RelVel, true);
+static TweakValueImpl_804F4DC8 sPanTweak("g_Pan", "audio/Stats", &g_Pan, true);
+static TweakValueImpl_804F4DC8 sDistanceTweak("g_Dist", "audio/Stats", &g_Dist, true);
+static TweakValueImpl_804F4DC8 sRelativeVelocityTweak("g_RelVel", "audio/Stats", &g_RelVel, true);
 
-void Plat3dSoundSrc::Update(AudioListener_8035DAD4* listener, float deltaTime)
+void Plat3dSoundSrc::Update(PlatAudioListener* listener, float deltaTime)
 {
     if ((m_Unknown1C & 0x4000) == 0 && (m_Unknown1C & 0x8000) == 0)
         return;
@@ -34,7 +34,7 @@ void Plat3dSoundSrc::Update(AudioListener_8035DAD4* listener, float deltaTime)
     nlVector4 plane;
     nlVector3 projected;
     nlVec4Set(plane, listener->m_Up.x, listener->m_Up.y, listener->m_Up.z, 0.0f);
-    fn_802B5D74(projected, ListenerOffset, plane);
+    nlProjectPointOntoPlane(projected, ListenerOffset, plane);
     nlVec3Scale(projected, nlRecipSqrt(nlVec3LengthSquared(projected), true));
     m_Unknown20 = nlVec3DotProduct(projected, listener->m_Unknown2C);
     if (m_Unknown44 & 0x00800000)
@@ -46,7 +46,7 @@ void Plat3dSoundSrc::Update(AudioListener_8035DAD4* listener, float deltaTime)
     m_Unknown14 = 180.0f * m_Unknown20;
 
     nlVec4Set(plane, listener->m_Unknown2C.x, listener->m_Unknown2C.y, listener->m_Unknown2C.z, 0.0f);
-    fn_802B5D74(projected, ListenerOffset, plane);
+    nlProjectPointOntoPlane(projected, ListenerOffset, plane);
     nlVec3Scale(projected, nlRecipSqrt(nlVec3LengthSquared(projected), true));
     m_Unknown24 = nlVec3DotProduct(projected, listener->m_View);
     if (m_Unknown44 & 0x00800000)
@@ -73,11 +73,11 @@ void Plat3dSoundSrc::Update(AudioListener_8035DAD4* listener, float deltaTime)
     g_RelVel = nlVec3Length(relativeVelocity);
     if (g_RelVel != 0.0f)
     {
-        m_Unknown40 = 12.0f * nlFastLog2(1.0f / (1.0f - g_RelVel / lbl_806DF9C0));
+        m_Unknown40 = 12.0f * nlFastLog2(1.0f / (1.0f - g_RelVel / sSpeedOfSound));
     }
 }
 
-void AudioListener_8035DAD4::fn_8035DAD4(float deltaTime)
+void PlatAudioListener::Update(float deltaTime)
 {
     if (m_HasTransform)
     {

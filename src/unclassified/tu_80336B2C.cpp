@@ -115,7 +115,7 @@ extern "C" s8 fn_80336D70(UnidentifiedNetworkPeerChannel* channel)
     return channel->mPeer->mMachineId * 4 + channel->mChannelIndex;
 }
 
-extern "C" cGlobalPad* fn_80336D90(UnidentifiedNetworkPeerChannel* channel)
+cGlobalPad* GetLocalChannelPad(UnidentifiedNetworkPeerChannel* channel)
 {
     if (channel->mGlobalPadIndex == -1)
     {
@@ -132,7 +132,7 @@ extern "C" cGlobalPad* fn_80336D90(UnidentifiedNetworkPeerChannel* channel)
 extern "C" void fn_80336DF4(UnidentifiedNetworkPeerChannel* channel)
 {
     channel->mInputs[2].fn_80332110(channel->mInputs[3]);
-    cGlobalPad* pad = fn_80336D90(channel);
+    cGlobalPad* pad = GetLocalChannelPad(channel);
     if (pad != 0 && !lbl_806E2138->mFrameProvider->UnidentifiedVirtual1C())
     {
         channel->mInputs[3].fn_8033222C(pad);

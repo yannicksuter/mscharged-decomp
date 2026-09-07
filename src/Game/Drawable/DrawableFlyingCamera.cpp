@@ -1,4 +1,5 @@
 #include "Game/Drawable/DrawableFlyingCamera.h"
+#include "Game/Drawable/RenderObject.h"
 
 #include "Game/BasicStadium.h"
 #include "Game/Drawable/RenderObject.h"
@@ -34,7 +35,6 @@ struct UnidentifiedStaticTag;
 
 extern "C"
 {
-    RenderObject* fn_80276360(int, int);
 }
 
 static float gShadowScaleHigh = 0.5f;
@@ -121,7 +121,7 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
     glSetCurrentTexture(glGetTexture("global/camera_shadow"), GLTT_Diffuse);
     glSetTextureState(GLTS_DiffuseWrap, 3);
     glSetCurrentTextureState(glHandleizeTextureState());
-    quad.Attach((eGLView)(u32)fn_8027262C(), 0);
+    quad.Attach((eGLView)(u32)GetUnshadowedView(), 0);
 }
 
 DrawableFlyingCamera::DrawableFlyingCamera()
@@ -148,7 +148,7 @@ void DrawableFlyingCamera::Grab()
 void DrawableFlyingCamera::Render() const
 {
     nlMatrix4 matrix;
-    RenderObject* drawable = fn_80276360(7, mIndex);
+    RenderObject* drawable = GetRenderObject(7, mIndex);
 
     if (drawable == 0)
     {

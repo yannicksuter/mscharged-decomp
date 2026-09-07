@@ -485,20 +485,20 @@ void glxInitTex()
 extern "C" void fn_8036BE88(
     int textureMap, UnidentifiedTextureState* textureState)
 {
-    TextureManager_802CDF0C* textureManager;
+    glTextureManager* textureManager;
     PlatTexture* pTex;
     GXTexWrapMode mode[2];
     eGLTextureMode tmode;
     static unsigned long missingTexture =
         glGetTexture("font/fixedWidthMedium");
 
-    textureManager = fn_802CDF0C();
-    pTex = textureManager->fn_802CE2B8(textureState);
+    textureManager = glGetTextureManager();
+    pTex = textureManager->GetTexture(textureState);
     if (pTex == 0)
     {
         unsigned long texture =
-            textureManager->fn_802CE1B8(missingTexture);
-        pTex = textureManager->fn_802CE294(&texture);
+            textureManager->GetTextureIndex(missingTexture);
+        pTex = textureManager->GetTextureAtIndex(&texture);
     }
 
     if (glx_bGridMode)

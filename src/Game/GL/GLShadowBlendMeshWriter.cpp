@@ -3,7 +3,7 @@
 
 #include "Game/GL/GLShadowBlendMeshWriter.h"
 
-#include "Game/GL/tu_802D38A4.h"
+#include "Game/GL/glModelBuilder.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
 
@@ -38,7 +38,7 @@ bool GLShadowBlendMeshWriter::Begin(
     }
     model = newModel;
 
-    fn_802D38A4(
+    glCreateModel(
         model, vertexCount, primitive, allocator, 3, 0x386ECBDD);
 
     glModelStream* streams = model->packets->streams;
@@ -62,7 +62,7 @@ bool GLShadowBlendMeshWriter::Begin(
         }
     }
     position = positionData;
-    fn_802D39CC(streams, 0, position,
+    glSetModelStream(streams, 0, position,
         sizeof(float) * 3, 1);
 
     u32* colourData;
@@ -84,7 +84,7 @@ bool GLShadowBlendMeshWriter::Begin(
         }
     }
     colour = colourData;
-    fn_802D39CC(
+    glSetModelStream(
         streams + 1, 1, colour, sizeof(u32), 3);
 
     int texcoordCount = vertexCount * 2;
@@ -107,7 +107,7 @@ bool GLShadowBlendMeshWriter::Begin(
         }
     }
     texcoord = texcoordData;
-    fn_802D39CC(streams + 2, 2, texcoord,
+    glSetModelStream(streams + 2, 2, texcoord,
         sizeof(float) * 2, 4);
 
     return true;

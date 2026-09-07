@@ -1,6 +1,7 @@
 #ifndef NL_AVL_TREE_H
 #define NL_AVL_TREE_H
 
+#include "NL/nlFunction.h"
 #include "NL/nlList.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
@@ -24,7 +25,7 @@ public:
     AVLTreeNode* AddAVLNode(AVLTreeNode** rootNode, void* key, void* value, AVLTreeNode** existingNode);
     AVLTreeNode* RemoveAVLNode(AVLTreeNode** root, void* key);
     AVLTreeNode* FindAVLNode(AVLTreeNode* node, void* key) const;
-    unsigned int fn_802A95C4(AVLTreeNode* root, unsigned int count);
+    unsigned int CountNodes(AVLTreeNode* root, unsigned int count);
     void DestroyTree(AVLTreeNode* curr, DeleteCallback cb);
 };
 
@@ -114,6 +115,17 @@ public:
             *foundKey = &node->key;
     }
 
+    ValueType* Add(const KeyType& key)
+    {
+        AVLTreeNode* existingNode;
+        AVLTreeNode* node = AddAVLNode(
+            (AVLTreeNode**)&m_Root, (void*)&key, 0, &existingNode);
+        ValueType* value = &((Entry*)node)->value;
+        if (existingNode == 0)
+            return value;
+        return 0;
+    }
+
     ValueType* Add(const KeyType& key, const ValueType& value)
     {
         AVLTreeNode* existingNode;
@@ -125,9 +137,9 @@ public:
 
     void Remove(const KeyType& key)
     {
-        Entry* removedEntry = (Entry*)RemoveAVLNode((AVLTreeNode**)&m_Root, (void*)&key);
-        if (removedEntry != 0)
-            m_Allocator.Free(removedEntry);
+        AVLTreeNode* removedNode = RemoveAVLNode((AVLTreeNode**)&m_Root, (void*)&key);
+        if (removedNode != 0)
+            DeleteEntry(this, removedNode);
     }
 
     template <typename CallbackType>
@@ -163,12 +175,36 @@ public:
         return true;
     }
 
+    bool Walk(const Function2<bool, const KeyType&, ValueType*>& callback)
+    {
+        return InorderWalk(m_Root, callback);
+    }
+
+    bool InorderWalk(Entry* curr,
+        const Function2<bool, const KeyType&, ValueType*>& callback)
+    {
+        while (curr != 0)
+        {
+            if (InorderWalk((Entry*)curr->node.left, callback))
+            {
+                if (callback(curr->key, &curr->value))
+                    curr = (Entry*)curr->node.right;
+                else
+                    return false;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     nlAVLTreeIterator<KeyType, ValueType, CompareType>* GetIterator();
 
     static void DeleteEntry(AVLTreeUntemplated* tree, AVLTreeNode* entry)
     {
-        AVLTreeBase* self = (AVLTreeBase*)tree;
-        self->m_Allocator.Free((Entry*)entry);
+        ((AVLTreeBase*)tree)->m_Allocator.Free((Entry*)entry);
     }
 
     static void DeleteValue(AVLTreeUntemplated* tree, AVLTreeNode* entry)
@@ -201,6 +237,11 @@ public:
         if (value != 0)
             newNode->value = *(ValueType*)value;
         return (AVLTreeNode*)newNode;
+    }
+
+    AllocatorType* GetAllocator()
+    {
+        return &m_Allocator;
     }
 
     AllocatorType m_Allocator;

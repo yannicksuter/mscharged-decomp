@@ -3,7 +3,7 @@
 
 #include "Game/GL/MeshWriter.h"
 
-#include "Game/GL/tu_802D38A4.h"
+#include "Game/GL/glModelBuilder.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
 
@@ -36,7 +36,7 @@ bool MeshWriter::Begin(int vertexCount, int primitive, void* allocator)
     }
     model = newModel;
 
-    fn_802D38A4(model, vertexCount, primitive, allocator, 2, 0xEE9D919D);
+    glCreateModel(model, vertexCount, primitive, allocator, 2, 0xEE9D919D);
 
     glModelStream* streams = model->packets->streams;
     int positionCount = vertexCount * 3;
@@ -57,7 +57,7 @@ bool MeshWriter::Begin(int vertexCount, int primitive, void* allocator)
         }
     }
     position = (float*)positionData;
-    fn_802D39CC(streams, 0, position, sizeof(float) * 3, 1);
+    glSetModelStream(streams, 0, position, sizeof(float) * 3, 1);
 
     int texcoordCount = vertexCount * 2;
     short* texcoordData;
@@ -77,7 +77,7 @@ bool MeshWriter::Begin(int vertexCount, int primitive, void* allocator)
         }
     }
     texcoord = texcoordData;
-    fn_802D39CC(streams + 1, 1, texcoord, sizeof(short) * 2, 4);
+    glSetModelStream(streams + 1, 1, texcoord, sizeof(short) * 2, 4);
 
     return true;
 }

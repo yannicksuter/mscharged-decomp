@@ -152,6 +152,37 @@ the renderer's ancestry. The original Charged filename and class name remain
 unidentified. The initializer's shared guarded object at `0x806E0B80` still
 lacks an identified type and header, so the unit remains `NonMatching`.
 
+`Game/Audio/AudioResourcePlatform.cpp` owns the resource loaders,
+report writer, static initialization, accessor, tree methods and destructors at
+`0x8035DE28..0x8035EF08`. The traversal and report share a 32-entry resident-bank
+tree keyed by memory-loader pointers, using `nlStaticArrayAllocator` and
+`Function2`. Each entry contains a 32-byte bank name and its size. The report writer's file
+handle is initialized after the tree; the initializer also requests the same guarded template statics
+used by other audio consumers. The stream-reader allocation and release paths
+reference the 16-entry stream-block allocator at `0x806E220C`.
+
+The portable bank-loader interface is separate from the platform loaders, and
+its chunk parser is defined as a member in `unclassified/tu_802EE964.cpp`. The
+manager accessor belongs to the audio interface header, and the platform
+loaders declare their own destructors. With file analysis, explicit inlining
+and per-header text sections, these definitions reproduce the loader vtable
+order and place the header-defined routines after static initialization. The
+unreferenced `blr` at `0x8035E63C` is the final instruction
+of `AudioMemoryLoader::ParseChunk`, not a separate empty function.
+All 19 methods now match, and the normal build links the unit from C++ while
+reproducing the retail DOL. Report content is written by an internal inline
+routine, with file opening and closing in `DumpAudioBankMemory`. The shared AVL
+tree uses its entry-deletion operation for both individual removal and clearing.
+These definitions also reproduce the retained helper order and initializer
+references. Audio filenames and descriptive identifiers are reconstruction
+names; no original debug identifiers survive in R4QE01.
+
+The resource loader retains the predecessor's three-argument
+`SPInitSoundTable` call, including the silence-buffer base in `r5`. The Wii
+implementation overwrites that register and does not use the third argument.
+The shared declaration preserves this compatibility, and `SPSoundTable` has a
+struct tag so game headers can forward-declare the SDK table type.
+
 `src/RVL_SDK/bte/` and `libs/RVL_SDK/include/private/bte/` do vendor Broadcom
 source. Both trees carry Broadcom's original copyright notice and its
 Apache-2.0 licence header, and each file records the Bluedroid path it came

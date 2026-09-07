@@ -1,4 +1,6 @@
+#include "Game/Sys/audio.h"
 #include "Game/CharacterTriggers.h"
+#include "Game/RumbleActions.h"
 #include "Game/Sys/debug.h"
 #include "Game/AnimInventory.h"
 #include "Game/AI/Fielder.h"
@@ -17,15 +19,9 @@
 #include "Game/SAnim.h"
 #include "NL/nlString.h"
 
-extern "C" EffectsGroup* fn_802E7CDC(
-    EmissionManager* manager, const char* name);
-extern "C" EmissionController* fn_802E7FE4(EmissionManager* manager,
-    EffectsGroup* group, int view, bool persistent, bool unknown);
-
 extern "C" bool fn_8001E168(const cCharacter* pCharacter);
-extern "C" void fn_800EC12C(unsigned long soundID, void* pParam);
+
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
-extern "C" void fn_80139D1C(int nPreset, DetInput* pPad);
 
 static inline void SetDefaultVelocity(EmissionController* pController)
 {
@@ -45,8 +41,7 @@ void KillStar(cFielder* pFielder)
     PowerupBase::StopPowerupInEffectSound(POWER_UP_STAR,
         PowerupBase::PWRUP_SOUND_IN_EFFECT,
         pFielder);
-    EffectsGroup* pGroup = fn_802E7CDC(
-        EmissionManager::Instance(), "star");
+    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("star");
     pFielder->KillEffect(pGroup);
     pFielder->EndBlur();
     pFielder->m_pEffectsTexturing = 0;
@@ -64,10 +59,8 @@ void EmitStar(cFielder* pFielder, bool bParam)
     if (!bParam)
     {
         const char* groupName = "star";
-        EffectsGroup* pGroup = fn_802E7CDC(
-            EmissionManager::Instance(), groupName);
-        EmissionController* pController = fn_802E7FE4(
-            EmissionManager::Instance(), pGroup, 3, true, false);
+        EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
+        EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
         SetDefaultVelocity(pController);
         pController->m_fGround = 0.02f;
         SetPoseUpdateCallback(pController);
@@ -105,10 +98,8 @@ void KillMushroom(cFielder* pFielder)
 void EmitMushroom(cFielder* pFielder, bool bParam)
 {
     const char* groupName = "mushroom";
-    EffectsGroup* pGroup = fn_802E7CDC(
-        EmissionManager::Instance(), groupName);
-    EmissionController* pController = fn_802E7FE4(
-        EmissionManager::Instance(), pGroup, 3, true, false);
+    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
+    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
     SetDefaultVelocity(pController);
     pController->m_fGround = 0.02f;
     SetPoseUpdateCallback(pController);
@@ -133,17 +124,15 @@ void EmitMushroom(cFielder* pFielder, bool bParam)
             pFielder);
         tDebugPrintManager::Print(DC_SOUND, "***EmitMushroom()***\n");
     }
-    fn_80139D1C(1, pFielder->GetGlobalPad());
+    PlayRumbleAction(1, pFielder->GetGlobalPad());
 }
 
 void EmitGoalieCatch(cPlayer* pPlayer, const char* name, bool bRumble)
 {
-    EmissionController* pController = fn_802E7FE4(
-        EmissionManager::Instance(),
-        fn_802E7CDC(EmissionManager::Instance(), name),
+    EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(name),
         3,
         true,
-        false);
+        0);
     SetDefaultVelocity(pController);
     pController->m_fGround = 0.02f;
     SetPoseUpdateCallback(pController);
@@ -162,15 +151,14 @@ bool KillDaze(cPlayer* player)
         unsigned long soundID = fn_8001E168(player)
                                   ? 0xFDC268FB
                                   : 0x1CCDFC62;
-        fn_800EC12C(soundID, player);
+        StopSound(soundID, player);
     }
     else
     {
-        fn_800EC12C(0x8F82BB80, player);
+        StopSound(0x8F82BB80, player);
     }
 
-    EffectsGroup* pGroup = fn_802E7CDC(
-        EmissionManager::Instance(), "dazed");
+    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("dazed");
     if (player->IsPlayingEffect(pGroup))
     {
         player->KillEffect(pGroup);
@@ -211,8 +199,7 @@ EmissionController* EmitGeneric(cCharacter* pCharacter, const char* baseName,
         nlStrNCat<char>(effectName, effectName, "_", 0x100);
         nlStrNCat<char>(effectName, effectName, "grass", 0x100);
 
-        pGroup = fn_802E7CDC(
-            EmissionManager::Instance(), effectName);
+        pGroup = EmissionManager::Instance()->GetEffectsGroup(effectName);
         if (pGroup == 0 && characterName[0] != '\0')
         {
             char fallbackName[0x100];
@@ -220,17 +207,15 @@ EmissionController* EmitGeneric(cCharacter* pCharacter, const char* baseName,
             nlStrNCat<char>(fallbackName, fallbackName, baseName, 0x100);
             nlStrNCat<char>(fallbackName, fallbackName, "_", 0x100);
             nlStrNCat<char>(fallbackName, fallbackName, "grass", 0x100);
-            pGroup = fn_802E7CDC(
-                EmissionManager::Instance(), fallbackName);
+            pGroup = EmissionManager::Instance()->GetEffectsGroup(fallbackName);
         }
     }
     else
     {
-        pGroup = fn_802E7CDC(EmissionManager::Instance(), baseName);
+        pGroup = EmissionManager::Instance()->GetEffectsGroup(baseName);
     }
 
-    EmissionController* pControl = fn_802E7FE4(
-        EmissionManager::Instance(), pGroup, 3, true, false);
+    EmissionController* pControl = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
     SetDefaultVelocity(pControl);
     pControl->m_fGround = 0.02f;
     SetPoseUpdateCallback(pControl);

@@ -377,7 +377,8 @@ void NetworkLobby_80133634::CloseConnections()
 
     int result = DWC_CloseAllConnectionsHard();
     tDebugPrintManager::Print(DC_NETWORK, "DWC_CloseAllConnectionsHard returned %d\n", result);
-    if (mMatchmakingThreadRunning || mState != 0)
+    bool failed = mMatchmakingThreadRunning || mState != 0;
+    if (failed)
     {
         mMatchFailed = true;
     }

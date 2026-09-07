@@ -77,6 +77,6 @@ public:
 
 RLView* GetLayerView(eCLV layer);
 
-RLView* fn_8027262C();
+RLView* GetUnshadowedView();
 
 #endif // GAME_RENDER_RL_VIEW_H

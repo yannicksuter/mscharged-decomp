@@ -250,7 +250,7 @@ extern "C" RLView* fn_8027261C()
     return sLayerViews[eCLV_Shadowed];
 }
 
-RLView* fn_8027262C()
+RLView* GetUnshadowedView()
 {
     return sLayerViews[eCLV_Unshadowed];
 }

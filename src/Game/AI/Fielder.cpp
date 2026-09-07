@@ -1,4 +1,6 @@
 #include "Game/AI/Fielder.h"
+#include "Game/Audio/GameStreams.h"
+#include "Game/RumbleActions.h"
 #include "Game/AI/FielderDesireMachine.h"
 #include "Game/AI/FielderInput.h"
 #include "Game/AI/AIPad.h"
@@ -7,7 +9,7 @@
 #include "Game/AI/DesireSteering.h"
 #include "Game/AI/DesireUsePowerup.h"
 #include "Game/AI/HeadTrack.h"
-#include "Game/AI/UnidentifiedAvoidanceObject.h"
+#include "Game/AI/AvoidableObject.h"
 #include "NL/nlMain.h"
 #include "NL/nlSlotPool.h"
 
@@ -74,10 +76,8 @@ extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_80035194(cFielder*, nlVector3&, nlVector3&, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
 extern "C" void fn_8005ED64(void*, void*);
-extern "C" void fn_80139D1C(int, DetInput*);
 extern "C" bool fn_8002F310(cFielder* pFielder);
 extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
-extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 extern "C" void fn_8001F16C(cCharacter*);
 extern "C" void fn_8001F1C0(cCharacter*, int);
@@ -914,20 +914,20 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 
             if (canPickup)
             {
-                fn_800EBBFC(0, 0xE89BA529, 0, 0);
+                PlaySound(0, 0xE89BA529, 0, 0);
             }
             else
             {
                 switch (nUnidentified)
                 {
                 case 0:
-                    fn_800EBBFC(0, 0x057208DA, 0, 0);
+                    PlaySound(0, 0x057208DA, 0, 0);
                     break;
                 case 1:
-                    fn_800EBBFC(0, 0xECE94BBB, 0, 0);
+                    PlaySound(0, 0xECE94BBB, 0, 0);
                     break;
                 case 2:
-                    fn_800EBBFC(0, 0xE8120AC5, 0, 0);
+                    PlaySound(0, 0xE8120AC5, 0, 0);
                     break;
                 }
             }
@@ -939,12 +939,12 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             pAttackData->pAttacker = pFielderCollidedWith;
             u8 bHasGlobalPad = pFielderCollidedWith->GetGlobalPad() != 0;
             pAttackData->nAttackerPadID = bHasGlobalPad
-                ? pFielderCollidedWith->GetGlobalPad()->fn_80332748() : -1;
+                ? pFielderCollidedWith->GetGlobalPad()->GetPadID() : -1;
             pAttackData->pTarget = this;
             pAttackData->mUnidentified0C = nUnidentified;
             pAttackData->mUnidentified10 = false;
             fn_8005ED64(g_pGame, pAttackData);
-            fn_80139D1C(2, pFielderCollidedWith->GetGlobalPad());
+            PlayRumbleAction(2, pFielderCollidedWith->GetGlobalPad());
         }
         else if (pFielderCollidedWith->fn_80038660() && m_eActionState != ACTION_HIT)
         {
@@ -1147,7 +1147,7 @@ void cFielder::CollideWithWallCallback(
             {
                 soundID = 0x5089F33E;
             }
-            fn_800ED92C(soundID);
+            PlayCrowdReaction(soundID);
         }
     }
     else if (m_eActionState != (eFielderActionState)3
@@ -1183,7 +1183,7 @@ void cFielder::fn_80099074(UnidentifiedEventData24* eventData)
                 ShootBallDueToContact(eventData->mUnidentified10->m_Velocity);
             }
             fn_8004E11C(lbl_806DB788);
-            fn_80139D1C(2, GetGlobalPad());
+            PlayRumbleAction(2, GetGlobalPad());
         }
     }
     else if (type == 0)
@@ -1303,20 +1303,20 @@ void cFielder::fn_80099074(UnidentifiedEventData24* eventData)
                 {
                     pOwner->fn_80047240(this,
                         pOwner->m_aActualFacingDirection + 0x8000, 1, false, false);
-                    fn_800EBBFC(0, 0xECE94BBB, 0, 0);
+                    PlaySound(0, 0xECE94BBB, 0, 0);
                 }
                 else
                 {
                     fn_80047240(pOwner, pOwner->m_aActualFacingDirection, 0, false, false);
-                    fn_800EBBFC(pOwner->mUnidentified318, 0x9E87FEBC, 0, 0);
-                    fn_80139D1C(2, pOwner->GetGlobalPad());
+                    PlaySound(pOwner->mUnidentified318, 0x9E87FEBC, 0, 0);
+                    PlayRumbleAction(2, pOwner->GetGlobalPad());
                 }
             }
             else if (!IsOnSameTeam(pOwner))
             {
                 fn_80047240(pOwner, pOwner->m_aActualFacingDirection, 1, false, true);
-                fn_800EBBFC(pOwner->mUnidentified318, 0x9E87FEBC, 0, 0);
-                fn_80139D1C(2, pOwner->GetGlobalPad());
+                PlaySound(pOwner->mUnidentified318, 0x9E87FEBC, 0, 0);
+                PlayRumbleAction(2, pOwner->GetGlobalPad());
             }
         }
     }
@@ -1330,7 +1330,7 @@ void cFielder::fn_80099074(UnidentifiedEventData24* eventData)
             && m_eActionState != (eFielderActionState)0x18
             && m_eActionState != (eFielderActionState)0x23)
         {
-            fn_80139D1C(3, GetGlobalPad());
+            PlayRumbleAction(3, GetGlobalPad());
             nlVector3 v3Unidentified = m_v3Velocity;
             v3Unidentified.z = 25.0f;
             fn_80044148(v3Unidentified);
@@ -1343,7 +1343,7 @@ void cFielder::fn_80099074(UnidentifiedEventData24* eventData)
             && !fn_8003EA6C() && !IsInvincible()
             && !IsCharacterInAir(eventData->mUnidentified10->GetRadius()))
         {
-            fn_80139D1C(3, GetGlobalPad());
+            PlayRumbleAction(3, GetGlobalPad());
             nlVector3 v3Start;
             nlVec3ScaleAdd(v3Start, -100.0f,
                 eventData->mUnidentified10->fn_80173CCC(),
@@ -1661,7 +1661,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
 
     case ACTION_SLIDE_ATTACK:
         fn_801BB5DC(this, 0);
-        fn_800EC12C(0x2AE03886, this);
+        StopSound(0x2AE03886, this);
         break;
 
     case 0x1C:
@@ -1908,7 +1908,7 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
     Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
 
     float kBallAllowance = 0.18f + cNet::m_fNetPostRadius;
-    kBallAllowance += lbl_8056CF08.m_pGameTweaks->fShotPostOffset;
+    kBallAllowance += gGameTweaks.m_pGameTweaks->fShotPostOffset;
     float fDist2NetSide = 0.5f * cNet::m_fNetWidth - kBallAllowance;
     cNet* pNet = m_pTeam->GetOtherNet();
     nlVector3 v3Target;
@@ -2084,7 +2084,7 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
         else
         {
             float fHeightVariance = InterpolateRangeClamped(1.0f, 0.2f, 1.0f, 0.0f, m_pTweaks->fShooting);
-            float fHeightAllowance = 0.18f + lbl_8056CF08.m_pGameTweaks->mUnidentified984;
+            float fHeightAllowance = 0.18f + gGameTweaks.m_pGameTweaks->fShotHeightOffsetFromPost;
             float fAllowableHeight = cNet::m_fNetHeight - 2.0f * fHeightAllowance;
             float fMinimumHeight = (1.0f - fHeightVariance) * fAllowableHeight;
             v3PositionOut.z = fMinimumHeight + fHeightAllowance + nlRandomf(fHeightVariance * fAllowableHeight);
@@ -2250,7 +2250,7 @@ void cFielder::DoRegularShooting(bool bParam)
     }
     if (g_pGame->IsGameplayOrOvertime())
     {
-        ShotAtGoalData* pShotData = lbl_80571820.Allocate();
+        ShotAtGoalData* pShotData = gShotAtGoalDataPool.Allocate();
         pShotData->pShooter = this;
         fn_8005EED0(g_pGame, pShotData);
         if (nBallState != 8)
@@ -2621,7 +2621,7 @@ void cFielder::PrePhysicsUpdate()
 
 void cFielder::Update(float fDeltaT)
 {
-    fn_800EDCE8(this);
+    SetPlayerAudioController(this);
     fn_8003EAC0(this, fDeltaT);
     cPlayer::Update(fDeltaT);
     mUnidentified428->fn_8030F800(true, fDeltaT);
@@ -2859,7 +2859,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         PlayerAttackData* pAttackData = lbl_80571960.Allocate();
         pAttackData->pAttacker = this;
         u8 bHasGlobalPad = GetGlobalPad() != NULL;
-        pAttackData->nAttackerPadID = bHasGlobalPad ? GetGlobalPad()->fn_80332748() : -1;
+        pAttackData->nAttackerPadID = bHasGlobalPad ? GetGlobalPad()->GetPadID() : -1;
         pAttackData->pTarget = pOpponent;
         pAttackData->mUnidentified0C = 2;
         pAttackData->mUnidentified10 = false;
@@ -2875,7 +2875,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         PlayerAttackData* pAttackData = lbl_80571960.Allocate();
         pAttackData->pAttacker = pOpponent;
         u8 bHasGlobalPad = pOpponent->GetGlobalPad() != NULL;
-        pAttackData->nAttackerPadID = bHasGlobalPad ? pOpponent->GetGlobalPad()->fn_80332748() : -1;
+        pAttackData->nAttackerPadID = bHasGlobalPad ? pOpponent->GetGlobalPad()->GetPadID() : -1;
         pAttackData->pTarget = this;
         pAttackData->mUnidentified0C = 2;
         pAttackData->mUnidentified10 = false;
@@ -3791,4 +3791,9 @@ float cNet::GetNetWidth()
 
 void Desire::UnidentifiedVirtual7(void*, DebugWriteCache*)
 {
+}
+
+PlayerTweaks* cFielder::GetTweaks() const
+{
+    return m_pTweaks;
 }

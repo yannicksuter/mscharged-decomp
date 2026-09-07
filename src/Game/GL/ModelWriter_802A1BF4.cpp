@@ -4,7 +4,7 @@
 #include "Game/GL/ModelWriter_802A1BF4.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
-#include "Game/GL/tu_802D38A4.h"
+#include "Game/GL/glModelBuilder.h"
 
 
 ModelWriter_802A1BF4::ModelWriter_802A1BF4()
@@ -38,7 +38,7 @@ bool ModelWriter_802A1BF4::fn_802A1C54(
     }
     model = newModel;
 
-    fn_802D38A4(
+    glCreateModel(
         model, vertexCount, primitive, allocator, 3, 0xCFB7215C);
 
     glModelStream* streams = model->packets->streams;
@@ -62,7 +62,7 @@ bool ModelWriter_802A1BF4::fn_802A1C54(
         }
     }
     position = positionData;
-    fn_802D39CC(streams, 0, position, sizeof(float) * 3, 1);
+    glSetModelStream(streams, 0, position, sizeof(float) * 3, 1);
 
     int texcoordCount = vertexCount * 2;
     short* texcoordData;
@@ -84,7 +84,7 @@ bool ModelWriter_802A1BF4::fn_802A1C54(
         }
     }
     texcoord = texcoordData;
-    fn_802D39CC(streams + 1, 1, texcoord, sizeof(short) * 2, 4);
+    glSetModelStream(streams + 1, 1, texcoord, sizeof(short) * 2, 4);
 
     u32* colourData;
     if (vertexCount == 0)
@@ -104,7 +104,7 @@ bool ModelWriter_802A1BF4::fn_802A1C54(
         }
     }
     colour = colourData;
-    fn_802D39CC(streams + 2, 2, colour, sizeof(u32), 3);
+    glSetModelStream(streams + 2, 2, colour, sizeof(u32), 3);
 
     return true;
 }

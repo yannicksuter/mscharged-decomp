@@ -9,11 +9,6 @@
 #include "Game/Debug/ShapeRender.h"
 #include "Game/Field.h"
 
-static inline int min(int a, int b)
-{
-    return a <= b ? a : b;
-}
-
 /**
  * Offset/Address/Size: 0x14 | 0x800A3FDC | size: 0x40
  */
@@ -111,7 +106,7 @@ float SpaceSearch::FindBestPosition(
     aToAngle = (int)((float)aDirection + 0.5f * (float)aSearchCone);
     aDelta = (short)(aToAngle - aFromAngle);
 
-    numRadiusSteps = min(5, (int)(0.5f + (fMaxRadius - fMinRadius) / 1.5f));
+    numRadiusSteps = nlMin(5, (int)(0.5f + (fMaxRadius - fMinRadius) / 1.5f));
 
     fRadiusDelta = (fMaxRadius - fMinRadius) / (float)numRadiusSteps;
 
@@ -131,7 +126,7 @@ float SpaceSearch::FindBestPosition(
 
         aAngleDelta = (unsigned short)(int)(65536.0f
                                             * (1.5f / (6.2831855f * pLocation.r)));
-        numAngleSteps = min(10,
+        numAngleSteps = nlMin(10,
             (int)(0.5f
                   + (float)(unsigned short)aDelta / (float)aAngleDelta));
 

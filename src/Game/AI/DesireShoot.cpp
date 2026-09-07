@@ -19,7 +19,6 @@ struct UnidentifiedDesireMachine
 extern "C" int fn_8002E9D0(cFielder*);
 extern "C" bool fn_8002F858(cFielder*, bool);
 extern "C" bool fn_8003C180(cFielder*);
-extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002C7E8(PlayerTweaks*);
 extern "C" UnidentifiedDesireMachine* fn_80316974(void*);
 extern "C" void fn_8031998C(
@@ -76,7 +75,7 @@ bool DesireShoot::UnidentifiedInitialize(void* context)
 
     if (fn_8003C180(mUnidentifiedFielder))
     {
-        mUnidentifiedFielder->m_pShotMeter->m_fTime = 0.1f + (float)nlRandom((unsigned int)(fn_8002C7E8(fn_8003E6E4(mUnidentifiedFielder)) - 0.2f));
+        mUnidentifiedFielder->m_pShotMeter->m_fTime = 0.1f + (float)nlRandom((unsigned int)(fn_8002C7E8(mUnidentifiedFielder->GetTweaks()) - 0.2f));
     }
 
     if (mUnidentifiedFielder->m_pBall != NULL)

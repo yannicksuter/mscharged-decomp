@@ -99,7 +99,7 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
     glSetCurrentTexture(glGetTexture("global/bulletbillshadow"), GLTT_Diffuse);
     glSetTextureState(GLTS_DiffuseWrap, 3);
     glSetCurrentTextureState(glHandleizeTextureState());
-    quad.Attach((eGLView)(u32)fn_8027262C(), 0);
+    quad.Attach((eGLView)(u32)GetUnshadowedView(), 0);
 }
 
 DrawableBulletBill::DrawableBulletBill()

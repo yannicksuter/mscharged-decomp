@@ -5,6 +5,8 @@
 #include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
 
+class cCharacter;
+
 class PhysicsSphere_80175F8C : public PhysicsSphere
 {
 public:
@@ -39,5 +41,7 @@ public:
     /* 0x58 */ int sourceIndex;
     /* 0x5C */ bool finished;
 }; // size: 0x60
+
+PhysicsSphere_80175F8C* CreateDaisyFistImpact(const nlVector3* position, cCharacter* owner);
 
 #endif // UNCLASSIFIED_TU_80175F8C_H

@@ -1,4 +1,6 @@
+#include "Game/Sys/audio.h"
 #include "Game/Goalie.h"
+#include "Game/RumbleActions.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AIPad.h"
@@ -164,7 +166,7 @@ extern "C" void fn_8001AD24(
     LiveBallTrail* pBallTrail, cFielder* pFielder);
 extern "C" void fn_802779EC(
     nlVector3& v3Result, float fParam1, float fParam2, float fParam3);
-extern "C" void fn_800EDCE8(cPlayer* pPlayer);
+
 extern "C" bool fn_8007BF68(Goalie* pGoalie, bool bParam);
 extern "C" bool fn_8007C590(Goalie* pGoalie);
 extern "C" bool fn_8007D644(Goalie* pGoalie);
@@ -203,13 +205,11 @@ extern "C" void fn_8005E800(
 extern "C" void fn_80080638(
     Goalie* pGoalie, cFielder* pFielder, bool bParam);
 extern "C" void fn_80080BFC(Goalie* pGoalie, float fDeltaT);
-extern "C" void fn_800EBBFC(
-    unsigned int nParam0, unsigned int nParam1, int nParam2, int nParam3);
+
 extern "C" bool fn_80331C04(
     DetInput* pGlobalPad, int nButton, bool bRemap);
 extern "C" void fn_80097574(
     cPlayer* pPlayer, int nNodeIndex, int nAnimID, float fParam);
-extern "C" void fn_80139D1C(int nParam, void* pParam);
 extern "C" void fn_801BABEC(cPlayer* pPlayer);
 extern "C" void fn_801BAF0C(cPlayer* pPlayer);
 extern "C" void fn_801B8B38(cPlayer* pPlayer);
@@ -868,7 +868,7 @@ void Goalie::fn_80083960(float)
             unsigned short aDirection
                 = (unsigned short)(m_aActualFacingDirection + 0x9FF6);
             fn_8003C5D8(mpMonty, true, aDirection);
-            fn_800EBBFC(mUnidentified318, 0x4AE0B399, 0, 0);
+            PlaySound(mUnidentified318, 0x4AE0B399, 0, 0);
         }
 
         if (m_pCurrentAnimController->m_fTime >= fGrabTime
@@ -913,7 +913,7 @@ void Goalie::fn_80083960(float)
                 }
 
                 fn_8004F204(mpMonty);
-                fn_800EBBFC(mUnidentified318, 0x76520305, 0, 0);
+                PlaySound(mUnidentified318, 0x76520305, 0, 0);
 
                 nlVector3 v3Position
                     = GetJointPosition(m_nRightHandJointIndex);
@@ -1129,7 +1129,7 @@ void Goalie::fn_8008418C(float fDeltaT)
             fn_8001AA0C(pBallTrail, true);
             pBallTrail->velocity = v3Velocity;
             fn_8001AD24(pBallTrail, mpShooter);
-            fn_800EBBFC(0, 0x2C17978A, 0, 0);
+            PlaySound(0, 0x2C17978A, 0, 0);
 
             nlVec3CrossProduct(v3Rotation, v3Axis, v3Velocity);
             nlVec3Scale(v3Rotation, 2.0f + nlRandomf(1.0f));
@@ -1220,9 +1220,9 @@ bool Goalie::fn_80084724(unsigned int nParam, float* pScore)
 
         if (!pCandidate->mUnidentified04C.mUnidentified01C)
         {
-            fn_800EDCE8(this);
-            fn_800EBBFC(0, 0xCC36B742, 0, 0);
-            fn_800EBBFC(0, 0x1B662C5F, 0, 0);
+            SetPlayerAudioController(this);
+            PlaySound(0, 0xCC36B742, 0, 0);
+            PlaySound(0, 0x1B662C5F, 0, 0);
             fn_801A7610(pCandidate);
             continue;
         }
@@ -1281,7 +1281,7 @@ void Goalie::fn_80084840(UnidentifiedMegaBallState* pState)
         = nlMinEquals(nlMaxEquals(fZ, 0.25f), fZLimit);
 
     mbCheckForMegaGoal = true;
-    fn_800EBBFC(0, 0x5CD383D8, 0, 0);
+    PlaySound(0, 0x5CD383D8, 0, 0);
 
     nlVec3Sub(v3Velocity, v3TargetPosition, pBallTrail->position);
     nlVec3Scale(v3Velocity, 10.0f);
@@ -1317,9 +1317,9 @@ void Goalie::fn_80084AE0(UnidentifiedMegaBallState* pState)
         pBallTrail->velocity = v3Velocity;
         fn_8001AA0C(pBallTrail, false);
 
-        fn_800EBBFC(0, 0xE335EFF5, 0, 0);
-        fn_800EBBFC(0, 0x848EBDEB, 0, 0);
-        fn_80139D1C(1, GetGlobalPad());
+        PlaySound(0, 0xE335EFF5, 0, 0);
+        PlaySound(0, 0x848EBDEB, 0, 0);
+        PlayRumbleAction(1, GetGlobalPad());
     }
 
     for (unsigned int i = 0;
@@ -2157,7 +2157,7 @@ void Goalie::ActionMove(float deltaTime)
         if (m_pBall != 0)
         {
             DetInput* pGlobalPad = GetGlobalPad();
-            fn_80139D1C(1, pGlobalPad);
+            PlayRumbleAction(1, pGlobalPad);
             ReleaseBall(0);
         }
         SetNoPickUpTime(0.2f);
@@ -2658,7 +2658,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
                 mfTargetTime = 0.0f;
                 PlayNewAnim(0x0B);
                 InitMovementFromAnim(0, v3Zero, 1.0f, false);
-                fn_800EBBFC(9, 0x87F93D32, 0, 0);
+                PlaySound(9, 0x87F93D32, 0, 0);
             }
         }
 
@@ -2954,7 +2954,7 @@ bool Goalie::fn_80090958(bool bParam)
         }
     }
 
-    fn_800EBBFC(
+    PlaySound(
         mpSkillShooter->mUnidentified318, 0xB721918A, 0, 0);
     mbDoHeadTrack = false;
     mpSkillShooter = 0;
@@ -3310,7 +3310,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
 
             if (m_pBall != 0)
             {
-                fn_80139D1C(1, GetGlobalPad());
+                PlayRumbleAction(1, GetGlobalPad());
                 ReleaseBall(false);
             }
 
@@ -3501,7 +3501,7 @@ void Goalie::ActionPursueBallPounce(float fDeltaT)
 
         if (m_pBall != 0)
         {
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
             ReleaseBall(false);
         }
 
@@ -3802,7 +3802,7 @@ void Goalie::fn_8008A610(float fDeltaT)
             m_fDesiredSpeed = 0.0f;
             m_fActualSpeed = 0.0f;
             SetVelocity(v3Zero);
-            fn_800EBBFC(mUnidentified318, 0x76520305, 0, 0);
+            PlaySound(mUnidentified318, 0x76520305, 0, 0);
             return;
         }
 
@@ -5936,7 +5936,7 @@ void Goalie::fn_8008E69C(float fDeltaT)
 
         if (m_pBall != 0)
         {
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
             ReleaseBall(0);
         }
 
@@ -6366,7 +6366,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
 
         if (m_pBall != 0)
         {
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
             ReleaseBall(0);
         }
 
@@ -6555,7 +6555,7 @@ void Goalie::fn_8008EC2C()
 
         if (m_pBall != 0)
         {
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
             ReleaseBall(0);
         }
 
@@ -6630,7 +6630,7 @@ void Goalie::fn_8008ED44(bool bParam)
 
         if (m_pBall != 0)
         {
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
             ReleaseBall(0);
         }
 
@@ -6782,7 +6782,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
     fEnergyLevel -= lbl_806DBCB4 * fn_800156A8(g_pBall);
     if (fEnergyLevel < lbl_806DBCB8)
     {
-        fn_800EBBFC(9, 0x90A88490, 0, 0);
+        PlaySound(9, 0x90A88490, 0, 0);
     }
 
     float fUnidentifiedRange = InterpolateRangeClamped(

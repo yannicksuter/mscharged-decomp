@@ -11,6 +11,7 @@
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/TweakValue.h"
 #include "NL/gl/glMemory.h"
+#include "NL/gl/glState.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -591,31 +592,42 @@ FEModelHandle* fn_801C2FB4(FEModelManager* manager, const char* name)
 
 FEImpostorCharacter_801C3100::FEImpostorCharacter_801C3100(
     const char* name, ImpostorModel_802DAEE0* model, void* animations,
-    int budget, bool animationFlag, bool alternate,
+    int budget, bool mirror, bool alternate,
     const ImpostorCharacterParams* params, int modelType)
     : ImpostorCharacterImpl_8052E9B8(
         name, model, animations, budget, 1, 1, params)
-    , mEnabled(true)
     , mModelType(modelType)
 {
-    (void)animationFlag;
-    (void)alternate;
-    char category[128];
-    nlSNPrintf(category, 128,
-        "/Render/Impostor/CharacterTweaks/%s", name);
+    model->PlayAnimation((const char*)animations, 0.0f, PM_HOLD);
+    model->mAnimController->m_bMirror = mirror;
+    mEnabled = true;
+    if (alternate)
+    {
+        char originalTexture[64];
+        char alternateTexture[64];
+        nlSNPrintf(originalTexture, sizeof(originalTexture), "%s/%s", name, name);
+        nlSNPrintf(alternateTexture, sizeof(alternateTexture), "%s_alt/%s_alt", name, name);
+        unsigned long original = glGetTexture(originalTexture);
+        unsigned long replacement = glGetTexture(alternateTexture);
+        model->mOriginalTexture = original;
+        model->SetReplacementTexture(replacement);
+    }
 
-    mfScaleInitialCup.fn_802C4FEC(
-        "mfScaleInitialCup", 0.0f, category, true, 0.0f, 3.0f);
-    mfCameraLookatZInitialCup.fn_802C4FEC(
-        "mfCameraLookatZInitialCup", 0.0f, category, true, -0.5f, 3.0f);
-    mfCameraDistanceInitialCup.fn_802C4FEC(
-        "mfCameraDistanceInitialCup", 0.0f, category, true, 0.0f, 3.0f);
-    mfScaleCup.fn_802C4FEC(
-        "mfScaleCup", 0.0f, category, true, 0.0f, 3.0f);
-    mfCameraLookatZCup.fn_802C4FEC(
-        "mfCameraLookatZCup", 0.0f, category, true, -0.5f, 3.0f);
-    mfCameraDistanceCup.fn_802C4FEC(
-        "mfCameraDistanceCup", 0.0f, category, true, 0.0f, 3.0f);
+    char category[128];
+    nlSNPrintf(category, sizeof(category),
+        "/Render/Impostor/CharacterTweaks/%s", name);
+    mfScaleInitialCup.BindWithDefault(
+        "mfScaleInitialCup", 1.0f, category, true, 0.0f, 3.0f, 0.001f);
+    mfCameraLookatZInitialCup.BindWithDefault(
+        "mfCameraLookatZInitialCup", 1.2f, category, true, 0.0f, 10.0f, 0.01f);
+    mfCameraDistanceInitialCup.BindWithDefault(
+        "mfCameraDistanceInitialCup", 2.3f, category, true, 0.0f, 40.0f, 0.01f);
+    mfScaleCup.BindWithDefault(
+        "mfScaleCup", 1.0f, category, true, 0.0f, 3.0f, 0.001f);
+    mfCameraLookatZCup.BindWithDefault(
+        "mfCameraLookatZCup", 1.2f, category, true, 0.0f, 10.0f, 0.01f);
+    mfCameraDistanceCup.BindWithDefault(
+        "mfCameraDistanceCup", 2.3f, category, true, 0.0f, 40.0f, 0.01f);
 }
 
 void FEImpostorCharacter_801C3100::SetScale(float scale)

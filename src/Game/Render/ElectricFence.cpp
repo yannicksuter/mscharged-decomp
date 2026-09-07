@@ -15,9 +15,6 @@
 class EffectsGroup;
 
 extern "C" float AIsgn(float);
-extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
-extern "C" EmissionController* fn_802E7FE4(
-    EmissionManager*, EffectsGroup*, int, bool, bool);
 extern "C" void* memcpy(void*, const void*, unsigned long);
 
 static float sfGridTextureSize = 7.0f;
@@ -382,12 +379,10 @@ bool EmitElectricFenceBallEffect(const nlVector3& pos,
 
     groupName = bNoSpark ? "electric_fence_nospark" : "electric_fence";
     if (!EmissionManager::Instance()->IsPlaying(emitterID,
-            fn_802E7CDC(EmissionManager::Instance(), groupName)))
+            EmissionManager::Instance()->GetEffectsGroup(groupName)))
     {
-        controller = fn_802E7FE4(
-            EmissionManager::Instance(),
-            fn_802E7CDC(EmissionManager::Instance(), groupName),
-            3, true, false);
+        controller = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(groupName),
+            3, true, 0);
         controller->m_uUserData = emitterID;
         controller->SetPosition(clampedPos);
 
@@ -414,14 +409,10 @@ void EmitElectricFenceCharacterEffect(const nlVector3& pos,
     EmissionController* controller;
 
     if (!EmissionManager::Instance()->IsPlaying(emitterID,
-            fn_802E7CDC(EmissionManager::Instance(),
-                "electric_fence_character")))
+            EmissionManager::Instance()->GetEffectsGroup("electric_fence_character")))
     {
-        controller = fn_802E7FE4(
-            EmissionManager::Instance(),
-            fn_802E7CDC(EmissionManager::Instance(),
-                "electric_fence_character"),
-            3, true, false);
+        controller = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("electric_fence_character"),
+            3, true, 0);
         controller->m_uUserData = emitterID;
         controller->SetPosition(pos);
 

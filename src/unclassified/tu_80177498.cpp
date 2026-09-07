@@ -1,4 +1,4 @@
-#include "Game/AI/UnidentifiedAvoidanceObject.h"
+#include "Game/AI/AvoidableObject.h"
 #include "unclassified/tu_80177498.h"
 
 #include "Game/AI/Fielder.h"
@@ -24,9 +24,6 @@ extern "C" bool fn_802B6BC8(const nlVector3*, const nlVector3*,
     const nlVector3*, const nlVector3*, float*, float*);
 extern "C" void fn_8014A180(void*);
 extern "C" void fn_802E8A2C(EmissionManager*, EffectsGroup*);
-extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
-extern "C" EmissionController* fn_802E7FE4(
-    EmissionManager*, EffectsGroup*, int, bool, bool);
 
 extern "C" void fn_80179390(EmissionController&, int);
 extern "C" void fn_801793D8(EmissionController&);
@@ -101,8 +98,8 @@ inline PhysicsBox_80177498::PhysicsBox_80177498(
     SetCollide(0x1B062);
 
     mUnidentified068 = new (nlMalloc(
-        sizeof(UnidentifiedAvoidancePolygon_804F4750), 8, false))
-        UnidentifiedAvoidancePolygon_804F4750(
+        sizeof(AvoidablePolygon), 8, false))
+        AvoidablePolygon(
             4, mUnidentified038, mUnidentified044, lbl_806DCB18);
 }
 
@@ -349,8 +346,7 @@ WaluigiWallManager_80178400::~WaluigiWallManager_80178400()
             mUnidentified000[i] = 0;
         }
     }
-    EffectsGroup* pGroup = fn_802E7CDC(
-        EmissionManager::Instance(), lbl_80511054);
+    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(lbl_80511054);
     fn_802E8A2C(EmissionManager::Instance(), pGroup);
     mUnidentified050 = 0;
     mUnidentified054 = 0;
@@ -396,11 +392,11 @@ PhysicsBox_80177498* WaluigiWallManager_80178400::fn_80178968(
     if (!mUnidentified05C)
     {
         EmissionManager* pManager = EmissionManager::Instance();
-        EffectsGroup* pGroup = fn_802E7CDC(pManager, lbl_80511054);
+        EffectsGroup* pGroup = pManager->GetEffectsGroup(lbl_80511054);
         if (pGroup != 0)
         {
             EmissionController* pController
-                = fn_802E7FE4(pManager, pGroup, 3, true, false);
+                = pManager->Create(pGroup, 3, true, 0);
             if (pController != 0)
             {
                 pController->SetPosition(pParam->m_v3Position);
@@ -426,8 +422,7 @@ void WaluigiWallManager_80178400::fn_80178D0C()
             mUnidentified000[i] = 0;
         }
     }
-    EffectsGroup* pGroup = fn_802E7CDC(
-        EmissionManager::Instance(), lbl_80511054);
+    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(lbl_80511054);
     fn_802E8A2C(EmissionManager::Instance(), pGroup);
     mUnidentified050 = 0;
     mUnidentified054 = 0;
@@ -556,8 +551,7 @@ extern "C" void fn_801794A4(cFielder* pParam)
     PhysicsBox_80177498* pObject = pManager->mUnidentified050;
     if (pObject != 0)
     {
-        EffectsGroup* pGroup = fn_802E7CDC(
-            EmissionManager::Instance(), lbl_80511054);
+        EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(lbl_80511054);
         if (EmissionManager::Instance()->IsPlaying(
                 (unsigned long)pObject, pGroup))
         {
@@ -588,8 +582,7 @@ extern "C" void fn_80179580(cFielder* pParam)
     PhysicsBox_80177498* pObject = pManager->mUnidentified050;
     if (pObject != 0)
     {
-        EffectsGroup* pGroup = fn_802E7CDC(
-            EmissionManager::Instance(), lbl_80511054);
+        EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(lbl_80511054);
         if (EmissionManager::Instance()->IsPlaying(
                 (unsigned long)pObject, pGroup))
         {

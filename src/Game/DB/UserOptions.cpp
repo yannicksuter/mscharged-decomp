@@ -1,6 +1,6 @@
 #include "Game/DB/UserOptions.h"
 
-#include "Game/Audio/AudioLoadMode_806E201C.h"
+#include "Game/Audio/AudioSystem.h"
 
 #include <string.h>
 
@@ -33,7 +33,7 @@ void AudioSettings::ApplySettings()
 {
     MusicVolume = MusicVolume < 0 ? 0 : MusicVolume;
     MusicVolume = MusicVolume > 10 ? 10 : MusicVolume;
-    AudioValues_801098E4* pValues = lbl_806E201C->m_unkCC->m_unk10->m_unk08;
+    AudioValues* pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
     float volume = VOLUME_TABLE[MusicVolume];
     if (volume < pValues->m_unk68)
     {
@@ -51,7 +51,7 @@ void AudioSettings::ApplySettings()
 
     SFXVolume = SFXVolume < 0 ? 0 : SFXVolume;
     SFXVolume = SFXVolume > 10 ? 10 : SFXVolume;
-    pValues = lbl_806E201C->m_unkCC->m_unk10->m_unk08;
+    pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
     volume = VOLUME_TABLE[SFXVolume];
     if (volume < pValues->m_unkB8)
     {
@@ -69,7 +69,7 @@ void AudioSettings::ApplySettings()
 
     VoiceVolume = VoiceVolume < 0 ? 0 : VoiceVolume;
     VoiceVolume = VoiceVolume > 10 ? 10 : VoiceVolume;
-    pValues = lbl_806E201C->m_unkCC->m_unk10->m_unk08;
+    pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
     volume = VOLUME_TABLE[VoiceVolume];
     if (volume < pValues->m_unk90)
     {
@@ -90,7 +90,7 @@ void AudioSettings::fn_80109A50()
 {
     MusicVolume = MusicVolume < 0 ? 0 : MusicVolume;
     MusicVolume = MusicVolume > 10 ? 10 : MusicVolume;
-    AudioValues_801098E4* pValues = lbl_806E201C->m_unkCC->m_unk10->m_unk08;
+    AudioValues* pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
     float volume = VOLUME_TABLE[MusicVolume];
     if (volume < pValues->m_unk68)
     {
@@ -111,7 +111,7 @@ void AudioSettings::fn_80109ACC()
 {
     SFXVolume = SFXVolume < 0 ? 0 : SFXVolume;
     SFXVolume = SFXVolume > 10 ? 10 : SFXVolume;
-    AudioValues_801098E4* pValues = lbl_806E201C->m_unkCC->m_unk10->m_unk08;
+    AudioValues* pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
     float volume = VOLUME_TABLE[SFXVolume];
     if (volume < pValues->m_unkB8)
     {
@@ -132,7 +132,7 @@ void AudioSettings::fn_80109B48()
 {
     VoiceVolume = VoiceVolume < 0 ? 0 : VoiceVolume;
     VoiceVolume = VoiceVolume > 10 ? 10 : VoiceVolume;
-    AudioValues_801098E4* pValues = lbl_806E201C->m_unkCC->m_unk10->m_unk08;
+    AudioValues* pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
     float volume = VOLUME_TABLE[VoiceVolume];
     if (volume < pValues->m_unk90)
     {

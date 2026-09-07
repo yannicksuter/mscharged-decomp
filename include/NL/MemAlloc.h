@@ -19,8 +19,8 @@ public:
     void* Allocate(unsigned long size, unsigned int alignment, bool fromEnd);
     void Free(void* ptr);
 
-    void* fn_802AE92C(unsigned long size, unsigned int alignment);
-    void* fn_802AED20(unsigned long size, unsigned int alignment);
+    void* AllocateFromStart(unsigned long size, unsigned int alignment);
+    void* AllocateFromEnd(unsigned long size, unsigned int alignment);
     void AddBlock(void* memory, unsigned int size);
 
     FreeBlockList* m_free_block_list;

@@ -84,10 +84,7 @@ extern "C" void fn_802DB9C4(
 
     for (int i = 0; i < collection->mUnidentified00C; ++i)
     {
-        if (collection->mUnidentified04C[i] != 0)
-        {
-            delete collection->mUnidentified04C[i];
-        }
+        delete collection->mUnidentified04C[i];
     }
 
     if (collection->mUnidentified04C != 0)
@@ -96,10 +93,7 @@ extern "C" void fn_802DB9C4(
         collection->mUnidentified04C = 0;
     }
 
-    if (collection->mUnidentified008 != 0)
-    {
-        delete collection->mUnidentified008;
-    }
+    delete collection->mUnidentified008;
 
     collection->mUnidentified008 = 0;
     collection->mUnidentified014 = 0;

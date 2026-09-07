@@ -1,4 +1,5 @@
 #include "Game/Render/Indicators.h"
+#include "Game/AI/Fielder.h"
 
 #include "Game/Render/RLView.h"
 
@@ -55,8 +56,7 @@ extern "C"
     extern cPlayer* lbl_8056B800[10];
 
     bool fn_8001E184(cPlayer* pCharacter);
-    bool fn_800387CC(cPlayer* pCharacter);
-    IndicatorPlayerTweaks* fn_8003E6E4(cPlayer* pCharacter);
+
 }
 
 static float s_fOverheadSize = 35.0f;
@@ -173,7 +173,7 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
         if (pOwner->mPeer == pPeer)
         {
             *pSameMachine = true;
-            index = ((IndicatorControllerInfo*)fn_80336D90(pOwner))->mPadIndex;
+            index = ((IndicatorControllerInfo*)GetLocalChannelPad(pOwner))->mPadIndex;
         }
         else
         {
@@ -181,7 +181,7 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
             bool used[4] = { false, false, false, false };
             for (int i = 0; i < (int)pPeer->mUnidentified004; ++i)
             {
-                used[((IndicatorControllerInfo*)fn_80336D90(
+                used[((IndicatorControllerInfo*)GetLocalChannelPad(
                     fn_80336B6C(pPeer, i)))
                          ->mPadIndex]
                     = true;
@@ -348,11 +348,11 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
 
         if (pCharacter->m_eClassType == FIELDER)
         {
-            if (fn_800387CC(pCharacter))
+            if (((cFielder*)pCharacter)->IsShattered())
             {
                 continue;
             }
-            worldPos.z += *fn_8003E6E4(pCharacter)->fPhysCapsuleHeight
+            worldPos.z += ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.UnidentifiedGetValue()
                 * 0.5f;
         }
         else
@@ -447,12 +447,12 @@ static void UpdateAndRenderPlayerIndicators(float)
         float fVerticalOffset = 0.0f;
         if (pCharacter->m_eClassType == FIELDER)
         {
-            if (fn_800387CC(pCharacter))
+            if (((cFielder*)pCharacter)->IsShattered())
             {
                 continue;
             }
             fVerticalOffset
-                = *fn_8003E6E4(pCharacter)->fPhysCapsuleHeight * 0.5f
+                = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.UnidentifiedGetValue() * 0.5f
                 * pCharacter->m_fPlayerScale;
         }
         else

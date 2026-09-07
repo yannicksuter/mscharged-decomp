@@ -6,7 +6,6 @@
 
 extern TLComponentInstance* lbl_80578450[4];
 
-extern "C" EffectsGroup* fn_802E7CDC(EmissionManager* manager, const char* name);
 extern "C" void fn_802E83C4(EmissionManager* manager, EffectsGroup* group);
 extern "C" void fn_801CBCE4(unsigned long hash, bool enabled);
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
@@ -18,7 +17,7 @@ TU80216CB0Scene::~TU80216CB0Scene()
 void fn_802172C4()
 {
     EmissionManager* manager = EmissionManager::Instance();
-    EffectsGroup* group = fn_802E7CDC(manager, "fe_light_cone_trophy");
+    EffectsGroup* group = manager->GetEffectsGroup("fe_light_cone_trophy");
     if (group != 0)
     {
         fn_802E83C4(manager, group);

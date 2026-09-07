@@ -13,7 +13,7 @@ class DebugWriteCache;
 class cFielder;
 class cPlayer;
 class DesireSteering;
-class UnidentifiedAvoidanceObject;
+class AvoidableObject;
 
 enum eAvoidableThings
 {
@@ -102,9 +102,9 @@ struct UnidentifiedAvoidanceMemory
     float mUnidentified014;
 };
 
-typedef nlAVLTreeSlotPool<UnidentifiedAvoidanceObject*,
+typedef nlAVLTreeSlotPool<AvoidableObject*,
     UnidentifiedAvoidanceValue,
-    DefaultKeyCompare<UnidentifiedAvoidanceObject*> >
+    DefaultKeyCompare<AvoidableObject*> >
     UnidentifiedAvoidanceTree;
 
 class AvoidController

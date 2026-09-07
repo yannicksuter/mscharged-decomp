@@ -5,7 +5,7 @@
 
 TextWindowTask* TextWindowTask::sInstance;
 
-void fn_802BD820(const char*, ...)
+void PrintTextWindowMessage(const char*, ...)
 {
 }
 

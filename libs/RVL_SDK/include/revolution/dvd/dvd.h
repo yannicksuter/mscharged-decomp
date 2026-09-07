@@ -92,6 +92,11 @@ typedef struct DVDFileInfo {
 extern volatile u32 __DVDLayoutFormat;
 
 void DVDInit(void);
+s32 DVDConvertPathToEntrynum(const char* path);
+BOOL DVDFastOpen(s32 entryNum, DVDFileInfo* info);
+BOOL DVDClose(DVDFileInfo* info);
+BOOL DVDReadAsyncPrio(DVDFileInfo* info, void* buffer, s32 size, s32 offset,
+                      DVDAsyncCallback callback, s32 priority);
 BOOL DVDReadAbsAsyncPrio(DVDCommandBlock* block, void* dst, u32 size,
                          u32 offset, DVDCommandCallback callback, s32 prio);
 BOOL DVDInquiryAsync(DVDCommandBlock* block, DVDDriveInfo* info,

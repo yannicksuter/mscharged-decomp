@@ -187,7 +187,7 @@ void FEResourceManager::Cleanup()
         s_pOnDemandBundle = 0;
     }
 
-    if (s_loadedResourceList.fn_802A95C4((AVLTreeNode*)s_loadedResourceList.m_Root, 0) != 0)
+    if (s_loadedResourceList.CountNodes((AVLTreeNode*)s_loadedResourceList.m_Root, 0) != 0)
     {
         nlPrintf("FEResourceManager: Warning! Manager being destroyed while resources are still loaded!\n");
         nlPrintf("                   Did all the scenes get popped before destroying the FEResourceManager?\n");

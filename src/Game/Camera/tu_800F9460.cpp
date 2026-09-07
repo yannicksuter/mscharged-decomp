@@ -518,17 +518,18 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
         mOwnsTimeScale = false;
     }
 
-    if (mZoomStart < 0.0f)
+    float zoomStart = mZoomStart;
+    if (zoomStart < 0.0f)
     {
-        mTransitionScale = nlMinEquals(
-            nlMaxEquals(mTransitionScale, mZoomStart),
-            -1.0f * mZoomStart);
+        float limit = -1.0f * zoomStart;
+        mTransitionScale
+            = nlMinEquals(nlMaxEquals(mTransitionScale, zoomStart), limit);
     }
     else
     {
-        mTransitionScale = nlMinEquals(
-            nlMaxEquals(mTransitionScale, -1.0f * mZoomStart),
-            mZoomStart);
+        float limit = -1.0f * zoomStart;
+        mTransitionScale
+            = nlMinEquals(nlMaxEquals(mTransitionScale, limit), zoomStart);
     }
 }
 

@@ -1,12 +1,12 @@
 #ifndef GAME_AUDIO_PLAT3DSOUNDSRC_H
 #define GAME_AUDIO_PLAT3DSOUNDSRC_H
 
-#include "Game/Audio/AudioLoadMode_806E201C.h"
+#include "Game/Audio/AudioSystem.h"
 
-class AudioListener_8035DAD4 : public AudioListener_802EBD54
+class PlatAudioListener : public AudioListener
 {
 public:
-    virtual void fn_8035DAD4(float deltaTime);
+    virtual void Update(float deltaTime);
 
     /* 0x2C */ nlVector3 m_Unknown2C;
     /* 0x38 */ nlVector3 m_Unknown38;
@@ -17,7 +17,7 @@ class Plat3dSoundSrc
 {
 public:
     virtual ~Plat3dSoundSrc();
-    virtual void Update(AudioListener_8035DAD4* listener, float deltaTime);
+    virtual void Update(PlatAudioListener* listener, float deltaTime);
 
     /* 0x04 */ union
     {

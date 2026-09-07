@@ -1,7 +1,7 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glPlat.h"
 
-#include "Game/GL/tu_802D38A4.h"
+#include "Game/GL/glModelBuilder.h"
 #include "types.h"
 
 extern "C" void* fn_802CC0A4(
@@ -55,7 +55,7 @@ extern "C" bool fn_802A19B8(State_802A195C* writer,
     }
     writer->model = newModel;
 
-    fn_802D38A4(
+    glCreateModel(
         writer->model, vertexCount, primitive, allocator, 2, 0xEC35CAAB);
 
     glModelStream* streams = writer->model->packets->streams;
@@ -79,7 +79,7 @@ extern "C" bool fn_802A19B8(State_802A195C* writer,
         }
     }
     writer->value_0C = positionData;
-    fn_802D39CC(streams, 0, writer->value_0C,
+    glSetModelStream(streams, 0, writer->value_0C,
         sizeof(float) * 3, 1);
 
     int texcoordCount = vertexCount * 2;
@@ -102,7 +102,7 @@ extern "C" bool fn_802A19B8(State_802A195C* writer,
         }
     }
     writer->value_10 = value_10Data;
-    fn_802D39CC(streams + 1, 1, writer->value_10,
+    glSetModelStream(streams + 1, 1, writer->value_10,
         sizeof(float) * 2, 4);
 
     return true;

@@ -18,7 +18,7 @@ EffectsTexturing* fxGetTexturing(eEffectsTextureType type)
         && texturing->m_ResolvedTexture.value == 0xFFFF)
     {
         texturing->m_ResolvedTexture.value =
-            fn_802CDF0C()->fn_802CE1B8(texture);
+            glGetTextureManager()->GetTextureIndex(texture);
     }
     return texturing;
 }

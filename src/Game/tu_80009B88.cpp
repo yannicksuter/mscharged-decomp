@@ -48,7 +48,7 @@ extern "C" void fn_802E67E0(void* data, void* nonResidentData,
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
-extern bool lbl_806DC450;
+extern bool gAudioEnabled;
 
 static bool g_bLoadAnimsCached;
 
@@ -1208,15 +1208,15 @@ bool CharacterLoader_8056B290::fn_8000BFA0()
     return true;
 }
 
-static void fn_8000C0EC(AudioResourceLoadOwner_802EDA54* handle, void* context)
+static void fn_8000C0EC(AudioResourceLoadOwner* handle, void* context)
 {
     CharacterLoader_8056B290::sUnidentifiedInstance.mAudioCompletedCount = (int)context;
 }
 
 void CharacterLoader_8056B290::fn_8000C0FC()
 {
-    mAudioRequestCount += lbl_806DC450;
-    fn_800EBB04((GameAudio_800EB6AC*)lbl_806E201C, 0, 0, fn_8000C0EC,
+    mAudioRequestCount += gAudioEnabled;
+    LoadSoundBank((GameAudio*)g_pAudioSystem, 0, 0, fn_8000C0EC,
         (void*)mAudioRequestCount);
 }
 
@@ -1228,8 +1228,8 @@ bool CharacterLoader_8056B290::fn_8000C124()
 void CharacterLoader_8056B290::fn_8000C130()
 {
     int nBank = GetCharacterInfo(mCurrent->cc).unknown_0x1C;
-    mAudioRequestCount += lbl_806DC450;
-    fn_800EBB04((GameAudio_800EB6AC*)lbl_806E201C, nBank,
+    mAudioRequestCount += gAudioEnabled;
+    LoadSoundBank((GameAudio*)g_pAudioSystem, nBank,
         (mCurrent->nTeamID == 0) ? 1 : 5, fn_8000C0EC, (void*)mAudioRequestCount);
 }
 
@@ -1241,18 +1241,18 @@ bool CharacterLoader_8056B290::fn_8000C1A4()
 void CharacterLoader_8056B290::fn_8000C1B0()
 {
     int nBank = GetCharacterInfo(mCurrent->cc).unknown_0x1C;
-    mAudioRequestCount += lbl_806DC450;
+    mAudioRequestCount += gAudioEnabled;
     Entry* pEntry = mCurrent;
     int nSlot = (pEntry->nTeamID == 0) ? 1 : 5;
     nSlot += pEntry->nPlayerID;
-    fn_800EBB04((GameAudio_800EB6AC*)lbl_806E201C, nBank, nSlot, fn_8000C0EC,
+    LoadSoundBank((GameAudio*)g_pAudioSystem, nBank, nSlot, fn_8000C0EC,
         (void*)mAudioRequestCount);
 }
 
 void CharacterLoader_8056B290::fn_8000C22C()
 {
-    mAudioRequestCount += lbl_806DC450;
-    fn_800EBB04((GameAudio_800EB6AC*)lbl_806E201C, 13, 9, fn_8000C0EC,
+    mAudioRequestCount += gAudioEnabled;
+    LoadSoundBank((GameAudio*)g_pAudioSystem, 13, 9, fn_8000C0EC,
         (void*)mAudioRequestCount);
 }
 

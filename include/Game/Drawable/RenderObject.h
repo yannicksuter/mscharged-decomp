@@ -5,4 +5,6 @@
 
 typedef DrawableObject RenderObject;
 
+RenderObject* GetRenderObject(int type, int index);
+
 #endif // GAME_DRAWABLE_RENDER_OBJECT_H

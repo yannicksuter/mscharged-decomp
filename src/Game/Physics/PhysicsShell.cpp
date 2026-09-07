@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsShell.h"
+#include "Game/Terrain.h"
 
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
@@ -46,14 +47,10 @@ extern void* lbl_806E1608;
 
 extern "C" bool fn_800167A8(cBall*);
 extern "C" bool fn_800977A4(cFielder*, float);
-extern "C" float fn_800A92C8(void*, float);
 extern "C" void fn_801473A4(CollisionPowerupGroundData*);
 extern "C" void fn_801474EC(CollisionPowerupGroundData*);
 extern "C" void fn_80147634(CollisionPowerupWallData*);
 extern "C" void fn_801481BC(SkinAnimatedNPC*);
-extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
-extern "C" EmissionController* fn_802E7FE4(
-    EmissionManager*, EffectsGroup*, int, bool, bool);
 
 static const nlVector3 v3Unidentified = { 0.0f, 0.0f, 160.0f };
 static const nlVector3 v3Direction = { 0.0f, 0.0f, 1.0f };
@@ -600,10 +597,8 @@ ContactType PhysicsShell::Contact(
                 || (obj->GetObjectType() == 0x10
                     && m_pPowerupObject->m_pTarget != 0))
             {
-                EffectsGroup* pGroup = fn_802E7CDC(
-                    EmissionManager::Instance(), "shell_ricochet");
-                EmissionController* pControl = fn_802E7FE4(
-                    EmissionManager::Instance(), pGroup, 3, true, false);
+                EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("shell_ricochet");
+                EmissionController* pControl = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
 
                 nlVector3 v3Position;
                 nlVector3 v3Velocity;
@@ -660,14 +655,13 @@ bool PhysicsShell::SetContactInfo(
 
     if (other->GetObjectType() == 0x12)
     {
-        contact->surface.bounce = fn_800A92C8(g_pGame->mUnidentified10D8,
-            lbl_8056CF08.m_pGameTweaks->fShellBounceGround);
+        contact->surface.bounce = g_pGame->mpTerrain->GetRestitution(gGameTweaks.m_pGameTweaks->fShellBounceGround);
         contact->surface.mu = 0.005f;
     }
     else
     {
         contact->surface.bounce
-            = lbl_8056CF08.m_pGameTweaks->fShellBounce;
+            = gGameTweaks.m_pGameTweaks->fShellBounce;
         contact->surface.mu = 0.005f;
     }
 

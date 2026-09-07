@@ -13,7 +13,7 @@ class PhysicsObject;
 class SFXEmitter;
 
 class PowerupBase;
-class UnidentifiedAvoidanceObject;
+class AvoidableObject;
 
 struct PowerupSounds
 {
@@ -133,7 +133,7 @@ public:
     /* 0x0C */ PhysicsObject* m_pPhysicsObject;
     /* 0x10 */ cFielder* m_pTarget;
     /* 0x14 */ cFielder* m_pThrower;
-    /* 0x18 */ UnidentifiedAvoidanceObject* m_unk18;
+    /* 0x18 */ AvoidableObject* m_unk18;
     /* 0x1C */ ePowerUpType m_eType;
     /* 0x20 */ bool m_unk20;
     /* 0x24 */ Timer mtActiveTimer;

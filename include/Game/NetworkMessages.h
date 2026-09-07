@@ -271,7 +271,7 @@ public:
     virtual ~NetMessageDraftPickedCaptain();
     virtual int GetType();
 
-    /* 0x08 */ u8 mTeamIndex;
+    /* 0x08 */ s8 mTeamIndex;
     /* 0x09 */ u8 mCaptain;
 };
 

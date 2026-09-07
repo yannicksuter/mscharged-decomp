@@ -1,4 +1,8 @@
-#include "Game/Audio/XSoundHandle_802ED74C.h"
+#include "NL/nlDebugString.h"
+#include "Game/Audio/AudioSource.h"
+#include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioSystem.h"
+#include "Game/Audio/XSoundHandle.h"
 #include "Game/Sys/debug.h"
 #include "NL/nlDLListContainer.h"
 #include "NL/nlSlotPool.h"
@@ -113,24 +117,10 @@ struct CueHandle_802F1758
     };
 };
 
-struct AudioResources_802F1758
-{
-    u8 pad_00[0xC];
-    void* sliderTable;
-};
-
-struct AudioSystem_802F1758
-{
-    u8 pad_00[0xCC];
-    AudioResources_802F1758* resources;
-};
-
 extern void* lbl_8052F6D0[];
 extern char lbl_8052F680[0x38];
 extern SlotPoolBase lbl_8057FA68;
 extern SlotPoolBase lbl_8057FAA8;
-extern int lbl_806E1DC8;
-extern AudioSystem_802F1758* lbl_806E201C;
 
 extern "C" CueHandle_802F1758* fn_802ED74C(CueHandle_802F1758*, void*, CueOwner_802F1758*, void*, void (*)(void*, CueHandle_802F1758*, void*), void*);
 extern "C" CueHandle_802F1758* fn_802ED7F0(CueHandle_802F1758*, int);
@@ -147,8 +137,7 @@ extern "C" void fn_802F2640(SoundInstance_802F1758*);
 extern "C" void fn_802F2648(SoundInstance_802F1758*);
 extern "C" void fn_802F2650(SoundInstance_802F1758*, PlaybackBackend_802F2C3C**, u32*);
 extern "C" void fn_802F26B0(SoundInstance_802F1758*, float);
-extern "C" const char* fn_802B9568(int, const char*);
-extern "C" void fn_8035CA84();
+void DumpAudioMemory();
 
 static inline SoundInstance_802F1758* AllocateInstance_802F1758()
 {
@@ -196,13 +185,13 @@ extern "C" CueHandle_802F1758* fn_802F1758(CueHandle_802F1758* handle,
         return handle;
     }
 
-    handle->localSliders = fn_802EED88(lbl_806E201C->resources->sliderTable, handle);
+    handle->localSliders = fn_802EED88(g_pAudioSystem->GetBundleManager()->GetSliderTable(), handle);
     if (handle->localSliders == 0)
-        fn_8035CA84();
+        DumpAudioMemory();
 
     if (handle->definition->useSlider)
     {
-        handle->slider = fn_802EED38(lbl_806E201C->resources->sliderTable,
+        handle->slider = fn_802EED38(g_pAudioSystem->GetBundleManager()->GetSliderTable(),
             handle->definition->sliderIndex,
             handle);
         handle->sliderValue = handle->slider->value;
@@ -211,7 +200,7 @@ extern "C" CueHandle_802F1758* fn_802F1758(CueHandle_802F1758* handle,
     void* selected = handle->definition->useSlider
                        ? fn_802F1460(handle->definition, handle->sliderValue)
                        : fn_802F11A0(handle->definition);
-    tDebugPrintManager::Print(DC_SOUND, lbl_8052F680, fn_802B9568(lbl_806E1DC8, *(const char**)selected), fn_802B9568(lbl_806E1DC8, handle->definition->name));
+    tDebugPrintManager::Print(DC_SOUND, lbl_8052F680, nlLookupDebugString(g_pDebugStringTable, (unsigned long)*(const char**)selected), nlLookupDebugString(g_pDebugStringTable, (unsigned long)handle->definition->name));
 
     SoundInstance_802F1758* instance = AllocateInstance_802F1758();
     if (instance != 0)
@@ -251,15 +240,16 @@ extern "C" CueHandle_802F1758* fn_802F194C(CueHandle_802F1758* handle, int destr
     return handle;
 }
 
-extern "C" SliderState_802F1758* fn_802F1A70(CueHandle_802F1758* handle, u32 index)
+AudioParameter* GetSoundParameter(XSoundHandle* handle, unsigned long index)
 {
-    return handle->localSliders->sliders + index;
+    return (AudioParameter*)(((CueHandle_802F1758*)handle)->localSliders->sliders + index);
 }
 
-extern "C" void fn_802F1A84(CueHandle_802F1758* handle, PlaybackBackend_802F2C3C** value, u32* output)
+void GetSoundSources(void* handle, AudioSource** sources, unsigned int* output)
 {
+    CueHandle_802F1758* cue = (CueHandle_802F1758*)handle;
     *output = 0;
-    fn_802F2650(handle->instance, value, output);
+    fn_802F2650(cue->instance, (PlaybackBackend_802F2C3C**)sources, (u32*)output);
 }
 
 extern "C" bool fn_802F1A94(CueHandle_802F1758* handle, u8 callbackEnabled)
@@ -268,7 +258,7 @@ extern "C" bool fn_802F1A94(CueHandle_802F1758* handle, u8 callbackEnabled)
     {
     case 1:
         handle->stateAndFlags |= 0x4000;
-        ((XSoundHandle_802ED74C*)handle)->fn_802ED74C_4(callbackEnabled);
+        ((XSoundHandle*)handle)->Prepare(callbackEnabled);
         return false;
     case 2:
     case 5:
@@ -370,7 +360,7 @@ extern "C" void fn_802F1C74(CueHandle_802F1758* handle, float dt)
     }
 
     if (handle->state == 8 && handle->callbackEnabled)
-        ((XSoundHandle_802ED74C*)handle)->fn_802ED74C_10();
+        ((XSoundHandle*)handle)->Release();
 }
 
 extern "C" void fn_802F1DC4(CueHandle_802F1758* handle, float dt)

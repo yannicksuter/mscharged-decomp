@@ -1,4 +1,5 @@
 #include "Game/NetTournManager.h"
+#include "NL/nlFunctionMemory.h"
 #include "Game/Sys/debug.h"
 
 #include "Game/Drawable/DrawableObj.h"
@@ -12,8 +13,6 @@
 
 #include <string.h>
 
-extern "C" void* fn_802B1C4C(unsigned long size);
-extern "C" void fn_802B1D4C(void* p, unsigned long size);
 
 static NetTournManager* sNetTournManager;
 static bool sCupPersonaOverrideActive;
@@ -210,13 +209,7 @@ int NetMessageTournamentStart::GetType()
 
 void NetTournManager::CreateInstance()
 {
-    void* storage = nlMalloc(sizeof(NetTournManager), 8, false);
-    NetTournManager* manager = 0;
-    if (storage != 0)
-    {
-        manager = new (storage) NetTournManager;
-    }
-    sNetTournManager = manager;
+    sNetTournManager = new ((u8*)nlMalloc(sizeof(NetTournManager), 8, false)) NetTournManager();
 }
 
 NetTournManager* NetTournManager::Instance()
@@ -1052,10 +1045,10 @@ struct NetTournManagerCallbackBinding
 class NetTournManagerDelegate
 {
 public:
-    void* operator new(unsigned long size) { return fn_802B1C4C(size); }
+    void* operator new(unsigned long size) { return AllocateFunctionMemory(size); }
     void operator delete(void* p)
     {
-        fn_802B1D4C(p, sizeof(NetTournManagerDelegate));
+        FreeFunctionMemory(p, sizeof(NetTournManagerDelegate));
     }
 
     NetTournManagerDelegate(const NetTournManagerCallbackBinding& binding)

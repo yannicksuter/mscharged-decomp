@@ -50,7 +50,6 @@ public:
         float& fTargetHeight, bool bDownOnly);
     static float GetPredictedPlaneIntersectTime(const nlVector4& v4Plane,
         nlVector3& v3ContactPoint, nlVector3& v3ContactVelocity);
-    static void ClearBallCache();
     static bool GetPredictedBallPosition(float fDeltaTime,
         nlVector3& v3Position, nlVector3& v3Velocity);
     static void InvalidateBallCache();

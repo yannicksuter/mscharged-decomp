@@ -2,7 +2,7 @@
 #define GAME_AI_AIPAD_H
 
 #include "types.h"
-#include "unclassified/tu_80331BE4.h"
+#include "Game/DetInput.h"
 
 class cAIPad
 {

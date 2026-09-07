@@ -58,7 +58,7 @@ void nlInitMemory()
     }
 }
 
-extern "C" void* fn_80372B30(unsigned long size, bool fromEnd)
+void* nlAllocateAlignedMemory(unsigned long size, bool fromEnd)
 {
     return StandardAllocator.Allocate(size, 32, fromEnd);
 }

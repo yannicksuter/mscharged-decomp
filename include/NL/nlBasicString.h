@@ -173,11 +173,7 @@ public:
     const CharT* c_str() const
     {
         static CharT emptyString = 0;
-        if (mData != 0)
-        {
-            return mData->mData.mData;
-        }
-        return &emptyString;
+        return mData ? mData->mData.mData : &emptyString;
     }
 
     int size() const

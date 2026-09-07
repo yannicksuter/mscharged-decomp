@@ -23,6 +23,8 @@ static void fn_802A3738(int mode)
 
     switch (mode)
     {
+    case 1:
+        break;
     case 3:
         gxSetTevColourIn(0, 15, 15, 15, 4);
         gxSetTevAlphaIn(0, 7, 7, 7, 2);

@@ -5,7 +5,7 @@
 
 #include "Game/Task/ResetTask.h"
 
-#include "Game/Audio/AudioLoadMode_806E201C.h"
+#include "Game/Audio/AudioSystem.h"
 #include "Game/NetworkSession.h"
 #include "NL/globalpad.h"
 
@@ -94,9 +94,9 @@ void ResetTask::Run(float dt)
             volume = volume * 2.0f - 1.0f;
         }
 
-        if (lbl_806E201C)
+        if (g_pAudioSystem)
         {
-            fn_802EC8A0(lbl_806E201C, true, true);
+            FlushAudio(g_pAudioSystem, true, true);
         }
 
         VISetBlack(true);

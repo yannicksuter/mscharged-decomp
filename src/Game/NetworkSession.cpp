@@ -1,4 +1,6 @@
 #include "Game/NetworkSession.h"
+#include "NL/nlFunctionMemory.h"
+#include "Game/Event.h"
 #include "Game/Sys/debug.h"
 #include "Game/NetworkRandom_803236CC.h"
 #include "Game/FE/feMusic.h"
@@ -98,8 +100,6 @@ extern int lbl_80507070[][2];
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/Game.h"
 
-extern "C" void* fn_802B1C4C(unsigned long size);
-extern "C" void fn_802B1D4C(void* p, unsigned long size);
 
 typedef void (UnidentifiedNetworkSession::*UnidentifiedNetworkCallback)();
 
@@ -122,10 +122,10 @@ struct UnidentifiedNetworkBinding
 class UnidentifiedNetworkDelegate
 {
 public:
-    void* operator new(unsigned long size) { return fn_802B1C4C(size); }
+    void* operator new(unsigned long size) { return AllocateFunctionMemory(size); }
     void operator delete(void* p)
     {
-        fn_802B1D4C(p, sizeof(UnidentifiedNetworkDelegate));
+        FreeFunctionMemory(p, sizeof(UnidentifiedNetworkDelegate));
     }
 
     UnidentifiedNetworkDelegate(const UnidentifiedNetworkBinding& binding)
@@ -193,7 +193,6 @@ static inline void RegisterNetworkAction(
 extern BaseGameSceneManager* lbl_806E1838;
 extern TLComponentInstance* lbl_80578450[4];
 
-extern "C" void fn_802B2E8C(u32* handle);
 extern "C" u32 fn_80111688(void*);
 void* GetFixedUpdateTask();
 extern "C" void fn_801CBCE4(u32, int);
@@ -2444,8 +2443,8 @@ void UnidentifiedNetworkSession::BaseVirtual48(int reason)
 {
     mUnidentified244C = reason;
     mUnidentified2448 = 6;
-    fn_802B2E8C(&mUnidentified2464);
-    fn_802B2E8C(&mUnidentified2468);
+    DisconnectEventOwner(&mUnidentified2464);
+    DisconnectEventOwner(&mUnidentified2468);
 
     if (mUnidentified2473 != 0)
     {

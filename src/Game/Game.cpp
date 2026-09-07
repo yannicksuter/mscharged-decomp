@@ -1,4 +1,6 @@
+#include "Game/Sys/audio.h"
 #include "Game/Game.h"
+#include "Game/Audio/GameStreams.h"
 #include "Game/Sys/debug.h"
 #include "Game/NetworkDiagnostics_803239A8.h"
 
@@ -105,34 +107,27 @@ extern "C" EventDispatcher* fn_800721C4();
 extern "C" bool fn_802B6AF8(
     const UnidentifiedGameRegion* param1, const nlVector2* param2);
 extern "C" int fn_800A9210(void* param1, int param2);
-extern "C" int GetAudioPauseDepth();
-extern "C" void ResumeAllAudio();
-extern "C" void fn_800EDC2C();
+
 extern "C" void fn_801E230C(
     BaseGameSceneManager* manager, SceneList scene, bool param3, bool param4);
 extern "C" void fn_801E2498(BaseGameSceneManager* manager, float param2);
 extern "C" void fn_801E999C(BaseSceneHandler* scene);
 extern "C" void* fn_800AA060(void* param1, int param2);
 extern "C" void fn_800AF404(void* param1);
-extern "C" void fn_800EDB9C();
-extern "C" void fn_800EDCAC();
+
 extern "C" bool fn_8001E184(cPlayer* pPlayer);
 extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
 extern "C" void fn_80038158(cFielder* pFielder, int param2);
 extern "C" float fn_80111D3C();
 extern "C" void fn_80111D28(float timeScale);
 extern "C" void fn_80111D4C(float timeScale, float transitionTime);
-extern "C" bool fn_800EBBFC(
-    int param1, unsigned long soundID, const void* name, void* context);
-extern "C" void fn_800EC12C(unsigned long soundID, void* context);
+
 extern "C" void fn_802F4E84(unsigned long* hash, int param2, int param3);
 extern "C" cGame* fn_800570B0(
     cGame* game, void* param1, int param2, bool param3);
 extern "C" cTeam* fn_800A5D4C(cTeam* team, int side);
 extern "C" void fn_800A62E8(cTeam* team, int deleteObject);
 extern "C" void fn_8031A02C(ScriptQuestionCache* cache);
-extern "C" void fn_800ED92C(unsigned long soundID);
-extern "C" void fn_800EC2A4(unsigned long soundID, cGame* game);
 
 extern UnidentifiedGameStatic lbl_8056B9A0;
 extern cPlayer* lbl_806E0C9C;
@@ -431,8 +426,8 @@ void cGame::fn_80058528(float timeScale, float transitionTime)
             if (fn_80111D3C() == lbl_806E3748)
             {
                 unsigned long soundID = 0xCE5CBAC7;
-                fn_800EC12C(soundID, g_pGame);
-                fn_800EBBFC(10, soundID, lbl_804FB284, g_pGame);
+                StopSound(soundID, g_pGame);
+                PlaySound(10, soundID, lbl_804FB284, g_pGame);
 
                 unsigned long hash = nlStringLowerHash(lbl_804FB294);
                 fn_802F4E84(&hash, 0, 0);
@@ -812,7 +807,7 @@ void cGame::ChangeGameState(int state)
     {
         if (m_eGameState == 6 && state == 3)
         {
-            fn_800EDCAC();
+            StopSuddenDeathMusic();
         }
 
         if (state == 3)
@@ -823,7 +818,7 @@ void cGame::ChangeGameState(int state)
                 || (lbl_806E0FA0->mCurrentChallenge == 2
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
             {
-                fn_800ED92C(0xEF3369E0);
+                PlayCrowdReaction(0xEF3369E0);
             }
             else
             {
@@ -841,7 +836,7 @@ void cGame::ChangeGameState(int state)
                 {
                     soundID = 0x1E859DCD;
                 }
-                fn_800ED92C(soundID);
+                PlayCrowdReaction(soundID);
             }
         }
 
@@ -849,7 +844,7 @@ void cGame::ChangeGameState(int state)
         {
             unsigned long soundID = GetStadiumSoundID(
                 GameInfoManager::Instance()->GetStadium());
-            fn_800EC2A4(soundID, this);
+            PauseSound(soundID, this);
         }
 
         InitGameState(state);
@@ -956,7 +951,7 @@ void cGame::fn_8005B508()
 
 extern "C" int fn_8005C5CC(void* param1, int param2)
 {
-    return fn_800A9210(g_pGame->mUnidentified10D8, param2);
+    return fn_800A9210(g_pGame->mpTerrain, param2);
 }
 
 void cGame::SetDifficulty(
@@ -992,7 +987,7 @@ void cGame::fn_8005DF38()
     {
         ResumeAllAudio();
     }
-    fn_800EDC2C();
+    ResumeSuddenDeathMusic();
 
     fn_801E230C(g_pOverlayManager, (SceneList)89, true, true);
     fn_801E2498(g_pOverlayManager, lbl_806E3770);
@@ -1089,13 +1084,13 @@ UnidentifiedGameEventQueue::UnidentifiedGameEventQueue()
 
 extern "C" void fn_80061AF0()
 {
-    fn_800EDB9C();
+    PlaySuddenDeathMusic();
 }
 
 extern "C" void fn_80061AF4()
 {
     lbl_806E12C8->ResetEffects();
-    fn_800EDCAC();
+    StopSuddenDeathMusic();
 }
 
 extern "C" void fn_80070960(
@@ -1117,7 +1112,7 @@ extern "C" void fn_80072134(UnidentifiedRegistrationNode* node)
 
 extern "C" void fn_8007214C(ShotAtGoalData* node)
 {
-    lbl_80571820.Free(node);
+    gShotAtGoalDataPool.Free(node);
 }
 
 extern "C" void fn_80072164(UnidentifiedRegistrationNode* node)

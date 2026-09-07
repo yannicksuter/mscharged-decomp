@@ -302,9 +302,9 @@ bool GameInfoManager::IsInMode4() const
     return mCurrentMode == GM_MODE_4;
 }
 
-void* GameInfoManager::GetUnknown0xA0()
+AudioSettings* GameInfoManager::GetAudioSettings()
 {
-    return unknown_0xA0;
+    return (AudioSettings*)unknown_0xA0;
 }
 
 void* GameInfoManager::GetUnknown0xB8()

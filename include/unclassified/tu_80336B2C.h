@@ -44,7 +44,7 @@ extern "C" void fn_80336D50(UnidentifiedNetworkPeerChannel* channel,
     UnidentifiedNetworkPeer* peer, s8 channelIndex, int globalPadIndex);
 extern "C" DetInput* fn_80336D68(UnidentifiedNetworkPeerChannel* channel);
 extern "C" s8 fn_80336D70(UnidentifiedNetworkPeerChannel* channel);
-extern "C" cGlobalPad* fn_80336D90(UnidentifiedNetworkPeerChannel* channel);
+cGlobalPad* GetLocalChannelPad(UnidentifiedNetworkPeerChannel* channel);
 extern "C" void fn_80336DF4(UnidentifiedNetworkPeerChannel* channel);
 extern "C" void fn_80336ECC(UnidentifiedNetworkPeerChannel* channel,
     InputRouterRecord* record, u16 tick, u8 connected);

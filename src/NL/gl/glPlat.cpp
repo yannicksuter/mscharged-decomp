@@ -82,7 +82,6 @@ extern "C"
     void GXSetDispCopyGamma(s32 gamma);
     void fn_803A6FE8(u8 fieldMode, u8 halfAspectRatio);
     void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
-    void* fn_80372B30(unsigned long size, bool fromEnd);
 
     void fn_802CB848(Function2<bool, PlatformStartupEntry&, PlatformStartupEntry&>* callback);
 
@@ -297,7 +296,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     VIFlush();
     VIConfigure(&glx_rmode);
 
-    glx_FIFOMem = fn_80372B30(glx_FIFOSize, 0);
+    glx_FIFOMem = nlAllocateAlignedMemory(glx_FIFOSize, 0);
     if (glx_FIFOMem == 0)
     {
         return false;

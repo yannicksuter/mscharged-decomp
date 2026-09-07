@@ -2,7 +2,7 @@
 #define _GLXTEXTURE_H_
 
 #include "types.h"
-#include "NL/gl/TextureManager_802CDF0C.h"
+#include "NL/gl/glTextureManager.h"
 
 #include <string.h>
 
@@ -126,10 +126,8 @@ void glxInitTex();
 glxTextureLoadCallback_t glx_SetLoadCallback(
     glxTextureLoadCallback_t callback);
 
-extern TextureManager_802CDF0C* lbl_806E1F08;
 
 extern "C" void fn_802CDEC0(unsigned long);
-TextureManager_802CDF0C* fn_802CDF0C();
 void fn_802CDF14(unsigned long texture, PlatTexture* platformTexture,
     void* allocator);
 extern "C" void fn_802CDF5C(PlatTexture* texture);

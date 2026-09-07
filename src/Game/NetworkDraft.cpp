@@ -426,12 +426,12 @@ void NetworkDraft::SendCaptainChoice()
 {
     NetMessageDraftPickedCaptain message;
     message.mTeamIndex = mCurrentDraftingTeam;
-    message.mCaptain = mTeams[mCurrentDraftingTeam].mCaptain;
+    message.mCaptain = GameInfoManager::Instance()->GetTeam(0);
     u8 buffer[0x20];
     int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
     tDebugPrintManager::Print(DC_NETWORK,
         "Sending NetworkDraftPickedCaptain team %d captain %d\n",
-        (s8)message.mTeamIndex, message.mCaptain);
+        message.mTeamIndex, message.mCaptain);
     SendToAllDraftPlayers(buffer, size);
 }
 

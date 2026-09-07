@@ -8,6 +8,10 @@ class CrowdRiot;
 class PhysicsObject;
 class PhysicsPatch;
 class PhysicsSphere_80175F8C;
+class cFielder;
+class cBall;
+class ChainChomp;
+class PowerupBase;
 
 struct CollisionPlayerPlayerData
 {
@@ -19,14 +23,20 @@ struct CollisionPlayerPlayerData
 
 template <typename T>
 class SlotPool;
-extern "C" SlotPool<CollisionPlayerPlayerData> lbl_80571258;
+extern SlotPool<CollisionPlayerPlayerData> gCollisionPlayerPlayerDataPool;
 
-struct UnidentifiedEventData_80066590
+struct ShotAtGoalData
 {
     /* 0x00 */ cPlayer* pShooter;
 }; // total size: 0x4
-typedef UnidentifiedEventData_80066590 ShotAtGoalData;
-extern "C" SlotPool<ShotAtGoalData> lbl_80571820;
+extern SlotPool<ShotAtGoalData> gShotAtGoalDataPool;
+
+struct CollisionChainPlayerData
+{
+    /* 0x00 */ cFielder* pFielder;
+    /* 0x04 */ ChainChomp* pChain;
+}; // total size: 0x8
+extern SlotPool<CollisionChainPlayerData> gCollisionChainPlayerDataPool;
 
 struct UnidentifiedEventData_800673FC
 {
@@ -56,7 +66,12 @@ struct UnidentifiedEventData05;
 struct UnidentifiedEventData06;
 struct UnidentifiedEventData07;
 struct UnidentifiedEventData08;
-struct UnidentifiedEventData09;
+struct CollisionBallChainData
+{
+    /* 0x00 */ ChainChomp* pChain;
+    /* 0x04 */ cBall* pBall;
+}; // total size: 0x8
+extern SlotPool<CollisionBallChainData> gCollisionBallChainDataPool;
 struct UnidentifiedEventData10;
 struct UnidentifiedEventData11;
 struct UnidentifiedEventData12;
@@ -77,13 +92,18 @@ struct UnidentifiedEventData24
     /* 0x0C */ cPlayer* mUnidentified0C;
     /* 0x10 */ PhysicsPatch* mUnidentified10;
 }; // total size: 0x14
-extern "C" SlotPool<UnidentifiedEventData24> lbl_80570138;
+extern SlotPool<UnidentifiedEventData24> lbl_80570138;
 
 struct UnidentifiedEventData25;
 struct UnidentifiedEventData26;
 struct UnidentifiedEventData27;
 struct UnidentifiedEventData28;
-struct UnidentifiedEventData29;
+struct CollisionChainPowerupData
+{
+    /* 0x00 */ ChainChomp* pChain;
+    /* 0x04 */ PowerupBase* pPowerup;
+}; // total size: 0x8
+extern SlotPool<CollisionChainPowerupData> gCollisionChainPowerupDataPool;
 struct UnidentifiedEventData30;
 struct UnidentifiedEventData31;
 struct UnidentifiedEventData32
@@ -111,5 +131,7 @@ struct CollisionPlayerWallData
     /* 0x04 */ nlVector3 contactPoint;
     /* 0x10 */ nlVector3 wallNormal;
 }; // total size: 0x1C
+
+void FreeEventDataPools();
 
 #endif // GAME_EVENT_DATA_TYPES_H

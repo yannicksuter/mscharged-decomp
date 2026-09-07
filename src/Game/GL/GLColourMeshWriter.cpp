@@ -3,7 +3,7 @@
 
 #include "Game/GL/GLColourMeshWriter.h"
 
-#include "Game/GL/tu_802D38A4.h"
+#include "Game/GL/glModelBuilder.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
 
@@ -37,7 +37,7 @@ bool GLColourMeshWriter::Begin(
     }
     model = newModel;
 
-    fn_802D38A4(
+    glCreateModel(
         model, vertexCount, primitive, allocator, 2, 0xD701656B);
 
     glModelStream* streams = model->packets->streams;
@@ -61,7 +61,7 @@ bool GLColourMeshWriter::Begin(
         }
     }
     position = positionData;
-    fn_802D39CC(streams, 0, position,
+    glSetModelStream(streams, 0, position,
         sizeof(float) * 3, 1);
 
     u32* colourData;
@@ -83,7 +83,7 @@ bool GLColourMeshWriter::Begin(
         }
     }
     colour = colourData;
-    fn_802D39CC(
+    glSetModelStream(
         streams + 1, 1, colour, sizeof(u32), 3);
 
     return true;

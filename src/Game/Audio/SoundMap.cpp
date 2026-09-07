@@ -1,21 +1,18 @@
+#include "NL/nlDebugString.h"
 #include "Game/Audio/SoundMap.h"
 #include "Game/Sys/debug.h"
 
-#include "Game/SAnim.h"
+#include "NL/nlChunk.h"
 #include "NL/nlMemory.h"
-
-extern "C" const char* fn_802B9568(void* stringTable, u32 value);
-
-extern void* lbl_806E1DC8;
 
 static inline const char* GetSoundCueString(u32 value)
 {
     if (value != 0)
-        return fn_802B9568(lbl_806E1DC8, value);
+        return nlLookupDebugString(g_pDebugStringTable, value);
     return "--";
 }
 
-u32 SoundMap::fn_802EE178(
+u32 SoundMap::FindCue(
     u32 field0, u32 field4, u32 field8, u32 fieldC)
 {
     SoundCue cue;
@@ -32,25 +29,25 @@ u32 SoundMap::fn_802EE178(
     return 0xFFFF;
 }
 
-void SoundMap::fn_802EE20C()
+void SoundMap::Unload()
 {
     delete m_CueTree;
     m_CueTree = 0;
 }
 
-SoundMap* SoundMap::fn_802EE458(nlChunk* chunk)
+SoundMap* SoundMap::ParseChunk(nlChunk* chunk)
 {
     const char* fieldCString;
     const char* field8String;
     const char* field4String;
-    SoundCueTreeIterator_802EE294::Entry* current;
+    SoundCueTreeIterator::Entry* current;
 
     nlChunk* mapChunk = chunk->GetFirstChunk();
     SoundMap* map = (SoundMap*)mapChunk->GetData();
     nlChunk* cuesChunk = mapChunk->GetNextChunk();
     map->m_Cues = (SoundCue*)cuesChunk->GetData();
 
-    map->m_CueTree = new (8, false) SoundCueTree_802EE294;
+    map->m_CueTree = new (8, false) SoundCueTree;
     for (u32 i = 0; i < map->m_CueCount; ++i)
     {
         SoundCue* cue = &map->m_Cues[i];
@@ -59,7 +56,7 @@ SoundMap* SoundMap::fn_802EE458(nlChunk* chunk)
 
     tDebugPrintManager::Print(DC_SOUND, "SoundMap: %d cues\n", map->m_CueCount);
 
-    SoundCueTreeIterator_802EE294* iterator =
+    SoundCueTreeIterator* iterator =
         map->m_CueTree->GetIterator();
     while (iterator->IsValid())
     {

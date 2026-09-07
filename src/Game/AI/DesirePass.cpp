@@ -30,7 +30,6 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80041B0C(
     void*, cFielder*, const char*);
 extern "C" float fn_800DCF18(cFielder*);
 extern "C" void fn_800B6A1C(void*, int, const Variant&);
-extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002C328(PlayerTweaks*);
 extern "C" bool fn_8002F858(cFielder*, bool);
 extern "C" bool fn_80035F34(cFielder*);
@@ -76,7 +75,7 @@ bool DesirePreparePass::UnidentifiedInitialize(void* context)
     }
 
     SkillTweaks* pSkillTweaks = fn_800A636C(lbl_806E0E00);
-    float fReactionTime = 1.0f - pSkillTweaks->fn_800A3474(0);
+    float fReactionTime = 1.0f - pSkillTweaks->GetReaction(0);
     float fAbortThreshold = lbl_806DC138;
     float fReactionTimeRange =
         fAbortThreshold * (lbl_806DC13C * fReactionTime);
@@ -196,7 +195,7 @@ bool DesirePass::UnidentifiedInitialize(void* context)
         return false;
     }
 
-    PlayerTweaks* pTweaks = fn_8003E6E4(mUnidentifiedFielder);
+    PlayerTweaks* pTweaks = mUnidentifiedFielder->GetTweaks();
     float fMaxSpeed = fn_8002C328(pTweaks);
     mUnidentifiedFielder->m_fDesiredSpeed =
         FMIN(mUnidentifiedFielder->m_fDesiredSpeed, fMaxSpeed);

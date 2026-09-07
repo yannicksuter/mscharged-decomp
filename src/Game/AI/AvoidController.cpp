@@ -4,7 +4,7 @@
 #include "Game/DebugWriteCache.h"
 #include "NL/nlMemory.h"
 
-extern "C" int fn_8000CEF8(eAvoidableThings);
+extern "C" int GetAvoidableIndex(eAvoidableThings);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -107,13 +107,13 @@ void AvoidController::SetThingsToAvoid(int thingsToAvoid)
 
 nlVector3& AvoidController::GetLastRepulsionVector(eAvoidableThings things)
 {
-    return m_LastRepulVec[fn_8000CEF8(things)];
+    return m_LastRepulVec[GetAvoidableIndex(things)];
 }
 
 extern "C" float fn_8000F558(
     AvoidController* controller, eAvoidableThings things)
 {
-    return controller->mUnidentified094[fn_8000CEF8(things)];
+    return controller->mUnidentified094[GetAvoidableIndex(things)];
 }
 
 extern "C" void fn_8000F324(AvoidController* controller,

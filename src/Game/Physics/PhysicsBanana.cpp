@@ -79,7 +79,7 @@ void PhysicsBanana::PreUpdate()
                 if (nlVec3LengthSquared(linVel) > 0.1f)
                 {
                     float dumping
-                        = -lbl_8056CF08.m_pGameTweaks->fBananaResistance / len;
+                        = -gGameTweaks.m_pGameTweaks->fBananaResistance / len;
                     nlVec3Scale(linVel, linVel, dumping);
                     AddForceAtCentreOfMass(linVel);
                 }
@@ -390,7 +390,7 @@ bool PhysicsBanana::SetContactInfo(dContact* contact, PhysicsObject* other, bool
 
     if (other->GetObjectType() == 0x12)
     {
-        contact->surface.bounce = lbl_8056CF08.m_pGameTweaks->fShellBounceGround;
+        contact->surface.bounce = gGameTweaks.m_pGameTweaks->fShellBounceGround;
     }
     else
     {

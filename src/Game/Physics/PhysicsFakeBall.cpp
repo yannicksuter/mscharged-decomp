@@ -12,6 +12,8 @@
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
+static void ClearBallCache();
+
 SlotPool<BallCacheInfo> BallCacheInfo::mBallCacheInfoSlotPool(16, 16);
 FakeBallWorld* FakeBallWorld::mpPredictWorld;
 nlDLListSlotPool<BallCacheInfo*> FakeBallWorld::mBallCacheList;
@@ -102,24 +104,25 @@ void FakeBallWorld::Destroy()
     BallCacheInfo::mBallCacheInfoSlotPool.FreeBlocks();
 }
 
-void FakeBallWorld::ClearBallCache()
+static void ClearBallCache()
 {
-    if (mBallCacheList.m_Head != 0)
+    if (!FakeBallWorld::mBallCacheList.IsEmpty())
     {
-        nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
+        nlDLListIterator<BallCacheInfo*> iter
+            = FakeBallWorld::mBallCacheList.Begin();
         while (iter.hasNext())
         {
             BallCacheInfo::mBallCacheInfoSlotPool.Free(*iter);
             iter.next();
         }
-        mBallCacheList.Clear();
+        FakeBallWorld::mBallCacheList.Clear();
     }
 
-    mfLastCacheTime = -1.0f;
-    if (mpPredictWorld != 0)
+    FakeBallWorld::mfLastCacheTime = -1.0f;
+    if (FakeBallWorld::mpPredictWorld != 0)
     {
-        mpPredictWorld->mbHitSuccess = false;
-        mpPredictWorld->mUnidentified1D = false;
+        FakeBallWorld::mpPredictWorld->mbHitSuccess = false;
+        FakeBallWorld::mpPredictWorld->mUnidentified1D = false;
     }
 }
 
@@ -693,7 +696,7 @@ extern "C" void fn_8016EEC8()
         if (FakeBallWorld::mpPredictWorld->mUnidentified1D)
         {
             FakeBallWorld::mpPredictWorld->mUnidentified1D = false;
-            FakeBallWorld::ClearBallCache();
+            FakeBallWorld::InvalidateBallCache();
         }
     }
 }
@@ -710,7 +713,7 @@ extern "C" void fn_8016F06C()
         if (FakeBallWorld::mpPredictWorld->mbHitSuccess)
         {
             FakeBallWorld::mpPredictWorld->mbHitSuccess = false;
-            FakeBallWorld::ClearBallCache();
+            FakeBallWorld::InvalidateBallCache();
         }
     }
 }

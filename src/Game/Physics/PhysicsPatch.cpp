@@ -1,4 +1,5 @@
-#include "Game/AI/UnidentifiedAvoidanceObject.h"
+#include "Game/Sys/audio.h"
+#include "Game/AI/AvoidableObject.h"
 #include "Game/Physics/PhysicsPatch.h"
 
 #include "Game/AI/AiUtil.h"
@@ -27,13 +28,9 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 
 extern CollisionSpace* g_CollisionSpace;
 extern UnidentifiedEventRegistry* g_pEventRegistry;
-extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
 extern "C" EmissionController* fn_802E81A0(
     EmissionManager*, unsigned long, const EffectsGroup*);
-extern "C" EmissionController* fn_802E7FE4(
-    EmissionManager*, EffectsGroup*, int, bool, bool);
-extern "C" bool fn_800EBBFC(
-    int, unsigned long, const char*, void*);
+
 extern "C" UnidentifiedNetworkSyncState* lbl_806E2488;
 
 extern "C" void fn_8017472C(void*);
@@ -112,17 +109,16 @@ void PhysicsPatch::fn_80172EE0(const int* type)
     SetCollide(info->mUnidentified0C);
     EnableCollisions();
     m_Gravity = info->mUnidentified14;
-    fn_800EBBFC(10, info->mUnidentified10, 0, 0);
+    PlaySound(10, info->mUnidentified10, 0, 0);
 
     if (info->mUnidentified08 != 0 && info->mUnidentified08[0] != '\0')
     {
         EffectsGroup* effects
-            = fn_802E7CDC(EmissionManager::Instance(), info->mUnidentified08);
+            = EmissionManager::Instance()->GetEffectsGroup(info->mUnidentified08);
         if (effects != 0)
         {
             int view = m_Type < 8 ? 3 : 2;
-            EmissionController* controller = fn_802E7FE4(
-                EmissionManager::Instance(), effects, view, true, false);
+            EmissionController* controller = EmissionManager::Instance()->Create(effects, view, true, 0);
             controller->SetPosition(GetPosition());
             controller->m_uUserData = (unsigned long)this;
             controller->SetUpdateCallback(
@@ -141,8 +137,8 @@ void PhysicsPatch::fn_80172EE0(const int* type)
     case 9:
     case 10:
         mUnidentified44
-            = new (nlMalloc(sizeof(UnidentifiedAvoidancePatch_804F4780), 8, false))
-                UnidentifiedAvoidancePatch_804F4780(this);
+            = new (nlMalloc(sizeof(AvoidablePatch), 8, false))
+                AvoidablePatch(this);
         break;
     default:
         mUnidentified44 = 0;
@@ -157,8 +153,7 @@ void PhysicsPatch::Unknown0()
         UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(&m_Type);
         if (info->mUnidentified08 != 0)
         {
-            EffectsGroup* effects = fn_802E7CDC(
-                EmissionManager::Instance(), info->mUnidentified08);
+            EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mUnidentified08);
             if (effects != 0)
             {
                 EmissionManager::Instance()->Kill(
@@ -312,8 +307,7 @@ void PhysicsPatch::fn_80173A10(float)
                 = fn_80174ED4(&m_Type);
             if (info->mUnidentified08 != 0)
             {
-                EffectsGroup* effects = fn_802E7CDC(
-                    EmissionManager::Instance(), info->mUnidentified08);
+                EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mUnidentified08);
                 if (effects != 0)
                 {
                     EmissionManager::Instance()->Destroy(
@@ -396,14 +390,9 @@ nlVector3 PhysicsPatch::fn_80173CCC()
     nlVector3 direction = { 0.0f, 0.0f, 0.0f };
     if (mUnidentified40 != 0 && m_CurrentPathPoint > 0)
     {
-        const nlVector3& position = GetPosition();
-        direction.x = mUnidentified40[m_CurrentPathPoint].x - position.x;
-        direction.y = mUnidentified40[m_CurrentPathPoint].y - position.y;
-        direction.z = mUnidentified40[m_CurrentPathPoint].z - position.z;
-        float scale = nlRecipSqrt(direction.GetLengthSq3D(), true);
-        direction.x *= scale;
-        direction.y *= scale;
-        direction.z *= scale;
+        nlVec3Sub(direction, mUnidentified40[m_CurrentPathPoint], m_position);
+        float scale = nlRecipSqrt(direction.GetLengthSq3D(), false);
+        nlVec3Scale(direction, scale);
     }
     return direction;
 }
@@ -600,8 +589,7 @@ extern "C" void fn_8017472C(void*)
             if (info != 0 && info->mUnidentified08 != 0
                 && info->mUnidentified08[0] != '\0')
             {
-                EffectsGroup* effects = fn_802E7CDC(
-                    EmissionManager::Instance(), info->mUnidentified08);
+                EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mUnidentified08);
                 if (effects != 0)
                 {
                     EmissionManager::Instance()->Kill(

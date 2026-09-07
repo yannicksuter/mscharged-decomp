@@ -9,6 +9,7 @@ class FuzzyTweaks;
 class DebugWriteCache;
 class RunningChecksum;
 class UnidentifiedGameRegion;
+class Terrain;
 class cFielder;
 class cPlayer;
 
@@ -179,10 +180,12 @@ public:
     /* 0x474 */ float m_fCachedBallPlayerDistances[10];
 
 public:
+    void QueueChainNisEnd(ShotAtGoalData* data);
+
     /* 0x49C */ UnidentifiedGameEventQueue mUnidentified49C;
 
 public:
-    /* 0x10D8 */ void* mUnidentified10D8;
+    /* 0x10D8 */ Terrain* mpTerrain;
     /* 0x10DC */ void* mUnidentified10DC;
     /* 0x10E0 */ void* mUnidentified10E0;
 };

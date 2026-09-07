@@ -18,7 +18,7 @@ void FuzzyScriptClearGlobals()
     if (g_pScriptCurrentTeam != 0)
     {
         SkillTweaks* pTeamContext = fn_800A636C(g_pScriptCurrentTeam);
-        pTeamContext->mUnidentified240 = 0;
+        pTeamContext->mpCurrentPlayer = 0;
     }
 
     g_pScriptCurrentFielder = 0;
@@ -61,5 +61,5 @@ void FuzzyScriptSetCurrentFielder(cFielder* pCurrentFielder)
     g_pScriptCurrentTeam = pCurrentFielder->m_pTeam;
     g_pScriptOtherTeam =
         (g_pTeams[0] == g_pScriptCurrentTeam) ? g_pTeams[1] : g_pTeams[0];
-    fn_800A636C(g_pScriptCurrentTeam)->mUnidentified240 = pCurrentFielder;
+    fn_800A636C(g_pScriptCurrentTeam)->mpCurrentPlayer = pCurrentFielder;
 }

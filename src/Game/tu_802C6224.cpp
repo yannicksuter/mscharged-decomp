@@ -220,14 +220,16 @@ void fn_802C6CAC(
     unsigned long size;
     char* data = fn_802C6BB0(filename, &size);
 
-    UnidentifiedTweakParser_8052BF40 parser;
-    if (category != 0)
     {
-        parser.mCategory = category;
-        parser.mCurrentSection = category;
-    }
+        UnidentifiedTweakParser_8052BF40 parser;
+        if (category != 0)
+        {
+            parser.mCategory = category;
+            parser.mCurrentSection = category;
+        }
 
-    fn_802C6828(data, size, &parser);
+        fn_802C6828(data, size, &parser);
+    }
     nlFree(data);
 }
 

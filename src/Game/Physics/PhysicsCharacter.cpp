@@ -506,7 +506,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         if (sPlayerPlayerCollisionData[collisionIndex] == 0)
         {
             CollisionPlayerPlayerData* data = 0;
-            lbl_80571258.Allocate(data);
+            gCollisionPlayerPlayerDataPool.Allocate(data);
             sPlayerPlayerCollisionData[collisionIndex] = data;
             data->player1 = (cPlayer*)collisionPlayer1;
             data->player2 = (cPlayer*)collisionPlayer2;

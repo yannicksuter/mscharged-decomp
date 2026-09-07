@@ -38,7 +38,6 @@ extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
 extern "C" float fn_800D85F8(cFielder*);
 extern "C" float fn_800D9EC4(cPlayer*);
 extern "C" float fn_800DF74C(cTeam*);
-extern "C" unsigned int fn_800387CC(cFielder*);
 extern "C" void fn_800D2074();
 
 extern bool lbl_806E0C50;
@@ -409,7 +408,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
                     || outOfBoundsFielder->m_v3Position.x < -20.6f)
                 && !fn_800D9EC4(outOfBoundsFielder)
                 && !outOfBoundsFielder->fn_800344B0()
-                && !fn_800387CC(outOfBoundsFielder))
+                && !outOfBoundsFielder->IsShattered())
             {
                 shouldRunToTarget = true;
             }

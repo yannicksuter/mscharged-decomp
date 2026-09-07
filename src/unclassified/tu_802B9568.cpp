@@ -1,3 +1,4 @@
+#include "NL/nlDebugString.h"
 #include "Game/Debug/ProfilerDisplay_802B9A3C.h"
 #include "Game/GL/GLColourMeshWriter.h"
 #include "NL/gl/glDraw2.h"
@@ -28,7 +29,7 @@ static UnidentifiedTimeRegionData_802B9570 lbl_8057C164(
     "variable c", 3, 0.25f, 0.5f);
 unsigned long lbl_806E1DD4 = lbl_806DF2BC;
 
-extern "C" const char* fn_802B9568(void*, unsigned long)
+const char* nlLookupDebugString(void*, unsigned long)
 {
     return "unknown";
 }

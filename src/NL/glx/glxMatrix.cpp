@@ -53,7 +53,7 @@ void glplatMatrixLookAt(nlMatrix4& m, const nlVector3& eye, const nlVector3& at,
         nlVec4Set(sidePlane, side.x, side.y, side.z, 0.0f);
 
         nlVector3 projectedUp;
-        fn_802B5D74(projectedUp, up, sidePlane);
+        nlProjectPointOntoPlane(projectedUp, up, sidePlane);
         if (nlAbs(projectedUp.x) > 0.001f || nlAbs(projectedUp.y) > 0.001f)
         {
             nlQuaternion rotation;

@@ -1,4 +1,7 @@
-#include "Game/SAnim.h"
+#include "NL/nlDebugString.h"
+#include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioSystem.h"
+#include "NL/nlChunk.h"
 #include "Game/Sys/debug.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
@@ -82,10 +85,7 @@ struct SliderState_802EFB70
 extern char lbl_8052F668[0x16];
 extern SlotPoolBase lbl_8057F9E8;
 extern SlotPoolBase lbl_8057FA10;
-extern int lbl_806E1DC8;
-extern void* lbl_806E201C;
 
-extern "C" const char* fn_802B9568(int table, ...);
 extern "C" SliderState_802EFB70* fn_802EED38(
     void* sliderTable, u32 sliderIndex, void* localOwner);
 
@@ -93,8 +93,7 @@ extern "C" void fn_802EFEFC(RpcController_802EFB70* controller);
 
 static inline void* GetSliderTable_802EFB70()
 {
-    void* resources = *(void**)((u8*)lbl_806E201C + 0xCC);
-    return *(void**)((u8*)resources + 0xC);
+    return g_pAudioSystem->GetBundleManager()->GetSliderTable();
 }
 
 static inline RpcRuntimeNode_802EFB70* AllocateRuntimeNode_802EFB70()
@@ -171,7 +170,7 @@ static inline void UpdateRuntimeNode_802EFB70(RpcRuntimeNode_802EFB70* node)
     node->value = EvaluateCurve_802EFB70(
         node->definition, slider->value);
     node->valid = true;
-    tDebugPrintManager::Print(DC_SOUND, lbl_8052F668, fn_802B9568(lbl_806E1DC8, slider->definition->name), node->value);
+    tDebugPrintManager::Print(DC_SOUND, lbl_8052F668, nlLookupDebugString(g_pDebugStringTable, (unsigned long)slider->definition->name), node->value);
 }
 
 extern "C" RpcController_802EFB70* fn_802EFB70(nlChunk* outer)

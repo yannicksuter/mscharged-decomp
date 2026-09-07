@@ -43,7 +43,7 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
     DetInput* pGlobalPad = mUnidentifiedFielder->GetGlobalPad();
     if (pGlobalPad != 0)
     {
-        fn_80336D90(
+        GetLocalChannelPad(
             (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser);
     }
     else
@@ -62,8 +62,8 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
         for (i = 0; i < 4; ++i)
         {
             probabilities[i] = fn_800A636C(lbl_806E0E00)
-                                   ->mUnidentified0A0[i]
-                                   ->fn_800A0D6C();
+                                   ->MegaGoalChance[i]
+                                   ->GetValue();
         }
 
         float fRandom = nlRandomf(1.0f);
@@ -124,8 +124,8 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
         int nSkillIndex = (int)(
             (float)mUnidentifiedA4 - mUnidentifiedFielder->fn_800489C4());
         float fAccuracy = fn_800A636C(lbl_806E0E00)
-                              ->mUnidentified0B0[nSkillIndex]
-                              ->fn_800A0D6C();
+                              ->MegaGoalAccuracy[nSkillIndex]
+                              ->GetValue();
         if (mUnidentifiedA8 < fAccuracy)
         {
             mUnidentifiedA8 = 1.0f - nlRandomf(fAccuracyRange);
@@ -201,7 +201,7 @@ void DesireMegaStrike::UnidentifiedUpdate(
             cGlobalPad* pInputPad = 0;
             if (pGlobalPad != 0)
             {
-                pInputPad = fn_80336D90(
+                pInputPad = GetLocalChannelPad(
                     (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser);
             }
             if (pInputPad != 0)

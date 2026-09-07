@@ -178,7 +178,7 @@ static void DrawShadow(float radius, float x, float y, float z)
     glSetTextureState((eGLTextureState)0, 3);
     glSetCurrentTextureState(glHandleizeTextureState());
 
-    quad.Attach((eGLView)(u32)fn_8027262C(), 0);
+    quad.Attach((eGLView)(u32)GetUnshadowedView(), 0);
 }
 
 void DrawablePowerup::Grab(int idx)

@@ -5,7 +5,7 @@
 
 extern "C" int fn_8013A12C(cGlobalPad* pad);
 extern "C" void fn_80139D68(int action, cGlobalPad* pad);
-extern "C" void fn_802F49AC(unsigned long* hash, int index);
+void SetAudioEffectContext(unsigned long* hash, int index);
 
 TU80219248Component::TU80219248Component()
     : TU80300104Component(0)
@@ -114,6 +114,6 @@ void TU80219248Component::fn_802195B4(int index)
 void TU80219248Component::fn_80219608(const TU80300104Event* event)
 {
     unsigned long hash = nlStringLowerHash("ControllerSpeaker");
-    fn_802F49AC(&hash, event->mIndex + 1);
+    SetAudioEffectContext(&hash, event->mIndex + 1);
     fn_80300594(event);
 }

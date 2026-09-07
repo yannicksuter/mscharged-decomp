@@ -12,14 +12,6 @@
 extern "C" int nlSNPrintf(char*, unsigned long, const char*, ...);
 extern "C" double floor(double);
 
-// The tweak-value constructor is inlined here, matching the pattern already
-// used by Game/InterpreterCore.cpp; the retained out-of-line copy at
-// 0x8007571C belongs to a translation unit that does not see this definition.
-inline TweakValueImpl_804F4DC8::TweakValueImpl_804F4DC8(float* value)
-    : m_pValue(value)
-{
-}
-
 u32 lbl_806E1F68;
 
 ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
@@ -46,38 +38,9 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     char pathBuffer[0x80];
     nlSNPrintf(pathBuffer, 0x80, "/Render/Impostor/CharacterTweaks/%s", name);
 
-    bool registered = mfScale.fn_802C4FEC(
-        "mfScale", 0.0f, pathBuffer, true, 3.0f, 0.001f);
-    if (!registered)
-    {
-        mfScale = mfScale.GetDefaultValue();
-    }
-    if (!registered)
-    {
-        mfScale = 1.0f;
-    }
-
-    registered = mfCameraLookatZ.fn_802C4FEC(
-        "mfCameraLookatZ", 0.0f, pathBuffer, true, 10.0f, 0.01f);
-    if (!registered)
-    {
-        mfCameraLookatZ = mfCameraLookatZ.GetDefaultValue();
-    }
-    if (!registered)
-    {
-        mfCameraLookatZ = 1.2f;
-    }
-
-    registered = mfCameraDistance.fn_802C4FEC(
-        "mfCameraDistance", 0.0f, pathBuffer, true, 40.0f, 0.01f);
-    if (!registered)
-    {
-        mfCameraDistance = mfCameraDistance.GetDefaultValue();
-    }
-    if (!registered)
-    {
-        mfCameraDistance = 2.3f;
-    }
+    mfScale.BindWithDefault("mfScale", 1.0f, pathBuffer, true, 0.0f, 3.0f, 0.001f);
+    mfCameraLookatZ.BindWithDefault("mfCameraLookatZ", 1.2f, pathBuffer, true, 0.0f, 10.0f, 0.01f);
+    mfCameraDistance.BindWithDefault("mfCameraDistance", 2.3f, pathBuffer, true, 0.0f, 40.0f, 0.01f);
 
     fn_802C8280("ImpostorCharacter");
 
@@ -354,7 +317,7 @@ ImpostorCharacterImpl_8052E9B8::ImpostorCharacterImpl_8052E9B8(
     }
     for (int i = 0; i < numTextures; ++i)
     {
-        fn_802DB528(mModels[i], (const char*)animations, 0.0f, PM_CYCLIC);
+        mModels[i]->PlayAnimation((const char*)animations, 0.0f, PM_CYCLIC);
     }
 }
 
@@ -384,7 +347,7 @@ void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual28(float dt,
     for (int i = 0; i < mNumModels; ++i)
     {
         float value = nlRandomf(0.25f * dt, dt, &nlDefaultSeed);
-        fn_802DB528(mModels[i], unidentified, value, PM_CYCLIC);
+        mModels[i]->PlayAnimation(unidentified, value, PM_CYCLIC);
     }
 }
 

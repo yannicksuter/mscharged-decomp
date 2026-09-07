@@ -6,11 +6,11 @@
 extern void nlPrintf(const char*, ...);
 extern void nlBreak();
 
-char lbl_8052B370[] = "Total Free Memory: %d\n";
-char lbl_8052B388[] = "Largest Free Block: %d\n";
-char lbl_8052B3A0[] = "FreePanicDump.txt";
-extern char lbl_8052B414[];
-extern char lbl_8052B45C[];
+char sTotalFreeMemoryFormat[] = "Total Free Memory: %d\n";
+char sLargestFreeBlockFormat[] = "Largest Free Block: %d\n";
+char sFreePanicDumpFilename[] = "FreePanicDump.txt";
+extern char sFreeMemoryDumpHeader[];
+extern char sFreeMemoryDumpTotalFormat[];
 
 struct MemoryStats_802AF2E4
 {
@@ -47,14 +47,14 @@ static inline void DumpFreeMemory(MemoryAllocator* allocator, const char* filena
     stats.largest = 0;
     stats.count = 0;
     nlWalkDLRing(allocator->m_free_block_list, &callback1, &MemoryStatsCallback_802AF2E4::Callback);
-    nlPrintf(lbl_8052B370, stats.total);
+    nlPrintf(sTotalFreeMemoryFormat, stats.total);
 
     callback2.stats = &stats;
     stats.total = 0;
     stats.largest = 0;
     stats.count = 0;
     nlWalkDLRing(allocator->m_free_block_list, &callback2, &MemoryStatsCallback_802AF2E4::Callback);
-    nlPrintf(lbl_8052B388, stats.largest);
+    nlPrintf(sLargestFreeBlockFormat, stats.largest);
 
     FreePanicDumpCallback_802AF470 dump;
     if (filename == 0)
@@ -70,17 +70,17 @@ static inline void DumpFreeMemory(MemoryAllocator* allocator, const char* filena
     void* file = dump.file;
     if (nlDebugFileIsValid(file))
     {
-        nlWriteLineDebug(file, lbl_8052B414, false);
+        nlWriteLineDebug(file, sFreeMemoryDumpHeader, false);
     }
     else
     {
-        nlPrintf(lbl_8052B414);
+        nlPrintf(sFreeMemoryDumpHeader);
     }
 
     nlWalkDLRing(allocator->m_free_block_list, &dump, &FreePanicDumpCallback_802AF470::Callback);
 
     char buffer[512];
-    nlSNPrintf(buffer, sizeof(buffer), lbl_8052B45C, dump.total);
+    nlSNPrintf(buffer, sizeof(buffer), sFreeMemoryDumpTotalFormat, dump.total);
     buffer[511] = 0;
     if (nlDebugFileIsValid(file))
     {
@@ -98,7 +98,7 @@ static inline void DumpFreeMemory(MemoryAllocator* allocator, const char* filena
     nlBreak();
 }
 
-void* MemoryAllocator::fn_802AE92C(unsigned long size, unsigned int alignment)
+void* MemoryAllocator::AllocateFromStart(unsigned long size, unsigned int alignment)
 {
     FreeBlockList* start = m_free_block_list == 0 ? 0 : m_free_block_list->m_next;
     FreeBlockList* cur = start;
@@ -126,7 +126,7 @@ void* MemoryAllocator::fn_802AE92C(unsigned long size, unsigned int alignment)
         cur = cur->m_next;
         if (cur == start)
         {
-            DumpFreeMemory(this, lbl_8052B3A0);
+            DumpFreeMemory(this, sFreePanicDumpFilename);
         }
     }
 
@@ -201,7 +201,7 @@ void* MemoryAllocator::fn_802AE92C(unsigned long size, unsigned int alignment)
     return result;
 }
 
-void* MemoryAllocator::fn_802AED20(unsigned long size, unsigned int alignment)
+void* MemoryAllocator::AllocateFromEnd(unsigned long size, unsigned int alignment)
 {
     FreeBlockList* end = nlDLRingGetEnd(m_free_block_list);
     FreeBlockList* cur = end;
@@ -228,7 +228,7 @@ void* MemoryAllocator::fn_802AED20(unsigned long size, unsigned int alignment)
         cur = cur->m_next;
         if (cur == end)
         {
-            DumpFreeMemory(this, lbl_8052B3A0);
+            DumpFreeMemory(this, sFreePanicDumpFilename);
         }
     }
 
@@ -314,9 +314,9 @@ void* MemoryAllocator::Allocate(unsigned long size, unsigned int alignment, bool
     }
     if (fromEnd)
     {
-        return fn_802AED20(size, alignment);
+        return AllocateFromEnd(size, alignment);
     }
-    return fn_802AE92C(size, alignment);
+    return AllocateFromStart(size, alignment);
 }
 
 void MemoryAllocator::Initialize(void* memory, unsigned int size)
@@ -451,8 +451,8 @@ unsigned int MemoryAllocator::LargestFreeBlock()
     return stats.largest;
 }
 
-char lbl_8052B414[] = "count   address     size        allocNum    file(line)  description \n";
-char lbl_8052B45C[] = "Total free memory: %d\n";
+char sFreeMemoryDumpHeader[] = "count   address     size        allocNum    file(line)  description \n";
+char sFreeMemoryDumpTotalFormat[] = "Total free memory: %d\n";
 
 void FreePanicDumpCallback_802AF470::Callback(FreeBlockList* block)
 {

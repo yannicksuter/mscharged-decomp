@@ -10,7 +10,7 @@ UnidentifiedSkinAnimatedNPC_80199880::UnidentifiedSkinAnimatedNPC_80199880(
     void* resource)
     : SkinAnimatedNPC(hierarchy, modelID, resource)
 {
-    sUnidentifiedView = fn_8027262C();
+    sUnidentifiedView = GetUnshadowedView();
     mpZip = animInventory.Find((char*)"zip");
     mpUnzip = animInventory.Find((char*)"unzip");
     mTimer.SetSeconds(0.0f);

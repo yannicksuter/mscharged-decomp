@@ -93,7 +93,10 @@ public:
 class TweakValueImpl_804F4DC8 : public UnidentifiedTweakValueImplBase
 {
 public:
-    TweakValueImpl_804F4DC8(float* value = 0);
+    TweakValueImpl_804F4DC8(float* value = 0)
+        : m_pValue(value)
+    {
+    }
     TweakValueImpl_804F4DC8(const char* name, const char* category, float* value,
         bool unidentified = false)
     {
@@ -126,12 +129,25 @@ public:
     virtual void UnidentifiedVirtual38(void* value);
     virtual float UnidentifiedVirtual3C();
 
-    bool fn_8002D078(const char*, float, const char*, bool, float, float, float);
+    bool BindWithDefault(const char* name, float defaultValue,
+        const char* group, bool reload, float value, float min, float max)
+    {
+        bool found = fn_802C4FEC(name, value, group, reload, min, max);
+        if (!found)
+        {
+            *m_pValue = GetDefaultValue();
+        }
+        if (!found)
+        {
+            *m_pValue = defaultValue;
+        }
+        return found;
+    }
 
-    TweakValueImpl_804F4DC8& operator=(float value)
+    const float& operator=(const float& value)
     {
         *m_pValue = value;
-        return *this;
+        return *m_pValue;
     }
 
     float GetDefaultValue()
@@ -197,7 +213,7 @@ public:
     virtual void UnidentifiedVirtual38(void* value);
     virtual int UnidentifiedVirtual3C();
 
-    bool fn_800757B4(const char*, int, const char*, bool, float, float, float);
+    bool BindWithDefault(const char*, int, const char*, bool, float, float, float);
 
     operator int() const
     {

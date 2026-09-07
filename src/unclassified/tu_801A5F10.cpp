@@ -20,9 +20,6 @@ extern "C"
 {
     PhysicsSphere* fn_801709D0(
         PhysicsSphere*, KoopaShellObject*, float);
-    EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
-    EmissionController* fn_802E7FE4(
-        EmissionManager*, EffectsGroup*, int, bool, bool);
     void fn_801BC6E4(cFielder*);
     void fn_801BC96C(const nlVector3*);
 }
@@ -90,8 +87,7 @@ static inline void Deactivate(KoopaShellObject* object, bool destroyEffect)
             object->mOwner->ReleaseBall(0);
         }
 
-        EffectsGroup* group = fn_802E7CDC(
-            EmissionManager::Instance(), sKoopaShellTrail);
+        EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(sKoopaShellTrail);
         if (!destroyEffect)
         {
             EmissionManager::Instance()->Kill(
@@ -218,8 +214,7 @@ extern "C" void fn_801A6074(
     {
         EmissionManager::Instance()->Kill(
             (unsigned long)object,
-            fn_802E7CDC(
-                EmissionManager::Instance(), sKoopaShellTrail));
+            EmissionManager::Instance()->GetEffectsGroup(sKoopaShellTrail));
     }
 }
 
@@ -266,10 +261,8 @@ extern "C" void fn_801A6344(
     object->mVisible = true;
     object->mPhysics->EnableCollisions();
 
-    EffectsGroup* group = fn_802E7CDC(
-        EmissionManager::Instance(), sKoopaShellTrail);
-    EmissionController* controller = fn_802E7FE4(
-        EmissionManager::Instance(), group, 3, true, false);
+    EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(sKoopaShellTrail);
+    EmissionController* controller = EmissionManager::Instance()->Create(group, 3, true, 0);
     controller->SetPosition(object->mPosition);
     controller->m_uUserData = (u32)object;
     controller->SetUpdateCallback(

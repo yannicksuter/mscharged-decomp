@@ -15,7 +15,7 @@ struct SoundCue
     u32 field_0x10;
 };
 
-class SoundCueCompare_802EE294
+class SoundCueCompare
 {
 public:
     int operator()(SoundCue* cue1, SoundCue* cue2) const
@@ -38,21 +38,21 @@ public:
     }
 };
 
-typedef nlAVLTree<SoundCue*, SoundCue*, SoundCueCompare_802EE294>
-    SoundCueTree_802EE294;
-typedef nlAVLTreeIterator<SoundCue*, SoundCue*, SoundCueCompare_802EE294>
-    SoundCueTreeIterator_802EE294;
+typedef nlAVLTree<SoundCue*, SoundCue*, SoundCueCompare>
+    SoundCueTree;
+typedef nlAVLTreeIterator<SoundCue*, SoundCue*, SoundCueCompare>
+    SoundCueTreeIterator;
 
 class SoundMap
 {
 public:
-    u32 fn_802EE178(u32 field0, u32 field4, u32 field8, u32 fieldC);
-    void fn_802EE20C();
-    static SoundMap* fn_802EE458(nlChunk* chunk);
+    u32 FindCue(u32 field0, u32 field4, u32 field8, u32 fieldC);
+    void Unload();
+    static SoundMap* ParseChunk(nlChunk* chunk);
 
     u32 m_CueCount;
     SoundCue* m_Cues;
-    SoundCueTree_802EE294* m_CueTree;
+    SoundCueTree* m_CueTree;
 };
 
 #endif // GAME_AUDIO_SOUND_MAP_H

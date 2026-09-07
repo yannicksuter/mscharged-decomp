@@ -2244,7 +2244,7 @@ void DisplayDVDMessageSebring(int arg)
         CanGetResetPauseState = false;
     }
 
-    if (ResetTask::s_ResetState != RS_STARTRESET && lbl_806E201C != 0)
+    if (ResetTask::s_ResetState != RS_STARTRESET && g_pAudioSystem != 0)
     {
         if (arg == 4 || arg == -1 || arg == 11 || arg == 6)
         {

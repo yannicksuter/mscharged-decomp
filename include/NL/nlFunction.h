@@ -2,9 +2,8 @@
 #define NL_FUNCTION_H
 
 #include "NL/nlMemory.h"
+#include "NL/nlFunctionMemory.h"
 
-extern "C" void* fn_802B1C4C(unsigned long);
-extern "C" void fn_802B1D4C(void*, unsigned long);
 
 enum FunctionTag
 {
@@ -113,10 +112,10 @@ class Function0
 public:
     struct FunctorBase
     {
-        void* operator new(unsigned long size) { return fn_802B1C4C(size); }
+        void* operator new(unsigned long size) { return AllocateFunctionMemory(size); }
         void operator delete(void* ptr, unsigned long size)
         {
-            fn_802B1D4C(ptr, size);
+            FreeFunctionMemory(ptr, size);
         }
 
         virtual ~FunctorBase() { }
@@ -263,10 +262,10 @@ class Function1
 public:
     struct FunctorBase
     {
-        void* operator new(unsigned long size) { return fn_802B1C4C(size); }
+        void* operator new(unsigned long size) { return AllocateFunctionMemory(size); }
         void operator delete(void* ptr, unsigned long size)
         {
-            fn_802B1D4C(ptr, size);
+            FreeFunctionMemory(ptr, size);
         }
 
         virtual ~FunctorBase() { }
@@ -285,6 +284,7 @@ public:
 
         virtual ReturnType operator()(P1 p0);
         virtual FunctorBase* Clone() const;
+        virtual ~FunctorImpl() { }
 
     private:
         ReturnType Call(BoolToType<false>, P1 p0)
@@ -522,10 +522,10 @@ class Function2
 public:
     struct FunctorBase
     {
-        void* operator new(unsigned long size) { return fn_802B1C4C(size); }
+        void* operator new(unsigned long size) { return AllocateFunctionMemory(size); }
         void operator delete(void* ptr, unsigned long size)
         {
-            fn_802B1D4C(ptr, size);
+            FreeFunctionMemory(ptr, size);
         }
 
         virtual ~FunctorBase() { }
@@ -657,10 +657,10 @@ class Function3
 public:
     struct FunctorBase
     {
-        void* operator new(unsigned long size) { return fn_802B1C4C(size); }
+        void* operator new(unsigned long size) { return AllocateFunctionMemory(size); }
         void operator delete(void* ptr, unsigned long size)
         {
-            fn_802B1D4C(ptr, size);
+            FreeFunctionMemory(ptr, size);
         }
 
         virtual ~FunctorBase() { }

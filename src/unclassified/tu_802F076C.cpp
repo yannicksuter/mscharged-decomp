@@ -1,4 +1,7 @@
-#include "Game/SAnim.h"
+#include "Game/Audio/AudioResourceLoader.h"
+#include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioSystem.h"
+#include "NL/nlChunk.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
@@ -78,7 +81,7 @@ struct ResourceGroupD_802F0860
     u8 pad_14[0x1C];
 };
 
-struct ResourceBundle_802F0860
+struct ResourceBundle
 {
     u32 field_00;
     u32 field_04;
@@ -136,14 +139,6 @@ struct AudioResources_802F1548
     RpcController_802F1548* rpcController;
 };
 
-struct AudioSystem_802F1548
-{
-    u8 pad_00[0xCC];
-    AudioResources_802F1548* resources;
-};
-
-extern AudioSystem_802F1548* lbl_806E201C;
-
 extern "C" void fn_802F1548(ResourceGroupB_802F0860* group);
 
 extern "C" void fn_802F076C(
@@ -178,10 +173,10 @@ extern "C" SlotPool<SlotPoolEntry_802F07F0>* fn_802F07F0(
     return pool;
 }
 
-extern "C" ResourceBundle_802F0860* fn_802F0860(nlChunk* outer)
+ResourceBundle* ParseAudioResourceBundle(nlChunk* outer)
 {
     nlChunk* header = (nlChunk*)outer->GetData();
-    ResourceBundle_802F0860* bundle = (ResourceBundle_802F0860*)header->GetData();
+    ResourceBundle* bundle = (ResourceBundle*)header->GetData();
 
     ResourceGroupB_802F0860* oldGroupsB = bundle->groupsB;
     ResourceGroupC_802F0860* oldGroupsC = bundle->groupsC;
@@ -394,7 +389,7 @@ extern "C" void fn_802F1548(ResourceGroupB_802F0860* group)
 {
     group->secondaryCount = 0;
     group->flattenedCount = 0;
-    RpcController_802F1548* controller = lbl_806E201C->resources->rpcController;
+    RpcController_802F1548* controller = ((AudioResources_802F1548*)g_pAudioSystem->GetBundleManager())->rpcController;
 
     for (u32 i = 0; i < group->referenceCount; i++)
     {

@@ -1,6 +1,6 @@
 #include "Game/GL/GLVertexAnim.h"
 
-#include "Game/GL/tu_802D38A4.h"
+#include "Game/GL/glModelBuilder.h"
 #include "NL/nlMemory.h"
 
 #include <string.h>
@@ -57,19 +57,18 @@ glModel* GLVertexAnim::GetModel(int frame)
         glModelStream* streams = packet->streams;
         glModelStream* endVertexData = streams + packet->numStreams;
         u32 offset = 0;
-        while (streams < endVertexData)
+        for (int i = 0; streams + i < endVertexData; i++)
         {
-            for (int i = 0; i < m_Unknown14; i++)
+            for (int j = 0; j < m_Unknown14; j++)
             {
-                if (m_Unknown18[i] == streams->id)
+                if (m_Unknown18[j] == streams[i].id)
                 {
-                    fn_802D3A00(streams,
+                    glSetStreamAddress(&streams[i],
                         vertices + offset * packet->numUniqueVertices);
-                    offset += streams->stride;
+                    offset += streams[i].stride;
                     break;
                 }
             }
-            streams++;
         }
         vertices += offset * packet->numUniqueVertices;
     }

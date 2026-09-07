@@ -33,6 +33,6 @@ private:
     u32 mHeld;
 };
 
-void fn_802BD820(const char* format, ...);
+void PrintTextWindowMessage(const char* format, ...);
 
 #endif // GAME_TEXT_WINDOW_TASK_H

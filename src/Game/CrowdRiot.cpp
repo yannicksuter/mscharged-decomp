@@ -1,3 +1,4 @@
+#include "Game/Sys/audio.h"
 #include "Game/CrowdRiot.h"
 
 #include "Game/AI/AiUtil.h"
@@ -31,13 +32,7 @@ class Goalie;
 extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" float lbl_806E0C40;
 extern "C" float lbl_806E0C44;
-extern "C" EffectsGroup* fn_802E7CDC(
-    EmissionManager*, const char*);
-extern "C" EmissionController* fn_802E7FE4(
-    EmissionManager*, EffectsGroup*, int, bool, bool);
-extern "C" void fn_800EC12C(unsigned long, void*);
-extern "C" void fn_800EBBFC(
-    int, unsigned long, const char*, void*);
+
 extern "C" void fn_8007EB90(Goalie*);
 extern "C" void fn_8005E29C(cGame*, void*);
 extern "C" SlotPool<UnidentifiedEventData_80066B08> lbl_80571438;
@@ -258,19 +253,15 @@ void CrowdRiot::fn_80029460(bool param1)
     mv3Target.y = 0.0f;
     mv3Target.z = 0.0f;
 
-    group = fn_802E7CDC(
-        EmissionManager::Instance(), "generator_broken");
+    group = EmissionManager::Instance()->GetEffectsGroup("generator_broken");
     EmissionManager::Instance()->Kill((unsigned long)this, group);
-    group = fn_802E7CDC(
-        EmissionManager::Instance(), "generator_explode");
+    group = EmissionManager::Instance()->GetEffectsGroup("generator_explode");
     EmissionManager::Instance()->Kill((unsigned long)this, group);
-    group = fn_802E7CDC(
-        EmissionManager::Instance(), "crowd_riot");
+    group = EmissionManager::Instance()->GetEffectsGroup("crowd_riot");
     EmissionManager::Instance()->Kill((unsigned long)this, group);
-    group = fn_802E7CDC(
-        EmissionManager::Instance(), "crowd_riot_with_fade");
+    group = EmissionManager::Instance()->GetEffectsGroup("crowd_riot_with_fade");
     EmissionManager::Instance()->Kill((unsigned long)this, group);
-    fn_800EC12C(0x198B7ED3, this);
+    StopSound(0x198B7ED3, this);
 
     if (resumeRiot && meState != 0 && meState == 1)
     {
@@ -292,10 +283,8 @@ void CrowdRiot::fn_80029460(bool param1)
             mUnidentified30->EnableCollisions();
         }
 
-        group = fn_802E7CDC(
-            EmissionManager::Instance(), "crowd_riot_with_fade");
-        controller = fn_802E7FE4(
-            EmissionManager::Instance(), group, 3, true, false);
+        group = EmissionManager::Instance()->GetEffectsGroup("crowd_riot_with_fade");
+        controller = EmissionManager::Instance()->Create(group, 3, true, 0);
         controller->SetPosition(mv3Position);
         controller->SetVelocity(mv3Velocity);
         {
@@ -313,7 +302,7 @@ void CrowdRiot::fn_80029460(bool param1)
             controller->SetUpdateCallback(callback);
         }
         controller->m_uUserData = (u32)this;
-        fn_800EBBFC(13, 0x198B7ED3, "CrowdRiot", this);
+        PlaySound(13, 0x198B7ED3, "CrowdRiot", this);
     }
 }
 

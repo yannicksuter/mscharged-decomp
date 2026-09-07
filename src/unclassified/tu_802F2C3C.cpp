@@ -1,5 +1,6 @@
-#include "Game/Audio/AudioBackend_8035B8E8.h"
-#include "Game/Audio/XSoundHandle_802ED74C.h"
+#include "Game/Audio/AudioBackend.h"
+#include "Game/Audio/AudioSource.h"
+#include "Game/Audio/XSoundHandle.h"
 #include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
@@ -39,12 +40,6 @@ struct PlaybackRequest_802F2C3C
     PlaybackDefinition_802F2C3C* definition;
 };
 
-struct CueHandle_802F2C3C
-{
-    void** vtable;
-    void* resource;
-};
-
 struct ModifierDefinition_802F2C3C
 {
     u8 pad_00[0xC];
@@ -73,7 +68,7 @@ struct SoundDefinition_802F2C3C
 
 struct SoundInstance_802F2C3C
 {
-    CueHandle_802F2C3C* owner;
+    XSoundHandle* owner;
     SoundDefinition_802F2C3C* definition;
     void* voices;
     SlotPoolBase* entryPool;
@@ -94,35 +89,6 @@ struct PlaybackOwner_802F2C3C
     float pitchOffset;
 };
 
-class PlaybackBackend_802F2C3C
-{
-public:
-    virtual ~PlaybackBackend_802F2C3C();
-    virtual void fn_8035F30C() = 0;
-    virtual int fn_802F3CC8() = 0;
-    virtual void fn_8035CC0C() = 0;
-    virtual void fn_8035CC04() = 0;
-    virtual void fn_8036042C() = 0;
-    virtual void fn_8036058C(u32) = 0;
-    virtual void fn_8036066C() = 0;
-    virtual void fn_80361108() = 0;
-    virtual void fn_803611B4() = 0;
-    virtual void fn_8035D060(float) = 0;
-    virtual void fn_8035CF88() = 0;
-    virtual void fn_8035CEA4(float) = 0;
-    virtual void fn_8035F274() = 0;
-    virtual void fn_80360310() = 0;
-    virtual void fn_80360778() = 0;
-    virtual void fn_8035CC14() = 0;
-    virtual void UnidentifiedVirtual19_802F2C3C() = 0;
-    virtual void fn_8035CDCC() = 0;
-    virtual void UnidentifiedVirtual21_802F2C3C() = 0;
-    virtual void fn_8035CCFC() = 0;
-    virtual void fn_8035CC34() = 0;
-    virtual void fn_8035D1E0() = 0;
-    virtual bool fn_8035D310() = 0;
-};
-
 struct PlaybackObject_802F2C3C
 {
     void** vtable;
@@ -136,7 +102,7 @@ struct PlaybackObject_802F2C3C
     float pitchModifier;
     float currentVolume;
     float currentPitch;
-    PlaybackBackend_802F2C3C* backend;
+    AudioSource* backend;
     u32 flags : 16;
     u32 savedState : 16;
 };
@@ -148,11 +114,9 @@ extern void* lbl_8052F7E8[];
 extern SlotPoolBase lbl_8057FAE8;
 extern SlotPoolBase lbl_8057FB10;
 extern SlotPoolBase lbl_8057FB38;
-extern AudioBackend_8035B8E8* lbl_806E2020;
 
 extern "C" float fn_802F29F8(SoundInstance_802F2C3C*);
 extern "C" float fn_802F2A6C(SoundInstance_802F2C3C*);
-extern "C" void* fn_8035C298(void*, u32, u32);
 extern "C" void fn_802F4630(PlaybackOwner_802F2C3C*, float);
 extern "C" void fn_802F4638(PlaybackOwner_802F2C3C*, float);
 
@@ -224,8 +188,8 @@ extern "C" PlaybackObject_802F2C3C* fn_802F2CAC(PlaybackOwner_802F2C3C* owner,
                                   ? minimum
                                   : RandomRange_802F2C3C(minimum, minimum + maximum);
             object->selection = (u32)fn_802F3114(object);
-            object->backend = (PlaybackBackend_802F2C3C*)fn_8035C298(
-                lbl_806E2020, object->selection, *(u32*)((u8*)owner->instance->owner->resource + 0x14));
+            object->backend = g_pAudioBackend->CreateSource(
+                (AudioSourceInfo*)object->selection, object->owner->instance->owner->m_Owner);
         }
         return object;
     case 3:
@@ -280,8 +244,8 @@ extern "C" PlaybackObject_802F2C3C* fn_802F2F8C(
     {
         object->vtable = lbl_8052F7B0;
         if (object->backend != 0)
-            lbl_806E2020->fn_8035C51C(
-                (AudioSource_8035C234*)object->backend);
+            g_pAudioBackend->ReleaseSource(
+                (AudioSource*)object->backend);
         if (destroy > 0)
         {
             object->vtable = (void**)lbl_8057FAE8.m_FreeList;
@@ -309,13 +273,13 @@ extern "C" void fn_802F3008(PlaybackObject_802F2C3C* object)
     object->currentVolume = -96.0f;
     object->currentPitch = 0.0f;
     fn_802F34E4(object, true);
-    object->backend->fn_8036058C(object->definition->soundId);
+    object->backend->Play(object->definition->soundId);
     object->state = 4;
 }
 
 extern "C" void fn_802F30D0(PlaybackObject_802F2C3C* object)
 {
-    object->backend->fn_8036042C();
+    object->backend->Prepare();
     object->state = 2;
 }
 
@@ -342,7 +306,7 @@ extern "C" PlaybackObject_802F2C3C* fn_802F3114(
         selectedIndex = definition->choices[index].index;
     }
 
-    u8* resource = (u8*)object->owner->instance->owner->resource;
+    u8* resource = (u8*)object->owner->instance->owner->m_Slot;
     void* table = *(void**)(resource + 4);
     void* entries = *(void**)((u8*)table + 0x10);
     return (PlaybackObject_802F2C3C*)((u8*)*(void**)((u8*)entries + 0x14)
@@ -352,17 +316,17 @@ extern "C" PlaybackObject_802F2C3C* fn_802F3114(
 extern "C" int fn_802F32A0(PlaybackObject_802F2C3C* object, float)
 {
     if (object->backend != 0)
-        object->backend->fn_8035F30C();
+        object->backend->UpdateState();
 
     switch (object->state)
     {
     case 2:
-        if (object->backend->fn_802F3CC8() == 3)
+        if (object->backend->GetState() == 3)
             object->state = 3;
         break;
     case 4:
     case 7:
-        if (object->backend->fn_802F3CC8() == 1)
+        if (object->backend->GetState() == 1)
         {
             object->state = 8;
             object->flags = 0;
@@ -390,7 +354,7 @@ extern "C" int fn_802F32A0(PlaybackObject_802F2C3C* object, float)
 extern "C" void fn_802F3430(PlaybackObject_802F2C3C* object)
 {
     if (object->backend != 0)
-        object->backend->fn_80361108();
+        object->backend->Pause();
     object->savedState = object->state;
     object->state = 5;
 }
@@ -398,7 +362,7 @@ extern "C" void fn_802F3430(PlaybackObject_802F2C3C* object)
 extern "C" void fn_802F3490(PlaybackObject_802F2C3C* object)
 {
     if (object->backend != 0)
-        object->backend->fn_803611B4();
+        object->backend->Resume();
     object->state = object->savedState;
 }
 
@@ -468,7 +432,7 @@ extern "C" void fn_802F34E4(
     if (force || object->currentVolume != currentVolume)
     {
         object->currentVolume = currentVolume;
-        object->backend->fn_8035D060(currentVolume);
+        object->backend->SetInputVolume(currentVolume);
     }
 
     float currentPitch = pitch + fn_802F2A6C(object->owner->instance)
@@ -476,23 +440,23 @@ extern "C" void fn_802F34E4(
     if (object->currentPitch != currentPitch)
     {
         object->currentPitch = currentPitch;
-        object->backend->fn_8035CEA4(currentPitch);
+        object->backend->SetPitch(currentPitch);
     }
 }
 
 extern "C" void fn_802F37E8(PlaybackObject_802F2C3C* object)
 {
-    object->backend->fn_8036066C();
+    object->backend->Stop();
     object->state = 7;
     object->flags = 0;
 }
 
 extern "C" bool fn_802F3838(
-    PlaybackObject_802F2C3C* object, PlaybackBackend_802F2C3C** output)
+    PlaybackObject_802F2C3C* object, AudioSource** output)
 {
     if (object->backend != 0)
     {
-        if (object->backend->fn_8035D310())
+        if (object->backend->HasVoice())
         {
             *output = object->backend;
             return true;
@@ -509,8 +473,8 @@ extern "C" int fn_802F38A8(PlaybackObject_802F2C3C* object, float)
                   && object->owner->instance->currentTime >= object->startTime;
     if (condition)
     {
-        ((XSoundHandle_802ED74C*)object->owner->instance->owner)
-            ->fn_802ED8D0((void*)object->definition->soundId);
+        ((XSoundHandle*)object->owner->instance->owner)
+            ->OnHitMarker((void*)object->definition->soundId);
         object->state = 8;
     }
     return object->state;

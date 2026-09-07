@@ -31,7 +31,7 @@ OptionsAudioMenuV2::OptionsAudioMenuV2(int value)
         mButtonComponents[i].mSpeakerEnabled = false;
     }
 
-    AudioSettings* settings = (AudioSettings*)GameInfoManager::Instance()->GetUnknown0xA0();
+    AudioSettings* settings = GameInfoManager::Instance()->GetAudioSettings();
     mSettings[0] = settings->MusicVolume;
     mSettings[1] = settings->SFXVolume;
     mSettings[2] = settings->VoiceVolume;

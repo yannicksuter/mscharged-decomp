@@ -18,7 +18,6 @@ extern "C" float fn_8002C7F4(PlayerTweaks*);
 extern "C" bool fn_80039148(cFielder*);
 extern "C" void fn_80039CA0(cFielder*);
 extern "C" bool fn_8003C180(cFielder*);
-extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" void fn_80060A00(void*, cFielder*);
 extern "C" float fn_800A0508(cFielder*, bool, bool);
 
@@ -79,8 +78,8 @@ void ShotMeter::Reset(cFielder* pFielder)
     m_fScoreValue = 0.0f;
     m_fSpeedValue = 0.0f;
     m_fSTSValue = 0.0f;
-    mUnidentified008 = fn_8002C7E8(fn_8003E6E4(pFielder));
-    mUnidentified00C = fn_8002C7F4(fn_8003E6E4(pFielder));
+    mUnidentified008 = fn_8002C7E8(pFielder->GetTweaks());
+    mUnidentified00C = fn_8002C7F4(pFielder->GetTweaks());
 }
 
 extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot,
@@ -93,7 +92,7 @@ extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot,
 
     fRatingsValue = LikelyToScore(pFielder);
     fPlayerDistance = PlayerShotDistance(pFielder);
-    PlayerTweaks* pTweaks = fn_8003E6E4(pFielder);
+    PlayerTweaks* pTweaks = pFielder->GetTweaks();
     float fShooting = pTweaks->fShooting;
     fChargedValue = fn_800155A0(g_pBall, 0);
     fChargedValue *= 0.25f;
@@ -229,7 +228,7 @@ void ShotMeter::CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass)
     float fCombinedValue = (fDirectionValue + fDistanceValue) * 0.5f;
 
     m_fSpeedValue = InterpolateRangeClamped(0.2f,
-        fn_8002C7A8(fn_8003E6E4(pFielder)),
+        fn_8002C7A8(pFielder->GetTweaks()),
         0.0f,
         1.0f,
         fCombinedValue);
@@ -271,7 +270,7 @@ void ShotMeter::Update(float fDeltaT)
             }
 
             float fDelta = fCurrent - fPrevious;
-            float fRange = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE18(fn_8003E6E4(g_pBall->GetOwnerFielder())));
+            float fRange = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE18((g_pBall->GetOwnerFielder())->GetTweaks()));
             float fValue = Interpolate(fDelta * lbl_806DBE58,
                 fDelta * lbl_806DBE5C,
                 fRange);

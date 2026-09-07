@@ -10,6 +10,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 #include "Game/tu_802C6224.h"
+#include "NL/gl/glTextureManager.h"
 #include "NL/nlMath.h"
 #include "NL/nlDLRing.h"
 #include "NL/nlString.h"
@@ -244,8 +245,6 @@ extern "C" void fn_801A51D8();
 extern "C"
 {
     extern unsigned long lbl_806E1F0C;
-    void* fn_802CDF0C();
-    unsigned long fn_802CE1B8(void* manager, unsigned long texture);
     unsigned long fn_802CC7E4(
         const glModelPacket* packet, unsigned long hash);
     void fn_802CC458(glModelPacket* packet, unsigned long hash,
@@ -448,7 +447,7 @@ extern "C" void fn_801A49E4(u32 hash, unsigned long texture)
     DLListEntry<DrawableObject*>* head
         = BasicStadium::GetCurrentStadium()->mUnidentified008;
     nlDLListIterator<DrawableObject*> iterator(head, nlDLRingGetStart(head));
-    unsigned long textureIndex = fn_802CE1B8(fn_802CDF0C(), texture);
+    unsigned long textureIndex = glGetTextureManager()->GetTextureIndex(texture);
 
     for (; iterator.hasNext(); iterator.next())
     {

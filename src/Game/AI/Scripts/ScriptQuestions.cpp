@@ -273,6 +273,42 @@ float GoalieType(cPlayer* player)
     return 0.0f;
 }
 
+float Marking(cFielder* pMarking, cPlayer* pMarked)
+{
+    if (pMarking == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pMarked == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pMarking->fn_800306F4((cFielder*)pMarked))
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+float UserControlled(cFielder* fielder)
+{
+    if (fielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    bool bHasGlobalPad = fielder->GetGlobalPad() != NULL;
+    if (bHasGlobalPad)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
 static float FielderType(cPlayer* player)
 {
     if (player == NULL)

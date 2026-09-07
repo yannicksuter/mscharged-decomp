@@ -426,7 +426,7 @@ ImpostorModel_802DAEE0* WorldNPCManager_802DD4F0::fn_802DDD88(
         model->mModelCallback = mModelCallback;
     }
 
-    fn_802DB528(model, "idle", 0.0f, PM_CYCLIC);
+    model->PlayAnimation("idle", 0.0f, PM_CYCLIC);
     fn_802DB2B8(model, nlRandomf(0.0f, 1.0f, &nlDefaultSeed));
     model->mWorldMatrix = transform;
     mWorldNPCs.AddEnd(model);

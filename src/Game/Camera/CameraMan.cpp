@@ -240,7 +240,7 @@ void cCameraManager::PushCameraWithTransition(cBaseCamera* pCamera, float fDurat
 /**
  * Offset/Address/Size: 0x19D4 | 0x800F1C14 | size: 0x30
  */
-extern "C" cBaseCamera* fn_800F1C14()
+cBaseCamera* GetNextCamera()
 {
     cBaseCamera* pCamera = cCameraManager::PeekCamera();
     if (pCamera != 0)

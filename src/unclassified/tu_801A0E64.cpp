@@ -1,4 +1,5 @@
 #include "unclassified/tu_801A0E64.h"
+#include "Game/Drawable/RenderObject.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
@@ -39,7 +40,6 @@ extern "C"
     extern PhysicsSphere_801700D8* fn_801700D8(PhysicsSphere_801700D8*);
     extern void fn_80170760(PhysicsObject*);
     extern void fn_8017076C(PhysicsObject*);
-    extern RenderObject* fn_80276360(int, int);
     extern void fn_801BCA5C(const nlVector3*);
 }
 
@@ -141,7 +141,7 @@ extern "C" HammerObject* fn_801A0E64(
     physics->_038 = object;
     object->_028->SetPosition(
         lbl_804DCE3C, PhysicsObject::WORLD_COORDINATES);
-    object->_02C = fn_80276360(2, index);
+    object->_02C = GetRenderObject(2, index);
     object->_030 = 0;
     Reset(object);
     return object;

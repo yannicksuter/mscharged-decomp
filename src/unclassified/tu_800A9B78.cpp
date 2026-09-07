@@ -1,4 +1,5 @@
 #include "NL/nlMemory.h"
+#include "NL/nlFunctionMemory.h"
 
 #include "types.h"
 
@@ -65,7 +66,6 @@ extern "C" float lbl_806DBF84;
 
 extern "C" void fn_800AD400(UnidentifiedWeatherState*);
 extern "C" void fn_800AEDAC(UnidentifiedWeatherState*, int);
-extern "C" void fn_802B1D4C(void*, unsigned long);
 
 extern "C" void fn_800AA688(UnidentifiedWeatherState* state)
 {
@@ -192,7 +192,7 @@ extern "C" void* fn_800B019C(void* object, int destroy)
 {
     if (object != 0 && destroy > 0)
     {
-        fn_802B1D4C(object, 0x14);
+        FreeFunctionMemory(object, 0x14);
     }
     return object;
 }
@@ -201,7 +201,7 @@ extern "C" void* fn_800B01E0(void* object, int destroy)
 {
     if (object != 0 && destroy > 0)
     {
-        fn_802B1D4C(object, 0x14);
+        FreeFunctionMemory(object, 0x14);
     }
     return object;
 }
@@ -210,7 +210,7 @@ extern "C" void* fn_800B0224(void* object, int destroy)
 {
     if (object != 0 && destroy > 0)
     {
-        fn_802B1D4C(object, 0x14);
+        FreeFunctionMemory(object, 0x14);
     }
     return object;
 }

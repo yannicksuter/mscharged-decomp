@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsNPC.h"
+#include "Game/Render/ChainChomp.h"
 
 #include "Game/Ball.h"
 #include "Game/Character.h"
@@ -15,7 +16,6 @@
 #include "math.h"
 
 extern CollisionSpace* g_CollisionSpace;
-extern "C" void fn_8019C734(SkinAnimatedMovableNPC* npc);
 
 PhysicsNPC::PhysicsNPC(float radius)
     : PhysicsSphere(g_CollisionSpace, (PhysicsWorld*)0, radius)
@@ -113,7 +113,7 @@ ContactType PhysicsNPC::Contact(
                 < cField::GetGoalLineX(1U) - 0.5f
             && bottom > cField::GetSidelineY(1U))
         {
-            fn_8019C734(mpAINPC);
+            ((ChainChomp*)mpAINPC)->Fall();
             mUnidentified040 = true;
         }
     }

@@ -55,7 +55,7 @@
 #include "unclassified/tu_801A4188.h"
 #include "unclassified/tu_801A6824.h"
 #include "unclassified/tu_801A6AAC.h"
-#include "unclassified/tu_801AD15C.h"
+#include "Game/Render/PeachPhoto.h"
 #include "unclassified/tu_801AE530.h"
 #include "unclassified/tu_801B369C.h"
 #include "unclassified/tu_802B7798.h"
@@ -64,7 +64,7 @@
 #include <string.h>
 
 extern const nlVector3 lbl_804DCBE8;
-extern void* lbl_806E14F8;
+extern void* gpChainChompShadowView;
 
 GameRenderTask* GameRenderTask::sInstance;
 
@@ -230,8 +230,8 @@ void GameRenderTask::Run(float fDeltaT)
         pipAlphaView = GetLayerView(eCLV_PictureInPictureAlpha);
         saveStadium068 = BasicStadium::GetCurrentStadium()->mUnidentified068;
         saveStadium06C = BasicStadium::GetCurrentStadium()->mUnidentified06C;
-        save14F8 = lbl_806E14F8;
-        lbl_806E14F8 = pipView;
+        save14F8 = gpChainChompShadowView;
+        gpChainChompShadowView = pipView;
         saveShapeView = g_ShapeRenderer.m_eView;
         g_ShapeRenderer.m_eView = pipView;
         save132C = g_pNetMeshView;
@@ -262,7 +262,7 @@ void GameRenderTask::Run(float fDeltaT)
         }
 
         g_pNisRenderView = save19D8;
-        lbl_806E14F8 = save14F8;
+        gpChainChompShadowView = save14F8;
         SetCharacterShadowView(saveShadowView);
         g_nCharacterView = saveView;
         g_pNetMeshView = save132C;

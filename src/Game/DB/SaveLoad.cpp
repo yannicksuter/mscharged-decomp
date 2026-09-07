@@ -163,11 +163,11 @@ static inline const unsigned short* LocalizedString(const char* name)
 
     nlLocalization::StringLookup* lookup = nlBSearch<nlLocalization::StringLookup, unsigned long>(
         hash, localization->m_LookupTable, localization->m_pFile->StringCount);
-    if (lookup == 0)
+    if (lookup != 0)
     {
-        return MissingLocString;
+        return localization->m_FirstString + lookup->StringOffset;
     }
-    return localization->m_FirstString + lookup->StringOffset;
+    return MissingLocString;
 }
 
 static inline FEPopupMenu* PushSavePopup()
@@ -405,11 +405,19 @@ void SaveLoad::ReadSaveFileCallback(s32 result)
     if ((u32)result == expectedSize)
     {
         bool valid = ReadSaveData(result);
-        if (valid && !OnlineMode)
+        s32 closeResult;
+        if (valid)
         {
-            GameInfoManager::GetInstance()->GetUnknown0xA0();
+            if (!OnlineMode)
+            {
+                GameInfoManager::GetInstance()->GetAudioSettings()->ApplySettings();
+            }
+            closeResult = nlFlashClose(ContinueAfterCloseCallback);
         }
-        nlFlashClose(valid ? ContinueAfterCloseCallback : CloseCallback);
+        else
+        {
+            closeResult = nlFlashClose(CloseCallback);
+        }
         if (OnlineMode)
         {
             OnlineSaveLoaded = true;
@@ -418,7 +426,7 @@ void SaveLoad::ReadSaveFileCallback(s32 result)
         {
             NormalSaveLoaded = true;
         }
-        HandleNANDResult(0);
+        HandleNANDResult(closeResult);
     }
     else if (result >= 0)
     {
@@ -427,10 +435,8 @@ void SaveLoad::ReadSaveFileCallback(s32 result)
         nlPrintf("SAVE FILE IS CORRUPT: The size is incorrect.\n");
         ResetTask::s_resetPaused = false;
         FEPopupMenu* popup = PushSavePopup();
-        Function<FnVoidVoid> remove(DeleteSaveFile);
-        popup->Create((ePopupMenu)0x45, remove);
-        nlFlashClose(CloseCallback);
-        HandleNANDResult(0);
+        popup->Create((ePopupMenu)0x45, Function<FnVoidVoid>(DeleteSaveFile));
+        HandleNANDResult(nlFlashClose(CloseCallback));
     }
     else
     {
@@ -451,18 +457,17 @@ void SaveLoad::DeleteSaveFileCallback(s32 result)
 {
     if (result == 0)
     {
-        FEPopupMenu* popup = PushSavePopup();
-        if (OnlineMode)
+        if (!OnlineMode)
         {
-            Function<FnVoidVoid> reset(BeginReset);
-            Function<FnVoidVoid> continueWithoutSaving(ContinueWithoutSaving);
-            popup->Create((ePopupMenu)0x40, reset, continueWithoutSaving);
+            FEPopupMenu* popup = PushSavePopup();
+            popup->Create((ePopupMenu)0x3E,
+                Function<FnVoidVoid>(CheckSaveSpace),
+                Function<FnVoidVoid>(CancelSave));
         }
         else
         {
-            Function<FnVoidVoid> reset(BeginReset);
-            Function<FnVoidVoid> cancel(CancelSave);
-            popup->Create((ePopupMenu)0x3E, reset, cancel);
+            FEPopupMenu* popup = PushSavePopup();
+            popup->Create((ePopupMenu)0x47, Function<FnVoidVoid>(CheckSaveSpace));
         }
     }
     else
@@ -540,20 +545,18 @@ void SaveLoad::ChangeDirectoryCallback(s32 result)
     if (result == -12)
     {
         FEPopupMenu* popup = PushSavePopup();
-        Function<FnVoidVoid> retry(CheckSaveAndBannerSpace);
-        popup->Create((ePopupMenu)0x47, retry);
+        popup->Create((ePopupMenu)0x47, Function<FnVoidVoid>(CheckSaveAndBannerSpace));
         RetryEnabled = false;
     }
     else if (result == 0)
     {
-        const char* filename = OnlineSaveFileName;
         if (BannerOpenMode == 0)
         {
-            HandleNANDResult(nlFlashOpen(filename, 1, OpenSaveForReadCallback));
+            nlFlashOpen(OnlineSaveFileName, 1, OpenSaveForReadCallback);
         }
         else
         {
-            HandleNANDResult(nlFlashOpen(filename, 2, OpenSaveForWriteCallback));
+            nlFlashOpen(OnlineSaveFileName, 2, OpenSaveForWriteCallback);
         }
     }
     else
@@ -648,8 +651,7 @@ bool SaveLoad::ReadSaveData(u32 size)
         SaveBuffer = 0;
         ResetTask::s_resetPaused = false;
         FEPopupMenu* popup = PushSavePopup();
-        Function<FnVoidVoid> remove(DeleteSaveFile);
-        popup->Create((ePopupMenu)0x45, remove);
+        popup->Create((ePopupMenu)0x45, Function<FnVoidVoid>(DeleteSaveFile));
         return false;
     }
 
@@ -676,26 +678,28 @@ void SaveLoad::HandleNANDResult(s32 result)
         return;
     }
 
-    ResetTask::s_resetPaused = false;
-    SaveError = true;
     if (result == -5 || result == -15)
     {
+        ResetTask::s_resetPaused = false;
         FEPopupMenu* popup = PushSavePopup();
-        Function<FnVoidVoid> retry(CheckSaveSpace);
-        Function<FnVoidVoid> cancel(CancelSave);
-        Function<FnVoidVoid> reset(BeginReset);
-        popup->Create((ePopupMenu)0x43, retry, cancel, reset);
+        popup->Create((ePopupMenu)0x45, Function<FnVoidVoid>(DeleteSaveFile));
+        InOperation = true;
     }
-    else if (result == -6 || result == -12)
+    else if (result == -4)
     {
         FEPopupMenu* popup = PushSavePopup();
-        Function<FnVoidVoid> retry(CheckSaveSpace);
-        Function<FnVoidVoid> cancel(CancelSave);
-        popup->Create((ePopupMenu)0x44, retry, cancel);
+        popup->Create((ePopupMenu)0x43, Function<FnVoidVoid>(CancelSave));
+        InOperation = true;
+        SaveError = true;
+        ResetTask::s_resetPaused = false;
     }
     else
     {
-        InOperation = false;
+        FEPopupMenu* popup = PushSavePopup();
+        popup->Create((ePopupMenu)0x44, Function<FnVoidVoid>(CancelSave));
+        InOperation = true;
+        SaveError = true;
+        ResetTask::s_resetPaused = false;
     }
 }
 
@@ -955,35 +959,36 @@ void SaveLoad::FreeBannerBuffer()
 void SaveLoad::CheckSpaceAnswer(u32 answer, bool online)
 {
     ResetTask::s_resetPaused = false;
-    FEPopupMenu* popup = PushSavePopup();
     if ((answer & 1) != 0 || (answer & 4) != 0)
     {
+        FEPopupMenu* popup = PushSavePopup();
         if (online)
         {
-            Function<FnVoidVoid> reset(BeginReset);
-            Function<FnVoidVoid> continueWithoutSaving(ContinueWithoutSaving);
-            popup->Create((ePopupMenu)0x40, reset, continueWithoutSaving);
+            popup->Create((ePopupMenu)0x40,
+                Function<FnVoidVoid>(BeginReset),
+                Function<FnVoidVoid>(ContinueWithoutSaving));
         }
         else
         {
-            Function<FnVoidVoid> reset(BeginReset);
-            Function<FnVoidVoid> cancel(CancelSave);
-            popup->Create((ePopupMenu)0x3F, reset, cancel);
+            popup->Create((ePopupMenu)0x3F,
+                Function<FnVoidVoid>(BeginReset),
+                Function<FnVoidVoid>(CancelSave));
         }
     }
     else if ((answer & 2) != 0 || (answer & 8) != 0)
     {
+        FEPopupMenu* popup = PushSavePopup();
         if (online)
         {
-            Function<FnVoidVoid> reset(BeginReset);
-            Function<FnVoidVoid> continueWithoutSaving(ContinueWithoutSaving);
-            popup->Create((ePopupMenu)0x42, reset, continueWithoutSaving);
+            popup->Create((ePopupMenu)0x42,
+                Function<FnVoidVoid>(BeginReset),
+                Function<FnVoidVoid>(ContinueWithoutSaving));
         }
         else
         {
-            Function<FnVoidVoid> reset(BeginReset);
-            Function<FnVoidVoid> cancel(CancelSave);
-            popup->Create((ePopupMenu)0x41, reset, cancel);
+            popup->Create((ePopupMenu)0x41,
+                Function<FnVoidVoid>(BeginReset),
+                Function<FnVoidVoid>(CancelSave));
         }
     }
     else

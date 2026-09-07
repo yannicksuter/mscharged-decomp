@@ -10,7 +10,7 @@ struct glModelPacket;
 
 typedef DrawableObject RenderObject;
 
-class UnidentifiedAvoidancePolygon_804F4750;
+class AvoidablePolygon;
 
 struct ThwompObject
 {
@@ -20,7 +20,7 @@ struct ThwompObject
     /* 0x09 */ u8 mPadding009[3];
     /* 0x0C */ PhysicsObject* mPhysics;
     /* 0x10 */ RenderObject* mDrawable;
-    /* 0x14 */ UnidentifiedAvoidancePolygon_804F4750* mUnidentified014;
+    /* 0x14 */ AvoidablePolygon* mUnidentified014;
     /* 0x18 */ float mUnidentified018;
     /* 0x1C */ float mUnidentified01C;
     /* 0x20 */ float mUnidentified020;

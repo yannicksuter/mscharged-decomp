@@ -11,7 +11,6 @@
 #include "Game/Game.h"
 #include "Game/SAnim/pnSAnimController.h"
 
-extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002C7D0(PlayerTweaks*);
 extern "C" float fn_8002CFD8(PlayerTweaks*);
 extern "C" void fn_8002E340(cFielder*);
@@ -53,7 +52,7 @@ static nlVector2 lbl_806DC188 = { 0.1f, 0.0f };
 bool DesireStar::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = fn_8002CFD8(fn_8003E6E4(mUnidentifiedFielder));
+    mUnidentified078 = fn_8002CFD8(mUnidentifiedFielder->GetTweaks());
     mUnidentifiedFielder->muInvincibleStatus |= 0x1F;
     EmitStar(mUnidentifiedFielder, false);
     return result;
@@ -67,7 +66,7 @@ bool DesireStar::UnidentifiedReinitialize(void* context)
     mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = fn_8002CFD8(fn_8003E6E4(mUnidentifiedFielder));
+    mUnidentified078 = fn_8002CFD8(mUnidentifiedFielder->GetTweaks());
     EmitStar(mUnidentifiedFielder, true);
     return result;
 }
@@ -87,7 +86,7 @@ void DesireStar::UnidentifiedCleanup()
 bool DesireMushroom::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = fn_8002C7D0(fn_8003E6E4(mUnidentifiedFielder));
+    mUnidentified078 = fn_8002C7D0(mUnidentifiedFielder->GetTweaks());
     fn_8002E340(mUnidentifiedFielder);
     if (!mUnidentifiedFielder->fn_8003E74C())
     {

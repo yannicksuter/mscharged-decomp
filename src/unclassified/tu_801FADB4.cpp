@@ -35,7 +35,7 @@ void TU801FADB4Overlay::Update(float fDeltaT)
         mUnidentified30 += fDeltaT;
         if (mUnidentified30 >= mUnidentified34 && mUnidentified2C < 4)
         {
-            fn_800EBBFC(15, 0x97E84AE4, 0, 0);
+            PlaySound(15, 0x97E84AE4, 0, 0);
             ++mUnidentified2C;
             mUnidentified30 = 0.0f;
         }
@@ -62,6 +62,6 @@ void TU801FADB4Overlay::fn_801FB12C()
 
     mUnidentified25 = true;
     mUnidentified30 = 0.0f;
-    fn_800EBBFC(15, 0x97E84AE4, 0, 0);
+    PlaySound(15, 0x97E84AE4, 0, 0);
     mUnidentified2C = 1;
 }

@@ -1,4 +1,8 @@
-#include "Game/SAnim.h"
+#include "Game/Audio/AudioBackend.h"
+#include "Game/Audio/AudioBundleManager.h"
+#include "NL/nlDebugString.h"
+#include "Game/Audio/AudioBankLoader.h"
+#include "NL/nlChunk.h"
 #include "Game/Sys/debug.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
@@ -90,35 +94,10 @@ struct SliderBinding_802EF6B0
     void* owner;
 };
 
-struct SliderBindingTable_802EF6B0
-{
-    u8 pad_00[0x10];
-    u32* count;
-    SliderBinding_802EF6B0* bindings;
-};
-
-struct AudioSystem_802EE964
-{
-    void** vtable;
-    u8 pad_04[0xC8];
-    struct
-    {
-        u8 pad_00[0xC];
-        SliderTable_802EE964* sliders;
-    }* resources;
-};
-
-struct AudioEngine_802EE964
-{
-    virtual ~AudioEngine_802EE964();
-    virtual void fn_8035BBD8();
-    virtual void fn_8035BFDC();
-};
-
 struct SliderManager_802EFA14
 {
     void** vtable;
-    AudioEngine_802EE964* engine;
+    AudioBackend* engine;
     u8 pad_08[4];
     SliderTable_802EE964* globalTable;
     LocalSliderTable_802EF218* localTable;
@@ -143,18 +122,10 @@ extern SlotPoolBase lbl_8057FB10;
 extern SlotPoolBase lbl_8057FB38;
 extern SlotPoolBase lbl_8057FB78;
 
-extern int lbl_806E1DC8;
-extern AudioSystem_802EE964* lbl_806E201C;
-
-extern "C" const char* fn_802B9568(int table, ...);
-extern "C" bool fn_802EDB00();
-extern "C" void fn_802EDC34();
 extern "C" void* fn_802EFB70(nlChunk* chunk);
 extern "C" void fn_802F00F0(void* controller, float dt);
 extern "C" void fn_802F4904(void* controller, float dt);
 extern "C" void fn_802F4958(void* controller);
-extern "C" void fn_8035C11C(void* engine, float dt);
-extern "C" void fn_8035CA84();
 
 extern "C" void fn_802EF130(SliderState_802EE964* slider);
 extern "C" void fn_802EF17C(LocalSliderSet_802EE964* set);
@@ -173,7 +144,7 @@ static inline void SetSliderValue_802EE964(
     ((SetValueFunc)slider->vtable[3])(slider, value, duration);
 }
 
-extern "C" SliderTable_802EE964* fn_802EE964(nlChunk* outer)
+SliderTable_802EE964* ParseAudioSliderTable(nlChunk* outer)
 {
     nlChunk* header = (nlChunk*)outer->GetData();
     SliderTable_802EE964* table = (SliderTable_802EE964*)header->GetData();
@@ -258,7 +229,7 @@ extern "C" LocalSliderSet_802EE964* fn_802EED88(
     while (setIndex < 0x50 && table->localSets[setIndex].owner != 0)
         setIndex++;
     if (setIndex >= 0x50)
-        fn_8035CA84();
+        DumpAudioMemory();
 
     LocalSliderSet_802EE964* set = table->localSets + setIndex;
     set->owner = owner;
@@ -277,7 +248,7 @@ extern "C" LocalSliderSet_802EE964* fn_802EED88(
 
     SliderDefinition_802EE964* definition = table->globalDefinitions + table->localToGlobal[0];
     SliderState_802EE964* slider = table->globalSliders + definition->index;
-    tDebugPrintManager::Print(DC_SOUND, lbl_8052F5D0, fn_802B9568(lbl_806E1DC8, slider->definition->name, set->sliders));
+    tDebugPrintManager::Print(DC_SOUND, lbl_8052F5D0, nlLookupDebugString(g_pDebugStringTable, (unsigned long)slider->definition->name));
     float value = (float)owner->valueSource->value;
     if (value < slider->minimumValue)
         value = slider->minimumValue;
@@ -353,7 +324,7 @@ extern "C" SliderState_802EE964* fn_802EF1D8(
     return slider;
 }
 
-extern "C" LocalSliderTable_802EF218* fn_802EF218(nlChunk* outer)
+LocalSliderTable_802EF218* ParseAudioCalculationTable(nlChunk* outer)
 {
     nlChunk* header = (nlChunk*)outer->GetData();
     LocalSliderTable_802EF218* table = (LocalSliderTable_802EF218*)header->GetData();
@@ -443,23 +414,22 @@ extern "C" SliderState_802EE964* fn_802EF670(
     return slider;
 }
 
-extern "C" void fn_802EF6B0(
-    SliderBindingTable_802EF6B0* table, nlChunk* chunk)
+void AudioBankLoader::ParseChunk(nlChunk* chunk)
 {
     if (chunk->GetID() != 0x80023200)
         return;
 
     nlChunk* header = (nlChunk*)chunk->GetData();
-    table->count = (u32*)header->GetData();
+    m_Chunk23200 = header->GetData();
     nlChunk* definitions = header->GetNextChunk();
-    table->bindings = (SliderBinding_802EF6B0*)definitions->GetData();
-    for (u32 i = 0; i < *table->count; i++)
-        table->bindings[i].owner = table;
+    m_Chunk23200Entries = definitions->GetData();
+    for (u32 i = 0; i < *(u32*)m_Chunk23200; i++)
+        ((SliderBinding_802EF6B0*)m_Chunk23200Entries)[i].owner = this;
 }
 
 extern "C" u8 fn_802EF870(u8* state)
 {
-    if (fn_802EDB00())
+    if (((AudioBundleManager*)state)->AudioBundleManager::Initialize())
         state[8] = true;
     return state[8];
 }
@@ -484,7 +454,7 @@ extern "C" void fn_802EF8B0(SliderManager_802EFA14* manager)
     SlotPoolBase::BaseFreeBlocks(&lbl_8057F9E8, 0x10);
     fn_802F4958(manager->controller);
 
-    manager->engine->fn_8035BFDC();
+    manager->engine->Shutdown();
 }
 
 extern "C" void fn_802EF9BC(
@@ -492,7 +462,7 @@ extern "C" void fn_802EF9BC(
 {
     if (chunk->GetID() != 0x80023600)
     {
-        fn_802EDC34();
+        ((AudioBundleManager*)manager)->AudioBundleManager::ParseChunk(chunk);
         return;
     }
     manager->rpcController = fn_802EFB70(chunk);
@@ -509,5 +479,5 @@ extern "C" void fn_802EFA14(
         fn_802F4904(manager->controller, dt);
         fn_802EF514(manager->localTable, dt);
     }
-    fn_8035C11C(manager->engine, dt);
+    manager->engine->ServiceReadQueue();
 }

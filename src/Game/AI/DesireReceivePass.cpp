@@ -100,7 +100,6 @@ extern "C" void fn_80098098(cFielder*);
 extern "C" bool fn_80035F34(cFielder*);
 extern "C" bool fn_80036A58(cFielder*, unsigned short*);
 extern "C" bool fn_80036C8C(cFielder*, unsigned short*);
-extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002C328(PlayerTweaks*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" void fn_8003C268(cFielder*, float, float);
@@ -206,11 +205,15 @@ bool DesireReceivePass::UnidentifiedInitialize(void* context)
 
     fn_800C1A08();
 
-    nlVector3 v3Delta;
-    v3Delta.Sub2D(
-        mEstimated.v3AnimStartPos, mUnidentifiedFielder->m_v3Position);
-    if (v3Delta.GetLengthSq2D()
-        > lbl_806DC1C4 * lbl_806DC1C4)
+    float fMaxDistanceSq = lbl_806DC1C4 * lbl_806DC1C4;
+
+    nlVector2 v2Delta = {
+        mEstimated.v3AnimStartPos.x
+            - mUnidentifiedFielder->m_v3Position.x,
+        mEstimated.v3AnimStartPos.y
+            - mUnidentifiedFielder->m_v3Position.y,
+    };
+    if (nlVec2LengthSquared(v2Delta) > fMaxDistanceSq)
     {
         meDesireSubState = 0;
         mUnidentifiedFielder->InitActionRunning();
@@ -252,10 +255,10 @@ extern "C" void fn_800C0704(DesireReceivePass* pDesire)
 
         if (pFielder->m_pBall != 0)
         {
-            PlayerTweaks* pTweaks = fn_8003E6E4(pFielder);
+            PlayerTweaks* pTweaks = pFielder->GetTweaks();
             float fMaxSpeed = fn_8002C328(pTweaks);
             float fMinSpeed = fn_8002CE14(
-                fn_8003E6E4(pFielder));
+                pFielder->GetTweaks());
             fn_8003C268(pFielder, fMinSpeed, fMaxSpeed);
             return;
         }
@@ -862,17 +865,16 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
     };
     float fDistanceToContact = nlVec2Length(v2DistanceToContact);
 
-    const LooseBallContactAnimInfo* pAnimInfo = pAnimInfoList;
-    for (int i = 0; i < nNumAnims; ++i, ++pAnimInfo)
+    for (int i = 0; i < nNumAnims; ++i)
     {
         const LooseBallContactAnimInfo* pCurrentAnimInfo = 0;
-        if (pAnimInfo->aIncomingAngleMin
-            < pAnimInfo->aIncomingAngleMax)
+        if (pAnimInfoList[i].aIncomingAngleMin
+            < pAnimInfoList[i].aIncomingAngleMax)
         {
             if (aIncomingDirection
-                    >= pAnimInfo->aIncomingAngleMin
+                    >= pAnimInfoList[i].aIncomingAngleMin
                 && aIncomingDirection
-                    <= pAnimInfo->aIncomingAngleMax)
+                    <= pAnimInfoList[i].aIncomingAngleMax)
             {
                 pCurrentAnimInfo = &pAnimInfoList[i];
             }
@@ -880,9 +882,9 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
         else
         {
             if (aIncomingDirection
-                    >= pAnimInfo->aIncomingAngleMin
+                    >= pAnimInfoList[i].aIncomingAngleMin
                 || aIncomingDirection
-                    <= pAnimInfo->aIncomingAngleMax)
+                    <= pAnimInfoList[i].aIncomingAngleMax)
             {
                 pCurrentAnimInfo = &pAnimInfoList[i];
             }
@@ -1283,7 +1285,7 @@ extern "C" void fn_800C22CC(DesireReceivePass* pDesire,
         eventData.pTarget = pPassTarget;
         eventData.bVolleyPass = bVolleyPass;
         eventData.mPasserControllerID = pPasser->GetGlobalPad() != 0
-            ? pPasser->GetGlobalPad()->fn_80332748()
+            ? pPasser->GetGlobalPad()->GetPadID()
             : -1;
         g_pGame->mUnidentified49C.mEvent16.Dispatch(
             &eventData, Function<PassBallData*>(), true);

@@ -124,7 +124,7 @@ extern "C" void fn_80276890()
     {
         ImpostorModel_802DAEE0* model = iterator.Current();
         model->mOriginalTexture = nlStringHash(szOriginalTexture);
-        fn_802DB4EC(model, nlStringHash(buffer));
+        model->SetReplacementTexture(nlStringHash(buffer));
     }
 }
 

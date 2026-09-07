@@ -68,7 +68,7 @@ void DesireDefendPos::UnidentifiedUpdate(
     }
 
     SkillTweaks* pSkillTweaks = fn_800A636C(lbl_806E0E00);
-    float fMarkingSkill = pSkillTweaks->Def_Marking->fn_800A0D6C();
+    float fMarkingSkill = pSkillTweaks->Def_Marking->GetValue();
     float fTimeDelay = Interpolate(g_vMarkFollowTimeDelay.x,
         g_vMarkFollowTimeDelay.y, fMarkingSkill);
     float fTimeDelayRange = fTimeDelay * 0.8f;
@@ -76,7 +76,7 @@ void DesireDefendPos::UnidentifiedUpdate(
         + (nlRandomf(fTimeDelayRange) - (0.5f * fTimeDelayRange)));
 
     pSkillTweaks = fn_800A636C(lbl_806E0E00);
-    fMarkingSkill = pSkillTweaks->Def_Marking->fn_800A0D6C();
+    fMarkingSkill = pSkillTweaks->Def_Marking->GetValue();
 
     float fMarkingNetPassBalance = Interpolate(
         g_vMarkingNetPassBalance.x,

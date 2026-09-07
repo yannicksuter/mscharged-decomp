@@ -34,7 +34,6 @@ struct cGame
 
 extern cGame* g_pGame;
 
-extern "C" unsigned int fn_800387CC(cFielder*);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" float fn_800DEFD4(cFielder*);
 extern "C" InterpreterCore* fn_800A695C(cTeam*);
@@ -263,7 +262,7 @@ void FormationManager::Update(float dt)
     for (i = 0; i < 4; ++i)
     {
         pFielder = m_pTeam->mUnidentified0D8[i];
-        bool bIgnoreFielder = pFielder->fn_800344B0() || fn_800387CC(pFielder);
+        bool bIgnoreFielder = pFielder->fn_800344B0() || pFielder->IsShattered();
         if (!bIgnoreFielder)
         {
             float newY = field_0x18.y + *pWeight * pFielder->m_v3Position.y;
@@ -381,7 +380,7 @@ void FormationManager::fn_80051F00(nlVector2* pCenter)
     for (int i = 0; i < 4; i++)
     {
         cFielder* pFielder = m_pTeam->GetFielder(i);
-        bool bIgnoreFielder = pFielder->fn_800344B0() || fn_800387CC(pFielder);
+        bool bIgnoreFielder = pFielder->fn_800344B0() || pFielder->IsShattered();
         if (!bIgnoreFielder)
         {
             numFielders++;
@@ -874,7 +873,7 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
     for (i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         cFielder* pFielder = team->GetFielder(i_fielder);
-        bool bApplyFielderOrder = pFielder->fn_800344B0() || fn_800387CC(pFielder);
+        bool bApplyFielderOrder = pFielder->fn_800344B0() || pFielder->IsShattered();
 
         for (i_pos = 0; i_pos < 4; i_pos++)
         {
@@ -1168,17 +1167,17 @@ float FormationEval::IsFielderInPosition(
     float distToTarget = nlVec2Length(offset2);
 
     float normalizedDist = NormalizeVal(distToDesired,
-        lbl_8056CF08.m_pGameTweaks->vGetInPositionKeyFielderDist.x,
-        lbl_8056CF08.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.x,
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
 
     float inDist = Interpolate(
-        lbl_8056CF08.m_pGameTweaks->vGetInPositionInRadius.x,
-        lbl_8056CF08.m_pGameTweaks->vGetInPositionInRadius.y,
+        gGameTweaks.m_pGameTweaks->vGetInPositionInRadius.x,
+        gGameTweaks.m_pGameTweaks->vGetInPositionInRadius.y,
         normalizedDist);
 
     float outDist = Interpolate(
-        lbl_8056CF08.m_pGameTweaks->vGetInPositionOutRadius.x,
-        lbl_8056CF08.m_pGameTweaks->vGetInPositionOutRadius.y,
+        gGameTweaks.m_pGameTweaks->vGetInPositionOutRadius.x,
+        gGameTweaks.m_pGameTweaks->vGetInPositionOutRadius.y,
         normalizedDist);
 
     float result = 0.0f;
@@ -1257,8 +1256,8 @@ float FormationDefensive::IsFielderInPosition(
         = nlSqrt(keyOffset.x * keyOffset.x + keyOffset.y * keyOffset.y, true);
 
     fPercent = NormalizeVal(fPercent,
-        lbl_8056CF08.m_pGameTweaks->vGetInPositionKeyFielderDist.x,
-        lbl_8056CF08.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.x,
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
 
     nlVector3 v3FielderPos = pFielder->m_v3Position;
     nlVector3 v3NetLocation = pFielder->GetAIOffNetLocation(0);
@@ -1383,8 +1382,8 @@ float FormationOffensive::IsFielderInPosition(
         = nlSqrt(keyOffset.x * keyOffset.x + keyOffset.y * keyOffset.y, true);
 
     fPercent = NormalizeVal(fPercent,
-        lbl_8056CF08.m_pGameTweaks->vGetInPositionKeyFielderDist.x,
-        lbl_8056CF08.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.x,
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
 
     nlVector3 v3FielderPos = pFielder->m_v3Position;
     nlVector3 v3NetLocation = pFielder->GetAIOffNetLocation(0);

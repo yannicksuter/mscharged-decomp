@@ -515,11 +515,11 @@ AVLTreeNode* AVLTreeUntemplated::FindAVLNode(AVLTreeNode* node, void* key) const
     return 0;
 }
 
-unsigned int AVLTreeUntemplated::fn_802A95C4(AVLTreeNode* root, unsigned int count)
+unsigned int AVLTreeUntemplated::CountNodes(AVLTreeNode* root, unsigned int count)
 {
     while (root != 0)
     {
-        count = fn_802A95C4(root->left, count);
+        count = CountNodes(root->left, count);
         ++count;
         root = root->right;
     }

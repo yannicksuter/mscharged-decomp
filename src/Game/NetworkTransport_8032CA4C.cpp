@@ -57,7 +57,10 @@ void NetworkTransport_8032CA4C::fn_8032CBD0(bool initialize)
     mUnidentified070 = -1;
     mUnidentified074 = 0;
     mUnidentified1C0 = 0;
-    mUnidentified1CC = initialize ? 0 : g_pNetworkSessionBase->GetDirectSocket();
+    if (initialize)
+        mUnidentified1CC = 0;
+    else
+        mUnidentified1CC = g_pNetworkSessionBase->GetDirectSocket();
     for (int index = 0; index < 8; ++index)
     {
         m_ConnectionPool[index].m_Connection = 0;
@@ -130,7 +133,7 @@ int NetworkTransport_8032CA4C::fn_8032CF60(int value)
     nlStrNCpy(mUnidentified0A0[0].mName, mUnidentified064, 11);
     mUnidentified0A0[0].mUnidentified0B = mUnidentified074;
     memcpy(&mUnidentified0A0[0].mUnidentified0C, mUnidentified075, mUnidentified074);
-    memcpy(mUnidentified0A0[0].mUnidentified14, address, 4);
+    *(u32*)mUnidentified0A0[0].mUnidentified14 = *(u32*)address;
     mUnidentified0A0[0].mUnidentified20 = mUnidentified1CC->GetLocalPort();
     mUnidentified0A0[0].mUnidentified18 = 0;
     mUnidentified0A0[0].mUnidentified22 = false;
@@ -357,7 +360,7 @@ void NetworkTransport_8032CA4C::OnConnected(u32 connection, int result)
             if (result == 0)
             {
                 NetworkMessageType4_80533468 message;
-                memcpy(message.mUnidentified08, mUnidentified1CC->GetLocalAddress(), 4);
+                *(u32*)message.mUnidentified08 = *(u32*)mUnidentified1CC->GetLocalAddress();
                 message.mUnidentified0C = mUnidentified1CC->GetLocalPort();
                 nlStrNCpy(message.mUnidentified0E, mUnidentified064, 11);
                 message.mUnidentified19 = mUnidentified074;
@@ -727,7 +730,7 @@ void NetworkTransport_8032CA4C::fn_8032EB88(NetworkMessageType3_805333C8* messag
 void NetworkTransport_8032CA4C::fn_8032ED28(int index)
 {
     NetworkMessageType7_80533440 message;
-    memcpy(message.mUnidentified08.mUnidentified00, mUnidentified0A0[index].mUnidentified14, 4);
+    *(u32*)message.mUnidentified08.mUnidentified00 = *(u32*)mUnidentified0A0[index].mUnidentified14;
     message.mUnidentified08.mUnidentified04 = mUnidentified0A0[index].mUnidentified20;
     nlStrNCpy(message.mUnidentified08.mUnidentified06, mUnidentified0A0[index].mName, 11);
     message.mUnidentified08.mUnidentified12 = mUnidentified0A0[index].mUnidentified0B;
@@ -747,7 +750,7 @@ void NetworkTransport_8032CA4C::fn_8032ED28(int index)
 void NetworkTransport_8032CA4C::fn_8032EE7C(UnidentifiedTransportConnection* connection, bool accepted)
 {
     NetworkMessageType5_80533454 message;
-    memcpy(message.mUnidentified08, mUnidentified1CC->GetLocalAddress(), 4);
+    *(u32*)message.mUnidentified08 = *(u32*)mUnidentified1CC->GetLocalAddress();
     message.mUnidentified0C = mUnidentified1CC->GetLocalPort();
     nlStrNCpy(message.mUnidentified0F, mUnidentified064, 11);
     message.mUnidentified1A = mUnidentified074;
@@ -759,7 +762,7 @@ void NetworkTransport_8032CA4C::fn_8032EE7C(UnidentifiedTransportConnection* con
         for (int peer = 1; peer < mUnidentified1C0 - 1; ++peer)
         {
             UnidentifiedNetworkPeerInfo_80330430& info = message.mUnidentified24[peer - 1];
-            memcpy(info.mUnidentified00, mUnidentified0A0[peer].mUnidentified14, 4);
+            *(u32*)info.mUnidentified00 = *(u32*)mUnidentified0A0[peer].mUnidentified14;
             info.mUnidentified04 = mUnidentified0A0[peer].mUnidentified20;
             nlStrNCpy(info.mUnidentified06, mUnidentified0A0[peer].mName, 11);
             info.mUnidentified12 = mUnidentified0A0[peer].mUnidentified0B;
@@ -781,7 +784,7 @@ void NetworkTransport_8032CA4C::fn_8032F084(int index, NetworkMessageType4_80533
         nlStrNCpy(mUnidentified0A0[mUnidentified1C0].mName, message->mUnidentified0E, 11);
         mUnidentified0A0[mUnidentified1C0].mUnidentified0B = message->mUnidentified19;
         memcpy(&mUnidentified0A0[mUnidentified1C0].mUnidentified0C, message->mUnidentified1A, message->mUnidentified19);
-        memcpy(mUnidentified0A0[mUnidentified1C0].mUnidentified14, connection->mAddress, 4);
+        *(u32*)mUnidentified0A0[mUnidentified1C0].mUnidentified14 = *(u32*)connection->mAddress;
         mUnidentified0A0[mUnidentified1C0].mUnidentified20 = connection->mPort;
         if (RosterVirtual08() == 0)
             mUnidentified0A0[mUnidentified1C0].mUnidentified18 = 2;
@@ -817,7 +820,7 @@ void NetworkTransport_8032CA4C::fn_8032F2AC(int index, NetworkMessageType5_80533
         nlStrNCpy(mUnidentified0A0[0].mName, message->mUnidentified0F, 11);
         mUnidentified0A0[0].mUnidentified0B = message->mUnidentified1A;
         memcpy(&mUnidentified0A0[0].mUnidentified0C, message->mUnidentified1B, message->mUnidentified1A);
-        memcpy(mUnidentified0A0[0].mUnidentified14, message->mUnidentified08, 4);
+        *(u32*)mUnidentified0A0[0].mUnidentified14 = *(u32*)message->mUnidentified08;
         mUnidentified0A0[0].mUnidentified20 = message->mUnidentified0C;
         mUnidentified0A0[0].mUnidentified1C = index;
         mUnidentified0A0[0].mUnidentified18 = 0;
@@ -829,7 +832,7 @@ void NetworkTransport_8032CA4C::fn_8032F2AC(int index, NetworkMessageType5_80533
             nlStrNCpy(mUnidentified0A0[peer].mName, info.mUnidentified06, 11);
             mUnidentified0A0[peer].mUnidentified0B = info.mUnidentified12;
             memcpy(&mUnidentified0A0[peer].mUnidentified0C, info.mUnidentified13, info.mUnidentified12);
-            memcpy(mUnidentified0A0[peer].mUnidentified14, info.mUnidentified00, 4);
+            *(u32*)mUnidentified0A0[peer].mUnidentified14 = *(u32*)info.mUnidentified00;
             mUnidentified0A0[peer].mUnidentified20 = info.mUnidentified04;
             mUnidentified0A0[peer].mUnidentified1C = -1;
             mUnidentified0A0[peer].mUnidentified18 = 0;
@@ -838,7 +841,7 @@ void NetworkTransport_8032CA4C::fn_8032F2AC(int index, NetworkMessageType5_80533
         nlStrNCpy(mUnidentified0A0[peer].mName, mUnidentified064, 11);
         mUnidentified0A0[peer].mUnidentified0B = mUnidentified074;
         memcpy(&mUnidentified0A0[peer].mUnidentified0C, mUnidentified075, mUnidentified074);
-        memcpy(mUnidentified0A0[peer].mUnidentified14, mUnidentified1CC->GetLocalAddress(), 4);
+        *(u32*)mUnidentified0A0[peer].mUnidentified14 = *(u32*)mUnidentified1CC->GetLocalAddress();
         mUnidentified0A0[peer].mUnidentified20 = mUnidentified1CC->GetLocalPort();
         mUnidentified0A0[peer].mUnidentified1C = -1;
         mUnidentified0A0[peer].mUnidentified18 = 0;
@@ -882,7 +885,7 @@ void NetworkTransport_8032CA4C::fn_8032F6B4(NetworkMessageType7_80533440* messag
 {
     UnidentifiedNetworkPeerInfo_80330430& info = message->mUnidentified08;
     int peer = info.mUnidentified11;
-    memcpy(mUnidentified0A0[peer].mUnidentified14, info.mUnidentified00, 4);
+    *(u32*)mUnidentified0A0[peer].mUnidentified14 = *(u32*)info.mUnidentified00;
     mUnidentified0A0[peer].mUnidentified20 = info.mUnidentified04;
     nlStrNCpy(mUnidentified0A0[peer].mName, info.mUnidentified06, 11);
     mUnidentified0A0[peer].mUnidentified0B = info.mUnidentified12;

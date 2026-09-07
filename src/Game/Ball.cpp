@@ -1,4 +1,6 @@
 #include <stddef.h>
+#include "Game/Audio/GameStreams.h"
+#include "Game/RumbleActions.h"
 #include <math.h>
 
 #include "Game/Ball.h"
@@ -164,7 +166,6 @@ extern "C" void fn_80031A30(cFielder*, int, float);
 extern "C" void fn_80035544(cFielder*);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" bool fn_80038660(cFielder*);
-extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_800DEFD4(cFielder*);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 extern "C" void fn_80017448(cBall*, float);
@@ -190,8 +191,7 @@ extern "C" void fn_801B7A28(cBall*);
 extern "C" void fn_801B9904(unsigned long);
 extern "C" void fn_801B9EAC(cBall*, nlVector3*, bool);
 extern "C" void fn_801B9FD0(cBall*, bool);
-extern "C" void fn_80139D1C(int, DetInput*);
-extern "C" void fn_802ECC54(void*, void*);
+void ReleaseAudioSoundOwner(void*, void*);
 extern "C" void fn_802B5370(
     nlQuaternion&, const nlVector3&, unsigned short);
 extern "C" DrawableObject* fn_8027638C(unsigned int);
@@ -288,10 +288,6 @@ extern float lbl_806DB5A4;
 extern bool lbl_806DB5A8;
 extern float lbl_806DB5AC;
 extern float lbl_806DB5B0;
-extern "C" EffectsGroup* fn_802E7CDC(
-    EmissionManager*, const char*);
-extern "C" EmissionController* fn_802E7FE4(
-    EmissionManager*, EffectsGroup*, int, bool, bool);
 extern float lbl_806E31C0;
 extern float lbl_806E31C4;
 extern float lbl_806E31C8;
@@ -377,7 +373,7 @@ cBall::cBall()
     m_pPhysicsBall->SetLinearVelocity(m_v3Velocity);
     m_pPhysicsBall->SetAngularVelocity(v3Zero);
 
-    mUnidentifiedEC = fn_802ECB68(lbl_806E201C);
+    mUnidentifiedEC = fn_802ECB68(g_pAudioSystem);
     mUnidentifiedEC->mUnidentified44 |= 0x00800000;
     mUnidentifiedEC->m_pPosition = &m_v3Position;
     mUnidentifiedEC->mUnidentified1C |= 0x8000;
@@ -408,9 +404,9 @@ cBall::~cBall()
     }
 
     fn_801B7A28(this);
-    fn_800EC12C(mUnidentifiedF0, this);
+    StopSound(mUnidentifiedF0, this);
     mUnidentifiedF0 = 0;
-    fn_802ECC54(lbl_806E201C, mUnidentifiedEC);
+    ReleaseAudioSoundOwner(g_pAudioSystem, mUnidentifiedEC);
     delete m_pPhysicsBall;
 }
 
@@ -498,7 +494,7 @@ void cBall::CollideWithCharacterCallback(
                     {
                         soundID = 0x5089F33E;
                     }
-                    fn_800ED92C(soundID);
+                    PlayCrowdReaction(soundID);
                 }
                 bReactToHit = false;
                 bDeflectBall = false;
@@ -717,7 +713,7 @@ void cBall::CollideWithCharacterCallback(
                     = pCharacter->m_v3Position;
                 nlVector3 v3PhysicsRadialSpot;
                 float fRadius = fn_8002BFA8(
-                    fn_8003E6E4(pCharacterFielder),
+                    pCharacterFielder->GetTweaks(),
                     pCharacter->m_fPlayerScale);
                 nlPolarToCartesian(v3PhysicsRadialSpot.x,
                     v3PhysicsRadialSpot.y,
@@ -746,9 +742,9 @@ void cBall::CollideWithCharacterCallback(
                             : nHitteeContactLocationFacingDelta;
                         if (absOwnerFacingDelta < 0x2000)
                         {
-                            if (fn_8003E6E4(pOwnerFielder)
+                            if (pOwnerFielder->GetTweaks()
                                     ->mUnidentified064
-                                < fn_8003E6E4(pCharacterFielder)
+                                < pCharacterFielder->GetTweaks()
                                       ->mUnidentified064)
                             {
                                 pOwnerFielder->InitActionSlideAttackReact(
@@ -756,9 +752,9 @@ void cBall::CollideWithCharacterCallback(
                                 fn_80035544(pCharacterFielder);
                                 pCharacterFielder->PickupBall(g_pBall);
                             }
-                            else if (fn_8003E6E4(pOwnerFielder)
+                            else if (pOwnerFielder->GetTweaks()
                                          ->mUnidentified064
-                                > fn_8003E6E4(pCharacterFielder)
+                                > pCharacterFielder->GetTweaks()
                                       ->mUnidentified064)
                             {
                                 pCharacterFielder
@@ -1396,8 +1392,10 @@ extern "C" float fn_800156A8(cBall* pBall)
 static inline void ShootAtFastImpl(cBall* pBall, nlVector3& v3Vel,
     const nlVector3& v3Target, float fDesiredTime)
 {
-    float k = lbl_806DB584 * pBall->m_pPhysicsBall->mfBallAirResistance;
-    float g = lbl_806DB588 * pBall->m_pPhysicsBall->m_gravity;
+    float gravity = pBall->m_pPhysicsBall->m_gravity;
+    float airResistance = pBall->m_pPhysicsBall->mfBallAirResistance;
+    float k = lbl_806DB584 * airResistance;
+    float g = lbl_806DB588 * gravity;
     float eToTheNegativeKT = Exp(-k * fDesiredTime);
     float kSquaredOverOneMinusEToTheNegativeKT
         = (k * k) / (1.0f - eToTheNegativeKT);
@@ -1698,7 +1696,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         {
             float resistance = pBall->m_pPhysicsBall->fn_80140C3C();
             PlayerTweaks* tweaks
-                = fn_8003E6E4((cFielder*)pBall->m_pPrevOwner);
+                = ((cFielder*)pBall->m_pPrevOwner)->GetTweaks();
             pBall->m_pPhysicsBall->mfBallAirResistance
                 = resistance * Interpolate(24.0f, 1.0f,
                     (float)tweaks->fShooting);
@@ -1716,95 +1714,95 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
 
     if (nBallState == 2 || nBallState == 4)
     {
-        fn_800EBC84(0, 0xBF92BBAF,
-            (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL, NULL);
+        PlayOwnedSound(0, 0xBF92BBAF,
+            (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
     }
 
     if (pBall->m_pPrevOwner != NULL
         && pBall->m_pPrevOwner->m_eClassType == FIELDER)
     {
-        fn_800EC12C(0x65321E47, pBall);
+        StopSound(0x65321E47, pBall);
         if (nBallState == 7)
         {
-            fn_800EBC84(0, 0xDE8FC45D,
-                (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL, NULL);
+            PlayOwnedSound(0, 0xDE8FC45D,
+                (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
         }
         else if (nBallState == 6)
         {
-            fn_800EBC84(0, 0xDE8FC45D,
-                (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL, NULL);
+            PlayOwnedSound(0, 0xDE8FC45D,
+                (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
             if (pBall->mfChargeValue >= 1.0f
                 && pBall->mfChargeValue < 2.0f)
             {
-                fn_800EBC84(0, 0xDE8FC45E,
-                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                PlayOwnedSound(0, 0xDE8FC45E,
+                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 2.0f
                 && pBall->mfChargeValue < 3.0f)
             {
-                fn_800EBC84(0, 0xDE8FC45F,
-                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                PlayOwnedSound(0, 0xDE8FC45F,
+                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 3.0f
                 && pBall->mfChargeValue < 4.0f)
             {
-                fn_800EBC84(0, 0xDE8FC460,
-                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                PlayOwnedSound(0, 0xDE8FC460,
+                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 4.0f)
             {
-                fn_800EBC84(0, 0xDE8FC461,
-                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                PlayOwnedSound(0, 0xDE8FC461,
+                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
         }
         else if (nBallState == 5 || nBallState == 3 || nBallState == 1)
         {
-            fn_800EBC84(0, 0x875086F2,
-                (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL, NULL);
+            PlayOwnedSound(0, 0x875086F2,
+                (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
             if (pBall->mfChargeValue >= 1.0f
                 && pBall->mfChargeValue < 2.0f)
             {
-                fn_800EBC84(0, 0x71406564,
-                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                PlayOwnedSound(0, 0x71406564,
+                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 2.0f
                 && pBall->mfChargeValue < 3.0f)
             {
-                fn_800EBC84(0, 0x71406565,
-                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                PlayOwnedSound(0, 0x71406565,
+                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 3.0f
                 && pBall->mfChargeValue < 4.0f)
             {
-                fn_800EBC84(0, 0x71406566,
-                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                PlayOwnedSound(0, 0x71406566,
+                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 4.0f)
             {
-                fn_800EBC84(0, 0x71406567,
-                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL,
+                PlayOwnedSound(0, 0x71406567,
+                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
 
             if (nBallState == 5)
             {
-                fn_800EBC84(0, 0x65321E47,
-                    (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC,
+                PlayOwnedSound(0, 0x65321E47,
+                    (XSoundOwner*)pBall->mUnidentifiedEC,
                     "Volley Pass", pBall);
             }
         }
         else if (nBallState == 8)
         {
-            fn_800EBC84(pBall->m_pPrevOwner->mUnidentified318,
+            PlayOwnedSound(pBall->m_pPrevOwner->mUnidentified318,
                 0x3D267BDF,
-                (XSoundOwner_802ED74C*)pBall->mUnidentifiedEC, NULL, NULL);
+                (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
         }
     }
 
@@ -2016,7 +2014,7 @@ extern "C" void fn_80016DF8(cBall* pBall, cPlayer* pPlayer,
 
     if (lbl_806DB500 && pPlayer->m_eClassType == FIELDER)
     {
-        float fValue = fn_8002BE64(fn_8003E6E4((cFielder*)pPlayer));
+        float fValue = fn_8002BE64(((cFielder*)pPlayer)->GetTweaks());
         float fPercent = InterpolateRangeClamped(
             0.0f, 1.0f, 0.5f, 1.0f, fValue);
         float fCharge = Interpolate(lbl_806DB504, lbl_806DB508, fPercent);
@@ -2413,8 +2411,10 @@ void cBall::KillBlurHandler()
 extern "C" void fn_800180F4(
     cBall* pBall, nlVector3* pPosition, float fTime)
 {
-    float k = pBall->m_pPhysicsBall->mfBallAirResistance * lbl_806DB584;
-    float g = lbl_806DB588 * pBall->m_pPhysicsBall->m_gravity;
+    float airResistance = pBall->m_pPhysicsBall->mfBallAirResistance;
+    float gravity = pBall->m_pPhysicsBall->m_gravity;
+    float k = lbl_806DB584 * airResistance;
+    float g = lbl_806DB588 * gravity;
     float eToTheNegativeKT = Exp(-k * fTime);
     float oneOverK = 1.0f / k;
     float oneMinusEToTheNegativeKTOverK
@@ -2477,8 +2477,10 @@ float cBall::PredictLandingSpotAndTime(nlVector3& v3Dest,
             return -10000.0f;
         }
 
-        float k = m_pPhysicsBall->mfBallAirResistance * lbl_806DB584;
-        float g = lbl_806DB588 * m_pPhysicsBall->m_gravity;
+        float airResistance = m_pPhysicsBall->mfBallAirResistance;
+        float gravity = m_pPhysicsBall->m_gravity;
+        float k = lbl_806DB584 * airResistance;
+        float g = lbl_806DB588 * gravity;
         float eToTheNegativeKT = Exp(-k * fTime);
         float oneOverK = 1.0f / k;
         float oneMinusEToTheNegativeKTOverK
@@ -2608,7 +2610,7 @@ extern "C" void fn_8001847C(cBall* pBall, bool bParam)
 
 extern "C" void fn_800189C4(cBall* pBall)
 {
-    fn_800EC12C(pBall->mUnidentifiedF0, pBall);
+    StopSound(pBall->mUnidentifiedF0, pBall);
     pBall->mUnidentifiedF0 = 0;
 }
 
@@ -3088,16 +3090,16 @@ extern "C" void fn_800194A4(void*)
 
     if (pCaptain->GetGlobalPad() != NULL)
     {
-        fn_800EDCE8(pCaptain);
-        fn_800EBBFC(0, 0xCC32C1A8, NULL, NULL);
-        fn_80139D1C(1, pCaptain->GetGlobalPad());
+        SetPlayerAudioController(pCaptain);
+        PlaySound(0, 0xCC32C1A8, NULL, NULL);
+        PlayRumbleAction(1, pCaptain->GetGlobalPad());
     }
 
     if (pOtherCaptain->GetGlobalPad() != NULL)
     {
-        fn_800EDCE8(pOtherCaptain);
-        fn_800EBBFC(0, 0xCC32C1A8, NULL, NULL);
-        fn_80139D1C(1, pOtherCaptain->GetGlobalPad());
+        SetPlayerAudioController(pOtherCaptain);
+        PlaySound(0, 0xCC32C1A8, NULL, NULL);
+        PlayRumbleAction(1, pOtherCaptain->GetGlobalPad());
     }
 
     if ((g_pTeams[0]->m_nScore > 0 || g_pTeams[1]->m_nScore > 0)
@@ -3621,20 +3623,16 @@ extern "C" void fn_8001AD24(
         "%s_megastrike_home_3_gameplay",
         pFielder->mUnidentified11C->mName);
 
-    EffectsGroup* pEffectsGroup = fn_802E7CDC(
-        EmissionManager::Instance(), effectName);
-    EmissionController* pController = fn_802E7FE4(
-        EmissionManager::Instance(), pEffectsGroup, 0, true, false);
+    EffectsGroup* pEffectsGroup = EmissionManager::Instance()->GetEffectsGroup(effectName);
+    EmissionController* pController = EmissionManager::Instance()->Create(pEffectsGroup, 0, true, 0);
     pController->m_fGround = 0.02f;
     pController->SetPosition(pBallTrail->position);
     pController->m_uUserData = (u32)pBallTrail;
     pController->SetUpdateCallback(
         Function1<void, EmissionController&>(UpdateEmitterFromBallTrail));
 
-    pEffectsGroup = fn_802E7CDC(
-        EmissionManager::Instance(), "megastrike_ball_launch");
-    pController = fn_802E7FE4(
-        EmissionManager::Instance(), pEffectsGroup, 0, true, false);
+    pEffectsGroup = EmissionManager::Instance()->GetEffectsGroup("megastrike_ball_launch");
+    pController = EmissionManager::Instance()->Create(pEffectsGroup, 0, true, 0);
     pController->SetPosition(pBallTrail->position);
     pController->SetVelocity(v3Zero);
 

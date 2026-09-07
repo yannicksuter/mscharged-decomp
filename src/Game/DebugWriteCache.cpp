@@ -50,14 +50,19 @@ static inline UnidentifiedDebugWriteField* GetUnidentifiedNextField(
     return field;
 }
 
+static inline void ResetUnidentifiedBuffer(
+    UnidentifiedDebugWriteBuffer* buffer, int frame)
+{
+    buffer->mCurrent = buffer->mData;
+    buffer->mFrame = frame;
+}
+
 extern "C" void fn_80338CC4(DebugWriteCache* cache)
 {
     cache->mCurrentBuffer = -1;
     for (int i = 0; i < cache->mBufferCount; ++i)
     {
-        UnidentifiedDebugWriteBuffer& buffer = cache->mBuffers[i];
-        buffer.mCurrent = buffer.mData;
-        buffer.mFrame = -1;
+        ResetUnidentifiedBuffer(&cache->mBuffers[i], -1);
     }
 }
 
@@ -295,10 +300,7 @@ extern "C" void fn_80339544(DebugWriteCache* cache, u32 frame)
 {
     cache->mCurrentBuffer
         = (cache->mCurrentBuffer + 1) % cache->mBufferCount;
-    UnidentifiedDebugWriteBuffer* buffer
-        = &cache->mBuffers[cache->mCurrentBuffer];
-    buffer->mCurrent = buffer->mData;
-    buffer->mFrame = frame;
+    ResetUnidentifiedBuffer(&cache->mBuffers[cache->mCurrentBuffer], frame);
 }
 
 extern "C" void fn_8033957C(

@@ -45,6 +45,9 @@ public:
     static EmissionManager* Instance();
     static EmissionManager& InstanceForReplayOnly();
 
+    EffectsGroup* GetEffectsGroup(const char* name);
+    EmissionController* Create(EffectsGroup* pEffectsGroup, int view, bool addToEnd, unsigned short id);
+
     void Shutdown();
     void Update(float dt);
     int GetNumLights();

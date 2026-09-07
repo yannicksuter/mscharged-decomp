@@ -36,6 +36,16 @@ public:
         return entry;
     }
 
+    void Allocate(T*& out)
+    {
+        out = Allocate();
+    }
+
+    void Free(T* entry)
+    {
+        DeleteEntry(entry);
+    }
+
     T* New(const T& data)
     {
         return new (Allocate()) T(data);

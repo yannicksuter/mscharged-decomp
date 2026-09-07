@@ -3,7 +3,7 @@
 
 #include "Game/Character.h"
 #include "NL/nlTimer.h"
-#include "unclassified/tu_80331BE4.h"
+#include "Game/DetInput.h"
 
 class cBall;
 class cAIPad;

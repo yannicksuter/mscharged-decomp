@@ -9,28 +9,28 @@ extern "C" void fn_80073A48(
 StadiumTweakValues_80278EA4::StadiumTweakValues_80278EA4(
     const char* category, const char* szBaseName)
 {
-    fGoalpostRadius.fn_8002D078(
+    fGoalpostRadius.BindWithDefault(
         "goalpost radius", 0.0f, category, false, 0.0f, 0.0f, 0.0f);
 
-    fGoalpostOffset.fn_8002D078(
+    fGoalpostOffset.BindWithDefault(
         "goalpost offset", 0.0f, category, false, 0.0f, 0.0f, 0.0f);
 
-    fNetWidth.fn_8002D078(
+    fNetWidth.BindWithDefault(
         "net width", 0.0f, category, false, 0.0f, 0.0f, 0.0f);
 
-    fNetHeight.fn_8002D078(
+    fNetHeight.BindWithDefault(
         "net height", 0.0f, category, false, 0.0f, 0.0f, 0.0f);
 
-    fPhysNetWidth.fn_8002D078(
+    fPhysNetWidth.BindWithDefault(
         "physics net width", 0.0f, category, false, 0.0f, 0.0f, 0.0f);
 
-    fPhysNetHeight.fn_8002D078(
+    fPhysNetHeight.BindWithDefault(
         "physics net height", 0.0f, category, false, 0.0f, 0.0f, 0.0f);
 
-    fPhysNetDepth.fn_8002D078(
+    fPhysNetDepth.BindWithDefault(
         "physics net depth", 0.0f, category, false, 0.0f, 0.0f, 0.0f);
 
-    fSoftness.fn_8002D078(
+    fSoftness.BindWithDefault(
         "physics net softness", -1.0f, category, false, 0.0f, 0.0f, 0.0f);
 
     bool registered = bDontUseLowest.fn_802C4FEC(
@@ -44,10 +44,10 @@ StadiumTweakValues_80278EA4::StadiumTweakValues_80278EA4(
         *bDontUseLowest.m_pValue = false;
     }
 
-    fShadowHeight.fn_8002D078(
+    fShadowHeight.BindWithDefault(
         "Shadow Height", 0.1f, category, false, 0.0f, 0.0f, 0.0f);
 
-    fShadowOpacity.fn_8002D078(
+    fShadowOpacity.BindWithDefault(
         "Shadow Opacity", 0.3f, category, false, 0.0f, 0.0f, 0.0f);
 
     char szFileName[128];

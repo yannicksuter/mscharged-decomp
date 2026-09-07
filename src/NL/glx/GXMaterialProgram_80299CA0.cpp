@@ -15,18 +15,6 @@ GXMaterialParameter GXMaterialProgram_80299CA0::Parameters[3] = {
 TweakValueImpl_804F4DC8 sCrystalTweak_8057B400;
 TweakValueImpl_804F4DC8 sCrystalTweak_8057B420;
 
-static inline void UnidentifiedInitCrystalTweak(
-    TweakValueImpl_804F4DC8& tweak, const char* name, float defaultValue,
-    const char* category, float value, float min, float max)
-{
-    bool registered = tweak.fn_802C4FEC(
-        name, value, category, false, min, max);
-    if (!registered)
-        tweak = tweak.GetDefaultValue();
-    if (!registered)
-        tweak = defaultValue;
-}
-
 GXMaterialProgram_80299CA0::GXMaterialProgram_80299CA0()
 {
     Instance = this;
@@ -45,12 +33,10 @@ void GXMaterialProgram_80299CA0::Initialize()
     if (Initialized)
         return;
 
-    UnidentifiedInitCrystalTweak(
-        sCrystalTweak_8057B400, "SilhouetteGlowMultiplier", 1.0f,
-        "Materials/", 0.0f, 1.0f, 0.05f);
-    UnidentifiedInitCrystalTweak(
-        sCrystalTweak_8057B420, "EdgeGlowMultiplier", 1.0f,
-        "Materials/", 0.0f, 1.0f, 0.05f);
+    sCrystalTweak_8057B400.BindWithDefault( "SilhouetteGlowMultiplier", 1.0f,
+        "Materials/", false, 0.0f, 1.0f, 0.05f);
+    sCrystalTweak_8057B420.BindWithDefault( "EdgeGlowMultiplier", 1.0f,
+        "Materials/", false, 0.0f, 1.0f, 0.05f);
 
     Initialized = true;
 }

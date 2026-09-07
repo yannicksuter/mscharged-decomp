@@ -42,7 +42,7 @@ Game/tu_80009B88.cpp:
 	.sbss       start:0x806E0B98 end:0x806E0BA8
 	.sdata2     start:0x806E30D0 end:0x806E30D8
 
-Game/AI/tu_8000CD44.cpp:
+Game/AI/AvoidableObject.cpp:
 	.text       start:0x8000CD44 end:0x8000EF9C
 	.ctors      start:0x804DB4F0 end:0x804DB4F4
 	.rodata     start:0x804DBC10 end:0x804DBC20
@@ -189,14 +189,14 @@ unclassified/tu_80073C98.cpp:
 	.sdata      start:0x806DBAE8 end:0x806DBB00
 
 Game/GameTweaks.cpp:
-	.text       start:0x800742DC end:0x80077224
+	.text       start:0x800742DC end:0x8007722C
 	.ctors      start:0x804DB52C end:0x804DB530
 	.data       start:0x804FC8C0 end:0x804FD8D8
 	.sdata      start:0x806DBB00 end:0x806DBB08
 	.sdata2     start:0x806E37A8 end:0x806E3858
 
 Game/Goalie.cpp:
-	.text       start:0x80077224 end:0x8008288C
+	.text       start:0x8007722C end:0x8008288C
 	.ctors      start:0x804DB530 end:0x804DB534
 	.rodata     start:0x804DBFF8 end:0x804DC030
 	.data       start:0x804FD8D8 end:0x804FE2A0
@@ -275,16 +275,16 @@ Game/AI/ShotMeter.cpp:
 	.sdata2     start:0x806E3CA8 end:0x806E3CD8
 
 Game/AI/SkillTweaks.cpp:
-	.text       start:0x800A07C0 end:0x800A3594
+	.text       start:0x800A07C0 end:0x800A3FDC
 	.ctors      start:0x804DB548 end:0x804DB54C
 	.data       start:0x804FFFC0 end:0x805008D0
 	.bss        start:0x8056D958 end:0x8056D988
 	.sdata      start:0x806DBE78 end:0x806DBED0
-	.sbss       start:0x806E0DE0 end:0x806E0DF0
+	.sbss       start:0x806E0DE0 end:0x806E0DE9
 	.sdata2     start:0x806E3CD8 end:0x806E3D10
 
 Game/AI/SpaceSearch.cpp:
-	.text       start:0x800A3FC8 end:0x800A5D34
+	.text       start:0x800A3FDC end:0x800A5D34
 	.ctors      start:0x804DB54C end:0x804DB550
 	.rodata     start:0x804DC100 end:0x804DC110
 	.data       start:0x805008D0 end:0x80500940
@@ -302,7 +302,7 @@ Game/Team.cpp:
 	.sbss       start:0x806E0DF8 end:0x806E0E10
 	.sdata2     start:0x806E3D90 end:0x806E3DD8
 
-unclassified/tu_800A9140.cpp:
+Game/Terrain.cpp:
 	.text       start:0x800A9140 end:0x800A9588
 	.ctors      start:0x804DB554 end:0x804DB558
 	.data       start:0x80500BE8 end:0x80500CC0
@@ -490,7 +490,7 @@ Game/Audio/audio.cpp:
 	.sdata      start:0x806DC450 end:0x806DC460
 	.sdata2     start:0x806E42E8 end:0x806E42F8
 
-Game/Audio/tu_800ED8B8.cpp:
+Game/Audio/GameStreams.cpp:
 	.text       start:0x800ED8B8 end:0x800EDE54
 	.ctors      start:0x804DB5AC end:0x804DB5B0
 	.data       start:0x805041B0 end:0x80504228
@@ -844,7 +844,7 @@ Game/PadActions.cpp:
 	.sbss       start:0x806E1198 end:0x806E11A0
 	.sdata2     start:0x806E4788 end:0x806E4790
 
-unclassified/tu_80139B18.cpp:
+Game/RumbleActions.cpp:
 	.text       start:0x80139B18 end:0x8013A25C
 	.ctors      start:0x804DB634 end:0x804DB638
 	.data       start:0x8050DFB8 end:0x8050E040
@@ -1179,7 +1179,7 @@ Game/ExcitementSystem.cpp:
 	.sbss       start:0x806E14E0 end:0x806E14E8
 	.sdata2     start:0x806E4EA0 end:0x806E4EB0
 
-unclassified/tu_80197120.cpp:
+Game/EventData.cpp:
 	.text       start:0x80197120 end:0x801982A0
 	.ctors      start:0x804DB6D8 end:0x804DB6DC
 	.bss        start:0x80571248 end:0x80571A18
@@ -1207,11 +1207,16 @@ unclassified/tu_8019A710.cpp:
 	.ctors      start:0x804DB6E4 end:0x804DB6E8
 
 Game/Render/ChainChomp.cpp:
-	.text       start:0x8019C988 end:0x8019CF98
-	.sdata      start:0x806DCD94 end:0x806DCD9C
-	.sdata2     start:0x806E4F6C end:0x806E4F84
+	.text       start:0x8019AE7C end:0x8019D6B4
+	.ctors      start:0x804DB6E8 end:0x804DB6EC
+	.rodata     start:0x804DCDD0 end:0x804DCDF4
+	.data       start:0x80511C50 end:0x80511D58
+	.bss        start:0x80571A48 end:0x80571B20
+	.sdata      start:0x806DCD88 end:0x806DCDB8
+	.sbss       start:0x806E14F0 end:0x806E14FC
+	.sdata2     start:0x806E4EF0 end:0x806E4F88
 
-unclassified/tu_8019D6B4.cpp:
+Game/Render/DaisyFist.cpp:
 	.text       start:0x8019D6B4 end:0x8019DA98
 	.rodata     start:0x804DCDF8 end:0x804DCE04
 	.sdata      start:0x806DCDB8 end:0x806DCDE0
@@ -1340,7 +1345,7 @@ unclassified/tu_801AC30C.cpp:
 	.sbss       start:0x806E1610 end:0x806E1618
 	.sdata2     start:0x806E5218 end:0x806E5248
 
-unclassified/tu_801AD15C.cpp:
+Game/Render/PeachPhoto.cpp:
 	.text       start:0x801AD15C end:0x801ADFE8
 	.data       start:0x80514430 end:0x80514480
 	.bss        start:0x80573C08 end:0x80574110
@@ -2311,7 +2316,7 @@ NL/gl/tu_802A0F04.cpp:
 NL/gl/tu_802A12E4.cpp:
 	.text       start:0x802A12E4 end:0x802A15B4
 
-NL/gl/tu_802A15D4.cpp:
+NL/gl/glMultiTextureModelWriter.cpp:
 	.text       start:0x802A15D4 end:0x802A193C
 
 Game/GL/ModelWriter_802A1BF4.cpp:
@@ -2552,12 +2557,12 @@ NL/nlDebugFile.cpp:
 	.sdata      start:0x806DF228 end:0x806DF238
 	.sbss       start:0x806E1D88 end:0x806E1D90
 
-NL/tu_802B1A30.cpp:
+NL/nlFunctionMemory.cpp:
 	.text       start:0x802B1A30 end:0x802B2518
 	.ctors      start:0x804DB980 end:0x804DB984
 	.bss        start:0x8057B570 end:0x8057B660
 
-NL/tu_802B2518.cpp:
+NL/nlEvent.cpp:
 	.text       start:0x802B2518 end:0x802B36B8
 	.ctors      start:0x804DB984 end:0x804DB988
 	.data       start:0x8052B4C8 end:0x8052B538
@@ -2731,7 +2736,7 @@ NL/plat/tu_802C02C0.cpp:
 	.sbss       start:0x806E1E20 end:0x806E1E24
 	.sdata2     start:0x806E62A8 end:0x806E62B0
 
-NL/plat/tu_802C06D4.cpp:
+NL/plat/globalpad.cpp:
 	.text       start:0x802C06D4 end:0x802C0854
 	.sbss       start:0x806E1E28 end:0x806E1E2C
 
@@ -2873,7 +2878,7 @@ NL/gl/glTexture.cpp:
 	.data       start:0x8052E450 end:0x8052E4E8
 	.sbss       start:0x806E1F08 end:0x806E1F38
 
-NL/gl/tu_802CE0A4.cpp:
+NL/gl/glTextureManager.cpp:
 	.text       start:0x802CE0A4 end:0x802CE528
 
 NL/gl/glView.cpp:
@@ -2893,7 +2898,7 @@ Game/GL/GLInventory.cpp:
 	.text       start:0x802D2B2C end:0x802D38A4
 	.data       start:0x8052E5C0 end:0x8052E758
 
-Game/GL/tu_802D38A4.cpp:
+Game/GL/glModelBuilder.cpp:
 	.text       start:0x802D38A4 end:0x802D3A08
 
 Game/GL/GLTextureAnim.cpp:
@@ -3024,28 +3029,28 @@ Game/Task/ParticleUpdateTask.cpp:
 	.sbss       start:0x806E2010 end:0x806E2018
 	.sdata2     start:0x806E65A0 end:0x806E65A8
 
-Game/Audio/Transition_802F2110.cpp:
+Game/Audio/Transition.cpp:
 	.text       start:0x802EB5BC end:0x802EB644
 
-Game/Audio/AudioBankTable_802EB644.cpp:
+Game/Audio/AudioBankTable.cpp:
 	.text       start:0x802EB644 end:0x802EBD54
 	.data       start:0x8052F3D8 end:0x8052F400
 
-Game/Audio/AudioResourceLoadOwner_802ED144.cpp:
+Game/Audio/AudioResourceLoadOwner.cpp:
 	.text       start:0x802ED144 end:0x802ED678
 	.data       start:0x8052F490 end:0x8052F49C
 
-Game/Audio/XSoundHandle_802ED74C.cpp:
+Game/Audio/XSoundHandle.cpp:
 	.text       start:0x802ED74C end:0x802ED964
 	.data       start:0x8052F4A0 end:0x8052F528
 	.sdata      start:0x806DF4C8 end:0x806DF4CC
 	.sdata2     start:0x806E65B8 end:0x806E65BC
 
-Game/Audio/AudioResourceLoader_802EDA38.cpp:
+Game/Audio/AudioResourceLoader.cpp:
 	.text       start:0x802EDA38 end:0x802EDA7C
 	.data       start:0x8052F528 end:0x8052F538
 
-Game/Audio/AudioBundleManager_802EDA7C.cpp:
+Game/Audio/AudioBundleManager.cpp:
 	.text       start:0x802EDA7C end:0x802EE08C
 	.data       start:0x8052F538 end:0x8052F570
 	.sdata      start:0x806DF4D0 end:0x806DF4D8
@@ -3075,7 +3080,7 @@ unclassified/tu_802F2110.cpp:
 unclassified/tu_802F2C3C.cpp:
 	.text       start:0x802F2C3C end:0x802F39EC
 
-Game/Audio/AudioRuntimeGroup_802F98F4.cpp:
+Game/Audio/AudioRuntimeGroup.cpp:
 	.text       start:0x802F98F4 end:0x802F9CD8
 	.data       start:0x8052F9F0 end:0x8052FA40
 
@@ -3501,7 +3506,7 @@ Game/DetermDataEvent.cpp:
 	.ctors      start:0x804DBADC end:0x804DBAE0
 	.bss        start:0x805848D8 end:0x80584900
 
-unclassified/tu_80331BE4.cpp:
+Game/DetInput.cpp:
 	.text       start:0x80331BE4 end:0x80332770
 
 unclassified/tu_80332770.cpp:
@@ -3691,7 +3696,7 @@ ode/NLGAdditions.cpp:
 	.data       start:0x80534738 end:0x80534750
 	.sdata2     start:0x806E6B88 end:0x806E6BA0
 
-Game/Audio/tu_8035952C.cpp:
+Game/Audio/CategoryVolume.cpp:
 	.text       start:0x8035952C end:0x80359D74
 	.ctors      start:0x804DBAFC end:0x804DBB00
 	.data       start:0x80534750 end:0x805347C0
@@ -3700,7 +3705,7 @@ Game/Audio/tu_8035952C.cpp:
 	.sbss       start:0x806E21C0 end:0x806E21C8
 	.sdata2     start:0x806E6BA0 end:0x806E6BB8
 
-Game/Audio/tu_80359D74.cpp:
+Game/Audio/Delay.cpp:
 	.text       start:0x80359D74 end:0x8035A9E0
 	.ctors      start:0x804DBB00 end:0x804DBB04
 	.data       start:0x805347C0 end:0x80534848
@@ -3709,7 +3714,7 @@ Game/Audio/tu_80359D74.cpp:
 	.sbss       start:0x806E21C8 end:0x806E21D0
 	.sdata2     start:0x806E6BB8 end:0x806E6BC8
 
-Game/Audio/tu_8035A9E0.cpp:
+Game/Audio/LowPassFilter.cpp:
 	.text       start:0x8035A9E0 end:0x8035B220
 	.ctors      start:0x804DBB04 end:0x804DBB08
 	.data       start:0x80534848 end:0x805348A8
@@ -3718,7 +3723,7 @@ Game/Audio/tu_8035A9E0.cpp:
 	.sbss       start:0x806E21D0 end:0x806E21D8
 	.sdata2     start:0x806E6BC8 end:0x806E6BE0
 
-Game/Audio/tu_8035B220.cpp:
+Game/Audio/Pitch.cpp:
 	.text       start:0x8035B220 end:0x8035B8E8
 	.ctors      start:0x804DBB08 end:0x804DBB0C
 	.data       start:0x805348A8 end:0x80534918
@@ -3727,7 +3732,7 @@ Game/Audio/tu_8035B220.cpp:
 	.sbss       start:0x806E21D8 end:0x806E21E0
 	.sdata2     start:0x806E6BE0 end:0x806E6BF8
 
-Game/Audio/AudioBackend_8035B8E8.cpp:
+Game/Audio/AudioBackend.cpp:
 	.text       start:0x8035B8E8 end:0x8035D578
 	.data       start:0x80534918 end:0x80534B08
 	.sdata      start:0x806DF9A8 end:0x806DF9C0
@@ -3742,15 +3747,15 @@ Game/Audio/Plat3dSoundSrc.cpp:
 	.sbss       start:0x806E21F0 end:0x806E2200
 	.sdata2     start:0x806E6BF8 end:0x806E6C18
 
-Game/Audio/AudioResourcePlatform_8035DE28.cpp:
-	.text       start:0x8035DE28 end:0x8035EA28
+Game/Audio/AudioResourcePlatform.cpp:
+	.text       start:0x8035DE28 end:0x8035EF08
 	.ctors      start:0x804DBB14 end:0x804DBB18
 	.data       start:0x80534BA0 end:0x80534CD0
 	.bss        start:0x80585558 end:0x80585C10
 	.sdata      start:0x806DF9D8 end:0x806DF9E0
 	.sbss       start:0x806E2200 end:0x806E2210
 
-Game/Audio/AudioSource_8035EF08.cpp:
+Game/Audio/AudioSource.cpp:
 	.text       start:0x8035EF08 end:0x803622F0
 	.ctors      start:0x804DBB18 end:0x804DBB1C
 	.data       start:0x80534CD0 end:0x80534E88
@@ -3758,7 +3763,7 @@ Game/Audio/AudioSource_8035EF08.cpp:
 	.sbss       start:0x806E2210 end:0x806E2238
 	.sdata2     start:0x806E6C18 end:0x806E6C50
 
-Game/Audio/AudioEffects_803622F0.cpp:
+Game/Audio/AudioEffects.cpp:
 	.text       start:0x803622F0 end:0x803632F8
 	.ctors      start:0x804DBB1C end:0x804DBB20
 	.data       start:0x80534E88 end:0x80534FB8

@@ -1,4 +1,6 @@
+#include "Game/Sys/audio.h"
 #include "Game/AI/Fielder.h"
+#include "Game/RumbleActions.h"
 #include "unclassified/tu_8019FE24.h"
 #include "unclassified/tu_80177498.h"
 
@@ -69,13 +71,10 @@ extern "C" void fn_80060014(cGame* pGame, void* pEvent);
 extern "C" void fn_8005FC1C(cGame* pGame, void* pEvent);
 extern "C" void fn_8005FE18(cGame* pGame, void* pEvent);
 extern "C" void fn_80060210(cGame* pGame, void* pEvent);
-extern "C" void fn_800EC12C(unsigned long soundID, void* pParam);
-extern "C" void fn_800EBBFC(
-    int nParam, unsigned long soundID, const void* pParam, void* pContext);
+
 extern "C" void fn_800F026C(float* pParams, float fParam1, float fParam2);
 extern "C" void fn_80061B1C(int nParam, float fParam1, float fParam2);
 extern "C" void fn_80111D7C(float fParam);
-extern "C" void fn_80139D1C(int nPreset, DetInput* pPad);
 extern "C" PhysicsSphere_80175F8C* fn_801765C8(
     cFielder* pFielder, const nlVector3* v3Position, float fParam);
 extern "C" void fn_801B897C(cFielder* pFielder);
@@ -106,7 +105,7 @@ void cFielder::fn_8004F8E8()
         lbl_806DBA10 * m_v3Position.x);
     fn_801765C8(
         this, &GetJointPosition(m_nHeadJointIndex), lbl_806DB9D8);
-    fn_80139D1C(4, GetGlobalPad());
+    PlayRumbleAction(4, GetGlobalPad());
 }
 
 void cFielder::fn_8004F974(float fDeltaT)
@@ -243,7 +242,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
 
         if (m_pBall == 0)
         {
-            fn_800EBBFC(mUnidentified318, 0x7997624D, 0, 0);
+            PlaySound(mUnidentified318, 0x7997624D, 0, 0);
         }
     }
     else if (m_pCurrentAnimController->TestFrameTrigger(
@@ -322,7 +321,7 @@ void cFielder::fn_8005001C(bool bForce)
             }
             mUnidentified3E8.nextFireballTime = 0.0f;
             fn_8002FE54(this);
-            fn_800EC12C(0x8A9FCF66, this);
+            StopSound(0x8A9FCF66, this);
         }
     }
     else if (m_eCharacterClass == MARIO)
@@ -348,7 +347,7 @@ void cFielder::fn_8005001C(bool bForce)
                 {
                     fn_80319E58(fn_8002E1A4(this), 0x23);
                 }
-                fn_800EC12C(0x8A9FCF66, this);
+                StopSound(0x8A9FCF66, this);
             }
             else
             {
@@ -361,7 +360,7 @@ void cFielder::fn_8005001C(bool bForce)
         if (mUnidentified3DC || bForce)
         {
             mUnidentified3DC = false;
-            fn_800EC12C(0x8A9FCF66, this);
+            StopSound(0x8A9FCF66, this);
         }
     }
     else if (m_eCharacterClass == YOSHI)
@@ -416,11 +415,11 @@ bool cFielder::fn_80050284()
     {
         if (m_eCharacterClass == YOSHI)
         {
-            fn_800EBBFC(mUnidentified318, 0x8A9FCF66, 0, 0);
+            PlaySound(mUnidentified318, 0x8A9FCF66, 0, 0);
         }
         else
         {
-            fn_800EBBFC(mUnidentified318, 0x8A9FCF66, "TankOn", this);
+            PlaySound(mUnidentified318, 0x8A9FCF66, "TankOn", this);
         }
         mUnidentified3DC = true;
         mUnidentified3DD = false;

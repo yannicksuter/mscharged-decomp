@@ -9,9 +9,10 @@ void nlCancelPendingAsyncReads(nlFile* pFile, void (*callback)(nlFile*, void*, u
 bool nlAsyncReadsPending(nlFile* file);
 void nlSeek(nlFile* file, unsigned int offset, unsigned long origin);
 void nlServiceFileSystem(void);
+AsyncEntry* nlGetCurrentAsyncRead();
 
-extern "C" bool fn_80367B70(AsyncEntry* entry);
-extern "C" bool fn_80367DAC(AsyncEntry* entry,
+bool nlAsyncReadBusy(AsyncEntry* entry);
+bool nlCancelAsyncRead(AsyncEntry* entry,
     void (*callback)(nlFile*, void*, unsigned int, unsigned long, void (*)(nlFile*, void*, unsigned int, unsigned long)));
 
 #endif // NL_FILE_GC_H

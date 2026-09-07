@@ -1,9 +1,10 @@
 #include "Game/Render/NPCManager.h"
+#include "Game/Drawable/RenderObject.h"
 
 #include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glTexture.h"
-#include "unclassified/tu_8019D6B4.h"
+#include "Game/Render/DaisyFist.h"
 #include "Game/GameTweaks.h"
 #include "Game/Render/ChainChomp.h"
 #include "Game/Render/SkinAnimatedNPC.h"
@@ -66,7 +67,6 @@ extern "C"
         PhysicsObject*, PhysicsObject*, const nlVector3&);
     void fn_801B4B9C(SkinAnimatedNPC* pObject);
 
-    void* fn_80276360(int nType, int nIndex);
     void fn_801A01F8();
     void fn_801A0208(float fDeltaT);
 
@@ -183,7 +183,7 @@ void NPCManager::fn_801A9874()
 
     PhysicsNPC* chainPhysics = new (nlMalloc(
         sizeof(PhysicsNPC), 8, false)) PhysicsNPC(
-        lbl_8056CF08.m_pGameTweaks->fChainChompRadius);
+        gGameTweaks.m_pGameTweaks->fChainChompRadius);
 
     void* chainChomp = nlMalloc(0xB4, 8, false);
     if (chainChomp != 0)
@@ -205,7 +205,7 @@ void NPCManager::fn_801A9AF8()
         = (UnidentifiedObject_801B535C*)nlMalloc(0x4C, 8, false);
     if (pObject != 0)
     {
-        pObject = fn_801B535C(pObject, fn_80276360(3, 0));
+        pObject = fn_801B535C(pObject, GetRenderObject(3, 0));
     }
     mUnidentified024 = pObject;
 }
@@ -215,7 +215,7 @@ void NPCManager::fn_801A9B64()
     State_80199E84* pObject = (State_80199E84*)nlMalloc(0x4C, 8, false);
     if (pObject != 0)
     {
-        pObject = fn_80199E84(pObject, fn_80276360(4, 0));
+        pObject = fn_80199E84(pObject, GetRenderObject(4, 0));
     }
     mUnidentified028 = pObject;
 }
@@ -226,7 +226,7 @@ void NPCManager::fn_801A9BD0()
         = (KoopaShellObject*)nlMalloc(0x3C, 8, false);
     if (pObject != 0)
     {
-        pObject = fn_801A5F30(pObject, fn_80276360(5, 0));
+        pObject = fn_801A5F30(pObject, GetRenderObject(5, 0));
     }
     mUnidentified02C = pObject;
 }
@@ -277,7 +277,7 @@ BulletBillObject* NPCManager::fn_801A9D20()
             pObject = (BulletBillObject*)nlMalloc(0x48, 8, false);
             if (pObject != 0)
             {
-                pObject = fn_8019A710(pObject, fn_80276360(1, i), i, lbl_806E5210, lbl_806E5214);
+                pObject = fn_8019A710(pObject, GetRenderObject(1, i), i, lbl_806E5210, lbl_806E5214);
             }
             mUnidentified058[i] = pObject;
             mUnidentified054 = i + 1;

@@ -1,4 +1,8 @@
-#include "Game/AI/UnidentifiedAvoidanceObject.h"
+#include "Game/Sys/audio.h"
+#include "Game/AI/AvoidableObject.h"
+#include "Game/Audio/GameStreams.h"
+#include "Game/RumbleActions.h"
+#include "Game/Terrain.h"
 #include "Game/Sys/debug.h"
 #include "Game/AI/Fielder.h"
 #include "NL/gl/glView.h"
@@ -59,7 +63,6 @@ static const nlVector3 v3Up = { 0.0f, 0.0f, 1.0f };
 
 extern FuzzyVariant fvNotSet;
 
-extern "C" unsigned int fn_800387CC(cFielder* pFielder);
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" void fn_8002E580(cFielder* pFielder);
 extern "C" bool fn_8003E948(cFielder* pFielder);
@@ -78,10 +81,9 @@ extern "C" void fn_8003B254(cFielder* pFielder);
 extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
 extern "C" float fn_8002CD2C(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CC44(PlayerTweaks* pTweaks);
-extern "C" PlayerTweaks* fn_8003E6E4(cFielder* pFielder);
 extern "C" float fn_8002BFA8(PlayerTweaks* pTweaks, float fParam);
 extern "C" bool fn_8001E168(const cCharacter* pCharacter);
-extern "C" void fn_800EDCE8(cPlayer* pPlayer);
+
 extern "C" cFielder* fn_80096F54(cPlayer* pPlayer, bool bParam);
 extern "C" bool fn_80035F34(cFielder* pFielder);
 extern "C" bool fn_8003881C(cFielder* pFielder);
@@ -94,7 +96,6 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fParam);
 extern "C" void fn_800978E8(cPlayer* pPlayer, int nParam);
 extern "C" void fn_80031A30(cFielder* pFielder, int nParam, float fParam);
 extern bool lbl_806DB5A8;
-extern "C" void fn_80139D1C(int nParam, void* pParam);
 extern "C" void fn_8003A544(cFielder* pFielder);
 extern "C" float fn_8002CFB0(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C328(PlayerTweaks* pTweaks);
@@ -111,7 +112,7 @@ extern "C" void fn_800395C0(cFielder* pFielder);
 extern "C" void fn_8019A270(void* pParam, cFielder* pFielder);
 extern "C" float fn_8002C7E8(PlayerTweaks* pTweaks);
 extern "C" void fn_801BA034();
-extern "C" void fn_800EC12C(unsigned long uParam, void* pParam);
+
 extern "C" void fn_8005CDD0(void* pParam);
 extern "C" float fn_8002CF9C(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C730(PlayerTweaks* pTweaks);
@@ -161,11 +162,9 @@ extern "C" void fn_8003ADAC(cFielder* pFielder);
 extern "C" void fn_8003B54C(cFielder* pFielder);
 extern "C" void fn_8003B020(cFielder* pFielder);
 extern "C" void fn_8003B0D8(cFielder* pFielder);
-extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" float fn_800E02B8(cTeam* pTeam);
 extern "C" bool fn_8003E99C(cFielder* pFielder);
 extern "C" void fn_801B8FF4(cFielder* pFielder);
-extern "C" float fn_800A9274(void* pParam);
 extern "C" void fn_80080BFC(Goalie* pGoalie, float fDeltaT);
 extern "C" void fn_801B7E4C(const char* pName, cFielder* pFielder);
 extern "C" void fn_8002E718(cFielder* pFielder);
@@ -192,8 +191,7 @@ extern "C" bool fn_802B6BC8(const nlVector3* v3Start,
     float* fOut1, float* fOut2);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern "C" void fn_80331F9C(void* pPad, int nParam, int nParam2);
-extern "C" bool fn_800EBC84(
-    int, unsigned long, const void*, const void*, void*);
+
 struct UnidentifiedActionTarget806E0C94
 {
     /* 0x00 */ u8 mUnidentified00[0x14];
@@ -258,8 +256,6 @@ struct UnidentifiedMegaStrikeScene
     /* 0x36 */ bool mUnidentified36;
 };
 
-
-
 struct UnidentifiedMegaStrikeEvent
 {
     /* 0x00 */ cFielder* pFielder;
@@ -274,11 +270,10 @@ struct UnidentifiedSkillshotNode
 };
 extern BasicSlotPool<UnidentifiedSkillshotNode> lbl_805712F8;
 
-extern UnidentifiedAvoidancePolygon_804F4750* lbl_806E0C74;
+extern AvoidablePolygon* lbl_806E0C74;
 extern "C" void fn_801B94EC(
     cFielder* pFielder, const nlVector3* pPosition, const nlVector3* pNormal);
 extern "C" void fn_801B968C(cFielder* pFielder);
-extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
 
 static int gHitReactAnims[3][4] = {
     { 0x6A, 0x6D, 0x6C, 0x6B },
@@ -424,15 +419,15 @@ void cFielder::fn_80043C18(float fDeltaT)
     case 0x7C:
     {
         float fSpin
-            = 1.0f - fn_8003E6E4(this)->mUnidentified064;
+            = 1.0f - this->GetTweaks()->mUnidentified064;
         Unknown8(m_aActualFacingDirection
                 + (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f)),
             false);
 
         SetFacingDirection(
             SeekDirection(m_aActualFacingDirection,
-                m_aDesiredFacingDirection, fn_8002CF88(fn_8003E6E4(this)),
-                fn_8002CF9C(fn_8003E6E4(this)), fDeltaT),
+                m_aDesiredFacingDirection, fn_8002CF88(this->GetTweaks()),
+                fn_8002CF9C(this->GetTweaks()), fDeltaT),
             true);
 
         if (!mUnidentified330.mUnidentified00)
@@ -537,8 +532,8 @@ void cFielder::fn_8004643C(float fDeltaT)
 
         SetFacingDirection(
             SeekDirection(m_aActualFacingDirection,
-                m_aDesiredFacingDirection, fn_8002C0AC(fn_8003E6E4(this)),
-                fn_8002CF10(fn_8003E6E4(this)), fDeltaT),
+                m_aDesiredFacingDirection, fn_8002C0AC(this->GetTweaks()),
+                fn_8002CF10(this->GetTweaks()), fDeltaT),
             true);
 
         nlPolarToCartesian(m_v3Velocity.x, m_v3Velocity.y,
@@ -583,7 +578,6 @@ void cFielder::fn_8004643C(float fDeltaT)
                         }
                     }
                 }
-
 
                 if (!bGiven)
                 {
@@ -632,11 +626,11 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
     {
         float fSpeedScale = InterpolateRangeClamped(lbl_806DB894,
             lbl_806DB898, lbl_806E35B0, lbl_806E3560,
-            fn_800A9274(g_pGame->mUnidentified10D8));
+            g_pGame->mpTerrain->GetSpeedFactor());
         float fStartTime
-            = fSpeedScale * (fn_8002D020(fn_8003E6E4(this)) / lbl_806E35B4);
+            = fSpeedScale * (fn_8002D020(this->GetTweaks()) / lbl_806E35B4);
         float fEndTime
-            = fSpeedScale * (fn_8002D050(fn_8003E6E4(this)) / lbl_806E35B4);
+            = fSpeedScale * (fn_8002D050(this->GetTweaks()) / lbl_806E35B4);
         float fTimeRange = fEndTime - fStartTime;
         float fMoveDistance = fn_80030750(this);
 
@@ -673,8 +667,8 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
             float fTargetRadius = pTarget->m_fPlayerScale;
             float fInterceptTimes[2];
             float combinedRadius
-                = fn_8002BFA8(fn_8003E6E4(this), fThisRadius)
-                + fn_8002BFA8(fn_8003E6E4(pTarget), fTargetRadius);
+                = fn_8002BFA8(this->GetTweaks(), fThisRadius)
+                + fn_8002BFA8(pTarget->GetTweaks(), fTargetRadius);
             CalcInterceptXY(m_v3Position, distance, combinedRadius,
                 pTarget->m_v3Position, targetVelocity, nInterceptResult,
                 fInterceptTimes);
@@ -733,7 +727,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         pData->pAttacker = this;
         bool bHasGlobalPad = GetGlobalPad() != 0;
         pData->nAttackerPadID
-            = bHasGlobalPad ? GetGlobalPad()->fn_80332748() : -1;
+            = bHasGlobalPad ? GetGlobalPad()->GetPadID() : -1;
         pData->pTarget = pTarget;
         pData->mUnidentified10 = false;
         fn_8005EBF8(g_pGame, pData);
@@ -744,7 +738,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
                 ->fn_801743A8(6, this, m_v3Position, v3Zero,
                     lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
                 ->fn_80173B08(lbl_806E3578);
-            fn_800EBBFC(mUnidentified318, 0xA9AF871E, 0, 0);
+            PlaySound(mUnidentified318, 0xA9AF871E, 0, 0);
         }
     }
 }
@@ -844,12 +838,12 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
     nFacingDelta = aAngle - pAttacker->m_aActualFacingDirection;
 
     float fIntensityA
-        = fn_8003E6E4(pFielder)->mUnidentified064;
+        = pFielder->GetTweaks()->mUnidentified064;
     float fIntensityB = 1.0f;
     if (pAttacker->m_eClassType == FIELDER)
     {
         fIntensityB
-            = fn_8003E6E4((cFielder*)pAttacker)->mUnidentified064;
+            = ((cFielder*)pAttacker)->GetTweaks()->mUnidentified064;
     }
 
     int nReact = 1;
@@ -908,7 +902,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
 
     if (!mUnidentified360)
     {
-        fn_800EDCE8(this);
+        SetPlayerAudioController(this);
 
         unsigned long soundID;
         if (fn_8001E168(pAttacker))
@@ -929,7 +923,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
                 soundID = 0xBD539FB8;
             }
         }
-        fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+        PlaySound(mUnidentified318, soundID, 0, 0);
     }
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -961,13 +955,13 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     switch (nReact)
     {
     case 0:
-        fn_80139D1C(2, GetGlobalPad());
+        PlayRumbleAction(2, GetGlobalPad());
         break;
     case 1:
-        fn_80139D1C(3, GetGlobalPad());
+        PlayRumbleAction(3, GetGlobalPad());
         break;
     case 2:
-        fn_80139D1C(4, GetGlobalPad());
+        PlayRumbleAction(4, GetGlobalPad());
         break;
     }
 
@@ -1085,7 +1079,7 @@ void cFielder::InitActionLateOneTimerFromVolley()
     {
         soundID = 0xFDE0C69B;
     }
-    fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+    PlaySound(mUnidentified318, soundID, 0, 0);
 }
 
 void cFielder::ActionLateOneTimerFromVolley(float fDeltaT)
@@ -1401,7 +1395,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
             {
                 soundID = 0xFDE0C69B;
             }
-            fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+            PlaySound(mUnidentified318, soundID, 0, 0);
         }
     }
     else if (DoCommonInitActionLooseBall(finalPassTarget->m_v3Position, true))
@@ -1453,7 +1447,7 @@ void cFielder::InitActionLooseBallShot(bool bIsChipShot)
         {
             soundID = 0xFDE0C69B;
         }
-        fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+        PlaySound(mUnidentified318, soundID, 0, 0);
     }
 }
 
@@ -1488,7 +1482,7 @@ void fn_80048870(cFielder* pFielder)
         for (int j = 0; j < 4; j++)
         {
             cFielder* pOther = pTeam->GetFielder(j);
-            if (pFielder != pOther && !fn_800387CC(pOther))
+            if (pFielder != pOther && !pOther->IsShattered())
             {
                 fn_800978E8(pOther, 0);
                 fn_80031A30(pOther, 3, lbl_806E3600);
@@ -1522,7 +1516,7 @@ void cFielder::fn_800489C0()
 
 float cFielder::fn_800489C4()
 {
-    float fShooting = fn_8003E6E4(this)->fShooting;
+    float fShooting = this->GetTweaks()->fShooting;
     if (fShooting > 1.0f)
     {
         fShooting = 1.0f;
@@ -1532,7 +1526,7 @@ float cFielder::fn_800489C4()
 
 float cFielder::fn_80048A08()
 {
-    float fShooting = fn_8003E6E4(this)->fShooting;
+    float fShooting = this->GetTweaks()->fShooting;
     if (fShooting > 1.0f)
     {
         fShooting = 1.0f;
@@ -1639,7 +1633,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
                 = m_v3Position;
             ShootToScoreMeter::instance.m_v3MeterPosition = m_v3Position;
             ShootToScoreMeter::instance.TurnOnMeter();
-            fn_800EBBFC(0, 0xC4534945, 0, 0);
+            PlaySound(0, 0xC4534945, 0, 0);
         }
 
         UnidentifiedMegaStrikeEvent event;
@@ -1658,7 +1652,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         mUnidentified3AC = lbl_806DB924;
         mUnidentified3B8 = false;
 
-        float fShooting = fn_8003E6E4(this)->fShooting;
+        float fShooting = this->GetTweaks()->fShooting;
         if (fShooting > 1.0f)
         {
             fShooting = 1.0f;
@@ -1700,8 +1694,8 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
         mUnidentified3D4 = mUnidentified3D0;
 
-        fn_800EC12C(0x5C8E379, this);
-        fn_800EBBFC(0, 0x5C8E379, "Needle Left", this);
+        StopSound(0x5C8E379, this);
+        PlaySound(0, 0x5C8E379, "Needle Left", this);
     }
 }
 
@@ -1755,10 +1749,10 @@ void cFielder::fn_80048FB0(float fDeltaT, bool bButtonPressed, int nParam)
 
             mUnidentified3A4 = InterpolateClamped(lbl_806DB934,
                 lbl_806DB938,
-                fn_8003E6E4(this)->fShooting);
+                this->GetTweaks()->fShooting);
             float fSecondPhaseTime = InterpolateClamped(lbl_806DB940,
                 lbl_806DB944,
-                fn_8003E6E4(this)->fShooting);
+                this->GetTweaks()->fShooting);
 
             mUnidentified3B8 = true;
             mUnidentified3AC = mUnidentified3B0;
@@ -1882,7 +1876,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 
     mUnidentified3BC = (float)(s32)fn_800499EC(this, 0);
 
-    fn_80139D1C(1, GetGlobalPad());
+    PlayRumbleAction(1, GetGlobalPad());
 
     UnidentifiedMegaStrikeEvent event;
     event.pFielder = this;
@@ -1897,7 +1891,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
         mUnidentified3AC = -1.0f;
     }
 
-    fn_800EC12C(0x5C8E379, this);
+    StopSound(0x5C8E379, this);
 
     for (int i = 0; i < 2; i++)
     {
@@ -1907,14 +1901,14 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
             cPlayer* pPlayer = pTeam->GetPlayer(j);
             if (pPlayer->GetGlobalPad() != 0)
             {
-                fn_800EDCE8(pPlayer);
-                fn_800EBBFC(0, 0xCC32C1A8, 0, 0);
+                SetPlayerAudioController(pPlayer);
+                PlaySound(0, 0xCC32C1A8, 0, 0);
             }
         }
     }
 
-    fn_800EC12C(0xBF541A4C, this);
-    fn_800EBBFC(0, 0xBF541A4C, "Needle Right", this);
+    StopSound(0xBF541A4C, this);
+    PlaySound(0, 0xBF541A4C, "Needle Right", this);
 }
 
 void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
@@ -1938,21 +1932,21 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
             {
                 if (mUnidentified3C0 >= 1.0f)
                 {
-                    fn_80139D1C(3, pPlayer->GetGlobalPad());
-                    fn_800EDCE8(pPlayer);
-                    fn_800EBBFC(0, 0xD17A65BA, 0, 0);
+                    PlayRumbleAction(3, pPlayer->GetGlobalPad());
+                    SetPlayerAudioController(pPlayer);
+                    PlaySound(0, 0xD17A65BA, 0, 0);
                 }
                 else if (mUnidentified3C0 >= 0.0f)
                 {
-                    fn_80139D1C(2, pPlayer->GetGlobalPad());
-                    fn_800EDCE8(pPlayer);
-                    fn_800EBBFC(0, 0xCC2F680B, 0, 0);
+                    PlayRumbleAction(2, pPlayer->GetGlobalPad());
+                    SetPlayerAudioController(pPlayer);
+                    PlaySound(0, 0xCC2F680B, 0, 0);
                 }
                 else
                 {
-                    fn_80139D1C(1, pPlayer->GetGlobalPad());
-                    fn_800EDCE8(pPlayer);
-                    fn_800EBBFC(0, 0xCC36B742, 0, 0);
+                    PlayRumbleAction(1, pPlayer->GetGlobalPad());
+                    SetPlayerAudioController(pPlayer);
+                    PlaySound(0, 0xCC36B742, 0, 0);
                 }
             }
         }
@@ -1983,7 +1977,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
         mUnidentified478 = 1;
     }
 
-    fn_800EC12C(0xBF541A4C, this);
+    StopSound(0xBF541A4C, this);
 
     if (!IsNetworkOrRecordedGame())
     {
@@ -1997,7 +1991,7 @@ extern "C" float fn_800499EC(cFielder* pFielder, int nParam)
     float fMeterMax = pFielder->fn_80048A08();
     float fMeterRange = fMeterMax - pFielder->fn_800489C4();
 
-    float fShooting = fn_8003E6E4(pFielder)->fShooting;
+    float fShooting = pFielder->GetTweaks()->fShooting;
     if (fShooting > 1.0f)
     {
         fShooting = 1.0f;
@@ -2073,7 +2067,7 @@ extern "C" float fn_80049CC0(cFielder* pFielder, int nParam)
         float fHalfWidth = fabsf(pFielder->mUnidentified3A4 / 2.0f);
         if (fDelta
             < InterpolateClamped(lbl_806DB940, lbl_806DB944,
-                  fn_8003E6E4(pFielder)->fShooting)
+                  pFielder->GetTweaks()->fShooting)
                 / 2.0f)
         {
             fDelta = 0.0f;
@@ -2105,7 +2099,7 @@ void cFielder::InitActionOneTimer(int animID, nlVector3& targetPos,
     {
         soundID = 0xFDE0C69B;
     }
-    fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+    PlaySound(mUnidentified318, soundID, 0, 0);
 }
 
 void cFielder::fn_80049EA0(float fDeltaT)
@@ -2181,7 +2175,7 @@ void cFielder::InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam)
         (s16)(nTurnAdjust + facingDelta2), v3Zero, lbl_806E3540, false);
 
     fn_80097858(this, pPlayer, bParam, true, true, bParam,
-        fn_8002CFC4(fn_8003E6E4(this)), fn_8002C730(fn_8003E6E4(this)));
+        fn_8002CFC4(this->GetTweaks()), fn_8002C730(this->GetTweaks()));
 
     mUnidentified371 = true;
 }
@@ -2268,12 +2262,12 @@ void cFielder::ActionPass(float fDeltaT)
 {
     if (m_pBall != 0 && m_pCurrentAnimController->TestFrameTrigger(1.0f))
     {
-        float fA = fn_8002CFC4(fn_8003E6E4(this));
-        float fB = fn_8002C730(fn_8003E6E4(this));
+        float fA = fn_8002CFC4(this->GetTweaks());
+        float fB = fn_8002C730(this->GetTweaks());
         if (!bIsModified)
         {
-            fA = fn_8002C6E8(fn_8003E6E4(this));
-            fB = fn_8002C678(fn_8003E6E4(this));
+            fA = fn_8002C6E8(this->GetTweaks());
+            fB = fn_8002C678(this->GetTweaks());
         }
         fn_80097858(this, mUnidentified36C, bIsModified,
             mUnidentified370, false, false, fA, fB);
@@ -2324,7 +2318,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
 
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
-        fn_80139D1C(2, GetGlobalPad());
+        PlayRumbleAction(2, GetGlobalPad());
 
         if (pAttacker->m_eClassType == FIELDER && !bSkipEvent
             && pAttacker != this && bHadBall)
@@ -2333,7 +2327,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
             pNode->pAttacker = pAttacker;
             bool bHasPad = pAttacker->GetGlobalPad() != 0;
             pNode->nAttackerPadID
-                = bHasPad ? pAttacker->GetGlobalPad()->fn_80332748() : -1;
+                = bHasPad ? pAttacker->GetGlobalPad()->GetPadID() : -1;
             pNode->pTarget = 0;
             pNode->mUnidentified10 = true;
             fn_8005ED64(g_pGame, pNode);
@@ -2346,23 +2340,23 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
                 {
                     soundID = 0x902DA0E4;
                 }
-                fn_800ED92C(soundID);
+                PlayCrowdReaction(soundID);
             }
         }
 
-        fn_80139D1C(1, pAttacker->GetGlobalPad());
-        fn_800EBBFC(0, 0x57208DA, 0, 0);
+        PlayRumbleAction(1, pAttacker->GetGlobalPad());
+        PlaySound(0, 0x57208DA, 0, 0);
         m_fDesiredSpeed = 0.0f;
     }
 }
 
 void cFielder::asmRunningWB(float fDeltaT)
 {
-    float fIdleToRunWBDesiredSpeed = 0.1f + fn_8002CE14(fn_8003E6E4(this));
+    float fIdleToRunWBDesiredSpeed = 0.1f + fn_8002CE14(this->GetTweaks());
     s16 nAbsActualToDesiredFacingDirection = (s16)(u16)abs_s16(
         (s16)(m_aDesiredFacingDirection - m_aActualFacingDirection));
     float fSpeedFactor = InterpolateRangeClamped(
-        0.96f, 0.6f, 0.0f, 0.5f, fn_8003E6E4(this)->mUnidentified034);
+        0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->mUnidentified034);
     bool bFirstTime;
 
     do
@@ -2400,13 +2394,13 @@ void cFielder::asmRunningWB(float fDeltaT)
         {
             if (ShouldStartCrossBlend(0x17))
             {
-                if (m_fDesiredSpeed <= fn_8002CE14(fn_8003E6E4(this)))
+                if (m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
                 {
                     fn_8003B920(this);
                 }
                 else
                 {
-                    m_fActualSpeed = fn_8002BFB8(fn_8003E6E4(this));
+                    m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
                     fn_8003BE14(this, 0.1f);
                 }
             }
@@ -2427,7 +2421,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (nAbsActualToDesiredFacingDirection >= 0x639C)
             {
                 if (m_fActualSpeed
-                    < fSpeedFactor * fn_8002C328(fn_8003E6E4(this)))
+                    < fSpeedFactor * fn_8002C328(this->GetTweaks()))
                 {
                     fn_8003A5C8(this);
                 }
@@ -2438,10 +2432,10 @@ void cFielder::asmRunningWB(float fDeltaT)
                 break;
             }
 
-            if (m_fDesiredSpeed > fn_8002CE14(fn_8003E6E4(this)))
+            if (m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
             {
                 if (m_fActualSpeed
-                    < fSpeedFactor * fn_8002C328(fn_8003E6E4(this)))
+                    < fSpeedFactor * fn_8002C328(this->GetTweaks()))
                 {
                     fn_8003A5C8(this);
                 }
@@ -2454,7 +2448,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (m_fDesiredSpeed > 1.0f)
             {
                 if (m_fActualSpeed
-                    < fSpeedFactor * fn_8002C328(fn_8003E6E4(this)))
+                    < fSpeedFactor * fn_8002C328(this->GetTweaks()))
                 {
                     fn_8003A5C8(this);
                 }
@@ -2464,7 +2458,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 }
             }
             else if (m_fActualSpeed
-                > 0.6f * fn_8002C328(fn_8003E6E4(this)))
+                > 0.6f * fn_8002C328(this->GetTweaks()))
             {
                 fn_8003B54C(this);
             }
@@ -2480,10 +2474,10 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (fn_8003E8A0(this) && mUnidentified3DC)
             {
                 if (m_fDesiredSpeed
-                    < fn_8002CE14(fn_8003E6E4(this)) - 0.15f)
+                    < fn_8002CE14(this->GetTweaks()) - 0.15f)
                 {
                     if (m_fActualSpeed
-                        > 0.6f * fn_8002BFB8(fn_8003E6E4(this)))
+                        > 0.6f * fn_8002BFB8(this->GetTweaks()))
                     {
                         fn_8003B54C(this);
                     }
@@ -2506,7 +2500,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (nAbsActualToDesiredFacingDirection >= 0x639C)
             {
                 if (m_fActualSpeed
-                    > 0.6f * fn_8002C328(fn_8003E6E4(this)))
+                    > 0.6f * fn_8002C328(this->GetTweaks()))
                 {
                     fn_8003ADAC(this);
                 }
@@ -2517,10 +2511,10 @@ void cFielder::asmRunningWB(float fDeltaT)
                 break;
             }
 
-            if (m_fDesiredSpeed < fn_8002CE14(fn_8003E6E4(this)) - 0.15f)
+            if (m_fDesiredSpeed < fn_8002CE14(this->GetTweaks()) - 0.15f)
             {
                 if (m_fActualSpeed
-                    > 0.6f * fn_8002C328(fn_8003E6E4(this)))
+                    > 0.6f * fn_8002C328(this->GetTweaks()))
                 {
                     fn_8003B54C(this);
                 }
@@ -2546,7 +2540,7 @@ void cFielder::asmRunningWB(float fDeltaT)
 
             if (bAnimFinished)
             {
-                if (m_fDesiredSpeed < fn_8002CE14(fn_8003E6E4(this)))
+                if (m_fDesiredSpeed < fn_8002CE14(this->GetTweaks()))
                 {
                     if (mActionRunningWBVars.bCuePitch)
                     {
@@ -2574,9 +2568,9 @@ void cFielder::asmRunningWB(float fDeltaT)
                     fn_8004B148();
                 }
                 else if (m_fDesiredSpeed
-                    >= fn_8002CE14(fn_8003E6E4(this)))
+                    >= fn_8002CE14(this->GetTweaks()))
                 {
-                    m_fActualSpeed = fn_8002BFB8(fn_8003E6E4(this));
+                    m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
                     fn_8003BE14(this, 0.1f);
                 }
                 else
@@ -2602,14 +2596,14 @@ void cFielder::asmRunningWB(float fDeltaT)
 
 void cFielder::asmRunning()
 {
-    fn_8002CE14(fn_8003E6E4(this));
+    fn_8002CE14(this->GetTweaks());
 
     s16 nAbsActualToDesiredFacingDirection = (s16)(u16)abs_s16(
         (s16)(m_aDesiredFacingDirection - m_aActualFacingDirection));
     s16 nAbsActualToDesiredMovementDirection = (s16)(u16)abs_s16(
         (s16)(m_aDesiredMovementDirection - m_aActualMovementDirection));
     float fSpeedFactor = InterpolateRangeClamped(
-        0.96f, 0.6f, 0.0f, 0.5f, fn_8003E6E4(this)->mUnidentified034);
+        0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->mUnidentified034);
     bool bFirstTime;
 
     do
@@ -2631,13 +2625,13 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(0))
             {
-                if (m_fDesiredSpeed <= fn_8002CE14(fn_8003E6E4(this)))
+                if (m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
                 {
                     fn_8003B854(this);
                 }
                 else
                 {
-                    m_fActualSpeed = fn_8002BFB8(fn_8003E6E4(this));
+                    m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
                     fn_8003BA94(this, 0.1f);
                 }
             }
@@ -2657,7 +2651,7 @@ void cFielder::asmRunning()
             case 0:
             case 3:
                 if (m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(fn_8003E6E4(this)))
+                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredFacingDirection >= 0x3A98)
                     {
@@ -2674,7 +2668,7 @@ void cFielder::asmRunning()
                 }
                 break;
             case 4:
-                m_fDesiredSpeed = fn_8002CD2C(fn_8003E6E4(this));
+                m_fDesiredSpeed = fn_8002CD2C(this->GetTweaks());
                 break;
             }
             break;
@@ -2788,7 +2782,7 @@ void cFielder::asmRunning()
             case 0:
             case 1:
                 if (m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(fn_8003E6E4(this)))
+                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
                 {
                     fn_8003B664(this);
                 }
@@ -2798,7 +2792,7 @@ void cFielder::asmRunning()
                 }
                 break;
             case 2:
-                m_fDesiredSpeed = fn_8002CC44(fn_8003E6E4(this));
+                m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
             case 3:
                 fn_8003BA94(this, 0.1f);
@@ -2817,7 +2811,7 @@ void cFielder::asmRunning()
             case 0:
             case 2:
                 if (m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(fn_8003E6E4(this)))
+                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
                 {
                     fn_8003B5FC(this);
                 }
@@ -2827,7 +2821,7 @@ void cFielder::asmRunning()
                 }
                 break;
             case 1:
-                m_fDesiredSpeed = fn_8002CC44(fn_8003E6E4(this));
+                m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
             case 3:
                 fn_8003BA94(this, 0.1f);
@@ -2867,7 +2861,7 @@ void cFielder::asmRunning()
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
                     if (m_fActualSpeed
-                        < fSpeedFactor * fn_8002BFB8(fn_8003E6E4(this)))
+                        < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
                     {
                         fn_8003A2D0(this, -1);
                     }
@@ -2909,7 +2903,7 @@ void cFielder::asmRunning()
             case 0:
                 m_fDesiredSpeed = 0.0f;
                 if (m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(fn_8003E6E4(this)))
+                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
                 {
                     fn_8003B54C(this);
                 }
@@ -2922,7 +2916,7 @@ void cFielder::asmRunning()
                 break;
             case 3:
                 if (m_fActualSpeed
-                    < fSpeedFactor * fn_8002BFB8(fn_8003E6E4(this)))
+                    < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
                 {
                     fn_8003A2D0(this, -1);
                 }
@@ -2943,10 +2937,10 @@ void cFielder::asmRunning()
             if (fn_8003E8A0(this) && mUnidentified3DC)
             {
                 if (m_fDesiredSpeed
-                    < fn_8002CE14(fn_8003E6E4(this)) - 0.15f)
+                    < fn_8002CE14(this->GetTweaks()) - 0.15f)
                 {
                     if (m_fActualSpeed
-                        > 0.6f * fn_8002BFB8(fn_8003E6E4(this)))
+                        > 0.6f * fn_8002BFB8(this->GetTweaks()))
                     {
                         fn_8003B54C(this);
                     }
@@ -2970,7 +2964,7 @@ void cFielder::asmRunning()
             {
             case 0:
                 if (m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(fn_8003E6E4(this)))
+                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
                 {
                     fn_8003B54C(this);
                 }
@@ -2983,7 +2977,7 @@ void cFielder::asmRunning()
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
                     if (m_fActualSpeed
-                        < fSpeedFactor * fn_8002BFB8(fn_8003E6E4(this)))
+                        < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
                     {
                         fn_8003A2D0(this, -1);
                     }
@@ -3005,7 +2999,7 @@ void cFielder::asmRunning()
                 fn_8003B6CC(this);
                 break;
             case 4:
-                if (m_fDesiredSpeed > fn_8002CE14(fn_8003E6E4(this)))
+                if (m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredMovementDirection < 0x4000)
                     {
@@ -3032,7 +3026,7 @@ void cFielder::asmRunning()
 
             if (bAnimFinished)
             {
-                if (m_fDesiredSpeed > fn_8002CE14(fn_8003E6E4(this)))
+                if (m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
                 {
                     fn_8003B0D8(this);
                 }
@@ -3048,9 +3042,9 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(0))
             {
-                if (m_fDesiredSpeed >= fn_8002CE14(fn_8003E6E4(this)))
+                if (m_fDesiredSpeed >= fn_8002CE14(this->GetTweaks()))
                 {
-                    m_fActualSpeed = fn_8002BFB8(fn_8003E6E4(this));
+                    m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
                     fn_8003BA94(this, 0.1f);
                 }
                 else
@@ -3186,7 +3180,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     case (eCharacterClass)0x13:
         m_pCurrentAnimController->m_fPlaybackSpeedScale
             = InterpolateRangeClamped(lbl_806DB988, lbl_806DB98C, 0.35f,
-                0.25f, fn_800A9274(g_pGame->mUnidentified10D8));
+                0.25f, g_pGame->mpTerrain->GetSpeedFactor());
         break;
     case (eCharacterClass)0x01:
     case (eCharacterClass)0x05:
@@ -3204,7 +3198,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     {
         soundID = 0xA91D4914;
     }
-    fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+    PlaySound(mUnidentified318, soundID, 0, 0);
 
     bool bUnidentified2 = g_pGame->m_eGameState == 5
         || g_pGame->m_eGameState == 6;
@@ -3293,7 +3287,7 @@ void cFielder::fn_80044290(float fDeltaT)
             }
 
             float fSpin = 1.0f
-                - fn_8003E6E4(this)->mUnidentified064;
+                - this->GetTweaks()->mUnidentified064;
             Unknown8(m_aActualFacingDirection
                     + (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f)),
                 false);
@@ -3301,8 +3295,8 @@ void cFielder::fn_80044290(float fDeltaT)
             SetFacingDirection(
                 SeekDirection(m_aActualFacingDirection,
                     m_aDesiredFacingDirection,
-                    fn_8002CF88(fn_8003E6E4(this)),
-                    fn_8002CF9C(fn_8003E6E4(this)), fDeltaT),
+                    fn_8002CF88(this->GetTweaks()),
+                    fn_8002CF9C(this->GetTweaks()), fDeltaT),
                 true);
         }
         break;
@@ -3386,7 +3380,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
     {
         return;
     }
-    if (fn_800387CC(this) != true)
+    if (this->IsShattered() != true)
     {
 
         fn_8002E3F8(this);
@@ -3429,7 +3423,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
         {
             float fAdjust = m_fPlayerScale;
             float fMaxY
-                = fn_8002BFA8(fn_8003E6E4(this), fAdjust) + 0.5f * fNetWidth;
+                = fn_8002BFA8(this->GetTweaks(), fAdjust) + 0.5f * fNetWidth;
             float fMinY = -fMaxY;
             float fY = jointPos.y;
             fY = (fY >= fMinY) ? fY : fMinY;
@@ -3466,7 +3460,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
         {
             soundID = 0x1602CA52;
         }
-        fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+        PlaySound(mUnidentified318, soundID, 0, 0);
     }
 }
 
@@ -3476,7 +3470,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
     {
         return;
     }
-    if (fn_800387CC(this) != true)
+    if (this->IsShattered() != true)
     {
 
         if (m_pBall != 0)
@@ -3526,7 +3520,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
         mUnidentified348 = true;
         fn_801B968C(this);
 
-        fn_80139D1C(4, GetGlobalPad());
+        PlayRumbleAction(4, GetGlobalPad());
 
         bool bUnidentified = fn_8001E168(this);
         unsigned long soundID = 0xBADF0EF9;
@@ -3534,7 +3528,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
         {
             soundID = 0x1602CA52;
         }
-        fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+        PlaySound(mUnidentified318, soundID, 0, 0);
     }
 }
 
@@ -3601,7 +3595,7 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
     {
         soundID = 0xFDEC8E0F;
     }
-    fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+    PlaySound(mUnidentified318, soundID, 0, 0);
 }
 
 void cFielder::ActionElectrocution(float dt)
@@ -3618,7 +3612,7 @@ void cFielder::ActionElectrocution(float dt)
         {
             nlVector3 v3Position = m_v3Position;
             float fShake
-                = fn_8003E6E4(this)->mUnidentified064;
+                = this->GetTweaks()->mUnidentified064;
             float fRise = lbl_806DB9A0
                 * ((1.0f - fShake) * nlRandomf(0.5f) + 0.5f);
             v3Position.z += fRise * dt;
@@ -3656,7 +3650,7 @@ void cFielder::ActionElectrocution(float dt)
 
             fn_801B93E8(this);
             InitMovementCoast();
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
         }
         break;
     }
@@ -3685,7 +3679,7 @@ void cFielder::ActionElectrocution(float dt)
             }
             InitMovementFromAnim(0, v3Zero, 0.0f, false);
             fn_801B968C(this);
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
         }
         else
         {
@@ -3706,17 +3700,17 @@ void cFielder::ActionElectrocution(float dt)
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9AC))
         {
             fn_801B93E8(this);
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
         }
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9B0))
         {
             fn_801B968C(this);
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
         }
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9B4))
         {
             fn_801B93E8(this);
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
         }
 
         if (ShouldStartCrossBlend(4))
@@ -3809,7 +3803,7 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
         {
             soundID = 0xFDEC8E0F;
         }
-        fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+        PlaySound(mUnidentified318, soundID, 0, 0);
     }
 }
 
@@ -3828,8 +3822,8 @@ void cFielder::fn_80045C74(float fDeltaT)
 
         SetFacingDirection(
             SeekDirection(m_aActualFacingDirection,
-                m_aDesiredFacingDirection, fn_8002CF88(fn_8003E6E4(this)),
-                fn_8002CF9C(fn_8003E6E4(this)), fDeltaT),
+                m_aDesiredFacingDirection, fn_8002CF88(this->GetTweaks()),
+                fn_8002CF9C(this->GetTweaks()), fDeltaT),
             true);
 
         float fT = FMIN((float)fabs(mUnidentified34C - lbl_806DB90C)
@@ -3873,8 +3867,8 @@ void cFielder::fn_80045C74(float fDeltaT)
 
         SetFacingDirection(
             SeekDirection(m_aActualFacingDirection,
-                m_aDesiredFacingDirection, fn_8002C0AC(fn_8003E6E4(this)),
-                fn_8002CF10(fn_8003E6E4(this)), fDeltaT),
+                m_aDesiredFacingDirection, fn_8002C0AC(this->GetTweaks()),
+                fn_8002CF10(this->GetTweaks()), fDeltaT),
             true);
 
         nlPolarToCartesian(m_v3Velocity.x, m_v3Velocity.y,
@@ -4015,7 +4009,7 @@ void cFielder::fn_80046244()
         {
             soundID = 0xFDEC8E0F;
         }
-        fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+        PlaySound(mUnidentified318, soundID, 0, 0);
     }
 }
 
@@ -4063,7 +4057,7 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
             {
                 soundID = 0x3642C41B;
             }
-            fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+            PlaySound(mUnidentified318, soundID, 0, 0);
         }
 
         InitDesire(
@@ -4102,7 +4096,7 @@ void cFielder::InitActionBombHitReact(const nlVector3& v3BombPosition)
         {
             soundID = 0x3642C41B;
         }
-        fn_800EBBFC(mUnidentified318, soundID, 0, 0);
+        PlaySound(mUnidentified318, soundID, 0, 0);
     }
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -4141,7 +4135,7 @@ void cFielder::InitActionBananaReact(const nlVector3& fDeltaT)
         ShootBallDueToContact(m_aActualFacingDirection);
     }
 
-    fn_80139D1C(2, GetGlobalPad());
+    PlayRumbleAction(2, GetGlobalPad());
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_BANANA_REACT);
@@ -4171,7 +4165,7 @@ void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
     fn_8002E580(this);
     fn_8009750C();
 
-    fn_80139D1C(2, GetGlobalPad());
+    PlayRumbleAction(2, GetGlobalPad());
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_SHELL_REACT);
@@ -4281,18 +4275,18 @@ void cFielder::fn_8004B658()
         SetAction(ACTION_UNKNOWN_30);
         DoResetShotMeter(0.0f);
         fn_8003A544(this);
-        InitMovementRunningNoTurn(0.0f, fn_8002CFB0(fn_8003E6E4(this)));
+        InitMovementRunningNoTurn(0.0f, fn_8002CFB0(this->GetTweaks()));
         m_fDesiredSpeed = 0.0f;
-        if (m_fActualSpeed > fn_8002C328(fn_8003E6E4(this)))
+        if (m_fActualSpeed > fn_8002C328(this->GetTweaks()))
         {
-            m_fActualSpeed = fn_8002C328(fn_8003E6E4(this));
+            m_fActualSpeed = fn_8002C328(this->GetTweaks());
         }
 
         cFielder* pFielder = this;
         fn_8005F03C(g_pGame, &pFielder);
         fn_8005CBF0(g_pGame);
 
-        fn_800EBBFC(0, 0x900862AC, "Windup", this);
+        PlaySound(0, 0x900862AC, "Windup", this);
 
         if (fn_800155A0(g_pBall, 0) < 1.0f)
         {
@@ -4336,9 +4330,9 @@ void cFielder::fn_8004B148()
         }
     }
 
-    if (m_fActualSpeed < fn_8002C5A4(fn_8003E6E4(this)))
+    if (m_fActualSpeed < fn_8002C5A4(this->GetTweaks()))
     {
-        float fMinSpeed = fn_8002C5A4(fn_8003E6E4(this));
+        float fMinSpeed = fn_8002C5A4(this->GetTweaks());
         m_fActualSpeed = fMinSpeed;
         m_fDesiredSpeed = fMinSpeed;
     }
@@ -4365,7 +4359,7 @@ void cFielder::fn_8004B148()
     }
 
     SetAnimState(0x25, true, 0.2f, false, false);
-    fn_800EBC84(0, 0x874F86F2, g_pBall->mUnidentifiedEC, 0, 0);
+    PlayOwnedSound(0, 0x874F86F2, (XSoundOwner*)g_pBall->mUnidentifiedEC, 0, 0);
 }
 
 void cFielder::fn_8004B2E4(float fDeltaT)
@@ -4399,15 +4393,15 @@ void cFielder::fn_8004B2E4(float fDeltaT)
 
         if (gbUseTurboCharging != 0)
         {
-            float fValue = fn_8003E6E4(this)->mUnidentified034;
+            float fValue = this->GetTweaks()->mUnidentified034;
             float fFraction
                 = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fValue);
             float fCharge = Interpolate(lbl_806DB980, lbl_806DB984, fFraction);
             fn_800154FC(g_pBall, fCharge + fn_800155A0(g_pBall, 0));
         }
 
-        InitMovementRunning(fn_8002C0AC(fn_8003E6E4(this)),
-            fn_8002CF10(fn_8003E6E4(this)), fn_8002C180(fn_8003E6E4(this)),
+        InitMovementRunning(fn_8002C0AC(this->GetTweaks()),
+            fn_8002CF10(this->GetTweaks()), fn_8002C180(this->GetTweaks()),
             0.0f);
         InitDesire(
             (eFielderDesireState)0x14, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -4499,7 +4493,7 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
         }
 
         float fSpeed = m_fActualSpeed;
-        InitMovementRunningNoTurn(0.0f, fSpeed / fn_8002C7E8(fn_8003E6E4(this)));
+        InitMovementRunningNoTurn(0.0f, fSpeed / fn_8002C7E8(this->GetTweaks()));
         m_fDesiredSpeed = 0.0f;
 
         nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
@@ -4519,9 +4513,9 @@ void cFielder::InitActionSlideAttack(
 
         SetAction(ACTION_SLIDE_ATTACK);
         SetAnimState(0x5E, true, 0.2f, false, false);
-        InitMovementRunning(0.0f, 0.0f, fn_8002C180(fn_8003E6E4(this)),
-            fn_8002CF24(fn_8003E6E4(this)));
-        m_tSlideAttackTimer.SetSeconds(fn_8002C800(fn_8003E6E4(this)));
+        InitMovementRunning(0.0f, 0.0f, fn_8002C180(this->GetTweaks()),
+            fn_8002CF24(this->GetTweaks()));
+        m_tSlideAttackTimer.SetSeconds(fn_8002C800(this->GetTweaks()));
 
         mUnidentified388 = 0;
         bAttackSucceeded = false;
@@ -4567,7 +4561,7 @@ void cFielder::InitActionSlideAttack(
                 = nlSqrt(v3BallDelta.GetLengthSq3D(), true);
 
             if (fBallDistance
-                < 0.1f + fn_8002BFA8(fn_8003E6E4(this), fAdjust))
+                < 0.1f + fn_8002BFA8(this->GetTweaks(), fAdjust))
             {
                 float fLengthSq = v3Velocity.GetLengthSq3D();
                 if (fLengthSq > lbl_806E361C)
@@ -4624,13 +4618,13 @@ void cFielder::InitActionSlideAttack(
         m_fDesiredSpeed = fFinalSpeed;
         m_fActualSpeed = fFinalSpeed;
 
-        fn_800EC12C(0x2AE03886, this);
-        fn_800EBBFC(0, 0x2AE03886, "SlideAttack", this);
+        StopSound(0x2AE03886, this);
+        PlaySound(0, 0x2AE03886, "SlideAttack", this);
 
         PlayerAttackData* pNode = lbl_80571960.Allocate();
         pNode->pAttacker = this;
         bool bHasPad = GetGlobalPad() != 0;
-        pNode->nAttackerPadID = bHasPad ? GetGlobalPad()->fn_80332748() : -1;
+        pNode->nAttackerPadID = bHasPad ? GetGlobalPad()->GetPadID() : -1;
         pNode->pTarget = 0;
         pNode->mUnidentified10 = true;
         fn_8005EBF8(g_pGame, pNode);
@@ -4646,7 +4640,7 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
     }
 
     fn_801BA034();
-    fn_800EC12C(0x900862AC, this);
+    StopSound(0x900862AC, this);
 
     if (eNewAction != ACTION_UNKNOWN_15)
     {
@@ -4671,7 +4665,7 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
 
 void cFielder::fn_8004BB80(float fDeltaT)
 {
-    fn_80139D1C(1, GetGlobalPad());
+    PlayRumbleAction(1, GetGlobalPad());
 
     nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
     nlVector3 v3Delta;
@@ -4680,12 +4674,12 @@ void cFielder::fn_8004BB80(float fDeltaT)
 
     SetFacingDirection(
         SeekDirection(m_aActualFacingDirection, m_aDesiredFacingDirection,
-            fn_8002CF88(fn_8003E6E4(this)), fn_8002CF9C(fn_8003E6E4(this)),
+            fn_8002CF88(this->GetTweaks()), fn_8002CF9C(this->GetTweaks()),
             fDeltaT),
         false);
 
     float fChargeTime = m_pShotMeter->m_fTime;
-    fChargeTime = fn_8002C7E8(fn_8003E6E4(this)) - fChargeTime;
+    fChargeTime = fn_8002C7E8(this->GetTweaks()) - fChargeTime;
     if (fChargeTime < 0.01f)
     {
         fChargeTime = 0.01f;
@@ -4707,8 +4701,8 @@ void cFielder::fn_8004BB80(float fDeltaT)
             nlVec3ScaleAdd(v3Dir, 2.0f, v3Dir, m_v3Position);
 
             lbl_806E0C74 = new (nlMalloc(
-                sizeof(UnidentifiedAvoidancePolygon_804F4750), 8, false))
-                UnidentifiedAvoidancePolygon_804F4750(2, v3Dir,
+                sizeof(AvoidablePolygon), 8, false))
+                AvoidablePolygon(2, v3Dir,
                     m_pTeam->GetOtherNet()->m_v3NetLocation, lbl_806E35DC);
             lbl_806E0C74->mUnidentified064 = this;
         }
@@ -4751,7 +4745,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
         SetFacingDirection(
             SeekDirection(m_aActualFacingDirection,
                 m_aDesiredFacingDirection, lbl_806E3618,
-                fn_8002CF9C(fn_8003E6E4(this)), fDeltaT),
+                fn_8002CF9C(this->GetTweaks()), fDeltaT),
             false);
     }
 
@@ -4882,7 +4876,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
                 pNode->pAttacker = this;
                 bool bHasPad = GetGlobalPad() != 0;
                 pNode->nAttackerPadID
-                    = bHasPad ? GetGlobalPad()->fn_80332748() : -1;
+                    = bHasPad ? GetGlobalPad()->GetPadID() : -1;
                 pNode->pTarget = 0;
                 pNode->mUnidentified10 = true;
                 fn_8005ED64(g_pGame, pNode);
@@ -4897,7 +4891,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
                         {
                             soundID = 0x902EA0E4;
                         }
-                        fn_800ED92C(soundID);
+                        PlayCrowdReaction(soundID);
                     }
                 }
             }
@@ -4940,9 +4934,9 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
         if (m_tSlideAttackTimer.m_uPackedTime == 0 || bUnidentified)
         {
-            fn_80139D1C(1, GetGlobalPad());
+            PlayRumbleAction(1, GetGlobalPad());
             mUnidentified388 = 1;
-            m_tSlideAttackTimer.SetSeconds(fn_8002C8D4(fn_8003E6E4(this)));
+            m_tSlideAttackTimer.SetSeconds(fn_8002C8D4(this->GetTweaks()));
         }
         break;
     }
@@ -4957,7 +4951,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
         float fTargetSpeed = 1.0f;
         if (m_pBall != 0)
         {
-            fTargetSpeed = fn_8002CE14(fn_8003E6E4(this));
+            fTargetSpeed = fn_8002CE14(this->GetTweaks());
         }
 
         InitMovementRunningNoTurn(
@@ -5033,7 +5027,7 @@ void cFielder::fn_8004D480(const nlVector3& v3CollisionVelocity)
         m_aActualMovementDirection = polar.a;
         m_fDesiredSpeed = 0.0f;
 
-        fn_80139D1C(2, GetGlobalPad());
+        PlayRumbleAction(2, GetGlobalPad());
 
         if (fn_8003E8A0(this))
         {
@@ -5161,14 +5155,14 @@ void cFielder::fn_8004E438()
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
-        fn_800EBC84(mUnidentified318, 0x3D267BDF, g_pBall->mUnidentifiedEC,
+        PlayOwnedSound(mUnidentified318, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC,
             "Skillshot", this);
     }
     else if (m_eCharacterClass == (eCharacterClass)0x12)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
-        fn_800EBC84(mUnidentified318, 0x3D267BDF, g_pBall->mUnidentifiedEC,
+        PlayOwnedSound(mUnidentified318, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC,
             "Skillshot", this);
     }
     else if (m_eCharacterClass == (eCharacterClass)0x13)
@@ -5177,7 +5171,7 @@ void cFielder::fn_8004E438()
         fn_8019AA00(mUnidentified420, this);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
         fn_801B8FF8(this);
-        fn_800EBBFC(mUnidentified318, 0x1D6C8D56, 0, 0);
+        PlaySound(mUnidentified318, 0x1D6C8D56, 0, 0);
     }
 
     bool bUnidentified = g_pGame->m_eGameState == 5
@@ -5226,7 +5220,6 @@ void cFielder::fn_8004E6B4()
             float fSpeed = pProjectile->_028->m_gravity;
             float fGravity = fn_801A1168(pProjectile)->z;
 
-
             float fHeight
                 = lbl_806DB8A4
                 * nlSqrt(v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y,
@@ -5267,8 +5260,8 @@ void cFielder::fn_8004E8B8()
         if (m_eCharacterClass == (eCharacterClass)0x13)
         {
             fn_801B90F8(this);
-            fn_800EBC84(mUnidentified318, 0x3D267BDF,
-                g_pBall->mUnidentifiedEC, "Skillshot", this);
+            PlayOwnedSound(mUnidentified318, 0x3D267BDF,
+                (XSoundOwner*)g_pBall->mUnidentifiedEC, "Skillshot", this);
         }
     }
 }
@@ -5367,7 +5360,7 @@ void cFielder::fn_8004EC40()
         m_v3PrevVelocity = v3Zero;
     }
 
-    fn_800EC12C(0x3D267BDF, this);
+    StopSound(0x3D267BDF, this);
 }
 
 void cFielder::fn_8004ED64()

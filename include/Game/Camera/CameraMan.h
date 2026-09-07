@@ -65,4 +65,6 @@ public:
     static int m_UpVectorStackSize;
 };
 
+cBaseCamera* GetNextCamera();
+
 #endif // _CAMERAMAN_H_

@@ -4,7 +4,7 @@
 #include "Game/GL/GLTexturedColourMeshWriter.h"
 #include "NL/nlMemory.h"
 
-#include "Game/GL/tu_802D38A4.h"
+#include "Game/GL/glModelBuilder.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
 
@@ -39,7 +39,7 @@ bool GLTexturedColourMeshWriter::Begin(
     }
     model = newModel;
 
-    fn_802D38A4(
+    glCreateModel(
         model, numVerts, prim, pResource, 3, 0xD3E572DA);
 
     glModelStream* streams = model->packets->streams;
@@ -61,7 +61,7 @@ bool GLTexturedColourMeshWriter::Begin(
         }
     }
     position = (float*)positionData;
-    fn_802D39CC(streams, 0, position, sizeof(float) * 3, 1);
+    glSetModelStream(streams, 0, position, sizeof(float) * 3, 1);
 
     int texcoordCount = numVerts * 2;
     short* texcoordData;
@@ -82,7 +82,7 @@ bool GLTexturedColourMeshWriter::Begin(
         }
     }
     texcoord = texcoordData;
-    fn_802D39CC(streams + 1, 1, texcoord, sizeof(short) * 2, 4);
+    glSetModelStream(streams + 1, 1, texcoord, sizeof(short) * 2, 4);
 
     u32* colourData;
     if (numVerts == 0)
@@ -102,7 +102,7 @@ bool GLTexturedColourMeshWriter::Begin(
         }
     }
     colour = colourData;
-    fn_802D39CC(streams + 2, 2, colour, sizeof(u32), 3);
+    glSetModelStream(streams + 2, 2, colour, sizeof(u32), 3);
 
     return true;
 }

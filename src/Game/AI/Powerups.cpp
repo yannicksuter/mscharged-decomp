@@ -1,4 +1,5 @@
-#include "Game/AI/UnidentifiedAvoidanceObject.h"
+#include "Game/Sys/audio.h"
+#include "Game/AI/AvoidableObject.h"
 #include "Game/AI/Powerups.h"
 
 #include "Game/AI/AIPad.h"
@@ -26,15 +27,10 @@
 
 extern "C" void fn_802772A4(DrawableObject*);
 extern "C" bool fn_8003877C(cFielder*);
-extern "C" unsigned int fn_800387CC(cFielder*);
-extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
-extern "C" void fn_800EBF78(int, unsigned long, const void*, void*, int);
-extern "C" void fn_800EC12C(unsigned long, void*);
-extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
 extern "C" float fn_8002CFF0(PlayerTweaks*);
 extern "C" bool fn_800A6764(cTeam*);
-extern "C" void fn_800EDCE8(cPlayer*);
+
 extern "C" bool fn_8019C988(void*);
 extern "C" bool fn_800AA060(void*, int);
 extern "C" void fn_80146964(void*);
@@ -42,8 +38,6 @@ extern "C" void fn_8014777C(void*);
 extern "C" void fn_801478C4(void*);
 extern "C" void fn_80147A0C(void*);
 extern "C" void fn_80147B54(void*);
-extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
-extern "C" EmissionController* fn_802E7FE4(EmissionManager*, EffectsGroup*, int, bool, bool);
 extern "C" void fn_8009F1B8(EmissionController&);
 extern "C" bool fn_8002D2C4(nlVector3*, bool, float);
 extern "C" void fn_800F0240(float, float, float, float);
@@ -149,7 +143,6 @@ extern SlotPool<CollisionPlayerBananaData> lbl_805716B8;
 extern SlotPool<PowerupHitPlayerEventData> lbl_805719D8;
 
 static int lbl_806E0DA8;
-
 
 unsigned long uPowerupTexID[NUM_POWER_UPS] = {
     nlStringLowerHash("fe/shell_green"),
@@ -327,7 +320,7 @@ cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)
 
         if (!pCandidate->IsFallenDown()
             && !pCandidate->IsStuck()
-            && !fn_800387CC(pCandidate))
+            && !pCandidate->IsShattered())
         {
             fTempScore = pThrower->DoFlashLight(
                 pCandidate->m_v3Position, aDirection, 0.0001f, 0.0f, 30.0f);
@@ -579,13 +572,13 @@ extern "C" float fn_8009A478(ePowerUpType eType, ePowerupSize eSize)
         switch (eSize)
         {
         case POWERUPSIZE_LARGE:
-            fUnidentified = lbl_8056CF08.m_pGameTweaks->fShellBigRadius;
+            fUnidentified = gGameTweaks.m_pGameTweaks->fShellBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fUnidentified = lbl_8056CF08.m_pGameTweaks->fShellMediumRadius;
+            fUnidentified = gGameTweaks.m_pGameTweaks->fShellMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fUnidentified = lbl_8056CF08.m_pGameTweaks->fShellSmallRadius;
+            fUnidentified = gGameTweaks.m_pGameTweaks->fShellSmallRadius;
             break;
         }
         break;
@@ -593,13 +586,13 @@ extern "C" float fn_8009A478(ePowerUpType eType, ePowerupSize eSize)
         switch (eSize)
         {
         case POWERUPSIZE_LARGE:
-            fUnidentified = lbl_8056CF08.m_pGameTweaks->fBananaBigRadius;
+            fUnidentified = gGameTweaks.m_pGameTweaks->fBananaBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fUnidentified = lbl_8056CF08.m_pGameTweaks->fBananaMediumRadius;
+            fUnidentified = gGameTweaks.m_pGameTweaks->fBananaMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fUnidentified = lbl_8056CF08.m_pGameTweaks->fBananaSmallRadius;
+            fUnidentified = gGameTweaks.m_pGameTweaks->fBananaSmallRadius;
             break;
         }
         break;
@@ -607,13 +600,13 @@ extern "C" float fn_8009A478(ePowerUpType eType, ePowerupSize eSize)
         switch (eSize)
         {
         case POWERUPSIZE_LARGE:
-            fUnidentified = lbl_8056CF08.m_pGameTweaks->fBobombBigRadius;
+            fUnidentified = gGameTweaks.m_pGameTweaks->fBobombBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fUnidentified = lbl_8056CF08.m_pGameTweaks->fBobombMediumRadius;
+            fUnidentified = gGameTweaks.m_pGameTweaks->fBobombMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fUnidentified = lbl_8056CF08.m_pGameTweaks->fBobombSmallRadius;
+            fUnidentified = gGameTweaks.m_pGameTweaks->fBobombSmallRadius;
             break;
         }
         break;
@@ -634,17 +627,17 @@ extern "C" void fn_8009A5D8(cFielder* pThrower, ePowerUpType eType,
     pUnidentified->eType = eType;
     pUnidentified->fRadius = 0.0f;
 
-    float fMediumChance = lbl_8056CF08.m_pGameTweaks->fShellMediumChance;
-    float fExplodeChance = lbl_8056CF08.m_pGameTweaks->fShellExplodeChance;
+    float fMediumChance = gGameTweaks.m_pGameTweaks->fShellMediumChance;
+    float fExplodeChance = gGameTweaks.m_pGameTweaks->fShellExplodeChance;
 
     switch (eType)
     {
     case POWER_UP_BANANA:
-        fMediumChance = lbl_8056CF08.m_pGameTweaks->fBananaMediumChance;
-        fExplodeChance = lbl_8056CF08.m_pGameTweaks->fBananaExplodeChance;
+        fMediumChance = gGameTweaks.m_pGameTweaks->fBananaMediumChance;
+        fExplodeChance = gGameTweaks.m_pGameTweaks->fBananaExplodeChance;
         break;
     case POWER_UP_BOBOMB:
-        fMediumChance = lbl_8056CF08.m_pGameTweaks->fBobombMediumChance;
+        fMediumChance = gGameTweaks.m_pGameTweaks->fBobombMediumChance;
         fExplodeChance = 1.0f;
         break;
     default:
@@ -856,7 +849,7 @@ u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
                         }
 
                         if (pTargetFielders[i] != 0
-                            && fn_800387CC(pTargetFielders[i]) == true)
+                            && (pTargetFielders[i])->IsShattered() == true)
                         {
                             pTargetFielders[i] = 0;
                         }
@@ -905,7 +898,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     , m_eType(eType)
     , m_unk20(true)
 {
-    UnidentifiedAvoidancePowerup_804F47E0* pUnidentified = 0;
+    AvoidablePowerup* pUnidentified = 0;
 
     m_aOrientation = 0;
     m_scale = 1.0f;
@@ -930,7 +923,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uGREEN_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(lbl_8056CF08.m_unk14->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.m_unk14->mUnidentified404);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -945,7 +938,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uRED_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(lbl_8056CF08.m_unk14->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.m_unk14->mUnidentified404);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -960,7 +953,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uSPINY_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(lbl_8056CF08.m_unk14->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.m_unk14->mUnidentified404);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -975,7 +968,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uFREEZE_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(lbl_8056CF08.m_unk14->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.m_unk14->mUnidentified404);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -990,7 +983,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uBANANA_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(lbl_8056CF08.m_pGameTweaks->fBananaActiveTime);
+        mtActiveTimer.SetSeconds(gGameTweaks.m_pGameTweaks->fBananaActiveTime);
         m_fBlurWidth = 0.0f;
         m_fBlurLength = 0.0f;
         break;
@@ -1005,7 +998,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uBOBOMB_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(lbl_8056CF08.m_pGameTweaks->fBobombActiveTime);
+        mtActiveTimer.SetSeconds(gGameTweaks.m_pGameTweaks->fBobombActiveTime);
         m_fBlurWidth = 0.5f * fRadius;
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -1045,8 +1038,8 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     m_pPhysicsObject->SetLinearVelocity(m_v3Velocity);
     m_pPhysicsObject->EnableCollisions();
 
-    pUnidentified = (UnidentifiedAvoidancePowerup_804F47E0*)nlMalloc(sizeof(UnidentifiedAvoidancePowerup_804F47E0), 8, false);
-    pUnidentified = new (pUnidentified) UnidentifiedAvoidancePowerup_804F47E0(this);
+    pUnidentified = (AvoidablePowerup*)nlMalloc(sizeof(AvoidablePowerup), 8, false);
+    pUnidentified = new (pUnidentified) AvoidablePowerup(this);
     m_unk18 = pUnidentified;
 
     if (eType == POWER_UP_RED_SHELL)
@@ -1056,15 +1049,15 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         {
             if (eType == POWER_UP_STAR)
             {
-                fn_800EBF78(0x12, soundID, "Powerup", this, 0);
+                PlayTrackedSound(0x12, soundID, "Powerup", this, 0);
             }
             else if (this != 0)
             {
-                fn_800EBBFC(0x10, soundID, "Powerup", this);
+                PlaySound(0x10, soundID, "Powerup", this);
             }
             else
             {
-                fn_800EBBFC(0x10, soundID, 0, 0);
+                PlaySound(0x10, soundID, 0, 0);
             }
         }
     }
@@ -1190,23 +1183,23 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     int nDifference = pTeam->m_nScore - pTeam->GetOtherTeam()->m_nScore;
 
     if ((u32)(nDifference < 0 ? -nDifference : nDifference)
-        <= (u32)lbl_8056CF08.m_pGameTweaks->nScoreDifferenceMinimum)
+        <= (u32)gGameTweaks.m_pGameTweaks->nScoreDifferenceMinimum)
     {
         nDifference = 0;
     }
     else
     {
         if (nDifference
-            < -lbl_8056CF08.m_pGameTweaks->nScoreDifferenceMaximum)
+            < -gGameTweaks.m_pGameTweaks->nScoreDifferenceMaximum)
         {
             nDifference
-                = -lbl_8056CF08.m_pGameTweaks->nScoreDifferenceMaximum;
+                = -gGameTweaks.m_pGameTweaks->nScoreDifferenceMaximum;
         }
         else if (nDifference
-            > lbl_8056CF08.m_pGameTweaks->nScoreDifferenceMaximum)
+            > gGameTweaks.m_pGameTweaks->nScoreDifferenceMaximum)
         {
             nDifference
-                = lbl_8056CF08.m_pGameTweaks->nScoreDifferenceMaximum;
+                = gGameTweaks.m_pGameTweaks->nScoreDifferenceMaximum;
         }
     }
 
@@ -1266,7 +1259,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     {
         nChanceForCaptainPowerup = 0;
     }
-    if (fn_800A6764(pTeam) || fn_800387CC(pTeam->GetCaptain()) == 1)
+    if (fn_800A6764(pTeam) || pTeam->GetCaptain()->IsShattered() == 1)
     {
         nChanceForCaptainPowerup = 0;
     }
@@ -1379,7 +1372,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
             = nChanceForBoBomb = nChanceForGreenShell
             = nChanceForFreezeShell = 0;
         if (!fn_800A6764(pTeam)
-            && fn_800387CC(pTeam->GetCaptain()) != 1)
+            && pTeam->GetCaptain()->IsShattered() != 1)
         {
             powerUpType = *(ePowerUpType*)(
                 *(u8**)((u8*)pTeam->GetCaptain() + 0x11C) + 0x14);
@@ -1454,7 +1447,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
 
         if (GameInfoManager::Instance()->IsRule0x0Equal10()
             && powerUpType == POWER_UP_NONE && !fn_800A6764(pTeam)
-            && fn_800387CC(pTeam->GetCaptain()) == 0)
+            && pTeam->GetCaptain()->IsShattered() == 0)
         {
             powerUpType = *(ePowerUpType*)(
                 *(u8**)((u8*)pTeam->GetCaptain() + 0x11C) + 0x14);
@@ -1476,10 +1469,10 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     case POWER_UP_FREEZE_SHELL:
     {
         const float fFiveChance
-            = lbl_8056CF08.m_pGameTweaks->fShellFiveChance.UnidentifiedGetValue();
+            = gGameTweaks.m_pGameTweaks->fShellFiveChance.UnidentifiedGetValue();
         const float fThreeChance
             = fFiveChance
-            + lbl_8056CF08.m_pGameTweaks->fShellThreeChance.UnidentifiedGetValue();
+            + gGameTweaks.m_pGameTweaks->fShellThreeChance.UnidentifiedGetValue();
         if (fRandom < fFiveChance)
         {
             nNumOfPowerups = 5;
@@ -1493,7 +1486,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     case POWER_UP_RED_SHELL:
     {
         bool bThreeChance
-            = fRandom < lbl_8056CF08.m_pGameTweaks->fShellThreeChance;
+            = fRandom < gGameTweaks.m_pGameTweaks->fShellThreeChance;
         if (bThreeChance)
         {
             nNumOfPowerups = 3;
@@ -1503,10 +1496,10 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     case POWER_UP_BOBOMB:
     {
         const float fFiveChance
-            = lbl_8056CF08.m_pGameTweaks->fBobombFiveChance.UnidentifiedGetValue();
+            = gGameTweaks.m_pGameTweaks->fBobombFiveChance.UnidentifiedGetValue();
         const float fThreeChance
             = fFiveChance
-            + lbl_8056CF08.m_pGameTweaks->fBobombThreeChance.UnidentifiedGetValue();
+            + gGameTweaks.m_pGameTweaks->fBobombThreeChance.UnidentifiedGetValue();
         if (fRandom < fFiveChance)
         {
             nNumOfPowerups = 5;
@@ -1520,10 +1513,10 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     case POWER_UP_BANANA:
     {
         const float fFiveChance
-            = lbl_8056CF08.m_pGameTweaks->fBananaFiveChance.UnidentifiedGetValue();
+            = gGameTweaks.m_pGameTweaks->fBananaFiveChance.UnidentifiedGetValue();
         const float fThreeChance
             = fFiveChance
-            + lbl_8056CF08.m_pGameTweaks->fBananaThreeChance.UnidentifiedGetValue();
+            + gGameTweaks.m_pGameTweaks->fBananaThreeChance.UnidentifiedGetValue();
         if (fRandom < fFiveChance)
         {
             nNumOfPowerups = 5;
@@ -1561,12 +1554,12 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
             cPlayer* pTeamPlayer = pTeam->GetPlayer(i);
             if (pTeamPlayer->GetGlobalPad() != 0)
             {
-                fn_800EDCE8(pTeamPlayer);
+                SetPlayerAudioController(pTeamPlayer);
                 unsigned long soundID
                     = powerupSounds[POWER_UP_BANANA].sndAcquire;
                 if (soundID != 0)
                 {
-                    fn_800EBBFC(0x10, soundID, 0, 0);
+                    PlaySound(0x10, soundID, 0, 0);
                 }
             }
         }
@@ -1574,7 +1567,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
         if ((int)powerUpType >= 9 && (int)powerUpType <= 20
             && pFielder != 0)
         {
-            fn_800EBBFC(pFielder->mUnidentified318,
+            PlaySound(pFielder->mUnidentified318,
                 powerupSounds[powerUpType].sndAcquire, 0, 0);
         }
 
@@ -1712,17 +1705,14 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
             EffectsGroup* pEffectsGroup;
             if (pObj->meSize == POWERUPSIZE_SMALL)
             {
-                pEffectsGroup = fn_802E7CDC(
-                    EmissionManager::Instance(), "bobomb_ground");
+                pEffectsGroup = EmissionManager::Instance()->GetEffectsGroup("bobomb_ground");
             }
             else
             {
-                pEffectsGroup = fn_802E7CDC(
-                    EmissionManager::Instance(), "bobomb_ground_large");
+                pEffectsGroup = EmissionManager::Instance()->GetEffectsGroup("bobomb_ground_large");
             }
 
-            EmissionController* pController = fn_802E7FE4(
-                EmissionManager::Instance(), pEffectsGroup, 3, true, false);
+            EmissionController* pController = EmissionManager::Instance()->Create(pEffectsGroup, 3, true, 0);
             pController->SetPosition(pObj->m_v3Position);
             pController->m_uUserData = (u32)pObj;
             Function1<void, EmissionController&> callback(fn_8009F1B8);
@@ -1749,7 +1739,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
             unsigned long soundID = powerupSounds[pObj->m_eType].sndHit;
             if (soundID != 0)
             {
-                fn_800EBBFC(0x10, soundID, 0, 0);
+                PlaySound(0x10, soundID, 0, 0);
             }
 
             {
@@ -1849,11 +1839,11 @@ void PowerupBase::fn_8009CAC0(cFielder* pFielder)
     {
         if (this != 0)
         {
-            fn_800EBBFC(0x10, soundID, "Powerup", this);
+            PlaySound(0x10, soundID, "Powerup", this);
         }
         else
         {
-            fn_800EBBFC(0x10, soundID, 0, 0);
+            PlaySound(0x10, soundID, 0, 0);
         }
     }
 
@@ -1874,11 +1864,11 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
     {
         if (this != 0)
         {
-            fn_800EBBFC(0x10, soundID, "Powerup", this);
+            PlaySound(0x10, soundID, "Powerup", this);
         }
         else
         {
-            fn_800EBBFC(0x10, soundID, 0, 0);
+            PlaySound(0x10, soundID, 0, 0);
         }
     }
 
@@ -1894,7 +1884,7 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
         v3TargetVel = m_pTarget->m_v3Velocity;
     }
 
-    float fSpeed = fn_8002CFF0(fn_8003E6E4(pThrower));
+    float fSpeed = fn_8002CFF0(pThrower->GetTweaks());
 
     if (lbl_806DBDA0 || pThrower->GetGlobalPad() == 0)
     {
@@ -2069,12 +2059,12 @@ void PowerupBase::Destroy(bool bSilent)
     unsigned long soundID = powerupSounds[m_eType].sndInEffect;
     if (soundID != 0)
     {
-        fn_800EC12C(soundID, this);
+        StopSound(soundID, this);
     }
     soundID = powerupSounds[m_eType].sndActivate;
     if (soundID != 0)
     {
-        fn_800EC12C(soundID, this);
+        StopSound(soundID, this);
     }
 
     bool bUnidentified = m_v3Position.z < -1.0f;
@@ -2088,42 +2078,34 @@ void PowerupBase::Destroy(bool bSilent)
             switch (meSize)
             {
             case POWERUPSIZE_LARGE:
-                pExplosionGroup = fn_802E7CDC(
-                    pManager, "bobomb_explode_big");
-                pGroundGroup = fn_802E7CDC(
-                    pManager, "bobomb_explode_ground_big");
+                pExplosionGroup = pManager->GetEffectsGroup("bobomb_explode_big");
+                pGroundGroup = pManager->GetEffectsGroup("bobomb_explode_ground_big");
                 fn_800F0240(0.0f, 0.2f, 5000.0f, 10.0f);
                 break;
             case POWERUPSIZE_MEDIUM:
-                pExplosionGroup = fn_802E7CDC(
-                    pManager, "bobomb_explode_med");
-                pGroundGroup = fn_802E7CDC(
-                    pManager, "bobomb_explode_ground_med");
+                pExplosionGroup = pManager->GetEffectsGroup("bobomb_explode_med");
+                pGroundGroup = pManager->GetEffectsGroup("bobomb_explode_ground_med");
                 break;
             case POWERUPSIZE_SMALL:
-                pExplosionGroup = fn_802E7CDC(
-                    pManager, "bobomb_explode_small");
-                pGroundGroup = fn_802E7CDC(
-                    pManager, "bobomb_explode_ground_small");
+                pExplosionGroup = pManager->GetEffectsGroup("bobomb_explode_small");
+                pGroundGroup = pManager->GetEffectsGroup("bobomb_explode_ground_small");
                 break;
             }
 
-            EmissionController* pControl = fn_802E7FE4(
-                pManager, pExplosionGroup, 0, true, false);
+            EmissionController* pControl = pManager->Create(pExplosionGroup, 0, true, 0);
             pControl->SetPosition(m_pPhysicsObject->GetPosition());
             if ((m_v3Position.z
                     - ((PhysicsSphere*)m_pPhysicsObject)->GetRadius())
                 < 1.0f)
             {
-                EmissionController* pControl = fn_802E7FE4(
-                    pManager, pGroundGroup, 0, true, false);
+                EmissionController* pControl = pManager->Create(pGroundGroup, 0, true, 0);
                 pControl->SetPosition(m_pPhysicsObject->GetPosition());
             }
 
             soundID = powerupSounds[m_eType].sndExplode;
             if (soundID != 0)
             {
-                fn_800EBBFC(0x10, soundID, 0, 0);
+                PlaySound(0x10, soundID, 0, 0);
             }
         }
 
@@ -2152,21 +2134,21 @@ void PowerupBase::Destroy(bool bSilent)
             soundID = powerupSounds[m_eType].sndEnd;
             if (soundID != 0)
             {
-                fn_800EBBFC(0x10, soundID, 0, 0);
+                PlaySound(0x10, soundID, 0, 0);
             }
             break;
         case POWERUPSIZE_MEDIUM:
             soundID = powerupSounds[m_eType].sndEnd;
             if (soundID != 0)
             {
-                fn_800EBBFC(0x10, soundID, 0, 0);
+                PlaySound(0x10, soundID, 0, 0);
             }
             break;
         case POWERUPSIZE_SMALL:
             soundID = powerupSounds[m_eType].sndEnd;
             if (soundID != 0)
             {
-                fn_800EBBFC(0x10, soundID, 0, 0);
+                PlaySound(0x10, soundID, 0, 0);
             }
             break;
         }
@@ -2300,7 +2282,7 @@ void PowerupBase::UpdateTransform()
     {
         nlCartesianToPolar(pDirectionalSpeed, m_v3Velocity.x, m_v3Velocity.y);
         fSpeedNormalized = NormalizeVal(pDirectionalSpeed.r, 0.0f,
-            lbl_8056CF08.m_unk14->fGreenShellSpeed);
+            gGameTweaks.m_unk14->fGreenShellSpeed);
 
         {
             float z = 250.0f;
@@ -2314,48 +2296,48 @@ void PowerupBase::UpdateTransform()
         switch (meSize)
         {
         case POWERUPSIZE_LARGE:
-            fActualRadius = lbl_8056CF08.m_pGameTweaks->fBananaBigRadius;
+            fActualRadius = gGameTweaks.m_pGameTweaks->fBananaBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fActualRadius = lbl_8056CF08.m_pGameTweaks->fBananaMediumRadius;
+            fActualRadius = gGameTweaks.m_pGameTweaks->fBananaMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fActualRadius = lbl_8056CF08.m_pGameTweaks->fBananaSmallRadius;
+            fActualRadius = gGameTweaks.m_pGameTweaks->fBananaSmallRadius;
             break;
         }
-        fNormalRadius = lbl_8056CF08.m_pGameTweaks->fBananaSmallRadius;
+        fNormalRadius = gGameTweaks.m_pGameTweaks->fBananaSmallRadius;
         break;
 
     case POWER_UP_BOBOMB:
         switch (meSize)
         {
         case POWERUPSIZE_LARGE:
-            fActualRadius = lbl_8056CF08.m_pGameTweaks->fBobombBigRadius;
+            fActualRadius = gGameTweaks.m_pGameTweaks->fBobombBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fActualRadius = lbl_8056CF08.m_pGameTweaks->fBobombMediumRadius;
+            fActualRadius = gGameTweaks.m_pGameTweaks->fBobombMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fActualRadius = lbl_8056CF08.m_pGameTweaks->fBobombSmallRadius;
+            fActualRadius = gGameTweaks.m_pGameTweaks->fBobombSmallRadius;
             break;
         }
-        fNormalRadius = lbl_8056CF08.m_pGameTweaks->fBobombSmallRadius;
+        fNormalRadius = gGameTweaks.m_pGameTweaks->fBobombSmallRadius;
         break;
 
     default:
         switch (meSize)
         {
         case POWERUPSIZE_LARGE:
-            fActualRadius = lbl_8056CF08.m_pGameTweaks->fShellBigRadius;
+            fActualRadius = gGameTweaks.m_pGameTweaks->fShellBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fActualRadius = lbl_8056CF08.m_pGameTweaks->fShellMediumRadius;
+            fActualRadius = gGameTweaks.m_pGameTweaks->fShellMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fActualRadius = lbl_8056CF08.m_pGameTweaks->fShellSmallRadius;
+            fActualRadius = gGameTweaks.m_pGameTweaks->fShellSmallRadius;
             break;
         }
-        fNormalRadius = lbl_8056CF08.m_pGameTweaks->fShellSmallRadius;
+        fNormalRadius = gGameTweaks.m_pGameTweaks->fShellSmallRadius;
         break;
     }
 
@@ -2450,7 +2432,7 @@ found1:
     {
         s32 padID;
         bool bHasPad = pFielder->GetGlobalPad() != 0;
-        padID = bHasPad ? pFielder->GetGlobalPad()->fn_80332748() : -1;
+        padID = bHasPad ? pFielder->GetGlobalPad()->GetPadID() : -1;
         m_nThrowerPadID = padID;
     }
 }
@@ -2507,7 +2489,7 @@ void PowerupBase::StopPowerupInEffectSound(ePowerUpType type, PowerupSound power
     unsigned long soundID = (&powerupSounds[type].sndAcquire)[powerupSnd];
     if (soundID != 0)
     {
-        fn_800EC12C(soundID, pParam);
+        StopSound(soundID, pParam);
     }
 }
 
@@ -2525,15 +2507,15 @@ void PowerupBase::PlayPowerupSound(ePowerUpType type, PowerupSound powerupSnd,
 
     if (type == POWER_UP_STAR && powerupSnd == PWRUP_SOUND_IN_EFFECT)
     {
-        fn_800EBF78(0x12, soundID, "Powerup", pParam, 0);
+        PlayTrackedSound(0x12, soundID, "Powerup", pParam, 0);
     }
     else if (pParam != 0)
     {
-        fn_800EBBFC(0x10, soundID, "Powerup", pParam);
+        PlaySound(0x10, soundID, "Powerup", pParam);
     }
     else
     {
-        fn_800EBBFC(0x10, soundID, 0, 0);
+        PlaySound(0x10, soundID, 0, 0);
     }
 }
 
@@ -2589,21 +2571,17 @@ void GreenShell::Destroy(bool bSilent)
         switch (meSize)
         {
         case POWERUPSIZE_LARGE:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "green_shell_explode_big");
+            pEffectsGroup = pUnk->GetEffectsGroup("green_shell_explode_big");
             break;
         case POWERUPSIZE_MEDIUM:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "green_shell_explode_med");
+            pEffectsGroup = pUnk->GetEffectsGroup("green_shell_explode_med");
             break;
         case POWERUPSIZE_SMALL:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "green_shell_explode");
+            pEffectsGroup = pUnk->GetEffectsGroup("green_shell_explode");
             break;
         }
 
-        EmissionController* pController = fn_802E7FE4(
-            pUnk, pEffectsGroup, 0, true, false);
+        EmissionController* pController = pUnk->Create(pEffectsGroup, 0, true, 0);
         pController->SetPosition(m_pPhysicsObject->GetPosition());
     }
 
@@ -2657,21 +2635,17 @@ void RedShell::Destroy(bool bSilent)
         switch (meSize)
         {
         case POWERUPSIZE_LARGE:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "red_shell_explode_big");
+            pEffectsGroup = pUnk->GetEffectsGroup("red_shell_explode_big");
             break;
         case POWERUPSIZE_MEDIUM:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "red_shell_explode_med");
+            pEffectsGroup = pUnk->GetEffectsGroup("red_shell_explode_med");
             break;
         case POWERUPSIZE_SMALL:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "red_shell_explode");
+            pEffectsGroup = pUnk->GetEffectsGroup("red_shell_explode");
             break;
         }
 
-        EmissionController* pController = fn_802E7FE4(
-            pUnk, pEffectsGroup, 0, true, false);
+        EmissionController* pController = pUnk->Create(pEffectsGroup, 0, true, 0);
         pController->SetPosition(m_pPhysicsObject->GetPosition());
     }
 
@@ -2692,7 +2666,7 @@ void RedShell::SeekTarget()
         unsigned long soundID = powerupSounds[m_eType].sndInEffect;
         if (soundID != 0)
         {
-            fn_800EC12C(soundID, this);
+            StopSound(soundID, this);
         }
         return;
     }
@@ -2766,7 +2740,7 @@ void Banana::ThrowAt(cFielder* pThrower)
     float fUnidentified = pThrower->m_fPlayerScale;
     float fRadius = GetRadius();
     float fUnidentified2 = fn_8002BFA8(
-        fn_8003E6E4(pThrower), fUnidentified);
+        pThrower->GetTweaks(), fUnidentified);
 
     nlPolarToCartesian(v3Unidentified.x, v3Unidentified.y,
         (unsigned short)(aDirection + 0x8000),
@@ -2787,11 +2761,11 @@ void Banana::ThrowAt(cFielder* pThrower)
     {
         if (this != 0)
         {
-            fn_800EBBFC(0x10, soundID, "Powerup", this);
+            PlaySound(0x10, soundID, "Powerup", this);
         }
         else
         {
-            fn_800EBBFC(0x10, soundID, 0, 0);
+            PlaySound(0x10, soundID, 0, 0);
         }
     }
 }
@@ -2843,21 +2817,17 @@ void Banana::Destroy(bool bSilent)
         switch (meSize)
         {
         case POWERUPSIZE_LARGE:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "banana_explode_big");
+            pEffectsGroup = pUnk->GetEffectsGroup("banana_explode_big");
             break;
         case POWERUPSIZE_MEDIUM:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "banana_explode_med");
+            pEffectsGroup = pUnk->GetEffectsGroup("banana_explode_med");
             break;
         case POWERUPSIZE_SMALL:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "banana_explode");
+            pEffectsGroup = pUnk->GetEffectsGroup("banana_explode");
             break;
         }
 
-        EmissionController* pController = fn_802E7FE4(
-            pUnk, pEffectsGroup, 0, true, false);
+        EmissionController* pController = pUnk->Create(pEffectsGroup, 0, true, 0);
         pController->SetPosition(m_pPhysicsObject->GetPosition());
     }
 
@@ -2905,21 +2875,17 @@ void SpinyShell::Destroy(bool bSilent)
         switch (meSize)
         {
         case POWERUPSIZE_LARGE:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "spiny_shell_explode_big");
+            pEffectsGroup = pUnk->GetEffectsGroup("spiny_shell_explode_big");
             break;
         case POWERUPSIZE_MEDIUM:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "spiny_shell_explode_med");
+            pEffectsGroup = pUnk->GetEffectsGroup("spiny_shell_explode_med");
             break;
         case POWERUPSIZE_SMALL:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "spiny_shell_explode");
+            pEffectsGroup = pUnk->GetEffectsGroup("spiny_shell_explode");
             break;
         }
 
-        EmissionController* pController = fn_802E7FE4(
-            pUnk, pEffectsGroup, 0, true, false);
+        EmissionController* pController = pUnk->Create(pEffectsGroup, 0, true, 0);
         pController->SetPosition(m_pPhysicsObject->GetPosition());
     }
 
@@ -2967,21 +2933,17 @@ void FreezeShell::Destroy(bool bSilent)
         switch (meSize)
         {
         case POWERUPSIZE_LARGE:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "freeze_shell_explode_big");
+            pEffectsGroup = pUnk->GetEffectsGroup("freeze_shell_explode_big");
             break;
         case POWERUPSIZE_MEDIUM:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "freeze_shell_explode_med");
+            pEffectsGroup = pUnk->GetEffectsGroup("freeze_shell_explode_med");
             break;
         case POWERUPSIZE_SMALL:
-            pEffectsGroup = fn_802E7CDC(
-                pUnk, "freeze_shell_explode");
+            pEffectsGroup = pUnk->GetEffectsGroup("freeze_shell_explode");
             break;
         }
 
-        EmissionController* pController = fn_802E7FE4(
-            pUnk, pEffectsGroup, 0, true, false);
+        EmissionController* pController = pUnk->Create(pEffectsGroup, 0, true, 0);
         pController->SetPosition(m_pPhysicsObject->GetPosition());
     }
 
@@ -3111,10 +3073,8 @@ void Bobomb::fn_8009F454(PowerupBase*, int nThrowOrder)
     m_v3Velocity = v3BobombVelocity;
     m_pPhysicsObject->SetLinearVelocity(v3BobombVelocity);
 
-    EffectsGroup* pEffectsGroup = fn_802E7CDC(
-        EmissionManager::Instance(), "bobomb_tick");
-    EmissionController* pController = fn_802E7FE4(
-        EmissionManager::Instance(), pEffectsGroup, 3, true, false);
+    EffectsGroup* pEffectsGroup = EmissionManager::Instance()->GetEffectsGroup("bobomb_tick");
+    EmissionController* pController = EmissionManager::Instance()->Create(pEffectsGroup, 3, true, 0);
     nlVector3 pos = m_pPhysicsObject->GetPosition();
     pos.z += ((PhysicsSphere*)m_pPhysicsObject)->GetRadius();
     pController->SetPosition(pos);
@@ -3127,11 +3087,11 @@ void Bobomb::fn_8009F454(PowerupBase*, int nThrowOrder)
     {
         if (this != 0)
         {
-            fn_800EBBFC(0x10, soundID, "Powerup", this);
+            PlaySound(0x10, soundID, "Powerup", this);
         }
         else
         {
-            fn_800EBBFC(0x10, soundID, 0, 0);
+            PlaySound(0x10, soundID, 0, 0);
         }
     }
 }
@@ -3149,8 +3109,7 @@ void Bobomb::ThrowAt(cFielder* pThrower)
  */
 void Bobomb::Destroy(bool bSilent)
 {
-    EffectsGroup* pEffectsGroup = fn_802E7CDC(
-        EmissionManager::Instance(), "bobomb_tick");
+    EffectsGroup* pEffectsGroup = EmissionManager::Instance()->GetEffectsGroup("bobomb_tick");
     EmissionManager::Instance()->Destroy((unsigned long)this, pEffectsGroup);
 
     if (gBobombAnticipationVoiceID != -1)

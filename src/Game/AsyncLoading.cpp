@@ -1,4 +1,8 @@
+#include "Game/Sys/audio.h"
 #include "Game/AsyncLoading.h"
+#include "NL/nlFunctionMemory.h"
+#include "Game/EventDataTypes.h"
+#include "Game/Event.h"
 #include "Game/Sys/debug.h"
 #include "Game/FE/feMusic.h"
 #include "Game/Render/CrowdManager.h"
@@ -9,9 +13,9 @@
 #include "NL/globalpad.h"
 #include "unclassified/tu_801B369C.h"
 
-#include "Game/Audio/AudioBundleManager_802EDA7C.h"
-#include "Game/Audio/AudioBankTable_802EB644.h"
-#include "Game/Audio/AudioLoadMode_806E201C.h"
+#include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioBankTable.h"
+#include "Game/Audio/AudioSystem.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/Sys/movie.h"
 #include "Game/Task/BeginFrameTask.h"
@@ -86,12 +90,6 @@ public:
     void Update(float dt);
 };
 
-class GameAudio_800EB6AC : public AudioLoadMode_806E201C
-{
-public:
-    void Update(float deltaTime);
-};
-
 class UnidentifiedDeletable
 {
 public:
@@ -114,7 +112,6 @@ extern "C" void OSYieldThread();
 extern "C" void fn_801B2770();
 extern "C" void fn_8027ED18();
 extern "C" void fn_8027E5D4();
-extern "C" void fn_802B2E8C(UnidentifiedOwnerHandle* handle);
 extern "C" void fn_800A6EDC(void*);
 extern "C" void fn_800AA3E8(void*, int);
 extern "C" void fn_801AF97C(void*);
@@ -129,8 +126,7 @@ extern "C" void fn_801B4238(void*);
 extern "C" void fn_800741A4(void*);
 extern "C" void fn_8013DDD4();
 extern "C" void fn_802EC9D0(void*);
-extern "C" void fn_800EBBD8(GameAudio_800EB6AC*);
-extern "C" void fn_800ED8D8();
+
 extern "C" void fn_801ACFC4();
 extern "C" void fn_801A5328();
 extern "C" void fn_80183E4C();
@@ -139,11 +135,7 @@ extern "C" bool fn_801C4D40();
 extern "C" void fn_801C4CBC();
 extern "C" void fn_802BDA28();
 extern "C" void fn_802C0CCC();
-extern "C" void fn_802B1AE4();
-extern "C" void fn_80197120();
 extern "C" void fn_80143FD4();
-extern "C" void fn_802B1B50();
-extern "C" void fn_802B26D4();
 
 void fn_80056EA8();
 void DestroyCharacters();
@@ -154,7 +146,7 @@ extern FrameTimingStat* lbl_806E16A0;
 extern void* g_pTeams[];
 extern cBall* g_pBall;
 extern u8 lbl_80574148[];
-extern u8 lbl_8056CF08[];
+extern u8 gGameTweaks[];
 extern u8 lbl_805721E8[];
 extern UnidentifiedDeletable* lbl_806E2090;
 extern SlotPool<cSAnimCallback> lbl_805840D8;
@@ -665,7 +657,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
         FEResourceManager::Instance()->Run(0.0f);
     }
 
-    fn_802B2E8C(&manager->mLoadingHandle);
+    DisconnectEventOwner(&manager->mLoadingHandle);
     FEMusic::StopStream();
     BeginFrameTask::s_FramerateLocked = false;
     fn_80332EC8();
@@ -710,37 +702,37 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     FreeElectricFence();
     DestroyGame();
-    fn_800741A4(lbl_8056CF08);
+    fn_800741A4(gGameTweaks);
     fn_8013DDD4();
 
     fn_802B467C(&Detail::sTempStringAllocatorPool);
     SlotPoolBase::BaseFreeBlocks(&Detail::sTempStringAllocatorPool, 0x40);
 
-    fn_802EC8A0(lbl_806E201C, true, true);
+    FlushAudio(g_pAudioSystem, true, true);
     u32 startTick = OSGetTick();
-    while (!lbl_806E201C->fn_802EBF78())
+    while (!g_pAudioSystem->IsIdle())
     {
-        fn_802EC8A0(lbl_806E201C, true, true);
-        static_cast<GameAudio_800EB6AC*>(lbl_806E201C)->Update(0.25f);
+        FlushAudio(g_pAudioSystem, true, true);
+        static_cast<GameAudio*>(g_pAudioSystem)->Update(0.25f);
         nlServiceFileSystem();
         OSYieldThread();
 
         if (OSTicksToMilliseconds(OSGetTick() - startTick) > 400)
         {
-            fn_802EC9D0(lbl_806E201C);
+            fn_802EC9D0(g_pAudioSystem);
             nlBreak();
         }
     }
 
-    fn_800EBBD8(static_cast<GameAudio_800EB6AC*>(lbl_806E201C));
-    AudioBankTable_802EB644* soundMap = lbl_806E201C->GetBundleManager()->GetSoundMap();
+    UnloadSoundBanks(static_cast<GameAudio*>(g_pAudioSystem));
+    AudioBankTable* soundMap = g_pAudioSystem->GetBundleManager()->GetSoundMap();
     if (soundMap != 0)
     {
-        soundMap->fn_802EBBBC();
+        soundMap->ClearSelectedGroups();
     }
-    lbl_806E201C->Shutdown();
+    g_pAudioSystem->Shutdown();
 
-    fn_800ED8D8();
+    StopCrowdReactions();
     fn_801ACFC4();
     fn_801A5328();
     fn_80183E4C();
@@ -779,17 +771,17 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     fn_802C8180();
     fn_802B467C(&lbl_8057AB80);
     SlotPoolBase::BaseFreeBlocks(&lbl_8057AB80, 8);
-    fn_802B1AE4();
+    FreeFunctionMemoryPools();
     fn_802CC094()->ReleaseResource((unsigned long)manager->mUnidentified4C);
     fn_802CC02C(fn_802CC094());
     fn_802CC08C(0);
-    fn_80197120();
+    FreeEventDataPools();
     fn_80143FD4();
     fn_80111658(true);
 
     manager->mLoadingState = 0;
-    fn_802B1B50();
-    fn_802B26D4();
+    PopFunctionMemoryState();
+    PopEventConnectionState();
     FinishLoadingStep(manager);
 }
 

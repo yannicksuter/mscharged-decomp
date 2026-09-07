@@ -138,7 +138,7 @@ void RLGReader_80369E5C::fn_8036A138()
         {
             glModelPacket* packet = &model->packets[packetIndex];
             packet->unknown10 =
-                fn_802CB7D0((unsigned long)packet->unknown10);
+                glGetMaterialProgram((unsigned long)packet->unknown10);
 
             if (HasStream(packet, 7))
             {

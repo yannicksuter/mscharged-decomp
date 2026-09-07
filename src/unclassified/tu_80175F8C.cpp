@@ -18,9 +18,6 @@ class EffectsGroup;
 extern "C" bool fn_800977A4(cFielder*, float);
 extern "C" void fn_800F026C(
     const nlVector3&, float, float);
-extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
-extern "C" EmissionController* fn_802E7FE4(
-    EmissionManager*, EffectsGroup*, int, bool, bool);
 
 extern "C" SlotPool<UnidentifiedEventData38> lbl_805701B0;
 extern "C" void fn_8014A2BC(UnidentifiedEventData38*);
@@ -268,11 +265,10 @@ static char sDaisyFistExitEffect[] = "daisy_fist_exit";
 static inline void EmitSphereEffect(
     const char* name, const nlVector3& position)
 {
-    EffectsGroup* group = fn_802E7CDC(EmissionManager::Instance(), name);
+    EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(name);
     if (group != 0)
     {
-        EmissionController* controller = fn_802E7FE4(
-            EmissionManager::Instance(), group, 3, true, false);
+        EmissionController* controller = EmissionManager::Instance()->Create(group, 3, true, 0);
         controller->SetPosition(position);
     }
 }
@@ -285,7 +281,7 @@ extern "C" PhysicsSphere_80175F8C* fn_80176A60(
         0, *position, 0, lbl_806DCAE0, lbl_806DCAF4);
 }
 
-extern "C" PhysicsSphere_80175F8C* fn_80176C18(
+PhysicsSphere_80175F8C* CreateDaisyFistImpact(
     const nlVector3* position, cCharacter* owner)
 {
     EmitSphereEffect(sDaisyFistExitEffect, *position);

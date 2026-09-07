@@ -4,7 +4,7 @@
 #include "NL/gl/tu_802A12E4.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
-#include "Game/GL/tu_802D38A4.h"
+#include "Game/GL/glModelBuilder.h"
 
 
 State_802A12E4::State_802A12E4()
@@ -38,7 +38,7 @@ bool State_802A12E4::fn_802A1344(
     }
     model = newModel;
 
-    fn_802D38A4(
+    glCreateModel(
         model, vertexCount, primitive, allocator, 3, 0x257C2FF3);
 
     glModelStream* streams = model->packets->streams;
@@ -62,7 +62,7 @@ bool State_802A12E4::fn_802A1344(
         }
     }
     value_0C = positionData;
-    fn_802D39CC(streams, 0, value_0C,
+    glSetModelStream(streams, 0, value_0C,
         sizeof(float) * 3, 1);
 
     int value_10Count = vertexCount * 2;
@@ -85,7 +85,7 @@ bool State_802A12E4::fn_802A1344(
         }
     }
     value_10 = value_10Data;
-    fn_802D39CC(streams + 1, 1, value_10,
+    glSetModelStream(streams + 1, 1, value_10,
         sizeof(short) * 2, 4);
 
     u32* value_14Data;
@@ -107,7 +107,7 @@ bool State_802A12E4::fn_802A1344(
         }
     }
     value_14 = value_14Data;
-    fn_802D39CC(streams + 2, 2, value_14,
+    glSetModelStream(streams + 2, 2, value_14,
         sizeof(u32), 3);
 
     return true;

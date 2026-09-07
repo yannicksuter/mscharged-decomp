@@ -25,8 +25,9 @@ void FaceCam::Update(float dt)
 
     float len = nlRecipSqrt(forward.z * forward.z + (forward.x * forward.x + (forward.y * forward.y)), 1);
 
+    float distance = mDistance;
     nlVec3Scale(forward, forward, len);
-    nlVec3ScaleAdd(mCameraPosition, mDistance, forward, mTargetPosition);
+    nlVec3ScaleAdd(mCameraPosition, distance, forward, mTargetPosition);
 
     glMatrixLookAt(mViewMatrix, GetCameraPosition(), GetTargetPosition(), mUpVector);
 }

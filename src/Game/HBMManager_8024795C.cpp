@@ -1,3 +1,4 @@
+#include "Game/Audio/AudioBackend.h"
 #include "NL/plat/PlatPadManager.h"
 #include "Game/HBMManager_8024795C.h"
 
@@ -57,7 +58,6 @@ struct UnidentifiedHBMGameState
 class TU80252180Scene;
 
 extern UnidentifiedHBMGameState* g_pGame;
-extern void* lbl_806E2020;
 
 extern "C"
 {
@@ -65,8 +65,6 @@ extern "C"
     bool IsIdleAndNoShotInProgress(void* presentation);
     void fn_801FC444();
     void fn_801FC454();
-    void fn_8035BE04(void* audio);
-    void fn_8035BE74(void* audio);
     TU80252180Scene* fn_80253E18();
     void fn_80253E24(TU80252180Scene* scene);
 }
@@ -293,7 +291,7 @@ void UnidentifiedHBMManager::fn_80248008()
     HBMCreate(&mDataInfo);
     HBMSetAdjustFlag(fn_80273B00());
     mActive = true;
-    fn_8035BE04(lbl_806E2020);
+    g_pAudioBackend->SuspendControllerSpeakers();
     HBMCreateSound((const char*)mSoundData, mSoundWork, 0x19000);
     HBMInit();
 
@@ -352,7 +350,7 @@ void UnidentifiedHBMManager::fn_802480EC()
         if (gpHBMManager->mActive)
         {
             gpHBMManager->mActive = false;
-            fn_8035BE74(lbl_806E2020);
+            g_pAudioBackend->ResumeControllerSpeakers();
             if (gpHBMManager->mPreviousTaskState != 1)
             {
                 ResumeAllAudio();

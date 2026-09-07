@@ -21,7 +21,7 @@ void LoadingTask::Run(float dt)
 {
     mElapsed += dt;
 
-    g_pPadManager->fn_802C084C(0);
+    g_pPadManager->SetActivePadSet(0);
     fn_8037537C(g_pPlatPadManager);
     g_pPadManager->Update(dt);
     FlickDetection::Update();

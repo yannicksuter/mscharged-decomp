@@ -26,9 +26,6 @@ extern "C"
 {
     extern unsigned long lbl_806E1F0C;
 
-    EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
-    EmissionController* fn_802E7FE4(
-        EmissionManager*, EffectsGroup*, int, bool, bool);
 }
 
 GLView* ModeledScreenTransition::s_3DView;
@@ -453,10 +450,10 @@ void ModeledScreenTransition::Reset()
         for (int i = 0; i < numLeafNodes; i++)
         {
             EmissionManager* manager = EmissionManager::Instance();
-            EffectsGroup* group = fn_802E7CDC(manager, m_EffectName);
+            EffectsGroup* group = manager->GetEffectsGroup(m_EffectName);
             m_Effects[i]
-                = fn_802E7FE4(EmissionManager::Instance(), group,
-                    0, true, false);
+                = EmissionManager::Instance()->Create(group,
+                    0, true, 0);
             m_Effects[i]->m_pContext = s_3DView;
         }
     }
@@ -482,7 +479,7 @@ ModeledScreenTransition* ModeledScreenTransition::LoadFromParser(
         {
             m_nTexture = glHash(parser->NextTokenOnLine(true));
             m_Unknown20
-                = fn_802CDF0C()->fn_802CE1B8(m_nTexture);
+                = glGetTextureManager()->GetTextureIndex(m_nTexture);
         }
         else if (nlStrCmp(pToken, "name") == 0)
         {

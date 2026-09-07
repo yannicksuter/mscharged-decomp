@@ -218,7 +218,16 @@ void SimpleInputRouter::RouterVirtual1C()
     int frame = lbl_806E2138->mFrameProvider->GetFrame();
     if (mLastGameFrame != frame)
     {
-        mCurrentCRC = 0;
+        if (IsNetworkOrRecordedGame())
+        {
+            mCurrentCRC = lbl_806E2138->mEnabled
+                ? lbl_806E2138->mFrameProvider->CalculateChecksum()
+                : lbl_806E2138->mFrameProvider->WriteSyncLog();
+        }
+        else
+        {
+            mCurrentCRC = 0;
+        }
         mLastGameFrame = frame;
     }
 }
@@ -451,3 +460,5 @@ typedef char VerifyInputQueueSize[
     (sizeof(NetworkInputMessageQueue) == 0x3850) ? 1 : -1];
 typedef char VerifyNetworkInputRouterSize[
     (sizeof(NetworkInputRouter) == 0xE5C8) ? 1 : -1];
+
+#include "NL/nlBind_impl.h"

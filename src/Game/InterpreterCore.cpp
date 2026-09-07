@@ -11,11 +11,6 @@
 
 typedef void (*InterpreterOperation)(InterpreterCore*);
 
-inline TweakValueImpl_804F4DC8::TweakValueImpl_804F4DC8(float* value)
-    : m_pValue(value)
-{
-}
-
 inline TweakValueIntImpl_804FD898::TweakValueIntImpl_804FD898(int* value)
     : m_pValue(value)
 {

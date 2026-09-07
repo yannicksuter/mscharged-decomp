@@ -284,16 +284,15 @@ UnidentifiedStateMachine_803171D0::UnidentifiedStateMachine_803171D0(
     nlStrNCat(functionName, functionName, name, 63);
     mUnidentified090 = nlStringHash(functionName);
 
-    UnidentifiedFuzzyRuntimeBase* runtime = fn_80311734(this);
-    if (fn_802DF3E4(runtime, &mUnidentified088) == 0)
+    if (!fn_80311734(this)->FunctionExists(mUnidentified088))
     {
         mUnidentified088 = 0;
     }
-    if (fn_802DF3E4(runtime, &mUnidentified08C) == 0)
+    if (!fn_80311734(this)->FunctionExists(mUnidentified08C))
     {
         mUnidentified08C = 0;
     }
-    if (fn_802DF3E4(runtime, &mUnidentified090) == 0)
+    if (!fn_80311734(this)->FunctionExists(mUnidentified090))
     {
         mUnidentified090 = 0;
     }

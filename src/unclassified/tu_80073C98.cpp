@@ -1,4 +1,5 @@
 #include "Game/GameTweaks.h"
+#include "Game/Terrain.h"
 #include "Game/GameInfo.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/DB/StadiumInfo.h"
@@ -8,12 +9,8 @@
 #include "unclassified/tu_80073898.h"
 
 extern "C" bool fn_80073BC0(void*);
-extern "C" int fn_800A9154(int, char*, unsigned long);
 extern "C" unk_800A9274* fn_800A9888(
     unk_800A9274*, const char*, const char*);
-extern "C" GameTweaks* fn_80074F04(
-    GameTweaks*, const char*, const char*);
-extern "C" void fn_800A2290(SkillTweaks*, int, bool, bool);
 
 extern const char sUnidentifiedHomeSkillCategory[];
 extern const char sUnidentifiedAwaySkillCategory[];
@@ -25,7 +22,7 @@ static const char* sSkillTweakCategories[2] = {
 };
 
 UnidentifiedTweakLoadState lbl_8056BA00;
-unk_8056CF08 lbl_8056CF08;
+unk_8056CF08 gGameTweaks;
 
 extern "C" void fn_80073C98(unk_8056CF08* state)
 {
@@ -36,7 +33,7 @@ extern "C" void fn_80073C98(unk_8056CF08* state)
     state->mUnidentified00 = terrain;
 
     char terrainName[100];
-    fn_800A9154(terrain, terrainName, sizeof(terrainName));
+    GetTerrainConfigFilename(terrain, terrainName, sizeof(terrainName));
 
     unk_800A9274* terrainTweaks =
         (unk_800A9274*)nlMalloc(sizeof(unk_800A9274), 8, false);
@@ -51,13 +48,8 @@ extern "C" void fn_80073C98(unk_8056CF08* state)
     state->mUnidentified08 = GetStadiumUnknown0x0C(stadium);
     state->mUnidentified0C = GetStadiumUnknown0x11(stadium);
 
-    GameTweaks* gameTweaks =
-        (GameTweaks*)nlMalloc(sizeof(GameTweaks), 8, false);
-    if (gameTweaks != 0)
-    {
-        gameTweaks = fn_80074F04(
-            gameTweaks, "/ini/GameTweaks.ini", "/Game/GameTweaks");
-    }
+    GameTweaks* gameTweaks = new (8, false)
+        GameTweaks("/ini/GameTweaks.ini", "/Game/GameTweaks");
     state->m_pGameTweaks = gameTweaks;
 
     state->m_unk14 =
@@ -131,8 +123,8 @@ extern "C" void fn_80073C98(unk_8056CF08* state)
         GameInfoManager::Instance()->mCurrentDifficulty[0] = difficulties[0];
         GameInfoManager::Instance()->mCurrentDifficulty[1] = difficulties[1];
     }
-    fn_800A2290(state->mUnidentified18, difficulties[0], true, false);
-    fn_800A2290(state->mUnidentified1C, difficulties[1], true, false);
+    state->mUnidentified18->Init(difficulties[0], true, false);
+    state->mUnidentified1C->Init(difficulties[1], true, false);
 }
 
 extern "C" bool fn_80074198(void*)

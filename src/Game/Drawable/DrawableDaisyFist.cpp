@@ -5,7 +5,7 @@
 #include "NL/gl/glView.h"
 #include "NL/nlMath.h"
 #include "NL/platvmath.h"
-#include "unclassified/tu_8019D6B4.h"
+#include "Game/Render/DaisyFist.h"
 
 // Charged-only render snapshot of one Daisy crystal fist. Like the other
 // gameplay-object snapshots it spins the prop about Z from a 16-bit angle unit,

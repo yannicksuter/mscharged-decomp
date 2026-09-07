@@ -149,7 +149,7 @@ static UnidentifiedMemoryRequirement_80376664 lbl_80509540[3] = {
 };
 
 static u32 sCountryCode;
-GameAudio_800EB6AC* g_pGameAudio;
+GameAudio* g_pGameAudio;
 bool g_e3_Build;
 bool lbl_806E1091;
 nlLocalization::nlLanguage g_Language;
@@ -451,8 +451,8 @@ static void Initialize()
     nlTaskManager::Startup(0x10000);
     sLoadingTask.Start();
     InstallImageRenderCallback();
-    g_pGameAudio = new (nlMalloc(sizeof(GameAudio_800EB6AC), 8, false))
-        GameAudio_800EB6AC;
+    g_pGameAudio = new (nlMalloc(sizeof(GameAudio), 8, false))
+        GameAudio;
     g_pGameAudio->Initialize();
     FlickDetection::Initialize();
     networkUpdateTask.Initialize();
@@ -563,7 +563,7 @@ extern "C" void fn_8011D5B0(void* writer, void* source,
 
 void AudioUpdateTask::Run(float dt)
 {
-    static_cast<GameAudio_800EB6AC*>(lbl_806E201C)->Update(dt);
+    static_cast<GameAudio*>(g_pAudioSystem)->Update(dt);
 }
 
 int main()

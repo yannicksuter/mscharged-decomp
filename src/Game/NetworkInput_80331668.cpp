@@ -1,6 +1,6 @@
 #include "Game/NetworkInput_80331668.h"
 
-#include "unclassified/tu_80331BE4.h"
+#include "Game/DetInput.h"
 
 extern "C" void fn_80331668(InputRouterRecord* record, const DetInput* input)
 {

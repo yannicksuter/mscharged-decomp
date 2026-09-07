@@ -16,7 +16,7 @@ extern "C" void fn_801CBC54(
         return;
     }
 
-    fn_800EBBFC(
+    PlaySound(
         slotId, cueId, debugName != 0 ? debugName : "FESFX", context);
 }
 
@@ -31,7 +31,7 @@ extern "C" void fn_801CBC78(
         return;
     }
 
-    fn_800EBF78(
+    PlayTrackedSound(
         slotId, cueId, debugName != 0 ? debugName : "FESFX", context, true);
 }
 
@@ -46,23 +46,23 @@ extern "C" void fn_801CBCA0(
         return;
     }
 
-    fn_800EBF78(sUnidentifiedAudioCategory, cueId,
+    PlayTrackedSound(sUnidentifiedAudioCategory, cueId,
         debugName != 0 ? debugName : "FESFX", context, restartable);
 }
 
 extern "C" void fn_801CBCE4(unsigned long cueId, void* context)
 {
-    fn_800EC12C(cueId, context);
+    StopSound(cueId, context);
 }
 
 extern "C" void fn_801CBCE8(unsigned long cueId, void* context)
 {
-    fn_800EC2A4(cueId, context);
+    PauseSound(cueId, context);
 }
 
 extern "C" void fn_801CBCEC(unsigned long cueId, void* context)
 {
-    fn_800EC400(cueId, context);
+    ResumeSound(cueId, context);
 }
 
 void FEAudio::EnableSounds(bool enable)
@@ -77,7 +77,7 @@ extern "C" void fn_801CBCF8(int category)
 
 extern "C" bool fn_801CBD00(unsigned long cueId, void* context)
 {
-    XSoundHandle_802ED74C* handle = fn_800EBEF4(cueId, context);
+    XSoundHandle* handle = FindSoundHandle(cueId, context);
     if (handle == 0)
     {
         return true;

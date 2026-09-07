@@ -1,8 +1,8 @@
 #include "unclassified/tu_802639C4.h"
 
-#include "Game/Audio/AudioBankTable_802EB644.h"
-#include "Game/Audio/AudioBundleManager_802EDA7C.h"
-#include "Game/Audio/AudioLoadMode_806E201C.h"
+#include "Game/Audio/AudioBankTable.h"
+#include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioSystem.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feScene.h"
@@ -102,7 +102,7 @@ void TU802639C4Scene::Update(float fDeltaT)
         {
             mUnidentified28 = 4;
             mUnidentified1C = 0.0f;
-            lbl_806E201C->GetBundleManager()->GetSoundMap()->fn_802EBC9C(0x17);
+            g_pAudioSystem->GetBundleManager()->GetSoundMap()->UnloadBank(0x17);
         }
     }
     else if (mUnidentified28 == 4)

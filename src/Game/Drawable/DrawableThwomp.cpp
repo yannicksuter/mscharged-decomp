@@ -109,7 +109,7 @@ static void DrawShadow(ThwompObject* object, const nlMatrix4& matrix, void* mate
 
     if (material == 0)
     {
-        material = fn_8027262C();
+        material = GetUnshadowedView();
     }
     quad.Attach((eGLView)(u32)material, 0);
 }

@@ -7,7 +7,7 @@
 
 #include "unclassified/tu_80284A58.h"
 
-#include "unclassified/tu_801AD15C.h"
+#include "Game/Render/PeachPhoto.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/Ball.h"
@@ -32,7 +32,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "types.h"
-#include "unclassified/tu_80331BE4.h"
+#include "Game/DetInput.h"
 #include "unclassified/tu_80332DC0.h"
 #include "unclassified/tu_80336B2C.h"
 #include "unclassified/tu_80338898.h"
@@ -199,7 +199,7 @@ u32 FixedUpdateTask::WriteSyncLog()
             if (copy != 0)
             {
                 copy->m_pPrevInput = 0;
-                copy->m_pMyUser = (void*)pad->fn_80332748();
+                copy->m_pMyUser = (void*)pad->GetPadID();
                 fn_80339450(cache, lbl_806DF740, copy, &checksum);
             }
         }
@@ -340,7 +340,7 @@ void FixedUpdateTask::Run(float dt)
         while (g_bRunSimAndRenderInLockStep
             || mAccumulatedDeltaT >= g_fFixedUpdateTick)
         {
-            g_pPadManager->fn_802C084C(1);
+            g_pPadManager->SetActivePadSet(1);
             simulationTick = g_fFixedUpdateTick;
             fn_8037537C(g_pPlatPadManager);
             g_pPadManager->Update(simulationTick);
@@ -389,7 +389,7 @@ void FixedUpdateTask::Run(float dt)
         }
     }
 
-    g_pPadManager->fn_802C084C(0);
+    g_pPadManager->SetActivePadSet(0);
     fn_8037537C(g_pPlatPadManager);
     g_pPadManager->Update(dt);
     FlickDetection::Update();
@@ -461,7 +461,7 @@ void FixedUpdateTask::CallFixedUpdateTasks()
     }
 
     mEventDispatcher.Dispatch(true);
-    fn_801AD7E4(&gPeachPhotoState, g_fSimulationTick, lbl_806E2130--);
+    UpdatePeachPhoto(&gPeachPhotoState, g_fSimulationTick, lbl_806E2130--);
     ReplayManager::Instance()->GrabSnapshot();
 }
 

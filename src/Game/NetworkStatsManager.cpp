@@ -143,8 +143,7 @@ NetworkLeaderboardCategory* NetworkStatsManager_8012F378::GetCategory(
 
 bool NetworkStatsManager_8012F378::RequestRankings(int category)
 {
-    NetworkStatsInterface* stats = g_pNetworkSession->fn_8012170C();
-    stats->SetListener(this);
+    g_pNetworkSession->fn_8012170C()->SetListener(this);
     if (mOperation != 0)
     {
         return false;
@@ -153,7 +152,7 @@ bool NetworkStatsManager_8012F378::RequestRankings(int category)
     mRequestedCategory = category;
     NetworkLeaderboardCategory& leaderboard = mCategories[category];
     leaderboard.mAvailable = false;
-    if (stats->GetLeaderboardStats(leaderboard.mPersistentCategory,
+    if (g_pNetworkSession->fn_8012170C()->GetLeaderboardStats(leaderboard.mPersistentCategory,
             leaderboard.mFilter,
             65,
             leaderboard.mPlayers,

@@ -96,6 +96,9 @@ public:
         GLView* translucentView, const cPoseAccumulator& poseAccumulator,
         const nlMatrix4* worldMatrix);
 
+    void SetReplacementTexture(unsigned long texture);
+    void PlayAnimation(const char* name, float blendTime, ePlayMode playMode);
+
     /* 0x04 */ nlMatrix4 mWorldMatrix;
     /* 0x44 */ cPN_SAnimController* mAnimController;
     /* 0x48 */ cPoseAccumulator* mPoseAccumulator;
@@ -123,10 +126,6 @@ extern "C" void fn_802DB22C(
 extern "C" void fn_802DB26C(ImpostorModel_802DAEE0* model);
 extern "C" void fn_802DB2B8(
     ImpostorModel_802DAEE0* model, float time);
-extern "C" void fn_802DB4EC(
-    ImpostorModel_802DAEE0* model, unsigned long texture);
-extern "C" void fn_802DB528(ImpostorModel_802DAEE0* model,
-    const char* name, float blendTime, ePlayMode playMode);
 extern "C" void fn_802DB6CC(ImpostorModel_802DAEE0* model,
     cSAnim& anim, ePlayMode playMode, const AnimRetarget* retarget);
 extern "C" void fn_802DB79C(ImpostorModel_802DAEE0* model);

@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsBall.h"
+#include "Game/Terrain.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/Ball.h"
@@ -23,8 +24,6 @@ float lbl_806DCA84 = 0.07f;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
-extern "C" float fn_800A92A4(void*, float);
-extern "C" float fn_800A92C8(void*, float);
 extern "C" void fn_8013F854(const char*, ...);
 extern float lbl_806E11E8;
 
@@ -122,8 +121,7 @@ bool PhysicsBall::SetContactInfo(
     {
         if (objType == 0x12)
         {
-            contact->surface.bounce = fn_800A92C8(
-                g_pGame->mUnidentified10D8, g_BallBounceGround);
+            contact->surface.bounce = g_pGame->mpTerrain->GetRestitution(g_BallBounceGround);
         }
         else if (objType == 0x16 || objType == 0x17)
         {
@@ -199,8 +197,7 @@ void PhysicsBall::PostUpdate()
 
         if (linVel.z < 0.0f)
         {
-            linVel.z *= -fn_800A92C8(
-                g_pGame->mUnidentified10D8, g_BallBounceGround);
+            linVel.z *= -g_pGame->mpTerrain->GetRestitution(g_BallBounceGround);
             SetLinearVelocity(linVel);
             mfBallAirResistance = g_BallAirResistance;
         }
@@ -353,9 +350,7 @@ void PhysicsBall::AddResistanceForces()
                 true);
             if (speed > 0.01f)
             {
-                float factor = -fn_800A92A4(
-                                   g_pGame->mUnidentified10D8,
-                                   g_BallRollingResistance)
+                float factor = -g_pGame->mpTerrain->GetRollingResistance(g_BallRollingResistance)
                              / speed;
                 resistance.x = factor * velocity.x;
                 resistance.y = factor * velocity.y;

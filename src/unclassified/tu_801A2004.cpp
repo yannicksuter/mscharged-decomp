@@ -40,29 +40,10 @@ extern "C" void fn_801A2004(
         *values->miHighRangeIndex.m_pValue = 6;
     }
 
-    registered = values->mfHighRangeMult.fn_802C4FEC(
-        "mfHighRangeMult", 0.5f, group, true, 16.0f, 0.125f);
-    if (!registered)
-    {
-        values->mfHighRangeMult
-            = values->mfHighRangeMult.GetDefaultValue();
-    }
-    if (!registered)
-    {
-        values->mfHighRangeMult = 2.5f;
-    }
-
-    registered = values->mfHighRangeOffset.fn_802C4FEC(
-        "mfHighRangeOffset", 0.0f, group, true, 8.0f, 0.125f);
-    if (!registered)
-    {
-        values->mfHighRangeOffset
-            = values->mfHighRangeOffset.GetDefaultValue();
-    }
-    if (!registered)
-    {
-        values->mfHighRangeOffset = 3.5f;
-    }
+    values->mfHighRangeMult.BindWithDefault(
+        "mfHighRangeMult", 2.5f, group, true, 0.5f, 16.0f, 0.125f);
+    values->mfHighRangeOffset.BindWithDefault(
+        "mfHighRangeOffset", 3.5f, group, true, 0.0f, 8.0f, 0.125f);
 
     registered
         = values->miHighRangeGray.fn_802C4FEC(

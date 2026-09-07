@@ -30,7 +30,6 @@ extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_8002EDC8(cFielder*, int);
 extern "C" void fn_8003C7B0(cFielder*);
-extern "C" PlayerTweaks* fn_8003E6E4(cFielder*);
 extern "C" bool fn_8003E70C(cFielder*);
 extern "C" bool fn_8003E8A0(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
@@ -67,7 +66,7 @@ static nlVector2 sSteeringSpeedScalePoints[] = {
     { 1.5f, 1.0f },
 };
 
-static UnidentifiedVector2Array sSteeringSpeedScale(
+static nlPiecewiseLinearCurve sSteeringSpeedScale(
     sSteeringSpeedScalePoints, 6);
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static unsigned short sDesireSteeringType = 0xFFFF;
@@ -275,7 +274,7 @@ extern "C" void fn_800C6390(DesireSteering* desire,
     const nlVector3& v3Position, float fDeltaT, float fDesiredArrivalTime)
 {
     nlVector3 v3FixedPos = v3Position;
-    float fRadius = fn_8002BFA8(fn_8003E6E4(desire->mUnidentifiedFielder),
+    float fRadius = fn_8002BFA8(desire->mUnidentifiedFielder->GetTweaks(),
         desire->mUnidentifiedFielder->m_fPlayerScale);
     cField::FixOutOfBoundsPosition(v3FixedPos, fRadius, false);
 
@@ -351,7 +350,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
     nlVector3 v3FixedPos = v3Pos;
     cFielder* pFielder = desire->mUnidentifiedFielder;
     float fRadius = fn_8002BFA8(
-        fn_8003E6E4(pFielder), pFielder->m_fPlayerScale);
+        pFielder->GetTweaks(), pFielder->m_fPlayerScale);
     cField::FixOutOfBoundsPosition(v3FixedPos, fRadius, false);
 
     float fDeltaX = v3FixedPos.x - pFielder->m_v3Position.x;
@@ -380,7 +379,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
     }
 
     float fSpeedPercent = 0.0f;
-    GameTweaks* pGameTweaks = lbl_8056CF08.m_pGameTweaks;
+    GameTweaks* pGameTweaks = gGameTweaks.m_pGameTweaks;
     switch (desire->m_ePositionSeekState)
     {
     case PSS_ARRIVED:
@@ -446,16 +445,16 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
         switch (desire->m_ePositionSeekState)
         {
         case PSS_NEAR_SEEKING:
-            fMinSpeed = fn_8002CE14(fn_8003E6E4(pFielder));
-            fMaxSpeed = fn_8002BFB8(fn_8003E6E4(pFielder));
+            fMinSpeed = fn_8002CE14(pFielder->GetTweaks());
+            fMaxSpeed = fn_8002BFB8(pFielder->GetTweaks());
             if (fMinSpeed > fMaxSpeed)
             {
                 fMinSpeed = fMaxSpeed;
             }
             break;
         case PSS_FAR_SEEKING:
-            fMinSpeed = fn_8002BFB8(fn_8003E6E4(pFielder));
-            fMaxSpeed = fn_8002C254(fn_8003E6E4(pFielder));
+            fMinSpeed = fn_8002BFB8(pFielder->GetTweaks());
+            fMaxSpeed = fn_8002C254(pFielder->GetTweaks());
             break;
         default:
             break;
@@ -463,7 +462,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
 
         if (turboRequest == TR_FORCED_OFF)
         {
-            float fRunningSpeed = fn_8002BFB8(fn_8003E6E4(pFielder));
+            float fRunningSpeed = fn_8002BFB8(pFielder->GetTweaks());
             if (fMaxSpeed > fRunningSpeed)
             {
                 fMaxSpeed = fRunningSpeed;
@@ -473,7 +472,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
             || (turboRequest == TR_MOVING_TARGET
                 && (float)fabs(fDesiredPositionRateOfChange) > 0.0001f))
         {
-            fMinSpeed = fn_8002C254(fn_8003E6E4(pFielder));
+            fMinSpeed = fn_8002C254(pFielder->GetTweaks());
             fMaxSpeed = fMinSpeed;
         }
     }
@@ -482,16 +481,16 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
         switch (desire->m_ePositionSeekState)
         {
         case PSS_NEAR_SEEKING:
-            fMinSpeed = fn_8002CE14(fn_8003E6E4(pFielder));
-            fMaxSpeed = fn_8002C328(fn_8003E6E4(pFielder));
+            fMinSpeed = fn_8002CE14(pFielder->GetTweaks());
+            fMaxSpeed = fn_8002C328(pFielder->GetTweaks());
             if (fMinSpeed > fMaxSpeed)
             {
                 fMinSpeed = fMaxSpeed;
             }
             break;
         case PSS_FAR_SEEKING:
-            fMinSpeed = fn_8002C328(fn_8003E6E4(pFielder));
-            fMaxSpeed = fn_8002C328(fn_8003E6E4(pFielder));
+            fMinSpeed = fn_8002C328(pFielder->GetTweaks());
+            fMaxSpeed = fn_8002C328(pFielder->GetTweaks());
             break;
         default:
             break;
@@ -499,7 +498,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
 
         if (turboRequest == TR_FORCED_OFF)
         {
-            float fRunningSpeed = fn_8002C328(fn_8003E6E4(pFielder));
+            float fRunningSpeed = fn_8002C328(pFielder->GetTweaks());
             if (fMaxSpeed > fRunningSpeed)
             {
                 fMaxSpeed = fRunningSpeed;
@@ -509,8 +508,8 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
             || (turboRequest == TR_MOVING_TARGET
                 && (float)fabs(fDesiredPositionRateOfChange) > 0.0001f))
         {
-            fMinSpeed = fn_8002C328(fn_8003E6E4(pFielder));
-            fMaxSpeed = fn_8002C328(fn_8003E6E4(pFielder));
+            fMinSpeed = fn_8002C328(pFielder->GetTweaks());
+            fMaxSpeed = fn_8002C328(pFielder->GetTweaks());
         }
     }
 
@@ -574,20 +573,20 @@ extern "C" eStrafeDirection fn_800C7348(DesireSteering* desire,
         || pFielder->mActionRunningVars.eLastStrafeDirection == 2)
     {
         fTransitionToForwardDelta
-            = lbl_8056CF08.m_pGameTweaks->nStrafeToRunOutDirectionDelta;
+            = gGameTweaks.m_pGameTweaks->nStrafeToRunOutDirectionDelta;
         fTransitionToBackWardsDelta
-            = lbl_8056CF08.m_pGameTweaks->nBackwardsToStrafeRunOutDirectionDelta;
+            = gGameTweaks.m_pGameTweaks->nBackwardsToStrafeRunOutDirectionDelta;
     }
     else
     {
         fTransitionToForwardDelta
-            = lbl_8056CF08.m_pGameTweaks->nStrafeToRunInDirectionDelta;
+            = gGameTweaks.m_pGameTweaks->nStrafeToRunInDirectionDelta;
         fTransitionToBackWardsDelta
-            = lbl_8056CF08.m_pGameTweaks->nBackwardsToStrafeRunInDirectionDelta;
+            = gGameTweaks.m_pGameTweaks->nBackwardsToStrafeRunInDirectionDelta;
     }
 
-    float fJoggingSpeed = fn_8002BFB8(fn_8003E6E4(pFielder));
-    float fRunningSpeed = fn_8002C254(fn_8003E6E4(pFielder));
+    float fJoggingSpeed = fn_8002BFB8(pFielder->GetTweaks());
+    float fRunningSpeed = fn_8002C254(pFielder->GetTweaks());
     float fRunThreshold
         = 0.5f * (fRunningSpeed - fJoggingSpeed) + fJoggingSpeed;
 
@@ -969,8 +968,8 @@ void UnidentifiedDesire35::UnidentifiedUpdate(
     }
 
     float fSpeed = pFielder->m_pBall != NULL
-                 ? fn_8002C328(fn_8003E6E4(pFielder))
-                 : fn_8002C254(fn_8003E6E4(pFielder));
+                 ? fn_8002C328(pFielder->GetTweaks())
+                 : fn_8002C254(pFielder->GetTweaks());
     pFielder->m_fDesiredSpeed = fSpeed;
     pFielder->mUnidentified3E0 -= fDeltaT;
     if (pFielder->mUnidentified3E0 <= 0.0f)

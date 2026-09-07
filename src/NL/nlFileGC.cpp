@@ -10,15 +10,6 @@
 #include <stdio.h>
 #include <string.h>
 
-extern "C"
-{
-    s32 DVDConvertPathToEntrynum(const char* path);
-    BOOL DVDFastOpen(s32 entryNum, DVDFileInfo* info);
-    BOOL DVDClose(DVDFileInfo* info);
-    BOOL DVDReadAsyncPrio(DVDFileInfo* info, void* buffer, s32 size, s32 offset,
-        DVDAsyncCallback callback, s32 priority);
-}
-
 class DolphinFile;
 class DolphinFileAllocator_80589450;
 class AsyncManager;
@@ -130,7 +121,8 @@ struct AsyncEntry
     /* 0x0C */ DVDFileInfo mFileInfo;
     /* 0x48 */ void* m_pBuffer;
     /* 0x4C */ unsigned long m_uSize;
-    /* 0x50 */ unsigned long mPositionAndPhase;
+    /* 0x50 */ unsigned long m_uPosition : 30;
+    /* 0x50 */ unsigned long Phase : 2;
     /* 0x54 */ void* mTailBuffer;
     /* 0x58 */ ReadAsyncCallback m_pFunc;
     /* 0x5C */ unsigned long m_uParam;
@@ -164,7 +156,7 @@ static unsigned long AlignUp32(unsigned long value)
     return value + (remainder != 0) * (32 - remainder);
 }
 
-extern "C" bool fn_803679A0(AsyncEntry* entry);
+bool IsAsyncReadBusy(AsyncEntry* entry);
 
 static bool CheckDVDStatus()
 {
@@ -330,7 +322,7 @@ void AsyncManager::CancelPendingReads(DolphinFile* pFile, CancelAsyncCallback ca
     {
         AsyncEntry* next = entry->m_next;
         BOOL interrupts = OSDisableInterrupts();
-        if (entry->m_pFile == pFile && !fn_803679A0(entry))
+        if (entry->m_pFile == pFile && !IsAsyncReadBusy(entry))
         {
             --pFile->PendingAsync;
             mCurrent = entry;
@@ -368,14 +360,14 @@ AsyncEntry* AsyncManager::AddEntry(DolphinFile* pFile, ReadAsyncCallback pFunc,
     pEntry->m_pBuffer = pBuffer;
     pEntry->m_uSize = uSize;
     pEntry->m_uParam = uParam;
-    pEntry->mPositionAndPhase = (pEntry->mPositionAndPhase & 3) | (position << 2);
-    pEntry->mPositionAndPhase = (pEntry->mPositionAndPhase & ~3) | ((unsigned long)phase & 3);
+    pEntry->m_uPosition = position;
+    pEntry->Phase = phase;
 
     DVDFastOpen(pFile->mEntryNum, &pEntry->mFileInfo);
     nlDLRingAddEnd(&m_activeEntryList, pEntry);
 
     void* readBuffer = (phase & READ_TAIL) != 0 ? pEntry->mTailBuffer : pBuffer;
-    DVDReadAsyncPrio(&pEntry->mFileInfo, readBuffer, AlignUp32(uSize), pEntry->mPositionAndPhase >> 2, 0, 2);
+    DVDReadAsyncPrio(&pEntry->mFileInfo, readBuffer, AlignUp32(uSize), pEntry->m_uPosition, 0, 2);
     return pEntry;
 }
 
@@ -411,7 +403,7 @@ int AsyncManager::Service()
             }
         }
 
-        AsyncReadPhase phase = (AsyncReadPhase)(entry->mPositionAndPhase & 3);
+        AsyncReadPhase phase = (AsyncReadPhase)entry->Phase;
         if (phase == READ_HEAD)
         {
             entry = entry->m_next;
@@ -499,12 +491,13 @@ AsyncManager::AsyncManager()
     {
         AsyncEntry* entry = &m_asyncEntries[i];
         entry->mTailBuffer = mTailBuffers + i * 32;
-        entry->mPositionAndPhase = 0;
+        entry->m_uPosition = 0;
+        entry->Phase = READ_HEAD;
         nlDLRingAddEnd(&m_freeEntryList, entry);
     }
 }
 
-extern "C" AsyncEntry* fn_803675D4()
+AsyncEntry* nlGetCurrentAsyncRead()
 {
     return s_pAsyncManager->mCurrent;
 }
@@ -579,7 +572,7 @@ void nlSeek(nlFile* file, unsigned int offset, unsigned long origin)
     }
 }
 
-extern "C" void* fn_803678B0(const char* fileName, unsigned long* outSize,
+void* nlLoadEntireHostFile(const char* fileName, unsigned long* outSize,
     unsigned int alignment, eAllocType type, void* target)
 {
     void* buffer = 0;
@@ -587,9 +580,9 @@ extern "C" void* fn_803678B0(const char* fileName, unsigned long* outSize,
     if (file != 0)
     {
         fseek(file, 0, 2);
-        unsigned long size = ftell(file);
-        *outSize = size;
+        *outSize = ftell(file);
         fseek(file, 0, 0);
+        unsigned long size = *outSize;
 
         if (size != 0)
         {
@@ -597,9 +590,13 @@ extern "C" void* fn_803678B0(const char* fileName, unsigned long* outSize,
             {
                 buffer = target;
             }
+            else if (type == AllocateEnd)
+            {
+                buffer = nlMalloc(size, alignment, true);
+            }
             else
             {
-                buffer = nlMalloc(size, alignment, type == AllocateEnd);
+                buffer = nlMalloc(size, alignment, false);
             }
             fread(buffer, 1, size, file);
         }
@@ -612,7 +609,7 @@ extern "C" void* fn_803678B0(const char* fileName, unsigned long* outSize,
     return buffer;
 }
 
-extern "C" bool fn_803679A0(AsyncEntry* entry)
+bool IsAsyncReadBusy(AsyncEntry* entry)
 {
     switch (DVDGetCommandBlockStatus(&entry->mFileInfo.block))
     {
@@ -621,9 +618,9 @@ extern "C" bool fn_803679A0(AsyncEntry* entry)
     case DVD_STATE_WAITING:
         return false;
     case DVD_STATE_IDLE:
-        if ((entry->mPositionAndPhase & 3) == READ_HEAD)
+        if (entry->Phase == READ_HEAD)
         {
-            return fn_803679A0(entry->m_next);
+            return IsAsyncReadBusy(entry->m_next);
         }
         return true;
     }
@@ -639,13 +636,13 @@ bool nlAsyncReadsPending(nlFile* file)
     return s_pAsyncManager->m_activeEntryList != 0;
 }
 
-extern "C" bool fn_80367B70(AsyncEntry* entry)
+bool nlAsyncReadBusy(AsyncEntry* entry)
 {
     if (!s_pAsyncManager->Contains(entry))
     {
         return false;
     }
-    return fn_803679A0(entry);
+    return IsAsyncReadBusy(entry);
 }
 
 void nlCancelPendingAsyncReads(nlFile* pFile, CancelAsyncCallback callback)
@@ -656,7 +653,7 @@ void nlCancelPendingAsyncReads(nlFile* pFile, CancelAsyncCallback callback)
     }
 }
 
-extern "C" bool fn_80367DAC(AsyncEntry* entry, CancelAsyncCallback callback)
+bool nlCancelAsyncRead(AsyncEntry* entry, CancelAsyncCallback callback)
 {
     return s_pAsyncManager->Cancel(entry, callback);
 }

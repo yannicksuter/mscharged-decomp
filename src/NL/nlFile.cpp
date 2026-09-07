@@ -7,11 +7,8 @@
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
 
-extern "C"
-{
-    void fn_802B3BA0(nlFile*, void*, unsigned int, unsigned long, ReadAsyncCallback);
-    void (*lbl_806E1D98)(void*, unsigned long, void*, LoadAsyncCallback);
-}
+void nlCancelEntireFileLoadCallback(nlFile*, void*, unsigned int, unsigned long, ReadAsyncCallback);
+void (*sCancelFileLoadCallback)(void*, unsigned long, void*, LoadAsyncCallback);
 
 struct AsyncFileLoadData
 {
@@ -185,22 +182,22 @@ unsigned int nlLoadEntireFileAsync(const char* filename, LoadAsyncCallback callb
     return result;
 }
 
-extern "C" bool fn_802B3B38(unsigned int handle, void (*callback)(void*, unsigned long, void*, LoadAsyncCallback))
+bool nlCancelEntireFileLoad(unsigned int handle, void (*callback)(void*, unsigned long, void*, LoadAsyncCallback))
 {
-    if (fn_80367B70((AsyncEntry*)handle))
+    if (nlAsyncReadBusy((AsyncEntry*)handle))
         return false;
 
-    lbl_806E1D98 = callback;
-    fn_80367DAC((AsyncEntry*)handle, fn_802B3BA0);
-    lbl_806E1D98 = 0;
+    sCancelFileLoadCallback = callback;
+    nlCancelAsyncRead((AsyncEntry*)handle, nlCancelEntireFileLoadCallback);
+    sCancelFileLoadCallback = 0;
     return true;
 }
 
-extern "C" void fn_802B3BA0(nlFile*, void* pBuffer, unsigned int, unsigned long uParam, ReadAsyncCallback)
+void nlCancelEntireFileLoadCallback(nlFile*, void* pBuffer, unsigned int, unsigned long uParam, ReadAsyncCallback)
 {
     AsyncFileLoadData* p = (AsyncFileLoadData*)uParam;
-    if (lbl_806E1D98 != 0)
-        lbl_806E1D98(p->alloc_data, p->datasize, p->user_data, p->callback);
+    if (sCancelFileLoadCallback != 0)
+        sCancelFileLoadCallback(p->alloc_data, p->datasize, p->user_data, p->callback);
 
     nlFree(pBuffer);
     delete p->file;

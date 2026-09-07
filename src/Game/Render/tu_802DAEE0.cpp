@@ -216,34 +216,32 @@ void ImpostorModel_802DAEE0::UnidentifiedVirtual14(GLView* opaqueView,
     mLastModel = model;
 }
 
-extern "C" void fn_802DB4EC(
-    ImpostorModel_802DAEE0* model, unsigned long texture)
+void ImpostorModel_802DAEE0::SetReplacementTexture(unsigned long texture)
 {
-    model->mReplacementTexture = texture;
-    model->mResolvedTexture = fn_802CDF0C()->fn_802CE1B8(model->mReplacementTexture);
+    mReplacementTexture = texture;
+    mResolvedTexture = glGetTextureManager()->GetTextureIndex(mReplacementTexture);
 }
 
-extern "C" void fn_802DB528(ImpostorModel_802DAEE0* model,
-    const char* name, float blendTime, ePlayMode playMode)
+void ImpostorModel_802DAEE0::PlayAnimation(const char* name, float blendTime, ePlayMode playMode)
 {
-    cSAnim* anim = model->mAnimations->Find(const_cast<char*>(name));
+    cSAnim* anim = mAnimations->Find(const_cast<char*>(name));
 
     cPN_SAnimController* controller = new cPN_SAnimController(
         anim, 0, playMode, 0, 0, false);
-    if (model->mPoseTree != 0 && blendTime > 0.0f)
+    if (mPoseTree != 0 && blendTime > 0.0f)
     {
-        model->mPoseTree = new cPN_Blender(
-            model->mPoseTree, controller, blendTime);
+        mPoseTree = new cPN_Blender(
+            mPoseTree, controller, blendTime);
     }
     else
     {
-        if (model->mPoseTree != 0)
+        if (mPoseTree != 0)
         {
-            delete model->mPoseTree;
+            delete mPoseTree;
         }
-        model->mPoseTree = controller;
+        mPoseTree = controller;
     }
-    model->mAnimController = controller;
+    mAnimController = controller;
 }
 
 extern "C" void fn_802DB6CC(ImpostorModel_802DAEE0* model,
@@ -285,7 +283,7 @@ extern "C" void fn_802DB79C(ImpostorModel_802DAEE0* model)
                         if (fn_802CC8FC(packet, parameter))
                         {
                             unsigned long texture = fn_802CC7E4(packet, parameter);
-                            unsigned long resolvedTexture = fn_802CDF0C()->fn_802CE1B8(texture);
+                            unsigned long resolvedTexture = glGetTextureManager()->GetTextureIndex(texture);
                             fn_802CC4FC(packet, parameter, &resolvedTexture);
                         }
                     }

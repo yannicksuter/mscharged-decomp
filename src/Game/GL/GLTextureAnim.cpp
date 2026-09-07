@@ -44,16 +44,16 @@ extern "C" void fn_802D3A34(const void* data, unsigned long size,
     }
 
     resource->m_inventory->AddTextureAnim(anim->m_unk_0x04, anim);
-    fn_802CDF0C()->fn_802CE3E0(anim);
+    glGetTextureManager()->RegisterTextureAnim(anim);
 }
 
 extern "C" void fn_802D3B68(GLTextureAnim* anim)
 {
-    TextureManager_802CDF0C* manager = fn_802CDF0C();
+    glTextureManager* manager = glGetTextureManager();
     u32 textureHandle = anim->m_unk_0x18;
-    manager->m_08->UnidentifiedAddEnd((u16)textureHandle);
+    manager->mFreeIndices->AddEnd((u16)textureHandle);
 
-    manager->m_04[textureHandle] = 0;
+    manager->mTextures[textureHandle] = 0;
     anim->m_unk_0x18 = 0xFFFF;
 }
 
@@ -130,5 +130,5 @@ void GLTextureAnim::Update(float dt)
         }
     }
 
-    fn_802CDF0C()->fn_802CE4B8(this);
+    glGetTextureManager()->RefreshTextureAnim(this);
 }

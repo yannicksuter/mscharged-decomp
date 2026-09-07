@@ -11,6 +11,7 @@ struct SaveFrame;
 class CrowdManager
 {
 public:
+    void Initialize(void* context);
     void Uninitialize();
     void Replay(LoadFrame& frame);
     void Replay(SaveFrame& frame);

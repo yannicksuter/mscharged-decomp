@@ -2,11 +2,6 @@
 
 #include "unclassified/tu_80073898.h"
 
-inline TweakValueImpl_804F4DC8::TweakValueImpl_804F4DC8(float* value)
-    : m_pValue(value)
-{
-}
-
 GoalieTweaks::GoalieTweaks(const char* name, const char* category)
     : TweaksBase(name)
     , mUnidentified358(category)

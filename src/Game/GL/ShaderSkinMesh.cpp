@@ -3,7 +3,7 @@
 #include "Game/GL/ShaderSkinMesh.h"
 
 #include "Game/SHierarchy.h"
-#include "Game/GL/tu_802D38A4.h"
+#include "Game/GL/glModelBuilder.h"
 #include "NL/gl/glMemory.h"
 #include <string.h>
 #include "Game/PoseAccumulator.h"
@@ -238,7 +238,7 @@ void ShaderSkinMesh::PrepareToRender()
         glModelPacket* pPackets = (glModelPacket*)glFrameAlloc(
             numPackets * sizeof(glModelPacket), GLM_Header);
         memcpy(pPackets, newModel->packets, numPackets * sizeof(glModelPacket));
-        fn_802D39E8(newModel, pPackets, numPackets);
+        glSetModelPackets(newModel, pPackets, numPackets);
 
         for (unsigned long i = 0; i < newModel->numPackets; i++)
         {
@@ -247,7 +247,7 @@ void ShaderSkinMesh::PrepareToRender()
             glModelStream* pStreams = (glModelStream*)glFrameAlloc(
                 numStreams * sizeof(glModelStream), GLM_Header);
             memcpy(pStreams, pPacket->streams, numStreams * sizeof(glModelStream));
-            fn_802D39CC(pStreams, pStreams->unknown04,
+            glSetModelStream(pStreams, pStreams->unknown04,
                 (void*)pPacket->unknown28, pStreams->stride, pStreams->id);
             if (pPacket->unknown2C != 0)
             {
@@ -256,13 +256,13 @@ void ShaderSkinMesh::PrepareToRender()
                 {
                     if (pStream->id == 2)
                     {
-                        fn_802D39CC(pStream, pStream->unknown04,
+                        glSetModelStream(pStream, pStream->unknown04,
                             (void*)pPacket->unknown2C, sizeof(nlVector3), 2);
                         break;
                     }
                 }
             }
-            fn_802D39F4(pPacket, pStreams, numStreams);
+            glSetPacketStreams(pPacket, pStreams, numStreams);
         }
     }
     else

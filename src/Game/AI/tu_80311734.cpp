@@ -296,6 +296,9 @@ bool UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual2(
     FunctionEntryPoint* function, unsigned int argumentCount,
     u32 arg1, u32 arg2, u32 arg3, u32 arg4)
 {
+    ListEntry<UnidentifiedVariant_80054AB8*>* entry;
+    UnidentifiedVariant_80054AB8* value;
+
     mUnidentified05C = function->hash;
     bool result = InterpreterCore::UnidentifiedVirtual2(
         function, argumentCount, arg1, arg2, arg3, arg4);
@@ -305,16 +308,14 @@ bool UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual2(
             ? *(UnidentifiedVariant_80054AB8**)m_SP
             : 0;
 
-    ListEntry<UnidentifiedVariant_80054AB8*>* entry =
-        mUnidentified038.m_Head;
-    while (entry != 0)
+    for (entry = mUnidentified038.m_Head; entry != 0;
+         entry = entry->next)
     {
-        UnidentifiedVariant_80054AB8* value = entry->entry;
-        if (value != returnValue && value != 0)
+        value = entry->entry;
+        if (returnValue != value)
         {
             delete value;
         }
-        entry = entry->next;
     }
     mUnidentified038.Clear();
     mUnidentified05C = 0;

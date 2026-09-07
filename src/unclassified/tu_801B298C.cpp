@@ -1,4 +1,7 @@
-#include "Game/AI/UnidentifiedAvoidanceObject.h"
+#include "Game/Sys/audio.h"
+#include "Game/AI/AvoidableObject.h"
+#include "Game/Drawable/RenderObject.h"
+#include "Game/RumbleActions.h"
 #include "unclassified/tu_801B298C.h"
 
 #include "Game/AI/Fielder.h"
@@ -51,15 +54,11 @@ extern "C"
     extern const nlVector3 lbl_804DCFBC = { 0.0f, 0.0f, 1.0f };
     extern const nlVector4 lbl_804DCFC8 = { 0.1f, 0.08f, 0.0f, 0.0f };
 
-    RenderObject* fn_80276360(int, int);
     EmissionController* fn_802E7DC4(
         EmissionManager*, const char*, int, bool, bool);
     void fn_802B5370(
         nlQuaternion&, const nlVector3&, unsigned short);
-    void fn_80139D1C(int, void*);
-    void fn_800EC12C(unsigned long, void*);
-    bool fn_800EBBFC(
-        int, unsigned long, const void*, void*);
+
 }
 
 static inline void ApplyTexture(ThwompObject* object,
@@ -99,7 +98,7 @@ extern "C" ThwompObject* fn_801B298C(
     object->mTexture50 = glGetTexture(lbl_805146F8);
     object->mTexture58 = glGetTexture(lbl_80514710);
     object->mTexture60 = glGetTexture(lbl_80514720);
-    object->mDrawable = fn_80276360(8, index);
+    object->mDrawable = GetRenderObject(8, index);
 
     PhysicsObject* physics
         = new PhysicsBox_80176EF4(object, 3.14f, 2.88f, 3.5f);
@@ -112,11 +111,11 @@ extern "C" ThwompObject* fn_801B298C(
     object->mPacket48 = 0;
     object->mPacket4C = 0;
     object->mResolvedTexture54
-        = fn_802CDF0C()->fn_802CE1B8(object->mTexture50);
+        = glGetTextureManager()->GetTextureIndex(object->mTexture50);
     object->mResolvedTexture5C
-        = fn_802CDF0C()->fn_802CE1B8(object->mTexture58);
+        = glGetTextureManager()->GetTextureIndex(object->mTexture58);
     object->mResolvedTexture64
-        = fn_802CDF0C()->fn_802CE1B8(object->mTexture60);
+        = glGetTextureManager()->GetTextureIndex(object->mTexture60);
 
     for (glModelPacket* packet = object->mDrawable->m_pModel->packets;
          packet < object->mDrawable->m_pModel->packets
@@ -326,8 +325,8 @@ extern "C" void fn_801B2EAC(
         object->mUnidentified020 = lbl_806DD104;
         object->mState = 2;
         object->mUnidentified014 = new (nlMalloc(
-            sizeof(UnidentifiedAvoidancePolygon_804F4750), 8, false))
-            UnidentifiedAvoidancePolygon_804F4750(
+            sizeof(AvoidablePolygon), 8, false))
+            AvoidablePolygon(
                 3, object->mPhysics->GetPosition(), 3.14f, 2.88f);
     }
     else if (state == 3)
@@ -336,8 +335,8 @@ extern "C" void fn_801B2EAC(
         object->mPhysics->EnableCollisions();
         object->mState = 3;
         unsigned long soundID = 0x014CC818;
-        fn_800EC12C(soundID, object);
-        fn_800EBBFC(11, soundID, lbl_80514730, object);
+        StopSound(soundID, object);
+        PlaySound(11, soundID, lbl_80514730, object);
     }
     else if (state == 4)
     {
@@ -355,8 +354,8 @@ extern "C" void fn_801B2EAC(
         object->mPhysics->m_gravity = lbl_806DD110;
         object->mState = 5;
         unsigned long soundID = 0xCC0C89C5;
-        fn_800EC12C(soundID, object);
-        fn_800EBBFC(11, soundID, lbl_80514730, object);
+        StopSound(soundID, object);
+        PlaySound(11, soundID, lbl_80514730, object);
     }
     else if (state == -1)
     {
@@ -403,15 +402,15 @@ extern "C" void fn_801B3284(ThwompObject* object)
                 cFielder* player = pTeam->GetFielder(fielder);
                 if (player->GetGlobalPad() != 0)
                 {
-                    fn_80139D1C(1, player->GetGlobalPad());
+                    PlayRumbleAction(1, player->GetGlobalPad());
                 }
             }
         }
         FireCameraRumbleFilter(lbl_806DD11C, lbl_806DD120,
             lbl_806DD124, lbl_806DD128);
         unsigned long soundID = 0x9320C77E;
-        fn_800EC12C(soundID, object);
-        fn_800EBBFC(11, soundID, lbl_80514730, object);
+        StopSound(soundID, object);
+        PlaySound(11, soundID, lbl_80514730, object);
     }
 }
 
