@@ -345,15 +345,24 @@ extern "C" EmissionController* fn_802E81A0(EmissionManager* manager,
 {
     nlDLListIterator<EmissionController*> iterator
         = manager->mControllers.Begin();
-    while (iterator.hasNext())
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
     {
-        EmissionController* current = *iterator;
-        if ((pEffectsGroup == 0 || current->m_pGroup == pEffectsGroup)
-            && userData == current->m_uUserData)
+        EmissionController* controller = current->entry;
+        if ((pEffectsGroup == 0 || controller->m_pGroup == pEffectsGroup)
+            && userData == controller->m_uUserData)
         {
-            return current;
+            return controller;
         }
-        iterator.Step();
+        if (nlDLRingIsEnd(head, current) || current == 0)
+        {
+            current = 0;
+        }
+        else
+        {
+            current = current->m_next;
+        }
     }
     return 0;
 }
@@ -364,13 +373,22 @@ extern "C" EmissionController* fn_802E81A0(EmissionManager* manager,
 bool EmissionManager::IsStillAlive(EmissionController* controller)
 {
     nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
-    while (iterator.hasNext())
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
     {
-        if (*iterator == controller)
+        if (current->entry == controller)
         {
             return true;
         }
-        iterator.Step();
+        if (nlDLRingIsEnd(head, current) || current == 0)
+        {
+            current = 0;
+        }
+        else
+        {
+            current = current->m_next;
+        }
     }
     return false;
 }
@@ -382,15 +400,24 @@ void EmissionManager::Kill(
     unsigned long userData, const EffectsGroup* pEffectsGroup)
 {
     nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
-    while (iterator.hasNext())
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
     {
-        EmissionController* current = *iterator;
-        if ((pEffectsGroup == 0 || current->m_pGroup == pEffectsGroup)
-            && userData == current->m_uUserData)
+        EmissionController* controller = current->entry;
+        if ((pEffectsGroup == 0 || controller->m_pGroup == pEffectsGroup)
+            && userData == controller->m_uUserData)
         {
-            current->Die();
+            controller->Die();
         }
-        iterator.Step();
+        if (nlDLRingIsEnd(head, current) || current == 0)
+        {
+            current = 0;
+        }
+        else
+        {
+            current = current->m_next;
+        }
     }
 }
 
@@ -427,15 +454,24 @@ bool EmissionManager::IsPlaying(
     if (pEffectsGroup != 0)
     {
         nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
-        while (iterator.hasNext())
+        DLListEntry<EmissionController*>* head = iterator.m_Head;
+        DLListEntry<EmissionController*>* current = iterator.m_Curr;
+        while (current != 0)
         {
-            EmissionController* current = *iterator;
-            if (current->m_pGroup == pEffectsGroup
-                && (userData == 0 || userData == current->m_uUserData))
+            EmissionController* controller = current->entry;
+            if (controller->m_pGroup == pEffectsGroup
+                && (userData == 0 || userData == controller->m_uUserData))
             {
                 return true;
             }
-            iterator.Step();
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
         }
     }
     return false;
@@ -451,15 +487,24 @@ extern "C" bool fn_802E8544(EmissionManager* manager,
     {
         nlDLListIterator<EmissionController*> iterator
             = manager->mControllers.Begin();
-        while (iterator.hasNext())
+        DLListEntry<EmissionController*>* head = iterator.m_Head;
+        DLListEntry<EmissionController*>* current = iterator.m_Curr;
+        while (current != 0)
         {
-            EmissionController* current = *iterator;
-            if (current->m_pGroup == pEffectsGroup
-                && (userData == 0 || userData == current->m_uUserData))
+            EmissionController* controller = current->entry;
+            if (controller->m_pGroup == pEffectsGroup
+                && (userData == 0 || userData == controller->m_uUserData))
             {
-                return current->m_bPlaying;
+                return controller->m_bPlaying;
             }
-            iterator.Step();
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
         }
     }
     return false;
@@ -471,21 +516,40 @@ extern "C" bool fn_802E8544(EmissionManager* manager,
 void EmissionManager::DestroyAll(int view, bool exceptPersistent)
 {
     nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
-    while (iterator.hasNext())
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
     {
-        EmissionController* current = *iterator;
-        if (current->m_pContext == mContext
-            && current->m_View == view
+        EmissionController* controller = current->entry;
+        if (controller->m_pContext == mContext
+            && controller->m_View == view
             && (!exceptPersistent
-                || !fn_802E3D4C(current->m_pGroup)))
+                || !fn_802E3D4C(controller->m_pGroup)))
         {
-            mControllers.Remove(&iterator);
-            fn_802E4358(current);
-            delete current;
+            DLListEntry<EmissionController*>* entry = current;
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
+            nlDLRingRemove(&mControllers.m_Head, entry);
+            delete entry;
+            fn_802E4358(controller);
+            delete controller;
         }
         else
         {
-            iterator.Step();
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
         }
     }
 }
@@ -496,19 +560,38 @@ void EmissionManager::DestroyAll(int view, bool exceptPersistent)
 void EmissionManager::DestroyAll(bool exceptPersistent)
 {
     nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
-    while (iterator.hasNext())
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
     {
-        EmissionController* current = *iterator;
-        if (current->m_pContext == mContext
+        EmissionController* controller = current->entry;
+        if (controller->m_pContext == mContext
             && (!exceptPersistent
-                || !fn_802E3D4C(current->m_pGroup)))
+                || !fn_802E3D4C(controller->m_pGroup)))
         {
-            mControllers.Remove(&iterator);
-            delete current;
+            DLListEntry<EmissionController*>* entry = current;
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
+            nlDLRingRemove(&mControllers.m_Head, entry);
+            delete entry;
+            delete controller;
         }
         else
         {
-            iterator.Step();
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
         }
     }
 }
@@ -520,19 +603,38 @@ void EmissionManager::Destroy(
     unsigned long userData, const EffectsGroup* pEffectsGroup)
 {
     nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
-    while (iterator.hasNext())
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
     {
-        EmissionController* current = *iterator;
-        if ((pEffectsGroup == 0 || current->m_pGroup == pEffectsGroup)
-            && userData == current->m_uUserData)
+        EmissionController* controller = current->entry;
+        if ((pEffectsGroup == 0 || controller->m_pGroup == pEffectsGroup)
+            && userData == controller->m_uUserData)
         {
-            mControllers.Remove(&iterator);
-            fn_802E4358(current);
-            delete current;
+            DLListEntry<EmissionController*>* entry = current;
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
+            nlDLRingRemove(&mControllers.m_Head, entry);
+            delete entry;
+            fn_802E4358(controller);
+            delete controller;
         }
         else
         {
-            iterator.Step();
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
         }
     }
 }
@@ -573,11 +675,20 @@ extern "C" void fn_802E8B78(
 {
     nlDLListIterator<EmissionController*> iterator
         = manager->mControllers.Begin();
-    while (iterator.hasNext())
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
     {
-        EmissionController* current = *iterator;
-        (*callback)(current);
-        iterator.Step();
+        EmissionController* controller = current->entry;
+        (*callback)(controller);
+        if (nlDLRingIsEnd(head, current) || current == 0)
+        {
+            current = 0;
+        }
+        else
+        {
+            current = current->m_next;
+        }
     }
 }
 

@@ -52,7 +52,7 @@ public:
     virtual glModel* GetModel() = 0;
     virtual void Pose(cPoseAccumulator* pPoseAccumulator) = 0;
     virtual void PrepareToRender() = 0;
-    virtual void fn_Unknown5() = 0;
+    virtual void fn_Unknown5(nlMatrix4* matrix, int nodeIndex) = 0;
 
     void fn_802D407C(unsigned long count);
     void fn_802D40F4(unsigned long index, unsigned long id);
@@ -75,6 +75,18 @@ struct BoneMapList
         , m_pBoneIndices(0)
         , m_pMatrices(0)
     {
+    }
+
+    ~BoneMapList()
+    {
+        if (m_pBoneIndices != 0)
+        {
+            delete[] m_pBoneIndices;
+        }
+        if (m_pMatrices != 0)
+        {
+            delete[] m_pMatrices;
+        }
     }
 
     /* 0x00 */ BoneMapList* m_next;
@@ -100,7 +112,7 @@ public:
     virtual glModel* GetModel();
     virtual void Pose(cPoseAccumulator* pPoseAccumulator);
     virtual void PrepareToRender();
-    virtual void fn_Unknown5();
+    virtual void fn_Unknown5(nlMatrix4* matrix, int nodeIndex);
 
     void fn_8036F768(unsigned long count);
     void fn_8036F7B0(unsigned long firstIndex, unsigned long secondIndex,

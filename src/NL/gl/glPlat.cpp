@@ -71,8 +71,8 @@ extern "C"
 
     bool fn_802C2DBC(const char* path);
     s32 fn_802C2BE8(const char* path, s32 defaultValue);
-    void fn_803A4084(const GXRenderModeObj* source, GXRenderModeObj* destination, u16 horizontal, u16 vertical);
-    f32 fn_803A43C4(u16 efbHeight, u16 xfbHeight);
+    void GXAdjustForOverscan(const GXRenderModeObj* source, GXRenderModeObj* destination, u16 horizontal, u16 vertical);
+    f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight);
     void fn_803A7828(f32 x, f32 y, f32 width, f32 height, f32 nearZ, f32 farZ);
     void fn_803A78A4(u32 x, u32 y, u32 width, u32 height);
     void GXSetDispCopySrc(u16 left, u16 top, u16 width, u16 height);
@@ -87,12 +87,12 @@ extern "C"
     void fn_802CB848(Function2<bool, PlatformStartupEntry&, PlatformStartupEntry&>* callback);
 
     extern GXRenderModeObj GXNtsc480IntDf;
-    extern GXRenderModeObj lbl_8053BC6C;
-    extern GXRenderModeObj lbl_8053BCA8;
+    extern GXRenderModeObj GXNtsc480Prog;
+    extern GXRenderModeObj GXNtsc480ProgSoft;
     extern GXRenderModeObj GXMpal480IntDf;
     extern GXRenderModeObj GXEurgb60Hz480IntDf;
-    extern GXRenderModeObj lbl_8053BD98;
-    extern GXRenderModeObj lbl_8053BDD4;
+    extern GXRenderModeObj GXEurgb60Hz480Prog;
+    extern GXRenderModeObj GXEurgb60Hz480ProgSoft;
 }
 
 static GXRenderModeObj glPal480IntDf = {
@@ -263,12 +263,12 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     {
         if (glx_VideoMode == 0)
         {
-            renderMode = glx_Widescreen ? &lbl_8053BCA8 : &lbl_8053BC6C;
+            renderMode = glx_Widescreen ? &GXNtsc480ProgSoft : &GXNtsc480Prog;
             OSReport("Setting Progressive NTSC Mode\n");
         }
         if (glx_VideoMode == 1 || tvFormat == 5)
         {
-            renderMode = glx_Widescreen ? &lbl_8053BDD4 : &lbl_8053BD98;
+            renderMode = glx_Widescreen ? &GXEurgb60Hz480ProgSoft : &GXEurgb60Hz480Prog;
             OSReport("Setting Progressive EURGB60 Mode\n");
         }
     }
@@ -278,11 +278,11 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
         OSReport("Setting Interlaced EURGB60 Mode\n");
     }
 
-    fn_803A4084(renderMode, &glx_rmode, 0, 16);
+    GXAdjustForOverscan(renderMode, &glx_rmode, 0, 16);
     if (glx_VideoMode == 1)
     {
         glx_rmode.efbHeight = 448;
-        glx_CopyDispScaleFactor = fn_803A43C4(448, glx_rmode.xfbHeight);
+        glx_CopyDispScaleFactor = GXGetYScaleFactor(448, glx_rmode.xfbHeight);
         glx_TargetFPS = 50;
     }
     else
@@ -315,7 +315,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     glx_FrameBuffer[0] = framebufferMemory;
     glx_FrameBuffer[1] = (u8*)framebufferMemory + fbSize;
     glx_FBSize = fbSize;
-    ClearXFBInline(glx_FrameBuffer[0]);
+    ClearXFBInline(framebufferMemory);
     ClearXFBInline(glx_FrameBuffer[1]);
 
     fn_8004F594(1, "%uKB used for FB and FIFO\n", totalSize >> 10, glx_FIFOSize >> 10);

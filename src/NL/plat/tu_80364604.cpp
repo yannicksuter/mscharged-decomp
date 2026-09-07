@@ -23,7 +23,10 @@ extern "C" void fn_80364650(UnidentifiedPointerData* data, KPADStatus* status)
     data->mCount = status->dpd_valid_fg;
     data->mUnidentified004.x = -status->pos.x;
     data->mUnidentified004.y = -status->pos.y;
-    data->mAngle = (unsigned short)(int)(10430.378f * nlATan2f(status->horizon.y, status->horizon.x));
+    float horizonX = status->horizon.x;
+    float horizonY = status->horizon.y;
+    data->mAngle
+        = (unsigned short)(int)(10430.378f * nlATan2f(horizonY, horizonX));
     data->mUnidentified010.x = status->vec.x;
     data->mUnidentified010.y = status->vec.y;
     data->mPosition = data->mUnidentified004;

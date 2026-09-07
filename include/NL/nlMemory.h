@@ -38,6 +38,7 @@ inline void* operator new[](unsigned long size, unsigned int alignment, bool fro
 }
 
 void nlInitMemory();
+extern "C" void* fn_80372B30(unsigned long size, bool atEnd);
 extern u8 gMemoryInitialized;
 
 #endif // NL_MEMORY_H

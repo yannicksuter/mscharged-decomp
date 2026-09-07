@@ -310,7 +310,8 @@ void cFielder::fn_8005001C(bool bForce)
         if (mUnidentified3DC || bForce)
         {
             mUnidentified3DC = false;
-            mUnidentified3E0 = mUnidentified3E0 - lbl_806DB9E8;
+            float fDecay = lbl_806DB9E8;
+            mUnidentified3E0 = mUnidentified3E0 - fDecay;
             bool bRunning = mUnidentified3E0 > 0.0f;
             if (bRunning)
             {
@@ -332,7 +333,8 @@ void cFielder::fn_8005001C(bool bForce)
             {
                 mUnidentified3DC = false;
                 mUnidentified3DD = false;
-                mUnidentified3E0 = mUnidentified3E0 - lbl_806E0C78;
+                float fDecay = lbl_806E0C78;
+                mUnidentified3E0 = mUnidentified3E0 - fDecay;
                 bool bRunning = mUnidentified3E0 > 0.0f;
                 if (bRunning)
                 {

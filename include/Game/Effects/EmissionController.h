@@ -56,7 +56,7 @@ public:
     /* 0x74 */ u32 m_uUserData;
     /* 0x78 */ u8 unknown_0x78[0x10];
     /* 0x88 */ EmissionManager* m_pManager;
-    /* 0x8C */ int m_View;
+    /* 0x8C */ u32 m_View;
 };
 
 void* fxLoadEntireFileHigh(const char* filename, unsigned long* fileSize);

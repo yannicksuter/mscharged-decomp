@@ -3909,6 +3909,9 @@ NL/glx/glxDisplayList.cpp:
 Game/GL/ShaderSkinMesh.cpp:
 	.text       start:0x8036F648 end:0x8037091C
 	.ctors      start:0x804DBB58 end:0x804DBB5C
+	.data       start:0x805356B0 end:0x805356E0
+	.sbss       start:0x806E2400 end:0x806E2408
+	.sdata2     start:0x806E6DB0 end:0x806E6DB8
 
 unclassified/tu_8037091C.cpp:
 	.text       start:0x8037091C end:0x80370E20
@@ -3936,9 +3939,14 @@ unclassified/tu_80372980.cpp:
 	.text       start:0x80372980 end:0x80372B4C
 	.data       start:0x80535828 end:0x80535880
 
-NL/tu_80372B4C.cpp:
-	.text       start:0x80372B4C end:0x803730D8
-	.data       start:0x80535880 end:0x80535928
+unclassified/tu_80372B4C.cpp:
+	.text       start:0x80372B4C end:0x80374098
+	.ctors      start:0x804DBB60 end:0x804DBB64
+	.data       start:0x80535880 end:0x80535C98
+	.bss        start:0x8059C418 end:0x8059C438
+	.sdata      start:0x806DFB00 end:0x806DFB08
+	.sbss       start:0x806E2460 end:0x806E2468
+	.sdata2     start:0x806E6DD0 end:0x806E6DD8
 
 unclassified/tu_80374098.cpp:
 	.text       start:0x80374098 end:0x80374D68

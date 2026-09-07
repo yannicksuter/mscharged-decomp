@@ -144,16 +144,19 @@ bool FEInput::IsAutoPressed(eFEINPUT_PAD pad, int button, bool remap, eFEINPUT_P
                 return false;
             }
 
-            cGlobalPad* pPad = lbl_806E1E28->GetPad(pad);
-            bool ispressed = pPad->IsPressed(button, remap);
-            int buttonIndex = pPad->GetButtonIndex(button, remap);
-            if (ispressed && !g_aFEPadData[pad].bIsPressed[buttonIndex])
+            bool ispressed = lbl_806E1E28->GetPad(pad)->IsPressed(button, remap);
+            int buttonIndex
+                = lbl_806E1E28->GetPad(pad)->GetButtonIndex(button, remap);
+            if (ispressed)
             {
-                ispressed = false;
-            }
-            if (IsButtonDisabled(pad, button, remap))
-            {
-                ispressed = false;
+                if (!g_aFEPadData[pad].bIsPressed[buttonIndex])
+                {
+                    ispressed = false;
+                }
+                else if (IsButtonDisabled(pad, button, remap))
+                {
+                    ispressed = false;
+                }
             }
             return ispressed;
         }

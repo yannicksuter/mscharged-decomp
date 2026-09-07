@@ -69,6 +69,19 @@ struct glModel
     /* 0x08 */ glModelPacket* packets;
 }; // size: 0xC
 
+inline glModelStream* fn_8036F99C(glModelPacket* pPacket, int id)
+{
+    for (unsigned long i = 0; i < pPacket->numStreams; i++)
+    {
+        glModelStream* stream = &pPacket->streams[i];
+        if (stream->id == id)
+        {
+            return stream;
+        }
+    }
+    return 0;
+}
+
 void glModelSetMatrix(glModel* model, const nlMatrix4& matrix);
 void glModelSetMatrix(glModel* model, unsigned long matrix);
 void glModelSetRasterState(glModel* model, unsigned long rasterState);

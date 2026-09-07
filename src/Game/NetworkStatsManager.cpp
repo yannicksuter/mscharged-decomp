@@ -1024,12 +1024,12 @@ int FindNetworkSeasonBoundary(
     int index = 0;
     for (; index < dates->mCount; ++index)
     {
-        const NetworkSeasonDate& candidate = dates->mDates[index];
-        if (candidate.mDay == date->mDay && candidate.mMonth == date->mMonth)
+        if (date->mDay == dates->mDates[index].mDay && date->mMonth == dates->mDates[index].mMonth)
         {
             return index;
         }
-        if (candidate.mMonth > date->mMonth || (candidate.mMonth == date->mMonth && candidate.mDay > date->mDay))
+        if (dates->mDates[index].mMonth > date->mMonth
+            || (date->mMonth == dates->mDates[index].mMonth && dates->mDates[index].mDay > date->mDay))
         {
             break;
         }

@@ -24,6 +24,7 @@
 #include "NL/gl/glTexture.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/nlFile.h"
+#include "NL/plat/tu_80372B4C.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -44,9 +45,6 @@ extern "C" bool fn_802B3E94(const char* path, LoadAsyncCallback callback,
     unsigned long param, MemoryAllocator* allocator);
 extern "C" void fn_802E67E0(void* data, void* nonResidentData,
     ResourceInterface_802CC094* allocator, bool);
-extern "C" bool fn_80372B4C(const char* filename, LoadAsyncCallback callback,
-    void* userData, unsigned int alignment, eAllocType type, void* buffer,
-    unsigned long bufferSize, MemoryAllocator* allocator);
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;

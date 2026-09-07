@@ -100,6 +100,14 @@ struct AudioResources_802F2110
     RpcController_802F2110* rpcController;
 };
 
+struct CalculationEntry_802F2110
+{
+    virtual float UnidentifiedVirtual0(
+        void* table, AudioResources_802F2110* resources);
+
+    u8 pad_04[0x24];
+};
+
 struct AudioSystem_802F2110
 {
     u8 pad_00[0xCC];
@@ -442,13 +450,14 @@ extern "C" void fn_802F26B0(SoundInstance_802F2110* instance, float dt)
 
 extern "C" float fn_802F29F8(SoundInstance_802F2110* instance)
 {
+    float volume = instance->volume.value;
     void* table = lbl_806E201C->resources->calculationTable;
-    u8* entry = (u8*)*(void**)((u8*)table + 8)
-              + instance->definition->sliderIndex * 0x28;
-    typedef float (*CalculateFunc)(void*, void*, AudioResources_802F2110*);
-    float value = ((CalculateFunc)(*(void***)entry)[2])(
-        entry, table, lbl_806E201C->resources);
-    return instance->field_70 + instance->volume.value + value;
+    CalculationEntry_802F2110* entry
+        = (CalculationEntry_802F2110*)*(void**)((u8*)table + 8)
+        + instance->definition->sliderIndex;
+    float value = entry->UnidentifiedVirtual0(
+        table, lbl_806E201C->resources);
+    return instance->field_70 + (value + volume);
 }
 
 extern "C" float fn_802F2A6C(SoundInstance_802F2110* instance)

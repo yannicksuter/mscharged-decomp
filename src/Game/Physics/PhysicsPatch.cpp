@@ -28,6 +28,8 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 extern CollisionSpace* g_CollisionSpace;
 extern UnidentifiedEventRegistry* lbl_806E1D90;
 extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
+extern "C" EmissionController* fn_802E81A0(
+    EmissionManager*, unsigned long, const EffectsGroup*);
 extern "C" EmissionController* fn_802E7FE4(
     EmissionManager*, EffectsGroup*, int, bool, bool);
 extern "C" bool fn_800EBBFC(
@@ -150,15 +152,24 @@ void PhysicsPatch::fn_80172EE0(const int* type)
 
 void PhysicsPatch::Unknown0()
 {
-    UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(&m_Type);
-    if (info != 0 && info->mUnidentified08 != 0
-        && info->mUnidentified08[0] != '\0')
+    if (m_Type != -1)
     {
-        EffectsGroup* effects = fn_802E7CDC(
-            EmissionManager::Instance(), info->mUnidentified08);
-        if (effects != 0)
+        UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(&m_Type);
+        if (info->mUnidentified08 != 0)
         {
-            EmissionManager::Instance()->Kill((unsigned long)this, effects);
+            EffectsGroup* effects = fn_802E7CDC(
+                EmissionManager::Instance(), info->mUnidentified08);
+            if (effects != 0)
+            {
+                EmissionManager::Instance()->Kill(
+                    (unsigned long)this, effects);
+                EmissionController* controller = fn_802E81A0(
+                    EmissionManager::Instance(), (unsigned long)this, effects);
+                if (controller != 0)
+                {
+                    controller->mUpdateCallback.Clear();
+                }
+            }
         }
     }
 
@@ -295,16 +306,26 @@ void PhysicsPatch::fn_80173A10(float)
 {
     if (m_Type == 4)
     {
-        UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(&m_Type);
-        if (info != 0 && info->mUnidentified08 != 0
-            && info->mUnidentified08[0] != '\0')
+        if (m_Type != -1)
         {
-            EffectsGroup* effects = fn_802E7CDC(
-                EmissionManager::Instance(), info->mUnidentified08);
-            if (effects != 0)
+            UnidentifiedPhysicsPatchInfo_80510BF0* info
+                = fn_80174ED4(&m_Type);
+            if (info->mUnidentified08 != 0)
             {
-                EmissionManager::Instance()->Destroy(
-                    (unsigned long)this, effects);
+                EffectsGroup* effects = fn_802E7CDC(
+                    EmissionManager::Instance(), info->mUnidentified08);
+                if (effects != 0)
+                {
+                    EmissionManager::Instance()->Destroy(
+                        (unsigned long)this, effects);
+                    EmissionController* controller = fn_802E81A0(
+                        EmissionManager::Instance(), (unsigned long)this,
+                        effects);
+                    if (controller != 0)
+                    {
+                        controller->mUpdateCallback.Clear();
+                    }
+                }
             }
         }
         Unknown0();

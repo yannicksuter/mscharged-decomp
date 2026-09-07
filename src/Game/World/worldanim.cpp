@@ -627,15 +627,24 @@ extern "C" void fn_80344218(WorldAnimEffect_803441C8* pEffect)
 {
     nlDLListIterator<EmissionController*> iterator
         = EmissionManager::Instance()->GetContainer()->Begin();
-    while (iterator.hasNext())
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
     {
-        EmissionController* pController = *iterator;
+        EmissionController* pController = current->entry;
         if (pController->m_uUserData == (u32)pEffect)
         {
             fn_802E4358(pController);
             pController->mUpdateCallback.Clear();
         }
-        iterator.Step();
+        if (nlDLRingIsEnd(head, current) || current == 0)
+        {
+            current = 0;
+        }
+        else
+        {
+            current = current->m_next;
+        }
     }
 }
 

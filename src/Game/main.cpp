@@ -49,6 +49,7 @@
 #include "NL/gl/tu_802A12E4.h"
 #include "unclassified/tu_802196B0.h"
 #include "NL/plat/nlFlash.h"
+#include "NL/plat/tu_80372B4C.h"
 
 #include <string.h>
 
@@ -103,14 +104,12 @@ extern "C"
     void fn_802C7018(void*, char*, u32, const char*);
     void fn_802E22D8(void*, float*, void*, void*, int, int, int);
     void fn_802A8278(void*, int, int, void*);
-    nlTask* fn_803733D4();
 
     void fn_801BFB08();
     void fn_8013D7A0();
     void fn_8013D7E0();
     void fn_802C0F24();
     void fn_80369574();
-    void fn_803730D8();
     void fn_80272AB4();
     void fn_80184858();
     void OSYieldThread();

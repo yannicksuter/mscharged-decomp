@@ -21,6 +21,7 @@ SlotPool<AudioReadQueueEntry_80361258> lbl_80585C98(32, 16);
 
 extern void* lbl_806E21E8;
 extern "C" void fn_8035CA84();
+extern "C" AsyncEntry* fn_803675D4();
 
 extern "C" void fn_8035EF08(AXVPB* voice, float value)
 {
@@ -332,6 +333,7 @@ extern "C" void fn_8035FC48(nlFile*, void*, unsigned int, unsigned long userPara
 {
     AudioReadState_80361258* state = ((AudioStreamChannel_8035FA38*)userParam)->m_Unknown00;
     --state->m_Unknown20_00;
+    fn_803675D4();
 
     AudioReadQueueEntry_80361258* entry = state->m_Unknown24->m_next;
     if (entry == state->m_Unknown24)
@@ -434,10 +436,11 @@ void AudioReadState_80361258::fn_24()
     {
     case 4:
     {
+        bool enabled;
         AudioStreamChannel_8035FA38* channel = fn_7C();
         while ((channel = fn_80(channel)) != 0)
         {
-            bool enabled = OSDisableInterrupts();
+            enabled = OSDisableInterrupts();
             if (channel->m_Unknown04 != 0)
                 AXSetVoiceState(channel->m_Unknown04, AX_VOICE_STOP);
             OSRestoreInterrupts(enabled);
@@ -452,6 +455,8 @@ void AudioReadState_80361258::fn_24()
     case 3:
     case 7:
         m_Unknown10 = 6;
+        break;
+    case 5:
         break;
     }
 }

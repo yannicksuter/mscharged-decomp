@@ -69,3 +69,7 @@ NisPlayer* NisPlayer::Instance()
     }
     return sInstance;
 }
+
+void NisPlayer::fn_8027E5D0()
+{
+}

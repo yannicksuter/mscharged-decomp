@@ -34,11 +34,16 @@ public:
     /* 0x54 */ SkinAnimatedNPC* mModel;
 }; // size: 0x58
 
-struct FEImpostorModelState_801C10DC
+class FEImpostorModelState_801C10DC
 {
-    /* 0x00 */ u8 mUnidentified00[0x44];
+public:
+    virtual ~FEImpostorModelState_801C10DC();
+
+    /* 0x04 */ u8 mUnidentified004[0x40];
     /* 0x44 */ cPN_SAnimController* mAnimationState;
 };
+
+class FEImpostorCharacter_801C3100;
 
 class FEModelType1_801C0F58 : public FEModel
 {
@@ -59,7 +64,7 @@ public:
 
     /* 0x54 */ FEImpostorModelState_801C10DC* mModel;
     /* 0x58 */ u32 mUnidentified58;
-    /* 0x5C */ ImpostorCharacter* mCharacter;
+    /* 0x5C */ FEImpostorCharacter_801C3100* mCharacter;
     /* 0x60 */ nlVector3 mPosition;
     /* 0x6C */ float mTime;
     /* 0x70 */ void* mModels[6];

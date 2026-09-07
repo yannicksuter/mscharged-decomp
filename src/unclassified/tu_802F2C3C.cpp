@@ -1,3 +1,4 @@
+#include "Game/Audio/AudioBackend_8035B8E8.h"
 #include "Game/Audio/XSoundHandle_802ED74C.h"
 #include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
@@ -147,12 +148,11 @@ extern void* lbl_8052F7E8[];
 extern SlotPoolBase lbl_8057FAE8;
 extern SlotPoolBase lbl_8057FB10;
 extern SlotPoolBase lbl_8057FB38;
-extern void* lbl_806E2020;
+extern AudioBackend_8035B8E8* lbl_806E2020;
 
 extern "C" float fn_802F29F8(SoundInstance_802F2C3C*);
 extern "C" float fn_802F2A6C(SoundInstance_802F2C3C*);
 extern "C" void* fn_8035C298(void*, u32, u32);
-extern "C" void fn_8035C51C(void*);
 extern "C" void fn_802F4630(PlaybackOwner_802F2C3C*, float);
 extern "C" void fn_802F4638(PlaybackOwner_802F2C3C*, float);
 
@@ -280,7 +280,8 @@ extern "C" PlaybackObject_802F2C3C* fn_802F2F8C(
     {
         object->vtable = lbl_8052F7B0;
         if (object->backend != 0)
-            fn_8035C51C(lbl_806E2020);
+            lbl_806E2020->fn_8035C51C(
+                (AudioSource_8035C234*)object->backend);
         if (destroy > 0)
         {
             object->vtable = (void**)lbl_8057FAE8.m_FreeList;
@@ -519,14 +520,15 @@ extern "C" int fn_802F3938(PlaybackObject_802F2C3C* object, float)
 {
     if (object->state == 2)
         object->state = 3;
-    float previous = object->owner->instance->previousTime;
-    float current = object->owner->instance->currentTime;
-    if (previous < object->startTime && current >= object->startTime)
+    PlaybackOwner_802F2C3C* owner = object->owner;
+    bool trigger = owner->instance->previousTime < object->startTime
+        && owner->instance->currentTime >= object->startTime;
+    if (trigger)
     {
         if (object->definition->mode == 0)
-            fn_802F4630(object->owner, object->definition->value);
+            fn_802F4630(owner, object->definition->value);
         else if (object->definition->mode == 1)
-            fn_802F4638(object->owner, object->definition->value);
+            fn_802F4638(owner, object->definition->value);
         object->state = 8;
     }
     return object->state;

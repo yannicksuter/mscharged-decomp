@@ -1498,7 +1498,8 @@ bool cFielder::fn_80034894(cFielder* pOtherFielder) const
         case ACTION_ONETIMER:
         case ACTION_RECEIVE_PASS:
         {
-            float fUnidentified2 = mUnidentified368 - m_pCurrentAnimController->m_fTime;
+            float fAnimTime = m_pCurrentAnimController->m_fTime;
+            float fUnidentified2 = mUnidentified368 - fAnimTime;
             if (fUnidentified2 > 0.0f
                 && fUnidentified2 <= pOtherFielder->mUnidentified368
                                          - pOtherFielder->m_pCurrentAnimController->m_fTime)

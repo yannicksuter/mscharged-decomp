@@ -220,10 +220,13 @@ void ImpostorCharacter::UnidentifiedVirtual2C(void* unidentified0,
 
 void ImpostorCharacter::UpdateSprites(int period, int slot)
 {
-    nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
-    DLListEntry<ImpostorSprite_802D4290*>* head = it.m_Head;
-    DLListEntry<ImpostorSprite_802D4290*>* entry = it.m_Curr;
+    DLListEntry<ImpostorSprite_802D4290*>* head;
+    DLListEntry<ImpostorSprite_802D4290*>* entry;
     int lastTexture = -1;
+
+    nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
+    head = it.m_Head;
+    entry = it.m_Curr;
     while (entry != 0)
     {
         ImpostorSprite_802D4290* sprite = entry->entry;

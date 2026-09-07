@@ -1316,7 +1316,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/nwc24/NWC24Ipc.c"),
             Object(NonMatching, "RVL_SDK/thp/THPSimple.cpp", cflags=cflags_game),
             Object(Matching, "unclassified/tu_80372980.cpp", cflags=cflags_game),
-            Object(NonMatching, "NL/tu_80372B4C.cpp", cflags=cflags_game),
+            Object(NonMatching, "unclassified/tu_80372B4C.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(NonMatching, "unclassified/tu_80374098.cpp", cflags=cflags_game),
             Object(Matching, "NL/plat/TransportSocket.cpp", cflags=cflags_game),
             Object(NonMatching, "NL/plat/platpad.cpp", cflags=cflags_game),
