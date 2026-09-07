@@ -321,7 +321,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
     float h;
 
     bool bCaptainShot = false;
-    if (nlTaskManager::m_pInstance->mCurrentState == 2 && g_pGame->mUnidentified040)
+    if (nlTaskManager::m_pInstance->mCurrentState == 2 && g_pGame->mbCaptainShotToScoreOn)
     {
         bCaptainShot = true;
     }
@@ -441,7 +441,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
     if (currState == 2
         || (currState == 1 && nlTaskManager::m_pInstance->mPreviousState == 2))
     {
-        if (g_pGame->mUnidentified040)
+        if (g_pGame->mbCaptainShotToScoreOn)
         {
             float indicatorDt;
             if (currState == 2)

@@ -287,11 +287,19 @@ extern "C" void fn_802FF644(FESceneManager* pSceneManager, FEScene* pFEScene)
 
 void FESceneManager::Update(float dt)
 {
+    DLListEntry<BaseSceneHandler*>* headEntry;
+    DLListEntry<BaseSceneHandler*>* currentEntry;
+
     ProcessPushPopQueue();
 
+    if (m_sceneHandlerStack.IsEmpty())
+    {
+        return;
+    }
+
     nlDLListIterator<BaseSceneHandler*> sceneIterator = m_sceneHandlerStack.Begin();
-    DLListEntry<BaseSceneHandler*>* headEntry = sceneIterator.m_Head;
-    DLListEntry<BaseSceneHandler*>* currentEntry = sceneIterator.m_Curr;
+    currentEntry = sceneIterator.m_Curr;
+    headEntry = sceneIterator.m_Head;
 
     while (currentEntry != 0)
     {

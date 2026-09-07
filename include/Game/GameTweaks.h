@@ -189,9 +189,9 @@ struct unk_8056CF08
         , mUnidentified0C(false)
         , m_pGameTweaks(0)
         , m_unk14(0)
-        , mUnidentified18(0)
-        , mUnidentified1C(0)
     {
+        mUnidentified18[0] = 0;
+        mUnidentified18[1] = 0;
     }
 
 public:
@@ -207,8 +207,7 @@ public:
     /* 0x14 */ FielderTweaks* m_unk14;
 
 public:
-    /* 0x18 */ SkillTweaks* mUnidentified18;
-    /* 0x1C */ SkillTweaks* mUnidentified1C;
+    /* 0x18 */ SkillTweaks* mUnidentified18[2];
 }; // total size: 0x20
 
 extern unk_8056CF08 gGameTweaks;

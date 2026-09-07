@@ -159,20 +159,18 @@ static void CreateElectricFenceGeometry(
         tdst[0].x = (float)segment / 15.0f;
         tdst[0].y = 0.0f;
 
-        float wallY2 = wallPoint.y;
-        float wallX2 = wallPoint.x;
-        pdst[1].x = wallX2;
-        pdst[1].y = wallY2;
+        float wY2 = wallPoint.y;
+        float wX2 = wallPoint.x;
+        pdst[1].x = wX2;
+        pdst[1].y = wY2;
         pdst[1].z = z1;
         tdst[1].x = (float)segment / 15.0f;
         tdst[1].y = 1.0f;
-        ++nSegment;
+        nSegment++;
 
         pdst += 2;
         tdst += 2;
     }
-
-    (void)cornerPosition;
 }
 
 static void DrawPrimitive(const ElectricFenceGeometry& prim,

@@ -17,7 +17,7 @@ extern "C" float fn_800D9070(cFielder*);
 extern "C" float fn_800DEFD4(cFielder*);
 extern "C" float fn_800DEAB4(cFielder*);
 extern "C" cPlayer* fn_800DF790(cTeam*);
-extern cTeam* lbl_806E0E00;
+extern cTeam* g_pCurrentlyUpdatingTeam;
 
 static float lbl_806DC0B8 = 0.1f;
 
@@ -67,7 +67,7 @@ void DesireDefendPos::UnidentifiedUpdate(
         return;
     }
 
-    SkillTweaks* pSkillTweaks = fn_800A636C(lbl_806E0E00);
+    SkillTweaks* pSkillTweaks = fn_800A636C(g_pCurrentlyUpdatingTeam);
     float fMarkingSkill = pSkillTweaks->Def_Marking->GetValue();
     float fTimeDelay = Interpolate(g_vMarkFollowTimeDelay.x,
         g_vMarkFollowTimeDelay.y, fMarkingSkill);
@@ -75,7 +75,7 @@ void DesireDefendPos::UnidentifiedUpdate(
     mThinkTimer.SetSeconds(fTimeDelay
         + (nlRandomf(fTimeDelayRange) - (0.5f * fTimeDelayRange)));
 
-    pSkillTweaks = fn_800A636C(lbl_806E0E00);
+    pSkillTweaks = fn_800A636C(g_pCurrentlyUpdatingTeam);
     fMarkingSkill = pSkillTweaks->Def_Marking->GetValue();
 
     float fMarkingNetPassBalance = Interpolate(

@@ -66,7 +66,7 @@ public:
 
 inline void FreeCollisionChainPlayerData(CollisionChainPlayerData* pData)
 {
-    gCollisionChainPlayerDataPool.Free(pData);
+    g_CollisionChainPlayerDataPool.Free(pData);
 }
 
 #endif // _CHAINCHOMP_H_

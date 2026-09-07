@@ -16,7 +16,7 @@
 #include "NL/nlList.h"
 #include "NL/nlMath.h"
 
-extern cTeam* lbl_806E0E00;
+extern cTeam* g_pCurrentlyUpdatingTeam;
 
 extern "C" void fn_8000F594(AvoidableObject* pObject);
 extern "C" float fn_80030750(cFielder*);
@@ -220,14 +220,15 @@ bool AvoidableFielder::UnidentifiedVirtual20(
     AvoidableObject* other, float range)
 {
     int nIndex = m_pFielder->mUnidentified120;
+    int otherType = other->mType;
     cPlayer* pOther = 0;
     int nOtherIndex = -1;
-    if (other->mType == AVOID_FIELDERS)
+    if (otherType == AVOID_FIELDERS)
     {
         pOther = ((AvoidableFielder*)other)->m_pFielder;
         nOtherIndex = pOther->mUnidentified120;
     }
-    else if (other->mType == AVOID_GOALIES)
+    else if (otherType == AVOID_GOALIES)
     {
         pOther = ((AvoidableGoalie*)other)->m_pPlayer;
         nOtherIndex = pOther->mUnidentified120;
@@ -248,7 +249,7 @@ bool AvoidableFielder::UnidentifiedVirtual20(
         }
         return fGap <= range;
     }
-    else if (other->mType == AVOID_SIDELINES)
+    else if (otherType == AVOID_SIDELINES)
     {
         return other->UnidentifiedVirtual20(this, range);
     }
@@ -261,7 +262,7 @@ bool AvoidableFielder::UnidentifiedVirtual20(
 float AvoidableFielder::UnidentifiedVirtual28(
     AvoidableObject* other)
 {
-    float fSkill = fn_800A636C(lbl_806E0E00)->Off_Avoidance->GetValue();
+    float fSkill = fn_800A636C(g_pCurrentlyUpdatingTeam)->Off_Avoidance->GetValue();
     float fMin = sUnidentifiedStrengthExtrema.x;
     float fMax = sUnidentifiedStrengthExtrema.y;
     float fStrength = InterpolateClamped(fMin, fMax, fSkill);

@@ -316,7 +316,7 @@ public:
     void ActionOneTouchPassFromVolley(float fDeltaT);
     bool fn_8004A330(cFielder* pOther);
     bool InitActionPass(
-        cPlayer* pPassTarget, bool bVolleyPass, int nParam, bool bParam);
+        cPlayer* pPassTarget, bool bVolleyPass, int nParam, bool bIsOneTouchPass);
     void ActionPass(float fDeltaT);
     void fn_8004F828();
     void fn_8004F8E8();
@@ -394,6 +394,7 @@ public:
     bool IsWinger() const;
     bool IsMidField() const;
     bool IsDefense() const;
+    PlayerTweaks* UnidentifiedGetTweaks() const { return mUnidentified32C; }
 
 private:
     /* 0x328 */ PlayerTweaks* mUnidentified328;

@@ -169,6 +169,78 @@ public:
     /* 0x44 */ int mActualMaxFrameSize;
 };
 
+template <typename T>
+void Replay::Play(
+    float time, T& previous, T& current, float* blend) const
+{
+    if (time < BeginTime())
+    {
+        time = BeginTime();
+    }
+    if (time > EndTime())
+    {
+        time = EndTime();
+    }
+
+    int interval;
+    Frame* rhs;
+    Frame* lhs;
+    Frame* tryLhs;
+    LoadFrame previousLoadFrame;
+    LoadFrame currentLoadFrame;
+
+    for (interval = 1; interval <= 3; interval++)
+    {
+        rhs = mReels[mReelIdx].mBegin;
+        while (rhs != 0)
+        {
+            if (rhs->mInterval == interval && rhs->mTime > time)
+            {
+                lhs = 0;
+                tryLhs = mReels[mReelIdx].mBegin;
+                while (tryLhs != 0)
+                {
+                    if (tryLhs->mInterval == interval
+                        && tryLhs->mTime <= time)
+                    {
+                        lhs = tryLhs;
+                    }
+                    tryLhs = Next(tryLhs, mReelIdx);
+                }
+
+                if (lhs != 0 && rhs != 0)
+                {
+                    blend[interval - 1]
+                        = (time - lhs->mTime) / (rhs->mTime - lhs->mTime);
+
+                    float aheadOfFrame = time - lhs->mTime;
+                    char* lhsBegin = lhs->mBegin;
+                    previousLoadFrame.mInterval = interval;
+                    previousLoadFrame.mStream.mCount = 0;
+                    previousLoadFrame.mStream.mStorage = lhsBegin;
+                    previousLoadFrame.mReplayNonBlendables
+                        = REPLAY_NON_BLENDABLES;
+                    previousLoadFrame.mNonBlendableAheadOfFrame
+                        = aheadOfFrame;
+                    Replayable<0>(previousLoadFrame, previous);
+
+                    char* rhsBegin = rhs->mBegin;
+                    currentLoadFrame.mInterval = interval;
+                    currentLoadFrame.mStream.mCount = 0;
+                    currentLoadFrame.mStream.mStorage = rhsBegin;
+                    currentLoadFrame.mReplayNonBlendables
+                        = DO_NOT_REPLAY_NON_BLENDABLES;
+                    currentLoadFrame.mNonBlendableAheadOfFrame = 0.0f;
+                    Replayable<0>(currentLoadFrame, current);
+
+                    break;
+                }
+            }
+            rhs = Next(rhs, mReelIdx);
+        }
+    }
+}
+
 extern "C" void fn_802C7FA4(Replay*, Replay::Frame**, Replay::Frame**,
     Replay::Frame**);
 extern "C" void fn_802C7FC0(

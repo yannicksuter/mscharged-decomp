@@ -1,16 +1,47 @@
 #include "Game/ReplayManager.h"
 
 #include "Game/Camera/CameraMan.h"
+#include "Game/Camera/DebugCam.h"
+#include "Game/Event.h"
 #include "Game/ExcitementSystem.h"
+#include "Game/GameEventQueue.h"
+#include "Game/ReplayChoreo.h"
 #include "Game/Task/FixedUpdateTask.h"
+#include "Game/Task/ProfilerTask.h"
+#include "Game/Task/TweakerTask.h"
+#include "NL/nlAVLTree.h"
+#include "NL/nlBind.h"
+#include "NL/nlConfig.h"
+#include "NL/globalpad.h"
 #include "NL/nlMemory.h"
 #include "NL/nlTask.h"
+#include "unclassified/tu_80332770.h"
 
 extern float g_fSimulationTick;
 extern float g_fFixedUpdateTick;
+extern bool lbl_806E14B8;
 extern float lbl_806E14CC;
 extern bool lbl_806E14D1;
+extern int lbl_806E227C;
+extern int lbl_806E228C;
 
+struct PlatPadManager_806E2478
+{
+    /* 0x000 */ u8 mUnidentified000[0x2F4];
+    /* 0x2F4 */ int type[4];
+};
+
+extern "C"
+{
+    extern PlatPadManager_806E2478* g_pPlatPadManager;
+    float fn_80189870();
+}
+
+typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
+    DefaultKeyCompare<unsigned int> >
+    UnidentifiedEventRegistry;
+
+extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 
 ReplayManager::ReplayManager()
     : mCurrent(mSnapshots)
@@ -45,6 +76,199 @@ void ReplayManager::Initialize()
     mTime = 0.0f;
 }
 
+template <typename EventData>
+static inline BindExp2<void,
+    Detail::MemFunImpl<void, void (ReplayManager::*)(EventData*)>,
+    ReplayManager*, Placeholder<0> >
+UnidentifiedMakeReplayBinding(
+    void (ReplayManager::*callback)(EventData*), ReplayManager* manager)
+{
+    typedef Detail::MemFunImpl<void,
+        void (ReplayManager::*)(EventData*)>
+        CallbackMemFun;
+    typedef BindExp2<void, CallbackMemFun, ReplayManager*, Placeholder<0> >
+        CallbackBind;
+    CallbackMemFun function(callback);
+    return CallbackBind(function, manager, placeholder0);
+}
+
+static inline BindExp1<void,
+    Detail::MemFunImpl<void, void (ReplayManager::*)()>, ReplayManager*>
+UnidentifiedMakeReplayBinding(
+    void (ReplayManager::*callback)(), ReplayManager* manager)
+{
+    typedef Detail::MemFunImpl<void, void (ReplayManager::*)()>
+        CallbackMemFun;
+    typedef BindExp1<void, CallbackMemFun, ReplayManager*> CallbackBind;
+    CallbackMemFun function(callback);
+    return CallbackBind(function, manager);
+}
+
+void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
+{
+    static bool debugReplay
+        = GetConfigBool(Config::Global(), "debug_replay_in_release", false);
+
+    cGlobalPad* unidentifiedPad = g_pPadManager->GetPad(0);
+    if (debugReplay && !g_bTweaking && !IsProfiling()
+        && !IsNetworkOrRecordedGame()
+        && unidentifiedPad->PlatJustPressed(4, true))
+    {
+        if (nlTaskManager::m_pInstance->mCurrentState == 0x20000)
+        {
+            nlTaskManager::SetNextState(2);
+            if (mUnidentified7604 != 0)
+            {
+                cCameraManager::PopCamera();
+                delete mUnidentified7604;
+                mUnidentified7604 = 0;
+            }
+            return;
+        }
+        else if (nlTaskManager::m_pInstance->mCurrentState == 2)
+        {
+            mTime = mReplay->EndTime();
+            nlTaskManager::SetNextState(0x20000);
+        }
+        return;
+    }
+
+    if (nlTaskManager::m_pInstance->mCurrentState == 0x20000)
+    {
+        if (cCameraManager::PeekCamera()->GetType() != eCameraType_Debug)
+        {
+            mUnidentified7604
+                = new (nlMalloc(0xA0, 8, false)) cDebugCamera(true);
+            cCameraManager::PushCamera(mUnidentified7604);
+        }
+
+        mDeltaTime = 0.0f;
+        if (lbl_806E14B8 == 1)
+        {
+            mDeltaTime = 0.02f * unidentifiedPad->GetPressure(5, true);
+            if (unidentifiedPad->GetPressure(5, true))
+            {
+                mDeltaTime = 0.02f;
+            }
+            else if (unidentifiedPad->GetPressure(6, true))
+            {
+                mDeltaTime = 0.02f * 5.0f;
+            }
+        }
+        else
+        {
+            mDeltaTime
+                -= 0.02f * unidentifiedPad->GetPressure(5, true);
+            mDeltaTime
+                += 0.02f * unidentifiedPad->GetPressure(6, true);
+        }
+
+        int unidentifiedClassID
+            = unidentifiedPad->mBackend->UnidentifiedClassID();
+        if (g_pPlatPadManager->type[0] == 2
+            && (unidentifiedClassID == lbl_806E227C
+                || unidentifiedClassID == lbl_806E228C))
+        {
+            mDeltaTime *= fn_80189870();
+        }
+
+        float time = mTime + mDeltaTime;
+        if (time < mReplay->BeginTime())
+        {
+            time = mReplay->BeginTime();
+        }
+        if (time > mReplay->EndTime())
+        {
+            time = mReplay->EndTime();
+        }
+
+        mDeltaTime = time - mTime;
+        mTime = time;
+        mReplay->Play<RenderSnapshot>(mTime, *mPrevious, *mCurrent, mBlend);
+    }
+}
+
+void ReplayManager::fn_80188D88()
+{
+    {
+        Function<UnidentifiedEventData_800662B4*> callback(
+            UnidentifiedMakeReplayBinding(
+                &ReplayManager::fn_801895C0, this));
+        UnidentifiedEventBase** foundEvent;
+        unsigned int hash;
+        hash = HashEventName("ReceiveBall", -1);
+        foundEvent = 0;
+        g_pEventRegistry->Find(hash, &foundEvent, 0);
+        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
+        ((UnidentifiedTypedEvent<UnidentifiedEventData_800662B4>*)event)
+            ->Add(callback, 0, -1);
+    }
+    {
+        Function<UnidentifiedEventData_80066590*> callback(
+            UnidentifiedMakeReplayBinding(
+                &ReplayManager::fn_801895D0, this));
+        UnidentifiedEventBase** foundEvent;
+        unsigned int hash;
+        hash = HashEventName("ShotAtGoal", -1);
+        foundEvent = 0;
+        g_pEventRegistry->Find(hash, &foundEvent, 0);
+        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
+        ((UnidentifiedTypedEvent<UnidentifiedEventData_80066590>*)event)
+            ->Add(callback, 0, -1);
+    }
+    {
+        Function<UnidentifiedEventData_800663A8*> callback(
+            UnidentifiedMakeReplayBinding(
+                &ReplayManager::fn_801895E0, this));
+        UnidentifiedEventBase** foundEvent;
+        unsigned int hash;
+        hash = HashEventName("PassBall", -1);
+        foundEvent = 0;
+        g_pEventRegistry->Find(hash, &foundEvent, 0);
+        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
+        ((UnidentifiedTypedEvent<UnidentifiedEventData_800663A8>*)event)
+            ->Add(callback, 0, -1);
+    }
+    {
+        Function<GoalScoredData*> callback(
+            UnidentifiedMakeReplayBinding(
+                &ReplayManager::fn_801895F0, this));
+        UnidentifiedEventBase** foundEvent;
+        unsigned int hash;
+        hash = HashEventName("GoalScored", -1);
+        foundEvent = 0;
+        g_pEventRegistry->Find(hash, &foundEvent, 0);
+        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
+        ((UnidentifiedTypedEvent<GoalScoredData>*)event)
+            ->Add(callback, 0, -1);
+    }
+    {
+        Function<UnidentifiedEventData_8006649C*> callback(
+            UnidentifiedMakeReplayBinding(
+                &ReplayManager::fn_80189610, this));
+        UnidentifiedEventBase** foundEvent;
+        unsigned int hash;
+        hash = HashEventName("GoalieSave", -1);
+        foundEvent = 0;
+        g_pEventRegistry->Find(hash, &foundEvent, 0);
+        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
+        ((UnidentifiedTypedEvent<UnidentifiedEventData_8006649C>*)event)
+            ->Add(callback, 0, -1);
+    }
+    {
+        Function<FnVoidVoid> callback(UnidentifiedMakeReplayBinding(
+            &ReplayManager::fn_80189620, this));
+        UnidentifiedEventBase** foundEvent;
+        unsigned int hash;
+        hash = HashEventName("Kickoff", -1);
+        foundEvent = 0;
+        g_pEventRegistry->Find(hash, &foundEvent, 0);
+        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
+        ((UnidentifiedTypedEvent<UnidentifiedEventNoData>*)event)
+            ->Add(callback, 0, -1);
+    }
+}
+
 void ReplayManager::InitializeSnapshots()
 {
     for (int i = 0; i < 3; i++)
@@ -58,22 +282,30 @@ void ReplayManager::fn_801895B0()
     mEvents |= 0x40;
 }
 
-void ReplayManager::fn_801895C0()
+void ReplayManager::fn_801895C0(UnidentifiedEventData_800662B4* event)
 {
     mEvents |= 4;
 }
 
-void ReplayManager::fn_801895D0()
+void ReplayManager::fn_801895D0(UnidentifiedEventData_80066590* event)
 {
     mEvents |= 2;
 }
 
-void ReplayManager::fn_801895E0()
+void ReplayManager::fn_801895E0(UnidentifiedEventData_800663A8* event)
 {
     mEvents |= 8;
 }
 
-void ReplayManager::fn_80189610()
+void ReplayManager::fn_801895F0(GoalScoredData* event)
+{
+    if ((event->mUnidentified000 & 0xFFFF) != 6)
+    {
+        mEvents |= 1;
+    }
+}
+
+void ReplayManager::fn_80189610(UnidentifiedEventData_8006649C* event)
 {
     mEvents |= 0x11;
 }

@@ -1,6 +1,7 @@
 #include "Game/AI/Powerups.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
+#include "Game/EventDataTypes.h"
 #include "Game/Field.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
@@ -17,24 +18,6 @@
 #include "unclassified/tu_801A5F10.h"
 #include "math.h"
 
-struct CollisionPowerupGroundData
-{
-    nlVector3 position;
-    float fVecZComponent;
-    ePowerUpType eType;
-};
-
-struct CollisionPowerupWallData
-{
-    PowerupBase* pPowerup;
-    ePowerupSize eSize;
-    ePowerUpType eType;
-    nlVector3 position;
-    nlVector3 normal;
-};
-
-extern SlotPool<CollisionPowerupGroundData> lbl_80571460;
-extern SlotPool<CollisionPowerupWallData> lbl_805714B0;
 extern void* lbl_806E1608;
 
 extern "C" bool fn_800167A8(cBall*);
@@ -135,7 +118,7 @@ ContactType PhysicsBanana::Contact(
                 if (linVel.z < -1.0f)
                 {
                     CollisionPowerupGroundData* eventData = 0;
-                    lbl_80571460.Allocate(eventData);
+                    g_CollisionPowerupGroundDataPool.Allocate(eventData);
                     GetPosition(&eventData->position);
                     eventData->fVecZComponent = linVel.z;
                     eventData->eType = m_pPowerupObject->m_eType;
@@ -365,7 +348,7 @@ ContactType PhysicsBanana::Contact(
             || other->GetObjectType() == 5)
         {
             CollisionPowerupWallData* eventData = 0;
-            lbl_805714B0.Allocate(eventData);
+            g_CollisionPowerupWallDataPool.Allocate(eventData);
             eventData->eSize = m_pPowerupObject->meSize;
             eventData->eType = m_pPowerupObject->m_eType;
             nlVec3Set(eventData->position, contact->geom.pos[0], contact->geom.pos[1], contact->geom.pos[2]);

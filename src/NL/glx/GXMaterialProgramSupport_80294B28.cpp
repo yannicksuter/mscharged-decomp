@@ -151,11 +151,8 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029E338>::Draw(
     static_cast<GXMaterialProgram_8029E338*>(this)->BindParameters(packet);
 
     int mode;
-    if (*(int*)((unsigned char*)packet->unknown20 + 20) == 0)
-    {
-        mode = 0;
-    }
-    else if (fn_801820FC() == 0)
+    if (*(int*)((unsigned char*)packet->unknown20 + 20) == 0
+        || fn_801820FC() == 0)
     {
         mode = 0;
     }
@@ -165,8 +162,9 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029E338>::Draw(
             mode = 3;
         else
         {
+            int result = fn_80182118();
             mode = 1;
-            if (fn_80182118() != 0)
+            if (result != 0)
                 mode = 2;
         }
     }

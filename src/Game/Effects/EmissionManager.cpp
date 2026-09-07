@@ -720,9 +720,8 @@ void fxSetTerrain(unsigned long terrainID)
  */
 void EmissionManager::KillOldest(int num, bool lingeringOnly)
 {
-    float prevBestAge;
+    float prevBestAge = 0.0f;
     float currentBestAge = 0.0f;
-    prevBestAge = currentBestAge;
 
     while (num > 0)
     {
@@ -736,9 +735,10 @@ void EmissionManager::KillOldest(int num, bool lingeringOnly)
             if ((!lingeringOnly || current->IsLingering())
                 && (current->m_uUserData + 0x21530000 != 0x0000BEEF))
             {
-                if (bestAge < current->m_Age
+                float age = current->m_Age;
+                if (bestAge < age
                     && (prevBestAge == currentBestAge
-                        || current->m_Age < currentBestAge))
+                        || age < currentBestAge))
                 {
                     bestAge = current->m_Age;
                     bestController = current;

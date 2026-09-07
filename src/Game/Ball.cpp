@@ -1977,7 +1977,7 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
         FakeBallWorld::InvalidateBallCache();
     }
 
-    if (!g_pGame->mUnidentified040)
+    if (!g_pGame->mbCaptainShotToScoreOn)
     {
         Goalie* pGoalie = m_pPrevOwner->m_pTeam->GetOtherTeam()->GetGoalie();
         pGoalie->InitActionSaveSetup(true);

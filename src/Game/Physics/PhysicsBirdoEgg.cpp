@@ -2,6 +2,7 @@
 
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
+#include "Game/EventDataTypes.h"
 #include "Game/Physics/Physics.h"
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsCharacter.h"
@@ -16,24 +17,6 @@ struct BirdoEggObject
     cFielder* mShooter;
 };
 
-struct CollisionBirdoShotBallPlayerData
-{
-    BirdoEggObject* egg;
-    cFielder* player;
-};
-
-struct CollisionBirdoEggGoalieData
-{
-    BirdoEggObject* egg;
-    cCharacter* goalie;
-};
-
-struct CollisionBirdoEggEndData
-{
-    BirdoEggObject* egg;
-    bool cracked;
-};
-
 struct CollisionCrackEggData
 {
     void* mUnidentified00;
@@ -43,9 +26,6 @@ struct CollisionCrackEggData
     void* mUnidentified10;
 };
 
-extern SlotPool<CollisionBirdoShotBallPlayerData> lbl_80571578;
-extern SlotPool<CollisionBirdoEggGoalieData> lbl_805715A0;
-extern SlotPool<CollisionBirdoEggEndData> lbl_805715F0;
 extern SlotPool<CollisionCrackEggData> lbl_80570188;
 
 extern "C" bool fn_8003E73C(cFielder*);
@@ -60,7 +40,7 @@ extern "C" void fn_80149EFC(CollisionCrackEggData*);
 static inline void QueueBirdoEggEnd(BirdoEggObject* egg, bool cracked)
 {
     CollisionBirdoEggEndData* eventData = 0;
-    lbl_805715F0.Allocate(eventData);
+    g_CollisionBirdoEggEndDataPool.Allocate(eventData);
     eventData->egg = egg;
     eventData->cracked = cracked;
     fn_8014725C(eventData);
@@ -106,7 +86,7 @@ ContactType PhysicsBirdoEgg::Contact(
             }
 
             CollisionBirdoShotBallPlayerData* eventData = 0;
-            lbl_80571578.Allocate(eventData);
+            g_CollisionBirdoShotBallPlayerDataPool.Allocate(eventData);
             eventData->player = fielder;
             eventData->egg = mBirdoEgg;
             fn_80146FCC(eventData);
@@ -120,7 +100,7 @@ ContactType PhysicsBirdoEgg::Contact(
         else
         {
             CollisionBirdoEggGoalieData* eventData = 0;
-            lbl_805715A0.Allocate(eventData);
+            g_CollisionBirdoEggGoalieDataPool.Allocate(eventData);
             eventData->goalie = character;
             eventData->egg = mBirdoEgg;
             fn_80147114(eventData);

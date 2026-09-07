@@ -181,8 +181,9 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029C2F8>::Draw(
     }
     else
     {
+        int result = fn_80182104(0);
         mode = 1;
-        if (fn_80182104(0) != 0)
+        if (result != 0)
             mode = 2;
     }
 

@@ -145,7 +145,7 @@ extern unsigned char lbl_806E0D18;
 extern unsigned char lbl_806E0D19;
 extern unsigned char lbl_806E0D1A;
 extern unsigned char lbl_806E0D22;
-extern cTeam* lbl_806E0E00;
+extern cTeam* g_pCurrentlyUpdatingTeam;
 extern nlVector4 lbl_8056D3B0;
 extern unsigned char lbl_806E0D20;
 extern unsigned char lbl_806E0D21;
@@ -1866,7 +1866,7 @@ void Goalie::ActionLooseBallPursueRolling(float deltaTime)
 
     bool bWallBlocked = mfWallBlock > 0.0f;
     if (bWallBlocked || (mnOffplayPending)
-        || (!IsLooseBallClose(*fn_800A636C(lbl_806E0E00)
+        || (!IsLooseBallClose(*fn_800A636C(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
         || ((g_pBall->m_pOwner != 0)
             && (g_pBall->m_pOwner != this)))
@@ -1882,7 +1882,7 @@ void Goalie::ActionLooseBallSetup(float fDeltaT)
 {
     bool bWallBlocked = mfWallBlock > 0.0f;
     if (bWallBlocked || (mnOffplayPending)
-        || (!IsLooseBallClose(*fn_800A636C(lbl_806E0E00)
+        || (!IsLooseBallClose(*fn_800A636C(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
         || ((g_pBall->m_pOwner != 0)
             && (g_pBall->m_pOwner != this)))
@@ -2267,7 +2267,7 @@ void Goalie::ActionMove(float deltaTime)
     }
 
     if (!isPassThreat && !fn_8007BF68(this, true)
-        && IsLooseBallClose(*fn_800A636C(lbl_806E0E00)
+        && IsLooseBallClose(*fn_800A636C(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
     {
         InitActionLooseBallSetup();
@@ -4471,7 +4471,7 @@ void Goalie::InitActionLooseBallSetup()
         return;
     }
 
-    if (!IsLooseBallClose(*fn_800A636C(lbl_806E0E00)
+    if (!IsLooseBallClose(*fn_800A636C(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
     {
         InitActionMove(true);

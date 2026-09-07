@@ -865,7 +865,7 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
     }
 
     const int* pFielderOrder = lbl_804DBF78;
-    if (m_pFormationManager->m_pTeam->field_0x18 == 0)
+    if (m_pFormationManager->m_pTeam->meCurrentSituation == 0)
     {
         pFielderOrder = lbl_804DBF88;
     }

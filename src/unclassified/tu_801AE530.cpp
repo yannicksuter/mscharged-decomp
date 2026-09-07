@@ -118,7 +118,7 @@ void UnidentifiedNumberDisplay_801AE530::fn_801AE71C()
 
 void UnidentifiedNumberDisplay_801AE530::fn_801AE728(float deltaTime)
 {
-    if (g_pGame->mUnidentified040)
+    if (g_pGame->mbCaptainShotToScoreOn)
     {
         return;
     }

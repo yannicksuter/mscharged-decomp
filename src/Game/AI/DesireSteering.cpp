@@ -5,6 +5,7 @@
 #include "Game/AI/DesireReceivePass.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Ball.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/DebugWriteCache.h"
@@ -49,7 +50,6 @@ extern "C" float fn_800DBC5C(cFielder*, cFielder*);
 extern "C" float fn_800DC19C(cFielder*, cBall*);
 extern "C" float fn_800DED80(cFielder*);
 extern "C" float fn_800DEFD4(cFielder*);
-extern "C" float fn_800DFD48(cTeam*);
 extern "C" float fn_800DFD74(cTeam*);
 
 extern bool lbl_806E0C50;
@@ -552,7 +552,7 @@ extern "C" float fn_800C6EB0(cFielder* pFielder)
         return 0.5f * fUnmarked
              + 0.5f * fn_800DC19C(pFielder, g_pBall);
     }
-    if (fn_800DFD48(fn_800D6670(pFielder)) >= 0.5f)
+    if (Offensive(fn_800D6670(pFielder)) >= 0.5f)
     {
         return 1.0f - fn_800D9070(pFielder);
     }

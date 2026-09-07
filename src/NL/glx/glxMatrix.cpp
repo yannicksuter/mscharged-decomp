@@ -1,5 +1,6 @@
 #include "NL/glx/glxMatrix.h"
 
+#include "math.h"
 #include <stddef.h>
 
 extern "C"
@@ -47,14 +48,14 @@ void glplatMatrixLookAt(nlMatrix4& m, const nlVector3& eye, const nlVector3& at,
     nlVec3Scale(side, side, nlRecipSqrt(nlVec3LengthSquared(side), true));
     nlVec3CrossProduct(cameraUp, view, side);
 
-    if (nlAbs(up.z) > 0.5f && (nlAbs(up.x) > 0.001f || nlAbs(up.y) > 0.001f))
+    if (fabsf(up.z) > 0.5f && (fabsf(up.x) > 0.001f || fabsf(up.y) > 0.001f))
     {
         nlVector4 sidePlane;
         nlVec4Set(sidePlane, side.x, side.y, side.z, 0.0f);
 
         nlVector3 projectedUp;
         nlProjectPointOntoPlane(projectedUp, up, sidePlane);
-        if (nlAbs(projectedUp.x) > 0.001f || nlAbs(projectedUp.y) > 0.001f)
+        if (fabsf(projectedUp.x) > 0.001f || fabsf(projectedUp.y) > 0.001f)
         {
             nlQuaternion rotation;
             const nlVector3 fallbackAxis = { 0.0f, 0.0f, 1.0f };

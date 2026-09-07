@@ -680,7 +680,29 @@ void NPCManager::fn_801AB9D4()
 
 NPCTemplate* NPCManager::fn_801ABBDC(const char* pName)
 {
-    return fn_801ABBDC_inline(pName);
+    for (int i = 0; i < 2; ++i)
+    {
+        nlDLListIterator<NPCTemplate*> iterator
+            = i == 0 ? mUnidentified00C.Begin()
+                     : mUnidentified014.Begin();
+        while (iterator.hasNext())
+        {
+            char name[40];
+            unsigned long length = nlStrLen((*iterator)->mName) + 1;
+            unsigned long copyLength = sizeof(name);
+            if (length <= sizeof(name))
+            {
+                copyLength = length;
+            }
+            nlStrNCpy(name, pName, copyLength);
+            if (nlStrICmp(name, (*iterator)->mName) == 0)
+            {
+                return *iterator;
+            }
+            iterator.next();
+        }
+    }
+    return 0;
 }
 
 void NPCManager::UpdateNPCs(float dt)

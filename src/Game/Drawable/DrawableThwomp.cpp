@@ -65,9 +65,8 @@ static void DrawShadow(ThwompObject* object, const nlMatrix4& matrix, void* mate
         groundHeight = ground->height;
     }
 
-    position.x = matrix.m41;
-    position.y = matrix.m42;
-    position.z = 0.015625f + groundHeight;
+    groundHeight = 0.015625f + groundHeight;
+    nlVec3Set(position, matrix.m41, matrix.m42, groundHeight);
     extent.x = size;
     extent.y = size;
     extent.z = 0.0f;

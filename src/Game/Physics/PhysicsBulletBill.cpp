@@ -4,6 +4,7 @@
 #include "Game/AI/Powerups.h"
 #include "Game/Ball.h"
 #include "Game/BulletBill.h"
+#include "Game/EventDataTypes.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
 #include "Game/Physics/Physics.h"
@@ -15,14 +16,6 @@
 #include "NL/nlSlotPool.h"
 
 #include <math.h>
-
-struct CollisionBulletBillData
-{
-    cCharacter* player;
-    BulletBillObject* bulletBill;
-};
-
-extern SlotPool<CollisionBulletBillData> lbl_805712F8;
 
 extern "C" void fn_80147C9C(CollisionBulletBillData*);
 extern "C" void fn_80147DE4(CollisionBulletBillData*);
@@ -67,7 +60,7 @@ ContactType PhysicsBulletBill::Contact(
             if (character != target && canHit)
             {
                 CollisionBulletBillData* eventData = 0;
-                lbl_805712F8.Allocate(eventData);
+                g_CollisionBulletBillDataPool.Allocate(eventData);
                 eventData->player = character;
                 eventData->bulletBill = mBulletBill;
                 fn_80147C9C(eventData);
@@ -76,7 +69,7 @@ ContactType PhysicsBulletBill::Contact(
         else
         {
             CollisionBulletBillData* eventData = 0;
-            lbl_805712F8.Allocate(eventData);
+            g_CollisionBulletBillDataPool.Allocate(eventData);
             eventData->player = character;
             eventData->bulletBill = mBulletBill;
             fn_80147F2C(eventData);
@@ -108,7 +101,7 @@ ContactType PhysicsBulletBill::Contact(
             if (canHit)
             {
                 CollisionBulletBillData* eventData = 0;
-                lbl_805712F8.Allocate(eventData);
+                g_CollisionBulletBillDataPool.Allocate(eventData);
                 eventData->player = owner;
                 eventData->bulletBill = mBulletBill;
                 fn_80147C9C(eventData);
@@ -117,7 +110,7 @@ ContactType PhysicsBulletBill::Contact(
         else
         {
             CollisionBulletBillData* eventData = 0;
-            lbl_805712F8.Allocate(eventData);
+            g_CollisionBulletBillDataPool.Allocate(eventData);
             eventData->player = owner;
             eventData->bulletBill = mBulletBill;
             fn_80147F2C(eventData);
@@ -139,7 +132,7 @@ ContactType PhysicsBulletBill::Contact(
         if (powerup->m_eType == POWER_UP_FREEZE_SHELL)
         {
             CollisionBulletBillData* eventData = 0;
-            lbl_805712F8.Allocate(eventData);
+            g_CollisionBulletBillDataPool.Allocate(eventData);
             eventData->player = mBulletBill->target;
             eventData->bulletBill = mBulletBill;
             fn_80147DE4(eventData);
@@ -155,7 +148,7 @@ ContactType PhysicsBulletBill::Contact(
         }
 
         CollisionBulletBillData* eventData = 0;
-        lbl_805712F8.Allocate(eventData);
+        g_CollisionBulletBillDataPool.Allocate(eventData);
         eventData->player = 0;
         eventData->bulletBill = mBulletBill;
         fn_80147F2C(eventData);
@@ -165,7 +158,7 @@ ContactType PhysicsBulletBill::Contact(
         if (mBulletBill->target->m_pBall == 0)
         {
             CollisionBulletBillData* eventData = 0;
-            lbl_805712F8.Allocate(eventData);
+            g_CollisionBulletBillDataPool.Allocate(eventData);
             eventData->player = 0;
             eventData->bulletBill = mBulletBill;
             fn_80147F2C(eventData);
@@ -182,7 +175,7 @@ ContactType PhysicsBulletBill::Contact(
     case 0x24:
     {
         CollisionBulletBillData* eventData = 0;
-        lbl_805712F8.Allocate(eventData);
+        g_CollisionBulletBillDataPool.Allocate(eventData);
         eventData->player = 0;
         eventData->bulletBill = mBulletBill;
         fn_80147F2C(eventData);
@@ -214,7 +207,7 @@ void PhysicsBulletBill::PreCollide()
         && fabsf(GetPosition().x) > cField::GetGoalLineX(1U) + 2.5f)
     {
         CollisionBulletBillData* eventData = 0;
-        lbl_805712F8.Allocate(eventData);
+        g_CollisionBulletBillDataPool.Allocate(eventData);
         eventData->player = mBulletBill->target;
         eventData->bulletBill = mBulletBill;
         fn_80147F2C(eventData);

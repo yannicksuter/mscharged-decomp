@@ -20,6 +20,9 @@
 class RenderSnapshot
 {
 public:
+    template <typename T>
+    void Replay(T& frame);
+
     RenderSnapshot();
 
     void Initialize();

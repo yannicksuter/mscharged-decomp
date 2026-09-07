@@ -47,6 +47,7 @@
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/DB/StatsTracker.h"
+#include "Game/EventDataTypes.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "NL/utility.h"
@@ -173,8 +174,6 @@ extern "C" void fn_8002E39C(cFielder* pFielder);
 extern "C" void fn_8002E2E4(cFielder* pFielder);
 extern "C" void fn_801BB640(cFielder* pFielder, int nParam);
 extern "C" void fn_8001458C(cBall* pBall);
-extern "C" float fn_800A6388(cTeam* pTeam);
-
 struct UnidentifiedTornado806E0C94
 {
     /* 0x00 */ u8 mUnidentified00[0x0C];
@@ -282,13 +281,6 @@ static int gHitReactAnims[3][4] = {
 };
 
 static int gShellAttackReactAnims[4] = { 0x5F, 0x62, 0x61, 0x60 };
-
-static int gPassAnims[4] = {
-    0x25,
-    0x28,
-    0x27,
-    0x26,
-};
 
 static unsigned short gHitReactFacingOffsets[4] = {
     0x8000, 0x4000, 0x0000, 0xC000,
@@ -723,7 +715,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
         m_pCurrentAnimController->m_fPlaybackSpeedScale = fSpeedScale;
 
-        PlayerAttackData* pData = lbl_80571960.Allocate();
+        PlayerAttackData* pData = g_PlayerAttackDataPool.Allocate();
         pData->pAttacker = this;
         bool bHasGlobalPad = GetGlobalPad() != 0;
         pData->nAttackerPadID
@@ -2213,7 +2205,7 @@ bool cFielder::fn_8004A330(cFielder* pOther)
 }
 
 bool cFielder::InitActionPass(
-    cPlayer* pPassTarget, bool bVolleyPass, int nParam, bool bParam)
+    cPlayer* pPassTarget, bool bVolleyPass, int nParam, bool bIsOneTouchPass)
 {
     if (pPassTarget == 0)
     {
@@ -2223,16 +2215,22 @@ bool cFielder::InitActionPass(
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_PASS);
 
-    s16 facingDelta = GetFacingDeltaToPosition(pPassTarget->m_v3Position);
-    int index = (u16)(facingDelta + 0x2000) >> 14;
+    static int PassingAnims[4] = {
+        0x25,
+        0x28,
+        0x27,
+        0x26,
+    };
+    signed short nFacingDelta = GetFacingDeltaToPosition(pPassTarget->m_v3Position);
+    int index = (u16)(nFacingDelta + 0x2000) >> 14;
 
     if (m_eCharacterClass == HAMMERBROS)
     {
-        SetAnimState(gPassAnims[index], false, lbl_806E35CC, false, false);
+        SetAnimState(PassingAnims[index], false, lbl_806E35CC, false, false);
     }
     else
     {
-        SetAnimState(gPassAnims[index], true, 0.2f, false, false);
+        SetAnimState(PassingAnims[index], true, 0.2f, false, false);
     }
 
     InitMovementCoast();
@@ -2254,7 +2252,7 @@ bool cFielder::InitActionPass(
     bIsModified = bVolleyPass;
     mUnidentified36C = pPassTarget;
     mUnidentified370 = nParam == 0;
-    mUnidentified371 = bParam;
+    mUnidentified371 = bIsOneTouchPass;
     return true;
 }
 
@@ -2323,7 +2321,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
         if (pAttacker->m_eClassType == FIELDER && !bSkipEvent
             && pAttacker != this && bHadBall)
         {
-            PlayerAttackData* pNode = lbl_80571960.Allocate();
+            PlayerAttackData* pNode = g_PlayerAttackDataPool.Allocate();
             pNode->pAttacker = pAttacker;
             bool bHasPad = pAttacker->GetGlobalPad() != 0;
             pNode->nAttackerPadID
@@ -4621,7 +4619,7 @@ void cFielder::InitActionSlideAttack(
         StopSound(0x2AE03886, this);
         PlaySound(0, 0x2AE03886, "SlideAttack", this);
 
-        PlayerAttackData* pNode = lbl_80571960.Allocate();
+        PlayerAttackData* pNode = g_PlayerAttackDataPool.Allocate();
         pNode->pAttacker = this;
         bool bHasPad = GetGlobalPad() != 0;
         pNode->nAttackerPadID = bHasPad ? GetGlobalPad()->GetPadID() : -1;
@@ -4872,7 +4870,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
                 && g_pBall->m_pPrevOwner->m_eClassType == FIELDER
                 && !IsOnSameTeam(g_pBall->m_pPrevOwner))
             {
-                PlayerAttackData* pNode = lbl_80571960.Allocate();
+                PlayerAttackData* pNode = g_PlayerAttackDataPool.Allocate();
                 pNode->pAttacker = this;
                 bool bHasPad = GetGlobalPad() != 0;
                 pNode->nAttackerPadID
@@ -5349,10 +5347,10 @@ void cFielder::fn_8004EC40()
 
         if (mUnidentified420->active)
         {
-            UnidentifiedSkillshotNode* pNode;
-            lbl_805712F8.Allocate(pNode);
-            pNode->mUnidentified0 = this;
-            pNode->mUnidentified4 = mUnidentified420;
+            CollisionBulletBillData* pNode = 0;
+            g_CollisionBulletBillDataPool.Allocate(pNode);
+            pNode->player = this;
+            pNode->bulletBill = mUnidentified420;
             fn_80147F2C(pNode);
         }
 

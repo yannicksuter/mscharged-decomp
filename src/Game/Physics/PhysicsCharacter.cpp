@@ -22,16 +22,6 @@ extern "C" int strcmpi(const char*, const char*);
 extern "C" bool fn_8003E948(cFielder*);
 extern void* lbl_806E1608;
 
-struct CollisionPlayerBallData
-{
-    cPlayer* pPlayer;
-    cBall* pBall;
-    nlVector3 velocity;
-    PhysicsBoneID boneID;
-};
-
-extern SlotPool<CollisionPlayerWallData> lbl_80571348;
-extern SlotPool<CollisionPlayerBallData> lbl_805714D8;
 extern "C" void fn_80145F18(CollisionPlayerWallData*);
 extern "C" void fn_801462DC(CollisionPlayerBallData*);
 extern "C" void fn_80145DD0(CollisionPlayerPlayerData*);
@@ -200,7 +190,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             if (contacts[i].geom.normal[2] < 0.08f)
             {
                 CollisionPlayerWallData* wallData = 0;
-                lbl_80571348.Allocate(wallData);
+                g_CollisionPlayerWallDataPool.Allocate(wallData);
                 wallData->pPlayer = (cPlayer*)m_pAICharacter;
                 wallData->contactPoint = contactPosition;
                 nlVec3Set(wallData->wallNormal,
@@ -382,7 +372,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         if (!m_HasCollidedWithBall)
         {
             CollisionPlayerBallData* ballData = 0;
-            lbl_805714D8.Allocate(ballData);
+            g_CollisionPlayerBallDataPool.Allocate(ballData);
             ballData->pPlayer = (cPlayer*)m_pAICharacter;
             ballData->pBall = ball;
             ballData->velocity = other->GetLinearVelocity();
@@ -506,7 +496,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         if (sPlayerPlayerCollisionData[collisionIndex] == 0)
         {
             CollisionPlayerPlayerData* data = 0;
-            gCollisionPlayerPlayerDataPool.Allocate(data);
+            g_CollisionPlayerPlayerDataPool.Allocate(data);
             sPlayerPlayerCollisionData[collisionIndex] = data;
             data->player1 = (cPlayer*)collisionPlayer1;
             data->player2 = (cPlayer*)collisionPlayer2;

@@ -341,26 +341,28 @@ bool NetworkStatsManager_8012F378::PostResetMyPlayerStats(
     {
         mOperation = 1;
         mOperationStartTime = mCurrentTime;
-        return true;
     }
-
-    tDebugPrintManager::Print(DC_NETWORK, "Initial failure PostResetMyPlayerStats cat %d\n", category);
-    mOperation = 0;
-    mStatsError = true;
-    return false;
+    else
+    {
+        tDebugPrintManager::Print(DC_NETWORK, "Initial failure PostResetMyPlayerStats cat %d\n", category);
+        mOperation = 0;
+        mStatsError = true;
+        return false;
+    }
+    return true;
 }
 
 void NetworkStatsManager_8012F378::OnSubmitScoreResult(
-    bool success, int)
+    bool success, int category)
 {
     mOperation = 0;
     mScoreRequestComplete = true;
     mScoreCategory = mSubmissionCategory;
-    if (!success)
+    if ((int)success != 1)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "FinishedPostResetMyPlayerStats returned error cat %d\n",
-            mSubmissionCategory);
+            category);
         mScoreRequestSucceeded = false;
         mStatsError = true;
     }
@@ -418,7 +420,7 @@ int CalculateResultPoints_80130684(int result, bool home, int homeScore,
         *scorePoints = 0;
         *won = false;
     }
-    return *bonusPoints + *resultPoints + *scorePoints;
+    return *resultPoints + *scorePoints + *bonusPoints;
 }
 
 void NetworkStatsManager_8012F378::UpdateOnlineResultTotals(

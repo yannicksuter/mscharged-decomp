@@ -214,17 +214,21 @@ void FERender::RenderScene(FEScene* scene)
     identity.SetIdentity();
 
     FEPresentation* presentation = scene->m_pFEPackage->GetPresentation();
+    TLInstance* curr;
+    TLInstance* next;
+    TLSlide* slide;
     if (presentation != 0 && presentation->m_slides != 0)
     {
-        TLSlide* slide = presentation->m_currentSlide;
+        slide = presentation->m_currentSlide;
         if (slide != 0 && slide->m_instances != 0)
         {
-            TLInstance* curr = slide->m_instances->m_next;
+            curr = slide->m_instances->m_next;
             for (;;)
             {
-                TLInstance* next = curr->m_next;
+                float fCurrentTime = slide->m_time;
+                next = curr->m_next;
                 nlFloatColour colour = s_currentAssetColour;
-                RenderTimeLineAsset(curr, slide->m_time, identity);
+                RenderTimeLineAsset(curr, fCurrentTime, identity);
                 s_currentAssetColour = colour;
                 if (curr == slide->m_instances)
                 {

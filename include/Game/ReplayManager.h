@@ -5,6 +5,12 @@
 #include "Game/RenderSnapshot.h"
 #include "Game/Replay.h"
 
+struct GoalScoredData;
+struct UnidentifiedEventData_800662B4;
+struct UnidentifiedEventData_800663A8;
+struct UnidentifiedEventData_8006649C;
+struct UnidentifiedEventData_80066590;
+
 class ReplayManager
 {
     ReplayManager();
@@ -15,12 +21,14 @@ class ReplayManager
 public:
     static ReplayManager* Instance();
     void Initialize();
+    void fn_80188D88();
     void InitializeSnapshots();
     void fn_801895B0();
-    void fn_801895C0();
-    void fn_801895D0();
-    void fn_801895E0();
-    void fn_80189610();
+    void fn_801895C0(UnidentifiedEventData_800662B4* event);
+    void fn_801895D0(UnidentifiedEventData_80066590* event);
+    void fn_801895E0(UnidentifiedEventData_800663A8* event);
+    void fn_801895F0(GoalScoredData* event);
+    void fn_80189610(UnidentifiedEventData_8006649C* event);
     void fn_80189620();
     void Uninitialize();
     void GrabSnapshot();

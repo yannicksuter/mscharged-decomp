@@ -4,6 +4,7 @@
 #include "Game/FE/feScene.h"
 #include "Game/FE/feSceneResource.h"
 #include "Game/FE/feTextureResource.h"
+#include "Game/Font/fontmanager.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"
 #include "NL/MemAlloc.h"
@@ -32,10 +33,7 @@ struct PermanentBundleLoadState
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
-extern void* lbl_806E2090;
 extern int nlPrintf(const char* format, ...);
-
-extern "C" void* fn_80307260(void* manager, unsigned long hashID);
 
 static nlAVLTreeSlotPool<unsigned long, FEResourceHandle*, DefaultKeyCompare<unsigned long> > s_loadedResourceList(0x200, 0);
 static unsigned char* s_pResourceLoadBuffer;
@@ -203,7 +201,10 @@ void FEResourceManager::Cleanup()
                 pFeResourceHandle->m_type);
             iterator->Next();
         }
-        delete iterator;
+        if (iterator != 0)
+        {
+            delete iterator;
+        }
     }
 
     s_loadedResourceList.Clear();
@@ -423,7 +424,7 @@ void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSi
     pHandle->m_bValid = true;
 }
 
-void FEResourceManager::Update(float)
+void FEResourceManager::Update(float dt)
 {
     ResourceResult result;
     bool bQueueNextResource = true;
@@ -463,11 +464,15 @@ void FEResourceManager::Update(float)
             result = IssueSceneContextSwitch((FESceneResource*)s_pCurrentResourceBeingLoaded);
             break;
         case FERT_FONT:
-            ((FEFontResource*)pendingResource.pHandle)
-                ->SetFontReference((nlFont*)fn_80307260(lbl_806E2090, pendingResource.pHandle->m_hashID));
-            pendingResource.pHandle->m_bValid = true;
+        {
+            FEFontResource* pFeFontResource = (FEFontResource*)pendingResource.pHandle;
+            FEResourceHandle* pFeResourceHandle = (FEResourceHandle*)pFeFontResource;
+            nlFont* pExistingFont = FontManager::Instance()->GetFontByHashID(pFeResourceHandle->m_hashID);
+            pFeFontResource->SetFontReference(pExistingFont);
+            pFeResourceHandle->m_bValid = true;
             result = FERR_AlreadyLoaded;
             break;
+        }
         default:
             break;
         }

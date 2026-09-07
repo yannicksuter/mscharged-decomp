@@ -18,6 +18,6 @@ struct PlayerAttackData
 
 template <typename T>
 class SlotPool;
-extern "C" SlotPool<PlayerAttackData> lbl_80571960;
+extern SlotPool<PlayerAttackData> g_PlayerAttackDataPool;
 
 #endif // GAME_AI_FIELDERACTIONS_H

@@ -566,7 +566,7 @@ float SkillTweaks::GetReaction(cPlayer* param1)
         return result;
     }
 
-    switch (param1->m_pTeam->field_0x18)
+    switch (param1->m_pTeam->meCurrentSituation)
     {
     case 1:
         return Def_Reaction->GetValue();

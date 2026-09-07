@@ -270,9 +270,9 @@ void HealthWarningSceneV2::SceneCreated()
 {
 }
 
-void HealthWarningSceneV2::Update(float dt)
+void HealthWarningSceneV2::Update(float fDeltaT)
 {
-    BaseSceneHandler::Update(dt);
+    BaseSceneHandler::Update(fDeltaT);
 
     switch (mState)
     {

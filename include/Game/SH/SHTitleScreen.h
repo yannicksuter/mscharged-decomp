@@ -40,7 +40,7 @@ class HealthWarningSceneV2 : public BaseSceneHandler
 public:
     HealthWarningSceneV2();
     virtual ~HealthWarningSceneV2();
-    virtual void Update(float dt);
+    virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
     /* 0x1C */ int mState;

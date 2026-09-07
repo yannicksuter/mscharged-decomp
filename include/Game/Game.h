@@ -97,6 +97,8 @@ public:
         return (m_eGameState == 5 || m_eGameState == 6);
     }
 
+    inline int GetGameState() const { return m_eGameState; }
+
     /* 0x04 */ FuzzyTweaks* m_pFuzzyTweaks;
     /* 0x08 */ Clock* m_pGameClock;
     /* 0x0C */ Clock* m_pPostResetClock;
@@ -132,7 +134,7 @@ public:
 
 private:
 public:
-    /* 0x40 */ bool mUnidentified040;
+    /* 0x40 */ bool mbCaptainShotToScoreOn;
     /* 0x41 */ bool mUnidentified041;
     /* 0x42 */ bool mUnidentified042;
 

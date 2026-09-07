@@ -2,6 +2,7 @@
 
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Ball.h"
+#include "Game/EventDataTypes.h"
 #include "Game/Field.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Team.h"
@@ -14,14 +15,6 @@
 
 extern cTeam* g_pTeams[];
 
-struct CollisionBallGoalpostData
-{
-    nlVector3 v3CollisionVelocity;
-    nlVector3 v3CollisionPosition;
-    unsigned int uTeamIndex;
-};
-
-extern SlotPool<CollisionBallGoalpostData> lbl_80571758;
 extern "C" void fn_8014681C(CollisionBallGoalpostData*);
 
 PhysicsNet* PhysicsNet::spPhysNetNegativeX = 0;
@@ -521,7 +514,7 @@ bool PhysicsNet::SweepTestForBallContact(const nlVector3& startPos, const nlVect
         if (velocitySquared > 25.0f)
         {
             pEventData = 0;
-            lbl_80571758.Allocate(pEventData);
+            g_CollisionBallGoalpostDataPool.Allocate(pEventData);
             pEventData->v3CollisionVelocity = ballLinearVelocity;
             pEventData->v3CollisionPosition = contactPos;
             pEventData->uTeamIndex = (g_pBall->m_v3Position.x < 0.0f) ? 0 : 1;

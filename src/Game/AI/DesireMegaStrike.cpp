@@ -24,7 +24,7 @@ extern "C" float fn_800499EC(cFielder*, int);
 extern "C" float fn_80049CC0(cFielder*, int);
 extern "C" void fn_8005FA2C(cGame*);
 extern "C" void fn_80098098(cFielder*);
-extern cTeam* lbl_806E0E00;
+extern cTeam* g_pCurrentlyUpdatingTeam;
 extern bool lbl_806E0E30;
 extern bool lbl_806E0E31;
 
@@ -61,7 +61,7 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
         int i;
         for (i = 0; i < 4; ++i)
         {
-            probabilities[i] = fn_800A636C(lbl_806E0E00)
+            probabilities[i] = fn_800A636C(g_pCurrentlyUpdatingTeam)
                                    ->MegaGoalChance[i]
                                    ->GetValue();
         }
@@ -123,7 +123,7 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
 
         int nSkillIndex = (int)(
             (float)mUnidentifiedA4 - mUnidentifiedFielder->fn_800489C4());
-        float fAccuracy = fn_800A636C(lbl_806E0E00)
+        float fAccuracy = fn_800A636C(g_pCurrentlyUpdatingTeam)
                               ->MegaGoalAccuracy[nSkillIndex]
                               ->GetValue();
         if (mUnidentifiedA8 < fAccuracy)

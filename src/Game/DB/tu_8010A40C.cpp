@@ -319,12 +319,492 @@ int fn_8011162C()
     return 0;
 }
 
-template TeamStats* Cup<4, 8>::GetPreviousTeamStats();
-template TeamStats* Cup<6, 12>::GetPreviousTeamStats();
-template TeamStats* Cup<10, 11>::GetPreviousTeamStats();
-template u16 Cup<4, 8>::GetNumTeams();
-template u16 Cup<6, 12>::GetNumTeams();
-template u16 Cup<10, 11>::GetNumTeams();
-template int Cup<4, 8>::GetSaveDataSize() const;
-template int Cup<6, 12>::GetSaveDataSize() const;
-template int Cup<10, 11>::GetSaveDataSize() const;
+// Explicit specializations emit strong symbols matching R4QE01 (predecessor
+// keeps these weak). Bodies reproduce the retail immediates via sizeof and
+// the vtable order follows Cup.h declaration order.
+
+template <>
+BasicGameInfo* Cup<4, 8>::GetGameInfo(int round, int matchup)
+{
+    return GetGameInfo(mRoundType, round, matchup);
+}
+template <>
+BasicGameInfo* Cup<6, 12>::GetGameInfo(int round, int matchup)
+{
+    return GetGameInfo(mRoundType, round, matchup);
+}
+template <>
+BasicGameInfo* Cup<10, 11>::GetGameInfo(int round, int matchup)
+{
+    return GetGameInfo(mRoundType, round, matchup);
+}
+
+template <>
+BasicGameInfo* Cup<4, 8>::GetGameInfo(int index)
+{
+    return &mGameInfo[0][index];
+}
+template <>
+BasicGameInfo* Cup<6, 12>::GetGameInfo(int index)
+{
+    return &mGameInfo[0][index];
+}
+template <>
+BasicGameInfo* Cup<10, 11>::GetGameInfo(int index)
+{
+    return &mGameInfo[0][index];
+}
+
+template <>
+TeamStats* Cup<4, 8>::GetTeamStats(int index)
+{
+    return &mTeamStats[index];
+}
+template <>
+TeamStats* Cup<6, 12>::GetTeamStats(int index)
+{
+    return &mTeamStats[index];
+}
+template <>
+TeamStats* Cup<10, 11>::GetTeamStats(int index)
+{
+    return &mTeamStats[index];
+}
+
+template <>
+TeamStats* Cup<4, 8>::GetPreviousTeamStats()
+{
+    return &mPreviousTeamStats;
+}
+template <>
+TeamStats* Cup<6, 12>::GetPreviousTeamStats()
+{
+    return &mPreviousTeamStats;
+}
+template <>
+TeamStats* Cup<10, 11>::GetPreviousTeamStats()
+{
+    return &mPreviousTeamStats;
+}
+
+template <>
+u16 Cup<4, 8>::GetNumTeams()
+{
+    return 4;
+}
+template <>
+u16 Cup<6, 12>::GetNumTeams()
+{
+    return 6;
+}
+template <>
+u16 Cup<10, 11>::GetNumTeams()
+{
+    return 10;
+}
+
+template <>
+BasicGameInfo* Cup<4, 8>::GetGameInfo(int phase, int round, int matchup)
+{
+    BasicGameInfo* result = 0;
+    switch (phase)
+    {
+    case 0:
+    {
+        int index = matchup + round * 4 / 2;
+        result = &mGameInfo[0][index];
+        break;
+    }
+    case 1:
+    {
+        int index = 12;
+        if (round != 0)
+        {
+            if (round == -1)
+            {
+                index = 10 + matchup;
+            }
+            else if (round == -2)
+            {
+                index = 6 + matchup;
+            }
+        }
+        result = &mGameInfo[0][index];
+        break;
+    }
+    case 2:
+    {
+        int index = 16 - (3 - round);
+        result = &mGameInfo[0][index];
+        break;
+    }
+    }
+    return result;
+}
+template <>
+BasicGameInfo* Cup<6, 12>::GetGameInfo(int phase, int round, int matchup)
+{
+    BasicGameInfo* result = 0;
+    switch (phase)
+    {
+    case 0:
+    {
+        int index = matchup + round * 6 / 2;
+        result = &mGameInfo[0][index];
+        break;
+    }
+    case 1:
+    {
+        int index = 32;
+        if (round != 1)
+        {
+            if (round == 0)
+            {
+                index = 30 + matchup;
+            }
+            else if (round == -1)
+            {
+                index = 26 + matchup;
+            }
+        }
+        result = &mGameInfo[0][index];
+        break;
+    }
+    case 2:
+    {
+        int index = 36 - (3 - round);
+        result = &mGameInfo[0][index];
+        break;
+    }
+    }
+    return result;
+}
+template <>
+BasicGameInfo* Cup<10, 11>::GetGameInfo(int phase, int round, int matchup)
+{
+    BasicGameInfo* result = 0;
+    switch (phase)
+    {
+    case 0:
+    {
+        int index = matchup + round * 10 / 2;
+        result = &mGameInfo[0][index];
+        break;
+    }
+    case 1:
+    {
+        int index = 51;
+        if (round != 2)
+        {
+            if (round == 1)
+            {
+                index = 49 + matchup;
+            }
+            else if (round == 0)
+            {
+                index = 45 + matchup;
+            }
+        }
+        result = &mGameInfo[0][index];
+        break;
+    }
+    case 2:
+    {
+        int index = 55 - (3 - round);
+        result = &mGameInfo[0][index];
+        break;
+    }
+    }
+    return result;
+}
+
+template <>
+u16 Cup<4, 8>::GetNumGamesPerRound(int phase)
+{
+    if (phase == 0)
+    {
+        return 6;
+    }
+    if (phase == 1)
+    {
+        return 1;
+    }
+    if (phase == 2)
+    {
+        return 3;
+    }
+    return 6;
+}
+template <>
+u16 Cup<6, 12>::GetNumGamesPerRound(int phase)
+{
+    if (phase == 0)
+    {
+        return 10;
+    }
+    if (phase == 1)
+    {
+        return 2;
+    }
+    if (phase == 2)
+    {
+        return 3;
+    }
+    return 10;
+}
+template <>
+u16 Cup<10, 11>::GetNumGamesPerRound(int phase)
+{
+    if (phase == 0)
+    {
+        return 9;
+    }
+    if (phase == 1)
+    {
+        return 3;
+    }
+    if (phase == 2)
+    {
+        return 3;
+    }
+    return 9;
+}
+
+template <>
+u16 Cup<4, 8>::GetNumRounds()
+{
+    return 10;
+}
+template <>
+u16 Cup<6, 12>::GetNumRounds()
+{
+    return 15;
+}
+template <>
+u16 Cup<10, 11>::GetNumRounds()
+{
+    return 15;
+}
+
+template <>
+u16 Cup<4, 8>::GetNumRegularGames()
+{
+    return 6;
+}
+template <>
+u16 Cup<6, 12>::GetNumRegularGames()
+{
+    return 10;
+}
+template <>
+u16 Cup<10, 11>::GetNumRegularGames()
+{
+    return 9;
+}
+
+template <>
+u16 Cup<4, 8>::GetNumPlayoffGames()
+{
+    return 1;
+}
+template <>
+u16 Cup<6, 12>::GetNumPlayoffGames()
+{
+    return 2;
+}
+template <>
+u16 Cup<10, 11>::GetNumPlayoffGames()
+{
+    return 3;
+}
+
+template <>
+u16 Cup<4, 8>::GetFirstRoundNumber()
+{
+    return 0;
+}
+template <>
+u16 Cup<6, 12>::GetFirstRoundNumber()
+{
+    return 0;
+}
+template <>
+u16 Cup<10, 11>::GetFirstRoundNumber()
+{
+    return 0;
+}
+
+template <>
+void Cup<4, 8>::Reset()
+{
+    for (int i = 0; i < 8 * (4 / 2); i++)
+    {
+        mGameInfo[0][i].Reset(true);
+    }
+}
+template <>
+void Cup<6, 12>::Reset()
+{
+    for (int i = 0; i < 12 * (6 / 2); i++)
+    {
+        mGameInfo[0][i].Reset(true);
+    }
+}
+template <>
+void Cup<10, 11>::Reset()
+{
+    for (int i = 0; i < 11 * (10 / 2); i++)
+    {
+        mGameInfo[0][i].Reset(true);
+    }
+}
+
+template <>
+void* Cup<4, 8>::SerializeData(void* dst) const
+{
+    memcpy(dst, &mUserSelectedTeam, sizeof(mUserSelectedTeam));
+    dst = (u8*)dst + sizeof(mUserSelectedTeam);
+    memcpy(dst, mUserSelectedSidekick, sizeof(mUserSelectedSidekick));
+    dst = (u8*)dst + sizeof(mUserSelectedSidekick);
+    memcpy(dst, &mRoundType, sizeof(mRoundType));
+    dst = (u8*)dst + sizeof(mRoundType);
+    memcpy(dst, &mRoundNumber, sizeof(mRoundNumber));
+    dst = (u8*)dst + sizeof(mRoundNumber);
+    memcpy(dst, &mGameNumber, sizeof(mGameNumber));
+    dst = (u8*)dst + sizeof(mGameNumber);
+    memcpy(dst, &mHumanTeams, sizeof(mHumanTeams));
+    dst = (u8*)dst + sizeof(mHumanTeams);
+    memcpy(dst, mGameInfo, sizeof(mGameInfo));
+    dst = (u8*)dst + sizeof(mGameInfo);
+    memcpy(dst, mTeamStats, sizeof(mTeamStats));
+    dst = (u8*)dst + sizeof(mTeamStats);
+    memcpy(dst, &mPreviousTeamStats, sizeof(mPreviousTeamStats));
+    return (u8*)dst + sizeof(mPreviousTeamStats);
+}
+template <>
+void* Cup<6, 12>::SerializeData(void* dst) const
+{
+    memcpy(dst, &mUserSelectedTeam, sizeof(mUserSelectedTeam));
+    dst = (u8*)dst + sizeof(mUserSelectedTeam);
+    memcpy(dst, mUserSelectedSidekick, sizeof(mUserSelectedSidekick));
+    dst = (u8*)dst + sizeof(mUserSelectedSidekick);
+    memcpy(dst, &mRoundType, sizeof(mRoundType));
+    dst = (u8*)dst + sizeof(mRoundType);
+    memcpy(dst, &mRoundNumber, sizeof(mRoundNumber));
+    dst = (u8*)dst + sizeof(mRoundNumber);
+    memcpy(dst, &mGameNumber, sizeof(mGameNumber));
+    dst = (u8*)dst + sizeof(mGameNumber);
+    memcpy(dst, &mHumanTeams, sizeof(mHumanTeams));
+    dst = (u8*)dst + sizeof(mHumanTeams);
+    memcpy(dst, mGameInfo, sizeof(mGameInfo));
+    dst = (u8*)dst + sizeof(mGameInfo);
+    memcpy(dst, mTeamStats, sizeof(mTeamStats));
+    dst = (u8*)dst + sizeof(mTeamStats);
+    memcpy(dst, &mPreviousTeamStats, sizeof(mPreviousTeamStats));
+    return (u8*)dst + sizeof(mPreviousTeamStats);
+}
+template <>
+void* Cup<10, 11>::SerializeData(void* dst) const
+{
+    memcpy(dst, &mUserSelectedTeam, sizeof(mUserSelectedTeam));
+    dst = (u8*)dst + sizeof(mUserSelectedTeam);
+    memcpy(dst, mUserSelectedSidekick, sizeof(mUserSelectedSidekick));
+    dst = (u8*)dst + sizeof(mUserSelectedSidekick);
+    memcpy(dst, &mRoundType, sizeof(mRoundType));
+    dst = (u8*)dst + sizeof(mRoundType);
+    memcpy(dst, &mRoundNumber, sizeof(mRoundNumber));
+    dst = (u8*)dst + sizeof(mRoundNumber);
+    memcpy(dst, &mGameNumber, sizeof(mGameNumber));
+    dst = (u8*)dst + sizeof(mGameNumber);
+    memcpy(dst, &mHumanTeams, sizeof(mHumanTeams));
+    dst = (u8*)dst + sizeof(mHumanTeams);
+    memcpy(dst, mGameInfo, sizeof(mGameInfo));
+    dst = (u8*)dst + sizeof(mGameInfo);
+    memcpy(dst, mTeamStats, sizeof(mTeamStats));
+    dst = (u8*)dst + sizeof(mTeamStats);
+    memcpy(dst, &mPreviousTeamStats, sizeof(mPreviousTeamStats));
+    return (u8*)dst + sizeof(mPreviousTeamStats);
+}
+
+template <>
+void* Cup<4, 8>::DeserializeData(void* src)
+{
+    memcpy(&mUserSelectedTeam, src, sizeof(mUserSelectedTeam));
+    src = (u8*)src + sizeof(mUserSelectedTeam);
+    memcpy(mUserSelectedSidekick, src, sizeof(mUserSelectedSidekick));
+    src = (u8*)src + sizeof(mUserSelectedSidekick);
+    memcpy(&mRoundType, src, sizeof(mRoundType));
+    src = (u8*)src + sizeof(mRoundType);
+    memcpy(&mRoundNumber, src, sizeof(mRoundNumber));
+    src = (u8*)src + sizeof(mRoundNumber);
+    memcpy(&mGameNumber, src, sizeof(mGameNumber));
+    src = (u8*)src + sizeof(mGameNumber);
+    memcpy(&mHumanTeams, src, sizeof(mHumanTeams));
+    src = (u8*)src + sizeof(mHumanTeams);
+    memcpy(mGameInfo, src, sizeof(mGameInfo));
+    src = (u8*)src + sizeof(mGameInfo);
+    memcpy(mTeamStats, src, sizeof(mTeamStats));
+    src = (u8*)src + sizeof(mTeamStats);
+    memcpy(&mPreviousTeamStats, src, sizeof(mPreviousTeamStats));
+    return (u8*)src + sizeof(mPreviousTeamStats);
+}
+template <>
+void* Cup<6, 12>::DeserializeData(void* src)
+{
+    memcpy(&mUserSelectedTeam, src, sizeof(mUserSelectedTeam));
+    src = (u8*)src + sizeof(mUserSelectedTeam);
+    memcpy(mUserSelectedSidekick, src, sizeof(mUserSelectedSidekick));
+    src = (u8*)src + sizeof(mUserSelectedSidekick);
+    memcpy(&mRoundType, src, sizeof(mRoundType));
+    src = (u8*)src + sizeof(mRoundType);
+    memcpy(&mRoundNumber, src, sizeof(mRoundNumber));
+    src = (u8*)src + sizeof(mRoundNumber);
+    memcpy(&mGameNumber, src, sizeof(mGameNumber));
+    src = (u8*)src + sizeof(mGameNumber);
+    memcpy(&mHumanTeams, src, sizeof(mHumanTeams));
+    src = (u8*)src + sizeof(mHumanTeams);
+    memcpy(mGameInfo, src, sizeof(mGameInfo));
+    src = (u8*)src + sizeof(mGameInfo);
+    memcpy(mTeamStats, src, sizeof(mTeamStats));
+    src = (u8*)src + sizeof(mTeamStats);
+    memcpy(&mPreviousTeamStats, src, sizeof(mPreviousTeamStats));
+    return (u8*)src + sizeof(mPreviousTeamStats);
+}
+template <>
+void* Cup<10, 11>::DeserializeData(void* src)
+{
+    memcpy(&mUserSelectedTeam, src, sizeof(mUserSelectedTeam));
+    src = (u8*)src + sizeof(mUserSelectedTeam);
+    memcpy(mUserSelectedSidekick, src, sizeof(mUserSelectedSidekick));
+    src = (u8*)src + sizeof(mUserSelectedSidekick);
+    memcpy(&mRoundType, src, sizeof(mRoundType));
+    src = (u8*)src + sizeof(mRoundType);
+    memcpy(&mRoundNumber, src, sizeof(mRoundNumber));
+    src = (u8*)src + sizeof(mRoundNumber);
+    memcpy(&mGameNumber, src, sizeof(mGameNumber));
+    src = (u8*)src + sizeof(mGameNumber);
+    memcpy(&mHumanTeams, src, sizeof(mHumanTeams));
+    src = (u8*)src + sizeof(mHumanTeams);
+    memcpy(mGameInfo, src, sizeof(mGameInfo));
+    src = (u8*)src + sizeof(mGameInfo);
+    memcpy(mTeamStats, src, sizeof(mTeamStats));
+    src = (u8*)src + sizeof(mTeamStats);
+    memcpy(&mPreviousTeamStats, src, sizeof(mPreviousTeamStats));
+    return (u8*)src + sizeof(mPreviousTeamStats);
+}
+
+template <>
+int Cup<4, 8>::GetSaveDataSize() const
+{
+    return 0x1A + sizeof(mGameInfo) + sizeof(mTeamStats) + sizeof(mPreviousTeamStats);
+}
+template <>
+int Cup<6, 12>::GetSaveDataSize() const
+{
+    return 0x1A + sizeof(mGameInfo) + sizeof(mTeamStats) + sizeof(mPreviousTeamStats);
+}
+template <>
+int Cup<10, 11>::GetSaveDataSize() const
+{
+    return 0x1A + sizeof(mGameInfo) + sizeof(mTeamStats) + sizeof(mPreviousTeamStats);
+}

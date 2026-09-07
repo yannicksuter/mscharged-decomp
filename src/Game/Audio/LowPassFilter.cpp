@@ -87,9 +87,7 @@ void LowPassFilter::CreateParameter(unsigned int definition, void*, bool disable
     {
         m_Final.m_On = sLowPassFilterEnabled;
         m_Final.m_Frequency = sLowPassFilterFrequency;
-        parameter->m_State = m_Final.m_State;
-        parameter->m_On = m_Final.m_On;
-        parameter->m_Frequency = m_Final.m_Frequency;
+        *parameter = m_Final;
         return;
     }
 

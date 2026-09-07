@@ -1,4 +1,3 @@
-#include "Game/Sys/audio.h"
 #include "Game/Render/Wiper.h"
 
 #include "Game/Effects/EmissionController.h"
@@ -14,6 +13,8 @@
 #include "string.h"
 
 class MemoryAllocator;
+
+extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
 
 extern bool g_ForceDoubleBallTransition;
 
@@ -79,7 +80,7 @@ void Wiper::DoWipe(const char* wipe)
 
         if (nlStrICmp<char>(wipe, "out") == 0 || nlStrICmp<char>(wipe, "in") == 0)
         {
-            PlaySound(10, 0xE7013118, 0, 0);
+            fn_800EBBFC(10, 0xE7013118, 0, 0);
         }
 
         if (strcmp(wipe, "cut") == 0)
@@ -103,10 +104,13 @@ void Wiper::DoWipe(const char* wipe)
 
 void Wiper::Run(float dt)
 {
-    if (!FrontEnd::m_bGameOver && (GetFixedUpdateTask()->mfFrameLockTime > 0.0f) == false
-        && nlTaskManager::m_pInstance->mCurrentState == 1)
+    if (!FrontEnd::m_bGameOver)
     {
-        dt = 0.0f;
+        bool b = GetFixedUpdateTask()->mfFrameLockTime > 0.0f;
+        if (!b && nlTaskManager::m_pInstance->mCurrentState == 1)
+        {
+            dt = 0.0f;
+        }
     }
 
     dt = dt * GetConfigFloat(Config::Global(), "transitions/speed", 1.0f);

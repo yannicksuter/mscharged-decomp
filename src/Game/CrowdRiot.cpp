@@ -9,6 +9,7 @@
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Event.h"
+#include "Game/EventDataTypes.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
 #include "Game/Physics/PhysicsObject.h"
@@ -35,8 +36,6 @@ extern "C" float lbl_806E0C44;
 
 extern "C" void fn_8007EB90(Goalie*);
 extern "C" void fn_8005E29C(cGame*, void*);
-extern "C" SlotPool<UnidentifiedEventData_80066B08> lbl_80571438;
-
 extern "C" void fn_800298D8(void*);
 extern "C" void fn_800299C4(void*);
 extern "C" void fn_80029AB0(void*);
@@ -454,7 +453,7 @@ void fn_80029C80(PhysicsObject*, PhysicsObject* other,
         if (crowdRiot->meState != 1)
         {
             UnidentifiedEventData_80066B08* event = 0;
-            lbl_80571438.Allocate(event);
+            g_CollisionCrowdDataPool.Allocate(event);
             event->mUnidentified0C = other;
             event->mUnidentified00 = position;
             event->mUnidentified10 = crowdRiot;

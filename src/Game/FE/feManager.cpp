@@ -281,7 +281,7 @@ void FrontEnd::EnterMenuState(FrontEnd::MenuEnterType menuType)
 void FrontEnd::PopupNetworkErrorOverlayCallback()
 {
     tDebugPrintManager::Print(DC_NETWORK, "Popup Network Error Overlay Callback\n");
-    if (g_pGame->mUnidentified040)
+    if (g_pGame->mbCaptainShotToScoreOn)
     {
         GoalieOnGameOver();
         RestoreWorldRendering(GetPresentation());
@@ -472,7 +472,7 @@ void FrontEnd::UpdateForGame(float fDeltaT)
     if (!m_bInPauseMenuState)
     {
         bool bPauseDelayElapsed = m_pauseDelay <= 0.0f;
-        if (bPauseDelayElapsed && !g_pGame->mUnidentified040
+        if (bPauseDelayElapsed && !g_pGame->mbCaptainShotToScoreOn
             && nlTaskManager::m_pInstance->mCurrentState != 1
             && (nlTaskManager::m_pInstance->mCurrentState & 0x18) == 0
             && nlTaskManager::m_pInstance->mPendingState
@@ -546,7 +546,7 @@ void FrontEnd::UpdateForGame(float fDeltaT)
         return;
     }
 
-    if (g_pGame->mUnidentified040)
+    if (g_pGame->mbCaptainShotToScoreOn)
     {
         return;
     }

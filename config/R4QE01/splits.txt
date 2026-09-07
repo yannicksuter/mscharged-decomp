@@ -1179,8 +1179,8 @@ Game/ExcitementSystem.cpp:
 	.sbss       start:0x806E14E0 end:0x806E14E8
 	.sdata2     start:0x806E4EA0 end:0x806E4EB0
 
-Game/EventData.cpp:
-	.text       start:0x80197120 end:0x801982A0
+Game/EventDataTypes.cpp:
+	.text       start:0x80197120 end:0x80199880
 	.ctors      start:0x804DB6D8 end:0x804DB6DC
 	.bss        start:0x80571248 end:0x80571A18
 

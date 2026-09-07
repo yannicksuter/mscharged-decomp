@@ -3,6 +3,7 @@
 #include "Game/Ball.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Drawable/RenderObject.h"
+#include "Game/EventDataTypes.h"
 #include "Game/Physics/NetMeshModelLoader.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBall.h"
@@ -48,12 +49,6 @@ struct NetMeshGameState
     nlVector3 upVector;
 };
 
-struct BallNetmeshEventData
-{
-    NetMesh* netMesh;
-    nlVector3 collisionVelocity;
-};
-
 extern "C" unsigned int fn_802AAC88(const void*, unsigned int);
 NetMeshFrameProvider* GetFixedUpdateTask();
 extern "C" void fn_80146424(BallNetmeshEventData*, bool);
@@ -61,8 +56,6 @@ extern "C" PlatTexture* fn_802D064C(unsigned long);
 
 extern NetMeshGameState* g_pGame;
 extern float lbl_806DC7B8;
-extern SlotPool<BallNetmeshEventData> lbl_80571780;
-
 DebugTypeState s_DetMeshType = { 0xFFFF, 0 };
 float NetMesh::s_fReboundForceCoefficient = 6.0f;
 float NetMesh::s_fVelocityDampingCoefficient = 0.7f;
@@ -670,7 +663,7 @@ void NetMesh::AddForcesToBall(
         }
 
         BallNetmeshEventData* eventData = 0;
-        lbl_80571780.Allocate(eventData);
+        g_BallNetmeshEventDataPool.Allocate(eventData);
         eventData->netMesh = this;
         eventData->collisionVelocity = g_pBall->m_v3Velocity;
         fn_80146424(eventData, sphere == 0);

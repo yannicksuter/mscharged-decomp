@@ -7,8 +7,6 @@
 #include <stddef.h>
 
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" bool fn_800A65E8(cTeam*, bool);
-
 static unsigned short sDesireUsePowerupType = 0xFFFF;
 
 /**
@@ -46,7 +44,7 @@ bool DesireUsePowerup::UnidentifiedInitialize(void* context)
             if (ePowerup != POWER_UP_NONE
                 && ePowerup != pTeam->GetCurrentPowerUp().eType)
             {
-                fn_800A65E8(pTeam, false);
+                pTeam->TogglePowerup(false);
             }
 
             fn_800D3A50(

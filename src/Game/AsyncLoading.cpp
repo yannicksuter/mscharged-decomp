@@ -31,6 +31,7 @@
 #include "Game/Game.h"
 #include "Game/NetworkSession.h"
 #include "Game/NisPlayer.h"
+#include "Game/Team.h"
 #include "Game/PadActions.h"
 #include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Physics/PhysicsPatch.h"
@@ -112,7 +113,6 @@ extern "C" void OSYieldThread();
 extern "C" void fn_801B2770();
 extern "C" void fn_8027ED18();
 extern "C" void fn_8027E5D4();
-extern "C" void fn_800A6EDC(void*);
 extern "C" void fn_800AA3E8(void*, int);
 extern "C" void fn_801AF97C(void*);
 extern "C" void fn_80013660(void*, int);
@@ -143,7 +143,6 @@ void DestroyCharacters();
 extern FrameTimingStat* lbl_806E1698;
 extern FrameTimingStat* lbl_806E169C;
 extern FrameTimingStat* lbl_806E16A0;
-extern void* g_pTeams[];
 extern cBall* g_pBall;
 extern u8 lbl_80574148[];
 extern u8 gGameTweaks[];
@@ -668,8 +667,8 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     lbl_806E2138->fn_8033288C();
     g_pNetworkSessionBase->Initialize(false);
 
-    fn_800A6EDC(g_pTeams[0]);
-    fn_800A6EDC(g_pTeams[1]);
+    g_pTeams[0]->StopGameplayEffectsAndSounds();
+    g_pTeams[1]->StopGameplayEffectsAndSounds();
     DestroyPowerups();
     lbl_806E12C8->ResetEffects();
     DestroyCharacters();

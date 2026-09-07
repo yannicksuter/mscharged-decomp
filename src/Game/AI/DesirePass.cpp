@@ -33,7 +33,7 @@ extern "C" void fn_800B6A1C(void*, int, const Variant&);
 extern "C" float fn_8002C328(PlayerTweaks*);
 extern "C" bool fn_8002F858(cFielder*, bool);
 extern "C" bool fn_80035F34(cFielder*);
-extern cTeam* lbl_806E0E00;
+extern cTeam* g_pCurrentlyUpdatingTeam;
 extern bool lbl_806E0E38;
 extern cFielder* g_pScriptCurrentFielder;
 extern nlVector3 lbl_804DC190;
@@ -74,7 +74,7 @@ bool DesirePreparePass::UnidentifiedInitialize(void* context)
         mThinkTimer.SetSeconds(fDuration);
     }
 
-    SkillTweaks* pSkillTweaks = fn_800A636C(lbl_806E0E00);
+    SkillTweaks* pSkillTweaks = fn_800A636C(g_pCurrentlyUpdatingTeam);
     float fReactionTime = 1.0f - pSkillTweaks->GetReaction(0);
     float fAbortThreshold = lbl_806DC138;
     float fReactionTimeRange =

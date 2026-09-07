@@ -386,7 +386,7 @@ void ChainChomp::Update(float fDeltaT)
                 delete mpAvoidable;
                 mpAvoidable = 0;
             }
-            ShotAtGoalData* pData = gShotAtGoalDataPool.Allocate();
+            ShotAtGoalData* pData = g_ShotAtGoalDataPool.Allocate();
             pData->pShooter = mpThrower;
             g_pGame->QueueChainNisEnd(pData);
             if (mpInEffectSFX != 0)
@@ -460,7 +460,7 @@ void ChainChomp::CollisionCallback(
         }
         if (pFielder == 0 && pBall->meBallState != 10)
         {
-            CollisionBallChainData* pData = gCollisionBallChainDataPool.Allocate();
+            CollisionBallChainData* pData = g_CollisionBallChainDataPool.Allocate();
             pData->pChain = pChainChomp;
             pData->pBall = pBall;
             QueueCollisionBallChain(pData);
@@ -469,7 +469,7 @@ void ChainChomp::CollisionCallback(
     }
     case 0x14:
     {
-        CollisionChainPowerupData* pData = gCollisionChainPowerupDataPool.Allocate();
+        CollisionChainPowerupData* pData = g_CollisionChainPowerupDataPool.Allocate();
         pData->pChain = pChainChomp;
         pData->pPowerup = ((PhysicsShell*)pObjA)->m_pPowerupObject;
         QueueCollisionChainPowerup(pData);
@@ -477,7 +477,7 @@ void ChainChomp::CollisionCallback(
     }
     case 0x15:
     {
-        CollisionChainPowerupData* pData = gCollisionChainPowerupDataPool.Allocate();
+        CollisionChainPowerupData* pData = g_CollisionChainPowerupDataPool.Allocate();
         pData->pChain = pChainChomp;
         pData->pPowerup = ((PhysicsBanana*)pObjA)->m_pPowerupObject;
         QueueCollisionChainPowerup(pData);
@@ -491,7 +491,7 @@ void ChainChomp::CollisionCallback(
                 && !pFielder->IsCharacterInAir(pChainChomp->mv3Position.z
                                                + pChainChomp->mpPhysObj->GetRadius()))))
     {
-        CollisionChainPlayerData* pData = gCollisionChainPlayerDataPool.Allocate();
+        CollisionChainPlayerData* pData = g_CollisionChainPlayerDataPool.Allocate();
         pData->pFielder = pFielder;
         pData->pChain = pChainChomp;
         g_pGame->mUnidentified49C.mEvent33.Queue(pData,

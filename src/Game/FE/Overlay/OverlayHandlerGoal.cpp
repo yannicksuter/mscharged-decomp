@@ -24,7 +24,7 @@ void GoalOverlay::Update(float fDeltaT)
 
 void GoalOverlay::fn_801F17D0(int homeAway)
 {
-    if (g_pGame->mUnidentified040)
+    if (g_pGame->mbCaptainShotToScoreOn)
     {
         UpdateGoalInfo(homeAway, 0, true, g_pGame->mUnidentified030);
     }

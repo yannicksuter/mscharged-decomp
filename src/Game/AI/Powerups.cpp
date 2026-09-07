@@ -9,6 +9,7 @@
 #include "Game/DB/tu_8010A40C.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
+#include "Game/EventDataTypes.h"
 #include "Game/GameTweaks.h"
 #include "Game/GameInfo.h"
 #include "Game/ObjectBlur.h"
@@ -29,8 +30,7 @@ extern "C" void fn_802772A4(DrawableObject*);
 extern "C" bool fn_8003877C(cFielder*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
 extern "C" float fn_8002CFF0(PlayerTweaks*);
-extern "C" bool fn_800A6764(cTeam*);
-
+extern "C" void fn_800EDCE8(cPlayer*);
 extern "C" bool fn_8019C988(void*);
 extern "C" bool fn_800AA060(void*, int);
 extern "C" void fn_80146964(void*);
@@ -94,53 +94,6 @@ float lbl_806DBE24 = 4.0f;
 int lbl_806DBE28 = 20;
 float lbl_806DBE2C = -0.6f;
 static int gBobombAnticipationVoiceID = -1;
-
-struct CollisionBallShellData
-{
-    cBall* pBall;
-    PowerupBase* pPowerup;
-    nlVector3 v3CollisionVelocity;
-};
-
-struct CollisionPlayerBananaData
-{
-    cFielder* pPlayer;
-    cFielder* pThrower;
-    int nThrowerPadID;
-    nlVector3 v3CollisionLocation;
-};
-
-struct CollisionPlayerShellData
-{
-    cFielder* pPlayer;
-    cFielder* pThrower;
-    u8 nThrowerPadID;
-    bool bIsExploder;
-    int eSize;
-    nlVector3 v3CollisionLocation;
-    nlVector3 v3CollisionVelocity;
-};
-
-struct CollisionPlayerFreezeData
-{
-    cFielder* pPlayer;
-    cFielder* pThrower;
-    int nThrowerPadID;
-    int eSize;
-};
-
-struct PowerupHitPlayerEventData
-{
-    ePowerUpType Type;
-    cPlayer* Thrower;
-    cPlayer* Target;
-};
-
-extern SlotPool<CollisionBallShellData> lbl_80571618;
-extern SlotPool<CollisionPlayerShellData> lbl_80571668;
-extern SlotPool<CollisionPlayerFreezeData> lbl_80571690;
-extern SlotPool<CollisionPlayerBananaData> lbl_805716B8;
-extern SlotPool<PowerupHitPlayerEventData> lbl_805719D8;
 
 static int lbl_806E0DA8;
 
@@ -1259,7 +1212,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     {
         nChanceForCaptainPowerup = 0;
     }
-    if (fn_800A6764(pTeam) || pTeam->GetCaptain()->IsShattered() == 1)
+    if (pTeam->fn_800A6764() || pTeam->GetCaptain()->IsShattered() == 1)
     {
         nChanceForCaptainPowerup = 0;
     }
@@ -1371,7 +1324,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
             = nChanceForRedShell = nChanceForBanana = nChanceForMushroom
             = nChanceForBoBomb = nChanceForGreenShell
             = nChanceForFreezeShell = 0;
-        if (!fn_800A6764(pTeam)
+        if (!pTeam->fn_800A6764()
             && pTeam->GetCaptain()->IsShattered() != 1)
         {
             powerUpType = *(ePowerUpType*)(
@@ -1446,7 +1399,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
         }
 
         if (GameInfoManager::Instance()->IsRule0x0Equal10()
-            && powerUpType == POWER_UP_NONE && !fn_800A6764(pTeam)
+            && powerUpType == POWER_UP_NONE && !pTeam->fn_800A6764()
             && pTeam->GetCaptain()->IsShattered() == 0)
         {
             powerUpType = *(ePowerUpType*)(
@@ -1606,7 +1559,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
             if (pBall->m_pOwner == 0)
             {
                 CollisionBallShellData* pData = 0;
-                lbl_80571618.Allocate(pData);
+                g_CollisionBallShellDataPool.Allocate(pData);
                 pData->pPowerup = pObj;
                 pData->pBall = pBall;
                 pData->v3CollisionVelocity = pObj->m_v3Velocity;
@@ -1746,7 +1699,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                 if (pObj->m_eType == POWER_UP_BANANA)
                 {
                     CollisionPlayerBananaData* pData = 0;
-                    lbl_805716B8.Allocate(pData);
+                    g_CollisionPlayerBananaDataPool.Allocate(pData);
                     pData->pPlayer = (cFielder*)pCharacter;
                     pData->pThrower = pObj->m_pThrower;
                     pData->nThrowerPadID = pObj->m_nThrowerPadID;
@@ -1762,7 +1715,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                         if (!bUnknown || pObj->m_eType == POWER_UP_SPINY_SHELL)
                         {
                             CollisionPlayerShellData* pData = 0;
-                            lbl_80571668.Allocate(pData);
+                            g_CollisionPlayerShellDataPool.Allocate(pData);
                             pData->pPlayer = (cFielder*)pCharacter;
                             pData->eSize = (int)pObj->meSize;
                             pData->pThrower = pObj->m_pThrower;
@@ -1783,7 +1736,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                     else
                     {
                         CollisionPlayerFreezeData* pData = 0;
-                        lbl_80571690.Allocate(pData);
+                        g_CollisionPlayerFreezeDataPool.Allocate(pData);
                         pData->pPlayer = (cFielder*)pCharacter;
                         pData->eSize = (int)pObj->meSize;
                         pData->pThrower = pObj->m_pThrower;
@@ -1821,7 +1774,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
     if (pPlayerTarget != 0)
     {
         PowerupHitPlayerEventData* pData = 0;
-        lbl_805719D8.Allocate(pData);
+        g_PowerupHitPlayerEventDataPool.Allocate(pData);
         pData->Type = pObj->m_eType;
         pData->Thrower = (cPlayer*)pObj->m_pThrower;
         pData->Target = pPlayerTarget;

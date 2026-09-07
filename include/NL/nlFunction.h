@@ -130,20 +130,10 @@ public:
         Callable mFunctor;
 
     public:
-        FunctorImpl(const Callable& callable)
-            : mFunctor(callable)
-        {
-        }
+        FunctorImpl(const Callable& callable);
 
-        virtual ReturnType operator()()
-        {
-            return Call(BoolToType<IsVoid<ReturnType>::value>());
-        }
-
-        virtual FunctorBase* Clone() const
-        {
-            return new FunctorImpl(*this);
-        }
+        virtual ReturnType operator()();
+        virtual FunctorBase* Clone() const;
 
     private:
         ReturnType Call(BoolToType<false>)
@@ -253,6 +243,29 @@ private:
         FunctorBase* mFunctor;
     };
 };
+
+template <typename ReturnType>
+template <typename Callable>
+inline Function0<ReturnType>::FunctorImpl<Callable>::FunctorImpl(
+    const Callable& callable)
+    : mFunctor(callable)
+{
+}
+
+template <typename ReturnType>
+template <typename Callable>
+inline ReturnType Function0<ReturnType>::FunctorImpl<Callable>::operator()()
+{
+    return Call(BoolToType<IsVoid<ReturnType>::value>());
+}
+
+template <typename ReturnType>
+template <typename Callable>
+inline typename Function0<ReturnType>::FunctorBase*
+Function0<ReturnType>::FunctorImpl<Callable>::Clone() const
+{
+    return new FunctorImpl(*this);
+}
 
 template <typename ReturnType, typename P1>
 class Function1

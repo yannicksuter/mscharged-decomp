@@ -280,7 +280,7 @@ static void DrawCircle(nlVector3 p0, float fRadius, float fScaleX, nlColour colo
         float fRadians = 0.0f;
 
         mesh.Colour(colour);
-        mesh.Vertex(v3point.x, v3point.y, v3point.z);
+        mesh.Vertex(v3point);
 
         const float angleScale = 10430.378f;
         int i = 0;
@@ -292,7 +292,7 @@ static void DrawCircle(nlVector3 p0, float fRadius, float fScaleX, nlColour colo
             v3point.y = p0.y + v3point.y * fRadius;
 
             mesh.Colour(colour);
-            mesh.Vertex(v3point.x, v3point.y, v3point.z);
+            mesh.Vertex(v3point);
 
             i++;
             fRadians += 6.2831855f / (numVerts - 1);

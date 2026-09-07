@@ -6,6 +6,7 @@
 #include "Game/Ball.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
+#include "Game/EventDataTypes.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
@@ -25,24 +26,6 @@
 
 #include <math.h>
 
-struct CollisionPowerupGroundData
-{
-    nlVector3 position;
-    float fVecZComponent;
-    ePowerUpType eType;
-};
-
-struct CollisionPowerupWallData
-{
-    PowerupBase* pPowerup;
-    ePowerupSize eSize;
-    ePowerUpType eType;
-    nlVector3 position;
-    nlVector3 normal;
-};
-
-extern SlotPool<CollisionPowerupGroundData> lbl_80571460;
-extern SlotPool<CollisionPowerupWallData> lbl_805714B0;
 extern void* lbl_806E1608;
 
 extern "C" bool fn_800167A8(cBall*);
@@ -220,7 +203,7 @@ ContactType PhysicsShell::Contact(
         {
             bWasRicochet = true;
             CollisionPowerupGroundData* eventData = 0;
-            lbl_80571460.Allocate(eventData);
+            g_CollisionPowerupGroundDataPool.Allocate(eventData);
             GetPosition(&eventData->position);
             eventData->eType = m_pPowerupObject->m_eType;
             fn_801474EC(eventData);
@@ -421,7 +404,7 @@ ContactType PhysicsShell::Contact(
                         if (v3IncidentVel.z < -1.0f)
                         {
                             CollisionPowerupGroundData* eventData = 0;
-                            lbl_80571460.Allocate(eventData);
+                            g_CollisionPowerupGroundDataPool.Allocate(eventData);
                             GetPosition(&eventData->position);
                             eventData->fVecZComponent = v3IncidentVel.z;
                             eventData->eType = m_pPowerupObject->m_eType;
@@ -578,7 +561,7 @@ ContactType PhysicsShell::Contact(
                 || obj->GetObjectType() == 5)
             {
                 CollisionPowerupWallData* eventData = 0;
-                lbl_805714B0.Allocate(eventData);
+                g_CollisionPowerupWallDataPool.Allocate(eventData);
                 eventData->eSize = m_pPowerupObject->meSize;
                 eventData->eType = m_pPowerupObject->m_eType;
                 nlVec3Set(eventData->position, info->geom.pos[0], info->geom.pos[1], info->geom.pos[2]);
