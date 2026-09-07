@@ -1,4 +1,5 @@
 #include "unclassified/tu_8026B10C.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/FE/feInput.h"
@@ -21,7 +22,6 @@
 
 extern "C" void fn_80306208(UnidentifiedTimer_8030616C* timer, bool enabled);
 extern "C" void fn_80306224(UnidentifiedTimer_8030616C* timer, float dt);
-extern "C" void fn_8004F594(int category, const char* format, ...);
 extern "C" void fn_801CC9B0(TU80219248Component* component, TLComponentInstance* instance, int value);
 extern "C" bool fn_8025BDA0();
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
@@ -292,7 +292,7 @@ void TU8026B10CScene::Update(float fDeltaT)
         }
     }
 
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     bool disconnected = false;
     for (int i = 0; i < roster->GetMachineCount(); ++i)
     {
@@ -304,7 +304,7 @@ void TU8026B10CScene::Update(float fDeltaT)
     }
     if (disconnected)
     {
-        lbl_806E10EC->fn_801216F0()->CloseConnectionsAndReset();
+        g_pNetworkSession->fn_801216F0()->CloseConnectionsAndReset();
         TU80252180Scene* object = fn_80253E18();
         if (object != 0)
         {
@@ -387,7 +387,7 @@ void TU8026B10CScene::Update(float fDeltaT)
             {
                 message.mUnidentified0A = 0;
             }
-            lbl_806E10EC->SendSidesChangedToHost(&message);
+            g_pNetworkSession->SendSidesChangedToHost(&message);
         }
         if (mUnidentified664[index] == -1)
         {
@@ -574,7 +574,7 @@ void TU8026B10CScene::fn_8026D85C(int index, void* context)
     {
         message.mUnidentified0A = 0;
     }
-    lbl_806E10EC->SendSidesChangedToHost(&message);
+    g_pNetworkSession->SendSidesChangedToHost(&message);
 }
 
 void TU8026B10CScene::fn_8026D984(int index, void* context)
@@ -645,7 +645,7 @@ void TU8026B10CScene::fn_8026DB5C(int index, void* context)
             }
         }
     }
-    lbl_806E10EC->SendDraftToEveryone(&mUnidentified020);
+    g_pNetworkSession->SendDraftToEveryone(&mUnidentified020);
     mUnidentified436 = true;
     fn_801CBCA0(0xF0AFD586, 0, 0, 1);
 }
@@ -767,7 +767,7 @@ void TU8026B10CScene::fn_8026E338(NetworkMessageType25_8050B778* message)
         }
         NetworkMessageType25_8050B778 response(*message);
         response.mUnidentified0B = 1;
-        lbl_806E10EC->SendSidesChangedToEveryone(&response);
+        g_pNetworkSession->SendSidesChangedToEveryone(&response);
     }
     else
     {
@@ -810,7 +810,7 @@ void TU8026B10CScene::fn_8026E6C4(int newSide, int oldSide, int index)
 {
     int slot = -1;
     char controller[16];
-    fn_8004F594(0x10, "DoChangeSides NewSide %d OldSide %d OnlineIndex %d\n",
+    tDebugPrintManager::Print(DC_NETWORK, "DoChangeSides NewSide %d OldSide %d OnlineIndex %d\n",
         newSide, oldSide, index);
     if (oldSide == newSide)
     {

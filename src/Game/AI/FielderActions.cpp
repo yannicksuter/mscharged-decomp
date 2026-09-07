@@ -1,4 +1,5 @@
 #include "Game/AI/UnidentifiedAvoidanceObject.h"
+#include "Game/Sys/debug.h"
 #include "Game/AI/Fielder.h"
 #include "NL/gl/glView.h"
 #include "Game/AI/FielderInput.h"
@@ -203,7 +204,6 @@ extern "C" void fn_8005CA10(cGame* pGame);
 extern "C" void fn_8005C830(cGame* pGame);
 extern "C" float fn_8004F58C(void);
 extern bool gbUseTurboCharging;
-extern "C" void fn_8004F594(int category, const char* format, ...);
 extern "C" void fn_8005F238(cGame* pGame, void* pEvent);
 extern "C" void fn_800AA568(void* pParam);
 
@@ -246,11 +246,11 @@ struct UnidentifiedOnlineState
 extern UnidentifiedOnlineState* lbl_806E2164;
 extern "C" bool fn_80123314(void* pParam);
 extern "C" void fn_80057FD8(cGame* pGame, bool bParam);
-extern "C" bool fn_80332770(void);
+extern "C" bool IsNetworkOrRecordedGame(void);
 extern "C" void fn_800AA3E8(void* pParam, int nParam);
 extern "C" void fn_8005F82C(cGame* pGame, cFielder* pFielder);
-extern void* lbl_806E10EC;
-extern BaseGameSceneManager* lbl_806E1860;
+extern void* g_pNetworkSession;
+extern BaseGameSceneManager* g_pOverlayManager;
 
 struct UnidentifiedMegaStrikeScene
 {
@@ -456,7 +456,7 @@ void cFielder::fn_80043C18(float fDeltaT)
                 float fBlend = 1.0f - fTime;
                 UnidentifiedActionTarget806E0C94* pTarget
                     = (UnidentifiedActionTarget806E0C94*)
-                          lbl_806E0C94->mUnidentified10E0;
+                          g_pGame->mUnidentified10E0;
                 nlVector3 v3Position;
                 v3Position.x = fTime * m_v3Position.x
                     + fBlend * pTarget->mUnidentified14.x;
@@ -589,7 +589,7 @@ void cFielder::fn_8004643C(float fDeltaT)
                 {
                     for (int i = 0; i < 0x10; i++)
                     {
-                        cAIPad* pPad = fn_80007C3C(i);
+                        cAIPad* pPad = GetAIPad(i);
                         if (pPad != 0)
                         {
                             int mySide = m_pTeam->m_nSide;
@@ -632,7 +632,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
     {
         float fSpeedScale = InterpolateRangeClamped(lbl_806DB894,
             lbl_806DB898, lbl_806E35B0, lbl_806E3560,
-            fn_800A9274(lbl_806E0C94->mUnidentified10D8));
+            fn_800A9274(g_pGame->mUnidentified10D8));
         float fStartTime
             = fSpeedScale * (fn_8002D020(fn_8003E6E4(this)) / lbl_806E35B4);
         float fEndTime
@@ -736,7 +736,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
             = bHasGlobalPad ? GetGlobalPad()->fn_80332748() : -1;
         pData->pTarget = pTarget;
         pData->mUnidentified10 = false;
-        fn_8005EBF8(lbl_806E0C94, pData);
+        fn_8005EBF8(g_pGame, pData);
 
         if (m_eCharacterClass == TOAD)
         {
@@ -947,8 +947,8 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
 
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
-    if (lbl_806E0C94->m_eGameState == 5
-        || lbl_806E0C94->m_eGameState == 6)
+    if (g_pGame->m_eGameState == 5
+        || g_pGame->m_eGameState == 6)
     {
         bTrackStats = true;
     }
@@ -980,7 +980,7 @@ void cFielder::fn_800474FC(float fDeltaT)
     if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB8EC)
         && mUnidentified360)
     {
-        fn_8005CA10(lbl_806E0C94);
+        fn_8005CA10(g_pGame);
     }
 
     if (ShouldStartCrossBlend(4))
@@ -1074,7 +1074,7 @@ void cFielder::InitActionLateOneTimerFromVolley()
     else
     {
         DoRegularShooting(false);
-        fn_8005C830(lbl_806E0C94);
+        fn_8005C830(g_pGame);
     }
 
     fn_801B75C8(this, 2, 0, 0, bShotNormally);
@@ -1508,7 +1508,7 @@ void cFielder::fn_80048918()
         {
             cFielder* pFielder = pTeam->GetFielder(j);
             if (this != pFielder && fn_8003881C(pFielder)
-                && lbl_806E0C94->mUnidentified030 == 0)
+                && g_pGame->mUnidentified030 == 0)
             {
                 fn_80316968(fn_80319FC0(fn_8002E1A4(pFielder), 0x1D));
             }
@@ -1542,7 +1542,7 @@ float cFielder::fn_80048A08()
 
 void cFielder::InitActionMegaStrikeMeter(bool bParam)
 {
-    fn_8004F594(0x10, "InitActionMegaStrikeMeter at frame %d\n",
+    tDebugPrintManager::Print(DC_NETWORK, "InitActionMegaStrikeMeter at frame %d\n",
         ((UnidentifiedHandler8011166C*)GetFixedUpdateTask())->UnidentifiedVirtual34());
 
     mUnidentified390 = 0.0f;
@@ -1564,7 +1564,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     mUnidentified3D0 = 0.0f;
     mUnidentified3D4 = 0.0f;
 
-    lbl_806E0C94->fn_80057FC0();
+    g_pGame->fn_80057FC0();
 
     mUnidentified478 = 0;
 
@@ -1602,7 +1602,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     }
 
     bool bDidWindup = false;
-    if (lbl_806E0C94->m_eGameState == 3 || bNearGoal)
+    if (g_pGame->m_eGameState == 3 || bNearGoal)
     {
         fn_801BA4C8("ball_sts_windup");
         fn_8004B86C(false, false);
@@ -1648,9 +1648,9 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         nlVector3 v3Column;
         fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &m_v3Position, &v3Column);
         event.v3Position = v3Column;
-        fn_8005F238(lbl_806E0C94, &event);
+        fn_8005F238(g_pGame, &event);
 
-        fn_800AA568(lbl_806E0C94->mUnidentified10DC);
+        fn_800AA568(g_pGame->mUnidentified10DC);
 
         fn_800978E8(this, 0);
 
@@ -1709,7 +1709,7 @@ void cFielder::fn_80048FB0(float fDeltaT, bool bButtonPressed, int nParam)
 {
     if (bButtonPressed)
     {
-        fn_8004F594(0x10, "Button pushed phase %d time %f\n",
+        tDebugPrintManager::Print(DC_NETWORK, "Button pushed phase %d time %f\n",
             mUnidentified3B8, mUnidentified3AC);
     }
 
@@ -1804,39 +1804,39 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
         if (nParam != 0)
         {
             UnidentifiedNetworkMessage_80126D84 message;
-            if (fn_80123314(lbl_806E10EC))
+            if (fn_80123314(g_pNetworkSession))
             {
-                fn_80057FD8(lbl_806E0C94, bButtonPressed);
+                fn_80057FD8(g_pGame, bButtonPressed);
             }
             fn_80048FB0(fDeltaT, bButtonPressed, nParam);
         }
-        else if (fn_80123314(lbl_806E10EC)
-            && lbl_806E0C94->mUnidentified0C0.mSize != 0)
+        else if (fn_80123314(g_pNetworkSession)
+            && g_pGame->mUnidentified0C0.mSize != 0)
         {
             fn_80048FB0(fDeltaT,
-                lbl_806E0C94->mUnidentified0C0.UnidentifiedRemoveStart(),
+                g_pGame->mUnidentified0C0.UnidentifiedRemoveStart(),
                 nParam);
         }
     }
-    else if (fn_80123314(lbl_806E10EC) && nParam == 0
-        && lbl_806E0C94->mUnidentified0C0.mSize != 0)
+    else if (fn_80123314(g_pNetworkSession) && nParam == 0
+        && g_pGame->mUnidentified0C0.mSize != 0)
     {
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Have unprocessed m_ReceivedMegaMeterQ %d in state %d.  "
             "Processing All Now.\n",
-            lbl_806E0C94->mUnidentified0C0.mSize, mUnidentified478);
+            g_pGame->mUnidentified0C0.mSize, mUnidentified478);
 
-        while (lbl_806E0C94->mUnidentified0C0.mSize != 0)
+        while (g_pGame->mUnidentified0C0.mSize != 0)
         {
             fn_80048FB0(fDeltaT,
-                lbl_806E0C94->mUnidentified0C0.UnidentifiedRemoveStart(),
+                g_pGame->mUnidentified0C0.UnidentifiedRemoveStart(),
                 nParam);
         }
     }
 
     if (mUnidentified478 == 2)
     {
-        if (!fn_80332770())
+        if (!IsNetworkOrRecordedGame())
         {
             mUnidentified478 = 3;
         }
@@ -1851,7 +1851,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
     }
     else if (mUnidentified478 == 3)
     {
-        ((UnidentifiedMegaStrikeScene*)lbl_806E1860->GetScene(
+        ((UnidentifiedMegaStrikeScene*)g_pOverlayManager->GetScene(
              (SceneList)0x64))
             ->mUnidentified36
             = true;
@@ -1866,16 +1866,16 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
 
         m_pTeam->GetOtherTeam()->GetGoalie()->fn_8008EF58();
 
-        fn_800AA3E8(lbl_806E0C94->mUnidentified10DC, 0);
-        lbl_806E0C94->fn_80058704();
-        lbl_806E0C94->mUnidentified03C = this;
-        fn_8005F82C(lbl_806E0C94, this);
+        fn_800AA3E8(g_pGame->mUnidentified10DC, 0);
+        g_pGame->fn_80058704();
+        g_pGame->mUnidentified03C = this;
+        fn_8005F82C(g_pGame, this);
     }
 }
 
 void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 {
-    fn_8004F594(0x10, "DoMegaMeterFirstButtonPressEvent at time %f\n",
+    tDebugPrintManager::Print(DC_NETWORK, "DoMegaMeterFirstButtonPressEvent at time %f\n",
         mUnidentified3AC);
 
     ShootToScoreMeter::instance.mbShowSavedWhiteBar = true;
@@ -1890,7 +1890,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
     nlVector3 v3Column;
     fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &m_v3Position, &v3Column);
     event.v3Position = v3Column;
-    fn_8005F434(lbl_806E0C94, &event);
+    fn_8005F434(g_pGame, &event);
 
     if (mUnidentified3AC >= 0.0f)
     {
@@ -1919,7 +1919,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 
 void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
 {
-    fn_8004F594(0x10, "DoMegaMeterSecondButtonPressEvent at time %f\n",
+    tDebugPrintManager::Print(DC_NETWORK, "DoMegaMeterSecondButtonPressEvent at time %f\n",
         mUnidentified3AC);
 
     ShootToScoreMeter::instance.mUnidentified2C = true;
@@ -1964,19 +1964,19 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     nlVector3 v3Column;
     fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &m_v3Position, &v3Column);
     event.v3Position = v3Column;
-    fn_8005F630(lbl_806E0C94, &event);
+    fn_8005F630(g_pGame, &event);
 
     if (nParam != 0)
     {
-        if (fn_80123314(lbl_806E10EC)
-            && lbl_806E0C94->mUnidentified134.mSize > 0)
+        if (fn_80123314(g_pNetworkSession)
+            && g_pGame->mUnidentified134.mSize > 0)
         {
-            lbl_806E0C94->fn_80058180();
+            g_pGame->fn_80058180();
         }
 
         if (!lbl_806E2164->mUnidentified004)
         {
-            lbl_806E0C94->fn_80059DEC(m_pTeam->m_nSide, m_ID,
+            g_pGame->fn_80059DEC(m_pTeam->m_nSide, m_ID,
                 mUnidentified3BC, mUnidentified3C0);
         }
 
@@ -1985,7 +1985,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
 
     fn_800EC12C(0xBF541A4C, this);
 
-    if (!fn_80332770())
+    if (!IsNetworkOrRecordedGame())
     {
         fn_80111D7C(lbl_806DB978);
     }
@@ -2336,7 +2336,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
                 = bHasPad ? pAttacker->GetGlobalPad()->fn_80332748() : -1;
             pNode->pTarget = 0;
             pNode->mUnidentified10 = true;
-            fn_8005ED64(lbl_806E0C94, pNode);
+            fn_8005ED64(g_pGame, pNode);
 
             if (pAttacker->m_pBall != 0
                 && GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
@@ -3186,7 +3186,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     case (eCharacterClass)0x13:
         m_pCurrentAnimController->m_fPlaybackSpeedScale
             = InterpolateRangeClamped(lbl_806DB988, lbl_806DB98C, 0.35f,
-                0.25f, fn_800A9274(lbl_806E0C94->mUnidentified10D8));
+                0.25f, fn_800A9274(g_pGame->mUnidentified10D8));
         break;
     case (eCharacterClass)0x01:
     case (eCharacterClass)0x05:
@@ -3206,8 +3206,8 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     }
     fn_800EBBFC(mUnidentified318, soundID, 0, 0);
 
-    bool bUnidentified2 = lbl_806E0C94->m_eGameState == 5
-        || lbl_806E0C94->m_eGameState == 6;
+    bool bUnidentified2 = g_pGame->m_eGameState == 5
+        || g_pGame->m_eGameState == 6;
     if (bUnidentified2)
     {
         StatsTracker::Instance()->TrackStat(
@@ -3737,7 +3737,7 @@ void cFielder::fn_80045930()
     if (!g_pBall->m_pPhysicsBall->mbUseWindForce)
     {
         UnidentifiedTornado806E0C94* pObject
-            = fn_800AA060(lbl_806E0C94->mUnidentified10DC, 2);
+            = fn_800AA060(g_pGame->mUnidentified10DC, 2);
         if (pObject != 0 && !pObject->mUnidentified0C)
         {
             pObject->UnidentifiedVirtual0C();
@@ -3924,7 +3924,7 @@ void cFielder::fn_80045C74(float fDeltaT)
                 {
                     for (int i = 0; i < 0x10; i++)
                     {
-                        cAIPad* pPad = fn_80007C3C(i);
+                        cAIPad* pPad = GetAIPad(i);
                         if (pPad != 0)
                         {
                             int mySide = m_pTeam->m_nSide;
@@ -4289,8 +4289,8 @@ void cFielder::fn_8004B658()
         }
 
         cFielder* pFielder = this;
-        fn_8005F03C(lbl_806E0C94, &pFielder);
-        fn_8005CBF0(lbl_806E0C94);
+        fn_8005F03C(g_pGame, &pFielder);
+        fn_8005CBF0(g_pGame);
 
         fn_800EBBFC(0, 0x900862AC, "Windup", this);
 
@@ -4633,7 +4633,7 @@ void cFielder::InitActionSlideAttack(
         pNode->nAttackerPadID = bHasPad ? GetGlobalPad()->fn_80332748() : -1;
         pNode->pTarget = 0;
         pNode->mUnidentified10 = true;
-        fn_8005EBF8(lbl_806E0C94, pNode);
+        fn_8005EBF8(g_pGame, pNode);
     }
 }
 
@@ -4666,7 +4666,7 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
         }
     }
 
-    fn_8005CDD0(lbl_806E0C94);
+    fn_8005CDD0(g_pGame);
 }
 
 void cFielder::fn_8004BB80(float fDeltaT)
@@ -4885,7 +4885,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
                     = bHasPad ? GetGlobalPad()->fn_80332748() : -1;
                 pNode->pTarget = 0;
                 pNode->mUnidentified10 = true;
-                fn_8005ED64(lbl_806E0C94, pNode);
+                fn_8005ED64(g_pGame, pNode);
 
                 if (m_pBall != 0)
                 {
@@ -4972,8 +4972,8 @@ void cFielder::fn_8004C88C(float fDeltaT)
     }
     }
 
-    bool bUnidentified2 = lbl_806E0C94->m_eGameState == 5
-        || lbl_806E0C94->m_eGameState == 6;
+    bool bUnidentified2 = g_pGame->m_eGameState == 5
+        || g_pGame->m_eGameState == 6;
     if (!bUnidentified2)
     {
         fn_8004D238();
@@ -5180,8 +5180,8 @@ void cFielder::fn_8004E438()
         fn_800EBBFC(mUnidentified318, 0x1D6C8D56, 0, 0);
     }
 
-    bool bUnidentified = lbl_806E0C94->m_eGameState == 5
-        || lbl_806E0C94->m_eGameState == 6;
+    bool bUnidentified = g_pGame->m_eGameState == 5
+        || g_pGame->m_eGameState == 6;
     if (bUnidentified)
     {
         StatsTracker::Instance()->TrackStat(
@@ -5562,9 +5562,14 @@ extern "C" float fn_8004F58C(void)
     return cNet::m_fNetPostRadius;
 }
 
-extern "C" void fn_8004F594(int category, const char* format, ...)
+namespace tDebugPrintManager
+{
+
+int Print(eDEBUG_CHANNEL channel, const char* format, ...)
 {
 }
+
+} // namespace tDebugPrintManager
 
 bool gbUseTurboCharging = true;
 

@@ -1,4 +1,5 @@
 #include "Game/Audio/XSoundHandle_802ED74C.h"
+#include "Game/Sys/debug.h"
 #include "NL/nlDLListContainer.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
@@ -146,7 +147,6 @@ extern "C" void fn_802F2640(SoundInstance_802F1758*);
 extern "C" void fn_802F2648(SoundInstance_802F1758*);
 extern "C" void fn_802F2650(SoundInstance_802F1758*, PlaybackBackend_802F2C3C**, u32*);
 extern "C" void fn_802F26B0(SoundInstance_802F1758*, float);
-extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" const char* fn_802B9568(int, const char*);
 extern "C" void fn_8035CA84();
 
@@ -211,7 +211,7 @@ extern "C" CueHandle_802F1758* fn_802F1758(CueHandle_802F1758* handle,
     void* selected = handle->definition->useSlider
                        ? fn_802F1460(handle->definition, handle->sliderValue)
                        : fn_802F11A0(handle->definition);
-    fn_8004F594(10, lbl_8052F680, fn_802B9568(lbl_806E1DC8, *(const char**)selected), fn_802B9568(lbl_806E1DC8, handle->definition->name));
+    tDebugPrintManager::Print(DC_SOUND, lbl_8052F680, fn_802B9568(lbl_806E1DC8, *(const char**)selected), fn_802B9568(lbl_806E1DC8, handle->definition->name));
 
     SoundInstance_802F1758* instance = AllocateInstance_802F1758();
     if (instance != 0)

@@ -60,7 +60,7 @@ struct cGame
     /* 0x18 */ eGameState m_eGameState;
 };
 
-extern cGame* lbl_806E0C94;
+extern cGame* g_pGame;
 extern void* lbl_806E1608;
 
 u8 lbl_806DBDA0 = true;
@@ -1222,7 +1222,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
 
     int nChanceForChainChomp
         = lbl_806DBE14 + (int)(nDifference * lbl_806DBE18);
-    if (nChanceForChainChomp < 0 || lbl_806E0C94->m_eGameState == (eGameState)6)
+    if (nChanceForChainChomp < 0 || g_pGame->m_eGameState == (eGameState)6)
     {
         nChanceForChainChomp = 0;
     }
@@ -1253,7 +1253,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
     }
 
     if (!fn_8019C988(*(void**)((u8*)lbl_806E1608 + 0x20))
-        || fn_800AA060(*(void**)((u8*)lbl_806E0C94 + 0x10DC), 7))
+        || fn_800AA060(*(void**)((u8*)g_pGame + 0x10DC), 7))
     {
         nChanceForChainChomp = 0;
     }
@@ -1546,7 +1546,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
 
     if (pTeam->SetCurrentPowerUp(powerUpType, nNumOfPowerups))
     {
-        if (lbl_806E0C94->m_eGameState == (eGameState)1
+        if (g_pGame->m_eGameState == (eGameState)1
             && GameInfoManager::Instance()->IsInMode4())
         {
             int mode = lbl_806E0FA0->mCurrentChallenge;
@@ -2993,7 +2993,7 @@ void FreezeShell::Destroy(bool bSilent)
  */
 extern "C" void fn_8009F1B8(EmissionController& controller)
 {
-    if (lbl_806E0C94 == 0 || lbl_806E0C94->m_eGameState == GS_GAMEPLAY)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_GAMEPLAY)
     {
         return;
     }

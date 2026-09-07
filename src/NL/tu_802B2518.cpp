@@ -33,15 +33,15 @@ typedef AVLTreeBase<unsigned int, EventRegistryValue,
 
 static const ConnectionValue sDefaultConnectionValue = 0;
 static ConnectionGroupTree sConnectionGroups;
-extern "C" EventRegistry* lbl_806E1D90 = 0;
+extern "C" EventRegistry* g_pEventRegistry = 0;
 
 static EventRegistry* GetEventRegistry()
 {
-    if (lbl_806E1D90 == 0)
+    if (g_pEventRegistry == 0)
     {
-        lbl_806E1D90 = new (8, false) EventRegistry;
+        g_pEventRegistry = new (8, false) EventRegistry;
     }
-    return lbl_806E1D90;
+    return g_pEventRegistry;
 }
 
 class ConnectionPoolStateCallback
@@ -79,7 +79,7 @@ extern "C" void fn_802B26D4()
         &callback, &ConnectionPoolStateCallback::Apply);
 }
 
-extern "C" unsigned int fn_802B289C(const char* name, int length)
+extern "C" unsigned int HashEventName(const char* name, int length)
 {
     unsigned int value = (unsigned int)length;
     unsigned int middleHigh = (value << 8) & 0x00FF0000;
@@ -119,7 +119,7 @@ extern "C" void fn_802B29C4(void* eventPtr)
 {
     UnidentifiedEventBase* event = (UnidentifiedEventBase*)eventPtr;
     unsigned int key = event->mHash;
-    lbl_806E1D90->Remove(key);
+    g_pEventRegistry->Remove(key);
 }
 
 extern "C" void fn_802B2A04(void* event, void* connectionPtr,

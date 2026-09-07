@@ -52,6 +52,10 @@ public:
     int CountBuddies_8013740C();
     void SetOwnStatusAvailable_801374A4();
 
+    int fn_8025D150() const { return mHostInvitationIndex; }
+    UnidentifiedFriendStatusPayload* fn_80260754() { return &mOwnStatus; }
+    int fn_8026075C() const { return mFriendStatusIndex; }
+
     /* 0x000 */ float mUpdateTime;
     /* 0x004 */ bool mFriendListChanged;
     /* 0x005 */ u8 mPadding005[3];

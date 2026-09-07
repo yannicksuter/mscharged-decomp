@@ -28,7 +28,7 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 
 class Goalie;
 
-extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
+extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" float lbl_806E0C40;
 extern "C" float lbl_806E0C44;
 extern "C" EffectsGroup* fn_802E7CDC(
@@ -66,9 +66,9 @@ static inline void UnidentifiedRegisterEventCallback(
     const char* name, void (*callback)(void*))
 {
     Function<void*> function(callback);
-    unsigned int hash = fn_802B289C(name, -1);
+    unsigned int hash = HashEventName(name, -1);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event;
     if (foundEvent != 0)
     {

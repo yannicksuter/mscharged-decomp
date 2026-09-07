@@ -1,4 +1,5 @@
 #include "Game/SAnim.h"
+#include "Game/Sys/debug.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
@@ -145,7 +146,6 @@ extern SlotPoolBase lbl_8057FB78;
 extern int lbl_806E1DC8;
 extern AudioSystem_802EE964* lbl_806E201C;
 
-extern "C" void fn_8004F594(int category, const char* format, ...);
 extern "C" const char* fn_802B9568(int table, ...);
 extern "C" bool fn_802EDB00();
 extern "C" void fn_802EDC34();
@@ -277,7 +277,7 @@ extern "C" LocalSliderSet_802EE964* fn_802EED88(
 
     SliderDefinition_802EE964* definition = table->globalDefinitions + table->localToGlobal[0];
     SliderState_802EE964* slider = table->globalSliders + definition->index;
-    fn_8004F594(10, lbl_8052F5D0, fn_802B9568(lbl_806E1DC8, slider->definition->name, set->sliders));
+    tDebugPrintManager::Print(DC_SOUND, lbl_8052F5D0, fn_802B9568(lbl_806E1DC8, slider->definition->name, set->sliders));
     float value = (float)owner->valueSource->value;
     if (value < slider->minimumValue)
         value = slider->minimumValue;
@@ -296,7 +296,7 @@ extern "C" void fn_802EEFF0(SliderTable_802EE964* table, float dt)
         SliderState_802EE964* slider = table->globalSliders + i;
         SetSliderValue_802EE964(slider, dt, 1.0f);
         if (slider->reportValue)
-            fn_8004F594(10, lbl_8052F5E8, slider->value);
+            tDebugPrintManager::Print(DC_SOUND, lbl_8052F5E8, slider->value);
     }
 
     for (u32 setIndex = 0; setIndex < 0x50; setIndex++)
@@ -310,7 +310,7 @@ extern "C" void fn_802EEFF0(SliderTable_802EE964* table, float dt)
             SliderState_802EE964* slider = set->sliders + sliderIndex;
             SetSliderValue_802EE964(slider, dt, 1.0f);
             if (slider->reportValue)
-                fn_8004F594(10, lbl_8052F600, slider->value);
+                tDebugPrintManager::Print(DC_SOUND, lbl_8052F600, slider->value);
         }
     }
 }
@@ -430,10 +430,8 @@ extern "C" void fn_802EF5D0(SliderState_802EE964* slider)
 extern "C" float fn_802EF634(SliderState_802EE964* slider)
 {
     float value = slider->duration + slider->value;
-    if (value < -96.0f)
-        value = -96.0f;
-    if (value > 6.0f)
-        value = 6.0f;
+    value = (value >= -96.0f) ? value : -96.0f;
+    value = (value <= 6.0f) ? value : 6.0f;
     return value;
 }
 

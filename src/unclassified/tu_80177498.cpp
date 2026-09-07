@@ -19,7 +19,7 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
     UnidentifiedEventRegistry_80177498;
 
-extern "C" UnidentifiedEventRegistry_80177498* lbl_806E1D90;
+extern "C" UnidentifiedEventRegistry_80177498* g_pEventRegistry;
 extern "C" bool fn_802B6BC8(const nlVector3*, const nlVector3*,
     const nlVector3*, const nlVector3*, float*, float*);
 extern "C" void fn_8014A180(void*);
@@ -290,9 +290,9 @@ WaluigiWallManager_80178400::WaluigiWallManager_80178400()
         Function<void*> callback((void (*)(void*))fn_80179490);
         UnidentifiedEventBase** ppEvent;
         unsigned int uHash;
-        uHash = fn_802B289C(lbl_8051106C, -1);
+        uHash = HashEventName(lbl_8051106C, -1);
         ppEvent = 0;
-        lbl_806E1D90->Find(uHash, &ppEvent, 0);
+        g_pEventRegistry->Find(uHash, &ppEvent, 0);
         UnidentifiedEventBase* pEvent = ppEvent != 0 ? *ppEvent : 0;
         ((UnidentifiedTypedEvent<void>*)pEvent)
             ->Add(callback, (unsigned int)&mUnidentified064, -1);
@@ -301,9 +301,9 @@ WaluigiWallManager_80178400::WaluigiWallManager_80178400()
         Function<void*> callback((void (*)(void*))fn_801794A4);
         UnidentifiedEventBase** ppEvent;
         unsigned int uHash;
-        uHash = fn_802B289C(lbl_80511080, -1);
+        uHash = HashEventName(lbl_80511080, -1);
         ppEvent = 0;
-        lbl_806E1D90->Find(uHash, &ppEvent, 0);
+        g_pEventRegistry->Find(uHash, &ppEvent, 0);
         UnidentifiedEventBase* pEvent = ppEvent != 0 ? *ppEvent : 0;
         ((UnidentifiedTypedEvent<void>*)pEvent)
             ->Add(callback, (unsigned int)&mUnidentified068, -1);
@@ -312,9 +312,9 @@ WaluigiWallManager_80178400::WaluigiWallManager_80178400()
         Function<void*> callback((void (*)(void*))fn_80179580);
         UnidentifiedEventBase** ppEvent;
         unsigned int uHash;
-        uHash = fn_802B289C(lbl_80511090, -1);
+        uHash = HashEventName(lbl_80511090, -1);
         ppEvent = 0;
-        lbl_806E1D90->Find(uHash, &ppEvent, 0);
+        g_pEventRegistry->Find(uHash, &ppEvent, 0);
         UnidentifiedEventBase* pEvent = ppEvent != 0 ? *ppEvent : 0;
         ((UnidentifiedTypedEvent<void>*)pEvent)
             ->Add(callback, (unsigned int)&mUnidentified06C, -1);
@@ -323,9 +323,9 @@ WaluigiWallManager_80178400::WaluigiWallManager_80178400()
         Function<void*> callback(fn_80179670);
         UnidentifiedEventBase** ppEvent;
         unsigned int uHash;
-        uHash = fn_802B289C(lbl_805110A8, -1);
+        uHash = HashEventName(lbl_805110A8, -1);
         ppEvent = 0;
-        lbl_806E1D90->Find(uHash, &ppEvent, 0);
+        g_pEventRegistry->Find(uHash, &ppEvent, 0);
         UnidentifiedEventBase* pEvent = ppEvent != 0 ? *ppEvent : 0;
         ((UnidentifiedTypedEvent<void>*)pEvent)
             ->Add(callback, (unsigned int)&mUnidentified070, -1);

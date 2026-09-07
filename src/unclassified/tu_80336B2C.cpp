@@ -122,8 +122,8 @@ extern "C" cGlobalPad* fn_80336D90(UnidentifiedNetworkPeerChannel* channel)
         return 0;
     }
     cGlobalPad* pad;
-    if (channel->mPeer == fn_80338C0C(lbl_806E20D8))
-        pad = lbl_806E1E28->GetPad(channel->mGlobalPadIndex);
+    if (channel->mPeer == fn_80338C0C(g_pNetworkSessionBase))
+        pad = g_pPadManager->GetPad(channel->mGlobalPadIndex);
     else
         pad = 0;
     return pad;
@@ -569,7 +569,7 @@ extern "C" void fn_803380F4(UnidentifiedNetGameState* state,
     {
         if (machine < machineCount)
             header.mPlayerCounts[machine]
-                = fn_80338BF8(lbl_806E20D8, (s8)machine)->mUnidentified004;
+                = fn_80338BF8(g_pNetworkSessionBase, (s8)machine)->mUnidentified004;
         else
             header.mPlayerCounts[machine] = 0;
     }

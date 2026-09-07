@@ -64,11 +64,11 @@ struct TPLPalette
 extern "C" void TPLBind(TPLPalette* palette);
 
 
-extern "C" bool fn_802C2C84(const char* path, bool create);
+extern "C" bool GetTweakBool(const char* path, bool create);
 extern void nlPrintf(const char* format, ...);
 
 extern BaseGameSceneManager* lbl_806E1838;
-extern BaseGameSceneManager* lbl_806E1860;
+extern BaseGameSceneManager* g_pOverlayManager;
 
 static const char* SaveFileName = "Strikers2";
 static const char* OnlineSaveFileName = "Online";
@@ -564,14 +564,14 @@ void SaveLoad::ChangeDirectoryCallback(s32 result)
 
 void SaveLoad::StartSave(bool online)
 {
-    if (fn_802C2C84("/user/no_save", false))
+    if (GetTweakBool("/user/no_save", false))
     {
         SaveEnabled = false;
         return;
     }
 
     OnlineMode = online;
-    SaveSceneManager = lbl_806E1838 != 0 ? lbl_806E1838 : lbl_806E1860;
+    SaveSceneManager = lbl_806E1838 != 0 ? lbl_806E1838 : g_pOverlayManager;
     if (SaveEnabled && !nlFlashCallbackPending())
     {
         BannerFileExists = false;
@@ -581,7 +581,7 @@ void SaveLoad::StartSave(bool online)
 
 void SaveLoad::StartLoad(bool online)
 {
-    if (fn_802C2C84("/user/no_save", false))
+    if (GetTweakBool("/user/no_save", false))
     {
         SaveEnabled = false;
         return;
@@ -589,7 +589,7 @@ void SaveLoad::StartLoad(bool online)
 
     OnlineMode = online;
     bool loaded = online ? OnlineSaveLoaded : NormalSaveLoaded;
-    SaveSceneManager = lbl_806E1838 != 0 ? lbl_806E1838 : lbl_806E1860;
+    SaveSceneManager = lbl_806E1838 != 0 ? lbl_806E1838 : g_pOverlayManager;
     if (SaveEnabled && !loaded && !nlFlashCallbackPending())
     {
         BannerFileExists = false;

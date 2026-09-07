@@ -1,4 +1,5 @@
 #include "Game/Sys/audio.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/Task/TextWindowTask.h"
 
@@ -18,7 +19,6 @@ extern "C" void fn_802EC1F4(AudioLoadMode_806E201C*, float);
 extern "C" XSoundHandle_802ED74C* fn_802EC030(
     AudioLoadMode_806E201C*, int, XSoundOwner_802ED74C*, unsigned long,
     int, int, int, int, int);
-extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void* fn_800F1C14();
 
 struct AudioParameter_802F1A70
@@ -50,7 +50,7 @@ static char sMissingCue[] = "SafePlay: No Cue \"%s\" (%d)";
 static char sResumedCue[] = "Resumed cue";
 
 bool lbl_806DC450 = true;
-unsigned long lbl_806DC454 = 1;
+unsigned long sAudioPauseDepth = 1;
 char lbl_806DC458[8] = "audio/";
 
 typedef nlAVLTreeSlotPool<unsigned long, XSoundHandle_802ED74C*,
@@ -116,8 +116,8 @@ bool GameAudio_800EB6AC::Initialize()
         fn_8035C818(lbl_806E2020, 0);
     }
 
-    lbl_806DC450 = !fn_802C2C84(sNoAudio, !lbl_806DC450);
-    fn_803622F0(!fn_802C2C84(sDisableControllerSpeaker, false));
+    lbl_806DC450 = !GetTweakBool(sNoAudio, !lbl_806DC450);
+    fn_803622F0(!GetTweakBool(sDisableControllerSpeaker, false));
     m_Listener->SetEnabled(true);
     return true;
 }
@@ -131,8 +131,8 @@ void GameAudio_800EB6AC::Shutdown()
     sAudioHandleStates.Clear();
     sAudioHandleStates.m_Allocator.FreeBlocks();
 
-    fn_8004F594(10, sResidentVoiceDrops, lbl_806E2210);
-    fn_8004F594(10, sStreamVoiceDrops, lbl_806E2214);
+    tDebugPrintManager::Print(DC_SOUND, sResidentVoiceDrops, lbl_806E2210);
+    tDebugPrintManager::Print(DC_SOUND, sStreamVoiceDrops, lbl_806E2214);
     lbl_806E2210 = 0;
     lbl_806E2214 = 0;
 }
@@ -424,7 +424,7 @@ extern "C" void fn_800EC2A4(unsigned long cueId, void* context)
 
     if ((state->m_Flags & 0x7000) == 0)
     {
-        state->m_Flags |= (lbl_806DC454 & 7) << 12;
+        state->m_Flags |= (sAudioPauseDepth & 7) << 12;
     }
 }
 
@@ -439,7 +439,7 @@ extern "C" void fn_800EC400(unsigned long cueId, void* context)
     XSoundHandle_802ED74C** slot = FindAudioHandleSlot(cueId, context);
     AudioHandleState_800EBF78* state = FindAudioHandleState(key);
     if (slot == 0 || state == 0
-        || ((state->m_Flags >> 12) & 7) < lbl_806DC454)
+        || ((state->m_Flags >> 12) & 7) < sAudioPauseDepth)
     {
         return;
     }
@@ -529,24 +529,24 @@ extern "C" bool fn_800EC7BC(unsigned long cueId, void* context)
     return true;
 }
 
-extern "C" void fn_800EC868()
+extern "C" void PauseAllAudio()
 {
-    ++lbl_806DC454;
+    ++sAudioPauseDepth;
     sAudioHandles.Walk(
         lbl_806E201C, &AudioLoadMode_806E201C::PauseTrackedSound);
     sPausedAudioHandles.Clear();
 }
 
-extern "C" void fn_800ECB50()
+extern "C" void ResumeAllAudio()
 {
     sAudioHandleStates.Walk(
         lbl_806E201C, &AudioLoadMode_806E201C::ResumeTrackedSound);
-    --lbl_806DC454;
+    --sAudioPauseDepth;
 }
 
-extern "C" unsigned int fn_800ECCCC()
+extern "C" unsigned int GetAudioPauseDepth()
 {
-    return lbl_806DC454;
+    return sAudioPauseDepth;
 }
 
 void AudioLoadMode_806E201C::PauseTrackedSound(

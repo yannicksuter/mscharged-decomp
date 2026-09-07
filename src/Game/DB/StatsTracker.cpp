@@ -82,8 +82,8 @@ public:
     virtual void Add(Function2<void, P1, P2>&, unsigned int, int) = 0;
 };
 
-extern StatsEventRegistry* lbl_806E1D90;
-extern BaseGameSceneManager* lbl_806E1860;
+extern StatsEventRegistry* g_pEventRegistry;
+extern BaseGameSceneManager* g_pOverlayManager;
 
 extern "C" eCharacterClass fn_801CBE78(eTeamID captain);
 extern "C" eCharacterClass fn_801CBE7C(eSidekickID sidekick);
@@ -101,9 +101,9 @@ static const char* STATS_FILE = "statsfile.csv";
 template <typename T>
 static inline UnidentifiedTypedEvent<T>* FindStatsEvent(const char* name)
 {
-    unsigned int hash = fn_802B289C(name, -1);
+    unsigned int hash = HashEventName(name, -1);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
     return (UnidentifiedTypedEvent<T>*)event;
 }
@@ -111,9 +111,9 @@ static inline UnidentifiedTypedEvent<T>* FindStatsEvent(const char* name)
 template <typename P1, typename P2>
 static inline StatsTypedEvent2<P1, P2>* FindStatsEvent2(const char* name)
 {
-    unsigned int hash = fn_802B289C(name, -1);
+    unsigned int hash = HashEventName(name, -1);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
     return (StatsTypedEvent2<P1, P2>*)event;
 }
@@ -304,7 +304,7 @@ void StatsTracker::ResetCurrentStats()
         InitializePlayerStats(mCurrentUserStats[i], i, TYPE_USER);
     }
 
-    fn_801E2A14(lbl_806E1860);
+    fn_801E2A14(g_pOverlayManager);
 }
 
 void StatsTracker::CreateEventHandler()

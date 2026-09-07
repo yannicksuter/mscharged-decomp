@@ -24,7 +24,7 @@ struct UnidentifiedCameraDisplayState
     bool field_0xC4;
 };
 
-UnidentifiedCameraDisplayState* fn_80284A58();
+UnidentifiedCameraDisplayState* GetPresentation();
 extern "C" float fn_800F2410(float fFOV);
 
 struct UnidentifiedSimulationTimeProvider
@@ -353,7 +353,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
 
     if (fn_80273B00())
     {
-        UnidentifiedCameraDisplayState* state = fn_80284A58();
+        UnidentifiedCameraDisplayState* state = GetPresentation();
         if (state->field_0xC4)
         {
             m_Fov = fn_800F2410(m_Fov);

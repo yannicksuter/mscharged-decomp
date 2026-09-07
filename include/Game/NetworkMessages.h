@@ -5,6 +5,7 @@
 
 #include "Game/DB/BasicGameInfo.h"
 #include "types.h"
+#include "Game/NetworkStatsManager.h"
 
 class UnidentifiedMessageSerializer
 {
@@ -149,26 +150,6 @@ public:
     /* 0x24 */ u32 mUnidentified24;
 };
 
-struct UnidentifiedDraftEntryHead
-{
-    UnidentifiedDraftEntryHead()
-        : mUnidentified00(1)
-        , mUnidentified01(1)
-        , mUnidentified02(2000)
-    {
-        mUnidentified04[0] = 0;
-        mUnidentified04[1] = 0;
-        mUnidentified04[2] = 0;
-        mUnidentified04[3] = 0;
-        mUnidentified04[4] = 0;
-    }
-
-    /* 0x00 */ u8 mUnidentified00;
-    /* 0x01 */ u8 mUnidentified01;
-    /* 0x02 */ u16 mUnidentified02;
-    /* 0x04 */ u32 mUnidentified04[5];
-}; // size: 0x18
-
 struct UnidentifiedDraftFooter
 {
     s8 mData[8];
@@ -181,7 +162,7 @@ struct UnidentifiedDraftEntry
         mUnidentified7F = 0;
     }
 
-    /* 0x00 */ UnidentifiedDraftEntryHead mHead;
+    /* 0x00 */ NetworkRankingMeta mHead;
     /* 0x18 */ u32 mUnidentified18;
     /* 0x1C */ u16 mName[11];
     /* 0x32 */ u8 mUnidentified32[0x4C];

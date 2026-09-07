@@ -103,7 +103,7 @@ cDebugCamera::cDebugCamera(bool bUnidentified)
     m_matView.SetIdentity();
     Update(0.0f);
 
-    m_pPad = lbl_806E1E28->GetPad(0);
+    m_pPad = g_pPadManager->GetPad(0);
     mUnidentified8E = true;
 }
 
@@ -259,7 +259,8 @@ void cDebugCamera::fn_800F2DA8(float dt, float controlSpeed)
     {
         float down = m_pPad->GetPressure(5, true);
         float up = m_pPad->GetPressure(6, true);
-        m_fHeight += dt * ((up - down) * controlSpeed);
+        float delta = up - down;
+        m_fHeight += dt * (delta * controlSpeed);
     }
 
     if (m_fHeight < 0.0f)
@@ -279,7 +280,7 @@ void cDebugCamera::Update(float dt)
 
     if (!g_bTweaking && !IsProfiling())
     {
-        m_pPad = lbl_806E1E28->GetPad(0);
+        m_pPad = g_pPadManager->GetPad(0);
 
         float yPressure = m_pPad->GetPressure(3, true);
         float xPressure = m_pPad->GetPressure(2, true);

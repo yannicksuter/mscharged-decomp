@@ -2020,7 +2020,7 @@ static bool ResetWasPaused;
 static bool lbl_806E17ED;
 static bool CanGetResetPauseState = true;
 
-extern UnidentifiedNetworkSession* lbl_806E10EC;
+extern UnidentifiedNetworkSession* g_pNetworkSession;
 
 extern "C"
 {
@@ -2250,7 +2250,7 @@ void DisplayDVDMessageSebring(int arg)
         {
             if (!lbl_806E17ED)
             {
-                fn_800EC868();
+                PauseAllAudio();
             }
             lbl_806E17ED = true;
         }
@@ -2285,16 +2285,16 @@ void DisplayDVDMessageSebring(int arg)
 
     for (int i = 0; i < 4; i++)
     {
-        cGlobalPad* pad = lbl_806E1E28->GetPad(i);
+        cGlobalPad* pad = g_pPadManager->GetPad(i);
         if (pad != 0)
         {
-            fn_8013A0A8(pad);
+            StopRumbleAction(pad);
         }
     }
 
-    if (lbl_806E10EC != 0)
+    if (g_pNetworkSession != 0)
     {
-        lbl_806E10EC->fn_801241C8();
+        g_pNetworkSession->fn_801241C8();
     }
     ResetTask::s_checkCardRemoved = true;
 }
@@ -2312,7 +2312,7 @@ void DVDAllClearSebring(int nStatus)
     ResetTask::s_resetPaused = ResetWasPaused;
     CanGetResetPauseState = true;
     ResetTask::s_checkCardRemoved = false;
-    fn_800ECB50();
+    ResumeAllAudio();
     lbl_806E17ED = false;
 }
 

@@ -155,7 +155,7 @@ private:
 
 extern "C" LiveBallTrail lbl_8056B518[];
 extern "C" unsigned int lbl_806E0C10;
-extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
+extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" void fn_8001847C(cBall*, bool);
 extern "C" float fn_8002BE64(PlayerTweaks*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
@@ -2874,7 +2874,7 @@ cFielder* cBall::GetPassTargetFielder() const
 bool cBall::GetInNet(int& nSide)
 {
     UnidentifiedGameState* gameState
-        = (UnidentifiedGameState*)lbl_806E0C94;
+        = (UnidentifiedGameState*)g_pGame;
     if (gameState->mUnidentified40 == 0)
     {
         if (m_pPhysicsBall->mbIsInsideNet)
@@ -2900,9 +2900,9 @@ static inline void UnidentifiedRegisterEventCallback(
     const char* name, void (*callback)(T*))
 {
     Function<T*> function(callback);
-    unsigned int hash = fn_802B289C(name, -1);
+    unsigned int hash = HashEventName(name, -1);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event
         = foundEvent != 0 ? *foundEvent : 0;
     ((UnidentifiedTypedEvent<T>*)event)->Add(function, 0, -1);
@@ -2912,9 +2912,9 @@ static inline void UnidentifiedRegisterEventCallback(
     const char* name, void (*callback)())
 {
     Function<FnVoidVoid> function(callback);
-    unsigned int hash = fn_802B289C(name, -1);
+    unsigned int hash = HashEventName(name, -1);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event
         = foundEvent != 0 ? *foundEvent : 0;
     ((UnidentifiedTypedEvent0*)event)->Add(function, 0, -1);
@@ -2925,9 +2925,9 @@ static inline void UnidentifiedRegisterEventCallback(
     const char* name, void (*callback)(P1, P2))
 {
     Function2<void, P1, P2> function(callback);
-    unsigned int hash = fn_802B289C(name, -1);
+    unsigned int hash = HashEventName(name, -1);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event
         = foundEvent != 0 ? *foundEvent : 0;
     ((UnidentifiedTypedEvent2<P1, P2>*)event)->Add(function, 0, -1);

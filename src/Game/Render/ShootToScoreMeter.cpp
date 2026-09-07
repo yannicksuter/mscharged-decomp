@@ -15,7 +15,7 @@ class BaseGameSceneManager;
 
 extern "C"
 {
-    extern BaseGameSceneManager* lbl_806E1860;
+    extern BaseGameSceneManager* g_pOverlayManager;
     void fn_801E29C0(BaseGameSceneManager* manager, nlVector3 position);
     u32 fn_80369D4C();
     u32 fn_80369D54();
@@ -391,7 +391,7 @@ void ShootToScoreMeter::DrawMeter()
     glViewProjectPoint(GetLayerView(eCLV_UnsortedSquareOrtho), screenPosition, projectedPosition);
     fn_802CE6DC(GetLayerView(eCLV_Anark), &projectedPosition,
         &projectedPosition);
-    fn_801E29C0(lbl_806E1860, projectedPosition);
+    fn_801E29C0(g_pOverlayManager, projectedPosition);
 
     glQuad3 quad;
     quad.SetupRotatedRectangle(

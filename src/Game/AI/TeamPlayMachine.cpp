@@ -11,7 +11,7 @@ struct UnidentifiedGameState
     int mUnidentified018;
 };
 
-extern UnidentifiedGameState* lbl_806E0C94;
+extern UnidentifiedGameState* g_pGame;
 extern UnidentifiedStateTransition lbl_806E20B8;
 
 float lbl_806DC448 = 1.1f;
@@ -41,7 +41,7 @@ void TeamPlayMachine::UnidentifiedVirtual7()
     UnidentifiedVariantCollection values;
     int state = -1;
 
-    if (lbl_806E0C94->mUnidentified018 == 1)
+    if (g_pGame->mUnidentified018 == 1)
     {
         values.Set(7, FuzzyVariant(lbl_806DC448));
         state = 1;

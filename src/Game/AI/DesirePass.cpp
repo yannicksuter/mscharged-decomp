@@ -76,11 +76,10 @@ bool DesirePreparePass::UnidentifiedInitialize(void* context)
     }
 
     SkillTweaks* pSkillTweaks = fn_800A636C(lbl_806E0E00);
-    float fReactionTimeRange;
     float fReactionTime = 1.0f - pSkillTweaks->fn_800A3474(0);
     float fAbortThreshold = lbl_806DC138;
-    fReactionTimeRange = lbl_806DC13C * fReactionTime;
-    fReactionTimeRange = fAbortThreshold * fReactionTimeRange;
+    float fReactionTimeRange =
+        fAbortThreshold * (lbl_806DC13C * fReactionTime);
     mfAbortThreshold = fAbortThreshold
         + (nlRandomf(fReactionTimeRange)
             - (0.5f * fReactionTimeRange));

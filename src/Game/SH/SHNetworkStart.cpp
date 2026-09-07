@@ -33,7 +33,7 @@ void UnidentifiedNetworkStartScene::fn_801FC680(int state)
     TLSlide* activeSlide = mPresentation->m_currentSlide;
     unsigned long buttonsHash = nlStringLowerHash("BUTTONS");
     unsigned long layerHash = nlStringLowerHash("Layer");
-    TLComponentInstance* buttons = (TLComponentInstance*)FEFinder<TLComponentInstance, 2>::_Find(
+    TLComponentInstance* buttons = FEFinder<TLComponentInstance, 2>::Find(
         activeSlide,
         layerHash,
         buttonsHash,

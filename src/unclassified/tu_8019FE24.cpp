@@ -67,7 +67,7 @@ extern "C"
     extern void* lbl_806E1550;
     extern void* lbl_806E1554;
     extern UnidentifiedFlyingCameraPool lbl_806E1558;
-    extern UnidentifiedEventRegistry* lbl_806E1D90;
+    extern UnidentifiedEventRegistry* g_pEventRegistry;
 
     extern const float lbl_806E5020;
     extern const float lbl_806E5024;
@@ -97,9 +97,9 @@ static inline void UnidentifiedRegisterEventCallback(
     const char* name, void (*callback)(void*), void** connection)
 {
     Function<void*> function(callback);
-    unsigned int hash = fn_802B289C(name, -1);
+    unsigned int hash = HashEventName(name, -1);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
     ((UnidentifiedTypedEvent<void>*)event)
         ->Add(function, (unsigned int)connection, -1);

@@ -54,6 +54,9 @@ public:
     void fn_8005830C();
     void fn_80058400();
     void fn_8005848C();
+    void BeginGame(bool bRematch, bool bStraightToKickoff);
+    void SendPauseGameEvent();
+    void SendResumingGameEvent();
     void fn_80058498(bool param1, int param2, int param3);
     void fn_80058528(float timeScale, float transitionTime);
     float GetNormalizedGameTime();
@@ -184,7 +187,6 @@ public:
     /* 0x10E0 */ void* mUnidentified10E0;
 };
 
-extern cGame* lbl_806E0C94;
-#define g_pGame lbl_806E0C94
+extern cGame* g_pGame;
 
 #endif // GAME_GAME_H

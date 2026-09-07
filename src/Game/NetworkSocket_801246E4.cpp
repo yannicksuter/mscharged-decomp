@@ -1,4 +1,5 @@
 #include "Game/NetworkSession.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -15,7 +16,6 @@ struct NetworkSocketInitializeInfo
 
 extern "C"
 {
-    int fn_8004F594(int channel, const char* format, ...);
     int DWC_SendUnreliable(u8 aid, const void* buffer, int size);
     long SOGetHostID();
 }
@@ -46,11 +46,11 @@ void NetworkSocket_801246E4::OnConnectionAttempted(
 {
     if (result != 0)
     {
-        fn_8004F594(0x10, "Connect failed (%d)\n", result);
+        tDebugPrintManager::Print(DC_NETWORK, "Connect failed (%d)\n", result);
     }
     else
     {
-        fn_8004F594(0x10, "Connected\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Connected\n");
     }
     mListener->ListenerVirtual0C(connection, result);
 }
@@ -58,26 +58,26 @@ void NetworkSocket_801246E4::OnConnectionAttempted(
 void NetworkSocket_801246E4::OnConnectionClosed(
     u32 connection, int reason)
 {
-    fn_8004F594(0x10, "Connection closed: ");
+    tDebugPrintManager::Print(DC_NETWORK, "Connection closed: ");
     if (reason == 0)
     {
-        fn_8004F594(0x10, "Local Close\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Local Close\n");
     }
     else if (reason == 1)
     {
-        fn_8004F594(0x10, "Remote Close\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Remote Close\n");
     }
     else if (reason == 2)
     {
-        fn_8004F594(0x10, "Communication Error\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Communication Error\n");
     }
     else if (reason == 3)
     {
-        fn_8004F594(0x10, "Socket Error\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Socket Error\n");
     }
     else if (reason == 4)
     {
-        fn_8004F594(0x10, "Not Enough Memory\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Not Enough Memory\n");
     }
     mListener->ListenerVirtual10(connection, reason);
 }
@@ -116,7 +116,7 @@ int NetworkSocket_801246E4::SendDatagram(
     bool sent = DWC_SendUnreliable(aid, buffer, size);
     if (!sent)
     {
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Failed to send message of size %d to aid %d.\n", size, aid);
         return -1;
     }
@@ -137,11 +137,11 @@ void NetworkSocket_801246E4::Initialize(
         bool started = false;
         if (!TransportSocketOpen(&mDirectSocket, false))
         {
-            fn_8004F594(0x10, "Direct socket open error\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Direct socket open error\n");
         }
         else if (!TransportSocketBind(&mDirectSocket, (u16)g_nLocalDirectPort))
         {
-            fn_8004F594(0x10, "Direct sock bind failed\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Direct sock bind failed\n");
         }
         else
         {
@@ -151,8 +151,7 @@ void NetworkSocket_801246E4::Initialize(
 
         if (!started)
         {
-            fn_8004F594(
-                0x10, "Failed to startup reliable UDP direct socket\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Failed to startup reliable UDP direct socket\n");
             return;
         }
     }
@@ -195,11 +194,11 @@ void NetworkSocket_801246E4::SetBroadcastEnabled(bool enabled)
     {
         if (!TransportSocketOpen(&mBroadcastSocket, false))
         {
-            fn_8004F594(0x10, "Broadcast socket open error\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Broadcast socket open error\n");
         }
         else if (!TransportSocketBind(&mBroadcastSocket, 1001))
         {
-            fn_8004F594(0x10, "Broadcast socket bind failed\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Broadcast socket bind failed\n");
         }
         else
         {
@@ -212,7 +211,7 @@ void NetworkSocket_801246E4::SendBroadcast(void* buffer, int size)
 {
     if (!TransportSocketIsOpen(&mBroadcastSocket))
     {
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Broadcast ignored because broadcast is currently turned off.\n");
         return;
     }
@@ -239,7 +238,7 @@ bool NetworkSocket_801246E4::Connect(
 {
     if (fn_80324920(&mReliableSocket, connection, address, port) != 0)
     {
-        fn_8004F594(0x10, "Failed initial connect attempt\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Failed initial connect attempt\n");
         return false;
     }
     return true;
@@ -371,14 +370,14 @@ u8* NetworkSocket_801246E4::GetLocalAddress()
         *(u32*)mLocalAddress = SOGetHostID();
         if (*(u32*)mLocalAddress != 0)
         {
-            fn_8004F594(0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Acquired local IP address %d.%d.%d.%d\n", mLocalAddress[0],
                 mLocalAddress[1], mLocalAddress[2], mLocalAddress[3]);
             mHasLocalAddress = true;
         }
         else
         {
-            fn_8004F594(0x10, "Failed to get local IP address\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Failed to get local IP address\n");
         }
     }
 

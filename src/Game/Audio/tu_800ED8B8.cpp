@@ -71,7 +71,7 @@ extern "C" void fn_800ED8D8()
 
 extern "C" void fn_800ED92C(unsigned long cueId)
 {
-    if (fn_802C2C84(lbl_805041B0, false))
+    if (GetTweakBool(lbl_805041B0, false))
     {
         return;
     }

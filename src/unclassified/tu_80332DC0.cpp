@@ -1,4 +1,5 @@
 #include "unclassified/tu_80332DC0.h"
+#include "Game/Sys/debug.h"
 #include "Game/EventDispatcher.inl"
 #include "unclassified/tu_80336B2C.h"
 
@@ -8,7 +9,6 @@
 #include "Game/TweakValue.h"
 #include "NL/nlMath.h"
 
-extern "C" int fn_8004F594(int category, const char* format, ...);
 u32 gNetworkRandomSeed = 0x12345678;
 
 int g_TransmitSyncDataEvery = 4;
@@ -81,7 +81,8 @@ extern "C" void fn_80332EDC()
 
 extern "C" UnidentifiedInputRouter* fn_803330AC()
 {
-    if (lbl_806E20D8->OnlineVirtual0C() == 0)
+    UnidentifiedNetworkOnlineInterface& online = *g_pNetworkSessionBase;
+    if (online.OnlineVirtual0C() == 0)
     {
         return lbl_806E2150;
     }
@@ -94,9 +95,9 @@ UnidentifiedInputRouter::~UnidentifiedInputRouter()
 
 void UnidentifiedInputRouter::Reset(int)
 {
-    mSession = lbl_806E20D8;
+    mSession = g_pNetworkSessionBase;
 
-    int machineCount = fn_80338BF0(mSession);
+    int machineCount = GetNumMachines(mSession);
     for (int machine = 0; machine < machineCount; ++machine)
     {
         fn_80336BE0(&mSession->mPeers[machine]);
@@ -128,7 +129,7 @@ void UnidentifiedInputRouter::Reset(int)
 
 void UnidentifiedInputRouter::RouterVirtual38()
 {
-    int machineCount = fn_80338BF0(mSession);
+    int machineCount = GetNumMachines(mSession);
     int gameFrame = lbl_806E2138->mFrameProvider->GetFrame();
     u32 seed = fn_80332EB8();
 
@@ -188,7 +189,7 @@ extern "C" void fn_80333908(
     }
     else
     {
-        fn_8004F594(0x10, "m_OutgoingCustomDetermDataQ overflowed\n");
+        tDebugPrintManager::Print(DC_NETWORK, "m_OutgoingCustomDetermDataQ overflowed\n");
         router->mOutgoingQueueOverflowed = true;
     }
 }
@@ -252,7 +253,7 @@ void NetworkInputRouter::Reset(int resetQueues)
 void NetworkInputRouter::RouterVirtual24()
 {
     mCongested = false;
-    int machineCount = fn_80338BF0(mSession);
+    int machineCount = GetNumMachines(mSession);
     for (int machine = 0; machine < machineCount; ++machine)
     {
         if (mInputQueues[machine].mCount <= 1)
@@ -273,7 +274,7 @@ bool NetworkInputRouter::RouterVirtual14()
         return true;
     }
 
-    int machineCount = fn_80338BF0(mSession);
+    int machineCount = GetNumMachines(mSession);
     for (s8 machine = 0; machine < machineCount; ++machine)
     {
         if (mInputQueues[machine].mCount == 0)
@@ -314,7 +315,7 @@ void NetworkInputRouter::RouterVirtual28(
     }
     else
     {
-        fn_8004F594(0x10, "m_InputQueue[%d] overflowed\n", machine);
+        tDebugPrintManager::Print(DC_NETWORK, "m_InputQueue[%d] overflowed\n", machine);
         mOutgoingQueueOverflowed = true;
     }
 }
@@ -323,7 +324,7 @@ void NetworkInputRouter::RouterVirtual30(int column, int* row)
 {
     if (mStarvedForInput)
     {
-        fn_8004F594(0x10, "StarvedForInput");
+        tDebugPrintManager::Print(DC_NETWORK, "StarvedForInput");
     }
 }
 

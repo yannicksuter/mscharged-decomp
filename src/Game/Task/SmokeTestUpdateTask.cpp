@@ -42,7 +42,7 @@ void SmokeTestUpdateTask::Run(float dt)
 
     if (mElapsed > mDuration)
     {
-        const char* smokeTestName = fn_802C2D20(sSmokeTestNamePath, sNotFound);
+        const char* smokeTestName = GetTweakString(sSmokeTestNamePath, sNotFound);
         fn_802BD644(sSmokeTestNameFormat, smokeTestName);
 
         if (lbl_806E1DF4 != 0)

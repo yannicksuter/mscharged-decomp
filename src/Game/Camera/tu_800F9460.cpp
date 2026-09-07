@@ -23,7 +23,7 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
     UnidentifiedEventRegistry;
 
-extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
+extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" unsigned char* lbl_806E2164;
 extern "C" bool fn_8003C180(cPlayer*);
 
@@ -105,9 +105,9 @@ UnidentifiedCameraEffects*
 static UnidentifiedTypedEvent<UnidentifiedEventData_8006649C>*
 GetGoalieSaveEvent(const char* name, int length)
 {
-    unsigned int hash = fn_802B289C(name, length);
+    unsigned int hash = HashEventName(name, length);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
     return (UnidentifiedTypedEvent<UnidentifiedEventData_8006649C>*)event;
 }
@@ -498,8 +498,9 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
         return;
     }
 
-    mTransitionBlend = nlAbs(1.0f
-        - nlMinEquals(nlMaxEquals(mTransitionBlend, 0.0f), 1.0f));
+    mTransitionBlend
+        = nlMinEquals(nlMaxEquals(mTransitionBlend, 0.0f), 1.0f);
+    mTransitionBlend = (float)__fabs(1.0f - mTransitionBlend);
     if (mTransitionBlend != 0.0f)
     {
         mTransitionScale = Interpolate(
@@ -509,7 +510,7 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
     if (mRestoreTimeScale == true && mOwnsTimeScale == true
         && mTransitionTime <= 0.0f)
     {
-        if (fn_80338C20(lbl_806E20D8) == 0
+        if (fn_80338C20(g_pNetworkSessionBase) == 0
             && lbl_806E2164[4] == 0)
         {
             g_pGame->fn_80059FC4();
@@ -549,13 +550,13 @@ float UnidentifiedCameraEffects::CalculateZoomScale(float) const
     if ((mCameraFlags & 0x40) != 0)
     {
         float gameX = g_pGame->mUnidentified080;
+        float clampedX = nlMinEquals(lbl_806DC5F4, gameX);
         float gameY = g_pGame->mUnidentified084;
-        float clampedX = gameX < lbl_806DC5F4 ? gameX : lbl_806DC5F4;
-        float clampedY = gameY < lbl_806DC5F4 ? gameY : lbl_806DC5F4;
-        float amount = nlAbs(clampedX) >= nlAbs(clampedY)
-                         ? nlAbs(clampedX)
-                         : nlAbs(clampedY);
-        result -= (amount / lbl_806DC5F4) * lbl_806E0F44;
+        float clampedY = nlMinEquals(lbl_806DC5F4, gameY);
+        float amount = nlAbs(clampedX);
+        amount = nlMaxEquals(amount, nlAbs(clampedY));
+        float fraction = amount / lbl_806DC5F4;
+        result -= fraction * lbl_806E0F44;
     }
     if (mCameraFlags == 0)
         result -= lbl_806E0F3C;
@@ -585,10 +586,13 @@ bool UnidentifiedCameraEffects::IsPassTargetClear() const
         cFielder* fielder = g_pTeams[otherTeam]->GetFielder(i);
         if (fielder->mUnidentified120 == passTarget->mUnidentified120)
             continue;
+        float dy = fielder->m_v3Position.y - passTarget->m_v3Position.y;
+        float dx = fielder->m_v3Position.x - passTarget->m_v3Position.x;
+        float dz = fielder->m_v3Position.z - passTarget->m_v3Position.z;
         nlVector3 delta;
-        delta.x = fielder->m_v3Position.x - passTarget->m_v3Position.x;
-        delta.y = fielder->m_v3Position.y - passTarget->m_v3Position.y;
-        delta.z = fielder->m_v3Position.z - passTarget->m_v3Position.z;
+        delta.x = dx;
+        delta.y = dy;
+        delta.z = dz;
         if (delta.GetLengthSq3D() < minimumDistanceSq)
             return false;
     }
@@ -621,10 +625,13 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
             return false;
         }
 
+        float dy = fielder->m_v3Position.y - owner->m_v3Position.y;
+        float dx = fielder->m_v3Position.x - owner->m_v3Position.x;
+        float dz = fielder->m_v3Position.z - owner->m_v3Position.z;
         nlVector3 delta;
-        delta.x = fielder->m_v3Position.x - owner->m_v3Position.x;
-        delta.y = fielder->m_v3Position.y - owner->m_v3Position.y;
-        delta.z = fielder->m_v3Position.z - owner->m_v3Position.z;
+        delta.x = dx;
+        delta.y = dy;
+        delta.z = dz;
         if (delta.GetLengthSq3D() < minimumDistanceSq)
             return false;
     }
@@ -667,7 +674,7 @@ void UnidentifiedCameraEffects::UpdateCameraFlags()
 
 void UnidentifiedCameraEffects::Reset()
 {
-    if (mOwnsTimeScale && fn_80338C20(lbl_806E20D8) == 0
+    if (mOwnsTimeScale && fn_80338C20(g_pNetworkSessionBase) == 0
         && lbl_806E2164[4] == 0)
     {
         g_pGame->fn_80059FC4();
@@ -709,23 +716,23 @@ void UnidentifiedCameraEffects::Update(float deltaTime)
         Reset();
     }
 
-    mFlagUpdateTimer += deltaTime;
     mZoomScale = 0.0f;
     mTransitionScale = 0.0f;
+    mFlagUpdateTimer += deltaTime;
     if (mFlagUpdateTimer <= lbl_806DC5D8)
     {
         mFlagUpdateTimer = 0.0f;
         UpdateCameraFlags();
     }
 
-    if (lbl_806DC540)
+    if (lbl_806DC540 == true)
     {
         if (IsTransitionActive())
         {
             if (nlTaskManager::m_pInstance->mCurrentState == 2)
                 UpdateTransition(deltaTime);
         }
-        else if (mOwnsTimeScale)
+        else if (mOwnsTimeScale == true)
         {
             Reset();
         }

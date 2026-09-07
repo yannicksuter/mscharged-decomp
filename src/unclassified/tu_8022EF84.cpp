@@ -13,7 +13,7 @@ extern "C" TLInstance* fn_803068F4(TLInstance* instance, unsigned long level1,
     unsigned long level5, unsigned long level6);
 
 extern BaseGameSceneManager* lbl_806E1838;
-extern BaseGameSceneManager* lbl_806E1860;
+extern BaseGameSceneManager* g_pOverlayManager;
 extern TLInstance lbl_80580248;
 
 /**
@@ -149,7 +149,7 @@ bool TU8022EF84Component::fn_8022F2E0(TU80300104Event event, float)
     BaseGameSceneManager* manager = lbl_806E1838;
     if (manager == 0)
     {
-        manager = lbl_806E1860;
+        manager = g_pOverlayManager;
     }
 
     if (mUnidentifiedCC && mUnidentifiedCF)

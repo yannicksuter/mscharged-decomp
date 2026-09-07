@@ -318,3 +318,13 @@ int fn_8011162C()
 {
     return 0;
 }
+
+template TeamStats* Cup<4, 8>::GetPreviousTeamStats();
+template TeamStats* Cup<6, 12>::GetPreviousTeamStats();
+template TeamStats* Cup<10, 11>::GetPreviousTeamStats();
+template u16 Cup<4, 8>::GetNumTeams();
+template u16 Cup<6, 12>::GetNumTeams();
+template u16 Cup<10, 11>::GetNumTeams();
+template int Cup<4, 8>::GetSaveDataSize() const;
+template int Cup<6, 12>::GetSaveDataSize() const;
+template int Cup<10, 11>::GetSaveDataSize() const;

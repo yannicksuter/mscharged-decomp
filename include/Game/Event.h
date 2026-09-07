@@ -5,7 +5,7 @@
 #include "NL/nlBind.h"
 #include "NL/nlDLListContainer.h"
 
-extern "C" unsigned int fn_802B289C(const char*, int);
+extern "C" unsigned int HashEventName(const char*, int);
 extern "C" void fn_802B2940(void*, void*);
 extern "C" void fn_802B29C4(void*);
 extern "C" void fn_802B2A04(void*, void*, unsigned int, int, void*);
@@ -16,7 +16,7 @@ class UnidentifiedEventBase
 {
 public:
     UnidentifiedEventBase(const char* name, int length)
-        : mHash(fn_802B289C(name, length))
+        : mHash(HashEventName(name, length))
     {
     }
 

@@ -32,6 +32,7 @@ public:
     static void Remove(const cBaseCamera& camera);
     static void Remove(eCameraType type, bool bDeleteAfterRemoving);
     static void PushCameraWithTransition(cBaseCamera* pCamera, float fDuration, eCameraTransition transition, void (*pCallback)(eCameraMessage), bool bDeleteCurrentCamera);
+    static cBaseCamera* PopCamera();
     static cBaseCamera* PopCameraWithTransition(float fDuration, eCameraTransition transition, void (*pCallback)(eCameraMessage));
     static float GetDistanceFromCameraToObject(const nlVector3& objectPosition);
     static void GetViewVector(nlVector3& viewVector);

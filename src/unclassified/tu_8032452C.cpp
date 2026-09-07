@@ -1,4 +1,5 @@
 #include "unclassified/tu_8032452C.h"
+#include "Game/Sys/debug.h"
 #include "unclassified/tu_80326844.h"
 
 #include "Game/NetworkSession.h"
@@ -139,7 +140,7 @@ extern "C" int fn_80324920(UnidentifiedReliableSocketState* socket,
         address[1], address[2], address[3], port);
     if (g_TransportLayerLog >= 1)
     {
-        fn_8004F594(0x10, lbl_805319F8,
+        tDebugPrintManager::Print(DC_NETWORK, lbl_805319F8,
             address[0], address[1], address[2], address[3], port);
     }
 

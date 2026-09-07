@@ -1,4 +1,5 @@
 #include <dwc/dwc_account.h>
+#include "Game/Sys/debug.h"
 #include <dwc/dwc_base64.h>
 #include <dwc/dwc_common.h>
 #include <dwc/dwc_friend.h>
@@ -17,7 +18,6 @@ extern BaseGameSceneManager* lbl_806E1838;
 
 extern "C"
 {
-    int fn_8004F594(int channel, const char* format, ...);
     u32 fn_80124238();
     void fn_8025BD7C(bool value);
     void fn_8025BDCC(unsigned long long friendKey, u16* output);
@@ -53,7 +53,7 @@ static inline u32 GetStatusDataSize(u8 status)
 static void BuddyFriendCallback_801364B4(int index, void*)
 {
     UnidentifiedFriendManager_801360A4* manager = lbl_806E1194;
-    fn_8004F594(0x10, "Got friendship with friend [%d].]\n", index);
+    tDebugPrintManager::Print(DC_NETWORK, "Got friendship with friend [%d].]\n", index);
     manager->mFriendListChanged = true;
 }
 
@@ -61,7 +61,7 @@ static void UpdateServersCallback_801364FC(int error, BOOL isChanged, void*)
 {
     if (error == 0)
     {
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Friends list synchronization successful (isChanged == %s)\n",
             isChanged ? "true" : "false");
         if (isChanged)
@@ -81,7 +81,7 @@ static void FriendStatusCallback_80136560(
 static void DeleteFriendCallback_80136584(
     int deletedIndex, int sourceIndex, void*)
 {
-    fn_8004F594(0x10,
+    tDebugPrintManager::Print(DC_NETWORK,
         "Friend [%d] was deleted (equal friend[%d]).\n",
         deletedIndex,
         sourceIndex);
@@ -213,7 +213,7 @@ void UnidentifiedFriendManager_801360A4::HandleFriendStatus_801365C4(
         return;
     }
 
-    fn_8004F594(0x10, "friend[%.2d] type %d Friend:%s status %s (%s).\n", index, DWC_GetFriendDataType(friendData), DWC_IsBuddyFriendData(friendData) ? "Yes" : "No", sFriendStatusNames[status], statusString);
+    tDebugPrintManager::Print(DC_NETWORK, "friend[%.2d] type %d Friend:%s status %s (%s).\n", index, DWC_GetFriendDataType(friendData), DWC_IsBuddyFriendData(friendData) ? "Yes" : "No", sFriendStatusNames[status], statusString);
 
     UnidentifiedFriendStatusPayload previous = mFriendStatus[index];
     UnidentifiedFriendStatusPayload& current = mFriendStatus[index];
@@ -292,35 +292,35 @@ void UnidentifiedFriendManager_801360A4::HandleFriendStatus_801365C4(
     switch (current.mStatus)
     {
     case 0:
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "FriendStatusChanged FriendPID %d EFriendStatus_Initial_NotAvailable\n",
             friendData->gs_profile_id.id);
         break;
     case 1:
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "FriendStatusChanged FriendPID %d EFriendStatus_Initial_Available\n",
             friendData->gs_profile_id.id);
         break;
     case 2:
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "FriendStatusChanged FriendPID %d EFriendStatus_HostInvitingPlayer forPID %d\n",
             friendData->gs_profile_id.id,
             current.mProfileId);
         break;
     case 3:
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "FriendStatusChanged FriendPID %d EFriendStatus_ClientDecliningHost forPID %d\n",
             friendData->gs_profile_id.id,
             current.mProfileId);
         break;
     case 4:
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "FriendStatusChanged FriendPID %d EFriendStatus_ClientReceivedInvitation forPID %d\n",
             friendData->gs_profile_id.id,
             current.mProfileId);
         break;
     default:
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "FriendStatusChanged FriendPID %d Invalid Status %d\n",
             friendData->gs_profile_id.id,
             current.mStatus);
@@ -468,13 +468,13 @@ int UnidentifiedFriendManager_801360A4::GetFriendInvitationResponse_80136D30()
 void UnidentifiedFriendManager_801360A4::Update(float dt)
 {
     mUpdateTime += dt;
-    if (!mFriendListChanged || lbl_806E20D8->OnlineVirtual10() != 2)
+    if (!mFriendListChanged || g_pNetworkSessionBase->OnlineVirtual10() != 2)
     {
         return;
     }
 
     bool matchmaking = false;
-    NetworkLobby_80133634* lobby = lbl_806E10EC->fn_801216F0();
+    NetworkLobby_80133634* lobby = g_pNetworkSession->fn_801216F0();
     if (lobby != 0 && (lobby->mMatchmakingThreadRunning || lobby->mState != 0))
     {
         matchmaking = true;
@@ -524,13 +524,13 @@ void UnidentifiedFriendManager_801360A4::SetOwnStatusInitial_80136FA4(
     if (currentStatus != status)
     {
         mOwnStatus.mStatus = status;
-        fn_8004F594(0x10, "SetOwnStatusInitial %d\n", status);
+        tDebugPrintManager::Print(DC_NETWORK, "SetOwnStatusInitial %d\n", status);
         DWC_SetOwnStatusData(reinterpret_cast<const char*>(&mOwnStatus),
             GetStatusDataSize(mOwnStatus.mStatus));
     }
     else
     {
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "SetOwnStatusInitial did not change from last %d not calling DWC_SetOwnStatusData\n",
             status);
     }
@@ -544,7 +544,7 @@ void UnidentifiedFriendManager_801360A4::SetOwnStatusDecline_80137068(int index)
         gameInfo->GetUnknown0x40(lbl_806E20E0, index));
     mOwnStatus.mStatus = 3;
     mOwnStatus.mProfileId = friendData->gs_profile_id.id;
-    fn_8004F594(0x10, "SetOwnStatusDecline forPID %d\n", mOwnStatus.mProfileId);
+    tDebugPrintManager::Print(DC_NETWORK, "SetOwnStatusDecline forPID %d\n", mOwnStatus.mProfileId);
     DWC_SetOwnStatusData(reinterpret_cast<const char*>(&mOwnStatus),
         GetStatusDataSize(mOwnStatus.mStatus));
 }
@@ -558,7 +558,7 @@ void UnidentifiedFriendManager_801360A4::
         gameInfo->GetUnknown0x40(lbl_806E20E0, index));
     mOwnStatus.mStatus = 4;
     mOwnStatus.mProfileId = friendData->gs_profile_id.id;
-    fn_8004F594(0x10, "SetOwnStatusReceivedInvitation forPID %d\n", mOwnStatus.mProfileId);
+    tDebugPrintManager::Print(DC_NETWORK, "SetOwnStatusReceivedInvitation forPID %d\n", mOwnStatus.mProfileId);
     DWC_SetOwnStatusData(reinterpret_cast<const char*>(&mOwnStatus),
         GetStatusDataSize(mOwnStatus.mStatus));
 }
@@ -577,7 +577,7 @@ void UnidentifiedFriendManager_801360A4::SetOwnStatusHostInviting_801371C8(
     mOwnStatus.mPowerupSettings = *powerupSettings;
     mOwnStatus.mUnidentified34 = value;
     mOwnStatus.mUnidentified30 = fn_80124238();
-    fn_8004F594(0x10, "SetOwnStatusHostInvitingPlayer forPID %d\n", mOwnStatus.mProfileId);
+    tDebugPrintManager::Print(DC_NETWORK, "SetOwnStatusHostInvitingPlayer forPID %d\n", mOwnStatus.mProfileId);
     DWC_SetOwnStatusData(reinterpret_cast<const char*>(&mOwnStatus),
         GetStatusDataSize(mOwnStatus.mStatus));
 }

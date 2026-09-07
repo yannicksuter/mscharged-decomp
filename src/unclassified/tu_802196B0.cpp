@@ -64,7 +64,7 @@ extern "C" nlVector2 fn_802197FC(int pad, u8* valid)
 
 extern "C" nlVector2 fn_80219824(int pad, u16* angle, u8* valid)
 {
-    cGlobalPad* globalPad = lbl_806E1E28->GetPad(pad);
+    cGlobalPad* globalPad = g_pPadManager->GetPad(pad);
     PadBackend* device = globalPad->mBackend;
     nlVector2 position;
     nlVec2Set(position, 0.0f, 0.0f);
@@ -77,7 +77,7 @@ extern "C" nlVector2 fn_80219824(int pad, u16* angle, u8* valid)
     {
         char path[32];
         nlSNPrintf(path, sizeof(path), "user/monkey_%d_offset", pad);
-        float offset = fn_802C2B48(path, 50.0f);
+        float offset = GetTweakFloat(path, 50.0f);
         float randomX = nlRandomf(-offset, offset, &nlDefaultSeed);
         float randomY = nlRandomf(-offset, offset, &nlDefaultSeed);
         position.x = randomX + lbl_80578460[pad].x;
@@ -141,10 +141,10 @@ void UnidentifiedTask_802196B0::Run(float)
 {
     for (int i = 0; i < 4; ++i)
     {
-        if (lbl_806E1E28->GetPad(i) != 0
-            && !fn_80375E04(lbl_806E2478, i))
+        if (g_pPadManager->GetPad(i) != 0
+            && !fn_80375E04(g_pPlatPadManager, i))
         {
-            fn_80375DF8(lbl_806E2478, i, true);
+            fn_80375DF8(g_pPlatPadManager, i, true);
         }
     }
 }
@@ -153,9 +153,9 @@ extern "C" void fn_80219E08(int, nlColour)
 {
 }
 
-extern "C" bool fn_80219E0C(int index)
+extern "C" bool IsFreeStylePad(int index)
 {
-    cGlobalPad* globalPad = lbl_806E1E28->GetPad(index);
+    cGlobalPad* globalPad = g_pPadManager->GetPad(index);
     PadBackend* device = globalPad->mBackend;
     int type = device->UnidentifiedClassID();
     return type == lbl_806E228C;

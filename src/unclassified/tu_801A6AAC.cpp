@@ -20,7 +20,7 @@ struct UnidentifiedControllerInfo_801A7C48
 
 extern "C"
 {
-    int fn_802C2C84(const char* pPath, int nDefault);
+    int GetTweakBool(const char* pPath, int nDefault);
     bool fn_80273B00();
     void fn_801A8F1C(u16 nAngle, u32 nTextureIndex, u32 nStatus,
         float fX, float fY);
@@ -125,7 +125,7 @@ extern "C" void fn_801A6B64(
     {
         pState->mUnidentified008 = (float)(int)glTextureGetWidth();
         pState->mUnidentified00C = (float)(int)glTextureGetHeight();
-        if (fn_802C2C84(lbl_80514210, 0))
+        if (GetTweakBool(lbl_80514210, 0))
         {
             pState->mUnidentified008 *= 0.5f;
             pState->mUnidentified00C *= 0.5f;
@@ -687,13 +687,13 @@ extern "C" void fn_801A7C48(float fDeltaT)
         lbl_80573498.mUnidentified018
             = 0.0000958738f * (float)nAngle;
 
-        if (lbl_806E10EC->fn_80123314())
+        if (g_pNetworkSession->fn_80123314())
         {
             fn_801A8F1C(nAngle, lbl_80573498.mUnidentified024, nStatus, fX, fY);
         }
         DrawState(lbl_80573498);
     }
-    else if (lbl_806E10EC->fn_80123314() && lbl_806E15F4)
+    else if (g_pNetworkSession->fn_80123314() && lbl_806E15F4)
     {
         UpdateStateTweens(lbl_80573498, fDeltaT);
         lbl_80573498.mUnidentified000 = lbl_806E15F8;
@@ -926,12 +926,12 @@ extern "C" void fn_801A8F1C(u16 nAngle, u32 nTextureIndex,
 
     u8 buffer[50];
     int nSize = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
-    int nPlayerCount = fn_80338BF0(lbl_806E20D8);
+    int nPlayerCount = GetNumMachines(g_pNetworkSessionBase);
     for (s8 i = 0; i < nPlayerCount; i++)
     {
-        if (i != fn_80338C20(lbl_806E20D8))
+        if (i != fn_80338C20(g_pNetworkSessionBase))
         {
-            lbl_806E20D8->Send(i, buffer, nSize, false);
+            g_pNetworkSessionBase->Send(i, buffer, nSize, false);
         }
     }
 }

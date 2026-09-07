@@ -40,7 +40,7 @@ struct PadUpdateState_80137B40
     /* 0x314 */ DeviceChangedEvent_80137B40 mDeviceChanged;
 }; // size 0x3B8
 
-extern PadUpdateState_80137B40* lbl_806E2478;
+extern PadUpdateState_80137B40* g_pPlatPadManager;
 
 bool g_bEnableGamecubePadMonkey;
 
@@ -100,12 +100,12 @@ void fn_80137890()
     {
         for (int padSet = 0; padSet < 2; ++padSet)
         {
-            lbl_806E1E28->fn_802C084C(padSet);
+            g_pPadManager->fn_802C084C(padSet);
             for (int padIndex = 0; padIndex < 4; ++padIndex)
             {
                 PadMonkey* monkey = new (nlMalloc(0xFC, 8, false))
                     PadMonkey_80375EEC(padIndex);
-                lbl_806E1E28->GetPad(padIndex)->mBackend = monkey;
+                g_pPadManager->GetPad(padIndex)->mBackend = monkey;
             }
         }
     }
@@ -113,41 +113,41 @@ void fn_80137890()
     {
         for (int padSet = 0; padSet < 2; ++padSet)
         {
-            lbl_806E1E28->fn_802C084C(padSet);
+            g_pPadManager->fn_802C084C(padSet);
             for (int padIndex = 0; padIndex < 4; ++padIndex)
             {
                 cPlatPad* pad = new cPlatPad(padIndex);
-                lbl_806E1E28->GetPad(padIndex)->mBackend = pad;
+                g_pPadManager->GetPad(padIndex)->mBackend = pad;
             }
         }
     }
-    lbl_806E1E28->fn_802C084C(0);
+    g_pPadManager->fn_802C084C(0);
 }
 
 void fn_801379AC()
 {
     for (int padSet = 0; padSet < 2; ++padSet)
     {
-        lbl_806E1E28->fn_802C084C(padSet);
+        g_pPadManager->fn_802C084C(padSet);
         for (int padIndex = 0; padIndex < 4; ++padIndex)
         {
-            lbl_806E1E28->GetPad(padIndex)->StopRumble();
-            delete lbl_806E1E28->GetPad(padIndex)->mBackend;
-            lbl_806E1E28->GetPad(padIndex)->mBackend = 0;
+            g_pPadManager->GetPad(padIndex)->StopRumble();
+            delete g_pPadManager->GetPad(padIndex)->mBackend;
+            g_pPadManager->GetPad(padIndex)->mBackend = 0;
         }
     }
-    lbl_806E1E28->fn_802C084C(0);
+    g_pPadManager->fn_802C084C(0);
 }
 
 void InitPads()
 {
-    if (lbl_806E1E28 == 0)
+    if (g_pPadManager == 0)
     {
-        lbl_806E1E28 = new (8, false) PadManager_802C06D4;
+        g_pPadManager = new (8, false) PadManager_802C06D4;
     }
 
-    lbl_806E1E28->fn_802C06D8(4, 2);
-    lbl_806E1E28->fn_802C084C(0);
+    g_pPadManager->fn_802C06D8(4, 2);
+    g_pPadManager->fn_802C084C(0);
     lbl_806E22A8 = g_pPadRemapArray;
     lbl_806E2278 = remapArray_8050DB2C;
 
@@ -170,15 +170,15 @@ void fn_80137B40()
     CurrentAllocator = &VirtualAllocator;
     AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
 
-    if (lbl_806E2478 == 0)
+    if (g_pPlatPadManager == 0)
     {
-        lbl_806E2478 = new (nlMalloc(
+        g_pPlatPadManager = new (nlMalloc(
             sizeof(PadUpdateState_80137B40), 8, false))
             PadUpdateState_80137B40;
     }
 
-    fn_80375288(lbl_806E2478);
-    lbl_806E2478->mUnidentified305 = true;
+    fn_80375288(g_pPlatPadManager);
+    g_pPlatPadManager->mUnidentified305 = true;
 
     --AllocatorStackDepth;
     AllocatorStack[AllocatorStackDepth] = 0;
@@ -195,38 +195,38 @@ void UpdateMonkeyState(int monkeySet)
     for (int j = 0; j < 4; ++j)
     {
         PadMonkey* monkey
-            = (PadMonkey*)lbl_806E1E28->GetPad(j)->mBackend;
+            = (PadMonkey*)g_pPadManager->GetPad(j)->mBackend;
         NLString monkeyPad = Format<NLString, int, int>(
             NLString("user/{0}_pad_monkey_{1}_"), monkeySet, j);
 
         monkey->m_unk_0x34
-            = fn_802C2B48(monkeyPad.Append("connected").c_str(), 100.0f);
+            = GetTweakFloat(monkeyPad.Append("connected").c_str(), 100.0f);
         monkey->SetButtonChance(0x0001,
-            fn_802C2B48(monkeyPad.Append("button_left").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_left").c_str(), 10.0f));
         monkey->SetButtonChance(0x0002,
-            fn_802C2B48(monkeyPad.Append("button_right").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_right").c_str(), 10.0f));
         monkey->SetButtonChance(0x0004,
-            fn_802C2B48(monkeyPad.Append("button_down").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_down").c_str(), 10.0f));
         monkey->SetButtonChance(0x0008,
-            fn_802C2B48(monkeyPad.Append("button_up").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_up").c_str(), 10.0f));
         monkey->SetButtonChance(0x0010,
-            fn_802C2B48(monkeyPad.Append("button_plus").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_plus").c_str(), 10.0f));
         monkey->SetButtonChance(0x0100,
-            fn_802C2B48(monkeyPad.Append("button_2").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_2").c_str(), 10.0f));
         monkey->SetButtonChance(0x0200,
-            fn_802C2B48(monkeyPad.Append("button_1").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_1").c_str(), 10.0f));
         monkey->SetButtonChance(0x0400,
-            fn_802C2B48(monkeyPad.Append("button_b").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_b").c_str(), 10.0f));
         monkey->SetButtonChance(0x0800,
-            fn_802C2B48(monkeyPad.Append("button_a").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_a").c_str(), 10.0f));
         monkey->SetButtonChance(0x1000,
-            fn_802C2B48(monkeyPad.Append("button_minus").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_minus").c_str(), 10.0f));
         monkey->SetButtonChance(0x8000,
-            fn_802C2B48(monkeyPad.Append("button_home").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_home").c_str(), 10.0f));
         monkey->SetButtonChance(0x2000,
-            fn_802C2B48(monkeyPad.Append("button_z").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_z").c_str(), 10.0f));
         monkey->SetButtonChance(0x4000,
-            fn_802C2B48(monkeyPad.Append("button_c").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_c").c_str(), 10.0f));
 
         monkey->Update(0.0f);
     }

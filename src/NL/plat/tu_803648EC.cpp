@@ -27,7 +27,7 @@ void Class_803648EC::Update(float dt)
         PlatPadStatus_80375EC8* temp = mUnidentified01C;
         mUnidentified01C = mUnidentified020;
         mUnidentified020 = temp;
-        *mUnidentified01C = *fn_80375EC8(lbl_806E2478, m_padIndex);
+        *mUnidentified01C = *fn_80375EC8(g_pPlatPadManager, m_padIndex);
         fn_80364650(&mUnidentified1B0, &mUnidentified01C->kpad);
 
         int changed = mUnidentified01C->wpad.button ^ mUnidentified020->wpad.button;

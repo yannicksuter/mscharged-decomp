@@ -180,16 +180,51 @@ public:
         return &emptyString;
     }
 
-    int size() const;
-    CharT* begin();
-    CharT* end();
+    int size() const
+    {
+        return mData ? mData->mData.mSize - 1 : 0;
+    }
+
+    CharT* begin()
+    {
+        Cow();
+        if (mData)
+        {
+            return GetData().begin();
+        }
+        return (CharT*)0;
+    }
+
+    CharT* end()
+    {
+        Cow();
+        if (mData)
+        {
+            return GetData().end();
+        }
+        return (CharT*)0;
+    }
+
+    Data& GetData()
+    {
+        return *mData;
+    }
+
+    const Data& GetData() const
+    {
+        return *mData;
+    }
 
     const CharT& operator[](int index) const
     {
         return mData->mData.mData[index];
     }
 
-    CharT& operator[](int index);
+    CharT& operator[](int index)
+    {
+        Cow();
+        return GetData()[index];
+    }
 
     inline void Cow()
     {
@@ -204,6 +239,7 @@ public:
     }
 
     void erase(const CharT* begin, const CharT* end);
+
     void insert(CharT* at, const CharT* begin, const CharT* end);
 
     template <typename OtherAllocator>
@@ -379,6 +415,23 @@ inline bool operator==(const BasicString<CharT, Allocator>& lhs, const char* rhs
         ++i;
     }
     return *rhs == 0;
+}
+
+template <typename CharT, typename Allocator>
+inline void BasicString<CharT, Allocator>::erase(const CharT* begin, const CharT* end)
+{
+    Cow();
+    GetData().erase(begin, end);
+}
+
+template <typename CharT, typename Allocator>
+inline void BasicString<CharT, Allocator>::insert(CharT* at, const CharT* begin, const CharT* end)
+{
+    CharT* oldData = this->begin();
+    int offset = at - oldData;
+    Cow();
+    CharT* dataPtr = this->begin();
+    mData->insertRange(dataPtr + offset, begin, end);
 }
 
 typedef BasicString<char, Detail::TempStringAllocator> NLString;

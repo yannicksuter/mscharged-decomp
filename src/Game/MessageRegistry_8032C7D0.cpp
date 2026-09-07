@@ -1,7 +1,7 @@
 #include "Game/NetworkMessages.h"
+#include "Game/Sys/debug.h"
 #include "NL/nlMemory.h"
 
-extern "C" int fn_8004F594(int channel, const char* format, ...);
 
 UnidentifiedMessageRegistry_8032C7D0* lbl_806E2100;
 
@@ -32,7 +32,7 @@ void UnidentifiedMessageRegistry_8032C7D0::fn_8032C8CC(
     UnidentifiedNetworkMessageFactory* factory = mUnidentified000[type];
     if (factory == 0)
     {
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "WARNING NO MESSAGE <FACTORY> FOR TYPE %d..DISCARDING MESSAGE\n",
             type);
         return;
@@ -50,7 +50,7 @@ void UnidentifiedMessageRegistry_8032C7D0::fn_8032C8CC(
     }
     else
     {
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "WARNING NO MESSAGE HANDLER FOR TYPE %d..DISCARDING MESSAGE\n",
             type);
         delete message;

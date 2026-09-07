@@ -26,6 +26,27 @@ struct NetworkStatsPlayer
 
 struct NetworkRankingMeta
 {
+    NetworkRankingMeta()
+    {
+        mMonth = 1;
+        mDay = 1;
+        mYear = 2000;
+        mScore = 0;
+        mDisplayRank = 0;
+        mWins = 0;
+        mLosses = 0;
+        mUnidentified14 = 0;
+    }
+
+    void fn_8025E41C()
+    {
+        mScore = 0;
+        mDisplayRank = 0;
+        mWins = 0;
+        mLosses = 0;
+        mUnidentified14 = 0;
+    }
+
     /* 0x00 */ u8 mMonth;
     /* 0x01 */ u8 mDay;
     /* 0x02 */ u16 mYear;

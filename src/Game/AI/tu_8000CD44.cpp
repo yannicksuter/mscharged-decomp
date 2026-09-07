@@ -687,12 +687,11 @@ const nlVector3& UnidentifiedAvoidancePolygon_804F4750::GetPosition()
     *(nlVector2*)&mCenter = v2Zero;
     for (int i = 0; i < 4; i++)
     {
-        mCenter.y += mPoints[i].y;
-        mCenter.x += mPoints[i].x;
+        nlVec2Set(*(nlVector2*)&mCenter, mCenter.x + mPoints[i].x,
+            mCenter.y + mPoints[i].y);
     }
-    mCenter.y = 0.25f * mCenter.y;
+    nlVec2Set(*(nlVector2*)&mCenter, 0.25f * mCenter.x, 0.25f * mCenter.y);
     mCenter.z = 0.0f;
-    mCenter.x = 0.25f * mCenter.x;
     return mCenter;
 }
 

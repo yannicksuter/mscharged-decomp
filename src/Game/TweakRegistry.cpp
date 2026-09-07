@@ -583,7 +583,7 @@ void fn_802C2B38(TweakValueBase_8052BF70* value)
     fn_802C595C(&lbl_8057C4E4, value);
 }
 
-float fn_802C2B48(const char* path, float defaultValue)
+float GetTweakFloat(const char* path, float defaultValue)
 {
     TweakEntry_8052BF00* entry = fn_802C41B4(&lbl_8057C4E4, path);
     if (entry == 0)
@@ -602,7 +602,7 @@ float fn_802C2B48(const char* path, float defaultValue)
     return defaultValue;
 }
 
-int fn_802C2BE8(const char* path, int defaultValue)
+int GetTweakInt(const char* path, int defaultValue)
 {
     TweakEntry_8052BF00* entry = fn_802C41B4(&lbl_8057C4E4, path);
     if (entry == 0)
@@ -621,7 +621,7 @@ int fn_802C2BE8(const char* path, int defaultValue)
     return defaultValue;
 }
 
-bool fn_802C2C84(const char* path, bool defaultValue)
+bool GetTweakBool(const char* path, bool defaultValue)
 {
     TweakEntry_8052BF00* entry = fn_802C41B4(&lbl_8057C4E4, path);
     if (entry == 0)
@@ -640,7 +640,7 @@ bool fn_802C2C84(const char* path, bool defaultValue)
     return defaultValue;
 }
 
-const char* fn_802C2D20(const char* path, const char* defaultValue)
+const char* GetTweakString(const char* path, const char* defaultValue)
 {
     TweakEntry_8052BF00* entry = fn_802C41B4(&lbl_8057C4E4, path);
     if (entry == 0)

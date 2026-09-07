@@ -58,6 +58,6 @@ public:
 
 
 extern BaseGameSceneManager* lbl_806E1838;
-extern BaseGameSceneManager* lbl_806E1860;
+extern BaseGameSceneManager* g_pOverlayManager;
 
 #endif // GAME_BASE_GAME_SCENE_MANAGER_H

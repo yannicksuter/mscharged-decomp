@@ -229,6 +229,8 @@ bool World::fn_80340FD4(nlChunk* pChunk, unsigned long uSize)
 bool World::fn_8034136C(
     void* pData, unsigned long uSize, bool bKeepData)
 {
+    unsigned long i = 0;
+
     if (bKeepData)
     {
         m_pOwnedData = (u8*)pData;
@@ -244,7 +246,7 @@ bool World::fn_8034136C(
     context.m_uNumObjectsLoaded = 0;
     context.m_pParent = 0;
 
-    for (unsigned long i = 0; i < *(unsigned long*)pData; ++i)
+    for (; i < *(unsigned long*)pData; ++i)
     {
         unsigned long uType = *(unsigned long*)(context.m_pObject + 8);
         if (uType == 0x10)

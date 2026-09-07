@@ -1,4 +1,5 @@
 #include "NL/gl/glPlat.h"
+#include "Game/Sys/debug.h"
 #include "NL/gl/glView.h"
 #include "NL/gl/tu_80364020.h"
 
@@ -70,7 +71,7 @@ extern "C"
     void OSReport(const char* format, ...);
 
     bool fn_802C2DBC(const char* path);
-    s32 fn_802C2BE8(const char* path, s32 defaultValue);
+    s32 GetTweakInt(const char* path, s32 defaultValue);
     void GXAdjustForOverscan(const GXRenderModeObj* source, GXRenderModeObj* destination, u16 horizontal, u16 vertical);
     f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight);
     void fn_803A7828(f32 x, f32 y, f32 width, f32 height, f32 nearZ, f32 farZ);
@@ -82,7 +83,6 @@ extern "C"
     void fn_803A6FE8(u8 fieldMode, u8 halfAspectRatio);
     void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
     void* fn_80372B30(unsigned long size, bool fromEnd);
-    void fn_8004F594(s32 category, const char* format, ...);
 
     void fn_802CB848(Function2<bool, PlatformStartupEntry&, PlatformStartupEntry&>* callback);
 
@@ -217,7 +217,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
 
     if (fn_802C2DBC("/user/gpu fifo"))
     {
-        glx_FIFOSize = (u32)fn_802C2BE8("/user/gpu fifo", 0) << 10;
+        glx_FIFOSize = (u32)GetTweakInt("/user/gpu fifo", 0) << 10;
     }
 
     screenInfo->ScreenWidth = 640;
@@ -318,7 +318,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     ClearXFBInline(framebufferMemory);
     ClearXFBInline(glx_FrameBuffer[1]);
 
-    fn_8004F594(1, "%uKB used for FB and FIFO\n", totalSize >> 10, glx_FIFOSize >> 10);
+    tDebugPrintManager::Print(DC_GL, "%uKB used for FB and FIFO\n", totalSize >> 10, glx_FIFOSize >> 10);
     glx_InitGX();
     VISetNextFrameBuffer(glx_FrameBuffer[0]);
     glxSwapSetBlack(true);

@@ -156,7 +156,7 @@ static inline nlColour GetIndicatorColour(cPlayer* pCharacter)
 
 extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
 {
-    if (fn_80338BF0(lbl_806E20D8) > 1)
+    if (GetNumMachines(g_pNetworkSessionBase) > 1)
     {
         DetInput* pGlobalPad = pCharacter->GetGlobalPad();
         if (pGlobalPad == 0)
@@ -165,7 +165,7 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
             return -1;
         }
 
-        UnidentifiedNetworkPeer* pPeer = fn_80338C0C(lbl_806E20D8);
+        UnidentifiedNetworkPeer* pPeer = fn_80338C0C(g_pNetworkSessionBase);
         UnidentifiedNetworkPeerChannel* pOwner
             = (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser;
         int index = -1;

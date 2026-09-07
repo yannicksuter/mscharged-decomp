@@ -2,7 +2,7 @@
 
 #include "unclassified/tu_80336B2C.h"
 
-extern "C" int fn_80338BF0(UnidentifiedNetworkSessionData* session)
+extern "C" int GetNumMachines(UnidentifiedNetworkSessionData* session)
 {
     return session->mUnidentified0000;
 }

@@ -18,7 +18,7 @@ Class_80365E84 lbl_8058936C;
 
 extern "C" bool fn_80365E84(PadBackend* pad)
 {
-    int type = lbl_806E2478->type[pad->m_padIndex];
+    int type = g_pPlatPadManager->type[pad->m_padIndex];
     if ((type == 1 && !lbl_806DFA48)
         || (type == 2 && !lbl_806DFA49)
         || (type == 3 && !lbl_806DFA4A))
@@ -66,7 +66,7 @@ extern "C" bool fn_80365E84(PadBackend* pad)
             break;
         }
 
-        cGlobalPad* globalPad = lbl_806E1E28->GetPad(pad->m_padIndex);
+        cGlobalPad* globalPad = g_pPadManager->GetPad(pad->m_padIndex);
         delete globalPad->mBackend;
         globalPad->mBackend = backend;
         OSEnableInterrupts();

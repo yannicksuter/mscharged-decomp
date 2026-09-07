@@ -1,9 +1,11 @@
 #include "unclassified/tu_80259B88.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/GameInfo.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
+#include "Game/FE/feManager.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
@@ -18,8 +20,6 @@
 #include "unclassified/tu_802196B0.h"
 #include "unclassified/tu_80252180.h"
 
-extern "C" int fn_8004F594(int channel, const char* format, ...);
-extern "C" void fn_801C3BEC();
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" void fn_801CC9B0(
     TU80219248Component* component, TLComponentInstance* instance, int value);
@@ -41,12 +41,6 @@ extern int lbl_806DE668[2];
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
-class UnidentifiedScene_8025AF0C : public BaseSceneHandler
-{
-public:
-    /* 0x1C */ int mUnidentified1C;
-    /* 0x20 */ float mUnidentified20;
-};
 
 template <typename T>
 static inline T* CastFound(TLInstance* found)
@@ -438,7 +432,7 @@ void TU80259B88Scene::Update(float fDeltaT)
 
             if (mUnidentified1C)
             {
-                fn_8004F594(16, "Respond invitation With Guest\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Respond invitation With Guest\n");
                 fn_80261CE0();
             }
             else if (fn_8025BD88())
@@ -450,7 +444,7 @@ void TU80259B88Scene::Update(float fDeltaT)
                 fn_801CBCA0(0x94A22E0E, 0, 0, 1);
                 lbl_806E1838->Push((SceneList)0x1B, SCREEN_FORWARD, true);
             }
-            fn_801C3BEC();
+            FrontEnd::SetControllerState();
             return;
         }
         else if (state == 3)
@@ -668,109 +662,5 @@ extern "C" void fn_8025BDCC(unsigned long long friendKey, u16* output)
     else
     {
         fn_802AA91C(output, 14, (const unsigned short*)L"UNKNOWN");
-    }
-}
-
-TU8025BE74Scene::TU8025BE74Scene()
-    : mUnidentified1C()
-    , mUnidentifiedD4(false)
-    , mUnidentified3D6(false)
-    , mUnidentified3D8(1.0f,
-          Function<UnidentifiedTimer_8030616C*>(Bind<void>(
-              MemFun(&TU8025BE74Scene::fn_8025C084), this, Placeholder<0>())))
-{
-    mUnidentified3F4 = 0;
-
-    TU80252180Scene* object = fn_80253E18();
-    if (object != 0)
-    {
-        fn_802534BC(object, 0, true);
-    }
-}
-
-TU8025BE74Scene::~TU8025BE74Scene()
-{
-}
-
-void TU8025BE74Scene::fn_8025C084(UnidentifiedTimer_8030616C* timer)
-{
-    mUnidentified3D6 = true;
-    fn_80306208(&mUnidentified3D8, false);
-}
-
-void TU8025BE74Scene::Update(float fDeltaT)
-{
-    BaseSceneHandler::Update(fDeltaT);
-    fn_80306224(&mUnidentified3D8, fDeltaT);
-
-    int state = mUnidentified3F4;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
-    {
-        TLSlide* slide = mPresentation->GetActiveSlide();
-        if (slide->GetCurrentTime() < slide->m_duration + slide->m_start)
-        {
-            for (int pad = 0; pad < 4; ++pad)
-            {
-                lbl_80578450[pad]->SetActiveSlide("waiting", true, false);
-            }
-            return;
-        }
-
-        if (state == 0)
-        {
-            TU80300104Base::Callback over(Bind<void>(
-                MemFun(&TU8025BE74Scene::fn_8025CFC0), this, Placeholder<0>(), Placeholder<1>()));
-            TU80300104Base::Callback off(Bind<void>(
-                MemFun(&TU8025BE74Scene::fn_8025D04C), this, Placeholder<0>(), Placeholder<1>()));
-            TU80300104Base::Callback select(Bind<void>(
-                MemFun(&TU8025BE74Scene::fn_8025D0C0), this, Placeholder<0>(), Placeholder<1>()));
-
-            mUnidentified1C.fn_80300D74(
-                mUnidentifiedD0, true, 0.0f, 0.0f, 1.0f, 1.0f);
-            mUnidentified1C.fn_803007C0(over);
-            mUnidentified1C.fn_80300864(off);
-            mUnidentified1C.fn_803009AC(select);
-            mUnidentifiedD4 = true;
-            mUnidentified3F4 = 1;
-        }
-        else if (state == 2)
-        {
-            lbl_806E1838->Push((SceneList)0x34, SCREEN_FORWARD, true);
-            return;
-        }
-    }
-
-    if (mUnidentified3D8.mEnabled)
-    {
-        return;
-    }
-
-    if (!lbl_806E1194->ValidateHostInvitation_80136BC0())
-    {
-        lbl_806E1838->Push((SceneList)0x35, SCREEN_FORWARD, true);
-        UnidentifiedScene_8025AF0C* scene
-            = (UnidentifiedScene_8025AF0C*)lbl_806E1838->GetScene((SceneList)0x35);
-        scene->mUnidentified1C = 2;
-        scene->mUnidentified20 = 2.0f;
-        return;
-    }
-
-    for (int pad = 0; pad < 4; ++pad)
-    {
-        TLComponentInstance* controller = lbl_80578450[pad];
-        if ((unsigned int)pad != lbl_806E18B0)
-        {
-            controller->SetActiveSlide("waiting", true, false);
-        }
-        else
-        {
-            unsigned char valid = 1;
-            TU80300104Event event;
-            event.mIndex = pad;
-            event.mPosition = fn_802197FC(pad, &valid);
-            event.mFlag0
-                = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
-            mUnidentified1C.fn_80219608(&event);
-        }
     }
 }

@@ -1,9 +1,9 @@
 #include "Game/Audio/SoundMap.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/SAnim.h"
 #include "NL/nlMemory.h"
 
-extern "C" void fn_8004F594(int category, const char* format, ...);
 extern "C" const char* fn_802B9568(void* stringTable, u32 value);
 
 extern void* lbl_806E1DC8;
@@ -57,7 +57,7 @@ SoundMap* SoundMap::fn_802EE458(nlChunk* chunk)
         map->m_CueTree->Add(cue, cue);
     }
 
-    fn_8004F594(10, "SoundMap: %d cues\n", map->m_CueCount);
+    tDebugPrintManager::Print(DC_SOUND, "SoundMap: %d cues\n", map->m_CueCount);
 
     SoundCueTreeIterator_802EE294* iterator =
         map->m_CueTree->GetIterator();
@@ -70,7 +70,7 @@ SoundMap* SoundMap::fn_802EE458(nlChunk* chunk)
         field4String = GetSoundCueString(
             iterator->Current()->value->field_0x4);
         current = iterator->Current();
-        fn_8004F594(10, " SoundCue %d = %s (%u),%s,%s,%s\n",
+        tDebugPrintManager::Print(DC_SOUND, " SoundCue %d = %s (%u),%s,%s,%s\n",
             iterator->Current()->value->field_0x10,
             GetSoundCueString(current->value->field_0x0),
             current->value->field_0x0, field4String, field8String,

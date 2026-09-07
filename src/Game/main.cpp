@@ -113,7 +113,7 @@ extern "C"
     void fn_80272AB4();
     void fn_80184858();
     void OSYieldThread();
-    const char* fn_802C2D20(const char*, const char*);
+    const char* GetTweakString(const char*, const char*);
 }
 
 void nlRegHandleDVDMessageCB(const Function<void(int)>&);
@@ -137,7 +137,7 @@ extern int lbl_806DF2FC;
 extern int lbl_806DEEBC;
 extern int lbl_806DEECC;
 
-extern "C" u8 fn_802C2C84(const char*, u8);
+extern "C" u8 GetTweakBool(const char*, u8);
 
 volatile int g_Region = 3;
 static u32 sPreviousTaskState = 1;
@@ -335,7 +335,7 @@ extern "C" void fn_8011C508()
     cGlobalPad* pad = 0;
     for (int i = 0; i < 4; ++i)
     {
-        pad = lbl_806E1E28->GetPad(i);
+        pad = g_pPadManager->GetPad(i);
         if (pad->IsConnected())
         {
             break;
@@ -353,7 +353,7 @@ extern "C" void fn_8011C508()
     const bool specialCountry =
         country == lbl_806DEEBC || country == lbl_806DEECC;
     const bool tweakerEnabled =
-        fn_802C2C84("/user/Tweaker with just Z Button", false);
+        GetTweakBool("/user/Tweaker with just Z Button", false);
 
     lbl_806DF2E0 = 9;
     lbl_806DF2E4 = 10;
@@ -437,7 +437,7 @@ static void Initialize()
 
     EnableAllStadiums();
     const char* buildInfo =
-        fn_802C2D20("/General/Build Info/BuildNumber", 0);
+        GetTweakString("/General/Build Info/BuildNumber", 0);
     if (buildInfo != 0)
     {
         fn_8011C610(buildInfo);

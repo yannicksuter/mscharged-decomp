@@ -8,6 +8,7 @@
 #include "Game/Goalie.h"
 #include "Game/Net.h"
 #include "Game/Player.h"
+#include "NL/nlTask.h"
 
 cTeam* g_pTeams[2] = { NULL, NULL };
 
@@ -238,4 +239,8 @@ cFielder* cTeam::GetRearMostFielder()
     }
 
     return pRearMostFielder;
+}
+
+void nlTask::StateTransition(unsigned int, unsigned int)
+{
 }

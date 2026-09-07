@@ -47,7 +47,7 @@ struct BallScaleData
 };
 
 extern TaskManager* m_pInstance__13nlTaskManager;
-BallScaleData* fn_80284A58();
+BallScaleData* GetPresentation();
 
 static float g_fBallTrailScale = 2.25f;
 
@@ -232,7 +232,7 @@ void DrawableBall::EvaluateFrom(DrawableCharacter& character)
 {
     mPosition = character.GetBallPosition();
     mOrientation = character.GetBallOrientation();
-    mScale = fn_80284A58()->scale;
+    mScale = GetPresentation()->scale;
 }
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

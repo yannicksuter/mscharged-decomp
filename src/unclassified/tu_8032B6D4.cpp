@@ -1,4 +1,5 @@
 #include "Game/NetworkMessages.h"
+#include "Game/Sys/debug.h"
 #include "Game/NetworkRandom_803236CC.h"
 #include "NL/blowfish.h"
 #include "NL/nlMemory.h"
@@ -24,7 +25,6 @@ extern u8 lbl_806DF708[8];
 
 extern "C"
 {
-    int fn_8004F594(int channel, const char* format, ...);
 }
 
 UnidentifiedTransportMessage_8032B6D4::UnidentifiedTransportMessage_8032B6D4()
@@ -119,13 +119,13 @@ extern "C" bool fn_8032B99C(UnidentifiedTransportMessage_8032B6D4* message,
 {
     if (message->mUnreliableCount == 16)
     {
-        fn_8004F594(0x10, lbl_80532378);
+        tDebugPrintManager::Print(DC_NETWORK, lbl_80532378);
         return false;
     }
     int size = message->mSize;
     if (size + fn_80326754(packet) > 0x587)
     {
-        fn_8004F594(0x10, lbl_805323B8);
+        tDebugPrintManager::Print(DC_NETWORK, lbl_805323B8);
         return false;
     }
 
@@ -141,13 +141,13 @@ extern "C" bool fn_8032BA74(UnidentifiedTransportMessage_8032B6D4* message,
 {
     if (message->mVoiceCount == 16)
     {
-        fn_8004F594(0x10, lbl_805323F4);
+        tDebugPrintManager::Print(DC_NETWORK, lbl_805323F4);
         return false;
     }
     int size = message->mSize;
     if (size + fn_80326754(packet) > 0x587)
     {
-        fn_8004F594(0x10, lbl_8053241C);
+        tDebugPrintManager::Print(DC_NETWORK, lbl_8053241C);
         return false;
     }
 
@@ -163,13 +163,13 @@ extern "C" bool fn_8032BB4C(UnidentifiedTransportMessage_8032B6D4* message,
 {
     if (message->mReliableCount == 16)
     {
-        fn_8004F594(0x10, lbl_80532454);
+        tDebugPrintManager::Print(DC_NETWORK, lbl_80532454);
         return false;
     }
     int size = message->mSize;
     if (size + fn_8032666C(packet) > 0x587)
     {
-        fn_8004F594(0x10, lbl_80532480);
+        tDebugPrintManager::Print(DC_NETWORK, lbl_80532480);
         return false;
     }
 

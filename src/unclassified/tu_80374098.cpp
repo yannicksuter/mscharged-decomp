@@ -1,4 +1,5 @@
 #include <revolution/os/OSThread.h>
+#include "Game/Sys/debug.h"
 #include <revolution/so.h>
 #include <string.h>
 
@@ -10,7 +11,6 @@
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
 
-extern "C" int fn_8004F594(int category, const char* format, ...);
 
 int g_nHardcodeIPAddr[4] = { 0x42, 0x77, 0xA7, 0x68 };
 int g_nHardcodeGatewayAddr[4] = { 0x42, 0x77, 0xA7, 0x61 };
@@ -86,15 +86,14 @@ extern "C" void fn_80374174()
         lbl_806E246C = SOInit(&config);
         if (lbl_806E246C != 0)
         {
-            fn_8004F594(16, "SOInit failed error %d\n", lbl_806E246C);
+            tDebugPrintManager::Print(DC_NETWORK, "SOInit failed error %d\n", lbl_806E246C);
         }
         else
         {
             lbl_806E246C = SOStartup();
             if (lbl_806E246C != 0)
             {
-                fn_8004F594(
-                    16, "SOStartup failed error %d\n", lbl_806E246C);
+                tDebugPrintManager::Print(DC_NETWORK, "SOStartup failed error %d\n", lbl_806E246C);
                 SOFinish();
             }
             else

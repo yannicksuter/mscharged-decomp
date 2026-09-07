@@ -1,4 +1,5 @@
 #include "Game/Effects/ParticleSystem.h"
+#include "Game/Sys/debug.h"
 
 #include <math.h>
 
@@ -52,7 +53,6 @@ extern GLInventory* lbl_806E1FFC;
 extern const nlVector3 lbl_804EB340;
 
 extern "C" unsigned long fn_802CDFCC(unsigned long texture);
-extern "C" void fn_8004F594(int channel, const char* format, ...);
 
 ParticleSystem::ParticleSystem(EffectsTemplate* pTemplate,
     nlDLListSlotPool<Particle*>* pFreeParticles, EffectsSpec* spec,
@@ -86,7 +86,7 @@ ParticleSystem::~ParticleSystem()
 {
     if (m_pTemplate->mUnidentified040 != 0)
     {
-        fn_8004F594(3, "OnEmitterDeath: %d\n",
+        tDebugPrintManager::Print(DC_RENDER, "OnEmitterDeath: %d\n",
             m_pTemplate->mUnidentified040);
     }
 
@@ -402,7 +402,7 @@ void ParticleSystem::CreateNewParticles(int numParticles)
 
         if (m_pTemplate->mUnidentified044 != 0)
         {
-            fn_8004F594(3, "OnParticleCreation: %d\n",
+            tDebugPrintManager::Print(DC_RENDER, "OnParticleCreation: %d\n",
                 m_pTemplate->mUnidentified044);
         }
 
@@ -466,7 +466,7 @@ void ParticleSystem::UpdateAllParticles(float dt,
         {
             if (m_pTemplate->mUnidentified048 != 0)
             {
-                fn_8004F594(3, "OnParticleDeath: %d\n",
+                tDebugPrintManager::Print(DC_RENDER, "OnParticleDeath: %d\n",
                     m_pTemplate->mUnidentified048);
             }
             m_Particles.Remove(&iterator);
@@ -947,19 +947,19 @@ int ParticleSystem::RenderAllParticles(GLView* view)
             if (mesh.End())
                 view->AttachModel(mesh.GetModel(), m_uLayer);
             else
-                fn_8004F594(3,
+                tDebugPrintManager::Print(DC_RENDER,
                     "couldn't end mesh built by sprites\n");
         }
         else
         {
-            fn_8004F594(3,
+            tDebugPrintManager::Print(DC_RENDER,
                 "could not begin a mesh for sprites\n");
         }
     }
     else if (!m_Callback(this, view, &m_Particles, viewRight, viewUp,
                  pCoord))
     {
-        fn_8004F594(3,
+        tDebugPrintManager::Print(DC_RENDER,
             "too many particles for the fast-path\n");
     }
 

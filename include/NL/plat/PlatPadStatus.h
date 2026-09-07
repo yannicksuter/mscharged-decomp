@@ -33,7 +33,7 @@ struct PlatPadManager;
 
 extern "C"
 {
-    extern PlatPadManager* lbl_806E2478;
+    extern PlatPadManager* g_pPlatPadManager;
     PlatPadStatus_80375EC8* fn_80375EC8(PlatPadManager* manager, int channel);
     PlatPadStatus_80375ED4* fn_80375ED4(PlatPadManager* manager, int channel);
     PlatPadStatus_80375EE0* fn_80375EE0(PlatPadManager* manager, int channel);

@@ -495,8 +495,7 @@ ModeledScreenTransition* ModeledScreenTransition::LoadFromParser(
         }
         else if (nlStrCmp(pToken, "effect") == 0)
         {
-            char* effect = parser->NextTokenOnLine(true);
-            nlStrNCpy(m_EffectName, effect, 64);
+            nlStrNCpy(m_EffectName, parser->NextTokenOnLine(true), 64);
         }
         else if (nlStrCmp(pToken, "outline") == 0)
         {

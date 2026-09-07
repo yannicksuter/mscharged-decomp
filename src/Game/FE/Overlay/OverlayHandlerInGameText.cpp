@@ -29,7 +29,7 @@ extern "C" int fn_80273B00();
 extern "C" void fn_801E230C(
     BaseGameSceneManager* manager, SceneList scene, bool visibility,
     bool overrideStateSettings);
-extern BaseGameSceneManager* lbl_806E1860;
+extern BaseGameSceneManager* g_pOverlayManager;
 
 const char* GetLOCTeamName(eTeamID team);
 
@@ -165,8 +165,8 @@ void InGameTextOverlay::Update(float fDeltaT)
     if (mCurrentSlideName == SLIDE_NAME_TEXT_WINNER
         && g_pFEInput->JustPressed(FE_ALL_PADS, 0x1E, true, 0) && mVisible)
     {
-        fn_801E230C(lbl_806E1860, (SceneList)90, false, false);
-        lbl_806E1860->Push((SceneList)91, SCREEN_NOTHING, false);
+        fn_801E230C(g_pOverlayManager, (SceneList)90, false, false);
+        g_pOverlayManager->Push((SceneList)91, SCREEN_NOTHING, false);
     }
 }
 

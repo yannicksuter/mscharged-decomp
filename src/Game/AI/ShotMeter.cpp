@@ -304,7 +304,7 @@ void ShotMeter::Update(float fDeltaT)
                 else if (fn_80039148(g_pBall->GetOwnerFielder()))
                 {
                     m_eShotMeterState = SHOT_METER_STS_RELEASED;
-                    fn_80060A00(lbl_806E0C94,
+                    fn_80060A00(g_pGame,
                         g_pBall->GetOwnerFielder());
                 }
             }

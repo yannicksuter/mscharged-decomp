@@ -72,7 +72,7 @@ void ResetTask::Run(float dt)
     {
         for (s32 i = 0; i < 4; ++i)
         {
-            lbl_806E1E28->GetPad(i)->StopRumble();
+            g_pPadManager->GetPad(i)->StopRumble();
         }
 
         while (s_AudioInInit)
@@ -80,9 +80,9 @@ void ResetTask::Run(float dt)
             OSYieldThread();
         }
 
-        if (lbl_806E10EC)
+        if (g_pNetworkSession)
         {
-            lbl_806E10EC->OnlineVirtual08();
+            g_pNetworkSession->OnlineVirtual08();
         }
 
         float volume = 0.99f;
@@ -145,7 +145,7 @@ void HandleSoftReset()
 
     for (s32 i = 0; i < 4; ++i)
     {
-        cGlobalPad* pad = lbl_806E1E28->GetPad(i);
+        cGlobalPad* pad = g_pPadManager->GetPad(i);
         if (!pad)
         {
             break;

@@ -51,7 +51,7 @@ extern "C" void* fn_80312E0C(void*, const Variant&);
 extern "C" int fn_802DF9FC(InterpreterCore*);
 extern "C" void fn_800B6A1C(
     UnidentifiedVariant_80054AB8*, int, const Variant&);
-extern "C" void* lbl_806E0C94;
+extern "C" void* g_pGame;
 
 char lbl_80503EEC[] = "art/Scripts/FuzzyAI.byte_code";
 char lbl_80503F0C[] = "Direction";
@@ -167,7 +167,7 @@ extern "C" cBall* fn_800E34E4()
 
 extern "C" void* fn_800E34EC()
 {
-    return lbl_806E0C94;
+    return g_pGame;
 }
 
 extern "C" float fn_800E34F4(

@@ -1,4 +1,5 @@
 #include <dwc/dwc_nastime.h>
+#include "Game/Sys/debug.h"
 
 #include "Game/NetworkStatsManager.h"
 #include "Game/tu_801360A4.h"
@@ -13,7 +14,6 @@
 
 #include <string.h>
 
-extern "C" int fn_8004F594(int channel, const char* format, ...);
 extern "C" int fn_8011C1B4();
 extern "C" bool fn_8011C1D0();
 extern "C" bool fn_801EDC10();
@@ -143,7 +143,7 @@ NetworkLeaderboardCategory* NetworkStatsManager_8012F378::GetCategory(
 
 bool NetworkStatsManager_8012F378::RequestRankings(int category)
 {
-    NetworkStatsInterface* stats = lbl_806E10EC->fn_8012170C();
+    NetworkStatsInterface* stats = g_pNetworkSession->fn_8012170C();
     stats->SetListener(this);
     if (mOperation != 0)
     {
@@ -166,7 +166,7 @@ bool NetworkStatsManager_8012F378::RequestRankings(int category)
 
     leaderboard.mCount = 0;
     leaderboard.mFirstRank = -1;
-    fn_8004F594(16,
+    tDebugPrintManager::Print(DC_NETWORK,
         "Initial failure GetLeaderboardStats cat %d filter %d\n",
         leaderboard.mPersistentCategory,
         leaderboard.mFilter);
@@ -276,7 +276,7 @@ void NetworkStatsManager_8012F378::OnLeaderboardResult(bool success,
     NetworkLeaderboardCategory& leaderboard = mCategories[mRequestedCategory];
     if (!success)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Unavailable Leaderboard Stats cat %d filter %d\n",
             category,
             filter);
@@ -294,7 +294,7 @@ void NetworkStatsManager_8012F378::OnLeaderboardResult(bool success,
         return;
     }
 
-    fn_8004F594(16,
+    tDebugPrintManager::Print(DC_NETWORK,
         "Sucessfully got leaderboard stats cat %d filter %d\n",
         category,
         filter);
@@ -337,7 +337,7 @@ bool NetworkStatsManager_8012F378::PostResetMyPlayerStats(
     mHasLocalStats[category] = true;
 
     const NetworkRankingMeta* submission = useExistingStats ? &mLocalStats[category] : 0;
-    NetworkRanking_8012D8F4* ranking = lbl_806E10EC->fn_80121754();
+    NetworkRanking_8012D8F4* ranking = g_pNetworkSession->fn_80121754();
     if (ranking->SubmitScore(mPersistentCategories[category], submission))
     {
         mOperation = 1;
@@ -345,8 +345,7 @@ bool NetworkStatsManager_8012F378::PostResetMyPlayerStats(
         return true;
     }
 
-    fn_8004F594(
-        16, "Initial failure PostResetMyPlayerStats cat %d\n", category);
+    tDebugPrintManager::Print(DC_NETWORK, "Initial failure PostResetMyPlayerStats cat %d\n", category);
     mOperation = 0;
     mStatsError = true;
     return false;
@@ -360,7 +359,7 @@ void NetworkStatsManager_8012F378::OnSubmitScoreResult(
     mScoreCategory = mSubmissionCategory;
     if (!success)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "FinishedPostResetMyPlayerStats returned error cat %d\n",
             mSubmissionCategory);
         mScoreRequestSucceeded = false;
@@ -452,7 +451,7 @@ void NetworkStatsManager_8012F378::UpdateOnlineResultTotals(
 
 bool NetworkStatsManager_8012F378::ShouldRestoreDefaultDisconnectLoss()
 {
-    if (lbl_806E10EC->fn_80121754() != 0)
+    if (g_pNetworkSession->fn_80121754() != 0)
     {
         int count = UsesEuropeanRankings() ? 3 : 2;
         for (int i = 0; i < count; ++i)
@@ -474,21 +473,21 @@ void NetworkStatsManager_8012F378::ReportDefaultDisconnectLoss()
     }
     if (IsNewNetworkDay(&mLocalStats[0]))
     {
-        fn_8004F594(16, "Skipping default disconnect loss new day\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Skipping default disconnect loss new day\n");
         return;
     }
     if (IsNewNetworkSeason(&mLocalStats[1]))
     {
-        fn_8004F594(16, "Skipping default disconnect loss new season\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Skipping default disconnect loss new season\n");
         return;
     }
 
-    fn_8004F594(16, "Returning Default Disconnect Loss\n");
+    tDebugPrintManager::Print(DC_NETWORK, "Returning Default Disconnect Loss\n");
     for (int i = 0; i < 3; ++i)
     {
         if (mDisconnectLossPending[i])
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "ReportDefaultDisconnectLoss: pers cat %d oldPoints %d new points %d New W:L %d:%d OneBasedRegion:%d\n",
                 mPersistentCategories[i],
                 mLocalStats[i].mScore,
@@ -505,7 +504,7 @@ void NetworkStatsManager_8012F378::ReportGameResult(int result,
     bool reportHome, int homeScore, int awayScore,
     const NetworkScoreSubmission* fallback)
 {
-    if (lbl_806E10EC->fn_80121754() != 0)
+    if (g_pNetworkSession->fn_80121754() != 0)
     {
         int points = 0;
         bool won = false;
@@ -530,7 +529,7 @@ void NetworkStatsManager_8012F378::ReportGameResult(int result,
             }
             else if (result == 0)
             {
-                fn_8004F594(16,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Already did CalculateAndReportGameResult..ignoring\n");
                 return;
             }
@@ -563,13 +562,13 @@ void NetworkStatsManager_8012F378::ReportGameResult(int result,
             {
                 if (IsNewNetworkDay(&mLocalStats[category]))
                 {
-                    fn_8004F594(16, "New day starting score fresh\n");
+                    tDebugPrintManager::Print(DC_NETWORK, "New day starting score fresh\n");
                     startFresh = true;
                 }
             }
             else if (IsNewNetworkSeason(&mLocalStats[category]))
             {
-                fn_8004F594(16, "New season starting score fresh\n");
+                tDebugPrintManager::Print(DC_NETWORK, "New season starting score fresh\n");
                 startFresh = true;
             }
 
@@ -597,7 +596,7 @@ void NetworkStatsManager_8012F378::ReportGameResult(int result,
             {
                 mLocalStats[category].mScore +=
                     pointsScored + disconnectPoints[category];
-                fn_8004F594(16, "Returning Default Disconnect Loss\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Returning Default Disconnect Loss\n");
                 disconnectPoints[category] = 0;
                 mDisconnectLossPending[category] = false;
                 if (result == 2)
@@ -644,7 +643,7 @@ void NetworkStatsManager_8012F378::ReportGameResult(int result,
             }
             mLocalStats[category].mUnidentified14 = fn_8011C1B4();
 
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "ReportGameResult: pers cat %d oldPoints %d + points scored %d = new points %d IWon: %d New W:L %d:%d OneBasedRegion:%d\n",
                 category,
                 oldPoints,
@@ -673,10 +672,10 @@ void NetworkStatsManager_8012F378::ReportGameResult(int result,
             SubmitJob(2);
         }
     }
-    else if (lbl_806E10EC->fn_80121738() != 0)
+    else if (g_pNetworkSession->fn_80121738() != 0)
     {
         NetworkStatsReporter_8012CE20* stats =
-            lbl_806E10EC->fn_80121738();
+            g_pNetworkSession->fn_80121738();
         stats->ReportGameResult(0,
             reinterpret_cast<const NetworkScoreSubmission*>(result), home,
             away, reportHome, homeScore, awayScore, 0);
@@ -688,7 +687,7 @@ void NetworkStatsManager_8012F378::OnReportGameResult(bool success, int category
     mOperation = 0;
     if ((int)success != 1)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "FinishedReportGameResult returned error cat %d\n",
             category);
         mStatsError = true;
@@ -702,7 +701,7 @@ void NetworkStatsManager_8012F378::SubmitJob(int job)
         mJobs[(mJobReadIndex + mJobCount++) % mJobCapacity] = job;
         return;
     }
-    fn_8004F594(16, "ERROR JobsQ full failed to submit %d\n", job);
+    tDebugPrintManager::Print(DC_NETWORK, "ERROR JobsQ full failed to submit %d\n", job);
 }
 
 void NetworkStatsManager_8012F378::RefreshSaveState_801314D0()
@@ -720,10 +719,10 @@ void NetworkStatsManager_8012F378::ResetPregameDisconnectState()
     mGameResultReported = false;
     mDisconnectPending = false;
     mUnidentifiedC41C = 0;
-    mUnidentifiedC420 = 0;
-    mUnidentifiedC424 = 0;
     mDisconnectLossPending[0] = false;
+    mUnidentifiedC420 = 0;
     mDisconnectLossPending[1] = false;
+    mUnidentifiedC424 = 0;
     mDisconnectLossPending[2] = false;
     if (fn_8025BD88())
     {
@@ -740,7 +739,7 @@ void NetworkStatsManager_8012F378::PreGameRestoreDefaultDisconnectLoss()
 {
     if (mStatsError)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "A disc error previously occured.  Exiting PreGameRestoreDefaultDisconnectLoss\n");
         return;
     }
@@ -760,7 +759,7 @@ void NetworkStatsManager_8012F378::RefreshFriendStats_80131B50()
     mUnidentifiedC420 = mCategories[5].mCount;
     if (previous != mUnidentifiedC420)
     {
-        fn_8004F594(16, "Num friends changed from %d to %d\n", previous, mUnidentifiedC420);
+        tDebugPrintManager::Print(DC_NETWORK, "Num friends changed from %d to %d\n", previous, mUnidentifiedC420);
     }
     PreGameRestoreDefaultDisconnectLoss();
 }
@@ -804,35 +803,34 @@ void NetworkStatsManager_8012F378::Update(float dt)
     case 3:
         if (!RequestRankings(2))
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure to RequestRankings STRIKER_OF_DAY Nearby\n");
         }
         break;
     case 4:
         if (!RequestRankings(3))
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure to RequestRankings STRIKER_OF_DAY TOP\n");
         }
         break;
     case 5:
         if (!RequestRankings(0))
         {
-            fn_8004F594(
-                16, "Job initial failure getting nearby season stats\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Job initial failure getting nearby season stats\n");
         }
         break;
     case 6:
         if (!RequestRankings(1))
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure getting TOP season stats\n");
         }
         break;
     case 7:
         if (!RequestRankings(4))
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure to RequestRankings Season FRIENDS\n");
         }
         break;
@@ -842,7 +840,7 @@ void NetworkStatsManager_8012F378::Update(float dt)
         RequestRankings(job - 5);
         break;
     default:
-        fn_8004F594(16, "Bad eJob case %d\n", job);
+        tDebugPrintManager::Print(DC_NETWORK, "Bad eJob case %d\n", job);
         break;
     }
 
@@ -850,7 +848,7 @@ void NetworkStatsManager_8012F378::Update(float dt)
 
 int GetLocalPlayingSide_801323F4()
 {
-    s8 machine = fn_80338C20(lbl_806E20D8);
+    s8 machine = fn_80338C20(g_pNetworkSessionBase);
     s8 player = fn_80336F68(0, machine);
     return GameInfoManager::GetInstance()->GetPlayingSide(player);
 }
@@ -863,7 +861,7 @@ void NetworkStatsManager_8012F378::HandleDisconnect_8013243C(int result)
     }
     if (mDisconnectPending)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "A disc error previously occured.  Exiting PreGameRestoreDefaultDisconnectLoss\n");
     }
     ResetPregameDisconnectState();
@@ -878,18 +876,17 @@ void NetworkStatsManager_8012F378::CalculateAndReportGameResult(int result)
 {
     if (mDisconnectPending)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "A disc error previously occured.  Exiting CalculateAndReportGameResult\n");
         return;
     }
     if (mGameResultReported)
     {
-        fn_8004F594(
-            16, "Already did CalculateAndReportGameResult..ignoring\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Already did CalculateAndReportGameResult..ignoring\n");
         return;
     }
 
-    fn_8004F594(16,
+    tDebugPrintManager::Print(DC_NETWORK,
         "Reporting Online Game Results HOME %s %d vs AWAY %s %d I am home: %d AlreadyReported %d\n",
         "",
         0,
@@ -913,7 +910,7 @@ bool IsNewNetworkSeason(const NetworkRankingMeta* previous)
     bool changed = date.year != previous->mYear || currentSeason != previousSeason;
     if (changed)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Detected new season old %d %d %d new %d %d %d\n",
             previous->mYear,
             previous->mMonth,
@@ -933,7 +930,7 @@ bool IsNewNetworkDay(const NetworkRankingMeta* previous)
     bool changed = date.month != previous->mMonth || date.mday != previous->mDay || date.year != previous->mYear;
     if (changed)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Detected Starting new day old %d %d %d new %d %d %d\n",
             previous->mYear,
             previous->mMonth,

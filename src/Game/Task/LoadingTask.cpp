@@ -6,7 +6,7 @@
 #include "Game/Pad/FlickDetection.h"
 #include "types.h"
 
-extern void* lbl_806E2478;
+extern void* g_pPlatPadManager;
 extern "C" void fn_8037537C(void*);
 extern bool g_e3_Build;
 extern bool g_bE3IdleReset;
@@ -21,9 +21,9 @@ void LoadingTask::Run(float dt)
 {
     mElapsed += dt;
 
-    lbl_806E1E28->fn_802C084C(0);
-    fn_8037537C(lbl_806E2478);
-    lbl_806E1E28->Update(dt);
+    g_pPadManager->fn_802C084C(0);
+    fn_8037537C(g_pPlatPadManager);
+    g_pPadManager->Update(dt);
     FlickDetection::Update();
 
     switch (fn_80118B7C(fn_80118A74()))

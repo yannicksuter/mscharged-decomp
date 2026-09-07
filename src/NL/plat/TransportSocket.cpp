@@ -1,8 +1,8 @@
 #include <revolution/so.h>
+#include "Game/Sys/debug.h"
 
 #include "NL/plat/TransportSocket.h"
 
-extern "C" void fn_8004F594(int category, const char* format, ...);
 
 extern "C" void TransportSocketInitialize(TransportSocket* transport)
 {
@@ -15,7 +15,7 @@ extern "C" bool TransportSocketOpen(TransportSocket* transport, bool stream)
         SO_PF_INET, stream ? SO_SOCK_STREAM : SO_SOCK_DGRAM, 0);
     if (transport->socket < 0)
     {
-        fn_8004F594(0x10, "Failed to open TransportSocket error %d\n",
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to open TransportSocket error %d\n",
             transport->socket);
         transport->socket = -1;
         return false;
@@ -41,8 +41,7 @@ extern "C" bool TransportSocketBind(TransportSocket* transport, u16 port)
         return true;
     }
 
-    fn_8004F594(
-        0x10, "Failed to Bind TransportSocket result %d\n", result);
+    tDebugPrintManager::Print(DC_NETWORK, "Failed to Bind TransportSocket result %d\n", result);
     if (transport->socket != -1)
     {
         SOClose(transport->socket);
@@ -74,7 +73,7 @@ extern "C" void TransportSocketSetNonBlocking(TransportSocket* transport, bool)
             transport->socket, SO_F_SETFL, flags | SO_O_NONBLOCK);
         if (result < 0)
         {
-            fn_8004F594(0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Failed to set socket to nonblocking mode error %d", result);
         }
     }

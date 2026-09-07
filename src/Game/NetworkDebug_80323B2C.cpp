@@ -6,7 +6,7 @@
 #include "unclassified/tu_802B7798.h"
 #include "unclassified/tu_80332DC0.h"
 
-UnidentifiedNetworkSession* lbl_806E20D8;
+UnidentifiedNetworkSession* g_pNetworkSessionBase;
 u8 lbl_806E20DC;
 int lbl_806E20E0;
 bool g_bDisplayNetwork;
@@ -76,7 +76,7 @@ void UnidentifiedNetworkSessionBase::BaseVirtual50()
 
 extern "C" void fn_80323D04()
 {
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     if (roster != 0)
     {
         roster->RosterVirtual0C(1);
@@ -85,7 +85,7 @@ extern "C" void fn_80323D04()
 
 extern "C" void fn_80323D50()
 {
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     if (roster != 0)
     {
         roster->RosterVirtual0C(0);

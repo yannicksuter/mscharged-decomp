@@ -44,7 +44,7 @@ extern "C" void fn_800D2074();
 extern bool lbl_806E0C50;
 extern bool lbl_806E0C51;
 extern bool lbl_806E0C52;
-extern cGame* lbl_806E0C94;
+extern cGame* g_pGame;
 extern const nlVector3 lbl_804DC388;
 extern UnidentifiedStateTransition lbl_806E20B8;
 
@@ -350,7 +350,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual3(float deltaTime)
         fn_80319E84(this, 34, 0, false);
     }
 
-    if (!waitForController && lbl_806E0C94->IsGameplayOrOvertime()
+    if (!waitForController && g_pGame->IsGameplayOrOvertime()
         && !fn_800DF74C(GetFielder()->m_pTeam)
         && !fn_80319FEC(this, 17) && fn_800D85F8(GetFielder()))
     {
@@ -390,11 +390,11 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
             state = 20;
         }
     }
-    else if (lbl_806E0C94->m_eGameState == 1)
+    else if (g_pGame->m_eGameState == 1)
     {
         state = 31;
     }
-    else if (lbl_806E0C94->IsGameplayOrOvertime())
+    else if (g_pGame->IsGameplayOrOvertime())
     {
         bool hasController = fielder->GetGlobalPad();
         if (hasController)
@@ -431,11 +431,11 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
             }
         }
     }
-    else if (lbl_806E0C94->m_eGameState == 2)
+    else if (g_pGame->m_eGameState == 2)
     {
         cTeam* team = fielder->m_pTeam;
         FormationSpec* formation;
-        if ((int)lbl_806E0C94->mUnidentified024 == team->m_nSide)
+        if ((int)g_pGame->mUnidentified024 == team->m_nSide)
         {
             formation = FormationManager::GetFormationSpec(
                 (eFormation)nlStringHash(lbl_80502C28));

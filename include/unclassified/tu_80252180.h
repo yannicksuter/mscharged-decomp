@@ -59,7 +59,7 @@ public:
     /* 0x1E9 */ unsigned char mPadding1E9[3];
 }; // size 0x1EC
 
-extern "C" void fn_80253284(bool value);
+extern "C" void SetPointerEnabled(bool value);
 extern "C" void fn_80253348(TU80252180Scene* scene, int mask, bool visible);
 extern "C" void fn_802533F0(TU80252180Scene* scene);
 extern "C" void fn_80253474(TU80252180Scene* scene);

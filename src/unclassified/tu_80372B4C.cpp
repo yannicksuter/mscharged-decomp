@@ -1,4 +1,5 @@
 #include "NL/plat/tu_80372B4C.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/TweakValue.h"
 #include "NL/MemAlloc.h"
@@ -101,7 +102,7 @@ extern "C" bool fn_80372B4C(const char* filename, LoadAsyncCallback callback,
             AsyncFileLoadData_80372D84(0, filename, alloc_data, datasize, filesize, callback, user_data, 0);
         if (!lbl_806E2460->LoadEntireCachedFileAsync(filename, alloc_data, datasize, filesize, fn_80372F14, asyncData))
         {
-            fn_8004F594(12, "Error calling LoadEntireCachedFileAsync\n");
+            tDebugPrintManager::Print(DC_LOADER, "Error calling LoadEntireCachedFileAsync\n");
             delete asyncData;
             return false;
         }
@@ -126,7 +127,7 @@ static void fn_80372F14(s32 result, const char*, void*, u32 size, void* user)
     }
     else
     {
-        fn_8004F594(12, "Error %d reading NAND cached file\n", result);
+        tDebugPrintManager::Print(DC_LOADER, "Error %d reading NAND cached file\n", result);
         delete data;
     }
 }
@@ -137,7 +138,7 @@ static void fn_80372F88(nlFile*, void* pBuffer, unsigned int, unsigned long uPar
     nlClose(data->file);
     if (!lbl_806E2460->WriteEntireFileToCacheAsync(data->m_04, pBuffer, data->datasize, data->m_8C, AfterWriteToCacheCallback, data))
     {
-        fn_8004F594(12, "Initial WriteEntireFileToCacheAsync failure\n");
+        tDebugPrintManager::Print(DC_LOADER, "Initial WriteEntireFileToCacheAsync failure\n");
         data->callback(data->alloc_data, data->datasize, data->user_data);
         delete data;
     }
@@ -155,7 +156,7 @@ static void AfterWriteToCacheCallback(s32 result, const char*, void*, u32 size, 
 {
     AsyncFileLoadData_80372D84* data = (AsyncFileLoadData_80372D84*)user;
     if (result != size)
-        fn_8004F594(12, "Failed in AfterWriteToCacheCallback\n");
+        tDebugPrintManager::Print(DC_LOADER, "Failed in AfterWriteToCacheCallback\n");
     data->callback(data->alloc_data, data->datasize, data->user_data);
     delete data;
 }
@@ -178,12 +179,12 @@ bool FileCache_80535C20::LoadEntireCachedFileAsync(const char* filename,
     m_20.FindGet(hash, &value);
     if (nlFlashChangeDirectory(2, 0) != 0)
     {
-        fn_8004F594(12, "nlFileCache cannot ensure in temp directory for load\n");
+        tDebugPrintManager::Print(DC_LOADER, "nlFileCache cannot ensure in temp directory for load\n");
         return false;
     }
     if (m_4C.IsFull())
     {
-        fn_8004F594(12, "Cannot load from cache, work request Q is full\n");
+        tDebugPrintManager::Print(DC_LOADER, "Cannot load from cache, work request Q is full\n");
         return false;
     }
     CacheRequest_803734A0 request;
@@ -206,12 +207,12 @@ bool FileCache_80535C20::WriteEntireFileToCacheAsync(const char* filename,
 {
     if (nlFlashChangeDirectory(2, 0) != 0)
     {
-        fn_8004F594(12, "nlFileCache cannot ensure in temp directory for write\n");
+        tDebugPrintManager::Print(DC_LOADER, "nlFileCache cannot ensure in temp directory for write\n");
         return false;
     }
     if (m_4C.IsFull())
     {
-        fn_8004F594(12, "Cannot write to cache, work request Q is full\n");
+        tDebugPrintManager::Print(DC_LOADER, "Cannot write to cache, work request Q is full\n");
         return false;
     }
     u32 hash = nlStringLowerHash(filename);
@@ -243,10 +244,10 @@ static void FlashWriteCallback(s32 result)
     CachedFile_80373588* value = request.m_18;
     s32 closeResult = nlFlashClose(0);
     if (closeResult != 0)
-        fn_8004F594(12, "nlFileCache: FlashMemClose returned error %d after write callback\n", closeResult);
+        tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashMemClose returned error %d after write callback\n", closeResult);
     if (result != value->m_00)
     {
-        fn_8004F594(12, "nlFileCache: FlashWriteCallback returned error %d\n", result);
+        tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashWriteCallback returned error %d\n", result);
         request.m_08(result, value->m_08, 0, 0, request.m_14);
         cache->m_20.Remove(nlStringLowerHash(value->m_08));
     }
@@ -262,10 +263,10 @@ static void FlashReadCallback(s32 result)
     CachedFile_80373588* value = request.m_18;
     s32 closeResult = nlFlashClose(0);
     if (closeResult != 0)
-        fn_8004F594(12, "nlFileCache: FlashMemClose returned error %d after read callback\n", closeResult);
+        tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashMemClose returned error %d after read callback\n", closeResult);
     if (result != value->m_00)
     {
-        fn_8004F594(12, "nlFileCache: FlashReadCallback returned error %d\n", result);
+        tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashReadCallback returned error %d\n", result);
         request.m_0C(result, value->m_08, 0, 0, request.m_14);
     }
     else
@@ -299,17 +300,17 @@ void FileCache_80535C20::Run(float)
                     started = true;
                 else
                 {
-                    fn_8004F594(12, "nlFileCache: Error %d calling FlashMemWrite\n", result);
+                    tDebugPrintManager::Print(DC_LOADER, "nlFileCache: Error %d calling FlashMemWrite\n", result);
                     s32 closeResult = nlFlashClose(0);
                     if (closeResult != 0)
-                        fn_8004F594(12, "nlFileCache: Error %d calling FlashMemClose after write error\n", closeResult);
+                        tDebugPrintManager::Print(DC_LOADER, "nlFileCache: Error %d calling FlashMemClose after write error\n", closeResult);
                 }
             }
             else
-                fn_8004F594(12, "nlFileCache: Error %d calling FlashMemOpen\n", result);
+                tDebugPrintManager::Print(DC_LOADER, "nlFileCache: Error %d calling FlashMemOpen\n", result);
         }
         else
-            fn_8004F594(12, "nlFileCache: Error %d calling FlashMemCreate\n", result);
+            tDebugPrintManager::Print(DC_LOADER, "nlFileCache: Error %d calling FlashMemCreate\n", result);
         if (!started)
         {
             request.m_08(result, value->m_08, 0, 0, request.m_14);
@@ -332,14 +333,14 @@ void FileCache_80535C20::Run(float)
                 started = true;
             else
             {
-                fn_8004F594(12, "nlFileCache: Error %d calling FlashMemRead\n", result);
+                tDebugPrintManager::Print(DC_LOADER, "nlFileCache: Error %d calling FlashMemRead\n", result);
                 s32 closeResult = nlFlashClose(0);
                 if (closeResult != 0)
-                    fn_8004F594(12, "nlFileCache: Error %d calling FlashMemClose after read error\n", closeResult);
+                    tDebugPrintManager::Print(DC_LOADER, "nlFileCache: Error %d calling FlashMemClose after read error\n", closeResult);
             }
         }
         else
-            fn_8004F594(12, "nlFileCache: Error %d calling FlashMemOpen\n", result);
+            tDebugPrintManager::Print(DC_LOADER, "nlFileCache: Error %d calling FlashMemOpen\n", result);
         if (!started)
         {
             request.m_0C(result, value->m_08, 0, 0, request.m_14);

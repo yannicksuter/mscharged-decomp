@@ -59,7 +59,7 @@ NetMeshFrameProvider* GetFixedUpdateTask();
 extern "C" void fn_80146424(BallNetmeshEventData*, bool);
 extern "C" PlatTexture* fn_802D064C(unsigned long);
 
-extern NetMeshGameState* lbl_806E0C94;
+extern NetMeshGameState* g_pGame;
 extern float lbl_806DC7B8;
 extern SlotPool<BallNetmeshEventData> lbl_80571780;
 
@@ -312,7 +312,7 @@ void NetMesh::SyncLog(void* context, DebugWriteCache* cache)
 
 inline static void AccumForces(NetMesh* self, nlVector3& newPos)
 {
-    nlVector3* upVector = &lbl_806E0C94->upVector;
+    nlVector3* upVector = &g_pGame->upVector;
     float gravityMagnitude = -NetMesh::s_fNetGravityMagnitude;
     nlVec3Set(newPos, gravityMagnitude * upVector->x, gravityMagnitude * upVector->y, gravityMagnitude * upVector->z);
 

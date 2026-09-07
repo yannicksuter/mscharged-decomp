@@ -14,7 +14,7 @@ extern SlotPool<DetermDataEvent> lbl_805848E8;
 struct DetermDataEvent
 {
     DetermDataEvent();
-    DetermDataEvent(const DetermDataEvent* other);
+    DetermDataEvent(DetermDataEvent* other);
     DetermDataEvent(const void* data, u32 size);
     ~DetermDataEvent();
 

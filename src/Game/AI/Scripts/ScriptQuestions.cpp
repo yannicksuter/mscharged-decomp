@@ -27,6 +27,8 @@ extern "C" float fn_800DB298(const nlVector3&, const nlVector3&, cFielder*,
 extern "C" float fn_800DAFCC(const nlVector3&, const nlVector3&, cPlayer*,
     cPlayer*, float, float, float, float);
 
+extern float lbl_806E41B0;
+
 static const nlVector2 g_vOpenToAdjust = { 0.0f, 0.8f };
 static const nlVector2 g_vPassCloseToDoneConfidence = { 0.0f, 0.5f };
 static const nlVector2 g_vStallingConfidenceTime = { 1.0f, 8.0f };
@@ -473,4 +475,9 @@ float GonnaGetBall(cTeam* team)
     }
 
     return fScore;
+}
+
+float GenerateFilteredRandom()
+{
+    return nlRandomf(lbl_806E41B0);
 }

@@ -28,11 +28,11 @@ extern "C" void fn_80109C48(void*);
 extern "C" void fn_80109C90(void*);
 extern "C" void fn_80109CA8(void*);
 extern "C" void fn_800FBCB0(void*, int);
-extern "C" bool fn_802C2C84(const char*, bool);
+extern "C" bool GetTweakBool(const char*, bool);
 extern "C" void* fn_802B6594(int, void*);
 extern "C" bool fn_802C2DBC(const char*);
-extern "C" const char* fn_802C2D20(const char*, const char*);
-extern "C" int fn_802C2BE8(const char*, int);
+extern "C" const char* GetTweakString(const char*, const char*);
+extern "C" int GetTweakInt(const char*, int);
 extern "C" int fn_801CBED0(const char*);
 extern "C" int fn_801CBEF8(const char*);
 extern "C" void nlBreak__Fv();
@@ -107,7 +107,7 @@ GameInfoManager::GameInfoManager()
     mGameInfo[GM_MODE_4] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
     fn_800FBCB0(mGameInfo[GM_MODE_4], 0);
 
-    if (fn_802C2C84("User/skipfe", false)) {
+    if (GetTweakBool("User/skipfe", false)) {
         SetMode(GM_FRIENDLY, false);
         SetTeam(0, 3);
         SetSidekick(0, 1, -1);
@@ -395,7 +395,7 @@ void GameInfoManager::SetupGameFromConfig()
         nlSNPrintf(name, sizeof(name), "user/team%d", side + 1);
 
         if (fn_802C2DBC(name)) {
-            SetTeam(side, fn_801CBED0(fn_802C2D20(name, kDefaultTeam)));
+            SetTeam(side, fn_801CBED0(GetTweakString(name, kDefaultTeam)));
         }
 
         for (int sidekick = 0; sidekick < 3; sidekick++) {
@@ -403,21 +403,21 @@ void GameInfoManager::SetupGameFromConfig()
 
             if (fn_802C2DBC(name)) {
                 SetSidekick(side,
-                    fn_801CBEF8(fn_802C2D20(name, side == 0 ? kDefaultHomeSidekick : kDefaultAwaySidekick)),
+                    fn_801CBEF8(GetTweakString(name, side == 0 ? kDefaultHomeSidekick : kDefaultAwaySidekick)),
                     sidekick);
             }
         }
     }
 
     if (fn_802C2DBC("user/soak_diff")) {
-        mCurGameSettings.unknown_0x00 = fn_802C2BE8("user/soak_diff", 2);
+        mCurGameSettings.unknown_0x00 = GetTweakInt("user/soak_diff", 2);
     }
 
     for (int pad = 0; pad < 4; pad++) {
         nlSNPrintf(padName, sizeof(padName), "user/pad%d", pad);
 
         if (fn_802C2DBC(padName)) {
-            const char* value = fn_802C2D20(padName, kHomeSide);
+            const char* value = GetTweakString(padName, kHomeSide);
 
             if (nlStrNCmp(value, kHomeSide, sizeof(padName)) == 0) {
                 SetPlayingSide(pad, 0);
@@ -450,12 +450,12 @@ void GameInfoManager::SetupGameFromConfig()
         mCurGameSettings.unknown_0x10 = 1;
     }
 
-    if (fn_802C2C84("User/skipfe", false)) {
+    if (GetTweakBool("User/skipfe", false)) {
         mCurGameSettings.unknown_0x10 = 11;
     }
 
     if (fn_802C2DBC("User/stadium")) {
-        const char* value = fn_802C2D20("User/stadium", 0);
+        const char* value = GetTweakString("User/stadium", 0);
 
         SetStadium(-1);
 
@@ -488,7 +488,7 @@ void GameInfoManager::ApplyDifficultySettings()
         { 7, 5 },
     };
 
-    if (fn_80338BF0(lbl_806E20D8) > 1) {
+    if (GetNumMachines(g_pNetworkSessionBase) > 1) {
         mCurrentDifficulty[0] = 7;
         mCurrentDifficulty[1] = 7;
         return;

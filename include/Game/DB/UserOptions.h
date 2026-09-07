@@ -19,6 +19,10 @@ public:
     void InitializeDefaults();
     void OnSettingsUpdated() const;
 
+    int fn_8025D158() const { return m_unk4; }
+    int fn_8025D160() const { return m_unk0; }
+    int fn_8025D168() const { return m_unk8; }
+
     /* 0x0 */ int m_unk0;
     /* 0x4 */ int m_unk4;
     /* 0x8 */ int m_unk8;

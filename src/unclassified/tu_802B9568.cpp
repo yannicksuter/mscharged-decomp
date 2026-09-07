@@ -58,18 +58,23 @@ extern "C" void fn_802B9670(
     UnidentifiedTimeRegionData_802B9570* data, float value)
 {
     ++data->m_unk18;
-    if (value < data->m_unk0C)
+    float minValue = data->m_unk0C;
+    if (value < minValue)
     {
         ++data->m_unk14[0];
     }
-    else if (value >= (data->m_unk08 - 2) * data->m_unk10 + data->m_unk0C)
-    {
-        ++data->m_unk14[data->m_unk08 - 1];
-    }
     else
     {
-        float bin = floor((value - data->m_unk0C) / data->m_unk10);
-        ++data->m_unk14[(int)bin + 1];
+        float binSize = data->m_unk10;
+        if (value >= (data->m_unk08 - 2) * binSize + minValue)
+        {
+            ++data->m_unk14[data->m_unk08 - 1];
+        }
+        else
+        {
+            float bin = floor((value - minValue) / binSize);
+            ++data->m_unk14[(int)bin + 1];
+        }
     }
 }
 

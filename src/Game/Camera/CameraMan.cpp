@@ -251,7 +251,7 @@ extern "C" cBaseCamera* fn_800F1C14()
 /**
  * Offset/Address/Size: 0x1888 | 0x800F1AC8 | size: 0x14C
  */
-extern "C" cBaseCamera* fn_800F1AC8()
+cBaseCamera* cCameraManager::PopCamera()
 {
     int i;
 

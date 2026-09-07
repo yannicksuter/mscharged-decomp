@@ -50,10 +50,10 @@ extern "C"
     int fn_802C278C(const char* name, int* outLength);
     const char* fn_802C2914(const char* name, int kind);
     void fn_802C2B38(TweakValueBase_8052BF70* value);
-    float fn_802C2B48(const char* path, float defaultValue);
-    int fn_802C2BE8(const char* path, int defaultValue);
-    bool fn_802C2C84(const char* path, bool defaultValue);
-    const char* fn_802C2D20(const char* path, const char* defaultValue);
+    float GetTweakFloat(const char* path, float defaultValue);
+    int GetTweakInt(const char* path, int defaultValue);
+    bool GetTweakBool(const char* path, bool defaultValue);
+    const char* GetTweakString(const char* path, const char* defaultValue);
     int fn_802C2DBC(const char* path);
 
     // TU3: node and path management.

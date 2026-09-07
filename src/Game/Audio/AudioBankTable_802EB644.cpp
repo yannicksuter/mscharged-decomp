@@ -1,9 +1,9 @@
 #include "Game/Audio/AudioBankTable_802EB644.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/SAnim.h"
 #include "NL/nlMemory.h"
 
-extern "C" void fn_8004F594(int category, const char* format, ...);
 extern "C" const char* fn_802B9568(void* stringTable, u32 value);
 
 extern void* lbl_806E1DC8;
@@ -77,7 +77,7 @@ void AudioBankTable_802EB644::fn_802EBBF0(int slotId, unsigned long cueId,
 {
     AudioResourceSource_802ED144* source = &records_0C[cueId];
     AudioResourceName_802ED144* resource = &records_14[slotId];
-    fn_8004F594(10, "Loading Bank %s into slot %s::%s\n", resource->name,
+    tDebugPrintManager::Print(DC_SOUND, "Loading Bank %s into slot %s::%s\n", resource->name,
         fn_802B9568(lbl_806E1DC8, source->field_0C->field_04),
         fn_802B9568(lbl_806E1DC8, source->field_04));
     source->resource = resource;

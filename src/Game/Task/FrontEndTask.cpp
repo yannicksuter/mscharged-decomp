@@ -165,12 +165,12 @@ void FrontEndTask::Run(float dt)
 
 void FrontEndTask::HandleE3IdleReset(float fDeltaT)
 {
-    if (!g_e3_Build || fn_802C2C84("/user/dosoak", false))
+    if (!g_e3_Build || GetTweakBool("/user/dosoak", false))
     {
         return;
     }
 
-    if (g_e3_Build && !fn_802C2C84("/user/e3_idle_reset", false))
+    if (g_e3_Build && !GetTweakBool("/user/e3_idle_reset", false))
     {
         return;
     }
@@ -186,7 +186,7 @@ void FrontEndTask::HandleE3IdleReset(float fDeltaT)
 
     for (int i = 0; i < 4; i++)
     {
-        cGlobalPad* pad = lbl_806E1E28->GetPad(i);
+        cGlobalPad* pad = g_pPadManager->GetPad(i);
         if (!pad->IsConnected())
         {
             continue;
@@ -258,7 +258,7 @@ void FrontEndTask::HandleSoftReset(float fDeltaT)
 
     for (int i = 0; i < 4; i++)
     {
-        cGlobalPad* pad = lbl_806E1E28->GetPad(i);
+        cGlobalPad* pad = g_pPadManager->GetPad(i);
         if (!pad->IsConnected())
         {
             continue;

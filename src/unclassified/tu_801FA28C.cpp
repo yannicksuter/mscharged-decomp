@@ -11,7 +11,7 @@ extern "C" TU80252180Scene* fn_80253E18();
 extern "C" void fn_80254310(TU80252180Scene* scene, bool enabled);
 
 extern TLComponentInstance* lbl_80578450[4];
-extern BaseGameSceneManager* lbl_806E1860;
+extern BaseGameSceneManager* g_pOverlayManager;
 
 TU801FA324Overlay::~TU801FA324Overlay()
 {
@@ -75,5 +75,5 @@ void TU801FA324Overlay::fn_801FABF8(int index, void*)
         lbl_80578450[i]->SetActiveSlide("waiting", true, false);
     }
 
-    lbl_806E1860->Push((SceneList)80, SCREEN_BACK, true);
+    g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
 }

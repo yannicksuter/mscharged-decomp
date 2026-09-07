@@ -687,10 +687,10 @@ public:
     /* 0x27C0 */ u8 mLoginThreadStack[0x4000];
 }; // size: 0x67C0
 
-extern UnidentifiedNetworkSession* lbl_806E20D8;
-extern UnidentifiedNetworkSession* lbl_806E10EC;
+extern UnidentifiedNetworkSession* g_pNetworkSessionBase;
+extern UnidentifiedNetworkSession* g_pNetworkSession;
 
-extern "C" int fn_80338BF0(UnidentifiedNetworkSessionData* session);
+extern "C" int GetNumMachines(UnidentifiedNetworkSessionData* session);
 extern "C" UnidentifiedNetworkPeer* fn_80338BF8(
     UnidentifiedNetworkSessionData* session, s8 machine);
 extern "C" UnidentifiedNetworkPeer* fn_80338C0C(

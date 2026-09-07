@@ -90,14 +90,7 @@ Reverb::Reverb()
 void Reverb::fn_802F6930(unsigned int definition, void*, bool negate,
     AudioEffectParameter_802F69A8** output)
 {
-    unsigned int definitionKey = definition;
-    unsigned int key = 0xD2894EC5;
-    ConfigValue_8035B240 value;
-    value.m_Raw = lbl_806E202C->m_Root->fn_8035B240(key);
-    ConfigNode_8035B240* node = (ConfigNode_8035B240*)value.m_Words.m_Value;
-    value.m_Raw = node->fn_8035B240(definitionKey);
-    node = (ConfigNode_8035B240*)value.m_Words.m_Value;
-
+    ConfigNode_8035B240* node = ConfigFindDefinition_8035B240(definition);
     ReverbParameter_80363D60* parameter = new ReverbParameter_80363D60;
     *output = parameter;
     if (lbl_806E2250)
@@ -113,30 +106,24 @@ void Reverb::fn_802F6930(unsigned int definition, void*, bool negate,
         return;
     }
 
-    key = nlStringLowerHash("tempDisableFX");
-    value.m_Raw = node->fn_8035B240(key);
+    ConfigValue_8035B240 value;
+    value.m_Raw = node->fn_8035B240(nlStringLowerHash("tempDisableFX"));
     parameter->tempDisableFX = value.m_Words.m_Value != 0;
-    key = nlStringLowerHash("time");
-    value.m_Raw = node->fn_8035B240(key);
+    value.m_Raw = node->fn_8035B240(nlStringLowerHash("time"));
     parameter->time = value.m_Float;
-    key = nlStringLowerHash("preDelay");
-    value.m_Raw = node->fn_8035B240(key);
+    value.m_Raw = node->fn_8035B240(nlStringLowerHash("preDelay"));
     parameter->preDelay = value.m_Float;
-    key = nlStringLowerHash("damping");
-    value.m_Raw = node->fn_8035B240(key);
+    value.m_Raw = node->fn_8035B240(nlStringLowerHash("damping"));
     parameter->damping = value.m_Float;
-    key = nlStringLowerHash("coloration");
-    value.m_Raw = node->fn_8035B240(key);
+    value.m_Raw = node->fn_8035B240(nlStringLowerHash("coloration"));
     parameter->coloration = value.m_Float;
-    key = nlStringLowerHash("crosstalk");
-    value.m_Raw = node->fn_8035B240(key);
+    value.m_Raw = node->fn_8035B240(nlStringLowerHash("crosstalk"));
     parameter->crosstalk = value.m_Float;
-    key = nlStringLowerHash("mix");
-    value.m_Raw = node->fn_8035B240(key);
+    value.m_Raw = node->fn_8035B240(nlStringLowerHash("mix"));
     parameter->mix = value.m_Float;
-    key = nlStringLowerHash("auxvol");
-    value.m_Raw = node->fn_8035B240(key);
-    parameter->auxvol = negate ? 1.0f - value.m_Float : value.m_Float;
+    value.m_Raw = node->fn_8035B240(nlStringLowerHash("auxvol"));
+    parameter->auxvol = value.m_Float;
+    parameter->auxvol = negate ? 1.0f - parameter->auxvol : parameter->auxvol;
 }
 
 void Reverb::fn_802F9B60(AudioEffectParameter_802F69A8* destination,
@@ -176,10 +163,8 @@ void Reverb::fn_802F98F0(void* handle)
 
 void Reverb::fn_802F692C(void*)
 {
-    AudioBackend_8035B8E8* platform = lbl_806E2020;
-    AXFX_REVERBHI* reverb = &platform->m_Unknown454.m_Reverb;
-    // Both modes use the normal settings layout before the mode-specific call.
-    if (platform->m_OutputMode == 3)
+    AXFX_REVERBHI* reverb = &lbl_806E2020->m_Unknown454.m_Reverb;
+    if (lbl_806E2020->m_OutputMode == 3)
     {
         float value = m_Final.time >= 0.0f ? m_Final.time : 0.0f;
         reverb->time = value <= 10.0f ? value : 10.0f;
@@ -193,7 +178,7 @@ void Reverb::fn_802F692C(void*)
         reverb->crosstalk = value <= 1.0f ? value : 1.0f;
         value = m_Final.mix >= 0.0f ? m_Final.mix : 0.0f;
         reverb->mix = value <= 1.0f ? value : 1.0f;
-        AXFXReverbHiSettingsDpl2(&platform->m_Unknown454.m_ReverbDpl2);
+        AXFXReverbHiSettingsDpl2((AXFX_REVERBHI_DPL2*)reverb);
     }
     else
     {

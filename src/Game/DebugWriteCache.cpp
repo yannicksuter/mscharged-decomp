@@ -37,6 +37,19 @@ static inline UnidentifiedDebugWriteBuffer* GetUnidentifiedCurrentBuffer(
     return 0;
 }
 
+static inline UnidentifiedDebugWriteField* GetUnidentifiedNextField(
+    DebugWriteCache* cache)
+{
+    if (cache->mFieldCount >= cache->mFieldCapacity)
+    {
+        nlBreak();
+        return 0;
+    }
+    UnidentifiedDebugWriteField* field = &cache->mFields[cache->mFieldCount];
+    cache->mFieldCount++;
+    return field;
+}
+
 extern "C" void fn_80338CC4(DebugWriteCache* cache)
 {
     cache->mCurrentBuffer = -1;
@@ -123,17 +136,7 @@ extern "C" void fn_80338F88(DebugWriteCache* cache, int fieldType, u16 size,
 {
     UnidentifiedDebugWriteType* owner
         = &cache->mTypes[cache->mCurrentType];
-    UnidentifiedDebugWriteField* field;
-
-    if (cache->mFieldCount >= cache->mFieldCapacity)
-    {
-        nlBreak();
-        field = 0;
-    }
-    else
-    {
-        field = &cache->mFields[cache->mFieldCount++];
-    }
+    UnidentifiedDebugWriteField* field = GetUnidentifiedNextField(cache);
 
     field->mSize = size;
     field->mOffset = offset;
@@ -162,17 +165,7 @@ extern "C" void fn_80339090(DebugWriteCache* cache, int fieldType, u16 size,
 {
     UnidentifiedDebugWriteType* owner
         = &cache->mTypes[cache->mCurrentType];
-    UnidentifiedDebugWriteField* field;
-
-    if (cache->mFieldCount >= cache->mFieldCapacity)
-    {
-        nlBreak();
-        field = 0;
-    }
-    else
-    {
-        field = &cache->mFields[cache->mFieldCount++];
-    }
+    UnidentifiedDebugWriteField* field = GetUnidentifiedNextField(cache);
 
     field->mSize = size;
     field->mOffset = offset;

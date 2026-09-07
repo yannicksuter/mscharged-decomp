@@ -357,6 +357,10 @@ extern "C" void fn_80099030(UnidentifiedEventData00*)
     }
 }
 
+extern "C" void fn_80099074(void)
+{
+}
+
 u16 lbl_806DBD96 = 0xFFFF;
 
 #define REGISTER_PLAYER_FIELD(type, field) \
@@ -412,4 +416,8 @@ void cPlayer::Unknown12(RunningChecksum* pChecksum)
     pChecksum->ChecksumData(&m_fShotStrengthTime, sizeof(m_fShotStrengthTime));
     pChecksum->ChecksumData(&m_tSlideAttackTimer, sizeof(m_tSlideAttackTimer));
     pChecksum->ChecksumData(&m_UserControlledTime, sizeof(m_UserControlledTime));
+}
+
+void cPlayer::InitActionPostWhistle()
+{
 }

@@ -438,7 +438,7 @@ bool cFielder::CanGetElectrocuted(
 
             if (bUnidentified && mUnidentified3DC)
             {
-                fn_80060608(lbl_806E0C94, this);
+                fn_80060608(g_pGame, this);
                 fn_8005001C(true);
                 return false;
             }
@@ -943,7 +943,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             pAttackData->pTarget = this;
             pAttackData->mUnidentified0C = nUnidentified;
             pAttackData->mUnidentified10 = false;
-            fn_8005ED64(lbl_806E0C94, pAttackData);
+            fn_8005ED64(g_pGame, pAttackData);
             fn_80139D1C(2, pFielderCollidedWith->GetGlobalPad());
         }
         else if (pFielderCollidedWith->fn_80038660() && m_eActionState != ACTION_HIT)
@@ -1770,8 +1770,10 @@ void cFielder::ShootBallDueToContact(const nlVector3& v3IncomingVelocity)
 void cFielder::ShootBallDueToContact(unsigned short aShootDirection)
 {
     nlVector3 v3ReleaseVelocity;
+    float fRadius = m_fActualSpeed;
+    fRadius = 2.0f + fRadius;
     nlPolarToCartesian(v3ReleaseVelocity.x, v3ReleaseVelocity.y,
-        aShootDirection, 2.0f + m_fActualSpeed);
+        aShootDirection, fRadius);
     v3ReleaseVelocity.z = 0.5f;
 
     g_pBall->ShootRelease(v3ReleaseVelocity, SPINTYPE_NONE);
@@ -2861,7 +2863,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         pAttackData->pTarget = pOpponent;
         pAttackData->mUnidentified0C = 2;
         pAttackData->mUnidentified10 = false;
-        fn_8005ED64(lbl_806E0C94, pAttackData);
+        fn_8005ED64(g_pGame, pAttackData);
     }
     else if (pOpponent->fn_8003E74C() && !fn_8003E74C()
         && !pOpponent->fn_80038918() && !bUnidentified && !fn_800344B0())
@@ -2877,7 +2879,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         pAttackData->pTarget = this;
         pAttackData->mUnidentified0C = 2;
         pAttackData->mUnidentified10 = false;
-        fn_8005ED64(lbl_806E0C94, pAttackData);
+        fn_8005ED64(g_pGame, pAttackData);
     }
     else if (IsInvincibleChars() && !pOpponent->IsInvincibleChars())
     {

@@ -4,17 +4,17 @@
 
 #include <string.h>
 
-PlatPadManager* lbl_806E2478;
+PlatPadManager* g_pPlatPadManager;
 
 extern "C" void fn_803751D4(WPADChannel channel, s32)
 {
-    lbl_806E2478->dpdActive[channel] = false;
-    lbl_806E2478->dataFormatSet[channel] = false;
+    g_pPlatPadManager->dpdActive[channel] = false;
+    g_pPlatPadManager->dataFormatSet[channel] = false;
 }
 
 extern "C" void fn_803751F4(WPADChannel channel, WPADResult result)
 {
-    PlatPadManager* manager = lbl_806E2478;
+    PlatPadManager* manager = g_pPlatPadManager;
 
     switch (result)
     {

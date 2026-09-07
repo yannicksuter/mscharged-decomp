@@ -1,4 +1,5 @@
 #include "Game/Audio/AudioResourcePlatform_8035DE28.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/SAnim.h"
 #include "NL/MemAlloc.h"
@@ -9,7 +10,6 @@
 #include "NL/nlPrint.h"
 #include "NL/nlstring_tmpl.h"
 
-extern "C" void fn_8004F594(int category, const char* format, ...);
 extern "C" void* fn_8035C0B4(void* host, unsigned long size);
 extern "C" void fn_8035C114(void* host, void* data);
 extern "C" unsigned char* fn_8035EA28();
@@ -158,7 +158,7 @@ static inline void AudioBankPrint_8035DE28(
     }
     else
     {
-        fn_8004F594(10, format, first, value);
+        tDebugPrintManager::Print(DC_SOUND, format, first, value);
     }
 }
 
@@ -176,7 +176,7 @@ extern "C" bool fn_8035DE28(
     }
     else
     {
-        fn_8004F594(10, format,
+        tDebugPrintManager::Print(DC_SOUND, format,
             value != 0 ? (unsigned long)value : size, size);
     }
     return true;

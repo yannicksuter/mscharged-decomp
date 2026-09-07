@@ -220,7 +220,7 @@ void CharacterLoader_8056B290::fn_80009BC8()
     goalie[0] = (eCharacterClass)GetGoalieCharacterIndex(GetCharacterInfo(captain[0]));
     goalie[1] = (eCharacterClass)GetGoalieCharacterIndex(GetCharacterInfo(captain[1]));
 
-    bool allcaptains = fn_802C2C84("/user/allcaptains", false);
+    bool allcaptains = GetTweakBool("/user/allcaptains", false);
     if (allcaptains)
     {
         sidekick[0][0] = captain[0];

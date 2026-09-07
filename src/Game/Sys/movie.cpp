@@ -1,4 +1,5 @@
 #include "Game/Sys/movie.h"
+#include "Game/Sys/debug.h"
 
 #include "RVL_SDK/thp/THPSimple.h"
 
@@ -159,7 +160,7 @@ bool MovieStop()
     int currentFrame = (int)(unsigned int)lbl_806E2424;
     if ((unsigned int)currentFrame != (unsigned int)lastFrame)
     {
-        fn_8004F594(3, "MOVIE did not finish playback.\n");
+        tDebugPrintManager::Print(DC_RENDER, "MOVIE did not finish playback.\n");
     }
 
     THPSimpleAudioStop();

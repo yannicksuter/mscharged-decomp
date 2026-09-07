@@ -13,8 +13,8 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
     UnidentifiedEventRegistry;
 
-extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
-extern "C" cGame* lbl_806E0C94;
+extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
+extern "C" cGame* g_pGame;
 extern "C" void fn_800C2C18(UnidentifiedDesireUpdate*, int);
 extern "C" void fn_800C93A4(
     DesireSuperPower*, UnidentifiedDesireUpdate*, float);
@@ -52,9 +52,9 @@ static inline void UnidentifiedRegisterEventCallback(
     const char* name, void (*callback)(void*))
 {
     Function<void*> function(callback);
-    unsigned int hash = fn_802B289C(name, -1);
+    unsigned int hash = HashEventName(name, -1);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event;
     if (foundEvent != 0)
     {
@@ -102,7 +102,7 @@ void DesireSuperPower::UnidentifiedSetContext(
 void DesireSuperPower::UnidentifiedUpdate(
     UnidentifiedDesireUpdate* update, float fDeltaT)
 {
-    if (!fn_800D1458(lbl_806E0C94))
+    if (!fn_800D1458(g_pGame))
     {
         fn_800C2C18(update, 1);
         return;

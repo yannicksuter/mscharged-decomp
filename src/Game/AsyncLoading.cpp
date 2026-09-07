@@ -1,4 +1,5 @@
 #include "Game/AsyncLoading.h"
+#include "Game/Sys/debug.h"
 #include "Game/FE/feMusic.h"
 #include "Game/Render/CrowdManager.h"
 #include "Game/Render/Jumbotron.h"
@@ -106,7 +107,7 @@ struct FrameTimingStat
 
 extern "C" void fn_801CC114();
 extern "C" void fn_801A95F0(void*, const char*, int);
-extern "C" bool fn_80332770();
+extern "C" bool IsNetworkOrRecordedGame();
 extern "C" u32 OSGetTick();
 extern "C" void OSYieldThread();
 
@@ -223,7 +224,7 @@ extern "C" void fn_80116988(void*, const char* bankName)
     if (nlStrCmp<char>(bankName, "FE_GEN") == 0)
     {
         lbl_806E104C = nlGetTickerDifference(lbl_806E1048, nlGetTicker());
-        fn_8004F594(12, "Loaded in %f MS big bank FE_GEN\n", lbl_806E104C);
+        tDebugPrintManager::Print(DC_LOADER, "Loaded in %f MS big bank FE_GEN\n", lbl_806E104C);
     }
 
     nlPrintf("Bank load complete \"%s\"\n", bankName);
@@ -449,7 +450,7 @@ extern "C" u32 fn_80118B7C(AsyncLoadingManager* manager)
     if (manager->mLoadingComment != lbl_806E103C)
     {
         u32 ticker = nlGetTicker();
-        fn_8004F594(12, "Processed %f, %s -> %s\n",
+        tDebugPrintManager::Print(DC_LOADER, "Processed %f, %s -> %s\n",
             nlGetTickerDifference(manager->mPreviousStageTick, ticker),
             lbl_806E103C, manager->mLoadingComment);
         lbl_806E103C = manager->mLoadingComment;
@@ -459,7 +460,7 @@ extern "C" u32 fn_80118B7C(AsyncLoadingManager* manager)
     if (nlGetTickerDifference(manager->mStageStartTick, nlGetTicker())
         > g_fScriptBlockingWarningMS)
     {
-        fn_8004F594(12, "Script function %s blocked for more than %f MS\n",
+        tDebugPrintManager::Print(DC_LOADER, "Script function %s blocked for more than %f MS\n",
             manager->mLoadingComment, g_fScriptBlockingWarningMS);
     }
 
@@ -584,23 +585,23 @@ extern "C" void fn_8011A800(AsyncLoadingManager* manager)
     BeginFrameTask::s_FramerateLocked = false;
     fn_801CC114();
     InitializeTimeRegions();
-    fn_80137824(fn_80332770());
+    fn_80137824(IsNetworkOrRecordedGame());
 
     manager->mLoadingState = 1;
     lbl_806E1040->SetVisible(false);
-    lbl_806E10EC->mUnidentified2472 = true;
+    g_pNetworkSession->mUnidentified2472 = true;
 
     float mem1Free = (float)StandardAllocator.TotalFreeMemory();
     float mem2Free = (float)VirtualAllocator.TotalFreeMemory();
     float totalMemFree = mem1Free + mem2Free;
 
-    fn_8004F594(9,
+    tDebugPrintManager::Print(DC_MEMORY,
         "MEM1 Free at end of InitializeGameState: %f bytes, or %f KB, or %f MB\n",
         mem1Free, mem1Free / 1024.0f, mem1Free / 1048576.0f);
-    fn_8004F594(9,
+    tDebugPrintManager::Print(DC_MEMORY,
         "MEM2 Free at end of InitializeGameState: %f bytes, or %f KB, or %f MB\n",
         mem2Free, mem2Free / 1024.0f, mem2Free / 1048576.0f);
-    fn_8004F594(9,
+    tDebugPrintManager::Print(DC_MEMORY,
         "Total Mem Free at end of InitializeGameState: %f bytes, or %f KB, or %f MB\n",
         totalMemFree, totalMemFree / 1024.0f,
         totalMemFree / 1048576.0f);
@@ -640,11 +641,11 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     fn_801B2770();
     FESceneManager::Instance()->ClearTopMostScene();
-    lbl_806E1860->PopEntireStack();
-    if (lbl_806E1860 != 0)
+    g_pOverlayManager->PopEntireStack();
+    if (g_pOverlayManager != 0)
     {
-        delete lbl_806E1860;
-        lbl_806E1860 = 0;
+        delete g_pOverlayManager;
+        g_pOverlayManager = 0;
     }
     FESceneManager::Instance()->ForceImmediateStackProcessing();
 
@@ -670,17 +671,17 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     fn_80332EC8();
     fn_80337FF0(lbl_806E2164, 0);
     fn_80338900(lbl_806E2168, 0);
-    lbl_806E20D8->BaseVirtual48(5);
+    g_pNetworkSessionBase->BaseVirtual48(5);
     fn_803330AC()->Reset(0);
     lbl_806E2138->fn_8033288C();
-    lbl_806E20D8->Initialize(false);
+    g_pNetworkSessionBase->Initialize(false);
 
     fn_800A6EDC(g_pTeams[0]);
     fn_800A6EDC(g_pTeams[1]);
     DestroyPowerups();
     lbl_806E12C8->ResetEffects();
     DestroyCharacters();
-    fn_800AA3E8(lbl_806E0C94->mUnidentified10DC, 1);
+    fn_800AA3E8(g_pGame->mUnidentified10DC, 1);
     fn_801AF97C(lbl_80574148);
     fn_80013660(g_pBall, 1);
     g_pBall = 0;
@@ -798,7 +799,7 @@ extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
     {
         for (int i = 0; i < 4; ++i)
         {
-            cGlobalPad* source = lbl_806E1E28->GetPad(i);
+            cGlobalPad* source = g_pPadManager->GetPad(i);
             if (source == 0)
             {
                 return;
@@ -886,7 +887,11 @@ extern "C" UnidentifiedOwnerHandle* fn_8011B858(
 {
     if (handle != 0)
     {
-        ReleaseUnidentifiedOwner(handle);
+        if (handle->mOwner != 0
+            && ((handle->mOwner->mFlags >> 30) & 1) != 0)
+        {
+            handle->mOwner->mTarget->Release(handle);
+        }
         if (shouldDelete > 0)
         {
             delete handle;

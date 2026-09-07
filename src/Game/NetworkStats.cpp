@@ -1,4 +1,5 @@
 #include <dwc/dwc_ranking.h>
+#include "Game/Sys/debug.h"
 #include <revolution/net/NETDigest.h>
 
 #include "Game/NetworkStats.h"
@@ -88,18 +89,18 @@ bool NetworkStatsReporter_8012CE20::ReportGameResult(int,
 {
     if (!reportHome)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "ReportGameResult returning true, but did not really report this game...only home team should do that for now\n");
         return true;
     }
 
     if (!TransportSocketOpen(&mSocket, true))
     {
-        fn_8004F594(16, "Failed to open Stats TCP Socket");
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to open Stats TCP Socket");
     }
     else if (!TransportSocketBind(&mSocket, 1002))
     {
-        fn_8004F594(16, "Failed to bind Stats TCP Socket");
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to bind Stats TCP Socket");
     }
     else
     {
@@ -108,8 +109,7 @@ bool NetworkStatsReporter_8012CE20::ReportGameResult(int,
 
     if (!TransportSocketIsOpen(&mSocket))
     {
-        fn_8004F594(
-            16, "Failed to ReportGameResult, TCP Socket not open\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to ReportGameResult, TCP Socket not open\n");
         return false;
     }
 
@@ -122,14 +122,14 @@ bool NetworkStatsReporter_8012CE20::ReportGameResult(int,
         &mSocket, address, (u16)g_nConnectToStatsPort);
     if (result != -26)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Connect Result (ReportGameResult) to Stats Server %d\n",
             result);
         Close();
         return false;
     }
 
-    fn_8004F594(16, "Connect (ReportGameResult) To Stats In Progress\n");
+    tDebugPrintManager::Print(DC_NETWORK, "Connect (ReportGameResult) To Stats In Progress\n");
     mState = 3;
     mHomePlayer.CopyFrom(*home);
     mAwayPlayer.CopyFrom(*away);
@@ -156,11 +156,11 @@ bool NetworkStatsReporter_8012CE20::GetLeaderboardStats(int category,
 {
     if (!TransportSocketOpen(&mSocket, true))
     {
-        fn_8004F594(16, "Failed to open Stats TCP Socket");
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to open Stats TCP Socket");
     }
     else if (!TransportSocketBind(&mSocket, 1002))
     {
-        fn_8004F594(16, "Failed to bind Stats TCP Socket");
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to bind Stats TCP Socket");
     }
     else
     {
@@ -169,8 +169,7 @@ bool NetworkStatsReporter_8012CE20::GetLeaderboardStats(int category,
 
     if (!TransportSocketIsOpen(&mSocket))
     {
-        fn_8004F594(
-            16, "Failed to Get Leaderboard stats, TCP Socket not open\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to Get Leaderboard stats, TCP Socket not open\n");
         if (mListener != 0)
         {
             mListener->OnLeaderboardResult(
@@ -188,7 +187,7 @@ bool NetworkStatsReporter_8012CE20::GetLeaderboardStats(int category,
         &mSocket, address, (u16)g_nConnectToStatsPort);
     if (result != -26)
     {
-        fn_8004F594(16, "Connect Result to Stats Server %d\n", result);
+        tDebugPrintManager::Print(DC_NETWORK, "Connect Result to Stats Server %d\n", result);
         if (mListener != 0)
         {
             mListener->OnLeaderboardResult(
@@ -198,7 +197,7 @@ bool NetworkStatsReporter_8012CE20::GetLeaderboardStats(int category,
         return false;
     }
 
-    fn_8004F594(16, "Connect To Stats In Progress\n");
+    tDebugPrintManager::Print(DC_NETWORK, "Connect To Stats In Progress\n");
     mState = 1;
     mFilter = filter;
     mLimit = limit;
@@ -275,7 +274,7 @@ void NetworkStatsReporter_8012CE20::Update()
         nlSNPrintf(request, 255,
             "GET /OnlineRankingSimulator/Rankings.py?SimpleFormat=true\r\n\r\n");
         int result = TransportSocketSend(&mSocket, request, strlen(request));
-        fn_8004F594(16, "Send Result to Stats Server %d\n", result);
+        tDebugPrintManager::Print(DC_NETWORK, "Send Result to Stats Server %d\n", result);
         if (result > 0)
         {
             mState = 2;
@@ -299,8 +298,7 @@ void NetworkStatsReporter_8012CE20::Update()
         {
             if (result != -6)
             {
-                fn_8004F594(
-                    16, "Received Stats String Error %d\n", result);
+                tDebugPrintManager::Print(DC_NETWORK, "Received Stats String Error %d\n", result);
                 if (mListener != 0)
                 {
                     mListener->OnLeaderboardResult(
@@ -312,10 +310,10 @@ void NetworkStatsReporter_8012CE20::Update()
         }
         else
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Received Stats Length = %d, Data follows:\n", result);
             response[result] = 0;
-            fn_8004F594(16, response);
+            tDebugPrintManager::Print(DC_NETWORK, response);
             ParseLeaderboardResponse(response, result);
             mState = 0;
             Close();
@@ -334,14 +332,14 @@ void NetworkStatsReporter_8012CE20::Update()
         int result = TransportSocketSend(&mSocket, request, strlen(request));
         if (result > 0)
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Send ReportGameResult to Stats Server %d\n", result);
             mState = 4;
             mReportStartTime = nlGetTicker();
         }
         else
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Send Error ReportGameResult to Stats Server %d\n", result);
             mState = 0;
             Close();
@@ -351,7 +349,7 @@ void NetworkStatsReporter_8012CE20::Update()
         && nlGetTickerDifference(mReportStartTime, nlGetTicker())
             > sReportSocketLifetime)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Waited, now closing socket that was used for ReportGameResult\n");
         mState = 0;
         Close();
@@ -408,18 +406,17 @@ void NetworkRanking_8012D8F4::InitializeRanking()
         (DWCUserData*)save);
     if (result == DWC_RNK_ERROR_INIT_ALREADYINITIALIZED)
     {
-        fn_8004F594(16, "DWC_RnkInitialize already initialized\n");
+        tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkInitialize already initialized\n");
     }
     if (result == DWC_RNK_SUCCESS
         || result == DWC_RNK_ERROR_INIT_ALREADYINITIALIZED)
     {
-        fn_8004F594(16, "DWC_RnkInitialize succeeded.\n");
+        tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkInitialize succeeded.\n");
         mInitialized = true;
     }
     else
     {
-        fn_8004F594(
-            16, "DWC_RnkInitialize returned error %d\n", result);
+        tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkInitialize returned error %d\n", result);
     }
 }
 
@@ -474,12 +471,12 @@ bool NetworkRanking_8012D8F4::ReportGameResult(int category,
     if (result == DWC_RNK_SUCCESS)
     {
         mOperation = 1;
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "DWC_RnkPutScoreAsync start processing okay cat %d\n",
             mCategory);
         return true;
     }
-    fn_8004F594(16,
+    tDebugPrintManager::Print(DC_NETWORK,
         "DWC_RnkPutScoreAsync cat %d returned error %d\n", mCategory,
         result);
     return false;
@@ -552,12 +549,10 @@ bool NetworkRanking_8012D8F4::SubmitScore(int category,
     if (result == DWC_RNK_SUCCESS)
     {
         mOperation = 1;
-        fn_8004F594(
-            16, "DWC_RnkPutScoreAsync start processing okay\n");
+        tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkPutScoreAsync start processing okay\n");
         return true;
     }
-    fn_8004F594(
-        16, "DWC_RnkPutScoreAsync returned error %d\n", result);
+    tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkPutScoreAsync returned error %d\n", result);
     return false;
 }
 
@@ -619,12 +614,10 @@ bool NetworkRanking_8012D8F4::GetLeaderboardStats(int category,
     if (result == DWC_RNK_SUCCESS)
     {
         mOperation = 2;
-        fn_8004F594(
-            16, "DWC_RnkGetScoreAsync start processing okay.\n");
+        tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkGetScoreAsync start processing okay.\n");
         return true;
     }
-    fn_8004F594(
-        16, "DWC_RnkGetScoreAsync returned error %d\n", result);
+    tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkGetScoreAsync returned error %d\n", result);
     return false;
 }
 
@@ -634,7 +627,7 @@ void NetworkRanking_8012D8F4::ProcessLeaderboardResults()
     DWCRnkError result = DWC_RnkResGetRowCount(&rowCount);
     if (result != DWC_RNK_SUCCESS)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Error %d from DWC_RnkResGetRowCount cat %d filter %d\n",
             result, mCategory, mFilter);
         if (mListener != 0)
@@ -652,7 +645,7 @@ void NetworkRanking_8012D8F4::ProcessLeaderboardResults()
         result = DWC_RnkResGetRow(&row, i);
         if (result != DWC_RNK_SUCCESS)
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Error %d calling DWC_RnkResGetRow %d\n", result, i);
             continue;
         }
@@ -677,8 +670,7 @@ void NetworkRanking_8012D8F4::ProcessLeaderboardResults()
             valid = memcmp(digest, submission->mDigest, sizeof(digest)) == 0;
             if (!valid)
             {
-                fn_8004F594(
-                    16, "Warning: Binary Data failed HMAC MD5 check\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Warning: Binary Data failed HMAC MD5 check\n");
             }
             else
             {
@@ -704,7 +696,7 @@ void NetworkRanking_8012D8F4::ProcessLeaderboardResults()
         }
         else
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Warning: Expected Binary Data Size %d Got Size %d\n",
                 sizeof(NetworkRankingSubmission), row.size);
         }
@@ -770,7 +762,7 @@ int NetworkRanking_8012D8F4::CompareLeaderboardRows(
 
     GameInfoSaveSlot* save =
         GameInfoManager::GetInstance()->GetSaveSlot(lbl_806E20E0);
-    int localProfile = *(int*)&save->unknown_0x000[0x1C];
+    int localProfile = save->unknown_0x01C;
     if (a->mPlayer.mProfileId == localProfile)
     {
         return -1;
@@ -864,14 +856,6 @@ void NetworkRanking_8012D8F4::SortLeaderboardResults(int count)
 
 NetworkRankingSortRow::NetworkRankingSortRow()
 {
-    mMetadata.mMonth = 1;
-    mMetadata.mDay = 1;
-    mMetadata.mYear = 2000;
-    mMetadata.mScore = 0;
-    mMetadata.mDisplayRank = 0;
-    mMetadata.mWins = 0;
-    mMetadata.mLosses = 0;
-    mMetadata.mUnidentified14 = 0;
 }
 
 void NetworkRanking_8012D8F4::Update()
@@ -889,11 +873,11 @@ void NetworkRanking_8012D8F4::Update()
 
     if (result == DWC_RNK_IN_ERROR)
     {
-        fn_8004F594(16, "DWC_RnkProcesss() returned error %d\n", result);
+        tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkProcesss() returned error %d\n", result);
         mRequestComplete = true;
         if (mOperation == 1 && mListener != 0)
         {
-            fn_8004F594(16, "Putting Score failed!\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Putting Score failed!\n");
             if (mReportGame)
             {
                 mListener->OnSubmitScoreResult(false, mCategory);
@@ -905,7 +889,7 @@ void NetworkRanking_8012D8F4::Update()
         }
         else if (mOperation == 2 && mListener != 0)
         {
-            fn_8004F594(16, "Getting score failed!\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Getting score failed!\n");
             mListener->OnLeaderboardResult(
                 false, mCategory, mFilter, 0, 0, 0);
         }
@@ -915,7 +899,7 @@ void NetworkRanking_8012D8F4::Update()
     {
         if (mOperation == 1 && mListener != 0)
         {
-            fn_8004F594(16, "Putting Score succeeded!\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Putting Score succeeded!\n");
             if (mReportGame)
             {
                 mListener->OnSubmitScoreResult(true, mCategory);
@@ -927,14 +911,14 @@ void NetworkRanking_8012D8F4::Update()
         }
         else if (mOperation == 2)
         {
-            fn_8004F594(16, "Getting score succeeded!\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Getting score succeeded!\n");
             ProcessLeaderboardResults();
         }
         mOperation = 0;
     }
     else
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Unexpected DWC_RnkProcesss returned %d\n", result);
     }
 }

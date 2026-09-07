@@ -1,4 +1,5 @@
 #include "Game/AI/TeamPlayMachine.h"
+#include "Game/Sys/debug.h"
 #include "Game/AI/FielderInput.h"
 
 #include "Game/AI/DesireUpdate.h"
@@ -46,7 +47,6 @@ extern "C" bool fn_80316A84(
 extern "C" void fn_80317010(
     shdStateMachine*, UnidentifiedVariant_80054AB8*, bool, float);
 extern "C" float fn_80314538(float, float, float, float, float);
-extern "C" void fn_8004F594(int, const char*, ...);
 
 extern float (*lbl_806DF560)();
 extern UnidentifiedStateTransition lbl_806E20B8;
@@ -338,7 +338,7 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual7()
 
     if (result.GetInt() == -1)
     {
-        fn_8004F594(4, lbl_805302A0, mUnidentified00C.mUnidentifiedHash);
+        tDebugPrintManager::Print(DC_AI, lbl_805302A0, mUnidentified00C.mUnidentifiedHash);
         UnidentifiedVirtual6();
     }
     else if (result.ExtraData.Get(9)->mData.b)

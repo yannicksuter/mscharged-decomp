@@ -1,4 +1,5 @@
 #include "Game/AI/Desire.h"
+#include "Game/Sys/debug.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FielderInput.h"
 #include "Game/AI/DesireUpdate.h"
@@ -6,7 +7,6 @@
 #include "Game/AI/Variant.h"
 #include "Game/DebugWriteCache.h"
 
-extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void fn_80098098(cFielder*);
 extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
 
@@ -63,7 +63,7 @@ void DesireFinishAction::UnidentifiedUpdate(UnidentifiedDesireUpdate* update, fl
 {
     if (update->mData.i == 2)
     {
-        fn_8004F594(4,
+        tDebugPrintManager::Print(DC_AI,
             "** WARNING! DesireFinishAction has expired after %f seconds, probably a bug!\n",
             mUnidentifiedTimer.GetSeconds());
     }

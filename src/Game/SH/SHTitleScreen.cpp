@@ -18,7 +18,7 @@
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" Presentation* fn_801FEEAC();
-extern "C" void fn_80253284(bool value);
+extern "C" void SetPointerEnabled(bool value);
 class TU80252180Scene;
 extern "C" TU80252180Scene* fn_80253E18();
 extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
@@ -96,7 +96,7 @@ void TitleScene::SceneCreated()
         mPresentation->GetActiveSlide(), InlineHasher("Layer2"), InlineHasher("Component2"));
 
     FEMusic::StartStreamIfDifferent(0);
-    fn_80253284(0);
+    SetPointerEnabled(0);
     TU80252180Scene* object = fn_80253E18();
     if (object != 0)
     {
@@ -140,17 +140,17 @@ void TitleScene::Update(float dt)
     if (!mStartedDemo)
     {
         float demoTimeout = GetConfigFloat(Config::Global(), "fe_demo_mode_time_out", 60.0f);
-        if (fn_802C2C84("/user/dosoak", false))
+        if (GetTweakBool("/user/dosoak", false))
         {
-            if (GameInfoManager::Instance()->unknown_0x121 && fn_802C2C84("/user/dosoak", false))
+            if (GameInfoManager::Instance()->unknown_0x121 && GetTweakBool("/user/dosoak", false))
             {
                 fn_801D1F6C();
             }
             m_fTimeElapsed = 0.0f;
             mStartedDemo = true;
         }
-        else if (fn_802C2C84("/user/Smoke Test", false)
-            && fn_802C2C84("/user/Smoke Test FE", false)
+        else if (GetTweakBool("/user/Smoke Test", false)
+            && GetTweakBool("/user/Smoke Test FE", false)
             && m_fTimeElapsed >= demoTimeout)
         {
             GameInfoManager::Instance()->SetMode(GameInfoManager::GM_FRIENDLY, false);
@@ -236,7 +236,7 @@ void TitleScene::fn_801D22C8(int index, void*)
     mTextPressStart->SetActiveSlide("down", true, false);
     mControllerComponent.mValues[index] = 2;
     fn_801CBCA0(0x55C84A9D, 0, 0, 1);
-    fn_80253284(1);
+    SetPointerEnabled(1);
     lbl_806E1838->Pop();
     VISetTimeToDimming(0);
     StartMovieCB();
@@ -291,7 +291,7 @@ void HealthWarningSceneV2::Update(float dt)
         {
             for (int pad = 0; pad < 4; ++pad)
             {
-                cGlobalPad* controller = lbl_806E1E28->GetPad(pad);
+                cGlobalPad* controller = g_pPadManager->GetPad(pad);
                 if (controller != 0 && controller->IsConnected()
                     && controller->IsPressed(0x1E, true)
                     && controller->IsPressed(0x1F, true))

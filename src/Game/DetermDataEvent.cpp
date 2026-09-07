@@ -11,7 +11,7 @@ DetermDataEvent::DetermDataEvent()
 {
 }
 
-DetermDataEvent::DetermDataEvent(const DetermDataEvent* other)
+DetermDataEvent::DetermDataEvent(DetermDataEvent* other)
 {
     mSize = other->mSize;
     memcpy(mData, other->mData, other->mSize);

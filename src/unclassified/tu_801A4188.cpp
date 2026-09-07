@@ -322,7 +322,7 @@ extern "C" void fn_801A43E0(bool alternateView)
     }
     lbl_806E15A8 = tweak;
 
-    int crowdMax = fn_802C2BE8(lbl_80514048, 10000);
+    int crowdMax = GetTweakInt(lbl_80514048, 10000);
     if (!lbl_806E15AC)
     {
         unsigned int scaled = (unsigned int)(crowdMax << 10);

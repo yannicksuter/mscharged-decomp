@@ -241,7 +241,7 @@ struct UnidentifiedMemberFunction
     void* function;
 };
 
-extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
+extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" long __ptmf_test(UnidentifiedMemberFunction*);
 extern "C" UnidentifiedMemberFunction lbl_8050F58C;
 extern "C" unsigned char lbl_804DCC60[];
@@ -652,9 +652,9 @@ static void UnidentifiedRegisterEventCallback(const char* name,
     void (*callback)(void*))
 {
     Function<void*> function(callback);
-    unsigned int hash = fn_802B289C(name, -1);
+    unsigned int hash = HashEventName(name, -1);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event;
     if (foundEvent != 0)
     {

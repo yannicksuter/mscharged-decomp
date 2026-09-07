@@ -22,6 +22,10 @@ extern TLComponentInstance* lbl_80578450[4];
 extern BaseGameSceneManager* lbl_806E1838;
 extern int lbl_806E18B0;
 
+void BaseSceneHandler::SceneCreated()
+{
+}
+
 OptionsScene::OptionsScene()
     : mUnidentified244()
     , mUnidentified31C(false)

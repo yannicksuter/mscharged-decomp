@@ -1,4 +1,5 @@
 #include "Game/SAnim.h"
+#include "Game/Sys/debug.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
@@ -84,7 +85,6 @@ extern SlotPoolBase lbl_8057FA10;
 extern int lbl_806E1DC8;
 extern void* lbl_806E201C;
 
-extern "C" void fn_8004F594(int category, const char* format, ...);
 extern "C" const char* fn_802B9568(int table, ...);
 extern "C" SliderState_802EFB70* fn_802EED38(
     void* sliderTable, u32 sliderIndex, void* localOwner);
@@ -171,7 +171,7 @@ static inline void UpdateRuntimeNode_802EFB70(RpcRuntimeNode_802EFB70* node)
     node->value = EvaluateCurve_802EFB70(
         node->definition, slider->value);
     node->valid = true;
-    fn_8004F594(10, lbl_8052F668, fn_802B9568(lbl_806E1DC8, slider->definition->name), node->value);
+    tDebugPrintManager::Print(DC_SOUND, lbl_8052F668, fn_802B9568(lbl_806E1DC8, slider->definition->name), node->value);
 }
 
 extern "C" RpcController_802EFB70* fn_802EFB70(nlChunk* outer)

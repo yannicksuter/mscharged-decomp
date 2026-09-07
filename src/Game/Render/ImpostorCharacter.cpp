@@ -148,11 +148,13 @@ void ImpostorCharacter::Acquire(Impostor* impostor)
 {
     ImpostorSprite_802D4290* best = 0;
     float pick = floor(nlRandomf(0.0f, (float)mNumTextures, &nlDefaultSeed));
+    DLListEntry<ImpostorSprite_802D4290*>* head;
+    DLListEntry<ImpostorSprite_802D4290*>* entry;
     int index = (int)pick;
     int current = 0;
     nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
-    DLListEntry<ImpostorSprite_802D4290*>* head = it.m_Head;
-    DLListEntry<ImpostorSprite_802D4290*>* entry = it.m_Curr;
+    head = it.m_Head;
+    entry = it.m_Curr;
     while (entry != 0)
     {
         ImpostorSprite_802D4290* sprite = entry->entry;

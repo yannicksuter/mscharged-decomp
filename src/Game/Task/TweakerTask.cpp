@@ -27,9 +27,9 @@ void TweakerTask::Run(float)
         return;
     }
 
-    if (g_bDisplayNetwork && lbl_806E20D8 != 0)
+    if (g_bDisplayNetwork && g_pNetworkSessionBase != 0)
     {
-        lbl_806E20D8->BaseVirtual50();
+        g_pNetworkSessionBase->BaseVirtual50();
     }
 
     if (lbl_806E2168 != 0)

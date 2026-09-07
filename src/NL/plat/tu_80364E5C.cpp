@@ -27,7 +27,7 @@ void Class_80364E5C::Update(float dt)
         PlatPadStatus_80375ED4* temp = mUnidentified01C;
         mUnidentified01C = mUnidentified020;
         mUnidentified020 = temp;
-        *mUnidentified01C = *fn_80375ED4(lbl_806E2478, m_padIndex);
+        *mUnidentified01C = *fn_80375ED4(g_pPlatPadManager, m_padIndex);
         fn_80364118(&mUnidentified01C->wpad.fsStickX, &mUnidentified01C->wpad.fsStickY);
         fn_80364650(&mUnidentified1D0, &mUnidentified01C->kpad);
 

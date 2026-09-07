@@ -1,4 +1,5 @@
 #include "Game/Formation.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
@@ -31,8 +32,7 @@ struct cGame
     }
 };
 
-extern cGame* lbl_806E0C94;
-#define g_pGame lbl_806E0C94
+extern cGame* g_pGame;
 
 extern "C" unsigned int fn_800387CC(cFielder*);
 extern "C" float fn_8002E1B0(cFielder*);
@@ -44,7 +44,6 @@ extern "C" cFielder* fn_800A8808(cTeam*);
 extern "C" cFielder* fn_800A8884(cTeam*);
 extern "C" void fn_800180F4(cBall*, nlVector3*, float);
 extern "C" float fn_800DFF1C();
-extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void* memset(void*, int, unsigned long);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(InterpreterCore*, void*, int, cTeam*, int);
 int nlPrintf(const char*, ...);
@@ -146,12 +145,12 @@ void FormationManager::LoadFormationSets()
         {
             if (m_FormationSetArray != 0)
             {
-                fn_8004F594(4, "Reload of FormationSets.ini failed, but we've got some loaded already.\n");
+                tDebugPrintManager::Print(DC_AI, "Reload of FormationSets.ini failed, but we've got some loaded already.\n");
                 break;
             }
 
             numTries++;
-            fn_8004F594(4, "WEIRD ASS BUG! Failed to reload FormationSets.ini, trying again %d\n", numTries);
+            tDebugPrintManager::Print(DC_AI, "WEIRD ASS BUG! Failed to reload FormationSets.ini, trying again %d\n", numTries);
         }
     }
 
@@ -476,7 +475,7 @@ bool FormationManager::CalculateFielderPosition(nlVector3& v3DestPosition,
             if (v3FormationPosition[0][i].GetLengthSq3D() == 0.0f
                 && fWeights[i] > 0.0f)
             {
-                fn_8004F594(4, "Formation returned 0,0 as position!\n");
+                tDebugPrintManager::Print(DC_AI, "Formation returned 0,0 as position!\n");
             }
         }
         else
@@ -519,7 +518,7 @@ bool FormationManager::CalculateFielderPosition(nlVector3& v3DestPosition,
 
     if (v3DestPosition.GetLengthSq3D() == 0.0f)
     {
-        fn_8004F594(4, "Formation returned 0,0 as position!\n");
+        tDebugPrintManager::Print(DC_AI, "Formation returned 0,0 as position!\n");
     }
 
     m_CachedPositions[id].vPosition = v3DestPosition;

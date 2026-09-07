@@ -141,16 +141,12 @@ void Volume::fn_802F9B5C()
 void Volume::fn_802F6930(unsigned int definition, void* context, bool negate,
     AudioEffectParameter_802F69A8** output)
 {
-    unsigned int definitionKey = definition;
-    unsigned int key = 0xD2894EC5;
-    ConfigValue_8035B240 value;
-    value.m_Raw = lbl_806E202C->m_Root->fn_8035B240(key);
-    ConfigNode_8035B240* node = (ConfigNode_8035B240*)value.m_Words.m_Value;
-    value.m_Raw = node->fn_8035B240(definitionKey);
-    node = (ConfigNode_8035B240*)value.m_Words.m_Value;
+    ConfigNode_8035B240* node = ConfigFindDefinition_8035B240(definition);
     VolumeParameter_80362EC8* parameter = new VolumeParameter_80362EC8;
     ConfigValue_8035B240* argument = (ConfigValue_8035B240*)context;
     *output = parameter;
+    unsigned int key;
+    ConfigValue_8035B240 value;
     if (argument->m_Words.m_Type == 2)
     {
         key = 0xCE5C5677;

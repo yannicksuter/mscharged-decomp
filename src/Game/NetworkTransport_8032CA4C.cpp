@@ -1,4 +1,5 @@
 #include "Game/NetworkSession.h"
+#include "Game/Sys/debug.h"
 #include "Game/NetworkDebug_80323B2C.h"
 #include "Game/NetworkRandom_803236CC.h"
 
@@ -14,7 +15,6 @@
 
 extern "C"
 {
-    int fn_8004F594(int channel, const char* format, ...);
 }
 
 void RegisterNetworkMessages_80330430();
@@ -57,7 +57,7 @@ void NetworkTransport_8032CA4C::fn_8032CBD0(bool initialize)
     mUnidentified070 = -1;
     mUnidentified074 = 0;
     mUnidentified1C0 = 0;
-    mUnidentified1CC = initialize ? 0 : lbl_806E20D8->GetDirectSocket();
+    mUnidentified1CC = initialize ? 0 : g_pNetworkSessionBase->GetDirectSocket();
     for (int index = 0; index < 8; ++index)
     {
         m_ConnectionPool[index].m_Connection = 0;
@@ -116,7 +116,7 @@ int NetworkTransport_8032CA4C::fn_8032CF60(int value)
     u8* address = mUnidentified1CC->GetLocalAddress();
     if (address == 0)
     {
-        fn_8004F594(16, "LANLobby: Failed to Create Game, failed to get local address!\n");
+        tDebugPrintManager::Print(DC_NETWORK, "LANLobby: Failed to Create Game, failed to get local address!\n");
         return 1;
     }
     mUnidentified07D = true;
@@ -153,7 +153,7 @@ int NetworkTransport_8032CA4C::fn_8032D0F4(int result)
 {
     if (!mUnidentified07D)
     {
-        fn_8004F594(16, "Ignored abort create game..We are not a host\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Ignored abort create game..We are not a host\n");
         return 3;
     }
     mUnidentified07D = false;
@@ -185,12 +185,12 @@ int NetworkTransport_8032CA4C::fn_8032D220(UnidentifiedTransportGame_8032CA4C* g
 {
     if (mUnidentified090 != 0)
     {
-        fn_8004F594(16, "Ignored join current join state %d\n", mUnidentified090);
+        tDebugPrintManager::Print(DC_NETWORK, "Ignored join current join state %d\n", mUnidentified090);
         return 2;
     }
     if (mUnidentified1CC->GetLocalAddress() == 0)
     {
-        fn_8004F594(16, "LANLobby: Failed to Join Game, failed to get local address!\n");
+        tDebugPrintManager::Print(DC_NETWORK, "LANLobby: Failed to Join Game, failed to get local address!\n");
         return 1;
     }
     if (game == 0)
@@ -219,7 +219,7 @@ int NetworkTransport_8032CA4C::fn_8032D220(UnidentifiedTransportGame_8032CA4C* g
             }
             if (game == 0)
             {
-                fn_8004F594(16, "No games to join\n");
+                tDebugPrintManager::Print(DC_NETWORK, "No games to join\n");
                 return 5;
             }
         }
@@ -232,14 +232,14 @@ int NetworkTransport_8032CA4C::fn_8032D220(UnidentifiedTransportGame_8032CA4C* g
             game->mUnidentified0C,
             game->mUnidentified18))
     {
-        fn_8004F594(16, "Attempting connection\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Attempting connection\n");
     }
     else
     {
         m_ConnectionPool[0].m_Connection = 0;
         m_ConnectionPool[0].mUnidentified04 = 0;
         mUnidentified1CC->SocketVirtual10(false);
-        fn_8004F594(16, "Connection failed at outset\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Connection failed at outset\n");
         return 4;
     }
     mUnidentified090 = 1;
@@ -252,7 +252,7 @@ void NetworkTransport_8032CA4C::OnGameStarted()
     mUnidentified1CC->SocketVirtual10(false);
     if (mUnidentified07D)
         mUnidentified080 = 2;
-    fn_8004F594(16, "LANLobby Game Started\n");
+    tDebugPrintManager::Print(DC_NETWORK, "LANLobby Game Started\n");
     fn_8032D5E0();
 }
 
@@ -280,19 +280,19 @@ void NetworkTransport_8032CA4C::Shutdown(bool)
 
 void NetworkTransport_8032CA4C::fn_8032D5E0()
 {
-    fn_8004F594(16, "Dumping %d entries in PeerInfoList\n", mUnidentified1C0);
+    tDebugPrintManager::Print(DC_NETWORK, "Dumping %d entries in PeerInfoList\n", mUnidentified1C0);
     for (int index = 0; index < mUnidentified1C0; ++index)
     {
-        fn_8004F594(16, "Peer %d address %d.%d.%d.%d port %d hoststate %d connInd %d connConf %d\n", index, mUnidentified0A0[index].mUnidentified14[0], mUnidentified0A0[index].mUnidentified14[1], mUnidentified0A0[index].mUnidentified14[2], mUnidentified0A0[index].mUnidentified14[3], mUnidentified0A0[index].mUnidentified20, mUnidentified0A0[index].mUnidentified18, mUnidentified0A0[index].mUnidentified1C, mUnidentified0A0[index].mUnidentified22);
+        tDebugPrintManager::Print(DC_NETWORK, "Peer %d address %d.%d.%d.%d port %d hoststate %d connInd %d connConf %d\n", index, mUnidentified0A0[index].mUnidentified14[0], mUnidentified0A0[index].mUnidentified14[1], mUnidentified0A0[index].mUnidentified14[2], mUnidentified0A0[index].mUnidentified14[3], mUnidentified0A0[index].mUnidentified20, mUnidentified0A0[index].mUnidentified18, mUnidentified0A0[index].mUnidentified1C, mUnidentified0A0[index].mUnidentified22);
     }
-    fn_8004F594(16, "Dumping ConnectionPool contents\n");
+    tDebugPrintManager::Print(DC_NETWORK, "Dumping ConnectionPool contents\n");
     for (int index = 0; index < 8; ++index)
     {
         UnidentifiedTransportConnection* connection = m_ConnectionPool[index].m_Connection;
         if (connection == 0)
-            fn_8004F594(16, "ConnPool %d Status %d\n", index, m_ConnectionPool[index].mUnidentified04);
+            tDebugPrintManager::Print(DC_NETWORK, "ConnPool %d Status %d\n", index, m_ConnectionPool[index].mUnidentified04);
         else
-            fn_8004F594(16, "ConnPool %d Status %d ConnAddr %d.%d.%d.%d\n", index, m_ConnectionPool[index].mUnidentified04, connection->mAddress[0], connection->mAddress[1], connection->mAddress[2], connection->mAddress[3]);
+            tDebugPrintManager::Print(DC_NETWORK, "ConnPool %d Status %d ConnAddr %d.%d.%d.%d\n", index, m_ConnectionPool[index].mUnidentified04, connection->mAddress[0], connection->mAddress[1], connection->mAddress[2], connection->mAddress[3]);
     }
 }
 
@@ -324,7 +324,7 @@ int NetworkTransport_8032CA4C::MachineIdxFromConnection(u32 connection)
     int connectionIndex = UnidentifiedConnectionIndex(entry);
     if (connectionIndex == -1)
     {
-        fn_8004F594(16, "Failed to get connection index from conn addr %d.%d.%d.%d\n", entry->mAddress[0], entry->mAddress[1], entry->mAddress[2], entry->mAddress[3]);
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to get connection index from conn addr %d.%d.%d.%d\n", entry->mAddress[0], entry->mAddress[1], entry->mAddress[2], entry->mAddress[3]);
         return -1;
     }
     for (int index = 0; index < mUnidentified1C0; ++index)
@@ -332,7 +332,7 @@ int NetworkTransport_8032CA4C::MachineIdxFromConnection(u32 connection)
         if (mUnidentified0A0[index].mUnidentified1C == connectionIndex)
             return index;
     }
-    fn_8004F594(16, "Failed to get peer index from connectionIndex %d conn addr %d.%d.%d.%d\n", connectionIndex, entry->mAddress[0], entry->mAddress[1], entry->mAddress[2], entry->mAddress[3]);
+    tDebugPrintManager::Print(DC_NETWORK, "Failed to get peer index from connectionIndex %d conn addr %d.%d.%d.%d\n", connectionIndex, entry->mAddress[0], entry->mAddress[1], entry->mAddress[2], entry->mAddress[3]);
     fn_8032D5E0();
     return -1;
 }
@@ -367,17 +367,17 @@ void NetworkTransport_8032CA4C::OnConnected(u32 connection, int result)
                 int index = UnidentifiedConnectionIndex(entry);
                 if (index == -1)
                 {
-                    fn_8004F594(16, "Connection established %x, but cannot find connection in pool\n", connection);
+                    tDebugPrintManager::Print(DC_NETWORK, "Connection established %x, but cannot find connection in pool\n", connection);
                     return;
                 }
                 m_ConnectionPool[index].mUnidentified04 = 2;
                 mUnidentified1CC->Send(connection, buffer, size, true);
                 mUnidentified090 = 2;
-                fn_8004F594(16, "Sent Join Request to machine %d\n", index);
+                tDebugPrintManager::Print(DC_NETWORK, "Sent Join Request to machine %d\n", index);
             }
             else
             {
-                fn_8004F594(16, "Join failed because ConnectionEstablished returned error %d\n", result);
+                tDebugPrintManager::Print(DC_NETWORK, "Join failed because ConnectionEstablished returned error %d\n", result);
                 mUnidentified090 = 0;
                 mUnidentified094 = false;
                 int index = UnidentifiedConnectionIndex(entry);
@@ -396,13 +396,13 @@ void NetworkTransport_8032CA4C::OnConnected(u32 connection, int result)
             {
                 int index = UnidentifiedConnectionIndex(entry);
                 if (index == -1)
-                    fn_8004F594(16, "Connection established %x, but cannot find connection in pool\n", connection);
+                    tDebugPrintManager::Print(DC_NETWORK, "Connection established %x, but cannot find connection in pool\n", connection);
                 else
                     m_ConnectionPool[index].mUnidentified04 = 2;
             }
             else
             {
-                fn_8004F594(16, "ConnectionEstablished returned error %d.  Peer to peer connection failed.\n", result);
+                tDebugPrintManager::Print(DC_NETWORK, "ConnectionEstablished returned error %d.  Peer to peer connection failed.\n", result);
                 int index = UnidentifiedConnectionIndex(entry);
                 if (index != -1)
                 {
@@ -412,10 +412,10 @@ void NetworkTransport_8032CA4C::OnConnected(u32 connection, int result)
             }
         }
         else
-            fn_8004F594(16, "Ignoring connection established notification, not in peer peer topology, client state = %d ConnResult = %d\n", mUnidentified090, result);
+            tDebugPrintManager::Print(DC_NETWORK, "Ignoring connection established notification, not in peer peer topology, client state = %d ConnResult = %d\n", mUnidentified090, result);
     }
     else
-        fn_8004F594(16, "Ignoring connection established notification, host state = %d ConnResult = %d\n", mUnidentified080, result);
+        tDebugPrintManager::Print(DC_NETWORK, "Ignoring connection established notification, host state = %d ConnResult = %d\n", mUnidentified080, result);
 }
 
 int NetworkTransport_8032CA4C::ShouldAcceptConnection(u32 connection, u8* address)
@@ -423,12 +423,12 @@ int NetworkTransport_8032CA4C::ShouldAcceptConnection(u32 connection, u8* addres
     int index = UnidentifiedFreeConnectionIndex();
     if (index == -1)
     {
-        fn_8004F594(16, "Rejected connection attempt from %d.%d.%d.%d because no free connection in pool\n", address[0], address[1], address[2], address[3]);
+        tDebugPrintManager::Print(DC_NETWORK, "Rejected connection attempt from %d.%d.%d.%d because no free connection in pool\n", address[0], address[1], address[2], address[3]);
         return 0;
     }
     if (mUnidentified07D)
     {
-        fn_8004F594(16, "Connection attempt accepted by host.  Address %d.%d.%d.%d assigned to connection pool %d\n", address[0], address[1], address[2], address[3], index);
+        tDebugPrintManager::Print(DC_NETWORK, "Connection attempt accepted by host.  Address %d.%d.%d.%d assigned to connection pool %d\n", address[0], address[1], address[2], address[3], index);
         m_ConnectionPool[index].m_Connection = (UnidentifiedTransportConnection*)connection;
         m_ConnectionPool[index].mUnidentified04 = 2;
         return 1;
@@ -440,19 +440,19 @@ int NetworkTransport_8032CA4C::ShouldAcceptConnection(u32 connection, u8* addres
         {
             if (memcmp(mUnidentified0A0[peer].mUnidentified14, address, 4) == 0)
             {
-                fn_8004F594(16, "Connection attempt accepted by client.  Address %d.%d.%d.%d assigned to connection pool %d\n", address[0], address[1], address[2], address[3], index);
+                tDebugPrintManager::Print(DC_NETWORK, "Connection attempt accepted by client.  Address %d.%d.%d.%d assigned to connection pool %d\n", address[0], address[1], address[2], address[3], index);
                 m_ConnectionPool[index].m_Connection = (UnidentifiedTransportConnection*)connection;
                 m_ConnectionPool[index].mUnidentified04 = 2;
                 mUnidentified0A0[peer].mUnidentified1C = index;
                 return 1;
             }
         }
-        fn_8004F594(16, "Rejected client-client connection attempt from %d.%d.%d.%d because from unknown client\n", address[0], address[1], address[2], address[3]);
+        tDebugPrintManager::Print(DC_NETWORK, "Rejected client-client connection attempt from %d.%d.%d.%d because from unknown client\n", address[0], address[1], address[2], address[3]);
         fn_8032D5E0();
         return 0;
     }
 
-    fn_8004F594(16, "Rejected connection attempt from %d.%d.%d.%d because I am not a host and am not in peer-peer topology\n", address[0], address[1], address[2], address[3]);
+    tDebugPrintManager::Print(DC_NETWORK, "Rejected connection attempt from %d.%d.%d.%d because I am not a host and am not in peer-peer topology\n", address[0], address[1], address[2], address[3]);
     return 0;
 }
 
@@ -469,22 +469,22 @@ void NetworkTransport_8032CA4C::OnConnectionClosed(u32 connection, int)
             {
                 if (mUnidentified0A0[peer].mUnidentified1C == index)
                 {
-                    fn_8004F594(16, "I peer %d (%s) lost connection to peer %d\n", mUnidentified070, mUnidentified07D ? "host" : "client", peer);
+                    tDebugPrintManager::Print(DC_NETWORK, "I peer %d (%s) lost connection to peer %d\n", mUnidentified070, mUnidentified07D ? "host" : "client", peer);
                     mUnidentified0A0[peer].mUnidentified1C = -1;
                     foundPeer = true;
                 }
             }
             if (!foundPeer)
-                fn_8004F594(16, "Lost connection. Failed to find which peer was using connection pool %d\n", index);
+                tDebugPrintManager::Print(DC_NETWORK, "Lost connection. Failed to find which peer was using connection pool %d\n", index);
             m_ConnectionPool[index].m_Connection = 0;
             m_ConnectionPool[index].mUnidentified04 = 0;
             foundConnection = true;
         }
     }
     if (!foundConnection)
-        fn_8004F594(16, "Lost connection but failed to find connection pool associated with that connection\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Lost connection but failed to find connection pool associated with that connection\n");
     else if (!foundPeer)
-        fn_8004F594(16, "Because did not find peer using this connection pool, just return\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Because did not find peer using this connection pool, just return\n");
     else if (mUnidentified07D)
     {
         if (mUnidentified054 != 0)
@@ -500,7 +500,7 @@ void NetworkTransport_8032CA4C::fn_8032E31C(const void* data)
     u8* address = mUnidentified1CC->GetLocalAddress();
     if (address == 0)
     {
-        fn_8004F594(16, "LANLobby: Not sending found game message because have no local address!\n");
+        tDebugPrintManager::Print(DC_NETWORK, "LANLobby: Not sending found game message because have no local address!\n");
         return;
     }
     u16 port = mUnidentified1CC->GetLocalPort();
@@ -585,7 +585,7 @@ void NetworkTransport_8032CA4C::Update(float dt)
             float elapsed = nlGetTickerDifference(mUnidentified08C, nlGetTicker());
             if (elapsed > g_fLANConfirmConnectionTimeout)
             {
-                fn_8004F594(16, "Confirm connections timed out after %f ms\n", elapsed);
+                tDebugPrintManager::Print(DC_NETWORK, "Confirm connections timed out after %f ms\n", elapsed);
                 if (mUnidentified054 != 0)
                     mUnidentified054->UnidentifiedVirtual08(9);
                 mState = 0;
@@ -606,13 +606,13 @@ void NetworkTransport_8032CA4C::Update(float dt)
             if (m_ConnectionPool[index].m_Connection != 0)
             {
                 mUnidentified1CC->Send((u32)m_ConnectionPool[index].m_Connection, buffer, size, true);
-                fn_8004F594(16, "Sent ready to launch confirm\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Sent ready to launch confirm\n");
             }
             else
-                fn_8004F594(16, "Failed to send ready to launch confirm, m_ConnectionPool[connectionIndex].m_Connection is NULL\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Failed to send ready to launch confirm, m_ConnectionPool[connectionIndex].m_Connection is NULL\n");
         }
         else
-            fn_8004F594(16, "Failed to send ready to launch confirm, no connection to host!\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Failed to send ready to launch confirm, no connection to host!\n");
         mUnidentified094 = false;
     }
 }
@@ -659,16 +659,16 @@ void NetworkTransport_8032CA4C::fn_8032E8C0()
             if (m_ConnectionPool[index].mUnidentified04 != 0)
             {
                 mUnidentified1CC->Send((u32)m_ConnectionPool[index].m_Connection, buffer, size, true);
-                fn_8004F594(16, "Sent ready to launch request to peer %d\n", peer);
+                tDebugPrintManager::Print(DC_NETWORK, "Sent ready to launch request to peer %d\n", peer);
             }
             else
             {
-                fn_8004F594(16, "Failed to send launch request to peer %d connIndx %d is not in use\n", peer, index);
+                tDebugPrintManager::Print(DC_NETWORK, "Failed to send launch request to peer %d connIndx %d is not in use\n", peer, index);
                 fn_8032D5E0();
             }
         }
         else
-            fn_8004F594(16, "Failed to send launch request to peer %d connectionIndex == %d\n", peer, index);
+            tDebugPrintManager::Print(DC_NETWORK, "Failed to send launch request to peer %d connectionIndex == %d\n", peer, index);
     }
 }
 
@@ -795,13 +795,13 @@ void NetworkTransport_8032CA4C::fn_8032F084(int index, NetworkMessageType4_80533
             fn_8032ED28(mUnidentified1C0 - 1);
         if (mUnidentified058 != 0)
             mUnidentified058->UnidentifiedVirtual00();
-        fn_8004F594(16, "Approved a join request\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Approved a join request\n");
         fn_8032D5E0();
     }
     else
     {
         fn_8032EE7C(connection, false);
-        fn_8004F594(16, "Rejected a join request\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Rejected a join request\n");
     }
 }
 
@@ -809,7 +809,7 @@ void NetworkTransport_8032CA4C::fn_8032F2AC(int index, NetworkMessageType5_80533
 {
     if (mUnidentified090 != 2)
     {
-        fn_8004F594(16, "Ignoring join response because in join state %d\n", mUnidentified090);
+        tDebugPrintManager::Print(DC_NETWORK, "Ignoring join response because in join state %d\n", mUnidentified090);
         return;
     }
     if (message->mUnidentified0E)
@@ -850,7 +850,7 @@ void NetworkTransport_8032CA4C::fn_8032F2AC(int index, NetworkMessageType5_80533
         mUnidentified090 = 3;
         if (mUnidentified054 != 0)
             mUnidentified054->UnidentifiedVirtual04(0);
-        fn_8004F594(16, "Successfully joined game.\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Successfully joined game.\n");
         fn_8032D5E0();
         if (RosterVirtual08() == 0)
         {
@@ -860,7 +860,7 @@ void NetworkTransport_8032CA4C::fn_8032F2AC(int index, NetworkMessageType5_80533
             int size = lbl_806E2100->fn_8032C830(&response, buffer, sizeof(buffer));
             u32 connection = GetMachineAid(0);
             if (connection == 0)
-                fn_8004F594(16, "Could not send client confirmed join no connection to host\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Could not send client confirmed join no connection to host\n");
             else
                 mUnidentified1CC->Send(connection, buffer, size, true);
         }
@@ -874,7 +874,7 @@ void NetworkTransport_8032CA4C::fn_8032F2AC(int index, NetworkMessageType5_80533
         mUnidentified070 = -1;
         if (mUnidentified054 != 0)
             mUnidentified054->UnidentifiedVirtual04(6);
-        fn_8004F594(16, "Join was refused.\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Join was refused.\n");
     }
 }
 
@@ -891,14 +891,14 @@ void NetworkTransport_8032CA4C::fn_8032F6B4(NetworkMessageType7_80533440* messag
     mUnidentified0A0[peer].mUnidentified22 = false;
     mUnidentified0A0[peer].mUnidentified1C = -1;
     ++mUnidentified1C0;
-    fn_8004F594(16, "ProcessGamePeerAdded peer %d added\n", peer);
+    tDebugPrintManager::Print(DC_NETWORK, "ProcessGamePeerAdded peer %d added\n", peer);
     fn_8032D5E0();
     if (mUnidentified00C == 0)
     {
         int index = UnidentifiedFreeConnectionIndex();
         if (index == -1)
         {
-            fn_8004F594(16, "Unable to connect to just added peer, no pool connection space\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Unable to connect to just added peer, no pool connection space\n");
             return;
         }
         mUnidentified0A0[peer].mUnidentified1C = index;
@@ -906,13 +906,13 @@ void NetworkTransport_8032CA4C::fn_8032F6B4(NetworkMessageType7_80533440* messag
         if (mUnidentified1CC->Connect(&m_ConnectionPool[index].m_Connection,
                 info.mUnidentified00,
                 info.mUnidentified04))
-            fn_8004F594(16, "Attempting peer-peer connection to other client\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Attempting peer-peer connection to other client\n");
         else
         {
             m_ConnectionPool[index].m_Connection = 0;
             m_ConnectionPool[index].mUnidentified04 = 0;
             mUnidentified0A0[peer].mUnidentified1C = -1;
-            fn_8004F594(16, "Connection failed to other client at outset\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Connection failed to other client at outset\n");
         }
     }
 }
@@ -940,7 +940,7 @@ int NetworkTransport_8032CA4C::ReceiverVirtual00(UnidentifiedNetworkMessage* mes
             if (index >= 0 && index < 8)
                 fn_8032F084(index, static_cast<NetworkMessageType4_80533468*>(message));
             else
-                fn_8004F594(16, "Ignored join request because did not find connection in pool\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Ignored join request because did not find connection in pool\n");
         }
         break;
     case 5:
@@ -950,7 +950,7 @@ int NetworkTransport_8032CA4C::ReceiverVirtual00(UnidentifiedNetworkMessage* mes
             if (index >= 0 && index < 8)
                 fn_8032F2AC(index, static_cast<NetworkMessageType5_80533454*>(message));
             else
-                fn_8004F594(16, "Ignored join response because did not find connection in pool\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Ignored join response because did not find connection in pool\n");
         }
         break;
     case 7:
@@ -960,13 +960,13 @@ int NetworkTransport_8032CA4C::ReceiverVirtual00(UnidentifiedNetworkMessage* mes
             if (index >= 0 && index < 8)
                 fn_8032F6B4(static_cast<NetworkMessageType7_80533440*>(message));
             else
-                fn_8004F594(16, "Ignored game peer added because did not find connection in pool\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Ignored game peer added because did not find connection in pool\n");
         }
         break;
     case 10:
         if (!mUnidentified07D)
         {
-            fn_8004F594(16, "Received ready to launch request\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Received ready to launch request\n");
             if (fn_8032EA20())
             {
                 NetworkMessageType11_80533404 response;
@@ -979,13 +979,13 @@ int NetworkTransport_8032CA4C::ReceiverVirtual00(UnidentifiedNetworkMessage* mes
                     if (m_ConnectionPool[index].m_Connection != 0)
                     {
                         mUnidentified1CC->Send((u32)m_ConnectionPool[index].m_Connection, buffer, size, true);
-                        fn_8004F594(16, "Sent ready to launch confirm\n");
+                        tDebugPrintManager::Print(DC_NETWORK, "Sent ready to launch confirm\n");
                     }
                     else
-                        fn_8004F594(16, "Failed to send ready to launch confirm, m_ConnectionPool[connectionIndex].m_Connection is NULL\n");
+                        tDebugPrintManager::Print(DC_NETWORK, "Failed to send ready to launch confirm, m_ConnectionPool[connectionIndex].m_Connection is NULL\n");
                 }
                 else
-                    fn_8004F594(16, "Failed to send ready to launch confirm, no connection to host!\n");
+                    tDebugPrintManager::Print(DC_NETWORK, "Failed to send ready to launch confirm, no connection to host!\n");
                 mUnidentified094 = false;
             }
             else
@@ -999,10 +999,10 @@ int NetworkTransport_8032CA4C::ReceiverVirtual00(UnidentifiedNetworkMessage* mes
             if (peer > 0 && peer < mUnidentified1C0)
             {
                 mUnidentified0A0[peer].mUnidentified22 = static_cast<NetworkMessageType11_80533404*>(message)->mUnidentified08;
-                fn_8004F594(16, "Received ready to launch confirm from peer %d\n", peer);
+                tDebugPrintManager::Print(DC_NETWORK, "Received ready to launch confirm from peer %d\n", peer);
             }
             else
-                fn_8004F594(16, "Ignored Ready To Launch Confirm because did not find peer it's from\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Ignored Ready To Launch Confirm because did not find peer it's from\n");
         }
         break;
     case 12:
@@ -1017,7 +1017,7 @@ int NetworkTransport_8032CA4C::ReceiverVirtual00(UnidentifiedNetworkMessage* mes
                     fn_8032ED28(reply->mUnidentified08);
             }
             else
-                fn_8004F594(16, "Ignored ClientConfirmedJoin because did not find peer it's from\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Ignored ClientConfirmedJoin because did not find peer it's from\n");
         }
         break;
     }

@@ -89,7 +89,7 @@ Replay::Replay(char* memory, int memorySize, int maxFrameSize)
     mReels[0].mBegin = mReels[0].mLast = mFree;
 
     renderMemoryLayout
-        = fn_802C2C84("/user/draw_replay_bar", false);
+        = GetTweakBool("/user/draw_replay_bar", false);
 }
 
 Replay::~Replay()

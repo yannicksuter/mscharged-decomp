@@ -3,6 +3,6 @@
 
 class cGlobalPad;
 
-void fn_8013A0A8(cGlobalPad* pad);
+void StopRumbleAction(cGlobalPad* pad);
 
 #endif // UNCLASSIFIED_TU_80139B18_H

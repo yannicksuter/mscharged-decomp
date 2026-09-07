@@ -26,7 +26,7 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     UnidentifiedEventRegistry;
 
 extern CollisionSpace* g_CollisionSpace;
-extern UnidentifiedEventRegistry* lbl_806E1D90;
+extern UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
 extern "C" EmissionController* fn_802E81A0(
     EmissionManager*, unsigned long, const EffectsGroup*);
@@ -476,9 +476,9 @@ PhysicsPatchManager_801740D0::PhysicsPatchManager_801740D0()
 
     Function<void*> callback(fn_8017472C);
     UnidentifiedEventBase** foundEvent;
-    unsigned int hash = fn_802B289C("ResetEffects", -1);
+    unsigned int hash = HashEventName("ResetEffects", -1);
     foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
     ((UnidentifiedTypedEvent<void>*)event)->Add(callback, (unsigned int)&mUnidentified0F0, -1);
 }

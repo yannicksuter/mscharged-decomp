@@ -5,6 +5,7 @@
 #include "Game/DB/tu_8010A40C.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
+#include "Game/FE/feManager.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"
@@ -33,14 +34,13 @@ extern "C" void fn_800A71A8(cTeam* team);
 extern "C" void fn_801CC888(float dt);
 extern "C" void fn_801CC988(TU80219248Component* component, TLComponentInstance* instance);
 extern "C" void fn_801CC9B0(TU80219248Component* component, TLComponentInstance* instance, int value);
-extern "C" void fn_801C3BEC();
 extern "C" Presentation* fn_801FEEAC();
 extern "C" bool fn_80273B00();
 extern "C" TLInstance* fn_8030677C(FEPresentation* presentation, unsigned long level1, unsigned long level2,
     unsigned long level3, unsigned long level4, unsigned long level5, unsigned long level6);
 extern TLComponentInstance* lbl_80578450[4];
 extern BaseGameSceneManager* lbl_806E1838;
-extern BaseGameSceneManager* lbl_806E1860;
+extern BaseGameSceneManager* g_pOverlayManager;
 extern TLComponentInstance lbl_80580030;
 extern TLComponentInstance lbl_80580138;
 extern TLInstance lbl_80580248;
@@ -1040,10 +1040,10 @@ void SHChooseSides2::Proceed()
             GameInfoManager::Instance()->mCurrentDifficulty[1],
             4,
             false);
-        lbl_806E1860->Push((SceneList)80, SCREEN_BACK, true);
+        g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
     }
 
-    fn_801C3BEC();
+    FrontEnd::SetControllerState();
 }
 
 const char* lbl_8051CAFC[3] = { "sk_2", "sk_1", "sk_0" };
@@ -1091,7 +1091,7 @@ void SHChooseSides2::fn_8021E76C(int, void*)
 
     if (mContext == PAUSE)
     {
-        FEPopupMenu* popup = (FEPopupMenu*)lbl_806E1860->Push(
+        FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(
             (SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3B, Function<FnVoidVoid>(FEPopupMenu::Nothing));
         popup->mUnidentified9A1 = true;
@@ -1256,7 +1256,7 @@ bool SHChooseSides2::fn_8021EED8(bool playSound)
     bool removedController = false;
     for (int i = 0; i < 4; ++i)
     {
-        if (mPlayingSides[i] != -1 && g_pFEInput->IsConnected((eFEINPUT_PAD)i) && !fn_80219E0C(i))
+        if (mPlayingSides[i] != -1 && g_pFEInput->IsConnected((eFEINPUT_PAD)i) && !IsFreeStylePad(i))
         {
             fn_8021E910(i);
             removedController = true;
@@ -1270,7 +1270,7 @@ bool SHChooseSides2::fn_8021EED8(bool playSound)
             fn_801CBCA0(0x9F9BF00F, 0, 0, 1);
         }
 
-        FEPopupMenu* popup = (FEPopupMenu*)lbl_806E1860->Push(
+        FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(
             (SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3C, Function<FnVoidVoid>(FEPopupMenu::Nothing));
         popup->mUnidentified9A1 = true;

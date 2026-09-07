@@ -41,6 +41,7 @@ public:
     void fn_803009AC(const Callback& callback);
     void fn_80300A50(const Callback& callback);
     void fn_80206B54();
+    void fn_80260748() { mDisabled = false; }
 
     virtual void fn_80301BE8(int index, void* context);
     virtual void fn_80301BA8(int index, void* context);
@@ -145,6 +146,14 @@ inline float TU80300104Component::fn_80219678() const
 inline bool TU80300104Base::fn_80219668()
 {
     return !mDisabled;
+}
+
+inline void TU80300104Base::fn_80206B54()
+{
+    mDisabled = true;
+    TU80300104Event event;
+    for (int i = 0; i < 4; ++i)
+        mPreviousEvents[i] = event;
 }
 
 #endif // UNCLASSIFIED_TU_80300104_H

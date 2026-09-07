@@ -612,7 +612,7 @@ extern "C" void fn_802BCE50(const ShapeRender* arg0, const nlVector3& p0,
             v3point.x = p0.x + fScaleX * (v3point.x * fRadius);
             v3point.y = p0.y + fScaleY * (v3point.y * fRadius);
             mesh.Colour(colour);
-            mesh.Vertex(v3point.x, v3point.y, v3point.z);
+            mesh.Vertex(v3point);
             fRadians += 6.2831855f / (numVerts - 1);
         }
 
@@ -631,6 +631,11 @@ extern "C" void fn_802BCE50(const ShapeRender* arg0, const nlVector3& p0,
 void ShapeRender::DrawRectangle2D(float x, float y, float w, float h,
     float z, const nlColour& colour, int view) const
 {
+    float bottom;
+    float right;
+    glPoly2 poly;
+    GLView* v;
+
     glSetDefaultState(false);
     glSetRasterState(GLS_AlphaBlend, 1);
     glSetRasterState(GLS_AlphaTest, 1);
@@ -638,15 +643,11 @@ void ShapeRender::DrawRectangle2D(float x, float y, float w, float h,
     glSetCurrentRasterState(glHandleizeRasterState());
     glSetCurrentTexture(glGetTexture("global/white"), GLTT_Diffuse);
 
-    float right = y + h;
-    float bottom = x + w;
+    right = y + h;
+    bottom = x + w;
 
-    glPoly2 poly;
     poly.m_pos[0].x = x;
     poly.m_pos[0].y = y;
-
-    glPoly2* pPoly = &poly;
-
     poly.m_pos[1].x = x;
     poly.m_pos[1].y = right;
     poly.m_pos[2].x = bottom;
@@ -661,7 +662,6 @@ void ShapeRender::DrawRectangle2D(float x, float y, float w, float h,
 
     poly.depth = z;
 
-    GLView* v;
     if (view == -1)
     {
         v = GetDebugFontView();
@@ -670,7 +670,7 @@ void ShapeRender::DrawRectangle2D(float x, float y, float w, float h,
     {
         v = m_eView;
     }
-    pPoly->Attach(v, 0, 0);
+    poly.Attach(v, 0, 0);
 }
 
 void ShapeRender::Initialize(void* resource)

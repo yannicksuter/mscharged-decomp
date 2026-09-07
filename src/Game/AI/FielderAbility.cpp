@@ -82,7 +82,7 @@ extern "C" void fn_801B897C(cFielder* pFielder);
 extern "C" void fn_801BAF98(cFielder* pFielder);
 extern "C" void fn_801BB0DC(cFielder* pFielder);
 extern "C" void fn_801BB120(cFielder* pFielder);
-extern "C" bool fn_80332770(void);
+extern "C" bool IsNetworkOrRecordedGame(void);
 
 void cFielder::fn_8004F828()
 {
@@ -142,10 +142,10 @@ void cFielder::fn_8004FA34()
         event.fParam1 = lbl_806DB9F4;
         event.fParam2 = lbl_806DB9F8;
         event.pFielder = this;
-        fn_80060210(lbl_806E0C94, &event);
+        fn_80060210(g_pGame, &event);
     }
 
-    if (!lbl_806E0C94->IsGameplayOrOvertime())
+    if (!g_pGame->IsGameplayOrOvertime())
     {
         StartRunning();
     }
@@ -179,7 +179,7 @@ void cFielder::fn_8004FB04()
     event.fParam1 = lbl_806DB9F4;
     event.fParam2 = lbl_806DB9F8;
     event.pFielder = this;
-    fn_80060014(lbl_806E0C94, &event);
+    fn_80060014(g_pGame, &event);
 
     float fParam = FMAX(lbl_806DB9F4, lbl_806DB9F8);
     fParam += 0.5f;
@@ -224,7 +224,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
         event.fParam1 = lbl_806DB9F4;
         event.fParam2 = lbl_806DB9F8;
         event.pFielder = this;
-        fn_8005FE18(lbl_806E0C94, &event);
+        fn_8005FE18(g_pGame, &event);
     }
     else if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DBA00))
     {
@@ -234,7 +234,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
         event.fParam2 = lbl_806DB9F8;
         fn_8002D2C4(&event.v3Position, lbl_806DB9F4, 1);
         event.pFielder = this;
-        fn_8005FC1C(lbl_806E0C94, &event);
+        fn_8005FC1C(g_pGame, &event);
 
         if (lbl_806E0C7C)
         {
@@ -249,7 +249,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
     else if (m_pCurrentAnimController->TestFrameTrigger(
                  1.0f + lbl_806DBA00))
     {
-        if (!fn_80332770())
+        if (!IsNetworkOrRecordedGame())
         {
             fn_80111D7C(lbl_806DB9F0);
         }
@@ -264,7 +264,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
         event.fParam1 = lbl_806DB9F4;
         event.fParam2 = lbl_806DB9F8;
         event.pFielder = this;
-        fn_80060210(lbl_806E0C94, &event);
+        fn_80060210(g_pGame, &event);
     }
 
     if (ShouldStartCrossBlend(4))

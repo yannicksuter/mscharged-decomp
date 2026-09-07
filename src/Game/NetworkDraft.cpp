@@ -1,4 +1,5 @@
 #include "Game/NetworkDraft.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
@@ -10,7 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern "C" int fn_8004F594(int channel, const char* format, ...);
 extern "C" bool fn_8025BD88();
 
 extern int lbl_80519920[12];
@@ -173,7 +173,7 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
     mSideDrafted[0] = false;
     mSideDrafted[1] = false;
 
-    fn_8004F594(16, "Starting Draft num Teams %d\n", mTeamCount);
+    tDebugPrintManager::Print(DC_NETWORK, "Starting Draft num Teams %d\n", mTeamCount);
     for (int teamIndex = 0; teamIndex < mTeamCount; ++teamIndex)
     {
         NetworkDraftTeam& team = mTeams[teamIndex];
@@ -204,16 +204,17 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
             mMyTeamIndex = teamIndex;
         }
     }
-    fn_8004F594(16, "Sorted Draft MyTeamIndex %d MyMachineIndex %d\n",
+    tDebugPrintManager::Print(DC_NETWORK, "Sorted Draft MyTeamIndex %d MyMachineIndex %d\n",
         mMyTeamIndex, mLocalMachineIndex);
     for (int teamIndex = 0; teamIndex < mTeamCount; ++teamIndex)
     {
         char name[12];
         nlWcsToStr(mTeams[teamIndex].mPlayers[0].mName, name, 11);
-        fn_8004F594(16, "%s Rank %d. %d-%d MyPeerIndex %d\n", name,
-            mTeams[teamIndex].mPlayers[0].mHead.mUnidentified04[0],
-            mTeams[teamIndex].mPlayers[0].mHead.mUnidentified04[1],
-            mTeams[teamIndex].mPlayers[0].mHead.mUnidentified04[2],
+        tDebugPrintManager::Print(DC_NETWORK,
+            "%s Rank %d. %d-%d MyPeerIndex %d\n", name,
+            mTeams[teamIndex].mPlayers[0].mHead.mScore,
+            mTeams[teamIndex].mPlayers[0].mHead.mDisplayRank,
+            mTeams[teamIndex].mPlayers[0].mHead.mWins,
             mTeams[teamIndex].mPlayers[0].mPeerIndex);
     }
     mNextDraftingTeam = -1;
@@ -286,8 +287,8 @@ int NetworkDraft::CompareDraftTeams(const void* left, const void* right)
 {
     const NetworkDraftTeam* leftTeam = (const NetworkDraftTeam*)left;
     const NetworkDraftTeam* rightTeam = (const NetworkDraftTeam*)right;
-    int leftRank = leftTeam->mPlayers[0].mHead.mUnidentified04[0];
-    int rightRank = rightTeam->mPlayers[0].mHead.mUnidentified04[0];
+    int leftRank = leftTeam->mPlayers[0].mHead.mScore;
+    int rightRank = rightTeam->mPlayers[0].mHead.mScore;
     if (leftRank > rightRank)
     {
         return 1;
@@ -383,7 +384,7 @@ void NetworkDraft::AdvanceDraftTeam()
     if (mCurrentDraftingTeam == mMyTeamIndex)
     {
         int captain = GetRandomAvailableCaptain();
-        fn_8004F594(16, "Found initial captain choice %d\n", captain);
+        tDebugPrintManager::Print(DC_NETWORK, "Found initial captain choice %d\n", captain);
         mTeams[mCurrentDraftingTeam].mCaptain = captain;
     }
 }
@@ -428,7 +429,7 @@ void NetworkDraft::SendCaptainChoice()
     message.mCaptain = mTeams[mCurrentDraftingTeam].mCaptain;
     u8 buffer[0x20];
     int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
-    fn_8004F594(16,
+    tDebugPrintManager::Print(DC_NETWORK,
         "Sending NetworkDraftPickedCaptain team %d captain %d\n",
         (s8)message.mTeamIndex, message.mCaptain);
     SendToAllDraftPlayers(buffer, size);
@@ -492,19 +493,19 @@ int NetworkDraft::ReceiverVirtual00(UnidentifiedNetworkMessage* message)
             (NetMessageDraftPickedCaptain*)message;
         if (mState != NET_DRAFT_CAPTAINS)
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Ignoring ReceivedDraftPickedCaptain because in draft state %d\n",
                 mState);
         }
         else if ((s8)pickedCaptain->mTeamIndex != mNextDraftingTeam)
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Ignoring ReceivedDraftPickedCaptain because expected update from team %d but got from %d\n",
                 mNextDraftingTeam, (s8)pickedCaptain->mTeamIndex);
         }
         else if (mNextDraftingTeam < 0 || mNextDraftingTeam >= mTeamCount)
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Ignoring ReceivedDraftPickedCaptain because m_nCurrentDraftingTeam is bad value %d\n",
                 mNextDraftingTeam);
         }
@@ -520,14 +521,14 @@ int NetworkDraft::ReceiverVirtual00(UnidentifiedNetworkMessage* message)
             (NetMessageDraftPickedSidekicks*)message;
         if (mState != NET_DRAFT_CAPTAINS && mState != NET_DRAFT_SIDEKICKS)
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Ignoring ReceivedDraftPickedSidekicks because in draft state %d\n",
                 mState);
         }
         else if ((s8)pickedSidekicks->mTeamIndex < 0
             || (s8)pickedSidekicks->mTeamIndex >= mTeamCount)
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Ignoring ReceivedDraftPickedSidekicks because pDraftPickedSidekicks m_nMyTeamIndex is bad value %d\n",
                 (s8)pickedSidekicks->mTeamIndex);
         }
@@ -544,16 +545,16 @@ int NetworkDraft::ReceiverVirtual00(UnidentifiedNetworkMessage* message)
 
 void NetworkDraft::SendToAllDraftPlayers(void* data, int size)
 {
-    if (lbl_806E20D8 == 0)
+    if (g_pNetworkSessionBase == 0)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "No lobby found, cannot send message of size %d to all machines in draft\n",
             size);
         return;
     }
 
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
-    NetworkSocket_801246E4* socket = lbl_806E20D8->GetDirectSocket();
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    NetworkSocket_801246E4* socket = g_pNetworkSessionBase->GetDirectSocket();
     for (int team = 0; team < mTeamCount; ++team)
     {
         for (int player = 0; player < mTeams[team].mPlayerCount; ++player)
@@ -570,7 +571,7 @@ void NetworkDraft::SendToAllDraftPlayers(void* data, int size)
             }
             else if (aid == 0)
             {
-                fn_8004F594(16,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Warning: Cannot send message to draft team %d player %d of size %d - no connection\n",
                     team, player, size);
             }

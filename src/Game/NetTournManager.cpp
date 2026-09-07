@@ -1,4 +1,5 @@
 #include "Game/NetTournManager.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/GameInfo.h"
@@ -11,7 +12,6 @@
 
 #include <string.h>
 
-extern "C" int fn_8004F594(int channel, const char* format, ...);
 extern "C" void* fn_802B1C4C(unsigned long size);
 extern "C" void fn_802B1D4C(void* p, unsigned long size);
 
@@ -359,7 +359,7 @@ void NetTournManager::GenerateFirstRoundSeedings(
         seedings[order[i]] = i;
     }
 
-    fn_8004F594(16,
+    tDebugPrintManager::Print(DC_NETWORK,
         "Generated 1st Rnd Seedings: %d %d %d %d %d %d %d %d\n",
         seedings[0], seedings[1], seedings[2], seedings[3], seedings[4],
         seedings[5], seedings[6], seedings[7]);
@@ -418,7 +418,7 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
 {
     if (message->mUnidentified1B == 0)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "NetTournManager discarded NetworkStartGame Msg because not a tournament game\n");
         return;
     }
@@ -431,7 +431,7 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
     u8 gameBuffer[0xFF];
     u8 buffer[0xFF];
     NetMessageTournamentLoadingState loading(mLocalMachineIndex, false);
-    fn_8004F594(16, "NotifyLoadingToGame called on machine %d\n",
+    tDebugPrintManager::Print(DC_NETWORK, "NotifyLoadingToGame called on machine %d\n",
         mLocalMachineIndex);
     int size = lbl_806E2100->fn_8032C830(&loading, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
@@ -480,10 +480,10 @@ bool NetTournManager::SendTournamentGameStart(NetworkTournamentGame* game)
 
 void NetTournManager::SendToAllTournamentMachines(void* data, int size)
 {
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     if (roster == 0)
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "No lobby found, cannot send message of size %d to all machines in tournament\n",
             size);
         return;
@@ -494,17 +494,17 @@ void NetTournManager::SendToAllTournamentMachines(void* data, int size)
         u32 aid = roster->GetMachineAid(machine);
         if (aid == 0xFFFFFFFF)
         {
-            lbl_806E20D8->GetDirectSocket()->Receive(data, size);
+            g_pNetworkSessionBase->GetDirectSocket()->Receive(data, size);
         }
         else if (aid == 0)
         {
-            fn_8004F594(16,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Warning: Cannot send message to tournament midx %d of size %d - no connection\n",
                 machine, size);
         }
         else
         {
-            lbl_806E20D8->GetDirectSocket()->Send(aid, data, size, true);
+            g_pNetworkSessionBase->GetDirectSocket()->Send(aid, data, size, true);
         }
     }
 }
@@ -782,7 +782,7 @@ void NetTournManager::NotifyFinishedLoadingToKnockout()
 {
     u8 buffer[0xFF];
     NetMessageTournamentLoadingState message(mLocalMachineIndex, true);
-    fn_8004F594(16,
+    tDebugPrintManager::Print(DC_NETWORK,
         "NotifyFinishedLoadingToKnockout called on machine %d\n",
         mLocalMachineIndex);
     int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
@@ -826,11 +826,11 @@ void NetTournManager::ResetGameProgressUpdateTimer(int)
 
 int NetTournManager::ReceiverVirtual00(UnidentifiedNetworkMessage* message)
 {
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     s8 machine = roster->MachineIdxFromConnection(message->mUnidentified04);
     if (machine < 0 || machine >= roster->GetMachineCount())
     {
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Discarded message type %d because from unknown connection %x\n",
             (u8)message->GetType(), message->mUnidentified04);
         return 1;
@@ -851,7 +851,7 @@ int NetTournManager::ReceiverVirtual00(UnidentifiedNetworkMessage* message)
         {
             destination = "Knockout";
         }
-        fn_8004F594(16, "Received Tournament Loaded to %s from %d\n",
+        tDebugPrintManager::Print(DC_NETWORK, "Received Tournament Loaded to %s from %d\n",
             destination, (s8)loading->mMachineIndex);
         u8 machine = loading->mMachineIndex;
         if ((s8)machine >= 0 && (s8)machine < mMachineCount)
@@ -867,7 +867,7 @@ int NetTournManager::ReceiverVirtual00(UnidentifiedNetworkMessage* message)
         }
         else
         {
-            fn_8004F594(16, "Loaded from machine %d out of range [0,%d)\n",
+            tDebugPrintManager::Print(DC_NETWORK, "Loaded from machine %d out of range [0,%d)\n",
                 (s8)machine, mMachineCount);
         }
         break;
@@ -900,7 +900,7 @@ void NetTournManager::HandleTournamentGameUpdate(
         game.mState = NET_TOURN_GAME_NO_CONTEST;
         break;
     default:
-        fn_8004F594(16,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Ignoring unknown NetworkTournamentGameUpdate type %d\n",
             message->mUpdateType);
         return;

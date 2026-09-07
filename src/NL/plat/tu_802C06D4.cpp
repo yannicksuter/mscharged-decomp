@@ -1,7 +1,7 @@
 #include "NL/globalpad.h"
 #include "NL/nlMemory.h"
 
-PadManager_802C06D4* lbl_806E1E28;
+PadManager_802C06D4* g_pPadManager;
 
 PadManager_802C06D4::PadManager_802C06D4()
 {

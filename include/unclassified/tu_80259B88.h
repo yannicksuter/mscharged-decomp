@@ -5,6 +5,7 @@
 #include "unclassified/tu_80219248.h"
 #include "unclassified/tu_8022EF84.h"
 #include "unclassified/tu_8030616C.h"
+#include "unclassified/tu_80262B54.h"
 
 class TLComponentInstance;
 
@@ -61,7 +62,13 @@ public:
     /* 0x01C */ TU80219248Component mUnidentified1C;
     /* 0x0D0 */ TLComponentInstance* mUnidentifiedD0;
     /* 0x0D4 */ bool mUnidentifiedD4;
-    /* 0x0D5 */ u8 mPaddingD5[0x301];
+    /* 0x0D5 */ u8 mPaddingD5;
+    /* 0x0D6 */ unsigned short mUnidentifiedD6[0x40];
+    /* 0x156 */ unsigned short mUnidentified156[0x40];
+    /* 0x1D6 */ unsigned short mUnidentified1D6[0x40];
+    /* 0x256 */ unsigned short mUnidentified256[0x40];
+    /* 0x2D6 */ unsigned short mUnidentified2D6[0x40];
+    /* 0x356 */ unsigned short mUnidentified356[0x40];
     /* 0x3D6 */ bool mUnidentified3D6;
     /* 0x3D7 */ u8 mPadding3D7;
     /* 0x3D8 */ UnidentifiedTimer_8030616C mUnidentified3D8;

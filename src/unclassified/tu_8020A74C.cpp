@@ -34,7 +34,7 @@ TU8020A74CScene::TU8020A74CScene()
     , mBracketInstance(0)
     , mState(0)
 {
-    UnidentifiedNetworkOnlineInterface& online = *lbl_806E20D8;
+    UnidentifiedNetworkOnlineInterface& online = *g_pNetworkSessionBase;
     if (online.OnlineVirtual0C())
     {
         mNetworkTournament = true;

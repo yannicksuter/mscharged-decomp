@@ -27,7 +27,7 @@ void Class_80365488::Update(float dt)
         PlatPadStatus_80375EE0* temp = mUnidentified01C;
         mUnidentified01C = mUnidentified020;
         mUnidentified020 = temp;
-        *mUnidentified01C = *fn_80375EE0(lbl_806E2478, m_padIndex);
+        *mUnidentified01C = *fn_80375EE0(g_pPlatPadManager, m_padIndex);
 
         signed char x = mUnidentified01C->wpad.clLStickX;
         signed char y = mUnidentified01C->wpad.clLStickY;

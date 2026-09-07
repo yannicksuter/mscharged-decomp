@@ -659,10 +659,12 @@ extern "C" void fn_80344308(
             if (pEffect->m_nRemainingEmissions > 0
                 || pEffect->m_nRemainingEmissions == -1)
             {
-                float fEmissionTime
-                    = pEffect->m_fEmissionTime + fDeltaT;
+                float fEmissionTime = pEffect->m_fEmissionTime;
+                float fEmissionInterval
+                    = pEffect->m_fEmissionInterval;
+                fEmissionTime += fDeltaT;
                 pEffect->m_fEmissionTime = fEmissionTime;
-                if (pEffect->m_fEmissionInterval <= fEmissionTime
+                if (fEmissionInterval <= fEmissionTime
                     && nlRandom(100, &nlDefaultSeed)
                         < pEffect->m_uProbability)
                 {
@@ -670,14 +672,17 @@ extern "C" void fn_80344308(
                 }
             }
         }
-        else if ((pEffect->m_nRemainingEmissions > 0
-                     || pEffect->m_nRemainingEmissions == -1)
-            && pEffect->m_fEmissionInterval
-                <= pEffect->m_fEmissionTime
-            && nlRandom(100, &nlDefaultSeed)
-                < pEffect->m_uProbability)
+        else if (pEffect->m_nRemainingEmissions > 0
+            || pEffect->m_nRemainingEmissions == -1)
         {
-            bEmit = true;
+            float fEmissionTime = pEffect->m_fEmissionTime;
+            float fEmissionInterval = pEffect->m_fEmissionInterval;
+            if (fEmissionInterval <= fEmissionTime
+                && nlRandom(100, &nlDefaultSeed)
+                    < pEffect->m_uProbability)
+            {
+                bEmit = true;
+            }
         }
 
         if (bEmit)
@@ -848,11 +853,7 @@ void WorldAnimManager::fn_80342328()
 void WorldAnimManager::fn_80342630(
     WorldAnimController* pController, unsigned long uHierarchyHash)
 {
-    AnimationSet** ppAnimationSet;
-    pController->m_pAnimationSet
-        = m_animationSetMap.FindGet(uHierarchyHash, &ppAnimationSet)
-        ? *ppAnimationSet
-        : 0;
+    pController->m_pAnimationSet = FindAnimationSet(uHierarchyHash);
 
     pController->m_pPoseAccumulator
         = new (nlMalloc(sizeof(cPoseAccumulator), 8, false))

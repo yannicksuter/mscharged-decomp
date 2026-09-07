@@ -16,7 +16,7 @@ void FlickDetection::Update()
 {
     for (int i = 0; i < 16; i++)
     {
-        cAIPad* pad = fn_80007C3C(i);
+        cAIPad* pad = GetAIPad(i);
         if (pad == NULL || pad->m_pGlobalPad == NULL)
         {
             continue;

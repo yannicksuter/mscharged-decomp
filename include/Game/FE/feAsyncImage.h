@@ -24,6 +24,11 @@ public:
     void QueueLoad(const char* path, bool isblocking);
     bool Update(bool autoswap);
 
+    void fn_8024F4D8(TLImageInstance* instance)
+    {
+        mImageInstance = instance;
+    }
+
     bool CanSwapTextures() const;
     void SwapTextures();
     void FreeLoadBuffer();

@@ -22,7 +22,7 @@ extern "C" void fn_8005D948(
     void* pGame, const GoalieSaveData* pData);
 extern "C" void fn_8005E9FC(
     void* pManager, const PlayerAttackData* pData);
-extern void* lbl_806E0C94;
+extern void* g_pGame;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -62,7 +62,7 @@ void Goalie::MakeExertEvent()
         pSaveData.padding = 3;
     }
 
-    fn_8005D948(lbl_806E0C94, &pSaveData);
+    fn_8005D948(g_pGame, &pSaveData);
 }
 
 void Goalie::SetGoalieAction(
@@ -676,5 +676,5 @@ void Goalie::WhackSTSPlayer(cFielder* pFielder)
     data.pTarget = pFielder;
     data.mUnidentified0C = 2;
     data.mUnidentified10 = false;
-    fn_8005E9FC(lbl_806E0C94, &data);
+    fn_8005E9FC(g_pGame, &data);
 }

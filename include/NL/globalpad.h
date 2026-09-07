@@ -47,6 +47,6 @@ public:
     /* 0x0C */ cGlobalPad** m_aPads;
 }; // size: 0x10
 
-extern PadManager_802C06D4* lbl_806E1E28;
+extern PadManager_802C06D4* g_pPadManager;
 
 #endif // NL_GLOBALPAD_H

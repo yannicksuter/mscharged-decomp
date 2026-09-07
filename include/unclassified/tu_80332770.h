@@ -102,7 +102,7 @@ public:
 
 extern UnidentifiedNetworkManager* lbl_806E2138;
 
-extern "C" bool fn_80332770();
+extern "C" bool IsNetworkOrRecordedGame();
 extern "C" void fn_803327DC();
 
 #endif // UNCLASSIFIED_TU_80332770_H

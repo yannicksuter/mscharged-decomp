@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// Singleton returned by fn_80284A58. Only the fields this unit reads are
+// Singleton returned by GetPresentation. Only the fields this unit reads are
 // modelled; the letter-box names come from the predecessor's Presentation.
 struct UnidentifiedPresentationState
 {
@@ -14,7 +14,7 @@ struct UnidentifiedPresentationState
     /* 0x164 */ bool mUnidentified164;
 };
 
-UnidentifiedPresentationState* fn_80284A58();
+UnidentifiedPresentationState* GetPresentation();
 void fn_80285714(UnidentifiedPresentationState* state, u32 from, u32 to);
 bool fn_80287AB0(UnidentifiedPresentationState* state);
 

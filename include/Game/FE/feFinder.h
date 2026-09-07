@@ -54,6 +54,9 @@ struct FEFinder
     static inline T* Find(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
         const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
 
+    static inline T* Find(TLSlide* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+        const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
+
     template <typename U>
     static T* Find(U* pTopLevel, InlineHasher Level1, InlineHasher Level2 = InlineHasher(0UL), InlineHasher Level3 = InlineHasher(0UL),
         InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL), InlineHasher Level6 = InlineHasher(0UL));
@@ -72,6 +75,16 @@ inline T* FEFinder<T, N>::Find(FEPresentation* pTopLevel, const unsigned long Le
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
     TLInstance* pResult = fn_8030677C(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    if (pResult == 0)
+        return 0;
+    return (T*)pResult;
+}
+
+template <typename T, int N>
+inline T* FEFinder<T, N>::Find(TLSlide* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+    const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
+{
+    TLInstance* pResult = _Find(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
     if (pResult == 0)
         return 0;
     return (T*)pResult;

@@ -1149,7 +1149,7 @@ extern "C" void fn_80257D0C(bool value0, unsigned char value1, bool value2)
 
     fn_8025BD94(value0);
     fn_8025BD7C(value2);
-    lbl_806E10EC->fn_80123E44(value1);
+    g_pNetworkSession->fn_80123E44(value1);
     lbl_806E18D4 = value0;
 
     GameInfoManager::GetInstance()->SetTeam(0, 0);
@@ -1162,7 +1162,7 @@ extern "C" void fn_80257D0C(bool value0, unsigned char value1, bool value2)
         lbl_806DE668[0] = lbl_806E18B0;
         lbl_806DE668[1] = -1;
     }
-    else if (lbl_806E10EC->OnlineVirtual0C() == 1)
+    else if (g_pNetworkSession->OnlineVirtual0C() == 1)
     {
         lbl_806DE668[0] = 0;
         lbl_806DE668[1] = 1;
@@ -1217,7 +1217,7 @@ void TU80257150Scene::fn_80257EA4(int, void* context)
     {
     case 0:
         fn_80257D0C(false, false, mMode == 0);
-        if (lbl_806E10EC->OnlineVirtual0C() == 2)
+        if (g_pNetworkSession->OnlineVirtual0C() == 2)
         {
             if (mMode == 0)
             {
@@ -1235,7 +1235,7 @@ void TU80257150Scene::fn_80257EA4(int, void* context)
         break;
     case 1:
         fn_80257D0C(true, false, mMode == 0);
-        if (lbl_806E10EC->OnlineVirtual0C() == 2)
+        if (g_pNetworkSession->OnlineVirtual0C() == 2)
         {
             mUnidentified284 = 0x2B;
         }

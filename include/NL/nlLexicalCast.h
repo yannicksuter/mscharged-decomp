@@ -14,7 +14,7 @@ struct LexicalCastImpl
 } // namespace Detail
 
 template <typename To, typename From>
-To LexicalCast(const From& from)
+inline To LexicalCast(const From& from)
 {
     return Detail::LexicalCastImpl<To, From>::Do(const_cast<From&>(from));
 }
@@ -69,6 +69,31 @@ inline NLString LexicalCastImpl<NLString, char>::Do(char value)
     return NLString(buffer);
 }
 
+template <typename To, typename From, int N>
+struct LexicalCastImpl<To, From[N]>
+{
+    static To Do(const From (&f)[N])
+    {
+        return To(f);
+    }
+};
+
 } // namespace Detail
+
+typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
+
+template <>
+inline WideBasicString Detail::LexicalCastImpl<WideBasicString, const unsigned short*>::Do(
+    const unsigned short* const& f)
+{
+    return WideBasicString(f);
+}
+
+template <>
+inline WideBasicString LexicalCast<WideBasicString, const unsigned short*>(
+    const unsigned short* const& from)
+{
+    return Detail::LexicalCastImpl<WideBasicString, const unsigned short*>::Do(from);
+}
 
 #endif // _NLLEXICALCAST_H_

@@ -1,4 +1,5 @@
 #include "Game/Sys/simpleparser.h"
+#include "Game/Sys/debug.h"
 #include "Game/TweakRegistry.h"
 #include "Game/TweakValue.h"
 
@@ -13,7 +14,6 @@
 
 typedef Config::String BString;
 
-extern "C" void fn_8004F594(int category, const char* format, ...);
 
 class UnidentifiedTweakParser_8052BF40 : public Config::Parser
 {
@@ -185,7 +185,7 @@ extern "C" void fn_802C6828(
 extern "C" char* fn_802C6BB0(
     const char* filename, unsigned long* outSize)
 {
-    fn_8004F594(0x13, "reading config file: %s\n", filename);
+    tDebugPrintManager::Print(DC_CONFIG_SYSTEM, "reading config file: %s\n", filename);
 
     char* buffer = 0;
     nlFile* file = nlOpen(filename);

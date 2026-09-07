@@ -56,13 +56,13 @@ struct UnidentifiedHBMGameState
 
 class TU80252180Scene;
 
-extern UnidentifiedHBMGameState* lbl_806E0C94;
+extern UnidentifiedHBMGameState* g_pGame;
 extern void* lbl_806E2020;
 
 extern "C"
 {
     bool fn_80273B00();
-    bool fn_80285E20(void* presentation);
+    bool IsIdleAndNoShotInProgress(void* presentation);
     void fn_801FC444();
     void fn_801FC454();
     void fn_8035BE04(void* audio);
@@ -300,7 +300,7 @@ void UnidentifiedHBMManager::fn_80248008()
     mPreviousTaskState = nlTaskManager::m_pInstance->mCurrentState;
     if (mPreviousTaskState != 1)
     {
-        fn_800EC868();
+        PauseAllAudio();
     }
     else
     {
@@ -316,22 +316,22 @@ void UnidentifiedHBMManager::fn_802480EC()
 {
     for (int i = 0; i < 4; ++i)
     {
-        switch (lbl_806E2478->type[i])
+        switch (g_pPlatPadManager->type[i])
         {
         case 0:
             mControllerData.wiiCon[i].kpad = 0;
             break;
         case 1:
             mControllerData.wiiCon[i].kpad
-                = &fn_80375EC8(lbl_806E2478, i)->kpad;
+                = &fn_80375EC8(g_pPlatPadManager, i)->kpad;
             break;
         case 2:
             mControllerData.wiiCon[i].kpad
-                = &fn_80375ED4(lbl_806E2478, i)->kpad;
+                = &fn_80375ED4(g_pPlatPadManager, i)->kpad;
             break;
         case 3:
             mControllerData.wiiCon[i].kpad
-                = &fn_80375EE0(lbl_806E2478, i)->kpad;
+                = &fn_80375EE0(g_pPlatPadManager, i)->kpad;
             break;
         }
     }
@@ -355,7 +355,7 @@ void UnidentifiedHBMManager::fn_802480EC()
             fn_8035BE74(lbl_806E2020);
             if (gpHBMManager->mPreviousTaskState != 1)
             {
-                fn_800ECB50();
+                ResumeAllAudio();
             }
             else
             {
@@ -418,7 +418,7 @@ void UnidentifiedHBMManager::fn_8024891C()
 
 bool UnidentifiedHBMManager::fn_80248940()
 {
-    if (lbl_806E0C94 != 0 && lbl_806E0C94->mBlocked)
+    if (g_pGame != 0 && g_pGame->mBlocked)
     {
         return true;
     }
@@ -434,7 +434,7 @@ bool UnidentifiedHBMManager::fn_80248940()
         return true;
     }
 
-    if ((state & 4) == 0 && !fn_80285E20(fn_80284A58()))
+    if ((state & 4) == 0 && !IsIdleAndNoShotInProgress(GetPresentation()))
     {
         return true;
     }
@@ -473,9 +473,9 @@ void UnidentifiedHBMManager::fn_802489F8()
     }
     else if ((state & 0x00200000) != 0)
     {
-        if (lbl_806E1860 != 0)
+        if (g_pOverlayManager != 0)
         {
-            scene = lbl_806E1860->GetScene((SceneList)25);
+            scene = g_pOverlayManager->GetScene((SceneList)25);
             if (scene != 0)
             {
                 ((UnidentifiedHBMScene*)scene)->UnidentifiedVirtual2C();

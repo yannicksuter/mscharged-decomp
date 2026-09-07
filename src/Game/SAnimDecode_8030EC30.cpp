@@ -65,7 +65,9 @@ extern "C" void fn_8030ECC8(register nlQuaternion* result, register const void* 
 
 extern "C" void fn_8030ECDC(nlVector3* result, const PackedScale* packed)
 {
-    nlVec3Set(*result, 0.00048828125f * packed->x, 0.00048828125f * packed->y, 0.00048828125f * packed->z);
+    result->x = 0.00048828125f * packed->x;
+    result->y = 0.00048828125f * packed->y;
+    result->z = 0.00048828125f * packed->z;
 }
 
 extern "C" void fn_8030ED48(float* result, const unsigned char* packed)

@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "Game/Sys/debug.h"
 #include <revolution/os.h>
 
 #include "NL/glx/glxMemory.h"
@@ -125,9 +126,9 @@ void glplatFrameAllocNextFrame()
 {
     if (glx_MemoryDump)
     {
-        fn_8004F594(2, lbl_80535F24,
+        tDebugPrintManager::Print(DC_GLPLAT, lbl_80535F24,
             n_frame[i_frame][0] >> 10, n_frame[i_frame][1] >> 10);
-        fn_8004F594(2, lbl_80535F54,
+        tDebugPrintManager::Print(DC_GLPLAT, lbl_80535F54,
             (FrameMemSizes[0] - n_frame[i_frame][0]) >> 10,
             (FrameMemSizes[1] - n_frame[i_frame][1]) >> 10);
         glx_MemoryDump = false;

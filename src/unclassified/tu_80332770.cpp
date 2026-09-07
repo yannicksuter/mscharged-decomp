@@ -1,4 +1,5 @@
 #include "unclassified/tu_80332770.h"
+#include "Game/Sys/debug.h"
 #include "unclassified/tu_80332DC0.h"
 #include "unclassified/tu_80336B2C.h"
 
@@ -13,11 +14,10 @@ static NetworkMessageFactory<NetworkMessageType1_80533B68> sFactoryType1;
 static NetworkMessageFactory<NetworkMessageType8_80533BA4> sFactoryType8;
 static NetworkMessageFactory<NetworkMessageType9_80533B90> sFactoryType9;
 
-extern "C" void fn_8004F594(int category, const char* format, ...);
 
-extern "C" bool fn_80332770()
+extern "C" bool IsNetworkOrRecordedGame()
 {
-    UnidentifiedNetworkOnlineInterface& online = *lbl_806E20D8;
+    UnidentifiedNetworkOnlineInterface& online = *g_pNetworkSessionBase;
     int mode = online.OnlineVirtual0C();
     if (mode == 1 || mode == 2)
     {
@@ -94,7 +94,7 @@ void UnidentifiedNetworkManager::fn_803328FC()
         }
 
         UnidentifiedNetworkPeer* peer
-            = fn_80338C0C(lbl_806E20D8);
+            = fn_80338C0C(g_pNetworkSessionBase);
         int numControllers = peer->mUnidentified004;
         for (int i = 0; i < numControllers; ++i)
         {
@@ -104,7 +104,7 @@ void UnidentifiedNetworkManager::fn_803328FC()
     }
     else if (!mUnidentified18)
     {
-        fn_8004F594(0x10, "Overflowed Queues just occured\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Overflowed Queues just occured\n");
         mFrameProvider->UnidentifiedVirtual14();
         mUnidentified18 = true;
     }
@@ -132,7 +132,7 @@ bool UnidentifiedNetworkManager::fn_80332A00()
                     = nlGetTickerDifference(mUnidentified08, nlGetTicker());
                 mUnidentified08 = 0;
                 ++mUnidentified10;
-                fn_8004F594(0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Congested for %dth time for %f ms at game frame %d\n",
                     mUnidentified10, mUnidentified0C,
                     mFrameProvider->GetFrame());
@@ -147,7 +147,7 @@ bool UnidentifiedNetworkManager::fn_80332A00()
     }
     else if (!mUnidentified18)
     {
-        fn_8004F594(0x10, "Overflowed Queues just occured\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Overflowed Queues just occured\n");
         mFrameProvider->UnidentifiedVirtual14();
         mUnidentified18 = true;
     }

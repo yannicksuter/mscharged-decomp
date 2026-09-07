@@ -18,7 +18,7 @@ extern BaseGameSceneManager* lbl_806E1838;
 extern TLComponentInstance lbl_80580030;
 
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" void fn_80253284(bool value);
+extern "C" void SetPointerEnabled(bool value);
 extern "C" bool fn_80273B00();
 
 SceneList CreditScene::mNextScene = (SceneList)13;
@@ -78,7 +78,7 @@ CreditScene::CreditScene()
     , mFadeStarted(false)
     , mPhase(0)
 {
-    fn_80253284(0);
+    SetPointerEnabled(0);
     mTimeElapsed = 0.0f;
 
     for (int i = 0; i < 20; ++i)
@@ -91,7 +91,7 @@ CreditScene::CreditScene()
 
 CreditScene::~CreditScene()
 {
-    fn_80253284(1);
+    SetPointerEnabled(1);
     BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
     pStadium->mUnidentified070 = true;
 }

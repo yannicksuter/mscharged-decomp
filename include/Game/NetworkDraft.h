@@ -17,7 +17,7 @@ struct NetworkDraftPlayer
         memset(mData, 0, sizeof(mData));
     }
 
-    /* 0x00 */ UnidentifiedDraftEntryHead mHead;
+    /* 0x00 */ NetworkRankingMeta mHead;
     /* 0x18 */ u16 mName[11];
     /* 0x2E */ u8 mData[0x4C];
     /* 0x7A */ u8 mPadding7A[2];

@@ -21,7 +21,7 @@
 
 struct PlatPadManager;
 
-extern PlatPadManager* lbl_806E2478;
+extern PlatPadManager* g_pPlatPadManager;
 extern TLComponentInstance* lbl_80578450[4];
 extern TLComponentInstance lbl_80580030;
 bool lbl_806DE828 = true;
@@ -88,9 +88,9 @@ TU80252180Scene::TU80252180Scene()
 
     for (int channel = 0; channel < 4; ++channel)
     {
-        if (lbl_806E1E28->GetPad(channel) != 0)
+        if (g_pPadManager->GetPad(channel) != 0)
         {
-            fn_80375DF8(lbl_806E2478, channel, true);
+            fn_80375DF8(g_pPlatPadManager, channel, true);
         }
     }
 }
@@ -99,9 +99,9 @@ TU80252180Scene::~TU80252180Scene()
 {
     for (int channel = 0; channel < 4; ++channel)
     {
-        if (lbl_806E1E28->GetPad(channel) != 0)
+        if (g_pPadManager->GetPad(channel) != 0)
         {
-            fn_80375DF8(lbl_806E2478, channel, false);
+            fn_80375DF8(g_pPlatPadManager, channel, false);
         }
         lbl_80578450[channel] = 0;
     }
@@ -230,7 +230,7 @@ void TU80252180Scene::Update(float fDeltaT)
     }
 }
 
-extern "C" void fn_80253284(bool value)
+extern "C" void SetPointerEnabled(bool value)
 {
     if (lbl_806DE828 != value)
     {
@@ -238,9 +238,9 @@ extern "C" void fn_80253284(bool value)
         {
             for (int channel = 0; channel < 4; ++channel)
             {
-                if (lbl_806E1E28->GetPad(channel) != 0)
+                if (g_pPadManager->GetPad(channel) != 0)
                 {
-                    fn_80375DF8(lbl_806E2478, channel, true);
+                    fn_80375DF8(g_pPlatPadManager, channel, true);
                 }
             }
         }
@@ -248,9 +248,9 @@ extern "C" void fn_80253284(bool value)
         {
             for (int channel = 0; channel < 4; ++channel)
             {
-                if (lbl_806E1E28->GetPad(channel) != 0)
+                if (g_pPadManager->GetPad(channel) != 0)
                 {
-                    fn_80375DF8(lbl_806E2478, channel, false);
+                    fn_80375DF8(g_pPlatPadManager, channel, false);
                 }
             }
         }

@@ -40,7 +40,7 @@ public:
     virtual void RemoveScreenHandler(BaseScreenHandler* handler);
     virtual void SetPresentation(FEPresentation* presentation) { mPresentation = presentation; }
     virtual void OnActivate();
-    virtual void SceneCreated() { }
+    virtual void SceneCreated();
     virtual void SetVisible(bool visible) { mVisible = visible; }
 
     FEPresentation* GetPresentation();

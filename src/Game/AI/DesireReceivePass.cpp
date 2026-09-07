@@ -1,4 +1,5 @@
 #include "Game/AI/DesireReceivePass.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/AI/DesireSteering.h"
 
@@ -89,7 +90,6 @@ extern "C" bool fn_80035F84(cFielder*, nlVector3*, float*, nlVector3*,
     float*, unsigned short, const LooseBallContactAnimInfo*);
 extern "C" bool fn_80036234(cFielder*, nlVector3*, float*, nlVector3*,
     float*, const LooseBallContactAnimInfo*, nlVector3*, unsigned short);
-extern "C" void fn_8004F594(int, const char*, ...);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" void fn_80016DF8(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);
@@ -601,7 +601,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
         }
         else
         {
-            fn_8004F594(4,
+            tDebugPrintManager::Print(DC_AI,
                 "DesireReceivePass::CalcRoughEstimates - failed to find an AIR interception point!\n");
             return false;
         }
@@ -618,7 +618,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
 
         if (nNumIntercepts == 0)
         {
-            fn_8004F594(4,
+            tDebugPrintManager::Print(DC_AI,
                 "DesireReceivePass::CalcRoughEstimates - failed to find a GROUND interception point!\n");
             return false;
         }
@@ -724,7 +724,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
             - estimated.fBallContactTime)
             > lbl_806E4034)
     {
-        fn_8004F594(4,
+        tDebugPrintManager::Print(DC_AI,
             "DesireReceivePass::CalcRoughEstimates - the ball got deflected too much, pass aborted\n");
         return false;
     }
@@ -794,7 +794,7 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
     }
     else
     {
-        fn_8004F594(4,
+        tDebugPrintManager::Print(DC_AI,
             "DesireReceivePass::CalcExactEstimates - failed to find an interception point!\n");
     }
     return result;
@@ -1078,7 +1078,7 @@ bool DesireReceivePass::StartPickupAnimation()
     if (fDistance - fRadius
         > mEstimated.fAnimStartOffset + lbl_806DC1C0)
     {
-        fn_8004F594(4,
+        tDebugPrintManager::Print(DC_AI,
             "DesireReceivePass::StartPickupAnimation - position is outside max threshold !\n");
         return false;
     }

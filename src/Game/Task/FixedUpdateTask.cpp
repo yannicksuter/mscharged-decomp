@@ -44,7 +44,7 @@ extern "C" void fn_8037537C(void*);
 extern u16 lbl_806DF740;
 extern int lbl_806E2130;
 
-extern void* lbl_806E2478;
+extern void* g_pPlatPadManager;
 
 float g_fFixedUpdateTick = 0.02f;
 bool g_bRunSimAndRenderInLockStep;
@@ -160,10 +160,10 @@ u32 FixedUpdateTask::WriteSyncLog()
     fn_80338D04(cache, &sTimeScaleType, "timeScale", &checksum,
         fixedUpdateTask.mTargetTimeScale);
 
-    int numGroups = fn_80338BF0(lbl_806E20D8);
+    int numGroups = GetNumMachines(g_pNetworkSessionBase);
     for (int groupIndex = 0; groupIndex < numGroups; groupIndex++)
     {
-        UnidentifiedNetworkPeer* group = fn_80338BF8(lbl_806E20D8, (s8)groupIndex);
+        UnidentifiedNetworkPeer* group = fn_80338BF8(g_pNetworkSessionBase, (s8)groupIndex);
         int numControllers = group->mUnidentified004;
         for (int controllerIndex = 0; controllerIndex < numControllers; controllerIndex++)
         {
@@ -226,17 +226,17 @@ u32 FixedUpdateTask::WriteSyncLog()
 
 void FixedUpdateTask::UnidentifiedVirtual10()
 {
-    if (lbl_806E10EC->OnlineVirtual0C())
+    if (g_pNetworkSession->OnlineVirtual0C())
     {
         NetworkStatsManager_8012F378::Instance()->CalculateAndReportGameResult(2);
     }
-    lbl_806E10EC->fn_80123FBC(1);
+    g_pNetworkSession->fn_80123FBC(1);
 }
 
 void FixedUpdateTask::UnidentifiedVirtual14()
 {
     NetworkStatsManager_8012F378::Instance()->CalculateAndReportGameResult(4);
-    lbl_806E10EC->fn_80123FBC(2);
+    g_pNetworkSession->fn_80123FBC(2);
 }
 
 u16 FixedUpdateTask::UnidentifiedVirtual18()
@@ -246,7 +246,7 @@ u16 FixedUpdateTask::UnidentifiedVirtual18()
 
 bool FixedUpdateTask::UnidentifiedVirtual1C()
 {
-    return lbl_806E180D;
+    return FrontEnd::m_bInPauseMenuState;
 }
 
 float FixedUpdateTask::GetPhysicsUpdateTick()
@@ -301,7 +301,7 @@ void FixedUpdateTask::DecrementFrameLock(float fDeltaT)
 void FixedUpdateTask::Run(float dt)
 {
     bool runFixedUpdate = true;
-    if (fn_80287AB0(fn_80284A58()))
+    if (fn_80287AB0(GetPresentation()))
     {
         runFixedUpdate = false;
     }
@@ -316,7 +316,7 @@ void FixedUpdateTask::Run(float dt)
 
     if (runFixedUpdate
         && nlTaskManager::m_pInstance->mCurrentState == 2
-        && !lbl_806E10EC->fn_80123A00())
+        && !g_pNetworkSession->fn_80123A00())
     {
         float simulationTick;
 
@@ -340,10 +340,10 @@ void FixedUpdateTask::Run(float dt)
         while (g_bRunSimAndRenderInLockStep
             || mAccumulatedDeltaT >= g_fFixedUpdateTick)
         {
-            lbl_806E1E28->fn_802C084C(1);
+            g_pPadManager->fn_802C084C(1);
             simulationTick = g_fFixedUpdateTick;
-            fn_8037537C(lbl_806E2478);
-            lbl_806E1E28->Update(simulationTick);
+            fn_8037537C(g_pPlatPadManager);
+            g_pPadManager->Update(simulationTick);
             FlickDetection::Update();
 
             mAccumulatedDeltaT -= g_fFixedUpdateTick;
@@ -363,7 +363,7 @@ void FixedUpdateTask::Run(float dt)
                     CallFixedUpdateTasks();
                     updated = true;
                 }
-                if (fn_80287AB0(fn_80284A58()))
+                if (fn_80287AB0(GetPresentation()))
                 {
                     break;
                 }
@@ -378,7 +378,7 @@ void FixedUpdateTask::Run(float dt)
                 mUnidentified28 = g_fFixedUpdateTick;
             }
 
-            if (fn_80287AB0(fn_80284A58()))
+            if (fn_80287AB0(GetPresentation()))
             {
                 break;
             }
@@ -389,9 +389,9 @@ void FixedUpdateTask::Run(float dt)
         }
     }
 
-    lbl_806E1E28->fn_802C084C(0);
-    fn_8037537C(lbl_806E2478);
-    lbl_806E1E28->Update(dt);
+    g_pPadManager->fn_802C084C(0);
+    fn_8037537C(g_pPlatPadManager);
+    g_pPadManager->Update(dt);
     FlickDetection::Update();
 }
 

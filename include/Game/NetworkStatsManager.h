@@ -7,21 +7,6 @@
 struct DWCDate;
 struct DWCTime;
 
-struct NetworkRankingRecord : NetworkRankingMeta
-{
-    NetworkRankingRecord()
-    {
-        mMonth = 1;
-        mDay = 1;
-        mYear = 2000;
-        mScore = 0;
-        mDisplayRank = 0;
-        mWins = 0;
-        mLosses = 0;
-        mUnidentified14 = 0;
-    }
-}; // size: 0x18
-
 struct NetworkLeaderboardCategory
 {
     int FindPlayer(int profileId) const;
@@ -34,7 +19,7 @@ struct NetworkLeaderboardCategory
     /* 0x0010 */ int mCount;
     /* 0x0014 */ int mFirstRank;
     /* 0x0018 */ NetworkStatsPlayer mPlayers[65];
-    /* 0x1A80 */ NetworkRankingRecord mMetadata[65];
+    /* 0x1A80 */ NetworkRankingMeta mMetadata[65];
 }; // size: 0x2098
 
 struct NetworkSeasonDate
@@ -105,6 +90,11 @@ public:
     void HandleDisconnect_8013243C(int result);
     void CalculateAndReportGameResult(int result);
 
+    NetworkRankingMeta* fn_80260764(int category)
+    {
+        return mHasLocalStats[category] ? &mLocalStats[category] : 0;
+    }
+
     virtual void StatsListenerVirtual00();
     virtual void OnLeaderboardResult(bool success, int category, int filter,
         int count, NetworkStatsPlayer* players,
@@ -126,7 +116,7 @@ public:
     /* 0x001C */ int mSubmissionCategory;
     /* 0x0020 */ bool mHasLocalStats[3];
     /* 0x0023 */ u8 mPadding0023;
-    /* 0x0024 */ NetworkRankingRecord mLocalStats[3];
+    /* 0x0024 */ NetworkRankingMeta mLocalStats[3];
     /* 0x006C */ NetworkLeaderboardCategory mCategories[6];
     /* 0xC3FC */ int mPersistentCategories[3];
     /* 0xC408 */ float mCurrentTime;

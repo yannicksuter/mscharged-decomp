@@ -33,7 +33,7 @@ struct AIPadManager
     static cAIPad mAIPads[16];
 };
 
-cAIPad* fn_80007C3C(int index);
+cAIPad* GetAIPad(int index);
 extern "C" void fn_80007A74(cAIPad*);
 
 #endif // GAME_AI_AIPAD_H

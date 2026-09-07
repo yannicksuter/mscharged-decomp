@@ -60,7 +60,7 @@ struct UnidentifiedFESceneState
     int mUnidentified074;
 };
 
-extern UnidentifiedGoalieActionState* lbl_806E0C94;
+extern UnidentifiedGoalieActionState* g_pGame;
 extern cCharacter* lbl_806E0C34;
 extern float lbl_806DBB08;
 extern float lbl_806DBBE0;
@@ -147,7 +147,7 @@ extern cTeam* lbl_806E0E00;
 extern nlVector4 lbl_8056D3B0;
 extern unsigned char lbl_806E0D20;
 extern unsigned char lbl_806E0D21;
-extern BaseGameSceneManager* lbl_806E1860;
+extern BaseGameSceneManager* g_pOverlayManager;
 extern "C" void fn_800797DC(
     Goalie* pGoalie, int nParam, float fDeltaT, float fParam);
 extern "C" void fn_8007B680(Goalie* pGoalie, bool bParam);
@@ -589,8 +589,8 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
 
     bool bUnidentifiedCondition = true;
     bool bActionStateActive = false;
-    if (lbl_806E0C94->mUnidentified20
-        || lbl_806E0C94->mUnidentified18 == 3)
+    if (g_pGame->mUnidentified20
+        || g_pGame->mUnidentified18 == 3)
     {
         bActionStateActive = true;
     }
@@ -1029,7 +1029,7 @@ extern "C" void fn_80083EC0()
     }
 
     for (unsigned int i = 0;
-        i < lbl_806E0C94->mUnidentified28;
+        i < g_pGame->mUnidentified28;
         i++)
     {
         nlVector2* pPosition = &v2Positions[nIndices[i % 6]];
@@ -1047,7 +1047,7 @@ extern "C" void fn_80083EC0()
     }
 
     for (unsigned int i = 0;
-        i < lbl_806E0C94->mUnidentified28;
+        i < g_pGame->mUnidentified28;
         i++)
     {
         UnidentifiedMegaBallState* pState = fn_801A7620(i);
@@ -1070,7 +1070,7 @@ void Goalie::fn_8008418C(float fDeltaT)
     nlVector3 v3CameraDelta;
 
     if (mBallsLaunched
-        & (1 << (lbl_806E0C94->mUnidentified28 - 1)))
+        & (1 << (g_pGame->mUnidentified28 - 1)))
     {
         return;
     }
@@ -1079,7 +1079,7 @@ void Goalie::fn_8008418C(float fDeltaT)
     if (mfNextBallTime < 0.01f)
     {
         for (unsigned int i = 0;
-            i < lbl_806E0C94->mUnidentified28;
+            i < g_pGame->mUnidentified28;
             i++)
         {
             unsigned int nBallMask = 1 << i;
@@ -1323,7 +1323,7 @@ void Goalie::fn_80084AE0(UnidentifiedMegaBallState* pState)
     }
 
     for (unsigned int i = 0;
-        i < lbl_806E0C94->mUnidentified28;
+        i < g_pGame->mUnidentified28;
         i++)
     {
         UnidentifiedMegaBallState* pCurrentState = fn_801A7620(i);
@@ -1360,7 +1360,7 @@ void Goalie::fn_80084CE0()
     if (mUnidentified529)
     {
         BaseSceneHandler* pSceneHandler
-            = lbl_806E1860->GetScene((SceneList)0x69);
+            = g_pOverlayManager->GetScene((SceneList)0x69);
         if (pSceneHandler != 0)
         {
             UnidentifiedFESceneState* pScene
@@ -1376,7 +1376,7 @@ void Goalie::fn_80084CE0()
             }
             if (bUnidentifiedCondition)
             {
-                lbl_806E1860->Pop();
+                g_pOverlayManager->Pop();
                 mUnidentified529 = false;
             }
         }
@@ -1411,22 +1411,22 @@ void Goalie::fn_80084D94(float fParam)
     }
     fChance += fInterpolated * lbl_806DBBEC;
 
-    for (unsigned int i = 0; i < lbl_806E0C94->mUnidentified28; i++)
+    for (unsigned int i = 0; i < g_pGame->mUnidentified28; i++)
     {
         if (nlRandomf(5.0f) < fChance)
         {
-            lbl_806E0C94->mUnidentified30++;
-            fn_8005DB44(lbl_806E0C94,
-                lbl_806E0C94->mUnidentified2C,
+            g_pGame->mUnidentified30++;
+            fn_8005DB44(g_pGame,
+                g_pGame->mUnidentified2C,
                 true);
         }
         else
         {
-            fn_8005DB44(lbl_806E0C94,
-                lbl_806E0C94->mUnidentified2C,
+            fn_8005DB44(g_pGame,
+                g_pGame->mUnidentified2C,
                 false);
         }
-        lbl_806E0C94->mUnidentified2C++;
+        g_pGame->mUnidentified2C++;
     }
 }
 
@@ -3325,8 +3325,8 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
         {
             cFielder* pOwnerFielder = g_pBall->GetOwnerFielder();
 
-            if (mnOffplayPending != 0 || lbl_806E0C94->mUnidentified20
-                || lbl_806E0C94->mUnidentified18 == 3
+            if (mnOffplayPending != 0 || g_pGame->mUnidentified20
+                || g_pGame->mUnidentified18 == 3
                 || pOwnerFielder == 0
                 || IsOnSameTeam((cPlayer*)pOwnerFielder)
                 || !IsOpponentBallCarrierInRange())
@@ -4058,8 +4058,8 @@ void Goalie::ActionSnapBall(float fDeltaT)
     nlVector3 v3RootPos;
 
     if (mnOffplayPending != GOALIE_OFFPLAY_NONE
-        || lbl_806E0C94->mUnidentified20
-        || lbl_806E0C94->mUnidentified18 == 3)
+        || g_pGame->mUnidentified20
+        || g_pGame->mUnidentified18 == 3)
     {
         if (m_pBall != 0)
         {
@@ -4386,7 +4386,7 @@ void Goalie::fn_8008BBB0(
         data.pTarget = mpTarget;
         data.mUnidentified0C = 2;
         data.mUnidentified10 = false;
-        fn_8005E408(lbl_806E0C94, &data);
+        fn_8005E408(g_pGame, &data);
     }
 }
 
@@ -5521,8 +5521,8 @@ void Goalie::fn_8008DAB4(float fDeltaT)
     bool bActionStateActive = false;
     bool bUnidentifiedCondition = true;
     float fAnimTime = m_pCurrentAnimController->m_fTime;
-    if (lbl_806E0C94->mUnidentified20
-        || lbl_806E0C94->mUnidentified18 == 3)
+    if (g_pGame->mUnidentified20
+        || g_pGame->mUnidentified18 == 3)
     {
         bActionStateActive = true;
     }
@@ -5841,7 +5841,7 @@ void Goalie::InitActionSTSAttackSetup(float fWaitTime)
     data.pTarget = g_pBall->GetOwnerFielder();
     data.mUnidentified0C = 2;
     data.mUnidentified10 = false;
-    fn_8005E800(lbl_806E0C94, &data);
+    fn_8005E800(g_pGame, &data);
 }
 
 void Goalie::InitActionSTSAttack()
@@ -6465,7 +6465,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
                 data.pTarget = mpShooter;
                 data.mUnidentified0C = 2;
                 data.mUnidentified10 = false;
-                fn_8005E604(lbl_806E0C94, &data);
+                fn_8005E604(g_pGame, &data);
 
                 mbPickedUp = true;
             }
@@ -6649,7 +6649,7 @@ void Goalie::fn_8008EF58()
     mbMegaUserSave = false;
     mUnidentified40C = -1;
 
-    if (fn_80338BF0(lbl_806E20D8) > 1)
+    if (GetNumMachines(g_pNetworkSessionBase) > 1)
     {
         mbMegaUserSave = true;
         return;

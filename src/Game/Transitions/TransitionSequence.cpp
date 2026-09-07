@@ -216,7 +216,7 @@ void TransitionSequence::Initialize(SimpleParser* parser)
         }
         else if (nlStrCmp<char>(token, "sound") == 0 || nlStrCmp<char>(token, "soundstopatend") == 0)
         {
-            char* soundName = parser->NextTokenOnLine(true);
+            const char* soundName = parser->NextTokenOnLine(true);
             int soundNameLen = nlStrLen<char>(soundName);
 
             sound[m_nNumTransitions].soundStr = (char*)nlMalloc(soundNameLen + 1, 8, false);

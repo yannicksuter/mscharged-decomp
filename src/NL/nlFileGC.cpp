@@ -164,27 +164,7 @@ static unsigned long AlignUp32(unsigned long value)
     return value + (remainder != 0) * (32 - remainder);
 }
 
-static bool EntryIsBusy(AsyncEntry* entry)
-{
-    int status = DVDGetCommandBlockStatus(&entry->mFileInfo.block);
-    if (status == DVD_STATE_BUSY)
-    {
-        return true;
-    }
-    if (status == DVD_STATE_WAITING)
-    {
-        return false;
-    }
-    if (status == DVD_STATE_IDLE)
-    {
-        if ((entry->mPositionAndPhase & 3) != READ_HEAD)
-        {
-            return true;
-        }
-        return EntryIsBusy(entry->m_next);
-    }
-    return false;
-}
+extern "C" bool fn_803679A0(AsyncEntry* entry);
 
 static bool CheckDVDStatus()
 {
@@ -350,7 +330,7 @@ void AsyncManager::CancelPendingReads(DolphinFile* pFile, CancelAsyncCallback ca
     {
         AsyncEntry* next = entry->m_next;
         BOOL interrupts = OSDisableInterrupts();
-        if (entry->m_pFile == pFile && !EntryIsBusy(entry))
+        if (entry->m_pFile == pFile && !fn_803679A0(entry))
         {
             --pFile->PendingAsync;
             mCurrent = entry;
@@ -634,7 +614,20 @@ extern "C" void* fn_803678B0(const char* fileName, unsigned long* outSize,
 
 extern "C" bool fn_803679A0(AsyncEntry* entry)
 {
-    return EntryIsBusy(entry);
+    switch (DVDGetCommandBlockStatus(&entry->mFileInfo.block))
+    {
+    case DVD_STATE_BUSY:
+        return true;
+    case DVD_STATE_WAITING:
+        return false;
+    case DVD_STATE_IDLE:
+        if ((entry->mPositionAndPhase & 3) == READ_HEAD)
+        {
+            return fn_803679A0(entry->m_next);
+        }
+        return true;
+    }
+    return false;
 }
 
 bool nlAsyncReadsPending(nlFile* file)
@@ -652,7 +645,7 @@ extern "C" bool fn_80367B70(AsyncEntry* entry)
     {
         return false;
     }
-    return EntryIsBusy(entry);
+    return fn_803679A0(entry);
 }
 
 void nlCancelPendingAsyncReads(nlFile* pFile, CancelAsyncCallback callback)

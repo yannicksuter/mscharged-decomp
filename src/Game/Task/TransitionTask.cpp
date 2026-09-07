@@ -86,7 +86,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (BasicStadium::GetCurrentStadium() != NULL)
     {
-        if (to == 0x10 && fn_80284A58()->mUnidentified164)
+        if (to == 0x10 && GetPresentation()->mUnidentified164)
         {
             fn_80278A00(BasicStadium::GetCurrentStadium(), 0x37, 1);
         }
@@ -96,7 +96,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         }
     }
 
-    fn_80285714(fn_80284A58(), from, to);
+    fn_80285714(GetPresentation(), from, to);
 
     if (to == 2)
     {
@@ -130,9 +130,9 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         }
     }
 
-    if (lbl_806E1860 != NULL)
+    if (g_pOverlayManager != NULL)
     {
-        fn_801E23A4(lbl_806E1860, from, to);
+        fn_801E23A4(g_pOverlayManager, from, to);
     }
 
     if ((to & 0x18) || to == 0x20000)
@@ -140,7 +140,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         if (from != 1 && to != 0x20000)
         {
             {
-                UnidentifiedPresentationState* presentation = fn_80284A58();
+                UnidentifiedPresentationState* presentation = GetPresentation();
                 presentation->mLetterBoxEnabled = true;
             }
 
@@ -160,7 +160,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
     {
         if (to != 1 && to != 4)
         {
-            UnidentifiedPresentationState* presentation = fn_80284A58();
+            UnidentifiedPresentationState* presentation = GetPresentation();
             presentation->mLetterBoxEnabled = false;
             presentation->mLetterBoxDuration = 0.0f;
 
@@ -174,7 +174,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         {
             if (g_pGame != NULL && g_pGame->m_eGameState == 3)
             {
-                UnidentifiedPresentationState* presentation = fn_80284A58();
+                UnidentifiedPresentationState* presentation = GetPresentation();
                 presentation->mLetterBoxEnabled = false;
                 presentation->mLetterBoxDuration = 0.0f;
             }

@@ -1,4 +1,5 @@
 #include "unclassified/tu_80326844.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/NetworkSession.h"
 #include "NL/nlPrint.h"
@@ -82,7 +83,7 @@ inline void UnidentifiedTransportConnection::UnidentifiedSetClosed()
     {                                                                          \
         int nResult = (result);                                                \
         int nReason = (reason);                                                \
-        fn_8004F594(0x10, "Connection Error result %d reason %d\n", nResult,  \
+        tDebugPrintManager::Print(DC_NETWORK, "Connection Error result %d reason %d\n", nResult,  \
             nReason);                                                          \
         if (mUnidentified7D4 < 6)                                              \
         {                                                                      \
@@ -243,7 +244,7 @@ void UnidentifiedTransportConnection::UnidentifiedUpdate()
             UnidentifiedPrepareMessage(message, mUnidentified7DA);
             if (g_TransportLayerLog >= 2)
             {
-                fn_8004F594(0x10, "Explicitly sent a pending ACK by itself\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Explicitly sent a pending ACK by itself\n");
             }
             UnidentifiedSend(message);
         }
@@ -255,7 +256,7 @@ void UnidentifiedTransportConnection::UnidentifiedUpdate()
         UnidentifiedPrepareMessage(message, mUnidentified7DA);
         if (g_TransportLayerLog >= 1)
         {
-            fn_8004F594(0x10, "Explicitly sent a Unreliable CLOSED\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Explicitly sent a Unreliable CLOSED\n");
         }
         UnidentifiedSend(message);
     }
@@ -281,7 +282,7 @@ void UnidentifiedTransportConnection::UnidentifiedUpdateConnecting()
             fn_8032644C(packet);
             if (g_TransportLayerLog >= 1)
             {
-                fn_8004F594(0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Not yet connected m_SentNotACKedQ out of space, will close connection\n");
             }
         }
@@ -378,7 +379,7 @@ void UnidentifiedTransportConnection::UnidentifiedUpdateConnected()
         UnidentifiedSubmitReliable(0xE5, data, length);
         if (g_TransportLayerLog >= 2)
         {
-            fn_8004F594(0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Submitted Keep Alive For Send after %d ms conn %d.%d\n",
                 elapsed, mAddress[2], mAddress[3]);
         }
@@ -409,7 +410,7 @@ void UnidentifiedTransportConnection::UnidentifiedUpdateConnected()
                 mUnidentified6D4.Push(packet);
                 if (g_TransportLayerLog >= 1)
                 {
-                    fn_8004F594(0x10,
+                    tDebugPrintManager::Print(DC_NETWORK,
                         "m_SentNotACKedQ out of space, will close connection\n");
                 }
             }
@@ -450,7 +451,7 @@ void UnidentifiedTransportConnection::UnidentifiedUpdateConnected()
         int resent = UnidentifiedResendNotACKed(message, 0);
         if (resent > 0 && g_TransportLayerLog >= 2)
         {
-            fn_8004F594(0x10, "Piggyback resent %d not ACKed messages\n", resent);
+            tDebugPrintManager::Print(DC_NETWORK, "Piggyback resent %d not ACKed messages\n", resent);
         }
         UnidentifiedSend(message);
         if (fn_8032BC30(&message))
@@ -472,7 +473,7 @@ void UnidentifiedTransportConnection::UnidentifiedUpdateConnected()
             UnidentifiedPrepareMessage(message, mUnidentified7DA);
             if (g_TransportLayerLog >= 2)
             {
-                fn_8004F594(0x10, "Resent %d not ACKed messages\n", resent);
+                tDebugPrintManager::Print(DC_NETWORK, "Resent %d not ACKed messages\n", resent);
             }
             while (m_OutgoingUnreliableSendQ.GetCount() > 0)
             {
@@ -565,7 +566,7 @@ void UnidentifiedTransportConnection::UnidentifiedUpdateConnected()
         }
         if (g_TransportLayerLog >= 1)
         {
-            fn_8004F594(0x10, "Explicitly sent %d Voice packets\n",
+            tDebugPrintManager::Print(DC_NETWORK, "Explicitly sent %d Voice packets\n",
                 fn_8032BCD0(&message));
         }
         UnidentifiedSend(message);
@@ -622,7 +623,7 @@ void UnidentifiedTransportConnection::UnidentifiedCheckTimeouts()
             int elapsed = (int)nlGetTimeDifference(mUnidentified058, nlGetTime());
             if (s_bExpireKeepAliveEnabled && elapsed > s_nExpireKeepAliveMS)
             {
-                fn_8004F594(0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Keep alive not received for %d MS, closing connection\n",
                     elapsed);
                 UNIDENTIFIED_CONNECTION_ERROR(6, 0);
@@ -679,7 +680,7 @@ void UnidentifiedTransportConnection::UnidentifiedSubmitReliable(
         fn_8032644C(packet);
         if (g_TransportLayerLog >= 1)
         {
-            fn_8004F594(0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "m_OutgoingSendQ out of space, will close connection\n");
         }
     }
@@ -703,7 +704,7 @@ void UnidentifiedTransportConnection::UnidentifiedSubmitUnreliable(
     {
         if (g_TransportLayerLog >= 1)
         {
-            fn_8004F594(0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "m_OutgoingUnreliableSendQ out of space, discarding unreliable send payload\n");
         }
         fn_8032644C(packet);
@@ -728,7 +729,7 @@ void UnidentifiedTransportConnection::UnidentifiedSubmitVoice(
     {
         if (g_TransportLayerLog >= 1)
         {
-            fn_8004F594(0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "m_OutgoingVoiceSendQ out of space, discarding payload\n");
         }
         fn_8032644C(packet);
@@ -740,14 +741,14 @@ void UnidentifiedTransportConnection::HandleTransportMessage(
 {
     if (g_TransportLayerLog >= 3)
     {
-        fn_8004F594(0x10, "HandleTransportMessage: ");
+        tDebugPrintManager::Print(DC_NETWORK, "HandleTransportMessage: ");
     }
     if (fn_8032BC18(message))
     {
         u16 ack = fn_8032BCFC(message) >> 16;
         if (g_TransportLayerLog >= 3)
         {
-            fn_8004F594(0x10, "ACK %d ", ack);
+            tDebugPrintManager::Print(DC_NETWORK, "ACK %d ", ack);
         }
         for (;;)
         {
@@ -781,7 +782,7 @@ void UnidentifiedTransportConnection::HandleTransportMessage(
         }
         if (g_TransportLayerLog >= 3)
         {
-            fn_8004F594(0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Received PONG 2-way latency = %d, processing on other end time = %d\n",
                 latency, other);
         }
@@ -816,14 +817,14 @@ void UnidentifiedTransportConnection::HandleTransportMessage(
         UnidentifiedTransportPacket_803263E4* packet = fn_8032BC94(message, i);
         if (g_TransportLayerLog >= 3)
         {
-            fn_8004F594(0x10, "Payload %d SN %d ", i, packet->mUnidentified06);
+            tDebugPrintManager::Print(DC_NETWORK, "Payload %d SN %d ", i, packet->mUnidentified06);
         }
         if (packet->mUnidentified06 == mUnidentified7DA)
         {
             UnidentifiedDeliver(packet);
             if (g_TransportLayerLog >= 3)
             {
-                fn_8004F594(0x10, "Delivered payload type %d size %d",
+                tDebugPrintManager::Print(DC_NETWORK, "Delivered payload type %d size %d",
                     packet->mUnidentified04, packet->mSize);
             }
             fn_8032644C(packet);
@@ -838,7 +839,7 @@ void UnidentifiedTransportConnection::HandleTransportMessage(
         {
             if (g_TransportLayerLog >= 3)
             {
-                fn_8004F594(0x10, "Out Of Order ");
+                tDebugPrintManager::Print(DC_NETWORK, "Out Of Order ");
             }
             if (!UnidentifiedHold(packet))
             {
@@ -849,21 +850,21 @@ void UnidentifiedTransportConnection::HandleTransportMessage(
         {
             if (g_TransportLayerLog >= 3)
             {
-                fn_8004F594(0x10, "Discarded duplicate ");
+                tDebugPrintManager::Print(DC_NETWORK, "Discarded duplicate ");
             }
             fn_8032644C(packet);
         }
     }
     if (g_TransportLayerLog >= 3)
     {
-        fn_8004F594(0x10, "END\n");
+        tDebugPrintManager::Print(DC_NETWORK, "END\n");
     }
 
     if (fn_8032BC54(message))
     {
         if (!UnidentifiedIsClosed())
         {
-            fn_8004F594(0x10, "Received unreliable CLOSED message\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Received unreliable CLOSED message\n");
             UNIDENTIFIED_CONNECTION_ERROR(2, mUnidentified7D4 != 7);
         }
     }
@@ -900,7 +901,7 @@ void UnidentifiedTransportConnection::UnidentifiedDeliver(
     {
         UnidentifiedClientResponse_8032C3CC payload;
         payload.Serialize(&serializer);
-        fn_8004F594(0x10, "Received Client Response Message\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Received Client Response Message\n");
         if (mUnidentified7D4 != 4)
         {
             UNIDENTIFIED_CONNECTION_ERROR(7, 2);
@@ -942,7 +943,7 @@ void UnidentifiedTransportConnection::UnidentifiedDeliver(
     {
         UnidentifiedClosing_8032C4B4 payload;
         payload.Serialize(&serializer);
-        fn_8004F594(0x10, "Received closing message\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Received closing message\n");
         mUnidentified06C += 3;
         UNIDENTIFIED_CONNECTION_ERROR(2, mUnidentified7D4 != 7);
         break;
@@ -954,7 +955,7 @@ void UnidentifiedTransportConnection::UnidentifiedDeliver(
         unsigned long long now = nlGetTime();
         if (g_TransportLayerLog >= 2)
         {
-            fn_8004F594(0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Received keep alive message after %d MS conn %d.%d\n",
                 (int)nlGetTimeDifference(mUnidentified058, now), mAddress[2],
                 mAddress[3]);
@@ -973,7 +974,7 @@ bool UnidentifiedTransportConnection::UnidentifiedHold(
     {
         if (g_TransportLayerLog >= 1)
         {
-            fn_8004F594(0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Discarded Out of Order packet .. no room in out of order hold\n");
         }
         return false;
@@ -984,8 +985,7 @@ bool UnidentifiedTransportConnection::UnidentifiedHold(
         mUnidentified078 = 1;
         if (g_TransportLayerLog >= 1)
         {
-            fn_8004F594(
-                0x10, "Placed payload SN %d in hold\n", packet->mUnidentified06);
+            tDebugPrintManager::Print(DC_NETWORK, "Placed payload SN %d in hold\n", packet->mUnidentified06);
         }
         return true;
     }
@@ -1008,7 +1008,7 @@ bool UnidentifiedTransportConnection::UnidentifiedHold(
         mUnidentified078 = 2;
         if (g_TransportLayerLog >= 1)
         {
-            fn_8004F594(0x10, "Placed 2nd payload SN %d in hold\n",
+            tDebugPrintManager::Print(DC_NETWORK, "Placed 2nd payload SN %d in hold\n",
                 packet->mUnidentified06);
         }
         return true;
@@ -1061,7 +1061,7 @@ bool UnidentifiedTransportConnection::UnidentifiedHold(
     }
     if (g_TransportLayerLog >= 1)
     {
-        fn_8004F594(0x10, "Placed %dth payload SN %d in hold\n",
+        tDebugPrintManager::Print(DC_NETWORK, "Placed %dth payload SN %d in hold\n",
             mUnidentified078 + 1, packet->mUnidentified06);
     }
     return true;
@@ -1079,7 +1079,7 @@ void UnidentifiedTransportConnection::UnidentifiedProcessHold()
         UnidentifiedDeliver(mUnidentified07C[delivered]);
         if (g_TransportLayerLog >= 2)
         {
-            fn_8004F594(0x10, "Delivered OUT OF ORDER payload type %d size %d",
+            tDebugPrintManager::Print(DC_NETWORK, "Delivered OUT OF ORDER payload type %d size %d",
                 mUnidentified07C[delivered]->mUnidentified04,
                 mUnidentified07C[delivered]->mSize);
         }
@@ -1095,7 +1095,7 @@ void UnidentifiedTransportConnection::UnidentifiedProcessHold()
     {
         if (g_TransportLayerLog >= 1)
         {
-            fn_8004F594(0x10, "Moved Out Of Order Hold up %d spots\n", delivered);
+            tDebugPrintManager::Print(DC_NETWORK, "Moved Out Of Order Hold up %d spots\n", delivered);
         }
         for (int i = delivered; i < mUnidentified078; i++)
         {
@@ -1107,7 +1107,7 @@ void UnidentifiedTransportConnection::UnidentifiedProcessHold()
 
 void UnidentifiedTransportConnection::UnidentifiedSendClientChallenge()
 {
-    fn_8004F594(0x10, "Sending Client Challenge\n");
+    tDebugPrintManager::Print(DC_NETWORK, "Sending Client Challenge\n");
     u8 buffer[200];
     UnidentifiedMessageSerializer serializer(1, buffer, sizeof(buffer));
     UnidentifiedClientChallenge_8032C294 payload;
@@ -1123,7 +1123,7 @@ void UnidentifiedTransportConnection::UnidentifiedSendClientChallenge()
 void UnidentifiedTransportConnection::UnidentifiedHandleClientChallenge(
     UnidentifiedClientChallenge_8032C294* challenge)
 {
-    fn_8004F594(0x10, "Received Client Challenge Message\n");
+    tDebugPrintManager::Print(DC_NETWORK, "Received Client Challenge Message\n");
     fn_80324CB4(((UnidentifiedReliableSocketLayout*)mSocket)->mDisplayEntries,
         "Received Client Challenge Message\n");
     if (mUnidentified7D4 != 3)
@@ -1149,7 +1149,7 @@ void UnidentifiedTransportConnection::UnidentifiedHandleClientChallenge(
 void UnidentifiedTransportConnection::UnidentifiedHandleServerChallenge(
     UnidentifiedServerChallenge_8032C308* challenge)
 {
-    fn_8004F594(0x10, "Received Server Challenge Message\n");
+    tDebugPrintManager::Print(DC_NETWORK, "Received Server Challenge Message\n");
     fn_80324CB4(((UnidentifiedReliableSocketLayout*)mSocket)->mDisplayEntries,
         "Received Server Challenge Message");
     if (mUnidentified7D4 != 1)
@@ -1232,7 +1232,7 @@ void UnidentifiedTransportConnection::UnidentifiedDisconnect(bool immediate)
     {
         mUnidentified7D4 = 7;
         mUnidentified048 = nlGetTicker();
-        fn_8004F594(0x10, "Sending Closing Message\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Sending Closing Message\n");
         u8 buffer[50];
         UnidentifiedMessageSerializer serializer(1, buffer, sizeof(buffer));
         UnidentifiedClosing_8032C4B4 payload;

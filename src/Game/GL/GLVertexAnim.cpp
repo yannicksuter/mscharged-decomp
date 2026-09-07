@@ -49,14 +49,14 @@ glModel* GLVertexAnim::GetModel(int frame)
 
     glModel* model = glModelDupNoStreams(m_pModel, false, 0);
     u8* vertices = m_pVertices
-                 + m_nNumVertices * actualFrame * m_Unknown0C;
+                 + actualFrame * m_Unknown0C * m_nNumVertices;
 
     for (glModelPacket* packet = model->packets;
          packet < model->packets + model->numPackets; packet++)
     {
-        u32 offset = 0;
         glModelStream* streams = packet->streams;
         glModelStream* endVertexData = streams + packet->numStreams;
+        u32 offset = 0;
         while (streams < endVertexData)
         {
             for (int i = 0; i < m_Unknown14; i++)

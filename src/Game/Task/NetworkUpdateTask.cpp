@@ -63,5 +63,5 @@ void NetworkUpdateTask::Initialize()
 
 void NetworkUpdateTask::Run(float)
 {
-    lbl_806E20D8->Update();
+    g_pNetworkSessionBase->Update();
 }

@@ -50,7 +50,7 @@ void cFollowCamera::Update(float fDeltaT)
     float fScalar;
     nlMatrix4 m4Orient;
 
-    pController = lbl_806E1E28->GetPad(0);
+    pController = g_pPadManager->GetPad(0);
     if (!pController->IsConnected())
     {
         m_matView.SetIdentity();

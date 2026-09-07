@@ -1,4 +1,5 @@
 #include "Game/Audio/XSoundHandle_802ED74C.h"
+#include "Game/Sys/debug.h"
 
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
@@ -6,7 +7,6 @@
 extern void* lbl_806E201C;
 
 extern "C" void fn_802ECC54(void* audioSystem, void* value);
-extern "C" void fn_8004F594(int category, const char* format, ...);
 
 static char sHitMarkerWarning[]
     = "Warning: hit marker (%d) with no callback\n";
@@ -67,12 +67,12 @@ void XSoundHandle_802ED74C::fn_802ED8D0(void* value)
         m_Callback(m_CallbackContext, this, value);
         return;
     }
-    fn_8004F594(10, sHitMarkerWarning, value);
+    tDebugPrintManager::Print(DC_SOUND, sHitMarkerWarning, value);
 }
 
 void XSoundHandle_802ED74C::fn_802ED904()
 {
     char buffer[0x100];
     nlSNPrintf(buffer, sizeof(buffer), sStateFormat, **m_Slot, m_CueIndex, m_State);
-    fn_8004F594(10, sLogFormat, buffer);
+    tDebugPrintManager::Print(DC_SOUND, sLogFormat, buffer);
 }

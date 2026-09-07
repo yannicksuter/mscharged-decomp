@@ -23,7 +23,7 @@ extern "C"
     UnidentifiedNumberModel_801AE530** fn_80276380();
     bool fn_80273B00();
 
-    extern UnidentifiedEventRegistry_801AE530* lbl_806E1D90;
+    extern UnidentifiedEventRegistry_801AE530* g_pEventRegistry;
 
     const float lbl_804DCF08[10] = {
         0.1662f,
@@ -100,9 +100,9 @@ UnidentifiedNumberDisplay_801AE530::UnidentifiedNumberDisplay_801AE530()
 
     Function<void*> callback(
         Bind<void>(MemFun(&UnidentifiedNumberDisplay_801AE530::fn_801AE71C), this));
-    unsigned int hash = fn_802B289C("GetReadyForKickoff", -1);
+    unsigned int hash = HashEventName("GetReadyForKickoff", -1);
     UnidentifiedEventBase** foundEvent = 0;
-    lbl_806E1D90->Find(hash, &foundEvent, 0);
+    g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
     ((UnidentifiedTypedEvent<void>*)event)->Add(callback, 0, -1);
 }

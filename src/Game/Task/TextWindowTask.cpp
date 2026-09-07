@@ -20,7 +20,7 @@ void TextWindowTask::Run(float)
     int index = 0;
     do
     {
-        input = lbl_806E1E28->GetPad(index);
+        input = g_pPadManager->GetPad(index);
         if (input->IsConnected())
         {
             break;

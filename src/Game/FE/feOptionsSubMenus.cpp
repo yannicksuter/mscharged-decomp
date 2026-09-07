@@ -6,6 +6,7 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlInstance.h"
 #include "Game/GameInfo.h"
+#include "Game/SH/SHMoviePlayer.h"
 #include "NL/nlColour.h"
 #include "NL/nlConfig.h"
 
@@ -330,4 +331,16 @@ void OptionsVisualMenuV2::fn_801D8538()
     fn_801CBCA0(0x304FDD1E, 0, 0, 1);
     mUnidentified6C6 = true;
     SaveLoad::StartSave(false);
+}
+
+void MoviePlayerScene::PlayScreenForwardSFX()
+{
+}
+
+void MoviePlayerScene::PlayScreenBackSFX()
+{
+}
+
+void MoviePlayerScene::OverrideMovieDimensions()
+{
 }

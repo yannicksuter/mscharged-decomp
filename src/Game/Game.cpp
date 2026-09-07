@@ -1,4 +1,5 @@
 #include "Game/Game.h"
+#include "Game/Sys/debug.h"
 #include "Game/NetworkDiagnostics_803239A8.h"
 
 #include "Game/Task/GameRenderTask.h"
@@ -104,9 +105,8 @@ extern "C" EventDispatcher* fn_800721C4();
 extern "C" bool fn_802B6AF8(
     const UnidentifiedGameRegion* param1, const nlVector2* param2);
 extern "C" int fn_800A9210(void* param1, int param2);
-extern "C" void fn_8004F594(int category, const char* format, ...);
-extern "C" int fn_800ECCCC();
-extern "C" void fn_800ECB50();
+extern "C" int GetAudioPauseDepth();
+extern "C" void ResumeAllAudio();
 extern "C" void fn_800EDC2C();
 extern "C" void fn_801E230C(
     BaseGameSceneManager* manager, SceneList scene, bool param3, bool param4);
@@ -138,7 +138,7 @@ extern UnidentifiedGameStatic lbl_8056B9A0;
 extern cPlayer* lbl_806E0C9C;
 extern int lbl_806E2130;
 extern UnidentifiedOnlineState* lbl_806E2164;
-extern BaseGameSceneManager* lbl_806E1860;
+extern BaseGameSceneManager* g_pOverlayManager;
 extern AISandbox* lbl_806E0B88;
 extern UnidentifiedRegistrationList lbl_805713E8;
 extern UnidentifiedRegistrationList lbl_80571988;
@@ -304,7 +304,7 @@ void cGame::fn_80057FC0()
 
 void cGame::fn_80058180()
 {
-    fn_8004F594(16, lbl_804FB238, mUnidentified134.mSize);
+    tDebugPrintManager::Print(DC_NETWORK, lbl_804FB238, mUnidentified134.mSize);
 
     while (mUnidentified134.mSize > 0)
     {
@@ -325,12 +325,12 @@ void cGame::fn_80058180()
         u8 buffer[50];
         s8 i;
         int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
-        int playerCount = fn_80338BF0(lbl_806E20D8);
+        int playerCount = GetNumMachines(g_pNetworkSessionBase);
         for (i = 0; i < playerCount; i++)
         {
-            if (i != fn_80338C20(lbl_806E20D8))
+            if (i != fn_80338C20(g_pNetworkSessionBase))
             {
-                lbl_806E20D8->Send(i, buffer, size, true);
+                g_pNetworkSessionBase->Send(i, buffer, size, true);
             }
         }
     }
@@ -345,7 +345,7 @@ void cGame::fn_8005830C()
         int frame = GetFixedUpdateTask()->GetFrame();
         nlSNPrintf(buffer, sizeof(buffer), lbl_804FB25C, frame);
         fn_8033919C(output, buffer);
-        fn_8004F594(16, buffer);
+        tDebugPrintManager::Print(DC_NETWORK, buffer);
     }
 
     g_pBall->m_uGoalType = 6;
@@ -414,7 +414,7 @@ void cGame::fn_80058498(bool param1, int param2, int param3)
 
 void cGame::fn_80058528(float timeScale, float transitionTime)
 {
-    if (fn_80338BF0(lbl_806E20D8) > 1 && timeScale < lbl_806E376C)
+    if (GetNumMachines(g_pNetworkSessionBase) > 1 && timeScale < lbl_806E376C)
     {
         timeScale = lbl_806E376C;
     }
@@ -438,7 +438,7 @@ void cGame::fn_80058528(float timeScale, float transitionTime)
                 fn_802F4E84(&hash, 0, 0);
             }
 
-            lbl_806E1860->GetScene((SceneList)89)->SetVisible(false);
+            g_pOverlayManager->GetScene((SceneList)89)->SetVisible(false);
             gpNumberDisplay->mUnidentified004 = false;
 
             if (transitionTime <= lbl_806E373C)
@@ -609,7 +609,7 @@ void cGame::fn_80059D80(u8 param1)
     message.param1 = param1;
 
     u32 frame = lbl_806E2138->mFrameProvider->GetFrame();
-    fn_8004F594(16, lbl_804FB2F4, message.param1, frame);
+    tDebugPrintManager::Print(DC_NETWORK, lbl_804FB2F4, message.param1, frame);
     fn_80333908(fn_803330AC(), &message, sizeof(message));
 }
 
@@ -634,7 +634,7 @@ void cGame::fn_80059DEC(
     message.param4 = param4;
 
     u32 frame = lbl_806E2138->mFrameProvider->GetFrame();
-    fn_8004F594(16, lbl_804FB318, message.param1, message.param2, message.param3, message.param4, frame);
+    tDebugPrintManager::Print(DC_NETWORK, lbl_804FB318, message.param1, message.param2, message.param3, message.param4, frame);
     fn_80333908(fn_803330AC(), &message, sizeof(message));
 }
 
@@ -642,7 +642,7 @@ void cGame::fn_80059E78()
 {
     u8 message = 183;
     u32 frame = lbl_806E2138->mFrameProvider->GetFrame();
-    fn_8004F594(16, lbl_804FB364, frame);
+    tDebugPrintManager::Print(DC_NETWORK, lbl_804FB364, frame);
     fn_80333908(fn_803330AC(), &message, sizeof(message));
 }
 
@@ -650,7 +650,7 @@ void cGame::fn_80059EDC()
 {
     u8 message = 185;
     u32 frame = lbl_806E2138->mFrameProvider->GetFrame();
-    fn_8004F594(16, lbl_804FB390, frame);
+    tDebugPrintManager::Print(DC_NETWORK, lbl_804FB390, frame);
     fn_80333908(fn_803330AC(), &message, sizeof(message));
 }
 
@@ -672,7 +672,7 @@ void cGame::fn_80059F40(u8 param1, u8 param2, float param3)
     message.param3 = param3;
 
     u32 frame = lbl_806E2138->mFrameProvider->GetFrame();
-    fn_8004F594(16, lbl_804FB3C0, message.param1, message.param2, message.param3, frame);
+    tDebugPrintManager::Print(DC_NETWORK, lbl_804FB3C0, message.param1, message.param2, message.param3, frame);
     fn_80333908(fn_803330AC(), &message, sizeof(message));
 }
 
@@ -680,7 +680,7 @@ void cGame::fn_80059FC4()
 {
     u8 message = 222;
     u32 frame = lbl_806E2138->mFrameProvider->GetFrame();
-    fn_8004F594(16, lbl_804FB404, frame);
+    tDebugPrintManager::Print(DC_NETWORK, lbl_804FB404, frame);
     fn_80333908(fn_803330AC(), &message, sizeof(message));
 }
 
@@ -721,7 +721,7 @@ extern "C" void fn_8005A7E8()
 {
     --lbl_806E2130;
 
-    if (fn_80338C20(lbl_806E20D8) == 0
+    if (fn_80338C20(g_pNetworkSessionBase) == 0
         && !lbl_806E2164->mUnidentified004
         && lbl_806E2138->mFrameProvider->GetFrame() % 10 == 0)
     {
@@ -801,7 +801,7 @@ void cGame::ChangeGameState(int state)
         nlSNPrintf(
             buffer, sizeof(buffer), lbl_804FB66C, m_eGameState, state, frame);
         fn_8033919C(output, buffer);
-        fn_8004F594(16, buffer);
+        tDebugPrintManager::Print(DC_NETWORK, buffer);
         if (fn_80323A58(6, buffer, sizeof(buffer)) != 0)
         {
             fn_8033919C(output, buffer);
@@ -988,15 +988,15 @@ void cGame::fn_8005DB44(int param1, bool param2)
 
 void cGame::fn_8005DF38()
 {
-    if (fn_800ECCCC() > 1)
+    if (GetAudioPauseDepth() > 1)
     {
-        fn_800ECB50();
+        ResumeAllAudio();
     }
     fn_800EDC2C();
 
-    fn_801E230C(lbl_806E1860, (SceneList)89, true, true);
-    fn_801E2498(lbl_806E1860, lbl_806E3770);
-    fn_801E999C(lbl_806E1860->GetScene((SceneList)89));
+    fn_801E230C(g_pOverlayManager, (SceneList)89, true, true);
+    fn_801E2498(g_pOverlayManager, lbl_806E3770);
+    fn_801E999C(g_pOverlayManager->GetScene((SceneList)89));
 
     if (mUnidentified10DC != 0)
     {

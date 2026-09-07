@@ -61,7 +61,9 @@ extern "C" void fn_8035F120(AXVPB* voice, float value)
 
 extern "C" void fn_8035F180(AXVPB* voice, int value)
 {
-    AXSetVoiceItdTarget(voice, value < 0 ? -value : 0, value > 0 ? value : 0);
+    u16 rShift = value <= 0 ? 0 : value;
+    u16 lShift = -value <= 0 ? 0 : -value;
+    AXSetVoiceItdTarget(voice, lShift, rShift);
 }
 
 extern "C" void fn_8035F1AC(AXVPB* voice, bool enabled, unsigned int frequency, bool unchanged)

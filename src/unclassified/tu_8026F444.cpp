@@ -1,4 +1,5 @@
 #include "unclassified/tu_8026F444.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/NetworkMessages.h"
@@ -144,7 +145,7 @@ void TU8026F444Scene::fn_8026FBB0(int index, void* context)
             lbl_80578450[i]->SetActiveSlide("waiting", true, false);
         }
 
-        UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+        UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
         bool isHost = roster->GetLocalMachineIndex() == 0;
         bool accepted = false;
         switch ((int)context)
@@ -178,14 +179,14 @@ void TU8026F444Scene::fn_8026FBB0(int index, void* context)
             NetworkMessageType27_8050B750 message;
             message.mUnidentified08 = accepted;
             message.mUnidentified09 = machineIndex;
-            lbl_806E10EC->SendConnectionDecisionToHost(&message);
+            g_pNetworkSession->SendConnectionDecisionToHost(&message);
         }
     }
 }
 
 void TU8026F444Scene::fn_8026FF28(NetworkMessageType27_8050B750* message)
 {
-    lbl_806E20D8->GetMachineRoster()->GetLocalMachineIndex();
+    g_pNetworkSessionBase->GetMachineRoster()->GetLocalMachineIndex();
     s8 machine = message->mUnidentified09;
     if (machine == 0)
     {
@@ -257,7 +258,7 @@ void TU8026F444Scene::SceneCreated()
 
 void TU8026F444Scene::fn_80270870()
 {
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     unsigned int value = 0;
     for (int i = 0; i < roster->GetMachineCount(); ++i)
     {
@@ -353,7 +354,7 @@ void TU8026F444Scene::Update(float dt)
         component->m_bVisible = true;
     }
 
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     bool disconnected = false;
     for (int i = 0; i < roster->GetMachineCount(); ++i)
     {
@@ -402,7 +403,7 @@ void TU8026F444Scene::Update(float dt)
     bool isHost = roster->GetLocalMachineIndex() == 0;
     if (mUnidentified034 == 2 && isHost)
     {
-        UnidentifiedMachineRoster* machines = lbl_806E20D8->GetMachineRoster();
+        UnidentifiedMachineRoster* machines = g_pNetworkSessionBase->GetMachineRoster();
         bool rejected = false;
         for (int i = 0; i < machines->GetMachineCount(); ++i)
         {
@@ -418,14 +419,14 @@ void TU8026F444Scene::Update(float dt)
             NetworkMessageType27_8050B750 message;
             message.mUnidentified08 = false;
             message.mUnidentified09 = 0;
-            lbl_806E10EC->SendConnectionDecisionToEveryone(&message);
+            g_pNetworkSession->SendConnectionDecisionToEveryone(&message);
         }
         else
         {
             bool accepted = true;
             if (mUnidentified180 > 0)
             {
-                UnidentifiedMachineRoster* machines = lbl_806E20D8->GetMachineRoster();
+                UnidentifiedMachineRoster* machines = g_pNetworkSessionBase->GetMachineRoster();
                 for (int i = 0; i < machines->GetMachineCount(); ++i)
                 {
                     if (mUnidentified03C[i] != 1)
@@ -438,10 +439,10 @@ void TU8026F444Scene::Update(float dt)
             if (accepted)
             {
                 mUnidentified034 = 1;
-                NetworkLobby_80133634* lobby = lbl_806E10EC->fn_801216F0();
+                NetworkLobby_80133634* lobby = g_pNetworkSession->fn_801216F0();
                 bool value = !fn_8025BD88();
                 UnidentifiedDraftEntry* info = lobby->GetLocalMachineInfo();
-                lbl_806E10EC->SendDraftToEveryone(lobby->GetPlayerCount(), info, false, value);
+                g_pNetworkSession->SendDraftToEveryone(lobby->GetPlayerCount(), info, false, value);
             }
         }
     }
@@ -481,7 +482,7 @@ void TU8026F444Scene::fn_802716E0(int index, void* context)
 void TU8026F444Scene::fn_80271768()
 {
     mUnidentified300 = false;
-    NetworkLobby_80133634* lobby = lbl_806E10EC->fn_801216F0();
+    NetworkLobby_80133634* lobby = g_pNetworkSession->fn_801216F0();
     int machineIndex = lobby->GetLocalMachineIndex();
     bool isHost = machineIndex == 0;
     unsigned int profileId = 0;
@@ -493,7 +494,7 @@ void TU8026F444Scene::fn_80271768()
             break;
         }
     }
-    lbl_806E10EC->fn_801216F0()->CloseConnectionsAndReset();
+    g_pNetworkSession->fn_801216F0()->CloseConnectionsAndReset();
 
     if (fn_8025BD88())
     {
@@ -502,14 +503,14 @@ void TU8026F444Scene::fn_80271768()
             lbl_8057848C.UnidentifiedRemoveStart();
         }
         *lbl_8057848C.UnidentifiedAddEnd() = profileId;
-        fn_8004F594(0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Adding rejected PID %d to last rejected PIDS Q size now %d\n",
             profileId, lbl_8057848C.mUnidentified08);
         lbl_806E1838->Push((SceneList)0x31, SCREEN_BACK, true);
     }
     else if (isHost)
     {
-        TU8025D170Scene* scene = static_cast<TU8025D170Scene*>(
+        SHOnlineInvitePlayers* scene = static_cast<SHOnlineInvitePlayers*>(
             lbl_806E1838->Push((SceneList)0x2C, SCREEN_NOTHING, true));
         scene->mUnidentified01C = true;
         scene->mUnidentified01D = true;

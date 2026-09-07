@@ -3,6 +3,7 @@
 
 #include "NL/gl/glModel.h"
 #include "NL/nlColour.h"
+#include "NL/nlMath.h"
 
 class GLColourMeshWriter
 {
@@ -27,6 +28,18 @@ public:
         nlColour colour;
         nlColourSet(colour, r, g, b, a);
         Colour(colour);
+    }
+
+    void Vertex(const nlVector3& value)
+    {
+        float x;
+        float y;
+        float z;
+
+        z = value.z;
+        y = value.y;
+        x = value.x;
+        Vertex(x, y, z);
     }
 
     void Vertex(float x, float y, float z)

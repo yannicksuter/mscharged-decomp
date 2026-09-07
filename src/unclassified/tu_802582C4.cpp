@@ -271,7 +271,7 @@ void TU802582C4Scene::Update(float fDeltaT)
         TU80300104Event event;
         event.mIndex = pad;
         event.mPosition = fn_802197FC(pad, &valid);
-        lbl_806E1E28->GetPad(pad)->GetButtonIndex(0x1E, true);
+        g_pPadManager->GetPad(pad)->GetButtonIndex(0x1E, true);
         event.mFlag0 = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
         event.mFlag1 = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
 

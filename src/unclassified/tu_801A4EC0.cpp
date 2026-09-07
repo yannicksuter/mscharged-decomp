@@ -38,6 +38,21 @@ static GXMaterialColourTweak_804FC520 g_HighlightBlue(
 static u32 lbl_806DCF90 = -1;
 static Lookup_801A537C* lbl_806E15B8;
 
+Lookup_801A537C::Lookup_801A537C()
+    : mValues(0)
+    , mWidth(0)
+    , mHeight(0)
+{
+}
+
+Lookup_801A537C::~Lookup_801A537C()
+{
+    if (mValues != 0)
+    {
+        delete[] mValues;
+    }
+}
+
 ArrayOwner_801A4EC0::~ArrayOwner_801A4EC0()
 {
     delete[] data;
@@ -130,21 +145,6 @@ extern "C" void fn_801A5328()
     {
         delete lbl_806E15B8;
         lbl_806E15B8 = 0;
-    }
-}
-
-Lookup_801A537C::Lookup_801A537C()
-    : mValues(0)
-    , mWidth(0)
-    , mHeight(0)
-{
-}
-
-Lookup_801A537C::~Lookup_801A537C()
-{
-    if (mValues != 0)
-    {
-        delete[] mValues;
     }
 }
 

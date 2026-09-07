@@ -1,4 +1,5 @@
 #include "NL/nlConfig.h"
+#include "Game/Sys/debug.h"
 
 #include "Game/Sys/simpleparser.h"
 #include "NL/nlFile.h"
@@ -7,7 +8,6 @@
 #include "cstring"
 
 extern "C" double atof(const char* string);
-extern "C" void fn_8004F594(int category, const char* format, ...);
 typedef Config::String BString;
 
 static char sBoolTrue[] = "true";
@@ -214,7 +214,7 @@ Config& Config::Global()
 
 void Config::LoadFromFile(const char* filename)
 {
-    fn_8004F594(0x13, "reading config file: %s\n", filename);
+    tDebugPrintManager::Print(DC_CONFIG_SYSTEM, "reading config file: %s\n", filename);
 
     unsigned long size = 0;
     void* loaded = nlLoadEntireFile(filename, &size, 0x20, AllocateEnd, 0, 0, 0);

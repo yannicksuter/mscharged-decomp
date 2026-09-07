@@ -1,4 +1,5 @@
 #include "Game/CharacterTriggers.h"
+#include "Game/Sys/debug.h"
 #include "Game/AnimInventory.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
@@ -25,7 +26,6 @@ extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 extern "C" void fn_800EC12C(unsigned long soundID, void* pParam);
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
 extern "C" void fn_80139D1C(int nPreset, DetInput* pPad);
-extern "C" int fn_8004F594(int category, const char* format, ...);
 
 static inline void SetDefaultVelocity(EmissionController* pController)
 {
@@ -50,7 +50,7 @@ void KillStar(cFielder* pFielder)
     pFielder->KillEffect(pGroup);
     pFielder->EndBlur();
     pFielder->m_pEffectsTexturing = 0;
-    fn_8004F594(10, "***KillStar()***\n");
+    tDebugPrintManager::Print(DC_SOUND, "***KillStar()***\n");
 }
 
 void EmitStar(cFielder* pFielder, bool bParam)
@@ -63,8 +63,9 @@ void EmitStar(cFielder* pFielder, bool bParam)
 
     if (!bParam)
     {
+        const char* groupName = "star";
         EffectsGroup* pGroup = fn_802E7CDC(
-            EmissionManager::Instance(), "star");
+            EmissionManager::Instance(), groupName);
         EmissionController* pController = fn_802E7FE4(
             EmissionManager::Instance(), pGroup, 3, true, false);
         SetDefaultVelocity(pController);
@@ -83,7 +84,7 @@ void EmitStar(cFielder* pFielder, bool bParam)
             100.0f,
             pFielder);
         pFielder->m_pEffectsTexturing = fxGetTexturing(eFXTex_Star);
-        fn_8004F594(10, "***EmitStar()***\n");
+        tDebugPrintManager::Print(DC_SOUND, "***EmitStar()***\n");
     }
 }
 
@@ -98,13 +99,14 @@ void KillMushroom(cFielder* pFielder)
         100.0f,
         0);
     pFielder->EndBlur();
-    fn_8004F594(10, "***KillMushroom()***\n");
+    tDebugPrintManager::Print(DC_SOUND, "***KillMushroom()***\n");
 }
 
 void EmitMushroom(cFielder* pFielder, bool bParam)
 {
+    const char* groupName = "mushroom";
     EffectsGroup* pGroup = fn_802E7CDC(
-        EmissionManager::Instance(), "mushroom");
+        EmissionManager::Instance(), groupName);
     EmissionController* pController = fn_802E7FE4(
         EmissionManager::Instance(), pGroup, 3, true, false);
     SetDefaultVelocity(pController);
@@ -129,7 +131,7 @@ void EmitMushroom(cFielder* pFielder, bool bParam)
             pFielder->m_pPhysicsCharacter,
             100.0f,
             pFielder);
-        fn_8004F594(10, "***EmitMushroom()***\n");
+        tDebugPrintManager::Print(DC_SOUND, "***EmitMushroom()***\n");
     }
     fn_80139D1C(1, pFielder->GetGlobalPad());
 }

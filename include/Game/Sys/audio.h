@@ -62,9 +62,9 @@ extern "C"
         XSoundOwner_802ED74C* owner, const void* debugName,
         void* context, bool restartable);
     bool fn_800EC7BC(unsigned long cueId, void* context);
-    void fn_800EC868();
-    void fn_800ECB50();
-    unsigned int fn_800ECCCC();
+    void PauseAllAudio();
+    void ResumeAllAudio();
+    unsigned int GetAudioPauseDepth();
     void fn_800ED8C8(XSoundHandle_802ED74C* handle);
     void fn_800ED8D4();
     void fn_800ED8D8();

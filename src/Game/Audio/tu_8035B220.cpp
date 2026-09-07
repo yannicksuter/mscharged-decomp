@@ -105,15 +105,10 @@ void Pitch::fn_802F6930(unsigned int definition, void*, bool negate,
         return;
     }
 
-    u32 definitionKey = definition;
-    u32 key = 0xD2894EC5;
+    ConfigNode_8035B240* node = ConfigFindDefinition_8035B240(definition);
+    u32 semitonesKey = lbl_806E21D8;
     ConfigValue_8035B240 value;
-    value.m_Raw = lbl_806E202C->m_Root->fn_8035B240(key);
-    ConfigNode_8035B240* node = (ConfigNode_8035B240*)value.m_Words.m_Value;
-    value.m_Raw = node->fn_8035B240(definitionKey);
-    node = (ConfigNode_8035B240*)value.m_Words.m_Value;
-    key = lbl_806E21D8;
-    value.m_Raw = node->fn_8035B240(key);
+    value.m_Raw = node->fn_8035B240(semitonesKey);
     parameter->m_Semitones = value.m_Float;
     parameter->m_Semitones = negate ? -parameter->m_Semitones : parameter->m_Semitones;
 }
@@ -131,15 +126,19 @@ void Pitch::fn_802F9B60(AudioEffectParameter_802F69A8* destination,
         amount = amount >= 0.0f ? amount : 0.0f;
         amount = amount <= 1.0f ? amount : 1.0f;
     }
-    else if (sourceParameter->m_State.m_Target.scalar != 0.0f)
-    {
-        amount = sourceParameter->m_State.m_Current.scalar / sourceParameter->m_State.m_Target.scalar;
-        amount = amount >= 0.0f ? amount : 0.0f;
-        amount = amount <= 1.0f ? amount : 1.0f;
-    }
     else
     {
-        amount = 1.0f;
+        amount = sourceParameter->m_State.m_Target.scalar;
+        if (amount)
+        {
+            amount = sourceParameter->m_State.m_Current.scalar / amount;
+            amount = amount >= 0.0f ? amount : 0.0f;
+            amount = amount <= 1.0f ? amount : 1.0f;
+        }
+        else
+        {
+            amount = 1.0f;
+        }
     }
 
     destinationParameter->m_Semitones += sourceParameter->m_Semitones * amount;

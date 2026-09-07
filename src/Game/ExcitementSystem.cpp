@@ -20,7 +20,7 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
     UnidentifiedEventRegistry;
 
-extern "C" UnidentifiedEventRegistry* lbl_806E1D90;
+extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 
 namespace
 {
@@ -82,9 +82,9 @@ void ExcitementSystem::fn_80196924()
     {
         Function<UnidentifiedEventData_80066748*> callback(
             Bind<void>(MemFun(&ExcitementSystem::fn_80196D30), this, placeholder0));
-        unsigned int hash = fn_802B289C("AttackSuccess", -1);
+        unsigned int hash = HashEventName("AttackSuccess", -1);
         UnidentifiedEventBase** foundEvent = 0;
-        lbl_806E1D90->Find(hash, &foundEvent, 0);
+        g_pEventRegistry->Find(hash, &foundEvent, 0);
         UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
         ((UnidentifiedTypedEvent<UnidentifiedEventData_80066748>*)event)
             ->Add(callback, 0, -1);
@@ -92,9 +92,9 @@ void ExcitementSystem::fn_80196924()
     {
         Function<UnidentifiedEventData_80067110*> callback(
             Bind<void>(MemFun(&ExcitementSystem::fn_80196D64), this, placeholder0));
-        unsigned int hash = fn_802B289C("LightningStrike", -1);
+        unsigned int hash = HashEventName("LightningStrike", -1);
         UnidentifiedEventBase** foundEvent = 0;
-        lbl_806E1D90->Find(hash, &foundEvent, 0);
+        g_pEventRegistry->Find(hash, &foundEvent, 0);
         UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
         ((UnidentifiedTypedEvent<UnidentifiedEventData_80067110>*)event)
             ->Add(callback, 0, -1);
@@ -102,9 +102,9 @@ void ExcitementSystem::fn_80196924()
     {
         Function<UnidentifiedEventData07*> callback(
             Bind<void>(MemFun(&ExcitementSystem::fn_80196D8C), this, placeholder0));
-        unsigned int hash = fn_802B289C("CollisionBallGoalpost", -1);
+        unsigned int hash = HashEventName("CollisionBallGoalpost", -1);
         UnidentifiedEventBase** foundEvent = 0;
-        lbl_806E1D90->Find(hash, &foundEvent, 0);
+        g_pEventRegistry->Find(hash, &foundEvent, 0);
         UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
         ((UnidentifiedTypedEvent<UnidentifiedEventData07>*)event)
             ->Add(callback, 0, -1);

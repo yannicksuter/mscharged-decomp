@@ -1,4 +1,5 @@
 #include "Game/NetworkSession.h"
+#include "Game/Sys/debug.h"
 #include "Game/NetworkRandom_803236CC.h"
 #include "Game/FE/feMusic.h"
 #include "Game/tu_801360A4.h"
@@ -26,7 +27,7 @@ extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
 
 bool lbl_806E10E8;
-UnidentifiedNetworkSession* lbl_806E10EC;
+UnidentifiedNetworkSession* g_pNetworkSession;
 int lbl_806E10F0;
 void* lbl_806E10F4;
 int lbl_806E10F8;
@@ -37,13 +38,12 @@ u32 lbl_806DC88C = 0x52345150;
 u32 lbl_806DC890 = 0x5234514A;
 u32 lbl_806DC894 = 0x52345145;
 
-extern UnidentifiedNetworkSession* lbl_806E20D8;
+extern UnidentifiedNetworkSession* g_pNetworkSessionBase;
 
 static MemoryAllocator s_NetworkAllocator;
 
-extern "C" int fn_8004F594(int channel, const char* format, ...);
 extern "C" bool fn_8025BD88();
-extern "C" int fn_802C2C84(const char* path, int);
+extern "C" int GetTweakBool(const char* path, int);
 extern u8 lbl_806E18D4;
 
 extern "C" void fn_80374174();
@@ -213,8 +213,8 @@ static inline void PopAllocator()
 void UnidentifiedNetworkSession::Create()
 {
     UnidentifiedNetworkSession* session = new UnidentifiedNetworkSession;
-    lbl_806E10EC = session;
-    lbl_806E20D8 = session;
+    g_pNetworkSession = session;
+    g_pNetworkSessionBase = session;
 }
 
 void UnidentifiedNetworkSession::Initialize(bool first)
@@ -342,8 +342,7 @@ void UnidentifiedNetworkSession::SendTournamentStartToEveryone()
         }
         else if (aid == 0)
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Failed to SendTournamentStartToEveryone to %d because no "
                 "connection\n",
                 machine);
@@ -384,7 +383,7 @@ void UnidentifiedNetworkSession::SendGameStartToEveryone()
     if (fn_8025BD88())
     {
         message.mStadium = fn_803236CC() & 0xF;
-        if (fn_802C2C84("/user/media_build", 0))
+        if (GetTweakBool("/user/media_build", 0))
         {
             while (!IsStadiumUnlocked(message.mStadium))
             {
@@ -434,8 +433,7 @@ void UnidentifiedNetworkSession::SendGameStartToEveryone()
         }
         else if (aid == 0)
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Failed to SendGameStartToEveryone to %d because no "
                 "connection\n",
                 machine);
@@ -471,8 +469,7 @@ void UnidentifiedNetworkSession::SendDraftToEveryone(
         }
         else if (aid == 0)
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Failed to SendDraftToEveryone to %d because no connection\n",
                 machine);
         }
@@ -497,8 +494,7 @@ void UnidentifiedNetworkSession::SendDraftToEveryone(NetMessageDraft* message)
         }
         else if (aid == 0)
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Failed to SendDraftToEveryone to %d because no connection\n",
                 machine);
         }
@@ -524,8 +520,7 @@ void UnidentifiedNetworkSession::SendSidesChangedToEveryone(
         }
         else if (aid == 0)
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Failed to SendSidesChangedToEveryone to %d because no "
                 "connection\n",
                 machine);
@@ -549,8 +544,7 @@ void UnidentifiedNetworkSession::SendSidesChangedToHost(
     }
     else if (aid == 0)
     {
-        fn_8004F594(
-            0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Failed to SendSidesChangedToHost because no connection\n");
     }
     else
@@ -579,8 +573,7 @@ void UnidentifiedNetworkSession::SendCheckConnectionToEveryone()
         }
         else if (aid == 0)
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Failed to SendCheckConnectionToEveryone to %d because no "
                 "connection\n",
                 machine);
@@ -607,8 +600,7 @@ void UnidentifiedNetworkSession::SendConnectionDecisionToEveryone(
         }
         else if (aid == 0)
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Failed to SendConnectionDecisionToEveryone to %d because no "
                 "connection\n",
                 machine);
@@ -632,8 +624,7 @@ void UnidentifiedNetworkSession::SendConnectionDecisionToHost(
     }
     else if (aid == 0)
     {
-        fn_8004F594(
-            0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Failed to SendConnectionDecisionToHost because no connection\n");
     }
     else
@@ -651,8 +642,7 @@ static inline void PopupNetworkErrorOverlay(
     }
     if (session->mPoppedOverlay != 3)
     {
-        fn_8004F594(
-            0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Ignored overlayRequest %d because already popped overlay %d\n",
             overlay, session->mPoppedOverlay);
         return;
@@ -708,16 +698,16 @@ void UnidentifiedNetworkSession::Update()
                     nlStrToWcs(info->mName, entries[player].mName, 0xB);
                     memset(entries[player].mUnidentified32, 0, 0x4C);
                     entries[player].mIndex = player;
-                    entries[player].mHead.mUnidentified04[0] = 0;
-                    entries[player].mHead.mUnidentified04[1] = 0;
-                    entries[player].mHead.mUnidentified04[2] = 0;
-                    entries[player].mHead.mUnidentified04[3] = 0;
-                    entries[player].mHead.mUnidentified04[4] = 0;
-                    entries[player].mHead.mUnidentified04[1] =
+                    entries[player].mHead.mScore = 0;
+                    entries[player].mHead.mDisplayRank = 0;
+                    entries[player].mHead.mWins = 0;
+                    entries[player].mHead.mLosses = 0;
+                    entries[player].mHead.mUnidentified14 = 0;
+                    entries[player].mHead.mDisplayRank =
                         info->mUnidentified0C;
-                    entries[player].mHead.mUnidentified04[2] =
+                    entries[player].mHead.mWins =
                         info->mUnidentified10;
-                    entries[player].mHead.mUnidentified04[3] =
+                    entries[player].mHead.mLosses =
                         info->mUnidentified12;
                 }
                 SendDraftToEveryone(mTransport->GetPlayerCount(), entries,
@@ -755,8 +745,7 @@ void UnidentifiedNetworkSession::Update()
 
     if (mOverlayRequest != 3 && mUnidentified2472 != 0)
     {
-        fn_8004F594(
-            0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Finished pending load, now can popup network error overlay "
             "%d\n",
             mOverlayRequest);
@@ -892,20 +881,18 @@ void UnidentifiedNetworkSession::OnlineVirtual04()
 
 static void* StaticSetInternetThreadFunc(void*)
 {
-    lbl_806E10EC->OnlineVirtual04();
+    g_pNetworkSession->OnlineVirtual04();
     return 0;
 }
 
 void UnidentifiedNetworkSession::fn_801202AC()
 {
-    fn_8004F594(
-        0x10, "Created StaticSetInternetThreadFunc returned %d\n",
+    tDebugPrintManager::Print(DC_NETWORK, "Created StaticSetInternetThreadFunc returned %d\n",
         OSCreateThread(
             (OSThread*)mLoginThread, StaticSetInternetThreadFunc, 0,
             mLoginThreadStack + sizeof(mLoginThreadStack), 0x4000, 0xE, 1)
             != 0);
-    fn_8004F594(
-        0x10, "Resumed StaticSetInternetThreadFunc returned %d\n",
+    tDebugPrintManager::Print(DC_NETWORK, "Resumed StaticSetInternetThreadFunc returned %d\n",
         OSResumeThread((OSThread*)mLoginThread));
 }
 
@@ -919,8 +906,7 @@ bool UnidentifiedNetworkSession::fn_80120368()
     switch (mDWCErrorType)
     {
     case 7:
-        fn_8004F594(
-            0x10, "DWCError Type is fatal, should we do something?\n");
+        tDebugPrintManager::Print(DC_NETWORK, "DWCError Type is fatal, should we do something?\n");
     case 3:
     case 4:
     case 5:
@@ -936,8 +922,7 @@ void UnidentifiedNetworkSession::fn_801203C0()
     mDWCLastError = error;
     if (error != 0)
     {
-        fn_8004F594(
-            0x10, "DWC_GetLastErrorEx error %d ErrorCode:%d ErrorType:%d\n",
+        tDebugPrintManager::Print(DC_NETWORK, "DWC_GetLastErrorEx error %d ErrorCode:%d ErrorType:%d\n",
             error, mDWCErrorCode, mDWCErrorType);
         DWC_ClearError();
     }
@@ -945,7 +930,7 @@ void UnidentifiedNetworkSession::fn_801203C0()
 
 static void StaticDWCLoginCallback(int error, int profileID, void* param)
 {
-    lbl_806E10EC->DWCLoginCallback(error, profileID, param);
+    g_pNetworkSession->DWCLoginCallback(error, profileID, param);
 }
 
 bool UnidentifiedNetworkSession::fn_80120440()
@@ -981,34 +966,31 @@ bool UnidentifiedNetworkSession::fn_80120440()
     bool result = DWC_LoginAsync(name, 0, StaticDWCLoginCallback, 0);
     if (!result)
     {
-        fn_8004F594(0x10, "Initial fail in DWC_LoginAsync\n");
+        tDebugPrintManager::Print(DC_NETWORK, "Initial fail in DWC_LoginAsync\n");
         int error = DWC_GetLastErrorEx(&mDWCErrorCode, &mDWCErrorType);
         mDWCLastError = error;
         if (error != 0)
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "DWC_GetLastErrorEx error %d ErrorCode:%d ErrorType:%d\n",
                 error, mDWCErrorCode, mDWCErrorType);
             DWC_ClearError();
         }
         return false;
     }
-    fn_8004F594(0x10, "Starting DWC_LoginAsync\n");
+    tDebugPrintManager::Print(DC_NETWORK, "Starting DWC_LoginAsync\n");
     return true;
 }
 
 void UnidentifiedNetworkSession::DWCLoginCallback(
     int error, int profileID, void* param)
 {
-    fn_8004F594(
-        0x10, "DWCLoginCallback returned %d, profileID %d param %d\n", error,
+    tDebugPrintManager::Print(DC_NETWORK, "DWCLoginCallback returned %d, profileID %d param %d\n", error,
         profileID, param);
 
     if (mLoginStage != 1)
     {
-        fn_8004F594(
-            0x10, "DWCLoginCallback ignored because in stage %d\n",
+        tDebugPrintManager::Print(DC_NETWORK, "DWCLoginCallback ignored because in stage %d\n",
             mLoginStage);
         return;
     }
@@ -1026,8 +1008,7 @@ void UnidentifiedNetworkSession::DWCLoginCallback(
 
     GameInfoManager::GetInstance()->ValidateSaveSlot(lbl_806E20E0);
     int check = DWC_GetIngamesnCheckResult();
-    fn_8004F594(
-        0x10, "DWC_GetIngamesnCheckResult returned %d\n", check);
+    tDebugPrintManager::Print(DC_NETWORK, "DWC_GetIngamesnCheckResult returned %d\n", check);
     if (check == 2)
     {
         mLoginListener->OnLoginResult(2);
@@ -1048,7 +1029,7 @@ bool UnidentifiedNetworkSession::fn_80120738()
         mLoginStage = 3;
         if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(4))
         {
-            fn_8004F594(0x10, "Error getting friends stats\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Error getting friends stats\n");
             started = false;
         }
         else
@@ -1061,7 +1042,7 @@ bool UnidentifiedNetworkSession::fn_80120738()
         mLoginStage = 5;
         if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(2))
         {
-            fn_8004F594(0x10, "Error getting nearby stats\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Error getting nearby stats\n");
             started = false;
         }
         else
@@ -1073,8 +1054,7 @@ bool UnidentifiedNetworkSession::fn_80120738()
     if (started)
     {
         mLoginStartTime = mElapsedTime;
-        fn_8004F594(
-            0x10, "Started login timestamp = %f\n", mElapsedTime);
+        tDebugPrintManager::Print(DC_NETWORK, "Started login timestamp = %f\n", mElapsedTime);
         return true;
     }
     return false;
@@ -1088,8 +1068,7 @@ void UnidentifiedNetworkSession::fn_80120838()
         if ((mLoginStage < 0xE || mLoginStage >= 0x10)
             && (mLoginStage >= 3 || mLoginStage < 1))
         {
-            fn_8004F594(
-                0x10, "Aborting Getting Stats in Login Timed out!\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Aborting Getting Stats in Login Timed out!\n");
             mLoginStage = 0xF;
             mLoginListener->OnStatsResult(false);
         }
@@ -1105,8 +1084,7 @@ void UnidentifiedNetworkSession::fn_80120838()
             mDWCLastError = error;
             if (error != 0)
             {
-                fn_8004F594(
-                    0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "DWC_GetLastErrorEx error %d ErrorCode:%d ErrorType:%d\n",
                     error, mDWCErrorCode, mDWCErrorType);
                 DWC_ClearError();
@@ -1132,16 +1110,14 @@ void UnidentifiedNetworkSession::fn_80120838()
             {
                 if (IsNewNetworkSeason(record))
                 {
-                    fn_8004F594(
-                        0x10,
+                    tDebugPrintManager::Print(DC_NETWORK,
                         "Starting new friends season clearing stats\n");
                     NetworkStatsManager_8012F378::Instance()->PostResetMyPlayerStats(2, 0);
                     mLoginStage = 4;
                 }
                 else if (lbl_806E20DC != 0)
                 {
-                    fn_8004F594(
-                        0x10,
+                    tDebugPrintManager::Print(DC_NETWORK,
                         "Detected Mii change putting friends unchanged "
                         "win/loss stats\n");
                     NetworkStatsManager_8012F378::Instance()->PostResetMyPlayerStats(2, 1);
@@ -1152,14 +1128,13 @@ void UnidentifiedNetworkSession::fn_80120838()
                     mLoginStage = 5;
                     if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(2))
                     {
-                        fn_8004F594(0x10, "Error getting nearby stats\n");
+                        tDebugPrintManager::Print(DC_NETWORK, "Error getting nearby stats\n");
                     }
                 }
             }
             else
             {
-                fn_8004F594(
-                    0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Login: Did not get own friends stats, first time user "
                     "will now put new own stats\n");
                 NetworkStatsManager_8012F378::Instance()->PostResetMyPlayerStats(2, 0);
@@ -1168,7 +1143,7 @@ void UnidentifiedNetworkSession::fn_80120838()
         }
         else
         {
-            fn_8004F594(0x10, "Error getting friends stats at login\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Error getting friends stats at login\n");
             mLoginListener->OnStatsResult(false);
             mLoginStage = 0xF;
         }
@@ -1185,14 +1160,13 @@ void UnidentifiedNetworkSession::fn_80120838()
             mLoginStage = 5;
             if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(2))
             {
-                fn_8004F594(0x10, "Error getting nearby stats\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Error getting nearby stats\n");
             }
             NetworkStatsManager_8012F378::Instance()->SubmitJob(0xA);
         }
         else
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Error finishing PostResetMyPlayerStats pers cat %d login\n",
                 NetworkStatsManager_8012F378::Instance()->mScoreCategory);
             mLoginListener->OnStatsResult(false);
@@ -1215,16 +1189,14 @@ void UnidentifiedNetworkSession::fn_80120838()
             {
                 if (IsNewNetworkSeason(record))
                 {
-                    fn_8004F594(
-                        0x10, "Starting new season clearing stats\n");
+                    tDebugPrintManager::Print(DC_NETWORK, "Starting new season clearing stats\n");
                     NetworkStatsManager_8012F378::Instance()->CommitPendingOnlineTotals(record);
                     NetworkStatsManager_8012F378::Instance()->PostResetMyPlayerStats(0, 0);
                     mLoginStage = 6;
                 }
                 else if (lbl_806E20DC != 0)
                 {
-                    fn_8004F594(
-                        0x10,
+                    tDebugPrintManager::Print(DC_NETWORK,
                         "Detected Mii change putting own unchanged win/loss "
                         "stats\n");
                     NetworkStatsManager_8012F378::Instance()->PostResetMyPlayerStats(0, 1);
@@ -1233,14 +1205,12 @@ void UnidentifiedNetworkSession::fn_80120838()
                 else
                 {
                     mLoginStage = 8;
-                    fn_8004F594(
-                        0x10,
+                    tDebugPrintManager::Print(DC_NETWORK,
                         "Login: Transition to "
                         "ELoggingInStage_GettingSODNearbyStats\n");
                     if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(0))
                     {
-                        fn_8004F594(
-                            0x10,
+                        tDebugPrintManager::Print(DC_NETWORK,
                             "Initial failure to RequestRankings "
                             "STRIKER_OF_DAY Nearby\n");
                         mLoginListener->OnStatsResult(false);
@@ -1250,8 +1220,7 @@ void UnidentifiedNetworkSession::fn_80120838()
             }
             else
             {
-                fn_8004F594(
-                    0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Login: Did not get own stats, first time user will now "
                     "put new own stats\n");
                 NetworkStatsManager_8012F378::Instance()->PostResetMyPlayerStats(0, 0);
@@ -1260,7 +1229,7 @@ void UnidentifiedNetworkSession::fn_80120838()
         }
         else
         {
-            fn_8004F594(0x10, "Error getting nearby stats at login\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Error getting nearby stats at login\n");
             mLoginListener->OnStatsResult(false);
             mLoginStage = 0xF;
         }
@@ -1277,15 +1246,14 @@ void UnidentifiedNetworkSession::fn_80120838()
             mLoginStage = 7;
             if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(2))
             {
-                fn_8004F594(0x10, "Error REgetting nearby stats\n");
+                tDebugPrintManager::Print(DC_NETWORK, "Error REgetting nearby stats\n");
                 mLoginListener->OnStatsResult(false);
                 mLoginStage = 0xF;
             }
         }
         else
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Error finishing PostResetMyPlayerStats pers cat %d login\n",
                 NetworkStatsManager_8012F378::Instance()->mScoreCategory);
             mLoginListener->OnStatsResult(false);
@@ -1302,14 +1270,12 @@ void UnidentifiedNetworkSession::fn_80120838()
         if (NetworkStatsManager_8012F378::Instance()->mLeaderboardRequestSucceeded != 0)
         {
             mLoginStage = 8;
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Login: Transition to "
                 "ELoggingInStage_GettingSODNearbyStats\n");
             if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(0))
             {
-                fn_8004F594(
-                    0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Initial failure to RequestRankings STRIKER_OF_DAY "
                     "Nearby\n");
                 mLoginListener->OnStatsResult(false);
@@ -1318,7 +1284,7 @@ void UnidentifiedNetworkSession::fn_80120838()
         }
         else
         {
-            fn_8004F594(0x10, "Error REgetting nearby stats at login\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Error REgetting nearby stats at login\n");
             mLoginListener->OnStatsResult(false);
             mLoginStage = 0xF;
         }
@@ -1339,14 +1305,13 @@ void UnidentifiedNetworkSession::fn_80120838()
             {
                 if (IsNewNetworkDay(record))
                 {
-                    fn_8004F594(0x10, "Starting new day clearing stats\n");
+                    tDebugPrintManager::Print(DC_NETWORK, "Starting new day clearing stats\n");
                     NetworkStatsManager_8012F378::Instance()->PostResetMyPlayerStats(1, 0);
                     mLoginStage = 9;
                 }
                 else if (lbl_806E20DC != 0)
                 {
-                    fn_8004F594(
-                        0x10,
+                    tDebugPrintManager::Print(DC_NETWORK,
                         "Detected Mii change putting SOD unchanged win/loss "
                         "stats\n");
                     NetworkStatsManager_8012F378::Instance()->PostResetMyPlayerStats(1, 1);
@@ -1357,8 +1322,7 @@ void UnidentifiedNetworkSession::fn_80120838()
                     mLoginStage = 0xB;
                     if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(4))
                     {
-                        fn_8004F594(
-                            0x10,
+                        tDebugPrintManager::Print(DC_NETWORK,
                             "Initial failure to RequestRankings SEASON "
                             "FRIENDS\n");
                         mLoginListener->OnStatsResult(false);
@@ -1370,8 +1334,7 @@ void UnidentifiedNetworkSession::fn_80120838()
                     mLoginStage = 0xC;
                     if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(1))
                     {
-                        fn_8004F594(
-                            0x10,
+                        tDebugPrintManager::Print(DC_NETWORK,
                             "Initial failure to RequestRankings "
                             "STRIKER_OF_DAY TOP\n");
                         mLoginListener->OnStatsResult(false);
@@ -1381,8 +1344,7 @@ void UnidentifiedNetworkSession::fn_80120838()
             }
             else
             {
-                fn_8004F594(
-                    0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Login: Did not get own SOD stats, first time user will "
                     "now put new own SOD stats\n");
                 NetworkStatsManager_8012F378::Instance()->PostResetMyPlayerStats(1, 0);
@@ -1391,7 +1353,7 @@ void UnidentifiedNetworkSession::fn_80120838()
         }
         else
         {
-            fn_8004F594(0x10, "Error getting SOD nearbystats at login\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Error getting SOD nearbystats at login\n");
             mLoginListener->OnStatsResult(false);
             mLoginStage = 0xF;
         }
@@ -1406,14 +1368,12 @@ void UnidentifiedNetworkSession::fn_80120838()
         if (NetworkStatsManager_8012F378::Instance()->mScoreRequestSucceeded != 0)
         {
             mLoginStage = 0xA;
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Login: Transition to "
                 "ELoggingInStage_ReGettingSODNearbyStats\n");
             if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(0))
             {
-                fn_8004F594(
-                    0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Initial failure to RE-RequestRankings STRIKER_OF_DAY "
                     "Nearby\n");
                 mLoginListener->OnStatsResult(false);
@@ -1422,8 +1382,7 @@ void UnidentifiedNetworkSession::fn_80120838()
         }
         else
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Error finishing PostResetMyPlayerStats pers cat %d login\n",
                 NetworkStatsManager_8012F378::Instance()->mScoreCategory);
             mLoginListener->OnStatsResult(false);
@@ -1444,8 +1403,7 @@ void UnidentifiedNetworkSession::fn_80120838()
                 mLoginStage = 0xB;
                 if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(4))
                 {
-                    fn_8004F594(
-                        0x10,
+                    tDebugPrintManager::Print(DC_NETWORK,
                         "Initial failure to RequestRankings SEASON "
                         "FRIENDS\n");
                     mLoginListener->OnStatsResult(false);
@@ -1457,8 +1415,7 @@ void UnidentifiedNetworkSession::fn_80120838()
                 mLoginStage = 0xC;
                 if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(1))
                 {
-                    fn_8004F594(
-                        0x10,
+                    tDebugPrintManager::Print(DC_NETWORK,
                         "Initial failure to RequestRankings STRIKER_OF_DAY "
                         "TOP\n");
                     mLoginListener->OnStatsResult(false);
@@ -1468,8 +1425,7 @@ void UnidentifiedNetworkSession::fn_80120838()
         }
         else
         {
-            fn_8004F594(
-                0x10, "Error REgetting SOD Nearby stats at login\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Error REgetting SOD Nearby stats at login\n");
             mLoginListener->OnStatsResult(false);
             mLoginStage = 0xF;
         }
@@ -1486,8 +1442,7 @@ void UnidentifiedNetworkSession::fn_80120838()
             mLoginStage = 0xC;
             if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(1))
             {
-                fn_8004F594(
-                    0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Initial failure to RequestRankings STRIKER_OF_DAY "
                     "TOP\n");
                 mLoginListener->OnStatsResult(false);
@@ -1496,8 +1451,7 @@ void UnidentifiedNetworkSession::fn_80120838()
         }
         else
         {
-            fn_8004F594(
-                0x10, "Error getting SEASON FRIENDS stats at login\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Error getting SEASON FRIENDS stats at login\n");
             mLoginListener->OnStatsResult(false);
             mLoginStage = 0xF;
         }
@@ -1514,8 +1468,7 @@ void UnidentifiedNetworkSession::fn_80120838()
             mLoginStage = 0xD;
             if (!NetworkStatsManager_8012F378::Instance()->RequestRankings(3))
             {
-                fn_8004F594(
-                    0x10,
+                tDebugPrintManager::Print(DC_NETWORK,
                     "Initial failure to RequestRankings SEASON TOP\n");
                 mLoginListener->OnStatsResult(false);
                 mLoginStage = 0xF;
@@ -1523,7 +1476,7 @@ void UnidentifiedNetworkSession::fn_80120838()
         }
         else
         {
-            fn_8004F594(0x10, "Error getting SOD TOP stats at login\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Error getting SOD TOP stats at login\n");
             mLoginListener->OnStatsResult(false);
             mLoginStage = 0xF;
         }
@@ -1538,15 +1491,14 @@ void UnidentifiedNetworkSession::fn_80120838()
         if (NetworkStatsManager_8012F378::Instance()->mLeaderboardRequestSucceeded != 0)
         {
             mLoginStage = 0xE;
-            lbl_806E10EC->OnlineVirtual14(2);
+            g_pNetworkSession->OnlineVirtual14(2);
             mLoginListener->OnStatsResult(true);
             NetworkStatsManager_8012F378::Instance()->RefreshSaveState_801314D0();
             lbl_806E20DC = 0;
         }
         else
         {
-            fn_8004F594(
-                0x10, "Error getting SEASON TOP stats at login\n");
+            tDebugPrintManager::Print(DC_NETWORK, "Error getting SEASON TOP stats at login\n");
             mLoginListener->OnStatsResult(false);
             mLoginStage = 0xF;
         }
@@ -1708,32 +1660,30 @@ void UnidentifiedNetworkSession::ListenerVirtual04(
 
 void UnidentifiedNetworkSession::ListenerVirtual08(u32 connection, u8* address)
 {
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     if (roster == 0)
     {
         return;
     }
-    NetworkSocket_801246E4* socket = lbl_806E20D8->GetDirectSocket();
+    NetworkSocket_801246E4* socket = g_pNetworkSessionBase->GetDirectSocket();
     if (roster->ShouldAcceptConnection(connection, address))
     {
         socket->AcceptConnection(connection);
-        fn_8004F594(
-            0x10, "Accepted connection from %d.%d.%d.%d\n", address[0],
+        tDebugPrintManager::Print(DC_NETWORK, "Accepted connection from %d.%d.%d.%d\n", address[0],
             address[1], address[2], address[3]);
     }
     else
     {
         socket->RejectConnection(connection);
-        fn_8004F594(
-            0x10, "Rejected connection from %d.%d.%d.%d\n", address[0],
+        tDebugPrintManager::Print(DC_NETWORK, "Rejected connection from %d.%d.%d.%d\n", address[0],
             address[1], address[2], address[3]);
     }
 }
 
 void UnidentifiedNetworkSession::ListenerVirtual0C(u32 connection, int result)
 {
-    fn_8004F594(0x10, "Connected callback result %d\n", result);
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    tDebugPrintManager::Print(DC_NETWORK, "Connected callback result %d\n", result);
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     if (roster != 0)
     {
         roster->OnConnected(connection, result);
@@ -1742,9 +1692,9 @@ void UnidentifiedNetworkSession::ListenerVirtual0C(u32 connection, int result)
 
 void UnidentifiedNetworkSession::ListenerVirtual10(u32 connection, int reason)
 {
-    fn_8004F594(0x10, "Connection closed reason %d\n", reason);
+    tDebugPrintManager::Print(DC_NETWORK, "Connection closed reason %d\n", reason);
     fn_80124038(connection, reason);
-    UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     if (roster != 0)
     {
         roster->OnConnectionClosed(connection, reason);
@@ -1786,7 +1736,7 @@ extern int lbl_806DE668[2];
 static inline void NotifyGameStarted(UnidentifiedNetworkSession* session)
 {
     UnidentifiedNetworkSyncState* state = lbl_806E2168;
-    int count = fn_80338BF0(session);
+    int count = GetNumMachines(session);
     fn_80338AD8(state, (s8)fn_80338C20(session), count);
 }
 
@@ -1797,7 +1747,7 @@ static inline void RecordGameConfig(
     UnidentifiedNetGameState* state = lbl_806E2164;
     if (state->mRecordingEnabled != 0)
     {
-        int count = fn_80338BF0(session);
+        int count = GetNumMachines(session);
         fn_803380F4(
             state, (s8)fn_80338C20(session), count, seed, config, 0x58);
     }
@@ -1849,8 +1799,7 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
     int machine = (s8)roster->MachineIdxFromConnection(message->mUnidentified04);
     if (machine < 0 || machine >= roster->GetMachineCount())
     {
-        fn_8004F594(
-            0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "Discarded message type %d because from unknown connection %x\n",
             (u8)message->GetType(), message->mUnidentified04);
         return 1;
@@ -1864,10 +1813,9 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
         int original = machine;
         machine = (s8)NetTournManager::Instance()->TournamentIdxToMachineIdx(
             machine);
-        if (machine < 0 || machine >= fn_80338BF0(this))
+        if (machine < 0 || machine >= GetNumMachines(this))
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Discarded message type %d.  TournamentIdxToMachineIdx "
                 "changed ID %d to ID %d, but invalid\n",
                 (u8)message->GetType(), (s8)original, machine);
@@ -1890,8 +1838,7 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
             fn_80332EC0(lbl_806E2164->mRandomSeed);
             UnidentifiedGameConfig* config = info->mConfig;
             fn_80122748(config);
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "PlaybackRecordedGame: Random seed %x Stadium %d HOME %d "
                 "[%d, %d, %d] Vs AWAY %d [%d, %d, %d]\n",
                 info->mSeed, config->mStadium, config->mHomeTeam,
@@ -1899,8 +1846,7 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
                 config->mHomeSidekicks[2], config->mAwayTeam,
                 config->mAwaySidekicks[0], config->mAwaySidekicks[1],
                 config->mAwaySidekicks[2]);
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "PlaybackRecordedGame: Skill %d WinBy %s GameTime %d "
                 "GameGoals %d BestSeries %d\n",
                 config->mSettings[0],
@@ -1908,10 +1854,10 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
                 config->mSettings[2], config->mSettings[3],
                 config->mSettings[4]);
             fn_803330AC()->Reset(0);
-            lbl_806E20D8->BaseVirtual3C(info);
+            g_pNetworkSessionBase->BaseVirtual3C(info);
             UnidentifiedNetworkSyncState* state = lbl_806E2168;
-            int count = fn_80338BF0(lbl_806E20D8);
-            fn_80338AD8(state, (s8)fn_80338C20(lbl_806E20D8), count);
+            int count = GetNumMachines(g_pNetworkSessionBase);
+            fn_80338AD8(state, (s8)fn_80338C20(g_pNetworkSessionBase), count);
             }
         }
         else
@@ -1993,22 +1939,19 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
     }
 
     case 0xF:
-        fn_8004F594(
-            0x10, "Received loaded game message from %d\n", machine);
+        tDebugPrintManager::Print(DC_NETWORK, "Received loaded game message from %d\n", machine);
         mUnidentified246E[machine] = 1;
         break;
 
     case 0x12:
-        fn_8004F594(
-            0x10, "Received loaded game CLIENT message from %d\n", machine);
+        tDebugPrintManager::Print(DC_NETWORK, "Received loaded game CLIENT message from %d\n", machine);
         mUnidentified246E[machine] = 1;
         break;
 
     case 0x13:
     {
-        fn_8004F594(
-            0x10, "Received loaded game EVERYONE message from %d\n", machine);
-        for (int index = 0; index < fn_80338BF0(this); ++index)
+        tDebugPrintManager::Print(DC_NETWORK, "Received loaded game EVERYONE message from %d\n", machine);
+        for (int index = 0; index < GetNumMachines(this); ++index)
         {
             mUnidentified246E[index] = 1;
         }
@@ -2023,10 +1966,9 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
         {
             break;
         }
-        if (machine < 0 || machine >= fn_80338BF0(this))
+        if (machine < 0 || machine >= GetNumMachines(this))
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Discarded message type %d because from unknown connection "
                 "%x\n",
                 (u8)message->GetType(), message->mUnidentified04);
@@ -2034,8 +1976,7 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
         }
         if (mUnidentified2448 != 5)
         {
-            fn_8004F594(
-                0x10, "Ignoring GameInput Message because in network stage %d",
+            tDebugPrintManager::Print(DC_NETWORK, "Ignoring GameInput Message because in network stage %d",
                 mUnidentified2448);
             break;
         }
@@ -2059,10 +2000,9 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
         {
             break;
         }
-        if (machine < 0 || machine >= fn_80338BF0(this))
+        if (machine < 0 || machine >= GetNumMachines(this))
         {
-            fn_8004F594(
-                0x10,
+            tDebugPrintManager::Print(DC_NETWORK,
                 "Discarded message type %d because from unknown connection "
                 "%x\n",
                 (u8)message->GetType(), message->mUnidentified04);
@@ -2070,8 +2010,7 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
         }
         if (mUnidentified2448 != 5)
         {
-            fn_8004F594(
-                0x10, "Ignoring GameInput Message because in network stage %d",
+            tDebugPrintManager::Print(DC_NETWORK, "Ignoring GameInput Message because in network stage %d",
                 mUnidentified2448);
             break;
         }
@@ -2110,9 +2049,8 @@ int UnidentifiedNetworkSession::ReceiverVirtual00(
         response.mMachineMask = mUnidentified246C;
         u8 buffer[0x32];
         u32 size = lbl_806E2100->fn_8032C830(&response, buffer, 0x32);
-        fn_8004F594(
-            0x10, "HOST sending Pause Response to all clients and myself\n");
-        int count = fn_80338BF0(this);
+        tDebugPrintManager::Print(DC_NETWORK, "HOST sending Pause Response to all clients and myself\n");
+        int count = GetNumMachines(this);
         for (s8 target = 0; target < count; ++target)
         {
             Send(target, buffer, size, true);
@@ -2281,8 +2219,7 @@ void UnidentifiedNetworkSession::BaseVirtual44(NetMessageGameStart* message)
         mUnidentified247C = 1;
     }
 
-    fn_8004F594(
-        0x10, "PreStartNetworkedGame NumMachines:%d MyMachineID:%d\n",
+    tDebugPrintManager::Print(DC_NETWORK, "PreStartNetworkedGame NumMachines:%d MyMachineID:%d\n",
         mUnidentified0000, mUnidentified2424);
     AIPadManager::Startup();
 
@@ -2344,8 +2281,7 @@ void UnidentifiedNetworkSession::BaseVirtual44(NetMessageGameStart* message)
         }
     }
 
-    fn_8004F594(
-        0x10, "StartNetworkedGame: Random seed %x NumMachines:%d "
+    tDebugPrintManager::Print(DC_NETWORK, "StartNetworkedGame: Random seed %x NumMachines:%d "
               "MyMachineID:%d\n",
         seed, mUnidentified0000, mUnidentified2424);
     fn_803330AC()->Reset(0);
@@ -2377,8 +2313,7 @@ public:
 
 void UnidentifiedNetworkSession::fn_80122C84()
 {
-    fn_8004F594(
-        0x10, "Rematching network game.  End Frame is %d\n",
+    tDebugPrintManager::Print(DC_NETWORK, "Rematching network game.  End Frame is %d\n",
         ((UnidentifiedFrameController*)GetFixedUpdateTask())->GetEndFrame());
     fn_80111688(GetFixedUpdateTask());
     fn_80332EC8();
@@ -2419,28 +2354,28 @@ extern "C" void fn_80122DCC()
     fn_80332EC0(seed);
 
     UnidentifiedNetworkSyncState* state = lbl_806E2168;
-    int count = fn_80338BF0(lbl_806E20D8);
-    fn_80338AD8(state, (s8)fn_80338C20(lbl_806E20D8), count);
+    int count = GetNumMachines(g_pNetworkSessionBase);
+    fn_80338AD8(state, (s8)fn_80338C20(g_pNetworkSessionBase), count);
 
     UnidentifiedGameConfig config;
     fn_80122650(&config);
     UnidentifiedNetGameState* record = lbl_806E2164;
     if (record->mRecordingEnabled != 0)
     {
-        int machines = fn_80338BF0(lbl_806E20D8);
+        int machines = GetNumMachines(g_pNetworkSessionBase);
         fn_803380F4(
-            record, (s8)fn_80338C20(lbl_806E20D8), machines, seed, &config,
+            record, (s8)fn_80338C20(g_pNetworkSessionBase), machines, seed, &config,
             0x58);
     }
 }
 
 extern "C" void fn_80122EC0()
 {
-    UnidentifiedNetworkOnlineInterface& online = *lbl_806E20D8;
+    UnidentifiedNetworkOnlineInterface& online = *g_pNetworkSessionBase;
     online.OnlineVirtual08();
-    fn_80338C2C(lbl_806E20D8, 1, 4);
+    fn_80338C2C(g_pNetworkSessionBase, 1, 4);
 
-    UnidentifiedNetworkPeer* peer = fn_80338BF8(lbl_806E20D8, 0);
+    UnidentifiedNetworkPeer* peer = fn_80338BF8(g_pNetworkSessionBase, 0);
     for (int player = 0; player < (int)peer->mUnidentified004; ++player)
     {
         fn_80336D50(fn_80336B6C(peer, player), peer, (s8)player, player);
@@ -2449,22 +2384,21 @@ extern "C" void fn_80122EC0()
 
     u32 seed = fn_803236CC();
     fn_80332EC0(seed);
-    fn_8004F594(
-        0x10, "StartSinglePlayerGame: Set random seed to %x\n", seed);
+    tDebugPrintManager::Print(DC_NETWORK, "StartSinglePlayerGame: Set random seed to %x\n", seed);
     fn_803330AC()->Reset(0);
 
     UnidentifiedNetworkSyncState* state = lbl_806E2168;
-    int count = fn_80338BF0(lbl_806E20D8);
-    fn_80338AD8(state, (s8)fn_80338C20(lbl_806E20D8), count);
+    int count = GetNumMachines(g_pNetworkSessionBase);
+    fn_80338AD8(state, (s8)fn_80338C20(g_pNetworkSessionBase), count);
 
     UnidentifiedGameConfig config;
     fn_80122650(&config);
     UnidentifiedNetGameState* record = lbl_806E2164;
     if (record->mRecordingEnabled != 0)
     {
-        int machines = fn_80338BF0(lbl_806E20D8);
+        int machines = GetNumMachines(g_pNetworkSessionBase);
         fn_803380F4(
-            record, (s8)fn_80338C20(lbl_806E20D8), machines, seed, &config,
+            record, (s8)fn_80338C20(g_pNetworkSessionBase), machines, seed, &config,
             0x58);
     }
 }
@@ -2485,8 +2419,7 @@ extern "C" void fn_8012300C()
     fn_80332EC0(lbl_806E2164->mRandomSeed);
     UnidentifiedGameConfig* config = info->mConfig;
     fn_80122748(config);
-    fn_8004F594(
-        0x10,
+    tDebugPrintManager::Print(DC_NETWORK,
         "PlaybackRecordedGame: Random seed %x Stadium %d HOME %d "
         "[%d, %d, %d] Vs AWAY %d [%d, %d, %d]\n",
         info->mSeed, config->mStadium, config->mHomeTeam,
@@ -2494,18 +2427,17 @@ extern "C" void fn_8012300C()
         config->mHomeSidekicks[2], config->mAwayTeam,
         config->mAwaySidekicks[0], config->mAwaySidekicks[1],
         config->mAwaySidekicks[2]);
-    fn_8004F594(
-        0x10,
+    tDebugPrintManager::Print(DC_NETWORK,
         "PlaybackRecordedGame: Skill %d WinBy %s GameTime %d GameGoals %d "
         "BestSeries %d\n",
         config->mSettings[0],
         config->mSettings[1] == 0 ? "Timed" : "Goals",
         config->mSettings[2], config->mSettings[3], config->mSettings[4]);
     fn_803330AC()->Reset(0);
-    lbl_806E20D8->BaseVirtual3C(info);
+    g_pNetworkSessionBase->BaseVirtual3C(info);
     UnidentifiedNetworkSyncState* state = lbl_806E2168;
-    int count = fn_80338BF0(lbl_806E20D8);
-    fn_80338AD8(state, (s8)fn_80338C20(lbl_806E20D8), count);
+    int count = GetNumMachines(g_pNetworkSessionBase);
+    fn_80338AD8(state, (s8)fn_80338C20(g_pNetworkSessionBase), count);
 }
 
 void UnidentifiedNetworkSession::BaseVirtual48(int reason)
@@ -2522,7 +2454,7 @@ void UnidentifiedNetworkSession::BaseVirtual48(int reason)
     }
     else
     {
-        UnidentifiedMachineRoster* roster = lbl_806E20D8->GetMachineRoster();
+        UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
         if (roster != 0)
         {
             roster->Shutdown(true);
@@ -2582,14 +2514,14 @@ int UnidentifiedNetworkSession::fn_80123360()
     {
         return 1;
     }
-    if (!lbl_806E10EC->fn_80123314())
+    if (!g_pNetworkSession->fn_80123314())
     {
         return 0;
     }
 
     if (mOverlayRequest == 3)
     {
-        for (int machine = 0; machine < fn_80338BF0(this); ++machine)
+        for (int machine = 0; machine < GetNumMachines(this); ++machine)
         {
             if (machine == (s8)fn_80338C20(this))
             {
@@ -2631,7 +2563,7 @@ int UnidentifiedNetworkSession::fn_80123360()
         return 1;
     }
 
-    for (int machine = 0; machine < fn_80338BF0(this); ++machine)
+    for (int machine = 0; machine < GetNumMachines(this); ++machine)
     {
         if (mUnidentified246E[machine] == 0)
         {
@@ -2639,16 +2571,15 @@ int UnidentifiedNetworkSession::fn_80123360()
         }
     }
 
-    fn_8004F594(0x10, "Game has loaded for everyone!\n");
+    tDebugPrintManager::Print(DC_NETWORK, "Game has loaded for everyone!\n");
     if (GetMachineRoster()->RosterVirtual08() == 1 && (s8)fn_80338C20(this) == 0)
     {
         NetMessageLoadedGameEveryone message;
         u8 buffer[0xC8];
         u32 size = lbl_806E2100->fn_8032C830(&message, buffer, 0xC8);
-        fn_8004F594(
-            0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "HOST sending Loaded Game Everyone message to all clients\n");
-        int count = fn_80338BF0(this);
+        int count = GetNumMachines(this);
         for (s8 target = 1; target < count; ++target)
         {
             Send(target, buffer, size, true);
@@ -2696,10 +2627,9 @@ void UnidentifiedNetworkSession::fn_80123A08()
         NetMessageLoadedGame message;
         u8 buffer[0xC8];
         u32 size = lbl_806E2100->fn_8032C830(&message, buffer, 0xC8);
-        fn_8004F594(
-            0x10, "Machine %d sending Loaded Game message\n",
+        tDebugPrintManager::Print(DC_NETWORK, "Machine %d sending Loaded Game message\n",
             (s8)fn_80338C20(this));
-        int count = fn_80338BF0(this);
+        int count = GetNumMachines(this);
         for (s8 target = 0; target < count; ++target)
         {
             Send(target, buffer, size, true);
@@ -2714,8 +2644,7 @@ void UnidentifiedNetworkSession::fn_80123A08()
         NetMessageLoadedGameClient message;
         u8 buffer[0xC8];
         u32 size = lbl_806E2100->fn_8032C830(&message, buffer, 0xC8);
-        fn_8004F594(
-            0x10, "Machine %d sending Loaded Game CLIENT message to HOST\n",
+        tDebugPrintManager::Print(DC_NETWORK, "Machine %d sending Loaded Game CLIENT message to HOST\n",
             (s8)fn_80338C20(this));
         Send(0, buffer, size, true);
     }
@@ -2747,7 +2676,7 @@ bool UnidentifiedNetworkSession::fn_80123E70(u32 connection)
 
     if (NetTournManager::Instance()->mTournamentMachineMappingActive)
     {
-        for (int machine = 0; machine < fn_80338BF0(this); ++machine)
+        for (int machine = 0; machine < GetNumMachines(this); ++machine)
         {
             int index
                 = NetTournManager::Instance()->MachineIdxToTournamentIdx(
@@ -2790,8 +2719,7 @@ void UnidentifiedNetworkSession::fn_80124038(u32 connection, int reason)
         }
         else
         {
-            fn_8004F594(
-                0x10, "Connection %x not one of our peers, ignoring\n",
+            tDebugPrintManager::Print(DC_NETWORK, "Connection %x not one of our peers, ignoring\n",
                 connection);
         }
         break;
@@ -2804,15 +2732,13 @@ void UnidentifiedNetworkSession::fn_80124038(u32 connection, int reason)
         }
         else
         {
-            fn_8004F594(
-                0x10, "Connection %x not one of our peers, ignoring\n",
+            tDebugPrintManager::Print(DC_NETWORK, "Connection %x not one of our peers, ignoring\n",
                 connection);
         }
         break;
 
     case 6:
-        fn_8004F594(
-            0x10,
+        tDebugPrintManager::Print(DC_NETWORK,
             "WARNING: Ignored Connection Lost Stage "
             "ENetworkStage_GameEnded\n");
         break;
@@ -2823,8 +2749,7 @@ void UnidentifiedNetworkSession::fn_80124038(u32 connection, int reason)
         break;
 
     default:
-        fn_8004F594(
-            0x10, "WARNING: Ignored Connection Lost %x unknown network stage "
+        tDebugPrintManager::Print(DC_NETWORK, "WARNING: Ignored Connection Lost %x unknown network stage "
                   "%d\n",
             connection, mUnidentified2448);
         break;

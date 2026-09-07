@@ -1,4 +1,5 @@
 #include "NL/glx/glxTexture.h"
+#include "Game/Sys/debug.h"
 
 #include "NL/gc/gcSwizzler.h"
 #include "NL/gl/glMemory.h"
@@ -112,7 +113,7 @@ static PlatTexture* glx_MakeGridTexture(int width, int height)
     }
 
     nGridMemory += height * (width << 1) + sizeof(PlatTexture);
-    fn_8004F594(1, "grid [%d %d] now using %uKB\n", width, height, nGridMemory / 1024);
+    tDebugPrintManager::Print(DC_GL, "grid [%d %d] now using %uKB\n", width, height, nGridMemory / 1024);
 
     texture->Swizzle(true);
     texture->Prepare();

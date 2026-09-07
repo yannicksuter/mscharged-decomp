@@ -43,7 +43,10 @@ public:
     ~WorldAnimController()
     {
         delete m_pPoseAccumulator;
-        delete m_pPoseTree;
+        if (m_pPoseTree != 0)
+        {
+            delete m_pPoseTree;
+        }
     }
 
     float GetAnimationTime();
@@ -73,6 +76,15 @@ public:
     void fn_80342328();
     void fn_80342630(
         WorldAnimController* pController, unsigned long uHierarchyHash);
+    AnimationSet* FindAnimationSet(unsigned long uHashID)
+    {
+        AnimationSet** ppAnimationSet;
+        if (m_animationSetMap.FindGet(uHashID, &ppAnimationSet))
+        {
+            return *ppAnimationSet;
+        }
+        return 0;
+    }
     WorldAnimController* fn_803426D8(unsigned long uHashID);
     WorldAnimController* fn_803427B0(unsigned long uHashID);
     AnimationSet* LoadHierarchy(nlChunk* pChunk);

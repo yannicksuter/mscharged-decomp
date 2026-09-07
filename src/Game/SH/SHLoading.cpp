@@ -21,7 +21,7 @@ extern "C" Presentation* fn_801FEEAC();
 extern "C" bool fn_801FF168(Presentation* presentation);
 extern "C" bool fn_80273B00();
 
-extern BaseGameSceneManager* lbl_806E1860;
+extern BaseGameSceneManager* g_pOverlayManager;
 
 struct LoadingFlowState
 {
@@ -68,7 +68,7 @@ void SuperLoadingScene::Update(float fDeltaT)
             }
             else if (mType == TT_OUT)
             {
-                lbl_806E1860->Pop();
+                g_pOverlayManager->Pop();
             }
         }
     }
