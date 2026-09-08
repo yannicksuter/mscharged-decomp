@@ -106,7 +106,7 @@ private:
 
 public:
     BindExp3() { }
-    BindExp3(F function, const A& t0, const B& t1, const C& t2)
+    BindExp3(const F& function, const A& t0, const B& t1, const C& t2)
         : mFunction(function)
         , mT0(t0)
         , mT1(t1)

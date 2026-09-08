@@ -5,7 +5,7 @@
 #include "Game/NetworkMessages.h"
 #include "Game/NetworkSession.h"
 #include "Game/tu_801360A4.h"
-#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"

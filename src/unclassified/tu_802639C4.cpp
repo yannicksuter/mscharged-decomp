@@ -3,7 +3,7 @@
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioSystem.h"
-#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feScene.h"
 #include "Game/FE/tlComponentInstance.h"

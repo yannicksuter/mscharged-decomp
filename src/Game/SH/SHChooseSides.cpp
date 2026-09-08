@@ -695,7 +695,7 @@ void SHChooseSides2::fn_8021CBD0()
  */
 void SHChooseSides2::BindChooseSideInstances()
 {
-    TLInstance* found = (TLInstance*)fn_803068F4(mSideGroups[0],
+    TLInstance* found = FEFinder<TLInstance, 2>::Find(mSideGroups[0],
         nlStringLowerHash("empty"),
         nlStringLowerHash("home_group"),
         nlStringLowerHash("home_away_box"),
@@ -715,7 +715,7 @@ void SHChooseSides2::BindChooseSideInstances()
     mControllerComponents[0].fn_80300D74(
         homeInstance, true, position.f.x, position.f.y, 1.0f, 1.0f);
 
-    found = (TLInstance*)fn_803068F4(mSideGroups[1],
+    found = FEFinder<TLInstance, 2>::Find(mSideGroups[1],
         nlStringLowerHash("empty"),
         nlStringLowerHash("away_group"),
         nlStringLowerHash("home_away_box"),
@@ -769,7 +769,7 @@ void SHChooseSides2::BindChooseSideInstances()
     TU80300104Base::Callback helpLeave(Bind<void>(MemFun(&SHChooseSides2::fn_8021E6E8), this, Placeholder<0>(), Placeholder<1>()));
     TU80300104Base::Callback helpSelect(Bind<void>(MemFun(&SHChooseSides2::fn_8021E76C), this, Placeholder<0>(), Placeholder<1>()));
 
-    found = (TLInstance*)fn_803068F4(mHelpButton, nlStringLowerHash("OVER"), nlStringLowerHash("list_high_250x60"), 0, 0, 0, 0);
+    found = FEFinder<TLInstance, 2>::Find(mHelpButton, nlStringLowerHash("OVER"), nlStringLowerHash("list_high_250x60"), 0, 0, 0, 0);
     TLInstance* helpInstance;
     if (found == 0)
     {

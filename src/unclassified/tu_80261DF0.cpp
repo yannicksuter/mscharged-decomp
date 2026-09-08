@@ -3,7 +3,7 @@
 #include "Game/BaseGameSceneManager.h"
 #include "Game/GameInfo.h"
 #include "Game/Sys/debug.h"
-#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/feScene.h"

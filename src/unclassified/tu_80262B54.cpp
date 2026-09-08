@@ -1,7 +1,7 @@
 #include "unclassified/tu_80262B54.h"
 
 #include "Game/BaseGameSceneManager.h"
-#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePopupMenu.h"

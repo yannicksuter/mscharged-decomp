@@ -218,9 +218,22 @@ vtable and three following methods use the shared `Function2`/`BindExp3`
 implementation. The next function destroys a containing scene, not this
 control. `UnidentifiedScrollWidget`, field placeholders, and address-based
 method names remain reconstruction identities. The predecessor's
-`FEScrollText` is a different control and is not a source donor here. Finder
-and binding emission, together with literal ordering, remain unresolved;
-the unit is not source-linked.
+`FEScrollText` is a different control and is not a source donor here. Binding
+emission, finder register allocation in the range setter, and literal ordering
+remain unresolved; the unit is not source-linked.
+
+The shared `FEFinder` implementation uses the predecessor's `InlineHasher`
+argument objects and inline finder structure. R4QE01's string constructor
+at `0x801CA5A8` hashes with `nlStringLowerHash`, and its integer constructor
+at `0x801CA5E0` stores the supplied hash. Their inline definitions and the
+argument-object finder are available through `Game/FE/feFinder.inl`.
+The scroll control's finder at `0x802308D0` and the online scene consumers
+expand this implementation, while `ButtonComponent::SetState` retains calls
+to both constructors and the shared finder instances under the same compiler
+flags. The declaration/implementation separation represents this observed
+visibility distinction, not recovered original header filenames. Recursive
+descent still calls the shared implementation at `0x803068F8`; no local
+recursive finder is instantiated.
 
 `NL/blowfish.cpp` retains the constructor, block encipher, key initialization
 and padded encoding paths from Jim Conger's C++ conversion, including its

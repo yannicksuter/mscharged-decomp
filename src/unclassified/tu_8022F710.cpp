@@ -1,6 +1,6 @@
 #include "unclassified/tu_8022F710.h"
 
-#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "NL/nlBind.h"
@@ -296,11 +296,11 @@ void UnidentifiedScrollWidget::fn_802308D0(TLInstance* instance)
 {
     mUnidentified00 = (TLComponentInstance*)instance;
     mUnidentified1C = instance->GetAssetPosition();
-    TLComponentInstance* up = FEFinder<TLComponentInstance, 4>::Find(mUnidentified00->GetActiveSlide(), nlStringLowerHash("up_arrow"), 0, 0, 0, 0, 0);
+    TLComponentInstance* up = FEFinder<TLComponentInstance, 4>::Find(mUnidentified00->GetActiveSlide(), "up_arrow");
     mUnidentified04[0] = up == 0 ? &lbl_80580030 : up;
-    TLComponentInstance* down = FEFinder<TLComponentInstance, 4>::Find(mUnidentified00->GetActiveSlide(), nlStringLowerHash("down_arrow"), 0, 0, 0, 0, 0);
+    TLComponentInstance* down = FEFinder<TLComponentInstance, 4>::Find(mUnidentified00->GetActiveSlide(), "down_arrow");
     mUnidentified04[1] = down == 0 ? &lbl_80580030 : down;
-    TLInstance* found = FEFinder<TLInstance, 2>::Find(mUnidentified00->GetActiveSlide(), nlStringLowerHash("track"), nlStringLowerHash("btn_scroll_minmax"), 0, 0, 0, 0);
+    TLInstance* found = FEFinder<TLInstance, 2>::Find(mUnidentified00->GetActiveSlide(), "track", "btn_scroll_minmax");
     mUnidentified0C = found == 0 ? &lbl_80580248 : found;
 }
 
@@ -308,15 +308,16 @@ void UnidentifiedScrollWidget::fn_80230B90(int value)
 {
     if (value > 0)
     {
-        TLInstance* track = FEFinder<TLInstance, 2>::Find(mUnidentified00->GetActiveSlide(), nlStringLowerHash("track"), nlStringLowerHash("btn_track "), 0, 0, 0, 0);
+        TLInstance* track = FEFinder<TLInstance, 2>::Find(mUnidentified00->GetActiveSlide(), "track", "btn_track ");
         feVector3 trackScale = track->GetScale();
         feVector3 scale = mUnidentified0C->GetScale();
-        float distance = 100.0f * (float(0.63671875 * trackScale.f.y) - scale.f.y * 0.5f);
+        float distance = 0.63671875 * trackScale.f.y;
+        distance = (distance - scale.f.y / 2.0f) * 100.0f;
         mUnidentified2C = distance / value;
         feVector3 position = mUnidentified0C->GetAssetPosition();
         if (mUnidentified48 == 9999.9f)
             mUnidentified48 = position.f.y;
-        mUnidentified30 = distance * 0.5f + position.f.y;
+        mUnidentified30 = distance / 2.0f + position.f.y;
         mUnidentified0C->SetAssetPosition(position.f.x, mUnidentified30, position.f.z);
         mUnidentified0C->m_bVisible = true;
     }
