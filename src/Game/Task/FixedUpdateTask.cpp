@@ -28,6 +28,7 @@
 #include "Game/Team.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/globalpad.h"
+#include "NL/platpad.h"
 #include "NL/nlMain.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -40,11 +41,8 @@
 #include <math.h>
 
 extern u16 m_aJoystickRemap__14cCameraManager;
-extern "C" void fn_8037537C(void*);
 extern u16 lbl_806DF740;
 extern int lbl_806E2130;
-
-extern void* g_pPlatPadManager;
 
 float g_fFixedUpdateTick = 0.02f;
 bool g_bRunSimAndRenderInLockStep;
@@ -160,10 +158,10 @@ u32 FixedUpdateTask::WriteSyncLog()
     fn_80338D04(cache, &sTimeScaleType, "timeScale", &checksum,
         fixedUpdateTask.mTargetTimeScale);
 
-    int numGroups = GetNumMachines(g_pNetworkSessionBase);
+    int numGroups = g_pNetworkSessionBase->GetNumMachines();
     for (int groupIndex = 0; groupIndex < numGroups; groupIndex++)
     {
-        UnidentifiedNetworkPeer* group = fn_80338BF8(g_pNetworkSessionBase, (s8)groupIndex);
+        UnidentifiedNetworkPeer* group = g_pNetworkSessionBase->GetPeer((s8)groupIndex);
         int numControllers = group->mUnidentified004;
         for (int controllerIndex = 0; controllerIndex < numControllers; controllerIndex++)
         {
@@ -226,7 +224,7 @@ u32 FixedUpdateTask::WriteSyncLog()
 
 void FixedUpdateTask::UnidentifiedVirtual10()
 {
-    if (g_pNetworkSession->OnlineVirtual0C())
+    if (g_pNetworkSession->GetSessionMode())
     {
         NetworkStatsManager_8012F378::Instance()->CalculateAndReportGameResult(2);
     }
@@ -342,7 +340,7 @@ void FixedUpdateTask::Run(float dt)
         {
             g_pPadManager->SetActivePadSet(1);
             simulationTick = g_fFixedUpdateTick;
-            fn_8037537C(g_pPlatPadManager);
+            UpdatePlatPad(g_pPlatPadManager);
             g_pPadManager->Update(simulationTick);
             FlickDetection::Update();
 
@@ -390,7 +388,7 @@ void FixedUpdateTask::Run(float dt)
     }
 
     g_pPadManager->SetActivePadSet(0);
-    fn_8037537C(g_pPlatPadManager);
+    UpdatePlatPad(g_pPlatPadManager);
     g_pPadManager->Update(dt);
     FlickDetection::Update();
 }

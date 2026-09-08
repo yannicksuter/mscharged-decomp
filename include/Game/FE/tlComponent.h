@@ -14,7 +14,7 @@ public:
     void SetActiveSlide(unsigned long hash, bool arg2, bool arg3);
     void SetActiveSlide(TLSlide* slide, bool arg2, bool arg3);
 
-    TLSlide* GetActiveSlide() const
+    TLSlide* GetActiveSlide()
     {
         return m_pActiveSlide;
     }

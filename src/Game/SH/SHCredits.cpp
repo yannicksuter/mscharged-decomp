@@ -1,4 +1,8 @@
+#include "Game/SH/SHNavigation.h"
+#include "Game/GameSceneManager.h"
 #include "Game/SH/SHCredits.h"
+#include "Game/Render/RLViewLayers.h"
+#include "Game/FE/FEAudio.h"
 
 #include "Game/BasicStadium.h"
 #include "Game/FE/feFinder.h"
@@ -14,12 +18,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 
-extern BaseGameSceneManager* lbl_806E1838;
-extern TLComponentInstance lbl_80580030;
 
-extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" void SetPointerEnabled(bool value);
-extern "C" bool fn_80273B00();
 
 SceneList CreditScene::mNextScene = (SceneList)13;
 
@@ -29,7 +28,7 @@ inline TLComponentInstance* CreditScene::GetWhiteFadeComponent()
         mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("WHITE FADE"), 0, 0, 0, 0);
     if (result == 0)
     {
-        result = &lbl_80580030;
+        result = &gDefaultTLComponentInstance;
     }
     return result;
 }
@@ -131,7 +130,7 @@ void CreditScene::SetupForPhase()
     switch (mPhase)
     {
     case 1:
-        if (fn_80273B00())
+        if (IsWidescreen())
         {
             mPresentation->SetActiveSlide("NLG", true);
         }
@@ -152,7 +151,7 @@ void CreditScene::SetupForPhase()
     case 0:
         mPresentation->SetActiveSlide("NINTENDO", true);
         mPresentation->m_currentSlide->Update(0.0f);
-        fn_801CBCA0(0xF394C076, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xF394C076, 0, 0, 1);
         BasicStadium::GetCurrentStadium()->mUnidentified070 = false;
         break;
     case 2:
@@ -165,8 +164,8 @@ void CreditScene::SetupForPhase()
         BasicStadium::GetCurrentStadium()->mUnidentified070 = false;
         break;
     case 4:
-        fn_801CBCA0(0xBB142B94, 0, 0, 1);
-        lbl_806E1838->Push(mNextScene, SCREEN_NOTHING, true);
+        FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
+        GameSceneManager::Instance()->Push(mNextScene, SCREEN_NOTHING, true);
         if (mNextScene == (SceneList)13)
         {
             FEMusic::StartStreamIfDifferent(1);
@@ -203,7 +202,7 @@ void CreditScene::SetupForCredits()
     {
         SetMovieDetails("art/movies/credits.thp", true, false);
     }
-    if (fn_80273B00())
+    if (IsWidescreen())
     {
         mPresentation->SetActiveSlide("CREDITS", true);
     }

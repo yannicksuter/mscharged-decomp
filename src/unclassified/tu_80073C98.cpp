@@ -6,6 +6,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_80073898.h"
+#include "NL/nlstring_tmpl.h"
 
 extern "C" bool fn_80073BC0(void*);
 extern "C" int fn_800A9154(int, char*, unsigned long);

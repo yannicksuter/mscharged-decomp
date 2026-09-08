@@ -21,8 +21,11 @@ class TLComponent;
 class TLInstance
 {
 public:
+    TLInstance(TLComponent* component);
+
     eTimeLineAssetType GetType() const;
     bool IsValidAtTime(float fCurrentTime);
+    void SetVisible(bool visible);
 
     feVector3& GetAssetPosition() const;
     feVector3& GetAssetRotation() const;
@@ -33,11 +36,21 @@ public:
     feVector3& GetScale() const;
     feVector3& GetPivot() const;
     nlColour& GetColour() const;
+    float GetUVX() const;
+    float GetUVY() const;
+    float GetUVWidth() const;
+    float GetUVHeight() const;
 
     void SetAssetPosition(float x, float y, float z);
     void SetAssetRotation(float x, float y, float z);
     void SetAssetScale(float x, float y, float z);
     void SetAssetColour(const nlColour& color);
+    void SetAssetPivot(float x, float y, float z);
+    void SetAssetUVX(float value);
+    void SetAssetUVY(float value);
+    void SetAssetUVWidth(float value);
+    void SetAssetUVHeight(float value);
+    void SetAssetVisible(bool visible);
 
     /* 0x00 */ TLInstance* m_next;
     /* 0x04 */ TLInstance* m_prev;

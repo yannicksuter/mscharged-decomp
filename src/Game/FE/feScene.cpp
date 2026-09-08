@@ -43,8 +43,6 @@ public:
     FEResourceManager* m_resourceManager;
 };
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 extern "C" void fn_802FF644(FESceneManager* pSceneManager, FEScene* pFEScene);
 

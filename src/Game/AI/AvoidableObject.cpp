@@ -8,6 +8,7 @@
 #include "Game/GameTweaks.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsPatch.h"
+#include "Game/Physics/PhysicsSphere_801798A8.h"
 #include "Game/Player.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/ChainChomp.h"
@@ -15,6 +16,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlList.h"
 #include "NL/nlMath.h"
+#include "unclassified/tu_801B535C.h"
 
 extern cTeam* g_pCurrentlyUpdatingTeam;
 
@@ -33,14 +35,6 @@ extern "C" void fn_802B5CC0(
 extern "C" void fn_802B5D10(
     nlVector4& out, const nlVector3& point, const nlVector3& normal);
 extern "C" float fn_802B5DD0(const nlVector2& point, const nlVector4& plane);
-
-// The object used by NPCManager's ball-carrier radius query. Only its
-// physics pointer is known here.
-struct UnidentifiedObject_801B535C
-{
-    /* 0x00 */ u8 mUnidentified000[0x2C];
-    /* 0x2C */ PhysicsSphere* mUnidentified02C;
-};
 
 // The desire queried by the fielder strength rule carries its target fielder
 // at 0xB8; the concrete desire class is not reconstructed yet.
@@ -183,7 +177,7 @@ float AvoidableFielder::GetRadius()
     float fRadius = 0.0f;
     if (m_pFielder->fn_8003EA6C())
     {
-        fRadius = lbl_806E1608->mUnidentified024->mUnidentified02C->GetRadius();
+        fRadius = lbl_806E1608->mUnidentified024->mUnidentified2C->GetRadius();
     }
     else
     {

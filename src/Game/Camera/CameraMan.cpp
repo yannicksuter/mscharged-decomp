@@ -1,4 +1,5 @@
 #include "Game/Camera/CameraMan.h"
+#include "Game/FE/feHelpFuncs.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/Camera/AnimViewerCam.h"
 #include "Game/Camera/DebugCam.h"
@@ -25,7 +26,6 @@ extern float g_fSimulationTick;
 extern "C" void fn_800F02DC(void*, unsigned long, void*);
 extern "C" cRumbleFilter* fn_800EF5F8(void*);
 extern "C" UnidentifiedCameraFilter* fn_800EF9F0(void*);
-extern "C" const char* fn_801CBE80(int);
 extern "C" void fn_8005B330(nlVector3*, float, float);
 extern "C" void fn_80277BB0();
 extern "C" void fn_800F0990(float);
@@ -732,8 +732,8 @@ extern "C" void fn_800F030C(bool bUnidentified)
         int i = 0;
         for (; i < 12; i++)
         {
-            nlSNPrintf(fileName, 100, "art/cameras/%s_shoottoscorecamera.cam", fn_801CBE80(i));
-            nlSNPrintf(lbl_8056DD70[i], 100, "%s_ShootToScoreCamera", fn_801CBE80(i));
+            nlSNPrintf(fileName, 100, "art/cameras/%s_shoottoscorecamera.cam", GetTeamName((eTeamID)i));
+            nlSNPrintf(lbl_8056DD70[i], 100, "%s_ShootToScoreCamera", GetTeamName((eTeamID)i));
             if (nlLoadEntireFileAsync(fileName, fn_800F02DC, (void*)lbl_8056DD70[i], 0x20, AllocateEnd, 0, 0, 0))
                 lbl_806E0ED0++;
         }

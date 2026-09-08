@@ -1,3 +1,7 @@
+#include "NL/plat/PlatPadManager.h"
+#include "NL/plat/WiiRemotePad.h"
+#include "NL/plat/WiiFreestylePad.h"
+
 #include "Game/ReplayManager.h"
 
 #include "Game/Camera/CameraMan.h"
@@ -22,18 +26,9 @@ extern float g_fFixedUpdateTick;
 extern bool lbl_806E14B8;
 extern float lbl_806E14CC;
 extern bool lbl_806E14D1;
-extern int lbl_806E227C;
-extern int lbl_806E228C;
-
-struct PlatPadManager_806E2478
-{
-    /* 0x000 */ u8 mUnidentified000[0x2F4];
-    /* 0x2F4 */ int type[4];
-};
 
 extern "C"
 {
-    extern PlatPadManager_806E2478* g_pPlatPadManager;
     float fn_80189870();
 }
 
@@ -164,10 +159,10 @@ void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
         }
 
         int unidentifiedClassID
-            = unidentifiedPad->mBackend->UnidentifiedClassID();
+            = unidentifiedPad->mBackend->GetClassID();
         if (g_pPlatPadManager->type[0] == 2
-            && (unidentifiedClassID == lbl_806E227C
-                || unidentifiedClassID == lbl_806E228C))
+            && (unidentifiedClassID == gWiiRemotePadClassID
+                || unidentifiedClassID == gWiiFreestylePadClassID))
         {
             mDeltaTime *= fn_80189870();
         }

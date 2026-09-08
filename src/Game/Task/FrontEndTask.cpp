@@ -4,7 +4,7 @@
 
 #include "types.h"
 
-#include "Game/BaseGameSceneManager.h"
+#include "Game/GameSceneManager.h"
 #include "Game/BasicStadium.h"
 #include "Game/FE/feHelpFuncs.h"
 #include "Game/FE/feInput.h"
@@ -15,7 +15,7 @@
 #include "Game/GL/GLInventory.h"
 #include "Game/GameInfo.h"
 #include "Game/GameObjectLighting.h"
-#include "Game/HBMManager_8024795C.h"
+#include "Game/HBMManager.h"
 #include "Game/Render/Presentation.h"
 #include "Game/Render/tu_80271960.h"
 #include "Game/TweakRegistry.h"
@@ -27,7 +27,7 @@
 #include "NL/glx/glxSend.h"
 #include "NL/nlConfig.h"
 #include "NL/nlTask.h"
-#include "unclassified/tu_802492E4.h"
+#include "Game/SH/SHHallOfFame.h"
 
 #include <math.h>
 
@@ -132,15 +132,15 @@ void FrontEndTask::Run(float dt)
         if (!gpHBMManager->mActive
             && g_pFEInput->PlatJustPressed(FE_ALL_PADS, 0x2e, true, 0))
         {
-            gpHBMManager->fn_80248008();
+            gpHBMManager->Show();
         }
         if (gpHBMManager->mActive)
         {
-            gpHBMManager->fn_802480EC();
+            gpHBMManager->Update();
         }
     }
 
-    fn_801FEEAC()->Update(dt);
+    Presentation::GetInstance()->Update(dt);
     DrawFrontEndElements(dt);
 
     if (nlTaskManager::m_pInstance->mCurrentState != 4)
@@ -152,13 +152,13 @@ void FrontEndTask::Run(float dt)
     }
     else if (GameInfoManager::Instance()->IsInMode3())
     {
-        if (!fn_8024A34C())
+        if (!IsHallOfFameImagePreloadStarted())
         {
-            fn_8024A178();
+            PreloadHallOfFameImages();
         }
-        if (fn_8024A354())
+        if (IsHallOfFameImagePreloadPending())
         {
-            fn_8024A290(dt);
+            UpdateHallOfFameImagePreload(dt);
         }
     }
 }
@@ -227,12 +227,12 @@ void FrontEndTask::HandleE3IdleReset(float fDeltaT)
             {
                 if (nlTaskManager::m_pInstance->mCurrentState == 4)
                 {
-                    if (!lbl_806E1838->IsOnStack(SCENE_TITLE))
+                    if (!GameSceneManager::Instance()->IsOnStack(SCENE_TITLE))
                     {
-                        lbl_806E1838->fn_801C5FB8((SceneList)0x19);
+                        GameSceneManager::Instance()->fn_801C5FB8((SceneList)0x19);
                         FESceneManager::Instance()->ForceImmediateStackProcessing();
-                        lbl_806E1838->Push(SCENE_TITLE, SCREEN_NOTHING, false);
-                        fn_801FEEAC()->Call("StartTitleScreenSequence");
+                        GameSceneManager::Instance()->Push(SCENE_TITLE, SCREEN_NOTHING, false);
+                        Presentation::GetInstance()->Call("StartTitleScreenSequence");
                     }
                 }
                 else

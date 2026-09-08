@@ -11,6 +11,7 @@
 
 #include "NL/gl/glMemory.h"
 #include "string.h"
+#include "NL/nlstring_tmpl.h"
 
 class MemoryAllocator;
 

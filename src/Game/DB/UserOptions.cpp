@@ -153,16 +153,16 @@ GameplaySettings::GameplaySettings()
 {
     memset(this, 0, sizeof(GameplaySettings));
     SkillLevel = ROOKIE;
-    m_unk10 = 3;
-    m_unk04 = 0;
-    m_unk0C = 5;
+    BestSeries = 3;
+    WinBy = 0;
+    GameGoals = 5;
     GameTime = 180;
-    PowerUps = true;
-    Shoot2Score = true;
-    BowserAttackEnabled = true;
-    RumbleEnabled = true;
-    m_unk18 = true;
-    m_unk19 = true;
+    HomePowerUps = true;
+    AwayPowerUps = true;
+    HomeShoot2Score = true;
+    AwayShoot2Score = true;
+    HomeSkillShots = true;
+    AwaySkillShots = true;
     m_unk1A = true;
 }
 
@@ -177,16 +177,16 @@ void GameplaySettings::OnSettingsUpdated() const
 PowerupSettings::PowerupSettings()
 {
     memset(this, 0, sizeof(PowerupSettings));
-    m_unk0 = 0;
-    m_unk4 = 0;
-    m_unk8 = 0;
+    mCustomPowerups = 0;
+    mEnvironmentCheat = 0;
+    mPlayerCheat = 0;
 }
 
 void PowerupSettings::InitializeDefaults()
 {
-    m_unk0 = 0;
-    m_unk4 = 0;
-    m_unk8 = 0;
+    mCustomPowerups = 0;
+    mEnvironmentCheat = 0;
+    mPlayerCheat = 0;
 }
 
 void PowerupSettings::OnSettingsUpdated() const

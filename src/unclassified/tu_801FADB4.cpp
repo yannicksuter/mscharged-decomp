@@ -26,7 +26,7 @@ void TU801FADB4Overlay::Update(float fDeltaT)
 
     if (mUnidentified25)
     {
-        TLSlide* slide = mPresentation->GetActiveSlide();
+        TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->m_start + slide->m_duration)
         {
             mUnidentified26 = true;

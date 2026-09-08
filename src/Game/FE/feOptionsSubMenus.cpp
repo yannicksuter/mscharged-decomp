@@ -1,4 +1,6 @@
+#include "Game/SH/SHNavigation.h"
 #include "Game/FE/feOptionsSubMenus.h"
+#include "Game/FE/FEAudio.h"
 
 #include "Game/DB/SaveLoad.h"
 #include "Game/DB/UserOptions.h"
@@ -10,10 +12,7 @@
 #include "NL/nlColour.h"
 #include "NL/nlConfig.h"
 
-extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-class TU80252180Scene;
-extern "C" TU80252180Scene* fn_80253E18();
-extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
+class SHNavigation;
 
 static Config lbl_80578320(Config::ALLOCATE_HIGH, 0x2800, 0x400);
 
@@ -38,7 +37,7 @@ OptionsAudioMenuV2::OptionsAudioMenuV2(int value)
     mBackupSettings[0] = mSettings[0];
     mBackupSettings[1] = mSettings[1];
     mBackupSettings[2] = mSettings[2];
-    mNavigation.fn_801D2BE0(false);
+    mNavigation.SetPopScene(false);
 }
 
 OptionsAudioMenuV2::~OptionsAudioMenuV2()
@@ -82,7 +81,7 @@ void OptionsAudioMenuV2::fn_801D4E9C(int setting)
 void OptionsAudioMenuV2::fn_801D4F70(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mButtonComponents[item].fn_802192FC(2, -1))
+    if (!mButtonComponents[item].HasOtherPointerState(2, -1))
     {
         bool enabled;
         switch (item)
@@ -115,20 +114,20 @@ void OptionsAudioMenuV2::fn_801D4F70(int index, void* context)
             return;
         }
 
-        mButtonComponents[item].fn_802195B4(index);
-        if (!mButtonComponents[item].fn_802192FC(1, index))
+        mButtonComponents[item].PlayHoverFeedback(index);
+        if (!mButtonComponents[item].HasOtherPointerState(1, index))
         {
             mButtons[item]->SetActiveSlide("over", true, false);
-            fn_801CBCA0(0x96DEB5C3, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
         }
-        mButtonComponents[item].mValues[index] = 1;
+        mButtonComponents[item].SetPointerState(1, index);
     }
 }
 
 void OptionsAudioMenuV2::fn_801D5108(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mButtonComponents[item].fn_802192FC(2, -1))
+    if (!mButtonComponents[item].HasOtherPointerState(2, -1))
     {
         bool enabled;
         switch (item)
@@ -161,28 +160,28 @@ void OptionsAudioMenuV2::fn_801D5108(int index, void* context)
             return;
         }
 
-        if (!mButtonComponents[item].fn_802192FC(1, index))
+        if (!mButtonComponents[item].HasOtherPointerState(1, index))
         {
             mButtons[item]->SetActiveSlide("off", true, false);
         }
-        mButtonComponents[item].mValues[index] = 0;
+        mButtonComponents[item].SetPointerState(0, index);
     }
 }
 
 void OptionsAudioMenuV2::fn_801D575C(int index)
 {
-    mSaveButtonComponent.mValues[index] = 1;
-    if (!mSaveButtonComponent.fn_802192FC(1, index))
+    mSaveButtonComponent.SetPointerState(1, index);
+    if (!mSaveButtonComponent.HasOtherPointerState(1, index))
     {
         mSaveButton->SetActiveSlide("over", true, false);
-        fn_801CBCA0(0xAA73EF33, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 }
 
 void OptionsAudioMenuV2::fn_801D57D8(int index)
 {
-    mSaveButtonComponent.mValues[index] = 0;
-    if (!mSaveButtonComponent.fn_802192FC(1, index))
+    mSaveButtonComponent.SetPointerState(0, index);
+    if (!mSaveButtonComponent.HasOtherPointerState(1, index))
     {
         mSaveButton->SetActiveSlide("off", true, false);
     }
@@ -191,16 +190,16 @@ void OptionsAudioMenuV2::fn_801D57D8(int index)
 void OptionsAudioMenuV2::fn_801D583C()
 {
     mState = 3;
-    TU80252180Scene* object = fn_80253E18();
+    SHNavigation* object = GetNavigationScene();
     if (object != 0)
     {
-        fn_802534BC(object, 0, true);
+        object->SetButtons(0, true);
     }
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);
     mUnidentified686 = true;
     mSaveButton->SetActiveSlide("down", true, false);
-    fn_801CBCA0(0xF0AFD586, 0, 0, 1);
-    fn_801CBCA0(0x304FDD1E, 0, 0, 1);
+    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
+    FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
     SaveLoad::StartSave(false);
 }
 
@@ -223,10 +222,10 @@ OptionsVisualMenuV2::OptionsVisualMenuV2(int value)
         mZoomButtonComponents[i].mSpeakerEnabled = false;
     }
 
-    VisualSettings settings = *(VisualSettings*)GameInfoManager::Instance()->GetUnknown0xB8();
+    VisualSettings settings = *GameInfoManager::Instance()->GetVisualOptions();
     mSettings[0] = !settings.mIsAutoZoomCamera;
     mSettings[1] = (int)(10.0f * settings.mCameraZoomLevel);
-    mNavigation.fn_801D2BE0(false);
+    mNavigation.SetPopScene(false);
     mBackupSettings[0] = mSettings[0];
     mBackupSettings[1] = mSettings[1];
 }
@@ -238,28 +237,28 @@ OptionsVisualMenuV2::~OptionsVisualMenuV2()
 void OptionsVisualMenuV2::fn_801D7948(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mButtonComponents[item].fn_802192FC(2, -1))
+    if (!mButtonComponents[item].HasOtherPointerState(2, -1))
     {
-        mButtonComponents[item].fn_802195B4(index);
-        if (!mButtonComponents[item].fn_802192FC(1, index))
+        mButtonComponents[item].PlayHoverFeedback(index);
+        if (!mButtonComponents[item].HasOtherPointerState(1, index))
         {
             mButtons[item]->SetActiveSlide("over", true, false);
-            fn_801CBCA0(0x96DEB5C3, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
         }
-        mButtonComponents[item].mValues[index] = 1;
+        mButtonComponents[item].SetPointerState(1, index);
     }
 }
 
 void OptionsVisualMenuV2::fn_801D7A0C(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mButtonComponents[item].fn_802192FC(2, -1))
+    if (!mButtonComponents[item].HasOtherPointerState(2, -1))
     {
-        if (!mButtonComponents[item].fn_802192FC(1, index))
+        if (!mButtonComponents[item].HasOtherPointerState(1, index))
         {
             mButtons[item]->SetActiveSlide("off", true, false);
         }
-        mButtonComponents[item].mValues[index] = 0;
+        mButtonComponents[item].SetPointerState(0, index);
     }
 }
 
@@ -268,15 +267,15 @@ void OptionsVisualMenuV2::fn_801D7EC8(int index, void* context)
     unsigned int item = (unsigned int)context;
     if ((unsigned int)mSettings[0] != item)
     {
-        if (!mZoomButtonComponents[item].fn_802192FC(2, -1))
+        if (!mZoomButtonComponents[item].HasOtherPointerState(2, -1))
         {
-            mZoomButtonComponents[item].fn_802195B4(index);
-            if (!mZoomButtonComponents[item].fn_802192FC(1, index))
+            mZoomButtonComponents[item].PlayHoverFeedback(index);
+            if (!mZoomButtonComponents[item].HasOtherPointerState(1, index))
             {
                 mZoomButtons[item]->SetActiveSlide("over", true, false);
-                fn_801CBCA0(0xF6EB899E, 0, 0, 1);
+                FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
             }
-            mZoomButtonComponents[item].mValues[index] = 1;
+            mZoomButtonComponents[item].SetPointerState(1, index);
         }
     }
 }
@@ -286,31 +285,31 @@ void OptionsVisualMenuV2::fn_801D7F9C(int index, void* context)
     unsigned int item = (unsigned int)context;
     if ((unsigned int)mSettings[0] != item)
     {
-        if (!mZoomButtonComponents[item].fn_802192FC(2, -1))
+        if (!mZoomButtonComponents[item].HasOtherPointerState(2, -1))
         {
-            if (!mZoomButtonComponents[item].fn_802192FC(1, index))
+            if (!mZoomButtonComponents[item].HasOtherPointerState(1, index))
             {
                 mZoomButtons[item]->SetActiveSlide("off", true, false);
             }
-            mZoomButtonComponents[item].mValues[index] = 0;
+            mZoomButtonComponents[item].SetPointerState(0, index);
         }
     }
 }
 
 void OptionsVisualMenuV2::fn_801D8458(int index)
 {
-    mSaveButtonComponent.mValues[index] = 1;
-    if (!mSaveButtonComponent.fn_802192FC(1, index))
+    mSaveButtonComponent.SetPointerState(1, index);
+    if (!mSaveButtonComponent.HasOtherPointerState(1, index))
     {
         mSaveButton->SetActiveSlide("over", true, false);
-        fn_801CBCA0(0xAA73EF33, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 }
 
 void OptionsVisualMenuV2::fn_801D84D4(int index)
 {
-    mSaveButtonComponent.mValues[index] = 0;
-    if (!mSaveButtonComponent.fn_802192FC(1, index))
+    mSaveButtonComponent.SetPointerState(0, index);
+    if (!mSaveButtonComponent.HasOtherPointerState(1, index))
     {
         mSaveButton->SetActiveSlide("off", true, false);
     }
@@ -319,16 +318,16 @@ void OptionsVisualMenuV2::fn_801D84D4(int index)
 void OptionsVisualMenuV2::fn_801D8538()
 {
     mState = 3;
-    TU80252180Scene* object = fn_80253E18();
+    SHNavigation* object = GetNavigationScene();
     if (object != 0)
     {
-        fn_802534BC(object, 0, true);
+        object->SetButtons(0, true);
     }
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);
     mPresentation->Update(0.0f);
     mSaveButton->SetActiveSlide("down", true, false);
-    fn_801CBCA0(0xF0AFD586, 0, 0, 1);
-    fn_801CBCA0(0x304FDD1E, 0, 0, 1);
+    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
+    FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
     mUnidentified6C6 = true;
     SaveLoad::StartSave(false);
 }

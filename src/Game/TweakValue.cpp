@@ -2,6 +2,7 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 extern "C"
 {

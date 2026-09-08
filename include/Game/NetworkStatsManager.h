@@ -84,13 +84,13 @@ public:
     void ResetPregameDisconnectState();
     void MarkDisconnectPending();
     void PreGameRestoreDefaultDisconnectLoss();
-    void RefreshFriendStats_80131B50();
+    bool RefreshFriendStats_80131B50();
     void BeginOnlineGame_80131DB4();
     void Update(float dt);
     void HandleDisconnect_8013243C(int result);
     void CalculateAndReportGameResult(int result);
 
-    NetworkRankingMeta* fn_80260764(int category)
+    NetworkRankingMeta* GetLocalStats(int category)
     {
         return mHasLocalStats[category] ? &mLocalStats[category] : 0;
     }
@@ -159,6 +159,8 @@ int GetDaysUntilNextSeasonBoundary(
     const NetworkSeasonDateTable* dates, int index, int year);
 int GetDaysSinceSeasonBoundary(const NetworkSeasonDateTable* dates, int index,
     const NetworkSeasonDate* date, int year);
+
+extern NetworkSeasonDateTable sNetworkSeasonDateTable;
 
 extern int g_nAddHoursTime;
 extern int g_nAddMinsTime;

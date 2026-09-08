@@ -2,7 +2,7 @@
 #define GAME_SH_SH_TITLE_SCREEN_H
 
 #include "Game/BaseGameSceneManager.h"
-#include "unclassified/tu_80219248.h"
+#include "Game/FE/fePointerButton.h"
 
 class TLComponentInstance;
 
@@ -23,7 +23,7 @@ public:
 
     /* 0x01C */ float m_fTimeElapsed;
     /* 0x020 */ u8 mUnidentified20[4];
-    /* 0x024 */ TU80219248Component mControllerComponent;
+    /* 0x024 */ FEPointerButton mControllerComponent;
     /* 0x0D8 */ TLComponentInstance* mTextPressStart;
     /* 0x0DC */ bool mStartedDemo;
     /* 0x0DD */ bool mStartedMovie;

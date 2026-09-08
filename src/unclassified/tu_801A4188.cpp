@@ -15,6 +15,7 @@
 #include "NL/nlDLRing.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_801A4188.h"
+#include "NL/nlstring_tmpl.h"
 
 static CrowdCharacterDefinition_801A4188 lbl_80513C80[36] = {
     { "birdo", "art/animation/crowdbirdo.sanim.zlib",

@@ -82,7 +82,7 @@ void ResetTask::Run(float dt)
 
         if (g_pNetworkSession)
         {
-            g_pNetworkSession->OnlineVirtual08();
+            g_pNetworkSession->Shutdown();
         }
 
         float volume = 0.99f;

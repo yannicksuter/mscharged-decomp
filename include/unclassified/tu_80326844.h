@@ -1,7 +1,7 @@
 #ifndef UNCLASSIFIED_TU_80326844_H
 #define UNCLASSIFIED_TU_80326844_H
 
-#include "NL/UnidentifiedQueue.h"
+#include "NL/CircularQueue.h"
 #include "types.h"
 #include "unclassified/tu_803263E4.h"
 #include "unclassified/tu_8032452C.h"
@@ -78,11 +78,11 @@ public:
     /* 0x074 */ u32 mUnidentified074;
     /* 0x078 */ int mUnidentified078;
     /* 0x07C */ UnidentifiedTransportPacket_803263E4* mUnidentified07C[30];
-    /* 0x0F4 */ UnidentifiedTransportQueue<UnidentifiedTransportPacket_803263E4*, 300> m_SentNotACKedQ;
-    /* 0x5B4 */ UnidentifiedTransportQueue<UnidentifiedTransportPacket_803263E4*, 20> m_OutgoingSendQ;
-    /* 0x614 */ UnidentifiedTransportQueue<UnidentifiedTransportPacket_803263E4*, 20> m_OutgoingUnreliableSendQ;
-    /* 0x674 */ UnidentifiedTransportQueue<UnidentifiedTransportPacket_803263E4*, 20> m_OutgoingVoiceSendQ;
-    /* 0x6D4 */ UnidentifiedTransportQueue<UnidentifiedTransportPacket_803263E4*, 60> mUnidentified6D4;
+    /* 0x0F4 */ StaticCircularQueue<UnidentifiedTransportPacket_803263E4*, 300> m_SentNotACKedQ;
+    /* 0x5B4 */ StaticCircularQueue<UnidentifiedTransportPacket_803263E4*, 20> m_OutgoingSendQ;
+    /* 0x614 */ StaticCircularQueue<UnidentifiedTransportPacket_803263E4*, 20> m_OutgoingUnreliableSendQ;
+    /* 0x674 */ StaticCircularQueue<UnidentifiedTransportPacket_803263E4*, 20> m_OutgoingVoiceSendQ;
+    /* 0x6D4 */ StaticCircularQueue<UnidentifiedTransportPacket_803263E4*, 60> mUnidentified6D4;
     /* 0x7D4 */ int mUnidentified7D4;
     /* 0x7D8 */ u16 mUnidentified7D8;
     /* 0x7DA */ u16 mUnidentified7DA;

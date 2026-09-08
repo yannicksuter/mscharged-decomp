@@ -64,7 +64,7 @@ public:
     /* 0x164 */ u32 mOutgoingCount;
     /* 0x168 */ u32 mOutgoingCapacity;
     /* 0x16C */ DetermDataEvent* mOutgoingDetermDataStorage[10];
-    /* 0x194 */ UnidentifiedNetworkSession* mSession;
+    /* 0x194 */ NetworkSessionBase* mSession;
 }; // size: 0x198
 
 class NetworkInputMessageQueue

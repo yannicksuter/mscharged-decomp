@@ -5,12 +5,14 @@
 #include "Game/SHierarchy.h"
 #include "NL/nlDLListContainer.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 #include "types.h"
 
 #include <string.h>
 
 class ChainChomp;
 class SkinAnimatedNPC;
+class UnidentifiedNPC_801B43F8;
 class UnidentifiedSkinAnimatedNPC_80199880;
 struct HammerObject;
 struct DaisyFistObject;
@@ -18,7 +20,7 @@ struct BulletBillObject;
 struct State_80199E84;
 struct KoopaShellObject;
 struct ThwompObject;
-struct UnidentifiedObject_801B535C;
+class UnidentifiedObject_801B535C;
 
 struct NPCTemplate
 {
@@ -68,7 +70,7 @@ public:
     DaisyFistObject* fn_801A9CA4(int nIndex);
     BulletBillObject* fn_801A9D10(int nIndex);
     BulletBillObject* fn_801A9D20();
-    SkinAnimatedNPC* fn_801A9DE0(int nIndex);
+    UnidentifiedNPC_801B43F8* fn_801A9DE0(int nIndex);
     void fn_801A9DF0();
     void fn_801AA088();
     void fn_801AA2C0();
@@ -131,7 +133,7 @@ public:
     /* 0x58 */ BulletBillObject* mUnidentified058[6];
     /* 0x70 */ HammerObject* mUnidentified070[15];
     /* 0xAC */ ThwompObject* mUnidentified0AC[8];
-    /* 0xCC */ SkinAnimatedNPC* mUnidentified0CC[3];
+    /* 0xCC */ UnidentifiedNPC_801B43F8* mUnidentified0CC[3];
     /* 0xD8 */ UnidentifiedSkinAnimatedNPC_80199880* mUnidentified0D8;
 }; // total size: 0xDC
 

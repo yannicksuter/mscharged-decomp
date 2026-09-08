@@ -1,6 +1,9 @@
+// MSL math.h defines abs/labs; include it before stdlib.h.
+#include <math.h>
 #include "unclassified/tu_8024F4E0.h"
 
-#include "Game/BaseGameSceneManager.h"
+#include "Game/SH/SHNavigation.h"
+#include "Game/GameSceneManager.h"
 #include "Game/DB/SaveLoad.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feFinder.h"
@@ -10,40 +13,17 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
-#include "Game/tu_801360A4.h"
+#include "Game/FriendManager.h"
 #include "NL/nlBind.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_802196B0.h"
+#include "Game/FE/feDPD.h"
 
+#include <stdlib.h>
 #include <string.h>
+#include "NL/nlstring_tmpl.h"
 
-extern TLComponentInstance lbl_80580138;
-extern TLComponentInstance lbl_80580030;
-extern TLComponentInstance* lbl_80578450[4];
-extern unsigned int lbl_806E18B0;
-extern BaseGameSceneManager* lbl_806E1838;
-class TU80252180Scene;
-extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" void fn_80253474(TU80252180Scene* scene);
-extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
-extern "C" TLComponentInstance* fn_80253D70(TU80252180Scene* scene, int value);
-extern "C" TU80252180Scene* fn_80253E18();
-extern "C" int atoi(const char* str);
-extern "C" double pow(double base, double exponent);
-extern int fn_802AA91C(
-    unsigned short* buffer, unsigned long size, const unsigned short* format, ...);
 extern char lbl_806DE80C[];
-
-template <typename T>
-static inline T* CastFound(TLInstance* found)
-{
-    if (found == 0)
-    {
-        return 0;
-    }
-    return (T*)found;
-}
 
 TU80250754Scene::TU80250754Scene()
     : mUnidentified001C(0)
@@ -68,7 +48,7 @@ TU80250754Scene::TU80250754Scene()
         nlStrNCpy(mUnidentified0028[i], empty, 2);
     }
 
-    mUnidentified1138.fn_801D2BE0(false);
+    mUnidentified1138.SetPopScene(false);
 }
 
 TU80250754Scene::~TU80250754Scene()
@@ -77,29 +57,29 @@ TU80250754Scene::~TU80250754Scene()
 
 void TU80250754Scene::fn_8024F570()
 {
-    TU80300104Base::Callback padSelect(
+    FEPointerListener::Callback padSelect(
         Bind<void>(MemFun(&TU80250754Scene::fn_80251328), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback padOver(
+    FEPointerListener::Callback padOver(
         Bind<void>(MemFun(&TU80250754Scene::fn_8024FDD4), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback padOff(
+    FEPointerListener::Callback padOff(
         Bind<void>(MemFun(&TU80250754Scene::fn_8024FE6C), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback codeSelect(
+    FEPointerListener::Callback codeSelect(
         Bind<void>(MemFun(&TU80250754Scene::fn_8024FEEC), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback codeOver(
+    FEPointerListener::Callback codeOver(
         Bind<void>(MemFun(&TU80250754Scene::fn_8025005C), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback codeOff(
+    FEPointerListener::Callback codeOff(
         Bind<void>(MemFun(&TU80250754Scene::fn_80250100), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 12; ++i)
     {
         float scale = 0.8f;
-        TLComponentInstance* positionInstance =
-            (TLComponentInstance*)FEFinder<TLComponentInstance, 3>::_Find<TLSlide>(
-                mPresentation->GetActiveSlide(), nlStringLowerHash("Layer"),
+        TLInstance* positionInstance =
+            FEFinder<TLInstance, 5>::_Find<TLSlide>(
+                mPresentation->m_currentSlide, nlStringLowerHash("Layer"),
                 nlStringLowerHash("Group"), nlStringLowerHash("PAD"), 0, 0, 0);
         if (positionInstance == 0)
         {
-            positionInstance = &lbl_80580138;
+            positionInstance = &gDefaultTLGroupInstance;
         }
 
         feVector3 position = positionInstance->GetAssetPosition();
@@ -107,30 +87,30 @@ void TU80250754Scene::fn_8024F570()
         {
             scale = 0.7f;
         }
-        mUnidentified0058[i].fn_80300D74(
+        mUnidentified0058[i].SetInstanceBounds(
             mUnidentified1210[i], true, position.f.x, position.f.y, scale, scale);
-        mUnidentified0058[i].fn_803009AC(padSelect);
-        mUnidentified0058[i].fn_803007C0(padOver);
-        mUnidentified0058[i].fn_80300864(padOff);
+        mUnidentified0058[i].SetPointerPressCallback(padSelect);
+        mUnidentified0058[i].SetPointerEnterCallback(padOver);
+        mUnidentified0058[i].SetPointerLeaveCallback(padOff);
     }
 
     for (int i = 0; i < 12; ++i)
     {
-        TLComponentInstance* positionInstance =
-            (TLComponentInstance*)FEFinder<TLComponentInstance, 3>::_Find<TLSlide>(
-                mPresentation->GetActiveSlide(), nlStringLowerHash("Layer"),
+        TLInstance* positionInstance =
+            FEFinder<TLInstance, 5>::_Find<TLSlide>(
+                mPresentation->m_currentSlide, nlStringLowerHash("Layer"),
                 nlStringLowerHash("Group"), nlStringLowerHash("CODE"), 0, 0, 0);
         if (positionInstance == 0)
         {
-            positionInstance = &lbl_80580138;
+            positionInstance = &gDefaultTLGroupInstance;
         }
 
         feVector3 position = positionInstance->GetAssetPosition();
-        mUnidentified08C8[i].fn_80300D74(
+        mUnidentified08C8[i].SetInstanceBounds(
             mUnidentified1240[i], true, position.f.x, position.f.y, 0.8f, 0.8f);
-        mUnidentified08C8[i].fn_803009AC(codeSelect);
-        mUnidentified08C8[i].fn_803007C0(codeOver);
-        mUnidentified08C8[i].fn_80300864(codeOff);
+        mUnidentified08C8[i].SetPointerPressCallback(codeSelect);
+        mUnidentified08C8[i].SetPointerEnterCallback(codeOver);
+        mUnidentified08C8[i].SetPointerLeaveCallback(codeOff);
     }
 }
 
@@ -139,8 +119,8 @@ void TU80250754Scene::fn_8024FDD4(int index, void* context)
     unsigned int item = (unsigned int)context;
     ++mUnidentified001C;
     mUnidentified1210[item]->SetActiveSlide("over", true, false);
-    mUnidentified0058[item].mValues[index] = 1;
-    fn_801CBCA0(0x0E2B7F90, 0, 0, 1);
+    mUnidentified0058[item].SetPointerState(1, index);
+    FEAudio::PlayAnimAudioEvent(0x0E2B7F90, 0, 0, 1);
 }
 
 void TU80250754Scene::fn_8024FE6C(int index, void* context)
@@ -148,12 +128,12 @@ void TU80250754Scene::fn_8024FE6C(int index, void* context)
     unsigned int item = (unsigned int)context;
     --mUnidentified001C;
     mUnidentified1210[item]->SetActiveSlide("off", true, false);
-    mUnidentified0058[item].mValues[index] = 0;
+    mUnidentified0058[item].SetPointerState(0, index);
 }
 
 void TU80250754Scene::fn_8024FEEC(int, void* context)
 {
-    fn_801CBCA0(0x3021A1EE, 0, 0, 1);
+    FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
 
     int item = (int)context;
     if (item >= 12)
@@ -171,7 +151,7 @@ void TU80250754Scene::fn_8024FEEC(int, void* context)
         mUnidentified1240[mUnidentified0024]->SetActiveSlide("OFF", true, false);
 
         mUnidentified08C8[item].mDisabled = true;
-        TU80300104Event event;
+        FEPointerEvent event;
         mUnidentified08C8[item].mPreviousEvents[0] = event;
         mUnidentified08C8[item].mPreviousEvents[1] = event;
         mUnidentified08C8[item].mPreviousEvents[2] = event;
@@ -191,8 +171,8 @@ void TU80250754Scene::fn_8025005C(int index, void* context)
     {
         ++mUnidentified001C;
         mUnidentified1240[item]->SetActiveSlide("over", true, false);
-        mUnidentified08C8[item].mValues[index] = 1;
-        fn_801CBCA0(0xFFC8A55D, 0, 0, 1);
+        mUnidentified08C8[item].SetPointerState(1, index);
+        FEAudio::PlayAnimAudioEvent(0xFFC8A55D, 0, 0, 1);
     }
 }
 
@@ -203,14 +183,14 @@ void TU80250754Scene::fn_80250100(int index, void* context)
     {
         --mUnidentified001C;
         mUnidentified1240[item]->SetActiveSlide("off", true, false);
-        mUnidentified08C8[item].mValues[index] = 0;
+        mUnidentified08C8[item].SetPointerState(0, index);
     }
 }
 
 void TU80250754Scene::fn_8025018C()
 {
     unsigned short* friendCode =
-        (unsigned short*)lbl_806E1194->mUnidentified018;
+        g_pFriendManager->mFriendCodeInput;
     unsigned short character[2];
     character[1] = 0;
     bool foundEmpty = false;
@@ -236,7 +216,7 @@ void TU80250754Scene::fn_8025018C()
                     "OFF", true, false);
 
                 mUnidentified08C8[item].mDisabled = true;
-                TU80300104Event event;
+                FEPointerEvent event;
                 mUnidentified08C8[item].mPreviousEvents[0] = event;
                 mUnidentified08C8[item].mPreviousEvents[1] = event;
                 mUnidentified08C8[item].mPreviousEvents[2] = event;
@@ -261,7 +241,7 @@ void TU80250754Scene::fn_8025018C()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[item]);
 
@@ -270,7 +250,7 @@ void TU80250754Scene::fn_8025018C()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[item]);
 
@@ -279,7 +259,7 @@ void TU80250754Scene::fn_8025018C()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[item]);
     }
@@ -290,7 +270,7 @@ void TU80250754Scene::fn_8025018C()
         mUnidentified1240[mUnidentified0024]->SetActiveSlide("OFF", true, false);
 
         mUnidentified08C8[11].mDisabled = true;
-        TU80300104Event event;
+        FEPointerEvent event;
         mUnidentified08C8[11].mPreviousEvents[0] = event;
         mUnidentified08C8[11].mPreviousEvents[1] = event;
         mUnidentified08C8[11].mPreviousEvents[2] = event;
@@ -300,7 +280,7 @@ void TU80250754Scene::fn_8025018C()
         mUnidentified0024 = 11;
     }
 
-    memset(friendCode, 0, sizeof(lbl_806E1194->mUnidentified018));
+    memset(friendCode, 0, sizeof(g_pFriendManager->mFriendCodeInput));
 }
 
 void TU80250754Scene::fn_802505E8()
@@ -318,7 +298,7 @@ void TU80250754Scene::fn_802505E8()
             mUnidentified1210[10]->m_bVisible = false;
             mUnidentified0058[10].mDisabled = true;
 
-            TU80300104Event event;
+            FEPointerEvent event;
             mUnidentified0058[10].mPreviousEvents[0] = event;
             mUnidentified0058[10].mPreviousEvents[1] = event;
             mUnidentified0058[10].mPreviousEvents[2] = event;
@@ -329,13 +309,13 @@ void TU80250754Scene::fn_802505E8()
 
     if (valid)
     {
-        fn_801CBCA0(0xCC2C93F1, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xCC2C93F1, 0, 0, 1);
     }
 }
 
 void TU80250754Scene::fn_80250718()
 {
-    lbl_806E1194->SetOwnStatusInitial_80136FA4(true);
+    g_pFriendManager->SetOwnStatusInitial(true);
     mUnidentified1274 = false;
 }
 
@@ -358,14 +338,13 @@ void TU80250754Scene::SceneCreated()
             nlSNPrintf(name, sizeof(name), "BUTTON_%d", i);
         }
 
-        TLComponentInstance* component = CastFound<TLComponentInstance>(
-            FEFinder<TLComponentInstance, 4>::_Find<TLSlide>(
-                mPresentation->GetActiveSlide(), nlStringLowerHash("Layer"),
-                nlStringLowerHash("Group"), nlStringLowerHash("PAD"),
-                nlStringLowerHash(name), 0, 0));
+        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
+            mPresentation->m_currentSlide, nlStringLowerHash("Layer"),
+            nlStringLowerHash("Group"), nlStringLowerHash("PAD"),
+            nlStringLowerHash(name), 0, 0);
         if (component == 0)
         {
-            component = &lbl_80580030;
+            component = &gDefaultTLComponentInstance;
         }
         mUnidentified1210[i] = component;
     }
@@ -373,14 +352,13 @@ void TU80250754Scene::SceneCreated()
     for (int i = 0; i < 12; ++i)
     {
         nlSNPrintf(name, sizeof(name), "CODE_BOX_%d", i);
-        TLComponentInstance* component = CastFound<TLComponentInstance>(
-            FEFinder<TLComponentInstance, 4>::_Find<TLSlide>(
-                mPresentation->GetActiveSlide(), nlStringLowerHash("Layer"),
-                nlStringLowerHash("Group"), nlStringLowerHash("CODE"),
-                nlStringLowerHash(name), 0, 0));
+        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
+            mPresentation->m_currentSlide, nlStringLowerHash("Layer"),
+            nlStringLowerHash("Group"), nlStringLowerHash("CODE"),
+            nlStringLowerHash(name), 0, 0);
         if (component == 0)
         {
-            component = &lbl_80580030;
+            component = &gDefaultTLComponentInstance;
         }
         mUnidentified1240[i] = component;
     }
@@ -404,7 +382,7 @@ void TU80250754Scene::SceneCreated()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[item]);
 
@@ -413,7 +391,7 @@ void TU80250754Scene::SceneCreated()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[item]);
 
@@ -422,7 +400,7 @@ void TU80250754Scene::SceneCreated()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[item]);
     }
@@ -432,19 +410,19 @@ void TU80250754Scene::SceneCreated()
 
     for (int i = 0; i < 4; ++i)
     {
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
     }
 
-    TU80252180Scene* object = fn_80253E18();
+    SHNavigation* object = GetNavigationScene();
     TLComponentInstance* screen = 0;
     if (object != 0)
     {
-        fn_802534BC(object, 0, true);
-        screen = fn_80253D70(object, 4);
+        object->SetButtons(0, true);
+        screen = object->GetButton(4);
     }
-    mUnidentified1138.fn_8022F194(screen);
+    mUnidentified1138.SetButtonInstance(screen);
 
-    fn_801CBCA0(0xBB142B94, 0, 0, 1);
+    FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
 }
 
 void TU80250754Scene::Update(float fDeltaT)
@@ -464,22 +442,22 @@ void TU80250754Scene::Update(float fDeltaT)
     int state = mUnidentified1278;
     if (state == 0 || (unsigned int)(state - 2) <= 1)
     {
-        TLSlide* slide = mPresentation->GetActiveSlide();
+        TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->m_duration + slide->m_start)
         {
             for (int pad = 0; pad < 4; ++pad)
             {
-                lbl_80578450[pad]->SetActiveSlide("waiting", true, false);
+                gFEPointerInstances[pad]->SetActiveSlide("waiting", true, false);
             }
             return;
         }
 
         if (state == 0)
         {
-            TU80252180Scene* object = fn_80253E18();
+            SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
-                fn_802534BC(object, 4, true);
+                object->SetButtons(4, true);
             }
             mUnidentified1278 = 1;
             fn_8024F570();
@@ -487,43 +465,43 @@ void TU80250754Scene::Update(float fDeltaT)
         }
         else if (state == 2)
         {
-            lbl_806E1838->Push((SceneList)0x2F, SCREEN_FORWARD, true);
+            GameSceneManager::Instance()->Push((SceneList)0x2F, SCREEN_FORWARD, true);
             return;
         }
         else if (state == 3)
         {
-            lbl_806E1838->Push((SceneList)0x2F, SCREEN_BACK, true);
+            GameSceneManager::Instance()->Push((SceneList)0x2F, SCREEN_BACK, true);
             return;
         }
     }
 
-    if (!lbl_806E1838->IsOnStack((SceneList)0xA)
-        && lbl_806E1194->FindHostInvitation_80136AB0())
+    if (!GameSceneManager::Instance()->IsOnStack((SceneList)0xA)
+        && g_pFriendManager->FindHostInvitation())
     {
-        lbl_806E1194->mUnidentified00C = 0x30;
-        lbl_806E1194->mUnidentified010 = 0;
+        g_pFriendManager->mReturnScene = 0x30;
+        g_pFriendManager->mPreviousRankedMode = 0;
         unsigned short* friendCode =
-            (unsigned short*)lbl_806E1194->mUnidentified018;
+            g_pFriendManager->mFriendCodeInput;
         for (int i = 0; i < 12; ++i)
         {
             friendCode[i] = mUnidentified0028[i][0];
         }
-        lbl_806E1838->Push((SceneList)0x34, SCREEN_FORWARD, true);
+        GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_RESPONSE, SCREEN_FORWARD, true);
         return;
     }
 
     for (int pad = 0; pad < 4; ++pad)
     {
-        TLComponentInstance* controller = lbl_80578450[pad];
+        TLComponentInstance* controller = gFEPointerInstances[pad];
         if (g_pFEInput->m_InputLockDepth == 0)
         {
-            if (pad != lbl_806E18B0)
+            if (pad != gFEControllerIndex)
             {
                 controller->SetActiveSlide("waiting", true, false);
                 continue;
             }
 
-            if (mUnidentified001C > 0 || mUnidentified1138.mUnidentifiedD2[pad])
+            if (mUnidentified001C > 0 || mUnidentified1138.mPointerInside[pad])
             {
                 controller->SetActiveSlide("A", true, false);
             }
@@ -534,30 +512,30 @@ void TU80250754Scene::Update(float fDeltaT)
         }
 
         unsigned char valid = 1;
-        TU80300104Event event;
+        FEPointerEvent event;
         event.mIndex = pad;
-        event.mPosition = fn_802197FC(pad, &valid);
-        event.mFlag0
+        event.mPosition = GetPointerPosition(pad, &valid);
+        event.mPressed
             = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
-        event.mFlag1
+        event.mReleased
             = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
 
         for (int i = 0; i < 12; ++i)
         {
-            mUnidentified0058[i].fn_80219608(&event);
+            mUnidentified0058[i].HandlePointerEvent(&event);
         }
         for (int i = 0; i < 12; ++i)
         {
-            mUnidentified08C8[i].fn_80219608(&event);
+            mUnidentified08C8[i].HandlePointerEvent(&event);
         }
 
-        if (mUnidentified1138.fn_8022F2E0(event, fDeltaT))
+        if (mUnidentified1138.UpdateBackButton(event, fDeltaT))
         {
             mUnidentified1278 = 3;
-            TU80252180Scene* object = fn_80253E18();
+            SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
-                fn_80253474(object);
+                object->HideButtons();
             }
             mPresentation->SetActiveSlide("out", true);
             mPresentation->Update(0.0f);
@@ -572,7 +550,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
 
     if (item == 10)
     {
-        fn_801CBCA0(0xF0AFD586, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
 
         unsigned long long friendKey = 0;
         for (int i = 0; i < 12; ++i)
@@ -582,32 +560,32 @@ void TU80250754Scene::fn_80251328(int, void* context)
         }
 
         int error = -1;
-        if (lbl_806E1194->AddFriendKey_801362FC(friendKey, &error))
+        if (g_pFriendManager->AddFriendKey(friendKey, &error))
         {
             SaveLoad::StartSave(true);
             mUnidentified1278 = 2;
 
-            TU80252180Scene* object = fn_80253E18();
+            SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
-                fn_80253474(object);
+                object->HideButtons();
             }
 
             for (int i = 0; i < 4; ++i)
             {
-                lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+                gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
             }
             mPresentation->SetActiveSlide("out", true);
             mPresentation->Update(0.0f);
         }
         else
         {
-            lbl_806E1194->SetOwnStatusInitial_80136FA4(false);
+            g_pFriendManager->SetOwnStatusInitial(false);
 
-            if (lbl_806E1838->GetSceneType(lbl_806E1838->GetCurrentScene())
+            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene())
                 != (SceneList)10)
             {
-                FEPopupMenu* popup = (FEPopupMenu*)lbl_806E1838->Push(
+                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                     (SceneList)10, SCREEN_NOTHING, false);
                 Function<FnVoidVoid> callback(
                     Bind<void>(MemFun(&TU80250754Scene::fn_80250718), this));
@@ -616,7 +594,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
             }
 
             FEAudio::EnableSounds(true);
-            fn_801CBCA0(0xD642865E, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0xD642865E, 0, 0, 1);
             FEAudio::EnableSounds(false);
 
             if (mUnidentified0024 != 0)
@@ -626,7 +604,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
                     "OFF", true, false);
 
                 mUnidentified08C8[0].mDisabled = true;
-                TU80300104Event event;
+                FEPointerEvent event;
                 mUnidentified08C8[0].mPreviousEvents[0] = event;
                 mUnidentified08C8[0].mPreviousEvents[1] = event;
                 mUnidentified08C8[0].mPreviousEvents[2] = event;
@@ -660,7 +638,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
                     "OFF", true, false);
 
                 mUnidentified08C8[nextItem].mDisabled = true;
-                TU80300104Event event;
+                FEPointerEvent event;
                 mUnidentified08C8[nextItem].mPreviousEvents[0] = event;
                 mUnidentified08C8[nextItem].mPreviousEvents[1] = event;
                 mUnidentified08C8[nextItem].mPreviousEvents[2] = event;
@@ -679,7 +657,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[mUnidentified0024]);
 
@@ -688,7 +666,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[mUnidentified0024]);
 
@@ -697,7 +675,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[mUnidentified0024]);
     }
@@ -711,7 +689,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
         else
         {
             unsigned short character[2];
-            fn_802AA91C(character, 2, (const unsigned short*)L"%d", item + 1);
+            nlSNPrintf(character, 2, (const unsigned short*)L"%d", item + 1);
             nlStrNCpy(mUnidentified0028[mUnidentified0024], character, 2);
         }
 
@@ -720,7 +698,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[mUnidentified0024]);
 
@@ -729,7 +707,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[mUnidentified0024]);
 
@@ -738,7 +716,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &UnidentifiedFallbackTextInstance;
+            text = &gDefaultTLTextInstance;
         }
         text->SetString(mUnidentified0028[mUnidentified0024]);
 
@@ -762,7 +740,7 @@ void TU80250754Scene::fn_80251328(int, void* context)
                     "OFF", true, false);
 
                 mUnidentified08C8[nextItem].mDisabled = true;
-                TU80300104Event event;
+                FEPointerEvent event;
                 mUnidentified08C8[nextItem].mPreviousEvents[0] = event;
                 mUnidentified08C8[nextItem].mPreviousEvents[1] = event;
                 mUnidentified08C8[nextItem].mPreviousEvents[2] = event;
@@ -778,16 +756,16 @@ void TU80250754Scene::fn_80251328(int, void* context)
 
     switch (item)
     {
-    case 0: fn_801CBCA0(0xD95E4CC9, 0, 0, 1); break;
-    case 1: fn_801CBCA0(0xD95E4CCA, 0, 0, 1); break;
-    case 2: fn_801CBCA0(0xD95E4CCB, 0, 0, 1); break;
-    case 3: fn_801CBCA0(0xD95E4CCC, 0, 0, 1); break;
-    case 4: fn_801CBCA0(0xD95E4CCD, 0, 0, 1); break;
-    case 5: fn_801CBCA0(0xD95E4CCE, 0, 0, 1); break;
-    case 6: fn_801CBCA0(0xD95E4CCF, 0, 0, 1); break;
-    case 7: fn_801CBCA0(0xD95E4CD0, 0, 0, 1); break;
-    case 8: fn_801CBCA0(0xD95E4CD1, 0, 0, 1); break;
-    case 9: fn_801CBCA0(0xD95E4CC8, 0, 0, 1); break;
-    case 11: fn_801CBCA0(0xB4BD572B, 0, 0, 1); break;
+    case 0: FEAudio::PlayAnimAudioEvent(0xD95E4CC9, 0, 0, 1); break;
+    case 1: FEAudio::PlayAnimAudioEvent(0xD95E4CCA, 0, 0, 1); break;
+    case 2: FEAudio::PlayAnimAudioEvent(0xD95E4CCB, 0, 0, 1); break;
+    case 3: FEAudio::PlayAnimAudioEvent(0xD95E4CCC, 0, 0, 1); break;
+    case 4: FEAudio::PlayAnimAudioEvent(0xD95E4CCD, 0, 0, 1); break;
+    case 5: FEAudio::PlayAnimAudioEvent(0xD95E4CCE, 0, 0, 1); break;
+    case 6: FEAudio::PlayAnimAudioEvent(0xD95E4CCF, 0, 0, 1); break;
+    case 7: FEAudio::PlayAnimAudioEvent(0xD95E4CD0, 0, 0, 1); break;
+    case 8: FEAudio::PlayAnimAudioEvent(0xD95E4CD1, 0, 0, 1); break;
+    case 9: FEAudio::PlayAnimAudioEvent(0xD95E4CC8, 0, 0, 1); break;
+    case 11: FEAudio::PlayAnimAudioEvent(0xB4BD572B, 0, 0, 1); break;
     }
 }

@@ -1,6 +1,7 @@
 #include "Game/FE/tlTextInstance.h"
 
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 void TLTextInstance::SetStringId(const char* id)
 {

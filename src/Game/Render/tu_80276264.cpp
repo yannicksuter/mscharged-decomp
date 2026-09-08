@@ -12,6 +12,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 extern BasicStadium* lbl_806E1964;
 extern StadiumEntry_80521F68 lbl_80521F68[22];

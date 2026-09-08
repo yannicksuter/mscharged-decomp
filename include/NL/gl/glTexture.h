@@ -3,6 +3,10 @@
 
 #include "types.h"
 
+class PlatTexture;
+
+void glRegisterTexture(unsigned long texture, PlatTexture* platformTexture, void* allocator);
+
 bool glTextureLoad(unsigned long texture);
 u32 glTextureGetWidth();
 u32 glTextureGetHeight();

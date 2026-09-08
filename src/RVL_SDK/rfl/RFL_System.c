@@ -290,6 +290,6 @@ BOOL RFLiCriticalError(void) {
            *broken & 1 << RFLiFileBrokenType_Corrupt;
 }
 
-const char* fn_804CF018(void) {
-    return "/RFL_Res.dat";
+char* RFLGetArcFilePath(void) {
+    return (char*)"/RFL_Res.dat";
 }

@@ -5,6 +5,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/plat/nlFlash.h"
+#include "NL/nlstring_tmpl.h"
 
 extern "C" void nlBufferedWriterInitialize(nlBufferedWriter* writer)
 {

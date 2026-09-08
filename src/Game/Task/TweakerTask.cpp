@@ -1,7 +1,7 @@
 #include "Game/Task/TweakerTask.h"
 
 #include "Game/NetworkSession.h"
-#include "Game/NetworkDebug_80323B2C.h"
+#include "Game/NetworkDebug.h"
 #include "unclassified/tu_80338898.h"
 
 #include "types.h"
@@ -29,7 +29,7 @@ void TweakerTask::Run(float)
 
     if (g_bDisplayNetwork && g_pNetworkSessionBase != 0)
     {
-        g_pNetworkSessionBase->BaseVirtual50();
+        g_pNetworkSessionBase->DebugDraw();
     }
 
     if (lbl_806E2168 != 0)

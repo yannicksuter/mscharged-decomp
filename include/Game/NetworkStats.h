@@ -38,7 +38,7 @@ struct NetworkRankingMeta
         mUnidentified14 = 0;
     }
 
-    void fn_8025E41C()
+    void Reset()
     {
         mScore = 0;
         mDisplayRank = 0;

@@ -6,9 +6,8 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/plat/nlFlash.h"
+#include "NL/nlstring_tmpl.h"
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 static bool g_bDisableAllFileCaching = true;
 static FileCache_80535C20* lbl_806E2460;

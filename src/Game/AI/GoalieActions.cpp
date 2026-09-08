@@ -6649,7 +6649,7 @@ void Goalie::fn_8008EF58()
     mbMegaUserSave = false;
     mUnidentified40C = -1;
 
-    if (GetNumMachines(g_pNetworkSessionBase) > 1)
+    if (g_pNetworkSessionBase->GetNumMachines() > 1)
     {
         mbMegaUserSave = true;
         return;

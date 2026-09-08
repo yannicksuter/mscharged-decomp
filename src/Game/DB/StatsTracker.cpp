@@ -1,4 +1,5 @@
 #include "Game/DB/StatsTracker.h"
+#include "Game/FE/feHelpFuncs.h"
 
 #include <stdio.h>
 
@@ -85,10 +86,6 @@ public:
 extern StatsEventRegistry* g_pEventRegistry;
 extern BaseGameSceneManager* g_pOverlayManager;
 
-extern "C" eCharacterClass fn_801CBE78(eTeamID captain);
-extern "C" eCharacterClass fn_801CBE7C(eSidekickID sidekick);
-extern "C" const char* fn_801CBE80(int captain);
-extern "C" const char* fn_801CBEA8(int sidekick);
 extern "C" void fn_801E2A14(BaseGameSceneManager* manager);
 extern "C" int fn_80380C34(FILE* file, long offset, int origin);
 extern "C" int fn_8037FA00(FILE* file);
@@ -252,11 +249,11 @@ void StatsTracker::SetBasicGameInfoPointer(
     InitializeTeamStats(mCurrentTeamStats[0], homeid);
     InitializeTeamStats(mCurrentTeamStats[1], awayid);
 
-    characterClass = (eCharacterClass)fn_801CBE78(homeid);
+    characterClass = (eCharacterClass)ConvertToCharacterClass(homeid);
     InitializePlayerStats(
         mCurrentPlayerStats[0][0], characterClass, TYPE_CHARACTER);
 
-    characterClass = (eCharacterClass)fn_801CBE78(awayid);
+    characterClass = (eCharacterClass)ConvertToCharacterClass(awayid);
     InitializePlayerStats(
         mCurrentPlayerStats[1][0], characterClass, TYPE_CHARACTER);
 
@@ -267,10 +264,10 @@ void StatsTracker::SetBasicGameInfoPointer(
             (eSidekickID)mBasicGameInfo->mSidekickIndex[0][i - 1];
         awaysk =
             (eSidekickID)mBasicGameInfo->mSidekickIndex[1][i - 1];
-        characterClass = (eCharacterClass)fn_801CBE7C(homesk);
+        characterClass = (eCharacterClass)ConvertToCharacterClass(homesk);
         InitializePlayerStats(mCurrentPlayerStats[0][i],
             characterClass, TYPE_CHARACTER);
-        characterClass = (eCharacterClass)fn_801CBE7C(awaysk);
+        characterClass = (eCharacterClass)ConvertToCharacterClass(awaysk);
         InitializePlayerStats(mCurrentPlayerStats[1][i],
             characterClass, TYPE_CHARACTER);
         i++;
@@ -880,10 +877,10 @@ void StatsTracker::WriteCurrentlyPlaying() const
 
     NLString text = Format(
         NLString("Home: {0} with {1}\nAway: {2} with {3}\nStadium: {4}\n"),
-        fn_801CBE80(GameInfoManager::Instance()->GetTeam(0)),
-        fn_801CBEA8(GameInfoManager::Instance()->GetSidekick(0, 0)),
-        fn_801CBE80(GameInfoManager::Instance()->GetTeam(1)),
-        fn_801CBEA8(GameInfoManager::Instance()->GetSidekick(1, 0)),
+        GetTeamName((eTeamID)GameInfoManager::Instance()->GetTeam(0)),
+        GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, 0)),
+        GetTeamName((eTeamID)GameInfoManager::Instance()->GetTeam(1)),
+        GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, 0)),
         GetStadiumName(GameInfoManager::Instance()->GetStadium()));
 
     fwrite(text.c_str(), 1, text.size(), file);

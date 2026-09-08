@@ -1,4 +1,6 @@
 #include "Game/Render/NPCManager.h"
+#include "Game/Render/tu_801B43F8.h"
+#include "Game/Render/tu_801B532C.h"
 #include "Game/Drawable/RenderObject.h"
 
 #include "NL/gl/gl.h"
@@ -15,17 +17,10 @@
 #include "unclassified/tu_801A0E64.h"
 #include "unclassified/tu_80199880.h"
 #include "unclassified/tu_801B298C.h"
+#include "unclassified/tu_801B535C.h"
 
 #include <string.h>
-
-struct UnidentifiedNPCConfig_801B532C
-{
-    u8 mUnidentified000[4];
-    const char* mName;
-    float mUnidentified008;
-    void* mUnidentified00C;
-    void* mUnidentified010;
-};
+#include "NL/nlstring_tmpl.h"
 
 extern "C"
 {
@@ -33,13 +28,6 @@ extern "C"
         void* pPhysics, cInventory<cSAnim>* pInventory, void* pResource);
     void fn_8019BF40(
         PhysicsObject*, PhysicsObject*, const nlVector3&);
-
-    UnidentifiedObject_801B535C* fn_801B535C(
-        UnidentifiedObject_801B535C* pObject, void* pDrawable);
-    UnidentifiedObject_801B535C* fn_801B543C(
-        UnidentifiedObject_801B535C* pObject, int bDelete);
-    void fn_801B5544(UnidentifiedObject_801B535C* pObject, float fDeltaT);
-    void fn_801B5D14(UnidentifiedObject_801B535C* pObject);
 
     State_80199E84* fn_80199E84(State_80199E84* pObject, void* pDrawable);
     State_80199E84* fn_80199F6C(State_80199E84* pObject, int bDelete);
@@ -59,13 +47,6 @@ extern "C"
     void fn_8019A854(BulletBillObject* pObject, float fDeltaT);
     void fn_8019AD18(BulletBillObject* pObject);
 
-    UnidentifiedNPCConfig_801B532C* fn_801B532C(int* pIndex);
-    SkinAnimatedNPC* fn_801B43F8(SkinAnimatedNPC* pObject,
-        cSHierarchy* pHierarchy, int nModel, void* pParam1, void* pParam2,
-        void* pPhysics, cInventory<cSAnim>* pInventory, void* pResource);
-    void fn_801B4830(
-        PhysicsObject*, PhysicsObject*, const nlVector3&);
-    void fn_801B4B9C(SkinAnimatedNPC* pObject);
 
     void fn_801A01F8();
     void fn_801A0208(float fDeltaT);
@@ -79,8 +60,6 @@ extern "C"
         MemoryAllocator* pAllocator);
 }
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 int nlSNPrintf(char* pBuffer, unsigned long nSize, const char* pFormat, ...);
 
 static char lbl_805142BC[] = "ChainChomp";
@@ -201,13 +180,7 @@ void NPCManager::fn_801A9874()
 
 void NPCManager::fn_801A9AF8()
 {
-    UnidentifiedObject_801B535C* pObject
-        = (UnidentifiedObject_801B535C*)nlMalloc(0x4C, 8, false);
-    if (pObject != 0)
-    {
-        pObject = fn_801B535C(pObject, GetRenderObject(3, 0));
-    }
-    mUnidentified024 = pObject;
+    mUnidentified024 = new (8, false) UnidentifiedObject_801B535C(GetRenderObject(3, 0));
 }
 
 void NPCManager::fn_801A9B64()
@@ -287,7 +260,7 @@ BulletBillObject* NPCManager::fn_801A9D20()
     return pObject;
 }
 
-SkinAnimatedNPC* NPCManager::fn_801A9DE0(int nIndex)
+UnidentifiedNPC_801B43F8* NPCManager::fn_801A9DE0(int nIndex)
 {
     return mUnidentified0CC[nIndex];
 }
@@ -296,26 +269,19 @@ void NPCManager::fn_801A9DF0()
 {
     for (int i = 0; i < 3; ++i)
     {
-        UnidentifiedNPCConfig_801B532C* pConfig = fn_801B532C(&i);
+        UnidentifiedNPCConfig_801B532C* pConfig = fn_801B532C(i);
         NPCTemplate* pTemplate
             = fn_801ABBDC_inline(pConfig->mName);
 
-        PhysicsNPC* pPhysics
-            = (PhysicsNPC*)nlMalloc(sizeof(PhysicsNPC), 8, false);
-        if (pPhysics != 0)
-        {
-            pPhysics = new (pPhysics) PhysicsNPC(
-                pConfig->mUnidentified008);
-        }
-
-        SkinAnimatedNPC* pObject
-            = (SkinAnimatedNPC*)nlMalloc(0x98, 8, false);
-        if (pObject != 0)
-        {
-            pObject = fn_801B43F8(pObject, pTemplate->hierarchy, pTemplate->modelID, pConfig->mUnidentified00C, pConfig->mUnidentified010, pPhysics, &pTemplate->mUnidentified014, pTemplate->mUnidentified010);
-        }
+        PhysicsNPC* pPhysics = new (8, false) PhysicsNPC(
+            pConfig->mUnidentified008);
+        UnidentifiedNPC_801B43F8* pObject = new (8, false) UnidentifiedNPC_801B43F8(
+            *pTemplate->hierarchy, pTemplate->modelID,
+            pConfig->mUnidentified00C, pConfig->mUnidentified010,
+            *pPhysics, &pTemplate->mUnidentified014,
+            pTemplate->mUnidentified010);
         mUnidentified0CC[i] = pObject;
-        pPhysics->SetCallbackFunction(fn_801B4830);
+        pPhysics->SetCallbackFunction(UnidentifiedNPC_801B43F8::fn_801B4830);
     }
 }
 
@@ -559,7 +525,7 @@ NPCManager::~NPCManager()
 
     if (mUnidentified024 != 0)
     {
-        fn_801B543C(mUnidentified024, 1);
+        delete mUnidentified024;
         mUnidentified024 = 0;
     }
     if (mUnidentified028 != 0)
@@ -625,7 +591,7 @@ void NPCManager::fn_801AB9D4()
 
     if (mUnidentified024 != 0)
     {
-        fn_801B543C(mUnidentified024, 1);
+        delete mUnidentified024;
         mUnidentified024 = 0;
     }
     if (mUnidentified028 != 0)
@@ -718,7 +684,7 @@ void NPCManager::UpdateAINPCs(float dt)
     mpChainChomp->Update(dt);
     if (mUnidentified024 != 0)
     {
-        fn_801B5544(mUnidentified024, dt);
+        mUnidentified024->fn_801B5544(dt);
     }
     if (mUnidentified028 != 0)
     {
@@ -783,7 +749,7 @@ void NPCManager::fn_801ABF8C()
     }
     if (mUnidentified024 != 0)
     {
-        fn_801B5D14(mUnidentified024);
+        mUnidentified024->fn_801B5D14();
     }
     if (mUnidentified028 != 0)
     {
@@ -822,7 +788,7 @@ void NPCManager::fn_801ABF8C()
     {
         if (mUnidentified0CC[i] != 0)
         {
-            fn_801B4B9C(mUnidentified0CC[i]);
+            mUnidentified0CC[i]->fn_801B4B9C();
         }
     }
     for (i = 0; i < 8; ++i)

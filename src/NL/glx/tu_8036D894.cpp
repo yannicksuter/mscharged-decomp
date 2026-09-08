@@ -1,5 +1,6 @@
 #include <revolution/gx.h>
 
+#include "NL/gl/glTexture.h"
 #include "NL/glx/tu_8036D894.h"
 
 #include "NL/gc/gcSwizzler.h"
@@ -100,7 +101,7 @@ void TargetPlatform_8036DE50::fn_8036D9AC(unsigned long hash)
     }
     nlZeroMemory(mUnidentified00C->m_SwizzledData,
         GCTextureSize(mUnidentified00C->m_Format, mUnidentified00C->m_Width, mUnidentified00C->m_Height, mUnidentified00C->m_Levels, -1));
-    fn_802CDF14(mUnidentified004, mUnidentified00C, allocator);
+    glRegisterTexture(mUnidentified004, mUnidentified00C, allocator);
 }
 
 void TargetPlatform_8036DE50::fn_8036DBA8()

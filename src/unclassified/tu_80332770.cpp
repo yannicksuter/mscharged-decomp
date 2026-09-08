@@ -17,8 +17,7 @@ static NetworkMessageFactory<NetworkMessageType9_80533B90> sFactoryType9;
 
 extern "C" bool IsNetworkOrRecordedGame()
 {
-    UnidentifiedNetworkOnlineInterface& online = *g_pNetworkSessionBase;
-    int mode = online.OnlineVirtual0C();
+    int mode = g_pNetworkSessionBase->GetSessionMode();
     if (mode == 1 || mode == 2)
     {
         return true;
@@ -94,7 +93,7 @@ void UnidentifiedNetworkManager::fn_803328FC()
         }
 
         UnidentifiedNetworkPeer* peer
-            = fn_80338C0C(g_pNetworkSessionBase);
+            = g_pNetworkSessionBase->GetLocalPeer();
         int numControllers = peer->mUnidentified004;
         for (int i = 0; i < numControllers; ++i)
         {

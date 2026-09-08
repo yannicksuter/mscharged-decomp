@@ -1,7 +1,11 @@
+#include "Game/SH/SHNavigation.h"
+#include "Game/FE/feHelpFuncs.h"
 #include "Game/SH/SHSceneBase.h"
+#include "Game/FE/tlImageInstance.h"
+#include "Game/FE/FEAudio.h"
 
 #include "Game/DB/CharacterInfo.h"
-#include "Game/DB/tu_8010A40C.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
@@ -16,7 +20,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_802196B0.h"
+#include "Game/FE/feDPD.h"
 
 // Text crossfade helpers owned by the 0x801E2xxx translation unit.
 extern "C" void fn_801E2F50(UnidentifiedTextFader* fader, TLInstance* instance, int value0, int value1, int value2);
@@ -25,20 +29,13 @@ extern "C" void fn_801E3B60(UnidentifiedTextFader* fader, const char* text);
 extern "C" void fn_801E3DB4(UnidentifiedTextFader* fader, float dt);
 extern "C" void fn_801E4460(UnidentifiedTextFader* fader, TLInstance* instance);
 
-extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" void fn_801CC9B0(TU80219248Component* component, int value0, int value1);
-class TU80252180Scene;
-extern "C" TU80252180Scene* fn_80253E18();
-extern "C" void fn_80253474(TU80252180Scene* scene);
-extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
+// Scroll widget owned by the 0x8022Fxxx/0x80230xxx translation units.
+
+class SHNavigation;
 
 
 extern bool lbl_806DC704;
 extern bool lbl_806E0F8B;
-extern unsigned int lbl_806E18B0;
-extern TLComponentInstance* lbl_80578450[4];
-extern TLComponentInstance lbl_80580030;
-extern TLInstance lbl_80580248;
 
 static inline TLInstance* FindInstance(TLSlide* slide, const char* item)
 {
@@ -54,7 +51,7 @@ static inline TLComponentInstance* FindComponent(TLSlide* slide, const char* ite
 {
     TLComponentInstance* result = (TLComponentInstance*)FindInstance(slide, item);
     if (result == 0)
-        result = &lbl_80580030;
+        result = &gDefaultTLComponentInstance;
     return result;
 }
 
@@ -94,21 +91,11 @@ static inline UnidentifiedSHSceneBinding BindSHSceneAction(UnidentifiedSHSceneCa
     return UnidentifiedSHSceneBinding(callback, target);
 }
 
-// Same contract as FEFinder<T, N>::Find: an unfound item is a null result, a
-// found one is the requested instance type.
-template <typename T>
-static inline T* CastFound(TLInstance* found)
-{
-    if (found == 0)
-        return 0;
-    return (T*)found;
-}
-
 inline TLInstance* UnidentifiedSHSceneBase::FindCurrentInstance(const char* item)
 {
     TLInstance* result;
     unsigned long itemHash = nlStringLowerHash(item);
-    result = FEFinder<TLInstance, 2>::_Find(mPresentation->GetActiveSlide(), nlStringLowerHash("Layer"), itemHash, 0, 0, 0, 0);
+    result = FEFinder<TLInstance, 2>::_Find(mPresentation->m_currentSlide, nlStringLowerHash("Layer"), itemHash, 0, 0, 0, 0);
     if (result == 0)
         return 0;
     return result;
@@ -118,7 +105,7 @@ inline TLComponentInstance* UnidentifiedSHSceneBase::FindCurrentComponent(const 
 {
     TLComponentInstance* result = (TLComponentInstance*)FindCurrentInstance(item);
     if (result == 0)
-        return &lbl_80580030;
+        return &gDefaultTLComponentInstance;
     return result;
 }
 
@@ -156,7 +143,7 @@ void UnidentifiedSHSceneBase::fn_8026932C()
         {
             mUnidentified2C = 1;
             presentation->SetActiveSlide("headline pic", true);
-            presentation->Update(presentation->GetActiveSlide()->m_start + presentation->GetActiveSlide()->m_duration);
+            presentation->Update(presentation->m_currentSlide->m_start + presentation->m_currentSlide->m_duration);
         }
         else if (mUnidentified2C == 3)
         {
@@ -169,7 +156,7 @@ void UnidentifiedSHSceneBase::fn_8026932C()
     {
         mUnidentified2C = 1;
         presentation->SetActiveSlide("headline pic", true);
-        presentation->Update(presentation->GetActiveSlide()->m_start + presentation->GetActiveSlide()->m_duration);
+        presentation->Update(presentation->m_currentSlide->m_start + presentation->m_currentSlide->m_duration);
     }
 }
 
@@ -184,7 +171,7 @@ void UnidentifiedSHSceneBase::fn_8026942C()
     {
         if (mUnidentified2C == 2)
         {
-            mUnidentified106 = GameInfoManager::Instance()->unknown_0x120 == 0;
+            mUnidentified106 = GameInfoManager::Instance()->mIsOnlineMode == 0;
             mUnidentified2C = 3;
             presentation->SetActiveSlide("game summary", true);
         }
@@ -210,18 +197,18 @@ void UnidentifiedSHSceneBase::SHSceneVirtual30()
 
 void UnidentifiedSHSceneBase::fn_80269524()
 {
-    if (!mUnidentified420.mUnidentified18)
+    if (!mUnidentified420.mInitialized)
     {
-        mUnidentified420.fn_802308D0(FindCurrentComponent("scrollbar"));
-        mUnidentified420.fn_8022F858();
+        mUnidentified420.SetComponent(FindCurrentComponent("scrollbar"));
+        mUnidentified420.Initialize();
     }
-    TU80300104Base::Callback callback(BindSHSceneAction(&UnidentifiedSHSceneBase::fn_8026ABF0, this));
-    mComponent.fn_803007C0(callback);
-    callback = TU80300104Base::Callback(BindSHSceneAction(&UnidentifiedSHSceneBase::fn_8026AD50, this));
-    mComponent.fn_80300864(callback);
-    TU80300104Base::Callback callback2(BindSHSceneAction(&UnidentifiedSHSceneBase::fn_8026AE98, this));
-    mComponent.fn_803009AC(callback2);
-    fn_801CC9B0(&mComponent, 0, 0);
+    FEPointerListener::Callback callback(BindSHSceneAction(&UnidentifiedSHSceneBase::fn_8026ABF0, this));
+    mComponent.SetPointerEnterCallback(callback);
+    callback = FEPointerListener::Callback(BindSHSceneAction(&UnidentifiedSHSceneBase::fn_8026AD50, this));
+    mComponent.SetPointerLeaveCallback(callback);
+    FEPointerListener::Callback callback2(BindSHSceneAction(&UnidentifiedSHSceneBase::fn_8026AE98, this));
+    mComponent.SetPointerPressCallback(callback2);
+    SetDoneButtonBounds(&mComponent, 0, 0);
 }
 
 UnidentifiedSHSceneBase::UnidentifiedSHSceneBase()
@@ -247,7 +234,7 @@ UnidentifiedSHSceneBase::UnidentifiedSHSceneBase()
 {
     mComponent.mIgnoreInputLock = true;
     mComponent.mDisabled = true;
-    TU80300104Event event;
+    FEPointerEvent event;
     mComponent.mPreviousEvents[0] = event;
     mComponent.mPreviousEvents[1] = event;
     mComponent.mPreviousEvents[2] = event;
@@ -256,21 +243,21 @@ UnidentifiedSHSceneBase::UnidentifiedSHSceneBase()
 
 void UnidentifiedSHSceneBase::SceneCreated()
 {
-    mUnidentified420.fn_802308D0(FindCurrentComponent("scrollbar"));
+    mUnidentified420.SetComponent(FindCurrentComponent("scrollbar"));
     if ((unsigned int)(mUnidentified28 - 0xB) <= 2)
     {
-        mUnidentified420.fn_80230B90(0);
+        mUnidentified420.SetRange(0);
         mUnidentified109 = true;
     }
     else if (mUnidentified28 == 0xA)
     {
-        mUnidentified420.fn_80230B90(2);
+        mUnidentified420.SetRange(2);
     }
     else
     {
-        mUnidentified420.fn_80230B90(1);
+        mUnidentified420.SetRange(1);
     }
-    mUnidentified420.fn_80230DE0(0);
+    mUnidentified420.SetValue(0);
 
     TLSlide* first = mPresentation->m_currentSlide;
     TLSlide* slide = first;
@@ -284,18 +271,18 @@ void UnidentifiedSHSceneBase::SceneCreated()
 
     if (mUnidentified28 != 0xA)
     {
-        TLInstance* more = CastFound<TLInstance>(fn_8030677C(mPresentation, nlStringLowerHash("story"),
-            nlStringLowerHash("Layer"), nlStringLowerHash("more"), 0, 0, 0));
+        TLInstance* more = FEFinder<TLComponentInstance, 4>::Find(mPresentation, nlStringLowerHash("story"),
+            nlStringLowerHash("Layer"), nlStringLowerHash("more"), 0, 0, 0);
         if (more == 0)
-            more = &lbl_80580030;
+            more = &gDefaultTLComponentInstance;
         more->m_bVisible = false;
     }
 
     if (mUnidentified28 != 8 && mUnidentified28 != 0xD)
     {
-        TU80252180Scene* scene = fn_80253E18();
+        SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
-            fn_802534BC(scene, 0, true);
+            scene->SetButtons(0, true);
     }
 
     char buffer[0x40];
@@ -324,8 +311,8 @@ void UnidentifiedSHSceneBase::SceneCreated()
     {
         unsigned long logoHash = nlStringLowerHash("st_logo");
         unsigned long itemHash = nlStringLowerHash("logo");
-        TLInstance* logo = CastFound<TLInstance>(fn_8030677C(mPresentation, nlStringLowerHash("logo"),
-            nlStringLowerHash("Layer"), itemHash, logoHash, 0, 0));
+        TLInstance* logo = FEFinder<TLImageInstance, 2>::Find(mPresentation, nlStringLowerHash("logo"),
+            nlStringLowerHash("Layer"), itemHash, logoHash, 0, 0);
         mUnidentified380.mImageInstance = (TLImageInstance*)logo;
         mUnidentified380.QueueLoad(buffer, false);
     }
@@ -354,7 +341,7 @@ void UnidentifiedSHSceneBase::Update(float dt)
     if (!mUnidentified108)
     {
         mUnidentified108 = true;
-        fn_801CBCA0(0xAFE4352B, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xAFE4352B, 0, 0, 1);
     }
     int state = mUnidentified100;
     if (state == 0 || (unsigned int)(state - 2) <= 1)
@@ -365,7 +352,7 @@ void UnidentifiedSHSceneBase::Update(float dt)
         {
             for (int pad = 0; pad < 4; ++pad)
             {
-                lbl_80578450[pad]->SetActiveSlide("waiting", true, false);
+                gFEPointerInstances[pad]->SetActiveSlide("waiting", true, false);
             }
             return;
         }
@@ -430,7 +417,7 @@ void UnidentifiedSHSceneBase::Update(float dt)
         FEPresentation* presentation = mPresentation;
         TLSlide* first = presentation->m_currentSlide;
         TLSlide* slide = first;
-        fn_801CBCA0(0x2AB04562, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x2AB04562, 0, 0, 1);
         do
         {
             TLComponentInstance* done = FindComponent(slide, "done");
@@ -443,8 +430,8 @@ void UnidentifiedSHSceneBase::Update(float dt)
     }
     for (int pad = 0; pad < 4; ++pad)
     {
-        TLComponentInstance* instance = lbl_80578450[pad];
-        if (mUnidentified28 != 0xC && pad != lbl_806E18B0)
+        TLComponentInstance* instance = gFEPointerInstances[pad];
+        if (mUnidentified28 != 0xC && pad != gFEControllerIndex)
         {
             instance->SetActiveSlide("waiting", true, false);
         }
@@ -452,21 +439,21 @@ void UnidentifiedSHSceneBase::Update(float dt)
         {
             instance->SetActiveSlide("cursor", true, false);
             u8 valid = 1;
-            TU80300104Event event;
+            FEPointerEvent event;
             event.mIndex = pad;
-            event.mPosition = fn_802197FC(pad, &valid);
+            event.mPosition = GetPointerPosition(pad, &valid);
             g_pPadManager->GetPad(pad)->GetButtonIndex(0x1E, true);
-            event.mFlag0 = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
-            event.mFlag1 = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
-            mComponent.fn_80219608(&event);
+            event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
+            event.mReleased = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
+            mComponent.HandlePointerEvent(&event);
             if (mUnidentified30)
                 return;
-            mUnidentified420.fn_80230468(event, dt);
-            if (mUnidentified420.fn_8022FD80(1, 1))
+            mUnidentified420.Update(event, dt);
+            if (mUnidentified420.IsScrolling(1, 1))
             {
                 fn_8026942C();
             }
-            else if (mUnidentified420.fn_8022FD80(0, 1))
+            else if (mUnidentified420.IsScrolling(0, 1))
             {
                 fn_8026932C();
             }
@@ -481,12 +468,12 @@ void UnidentifiedSHSceneBase::fn_8026A63C()
     TLTextInstance* headlineText = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("headline pic"), nlStringLowerHash("Layer"),
         nlStringLowerHash("HEADLINE"), 0, 0, 0);
     if (headlineText == 0)
-        headlineText = &UnidentifiedFallbackTextInstance;
+        headlineText = &gDefaultTLTextInstance;
 
     TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
         nlStringLowerHash("Description_clip"), 0, 0, 0);
     if (descriptionText == 0)
-        descriptionText = &UnidentifiedFallbackTextInstance;
+        descriptionText = &gDefaultTLTextInstance;
 
     fn_801E2F50(&mUnidentified1C0, headlineText, -1, -1, -300);
     if (mUnidentifiedFC)
@@ -499,7 +486,7 @@ void UnidentifiedSHSceneBase::fn_8026A63C()
     TLTextInstance* storyHeadline = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
         nlStringLowerHash("HEADLINE"), 0, 0, 0);
     if (storyHeadline == 0)
-        storyHeadline = &UnidentifiedFallbackTextInstance;
+        storyHeadline = &gDefaultTLTextInstance;
     fn_801E2F50(&mUnidentified200, storyHeadline, -1, -1, -300);
     if (mUnidentifiedFC)
         fn_801E3A88(&mUnidentified200, &mUnidentifiedF4);
@@ -510,7 +497,7 @@ void UnidentifiedSHSceneBase::fn_8026A63C()
     TLTextInstance* bodyText = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
         nlStringLowerHash("BODY"), 0, 0, 0);
     if (bodyText == 0)
-        bodyText = &UnidentifiedFallbackTextInstance;
+        bodyText = &gDefaultTLTextInstance;
     if (mUnidentifiedFC)
         bodyText->SetString(mUnidentifiedF8.c_str());
     else
@@ -524,13 +511,13 @@ void UnidentifiedSHSceneBase::fn_8026A63C()
     TLInstance* storyTexture = FEFinder<TLInstance, 2>::Find(mPresentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
         nlStringLowerHash("00_dummy_texture"), 0, 0, 0);
     if (storyTexture == 0)
-        storyTexture = &lbl_80580248;
+        storyTexture = &gDefaultTLImageInstance;
     mUnidentified240.mImageInstance = (TLImageInstance*)storyTexture;
 
     TLInstance* headlineTexture = FEFinder<TLInstance, 2>::Find(mPresentation, nlStringLowerHash("headline pic"), nlStringLowerHash("Layer"),
         nlStringLowerHash("00_dummy_texture"), 0, 0, 0);
     if (headlineTexture == 0)
-        headlineTexture = &lbl_80580248;
+        headlineTexture = &gDefaultTLImageInstance;
     mUnidentified2E0.mImageInstance = (TLImageInstance*)headlineTexture;
 
     mUnidentified2E0.QueueLoad(mUnidentifiedB1, false);
@@ -543,11 +530,11 @@ void UnidentifiedSHSceneBase::SHSceneVirtual38(int captain, int mood, int specia
     int variant = nlRandom(3, &nlDefaultSeed);
     if (mUnidentified28 == 8)
     {
-        s8 stored = lbl_806E0FA0->mHeadlineVariant;
+        s8 stored = g_pStrikerChallenge->mHeadlineVariant;
         if (stored != -1)
             variant = stored;
         else
-            lbl_806E0FA0->mHeadlineVariant = variant;
+            g_pStrikerChallenge->mHeadlineVariant = variant;
     }
     const CharacterInfo& info = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     char name[0x10];
@@ -597,20 +584,20 @@ void UnidentifiedSHSceneBase::SHSceneVirtual38(int captain, int mood, int specia
 
 void UnidentifiedSHSceneBase::fn_8026ABF0(int index, void* context)
 {
-    mComponent.mValues[index] = 1;
+    mComponent.SetPointerState(1, index);
     TLComponentInstance* done = FindCurrentComponent("done");
-    if (!mComponent.fn_802192FC(1, index))
+    if (!mComponent.HasOtherPointerState(1, index))
     {
         done->SetActiveSlide("over", true, false);
-        fn_801CBCA0(0xAA73EF33, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 }
 
 void UnidentifiedSHSceneBase::fn_8026AD50(int index, void* context)
 {
-    mComponent.mValues[index] = 0;
+    mComponent.SetPointerState(0, index);
     TLComponentInstance* done = FindCurrentComponent("done");
-    if (!mComponent.fn_802192FC(1, index))
+    if (!mComponent.HasOtherPointerState(1, index))
     {
         done->SetActiveSlide("off", true, false);
     }
@@ -618,18 +605,18 @@ void UnidentifiedSHSceneBase::fn_8026AD50(int index, void* context)
 
 void UnidentifiedSHSceneBase::fn_8026AE98(int index, void* context)
 {
-    fn_801CBCA0(0xF0AFD586, 0, 0, 1);
+    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     mUnidentified30 = true;
     mUnidentified100 = 2;
     mPresentation->SetActiveSlide("out", true);
     mPresentation->Update(0.0f);
     if (mUnidentified28 != 0xD)
     {
-        fn_80253474(fn_80253E18());
+        GetNavigationScene()->HideButtons();
     }
     if (mUnidentified28 == 8)
     {
-        fn_801CBCA0(0x4861E03D, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x4861E03D, 0, 0, 1);
     }
     FindCurrentComponent("done")->SetActiveSlide("down", true, false);
 }

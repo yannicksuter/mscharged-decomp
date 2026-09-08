@@ -20,6 +20,7 @@ public:
     void UnloadPackage();
     void Update(float dt);
     void AllResourcesLoadedCallback();
+    FEPackage* GetPackage() const;
 
     /* 0x00 */ FEPackage* m_pFEPackage;
     /* 0x04 */ unsigned long m_uHashID;

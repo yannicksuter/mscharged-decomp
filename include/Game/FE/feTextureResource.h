@@ -8,7 +8,7 @@ class FETextureResource : public FEResourceHandle
 public:
     FETextureResource();
 
-    void fn_8030009C(const unsigned long& textureReference);
+    void SetTextureHandle(const unsigned long& textureReference);
     u32 GetTextureHandle() const;
 
     /* 0x18 */ u32 m_glTextureHandle;

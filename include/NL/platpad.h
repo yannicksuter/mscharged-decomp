@@ -5,8 +5,14 @@
 #include "NL/nlArrayAllocator.h"
 #include "types.h"
 
-extern "C" int fn_802C03FC(int button);
-extern "C" int fn_802C06C8(int buttonIndex);
+struct PlatPadManager;
+extern PlatPadManager* g_pPlatPadManager;
+void UpdatePlatPad(PlatPadManager* manager);
+
+extern int gNextPadClassID;
+
+int GetPadButtonIndex(int button);
+int GetPadButtonMask(int buttonIndex);
 
 class PadBackend
 {
@@ -35,7 +41,7 @@ public:
     virtual void StartRumble(float duration, float intensity, float frequency);
     virtual void StopRumble();
     virtual void Update(float deltaTime);
-    virtual int UnidentifiedClassID();
+    virtual int GetClassID();
 
     void DisableLeftAnalogToDPadMap()
     {
@@ -54,9 +60,8 @@ public:
 }; // size 0x1C
 
 class cPlatPad;
-extern nlArrayAllocator<cPlatPad> lbl_806E2260;
-
-extern "C" bool fn_80365E84(PadBackend* pad);
+extern nlArrayAllocator<cPlatPad> gPlatPadAllocator;
+extern int gPlatPadClassID;
 
 class cPlatPad : public PadBackend
 {
@@ -66,7 +71,7 @@ public:
     {
     }
 
-    virtual ~cPlatPad();
+    virtual ~cPlatPad() { }
     virtual bool IsConnected();
     virtual bool IsPressed(int button, bool remap);
     virtual float GetPressure(int button, bool remap);
@@ -84,16 +89,16 @@ public:
     virtual void StartRumble(float fDuration, float fIntensity, float fFrequency);
     virtual void StopRumble();
     virtual void Update(float dt);
-    virtual int UnidentifiedClassID();
+    virtual int GetClassID() { return gPlatPadClassID; }
 
     static void* operator new(unsigned long)
     {
-        return lbl_806E2260.Allocate();
+        return gPlatPadAllocator.Allocate();
     }
 
     static void operator delete(void* ptr)
     {
-        lbl_806E2260.DeleteEntry(static_cast<cPlatPad*>(ptr));
+        gPlatPadAllocator.DeleteEntry(static_cast<cPlatPad*>(ptr));
     }
 }; // size 0x1C
 

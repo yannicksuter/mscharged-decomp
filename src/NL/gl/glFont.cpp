@@ -1,3 +1,4 @@
+#include "NL/gl/glTexture.h"
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glFont.h"
 #include "NL/gl/glView.h"
@@ -11,6 +12,7 @@
 #include "NL/nlString.h"
 
 #include <stdarg.h>
+#include "NL/nlstring_tmpl.h"
 
 enum eGLFont
 {
@@ -150,7 +152,7 @@ void gl_FontStartup()
 
         unsigned long platformTexture = glplatCreateFont(width, height, image,
             texture, (MemoryAllocator*)fn_802CC094());
-        fn_802CDF14(texture, (PlatTexture*)platformTexture,
+        glRegisterTexture(texture, (PlatTexture*)platformTexture,
             (MemoryAllocator*)fn_802CC094());
         delete[] image;
     }

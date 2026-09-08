@@ -3,7 +3,7 @@
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/FE/BaseOverlayHandler.h"
-#include "unclassified/tu_80219248.h"
+#include "Game/FE/fePointerButton.h"
 
 class TLComponentInstance;
 
@@ -19,7 +19,7 @@ public:
     void fn_801F9C6C(int index, void* context);
     void fn_801F9CDC(int index, void* context);
 
-    /* 0x028 */ TU80219248Component mControllerComponent;
+    /* 0x028 */ FEPointerButton mControllerComponent;
     /* 0x0DC */ TLComponentInstance* mUnidentified0DC;
     /* 0x0E0 */ ScreenMovement mMovement;
     /* 0x0E4 */ bool mUnidentified0E4;

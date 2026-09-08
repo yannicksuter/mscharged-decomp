@@ -106,9 +106,9 @@ public:
     /* 0x5C */ nlVector3 mPosition;
 }; // size: 0x68
 
-struct FEModelHandleListEntry_801C2FB4
+struct FEModelHandleListEntry
 {
-    /* 0x00 */ FEModelHandleListEntry_801C2FB4* mNext;
+    /* 0x00 */ FEModelHandleListEntry* mNext;
     /* 0x04 */ FEModelHandle* mHandle;
 };
 
@@ -120,10 +120,11 @@ public:
 
     void Update(float dt);
     void Render();
+    FEModelHandle* GetModel(const char* name);
 
     /* 0x04 */ void* mUnidentified04;
-    /* 0x08 */ FEModelHandleListEntry_801C2FB4* mHandlesHead;
-    /* 0x0C */ FEModelHandleListEntry_801C2FB4* mHandlesTail;
+    /* 0x08 */ FEModelHandleListEntry* mHandlesHead;
+    /* 0x0C */ FEModelHandleListEntry* mHandlesTail;
     /* 0x10 */ void* mUnidentified10;
     /* 0x14 */ void* mModelsHead;
     /* 0x18 */ void* mModelsTail;
@@ -155,8 +156,6 @@ extern "C"
         void* unidentified4C, void* unidentified50, bool alternate);
     void fn_801C2BD8(FEModelManager* manager, FEModelHandle* handle);
     void fn_801C2E10(FEModelManager* manager);
-    FEModelHandle* fn_801C2FB4(
-        FEModelManager* manager, const char* name);
     void fn_801C3014(FEModelManager* manager);
 }
 

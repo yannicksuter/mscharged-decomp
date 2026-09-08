@@ -1,3 +1,5 @@
+#include "NL/plat/PlatPadManager.h"
+#include "Game/HBMManager.h"
 #include "Game/FE/feManager.h"
 #include "Game/Sys/debug.h"
 
@@ -16,10 +18,10 @@
 #include "Game/FE/feSceneManager.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
-#include "Game/HBMManager_8024795C.h"
 #include "Game/MathHelpers.h"
 #include "Game/NetworkSession.h"
 #include "Game/Render/ShootToScoreArrow.h"
+#include "Game/SH/SHPause.h"
 #include "Game/Sys/audio.h"
 #include "Game/TweakRegistry.h"
 #include "Game/TweakValue.h"
@@ -34,20 +36,14 @@
 #include "NL/nlPrint.h"
 #include "NL/nlTask.h"
 #include "unclassified/tu_80139B18.h"
-#include "unclassified/tu_802196B0.h"
-#include "unclassified/tu_80252180.h"
+#include "Game/FE/feDPD.h"
+#include "Game/SH/SHNavigation.h"
 #include "unclassified/tu_80284A58.h"
 #include "unclassified/tu_80332770.h"
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
     UnidentifiedEventRegistry;
-
-struct PlatPadManager_806E2478
-{
-    /* 0x000 */ u8 mUnidentified000[0x2F4];
-    /* 0x2F4 */ int type[4];
-};
 
 extern "C"
 {
@@ -60,9 +56,7 @@ extern "C"
     void GetMaxRemoteAccelDelta(cAIPad* pad, int index, nlVector3* out);
 
     extern UnidentifiedEventRegistry* g_pEventRegistry;
-    extern PlatPadManager_806E2478* g_pPlatPadManager;
     extern float g_AllActorsHidden;
-    extern int g_PauseMenuControllingInput;
 }
 
 cAnimCamera* FrontEnd::m_pPauseMenuCamera = 0;
@@ -235,12 +229,12 @@ void FrontEnd::EnterMenuState(FrontEnd::MenuEnterType menuType)
         {
             g_pOverlayManager->Push((SceneList)0x50, SCREEN_NOTHING, false);
         }
-        g_PauseMenuControllingInput = FE_ALL_PADS;
+        PauseMenuScene::mControllingInput = FE_ALL_PADS;
         break;
 
     case MET_CHOOSESIDES:
         g_pOverlayManager->Push((SceneList)0x51, SCREEN_NOTHING, false);
-        g_PauseMenuControllingInput = FE_ALL_PADS;
+        PauseMenuScene::mControllingInput = FE_ALL_PADS;
         break;
 
     case MET_CONNECTIONLOST:
@@ -433,7 +427,7 @@ void FrontEnd::UpdateForGame(float fDeltaT)
         return;
     }
 
-    if (GetNumMachines(g_pNetworkSessionBase) > 1)
+    if (g_pNetworkSessionBase->GetNumMachines() > 1)
     {
         if (!m_bInPauseMenuState)
         {

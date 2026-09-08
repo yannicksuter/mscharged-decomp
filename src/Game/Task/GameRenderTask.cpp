@@ -1,3 +1,4 @@
+#include "Game/HBMManager.h"
 #include "Game/Task/GameRenderTask.h"
 
 #include "types.h"
@@ -15,7 +16,6 @@
 #include "Game/GL/UnidentifiedMeshWriter_802A195C.h"
 #include "Game/Game.h"
 #include "Game/GameObjectLighting.h"
-#include "Game/HBMManager_8024795C.h"
 #include "Game/NisPlayer.h"
 #include "Game/ObjectBlur.h"
 #include "Game/Render/AttackSideIndicators.h"

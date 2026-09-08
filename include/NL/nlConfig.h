@@ -37,12 +37,6 @@ struct LexicalCastImpl<const char*, const char*>
 };
 
 template <typename To>
-struct LexicalCastImpl<To, int>
-{
-    static To Do(int t);
-};
-
-template <typename To>
 struct LexicalCastImpl<To, float>
 {
     static To Do(float t);

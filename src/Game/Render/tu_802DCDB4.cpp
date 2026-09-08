@@ -9,6 +9,7 @@
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
 #include "unclassified/tu_801A4188.h"
+#include "NL/nlstring_tmpl.h"
 
 // Serialized world-NPC record used by the stadium/world object stream. The
 // retail binary does not preserve the original class name.

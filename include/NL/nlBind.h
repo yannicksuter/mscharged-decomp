@@ -36,7 +36,7 @@ public:
 };
 
 template <typename R, typename F, typename A>
-BindExp1<R, F, A> Bind(F fn, const A& arg)
+inline BindExp1<R, F, A> Bind(F fn, const A& arg)
 {
     return BindExp1<R, F, A>(fn, arg);
 }

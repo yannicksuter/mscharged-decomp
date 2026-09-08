@@ -23,9 +23,9 @@ extern "C"
     void fn_80183A98();
     void fn_80183B40(unsigned long matrix);
     void fn_80183BF4(const nlMatrix4* matrix);
-    void fn_801B5EE8(const bool* flags, int stageCount, int texGenCount,
+    void fn_801B5EE8(float value, const bool* flags, int stageCount, int texGenCount,
         int texture4, int texture5, int texCoord3, int texCoord4,
-        int texCoord5, int finalTexture, float value);
+        int texCoord5, int finalTexture);
 }
 
 struct GXMaterialProgramParameters_80298B18
@@ -238,7 +238,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298B18>::Draw(
         bool flags[2];
         flags[0] = lbl_806E1AAF || parameters->value96 != 0;
         flags[1] = lbl_806E1AB0 || parameters->value100 != 0;
-        fn_801B5EE8(flags, stageCount, lbl_806DF00C, 4, 5, 3, 4, 5, 3, value76);
+        fn_801B5EE8(value76, flags, stageCount, lbl_806DF00C, 4, 5, 3, 4, 5, 3);
     }
 
     float value56 = parameters->value56;

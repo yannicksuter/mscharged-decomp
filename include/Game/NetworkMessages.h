@@ -289,17 +289,18 @@ public:
     /* 0x0B */ u8 mSidekick2;
 };
 
-class NetworkMessageType25_8050B778 : public UnidentifiedNetworkMessage
+// "Failed to SendSidesChangedToEveryone to %d because no connection".
+class NetMessageSidesChanged : public UnidentifiedNetworkMessage
 {
 public:
     virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetworkMessageType25_8050B778();
+    virtual ~NetMessageSidesChanged();
     virtual int GetType();
 
-    /* 0x08 */ u8 mUnidentified08;
-    /* 0x09 */ u8 mUnidentified09;
-    /* 0x0A */ u8 mUnidentified0A;
-    /* 0x0B */ u8 mUnidentified0B;
+    /* 0x08 */ u8 mMachineIndex;
+    /* 0x09 */ u8 mSide;
+    /* 0x0A */ u8 mIsGuest;
+    /* 0x0B */ u8 mIsResponse;
 };
 
 class NetworkMessageType27_8050B750 : public UnidentifiedNetworkMessage

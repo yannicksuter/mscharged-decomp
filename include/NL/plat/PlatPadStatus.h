@@ -4,19 +4,19 @@
 #include <revolution/wpad/WPAD.h>
 #include <revolution/kpad/KPAD.h>
 
-struct PlatPadStatus_80375EC8
+struct WiiRemotePadStatus
 {
     WPADStatus wpad;
     KPADStatus kpad;
 }; // size 0xB0
 
-struct PlatPadStatus_80375ED4
+struct WiiFreestylePadStatus
 {
     WPADFSStatus wpad;
     KPADStatus kpad;
 }; // size 0xB8
 
-struct PlatPadStatus_80375EE0
+struct WiiClassicPadStatus
 {
     WPADCLStatus wpad;
     KPADStatus kpad;
@@ -24,19 +24,10 @@ struct PlatPadStatus_80375EE0
 
 union PlatPadStatus
 {
-    PlatPadStatus_80375EC8 core;
-    PlatPadStatus_80375ED4 freestyle;
-    PlatPadStatus_80375EE0 classic;
+    WiiRemotePadStatus core;
+    WiiFreestylePadStatus freestyle;
+    WiiClassicPadStatus classic;
 };
 
-struct PlatPadManager;
-
-extern "C"
-{
-    extern PlatPadManager* g_pPlatPadManager;
-    PlatPadStatus_80375EC8* fn_80375EC8(PlatPadManager* manager, int channel);
-    PlatPadStatus_80375ED4* fn_80375ED4(PlatPadManager* manager, int channel);
-    PlatPadStatus_80375EE0* fn_80375EE0(PlatPadManager* manager, int channel);
-}
 
 #endif // NL_PLAT_PLATPADSTATUS_H

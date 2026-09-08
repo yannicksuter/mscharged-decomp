@@ -12,6 +12,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_80332DC0.h"
+#include "NL/nlstring_tmpl.h"
 
 struct UnidentifiedPacketHeader
 {
@@ -122,7 +123,7 @@ cGlobalPad* GetLocalChannelPad(UnidentifiedNetworkPeerChannel* channel)
         return 0;
     }
     cGlobalPad* pad;
-    if (channel->mPeer == fn_80338C0C(g_pNetworkSessionBase))
+    if (channel->mPeer == g_pNetworkSessionBase->GetLocalPeer())
         pad = g_pPadManager->GetPad(channel->mGlobalPadIndex);
     else
         pad = 0;
@@ -569,7 +570,7 @@ extern "C" void fn_803380F4(UnidentifiedNetGameState* state,
     {
         if (machine < machineCount)
             header.mPlayerCounts[machine]
-                = fn_80338BF8(g_pNetworkSessionBase, (s8)machine)->mUnidentified004;
+                = g_pNetworkSessionBase->GetPeer((s8)machine)->mUnidentified004;
         else
             header.mPlayerCounts[machine] = 0;
     }

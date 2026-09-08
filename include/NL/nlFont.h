@@ -93,6 +93,7 @@ public:
     };
 
     unsigned long GetCharWidth(unsigned short FontChar, unsigned short PrevFontChar) const;
+    unsigned long GetStringWidth(const FontCharString& Text, bool SingleLine, unsigned long MaxWidth, bool WordWrap) const;
     void DisableScissorBox() const;
     void SetScissorBox(const ScissorBox& other) const;
     void DrawString(eGLView View, const FontCharString& Text, const nlVector2& Position, const nlColour& Colour, const nlColour& EffectColour, int Length, nlFont::TextPass Passes, bool FlipY, unsigned long* pMatrix, nlColour* pOverrideColour) const;

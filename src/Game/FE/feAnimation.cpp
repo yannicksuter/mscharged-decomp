@@ -4,12 +4,6 @@
 #include "NL/nlDLRing.h"
 #include "NL/nlMath.h"
 
-extern "C" void fn_803023B4(TLInstance*, float, float, float);
-extern "C" void fn_803023D0(TLInstance*, float);
-extern "C" void fn_803023E4(TLInstance*, float);
-extern "C" void fn_803023F8(TLInstance*, float);
-extern "C" void fn_8030240C(TLInstance*, float);
-
 void FEAnimation::AnimateTargetAtTimeWithFloat(float fCurrentTime)
 {
     fAnimationKeyframe* currentFrame;
@@ -61,17 +55,17 @@ void FEAnimation::AnimateTargetAtTimeWithFloat(float fCurrentTime)
             {
                 switch (m_type)
                 {
-                case (AnimType)7:
-                    fn_803023D0(m_pTLInstanceTarget, fAnimatedResult);
+                case eAnimUVX:
+                    m_pTLInstanceTarget->SetAssetUVX(fAnimatedResult);
                     break;
-                case (AnimType)8:
-                    fn_803023E4(m_pTLInstanceTarget, fAnimatedResult);
+                case eAnimUVY:
+                    m_pTLInstanceTarget->SetAssetUVY(fAnimatedResult);
                     break;
-                case (AnimType)9:
-                    fn_803023F8(m_pTLInstanceTarget, fAnimatedResult);
+                case eAnimUVWidth:
+                    m_pTLInstanceTarget->SetAssetUVWidth(fAnimatedResult);
                     break;
-                case (AnimType)10:
-                    fn_8030240C(m_pTLInstanceTarget, fAnimatedResult);
+                case eAnimUVHeight:
+                    m_pTLInstanceTarget->SetAssetUVHeight(fAnimatedResult);
                     break;
                 }
             }
@@ -155,7 +149,7 @@ void FEAnimation::AnimateTargetAtTimeWithVector3(float fCurrentTime)
         m_pTLInstanceTarget->SetAssetScale(result[0], result[1], result[2]);
         break;
     case eAnimPivot:
-        fn_803023B4(m_pTLInstanceTarget, result[0], result[1], result[2]);
+        m_pTLInstanceTarget->SetAssetPivot(result[0], result[1], result[2]);
         break;
     case eAnimColor:
     {

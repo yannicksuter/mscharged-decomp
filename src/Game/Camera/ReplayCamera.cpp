@@ -1,4 +1,5 @@
 #include "Game/Camera/ReplayCamera.h"
+#include "Game/Render/RLViewLayers.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/CharacterTemplate.h"
@@ -11,7 +12,6 @@
 #include "NL/nlTask.h"
 #include "NL/gl/glMatrix.h"
 
-extern "C" bool fn_80273B00();
 extern "C" float fn_800F2410(float fov);
 
 float lbl_806DC510[2] = { 18.0f, 0.0f };
@@ -442,7 +442,7 @@ void ReplayCamera::Update(float fDeltaT)
 float ReplayCamera::GetFOV() const
 {
     float fov = mFov;
-    if (fn_80273B00())
+    if (IsWidescreen())
     {
         fov = fn_800F2410(mFov);
     }

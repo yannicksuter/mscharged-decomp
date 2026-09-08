@@ -33,10 +33,6 @@ struct UnidentifiedStaticStorage
 
 struct UnidentifiedStaticTag;
 
-extern "C"
-{
-}
-
 static float gShadowScaleHigh = 0.5f;
 static int gShadowAlphaLow = 100;
 static int gShadowAlphaHigh = 10;

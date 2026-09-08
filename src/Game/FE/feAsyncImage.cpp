@@ -10,10 +10,9 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 extern unsigned int nlDefaultSeed;
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 inline bool AsyncImage::CanSwapTextures() const
 {
@@ -36,7 +35,7 @@ inline bool AsyncImage::CanSwapTextures() const
         else
         {
             res = false;
-            if (glTextureLoad(mUnidentified14) != 0 && glTextureLoad(mTextureHandle) != 0)
+            if (glTextureLoad(mTargetTextureHandle) != 0 && glTextureLoad(mTextureHandle) != 0)
             {
                 res = true;
             }
@@ -54,7 +53,7 @@ inline void AsyncImage::SwapTextures()
     }
     else
     {
-        glTextureReplace(mUnidentified14, m_loadBuffer, mTextureSize);
+        glTextureReplace(mTargetTextureHandle, m_loadBuffer, mTextureSize);
     }
     glDiscardFrame(1);
 }
@@ -74,24 +73,24 @@ void AsyncImage::TextureLoadComplete(void* buffer, unsigned long size, unsigned 
     self->mLoadState = LS_LOAD_COMPLETE;
 }
 
-void AsyncImage::fn_801BF4D4(void* arg0, unsigned long arg1, unsigned long userData)
+void AsyncImage::BundleOpenComplete(void* buffer, unsigned long size, unsigned long userData)
 {
     AsyncImage* self = (AsyncImage*)userData;
-    self->mLoadState = LS_UNIDENTIFIED_1;
+    self->mLoadState = LS_READY_TO_LOAD;
 }
 
 bool AsyncImage::Update(bool autoswap)
 {
-    if (mImageInstance == 0 && mUnidentified14 == 0)
+    if (mImageInstance == 0 && mTargetTextureHandle == 0)
     {
         return false;
     }
 
     bool res = false;
-    if (mLoadState == LS_UNIDENTIFIED_1)
+    if (mLoadState == LS_READY_TO_LOAD)
     {
         BundleFileDirectoryEntry info;
-        mBundleFile->GetFileInfo(mUnidentifiedPath, &info, true);
+        mBundleFile->GetFileInfo(mLoadPath, &info, true);
 
         if (m_loadBuffer == 0)
         {
@@ -104,7 +103,7 @@ bool AsyncImage::Update(bool autoswap)
             mTextureSize = info.m_length;
         }
 
-        mBundleFile->ReadFileAsync(mUnidentifiedPath, m_loadBuffer, mTextureSize, &AsyncImage::TextureLoadComplete, (unsigned long)this);
+        mBundleFile->ReadFileAsync(mLoadPath, m_loadBuffer, mTextureSize, &AsyncImage::TextureLoadComplete, (unsigned long)this);
         mLoadState = LS_ISSUED_LOAD;
     }
 
@@ -115,7 +114,7 @@ bool AsyncImage::Update(bool autoswap)
             if (mTextureHandle != mImageInstance->m_pTextureResource->GetTextureHandle() && glTextureLoad(mTextureHandle) == 0)
             {
                 glTextureAdd(mTextureHandle, m_loadBuffer, mTextureSize, FEResourceManager::s_pInstance->fn_802FDD84());
-                mImageInstance->m_pTextureResource->fn_8030009C(mTextureHandle);
+                mImageInstance->m_pTextureResource->SetTextureHandle(mTextureHandle);
             }
         }
         else if (glTextureLoad(mTextureHandle) == 0)
@@ -141,17 +140,17 @@ void AsyncImage::QueueLoad(const char* path, bool isblocking)
 {
     if (mLoadState != LS_ISSUED_LOAD)
     {
-        nlStrNCpy(mUnidentifiedPath, path, sizeof(mUnidentifiedPath));
-        if (mLoadState != LS_UNIDENTIFIED_1 && mLoadState != LS_UNIDENTIFIED_0)
+        nlStrNCpy(mLoadPath, path, sizeof(mLoadPath));
+        if (mLoadState != LS_READY_TO_LOAD && mLoadState != LS_OPENING_BUNDLE)
         {
-            mLoadState = LS_UNIDENTIFIED_1;
+            mLoadState = LS_READY_TO_LOAD;
         }
     }
 }
 
 AsyncImage::~AsyncImage()
 {
-    while (mLoadState == LS_ISSUED_LOAD || mLoadState == LS_UNIDENTIFIED_0)
+    while (mLoadState == LS_ISSUED_LOAD || mLoadState == LS_OPENING_BUNDLE)
     {
         nlServiceFileSystem();
     }
@@ -166,12 +165,12 @@ AsyncImage::AsyncImage(const char* filename, const char* texturename)
     mBundleFile = 0;
     mImageInstance = 0;
     m_loadBuffer = 0;
-    mUnidentified14 = 0;
+    mTargetTextureHandle = 0;
     mTextureSize = 0;
-    mLoadState = LS_UNIDENTIFIED_0;
+    mLoadState = LS_OPENING_BUNDLE;
 
     mBundleFile = new (nlMalloc(sizeof(BundleFile), 0x20, 1)) BundleFile();
-    mBundleFile->OpenAsync(filename, &AsyncImage::fn_801BF4D4, (unsigned long)this, false);
+    mBundleFile->OpenAsync(filename, &AsyncImage::BundleOpenComplete, (unsigned long)this, false);
 
     int hash;
     if (texturename != 0)

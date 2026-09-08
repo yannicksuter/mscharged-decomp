@@ -1,4 +1,10 @@
+#include "Game/SH/SHNavigation.h"
+#include "Game/GameSceneManager.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/Render/Presentation.h"
+#include "Game/Render/RLViewLayers.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/FE/feModelManager.h"
 
 #include "Game/BasicStadium.h"
 #include "Game/FE/feMusic.h"
@@ -15,6 +21,8 @@
 #include "NL/nlPrint.h"
 #include "NL/nlSingleton.h"
 #include "NL/nlString.h"
+#include "Game/FE/feDPD.h"
+#include "NL/nlstring_tmpl.h"
 
 static char sPresentationByteCode[] = "art/Scripts/fe_presentation.byte_code";
 static char sBronzeFormat[] = "%sbronze";
@@ -26,34 +34,12 @@ static const char* idleFun = sIdleFunctionName;
 static char sIdleAnimation[] = "fe_idle";
 
 extern "C" void fn_8010E294(void*);
-extern "C" void fn_801C27C4(
-    void*, int, unsigned int, int, bool, int, int, int);
-extern "C" void fn_801C3014(void*);
-extern "C" void* fn_801C2FB4(void*, unsigned int);
-extern "C" void* fn_801C2798(void*, unsigned int);
-extern "C" void fn_801C2BD8(void*, void*);
-extern "C" bool fn_801C08C4(void*, unsigned int);
-extern "C" bool fn_801C05B0(void*);
-extern "C" bool fn_801C05C4(void*);
-extern "C" void fn_801C05D0(void*, void*);
-extern "C" void fn_801C08A0(void*, void*);
-extern "C" void fn_801C08BC(void*, unsigned int);
-extern "C" void fn_801C0898(void*, void (*)(void*));
-extern "C" void fn_801C0704(
-    void*, const char*, unsigned int, float, float, unsigned int);
-extern "C" void fn_801CBCA0(unsigned int, int, int, bool);
-extern "C" void fn_801FEA18(const char*, void (*)(), float, bool);
-extern "C" void fn_801FEB74(void (*)(), float);
 extern "C" void fn_802081C0();
 extern "C" void fn_80208458();
 extern "C" void fn_80208518();
 extern "C" void fn_80208594();
 extern "C" void fn_802092D0(bool);
-class TU80252180Scene;
-extern "C" void fn_80253474(TU80252180Scene* scene);
-extern "C" TU80252180Scene* fn_80253E18();
-extern "C" void fn_80254E3C(TU80252180Scene* scene);
-extern "C" unsigned int fn_80273B00();
+class SHNavigation;
 extern "C" void fn_80276D10();
 extern "C" bool fn_80276DE0();
 extern "C" void fn_80276E0C();
@@ -63,19 +49,9 @@ extern "C" void fn_802E8B78(EmissionManager*, Function<void*>*);
 extern "C" void fn_80341E68(BasicStadium*, unsigned int);
 extern "C" void fn_802DEDE8(InterpreterCore*);
 
-extern "C" void* lbl_806E17F0;
-extern "C" void* lbl_806E0F90;
 extern bool g_e3_Build;
 extern "C" bool lbl_806DC704;
 extern "C" bool lbl_806E0F8B;
-extern "C" TLComponentInstance* lbl_80578450[4];
-
-class PresentationInterface_806E1838
-{
-public:
-    virtual ~PresentationInterface_806E1838();
-    virtual void Invoke(int, int, int) = 0;
-};
 
 class PresentationLookupResult
 {
@@ -85,14 +61,13 @@ public:
     virtual void* GetValue() = 0;
 };
 
-extern "C" PresentationInterface_806E1838* lbl_806E1838;
 
 inline Presentation::Presentation()
     : InterpreterCore(100)
     , mWaitTime(0.0f)
     , mDeltaTime(0.0f)
     , mCameraFinished(false)
-    , mPresentationFinished(false)
+    , mCameraTransitionFinished(false)
 {
     unsigned long fileSize = 0;
     void* byteCode = nlLoadEntireFile(sPresentationByteCode, &fileSize, 0x20, AllocateStart, 0, 0, 0);
@@ -107,17 +82,17 @@ inline Presentation& Presentation::Instance()
     return instance;
 }
 
-extern "C" void fn_801FEBEC()
+static void OnCameraAnimationFinished()
 {
     Presentation::Instance().mCameraFinished = true;
 }
 
-extern "C" void fn_801FED4C()
+static void OnCameraTransitionFinished(eCameraMessage message)
 {
-    Presentation::Instance().mPresentationFinished = true;
+    Presentation::Instance().mCameraTransitionFinished = true;
 }
 
-extern "C" Presentation* fn_801FEEAC()
+Presentation* Presentation::GetInstance()
 {
     return &Presentation::Instance();
 }
@@ -138,38 +113,38 @@ void Presentation::Update(float deltaTime)
     {
         mCameraFinished = false;
         mWaitTime = 0.0f;
-        mPresentationFinished = false;
+        mCameraTransitionFinished = false;
 
         const char* functionName = idleFun;
         mWaitTime = 0.0f;
         mCameraFinished = false;
-        mPresentationFinished = false;
+        mCameraTransitionFinished = false;
         nlStrNCpy(mCurrentFunction, functionName, 64);
         fn_802DEDE8(this);
         CallFunction(nlStringHash(functionName));
     }
 }
 
-extern "C" bool fn_801FF168(Presentation* presentation)
+bool Presentation::IsActive() const
 {
-    return nlStrCmp<char>(idleFun, presentation->mCurrentFunction) != 0;
+    return nlStrCmp<char>(idleFun, mCurrentFunction) != 0;
 }
 
 void Presentation::Call(const char* functionName)
 {
     mCameraFinished = false;
     mWaitTime = 0.0f;
-    mPresentationFinished = false;
+    mCameraTransitionFinished = false;
     nlStrNCpy(mCurrentFunction, functionName, 64);
     fn_802DEDE8(this);
     CallFunction(nlStringHash(functionName));
 }
 
-extern "C" void fn_801FF284(void* object)
+void OnPresentationModelAnimationFinished(FEModelHandle* object)
 {
     if (object != 0)
     {
-        fn_801C0704(object, sIdleAnimation, 0, 0.2f, 0.0f, 0);
+        object->PlayAnimation(sIdleAnimation, PM_CYCLIC, 0.2f, 0.0f, false);
     }
 }
 
@@ -220,7 +195,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         bool alternate = false;
         if (side == -1 && GameInfoManager::Instance()->mCurrentMode == 3)
         {
-            side = *(int*)((char*)lbl_806E0F90 + 0x8A28);
+            side = g_pCupManager->unknown_0x8A28;
         }
         else
         {
@@ -228,17 +203,17 @@ void Presentation::DoFunctionCall(unsigned int function)
             int opponent = GameInfoManager::Instance()->GetTeam((short)!side);
             alternate = CaptainsNeedAlternateColour(captain, opponent);
         }
-        fn_801C27C4(lbl_806E17F0, 1, name, side, value != 0, 0, 0, alternate);
+        fn_801C27C4(FEModelManager::Instance(), FE_MODEL_IMPOSTOR, (const char*)name, side, value != 0, 0, 0, alternate);
         break;
     }
     case 2:
-        fn_801C3014(lbl_806E17F0);
+        fn_801C3014(FEModelManager::Instance());
         break;
     case 3:
         NetTournManager::Instance()->DestroyTournamentTrophy();
         break;
     case 4:
-        fn_8010E294(lbl_806E0F90);
+        fn_8010E294(g_pCupManager);
         break;
     case 5:
     {
@@ -273,9 +248,9 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         unsigned int original = m_SP[-2];
         unsigned int value = Pop();
-        void* object = fn_801C2FB4(lbl_806E17F0, original);
-        m_SP[-1] = object != 0 && fn_801C08C4(object, value)
-                && !fn_801C05B0(object);
+        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)original);
+        m_SP[-1] = object != 0 && object->IsPlayingAnimation((const char*)value)
+                && !object->IsAnimationFinished();
         if (m_RunState == 3)
         {
             m_SP[-1] = original;
@@ -283,7 +258,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 11:
-        *m_SP++ = fn_80273B00();
+        *m_SP++ = IsWidescreen();
         break;
     case 12:
     {
@@ -314,7 +289,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         cAnimCamera* camera = GetCurrentAnimatedCamera();
         camera->SelectCameraAnimation(name);
         camera->m_bCyclic = false;
-        camera->m_EndOfAnimationCallback = fn_801FEBEC;
+        camera->m_EndOfAnimationCallback = OnCameraAnimationFinished;
         break;
     }
     case 16:
@@ -332,11 +307,10 @@ void Presentation::DoFunctionCall(unsigned int function)
         const char* argument0 = (const char*)m_SP[-3];
         const char* objectName = (const char*)m_SP[-4];
         m_SP -= 4;
-        void* object = fn_801C2FB4(lbl_806E17F0,
-            (unsigned int)objectName);
+        FEModelHandle* object = FEModelManager::Instance()->GetModel(objectName);
         if (object != 0)
         {
-            fn_801C0704(object, argument0, argument1, 0.0f, value, 0);
+            object->PlayAnimation(argument0, (ePlayMode)argument1, 0.0f, value, false);
         }
         break;
     }
@@ -345,37 +319,36 @@ void Presentation::DoFunctionCall(unsigned int function)
         unsigned int argument1 = Pop();
         const char* argument0 = (const char*)Pop();
         const char* objectName = (const char*)Pop();
-        void* object = fn_801C2FB4(lbl_806E17F0,
-            (unsigned int)objectName);
+        FEModelHandle* object = FEModelManager::Instance()->GetModel(objectName);
         if (object != 0)
         {
-            fn_801C0704(object, argument0, argument1, 0.0f, 0.0f, 0);
+            object->PlayAnimation(argument0, (ePlayMode)argument1, 0.0f, 0.0f, false);
         }
         break;
     }
     case 19:
-        fn_801CBCA0(0xB60A9CC0, 0, 0, true);
+        FEAudio::PlayAnimAudioEvent(0xB60A9CC0, 0, 0, true);
         break;
     case 20:
-        fn_801CBCA0(Pop(), 0, 0, true);
+        FEAudio::PlayAnimAudioEvent(Pop(), 0, 0, true);
         break;
     case 21:
-        fn_801FEB74(fn_801FED4C, *(float*)&m_SP[-1]);
+        PopPresentationCamera(OnCameraTransitionFinished, *(float*)&m_SP[-1]);
         --m_SP;
-        mPresentationFinished = false;
+        mCameraTransitionFinished = false;
         break;
     case 22:
     {
         unsigned int childName = Pop();
         unsigned int objectName = Pop();
-        void* object = fn_801C2FB4(lbl_806E17F0, objectName);
+        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)objectName);
         if (object != 0)
         {
             PresentationLookupResult* child = (PresentationLookupResult*)fn_801C2798(
-                lbl_806E17F0, childName);
+                FEModelManager::Instance(), childName);
             if (child != 0)
             {
-                fn_801C05D0(object, child->GetValue());
+                object->SetTransform(*(nlMatrix4*)child->GetValue());
             }
         }
         break;
@@ -386,12 +359,12 @@ void Presentation::DoFunctionCall(unsigned int function)
         float duration = *(float*)&m_SP[-1];
         --m_SP;
         const char* name = (const char*)Pop();
-        fn_801FEA18(name, fn_801FED4C, duration, value);
+        PushPresentationCamera(name, OnCameraTransitionFinished, duration, value);
         cAnimCamera* camera = GetCurrentAnimatedCamera();
         camera->m_bCyclic = false;
-        camera->m_EndOfAnimationCallback = fn_801FEBEC;
+        camera->m_EndOfAnimationCallback = OnCameraAnimationFinished;
         mCameraFinished = false;
-        mPresentationFinished = false;
+        mCameraTransitionFinished = false;
         break;
     }
     case 24:
@@ -401,39 +374,37 @@ void Presentation::DoFunctionCall(unsigned int function)
         --m_SP;
         const char* baseName = (const char*)Pop();
         char name[64];
-        typedef int (*GetPresentationMode)(void*);
-        void** vtable = *(void***)lbl_806E0F90;
-        int mode = ((GetPresentationMode)vtable[8])(lbl_806E0F90);
+        int mode = g_pCupManager->GetCurrentMode();
         if (mode == 0)
             nlSNPrintf(name, sizeof(name), sBronzeFormat, baseName);
         else if (mode == 1)
             nlSNPrintf(name, sizeof(name), sSilverFormat, baseName);
         else
             nlSNPrintf(name, sizeof(name), sGoldFormat, baseName);
-        fn_801FEA18(name, fn_801FED4C, duration, value);
+        PushPresentationCamera(name, OnCameraTransitionFinished, duration, value);
         cAnimCamera* camera = GetCurrentAnimatedCamera();
         camera->m_bCyclic = false;
-        camera->m_EndOfAnimationCallback = fn_801FEBEC;
+        camera->m_EndOfAnimationCallback = OnCameraAnimationFinished;
         mCameraFinished = false;
-        mPresentationFinished = false;
+        mCameraTransitionFinished = false;
         break;
     }
     case 25:
     {
         int value1 = (int)Pop();
         int value0 = (int)Pop();
-        lbl_806E1838->Invoke(value0, value1, 0);
+        GameSceneManager::Instance()->Push((SceneList)value0, (ScreenMovement)value1, false);
         break;
     }
     case 26:
-        lbl_806E1838->Invoke(8, 1, 0);
+        GameSceneManager::Instance()->Push((SceneList)8, SCREEN_FORWARD, false);
         break;
     case 27:
     {
-        void* object = fn_801C2FB4(lbl_806E17F0, Pop());
+        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
         if (object != 0)
         {
-            fn_801C2BD8(lbl_806E17F0, object);
+            fn_801C2BD8(FEModelManager::Instance(), object);
         }
         break;
     }
@@ -454,24 +425,24 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 30:
     {
         unsigned int value = Pop();
-        void* object = fn_801C2FB4(lbl_806E17F0, Pop());
+        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
         if (object != 0)
         {
-            fn_801C08BC(object, value);
+            object->SetDefaultAnimation((const char*)value);
         }
         break;
     }
     case 31:
     {
         unsigned int childName = Pop();
-        void* object = fn_801C2FB4(lbl_806E17F0, Pop());
+        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
         if (object != 0)
         {
             PresentationLookupResult* child = (PresentationLookupResult*)fn_801C2798(
-                lbl_806E17F0, childName);
+                FEModelManager::Instance(), childName);
             if (child != 0)
             {
-                fn_801C08A0(object, (char*)child->GetValue() + 0x30);
+                object->SetPosition(*(nlVector3*)((char*)child->GetValue() + 0x30));
             }
         }
         break;
@@ -483,19 +454,19 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 33:
     {
         bool value = Pop() != 0;
-        void* object = fn_801C2FB4(lbl_806E17F0, Pop());
+        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
         if (object != 0)
         {
-            *((bool*)object + 0x58) = value;
+            object->mEnabled = value;
         }
         break;
     }
     case 34:
     {
-        void* object = fn_801C2FB4(lbl_806E17F0, Pop());
+        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
         if (object != 0)
         {
-            fn_801C0898(object, fn_801FF284);
+            object->SetAnimationCompleteCallback(OnPresentationModelAnimationFinished);
         }
         break;
     }
@@ -525,20 +496,20 @@ void Presentation::DoFunctionCall(unsigned int function)
         fn_80208518();
         break;
     case 41:
-        if (TU80252180Scene* scene = fn_80253E18())
+        if (SHNavigation* scene = GetNavigationScene())
         {
-            fn_80254E3C(scene);
+            scene->StartTransition();
         }
         break;
     case 42:
         FEMusic::StartStreamIfDifferent(1);
-        if (TU80252180Scene* scene = fn_80253E18())
+        if (SHNavigation* scene = GetNavigationScene())
         {
-            fn_80253474(scene);
+            scene->HideButtons();
         }
         for (int i = 0; i < 4; ++i)
         {
-            lbl_80578450[i]->SetActiveSlide(
+            gFEPointerInstances[i]->SetActiveSlide(
                 sWaitingSlide, true, false);
         }
         break;
@@ -559,18 +530,18 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 45:
     {
-        void* object = fn_801C2FB4(lbl_806E17F0, Pop());
-        if (object != 0 && !fn_801C05B0(object))
+        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
+        if (object != 0 && !object->IsAnimationFinished())
         {
             StopWithUndo();
         }
         break;
     }
     case 46:
-        if (!mPresentationFinished)
+        if (!mCameraTransitionFinished)
             StopWithUndo();
         else
-            mPresentationFinished = false;
+            mCameraTransitionFinished = false;
         break;
     case 47:
         if (lbl_806DC704 && lbl_806E0F8B)
@@ -586,15 +557,15 @@ void Presentation::DoFunctionCall(unsigned int function)
             mWaitTime = 0.0f;
         break;
     case 49:
-        if (fn_801C2FB4(lbl_806E17F0, Pop()) == 0)
+        if (FEModelManager::Instance()->GetModel((const char*)Pop()) == 0)
         {
             StopWithUndo();
         }
         break;
     case 50:
     {
-        void* object = fn_801C2FB4(lbl_806E17F0, Pop());
-        if (object == 0 || !fn_801C05C4(object))
+        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
+        if (object == 0 || !object->IsLoaded())
         {
             StopWithUndo();
         }

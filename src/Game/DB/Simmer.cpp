@@ -3,7 +3,7 @@
 #include "Game/DB/StatsTracker.h"
 #include "NL/nlMath.h"
 
-extern void* lbl_806E0F90;
+extern void* g_pCupManager;
 extern "C" void fn_8010BCB8(void*, bool, int);
 
 /**
@@ -199,5 +199,5 @@ void Simulator::fn_80109E34()
             STATS_WIN, winningSide, 0, goals[0], goals[1], 0, 0);
     }
 
-    fn_8010BCB8(lbl_806E0F90, overtime, winningSide);
+    fn_8010BCB8(g_pCupManager, overtime, winningSide);
 }

@@ -47,10 +47,10 @@ struct FELibObjectAttributes
     /* 0x30 */ bool bVisible;
     /* 0x31 */ nlColour colour;
     /* 0x35 */ u8 pad_35[3];
-    /* 0x38 */ float field_0x38;
-    /* 0x3C */ float field_0x3C;
-    /* 0x40 */ float field_0x40;
-    /* 0x44 */ float field_0x44;
+    /* 0x38 */ float fUVX;
+    /* 0x3C */ float fUVY;
+    /* 0x40 */ float fUVWidth;
+    /* 0x44 */ float fUVHeight;
 };
 
 class FELibObject
@@ -63,6 +63,10 @@ public:
     feVector3& GetScale() const;
     feVector3& GetPivot() const;
     nlColour& GetColour() const;
+    float GetUVX() const;
+    float GetUVY() const;
+    float GetUVWidth() const;
+    float GetUVHeight() const;
 
     /* 0x00 */ FELibObject* next;
     /* 0x04 */ FELibObject* prev;
@@ -71,10 +75,5 @@ public:
     /* 0x54 */ char m_szName[32];
     /* 0x74 */ eFELibObjectType m_type;
 };
-
-float fn_803020BC(FELibObject* object);
-float fn_803020C4(FELibObject* object);
-float fn_803020CC(FELibObject* object);
-float fn_803020D4(FELibObject* object);
 
 #endif // _FELIBOBJECT_H_

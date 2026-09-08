@@ -1,16 +1,15 @@
 #include "unclassified/tu_80203D70.h"
+#include "Game/SH/SHNavigation.h"
+#include "Game/FE/FEAudio.h"
 
-#include "Game/DB/tu_8010A40C.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
+#include "Game/FE/feDPD.h"
 
-extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" void fn_802081C0();
-class TU80252180Scene;
-extern "C" void fn_80253474(TU80252180Scene* scene);
-extern "C" TU80252180Scene* fn_80253E18();
+class SHNavigation;
 
-extern TLComponentInstance* lbl_80578450[4];
 
 TU80203D70Scene::TU80203D70Scene()
     : mUnidentified21C(false)
@@ -46,37 +45,37 @@ void TU80203D70Scene::fn_802066C8(int index, void* context)
 
     if (context == (void*)0)
     {
-        if (!mButtonComponent0.fn_802192FC(1, index))
+        if (!mButtonComponent0.HasOtherPointerState(1, index))
         {
             mUnidentified5DC->SetActiveSlide("over", true, false);
-            fn_801CBCA0(0xAA73EF34, 0, 0, 1);
-            mButtonComponent0.mValues[index] = 1;
+            FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
+            mButtonComponent0.SetPointerState(1, index);
         }
     }
     else if (context == (void*)1)
     {
-        if (!mButtonComponent1.fn_802192FC(1, index))
+        if (!mButtonComponent1.HasOtherPointerState(1, index))
         {
             mUnidentified5E0->SetActiveSlide("over", true, false);
-            fn_801CBCA0(0x96DFB5C3, 0, 0, 1);
-            mButtonComponent1.mValues[index] = 1;
+            FEAudio::PlayAnimAudioEvent(0x96DFB5C3, 0, 0, 1);
+            mButtonComponent1.SetPointerState(1, index);
         }
     }
     else if (context == (void*)2)
     {
-        if (!mButtonComponent2.fn_802192FC(1, index))
+        if (!mButtonComponent2.HasOtherPointerState(1, index))
         {
             mUnidentified5E4->SetActiveSlide("over", true, false);
-            fn_801CBCA0(0x96DFB5C3, 0, 0, 1);
-            mButtonComponent2.mValues[index] = 1;
+            FEAudio::PlayAnimAudioEvent(0x96DFB5C3, 0, 0, 1);
+            mButtonComponent2.SetPointerState(1, index);
         }
     }
     else if (context == (void*)3
-        && !mButtonComponent3.fn_802192FC(1, index))
+        && !mButtonComponent3.HasOtherPointerState(1, index))
     {
         mUnidentified5E8->SetActiveSlide("over", true, false);
-        fn_801CBCA0(0xACCECA48, 0, 0, 1);
-        mButtonComponent3.mValues[index] = 1;
+        FEAudio::PlayAnimAudioEvent(0xACCECA48, 0, 0, 1);
+        mButtonComponent3.SetPointerState(1, index);
     }
 }
 
@@ -86,33 +85,33 @@ void TU80203D70Scene::fn_8020688C(int index, void* context)
 
     if (context == (void*)0)
     {
-        if (!mButtonComponent0.fn_802192FC(1, index))
+        if (!mButtonComponent0.HasOtherPointerState(1, index))
         {
             mUnidentified5DC->SetActiveSlide("off", true, false);
-            mButtonComponent0.mValues[index] = 0;
+            mButtonComponent0.SetPointerState(0, index);
         }
     }
     else if (context == (void*)1)
     {
-        if (!mButtonComponent1.fn_802192FC(1, index))
+        if (!mButtonComponent1.HasOtherPointerState(1, index))
         {
             mUnidentified5E0->SetActiveSlide("off", true, false);
-            mButtonComponent1.mValues[index] = 0;
+            mButtonComponent1.SetPointerState(0, index);
         }
     }
     else if (context == (void*)2)
     {
-        if (!mButtonComponent2.fn_802192FC(1, index))
+        if (!mButtonComponent2.HasOtherPointerState(1, index))
         {
             mUnidentified5E4->SetActiveSlide("off", true, false);
-            mButtonComponent2.mValues[index] = 0;
+            mButtonComponent2.SetPointerState(0, index);
         }
     }
     else if (context == (void*)3
-        && !mButtonComponent3.fn_802192FC(1, index))
+        && !mButtonComponent3.HasOtherPointerState(1, index))
     {
         mUnidentified5E8->SetActiveSlide("off", true, false);
-        mButtonComponent3.mValues[index] = 0;
+        mButtonComponent3.SetPointerState(0, index);
     }
 }
 
@@ -121,30 +120,30 @@ void TU80203D70Scene::fn_802069F0(int, void* context)
     mUnidentified21D = true;
     for (int i = 0; i < 4; ++i)
     {
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
     }
 
     int value = (int)context;
     if (value != 0)
     {
-        fn_801CBCA0(0xF0B0D586, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xF0B0D586, 0, 0, 1);
     }
 
     if ((unsigned int)(value - 1) <= 1)
     {
-        fn_801CBCA0(0xE4023EE3, 0, 0, 1);
-        fn_801CBCA0(0xEA7BD449, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xE4023EE3, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xEA7BD449, 0, 0, 1);
     }
 
     if (value != 3)
     {
-        fn_801CBCA0(0x6E5C794C, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         mUnidentified5EC = 2;
 
-        TU80252180Scene* object = fn_80253E18();
+        SHNavigation* object = GetNavigationScene();
         if (object != 0)
         {
-            fn_80253474(object);
+            object->HideButtons();
         }
 
         mPresentation->SetActiveSlide("OUT", true);
@@ -157,6 +156,6 @@ void TU80203D70Scene::fn_802069F0(int, void* context)
 
     if (value == 0)
     {
-        fn_801CBCA0(0x4A52995D, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x4A52995D, 0, 0, 1);
     }
 }

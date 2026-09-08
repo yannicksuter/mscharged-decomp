@@ -2,9 +2,9 @@
 #define GAME_SH_SH_CUP_HUB_H
 
 #include "Game/BaseSceneHandler.h"
-#include "unclassified/tu_8022F710.h"
-#include "unclassified/tu_80219248.h"
-#include "unclassified/tu_8022EF84.h"
+#include "Game/FE/feScrollBar.h"
+#include "Game/FE/fePointerButton.h"
+#include "Game/FE/feBackButton.h"
 
 class TLComponentInstance;
 
@@ -30,19 +30,19 @@ public:
     void fn_80203B54();
 
     /* 0x01C */ TLComponentInstance* mUnidentified1C[5];
-    /* 0x030 */ TU80219248Component mMatchupComponents[4];
+    /* 0x030 */ FEPointerButton mMatchupComponents[4];
     /* 0x300 */ bool mUnidentified300;
     /* 0x304 */ int mUnidentified304;
-    /* 0x308 */ UnidentifiedScrollWidget mScrollWidget;
+    /* 0x308 */ FEScrollBar mScrollWidget;
     /* 0x4BC */ u16 mTextBuffers[7][32];
     /* 0x67C */ bool mUnidentified67C;
     /* 0x67D */ bool mUnidentified67D;
     /* 0x67E */ bool mUnidentified67E;
     /* 0x67F */ bool mUnidentified67F;
     /* 0x680 */ int mUnidentified680[4];
-    /* 0x690 */ TU8022EF84Component mNavigationComponent;
+    /* 0x690 */ FEBackButton mNavigationComponent;
     /* 0x768 */ int mUnidentified768;
-    /* 0x76C */ TU80219248Component mRulesComponent;
+    /* 0x76C */ FEPointerButton mRulesComponent;
     /* 0x820 */ TLComponentInstance* mRulesButton;
     /* 0x824 */ s8 mMatchupStates[9][12];
     /* 0x890 */ bool mUnidentified890;

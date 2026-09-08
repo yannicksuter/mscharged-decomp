@@ -67,10 +67,10 @@ void AIPadManager::Startup()
         mAIPads[i].m_pGlobalPad = 0;
     }
 
-    int numGroups = GetNumMachines(g_pNetworkSessionBase);
+    int numGroups = g_pNetworkSessionBase->GetNumMachines();
     for (s8 groupIndex = 0; groupIndex < numGroups; ++groupIndex)
     {
-        UnidentifiedNetworkPeer* group = fn_80338BF8(g_pNetworkSessionBase, groupIndex);
+        UnidentifiedNetworkPeer* group = g_pNetworkSessionBase->GetPeer(groupIndex);
         for (s8 controllerIndex = 0;
             controllerIndex < (int)group->mUnidentified004;
             ++controllerIndex)
@@ -81,7 +81,7 @@ void AIPadManager::Startup()
             cAIPad& pad = mAIPads[padIndex];
             pad.m_pGlobalPad = fn_80336D68(controller);
 
-            if (groupIndex == fn_80338C20(g_pNetworkSessionBase))
+            if (groupIndex == g_pNetworkSessionBase->GetLocalMachineId())
             {
                 pad.mUnidentified2D8 = controllerIndex;
             }

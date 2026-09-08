@@ -4,8 +4,6 @@
 #include "NL/nlFileGC.h"
 #include "NL/nlMemory.h"
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 void nlCancelEntireFileLoadCallback(nlFile*, void*, unsigned int, unsigned long, ReadAsyncCallback);
 void (*sCancelFileLoadCallback)(void*, unsigned long, void*, LoadAsyncCallback);

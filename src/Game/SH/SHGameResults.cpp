@@ -1,6 +1,7 @@
+#include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHGameResults.h"
 
-#include "Game/BaseGameSceneManager.h"
+#include "Game/GameSceneManager.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
@@ -9,12 +10,8 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 
-class TU80252180Scene;
-extern "C" TU80252180Scene* fn_80253E18();
-extern "C" void fn_802533F0(TU80252180Scene* scene);
-extern "C" void fn_80253474(TU80252180Scene* scene);
+class SHNavigation;
 
-extern BaseGameSceneManager* lbl_806E1838;
 
 static inline TLTextInstance* AsTextInstance(TLInstance* instance)
 {
@@ -44,9 +41,9 @@ GameResultsScene::GameResultsScene()
 GameResultsScene::~GameResultsScene()
 {
     g_pFEInput->PopExclusiveInputLock(this);
-    TU80252180Scene* scene = fn_80253E18();
+    SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
-        fn_802533F0(scene);
+        scene->RestoreButtonVisibility();
 }
 
 void GameResultsScene::fn_8020A494(UnidentifiedGameResultsData* data, UnidentifiedResultsListener* listener, UnidentifiedGameClock* clock)
@@ -60,7 +57,7 @@ void GameResultsScene::SHSceneVirtual30()
 {
     UnidentifiedSHSceneBase::SHSceneVirtual30();
     mUnidentifiedA14->Virtual28(1);
-    lbl_806E1838->Pop();
+    GameSceneManager::Instance()->Pop();
 }
 
 void GameResultsScene::SceneCreated()
@@ -74,14 +71,14 @@ void GameResultsScene::SceneCreated()
     titleHash = nlStringLowerHash("title");
     summaryHash = nlStringLowerHash("game summary");
     layerHash = nlStringLowerHash("Layer");
-    TLTextInstance* text = AsTextInstance(fn_8030677C(presentation, nlStringLowerHash("game summary"), layerHash, summaryHash, titleHash, 0, 0));
+    TLTextInstance* text = AsTextInstance(FEFindInstance(presentation, nlStringLowerHash("game summary"), layerHash, summaryHash, titleHash, 0, 0));
     if (text == 0)
-        text = &UnidentifiedFallbackTextInstance;
+        text = &gDefaultTLTextInstance;
     mTitleText = text;
     mTitleText->SetStringId("CUP_GAME_RESULTS");
-    TU80252180Scene* scene = fn_80253E18();
+    SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
-        fn_80253474(scene);
+        scene->HideButtons();
 }
 
 void GameResultsScene::Update(float dt)

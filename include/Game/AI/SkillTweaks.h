@@ -5,6 +5,7 @@
 #include "NL/nlAVLTree.h"
 #include "NL/nlPiecewiseLinearCurve.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 class cPlayer;
 class Config;

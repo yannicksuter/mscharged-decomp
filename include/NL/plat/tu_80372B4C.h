@@ -1,7 +1,7 @@
 #ifndef NL_PLAT_TU_80372B4C_H
 #define NL_PLAT_TU_80372B4C_H
 
-#include "NL/UnidentifiedQueue.h"
+#include "NL/CircularQueue.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlFile.h"
 #include "NL/nlString.h"
@@ -92,7 +92,7 @@ public:
     nlAVLTreeSlotPool<u32, CachedFile_80373588, DefaultKeyCompare<u32> > m_20;
     u32 m_44;
     u32 m_48;
-    UnidentifiedTransportQueue<CacheRequest_803734A0, 50> m_4C;
+    StaticCircularQueue<CacheRequest_803734A0, 50> m_4C;
     bool m_5D4;
 };
 

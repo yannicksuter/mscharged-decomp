@@ -256,6 +256,24 @@ protected:
     DLListContainerBase<Listener, BasicSlotPool<ListenerEntry> > mListeners;
 };
 
+// No-data events deliver with no argument; the queued dispatch therefore
+// calls the no-argument walk while retaining the generic disposer shape.
+template <>
+inline void UnidentifiedEvent<UnidentifiedEventNoData>::Dispatch(
+    UnidentifiedEventNoData* data, Function<UnidentifiedEventNoData*> disposer,
+    bool deliver)
+{
+    if (deliver)
+    {
+        UnidentifiedDeliver();
+    }
+
+    if (disposer)
+    {
+        disposer(data);
+    }
+}
+
 // The callback may have changed the list while it ran, so the walk is
 // re-anchored on the current list head before it continues past the entry
 // that was just delivered.

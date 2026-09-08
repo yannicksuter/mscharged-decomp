@@ -6,6 +6,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "math.h"
+#include "NL/nlstring_tmpl.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 

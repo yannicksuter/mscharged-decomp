@@ -8,5 +8,7 @@ extern int g_BuildNumber;
 extern bool g_e3_Build;
 
 int GetRegion();
+int GetOnlineRegion();
+bool IsAlternateOnlineCountryGroup();
 
 #endif // GAME_MAIN_H

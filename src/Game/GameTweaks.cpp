@@ -123,7 +123,7 @@ void TweakValueIntImpl_804FD898::UnidentifiedVirtual38(void* value)
 
 void GameTweaks::Init()
 {
-    fGameDuration.BindWithDefault("Game Duration", (float)GameInfoManager::Instance()->GetCurrentSettings()->unknown_0x08, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGameDuration.BindWithDefault("Game Duration", (float)GameInfoManager::Instance()->GetCurrentSettings()->GameTime, mCategory, false, 0.0f, 0.0f, 0.0f);
     fFielderAttributeWeight.BindWithDefault("Fielder Attributes Weight", 0.2f, mCategory, false, 0.0f, 0.0f, 0.0f);
     vGetInPositionKeyFielderDist.x.BindWithDefault("Get In Position Key Fielder Min Distance", 2.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
     vGetInPositionKeyFielderDist.y.BindWithDefault("Get In Position Key Fielder Max Distance", 12.0f, mCategory, false, 0.0f, 0.0f, 0.0f);

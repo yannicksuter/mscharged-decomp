@@ -8,6 +8,7 @@
 #include "unclassified/tu_80073898.h"
 
 #include <stdlib.h>
+#include "NL/nlstring_tmpl.h"
 
 extern "C" void fn_802C7018(
     void*, char*, unsigned long, const char*);

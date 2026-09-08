@@ -1,12 +1,12 @@
 #include "Game/OverlayHandlerGoal.h"
+#include "Game/Render/RLViewLayers.h"
 
-#include "Game/DB/tu_8010A40C.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
 
-extern "C" bool fn_80273B00();
 
 GoalOverlay::~GoalOverlay()
 {
@@ -38,7 +38,7 @@ void GoalOverlay::Restart()
 {
     if (mIsCreated)
     {
-        const char* slideName = fn_80273B00() ? "widescreen" : "normal";
+        const char* slideName = IsWidescreen() ? "widescreen" : "normal";
         mPresentation->SetActiveSlide(slideName, true);
         mPresentation->m_fadeDuration = mPresentation->m_currentSlide->m_start;
     }
@@ -54,14 +54,14 @@ void GoalOverlay::Reset()
 
     if (GameInfoManager::Instance()->IsInMode4())
     {
-        mCaptainGoals[0] = lbl_806E0FA0->mHomeScore;
-        mCaptainGoals[1] = lbl_806E0FA0->mAwayScore;
+        mCaptainGoals[0] = g_pStrikerChallenge->mHomeScore;
+        mCaptainGoals[1] = g_pStrikerChallenge->mAwayScore;
     }
 }
 
 void GoalOverlay::SceneCreated()
 {
     mIsCreated = true;
-    const char* slideName = fn_80273B00() ? "widescreen" : "normal";
+    const char* slideName = IsWidescreen() ? "widescreen" : "normal";
     mPresentation->SetActiveSlide(slideName, true);
 }

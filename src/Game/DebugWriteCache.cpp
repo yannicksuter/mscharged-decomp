@@ -7,6 +7,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTimer.h"
+#include "NL/nlstring_tmpl.h"
 
 struct UnidentifiedDebugWriteHeader
 {

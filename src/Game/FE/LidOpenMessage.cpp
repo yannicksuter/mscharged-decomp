@@ -2020,7 +2020,7 @@ static bool ResetWasPaused;
 static bool lbl_806E17ED;
 static bool CanGetResetPauseState = true;
 
-extern UnidentifiedNetworkSession* g_pNetworkSession;
+extern NetworkSession* g_pNetworkSession;
 
 extern "C"
 {

@@ -8,6 +8,7 @@
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 static EffectsLight g_EffectsLights[3];
 static int g_nNumLights;
@@ -424,8 +425,7 @@ void EmissionManager::Kill(
 /**
  * Offset/Address/Size: 0x0 | 0x802E83C4 | size: 0xC8
  */
-extern "C" void fn_802E83C4(
-    EmissionManager* manager, const EffectsGroup* pEffectsGroup)
+void EmissionManager::Kill(const EffectsGroup* pEffectsGroup)
 {
     if (pEffectsGroup == 0)
     {
@@ -433,7 +433,7 @@ extern "C" void fn_802E83C4(
     }
 
     nlDLListIterator<EmissionController*> iterator
-        = manager->mControllers.Begin();
+        = mControllers.Begin();
     while (iterator.hasNext())
     {
         EmissionController* current = *iterator;
@@ -720,8 +720,9 @@ void fxSetTerrain(unsigned long terrainID)
  */
 void EmissionManager::KillOldest(int num, bool lingeringOnly)
 {
-    float prevBestAge = 0.0f;
+    float prevBestAge;
     float currentBestAge = 0.0f;
+    prevBestAge = currentBestAge;
 
     while (num > 0)
     {
@@ -735,10 +736,9 @@ void EmissionManager::KillOldest(int num, bool lingeringOnly)
             if ((!lingeringOnly || current->IsLingering())
                 && (current->m_uUserData + 0x21530000 != 0x0000BEEF))
             {
-                float age = current->m_Age;
-                if (bestAge < age
+                if (bestAge < current->m_Age
                     && (prevBestAge == currentBestAge
-                        || age < currentBestAge))
+                        || current->m_Age < currentBestAge))
                 {
                     bestAge = current->m_Age;
                     bestController = current;

@@ -43,6 +43,8 @@ public:
 
     unsigned char Load(nlLanguage Language, bool ingameloc, void* allocator);
     static void Initialize();
+    nlLanguage GetCurrentLanguage() const;
+    const unsigned short* GetString(const char* name) const;
 
     LOCHeader* m_pFile;
     StringLookup* m_LookupTable;

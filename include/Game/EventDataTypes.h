@@ -32,10 +32,12 @@ struct CollisionChainPlayerData
     /* 0x04 */ ChainChomp* pChain;
 }; // total size: 0x8
 
+class UnidentifiedNPC_801B43F8;
+
 struct CollisionWindDebrisPlayerData
 {
     /* 0x00 */ cFielder* pFielder;
-    /* 0x04 */ PhysicsObject* pDebris;
+    /* 0x04 */ UnidentifiedNPC_801B43F8* pDebris;
 }; // total size: 0x8
 
 struct CollisionThwompPlayerData
@@ -168,8 +170,8 @@ struct CollisionBallShellData
 
 struct CollisionBallChainData
 {
-    /* 0x00 */ cBall* pBall;
-    /* 0x04 */ ChainChomp* pChain;
+    /* 0x00 */ ChainChomp* pChain;
+    /* 0x04 */ cBall* pBall;
 }; // total size: 0x8
 
 struct CollisionPlayerShellData
@@ -339,7 +341,6 @@ struct UnidentifiedEventData33;
 struct UnidentifiedEventData34;
 struct UnidentifiedEventData35;
 struct UnidentifiedEventData36;
-struct UnidentifiedEventData37;
 
 struct UnidentifiedEventData38
 {

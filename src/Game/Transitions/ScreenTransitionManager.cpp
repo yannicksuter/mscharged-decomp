@@ -12,6 +12,7 @@
 #include "NL/gl/gl.h"
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 template <>
 ScreenTransitionManager* nlSingleton<ScreenTransitionManager>::s_pInstance = 0;

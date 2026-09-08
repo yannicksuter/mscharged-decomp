@@ -9,7 +9,7 @@ protected:
 
 public:
     static T* Instance() { return s_pInstance; }
-    static T* GetInstance() { return s_pInstance; }
+    static T* GetInstance();
 
     static T* s_pInstance;
 };

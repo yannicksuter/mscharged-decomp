@@ -20,6 +20,7 @@
 #include "Game/Sys/audio.h"
 #include "NL/nlMain.h"
 #include "unclassified/tu_80336B2C.h"
+#include "unclassified/tu_801B535C.h"
 
 extern "C" cPlayer* fn_80096514(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
@@ -28,8 +29,6 @@ extern "C" nlVector3 fn_800A6AC8(
     cTeam* pTeam, const nlVector3* v3ReferencePos);
 extern "C" nlVector3 fn_800A6B84(
     cTeam* pTeam, const nlVector3* v3ReferencePos);
-extern "C" void fn_801B59DC(
-    UnidentifiedObject_801B535C* pObject, bool bParam);
 extern "C" void fn_801BCC38(cCharacter*);
 extern "C" void fn_801BCE2C(cCharacter*);
 extern "C" void fn_80095DF4(cPlayer* self, float fDeltaT);
@@ -352,7 +351,7 @@ extern "C" void fn_80099030(UnidentifiedEventData00*)
         lbl_806E1608->fn_801AA348();
         if (lbl_806E1608->mUnidentified024 != NULL)
         {
-            fn_801B59DC(lbl_806E1608->mUnidentified024, true);
+            lbl_806E1608->mUnidentified024->fn_801B59DC(true);
         }
     }
 }

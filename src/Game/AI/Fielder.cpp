@@ -487,7 +487,7 @@ bool cFielder::CanDoCaptainShootToScore()
         bool bUnidentified0 = false;
         if (GameInfoManager::Instance()
                 ->GetCurrentSettings()
-                ->unknown_0x16
+                ->HomeShoot2Score
             && m_pTeam->m_nSide == 0)
         {
             bUnidentified0 = true;
@@ -497,7 +497,7 @@ bool cFielder::CanDoCaptainShootToScore()
         if (bUnidentified0
             || (GameInfoManager::Instance()
                     ->GetCurrentSettings()
-                    ->unknown_0x17
+                    ->AwayShoot2Score
                 && m_pTeam->m_nSide == 1))
         {
             bUnidentified1 = true;
@@ -3791,4 +3791,9 @@ float cNet::GetNetWidth()
 
 void Desire::UnidentifiedVirtual7(void*, DebugWriteCache*)
 {
+}
+
+PlayerTweaks* cFielder::GetTweaks() const
+{
+    return m_pTweaks;
 }

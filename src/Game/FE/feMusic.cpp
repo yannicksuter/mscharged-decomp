@@ -1,6 +1,7 @@
 #include "Game/FE/feMusic.h"
+#include "Game/FE/FEAudio.h"
 
-const unsigned long lbl_804E8438[14][2] = {
+const unsigned long streamcues[14][2] = {
     { 0, 0xE326F931 },
     { 0, 0x445ABF3A },
     { 0, 0x445ABF3A },
@@ -17,70 +18,89 @@ const unsigned long lbl_804E8438[14][2] = {
     { 0, 0x11EAB39F },
 };
 
-extern "C" void fn_801CBC54(int slotId, unsigned long cueId, const void* debugName, void* context);
-extern "C" void fn_801CBC78(int slotId, unsigned long cueId, const void* debugName, void* context);
-extern "C" void fn_801CBCE4(unsigned long cueId, void* context);
-extern "C" bool fn_801CBD00(unsigned long cueId, void* context);
-
 namespace FEMusic
 {
-bool mEnabled_806DDA98 = true;
-unsigned long mCurrentMusicCue_806E1878;
-unsigned long mCurrentSoundCue_806E187C;
-bool mUnidentifiedMode_806E1880;
+bool mEnabled = true;
+unsigned long mCurrentMusicCue;
+unsigned long mCurrentSoundCue;
+bool mInGame;
 } // namespace FEMusic
+
+bool FEMusic::IsPlayingCupResultStream()
+{
+    switch (mCurrentMusicCue)
+    {
+    case (int)0xAE597F5E:
+    case 0x2341D569:
+    case 0x2447F290:
+    case 0x244A44AE:
+        return true;
+    default:
+        return false;
+    }
+}
+
+void FEMusic::ResumeStream()
+{
+    FEAudio::ResumeSound(mCurrentMusicCue, (void*)StartStreamIfDifferent);
+}
+
+void FEMusic::PauseStream()
+{
+    FEAudio::PauseSound(mCurrentMusicCue, (void*)StartStreamIfDifferent);
+}
 
 void FEMusic::StopStream()
 {
-    fn_801CBCE4(mCurrentSoundCue_806E187C, (void*)StartStreamIfDifferent);
-    mCurrentSoundCue_806E187C = 0;
-    fn_801CBCE4(mCurrentMusicCue_806E1878, (void*)StartStreamIfDifferent);
-    mCurrentMusicCue_806E1878 = 0;
+    FEAudio::StopAnimAudioEvent(mCurrentSoundCue, (void*)StartStreamIfDifferent);
+    mCurrentSoundCue = 0;
+    FEAudio::StopAnimAudioEvent(mCurrentMusicCue, (void*)StartStreamIfDifferent);
+    mCurrentMusicCue = 0;
 }
 
 void FEMusic::StartStreamIfDifferent(int idx)
 {
-    unsigned long SoundCue = lbl_804E8438[idx][0];
-    if (mCurrentSoundCue_806E187C != SoundCue)
+    unsigned long SoundCue = streamcues[idx][0];
+    if (mCurrentSoundCue != SoundCue)
     {
-        fn_801CBCE4(mCurrentSoundCue_806E187C, (void*)StartStreamIfDifferent);
-        mCurrentSoundCue_806E187C = 0;
-        fn_801CBC54(mUnidentifiedMode_806E1880 ? 15 : 21, SoundCue,
+        FEAudio::StopAnimAudioEvent(mCurrentSoundCue, (void*)StartStreamIfDifferent);
+        mCurrentSoundCue = 0;
+        FEAudio::PlaySound(mInGame ? 15 : 21, SoundCue,
             "FEMusic::SoundCue", (void*)StartStreamIfDifferent);
-        mCurrentSoundCue_806E187C = SoundCue;
+        mCurrentSoundCue = SoundCue;
     }
 
-    unsigned long MusicCue = lbl_804E8438[idx][1];
-    if (mCurrentMusicCue_806E1878 != MusicCue)
+    unsigned long MusicCue = streamcues[idx][1];
+    if (mCurrentMusicCue != MusicCue)
     {
-        fn_801CBCE4(mCurrentMusicCue_806E1878, (void*)StartStreamIfDifferent);
-        mCurrentMusicCue_806E1878 = 0;
-        if (mEnabled_806DDA98)
+        FEAudio::StopAnimAudioEvent(mCurrentMusicCue, (void*)StartStreamIfDifferent);
+        mCurrentMusicCue = 0;
+        if (mEnabled)
         {
-            fn_801CBC78(mUnidentifiedMode_806E1880 ? 18 : 22, MusicCue,
+            FEAudio::PlayTrackedSound(mInGame ? 18 : 22, MusicCue,
                 "FEMusic::MusicCue", (void*)StartStreamIfDifferent);
         }
-        mCurrentMusicCue_806E1878 = MusicCue;
+        mCurrentMusicCue = MusicCue;
     }
-    else if (fn_801CBD00(mCurrentMusicCue_806E1878, (void*)StartStreamIfDifferent))
+    else if (FEAudio::IsSoundFinished(mCurrentMusicCue, (void*)StartStreamIfDifferent))
     {
-        fn_801CBCE4(mCurrentMusicCue_806E1878, (void*)StartStreamIfDifferent);
-        mCurrentMusicCue_806E1878 = 0;
+        FEAudio::StopAnimAudioEvent(mCurrentMusicCue, (void*)StartStreamIfDifferent);
+        mCurrentMusicCue = 0;
         StartStreamIfDifferent(idx);
     }
 }
 
-bool FEMusic::IsEnabled_801FC2AC()
+bool FEMusic::IsEnabled()
 {
-    return mEnabled_806DDA98;
+    return mEnabled;
 }
 
-void FEMusic::SetEnabled_801FC2A4(bool value)
+void FEMusic::SetEnabled(bool value)
 {
-    mEnabled_806DDA98 = value;
+    mEnabled = value;
 }
 
-void FEMusic::SetUnidentifiedMode_801FC29C(bool value)
+void FEMusic::SetInGame(bool value)
 {
-    mUnidentifiedMode_806E1880 = value;
+    mInGame = value;
 }

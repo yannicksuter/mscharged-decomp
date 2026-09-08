@@ -13,6 +13,7 @@
 
 #include <NMWException.h>
 #include <math.h>
+#include "NL/nlstring_tmpl.h"
 
 struct SaveInfo
 {

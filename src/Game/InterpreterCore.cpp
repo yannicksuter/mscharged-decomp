@@ -8,6 +8,7 @@
 #include "NL/nlString.h"
 
 #include <string.h>
+#include "NL/nlstring_tmpl.h"
 
 typedef void (*InterpreterOperation)(InterpreterCore*);
 

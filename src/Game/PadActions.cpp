@@ -1,3 +1,4 @@
+#include "NL/plat/PlatPadManager.h"
 #include "Game/PadActions.h"
 
 #include "Game/Event.h"
@@ -10,91 +11,64 @@
 #include "NL/nlFormat.h"
 #include "NL/nlMemory.h"
 #include "NL/platpad.h"
+#include "NL/plat/WiiPad.h"
 #include "types.h"
 
-extern bool g_bEnableGamecubePadMonkey;
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
-extern s32* lbl_806E2278;
-extern s32* lbl_806E2288;
-extern s32* lbl_806E22A8;
-
-extern "C"
-{
-    void fn_80375288(void* state);
-}
-
-struct PadUpdateState_80137B40
-{
-    PadUpdateState_80137B40()
-        : mUnidentified304(false)
-        , mUnidentified305(false)
-        , mDeviceChanged()
-    {
-    }
-
-    /* 0x000 */ u8 mUnidentified000[0x304];
-    /* 0x304 */ bool mUnidentified304;
-    /* 0x305 */ bool mUnidentified305;
-    /* 0x306 */ u8 mUnidentified306[0xE];
-    /* 0x314 */ DeviceChangedEvent_80137B40 mDeviceChanged;
-}; // size 0x3B8
-
-extern PadUpdateState_80137B40* g_pPlatPadManager;
+extern int* lbl_806E22A8;
 
 bool g_bEnableGamecubePadMonkey;
 
 int PadMonkey::GetButtonMask(int buttonIndex)
 {
-    return fn_802C06C8(buttonIndex);
+    return GetPadButtonMask(buttonIndex);
 }
 
-s32 g_pPadRemapArray[51] = {
+int g_pPadRemapArray[51] = {
     0x00000020, 0x00000040, 0x00000800, 0x00000400, 0x00000001, 0x00000040, 0x00000020, 0x00000100, 0x00000010, 0x00000100, 0x00000200, 0x00000001, 0x00000002, 0x00000008, 0x00000004, 0x00000100, 0x00000200, 0x00000400, 0x00000800, 0x00001000, 0x00000020, 0x00000400, 0x00000010, 0x00000040, 0x00000800, 0x00000200, 0x00000100, 0x00000100, 0x00000200, 0x00000800, 0x00000100, 0x00000200, 0x00001000, 0x00000800, 0x00000800, 0x00000800, 0x00000200, 0x00000800, 0x00000040, 0x00000020, 0x00000800, 0x00000400, 0x00000040, 0x00000020, 0x00000040, 0x00000020, 0x00000010, 0x00001000, 0x00000020, 0x00000040, 0x00001000
 };
 
-static s32 remapArray_8050DB2C[51] = {
+static int sWiiRemoteButtonRemap[51] = {
     0x00000000, 0x00000000, 0x00000100, 0x00000200, 0x00000010, 0x00000000, 0x00000000, 0x00000800, 0x00001000, 0x00000200, 0x00000100, 0x00000001, 0x00000002, 0x00000008, 0x00000004, 0x00000800, 0x00000400, 0x00000200, 0x00000100, 0x00000010, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000800, 0x00000800, 0x00000400, 0x00000000, 0x00000800, 0x00000400, 0x00000010, 0x00000100, 0x00000100, 0x00000100, 0x00000400, 0x00000200, 0x00002000, 0x00004000, 0x00000200, 0x00000100, 0x00004000, 0x00002000, 0x00002000, 0x00004000, 0x00008000, 0x00000200, 0x00000010, 0x00001000, 0x00000010
 };
 
-static s32 remapArray_8050DBF8[51] = {
+static int sDefaultFreestyleButtonRemap[51] = {
     0x00004000, 0x00002000, 0x00002000, 0x00004000, 0x00000010, 0x00000001, 0x00000002, 0x00000800, 0x00001000, 0x00002000, 0x00000400, 0x00000001, 0x00000002, 0x00000008, 0x00000004, 0x00000800, 0x00000400, 0x00000200, 0x00000100, 0x00000010, 0x00002000, 0x00004000, 0x00000000, 0x00002000, 0x00000000, 0x00000000, 0x00000800, 0x00000800, 0x00000400, 0x00000000, 0x00000800, 0x00000400, 0x00000010, 0x00000100, 0x00000100, 0x00000100, 0x00000400, 0x00000200, 0x00002000, 0x00004000, 0x00000200, 0x00000100, 0x00004000, 0x00002000, 0x00002000, 0x00004000, 0x00008000, 0x00000200, 0x00000010, 0x00001000, 0x00000010
 };
 
-static s32 remapArray_8050DCC4[51] = {
+static int sFreestyleButtonRemapConfig1[51] = {
     0x00004000, 0x00002000, 0x00000100, 0x00000200, 0x00000010, 0x00002000, 0x00004000, 0x00000800, 0x00001000, 0x00002000, 0x00000400, 0x00000001, 0x00000002, 0x00000008, 0x00000004, 0x00000800, 0x00000400, 0x00000200, 0x00000100, 0x00000010, 0x00002000, 0x00004000, 0x00000000, 0x00002000, 0x00000000, 0x00000400, 0x00000800, 0x00000800, 0x00000400, 0x00000000, 0x00000800, 0x00000400, 0x00000010, 0x00000100, 0x00000100, 0x00000100, 0x00000400, 0x00000200, 0x00002000, 0x00004000, 0x00000200, 0x00000100, 0x00004000, 0x00002000, 0x00002000, 0x00004000, 0x00008000, 0x00000200, 0x00000010, 0x00001000, 0x00000010
 };
 
-static s32 remapArray_8050DD90[51] = {
+static int sFreestyleButtonRemapConfig2[51] = {
     0x00004000, 0x00002000, 0x00000100, 0x00000200, 0x00000010, 0x00002000, 0x00004000, 0x00000800, 0x00001000, 0x00002000, 0x00000400, 0x00000001, 0x00000002, 0x00000008, 0x00000004, 0x00000800, 0x00000400, 0x00000200, 0x00000100, 0x00000010, 0x00004000, 0x00002000, 0x00000000, 0x00004000, 0x00000000, 0x00000000, 0x00000800, 0x00000800, 0x00000400, 0x00000000, 0x00000800, 0x00000400, 0x00000010, 0x00000100, 0x00000100, 0x00000100, 0x00000400, 0x00000200, 0x00002000, 0x00004000, 0x00000200, 0x00000100, 0x00004000, 0x00002000, 0x00002000, 0x00004000, 0x00008000, 0x00000200, 0x00000010, 0x00001000, 0x00000010
 };
 
-static GXMaterialColourTweak_804FC520 lbl_8056FE90(
+static GXMaterialColourTweak_804FC520 sControllerConfig(
     "giControllerConfig", "Controller Config", 0);
 
-void fn_80137824(bool useDefaultRemap)
+void UseDefaultFreestyleButtonRemap(bool useDefaultRemap)
 {
     if (useDefaultRemap)
     {
-        lbl_806E2288 = remapArray_8050DBF8;
+        gWiiFreestyleButtonRemap = sDefaultFreestyleButtonRemap;
         return;
     }
 
-    switch (lbl_8056FE90.value)
+    switch (sControllerConfig.value)
     {
     case 1:
-        lbl_806E2288 = remapArray_8050DCC4;
+        gWiiFreestyleButtonRemap = sFreestyleButtonRemapConfig1;
         break;
     case 2:
-        lbl_806E2288 = remapArray_8050DD90;
+        gWiiFreestyleButtonRemap = sFreestyleButtonRemapConfig2;
         break;
     default:
-        lbl_806E2288 = remapArray_8050DBF8;
+        gWiiFreestyleButtonRemap = sDefaultFreestyleButtonRemap;
         break;
     }
 }
 
-void fn_80137890()
+void CreatePadBackends()
 {
     if (g_bEnableGamecubePadMonkey)
     {
@@ -104,7 +78,7 @@ void fn_80137890()
             for (int padIndex = 0; padIndex < 4; ++padIndex)
             {
                 PadMonkey* monkey = new (nlMalloc(0xFC, 8, false))
-                    PadMonkey_80375EEC(padIndex);
+                    WiiPadMonkey(padIndex);
                 g_pPadManager->GetPad(padIndex)->mBackend = monkey;
             }
         }
@@ -124,7 +98,7 @@ void fn_80137890()
     g_pPadManager->SetActivePadSet(0);
 }
 
-void fn_801379AC()
+void DestroyPadBackends()
 {
     for (int padSet = 0; padSet < 2; ++padSet)
     {
@@ -149,23 +123,23 @@ void InitPads()
     g_pPadManager->Initialize(4, 2);
     g_pPadManager->SetActivePadSet(0);
     lbl_806E22A8 = g_pPadRemapArray;
-    lbl_806E2278 = remapArray_8050DB2C;
+    gWiiRemoteButtonRemap = sWiiRemoteButtonRemap;
 
-    switch (lbl_8056FE90.value)
+    switch (sControllerConfig.value)
     {
     case 1:
-        lbl_806E2288 = remapArray_8050DCC4;
+        gWiiFreestyleButtonRemap = sFreestyleButtonRemapConfig1;
         break;
     case 2:
-        lbl_806E2288 = remapArray_8050DD90;
+        gWiiFreestyleButtonRemap = sFreestyleButtonRemapConfig2;
         break;
     default:
-        lbl_806E2288 = remapArray_8050DBF8;
+        gWiiFreestyleButtonRemap = sDefaultFreestyleButtonRemap;
         break;
     }
 }
 
-void fn_80137B40()
+void InitPlatPad()
 {
     CurrentAllocator = &VirtualAllocator;
     AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
@@ -173,12 +147,12 @@ void fn_80137B40()
     if (g_pPlatPadManager == 0)
     {
         g_pPlatPadManager = new (nlMalloc(
-            sizeof(PadUpdateState_80137B40), 8, false))
-            PadUpdateState_80137B40;
+            sizeof(PlatPadManager), 8, false))
+            PlatPadManager;
     }
 
-    fn_80375288(g_pPlatPadManager);
-    g_pPlatPadManager->mUnidentified305 = true;
+    g_pPlatPadManager->Initialize();
+    g_pPlatPadManager->disableClassic = true;
 
     --AllocatorStackDepth;
     AllocatorStack[AllocatorStackDepth] = 0;

@@ -2,8 +2,8 @@
 #define UNCLASSIFIED_TU_8024F4E0_H
 
 #include "Game/BaseSceneHandler.h"
-#include "unclassified/tu_80219248.h"
-#include "unclassified/tu_8022EF84.h"
+#include "Game/FE/fePointerButton.h"
+#include "Game/FE/feBackButton.h"
 
 class TLComponentInstance;
 
@@ -31,9 +31,9 @@ public:
     /* 0x0021 */ unsigned char mPadding0021[3];
     /* 0x0024 */ int mUnidentified0024;
     /* 0x0028 */ unsigned short mUnidentified0028[12][2];
-    /* 0x0058 */ TU80219248Component mUnidentified0058[12];
-    /* 0x08C8 */ TU80219248Component mUnidentified08C8[12];
-    /* 0x1138 */ TU8022EF84Component mUnidentified1138;
+    /* 0x0058 */ FEPointerButton mUnidentified0058[12];
+    /* 0x08C8 */ FEPointerButton mUnidentified08C8[12];
+    /* 0x1138 */ FEBackButton mUnidentified1138;
     /* 0x1210 */ TLComponentInstance* mUnidentified1210[12];
     /* 0x1240 */ TLComponentInstance* mUnidentified1240[12];
     /* 0x1270 */ TLComponentInstance* mUnidentified1270;

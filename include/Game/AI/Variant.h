@@ -5,6 +5,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 class cPlayer;
 class cTeam;

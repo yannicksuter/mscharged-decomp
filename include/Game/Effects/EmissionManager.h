@@ -60,6 +60,7 @@ public:
     void DestroyAll(int view, bool exceptPersistent);
     void DestroyAll(bool exceptPersistent);
     void Kill(unsigned long userData, const EffectsGroup* pEffectsGroup);
+    void Kill(const EffectsGroup* pEffectsGroup);
     bool IsPlaying(
         unsigned long userData, const EffectsGroup* pEffectsGroup);
     void AddError(const char* format, ...);

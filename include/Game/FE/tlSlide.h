@@ -22,6 +22,16 @@ public:
         return m_time;
     }
 
+    f32 GetStartTime() const
+    {
+        return m_start;
+    }
+
+    f32 GetDuration() const
+    {
+        return m_duration;
+    }
+
     void Update(float time);
     void UpdateAsset(TLInstance* instance, float time);
 

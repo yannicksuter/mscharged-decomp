@@ -3,13 +3,9 @@
 #include "Game/PadMonkey.h"
 #include "NL/globalpad.h"
 #include "NL/platpad.h"
-#include "NL/plat/tu_80364118.h"
+#include "NL/plat/WiiPad.h"
 #include "unclassified/tu_80336B2C.h"
 
-extern int* lbl_806E2278;
-extern int lbl_806E227C;
-extern int* lbl_806E2288;
-extern int lbl_806E228C;
 extern int* lbl_806E22A8;
 extern int lbl_806E22AC;
 
@@ -45,10 +41,10 @@ extern "C" bool fn_80331C04(DetInput* input, int button, bool remap)
             pArray = lbl_806E22A8;
             break;
         case 1:
-            pArray = lbl_806E2278;
+            pArray = gWiiRemoteButtonRemap;
             break;
         case 2:
-            pArray = lbl_806E2288;
+            pArray = gWiiFreestyleButtonRemap;
             break;
         default:
             pArray = lbl_806E22A8;
@@ -71,10 +67,10 @@ bool DetInput::JustPressed(int button, bool remap)
             pArray = lbl_806E22A8;
             break;
         case 1:
-            pArray = lbl_806E2278;
+            pArray = gWiiRemoteButtonRemap;
             break;
         case 2:
-            pArray = lbl_806E2288;
+            pArray = gWiiFreestyleButtonRemap;
             break;
         default:
             pArray = lbl_806E22A8;
@@ -102,10 +98,10 @@ bool DetInput::JustReleased(int button, bool remap)
             pArray = lbl_806E22A8;
             break;
         case 1:
-            pArray = lbl_806E2278;
+            pArray = gWiiRemoteButtonRemap;
             break;
         case 2:
-            pArray = lbl_806E2288;
+            pArray = gWiiFreestyleButtonRemap;
             break;
         default:
             pArray = lbl_806E22A8;
@@ -136,11 +132,11 @@ void DetInput::fn_80331DC8()
         {
         case 0:
         case 3:
-            button = fn_802C06C8(i);
+            button = GetPadButtonMask(i);
             break;
         case 1:
         case 2:
-            button = fn_803643A8(i);
+            button = GetWiiButtonMask(i);
             break;
         }
 
@@ -173,10 +169,10 @@ int DetInput::fn_80331ECC(int button, bool remap)
             pArray = lbl_806E22A8;
             break;
         case 1:
-            pArray = lbl_806E2278;
+            pArray = gWiiRemoteButtonRemap;
             break;
         case 2:
-            pArray = lbl_806E2288;
+            pArray = gWiiFreestyleButtonRemap;
             break;
         default:
             pArray = lbl_806E22A8;
@@ -189,10 +185,10 @@ int DetInput::fn_80331ECC(int button, bool remap)
     {
     case 0:
     case 3:
-        return m_buttonStateTicks[fn_802C03FC(button)];
+        return m_buttonStateTicks[GetPadButtonIndex(button)];
     case 1:
     case 2:
-        return m_buttonStateTicks[fn_80364298(button)];
+        return m_buttonStateTicks[GetWiiButtonIndex(button)];
     default:
         return 0;
     }
@@ -210,10 +206,10 @@ void DetInput::fn_80331F9C(int button, bool remap)
             pArray = lbl_806E22A8;
             break;
         case 1:
-            pArray = lbl_806E2278;
+            pArray = gWiiRemoteButtonRemap;
             break;
         case 2:
-            pArray = lbl_806E2288;
+            pArray = gWiiFreestyleButtonRemap;
             break;
         default:
             pArray = lbl_806E22A8;
@@ -227,14 +223,14 @@ void DetInput::fn_80331F9C(int button, bool remap)
     case 0:
     case 3:
     {
-        int buttonIndex = fn_802C03FC(button);
+        int buttonIndex = GetPadButtonIndex(button);
         m_buttonStateTicks[buttonIndex] = 0;
         break;
     }
     case 1:
     case 2:
     {
-        int buttonIndex = fn_80364298(button);
+        int buttonIndex = GetWiiButtonIndex(button);
         m_buttonStateTicks[buttonIndex] = 0;
         break;
     }
@@ -359,12 +355,12 @@ void DetInput::fn_8033222C(cGlobalPad* pad)
     }
     else
     {
-        int classID = backend->UnidentifiedClassID();
+        int classID = backend->GetClassID();
         UnidentifiedPadStatus* status
             = *(UnidentifiedPadStatus**)((u8*)backend + 0x1C);
-        if (classID == lbl_806E227C || classID == lbl_806E228C)
+        if (classID == gWiiRemotePadClassID || classID == gWiiFreestylePadClassID)
         {
-            m_nConnected = classID == lbl_806E227C ? 1 : 2;
+            m_nConnected = classID == gWiiRemotePadClassID ? 1 : 2;
             m_ButtonBitfield = status->buttons;
             m_LeftTrigger = 0;
             m_RightTrigger = 0;
@@ -372,7 +368,7 @@ void DetInput::fn_8033222C(cGlobalPad* pad)
             m_v3RevRemoteAccel.x = scale * status->remoteX;
             m_v3RevRemoteAccel.y = scale * status->remoteY;
             m_v3RevRemoteAccel.z = scale * status->remoteZ;
-            if (classID == lbl_806E228C)
+            if (classID == gWiiFreestylePadClassID)
             {
                 m_v3RevFreeStyleAccel.x = scale * status->freestyleX;
                 m_v3RevFreeStyleAccel.y = scale * status->freestyleY;

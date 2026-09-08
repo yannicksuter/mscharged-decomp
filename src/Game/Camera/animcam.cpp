@@ -1,4 +1,5 @@
 #include "Game/Camera/animcam.h"
+#include "Game/Render/RLViewLayers.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/Render/depthoffield.h"
@@ -8,6 +9,7 @@
 #include "NL/nlString.h"
 #include "NL/platqmath.h"
 #include "NL/platvmath.h"
+#include "NL/nlstring_tmpl.h"
 
 static float dofBehindTarget = 2.0f;
 static float lbl_806DC464 = 45.0f;
@@ -16,7 +18,6 @@ static float lbl_806DC46C = 1.0f;
 
 cCameraData* cAnimCamera::m_cameraDataList;
 
-extern "C" bool fn_80273B00();
 
 struct UnidentifiedCameraDisplayState
 {
@@ -351,7 +352,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
         }
     }
 
-    if (fn_80273B00())
+    if (IsWidescreen())
     {
         UnidentifiedCameraDisplayState* state = GetPresentation();
         if (state->field_0xC4)

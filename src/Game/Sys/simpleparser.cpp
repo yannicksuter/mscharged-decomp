@@ -1,6 +1,7 @@
 #include "Game/Sys/simpleparser.h"
 
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 static inline bool Contains(const char* characters, char value)
 {

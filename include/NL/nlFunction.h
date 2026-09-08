@@ -76,7 +76,7 @@ public:
 } // namespace Detail
 
 template <typename T, typename R>
-Detail::MemFunImpl<R, R (T::*)()> MemFun(R (T::*function)())
+inline Detail::MemFunImpl<R, R (T::*)()> MemFun(R (T::*function)())
 {
     return Detail::MemFunImpl<R, R (T::*)()>(function);
 }

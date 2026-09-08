@@ -3,8 +3,6 @@
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 struct AsyncLoadState_802B3C28
 {

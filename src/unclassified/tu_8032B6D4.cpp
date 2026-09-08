@@ -23,10 +23,6 @@ SlotPool<UnidentifiedNetworkMessageStorage_8032C66C> lbl_80584840(15, 0);
 CBlowFish* lbl_806E20F8;
 extern u8 lbl_806DF708[8];
 
-extern "C"
-{
-}
-
 UnidentifiedTransportMessage_8032B6D4::UnidentifiedTransportMessage_8032B6D4()
 {
     mUnidentified04 = 0;

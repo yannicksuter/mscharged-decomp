@@ -19,13 +19,13 @@ public:
     void InitializeDefaults();
     void OnSettingsUpdated() const;
 
-    int fn_8025D158() const { return m_unk4; }
-    int fn_8025D160() const { return m_unk0; }
-    int fn_8025D168() const { return m_unk8; }
+    int GetEnvironmentCheat() const { return mEnvironmentCheat; }
+    int GetCustomPowerups() const { return mCustomPowerups; }
+    int GetPlayerCheat() const { return mPlayerCheat; }
 
-    /* 0x0 */ int m_unk0;
-    /* 0x4 */ int m_unk4;
-    /* 0x8 */ int m_unk8;
+    /* 0x0 */ int mCustomPowerups;
+    /* 0x4 */ int mEnvironmentCheat;
+    /* 0x8 */ int mPlayerCheat;
 };
 
 class GameplaySettings
@@ -45,16 +45,16 @@ public:
     void OnSettingsUpdated() const;
 
     /* 0x00 */ eSkillLevel SkillLevel;
-    /* 0x04 */ int m_unk04;
+    /* 0x04 */ int WinBy;
     /* 0x08 */ int GameTime;
-    /* 0x0C */ int m_unk0C;
-    /* 0x10 */ int m_unk10;
-    /* 0x14 */ bool PowerUps;
-    /* 0x15 */ bool Shoot2Score;
-    /* 0x16 */ bool BowserAttackEnabled;
-    /* 0x17 */ bool RumbleEnabled;
-    /* 0x18 */ bool m_unk18;
-    /* 0x19 */ bool m_unk19;
+    /* 0x0C */ int GameGoals;
+    /* 0x10 */ int BestSeries;
+    /* 0x14 */ bool HomePowerUps;
+    /* 0x15 */ bool AwayPowerUps;
+    /* 0x16 */ bool HomeShoot2Score;
+    /* 0x17 */ bool AwayShoot2Score;
+    /* 0x18 */ bool HomeSkillShots;
+    /* 0x19 */ bool AwaySkillShots;
     /* 0x1A */ bool m_unk1A;
 };
 

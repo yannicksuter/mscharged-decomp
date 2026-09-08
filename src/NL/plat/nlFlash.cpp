@@ -4,6 +4,7 @@
 
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 static char sTempDirectoryPath[] = "/tmp";
 static char* sTempDirectory = sTempDirectoryPath;

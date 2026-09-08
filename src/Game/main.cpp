@@ -47,11 +47,12 @@
 #include "NL/nlTask.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/tu_802A12E4.h"
-#include "unclassified/tu_802196B0.h"
+#include "Game/FE/feDPD.h"
 #include "NL/plat/nlFlash.h"
 #include "NL/plat/tu_80372B4C.h"
 
 #include <string.h>
+#include "NL/nlstring_tmpl.h"
 
 class AudioUpdateTask : public nlTask
 {
@@ -201,7 +202,7 @@ static ProfilerTask profilerTask;
 static ResetTask resetTask;
 static UnidentifiedMemCheckTask memCheckTask;
 static TextWindowTask textWindowTask;
-static UnidentifiedTask_802196B0 unidentifiedTask_802196B0;
+static FEDPDTask unidentifiedTask_802196B0;
 static FlashMemoryTask flashMemoryTask;
 
 static TweakValueBool_804F4578 sAllowWarble(
@@ -229,7 +230,7 @@ int GetRegion()
     return region;
 }
 
-extern "C" int fn_8011C1B4()
+int GetOnlineRegion()
 {
     int region = 0;
     if (g_Region != 3)
@@ -239,7 +240,7 @@ extern "C" int fn_8011C1B4()
     return region + 1;
 }
 
-extern "C" bool fn_8011C1D0()
+bool IsAlternateOnlineCountryGroup()
 {
     int country;
     if (sCountryCode != 0)
@@ -576,7 +577,7 @@ int main()
     }
 
     nlTaskManager::SetNextState(0x00100000);
-    FEMusic::SetEnabled_801FC2A4(true);
+    FEMusic::SetEnabled(true);
 
     for (;;)
     {

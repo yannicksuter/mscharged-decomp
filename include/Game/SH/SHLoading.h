@@ -25,28 +25,30 @@ public:
     /* 0x1C */ TransitionType mType;
 }; // size 0x20
 
-class LoadingScene_801CDB4C : public BaseSceneHandler
+class AsyncLoadingScene : public BaseSceneHandler
 {
 public:
-    LoadingScene_801CDB4C();
-    virtual ~LoadingScene_801CDB4C();
+    AsyncLoadingScene();
+    virtual ~AsyncLoadingScene();
     virtual void Update(float dt);
     virtual void SceneCreated();
-    virtual void fn_801CE274();
+    virtual void ShowHomeButtonWarning();
 
-    /* 0x1C */ TLComponentInstance* mTransitionComponent;
-    /* 0x20 */ bool mTransitionActive;
+    /* 0x1C */ TLComponentInstance* mHomeButtonWarning;
+    /* 0x20 */ bool mHomeButtonWarningActive;
     /* 0x21 */ bool mWidescreen;
     /* 0x22 */ unsigned char mPadding22[2];
 }; // size 0x24
 
-class LoadingScene_801CDC2C : public LoadingScene_801CDB4C
+class WidescreenLoadingScene : public AsyncLoadingScene
 {
 public:
-    LoadingScene_801CDC2C();
-    virtual ~LoadingScene_801CDC2C();
+    WidescreenLoadingScene();
+    virtual ~WidescreenLoadingScene();
     virtual void Update(float dt);
     virtual void SceneCreated();
+
+    void SetStadiumText(TLTextInstance* stadiumText);
 
     /* 0x024 */ TLTextInstance* mTextInstances[6];
     /* 0x03C */ unsigned short mTextBuffers[5][128];

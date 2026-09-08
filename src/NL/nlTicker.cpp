@@ -20,7 +20,7 @@ f32 fn_802AAA28(u32 delta)
     return 0.001f * (f32)(u32)((delta << 3) / ((__OSBusClock >> 2) / 125000));
 }
 
-f32 nlGetTickerDifference(u32 startTick, u32 endTick)
+f32 nlGetTickerDifference(unsigned int startTick, unsigned int endTick)
 {
     u32 delta = endTick - startTick;
 

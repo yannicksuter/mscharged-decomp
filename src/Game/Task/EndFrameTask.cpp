@@ -3,7 +3,7 @@
 #include "Game/Task/EndFrameTask.h"
 
 #include "Game/Debug/FrameCounter.h"
-#include "Game/HBMManager_8024795C.h"
+#include "Game/HBMManager.h"
 #include "Game/Render/RLView.h"
 #include "NL/gl/gl.h"
 #include "types.h"
@@ -53,7 +53,7 @@ void EndFrameTask::Run(float)
 
         if (gpHBMManager != 0 && gpHBMManager->mReady && gpHBMManager->mActive)
         {
-            UnidentifiedHBMManager::fn_8024891C();
+            HBMManager::Draw();
             fn_802C80FC();
         }
 

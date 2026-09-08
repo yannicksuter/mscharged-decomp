@@ -8,33 +8,7 @@
 
 typedef unsigned long long u64;
 
-/**
- * The 0x1C-byte option block selected by GameInfoManager::GetCurrentSettings.
- * R4QE01 copies it field by field in the config setup, which is what fixes the
- * five leading words and the seven trailing bytes.
- */
-struct GameSettings
-{
-    /* 0x00 */ int unknown_0x00;
-    /* 0x04 */ int unknown_0x04;
-    /* 0x08 */ int unknown_0x08;
-    /* 0x0C */ int unknown_0x0C;
-    /* 0x10 */ int unknown_0x10;
-    /* 0x14 */ u8 unknown_0x14;
-    /* 0x15 */ u8 unknown_0x15;
-    /* 0x16 */ u8 unknown_0x16;
-    /* 0x17 */ u8 unknown_0x17;
-    /* 0x18 */ u8 unknown_0x18;
-    /* 0x19 */ u8 unknown_0x19;
-    /* 0x1A */ u8 unknown_0x1A;
-    /* 0x1B */ u8 unknown_0x1B;
-};
-
-/**
- * The 0xC-byte rule block selected by GameInfoManager::GetActiveRules. R4QE01
- * only ever compares its three words against small enum constants, so the
- * fields keep offset-derived names.
- */
+// Serialized rule presets.
 struct GameRules
 {
     /* 0x0 */ int unknown_0x0;
@@ -45,8 +19,7 @@ struct GameRules
 /**
  * One saved user profile. R4QE01 stores ten of them contiguously and always
  * addresses them as `base + slot * 0xB10`, which is what fixes both the record
- * size and the slot count. Field names are offset-derived: the stripped DOL
- * does not preserve them.
+ * size and the slot count. Unidentified fields retain offset-derived names.
  */
 struct GameInfoSaveSlot
 {
@@ -54,7 +27,7 @@ struct GameInfoSaveSlot
     /* 0x01C */ int unknown_0x01C;
     /* 0x020 */ u8 unknown_0x020[0x20];
     /* 0x040 */ u8 unknown_0x040[64][0xC];
-    /* 0x340 */ u8 unknown_0x340[64][0x1C];
+    /* 0x340 */ u16 mFriendNames[64][14];
     /* 0xA40 */ u8 unknown_0xA40[0x40];
     /* 0xA80 */ u64 mSaveId;
     /* 0xA88 */ u8 unknown_0xA88[0x8];
@@ -79,14 +52,40 @@ struct GameInfoSlotEntry
     /* 0x50 */ int unknown_0x50;
 };
 
+struct UserInfo
+{
+    UserInfo()
+        : mSaveID(0)
+        , mNumGamesPlayed(0)
+        , mNumGoalsScored(0)
+        , mNumSTSAttempts(0)
+        , mNumPerfectPasses(0)
+        , mNumHits(0)
+    {
+    }
+
+    bool IsWidescreen() const;
+
+    /* 0x00 */ unsigned long mSaveID;
+    /* 0x04 */ AudioSettings mAudioOptions;
+    /* 0x1C */ VisualSettings mVisualOptions;
+    /* 0x24 */ GameplaySettings mGameplayOptions;
+    /* 0x40 */ PowerupSettings mPowerupOptions;
+    /* 0x4C */ GameplaySettings mUnidentified4C;
+    /* 0x68 */ PowerupSettings mUnidentified68;
+    /* 0x74 */ unsigned short mNumGamesPlayed;
+    /* 0x76 */ unsigned short mNumGoalsScored;
+    /* 0x78 */ unsigned short mNumSTSAttempts;
+    /* 0x7A */ unsigned short mNumPerfectPasses;
+    /* 0x7C */ unsigned short mNumHits;
+}; // size: 0x80
+
 /**
  * Charged keeps the predecessor's GameInfoManager singleton but rebuilds its
  * storage: five per-mode BasicGameInfo slots, several rule blocks, and one
  * large contiguous save-data block.
  *
- * The sub-object types at 0x04, 0x74, 0xA0, 0xB8, 0x128 and 0x298 are owned by
- * translation units that are not reconstructed yet, so they are kept as sized
- * storage rather than invented declarations.
+ * User option blocks use the shared settings types.
  */
 class GameInfoManager : public nlSingleton<GameInfoManager>
 {
@@ -106,14 +105,14 @@ public:
 
     int GetTeam(short side) const;
     void SetTeam(short side, int team);
-    int GetSidekick(short side, short slot) const;
+    int GetSidekick(short side, int slot) const;
     void SetSidekick(short side, int sidekick, int slot);
     int GetStadium() const;
     void SetStadium(int stadium);
     short GetPlayingSide(unsigned short pad) const;
     void SetPlayingSide(unsigned short pad, short side);
     void ResetPlayingSides();
-    void SetMode(int mode, u8 flag);
+    void SetMode(int mode, u8 isOnline);
 
     unsigned long GetMemoryCardDataSize() const;
     void GetMemoryCardData(void* data) const;
@@ -130,7 +129,7 @@ public:
     void* GetUnknown806E0F90Block() const;
     void SerializeSettings(void* data) const;
     void DeserializeSettings(void* data);
-    const GameSettings* GetCurrentSettings() const;
+    const GameplaySettings* GetCurrentSettings() const;
 
     int FindSaveSlot(u64 id) const;
     bool HasSaveSlot(u64 id) const;
@@ -140,8 +139,8 @@ public:
     int GetRule0x0() const;
     void ResetRules(int index);
 
-    bool UseAltRules() const { return unknown_0x120 != 0 && unknown_0x124 == 0; }
-    const GameRules* GetActiveRules() const;
+    bool UseAltRules() const { return mIsOnlineMode != 0 && mOnlineRankedMatch == 0; }
+    const PowerupSettings* GetActiveRules() const;
 
     void SetupGameFromConfig();
     void ApplyDifficultySettings();
@@ -158,14 +157,15 @@ public:
     bool IsRule0x4Equal5() const;
     bool IsRule0x0Equal11() const;
 
+    UserInfo* GetUserInfo();
     AudioSettings* GetAudioSettings();
-    void* GetUnknown0xB8();
+    VisualSettings* GetVisualOptions();
     void ResetUnknown0xA0();
 
     GameInfoSaveSlot* GetSaveSlot(int slot);
     void* GetUnknown0x40(int slot, int index);
     void* GetUnknown0xA80(int slot);
-    void* GetUnknown0x340(int slot, int index);
+    u16* GetSavedFriendName(int slot, int index);
     void* GetUnknown0xA88(int slot);
     void* GetUnknown0xA40(int slot, int index);
     int* GetUnknown0xA90(int slot);
@@ -184,36 +184,28 @@ public:
 
     BasicGameInfo* GetCurrentGameInfo() const { return mGameInfo[mCurrentMode]; }
 
-    /* 0x0004 */ GameSettings mCurGameSettings;
-    /* 0x0020 */ GameSettings mDefaultSettings;
-    /* 0x003C */ GameSettings mMode1Settings;
-    /* 0x0058 */ GameSettings mNoCheatSettings;
-    /* 0x0074 */ GameRules mRulesA;
+    /* 0x0004 */ GameplaySettings mCurGameSettings;
+    /* 0x0020 */ GameplaySettings mDefaultSettings;
+    /* 0x003C */ GameplaySettings mMode1Settings;
+    /* 0x0058 */ GameplaySettings mNoCheatSettings;
+    /* 0x0074 */ PowerupSettings mRulesA;
     /* 0x0080 */ BasicGameInfo* mGameInfo[GM_NUM_MODES];
     /* 0x0094 */ int mCurrentDifficulty[2];
-    /* 0x009C */ void* unknown_0x9C;
-    /* 0x00A0 */ u8 unknown_0xA0[0x18];
-    /* 0x00B8 */ VisualSettings mVisualOptions;
-    /* 0x00C0 */ GameSettings mBaseSettings;
-    /* 0x00DC */ GameRules mRulesB;
-    /* 0x00E8 */ GameSettings unknown_0xE8;
-    /* 0x0104 */ GameRules unknown_0x104;
-    /* 0x0110 */ s16 unknown_0x110[5];
-    /* 0x011A */ u8 unknown_0x11A[2];
+    /* 0x009C */ UserInfo mUserInfo;
     /* 0x011C */ int mCurrentMode;
-    /* 0x0120 */ u8 unknown_0x120;
+    /* 0x0120 */ u8 mIsOnlineMode;
     /* 0x0121 */ u8 unknown_0x121;
     /* 0x0122 */ u8 unknown_0x122;
     /* 0x0123 */ u8 unknown_0x123;
-    /* 0x0124 */ bool unknown_0x124;
-    /* 0x0125 */ bool unknown_0x125;
-    /* 0x0126 */ bool unknown_0x126;
+    /* 0x0124 */ bool mOnlineRankedMatch;
+    /* 0x0125 */ bool mOnlineTwoLocalPlayers;
+    /* 0x0126 */ bool mOnlineFriendSelectionMode;
     /* 0x0127 */ u8 unknown_0x127;
     /* 0x0128 */ GameInfoSlotEntry unknown_0x128[4];
     /* 0x0278 */ int unknown_0x278;
     /* 0x027C */ u8 unknown_0x27C;
     /* 0x027D */ u8 unknown_0x27D[3];
-    /* 0x0280 */ u8 unknown_0x280[0x18];
+    /* 0x0280 */ AudioSettings unknown_0x280;
     /* 0x0298 */ GameRules mRulesTable[12];
     /* 0x0328 */ GameInfoSaveSlot mSaveSlots[10];
     /* 0x71C8 */ int unknown_0x71C8;
@@ -221,5 +213,14 @@ public:
 
     static GameInfoManager* sThis;
 };
+
+void SetOnlineRankedMatch(bool value);
+bool IsOnlineRankedMatch();
+void SetOnlineTwoLocalPlayers(bool value);
+bool HasOnlineTwoLocalPlayers();
+void SetOnlineFriendSelectionMode(bool value);
+bool IsOnlineFriendSelectionMode();
+void SetOnlineFriendSelectionContext(void* context);
+extern void* gOnlineFriendSelectionContext;
 
 #endif // GAME_GAMEINFO_H

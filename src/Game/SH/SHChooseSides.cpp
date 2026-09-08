@@ -1,8 +1,13 @@
+#include "Game/SH/SHNavigation.h"
+#include "Game/FE/feHelpFuncs.h"
+#include "Game/GameSceneManager.h"
 #include "Game/SH/SHChooseSides.h"
+#include "Game/Render/RLViewLayers.h"
+#include "Game/FE/FEAudio.h"
 
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/SaveLoad.h"
-#include "Game/DB/tu_8010A40C.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feManager.h"
@@ -19,31 +24,12 @@
 #include "NL/nlBind.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_802196B0.h"
+#include "Game/FE/feDPD.h"
 
-class TU80252180Scene;
+class SHNavigation;
 
-extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" TU80252180Scene* fn_80253E18();
-extern "C" void fn_80253348(TU80252180Scene* scene, int mask, bool visible);
-extern "C" void fn_80253474(TU80252180Scene* scene);
-extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
-extern "C" TLComponentInstance* fn_80253D70(TU80252180Scene* scene, int value);
-extern "C" void fn_80254310(TU80252180Scene* object, bool enabled);
 extern "C" void fn_800A71A8(cTeam* team);
-extern "C" void fn_801CC888(float dt);
-extern "C" void fn_801CC988(TU80219248Component* component, TLComponentInstance* instance);
-extern "C" void fn_801CC9B0(TU80219248Component* component, TLComponentInstance* instance, int value);
-extern "C" Presentation* fn_801FEEAC();
-extern "C" bool fn_80273B00();
-extern "C" TLInstance* fn_8030677C(FEPresentation* presentation, unsigned long level1, unsigned long level2,
-    unsigned long level3, unsigned long level4, unsigned long level5, unsigned long level6);
-extern TLComponentInstance* lbl_80578450[4];
-extern BaseGameSceneManager* lbl_806E1838;
 extern BaseGameSceneManager* g_pOverlayManager;
-extern TLComponentInstance lbl_80580030;
-extern TLComponentInstance lbl_80580138;
-extern TLInstance lbl_80580248;
 
 class TU8021CBD0Scene : public BaseSceneHandler
 {
@@ -87,26 +73,26 @@ SHChooseSides2::SHChooseSides2(eCSContext context, ScreenMovement movement)
 
     if (movement != SCREEN_BACK && mContext != CUP && mContext != PAUSE && mContext != TOURNAMENT)
     {
-        fn_801FEEAC()->Call("StartHomeAwayCaptainHologramSequence");
+        Presentation::GetInstance()->Call("StartHomeAwayCaptainHologramSequence");
     }
 
-    mUnidentified2F0.fn_801D2BE0(false);
+    mUnidentified2F0.SetPopScene(false);
     if (mContext == CUP)
     {
-        mUnidentified2F0.fn_801D2BE8(false);
+        mUnidentified2F0.SetPushBackScene(false);
     }
     else if (mContext == TOURNAMENT)
     {
-        mUnidentified2F0.fn_801D2BE8(false);
+        mUnidentified2F0.SetPushBackScene(false);
     }
     else if (mContext != PAUSE)
     {
-        mUnidentified2F0.fn_801D2BE8(false);
+        mUnidentified2F0.SetPushBackScene(false);
     }
     else
     {
         mUnidentified2F0.mDisabled = true;
-        TU80300104Event event;
+        FEPointerEvent event;
         mUnidentified2F0.mPreviousEvents[0] = event;
         mUnidentified2F0.mPreviousEvents[1] = event;
         mUnidentified2F0.mPreviousEvents[2] = event;
@@ -132,11 +118,11 @@ SHChooseSides2::~SHChooseSides2()
 {
     if (mContext == PAUSE)
     {
-        TU80252180Scene* object = fn_80253E18();
+        SHNavigation* object = GetNavigationScene();
         if (object != 0)
         {
-            fn_80254310(object, true);
-            fn_80253348(object, mUnidentified408, false);
+            object->ResetButtons(true);
+            object->SetButtonVisibility(mUnidentified408, false);
         }
     }
 }
@@ -150,7 +136,7 @@ void SHChooseSides2::SceneCreated()
         mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("home"), 0, 0, 0, 0);
     if (sideGroup == 0)
     {
-        sideGroup = &lbl_80580030;
+        sideGroup = &gDefaultTLComponentInstance;
     }
     mSideGroups[0] = sideGroup;
 
@@ -158,7 +144,7 @@ void SHChooseSides2::SceneCreated()
         mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("away"), 0, 0, 0, 0);
     if (sideGroup == 0)
     {
-        sideGroup = &lbl_80580030;
+        sideGroup = &gDefaultTLComponentInstance;
     }
     mSideGroups[1] = sideGroup;
 
@@ -181,34 +167,34 @@ void SHChooseSides2::SceneCreated()
     mUnidentified3F0[1] = colour1;
 
     TLComponentInstance* screen = 0;
-    TU80252180Scene* object = fn_80253E18();
+    SHNavigation* object = GetNavigationScene();
     if (object != 0)
     {
         if (mContext == CUP || mContext == TOURNAMENT)
         {
-            fn_80253474(object);
-            screen = fn_80253D70(object, 4);
-            mHomeAwayBox = fn_80253D70(object, 0x10);
+            object->HideButtons();
+            screen = object->GetButton(4);
+            mHomeAwayBox = object->GetButton(0x10);
             mUnidentified408 = 0x10;
         }
         else if (mContext != PAUSE)
         {
-            fn_80253474(object);
-            screen = fn_80253D70(object, 4);
-            mHomeAwayBox = fn_80253D70(object, 0x20);
+            object->HideButtons();
+            screen = object->GetButton(4);
+            mHomeAwayBox = object->GetButton(0x20);
             mUnidentified408 = 0x20;
         }
         else
         {
-            fn_80253474(object);
-            mHomeAwayBox = fn_80253D70(object, 0x20);
+            object->HideButtons();
+            mHomeAwayBox = object->GetButton(0x20);
             mUnidentified408 = 0x20;
         }
     }
 
     for (int i = 0; i < 4; ++i)
     {
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
 
         char controllerName[16];
         nlSNPrintf(controllerName, 16, "controller%d", i);
@@ -287,10 +273,10 @@ void SHChooseSides2::SceneCreated()
 
     if (GameInfoManager::Instance()->IsInMode3())
     {
-        if (GameInfoManager::Instance()->GetTeam(0) == lbl_806E0F90->GetUserSelectedCupTeam())
+        if (GameInfoManager::Instance()->GetTeam(0) == g_pCupManager->GetUserSelectedCupTeam())
         {
             mControllerComponents[1].mDisabled = true;
-            TU80300104Event event;
+            FEPointerEvent event;
             mControllerComponents[1].mPreviousEvents[0] = event;
             mControllerComponents[1].mPreviousEvents[1] = event;
             mControllerComponents[1].mPreviousEvents[2] = event;
@@ -301,7 +287,7 @@ void SHChooseSides2::SceneCreated()
         else
         {
             mControllerComponents[0].mDisabled = true;
-            TU80300104Event event;
+            FEPointerEvent event;
             mControllerComponents[0].mPreviousEvents[0] = event;
             mControllerComponents[0].mPreviousEvents[1] = event;
             mControllerComponents[0].mPreviousEvents[2] = event;
@@ -313,7 +299,7 @@ void SHChooseSides2::SceneCreated()
     else if (GameInfoManager::Instance()->IsInMode4())
     {
         mControllerComponents[1].mDisabled = true;
-        TU80300104Event event;
+        FEPointerEvent event;
         mControllerComponents[1].mPreviousEvents[0] = event;
         mControllerComponents[1].mPreviousEvents[1] = event;
         mControllerComponents[1].mPreviousEvents[2] = event;
@@ -335,7 +321,7 @@ void SHChooseSides2::SceneCreated()
 
     if (mContext != PAUSE)
     {
-        mUnidentified2F0.fn_8022F194(screen);
+        mUnidentified2F0.SetButtonInstance(screen);
     }
 
     for (int team = 0; team < 2; ++team)
@@ -343,28 +329,28 @@ void SHChooseSides2::SceneCreated()
         if (mContext != PAUSE)
         {
             const char* componentName = team == 0 ? "sk_left2" : "sk_right";
-            TLComponentInstance* component = (TLComponentInstance*)FEFinder<TLComponentInstance, 4>::_Find<TLSlide>(
+            TLInstance* component = FEFinder<TLInstance, 5>::_Find<TLSlide>(
                 mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash(componentName), 0, 0, 0, 0);
             if (component == 0)
             {
-                component = &lbl_80580138;
+                component = &gDefaultTLGroupInstance;
             }
 
             const char** sidekickName = lbl_8051CAFC;
             for (int slot = 0; slot < 3; ++slot)
             {
-                TLComponentInstance* sidekick = (TLComponentInstance*)FEFinder<TLComponentInstance, 2>::_Find<TLComponentInstance>(
+                TLComponentInstance* sidekick = (TLComponentInstance*)FEFinder<TLComponentInstance, 2>::_Find<TLInstance>(
                     component, nlStringLowerHash(*sidekickName), 0, 0, 0, 0, 0);
                 if (sidekick == 0)
                 {
-                    sidekick = &lbl_80580030;
+                    sidekick = &gDefaultTLComponentInstance;
                 }
 
                 TLImageInstance* image = (TLImageInstance*)FEFinder<TLImageInstance, 2>::_Find<TLSlide>(
                     sidekick->GetActiveSlide(), nlStringLowerHash("00_dummy_texture"), 0, 0, 0, 0, 0);
                 if (image == 0)
                 {
-                    image = (TLImageInstance*)&lbl_80580248;
+                    image = (TLImageInstance*)&gDefaultTLImageInstance;
                 }
 
                 fn_8021ED64(image, GameInfoManager::Instance()->GetSidekick(team, slot), team);
@@ -381,7 +367,7 @@ void SHChooseSides2::SceneCreated()
             0);
         if (instance == 0)
         {
-            instance = &lbl_80580248;
+            instance = &gDefaultTLImageInstance;
         }
         instance->SetAssetColour(mUnidentified3F0[team]);
 
@@ -394,7 +380,7 @@ void SHChooseSides2::SceneCreated()
             0);
         if (instance == 0)
         {
-            instance = &lbl_80580248;
+            instance = &gDefaultTLImageInstance;
         }
         instance->SetAssetColour(mUnidentified3F0[team]);
 
@@ -407,7 +393,7 @@ void SHChooseSides2::SceneCreated()
             0);
         if (instance == 0)
         {
-            instance = &lbl_80580248;
+            instance = &gDefaultTLImageInstance;
         }
         instance->SetAssetColour(mUnidentified3F0[team]);
     }
@@ -416,10 +402,10 @@ void SHChooseSides2::SceneCreated()
         mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("HELP_BUTTON"), 0, 0, 0, 0);
     if (help == 0)
     {
-        help = &lbl_80580030;
+        help = &gDefaultTLComponentInstance;
     }
 
-    if (fn_80273B00())
+    if (IsWidescreen())
     {
         help->SetActiveSlide("16:9", true, false);
     }
@@ -432,17 +418,17 @@ void SHChooseSides2::SceneCreated()
         help->GetActiveSlide(), nlStringLowerHash("HELP"), 0, 0, 0, 0, 0);
     if (helpButton == 0)
     {
-        helpButton = &lbl_80580030;
+        helpButton = &gDefaultTLComponentInstance;
     }
     mHelpButton = helpButton;
 
     if (mContext == PAUSE)
     {
-        fn_801CBCA0(0x4861E03D, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x4861E03D, 0, 0, 1);
     }
     else if (mContext == CUP)
     {
-        fn_801CBCA0(0xE3C7087A, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xE3C7087A, 0, 0, 1);
     }
 }
 
@@ -456,7 +442,7 @@ void SHChooseSides2::Update(float fDeltaT)
 
     if (mContext != PAUSE)
     {
-        fn_801CC888(fDeltaT);
+        UpdateCharacterIdleAnimations(fDeltaT);
     }
 
     if (mState == 0 || mState == 2 || mState == 3)
@@ -466,28 +452,28 @@ void SHChooseSides2::Update(float fDeltaT)
         {
             for (int i = 0; i < 4; ++i)
             {
-                lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+                gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
             }
             return;
         }
 
         if (mState == 0 && !mUnidentified1C)
         {
-            TU80252180Scene* object = fn_80253E18();
+            SHNavigation* object = GetNavigationScene();
             if (mContext == CUP || mContext == TOURNAMENT)
             {
-                fn_802534BC(object, 20, true);
+                object->SetButtons(20, true);
             }
             else if (mContext != PAUSE)
             {
-                fn_802534BC(object, 36, true);
+                object->SetButtons(36, true);
             }
             else
             {
-                fn_802534BC(object, 32, true);
+                object->SetButtons(32, true);
             }
 
-            fn_80253348(object, mUnidentified408, false);
+            object->SetButtonVisibility(mUnidentified408, false);
             BindChooseSideInstances();
             fn_8021EB18();
             mUnidentified1C = true;
@@ -497,11 +483,11 @@ void SHChooseSides2::Update(float fDeltaT)
             {
                 if (mPlayingSides[i] == -1)
                 {
-                    lbl_80578450[i]->SetActiveSlide("holding", true, false);
+                    gFEPointerInstances[i]->SetActiveSlide("holding", true, false);
                 }
                 else
                 {
-                    lbl_80578450[i]->SetActiveSlide("cursor", true, false);
+                    gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
                 }
             }
 
@@ -531,11 +517,11 @@ void SHChooseSides2::Update(float fDeltaT)
         {
             if (mContext == CUP || mContext == TOURNAMENT)
             {
-                fn_801CC988(&mHomeAwayComponent, mHomeAwayBox);
+                SetPlayButtonBounds(&mHomeAwayComponent, mHomeAwayBox);
             }
             else
             {
-                fn_801CC9B0(&mHomeAwayComponent, mHomeAwayBox, 0);
+                SetDoneButtonBounds(&mHomeAwayComponent, mHomeAwayBox, 0);
             }
             mHomeAwayComponent.mDisabled = false;
             mUnidentified1D = false;
@@ -550,16 +536,16 @@ void SHChooseSides2::Update(float fDeltaT)
     for (int i = 0; i < 4; ++i)
     {
         bool valid = true;
-        TLComponentInstance* controller = lbl_80578450[i];
-        TU80300104Event event;
+        TLComponentInstance* controller = gFEPointerInstances[i];
+        FEPointerEvent event;
         event.mIndex = i;
-        event.mPosition = fn_802197FC(i, (u8*)&valid);
-        event.mFlag0 = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 0x1E, true, 0);
+        event.mPosition = GetPointerPosition(i, (u8*)&valid);
+        event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 0x1E, true, 0);
 
         if (GameInfoManager::Instance()->IsInMode4())
         {
             int required = 1;
-            int available = 4 - lbl_806E0FA0->mHomeMissingSidekicks;
+            int available = 4 - g_pStrikerChallenge->mHomeMissingSidekicks;
             if (available > 0)
             {
                 required = available;
@@ -582,9 +568,9 @@ void SHChooseSides2::Update(float fDeltaT)
             }
         }
 
-        mHomeAwayComponent.fn_80219608(&event);
-        mControllerComponents[0].fn_80219608(&event);
-        mControllerComponents[1].fn_80219608(&event);
+        mHomeAwayComponent.HandlePointerEvent(&event);
+        mControllerComponents[0].HandlePointerEvent(&event);
+        mControllerComponents[1].HandlePointerEvent(&event);
 
         if (mUnidentified1E)
         {
@@ -599,7 +585,7 @@ void SHChooseSides2::Update(float fDeltaT)
         bool leave = false;
         if (mContext != PAUSE)
         {
-            if (mUnidentified2F0.fn_8022F2E0(event, fDeltaT))
+            if (mUnidentified2F0.UpdateBackButton(event, fDeltaT))
             {
                 leave = true;
             }
@@ -608,23 +594,23 @@ void SHChooseSides2::Update(float fDeltaT)
         if (leave)
         {
             mState = 3;
-            TU80252180Scene* object = fn_80253E18();
+            SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
-                fn_80253474(object);
+                object->HideButtons();
             }
             mPresentation->SetActiveSlide("out", true);
             return;
         }
 
-        mHelpComponent.fn_80219608(&event);
+        mHelpComponent.HandlePointerEvent(&event);
         if (!mUnidentified1F)
         {
             if (mPlayingSides[i] == -1)
             {
                 controller->SetActiveSlide("holding", true, false);
             }
-            else if (mUnidentified2F0.mUnidentifiedD2[i] || mControllerCounts[i] > 0)
+            else if (mUnidentified2F0.mPointerInside[i] || mControllerCounts[i] > 0)
             {
                 controller->SetActiveSlide("A", true, false);
             }
@@ -643,25 +629,25 @@ void SHChooseSides2::fn_8021CBD0()
 {
     nlColour white;
     nlColourSet(white, 0xFF, 0xFF, 0xFF, 0xFF);
-    lbl_806E1838->Pop();
+    GameSceneManager::Instance()->Pop();
 
     if (mContext == CUP)
     {
         for (int i = 0; i < 4; ++i)
         {
-            fn_80219E08(i, white);
+            SetPointerColour(i, white);
         }
-        fn_801CBCA0(0xA6F93A5D, 0, 0, 1);
-        fn_801FEEAC()->Call("TransitionChooseSidesToCup");
+        FEAudio::PlayAnimAudioEvent(0xA6F93A5D, 0, 0, 1);
+        Presentation::GetInstance()->Call("TransitionChooseSidesToCup");
     }
     else if (mContext == TOURNAMENT)
     {
         for (int i = 0; i < 4; ++i)
         {
-            fn_80219E08(i, white);
+            SetPointerColour(i, white);
         }
-        fn_801FEEAC()->Call("TransitionFromStrikerChallengeChooseSides");
-        TU8021CBD0Scene* scene = (TU8021CBD0Scene*)lbl_806E1838->Push(
+        Presentation::GetInstance()->Call("TransitionFromStrikerChallengeChooseSides");
+        TU8021CBD0Scene* scene = (TU8021CBD0Scene*)GameSceneManager::Instance()->Push(
             (SceneList)77, SCREEN_BACK, false);
         if (scene != 0)
         {
@@ -670,22 +656,22 @@ void SHChooseSides2::fn_8021CBD0()
     }
     else if (mContext != PAUSE)
     {
-        fn_801FEEAC()->Call("RemoveModels");
-        fn_801FEEAC()->Call("KillLightCones");
+        Presentation::GetInstance()->Call("RemoveModels");
+        Presentation::GetInstance()->Call("KillLightCones");
         for (int i = 0; i < 4; ++i)
         {
-            lbl_80578450[i]->SetActiveSlide("cursor", true, false);
-            fn_80219E08(i, white);
+            gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+            SetPointerColour(i, white);
         }
-        lbl_806E1838->Push((SceneList)3, SCREEN_BACK, false);
-        fn_801CBCA0(0xF8F6BB3C, 0, 0, 1);
+        GameSceneManager::Instance()->Push((SceneList)3, SCREEN_BACK, false);
+        FEAudio::PlayAnimAudioEvent(0xF8F6BB3C, 0, 0, 1);
     }
     else
     {
         for (int i = 0; i < 4; ++i)
         {
-            lbl_80578450[i]->SetActiveSlide("cursor", true, false);
-            fn_80219E08(i, white);
+            gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+            SetPointerColour(i, white);
         }
     }
 }
@@ -695,7 +681,7 @@ void SHChooseSides2::fn_8021CBD0()
  */
 void SHChooseSides2::BindChooseSideInstances()
 {
-    TLInstance* found = FEFinder<TLInstance, 2>::Find(mSideGroups[0],
+    TLInstance* found = FEFinder<TLImageInstance, 2>::Find(mSideGroups[0],
         nlStringLowerHash("empty"),
         nlStringLowerHash("home_group"),
         nlStringLowerHash("home_away_box"),
@@ -705,17 +691,17 @@ void SHChooseSides2::BindChooseSideInstances()
     TLInstance* homeInstance;
     if (found == 0)
     {
-        homeInstance = &lbl_80580248;
+        homeInstance = &gDefaultTLImageInstance;
     }
     else
     {
         homeInstance = found;
     }
     feVector3 position = mSideGroups[0]->GetAssetPosition();
-    mControllerComponents[0].fn_80300D74(
+    mControllerComponents[0].SetInstanceBounds(
         homeInstance, true, position.f.x, position.f.y, 1.0f, 1.0f);
 
-    found = FEFinder<TLInstance, 2>::Find(mSideGroups[1],
+    found = FEFinder<TLImageInstance, 2>::Find(mSideGroups[1],
         nlStringLowerHash("empty"),
         nlStringLowerHash("away_group"),
         nlStringLowerHash("home_away_box"),
@@ -725,67 +711,60 @@ void SHChooseSides2::BindChooseSideInstances()
     TLInstance* awayInstance;
     if (found == 0)
     {
-        awayInstance = &lbl_80580248;
+        awayInstance = &gDefaultTLImageInstance;
     }
     else
     {
         awayInstance = found;
     }
     position = mSideGroups[1]->GetAssetPosition();
-    mControllerComponents[1].fn_80300D74(
+    mControllerComponents[1].SetInstanceBounds(
         awayInstance, true, position.f.x, position.f.y, 1.0f, 1.0f);
 
-    TU80300104Base::Callback callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DC28), this, Placeholder<0>(), Placeholder<1>()));
-    mControllerComponents[0].fn_803007C0(callback);
-    mControllerComponents[1].fn_803007C0(callback);
+    FEPointerListener::Callback callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DC28), this, Placeholder<0>(), Placeholder<1>()));
+    mControllerComponents[0].SetPointerEnterCallback(callback);
+    mControllerComponents[1].SetPointerEnterCallback(callback);
 
-    callback = TU80300104Base::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DCFC), this, Placeholder<0>(), Placeholder<1>()));
-    mControllerComponents[0].fn_80300864(callback);
-    mControllerComponents[1].fn_80300864(callback);
+    callback = FEPointerListener::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DCFC), this, Placeholder<0>(), Placeholder<1>()));
+    mControllerComponents[0].SetPointerLeaveCallback(callback);
+    mControllerComponents[1].SetPointerLeaveCallback(callback);
 
-    TU80300104Base::Callback selectCallback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DDAC), this, Placeholder<0>(), Placeholder<1>()));
-    mControllerComponents[0].fn_803009AC(selectCallback);
-    mControllerComponents[1].fn_803009AC(selectCallback);
+    FEPointerListener::Callback selectCallback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DDAC), this, Placeholder<0>(), Placeholder<1>()));
+    mControllerComponents[0].SetPointerPressCallback(selectCallback);
+    mControllerComponents[1].SetPointerPressCallback(selectCallback);
 
-    callback = TU80300104Base::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DFCC), this, Placeholder<0>(), Placeholder<1>()));
-    mHomeAwayComponent.fn_803007C0(callback);
-    callback = TU80300104Base::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021E170), this, Placeholder<0>(), Placeholder<1>()));
-    mHomeAwayComponent.fn_80300864(callback);
-    callback = TU80300104Base::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021E098), this, Placeholder<0>(), Placeholder<1>()));
-    mHomeAwayComponent.fn_80300908(callback);
-    selectCallback = TU80300104Base::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021E1E0), this, Placeholder<0>(), Placeholder<1>()));
-    mHomeAwayComponent.fn_803009AC(selectCallback);
+    callback = FEPointerListener::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DFCC), this, Placeholder<0>(), Placeholder<1>()));
+    mHomeAwayComponent.SetPointerEnterCallback(callback);
+    callback = FEPointerListener::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021E170), this, Placeholder<0>(), Placeholder<1>()));
+    mHomeAwayComponent.SetPointerLeaveCallback(callback);
+    callback = FEPointerListener::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021E098), this, Placeholder<0>(), Placeholder<1>()));
+    mHomeAwayComponent.SetPointerInsideCallback(callback);
+    selectCallback = FEPointerListener::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021E1E0), this, Placeholder<0>(), Placeholder<1>()));
+    mHomeAwayComponent.SetPointerPressCallback(selectCallback);
 
-    {
-        mHomeAwayComponent.mDisabled = true;
-        TU80300104Event event;
-        mHomeAwayComponent.mPreviousEvents[0] = event;
-        mHomeAwayComponent.mPreviousEvents[1] = event;
-        mHomeAwayComponent.mPreviousEvents[2] = event;
-        mHomeAwayComponent.mPreviousEvents[3] = event;
-    }
+    mHomeAwayComponent.Disable();
 
-    TU80300104Base::Callback helpEnter(Bind<void>(MemFun(&SHChooseSides2::fn_8021E64C), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback helpLeave(Bind<void>(MemFun(&SHChooseSides2::fn_8021E6E8), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback helpSelect(Bind<void>(MemFun(&SHChooseSides2::fn_8021E76C), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback helpEnter(Bind<void>(MemFun(&SHChooseSides2::fn_8021E64C), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback helpLeave(Bind<void>(MemFun(&SHChooseSides2::fn_8021E6E8), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback helpSelect(Bind<void>(MemFun(&SHChooseSides2::fn_8021E76C), this, Placeholder<0>(), Placeholder<1>()));
 
-    found = FEFinder<TLInstance, 2>::Find(mHelpButton, nlStringLowerHash("OVER"), nlStringLowerHash("list_high_250x60"), 0, 0, 0, 0);
+    found = FEFinder<TLImageInstance, 2>::Find(mHelpButton, nlStringLowerHash("OVER"), nlStringLowerHash("list_high_250x60"), 0, 0, 0, 0);
     TLInstance* helpInstance;
     if (found == 0)
     {
-        helpInstance = &lbl_80580248;
+        helpInstance = &gDefaultTLImageInstance;
     }
     else
     {
         helpInstance = found;
     }
     position = mHelpButton->GetAssetPosition();
-    mHelpComponent.fn_80300D74(
+    mHelpComponent.SetInstanceBounds(
         helpInstance, true, position.f.x, position.f.y, 1.0f, 1.0f);
 
-    mHelpComponent.fn_803007C0(helpEnter);
-    mHelpComponent.fn_80300864(helpLeave);
-    mHelpComponent.fn_803009AC(helpSelect);
+    mHelpComponent.SetPointerEnterCallback(helpEnter);
+    mHelpComponent.SetPointerLeaveCallback(helpLeave);
+    mHelpComponent.SetPointerPressCallback(helpSelect);
 }
 
 /**
@@ -794,19 +773,18 @@ void SHChooseSides2::BindChooseSideInstances()
 void SHChooseSides2::fn_8021DC28(int index, void* context)
 {
     unsigned long side = (unsigned long)context;
-    unsigned int which = index;
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
         return;
 
-    if (!mControllerComponents[side].fn_802192FC(1, which))
+    if (!mControllerComponents[side].HasOtherPointerState(1, index))
     {
         mSideGroups[side]->SetActiveSlide("over", true, false);
-        fn_801CBCA0(0x19E7B6AE, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x19E7B6AE, 0, 0, 1);
     }
 
-    mControllerComponents[side].mValues[which] = 1;
+    mControllerComponents[side].SetPointerState(1, index);
     ++mControllerCounts[index];
-    mControllerComponents[side].fn_802195B4(index);
+    mControllerComponents[side].PlayHoverFeedback(index);
 }
 
 /**
@@ -815,16 +793,15 @@ void SHChooseSides2::fn_8021DC28(int index, void* context)
 void SHChooseSides2::fn_8021DCFC(int index, void* context)
 {
     unsigned long side = (unsigned long)context;
-    unsigned int which = index;
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
         return;
 
-    if (!mControllerComponents[side].fn_802192FC(1, which))
+    if (!mControllerComponents[side].HasOtherPointerState(1, index))
     {
         mSideGroups[side]->SetActiveSlide("controllers", true, false);
     }
 
-    mControllerComponents[side].mValues[which] = 0;
+    mControllerComponents[side].SetPointerState(0, index);
     --mControllerCounts[index];
 }
 
@@ -837,7 +814,7 @@ void SHChooseSides2::fn_8021DDAC(int index, void* context)
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
         return;
 
-    TLComponentInstance* controller = lbl_80578450[index];
+    TLComponentInstance* controller = gFEPointerInstances[index];
     char controllerName[16];
     nlSNPrintf(controllerName, 16, "controller%d", index);
 
@@ -864,8 +841,8 @@ void SHChooseSides2::fn_8021DDAC(int index, void* context)
         highlighted->m_bVisible = true;
 
         nlColour colour = mUnidentified3F0[side];
-        fn_80219E08(index, colour);
-        fn_801CBCA0(0xB3586309, 0, 0, 1);
+        SetPointerColour(index, colour);
+        FEAudio::PlayAnimAudioEvent(0xB3586309, 0, 0, 1);
     }
     else if (mPlayingSides[index] == side)
     {
@@ -876,8 +853,8 @@ void SHChooseSides2::fn_8021DDAC(int index, void* context)
 
         nlColour white;
         nlColourSet(white, 0xFF, 0xFF, 0xFF, 0xFF);
-        fn_80219E08(index, white);
-        fn_801CBCA0(0xB3586309, 0, 0, 1);
+        SetPointerColour(index, white);
+        FEAudio::PlayAnimAudioEvent(0xB3586309, 0, 0, 1);
     }
 
     fn_8021EB18();
@@ -889,18 +866,18 @@ void SHChooseSides2::fn_8021DDAC(int index, void* context)
 void SHChooseSides2::fn_8021DFCC(int index, void*)
 {
     ++mControllerCounts[index];
-    mHomeAwayComponent.mValues[index] = 1;
-    mHomeAwayComponent.fn_802195B4(index);
-    if (!mHomeAwayComponent.fn_802192FC(1, index))
+    mHomeAwayComponent.SetPointerState(1, index);
+    mHomeAwayComponent.PlayHoverFeedback(index);
+    if (!mHomeAwayComponent.HasOtherPointerState(1, index))
     {
         mHomeAwayBox->SetActiveSlide("over", true, false);
         if (mContext == CUP || mContext == TOURNAMENT)
         {
-            fn_801CBCA0(0xAA73EF34, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
         }
         else
         {
-            fn_801CBCA0(0xAA73EF33, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
         }
     }
 }
@@ -910,22 +887,22 @@ void SHChooseSides2::fn_8021DFCC(int index, void*)
  */
 void SHChooseSides2::fn_8021E098(int index, void*)
 {
-    if (mHomeAwayComponent.mValues[index] != 0)
+    if (mHomeAwayComponent.GetPointerState(index) != 0)
         return;
 
     ++mControllerCounts[index];
-    mHomeAwayComponent.mValues[index] = 1;
-    mHomeAwayComponent.fn_802195B4(index);
-    if (!mHomeAwayComponent.fn_802192FC(1, index))
+    mHomeAwayComponent.SetPointerState(1, index);
+    mHomeAwayComponent.PlayHoverFeedback(index);
+    if (!mHomeAwayComponent.HasOtherPointerState(1, index))
     {
         mHomeAwayBox->SetActiveSlide("over", true, false);
         if (mContext == CUP || mContext == TOURNAMENT)
         {
-            fn_801CBCA0(0xAA73EF34, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
         }
         else
         {
-            fn_801CBCA0(0xAA73EF33, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
         }
     }
 }
@@ -936,8 +913,8 @@ void SHChooseSides2::fn_8021E098(int index, void*)
 void SHChooseSides2::fn_8021E170(int index, void*)
 {
     --mControllerCounts[index];
-    mHomeAwayComponent.mValues[index] = 0;
-    if (!mHomeAwayComponent.fn_802192FC(1, index))
+    mHomeAwayComponent.SetPointerState(0, index);
+    if (!mHomeAwayComponent.HasOtherPointerState(1, index))
     {
         mHomeAwayBox->SetActiveSlide("off", true, false);
     }
@@ -953,7 +930,7 @@ void SHChooseSides2::fn_8021E1E0(int, void*)
 
     {
         mControllerComponents[0].mDisabled = true;
-        TU80300104Event event;
+        FEPointerEvent event;
         mControllerComponents[0].mPreviousEvents[0] = event;
         mControllerComponents[0].mPreviousEvents[1] = event;
         mControllerComponents[0].mPreviousEvents[2] = event;
@@ -961,7 +938,7 @@ void SHChooseSides2::fn_8021E1E0(int, void*)
     }
     {
         mControllerComponents[1].mDisabled = true;
-        TU80300104Event event;
+        FEPointerEvent event;
         mControllerComponents[1].mPreviousEvents[0] = event;
         mControllerComponents[1].mPreviousEvents[1] = event;
         mControllerComponents[1].mPreviousEvents[2] = event;
@@ -969,7 +946,7 @@ void SHChooseSides2::fn_8021E1E0(int, void*)
     }
     {
         mHomeAwayComponent.mDisabled = true;
-        TU80300104Event event;
+        FEPointerEvent event;
         mHomeAwayComponent.mPreviousEvents[0] = event;
         mHomeAwayComponent.mPreviousEvents[1] = event;
         mHomeAwayComponent.mPreviousEvents[2] = event;
@@ -977,19 +954,19 @@ void SHChooseSides2::fn_8021E1E0(int, void*)
     }
     mState = 2;
 
-    TU80252180Scene* object = fn_80253E18();
+    SHNavigation* object = GetNavigationScene();
     if (object != 0)
     {
-        fn_80253474(object);
+        object->HideButtons();
     }
 
     if (mContext == CUP || mContext == TOURNAMENT)
     {
-        fn_801CBCA0(0x6E5C794C, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
     }
     else
     {
-        fn_801CBCA0(0x9F9BF00F, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x9F9BF00F, 0, 0, 1);
     }
 
     mPresentation->SetActiveSlide("out", true);
@@ -1004,32 +981,32 @@ void SHChooseSides2::Proceed()
     for (int i = 0; i < 4; ++i)
     {
         GameInfoManager::Instance()->SetPlayingSide(i, (short)mPlayingSides[i]);
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
     }
 
-    TU80252180Scene* object = fn_80253E18();
+    SHNavigation* object = GetNavigationScene();
     if (mContext == CUP)
     {
-        fn_801CBCA0(0xF8350154, 0, 0, 1);
-        lbl_806E0F90->mUnidentified869C = 1;
-        UnidentifiedCupManager* info = lbl_806E0F90;
+        FEAudio::PlayAnimAudioEvent(0xF8350154, 0, 0, 1);
+        g_pCupManager->mUnidentified869C = 1;
+        CupManager* info = g_pCupManager;
         info->mUnidentified8694[0] = GameInfoManager::Instance()->GetTeam(0);
         info->mUnidentified8694[1] = GameInfoManager::Instance()->GetTeam(1);
-        lbl_806E1838->PushLoadingScene(true);
+        GameSceneManager::Instance()->PushLoadingScene(true);
         SaveLoad::StartSave(false);
-        fn_802534BC(object, 0, true);
+        object->SetButtons(0, true);
     }
     else if (mContext == TOURNAMENT)
     {
         GameInfoManager::Instance()->unknown_0x71C8 = 1;
-        fn_801FEEAC()->Call("StartChallengeSequence");
-        lbl_806E1838->PushLoadingScene(true);
-        fn_802534BC(object, 0, true);
+        Presentation::GetInstance()->Call("StartChallengeSequence");
+        GameSceneManager::Instance()->PushLoadingScene(true);
+        object->SetButtons(0, true);
     }
     else if (mContext != PAUSE)
     {
-        fn_801CBCA0(0x64B85E8D, 0, 0, 1);
-        lbl_806E1838->Push((SceneList)5, SCREEN_FORWARD, true);
+        FEAudio::PlayAnimAudioEvent(0x64B85E8D, 0, 0, 1);
+        GameSceneManager::Instance()->Push((SceneList)5, SCREEN_FORWARD, true);
     }
     else
     {
@@ -1053,14 +1030,13 @@ const char* lbl_8051CAFC[3] = { "sk_2", "sk_1", "sk_0" };
  */
 void SHChooseSides2::fn_8021E64C(int index, void*)
 {
-    unsigned int which = index;
     ++mControllerCounts[index];
-    if (!mHelpComponent.fn_802192FC(1, which))
+    if (!mHelpComponent.HasOtherPointerState(1, index))
     {
         mHelpButton->SetActiveSlide("over", true, false);
-        fn_801CBCA0(0xACCDCA48, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
     }
-    mHelpComponent.mValues[which] = 1;
+    mHelpComponent.SetPointerState(1, index);
 }
 
 /**
@@ -1068,13 +1044,12 @@ void SHChooseSides2::fn_8021E64C(int index, void*)
  */
 void SHChooseSides2::fn_8021E6E8(int index, void*)
 {
-    unsigned int which = index;
     --mControllerCounts[index];
-    if (!mHelpComponent.fn_802192FC(1, which))
+    if (!mHelpComponent.HasOtherPointerState(1, index))
     {
         mHelpButton->SetActiveSlide("off", true, false);
     }
-    mHelpComponent.mValues[which] = 0;
+    mHelpComponent.SetPointerState(0, index);
 }
 
 /**
@@ -1084,10 +1059,10 @@ void SHChooseSides2::fn_8021E76C(int, void*)
 {
     for (int i = 0; i < 4; ++i)
     {
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
     }
 
-    fn_801CBCA0(0xF0AFD586, 0, 0, 1);
+    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
 
     if (mContext == PAUSE)
     {
@@ -1098,7 +1073,7 @@ void SHChooseSides2::fn_8021E76C(int, void*)
     }
     else
     {
-        FEPopupMenu* popup = (FEPopupMenu*)lbl_806E1838->Push(
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
             (SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3B, Function<FnVoidVoid>(FEPopupMenu::Nothing));
         popup->mUnidentified9A1 = true;
@@ -1112,14 +1087,14 @@ void SHChooseSides2::fn_8021E76C(int, void*)
  */
 void SHChooseSides2::fn_8021E910(int index)
 {
-    lbl_80578450[index]->SetActiveSlide("holding", true, false);
+    gFEPointerInstances[index]->SetActiveSlide("holding", true, false);
     mPlayingSides[index] = -1;
     mControllerCounts[index] = 0;
 
     char controllerName[16];
     nlSNPrintf(controllerName, 16, "controller%d", index);
 
-    TLInstance* instance = (TLInstance*)fn_803068F4(mSideGroups[0],
+    TLInstance* instance = (TLInstance*)FEFindInstance(mSideGroups[0],
         nlStringLowerHash("controllers"),
         nlStringLowerHash(lbl_806DE038[0]),
         nlStringLowerHash(controllerName),
@@ -1128,7 +1103,7 @@ void SHChooseSides2::fn_8021E910(int index)
         0);
     instance->m_bVisible = false;
 
-    instance = (TLInstance*)fn_803068F4(mSideGroups[1],
+    instance = (TLInstance*)FEFindInstance(mSideGroups[1],
         nlStringLowerHash("controllers"),
         nlStringLowerHash(lbl_806DE038[1]),
         nlStringLowerHash(controllerName),
@@ -1137,15 +1112,15 @@ void SHChooseSides2::fn_8021E910(int index)
         0);
     instance->m_bVisible = false;
 
-    instance = (TLInstance*)fn_803068F4(mSideGroups[0], nlStringLowerHash("over"), nlStringLowerHash(lbl_806DE038[0]), nlStringLowerHash(controllerName), 0, 0, 0);
+    instance = (TLInstance*)FEFindInstance(mSideGroups[0], nlStringLowerHash("over"), nlStringLowerHash(lbl_806DE038[0]), nlStringLowerHash(controllerName), 0, 0, 0);
     instance->m_bVisible = false;
 
-    instance = (TLInstance*)fn_803068F4(mSideGroups[1], nlStringLowerHash("over"), nlStringLowerHash(lbl_806DE038[1]), nlStringLowerHash(controllerName), 0, 0, 0);
+    instance = (TLInstance*)FEFindInstance(mSideGroups[1], nlStringLowerHash("over"), nlStringLowerHash(lbl_806DE038[1]), nlStringLowerHash(controllerName), 0, 0, 0);
     instance->m_bVisible = false;
 
     nlColour white;
     nlColourSet(white, 0xFF, 0xFF, 0xFF, 0xFF);
-    fn_80219E08(index, white);
+    SetPointerColour(index, white);
     fn_8021EB18();
 }
 
@@ -1154,7 +1129,7 @@ void SHChooseSides2::fn_8021E910(int index)
  */
 void SHChooseSides2::fn_8021EB18()
 {
-    TU80252180Scene* object = fn_80253E18();
+    SHNavigation* object = GetNavigationScene();
     bool hasPlayingSide = false;
     for (int i = 0; i < 4; ++i)
     {
@@ -1170,28 +1145,28 @@ void SHChooseSides2::fn_8021EB18()
         if (!hasPlayingSide)
         {
             mUnidentified1D = false;
-            fn_80253348(object, mUnidentified408, false);
+            object->SetButtonVisibility(mUnidentified408, false);
             mHomeAwayComponent.mDisabled = true;
-            TU80300104Event event;
+            FEPointerEvent event;
             mHomeAwayComponent.mPreviousEvents[0] = event;
             mHomeAwayComponent.mPreviousEvents[1] = event;
             mHomeAwayComponent.mPreviousEvents[2] = event;
             mHomeAwayComponent.mPreviousEvents[3] = event;
 
-            for (int i = 0; i < 4; ++i)
+            for (unsigned int i = 0; i < 4; ++i)
             {
-                if (mHomeAwayComponent.mValues[i] == 1)
+                if (mHomeAwayComponent.GetPointerState(i) == 1)
                 {
                     --mControllerCounts[i];
-                    mHomeAwayComponent.mValues[i] = 0;
+                    mHomeAwayComponent.SetPointerState(0, i);
                 }
             }
         }
     }
     else if (hasPlayingSide == true)
     {
-        fn_801CBCA0(0x2AB04562, 0, 0, 1);
-        fn_80253348(object, mUnidentified408, true);
+        FEAudio::PlayAnimAudioEvent(0x2AB04562, 0, 0, 1);
+        object->SetButtonVisibility(mUnidentified408, true);
 
         if (mContext == CUP || mContext == TOURNAMENT)
         {
@@ -1239,7 +1214,7 @@ void SHChooseSides2::fn_8021ED64(TLImageInstance* image, int sidekick, int team)
             break;
         }
 
-        TLInstance* found = fn_8030677C(mPresentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(textureName), 0, 0, 0);
+        TLInstance* found = FEFindInstance(mPresentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(textureName), 0, 0, 0);
         TLImageInstance* texture = found == 0 ? 0 : (TLImageInstance*)found;
         if (texture != 0 && texture->m_pTextureResource != 0)
         {
@@ -1267,7 +1242,7 @@ bool SHChooseSides2::fn_8021EED8(bool playSound)
     {
         if (playSound)
         {
-            fn_801CBCA0(0x9F9BF00F, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0x9F9BF00F, 0, 0, 1);
         }
 
         FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(

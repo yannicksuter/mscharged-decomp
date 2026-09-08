@@ -4,7 +4,7 @@
 #include "Game/BaseSceneHandler.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlFunction.h"
-#include "unclassified/tu_80219248.h"
+#include "Game/FE/fePointerButton.h"
 #include "types.h"
 
 class TLComponentInstance;
@@ -85,7 +85,7 @@ public:
     /* 0x9B0 */ Popup mPopup;
     /* 0x9C4 */ TLComponentInstance* mOptionInstances[3];
     /* 0x9D0 */ TLComponentInstance* mUnidentified9D0[3];
-    /* 0x9DC */ TU80219248Component mControllerComponents[3];
+    /* 0x9DC */ FEPointerButton mControllerComponents[3];
     /* 0xBF8 */ unsigned int mUnidentifiedBF8[4];
     /* 0xC08 */ int mUnidentifiedC08;
     /* 0xC0C */ int mUnidentifiedC0C;

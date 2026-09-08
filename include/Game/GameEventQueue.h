@@ -16,7 +16,6 @@ struct UnidentifiedEventData_80066748;
 struct UnidentifiedEventData_80066A04;
 struct UnidentifiedEventData_80066B08;
 struct CollisionChainPlayerData;
-struct UnidentifiedEventData_80066D10;
 struct UnidentifiedEventData_80066E14;
 struct UnidentifiedEventData_80066F18;
 struct UnidentifiedEventData_8006701C;
@@ -67,7 +66,7 @@ public:
     UnidentifiedQueuedEvent<UnidentifiedEventData_80066A04> mEvent31;
     UnidentifiedQueuedEvent<UnidentifiedEventData_80066B08> mEvent32;
     UnidentifiedQueuedEvent<CollisionChainPlayerData> mEvent33;
-    UnidentifiedQueuedEvent<UnidentifiedEventData_80066D10> mEvent34;
+    UnidentifiedQueuedEvent<CollisionWindDebrisPlayerData> mEvent34;
     UnidentifiedQueuedEvent<UnidentifiedEventData_80066E14> mEvent35;
     UnidentifiedQueuedEvent<ShotAtGoalData> mEvent36;
     UnidentifiedQueuedEvent<ShotAtGoalData> mEvent37;

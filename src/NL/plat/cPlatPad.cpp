@@ -1,14 +1,13 @@
 #include "NL/platpad.h"
+#include "NL/plat/SwappablePad.h"
 
-extern int lbl_806E1E20;
-
-static unsigned char lbl_80585FF0[8 * sizeof(cPlatPad)];
-nlArrayAllocator<cPlatPad> lbl_806E2260(reinterpret_cast<cPlatPad*>(lbl_80585FF0), 8);
-int lbl_806E2268 = lbl_806E1E20++;
+static unsigned char sPlatPadStorage[8 * sizeof(cPlatPad)];
+nlArrayAllocator<cPlatPad> gPlatPadAllocator(reinterpret_cast<cPlatPad*>(sPlatPadStorage), 8);
+int gPlatPadClassID = gNextPadClassID++;
 
 void cPlatPad::Update(float dt)
 {
-    if (!fn_80365E84(this))
+    if (!UpdatePadBackend(this))
         PadBackend::Update(dt);
 }
 
@@ -87,14 +86,5 @@ void cPlatPad::StartRumble(float fDuration, float fIntensity, float fFrequency)
 }
 
 void cPlatPad::StopRumble()
-{
-}
-
-int cPlatPad::UnidentifiedClassID()
-{
-    return lbl_806E2268;
-}
-
-cPlatPad::~cPlatPad()
 {
 }

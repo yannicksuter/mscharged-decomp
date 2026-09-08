@@ -2,7 +2,7 @@
 #define GAME_FE_ONLINE_RANKING_H
 
 #include "Game/FE/BaseOverlayHandler.h"
-#include "unclassified/tu_8030616C.h"
+#include "Game/FE/feTimer.h"
 
 class UnidentifiedOnlineRankingScene : public BaseOverlayHandler
 {
@@ -12,10 +12,10 @@ public:
     virtual void Update(float dt);
     virtual void SceneCreated();
 
-    void fn_801F048C(UnidentifiedTimer_8030616C* timer);
+    void fn_801F048C(FETimer* timer);
 
     /* 0x028 */ u32 mUnidentified028[0x58];
-    /* 0x188 */ UnidentifiedTimer_8030616C mUnidentified188;
+    /* 0x188 */ FETimer mUnidentified188;
     /* 0x1A4 */ bool mUnidentified1A4;
     /* 0x1A5 */ bool mUnidentified1A5;
     /* 0x1A6 */ bool mUnidentified1A6;

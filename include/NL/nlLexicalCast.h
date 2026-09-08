@@ -22,6 +22,12 @@ inline To LexicalCast(const From& from)
 namespace Detail
 {
 
+template <typename To>
+struct LexicalCastImpl<To, int>
+{
+    static To Do(int t);
+};
+
 template <typename Allocator>
 struct LexicalCastImpl<BasicString<char, Allocator>, const char*>
 {

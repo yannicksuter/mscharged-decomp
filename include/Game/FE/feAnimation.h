@@ -14,6 +14,10 @@ enum AnimType
     eAnimPivot = 4,
     eAnimColor = 5,
     eAnimOpacity = 6,
+    eAnimUVX = 7,
+    eAnimUVY = 8,
+    eAnimUVWidth = 9,
+    eAnimUVHeight = 10,
 };
 
 class FEAnimationKeyframe

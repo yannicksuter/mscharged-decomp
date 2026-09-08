@@ -3,6 +3,11 @@
 
 #include "types.h"
 
+class MemoryAllocator;
+
+extern MemoryAllocator* AllocatorStack[16];
+extern unsigned int AllocatorStackDepth;
+
 void* operator new(unsigned long size);
 void* operator new[](unsigned long size);
 void operator delete(void* ptr);

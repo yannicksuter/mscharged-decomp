@@ -7,6 +7,7 @@
 #include "Game/InterpreterCore.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 extern "C" void fn_80319904(
     UnidentifiedScriptMachine*, shdStateMachine*);

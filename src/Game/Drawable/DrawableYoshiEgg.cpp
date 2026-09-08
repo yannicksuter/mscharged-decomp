@@ -5,6 +5,7 @@
 #include "Game/Drawable/ShadowProp.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
+#include "unclassified/tu_801B535C.h"
 
 // Charged-only shadow prop, fifth of the run described beside
 // DrawableBulletBill. The live object's translation unit spells
@@ -12,22 +13,9 @@
 // own tunables and live-object layout. The live object and the material
 // services stay address-named.
 
-struct YoshiEggObject;
-
-struct YoshiEggObjectFields
-{
-    /* 0x00 */ nlQuaternion mOrientation;
-    /* 0x10 */ nlVector3 mPosition;
-    char _01C[0x0C];
-    /* 0x28 */ bool mVisible;
-    char _029[7];
-    /* 0x30 */ RenderObject* mDrawable;
-};
-
 extern "C"
 {
     float fn_8002D194(int);
-    float fn_801B5B30(const YoshiEggObject*);
 }
 
 static float gShadowScaleIn = 1.0f;
@@ -144,7 +132,7 @@ DrawableYoshiEgg::DrawableYoshiEgg()
     mOrientation.w = 1.0f;
 }
 
-void DrawableYoshiEgg::Grab(const YoshiEggObject* object)
+void DrawableYoshiEgg::Grab(const UnidentifiedObject_801B535C* object)
 {
     if (object == 0)
     {
@@ -152,18 +140,18 @@ void DrawableYoshiEgg::Grab(const YoshiEggObject* object)
         return;
     }
 
-    mVisible = ((const YoshiEggObjectFields*)object)->mVisible;
+    mVisible = object->mUnidentified28;
     if (!mVisible)
     {
         return;
     }
 
-    mPosition = ((const YoshiEggObjectFields*)object)->mPosition;
-    mOrientation = ((const YoshiEggObjectFields*)object)->mOrientation;
-    mScale = fn_801B5B30(object);
+    mPosition = object->mUnidentified10;
+    mOrientation = object->mUnidentified00;
+    mScale = object->fn_801B5B30();
 }
 
-void DrawableYoshiEgg::Render(const YoshiEggObject* object) const
+void DrawableYoshiEgg::Render(const UnidentifiedObject_801B535C* object) const
 {
     nlMatrix4 matrix;
     RenderObject* drawable;
@@ -173,7 +161,7 @@ void DrawableYoshiEgg::Render(const YoshiEggObject* object) const
         return;
     }
 
-    drawable = ((const YoshiEggObjectFields*)object)->mDrawable;
+    drawable = object->mUnidentified30;
     if (drawable == 0)
     {
         return;

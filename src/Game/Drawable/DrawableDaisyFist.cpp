@@ -11,10 +11,6 @@
 // gameplay-object snapshots it spins the prop about Z from a 16-bit angle unit,
 // but it draws through a dedicated view instead of the default one.
 
-extern "C"
-{
-}
-
 DrawableDaisyFist::DrawableDaisyFist()
 {
     mVisible = false;

@@ -1,6 +1,7 @@
+#include "NL/nlSingleton.inl"
 #include "Game/DB/SaveLoad.h"
 
-#include "Game/BaseGameSceneManager.h"
+#include "Game/GameSceneManager.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/GameInfo.h"
 #include "Game/Task/ResetTask.h"
@@ -67,7 +68,6 @@ extern "C" void TPLBind(TPLPalette* palette);
 extern "C" bool GetTweakBool(const char* path, bool create);
 extern void nlPrintf(const char* format, ...);
 
-extern BaseGameSceneManager* lbl_806E1838;
 extern BaseGameSceneManager* g_pOverlayManager;
 
 static const char* SaveFileName = "Strikers2";
@@ -243,7 +243,7 @@ void SaveLoad::ContinueWithoutSaving()
         bool enabled;
     };
 
-    SceneState* scene = (SceneState*)lbl_806E1838->GetScene((SceneList)1);
+    SceneState* scene = (SceneState*)GameSceneManager::Instance()->GetScene((SceneList)1);
     if (scene != 0)
     {
         scene->enabled = false;
@@ -574,7 +574,7 @@ void SaveLoad::StartSave(bool online)
     }
 
     OnlineMode = online;
-    SaveSceneManager = lbl_806E1838 != 0 ? lbl_806E1838 : g_pOverlayManager;
+    SaveSceneManager = GameSceneManager::Instance() != 0 ? GameSceneManager::Instance() : g_pOverlayManager;
     if (SaveEnabled && !nlFlashCallbackPending())
     {
         BannerFileExists = false;
@@ -592,7 +592,7 @@ void SaveLoad::StartLoad(bool online)
 
     OnlineMode = online;
     bool loaded = online ? OnlineSaveLoaded : NormalSaveLoaded;
-    SaveSceneManager = lbl_806E1838 != 0 ? lbl_806E1838 : g_pOverlayManager;
+    SaveSceneManager = GameSceneManager::Instance() != 0 ? GameSceneManager::Instance() : g_pOverlayManager;
     if (SaveEnabled && !loaded && !nlFlashCallbackPending())
     {
         BannerFileExists = false;
@@ -624,7 +624,7 @@ void SaveLoad::WriteSaveData()
     SaveBuffer = nlMalloc(alignedSize, 0x20, true);
 
     GameInfoManager* gameInfo = GameInfoManager::GetInstance();
-    gameInfo->unknown_0x9C = (void*)nlRandom(0xFFFFFFFF, &nlDefaultSeed);
+    gameInfo->mUserInfo.mSaveID = nlRandom(0xFFFFFFFF, &nlDefaultSeed);
     if (OnlineMode)
     {
         gameInfo->GetMemoryCardData((u8*)SaveBuffer + sizeof(SaveFileHeader));

@@ -16,6 +16,7 @@
 #include "unclassified/tu_802BAE84.h"
 
 #include <string.h>
+#include "NL/nlstring_tmpl.h"
 
 extern "C" const char lbl_8052B590[];
 extern "C" const char lbl_8052B5A0[];

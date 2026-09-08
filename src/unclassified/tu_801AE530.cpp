@@ -1,4 +1,5 @@
 #include "unclassified/tu_801AE530.h"
+#include "Game/Render/RLViewLayers.h"
 
 #include "Game/Render/RLView.h"
 
@@ -21,7 +22,6 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 extern "C"
 {
     UnidentifiedNumberModel_801AE530** fn_80276380();
-    bool fn_80273B00();
 
     extern UnidentifiedEventRegistry_801AE530* g_pEventRegistry;
 
@@ -268,7 +268,7 @@ void UnidentifiedNumberDisplay_801AE530::fn_801AEA90()
     float opacity = UnidentifiedLerp_801AE530(
         lbl_806DD06C, lbl_806DD088, mUnidentified014);
 
-    if (fn_80273B00())
+    if (IsWidescreen())
     {
         separation = UnidentifiedLerp_801AE530(
             lbl_806DD068, lbl_806DD084, mUnidentified014);
@@ -276,14 +276,14 @@ void UnidentifiedNumberDisplay_801AE530::fn_801AEA90()
 
     if (mUnidentified008 >= 100 || mUnidentified00C >= 100)
     {
-        float endScale = fn_80273B00() ? lbl_806DD078 : lbl_806DD074;
+        float endScale = IsWidescreen() ? lbl_806DD078 : lbl_806DD074;
         scale = UnidentifiedLerp_801AE530(
             lbl_806DD05C, endScale, mUnidentified014);
     }
 
     nlVector2 position;
     position.y = positionY + scale * 0.2f * 0.5f;
-    float digitScale = fn_80273B00() ? scale * lbl_806DD054 : scale;
+    float digitScale = IsWidescreen() ? scale * lbl_806DD054 : scale;
 
     int value = mUnidentified008;
     int remaining = value;
@@ -372,7 +372,7 @@ void UnidentifiedNumberDisplay_801AE530::fn_801AEE80(
 
     nlMatrix4 transform;
     transform.SetIdentity();
-    if (fn_80273B00())
+    if (IsWidescreen())
     {
         nlMakeScaleMatrix(transform,
             scale * lbl_806DD054, scale, scale * lbl_806DD058);

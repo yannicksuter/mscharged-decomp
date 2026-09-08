@@ -25,9 +25,9 @@ public:
     virtual void StartRumble(float fDuration, float fIntensity, float fFrequency);
     virtual void StopRumble();
     virtual void Update(float deltaTime);
-    virtual int UnidentifiedClassID() { return sUnidentifiedClassID; }
+    virtual int GetClassID() { return sClassID; }
 
-    static int sUnidentifiedClassID;
+    static int sClassID;
 
     /* 0x1C */ PadBackend* mBackend;
 }; // size: 0x20

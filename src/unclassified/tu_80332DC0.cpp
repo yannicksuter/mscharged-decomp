@@ -81,8 +81,7 @@ extern "C" void fn_80332EDC()
 
 extern "C" UnidentifiedInputRouter* fn_803330AC()
 {
-    UnidentifiedNetworkOnlineInterface& online = *g_pNetworkSessionBase;
-    if (online.OnlineVirtual0C() == 0)
+    if (g_pNetworkSessionBase->GetSessionMode() == 0)
     {
         return lbl_806E2150;
     }
@@ -97,7 +96,7 @@ void UnidentifiedInputRouter::Reset(int)
 {
     mSession = g_pNetworkSessionBase;
 
-    int machineCount = GetNumMachines(mSession);
+    int machineCount = mSession->GetNumMachines();
     for (int machine = 0; machine < machineCount; ++machine)
     {
         fn_80336BE0(&mSession->mPeers[machine]);
@@ -129,7 +128,7 @@ void UnidentifiedInputRouter::Reset(int)
 
 void UnidentifiedInputRouter::RouterVirtual38()
 {
-    int machineCount = GetNumMachines(mSession);
+    int machineCount = mSession->GetNumMachines();
     int gameFrame = lbl_806E2138->mFrameProvider->GetFrame();
     u32 seed = fn_80332EB8();
 
@@ -262,7 +261,7 @@ void NetworkInputRouter::Reset(int resetQueues)
 void NetworkInputRouter::RouterVirtual24()
 {
     mCongested = false;
-    int machineCount = GetNumMachines(mSession);
+    int machineCount = mSession->GetNumMachines();
     for (int machine = 0; machine < machineCount; ++machine)
     {
         if (mInputQueues[machine].mCount <= 1)
@@ -283,7 +282,7 @@ bool NetworkInputRouter::RouterVirtual14()
         return true;
     }
 
-    int machineCount = GetNumMachines(mSession);
+    int machineCount = mSession->GetNumMachines();
     for (s8 machine = 0; machine < machineCount; ++machine)
     {
         if (mInputQueues[machine].mCount == 0)

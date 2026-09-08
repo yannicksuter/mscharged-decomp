@@ -3,7 +3,7 @@
 
 #include "Game/FE/BaseOverlayHandler.h"
 #include "Game/FE/feAsyncImage.h"
-#include "unclassified/tu_80219248.h"
+#include "Game/FE/fePointerButton.h"
 
 class TLComponentInstance;
 class TLImageInstance;
@@ -20,7 +20,7 @@ public:
     void fn_801FAB88(int index, void* context);
     void fn_801FABF8(int index, void* context);
 
-    /* 0x028 */ TU80219248Component mControllerComponent;
+    /* 0x028 */ FEPointerButton mControllerComponent;
     /* 0x0DC */ TLComponentInstance* mUnidentified0DC;
     /* 0x0E0 */ TLImageInstance* mUnidentified0E0;
     /* 0x0E4 */ bool mUnidentified0E4;

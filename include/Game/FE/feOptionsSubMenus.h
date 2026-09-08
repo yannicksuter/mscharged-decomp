@@ -2,8 +2,8 @@
 #define _FEOPTIONSSUBMENUS_H_
 
 #include "Game/BaseSceneHandler.h"
-#include "unclassified/tu_80219248.h"
-#include "unclassified/tu_8022EF84.h"
+#include "Game/FE/fePointerButton.h"
+#include "Game/FE/feBackButton.h"
 
 class TLComponentInstance;
 class TLInstance;
@@ -44,12 +44,12 @@ public:
     void fn_801D58EC(int setting);
 
     /* 0x028 */ int mUnidentified28;
-    /* 0x02C */ TU8022EF84Component mNavigation;
+    /* 0x02C */ FEBackButton mNavigation;
     /* 0x104 */ TLComponentInstance* mButtons[6];
     /* 0x11C */ TLComponentInstance* mSaveButton;
     /* 0x120 */ TLInstance* mVolumeBars[3][10];
-    /* 0x198 */ TU80219248Component mButtonComponents[6];
-    /* 0x5D0 */ TU80219248Component mSaveButtonComponent;
+    /* 0x198 */ FEPointerButton mButtonComponents[6];
+    /* 0x5D0 */ FEPointerButton mSaveButtonComponent;
     /* 0x684 */ bool mUnidentified684;
     /* 0x685 */ bool mUnidentified685;
     /* 0x686 */ bool mUnidentified686;
@@ -80,13 +80,13 @@ public:
     void fn_801D8538();
 
     /* 0x028 */ int mUnidentified28;
-    /* 0x02C */ TU8022EF84Component mNavigation;
+    /* 0x02C */ FEBackButton mNavigation;
     /* 0x104 */ TLComponentInstance* mButtons[5];
     /* 0x118 */ TLComponentInstance* mZoomButtons[2];
     /* 0x120 */ TLComponentInstance* mSaveButton;
-    /* 0x124 */ TU80219248Component mButtonComponents[5];
-    /* 0x4A8 */ TU80219248Component mZoomButtonComponents[2];
-    /* 0x610 */ TU80219248Component mSaveButtonComponent;
+    /* 0x124 */ FEPointerButton mButtonComponents[5];
+    /* 0x4A8 */ FEPointerButton mZoomButtonComponents[2];
+    /* 0x610 */ FEPointerButton mSaveButtonComponent;
     /* 0x6C4 */ bool mUnidentified6C4;
     /* 0x6C5 */ bool mUnidentified6C5;
     /* 0x6C6 */ bool mUnidentified6C6;

@@ -64,7 +64,7 @@ static NetworkMessageFactory<NetMessageDraft> sFactoryType21;
 static NetworkMessageFactory<NetworkMessageType22_8050B7B4> sFactoryType22;
 static NetworkMessageFactory<NetMessageDraftPickedCaptain> sFactoryType23;
 static NetworkMessageFactory<NetMessageDraftPickedSidekicks> sFactoryType24;
-static NetworkMessageFactory<NetworkMessageType25_8050B778> sFactoryType25;
+static NetworkMessageFactory<NetMessageSidesChanged> sSidesChangedFactory;
 static NetworkMessageFactory<NetMessageCheckConnection> sFactoryType26;
 static NetworkMessageFactory<NetworkMessageType27_8050B750> sFactoryType27;
 static NetworkMessageFactory<NetworkMessageType34_8050ADCC> sFactoryType34;
@@ -84,7 +84,7 @@ void RegisterNetworkMessages_801258A8()
     lbl_806E2100->fn_8032CA40(22, &sFactoryType22);
     lbl_806E2100->fn_8032CA40(23, &sFactoryType23);
     lbl_806E2100->fn_8032CA40(24, &sFactoryType24);
-    lbl_806E2100->fn_8032CA40(25, &sFactoryType25);
+    lbl_806E2100->fn_8032CA40(25, &sSidesChangedFactory);
     lbl_806E2100->fn_8032CA40(26, &sFactoryType26);
     lbl_806E2100->fn_8032CA40(27, &sFactoryType27);
     lbl_806E2100->fn_8032CA40(28, &sFactoryType28);

@@ -1,4 +1,5 @@
 #include "Game/Camera/GameplayCam.h"
+#include "Game/Render/RLViewLayers.h"
 
 #include "Game/Ball.h"
 #include "Game/AI/AiUtil.h"
@@ -10,7 +11,6 @@
 #include "NL/nlTask.h"
 #include "NL/gl/glMatrix.h"
 
-extern "C" bool fn_80273B00();
 
 bool lbl_806DC4F0 = true;
 float lbl_806DC4F4 = 1.0f;
@@ -105,13 +105,13 @@ GameplayCamera::GameplayCamera()
 
 void GameplayCamera::Update(float deltaTime)
 {
-    m_bDynamicZoom = GameInfoManager::Instance()->mVisualOptions.mIsAutoZoomCamera;
-    m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mVisualOptions.mCameraZoomLevel;
+    m_bDynamicZoom = GameInfoManager::Instance()->mUserInfo.mVisualOptions.mIsAutoZoomCamera;
+    m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel;
 
     bool gamePaused = nlTaskManager::m_pInstance->mCurrentState == 1
                    || nlTaskManager::m_pInstance->mCurrentState == 32;
 
-    if (fn_80273B00())
+    if (IsWidescreen())
     {
         m_nearZoom.m_CameraData = gCameraData + 2;
         m_farZoom.m_CameraData = gCameraData + 3;

@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern "C" bool fn_8025BD88();
 
 extern int lbl_80519920[12];
 
@@ -83,13 +82,13 @@ void NetMessageDraftPickedSidekicks::Serialize(
     serializer->Transfer(&mSidekick2, sizeof(mSidekick2));
 }
 
-void NetworkMessageType25_8050B778::Serialize(
+void NetMessageSidesChanged::Serialize(
     UnidentifiedMessageSerializer* serializer)
 {
-    serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
-    serializer->Transfer(&mUnidentified09, sizeof(mUnidentified09));
-    serializer->Transfer(&mUnidentified0A, sizeof(mUnidentified0A));
-    serializer->Transfer(&mUnidentified0B, sizeof(mUnidentified0B));
+    serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
+    serializer->Transfer(&mSide, sizeof(mSide));
+    serializer->Transfer(&mIsGuest, sizeof(mIsGuest));
+    serializer->Transfer(&mIsResponse, sizeof(mIsResponse));
 }
 
 void NetMessageCheckConnection::Serialize(
@@ -111,12 +110,12 @@ void NetworkMessageType27_8050B750::Serialize(
 NetworkMessageType22_8050B7B4::~NetworkMessageType22_8050B7B4() { }
 NetMessageDraftPickedCaptain::~NetMessageDraftPickedCaptain() { }
 NetMessageDraftPickedSidekicks::~NetMessageDraftPickedSidekicks() { }
-NetworkMessageType25_8050B778::~NetworkMessageType25_8050B778() { }
+NetMessageSidesChanged::~NetMessageSidesChanged() { }
 NetworkMessageType27_8050B750::~NetworkMessageType27_8050B750() { }
 
 int NetworkMessageType27_8050B750::GetType() { return 27; }
 int NetMessageCheckConnection::GetType() { return 26; }
-int NetworkMessageType25_8050B778::GetType() { return 25; }
+int NetMessageSidesChanged::GetType() { return 25; }
 int NetMessageDraftPickedSidekicks::GetType() { return 24; }
 int NetMessageDraftPickedCaptain::GetType() { return 23; }
 int NetworkMessageType22_8050B7B4::GetType() { return 22; }

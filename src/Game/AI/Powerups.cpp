@@ -6,7 +6,7 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
-#include "Game/DB/tu_8010A40C.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/EventDataTypes.h"
@@ -1124,9 +1124,9 @@ void PowerupBase::Update(float dt)
  */
 int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
 {
-    if ((!GameInfoManager::Instance()->GetCurrentSettings()->unknown_0x14
+    if ((!GameInfoManager::Instance()->GetCurrentSettings()->HomePowerUps
             && pTeam->m_nSide == 0)
-        || (!GameInfoManager::Instance()->GetCurrentSettings()->unknown_0x15
+        || (!GameInfoManager::Instance()->GetCurrentSettings()->AwayPowerUps
             && pTeam->m_nSide == 1)
         || GameInfoManager::Instance()->IsRule0x0Equal11())
     {
@@ -1495,7 +1495,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
         if (g_pGame->m_eGameState == (eGameState)1
             && GameInfoManager::Instance()->IsInMode4())
         {
-            int mode = lbl_806E0FA0->mCurrentChallenge;
+            int mode = g_pStrikerChallenge->mCurrentChallenge;
             if (!(mode != 6 && mode != 7))
             {
                 return powerUpType;

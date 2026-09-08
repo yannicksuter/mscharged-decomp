@@ -628,7 +628,7 @@ void fn_80273AF8(bool widescreen)
     sWidescreen = widescreen;
 }
 
-extern "C" bool fn_80273B00()
+bool IsWidescreen()
 {
     return sWidescreen;
 }

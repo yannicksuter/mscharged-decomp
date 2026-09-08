@@ -3,6 +3,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSmallBlockAllocator.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 extern "C"
 {

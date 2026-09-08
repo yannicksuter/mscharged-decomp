@@ -3,9 +3,9 @@
 #include "Game/Sys/audio.h"
 
 static bool mIsEnabled = true;
-static int sUnidentifiedAudioCategory = 0x15;
+static int sSoundCategory = 0x15;
 
-extern "C" void fn_801CBC54(
+void FEAudio::PlaySound(
     int slotId,
     unsigned long cueId,
     const void* debugName,
@@ -16,11 +16,11 @@ extern "C" void fn_801CBC54(
         return;
     }
 
-    PlaySound(
+    ::PlaySound(
         slotId, cueId, debugName != 0 ? debugName : "FESFX", context);
 }
 
-extern "C" void fn_801CBC78(
+void FEAudio::PlayTrackedSound(
     int slotId,
     unsigned long cueId,
     const void* debugName,
@@ -31,11 +31,11 @@ extern "C" void fn_801CBC78(
         return;
     }
 
-    PlayTrackedSound(
+    ::PlayTrackedSound(
         slotId, cueId, debugName != 0 ? debugName : "FESFX", context, true);
 }
 
-extern "C" void fn_801CBCA0(
+void FEAudio::PlayAnimAudioEvent(
     unsigned long cueId,
     const void* debugName,
     void* context,
@@ -46,23 +46,23 @@ extern "C" void fn_801CBCA0(
         return;
     }
 
-    PlayTrackedSound(sUnidentifiedAudioCategory, cueId,
+    ::PlayTrackedSound(sSoundCategory, cueId,
         debugName != 0 ? debugName : "FESFX", context, restartable);
 }
 
-extern "C" void fn_801CBCE4(unsigned long cueId, void* context)
+void FEAudio::StopAnimAudioEvent(unsigned long cueId, void* context)
 {
-    StopSound(cueId, context);
+    ::StopSound(cueId, context);
 }
 
-extern "C" void fn_801CBCE8(unsigned long cueId, void* context)
+void FEAudio::PauseSound(unsigned long cueId, void* context)
 {
-    PauseSound(cueId, context);
+    ::PauseSound(cueId, context);
 }
 
-extern "C" void fn_801CBCEC(unsigned long cueId, void* context)
+void FEAudio::ResumeSound(unsigned long cueId, void* context)
 {
-    ResumeSound(cueId, context);
+    ::ResumeSound(cueId, context);
 }
 
 void FEAudio::EnableSounds(bool enable)
@@ -70,12 +70,12 @@ void FEAudio::EnableSounds(bool enable)
     mIsEnabled = enable;
 }
 
-extern "C" void fn_801CBCF8(int category)
+void FEAudio::SetSoundCategory(int category)
 {
-    sUnidentifiedAudioCategory = category;
+    sSoundCategory = category;
 }
 
-extern "C" bool fn_801CBD00(unsigned long cueId, void* context)
+bool FEAudio::IsSoundFinished(unsigned long cueId, void* context)
 {
     XSoundHandle* handle = FindSoundHandle(cueId, context);
     if (handle == 0)

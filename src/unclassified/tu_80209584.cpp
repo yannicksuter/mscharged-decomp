@@ -13,8 +13,6 @@ extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
-extern "C" TLInstance* fn_8030677C(FEPresentation* pPresentation, unsigned long Level1, unsigned long Level2,
-    unsigned long Level3, unsigned long Level4, unsigned long Level5, unsigned long Level6);
 
 static const unsigned short* LookupSummaryLocString(const char* id)
 {
@@ -49,7 +47,7 @@ void TU80209584Summary::fn_802095D0(const TU80209584StatsSource* home, const TU8
     mTeamB = away->mTeam;
     mStatsB = away->mStats;
 
-    TLInstance* pSummary = fn_8030677C(mPresentation, nlStringLowerHash("game summary"), nlStringLowerHash("Layer"), nlStringLowerHash("game summary"), 0, 0, 0);
+    TLInstance* pSummary = FEFindInstance(mPresentation, nlStringLowerHash("game summary"), nlStringLowerHash("Layer"), nlStringLowerHash("game summary"), 0, 0, 0);
 
     unsigned long subHash = 0;
     const TU80209584Stats* stats[2] = { &mStatsA, &mStatsB };
@@ -133,7 +131,7 @@ void TU80209584Summary::fn_802095D0(const TU80209584StatsSource* home, const TU8
         "captain_petey_s",
     };
 
-    TLImageInstance* pTexture = (TLImageInstance*)fn_8030677C(mPresentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(CAPTAIN_TEXTURES[mTeamA]), 0, 0, 0);
+    TLImageInstance* pTexture = (TLImageInstance*)FEFindInstance(mPresentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(CAPTAIN_TEXTURES[mTeamA]), 0, 0, 0);
     if (pTexture->m_pTextureResource != 0)
     {
         ((TLImageInstance*)pIcon)->m_pTextureResource = pTexture->m_pTextureResource;
@@ -142,7 +140,7 @@ void TU80209584Summary::fn_802095D0(const TU80209584StatsSource* home, const TU8
     pIconComponent = (TLComponentInstance*)FEFinder<TLComponentInstance, 4>::_Find(pSummary, nlStringLowerHash("team_icon_right"), 0, 0, 0, 0, 0);
     pIcon = FEFinder<TLInstance, 3>::_Find(pIconComponent->GetActiveSlide(), nlStringLowerHash("team_icon"), subHash, 0, 0, 0, 0);
 
-    pTexture = (TLImageInstance*)fn_8030677C(mPresentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(CAPTAIN_TEXTURES[mTeamB]), 0, 0, 0);
+    pTexture = (TLImageInstance*)FEFindInstance(mPresentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(CAPTAIN_TEXTURES[mTeamB]), 0, 0, 0);
     if (pTexture->m_pTextureResource != 0)
     {
         ((TLImageInstance*)pIcon)->m_pTextureResource = pTexture->m_pTextureResource;

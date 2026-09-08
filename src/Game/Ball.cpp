@@ -45,6 +45,7 @@
 #include "unclassified/tu_801A5F10.h"
 #include "Game/DB/StadiumInfo.h"
 #include "unclassified/tu_80276264.h"
+#include "NL/nlstring_tmpl.h"
 
 struct UnidentifiedBallRuntime
 {

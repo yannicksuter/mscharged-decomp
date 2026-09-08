@@ -2,10 +2,38 @@
 #define NL_PLAT_PLATPADMANAGER_H
 
 #include "NL/plat/PlatPadStatus.h"
-#include "Game/PadActions.h"
+#include "NL/platpad.h"
+#include "Game/Event.h"
+
+class PadDeviceChangedEvent : public UnidentifiedStaticEvent3<int, int, int, 5>
+{
+public:
+    PadDeviceChangedEvent()
+        : UnidentifiedStaticEvent3<int, int, int, 5>("DeviceChanged", -1)
+    {
+    }
+
+    virtual ~PadDeviceChangedEvent() { }
+};
 
 struct PlatPadManager
 {
+    PlatPadManager()
+        : disableFreestyle(false)
+        , disableClassic(false)
+        , deviceChanged()
+    {
+    }
+
+    void Initialize();
+    void UpdateChannel(int channel);
+    void UpdateDPD(int channel, unsigned int deviceType);
+    WiiRemotePadStatus* GetRemoteStatus(int channel);
+    WiiFreestylePadStatus* GetFreestyleStatus(int channel);
+    WiiClassicPadStatus* GetClassicStatus(int channel);
+    void SetDPDEnabled(int channel, bool enabled);
+    bool IsDPDEnabled(int channel) const;
+
     PlatPadStatus status[WPAD_MAX_CONTROLLERS];
     bool connected[WPAD_MAX_CONTROLLERS];
     int type[WPAD_MAX_CONTROLLERS];
@@ -15,7 +43,7 @@ struct PlatPadManager
     bool dpdActive[WPAD_MAX_CONTROLLERS];
     bool dataFormatSet[WPAD_MAX_CONTROLLERS];
     unsigned char padding[2];
-    DeviceChangedEvent_80137B40 deviceChanged;
+    PadDeviceChangedEvent deviceChanged;
 };
 
 #endif // NL_PLAT_PLATPADMANAGER_H

@@ -28,10 +28,6 @@ static MovieRenderCallback s_movieRenderCallback;
 static const unsigned long grabTex = nlStringLowerHash("target/grab_texture");
 static const unsigned long movieTex = nlStringLowerHash("movie");
 
-extern "C" float fn_80302210(const TLInstance* instance);
-extern "C" float fn_80302230(const TLInstance* instance);
-extern "C" float fn_80302250(const TLInstance* instance);
-extern "C" float fn_80302270(const TLInstance* instance);
 
 void FERender::Initialize()
 {
@@ -258,11 +254,11 @@ unsigned char FERender::RenderImageInstance(const TLImageInstance* pTLImageInsta
     unsigned long textureHandle = pTexRes->GetTextureHandle();
     float halfPixelU = 0.5f / (float)pTexRes->m_uWidth;
     float halfPixelV = 0.5f / (float)pTexRes->m_uHeight;
-    float left = fn_80302210(pTLImageInstance);
-    float top = fn_80302230(pTLImageInstance);
-    float bottom = 1.0f - (fn_80302270(pTLImageInstance) + top);
-    float right = left + fn_80302250(pTLImageInstance);
-    top = 1.0f - fn_80302230(pTLImageInstance);
+    float left = pTLImageInstance->GetUVX();
+    float top = pTLImageInstance->GetUVY();
+    float bottom = 1.0f - (pTLImageInstance->GetUVHeight() + top);
+    float right = left + pTLImageInstance->GetUVWidth();
+    top = 1.0f - pTLImageInstance->GetUVY();
 
     glSetDefaultState(false);
     glSetRasterState(GLS_Culling, 0);

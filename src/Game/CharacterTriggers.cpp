@@ -30,6 +30,7 @@
 #include "Game/AI/Desire.h"
 #include "Game/Effects/EffectsGroup.h"
 #include "Game/TweakValue.h"
+#include "NL/nlstring_tmpl.h"
 
 extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);

@@ -11,6 +11,7 @@
 
 #include <cstring>
 #include <stdlib.h>
+#include "NL/nlstring_tmpl.h"
 
 typedef Config::String BString;
 

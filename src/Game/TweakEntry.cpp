@@ -2,6 +2,7 @@
 
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 nlSlotPoolFixed<0x2C> lbl_8057C734(0x20);
 

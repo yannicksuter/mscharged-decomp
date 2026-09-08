@@ -1,6 +1,8 @@
 #ifndef NL_STRING_TMPL_H
 #define NL_STRING_TMPL_H
 
+#include "NL/nlString.h"
+
 template <typename CharT>
 CharT nlToUpper(CharT value);
 

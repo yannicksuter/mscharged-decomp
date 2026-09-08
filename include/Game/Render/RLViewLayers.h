@@ -8,6 +8,8 @@
 #include "NL/nlMath.h"
 #include "types.h"
 
+bool IsWidescreen();
+
 class RLViewCamera : public GLViewInterface
 {
 public:

@@ -14,6 +14,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/gl/glTexture.h"
+#include "NL/nlstring_tmpl.h"
 
 struct PendingResourceLoad
 {
@@ -31,8 +32,6 @@ struct PermanentBundleLoadState
     /* 0x14 */ unsigned long field_0x14;
 };
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 extern int nlPrintf(const char* format, ...);
 
 static nlAVLTreeSlotPool<unsigned long, FEResourceHandle*, DefaultKeyCompare<unsigned long> > s_loadedResourceList(0x200, 0);
@@ -126,7 +125,7 @@ void FEResourceManager::fn_802FC9C4(void* buffer, unsigned long uReadSize, unsig
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;
     unsigned long textureHandle = pTextureResource->m_hashID;
-    pTextureResource->fn_8030009C(textureHandle);
+    pTextureResource->SetTextureHandle(textureHandle);
     FEResourceManager::Instance()->AddResourceToResourceList(pTextureResource);
     pTextureResource->m_bValid = true;
     fn_802FC858(state);
@@ -286,7 +285,7 @@ void FEResourceManager::LoadPermanentTextures()
                 delete[] s_pResourceLoadBuffer;
                 s_pResourceLoadBuffer = 0;
                 unsigned long textureHandle = pTextureResource->m_hashID;
-                pTextureResource->fn_8030009C(textureHandle);
+                pTextureResource->SetTextureHandle(textureHandle);
                 AddResourceToResourceList(pTextureResource);
                 pTextureResource->m_bValid = true;
                 delete[] s_pResourceLoadBuffer;
@@ -419,7 +418,7 @@ void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSi
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;
     unsigned long textureHandle = pHandle->m_hashID;
-    pHandle->fn_8030009C(textureHandle);
+    pHandle->SetTextureHandle(textureHandle);
     FEResourceManager::Instance()->AddResourceToResourceList(pHandle);
     pHandle->m_bValid = true;
 }
@@ -487,7 +486,7 @@ ResourceResult FEResourceManager::IssueTextureLoadRequest(FETextureResource* pFe
         && pFeExistingTextureResource->GetResourceType() == pFeTextureResource->GetResourceType())
     {
         unsigned long textureHandle = pFeExistingTextureResource->GetTextureHandle();
-        pFeTextureResource->fn_8030009C(textureHandle);
+        pFeTextureResource->SetTextureHandle(textureHandle);
         pFeTextureResource->m_bValid = pFeExistingTextureResource->m_bValid;
         return FERR_AlreadyLoaded;
     }

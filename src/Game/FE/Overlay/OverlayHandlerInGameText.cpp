@@ -1,4 +1,6 @@
 #include "Game/OverlayHandlerInGameText.h"
+#include "Game/FE/feHelpFuncs.h"
+#include "Game/Render/RLViewLayers.h"
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/DB/BasicGameInfo.h"
@@ -22,22 +24,17 @@
 #include "NL/nlTask.h"
 
 extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
-extern "C" TLInstance* fn_8030677C(FEPresentation* pPresentation, unsigned long Level1,
-    unsigned long Level2, unsigned long Level3, unsigned long Level4,
-    unsigned long Level5, unsigned long Level6);
-extern "C" int fn_80273B00();
 extern "C" void fn_801E230C(
     BaseGameSceneManager* manager, SceneList scene, bool visibility,
     bool overrideStateSettings);
 extern BaseGameSceneManager* g_pOverlayManager;
 
-const char* GetLOCTeamName(eTeamID team);
 
 template <typename T>
 static inline T* FindInPresentation(FEPresentation* presentation,
     unsigned long Level1, unsigned long Level2, unsigned long Level3)
 {
-    TLInstance* result = fn_8030677C(
+    TLInstance* result = FEFindInstance(
         presentation, Level1, Level2, Level3, 0, 0, 0);
     if (result == 0)
     {
@@ -130,7 +127,7 @@ void InGameTextOverlay::Update(float fDeltaT)
     if (mCurrentSlideName != mPendingSlideName)
     {
         mCurrentSlideName = mPendingSlideName;
-        if (mCurrentSlideName == SLIDE_NAME_TEXT_REPLAY && fn_80273B00() == 0)
+        if (mCurrentSlideName == SLIDE_NAME_TEXT_REPLAY && IsWidescreen() == 0)
         {
             mPresentation->SetActiveSlide("REPLAY 4:3", true);
         }

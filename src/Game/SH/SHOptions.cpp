@@ -1,4 +1,7 @@
+#include "Game/SH/SHNavigation.h"
+#include "Game/GameSceneManager.h"
 #include "Game/SH/SHOptions.h"
+#include "Game/FE/FEAudio.h"
 
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
@@ -8,19 +11,10 @@
 #include "Game/Render/Presentation.h"
 #include "NL/nlBind.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_802196B0.h"
+#include "Game/FE/feDPD.h"
 
-extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" Presentation* fn_801FEEAC();
-class TU80252180Scene;
-extern "C" void fn_80253474(TU80252180Scene* scene);
-extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
-extern "C" TLComponentInstance* fn_80253D70(TU80252180Scene* scene, int value);
-extern "C" TU80252180Scene* fn_80253E18();
+class SHNavigation;
 
-extern TLComponentInstance* lbl_80578450[4];
-extern BaseGameSceneManager* lbl_806E1838;
-extern int lbl_806E18B0;
 
 void BaseSceneHandler::SceneCreated()
 {
@@ -35,7 +29,7 @@ OptionsScene::OptionsScene()
     mUnidentified28[0].mContext = (void*)0;
     mUnidentified28[1].mContext = (void*)1;
     mUnidentified28[2].mContext = (void*)2;
-    mUnidentified244.fn_801D2BE0(false);
+    mUnidentified244.SetPopScene(false);
 }
 
 OptionsScene::~OptionsScene()
@@ -44,7 +38,7 @@ OptionsScene::~OptionsScene()
 
 void OptionsScene::fn_801D2A08(int, void* context)
 {
-    TU80300104Event event;
+    FEPointerEvent event;
     for (int i = 0; i < 3; ++i)
     {
         mUnidentified28[i].mDisabled = true;
@@ -56,19 +50,19 @@ void OptionsScene::fn_801D2A08(int, void* context)
 
     for (int i = 0; i < 4; ++i)
     {
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
     }
 
-    fn_801CBCA0(0xF0AFD586, 0, 0, 1);
+    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
 
     switch ((int)context)
     {
     case 1:
-        fn_801CBCA0(0x304FDD1E, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
         mUnidentified324 = (SceneList)14;
         break;
     case 0:
-        fn_801CBCA0(0x304FDD1E, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
         mUnidentified324 = (SceneList)15;
         break;
     case 3:
@@ -78,10 +72,10 @@ void OptionsScene::fn_801D2A08(int, void* context)
 
     mUnidentified320 = 2;
 
-    TU80252180Scene* object = fn_80253E18();
+    SHNavigation* object = GetNavigationScene();
     if (object != 0)
     {
-        fn_80253474(object);
+        object->HideButtons();
     }
 
     mPresentation->SetActiveSlide("out", true);
@@ -116,18 +110,18 @@ void OptionsScene::SceneCreated()
         0);
 
     TLComponentInstance* screen = 0;
-    TU80252180Scene* object = fn_80253E18();
+    SHNavigation* object = GetNavigationScene();
     if (object != 0)
     {
-        fn_80253474(object);
-        screen = fn_80253D70(object, 4);
+        object->HideButtons();
+        screen = object->GetButton(4);
     }
-    mUnidentified244.fn_8022F194(screen);
-    mUnidentified244.fn_801D2BE8(false);
+    mUnidentified244.SetButtonInstance(screen);
+    mUnidentified244.SetPushBackScene(false);
 
     for (int i = 0; i < 4; ++i)
     {
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
     }
     FEMusic::StartStreamIfDifferent(1);
 }
@@ -143,30 +137,30 @@ void OptionsScene::Update(float fDeltaT)
         {
             for (int i = 0; i < 4; ++i)
             {
-                lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+                gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
             }
             return;
         }
 
         if (mUnidentified320 == 0)
         {
-            TU80252180Scene* object = fn_80253E18();
+            SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
-                fn_802534BC(object, 4, true);
+                object->SetButtons(4, true);
             }
             mUnidentified320 = 1;
         }
         else if (mUnidentified320 == 2)
         {
-            lbl_806E1838->Push(mUnidentified324, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(mUnidentified324, SCREEN_NOTHING, true);
             return;
         }
         else if (mUnidentified320 == 3)
         {
-            fn_801CBCA0(0x4430B152, 0, 0, 1);
-            fn_801FEEAC()->Call("TransitionOptionsToMainMenu");
-            lbl_806E1838->Pop();
+            FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
+            Presentation::GetInstance()->Call("TransitionOptionsToMainMenu");
+            GameSceneManager::Instance()->Pop();
             return;
         }
     }
@@ -179,27 +173,27 @@ void OptionsScene::Update(float fDeltaT)
 
     for (int i = 0; i < 4; ++i)
     {
-        if (i != lbl_806E18B0)
+        if (i != gFEControllerIndex)
         {
-            lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
             continue;
         }
 
-        lbl_80578450[i]->SetActiveSlide("cursor", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
 
         bool valid = true;
-        TU80300104Event event;
+        FEPointerEvent event;
         event.mIndex = i;
-        event.mPosition = fn_802197FC(i, (u8*)&valid);
-        event.mFlag0 = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 0x1E, true, 0);
+        event.mPosition = GetPointerPosition(i, (u8*)&valid);
+        event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 0x1E, true, 0);
 
-        if (mUnidentified244.fn_8022F2E0(event, fDeltaT))
+        if (mUnidentified244.UpdateBackButton(event, fDeltaT))
         {
             mUnidentified320 = 3;
-            TU80252180Scene* object = fn_80253E18();
+            SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
-                fn_80253474(object);
+                object->HideButtons();
             }
             mPresentation->SetActiveSlide("out", true);
             mPresentation->Update(0.0f);
@@ -208,7 +202,7 @@ void OptionsScene::Update(float fDeltaT)
 
         for (int j = 0; j < 3; ++j)
         {
-            mUnidentified28[j].fn_80219608(&event);
+            mUnidentified28[j].HandlePointerEvent(&event);
         }
     }
 }
@@ -216,31 +210,31 @@ void OptionsScene::Update(float fDeltaT)
 void OptionsScene::fn_801D3098(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mUnidentified28[item].fn_802192FC(1, index))
+    if (!mUnidentified28[item].HasOtherPointerState(1, index))
     {
         mUnidentified1C[item]->SetActiveSlide("over", true, false);
-        mUnidentified28[item].mValues[index] = 1;
-        fn_801CBCA0(0xF6EB899E, 0, 0, 1);
+        mUnidentified28[item].SetPointerState(1, index);
+        FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
     }
 }
 
 void OptionsScene::fn_801D3148(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mUnidentified28[item].fn_802192FC(1, index))
+    if (!mUnidentified28[item].HasOtherPointerState(1, index))
     {
         mUnidentified1C[item]->SetActiveSlide("off", true, false);
-        mUnidentified28[item].mValues[index] = 0;
+        mUnidentified28[item].SetPointerState(0, index);
     }
 }
 
 void OptionsScene::fn_801D31E0()
 {
-    TU80300104Base::Callback over(
+    FEPointerListener::Callback over(
         Bind<void>(MemFun(&OptionsScene::fn_801D3098), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback off(
+    FEPointerListener::Callback off(
         Bind<void>(MemFun(&OptionsScene::fn_801D3148), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback select(
+    FEPointerListener::Callback select(
         Bind<void>(MemFun(&OptionsScene::fn_801D2A08), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 3; ++i)
@@ -254,10 +248,10 @@ void OptionsScene::fn_801D31E0()
             0,
             0,
             0);
-        mUnidentified28[i].fn_80300D74(
+        mUnidentified28[i].SetInstanceBounds(
             instance, true, position.f.x, position.f.y, 1.0f, 1.0f);
-        mUnidentified28[i].fn_803007C0(over);
-        mUnidentified28[i].fn_80300864(off);
-        mUnidentified28[i].fn_803009AC(select);
+        mUnidentified28[i].SetPointerEnterCallback(over);
+        mUnidentified28[i].SetPointerLeaveCallback(off);
+        mUnidentified28[i].SetPointerPressCallback(select);
     }
 }

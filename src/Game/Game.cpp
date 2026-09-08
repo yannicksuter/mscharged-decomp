@@ -10,6 +10,9 @@
 #include "Game/AI/AISandbox.h"
 #include "Game/AI/Powerups.h"
 #include "Game/AI/Scripts/ScriptCaching.h"
+#include "Game/AI/AvoidableObject.h"
+#include "Game/AI/FielderInput.h"
+#include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/Camera/tu_800F9460.h"
@@ -19,7 +22,7 @@
 #include "Game/Formation.h"
 #include "Game/GameInfo.h"
 #include "Game/DB/StatsTracker.h"
-#include "Game/DB/tu_8010A40C.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/Goalie.h"
 #include "Game/Net.h"
 #include "Game/NetworkSession.h"
@@ -33,6 +36,13 @@
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Task/ParticleUpdateTask.h"
 #include "Game/Team.h"
+#include "Game/Terrain.h"
+#include "Game/CrowdRiot.h"
+#include "Game/ScriptTuning.h"
+#include "Game/GameTweaks.h"
+#include "Game/TweakRegistry.h"
+#include "Game/Event.h"
+#include "Game/NetworkMessages.h"
 #include "NL/nlAlgorithm.h"
 #include "NL/nlConfig.h"
 #include "NL/nlMain.h"
@@ -97,6 +107,7 @@ struct UnidentifiedRegistrationNode
 };
 
 extern "C" EventDispatcher* fn_800721C4();
+extern "C" void fn_8007214C(ShotAtGoalData* node);
 extern "C" bool fn_802B6AF8(
     const UnidentifiedGameRegion* param1, const nlVector2* param2);
 extern "C" int fn_800A9210(void* param1, int param2);
@@ -121,12 +132,16 @@ extern "C" bool fn_800EBBFC(
     int param1, unsigned long soundID, const void* name, void* context);
 extern "C" void fn_800EC12C(unsigned long soundID, void* context);
 extern "C" void fn_802F4E84(unsigned long* hash, int param2, int param3);
-extern "C" cGame* fn_800570B0(
-    cGame* game, void* param1, int param2, bool param3);
 extern "C" cTeam* fn_800A5D4C(cTeam* team, int side);
 extern "C" void fn_8031A02C(ScriptQuestionCache* cache);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" void fn_800EC2A4(unsigned long soundID, cGame* game);
+extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
+extern "C" void fn_800A9B78(void* param1);
+extern "C" void fn_800A9E48(int param1);
+extern "C" void fn_80061AF0();
+extern "C" void fn_80061AF4();
+extern "C" void fn_8005B330(nlVector3* pVector, float fXAxisTilt, float fYAxisTilt);
 
 extern UnidentifiedGameStatic lbl_8056B9A0;
 extern cPlayer* lbl_806E0C9C;
@@ -154,6 +169,16 @@ extern "C" const float lbl_806E3740;
 extern "C" const float lbl_806E3748;
 extern "C" const float lbl_806E376C;
 extern "C" const float lbl_806E3770;
+extern "C" const float lbl_806E3744;
+extern "C" const float lbl_806E3750;
+extern "C" const float lbl_806E3754;
+extern "C" const float lbl_806E3758;
+extern "C" const float lbl_806E375C;
+extern "C" const float lbl_806E3760;
+extern "C" const float lbl_806E3764;
+extern "C" const float lbl_806E3768;
+extern bool lbl_806E0C98;
+extern int lbl_806DBA68;
 
 static inline int GetUnidentifiedPlayerIndex(cPlayer* pPlayer)
 {
@@ -174,11 +199,7 @@ void fn_80056CF4(void* param1, int param2, bool param3)
 {
     ++lbl_806E2130;
 
-    cGame* game = static_cast<cGame*>(nlMalloc(0x10F4, 8, false));
-    if (game != 0)
-    {
-        game = fn_800570B0(game, param1, param2, param3);
-    }
+    cGame* game = new (nlMalloc(0x10F4, 8, false)) cGame(param1, param2, param3);
     g_pGame = game;
 
     cTeam* team = static_cast<cTeam*>(nlMalloc(0xF8, 8, false));
@@ -229,6 +250,78 @@ void fn_80056CF4(void* param1, int param2, bool param3)
     --lbl_806E2130;
     SetRenderWorldEffects(true);
     WorldDarkening::Instance().fn_801AF550();
+}
+
+cGame::cGame(void* param1, int param2, bool param3)
+    : mUnidentified0C0((bool*)mUnidentified0D0, 0, 0, 100)
+    , mUnidentified134((bool*)mUnidentified144, 0, 0, 16)
+{
+    mpTerrain = 0;
+    mUnidentified10DC = 0;
+    mUnidentified10E0 = 0;
+    m_eGameState = -1;
+
+    m_pPostResetClock = new (nlMalloc(sizeof(Clock), 8, false))
+        Clock(lbl_806E373C, lbl_806E3744, lbl_806E3748, 2, fn_80058ABC);
+    m_pPostResetClock->m_uParam1 = (unsigned long)this;
+
+    mpTerrain = new (nlMalloc(sizeof(Terrain), 8, false))
+        Terrain((int)param1);
+
+    void* mem28 = nlMalloc(28, 8, false);
+    if (mem28 != 0)
+    {
+        fn_800A9B78(mem28);
+    }
+    mUnidentified10DC = mem28;
+
+    fn_800A9E48(param2);
+
+    mUnidentified10E0 = new (nlMalloc(sizeof(CrowdRiot), 8, false))
+        CrowdRiot(param3);
+
+    m_pFuzzyTweaks = new (nlMalloc(sizeof(FuzzyTweaks), 8, false))
+        FuzzyTweaks("/ini/FuzzyTweaks.ini", "/Game/Fuzzy");
+
+    mUnidentified020 = false;
+    mUnidentified024 = 1;
+    mUnidentified028 = 0;
+    mUnidentified02C = 0;
+    mUnidentified030 = 0;
+    mUnidentified034 = 0;
+    mUnidentified038 = 0;
+    mUnidentified03C = 0;
+    mbCaptainShotToScoreOn = false;
+    mUnidentified041 = false;
+    mUnidentified042 = false;
+    m_pScorer = 0;
+    m_pAssister = 0;
+    m_pTeamTouch[0] = 0;
+    m_pTeamTouch[1] = 0;
+    m_pRandomPlayersArray[0] = 0;
+    m_pRandomPlayersArray[1] = 0;
+    m_pRandomPlayersArray[2] = 0;
+    m_pRandomPlayersArray[3] = 0;
+    m_pRandomPlayersArray[4] = 0;
+    m_pRandomPlayersArray[5] = 0;
+    m_pRandomPlayersArray[6] = 0;
+    m_pRandomPlayersArray[7] = 0;
+    m_pRandomPlayersArray[8] = 0;
+    m_pRandomPlayersArray[9] = 0;
+    mUnidentified07C = lbl_806E373C;
+    mUnidentified080 = lbl_806E373C;
+    mUnidentified084 = lbl_806E373C;
+    mUnidentified088 = lbl_806E3740;
+    mUnidentified08C = lbl_806E3748;
+    mUnidentified090 = lbl_806E3740;
+    mUnidentified094 = lbl_806E3748;
+    mUnidentified098 = lbl_806E373C;
+    mUnidentified09C = lbl_806E373C;
+    mUnidentified0A0 = lbl_806E373C;
+    mUnidentified0A4 = 0;
+    mUnidentified0A6 = 0;
+    mUnidentified0A8 = 0;
+    fn_8005B330((nlVector3*)&mUnidentified0AC, 0.0f, 136.0f);
 }
 
 void fn_80056EA8()
@@ -315,10 +408,10 @@ void cGame::fn_80058180()
         u8 buffer[50];
         s8 i;
         int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
-        int playerCount = GetNumMachines(g_pNetworkSessionBase);
+        int playerCount = g_pNetworkSessionBase->GetNumMachines();
         for (i = 0; i < playerCount; i++)
         {
-            if (i != fn_80338C20(g_pNetworkSessionBase))
+            if (i != g_pNetworkSessionBase->GetLocalMachineId())
             {
                 g_pNetworkSessionBase->Send(i, buffer, size, true);
             }
@@ -404,7 +497,7 @@ void cGame::fn_80058498(bool param1, int param2, int param3)
 
 void cGame::fn_80058528(float timeScale, float transitionTime)
 {
-    if (GetNumMachines(g_pNetworkSessionBase) > 1 && timeScale < lbl_806E376C)
+    if (g_pNetworkSessionBase->GetNumMachines() > 1 && timeScale < lbl_806E376C)
     {
         timeScale = lbl_806E376C;
     }
@@ -413,7 +506,7 @@ void cGame::fn_80058528(float timeScale, float transitionTime)
     {
         if (g_pGame->m_eGameState != 4)
         {
-            if (GameInfoManager::Instance()->GetCurrentSettings()->unknown_0x04 == 0)
+            if (GameInfoManager::Instance()->GetCurrentSettings()->WinBy == 0)
             {
                 m_pGameClock->Stop();
             }
@@ -457,7 +550,7 @@ float cGame::GetGameTime()
 
 void cGame::fn_800586C0()
 {
-    if (GameInfoManager::Instance()->GetCurrentSettings()->unknown_0x04 == 0)
+    if (GameInfoManager::Instance()->GetCurrentSettings()->WinBy == 0)
     {
         m_pGameClock->Start();
     }
@@ -465,7 +558,7 @@ void cGame::fn_800586C0()
 
 void cGame::fn_80058704()
 {
-    if (GameInfoManager::Instance()->GetCurrentSettings()->unknown_0x04 == 0)
+    if (GameInfoManager::Instance()->GetCurrentSettings()->WinBy == 0)
     {
         m_pGameClock->Stop();
     }
@@ -711,7 +804,7 @@ extern "C" void fn_8005A7E8()
 {
     --lbl_806E2130;
 
-    if (fn_80338C20(g_pNetworkSessionBase) == 0
+    if (g_pNetworkSessionBase->GetLocalMachineId() == 0
         && !lbl_806E2164->mUnidentified004
         && lbl_806E2138->mFrameProvider->GetFrame() % 10 == 0)
     {
@@ -808,9 +901,9 @@ void cGame::ChangeGameState(int state)
         if (state == 3)
         {
             if ((GameInfoManager::Instance()->IsInMode4()
-                    && lbl_806E0FA0->mCondition == 2
+                    && g_pStrikerChallenge->mCondition == 2
                     && g_pTeams[1]->m_nScore > 0)
-                || (lbl_806E0FA0->mCurrentChallenge == 2
+                || (g_pStrikerChallenge->mCurrentChallenge == 2
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
             {
                 fn_800ED92C(0xEF3369E0);
@@ -844,6 +937,29 @@ void cGame::ChangeGameState(int state)
 
         InitGameState(state);
     }
+}
+
+void cGame::SendPauseGameEvent()
+{
+    mUnidentified49C.mEvent00.Queue(
+        (UnidentifiedEventNoData*)0, Function<UnidentifiedEventNoData*>());
+}
+
+void cGame::SendResumingGameEvent()
+{
+    mUnidentified49C.mEvent01.Queue(
+        (UnidentifiedEventNoData*)0, Function<UnidentifiedEventNoData*>());
+}
+
+void cGame::QueueChainNisEnd(ShotAtGoalData* data)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        g_ShotAtGoalDataPool.Free(data);
+        return;
+    }
+    mUnidentified49C.mEvent37.Queue(
+        data, Function<ShotAtGoalData*>(fn_8007214C));
 }
 
 extern "C" void fn_8005B330(
@@ -1148,3 +1264,5 @@ extern "C" char lbl_804FB390[] = "Sending SendMegaStrikeKillCursor at frame %d\n
 extern "C" char lbl_804FB3C0[] = "Sending MegaStrikeGoalie Side %d CurTarget %d Score %f at frame %d\n";
 extern "C" char lbl_804FB404[] = "Sending Slow Down End at frame %d\n";
 extern "C" char lbl_804FB66C[] = "Changing game state %d to %d at frame %d\n";
+
+#include "NL/nlBind_impl.h"

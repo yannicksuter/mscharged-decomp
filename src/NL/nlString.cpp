@@ -3,6 +3,7 @@
 #include "NL/nlString.h"
 
 #include <mem.h>
+#include "NL/nlstring_tmpl.h"
 
 u32 nlStringHash(const char* str)
 {

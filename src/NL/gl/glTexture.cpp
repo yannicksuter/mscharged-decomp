@@ -135,7 +135,7 @@ glTextureManager* glGetTextureManager()
     return gTextureManager;
 }
 
-void fn_802CDF14(unsigned long texture, PlatTexture* platformTexture,
+void glRegisterTexture(unsigned long texture, PlatTexture* platformTexture,
     void* allocator)
 {
     ResourceInterface_802CC094* resource = (ResourceInterface_802CC094*)allocator;

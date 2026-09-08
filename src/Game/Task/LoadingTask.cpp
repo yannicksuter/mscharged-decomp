@@ -1,13 +1,12 @@
 #include "Game/Task/LoadingTask.h"
 
 #include "NL/globalpad.h"
+#include "NL/platpad.h"
 
 #include "Game/AsyncLoading.h"
 #include "Game/Pad/FlickDetection.h"
 #include "types.h"
 
-extern void* g_pPlatPadManager;
-extern "C" void fn_8037537C(void*);
 extern bool g_e3_Build;
 extern bool g_bE3IdleReset;
 
@@ -22,7 +21,7 @@ void LoadingTask::Run(float dt)
     mElapsed += dt;
 
     g_pPadManager->SetActivePadSet(0);
-    fn_8037537C(g_pPlatPadManager);
+    UpdatePlatPad(g_pPlatPadManager);
     g_pPadManager->Update(dt);
     FlickDetection::Update();
 
@@ -46,7 +45,7 @@ void LoadingTask::Run(float dt)
     }
 }
 
-void LoadingTask::StateTransition(u32 from, u32 to)
+void LoadingTask::StateTransition(unsigned int from, unsigned int to)
 {
     if (to == 0x00100000 && from == 0x00010000)
     {

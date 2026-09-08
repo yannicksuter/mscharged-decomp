@@ -12,7 +12,7 @@ FETextureResource::FETextureResource()
     m_type = FERT_TEXTURE;
 }
 
-void FETextureResource::fn_8030009C(const unsigned long& textureReference)
+void FETextureResource::SetTextureHandle(const unsigned long& textureReference)
 {
     m_glTextureHandle = textureReference;
     if (glTextureLoad(textureReference))

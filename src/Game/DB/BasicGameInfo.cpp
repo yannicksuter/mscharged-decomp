@@ -3,6 +3,7 @@
 #include "Game/DB/CharacterInfo.h"
 #include "NL/nlString.h"
 #include "types.h"
+#include "NL/nlstring_tmpl.h"
 
 enum
 {

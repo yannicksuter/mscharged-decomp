@@ -13,7 +13,7 @@ int nlSNPrintf(char* buffer, unsigned long size, const char* format, ...)
     return result;
 }
 
-int fn_802AA91C(unsigned short* buffer, unsigned long size, const unsigned short* format, ...)
+int nlSNPrintf(unsigned short* buffer, unsigned long size, const unsigned short* format, ...)
 {
     va_list args;
     va_start(args, format);

@@ -38,6 +38,4 @@ public:
     /* 0x10A */ nlFont::ScissorBox m_ScissorRect;
 };
 
-extern TLTextInstance UnidentifiedFallbackTextInstance;
-
 #endif // _TLTEXTINSTANCE_H_

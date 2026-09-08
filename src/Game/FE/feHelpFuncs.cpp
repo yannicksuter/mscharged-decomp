@@ -1,6 +1,7 @@
 #include "Game/FE/feHelpFuncs.h"
 
 #include "Game/DB/CharacterInfo.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feModelManager.h"
@@ -10,7 +11,8 @@
 #include "Game/FE/tlTextInstance.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_80219248.h"
+#include "Game/FE/fePointerButton.h"
+#include "NL/nlstring_tmpl.h"
 
 static const char* ModeToStringName[10] = {
     "FRIENDLY",
@@ -25,47 +27,47 @@ static const char* ModeToStringName[10] = {
     "TOURNAMENT",
 };
 
-extern "C" const char* fn_801CBE28(int captain)
+const char* GetLOCCharacterName(eTeamID teamid)
 {
-    return GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).mDisplayNameKey;
+    return GetLOCTeamName(teamid);
 }
 
-extern "C" const char* fn_801CBE50(int captain)
+const char* GetLOCTeamName(eTeamID teamID)
 {
-    return GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).mDisplayNameKey;
+    return GetCharacterInfo(GetCharacterIndexFromCaptain(teamID)).mDisplayNameKey;
 }
 
-extern "C" int fn_801CBE78(int captain)
+eCharacterClass ConvertToCharacterClass(eTeamID teamID)
 {
-    return GetCharacterIndexFromCaptain(captain);
+    return (eCharacterClass)GetCharacterIndexFromCaptain(teamID);
 }
 
-extern "C" int fn_801CBE7C(int sidekick)
+eCharacterClass ConvertToCharacterClass(eSidekickID sidekickID)
 {
-    return GetCharacterIndexFromSidekick(sidekick);
+    return (eCharacterClass)GetCharacterIndexFromSidekick(sidekickID);
 }
 
-extern "C" const char* fn_801CBE80(int captain)
+const char* GetTeamName(eTeamID teamID)
 {
-    return GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).mName;
+    return GetCharacterInfo(GetCharacterIndexFromCaptain(teamID)).mName;
 }
 
-extern "C" const char* fn_801CBEA8(int sidekick)
+const char* GetSidekickName(eSidekickID sidekickID)
 {
-    return GetCharacterInfo(GetCharacterIndexFromSidekick(sidekick)).mName;
+    return GetCharacterInfo(GetCharacterIndexFromSidekick(sidekickID)).mName;
 }
 
-extern "C" int fn_801CBED0(const char* name)
+eTeamID ConvertToTeamID(const char* name)
 {
-    return GetCharacterInfo(GetCharacterIndexFromName(name)).mCaptainId;
+    return (eTeamID)GetCharacterInfo(GetCharacterIndexFromName(name)).mCaptainId;
 }
 
-extern "C" int fn_801CBEF8(const char* name)
+eSidekickID ConvertToSidekickID(const char* name)
 {
-    return GetCharacterInfo(GetCharacterIndexFromName(name)).mSidekickId;
+    return (eSidekickID)GetCharacterInfo(GetCharacterIndexFromName(name)).mSidekickId;
 }
 
-extern "C" int fn_801CBF20(const char* name)
+eStadiumID ConvertToStadiumID(const char* name)
 {
     int stadium = -1;
     for (int i = 0; i < 18; ++i)
@@ -76,10 +78,10 @@ extern "C" int fn_801CBF20(const char* name)
             break;
         }
     }
-    return stadium;
+    return (eStadiumID)stadium;
 }
 
-extern "C" const char* fn_801CBFF4(int mode)
+const char* GetLOCModeName(int mode)
 {
     return ModeToStringName[mode];
 }
@@ -93,7 +95,7 @@ void EnableAutoPressed()
     g_pFEInput->SetAutoRepeatParams(FE_ALL_PADS, 0xC, 0.7f, 0.3f);
 }
 
-extern "C" unsigned long fn_801CC090(int captain)
+unsigned long FECharacterSound::GetCaptainAcceptSound(eTeamID teamID)
 {
     static const unsigned long CHARACTER_ACCEPT_SOUNDS[12] = {
         0xC62D125A,
@@ -109,10 +111,10 @@ extern "C" unsigned long fn_801CC090(int captain)
         0xC58E5CB0,
         0xC6659569,
     };
-    return CHARACTER_ACCEPT_SOUNDS[captain];
+    return CHARACTER_ACCEPT_SOUNDS[teamID];
 }
 
-extern "C" unsigned long fn_801CC0A4(int sidekick)
+unsigned long FECharacterSound::GetSidekickAcceptSound(eSidekickID sidekickID)
 {
     static const unsigned long SIDEKICK_SOUNDS[8] = {
         0x441E2551,
@@ -124,7 +126,7 @@ extern "C" unsigned long fn_801CC0A4(int sidekick)
         0x7A095D6D,
         0xC175A6B2,
     };
-    return SIDEKICK_SOUNDS[sidekick];
+    return SIDEKICK_SOUNDS[sidekickID];
 }
 
 static unsigned long GetLargestFreeBlock()
@@ -159,20 +161,8 @@ void TakeGameMemSnapshot::ResetTimers()
     gTimeElapsed = 0.0f;
 }
 
-extern "C" bool fn_8011050C();
-extern "C" bool fn_801105B8();
-extern "C" bool fn_80110660();
-extern "C" bool fn_80110708();
-extern "C" bool fn_801107B0();
-extern "C" bool fn_80110858();
-extern "C" bool fn_80110900();
-extern "C" bool fn_801109A8();
-extern "C" bool fn_80110A50();
-extern "C" bool fn_80110AF8();
-extern "C" bool fn_80110BA0();
-extern "C" bool fn_80110C48();
 
-extern "C" bool fn_801CCE30(int cheat)
+bool IsPowerupCheatUnlocked(int cheat)
 {
     bool unlocked = true;
     switch (cheat)
@@ -186,64 +176,64 @@ extern "C" bool fn_801CCE30(int cheat)
     case 7:
     case 8:
     case 10:
-        unlocked = fn_80110858();
+        unlocked = IsPowerupCheatsUnlocked();
         break;
     case 11:
-        unlocked = fn_80110C48();
+        unlocked = IsButterfingersPlayerCheatUnlocked();
         break;
     case 9:
-        unlocked = fn_80110900();
+        unlocked = IsSuperPowerupsCheatUnlocked();
         break;
     }
     return unlocked;
 }
 
-extern "C" bool fn_801CCDB8(int cheat)
+bool IsPlayerCheatUnlocked(int cheat)
 {
     bool unlocked = true;
     switch (cheat)
     {
     case 1:
-        unlocked = fn_801109A8();
+        unlocked = IsDevastatingPlayerCheatUnlocked();
         break;
     case 2:
-        unlocked = fn_80110A50();
+        unlocked = IsSafePlayerCheatUnlocked();
         break;
     case 3:
-        unlocked = fn_80110AF8();
+        unlocked = IsSkillShotPlayerCheatUnlocked();
         break;
     case 4:
-        unlocked = fn_80110BA0();
+        unlocked = IsGlassJawPlayerCheatUnlocked();
         break;
     }
     return unlocked;
 }
 
-extern "C" bool fn_801CCD30(int cheat)
+bool IsEnvironmentCheatUnlocked(int cheat)
 {
     bool unlocked = true;
     switch (cheat)
     {
     case 1:
-        unlocked = fn_8011050C();
+        unlocked = IsSecureEnvironmentCheatUnlocked();
         break;
     case 2:
-        unlocked = fn_801105B8();
+        unlocked = IsPowerEnvironmentCheatUnlocked();
         break;
     case 3:
-        unlocked = fn_80110660();
+        unlocked = IsVoltageEnvironmentCheatUnlocked();
         break;
     case 4:
-        unlocked = fn_80110708();
+        unlocked = IsTiltEnvironmentCheatUnlocked();
         break;
     case 5:
-        unlocked = fn_801107B0();
+        unlocked = IsWhiteBallEnvironmentCheatUnlocked();
         break;
     }
     return unlocked;
 }
 
-extern "C" const char* fn_801CCC80(int cheat)
+const char* GetLOCPowerupCheatDescription(int cheat)
 {
     switch (cheat)
     {
@@ -274,7 +264,7 @@ extern "C" const char* fn_801CCC80(int cheat)
     }
 }
 
-extern "C" const char* fn_801CCBD0(int cheat)
+const char* GetLOCPowerupCheatName(int cheat)
 {
     switch (cheat)
     {
@@ -305,7 +295,7 @@ extern "C" const char* fn_801CCBD0(int cheat)
     }
 }
 
-extern "C" const char* fn_801CCB68(int cheat)
+const char* GetLOCPlayerCheatDescription(int cheat)
 {
     switch (cheat)
     {
@@ -322,7 +312,7 @@ extern "C" const char* fn_801CCB68(int cheat)
     }
 }
 
-extern "C" const char* fn_801CCB00(int cheat)
+const char* GetLOCPlayerCheatName(int cheat)
 {
     switch (cheat)
     {
@@ -339,7 +329,7 @@ extern "C" const char* fn_801CCB00(int cheat)
     }
 }
 
-extern "C" const char* fn_801CCA84(int cheat)
+const char* GetLOCEnvironmentCheatDescription(int cheat)
 {
     switch (cheat)
     {
@@ -358,7 +348,7 @@ extern "C" const char* fn_801CCA84(int cheat)
     }
 }
 
-extern "C" const char* fn_801CCA08(int cheat)
+const char* GetLOCEnvironmentCheatName(int cheat)
 {
     switch (cheat)
     {
@@ -377,65 +367,63 @@ extern "C" const char* fn_801CCA08(int cheat)
     }
 }
 
-static const float lbl_804E82F8[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
-static const float lbl_804E8308[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
+static const float sDoneButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
+static const float sPlayButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
 
-extern "C" void fn_801CC9B0(
-    TU80219248Component* component, TLComponentInstance*, int value)
+void SetDoneButtonBounds(
+    FEPointerButton* component, TLComponentInstance*, int value)
 {
     if (value)
     {
-        component->fn_801CD9D0(lbl_804E8308[0], lbl_804E8308[1],
-            lbl_804E8308[2], lbl_804E8308[3]);
+        component->SetBounds(sPlayButtonBounds[0], sPlayButtonBounds[1],
+            sPlayButtonBounds[2], sPlayButtonBounds[3]);
     }
     else
     {
-        component->fn_801CD9D0(lbl_804E82F8[0], lbl_804E82F8[1],
-            lbl_804E82F8[2], lbl_804E82F8[3]);
+        component->SetBounds(sDoneButtonBounds[0], sDoneButtonBounds[1],
+            sDoneButtonBounds[2], sDoneButtonBounds[3]);
     }
 }
 
-extern "C" void fn_801CC988(
-    TU80219248Component* component, TLComponentInstance*)
+void SetPlayButtonBounds(
+    FEPointerButton* component, TLComponentInstance*)
 {
-    component->fn_801CD9D0(lbl_804E8308[0], lbl_804E8308[1],
-        lbl_804E8308[2], lbl_804E8308[3]);
+    component->SetBounds(sPlayButtonBounds[0], sPlayButtonBounds[1],
+        sPlayButtonBounds[2], sPlayButtonBounds[3]);
 }
 
-extern "C" void fn_801CC864(FEModelHandle* model);
 
-static float lbl_806E1850;
+static float sCharacterIdleTime;
 
-extern "C" void fn_801CC888(float dt)
+void UpdateCharacterIdleAnimations(float dt)
 {
-    lbl_806E1850 += dt;
-    if (lbl_806E1850 >= 2.0f)
+    sCharacterIdleTime += dt;
+    if (sCharacterIdleTime >= 2.0f)
     {
-        lbl_806E1850 = 0.0f;
+        sCharacterIdleTime = 0.0f;
     }
 
-    if (lbl_806E1850 == 0.0f)
+    if (sCharacterIdleTime == 0.0f)
     {
         for (int i = 0; i < 2; ++i)
         {
             if (nlRandom(100, &nlDefaultSeed) < 25)
             {
-                FEModelHandle* model = fn_801C2FB4(
-                    FEModelManager::Instance(),
+                FEModelHandle* model = FEModelManager::Instance()->GetModel(
                     i == 0 ? "homemodel" : "awaymodel");
                 if (model != 0 && model->IsLoaded()
                     && model->IsPlayingAnimation("fe_idle"))
                 {
                     model->PlayAnimation(
                         "fe_idle_action_01", PM_HOLD, 0.2f, 0.0f, false);
-                    model->SetAnimationCompleteCallback(fn_801CC864);
+                    model->SetAnimationCompleteCallback(ResetCharacterIdleAnimation);
                 }
             }
         }
     }
 }
 
-extern "C" void fn_801CC864(FEModelHandle* model)
+void ResetCharacterIdleAnimation(FEModelHandle* model)
 {
     if (model != 0)
     {

@@ -1,6 +1,7 @@
 #include "revolution/os/OSTime.h"
 #include "Game/Sys/audio.h"
 #include "Game/Audio/GameStreams.h"
+#include "Game/Audio/AudioGlobals.h"
 
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Player.h"
@@ -9,7 +10,6 @@
 #include "NL/nlString.h"
 #include "unclassified/tu_80336B2C.h"
 
-void SetAudioEffectContext(unsigned long*, int);
 
 struct AudioControllerOwner
 {

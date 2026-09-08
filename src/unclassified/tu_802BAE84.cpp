@@ -11,6 +11,7 @@
 
 #include <stdarg.h>
 #include <string.h>
+#include "NL/nlstring_tmpl.h"
 
 static nlColour lbl_806DF2C8 = { 0xFF, 0xFF, 0xFF, 0xFF };
 static bool lbl_806DF2CC = true;

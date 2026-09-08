@@ -34,7 +34,7 @@ public:
     static void Startup(u32 initialState);
     static void AddTask(nlTask* task, u32 priority, u32 activeStates);
     static void RunAllTasks();
-    static void SetNextState(u32 nextState);
+    static void SetNextState(unsigned int nextState);
     static void SetTimeDilation(float timeDilation);
 
     static nlTaskManager* m_pInstance;

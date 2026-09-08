@@ -3,6 +3,7 @@
 
 #include "NL/nlDLRing.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 extern const float lbl_806E66B8;
 

@@ -1,15 +1,13 @@
 #include "unclassified/tu_80214DF8.h"
+#include "Game/FE/FEAudio.h"
 
-#include "Game/BaseGameSceneManager.h"
+#include "Game/GameSceneManager.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/NetworkStatsManager.h"
 #include "Game/Render/Presentation.h"
+#include "Game/FE/feDPD.h"
 
-extern BaseGameSceneManager* lbl_806E1838;
-extern TLComponentInstance* lbl_80578450[4];
 
-extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" Presentation* fn_801FEEAC();
 
 TU80214DF8Scene::TU80214DF8Scene()
     : mUnidentified30(false)
@@ -32,7 +30,7 @@ TU80214DF8Scene::TU80214DF8Scene()
         mUnidentified1064[i].mSpeakerEnabled = false;
     }
 
-    mUnidentified1920.fn_801D2BE0(false);
+    mUnidentified1920.SetPopScene(false);
 }
 
 TU80214DF8Scene::~TU80214DF8Scene()
@@ -41,7 +39,7 @@ TU80214DF8Scene::~TU80214DF8Scene()
 
 void TU80214DF8Scene::fn_80216048()
 {
-    fn_801CBCA0(0x375C885A, 0, 0, 1);
+    FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
     fn_802168A0();
 
     int categoryIndex = mUnidentified105C;
@@ -99,14 +97,14 @@ void TU80214DF8Scene::fn_80216838(int, void*)
 {
     for (int i = 0; i < 4; ++i)
     {
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
     }
 }
 
 void TU80214DF8Scene::fn_80216A90(int, void*)
 {
     mUnidentified1A44 = false;
-    lbl_806E1838->Pop();
-    fn_801CBCA0(0x4430B152, 0, 0, 1);
-    fn_801FEEAC()->Call("TransitionOnlineMatchToMainMenu");
+    GameSceneManager::Instance()->Pop();
+    FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
+    Presentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
 }

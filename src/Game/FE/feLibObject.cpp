@@ -1,6 +1,7 @@
 #include "Game/FE/feLibObject.h"
 
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 FELibObject::FELibObject()
 {
@@ -19,10 +20,10 @@ FELibObject::FELibObject()
     m_attributes.v3Pivot.f.x = 0.0f;
     m_attributes.v3Pivot.f.y = 0.0f;
     m_attributes.v3Pivot.f.z = 0.0f;
-    m_attributes.field_0x38 = 0.0f;
-    m_attributes.field_0x3C = 0.0f;
-    m_attributes.field_0x40 = 1.0f;
-    m_attributes.field_0x44 = 1.0f;
+    m_attributes.fUVX = 0.0f;
+    m_attributes.fUVY = 0.0f;
+    m_attributes.fUVWidth = 1.0f;
+    m_attributes.fUVHeight = 1.0f;
     m_attributes.bVisible = true;
 
     next = 0;
@@ -55,22 +56,22 @@ feVector3& FELibObject::GetScale() const
     return const_cast<feVector3&>(m_attributes.v3Scale);
 }
 
-float fn_803020BC(FELibObject* object)
+float FELibObject::GetUVX() const
 {
-    return object->m_attributes.field_0x38;
+    return m_attributes.fUVX;
 }
 
-float fn_803020C4(FELibObject* object)
+float FELibObject::GetUVY() const
 {
-    return object->m_attributes.field_0x3C;
+    return m_attributes.fUVY;
 }
 
-float fn_803020CC(FELibObject* object)
+float FELibObject::GetUVWidth() const
 {
-    return object->m_attributes.field_0x40;
+    return m_attributes.fUVWidth;
 }
 
-float fn_803020D4(FELibObject* object)
+float FELibObject::GetUVHeight() const
 {
-    return object->m_attributes.field_0x44;
+    return m_attributes.fUVHeight;
 }

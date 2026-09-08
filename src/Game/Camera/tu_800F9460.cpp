@@ -510,7 +510,7 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
     if (mRestoreTimeScale == true && mOwnsTimeScale == true
         && mTransitionTime <= 0.0f)
     {
-        if (fn_80338C20(g_pNetworkSessionBase) == 0
+        if (g_pNetworkSessionBase->GetLocalMachineId() == 0
             && lbl_806E2164[4] == 0)
         {
             g_pGame->fn_80059FC4();
@@ -675,7 +675,7 @@ void UnidentifiedCameraEffects::UpdateCameraFlags()
 
 void UnidentifiedCameraEffects::Reset()
 {
-    if (mOwnsTimeScale && fn_80338C20(g_pNetworkSessionBase) == 0
+    if (mOwnsTimeScale && g_pNetworkSessionBase->GetLocalMachineId() == 0
         && lbl_806E2164[4] == 0)
     {
         g_pGame->fn_80059FC4();

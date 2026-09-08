@@ -1,4 +1,7 @@
+#include "Game/HBMManager.h"
 #include "Game/SH/SHLoading.h"
+#include "Game/Render/RLViewLayers.h"
+#include "Game/FE/FEAudio.h"
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/BaseSceneHandler.h"
@@ -16,31 +19,16 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 
-extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" Presentation* fn_801FEEAC();
-extern "C" bool fn_801FF168(Presentation* presentation);
-extern "C" bool fn_80273B00();
-
-extern BaseGameSceneManager* g_pOverlayManager;
-
-struct LoadingFlowState
-{
-    unsigned char mPadding000[0x92];
-    bool mLoading;
-};
-
-extern LoadingFlowState* gpHBMManager;
-extern TLComponentInstance lbl_80580030;
 
 SuperLoadingScene::SuperLoadingScene()
     : mType(TT_INVALID)
 {
-    gpHBMManager->mLoading = true;
+    gpHBMManager->mBlocked = true;
 }
 
 SuperLoadingScene::~SuperLoadingScene()
 {
-    gpHBMManager->mLoading = false;
+    gpHBMManager->mBlocked = false;
 }
 
 void SuperLoadingScene::Update(float fDeltaT)
@@ -49,14 +37,14 @@ void SuperLoadingScene::Update(float fDeltaT)
 
     if (mType == TT_3D_TRANSITION)
     {
-        if (!fn_801FF168(fn_801FEEAC()))
+        if (!Presentation::GetInstance()->IsActive())
         {
             nlTaskManager::SetNextState(0x200000);
         }
     }
     else
     {
-        TLSlide* slide = mFEScene->m_pFEPackage->GetPresentation()->GetActiveSlide();
+        TLSlide* slide = mFEScene->m_pFEPackage->GetPresentation()->m_currentSlide;
         float duration = slide->m_duration;
         float start = slide->m_start;
         float time = slide->m_time;
@@ -74,61 +62,61 @@ void SuperLoadingScene::Update(float fDeltaT)
     }
 }
 
-LoadingScene_801CDB4C::LoadingScene_801CDB4C()
-    : mTransitionActive(false)
+AsyncLoadingScene::AsyncLoadingScene()
+    : mHomeButtonWarningActive(false)
     , mWidescreen(false)
 {
 }
 
-LoadingScene_801CDB4C::~LoadingScene_801CDB4C()
+AsyncLoadingScene::~AsyncLoadingScene()
 {
 }
 
-void LoadingScene_801CDB4C::Update(float dt)
+void AsyncLoadingScene::Update(float dt)
 {
     BaseSceneHandler::Update(dt);
 
-    if (mTransitionActive)
+    if (mHomeButtonWarningActive)
     {
-        TLSlide* slide = mTransitionComponent->GetActiveSlide();
+        TLSlide* slide = mHomeButtonWarning->GetActiveSlide();
         float duration = slide->m_duration;
         float start = slide->m_start;
         float time = slide->m_time;
         if (time >= start + duration)
         {
-            mTransitionComponent->m_bVisible = false;
-            mTransitionActive = false;
+            mHomeButtonWarning->m_bVisible = false;
+            mHomeButtonWarningActive = false;
         }
     }
 }
 
-LoadingScene_801CDC2C::LoadingScene_801CDC2C()
+WidescreenLoadingScene::WidescreenLoadingScene()
 {
 }
 
-LoadingScene_801CDC2C::~LoadingScene_801CDC2C()
+WidescreenLoadingScene::~WidescreenLoadingScene()
 {
 }
 
-void LoadingScene_801CDC2C::Update(float dt)
+void WidescreenLoadingScene::Update(float dt)
 {
     BaseSceneHandler::Update(dt);
 
-    if (mTransitionActive)
+    if (mHomeButtonWarningActive)
     {
-        TLSlide* slide = mTransitionComponent->GetActiveSlide();
+        TLSlide* slide = mHomeButtonWarning->GetActiveSlide();
         float duration = slide->m_duration;
         float start = slide->m_start;
         float time = slide->m_time;
         if (time >= start + duration)
         {
-            mTransitionComponent->m_bVisible = false;
-            mTransitionActive = false;
+            mHomeButtonWarning->m_bVisible = false;
+            mHomeButtonWarningActive = false;
         }
     }
 }
 
-extern "C" void fn_801CDFC8(void*, TLTextInstance* stadiumText)
+void WidescreenLoadingScene::SetStadiumText(TLTextInstance* stadiumText)
 {
     const char* stringID = GetStadiumTickerStringID(GameInfoManager::Instance()->GetStadium());
     stadiumText->SetStringId(stringID);
@@ -136,9 +124,9 @@ extern "C" void fn_801CDFC8(void*, TLTextInstance* stadiumText)
 
 static inline TLTextInstance* FindLoadingText(FEPresentation* presentation, const char* name)
 {
-    TLTextInstance* text = (TLTextInstance*)fn_8030677C(
+    TLTextInstance* text = (TLTextInstance*)FEFindInstance(
         presentation, nlStringLowerHash("Layer"), nlStringLowerHash(name), 0, 0, 0, 0);
-    return text != 0 ? text : &UnidentifiedFallbackTextInstance;
+    return text != 0 ? text : &gDefaultTLTextInstance;
 }
 
 void SuperLoadingScene::SceneCreated()
@@ -157,72 +145,72 @@ void SuperLoadingScene::SceneCreated()
         pres->SetActiveSlide("3dtransition", true);
 
         GameInfoManager* gameInfo = GameInfoManager::Instance();
-        if (gameInfo->unknown_0x120)
+        if (gameInfo->mIsOnlineMode)
         {
             if (gameInfo->mCurrentMode == 0)
             {
-                fn_801CBCA0(0x7FEC4468, 0, 0, 1);
-                fn_801FEEAC()->Call("StartOnlineGrudgeMatchSequence");
+                FEAudio::PlayAnimAudioEvent(0x7FEC4468, 0, 0, 1);
+                Presentation::GetInstance()->Call("StartOnlineGrudgeMatchSequence");
             }
             else if (NetTournManager::Instance()->mState != 0)
             {
-                fn_801FEEAC()->Call("TransitionOnlineTournamentToGame");
+                Presentation::GetInstance()->Call("TransitionOnlineTournamentToGame");
             }
         }
         else if (gameInfo->mCurrentMode == 0)
         {
-            fn_801FEEAC()->Call("StartGrudgeMatchSequence");
+            Presentation::GetInstance()->Call("StartGrudgeMatchSequence");
         }
         else if (gameInfo->mCurrentMode == 3)
         {
-            fn_801FEEAC()->Call("StartCupMatchSequence");
+            Presentation::GetInstance()->Call("StartCupMatchSequence");
         }
     }
 }
 
-void LoadingScene_801CDB4C::SceneCreated()
+void AsyncLoadingScene::SceneCreated()
 {
     TLInstance* transitionComponent
         = FEFinder<TLComponentInstance, 2>::_Find<TLSlide>(
-            mPresentation->GetActiveSlide(), nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0, 0);
+            mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0, 0);
     if (transitionComponent == 0)
     {
-        transitionComponent = &lbl_80580030;
+        transitionComponent = &gDefaultTLComponentInstance;
     }
-    mTransitionComponent = (TLComponentInstance*)transitionComponent;
-    mTransitionComponent->m_bVisible = false;
+    mHomeButtonWarning = (TLComponentInstance*)transitionComponent;
+    mHomeButtonWarning->m_bVisible = false;
 
-    if (fn_80273B00())
+    if (IsWidescreen())
     {
         mWidescreen = true;
-        mTransitionComponent->SetActiveSlide("widescreen", true, false);
+        mHomeButtonWarning->SetActiveSlide("widescreen", true, false);
     }
 
-    gpHBMManager->mLoading = false;
+    gpHBMManager->mBlocked = false;
 }
 
-void LoadingScene_801CDB4C::fn_801CE274()
+void AsyncLoadingScene::ShowHomeButtonWarning()
 {
-    if (mFEScene == 0 || mFEScene->mState != 6 || mTransitionActive)
+    if (mFEScene == 0 || mFEScene->mState != 6 || mHomeButtonWarningActive)
     {
         return;
     }
 
-    mTransitionComponent->m_bVisible = true;
+    mHomeButtonWarning->m_bVisible = true;
     if (mWidescreen)
     {
-        mTransitionComponent->SetActiveSlide("widescreen", true, false);
+        mHomeButtonWarning->SetActiveSlide("widescreen", true, false);
     }
     else
     {
-        mTransitionComponent->SetActiveSlide("Slide1", true, false);
+        mHomeButtonWarning->SetActiveSlide("Slide1", true, false);
     }
-    mTransitionActive = true;
+    mHomeButtonWarningActive = true;
 }
 
-void LoadingScene_801CDC2C::SceneCreated()
+void WidescreenLoadingScene::SceneCreated()
 {
-    LoadingScene_801CDB4C::SceneCreated();
+    AsyncLoadingScene::SceneCreated();
 
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     mTextInstances[0] = FindLoadingText(presentation, "TOP TEXT");

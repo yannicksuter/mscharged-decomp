@@ -24,6 +24,8 @@ struct CharacterValuePair
  */
 struct CharacterInfo
 {
+    const char* GetName() const;
+
     /* 0x00 */ int mIndex;
     /* 0x04 */ const char* mName;
     /* 0x08 */ const char* mDisplayNameKey;

@@ -12,6 +12,7 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include "NL/nlstring_tmpl.h"
 
 static TweakEntry_8052BF00 lbl_8057C4E4;
 

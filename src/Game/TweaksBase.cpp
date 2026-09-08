@@ -1,6 +1,7 @@
 #include "Game/TweaksBase.h"
 
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 TweaksBase::TweaksBase(const char* param_1)
 {

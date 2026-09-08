@@ -1,9 +1,9 @@
+#include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHPausePostGame.h"
 
 #include "Game/FE/feManager.h"
 #include "Game/GameInfo.h"
 
-extern "C" void SetPointerEnabled(int value);
 
 void PausePostGameScene::OnSelectChangeTeams()
 {

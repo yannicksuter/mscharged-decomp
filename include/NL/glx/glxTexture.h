@@ -128,8 +128,6 @@ glxTextureLoadCallback_t glx_SetLoadCallback(
 
 
 extern "C" void fn_802CDEC0(unsigned long);
-void fn_802CDF14(unsigned long texture, PlatTexture* platformTexture,
-    void* allocator);
 extern "C" void fn_802CDF5C(PlatTexture* texture);
 extern "C" PlatTexture* fn_8036BBC0(glTexBundleDict* entry,
     GXTextureHeader* header, void* allocator);

@@ -10,11 +10,22 @@ class DebugWriteCache;
 class RunningChecksum;
 class UnidentifiedGameRegion;
 class Terrain;
+class CrowdRiot;
+class AvoidablePolygon;
+class UnidentifiedFielderInput;
 class cFielder;
 class cPlayer;
 
 struct UnidentifiedCircularByteQueue
 {
+    UnidentifiedCircularByteQueue(bool* data, u32 start, int size, u32 capacity)
+    {
+        mStart = start;
+        mSize = size;
+        mCapacity = capacity;
+        mData = data;
+    }
+
     bool UnidentifiedRemoveStart()
     {
         bool* entry;
@@ -49,6 +60,8 @@ class cGame
 public:
     virtual void UnidentifiedVirtual();
     virtual ~cGame();
+
+    cGame(void* param1, int param2, bool param3);
 
     void fn_80057FC0();
     void fn_80058180();
@@ -105,7 +118,7 @@ public:
     /* 0x10 */ Clock* m_pPostGameDoneClock;
 
 private:
-    /* 0x14 */ u8 mUnidentified014[0x04];
+    /* 0x14 */ UnidentifiedFielderInput* mUnidentified014;
 
 public:
     /* 0x18 */ int m_eGameState;
@@ -148,14 +161,27 @@ public:
     /* 0x54 */ cPlayer* m_pRandomPlayersArray[10];
 
 private:
-    /* 0x7C */ u8 mUnidentified07C[0x04];
+    /* 0x7C */ float mUnidentified07C;
 
 public:
     /* 0x80 */ float mUnidentified080;
     /* 0x84 */ float mUnidentified084;
 
 private:
-    /* 0x88 */ u8 mUnidentified088[0x34];
+    /* 0x88 */ float mUnidentified088;
+    /* 0x8C */ float mUnidentified08C;
+    /* 0x90 */ float mUnidentified090;
+    /* 0x94 */ float mUnidentified094;
+    /* 0x98 */ float mUnidentified098;
+    /* 0x9C */ float mUnidentified09C;
+    /* 0xA0 */ float mUnidentified0A0;
+    /* 0xA4 */ u16 mUnidentified0A4;
+    /* 0xA6 */ u16 mUnidentified0A6;
+    /* 0xA8 */ u32 mUnidentified0A8;
+    /* 0xAC */ float mUnidentified0AC;
+    /* 0xB0 */ float mUnidentified0B0;
+    /* 0xB4 */ float mUnidentified0B4;
+    /* 0xB8 */ u32 mUnidentified0B8;
 
 public:
     /* 0xBC */ bool mUnidentified0BC;
@@ -189,7 +215,11 @@ public:
 public:
     /* 0x10D8 */ Terrain* mpTerrain;
     /* 0x10DC */ void* mUnidentified10DC;
-    /* 0x10E0 */ void* mUnidentified10E0;
+    /* 0x10E0 */ CrowdRiot* mUnidentified10E0;
+    /* 0x10E4 */ AvoidablePolygon* mUnidentified10E4;
+    /* 0x10E8 */ AvoidablePolygon* mUnidentified10E8;
+    /* 0x10EC */ AvoidablePolygon* mUnidentified10EC;
+    /* 0x10F0 */ AvoidablePolygon* mUnidentified10F0;
 };
 
 extern cGame* g_pGame;

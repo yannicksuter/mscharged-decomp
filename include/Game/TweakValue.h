@@ -4,6 +4,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSmallBlockAllocator.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 #include "types.h"
 
 int nlSNPrintf(char* buffer, unsigned long size, const char* format, ...);

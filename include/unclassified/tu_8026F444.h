@@ -2,8 +2,8 @@
 #define UNCLASSIFIED_TU_8026F444_H
 
 #include "Game/BaseSceneHandler.h"
-#include "unclassified/tu_80219248.h"
-#include "unclassified/tu_8030616C.h"
+#include "Game/FE/fePointerButton.h"
+#include "Game/FE/feTimer.h"
 
 class NetMessageCheckConnection;
 class NetworkMessageType27_8050B750;
@@ -18,8 +18,8 @@ public:
     virtual void SceneCreated();
 
     void fn_8026F7F8(NetMessageCheckConnection* message);
-    void fn_8026F80C(UnidentifiedTimer_8030616C* timer);
-    void fn_8026F874(UnidentifiedTimer_8030616C* timer);
+    void fn_8026F80C(FETimer* timer);
+    void fn_8026F874(FETimer* timer);
     void fn_8026F878();
     void fn_8026FBB0(int index, void* context);
     void fn_8026FF28(NetworkMessageType27_8050B750* message);
@@ -37,13 +37,13 @@ public:
     /* 0x038 */ int mUnidentified038;
     /* 0x03C */ int mUnidentified03C[2];
     /* 0x044 */ unsigned short mUnidentified044[128];
-    /* 0x144 */ UnidentifiedTimer_8030616C mUnidentified144;
-    /* 0x160 */ UnidentifiedTimer_8030616C mUnidentified160;
+    /* 0x144 */ FETimer mUnidentified144;
+    /* 0x160 */ FETimer mUnidentified160;
     /* 0x17C */ bool mUnidentified17C;
     /* 0x17D */ unsigned char mPadding17D[3];
     /* 0x180 */ int mUnidentified180;
     /* 0x184 */ unsigned int mUnidentified184[2];
-    /* 0x18C */ TU80219248Component mUnidentified18C[2];
+    /* 0x18C */ FEPointerButton mUnidentified18C[2];
     /* 0x2F4 */ TLComponentInstance* mUnidentified2F4[2];
     /* 0x2FC */ TLComponentInstance* mUnidentified2FC;
     /* 0x300 */ bool mUnidentified300;

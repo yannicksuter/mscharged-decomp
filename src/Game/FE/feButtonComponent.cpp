@@ -10,6 +10,7 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/nlFont.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 ButtonComponent::ButtonComponent()
 {
@@ -163,3 +164,5 @@ void ButtonComponent::SetState(ButtonComponent::ButtonState buttonstate)
         }
     }
 }
+
+#include "Game/FE/feFinder_impl.h"

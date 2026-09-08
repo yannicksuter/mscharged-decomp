@@ -1,6 +1,7 @@
 #include "NL/nlTextBox.h"
 #include "NL/nlString.h"
 #include "NL/nlTextEscape.h"
+#include "NL/nlstring_tmpl.h"
 
 void nlTextBox::ProcessString(const FontCharString* pString, const nlFont* pFont, const nlVector2& BoxSize, unsigned long DrawOptions, const nlMatrix4* pMatrix, nlTextBox::StringDrawInfo& DrawInfo)
 {

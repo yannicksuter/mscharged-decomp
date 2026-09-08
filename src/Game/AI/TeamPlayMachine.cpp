@@ -1,7 +1,7 @@
 #include "Game/AI/TeamPlayMachine.h"
 
 #include "Game/AI/FuzzyVariant.h"
-#include "Game/DB/tu_8010A40C.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/GameInfo.h"
 #include "NL/nlMemory.h"
 
@@ -47,7 +47,7 @@ void TeamPlayMachine::UnidentifiedVirtual7()
         state = 1;
     }
     else if (GameInfoManager::Instance()->IsInMode4()
-        && lbl_806E0FA0->mCurrentChallenge == 2)
+        && g_pStrikerChallenge->mCurrentChallenge == 2)
     {
         state = 5;
     }

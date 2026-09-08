@@ -62,7 +62,7 @@ extern "C" tCharacterTemplate* fn_80025F5C(int arg0, bool* arg1)
     return g_GoalieTemplate;
 }
 
-tCharacterTemplateInfo* fn_8002600C(eCharacterClass cc)
+tCharacterTemplateInfo* GetCharacterTemplateInfo(eCharacterClass cc)
 {
     if (cc < 20)
     {

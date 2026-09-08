@@ -3,6 +3,7 @@
 
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 #include "types.h"
 
 class UnidentifiedRegistryContainer;

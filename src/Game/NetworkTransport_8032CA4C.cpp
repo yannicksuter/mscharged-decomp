@@ -1,6 +1,6 @@
 #include "Game/NetworkSession.h"
 #include "Game/Sys/debug.h"
-#include "Game/NetworkDebug_80323B2C.h"
+#include "Game/NetworkDebug.h"
 #include "Game/NetworkRandom_803236CC.h"
 
 #include "Game/TweakValue.h"
@@ -12,14 +12,9 @@
 #include "unclassified/tu_80330430.h"
 
 #include <string.h>
-
-extern "C"
-{
-}
+#include "NL/nlstring_tmpl.h"
 
 void RegisterNetworkMessages_80330430();
-extern char lbl_80584360[12];
-extern int lbl_805317E8[4];
 
 float g_fBroadCastFindGameTime = 1.0f;
 float g_fLANGameExpireTime = 3.5f;
@@ -84,8 +79,8 @@ void NetworkTransport_8032CA4C::fn_8032CBD0(bool initialize)
         lbl_806E2100->fn_8032CA1C(10, this);
         lbl_806E2100->fn_8032CA1C(11, this);
         lbl_806E2100->fn_8032CA1C(12, this);
-        if (lbl_80584360[0] != '\0')
-            nlStrNCpy(mUnidentified064, lbl_80584360, 11);
+        if (gNetworkMiiName[0] != '\0')
+            nlStrNCpy(mUnidentified064, gNetworkMiiName, 11);
         if (mUnidentified064[0] == '\0')
             fn_8032376C(mUnidentified064, 11);
         if (!mUnidentified095)
@@ -202,10 +197,10 @@ int NetworkTransport_8032CA4C::fn_8032D220(UnidentifiedTransportGame_8032CA4C* g
         {
             game = &lbl_805848B8;
             nlStrNCpy(game->mUnidentified00, "Server", 11);
-            game->mUnidentified0C[0] = lbl_805317E8[0];
-            game->mUnidentified0C[1] = lbl_805317E8[1];
-            game->mUnidentified0C[2] = lbl_805317E8[2];
-            game->mUnidentified0C[3] = lbl_805317E8[3];
+            game->mUnidentified0C[0] = g_nConnectToServerAddress[0];
+            game->mUnidentified0C[1] = g_nConnectToServerAddress[1];
+            game->mUnidentified0C[2] = g_nConnectToServerAddress[2];
+            game->mUnidentified0C[3] = g_nConnectToServerAddress[3];
             game->mUnidentified14 = 0.0f;
             game->mUnidentified10 = 0;
             game->mUnidentified18 = g_nConnectToServerPort;

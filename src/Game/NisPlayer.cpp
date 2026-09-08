@@ -3,6 +3,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 NisPlayer* NisPlayer::sInstance;
 

@@ -12,6 +12,7 @@
 #include "NL/nlConfig.h"
 #include "NL/nlList.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 struct SkillTweakModifier
 {

@@ -3,9 +3,9 @@
 
 #include "Game/BaseSceneHandler.h"
 #include "Game/FE/feCaptainComponent.h"
-#include "unclassified/tu_8022F710.h"
-#include "unclassified/tu_80219248.h"
-#include "unclassified/tu_8022EF84.h"
+#include "Game/FE/feScrollBar.h"
+#include "Game/FE/fePointerButton.h"
+#include "Game/FE/feBackButton.h"
 
 class TLComponentInstance;
 
@@ -37,11 +37,11 @@ public:
     /* 0x0FF */ bool mUnidentifiedFF;
     /* 0x100 */ int mUnidentified100[4];
     /* 0x110 */ int mUnidentified110;
-    /* 0x114 */ UnidentifiedScrollWidget mUnidentified114;
-    /* 0x2C8 */ TU8022EF84Component mUnidentified2C8;
+    /* 0x114 */ FEScrollBar mUnidentified114;
+    /* 0x2C8 */ FEBackButton mUnidentified2C8;
     /* 0x3A0 */ TLComponentInstance* mUnidentified3A0;
-    /* 0x3A4 */ TU80219248Component mUnidentified3A4;
-    /* 0x458 */ TU80219248Component mUnidentified458[4];
+    /* 0x3A4 */ FEPointerButton mUnidentified3A4;
+    /* 0x458 */ FEPointerButton mUnidentified458[4];
     /* 0x728 */ UnidentifiedTextFader mUnidentified728;
     /* 0x768 */ TLComponentInstance* mUnidentified768;
     /* 0x76C */ TLComponentInstance* mUnidentified76C;

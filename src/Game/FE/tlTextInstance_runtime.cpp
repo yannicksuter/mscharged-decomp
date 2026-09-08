@@ -4,6 +4,7 @@
 #include "NL/nlAlgorithm.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 const unsigned short* TLTextInstance::GetString() const
 {

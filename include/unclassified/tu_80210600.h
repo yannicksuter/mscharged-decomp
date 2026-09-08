@@ -2,9 +2,9 @@
 #define UNCLASSIFIED_TU_80210600_H
 
 #include "Game/BaseSceneHandler.h"
-#include "unclassified/tu_8022F710.h"
-#include "unclassified/tu_80219248.h"
-#include "unclassified/tu_8022EF84.h"
+#include "Game/FE/feScrollBar.h"
+#include "Game/FE/fePointerButton.h"
+#include "Game/FE/feBackButton.h"
 
 class TLComponentInstance;
 
@@ -34,12 +34,12 @@ public:
     /* 0x206 */ bool mUnidentified206;
     /* 0x207 */ bool mUnidentified207;
     /* 0x208 */ int mUnidentified208[4];
-    /* 0x218 */ UnidentifiedScrollWidget mUnidentified218;
-    /* 0x3CC */ TU8022EF84Component mUnidentified3CC;
+    /* 0x218 */ FEScrollBar mUnidentified218;
+    /* 0x3CC */ FEBackButton mUnidentified3CC;
     /* 0x4A4 */ TLComponentInstance* mUnidentified4A4;
-    /* 0x4A8 */ TU80219248Component mUnidentified4A8;
-    /* 0x55C */ TU80219248Component mUnidentified55C;
-    /* 0x610 */ TU80219248Component mUnidentified610[5];
+    /* 0x4A8 */ FEPointerButton mUnidentified4A8;
+    /* 0x55C */ FEPointerButton mUnidentified55C;
+    /* 0x610 */ FEPointerButton mUnidentified610[5];
     /* 0x994 */ unsigned char mUnidentified994[0x14];
     /* 0x9A8 */ TLComponentInstance* mUnidentified9A8;
     /* 0x9AC */ TLComponentInstance* mUnidentified9AC;

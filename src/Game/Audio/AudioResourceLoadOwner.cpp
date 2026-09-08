@@ -9,8 +9,6 @@
 #include "NL/nlPrint.h"
 #include "types.h"
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 static inline void PushAllocator(MemoryAllocator* allocator)
 {

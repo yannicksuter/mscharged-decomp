@@ -1,4 +1,5 @@
 #include "unclassified/tu_801A6AAC.h"
+#include "Game/Render/RLViewLayers.h"
 
 #include "Game/Render/RLView.h"
 
@@ -10,7 +11,8 @@
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
-#include "NL/plat/tu_80364604.h"
+#include "NL/plat/DPDData.h"
+#include "NL/plat/WiiPad.h"
 
 struct UnidentifiedControllerInfo_801A7C48
 {
@@ -21,12 +23,9 @@ struct UnidentifiedControllerInfo_801A7C48
 extern "C"
 {
     int GetTweakBool(const char* pPath, int nDefault);
-    bool fn_80273B00();
-    void fn_801A8F1C(u16 nAngle, u32 nTextureIndex, u32 nStatus,
+        void fn_801A8F1C(u16 nAngle, u32 nTextureIndex, u32 nStatus,
         float fX, float fY);
 
-    extern int lbl_806E227C;
-    extern int lbl_806E228C;
 }
 
 static char lbl_80514210[] = "/Rendering/Engine/Reduce Textures";
@@ -458,7 +457,7 @@ static inline void DrawState(const UnidentifiedMegaBallState& state)
 extern "C" void fn_801A7A3C(int nX, int nY, unsigned int nTexture,
     float fWidth, float fHeight, float fOpacity, float fAngle)
 {
-    bool bWideScreen = fn_80273B00();
+    bool bWideScreen = IsWidescreen();
     glPoly2 poly;
     glSetDefaultState(false);
     glSetRasterState(GLS_AlphaBlend, 1);
@@ -517,11 +516,11 @@ static inline void* GetMegaBallControllerData()
         return 0;
     }
     int nType = ((ControllerMethod)pVTable[20])(pPlatform);
-    if (nType == lbl_806E227C)
+    if (nType == gWiiRemotePadClassID)
     {
         return (u8*)pPlatform + 0x1B0;
     }
-    if (nType == lbl_806E228C)
+    if (nType == gWiiFreestylePadClassID)
     {
         return (u8*)pPlatform + 0x1D0;
     }
@@ -659,7 +658,7 @@ extern "C" void fn_801A7C48(float fDeltaT)
 
         nlVector2 v2Position;
         u16 nAngle;
-        int nStatus = fn_80364630(static_cast<UnidentifiedPointerData*>(pData), &v2Position, &nAngle);
+        int nStatus = static_cast<DPDData*>(pData)->GetPosition(&v2Position, &nAngle);
         float fX = 320.0f - 400.0f * v2Position.x;
         if (fX < 30.0f)
         {
@@ -774,7 +773,7 @@ extern "C" void fn_801A8908(unsigned int nCount)
         return;
     }
 
-    float fAspectScale = fn_80273B00() ? 0.8f : 1.0f;
+    float fAspectScale = IsWidescreen() ? 0.8f : 1.0f;
     float fSpacing = fAspectScale
                        * (lbl_80573528[0].mUnidentified008 * lbl_806DCFF8)
                    - 1.0f;
@@ -926,10 +925,10 @@ extern "C" void fn_801A8F1C(u16 nAngle, u32 nTextureIndex,
 
     u8 buffer[50];
     int nSize = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
-    int nPlayerCount = GetNumMachines(g_pNetworkSessionBase);
+    int nPlayerCount = g_pNetworkSessionBase->GetNumMachines();
     for (s8 i = 0; i < nPlayerCount; i++)
     {
-        if (i != fn_80338C20(g_pNetworkSessionBase))
+        if (i != g_pNetworkSessionBase->GetLocalMachineId())
         {
             g_pNetworkSessionBase->Send(i, buffer, nSize, false);
         }

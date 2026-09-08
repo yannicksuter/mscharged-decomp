@@ -6,8 +6,8 @@
 #include "Game/FE/feCaptainComponent.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlFunction.h"
-#include "unclassified/tu_80219248.h"
-#include "unclassified/tu_8022F710.h"
+#include "Game/FE/fePointerButton.h"
+#include "Game/FE/feScrollBar.h"
 
 class TLComponentInstance;
 class TLInstance;
@@ -52,13 +52,13 @@ public:
     /* 0x107 */ bool mUnidentified107;
     /* 0x108 */ bool mUnidentified108;
     /* 0x109 */ bool mUnidentified109;
-    /* 0x10C */ TU80219248Component mComponent;
+    /* 0x10C */ FEPointerButton mComponent;
     /* 0x1C0 */ UnidentifiedTextFader mUnidentified1C0;
     /* 0x200 */ UnidentifiedTextFader mUnidentified200;
     /* 0x240 */ AsyncImage mUnidentified240;
     /* 0x2E0 */ AsyncImage mUnidentified2E0;
     /* 0x380 */ AsyncImage mUnidentified380;
-    /* 0x420 */ UnidentifiedScrollWidget mUnidentified420;
+    /* 0x420 */ FEScrollBar mUnidentified420;
 
 private:
     inline TLInstance* FindCurrentInstance(const char* item);

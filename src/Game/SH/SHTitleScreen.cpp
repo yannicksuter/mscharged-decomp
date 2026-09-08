@@ -1,4 +1,8 @@
+#include "Game/SH/SHNavigation.h"
+#include "Game/GameSceneManager.h"
 #include "Game/SH/SHTitleScreen.h"
+#include "Game/Render/RLViewLayers.h"
+#include "Game/FE/FEAudio.h"
 
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/SaveLoad.h"
@@ -15,18 +19,11 @@
 #include "NL/nlBind.h"
 #include "NL/nlConfig.h"
 #include "NL/nlMath.h"
+#include "Game/FE/feDPD.h"
 
-extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
-extern "C" Presentation* fn_801FEEAC();
-extern "C" void SetPointerEnabled(bool value);
-class TU80252180Scene;
-extern "C" TU80252180Scene* fn_80253E18();
-extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
-extern "C" bool fn_80273B00();
+class SHNavigation;
 extern "C" int VISetTimeToDimming(int time);
 
-extern TLComponentInstance* lbl_80578450[4];
-extern BaseGameSceneManager* lbl_806E1838;
 extern bool g_e3_Build;
 
 extern const int lbl_804E8368[10] = {
@@ -41,10 +38,10 @@ void StartMovieCB()
 {
     for (int i = 0; i < 4; ++i)
     {
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
     }
-    fn_801FEEAC()->Call("TransitionTitleScreenToMainMenu");
-    fn_801CBCA0(0x80060B2D, 0, 0, 1);
+    Presentation::GetInstance()->Call("TransitionTitleScreenToMainMenu");
+    FEAudio::PlayAnimAudioEvent(0x80060B2D, 0, 0, 1);
 }
 
 TitleScene::TitleScene(ScreenMovement movement)
@@ -78,7 +75,7 @@ TitleScene::~TitleScene()
 
 void TitleScene::SceneCreated()
 {
-    if (fn_80273B00())
+    if (IsWidescreen())
     {
         mPresentation->SetActiveSlide("widescreen", true);
     }
@@ -89,7 +86,7 @@ void TitleScene::SceneCreated()
 
     for (int i = 0; i < 4; ++i)
     {
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
     }
 
     mTextPressStart = FEFinder<TLComponentInstance, 2>::Find<TLSlide>(
@@ -97,15 +94,15 @@ void TitleScene::SceneCreated()
 
     FEMusic::StartStreamIfDifferent(0);
     SetPointerEnabled(0);
-    TU80252180Scene* object = fn_80253E18();
+    SHNavigation* object = GetNavigationScene();
     if (object != 0)
     {
-        fn_802534BC(object, 0, true);
+        object->SetButtons(0, true);
     }
 
     if (mMovement != SCREEN_BACK)
     {
-        fn_801CBCA0(0x26894C84, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x26894C84, 0, 0, 1);
     }
 }
 
@@ -118,21 +115,21 @@ void TitleScene::Update(float dt)
 
     if (!mUnidentifiedDE)
     {
-        TU80300104Base::Callback enter(
+        FEPointerListener::Callback enter(
             Bind<void>(MemFun(&TitleScene::fn_801D2478), this, Placeholder<0>(), Placeholder<1>()));
-        TU80300104Base::Callback leave(
+        FEPointerListener::Callback leave(
             Bind<void>(MemFun(&TitleScene::fn_801D24EC), this, Placeholder<0>(), Placeholder<1>()));
-        TU80300104Base::Callback select(
+        FEPointerListener::Callback select(
             Bind<void>(MemFun(&TitleScene::fn_801D22C8), this, Placeholder<0>(), Placeholder<1>()));
 
-        mControllerComponent.fn_80300D74(mTextPressStart, true, 0.0f, 0.0f, 1.0f, 1.0f);
-        mControllerComponent.fn_803007C0(enter);
-        mControllerComponent.fn_80300864(leave);
-        mControllerComponent.fn_803009AC(select);
+        mControllerComponent.SetInstanceBounds(mTextPressStart, true, 0.0f, 0.0f, 1.0f, 1.0f);
+        mControllerComponent.SetPointerEnterCallback(enter);
+        mControllerComponent.SetPointerLeaveCallback(leave);
+        mControllerComponent.SetPointerPressCallback(select);
 
         for (int i = 0; i < 4; ++i)
         {
-            lbl_80578450[i]->SetActiveSlide("cursor", true, false);
+            gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
         }
         mUnidentifiedDE = true;
     }
@@ -154,7 +151,7 @@ void TitleScene::Update(float dt)
             && m_fTimeElapsed >= demoTimeout)
         {
             GameInfoManager::Instance()->SetMode(GameInfoManager::GM_FRIENDLY, false);
-            lbl_806E1838->Push(SCENE_SUPER_LOADING, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_SUPER_LOADING, SCREEN_NOTHING, true);
             m_fTimeElapsed = 0.0f;
             mStartedDemo = true;
         }
@@ -162,7 +159,7 @@ void TitleScene::Update(float dt)
 
     for (int pad = 0; pad < 4; ++pad)
     {
-        lbl_80578450[pad]->SetActiveSlide("A", true, false);
+        gFEPointerInstances[pad]->SetActiveSlide("A", true, false);
         if (g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0))
         {
             fn_801D22C8(pad, 0);
@@ -228,16 +225,16 @@ void TitleScene::fn_801D1F6C()
         }
     }
     gameInfo->ResetPlayingSides();
-    lbl_806E1838->PushLoadingScene(true);
+    GameSceneManager::Instance()->PushLoadingScene(true);
 }
 
 void TitleScene::fn_801D22C8(int index, void*)
 {
     mTextPressStart->SetActiveSlide("down", true, false);
-    mControllerComponent.mValues[index] = 2;
-    fn_801CBCA0(0x55C84A9D, 0, 0, 1);
+    mControllerComponent.SetPointerState(2, index);
+    FEAudio::PlayAnimAudioEvent(0x55C84A9D, 0, 0, 1);
     SetPointerEnabled(1);
-    lbl_806E1838->Pop();
+    GameSceneManager::Instance()->Pop();
     VISetTimeToDimming(0);
     StartMovieCB();
 }
@@ -245,15 +242,15 @@ void TitleScene::fn_801D22C8(int index, void*)
 void TitleScene::fn_801D2478(int index, void*)
 {
     mTextPressStart->SetActiveSlide("over", true, false);
-    mControllerComponent.mValues[index] = 1;
-    fn_801CBCA0(0xAA73EF32, 0, 0, 1);
+    mControllerComponent.SetPointerState(1, index);
+    FEAudio::PlayAnimAudioEvent(0xAA73EF32, 0, 0, 1);
     mUnidentifiedDF = true;
 }
 
 void TitleScene::fn_801D24EC(int index, void*)
 {
     mTextPressStart->SetActiveSlide("off", true, false);
-    mControllerComponent.mValues[index] = 0;
+    mControllerComponent.SetPointerState(0, index);
     mUnidentifiedDF = false;
 }
 
@@ -277,7 +274,7 @@ void HealthWarningSceneV2::Update(float fDeltaT)
     switch (mState)
     {
     case 0:
-        if (fn_80273B00())
+        if (IsWidescreen())
             mPresentation->SetActiveSlide("fadein_widescreen", true);
         else
             mPresentation->SetActiveSlide("fadein_regular", true);
@@ -286,7 +283,7 @@ void HealthWarningSceneV2::Update(float fDeltaT)
         break;
     case 1:
     {
-        TLSlide* slide = mPresentation->GetActiveSlide();
+        TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->m_duration)
         {
             for (int pad = 0; pad < 4; ++pad)
@@ -296,7 +293,7 @@ void HealthWarningSceneV2::Update(float fDeltaT)
                     && controller->IsPressed(0x1E, true)
                     && controller->IsPressed(0x1F, true))
                 {
-                    if (fn_80273B00())
+                    if (IsWidescreen())
                     {
                         mPresentation->SetActiveSlide("fadeout_widescreen", true);
                         mPresentation->Update(0.0f);
@@ -314,14 +311,16 @@ void HealthWarningSceneV2::Update(float fDeltaT)
     }
     case 2:
     {
-        TLSlide* slide = mPresentation->GetActiveSlide();
+        TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->m_start + slide->m_duration)
         {
             mState = 3;
-            lbl_806E1838->Push(SCENE_MAIN_MENU, SCREEN_FORWARD, true);
-            fn_801FEEAC()->Call("TransitionTitleScreenToMainMenu");
+            GameSceneManager::Instance()->Push(SCENE_MAIN_MENU, SCREEN_FORWARD, true);
+            Presentation::GetInstance()->Call("TransitionTitleScreenToMainMenu");
         }
         break;
     }
     }
 }
+
+#include "Game/FE/feFinder_impl.h"

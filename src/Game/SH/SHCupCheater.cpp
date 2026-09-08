@@ -2,7 +2,7 @@
 
 #include "Game/DB/SaveLoad.h"
 #include "Game/DB/StatsTracker.h"
-#include "Game/DB/tu_8010A40C.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
@@ -20,10 +20,8 @@
 #include "NL/nlString.h"
 
 extern "C" void fn_8010BCB8(void* object, bool overtime, int winningSide);
-extern "C" void fn_8010C5E0(UnidentifiedCupManager* manager);
-extern "C" Presentation* fn_801FEEAC();
+extern "C" void fn_8010C5E0(CupManager* manager);
 
-extern BaseGameSceneManager* lbl_806E1838;
 
 void CupCheaterScene::UpdateSlides()
 {
@@ -71,8 +69,8 @@ void CupCheaterScene::UpdateSlides()
 
 void CupCheaterScene::OnSelectGameplay()
 {
-    fn_801FEEAC()->Call("TransitionCupToChooseSides");
-    lbl_806E1838->Pop();
+    Presentation::GetInstance()->Call("TransitionCupToChooseSides");
+    GameSceneManager::Instance()->Pop();
 }
 
 void CupCheaterScene::SceneCreated()
@@ -140,7 +138,7 @@ void CupCheaterScene::fn_801E793C()
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     StatsTracker::s_pInstance->SetBasicGameInfoPointer(
         gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode], true);
-    fn_8010C5E0(lbl_806E0F90);
+    fn_8010C5E0(g_pCupManager);
 
     if (mSniper == mStriker)
     {
@@ -167,7 +165,7 @@ void CupCheaterScene::fn_801E793C()
     }
     StatsTracker::s_pInstance->TrackStat(
         STATS_WIN, winningSide, 0, mSniper, mStriker, 0, 0);
-    fn_8010BCB8(lbl_806E0F90, false, winningSide);
+    fn_8010BCB8(g_pCupManager, false, winningSide);
     fn_801E7A94();
 }
 
@@ -176,11 +174,11 @@ static inline void TrackHomeWinResult()
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     StatsTracker::s_pInstance->SetBasicGameInfoPointer(
         gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode], true);
-    fn_8010C5E0(lbl_806E0F90);
+    fn_8010C5E0(g_pCupManager);
     StatsTracker::s_pInstance->TrackStat(
         STATS_GOALS_FOR, 0, nlRandom(4, &nlDefaultSeed), -1, 0, 1, 0);
     StatsTracker::s_pInstance->TrackStat(STATS_WIN, 0, 0, 1, 0, 0, 0);
-    fn_8010BCB8(lbl_806E0F90, false, 0);
+    fn_8010BCB8(g_pCupManager, false, 0);
 }
 
 static inline void TrackAwayWinResult()
@@ -188,11 +186,11 @@ static inline void TrackAwayWinResult()
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     StatsTracker::s_pInstance->SetBasicGameInfoPointer(
         gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode], true);
-    fn_8010C5E0(lbl_806E0F90);
+    fn_8010C5E0(g_pCupManager);
     StatsTracker::s_pInstance->TrackStat(
         STATS_GOALS_FOR, 1, nlRandom(4, &nlDefaultSeed), -1, 0, 1, 0);
     StatsTracker::s_pInstance->TrackStat(STATS_WIN, 1, 0, 0, 1, 0, 0);
-    fn_8010BCB8(lbl_806E0F90, false, 1);
+    fn_8010BCB8(g_pCupManager, false, 1);
 }
 
 static inline void TrackHomeOTWinResult()
@@ -200,11 +198,11 @@ static inline void TrackHomeOTWinResult()
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     StatsTracker::s_pInstance->SetBasicGameInfoPointer(
         gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode], true);
-    fn_8010C5E0(lbl_806E0F90);
+    fn_8010C5E0(g_pCupManager);
     StatsTracker::s_pInstance->TrackStat(
         STATS_GOALS_FOR, 0, nlRandom(4, &nlDefaultSeed), -1, 0, 1, 0);
     StatsTracker::s_pInstance->TrackStat(STATS_LOSS, 0, 0, 1, 0, 0, 0);
-    fn_8010BCB8(lbl_806E0F90, true, 0);
+    fn_8010BCB8(g_pCupManager, true, 0);
 }
 
 static inline void TrackAwayOTWinResult()
@@ -212,11 +210,11 @@ static inline void TrackAwayOTWinResult()
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     StatsTracker::s_pInstance->SetBasicGameInfoPointer(
         gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode], true);
-    fn_8010C5E0(lbl_806E0F90);
+    fn_8010C5E0(g_pCupManager);
     StatsTracker::s_pInstance->TrackStat(
         STATS_GOALS_FOR, 1, nlRandom(4, &nlDefaultSeed), -1, 0, 1, 0);
     StatsTracker::s_pInstance->TrackStat(STATS_LOSS, 1, 0, 0, 1, 0, 0);
-    fn_8010BCB8(lbl_806E0F90, true, 1);
+    fn_8010BCB8(g_pCupManager, true, 1);
 }
 
 void CupCheaterScene::OnSelectAwayOTWin()
@@ -307,5 +305,7 @@ CupCheaterScene::CupCheaterScene()
 
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     int team = gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode]->mTeamIndex[0];
-    mUnidentified50 = team != lbl_806E0F90->GetUserSelectedCupTeam();
+    mUnidentified50 = team != g_pCupManager->GetUserSelectedCupTeam();
 }
+
+#include "Game/FE/feFinder_impl.h"

@@ -3,6 +3,7 @@
 #include "NL/nlFileGC.h"
 
 #include <string.h>
+#include "NL/nlstring_tmpl.h"
 
 char lbl_8052BA40[] = "ERROR: Failed to find file with hash ID: %d\n";
 

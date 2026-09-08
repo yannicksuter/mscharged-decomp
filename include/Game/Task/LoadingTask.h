@@ -10,7 +10,7 @@ public:
 
     virtual const char* GetName();
     virtual void Run(float dt);
-    virtual void StateTransition(u32 from, u32 to);
+    virtual void StateTransition(unsigned int from, unsigned int to);
 
     /* 0x20 */ float mElapsed;
 }; // size 0x24

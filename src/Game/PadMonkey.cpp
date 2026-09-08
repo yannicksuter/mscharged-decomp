@@ -5,7 +5,6 @@
 
 #include <string.h>
 
-extern int lbl_806E1E20;
 
 PadMonkey::PadMonkey(int padIndex)
     : PadBackend(padIndex)
@@ -150,4 +149,4 @@ void PadMonkey::SetButtonChance(int button, float pct)
     m_buttonChance[GetButtonIndex(button, false)] = pct;
 }
 
-int PadMonkey::sClassID = lbl_806E1E20++;
+int PadMonkey::sClassID = gNextPadClassID++;

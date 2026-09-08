@@ -1,6 +1,6 @@
 #include "Game/DB/StadiumInfo.h"
 
-#include "Game/DB/tu_8010A40C.h"
+#include "Game/DB/GameProgress.h"
 #include "NL/gl/glPlat.h"
 
 enum
@@ -222,17 +222,17 @@ bool IsStadiumUnlocked(int stadium)
     switch (stadium)
     {
     case 14:
-        return fn_801100E0();
+        return IsWastelandsUnlocked();
     case 4:
-        return fn_80110188();
+        return IsDumpUnlocked();
     case 5:
-        return fn_80110230();
+        return IsGalacticStadiumUnlocked();
     case 7:
-        return fn_80110470();
+        return IsLavaPitUnlocked();
     case 3:
-        return fn_801103D4();
+        return IsCrystalCanyonUnlocked();
     case 9:
-        return fn_80110338();
+        return IsStormshipUnlocked();
     default:
         return true;
     }

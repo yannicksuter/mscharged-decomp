@@ -10,6 +10,7 @@
 class cTeam;
 class cBall;
 class cFielder;
+class cGame;
 class InterpreterCore;
 class UnidentifiedScriptMachine;
 class UnidentifiedFielderInput;
@@ -48,6 +49,13 @@ public:
         : Variant()
     {
         mType = FT_BALL;
+        mData.pointer = value;
+    }
+
+    FuzzyVariant(cGame* value)
+        : Variant()
+    {
+        mType = FT_GAME;
         mData.pointer = value;
     }
 

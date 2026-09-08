@@ -109,59 +109,28 @@ void ImpostorManager::InvalidateCapture()
 
 void ImpostorManager::ResetImpostors()
 {
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
-    DLListEntry<ImpostorCharacter*>* head = it.m_Head;
-    DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
-    while (entry != 0)
+    for (nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+         it.hasNext(); it.next())
     {
-        entry->entry->ReleaseSprites();
-        if (nlDLRingIsEnd(head, entry) || entry == 0)
-        {
-            entry = 0;
-        }
-        else
-        {
-            entry = entry->m_next;
-        }
+        (*it)->ReleaseSprites();
     }
 
     for (int i = 0; i < mNumUsed; ++i)
     {
         mImpostors[i].Reset();
-
-        nlDLListIterator<ImpostorCharacter*> characters = mCharacters.Begin();
-        DLListEntry<ImpostorCharacter*>* charHead = characters.m_Head;
-        DLListEntry<ImpostorCharacter*>* charEntry = characters.m_Curr;
-        while (charEntry != 0)
+        for (nlDLListIterator<ImpostorCharacter*> characters = mCharacters.Begin();
+             characters.hasNext(); characters.next())
         {
-            nlDLListIterator<ImpostorSprite_802D4290*> sprites =
-                charEntry->entry->mSprites.Begin();
-            DLListEntry<ImpostorSprite_802D4290*>* spriteHead = sprites.m_Head;
-            DLListEntry<ImpostorSprite_802D4290*>* spriteEntry = sprites.m_Curr;
-            while (spriteEntry != 0)
+            for (nlDLListIterator<ImpostorSprite_802D4290*> sprites =
+                     (*characters)->mSprites.Begin();
+                 sprites.hasNext(); sprites.next())
             {
-                ImpostorSprite_802D4290* sprite = spriteEntry->entry;
+                ImpostorSprite_802D4290* sprite = *sprites;
                 fn_802D5034(sprite);
                 if (lbl_806E1F61 != 0)
                 {
                     fn_802D5040(sprite);
                 }
-                if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
-                {
-                    spriteEntry = 0;
-                }
-                else
-                {
-                    spriteEntry = spriteEntry->m_next;
-                }
-            }
-            if (nlDLRingIsEnd(charHead, charEntry) || charEntry == 0)
-            {
-                charEntry = 0;
-            }
-            else
-            {
-                charEntry = charEntry->m_next;
             }
         }
     }

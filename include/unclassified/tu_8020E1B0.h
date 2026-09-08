@@ -2,8 +2,8 @@
 #define UNCLASSIFIED_TU_8020E1B0_H
 
 #include "Game/BaseSceneHandler.h"
-#include "unclassified/tu_80219248.h"
-#include "unclassified/tu_8022EF84.h"
+#include "Game/FE/fePointerButton.h"
+#include "Game/FE/feBackButton.h"
 
 class TLComponentInstance;
 
@@ -29,10 +29,10 @@ public:
     /* 0x0CE */ bool mUnidentifiedCE;
     /* 0x0CF */ bool mUnidentifiedCF;
     /* 0x0D0 */ int mSelectionCounts[4];
-    /* 0x0E0 */ TU8022EF84Component mNavigationComponent;
-    /* 0x1B8 */ TU80219248Component mMatchupComponents[3];
+    /* 0x0E0 */ FEBackButton mNavigationComponent;
+    /* 0x1B8 */ FEPointerButton mMatchupComponents[3];
     /* 0x3D4 */ unsigned char mPadding3D4[4];
-    /* 0x3D8 */ TU80219248Component mBracketComponent;
+    /* 0x3D8 */ FEPointerButton mBracketComponent;
     /* 0x48C */ TLComponentInstance* mBracketInstance;
     /* 0x490 */ TLComponentInstance* mMatchupInstances[3];
     /* 0x49C */ int mState;

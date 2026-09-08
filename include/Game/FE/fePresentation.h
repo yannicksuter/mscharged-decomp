@@ -9,10 +9,7 @@ class FEPresentation
 {
 public:
     void Update(float deltaTime);
-    TLSlide* GetActiveSlide() const
-    {
-        return m_currentSlide;
-    }
+    TLSlide* GetActiveSlide();
     void SetActiveSlide(const char* slideName, bool resetTime);
 
     /* 0x00 */ TLSlide* m_slides;

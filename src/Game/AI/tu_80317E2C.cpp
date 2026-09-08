@@ -10,6 +10,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include <string.h>
+#include "NL/nlstring_tmpl.h"
 
 class ScriptQuestionCache;
 

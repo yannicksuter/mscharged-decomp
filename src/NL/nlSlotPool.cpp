@@ -4,8 +4,6 @@
 #include "NL/nlList.h"
 #include "NL/nlMemory.h"
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 extern void nlBreak();
 

@@ -4,6 +4,7 @@
 #include "RVL_SDK/thp/THPSimple.h"
 
 #include "Game/ResourceInterface_802CC094.h"
+#include "NL/gl/glTexture.h"
 #include "NL/gc/gcSwizzler.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"
@@ -19,6 +20,7 @@
 #include <revolution/os/OSThread.h>
 
 #include <string.h>
+#include "NL/nlstring_tmpl.h"
 
 static THPVideoInfo videoInfo;
 static PlatTexture* pTex[4];
@@ -92,17 +94,17 @@ bool MovieStart(
     pTex[0] = glx_CreatePlatTexture(allocator);
     pTex[0]->Create(videoInfo.xSize, videoInfo.ySize, GXTex_I8,
         allocator, 1, false, false);
-    fn_802CDF14(glGetTexture("movie"), pTex[0], allocator);
+    glRegisterTexture(glGetTexture("movie"), pTex[0], allocator);
 
     pTex[1] = glx_CreatePlatTexture(allocator);
     pTex[1]->Create(videoInfo.xSize / 2, videoInfo.ySize / 2,
         GXTex_I8, allocator, 1, false, false);
-    fn_802CDF14(glGetTexture("movie_u"), pTex[1], allocator);
+    glRegisterTexture(glGetTexture("movie_u"), pTex[1], allocator);
 
     pTex[2] = glx_CreatePlatTexture(allocator);
     pTex[2]->Create(videoInfo.xSize / 2, videoInfo.ySize / 2,
         GXTex_I8, allocator, 1, false, false);
-    fn_802CDF14(glGetTexture("movie_v"), pTex[2], allocator);
+    glRegisterTexture(glGetTexture("movie_v"), pTex[2], allocator);
 
     unsigned long texSize = GCTextureSize(pTex[0]->m_Format,
         pTex[0]->m_Width, pTex[0]->m_Height, pTex[0]->m_Levels,

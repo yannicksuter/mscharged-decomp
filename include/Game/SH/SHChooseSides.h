@@ -3,8 +3,8 @@
 
 #include "Game/BaseGameSceneManager.h"
 #include "NL/nlColour.h"
-#include "unclassified/tu_80219248.h"
-#include "unclassified/tu_8022EF84.h"
+#include "Game/FE/fePointerButton.h"
+#include "Game/FE/feBackButton.h"
 
 class TLComponentInstance;
 class TLImageInstance;
@@ -48,10 +48,10 @@ public:
     /* 0x01D */ bool mUnidentified1D;
     /* 0x01E */ bool mUnidentified1E;
     /* 0x01F */ bool mUnidentified1F;
-    /* 0x020 */ TU80219248Component mControllerComponents[2];
-    /* 0x188 */ TU80219248Component mHomeAwayComponent;
-    /* 0x23C */ TU80219248Component mHelpComponent;
-    /* 0x2F0 */ TU8022EF84Component mUnidentified2F0;
+    /* 0x020 */ FEPointerButton mControllerComponents[2];
+    /* 0x188 */ FEPointerButton mHomeAwayComponent;
+    /* 0x23C */ FEPointerButton mHelpComponent;
+    /* 0x2F0 */ FEBackButton mUnidentified2F0;
     /* 0x3C8 */ ScreenMovement mMovement;
     /* 0x3CC */ TLComponentInstance* mSideGroups[2];
     /* 0x3D4 */ TLComponentInstance* mHomeAwayBox;

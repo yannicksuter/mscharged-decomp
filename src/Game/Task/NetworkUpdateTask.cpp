@@ -1,3 +1,4 @@
+#include "NL/plat/SocketNetwork.h"
 #include "Game/Task/NetworkUpdateTask.h"
 
 #include "unclassified/tu_80332DC0.h"
@@ -9,7 +10,7 @@
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
 #include "Game/NetworkStatsManager.h"
-#include "Game/tu_801360A4.h"
+#include "Game/FriendManager.h"
 #include "Game/main.h"
 #include "unclassified/tu_80336B2C.h"
 #include "unclassified/tu_80338898.h"
@@ -18,13 +19,12 @@
 #include "types.h"
 
 extern u8 lbl_806E1008;
-extern "C" void fn_803740B8();
 
 void RegisterNetworkMessages_801258A8();
 void NetworkUpdateTask::Initialize()
 {
-    fn_803740B8();
-    UnidentifiedNetworkSession::Create();
+    SocketNetworkInitializeMemory();
+    NetworkSession::Create();
     fn_80338898();
     fn_80337F68();
     fn_8032C7D0();
@@ -38,12 +38,12 @@ void NetworkUpdateTask::Initialize()
     NetTournManager::CreateInstance();
     NetworkDraft::CreateInstance();
 
-    if (lbl_806E1194 == 0)
+    if (g_pFriendManager == 0)
     {
         void* instance
-            = nlMalloc(sizeof(UnidentifiedFriendManager_801360A4), 8, false);
-        lbl_806E1194
-            = new (instance) UnidentifiedFriendManager_801360A4();
+            = nlMalloc(sizeof(FriendManager), 8, false);
+        g_pFriendManager
+            = new (instance) FriendManager();
     }
 
     NetworkStatsManager_8012F378::CreateInstance();

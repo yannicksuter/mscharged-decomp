@@ -10,6 +10,7 @@
 #include "Game/Transitions/ColourBlendScreenTransition.h"
 #include "Game/Transitions/ModelTransition.h"
 #include "Game/Transitions/ScriptedTransition.h"
+#include "NL/nlstring_tmpl.h"
 
 TransitionSequence::TransitionSequence()
 {

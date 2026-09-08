@@ -1,4 +1,6 @@
 #include "Game/FE/feModelManager.h"
+#include "Game/CharacterTemplate.h"
+#include "Game/DB/CharacterInfo.h"
 
 #include "unclassified/tu_801A4188.h"
 
@@ -15,6 +17,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 class FEModelType0_801C0960 : public FEModel
 {
@@ -99,11 +102,6 @@ public:
     /* 0xCC */ TweakValueImpl_804F4DC8 mfCameraDistanceCup;
 }; // size: 0xDC
 
-extern "C"
-{
-    void* fn_8002600C(int characterIndex);
-    int GetCharacterIndexFromCaptain__Fi(int captain);
-}
 
 static const u32 sLoaderConfiguration[4] = { 0, 0x8000, 3, 0x100000 };
 static char sDefaultAnimation[] = "fe_idle";
@@ -451,7 +449,7 @@ FEModelManager::FEModelManager()
 
 void FEModelManager::Update(float dt)
 {
-    FEModelHandleListEntry_801C2FB4* entry = mHandlesHead;
+    FEModelHandleListEntry* entry = mHandlesHead;
     while (entry != 0)
     {
         FEModelHandle* handle = entry->mHandle;
@@ -466,7 +464,7 @@ void FEModelManager::Update(float dt)
 
 void FEModelManager::Render()
 {
-    FEModelHandleListEntry_801C2FB4* entry = mHandlesHead;
+    FEModelHandleListEntry* entry = mHandlesHead;
     while (entry != 0)
     {
         FEModelHandle* handle = entry->mHandle;
@@ -540,11 +538,11 @@ FEModelHandle* fn_801C27C4(FEModelManager* manager, FEModelType type,
     const char* name, int captain, bool unidentified59,
     void* unidentified4C, void* unidentified50, bool alternate)
 {
-    int characterIndex = GetCharacterIndexFromCaptain__Fi(captain);
+    int characterIndex = GetCharacterIndexFromCaptain(captain);
     if (characterIndex != -1)
     {
         return fn_801C2844(manager, type, name,
-            fn_8002600C(characterIndex), unidentified59,
+            GetCharacterTemplateInfo((eCharacterClass)characterIndex), unidentified59,
             unidentified4C, unidentified50, alternate);
     }
     return 0;
@@ -554,13 +552,13 @@ FEModelHandle* fn_801C2844(FEModelManager* manager, FEModelType type,
     const char* name, void* modelData, bool unidentified59,
     void* unidentified4C, void* unidentified50, bool alternate)
 {
-    FEModelHandle* handle = fn_801C2FB4(manager, name);
+    FEModelHandle* handle = manager->GetModel(name);
     if (handle == 0)
     {
         handle = new (8, false) FEModelHandle(type, name, modelData,
             unidentified59, unidentified4C, unidentified50, alternate);
-        FEModelHandleListEntry_801C2FB4* entry
-            = new (8, false) FEModelHandleListEntry_801C2FB4;
+        FEModelHandleListEntry* entry
+            = new (8, false) FEModelHandleListEntry;
         if (entry != 0)
         {
             entry->mNext = manager->mHandlesHead;
@@ -575,10 +573,10 @@ FEModelHandle* fn_801C2844(FEModelManager* manager, FEModelType type,
     return handle;
 }
 
-FEModelHandle* fn_801C2FB4(FEModelManager* manager, const char* name)
+FEModelHandle* FEModelManager::GetModel(const char* name)
 {
     u32 hash = nlStringLowerHash(name);
-    FEModelHandleListEntry_801C2FB4* entry = manager->mHandlesHead;
+    FEModelHandleListEntry* entry = mHandlesHead;
     while (entry != 0)
     {
         if (hash == entry->mHandle->mNameHash)

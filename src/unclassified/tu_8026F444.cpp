@@ -1,10 +1,14 @@
+#include "Game/GameInfo.h"
+#include "Game/FE/fePresentation.inl"
 #include "unclassified/tu_8026F444.h"
+#include "Game/FE/FEAudio.h"
 #include "Game/Sys/debug.h"
 
-#include "Game/BaseGameSceneManager.h"
+#include "Game/GameSceneManager.h"
 #include "Game/NetworkMessages.h"
 #include "Game/NetworkSession.h"
-#include "Game/tu_801360A4.h"
+#include "Game/NetworkLobby.h"
+#include "Game/FriendManager.h"
 #include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePopupMenu.h"
@@ -14,22 +18,13 @@
 #include "NL/nlFormat.h"
 #include "NL/nlLocalizationLookup.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_802196B0.h"
-#include "unclassified/tu_80245DB4.h"
-#include "unclassified/tu_80252180.h"
-#include "unclassified/tu_8025D170.h"
+#include "Game/FE/feDPD.h"
+#include "Game/OnlineMatchmaking.h"
+#include "Game/SH/SHNavigation.h"
+#include "Game/SH/SHOnlineInvitePlayers.h"
 #include "unclassified/tu_80326844.h"
+#include "NL/nlstring_tmpl.h"
 
-extern TLComponentInstance* lbl_80578450[4];
-extern TLComponentInstance lbl_80580030;
-extern unsigned int lbl_806E18B0;
-extern BaseGameSceneManager* lbl_806E1838;
-
-extern "C" void fn_80306208(UnidentifiedTimer_8030616C* timer, bool enabled);
-extern "C" void fn_80306224(UnidentifiedTimer_8030616C* timer, float dt);
-extern "C" bool fn_8025BD88();
-extern "C" void fn_801CBCA0(
-    unsigned long cueId, const void* debugName, void* context, bool restartable);
 
 const char* lbl_806DEDB8[2] = { "ACCEPT", "REJECT" };
 
@@ -39,10 +34,10 @@ TU8026F444Scene::TU8026F444Scene()
     , mUnidentified034(2)
     , mUnidentified038(2)
     , mUnidentified144(1.0f,
-          Function<UnidentifiedTimer_8030616C*>(
+          Function<FETimer*>(
               Bind<void>(MemFun(&TU8026F444Scene::fn_8026F80C), this, Placeholder<0>())))
     , mUnidentified160(1.0f,
-          Function<UnidentifiedTimer_8030616C*>(
+          Function<FETimer*>(
               Bind<void>(MemFun(&TU8026F444Scene::fn_8026F874), this, Placeholder<0>())))
     , mUnidentified17C(false)
     , mUnidentified180(30)
@@ -60,15 +55,15 @@ TU8026F444Scene::TU8026F444Scene()
     mUnidentified184[0] = 0;
     mUnidentified03C[1] = 2;
     mUnidentified184[1] = 0;
-    fn_80306208(&mUnidentified160, false);
+    mUnidentified160.SetEnabled(false);
 }
 
 TU8026F444Scene::~TU8026F444Scene()
 {
-    TU80252180Scene* scene = fn_80253E18();
+    SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
     {
-        fn_802533F0(scene);
+        scene->RestoreButtonVisibility();
     }
 }
 
@@ -78,7 +73,7 @@ void TU8026F444Scene::fn_8026F7F8(NetMessageCheckConnection* message)
     mUnidentified184[1] = message->mUnidentified08[1];
 }
 
-void TU8026F444Scene::fn_8026F80C(UnidentifiedTimer_8030616C* timer)
+void TU8026F444Scene::fn_8026F80C(FETimer* timer)
 {
     mUnidentified17C = true;
     if (mUnidentified180 > 0)
@@ -88,52 +83,52 @@ void TU8026F444Scene::fn_8026F80C(UnidentifiedTimer_8030616C* timer)
         {
             if (mUnidentified180 == 1)
             {
-                fn_801CBCA0(0x09AA8790, 0, 0, true);
+                FEAudio::PlayAnimAudioEvent(0x09AA8790, 0, 0, true);
             }
             else
             {
-                fn_801CBCA0(0xFF48403F, 0, 0, true);
+                FEAudio::PlayAnimAudioEvent(0xFF48403F, 0, 0, true);
             }
         }
     }
 }
 
-void TU8026F444Scene::fn_8026F874(UnidentifiedTimer_8030616C* timer)
+void TU8026F444Scene::fn_8026F874(FETimer* timer)
 {
     fn_80271768();
 }
 
 void TU8026F444Scene::fn_8026F878()
 {
-    TU80300104Base::Callback over(
+    FEPointerListener::Callback over(
         Bind<void>(MemFun(&TU8026F444Scene::fn_80271640), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback off(
+    FEPointerListener::Callback off(
         Bind<void>(MemFun(&TU8026F444Scene::fn_802716E0), this, Placeholder<0>(), Placeholder<1>()));
-    TU80300104Base::Callback select(
+    FEPointerListener::Callback select(
         Bind<void>(MemFun(&TU8026F444Scene::fn_8026FBB0), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 2; ++i)
     {
-        mUnidentified18C[i].fn_80300D74(
+        mUnidentified18C[i].SetInstanceBounds(
             mUnidentified2F4[i], true, 0.0f, 0.0f, 1.0f, 1.0f);
-        mUnidentified18C[i].fn_803007C0(over);
-        mUnidentified18C[i].fn_80300864(off);
-        mUnidentified18C[i].fn_803009AC(select);
+        mUnidentified18C[i].SetPointerEnterCallback(over);
+        mUnidentified18C[i].SetPointerLeaveCallback(off);
+        mUnidentified18C[i].SetPointerPressCallback(select);
     }
 }
 
 void TU8026F444Scene::fn_8026FBB0(int index, void* context)
 {
     mUnidentified2F4[0]->m_bVisible = false;
-    mUnidentified18C[0].fn_80206B54();
+    mUnidentified18C[0].Disable();
     mUnidentified2F4[1]->m_bVisible = false;
-    mUnidentified18C[1].fn_80206B54();
+    mUnidentified18C[1].Disable();
 
     TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
         mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("WAITING"));
     if (component == 0)
     {
-        component = &lbl_80580030;
+        component = &gDefaultTLComponentInstance;
     }
     component->m_bVisible = true;
 
@@ -142,7 +137,7 @@ void TU8026F444Scene::fn_8026FBB0(int index, void* context)
         mUnidentified031 = true;
         for (int i = 0; i < 4; ++i)
         {
-            lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
         }
 
         UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
@@ -153,12 +148,12 @@ void TU8026F444Scene::fn_8026FBB0(int index, void* context)
         case 0:
             accepted = true;
             mUnidentified038 = 1;
-            fn_801CBCA0(0xF0AFD586, 0, 0, true);
+            FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, true);
             break;
         case 1:
             accepted = false;
             mUnidentified038 = 0;
-            fn_801CBCA0(0x6F6A3A07, 0, 0, true);
+            FEAudio::PlayAnimAudioEvent(0x6F6A3A07, 0, 0, true);
             break;
         }
 
@@ -220,7 +215,7 @@ void TU8026F444Scene::SceneCreated()
             mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher(lbl_806DEDB8[i]));
         if (component == 0)
         {
-            component = &lbl_80580030;
+            component = &gDefaultTLComponentInstance;
         }
         mUnidentified2F4[i] = component;
     }
@@ -232,7 +227,7 @@ void TU8026F444Scene::SceneCreated()
         mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("WAITING"));
     if (component == 0)
     {
-        component = &lbl_80580030;
+        component = &gDefaultTLComponentInstance;
     }
     component->m_bVisible = false;
 
@@ -244,16 +239,16 @@ void TU8026F444Scene::SceneCreated()
             mUnidentified180).c_str(), 128));
 
     fn_80270870();
-    TU80252180Scene* scene = fn_80253E18();
+    SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
     {
-        fn_802534BC(scene, 0, true);
+        scene->SetButtons(0, true);
     }
     for (int i = 0; i < 4; ++i)
     {
-        lbl_80578450[i]->SetActiveSlide("waiting", true, false);
+        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
     }
-    fn_801CBCA0(0xBB142B94, 0, 0, true);
+    FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, true);
 }
 
 void TU8026F444Scene::fn_80270870()
@@ -275,7 +270,7 @@ void TU8026F444Scene::fn_80270870()
         InlineHasher("RATING"), InlineHasher("stars"));
     if (component == 0)
     {
-        component = &lbl_80580030;
+        component = &gDefaultTLComponentInstance;
     }
     mUnidentified2FC = component;
     value >>= 1;
@@ -308,14 +303,14 @@ void TU8026F444Scene::Update(float dt)
     {
         return;
     }
-    fn_80306224(&mUnidentified160, dt);
+    mUnidentified160.Update(dt);
     if (mUnidentified160.mEnabled)
     {
         return;
     }
     if (!mUnidentified030)
     {
-        TLSlide* slide = mPresentation->GetActiveSlide();
+        TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->m_start + slide->m_duration)
         {
             return;
@@ -324,15 +319,15 @@ void TU8026F444Scene::Update(float dt)
         mUnidentified030 = true;
         for (int i = 0; i < 4; ++i)
         {
-            lbl_80578450[i]->SetActiveSlide("cursor", true, false);
+            gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
         }
     }
 
-    fn_80306224(&mUnidentified144, dt);
+    mUnidentified144.Update(dt);
     if (mUnidentified17C)
     {
         TLTextInstance* timer = FEFinder<TLTextInstance, 3>::Find(
-            mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("TIMER"));
+            mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("TIMER"));
         typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
         timer->SetString(nlStrNCpy(mUnidentified044,
             Format(WideBasicString(LookupLocString("ONLINE_CONNECTION_QUALITY_TIME")),
@@ -342,14 +337,14 @@ void TU8026F444Scene::Update(float dt)
     if (mUnidentified180 <= 0)
     {
         mUnidentified2F4[0]->m_bVisible = false;
-        mUnidentified18C[0].fn_80206B54();
+        mUnidentified18C[0].Disable();
         mUnidentified2F4[1]->m_bVisible = false;
-        mUnidentified18C[1].fn_80206B54();
+        mUnidentified18C[1].Disable();
         TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
-            mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("WAITING"));
+            mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("WAITING"));
         if (component == 0)
         {
-            component = &lbl_80580030;
+            component = &gDefaultTLComponentInstance;
         }
         component->m_bVisible = true;
     }
@@ -366,10 +361,10 @@ void TU8026F444Scene::Update(float dt)
     }
     if (disconnected)
     {
-        if (lbl_806E1838->GetSceneType(lbl_806E1838->GetCurrentScene()) != (SceneList)10)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
         {
             FEPopupMenu* popup = static_cast<FEPopupMenu*>(
-                lbl_806E1838->Push((SceneList)10, SCREEN_NOTHING, false));
+                GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false));
             popup->Create((ePopupMenu)0x60,
                 Function<FnVoidVoid>(Bind<void>(MemFun(&TU8026F444Scene::fn_80271768), this)));
             mUnidentified300 = true;
@@ -380,22 +375,22 @@ void TU8026F444Scene::Update(float dt)
     fn_80270870();
     for (unsigned int pad = 0; pad < 4; ++pad)
     {
-        TLComponentInstance* controller = lbl_80578450[pad];
-        if (pad != lbl_806E18B0)
+        TLComponentInstance* controller = gFEPointerInstances[pad];
+        if (pad != gFEControllerIndex)
         {
             controller->SetActiveSlide("waiting", true, false);
         }
         else
         {
             u8 valid = 1;
-            TU80300104Event event;
+            FEPointerEvent event;
             event.mIndex = pad;
-            event.mPosition = fn_802197FC(pad, &valid);
-            event.mFlag0 = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
-            event.mFlag1 = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
+            event.mPosition = GetPointerPosition(pad, &valid);
+            event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
+            event.mReleased = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
             for (int i = 0; i < 2; ++i)
             {
-                mUnidentified18C[i].fn_80219608(&event);
+                mUnidentified18C[i].HandlePointerEvent(&event);
             }
         }
     }
@@ -439,8 +434,8 @@ void TU8026F444Scene::Update(float dt)
             if (accepted)
             {
                 mUnidentified034 = 1;
-                NetworkLobby_80133634* lobby = g_pNetworkSession->fn_801216F0();
-                bool value = !fn_8025BD88();
+                NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
+                bool value = !IsOnlineRankedMatch();
                 UnidentifiedDraftEntry* info = lobby->GetLocalMachineInfo();
                 g_pNetworkSession->SendDraftToEveryone(lobby->GetPlayerCount(), info, false, value);
             }
@@ -451,12 +446,12 @@ void TU8026F444Scene::Update(float dt)
     {
         if (mUnidentified038 == 0)
         {
-            fn_80306208(&mUnidentified160, true);
+            mUnidentified160.SetEnabled(true);
         }
-        else if (lbl_806E1838->GetSceneType(lbl_806E1838->GetCurrentScene()) != (SceneList)10)
+        else if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
         {
             FEPopupMenu* popup = static_cast<FEPopupMenu*>(
-                lbl_806E1838->Push((SceneList)10, SCREEN_NOTHING, false));
+                GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false));
             popup->Create((ePopupMenu)0x72,
                 Function<FnVoidVoid>(Bind<void>(MemFun(&TU8026F444Scene::fn_80271768), this)));
             mUnidentified300 = true;
@@ -468,21 +463,21 @@ void TU8026F444Scene::fn_80271640(int index, void* context)
 {
     ++mUnidentified020[index];
     mUnidentified2F4[(int)context]->SetActiveSlide("OVER", true, false);
-    mUnidentified18C[(int)context].mValues[index] = 1;
-    fn_801CBCA0(0xDE912775, 0, 0, true);
+    mUnidentified18C[(int)context].SetPointerState(1, index);
+    FEAudio::PlayAnimAudioEvent(0xDE912775, 0, 0, true);
 }
 
 void TU8026F444Scene::fn_802716E0(int index, void* context)
 {
     --mUnidentified020[index];
     mUnidentified2F4[(int)context]->SetActiveSlide("OFF", true, false);
-    mUnidentified18C[(int)context].mValues[index] = 0;
+    mUnidentified18C[(int)context].SetPointerState(0, index);
 }
 
 void TU8026F444Scene::fn_80271768()
 {
     mUnidentified300 = false;
-    NetworkLobby_80133634* lobby = g_pNetworkSession->fn_801216F0();
+    NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
     int machineIndex = lobby->GetLocalMachineIndex();
     bool isHost = machineIndex == 0;
     unsigned int profileId = 0;
@@ -494,30 +489,30 @@ void TU8026F444Scene::fn_80271768()
             break;
         }
     }
-    g_pNetworkSession->fn_801216F0()->CloseConnectionsAndReset();
+    g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
 
-    if (fn_8025BD88())
+    if (IsOnlineRankedMatch())
     {
-        if (lbl_8057848C.mUnidentified08 >= lbl_8057848C.mUnidentified0C)
+        if (gRejectedOpponentProfileIds.IsFull())
         {
-            lbl_8057848C.UnidentifiedRemoveStart();
+            gRejectedOpponentProfileIds.Pop();
         }
-        *lbl_8057848C.UnidentifiedAddEnd() = profileId;
+        gRejectedOpponentProfileIds.Push(profileId);
         tDebugPrintManager::Print(DC_NETWORK,
             "Adding rejected PID %d to last rejected PIDS Q size now %d\n",
-            profileId, lbl_8057848C.mUnidentified08);
-        lbl_806E1838->Push((SceneList)0x31, SCREEN_BACK, true);
+            profileId, gRejectedOpponentProfileIds.GetCount());
+        GameSceneManager::Instance()->Push((SceneList)0x31, SCREEN_BACK, true);
     }
     else if (isHost)
     {
         SHOnlineInvitePlayers* scene = static_cast<SHOnlineInvitePlayers*>(
-            lbl_806E1838->Push((SceneList)0x2C, SCREEN_NOTHING, true));
-        scene->mUnidentified01C = true;
-        scene->mUnidentified01D = true;
+            GameSceneManager::Instance()->Push((SceneList)0x2C, SCREEN_NOTHING, true));
+        scene->mIsHost = true;
+        scene->mStartFriendServer = true;
     }
     else
     {
-        lbl_806E1194->SetOwnStatusAvailable_801374A4();
-        lbl_806E1838->Push((SceneList)lbl_806E1194->mUnidentified00C, SCREEN_BACK, true);
+        g_pFriendManager->SetOwnStatusAvailable();
+        GameSceneManager::Instance()->Push((SceneList)g_pFriendManager->mReturnScene, SCREEN_BACK, true);
     }
 }

@@ -18,6 +18,7 @@
 #include "NL/nlAVLTree.h"
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
+#include "unclassified/tu_801B535C.h"
 #include <stdlib.h>
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
@@ -57,7 +58,6 @@ extern "C" eCharacterClass fn_800D1440(const cCharacter*);
 extern "C" unsigned short fn_800D1448(const cCharacter*);
 extern "C" const nlVector3* fn_800D1450(const cCharacter*);
 extern "C" bool fn_800D1458(const cGame*);
-extern "C" void fn_801B5858(void*, cFielder*);
 extern "C" void fn_8002E52C(cFielder*);
 extern "C" void fn_800395C0(cFielder*);
 extern "C" void fn_80316968(shdStateMachine*);
@@ -67,7 +67,6 @@ extern "C" void fn_801B98A0(cFielder*);
 extern "C" void fn_801BB0DC(cFielder*);
 extern "C" void fn_801BC094(cFielder*);
 extern "C" void fn_801B881C(cFielder*);
-extern "C" void fn_801B5DD0(void*);
 extern "C" void fn_80039CF0(cFielder*, int);
 extern "C" void fn_801A0C58(cFielder*);
 extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
@@ -278,7 +277,7 @@ void DesireSuperPower::UnidentifiedCleanup()
         fn_80039CF0(mUnidentifiedFielder, 0);
         mUnidentifiedFielder->bYoshiInWindup = false;
         fn_801B881C(mUnidentifiedFielder);
-        fn_801B5DD0(lbl_806E1608->mUnidentified024);
+        lbl_806E1608->mUnidentified024->fn_801B5DD0();
         break;
     }
 
@@ -408,8 +407,7 @@ extern "C" float fn_800D1D4C(const cCharacter* character)
  */
 extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
 {
-    fn_801B5858(lbl_806E1608->mUnidentified024,
-        self->mUnidentifiedFielder);
+    lbl_806E1608->mUnidentified024->fn_801B5858(self->mUnidentifiedFielder);
     self->mUnidentifiedFielder->m_pTweaks
         = self->mUnidentifiedFielder->mUnidentified328;
     fn_8002E52C(self->mUnidentifiedFielder);

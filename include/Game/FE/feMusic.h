@@ -5,11 +5,14 @@
 
 namespace FEMusic
 {
-void SetUnidentifiedMode_801FC29C(bool value);
-void SetEnabled_801FC2A4(bool value);
-bool IsEnabled_801FC2AC();
+void SetInGame(bool value);
+void SetEnabled(bool value);
+bool IsEnabled();
 void StartStreamIfDifferent(int idx);
 void StopStream();
+void PauseStream();
+void ResumeStream();
+bool IsPlayingCupResultStream();
 } // namespace FEMusic
 
 #endif // _FEMUSIC_H_

@@ -16,7 +16,7 @@
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioSystem.h"
-#include "Game/BaseGameSceneManager.h"
+#include "Game/GameSceneManager.h"
 #include "Game/Sys/movie.h"
 #include "Game/Task/BeginFrameTask.h"
 #include "Game/Task/FrontEndTask.h"
@@ -27,6 +27,7 @@
 #include "Game/Drawable/DrawableModel.h"
 #include "Game/FE/feManager.h"
 #include "Game/FE/feSceneManager.h"
+#include "Game/SH/SHPause.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Game.h"
 #include "Game/NetworkSession.h"
@@ -71,6 +72,7 @@
 #include "unclassified/tu_80332770.h"
 #include "unclassified/tu_80336B2C.h"
 #include "unclassified/tu_80338898.h"
+#include "NL/nlstring_tmpl.h"
 
 #define OS_BUS_CLOCK_SPEED           (*(volatile u32*)0x800000F8)
 #define OS_TIME_SPEED                (OS_BUS_CLOCK_SPEED / 4)
@@ -151,7 +153,6 @@ extern UnidentifiedDeletable* lbl_806E2090;
 extern SlotPool<cSAnimCallback> lbl_805840D8;
 extern SlotPoolBase lbl_8057AB80;
 extern bool g_e3_Build;
-extern void* lbl_806E18C0;
 
 namespace Detail
 {
@@ -571,12 +572,12 @@ extern "C" void fn_8011A800(AsyncLoadingManager* manager)
 {
     manager->mLoadingComment = "GameStateFinalize";
 
-    lbl_806E18C0 = 0;
+    PauseMenuScene::mLastSelectedIndex = 0;
     InitializeElectricFence(GetLayerView(eCLV_ElectricFence));
     BeginFrameTask::s_FramerateLocked = false;
     fn_801CC114();
     InitializeTimeRegions();
-    fn_80137824(IsNetworkOrRecordedGame());
+    UseDefaultFreestyleButtonRemap(IsNetworkOrRecordedGame());
 
     manager->mLoadingState = 1;
     lbl_806E1040->SetVisible(false);
@@ -753,7 +754,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     nlFree(g_pLocalization->m_pFile);
     delete lbl_806E1050;
-    fn_801379AC();
+    DestroyPadBackends();
 
     cPN_SAnimController::m_SAnimControllerSlotPool.FreeBlocks();
     cPN_Blender::m_BlenderSlotPool.FreeBlocks();
@@ -805,7 +806,7 @@ extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
         }
     }
 
-    lbl_806E1838->Push((SceneList)0x10, SCREEN_NOTHING, false);
+    GameSceneManager::Instance()->Push((SceneList)0x10, SCREEN_NOTHING, false);
     fn_80370E20();
     FinishLoadingStep(manager);
 }

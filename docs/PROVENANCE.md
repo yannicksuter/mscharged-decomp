@@ -47,10 +47,166 @@ The project was built with or adapted source from the following projects:
 | [Jim Conger's C++ Blowfish, June 1996 archive](https://www.schneier.com/wp-content/uploads/2015/12/bfsh-con.zip) | Retained CBlowFish implementation, original names and P/S tables in `NL/blowfish.cpp`. |
 | [zlib 1.2.2](https://zlib.net/fossils/zlib-1.2.2.tar.gz) | Pristine upstream decompression and checksum sources. |
 
+`Game/GameInfo.h` adapts `UserInfo`, its option members, save ID and five
+lifetime-counter names from the predecessor's same header. R4QE01 serializes
+the smaller `0x80`-byte block at `GameInfoManager+0x9C`; its constructor and
+save writer confirm the retained members. `GameplaySettings` keeps the
+predecessor's `SkillLevel`, `GameTime` and skill-level enum. The home/away
+powerup and special-shot flags follow the retail challenge settings and their
+gameplay consumers. `WinBy`, `GameGoals` and `BestSeries` follow the recorded-game
+diagnostics in `Game/NetworkSession.cpp`.
+
+`Game/SH/SHOnlineFriendsChooseSides.cpp` names the scene constructed at
+`0x8026B10C` for scene 56 and `art/fe/online_friends_choose_sides.fen`. Its
+callback and member names describe the retail home/away selection, guest-player
+mapping, and countdown behavior. `DoChangeSides` follows its retail diagnostic
+string. `NetMessageSidesChanged` follows the session send diagnostics and
+message-25 dispatch; the payload carries the machine, side, guest flag, and
+host-response flag. These scene and message identities describe supported
+roles; original debug spellings are unavailable.
+
+`Game/FE/feTimer.h` describes the callback timer at `0x8030616C`. The
+front-end consumers and retail timer-list operations establish its callback,
+enabled state, duration, elapsed time, tick count, and intrusive next pointer.
+`SetEnabled` resets elapsed time only when the enabled state changes; `Update`
+invokes the callback at most once per call. The class name describes this role.
+
+`Game/Audio/AudioSystem.cpp` is the reconstruction unit for
+`0x802EBD54..0x802ED144`, including the listener, sound-handle, and callback
+helpers first retained here. Its constructor, update/flush operations,
+member-function pointers, and vtables connect the ordinary code to this tail.
+The initializer at `0x802ECF90`, referenced by `.ctors:0x804DBA3C`, registers
+the `audio/Stats` / `AllocatedCueCount` tweak used by this unit and closes the
+range before `AudioResourceLoadOwner`. Its tweak and destructor-registration
+storage is `0x8057F928..0x8057F960`; the shared sound pools themselves remain
+with their earlier owner. The unit owns `.data:0x8052F400..0x8052F48A`,
+`.sbss:0x806E2018..0x806E2020`, and the two float constants at
+`0x806E65B0..0x806E65B8`, not the preceding transition constant or trailing
+data alignment padding. The filename follows the existing class identity,
+not recovered original filename metadata; the unit remains unreconstructed.
+
+The former automatic boundary at `0x802F7E00` bisected a deferred helper
+tail. `unclassified/tu_802F6BC4.cpp` groups `0x802F6BC4..0x802F841C`:
+the ordinary callers use the AVL walks, searches, comparator, and callback
+adapter after that boundary, while the initializer at `0x802F7D94`
+(`.ctors:0x804DBA70`) registers the pool destructor at `0x802F83A8`.
+Its member-function pointer and adapter table occupy
+`0x8052F978..0x8052F998`; its registration record and pool occupy
+`0x8057FBC8..0x8057FBF0`, including four bytes of interior alignment.
+
+`unclassified/tu_802F841C.cpp` groups `0x802F841C..0x802F98F4`. Its
+ordinary methods operate on the same two AVL trees and use the following
+walks and callback adapters. The two empty `AudioEffectBase` methods at
+`0x802F98EC` and `0x802F98F0` stay with this consumer's tail, not with the
+following constructor. The associated member-function pointers and three
+five-word adapter tables occupy `0x8052F998..0x8052F9EC`. The default value
+at `0x806DF4F0` is one byte, as shown by the receiving node allocator's
+`lbz`/`stb` at `0x802F6654..0x802F6658`; subsequent zero bytes are alignment,
+not part of the value. These two unit names remain address-based because
+the predecessor has no corresponding audio implementation establishing
+original filenames or concrete template argument names. Both remain
+unreconstructed.
+
+The automatic function split at `0x80302A98..0x80302D04` contains guarded
+initialization of fourteen FE default objects, reached from
+`.ctors:0x804DBA84`; it is not a localization function. Its object storage
+is `0x8057FFB0..0x80580720`, with fourteen guard bytes at
+`0x806E2078..0x806E2086`. The predecessor's retail `MarioSoccerZ.MAP`
+distinguishes `tlTextInstance.o` (`SetStringId`) from
+`tlTextInstance_runtime.o` (`GetString`, `Render`, and the string/scissor
+setters), supporting the existing two text-instance units. The initializer's
+original filename and ownership relative to the preceding runtime unit are
+not established; its automatic split is not evidence of a separate original
+translation unit.
+
+`SetPlayButtonBounds` and `SetDoneButtonBounds` in `Game/FE/feHelpFuncs.cpp`
+follow the navigation controls bound by their callers: `Play_Now` (mask
+`0x10`) and `done` (mask `0x20`). Their separate four-float bounds tables
+remain as retained in R4QE01.
+
+The character conversion, team/sidekick name, and mode-name helpers in
+`feHelpFuncs.cpp` preserve the predecessor's API names and character-ID enum
+parameter types. Charged's match-end/cup-win and score/winner-title callers distinguish
+`GetLOCCharacterName` from `GetLOCTeamName`; both now return localization keys,
+and the former no longer takes the predecessor's Super Team flags. The
+`FECharacterSound` tables retain their donor names, while the sound getters
+describe Charged's lookup-only behavior. Cheat name/description helpers and
+their progress predicates follow retail localization keys and switch cases.
+The character idle helpers follow the `fe_idle`/`fe_idle_action_01` animation
+cycle. These added role names do not claim recovered debug spellings.
+
+`Game/SH/SHOptionsCheatsList.cpp` describes scene 28, whose retail factory
+loads `art/fe/options_cheats_list.fen` and constructs the `0x668`-byte scene at
+`0x802582C4`. Its pointer callbacks, scroll offset, and localization lookups
+establish the item and category names. The options scene constructs
+`PowerupSettings` at offset `0x15DC` and passes that same member to the list;
+the list therefore uses the shared settings type. Selection and preview
+callers establish its three word-sized fields: custom powerups, environment
+cheat, and player cheat. `mCustomPowerups` preserves the predecessor's field
+name for that role; the added category and getter names describe Charged's
+behavior without assuming the predecessor's smaller settings layout.
+
+`Game/SH/SHGameplayOptions.h` describes the parent options scene constructed
+at `0x8023483C` for scene 27 and `art/fe/options.fen`. Its retail gameplay
+settings, series/goal/time controls, and diagnostics establish this role. The
+constructor and destructor identify its 24 option buttons, three cheat
+buttons, back button, and Done button; callers identify its shared page
+controls and settings members. Its nine-slot vtable establishes the retained
+lifecycle declarations. `UpdateCheatText` at `0x80238234` updates the three
+cheat name/description pairs after a selection. The predecessor's gameplay
+menu supplies the applicable `mSettings` name, while Charged's embedded
+storage and pointer controls follow the retail layout. Unresolved members
+retain neutral names.
+
+`FEModelManager::GetModel` at `0x801C2FB4` searches the manager's handle list
+using the lowercase hash of a model name. The presentation interpreter uses
+that same manager and the owning `FEModelHandle` animation, transform,
+position, visibility, and callback interfaces. Its model completion callback
+restarts `fe_idle`. `GetCharacterTemplateInfo` at `0x8002600C` returns the
+character-indexed template record, or the shared goalie record for indices
+twenty and above. These names describe retail behavior.
+
+`Game/FriendManager.cpp` describes the friend-list and invitation manager at
+`0x801360A4`. Retail diagnostics provide the five `EFriendStatus` enumerators
+and the status-setting operation names. The status payload stores the targeted
+profile, game/powerup settings, network version, and stadium. Invitation screens
+establish the return scene, saved ranked mode, and UTF-16 friend-code input.
+`GetFriendManager` returns the manager allocated by the network task;
+`FormatFriendKey` prints its two six-digit groups. The two manager pointers
+retain distinct storage: `Reset(true)` also registers the instance pointer.
+The class, file, and remaining role names are descriptive reconstructions.
+
 `libs/RVL_SDK/include/revolution/bte.h` declares the handful of Broadcom BTE
 types and entry points the SDK's WPAD and WUD headers refer to (`BD_ADDR`,
 `BT_HDR`, `GKI_getbuf`, and the `BTA_Hh*` calls). Their names and widths follow
 Broadcom's published BTE/Bluedroid headers.
+
+`unclassified/tu_801B5EE8.cpp` reconstructs the GX setup routine at
+`0x801B5EE8..0x801B6168`, called by material program support at `0x8028CC78`.
+Its original filename and function name remain unidentified. The two flag
+bytes control additional texture stages; a nonzero float enables the final
+constant-colour blend. The predecessor's `NL/nlColour.h` supplies
+`nlFloatColourSet` and the existing `ConvertColour` abstraction. The partition
+also retains the adjacent initializer at `0x801B6168..0x801B6188`, its constructor
+entry at `0x804DB750`, and the routine's float literals at `0x806E5420..0x806E5428`.
+The initializer's original shared definition and inclusion trigger remain
+unidentified, so it is not reconstructed and the complete unit remains
+assembly-linked.
+
+`unclassified/tu_801B535C.cpp` reconstructs the 0x4C-byte object used by the
+snapshot renderer and the sphere at `0x801798A8`. Its orientation, position,
+radius, activation flag, drawable, player reference, and pending displacement
+are corroborated by construction, update, collision, and snapshot consumers.
+No predecessor source identity has been established; the class and methods
+retain address-based names. The vector constants at `0x804DCF98` and
+`0x804DCFA4` remain owned by `unclassified/tu_801B298C.cpp`.
+The partition includes the following initializer at `0x801B5DF8` and its
+constructor entry at `0x804DB74C`. The initializer remains unreconstructed
+because the shared pool specializations and their inclusion trigger are
+unidentified; the complete unit remains assembly-linked.
+The retail `0x801B59DC` path also queries `cFielder::IsFallenDown()` before
+playing its sound, but the use of that result is unresolved; no discarded
+query was added solely to reproduce the call.
 
 `Game/Effects/EmitterCallbacks.cpp` contains the emitter updates at
 `0x801BE428..0x801BEF44`. The predecessor's `Game/CharacterTriggers.cpp`
@@ -244,6 +400,112 @@ bitfield order on PowerPC. The key packing, S-box byte selection and padding
 behavior follow the game; they are not changed to a different Blowfish
 implementation's byte order. Unretained decryption/destruction bodies are
 not imported. The original source attribution is preserved.
+
+`Game/Render/tu_801B43F8.cpp` reconstructs the movable NPC used by the
+`CollisionWindDebrisPlayer` event. Its constructor, virtual table, collision
+callback and independent `NPCManager` allocations establish a `0x98`-byte
+object derived from `SkinAnimatedMovableNPC`. The shared base-class names
+follow the predecessor; the derived class and unidentified methods retain
+address-based names because no applicable predecessor class was found.
+The player-event payload holds this NPC, rather than a `PhysicsObject`.
+The physics queue's `CollisionDebrisBall` event carries the NPC pointer itself,
+without a separately allocated payload.
+
+`Game/Render/tu_801B532C.cpp` supplies the descriptor accessor and the
+three retail records for `CowDebris`, `CatfishDebris` and `TractorDebris`.
+The records contain the model name, physics radius and two values passed to
+the NPC constructor; the first value is subsequently passed to `PlaySound`.
+This descriptor unit is source-linked. The NPC implementation is not:
+boolean forwarding, update code generation and object layout remain
+unresolved. Its two vector constants still use the existing definitions in
+`unclassified/tu_801B298C.cpp`; their original definition ownership has not
+been established. The address-based source partition does not identify
+original filenames. The trailing initializer at `0x801B523C` remains
+unreconstructed: its guarded static storage is visible in retail, but its
+original shared declaration and instantiation trigger are not established.
+
+`Game/SH/SHPause.cpp` reconstructs the pause scene at `0x80239454` through
+`0x8023B144`. The predecessor's `SHPause.cpp` supplies the `PauseMenuScene`,
+quit-confirmation, transition, and static-state names where the Wii behavior
+retains those operations. The Wii scene replaces the predecessor's menu-list
+storage with seven pointer-input components and has no constructor context
+argument. Retail constructor stores, callback families, and the vtable at
+`0x8051DDCC` establish the `0x594`-byte layout and this partition. The remaining
+callbacks retain address-based names. The source is not yet source-linked.
+
+The online hub, friends list, and matchmaking draft screens occupy
+`0x8023B144..0x8023E9F4`, `0x8023E9F4..0x802441B4`, and
+`0x802441B4..0x80245DB4`. Their `SHOnlineHub`, `SHOnlineFriends`, and
+`SHOnlineMatchmakingDraft` names describe the retail menu actions, localization
+keys, and `FE_MATCHMAKING_DRAFT` audio context. These are descriptive source
+names, not recovered debug identifiers. `SHOnlineInvitePlayers` keeps its
+existing class identity under the corresponding source and header paths.
+
+The friends, draft, and invitation screens share a `0x98`-byte
+`FEOnlinePlayerRow`. Its reset stores and renderer establish the name, Mii data,
+friend index, search/status selections, ranking metadata, captain and side,
+visibility, guest, and cancel fields. The renderer belongs to this shared
+interface. The component-root default finder at `0x80244158` uses the common
+`FEFinder` template. Mii texture lookup and manager access at `0x80244080` and
+`0x802441AC` use the same state owned by `MiiManager`; their inline definitions
+are supplied through its implementation header. These interfaces preserve
+the existing calling conventions and layouts. The scene units remain
+`NonMatching` while their other code and object differences are unresolved.
+
+The invitation callbacks and `SHOnlineLogin` use names describing their
+pointer actions, lobby slots, login stages, and error handling. The login
+scene at `0x80260990..0x80261940` registers the session's two-result listener
+and uses the `FE_LOGIN` audio context. Its error-range table and the displayed
+error code are shared through `Game/FE/feOnlineError.h`. The four-machine
+friend-lobby flag follows the lobby's connection-capacity selection and the
+invitation screen's host-start control. These are descriptive names based on
+retail behavior; existing layouts and data ranges are retained.
+
+The GameInfo accessor at `0x80077224` reads the existing singleton pointer.
+It uses the common `nlSingleton<T>::GetInstance` definition, with no separate
+accessor body. The implementation header is visible before derived-type
+instantiation in the inline consumers and after the navigation scene's
+methods, preserving its retained call under the configured compiler.
+
+`SHNavigation` owns the literal pool at `0x806DE828..0x806DE907` and pointer
+visibility state at `0x806E18F0`. Its slide names, button text identifiers,
+and eight door names are ordinary string literals. Retail references and
+null terminators establish their complete extents; the final byte before the
+next pool is alignment padding. The previously split suffixes have no retail
+references. Their apparent users were superseded renderer sources whose
+small-data addresses did not use the retail r13 base. The configured
+`GXMaterialProgram` implementations already own the corresponding state.
+
+Navigation's button helpers use the shared argument-object finder with inline
+hash constructors. The retail code retains a zero-level descent check in these
+calls, while `SceneCreated` retains out-of-line constructor calls. Definition
+visibility and file-level inlining preserve both forms. Literal first use also
+places the home-button warning definition after the button-text helpers.
+The text lookup at `0x802281EC` has a shared `FEFindTextInstance` declaration
+used by the timer and online invitation preview. This descriptive interface
+does not establish the original template identity of that retained entry.
+Navigation's owned data matches; its remaining code differences keep the unit
+`NonMatching`.
+
+`SHOnlineInvitePreview` names the `0x3F8` scene at `0x8025BE74` that reads the
+host invitation payload and displays six gameplay options. Its continue-button
+callbacks, preview delay, text buffers, and literal names follow those retail
+uses. The class has its own header; its layout and retained ranges are unchanged.
+The wide-string formatter at `0x801CFE3C` follows the shared `Format` template:
+it converts a pointer argument, replaces the numbered brace placeholder, and
+returns the formatted string. The preview now uses that existing template with
+`const unsigned short*`, replacing its local C-linkage declaration. This names
+the interface without claiming an exact formatter body or a matching preview
+object.
+
+`SHOnlineInviteStatus` owns the `0x10C` invitation-status scene at `0x80262B54`
+and scene ID 53. Its callers set the lobby, cancellation, or decline status
+and return delay; the scene manages cancellation, pointer setup, and connection
+error dismissal. The owner header exposes those fields directly to its callers.
+The error callback descriptor at `0x80520640` contains the normal three-word
+member-function pointer; the following four zero bytes are alignment padding.
+The naming and header changes preserve the existing function bytes and data
+ranges.
 
 The repository's [CC0 license](../LICENSE) applies only to contributions whose
 authors have the right to make that dedication. Nintendo, Next Level Games,

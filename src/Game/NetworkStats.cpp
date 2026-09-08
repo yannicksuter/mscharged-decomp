@@ -1,3 +1,4 @@
+#include "NL/nlSingleton.inl"
 #include <dwc/dwc_ranking.h>
 #include "Game/Sys/debug.h"
 #include <revolution/net/NETDigest.h>
@@ -17,11 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern "C" int fn_8011C1B4();
 
-extern int lbl_806E20E0;
-extern u16 lbl_8058436C[];
-extern u8 lbl_80584384[];
 
 int g_nConnectToStatsAddress[4] = { 192, 168, 2, 188 };
 
@@ -222,7 +219,7 @@ void NetworkStatsReporter_8012CE20::ParseLeaderboardResponse(
         {
             break;
         }
-        metadata.mUnidentified14 = fn_8011C1B4();
+        metadata.mUnidentified14 = GetOnlineRegion();
         metadata.mDisplayRank = atoi(token);
 
         token = parser.NextTokenOnLine(true);
@@ -400,7 +397,7 @@ void NetworkRanking_8012D8F4::ShutdownRanking()
 void NetworkRanking_8012D8F4::InitializeRanking()
 {
     GameInfoSaveSlot* save =
-        GameInfoManager::GetInstance()->GetSaveSlot(lbl_806E20E0);
+        GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex);
     DWCRnkError result = DWC_RnkInitialize(
         "DbfBialvJznkQWYuOrRa0002282500000ef90000020042db60ecmschargedwii",
         (DWCUserData*)save);
@@ -436,14 +433,14 @@ bool NetworkRanking_8012D8F4::ReportGameResult(int category,
     int i = 0;
     for (; i < 10; ++i)
     {
-        mSubmission.mName[i] = lbl_8058436C[i];
-        if (lbl_8058436C[i] == 0)
+        mSubmission.mName[i] = gNetworkMiiNameWide[i];
+        if (gNetworkMiiNameWide[i] == 0)
         {
             break;
         }
     }
     mSubmission.mName[i] = 0;
-    memcpy(mSubmission.mData, lbl_80584384, sizeof(mSubmission.mData));
+    memcpy(mSubmission.mData, &gNetworkMiiData, sizeof(mSubmission.mData));
     mSubmission.mMonth = fallback->mMonth;
     mSubmission.mDay = fallback->mDay;
     mSubmission.mYear = fallback->mYear;
@@ -495,20 +492,20 @@ bool NetworkRanking_8012D8F4::SubmitScore(int category,
     int i = 0;
     for (; i < 10; ++i)
     {
-        mSubmission.mName[i] = lbl_8058436C[i];
-        if (lbl_8058436C[i] == 0)
+        mSubmission.mName[i] = gNetworkMiiNameWide[i];
+        if (gNetworkMiiNameWide[i] == 0)
         {
             break;
         }
     }
     mSubmission.mName[i] = 0;
-    memcpy(mSubmission.mData, lbl_80584384, sizeof(mSubmission.mData));
+    memcpy(mSubmission.mData, &gNetworkMiiData, sizeof(mSubmission.mData));
 
     if (submission == 0)
     {
         mSubmission.mWins = 0;
         mSubmission.mLosses = 0;
-        mSubmission.mUnidentified0C = (u16)fn_8011C1B4();
+        mSubmission.mUnidentified0C = (u16)GetOnlineRegion();
         NetworkRankingIdentity identity;
         identity.LoadLocal();
         mSubmission.mMonth = identity.mMonth;
@@ -583,7 +580,7 @@ bool NetworkRanking_8012D8F4::GetLeaderboardStats(int category,
         for (int i = 0; i < DWC_RNK_FRIENDS_MAX; ++i)
         {
             int* entry = (int*)GameInfoManager::GetInstance()->GetUnknown0x40(
-                lbl_806E20E0, i);
+                gNetworkSaveSlotIndex, i);
             parameter.friends.friends[i] = entry[1];
         }
     }
@@ -761,7 +758,7 @@ int NetworkRanking_8012D8F4::CompareLeaderboardRows(
     }
 
     GameInfoSaveSlot* save =
-        GameInfoManager::GetInstance()->GetSaveSlot(lbl_806E20E0);
+        GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex);
     int localProfile = save->unknown_0x01C;
     if (a->mPlayer.mProfileId == localProfile)
     {

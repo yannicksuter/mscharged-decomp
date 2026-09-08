@@ -21,6 +21,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include "NL/nlstring_tmpl.h"
 
 extern "C"
 {

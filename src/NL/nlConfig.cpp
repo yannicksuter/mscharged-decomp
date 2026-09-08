@@ -6,6 +6,7 @@
 #include "NL/nlMemory.h"
 #include "ctype.h"
 #include "cstring"
+#include "NL/nlstring_tmpl.h"
 
 extern "C" double atof(const char* string);
 typedef Config::String BString;

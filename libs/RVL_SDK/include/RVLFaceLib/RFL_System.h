@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+char* RFLGetArcFilePath(void);
 u32 RFLGetWorkSize(BOOL deluxeTex);
 RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize,
                            BOOL deluxeTex);

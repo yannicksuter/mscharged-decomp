@@ -11,6 +11,7 @@
 #include "NL/nlColour.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 extern "C" void fn_802B5370(
     nlQuaternion& out, const nlVector3& v3RotationAxis, unsigned short angle);

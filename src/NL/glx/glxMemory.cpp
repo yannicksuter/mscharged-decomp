@@ -12,6 +12,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 class UnidentifiedResourceAllocator_80376234;
 

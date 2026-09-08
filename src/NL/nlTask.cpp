@@ -107,7 +107,7 @@ void nlTaskManager::RunAllTasks()
     }
 }
 
-void nlTaskManager::SetNextState(u32 nextState)
+void nlTaskManager::SetNextState(unsigned int nextState)
 {
     m_pInstance->mPendingState = nextState;
 }

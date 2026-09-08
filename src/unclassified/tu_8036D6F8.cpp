@@ -1,9 +1,8 @@
 #include "NL/MemAlloc.h"
 
 #include "unclassified/tu_8036D6F8.h"
+#include "NL/nlMemory.h"
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 void fn_8036D6F8(MemoryAllocator* allocator)
 {

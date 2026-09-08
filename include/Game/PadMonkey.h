@@ -2,15 +2,14 @@
 #define GAME_PAD_MONKEY_H
 
 #include "NL/platpad.h"
+#include "NL/plat/WiiPad.h"
 #include "types.h"
-
-extern s32* lbl_806E2288;
 
 class PadMonkey : public PadBackend
 {
 public:
     PadMonkey(int padIndex);
-    virtual int UnidentifiedClassID() { return sClassID; }
+    virtual int GetClassID() { return sClassID; }
     virtual ~PadMonkey() { }
 
     virtual bool IsConnected();
@@ -47,19 +46,19 @@ public:
     /* 0x38 */ float* m_buttonChance;
 }; // size 0x3C
 
-class PadMonkey_80375EEC : public PadMonkey
+class WiiPadMonkey : public PadMonkey
 {
 public:
-    PadMonkey_80375EEC(int padIndex);
-    virtual ~PadMonkey_80375EEC() { }
+    WiiPadMonkey(int padIndex);
+    virtual ~WiiPadMonkey() { }
 
     virtual int GetButtonIndex(int button, bool remap)
     {
-        return fn_802C03FC(remap ? lbl_806E2288[button] : button);
+        return GetPadButtonIndex(remap ? gWiiFreestyleButtonRemap[button] : button);
     }
     virtual int GetButtonMask(int buttonIndex)
     {
-        return fn_802C06C8(buttonIndex);
+        return GetPadButtonMask(buttonIndex);
     }
     virtual int GetButtonCount() { return 16; }
 
