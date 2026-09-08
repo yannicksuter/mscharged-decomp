@@ -31,9 +31,6 @@ extern TLComponentInstance* lbl_80578450[4];
 extern unsigned int lbl_806E18B0;
 extern bool lbl_806E1009;
 extern TLComponentInstance lbl_80580030;
-extern "C" void fn_802308D0(UnidentifiedScrollWidget* widget, TLInstance* instance);
-extern "C" void fn_80230B90(UnidentifiedScrollWidget* widget, int value);
-extern "C" void fn_80230DE0(UnidentifiedScrollWidget* widget, int value);
 extern "C" void fn_80253348(TU80252180Scene* scene, int value, bool enabled);
 extern "C" void fn_801CC9B0(TU80219248Component* component, TLComponentInstance* instance, int value);
 extern "C" int fn_80261770(int error, bool connected, int value);
@@ -246,9 +243,9 @@ void SHOnlineInvitePlayers::SceneCreated()
         mPresentation->GetActiveSlide(), nlStringLowerHash("Layer"), nlStringLowerHash("scrollbar"), 0, 0, 0, 0);
     if (scrollbar == 0)
         scrollbar = &lbl_80580030;
-    fn_802308D0(&mUnidentified11C, scrollbar);
-    fn_80230B90(&mUnidentified11C, 0);
-    fn_80230DE0(&mUnidentified11C, 0);
+    mUnidentified11C.fn_802308D0(scrollbar);
+    mUnidentified11C.fn_80230B90(0);
+    mUnidentified11C.fn_80230DE0(0);
     mUnidentified42 = mUnidentified01C && !(mUnidentified34 > 0.0f) && lbl_806E1194->mOwnStatus.mStatus != 2;
     TU80252180Scene* screen = fn_80253E18();
     fn_802534BC(screen, 0x24, true);

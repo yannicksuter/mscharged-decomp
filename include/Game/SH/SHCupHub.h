@@ -2,7 +2,7 @@
 #define GAME_SH_SH_CUP_HUB_H
 
 #include "Game/BaseSceneHandler.h"
-#include "Game/SH/SHSceneBase.h"
+#include "unclassified/tu_8022F710.h"
 #include "unclassified/tu_80219248.h"
 #include "unclassified/tu_8022EF84.h"
 

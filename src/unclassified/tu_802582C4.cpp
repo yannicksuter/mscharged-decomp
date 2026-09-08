@@ -14,13 +14,6 @@
 #include "unclassified/tu_80252180.h"
 #include "unclassified/tu_80300104.h"
 
-extern "C" void fn_8022F848(UnidentifiedScrollWidget* widget, bool enabled);
-extern "C" void fn_8022F858(UnidentifiedScrollWidget* widget);
-extern "C" bool fn_8022FD80(UnidentifiedScrollWidget* widget, int direction, int value);
-extern "C" void fn_80230468(UnidentifiedScrollWidget* widget, TU80300104Event event, float fDeltaT);
-extern "C" void fn_802308D0(UnidentifiedScrollWidget* widget, TLInstance* instance);
-extern "C" void fn_80230B90(UnidentifiedScrollWidget* widget, int mode);
-extern "C" void fn_80230DE0(UnidentifiedScrollWidget* widget, int value);
 extern "C" void fn_80238234(BaseSceneHandler* scene);
 extern "C" bool fn_801CCD30(int cheat);
 extern "C" bool fn_801CCDB8(int cheat);
@@ -67,7 +60,7 @@ TU802582C4Scene::TU802582C4Scene()
         mComponents[i].mSpeakerEnabled = false;
     }
 
-    fn_8022F848(&mScrollWidget, true);
+    mScrollWidget.fn_8022F848(true);
 
     mUnidentified644[0] = 0;
     mUnidentified644[1] = 0;
@@ -287,10 +280,10 @@ void TU802582C4Scene::Update(float fDeltaT)
         {
             mComponents[i].fn_80219608(&event);
         }
-        fn_80230468(&mScrollWidget, event, fDeltaT);
+        mScrollWidget.fn_80230468(event, fDeltaT);
     }
 
-    if (fn_8022FD80(&mScrollWidget, 1, 1))
+    if (mScrollWidget.fn_8022FD80(1, 1))
     {
         ++mUnidentified65C;
         for (int i = 0; i < 5; ++i)
@@ -298,7 +291,7 @@ void TU802582C4Scene::Update(float fDeltaT)
             fn_80258730(i);
         }
     }
-    else if (fn_8022FD80(&mScrollWidget, 0, 1))
+    else if (mScrollWidget.fn_8022FD80(0, 1))
     {
         --mUnidentified65C;
         for (int i = 0; i < 5; ++i)
@@ -397,9 +390,9 @@ void TU802582C4Scene::SceneCreated()
             0,
             0,
             0));
-    fn_802308D0(&mScrollWidget, scrollbar);
-    fn_80230B90(&mScrollWidget, scrollRange);
-    fn_80230DE0(&mScrollWidget, mUnidentified65C);
+    mScrollWidget.fn_802308D0(scrollbar);
+    mScrollWidget.fn_80230B90(scrollRange);
+    mScrollWidget.fn_80230DE0(mUnidentified65C);
 
     for (int i = 0; i < 5; ++i)
     {
@@ -440,9 +433,9 @@ void TU802582C4Scene::fn_80259330()
         mComponents[i].fn_803009AC(select);
     }
 
-    if (!mScrollWidget.mUnidentified00[0x18])
+    if (!mScrollWidget.mUnidentified18)
     {
-        fn_8022F858(&mScrollWidget);
+        mScrollWidget.fn_8022F858();
     }
 }
 

@@ -161,7 +161,6 @@ extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" void fn_8001847C(cBall*, bool);
 extern "C" float fn_8002BE64(PlayerTweaks*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
-extern "C" bool fn_8002D92C(nlVector3*, bool, float);
 extern "C" void fn_80031A30(cFielder*, int, float);
 extern "C" void fn_80035544(cFielder*);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
@@ -2076,7 +2075,7 @@ extern "C" void fn_80017114(cBall* pBall)
 
     nlVector3 v3Position = pBall->m_v3Position;
     v3Position.y = AIsgn(v3Position.y) * lbl_806DB56C;
-    fn_8002D92C(&v3Position, true, 3.0f);
+    cField::FixOutOfBoundsX(v3Position, true, 3.0f);
 
     nlVector3 v3Direction;
     nlVec3Sub(v3Direction, v3Position, pBall->m_v3Position);

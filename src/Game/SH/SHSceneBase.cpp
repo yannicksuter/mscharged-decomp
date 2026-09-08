@@ -25,14 +25,6 @@ extern "C" void fn_801E3B60(UnidentifiedTextFader* fader, const char* text);
 extern "C" void fn_801E3DB4(UnidentifiedTextFader* fader, float dt);
 extern "C" void fn_801E4460(UnidentifiedTextFader* fader, TLInstance* instance);
 
-// Scroll widget owned by the 0x8022Fxxx/0x80230xxx translation units.
-extern "C" void fn_8022F858(UnidentifiedScrollWidget* widget);
-extern "C" bool fn_8022FD80(UnidentifiedScrollWidget* widget, int direction, int value);
-extern "C" void fn_80230468(UnidentifiedScrollWidget* widget, TU80300104Event event, float dt);
-extern "C" void fn_802308D0(UnidentifiedScrollWidget* widget, TLInstance* instance);
-extern "C" void fn_80230B90(UnidentifiedScrollWidget* widget, int mode);
-extern "C" void fn_80230DE0(UnidentifiedScrollWidget* widget, int value);
-
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" void fn_801CC9B0(TU80219248Component* component, int value0, int value1);
 class TU80252180Scene;
@@ -218,10 +210,10 @@ void UnidentifiedSHSceneBase::SHSceneVirtual30()
 
 void UnidentifiedSHSceneBase::fn_80269524()
 {
-    if (!mUnidentified420.mUnidentified00[0x18])
+    if (!mUnidentified420.mUnidentified18)
     {
-        fn_802308D0(&mUnidentified420, FindCurrentComponent("scrollbar"));
-        fn_8022F858(&mUnidentified420);
+        mUnidentified420.fn_802308D0(FindCurrentComponent("scrollbar"));
+        mUnidentified420.fn_8022F858();
     }
     TU80300104Base::Callback callback(BindSHSceneAction(&UnidentifiedSHSceneBase::fn_8026ABF0, this));
     mComponent.fn_803007C0(callback);
@@ -264,21 +256,21 @@ UnidentifiedSHSceneBase::UnidentifiedSHSceneBase()
 
 void UnidentifiedSHSceneBase::SceneCreated()
 {
-    fn_802308D0(&mUnidentified420, FindCurrentComponent("scrollbar"));
+    mUnidentified420.fn_802308D0(FindCurrentComponent("scrollbar"));
     if ((unsigned int)(mUnidentified28 - 0xB) <= 2)
     {
-        fn_80230B90(&mUnidentified420, 0);
+        mUnidentified420.fn_80230B90(0);
         mUnidentified109 = true;
     }
     else if (mUnidentified28 == 0xA)
     {
-        fn_80230B90(&mUnidentified420, 2);
+        mUnidentified420.fn_80230B90(2);
     }
     else
     {
-        fn_80230B90(&mUnidentified420, 1);
+        mUnidentified420.fn_80230B90(1);
     }
-    fn_80230DE0(&mUnidentified420, 0);
+    mUnidentified420.fn_80230DE0(0);
 
     TLSlide* first = mPresentation->m_currentSlide;
     TLSlide* slide = first;
@@ -469,12 +461,12 @@ void UnidentifiedSHSceneBase::Update(float dt)
             mComponent.fn_80219608(&event);
             if (mUnidentified30)
                 return;
-            fn_80230468(&mUnidentified420, event, dt);
-            if (fn_8022FD80(&mUnidentified420, 1, 1))
+            mUnidentified420.fn_80230468(event, dt);
+            if (mUnidentified420.fn_8022FD80(1, 1))
             {
                 fn_8026942C();
             }
-            else if (fn_8022FD80(&mUnidentified420, 0, 1))
+            else if (mUnidentified420.fn_8022FD80(0, 1))
             {
                 fn_8026932C();
             }

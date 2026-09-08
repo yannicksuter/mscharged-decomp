@@ -13,7 +13,6 @@
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/Render/Presentation.h"
-#include "Game/SH/SHSceneBase.h"
 #include "NL/MemAlloc.h"
 #include "NL/gl/glState.h"
 #include "NL/nlAlgorithm.h"
@@ -26,6 +25,7 @@
 #include "unclassified/tu_80216CB0.h"
 #include "unclassified/tu_802196B0.h"
 #include "unclassified/tu_8022EF84.h"
+#include "unclassified/tu_8022F710.h"
 
 extern TLComponentInstance lbl_80580030;
 extern BaseGameSceneManager* lbl_806E1838;
@@ -47,12 +47,6 @@ extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int valu
 extern "C" void fn_801CCEA0(int group, int index);
 extern "C" Presentation* fn_801FEEAC();
 extern "C" void fn_80209344(bool enabled);
-extern "C" void fn_8022F858(UnidentifiedScrollWidget* widget);
-extern "C" bool fn_8022FD80(UnidentifiedScrollWidget* widget, int direction, int value);
-extern "C" void fn_80230468(UnidentifiedScrollWidget* widget, TU80300104Event event, float fDeltaT);
-extern "C" void fn_802308D0(UnidentifiedScrollWidget* widget, TLInstance* instance);
-extern "C" void fn_80230B90(UnidentifiedScrollWidget* widget, int mode);
-extern "C" void fn_80230DE0(UnidentifiedScrollWidget* widget, int value);
 class TU80252180Scene;
 extern "C" void fn_80253474(TU80252180Scene* scene);
 extern "C" void fn_802534BC(TU80252180Scene* scene, int value, bool enabled);
@@ -812,9 +806,9 @@ extern "C" void fn_8024A7DC(TU8024A368Scene* scene)
     TLComponentInstance* scrollbar = CastFound<TLComponentInstance>(
         FEFinder<TLComponentInstance, 2>::_Find<TLSlide>(presentation->GetActiveSlide(),
             nlStringLowerHash("Layer"), nlStringLowerHash("scrollbar"), 0, 0, 0, 0));
-    fn_802308D0(&scene->mScrollWidget, scrollbar);
-    fn_80230B90(&scene->mScrollWidget, scene->mHistoryCount - 1);
-    fn_80230DE0(&scene->mScrollWidget, scene->mUnidentified30C);
+    scene->mScrollWidget.fn_802308D0(scrollbar);
+    scene->mScrollWidget.fn_80230B90(scene->mHistoryCount - 1);
+    scene->mScrollWidget.fn_80230DE0(scene->mUnidentified30C);
 
     fn_8024AF04(scene);
     switch (scene->mMode)
@@ -858,14 +852,14 @@ extern "C" void fn_8024A990(TU8024A368Scene* scene, float fDeltaT)
         {
             fn_802534BC(fn_80253E18(), 4, true);
             scene->mUnidentified328 = 1;
-            if (!scene->mScrollWidget.mUnidentified00[0x18])
+            if (!scene->mScrollWidget.mUnidentified18)
             {
                 TLComponentInstance* scrollbar = CastFound<TLComponentInstance>(
                     FEFinder<TLComponentInstance, 2>::_Find<TLSlide>(
                         scene->mPresentation->GetActiveSlide(), nlStringLowerHash("Layer"),
                         nlStringLowerHash("scrollbar"), 0, 0, 0, 0));
-                fn_802308D0(&scene->mScrollWidget, scrollbar);
-                fn_8022F858(&scene->mScrollWidget);
+                scene->mScrollWidget.fn_802308D0(scrollbar);
+                scene->mScrollWidget.fn_8022F858();
             }
         }
         else if (state == 2)
@@ -933,7 +927,7 @@ extern "C" void fn_8024A990(TU8024A368Scene* scene, float fDeltaT)
                 = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
             event.mFlag1
                 = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
-            fn_80230468(&scene->mScrollWidget, event, fDeltaT);
+            scene->mScrollWidget.fn_80230468(event, fDeltaT);
 
             if (scene->mNavigation.fn_8022F2E0(event, fDeltaT))
             {
@@ -950,7 +944,7 @@ extern "C" void fn_8024A990(TU8024A368Scene* scene, float fDeltaT)
         }
     }
 
-    if (fn_8022FD80(&scene->mScrollWidget, 1, 1))
+    if (scene->mScrollWidget.fn_8022FD80(1, 1))
     {
         ++scene->mUnidentified30C;
         switch (scene->mMode)
@@ -972,7 +966,7 @@ extern "C" void fn_8024A990(TU8024A368Scene* scene, float fDeltaT)
         fn_8024CBD8(scene);
         fn_8024D074(scene);
     }
-    else if (fn_8022FD80(&scene->mScrollWidget, 0, 1))
+    else if (scene->mScrollWidget.fn_8022FD80(0, 1))
     {
         --scene->mUnidentified30C;
         switch (scene->mMode)

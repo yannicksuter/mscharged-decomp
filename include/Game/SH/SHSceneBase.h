@@ -7,19 +7,11 @@
 #include "NL/nlBasicString.h"
 #include "NL/nlFunction.h"
 #include "unclassified/tu_80219248.h"
+#include "unclassified/tu_8022F710.h"
 
 class TLComponentInstance;
 class TLInstance;
 class TLTextInstance;
-
-// Scroll widget owned by the 0x8022Fxxx/0x80230xxx translation units.
-struct UnidentifiedScrollWidget
-{
-    UnidentifiedScrollWidget();
-    ~UnidentifiedScrollWidget();
-
-    /* 0x000 */ u8 mUnidentified00[0x1B4];
-}; // size 0x1B4
 
 class UnidentifiedSHSceneBase : public BaseSceneHandler
 {

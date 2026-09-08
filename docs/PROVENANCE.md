@@ -209,6 +209,19 @@ External source is accepted only after comparison against R4QE01. A unit is
 marked `Matching` only when its code and owned data agree and the complete
 build reproduces the original `main.dol` hash.
 
+`unclassified/tu_8022F710.cpp` reconstructs the scroll control at
+`0x8022F710..0x80231118`. Its two `TU80219248Component` members occupy
+`0x4C..0x1B4`; array construction, destruction, callback contexts, and the
+independent scene consumers establish their layout. The callback records at
+`0x8051D67C..0x8051D6AC` identify four member functions, and the functor
+vtable and three following methods use the shared `Function2`/`BindExp3`
+implementation. The next function destroys a containing scene, not this
+control. `UnidentifiedScrollWidget`, field placeholders, and address-based
+method names remain reconstruction identities. The predecessor's
+`FEScrollText` is a different control and is not a source donor here. Finder
+and binding emission, together with literal ordering, remain unresolved;
+the unit is not source-linked.
+
 `NL/blowfish.cpp` retains the constructor, block encipher, key initialization
 and padded encoding paths from Jim Conger's C++ conversion, including its
 output-length helper. The source archive SHA-256 is

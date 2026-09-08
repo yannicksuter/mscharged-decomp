@@ -11,6 +11,7 @@ class AnimRetargetList;
 class GoalieTweaks;
 class cSHierarchy;
 class CharacterPhysicsData;
+class cBaseCamera;
 
 class PhysicsGoalie;
 class LooseBallInfo;
@@ -112,6 +113,7 @@ public:
         cAnimInventory* pAnimInventory,
         const CharacterPhysicsData* pPhysicsData, GoalieTweaks* pTweaks,
         AnimRetargetList* pAnimRetargetList, int nIndex);
+    ~Goalie();
     virtual void UnidentifiedVirtual1C();
     virtual void Unknown10(
         const nlVector3& v3Position, unsigned short aDirection);
@@ -157,6 +159,7 @@ public:
     inline void InitActionPursueRecover();
     void CleanupStun();
     void ChooseSwatAnim(int nParam);
+    void DoPassRelease();
     void ExecutePounce(cPlayer* pPlayer, bool bCheckHitDistance);
     PhysicsGoalie* GetPhysicsGoalie();
     void SetDesiredSaveFacing(const nlVector3& v3BallPosition);
@@ -335,7 +338,7 @@ public:
     /* 0x424 */ SaveData* mpSaveData;
     /* 0x428 */ SaveBlendInfo mBlendInfo;
     /* 0x4B8 */ GoalieFatigue mFatigue;
-    /* 0x4C8 */ u8 mUnidentified4C8[4];
+    /* 0x4C8 */ cBaseCamera* mUnidentified4C8;
     /* 0x4CC */ const LooseBallInfo* mpLooseBallInfo;
     /* 0x4D0 */ int mUnidentified4D0[10];
     /* 0x4F8 */ float mUnidentified4F8[10];

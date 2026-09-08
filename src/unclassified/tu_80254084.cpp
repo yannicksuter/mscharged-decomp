@@ -132,12 +132,6 @@ extern bool fn_8010FE54(unsigned int flag);
 extern "C" void fn_801CBCA0(unsigned long hash, int value0, int value1, int value2);
 extern "C" void fn_8025BD7C(bool value);
 extern "C" void fn_8025BD94(bool value);
-extern "C" void fn_8022F858(UnidentifiedScrollWidget* widget);
-extern "C" bool fn_8022FD80(UnidentifiedScrollWidget* widget, int direction, int value);
-extern "C" void fn_80230468(UnidentifiedScrollWidget* widget, TU80300104Event event, float fDeltaT);
-extern "C" void fn_802308D0(UnidentifiedScrollWidget* widget, TLInstance* instance);
-extern "C" void fn_80230B90(UnidentifiedScrollWidget* widget, int mode);
-extern "C" void fn_80230DE0(UnidentifiedScrollWidget* widget, int value);
 extern "C" void fn_80238A1C(TU802384AC* object, int index, bool enabled, bool visible);
 extern "C" void fn_80255FE8(TU802554B4Scene* scene);
 extern "C" void fn_80256664(TU802554B4Scene* scene, int index, const char* stringId, bool unlocked);
@@ -537,9 +531,9 @@ void TU802554B4Scene::SceneCreated()
         FEFinder<TLComponentInstance, 4>::_Find<TLSlide>(presentation->GetActiveSlide(),
             nlStringLowerHash(lbl_806DE918), nlStringLowerHash(lbl_806DE910),
             nlStringLowerHash(lbl_8051FB78), 0, 0, 0));
-    fn_802308D0(&mScrollWidget, scrollbar);
-    fn_80230B90(&mScrollWidget, mUnidentified6C0 - 7);
-    fn_80230DE0(&mScrollWidget, mUnidentified6C4);
+    mScrollWidget.fn_802308D0(scrollbar);
+    mScrollWidget.fn_80230B90(mUnidentified6C0 - 7);
+    mScrollWidget.fn_80230DE0(mUnidentified6C4);
 
     for (int i = 0; i < 4; i++)
     {
@@ -620,9 +614,9 @@ void TU802554B4Scene::Update(float fDeltaT)
         mUnidentified6C8 = true;
     }
 
-    if (!mScrollWidget.mUnidentified00[0x18])
+    if (!mScrollWidget.mUnidentified18)
     {
-        fn_8022F858(&mScrollWidget);
+        mScrollWidget.fn_8022F858();
     }
 
     for (unsigned int pad = 0; pad < 4; pad++)
@@ -658,7 +652,7 @@ void TU802554B4Scene::Update(float fDeltaT)
                 = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
 
             mUnidentified0F8->fn_802385D0(event, fDeltaT);
-            fn_80230468(&mScrollWidget, event, fDeltaT);
+            mScrollWidget.fn_80230468(event, fDeltaT);
 
             if (mNavigation.fn_8022F2E0(event, fDeltaT))
             {
@@ -697,7 +691,7 @@ void TU802554B4Scene::Update(float fDeltaT)
         }
     }
 
-    if (fn_8022FD80(&mScrollWidget, 1, 1))
+    if (mScrollWidget.fn_8022FD80(1, 1))
     {
         ++mUnidentified6C4;
         switch (mMode)
@@ -726,7 +720,7 @@ void TU802554B4Scene::Update(float fDeltaT)
             break;
         }
     }
-    else if (fn_8022FD80(&mScrollWidget, 0, 1))
+    else if (mScrollWidget.fn_8022FD80(0, 1))
     {
         --mUnidentified6C4;
         switch (mMode)

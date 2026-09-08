@@ -1,5 +1,6 @@
 #include "Game/Field.h"
 
+#include "Game/MathHelpers.h"
 #include "math.h"
 
 static const float cornerRadius = 3.0f;
@@ -13,9 +14,9 @@ sSideLinePlane cField::mSidelines[4] = {
 };
 sCornerSegment cField::mCorners[4] = {
     { { cField::mv3FieldPosition.x - cornerRadius, cField::mv3FieldPosition.y - cornerRadius }, 0x0000, 0x4000, cornerRadius },
-    { { cornerRadius - cField::mv3FieldPosition.x, cField::mv3FieldPosition.y - cornerRadius }, 0x4000, 0x8000, cornerRadius },
-    { { cornerRadius - cField::mv3FieldPosition.x, cornerRadius - cField::mv3FieldPosition.y }, 0x8000, 0xC000, cornerRadius },
-    { { cField::mv3FieldPosition.x - cornerRadius, cornerRadius - cField::mv3FieldPosition.y }, 0xC000, 0x0000, cornerRadius }
+    { { -cField::mv3FieldPosition.x + cornerRadius, cField::mv3FieldPosition.y - cornerRadius }, 0x4000, 0x8000, cornerRadius },
+    { { -cField::mv3FieldPosition.x + cornerRadius, -cField::mv3FieldPosition.y + cornerRadius }, 0x8000, 0xC000, cornerRadius },
+    { { cField::mv3FieldPosition.x - cornerRadius, -cField::mv3FieldPosition.y + cornerRadius }, 0xC000, 0x0000, cornerRadius }
 };
 float cField::mfPenaltyBoxX = 13.5f;
 float cField::mfPenaltyBoxY = 4.5f;
@@ -102,6 +103,112 @@ bool cField::IsOnField(const nlVector2& location)
         }
     }
     return false;
+}
+
+static float FixComponent(const float& component, float fMin, float fMax)
+{
+    float value = component;
+    value = (value >= fMin) ? value : fMin;
+    value = (value <= fMax) ? value : fMax;
+    return value;
+}
+
+static bool FixOutOfBoundsY(nlVector3& v, float fMinDistanceFromWall)
+{
+    float fOldY = v.y;
+    v.y = FixComponent(v.y, -cField::mv3FieldPosition.y + fMinDistanceFromWall,
+        cField::mv3FieldPosition.y - fMinDistanceFromWall);
+    return v.y != fOldY;
+}
+
+bool cField::FixOutOfBoundsPosition(nlVector3& v, float fMinDistanceFromWall, bool bExcludeNet)
+{
+    bool bFixed;
+    bool bFixCorners = fMinDistanceFromWall < GetCorner(0).fRadius;
+
+    if (bFixCorners)
+    {
+        bFixed = FixCornerPosition(v, fMinDistanceFromWall);
+        if (!bFixed)
+        {
+            bFixed = FixOutOfBoundsX(v, bExcludeNet, fMinDistanceFromWall);
+        }
+        if (!bFixed)
+        {
+            bFixed = FixOutOfBoundsY(v, fMinDistanceFromWall);
+        }
+    }
+    else
+    {
+        bool bFixedX = FixOutOfBoundsX(v, bExcludeNet, fMinDistanceFromWall);
+        bFixed = FixOutOfBoundsY(v, fMinDistanceFromWall) || bFixedX;
+    }
+
+    return bFixed;
+}
+
+bool cField::FixCornerPosition(nlVector3& v, float fMinDistanceFromWall)
+{
+    float fOldX = v.x;
+    float fOldY = v.y;
+
+    for (int i = 0; i < 4; i++)
+    {
+        sCornerSegment corner = GetCorner(i);
+        nlVector2 vFromCorner;
+        nlVector2 vToCorner;
+        nlVec2Set(vToCorner, corner.vCenter.x - v.x, corner.vCenter.y - v.y);
+        float fDistanceToCorner = nlVec2Length(vToCorner);
+        float fLimitRadius = corner.fRadius - fMinDistanceFromWall;
+
+        if ((float)fabs(v.x) > (float)fabs(corner.vCenter.x)
+            && (float)fabs(v.y) > (float)fabs(corner.vCenter.y))
+        {
+            nlVec2Set(vFromCorner, v.x - corner.vCenter.x, v.y - corner.vCenter.y);
+            float fDistance = nlVec2Length(vFromCorner);
+            u16 uAngle = RadToAng16(nlATan2f(vFromCorner.y, vFromCorner.x));
+
+            if (abs_ang16(nlAngleDiff(uAngle, corner.thetaStart)) <= 0x4000
+                && abs_ang16(nlAngleDiff(uAngle, corner.thetaEnd)) <= 0x4000
+                && fDistance > fLimitRadius)
+            {
+                float fInvLength = nlRecipSqrt(nlVec2LengthSquared(vFromCorner), true);
+                float fOffsetY = fLimitRadius * (fInvLength * vFromCorner.y);
+                float fOffsetX = fLimitRadius * (fInvLength * vFromCorner.x);
+                vFromCorner.y = corner.vCenter.y + fOffsetY;
+                vFromCorner.x = corner.vCenter.x + fOffsetX;
+                v.x = vFromCorner.x;
+                v.y = vFromCorner.y;
+            }
+        }
+    }
+
+    bool bFixed = (v.x != fOldX);
+    return bFixed || v.y != fOldY;
+}
+
+bool cField::FixOutOfBoundsX(nlVector3& v, bool bExcludeNet, float fMinDistanceFromWall)
+{
+    float fOldX = v.x;
+
+    if (bExcludeNet)
+    {
+        v.x = FixComponent(v.x, -mv3FieldPosition.x + fMinDistanceFromWall,
+            mv3FieldPosition.x - fMinDistanceFromWall);
+    }
+    else if ((float)fabs(v.y) > 0.5f * cNet::m_fNetWidth - fMinDistanceFromWall)
+    {
+        v.x = FixComponent(v.x, -mv3FieldPosition.x + fMinDistanceFromWall,
+            mv3FieldPosition.x - fMinDistanceFromWall);
+    }
+    else
+    {
+        float fNetBack = mv3FieldPosition.x + cNet::m_fNetDepth;
+        v.x = FixComponent(v.x, -fNetBack, fNetBack);
+    }
+
+    bool bFixed = (v.x != fOldX);
+    return bFixed || FixCornerPosition(v, fMinDistanceFromWall);
 }
 
 void cField::SetFieldDimensions(float fX, float fY, float fZ)

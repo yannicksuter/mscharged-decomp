@@ -1,4 +1,6 @@
 #include "Game/DB/tu_8010A40C.h"
+#include "Game/GameInfo.h"
+#include "NL/nlPrint.h"
 
 struct StrikerChallengeDefinition
 {
@@ -13,6 +15,12 @@ extern const StrikerChallengeDefinition lbl_804DCA30[22];
 extern bool fn_8010FE54(u32);
 extern void fn_8010FD84(u32);
 extern void fn_80111560(u32* completionData, u32 unlockFlag);
+extern "C" const char* GetTweakString(const char*, const char*);
+extern "C" int GetTweakInt(const char*, int);
+extern "C" bool GetTweakBool(const char*, bool);
+extern "C" int fn_801CBED0(const char*);
+extern "C" int fn_801CBEF8(const char*);
+extern "C" int fn_801CBF20(const char*);
 
 void* BaseCup::SerializeData(void* dst) const
 {
@@ -136,6 +144,59 @@ void UnidentifiedStrikerChallenge::SetCurrentChallenge(int challenge)
 {
     mCurrentChallenge = challenge;
     mCaptain = lbl_804DCA30[challenge].mCaptain;
+}
+
+void UnidentifiedStrikerChallenge::LoadSettings()
+{
+    BasicGameInfo* info = GameInfoManager::Instance()->GetCurrentGameInfo();
+    info->mTeamIndex[0] = fn_801CBED0(GetTweakString("challenge/home", "mario"));
+    info->mTeamIndex[1] = fn_801CBED0(GetTweakString("challenge/away", "luigi"));
+    info->mStadiumIndex = fn_801CBF20(GetTweakString("challenge/stadium", "vice"));
+
+    char name[64];
+    for (int side = 0; side < 2; side++)
+    {
+        for (int sidekick = 0; sidekick < 3; sidekick++)
+        {
+            const char* format = "challenge/sidekickaway%d";
+            if (side == 0)
+            {
+                format = "challenge/sidekickhome%d";
+            }
+            nlSNPrintf(name, sizeof(name), format, sidekick);
+            int id = fn_801CBEF8(GetTweakString(name, "toad"));
+            if (sidekick == 0)
+            {
+                info->mSidekickIndex[side][0] = id;
+            }
+            else if (sidekick == 1)
+            {
+                info->mSidekickIndex[side][1] = id;
+            }
+            else if (sidekick == 2)
+            {
+                info->mSidekickIndex[side][2] = id;
+            }
+        }
+    }
+
+    mRemainingTime = GetTweakInt("challenge/remainingtime", 180);
+    mAIDifficulty = GetTweakInt("challenge/ai", 1);
+    mCondition = GetTweakInt("challenge/condition", 0);
+    mWinParameter = GetTweakInt("challenge/winparameter", 0);
+    mHomeScore = GetTweakInt("challenge/homescore", 0);
+    mAwayScore = GetTweakInt("challenge/awayscore", 0);
+    mHomeMissingSidekicks = GetTweakInt("challenge/homemissingsidekicks", 0);
+    mAwayMissingSidekicks = GetTweakInt("challenge/awaymissingsidekicks", 0);
+    mHomePowerupsDisabled = !GetTweakBool("challenge/homepowerups", false);
+    mAwayPowerupsDisabled = !GetTweakBool("challenge/awaypowerups", false);
+    mHomeMegastrikeDisabled = !GetTweakBool("challenge/homemegastrike", false);
+    mAwayMegastrikeDisabled = !GetTweakBool("challenge/awaymegastrike", false);
+    mHomeSkillshotDisabled = !GetTweakBool("challenge/homeskillshot", false);
+    mAwaySkillshotDisabled = !GetTweakBool("challenge/awayskillshot", false);
+    mStunnedHomeGoalies = GetTweakBool("challenge/stunnedhomegoalies", false);
+    mStunnedAwayGoalies = GetTweakBool("challenge/stunnedawaygoalies", false);
+    mCustomPowerups = GetTweakInt("challenge/custompowerups", 0);
 }
 
 bool UnidentifiedStrikerChallenge::IsUnlocked(int challenge) const

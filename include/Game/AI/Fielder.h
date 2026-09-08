@@ -162,8 +162,12 @@ class FuzzyVariant;
 class DesireSteering;
 class DesireUserControlled;
 class UnidentifiedDesire35;
+class cFielder;
+class DesireSuperPower;
 extern "C" void fn_800C5DBC(DesireSteering*, float);
 extern "C" void fn_800C6FDC(DesireSteering*, float);
+extern "C" bool fn_800D1C34(const cFielder*);
+extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
 class PhysicsObject;
 class ShotMeter;
 class UnidentifiedFielderInput;
@@ -175,6 +179,9 @@ class cFielder : public cPlayer
     friend void fn_800C6FDC(DesireSteering*, float);
     friend class UnidentifiedDesire35;
     friend class DesireUserControlled;
+    friend class DesireSuperPower;
+    friend bool fn_800D1C34(const cFielder*);
+    friend bool fn_800D0DB0(class DesireSuperPower*, void*);
 
 public:
     PlayerTweaks* GetTweaks() const;

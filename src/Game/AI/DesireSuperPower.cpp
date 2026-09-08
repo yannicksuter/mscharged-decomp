@@ -1,12 +1,23 @@
 #include "Game/AI/DesireSuperPower.h"
 
+#include "Game/AI/AIPad.h"
+#include "Game/AI/AvoidableObject.h"
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/Fielder.h"
+#include "Game/DB/CharacterInfo.h"
 #include "Game/DebugWriteCache.h"
+#include "Game/Effects/EmissionController.h"
+#include "Game/Effects/EmissionManager.h"
+#include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Event.h"
 #include "Game/Game.h"
+#include "Game/Physics/PhysicsPatch.h"
+#include "Game/Render/NPCManager.h"
+#include "Game/Sys/audio.h"
+#include "Game/Team.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlMath.h"
+#include "NL/nlString.h"
 #include <stdlib.h>
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
@@ -46,6 +57,33 @@ extern "C" eCharacterClass fn_800D1440(const cCharacter*);
 extern "C" unsigned short fn_800D1448(const cCharacter*);
 extern "C" const nlVector3* fn_800D1450(const cCharacter*);
 extern "C" bool fn_800D1458(const cGame*);
+extern "C" void fn_801B5858(void*, cFielder*);
+extern "C" void fn_8002E52C(cFielder*);
+extern "C" void fn_800395C0(cFielder*);
+extern "C" void fn_80316968(shdStateMachine*);
+extern "C" void fn_80038158(cFielder*, int);
+extern "C" void fn_8001EE74(cFielder*, float, float, float);
+extern "C" void fn_801B98A0(cFielder*);
+extern "C" void fn_801BB0DC(cFielder*);
+extern "C" void fn_801BC094(cFielder*);
+extern "C" void fn_801B881C(cFielder*);
+extern "C" void fn_801B5DD0(void*);
+extern "C" void fn_80039CF0(cFielder*, int);
+extern "C" void fn_801A0C58(cFielder*);
+extern "C" EffectsGroup* fn_802E7CDC(EmissionManager*, const char*);
+extern "C" void fn_802E83C4(EmissionManager*, EffectsGroup*);
+extern "C" EmissionController* fn_802E7FE4(
+    EmissionManager*, EffectsGroup*, int, bool, bool);
+extern "C" void fn_80139D1C(int, void*);
+extern "C" void fn_800A6968(cTeam*);
+extern "C" void fn_803198F4();
+extern "C" void fn_802F4E84(unsigned long*, int, int);
+extern "C" const nlVector2 lbl_804DC348[6];
+extern "C" const nlVector2 lbl_804DC378[2];
+extern FuzzyVariant fvNotSet;
+extern const nlVector3 lbl_804DC338;
+extern bool lbl_806DC2F8;
+extern bool lbl_806DC314;
 static unsigned short sDesireSuperPowerType = 0xFFFF;
 
 static inline void UnidentifiedRegisterEventCallback(
@@ -150,6 +188,114 @@ void DesireSuperPower::UnidentifiedUpdate(
 }
 
 /**
+ * Offset/Address/Size: 0x9F0 | 0x800C90EC | size: 0x2B8
+ */
+void DesireSuperPower::UnidentifiedCleanup()
+{
+    fn_800A6968(mUnidentifiedFielder->m_pTeam);
+    fn_803198F4();
+
+    switch (mUnidentifiedFielder->m_eCharacterClass)
+    {
+    case DAISY:
+        mUnidentifiedFielder->fn_80050008();
+        mUnidentifiedFielder->m_pTeam->ClearCurrentPowerUp();
+        fn_801B98A0(mUnidentifiedFielder);
+        break;
+    case WALUIGI:
+        fn_80038158(mUnidentifiedFielder, 0);
+        {
+            EffectsGroup* group = fn_802E7CDC(
+                EmissionManager::Instance(), "bowserjr_shriek_mouth");
+            if (group != 0)
+            {
+                fn_802E83C4(EmissionManager::Instance(), group);
+            }
+        }
+        break;
+    case DONKEYKONG:
+        fn_80038158(mUnidentifiedFielder, 0);
+        break;
+    case WARIO:
+        mUnidentifiedFielder->mUnidentified181 = false;
+        mUnidentifiedFielder->mUnidentified182 = false;
+        fn_80038158(mUnidentifiedFielder, 0);
+        break;
+    case HAMMERBROS:
+        fn_801BB0DC(mUnidentifiedFielder);
+        fn_80038158(mUnidentifiedFielder, 0);
+        delete (AvoidablePoint*)mpDKShockAvoidable;
+        mpDKShockAvoidable = 0;
+        break;
+    case KOOPA:
+        mUnidentifiedFielder->m_pTweaks
+            = mUnidentifiedFielder->mUnidentified32C;
+        fn_8001EE74(mUnidentifiedFielder, 1.0f, 0.25f, 1.0f);
+        fn_801BC094(mUnidentifiedFielder);
+        break;
+    case BIRDO:
+        mUnidentifiedFielder->m_pTweaks
+            = mUnidentifiedFielder->mUnidentified32C;
+        fn_8001EE74(mUnidentifiedFielder, 1.0f, 0.25f, 1.0f);
+        fn_801BC094(mUnidentifiedFielder);
+        break;
+    case LUIGI:
+        mUnidentifiedFielder->fn_8004FA34();
+        fn_801A0C58((cFielder*)0);
+        break;
+    case YOSHI:
+        fn_80038158(mUnidentifiedFielder, 0);
+        mUnidentifiedFielder->mUnidentified404 = 0.0f;
+        mUnidentifiedFielder->mUnidentified408 = 0.0f;
+        mUnidentifiedFielder->fn_80050008();
+        mUnidentifiedFielder->m_pTeam->ClearCurrentPowerUp();
+        if (mUnidentifiedFielder->m_eAnimID == 104)
+        {
+            mUnidentifiedFielder->EndDesire();
+            mUnidentifiedFielder->StartRunning();
+        }
+        break;
+    case MARIO:
+        if (mUnidentifiedFielder->fn_8002E060() == 12)
+        {
+            mUnidentifiedFielder->EndDesire();
+        }
+        mUnidentifiedFielder->fn_80050008();
+        mUnidentifiedFielder->m_pTeam->ClearCurrentPowerUp();
+        break;
+    case PEACH:
+        mUnidentifiedFielder->fn_80050008();
+        mUnidentifiedFielder->m_pTeam->ClearCurrentPowerUp();
+        if (mUnidentifiedFielder->m_eAnimID == 104)
+        {
+            mUnidentifiedFielder->EndDesire();
+            mUnidentifiedFielder->StartRunning();
+        }
+        break;
+    case TOAD:
+        mUnidentifiedFielder->m_pTweaks
+            = mUnidentifiedFielder->mUnidentified32C;
+        fn_80039CF0(mUnidentifiedFielder, 0);
+        mUnidentifiedFielder->bYoshiInWindup = false;
+        fn_801B881C(mUnidentifiedFielder);
+        fn_801B5DD0(lbl_806E1608->mUnidentified024);
+        break;
+    }
+
+    unsigned long sound = PowerupBase::GetSoundType(
+        (ePowerUpType)mUnidentifiedFielder->mUnidentified11C->unknown_0x14,
+        PowerupBase::PWRUP_SOUND_ACTIVATE);
+    StopCaptainPowerupStream(sound, mUnidentifiedFielder);
+    if ((mUnidentifiedFielder->m_eCharacterClass == BIRDO)
+        || (mUnidentifiedFielder->m_eCharacterClass == KOOPA))
+    {
+        ResumeSuddenDeathMusic();
+        unsigned long hash = nlStringLowerHash("MarioPowerup");
+        fn_802F4E84(&hash, 1, 0);
+    }
+}
+
+/**
  * Offset/Address/Size: 0x8D44 | 0x800D1440 | size: 0x8
  */
 extern "C" eCharacterClass fn_800D1440(const cCharacter* character)
@@ -213,6 +359,209 @@ extern "C" float fn_800D1C80(
         first->y - second->y,
     };
     return nlVec2Length(delta);
+}
+
+/**
+ * Offset/Address/Size: 0x9538 | 0x800D1C34 | size: 0x8
+ */
+extern "C" bool fn_800D1C34(const cFielder* fielder)
+{
+    return fielder->mUnidentified3DC;
+}
+
+/**
+ * Offset/Address/Size: 0x51E8 | 0x800CD8E4 | size: 0x14
+ */
+extern "C" void fn_800CD8E4(int* dst, const int* src)
+{
+    dst[0] = src[0];
+    dst[1] = src[1];
+}
+
+/**
+ * Offset/Address/Size: 0x9640 | 0x800D1D3C | size: 0x8
+ */
+extern "C" UnidentifiedVariantCollection* fn_800D1D3C(
+    shdStateMachine* stateMachine)
+{
+    return &stateMachine->mUnidentified01C;
+}
+
+/**
+ * Offset/Address/Size: 0x9648 | 0x800D1D44 | size: 0xC
+ */
+extern "C" float fn_800D1D44(const cCharacter* character)
+{
+    return character->m_fDesiredMovementScale;
+}
+
+/**
+ * Offset/Address/Size: 0x9650 | 0x800D1D4C | size: 0x8
+ */
+extern "C" float fn_800D1D4C(const cCharacter* character)
+{
+    return character->m_fDesiredPlayerScale;
+}
+
+/**
+ * Offset/Address/Size: 0x86B4 | 0x800D0DB0 | size: 0xFC
+ */
+extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
+{
+    fn_801B5858(lbl_806E1608->mUnidentified024,
+        self->mUnidentifiedFielder);
+    self->mUnidentifiedFielder->m_pTweaks
+        = self->mUnidentifiedFielder->mUnidentified328;
+    fn_8002E52C(self->mUnidentifiedFielder);
+    if (self->mUnidentifiedFielder->m_tFireTimer.m_uPackedTime != 0)
+    {
+        self->mUnidentifiedFielder->fn_8009750C();
+        self->mUnidentifiedFielder->EndAction();
+    }
+    self->mUnidentifiedFielder->bYoshiInWindup
+        = (self->mUnidentifiedFielder->m_eActionState
+            == ACTION_UNKNOWN_30);
+    if ((self->mUnidentifiedFielder->fn_8002E060() == 21)
+        || (self->mUnidentifiedFielder->fn_8002E060() == 19)
+        || (self->mUnidentifiedFielder->fn_8002E060() == 18)
+        || (self->mUnidentifiedFielder->fn_8002E060() == 9))
+    {
+        self->mUnidentifiedFielder->EndDesire();
+        self->mUnidentifiedFielder->StartRunning();
+    }
+    else if (self->mUnidentifiedFielder->m_eActionState
+        == ACTION_UNKNOWN_30)
+    {
+        self->mUnidentifiedFielder->StartRunning();
+    }
+    fn_800395C0(self->mUnidentifiedFielder);
+    self->mUnidentified078 = 5.5f;
+    return true;
+}
+
+/**
+ * Offset/Address/Size: 0x1850 | 0x800C9F4C | size: 0x130
+ */
+extern "C" bool fn_800C9F4C(DesireSuperPower* self, void*)
+{
+    if (self->mUnidentifiedFielder->GetGlobalPad() != 0)
+    {
+        if (self->mUnidentifiedFielder->m_pController
+                ->GetMovementStickMagnitude() > 0.01f)
+        {
+            self->mUnidentifiedFielder->m_pController
+                ->GetMovementStickDirection();
+        }
+    }
+    short dir = 0;
+    cFielder* target = FindPowerupTarget(
+        self->mUnidentifiedFielder, (ePowerUpType)-1);
+    self->mpTarget = target;
+    if ((target != 0) && (lbl_806DC2F8 != 0))
+    {
+        dir = self->mUnidentifiedFielder->GetFacingDeltaToPosition(
+            target->m_v3Position);
+    }
+    self->mUnidentifiedFielder->InitDesire(
+        (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    self->mUnidentifiedFielder->SetAction((eFielderActionState)29);
+    self->mUnidentifiedFielder->muInvincibleStatus |= 1;
+    self->mUnidentifiedFielder->SetAnimState(104, true, 0.2f, false, false);
+    self->mUnidentifiedFielder->InitMovementFromAnim(
+        dir, lbl_804DC338, 0.15f, false);
+    self->mUnidentified078 = 1234567.0f;
+    return self->mUnidentifiedFielder->m_eActionState
+        == (eFielderActionState)29;
+}
+
+/**
+ * Offset/Address/Size: 0x1678 | 0x800C9D74 | size: 0x40
+ */
+extern "C" void fn_800C9D74(DesireSuperPower* self, int param)
+{
+    if (param != 0)
+    {
+        self->mUnidentifiedFielder->fn_8004FF40();
+    }
+    fn_80316968(self);
+}
+
+/**
+ * Offset/Address/Size: 0x2590 | 0x800CAC8C | size: 0x130
+ */
+extern "C" bool fn_800CAC8C(DesireSuperPower* self, void*)
+{
+    if (self->mUnidentifiedFielder->GetGlobalPad() != 0)
+    {
+        if (self->mUnidentifiedFielder->m_pController
+                ->GetMovementStickMagnitude() > 0.01f)
+        {
+            self->mUnidentifiedFielder->m_pController
+                ->GetMovementStickDirection();
+        }
+    }
+    short dir = 0;
+    cFielder* target = FindPowerupTarget(
+        self->mUnidentifiedFielder, (ePowerUpType)-1);
+    self->mpTarget = target;
+    if ((target != 0) && (lbl_806DC314 != 0))
+    {
+        dir = self->mUnidentifiedFielder->GetFacingDeltaToPosition(
+            target->m_v3Position);
+    }
+    self->mUnidentifiedFielder->InitDesire(
+        (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    self->mUnidentifiedFielder->SetAction((eFielderActionState)29);
+    self->mUnidentifiedFielder->muInvincibleStatus |= 1;
+    self->mUnidentifiedFielder->SetAnimState(104, true, 0.2f, false, false);
+    self->mUnidentifiedFielder->InitMovementFromAnim(
+        dir, lbl_804DC338, 0.15f, false);
+    self->mUnidentified078 = 1234567.0f;
+    return self->mUnidentifiedFielder->m_eActionState
+        == (eFielderActionState)29;
+}
+
+/**
+ * Offset/Address/Size: 0x16B8 | 0x800C9DB4 | size: 0x198
+ */
+extern "C" void fn_800C9DB4(DesireSuperPower* self)
+{
+    fn_80038158(self->mUnidentifiedFielder, 0);
+    float x;
+    float y;
+    nlPolarToCartesian(x, y,
+        self->mUnidentifiedFielder->m_aActualFacingDirection, 1.0f);
+    x *= 18.5f;
+    y *= 18.5f;
+    nlVector3 joint = self->mUnidentifiedFielder->GetJointPosition(
+        self->mUnidentifiedFielder->m_nHeadJointIndex);
+    nlVector3 pos;
+    nlVector3 vel;
+    pos.x = joint.x + x;
+    pos.y = joint.y + y;
+    pos.z = joint.z;
+    vel.x = x;
+    vel.y = y;
+    vel.z = 0.0f;
+    PhysicsPatch* patch = lbl_806E12C8->fn_801743A8(7,
+        self->mUnidentifiedFielder, pos, vel, 0.25f, 5.0f, 0.7f);
+    patch->fn_80173B08(1.0f);
+    fn_80139D1C(1, self->mUnidentifiedFielder->GetGlobalPad());
+    EffectsGroup* group = fn_802E7CDC(
+        EmissionManager::Instance(), "bowserjr_shriek_mouth");
+    if (group != 0)
+    {
+        EmissionController* controller = fn_802E7FE4(
+            EmissionManager::Instance(), group, 3, true, false);
+        controller->m_uUserData = (u32)self->mUnidentifiedFielder;
+        controller->SetPosition(
+            self->mUnidentifiedFielder->m_v3Position);
+        controller->SetVelocity(
+            self->mUnidentifiedFielder->m_v3Velocity);
+        controller->SetUpdateCallback(
+            Function1<void, EmissionController&>(
+                UpdateEmitterFromCharacterForward));
+    }
 }
 
 /**

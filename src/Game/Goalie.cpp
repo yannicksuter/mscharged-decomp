@@ -7,6 +7,8 @@
 #include "Game/AI/GoalieLooseBall.h"
 #include "Game/Ball.h"
 #include "Game/CharacterTriggers.h"
+#include "Game/Camera/CameraMan.h"
+#include "Game/Drawable/DrawableCharacter.h"
 #include "Game/Field.h"
 #include "Game/MathHelpers.h"
 #include "Game/Net.h"
@@ -22,11 +24,33 @@ extern "C" void fn_8005D948(
 extern "C" void fn_8005E9FC(
     void* pManager, const PlayerAttackData* pData);
 extern void* g_pGame;
+extern float lbl_806DC7C8;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 bool Goalie::mbPosGoalieNetCheck;
 bool Goalie::mbNegGoalieNetCheck;
+
+Goalie::~Goalie()
+{
+    GoalieSave::ClearData();
+    LooseBallAnims::Destroy();
+
+    if (mUnidentified4C8 != 0)
+    {
+        cCameraManager::Remove(*mUnidentified4C8);
+        delete mUnidentified4C8;
+        mUnidentified4C8 = 0;
+
+        lbl_806DC7C8 = -1.0f;
+        DrawableCharacter::RenderAllCharacters();
+
+        if (g_pBall != 0)
+        {
+            g_pBall->m_bVisible = true;
+        }
+    }
+}
 
 bool Goalie::IsTargetViable(cPlayer* pTarget)
 {

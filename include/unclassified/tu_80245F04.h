@@ -1,7 +1,8 @@
 #ifndef UNCLASSIFIED_TU_80245F04_H
 #define UNCLASSIFIED_TU_80245F04_H
 
-#include "Game/SH/SHSceneBase.h"
+#include "Game/BaseSceneHandler.h"
+#include "unclassified/tu_8022F710.h"
 
 class TU80245F04Scene : public BaseSceneHandler
 {

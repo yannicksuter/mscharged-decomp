@@ -31,7 +31,10 @@ public:
     static float GetPenaltyBoxY();
     static bool IsOnField(const nlVector3& location);
     static bool IsOnField(const nlVector2& location);
-    static bool FixOutOfBoundsPosition(nlVector3& v, float fMinDistanceFromWall, bool);
+    static bool FixOutOfBoundsPosition(
+        nlVector3& v, float fMinDistanceFromWall, bool bExcludeNet);
+    static bool FixOutOfBoundsX(
+        nlVector3& v, bool bExcludeNet, float fMinDistanceFromWall);
     static void SetFieldDimensions(float fX, float fY, float fZ);
 
     static const sSideLinePlane& GetSideline(int index)
@@ -52,6 +55,9 @@ public:
     static float mfPenaltyBoxX;
     static float mfPenaltyBoxY;
     static cNet* mpNet[2];
+
+private:
+    static bool FixCornerPosition(nlVector3& v, float fMinDistanceFromWall);
 };
 
 #endif // GAME_FIELD_H

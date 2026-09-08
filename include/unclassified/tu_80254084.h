@@ -2,7 +2,7 @@
 #define UNCLASSIFIED_TU_80254084_H
 
 #include "Game/BaseSceneHandler.h"
-#include "Game/SH/SHSceneBase.h"
+#include "unclassified/tu_8022F710.h"
 #include "unclassified/tu_8022EF84.h"
 
 class TLComponentInstance;

@@ -22,7 +22,21 @@ struct EffectsSpec
     /* 0x44 */ unsigned char mPadding044[0x14];
 }; // size: 0x58
 
-class EffectsGroup;
+class UserEffectSpec;
+
+class EffectsGroup
+{
+public:
+    unsigned long GetHashID() const { return m_hashID; }
+
+    /* 0x00 */ unsigned long m_hashID;
+    /* 0x04 */ EffectsSpec* m_specs;
+    /* 0x08 */ int m_numSpecs;
+    /* 0x0C */ bool m_isLingering;
+    /* 0x10 */ UserEffectSpec** m_userSpecsPtr;
+    /* 0x14 */ int m_userSpecs;
+}; // size: 0x18
+
 void SetEffectsGroupFountainLife(EffectsGroup* group, float life);
 
 #endif // GAME_EFFECTS_EFFECTS_GROUP_H

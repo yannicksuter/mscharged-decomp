@@ -50,9 +50,6 @@ extern "C"
     extern const nlVector3 lbl_804DCF8C = { 0.0f, 0.0f, -10.0f };
     extern const nlVector3 lbl_804DCF98 = { 0.0f, 0.0f, 0.0f };
     extern const nlVector3 lbl_804DCFA4 = { 0.0f, -20.0f, -20.0f };
-    extern const nlVector3 lbl_804DCFB0 = { 0.0f, 0.0f, 0.0f };
-    extern const nlVector3 lbl_804DCFBC = { 0.0f, 0.0f, 1.0f };
-    extern const nlVector4 lbl_804DCFC8 = { 0.1f, 0.08f, 0.0f, 0.0f };
 
     EmissionController* fn_802E7DC4(
         EmissionManager*, const char*, int, bool, bool);

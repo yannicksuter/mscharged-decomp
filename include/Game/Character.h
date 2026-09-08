@@ -203,7 +203,10 @@ public:
     /* 0x174 */ Blinker* m_pBlinker;
     /* 0x178 */ float mUnidentified178;
     /* 0x17C */ bool mUnidentified17C;
-    /* 0x17D */ u8 unknown_0x17D[0x33];
+    /* 0x17D */ u8 unknown_0x17D[0x04];
+    /* 0x181 */ bool mUnidentified181;
+    /* 0x182 */ bool mUnidentified182;
+    /* 0x183 */ u8 unknown_0x183[0x2D];
     /* 0x1B0 */ EffectsTexturing* m_pEffectsTexturing;
     /* 0x1B4 */ u8 unknown_0x1B4[0x30];
 }; // total size: 0x1E4

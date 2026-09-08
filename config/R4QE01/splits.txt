@@ -1412,7 +1412,7 @@ Game/Debug/TimeRegions.cpp:
 
 unclassified/tu_801B298C.cpp:
 	.text       start:0x801B298C end:0x801B35AC
-	.rodata     start:0x804DCF68 end:0x804DCFD8
+	.rodata     start:0x804DCF68 end:0x804DCFB0
 	.data       start:0x805146F8 end:0x80514750
 	.sdata      start:0x806DD0F8 end:0x806DD130
 	.sbss       start:0x806E16B8 end:0x806E16C0
@@ -1439,8 +1439,10 @@ Game/Triggers/AnimTrigger.cpp:
 
 Game/CharacterTriggers.cpp:
 	.text       start:0x801B64E8 end:0x801BE144
-	.data       start:0x80515478 end:0x80515CA8
+	.rodata     start:0x804DCFB0 end:0x804DCFD4
+	.data       start:0x80515478 end:0x80515CA3
 	.sdata      start:0x806DD1C0 end:0x806DD238
+	.sbss       start:0x806E16F8 end:0x806E17D8
 	.sdata2     start:0x806E5428 end:0x806E5460
 
 Game/WorldTriggers.cpp:
@@ -1775,6 +1777,12 @@ unclassified/tu_8022EF84.cpp:
 	.data       start:0x8051D5B0 end:0x8051D650
 	.sdata      start:0x806DE268 end:0x806DE288
 	.sdata2     start:0x806E5958 end:0x806E5960
+
+unclassified/tu_8022F710.cpp:
+	.text       start:0x8022F710 end:0x80231118
+	.data       start:0x8051D650 end:0x8051D6D0
+	.sdata      start:0x806DE288 end:0x806DE2AC
+	.sdata2     start:0x806E5960 end:0x806E5990
 
 unclassified/tu_80245F04.cpp:
 	.text       start:0x80245F04 end:0x80247350

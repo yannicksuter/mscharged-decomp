@@ -3,7 +3,7 @@
 
 #include "Game/BaseSceneHandler.h"
 #include "Game/NetworkStatsManager.h"
-#include "Game/SH/SHSceneBase.h"
+#include "unclassified/tu_8022F710.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_8022EF84.h"
 
