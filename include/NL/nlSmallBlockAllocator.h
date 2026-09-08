@@ -44,12 +44,15 @@ public:
 
     ~nlSlotPoolFixed()
     {
-        while (m_Depth > 0)
+        if (this != 0)
         {
+            while (m_Depth > 0)
+            {
+                FreeBlocks();
+                PopState();
+            }
             FreeBlocks();
-            PopState();
         }
-        FreeBlocks();
     }
 
     void FreeBlocks()
