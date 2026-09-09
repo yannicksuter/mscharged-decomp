@@ -93,8 +93,7 @@ public:
     /* 0x14 */ int mWinParameter;
     /* 0x18 */ int mHomeScore;
     /* 0x1C */ int mAwayScore;
-    /* 0x20 */ int mHomeMissingSidekicks;
-    /* 0x24 */ int mAwayMissingSidekicks;
+    /* 0x20 */ int mMissingSidekicks[2];
     /* 0x28 */ bool mHomePowerupsEnabled;
     /* 0x29 */ bool mAwayPowerupsEnabled;
     /* 0x2A */ bool mHomeMegastrikeEnabled;

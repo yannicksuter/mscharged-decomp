@@ -7,6 +7,7 @@
 class Clock;
 class FuzzyTweaks;
 class DebugWriteCache;
+class TU800A9B78;
 class RunningChecksum;
 class UnidentifiedGameRegion;
 class Terrain;
@@ -129,7 +130,7 @@ private:
     /* 0x21 */ u8 mUnidentified021[0x03];
 
 public:
-    /* 0x24 */ u32 mUnidentified024;
+    /* 0x24 */ int m_nLastTeamToScore;
 
 private:
     /* 0x28 */ u32 mUnidentified028;
@@ -174,7 +175,11 @@ private:
     /* 0x94 */ float mUnidentified094;
     /* 0x98 */ float mUnidentified098;
     /* 0x9C */ float mUnidentified09C;
+
+public:
     /* 0xA0 */ float mUnidentified0A0;
+
+private:
     /* 0xA4 */ u16 mUnidentified0A4;
     /* 0xA6 */ u16 mUnidentified0A6;
     /* 0xA8 */ u32 mUnidentified0A8;
@@ -209,12 +214,13 @@ public:
 
 public:
     void QueueChainNisEnd(ShotAtGoalData* data);
+    void fn_80060BFC(CollisionBulletBillData& data);
 
     /* 0x49C */ UnidentifiedGameEventQueue mUnidentified49C;
 
 public:
     /* 0x10D8 */ Terrain* mpTerrain;
-    /* 0x10DC */ void* mUnidentified10DC;
+    /* 0x10DC */ TU800A9B78* mUnidentified10DC;
     /* 0x10E0 */ CrowdRiot* mUnidentified10E0;
     /* 0x10E4 */ AvoidablePolygon* mUnidentified10E4;
     /* 0x10E8 */ AvoidablePolygon* mUnidentified10E8;
@@ -223,5 +229,7 @@ public:
 };
 
 extern cGame* g_pGame;
+
+extern "C" void fn_8005D210(cGame*, LightningStrikeData*);
 
 #endif // GAME_GAME_H

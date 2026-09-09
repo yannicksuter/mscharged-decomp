@@ -33,8 +33,8 @@ void UnidentifiedSkinAnimatedNPC_80199880::Update(float dt)
     {
         if (mpCharacter != 0)
         {
-            maFacingDirection = mpCharacter->m_aActualFacingDirection;
-            SetPosition(mpCharacter->m_v3Position);
+            maFacingDirection = mpCharacter->mUnidentified024.m_aActualFacingDirection;
+            SetPosition(mpCharacter->mUnidentified024.m_v3Position);
         }
 
         if (mTimer.m_uPackedTime != 0)

@@ -6,6 +6,7 @@
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 #include "types.h"
+#include <stdlib.h>
 
 int nlSNPrintf(char* buffer, unsigned long size, const char* format, ...);
 
@@ -124,11 +125,18 @@ public:
             }
         }
     }
-    virtual int UnidentifiedVirtual30();
+    virtual int UnidentifiedVirtual0C();
+    virtual int UnidentifiedVirtual10();
+    virtual float UnidentifiedVirtual3C();
     virtual TweakValueBase_8052BF70* UnidentifiedVirtual34(const char* name,
         void* entry);
+    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
+    virtual void* UnidentifiedVirtual20();
+    virtual void UnidentifiedVirtual24(char*, unsigned long);
+    virtual void UnidentifiedVirtual28(const char*);
+    virtual int UnidentifiedVirtual30();
+    virtual void UnidentifiedVirtual14(float*, float*, float*);
     virtual void UnidentifiedVirtual38(void* value);
-    virtual float UnidentifiedVirtual3C();
 
     bool BindWithDefault(const char* name, float defaultValue,
         const char* group, bool reload, float value, float min, float max)
@@ -485,6 +493,128 @@ inline void TweakValueBool_804F4578::UnidentifiedVirtual14(
 
 inline void TweakValueBool_804F4578::UnidentifiedVirtual18()
 {
+}
+
+class GXMaterialFloatTweak_804F4190 : public TweakValueBase_8052BF70
+{
+public:
+    GXMaterialFloatTweak_804F4190(
+        const char* name, const char* category, float initialValue = 1.0f)
+        : value(initialValue)
+    {
+        mName = name;
+        mUnidentified009 = true;
+
+        if (fn_802C0F04() == 0)
+        {
+            void* entry = nlMalloc(0x18, 8, true);
+            if (entry != 0)
+                fn_802C2DF4((TweakPendingValue*)entry, this, category);
+        }
+        else
+        {
+            TweakEntry_8052BF00* config = fn_802C0E30();
+            TweakEntry_8052BF00* entry = fn_802C4504(config, category, 0);
+            if (entry != 0)
+                fn_802C5780(entry, this);
+        }
+
+        lbl_806E1E90 = category;
+    }
+    GXMaterialFloatTweak_804F4190(const char* name, float initialValue)
+        : value(initialValue)
+    {
+        mName = name;
+    }
+    virtual ~GXMaterialFloatTweak_804F4190();
+    virtual int UnidentifiedVirtual0C();
+    virtual int UnidentifiedVirtual10();
+    virtual void UnidentifiedVirtual14(float*, float*, float*);
+    virtual void UnidentifiedVirtual18();
+    virtual void* UnidentifiedVirtual20();
+    virtual void UnidentifiedVirtual24(char*, unsigned long);
+    virtual void UnidentifiedVirtual28(const char*);
+    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
+
+    static void operator delete(void* pointer)
+    {
+        lbl_806E1E58->m_Pool1.Free(pointer);
+    }
+
+    /* 0x0C */ float value;
+}; // size: 0x10
+
+inline int TweakValueImpl_804F4DC8::UnidentifiedVirtual0C()
+{
+    return 5;
+}
+
+inline int TweakValueImpl_804F4DC8::UnidentifiedVirtual10()
+{
+    return 2;
+}
+
+inline float TweakValueImpl_804F4DC8::UnidentifiedVirtual3C()
+{
+    return 0.0f;
+}
+
+inline TweakValueBase_8052BF70* TweakValueImpl_804F4DC8::UnidentifiedVirtual34(
+    const char* name, void* entry)
+{
+    GXMaterialFloatTweak_804F4190* created = new (
+        lbl_806E1E58->Allocate(sizeof(GXMaterialFloatTweak_804F4190)))
+        GXMaterialFloatTweak_804F4190(name, 0.0f);
+    fn_802C5780((TweakEntry_8052BF00*)entry, created);
+    return created;
+}
+
+inline void TweakValueImpl_804F4DC8::UnidentifiedVirtual2C(
+    TweakValueBase_8052BF70* other)
+{
+    switch (other->UnidentifiedVirtual10())
+    {
+    case 1:
+        *m_pValue = ((GXMaterialFloatTweak_804F4190*)other)->value;
+        break;
+    case 2:
+        *m_pValue = *((TweakValueImpl_804F4DC8*)other)->m_pValue;
+        break;
+    }
+}
+
+inline void* TweakValueImpl_804F4DC8::UnidentifiedVirtual20()
+{
+    return m_pValue;
+}
+
+inline void TweakValueImpl_804F4DC8::UnidentifiedVirtual24(
+    char* buffer, unsigned long size)
+{
+    nlSNPrintf(buffer, size, "%.3f", *m_pValue);
+}
+
+inline void TweakValueImpl_804F4DC8::UnidentifiedVirtual28(const char* value)
+{
+    *m_pValue = atof(value);
+}
+
+inline int TweakValueImpl_804F4DC8::UnidentifiedVirtual30()
+{
+    return m_pValue != 0;
+}
+
+inline void TweakValueImpl_804F4DC8::UnidentifiedVirtual14(
+    float* minimum, float* maximum, float* increment)
+{
+    *minimum = 0.0f;
+    *maximum = 0.0f;
+    *increment = 0.0f;
+}
+
+inline void TweakValueImpl_804F4DC8::UnidentifiedVirtual38(void* value)
+{
+    m_pValue = (float*)value;
 }
 
 #endif // GAME_TWEAK_VALUE_H

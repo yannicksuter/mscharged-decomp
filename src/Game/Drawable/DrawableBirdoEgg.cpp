@@ -1,5 +1,6 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/BasicStadium.h"
+#include "Game/BirdoEggObject.h"
 #include "Game/Drawable/DrawableBirdoEgg.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Drawable/ShadowProp.h"
@@ -14,19 +15,6 @@
 // "birdo_egg_trail" and "BirdoEggShow". It carries a full orientation rather
 // than a spin angle. The live object and the material services stay
 // address-named.
-
-struct BirdoEggObject;
-
-struct BirdoEggObjectFields
-{
-    /* 0x00 */ nlQuaternion mOrientation;
-    /* 0x10 */ char _010[4];
-    /* 0x14 */ nlVector3 mPosition;
-    char _020[0x10];
-    /* 0x30 */ bool mVisible;
-    char _031[7];
-    /* 0x38 */ RenderObject* mDrawable;
-};
 
 static float gShadowScaleIn = 0.125f;
 static float gShadowScaleHigh = 0.125f;
@@ -149,15 +137,15 @@ void DrawableBirdoEgg::Grab(const BirdoEggObject* object)
         return;
     }
 
-    mVisible = ((const BirdoEggObjectFields*)object)->mVisible;
+    mVisible = object->visible;
     if (!mVisible)
     {
         return;
     }
 
-    mPosition = ((const BirdoEggObjectFields*)object)->mPosition;
-    mOrientation = ((const BirdoEggObjectFields*)object)->mOrientation;
-    mScale = fn_8019A574((const State_80199E84*)object);
+    mPosition = object->position;
+    mOrientation = object->orientation;
+    mScale = fn_8019A574(object);
 }
 
 void DrawableBirdoEgg::Render(const BirdoEggObject* object) const
@@ -170,7 +158,7 @@ void DrawableBirdoEgg::Render(const BirdoEggObject* object) const
         return;
     }
 
-    drawable = ((const BirdoEggObjectFields*)object)->mDrawable;
+    drawable = object->drawable;
     if (drawable == 0)
     {
         return;

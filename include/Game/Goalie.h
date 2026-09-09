@@ -117,6 +117,7 @@ public:
     virtual void UnidentifiedVirtual1C();
     virtual void Unknown10(
         const nlVector3& v3Position, unsigned short aDirection);
+    virtual void Unknown12(RunningChecksum* pChecksum);
     virtual void CollideWithBallCallback(cBall* pBall);
     virtual void CollideWithCharacterCallback(
         CollisionPlayerPlayerData* pData);
@@ -141,7 +142,7 @@ public:
     void InitActionMoveWB();
     void InitActionChipShotStumble(float fTargetTime);
     void InitActionDiveRecover();
-    void fn_80090858(eGoalieOffplayType offplayType);
+    void InitActionOffplay(eGoalieOffplayType offplayType);
     void InitActionPass(bool useTarget);
     void InitActionPreCrouch(eGoalieCrouchType crouchType);
     void fn_8008BBB0(cFielder* pTarget, int nPursueDekeType);
@@ -160,12 +161,20 @@ public:
     void CleanupStun();
     void ChooseSwatAnim(int nParam);
     void DoPassRelease();
+    static void fn_8007FE28(int nTeamSide);
+    void fn_8007EA90();
+    bool fn_8007EB10();
+    void fn_8007EB5C();
+    float CalcSaveParameters(float fTimeToContact,
+        unsigned int uSaveType, bool bFromTakeoff,
+        bool bFindFailSave);
     void ExecutePounce(cPlayer* pPlayer, bool bCheckHitDistance);
     PhysicsGoalie* GetPhysicsGoalie();
     void SetDesiredSaveFacing(const nlVector3& v3BallPosition);
     bool IsCloseToPlane(const nlVector3& rPos1,
         const nlVector3& rPos2, float fThreshold);
     bool IsInsideNetArea(const nlVector3& v3Target);
+    void MakeSaveEvent(bool bIsSTS);
     void MakeExertEvent();
     bool CanInterceptPass();
     bool CheckForSTSAttack();
@@ -184,9 +193,12 @@ public:
         const nlVector3* pThreatPos);
     int ChooseRunAnim(short nAngle, const nlVector3& rTargetPos,
         float fThreshold);
+    void fn_8007F430();
+    void fn_8007F44C();
     void TrackTarget(
         const nlVector3& v3Target, float fRatio, float fParam3);
     void TacklePlayer(cPlayer* pPlayer);
+    void fn_80080BFC(float fDeltaT);
     void StealBall(cPlayer* pPlayer);
     void WhackSTSPlayer(cFielder* pFielder);
     bool IsLooseBallClose(float fDistFromBox);
@@ -318,8 +330,8 @@ public:
     /* 0x3D4 */ float mfNextBallTime;
     /* 0x3D8 */ float mfMegaAccuracy;
     /* 0x3DC */ float mfMegaTargetTime;
-    /* 0x3E0 */ unsigned int muBallDeflectCount;
-    /* 0x3E4 */ unsigned int mUnidentified3E4;
+    /* 0x3E0 */ unsigned int muBallChangeCount;
+    /* 0x3E4 */ unsigned int muBallDeflectCount;
     /* 0x3E8 */ eGoalieOffplayType mnOffplayPending;
     /* 0x3EC */ unsigned int muMegaAnimState;
     /* 0x3F0 */ unsigned int muMegaStoreTexID;
@@ -328,7 +340,7 @@ public:
     /* 0x3FC */ int mBallsLaunched;
     /* 0x400 */ int mLowLobAnim;
     /* 0x404 */ Timer mFreezeTimer;
-    /* 0x40C */ s8 mUnidentified40C;
+    /* 0x40C */ s8 mMegaMachine;
     /* 0x40D */ u8 mUnknown40D[0x03];
     /* 0x410 */ cPlayer* mpPassTarget;
     /* 0x414 */ cFielder* mpShooter;

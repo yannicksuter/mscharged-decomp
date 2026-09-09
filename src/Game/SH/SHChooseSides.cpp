@@ -28,7 +28,6 @@
 
 class SHNavigation;
 
-extern "C" void fn_800A71A8(cTeam* team);
 extern BaseGameSceneManager* g_pOverlayManager;
 
 class TU8021CBD0Scene : public BaseSceneHandler
@@ -545,7 +544,7 @@ void SHChooseSides2::Update(float fDeltaT)
         if (GameInfoManager::Instance()->IsInMode4())
         {
             int required = 1;
-            int available = 4 - g_pStrikerChallenge->mHomeMissingSidekicks;
+            int available = 4 - g_pStrikerChallenge->mMissingSidekicks[HOME];
             if (available > 0)
             {
                 required = available;
@@ -1010,8 +1009,8 @@ void SHChooseSides2::Proceed()
     }
     else
     {
-        fn_800A71A8(g_pTeams[0]);
-        fn_800A71A8(g_pTeams[1]);
+        g_pTeams[0]->UpdateControllers();
+        g_pTeams[1]->UpdateControllers();
         GameInfoManager::Instance()->ApplyDifficultySettings();
         g_pGame->SetDifficulty(GameInfoManager::Instance()->mCurrentDifficulty[0],
             GameInfoManager::Instance()->mCurrentDifficulty[1],

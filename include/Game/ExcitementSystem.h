@@ -3,9 +3,9 @@
 
 #include "Game/InterpreterCore.h"
 
-struct UnidentifiedEventData07;
-struct UnidentifiedEventData_80066748;
-struct UnidentifiedEventData_80067110;
+struct CollisionBallGoalpostData;
+struct PlayerAttackData;
+struct LightningStrikeData;
 
 class ExcitementSystem : public InterpreterCore
 {
@@ -14,9 +14,9 @@ public:
 
     void fn_801967DC();
     void fn_80196924();
-    void fn_80196D30(UnidentifiedEventData_80066748*);
-    void fn_80196D64(UnidentifiedEventData_80067110*);
-    void fn_80196D8C(UnidentifiedEventData07*);
+    void fn_80196D30(PlayerAttackData*);
+    void fn_80196D64(LightningStrikeData*);
+    void fn_80196D8C(CollisionBallGoalpostData*);
     virtual void DoFunctionCall(unsigned int);
 
     /* 0x028 */ float mUnidentified028;

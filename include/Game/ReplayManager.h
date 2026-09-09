@@ -6,7 +6,7 @@
 #include "Game/Replay.h"
 
 struct GoalScoredData;
-struct UnidentifiedEventData_800662B4;
+struct ReceiveBallData;
 struct UnidentifiedEventData_800663A8;
 struct UnidentifiedEventData_8006649C;
 struct UnidentifiedEventData_80066590;
@@ -24,7 +24,7 @@ public:
     void fn_80188D88();
     void InitializeSnapshots();
     void fn_801895B0();
-    void fn_801895C0(UnidentifiedEventData_800662B4* event);
+    void fn_801895C0(ReceiveBallData* event);
     void fn_801895D0(UnidentifiedEventData_80066590* event);
     void fn_801895E0(UnidentifiedEventData_800663A8* event);
     void fn_801895F0(GoalScoredData* event);

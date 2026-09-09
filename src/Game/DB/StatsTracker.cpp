@@ -45,21 +45,6 @@ struct GoalScoredStatsData
     /* 0x20 */ int goalValue;
 };
 
-struct MegaStrikeEndData
-{
-    /* 0x00 */ cPlayer* pPlayer;
-    /* 0x04 */ s8 attempts;
-    /* 0x05 */ s8 goals;
-    /* 0x06 */ s8 defendingSide;
-    /* 0x07 */ s8 goalValue;
-};
-
-struct ReceiveBallStatsData
-{
-    /* 0x00 */ cPlayer* pPlayer;
-    /* 0x04 */ int receiveType;
-};
-
 struct PenaltyStatsData
 {
     /* 0x00 */ cPlayer* pPlayer;
@@ -319,8 +304,8 @@ void StatsTracker::CreateEventHandler()
         FindStatsEvent<PassBallData>("PassBall")->Add(callback, 0, -1);
     }
     {
-        Function<ReceiveBallStatsData*> callback(OnReceiveBall);
-        FindStatsEvent<ReceiveBallStatsData>("ReceiveBall")
+        Function<ReceiveBallData*> callback(OnReceiveBall);
+        FindStatsEvent<ReceiveBallData>("ReceiveBall")
             ->Add(callback, 0, -1);
     }
     {
@@ -354,9 +339,9 @@ void StatsTracker::CreateEventHandler()
             ->Add(callback, 0, -1);
     }
     {
-        Function<UnidentifiedEventData07*> callback(
+        Function<CollisionBallGoalpostData*> callback(
             OnCollisionBallGoalpost);
-        FindStatsEvent<UnidentifiedEventData07>("CollisionBallGoalpost")
+        FindStatsEvent<CollisionBallGoalpostData>("CollisionBallGoalpost")
             ->Add(callback, 0, -1);
     }
 }
@@ -426,18 +411,18 @@ void StatsTracker::OnMegastrikeEnd(MegaStrikeEndData* data)
         data->attempts, 0, 0, 0);
 }
 
-void StatsTracker::OnReceiveBall(ReceiveBallStatsData* data)
+void StatsTracker::OnReceiveBall(ReceiveBallData* data)
 {
-    if (data->receiveType == 1)
+    if (data->eResult == RECEIVEBALL_PASS_COMPLETE)
     {
         s_pInstance->TrackStat(
-            STATS_PASSES_RECEIVED, data->pPlayer->m_pTeam->m_nSide,
-            data->pPlayer->m_ID, 0, 0, 0, 0);
+            STATS_PASSES_RECEIVED, data->pReceiver->m_pTeam->m_nSide,
+            data->pReceiver->m_ID, 0, 0, 0, 0);
     }
-    else if (data->receiveType == 2)
+    else if (data->eResult == RECEIVEBALL_PASS_INTERCEPT)
     {
         s_pInstance->TrackStat(STATS_PASSES_INTERCEPTED,
-            data->pPlayer->m_pTeam->m_nSide, data->pPlayer->m_ID,
+            data->pReceiver->m_pTeam->m_nSide, data->pReceiver->m_ID,
             0, 0, 0, 0);
     }
 }
@@ -488,7 +473,7 @@ void StatsTracker::OnBallStateChange(int previousState, int currentState)
     }
 }
 
-void StatsTracker::OnCollisionBallGoalpost(UnidentifiedEventData07*)
+void StatsTracker::OnCollisionBallGoalpost(CollisionBallGoalpostData*)
 {
     nlVector3 ballVelocity = g_pBall->m_v3Velocity;
     if (g_pBall != 0 && g_pBall->m_pShooter != 0

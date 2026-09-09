@@ -13,6 +13,7 @@ enum eBallShotEffectType
     NUM_BALL_EFFECTS = 7,
 };
 
+class nlVector3;
 class cCharacter;
 class cPlayer;
 class cFielder;
@@ -28,9 +29,19 @@ void KillMushroom(cFielder* pFielder);
 void EmitStar(cFielder* pFielder, bool bParam);
 void KillStar(cFielder* pFielder);
 bool KillDaze(cPlayer* player);
+void EmitDaze(cPlayer* pCharacter);
+extern "C" void fn_8001EFE4(cFielder*, bool);
+extern "C" void fn_801B8CF4(const nlVector3& v3Position);
+
 extern "C" void fn_801B93E8(cCharacter*);
 extern "C" void fn_801B97DC(cFielder*);
 extern "C" void fn_801BB5DC(cFielder*, int);
 EmissionController* EmitGeneric(cCharacter* pCharacter, const char* baseName, const char* characterName);
+
+extern "C" void fn_801BDDE0(bool bParam);
+
+extern "C" void fn_801BDD24(const char* name, nlVector3 v3Position, bool bParam);
+
+extern "C" void fn_801BDCB4(bool bParam);
 
 #endif // GAME_CHARACTERTRIGGERS_H

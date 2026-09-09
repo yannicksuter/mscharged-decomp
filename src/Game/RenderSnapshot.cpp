@@ -44,7 +44,7 @@ void RenderSnapshot::Initialize()
 
     for (int i = 0; i < 10; ++i)
     {
-        int value = lbl_8056B800[i]->m_eCharacterClass;
+        int value = lbl_8056B800[i]->mUnidentified024.m_eCharacterClass;
         if (value == 8)
         {
             _2714 |= 0x80000000;

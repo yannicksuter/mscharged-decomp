@@ -34,9 +34,6 @@
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 
-extern "C" void fn_80022DAC(cCharacter* pCharacter, unsigned long uTextureID);
-extern "C" void fn_80022DE8(cCharacter* pCharacter, unsigned long uTextureID);
-extern "C" void fn_80022E24(cCharacter* pCharacter, unsigned long uTextureID);
 extern "C" bool fn_80073BC0(void* pLoadState);
 extern "C" void fn_800957E4(cCharacter* pCharacter, cTeam* pTeam);
 extern "C" bool fn_802B3E94(const char* path, LoadAsyncCallback callback,
@@ -431,11 +428,11 @@ bool CharacterLoader_8056B290::fn_8000A224()
     unsigned long texture = glGetTexture(sUnidentifiedShockTextureName);
     if (glTextureLoad(texture))
     {
-        fn_80022E24(pChar, texture);
+        pChar->fn_80022E24(texture);
     }
     else
     {
-        fn_80022E24(pChar, 0);
+        pChar->fn_80022E24(0);
     }
     return true;
 }
@@ -922,15 +919,15 @@ bool CharacterLoader_8056B290::fn_8000B3E0()
     if (glTextureLoad(glGetTexture(szPlayerPath)))
     {
         nlSNPrintf(szArtPath, 64, "%s/%s_mario", szName, szTexName);
-        fn_80022DAC(pChar, glGetTexture(szArtPath));
-        fn_80022DE8(pChar, glGetTexture(szPlayerPath));
+        pChar->fn_80022DAC(glGetTexture(szArtPath));
+        pChar->fn_80022DE8(glGetTexture(szPlayerPath));
         return false;
     }
 
     if (!fn_802C8204(szArtPath, fn_8000B3CC, mCurrent, fn_802CC094()))
     {
-        fn_80022DAC(pChar, (unsigned long)-1);
-        fn_80022DE8(pChar, (unsigned long)-1);
+        pChar->fn_80022DAC((unsigned long)-1);
+        pChar->fn_80022DE8((unsigned long)-1);
         return false;
     }
     return true;
@@ -985,8 +982,8 @@ bool CharacterLoader_8056B290::fn_8000B6C4()
     }
 
     nlSNPrintf(szBundlePath, 64, "%s/%s_mario", szName, szTexName);
-    fn_80022DAC(pChar, glGetTexture(szBundlePath));
-    fn_80022DE8(pChar, glGetTexture(szPlayerPath));
+    pChar->fn_80022DAC(glGetTexture(szBundlePath));
+    pChar->fn_80022DE8(glGetTexture(szPlayerPath));
     return true;
 }
 
@@ -1061,8 +1058,8 @@ void CharacterLoader_8056B290::fn_8000BA00()
             pTemplate->pPhysicsData, pTemplate->pUnidentified30, pAnimRetargetList,
             mCurrent->nCharIdx);
         pGoalie->m_szEffectsName = pInfo->szEffectsName;
-        fn_80022DAC(pGoalie, GetHashFromTextureFile(pInfo->szTextureFilename));
-        fn_80022DE8(pGoalie, GetHashFromTextureFile(fn_80025F48(goalieIdx)->szTextureFilename));
+        pGoalie->fn_80022DAC(GetHashFromTextureFile(pInfo->szTextureFilename));
+        pGoalie->fn_80022DE8(GetHashFromTextureFile(fn_80025F48(goalieIdx)->szTextureFilename));
 
         g_pCharacters[mCurrent->nCharIdx] = pGoalie;
         g_pCharacters[mCurrent->nCharIdx]->SetPosition(goaliepos[mCurrent->nTeamID]);
@@ -1077,8 +1074,8 @@ void CharacterLoader_8056B290::fn_8000BA00()
             const char* szName = GetCharacterInfo(mCurrent->cc).mName;
             nlSNPrintf(szTexPath, 64, "mariogoalie/mariogoalie");
             nlSNPrintf(szSwapPath, 64, "%s/%s", szName, szName);
-            fn_80022DAC(pChar, glGetTexture(szTexPath));
-            fn_80022DE8(pChar, glGetTexture(szSwapPath));
+            pChar->fn_80022DAC(glGetTexture(szTexPath));
+            pChar->fn_80022DE8(glGetTexture(szSwapPath));
         }
     }
     else
@@ -1198,8 +1195,8 @@ bool CharacterLoader_8056B290::fn_8000BFA0()
     cCharacter* pChar = g_pCharacters[mCurrent->nCharIdx];
     unsigned long texture = glGetTexture(szTexPath);
     unsigned long swapTexture = glGetTexture(szSwapPath);
-    fn_80022DAC(pChar, texture);
-    fn_80022DE8(pChar, swapTexture);
+    pChar->fn_80022DAC(texture);
+    pChar->fn_80022DE8(swapTexture);
 
     nlFree(mAltTextureData);
     mAltTextureData = 0;

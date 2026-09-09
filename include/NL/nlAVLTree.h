@@ -126,6 +126,14 @@ public:
         return 0;
     }
 
+    ValueType* UnidentifiedAddOrGet(const KeyType& key)
+    {
+        AVLTreeNode* existingNode;
+        AVLTreeNode* node = AddAVLNode(
+            (AVLTreeNode**)&m_Root, (void*)&key, 0, &existingNode);
+        return &((Entry*)node)->value;
+    }
+
     ValueType* Add(const KeyType& key, const ValueType& value)
     {
         AVLTreeNode* existingNode;
@@ -204,14 +212,14 @@ public:
 
     static void DeleteEntry(AVLTreeUntemplated* tree, AVLTreeNode* entry)
     {
-        ((AVLTreeBase*)tree)->m_Allocator.Free((Entry*)entry);
+        ((AVLTreeBase*)tree)->m_Allocator.Delete((Entry*)entry);
     }
 
     static void DeleteValue(AVLTreeUntemplated* tree, AVLTreeNode* entry)
     {
         AVLTreeBase* self = (AVLTreeBase*)tree;
         delete ((Entry*)entry)->value;
-        self->m_Allocator.Free((Entry*)entry);
+        self->m_Allocator.Delete((Entry*)entry);
     }
 
     virtual int CompareNodes(AVLTreeNode* node1, AVLTreeNode* node2)
@@ -228,8 +236,7 @@ public:
 
     virtual AVLTreeNode* AllocateEntry(void* key, void* value)
     {
-        Entry* newNode;
-        m_Allocator.Allocate(newNode);
+        Entry* newNode = new (m_Allocator.Allocate()) Entry;
         newNode->node.left = 0;
         newNode->node.right = 0;
         newNode->node.heavy = 0;

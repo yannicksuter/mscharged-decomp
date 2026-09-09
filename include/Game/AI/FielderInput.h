@@ -44,6 +44,24 @@ public:
         }
     }
 
+    UnidentifiedFielderInput(cTeam* value,
+        UnidentifiedScriptMachine* machine,
+        UnidentifiedFuzzyRuntimeBase* runtime)
+        : FuzzyVariant(value)
+        , mTimers(16, 16)
+    {
+        mUnidentified14 = runtime;
+        mUnidentified18 = machine;
+        if (mUnidentified18 != 0)
+        {
+            mUnidentified18->mUnidentified064 = this;
+        }
+        if (mUnidentified14 != 0)
+        {
+            mUnidentified14->mValue = this;
+        }
+    }
+
     ~UnidentifiedFielderInput();
 
     void fn_8030F74C(bool deleteOwner, bool deleteController);

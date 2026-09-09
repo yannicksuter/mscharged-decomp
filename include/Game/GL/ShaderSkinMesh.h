@@ -49,7 +49,7 @@ public:
 
     virtual ~GLSkinMesh();
     virtual void fn_802D4268(glModel* model);
-    virtual glModel* GetModel() = 0;
+    virtual glModel* GetModel() { return pModel; }
     virtual void Pose(cPoseAccumulator* pPoseAccumulator) = 0;
     virtual void PrepareToRender() = 0;
     virtual void fn_Unknown5(nlMatrix4* matrix, int nodeIndex) = 0;
@@ -61,7 +61,7 @@ public:
 
     /* 0x04 */ glModel* pModel;
     /* 0x08 */ unsigned long m_Unknown08;
-    /* 0x0C */ void* m_Unknown0C;
+    /* 0x0C */ int m_Unknown0C;
     /* 0x10 */ UnidentifiedGLSkinMeshEntry* m_Unknown10;
     /* 0x14 */ unsigned long numMorphs;
     /* 0x18 */ unsigned long m_Unknown18;

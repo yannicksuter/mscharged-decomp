@@ -94,7 +94,7 @@ extern "C" void fn_8019A854(BulletBillObject* state, float deltaTime)
     if (state->target != 0)
     {
         fn_802B549C(
-            state->orientation, state->target->m_aActualFacingDirection);
+            state->orientation, state->target->mUnidentified024.m_aActualFacingDirection);
     }
 }
 

@@ -5,26 +5,25 @@
 #include "Game/EventDataTypes.h"
 
 struct UnidentifiedEventData_80065E10;
-struct UnidentifiedEventData_80065F14;
+struct GoalScoredData;
 struct UnidentifiedEventData_80066008;
 struct UnidentifiedEventData_800661C0;
-struct UnidentifiedEventData_800662B4;
+struct ReceiveBallData;
 struct UnidentifiedEventData_800663A8;
 struct UnidentifiedEventData_8006649C;
 struct ShotAtGoalData;
-struct UnidentifiedEventData_80066748;
+struct PlayerAttackData;
 struct UnidentifiedEventData_80066A04;
 struct UnidentifiedEventData_80066B08;
 struct CollisionChainPlayerData;
 struct UnidentifiedEventData_80066E14;
 struct UnidentifiedEventData_80066F18;
 struct UnidentifiedEventData_8006701C;
-struct UnidentifiedEventData_80067110;
+struct LightningStrikeData;
 struct UnidentifiedEventData_80067214;
-struct UnidentifiedEventData_80067308;
+struct MegaStrikeEndData;
 struct UnidentifiedEventData_800673FC;
 struct UnidentifiedEventData_800676D8;
-struct UnidentifiedEventData_800677DC;
 struct UnidentifiedEventData_800678D0;
 
 class UnidentifiedGameEventQueue
@@ -38,7 +37,7 @@ public:
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent03;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent04;
     UnidentifiedQueuedEvent<UnidentifiedEventData_80065E10> mEvent05;
-    UnidentifiedEvent<UnidentifiedEventData_80065F14> mEvent06;
+    UnidentifiedEvent<GoalScoredData> mEvent06;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent07;
     UnidentifiedQueuedEvent<UnidentifiedEventData_80066008> mEvent08;
     UnidentifiedEvent<UnidentifiedEventNoData> mEvent09;
@@ -47,7 +46,7 @@ public:
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent12;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent13;
     UnidentifiedEvent<UnidentifiedEventData_800661C0> mEvent14;
-    UnidentifiedEvent<UnidentifiedEventData_800662B4> mEvent15;
+    UnidentifiedEvent<ReceiveBallData> mEvent15;
     UnidentifiedEvent<UnidentifiedEventData_800663A8> mEvent16;
     UnidentifiedEvent<UnidentifiedEventData_8006649C> mEvent17;
     UnidentifiedEvent<UnidentifiedEventData_8006649C> mEvent18;
@@ -56,13 +55,13 @@ public:
     UnidentifiedEvent<UnidentifiedEventData_8006649C> mEvent21;
     UnidentifiedQueuedEvent<ShotAtGoalData> mEvent22;
     UnidentifiedEvent<ShotAtGoalData> mEvent23;
-    UnidentifiedEvent<UnidentifiedEventData_80066748> mEvent24;
-    UnidentifiedEvent<UnidentifiedEventData_80066748> mEvent25;
-    UnidentifiedEvent<UnidentifiedEventData_80066748> mEvent26;
-    UnidentifiedEvent<UnidentifiedEventData_80066748> mEvent27;
-    UnidentifiedQueuedEvent<UnidentifiedEventData_80066748> mEvent28;
-    UnidentifiedQueuedEvent<UnidentifiedEventData_80066748> mEvent29;
-    UnidentifiedQueuedEvent<UnidentifiedEventData02> mEvent30;
+    UnidentifiedEvent<PlayerAttackData> mEvent24;
+    UnidentifiedEvent<PlayerAttackData> mEvent25;
+    UnidentifiedEvent<PlayerAttackData> mEvent26;
+    UnidentifiedEvent<PlayerAttackData> mEvent27;
+    UnidentifiedQueuedEvent<PlayerAttackData> mEvent28;
+    UnidentifiedQueuedEvent<PlayerAttackData> mEvent29;
+    UnidentifiedQueuedEvent<CollisionPlayerWallData> mEvent30;
     UnidentifiedQueuedEvent<UnidentifiedEventData_80066A04> mEvent31;
     UnidentifiedQueuedEvent<UnidentifiedEventData_80066B08> mEvent32;
     UnidentifiedQueuedEvent<CollisionChainPlayerData> mEvent33;
@@ -76,10 +75,10 @@ public:
     UnidentifiedEvent<UnidentifiedEventData_8006701C> mEvent41;
     UnidentifiedEvent<UnidentifiedEventData_8006701C> mEvent42;
     UnidentifiedEvent<UnidentifiedEventNoData> mEvent43;
-    UnidentifiedQueuedEvent<UnidentifiedEventData_80067110> mEvent44;
+    UnidentifiedQueuedEvent<LightningStrikeData> mEvent44;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent45;
     UnidentifiedEvent<UnidentifiedEventData_80067214> mEvent46;
-    UnidentifiedEvent<UnidentifiedEventData_80067308> mEvent47;
+    UnidentifiedEvent<MegaStrikeEndData> mEvent47;
     UnidentifiedEvent<UnidentifiedEventNoData> mEvent48;
     UnidentifiedEvent<UnidentifiedEventNoData> mEvent49;
     UnidentifiedEvent<UnidentifiedEventNoData> mEvent50;
@@ -95,17 +94,17 @@ public:
     UnidentifiedEvent<UnidentifiedEventData_80067214> mEvent60;
     UnidentifiedEvent<UnidentifiedEventData_80067214> mEvent61;
     UnidentifiedEvent<UnidentifiedEventData_80067214> mEvent62;
-    UnidentifiedEvent<UnidentifiedEventData23> mEvent63;
-    UnidentifiedEvent<UnidentifiedEventData36> mEvent64;
+    UnidentifiedEvent<CollisionBulletBillData> mEvent63;
+    UnidentifiedEvent<cFielder> mEvent64;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent65;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent66;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent67;
     UnidentifiedQueuedEvent<UnidentifiedEventData_800676D8> mEvent68;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent69;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent70;
-    UnidentifiedEvent<UnidentifiedEventData_800677DC> mEvent71;
-    UnidentifiedEvent<UnidentifiedEventData_800677DC> mEvent72;
-    UnidentifiedEvent<UnidentifiedEventData_800677DC> mEvent73;
+    UnidentifiedEvent<CharacterImpactEvent> mEvent71;
+    UnidentifiedEvent<CharacterImpactEvent> mEvent72;
+    UnidentifiedEvent<CharacterImpactEvent> mEvent73;
     UnidentifiedQueuedEvent<UnidentifiedEventData_800678D0> mEvent74;
 };
 

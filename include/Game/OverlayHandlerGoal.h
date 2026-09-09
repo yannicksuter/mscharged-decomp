@@ -4,7 +4,7 @@
 #include "Game/FE/BaseOverlayHandler.h"
 
 struct GoalScoredData;
-struct UnidentifiedEventData_80067308;
+struct MegaStrikeEndData;
 
 class GoalOverlay : public BaseOverlayHandler
 {
@@ -16,7 +16,7 @@ public:
 
     void fn_801F178C(GoalScoredData* data);
     void fn_801F17D0(int homeAway);
-    void fn_801F17F4(UnidentifiedEventData_80067308* data);
+    void fn_801F17F4(MegaStrikeEndData* data);
     void Restart();
     void Reset();
     void UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2S, int numGoals);

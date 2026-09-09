@@ -203,7 +203,7 @@ SSearchOpenLane::SSearchOpenLane(cPlayer* pPlayer1, cPlayer* pPlayer2)
 
         if (pPlayer1 != NULL)
         {
-            m_v3OtherPos = pPlayer1->m_v3Position;
+            m_v3OtherPos = pPlayer1->mUnidentified024.m_v3Position;
         }
         else
         {

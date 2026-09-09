@@ -29,7 +29,7 @@
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Player.h"
-#include "Game/UnidentifiedPlayerRadius.h"
+#include "Game/AI/AvoidableObject.h"
 #include "Game/Render/ShootToScoreArrow.h"
 #include "Game/Sys/clock.h"
 #include "Game/Task/DispatchEventsTask.h"
@@ -122,7 +122,6 @@ extern "C" void* fn_800AA060(void* param1, int param2);
 extern "C" void fn_800AF404(void* param1);
 extern "C" void fn_800EDB9C();
 extern "C" void fn_800EDCAC();
-extern "C" bool fn_8001E184(cPlayer* pPlayer);
 extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
 extern "C" void fn_80038158(cFielder* pFielder, int param2);
 extern "C" float fn_80111D3C();
@@ -132,7 +131,6 @@ extern "C" bool fn_800EBBFC(
     int param1, unsigned long soundID, const void* name, void* context);
 extern "C" void fn_800EC12C(unsigned long soundID, void* context);
 extern "C" void fn_802F4E84(unsigned long* hash, int param2, int param3);
-extern "C" cTeam* fn_800A5D4C(cTeam* team, int side);
 extern "C" void fn_8031A02C(ScriptQuestionCache* cache);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" void fn_800EC2A4(unsigned long soundID, cGame* game);
@@ -202,18 +200,10 @@ void fn_80056CF4(void* param1, int param2, bool param3)
     cGame* game = new (nlMalloc(0x10F4, 8, false)) cGame(param1, param2, param3);
     g_pGame = game;
 
-    cTeam* team = static_cast<cTeam*>(nlMalloc(0xF8, 8, false));
-    if (team != 0)
-    {
-        team = fn_800A5D4C(team, 0);
-    }
+    cTeam* team = new (8, false) cTeam(0);
     g_pTeams[0] = team;
 
-    team = static_cast<cTeam*>(nlMalloc(0xF8, 8, false));
-    if (team != 0)
-    {
-        team = fn_800A5D4C(team, 1);
-    }
+    team = new (8, false) cTeam(1);
     g_pTeams[1] = team;
 
     cField::Init(g_pTeams[0]->m_pNet, g_pTeams[1]->m_pNet);
@@ -273,7 +263,7 @@ cGame::cGame(void* param1, int param2, bool param3)
     {
         fn_800A9B78(mem28);
     }
-    mUnidentified10DC = mem28;
+    mUnidentified10DC = (TU800A9B78*)mem28;
 
     fn_800A9E48(param2);
 
@@ -284,7 +274,7 @@ cGame::cGame(void* param1, int param2, bool param3)
         FuzzyTweaks("/ini/FuzzyTweaks.ini", "/Game/Fuzzy");
 
     mUnidentified020 = false;
-    mUnidentified024 = 1;
+    m_nLastTeamToScore = 1;
     mUnidentified028 = 0;
     mUnidentified02C = 0;
     mUnidentified030 = 0;
@@ -817,7 +807,7 @@ extern "C" void fn_8005A7E8()
             cTeam* pTeam = g_pTeams[i];
             for (int j = 0; j < 5; j++)
             {
-                if (fn_8001E184(pTeam->GetPlayer(j)))
+                if (pTeam->GetPlayer(j)->fn_8001E184())
                 {
                     flags |= 1 << j;
                 }
@@ -871,7 +861,7 @@ void cGame::fn_8005BF50(RunningChecksum* runningChecksum)
 {
     runningChecksum->ChecksumData(&m_eGameState, sizeof(m_eGameState));
     runningChecksum->ChecksumData(&mUnidentified020, sizeof(mUnidentified020));
-    runningChecksum->ChecksumData(&mUnidentified024, sizeof(mUnidentified024));
+    runningChecksum->ChecksumData(&m_nLastTeamToScore, sizeof(m_nLastTeamToScore));
 }
 
 void cGame::ChangeGameState(int state)
@@ -1018,9 +1008,9 @@ void cGame::fn_8005B508()
         cBall* pBall = g_pBall;
         nlVector2 v2BallDistance;
         v2BallDistance.x
-            = pBall->m_v3Position.x - pPlayer->m_v3Position.x;
+            = pBall->m_v3Position.x - pPlayer->mUnidentified024.m_v3Position.x;
         v2BallDistance.y
-            = pBall->m_v3Position.y - pPlayer->m_v3Position.y;
+            = pBall->m_v3Position.y - pPlayer->mUnidentified024.m_v3Position.y;
         m_fCachedBallPlayerDistances[i] = nlVec2Length(v2BallDistance);
         m_fCachedBallPlayerDistances[i]
             -= fBallRadius + fPlayerRadius;
@@ -1036,10 +1026,10 @@ void cGame::fn_8005B508()
                 cPlayer* pPlayer = lbl_8056B800[i];
                 cPlayer* pOtherPlayer = lbl_8056B800[j];
                 nlVector2 v2PlayerDistance;
-                v2PlayerDistance.x = pPlayer->m_v3Position.x
-                                   - pOtherPlayer->m_v3Position.x;
-                v2PlayerDistance.y = pPlayer->m_v3Position.y
-                                   - pOtherPlayer->m_v3Position.y;
+                v2PlayerDistance.x = pPlayer->mUnidentified024.m_v3Position.x
+                                   - pOtherPlayer->mUnidentified024.m_v3Position.x;
+                v2PlayerDistance.y = pPlayer->mUnidentified024.m_v3Position.y
+                                   - pOtherPlayer->mUnidentified024.m_v3Position.y;
                 m_fCachedPlayerDistances[i][j]
                     = nlVec2Length(v2PlayerDistance);
                 m_fCachedPlayerDistances[i][j]
@@ -1215,10 +1205,9 @@ extern "C" void fn_800709FC(UnidentifiedCallbackNoArgBinding* binding)
     (binding->mTarget->*binding->mCallback)();
 }
 
-extern "C" void fn_80072134(UnidentifiedRegistrationNode* node)
+extern "C" void fn_80072134(LightningStrikeData* node)
 {
-    node->mNext = (UnidentifiedRegistrationNode*)g_LightningStrikeDataPool.m_FreeList;
-    g_LightningStrikeDataPool.m_FreeList = (SlotPoolEntry*)node;
+    g_LightningStrikeDataPool.Free(node);
 }
 
 extern "C" void fn_8007214C(ShotAtGoalData* node)
@@ -1243,10 +1232,9 @@ extern "C" void fn_80072194(PlayerAttackData* node)
     g_PlayerAttackDataPool.Free(node);
 }
 
-extern "C" void fn_800721AC(UnidentifiedRegistrationNode* node)
+extern "C" void fn_800721AC(CollisionPlayerWallData* node)
 {
-    node->mNext = (UnidentifiedRegistrationNode*)g_CollisionPlayerWallDataPool.m_FreeList;
-    g_CollisionPlayerWallDataPool.m_FreeList = (SlotPoolEntry*)node;
+    g_CollisionPlayerWallDataPool.Free(node);
 }
 
 extern "C" EventDispatcher* fn_800721C4()

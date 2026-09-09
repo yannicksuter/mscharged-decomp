@@ -434,7 +434,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             bool invincible = !fielder->IsStuck()
                            && (fielder->muInvincibleStatus & 1) != 0;
             if (invincible
-                || fn_800344DC(fielder, &otherFielder->m_v3Position)
+                || fn_800344DC(fielder, &otherFielder->mUnidentified024.m_v3Position)
                 || fielder->IsStuck()
                 || (fn_8003E948(fielder) && ReadBool(fielder, 0x3DC)))
             {
@@ -445,7 +445,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 invincible = !otherFielder->IsStuck()
                           && (otherFielder->muInvincibleStatus & 1) != 0;
                 if (invincible
-                    || fn_800344DC(otherFielder, &fielder->m_v3Position)
+                    || fn_800344DC(otherFielder, &fielder->mUnidentified024.m_v3Position)
                     || otherFielder->IsStuck())
                 {
                     contactType = ONE_WAY_CONTACT_THIS;
@@ -500,8 +500,8 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             sPlayerPlayerCollisionData[collisionIndex] = data;
             data->player1 = (cPlayer*)collisionPlayer1;
             data->player2 = (cPlayer*)collisionPlayer2;
-            data->velocity1 = m_pAICharacter->m_v3Velocity;
-            data->velocity2 = otherCharacter->m_pAICharacter->m_v3Velocity;
+            data->velocity1 = m_pAICharacter->mUnidentified024.m_v3Velocity;
+            data->velocity2 = otherCharacter->m_pAICharacter->mUnidentified024.m_v3Velocity;
             fn_80145DD0(data);
         }
     }

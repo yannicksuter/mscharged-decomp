@@ -29,10 +29,10 @@ extern "C"
     void fn_8019BF40(
         PhysicsObject*, PhysicsObject*, const nlVector3&);
 
-    State_80199E84* fn_80199E84(State_80199E84* pObject, void* pDrawable);
-    State_80199E84* fn_80199F6C(State_80199E84* pObject, int bDelete);
-    void fn_80199FDC(State_80199E84* pObject, float fDeltaT);
-    void fn_8019A584(State_80199E84* pObject);
+    BirdoEggObject* fn_80199E84(BirdoEggObject* pObject, RenderObject* pDrawable);
+    BirdoEggObject* fn_80199F6C(BirdoEggObject* pObject, int bDelete);
+    void fn_80199FDC(BirdoEggObject* pObject, float fDeltaT);
+    void fn_8019A584(BirdoEggObject* pObject);
 
     KoopaShellObject* fn_801A5F30(
         KoopaShellObject* pObject, void* pDrawable);
@@ -185,7 +185,7 @@ void NPCManager::fn_801A9AF8()
 
 void NPCManager::fn_801A9B64()
 {
-    State_80199E84* pObject = (State_80199E84*)nlMalloc(0x4C, 8, false);
+    BirdoEggObject* pObject = (BirdoEggObject*)nlMalloc(0x4C, 8, false);
     if (pObject != 0)
     {
         pObject = fn_80199E84(pObject, GetRenderObject(4, 0));

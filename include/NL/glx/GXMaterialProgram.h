@@ -4,18 +4,13 @@
 #include <revolution/gx/GXTypes.h>
 
 #include "NL/gl/glModel.h"
+#include "NL/glx/GXMaterialProgramBase.h"
+#include "NL/glx/GXMaterialProgram_80298B18.h"
 #include "NL/gl/tu_802CC370.h"
 #include "NL/glx/tu_8036A800.h"
 #include "NL/glx/tu_8036D774.h"
 
 class GLView;
-
-struct GXMaterialParameter
-{
-    /* 0x00 */ unsigned long hash;
-    /* 0x04 */ unsigned long metadata;
-    /* 0x08 */ unsigned long offset;
-}; // size: 0xC
 
 extern "C"
 {
@@ -27,26 +22,6 @@ extern "C"
 }
 
 extern GXPrimitive lbl_80524470[6];
-
-template <class Derived>
-class GXMaterialProgramImpl
-{
-public:
-    virtual void Activate(GLView* view);
-    virtual void Deactivate();
-    virtual void Configure() = 0;
-    virtual void Prepare(const glModelPacket* packet);
-    virtual void Draw(const glModelPacket* packet);
-    virtual const GXMaterialParameter* GetParameters() = 0;
-    virtual void Initialize() = 0;
-
-    /* 0x04 */ unsigned long programHash;
-    /* 0x08 */ unsigned long parameterDataSize;
-    /* 0x0C */ unsigned long parameterCount;
-
-protected:
-    ~GXMaterialProgramImpl() { }
-}; // size: 0x10
 
 struct GXMaterialProgramParameters_802A6B6C
 {
@@ -131,24 +106,6 @@ public:
     static GXMaterialProgram_802987A0* Instance;
     static bool Initialized;
     static GXMaterialParameter Parameters[16];
-};
-
-class GXMaterialProgram_80298B18 : public GXMaterialProgramImpl<GXMaterialProgram_80298B18>
-{
-public:
-    GXMaterialProgram_80298B18();
-    virtual ~GXMaterialProgram_80298B18();
-    virtual void Configure();
-    virtual const GXMaterialParameter* GetParameters();
-    virtual void Initialize();
-
-    void ConfigureVertexFormat(bool indexed);
-    void BindVertexArrays(const glModelPacket* packet);
-    void BindParameters(const glModelPacket* packet);
-
-    static GXMaterialProgram_80298B18* Instance;
-    static bool Initialized;
-    static GXMaterialParameter Parameters[19];
 };
 
 class GXMaterialProgram_80298EE0 : public GXMaterialProgramImpl<GXMaterialProgram_80298EE0>

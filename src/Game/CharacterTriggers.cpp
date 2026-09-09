@@ -32,7 +32,6 @@
 #include "Game/TweakValue.h"
 #include "NL/nlstring_tmpl.h"
 
-extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
 static bool lbl_806E16F8;
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -50,8 +49,6 @@ extern "C" void fn_802E8A2C(EmissionManager* pManager, const EffectsGroup* pEffe
 static nlVector3 lbl_80515478 = { 0.0f, 0.0f, 1.0f };
 extern "C" void fn_800EDCE8(cPlayer* pPlayer);
 extern "C" bool fn_800EBBFC(int slotId, unsigned long cueId, const void* debugName, void* context);
-extern "C" void fn_8001C510(cCharacter* pCharacter, bool bEnable);
-extern "C" bool fn_8001E2C0(cCharacter* pCharacter, EffectsGroup* pGroup);
 extern "C" bool fn_8003877C(cFielder* pFielder);
 extern "C" bool fn_80014EA4(cBall* pBall, const EffectsGroup* pGroup);
 extern "C" void fn_800152B4(cBall* pBall);
@@ -65,12 +62,6 @@ extern "C" {
 extern "C" void fn_80038158(cFielder* pFielder, int nParam);
 extern "C" void fn_800611F0(cGame* pGame, const void* pEventData);
 extern "C" void fn_80060FF4(cGame* pGame, const void* pEventData);
-struct CharacterImpactEvent
-{
-    nlVector3 v3Position;
-    float fMagnitude;
-    cCharacter* pCharacter;
-};
 extern "C" EffectsGroup* fn_802E7D54(EmissionManager* pManager, unsigned long uHash);
 extern "C" void fn_802E83C4(EmissionManager* pManager, const EffectsGroup* pEffectsGroup);
 class PhysicsSphere_80175F8C;
@@ -83,7 +74,6 @@ extern "C" const nlVector3* fn_800D1450(const cCharacter*);
 extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
 extern "C" void fn_800CAB18(Desire*);
 extern "C" void fn_800C9DB4(Desire*);
-extern "C" void fn_8001EFE4(cFielder*, int);
 extern "C" void fn_800318F8(cFielder*);
 extern "C" void fn_800395C0(cFielder*);
 extern "C" void fn_800367B4(cFielder*);
@@ -108,9 +98,6 @@ void SetEffectsGroupFountainLife(EffectsGroup* group, float life);
 extern "C" void fn_801BDF0C(cCharacter* pCharacter);
 extern "C" void fn_801BDF08(cCharacter* pCharacter);
 extern "C" void fn_801BDDE4();
-extern "C" void fn_801BDDE0(cCharacter* pCharacter);
-extern "C" void fn_801BDD24(const char* name, const nlVector3& v3Position, bool bParam);
-extern "C" void fn_801BDCB4(int bParam);
 extern "C" void fn_801BDC1C(const nlVector3& v3Position, const nlVector3& v3Direction, const nlVector3& v3Velocity);
 extern "C" void fn_801BD4EC(cFielder* pFielder);
 extern "C" void fn_801BD1C0(cFielder* pFielder);
@@ -184,7 +171,6 @@ extern "C" void fn_801B86A4(cPlayer* pCharacter);
 extern "C" void fn_801B865C(cPlayer* pCharacter);
 extern "C" void fn_801B84B4(cPlayer* pCharacter);
 bool KillDaze(cPlayer* player);
-extern "C" void fn_801B81F8(cPlayer* pCharacter);
 extern "C" bool fn_801B8164(cFielder* pFielder);
 extern "C" void fn_801B7F8C(cPlayer* pCharacter);
 extern "C" void fn_801B7E4C(const char* pName, cCharacter* pCharacter);
@@ -545,7 +531,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
             if (fn_8019464C(lbl_806E0C34)
                 && !((cFielder*)lbl_806E0C34)->fn_800344B0())
             {
-                fn_801B81F8((cPlayer*)lbl_806E0C34);
+                EmitDaze((cPlayer*)lbl_806E0C34);
             }
             break;
 
@@ -781,7 +767,7 @@ extern "C" void fn_801B75C8(cFielder* pCharacter,
     if (pGlowControl != 0)
     {
         pGlowControl->SetPosition(g_pBall->m_v3Position);
-        pGlowControl->SetVelocity(pCharacter->m_v3Velocity);
+        pGlowControl->SetVelocity(pCharacter->mUnidentified024.m_v3Velocity);
         SetBallUpdateCallback(pGlowControl);
     }
 }
@@ -895,7 +881,7 @@ extern "C" void fn_801B7D00(cCharacter* pCharacter)
     v3Position.z = 0.0f;
 
     nlPolarToCartesian(v3Offset.x, v3Offset.y,
-        pCharacter->m_aActualFacingDirection, 0.65f);
+        pCharacter->mUnidentified024.m_aActualFacingDirection, 0.65f);
     v3Offset.z = 0.0f;
 
     nlVec3Add(v3Position, v3Position, v3Offset);
@@ -912,7 +898,7 @@ extern "C" void fn_801B7E4C(const char* pName, cCharacter* pCharacter)
 
 extern "C" void fn_801B7F8C(cPlayer* pCharacter)
 {
-    StopSound(fn_8001E168(pCharacter) ? 0xD73B11EC : 0x1CCDFC62, pCharacter);
+    StopSound(pCharacter->fn_8001E168() ? 0xD73B11EC : 0x1CCDFC62, pCharacter);
 
     EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("confused");
     if (pCharacter->IsPlayingEffect(pGroup))
@@ -935,13 +921,13 @@ extern "C" void fn_801B7F8C(cPlayer* pCharacter)
 
     fn_800EDCE8(pCharacter);
     fn_800EBBFC(pCharacter->mUnidentified318,
-        fn_8001E168(pCharacter) ? 0xD73B11EC : 0x1CCDFC62,
+        pCharacter->fn_8001E168() ? 0xD73B11EC : 0x1CCDFC62,
         "confused", pCharacter);
 }
 
 extern "C" bool fn_801B8164(cFielder* pFielder)
 {
-    unsigned long soundID = fn_8001E168(pFielder)
+    unsigned long soundID = pFielder->fn_8001E168()
                               ? 0xD73B11EC
                               : 0x1CCDFC62;
     StopSound(soundID, pFielder);
@@ -955,11 +941,11 @@ extern "C" bool fn_801B8164(cFielder* pFielder)
     return false;
 }
 
-extern "C" void fn_801B81F8(cPlayer* pCharacter)
+void EmitDaze(cPlayer* pCharacter)
 {
     if (pCharacter->m_eClassType == FIELDER)
     {
-        StopSound(fn_8001E168(pCharacter) ? 0xFDC268FB : 0x1CCDFC62, pCharacter);
+        StopSound(pCharacter->fn_8001E168() ? 0xFDC268FB : 0x1CCDFC62, pCharacter);
     }
     else
     {
@@ -988,7 +974,7 @@ extern "C" void fn_801B81F8(cPlayer* pCharacter)
     if (pCharacter->m_eClassType == FIELDER)
     {
         fn_800EBBFC(pCharacter->mUnidentified318,
-            fn_8001E168(pCharacter) ? 0xFDC268FB : 0x1CCDFC62,
+            pCharacter->fn_8001E168() ? 0xFDC268FB : 0x1CCDFC62,
             "dazed", pCharacter);
     }
     else
@@ -1001,7 +987,7 @@ bool KillDaze(cPlayer* player)
 {
     if (player->m_eClassType == FIELDER)
     {
-        unsigned long soundID = fn_8001E168(player)
+        unsigned long soundID = player->fn_8001E168()
                                   ? 0xFDC268FB
                                   : 0x1CCDFC62;
         StopSound(soundID, player);
@@ -1037,7 +1023,7 @@ extern "C" void fn_801B84B4(cPlayer* pCharacter)
 
     pGroup = EmissionManager::Instance()->GetEffectsGroup("freeze_ground");
     pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
     PlayRumbleAction(1, pCharacter->GetGlobalPad());
     pCharacter->m_pEffectsTexturing = fxGetTexturing(eFXTex_Freeze);
@@ -1078,7 +1064,7 @@ extern "C" void fn_801B881C(cCharacter* pCharacter)
     pController->m_fGround = 0.02f;
     SetPoseUpdateCallback(pController);
     pCharacter->AttachEffect(pController);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
     {
         Function1<void, EmissionController&> update2(
@@ -1090,7 +1076,7 @@ extern "C" void fn_801B881C(cCharacter* pCharacter)
 extern "C" void fn_801B897C(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("peach_photo"), 0, true, 0);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
@@ -1125,11 +1111,11 @@ static char s_szBowserJrGroundPound[] = "bowserjr_ground_pound";
 
 static inline void EmitGroundPound(cCharacter* pCharacter)
 {
-    if (pCharacter->m_eCharacterClass == 7)
+    if (pCharacter->mUnidentified024.m_eCharacterClass == 7)
     {
         EmitCharacterEffect(pCharacter, s_szGroundPound);
     }
-    else if (pCharacter->m_eCharacterClass == 9)
+    else if (pCharacter->mUnidentified024.m_eCharacterClass == 9)
     {
         EmitCharacterEffect(pCharacter, s_szBowserJrGroundPound);
     }
@@ -1138,14 +1124,14 @@ static inline void EmitGroundPound(cCharacter* pCharacter)
 extern "C" void fn_801B8D6C(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("monty_squish_enter"), 3, true, 0);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
 extern "C" void fn_801B8DE4(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("monty_squish_exit"), 3, true, 0);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
@@ -1156,7 +1142,7 @@ extern "C" void fn_801B8E5C(cPlayer* pPlayer)
 
     nlVector3 v3Point;
     nlVec3Set(v3Point, lbl_806DD1DC, lbl_806DD1E0, 0.2f);
-    GetWorldPoint(v3Point, v3Point, pPlayer->m_v3Position, pPlayer->m_aActualFacingDirection);
+    GetWorldPoint(v3Point, v3Point, pPlayer->mUnidentified024.m_v3Position, pPlayer->mUnidentified024.m_aActualFacingDirection);
     pController->SetPosition(v3Point);
     pController->SetVelocity(v3Zero);
 }
@@ -1164,14 +1150,14 @@ extern "C" void fn_801B8E5C(cPlayer* pPlayer)
 extern "C" void fn_801B8F04(cCharacter* pCharacter, const char* name)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(name), 3, true, 0);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
 extern "C" void fn_801B8F7C(cCharacter* pCharacter, const char* name)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(name), 3, true, 0);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
@@ -1218,14 +1204,14 @@ extern "C" void fn_801B91F8(cFielder* pFielder)
 extern "C" void fn_801B92F8(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("boo_deke_puff_start"), 3, true, 0);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
 extern "C" void fn_801B9370(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("boo_deke_puff_end"), 3, true, 0);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
@@ -1233,7 +1219,7 @@ extern "C" void fn_801B93E8(cCharacter* pCharacter)
 {
     pCharacter->EndEffect(EmissionManager::Instance()->GetEffectsGroup("electrocution"));
     pCharacter->m_pEffectsTexturing = 0;
-    fn_8001C510(pCharacter, false);
+    pCharacter->fn_8001C510(0);
 }
 
 static int lbl_806DD20C = 4;
@@ -1281,7 +1267,7 @@ extern "C" void fn_801B94EC(cCharacter* pCharacter, const nlVector3& v3Position,
     SetFreeUpdateCallback(pController, UpdateEmitterPoseFromCharacter);
     pCharacter->AttachEffect(pController);
     SetFreeUpdateCallback(pController, fn_801B9440);
-    fn_8001C510(pCharacter, true);
+    pCharacter->fn_8001C510(1);
     EmitElectricFenceCharacterEffect(v3Position, v3Normal, GetCharacterIndex(pCharacter));
 }
 
@@ -1298,7 +1284,7 @@ extern "C" void fn_801B968C(cCharacter* pCharacter)
         Function1<void, EmissionController&> update2(fn_801B9440);
         pController->SetUpdateCallback(update2);
     }
-    fn_8001C510(pCharacter, true);
+    pCharacter->fn_8001C510(1);
 }
 
 extern "C" void fn_801B97DC(cFielder* pFielder)
@@ -1357,7 +1343,7 @@ extern "C" void fn_801B9A98(cCharacter* pCharacter)
     pController->m_fGround = 0.02f;
     SetPoseUpdateCallback(pController);
     pCharacter->AttachEffect(pController);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
 }
 
 extern "C" void fn_801B9B94(cCharacter* pCharacter)
@@ -1369,7 +1355,7 @@ extern "C" void fn_801B9B94(cCharacter* pCharacter)
     pController->m_fGround = 0.02f;
     SetPoseUpdateCallback(pController);
     pCharacter->AttachEffect(pController);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
 }
 
 extern "C" bool fn_801B9C90(const char* szEffectName)
@@ -1711,7 +1697,7 @@ extern "C" void fn_801BB20C(cCharacter* pCharacter)
     pController->m_fGround = 0.02f;
     SetPoseUpdateCallback(pController);
     pCharacter->AttachEffect(pController);
-    pController->SetPosition(pCharacter->m_v3Position);
+    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
@@ -1851,14 +1837,14 @@ extern "C" void fn_801BB6A4(cCharacter* pCharacter, int nIcon)
     nlVector3 v3Position = pCharacter->GetJointPosition(pCharacter->m_nHeadJointIndex);
     v3Position.z += 0.1f;
     pController->SetPosition(v3Position);
-    pController->SetVelocity(pCharacter->m_v3Velocity);
+    pController->SetVelocity(pCharacter->mUnidentified024.m_v3Velocity);
 }
 
 extern "C" void fn_801BBE80(cCharacter* pCharacter)
 {
     EmissionController* pController;
 
-    if (pCharacter->m_eCharacterClass == 0)
+    if (pCharacter->mUnidentified024.m_eCharacterClass == 0)
     {
         pController = EmitGeneric(pCharacter, "mario_super_grow", 0);
     }
@@ -1875,7 +1861,7 @@ extern "C" void fn_801BC094(cCharacter* pCharacter)
 {
     EmissionController* pController;
 
-    if (pCharacter->m_eCharacterClass == 0)
+    if (pCharacter->mUnidentified024.m_eCharacterClass == 0)
     {
         pController = EmitGeneric(pCharacter, "mario_super_shrink", 0);
     }
@@ -1894,7 +1880,7 @@ extern "C" void fn_801BC2A8(cCharacter* pCharacter, bool bRight)
 
     if (bRight)
     {
-        if (pCharacter->m_eCharacterClass == 0)
+        if (pCharacter->mUnidentified024.m_eCharacterClass == 0)
         {
             const char* szEffectName = "mario_right_super_footstep";
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
@@ -1917,7 +1903,7 @@ extern "C" void fn_801BC2A8(cCharacter* pCharacter, bool bRight)
     }
     else
     {
-        if (pCharacter->m_eCharacterClass == 0)
+        if (pCharacter->mUnidentified024.m_eCharacterClass == 0)
         {
             const char* szEffectName = "mario_left_super_footstep";
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
@@ -2024,7 +2010,7 @@ extern "C" void fn_801BCC38(cCharacter* pCharacter)
 extern "C" void fn_801BCC9C(cCharacter* pCharacter)
 {
     EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("skillshot_player_on_fire");
-    if (fn_8001E2C0(pCharacter, pGroup))
+    if (pCharacter->fn_8001E2C0(pGroup))
     {
         EmissionManager::Instance()->Destroy((unsigned long)pCharacter, pGroup);
     }
@@ -2062,11 +2048,11 @@ extern "C" void fn_801BCE90(cCharacter* pCharacter)
         if (pAnimController->m_fTime
             < 15.0f / pAnimController->m_pSAnim->m_nNumKeys)
         {
-            if (pCharacter->m_eCharacterClass == 0xB)
+            if (pCharacter->mUnidentified024.m_eCharacterClass == 0xB)
             {
                 fn_801B7E4C("petey_deke", pCharacter);
             }
-            else if (pCharacter->m_eCharacterClass == 0xC)
+            else if (pCharacter->mUnidentified024.m_eCharacterClass == 0xC)
             {
                 fn_801B7E4C("birdo_deke", pCharacter);
             }
@@ -2076,12 +2062,12 @@ extern "C" void fn_801BCE90(cCharacter* pCharacter)
 
 extern "C" void fn_801BD144(cCharacter* pCharacter)
 {
-    if (pCharacter->m_eCharacterClass == 11)
+    if (pCharacter->mUnidentified024.m_eCharacterClass == 11)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("petey_deke");
         fn_802E83C4(EmissionManager::Instance(), pGroup);
     }
-    else if (pCharacter->m_eCharacterClass == 12)
+    else if (pCharacter->mUnidentified024.m_eCharacterClass == 12)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("birdo_deke");
         fn_802E83C4(EmissionManager::Instance(), pGroup);
@@ -2090,7 +2076,7 @@ extern "C" void fn_801BD144(cCharacter* pCharacter)
 
 extern "C" void fn_801BD1C0(cFielder* pFielder)
 {
-    int eCharacterClass = pFielder->m_eCharacterClass;
+    int eCharacterClass = pFielder->mUnidentified024.m_eCharacterClass;
 
     if (eCharacterClass == 7 || eCharacterClass == 9 || eCharacterClass == 1
         || eCharacterClass == 3 || eCharacterClass == 11
@@ -2105,7 +2091,7 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
         if (pAnimController->m_fTime
             < 15.0f / (float)pAnimController->m_pSAnim->m_nNumKeys)
         {
-            if (pFielder->m_eCharacterClass == 11)
+            if (pFielder->mUnidentified024.m_eCharacterClass == 11)
             {
                 const char* groupName = "petey_deke";
                 EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
@@ -2122,7 +2108,7 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
                     pController->SetUpdateCallback(update2);
                 }
             }
-            else if (pFielder->m_eCharacterClass == 12)
+            else if (pFielder->mUnidentified024.m_eCharacterClass == 12)
             {
                 const char* groupName = "birdo_deke";
                 EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
@@ -2142,8 +2128,8 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
         }
     }
 
-    if (pFielder->m_eCharacterClass == 13 || pFielder->m_eCharacterClass == 7
-        || pFielder->m_eCharacterClass == 9)
+    if (pFielder->mUnidentified024.m_eCharacterClass == 13 || pFielder->mUnidentified024.m_eCharacterClass == 7
+        || pFielder->mUnidentified024.m_eCharacterClass == 9)
     {
         pFielder->InitMovementFromAnim(0, v3Zero, 0.0f, false);
     }
@@ -2153,49 +2139,49 @@ extern "C" void fn_801BD4EC(cFielder* pFielder)
 {
     fn_80038158(pFielder, 0);
 
-    if (pFielder->m_eCharacterClass == 3)
+    if (pFielder->mUnidentified024.m_eCharacterClass == 3)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("dk_deke");
         EmissionManager::Instance()->Destroy((unsigned long)g_pBall, pGroup);
     }
     else if (pFielder->m_eActionState == 1)
     {
-        if (pFielder->m_eCharacterClass == 11)
+        if (pFielder->mUnidentified024.m_eCharacterClass == 11)
         {
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("petey_deke");
             fn_802E83C4(EmissionManager::Instance(), pGroup);
         }
-        else if (pFielder->m_eCharacterClass == 12)
+        else if (pFielder->mUnidentified024.m_eCharacterClass == 12)
         {
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("birdo_deke");
             fn_802E83C4(EmissionManager::Instance(), pGroup);
         }
 
-        if (pFielder->m_eCharacterClass == 1)
+        if (pFielder->mUnidentified024.m_eCharacterClass == 1)
         {
             pFielder->InitMovementFromAnim(0, v3Zero, 0.0f, false);
         }
-        else if (pFielder->m_eCharacterClass == 7)
+        else if (pFielder->mUnidentified024.m_eCharacterClass == 7)
         {
             CharacterImpactEvent event;
-            event.v3Position = pFielder->m_v3Position;
+            event.v3Position = pFielder->mUnidentified024.m_v3Position;
             event.fMagnitude = lbl_806DD1C0;
             event.pCharacter = pFielder;
             fn_800611F0(g_pGame, &event);
             EmitGroundPound(pFielder);
             fn_800EBBFC(pFielder->mUnidentified318, 0x5BF8E132, 0, 0);
         }
-        else if (pFielder->m_eCharacterClass == 9)
+        else if (pFielder->mUnidentified024.m_eCharacterClass == 9)
         {
             CharacterImpactEvent event;
-            event.v3Position = pFielder->m_v3Position;
+            event.v3Position = pFielder->mUnidentified024.m_v3Position;
             event.fMagnitude = lbl_806DD1C4;
             event.pCharacter = pFielder;
             fn_800611F0(g_pGame, &event);
             EmitGroundPound(pFielder);
             fn_800EBBFC(pFielder->mUnidentified318, 0x560BD5F9, 0, 0);
         }
-        else if (pFielder->m_eCharacterClass == 13)
+        else if (pFielder->mUnidentified024.m_eCharacterClass == 13)
         {
             CharacterImpactEvent event;
             nlVector3 v3Offset;
@@ -2204,7 +2190,7 @@ extern "C" void fn_801BD4EC(cFielder* pFielder)
             event.v3Position = pFielder->GetJointPosition(nNodeIndex);
             event.v3Position.z = 0.0f;
             nlPolarToCartesian(v3Offset.x, v3Offset.y,
-                pFielder->m_aActualFacingDirection, lbl_806DD1CC);
+                pFielder->mUnidentified024.m_aActualFacingDirection, lbl_806DD1CC);
             v3Offset.z = 0.0f;
             nlVec3Add(event.v3Position, event.v3Position, v3Offset);
             event.fMagnitude = lbl_806DD1C8;
@@ -2230,7 +2216,7 @@ extern "C" void fn_801BDC1C(const nlVector3& v3Position, const nlVector3& v3Dire
     pController->SetVelocity(v3Velocity);
 }
 
-extern "C" void fn_801BDCB4(int bParam)
+extern "C" void fn_801BDCB4(bool bParam)
 {
     if (bParam)
     {
@@ -2244,7 +2230,7 @@ extern "C" void fn_801BDCB4(int bParam)
     }
 }
 
-extern "C" void fn_801BDD24(const char* name, const nlVector3& v3Position, bool bParam)
+extern "C" void fn_801BDD24(const char* name, nlVector3 v3Position, bool bParam)
 {
     cBall* pBall = g_pBall;
     EmissionController* pController = EmissionManager::Instance()->Create(
@@ -2257,7 +2243,7 @@ extern "C" void fn_801BDD24(const char* name, const nlVector3& v3Position, bool 
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801BDDE0(cCharacter* pCharacter)
+extern "C" void fn_801BDDE0(bool bParam)
 {
 }
 

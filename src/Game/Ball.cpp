@@ -166,7 +166,7 @@ extern "C" void fn_80031A30(cFielder*, int, float);
 extern "C" void fn_80035544(cFielder*);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" bool fn_80038660(cFielder*);
-extern "C" float fn_800DEFD4(cFielder*);
+float ReceivingPass(cFielder*);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 extern "C" void fn_80017448(cBall*, float);
 extern "C" void fn_80017F18(cBall*);
@@ -182,7 +182,7 @@ extern "C" void fn_80019F10(void*);
 extern "C" void fn_8001A00C(void*);
 extern "C" void fn_8001A108(int, int);
 extern "C" void fn_8001AA0C(LiveBallTrail*, bool);
-extern "C" void fn_8019A434(State_80199E84*, bool);
+extern "C" void fn_8019A434(BirdoEggObject*, bool);
 extern "C" void fn_801BDDE4();
 extern "C" void fn_801BDF08(int);
 extern "C" void fn_80097358(cPlayer*, float);
@@ -260,15 +260,29 @@ extern float lbl_806DB538;
 extern float lbl_806DB53C;
 extern float lbl_806DB540;
 extern unsigned char lbl_806DB544;
-extern unsigned char lbl_806DB500;
+bool lbl_806DB500 = true;
+bool lbl_806DB501 = true;
 extern float lbl_806DB504;
 extern float lbl_806DB508;
 extern float lbl_806DB50C;
 extern float lbl_806DB510;
 extern float lbl_806DB548;
 extern float lbl_806DB54C;
-extern float lbl_806DB558;
-extern float lbl_806DB55C;
+float lbl_806DB558 = 10.0f;
+float lbl_806DB55C = 10.0f;
+
+static TweakValueBoolImpl_804F4538 sUnidentifiedTweak_8056B478(
+    "gbUsePassCharging", "Game/Gameplay/Charging/Pass", &lbl_806DB500, true);
+static TweakValueBoolImpl_804F4538 sUnidentifiedTweak_8056B498(
+    "gbUseShotCharging", "Game/Gameplay/Charging/Shot", &lbl_806DB501, true);
+static TweakValueImpl_804F4DC8 sUnidentifiedTweak_8056B4B8(
+    "gfShotClockTime", "Game/Gameplay/Charging/Shot Clock", &lbl_806DB558, true);
+static TweakValueImpl_804F4DC8 sUnidentifiedTweak_8056B4D8(
+    "gfShotClockFrozenTime", "Game/Gameplay/Charging/Shot Clock", &lbl_806DB55C, true);
+static TweakValueBoolImpl_804F4538 sUnidentifiedTweak_8056B4F8(
+    "gbUseShotClock", "Game/Gameplay/Charging/Shot Clock", &lbl_806E0BDC, true);
+LiveBallTrail lbl_8056B518[10];
+
 extern float lbl_806DB560;
 extern float lbl_806DB564;
 extern float lbl_806DB568;
@@ -457,7 +471,7 @@ void cBall::CollideWithCharacterCallback(
         cFielder* pCharacterFielder = (cFielder*)pCharacter;
         nlVector3 v3BallDirection;
         nlVec3Sub(v3BallDirection, m_v3Position,
-            m_pPrevOwner->m_v3Position);
+            m_pPrevOwner->mUnidentified024.m_v3Position);
         unsigned short aBallDirection
             = (unsigned short)(int)(lbl_806E31C4
                 * nlATan2f(v3BallDirection.y, v3BallDirection.x));
@@ -477,15 +491,15 @@ void cBall::CollideWithCharacterCallback(
             bool bLightningBall = m_tLightningTimer.m_uPackedTime != 0
                 && meBallState == 8 && pShooter != NULL;
             if (bLightningBall
-                && pShooter->m_eCharacterClass == (eCharacterClass)0xF)
+                && pShooter->mUnidentified024.m_eCharacterClass == (eCharacterClass)0xF)
             {
                 fn_80097358(pCharacter, lbl_806E31C8);
             }
             else if (bLightningBall
-                && pShooter->m_eCharacterClass == (eCharacterClass)0x11)
+                && pShooter->mUnidentified024.m_eCharacterClass == (eCharacterClass)0x11)
             {
                 fn_800156F8(this, pShooter);
-                pCharacterFielder->fn_800451B0(pShooter->m_v3Position);
+                pCharacterFielder->fn_800451B0(pShooter->mUnidentified024.m_v3Position);
                 if (GetStadiumUnknown0x10(
                         GameInfoManager::Instance()->GetStadium()))
                 {
@@ -538,7 +552,7 @@ void cBall::CollideWithCharacterCallback(
                                        || meBallState == 3)
                     && m_pPassTarget != NULL;
                 if (bPassTarget
-                    && fn_800DEFD4((cFielder*)m_pPassTarget))
+                    && ReceivingPass((cFielder*)m_pPassTarget))
                 {
                     cFielder* pFielder;
                     if (m_pPassTarget != NULL
@@ -573,7 +587,7 @@ void cBall::CollideWithCharacterCallback(
                 nlVec3Scale(v3Velocity, m_v3Velocity, lbl_806E31D0);
                 nlVector3 v3CharacterToBall;
                 nlVec3Sub(v3CharacterToBall, m_v3Position,
-                    pCharacter->m_v3Position);
+                    pCharacter->mUnidentified024.m_v3Position);
                 if (nlVec3DotProduct(v3CharacterToBall, v3Velocity) < 0.0f)
                 {
                     m_v3Position = m_v3PrevPosition;
@@ -615,7 +629,7 @@ void cBall::CollideWithCharacterCallback(
                                        || meBallState == 3)
                     && m_pPassTarget != NULL;
                 if (bPassTarget
-                    && fn_800DEFD4((cFielder*)m_pPassTarget))
+                    && ReceivingPass((cFielder*)m_pPassTarget))
                 {
                     cFielder* pPassTarget;
                     if (m_pPassTarget != NULL
@@ -664,7 +678,7 @@ void cBall::CollideWithCharacterCallback(
                                       || meBallState == 3)
                 && m_pPassTarget != NULL;
             if (bHasPassTarget
-                && fn_800DEFD4((cFielder*)m_pPassTarget))
+                && ReceivingPass((cFielder*)m_pPassTarget))
             {
                 cFielder* pFielder;
                 if (m_pPassTarget != NULL
@@ -710,14 +724,14 @@ void cBall::CollideWithCharacterCallback(
             if (fn_80038660(pCharacterFielder))
             {
                 nlVector3 v3ContactLocation
-                    = pCharacter->m_v3Position;
+                    = pCharacter->mUnidentified024.m_v3Position;
                 nlVector3 v3PhysicsRadialSpot;
                 float fRadius = fn_8002BFA8(
                     pCharacterFielder->GetTweaks(),
-                    pCharacter->m_fPlayerScale);
+                    pCharacter->mUnidentified024.m_fPlayerScale);
                 nlPolarToCartesian(v3PhysicsRadialSpot.x,
                     v3PhysicsRadialSpot.y,
-                    pCharacter->m_aActualFacingDirection, fRadius);
+                    pCharacter->mUnidentified024.m_aActualFacingDirection, fRadius);
                 v3PhysicsRadialSpot.z = 0.0f;
                 nlVec3Add(v3ContactLocation, v3ContactLocation,
                     v3PhysicsRadialSpot);
@@ -762,8 +776,8 @@ void cBall::CollideWithCharacterCallback(
                                         pOwnerFielder, false);
                                 fn_80035544(pOwnerFielder);
                             }
-                            else if (pOwnerFielder->m_fActualSpeed
-                                < pCharacterFielder->m_fActualSpeed)
+                            else if (pOwnerFielder->mUnidentified024.m_fActualSpeed
+                                < pCharacterFielder->mUnidentified024.m_fActualSpeed)
                             {
                                 pOwnerFielder->InitActionSlideAttackReact(
                                     pCharacterFielder, false);
@@ -868,7 +882,7 @@ static inline void fn_80014494Impl(cBall* pBall)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
-        if (fn_800DEFD4((cFielder*)pBall->m_pPassTarget))
+        if (ReceivingPass((cFielder*)pBall->m_pPassTarget))
         {
             cPlayer* pPassTarget = pBall->m_pPassTarget;
             cFielder* pFielder;
@@ -935,7 +949,7 @@ extern "C" void fn_800145A4(cBall* pBall)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
-        if (fn_800DEFD4((cFielder*)pBall->m_pPassTarget))
+        if (ReceivingPass((cFielder*)pBall->m_pPassTarget))
         {
             cPlayer* pPassTarget = pBall->m_pPassTarget;
             cFielder* pFielder;
@@ -1094,7 +1108,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
 
     bool bUnidentified = m_tLightningTimer.m_uPackedTime != 0
         && meBallState == 8 && m_pShooter != NULL
-        && m_pShooter->m_eCharacterClass == (eCharacterClass)0x10;
+        && m_pShooter->mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10;
     if (bUnidentified)
     {
         cFielder* pFielder = (cFielder*)m_pShooter;
@@ -1104,13 +1118,13 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             nlVector3 v3JointPosition = pFielder->GetJointPosition(
                 pFielder->m_nBip01JointIndex_0xA4);
             nlVector3 v3Delta;
-            v3Delta.x = v3JointPosition.x - pFielder->m_v3Position.x;
-            v3Delta.y = v3JointPosition.y - pFielder->m_v3Position.y;
+            v3Delta.x = v3JointPosition.x - pFielder->mUnidentified024.m_v3Position.x;
+            v3Delta.y = v3JointPosition.y - pFielder->mUnidentified024.m_v3Position.y;
             float fDistance
                 = nlSqrt(v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y,
                     true);
             float fHeight
-                = pFielder->m_v3Position.z - v3JointPosition.z;
+                = pFielder->mUnidentified024.m_v3Position.z - v3JointPosition.z;
 
             nlVector3 v3Velocity = m_v3Velocity;
             pFielder->SetFacingDirection(
@@ -1149,7 +1163,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
         fn_801A65D0(pKoopaShell, m_v3Position);
     }
 
-    State_80199E84* pState = lbl_806E1608->mUnidentified028;
+    BirdoEggObject* pState = lbl_806E1608->mUnidentified028;
     if (pState != NULL && pState->visible)
     {
         pState->unknown_40 = m_v3Velocity;
@@ -1421,8 +1435,8 @@ extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
     eCharacterClass eClass = CHARACTER_CLASS_INVALID;
     if (pShooter != NULL)
     {
-        eClass = pShooter->m_eCharacterClass;
-        v3Position = pShooter->m_v3Position;
+        eClass = pShooter->mUnidentified024.m_eCharacterClass;
+        v3Position = pShooter->mUnidentified024.m_v3Position;
     }
 
     float fTimeScale;
@@ -1534,7 +1548,7 @@ static inline void fn_80015B38Impl(cBall* pBall, bool bParam)
         bool bPassTarget = (pBall->meBallState == 5
                                || pBall->meBallState == 3)
             && pBall->m_pPassTarget != NULL;
-        if (bPassTarget && fn_800DEFD4((cFielder*)pBall->m_pPassTarget))
+        if (bPassTarget && ReceivingPass((cFielder*)pBall->m_pPassTarget))
         {
             cPlayer* pPassTarget = pBall->m_pPassTarget;
             cFielder* pFielder;
@@ -1823,7 +1837,7 @@ extern "C" bool fn_80016768(cBall* pBall)
 {
     return pBall->m_tLightningTimer.m_uPackedTime != 0
         && pBall->meBallState == 8 && pBall->m_pShooter != NULL
-        && pBall->m_pShooter->m_eCharacterClass
+        && pBall->m_pShooter->mUnidentified024.m_eCharacterClass
         == (eCharacterClass)0x11;
 }
 
@@ -1831,7 +1845,7 @@ extern "C" bool fn_800167A8(cBall* pBall)
 {
     return pBall->m_tLightningTimer.m_uPackedTime != 0
         && pBall->meBallState == 8 && pBall->m_pShooter != NULL
-        && pBall->m_pShooter->m_eCharacterClass
+        && pBall->m_pShooter->mUnidentified024.m_eCharacterClass
         == (eCharacterClass)0x10;
 }
 
@@ -2741,7 +2755,7 @@ nlVector3* cBall::GetAIVelocity() const
     cPlayer* temp_r4 = m_pOwner;
     if (temp_r4 != NULL)
     {
-        return &(temp_r4->m_v3Velocity);
+        return &(temp_r4->mUnidentified024.m_v3Velocity);
     }
     return (nlVector3*)&(m_v3Velocity);
 }
@@ -2841,13 +2855,13 @@ float fn_800155A0(cBall* pBall, int nParam)
         }
 
         if (pBall->GetOwnerFielder() != NULL
-            && pBall->GetOwnerFielder()->m_eCharacterClass == MYSTERY)
+            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass == MYSTERY)
         {
             return 0.0f;
         }
 
         if (pBall->GetOwnerFielder() != NULL
-            && pBall->GetOwnerFielder()->m_eCharacterClass
+            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass
                 == (eCharacterClass)0x13
             && pBall->GetOwnerFielder()->m_eActionState == ACTION_UNKNOWN_32)
         {
@@ -2995,7 +3009,7 @@ extern "C" void fn_8001929C()
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
-        if (fn_800DEFD4((cFielder*)pBall->m_pPassTarget))
+        if (ReceivingPass((cFielder*)pBall->m_pPassTarget))
         {
             cPlayer* pPassTarget = pBall->m_pPassTarget;
             cFielder* pFielder;
@@ -3045,7 +3059,7 @@ extern "C" void fn_800193A0(void*)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
-        if (fn_800DEFD4((cFielder*)pBall->m_pPassTarget))
+        if (ReceivingPass((cFielder*)pBall->m_pPassTarget))
         {
             cPlayer* pPassTarget = pBall->m_pPassTarget;
             cFielder* pFielder;
@@ -3084,7 +3098,7 @@ extern "C" void fn_800194A4(void*)
     }
 
     cFielder* pCaptain
-        = g_pTeams[g_pGame->mUnidentified024]->GetCaptain();
+        = g_pTeams[g_pGame->m_nLastTeamToScore]->GetCaptain();
     cFielder* pOtherCaptain
         = pCaptain->m_pTeam->GetOtherTeam()->GetCaptain();
 
@@ -3169,7 +3183,7 @@ extern "C" void fn_80019718(void*)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
-        if (fn_800DEFD4((cFielder*)pBall->m_pPassTarget))
+        if (ReceivingPass((cFielder*)pBall->m_pPassTarget))
         {
             cPlayer* pPassTarget = pBall->m_pPassTarget;
             cFielder* pFielder;
@@ -3214,7 +3228,7 @@ extern "C" void fn_80019814(void*)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
-        if (fn_800DEFD4((cFielder*)pBall->m_pPassTarget))
+        if (ReceivingPass((cFielder*)pBall->m_pPassTarget))
         {
             cPlayer* pPassTarget = pBall->m_pPassTarget;
             cFielder* pFielder;
@@ -3367,7 +3381,7 @@ extern "C" void fn_80019F10(void*)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
-        if (fn_800DEFD4((cFielder*)pBall->m_pPassTarget))
+        if (ReceivingPass((cFielder*)pBall->m_pPassTarget))
         {
             cPlayer* pPassTarget = pBall->m_pPassTarget;
             cFielder* pFielder;
@@ -3412,7 +3426,7 @@ extern "C" void fn_8001A00C(void*)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
-        if (fn_800DEFD4((cFielder*)pBall->m_pPassTarget))
+        if (ReceivingPass((cFielder*)pBall->m_pPassTarget))
         {
             cPlayer* pPassTarget = pBall->m_pPassTarget;
             cFielder* pFielder;
@@ -3483,7 +3497,7 @@ extern "C" void fn_8001A108(int previousState, int currentState)
             fn_801A64A4(pKoopaShell, false);
         }
 
-        State_80199E84* pState = lbl_806E1608->mUnidentified028;
+        BirdoEggObject* pState = lbl_806E1608->mUnidentified028;
         if (pState != NULL && pState->visible)
         {
             fn_8019A434(pState, false);
@@ -3642,7 +3656,7 @@ extern "C" void fn_8001AD24(
         pBallTrail->mUnidentified038 = NULL;
     }
 
-    switch (pFielder->m_eCharacterClass)
+    switch (pFielder->mUnidentified024.m_eCharacterClass)
     {
     case (eCharacterClass)1:
         nlStrNCpy(textureName,

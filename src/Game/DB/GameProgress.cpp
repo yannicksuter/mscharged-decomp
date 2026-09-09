@@ -112,8 +112,8 @@ StrikerChallenge::StrikerChallenge()
     mHeadlineVariant = -1;
     mHomeScore = 0;
     mAwayScore = 0;
-    mHomeMissingSidekicks = 0;
-    mAwayMissingSidekicks = 0;
+    mMissingSidekicks[0] = 0;
+    mMissingSidekicks[1] = 0;
     mHomePowerupsEnabled = true;
     mAwayPowerupsEnabled = true;
     mHomeMegastrikeEnabled = true;
@@ -179,8 +179,8 @@ void StrikerChallenge::LoadSettings()
     mWinParameter = GetTweakInt("challenge/winparameter", 0);
     mHomeScore = GetTweakInt("challenge/homescore", 0);
     mAwayScore = GetTweakInt("challenge/awayscore", 0);
-    mHomeMissingSidekicks = GetTweakInt("challenge/homemissingsidekicks", 0);
-    mAwayMissingSidekicks = GetTweakInt("challenge/awaymissingsidekicks", 0);
+    mMissingSidekicks[0] = GetTweakInt("challenge/homemissingsidekicks", 0);
+    mMissingSidekicks[1] = GetTweakInt("challenge/awaymissingsidekicks", 0);
     mHomePowerupsEnabled = !GetTweakBool("challenge/homepowerups", false);
     mAwayPowerupsEnabled = !GetTweakBool("challenge/awaypowerups", false);
     mHomeMegastrikeEnabled = !GetTweakBool("challenge/homemegastrike", false);

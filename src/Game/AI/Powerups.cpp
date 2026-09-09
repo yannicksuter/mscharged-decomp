@@ -33,11 +33,11 @@ extern "C" float fn_8002CFF0(PlayerTweaks*);
 extern "C" void fn_800EDCE8(cPlayer*);
 extern "C" bool fn_8019C988(void*);
 extern "C" bool fn_800AA060(void*, int);
-extern "C" void fn_80146964(void*);
+extern "C" void fn_80146964(CollisionBallShellData*);
 extern "C" void fn_8014777C(void*);
-extern "C" void fn_801478C4(void*);
-extern "C" void fn_80147A0C(void*);
-extern "C" void fn_80147B54(void*);
+extern "C" void fn_801478C4(CollisionPlayerBananaData*);
+extern "C" void fn_80147A0C(CollisionPlayerShellData*);
+extern "C" void fn_80147B54(CollisionPlayerFreezeData*);
 extern "C" void fn_8009F1B8(EmissionController&);
 extern "C" bool fn_8002D2C4(nlVector3*, bool, float);
 extern "C" void fn_800F0240(float, float, float, float);
@@ -255,7 +255,7 @@ cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)
     cFielder* pCandidate;
 
     pTeam = pThrower->m_pTeam->GetOtherTeam();
-    aDirection = pThrower->m_aActualFacingDirection;
+    aDirection = pThrower->mUnidentified024.m_aActualFacingDirection;
 
     if (pThrower->m_pController != 0)
     {
@@ -276,7 +276,7 @@ cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)
             && !pCandidate->IsShattered())
         {
             fTempScore = pThrower->DoFlashLight(
-                pCandidate->m_v3Position, aDirection, 0.0001f, 0.0f, 30.0f);
+                pCandidate->mUnidentified024.m_v3Position, aDirection, 0.0001f, 0.0f, 30.0f);
         }
 
         if (gbAlwaysSurround || eType == POWER_UP_BOBOMB)
@@ -475,7 +475,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
         }
         else
         {
-            nFlipAngle += pFirstPowerup->m_pThrower->m_aActualFacingDirection;
+            nFlipAngle += pFirstPowerup->m_pThrower->mUnidentified024.m_aActualFacingDirection;
         }
 
         nlVector3 v3CurrentVelocity = { 0.0f, 0.0f, 0.0f };
@@ -790,7 +790,7 @@ u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
             else
             {
                 PowerupThrowPosition(j, pUnidentified->eStyle, pPowerup,
-                    pFirstPowerup, pThrower->m_aActualFacingDirection);
+                    pFirstPowerup, pThrower->mUnidentified024.m_aActualFacingDirection);
 
                 if (pPowerup->m_eType == POWER_UP_RED_SHELL)
                 {
@@ -1122,7 +1122,7 @@ void PowerupBase::Update(float dt)
 /**
  * Offset/Address/Size: 0x2430 | 0x8009BA90 | size: 0x9B0
  */
-int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder)
+int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
 {
     if ((!GameInfoManager::Instance()->GetCurrentSettings()->HomePowerUps
             && pTeam->m_nSide == 0)
@@ -1800,7 +1800,7 @@ void PowerupBase::fn_8009CAC0(cFielder* pFielder)
         }
     }
 
-    m_v3Position = pFielder->m_v3Position;
+    m_v3Position = pFielder->mUnidentified024.m_v3Position;
     m_pPhysicsObject->SetPosition(
         m_v3Position, PhysicsObject::WORLD_COORDINATES);
     m_v3Velocity = v3Zero;
@@ -1828,13 +1828,13 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
     nlVector3 v3TargetPos;
     nlVector3 v3TargetVel;
 
-    v3TargetPos = pThrower->m_v3Position;
-    v3TargetVel = pThrower->m_v3Velocity;
+    v3TargetPos = pThrower->mUnidentified024.m_v3Position;
+    v3TargetVel = pThrower->mUnidentified024.m_v3Velocity;
 
     if (m_pTarget != 0)
     {
-        v3TargetPos = m_pTarget->m_v3Position;
-        v3TargetVel = m_pTarget->m_v3Velocity;
+        v3TargetPos = m_pTarget->mUnidentified024.m_v3Position;
+        v3TargetVel = m_pTarget->mUnidentified024.m_v3Velocity;
     }
 
     float fSpeed = fn_8002CFF0(pThrower->GetTweaks());
@@ -1890,7 +1890,7 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
     }
     else
     {
-        unsigned short aDirection = pThrower->m_aActualFacingDirection;
+        unsigned short aDirection = pThrower->mUnidentified024.m_aActualFacingDirection;
         if (pThrower->m_pController != 0
             && pThrower->m_pController->GetMovementStickMagnitude() > 0.01f)
         {
@@ -2631,7 +2631,7 @@ void RedShell::SeekTarget()
     }
 
     const nlVector3& targetPos =
-        ((cCharacter*)m_pTarget)->m_v3Position;
+        ((cCharacter*)m_pTarget)->mUnidentified024.m_v3Position;
     nlVector2 v2Delta;
     nlVector2 v2Direction;
     v2Delta.x = targetPos.x - m_v3Position.x;
@@ -2689,8 +2689,8 @@ Banana::~Banana()
 void Banana::ThrowAt(cFielder* pThrower)
 {
     nlVector3 v3Unidentified = { 0.0f, 0.0f, 0.0f };
-    unsigned short aDirection = pThrower->m_aActualFacingDirection;
-    float fUnidentified = pThrower->m_fPlayerScale;
+    unsigned short aDirection = pThrower->mUnidentified024.m_aActualFacingDirection;
+    float fUnidentified = pThrower->mUnidentified024.m_fPlayerScale;
     float fRadius = GetRadius();
     float fUnidentified2 = fn_8002BFA8(
         pThrower->GetTweaks(), fUnidentified);
@@ -2700,7 +2700,7 @@ void Banana::ThrowAt(cFielder* pThrower)
         0.15f + fRadius + fUnidentified2);
 
     nlVec3Add(v3Unidentified,
-        pThrower->m_v3Position, v3Unidentified);
+        pThrower->mUnidentified024.m_v3Position, v3Unidentified);
 
     m_v3Position = v3Unidentified;
     m_pPhysicsObject->SetPosition(
@@ -2978,14 +2978,14 @@ void Bobomb::fn_8009F454(PowerupBase*, int nThrowOrder)
     }
 
     float t = (float)nThrowOrder * lbl_806DBDAC + lbl_806DBDA8;
-    nlVector3 v3TargetPos = pTarget->m_v3Position;
-    nlVector3 v3TargetVel = pTarget->m_v3Velocity;
+    nlVector3 v3TargetPos = pTarget->mUnidentified024.m_v3Position;
+    nlVector3 v3TargetVel = pTarget->mUnidentified024.m_v3Velocity;
 
     if (nlVec3Length(v3TargetVel) < lbl_806DBDDC)
     {
         if (nlVec3Length(v3TargetVel) < 0.01f)
         {
-            nlPolarToCartesian(v3TargetVel.x, v3TargetVel.y, pTarget->m_aActualFacingDirection, lbl_806DBDDC);
+            nlPolarToCartesian(v3TargetVel.x, v3TargetVel.y, pTarget->mUnidentified024.m_aActualFacingDirection, lbl_806DBDDC);
             v3TargetVel.z = 0.0f;
         }
         else

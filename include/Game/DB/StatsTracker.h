@@ -159,10 +159,10 @@ struct AttackStatsData;
 struct GoalScoredStatsData;
 struct MegaStrikeEndData;
 struct PowerupStatsData;
-struct ReceiveBallStatsData;
+struct ReceiveBallData;
 struct GoalieSaveData;
 struct PenaltyStatsData;
-struct UnidentifiedEventData07;
+struct CollisionBallGoalpostData;
 
 class StatsTracker : public nlSingleton<StatsTracker>
 {
@@ -180,12 +180,12 @@ public:
     static void OnAttackAttempt(AttackStatsData* data);
     static void OnGoalScored(GoalScoredStatsData* data);
     static void OnMegastrikeEnd(MegaStrikeEndData* data);
-    static void OnReceiveBall(ReceiveBallStatsData* data);
+    static void OnReceiveBall(ReceiveBallData* data);
     static void OnPassBall(PassBallData* data);
     static void OnPenalty(PenaltyStatsData* data);
     static void OnGoalieSave(GoalieSaveData* data);
     static void OnBallStateChange(int previousState, int currentState);
-    static void OnCollisionBallGoalpost(UnidentifiedEventData07* data);
+    static void OnCollisionBallGoalpost(CollisionBallGoalpostData* data);
 
     void TrackStat(ePlayerStats stat, int homeaway, int playerindex,
         int param0, int param1, int param2, int param3);

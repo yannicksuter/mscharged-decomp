@@ -46,6 +46,12 @@ public:
         DeleteEntry(entry);
     }
 
+    void Delete(T* entry)
+    {
+        entry->~T();
+        Free(entry);
+    }
+
     T* New(const T& data)
     {
         return new (Allocate()) T(data);

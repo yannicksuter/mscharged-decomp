@@ -5,6 +5,7 @@
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Ball.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Team.h"
@@ -15,7 +16,6 @@ extern "C" AvoidController* fn_8002E144(cFielder*);
 extern "C" void fn_800401C0(
     cFielder*, const nlVector3&, float, float);
 extern "C" float fn_800D7B00(cFielder*);
-extern "C" float fn_800DF74C(cTeam*);
 static float lbl_806DC238 = 0.25f;
 static unsigned short sDesireSlideAttackType = 0xFFFF;
 
@@ -25,7 +25,7 @@ static unsigned short sDesireSlideAttackType = 0xFFFF;
 bool DesireSlideAttack::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    fn_800DF74C(mUnidentifiedFielder->m_pTeam);
+    UserControlledT(mUnidentifiedFielder->m_pTeam);
 
     UnidentifiedVariantCollection* params
         = (UnidentifiedVariantCollection*)context;
@@ -75,10 +75,10 @@ void DesireSlideAttack::UnidentifiedUpdate(
             break;
         }
 
-        v3VictimPosition.x = mpTarget->m_v3Position.x
-                           + lbl_806DC238 * mpTarget->m_v3Velocity.x;
-        v3VictimPosition.y = mpTarget->m_v3Position.y
-                           + lbl_806DC238 * mpTarget->m_v3Velocity.y;
+        v3VictimPosition.x = mpTarget->mUnidentified024.m_v3Position.x
+                           + lbl_806DC238 * mpTarget->mUnidentified024.m_v3Velocity.x;
+        v3VictimPosition.y = mpTarget->mUnidentified024.m_v3Position.y
+                           + lbl_806DC238 * mpTarget->mUnidentified024.m_v3Velocity.y;
         v3VictimPosition.z = 0.0f;
         fn_800401C0(pFielder, v3VictimPosition, 1.5f, 1.0f);
         fn_8002E144(pFielder)->UseMinimumAvoidance(mpTarget);
@@ -102,7 +102,7 @@ void DesireSlideAttack::UnidentifiedUpdate(
                     fBallClosingSpeed = GetClosingSpeed2D(
                         pFielder->GetJointPosition(
                             pFielder->m_nLeftFootJointIndex),
-                        pFielder->m_v3Velocity,
+                        pFielder->mUnidentified024.m_v3Velocity,
                         g_pBall->m_v3Position, ballVelocity);
                     if (fBallClosingSpeed < 0.0f
                         && nlRandomf(1.0f) > 0.5f)

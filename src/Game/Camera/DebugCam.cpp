@@ -157,7 +157,7 @@ void cDebugCamera::RenderTarget() const
     {
         if (entry->mTarget != 0 && g_pCharacters[i] != 0)
         {
-            entry->mTarget->mPosition = g_pCharacters[i]->m_v3Position;
+            entry->mTarget->mPosition = g_pCharacters[i]->mUnidentified024.m_v3Position;
         }
 
         if (entry == m_pTargets)

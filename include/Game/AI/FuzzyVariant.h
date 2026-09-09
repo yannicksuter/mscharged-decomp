@@ -45,6 +45,13 @@ public:
         mData.pPlayer = value;
     }
 
+    FuzzyVariant(cTeam* value)
+        : Variant()
+    {
+        mType = FT_TEAM;
+        mData.pTeam = value;
+    }
+
     FuzzyVariant(cBall* value)
         : Variant()
     {

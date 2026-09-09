@@ -62,7 +62,6 @@ extern "C" void fn_8002E52C(cFielder*);
 extern "C" void fn_800395C0(cFielder*);
 extern "C" void fn_80316968(shdStateMachine*);
 extern "C" void fn_80038158(cFielder*, int);
-extern "C" void fn_8001EE74(cFielder*, float, float, float);
 extern "C" void fn_801B98A0(cFielder*);
 extern "C" void fn_801BB0DC(cFielder*);
 extern "C" void fn_801BC094(cFielder*);
@@ -122,7 +121,7 @@ void DesireSuperPower::UnidentifiedSetContext(
 {
     Desire::UnidentifiedSetContext(context);
 
-    if (mUnidentifiedFielder->m_eCharacterClass == YOSHI)
+    if (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass == YOSHI)
     {
         UnidentifiedRegisterEventCallback(
             "CollisionPatchGround", fn_800D1140);
@@ -194,7 +193,7 @@ void DesireSuperPower::UnidentifiedCleanup()
     fn_800A6968(mUnidentifiedFielder->m_pTeam);
     fn_803198F4();
 
-    switch (mUnidentifiedFielder->m_eCharacterClass)
+    switch (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass)
     {
     case DAISY:
         mUnidentifiedFielder->fn_80050008();
@@ -229,13 +228,13 @@ void DesireSuperPower::UnidentifiedCleanup()
     case KOOPA:
         mUnidentifiedFielder->m_pTweaks
             = mUnidentifiedFielder->mUnidentified32C;
-        fn_8001EE74(mUnidentifiedFielder, 1.0f, 0.25f, 1.0f);
+        mUnidentifiedFielder->fn_8001EE74(1.0f, 0.25f, 1.0f);
         fn_801BC094(mUnidentifiedFielder);
         break;
     case BIRDO:
         mUnidentifiedFielder->m_pTweaks
             = mUnidentifiedFielder->mUnidentified32C;
-        fn_8001EE74(mUnidentifiedFielder, 1.0f, 0.25f, 1.0f);
+        mUnidentifiedFielder->fn_8001EE74(1.0f, 0.25f, 1.0f);
         fn_801BC094(mUnidentifiedFielder);
         break;
     case LUIGI:
@@ -285,8 +284,8 @@ void DesireSuperPower::UnidentifiedCleanup()
         (ePowerUpType)mUnidentifiedFielder->mUnidentified11C->unknown_0x14,
         PowerupBase::PWRUP_SOUND_ACTIVATE);
     StopCaptainPowerupStream(sound, mUnidentifiedFielder);
-    if ((mUnidentifiedFielder->m_eCharacterClass == BIRDO)
-        || (mUnidentifiedFielder->m_eCharacterClass == KOOPA))
+    if ((mUnidentifiedFielder->mUnidentified024.m_eCharacterClass == BIRDO)
+        || (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass == KOOPA))
     {
         ResumeSuddenDeathMusic();
         unsigned long hash = nlStringLowerHash("MarioPowerup");
@@ -299,7 +298,7 @@ void DesireSuperPower::UnidentifiedCleanup()
  */
 extern "C" eCharacterClass fn_800D1440(const cCharacter* character)
 {
-    return character->m_eCharacterClass;
+    return character->mUnidentified024.m_eCharacterClass;
 }
 
 /**
@@ -307,7 +306,7 @@ extern "C" eCharacterClass fn_800D1440(const cCharacter* character)
  */
 extern "C" unsigned short fn_800D1448(const cCharacter* character)
 {
-    return character->m_aActualFacingDirection;
+    return character->mUnidentified024.m_aActualFacingDirection;
 }
 
 /**
@@ -315,7 +314,7 @@ extern "C" unsigned short fn_800D1448(const cCharacter* character)
  */
 extern "C" const nlVector3* fn_800D1450(const cCharacter* character)
 {
-    return &character->m_v3Position;
+    return &character->mUnidentified024.m_v3Position;
 }
 
 /**
@@ -391,7 +390,7 @@ extern "C" UnidentifiedVariantCollection* fn_800D1D3C(
  */
 extern "C" float fn_800D1D44(const cCharacter* character)
 {
-    return character->m_fDesiredMovementScale;
+    return character->mUnidentified024.m_fDesiredMovementScale;
 }
 
 /**
@@ -399,7 +398,7 @@ extern "C" float fn_800D1D44(const cCharacter* character)
  */
 extern "C" float fn_800D1D4C(const cCharacter* character)
 {
-    return character->m_fDesiredPlayerScale;
+    return character->mUnidentified024.m_fDesiredPlayerScale;
 }
 
 /**
@@ -458,7 +457,7 @@ extern "C" bool fn_800C9F4C(DesireSuperPower* self, void*)
     if ((target != 0) && (lbl_806DC2F8 != 0))
     {
         dir = self->mUnidentifiedFielder->GetFacingDeltaToPosition(
-            target->m_v3Position);
+            target->mUnidentified024.m_v3Position);
     }
     self->mUnidentifiedFielder->InitDesire(
         (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -505,7 +504,7 @@ extern "C" bool fn_800CAC8C(DesireSuperPower* self, void*)
     if ((target != 0) && (lbl_806DC314 != 0))
     {
         dir = self->mUnidentifiedFielder->GetFacingDeltaToPosition(
-            target->m_v3Position);
+            target->mUnidentified024.m_v3Position);
     }
     self->mUnidentifiedFielder->InitDesire(
         (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -528,7 +527,7 @@ extern "C" void fn_800C9DB4(DesireSuperPower* self)
     float x;
     float y;
     nlPolarToCartesian(x, y,
-        self->mUnidentifiedFielder->m_aActualFacingDirection, 1.0f);
+        self->mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection, 1.0f);
     x *= 18.5f;
     y *= 18.5f;
     nlVector3 joint = self->mUnidentifiedFielder->GetJointPosition(
@@ -553,9 +552,9 @@ extern "C" void fn_800C9DB4(DesireSuperPower* self)
             EmissionManager::Instance(), group, 3, true, false);
         controller->m_uUserData = (u32)self->mUnidentifiedFielder;
         controller->SetPosition(
-            self->mUnidentifiedFielder->m_v3Position);
+            self->mUnidentifiedFielder->mUnidentified024.m_v3Position);
         controller->SetVelocity(
-            self->mUnidentifiedFielder->m_v3Velocity);
+            self->mUnidentifiedFielder->mUnidentified024.m_v3Velocity);
         controller->SetUpdateCallback(
             Function1<void, EmissionController&>(
                 UpdateEmitterFromCharacterForward));

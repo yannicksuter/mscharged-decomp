@@ -296,7 +296,7 @@ nlVector3 ReplayCamera::fn_800F6B40(int focus) const
         cCharacter* goalie = g_pCharacters[mSideOfInterest == 0 ? 8 : 9];
         if (goalie != NULL)
         {
-            result = goalie->m_v3Position;
+            result = goalie->mUnidentified024.m_v3Position;
             result.z = 1.0f;
         }
         break;
@@ -306,7 +306,7 @@ nlVector3 ReplayCamera::fn_800F6B40(int focus) const
         cCharacter* captain = g_pCharacters[mSideOfInterest == 0 ? 0 : 5];
         if (captain != NULL)
         {
-            result = captain->m_v3Position;
+            result = captain->mUnidentified024.m_v3Position;
             result.z = 1.0f;
         }
         break;

@@ -42,15 +42,15 @@ void cAnimInventory::AddAnimBundle(
     {
         inventory = m_pSAnimInventory;
         m_pSAnims[i]
-            = inventory->Find((char*)m_pAnimProperties[i].animation);
+            = inventory->Find((char*)m_pAnimProperties[i].animName);
         if (m_pSAnims[i] == 0)
         {
             nlPrintf("Warning! Could not find \"%s\" in bundle \"%s\"\n",
-                m_pAnimProperties[i].animation,
+                m_pAnimProperties[i].animName,
                 szFilename);
             inventory = g_pDefaultSAnimInventory;
             m_pSAnims[i]
-                = inventory->Find((char*)m_pAnimProperties[i].animation);
+                = inventory->Find((char*)m_pAnimProperties[i].animName);
             if (m_pSAnims[i] == 0)
             {
                 m_pSAnims[i] = m_pSAnims[0];

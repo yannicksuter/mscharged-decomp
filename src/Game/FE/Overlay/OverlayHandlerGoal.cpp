@@ -30,7 +30,7 @@ void GoalOverlay::fn_801F17D0(int homeAway)
     }
 }
 
-void GoalOverlay::fn_801F17F4(UnidentifiedEventData_80067308*)
+void GoalOverlay::fn_801F17F4(MegaStrikeEndData*)
 {
 }
 

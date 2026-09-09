@@ -164,12 +164,12 @@ bool AvoidableObject::UnidentifiedVirtual1C(
 
 const nlVector3& AvoidableFielder::GetPosition()
 {
-    return m_pFielder->m_v3Position;
+    return m_pFielder->mUnidentified024.m_v3Position;
 }
 
 const nlVector3& AvoidableFielder::GetVelocity()
 {
-    return m_pFielder->m_v3Velocity;
+    return m_pFielder->mUnidentified024.m_v3Velocity;
 }
 
 float AvoidableFielder::GetRadius()
@@ -199,7 +199,7 @@ float AvoidableFielder::UnidentifiedVirtual18()
     }
     else
     {
-        float fTime = m_pFielder->m_fPlayerScale;
+        float fTime = m_pFielder->mUnidentified024.m_fPlayerScale;
         float fValue = fn_8002BFA8(m_pFielder->GetTweaks(), fTime);
         fRadius = fn_80030750(m_pFielder) - fValue;
     }
@@ -243,7 +243,7 @@ bool AvoidableFielder::UnidentifiedVirtual20(
         }
         return fGap <= range;
     }
-    else if (otherType == AVOID_SIDELINES)
+    else if (otherType == AVOID_UNIDENTIFIED_08)
     {
         return other->UnidentifiedVirtual20(this, range);
     }
@@ -275,7 +275,7 @@ float AvoidableFielder::UnidentifiedVirtual28(
         }
         m_pFielder->fn_8003EA6C();
         break;
-    case AVOID_SIDELINES:
+    case AVOID_UNIDENTIFIED_08:
     {
         AvoidablePolygon* pPolygon
             = (AvoidablePolygon*)other;
@@ -455,19 +455,19 @@ float AvoidableFielder::UnidentifiedVirtual24(
         switch (((AvoidablePatch*)other)->m_pPatch->m_Type)
         {
         case 4:
-            if (m_pFielder->m_eCharacterClass == YOSHI)
+            if (m_pFielder->mUnidentified024.m_eCharacterClass == YOSHI)
             {
                 fWeight = 0.0f;
             }
             break;
         case 0:
-            if (m_pFielder->m_eCharacterClass == PEACH)
+            if (m_pFielder->mUnidentified024.m_eCharacterClass == PEACH)
             {
                 fWeight = 0.0f;
             }
             break;
         case 2:
-            if (m_pFielder->m_eCharacterClass == WARIO)
+            if (m_pFielder->mUnidentified024.m_eCharacterClass == WARIO)
             {
                 fWeight = 0.0f;
             }
@@ -480,12 +480,12 @@ float AvoidableFielder::UnidentifiedVirtual24(
 
 const nlVector3& AvoidableGoalie::GetPosition()
 {
-    return m_pPlayer->m_v3Position;
+    return m_pPlayer->mUnidentified024.m_v3Position;
 }
 
 const nlVector3& AvoidableGoalie::GetVelocity()
 {
-    return m_pPlayer->m_v3Velocity;
+    return m_pPlayer->mUnidentified024.m_v3Velocity;
 }
 
 float AvoidableGoalie::GetRadius()
@@ -646,7 +646,7 @@ static inline void BuildPolygon(AvoidablePolygon* pPolygon,
 
 AvoidablePolygon::AvoidablePolygon(
     int mode, const nlVector3& a, const nlVector3& b, float width)
-    : AvoidableObject(AVOID_SIDELINES)
+    : AvoidableObject(AVOID_UNIDENTIFIED_08)
 {
     InitPolygon(this);
     mUnidentified014 = mode;
@@ -655,7 +655,7 @@ AvoidablePolygon::AvoidablePolygon(
 
 AvoidablePolygon::AvoidablePolygon(
     int mode, const nlVector3& center, float length, float width)
-    : AvoidableObject(AVOID_SIDELINES)
+    : AvoidableObject(AVOID_UNIDENTIFIED_08)
 {
     nlVector2 a;
     nlVector2 b;

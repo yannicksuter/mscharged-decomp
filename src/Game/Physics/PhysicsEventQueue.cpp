@@ -41,8 +41,6 @@ extern "C" void fn_80144AB8();
 
 extern "C" void fn_80065D4C(void*, EventDispatcher*, const char*, int);
 extern "C" void fn_80062254(void*, int);
-extern "C" void fn_80066900(void*, EventDispatcher*, const char*, int);
-extern "C" void fn_8006458C(void*, int);
 
 class UnidentifiedExternalEvent00
 {
@@ -62,23 +60,6 @@ private:
     unsigned char mStorage[0x2C];
 };
 
-class UnidentifiedExternalEvent02
-{
-public:
-    UnidentifiedExternalEvent02(EventDispatcher* dispatcher, const char* name,
-        int length)
-    {
-        fn_80066900(this, dispatcher, name, length);
-    }
-
-    ~UnidentifiedExternalEvent02()
-    {
-        fn_8006458C(this, -1);
-    }
-
-private:
-    unsigned char mStorage[0x2C];
-};
 
 class PhysicsEventQueue
 {
@@ -95,31 +76,31 @@ public:
     EventDispatcher mDispatcher;
     UnidentifiedExternalEvent00 mEvent00;
     UnidentifiedQueuedEvent<CollisionPlayerPlayerData> mEvent01;
-    UnidentifiedExternalEvent02 mEvent02;
-    UnidentifiedQueuedEvent<UnidentifiedEventData03> mEvent03;
+    UnidentifiedQueuedEvent<CollisionPlayerWallData> mEvent02;
+    UnidentifiedQueuedEvent<CollisionPlayerBallData> mEvent03;
     UnidentifiedQueuedEvent<UnidentifiedEventData04> mEvent04;
-    UnidentifiedQueuedEvent<UnidentifiedEventData05> mEvent05;
-    UnidentifiedQueuedEvent<UnidentifiedEventData06> mEvent06;
-    UnidentifiedQueuedEvent<UnidentifiedEventData07> mEvent07;
-    UnidentifiedQueuedEvent<UnidentifiedEventData08> mEvent08;
+    UnidentifiedQueuedEvent<CollisionBallGroundData> mEvent05;
+    UnidentifiedQueuedEvent<CollisionBallWallData> mEvent06;
+    UnidentifiedQueuedEvent<CollisionBallGoalpostData> mEvent07;
+    UnidentifiedQueuedEvent<CollisionBallShellData> mEvent08;
     UnidentifiedQueuedEvent<CollisionBallChainData> mEvent09;
-    UnidentifiedQueuedEvent<UnidentifiedEventData10> mEvent10;
-    UnidentifiedQueuedEvent<UnidentifiedEventData11> mEvent11;
+    UnidentifiedQueuedEvent<CollisionKoopaShotBallPlayerData> mEvent10;
+    UnidentifiedQueuedEvent<CollisionKoopaShellGoalieData> mEvent11;
     UnidentifiedQueuedEvent<UnidentifiedEventData12> mEvent12;
-    UnidentifiedQueuedEvent<UnidentifiedEventData13> mEvent13;
-    UnidentifiedQueuedEvent<UnidentifiedEventData14> mEvent14;
+    UnidentifiedQueuedEvent<CollisionBirdoShotBallPlayerData> mEvent13;
+    UnidentifiedQueuedEvent<CollisionBirdoEggGoalieData> mEvent14;
     UnidentifiedQueuedEvent<UnidentifiedEventData15> mEvent15;
     UnidentifiedQueuedEvent<UnidentifiedEventData16> mEvent16;
     UnidentifiedQueuedEvent<UnidentifiedEventData17> mEvent17;
     UnidentifiedQueuedEvent<UnidentifiedEventData17> mEvent18;
-    UnidentifiedQueuedEvent<UnidentifiedEventData18> mEvent19;
+    UnidentifiedQueuedEvent<CollisionPowerupWallData> mEvent19;
     UnidentifiedQueuedEvent<UnidentifiedEventData19> mEvent20;
-    UnidentifiedQueuedEvent<UnidentifiedEventData20> mEvent21;
-    UnidentifiedQueuedEvent<UnidentifiedEventData21> mEvent22;
-    UnidentifiedQueuedEvent<UnidentifiedEventData22> mEvent23;
-    UnidentifiedQueuedEvent<UnidentifiedEventData23> mEvent24;
-    UnidentifiedQueuedEvent<UnidentifiedEventData23> mEvent25;
-    UnidentifiedQueuedEvent<UnidentifiedEventData23> mEvent26;
+    UnidentifiedQueuedEvent<CollisionPlayerBananaData> mEvent21;
+    UnidentifiedQueuedEvent<CollisionPlayerShellData> mEvent22;
+    UnidentifiedQueuedEvent<CollisionPlayerFreezeData> mEvent23;
+    UnidentifiedQueuedEvent<CollisionBulletBillData> mEvent24;
+    UnidentifiedQueuedEvent<CollisionBulletBillData> mEvent25;
+    UnidentifiedQueuedEvent<CollisionBulletBillData> mEvent26;
     UnidentifiedQueuedEvent<UnidentifiedEventData24> mEvent27;
     UnidentifiedExternalEvent00 mEvent28;
     UnidentifiedQueuedEvent<UnidentifiedEventData25> mEvent29;
@@ -142,7 +123,7 @@ public:
     UnidentifiedQueuedEvent<UnidentifiedEventData26> mEvent46;
     UnidentifiedQueuedEvent<UnidentifiedEventData27> mEvent47;
     UnidentifiedQueuedEvent<UnidentifiedEventData28> mEvent48;
-    UnidentifiedQueuedEvent<UnidentifiedEventData32> mEvent49;
+    UnidentifiedQueuedEvent<CollisionThwompPlayerData> mEvent49;
     UnidentifiedQueuedEvent<UnidentifiedEventData33> mEvent50;
     UnidentifiedQueuedEvent<UnidentifiedEventData28> mEvent51;
     UnidentifiedQueuedEvent<UnidentifiedEventData34> mEvent52;
@@ -152,9 +133,9 @@ public:
     UnidentifiedQueuedEvent<UnidentifiedEventData34> mEvent56;
     UnidentifiedQueuedEvent<UnidentifiedEventData27> mEvent57;
     UnidentifiedQueuedEvent<UnidentifiedEventData35> mEvent58;
-    UnidentifiedQueuedEvent<UnidentifiedEventData36> mEvent59;
+    UnidentifiedQueuedEvent<cFielder> mEvent59;
     UnidentifiedQueuedEvent<UnidentifiedNPC_801B43F8> mEvent60;
-    UnidentifiedQueuedEvent<UnidentifiedEventData36> mEvent61;
+    UnidentifiedQueuedEvent<cFielder> mEvent61;
     UnidentifiedQueuedEvent<UnidentifiedEventData38> mEvent62;
 };
 
@@ -338,10 +319,7 @@ extern "C" void fn_8014545C(void* data)
     fn_8019A434(*(void**)bytes, 0);
 }
 
-extern "C" void fn_80025A14(void*);
 extern "C" void fn_80032534(cFielder*, const nlVector3&);
-extern "C" void fn_80031FBC(cFielder*);
-extern "C" bool fn_80032360(cFielder*, const nlVector3&, float);
 extern "C" bool fn_800167A8(cBall*);
 extern "C" void fn_80080EFC(cPlayer*);
 extern "C" void fn_800ED92C(unsigned long soundID);
@@ -400,7 +378,7 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
                 fn_80032534(pFielder, pShockwave->position);
                 break;
             case 3:
-                fn_80031FBC(pFielder);
+                pFielder->CollideWithFreezeCallback();
                 break;
             case 0:
             case 4:
@@ -414,13 +392,13 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
                 {
                     break;
                 }
-                if (fn_80032360(pFielder, pShockwave->position,
+                if (pFielder->CollideWithBobombCallback(pShockwave->position,
                         pShockwave->GetRadius())
                     && pShockwave->owner != 0 && effectType != 4)
                 {
                     pStats = 0;
                     g_CollisionPowerupStatsDataPool.Allocate(pStats);
-                    pStats->mUnidentified08 = pShockwave->owner;
+                    pStats->mUnidentified08 = (cPlayer*)pShockwave->owner;
                     pStats->mUnidentified0C = pShockwave->sourceIndex;
                     pStats->mUnidentified00 = pFielder;
                     bool bHasPad = pFielder->GetGlobalPad() != 0;
@@ -428,7 +406,7 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
                         bHasPad ? pFielder->GetGlobalPad()->GetPadID() : -1;
                     g_pGame->mUnidentified49C.mEvent31.Queue(pStats,
                         Function<UnidentifiedEventData_80066A04*>(
-                            (void (*)(UnidentifiedEventData_80066A04*))fn_80025A14));
+                            fn_80025A14));
                 }
                 break;
             case 2:
@@ -532,7 +510,7 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
         if (effectType == 5)
         {
             pBall->ShootAtFast(v3Velocity,
-                ((cCharacter*)pShockwave->owner)->m_v3Position, lbl_806DCA90);
+                ((cCharacter*)pShockwave->owner)->mUnidentified024.m_v3Position, lbl_806DCA90);
             nlRandom(2);
         }
         else
@@ -671,35 +649,35 @@ extern "C" void fn_80144AB8()
     UnidentifiedRegisterEventCallback("CollisionWaluigiWall", fn_80145318);
 }
 
-extern "C" void fn_800721AC(void*);
+extern "C" void fn_800721AC(CollisionPlayerWallData*);
 extern "C" void fn_8016A658(void*);
 extern "C" void fn_8016A670(void*);
-extern "C" void fn_8016A688(void*);
+extern "C" void fn_8016A688(CollisionPlayerBallData*);
 extern "C" void fn_8016A6A0(void*);
-extern "C" void fn_8016A6B8(void*);
-extern "C" void fn_8016A6D0(void*);
-extern "C" void fn_8016A6E8(void*);
-extern "C" void fn_8016A700(void*);
+extern "C" void fn_8016A6B8(CollisionBallGroundData*);
+extern "C" void fn_8016A6D0(CollisionBallWallData*);
+extern "C" void fn_8016A6E8(CollisionBallGoalpostData*);
+extern "C" void fn_8016A700(CollisionBallShellData*);
 void FreeCollisionBallChainData(CollisionBallChainData*);
-extern "C" void fn_8016A730(void*);
-extern "C" void fn_8016A748(void*);
+extern "C" void fn_8016A730(CollisionKoopaShotBallPlayerData*);
+extern "C" void fn_8016A748(CollisionKoopaShellGoalieData*);
 extern "C" void fn_8016A760(void*);
-extern "C" void fn_8016A778(void*);
-extern "C" void fn_8016A790(void*);
+extern "C" void fn_8016A778(CollisionBirdoShotBallPlayerData*);
+extern "C" void fn_8016A790(CollisionBirdoEggGoalieData*);
 extern "C" void fn_8016A7A8(void*);
 extern "C" void fn_8016A7C0(void*);
-extern "C" void fn_8016A7D8(void*);
+extern "C" void fn_8016A7D8(CollisionPowerupWallData*);
 extern "C" void fn_8016A7F0(void*);
-extern "C" void fn_8016A808(void*);
-extern "C" void fn_8016A820(void*);
-extern "C" void fn_8016A838(void*);
-extern "C" void fn_8016A850(void*);
+extern "C" void fn_8016A808(CollisionPlayerBananaData*);
+extern "C" void fn_8016A820(CollisionPlayerShellData*);
+extern "C" void fn_8016A838(CollisionPlayerFreezeData*);
+extern "C" void fn_8016A850(CollisionBulletBillData*);
 extern "C" void fn_8016A868(void*);
 void FreeCollisionChainPowerupData(CollisionChainPowerupData*);
 extern "C" void fn_8016A898(void*);
-extern "C" void fn_8016A8B0(void*);
-extern "C" void fn_8016A8C8(void*);
-extern "C" void fn_8016A8E0(void*);
+extern "C" void fn_8016A8B0(UnidentifiedEventData26*);
+extern "C" void fn_8016A8C8(CollisionThwompPlayerData*);
+extern "C" void fn_8016A8E0(UnidentifiedEventData34*);
 extern "C" void fn_8016A8F8(void*);
 
 extern "C" void fn_80145C9C()
@@ -716,12 +694,9 @@ extern "C" void fn_80145DD0(CollisionPlayerPlayerData* data)
     lbl_806E11F0->mEvent01.Queue(data, disposer);
 }
 
-extern "C" void fn_80145F18(UnidentifiedEventData02* data)
+extern "C" void fn_80145F18(CollisionPlayerWallData* data)
 {
-    ((UnidentifiedQueuedEvent<UnidentifiedEventData02>*)&lbl_806E11F0->mEvent02)
-        ->Queue(data,
-            Function<UnidentifiedEventData02*>(
-                (void (*)(UnidentifiedEventData02*))fn_800721AC));
+    lbl_806E11F0->mEvent02.Queue(data, Function<CollisionPlayerWallData*>(fn_800721AC));
 }
 
 extern "C" void fn_80146060(UnidentifiedEventData24* data)
@@ -736,10 +711,10 @@ extern "C" void fn_801461A8(UnidentifiedEventData00* data)
         ->Queue(data, Function<UnidentifiedEventData00*>());
 }
 
-extern "C" void fn_801462DC(UnidentifiedEventData03* data)
+extern "C" void fn_801462DC(CollisionPlayerBallData* data)
 {
     lbl_806E11F0->mEvent03.Queue(
-        data, Function<UnidentifiedEventData03*>((void (*)(UnidentifiedEventData03*))fn_8016A688));
+        data, Function<CollisionPlayerBallData*>(fn_8016A688));
 }
 
 extern "C" void fn_80146424(UnidentifiedEventData04* data, bool release)
@@ -755,28 +730,28 @@ extern "C" void fn_80146424(UnidentifiedEventData04* data, bool release)
     }
 }
 
-extern "C" void fn_8014658C(UnidentifiedEventData05* data)
+extern "C" void fn_8014658C(CollisionBallGroundData* data)
 {
     lbl_806E11F0->mEvent05.Queue(
-        data, Function<UnidentifiedEventData05*>((void (*)(UnidentifiedEventData05*))fn_8016A6B8));
+        data, Function<CollisionBallGroundData*>(fn_8016A6B8));
 }
 
-extern "C" void fn_801466D4(UnidentifiedEventData06* data)
+extern "C" void fn_801466D4(CollisionBallWallData* data)
 {
     lbl_806E11F0->mEvent06.Queue(
-        data, Function<UnidentifiedEventData06*>((void (*)(UnidentifiedEventData06*))fn_8016A6D0));
+        data, Function<CollisionBallWallData*>(fn_8016A6D0));
 }
 
-extern "C" void fn_8014681C(UnidentifiedEventData07* data)
+extern "C" void fn_8014681C(CollisionBallGoalpostData* data)
 {
     lbl_806E11F0->mEvent07.Queue(
-        data, Function<UnidentifiedEventData07*>((void (*)(UnidentifiedEventData07*))fn_8016A6E8));
+        data, Function<CollisionBallGoalpostData*>(fn_8016A6E8));
 }
 
-extern "C" void fn_80146964(UnidentifiedEventData08* data)
+extern "C" void fn_80146964(CollisionBallShellData* data)
 {
     lbl_806E11F0->mEvent08.Queue(
-        data, Function<UnidentifiedEventData08*>((void (*)(UnidentifiedEventData08*))fn_8016A700));
+        data, Function<CollisionBallShellData*>(fn_8016A700));
 }
 
 void QueueCollisionBallChain(CollisionBallChainData* data)
@@ -785,16 +760,16 @@ void QueueCollisionBallChain(CollisionBallChainData* data)
         data, Function<CollisionBallChainData*>(FreeCollisionBallChainData));
 }
 
-extern "C" void fn_80146BF4(UnidentifiedEventData10* data)
+extern "C" void fn_80146BF4(CollisionKoopaShotBallPlayerData* data)
 {
     lbl_806E11F0->mEvent10.Queue(
-        data, Function<UnidentifiedEventData10*>((void (*)(UnidentifiedEventData10*))fn_8016A730));
+        data, Function<CollisionKoopaShotBallPlayerData*>(fn_8016A730));
 }
 
-extern "C" void fn_80146D3C(UnidentifiedEventData11* data)
+extern "C" void fn_80146D3C(CollisionKoopaShellGoalieData* data)
 {
     lbl_806E11F0->mEvent11.Queue(
-        data, Function<UnidentifiedEventData11*>((void (*)(UnidentifiedEventData11*))fn_8016A748));
+        data, Function<CollisionKoopaShellGoalieData*>(fn_8016A748));
 }
 
 extern "C" void fn_80146E84(UnidentifiedEventData12* data)
@@ -803,16 +778,16 @@ extern "C" void fn_80146E84(UnidentifiedEventData12* data)
         data, Function<UnidentifiedEventData12*>((void (*)(UnidentifiedEventData12*))fn_8016A760));
 }
 
-extern "C" void fn_80146FCC(UnidentifiedEventData13* data)
+extern "C" void fn_80146FCC(CollisionBirdoShotBallPlayerData* data)
 {
     lbl_806E11F0->mEvent13.Queue(
-        data, Function<UnidentifiedEventData13*>((void (*)(UnidentifiedEventData13*))fn_8016A778));
+        data, Function<CollisionBirdoShotBallPlayerData*>(fn_8016A778));
 }
 
-extern "C" void fn_80147114(UnidentifiedEventData14* data)
+extern "C" void fn_80147114(CollisionBirdoEggGoalieData* data)
 {
     lbl_806E11F0->mEvent14.Queue(
-        data, Function<UnidentifiedEventData14*>((void (*)(UnidentifiedEventData14*))fn_8016A790));
+        data, Function<CollisionBirdoEggGoalieData*>(fn_8016A790));
 }
 
 extern "C" void fn_8014725C(UnidentifiedEventData15* data)
@@ -833,10 +808,10 @@ extern "C" void fn_801474EC(UnidentifiedEventData17* data)
         data, Function<UnidentifiedEventData17*>((void (*)(UnidentifiedEventData17*))fn_8016A7C0));
 }
 
-extern "C" void fn_80147634(UnidentifiedEventData18* data)
+extern "C" void fn_80147634(CollisionPowerupWallData* data)
 {
     lbl_806E11F0->mEvent19.Queue(
-        data, Function<UnidentifiedEventData18*>((void (*)(UnidentifiedEventData18*))fn_8016A7D8));
+        data, Function<CollisionPowerupWallData*>(fn_8016A7D8));
 }
 
 extern "C" void fn_8014777C(UnidentifiedEventData19* data)
@@ -845,40 +820,40 @@ extern "C" void fn_8014777C(UnidentifiedEventData19* data)
         data, Function<UnidentifiedEventData19*>((void (*)(UnidentifiedEventData19*))fn_8016A7F0));
 }
 
-extern "C" void fn_801478C4(UnidentifiedEventData20* data)
+extern "C" void fn_801478C4(CollisionPlayerBananaData* data)
 {
     lbl_806E11F0->mEvent21.Queue(
-        data, Function<UnidentifiedEventData20*>((void (*)(UnidentifiedEventData20*))fn_8016A808));
+        data, Function<CollisionPlayerBananaData*>(fn_8016A808));
 }
 
-extern "C" void fn_80147A0C(UnidentifiedEventData21* data)
+extern "C" void fn_80147A0C(CollisionPlayerShellData* data)
 {
     lbl_806E11F0->mEvent22.Queue(
-        data, Function<UnidentifiedEventData21*>((void (*)(UnidentifiedEventData21*))fn_8016A820));
+        data, Function<CollisionPlayerShellData*>(fn_8016A820));
 }
 
-extern "C" void fn_80147B54(UnidentifiedEventData22* data)
+extern "C" void fn_80147B54(CollisionPlayerFreezeData* data)
 {
     lbl_806E11F0->mEvent23.Queue(
-        data, Function<UnidentifiedEventData22*>((void (*)(UnidentifiedEventData22*))fn_8016A838));
+        data, Function<CollisionPlayerFreezeData*>(fn_8016A838));
 }
 
-extern "C" void fn_80147C9C(UnidentifiedEventData23* data)
+extern "C" void fn_80147C9C(CollisionBulletBillData* data)
 {
     lbl_806E11F0->mEvent24.Queue(
-        data, Function<UnidentifiedEventData23*>((void (*)(UnidentifiedEventData23*))fn_8016A850));
+        data, Function<CollisionBulletBillData*>(fn_8016A850));
 }
 
-extern "C" void fn_80147DE4(UnidentifiedEventData23* data)
+extern "C" void fn_80147DE4(CollisionBulletBillData* data)
 {
     lbl_806E11F0->mEvent25.Queue(
-        data, Function<UnidentifiedEventData23*>((void (*)(UnidentifiedEventData23*))fn_8016A850));
+        data, Function<CollisionBulletBillData*>(fn_8016A850));
 }
 
-extern "C" void fn_80147F2C(UnidentifiedEventData23* data)
+extern "C" void fn_80147F2C(CollisionBulletBillData* data)
 {
     lbl_806E11F0->mEvent26.Queue(
-        data, Function<UnidentifiedEventData23*>((void (*)(UnidentifiedEventData23*))fn_8016A850));
+        data, Function<CollisionBulletBillData*>(fn_8016A850));
 }
 
 extern "C" void fn_80148074(UnidentifiedEventData25* data)
@@ -940,13 +915,13 @@ extern "C" void fn_80148BD8(UnidentifiedEventData31* data)
 extern "C" void fn_80148D14(UnidentifiedEventData26* data)
 {
     lbl_806E11F0->mEvent44.Queue(
-        data, Function<UnidentifiedEventData26*>((void (*)(UnidentifiedEventData26*))fn_8016A8B0));
+        data, Function<UnidentifiedEventData26*>(fn_8016A8B0));
 }
 
 extern "C" void fn_80148E5C(UnidentifiedEventData26* data)
 {
     lbl_806E11F0->mEvent46.Queue(
-        data, Function<UnidentifiedEventData26*>((void (*)(UnidentifiedEventData26*))fn_8016A8B0));
+        data, Function<UnidentifiedEventData26*>(fn_8016A8B0));
 }
 
 extern "C" void fn_80148FA4(UnidentifiedEventData27* data)
@@ -974,14 +949,14 @@ extern "C" void fn_80149494(UnidentifiedEventData35* data)
     lbl_806E11F0->mEvent58.Queue(data, Function<UnidentifiedEventData35*>());
 }
 
-extern "C" void fn_801495D0(UnidentifiedEventData36* data)
+extern "C" void fn_801495D0(cFielder* data)
 {
-    lbl_806E11F0->mEvent59.Queue(data, Function<UnidentifiedEventData36*>());
+    lbl_806E11F0->mEvent59.Queue(data, Function<cFielder*>());
 }
 
-extern "C" void fn_8014970C(UnidentifiedEventData36* data)
+extern "C" void fn_8014970C(cFielder* data)
 {
-    lbl_806E11F0->mEvent59.Queue(data, Function<UnidentifiedEventData36*>());
+    lbl_806E11F0->mEvent59.Queue(data, Function<cFielder*>());
 }
 
 extern "C" void fn_80149848(UnidentifiedEventData28* data)
@@ -989,7 +964,7 @@ extern "C" void fn_80149848(UnidentifiedEventData28* data)
     lbl_806E11F0->mEvent48.Queue(data, Function<UnidentifiedEventData28*>());
 }
 
-extern "C" void fn_80149984(void* source, void* target)
+extern "C" void fn_80149984(void* source, cCharacter* target)
 {
     CollisionThwompPlayerData* data = 0;
     g_CollisionThwompPlayerDataPool.Allocate(data);
@@ -997,8 +972,8 @@ extern "C" void fn_80149984(void* source, void* target)
     data->sourceValue = *(void**)source;
     data->target = target;
     lbl_806E11F0->mEvent49.Queue(
-        (UnidentifiedEventData32*)data,
-        Function<UnidentifiedEventData32*>((void (*)(UnidentifiedEventData32*))fn_8016A8C8));
+        data,
+        Function<CollisionThwompPlayerData*>(fn_8016A8C8));
 }
 
 extern "C" void fn_80149B30(UnidentifiedEventData33* data)
@@ -1009,19 +984,19 @@ extern "C" void fn_80149B30(UnidentifiedEventData33* data)
 extern "C" void fn_80149C6C(UnidentifiedEventData34* data)
 {
     lbl_806E11F0->mEvent52.Queue(
-        data, Function<UnidentifiedEventData34*>((void (*)(UnidentifiedEventData34*))fn_8016A8E0));
+        data, Function<UnidentifiedEventData34*>(fn_8016A8E0));
 }
 
 extern "C" void fn_80149DB4(UnidentifiedEventData34* data)
 {
     lbl_806E11F0->mEvent53.Queue(
-        data, Function<UnidentifiedEventData34*>((void (*)(UnidentifiedEventData34*))fn_8016A8E0));
+        data, Function<UnidentifiedEventData34*>(fn_8016A8E0));
 }
 
 extern "C" void fn_80149EFC(UnidentifiedEventData34* data)
 {
     lbl_806E11F0->mEvent56.Queue(
-        data, Function<UnidentifiedEventData34*>((void (*)(UnidentifiedEventData34*))fn_8016A8E0));
+        data, Function<UnidentifiedEventData34*>(fn_8016A8E0));
 }
 
 extern "C" void fn_8014A044(UnidentifiedNPC_801B43F8* data)
@@ -1029,9 +1004,9 @@ extern "C" void fn_8014A044(UnidentifiedNPC_801B43F8* data)
     lbl_806E11F0->mEvent60.Queue(data, Function<UnidentifiedNPC_801B43F8*>());
 }
 
-extern "C" void fn_8014A180(UnidentifiedEventData36* data)
+extern "C" void fn_8014A180(cFielder* data)
 {
-    lbl_806E11F0->mEvent61.Queue(data, Function<UnidentifiedEventData36*>());
+    lbl_806E11F0->mEvent61.Queue(data, Function<cFielder*>());
 }
 
 extern "C" void fn_8014A2BC(UnidentifiedEventData38* data)
@@ -1045,19 +1020,9 @@ EventDispatcher::EventDispatcher(const char*)
 {
 }
 
-struct UnidentifiedPooledData20
-{
-    unsigned char data[0x20];
-};
-
 struct UnidentifiedPooledData08
 {
     unsigned char data[0x08];
-};
-
-struct UnidentifiedPooledData14B
-{
-    unsigned char data[0x14];
 };
 
 struct UnidentifiedPooledData0C
@@ -1065,10 +1030,10 @@ struct UnidentifiedPooledData0C
     unsigned char data[0x0C];
 };
 
-static SlotPool<UnidentifiedPooledData20> lbl_80570110(16, 16);
+static SlotPool<UnidentifiedEventData26> lbl_80570110(16, 16);
 SlotPool<UnidentifiedEventData24> lbl_80570138(16, 16);
 static SlotPool<UnidentifiedPooledData08> lbl_80570160(16, 16);
-static SlotPool<UnidentifiedPooledData14B> lbl_80570188(16, 16);
+static SlotPool<UnidentifiedEventData34> lbl_80570188(16, 16);
 static SlotPool<UnidentifiedPooledData0C> lbl_805701B0(16, 16);
 
 PhysicsEventQueue* lbl_806E11F0;
@@ -1131,9 +1096,9 @@ extern "C" void fn_8016A670(void* data)
     lbl_80570138.Free((UnidentifiedEventData24*)data);
 }
 
-extern "C" void fn_8016A688(void* data)
+extern "C" void fn_8016A688(CollisionPlayerBallData* data)
 {
-    g_CollisionPlayerBallDataPool.Free((CollisionPlayerBallData*)data);
+    g_CollisionPlayerBallDataPool.Free(data);
 }
 
 extern "C" void fn_8016A6A0(void* data)
@@ -1141,24 +1106,24 @@ extern "C" void fn_8016A6A0(void* data)
     g_BallNetmeshEventDataPool.Free((BallNetmeshEventData*)data);
 }
 
-extern "C" void fn_8016A6B8(void* data)
+extern "C" void fn_8016A6B8(CollisionBallGroundData* data)
 {
-    g_CollisionBallGroundDataPool.Free((CollisionBallGroundData*)data);
+    g_CollisionBallGroundDataPool.Free(data);
 }
 
-extern "C" void fn_8016A6D0(void* data)
+extern "C" void fn_8016A6D0(CollisionBallWallData* data)
 {
-    g_CollisionBallWallDataPool.Free((CollisionBallWallData*)data);
+    g_CollisionBallWallDataPool.Free(data);
 }
 
-extern "C" void fn_8016A6E8(void* data)
+extern "C" void fn_8016A6E8(CollisionBallGoalpostData* data)
 {
-    g_CollisionBallGoalpostDataPool.Free((CollisionBallGoalpostData*)data);
+    g_CollisionBallGoalpostDataPool.Free(data);
 }
 
-extern "C" void fn_8016A700(void* data)
+extern "C" void fn_8016A700(CollisionBallShellData* data)
 {
-    g_CollisionBallShellDataPool.Free((CollisionBallShellData*)data);
+    g_CollisionBallShellDataPool.Free(data);
 }
 
 void FreeCollisionBallChainData(CollisionBallChainData* data)
@@ -1166,14 +1131,14 @@ void FreeCollisionBallChainData(CollisionBallChainData* data)
     g_CollisionBallChainDataPool.Free(data);
 }
 
-extern "C" void fn_8016A730(void* data)
+extern "C" void fn_8016A730(CollisionKoopaShotBallPlayerData* data)
 {
-    g_CollisionKoopaShotBallPlayerDataPool.Free((CollisionKoopaShotBallPlayerData*)data);
+    g_CollisionKoopaShotBallPlayerDataPool.Free(data);
 }
 
-extern "C" void fn_8016A748(void* data)
+extern "C" void fn_8016A748(CollisionKoopaShellGoalieData* data)
 {
-    g_CollisionKoopaShellGoalieDataPool.Free((CollisionKoopaShellGoalieData*)data);
+    g_CollisionKoopaShellGoalieDataPool.Free(data);
 }
 
 extern "C" void fn_8016A760(void* data)
@@ -1181,14 +1146,14 @@ extern "C" void fn_8016A760(void* data)
     g_CollisionKoopaShellEndDataPool.Free((CollisionKoopaShellEndData*)data);
 }
 
-extern "C" void fn_8016A778(void* data)
+extern "C" void fn_8016A778(CollisionBirdoShotBallPlayerData* data)
 {
-    g_CollisionBirdoShotBallPlayerDataPool.Free((CollisionBirdoShotBallPlayerData*)data);
+    g_CollisionBirdoShotBallPlayerDataPool.Free(data);
 }
 
-extern "C" void fn_8016A790(void* data)
+extern "C" void fn_8016A790(CollisionBirdoEggGoalieData* data)
 {
-    g_CollisionBirdoEggGoalieDataPool.Free((CollisionBirdoEggGoalieData*)data);
+    g_CollisionBirdoEggGoalieDataPool.Free(data);
 }
 
 extern "C" void fn_8016A7A8(void* data)
@@ -1201,9 +1166,9 @@ extern "C" void fn_8016A7C0(void* data)
     g_CollisionPowerupGroundDataPool.Free((CollisionPowerupGroundData*)data);
 }
 
-extern "C" void fn_8016A7D8(void* data)
+extern "C" void fn_8016A7D8(CollisionPowerupWallData* data)
 {
-    g_CollisionPowerupWallDataPool.Free((CollisionPowerupWallData*)data);
+    g_CollisionPowerupWallDataPool.Free(data);
 }
 
 extern "C" void fn_8016A7F0(void* data)
@@ -1211,24 +1176,24 @@ extern "C" void fn_8016A7F0(void* data)
     g_PowerupHitPlayerEventDataPool.Free((PowerupHitPlayerEventData*)data);
 }
 
-extern "C" void fn_8016A808(void* data)
+extern "C" void fn_8016A808(CollisionPlayerBananaData* data)
 {
-    g_CollisionPlayerBananaDataPool.Free((CollisionPlayerBananaData*)data);
+    g_CollisionPlayerBananaDataPool.Free(data);
 }
 
-extern "C" void fn_8016A820(void* data)
+extern "C" void fn_8016A820(CollisionPlayerShellData* data)
 {
-    g_CollisionPlayerShellDataPool.Free((CollisionPlayerShellData*)data);
+    g_CollisionPlayerShellDataPool.Free(data);
 }
 
-extern "C" void fn_8016A838(void* data)
+extern "C" void fn_8016A838(CollisionPlayerFreezeData* data)
 {
-    g_CollisionPlayerFreezeDataPool.Free((CollisionPlayerFreezeData*)data);
+    g_CollisionPlayerFreezeDataPool.Free(data);
 }
 
-extern "C" void fn_8016A850(void* data)
+extern "C" void fn_8016A850(CollisionBulletBillData* data)
 {
-    g_CollisionBulletBillDataPool.Free((CollisionBulletBillData*)data);
+    g_CollisionBulletBillDataPool.Free(data);
 }
 
 extern "C" void fn_8016A868(void* data)
@@ -1246,19 +1211,19 @@ extern "C" void fn_8016A898(void* data)
     lbl_80570160.Free((UnidentifiedPooledData08*)data);
 }
 
-extern "C" void fn_8016A8B0(void* data)
+extern "C" void fn_8016A8B0(UnidentifiedEventData26* data)
 {
-    lbl_80570110.Free((UnidentifiedPooledData20*)data);
+    lbl_80570110.Free(data);
 }
 
-extern "C" void fn_8016A8C8(void* data)
+extern "C" void fn_8016A8C8(CollisionThwompPlayerData* data)
 {
-    g_CollisionThwompPlayerDataPool.Free((CollisionThwompPlayerData*)data);
+    g_CollisionThwompPlayerDataPool.Free(data);
 }
 
-extern "C" void fn_8016A8E0(void* data)
+extern "C" void fn_8016A8E0(UnidentifiedEventData34* data)
 {
-    lbl_80570188.Free((UnidentifiedPooledData14B*)data);
+    lbl_80570188.Free(data);
 }
 
 extern "C" void fn_8016A8F8(void* data)

@@ -51,8 +51,6 @@ extern "C"
     extern const nlVector3 lbl_804DCF98 = { 0.0f, 0.0f, 0.0f };
     extern const nlVector3 lbl_804DCFA4 = { 0.0f, -20.0f, -20.0f };
 
-    EmissionController* fn_802E7DC4(
-        EmissionManager*, const char*, int, bool, bool);
     void fn_802B5370(
         nlQuaternion&, const nlVector3&, unsigned short);
 

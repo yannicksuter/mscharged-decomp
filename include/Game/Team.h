@@ -44,13 +44,14 @@ class RunningChecksum;
 class cTeam
 {
 public:
+    cTeam(int nSide);
     ~cTeam();
     void ClearAllPowerUps();
     void ClearCurrentPowerUp();
     bool fn_800A6560();
     bool TogglePowerup(bool bIsSilent);
     bool IncrementPowerupMeter(
-        float fAdjustAmount, cFielder* pFielder, bool);
+        float fAdjustAmount, cFielder* pFielder, bool param3);
     bool fn_800A6764() const;
     PowerUpTeamType GetCurrentPowerUp() const;
     void SetIsPowerUpNew(int index, bool isNew);
@@ -67,20 +68,30 @@ public:
     cTeam* GetOtherTeam();
     Goalie* GetGoalie();
     cNet* GetOtherNet();
+    nlVector3 GetAIOffNetLocation(const nlVector3* v3ReferencePos);
+    nlVector3 GetAIDefNetLocation(const nlVector3* v3ReferencePos);
     int GetNumAssignedControllers();
     void PreUpdate(float fDeltaT);
     void Update(float fDeltaT);
+    void UpdateTeamAI(float fDeltaT);
+    bool AssignSituation();
+    void AssignMarks(bool bForceReMark);
+    void UpdateControllers();
+    void ResetCharacters();
     void StopGameplayEffectsAndSounds();
     bool CalculateFormationPosition(nlVector3& v3DestPosition,
         cFielder* pFielder, bool bInPosition,
         float fBallPosFormationWeight);
+    void CalculateNewBallInterceptTimes();
     PowerUpTeamType GetPowerUpByIndex(int index) const;
     int SetCurrentPowerUp(
         ePowerUpType eNewPowerUpType, int nnumOfPowerups);
     void SetDifficulty(int difficulty, int param2, bool param3);
     void fn_800A607C();
+    void fn_800A6248();
     void fn_800A7998();
-    void fn_800A8900(void* checksum, DebugWriteCache* cache);
+    void fn_800A8098();
+    void fn_800A8900(void* context, DebugWriteCache* cache);
     void fn_800A8DE8(RunningChecksum* runningChecksum);
     float fn_800A8EC0();
     float fn_800A8F20();
@@ -97,11 +108,11 @@ public:
     /* 0x0C */ float mUnidentified00C;
 
 private:
-    /* 0x10 */ u8 mUnidentified010[0x04];
+    /* 0x10 */ float mUnidentified010;
 
 public:
     /* 0x14 */ float mfPowerupTimer;
-    /* 0x18 */ eSituation meCurrentSituation;
+    /* 0x18 */ eSituation mpCurrentSituation;
     /* 0x1C */ eTeamStyle meCurrentTeamStyle;
 
 public:
@@ -109,11 +120,11 @@ public:
     /* 0x28 */ Timer mtMarkTimer;
     /* 0x30 */ Timer mtRoleTimer;
     /* 0x38 */ Timer mtDefensiveZoneTimer;
-    /* 0x40 */ Timer mUnidentified040;
+    /* 0x40 */ Timer mtToggleTimer;
     /* 0x48 */ float mfBallInTimes[4];
 
 private:
-    /* 0x58 */ u8 mUnidentified058[0x30];
+    /* 0x58 */ nlVector3 mvBallInterceptPosition[4];
 
 public:
     /* 0x88 */ cFielder* mpBestBallInterceptor;
@@ -125,6 +136,7 @@ public:
     /* 0xE8 */ cNet* m_pNet;
     /* 0xEC */ FormationManager* m_pFormationManager;
     /* 0xF0 */ UnidentifiedFielderInput* mUnidentified0F0;
+    /* 0xF4 */ u32 mUnidentified0F4;
 };
 
 extern cTeam* g_pTeams[];

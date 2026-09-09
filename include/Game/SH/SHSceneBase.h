@@ -27,7 +27,7 @@ public:
 
     void fn_8026932C();
     void fn_8026942C();
-    void fn_80269524();
+    void InitializeControls();
     void fn_8026A63C();
     void fn_8026ABF0(int index, void* context);
     void fn_8026AD50(int index, void* context);

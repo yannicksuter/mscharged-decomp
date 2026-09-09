@@ -211,7 +211,7 @@ void fn_801A0208(float dt)
     else
     {
         bUnidentified = false;
-        v3Unidentified = lbl_806E153C->m_v3Position;
+        v3Unidentified = lbl_806E153C->mUnidentified024.m_v3Position;
         lbl_80571C30 = v3Unidentified;
 
         if (lbl_806DCE3C < lbl_806E1538)
@@ -337,13 +337,13 @@ void fn_801A0500(int count, cFielder* fielder, float duration)
     lbl_806E153C = fielder;
     if (fielder != 0)
     {
-        lbl_80571C30 = fielder->m_v3Position;
+        lbl_80571C30 = fielder->mUnidentified024.m_v3Position;
     }
 
     if (fielder != 0)
     {
-        v3Unidentified.x = fielder->m_v3Position.x;
-        v3Unidentified.y = fielder->m_v3Position.y;
+        v3Unidentified.x = fielder->mUnidentified024.m_v3Position.x;
+        v3Unidentified.y = fielder->mUnidentified024.m_v3Position.y;
     }
 
     for (unsigned int i = 0; i < (unsigned int)count; ++i)
@@ -387,7 +387,7 @@ void fn_801A0C58(cFielder* fielder)
     lbl_806E153C = fielder;
     if (fielder != 0)
     {
-        lbl_80571C30 = fielder->m_v3Position;
+        lbl_80571C30 = fielder->mUnidentified024.m_v3Position;
     }
 }
 

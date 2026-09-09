@@ -438,13 +438,13 @@ void FixedUpdateTask::CallFixedUpdateTasks()
     if (NetMesh::s_bAnimatedNetMeshEnabled)
     {
         bool i = true;
-        float goalieX = (float)fabs(g_pTeams[0]->GetGoalie()->m_v3Position.x);
+        float goalieX = (float)fabs(g_pTeams[0]->GetGoalie()->mUnidentified024.m_v3Position.x);
         if (goalieX > cField::GetGoalLineX(1U))
         {
         }
         else
         {
-            goalieX = (float)fabs(g_pTeams[1]->GetGoalie()->m_v3Position.x);
+            goalieX = (float)fabs(g_pTeams[1]->GetGoalie()->mUnidentified024.m_v3Position.x);
             if (goalieX > cField::GetGoalLineX(1U))
             {
             }

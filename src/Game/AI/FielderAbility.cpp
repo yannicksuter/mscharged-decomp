@@ -91,9 +91,9 @@ void cFielder::fn_8004F828()
     muInvincibleStatus |= 1;
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     InitMovementDecelerateExponential(lbl_806DB9C8);
-    Unknown8(m_aActualFacingDirection, false);
-    m_aDesiredMovementDirection = m_aActualMovementDirection;
-    m_fDesiredSpeed = 0.0f;
+    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+    mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
+    mUnidentified024.m_fDesiredSpeed = 0.0f;
     fn_801BAF98(this);
 }
 
@@ -101,8 +101,8 @@ void cFielder::fn_8004F8E8()
 {
     fn_801BB120(this);
     fn_800F026C(gUnidentified804FAD80, lbl_806DB9D0, lbl_806DB9D4);
-    fn_80061B1C(1, lbl_806DBA10 * m_v3Position.y,
-        lbl_806DBA10 * m_v3Position.x);
+    fn_80061B1C(1, lbl_806DBA10 * mUnidentified024.m_v3Position.y,
+        lbl_806DBA10 * mUnidentified024.m_v3Position.x);
     fn_801765C8(
         this, &GetJointPosition(m_nHeadJointIndex), lbl_806DB9D8);
     PlayRumbleAction(4, GetGlobalPad());
@@ -110,15 +110,15 @@ void cFielder::fn_8004F8E8()
 
 void cFielder::fn_8004F974(float fDeltaT)
 {
-    m_fDesiredSpeed = 0.0f;
+    mUnidentified024.m_fDesiredSpeed = 0.0f;
 
     if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB9CC))
     {
         fn_801BB0DC(this);
-        m_fActualSpeed = 0.0f;
-        m_fDesiredSpeed = 0.0f;
+        mUnidentified024.m_fActualSpeed = 0.0f;
+        mUnidentified024.m_fDesiredSpeed = 0.0f;
         SetVelocity(v3Zero);
-        Unknown8(m_aActualFacingDirection, false);
+        Unknown8(mUnidentified024.m_aActualFacingDirection, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
     }
 
@@ -137,7 +137,7 @@ void cFielder::fn_8004FA34()
         < lbl_806DBA04)
     {
         UnidentifiedAbilityEvent event;
-        event.v3Position = m_v3Position;
+        event.v3Position = mUnidentified024.m_v3Position;
         event.fParam1 = lbl_806DB9F4;
         event.fParam2 = lbl_806DB9F8;
         event.pFielder = this;
@@ -157,7 +157,7 @@ void cFielder::fn_8004FB04()
     SetAction((eFielderActionState)0x1D);
     muInvincibleStatus |= 1;
 
-    if ((u16)abs_s16((s16)(m_aActualFacingDirection
+    if ((u16)abs_s16((s16)(mUnidentified024.m_aActualFacingDirection
             - (u16)(s32)(65536.0f * lbl_806DBA08)))
         < 0x4000)
     {
@@ -169,12 +169,12 @@ void cFielder::fn_8004FB04()
     }
 
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    Unknown8(m_aActualFacingDirection, false);
-    m_aDesiredMovementDirection = m_aActualMovementDirection;
-    m_fDesiredSpeed = 0.0f;
+    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+    mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
+    mUnidentified024.m_fDesiredSpeed = 0.0f;
 
     UnidentifiedAbilityEvent event;
-    event.v3Position = m_v3Position;
+    event.v3Position = mUnidentified024.m_v3Position;
     event.fParam1 = lbl_806DB9F4;
     event.fParam2 = lbl_806DB9F8;
     event.pFielder = this;
@@ -193,7 +193,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
 
     if (fFrame <= 1.0f)
     {
-        u32 aFacing = m_aActualFacingDirection;
+        u32 aFacing = mUnidentified024.m_aActualFacingDirection;
         float fBlend = fFrame * (lbl_806E3650 * fFrame + lbl_806E364C);
         fBlend = fFrame * fBlend;
         float fTurn = lbl_806DBA08 - (float)aFacing / 65536.0f;
@@ -219,7 +219,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
     if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB9FC))
     {
         UnidentifiedAbilityEvent event;
-        event.v3Position = m_v3Position;
+        event.v3Position = mUnidentified024.m_v3Position;
         event.fParam1 = lbl_806DB9F4;
         event.fParam2 = lbl_806DB9F8;
         event.pFielder = this;
@@ -228,7 +228,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
     else if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DBA00))
     {
         UnidentifiedAbilityEvent event;
-        event.v3Position = m_v3Position;
+        event.v3Position = mUnidentified024.m_v3Position;
         event.fParam1 = lbl_806DB9F4;
         event.fParam2 = lbl_806DB9F8;
         fn_8002D2C4(&event.v3Position, lbl_806DB9F4, 1);
@@ -259,7 +259,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
         fn_801A0C58(0);
 
         UnidentifiedAbilityEvent event;
-        event.v3Position = m_v3Position;
+        event.v3Position = mUnidentified024.m_v3Position;
         event.fParam1 = lbl_806DB9F4;
         event.fParam2 = lbl_806DB9F8;
         event.pFielder = this;
@@ -286,7 +286,7 @@ void cFielder::fn_8004FF40()
         SetAction((eFielderActionState)5);
         SetAnimState(0x68, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
-        m_fDesiredSpeed = 0.0f;
+        mUnidentified024.m_fDesiredSpeed = 0.0f;
     }
 }
 
@@ -304,7 +304,7 @@ void cFielder::fn_80050008()
 
 void cFielder::fn_8005001C(bool bForce)
 {
-    if (m_eCharacterClass == DAISY)
+    if (mUnidentified024.m_eCharacterClass == DAISY)
     {
         if (mUnidentified3DC || bForce)
         {
@@ -324,7 +324,7 @@ void cFielder::fn_8005001C(bool bForce)
             StopSound(0x8A9FCF66, this);
         }
     }
-    else if (m_eCharacterClass == MARIO)
+    else if (mUnidentified024.m_eCharacterClass == MARIO)
     {
         if (mUnidentified3DC)
         {
@@ -355,7 +355,7 @@ void cFielder::fn_8005001C(bool bForce)
             }
         }
     }
-    else if (m_eCharacterClass == PEACH)
+    else if (mUnidentified024.m_eCharacterClass == PEACH)
     {
         if (mUnidentified3DC || bForce)
         {
@@ -363,7 +363,7 @@ void cFielder::fn_8005001C(bool bForce)
             StopSound(0x8A9FCF66, this);
         }
     }
-    else if (m_eCharacterClass == YOSHI)
+    else if (mUnidentified024.m_eCharacterClass == YOSHI)
     {
         if (mUnidentified3DC || bForce)
         {
@@ -376,7 +376,7 @@ void cFielder::fn_8005001C(bool bForce)
 
 void cFielder::fn_800501F0(bool bParam)
 {
-    switch (m_eCharacterClass)
+    switch (mUnidentified024.m_eCharacterClass)
     {
     case DAISY:
         mUnidentified3E4 = lbl_806DB9E4;
@@ -413,7 +413,7 @@ bool cFielder::fn_80050284()
 
     if (!mUnidentified3DC)
     {
-        if (m_eCharacterClass == YOSHI)
+        if (mUnidentified024.m_eCharacterClass == YOSHI)
         {
             PlaySound(mUnidentified318, 0x8A9FCF66, 0, 0);
         }
@@ -425,7 +425,7 @@ bool cFielder::fn_80050284()
         mUnidentified3DD = false;
     }
 
-    if (m_eCharacterClass == DAISY)
+    if (mUnidentified024.m_eCharacterClass == DAISY)
     {
         bool bRunning = mUnidentified3E0 > 0.0f;
         if (bRunning)
@@ -435,7 +435,7 @@ bool cFielder::fn_80050284()
             fn_800301E8(this);
         }
     }
-    else if (m_eCharacterClass == MARIO)
+    else if (mUnidentified024.m_eCharacterClass == MARIO)
     {
         m_pTweaks = mUnidentified328;
         if (fn_8002E060() != (eFielderDesireState)0xC)
@@ -451,13 +451,13 @@ bool cFielder::fn_80050284()
             InitActionRunningWB(false);
         }
         InitMovementCoast();
-        m_fLeanAmount = 0.0f;
+        mUnidentified024.m_fLeanAmount = 0.0f;
         if (!fn_80319FEC(fn_8002E1A4(this), 0x23))
         {
             fn_80319E84(fn_8002E1A4(this), 0x23, 0, 0);
         }
     }
-    else if (m_eCharacterClass == PEACH)
+    else if (mUnidentified024.m_eCharacterClass == PEACH)
     {
         if (m_eAnimID != 0x68 && IsRunning()
             && fn_8002E060() != (eFielderDesireState)0x16)
@@ -469,7 +469,7 @@ bool cFielder::fn_80050284()
             InitMovementFromAnim(0, v3Zero, 1.0f, false);
         }
     }
-    else if (m_eCharacterClass == YOSHI)
+    else if (mUnidentified024.m_eCharacterClass == YOSHI)
     {
         mUnidentified408 = 0.0f;
         fn_800301E8(this);

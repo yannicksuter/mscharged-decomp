@@ -20,4 +20,6 @@ template <typename T>
 class SlotPool;
 extern SlotPool<PlayerAttackData> g_PlayerAttackDataPool;
 
+void UnFreezeEveryoneButCaptain(cFielder* pCaptain);
+
 #endif // GAME_AI_FIELDERACTIONS_H

@@ -1,4 +1,5 @@
 #include "Game/ExcitementSystem.h"
+#include "Game/AI/FielderActions.h"
 
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
@@ -9,12 +10,6 @@
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-
-struct UnidentifiedEventData_80066748
-{
-    u8 mUnidentified000[0x10];
-    u8 mUnidentified010;
-};
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
@@ -80,48 +75,48 @@ void ExcitementSystem::fn_801967DC()
 void ExcitementSystem::fn_80196924()
 {
     {
-        Function<UnidentifiedEventData_80066748*> callback(
+        Function<PlayerAttackData*> callback(
             Bind<void>(MemFun(&ExcitementSystem::fn_80196D30), this, placeholder0));
         unsigned int hash = HashEventName("AttackSuccess", -1);
         UnidentifiedEventBase** foundEvent = 0;
         g_pEventRegistry->Find(hash, &foundEvent, 0);
         UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventData_80066748>*)event)
+        ((UnidentifiedTypedEvent<PlayerAttackData>*)event)
             ->Add(callback, 0, -1);
     }
     {
-        Function<UnidentifiedEventData_80067110*> callback(
+        Function<LightningStrikeData*> callback(
             Bind<void>(MemFun(&ExcitementSystem::fn_80196D64), this, placeholder0));
         unsigned int hash = HashEventName("LightningStrike", -1);
         UnidentifiedEventBase** foundEvent = 0;
         g_pEventRegistry->Find(hash, &foundEvent, 0);
         UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventData_80067110>*)event)
+        ((UnidentifiedTypedEvent<LightningStrikeData>*)event)
             ->Add(callback, 0, -1);
     }
     {
-        Function<UnidentifiedEventData07*> callback(
+        Function<CollisionBallGoalpostData*> callback(
             Bind<void>(MemFun(&ExcitementSystem::fn_80196D8C), this, placeholder0));
         unsigned int hash = HashEventName("CollisionBallGoalpost", -1);
         UnidentifiedEventBase** foundEvent = 0;
         g_pEventRegistry->Find(hash, &foundEvent, 0);
         UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventData07>*)event)
+        ((UnidentifiedTypedEvent<CollisionBallGoalpostData>*)event)
             ->Add(callback, 0, -1);
     }
 }
 
 void ExcitementSystem::fn_80196D30(
-    UnidentifiedEventData_80066748* event)
+    PlayerAttackData* event)
 {
-    if (event->mUnidentified010 == 1 && mUnidentified164[1] != 0)
+    if (event->mUnidentified10 == 1 && mUnidentified164[1] != 0)
     {
         mUnidentified02C += mUnidentified164[1];
         mUnidentified02E++;
     }
 }
 
-void ExcitementSystem::fn_80196D64(UnidentifiedEventData_80067110*)
+void ExcitementSystem::fn_80196D64(LightningStrikeData*)
 {
     if (mUnidentified164[3] != 0)
     {
@@ -130,7 +125,7 @@ void ExcitementSystem::fn_80196D64(UnidentifiedEventData_80067110*)
     }
 }
 
-void ExcitementSystem::fn_80196D8C(UnidentifiedEventData07*)
+void ExcitementSystem::fn_80196D8C(CollisionBallGoalpostData*)
 {
     if (mUnidentified164[0] != 0)
     {

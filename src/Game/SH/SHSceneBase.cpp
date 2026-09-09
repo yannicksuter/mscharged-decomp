@@ -18,6 +18,7 @@
 #include "Game/GameInfo.h"
 #include "NL/globalpad.h"
 #include "NL/nlMath.h"
+#include "NL/nlBind.h"
 #include "NL/nlPrint.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
@@ -46,42 +47,6 @@ static inline TLComponentInstance* FindComponent(TLSlide* slide, const char* ite
     if (result == 0)
         result = &gDefaultTLComponentInstance;
     return result;
-}
-
-typedef void (UnidentifiedSHSceneBase::*UnidentifiedSHSceneCallback)(int, void*);
-
-struct UnidentifiedSHSceneCallbackRef
-{
-    UnidentifiedSHSceneCallbackRef(UnidentifiedSHSceneCallback callback)
-        : mCallback(callback)
-    {
-    }
-
-    UnidentifiedSHSceneCallback mCallback;
-};
-
-struct UnidentifiedSHSceneBinding
-{
-    UnidentifiedSHSceneCallback mCallback;
-    UnidentifiedSHSceneBase* mTarget;
-    bool mUnidentified10;
-    bool mUnidentified11;
-
-    UnidentifiedSHSceneBinding(UnidentifiedSHSceneCallbackRef callback, UnidentifiedSHSceneBase* target)
-        : mCallback(callback.mCallback)
-        , mTarget(target)
-    {
-    }
-
-    void operator()(int index, void* context) const
-    {
-        (mTarget->*mCallback)(index, context);
-    }
-};
-
-static inline UnidentifiedSHSceneBinding BindSHSceneAction(UnidentifiedSHSceneCallbackRef callback, UnidentifiedSHSceneBase* target)
-{
-    return UnidentifiedSHSceneBinding(callback, target);
 }
 
 inline TLInstance* UnidentifiedSHSceneBase::FindCurrentInstance(const char* item)
@@ -188,18 +153,21 @@ void UnidentifiedSHSceneBase::SHSceneVirtual30()
 {
 }
 
-void UnidentifiedSHSceneBase::fn_80269524()
+void UnidentifiedSHSceneBase::InitializeControls()
 {
     if (!mUnidentified420.mInitialized)
     {
         mUnidentified420.SetComponent(FindCurrentComponent("scrollbar"));
         mUnidentified420.Initialize();
     }
-    FEPointerListener::Callback callback(BindSHSceneAction(&UnidentifiedSHSceneBase::fn_8026ABF0, this));
+    FEPointerListener::Callback callback(
+        Bind<void>(MemFun(&UnidentifiedSHSceneBase::fn_8026ABF0), this, Placeholder<0>(), Placeholder<1>()));
     mComponent.SetPointerEnterCallback(callback);
-    callback = FEPointerListener::Callback(BindSHSceneAction(&UnidentifiedSHSceneBase::fn_8026AD50, this));
+    callback = FEPointerListener::Callback(
+        Bind<void>(MemFun(&UnidentifiedSHSceneBase::fn_8026AD50), this, Placeholder<0>(), Placeholder<1>()));
     mComponent.SetPointerLeaveCallback(callback);
-    FEPointerListener::Callback callback2(BindSHSceneAction(&UnidentifiedSHSceneBase::fn_8026AE98, this));
+    FEPointerListener::Callback callback2(
+        Bind<void>(MemFun(&UnidentifiedSHSceneBase::fn_8026AE98), this, Placeholder<0>(), Placeholder<1>()));
     mComponent.SetPointerPressCallback(callback2);
     SetDoneButtonBounds(&mComponent, 0, 0);
 }
@@ -353,7 +321,7 @@ void UnidentifiedSHSceneBase::Update(float dt)
         {
             if (!mUnidentified104)
             {
-                fn_80269524();
+                InitializeControls();
                 mUnidentified104 = true;
             }
             mUnidentified100 = 1;

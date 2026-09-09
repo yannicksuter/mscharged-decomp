@@ -25,10 +25,6 @@
 extern "C" cPlayer* fn_80096514(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
-extern "C" nlVector3 fn_800A6AC8(
-    cTeam* pTeam, const nlVector3* v3ReferencePos);
-extern "C" nlVector3 fn_800A6B84(
-    cTeam* pTeam, const nlVector3* v3ReferencePos);
 extern "C" void fn_801BCC38(cCharacter*);
 extern "C" void fn_801BCE2C(cCharacter*);
 extern "C" void fn_80095DF4(cPlayer* self, float fDeltaT);
@@ -56,7 +52,7 @@ void cPlayer::Update(float fDeltaT)
     fn_80095DF4(this, fDeltaT);
 
     FieldLocToAILoc(
-        m_v3AIPosition, m_v3Position, (eTeamSide)m_pTeam->m_nSide);
+        m_v3AIPosition, mUnidentified024.m_v3Position, (eTeamSide)m_pTeam->m_nSide);
 }
 
 void cPlayer::SetAnimID(int animID)
@@ -64,7 +60,7 @@ void cPlayer::SetAnimID(int animID)
     cCharacter::SetAnimID(animID);
     eBallRotationMode ballRotationMode
         = (eBallRotationMode)m_pAnimInventory->GetBallRotationMode(animID);
-    if (m_eCharacterClass != MYSTERY)
+    if (mUnidentified024.m_eCharacterClass != MYSTERY)
     {
         m_eBallRotationMode = ballRotationMode;
         if (m_pBall != NULL)
@@ -205,16 +201,14 @@ cPlayer* cPlayer::fn_8009670C(nlVector3* pPosition, bool bParam)
 
 nlVector3 cPlayer::GetAIOffNetLocation(const nlVector3* v3ReferencePos)
 {
-    return ::fn_800A6AC8(
-        m_pTeam,
-        v3ReferencePos != NULL ? v3ReferencePos : &m_v3Position);
+    return m_pTeam->GetAIOffNetLocation(
+        v3ReferencePos != NULL ? v3ReferencePos : &mUnidentified024.m_v3Position);
 }
 
 nlVector3 cPlayer::GetAIDefNetLocation(const nlVector3* v3ReferencePos)
 {
-    return ::fn_800A6B84(
-        m_pTeam,
-        v3ReferencePos != NULL ? v3ReferencePos : &m_v3Position);
+    return m_pTeam->GetAIDefNetLocation(
+        v3ReferencePos != NULL ? v3ReferencePos : &mUnidentified024.m_v3Position);
 }
 
 void cPlayer::CollideWithWallCallback(const CollisionPlayerWallData* pData)
@@ -227,7 +221,7 @@ void cPlayer::CollideWithWallCallback(const CollisionPlayerWallData* pData)
     {
         return;
     }
-    if (m_eCharacterClass != MYSTERY)
+    if (mUnidentified024.m_eCharacterClass != MYSTERY)
     {
         m_eBallRotationMode = BRM_MATCH_VELOCITY;
         if (m_pBall != NULL)
@@ -291,7 +285,7 @@ void cPlayer::PostPhysicsUpdate()
     if (m_pBall != NULL)
     {
         nlVector3 jointPos = GetJointPosition(m_nBallJointIndex);
-        float scale = m_fPlayerScale;
+        float scale = mUnidentified024.m_fPlayerScale;
         if (scale > 1.0f)
         {
             float radius = g_pBall->m_pPhysicsBall->GetRadius();

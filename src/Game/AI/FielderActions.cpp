@@ -18,6 +18,7 @@
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/HeadTrack.h"
 #include "Game/AI/ShotMeter.h"
+#include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Goalie.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/Physics/PhysicsAIBall.h"
@@ -83,7 +84,6 @@ extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
 extern "C" float fn_8002CD2C(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CC44(PlayerTweaks* pTweaks);
 extern "C" float fn_8002BFA8(PlayerTweaks* pTweaks, float fParam);
-extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 
 extern "C" cFielder* fn_80096F54(cPlayer* pPlayer, bool bParam);
 extern "C" bool fn_80035F34(cFielder* pFielder);
@@ -163,7 +163,6 @@ extern "C" void fn_8003ADAC(cFielder* pFielder);
 extern "C" void fn_8003B54C(cFielder* pFielder);
 extern "C" void fn_8003B020(cFielder* pFielder);
 extern "C" void fn_8003B0D8(cFielder* pFielder);
-extern "C" float fn_800E02B8(cTeam* pTeam);
 extern "C" bool fn_8003E99C(cFielder* pFielder);
 extern "C" void fn_801B8FF4(cFielder* pFielder);
 extern "C" void fn_80080BFC(Goalie* pGoalie, float fDeltaT);
@@ -227,8 +226,6 @@ public:
     /* 0x2C */ float mUnidentified2C;
 };
 extern "C" void fn_801BA4C8(const char* szName);
-extern "C" int fn_8001C5E4(cFielder* pFielder, unsigned short aFacing,
-    unsigned short aTarget, int nAnimID, float fParam);
 extern "C" float fn_800499EC(cFielder* pFielder, int nParam);
 extern "C" float fn_80049CC0(cFielder* pFielder, int nParam);
 extern "C" void fn_8005F434(cGame* pGame, void* pEvent);
@@ -412,13 +409,13 @@ void cFielder::fn_80043C18(float fDeltaT)
     {
         float fSpin
             = 1.0f - this->GetTweaks()->mUnidentified064;
-        Unknown8(m_aActualFacingDirection
+        Unknown8(mUnidentified024.m_aActualFacingDirection
                 + (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f)),
             false);
 
         SetFacingDirection(
-            SeekDirection(m_aActualFacingDirection,
-                m_aDesiredFacingDirection, fn_8002CF88(this->GetTweaks()),
+            SeekDirection(mUnidentified024.m_aActualFacingDirection,
+                mUnidentified024.m_aDesiredFacingDirection, fn_8002CF88(this->GetTweaks()),
                 fn_8002CF9C(this->GetTweaks()), fDeltaT),
             true);
 
@@ -436,7 +433,7 @@ void cFielder::fn_80043C18(float fDeltaT)
                 v3Velocity.z = fUpVelocity;
                 SetVelocity(v3Velocity);
                 mUnidentified330.mUnidentified00 = true;
-                m_v3Position.z += fDeltaT * m_v3Velocity.z;
+                mUnidentified024.m_v3Position.z += fDeltaT * mUnidentified024.m_v3Velocity.z;
             }
             else
             {
@@ -445,34 +442,34 @@ void cFielder::fn_80043C18(float fDeltaT)
                     = (UnidentifiedActionTarget806E0C94*)
                           g_pGame->mUnidentified10E0;
                 nlVector3 v3Position;
-                v3Position.x = fTime * m_v3Position.x
+                v3Position.x = fTime * mUnidentified024.m_v3Position.x
                     + fBlend * pTarget->mUnidentified14.x;
-                v3Position.y = fTime * m_v3Position.y
+                v3Position.y = fTime * mUnidentified024.m_v3Position.y
                     + fBlend * pTarget->mUnidentified14.y;
-                v3Position.z = fTime * m_v3Position.z
+                v3Position.z = fTime * mUnidentified024.m_v3Position.z
                     + fBlend * pTarget->mUnidentified14.z;
                 SetPosition(v3Position);
             }
         }
         else
         {
-            nlVector3 v3Velocity = m_v3Velocity;
+            nlVector3 v3Velocity = mUnidentified024.m_v3Velocity;
             v3Velocity.x *= 0.99f;
             v3Velocity.y *= 0.99f;
             v3Velocity.z = -30.0f * fDeltaT + v3Velocity.z;
             SetVelocity(v3Velocity);
 
-            float fNewZ = fDeltaT * m_v3Velocity.z + m_v3Position.z;
-            m_v3Position.z = fNewZ;
+            float fNewZ = fDeltaT * mUnidentified024.m_v3Velocity.z + mUnidentified024.m_v3Position.z;
+            mUnidentified024.m_v3Position.z = fNewZ;
             if (fNewZ < 0.0f)
             {
-                m_v3Position.z = 0.0f;
-                m_v3Velocity.z = 0.0f;
+                mUnidentified024.m_v3Position.z = 0.0f;
+                mUnidentified024.m_v3Velocity.z = 0.0f;
 
                 nlPolar polar;
-                nlCartesianToPolar(polar, m_v3Velocity.x, m_v3Velocity.y);
-                s16 sFacingDelta = polar.a - m_aActualFacingDirection;
-                Unknown8(m_aActualFacingDirection, false);
+                nlCartesianToPolar(polar, mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y);
+                s16 sFacingDelta = polar.a - mUnidentified024.m_aActualFacingDirection;
+                Unknown8(mUnidentified024.m_aActualFacingDirection, false);
                 SetVelocity(v3Zero);
                 SetAnimState(0x7D, true, 0.2f, false, false);
                 InitMovementFromAnim(sFacingDelta, v3Zero, 0.15f, false);
@@ -496,13 +493,13 @@ void cFielder::fn_8004643C(float fDeltaT)
 {
     if (mUnidentified34C > 0.0f)
     {
-        if (m_v3Position.z > lbl_806E35E4)
+        if (mUnidentified024.m_v3Position.z > lbl_806E35E4)
         {
-            m_v3Position.z += fDeltaT * m_v3Velocity.z;
+            mUnidentified024.m_v3Position.z += fDeltaT * mUnidentified024.m_v3Velocity.z;
         }
         mUnidentified34C -= fDeltaT;
 
-        nlVector3 v3Velocity = m_v3Velocity;
+        nlVector3 v3Velocity = mUnidentified024.m_v3Velocity;
         if (v3Velocity.z >= -15.0f)
         {
             v3Velocity.z += lbl_806E35E8 * fDeltaT;
@@ -517,25 +514,25 @@ void cFielder::fn_8004643C(float fDeltaT)
     else if (m_eAnimID == 0x7E)
     {
         nlVector3 v3Delta;
-        v3Delta.y = v3Zero.y - m_v3Position.y;
-        v3Delta.x = v3Zero.x - m_v3Position.x;
-        v3Delta.z = v3Zero.z - m_v3Position.z;
+        v3Delta.y = v3Zero.y - mUnidentified024.m_v3Position.y;
+        v3Delta.x = v3Zero.x - mUnidentified024.m_v3Position.x;
+        v3Delta.z = v3Zero.z - mUnidentified024.m_v3Position.z;
         Unknown8(nlVector3ToAngle(v3Delta), false);
 
         SetFacingDirection(
-            SeekDirection(m_aActualFacingDirection,
-                m_aDesiredFacingDirection, fn_8002C0AC(this->GetTweaks()),
+            SeekDirection(mUnidentified024.m_aActualFacingDirection,
+                mUnidentified024.m_aDesiredFacingDirection, fn_8002C0AC(this->GetTweaks()),
                 fn_8002CF10(this->GetTweaks()), fDeltaT),
             true);
 
-        nlPolarToCartesian(m_v3Velocity.x, m_v3Velocity.y,
-            m_aActualFacingDirection,
+        nlPolarToCartesian(mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y,
+            mUnidentified024.m_aActualFacingDirection,
             InterpolateRangeClamped(lbl_806DB8B4, lbl_806DB8B8, 0.0f, 4.0f,
                 fn_800A6388(m_pTeam)));
 
         nlVector2 v3Distance = {
-            m_v3Position.x - v3Zero.x,
-            m_v3Position.y - v3Zero.y,
+            mUnidentified024.m_v3Position.x - v3Zero.x,
+            mUnidentified024.m_v3Position.y - v3Zero.y,
         };
         if (nlSqrt(v3Distance.x * v3Distance.x
                     + v3Distance.y * v3Distance.y,
@@ -637,7 +634,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
             float fMidTime = fTimeRange * 0.5f + fStartTime;
 
-            nlVector3 targetVelocity = pTarget->m_v3Velocity;
+            nlVector3 targetVelocity = pTarget->mUnidentified024.m_v3Velocity;
 
             if (pTarget->m_eActionState == 1
                 && pTarget->m_pCurrentAnimController->m_fTime < lbl_806E35EC)
@@ -649,20 +646,20 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
             nlVector3 interceptPos;
             interceptPos.z
-                = fMidTime * targetVelocity.z + pTarget->m_v3Position.z;
+                = fMidTime * targetVelocity.z + pTarget->mUnidentified024.m_v3Position.z;
             interceptPos.y
-                = fMidTime * targetVelocity.y + pTarget->m_v3Position.y;
+                = fMidTime * targetVelocity.y + pTarget->mUnidentified024.m_v3Position.y;
             interceptPos.x
-                = fMidTime * targetVelocity.x + pTarget->m_v3Position.x;
+                = fMidTime * targetVelocity.x + pTarget->mUnidentified024.m_v3Position.x;
 
-            float fThisRadius = m_fPlayerScale;
-            float fTargetRadius = pTarget->m_fPlayerScale;
+            float fThisRadius = mUnidentified024.m_fPlayerScale;
+            float fTargetRadius = pTarget->mUnidentified024.m_fPlayerScale;
             float fInterceptTimes[2];
             float combinedRadius
                 = fn_8002BFA8(this->GetTweaks(), fThisRadius)
                 + fn_8002BFA8(pTarget->GetTweaks(), fTargetRadius);
-            CalcInterceptXY(m_v3Position, distance, combinedRadius,
-                pTarget->m_v3Position, targetVelocity, nInterceptResult,
+            CalcInterceptXY(mUnidentified024.m_v3Position, distance, combinedRadius,
+                pTarget->mUnidentified024.m_v3Position, targetVelocity, nInterceptResult,
                 fInterceptTimes);
 
             float fTime;
@@ -685,22 +682,22 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
             }
 
             interceptPos.y
-                = (fTime * targetVelocity.y) + pTarget->m_v3Position.y;
+                = (fTime * targetVelocity.y) + pTarget->mUnidentified024.m_v3Position.y;
             interceptPos.x
-                = (fTime * targetVelocity.x) + pTarget->m_v3Position.x;
+                = (fTime * targetVelocity.x) + pTarget->mUnidentified024.m_v3Position.x;
             interceptPos.z
-                = (fTime * targetVelocity.z) + pTarget->m_v3Position.z;
+                = (fTime * targetVelocity.z) + pTarget->mUnidentified024.m_v3Position.z;
 
             nlVector3 v3Delta;
-            v3Delta.x = interceptPos.x - m_v3Position.x;
-            v3Delta.y = interceptPos.y - m_v3Position.y;
-            v3Delta.z = interceptPos.z - m_v3Position.z;
+            v3Delta.x = interceptPos.x - mUnidentified024.m_v3Position.x;
+            v3Delta.y = interceptPos.y - mUnidentified024.m_v3Position.y;
+            v3Delta.z = interceptPos.z - mUnidentified024.m_v3Position.z;
             Unknown8(nlVector3ToAngle(v3Delta), false);
-            SetFacingDirection(m_aDesiredFacingDirection, true);
+            SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
         }
         else if (fn_8003E70C(this))
         {
-            SetFacingDirection(m_aActualFacingDirection, true);
+            SetFacingDirection(mUnidentified024.m_aActualFacingDirection, true);
         }
         else
         {
@@ -724,10 +721,10 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         pData->mUnidentified10 = false;
         fn_8005EBF8(g_pGame, pData);
 
-        if (m_eCharacterClass == TOAD)
+        if (mUnidentified024.m_eCharacterClass == TOAD)
         {
             lbl_806E12C8
-                ->fn_801743A8(6, this, m_v3Position, v3Zero,
+                ->fn_801743A8(6, this, mUnidentified024.m_v3Position, v3Zero,
                     lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
                 ->fn_80173B08(lbl_806E3578);
             PlaySound(mUnidentified318, 0xA9AF871E, 0, 0);
@@ -737,7 +734,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
 void cFielder::ActionHit(float fDeltaT)
 {
-    if (m_eCharacterClass == TOAD)
+    if (mUnidentified024.m_eCharacterClass == TOAD)
     {
         for (int i = 0; i < 0x3C; i++)
         {
@@ -753,24 +750,24 @@ void cFielder::ActionHit(float fDeltaT)
         }
     }
 
-    if (m_eCharacterClass == MYSTERY)
+    if (mUnidentified024.m_eCharacterClass == MYSTERY)
     {
-        if (m_pTeam->GetCaptain()->m_eCharacterClass == MARIO
-            || m_pTeam->GetOtherTeam()->GetCaptain()->m_eCharacterClass
+        if (m_pTeam->GetCaptain()->mUnidentified024.m_eCharacterClass == MARIO
+            || m_pTeam->GetOtherTeam()->GetCaptain()->mUnidentified024.m_eCharacterClass
                 == MARIO)
         {
             cFielder* pCaptain = m_pTeam->GetCaptain();
-            if (pCaptain->m_eCharacterClass != MARIO)
+            if (pCaptain->mUnidentified024.m_eCharacterClass != MARIO)
             {
                 pCaptain = m_pTeam->GetOtherTeam()->GetCaptain();
             }
 
-            nlVector3& rv3Position = m_v3Position;
+            nlVector3& rv3Position = mUnidentified024.m_v3Position;
 
             float fOffsetY;
             float fOffsetX;
             nlPolarToCartesian(
-                fOffsetX, fOffsetY, m_aActualFacingDirection, lbl_806E35F0);
+                fOffsetX, fOffsetY, mUnidentified024.m_aActualFacingDirection, lbl_806E35F0);
 
             nlVector3 v3Target;
             v3Target.y = fOffsetY + rv3Position.y;
@@ -794,13 +791,13 @@ void cFielder::ActionHit(float fDeltaT)
 
             if (bBlocked)
             {
-                if (m_eMovementState != MOVEMENT_NONE)
+                if (mUnidentified024.m_eMovementState != MOVEMENT_NONE)
                 {
                     SetVelocity(v3Zero);
                     InitMovementNone(0.0f, 0.0f);
                 }
             }
-            else if (m_eMovementState != MOVEMENT_FROM_ANIM)
+            else if (mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM)
             {
                 InitMovementFromAnim(0, v3Zero, 1.0f, false);
             }
@@ -809,8 +806,8 @@ void cFielder::ActionHit(float fDeltaT)
 
     if (ShouldStartCrossBlend(4))
     {
-        m_fActualSpeed = 0.0f;
-        m_fDesiredSpeed = 0.0f;
+        mUnidentified024.m_fActualSpeed = 0.0f;
+        mUnidentified024.m_fDesiredSpeed = 0.0f;
         SetVelocity(v3Zero);
         InitMovementNone(0.0f, 0.0f);
         EndAction();
@@ -823,11 +820,11 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
     s16 nFacingDelta;
     u16 aAngle;
 
-    v3Delta.y = pFielder->m_v3Position.y - pAttacker->m_v3Position.y;
-    v3Delta.x = pFielder->m_v3Position.x - pAttacker->m_v3Position.x;
-    v3Delta.z = pFielder->m_v3Position.z - pAttacker->m_v3Position.z;
+    v3Delta.y = pFielder->mUnidentified024.m_v3Position.y - pAttacker->mUnidentified024.m_v3Position.y;
+    v3Delta.x = pFielder->mUnidentified024.m_v3Position.x - pAttacker->mUnidentified024.m_v3Position.x;
+    v3Delta.z = pFielder->mUnidentified024.m_v3Position.z - pAttacker->mUnidentified024.m_v3Position.z;
     aAngle = nlVector3ToAngle(v3Delta);
-    nFacingDelta = aAngle - pAttacker->m_aActualFacingDirection;
+    nFacingDelta = aAngle - pAttacker->mUnidentified024.m_aActualFacingDirection;
 
     float fIntensityA
         = pFielder->GetTweaks()->mUnidentified064;
@@ -856,10 +853,10 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
         nReact = 2;
     }
 
-    if (pAttacker->m_eCharacterClass == MYSTERY
+    if (pAttacker->mUnidentified024.m_eCharacterClass == MYSTERY
         && ((cFielder*)pAttacker)->m_eActionState == 1)
     {
-        aAngle = pFielder->m_aActualFacingDirection;
+        aAngle = pFielder->mUnidentified024.m_aActualFacingDirection;
     }
 
     return pFielder->fn_80047240(pAttacker, aAngle, nReact, false, false);
@@ -880,7 +877,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     if (m_pBall != 0)
     {
         ReleaseBall(0);
-        ShootBallDueToContact(pAttacker->m_v3Velocity);
+        ShootBallDueToContact(pAttacker->mUnidentified024.m_v3Velocity);
 
         if (bBookPenalty)
         {
@@ -897,9 +894,9 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
         SetPlayerAudioController(this);
 
         unsigned long soundID;
-        if (fn_8001E168(pAttacker))
+        if (pAttacker->fn_8001E168())
         {
-            bool bUnidentified = fn_8001E168(this);
+            bool bUnidentified = fn_8001E168();
             soundID = 0xE606A2;
             if (bUnidentified)
             {
@@ -908,7 +905,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
         }
         else
         {
-            bool bUnidentified = fn_8001E168(this);
+            bool bUnidentified = fn_8001E168();
             soundID = 0xBDD19FFF;
             if (bUnidentified)
             {
@@ -922,7 +919,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     SetAction((eFielderActionState)5);
 
     s16 angleDiff
-        = (s16)((u16)(aDirection + 0x8000) - m_aActualFacingDirection);
+        = (s16)((u16)(aDirection + 0x8000) - mUnidentified024.m_aActualFacingDirection);
     u32 index = (u32)((s16)(angleDiff + 0x2000)) >> 14 & 3;
 
     bool bTrackStats = false;
@@ -957,7 +954,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
         break;
     }
 
-    m_fDesiredSpeed = 0.0f;
+    mUnidentified024.m_fDesiredSpeed = 0.0f;
     return true;
 }
 
@@ -971,8 +968,8 @@ void cFielder::fn_800474FC(float fDeltaT)
 
     if (ShouldStartCrossBlend(4))
     {
-        m_fActualSpeed = 0.0f;
-        m_fDesiredSpeed = 0.0f;
+        mUnidentified024.m_fActualSpeed = 0.0f;
+        mUnidentified024.m_fDesiredSpeed = 0.0f;
         SetVelocity(v3Zero);
         InitMovementNone(0.0f, 0.0f);
         EndAction();
@@ -990,7 +987,7 @@ void cFielder::InitActionIdleTurn(unsigned short desiredFacingDirection)
 void cFielder::ActionIdleTurn(float fDeltaT)
 {
     s16 angleDiff
-        = (u16)abs_s16(m_aDesiredFacingDirection - m_aActualFacingDirection);
+        = (u16)abs_s16(mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection);
 
     if (angleDiff < g_IdleTurnCompletionDelta)
     {
@@ -1065,7 +1062,7 @@ void cFielder::InitActionLateOneTimerFromVolley()
 
     fn_801B75C8(this, 2, 0, 0, bShotNormally);
 
-    bool bUnidentified = fn_8001E168(this);
+    bool bUnidentified = fn_8001E168();
     unsigned long soundID = 0x1CEC5A02;
     if (bUnidentified)
     {
@@ -1156,8 +1153,8 @@ bool cFielder::DoCommonInitActionLooseBall(
             fMinBallZ = v3SimulatedBallPos.z;
         }
 
-        fBallDelta[1] = v3SimulatedBallPos.y - m_v3Position.y;
-        fBallDelta[0] = v3SimulatedBallPos.x - m_v3Position.x;
+        fBallDelta[1] = v3SimulatedBallPos.y - mUnidentified024.m_v3Position.y;
+        fBallDelta[0] = v3SimulatedBallPos.x - mUnidentified024.m_v3Position.x;
         float fBallDistance = nlSqrt(fBallDelta[0] * fBallDelta[0]
                 + fBallDelta[1] * fBallDelta[1],
             true);
@@ -1165,15 +1162,15 @@ bool cFielder::DoCommonInitActionLooseBall(
         if (!bBallState5)
         {
             if (v3SimulatedBallPos.z
-                < g_pBall->fn_80014F38(m_fPlayerScale))
+                < g_pBall->fn_80014F38(mUnidentified024.m_fPlayerScale))
             {
                 float fAnimTime
                     = (pAnimInfoList->fAnimContactFrame / 30.0f)
                     / fSimulatedTime;
                 fGroundReachDelta[1]
-                    = v3IdleGroundContactOffset.y - m_v3Position.y;
+                    = v3IdleGroundContactOffset.y - mUnidentified024.m_v3Position.y;
                 fGroundReachDelta[0]
-                    = v3IdleGroundContactOffset.x - m_v3Position.x;
+                    = v3IdleGroundContactOffset.x - mUnidentified024.m_v3Position.x;
                 float fCatchup = fBallDistance
                     - nlSqrt(fGroundReachDelta[0] * fGroundReachDelta[0]
                             + fGroundReachDelta[1] * fGroundReachDelta[1],
@@ -1193,16 +1190,16 @@ bool cFielder::DoCommonInitActionLooseBall(
 
             float fVolleyZDelta = (float)fabs(
                 v3SimulatedBallPos.z - v3IdleVolleyContactOffset.z);
-            if (fVolleyZDelta < g_pBall->fn_80014F38(m_fPlayerScale))
+            if (fVolleyZDelta < g_pBall->fn_80014F38(mUnidentified024.m_fPlayerScale))
             {
                 float fAnimTime
                     = (GetOneTimerIdleVolleyContactAnims()->fAnimContactFrame
                           / 30.0f)
                     / fSimulatedTime;
                 fVolleyReachDelta[1]
-                    = v3IdleVolleyContactOffset.y - m_v3Position.y;
+                    = v3IdleVolleyContactOffset.y - mUnidentified024.m_v3Position.y;
                 fVolleyReachDelta[0]
-                    = v3IdleVolleyContactOffset.x - m_v3Position.x;
+                    = v3IdleVolleyContactOffset.x - mUnidentified024.m_v3Position.x;
                 float fCatchup = fBallDistance
                     - nlSqrt(fVolleyReachDelta[0] * fVolleyReachDelta[0]
                             + fVolleyReachDelta[1] * fVolleyReachDelta[1],
@@ -1225,16 +1222,16 @@ bool cFielder::DoCommonInitActionLooseBall(
 
         float fLeadZDelta = (float)fabs(
             v3SimulatedBallPos.z - v3LeadGroundContactOffset.z);
-        if (fLeadZDelta < g_pBall->fn_80014F38(m_fPlayerScale))
+        if (fLeadZDelta < g_pBall->fn_80014F38(mUnidentified024.m_fPlayerScale))
         {
             float fAnimTime
                 = (GetOneTimerLeadGroundContactAnims()->fAnimContactFrame
                       / 30.0f)
                 / fSimulatedTime;
             fLeadReachDelta[1]
-                = v3LeadGroundContactOffset.y - m_v3Position.y;
+                = v3LeadGroundContactOffset.y - mUnidentified024.m_v3Position.y;
             fLeadReachDelta[0]
-                = v3LeadGroundContactOffset.x - m_v3Position.x;
+                = v3LeadGroundContactOffset.x - mUnidentified024.m_v3Position.x;
             float fCatchup = fBallDistance
                 - nlSqrt(fLeadReachDelta[0] * fLeadReachDelta[0]
                         + fLeadReachDelta[1] * fLeadReachDelta[1],
@@ -1266,18 +1263,18 @@ bool cFielder::DoCommonInitActionLooseBall(
         return false;
     }
 
-    v3BallToSelf.y = m_v3Position.y - g_pBall->m_v3Position.y;
-    v3BallToSelf.x = m_v3Position.x - g_pBall->m_v3Position.x;
-    v3BallToSelf.z = m_v3Position.z - g_pBall->m_v3Position.z;
+    v3BallToSelf.y = mUnidentified024.m_v3Position.y - g_pBall->m_v3Position.y;
+    v3BallToSelf.x = mUnidentified024.m_v3Position.x - g_pBall->m_v3Position.x;
+    v3BallToSelf.z = mUnidentified024.m_v3Position.z - g_pBall->m_v3Position.z;
 
     const LooseBallContactAnimInfo* pBestBallContactAnimInfo
         = fn_80038230(pAnimInfoList, nNumAnims,
-            m_aActualFacingDirection, m_v3Position, rv3OneTimerTarget,
+            mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_v3Position, rv3OneTimerTarget,
             nlATan2f(v3BallToSelf.y, v3BallToSelf.x));
 
-    v3ToTarget.y = rv3OneTimerTarget.y - m_v3Position.y;
-    v3ToTarget.x = rv3OneTimerTarget.x - m_v3Position.x;
-    v3ToTarget.z = rv3OneTimerTarget.z - m_v3Position.z;
+    v3ToTarget.y = rv3OneTimerTarget.y - mUnidentified024.m_v3Position.y;
+    v3ToTarget.x = rv3OneTimerTarget.x - mUnidentified024.m_v3Position.x;
+    v3ToTarget.z = rv3OneTimerTarget.z - mUnidentified024.m_v3Position.z;
     u32 aDesiredFacingDirection = nlVector3ToAngle(v3ToTarget);
 
     switch (pBestBallContactAnimInfo->nAnimID)
@@ -1302,7 +1299,7 @@ bool cFielder::DoCommonInitActionLooseBall(
     cSAnim* pBestContactAnim
         = m_pAnimInventory->GetAnim(pBestBallContactAnimInfo->nAnimID);
     s16 nFacingDelta
-        = (s16)(aDesiredFacingDirection - m_aActualFacingDirection);
+        = (s16)(aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection);
 
     GetJointPositionFuture(&v3ContactOffsetLocal,
         pBestBallContactAnimInfo->nAnimID, m_nBallJointIndex,
@@ -1332,7 +1329,7 @@ bool cFielder::DoCommonInitActionLooseBall(
         / fSimulatedTime;
 
     nlVec3Sub(v3TmpAdjustment, v3SimulatedBallPos, v3ContactOffsetWorld);
-    nlVec3Sub(v3MoveAdjustment, v3TmpAdjustment, m_v3Position);
+    nlVec3Sub(v3MoveAdjustment, v3TmpAdjustment, mUnidentified024.m_v3Position);
 
     InitMovementFromAnim(nFacingDelta, v3MoveAdjustment,
         mUnidentified368 * lbl_806DB990, false);
@@ -1381,7 +1378,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
             bIsModified = false;
             SetNoPickUpTime(3.0f);
 
-            bool bUnidentified = fn_8001E168(this);
+            bool bUnidentified = fn_8001E168();
             unsigned long soundID = 0x1CEC5A02;
             if (bUnidentified)
             {
@@ -1390,7 +1387,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
             PlaySound(mUnidentified318, soundID, 0, 0);
         }
     }
-    else if (DoCommonInitActionLooseBall(finalPassTarget->m_v3Position, true))
+    else if (DoCommonInitActionLooseBall(finalPassTarget->mUnidentified024.m_v3Position, true))
     {
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -1433,7 +1430,7 @@ void cFielder::InitActionLooseBallShot(bool bIsChipShot)
         bIsModified = bIsChipShot;
         SetNoPickUpTime(lbl_806E35E0);
 
-        bool bUnidentified = fn_8001E168(this);
+        bool bUnidentified = fn_8001E168();
         unsigned long soundID = 0x1CEC5A02;
         if (bUnidentified)
         {
@@ -1483,7 +1480,7 @@ void fn_80048870(cFielder* pFielder)
     }
 }
 
-void cFielder::fn_80048918()
+void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
 {
     lbl_806DB5A8 = true;
 
@@ -1493,7 +1490,7 @@ void cFielder::fn_80048918()
         for (int j = 0; j < 4; j++)
         {
             cFielder* pFielder = pTeam->GetFielder(j);
-            if (this != pFielder && fn_8003881C(pFielder)
+            if (pCaptain != pFielder && fn_8003881C(pFielder)
                 && g_pGame->mUnidentified030 == 0)
             {
                 fn_80316968(fn_80319FC0(fn_8002E1A4(pFielder), 0x1D));
@@ -1561,10 +1558,10 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         if (m_eActionState != 0x12)
         {
             mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
-            m_aActualMovementDirection = m_aActualFacingDirection;
-            Unknown8(m_aActualFacingDirection, false);
+            mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+            Unknown8(mUnidentified024.m_aActualFacingDirection, false);
             mActionRunningVars.bFirstCycleOfTurbo = false;
-            m_fDesiredSpeed = m_fActualSpeed;
+            mUnidentified024.m_fDesiredSpeed = mUnidentified024.m_fActualSpeed;
         }
 
         SetAction(ACTION_RUNNING);
@@ -1577,10 +1574,10 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     }
 
     bool bNearGoal = false;
-    float fAbsX = (float)fabs(m_v3Position.x);
+    float fAbsX = (float)fabs(mUnidentified024.m_v3Position.x);
     if (fAbsX > cField::GetGoalLineX(1U) - lbl_806E3570)
     {
-        if ((float)fabs(m_v3Position.y)
+        if ((float)fabs(mUnidentified024.m_v3Position.y)
             < 0.5f * cNet::m_fNetWidth + 1.0f)
         {
             bNearGoal = true;
@@ -1612,18 +1609,18 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         nlVector3 v3NetLocation = m_pTeam->GetOtherNet()->m_v3NetLocation;
 
         InitMovementFromAnim(
-            (s16)fn_8001C5E4(this, m_aActualFacingDirection,
+            (s16)CalcAnimTurnAdjust(mUnidentified024.m_aActualFacingDirection,
                 (u16)(s32)(10430.378f
-                    * nlATan2f(v3NetLocation.y - m_v3Position.y,
-                        v3NetLocation.x - m_v3Position.x)),
+                    * nlATan2f(v3NetLocation.y - mUnidentified024.m_v3Position.y,
+                        v3NetLocation.x - mUnidentified024.m_v3Position.x)),
                 m_eAnimID, 1.0f),
             v3Zero, lbl_806E35CC, false);
 
         if (bParam)
         {
             ShootToScoreMeter::instance.m_v3OriginalMeterPosition
-                = m_v3Position;
-            ShootToScoreMeter::instance.m_v3MeterPosition = m_v3Position;
+                = mUnidentified024.m_v3Position;
+            ShootToScoreMeter::instance.m_v3MeterPosition = mUnidentified024.m_v3Position;
             ShootToScoreMeter::instance.TurnOnMeter();
             PlaySound(0, 0xC4534945, 0, 0);
         }
@@ -1632,7 +1629,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         event.pFielder = this;
         event.fMeterValue = mUnidentified3BC;
         nlVector3 v3Column;
-        fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &m_v3Position, &v3Column);
+        fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
         event.v3Position = v3Column;
         fn_8005F238(g_pGame, &event);
 
@@ -1874,7 +1871,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
     event.pFielder = this;
     event.fMeterValue = mUnidentified3BC;
     nlVector3 v3Column;
-    fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &m_v3Position, &v3Column);
+    fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
     event.v3Position = v3Column;
     fn_8005F434(g_pGame, &event);
 
@@ -1948,7 +1945,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     event.pFielder = this;
     event.fMeterValue = mUnidentified3C0;
     nlVector3 v3Column;
-    fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &m_v3Position, &v3Column);
+    fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
     event.v3Position = v3Column;
     fn_8005F630(g_pGame, &event);
 
@@ -2079,13 +2076,13 @@ void cFielder::InitActionOneTimer(int animID, nlVector3& targetPos,
     SetAnimState(animID, false, fAdjustEndTime * lbl_806DB990, false, false);
 
     nlVector3 v3MoveAdjustment;
-    nlVec3Sub(v3MoveAdjustment, targetPos, m_v3Position);
+    nlVec3Sub(v3MoveAdjustment, targetPos, mUnidentified024.m_v3Position);
     InitMovementFromAnim(nTurnAdjust, v3MoveAdjustment,
         fAdjustEndTime * lbl_806DB990, false);
 
     fn_800978E8(this, 0);
 
-    bool bUnidentified = fn_8001E168(this);
+    bool bUnidentified = fn_8001E168();
     unsigned long soundID = 0x1CEC5A02;
     if (bUnidentified)
     {
@@ -2134,7 +2131,7 @@ void cFielder::InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam)
         0x4B,
     };
 
-    s16 facingDelta = GetFacingDeltaToPosition(pPlayer->m_v3Position);
+    s16 facingDelta = GetFacingDeltaToPosition(pPlayer->mUnidentified024.m_v3Position);
     int index = (u16)(facingDelta + 0x2000) >> 14;
 
     bool bMirror = false;
@@ -2159,7 +2156,7 @@ void cFielder::InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam)
         break;
     }
 
-    s16 facingDelta2 = GetFacingDeltaToPosition(pPlayer->m_v3Position);
+    s16 facingDelta2 = GetFacingDeltaToPosition(pPlayer->mUnidentified024.m_v3Position);
 
     SetAnimState(nAnimID, true, 0.0f, false, bMirror);
 
@@ -2191,8 +2188,8 @@ bool cFielder::fn_8004A330(cFielder* pOther)
         float fThisOpen = fn_800A0508(this, 0, 0);
 
         nlVector2 v2Delta = {
-            pOther->m_v3Position.x - m_v3Position.x,
-            pOther->m_v3Position.y - m_v3Position.y,
+            pOther->mUnidentified024.m_v3Position.x - mUnidentified024.m_v3Position.x,
+            pOther->mUnidentified024.m_v3Position.y - mUnidentified024.m_v3Position.y,
         };
         if (nlVec2LengthSquared(v2Delta) > lbl_806E360C
             && fOtherScore > lbl_806DB890 && fOtherOpen > fThisOpen)
@@ -2221,10 +2218,10 @@ bool cFielder::InitActionPass(
         0x27,
         0x26,
     };
-    signed short nFacingDelta = GetFacingDeltaToPosition(pPassTarget->m_v3Position);
+    signed short nFacingDelta = GetFacingDeltaToPosition(pPassTarget->mUnidentified024.m_v3Position);
     int index = (u16)(nFacingDelta + 0x2000) >> 14;
 
-    if (m_eCharacterClass == HAMMERBROS)
+    if (mUnidentified024.m_eCharacterClass == HAMMERBROS)
     {
         SetAnimState(PassingAnims[index], false, lbl_806E35CC, false, false);
     }
@@ -2238,7 +2235,7 @@ bool cFielder::InitActionPass(
     if (bVolleyPass)
     {
         nlVector3 delta;
-        nlVec3Sub(delta, m_v3Position, pPassTarget->m_v3Position);
+        nlVec3Sub(delta, mUnidentified024.m_v3Position, pPassTarget->mUnidentified024.m_v3Position);
         float minDistSq = lbl_806E35C8;
         minDistSq *= minDistSq;
         float distSq = delta.GetLengthSq3D();
@@ -2297,11 +2294,11 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
         s16 facingDelta;
         if (pAttacker != this)
         {
-            facingDelta = GetFacingDeltaToPosition(pAttacker->m_v3Position);
+            facingDelta = GetFacingDeltaToPosition(pAttacker->mUnidentified024.m_v3Position);
         }
         else
         {
-            facingDelta = (s16)(int)m_aActualFacingDirection;
+            facingDelta = (s16)(int)mUnidentified024.m_aActualFacingDirection;
         }
 
         static int SlideAttackReactAnims[4] = {
@@ -2344,7 +2341,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
 
         PlayRumbleAction(1, pAttacker->GetGlobalPad());
         PlaySound(0, 0x57208DA, 0, 0);
-        m_fDesiredSpeed = 0.0f;
+        mUnidentified024.m_fDesiredSpeed = 0.0f;
     }
 }
 
@@ -2352,7 +2349,7 @@ void cFielder::asmRunningWB(float fDeltaT)
 {
     float fIdleToRunWBDesiredSpeed = 0.1f + fn_8002CE14(this->GetTweaks());
     s16 nAbsActualToDesiredFacingDirection = (s16)(u16)abs_s16(
-        (s16)(m_aDesiredFacingDirection - m_aActualFacingDirection));
+        (s16)(mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection));
     float fSpeedFactor = InterpolateRangeClamped(
         0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->mUnidentified034);
     bool bFirstTime;
@@ -2370,7 +2367,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 bool bAnimFinished = m_pCurrentAnimController->m_ePlayMode == PM_HOLD
                     && m_pCurrentAnimController->m_fTime == 1.0f;
                 if (bAnimFinished
-                    || m_fDesiredSpeed >= fIdleToRunWBDesiredSpeed)
+                    || mUnidentified024.m_fDesiredSpeed >= fIdleToRunWBDesiredSpeed)
                 {
                     mActionRunningWBVars.bWaitForAnimToFinish = false;
                 }
@@ -2392,13 +2389,13 @@ void cFielder::asmRunningWB(float fDeltaT)
         {
             if (ShouldStartCrossBlend(0x17))
             {
-                if (m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
                 {
                     fn_8003B920(this);
                 }
                 else
                 {
-                    m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
                     fn_8003BE14(this, 0.1f);
                 }
             }
@@ -2407,18 +2404,18 @@ void cFielder::asmRunningWB(float fDeltaT)
 
         case 0x17:
         {
-            m_aActualMovementDirection = m_aActualFacingDirection;
+            mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
 
             if (ShouldStartCrossBlend(0xF))
             {
                 fn_8003B920(this);
-                m_fActualSpeed = 0.0f;
+                mUnidentified024.m_fActualSpeed = 0.0f;
                 break;
             }
 
             if (nAbsActualToDesiredFacingDirection >= 0x639C)
             {
-                if (m_fActualSpeed
+                if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * fn_8002C328(this->GetTweaks()))
                 {
                     fn_8003A5C8(this);
@@ -2430,9 +2427,9 @@ void cFielder::asmRunningWB(float fDeltaT)
                 break;
             }
 
-            if (m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
+            if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
             {
-                if (m_fActualSpeed
+                if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * fn_8002C328(this->GetTweaks()))
                 {
                     fn_8003A5C8(this);
@@ -2443,9 +2440,9 @@ void cFielder::asmRunningWB(float fDeltaT)
 
         case 0xF:
         {
-            if (m_fDesiredSpeed > 1.0f)
+            if (mUnidentified024.m_fDesiredSpeed > 1.0f)
             {
-                if (m_fActualSpeed
+                if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * fn_8002C328(this->GetTweaks()))
                 {
                     fn_8003A5C8(this);
@@ -2455,14 +2452,14 @@ void cFielder::asmRunningWB(float fDeltaT)
                     fn_8003BE14(this, 0.1f);
                 }
             }
-            else if (m_fActualSpeed
+            else if (mUnidentified024.m_fActualSpeed
                 > 0.6f * fn_8002C328(this->GetTweaks()))
             {
                 fn_8003B54C(this);
             }
             else
             {
-                m_fDesiredSpeed = 0.0f;
+                mUnidentified024.m_fDesiredSpeed = 0.0f;
             }
             break;
         }
@@ -2471,10 +2468,10 @@ void cFielder::asmRunningWB(float fDeltaT)
         {
             if (fn_8003E8A0(this) && mUnidentified3DC)
             {
-                if (m_fDesiredSpeed
+                if (mUnidentified024.m_fDesiredSpeed
                     < fn_8002CE14(this->GetTweaks()) - 0.15f)
                 {
-                    if (m_fActualSpeed
+                    if (mUnidentified024.m_fActualSpeed
                         > 0.6f * fn_8002BFB8(this->GetTweaks()))
                     {
                         fn_8003B54C(this);
@@ -2497,7 +2494,7 @@ void cFielder::asmRunningWB(float fDeltaT)
         {
             if (nAbsActualToDesiredFacingDirection >= 0x639C)
             {
-                if (m_fActualSpeed
+                if (mUnidentified024.m_fActualSpeed
                     > 0.6f * fn_8002C328(this->GetTweaks()))
                 {
                     fn_8003ADAC(this);
@@ -2509,9 +2506,9 @@ void cFielder::asmRunningWB(float fDeltaT)
                 break;
             }
 
-            if (m_fDesiredSpeed < fn_8002CE14(this->GetTweaks()) - 0.15f)
+            if (mUnidentified024.m_fDesiredSpeed < fn_8002CE14(this->GetTweaks()) - 0.15f)
             {
-                if (m_fActualSpeed
+                if (mUnidentified024.m_fActualSpeed
                     > 0.6f * fn_8002C328(this->GetTweaks()))
                 {
                     fn_8003B54C(this);
@@ -2538,7 +2535,7 @@ void cFielder::asmRunningWB(float fDeltaT)
 
             if (bAnimFinished)
             {
-                if (m_fDesiredSpeed < fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed < fn_8002CE14(this->GetTweaks()))
                 {
                     if (mActionRunningWBVars.bCuePitch)
                     {
@@ -2565,10 +2562,10 @@ void cFielder::asmRunningWB(float fDeltaT)
                 {
                     fn_8004B148();
                 }
-                else if (m_fDesiredSpeed
+                else if (mUnidentified024.m_fDesiredSpeed
                     >= fn_8002CE14(this->GetTweaks()))
                 {
-                    m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
                     fn_8003BE14(this, 0.1f);
                 }
                 else
@@ -2584,7 +2581,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (ShouldStartCrossBlend(0x14))
             {
                 fn_8003B920(this);
-                m_fActualSpeed = 0.0f;
+                mUnidentified024.m_fActualSpeed = 0.0f;
             }
             break;
         }
@@ -2597,9 +2594,9 @@ void cFielder::asmRunning()
     fn_8002CE14(this->GetTweaks());
 
     s16 nAbsActualToDesiredFacingDirection = (s16)(u16)abs_s16(
-        (s16)(m_aDesiredFacingDirection - m_aActualFacingDirection));
+        (s16)(mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection));
     s16 nAbsActualToDesiredMovementDirection = (s16)(u16)abs_s16(
-        (s16)(m_aDesiredMovementDirection - m_aActualMovementDirection));
+        (s16)(mUnidentified024.m_aDesiredMovementDirection - mUnidentified024.m_aActualMovementDirection));
     float fSpeedFactor = InterpolateRangeClamped(
         0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->mUnidentified034);
     bool bFirstTime;
@@ -2623,13 +2620,13 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(0))
             {
-                if (m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
                 {
                     fn_8003B854(this);
                 }
                 else
                 {
-                    m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
                     fn_8003BA94(this, 0.1f);
                 }
             }
@@ -2648,7 +2645,7 @@ void cFielder::asmRunning()
                 break;
             case 0:
             case 3:
-                if (m_fActualSpeed
+                if (mUnidentified024.m_fActualSpeed
                     > 0.6f * fn_8002BFB8(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredFacingDirection >= 0x3A98)
@@ -2666,7 +2663,7 @@ void cFielder::asmRunning()
                 }
                 break;
             case 4:
-                m_fDesiredSpeed = fn_8002CD2C(this->GetTweaks());
+                mUnidentified024.m_fDesiredSpeed = fn_8002CD2C(this->GetTweaks());
                 break;
             }
             break;
@@ -2707,8 +2704,8 @@ void cFielder::asmRunning()
                     break;
                 case 3:
                 {
-                    int nIndex = (u16)(m_aDesiredFacingDirection
-                                     - m_aActualFacingDirection + 0x2000)
+                    int nIndex = (u16)(mUnidentified024.m_aDesiredFacingDirection
+                                     - mUnidentified024.m_aActualFacingDirection + 0x2000)
                         >> 14;
                     if (nIndex != 0)
                     {
@@ -2779,7 +2776,7 @@ void cFielder::asmRunning()
             {
             case 0:
             case 1:
-                if (m_fActualSpeed
+                if (mUnidentified024.m_fActualSpeed
                     > 0.6f * fn_8002BFB8(this->GetTweaks()))
                 {
                     fn_8003B664(this);
@@ -2790,7 +2787,7 @@ void cFielder::asmRunning()
                 }
                 break;
             case 2:
-                m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
+                mUnidentified024.m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
             case 3:
                 fn_8003BA94(this, 0.1f);
@@ -2808,7 +2805,7 @@ void cFielder::asmRunning()
             {
             case 0:
             case 2:
-                if (m_fActualSpeed
+                if (mUnidentified024.m_fActualSpeed
                     > 0.6f * fn_8002BFB8(this->GetTweaks()))
                 {
                     fn_8003B5FC(this);
@@ -2819,7 +2816,7 @@ void cFielder::asmRunning()
                 }
                 break;
             case 1:
-                m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
+                mUnidentified024.m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
             case 3:
                 fn_8003BA94(this, 0.1f);
@@ -2833,7 +2830,7 @@ void cFielder::asmRunning()
 
         case 5:
         {
-            m_aActualMovementDirection = m_aActualFacingDirection;
+            mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
 
             switch (mActionRunningVars.eLastStrafeDirection)
             {
@@ -2858,7 +2855,7 @@ void cFielder::asmRunning()
             case 3:
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
-                    if (m_fActualSpeed
+                    if (mUnidentified024.m_fActualSpeed
                         < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
                     {
                         fn_8003A2D0(this, -1);
@@ -2877,7 +2874,7 @@ void cFielder::asmRunning()
                 if (ShouldStartCrossBlend(0))
                 {
                     fn_8003B190(this);
-                    m_fActualSpeed = 0.0f;
+                    mUnidentified024.m_fActualSpeed = 0.0f;
                 }
                 break;
             }
@@ -2899,8 +2896,8 @@ void cFielder::asmRunning()
             switch (mActionRunningVars.eLastStrafeDirection)
             {
             case 0:
-                m_fDesiredSpeed = 0.0f;
-                if (m_fActualSpeed
+                mUnidentified024.m_fDesiredSpeed = 0.0f;
+                if (mUnidentified024.m_fActualSpeed
                     > 0.6f * fn_8002BFB8(this->GetTweaks()))
                 {
                     fn_8003B54C(this);
@@ -2913,7 +2910,7 @@ void cFielder::asmRunning()
                 fn_8003B6CC(this);
                 break;
             case 3:
-                if (m_fActualSpeed
+                if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
                 {
                     fn_8003A2D0(this, -1);
@@ -2934,10 +2931,10 @@ void cFielder::asmRunning()
         {
             if (fn_8003E8A0(this) && mUnidentified3DC)
             {
-                if (m_fDesiredSpeed
+                if (mUnidentified024.m_fDesiredSpeed
                     < fn_8002CE14(this->GetTweaks()) - 0.15f)
                 {
-                    if (m_fActualSpeed
+                    if (mUnidentified024.m_fActualSpeed
                         > 0.6f * fn_8002BFB8(this->GetTweaks()))
                     {
                         fn_8003B54C(this);
@@ -2961,7 +2958,7 @@ void cFielder::asmRunning()
             switch (mActionRunningVars.eLastStrafeDirection)
             {
             case 0:
-                if (m_fActualSpeed
+                if (mUnidentified024.m_fActualSpeed
                     > 0.6f * fn_8002BFB8(this->GetTweaks()))
                 {
                     fn_8003B54C(this);
@@ -2974,7 +2971,7 @@ void cFielder::asmRunning()
             case 3:
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
-                    if (m_fActualSpeed
+                    if (mUnidentified024.m_fActualSpeed
                         < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
                     {
                         fn_8003A2D0(this, -1);
@@ -2997,7 +2994,7 @@ void cFielder::asmRunning()
                 fn_8003B6CC(this);
                 break;
             case 4:
-                if (m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredMovementDirection < 0x4000)
                     {
@@ -3024,7 +3021,7 @@ void cFielder::asmRunning()
 
             if (bAnimFinished)
             {
-                if (m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
                 {
                     fn_8003B0D8(this);
                 }
@@ -3040,9 +3037,9 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(0))
             {
-                if (m_fDesiredSpeed >= fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed >= fn_8002CE14(this->GetTweaks()))
                 {
-                    m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
                     fn_8003BA94(this, 0.1f);
                 }
                 else
@@ -3092,13 +3089,13 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
             fn_8005001C(false);
         }
     }
-    else if (m_eCharacterClass == (eCharacterClass)0x13)
+    else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
         fn_801B8FF4(this);
     }
 
     s16 sFacingDelta;
-    switch (m_eCharacterClass)
+    switch (mUnidentified024.m_eCharacterClass)
     {
     case (eCharacterClass)0x01:
     case (eCharacterClass)0x03:
@@ -3107,7 +3104,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     case (eCharacterClass)0x0B:
     case (eCharacterClass)0x0C:
     case (eCharacterClass)0x12:
-        sFacingDelta = aDirection - m_aActualFacingDirection;
+        sFacingDelta = aDirection - mUnidentified024.m_aActualFacingDirection;
         SetAnimState(0x50, true, 0.2f, false, false);
         break;
     case (eCharacterClass)0x02:
@@ -3118,7 +3115,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
         {
             aDirection = m_pController->GetMovementStickDirection();
         }
-        sFacingDelta = aDirection - m_aActualFacingDirection;
+        sFacingDelta = aDirection - mUnidentified024.m_aActualFacingDirection;
         SetAnimState(0x50, true, 0.2f, false, false);
         break;
     case (eCharacterClass)0x05:
@@ -3126,12 +3123,12 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     case (eCharacterClass)0x0D:
     case (eCharacterClass)0x0F:
     case (eCharacterClass)0x10:
-        sFacingDelta = aDirection - m_aActualFacingDirection;
+        sFacingDelta = aDirection - mUnidentified024.m_aActualFacingDirection;
         SetAnimState(0x50, true, 0.2f, false, false);
         break;
     default:
     {
-        sFacingDelta = aDirection - m_aActualFacingDirection;
+        sFacingDelta = aDirection - mUnidentified024.m_aActualFacingDirection;
         if ((u16)abs_s16(sFacingDelta) < 0x2AAA)
         {
             SetAnimState(0x50, true, 0.2f, false, false);
@@ -3162,14 +3159,14 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
 
     if (fn_8003E70C(this))
     {
-        Unknown8(m_aActualFacingDirection, false);
-        SetFacingDirection(m_aDesiredFacingDirection, true);
+        Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+        SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
     }
 
-    m_fDesiredSpeed = 0.0f;
+    mUnidentified024.m_fDesiredSpeed = 0.0f;
     InitMovementFromAnim(sFacingDelta, v3Zero, 0.1f, false);
 
-    switch (m_eCharacterClass)
+    switch (mUnidentified024.m_eCharacterClass)
     {
     case (eCharacterClass)0x00:
     case (eCharacterClass)0x04:
@@ -3185,12 +3182,12 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     case (eCharacterClass)0x07:
     case (eCharacterClass)0x09:
     case (eCharacterClass)0x0D:
-        SetFacingDirection(sFacingDelta + m_aActualFacingDirection, true);
+        SetFacingDirection(sFacingDelta + mUnidentified024.m_aActualFacingDirection, true);
         InitMovementDecelerateExponential(lbl_806DB8F4);
         break;
     }
 
-    bool bUnidentified = fn_8001E168(this);
+    bool bUnidentified = fn_8001E168();
     unsigned long soundID = 0xDEA5F49B;
     if (bUnidentified)
     {
@@ -3215,9 +3212,9 @@ void cFielder::fn_80044290(float fDeltaT)
     {
     case 0x7C:
     {
-        if (m_v3Velocity.z < 0.0f && m_v3Position.z <= 0.1f)
+        if (mUnidentified024.m_v3Velocity.z < 0.0f && mUnidentified024.m_v3Position.z <= 0.1f)
         {
-            nlVector3 v3Position = m_v3Position;
+            nlVector3 v3Position = mUnidentified024.m_v3Position;
             float fGoalLineX = (float)fabs(cField::GetGoalLineX(0U));
             float fSidelineY
                 = (float)fabs(0.5f * (2.0f * cField::mv3FieldPosition.y));
@@ -3230,7 +3227,7 @@ void cFielder::fn_80044290(float fDeltaT)
                         && (float)fabs(v3Position.y) - (1.0f + fSidelineY)
                             < 0.0f)))
             {
-                nlVector3 v3Velocity = m_v3Velocity;
+                nlVector3 v3Velocity = mUnidentified024.m_v3Velocity;
                 float fUpVelocity = v3Velocity.z;
                 v3Velocity.z = 0.0f;
                 float fSpeed = nlSqrt(v3Velocity.GetLengthSq3D(), true);
@@ -3238,7 +3235,7 @@ void cFielder::fn_80044290(float fDeltaT)
                 {
                     if (fSpeed < 0.01f)
                     {
-                        v3Velocity = m_v3Position;
+                        v3Velocity = mUnidentified024.m_v3Position;
                     }
                     float fRecipLength
                         = nlRecipSqrt(v3Velocity.GetLengthSq3D(), true);
@@ -3269,13 +3266,13 @@ void cFielder::fn_80044290(float fDeltaT)
         }
         else
         {
-            nlVector3 v3Velocity = m_v3Velocity;
+            nlVector3 v3Velocity = mUnidentified024.m_v3Velocity;
             float fDamping = 1.0f - 0.5f * fDeltaT;
             v3Velocity.x *= fDamping;
             v3Velocity.y *= fDamping;
             v3Velocity.z = -30.0f * fDeltaT + v3Velocity.z;
             SetVelocity(v3Velocity);
-            m_v3Position.z += v3Velocity.z * fDeltaT;
+            mUnidentified024.m_v3Position.z += v3Velocity.z * fDeltaT;
 
             Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
             if (pGoalie->mGoalieActionState == (eGoalieActionState)0x0D
@@ -3286,13 +3283,13 @@ void cFielder::fn_80044290(float fDeltaT)
 
             float fSpin = 1.0f
                 - this->GetTweaks()->mUnidentified064;
-            Unknown8(m_aActualFacingDirection
+            Unknown8(mUnidentified024.m_aActualFacingDirection
                     + (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f)),
                 false);
 
             SetFacingDirection(
-                SeekDirection(m_aActualFacingDirection,
-                    m_aDesiredFacingDirection,
+                SeekDirection(mUnidentified024.m_aActualFacingDirection,
+                    mUnidentified024.m_aDesiredFacingDirection,
                     fn_8002CF88(this->GetTweaks()),
                     fn_8002CF9C(this->GetTweaks()), fDeltaT),
                 true);
@@ -3310,9 +3307,9 @@ void cFielder::fn_80044290(float fDeltaT)
 
 void cFielder::fn_80044BEC(float fDeltaT)
 {
-    if (m_eMovementState == MOVEMENT_DECELERATE_EXPONENTIAL)
+    if (mUnidentified024.m_eMovementState == MOVEMENT_DECELERATE_EXPONENTIAL)
     {
-        m_fDesiredSpeed = 0.0f;
+        mUnidentified024.m_fDesiredSpeed = 0.0f;
     }
 
     if (GetGlobalPad() != 0)
@@ -3333,13 +3330,13 @@ void cFielder::fn_80044BEC(float fDeltaT)
     }
     else
     {
-        switch (m_eCharacterClass)
+        switch (mUnidentified024.m_eCharacterClass)
         {
         case (eCharacterClass)0x05:
         case (eCharacterClass)0x0A:
         case (eCharacterClass)0x0F:
         {
-            float fChance = fn_800E02B8(m_pTeam);
+            float fChance = Difficult(m_pTeam);
             if (nlRandomf(2.0f) < fChance)
             {
                 if (m_pCurrentAnimController->TestFrameTrigger(5.0f))
@@ -3396,8 +3393,8 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
             ReleaseBall(0);
 
             nlVector3 v3BallVelocity;
-            nlVec3Set(v3BallVelocity, 0.4f * m_v3Velocity.x,
-                0.5f * -m_v3Position.y, 6.0f);
+            nlVec3Set(v3BallVelocity, 0.4f * mUnidentified024.m_v3Velocity.x,
+                0.5f * -mUnidentified024.m_v3Position.y, 6.0f);
             g_pBall->ShootRelease(v3BallVelocity, SPINTYPE_NONE);
             SetNoPickUpTime(0.5f);
         }
@@ -3419,7 +3416,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
         float fNetWidth = cNet::m_fNetWidth;
         if ((float)fabs(jointPos.y) < 0.5f * fNetWidth)
         {
-            float fAdjust = m_fPlayerScale;
+            float fAdjust = mUnidentified024.m_fPlayerScale;
             float fMaxY
                 = fn_8002BFA8(this->GetTweaks(), fAdjust) + 0.5f * fNetWidth;
             float fMinY = -fMaxY;
@@ -3452,7 +3449,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
             fn_801B968C(this);
         }
 
-        bool bUnidentified = fn_8001E168(this);
+        bool bUnidentified = fn_8001E168();
         unsigned long soundID = 0xBADF0EF9;
         if (bUnidentified)
         {
@@ -3490,9 +3487,9 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
         {
             nlVector3 v3Direction;
             nlVec3Set(v3Direction,
-                v3Position.x - m_v3Position.x,
-                v3Position.y - m_v3Position.y,
-                v3Position.z - m_v3Position.z);
+                v3Position.x - mUnidentified024.m_v3Position.x,
+                v3Position.y - mUnidentified024.m_v3Position.y,
+                v3Position.z - mUnidentified024.m_v3Position.z);
             SetFacingDirection(nlVector3ToAngle(v3Direction), true);
         }
 
@@ -3520,7 +3517,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
 
         PlayRumbleAction(4, GetGlobalPad());
 
-        bool bUnidentified = fn_8001E168(this);
+        bool bUnidentified = fn_8001E168();
         unsigned long soundID = 0xBADF0EF9;
         if (bUnidentified)
         {
@@ -3569,7 +3566,7 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
     if (m_pBall != 0)
     {
         ReleaseBall(0);
-        g_pBall->SetVelocity(m_v3Velocity, SPINTYPE_NONE, 0);
+        g_pBall->SetVelocity(mUnidentified024.m_v3Velocity, SPINTYPE_NONE, 0);
     }
 
     InitDesire(
@@ -3587,7 +3584,7 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
         m_pPhysicsCharacter->m_CanCollideWithWall = 0;
     }
 
-    bool bUnidentified = fn_8001E168(this);
+    bool bUnidentified = fn_8001E168();
     unsigned long soundID = 0x1CF82176;
     if (bUnidentified)
     {
@@ -3608,7 +3605,7 @@ void cFielder::ActionElectrocution(float dt)
 
         if (m_eAnimID == 0x79 && mUnidentified344 > 0.0f)
         {
-            nlVector3 v3Position = m_v3Position;
+            nlVector3 v3Position = mUnidentified024.m_v3Position;
             float fShake
                 = this->GetTweaks()->mUnidentified064;
             float fRise = lbl_806DB9A0
@@ -3626,7 +3623,7 @@ void cFielder::ActionElectrocution(float dt)
                 nlVector3 launchVelocity = v3ElectrocutionLaunch;
                 float cosAngle;
                 float sinAngle;
-                nlSinCos(&sinAngle, &cosAngle, m_aActualFacingDirection);
+                nlSinCos(&sinAngle, &cosAngle, mUnidentified024.m_aActualFacingDirection);
 
                 nlVector3 velocity;
                 velocity.x = launchVelocity.x * cosAngle
@@ -3655,17 +3652,17 @@ void cFielder::ActionElectrocution(float dt)
     case 0x77:
     case 0x7A:
     {
-        nlVector3 velocity = m_v3Velocity;
+        nlVector3 velocity = mUnidentified024.m_v3Velocity;
         velocity.x *= 0.99f;
         velocity.y *= 0.99f;
         velocity.z = -30.0f * dt + velocity.z;
         SetVelocity(velocity);
 
-        m_v3Position.z += dt * m_v3Velocity.z;
-        if (m_v3Position.z < 0.0f)
+        mUnidentified024.m_v3Position.z += dt * mUnidentified024.m_v3Velocity.z;
+        if (mUnidentified024.m_v3Position.z < 0.0f)
         {
-            m_v3Position.z = 0.0f;
-            m_v3Velocity.z = 0.0f;
+            mUnidentified024.m_v3Position.z = 0.0f;
+            mUnidentified024.m_v3Velocity.z = 0.0f;
 
             if (m_eAnimID == 0x77)
             {
@@ -3722,8 +3719,8 @@ void cFielder::ActionElectrocution(float dt)
 
 void cFielder::fn_80045930()
 {
-    m_v3Position.z = 0.0f;
-    m_v3Velocity.z = 0.0f;
+    mUnidentified024.m_v3Position.z = 0.0f;
+    mUnidentified024.m_v3Velocity.z = 0.0f;
 
     nlVector3 v3Direction;
     if (!g_pBall->m_pPhysicsBall->mbUseWindForce)
@@ -3766,7 +3763,7 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
         if (m_pBall != 0)
         {
             ReleaseBall(0);
-            g_pBall->ShootRelease(m_v3Velocity, SPINTYPE_NONE);
+            g_pBall->ShootRelease(mUnidentified024.m_v3Velocity, SPINTYPE_NONE);
         }
 
         fn_8002E718(this);
@@ -3795,7 +3792,7 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
             SwapController(false);
         }
 
-        bool bUnidentified = fn_8001E168(this);
+        bool bUnidentified = fn_8001E168();
         unsigned long soundID = 0x1CF82176;
         if (bUnidentified)
         {
@@ -3814,13 +3811,13 @@ void cFielder::fn_80045C74(float fDeltaT)
         int nSpinStep = (u16)(lbl_806DB918
             * (lbl_806DB914
                     * InterpolateRangeClamped(
-                        0.0f, 1.0f, 0.0f, lbl_806DB910, m_v3Velocity.z)
+                        0.0f, 1.0f, 0.0f, lbl_806DB910, mUnidentified024.m_v3Velocity.z)
                 + 1.0f));
-        Unknown8(m_aActualFacingDirection + nSpinStep, false);
+        Unknown8(mUnidentified024.m_aActualFacingDirection + nSpinStep, false);
 
         SetFacingDirection(
-            SeekDirection(m_aActualFacingDirection,
-                m_aDesiredFacingDirection, fn_8002CF88(this->GetTweaks()),
+            SeekDirection(mUnidentified024.m_aActualFacingDirection,
+                mUnidentified024.m_aDesiredFacingDirection, fn_8002CF88(this->GetTweaks()),
                 fn_8002CF9C(this->GetTweaks()), fDeltaT),
             true);
 
@@ -3830,22 +3827,22 @@ void cFielder::fn_80045C74(float fDeltaT)
 
         nlVector3 v3NewPosition;
         v3NewPosition.x
-            = (1.0f - fT) * m_v3Position.x + fT * mUnidentified350.x;
+            = (1.0f - fT) * mUnidentified024.m_v3Position.x + fT * mUnidentified350.x;
         v3NewPosition.y
-            = (1.0f - fT) * m_v3Position.y + fT * mUnidentified350.y;
+            = (1.0f - fT) * mUnidentified024.m_v3Position.y + fT * mUnidentified350.y;
         v3NewPosition.z
-            = (1.0f - fT) * m_v3Position.z + fT * mUnidentified350.z;
-        v3NewPosition.z = m_v3Position.z;
+            = (1.0f - fT) * mUnidentified024.m_v3Position.z + fT * mUnidentified350.z;
+        v3NewPosition.z = mUnidentified024.m_v3Position.z;
         SetPosition(v3NewPosition);
 
-        m_v3Position.z += fDeltaT * m_v3Velocity.z;
-        if (m_v3Position.z >= 50.0f)
+        mUnidentified024.m_v3Position.z += fDeltaT * mUnidentified024.m_v3Velocity.z;
+        if (mUnidentified024.m_v3Position.z >= 50.0f)
         {
-            m_v3Position.z = 50.0f;
+            mUnidentified024.m_v3Position.z = 50.0f;
         }
 
         float fNewVelocityZ = SeekSpeedExponential(
-            m_v3Velocity.z, lbl_806DB910, lbl_806DB91C, fDeltaT);
+            mUnidentified024.m_v3Velocity.z, lbl_806DB910, lbl_806DB91C, fDeltaT);
         nlVector3 v3NewVelocity = v3Zero;
         v3NewVelocity.z = fNewVelocityZ;
         SetVelocity(v3NewVelocity);
@@ -3858,25 +3855,25 @@ void cFielder::fn_80045C74(float fDeltaT)
     else if (m_eAnimID == 0x7E)
     {
         nlVector3 v3Delta;
-        v3Delta.y = v3Zero.y - m_v3Position.y;
-        v3Delta.x = v3Zero.x - m_v3Position.x;
-        v3Delta.z = v3Zero.z - m_v3Position.z;
+        v3Delta.y = v3Zero.y - mUnidentified024.m_v3Position.y;
+        v3Delta.x = v3Zero.x - mUnidentified024.m_v3Position.x;
+        v3Delta.z = v3Zero.z - mUnidentified024.m_v3Position.z;
         Unknown8(nlVector3ToAngle(v3Delta), false);
 
         SetFacingDirection(
-            SeekDirection(m_aActualFacingDirection,
-                m_aDesiredFacingDirection, fn_8002C0AC(this->GetTweaks()),
+            SeekDirection(mUnidentified024.m_aActualFacingDirection,
+                mUnidentified024.m_aDesiredFacingDirection, fn_8002C0AC(this->GetTweaks()),
                 fn_8002CF10(this->GetTweaks()), fDeltaT),
             true);
 
-        nlPolarToCartesian(m_v3Velocity.x, m_v3Velocity.y,
-            m_aActualFacingDirection,
+        nlPolarToCartesian(mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y,
+            mUnidentified024.m_aActualFacingDirection,
             InterpolateRangeClamped(lbl_806DB8B4, lbl_806DB8B8, 0.0f, 4.0f,
                 fn_800A6388(m_pTeam)));
 
         nlVector2 v3Distance = {
-            m_v3Position.x - v3Zero.x,
-            m_v3Position.y - v3Zero.y,
+            mUnidentified024.m_v3Position.x - v3Zero.x,
+            mUnidentified024.m_v3Position.y - v3Zero.y,
         };
         if (nlSqrt(v3Distance.x * v3Distance.x
                     + v3Distance.y * v3Distance.y,
@@ -3959,7 +3956,7 @@ void cFielder::fn_80046244()
         if (m_pBall != 0)
         {
             ReleaseBall(0);
-            g_pBall->ShootRelease(m_v3Velocity, SPINTYPE_NONE);
+            g_pBall->ShootRelease(mUnidentified024.m_v3Velocity, SPINTYPE_NONE);
             fn_8001458C(g_pBall);
         }
 
@@ -3975,8 +3972,8 @@ void cFielder::fn_80046244()
         SetAnimState(0x7C, false, 0.2f, false, false);
         InitMovementCoast();
 
-        nlVector3 v3Velocity = m_v3Velocity;
-        v3Velocity.y += AIsgn(m_v3Position.y);
+        nlVector3 v3Velocity = mUnidentified024.m_v3Velocity;
+        v3Velocity.y += AIsgn(mUnidentified024.m_v3Position.y);
         v3Velocity.z += lbl_806E35DC;
         SetVelocity(v3Velocity);
 
@@ -4001,7 +3998,7 @@ void cFielder::fn_80046244()
             m_pPhysicsCharacter->m_CanCollideWithWall = 0;
         }
 
-        bool bUnidentified = fn_8001E168(this);
+        bool bUnidentified = fn_8001E168();
         unsigned long soundID = 0x1CF82176;
         if (bUnidentified)
         {
@@ -4016,8 +4013,8 @@ void cFielder::InitActionPostWhistle()
     SetAction(ACTION_POST_WHISTLE);
     SetAnimState(0, false, 0.0f, false, false);
     InitMovementNone(0.0f, 0.0f);
-    Unknown8(m_aActualFacingDirection, false);
-    m_fActualSpeed = 0.0f;
+    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+    mUnidentified024.m_fActualSpeed = 0.0f;
     SetVelocity(v3Zero);
 }
 
@@ -4038,7 +4035,7 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
     }
 
     float fDistance
-        = nlSqrt(CalculateDistanceSquared(m_v3Position, v3BombPosition), true)
+        = nlSqrt(CalculateDistanceSquared(mUnidentified024.m_v3Position, v3BombPosition), true)
         - fRadius;
 
     if (fDistance > 1.0f && !IsFallenDown())
@@ -4049,7 +4046,7 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
     {
         if (!IsFallenDown())
         {
-            bool bUnidentified = fn_8001E168(this);
+            bool bUnidentified = fn_8001E168();
             unsigned long soundID = 0x00E606A2;
             if (bUnidentified)
             {
@@ -4075,7 +4072,7 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
         }
 
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
-        m_fDesiredSpeed = 0.0f;
+        mUnidentified024.m_fDesiredSpeed = 0.0f;
     }
 }
 
@@ -4088,7 +4085,7 @@ void cFielder::InitActionBombHitReact(const nlVector3& v3BombPosition)
 
     if (!IsFallenDown())
     {
-        bool bUnidentified = fn_8001E168(this);
+        bool bUnidentified = fn_8001E168();
         unsigned long soundID = 0x00E606A2;
         if (bUnidentified)
         {
@@ -4103,21 +4100,21 @@ void cFielder::InitActionBombHitReact(const nlVector3& v3BombPosition)
     u32 index = (((u16)((u16)GetFacingDeltaToPosition(v3BombPosition)) >> 14) & 3);
     SetAnimState(gHitReactAnims[2][index], true, 0.2f, false, false);
 
-    float fDX = m_v3Position.x - v3BombPosition.x;
-    float fDY = m_v3Position.y - v3BombPosition.y;
+    float fDX = mUnidentified024.m_v3Position.x - v3BombPosition.x;
+    float fDY = mUnidentified024.m_v3Position.y - v3BombPosition.y;
     float angleRad = nlATan2f(fDY, fDX);
     u16 targetAngle = (u16)(s32)(10430.378f * angleRad);
     SetFacingDirection(targetAngle + gHitReactFacingOffsets[index], true);
 
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
-    m_fDesiredSpeed = 0.0f;
+    mUnidentified024.m_fDesiredSpeed = 0.0f;
 }
 
 void cFielder::InitActionBananaReact(const nlVector3& fDeltaT)
 {
     u16 angleDiff
-        = (u16)abs_s16(m_aActualFacingDirection - m_aActualMovementDirection);
+        = (u16)abs_s16(mUnidentified024.m_aActualFacingDirection - mUnidentified024.m_aActualMovementDirection);
     if (angleDiff < 0x4000)
     {
         SetAnimState(0x63, true, 0.2f, false, false);
@@ -4130,7 +4127,7 @@ void cFielder::InitActionBananaReact(const nlVector3& fDeltaT)
     if (g_pBall->m_pOwner == this)
     {
         ReleaseBall(0);
-        ShootBallDueToContact(m_aActualFacingDirection);
+        ShootBallDueToContact(mUnidentified024.m_aActualFacingDirection);
     }
 
     PlayRumbleAction(2, GetGlobalPad());
@@ -4140,7 +4137,7 @@ void cFielder::InitActionBananaReact(const nlVector3& fDeltaT)
 
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
-    m_fDesiredSpeed = 0.0f;
+    mUnidentified024.m_fDesiredSpeed = 0.0f;
 }
 
 void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
@@ -4156,7 +4153,7 @@ void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
         }
         else
         {
-            ShootBallDueToContact(m_aActualFacingDirection);
+            ShootBallDueToContact(mUnidentified024.m_aActualFacingDirection);
         }
     }
 
@@ -4175,7 +4172,7 @@ void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
 
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
-    m_fDesiredSpeed = 0.0f;
+    mUnidentified024.m_fDesiredSpeed = 0.0f;
 }
 
 void cFielder::InitActionRunning()
@@ -4185,9 +4182,9 @@ void cFielder::InitActionRunning()
     if (m_eActionState != ACTION_RUNNING)
     {
         mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
-        m_aActualMovementDirection = m_aActualFacingDirection;
-        Unknown8(m_aActualFacingDirection, false);
-        m_fDesiredSpeed = m_fActualSpeed;
+        mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+        Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+        mUnidentified024.m_fDesiredSpeed = mUnidentified024.m_fActualSpeed;
         mActionRunningVars.bFirstCycleOfTurbo = false;
     }
 
@@ -4202,7 +4199,7 @@ void cFielder::ActionRunning(float dt)
         mActionRunningWBVars.bWaitForAnimToFinish = false;
         mActionRunningWBVars.bCuePitch = false;
         mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
-        m_aActualMovementDirection = m_aActualFacingDirection;
+        mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
         bIsModified = false;
         mUnidentified374 = UnidentifiedFielderPair374();
     }
@@ -4227,7 +4224,7 @@ void cFielder::ActionRunning(float dt)
             mActionRunningWBVars.bWaitForAnimToFinish = false;
             mActionRunningWBVars.bCuePitch = false;
             mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
-            m_aActualMovementDirection = m_aActualFacingDirection;
+            mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
             bIsModified = false;
             mUnidentified374 = UnidentifiedFielderPair374();
         }
@@ -4240,7 +4237,7 @@ void cFielder::InitActionRunningWB(bool bWaitForAnimToFinish)
     mActionRunningWBVars.bWaitForAnimToFinish = bWaitForAnimToFinish;
     mActionRunningWBVars.bCuePitch = false;
     mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
-    m_aActualMovementDirection = m_aActualFacingDirection;
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
     bIsModified = false;
     mUnidentified374 = UnidentifiedFielderPair374();
 }
@@ -4255,9 +4252,9 @@ void cFielder::ActionRunningWB(float dt)
     {
         nlVector3 v3Target;
         nlPolarToCartesian(
-            v3Target.x, v3Target.y, m_aActualFacingDirection, 2.0f);
+            v3Target.x, v3Target.y, mUnidentified024.m_aActualFacingDirection, 2.0f);
         v3Target.z = 0.0f;
-        nlVec3Add(v3Target, v3Target, m_v3Position);
+        nlVec3Add(v3Target, v3Target, mUnidentified024.m_v3Position);
         asmRunningWB(dt);
     }
 }
@@ -4274,10 +4271,10 @@ void cFielder::fn_8004B658()
         DoResetShotMeter(0.0f);
         fn_8003A544(this);
         InitMovementRunningNoTurn(0.0f, fn_8002CFB0(this->GetTweaks()));
-        m_fDesiredSpeed = 0.0f;
-        if (m_fActualSpeed > fn_8002C328(this->GetTweaks()))
+        mUnidentified024.m_fDesiredSpeed = 0.0f;
+        if (mUnidentified024.m_fActualSpeed > fn_8002C328(this->GetTweaks()))
         {
-            m_fActualSpeed = fn_8002C328(this->GetTweaks());
+            mUnidentified024.m_fActualSpeed = fn_8002C328(this->GetTweaks());
         }
 
         cFielder* pFielder = this;
@@ -4319,7 +4316,7 @@ void cFielder::fn_8004B148()
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction((eFielderActionState)0x13);
 
-    u16 aDirection = m_aActualFacingDirection;
+    u16 aDirection = mUnidentified024.m_aActualFacingDirection;
     if (GetGlobalPad() != 0)
     {
         if (m_pController->GetMovementStickMagnitude() > 0.01f)
@@ -4328,16 +4325,16 @@ void cFielder::fn_8004B148()
         }
     }
 
-    if (m_fActualSpeed < fn_8002C5A4(this->GetTweaks()))
+    if (mUnidentified024.m_fActualSpeed < fn_8002C5A4(this->GetTweaks()))
     {
         float fMinSpeed = fn_8002C5A4(this->GetTweaks());
-        m_fActualSpeed = fMinSpeed;
-        m_fDesiredSpeed = fMinSpeed;
+        mUnidentified024.m_fActualSpeed = fMinSpeed;
+        mUnidentified024.m_fDesiredSpeed = fMinSpeed;
     }
 
     nlVector3 v3Velocity;
     nlPolarToCartesian(v3Velocity.x, v3Velocity.y, aDirection,
-        fn_8003C300(this, m_fActualSpeed));
+        fn_8003C300(this, mUnidentified024.m_fActualSpeed));
     v3Velocity.z = 0.0f;
     SetVelocity(v3Velocity);
     InitMovementCoast();
@@ -4364,7 +4361,7 @@ void cFielder::fn_8004B2E4(float fDeltaT)
 {
     if (m_pBall != 0 && m_pCurrentAnimController->TestFrameTrigger(1.0f))
     {
-        float fSpeed = m_fActualSpeed + mUnidentified374.mUnidentified04;
+        float fSpeed = mUnidentified024.m_fActualSpeed + mUnidentified374.mUnidentified04;
         if (fSpeed < lbl_806DB8E8)
         {
             fSpeed = lbl_806DB8E8;
@@ -4372,7 +4369,7 @@ void cFielder::fn_8004B2E4(float fDeltaT)
 
         nlVector3 v3BallVelocity;
         nlPolarToCartesian(v3BallVelocity.x, v3BallVelocity.y,
-            m_aActualFacingDirection, fSpeed);
+            mUnidentified024.m_aActualFacingDirection, fSpeed);
         v3BallVelocity.z = InterpolateRangeClamped(lbl_806DB8D0,
             lbl_806DB8D4, lbl_806DB8D8, lbl_806DB8DC,
             mUnidentified374.mUnidentified04);
@@ -4434,25 +4431,25 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
         if (m_pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
         {
             g_pBall->m_uGoalType = 2;
-            if (m_eCharacterClass == (eCharacterClass)0x10)
+            if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10)
             {
                 fn_800395C0(this);
             }
-            else if (m_eCharacterClass == (eCharacterClass)0x0D
-                     || m_eCharacterClass == (eCharacterClass)0x12
-                     || m_eCharacterClass + 0 == (eCharacterClass)0x13)
+            else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0D
+                     || mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12
+                     || mUnidentified024.m_eCharacterClass + 0 == (eCharacterClass)0x13)
             {
                 fn_8004E438();
                 return true;
             }
-            else if (m_eCharacterClass == (eCharacterClass)0x0E)
+            else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0E)
             {
                 if (lbl_806E1608->mUnidentified02C != 0)
                 {
                     fn_801A6344(lbl_806E1608->mUnidentified02C, this);
                 }
             }
-            else if (m_eCharacterClass == (eCharacterClass)0x0C)
+            else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0C)
             {
                 if (lbl_806E1608->mUnidentified028 != 0)
                 {
@@ -4490,13 +4487,13 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
         }
         }
 
-        float fSpeed = m_fActualSpeed;
+        float fSpeed = mUnidentified024.m_fActualSpeed;
         InitMovementRunningNoTurn(0.0f, fSpeed / fn_8002C7E8(this->GetTweaks()));
-        m_fDesiredSpeed = 0.0f;
+        mUnidentified024.m_fDesiredSpeed = 0.0f;
 
         nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
         nlVector3 v3Delta;
-        nlVec3Sub(v3Delta, v3NetPos, m_v3Position);
+        nlVec3Sub(v3Delta, v3NetPos, mUnidentified024.m_v3Position);
         Unknown8(nlVector3ToAngle(v3Delta), false);
         return true;
     }
@@ -4507,7 +4504,7 @@ void cFielder::InitActionSlideAttack(
 {
     if (!IsStuck())
     {
-        nlVector3 v3Velocity = m_v3Velocity;
+        nlVector3 v3Velocity = mUnidentified024.m_v3Velocity;
 
         SetAction(ACTION_SLIDE_ATTACK);
         SetAnimState(0x5E, true, 0.2f, false, false);
@@ -4530,8 +4527,8 @@ void cFielder::InitActionSlideAttack(
             nlVector3 v3TargetVelocity;
             if (pTarget != 0)
             {
-                v3TargetPosition = pTarget->m_v3Position;
-                v3TargetVelocity = pTarget->m_v3Velocity;
+                v3TargetPosition = pTarget->mUnidentified024.m_v3Position;
+                v3TargetVelocity = pTarget->mUnidentified024.m_v3Velocity;
             }
             else
             {
@@ -4548,13 +4545,13 @@ void cFielder::InitActionSlideAttack(
         if (fn_8003E70C(this))
         {
             nlPolarToCartesian(
-                v3Velocity.x, v3Velocity.y, m_aActualFacingDirection, fSpeed);
+                v3Velocity.x, v3Velocity.y, mUnidentified024.m_aActualFacingDirection, fSpeed);
         }
         else
         {
             nlVector3 v3BallDelta;
-            nlVec3Sub(v3BallDelta, m_v3Position, g_pBall->m_v3Position);
-            float fAdjust = m_fPlayerScale;
+            nlVec3Sub(v3BallDelta, mUnidentified024.m_v3Position, g_pBall->m_v3Position);
+            float fAdjust = mUnidentified024.m_fPlayerScale;
             float fBallDistance
                 = nlSqrt(v3BallDelta.GetLengthSq3D(), true);
 
@@ -4571,7 +4568,7 @@ void cFielder::InitActionSlideAttack(
                 else
                 {
                     nlPolarToCartesian(v3Velocity.x, v3Velocity.y,
-                        m_aActualFacingDirection, fSpeed);
+                        mUnidentified024.m_aActualFacingDirection, fSpeed);
                 }
             }
             else
@@ -4579,12 +4576,12 @@ void cFielder::InitActionSlideAttack(
                 if (0.0f == fTime)
                 {
                     nlPolarToCartesian(v3Velocity.x, v3Velocity.y,
-                        m_aActualFacingDirection, fSpeed);
+                        mUnidentified024.m_aActualFacingDirection, fSpeed);
                 }
                 else
                 {
-                    v3Velocity.x = v3Target.x - m_v3Position.x;
-                    v3Velocity.y = v3Target.y - m_v3Position.y;
+                    v3Velocity.x = v3Target.x - mUnidentified024.m_v3Position.x;
+                    v3Velocity.y = v3Target.y - mUnidentified024.m_v3Position.y;
                     v3Velocity.z = 0.0f;
                     float fLengthSq = v3Velocity.GetLengthSq3D();
                     if (fLengthSq > lbl_806E361C)
@@ -4596,14 +4593,14 @@ void cFielder::InitActionSlideAttack(
                     else
                     {
                         nlPolarToCartesian(v3Velocity.x, v3Velocity.y,
-                            m_aActualFacingDirection, fSpeed);
+                            mUnidentified024.m_aActualFacingDirection, fSpeed);
                     }
                 }
 
                 nlPolar polar;
                 nlCartesianToPolar(polar, v3Velocity.x, v3Velocity.y);
                 Unknown8(polar.a, false);
-                SetFacingDirection(m_aDesiredFacingDirection, true);
+                SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
             }
         }
 
@@ -4613,8 +4610,8 @@ void cFielder::InitActionSlideAttack(
         nlPolar polar;
         nlCartesianToPolar(polar, v3Velocity.x, v3Velocity.y);
         float fFinalSpeed = polar.r;
-        m_fDesiredSpeed = fFinalSpeed;
-        m_fActualSpeed = fFinalSpeed;
+        mUnidentified024.m_fDesiredSpeed = fFinalSpeed;
+        mUnidentified024.m_fActualSpeed = fFinalSpeed;
 
         StopSound(0x2AE03886, this);
         PlaySound(0, 0x2AE03886, "SlideAttack", this);
@@ -4643,7 +4640,7 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
     if (eNewAction != ACTION_UNKNOWN_15)
     {
         m_pShotMeter->Abort();
-        if (m_eCharacterClass == (eCharacterClass)0x10
+        if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10
             && eNewAction != (eFielderActionState)1)
         {
             mUnidentified178 = 1.0f;
@@ -4651,7 +4648,7 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
     }
     else
     {
-        if (m_eCharacterClass == (eCharacterClass)0x10
+        if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10
             && m_pShotMeter->m_eShotMeterState != SHOT_METER_STS_RELEASED)
         {
             mUnidentified178 = 1.0f;
@@ -4667,11 +4664,11 @@ void cFielder::fn_8004BB80(float fDeltaT)
 
     nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
     nlVector3 v3Delta;
-    nlVec3Sub(v3Delta, v3NetPos, m_v3Position);
-    m_aDesiredFacingDirection = nlVector3ToAngle(v3Delta);
+    nlVec3Sub(v3Delta, v3NetPos, mUnidentified024.m_v3Position);
+    mUnidentified024.m_aDesiredFacingDirection = nlVector3ToAngle(v3Delta);
 
     SetFacingDirection(
-        SeekDirection(m_aActualFacingDirection, m_aDesiredFacingDirection,
+        SeekDirection(mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_aDesiredFacingDirection,
             fn_8002CF88(this->GetTweaks()), fn_8002CF9C(this->GetTweaks()),
             fDeltaT),
         false);
@@ -4683,20 +4680,20 @@ void cFielder::fn_8004BB80(float fDeltaT)
         fChargeTime = 0.01f;
     }
 
-    InitMovementRunningNoTurn(0.0f, m_fActualSpeed / fChargeTime);
-    m_fDesiredSpeed = 0.0f;
+    InitMovementRunningNoTurn(0.0f, mUnidentified024.m_fActualSpeed / fChargeTime);
+    mUnidentified024.m_fDesiredSpeed = 0.0f;
 
     if (fChargeTime < 0.5f && lbl_806E0C74 == 0)
     {
-        if (AIsgn(m_v3Position.x)
+        if (AIsgn(mUnidentified024.m_v3Position.x)
             == AIsgn(m_pTeam->GetOtherNet()->m_v3NetLocation.x))
         {
             nlVector3 v3Dir;
-            nlVec3Sub(v3Dir, m_v3Position,
+            nlVec3Sub(v3Dir, mUnidentified024.m_v3Position,
                 m_pTeam->GetOtherNet()->m_v3NetLocation);
             float fRecipLength = nlRecipSqrt(v3Dir.GetLengthSq3D(), true);
             nlVec3Scale(v3Dir, v3Dir, fRecipLength);
-            nlVec3ScaleAdd(v3Dir, 2.0f, v3Dir, m_v3Position);
+            nlVec3ScaleAdd(v3Dir, 2.0f, v3Dir, mUnidentified024.m_v3Position);
 
             lbl_806E0C74 = new (nlMalloc(
                 sizeof(AvoidablePolygon), 8, false))
@@ -4711,7 +4708,7 @@ void cFielder::fn_8004BB80(float fDeltaT)
         m_pShotMeter->Update(fDeltaT);
     }
 
-    if (m_eCharacterClass == (eCharacterClass)0x10 && m_pBall != 0)
+    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10 && m_pBall != 0)
     {
         ShotMeter* pShotMeter = m_pShotMeter;
         float fWindow = 0.1f;
@@ -4737,12 +4734,12 @@ void cFielder::fn_8004C02C(float fDeltaT)
     {
         nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
         nlVector3 v3Delta;
-        nlVec3Sub(v3Delta, v3NetPos, m_v3Position);
-        m_aDesiredFacingDirection = nlVector3ToAngle(v3Delta);
+        nlVec3Sub(v3Delta, v3NetPos, mUnidentified024.m_v3Position);
+        mUnidentified024.m_aDesiredFacingDirection = nlVector3ToAngle(v3Delta);
 
         SetFacingDirection(
-            SeekDirection(m_aActualFacingDirection,
-                m_aDesiredFacingDirection, lbl_806E3618,
+            SeekDirection(mUnidentified024.m_aActualFacingDirection,
+                mUnidentified024.m_aDesiredFacingDirection, lbl_806E3618,
                 fn_8002CF9C(this->GetTweaks()), fDeltaT),
             false);
     }
@@ -4756,15 +4753,15 @@ void cFielder::fn_8004C02C(float fDeltaT)
 
             if (g_pBall->meBallState == 8)
             {
-                if (m_eCharacterClass == (eCharacterClass)0x11)
+                if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x11)
                 {
                     fn_801B75C8(this, 4, 0, 0, 1);
                 }
-                else if (m_eCharacterClass == (eCharacterClass)0x0F)
+                else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0F)
                 {
                     fn_801B75C8(this, 3, 0, 0, 1);
                 }
-                else if (m_eCharacterClass == (eCharacterClass)0x10)
+                else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10)
                 {
                     fn_801B75C8(this, 5, 0, 0, 1);
                 }
@@ -4803,8 +4800,8 @@ void cFielder::fn_8004C88C(float fDeltaT)
     if (!bAttackSucceeded && mUnidentified388 == 0 && fn_8003E6FC())
     {
         nlVector3 v3Delta;
-        v3Delta.y = g_pBall->m_v3Position.y - m_v3Position.y;
-        v3Delta.x = g_pBall->m_v3Position.x - m_v3Position.x;
+        v3Delta.y = g_pBall->m_v3Position.y - mUnidentified024.m_v3Position.y;
+        v3Delta.x = g_pBall->m_v3Position.x - mUnidentified024.m_v3Position.x;
         float fLength = nlSqrt(
             v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y, true);
         float fRecipLength = 1.0f
@@ -4816,13 +4813,13 @@ void cFielder::fn_8004C88C(float fDeltaT)
         v3Delta.y = lbl_806E3620 * fDir[1];
         v3Delta.x = lbl_806E3620 * fDir[0];
 
-        float fVelX2 = m_v3Velocity.x * m_v3Velocity.x;
-        float fVelY2 = m_v3Velocity.y * m_v3Velocity.y;
+        float fVelX2 = mUnidentified024.m_v3Velocity.x * mUnidentified024.m_v3Velocity.x;
+        float fVelY2 = mUnidentified024.m_v3Velocity.y * mUnidentified024.m_v3Velocity.y;
         float fSpeed = nlSqrt(fVelX2 + fVelY2, true);
 
         float fBlend[2];
-        fBlend[1] = v3Delta.y + m_v3Velocity.y;
-        fBlend[0] = v3Delta.x + m_v3Velocity.x;
+        fBlend[1] = v3Delta.y + mUnidentified024.m_v3Velocity.y;
+        fBlend[0] = v3Delta.x + mUnidentified024.m_v3Velocity.x;
         float fRecipBlend = 1.0f
             / nlSqrt(fBlend[0] * fBlend[0] + fBlend[1] * fBlend[1], true);
         float fBlendN[2];
@@ -4915,9 +4912,9 @@ void cFielder::fn_8004C88C(float fDeltaT)
     {
     case 0:
     {
-        nlVector3 v3Velocity = m_v3Velocity;
+        nlVector3 v3Velocity = mUnidentified024.m_v3Velocity;
         nlPolarToCartesian(v3Velocity.x, v3Velocity.y,
-            m_aActualFacingDirection, m_fActualSpeed);
+            mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_fActualSpeed);
         v3Velocity.z = 0.0f;
         SetVelocity(v3Velocity);
 
@@ -4953,8 +4950,8 @@ void cFielder::fn_8004C88C(float fDeltaT)
         }
 
         InitMovementRunningNoTurn(
-            0.0f, (m_fActualSpeed - fTargetSpeed) / fDecelTime);
-        m_fDesiredSpeed = fTargetSpeed;
+            0.0f, (mUnidentified024.m_fActualSpeed - fTargetSpeed) / fDecelTime);
+        mUnidentified024.m_fDesiredSpeed = fTargetSpeed;
 
         if (m_tSlideAttackTimer.m_uPackedTime == 0)
         {
@@ -5022,8 +5019,8 @@ void cFielder::fn_8004D480(const nlVector3& v3CollisionVelocity)
         nlCartesianToPolar(
             polar, v3CollisionVelocity.x, v3CollisionVelocity.y);
         SetFacingDirection(polar.a, true);
-        m_aActualMovementDirection = polar.a;
-        m_fDesiredSpeed = 0.0f;
+        mUnidentified024.m_aActualMovementDirection = polar.a;
+        mUnidentified024.m_fDesiredSpeed = 0.0f;
 
         PlayRumbleAction(2, GetGlobalPad());
 
@@ -5083,9 +5080,9 @@ void cFielder::InitActionReceivePass(int animID, nlVector3& v3TargetPos,
 
     nlVector3 v3Direction;
     nlVec3Set(v3Direction,
-        v3TargetPos.x - m_v3Position.x,
-        v3TargetPos.y - m_v3Position.y,
-        v3TargetPos.z - m_v3Position.z);
+        v3TargetPos.x - mUnidentified024.m_v3Position.x,
+        v3TargetPos.y - mUnidentified024.m_v3Position.y,
+        v3TargetPos.z - mUnidentified024.m_v3Position.z);
 
     InitMovementFromAnim(sDirectionSeekSpeed, v3Direction,
         fAdjustEndTime * lbl_806DB990, false);
@@ -5133,7 +5130,7 @@ void cFielder::fn_8004E228()
             mUnidentified3D8 = -lbl_806DB8B0;
         }
         mUnidentified3DA = mUnidentified3DA + mUnidentified3D8;
-        SetFacingDirection(mUnidentified3DA + m_aActualFacingDirection, true);
+        SetFacingDirection(mUnidentified3DA + mUnidentified024.m_aActualFacingDirection, true);
     }
 }
 
@@ -5145,25 +5142,25 @@ void cFielder::fn_8004E438()
 
     nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
     nlVector3 v3Delta;
-    nlVec3Sub(v3Delta, v3NetPos, m_v3Position);
+    nlVec3Sub(v3Delta, v3NetPos, mUnidentified024.m_v3Position);
     Unknown8(nlVector3ToAngle(v3Delta), false);
-    SetFacingDirection(m_aDesiredFacingDirection, true);
+    SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
 
-    if (m_eCharacterClass == (eCharacterClass)0x0D)
+    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0D)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
         PlayOwnedSound(mUnidentified318, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC,
             "Skillshot", this);
     }
-    else if (m_eCharacterClass == (eCharacterClass)0x12)
+    else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
         PlayOwnedSound(mUnidentified318, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC,
             "Skillshot", this);
     }
-    else if (m_eCharacterClass == (eCharacterClass)0x13)
+    else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         fn_8019AA00(mUnidentified420, this);
@@ -5206,14 +5203,14 @@ void cFielder::fn_8004E6B4()
 
             nlVector3 v3Target;
             v3Target.x = fDistance * m_m4WorldMatrix.e2[0][0]
-                + m_v3Position.x;
+                + mUnidentified024.m_v3Position.x;
             v3Target.y = fDistance * m_m4WorldMatrix.e2[0][1]
-                + m_v3Position.y;
+                + mUnidentified024.m_v3Position.y;
             v3Target.z = fDistance * m_m4WorldMatrix.e2[0][2]
-                + m_v3Position.z;
+                + mUnidentified024.m_v3Position.z;
 
             nlVector3 v3Delta;
-            nlVec3Sub(v3Delta, v3Target, m_v3Position);
+            nlVec3Sub(v3Delta, v3Target, mUnidentified024.m_v3Position);
 
             float fSpeed = pProjectile->_028->m_gravity;
             float fGravity = fn_801A1168(pProjectile)->z;
@@ -5255,7 +5252,7 @@ void cFielder::fn_8004E8B8()
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
         muInvincibleStatus |= 1;
-        if (m_eCharacterClass == (eCharacterClass)0x13)
+        if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
         {
             fn_801B90F8(this);
             PlayOwnedSound(mUnidentified318, 0x3D267BDF,
@@ -5282,7 +5279,7 @@ void cFielder::fn_8004E92C()
             DoResetShotMeter(0.0f);
             m_pShotMeter->CalcOneTimerValue(this, false);
 
-            if (m_eCharacterClass == (eCharacterClass)0x12)
+            if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12)
             {
                 g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
 
@@ -5299,7 +5296,7 @@ void cFielder::fn_8004E92C()
                 }
                 fn_801B75C8(this, 1, 0, 0, 0);
             }
-            else if (m_eCharacterClass == (eCharacterClass)0x0D)
+            else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0D)
             {
                 DoRegularShooting(false);
                 fn_801B75C8(this, 1, 0, 0, 0);
@@ -5317,10 +5314,10 @@ void cFielder::fn_8004E92C()
 
 void cFielder::fn_8004EAB4(float fDeltaT)
 {
-    if (m_eCharacterClass == (eCharacterClass)0x13)
+    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
         mUnidentified420->position = GetJointPosition(m_nBallJointIndex);
-        mUnidentified420->velocity = m_v3Velocity;
+        mUnidentified420->velocity = mUnidentified024.m_v3Velocity;
     }
 
     if (ShouldStartCrossBlend(4))
@@ -5336,12 +5333,12 @@ void cFielder::fn_8004EC40()
         fn_80039CF0(this, 0);
     }
 
-    if (m_eCharacterClass == (eCharacterClass)0x12)
+    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12)
     {
         fn_80038158(this, 0);
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
     }
-    else if (m_eCharacterClass == (eCharacterClass)0x13)
+    else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
         fn_80038158(this, 0);
 
@@ -5355,7 +5352,7 @@ void cFielder::fn_8004EC40()
         }
 
         SetVelocity(v3Zero);
-        m_v3PrevVelocity = v3Zero;
+        mUnidentified024.m_v3PrevVelocity = v3Zero;
     }
 
     StopSound(0x3D267BDF, this);
@@ -5368,7 +5365,7 @@ void cFielder::fn_8004ED64()
     SetAction((eFielderActionState)0x21);
     InitMovementCoast();
 
-    mUnidentified410.mUnidentified00 = m_v3Position;
+    mUnidentified410.mUnidentified00 = mUnidentified024.m_v3Position;
     mUnidentified410.mUnidentified0C = true;
 
     g_pBall->m_tNoPickupTimer.SetSeconds(0.5f);
@@ -5418,7 +5415,7 @@ void cFielder::fn_8004EE48(float fDeltaT)
     }
     else
     {
-        nlVector3 v3Position = m_v3Position;
+        nlVector3 v3Position = mUnidentified024.m_v3Position;
         v3Position.z
             *= 1.0f - m_pCurrentAnimController->m_fTime;
         if (v3Position.z < 0.0f)
@@ -5446,7 +5443,7 @@ void cFielder::fn_8004EE48(float fDeltaT)
 
 void cFielder::fn_8004F180()
 {
-    nlVector3 v3Position = m_v3Position;
+    nlVector3 v3Position = mUnidentified024.m_v3Position;
     v3Position.z = 0.0f;
     SetPosition(v3Position);
 
@@ -5463,7 +5460,7 @@ void cFielder::fn_8004F204()
     SetAnimState(0, false, 0.0f, false, false);
     InitMovementNone(0.0f, 0.0f);
 
-    nlVector3 v3Position = m_v3Position;
+    nlVector3 v3Position = mUnidentified024.m_v3Position;
     v3Position.z = lbl_806E3624;
     SetPosition(v3Position);
     SetVelocity(v3Zero);
@@ -5484,9 +5481,9 @@ void cFielder::fn_8004F2FC(float fDeltaT)
         {
         case 0x7C:
         {
-            if (m_v3Velocity.z < 0.0f && m_v3Position.z <= 0.1f)
+            if (mUnidentified024.m_v3Velocity.z < 0.0f && mUnidentified024.m_v3Position.z <= 0.1f)
             {
-                nlVector3 v3Position = m_v3Position;
+                nlVector3 v3Position = mUnidentified024.m_v3Position;
                 v3Position.z = 0.0f;
                 SetPosition(v3Position);
                 SetVelocity(v3Zero);
@@ -5495,13 +5492,13 @@ void cFielder::fn_8004F2FC(float fDeltaT)
             }
             else
             {
-                nlVector3 v3Velocity = m_v3Velocity;
+                nlVector3 v3Velocity = mUnidentified024.m_v3Velocity;
                 float fDamping = 1.0f - 0.5f * fDeltaT;
                 v3Velocity.x *= fDamping;
                 v3Velocity.y *= fDamping;
                 v3Velocity.z = -30.0f * fDeltaT + v3Velocity.z;
                 SetVelocity(v3Velocity);
-                m_v3Position.z += v3Velocity.z * fDeltaT;
+                mUnidentified024.m_v3Position.z += v3Velocity.z * fDeltaT;
             }
             break;
         }
@@ -5522,7 +5519,7 @@ void cFielder::InitActionWait()
     SetAction(ACTION_WAIT);
     SetAnimState(0, true, 0.2f, false, false);
     InitMovementNone(0.0f, 0.0f);
-    Unknown8(m_aActualFacingDirection, false);
+    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
 }
 
 void cFielder::ActionWait(float fDeltaT)
@@ -5531,7 +5528,7 @@ void cFielder::ActionWait(float fDeltaT)
 
 void cFielder::fn_8004E11C(float fParam)
 {
-    Unknown8(m_aActualFacingDirection, false);
+    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
     fn_80097358(this, fParam);
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_UNKNOWN_31);

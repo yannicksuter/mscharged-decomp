@@ -37,7 +37,6 @@ extern "C" void fn_80319E84(
 extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
 extern "C" float fn_800D85F8(cFielder*);
 extern "C" float fn_800D9EC4(cPlayer*);
-extern "C" float fn_800DF74C(cTeam*);
 extern "C" void fn_800D2074();
 
 extern bool lbl_806E0C50;
@@ -350,7 +349,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual3(float deltaTime)
     }
 
     if (!waitForController && g_pGame->IsGameplayOrOvertime()
-        && !fn_800DF74C(GetFielder()->m_pTeam)
+        && !UserControlledT(GetFielder()->m_pTeam)
         && !fn_80319FEC(this, 17) && fn_800D85F8(GetFielder()))
     {
         UnidentifiedVariantCollection params;
@@ -404,8 +403,8 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
         {
             cFielder* outOfBoundsFielder = GetFielder();
             bool shouldRunToTarget;
-            if ((outOfBoundsFielder->m_v3Position.x > 20.6f
-                    || outOfBoundsFielder->m_v3Position.x < -20.6f)
+            if ((outOfBoundsFielder->mUnidentified024.m_v3Position.x > 20.6f
+                    || outOfBoundsFielder->mUnidentified024.m_v3Position.x < -20.6f)
                 && !fn_800D9EC4(outOfBoundsFielder)
                 && !outOfBoundsFielder->fn_800344B0()
                 && !outOfBoundsFielder->IsShattered())
@@ -424,7 +423,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
                 params.Set(2, FuzzyVariant(lbl_806DC3B8[0]));
 
                 nlVector3 position = lbl_804DC388;
-                position.x = GetFielder()->m_v3Position.x;
+                position.x = GetFielder()->mUnidentified024.m_v3Position.x;
                 position.x -= 10.0f * AIsgn(position.x);
                 params.Set(14, FuzzyVariant(FT_VECTOR, position));
             }
@@ -434,7 +433,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
     {
         cTeam* team = fielder->m_pTeam;
         FormationSpec* formation;
-        if ((int)g_pGame->mUnidentified024 == team->m_nSide)
+        if ((int)g_pGame->m_nLastTeamToScore == team->m_nSide)
         {
             formation = FormationManager::GetFormationSpec(
                 (eFormation)nlStringHash(lbl_80502C28));

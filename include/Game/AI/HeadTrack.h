@@ -10,8 +10,11 @@ void CalcHeadTrackMatrix(unsigned short spin, unsigned short tilt,
 class cHeadTrack
 {
 public:
-    cHeadTrack();
-    virtual ~cHeadTrack();
+    cHeadTrack()
+    {
+        UnidentifiedReset();
+    }
+    virtual ~cHeadTrack() { }
 
     void UnidentifiedReset()
     {

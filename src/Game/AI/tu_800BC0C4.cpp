@@ -15,8 +15,6 @@ extern "C" float fn_8002C7D0(PlayerTweaks*);
 extern "C" float fn_8002CFD8(PlayerTweaks*);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" bool fn_8003E73C(cFielder*);
-extern "C" void fn_8001EE74(cFielder*, float, float, float);
-extern "C" void fn_8001EF6C(cFielder*, float);
 extern "C" void fn_80038158(cFielder*, bool);
 extern "C" void fn_801B8164(cFielder*);
 extern "C" void fn_801B7F8C(cFielder*);
@@ -90,8 +88,7 @@ bool DesireMushroom::UnidentifiedInitialize(void* context)
     fn_8002E340(mUnidentifiedFielder);
     if (!mUnidentifiedFielder->fn_8003E74C())
     {
-        fn_8001EE74(
-            mUnidentifiedFielder, lbl_806DC17C, 0.2f, -1.0f);
+        mUnidentifiedFielder->fn_8001EE74(lbl_806DC17C, 0.2f, -1.0f);
     }
     EmitMushroom(mUnidentifiedFielder, false);
     return result;
@@ -118,7 +115,7 @@ void DesireMushroom::UnidentifiedCleanup()
     if (!mUnidentifiedFielder->fn_8003E74C()
         && !fn_8003E73C(mUnidentifiedFielder))
     {
-        fn_8001EE74(mUnidentifiedFielder, 1.0f, 0.2f, -1.0f);
+        mUnidentifiedFielder->fn_8001EE74(1.0f, 0.2f, -1.0f);
     }
 }
 
@@ -228,13 +225,13 @@ void DesireGooey::UnidentifiedUpdate(
             1.0f, mf_NotRunning_SpeedScale, 0.02f, 2.0f, mfGooPercentage);
         float movementScale = InterpolateRangeClamped(
             1.0f, mf_NotRunning_MovementScale, 0.02f, 2.0f, mfGooPercentage);
-        fn_8001EF6C(mUnidentifiedFielder, movementScale);
+        mUnidentifiedFielder->fn_8001EF6C(movementScale);
     }
     else
     {
         float movementScale = InterpolateRangeClamped(
             1.0f, mfMaxGooEffect, 0.0f, 1.0f, mfGooPercentage);
-        fn_8001EF6C(mUnidentifiedFielder, movementScale);
+        mUnidentifiedFielder->fn_8001EF6C(movementScale);
     }
 
     if (!g_pGame->IsGameplayOrOvertime())
@@ -253,7 +250,7 @@ void DesireGooey::UnidentifiedUpdate(
 void DesireGooey::UnidentifiedCleanup()
 {
     mfMaxGooEffect = 1.0f;
-    fn_8001EF6C(mUnidentifiedFielder, 1.0f);
+    mUnidentifiedFielder->fn_8001EF6C(1.0f);
     mUnidentifiedFielder->m_pCurrentAnimController->m_fPlaybackSpeedScale = 1.0f;
 }
 
@@ -309,12 +306,12 @@ bool DesireConfused::UnidentifiedInitialize(void* context)
             mUnidentifiedFielder->EndDesire();
             mUnidentifiedFielder->InitActionRunning();
         }
-        else if (mUnidentifiedFielder->m_eCharacterClass
+        else if (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass
                      == (eCharacterClass)0x13
                  && mUnidentifiedFielder->m_eActionState
                         == ACTION_UNKNOWN_32)
         {
-            unsigned short direction = mUnidentifiedFielder->m_aActualFacingDirection;
+            unsigned short direction = mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
             bool hasGlobalPad = mUnidentifiedFielder->GetGlobalPad() != 0;
             if (hasGlobalPad)
             {
@@ -326,7 +323,7 @@ bool DesireConfused::UnidentifiedInitialize(void* context)
         {
             mUnidentifiedFielder->ReleaseBall(0);
             mUnidentifiedFielder->ShootBallDueToContact(
-                mUnidentifiedFielder->m_aActualFacingDirection);
+                mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection);
         }
     }
 
@@ -351,14 +348,14 @@ bool DesireConfused::UnidentifiedReinitialize(void* context)
     }
 
     if (mUnidentifiedFielder->m_pBall != 0
-        && (mUnidentifiedFielder->m_eCharacterClass
+        && (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass
                 != (eCharacterClass)0x13
             || mUnidentifiedFielder->m_eActionState
                    != ACTION_UNKNOWN_32))
     {
         mUnidentifiedFielder->ReleaseBall(0);
         mUnidentifiedFielder->ShootBallDueToContact(
-            mUnidentifiedFielder->m_aActualFacingDirection);
+            mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection);
     }
     return result;
 }

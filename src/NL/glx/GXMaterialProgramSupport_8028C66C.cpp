@@ -28,30 +28,6 @@ extern "C"
         int texCoord5, int finalTexture);
 }
 
-struct GXMaterialProgramParameters_80298B18
-{
-    /* 0x00 */ UnidentifiedTextureState texture0;
-    /* 0x08 */ UnidentifiedTextureState texture1;
-    /* 0x10 */ UnidentifiedTextureState texture2;
-    /* 0x18 */ UnidentifiedTextureState texture3;
-    /* 0x20 */ UnidentifiedTextureState texture4;
-    /* 0x28 */ UnidentifiedTextureState texture5;
-    /* 0x30 */ const float (*matrices)[3][4];
-    /* 0x34 */ unsigned long matricesSize;
-    /* 0x38 */ float value56;
-    /* 0x3C */ float value60;
-    /* 0x40 */ float scaleX;
-    /* 0x44 */ float scaleY;
-    /* 0x48 */ int textureIndex;
-    /* 0x4C */ float value76;
-    /* 0x50 */ int value80;
-    /* 0x54 */ unsigned long value84;
-    /* 0x58 */ int value88;
-    /* 0x5C */ int value92;
-    /* 0x60 */ int value96;
-    /* 0x64 */ int value100;
-}; // size: 0x68
-
 static int lbl_806DF008 = 5;
 static int lbl_806DF00C = 4;
 static bool lbl_806DF010 = true;

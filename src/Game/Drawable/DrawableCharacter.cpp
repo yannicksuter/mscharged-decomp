@@ -1,5 +1,8 @@
 #include "Game/Drawable/DrawableCharacter.h"
 #include "Game/GameObjectLighting.h"
+#include "Game/Character.h"
+#include "Game/Player.h"
+#include "Game/DB/CharacterInfo.h"
 #include "Game/Render/PeachPhoto.h"
 
 #include "Game/BasicStadium.h"
@@ -42,92 +45,11 @@ struct UnidentifiedStaticTag;
 template <typename T>
 UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
 
-struct LightObject
-{
-    char _000[0x2C];
-    int intervalIndex;
-    float height;
-    float radius;
-};
-
 struct PoseNode
 {
     virtual void Reserved0() = 0;
     virtual void Reserved1() = 0;
     virtual void Evaluate(float, cPoseAccumulator*) = 0;
-};
-
-struct Character
-{
-    nlVector3& GetJointPosition(int) const;
-    int GetBallJointIndex() const { return ballJointIndex; }
-
-    char _000[0x1C];
-    int characterType;
-    char _020[4];
-    int characterClass;
-    char _028[8];
-    nlVector3 position;
-    char _03C[0x0C];
-    nlVector3 velocity;
-    char _054[0x0E];
-    u16 facingDirection;
-    char _064[0x3C];
-    union
-    {
-        float height;
-        float scale;
-    };
-    char _0A4[0x18];
-    cPoseAccumulator* sourcePoseAccumulator;
-    void* object;
-    void* unknownC4;
-    void* animationController;
-    char _0CC[8];
-    cHeadTrack* headTrack;
-    int headJointIndex;
-    int bip01JointIndex;
-    char _0E0[0x10];
-    int specialState;
-    char _0F4[0x0C];
-    u32 normalTexture;
-    u32 swapTexture;
-    u32 alternateTexture;
-    ResolvedTexture resolvedNormalTexture;
-    ResolvedTexture resolvedSwapTexture;
-    ResolvedTexture resolvedAlternateTexture;
-    char _118[4];
-    LightObject* shadowLight;
-    int partitionIndex;
-    char _124[0x40];
-    float damage1;
-    float damage2;
-    int damageType;
-    char _170[8];
-    float blendAmount;
-    u8 shadowEnabled;
-    u8 alternateView;
-    u8 flag2;
-    u8 flag3;
-    u8 megaEnabled;
-    u8 flag5;
-    u8 flag6;
-    u8 _183;
-    nlVector4 megaBasis;
-    nlVector3 megaTranslation;
-    float megaScale;
-    char _1A4[4];
-    union
-    {
-        float state1A8;
-        float megaBlend;
-    };
-    char _1AC[4];
-    EffectsTexturing* effectsTexturing;
-    char _1B4[0x144];
-    int ballJointIndex;
-    char _2FC[0x18];
-    cTeam* teamOrPlayer;
 };
 
 struct SkinMesh
@@ -225,11 +147,8 @@ extern "C" int fn_8030C374(cPoseAccumulator*);
 extern "C" void fn_8030C380(cPoseAccumulator*, int, void (*)(void*), void*, int);
 extern "C" int fn_8030CC1C(cSHierarchy*, u32);
 extern "C" void fn_8017BF84(void*);
-extern "C" bool fn_8001C534(Character*, bool);
-extern "C" SkinMesh* fn_8001C550(Character*, int);
-extern "C" void fn_8001C574(Character*);
-extern "C" void fn_8001D6F4(Character*, cPoseAccumulator*, int);
-extern "C" void fn_8001EFCC(Character*, SkinMesh*, Model*);
+extern "C" SkinMesh* fn_8001C550(cCharacter*, int);
+extern "C" void fn_8001EFCC(cCharacter*, SkinMesh*, Model*);
 extern "C" void fn_80182EC8(int);
 extern "C" int fn_800FC748(int);
 extern "C" int fn_80183DEC(const nlVector3*);
@@ -291,7 +210,7 @@ u8 lbl_806E13B1;
 u8 lbl_806E13B2;
 int lbl_806E13B4;
 u8 lbl_806E13B8;
-Character* DrawableCharacter::renderOnlyCharacter;
+cCharacter* DrawableCharacter::renderOnlyCharacter;
 bool DrawableCharacter::renderOpposingGoalie;
 u8 lbl_806E13C1;
 bool DrawableCharacter::sCameraRelativeLighting;
@@ -494,45 +413,45 @@ void DrawableCharacter::Free()
 
 cPN_SAnimController& DrawableCharacter::GetAnimController() const
 {
-    return *(cPN_SAnimController*)character->animationController;
+    return *(cPN_SAnimController*)character->m_pCurrentAnimController;
 }
 
-void DrawableCharacter::Grab(Character& source)
+void DrawableCharacter::Grab(cCharacter& source)
 {
     character = &source;
-    position = source.position;
-    bip01Position = source.GetJointPosition(source.bip01JointIndex);
-    headPosition = source.GetJointPosition(source.headJointIndex);
+    position = source.mUnidentified024.m_v3Position;
+    bip01Position = source.GetJointPosition(source.m_nBip01JointIndex_0xA4);
+    headPosition = source.GetJointPosition(source.m_nHeadJointIndex);
     height = bip01Position.z;
-    scale = source.height;
-    flag2 = source.flag2;
-    flag3 = source.flag3;
-    megaEnabled = source.megaEnabled;
+    scale = source.mUnidentified024.m_fPlayerScale;
+    flag2 = source.mUnidentified17E;
+    flag3 = source.mUnidentified17F;
+    megaEnabled = source.mUnidentified180;
     if (megaEnabled)
     {
-        megaTranslation = source.megaTranslation;
-        megaBasis = source.megaBasis;
-        megaScale = source.megaScale;
+        megaTranslation = source.mUnidentified194;
+        megaBasis = *(const nlVector4*)&source.mUnidentified184;
+        megaScale = source.mUnidentified1A0;
     }
-    flag5 = source.flag5;
-    flag6 = source.flag6;
-    typeIsOne = source.characterType == 1;
-    blendAmount = source.blendAmount;
-    state40 = source.state1A8;
-    shadowLevel = (float)BoolAsDouble(source.shadowEnabled != 0);
+    flag5 = source.mUnidentified181;
+    flag6 = source.mUnidentified182;
+    typeIsOne = source.m_ModelType == 1;
+    blendAmount = source.mUnidentified178;
+    state40 = source.mUnidentified1A8;
+    shadowLevel = (float)BoolAsDouble(source.mUnidentified17C != 0);
     shadowLevel = shadowLevel * blendAmount;
-    velocity = source.velocity;
-    facingDirection = source.facingDirection;
-    headSpin = (u16)(int)source.headTrack->m_fHeadSpin;
-    headTilt = (u16)(int)source.headTrack->m_fHeadTilt;
+    velocity = source.mUnidentified024.m_v3Velocity;
+    facingDirection = source.mUnidentified024.m_aActualFacingDirection;
+    headSpin = (u16)(int)source.m_pHeadTrack->m_fHeadSpin;
+    headTilt = (u16)(int)source.m_pHeadTrack->m_fHeadTilt;
     visible = true;
-    useObject = source.sourcePoseAccumulator->m_bUseObject;
-    damage1 = source.damage1;
-    damage2 = source.damage2;
-    damageType = source.damageType;
+    useObject = source.m_pPoseAccumulator->m_bUseObject;
+    damage1 = source.m_Dirt;
+    damage2 = source.m_MinDirt;
+    damageType = source.mUnidentified16C;
     if (!useObject)
     {
-        object = source.object;
+        object = source.m_pPoseTree;
     }
 
     if (poseAccumulator == 0)
@@ -540,12 +459,12 @@ void DrawableCharacter::Grab(Character& source)
         cPoseAccumulator* accumulator =
             (cPoseAccumulator*)nlMalloc(sizeof(cPoseAccumulator), 8, false);
         accumulator = new (accumulator)
-            cPoseAccumulator(*source.sourcePoseAccumulator);
+            cPoseAccumulator(*source.m_pPoseAccumulator);
         poseAccumulator = accumulator;
     }
     else
     {
-        *poseAccumulator = *source.sourcePoseAccumulator;
+        *poseAccumulator = *source.m_pPoseAccumulator;
     }
 
     if (lbl_806E13B0 == 0 && megaEnabled)
@@ -567,7 +486,7 @@ void DrawableCharacter::Grab(Character& source)
         poseAccumulator->m_NodeMatrices[lbl_806E1398] = matrix;
     }
 
-    EffectsTexturing* texturing = source.effectsTexturing;
+    EffectsTexturing* texturing = source.m_pEffectsTexturing;
     if (texturing == 0)
     {
         texturing = fxGetTexturing(eFXTex_Nothing);
@@ -595,14 +514,14 @@ void DrawableCharacter::BuildNodeMatrices(cPoseAccumulator* accumulator)
     if (character != 0)
     {
         fn_8030C380(
-            accumulator, character->headJointIndex,
+            accumulator, character->m_nHeadJointIndex,
             fn_8017BF84, this, 0);
     }
     accumulator->BuildNodeMatrices(matrix);
     if (character != 0)
     {
         fn_8030C380(
-            accumulator, character->headJointIndex, 0, 0, 0);
+            accumulator, character->m_nHeadJointIndex, 0, 0, 0);
     }
 }
 
@@ -617,7 +536,7 @@ void DrawableCharacter::BuildNpcMatrix()
     fn_8030B9C8(poseAccumulator, &matrix);
 }
 
-void DrawableCharacter::Render(Character& source)
+void DrawableCharacter::Render(cCharacter& source)
 {
     if (!visible)
     {
@@ -626,34 +545,34 @@ void DrawableCharacter::Render(Character& source)
 
     bool special = false;
     if (typeIsOne
-        || (lbl_806E13AC != 0 && fn_8001C534(&source, true)))
+        || (lbl_806E13AC != 0 && source.fn_8001C534(1)))
     {
         special = true;
     }
 
     if (special)
     {
-        fn_8001D6F4(&source, poseAccumulator, 1);
+        source.PoseSkinMesh(poseAccumulator, 1);
     }
 
     if (!special || lbl_806DCB4C != 0)
     {
         if (m_pInstance__13nlTaskManager->state == 2)
         {
-            fn_8001D6F4(&source, poseAccumulator, 2);
+            source.PoseSkinMesh(poseAccumulator, 2);
         }
         else
         {
-            fn_8001D6F4(&source, poseAccumulator, 0);
+            source.PoseSkinMesh(poseAccumulator, 0);
         }
     }
-    fn_8001D6F4(&source, poseAccumulator, 3);
+    source.PoseSkinMesh(poseAccumulator, 3);
 
-    Character* renderOnly = renderOnlyCharacter;
+    cCharacter* renderOnly = renderOnlyCharacter;
     if (renderOnly == 0 || renderOnly == &source
         || (renderOpposingGoalie
             && (void*)&source
-                == (void*)renderOnly->teamOrPlayer->GetOtherTeam()->GetGoalie()))
+                == (void*)((cPlayer*)renderOnly)->m_pTeam->GetOtherTeam()->GetGoalie()))
     {
         if (special)
         {
@@ -669,23 +588,23 @@ void DrawableCharacter::Render(Character& source)
         }
     }
 
-    fn_8001C574(&source);
+    source.fn_8001C574();
 }
 
-void DrawableCharacter::SendToGl(Character& source, int renderPass)
+void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
 {
     SkinMesh* skinMesh;
-    int characterClass = source.characterClass;
+    int characterClass = source.mUnidentified024.m_eCharacterClass;
     int view = g_nCharacterView;
     if (gPeachPhotoState.state == 1)
     {
         view = 13;
-        if (source.alternateView)
+        if (source.mUnidentified17D)
         {
             view = 11;
         }
     }
-    if (characterClass == 5 && source.state1A8 > 0.0f)
+    if (characterClass == 5 && source.mUnidentified1A8 > 0.0f)
     {
         view = 15;
     }
@@ -870,9 +789,9 @@ void DrawableCharacter::Blend(
 
     if (character != 0)
     {
-        if (character->specialState == 2)
+        if (character->m_eClassType == 2)
         {
-            if (character->characterClass == 13)
+            if (character->mUnidentified024.m_eCharacterClass == 13)
             {
                 specialCharacter = true;
                 if (lbl_806E1394 <= 0)
@@ -1152,11 +1071,11 @@ void DrawableCharacter::EvaluateFrom(
     blendAmount = initialOne;
     state40 = initialZero;
 
-    float currentDamage1 = character->damage1;
+    float currentDamage1 = character->m_Dirt;
     damage1 = currentDamage1;
-    float currentDamage2 = character->damage2;
+    float currentDamage2 = character->m_MinDirt;
     damage2 = currentDamage2;
-    damageType = character->damageType;
+    damageType = character->mUnidentified16C;
     shadowLevel = initialOne;
 
     poseAccumulator->m_Scale = poseScale;
@@ -1175,30 +1094,30 @@ void DrawableCharacter::EvaluateFrom(
     if (character != 0)
     {
         fn_8030C380(
-            accumulator, character->headJointIndex,
+            accumulator, character->m_nHeadJointIndex,
             fn_8017BF84, this, 0);
     }
     accumulator->BuildNodeMatrices(matrix);
     if (character != 0)
     {
         fn_8030C380(
-            accumulator, character->headJointIndex, 0, 0, 0);
+            accumulator, character->m_nHeadJointIndex, 0, 0, 0);
     }
 
     nlMatrix4& bip01Matrix =
-        poseAccumulator->GetNodeMatrix(character->bip01JointIndex);
+        poseAccumulator->GetNodeMatrix(character->m_nBip01JointIndex_0xA4);
     bip01Position = GetMatrixTranslation(bip01Matrix);
     nlMatrix4& headMatrix =
-        poseAccumulator->GetNodeMatrix(character->headJointIndex);
+        poseAccumulator->GetNodeMatrix(character->m_nHeadJointIndex);
     headPosition = GetMatrixTranslation(headMatrix);
 }
 
 #pragma schedule off
 nlVector3 DrawableCharacter::GetBallPosition() const
 {
-    Character* player = *(Character* volatile*)&character;
+    cCharacter* player = *(cCharacter* volatile*)&character;
     nlMatrix4& matrix =
-        poseAccumulator->GetNodeMatrix(player->ballJointIndex);
+        poseAccumulator->GetNodeMatrix(((cPlayer*)player)->m_nBallJointIndex);
     return GetMatrixTranslation(matrix);
 }
 #pragma schedule reset
@@ -1207,7 +1126,7 @@ nlQuaternion DrawableCharacter::GetBallOrientation()
 {
     nlQuaternion result;
     nlMatrix4 matrix;
-    int ballJointIndex = character->ballJointIndex;
+    int ballJointIndex = ((cPlayer*)character)->m_nBallJointIndex;
 
     if (1.0f != scale)
     {
@@ -1240,7 +1159,7 @@ nlQuaternion DrawableCharacter::GetBallOrientation()
 }
 
 void DrawableCharacter::RenderOnlyOneCharacter(
-    Character& source, bool goalie)
+    cCharacter& source, bool goalie)
 {
     renderOnlyCharacter = &source;
     renderOpposingGoalie = goalie;
@@ -1275,7 +1194,7 @@ static inline void ApplyTexture(
 }
 
 void DrawableCharacter::ApplyMaterialEffects(
-    const Character& source,
+    const cCharacter& source,
     Model* model,
     eCharacterRenderPass renderPass,
     bool* attachEffects)
@@ -1283,7 +1202,7 @@ void DrawableCharacter::ApplyMaterialEffects(
     static u32 blendAmountHash = nlStringLowerHash(CharacterBlendAmountName);
 
     EffectsTexturing* texturing = effectsTexturing;
-    int characterClass = source.characterClass;
+    int characterClass = source.mUnidentified024.m_eCharacterClass;
 
     if (texturing != 0 && texturing->m_uTexture == 0xFFFFFFFF)
     {
@@ -1329,10 +1248,10 @@ void DrawableCharacter::ApplyMaterialEffects(
     }
     else
     {
-        u32 texture = source.normalTexture;
+        u32 texture = source.mUnidentified100;
         if (renderPass == CRP_Default)
         {
-            if (texture != source.swapTexture)
+            if (texture != source.mUnidentified104)
             {
                 for (ModelPacket* packet = model->packets;
                      packet < model->packets + model->packetCount;
@@ -1342,9 +1261,9 @@ void DrawableCharacter::ApplyMaterialEffects(
                         == fn_802CC7E4((glModelPacket*)packet, lbl_806E1F0C))
                     {
                         fn_802CC458((glModelPacket*)packet, lbl_806E1F0C,
-                            source.swapTexture);
+                            source.mUnidentified104);
                         ResolvedTexture packetTexture =
-                            source.resolvedSwapTexture;
+                            source.mUnidentified110;
                         fn_802CC4FC((glModelPacket*)packet, lbl_806E1F0C,
                             (const unsigned long*)&packetTexture.value);
                     }
@@ -1370,8 +1289,8 @@ void DrawableCharacter::ApplyMaterialEffects(
             {
                 ApplyTexture(
                     model,
-                    source.alternateTexture,
-                    source.resolvedAlternateTexture);
+                    source.mUnidentified108,
+                    source.mUnidentified114);
             }
         }
     }
@@ -1379,7 +1298,7 @@ void DrawableCharacter::ApplyMaterialEffects(
 
 #pragma opt_common_subs off
 void DrawableCharacter::ApplyDamageEffects(
-    const Character& source, Model* model, int renderPass)
+    const cCharacter& source, Model* model, int renderPass)
 {
     DrawableCharacter* self = this;
     ModelPacket* packet;
@@ -1433,7 +1352,7 @@ void DrawableCharacter::ApplyDamageEffects(
     static u32 megaBlendHash = nlStringLowerHash(CharacterMegaBlendName);
     const float zero = 0.0f;
     float megaAmount =
-        zero != lbl_806E13A8 ? lbl_806E13A8 : source.megaBlend;
+        zero != lbl_806E13A8 ? lbl_806E13A8 : source.mUnidentified1A8;
     if (megaAmount != zero)
     {
         for (packet = model->packets;
@@ -1539,12 +1458,12 @@ void DrawableCharacter::ApplyDamageEffects(
 #pragma opt_common_subs on
 
 void DrawableCharacter::RenderCharacterShadow(
-    const Character& source, void* skinModel, int renderContext)
+    const cCharacter& source, void* skinModel, int renderContext)
 {
     DrawableCharacter* drawable = this;
     ProjectedShadowParams params;
     Camera* camera;
-    LightObject* light;
+    const CharacterInfo* light;
     float height;
     float radius;
     int intervalIndex;
@@ -1563,14 +1482,14 @@ void DrawableCharacter::RenderCharacterShadow(
 
     static u32 blackHash = nlStringLowerHash(CharacterAlphaValueName);
     params.fScalar = 1.0f;
-    light = source.shadowLight;
-    float lightRadius = light->radius;
-    float lightHeight = light->height;
-    intervalIndex = light->intervalIndex;
+    light = source.mUnidentified11C;
+    float lightRadius = light->unknown_0x30.unknown_0x4;
+    float lightHeight = light->unknown_0x30.unknown_0x0;
+    intervalIndex = light->unknown_0x2C;
     radius = lbl_806DCB8C * lightRadius;
     height = lbl_806DCB90 * lightHeight;
     float one = 1.0f;
-    float characterScale = source.scale;
+    float characterScale = source.mUnidentified024.m_fPlayerScale;
     nlVec4Set(
         params.vLight,
         camera->position.x,
@@ -1582,7 +1501,7 @@ void DrawableCharacter::RenderCharacterShadow(
     params.fHeight = characterScale * height;
     params.pModel = 0;
     params.fScalar = currentShadowLevel;
-    params.nPartitionIndex = source.partitionIndex;
+    params.nPartitionIndex = source.mUnidentified120;
 
     if (m_pInstance__13nlTaskManager->state == 2)
     {

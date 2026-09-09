@@ -511,3 +511,8 @@ The repository's [CC0 license](../LICENSE) applies only to contributions whose
 authors have the right to make that dedication. Nintendo, Next Level Games,
 and third-party names, trademarks, game content, and other proprietary
 material are not granted or licensed by this repository.
+
+`cCameraManager::GetCamera<T>` in `Game/Camera/CameraMan.h` follows the
+predecessor header's template, including its identifiers and circular-list
+traversal. R4QE01's weather callback at `0x800AC6D8` embeds that lookup and
+writes the gameplay camera's zoom override.

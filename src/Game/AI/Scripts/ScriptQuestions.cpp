@@ -21,7 +21,6 @@ extern cBall* g_pBall;
 extern cTeam* g_pScriptOtherTeam;
 extern cTeam* g_pScriptCurrentTeam;
 extern cFielder* g_pScriptBallOwner;
-extern "C" bool fn_8001E168(const cCharacter* pCharacter);
 extern "C" float fn_800DB298(const nlVector3&, const nlVector3&, cFielder*,
     float, float, float, float, bool);
 extern "C" float fn_800DAFCC(const nlVector3&, const nlVector3&, cPlayer*,
@@ -151,7 +150,7 @@ float LastBallOwner(cPlayer* player)
         return 0.0f;
     }
 
-    if (g_pScriptBall->m_pPrevOwner == player)
+    if (g_pBall->m_pPrevOwner == player)
     {
         return 1.0f;
     }
@@ -250,7 +249,7 @@ float Captain(cFielder* fielder)
         return 0.0f;
     }
 
-    if (fn_8001E168(fielder))
+    if (fielder->fn_8001E168())
     {
         return 1.0f;
     }
@@ -351,7 +350,7 @@ float GoalieOutOfPosition(cFielder* pFielder)
 
     pGoalie = (cPlayer*)pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
     float halfNetWidth = cNet::m_fNetWidth / 2.0f;
-    goalieNetPos = pGoalie->m_v3Position;
+    goalieNetPos = pGoalie->mUnidentified024.m_v3Position;
     goalieNetPos.x = pGoalie->m_pTeam->m_pNet->m_v3NetLocation.x;
 
     float goalieY = goalieNetPos.y;
@@ -367,10 +366,10 @@ float GoalieOutOfPosition(cFielder* pFielder)
     const nlVector3& offNetLocation = pFielder->GetAIOffNetLocation(NULL);
 
     float fielderDistance = nlSqrt(
-        nlVec3DistanceSquared2D(pFielder->m_v3Position, offNetLocation), true);
+        nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position, offNetLocation), true);
 
     float goalieDistance = nlSqrt(
-        nlVec3DistanceSquared2D(pGoalie->m_v3Position, goalieNetPos), true);
+        nlVec3DistanceSquared2D(pGoalie->mUnidentified024.m_v3Position, goalieNetPos), true);
 
     if (!((double)fielderDistance > 0.0))
     {
@@ -395,7 +394,7 @@ float LikelyToScore(cFielder* pFielder)
     }
 
     cNet* pNet = pFielder->m_pTeam->GetOtherNet();
-    return fn_800DB298(pFielder->m_v3Position, pNet->m_v3NetLocation,
+    return fn_800DB298(pFielder->mUnidentified024.m_v3Position, pNet->m_v3NetLocation,
         pFielder, 0.0f, 0.2f, 1.0f, 0.0f, false);
 }
 
@@ -407,7 +406,7 @@ float Open(cFielder* pFielder)
     }
 
     return OpenPosition(
-        pFielder->m_v3Position,
+        pFielder->mUnidentified024.m_v3Position,
         pFielder->m_pTeam->GetOtherTeam(),
         NULL,
         NULL);
@@ -421,7 +420,7 @@ float WideOpen(cFielder* pFielder)
     }
 
     return WideOpenPosition(
-        pFielder->m_v3Position,
+        pFielder->mUnidentified024.m_v3Position,
         pFielder->m_pTeam->GetOtherTeam(),
         pFielder);
 }
@@ -435,7 +434,7 @@ float OpenToTheirNet(cFielder* pFielder)
 
     cTeam* pOtherTeam = pFielder->m_pTeam->GetOtherTeam();
 
-    return OpenToPosition(pFielder->m_v3Position, pFielder->GetAIOffNetLocation(NULL), pOtherTeam, pFielder, NULL, true);
+    return OpenToPosition(pFielder->mUnidentified024.m_v3Position, pFielder->GetAIOffNetLocation(NULL), pOtherTeam, pFielder, NULL, true);
 }
 
 float OpenTo(cPlayer* pFromFielder, cPlayer* pToFielder)
@@ -450,8 +449,8 @@ float OpenTo(cPlayer* pFromFielder, cPlayer* pToFielder)
         return 0.0f;
     }
 
-    float fResult = fn_800DAFCC(pFromFielder->m_v3Position,
-        pToFielder->m_v3Position, pFromFielder, pToFielder,
+    float fResult = fn_800DAFCC(pFromFielder->mUnidentified024.m_v3Position,
+        pToFielder->mUnidentified024.m_v3Position, pFromFielder, pToFielder,
         0.5f, 1.0f, 1.0f, 0.0f);
     return NormalizeVal(fResult, g_vOpenToAdjust);
 }
@@ -478,8 +477,7 @@ float UserControlledT(cTeam* team)
         return 0.0f;
     }
 
-    bool bHasAssignedController = team->GetNumAssignedControllers() > 0;
-    if (bHasAssignedController)
+    if (team->GetNumAssignedControllers() > 0)
     {
         return 1.0f;
     }

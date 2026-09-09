@@ -165,7 +165,7 @@ void PhysicsAIBall::CheckIfBallWentThroughGoalie()
     }
     Goalie* pGoalie = (Goalie*)pGoaliePlayer;
 
-    if (newPosition.x * pGoaliePlayer->m_v3Position.x < 0.0f)
+    if (newPosition.x * pGoaliePlayer->mUnidentified024.m_v3Position.x < 0.0f)
     {
         pGoalie = (Goalie*)g_pCharacters[9];
     }

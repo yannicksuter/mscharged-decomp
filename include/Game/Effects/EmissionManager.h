@@ -63,6 +63,7 @@ public:
     void Kill(const EffectsGroup* pEffectsGroup);
     bool IsPlaying(
         unsigned long userData, const EffectsGroup* pEffectsGroup);
+    bool fn_802E8544(unsigned long userData, const EffectsGroup* pEffectsGroup);
     void AddError(const char* format, ...);
     void Replay(LoadFrame& frame);
     void Replay(SaveFrame& frame);
@@ -90,6 +91,9 @@ public:
     /* 0x1F8 */ bool unknown_0x1F8;
     /* 0x1F9 */ u8 unknown_0x1F9[0x03];
 };
+
+extern "C" EmissionController* fn_802E7DC4(
+    EmissionManager*, const char*, int, bool, unsigned short);
 
 extern "C" void fn_802E6C20(EmissionManager*, void*, int, int);
 EmissionManager* GetEmissionManager();

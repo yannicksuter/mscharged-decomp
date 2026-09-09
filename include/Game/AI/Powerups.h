@@ -117,7 +117,7 @@ public:
     void fn_8009D74C(float seconds, bool bEnableCollisions);
     void SpeedManagement();
     void UpdateTransform();
-    static int AwardPowerup(cTeam* pTeam, cFielder* pFielder);
+    static int AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool);
     static void CollisionCallback(PhysicsObject* pObjA,
         PhysicsObject* pObjB, const nlVector3& v3Pos, void* pParam);
     static unsigned long GetSoundType(ePowerUpType type, PowerupSound powerupSnd);

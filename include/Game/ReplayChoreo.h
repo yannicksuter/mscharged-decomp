@@ -1,19 +1,13 @@
 #ifndef GAME_REPLAY_CHOREO_H
 #define GAME_REPLAY_CHOREO_H
 
+#include "Game/EventDataTypes.h"
 #include "Game/Camera/ReplayCamera.h"
 #include "Game/Camera/rumblefilter.h"
 #include "Game/InterpreterCore.h"
 #include "Game/ReplayManager.h"
 
 class cPlayer;
-
-struct GoalScoredData
-{
-    /* 0x00 */ u32 mUnidentified000;
-    /* 0x04 */ nlVector3 v3ShotPosition;
-    /* 0x10 */ cPlayer* pScorer;
-}; // total size: 0x14
 
 class ReplayChoreo : public InterpreterCore
 {

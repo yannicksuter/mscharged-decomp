@@ -74,7 +74,7 @@ void cFollowCamera::Update(float fDeltaT)
             return;
         }
 
-        m_v3OOI = pCharacter->m_v3Position;
+        m_v3OOI = pCharacter->mUnidentified024.m_v3Position;
     }
     else if (m_FollowTarget == FOLLOW_BALL)
     {

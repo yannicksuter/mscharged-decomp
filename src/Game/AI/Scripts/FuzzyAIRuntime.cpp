@@ -670,9 +670,9 @@ extern "C" void* fn_800E923C(void* runtime, cTeam* value)
 }
 
 extern "C" void fn_800E92E4(
-    Unidentified8002E1A4Result* state, const char* name)
+    UnidentifiedScriptMachine* state, const char* name)
 {
     UnidentifiedStringHash value(name);
-    state->mUnidentified00C = value.mUnidentifiedHash;
-    state->mUnidentified010 = value.mUnidentifiedFunction;
+    state->mUnidentified00C.mUnidentifiedHash = value.mUnidentifiedHash;
+    state->mUnidentified00C.mUnidentifiedFunction = value.mUnidentifiedFunction;
 }

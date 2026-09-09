@@ -6,6 +6,11 @@
 class PhysicsGoalie : public PhysicsCharacter
 {
 public:
+    PhysicsGoalie(float radius, float height)
+        : PhysicsCharacter(radius, height)
+    {
+    }
+
     virtual void PostUpdate();
 
     bool SweepTestForBallContact(const nlVector3& ballPrevPosition,

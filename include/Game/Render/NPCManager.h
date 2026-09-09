@@ -17,7 +17,7 @@ class UnidentifiedSkinAnimatedNPC_80199880;
 struct HammerObject;
 struct DaisyFistObject;
 struct BulletBillObject;
-struct State_80199E84;
+struct BirdoEggObject;
 struct KoopaShellObject;
 struct ThwompObject;
 class UnidentifiedObject_801B535C;
@@ -125,7 +125,7 @@ public:
     /* 0x1C */ NPCTemplate* mUnidentified01C;
     /* 0x20 */ ChainChomp* mpChainChomp;
     /* 0x24 */ UnidentifiedObject_801B535C* mUnidentified024;
-    /* 0x28 */ State_80199E84* mUnidentified028;
+    /* 0x28 */ BirdoEggObject* mUnidentified028;
     /* 0x2C */ KoopaShellObject* mUnidentified02C;
     /* 0x30 */ unsigned int mUnidentified030;
     /* 0x34 */ DaisyFistObject* mDaisyFists[8];
@@ -139,5 +139,7 @@ public:
 
 extern NPCManager* lbl_806E1608;
 extern NPCManager* lbl_806E160C;
+
+extern "C" void fn_801B4B24(SkinAnimatedNPC*, int);
 
 #endif // GAME_RENDER_NPCMANAGER_H

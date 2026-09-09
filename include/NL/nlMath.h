@@ -17,6 +17,11 @@ inline int nlMin(int a, int b)
     return a <= b ? a : b;
 }
 
+inline int nlMax(int a, int b)
+{
+    return a >= b ? a : b;
+}
+
 float nlRandomf(float fMin, float fMax, unsigned int* pSeed);
 float nlRandomf(float fMax, unsigned int* pSeed);
 float nlRandomf(float fMax);

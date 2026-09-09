@@ -195,6 +195,9 @@ public:
     /* 0x64 */ cFielder* mUnidentified064;
 }; // size: 0x68
 
+extern nlList<AvoidableObject> gAvoidableObjects;
+extern float sUnidentifiedTweaks[7][7];
+
 extern "C" int GetAvoidableIndex(eAvoidableThings avoidable);
 extern "C" int GetAvoidableMask(int index);
 

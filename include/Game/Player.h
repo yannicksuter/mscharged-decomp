@@ -17,7 +17,7 @@ class cSHierarchy;
 class AnimRetargetList;
 class CharacterPhysicsData;
 class SpaceSearch;
-class UnidentifiedPlayerRadius;
+class AvoidableObject;
 struct CollisionPlayerPlayerData;
 struct CollisionPlayerWallData;
 struct UnidentifiedEventData24;
@@ -83,6 +83,10 @@ public:
         return m_nBallJointIndex;
     }
     bool IsOnSameTeam(cPlayer* other);
+    cTeam* GetTeam() const
+    {
+        return m_pTeam;
+    }
     float DoFlashLight(const nlVector3& Position, unsigned short aDirection,
         float fAngleWeighting, float fIgnoreObjectCloserThanThis,
         float fIgnoreObjectFartherThanThis);
@@ -92,6 +96,7 @@ public:
     void fn_8009750C();
     void fn_80097648(float fParam);
     bool fn_800976C4();
+    void SetPowerupAnimState(int nodeIndex, int animID, float blendTime);
     bool IsCharacterInAir(float fParam) const;
     cPN_SingleAxisBlender* CreateSingleAxisBlender(
         const int* pSABAnims, int nNumSABAnims, int nPrimaryAnim,
@@ -163,7 +168,7 @@ public:
 
 public:
     /* 0x31C */ SpaceSearch* m_pSpaceSearch;
-    /* 0x320 */ UnidentifiedPlayerRadius* mUnidentified320;
+    /* 0x320 */ AvoidableObject* mUnidentified320;
 
 public:
     /* 0x324 */ PlayerTweaks* m_pTweaks;

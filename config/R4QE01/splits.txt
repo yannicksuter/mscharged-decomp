@@ -58,9 +58,10 @@ Game/AI/AvoidController.cpp:
 	.data       start:0x804F48A0 end:0x804F4A50
 	.sdata      start:0x806DB4E0 end:0x806DB500
 	.sdata2     start:0x806E3140 end:0x806E31B0
+	.sbss2      start:0x806E7BA8 end:0x806E7BB0
 
 Game/Ball.cpp:
-	.text       start:0x800133D8 end:0x8001BA0C
+	.text       start:0x800133D8 end:0x8001BCA0
 	.ctors      start:0x804DB4F8 end:0x804DB4FC
 	.rodata     start:0x804DBC30 end:0x804DBE58
 	.data       start:0x804F4A50 end:0x804F5078
@@ -70,7 +71,7 @@ Game/Ball.cpp:
 	.sdata2     start:0x806E31B0 end:0x806E3240
 
 Game/Character.cpp:
-	.text       start:0x8001BA0C end:0x80025E9C
+	.text       start:0x8001BCA0 end:0x80025E9C
 	.ctors      start:0x804DB4FC end:0x804DB500
 	.rodata     start:0x804DBE58 end:0x804DBE68
 	.data       start:0x804F5078 end:0x804F59C0
@@ -295,7 +296,7 @@ Game/AI/SpaceSearch.cpp:
 Game/Team.cpp:
 	.text       start:0x800A5D34 end:0x800A9140
 	.ctors      start:0x804DB550 end:0x804DB554
-	.rodata     start:0x804DC110 end:0x804DC180
+	.rodata     start:0x804DC110 end:0x804DC128
 	.data       start:0x80500940 end:0x80500BE8
 	.bss        start:0x8056D988 end:0x8056D9A0
 	.sdata      start:0x806DBEF0 end:0x806DBF18
@@ -324,6 +325,7 @@ Game/TweaksBase.cpp:
 unclassified/tu_800A9B78.cpp:
 	.text       start:0x800A9B78 end:0x800B0358
 	.ctors      start:0x804DB55C end:0x804DB560
+	.rodata     start:0x804DC128 end:0x804DC180
 	.data       start:0x80500D28 end:0x805012B8
 	.bss        start:0x8056D9E8 end:0x8056DA00
 	.sdata      start:0x806DBF20 end:0x806DC04C

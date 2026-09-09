@@ -130,6 +130,7 @@ public:
 
     void Delete(T* entry)
     {
+        entry->~T();
         Free(entry);
     }
 };

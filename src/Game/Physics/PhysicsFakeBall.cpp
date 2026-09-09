@@ -159,7 +159,7 @@ bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
     if (pBall->m_pOwner != 0)
     {
         v3Position = pBall->m_v3Position;
-        v3Velocity = pBall->m_pOwner->m_v3Velocity;
+        v3Velocity = pBall->m_pOwner->mUnidentified024.m_v3Velocity;
         return false;
     }
 

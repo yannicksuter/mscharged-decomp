@@ -14,7 +14,7 @@ void cAnimViewerCamera::Update(float fDeltaT)
 {
     if (m_pCurrentPlayer)
     {
-        m_v3OOI = m_pCurrentPlayer->m_v3Position;
+        m_v3OOI = m_pCurrentPlayer->mUnidentified024.m_v3Position;
     }
     cFollowCamera::Update(fDeltaT);
 }

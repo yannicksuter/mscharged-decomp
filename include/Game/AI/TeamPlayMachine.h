@@ -8,13 +8,6 @@
 class cTeam;
 class UnidentifiedVariantCollection;
 
-struct Unidentified8002E1A4Result
-{
-    u8 mUnidentified000[0x0C];
-    unsigned long mUnidentified00C;
-    void* mUnidentified010;
-};
-
 class UnidentifiedScriptMachine
 {
 public:
@@ -101,6 +94,6 @@ public:
 };
 
 class cFielder;
-Unidentified8002E1A4Result* fn_8002E1A4(cFielder* pFielder);
+UnidentifiedScriptMachine* fn_8002E1A4(cFielder* pFielder);
 
 #endif // GAME_AI_TEAM_PLAY_MACHINE_H

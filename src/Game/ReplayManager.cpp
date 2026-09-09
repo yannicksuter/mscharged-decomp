@@ -186,7 +186,7 @@ void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
 void ReplayManager::fn_80188D88()
 {
     {
-        Function<UnidentifiedEventData_800662B4*> callback(
+        Function<ReceiveBallData*> callback(
             UnidentifiedMakeReplayBinding(
                 &ReplayManager::fn_801895C0, this));
         UnidentifiedEventBase** foundEvent;
@@ -195,7 +195,7 @@ void ReplayManager::fn_80188D88()
         foundEvent = 0;
         g_pEventRegistry->Find(hash, &foundEvent, 0);
         UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventData_800662B4>*)event)
+        ((UnidentifiedTypedEvent<ReceiveBallData>*)event)
             ->Add(callback, 0, -1);
     }
     {
@@ -277,7 +277,7 @@ void ReplayManager::fn_801895B0()
     mEvents |= 0x40;
 }
 
-void ReplayManager::fn_801895C0(UnidentifiedEventData_800662B4* event)
+void ReplayManager::fn_801895C0(ReceiveBallData* event)
 {
     mEvents |= 4;
 }

@@ -4,6 +4,7 @@
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
@@ -15,7 +16,6 @@
 #include <stdlib.h>
 
 extern "C" cTeam* fn_800D6670(cFielder*);
-extern "C" float fn_800E02B8(cTeam*);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E39C(cFielder*);
 extern "C" float fn_8002E058(cFielder*);
@@ -49,7 +49,7 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
     else
     {
         float fDelay = InterpolateClamped(lbl_806DC11C, lbl_806DC120,
-            1.0f - fn_800E02B8(fn_800D6670(mUnidentifiedFielder)));
+            1.0f - Difficult(fn_800D6670(mUnidentifiedFielder)));
         mUnidentifiedB0 = fDelay;
 
         float fRange = fDelay * lbl_806DC124;
@@ -118,7 +118,7 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
 
         float fAccuracyRange = InterpolateRangeClamped(
             0.49f, 0.98f, 1.0f, 0.2f,
-            fn_800E02B8(fn_800D6670(mUnidentifiedFielder)));
+            Difficult(fn_800D6670(mUnidentifiedFielder)));
         mUnidentifiedA8 = nlRandomf(1.0f);
 
         int nSkillIndex = (int)(
@@ -273,7 +273,7 @@ bool DesireMegaStrike::fn_800B9D84(
     case 0:
     {
         bool bAtRequestedValue = false;
-        if (fn_800E02B8(mUnidentifiedFielder->m_pTeam) < 0.25f
+        if (Difficult(mUnidentifiedFielder->m_pTeam) < 0.25f
             && (float)mUnidentifiedA4
                 == mUnidentifiedFielder->fn_800489C4())
         {
@@ -289,7 +289,7 @@ bool DesireMegaStrike::fn_800B9D84(
 
             float fChance = InterpolateRangeClamped(
                 0.65f, 0.8f, 1.0f, 0.2f,
-                fn_800E02B8(mUnidentifiedFielder->m_pTeam));
+                Difficult(mUnidentifiedFielder->m_pTeam));
             if (nlRandomf(1.0f) > fChance)
             {
                 bButtonPressed = true;

@@ -14,7 +14,7 @@ extern "C" nlVector3* fn_80040234(cFielder*);
 extern "C" bool fn_800381B4(cFielder*, nlVector3*);
 extern "C" float fn_800DA6E8(cFielder*);
 extern "C" float fn_800D9070(cFielder*);
-extern "C" float fn_800DEFD4(cFielder*);
+float ReceivingPass(cFielder*);
 extern "C" float fn_800DEAB4(cFielder*);
 extern "C" cPlayer* fn_800DF790(cTeam*);
 extern cTeam* g_pCurrentlyUpdatingTeam;
@@ -47,7 +47,7 @@ bool DesireMark::UnidentifiedInitialize(void* context)
  */
 bool DesireDefendPos::UnidentifiedInitialize(void*)
 {
-    mvDesiredPosition = mUnidentifiedFielder->m_v3Position;
+    mvDesiredPosition = mUnidentifiedFielder->mUnidentified024.m_v3Position;
     mThinkTimer.m_unk0 = mThinkTimer.m_uPackedTime != 0;
     mThinkTimer.m_uPackedTime = 0;
     return true;
@@ -115,17 +115,17 @@ void DesireDefendPos::UnidentifiedUpdate(
             (short)mUnidentifiedFielder->m_pTeam->m_nSide];
         if ((unsigned int)(difficulty - 5) <= 2
             && (pMark->m_pBall != 0
-                || fn_800DEFD4(pMark) != 0.0f
+                || ReceivingPass(pMark) != 0.0f
                 || fn_800DEAB4(pMark) != 0.0f))
         {
-            v3MarkPosition = pMark->m_v3Position;
+            v3MarkPosition = pMark->mUnidentified024.m_v3Position;
             fMarkingDistance *= fMarkThreatCoeff;
             fSpeed = 1.5f;
         }
         else
         {
             nlVec3ScaleAdd(v3MarkPosition, lbl_806DC0B8,
-                pMark->m_v3Velocity, pMark->m_v3Position);
+                pMark->mUnidentified024.m_v3Velocity, pMark->mUnidentified024.m_v3Position);
         }
         v3MarkPosition.z = 0.0f;
 
@@ -145,7 +145,7 @@ void DesireDefendPos::UnidentifiedUpdate(
             {
                 nlVector3 v3SBCPosition;
                 nlVec3ScaleAdd(v3SBCPosition, lbl_806DC0B8,
-                    pSBC->m_v3Velocity, pSBC->m_v3Position);
+                    pSBC->mUnidentified024.m_v3Velocity, pSBC->mUnidentified024.m_v3Position);
 
                 nlVector3 v3SBCDir;
                 nlVec3Sub(v3SBCDir, v3SBCPosition, v3MarkPosition);
@@ -195,7 +195,7 @@ void DesireDefendPos::UnidentifiedUpdate(
             fn_800381B4(mUnidentifiedFielder, &v3FormationPosition);
         if (bInPosition)
         {
-            v3FormationPosition = mUnidentifiedFielder->m_v3Position;
+            v3FormationPosition = mUnidentifiedFielder->mUnidentified024.m_v3Position;
         }
         fn_800401C0(mUnidentifiedFielder, v3FormationPosition,
             0.8f, fFormationWeight);

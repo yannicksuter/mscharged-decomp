@@ -47,6 +47,9 @@ public:
         return pCamera;
     }
 
+    template <typename T>
+    static T* GetCamera(eCameraType type);
+
     static u16 m_aJoystickRemap;
     static cBaseCamera* m_cameraStack;
     static eCameraTransition m_transition;
@@ -64,6 +67,24 @@ public:
     static nlVector3 m_UpVectorStack[2];
     static int m_UpVectorStackSize;
 };
+
+template <typename T>
+T* cCameraManager::GetCamera(eCameraType type)
+{
+    cBaseCamera* cam = m_cameraStack;
+    if (cam != NULL)
+    {
+        do
+        {
+            if (cam->GetType() == type)
+            {
+                return (T*)cam;
+            }
+            cam = cam->m_next;
+        } while (cam != m_cameraStack);
+    }
+    return NULL;
+}
 
 cBaseCamera* GetNextCamera();
 

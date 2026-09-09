@@ -119,6 +119,13 @@ public:
         m_FreeList = slot;
     }
 
+    template <typename T>
+    void Delete(T* entry)
+    {
+        entry->~T();
+        Free(entry);
+    }
+
     SavedState m_States[5];
     int m_Depth;
 }; // size: 0x44

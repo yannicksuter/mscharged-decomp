@@ -4,7 +4,6 @@
 #include "Game/CharacterEffects.h"
 #include "NL/nlMath.h"
 
-struct Character;
 struct Model;
 struct PoseNode;
 class cCharacter;
@@ -27,12 +26,12 @@ public:
 
     void Free();
     cPN_SAnimController& GetAnimController() const;
-    void Grab(Character&);
+    void Grab(cCharacter&);
     static void HeadTrackCallback(u32, u32, cPoseAccumulator*, u32, int);
     void BuildNodeMatrices(cPoseAccumulator*);
     void BuildNpcMatrix();
-    void Render(Character&);
-    void SendToGl(Character&, int);
+    void Render(cCharacter&);
+    void SendToGl(cCharacter&, int);
     void Grab(SkinAnimatedMovableNPC&);
     void Render(SkinAnimatedMovableNPC&);
     void Blend(float*, DrawableCharacter&, DrawableCharacter&);
@@ -40,14 +39,14 @@ public:
     nlVector3 GetBallPosition() const;
     nlQuaternion GetBallOrientation();
 
-    static void RenderOnlyOneCharacter(Character&, bool);
+    static void RenderOnlyOneCharacter(cCharacter&, bool);
     static void RenderAllCharacters();
     static cCharacter* OnlyRenderingOneCharacter();
 
     void ApplyMaterialEffects(
-        const Character&, Model*, eCharacterRenderPass, bool*);
-    void ApplyDamageEffects(const Character&, Model*, int);
-    void RenderCharacterShadow(const Character&, void*, int);
+        const cCharacter&, Model*, eCharacterRenderPass, bool*);
+    void ApplyDamageEffects(const cCharacter&, Model*, int);
+    void RenderCharacterShadow(const cCharacter&, void*, int);
     static bool NoShadowCallback();
 
     u8 visible;
@@ -74,7 +73,7 @@ public:
     void* object;
     cPoseAccumulator* poseAccumulator;
     EffectsTexturing* effectsTexturing;
-    Character* character;
+    cCharacter* character;
     nlVector4 megaBasis;
     nlVector3 megaTranslation;
     float megaScale;
@@ -86,7 +85,7 @@ public:
     u32 scorchTexture;
     ResolvedTexture resolvedScorchTexture;
 
-    static Character* renderOnlyCharacter;
+    static cCharacter* renderOnlyCharacter;
     static bool renderOpposingGoalie;
     static bool sCameraRelativeLighting;
 };

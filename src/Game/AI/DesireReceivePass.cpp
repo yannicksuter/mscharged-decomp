@@ -25,7 +25,7 @@
 #include "Game/Player.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedPlayerRadius.h"
+#include "Game/AI/AvoidableObject.h"
 #include "NL/globalpad.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -209,9 +209,9 @@ bool DesireReceivePass::UnidentifiedInitialize(void* context)
 
     nlVector2 v2Delta = {
         mEstimated.v3AnimStartPos.x
-            - mUnidentifiedFielder->m_v3Position.x,
+            - mUnidentifiedFielder->mUnidentified024.m_v3Position.x,
         mEstimated.v3AnimStartPos.y
-            - mUnidentifiedFielder->m_v3Position.y,
+            - mUnidentifiedFielder->mUnidentified024.m_v3Position.y,
     };
     if (nlVec2LengthSquared(v2Delta) > fMaxDistanceSq)
     {
@@ -269,7 +269,7 @@ extern "C" void fn_800C0704(DesireReceivePass* pDesire)
             if (fn_80036A58(pFielder, &aDirection))
             {
                 unsigned short aHitDirection =
-                    pFielder->m_aActualFacingDirection;
+                    pFielder->mUnidentified024.m_aActualFacingDirection;
                 cAIPad* pAIPad = pFielder->m_pController;
                 if (pAIPad != 0
                     && pAIPad->GetMovementStickMagnitude() > 0.001f)
@@ -516,8 +516,8 @@ bool DesireReceivePass::fn_800C0E74()
     case 0:
     {
         nlVector2 v2Delta = {
-            mUnidentifiedFielder->m_v3Position.x - mv3PassIntercept.x,
-            mUnidentifiedFielder->m_v3Position.y - mv3PassIntercept.y,
+            mUnidentifiedFielder->mUnidentified024.m_v3Position.x - mv3PassIntercept.x,
+            mUnidentifiedFielder->mUnidentified024.m_v3Position.y - mv3PassIntercept.y,
         };
         result = nlVec2LengthSquared(v2Delta) > lbl_806DC1C4;
         break;
@@ -543,7 +543,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
                         ->GetAnim(pAnimInfo->nAnimID);
     nlVector3 v3ContactOffsetLocal;
     unsigned short aFacingDirection =
-        mUnidentifiedFielder->m_aActualFacingDirection;
+        mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
     mUnidentifiedFielder->GetJointPositionFuture(
         &v3ContactOffsetLocal, pAnimInfo->nAnimID,
         mUnidentifiedFielder->m_nBallJointIndex,
@@ -615,7 +615,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
         float fRadius =
             mUnidentifiedFielder->mUnidentified320->GetRadius();
         float fMaxCatchupSpeed = fn_8002E1B0(mUnidentifiedFielder);
-        CalcInterceptXY(mUnidentifiedFielder->m_v3Position,
+        CalcInterceptXY(mUnidentifiedFielder->mUnidentified024.m_v3Position,
             fMaxCatchupSpeed, fRadius, g_pBall->m_v3Position,
             g_pBall->m_v3Velocity, nNumIntercepts, fInterceptTimes);
 
@@ -659,7 +659,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
                 g_pBall->m_v3Position);
             nlVector3 v3FielderDirection;
             nlVec3Sub(v3FielderDirection, v3ClosestPoint,
-                mUnidentifiedFielder->m_v3Position);
+                mUnidentifiedFielder->mUnidentified024.m_v3Position);
 
             float fDot = 0.0f;
             bool bBallDirectionValid = false;
@@ -693,7 +693,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
             {
                 v3ClosestPoint = GetClosestPointOnLineABFromPointC(
                     v3FirstBallPosition, v3SecondBallPosition,
-                    mUnidentifiedFielder->m_v3Position);
+                    mUnidentifiedFielder->mUnidentified024.m_v3Position);
                 float fBlend = NormalizeVal(
                     nlVec2Length(*(nlVector2*)&g_pBall->m_v3Velocity)
                         / mUnidentifiedB4,
@@ -737,11 +737,11 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
 
     nlVector3 v3FacingDirection;
     nlVec3Sub(v3FacingDirection, estimated.v3BallContactPos,
-        mUnidentifiedFielder->m_v3Position);
+        mUnidentifiedFielder->mUnidentified024.m_v3Position);
     if (!fn_800C0E74())
     {
         nlVec3Sub(v3FacingDirection, g_pBall->m_v3Position,
-            mUnidentifiedFielder->m_v3Position);
+            mUnidentifiedFielder->mUnidentified024.m_v3Position);
     }
     estimated.aFacingDirection =
         nlVector3ToAngle(v3FacingDirection);
@@ -852,7 +852,7 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
     nlVector3 v3BallDirection;
     nlVec3Sub(v3BallDirection, v3BallPosition, v3BallContactPos);
     unsigned short aActualFacingDirection =
-        mUnidentifiedFielder->m_aActualFacingDirection;
+        mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
     unsigned short aIncomingDirection =
         nlVector3ToAngle(v3BallDirection) - aActualFacingDirection;
 
@@ -860,8 +860,8 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
     const LooseBallContactAnimInfo* pReachableAnimInfo = 0;
     float fBestContactOffset = lbl_806E4040;
     nlVector2 v2DistanceToContact = {
-        mUnidentifiedFielder->m_v3Position.x - v3BallContactPos.x,
-        mUnidentifiedFielder->m_v3Position.y - v3BallContactPos.y,
+        mUnidentifiedFielder->mUnidentified024.m_v3Position.x - v3BallContactPos.x,
+        mUnidentifiedFielder->mUnidentified024.m_v3Position.y - v3BallContactPos.y,
     };
     float fDistanceToContact = nlVec2Length(v2DistanceToContact);
 
@@ -954,11 +954,11 @@ void DesireReceivePass::fn_800C1A08()
 
         nlVector3 v3ToTarget;
         nlVec3Sub(v3ToTarget, v3BallPosition,
-            mUnidentifiedFielder->m_v3Position);
+            mUnidentifiedFielder->mUnidentified024.m_v3Position);
         mEstimated.aFacingTargetDirection =
             nlVector3ToAngle(v3ToTarget);
         mEstimated.aFacingDirection =
-            mUnidentifiedFielder->m_aActualFacingDirection;
+            mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
     }
     else
     {
@@ -966,7 +966,7 @@ void DesireReceivePass::fn_800C1A08()
         if (fn_800C0E74())
         {
             unsigned short aFacingDirection =
-                mUnidentifiedFielder->m_aActualFacingDirection;
+                mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
             mEstimated.aFacingDirection = aFacingDirection;
             mEstimated.aFacingTargetDirection = aFacingDirection;
         }
@@ -979,7 +979,7 @@ void DesireReceivePass::fn_800C1A08()
 
     const LooseBallContactAnimInfo* pBestBallContactAnimInfo =
         fn_800C2048(v3BallPosition,
-            mUnidentifiedFielder->m_v3Position,
+            mUnidentifiedFielder->mUnidentified024.m_v3Position,
             mEstimated.v3BallContactPos,
             mEstimated.aFacingTargetDirection, meReceiveAnimType);
 
@@ -987,8 +987,8 @@ void DesireReceivePass::fn_800C1A08()
         && mpOneTouchPassTarget != 0)
     {
         nlVector3 v3ToTarget;
-        nlVec3Sub(v3ToTarget, mpOneTouchPassTarget->m_v3Position,
-            mUnidentifiedFielder->m_v3Position);
+        nlVec3Sub(v3ToTarget, mpOneTouchPassTarget->mUnidentified024.m_v3Position,
+            mUnidentifiedFielder->mUnidentified024.m_v3Position);
         mEstimated.aFacingTargetDirection =
             nlVector3ToAngle(v3ToTarget);
 
@@ -1071,9 +1071,9 @@ bool DesireReceivePass::StartPickupAnimation()
 {
     nlVector2 v2Delta = {
         mEstimated.v3AnimStartPos.x
-            - mUnidentifiedFielder->m_v3Position.x,
+            - mUnidentifiedFielder->mUnidentified024.m_v3Position.x,
         mEstimated.v3AnimStartPos.y
-            - mUnidentifiedFielder->m_v3Position.y,
+            - mUnidentifiedFielder->mUnidentified024.m_v3Position.y,
     };
     float fDistance = nlSqrt(nlVec2LengthSquared(v2Delta), true);
     float fRadius = mUnidentifiedFielder->mUnidentified320->GetRadius();
@@ -1086,7 +1086,7 @@ bool DesireReceivePass::StartPickupAnimation()
     }
 
     short sFacingDelta = (short)(mEstimated.aFacingTargetDirection
-        - mUnidentifiedFielder->m_aActualFacingDirection);
+        - mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection);
     if (mbOneTouchShot && !mbOneTouchShotLate)
     {
         mUnidentifiedFielder->InitActionOneTimer(
@@ -1139,10 +1139,10 @@ extern "C" void fn_800C22CC(DesireReceivePass* pDesire,
         }
     }
 
-    nlVector3 v3PassPosition = pPassTarget->m_v3Position;
+    nlVector3 v3PassPosition = pPassTarget->mUnidentified024.m_v3Position;
     nlVector2 v2BallToTarget = {
-        pPassTarget->m_v3Position.x - g_pBall->m_v3Position.x,
-        pPassTarget->m_v3Position.y - g_pBall->m_v3Position.y,
+        pPassTarget->mUnidentified024.m_v3Position.x - g_pBall->m_v3Position.x,
+        pPassTarget->mUnidentified024.m_v3Position.y - g_pBall->m_v3Position.y,
     };
     float fPassCharge = NormalizeVal(
                             nlSqrt(nlVec2LengthSquared(v2BallToTarget), true),
@@ -1191,8 +1191,8 @@ extern "C" void fn_800C22CC(DesireReceivePass* pDesire,
             pPassTarget->SetSpaceSearch(pDesire->m_pSpaceSearch);
             pPassTarget->m_pSpaceSearch->m_bDebugOn = false;
             pPassTarget->m_pSpaceSearch->FindBestPosition(
-                v3PassPosition, pPassTarget->m_v3Position,
-                eSearchDirection, &pPasser->m_v3Position,
+                v3PassPosition, pPassTarget->mUnidentified024.m_v3Position,
+                eSearchDirection, &pPasser->mUnidentified024.m_v3Position,
                 6.0f, 0xAAAA);
 
             float fRadius;
@@ -1233,7 +1233,7 @@ extern "C" void fn_800C22CC(DesireReceivePass* pDesire,
         float fSin;
         float fCos;
         nlSinCos(&fSin, &fCos,
-            pPassTarget->m_aActualFacingDirection);
+            pPassTarget->mUnidentified024.m_aActualFacingDirection);
         nlVector3 v3ContactOffsetWorld;
         v3ContactOffsetWorld.z = v3ContactOffsetLocal.z;
         v3ContactOffsetWorld.x =

@@ -56,7 +56,7 @@ ImpostorModel_802DAEE0::ImpostorModel_802DAEE0(cSHierarchy& hierarchy,
             modelID, &hierarchy);
         if (mSkinMesh != 0)
         {
-            mSkinMesh->m_Unknown0C = (void*)1;
+            mSkinMesh->m_Unknown0C = 1;
         }
     }
 
@@ -90,7 +90,7 @@ ImpostorModel_802DAEE0::ImpostorModel_802DAEE0(cSHierarchy& hierarchy,
             modelID, &hierarchy);
         if (mSkinMesh != 0)
         {
-            mSkinMesh->m_Unknown0C = (void*)1;
+            mSkinMesh->m_Unknown0C = 1;
         }
     }
 
@@ -265,10 +265,10 @@ extern "C" void fn_802DB79C(ImpostorModel_802DAEE0* model)
     }
     if (model->mSkinMesh != 0)
     {
-        void* modelIndex = model->mSkinMesh->m_Unknown0C;
+        int modelIndex = model->mSkinMesh->m_Unknown0C;
         for (unsigned long i = 0; i < 2; ++i)
         {
-            model->mSkinMesh->m_Unknown0C = (void*)i;
+            model->mSkinMesh->m_Unknown0C = i;
             glModel* skinModel = model->mSkinMesh->GetModel();
             if (skinModel != 0)
             {

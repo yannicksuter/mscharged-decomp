@@ -7,11 +7,10 @@
 
 class GameplayCamera;
 class cFielder;
-struct UnidentifiedEventData00;
-struct UnidentifiedEventData32;
-struct UnidentifiedEventData_80065F14;
+struct CollisionThwompPlayerData;
+struct GoalScoredData;
 struct UnidentifiedEventData_8006649C;
-struct UnidentifiedEventData_80066748;
+struct PlayerAttackData;
 struct UnidentifiedEventData_8006701C;
 
 class UnidentifiedCameraEffects
@@ -35,27 +34,27 @@ public:
         float deltaTime, nlVector3* camera, nlVector3* target) const;
     nlVector3 CalculateTargetOffset(const GameplayCamera* camera) const;
 
-    void OnGoalScored(UnidentifiedEventData_80065F14* eventData);
+    void OnGoalScored(GoalScoredData* eventData);
     void ResetForPresentation(void* context);
-    void OnShotPresentation(UnidentifiedEventData00* eventData);
-    void OnShotPresentationEnd(UnidentifiedEventData00* eventData);
-    void OnCaptainClashPresentation(UnidentifiedEventData00* eventData);
-    void OnCaptainClashPresentationEnd(UnidentifiedEventData00* eventData);
-    void OnWindupPresentation(UnidentifiedEventData00* eventData);
-    void OnWindupPresentationEnd(UnidentifiedEventData00* eventData);
+    void OnShotPresentation();
+    void OnShotPresentationEnd();
+    void OnCaptainClashPresentation();
+    void OnCaptainClashPresentationEnd();
+    void OnWindupPresentation();
+    void OnWindupPresentationEnd();
     void OnMegaStrikeMeterStart(
         UnidentifiedEventData_8006701C* eventData);
-    void OnMegaStrikeMeterEnd(UnidentifiedEventData00* eventData);
+    void OnMegaStrikeMeterEnd();
     void OnGoalieSave(UnidentifiedEventData_8006649C* eventData);
-    void OnCollisionThwompPlayer(UnidentifiedEventData32* eventData);
+    void OnCollisionThwompPlayer(CollisionThwompPlayerData* eventData);
     void OnGoalieDekeAttackAttempt(
-        UnidentifiedEventData_80066748* eventData);
+        PlayerAttackData* eventData);
     void OnGoalieDekeAttackSuccess(
-        UnidentifiedEventData_80066748* eventData);
+        PlayerAttackData* eventData);
     void OnGoalieSlamAttackAttempt(
-        UnidentifiedEventData_80066748* eventData);
+        PlayerAttackData* eventData);
     void OnGoalieSlamAttackSuccess(
-        UnidentifiedEventData_80066748* eventData);
+        PlayerAttackData* eventData);
 
     /* 0x00 */ u32 mCameraFlags;
     /* 0x04 */ float mFlagUpdateTimer;

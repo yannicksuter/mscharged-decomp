@@ -60,6 +60,11 @@ public:
     {
         delete entry;
     }
+
+    void Delete(T* ptr)
+    {
+        delete ptr;
+    }
 };
 
 template <typename EntryT, typename ContainerT>

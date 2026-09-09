@@ -345,8 +345,8 @@ void PhysicsPatch::fn_80173B10(float time)
 void PhysicsPatch::fn_80173B18()
 {
     nlVector3 delta;
-    delta.x = m_pTarget->m_v3Position.x - GetPosition().x;
-    delta.y = m_pTarget->m_v3Position.y - GetPosition().y;
+    delta.x = m_pTarget->mUnidentified024.m_v3Position.x - GetPosition().x;
+    delta.y = m_pTarget->mUnidentified024.m_v3Position.y - GetPosition().y;
     float length = nlSqrt(delta.x * delta.x + delta.y * delta.y, true);
     if (length == 0.0f)
     {

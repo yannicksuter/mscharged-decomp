@@ -24,10 +24,10 @@ bool TutorialMegastrikeDesire::UnidentifiedInitialize(void*)
 
     for (int i = 0; i < 4; ++i)
     {
-        Unidentified8002E1A4Result* state = fn_8002E1A4(m_pTeam->GetFielder(i));
+        UnidentifiedScriptMachine* state = fn_8002E1A4(m_pTeam->GetFielder(i));
         UnidentifiedStringHash value(name);
-        state->mUnidentified00C = value.mUnidentifiedHash;
-        state->mUnidentified010 = value.mUnidentifiedFunction;
+        state->mUnidentified00C.mUnidentifiedHash = value.mUnidentifiedHash;
+        state->mUnidentified00C.mUnidentifiedFunction = value.mUnidentifiedFunction;
     }
 
     return true;

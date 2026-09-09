@@ -6,6 +6,7 @@
 #include "NL/nlSlotPool.h"
 
 class cCharacter;
+struct BulletBillObject;
 
 class PhysicsSphere_80175F8C : public PhysicsSphere
 {
@@ -41,6 +42,11 @@ public:
     /* 0x58 */ int sourceIndex;
     /* 0x5C */ bool finished;
 }; // size: 0x60
+
+extern "C" PhysicsSphere_80175F8C* fn_80176754(BulletBillObject* bulletBill);
+
+extern "C" PhysicsSphere_80175F8C* fn_801768E0(
+    const nlVector3* position, float maximumRadius);
 
 PhysicsSphere_80175F8C* CreateDaisyFistImpact(const nlVector3* position, cCharacter* owner);
 

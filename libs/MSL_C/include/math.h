@@ -49,8 +49,12 @@ extern "C"
 #endif
 
 #ifdef __MWERKS__
+#ifndef abs
 #define abs(n)  __abs(n)
+#endif
+#ifndef labs
 #define labs(n) __labs(n)
+#endif
     _MATH_INLINE double fabs(double x)
     {
         return __fabs(x);

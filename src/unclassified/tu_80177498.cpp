@@ -22,7 +22,7 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 extern "C" UnidentifiedEventRegistry_80177498* g_pEventRegistry;
 extern "C" bool fn_802B6BC8(const nlVector3*, const nlVector3*,
     const nlVector3*, const nlVector3*, float*, float*);
-extern "C" void fn_8014A180(void*);
+extern "C" void fn_8014A180(cFielder*);
 extern "C" void fn_802E8A2C(EmissionManager*, EffectsGroup*);
 
 extern "C" void fn_80179390(EmissionController&, int);
@@ -73,20 +73,20 @@ inline PhysicsBox_80177498::PhysicsBox_80177498(
 {
     nlMatrix3 mRotation;
     nlMakeRotationMatrixZ(
-        mRotation, sAngleToRadians * pParam->m_aActualFacingDirection);
+        mRotation, sAngleToRadians * pParam->mUnidentified024.m_aActualFacingDirection);
 
     mUnidentified038.x
-        = pParam->m_v3Position.x + lbl_806DCB1C * mRotation.m11;
+        = pParam->mUnidentified024.m_v3Position.x + lbl_806DCB1C * mRotation.m11;
     mUnidentified038.y
-        = pParam->m_v3Position.y + lbl_806DCB1C * mRotation.m12;
+        = pParam->mUnidentified024.m_v3Position.y + lbl_806DCB1C * mRotation.m12;
     mUnidentified038.z
-        = pParam->m_v3Position.z + lbl_806DCB1C * mRotation.m13;
+        = pParam->mUnidentified024.m_v3Position.z + lbl_806DCB1C * mRotation.m13;
     mUnidentified044.x
-        = pParam->m_v3Position.x - lbl_806DCB1C * mRotation.m11;
+        = pParam->mUnidentified024.m_v3Position.x - lbl_806DCB1C * mRotation.m11;
     mUnidentified044.y
-        = pParam->m_v3Position.y - lbl_806DCB1C * mRotation.m12;
+        = pParam->mUnidentified024.m_v3Position.y - lbl_806DCB1C * mRotation.m12;
     mUnidentified044.z
-        = pParam->m_v3Position.z - lbl_806DCB1C * mRotation.m13;
+        = pParam->mUnidentified024.m_v3Position.z - lbl_806DCB1C * mRotation.m13;
 
     nlVector3 v3Position;
     nlVec3WeightedSum(v3Position, sHalf, mUnidentified038,
@@ -399,8 +399,8 @@ PhysicsBox_80177498* WaluigiWallManager_80178400::fn_80178968(
                 = pManager->Create(pGroup, 3, true, 0);
             if (pController != 0)
             {
-                pController->SetPosition(pParam->m_v3Position);
-                pController->SetVelocity(pParam->m_v3Velocity);
+                pController->SetPosition(pParam->mUnidentified024.m_v3Position);
+                pController->SetVelocity(pParam->mUnidentified024.m_v3Velocity);
                 pController->m_uUserData = (unsigned long)pObject;
                 pController->SetUpdateCallback(
                     Function1<void, EmissionController&>(fn_801793D8));
@@ -534,8 +534,8 @@ extern "C" void fn_801793D8(EmissionController& rController)
         = (PhysicsBox_80177498*)rController.m_uUserData;
     if (pObject != 0 && pObject->mUnidentified050 != 0)
     {
-        rController.SetPosition(pObject->mUnidentified050->m_v3Position);
-        rController.SetVelocity(pObject->mUnidentified050->m_v3Velocity);
+        rController.SetPosition(pObject->mUnidentified050->mUnidentified024.m_v3Position);
+        rController.SetVelocity(pObject->mUnidentified050->mUnidentified024.m_v3Velocity);
     }
 }
 

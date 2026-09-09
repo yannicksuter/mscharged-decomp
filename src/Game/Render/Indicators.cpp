@@ -29,14 +29,6 @@ struct IndicatorControllerInfo
     /* 0x04 */ int mPadIndex;
 };
 
-struct IndicatorPlayerState
-{
-    /* 0x000 */ u8 mUnidentified000[0x1B4];
-    /* 0x1B4 */ nlVector3 mScreenPosition;
-    /* 0x1C0 */ u8 mUnidentified1C0[0xAC];
-    /* 0x26C */ float mSwitchScale;
-};
-
 struct IndicatorPlayerTweaks
 {
     /* 0x000 */ u8 mUnidentified000[0x10];
@@ -54,9 +46,6 @@ struct IndicatorCharacterInfoState
 extern "C"
 {
     extern cPlayer* lbl_8056B800[10];
-
-    bool fn_8001E184(cPlayer* pCharacter);
-
 }
 
 static float s_fOverheadSize = 35.0f;
@@ -364,7 +353,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
 
         nlVector3 projectedPos;
         glViewProjectPoint(GetLayerView(eCLV_Unshadowed), worldPos, projectedPos);
-        ((IndicatorPlayerState*)pCharacter)->mScreenPosition = projectedPos;
+        pCharacter->m_v3ScreenPosition = projectedPos;
 
         bool sameMachine = false;
         if (fn_801A323C(pCharacter, &sameMachine) == -1)
@@ -372,7 +361,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
             continue;
         }
 
-        if (fn_8001E184(pCharacter) || !g_pGame->IsGameplayOrOvertime())
+        if (pCharacter->fn_8001E184() || !g_pGame->IsGameplayOrOvertime())
         {
             indicatorInfo[i].IncrementOnscreenTimer(dt);
         }
@@ -453,7 +442,7 @@ static void UpdateAndRenderPlayerIndicators(float)
             }
             fVerticalOffset
                 = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.UnidentifiedGetValue() * 0.5f
-                * pCharacter->m_fPlayerScale;
+                * pCharacter->mUnidentified024.m_fPlayerScale;
         }
         else
         {
@@ -470,7 +459,7 @@ static void UpdateAndRenderPlayerIndicators(float)
         v3ScreenPosition.y -= lbl_806DCEF0;
 
         float switchScale
-            = ((IndicatorPlayerState*)pCharacter)->mSwitchScale;
+            = pCharacter->m_UserControlledTime;
         if (switchScale < 0.5f)
         {
             switchScale = (0.5f - switchScale) / 0.5f;

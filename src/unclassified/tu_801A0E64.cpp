@@ -271,7 +271,7 @@ extern "C" void fn_801A1B54(HammerObject* object, cFielder* fielder)
 {
     object->_034 = fielder;
     object->_028->SetPosition(
-        fielder->m_v3Position, PhysicsObject::WORLD_COORDINATES);
+        fielder->mUnidentified024.m_v3Position, PhysicsObject::WORLD_COORDINATES);
     object->_025 = false;
     object->_024 = true;
     object->_028->EnableCollisions();

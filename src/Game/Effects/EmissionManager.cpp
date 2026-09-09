@@ -480,13 +480,12 @@ bool EmissionManager::IsPlaying(
 /**
  * Offset/Address/Size: 0x0 | 0x802E8544 | size: 0xB8
  */
-extern "C" bool fn_802E8544(EmissionManager* manager,
-    unsigned long userData, const EffectsGroup* pEffectsGroup)
+bool EmissionManager::fn_802E8544(unsigned long userData, const EffectsGroup* pEffectsGroup)
 {
     if (pEffectsGroup != 0)
     {
         nlDLListIterator<EmissionController*> iterator
-            = manager->mControllers.Begin();
+            = mControllers.Begin();
         DLListEntry<EmissionController*>* head = iterator.m_Head;
         DLListEntry<EmissionController*>* current = iterator.m_Curr;
         while (current != 0)

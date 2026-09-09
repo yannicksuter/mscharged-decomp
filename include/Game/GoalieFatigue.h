@@ -7,7 +7,13 @@ class GoalieFatigue
 {
 public:
     GoalieFatigue();
-    void Reset();
+    void Reset()
+    {
+        mfEnergyLevel = 100.0f;
+        mfTimeSinceLastSave = 0.0f;
+        mfHotStreakTimer = 0.0f;
+        mfRecoverRate = 1.0f;
+    }
     void Update(float dt);
     void RegisterShot(float fLevel);
 

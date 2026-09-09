@@ -157,7 +157,7 @@ void ShotMeter::CalcShotAim(cFielder* pFielder)
     else
     {
         float fRandom = nlRandomf(1.0f);
-        if (pFielder->m_v3Position.y < 0.0f)
+        if (pFielder->mUnidentified024.m_v3Position.y < 0.0f)
         {
             if (fRandom < 0.5f)
             {
@@ -203,7 +203,7 @@ void ShotMeter::CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass)
     nlVector3 v3FielderToNet;
     const nlVector3& v3OffNetLocation
         = pFielder->GetAIOffNetLocation(0);
-    nlVec3Sub(v3FielderToNet, v3OffNetLocation, pFielder->m_v3Position);
+    nlVec3Sub(v3FielderToNet, v3OffNetLocation, pFielder->mUnidentified024.m_v3Position);
     if (nlSqrt(v3FielderToNet.GetLengthSq3D(), true) > 0.0001f)
     {
         float fFielderToNetInvLength
