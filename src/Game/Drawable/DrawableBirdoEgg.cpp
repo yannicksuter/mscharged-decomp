@@ -1,14 +1,15 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/BasicStadium.h"
-#include "Game/BirdoEggObject.h"
+#include "Game/Render/BirdoEgg.h"
 #include "Game/Drawable/DrawableBirdoEgg.h"
 #include "Game/Drawable/RenderObject.h"
-#include "Game/Drawable/ShadowProp.h"
+#include "Game/Render/RLView.h"
+#include "NL/gl/glDraw3.h"
 #include "Game/Field.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "math.h"
-#include "unclassified/tu_80199E84.h"
+#include "Game/Render/BirdoEgg.h"
 
 // Charged-only shadow prop, fourth of the run described beside
 // DrawableBulletBill. The live object's translation unit spells
@@ -65,12 +66,11 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
         }
     }
 
-    GroundInfo* ground =
-        reinterpret_cast<GroundInfo*>(BasicStadium::GetCurrentStadium());
+    BasicStadium* stadium = BasicStadium::GetCurrentStadium();
     float groundHeight = 0.0f;
-    if (ground != 0)
+    if (stadium != 0)
     {
-        groundHeight = ground->height;
+        groundHeight = stadium->m_shadowHeight;
     }
 
     groundHeight = 0.015625f + groundHeight;
@@ -137,15 +137,15 @@ void DrawableBirdoEgg::Grab(const BirdoEggObject* object)
         return;
     }
 
-    mVisible = object->visible;
+    mVisible = object->mVisible;
     if (!mVisible)
     {
         return;
     }
 
-    mPosition = object->position;
-    mOrientation = object->orientation;
-    mScale = fn_8019A574(object);
+    mPosition = object->mPosition;
+    mOrientation = object->mOrientation;
+    mScale = object->GetScale();
 }
 
 void DrawableBirdoEgg::Render(const BirdoEggObject* object) const
@@ -158,7 +158,7 @@ void DrawableBirdoEgg::Render(const BirdoEggObject* object) const
         return;
     }
 
-    drawable = object->drawable;
+    drawable = object->mDrawable;
     if (drawable == 0)
     {
         return;

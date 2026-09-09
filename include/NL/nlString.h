@@ -5,6 +5,7 @@
 #include "NL/nlMemory.h"
 #include "types.h"
 
+
 namespace Detail
 {
 struct StringBlock
@@ -145,5 +146,6 @@ CharT* nlToLower(CharT* str);
 template <typename CharT>
 CharT* nlStrChr(const CharT* str, CharT c);
 
+#include "NL/nlPrint.h"
 
 #endif // NL_STRING_H

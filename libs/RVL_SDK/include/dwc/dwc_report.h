@@ -1,6 +1,7 @@
 #pragma once
 
 #include <revolution/types.h>
+#include <dwc/dwc_report_fwd.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -32,8 +33,6 @@ extern "C"
         DWC_REPORTFLAG_ALL = 0xFFFFFFFF
     };
 
-    void DWC_SetReportLevel(u32 level);
-    void DWC_Printf(u32 level, const char* format, ...);
 
 #ifdef __cplusplus
 }

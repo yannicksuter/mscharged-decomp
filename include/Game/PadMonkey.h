@@ -1,6 +1,7 @@
 #ifndef GAME_PAD_MONKEY_H
 #define GAME_PAD_MONKEY_H
 
+#include "NL/plat/WiiPad.h"
 #include "NL/platpad.h"
 #include "NL/plat/WiiPad.h"
 #include "types.h"

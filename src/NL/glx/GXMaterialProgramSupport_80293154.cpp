@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include "NL/gl/glView.h"
 #include "NL/glx/GXMaterialProgram.h"
@@ -113,7 +114,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029D0E8>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 struct FloatColour_80293154

@@ -35,8 +35,8 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "Game/Render/PeachPhoto.h"
-#include "unclassified/tu_80332770.h"
-#include "unclassified/tu_80336B2C.h"
+#include "Game/InputManager.h"
+#include "Game/NetworkInput.h"
 
 #include <stdlib.h>
 
@@ -573,8 +573,7 @@ cPlayer* cTeam::GetControlledPlayer(cGlobalPad* pController)
         cGlobalPad* pUnidentifiedController = NULL;
         if (pUnidentifiedInput != NULL)
         {
-            pUnidentifiedController = GetLocalChannelPad(
-                (UnidentifiedNetworkPeerChannel*)pUnidentifiedInput->m_pMyUser);
+            pUnidentifiedController = ((NetworkPeerChannel*)pUnidentifiedInput->m_pMyUser)->GetLocalChannelPad();
         }
         if (pUnidentifiedController == pController)
         {
@@ -1358,8 +1357,7 @@ void cTeam::fn_800A8098()
             bool bIsChipShot = g_pBall->GetOwnerFielder()->bIsModified;
             if (g_pBall->GetOwnerFielder()->GetGlobalPad() != NULL)
             {
-                bIsChipShot = fn_80331C04(
-                    g_pBall->GetOwnerFielder()->GetGlobalPad(), 0x17, true);
+                bIsChipShot = g_pBall->GetOwnerFielder()->GetGlobalPad()->IsPressed(0x17, true);
             }
 
             float fScoreValue = fn_800A0508(
@@ -1669,46 +1667,46 @@ void cTeam::fn_800A8900(void* context, DebugWriteCache* cache)
 {
     if (lbl_806DBF06 == 0xFFFF)
     {
-        lbl_806DBF06 = fn_80338EBC(cache, lbl_806DBF10);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, 0, lbl_806DBF08);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size,
+        lbl_806DBF06 = cache->BeginType(lbl_806DBF10);
+        cache->AddField(8, gDebugFieldTypes[8].size, 0, lbl_806DBF08);
+        cache->AddField(8, gDebugFieldTypes[8].size,
             (u8*)&m_nScore - (u8*)this, lbl_80500B6C);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size,
+        cache->AddField(17, gDebugFieldTypes[17].size,
             (u8*)&mfPowerupMeter - (u8*)this, lbl_80500B5C);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size,
+        cache->AddField(17, gDebugFieldTypes[17].size,
             (u8*)&mfPowerupTimer - (u8*)this, lbl_80500B4C);
-        fn_80338F88(cache, 14, lbl_80533C98[14].size,
+        cache->AddField(14, gDebugFieldTypes[14].size,
             (u8*)&mpCurrentSituation - (u8*)this, lbl_80500B38);
-        fn_80338F88(cache, 14, lbl_80533C98[14].size,
+        cache->AddField(14, gDebugFieldTypes[14].size,
             (u8*)&meCurrentTeamStyle - (u8*)this, lbl_80500B24);
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&mtTeamStyleTimer - (u8*)this, lbl_80500B10);
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&mtMarkTimer - (u8*)this, lbl_80500B04);
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&mtRoleTimer - (u8*)this, lbl_80500AF8);
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&mtDefensiveZoneTimer - (u8*)this, lbl_80500AE0);
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&mtToggleTimer - (u8*)this, lbl_80500AD0);
-        fn_80339090(cache, 17, lbl_80533C98[17].size, 4,
+        cache->AddArrayField(17, gDebugFieldTypes[17].size, 4,
             (u8*)&mfBallInTimes - (u8*)this, lbl_80500AC0);
-        fn_80339090(cache, 22, lbl_80533C98[22].size, 4,
+        cache->AddArrayField(22, gDebugFieldTypes[22].size, 4,
             (u8*)&mvBallInterceptPosition - (u8*)this,
             lbl_80500AA0);
-        fn_80338F88(cache, 15, lbl_80533C98[15].size,
+        cache->AddField(15, gDebugFieldTypes[15].size,
             (u8*)&mpBestBallInterceptor - (u8*)this, lbl_80500A88);
-        fn_80338F78(cache);
+        cache->EndType();
     }
 
-    cTeam* copy = (cTeam*)fn_8033930C(
-        cache, lbl_806DBF06, this, offsetof(cTeam, m_ePowerupList));
+    cTeam* copy = (cTeam*)cache->WriteData(
+        lbl_806DBF06, this, offsetof(cTeam, m_ePowerupList));
     if (copy != NULL)
     {
         *(int*)&copy->mpBestBallInterceptor = mpBestBallInterceptor == NULL
             ? -1
             : mpBestBallInterceptor->mUnidentified120;
-        fn_80339450(cache, lbl_806DBF06, copy, context);
+        cache->ChecksumData(lbl_806DBF06, copy, context);
     }
 
     GenDetTeam data;
@@ -1732,26 +1730,26 @@ void cTeam::fn_800A8900(void* context, DebugWriteCache* cache)
 
     if (lbl_806DBF04 == 0xFFFF)
     {
-        lbl_806DBF04 = fn_80338EBC(cache, lbl_80500A7C);
-        fn_80339090(cache, 8, lbl_80533C98[8].size, 2, 0,
+        lbl_806DBF04 = cache->BeginType(lbl_80500A7C);
+        cache->AddArrayField(8, gDebugFieldTypes[8].size, 2, 0,
             lbl_80500A6C);
-        fn_80339090(cache, 8, lbl_80533C98[8].size, 2,
+        cache->AddArrayField(8, gDebugFieldTypes[8].size, 2,
             (u8*)&data.m_nPowerups - (u8*)&data,
             lbl_80500A5C);
-        fn_80339090(cache, 8, lbl_80533C98[8].size, 4,
+        cache->AddArrayField(8, gDebugFieldTypes[8].size, 4,
             (u8*)&data.m_nAIOrdFs - (u8*)&data,
             lbl_80500A4C);
-        fn_80339090(cache, 8, lbl_80533C98[8].size, 4,
+        cache->AddArrayField(8, gDebugFieldTypes[8].size, 4,
             (u8*)&data.BallIntOrdFs - (u8*)&data,
             lbl_80500A3C);
-        fn_80338F88(cache, 2, lbl_80533C98[2].size,
+        cache->AddField(2, gDebugFieldTypes[2].size,
             (u8*)&data.m_nTeamPlayTransFunc - (u8*)&data,
             lbl_80500A24);
-        fn_80338F78(cache);
+        cache->EndType();
     }
 
-    fn_80339450(cache, lbl_806DBF04, &data, context);
-    fn_8033930C(cache, lbl_806DBF04, &data, sizeof(data));
+    cache->ChecksumData(lbl_806DBF04, &data, context);
+    cache->WriteData(lbl_806DBF04, &data, sizeof(data));
 
     for (int i = 0; i < 5; i++)
     {
@@ -1759,7 +1757,7 @@ void cTeam::fn_800A8900(void* context, DebugWriteCache* cache)
         char buffer[32];
         nlSNPrintf(buffer, sizeof(buffer), lbl_80500A10,
             i + m_nSide * 5);
-        fn_8033919C(cache, buffer);
+        cache->WriteText(buffer);
     }
 }
 

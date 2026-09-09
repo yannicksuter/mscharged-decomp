@@ -1,4 +1,5 @@
 #include "Game/Transitions/ModelTransition.h"
+#include "NL/gl/glTexture.h"
 
 #include "Game/Effects/EffectsGroup.h"
 #include "Game/Effects/EmissionManager.h"
@@ -10,7 +11,7 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
@@ -22,12 +23,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include "NL/nlstring_tmpl.h"
-
-extern "C"
-{
-    extern unsigned long lbl_806E1F0C;
-
-}
 
 GLView* ModeledScreenTransition::s_3DView;
 void (*lbl_806E217C)(glModel*);
@@ -530,7 +525,7 @@ void ModeledScreenTransition::CreateInstance(
 {
     m_nModels = modelInfo.nModels;
     m_pModels = glModelDupArrayNoStreams(modelInfo.pModels,
-        modelInfo.nModels, true, fn_802CC094());
+        modelInfo.nModels, true, glGetCurrentResourcePool());
 }
 
 void ModeledScreenTransition::Load(const char* szName)
@@ -552,7 +547,7 @@ void ModeledScreenTransition::Load(const char* szName)
         glSetIgnoreDuplicateModels(true);
 
         nlSNPrintf(buf, 128, "art/transitions/%s.rlg", szName);
-        m_pModels = (glModel*)fn_802C8208(buf, &m_nModels, fn_802CC094());
+        m_pModels = glLoadModel(buf, &m_nModels, glGetCurrentResourcePool());
 
         glSetIgnoreDuplicateModels(false);
 
@@ -597,11 +592,11 @@ void ModeledScreenTransition::FixupModel()
 
             if (m_nTexture != 0xFFFFFFFF)
             {
-                fn_802CC458(&m_pModels[i].packets[j],
-                    lbl_806E1F0C, m_nTexture);
+                glSetMaterialTextureParameter(&m_pModels[i].packets[j],
+                    gDiffuseTextureSemantic, m_nTexture);
                 unsigned long unknown20 = m_Unknown20;
-                fn_802CC4FC(&m_pModels[i].packets[j],
-                    lbl_806E1F0C, &unknown20);
+                glSetMaterialTextureIndexParameter(&m_pModels[i].packets[j],
+                    gDiffuseTextureSemantic, &unknown20);
             }
 
             m_pModels[i].packets[j].rasterState

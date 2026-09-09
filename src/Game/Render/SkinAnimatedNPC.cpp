@@ -15,7 +15,7 @@
 #include "NL/MemAlloc.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/nlColour.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -32,16 +32,14 @@ void SkinAnimatedNPC::DrawShadow(
 {
     RLView* pView = GetLayerView(eCLV_Characters);
     float shadowLevel = 0.75f;
-    UnidentifiedStadiumShadowData* pStadium =
-        reinterpret_cast<UnidentifiedStadiumShadowData*>(
-            BasicStadium::GetCurrentStadium());
+    BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
     float alphaValue = 0.75f;
     static u32 alphaValueHash = nlStringLowerHash(AlphaValueName);
 
     ProjectedShadowParams params;
     params.fScalar = 1.0f;
-    nlVec4Set(params.vLight, pStadium->unknown8C.x,
-        pStadium->unknown8C.y, pStadium->unknown8C.z, 1.0f);
+    nlVec4Set(params.vLight, pStadium->m_shadowLightPosition.x,
+        pStadium->m_shadowLightPosition.y, pStadium->m_shadowLightPosition.z, 1.0f);
     params.vPosition = matrix.GetTranslation();
     params.fRadius = ShadowRadius;
     params.fHeight = ShadowHeight;
@@ -60,7 +58,7 @@ void SkinAnimatedNPC::DrawShadow(
                  pPacket < params.pModel->packets + params.pModel->numPackets;
                  ++pPacket)
             {
-                fn_802CC628(pPacket, alphaValueHash, 1.0f);
+                glSetMaterialFloatParameter(pPacket, alphaValueHash, 1.0f);
             }
         }
         RenderCharacterIntoTexture(params);
@@ -100,16 +98,14 @@ void SkinAnimatedNPC::DrawShadow(
     glModel* pModel = glModelDupNoStreams(
         mpSkinMesh->GetModel(), false, 0);
     float shadowLevel = 0.5f;
-    UnidentifiedStadiumShadowData* pStadium =
-        reinterpret_cast<UnidentifiedStadiumShadowData*>(
-            BasicStadium::GetCurrentStadium());
+    BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
     float alphaValue = 0.5f;
     static u32 alphaValueHash = nlStringLowerHash(AlphaValueName);
 
     ProjectedShadowParams params;
     params.fScalar = 1.0f;
-    nlVec4Set(params.vLight, pStadium->unknown8C.x,
-        pStadium->unknown8C.y, pStadium->unknown8C.z, 1.0f);
+    nlVec4Set(params.vLight, pStadium->m_shadowLightPosition.x,
+        pStadium->m_shadowLightPosition.y, pStadium->m_shadowLightPosition.z, 1.0f);
     params.vPosition = mWorldMatrix.GetTranslation();
     params.fRadius = ShadowRadius;
     params.fHeight = ShadowHeight;
@@ -128,7 +124,7 @@ void SkinAnimatedNPC::DrawShadow(
                  pPacket < params.pModel->packets + params.pModel->numPackets;
                  ++pPacket)
             {
-                fn_802CC628(pPacket, alphaValueHash, 1.0f);
+                glSetMaterialFloatParameter(pPacket, alphaValueHash, 1.0f);
             }
         }
         RenderCharacterIntoTexture(params);
@@ -168,7 +164,7 @@ void SkinAnimatedNPC::SendToGL() const
 
     while (pPacket < pModel->packets + pModel->numPackets)
     {
-        fn_802CC6C0(pPacket, shadowLevelHash, shadowColourValue);
+        glSetMaterialUnsignedParameter(pPacket, shadowLevelHash, shadowColourValue);
         ++pPacket;
     }
 
@@ -177,7 +173,7 @@ void SkinAnimatedNPC::SendToGL() const
         GetSkinAnimatedNPC_Type() == SkinAnimatedNPC_CHAIN_CHOMP;
     if (isChainChomp)
     {
-        if (lbl_806E1608->mpChainChomp == 0)
+        if (gNPCManager->mpChainChomp == 0)
         {
             return;
         }

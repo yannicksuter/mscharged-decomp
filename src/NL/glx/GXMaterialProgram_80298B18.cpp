@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/glx/GXMaterialProgram.h"
+#include "NL/gl/glLoadModel.h"
 
 GXMaterialProgram_80298B18* GXMaterialProgram_80298B18::Instance;
 bool GXMaterialProgram_80298B18::Initialized;
@@ -33,7 +34,7 @@ GXMaterialProgram_80298B18::GXMaterialProgram_80298B18()
     programHash = 0x1ACE1D01;
     parameterDataSize = 104;
     parameterCount = 19;
-    fn_802CB790(this, programHash);
+    glRegisterMaterialProgram(this, programHash);
 }
 
 GXMaterialProgram_80298B18::~GXMaterialProgram_80298B18()
@@ -47,7 +48,7 @@ void GXMaterialProgram_80298B18::Initialize()
     Initialized = true;
 }
 
-void GXMaterialProgram_80298B18::Configure()
+void GXMaterialProgram_80298B18::Configure(glModelPacket*)
 {
 }
 
@@ -102,12 +103,12 @@ void GXMaterialProgram_80298B18::BindVertexArrays(const glModelPacket* packet)
 
 void GXMaterialProgram_80298B18::BindParameters(const glModelPacket* packet)
 {
-    fn_8036BE88(0, packet->unknown20);
-    fn_8036BE88(1, (unsigned char*)packet->unknown20 + 8);
-    fn_8036BE88(2, (unsigned char*)packet->unknown20 + 16);
-    fn_8036BE88(3, (unsigned char*)packet->unknown20 + 24);
-    fn_8036BE88(4, (unsigned char*)packet->unknown20 + 32);
-    fn_8036BE88(5, (unsigned char*)packet->unknown20 + 40);
+    glx_BindTexture(0, (glTextureBinding*)(packet->unknown20));
+    glx_BindTexture(1, (glTextureBinding*)((unsigned char*)packet->unknown20 + 8));
+    glx_BindTexture(2, (glTextureBinding*)((unsigned char*)packet->unknown20 + 16));
+    glx_BindTexture(3, (glTextureBinding*)((unsigned char*)packet->unknown20 + 24));
+    glx_BindTexture(4, (glTextureBinding*)((unsigned char*)packet->unknown20 + 32));
+    glx_BindTexture(5, (glTextureBinding*)((unsigned char*)packet->unknown20 + 40));
 }
 
 const GXMaterialParameter* GXMaterialProgram_80298B18::GetParameters()

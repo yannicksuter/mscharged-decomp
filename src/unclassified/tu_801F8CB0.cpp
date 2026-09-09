@@ -5,6 +5,8 @@
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/SH/SHNavigation.h"
 
 class SHNavigation;
 

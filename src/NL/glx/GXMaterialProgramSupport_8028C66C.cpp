@@ -1,5 +1,7 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 #include <revolution/mtx.h>
+#include "NL/glx/GXMaterialProgram_80298B18.h"
 
 #include <string.h>
 
@@ -165,7 +167,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80298B18>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 struct FloatColour_8028C66C
@@ -275,12 +277,12 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298B18>::Draw(
         {
             lbl_8057AEAC[textureIndex] = glGetTextureManager()->GetTextureIndex(texture);
         }
-        UnidentifiedTextureState textureState;
+        glTextureBinding textureState;
         textureState.texture = texture;
         textureState.textureIndex = lbl_8057AEAC[textureIndex];
         textureState.flags = 3;
         textureState.unknown07 = 0;
-        fn_8036BE88(lbl_806DF01C, &textureState);
+        glx_BindTexture(lbl_806DF01C, &textureState);
     }
 
     nlMatrix4 model;
@@ -308,11 +310,11 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298B18>::Draw(
 
     if (packet->unknown28 == 0)
     {
-        fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
+        glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }
     else
     {
-        fn_8036D774(&modelview);
+        glx_LoadDefaultSkinMatrices(&modelview);
     }
 
     if (lbl_806DF018)

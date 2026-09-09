@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 #include <revolution/mtx.h>
 
 #include <string.h>
@@ -29,10 +30,10 @@ extern "C"
 
 struct GXMaterialProgramParameters_80298478
 {
-    /* 0x00 */ UnidentifiedTextureState texture0;
-    /* 0x08 */ UnidentifiedTextureState texture1;
-    /* 0x10 */ UnidentifiedTextureState texture2;
-    /* 0x18 */ UnidentifiedTextureState texture3;
+    /* 0x00 */ glTextureBinding texture0;
+    /* 0x08 */ glTextureBinding texture1;
+    /* 0x10 */ glTextureBinding texture2;
+    /* 0x18 */ glTextureBinding texture3;
     /* 0x20 */ const float (*matrices)[3][4];
     /* 0x24 */ unsigned long matricesSize;
     /* 0x28 */ float value40;
@@ -148,7 +149,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 template <>
@@ -231,14 +232,14 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
         {
             lbl_8057ADDC[textureIndex] = glGetTextureManager()->GetTextureIndex(texture);
         }
-        UnidentifiedTextureState textureState;
+        glTextureBinding textureState;
         textureState.texture = texture;
         textureState.flags = 0;
         textureState.unknown07 = 0;
         textureState.SetWrapS(true);
         textureState.SetWrapT(true);
         textureState.textureIndex = lbl_8057ADDC[textureIndex];
-        fn_8036BE88(4, &textureState);
+        glx_BindTexture(4, &textureState);
         lbl_806E1A78 = texture;
     }
 
@@ -261,14 +262,14 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
 
     if (packet->unknown28 == 0)
     {
-        fn_8036D7EC(
+        glx_LoadSkinMatrices(
             ((GXMaterialProgramParameters_80298478*)packet->unknown20)->matrices,
             ((GXMaterialProgramParameters_80298478*)packet->unknown20)->matricesSize / 48,
             &modelview, 0);
     }
     else
     {
-        fn_8036D774(&modelview);
+        glx_LoadDefaultSkinMatrices(&modelview);
     }
 
     fn_801837DC(

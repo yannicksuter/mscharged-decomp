@@ -10,6 +10,7 @@
 #include "Game/Team.h"
 #include "NL/nlTask.h"
 #include "NL/gl/glMatrix.h"
+#include "Game/Render/RLViewLayers.h"
 
 
 bool lbl_806DC4F0 = true;

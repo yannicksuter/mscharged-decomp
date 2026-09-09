@@ -12,6 +12,8 @@
 #include "NL/nlBind.h"
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/SH/SHNavigation.h"
 
 class SHNavigation;
 

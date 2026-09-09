@@ -8,8 +8,12 @@
 #include "Game/SH/SHHallOfFamePlayerCard.h"
 
 #include "Game/GameSceneManager.h"
+#include "Game/DB/GameProgress.h"
+#include <string.h>
+#include "Game/BaseGameSceneManager.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/GameProgress.h"
+#include "Game/FE/feCupFlow.h"
 #include "Game/FE/feAsyncImage.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
@@ -31,8 +35,12 @@
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
 #include "Game/FE/feBackButton.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/Render/RLViewLayers.h"
+#include "Game/SH/SHNavigation.h"
 
 #include <string.h>
+#include "NL/nlBasicString.inl"
 
 AsyncImage* sHallOfFameImages[12];
 int sHallOfFamePlayerCardIndex;
@@ -1454,7 +1462,7 @@ void SHHallOfFamePlayerCard::UpdateImages()
     }
     if (image0 == 0)
     {
-        image0 = (TLImageInstance*)&gDefaultTLImageInstance;
+        image0 = &gDefaultTLImageInstance;
     }
 
     {
@@ -1465,7 +1473,7 @@ void SHHallOfFamePlayerCard::UpdateImages()
     }
     if (image1 == 0)
     {
-        image1 = (TLImageInstance*)&gDefaultTLImageInstance;
+        image1 = &gDefaultTLImageInstance;
     }
 
     name0 = 0;

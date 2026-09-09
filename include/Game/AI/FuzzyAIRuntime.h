@@ -76,7 +76,7 @@ public:
     UnidentifiedFuzzyRuntimeBase(UnidentifiedFielderInput*);
     virtual ~UnidentifiedFuzzyRuntimeBase();
     virtual void DoFunctionCall(unsigned int) = 0;
-    virtual bool UnidentifiedVirtual2(
+    virtual bool ExecuteFunction(
         FunctionEntryPoint*, unsigned int, u32, u32, u32, u32);
     virtual float UnidentifiedVirtual3(float, float);
     virtual float UnidentifiedVirtual4(float, float);

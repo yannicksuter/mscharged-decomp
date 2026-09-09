@@ -17,7 +17,10 @@ public:
     ~FEScene();
 
     bool LoadPackage(const char* szPackageFileName, MemoryAllocator* pAllocator);
+    void LoadPackage(void* pData, unsigned long uSize);
+    static void LoadPackageCallback(void* pData, unsigned long uSize, void* pUserData);
     void UnloadPackage();
+    void ReleaseResourceHandles();
     void Update(float dt);
     void AllResourcesLoadedCallback();
     FEPackage* GetPackage() const;
@@ -26,11 +29,11 @@ public:
     /* 0x04 */ unsigned long m_uHashID;
     /* 0x08 */ nlMatrix4 m_matView;
     /* 0x48 */ unsigned long m_uRenderView;
-    /* 0x4C */ FE_FILE_HEADER* field_0x4C;
-    /* 0x50 */ unsigned long* field_0x50;
+    /* 0x4C */ FE_FILE_HEADER* m_pFileHeader;
+    /* 0x50 */ unsigned long* m_pPointerTable;
     /* 0x54 */ FESceneResource m_feSceneResourceHandle;
     /* 0x74 */ int mState;
-    /* 0x78 */ FEResourceHandle* field_0x78;
+    /* 0x78 */ FEResourceHandle* m_pResourceHandles;
     /* 0x7C */ MemoryAllocator* m_pAllocator;
 }; // size 0x80
 

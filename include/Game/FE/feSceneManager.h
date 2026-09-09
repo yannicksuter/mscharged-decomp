@@ -8,6 +8,7 @@
 #include "NL/nlSingleton.h"
 
 class MemoryAllocator;
+class FEScene;
 
 struct PackagePushPopMessage
 {
@@ -28,7 +29,8 @@ public:
     bool AreAllScenesValid();
     void ForceImmediateStackProcessing();
     BaseSceneHandler* GetSceneHandler(unsigned long hashID);
-    BaseSceneHandler* fn_802FECB0();
+    BaseSceneHandler* GetTopSceneHandler();
+    void InitializeScene(FEScene* pFEScene);
     void ProcessPushPopQueue();
     void QueueScenePush(BaseSceneHandler* pSceneHandler, const char* szFilename, MemoryAllocator* pAllocator);
     void QueueScenePop();

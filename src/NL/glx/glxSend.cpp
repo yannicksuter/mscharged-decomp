@@ -6,7 +6,8 @@
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
 #include "NL/glx/GXMaterialCrystalTweaks.h"
-#include "NL/glx/GXMaterialProgram.h"
+#include "NL/gl/glMaterialProgram.h"
+#include "NL/gl/glModel.h"
 #include "NL/glx/GXMaterialShadowTweaks.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxMatrix.h"
@@ -39,7 +40,7 @@ static float glx_FogNear = 0.25f;
 static float glx_FogFar = 130.0f;
 
 static GLView* prev_view;
-static GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>* glx_program;
+static GLMaterialProgram* glx_program;
 static unsigned long glx_DirtyFlags;
 
 static nlMatrix4 mview;
@@ -47,22 +48,22 @@ static nlMatrix4 mproj;
 static nlMatrix4 viewproj;
 static nlMatrix4 modelview;
 
-static GXMaterialFloatTweak_804F4190 glx_FogStart(
+static TweakValueFloat glx_FogStart(
     "sfFogStart", "/Render/Fog", 5.0f);
-static GXMaterialFloatTweak_804F4190 glx_FogEnd(
+static TweakValueFloat glx_FogEnd(
     "sfFogEnd", "/Render/Fog", 160.0f);
-static GXMaterialColourTweak_804FC520 glx_FogRed(
-    "siFogRed", lbl_806E1E90, 255);
-static GXMaterialColourTweak_804FC520 glx_FogGreen(
-    "siFogGreen", lbl_806E1E90, 255);
-static GXMaterialColourTweak_804FC520 glx_FogBlue(
-    "siFogBlue", lbl_806E1E90, 255);
-static GXMaterialFloatTweak_804F4190 glx_FogIntensity(
-    "sfFogIntensity", lbl_806E1E90, 1.0f);
-static TweakValueBool_804F4578 glx_bFog(
-    "sbFogEnabled", lbl_806E1E90, false);
-static GXMaterialColourTweak_804FC520 glx_FogType(
-    "siFogType", lbl_806E1E90, 0);
+static TweakValueInt glx_FogRed(
+    "siFogRed", gLastTweakCategory, 255);
+static TweakValueInt glx_FogGreen(
+    "siFogGreen", gLastTweakCategory, 255);
+static TweakValueInt glx_FogBlue(
+    "siFogBlue", gLastTweakCategory, 255);
+static TweakValueFloat glx_FogIntensity(
+    "sfFogIntensity", gLastTweakCategory, 1.0f);
+static TweakValueBool glx_bFog(
+    "sbFogEnabled", gLastTweakCategory, false);
+static TweakValueInt glx_FogType(
+    "siFogType", gLastTweakCategory, 0);
 
 static void glx_SwitchViews(GLView* view);
 static void glx_SwitchRaster(const glModelPacket* p);
@@ -101,8 +102,8 @@ void glx_SendFrame_cb(
 
     if (p != 0)
     {
-        GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>* program
-            = (GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>*)p->unknown10;
+        GLMaterialProgram* program
+            = (GLMaterialProgram*)p->unknown10;
         if (glx_program != program)
         {
             if (glx_program != 0)
@@ -154,7 +155,7 @@ void glx_SendFrame_cb(
         }
         if ((flags & 0x80) != 0)
         {
-            ((GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>*)p->unknown10)->Draw(p);
+            ((GLMaterialProgram*)p->unknown10)->Draw(p);
         }
     }
     else
@@ -268,28 +269,28 @@ static GXFogType fogtype[] = {
     GX_FOG_PERSP_REVEXP2,
 };
 
-extern "C" void fn_8036EB44(float nearPlane, float farPlane)
+void glx_SetFogClipPlanes(float nearPlane, float farPlane)
 {
     glx_FogNear = nearPlane;
     glx_FogFar = farPlane;
 }
 
-extern "C" float fn_8036EB50()
+float glx_GetFogStart()
 {
     return glx_FogStart.value;
 }
 
-extern "C" void fn_8036EB60(float value)
+void glx_SetFogStart(float value)
 {
     glx_FogStart.value = value;
 }
 
-extern "C" float fn_8036EB70()
+float glx_GetFogEnd()
 {
     return glx_FogEnd.value;
 }
 
-extern "C" void fn_8036EB80(float value)
+void glx_SetFogEnd(float value)
 {
     glx_FogEnd.value = value;
 }

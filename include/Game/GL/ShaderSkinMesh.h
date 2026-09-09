@@ -7,30 +7,53 @@
 class cSHierarchy;
 class cPoseAccumulator;
 struct glModel;
+struct glModelPacket;
 
-struct UnidentifiedGLSkinMeshEntry
+extern int gMorphOverrideID;
+extern float gMorphOverrideWeight;
+extern unsigned char gMorphOverrideEnabled;
+
+struct MorphWeight
 {
     /* 0x00 */ unsigned long morphID;
     /* 0x04 */ float morphWeight;
 };
 
-struct UnidentifiedShaderSkinEntry_80370868
+struct SkinWeight
 {
-    UnidentifiedShaderSkinEntry_80370868();
-    ~UnidentifiedShaderSkinEntry_80370868();
-
-    /* 0x00 */ unsigned long m_Unknown00;
-    /* 0x04 */ unsigned char* m_Unknown04;
+    /* 0x00 */ unsigned long vertexIndex;
+    /* 0x04 */ float vertexWeight;
 };
 
-struct UnidentifiedShaderSkinData_80370808
+struct BoneSkinWeights
 {
-    UnidentifiedShaderSkinData_80370808();
-    ~UnidentifiedShaderSkinData_80370808();
+    BoneSkinWeights();
+    ~BoneSkinWeights();
 
-    /* 0x00 */ unsigned long m_Unknown00;
-    /* 0x04 */ unsigned long m_Unknown04;
-    /* 0x08 */ UnidentifiedShaderSkinEntry_80370868* m_Unknown08;
+    /* 0x00 */ unsigned long numWeights;
+    /* 0x04 */ SkinWeight* weights;
+};
+
+struct PacketSkinData
+{
+    PacketSkinData();
+    ~PacketSkinData();
+
+    /* 0x00 */ unsigned long numVertices;
+    /* 0x04 */ unsigned long numBones;
+    /* 0x08 */ BoneSkinWeights* boneWeights;
+};
+
+struct MorphDelta
+{
+    /* 0x00 */ nlVector3 delta;
+    /* 0x0C */ int index;
+};
+
+struct MorphDeltaList
+{
+    /* 0x00 */ unsigned long numDeltas;
+    /* 0x04 */ const MorphDelta* deltas;
 };
 
 class GLSkinMesh
@@ -38,34 +61,34 @@ class GLSkinMesh
 public:
     GLSkinMesh()
         : pModel(0)
-        , m_Unknown08(0)
+        , hierarchySignature(0)
         , m_Unknown0C(0)
-        , m_Unknown10(0)
+        , morphWeights(0)
         , numMorphs(0)
-        , m_Unknown18(0)
-        , m_Unknown1C(true)
+        , numActiveMorphs(0)
+        , morphWeightsChanged(true)
     {
     }
 
     virtual ~GLSkinMesh();
-    virtual void fn_802D4268(glModel* model);
+    virtual void SetModel(glModel* model);
     virtual glModel* GetModel() { return pModel; }
     virtual void Pose(cPoseAccumulator* pPoseAccumulator) = 0;
     virtual void PrepareToRender() = 0;
-    virtual void fn_Unknown5(nlMatrix4* matrix, int nodeIndex) = 0;
+    virtual void GetPoseMatrix(nlMatrix4* matrix, int nodeIndex) = 0;
 
-    void fn_802D407C(unsigned long count);
-    void fn_802D40F4(unsigned long index, unsigned long id);
-    void fn_802D4104(cPoseAccumulator* pPoseAccumulator);
-    void fn_802D41D4();
+    void SetNumMorphs(unsigned long count);
+    void SetMorphID(unsigned long index, unsigned long id);
+    void UpdateMorphWeights(cPoseAccumulator* pPoseAccumulator);
+    void ApplyMorphOverride();
 
     /* 0x04 */ glModel* pModel;
-    /* 0x08 */ unsigned long m_Unknown08;
+    /* 0x08 */ unsigned long hierarchySignature;
     /* 0x0C */ int m_Unknown0C;
-    /* 0x10 */ UnidentifiedGLSkinMeshEntry* m_Unknown10;
+    /* 0x10 */ MorphWeight* morphWeights;
     /* 0x14 */ unsigned long numMorphs;
-    /* 0x18 */ unsigned long m_Unknown18;
-    /* 0x1C */ bool m_Unknown1C;
+    /* 0x18 */ unsigned long numActiveMorphs;
+    /* 0x1C */ bool morphWeightsChanged;
 };
 
 struct BoneMapList
@@ -100,11 +123,11 @@ class ShaderSkinMesh : public GLSkinMesh
 public:
     ShaderSkinMesh()
         : boneMaps(0)
-        , m_Unknown24(0)
-        , m_Unknown28(0)
-        , m_Unknown38(0)
-        , m_Unknown3C(0)
-        , m_Unknown45(false)
+        , packetSkinData(0)
+        , softwareModel(0)
+        , numPackets(0)
+        , morphData(0)
+        , rigidSkin(false)
     {
     }
 
@@ -112,26 +135,32 @@ public:
     virtual glModel* GetModel();
     virtual void Pose(cPoseAccumulator* pPoseAccumulator);
     virtual void PrepareToRender();
-    virtual void fn_Unknown5(nlMatrix4* matrix, int nodeIndex);
+    virtual void GetPoseMatrix(nlMatrix4* matrix, int nodeIndex);
 
-    void fn_8036F768(unsigned long count);
-    void fn_8036F7B0(unsigned long firstIndex, unsigned long secondIndex,
-        unsigned long count, const void* data);
-    void fn_8036F7E4();
-    void fn_8036FB74(cSHierarchy* hierarchy);
-    void fn_8036FC4C(int nodeIndex, const nlMatrix4* matrix);
+    void SetNumMorphPackets(unsigned long count);
+    void SetMorphDeltas(unsigned long packetIndex, unsigned long morphIndex,
+        unsigned long count, const MorphDelta* data);
+    void InitializeSkinData();
+    void SetHierarchy(cSHierarchy* hierarchy);
+    void SetBoneMatrix(int nodeIndex, const nlMatrix4* matrix);
 
     /* 0x20 */ BoneMapList* boneMaps;
-    /* 0x24 */ UnidentifiedShaderSkinData_80370808* m_Unknown24;
-    /* 0x28 */ void* m_Unknown28;
-    /* 0x2C */ nlMatrix4* m_Unknown2C;
-    /* 0x30 */ nlMatrix4* m_Unknown30;
-    /* 0x34 */ unsigned long m_Unknown34;
-    /* 0x38 */ unsigned long m_Unknown38;
-    /* 0x3C */ void* m_Unknown3C;
-    /* 0x40 */ void* m_Unknown40;
+    /* 0x24 */ PacketSkinData* packetSkinData;
+    /* 0x28 */ glModel* softwareModel;
+    /* 0x2C */ nlMatrix4* boneMatrices;
+    /* 0x30 */ nlMatrix4* poseMatrices;
+    /* 0x34 */ unsigned long numBones;
+    /* 0x38 */ unsigned long numPackets;
+    /* 0x3C */ MorphDeltaList* morphData;
+    /* 0x40 */ nlVector3* morphBuffer;
     /* 0x44 */ unsigned char m_Unknown44;
-    /* 0x45 */ bool m_Unknown45;
+    /* 0x45 */ bool rigidSkin;
+
+private:
+    void BuildPacketSkinData(PacketSkinData* data, glModelPacket* pPacket,
+        BoneMapList* node);
+    void CreateMorphBuffer(unsigned long packetIndex, unsigned long count);
+    void SoftwareSkinModel(glModel* model);
 };
 
 #endif // GAME_GL_SHADER_SKIN_MESH_H

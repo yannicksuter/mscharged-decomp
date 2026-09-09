@@ -28,7 +28,7 @@ extern "C" void fn_801A2004(
     HighRangeTweakValues_801A2004* values, const char* group)
 {
     bool registered
-        = values->miHighRangeIndex.fn_802C4FEC(
+        = values->miHighRangeIndex.Bind(
             "miHighRangeIndex", 0.0f, group, true, 6.0f, 1.0f);
     if (!registered)
     {
@@ -46,7 +46,7 @@ extern "C" void fn_801A2004(
         "mfHighRangeOffset", 3.5f, group, true, 0.0f, 8.0f, 0.125f);
 
     registered
-        = values->miHighRangeGray.fn_802C4FEC(
+        = values->miHighRangeGray.Bind(
             "miHighRangeGray", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
@@ -59,7 +59,7 @@ extern "C" void fn_801A2004(
     }
 
     registered
-        = values->mbFineHighRange.fn_802C4FEC(
+        = values->mbFineHighRange.Bind(
             "mbFineHighRange", 0.0f, group, true, 0.0f, 0.0f);
     if (!registered)
     {
@@ -71,7 +71,7 @@ extern "C" void fn_801A2004(
         *values->mbFineHighRange.m_pValue = true;
     }
 
-    registered = values->miRed.fn_802C4FEC(
+    registered = values->miRed.Bind(
             "miRed", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
@@ -82,7 +82,7 @@ extern "C" void fn_801A2004(
         *values->miRed.m_pValue = 255;
     }
 
-    registered = values->miGreen.fn_802C4FEC(
+    registered = values->miGreen.Bind(
             "miGreen", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
@@ -94,7 +94,7 @@ extern "C" void fn_801A2004(
         *values->miGreen.m_pValue = 255;
     }
 
-    registered = values->miBlue.fn_802C4FEC(
+    registered = values->miBlue.Bind(
             "miBlue", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
@@ -106,7 +106,7 @@ extern "C" void fn_801A2004(
         *values->miBlue.m_pValue = 255;
     }
 
-    registered = values->miAlpha.fn_802C4FEC(
+    registered = values->miAlpha.Bind(
             "miAlpha", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
@@ -129,7 +129,7 @@ extern "C" void fn_801A2394(HighRangeState_801A2394* state)
     u32 widths[7] = { 320, 160, 80, 40, 80, 160, 320 };
     u32 heights[7] = { 224, 112, 56, 28, 56, 112, 224 };
     int i;
-    TargetInfo_8036DE50 info;
+    GLTargetInfo info;
 
     for (i = 0; i < 7; ++i)
     {
@@ -188,7 +188,7 @@ extern "C" void fn_801A2394(HighRangeState_801A2394* state)
         info.format = 6;
         info.unknown18 = 0;
         info.unknown1C = 0;
-        state->mRenderPairs[i] = fn_802CD884(state->mNames[i], &info);
+        state->mRenderPairs[i] = glCreateTarget(state->mNames[i], &info);
     }
 
     for (i = 0; i < 7; ++i)
@@ -200,8 +200,8 @@ extern "C" void fn_801A2394(HighRangeState_801A2394* state)
         view->m_ViewportY = state->mViewports[i].y;
         view->m_ViewportWidth = state->mViewports[i].width;
         view->m_ViewportHeight = state->mViewports[i].height;
-        view->m_Unknown33 = false;
         view->m_ClearColour = false;
+        view->m_ClearDepth = false;
         view->m_Target = 10;
         state->mViews[i] = view;
     }

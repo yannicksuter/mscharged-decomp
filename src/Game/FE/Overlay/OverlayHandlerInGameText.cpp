@@ -22,6 +22,8 @@
 #include "NL/nlSingleton.h"
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
+#include "Game/Render/RLViewLayers.h"
+#include "NL/nlBasicString.inl"
 
 extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
 extern "C" void fn_801E230C(
@@ -34,7 +36,7 @@ template <typename T>
 static inline T* FindInPresentation(FEPresentation* presentation,
     unsigned long Level1, unsigned long Level2, unsigned long Level3)
 {
-    TLInstance* result = FEFindInstance(
+    void* result = FEFindInstance(
         presentation, Level1, Level2, Level3, 0, 0, 0);
     if (result == 0)
     {

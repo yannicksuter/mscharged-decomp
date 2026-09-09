@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/glx/GXMaterialProgram.h"
+#include "NL/gl/glLoadModel.h"
 
 GXMaterialProgram_802A58E8* GXMaterialProgram_802A58E8::Instance;
 bool GXMaterialProgram_802A58E8::Initialized;
@@ -18,7 +19,7 @@ GXMaterialProgram_802A58E8::GXMaterialProgram_802A58E8()
     programHash = 0xAD0DB7E9;
     parameterDataSize = 56;
     parameterCount = 4;
-    fn_802CB790(this, programHash);
+    glRegisterMaterialProgram(this, programHash);
 }
 
 GXMaterialProgram_802A58E8::~GXMaterialProgram_802A58E8()
@@ -32,7 +33,7 @@ void GXMaterialProgram_802A58E8::Initialize()
     Initialized = true;
 }
 
-void GXMaterialProgram_802A58E8::Configure()
+void GXMaterialProgram_802A58E8::Configure(glModelPacket*)
 {
 }
 
@@ -69,7 +70,7 @@ void GXMaterialProgram_802A58E8::DrawIndexed(const glModelPacket* packet)
 {
     unsigned short* idxPtr = packet->indexBuffer;
     unsigned short* end = idxPtr + packet->numVertices;
-    GXBegin(lbl_80524470[(unsigned char)packet->primType], GX_VTXFMT0, (unsigned short)packet->numVertices);
+    GXBegin(glx_PrimitiveTypes[(unsigned char)packet->primType], GX_VTXFMT0, (unsigned short)packet->numVertices);
 
     while (idxPtr < end)
     {
@@ -82,7 +83,7 @@ void GXMaterialProgram_802A58E8::DrawIndexed(const glModelPacket* packet)
 
 void GXMaterialProgram_802A58E8::DrawDirect(const glModelPacket* packet)
 {
-    GXBegin(lbl_80524470[(unsigned char)packet->primType], GX_VTXFMT0, packet->numUniqueVertices);
+    GXBegin(glx_PrimitiveTypes[(unsigned char)packet->primType], GX_VTXFMT0, packet->numUniqueVertices);
 
     for (unsigned short i = 0; i < packet->numUniqueVertices; ++i)
     {
@@ -94,7 +95,7 @@ void GXMaterialProgram_802A58E8::DrawDirect(const glModelPacket* packet)
 
 void GXMaterialProgram_802A58E8::BindParameters(const glModelPacket* packet)
 {
-    fn_8036BE88(0, packet->unknown20);
+    glx_BindTexture(0, (glTextureBinding*)(packet->unknown20));
 }
 
 const GXMaterialParameter* GXMaterialProgram_802A58E8::GetParameters()

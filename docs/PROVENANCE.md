@@ -208,6 +208,93 @@ The retail `0x801B59DC` path also queries `cFielder::IsFallenDown()` before
 playing its sound, but the use of that result is unresolved; no discarded
 query was added solely to reproduce the call.
 
+`Game/FE/feFinder.cpp` reconstructs the shared presentation and recursive
+instance lookups at `0x8030677C..0x80306B34`. A raw lookup can return a
+`TLSlide` or a `TLInstance`; typed finder callers select the expected result
+type. The circular-list traversal follows the predecessor's `feFinder.h`.
+The finder range and the preceding timer family at
+`0x8030616C..0x8030677C` are separated from the font-loading code beginning
+at `0x80306B34`. These source groupings and the `Game/FE/feTimer.cpp` filename
+are inferred from the retained behavior and calls; original object names
+are unavailable.
+
+`Game/GameInfo.h` reconstructs the 0x80-byte `UserInfo` settings record at
+`GameInfoManager+0x9C`, using the predecessor's record and option names where
+their roles agree with R4QE01. `Game/DB/UserOptions` uses `CheatSettings` for
+the three-word custom-powerup, environment and player cheat selections;
+its zero defaults and frontend string-key lookups distinguish it from the
+predecessor's enabled-powerup bit fields. Gameplay settings contain paired
+home/away powerup and megastrike enable flags, as established by the award
+and shooting checks. The other new field and accessor names describe retained
+behavior; they are not recovered retail debug identifiers.
+
+`Game/TweakRegistry`, `Game/TweakNode`, `Game/TweakEntry` and
+`Game/TweakNameRecycler` use descriptive reconstructed names for the
+registry hierarchy, deferred registrations, string storage and value
+lifetime states. The predecessor has no corresponding value hierarchy.
+`NL/PointerEntryTable` replaces the address-based table identity; its
+retained removal method searches entries by pointer equality. These names
+describe R4QE01 behavior and do not establish original source filenames
+or debug identifiers.
+
+`Game/TweakConfig` names the configuration parser and synchronous file
+and buffer-loading entry points by their retained behavior. Its
+`Config::Parser` callbacks preserve the predecessor interface names,
+while its loader names and filename are descriptive reconstructions.
+The in-place parser is distinct from `Config::Parse`, which copies
+the input and enforces the configuration table capacity.
+
+`Game/TweakValue.h` names the pointer-backed float, int and bool values
+`TweakFloatBinding`, `TweakIntBinding` and `TweakBoolBinding`, with
+`TweakBindingBase` owning their shared binding operations. `TweakValueBool`
+stores its value directly; `Game/TweakCallback` stores a callback and
+registers it in the shared callback list. These are descriptive names
+for the retained hierarchy, not recovered debug identifiers. The zero
+literal used by `TweakBindingBase::Bind(path)` belongs to TweakValue at
+`0x806E62D0..0x806E62D4`; the following four bytes are alignment padding.
+
+`Game/TweakFileLoader`, `Game/GameTweaksManager` and
+`Game/Render/StadiumTweaks` name the asynchronous configuration loader,
+game tweak lifetime manager and stadium bindings by their retained
+behavior. Their shared declarations use the same C++ types as their
+consumers, including the terrain constructor and destructor.
+`Game/TweakValueInt.h` and `Game/TweakValueFloat.h` declare the generic
+owned numeric values used by the registry, gameplay and graphics.
+These are descriptive reconstruction names, not recovered debug
+identifiers or original source filenames.
+
+`Game/TrophyInfo` provides separate cup-series and online cup-persona
+trophy names. The persona localization keys and its paired stadium
+table distinguish the persona ID from the arenas selected for
+tournament games. `CupInterface::GetCupPersona` and the tournament
+message fields follow these retail uses; their names are descriptive
+reconstructions. `AsyncLoadingManager::LoadTrophyTemplates` restores
+the retained cup and online-tournament loading branches through the
+shared NPC and trophy interfaces. The predecessor trophy API has
+different retained types and behavior.
+
+`NPCManager` loads animation, hierarchy, texture and model resources
+asynchronously into persistent or transient template collections.
+The retained `PersistentResourcePool` string and loader calls identify
+the persistent pool exposed by `AsyncLoadingManager`. The loading
+callbacks, completion flags and collection names describe these retail
+uses; the predecessor has a different fixed template table. Applicable
+predecessor names and the shared `ChainChomp` constructor and collision
+callback interfaces are preserved.
+
+`Game/Render/DiddyBanana` is identified by the NPC template requested
+by its loading consumer and its zip/unzip animation pair. The Birdo
+egg owner now shares `BirdoEggObject` with its physics and drawable
+consumers, replacing their separate partial layouts. Retail field
+accesses establish the orientation, radius transition, lifetime,
+shooter and velocity members. Its Show/Hide diagnostics and loading,
+collision and rendering uses identify the ordinary C++ methods. The
+filenames and otherwise unavailable identifiers are descriptive
+reconstructions; these Wii objects have no applicable predecessor
+implementation. BirdoEgg static-pool and literal ownership remain
+incomplete.
+
+
 `Game/Effects/EmitterCallbacks.cpp` contains the emitter updates at
 `0x801BE428..0x801BEF44`. The predecessor's `Game/CharacterTriggers.cpp`
 supplies the names `UpdateEmitterFromCharacter`,
@@ -292,12 +379,17 @@ array with a view hierarchy, adds the orthographic projection path, and resets
 the per-view sorter trees each frame. Retail callers establish the additional
 projection helper parameters; those functions retain address-based names.
 
-`NL/tu_802A99D8.cpp` contains the incremental inflate wrapper used by the
-chunked asynchronous file loader. Its stream layout and allocator callbacks
-use the existing zlib 1.2.2 declarations. The stripped executable does not
-preserve the wrapper's original file, class, or method names.
+`NL/InflateStream.cpp` contains the incremental inflate wrapper at
+`0x802A99D8..0x802A9B8C`. Its stream layout and allocator callbacks use the
+existing zlib 1.2.2 declarations. `NL/nlCompressedFile.cpp` contains the
+asynchronous compressed-file loader at `0x802B3C28..0x802B41B4`: it reads the
+uncompressed size, alternates two input buffers, and delivers the completed
+output through the shared file callback. The effects, character, stadium,
+crowd and NPC loaders share its C++ declaration and allocation type. These
+filenames, classes and operation names are descriptive reconstructions;
+the stripped executable does not preserve their original spellings.
 
-`Game/Render/tu_80271960.cpp` includes the static initializer at
+`Game/Render/HomeButtonFade.cpp` includes the static initializer at
 `0x80271BE0`, its constructor-table entry, texture handles and pooled strings.
 The initializer and fade renderer share the `"global/white"` literal at
 `0x80520F88`; the compiler reproduces that sharing, string order and small-data
@@ -365,15 +457,15 @@ External source is accepted only after comparison against R4QE01. A unit is
 marked `Matching` only when its code and owned data agree and the complete
 build reproduces the original `main.dol` hash.
 
-`unclassified/tu_8022F710.cpp` reconstructs the scroll control at
-`0x8022F710..0x80231118`. Its two `TU80219248Component` members occupy
+`Game/FE/feScrollBar.cpp` reconstructs the scroll control at
+`0x8022F710..0x80231118`. Its two `FEButtonPointerRegion` members occupy
 `0x4C..0x1B4`; array construction, destruction, callback contexts, and the
 independent scene consumers establish their layout. The callback records at
 `0x8051D67C..0x8051D6AC` identify four member functions, and the functor
 vtable and three following methods use the shared `Function2`/`BindExp3`
 implementation. The next function destroys a containing scene, not this
-control. `UnidentifiedScrollWidget`, field placeholders, and address-based
-method names remain reconstruction identities. The predecessor's
+control. `FEScrollBar` and its method names describe the reconstructed behavior.
+The predecessor's
 `FEScrollText` is a different control and is not a source donor here. Binding
 emission, finder register allocation in the range setter, and literal ordering
 remain unresolved; the unit is not source-linked.
@@ -390,6 +482,16 @@ flags. The declaration/implementation separation represents this observed
 visibility distinction, not recovered original header filenames. Recursive
 descent still calls the shared implementation at `0x803068F8`; no local
 recursive finder is instantiated.
+
+`Game/FE/feScrollText.h` uses the predecessor's `FEScrollText` name and
+applicable API and field names. The R4QE01 control at `0x801E2E30` retains
+the wide-string message, text metrics, font and completion callback, with a
+different 0x40-byte layout and additional scroll-axis, direction and loop
+state. Its message setters at `0x801E3A88` and `0x801E3B60` use
+`BasicString<unsigned short>`, and its updater moves the text instance's
+position. The Striker Times headline and body values are also wide strings,
+as shown by the cup-news formatting calls. The predecessor's larger text
+buffer and original field offsets are not used for this Wii layout.
 
 `NL/blowfish.cpp` retains the constructor, block encipher, key initialization
 and padded encoding paths from Jim Conger's C++ conversion, including its
@@ -507,6 +609,35 @@ member-function pointer; the following four zero bytes are alignment padding.
 The naming and header changes preserve the existing function bytes and data
 ranges.
 
+`Game/FE/feScrollText.h` restores the predecessor's `FEScrollText` name and
+applicable message, update, metrics, and text-instance interfaces. The retail
+methods at `0x801E2E30..0x801E45C0` establish a smaller Wii layout: a wide
+`BasicString`, axis and direction controls, scrolling modes, offset, speed, and
+the message-finished callback occupy `0x40` bytes. The constructor's halfword
+copy and the message setter's wide-string assignment establish the string
+type independently. `SHStrikerTimesBase` passes its wide headline string to this
+interface. New Wii-specific method and field names describe their retail
+roles; they are reconstruction names. The header restoration does not change
+the containing aggregate's translation-unit boundaries or matching status.
+
+`SHStrikerTimesBase` names the shared Striker Times scene at
+`0x80269078..0x8026B10C`. Its resource path, localized logos, headline and
+story pages, and game-summary presentation establish the role. Its derived
+scenes use separate Done and Back completion hooks after the out slide.
+The class, page state, callbacks, image and text fields, and literal names
+describe those retail uses; the original class and file names are unavailable.
+The rename preserves the existing layout, retained functions, data ranges,
+and translation-unit boundaries.
+
+`NL/gl/glMaterialProgram.h` describes the common 0x10-byte material program
+interface used by startup, model loading, parameter lookup, and rendering.
+These independent callers establish the seven virtual operations and the
+shared hash, parameter-data size, and parameter count. `GLMaterialProgram`
+is a descriptive reconstruction name. The lighting and skin-matrix helpers
+under `NL/glx` likewise use behavior-supported filenames; the applicable
+`glx_LoadDirectionalLight` and `glx_LoadSpecular` names follow the predecessor,
+with the Wii argument and cache layouts established from R4QE01.
+
 The repository's [CC0 license](../LICENSE) applies only to contributions whose
 authors have the right to make that dedication. Nintendo, Next Level Games,
 and third-party names, trademarks, game content, and other proprietary
@@ -516,3 +647,34 @@ material are not granted or licensed by this repository.
 predecessor header's template, including its identifiers and circular-list
 traversal. R4QE01's weather callback at `0x800AC6D8` embeds that lookup and
 writes the gameplay camera's zoom override.
+
+`Game/FE/feCupFlow.cpp` names the shared cup-page navigation, back-menu,
+restart, news, award and trophy-visibility interfaces at `0x80206CE4..0x80209584`.
+The retail scene and popup tables identify the associated standings, schedule,
+Golden Boot, Brick Wall, rules and reward screens. Its team-slide helper returns
+`"user"` in retail; its callers supply the team category. CupManager supplies
+the record restoration, cup-series restart and round-news operations through
+C++ member declarations. These file and operation names are descriptive
+reconstructions, not identifiers recovered from debug information.
+
+`BasicStadium` inherits `World` at offset zero. Its retail allocation at
+`0x80276674` is `0xAC` bytes, and its constructor at `0x80278A2C` initializes
+the base, a second drawable registry, the shadow light position and height,
+time, and stadium/megastrike high-range tweak pointers. Its vtable at
+`0x805223D0` distinguishes the inherited two-argument `Update` from the
+three-argument stadium overload. Shadow consumers use this shared class layout.
+The tournament-trophy loading interfaces at `0x80276D10..0x80276F5C` and
+`SetWorldAnimation` at `0x80277BB4` use C++ declarations; the latter takes
+two names and an `ePlayMode`. The World loading and effect-triggering calls
+also use their actual member declarations. Operation and field names added
+without a predecessor counterpart are descriptive reconstructions.
+
+`Game/Render/StadiumLoading.cpp` names the reconstructed loading range at
+`0x80276724..0x80276D10`. Its canonical header also declares the associated
+resource callbacks, drawable lookup and stadium lifecycle interfaces. The
+retail table at `0x80521F68` identifies 22 model resources, their instance
+counts and captain/sidekick/stadium load conditions. Loaded data, sizes,
+completion flags, effect requests and double buffers retain their existing
+storage and ownership. These operation, file and data names describe retail
+behavior; they are not recovered debug names. Existing split boundaries
+and the source-link status are unchanged.

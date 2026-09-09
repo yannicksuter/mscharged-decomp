@@ -10,7 +10,6 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include <string.h>
-#include "NL/nlstring_tmpl.h"
 
 class ScriptQuestionCache;
 
@@ -27,7 +26,7 @@ public:
         return UnidentifiedInitialize(context);
     }
     virtual void UnidentifiedCleanup();
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void Update(UnidentifiedDesireUpdate*, float);
 
     u32 mUnidentified088;
     u32 mUnidentified08C;
@@ -100,7 +99,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(
 {
     u32 localHash = *hash;
     return UnidentifiedVariant_80054AB8(fn_80312360(
-        runtime, fn_802DF3E4(runtime, &localHash), 1, argument, 0));
+        runtime, runtime->FindFunctionEntryPoint(localHash), 1, argument, 0));
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
@@ -110,7 +109,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
     u32 localHash = *hash;
     u32 valueBits = *(u32*)&value;
     return UnidentifiedVariant_80054AB8(fn_80312360(
-        runtime, fn_802DF3E4(runtime, &localHash), 2, argument, (void*)valueBits));
+        runtime, runtime->FindFunctionEntryPoint(localHash), 2, argument, (void*)valueBits));
 }
 
 UnidentifiedScriptMachine::UnidentifiedScriptMachine(
@@ -171,13 +170,13 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual2()
     u32 hash = nlStringHash(functionName);
     runtime = fn_80311744(this);
     u32 localHash = hash;
-    bool hasFunction = fn_802DF3E4(runtime, &localHash) != 0;
+    bool hasFunction = runtime->FindFunctionEntryPoint(localHash) != 0;
     if (hasFunction)
     {
         runtime = fn_80311744(this);
         u32 callHash = hash;
-        runtime->UnidentifiedVirtual2(
-            fn_802DF3E4(runtime, &callHash), 1, (u32)this, 0, 0, 0);
+        runtime->ExecuteFunction(
+            runtime->FindFunctionEntryPoint(callHash), 1, (u32)this, 0, 0, 0);
     }
 }
 

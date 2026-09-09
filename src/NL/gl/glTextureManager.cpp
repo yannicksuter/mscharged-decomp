@@ -23,20 +23,20 @@ glTextureManager::glTextureManager(unsigned long count)
 
 unsigned long glTextureManager::GetTextureIndex(unsigned long texture)
 {
-    GLTextureAnim* anim = fn_802D0758(texture);
+    GLTextureAnim* anim = glGetTextureAnim(texture);
     if (anim != 0)
     {
-        return anim->m_unk_0x18;
+        return anim->m_textureIndex;
     }
     PlatTexture* platformTexture = glx_GetTex(texture);
     if (platformTexture == 0)
     {
         return 0xFFFF;
     }
-    return platformTexture->unknown0E;
+    return platformTexture->m_TextureIndex;
 }
 
-void glTextureManager::ResolveTextureIndex(UnidentifiedTextureState* texture)
+void glTextureManager::ResolveTextureIndex(glTextureBinding* texture)
 {
     if (texture->textureIndex == 0xFFFF)
     {
@@ -53,7 +53,7 @@ PlatTexture* glTextureManager::GetTextureAtIndex(const unsigned long* texture)
     return mTextures[*texture];
 }
 
-PlatTexture* glTextureManager::GetTexture(UnidentifiedTextureState* texture)
+PlatTexture* glTextureManager::GetTexture(glTextureBinding* texture)
 {
     ResolveTextureIndex(texture);
     unsigned long textureIndex = texture->textureIndex;
@@ -62,19 +62,19 @@ PlatTexture* glTextureManager::GetTexture(UnidentifiedTextureState* texture)
 
 void glTextureManager::RegisterTexture(PlatTexture* texture)
 {
-    texture->unknown0E = mFreeIndices->RemoveStart();
-    mTextures[texture->unknown0E] = texture;
+    texture->m_TextureIndex = mFreeIndices->RemoveStart();
+    mTextures[texture->m_TextureIndex] = texture;
 }
 
 void glTextureManager::RegisterTextureAnim(GLTextureAnim* anim)
 {
     unsigned long index = mFreeIndices->RemoveStart();
-    anim->m_unk_0x18 = index;
+    anim->m_textureIndex = index;
     mTextures[index] = GetTextureAtIndex(&anim->GetTexture(-1)->textureHandle);
 }
 
 void glTextureManager::RefreshTextureAnim(GLTextureAnim* anim)
 {
-    u32 index = anim->m_unk_0x18;
+    u32 index = anim->m_textureIndex;
     mTextures[index] = GetTextureAtIndex(&anim->GetTexture(-1)->textureHandle);
 }

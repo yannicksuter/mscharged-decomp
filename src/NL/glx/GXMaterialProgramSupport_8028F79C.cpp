@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include "Game/GameObjectLighting.h"
 #include "NL/gl/glMatrix.h"
@@ -11,7 +12,7 @@
 
 struct GXMaterialProgramParameters_80299A90
 {
-    /* 0x00 */ UnidentifiedTextureState texture0;
+    /* 0x00 */ glTextureBinding texture0;
     /* 0x08 */ const float (*matrices)[3][4];
     /* 0x0C */ unsigned long matricesSize;
 }; // size: 0x10
@@ -49,7 +50,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, static_cast<const GXMaterialProgramParameters_80299A90*>(packet->unknown20)->texture0.texture);
+    glSetMaterialTextureAlphaState(this, packet, static_cast<const GXMaterialProgramParameters_80299A90*>(packet->unknown20)->texture0.texture);
 }
 
 template <>
@@ -71,14 +72,14 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Draw(
     if (packet->unknown28 == 0)
     {
         const GXMaterialProgramParameters_80299A90* parameters = static_cast<const GXMaterialProgramParameters_80299A90*>(packet->unknown20);
-        fn_8036D7EC(parameters->matrices,
+        glx_LoadSkinMatrices(parameters->matrices,
             parameters->matricesSize / 48,
             &modelview,
             0);
     }
     else
     {
-        fn_8036D774(&modelview);
+        glx_LoadDefaultSkinMatrices(&modelview);
     }
 
     GXCallDisplayList(packet->displayList->list, packet->displayList->size);

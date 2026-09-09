@@ -3,7 +3,6 @@
 #include "Game/Render/ImpostorCharacter.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" void fn_802D7664(ImpostorCharacter*, Impostor*);
 Impostor::Impostor()
 {
     mpCharacter = 0;
@@ -53,7 +52,7 @@ void Impostor::Set(ImpostorCharacter* character, const nlVector3& position,
     mHeight = height;
     mPosition = position;
     mAngle = angle;
-    fn_802D7664(character, this);
+    character->Acquire(this);
     mUnidentified02C = false;
     mColour.c[0] = 0xFF;
     mColour.c[1] = 0xFF;
@@ -65,7 +64,7 @@ void Impostor::Release()
 {
     if (mpSprite != 0)
     {
-        fn_802D5078(mpSprite, mSlot);
+        mpSprite->QueueSlot(mSlot);
     }
 }
 

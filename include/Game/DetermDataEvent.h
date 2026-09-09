@@ -4,10 +4,10 @@
 #include "NL/nlSlotPool.h"
 #include "types.h"
 
-class UnidentifiedMessageSerializer;
+class NetworkMessageSerializer;
 struct DetermDataEvent;
 
-extern SlotPool<DetermDataEvent> lbl_805848E8;
+extern SlotPool<DetermDataEvent> gDetermDataEventPool;
 
 // Variable-length deterministic data packet. The first byte is the payload
 // size; the remaining 32 bytes are copied to and from network messages.
@@ -20,15 +20,15 @@ struct DetermDataEvent
 
     void* operator new(unsigned long)
     {
-        return lbl_805848E8.Allocate();
+        return gDetermDataEventPool.Allocate();
     }
 
     void operator delete(void* data)
     {
-        lbl_805848E8.Free((DetermDataEvent*)data);
+        gDetermDataEventPool.Free((DetermDataEvent*)data);
     }
 
-    void fn_80331A34(UnidentifiedMessageSerializer* serializer);
+    void Serialize(NetworkMessageSerializer* serializer);
 
     /* 0x00 */ u8 mSize;
     /* 0x01 */ u8 mPadding01[3];

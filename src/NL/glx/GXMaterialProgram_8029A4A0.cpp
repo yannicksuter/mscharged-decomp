@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/glx/GXMaterialProgram.h"
+#include "NL/gl/glLoadModel.h"
 
 GXMaterialProgram_8029A4A0* GXMaterialProgram_8029A4A0::Instance;
 bool GXMaterialProgram_8029A4A0::Initialized;
@@ -18,7 +19,7 @@ GXMaterialProgram_8029A4A0::GXMaterialProgram_8029A4A0()
     programHash = 0x2910966C;
     parameterDataSize = 32;
     parameterCount = 4;
-    fn_802CB790(this, programHash);
+    glRegisterMaterialProgram(this, programHash);
 }
 
 GXMaterialProgram_8029A4A0::~GXMaterialProgram_8029A4A0()
@@ -32,7 +33,7 @@ void GXMaterialProgram_8029A4A0::Initialize()
     Initialized = true;
 }
 
-void GXMaterialProgram_8029A4A0::Configure()
+void GXMaterialProgram_8029A4A0::Configure(glModelPacket*)
 {
 }
 
@@ -81,7 +82,7 @@ void GXMaterialProgram_8029A4A0::DrawIndexed(const glModelPacket* packet)
 {
     unsigned short* idxPtr = packet->indexBuffer;
     unsigned short* end = idxPtr + packet->numVertices;
-    GXBegin(lbl_80524470[(unsigned char)packet->primType], GX_VTXFMT0, (unsigned short)packet->numVertices);
+    GXBegin(glx_PrimitiveTypes[(unsigned char)packet->primType], GX_VTXFMT0, (unsigned short)packet->numVertices);
 
     while (idxPtr < end)
     {
@@ -97,7 +98,7 @@ void GXMaterialProgram_8029A4A0::DrawIndexed(const glModelPacket* packet)
 
 void GXMaterialProgram_8029A4A0::DrawDirect(const glModelPacket* packet)
 {
-    GXBegin(lbl_80524470[(unsigned char)packet->primType], GX_VTXFMT0, packet->numUniqueVertices);
+    GXBegin(glx_PrimitiveTypes[(unsigned char)packet->primType], GX_VTXFMT0, packet->numUniqueVertices);
 
     for (unsigned short i = 0; i < packet->numUniqueVertices; ++i)
     {
@@ -112,10 +113,10 @@ void GXMaterialProgram_8029A4A0::DrawDirect(const glModelPacket* packet)
 
 void GXMaterialProgram_8029A4A0::BindParameters(const glModelPacket* packet)
 {
-    fn_8036BE88(0, packet->unknown20);
-    fn_8036BE88(1, (unsigned char*)packet->unknown20 + 8);
-    fn_8036BE88(2, (unsigned char*)packet->unknown20 + 16);
-    fn_8036BE88(3, (unsigned char*)packet->unknown20 + 24);
+    glx_BindTexture(0, (glTextureBinding*)(packet->unknown20));
+    glx_BindTexture(1, (glTextureBinding*)((unsigned char*)packet->unknown20 + 8));
+    glx_BindTexture(2, (glTextureBinding*)((unsigned char*)packet->unknown20 + 16));
+    glx_BindTexture(3, (glTextureBinding*)((unsigned char*)packet->unknown20 + 24));
 }
 
 const GXMaterialParameter* GXMaterialProgram_8029A4A0::GetParameters()

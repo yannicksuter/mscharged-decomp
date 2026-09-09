@@ -68,7 +68,7 @@ bool UpdatePadBackend(PadBackend* pad)
         globalPad->mBackend = backend;
         OSEnableInterrupts();
 
-        gSwappablePadChanged.UnidentifiedDeliver(pad->m_padIndex);
+        gSwappablePadChanged.Deliver(pad->m_padIndex);
         return true;
     }
     return false;

@@ -2,6 +2,7 @@
 #define REVOLUTION_OS_THREAD_H
 
 #include <revolution/os/OSContext.h>
+#include <revolution/os/OSThread_fwd.h>
 #include <revolution/types.h>
 
 #ifdef __cplusplus
@@ -25,7 +26,6 @@ typedef enum OSThreadFlag {
     OS_THREAD_DETACHED = (1 << 0),
 } OSThreadFlag;
 
-typedef struct OSThread OSThread;
 typedef struct OSMutex OSMutex;
 
 typedef struct OSThreadQueue {
@@ -69,7 +69,6 @@ struct OSThread {
 #define queueMutex mutexQueue
 
 typedef void (*OSSwitchThreadCallback)(OSThread* current, OSThread* next);
-typedef void* (*OSThreadFunc)(void* argument);
 
 OSSwitchThreadCallback
 OSSetSwitchThreadCallback(OSSwitchThreadCallback callback);
@@ -78,20 +77,16 @@ void OSSetCurrentThread(OSThread* thread);
 void OSInitMutexQueue(OSMutexQueue* queue);
 void OSInitThreadQueue(OSThreadQueue* queue);
 OSThread* OSGetCurrentThread(void);
-BOOL OSIsThreadTerminated(OSThread* thread);
 s32 OSDisableScheduler(void);
 s32 OSEnableScheduler(void);
 s32 __OSGetEffectivePriority(OSThread* thread);
 void __OSPromoteThread(OSThread* thread, s32 priority);
 void __OSReschedule(void);
 void OSYieldThread(void);
-BOOL OSCreateThread(OSThread* thread, OSThreadFunc function, void* argument,
-                    void* stackBegin, u32 stackSize, s32 priority, u16 flags);
 void OSExitThread(OSThread* value);
 void OSCancelThread(OSThread* thread);
 BOOL OSJoinThread(OSThread* thread, void* value);
 void OSDetachThread(OSThread* thread);
-s32 OSResumeThread(OSThread* thread);
 s32 OSSuspendThread(OSThread* thread);
 void OSSleepThread(OSThreadQueue* queue);
 void OSWakeupThread(OSThreadQueue* queue);

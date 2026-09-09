@@ -1,7 +1,5 @@
 #include "Game/FE/tlInstance.h"
 
-#include "Game/FE/feLibObject.h"
-#include "Game/FE/tlComponent.h"
 #include "NL/nlString.h"
 
 #include <math.h>
@@ -217,7 +215,7 @@ void TLInstance::SetAssetVisible(bool visible)
     m_overloadedAttributes.colour = color;
 }
 
-TLInstance::TLInstance(TLComponent* component)
+TLInstance::TLInstance(FELibObject* component)
 {
     m_next = 0;
     m_prev = 0;

@@ -21,6 +21,7 @@ public:
     bool WorldIsFrozen() const;
     void Render(int pass);
     void fn_8027E5D0();
+    void fn_8027E714();
     static NisPlayer* Instance();
 
     static NisPlayer* sInstance;
@@ -32,7 +33,11 @@ public:
     /* 0x3405C */ Nis* mLoaded[8];
     /* 0x3407C */ NisHeader* mLoadQueue[8];
     /* 0x3409C */ bool mAsyncStarted[8];
-    /* 0x340A4 */ u8 unknown_0x340A4[0x210];
+    /* 0x340A4 */ u8 unknown_0x340A4[0x18C];
+    /* 0x34230 */ int mUnidentified34230;
+    /* 0x34234 */ u8 unknown_0x34234[0x4];
+    /* 0x34238 */ int mUnidentified34238;
+    /* 0x3423C */ u8 unknown_0x3423C[0x78];
     /* 0x342B4 */ char mExtraNameFilter[128];
     /* 0x34334 */ u8 unknown_0x34334[0x04];
     /* 0x34338 */ int mUnidentified34338;

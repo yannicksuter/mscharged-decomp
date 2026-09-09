@@ -7,22 +7,10 @@
 class Impostor;
 class ImpostorCharacter;
 
-// Render view management unit at 0x802CBEC4; not yet reconstructed.
-class UnidentifiedView_802CBEC4
-{
-public:
-    virtual void UnidentifiedVirtual08() = 0;
-    virtual void* UnidentifiedVirtual0C() = 0;
-    virtual void UnidentifiedVirtual10(void* camera) = 0;
-};
-
-struct UnidentifiedViewConfig_8052E828
-{
-    /* 0x00 */ u32 mUnidentified00;
-    /* 0x04 */ u32 mUnidentified04;
-    /* 0x08 */ u32 mUnidentified08;
-    /* 0x0C */ u32 mUnidentified0C;
-}; // size: 0x10
+class GLView;
+class GLResourcePool;
+class nlVector3;
+struct GLMemoryRequirement;
 
 class ImpostorManager
 {
@@ -35,8 +23,8 @@ public:
     static float GetImpostorSizeScale();
     static void SetImpostorSizeScale(float scale);
 
-    void Initialize(void* registry, int capacity,
-        const UnidentifiedViewConfig_8052E828* config, int layer, bool flag);
+    void Initialize(GLView* registry, int capacity,
+        const GLMemoryRequirement* config, int numRequirements, bool flag);
     void Uninitialize();
     void ResetImpostors();
     void ResetSpriteSlots();
@@ -48,7 +36,7 @@ public:
     void UpdateCharacters(float dt, const char* unidentified);
     void UpdateAnimations(float dt);
     void UpdateSprites();
-    void UpdatePositions(void* unidentified0, void* unidentified1);
+    void UpdatePositions(const nlVector3* direction, const nlVector3* up);
     void StaggerAnimations();
     void SetEnabled(bool enable);
     void SetUpdatePeriod(int period);
@@ -60,17 +48,17 @@ public:
     /* 0x0C */ int mCapacity;
     /* 0x10 */ void* mUnidentified010;
     /* 0x14 */ nlDLListSlotPool<ImpostorCharacter*> mCharacters;
-    /* 0x30 */ void* mpRegistry;
+    /* 0x30 */ GLView* mParentView;
     /* 0x34 */ u8 mInitialized;
     /* 0x35 */ u8 mUnidentified035;
     /* 0x36 */ u8 mUnidentified036;
     /* 0x37 */ u8 mUnidentified037;
-    /* 0x38 */ UnidentifiedView_802CBEC4* mViews[2];
-    /* 0x40 */ void* mCameras[2];
-    /* 0x48 */ int mCurrentView;
+    /* 0x38 */ GLResourcePool* mResources[2];
+    /* 0x40 */ unsigned long mResourceMarkers[2];
+    /* 0x48 */ int mCurrentResource;
     /* 0x4C */ u8 mUnidentified04C;
     /* 0x4D */ u8 mUnidentified04D[3];
-    /* 0x50 */ u32 mLastSpriteCount;
+    /* 0x50 */ u32 mLastRenderChecksum;
     /* 0x54 */ int mFrameCount;
     /* 0x58 */ u8 mCaptured;
     /* 0x59 */ u8 mUnidentified059;

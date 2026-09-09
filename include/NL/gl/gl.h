@@ -58,30 +58,31 @@ void glBeginFrame();
 void glEndFrame();
 void glDiscardFrame(int count);
 void glSendFrame();
-bool fn_802C80FC();
+bool glIsFrameActive();
 void glFinish();
 unsigned long glGetNumTriangles(eGLPrimitive primitive, unsigned long count);
 float glGetOrthographicWidth();
 float glGetOrthographicHeight();
 
-class MemoryAllocator;
+class GLResourcePool;
+struct glModel;
 
-bool fn_802C7FD0(void (*startupCallback)());
-void fn_802C8180();
-void* fn_802C81FC(
+bool glStartup(void (*startupCallback)());
+void glCompact();
+glModel* glEndLoadModel(
     void* data, unsigned long size, unsigned long* pNumModels, void* context);
-bool fn_802C8200(const char* filename,
+bool glBeginLoadModel(const char* filename,
     void (*callback)(void*, unsigned long, void*), void* userData,
     void* context);
-bool fn_802C8204(const char* filename,
+bool glBeginLoadTextureBundle(const char* filename,
     void (*callback)(void*, unsigned long, void*), void* param,
     void* context);
-void* fn_802C8208(
+glModel* glLoadModel(
     const char* filename, unsigned long* pNumModels, void* context);
-void fn_802C8280(const char* name);
-void fn_802C8284(unsigned long texture);
-bool fn_802C820C(const char* filename, MemoryAllocator* allocator);
-void fn_802C8288();
-void fn_802C828C(const char* name, void* allocator);
+void glBeginResource(const char* name);
+void glBeginResource(unsigned long texture);
+bool glLoadTextureBundle(const char* filename, GLResourcePool* allocator);
+void glEndResource();
+void glDumpResources(const char* name, GLResourcePool* resourcePool);
 
 #endif // NL_GL_GL_H

@@ -144,7 +144,7 @@ void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, 
     }
     case TLAT_COMPONENT:
     {
-        TLComponent* component = pTLInstance->m_component;
+        TLComponent* component = static_cast<TLComponent*>(pTLInstance->m_component);
         if (component != 0)
         {
             TLSlide* slide = component->GetActiveSlide();
@@ -189,7 +189,7 @@ void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, 
     }
 }
 
-extern "C" void fn_802FC280()
+void FERender::BeginFrame()
 {
 }
 

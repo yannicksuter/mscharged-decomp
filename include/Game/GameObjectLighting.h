@@ -5,6 +5,14 @@
 #include "types.h"
 
 class GLView;
+class LightingLookup;
+class TweakValueFloat;
+
+extern TweakValueFloat gShadowLookupScaleX;
+extern TweakValueFloat gShadowLookupScaleY;
+extern TweakValueFloat gShadowLookupTransX;
+extern TweakValueFloat gShadowLookupTransY;
+extern LightingLookup* gpShadowLightingLookup;
 
 class nlVector2;
 u32 GetGameObjectLightRamp();

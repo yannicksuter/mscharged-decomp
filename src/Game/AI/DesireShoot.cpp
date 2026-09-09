@@ -110,7 +110,7 @@ bool DesireShoot::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0xE70 | 0x800C5008 | size: 0x4
  */
-void DesireShoot::UnidentifiedUpdate(
+void DesireShoot::Update(
     UnidentifiedDesireUpdate*, float)
 {
 }
@@ -121,12 +121,12 @@ void DesireShoot::UnidentifiedUpdate(
 void DesireShoot::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireShoot");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size, (u8*)&mbLobShot - (u8*)&mvDesiredPosition, "mbLobShot");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireShoot");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbLobShot - (u8*)&mvDesiredPosition, "mbLobShot");
+    cache->EndType();
 }
 
 /**
@@ -142,8 +142,8 @@ void DesireShoot::UnidentifiedVirtual7(
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
     void* data = (u8*)this + offset;
-    fn_80339450(cache, sDesireShootType, data, context);
-    fn_8033930C(cache, sDesireShootType, data, sizeof(DesireShoot) - offset);
+    cache->ChecksumData(sDesireShootType, data, context);
+    cache->WriteData(sDesireShootType, data, sizeof(DesireShoot) - offset);
 }
 
 /**
@@ -152,12 +152,12 @@ void DesireShoot::UnidentifiedVirtual7(
 void DesireWindupShot::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireWindupShot");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size, (u8*)&mbShotMeterActivated - (u8*)&mvDesiredPosition, "mbShotMeterActivated");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireWindupShot");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbShotMeterActivated - (u8*)&mvDesiredPosition, "mbShotMeterActivated");
+    cache->EndType();
 }
 
 /**
@@ -173,8 +173,8 @@ void DesireWindupShot::UnidentifiedVirtual7(
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
     void* data = (u8*)this + offset;
-    fn_80339450(cache, sDesireWindupShotType, data, context);
-    fn_8033930C(cache, sDesireWindupShotType, data, sizeof(DesireWindupShot) - offset);
+    cache->ChecksumData(sDesireWindupShotType, data, context);
+    cache->WriteData(sDesireWindupShotType, data, sizeof(DesireWindupShot) - offset);
 }
 
 /**

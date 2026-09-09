@@ -27,6 +27,7 @@
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/FE/FEAudio.h"
 
 
 SHOnlineInvitePlayers::SHOnlineInvitePlayers()
@@ -302,10 +303,10 @@ bool SHOnlineInvitePlayers::RefreshLobbySlots()
     {
         mSlots[mSlotCount].mLocal = i == lobby->GetLocalMachineIndex();
         mSlots[mSlotCount].mGuest = false;
-        UnidentifiedDraftEntry* entry = lobby->GetMachineInfo(i);
+        NetworkDraftMachineInfo* entry = lobby->GetMachineInfo(i);
         mSlots[mSlotCount].mEntry = entry;
         ++mSlotCount;
-        if (entry != 0 && entry->mUnidentified7F)
+        if (entry != 0 && entry->mGuestEnabled)
         {
             mSlots[mSlotCount].mLocal = i == lobby->GetLocalMachineIndex();
             mSlots[mSlotCount].mGuest = true;
@@ -472,14 +473,14 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
         row.mSearchState = 4;
         row.mStatus = 1;
         memset(&row.mStats, 0, sizeof(row.mStats));
-        if (NetworkStatsManager_8012F378::Instance()->UsesEuropeanRankings())
+        if (NetworkStatsManager::Instance()->UsesEuropeanRankings())
         {
-            if (NetworkStatsManager_8012F378::Instance()->GetLocalStats(2) != 0)
-                row.mStats = *NetworkStatsManager_8012F378::Instance()->GetLocalStats(2);
+            if (NetworkStatsManager::Instance()->GetLocalStats(2) != 0)
+                row.mStats = *NetworkStatsManager::Instance()->GetLocalStats(2);
         }
         else
         {
-            NetworkLeaderboardCategory* category = NetworkStatsManager_8012F378::Instance()->GetCategory(4);
+            NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(4);
             if (category != 0)
             {
                 int player = category->FindPlayer(GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex)->unknown_0x01C);
@@ -519,13 +520,13 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
     {
         FEOnlinePlayerRow& row = mRows[index];
         row.Reset();
-        UnidentifiedDraftEntry* entry = mSlots[index].mEntry;
+        NetworkDraftMachineInfo* entry = mSlots[index].mEntry;
         nlStrNCpy(row.mName, entry->mName, 14);
         memcpy(row.mMiiData, entry->mUnidentified32, sizeof(row.mMiiData));
         row.mSearchState = 4;
         row.mStatus = 1;
         row.mStats = entry->mHead;
-        NetworkLeaderboardCategory* category = NetworkStatsManager_8012F378::Instance()->GetCategory(4);
+        NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(4);
         if (category != 0)
         {
             int player = category->FindPlayer(entry->mUnidentified18);

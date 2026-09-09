@@ -356,5 +356,5 @@ void FileCache_80535C20::Run(float)
     }
 }
 
-static TweakValueBoolImpl_804F4538 lbl_8059C428(
+static TweakBoolBinding lbl_8059C428(
     "g_bDisableAllFileCaching", "FileCache", &g_bDisableAllFileCaching, true);

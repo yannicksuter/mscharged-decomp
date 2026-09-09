@@ -85,9 +85,9 @@ public:
     unsigned long m_ViewportHeight;
     GLRenderPair m_RenderPair;
     bool m_Enabled;
-    bool m_ClearColour;
     bool m_ClearDepth;
-    bool m_Unknown33;
+    bool m_Unknown32;
+    bool m_ClearColour;
     unsigned long m_Target;
     void* m_Unknown38;
     void* m_Unknown3C;
@@ -124,16 +124,16 @@ public:
     int m_Depth;
 };
 
-extern "C" GLViewInterface lbl_806E1F38;
-extern "C" GLView lbl_8057F250;
+extern GLViewInterface gDefaultViewInterface;
+extern GLView gRootView;
 
 void glViewCompact();
 void glViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v3NDC);
-extern "C" void fn_802CE6DC(GLView* view, const nlVector3* normalized, nlVector3* screen);
-extern "C" float fn_802CE76C(GLView* view);
-float fn_802CE7B0(GLView* view);
-extern "C" void fn_802CE7F4(GLView* view, const nlVector3* world, nlVector3* screen);
-extern "C" void fn_802CEA40(GLView* source, GLView* destination, const nlVector3* world, nlVector3* projected);
+void glViewUnprojectOrthographicPoint(GLView* view, const nlVector3* normalized, nlVector3* viewPosition);
+float glViewGetOrthographicWidth(GLView* view);
+float glViewGetOrthographicHeight(GLView* view);
+void glViewProjectPointToViewport(GLView* view, const nlVector3* world, nlVector3* screen);
+void glViewProjectPointBetweenViews(GLView* source, GLView* destination, const nlVector3* world, nlVector3* projected);
 void gl_ViewReset();
 void gl_ViewStartup();
 

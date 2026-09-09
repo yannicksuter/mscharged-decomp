@@ -3,8 +3,8 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 #include "Game/TweakValue.h"
-#include "NL/glx/GXMaterialCrystalTweaks.h"
-#include "NL/glx/GXMaterialShadowTweaks.h"
+#include "Game/TweakValueFloat.h"
+#include "Game/TweakValueInt.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
@@ -14,128 +14,125 @@
 #include <stdlib.h>
 #include "NL/nlstring_tmpl.h"
 
-static TweakEntry_8052BF00 lbl_8057C4E4;
+static TweakEntry sTweakRootEntry;
 
 // Interned string storage, indexed by TweakStringKind.
-char* lbl_8057C510[4];
-char* lbl_8057C520[4];
-unsigned int lbl_8057C530[4];
-int lbl_8057C540[4];
-int lbl_8057C550[4];
+char* gTweakStringBuffers[4];
+char* gTweakStringNext[4];
+unsigned int gTweakStringCapacities[4];
+int gTweakStringBytesUsed[4];
+int gTweakStringCounts[4];
 
-static u8 lbl_806DF310 = 1;
+static u8 sTweakRegistryStateUninitialized = 1;
 
-extern "C"
+TweakNode* gTweakPriorityNode;
+TweakEntry* gUserTweakEntry;
+u8 gTweakRegistryInitialized;
+u8 gDeletePersistentTweakValues;
+u8 gTweakStatePushed;
+u8 gTweakRegistryResetPending;
+u8 gTweakStatePushEnabled;
+u8 gResetTweakValueStrings;
+unsigned int gTweakStaticStringCapacity;
+unsigned int gTweakDynamicStringCapacity;
+unsigned int gTweakValueStringCapacity;
+unsigned int gTweakFolderStringCapacity;
+TweakValueAllocator3* gTweakValueAllocator;
+TweakValueAllocator2* gTweakBindingAllocator;
+TweakPendingValue* gPendingTweakHead;
+TweakPendingValue* gPendingTweakTail;
+
+void ResetDynamicTweaks(void)
 {
-    void* lbl_806E1E38;
-    TweakEntry_8052BF00* lbl_806E1E3C;
-    u8 lbl_806E1E40;
-    u8 lbl_806E1E41;
-    u8 lbl_806E1E42;
-    u8 lbl_806E1E43;
-    u8 lbl_806E1E44;
-    u8 lbl_806E1E45;
-    unsigned int lbl_806E1E48;
-    unsigned int lbl_806E1E4C;
-    unsigned int lbl_806E1E50;
-    unsigned int lbl_806E1E54;
-    TweakValueAllocator3* lbl_806E1E58;
-    TweakValueAllocator2* lbl_806E1E5C;
-    TweakPendingValue* lbl_806E1E60;
-    TweakPendingValue* lbl_806E1E64;
-}
-
-void fn_802C0CCC(void)
-{
-    fn_802C5D74(&lbl_8057C4E4);
-    fn_802C3970();
-    lbl_8057C66C.FreeBlocks();
-    lbl_8057C734.FreeBlocks();
-    lbl_8057C6E4.FreeBlocks();
-    lbl_806E1E58->m_Pool1.FreeBlocks();
-    lbl_806E1E58->m_Pool2.FreeBlocks();
-    lbl_806E1E58->m_Pool3.FreeBlocks();
-    lbl_806E1E5C->m_Pool1.FreeBlocks();
-    lbl_806E1E5C->m_Pool2.FreeBlocks();
-    nlZeroMemory(lbl_8057C510[kTweakStringDynamic], lbl_8057C530[kTweakStringDynamic]);
-    lbl_8057C520[kTweakStringDynamic] = lbl_8057C510[kTweakStringDynamic];
-    if (lbl_806E1E45)
+    RemoveDynamicTweakChildren(&sTweakRootEntry);
+    RecycleTweakNames();
+    gTweakNamePool.FreeBlocks();
+    gTweakEntryPool.FreeBlocks();
+    gTweakNodePool.FreeBlocks();
+    gTweakValueAllocator->m_Pool1.FreeBlocks();
+    gTweakValueAllocator->m_Pool2.FreeBlocks();
+    gTweakValueAllocator->m_Pool3.FreeBlocks();
+    gTweakBindingAllocator->m_Pool1.FreeBlocks();
+    gTweakBindingAllocator->m_Pool2.FreeBlocks();
+    nlZeroMemory(gTweakStringBuffers[kTweakStringDynamic], gTweakStringCapacities[kTweakStringDynamic]);
+    gTweakStringNext[kTweakStringDynamic] = gTweakStringBuffers[kTweakStringDynamic];
+    if (gResetTweakValueStrings)
     {
-        nlZeroMemory(lbl_8057C510[kTweakStringValue], lbl_8057C530[kTweakStringValue]);
-        lbl_8057C520[kTweakStringValue] = lbl_8057C510[kTweakStringValue];
+        nlZeroMemory(gTweakStringBuffers[kTweakStringValue], gTweakStringCapacities[kTweakStringValue]);
+        gTweakStringNext[kTweakStringValue] = gTweakStringBuffers[kTweakStringValue];
     }
-    lbl_806E1E43 = true;
+    gTweakRegistryResetPending = true;
 }
 
-TweakEntry_8052BF00* fn_802C0E30(void)
+TweakEntry* GetTweakRoot(void)
 {
-    return &lbl_8057C4E4;
+    return &sTweakRootEntry;
 }
 
-void* fn_802C0E3C(void)
+TweakNode* GetTweakPriorityNode(void)
 {
-    return lbl_806E1E38;
+    return gTweakPriorityNode;
 }
 
-TweakEntry_8052BF00* fn_802C0E44(void)
+TweakEntry* GetUserTweakEntry(void)
 {
-    return lbl_806E1E3C;
+    return gUserTweakEntry;
 }
 
-TweakEntry_8052BF00* fn_802C0E4C(TweakValueBase_8052BF70* value, TweakEntry_8052BF00* parent)
+TweakEntry* CreateTweakEntry(TweakValueBase* value, TweakEntry* parent)
 {
-    TweakEntry_8052BF00* entry = new (lbl_8057C734.Allocate()) TweakEntry_8052BF00;
+    TweakEntry* entry = new (gTweakEntryPool.Allocate()) TweakEntry;
     entry->m_Value = value;
-    fn_802C47E4(entry);
+    UpdateTweakNodePathHash(entry);
     if (parent != 0)
     {
-        fn_802C56E8(parent, entry);
+        AddTweakChild(parent, entry);
     }
     return entry;
 }
 
-int fn_802C0F04(void)
+int IsTweakRegistryInitialized(void)
 {
-    if (lbl_806DF310)
+    if (sTweakRegistryStateUninitialized)
     {
-        lbl_806E1E40 = 0;
-        lbl_806DF310 = 0;
+        gTweakRegistryInitialized = 0;
+        sTweakRegistryStateUninitialized = 0;
     }
-    return lbl_806E1E40;
+    return gTweakRegistryInitialized;
 }
 
-void fn_802C0F24(int fromEnd, u8 flag, unsigned int* sizes)
+void InitializeTweakRegistry(int fromEnd, u8 flag, unsigned int* sizes)
 {
-    lbl_806E1E48 = 0x7800;
-    lbl_806E1E4C = 0x2800;
-    lbl_806E1E50 = 0x800;
-    lbl_806E1E54 = 0x3000;
+    gTweakStaticStringCapacity = 0x7800;
+    gTweakDynamicStringCapacity = 0x2800;
+    gTweakValueStringCapacity = 0x800;
+    gTweakFolderStringCapacity = 0x3000;
     if (sizes != 0)
     {
         if (sizes[0] != 0)
         {
-            lbl_806E1E48 = sizes[0];
+            gTweakStaticStringCapacity = sizes[0];
         }
         if (sizes[1] != 0)
         {
-            lbl_806E1E4C = sizes[1];
+            gTweakDynamicStringCapacity = sizes[1];
         }
         if (sizes[2] != 0)
         {
-            lbl_806E1E50 = sizes[2];
+            gTweakValueStringCapacity = sizes[2];
         }
         if (sizes[3] != 0)
         {
-            lbl_806E1E54 = sizes[3];
+            gTweakFolderStringCapacity = sizes[3];
         }
     }
-    lbl_806E1E44 = flag;
+    gTweakStatePushEnabled = flag;
 
-    lbl_806E1E58 = new (nlMalloc(sizeof(TweakValueAllocator3), 8, false)) TweakValueAllocator3;
+    gTweakValueAllocator = new (nlMalloc(sizeof(TweakValueAllocator3), 8, false)) TweakValueAllocator3;
 
     TweakValueAllocator2* dynamic_pools = new (nlMalloc(sizeof(TweakValueAllocator2), 8, false)) TweakValueAllocator2;
-    lbl_806E1E40 = 1;
-    lbl_806E1E5C = dynamic_pools;
+    gTweakRegistryInitialized = 1;
+    gTweakBindingAllocator = dynamic_pools;
 
     unsigned int i;
     for (i = 0; i < 4; i++)
@@ -143,19 +140,19 @@ void fn_802C0F24(int fromEnd, u8 flag, unsigned int* sizes)
         switch (i)
         {
         case 0:
-            lbl_8057C530[i] = lbl_806E1E48;
+            gTweakStringCapacities[i] = gTweakStaticStringCapacity;
             break;
         case 1:
-            lbl_8057C530[i] = lbl_806E1E4C;
+            gTweakStringCapacities[i] = gTweakDynamicStringCapacity;
             break;
         case 2:
-            lbl_8057C530[i] = lbl_806E1E50;
+            gTweakStringCapacities[i] = gTweakValueStringCapacity;
             break;
         case 3:
-            lbl_8057C530[i] = lbl_806E1E54;
+            gTweakStringCapacities[i] = gTweakFolderStringCapacity;
             break;
         default:
-            lbl_8057C530[i] = 0;
+            gTweakStringCapacities[i] = 0;
             break;
         }
     }
@@ -164,26 +161,26 @@ void fn_802C0F24(int fromEnd, u8 flag, unsigned int* sizes)
     {
         for (int j = 0; j < 4; j++)
         {
-            lbl_8057C510[j] = (char*)nlMalloc(lbl_8057C530[j], 8, false);
+            gTweakStringBuffers[j] = (char*)nlMalloc(gTweakStringCapacities[j], 8, false);
         }
     }
     else
     {
         for (int j = 0; j < 4; j++)
         {
-            lbl_8057C510[j] = (char*)nlMalloc(lbl_8057C530[j], 8, true);
+            gTweakStringBuffers[j] = (char*)nlMalloc(gTweakStringCapacities[j], 8, true);
         }
     }
 
     for (int j = 0; j < 4; j++)
     {
-        lbl_8057C520[j] = lbl_8057C510[j];
-        lbl_8057C510[j][lbl_8057C530[j] - 1] = '\0';
+        gTweakStringNext[j] = gTweakStringBuffers[j];
+        gTweakStringBuffers[j][gTweakStringCapacities[j] - 1] = '\0';
     }
 
-    lbl_806E1E3C = fn_802C3FF8(&lbl_8057C4E4, "User", 0);
-    fn_802C1BB0();
-    fn_802C1D30();
+    gUserTweakEntry = FindOrCreateTweakChildEntry(&sTweakRootEntry, "User", 0);
+    RegisterPendingTweaks();
+    BindPendingTweaks();
 
     TweakPendingValue* pending = TweakPendingValue::PopHead();
     while (pending != 0)
@@ -194,62 +191,62 @@ void fn_802C0F24(int fromEnd, u8 flag, unsigned int* sizes)
 
     if (flag != 0)
     {
-        lbl_8057C734.PushState();
-        lbl_8057C6E4.PushState();
-        lbl_806E1E58->m_Pool1.PushState();
-        lbl_806E1E58->m_Pool2.PushState();
-        lbl_806E1E58->m_Pool3.PushState();
-        lbl_806E1E5C->m_Pool1.PushState();
-        lbl_806E1E5C->m_Pool2.PushState();
-        lbl_8057C66C.PushState();
-        lbl_806E1E42 = 1;
+        gTweakEntryPool.PushState();
+        gTweakNodePool.PushState();
+        gTweakValueAllocator->m_Pool1.PushState();
+        gTweakValueAllocator->m_Pool2.PushState();
+        gTweakValueAllocator->m_Pool3.PushState();
+        gTweakBindingAllocator->m_Pool1.PushState();
+        gTweakBindingAllocator->m_Pool2.PushState();
+        gTweakNamePool.PushState();
+        gTweakStatePushed = 1;
     }
 }
 
-void fn_802C1B98(void)
+void ClearTweakRegistryReset(void)
 {
-    if (lbl_806E1E43)
+    if (gTweakRegistryResetPending)
     {
-        lbl_806E1E43 = 0;
+        gTweakRegistryResetPending = 0;
     }
 }
 
-void fn_802C1BB0(void)
+void RegisterPendingTweaks(void)
 {
-    TweakValueBase_8052BF70* value;
-    TweakPendingValue* pending = lbl_806E1E60;
+    TweakValueBase* value;
+    TweakPendingValue* pending = gPendingTweakHead;
     while (pending != 0)
     {
         value = pending->m_Value;
         value->UnidentifiedVirtual0C();
         int kind = value->UnidentifiedVirtual10();
-        if ((!pending->m_Registered && kind == 1) || (kind == 2 && ((UnidentifiedTweakValueImplBase*)value)->UnidentifiedVirtual30()))
+        if ((!pending->m_Registered && kind == 1) || (kind == 2 && ((TweakBindingBase*)value)->UnidentifiedVirtual30()))
         {
             if (value->mUnidentified009)
             {
-                if (fn_802C278C(value->mName, 0))
+                if (NeedsTweakNameFormatting(value->mName, 0))
                 {
-                    value->mName = fn_802C2914(value->mName, kTweakStringStatic);
+                    value->mName = FormatTweakName(value->mName, kTweakStringStatic);
                 }
             }
-            TweakEntry_8052BF00* entry;
+            TweakEntry* entry;
             if (nlStrChr(value->mName, '/') != 0)
             {
                 const char* name;
                 char dir[0x100];
                 char combined[0x100];
-                fn_802C7480(value->mName, &name, dir);
-                fn_802C7534(pending->m_Category, dir, combined);
-                entry = fn_802C4504(&lbl_8057C4E4, combined, 0);
+                SplitTweakPath(value->mName, &name, dir);
+                JoinTweakPath(pending->m_Category, dir, combined);
+                entry = FindOrCreateTweakPath(&sTweakRootEntry, combined, 0);
                 value->mName = name;
             }
             else
             {
-                entry = fn_802C4504(&lbl_8057C4E4, pending->m_Category, 0);
+                entry = FindOrCreateTweakPath(&sTweakRootEntry, pending->m_Category, 0);
             }
             if (entry != 0)
             {
-                fn_802C5780(entry, value);
+                AddTweakValue(entry, value);
             }
             pending->m_Registered = true;
         }
@@ -257,27 +254,27 @@ void fn_802C1BB0(void)
     }
 }
 
-void fn_802C1D30(void)
+void BindPendingTweaks(void)
 {
     TweakPendingValue* pending = TweakPendingValue::PopHead();
     for (; pending != 0; pending = pending->m_Next)
     {
-        TweakValueBase_8052BF70* value = pending->m_Value;
+        TweakValueBase* value = pending->m_Value;
         int type = value->UnidentifiedVirtual0C();
         int kind = value->UnidentifiedVirtual10();
         if (!pending->m_Registered && kind == 2)
         {
             if (value->mUnidentified009)
             {
-                if (fn_802C278C(value->mName, 0))
+                if (NeedsTweakNameFormatting(value->mName, 0))
                 {
-                    value->mName = fn_802C2914(value->mName, kTweakStringStatic);
+                    value->mName = FormatTweakName(value->mName, kTweakStringStatic);
                 }
             }
-            if (!((UnidentifiedTweakValueImplBase*)value)
-                    ->fn_802C4FEC(value->mName, 0.0f, pending->m_Category, false, 0.0f, 0.0f))
+            if (!((TweakBindingBase*)value)
+                    ->Bind(value->mName, 0.0f, pending->m_Category, false, 0.0f, 0.0f))
             {
-                TweakValueImpl_804F4DC8* impl = (TweakValueImpl_804F4DC8*)value;
+                TweakFloatBinding* impl = (TweakFloatBinding*)value;
                 switch (type)
                 {
                 case 5:
@@ -299,16 +296,16 @@ void fn_802C1D30(void)
     }
 }
 
-const char* fn_802C1EBC(const char* str, int kind)
+const char* InternTweakString(const char* str, int kind)
 {
     if (kind == kTweakStringCurrent)
     {
-        kind = lbl_806E1E42 != 0;
+        kind = gTweakStatePushed != 0;
     }
     if (kind != kTweakStringValue)
     {
-        const char* existing = lbl_8057C510[kind];
-        while (existing < lbl_8057C520[kind])
+        const char* existing = gTweakStringBuffers[kind];
+        while (existing < gTweakStringNext[kind])
         {
             if (nlStrICmp(str, existing) == 0)
             {
@@ -317,23 +314,23 @@ const char* fn_802C1EBC(const char* str, int kind)
             existing += nlStrLen(existing) + 2;
         }
     }
-    const char* start = lbl_8057C520[kind];
+    const char* start = gTweakStringNext[kind];
     while (*str != '\0')
     {
-        if (lbl_8057C520[kind] - lbl_8057C510[kind] >= (int)lbl_8057C530[kind] - 1)
+        if (gTweakStringNext[kind] - gTweakStringBuffers[kind] >= (int)gTweakStringCapacities[kind] - 1)
         {
             return start;
         }
-        *lbl_8057C520[kind] = *str;
+        *gTweakStringNext[kind] = *str;
         str++;
-        lbl_8057C520[kind]++;
+        gTweakStringNext[kind]++;
     }
-    *lbl_8057C520[kind] = '\0';
-    lbl_8057C520[kind]++;
-    *lbl_8057C520[kind] = 1;
-    lbl_8057C520[kind]++;
-    lbl_8057C540[kind] = lbl_8057C520[kind] - lbl_8057C510[kind];
-    lbl_8057C550[kind]++;
+    *gTweakStringNext[kind] = '\0';
+    gTweakStringNext[kind]++;
+    *gTweakStringNext[kind] = 1;
+    gTweakStringNext[kind]++;
+    gTweakStringBytesUsed[kind] = gTweakStringNext[kind] - gTweakStringBuffers[kind];
+    gTweakStringCounts[kind]++;
     return start;
 }
 
@@ -341,18 +338,18 @@ const char* fn_802C1EBC(const char* str, int kind)
 // under the entry. Retail evaluates the value argument before the interning
 // call in every branch, which only a call boundary reproduces.
 template <typename T, typename V>
-static T* UnidentifiedCreateValue(TweakEntry_8052BF00* entry, const char* name, V value)
+static T* UnidentifiedCreateValue(TweakEntry* entry, const char* name, V value)
 {
-    const char* interned = fn_802C1EBC(name, kTweakStringCurrent);
-    T* created = new (lbl_806E1E58->Allocate(sizeof(T))) T(interned, value);
-    fn_802C5780(entry, created);
+    const char* interned = InternTweakString(name, kTweakStringCurrent);
+    T* created = new (gTweakValueAllocator->Allocate(sizeof(T))) T(interned, value);
+    AddTweakValue(entry, created);
     return created;
 }
 
-void fn_802C2080(TweakEntry_8052BF00* entry, const char* name, const char* valueStr)
+void CreateTweakValueFromString(TweakEntry* entry, const char* name, const char* valueStr)
 {
     int intValue = 0;
-    TweakValueBase_8052BF70* value;
+    TweakValueBase* value;
     bool boolValue = 0;
     const char* scan;
     float floatValue = 0.0f;
@@ -371,7 +368,7 @@ void fn_802C2080(TweakEntry_8052BF00* entry, const char* name, const char* value
 scannedInt:
     if (isInt)
     {
-        value = UnidentifiedCreateValue<GXMaterialColourTweak_804FC520>(entry, name, intValue);
+        value = UnidentifiedCreateValue<TweakValueInt>(entry, name, intValue);
     }
     else
     {
@@ -392,15 +389,15 @@ scannedInt:
     scannedFloat:
         if (isFloat)
         {
-                value = UnidentifiedCreateValue<GXMaterialFloatTweak_804F4190>(entry, name, floatValue);
+                value = UnidentifiedCreateValue<TweakValueFloat>(entry, name, floatValue);
         }
-        else if (fn_802C250C(valueStr, &boolValue))
+        else if (ParseTweakBool(valueStr, &boolValue))
         {
-                value = UnidentifiedCreateValue<TweakValueBool_804F4578>(entry, name, boolValue);
+                value = UnidentifiedCreateValue<TweakValueBool>(entry, name, boolValue);
         }
         else
         {
-                value = UnidentifiedCreateValue<TweakValueString_8052BD48>(entry, name, "");
+                value = UnidentifiedCreateValue<TweakValueString>(entry, name, "");
         }
     }
     value->UnidentifiedVirtual28(valueStr);
@@ -416,7 +413,7 @@ static const char* sTweakBoolStrings[] = {
     "off",
 };
 
-int fn_802C250C(const char* str, bool* out)
+int ParseTweakBool(const char* str, bool* out)
 {
     int index = -1;
     switch (tolower((signed char)*str))
@@ -469,7 +466,7 @@ int fn_802C250C(const char* str, bool* out)
     return 0;
 }
 
-int fn_802C269C(const char* str, unsigned int count, int index)
+int IsTweakNamePrefix(const char* str, unsigned int count, int index)
 {
     if (count == 0)
     {
@@ -483,12 +480,12 @@ int fn_802C269C(const char* str, unsigned int count, int index)
             {
                 return str[1] >= 'A' && str[1] <= 'Z';
             }
-            return fn_802C269C(str, count - 1, index + 1);
+            return IsTweakNamePrefix(str, count - 1, index + 1);
         }
     }
     if (str[index] == '_')
     {
-        return fn_802C269C(str, count - 1, index + 1);
+        return IsTweakNamePrefix(str, count - 1, index + 1);
     }
     if (str[index] == 'f' || str[index] == 'b' || str[index] == 'i' || str[index] == 'n')
     {
@@ -496,12 +493,12 @@ int fn_802C269C(const char* str, unsigned int count, int index)
         {
             return str[index + 1] >= 'A' && str[index + 1] <= 'Z';
         }
-        return fn_802C269C(str, count - 1, index + 1);
+        return IsTweakNamePrefix(str, count - 1, index + 1);
     }
     return 0;
 }
 
-int fn_802C278C(const char* name, int* outLength)
+int NeedsTweakNameFormatting(const char* name, int* outLength)
 {
     int found = 0;
     unsigned int i;
@@ -530,7 +527,7 @@ int fn_802C278C(const char* name, int* outLength)
         int prefixLength;
         for (int length = 3; length >= 1; length--)
         {
-            if (fn_802C269C(name, length, 0))
+            if (IsTweakNamePrefix(name, length, 0))
             {
                 prefixLength = length;
                 goto haveLength;
@@ -547,10 +544,10 @@ int fn_802C278C(const char* name, int* outLength)
     return 0;
 }
 
-const char* fn_802C2914(const char* name, int kind)
+const char* FormatTweakName(const char* name, int kind)
 {
     int prefix = 0;
-    fn_802C278C(name, &prefix);
+    NeedsTweakNameFormatting(name, &prefix);
 
     char buffer[0x48];
     unsigned int out = 0;
@@ -576,17 +573,17 @@ const char* fn_802C2914(const char* name, int kind)
         }
     }
     buffer[out] = '\0';
-    return fn_802C1EBC(buffer, kind);
+    return InternTweakString(buffer, kind);
 }
 
-void fn_802C2B38(TweakValueBase_8052BF70* value)
+void UnregisterTweakValue(TweakValueBase* value)
 {
-    fn_802C595C(&lbl_8057C4E4, value);
+    RemoveTweakValue(&sTweakRootEntry, value);
 }
 
 float GetTweakFloat(const char* path, float defaultValue)
 {
-    TweakEntry_8052BF00* entry = fn_802C41B4(&lbl_8057C4E4, path);
+    TweakNode* entry = FindTweakNode(&sTweakRootEntry, path);
     if (entry == 0)
     {
         return defaultValue;
@@ -594,18 +591,18 @@ float GetTweakFloat(const char* path, float defaultValue)
     int kind = entry->m_Value->UnidentifiedVirtual10();
     if (kind == 1)
     {
-        return ((GXMaterialFloatTweak_804F4190*)entry->m_Value)->value;
+        return ((TweakValueFloat*)entry->m_Value)->value;
     }
     if (kind == 2)
     {
-        return *((TweakValueImpl_804F4DC8*)entry->m_Value)->m_pValue;
+        return *((TweakFloatBinding*)entry->m_Value)->m_pValue;
     }
     return defaultValue;
 }
 
 int GetTweakInt(const char* path, int defaultValue)
 {
-    TweakEntry_8052BF00* entry = fn_802C41B4(&lbl_8057C4E4, path);
+    TweakNode* entry = FindTweakNode(&sTweakRootEntry, path);
     if (entry == 0)
     {
         return defaultValue;
@@ -613,18 +610,18 @@ int GetTweakInt(const char* path, int defaultValue)
     int kind = entry->m_Value->UnidentifiedVirtual10();
     if (kind == 1)
     {
-        return ((GXMaterialColourTweak_804FC520*)entry->m_Value)->value;
+        return ((TweakValueInt*)entry->m_Value)->value;
     }
     if (kind == 2)
     {
-        return *(int*)((TweakValueImpl_804F4DC8*)entry->m_Value)->m_pValue;
+        return *(int*)((TweakFloatBinding*)entry->m_Value)->m_pValue;
     }
     return defaultValue;
 }
 
 bool GetTweakBool(const char* path, bool defaultValue)
 {
-    TweakEntry_8052BF00* entry = fn_802C41B4(&lbl_8057C4E4, path);
+    TweakNode* entry = FindTweakNode(&sTweakRootEntry, path);
     if (entry == 0)
     {
         return defaultValue;
@@ -632,18 +629,18 @@ bool GetTweakBool(const char* path, bool defaultValue)
     int kind = entry->m_Value->UnidentifiedVirtual10();
     if (kind == 1)
     {
-        return ((TweakValueBool_804F4578*)entry->m_Value)->mValue;
+        return ((TweakValueBool*)entry->m_Value)->mValue;
     }
     if (kind == 2)
     {
-        return *(bool*)((TweakValueImpl_804F4DC8*)entry->m_Value)->m_pValue;
+        return *(bool*)((TweakFloatBinding*)entry->m_Value)->m_pValue;
     }
     return defaultValue;
 }
 
 const char* GetTweakString(const char* path, const char* defaultValue)
 {
-    TweakEntry_8052BF00* entry = fn_802C41B4(&lbl_8057C4E4, path);
+    TweakNode* entry = FindTweakNode(&sTweakRootEntry, path);
     if (entry == 0)
     {
         return defaultValue;
@@ -651,56 +648,56 @@ const char* GetTweakString(const char* path, const char* defaultValue)
     int kind = entry->m_Value->UnidentifiedVirtual10();
     if (kind == 1)
     {
-        return ((TweakValueString_8052BD48*)entry->m_Value)->m_Value;
+        return ((TweakValueString*)entry->m_Value)->m_Value;
     }
     if (kind == 2)
     {
-        return *(const char**)((TweakValueImpl_804F4DC8*)entry->m_Value)->m_pValue;
+        return *(const char**)((TweakFloatBinding*)entry->m_Value)->m_pValue;
     }
     return defaultValue;
 }
 
-int fn_802C2DBC(const char* path)
+bool TweakExists(const char* path)
 {
-    return fn_802C41B4(&lbl_8057C4E4, path) != 0;
+    return FindTweakNode(&sTweakRootEntry, path) != 0;
 }
 
-void fn_802C2DF4(TweakPendingValue* pending, TweakValueBase_8052BF70* value, const char* category)
+void QueueTweakValue(TweakPendingValue* pending, TweakValueBase* value, const char* category)
 {
     pending->m_Value = value;
     pending->m_Category = category;
     pending->m_Unk8 = 0;
     pending->m_Next = 0;
     pending->m_Registered = 0;
-    if (lbl_806E1E60 == 0 && lbl_806E1E64 == 0)
+    if (gPendingTweakHead == 0 && gPendingTweakTail == 0)
     {
-        lbl_806E1E60 = pending;
-        lbl_806E1E64 = pending;
+        gPendingTweakHead = pending;
+        gPendingTweakTail = pending;
     }
     else
     {
-        lbl_806E1E64->m_Next = pending;
-        lbl_806E1E64 = pending;
+        gPendingTweakTail->m_Next = pending;
+        gPendingTweakTail = pending;
     }
 }
 
-int TweakNode_8052BEB0::UnidentifiedVirtual0C()
+int TweakNode::UnidentifiedVirtual0C()
 {
     return 0;
 }
 
-TweakEntry_8052BF00* TweakNode_8052BEB0::UnidentifiedVirtual18()
+TweakEntry* TweakNode::UnidentifiedVirtual18()
 {
     return 0;
 }
 
-static TweakValueIntImpl_804FD898 sStaticStringBytes("Static String Mem Used", "/Registry/Stats/Bytes", &lbl_8057C540[kTweakStringStatic]);
-static TweakValueIntImpl_804FD898 sDynamicStringBytes("Dynamic String Mem Used", lbl_806E1E90, &lbl_8057C540[kTweakStringDynamic]);
-static TweakValueIntImpl_804FD898 sValueStringBytes("String Value Mem Used", lbl_806E1E90, &lbl_8057C540[kTweakStringValue]);
-static TweakValueIntImpl_804FD898 sFolderNameBytes("Folder Name Mem Used", lbl_806E1E90, &lbl_8057C540[kTweakStringFolder]);
-static TweakValueIntImpl_804FD898 sStaticStringCount("Num static strings", "/Registry/Stats/Number", &lbl_8057C550[kTweakStringStatic]);
-static TweakValueIntImpl_804FD898 sDynamicStringCount("Num dynamic strings", lbl_806E1E90, &lbl_8057C550[kTweakStringDynamic]);
-static TweakValueIntImpl_804FD898 sValueStringCount("Num value strings", lbl_806E1E90, &lbl_8057C550[kTweakStringValue]);
-static TweakValueIntImpl_804FD898 sFolderNameCount("Num folder names", lbl_806E1E90, &lbl_8057C550[kTweakStringFolder]);
+static TweakIntBinding sStaticStringBytes("Static String Mem Used", "/Registry/Stats/Bytes", &gTweakStringBytesUsed[kTweakStringStatic]);
+static TweakIntBinding sDynamicStringBytes("Dynamic String Mem Used", gLastTweakCategory, &gTweakStringBytesUsed[kTweakStringDynamic]);
+static TweakIntBinding sValueStringBytes("String Value Mem Used", gLastTweakCategory, &gTweakStringBytesUsed[kTweakStringValue]);
+static TweakIntBinding sFolderNameBytes("Folder Name Mem Used", gLastTweakCategory, &gTweakStringBytesUsed[kTweakStringFolder]);
+static TweakIntBinding sStaticStringCount("Num static strings", "/Registry/Stats/Number", &gTweakStringCounts[kTweakStringStatic]);
+static TweakIntBinding sDynamicStringCount("Num dynamic strings", gLastTweakCategory, &gTweakStringCounts[kTweakStringDynamic]);
+static TweakIntBinding sValueStringCount("Num value strings", gLastTweakCategory, &gTweakStringCounts[kTweakStringValue]);
+static TweakIntBinding sFolderNameCount("Num folder names", gLastTweakCategory, &gTweakStringCounts[kTweakStringFolder]);
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

@@ -1,9 +1,12 @@
 #ifndef NL_BUNDLE_FILE_H
 #define NL_BUNDLE_FILE_H
 
+#include "NL/nlPrint.h"
+
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "types.h"
+#include "NL/nlPrint.h"
 
 struct nlFile;
 
@@ -88,7 +91,6 @@ public:
                 return i;
             }
         }
-        extern int nlPrintf(const char*, ...);
         nlPrintf(lbl_8052BA40, hash);
         return -1U;
     }
@@ -104,7 +106,6 @@ public:
         }
         if (printError)
         {
-            extern int nlPrintf(const char*, ...);
             nlPrintf(lbl_8052BA40, hash);
         }
         return -1U;

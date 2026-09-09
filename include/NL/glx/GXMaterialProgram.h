@@ -6,22 +6,18 @@
 #include "NL/gl/glModel.h"
 #include "NL/glx/GXMaterialProgramBase.h"
 #include "NL/glx/GXMaterialProgram_80298B18.h"
-#include "NL/gl/tu_802CC370.h"
-#include "NL/glx/tu_8036A800.h"
-#include "NL/glx/tu_8036D774.h"
+#include "NL/gl/glMaterialParameters.h"
+#include "NL/glx/glxLight.h"
+#include "NL/glx/glxSkinMatrix.h"
+#include "NL/glx/glxTexture.h"
 
 class GLView;
 
-extern "C"
-{
-    void fn_802CB790(void* program, unsigned long hash);
-    void fn_8036BE88(int textureMap, void* textureData);
-    // Program state helpers retained in automatic ranges; their parameter
-    // types are not established, so they keep C linkage.
-    void fn_80297F70(bool enabled);
-}
+void glx_EnableWarble(bool enabled);
 
-extern GXPrimitive lbl_80524470[6];
+extern GXPrimitive glx_PrimitiveTypes[6];
+
+
 
 struct GXMaterialProgramParameters_802A6B6C
 {
@@ -39,7 +35,7 @@ class GXMaterialProgram_802A6B6C
 public:
     GXMaterialProgram_802A6B6C();
     virtual ~GXMaterialProgram_802A6B6C();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -59,7 +55,7 @@ class GXMaterialProgram_802981F0 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802981F0();
     virtual ~GXMaterialProgram_802981F0();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -77,7 +73,7 @@ class GXMaterialProgram_80298478 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_80298478();
     virtual ~GXMaterialProgram_80298478();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -95,7 +91,7 @@ class GXMaterialProgram_802987A0 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802987A0();
     virtual ~GXMaterialProgram_802987A0();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -108,12 +104,13 @@ public:
     static GXMaterialParameter Parameters[16];
 };
 
+
 class GXMaterialProgram_80298EE0 : public GXMaterialProgramImpl<GXMaterialProgram_80298EE0>
 {
 public:
     GXMaterialProgram_80298EE0();
     virtual ~GXMaterialProgram_80298EE0();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -131,7 +128,7 @@ class GXMaterialProgram_802991B8 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802991B8();
     virtual ~GXMaterialProgram_802991B8();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -149,7 +146,7 @@ class GXMaterialProgram_80299490 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_80299490();
     virtual ~GXMaterialProgram_80299490();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -167,7 +164,7 @@ class GXMaterialProgram_802997B8 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802997B8();
     virtual ~GXMaterialProgram_802997B8();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -185,7 +182,7 @@ class GXMaterialProgram_80299A90 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_80299A90();
     virtual ~GXMaterialProgram_80299A90();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -198,19 +195,19 @@ public:
     static GXMaterialParameter Parameters[2];
 };
 
-struct GXMaterialProgramParameters_80299CA0
+struct GXCrystalMaterialParameters
 {
-    /* 0x00 */ UnidentifiedTextureState texture0;
-    /* 0x08 */ UnidentifiedTextureState texture1;
-    /* 0x10 */ UnidentifiedTextureState texture2;
+    /* 0x00 */ glTextureBinding texture0;
+    /* 0x08 */ glTextureBinding texture1;
+    /* 0x10 */ glTextureBinding texture2;
 }; // size: 0x18
 
-class GXMaterialProgram_80299CA0 : public GXMaterialProgramImpl<GXMaterialProgram_80299CA0>
+class GXCrystalMaterialProgram : public GXMaterialProgramImpl<GXCrystalMaterialProgram>
 {
 public:
-    GXMaterialProgram_80299CA0();
-    virtual ~GXMaterialProgram_80299CA0();
-    virtual void Configure();
+    GXCrystalMaterialProgram();
+    virtual ~GXCrystalMaterialProgram();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters()
     {
         return Parameters;
@@ -223,7 +220,7 @@ public:
     void DrawDirect(const glModelPacket* packet);
     void BindParameters(const glModelPacket* packet);
 
-    static GXMaterialProgram_80299CA0* Instance;
+    static GXCrystalMaterialProgram* Instance;
     static bool Initialized;
     static GXMaterialParameter Parameters[3];
 };
@@ -233,7 +230,7 @@ class GXMaterialProgram_8029A4A0 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029A4A0();
     virtual ~GXMaterialProgram_8029A4A0();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -253,7 +250,7 @@ class GXMaterialProgram_8029AB0C : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029AB0C();
     virtual ~GXMaterialProgram_8029AB0C();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -273,7 +270,7 @@ class GXMaterialProgram_8029AFC4 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029AFC4();
     virtual ~GXMaterialProgram_8029AFC4();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -293,7 +290,7 @@ class GXMaterialProgram_8029B434 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029B434();
     virtual ~GXMaterialProgram_8029B434();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -313,7 +310,7 @@ class GXMaterialProgram_8029BA04 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029BA04();
     virtual ~GXMaterialProgram_8029BA04();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -331,7 +328,7 @@ class GXMaterialProgram_8029BC9C : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029BC9C();
     virtual ~GXMaterialProgram_8029BC9C();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -351,7 +348,7 @@ class GXMaterialProgram_8029C2F8 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029C2F8();
     virtual ~GXMaterialProgram_8029C2F8();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -371,7 +368,7 @@ class GXMaterialProgram_8029C9F0 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029C9F0();
     virtual ~GXMaterialProgram_8029C9F0();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -391,7 +388,7 @@ class GXMaterialProgram_8029D0E8 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029D0E8();
     virtual ~GXMaterialProgram_8029D0E8();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -411,7 +408,7 @@ class GXMaterialProgram_8029D7E0 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029D7E0();
     virtual ~GXMaterialProgram_8029D7E0();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -431,7 +428,7 @@ class GXMaterialProgram_8029DE3C : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029DE3C();
     virtual ~GXMaterialProgram_8029DE3C();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -451,7 +448,7 @@ class GXMaterialProgram_8029E338 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029E338();
     virtual ~GXMaterialProgram_8029E338();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -471,7 +468,7 @@ class GXMaterialProgram_8029E8F8 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029E8F8();
     virtual ~GXMaterialProgram_8029E8F8();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -491,7 +488,7 @@ class GXMaterialProgram_8029EF54 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029EF54();
     virtual ~GXMaterialProgram_8029EF54();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -511,7 +508,7 @@ class GXMaterialProgram_8029F5B0 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029F5B0();
     virtual ~GXMaterialProgram_8029F5B0();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -531,7 +528,7 @@ class GXMaterialProgram_8029FC0C : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_8029FC0C();
     virtual ~GXMaterialProgram_8029FC0C();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -551,7 +548,7 @@ class GXMaterialProgram_802A01CC : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A01CC();
     virtual ~GXMaterialProgram_802A01CC();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -565,12 +562,12 @@ public:
     static GXMaterialParameter Parameters[2];
 };
 
-class GXMaterialProgram_802A05A4 : public GXMaterialProgramImpl<GXMaterialProgram_802A05A4>
+class GXWarbleMaterialProgram : public GXMaterialProgramImpl<GXWarbleMaterialProgram>
 {
 public:
-    GXMaterialProgram_802A05A4();
-    virtual ~GXMaterialProgram_802A05A4();
-    virtual void Configure();
+    GXWarbleMaterialProgram();
+    virtual ~GXWarbleMaterialProgram();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -580,7 +577,7 @@ public:
     void DrawDirect(const glModelPacket* packet);
     void BindParameters(const glModelPacket* packet);
 
-    static GXMaterialProgram_802A05A4* Instance;
+    static GXWarbleMaterialProgram* Instance;
     static bool Initialized;
     static GXMaterialParameter Parameters[1];
 };
@@ -590,7 +587,7 @@ class GXMaterialProgram_802A3EF0 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A3EF0();
     virtual ~GXMaterialProgram_802A3EF0();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -605,12 +602,12 @@ public:
     static GXMaterialParameter Parameters[1];
 };
 
-class GXMaterialProgram_802A4360 : public GXMaterialProgramImpl<GXMaterialProgram_802A4360>
+class GXConstantColourMaterialProgram : public GXMaterialProgramImpl<GXConstantColourMaterialProgram>
 {
 public:
-    GXMaterialProgram_802A4360();
-    virtual ~GXMaterialProgram_802A4360();
-    virtual void Configure();
+    GXConstantColourMaterialProgram();
+    virtual ~GXConstantColourMaterialProgram();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -620,7 +617,7 @@ public:
     void DrawDirect(const glModelPacket* packet);
     void BindParameters(const glModelPacket* packet);
 
-    static GXMaterialProgram_802A4360* Instance;
+    static GXConstantColourMaterialProgram* Instance;
     static bool Initialized;
     static GXMaterialParameter Parameters[2];
 };
@@ -630,7 +627,7 @@ class GXMaterialProgram_802A4744 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A4744();
     virtual ~GXMaterialProgram_802A4744();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -650,7 +647,7 @@ class GXMaterialProgram_802A4B28 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A4B28();
     virtual ~GXMaterialProgram_802A4B28();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -670,7 +667,7 @@ class GXMaterialProgram_802A4F0C : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A4F0C();
     virtual ~GXMaterialProgram_802A4F0C();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -690,7 +687,7 @@ class GXMaterialProgram_802A53B4 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A53B4();
     virtual ~GXMaterialProgram_802A53B4();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -710,7 +707,7 @@ class GXMaterialProgram_802A58E8 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A58E8();
     virtual ~GXMaterialProgram_802A58E8();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -730,7 +727,7 @@ class GXMaterialProgram_802A5D58 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A5D58();
     virtual ~GXMaterialProgram_802A5D58();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -750,7 +747,7 @@ class GXMaterialProgram_802A61C8 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A61C8();
     virtual ~GXMaterialProgram_802A61C8();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -768,7 +765,7 @@ class GXMaterialProgram_802A63D8 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A63D8();
     virtual ~GXMaterialProgram_802A63D8();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -788,7 +785,7 @@ class GXMaterialProgram_802A6848 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A6848();
     virtual ~GXMaterialProgram_802A6848();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -807,7 +804,7 @@ class GXMaterialProgram_802A6FDC : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A6FDC();
     virtual ~GXMaterialProgram_802A6FDC();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -821,12 +818,12 @@ public:
     static bool Initialized;
 };
 
-class GXMaterialProgram_802A73B0 : public GXMaterialProgramImpl<GXMaterialProgram_802A73B0>
+class GXShadowVolumeMaterialProgram : public GXMaterialProgramImpl<GXShadowVolumeMaterialProgram>
 {
 public:
-    GXMaterialProgram_802A73B0();
-    virtual ~GXMaterialProgram_802A73B0();
-    virtual void Configure();
+    GXShadowVolumeMaterialProgram();
+    virtual ~GXShadowVolumeMaterialProgram();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 
@@ -836,7 +833,7 @@ public:
     void DrawDirect(const glModelPacket* packet);
     void BindParameters(const glModelPacket* packet);
 
-    static GXMaterialProgram_802A73B0* Instance;
+    static GXShadowVolumeMaterialProgram* Instance;
     static bool Initialized;
     static GXMaterialParameter Parameters[2];
 };
@@ -846,7 +843,7 @@ class GXMaterialProgram_802A7820 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_802A7820();
     virtual ~GXMaterialProgram_802A7820();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 

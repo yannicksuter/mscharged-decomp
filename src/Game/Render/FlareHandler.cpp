@@ -120,8 +120,8 @@ void FlareHandler::Render()
             if (writer.Begin(count * 4, 3, 0))
             {
                 u32 texture = glGetTexture("global/flare_halo");
-                UnidentifiedTextureState* state =
-                    (UnidentifiedTextureState*)writer.GetModel()
+                glTextureBinding* state =
+                    (glTextureBinding*)writer.GetModel()
                         ->packets->unknown20;
                 state->texture = texture;
                 state->textureIndex = 0xFFFF;
@@ -157,8 +157,8 @@ void FlareHandler::Render()
             if (writer.Begin(count * 4, 3, 0))
             {
                 u32 texture = glGetTexture("global/flare_glow");
-                UnidentifiedTextureState* state =
-                    (UnidentifiedTextureState*)writer.GetModel()
+                glTextureBinding* state =
+                    (glTextureBinding*)writer.GetModel()
                         ->packets->unknown20;
                 state->texture = texture;
                 state->textureIndex = 0xFFFF;

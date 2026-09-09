@@ -79,29 +79,29 @@ void DesireUsePowerup::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
-        = fn_80338EBC(cache, "DesireUsePowerup");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        = cache->BeginType("DesireUsePowerup");
+    cache->AddField(22, gDebugFieldTypes[22].size,
         0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
         "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
         "mThinkTimer");
-    fn_80338F88(cache, 15, lbl_80533C98[15].size,
+    cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpTarget - (u8*)&mvDesiredPosition, "mpTarget");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size,
+    cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&mbThrowingPowerup - (u8*)&mvDesiredPosition,
         "mbThrowingPowerup");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mePowerup - (u8*)&mvDesiredPosition, "mePowerup");
-    fn_80338F88(cache, 8, lbl_80533C98[8].size,
+    cache->AddField(8, gDebugFieldTypes[8].size,
         (u8*)&mnNumPowerups - (u8*)&mvDesiredPosition,
         "mnNumPowerups");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mtPowerupEffectTime - (u8*)&mvDesiredPosition,
         "mtPowerupEffectTime");
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 /**
@@ -116,7 +116,7 @@ void DesireUsePowerup::UnidentifiedVirtual7(
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = fn_8033930C(cache, sDesireUsePowerupType,
+    void* data = cache->WriteData(sDesireUsePowerupType,
         (u8*)this + offset, sizeof(DesireUsePowerup) - offset);
     if (data != NULL)
     {
@@ -124,8 +124,7 @@ void DesireUsePowerup::UnidentifiedVirtual7(
             = (DesireUsePowerup*)((u8*)data - offset);
         *(int*)&copy->mpTarget
             = mpTarget == NULL ? -1 : mpTarget->mUnidentified120;
-        fn_80339450(
-            cache, sDesireUsePowerupType, data, context);
+        cache->ChecksumData(sDesireUsePowerupType, data, context);
     }
 }
 

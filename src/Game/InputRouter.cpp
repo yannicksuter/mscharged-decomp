@@ -1,0 +1,462 @@
+#include "Game/InputRouter.h"
+#include "Game/Sys/debug.h"
+#include "Game/EventDispatcher.inl"
+#include "Game/NetworkInput.h"
+
+#include <string.h>
+
+#include "Game/NetworkEvents.h"
+#include "Game/TweakValue.h"
+#include "NL/nlMath.h"
+
+u32 gNetworkRandomSeed = 0x12345678;
+
+int g_TransmitSyncDataEvery = 4;
+int g_nTicksPerPacket = 2;
+int g_nOverrideTickDelayTarget = -1;
+float g_fCSInputQHighwaterMarkMin = 4.0f;
+float g_fCSInputQHighwaterMarkDef = 4.0f;
+float g_fCSInputQHighwaterMarkMax = 7.0f;
+float g_fCSInputQHighwaterMarkInc = 0.8f;
+float g_fCSInputQHighwaterMarkDec = 0.03f;
+int g_nCSHostDelayMin = 1;
+int g_nCSHostDelayMax = 10;
+float fMinCongestionMultiplier = 2.0f;
+float fDefCongestionMultiplier = 4.0f;
+float fMaxCongestionMultiplier = 10.0f;
+float fCongestionMultiplierIncrement = 0.3f;
+float fCongestionMultiplierDecrement = 0.06f;
+int g_nDumpSyncTextAt = -1;
+u32 g_SyncMismatchColour = 0xFF0000FF;
+u32 g_SyncTextColour = 0xFFFFFFFF;
+
+InputRouter* gSimpleInputRouter;
+NetworkInputRouter* gNetworkInputRouter;
+
+static EventDispatcher sDetermDataDispatcher;
+static UnidentifiedQueuedEvent<DetermDataEvent> sDetermDataEventQueue(
+    &sDetermDataDispatcher, "DetermDataEventQueue", 21);
+
+NetMessageInput::~NetMessageInput()
+{
+}
+
+DetermDataEvent::~DetermDataEvent()
+{
+}
+
+NetMessageAllInputs::~NetMessageAllInputs()
+{
+}
+
+u32 GetNetworkRandomSeed()
+{
+    return gNetworkRandomSeed;
+}
+
+void SetNetworkRandomSeed(u32 seed)
+{
+    gNetworkRandomSeed = seed;
+}
+
+void OnInputSessionReset()
+{
+}
+
+u32 nlRandom(u32 range)
+{
+    return nlRandom(range, &gNetworkRandomSeed);
+}
+
+float nlRandomf(float maximum)
+{
+    return nlRandomf(maximum, &gNetworkRandomSeed);
+}
+
+void InitializeInputRouters()
+{
+    gSimpleInputRouter = new SimpleInputRouter;
+    gNetworkInputRouter = new NetworkInputRouter;
+}
+
+InputRouter* GetInputRouter()
+{
+    if (g_pNetworkSessionBase->GetSessionMode() == 0)
+    {
+        return gSimpleInputRouter;
+    }
+    return gNetworkInputRouter;
+}
+
+InputRouter::~InputRouter()
+{
+}
+
+void InputRouter::Reset(int)
+{
+    mSession = g_pNetworkSessionBase;
+
+    int machineCount = mSession->GetNumMachines();
+    for (int machine = 0; machine < machineCount; ++machine)
+    {
+        (&mSession->mPeers[machine])->ResetNetworkPeerInputs();
+    }
+
+    for (int input = 0; input < 16; ++input)
+    {
+        memset(&mInputRecords[input], 0, sizeof(PackedDetInput));
+        mInputStates[input] = 2;
+    }
+
+    for (int machine = 0; machine < 4; ++machine)
+    {
+        mNetworkTicks[machine] = 0;
+        mNetworkCRCs[machine] = 0;
+        mRemoteTicks[machine] = 0;
+        mRandomSeeds[machine] = 0;
+    }
+
+    mCurrentCRC = 0;
+    mLastGameFrame = -1;
+    mOutgoingHead = 0;
+    mOutgoingCount = 0;
+    mSyncMismatch = false;
+    mSyncMismatchReported = false;
+    mOutgoingQueueOverflowed = false;
+    mStarvedForInput = false;
+}
+
+void InputRouter::CheckSyncMismatch()
+{
+    int machineCount = mSession->GetNumMachines();
+    int gameFrame = gInputManager->mFrameProvider->GetFrame();
+    u32 seed = GetNetworkRandomSeed();
+
+    bool mismatch = false;
+    for (int machine = 0; machine < machineCount; ++machine)
+    {
+        if (mRemoteTicks[machine] != (u32)gameFrame
+            || mNetworkCRCs[machine] != mCurrentCRC
+            || mRandomSeeds[machine] != seed)
+        {
+            mismatch = true;
+        }
+    }
+
+    if (mismatch && !mSyncMismatch)
+    {
+        mSyncMismatch = true;
+    }
+}
+
+bool InputRouter::ProcessPlaybackFrame()
+{
+    while (mOutgoingCount != 0)
+    {
+        DetermDataEvent* event = mOutgoingDetermData[mOutgoingHead];
+        mOutgoingHead = (mOutgoingHead + 1) % mOutgoingCapacity;
+        --mOutgoingCount;
+
+        Function<DetermDataEvent*> disposer(
+            (void (*)(DetermDataEvent*))DetermDataEvent::operator delete);
+        sDetermDataEventQueue.Queue(event, disposer);
+    }
+
+    CheckSyncMismatch();
+    return true;
+}
+
+void InputRouter::MarkSyncMismatchReported()
+{
+    if (!mSyncMismatchReported)
+    {
+        mSyncMismatchReported = true;
+    }
+}
+
+void InputRouter::QueueDetermData(const void* data, u32 size)
+{
+    DetermDataEvent* event = new DetermDataEvent(data, size);
+
+    if (mOutgoingCount < mOutgoingCapacity)
+    {
+        u32 position = (mOutgoingHead + mOutgoingCount)
+            % mOutgoingCapacity;
+        mOutgoingDetermData[position] = event;
+        ++mOutgoingCount;
+    }
+    else
+    {
+        tDebugPrintManager::Print(DC_NETWORK, "m_OutgoingCustomDetermDataQ overflowed\n");
+        mOutgoingQueueOverflowed = true;
+    }
+}
+
+void DispatchDetermDataEvents()
+{
+    sDetermDataDispatcher.Dispatch(true);
+}
+
+UnidentifiedQueuedEvent<DetermDataEvent>* GetDetermDataEventQueue()
+{
+    return &sDetermDataEventQueue;
+}
+
+SimpleInputRouter::~SimpleInputRouter()
+{
+}
+
+void SimpleInputRouter::Reset(int resetQueues)
+{
+    InputRouter::Reset(resetQueues);
+}
+
+void SimpleInputRouter::OnInputCaptured()
+{
+    int frame = gInputManager->mFrameProvider->GetFrame();
+    if (mLastGameFrame != frame)
+    {
+        if (IsNetworkOrRecordedGame())
+        {
+            mCurrentCRC = gInputManager->mEnabled
+                ? gInputManager->mFrameProvider->CalculateChecksum()
+                : gInputManager->mFrameProvider->WriteSyncLog();
+        }
+        else
+        {
+            mCurrentCRC = 0;
+        }
+        mLastGameFrame = frame;
+    }
+}
+
+void SimpleInputRouter::OnInputReady()
+{
+    CheckSyncMismatch();
+}
+
+NetworkInputRouter::~NetworkInputRouter()
+{
+}
+
+void NetworkInputRouter::Reset(int resetQueues)
+{
+    InputRouter::Reset(resetQueues);
+    mCongested = false;
+    mWasCongested = false;
+    mCongestionMultiplier = fDefCongestionMultiplier;
+    mUnidentified290 = 0;
+    mUnidentified294 = 0;
+
+    for (int machine = 0; machine < 4; ++machine)
+    {
+        mInputQueues[machine].mHead = 0;
+        mInputQueues[machine].mCount = 0;
+    }
+    mQueueCursor = 0;
+    mQueueLimit = 4;
+}
+
+void NetworkInputRouter::CheckCongestion()
+{
+    mCongested = false;
+    int machineCount = mSession->GetNumMachines();
+    for (int machine = 0; machine < machineCount; ++machine)
+    {
+        if (mInputQueues[machine].mCount <= 1)
+        {
+            mCongested = true;
+        }
+    }
+    if (mCongested)
+    {
+        mWasCongested = true;
+    }
+}
+
+bool NetworkInputRouter::HasInput()
+{
+    if (mQueueLimit > mQueueCursor)
+    {
+        return true;
+    }
+
+    int machineCount = mSession->GetNumMachines();
+    for (s8 machine = 0; machine < machineCount; ++machine)
+    {
+        if (mInputQueues[machine].mCount == 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void NetworkInputRouter::OnInputCaptured()
+{
+    for (int machine = 0; machine < 4; ++machine)
+    {
+        NetworkInputMessageQueue& queue = mInputQueues[machine];
+        if (queue.mCount != 0)
+        {
+            queue.mHead = (queue.mHead + 1) % queue.mCapacity;
+            --queue.mCount;
+        }
+    }
+}
+
+void NetworkInputRouter::OnInputReady()
+{
+    CheckSyncMismatch();
+}
+
+void NetworkInputRouter::ReceiveInput(
+    s8 machine, NetMessageInput* message)
+{
+    NetworkInputMessageQueue& queue = mInputQueues[machine];
+    if (queue.mCount < queue.mCapacity)
+    {
+        u32 position = (queue.mHead + queue.mCount) % queue.mCapacity;
+        memcpy(&queue.mMessages[position], message, sizeof(*message));
+        ++queue.mCount;
+    }
+    else
+    {
+        tDebugPrintManager::Print(DC_NETWORK, "m_InputQueue[%d] overflowed\n", machine);
+        mOutgoingQueueOverflowed = true;
+    }
+}
+
+void NetworkInputRouter::DebugDraw(int column, int* row)
+{
+    if (mStarvedForInput)
+    {
+        tDebugPrintManager::Print(DC_NETWORK, "StarvedForInput");
+    }
+}
+
+NetMessageAllInputsBundle::~NetMessageAllInputsBundle()
+{
+}
+
+NetworkInputMessageQueue::NetworkInputMessageQueue()
+    : mMessages(mStorage)
+    , mHead(0)
+    , mCount(0)
+    , mCapacity(60)
+{
+}
+
+NetworkInputMessageQueue::~NetworkInputMessageQueue()
+{
+}
+
+NetMessageInputBundle::~NetMessageInputBundle()
+{
+}
+
+void NetworkInputRouter::ReceiveAllInputs(
+    s8, NetMessageAllInputs*)
+{
+}
+
+bool NetworkInputRouter::CanCaptureInput()
+{
+    return !mStarvedForInput;
+}
+
+int NetworkInputRouter::GetUpdateCount()
+{
+    return 1;
+}
+
+void SimpleInputRouter::DebugDraw(int column, int* row)
+{
+}
+
+void SimpleInputRouter::ReceiveAllInputs(
+    s8, NetMessageAllInputs*)
+{
+}
+
+void SimpleInputRouter::ReceiveInput(
+    s8, NetMessageInput*)
+{
+}
+
+void SimpleInputRouter::CheckCongestion()
+{
+}
+
+bool SimpleInputRouter::CanCaptureInput()
+{
+    return true;
+}
+
+bool SimpleInputRouter::HasInput()
+{
+    return true;
+}
+
+int SimpleInputRouter::GetUpdateCount()
+{
+    return 1;
+}
+
+static TweakIntBinding sTransmitSyncDataEvery(
+    "g_TransmitSyncDataEvery", "Network/InputMan", &g_TransmitSyncDataEvery);
+static TweakIntBinding sTicksPerPacket(
+    "g_nTicksPerPacket", "Network/InputMan", &g_nTicksPerPacket);
+static TweakFloatBinding sInputQHighwaterMarkMin(
+    "g_fCSInputQHighwaterMarkMin", "Network/InputMan",
+    &g_fCSInputQHighwaterMarkMin);
+static TweakFloatBinding sInputQHighwaterMarkDef(
+    "g_fCSInputQHighwaterMarkDef", "Network/InputMan",
+    &g_fCSInputQHighwaterMarkDef);
+static TweakFloatBinding sInputQHighwaterMarkMax(
+    "g_fCSInputQHighwaterMarkMax", "Network/InputMan",
+    &g_fCSInputQHighwaterMarkMax);
+static TweakFloatBinding sInputQHighwaterMarkInc(
+    "g_fCSInputQHighwaterMarkInc", "Network/InputMan",
+    &g_fCSInputQHighwaterMarkInc);
+static TweakFloatBinding sInputQHighwaterMarkDec(
+    "g_fCSInputQHighwaterMarkDec", "Network/InputMan",
+    &g_fCSInputQHighwaterMarkDec);
+static TweakIntBinding sHostDelayMin(
+    "g_nCSHostDelayMin", "Network/InputMan", &g_nCSHostDelayMin);
+static TweakIntBinding sHostDelayMax(
+    "g_nCSHostDelayMax", "Network/InputMan", &g_nCSHostDelayMax);
+static TweakFloatBinding sCongestionMultiplierMin(
+    "fMinCongestionMultiplier", "Network/InputMan",
+    &fMinCongestionMultiplier);
+static TweakFloatBinding sCongestionMultiplierDef(
+    "fDefCongestionMultiplier", "Network/InputMan",
+    &fDefCongestionMultiplier);
+static TweakFloatBinding sCongestionMultiplierMax(
+    "fMaxCongestionMultiplier", "Network/InputMan",
+    &fMaxCongestionMultiplier);
+static TweakFloatBinding sCongestionMultiplierIncrement(
+    "fCongestionMultiplierIncrement", "Network/InputMan",
+    &fCongestionMultiplierIncrement);
+static TweakFloatBinding sCongestionMultiplierDecrement(
+    "fCongestionMultiplierDecrement", "Network/InputMan",
+    &fCongestionMultiplierDecrement);
+static TweakIntBinding sOverrideTickDelayTarget(
+    "g_nOverrideTickDelayTarget", "Network/InputMan",
+    &g_nOverrideTickDelayTarget);
+static TweakIntBinding sDumpSyncTextAt(
+    "g_nDumpSyncTextAt", "Network/InputMan", &g_nDumpSyncTextAt);
+
+typedef char VerifyDetermDataEventSize[(sizeof(DetermDataEvent) == 0x24) ? 1 : -1];
+typedef char VerifyNetworkMessageType0Size[
+    (sizeof(NetMessageInput) == 0xF0) ? 1 : -1];
+typedef char VerifyNetworkMessageType8Size[
+    (sizeof(NetMessageAllInputs) == 0x3D8) ? 1 : -1];
+typedef char VerifyInputRouterSize[
+    (sizeof(InputRouter) == 0x198) ? 1 : -1];
+typedef char VerifyInputQueueSize[
+    (sizeof(NetworkInputMessageQueue) == 0x3850) ? 1 : -1];
+typedef char VerifyNetworkInputRouterSize[
+    (sizeof(NetworkInputRouter) == 0xE5C8) ? 1 : -1];
+
+#include "NL/nlBind_impl.h"

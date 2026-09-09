@@ -2,6 +2,7 @@
 
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
+#include "Game/Render/NPCManager.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Field.h"
 #include "Game/GameInfo.h"
@@ -20,7 +21,6 @@ extern PhysicsWorld* g_PhysicsWorld;
 extern "C" void fn_8013F854(const char*, ...);
 extern "C" int strcmpi(const char*, const char*);
 extern "C" bool fn_8003E948(cFielder*);
-extern void* lbl_806E1608;
 
 extern "C" void fn_80145F18(CollisionPlayerWallData*);
 extern "C" void fn_801462DC(CollisionPlayerBallData*);
@@ -356,13 +356,13 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         }
 
         fn_8013F854("PhysChar Not fielder\n");
-        void* koopaShell = ReadPointer(lbl_806E1608, 0x2C);
+        void* koopaShell = ReadPointer(gNPCManager, 0x2C);
         if (koopaShell != 0 && ReadBool(koopaShell, 0x20))
         {
             fn_8013F854("PhysChar KoopaShell->IsVisible\n");
             return NO_CONTACT;
         }
-        void* egg = ReadPointer(lbl_806E1608, 0x28);
+        void* egg = ReadPointer(gNPCManager, 0x28);
         if (egg != 0 && ReadBool(egg, 0x30))
         {
             fn_8013F854("PhysChar Egg->IsVisible\n");

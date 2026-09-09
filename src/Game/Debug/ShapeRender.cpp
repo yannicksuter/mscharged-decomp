@@ -507,7 +507,7 @@ extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
     {
         glModelPacket* packet = &pModel->packets[index];
         packet->matrix = matrix;
-        memcpy((u8*)packet->unknown20 + sizeof(UnidentifiedTextureState),
+        memcpy((u8*)packet->unknown20 + sizeof(glTextureBinding),
             &local_08,
             sizeof(local_08));
 
@@ -679,7 +679,7 @@ void ShapeRender::Initialize(void* resource)
     {
         m_Unknown00 = resource;
         m_Initialized = true;
-        fn_802C8280("ShapeRender");
+        glBeginResource("ShapeRender");
         CreateBoxGeometry(m_Box);
         CreateCylinderGeometry(m_Cylinder);
         CreateHemisphereGeometry(m_Hemisphere);
@@ -689,7 +689,7 @@ void ShapeRender::Initialize(void* resource)
         fn_802BD2C8(&m_Hemisphere, GLP_TriStrip, m_Unknown00);
         fn_802BD2C8(&m_FlatCylinderEnd, GLP_TriStrip, m_Unknown00);
         m_pLightUserData = 0;
-        fn_802C8288();
+        glEndResource();
         m_eView = 0;
     }
 }
@@ -716,14 +716,14 @@ extern "C" void fn_802BD2C8(PrimitiveShape* shape, int arg1, void* arg2)
             index++;
         }
 
-        UnidentifiedTextureState* textureState = (UnidentifiedTextureState*)mesh.GetModel()->packets->unknown20;
+        glTextureBinding* textureState = (glTextureBinding*)mesh.GetModel()->packets->unknown20;
         textureState->texture = WhiteTexture;
         textureState->textureIndex = 0xFFFF;
         textureState->SetWrapS(true);
         textureState->SetWrapT(true);
         textureState->unknown07 = 0;
         memcpy((u8*)mesh.GetModel()->packets->unknown20
-                   + sizeof(UnidentifiedTextureState),
+                   + sizeof(glTextureBinding),
             &colour,
             sizeof(colour));
 

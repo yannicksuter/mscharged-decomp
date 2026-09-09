@@ -5,6 +5,7 @@
 #include "Game/CharacterTemplate.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/DB/CharacterInfo.h"
+#include "Game/Effects/EmissionManager.h"
 #include "Game/GameInfo.h"
 #include "Game/Goalie.h"
 #include "Game/Inventory.h"
@@ -25,23 +26,23 @@
 #include "NL/gl/glTexture.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/nlFile.h"
+#include "NL/nlCompressedFile.h"
 #include "NL/plat/tu_80372B4C.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_80073898.h"
+#include "Game/TweakFileLoader.h"
 
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 
-extern "C" bool fn_80073BC0(void* pLoadState);
 extern "C" void fn_800957E4(cCharacter* pCharacter, cTeam* pTeam);
-extern "C" bool fn_802B3E94(const char* path, LoadAsyncCallback callback,
+extern "C" bool nlLoadCompressedFileAsync(const char* path, LoadAsyncCallback callback,
     void* userData, unsigned int alignment, int allocType,
     unsigned int chunkSize, void* readBuffer0, void* readBuffer1, void*,
     unsigned long param, MemoryAllocator* allocator);
-extern "C" void fn_802E67E0(void* data, void* nonResidentData,
-    ResourceInterface_802CC094* allocator, bool);
+extern "C" void LoadBundle(void* data, void* nonResidentData,
+    GLResourcePool* allocator, bool);
 
 extern bool gAudioEnabled;
 
@@ -226,7 +227,7 @@ void CharacterLoader_8056B290::fn_80009BC8()
         sidekick[1][2] = captain[1];
     }
 
-    fn_80025E9C();
+    GetAnimScriptInterpreter();
 
     int n = 0;
     int plrindex;
@@ -311,7 +312,7 @@ bool CharacterLoader_8056B290::fn_80009F48()
     Entry* pEntry = mCurrent;
     if (pEntry->bGoalie)
     {
-        return !fn_80025F48(pEntry->cc - 20)->bLoaded;
+        return !GetGoalieTemplateInfo(pEntry->cc - 20)->bLoaded;
     }
     if (pEntry->bCaptain)
     {
@@ -336,14 +337,14 @@ void CharacterLoader_8056B290::fn_80009FCC()
     if (pEntry->bGoalie)
     {
         s32 goalieIdx = pEntry->cc - 20;
-        fn_802C8204(fn_80025F48(goalieIdx)->szTextureFilename, fn_80009FB8,
-            mCurrent, fn_802CC094());
-        fn_80025F48(goalieIdx)->bLoaded = 1;
+        glBeginLoadTextureBundle(GetGoalieTemplateInfo(goalieIdx)->szTextureFilename, fn_80009FB8,
+            mCurrent, glGetCurrentResourcePool());
+        GetGoalieTemplateInfo(goalieIdx)->bLoaded = 1;
     }
     else
     {
-        fn_802C8204(GetCharacterTemplateInfo(pEntry->cc)->szTextureFilename, fn_80009FB8,
-            pEntry, fn_802CC094());
+        glBeginLoadTextureBundle(GetCharacterTemplateInfo(pEntry->cc)->szTextureFilename, fn_80009FB8,
+            pEntry, glGetCurrentResourcePool());
         GetCharacterTemplateInfo(mCurrent->cc)->bUnidentified58 = 1;
     }
 }
@@ -358,7 +359,7 @@ void CharacterLoader_8056B290::fn_8000A0A8()
     if (!glTextureLoad(glGetTexture(sUnidentifiedShockTextureName)))
     {
         const char* szFilename = "art/characters/mario/mario_shock.rlt";
-        fn_802C8204(szFilename, fn_80009FB8, mCurrent, fn_802CC094());
+        glBeginLoadTextureBundle(szFilename, fn_80009FB8, mCurrent, glGetCurrentResourcePool());
     }
     else
     {
@@ -397,7 +398,7 @@ bool CharacterLoader_8056B290::fn_8000A144()
         oldCallback = glx_SetLoadCallback(SidekickTexture_cb);
     }
 
-    fn_802CDD78(mTextureData, mTextureSize, fn_802CC094(), true);
+    glEndLoadTextureBundle(mTextureData, mTextureSize, glGetCurrentResourcePool(), true);
 
     if (mCurrent->bSidekick)
     {
@@ -418,7 +419,7 @@ bool CharacterLoader_8056B290::fn_8000A224()
 
     if (mTextureSize != 0xF0000000)
     {
-        fn_802CDD78(mTextureData, mTextureSize, fn_802CC094(), true);
+        glEndLoadTextureBundle(mTextureData, mTextureSize, glGetCurrentResourcePool(), true);
         nlFree(mTextureData);
     }
     mTextureData = 0;
@@ -453,8 +454,8 @@ void CharacterLoader_8056B290::fn_8000A324()
 {
     mTextureData = 0;
     mTextureSize = 0;
-    fn_802C8204("art/characters/mariogoalie/mariogoalie.rlt", fn_80009FB8,
-        mCurrent, fn_802CC094());
+    glBeginLoadTextureBundle("art/characters/mariogoalie/mariogoalie.rlt", fn_80009FB8,
+        mCurrent, glGetCurrentResourcePool());
 }
 
 bool CharacterLoader_8056B290::fn_8000A378()
@@ -466,7 +467,7 @@ bool CharacterLoader_8056B290::fn_8000A378()
 
     skiptexture = glGetTexture("mariogoalie/mariogoalie");
     glxTextureLoadCallback_t oldCallback = glx_SetLoadCallback(SidekickTexture_cb);
-    fn_802CDD78(mTextureData, mTextureSize, fn_802CC094(), false);
+    glEndLoadTextureBundle(mTextureData, mTextureSize, glGetCurrentResourcePool(), false);
     glx_SetLoadCallback(oldCallback);
 
     nlFree(mTextureData);
@@ -500,7 +501,7 @@ void CharacterLoader_8056B290::fn_8000A418()
     szEffectsName = GetCharacterTemplateInfo(mCurrent->cc)->szEffectsName;
     nlStrNCat(szPath, szPath, szEffectsName, sizeof(szPath));
     nlStrNCat(szPath, szPath, "EffectsNonRes.bun.zlib", sizeof(szPath));
-    mEffectsNonResLoad = fn_802B3E94(szPath, fn_8000A410, &mEffectsNonResData,
+    mEffectsNonResLoad = nlLoadCompressedFileAsync(szPath, fn_8000A410, &mEffectsNonResData,
         0x20, AllocateEnd, 0x20000, 0, 0, 0, 0, 0);
 }
 
@@ -515,7 +516,7 @@ bool CharacterLoader_8056B290::fn_8000A5D8()
         return false;
     }
 
-    fn_802E67E0(mEffectsData, mEffectsNonResData, fn_802CC094(), true);
+    EmissionManager::LoadBundle(mEffectsData, mEffectsNonResData, glGetCurrentResourcePool(), true);
     sUnidentifiedEffectsLoadCount--;
     return true;
 }
@@ -546,7 +547,7 @@ bool CharacterLoader_8056B290::fn_8000A67C()
     }
     *pEnd = '\0';
     nlStrNCat(szPath, szPath, "/ExtraTextures.rlt", sizeof(szPath));
-    return fn_802C8204(szPath, fn_8000A668, mCurrent, fn_802CC094());
+    return glBeginLoadTextureBundle(szPath, fn_8000A668, mCurrent, glGetCurrentResourcePool());
 }
 
 bool CharacterLoader_8056B290::fn_8000A790()
@@ -570,7 +571,7 @@ bool CharacterLoader_8056B290::fn_8000A790()
         oldCallback = glx_SetLoadCallback(SidekickTexture_cb);
     }
 
-    fn_802CDD78(mExtraTextureData, mExtraTextureSize, fn_802CC094(), true);
+    glEndLoadTextureBundle(mExtraTextureData, mExtraTextureSize, glGetCurrentResourcePool(), true);
 
     if (mCurrent->bSidekick)
     {
@@ -585,7 +586,7 @@ bool CharacterLoader_8056B290::fn_8000A790()
 bool CharacterLoader_8056B290::fn_8000A870()
 {
     bool bCreated = false;
-    mTemplate = fn_80025F5C(mCurrent->cc, &bCreated);
+    mTemplate = GetCharacterTemplate(mCurrent->cc, &bCreated);
     mTemplateInfo = GetCharacterTemplateInfo(mCurrent->cc);
     return bCreated;
 }
@@ -618,7 +619,7 @@ void CharacterLoader_8056B290::fn_8000A8E4(int nModel)
     }
     if (szFilename != 0)
     {
-        fn_802C8200(szFilename, fn_8000A8C8, (void*)nModel, fn_802CC094());
+        glBeginLoadModel(szFilename, fn_8000A8C8, (void*)nModel, glGetCurrentResourcePool());
     }
 }
 
@@ -651,8 +652,8 @@ bool CharacterLoader_8056B290::fn_8000A9A4(int nModel)
     }
 
     unsigned long numModels = 0;
-    glModel* pModel = (glModel*)fn_802C81FC(mModelData[nModel],
-        mModelSize[nModel], &numModels, fn_802CC094());
+    glModel* pModel = glEndLoadModel(mModelData[nModel],
+        mModelSize[nModel], &numModels, glGetCurrentResourcePool());
     nlFree(mModelData[nModel]);
     mModelData[nModel] = 0;
     mTemplate->nCharacterModelID[nModel] = pModel->unknown00;
@@ -766,7 +767,7 @@ void CharacterLoader_8056B290::fn_8000AE90()
         }
         else
         {
-            fn_802B3E94(szAnimFilename, fn_8000AE7C, mCurrent, 0x20,
+            nlLoadCompressedFileAsync(szAnimFilename, fn_8000AE7C, mCurrent, 0x20,
                 AllocateStart, 0x40000, 0, 0, 0, 0, 0);
         }
     }
@@ -819,7 +820,7 @@ bool CharacterLoader_8056B290::fn_8000B14C()
         return false;
     }
 
-    fn_80025E9C()->SetupAnimationTriggers(pData, mTriggerSize,
+    GetAnimScriptInterpreter()->SetupAnimationTriggers(pData, mTriggerSize,
         mTemplate->pAnimInventory->m_pSAnimInventory);
     mTriggerData = 0;
     return true;
@@ -924,7 +925,7 @@ bool CharacterLoader_8056B290::fn_8000B3E0()
         return false;
     }
 
-    if (!fn_802C8204(szArtPath, fn_8000B3CC, mCurrent, fn_802CC094()))
+    if (!glBeginLoadTextureBundle(szArtPath, fn_8000B3CC, mCurrent, glGetCurrentResourcePool()))
     {
         pChar->fn_80022DAC((unsigned long)-1);
         pChar->fn_80022DE8((unsigned long)-1);
@@ -947,7 +948,7 @@ bool CharacterLoader_8056B290::fn_8000B6C4()
     eCharacterClass captaincc = captain[pEntry->nTeamID];
     eCharacterClass cc = pEntry->cc;
 
-    fn_802CDD78(mSidekickTextureData, mSidekickTextureSize, fn_802CC094(), false);
+    glEndLoadTextureBundle(mSidekickTextureData, mSidekickTextureSize, glGetCurrentResourcePool(), false);
     nlFree(mSidekickTextureData);
     mSidekickTextureData = 0;
 
@@ -1015,7 +1016,7 @@ void CharacterLoader_8056B290::fn_8000B8E8()
 
 bool CharacterLoader_8056B290::fn_8000B9F4()
 {
-    return fn_80073BC0(&lbl_8056BA00);
+    return gTweakFileLoader.ProcessLoadedFiles();
 }
 
 void CharacterLoader_8056B290::fn_8000BA00()
@@ -1037,7 +1038,7 @@ void CharacterLoader_8056B290::fn_8000BA00()
     };
 
     bool bCreated;
-    tCharacterTemplate* pTemplate = fn_80025F5C(mCurrent->cc, &bCreated);
+    tCharacterTemplate* pTemplate = GetCharacterTemplate(mCurrent->cc, &bCreated);
     tCharacterTemplateInfo* pInfo = GetCharacterTemplateInfo(mCurrent->cc);
 
     cInventory<cSHierarchy>* pHierInv = pTemplate->pHierarchyInventory;
@@ -1059,7 +1060,7 @@ void CharacterLoader_8056B290::fn_8000BA00()
             mCurrent->nCharIdx);
         pGoalie->m_szEffectsName = pInfo->szEffectsName;
         pGoalie->fn_80022DAC(GetHashFromTextureFile(pInfo->szTextureFilename));
-        pGoalie->fn_80022DE8(GetHashFromTextureFile(fn_80025F48(goalieIdx)->szTextureFilename));
+        pGoalie->fn_80022DE8(GetHashFromTextureFile(GetGoalieTemplateInfo(goalieIdx)->szTextureFilename));
 
         g_pCharacters[mCurrent->nCharIdx] = pGoalie;
         g_pCharacters[mCurrent->nCharIdx]->SetPosition(goaliepos[mCurrent->nTeamID]);
@@ -1140,7 +1141,7 @@ bool CharacterLoader_8056B290::fn_8000BD88()
             if (altcaptain != CHARACTER_CLASS_INVALID
                 && mCurrent->nTeamID == (captain[0] != altcaptain))
             {
-                const char* szFilename = fn_80025F48(mCurrent->cc - 20)->pUnidentified08;
+                const char* szFilename = GetGoalieTemplateInfo(mCurrent->cc - 20)->pUnidentified08;
                 if (szFilename != 0 && nlFileExists(szFilename))
                 {
                     return true;
@@ -1163,9 +1164,9 @@ bool CharacterLoader_8056B290::fn_8000BF04()
     }
     else if (pEntry->bGoalie)
     {
-        szFilename = fn_80025F48(pEntry->cc - 20)->pUnidentified08;
+        szFilename = GetGoalieTemplateInfo(pEntry->cc - 20)->pUnidentified08;
     }
-    fn_802C8204(szFilename, fn_8000BD74, mCurrent, fn_802CC094());
+    glBeginLoadTextureBundle(szFilename, fn_8000BD74, mCurrent, glGetCurrentResourcePool());
     return true;
 }
 
@@ -1179,7 +1180,7 @@ bool CharacterLoader_8056B290::fn_8000BFA0()
         return false;
     }
 
-    fn_802CDD78(mAltTextureData, mAltTextureSize, fn_802CC094(), false);
+    glEndLoadTextureBundle(mAltTextureData, mAltTextureSize, glGetCurrentResourcePool(), false);
 
     const char* szName = GetCharacterInfo(mCurrent->cc).mName;
     if (mCurrent->bGoalie)
@@ -1262,7 +1263,7 @@ bool CharacterLoader_8056B290::fn_8000C254()
     return false;
 }
 
-static TweakValueBoolImpl_804F4538 sUnidentifiedLoadAnimsCachedTweak(
+static TweakBoolBinding sUnidentifiedLoadAnimsCachedTweak(
     "g_bLoadAnimsCached", "FileCache", &g_bLoadAnimsCached, true);
 
 CharacterLoader_8056B290 CharacterLoader_8056B290::sUnidentifiedInstance;

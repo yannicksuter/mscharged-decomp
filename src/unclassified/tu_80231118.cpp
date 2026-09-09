@@ -15,7 +15,7 @@
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/Render/Presentation.h"
-#include "Game/SH/SHSceneBase.h"
+#include "Game/SH/SHStrikerTimesBase.h"
 #include "NL/nlBind.h"
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
@@ -347,12 +347,12 @@ void TU80231118Scene::Update(float dt)
         }
         else if (mState == 2)
         {
-            UnidentifiedSHSceneBase* scene = static_cast<UnidentifiedSHSceneBase*>(
+            SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(
                 GameSceneManager::Instance()->Push((SceneList)0x4D, SCREEN_NOTHING, true));
             g_pStrikerChallenge->mUnidentified6C = mChallengeOffset;
             if (scene != 0)
             {
-                scene->SHSceneVirtual2C(8);
+                scene->SetDisplayMode(8);
             }
             return;
         }

@@ -23,7 +23,7 @@ void gl_MatrixStartup()
     nlMatrix4 m;
     m.SetIdentity();
     gl_IdentityMatrix = (unsigned long)glResourceAlloc(
-        sizeof(nlMatrix4), GLM_Matrix, fn_802CC094());
+        sizeof(nlMatrix4), GLM_Matrix, glGetCurrentResourcePool());
     glplatSetMatrix(gl_IdentityMatrix, m);
 }
 

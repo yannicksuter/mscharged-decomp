@@ -1,4 +1,5 @@
 #include "Game/NetTournManager.h"
+#include "Game/NetworkMessageRegistry.h"
 #include "NL/nlFunctionMemory.h"
 #include "Game/Sys/debug.h"
 
@@ -21,80 +22,80 @@ static int sCupPersonaOverride;
 static float s_fDefaultTimeToStartGames = 50.0f;
 static int s_nSendGameInProgressUpdateEvery = 1;
 static int s_nSendGameInProgressMajorUpdate = 5;
-static int s_nOverrideCupPersona = 10;
+int s_nOverrideCupPersona = 10;
 
-static TweakValueImpl_804F4DC8 sDefaultTimeToStartGamesTweak(
+static TweakFloatBinding sDefaultTimeToStartGamesTweak(
     "s_fDefaultTimeToStartGames", "Network/Tournament",
     &s_fDefaultTimeToStartGames);
-static TweakValueIntImpl_804FD898 sSendGameInProgressUpdateEveryTweak(
+static TweakIntBinding sSendGameInProgressUpdateEveryTweak(
     "s_nSendGameInProgressUpdateEvery", "Network/Tournament",
     &s_nSendGameInProgressUpdateEvery, true);
-static TweakValueIntImpl_804FD898 sSendGameInProgressMajorUpdateTweak(
+static TweakIntBinding sSendGameInProgressMajorUpdateTweak(
     "s_nSendGameInProgressMajorUpdate", "Network/Tournament",
     &s_nSendGameInProgressMajorUpdate, true);
-static TweakValueIntImpl_804FD898 sOverrideCupPersonaTweak(
+static TweakIntBinding sOverrideCupPersonaTweak(
     "s_nOverrideCupPersona", "Network/Tournament", &s_nOverrideCupPersona,
     true);
 
-void NetMessagePauseRequest_8050AD7C::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+void NetMessagePauseRequest::Serialize(
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
     serializer->Transfer(&mPaused, sizeof(mPaused));
 }
 
-void NetMessagePauseResponse_8050AD68::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+void NetMessagePauseResponse::Serialize(
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mMachineMask, sizeof(mMachineMask));
 }
 
-int NetMessagePauseResponse_8050AD68::GetType()
+int NetMessagePauseResponse::GetType()
 {
     return 29;
 }
 
-int NetMessagePauseRequest_8050AD7C::GetType()
+int NetMessagePauseRequest::GetType()
 {
     return 28;
 }
 
-NetMessagePauseRequest_8050AD7C::~NetMessagePauseRequest_8050AD7C()
+NetMessagePauseRequest::~NetMessagePauseRequest()
 {
 }
 
-void NetworkMessageType30_8050ADA4::Serialize(
-    UnidentifiedMessageSerializer* serializer)
-{
-    serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
-}
-
-void NetworkMessageType31_8050AD90::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+void NetworkMessageType30::Serialize(
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
 }
 
-NetworkMessageType30_8050ADA4::~NetworkMessageType30_8050ADA4()
+void NetworkMessageType31::Serialize(
+    NetworkMessageSerializer* serializer)
+{
+    serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
+}
+
+NetworkMessageType30::~NetworkMessageType30()
 {
 }
 
-NetworkMessageType31_8050AD90::~NetworkMessageType31_8050AD90()
+NetworkMessageType31::~NetworkMessageType31()
 {
 }
 
-int NetworkMessageType31_8050AD90::GetType()
+int NetworkMessageType31::GetType()
 {
     return 31;
 }
 
-int NetworkMessageType30_8050ADA4::GetType()
+int NetworkMessageType30::GetType()
 {
     return 30;
 }
 
-void NetworkMessageType34_8050ADCC::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+void NetworkMessageType34::Serialize(
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
     serializer->Transfer(&mUnidentified0A, sizeof(mUnidentified0A));
@@ -103,8 +104,8 @@ void NetworkMessageType34_8050ADCC::Serialize(
     serializer->Transfer(&mUnidentified0E, sizeof(mUnidentified0E));
 }
 
-void UnidentifiedNetworkMessage_80126D84::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+void NetworkMessageType35::Serialize(
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mCount, sizeof(mCount));
 
@@ -140,29 +141,29 @@ void UnidentifiedNetworkMessage_80126D84::Serialize(
     }
 }
 
-int UnidentifiedNetworkMessage_80126D84::GetType()
+int NetworkMessageType35::GetType()
 {
     return 35;
 }
 
-int NetworkMessageType34_8050ADCC::GetType()
+int NetworkMessageType34::GetType()
 {
     return 34;
 }
 
 void NetMessageTournamentStart::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
     serializer->Transfer(&mMachineCount, sizeof(mMachineCount));
-    serializer->Transfer(&mStadium, sizeof(mStadium));
-    serializer->Transfer(&mUnidentified0B, sizeof(mUnidentified0B));
-    serializer->Transfer(&mUnidentified0C, sizeof(mUnidentified0C));
+    serializer->Transfer(&mCupPersona, sizeof(mCupPersona));
+    serializer->Transfer(&mFirstStadium, sizeof(mFirstStadium));
+    serializer->Transfer(&mSecondStadium, sizeof(mSecondStadium));
     serializer->Transfer(mSeedings, sizeof(mSeedings));
 }
 
 void NetMessageTournamentGameUpdate::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mUpdateType, sizeof(mUpdateType));
     serializer->Transfer(&mGameIndex, sizeof(mGameIndex));
@@ -177,7 +178,7 @@ void NetMessageTournamentGameUpdate::Serialize(
 }
 
 void NetMessageTournamentLoadingState::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
     serializer->Transfer(
@@ -223,9 +224,9 @@ void NetTournManager::Reset(bool)
     mMachineCount = 0;
     mLocalMachineIndex = -1;
     mLargeBracket = false;
-    mStadium = 10;
-    mHomeTeam = -1;
-    mAwayTeam = -1;
+    mCupPersona = 10;
+    mFirstStadium = -1;
+    mSecondStadium = -1;
     mSeedings[0] = 0;
     mSeedings[1] = 1;
     mSeedings[2] = 2;
@@ -281,16 +282,16 @@ void NetTournManager::Reset(bool)
 void NetTournManager::TransitionOnlineMenuToTournament(
     NetMessageTournamentStart* message)
 {
-    UnidentifiedNetworkMessageReceiver* receiver = this;
-    lbl_806E2100->fn_8032CA1C(32, receiver);
-    lbl_806E2100->fn_8032CA1C(33, receiver);
+    NetworkMessageReceiver* receiver = this;
+    gNetworkMessageRegistry->RegisterReceiver(32, receiver);
+    gNetworkMessageRegistry->RegisterReceiver(33, receiver);
 
     mMachineCount = (s8)message->mMachineCount;
     mLocalMachineIndex = (s8)message->mMachineIndex;
     mLargeBracket = mMachineCount > 4;
-    mStadium = message->mStadium;
-    mHomeTeam = (s8)message->mUnidentified0B;
-    mAwayTeam = (s8)message->mUnidentified0C;
+    mCupPersona = message->mCupPersona;
+    mFirstStadium = (s8)message->mFirstStadium;
+    mSecondStadium = (s8)message->mSecondStadium;
     for (int i = 0; i < 8; ++i)
     {
         mSeedings[i] = message->mSeedings[i];
@@ -372,7 +373,14 @@ void NetTournManager::BuildInitialBracket()
         game.mHomeUpdate = 0;
         game.mAwayUpdate = 0;
         game.mGameInfo.Reset(true);
-        game.mGameInfo.mStadiumIndex = mStadium;
+        if (mCurrentRound == 1)
+        {
+            game.mGameInfo.mStadiumIndex = mSecondStadium;
+        }
+        else
+        {
+            game.mGameInfo.mStadiumIndex = mFirstStadium;
+        }
     }
 }
 
@@ -426,7 +434,7 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
     NetMessageTournamentLoadingState loading(mLocalMachineIndex, false);
     tDebugPrintManager::Print(DC_NETWORK, "NotifyLoadingToGame called on machine %d\n",
         mLocalMachineIndex);
-    int size = lbl_806E2100->fn_8032C830(&loading, buffer, sizeof(buffer));
+    int size = gNetworkMessageRegistry->Serialize(&loading, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
 
     bool isHomeMachine = false;
@@ -438,7 +446,7 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
     {
         NetMessageTournamentGameUpdate gameUpdate(
             1, mCurrentGameIndex, isHomeMachine, 1, 0, false);
-        int gameSize = lbl_806E2100->fn_8032C830(&gameUpdate, gameBuffer, sizeof(gameBuffer));
+        int gameSize = gNetworkMessageRegistry->Serialize(&gameUpdate, gameBuffer, sizeof(gameBuffer));
         SendToAllTournamentMachines(gameBuffer, gameSize);
     }
 }
@@ -473,7 +481,7 @@ bool NetTournManager::SendTournamentGameStart(NetworkTournamentGame* game)
 
 void NetTournManager::SendToAllTournamentMachines(void* data, int size)
 {
-    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     if (roster == 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,
@@ -746,13 +754,13 @@ void NetTournManager::Update(float dt)
     else if (AreRoundGamesFinished())
     {
         ++mCurrentRound;
-        if (mCurrentRound >= GetNumRounds())
+        if (mCurrentRound >= GetNumPlayoffRounds())
         {
             int winnerSide = -1;
             mGames[mFirstGameInRound].GetWinnerAndLoser(
                 &winnerSide, &mWinningMachine);
-            lbl_806E2100->fn_8032CA2C(32);
-            lbl_806E2100->fn_8032CA2C(33);
+            gNetworkMessageRegistry->UnregisterReceiver(32);
+            gNetworkMessageRegistry->UnregisterReceiver(33);
             mState = 2;
         }
         else
@@ -778,7 +786,7 @@ void NetTournManager::NotifyFinishedLoadingToKnockout()
     tDebugPrintManager::Print(DC_NETWORK,
         "NotifyFinishedLoadingToKnockout called on machine %d\n",
         mLocalMachineIndex);
-    int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
+    int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
 }
 
@@ -792,7 +800,7 @@ void NetTournManager::NotifyOverlayPopped(int)
     NetMessageTournamentGameUpdate message(2, mCurrentGameIndex,
         isHomeMachine, 0, 0, false);
     u8 buffer[0xFF];
-    int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
+    int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
 }
 
@@ -807,7 +815,7 @@ void NetTournManager::NotifyGameOver()
         isHomeMachine, 1, 0, true);
     message.mGameInfo = *GameInfoManager::Instance()->GetCurrentGameInfo();
     u8 buffer[0xFF];
-    int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
+    int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
 }
 
@@ -817,15 +825,15 @@ void NetTournManager::ResetGameProgressUpdateTimer(int)
     mGameProgressUpdateCount = 0;
 }
 
-int NetTournManager::ReceiverVirtual00(UnidentifiedNetworkMessage* message)
+int NetTournManager::ProcessMessage(NetworkMessage* message)
 {
-    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
-    s8 machine = roster->MachineIdxFromConnection(message->mUnidentified04);
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    s8 machine = roster->MachineIdxFromConnection(message->mSource);
     if (machine < 0 || machine >= roster->GetMachineCount())
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Discarded message type %d because from unknown connection %x\n",
-            (u8)message->GetType(), message->mUnidentified04);
+            (u8)message->GetType(), message->mSource);
         return 1;
     }
 
@@ -934,26 +942,26 @@ BasicGameInfo* NetTournManager::GetCurrentGameInfo()
     return 0;
 }
 
-int NetTournManager::GetRoundMask(int, int round) const
+u16 NetTournManager::GetNumGamesPerRound(int, int round) const
 {
-    u16 numRounds = GetNumRounds();
-    int mask = 0;
+    u16 numRounds = GetNumPlayoffRounds();
+    u16 numGames = 0;
     if (round == numRounds - 1)
     {
-        mask = 1;
+        numGames = 1;
     }
     else if (round == numRounds - 2)
     {
-        mask = 2;
+        numGames = 2;
     }
     else if (round == numRounds - 3)
     {
-        mask = 4;
+        numGames = 4;
     }
-    return mask;
+    return numGames;
 }
 
-int NetTournManager::GetNumTournamentGames() const
+u16 NetTournManager::GetNumGames(int) const
 {
     return mLargeBracket ? 7 : 3;
 }
@@ -977,12 +985,12 @@ void NetTournManager::DestroyTournamentTrophy()
 
 const char* NetTournManager::GetTournamentTrophyResource() const
 {
-    int stadium = GetStadium();
+    int cupPersona = GetCupPersona();
     if (sCupPersonaOverrideActive)
     {
-        stadium = sCupPersonaOverride;
+        cupPersona = sCupPersonaOverride;
     }
-    switch (stadium)
+    switch (cupPersona)
     {
     case 0:
         return "art/characters/npcs/trophymushroom/trophymushroom";
@@ -1009,14 +1017,14 @@ const char* NetTournManager::GetTournamentTrophyResource() const
     }
 }
 
-u16 NetTournManager::GetNumRounds() const
+u16 NetTournManager::GetNumPlayoffRounds() const
 {
     return mLargeBracket ? 3 : 2;
 }
 
-bool NetTournManager::IsFinalRound() const
+bool NetTournManager::IsCupWinningGame(int) const
 {
-    return GetCurrentRoundNumber() == GetNumRounds() - 1;
+    return GetCurrentRoundNumber() == GetNumPlayoffRounds() - 1;
 }
 
 s16 NetTournManager::GetCurrentRoundNumber() const
@@ -1024,7 +1032,7 @@ s16 NetTournManager::GetCurrentRoundNumber() const
     return mCurrentRound;
 }
 
-int NetTournManager::IsTournamentMode() const
+int NetTournManager::GetCurrentRoundType() const
 {
     return 1;
 }

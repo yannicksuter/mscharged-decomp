@@ -1,7 +1,7 @@
 #ifndef GAME_SH_SH_GAME_RESULTS_H
 #define GAME_SH_SH_GAME_RESULTS_H
 
-#include "Game/SH/SHSceneBase.h"
+#include "Game/SH/SHStrikerTimesBase.h"
 #include "unclassified/tu_80209584.h"
 
 class TLTextInstance;
@@ -34,14 +34,14 @@ struct UnidentifiedGameClock
     /* 0x13C */ int mUnidentified13C;
 }; // size unknown
 
-class GameResultsScene : public UnidentifiedSHSceneBase
+class GameResultsScene : public SHStrikerTimesBase
 {
 public:
     GameResultsScene();
     virtual ~GameResultsScene();
     virtual void Update(float dt);
     virtual void SceneCreated();
-    virtual void SHSceneVirtual30();
+    virtual void OnDoneTransitionComplete();
 
     void fn_8020A494(UnidentifiedGameResultsData* data, UnidentifiedResultsListener* listener, UnidentifiedGameClock* clock);
 

@@ -3,6 +3,8 @@
 
 #include "Game/InterpreterCore.h"
 
+class GLResourcePool;
+
 struct UnidentifiedOwnerTarget
 {
     virtual ~UnidentifiedOwnerTarget();
@@ -69,6 +71,10 @@ public:
     virtual ~AsyncLoadingManager();
     virtual void DoFunctionCall(unsigned int functionIndex);
 
+    static AsyncLoadingManager* Instance();
+    GLResourcePool* GetPersistentResourcePool();
+    void LoadTrophyTemplates();
+
     /* 0x28 */ void* mByteCode;
     /* 0x2C */ u32 mSequenceState;
     /* 0x30 */ u32 mLoadingState;
@@ -82,12 +88,6 @@ public:
     /* 0x54 */ UnidentifiedOwnerHandle mLoadingHandle;
 }; // size 0x58
 
-struct UnidentifiedLoadingStateProvider
-{
-    /* 0x00 */ u8 mUnidentified00[0x18];
-    /* 0x18 */ void* mUnidentified18;
-};
-
 extern bool g_VerboseAudio;
 extern bool g_bDumpMemoryStatsOnLoad;
 extern float g_fScriptBlockingWarningMS;
@@ -95,7 +95,6 @@ extern float g_fYieldScriptBlockingTimeMS;
 
 extern "C" {
 void fn_80116988(void*, const char* bankName);
-AsyncLoadingManager* fn_80118A74();
 void fn_80118B38(void* data, unsigned long size, void* userData);
 void fn_80118B50(AsyncLoadingManager* manager);
 u32 fn_80118B7C(AsyncLoadingManager* manager);
@@ -123,12 +122,9 @@ void fn_8011B2E4(AsyncLoadingManager* manager);
 void fn_8011B40C(void*, unsigned long, unsigned long);
 void fn_8011B418(void*, unsigned long, unsigned long);
 void fn_8011B424(void*, unsigned long, unsigned long);
-void fn_8011B430(AsyncLoadingManager* manager);
 void fn_8011B6E8(AsyncLoadingManager* manager);
-void* fn_8011B850();
 UnidentifiedOwnerHandle* fn_8011B858(UnidentifiedOwnerHandle* handle,
     int shouldDelete);
-void* fn_8011B8D8(UnidentifiedLoadingStateProvider* provider);
 }
 
 #endif // GAME_ASYNC_LOADING_H

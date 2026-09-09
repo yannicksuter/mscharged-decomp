@@ -1,34 +1,10 @@
 #ifndef GAME_FE_FE_CAPTAIN_COMPONENT_H
 #define GAME_FE_FE_CAPTAIN_COMPONENT_H
 
+#include "types.h"
+
 class BaseGameSceneManager;
-
-#include "NL/nlBasicString.h"
-#include "NL/nlFunction.h"
-
 class TLComponentInstance;
-
-struct UnidentifiedTextFader
-{
-    UnidentifiedTextFader(int value);
-
-    void fn_801E423C(int value);
-    void fn_801E4244(int value);
-    void fn_801E424C(int value);
-
-    /* 0x00 */ u8 mUnidentified00[0x4];
-    /* 0x04 */ BasicString<char, Detail::TempStringAllocator> mText;
-    /* 0x08 */ u8 mUnidentified08[0xC];
-    /* 0x14 */ int mUnidentified14;
-    /* 0x18 */ u8 mUnidentified18[0x4];
-    /* 0x1C */ int mUnidentified1C;
-    /* 0x20 */ int mUnidentified20;
-    /* 0x24 */ float mUnidentified24;
-    /* 0x28 */ float mUnidentified28;
-    /* 0x2C */ float mUnidentified2C;
-    /* 0x30 */ Function<FnVoidVoid> mUnidentified30;
-    /* 0x38 */ u8 mUnidentified38[0x8];
-}; // size 0x40
 
 class TU801DA134Component
 {
@@ -38,6 +14,8 @@ public:
 
     void fn_801DA198(TLComponentInstance* component, int side);
     void fn_801DA88C();
+    void fn_801DCB28();
+    void fn_801DCC28();
     void fn_801DC824(bool visible0, bool visible1, bool visible2);
     int fn_801DCD74(int index);
     void fn_801DCD84(int value);
@@ -52,6 +30,18 @@ public:
     /* 0x24 */ int mUnidentified24;
 }; // size 0x28
 
+class TU801DCD9CComponent
+{
+public:
+    TU801DCD9CComponent();
+    virtual ~TU801DCD9CComponent();
+
+    void fn_801E0B20(bool visible);
+    void fn_801DEDD0(int captain, int index, unsigned long flag);
+    void fn_801E0280(int value);
+
+    /* 0x004 */ u8 mUnidentified04[0x2A8];
+}; // size 0x2AC
 
 void fn_801E23A4(BaseGameSceneManager* manager, u32 from, u32 to);
 

@@ -1,7 +1,8 @@
+#include "NL/glx/glxLight.h"
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlColour.h"
 
@@ -18,8 +19,6 @@ extern "C" void fn_802A5ED8(void*, const glModelPacket*);
 extern "C" void fn_802A5F30(void*, const glModelPacket*);
 extern "C" void fn_802A611C(void*, const glModelPacket*);
 extern "C" void fn_802A6190(void*, const glModelPacket*);
-extern "C" void fn_8036A800(int, void*, void*);
-extern "C" void fn_8036A938(void*);
 
 extern "C" void fn_802A2CFC(void* renderer)
 {
@@ -42,19 +41,19 @@ extern "C" void fn_802A2DB8()
 extern "C" void fn_802A2DD8(void* renderer, const glModelPacket* packet)
 {
     u32* parameter = static_cast<u32*>(packet->unknown20);
-    fn_802CC978(renderer, packet, *parameter);
+    glSetMaterialTextureAlphaState(renderer, packet, *parameter);
 }
 
 extern "C" void fn_802A2DE4(void* renderer, const glModelPacket* packet)
 {
     u8* parameters = static_cast<u8*>(packet->unknown20);
-    fn_8036A800(0, parameters + 8, parameters + 0x2C);
+    glx_LoadDirectionalLight(0, (const nlVector3*)(parameters + 8), (const nlFloatColour*)(parameters + 0x2C));
     parameters = static_cast<u8*>(packet->unknown20);
-    fn_8036A800(1, parameters + 0x14, parameters + 0x3C);
+    glx_LoadDirectionalLight(1, (const nlVector3*)(parameters + 0x14), (const nlFloatColour*)(parameters + 0x3C));
     parameters = static_cast<u8*>(packet->unknown20);
-    fn_8036A800(2, parameters + 0x20, parameters + 0x4C);
+    glx_LoadDirectionalLight(2, (const nlVector3*)(parameters + 0x20), (const nlFloatColour*)(parameters + 0x4C));
     parameters = static_cast<u8*>(packet->unknown20);
-    fn_8036A938(parameters + 0x5C);
+    glx_SetAmbientColour((const nlFloatColour*)(parameters + 0x5C));
 
     fn_802A5ED8(renderer, packet);
     fn_802A6190(renderer, packet);

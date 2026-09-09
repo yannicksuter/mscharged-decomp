@@ -9,7 +9,7 @@ struct GLAnimTex
     /* 0x04 */ f32 time;
 };
 
-class ResourceInterface_802CC094;
+class GLResourcePool;
 
 class GLTextureAnim
 {
@@ -28,21 +28,21 @@ public:
     void Update(float dt);
 
     /* 0x00 */ s32 m_currentFrame;
-    /* 0x04 */ u32 m_unk_0x04;
+    /* 0x04 */ u32 m_hashID;
     /* 0x08 */ s32 m_frameCount;
     /* 0x0C */ u32 m_mode;
     /* 0x10 */ s32 m_direction;
     /* 0x14 */ bool m_isStopped;
     /* 0x15 */ u8 m_pad15[3];
-    /* 0x18 */ u32 m_unk_0x18;
+    /* 0x18 */ u32 m_textureIndex;
     /* 0x1C */ f32 m_currentTime;
     /* 0x20 */ GLAnimTex* m_frames;
 };
 
-extern "C" GLTextureAnim* fn_802D0758(unsigned long texture);
-extern "C" bool fn_802D3A08(const void* data, unsigned long size);
-extern "C" void fn_802D3A34(const void* data, unsigned long size,
-    ResourceInterface_802CC094* resource);
-extern "C" void fn_802D3B68(GLTextureAnim* anim);
+GLTextureAnim* glGetTextureAnim(unsigned long texture);
+bool glIsTextureAnim(const void* data, unsigned long size);
+void glAddTextureAnim(const void* data, unsigned long size,
+    GLResourcePool* resource);
+void glReleaseTextureAnim(GLTextureAnim* anim);
 
 #endif // GAME_GL_GLTEXTUREANIM_H

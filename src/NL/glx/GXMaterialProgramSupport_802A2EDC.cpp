@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glView.h"
@@ -43,7 +44,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A61C8>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 template <>
@@ -62,11 +63,11 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A61C8>::Draw(
     if (packet->unknown28 == 0)
     {
         GXMaterialProgramParameters_802A61C8* parameters = (GXMaterialProgramParameters_802A61C8*)packet->unknown20;
-        fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, false);
+        glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, false);
     }
     else
     {
-        fn_8036D774(&modelview);
+        glx_LoadDefaultSkinMatrices(&modelview);
     }
 
     GXCallDisplayList(packet->displayList->list, packet->displayList->size);

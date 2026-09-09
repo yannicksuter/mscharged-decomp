@@ -2,7 +2,7 @@
 
 #include "NL/gl/glModel.h"
 #include "NL/gl/glPlat.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
 
@@ -39,15 +39,15 @@ extern "C" void fn_802A33E0(void* renderer)
 
 extern "C" void fn_802A34A8()
 {
-    u32 height = fn_803693A4();
-    u32 width = fn_80369394();
+    u32 height = glplatGetFrameBufferHeight();
+    u32 width = glplatGetFrameBufferWidth();
     GXSetScissor(0, 0, width, height);
 }
 
 extern "C" void fn_802A34EC(void* renderer, const glModelPacket* packet)
 {
     ScissorParameters_802A34F8* parameters = static_cast<ScissorParameters_802A34F8*>(packet->unknown20);
-    fn_802CC978(renderer, packet, parameters->value);
+    glSetMaterialTextureAlphaState(renderer, packet, parameters->value);
 }
 
 extern "C" void fn_802A34F8(void* renderer, const glModelPacket* packet)
@@ -55,8 +55,8 @@ extern "C" void fn_802A34F8(void* renderer, const glModelPacket* packet)
     ScissorParameters_802A34F8* parameters = static_cast<ScissorParameters_802A34F8*>(packet->unknown20);
     if (parameters->x <= lbl_806E5FB8)
     {
-        u32 height = fn_803693A4();
-        u32 width = fn_80369394();
+        u32 height = glplatGetFrameBufferHeight();
+        u32 width = glplatGetFrameBufferWidth();
         GXSetScissor(0, 0, width, height);
     }
     else

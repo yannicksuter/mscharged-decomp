@@ -5,6 +5,7 @@
 #include "Game/SH/SHHallOfFame.h"
 #include "Game/FE/feDPD.h"
 #include "NL/nlBind.h"
+#include "Game/FE/FEAudio.h"
 
 SHHallOfFameRoom::~SHHallOfFameRoom()
 {

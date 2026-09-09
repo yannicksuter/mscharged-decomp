@@ -3,11 +3,14 @@
 #include "Game/FE/FEAudio.h"
 
 #include "Game/DB/GameProgress.h"
+#include "Game/FE/feCupFlow.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/SH/SHNavigation.h"
 
-extern "C" void fn_802081C0();
+extern "C" void ShowCupRulesPopup();
 class SHNavigation;
 
 
@@ -151,7 +154,7 @@ void TU80203D70Scene::fn_802069F0(int, void* context)
     }
     else
     {
-        fn_802081C0();
+        ShowCupRulesPopup();
     }
 
     if (value == 0)

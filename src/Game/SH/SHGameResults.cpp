@@ -9,11 +9,12 @@
 #include "Game/FE/tlTextInstance.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "Game/SH/SHNavigation.h"
 
 class SHNavigation;
 
 
-static inline TLTextInstance* AsTextInstance(TLInstance* instance)
+static inline TLTextInstance* AsTextInstance(void* instance)
 {
     if (instance == 0)
         return 0;
@@ -53,16 +54,16 @@ void GameResultsScene::fn_8020A494(UnidentifiedGameResultsData* data, Unidentifi
     mUnidentifiedA18 = clock;
 }
 
-void GameResultsScene::SHSceneVirtual30()
+void GameResultsScene::OnDoneTransitionComplete()
 {
-    UnidentifiedSHSceneBase::SHSceneVirtual30();
+    SHStrikerTimesBase::OnDoneTransitionComplete();
     mUnidentifiedA14->Virtual28(1);
     GameSceneManager::Instance()->Pop();
 }
 
 void GameResultsScene::SceneCreated()
 {
-    UnidentifiedSHSceneBase::SceneCreated();
+    SHStrikerTimesBase::SceneCreated();
     unsigned long titleHash;
     unsigned long summaryHash;
     unsigned long layerHash;
@@ -83,7 +84,7 @@ void GameResultsScene::SceneCreated()
 
 void GameResultsScene::Update(float dt)
 {
-    UnidentifiedSHSceneBase::Update(dt);
+    SHStrikerTimesBase::Update(dt);
     if (!mUnidentified5D8 && mUnidentifiedA10 != 0)
     {
         FillSummary(&mSummary, mUnidentifiedA10->mHome, mUnidentifiedA10->mAway, mFEScene->m_pFEPackage->GetPresentation());

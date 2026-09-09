@@ -1,9 +1,8 @@
 #include "objects.h"
 
 #include "Game/DebugWriteCache.h"
+#include "NL/nlMain.h"
 #include "ode/NLGAdditions.h"
-
-extern "C" void fn_802AADE8(void*, void*, unsigned int);
 
 extern unsigned short s_dxBodyType;
 extern char s_dxBodyName[7];
@@ -32,44 +31,42 @@ extern char s_BodyStepsLeftName[15];
 #define BODY_FIELD_OFFSET(body, field) \
     ((unsigned char*)&(body)->field - (unsigned char*)&(body)->flags)
 
-void fn_80358B08(dBodyID body, void* context, DebugWriteCache* cache)
+void dBodySyncLog(dBodyID body, void* context, DebugWriteCache* cache)
 {
     if (s_dxBodyType == 0xFFFF)
     {
-        s_dxBodyType = fn_80338EBC(cache, s_dxBodyName);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, 0, s_BodyFlagsName);
-        fn_80338F88(
-            cache, 15, lbl_80533C98[15].size, BODY_FIELD_OFFSET(body, geom), s_BodyGeomName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, BODY_FIELD_OFFSET(body, mass.mass), s_BodyMassMassName);
-        fn_80338F88(cache, 28, lbl_80533C98[28].size, BODY_FIELD_OFFSET(body, mass.c), s_BodyMassCName);
-        fn_80338F88(cache, 30, lbl_80533C98[30].size, BODY_FIELD_OFFSET(body, mass.I), s_BodyMassIName);
-        fn_80338F88(
-            cache, 30, lbl_80533C98[30].size, BODY_FIELD_OFFSET(body, invI), s_BodyInvIName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, BODY_FIELD_OFFSET(body, invMass), s_BodyInvMassName);
-        fn_80338F88(cache, 27, lbl_80533C98[27].size, BODY_FIELD_OFFSET(body, pos), s_BodyPositionName);
-        fn_80338F88(cache, 29, lbl_80533C98[29].size, BODY_FIELD_OFFSET(body, q), s_BodyQuaternionName);
-        fn_80338F88(cache, 30, lbl_80533C98[30].size, BODY_FIELD_OFFSET(body, R), s_BodyRotationName);
-        fn_80338F88(cache, 27, lbl_80533C98[27].size, BODY_FIELD_OFFSET(body, lvel), s_BodyLinearVelocityName);
-        fn_80338F88(cache, 27, lbl_80533C98[27].size, BODY_FIELD_OFFSET(body, avel), s_BodyAngularVelocityName);
-        fn_80338F88(cache, 27, lbl_80533C98[27].size, BODY_FIELD_OFFSET(body, facc), s_BodyForceAccumulatorName);
-        fn_80338F88(cache, 27, lbl_80533C98[27].size, BODY_FIELD_OFFSET(body, tacc), s_BodyTorqueAccumulatorName);
-        fn_80338F88(cache, 27, lbl_80533C98[27].size, BODY_FIELD_OFFSET(body, finite_rot_axis), s_BodyFiniteRotationAxisName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, BODY_FIELD_OFFSET(body, adis.linear_threshold), s_BodyLinearThresholdName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, BODY_FIELD_OFFSET(body, adis.angular_threshold), s_BodyAngularThresholdName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, BODY_FIELD_OFFSET(body, adis.idle_time), s_BodyIdleTimeName);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, BODY_FIELD_OFFSET(body, adis.idle_steps), s_BodyIdleStepsName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, BODY_FIELD_OFFSET(body, adis_timeleft), s_BodyTimeLeftName);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, BODY_FIELD_OFFSET(body, adis_stepsleft), s_BodyStepsLeftName);
-        fn_80338F78(cache);
+        s_dxBodyType = cache->BeginType(s_dxBodyName);
+        cache->AddField(8, gDebugFieldTypes[8].size, 0, s_BodyFlagsName);
+        cache->AddField(15, gDebugFieldTypes[15].size, BODY_FIELD_OFFSET(body, geom), s_BodyGeomName);
+        cache->AddField(17, gDebugFieldTypes[17].size, BODY_FIELD_OFFSET(body, mass.mass), s_BodyMassMassName);
+        cache->AddField(28, gDebugFieldTypes[28].size, BODY_FIELD_OFFSET(body, mass.c), s_BodyMassCName);
+        cache->AddField(30, gDebugFieldTypes[30].size, BODY_FIELD_OFFSET(body, mass.I), s_BodyMassIName);
+        cache->AddField(30, gDebugFieldTypes[30].size, BODY_FIELD_OFFSET(body, invI), s_BodyInvIName);
+        cache->AddField(17, gDebugFieldTypes[17].size, BODY_FIELD_OFFSET(body, invMass), s_BodyInvMassName);
+        cache->AddField(27, gDebugFieldTypes[27].size, BODY_FIELD_OFFSET(body, pos), s_BodyPositionName);
+        cache->AddField(29, gDebugFieldTypes[29].size, BODY_FIELD_OFFSET(body, q), s_BodyQuaternionName);
+        cache->AddField(30, gDebugFieldTypes[30].size, BODY_FIELD_OFFSET(body, R), s_BodyRotationName);
+        cache->AddField(27, gDebugFieldTypes[27].size, BODY_FIELD_OFFSET(body, lvel), s_BodyLinearVelocityName);
+        cache->AddField(27, gDebugFieldTypes[27].size, BODY_FIELD_OFFSET(body, avel), s_BodyAngularVelocityName);
+        cache->AddField(27, gDebugFieldTypes[27].size, BODY_FIELD_OFFSET(body, facc), s_BodyForceAccumulatorName);
+        cache->AddField(27, gDebugFieldTypes[27].size, BODY_FIELD_OFFSET(body, tacc), s_BodyTorqueAccumulatorName);
+        cache->AddField(27, gDebugFieldTypes[27].size, BODY_FIELD_OFFSET(body, finite_rot_axis), s_BodyFiniteRotationAxisName);
+        cache->AddField(17, gDebugFieldTypes[17].size, BODY_FIELD_OFFSET(body, adis.linear_threshold), s_BodyLinearThresholdName);
+        cache->AddField(17, gDebugFieldTypes[17].size, BODY_FIELD_OFFSET(body, adis.angular_threshold), s_BodyAngularThresholdName);
+        cache->AddField(17, gDebugFieldTypes[17].size, BODY_FIELD_OFFSET(body, adis.idle_time), s_BodyIdleTimeName);
+        cache->AddField(8, gDebugFieldTypes[8].size, BODY_FIELD_OFFSET(body, adis.idle_steps), s_BodyIdleStepsName);
+        cache->AddField(17, gDebugFieldTypes[17].size, BODY_FIELD_OFFSET(body, adis_timeleft), s_BodyTimeLeftName);
+        cache->AddField(8, gDebugFieldTypes[8].size, BODY_FIELD_OFFSET(body, adis_stepsleft), s_BodyStepsLeftName);
+        cache->EndType();
     }
 
     unsigned int size = (unsigned char*)body + sizeof(dxBody) - (unsigned char*)&body->flags;
-    void* data = fn_8033930C(cache, s_dxBodyType, &body->flags, size);
+    void* data = cache->WriteData(s_dxBodyType, &body->flags, size);
     if (data != 0)
     {
         dxBody* copiedBody = (dxBody*)((unsigned char*)data - ((unsigned char*)&body->flags - (unsigned char*)body));
         copiedBody->geom = 0;
-        fn_802AADE8(context, data, size);
+        static_cast<RunningChecksum*>(context)->ChecksumData(data, size);
     }
 }
 

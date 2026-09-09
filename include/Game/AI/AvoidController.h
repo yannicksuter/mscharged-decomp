@@ -99,7 +99,7 @@ public:
             UnidentifiedRemoveOldest();
     }
 
-    void UnidentifiedUpdate(nlVector3& value, const nlVector3& sample, float dt)
+    void Update(nlVector3& value, const nlVector3& sample, float dt)
     {
         UnidentifiedAdd(sample, dt);
         if (mUnidentified00C != mUnidentified010)
@@ -189,7 +189,7 @@ struct UnidentifiedAvoidanceValue
     bool UnidentifiedResponse_800121D0(UnidentifiedAvoidanceContext&, float);
     bool UnidentifiedMovingResponse(UnidentifiedAvoidanceContext&, float);
     void UnidentifiedPrepareContext(UnidentifiedAvoidanceContext&, float);
-    void UnidentifiedUpdate(float fDeltaT);
+    void Update(float fDeltaT);
     void UnidentifiedInitialize(AvoidableObject*, AvoidableObject*);
     float UnidentifiedGetWeight() const;
 

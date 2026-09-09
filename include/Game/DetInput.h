@@ -11,18 +11,19 @@ class DetInput
 public:
     DetInput();
 
-    u8 fn_80331BE4();
-    u8 fn_80331BEC();
-    nlVector3* fn_80331BF4();
-    nlVector3* fn_80331BFC();
+    u8 GetConnectionStatus();
+    u8 GetControllerType();
+    nlVector3* GetRemoteAcceleration();
+    nlVector3* GetFreestyleAcceleration();
+    bool IsPressed(int button, bool remap);
     bool JustPressed(int button, bool remap);
     bool JustReleased(int button, bool remap);
-    void fn_80331D80();
-    void fn_80331DC8();
-    int fn_80331ECC(int button, bool remap);
-    void fn_80331F9C(int button, bool remap);
-    void fn_80332110(const DetInput& input);
-    void fn_8033222C(cGlobalPad* pad);
+    void UpdatePolarAnalog();
+    void UpdateButtonStateTicks();
+    int GetButtonStateTicks(int button, bool remap);
+    void ResetButtonStateTicks(int button, bool remap);
+    void CopyState(const DetInput& input);
+    void ReadFromPad(cGlobalPad* pad);
     int GetPadID();
 
     /* 0x00 */ float m_AnalogLeftX;
@@ -47,7 +48,5 @@ public:
     /* 0x54 */ int m_buttonStateTicks[13];
     /* 0x88 */ u16 m_aRemapAngle;
 }; // size: 0x8C
-
-extern "C" bool fn_80331C04(DetInput* input, int button, bool remap);
 
 #endif // GAME_DET_INPUT_H

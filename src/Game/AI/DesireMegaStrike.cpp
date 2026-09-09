@@ -12,7 +12,7 @@
 #include "Game/Player.h"
 #include "Game/Team.h"
 #include "NL/globalpad.h"
-#include "unclassified/tu_80336B2C.h"
+#include "Game/NetworkInput.h"
 #include <stdlib.h>
 
 extern "C" cTeam* fn_800D6670(cFielder*);
@@ -43,8 +43,7 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
     DetInput* pGlobalPad = mUnidentifiedFielder->GetGlobalPad();
     if (pGlobalPad != 0)
     {
-        GetLocalChannelPad(
-            (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser);
+        ((NetworkPeerChannel*)pGlobalPad->m_pMyUser)->GetLocalChannelPad();
     }
     else
     {
@@ -155,7 +154,7 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0x384 | 0x800B9748 | size: 0x63C
  */
-void DesireMegaStrike::UnidentifiedUpdate(
+void DesireMegaStrike::Update(
     UnidentifiedDesireUpdate* update, float fDeltaT)
 {
     if (!g_pGame->IsGameplayOrOvertime())
@@ -201,8 +200,7 @@ void DesireMegaStrike::UnidentifiedUpdate(
             cGlobalPad* pInputPad = 0;
             if (pGlobalPad != 0)
             {
-                pInputPad = GetLocalChannelPad(
-                    (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser);
+                pInputPad = ((NetworkPeerChannel*)pGlobalPad->m_pMyUser)->GetLocalChannelPad();
             }
             if (pInputPad != 0)
             {
@@ -371,14 +369,14 @@ void DesireMegaStrike::UnidentifiedCleanup()
 void DesireMegaStrike::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireMegaStrike");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    *(unsigned short*)field = cache->BeginType("DesireMegaStrike");
+    cache->AddField(22, gDebugFieldTypes[22].size,
         0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 /**
@@ -394,8 +392,8 @@ void DesireMegaStrike::UnidentifiedVirtual7(
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
     void* data = (u8*)this + offset;
-    fn_80339450(cache, sDesireMegaStrikeType, data, context);
-    fn_8033930C(cache, sDesireMegaStrikeType, data,
+    cache->ChecksumData(sDesireMegaStrikeType, data, context);
+    cache->WriteData(sDesireMegaStrikeType, data,
         sizeof(DesireMegaStrike) - offset);
 }
 

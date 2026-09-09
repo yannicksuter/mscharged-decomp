@@ -7,7 +7,7 @@
 #include "Game/TweakValue.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
-#include "NL/glx/GXMaterialCrystalTweaks.h"
+#include "Game/TweakValueFloat.h"
 #include "NL/globalpad.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -57,21 +57,21 @@ static u32 sLightRampTexture = glGetTexture("global/lightramp");
 static u32 sBlackTexture = glGetTexture("global/black");
 static u32 sWhiteTexture = glGetTexture("global/white");
 
-static GXMaterialFloatTweak_804F4190 gDebugCameraSensitivity(
+static TweakValueFloat gDebugCameraSensitivity(
     "gDebugCameraSensitivity", "Controller Config/DPD", 3.0f);
 
 static float sDebugCamFOVTweak;
-static TweakValueImpl_804F4DC8 sSpeed0(
+static TweakFloatBinding sSpeed0(
     "Speed 0", "Controller Config/DPD", &sControlTweakValues.speed0);
-static TweakValueImpl_804F4DC8 sWeight0(
+static TweakFloatBinding sWeight0(
     "Weight 0", "Controller Config/DPD", &sControlTweakValues.weight0);
-static TweakValueImpl_804F4DC8 sSpeed1(
+static TweakFloatBinding sSpeed1(
     "Speed 1", "Controller Config/DPD", &sControlTweakValues.speed1);
-static TweakValueImpl_804F4DC8 sWeight1(
+static TweakFloatBinding sWeight1(
     "Weight 1", "Controller Config/DPD", &sControlTweakValues.weight1);
-static TweakValueImpl_804F4DC8 sSpeed2(
+static TweakFloatBinding sSpeed2(
     "Speed 2", "Controller Config/DPD", &sControlTweakValues.speed2);
-static TweakValueImpl_804F4DC8 sWeight2(
+static TweakFloatBinding sWeight2(
     "Weight 2", "Controller Config/DPD", &sControlTweakValues.weight2);
 
 static u32 sSightTexture = nlStringLowerHash("global/sight");

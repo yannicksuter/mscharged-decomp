@@ -1,4 +1,7 @@
+#include "Game/World/WorldVisibility.h"
+#include "NL/gl/gl.h"
 #include "Game/World.h"
+#include "Game/World/WorldEffect.h"
 
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/Effects/EmissionManager.h"
@@ -20,40 +23,20 @@ public:
     virtual void Update(float fDeltaT);
 };
 
-class WorldEffect_80341D40
-{
-public:
-    u8 m_pad00[0x60];
-    /* 0x60 */ float m_fDuration;
-    u8 m_pad64[0x14];
-    /* 0x78 */ unsigned long m_uState;
-    /* 0x7C */ unsigned long m_uType;
-    /* 0x80 */ float m_fTime;
-    /* 0x84 */ float m_fUnidentified084;
-    u8 m_pad88[0x08];
-    /* 0x90 */ unsigned long m_uPreviousState;
-};
-
-extern "C" void fn_802C81FC(
-    nlChunk*, unsigned long, unsigned long, ResourceInterface_802CC094*);
-extern "C" void* fn_802DC9EC(nlChunk*);
-extern "C" void fn_802DCD18(void*, const nlVector4*, bool);
 extern "C" void fn_80343DE4(
-    DrawableObject*, WorldObjectLoadContext_8034136C*);
+    DrawableObject*, WorldObjectLoadContext*);
 extern "C" void fn_80343E3C(
-    DrawableObject*, WorldObjectLoadContext_8034136C*);
+    DrawableObject*, WorldObjectLoadContext*);
 extern "C" void fn_80344144(
-    DrawableObject*, WorldObjectLoadContext_8034136C*);
-extern "C" void fn_80344308(WorldEffect_80341D40*, float);
-extern int nlPrintf(const char*, ...);
+    DrawableObject*, WorldObjectLoadContext*);
 
-World::World(ResourceInterface_802CC094* pResource)
+World::World(GLResourcePool* pResource)
     : m_pResource(pResource)
     , m_pOwnedData(0)
-    , m_pView68(0)
-    , m_pView6C(0)
+    , m_pOpaqueView(0)
+    , m_pAlphaView(0)
 {
-    m_pRenderable = 0;
+    m_pVisibilityTree = 0;
     m_bRenderingEnabled = true;
 }
 
@@ -79,9 +62,9 @@ World::~World()
     }
     delete pIterator;
 
-    mWorldAnimManager_02C.fn_80342324();
+    mWorldAnimManager.fn_80342324();
     UnidentifiedVirtual20();
-    mWorldAnimManager_02C.fn_80342328();
+    mWorldAnimManager.Clear();
     delete m_pOwnedData;
 }
 
@@ -159,15 +142,15 @@ void World::RemoveDrawableObject(DrawableObject* pObject)
     }
 }
 
-bool World::fn_80340F48(void* pData0, unsigned long uSize0, void* pData1,
+bool World::LoadData(void* pData0, unsigned long uSize0, void* pData1,
     unsigned long uSize1, bool bKeepData)
 {
-    mAnimationSet_74 = 0;
+    m_pAnimationSet = 0;
     if (pData0 != 0)
     {
-        fn_80340FD4((nlChunk*)pData0, uSize0);
+        LoadChunks((nlChunk*)pData0, uSize0);
     }
-    fn_80340FD4((nlChunk*)pData1, uSize1);
+    LoadChunks((nlChunk*)pData1, uSize1);
     if (bKeepData)
     {
         m_pOwnedData = (u8*)pData1;
@@ -179,7 +162,7 @@ bool World::fn_80340F48(void* pData0, unsigned long uSize0, void* pData1,
     return true;
 }
 
-bool World::fn_80340FD4(nlChunk* pChunk, unsigned long uSize)
+bool World::LoadChunks(nlChunk* pChunk, unsigned long uSize)
 {
     nlChunk* pCurrent = pChunk->GetFirstChunk();
     nlChunk* pEnd = pChunk->GetLastChunk();
@@ -189,25 +172,25 @@ bool World::fn_80340FD4(nlChunk* pChunk, unsigned long uSize)
         switch (pCurrent->GetID())
         {
         case 0x00026000:
-            fn_8034136C(pCurrent->GetData(),
+            LoadObjects(pCurrent->GetData(),
                 pCurrent->GetSize()
                     - ((u8*)pCurrent->GetData()
                         - ((u8*)pCurrent + sizeof(nlChunk))),
                 false);
             break;
         case 0x80008000:
-            mAnimationSet_74
-                = mWorldAnimManager_02C.LoadHierarchy(pCurrent);
+            m_pAnimationSet
+                = mWorldAnimManager.LoadHierarchy(pCurrent);
             break;
         case 0x80007000:
-            mWorldAnimManager_02C.LoadAnimationSet(
-                mAnimationSet_74, pCurrent);
+            mWorldAnimManager.LoadAnimationSet(
+                m_pAnimationSet, pCurrent);
             break;
         case 0x80026100:
-            m_pRenderable = fn_802DC9EC(pCurrent);
+            m_pVisibilityTree = LoadWorldVisibilityTree(pCurrent);
             break;
         case 0x00024100:
-            fn_802CDD78(pCurrent->GetData(),
+            glEndLoadTextureBundle(pCurrent->GetData(),
                 pCurrent->GetSize()
                     - ((u8*)pCurrent->GetData()
                         - ((u8*)pCurrent + sizeof(nlChunk))),
@@ -215,7 +198,7 @@ bool World::fn_80340FD4(nlChunk* pChunk, unsigned long uSize)
             break;
         case 0x8001B000:
         case 0x8001B100:
-            fn_802C81FC(pCurrent, 0, 0, m_pResource);
+            glEndLoadModel(pCurrent, 0, 0, m_pResource);
             break;
         default:
             HandleUnknownChunk(pCurrent);
@@ -226,7 +209,7 @@ bool World::fn_80340FD4(nlChunk* pChunk, unsigned long uSize)
     return true;
 }
 
-bool World::fn_8034136C(
+bool World::LoadObjects(
     void* pData, unsigned long uSize, bool bKeepData)
 {
     unsigned long i = 0;
@@ -240,7 +223,7 @@ bool World::fn_8034136C(
         m_pOwnedData = 0;
     }
 
-    WorldObjectLoadContext_8034136C context;
+    WorldObjectLoadContext context;
     context.m_pObject = (u8*)pData + 0x10;
     context.m_pWorld = this;
     context.m_uNumObjectsLoaded = 0;
@@ -260,7 +243,7 @@ bool World::fn_8034136C(
         DrawableObject* pObject;
         if (uType < 0x10000)
         {
-            pObject = fn_803415E8(uType, &context);
+            pObject = CreateObject(uType, &context);
         }
         else
         {
@@ -275,12 +258,12 @@ bool World::fn_8034136C(
         context.m_pParent = 0;
     }
 
-    mWorldAnimManager_02C.fn_80342A74();
+    mWorldAnimManager.BindObjects();
     return true;
 }
 
-DrawableObject* World::fn_803415E8(
-    unsigned long uType, WorldObjectLoadContext_8034136C* pContext)
+DrawableObject* World::CreateObject(
+    unsigned long uType, WorldObjectLoadContext* pContext)
 {
     DrawableObject* pObject = 0;
     unsigned long uSize = 0;
@@ -335,7 +318,7 @@ DrawableObject* World::fn_803415E8(
     return pObject;
 }
 
-bool World::fn_803418C4(glModel*& pMaterial)
+bool World::ResolveModel(glModel*& pMaterial)
 {
     unsigned long uHashID = (unsigned long)pMaterial;
     pMaterial = m_pResource->m_inventory->GetModel(uHashID);
@@ -354,7 +337,7 @@ void World::HandleUnknownChunk(nlChunk* pChunk)
     nlPrintf("Unknown Chunk = 0x%08x\n", pChunk->GetID());
 }
 
-void World::fn_80341934()
+void World::InitializeObjects()
 {
     typedef nlAVLTreeIterator<unsigned long, DrawableObject*,
         DefaultKeyCompare<unsigned long> > DrawableIterator;
@@ -373,10 +356,10 @@ void World::fn_80341934()
 
 void World::Render()
 {
-    if (m_pRenderable != 0)
+    if (m_pVisibilityTree != 0)
     {
-        fn_802DCD18(m_pRenderable,
-            m_pView68->m_Interface->GetShadowMatrix(), false);
+        UpdateWorldVisibility(m_pVisibilityTree,
+            m_pOpaqueView->m_Interface->GetShadowMatrix(), 0);
     }
 
     if (m_bRenderingEnabled)
@@ -386,7 +369,7 @@ void World::Render()
         while (iterator.hasNext())
         {
             if (((DrawableObject*)*iterator)
-                    ->V6(m_pView68->m_Interface->GetShadowMatrix()))
+                    ->V6(m_pOpaqueView->m_Interface->GetShadowMatrix()))
             {
                 ((DrawableObject*)*iterator)->Draw();
             }
@@ -395,25 +378,25 @@ void World::Render()
     }
 }
 
-void World::fn_80341BC0(float fDeltaT)
+void World::UpdateAnimations(float fDeltaT)
 {
-    mWorldAnimManager_02C.fn_80342BE8(fDeltaT);
+    mWorldAnimManager.Update(fDeltaT);
 }
 
 void World::Update(float fDeltaT, bool bUpdateState)
 {
     if (bUpdateState)
     {
-        fn_80341BC0(fDeltaT);
+        UpdateAnimations(fDeltaT);
     }
 
     if (EmissionManager::Instance() != 0)
     {
-        nlListIterator<WorldEffect_80341D40*> iterator
+        nlListIterator<WorldEffect*> iterator
             = m_worldEffects.Begin();
         while (iterator.IsValid())
         {
-            fn_80344308(iterator.Current(), fDeltaT);
+            iterator.Current()->Update(fDeltaT);
             iterator.Next();
         }
     }
@@ -437,54 +420,54 @@ DrawableObject* World::FindDrawableObject(unsigned long uHashID)
     return *foundValue;
 }
 
-void World::fn_80341D40(WorldEffect_80341D40* pEffect)
+void World::AddEffect(WorldEffect* pEffect)
 {
     m_worldEffects.AddStart(pEffect);
 }
 
-void World::fn_80341DBC(float fDeltaT)
+void World::UpdateEffects(float fDeltaT)
 {
     if (EmissionManager::Instance() != 0)
     {
-        nlListIterator<WorldEffect_80341D40*> iterator
+        nlListIterator<WorldEffect*> iterator
             = m_worldEffects.Begin();
         while (iterator.IsValid())
         {
-            fn_80344308(iterator.Current(), fDeltaT);
+            iterator.Current()->Update(fDeltaT);
             iterator.Next();
         }
     }
 }
 
-void World::fn_80341E1C()
+void World::ResetEffects()
 {
-    nlListIterator<WorldEffect_80341D40*> iterator
+    nlListIterator<WorldEffect*> iterator
         = m_worldEffects.Begin();
     while (iterator.IsValid())
     {
-        WorldEffect_80341D40* pEffect = iterator.Current();
-        pEffect->m_fTime = 0.0f;
-        pEffect->m_uPreviousState = pEffect->m_uState;
-        pEffect->m_fUnidentified084 = 0.0f;
-        if (pEffect->m_uType == 0)
+        WorldEffect* pEffect = iterator.Current();
+        pEffect->m_fEmissionTime = 0.0f;
+        pEffect->m_nRemainingEmissions = pEffect->m_nEmissionCount;
+        pEffect->m_fPreviousEmissionTime = 0.0f;
+        if (pEffect->m_nTimingMode == 0)
         {
-            pEffect->m_fTime = 1.0f + pEffect->m_fDuration;
+            pEffect->m_fEmissionTime = 1.0f + pEffect->m_fEmissionInterval;
         }
         iterator.Next();
     }
 }
 
-void World::fn_80341E68(unsigned long uType)
+void World::TriggerEffects(unsigned long uType)
 {
-    nlListIterator<WorldEffect_80341D40*> iterator
+    nlListIterator<WorldEffect*> iterator
         = m_worldEffects.Begin();
     while (iterator.IsValid())
     {
-        WorldEffect_80341D40* pEffect = iterator.Current();
-        if (uType == pEffect->m_uType)
+        WorldEffect* pEffect = iterator.Current();
+        if (uType == pEffect->m_nTimingMode)
         {
-            pEffect->m_uPreviousState = pEffect->m_uState;
-            pEffect->m_fTime = 1.0f + pEffect->m_fDuration;
+            pEffect->m_nRemainingEmissions = pEffect->m_nEmissionCount;
+            pEffect->m_fEmissionTime = 1.0f + pEffect->m_fEmissionInterval;
         }
         iterator.Next();
     }

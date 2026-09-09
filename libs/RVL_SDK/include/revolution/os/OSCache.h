@@ -1,6 +1,7 @@
 #ifndef REVOLUTION_OS_CACHE_H
 #define REVOLUTION_OS_CACHE_H
 
+#include <revolution/os/OSCache_fwd.h>
 #include <revolution/types.h>
 
 typedef struct OSContext OSContext;
@@ -10,13 +11,6 @@ extern "C" {
 #endif
 
 void DCEnable(void);
-void DCInvalidateRange(const void* address, u32 length);
-void DCFlushRange(const void* address, u32 length);
-void DCStoreRange(const void* address, u32 length);
-void DCFlushRangeNoSync(const void* address, u32 length);
-void DCStoreRangeNoSync(const void* address, u32 length);
-void DCZeroRange(const void* address, u32 length);
-void ICInvalidateRange(const void* address, u32 length);
 void ICFlashInvalidate(void);
 void ICEnable(void);
 void LCEnable(void);

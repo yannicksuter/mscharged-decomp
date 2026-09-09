@@ -1,19 +1,18 @@
 #include <revolution/gx.h>
 
+#include "NL/gl/glPlat.h"
 #include "Game/Render/RLViewLayers.h"
-#include "Game/Render/tu_802DCDB4.h"
+#include "Game/Render/Frustum.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxSend.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_801A2004.h"
 
-extern "C" void fn_8036EB44(float nearPlane, float farPlane);
-extern "C" u32 fn_80369D4C();
-extern "C" u32 fn_80369D54();
 extern "C" void fn_8037091C();
 extern "C" void fn_80370998(GLView*, GLView*);
 void CopyShadowVolumeColour(const GXColor* colour);
@@ -118,7 +117,7 @@ void fn_80272214(int view, const nlMatrix4& viewMatrix, const nlMatrix4& project
 
 void fn_80272388()
 {
-    TargetInfo_8036DE50 info;
+    GLTargetInfo info;
     int i;
 
     for (i = 0; i < 11; i++)
@@ -137,13 +136,13 @@ void fn_80272388()
 
     for (i = 0; i < 11; i++)
     {
-        nlZeroMemory(&info, sizeof(TargetInfo_8036DE50));
+        nlZeroMemory(&info, sizeof(GLTargetInfo));
         info.width = 0x48;
         info.height = 0x48;
         info.format = 6;
         info.unknown18 = 0;
         info.unknown1C = 0;
-        GLRenderPair pair = fn_802CD884(sShadowDebugNames[i], &info);
+        GLRenderPair pair = glCreateTarget(sShadowDebugNames[i], &info);
         sShadowDebugPairs[i] = pair;
         sShadowDebugTargets[i] = pair.hash;
     }
@@ -156,8 +155,8 @@ void fn_80272388()
         view->m_ViewportY = sShadowDebugRects[i].y;
         view->m_ViewportWidth = sShadowDebugRects[i].width;
         view->m_ViewportHeight = sShadowDebugRects[i].height;
-        view->m_Unknown33 = false;
         view->m_ClearColour = false;
+        view->m_ClearDepth = false;
         view->m_Target = 0;
         sViews[i] = view;
     }
@@ -169,8 +168,8 @@ void fn_80272388()
         sViews[i]->m_Parent = sLayerViews[eCLV_ShadowTexture];
     }
 
-    sLayerViews[eCLV_ShadowTexture]->m_Unknown33 = true;
     sLayerViews[eCLV_ShadowTexture]->m_ClearColour = true;
+    sLayerViews[eCLV_ShadowTexture]->m_ClearDepth = true;
 }
 
 static RLViewLayerDesc sPerspectiveLayers[] = {
@@ -284,7 +283,7 @@ GLViewInterface* fn_802726A0()
 
 void fn_802726AC()
 {
-    TargetInfo_8036DE50 info;
+    GLTargetInfo info;
     info.width = 0x40;
     info.height = 0x40;
     info.format = 7;
@@ -294,11 +293,11 @@ void fn_802726AC()
     info.colour[1] = 0x7C;
     info.colour[2] = 0x7C;
     info.colour[3] = 0x7C;
-    GLRenderPair texturePair = fn_802CD884("warbletexture", &info);
+    GLRenderPair texturePair = glCreateTarget("warbletexture", &info);
     sWarbleTextureTarget = texturePair;
 
-    info.width = fn_80369D4C();
-    info.height = fn_80369D54();
+    info.width = glplatGetDefaultTargetWidth();
+    info.height = glplatGetDefaultTargetHeight();
     info.format = 1;
     info.unknown18 = 0;
     info.unknown1C = 0;
@@ -306,37 +305,37 @@ void fn_802726AC()
     info.colour[1] = 0;
     info.colour[2] = 0;
     info.colour[3] = 0;
-    GLRenderPair colourPair = fn_802CD884("warblecolour", &info);
+    GLRenderPair colourPair = glCreateTarget("warblecolour", &info);
     sWarbleColourTarget = colourPair;
     sLayerViews[eCLV_PreWarble]->m_RenderPair = colourPair;
     sLayerViews[eCLV_PreWarble]->m_Target = 8;
 
     sLayerViews[eCLV_Warble]->m_ViewportX = 0;
     sLayerViews[eCLV_Warble]->m_ViewportY = 0;
-    sLayerViews[eCLV_Warble]->m_ViewportWidth = fn_80369D4C() >> 1;
-    sLayerViews[eCLV_Warble]->m_ViewportHeight = fn_80369D54() >> 1;
+    sLayerViews[eCLV_Warble]->m_ViewportWidth = glplatGetDefaultTargetWidth() >> 1;
+    sLayerViews[eCLV_Warble]->m_ViewportHeight = glplatGetDefaultTargetHeight() >> 1;
 
-    info.width = fn_80369D4C() >> 2;
-    info.height = fn_80369D54() >> 2;
+    info.width = glplatGetDefaultTargetWidth() >> 2;
+    info.height = glplatGetDefaultTargetHeight() >> 2;
     info.format = 5;
     info.unknown18 = 1;
     info.colour[0] = 0x80;
     info.colour[1] = 0x80;
     info.colour[2] = 0x80;
     info.colour[3] = 0x80;
-    GLRenderPair offsetPair = fn_802CD884("warbleoffset", &info);
+    GLRenderPair offsetPair = glCreateTarget("warbleoffset", &info);
     sWarbleOffsetTarget = offsetPair;
     sLayerViews[eCLV_Warble]->m_RenderPair = offsetPair;
-    sLayerViews[eCLV_Warble]->m_Unknown33 = true;
+    sLayerViews[eCLV_Warble]->m_ClearColour = true;
     sLayerViews[eCLV_Warble]->m_Target = 8;
 }
 
 void fn_80272850()
 {
-    TargetInfo_8036DE50 info;
-    nlZeroMemory(&info, sizeof(TargetInfo_8036DE50));
-    info.width = fn_80369D4C() >> 1;
-    info.height = fn_80369D54() >> 1;
+    GLTargetInfo info;
+    nlZeroMemory(&info, sizeof(GLTargetInfo));
+    info.width = glplatGetDefaultTargetWidth() >> 1;
+    info.height = glplatGetDefaultTargetHeight() >> 1;
     info.format = 1;
     info.unknown18 = 1;
     info.unknown1C = 0;
@@ -344,24 +343,24 @@ void fn_80272850()
     info.colour[1] = 0xFF;
     info.colour[2] = 0;
     info.colour[3] = 0;
-    GLRenderPair dofPair = fn_802CD884(sDofTargetName, &info);
+    GLRenderPair dofPair = glCreateTarget(sDofTargetName, &info);
     sDofTarget = dofPair;
     sLayerViews[eCLV_UnsortedPerspective]->m_RenderPair = dofPair;
-    sLayerViews[eCLV_UnsortedPerspective]->m_Unknown33 = false;
     sLayerViews[eCLV_UnsortedPerspective]->m_ClearColour = false;
+    sLayerViews[eCLV_UnsortedPerspective]->m_ClearDepth = false;
 
     info.unknown18 = 0;
     info.colour[0] = 0;
     info.colour[1] = 0;
     info.colour[2] = 0;
     info.colour[3] = 0;
-    GLRenderPair grabPair = fn_802CD884("screengrab", &info);
+    GLRenderPair grabPair = glCreateTarget("screengrab", &info);
     sScreenGrabTarget = grabPair;
     sLayerViews[eCLV_ScreenGrab]->m_RenderPair = grabPair;
-    sLayerViews[eCLV_ScreenGrab]->m_Unknown33 = false;
     sLayerViews[eCLV_ScreenGrab]->m_ClearColour = false;
+    sLayerViews[eCLV_ScreenGrab]->m_ClearDepth = false;
 
-    nlZeroMemory(&info, sizeof(TargetInfo_8036DE50));
+    nlZeroMemory(&info, sizeof(GLTargetInfo));
     info.width = 0x100;
     info.height = 0x80;
     info.format = 1;
@@ -372,30 +371,30 @@ void fn_80272850()
     info.colour[2] = 0;
     info.colour[3] = 0xFF;
     sLayerViews[eCLV_PictureInPicture]->m_Target = 0;
+    sLayerViews[eCLV_PictureInPicture]->m_ClearDepth = true;
     sLayerViews[eCLV_PictureInPicture]->m_ClearColour = true;
-    sLayerViews[eCLV_PictureInPicture]->m_Unknown33 = true;
     sLayerViews[eCLV_PictureInPicture]->m_ViewportX = 0;
     sLayerViews[eCLV_PictureInPicture]->m_ViewportY = 0;
     sLayerViews[eCLV_PictureInPicture]->m_ViewportWidth = 0x200;
     sLayerViews[eCLV_PictureInPicture]->m_ViewportHeight = 0x100;
-    GLRenderPair pipPair = fn_802CD884(sPipTargetName, &info);
+    GLRenderPair pipPair = glCreateTarget(sPipTargetName, &info);
     sLayerViews[eCLV_PictureInPictureAlpha]->SetRenderPair(pipPair);
     sLayerViews[eCLV_PictureInPictureAlpha]->m_Target = 9;
+    sLayerViews[eCLV_PictureInPictureAlpha]->m_ClearDepth = false;
     sLayerViews[eCLV_PictureInPictureAlpha]->m_ClearColour = false;
-    sLayerViews[eCLV_PictureInPictureAlpha]->m_Unknown33 = false;
     sLayerViews[eCLV_PictureInPictureAlpha]->m_ViewportX = 0;
     sLayerViews[eCLV_PictureInPictureAlpha]->m_ViewportY = 0;
     sLayerViews[eCLV_PictureInPictureAlpha]->m_ViewportWidth = 0x200;
     sLayerViews[eCLV_PictureInPictureAlpha]->m_ViewportHeight = 0x100;
 
-    info.width = fn_80369D4C() >> 1;
-    info.height = fn_80369D54() >> 1;
+    info.width = glplatGetDefaultTargetWidth() >> 1;
+    info.height = glplatGetDefaultTargetHeight() >> 1;
     info.format = 7;
     info.unknown18 = 0;
-    GLRenderPair greyPair = fn_802CD884("grayscale", &info);
+    GLRenderPair greyPair = glCreateTarget("grayscale", &info);
     sLayerViews[eCLV_Characters]->SetRenderPair(greyPair);
+    sLayerViews[eCLV_Characters]->m_ClearDepth = false;
     sLayerViews[eCLV_Characters]->m_ClearColour = false;
-    sLayerViews[eCLV_Characters]->m_Unknown33 = false;
 
     fn_802726AC();
 }
@@ -405,7 +404,7 @@ void fn_80272AB4()
     int i;
 
     {
-        GLRenderPair display = fn_802CD82C();
+        GLRenderPair display = glGetBackBufferTarget();
         GLRenderPair pairs[2] = { display, GLRenderPair() };
         for (i = 0; i < 27; i++)
         {
@@ -417,7 +416,7 @@ void fn_80272AB4()
     }
 
     {
-        GLRenderPair display = fn_802CD82C();
+        GLRenderPair display = glGetBackBufferTarget();
         GLRenderPair pairs[2] = { display, GLRenderPair() };
         for (i = 0; i < 2; i++)
         {
@@ -429,7 +428,7 @@ void fn_80272AB4()
     }
 
     {
-        GLRenderPair display = fn_802CD82C();
+        GLRenderPair display = glGetBackBufferTarget();
         GLRenderPair pairs[2] = { display, GLRenderPair() };
         for (i = 0; i < 12; i++)
         {
@@ -441,7 +440,7 @@ void fn_80272AB4()
     }
 
     {
-        GLRenderPair display = fn_802CD82C();
+        GLRenderPair display = glGetBackBufferTarget();
         GLRenderPair pairs[2] = { display, GLRenderPair() };
         for (i = 0; i < 2; i++)
         {
@@ -453,7 +452,7 @@ void fn_80272AB4()
     }
 
     {
-        GLRenderPair display = fn_802CD82C();
+        GLRenderPair display = glGetBackBufferTarget();
         GLRenderPair pairs[2] = { display, GLRenderPair() };
         for (i = 0; i < 1; i++)
         {
@@ -465,7 +464,7 @@ void fn_80272AB4()
     }
 
     {
-        GLRenderPair display = fn_802CD82C();
+        GLRenderPair display = glGetBackBufferTarget();
         GLRenderPair pairs[2] = { display, GLRenderPair() };
         for (i = 0; i < 1; i++)
         {
@@ -477,7 +476,7 @@ void fn_80272AB4()
     }
 
     {
-        GLRenderPair display = fn_802CD82C();
+        GLRenderPair display = glGetBackBufferTarget();
         GLRenderPair pairs[2] = { display, GLRenderPair() };
         for (i = 0; i < 1; i++)
         {
@@ -489,7 +488,7 @@ void fn_80272AB4()
     }
 
     {
-        GLRenderPair display = fn_802CD82C();
+        GLRenderPair display = glGetBackBufferTarget();
         GLRenderPair pairs[2] = { display, GLRenderPair() };
         for (i = 0; i < 2; i++)
         {
@@ -512,8 +511,8 @@ void fn_80272AB4()
     for (i = 0; i < eCLV_Num; i++)
     {
         sLayerViews[i]->m_Enabled = false;
-        lbl_8057F250.m_Children.AddEnd(sLayerViews[i]);
-        sLayerViews[i]->m_Parent = &lbl_8057F250;
+        gRootView.m_Children.AddEnd(sLayerViews[i]);
+        sLayerViews[i]->m_Parent = &gRootView;
     }
 
     sLayerViews[eCLV_Warble]->m_Enabled = true;
@@ -525,8 +524,8 @@ void fn_80272AB4()
     GXColor colour = sShadowVolumeColour;
     CopyShadowVolumeColour(&colour);
 
-    sLayerViews[eCLV_ImpostorTexture]->m_Unknown33 = true;
     sLayerViews[eCLV_ImpostorTexture]->m_ClearColour = true;
+    sLayerViews[eCLV_ImpostorTexture]->m_ClearDepth = true;
     sLayerViews[eCLV_ImpostorTexture]->m_Enabled = true;
     sLayerViews[eCLV_HighRange3D]->m_Enabled = true;
     sLayerViews[eCLV_HighRange3DNoFog]->m_Enabled = true;
@@ -583,7 +582,7 @@ void fn_80273144(const nlMatrix4& view, const nlMatrix4& pipView, float aspect, 
     glMatrixLookAt(lookAt, eye, at, up);
     sAnark3DCamera.mView = lookAt;
 
-    fn_8036EB44(0.25f, 4096.0f);
+    glx_SetFogClipPlanes(0.25f, 4096.0f);
     fn_80271DE0();
 }
 
@@ -623,7 +622,7 @@ extern "C" void fn_80273A4C(eCLV layer, const glModel* model, unsigned long key)
     }
 }
 
-void fn_80273AF8(bool widescreen)
+void rlSetWidescreen(bool widescreen)
 {
     sWidescreen = widescreen;
 }
@@ -637,7 +636,7 @@ const nlVector4* RLViewCamera::GetShadowMatrix() const
 {
     if (mShadowDirty)
     {
-        fn_802DCDB4(mShadowPlanes, mProjection, mView);
+        ExtractFrustumPlanes(mShadowPlanes, mProjection, mView);
         mShadowDirty = false;
     }
     return mShadowPlanes;

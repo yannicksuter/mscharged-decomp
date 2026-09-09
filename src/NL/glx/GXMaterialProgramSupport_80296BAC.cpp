@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include "NL/gl/glView.h"
 #include "NL/glx/GXMaterialProgram.h"
@@ -40,8 +41,8 @@ enum MaterialMode_80296BAC
 
 struct GXMaterialProgramParameters_8029FC0C
 {
-    /* 0x00 */ UnidentifiedTextureState texture0;
-    /* 0x08 */ UnidentifiedTextureState texture1;
+    /* 0x00 */ glTextureBinding texture0;
+    /* 0x08 */ glTextureBinding texture1;
     /* 0x10 */ float value16;
     /* 0x14 */ float value20;
     /* 0x18 */ nlFloatColour colour24;
@@ -199,7 +200,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 static inline float WrapTextureOffset_80296BAC(float value)
@@ -260,7 +261,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Draw(
 
     if (lbl_806E1BE0[0] == 3)
     {
-        UnidentifiedTextureState texture;
+        glTextureBinding texture;
         texture.texture = 0;
         texture.textureIndex = 0xFFFF;
         texture.flags = 0;
@@ -270,7 +271,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Draw(
         texture.SetWrapS(true);
         texture.SetWrapT(true);
         texture.unknown07 = 0;
-        fn_8036BE88(2, &texture);
+        glx_BindTexture(2, &texture);
     }
 
     float alpha = lbl_806DF0C1

@@ -4,12 +4,12 @@
 #include "NL/plat/TransportSocket.h"
 
 
-extern "C" void TransportSocketInitialize(TransportSocket* transport)
+void TransportSocketInitialize(TransportSocket* transport)
 {
     transport->socket = -1;
 }
 
-extern "C" bool TransportSocketOpen(TransportSocket* transport, bool stream)
+bool TransportSocketOpen(TransportSocket* transport, bool stream)
 {
     transport->socket = SOSocket2(
         SO_PF_INET, stream ? SO_SOCK_STREAM : SO_SOCK_DGRAM, 0);
@@ -23,7 +23,7 @@ extern "C" bool TransportSocketOpen(TransportSocket* transport, bool stream)
     return true;
 }
 
-extern "C" bool TransportSocketBind(TransportSocket* transport, u16 port)
+bool TransportSocketBind(TransportSocket* transport, u16 port)
 {
     if (transport->socket == -1)
     {
@@ -50,7 +50,7 @@ extern "C" bool TransportSocketBind(TransportSocket* transport, u16 port)
     return false;
 }
 
-extern "C" void TransportSocketClose(TransportSocket* transport)
+void TransportSocketClose(TransportSocket* transport)
 {
     if (transport->socket != -1)
     {
@@ -59,12 +59,12 @@ extern "C" void TransportSocketClose(TransportSocket* transport)
     }
 }
 
-extern "C" bool TransportSocketIsOpen(TransportSocket* transport)
+bool TransportSocketIsOpen(TransportSocket* transport)
 {
     return transport->socket != -1;
 }
 
-extern "C" void TransportSocketSetNonBlocking(TransportSocket* transport, bool)
+void TransportSocketSetNonBlocking(TransportSocket* transport, bool)
 {
     if (transport->socket != -1)
     {
@@ -79,7 +79,7 @@ extern "C" void TransportSocketSetNonBlocking(TransportSocket* transport, bool)
     }
 }
 
-extern "C" int TransportSocketConnect(
+int TransportSocketConnect(
     TransportSocket* transport, const u8* host, u16 port)
 {
     if (transport->socket == -1)
@@ -94,7 +94,7 @@ extern "C" int TransportSocketConnect(
     return SOConnect(transport->socket, &address);
 }
 
-extern "C" int TransportSocketSend(
+int TransportSocketSend(
     TransportSocket* transport, const void* data, int size)
 {
     if (transport->socket == -1)
@@ -104,7 +104,7 @@ extern "C" int TransportSocketSend(
     return SOSend(transport->socket, data, size, 0);
 }
 
-extern "C" int TransportSocketBroadcast(
+int TransportSocketBroadcast(
     TransportSocket* transport, const void* data, int size, u16 port)
 {
     if (transport->socket == -1)
@@ -119,7 +119,7 @@ extern "C" int TransportSocketBroadcast(
     return SOSendTo(transport->socket, data, size, 0, &address);
 }
 
-extern "C" int TransportSocketSendTo(TransportSocket* transport, const void* data,
+int TransportSocketSendTo(TransportSocket* transport, const void* data,
     int size, const u8* host, u16 port)
 {
     if (transport->socket == -1)
@@ -134,8 +134,8 @@ extern "C" int TransportSocketSendTo(TransportSocket* transport, const void* dat
     return SOSendTo(transport->socket, data, size, 0, &address);
 }
 
-extern "C" int TransportSocketReceiveFrom(TransportSocket* transport, void* data, int size,
-    u32* host, u16* port)
+int TransportSocketReceiveFrom(TransportSocket* transport, void* data, int size,
+    unsigned int* host, u16* port)
 {
     if (transport->socket == -1)
     {

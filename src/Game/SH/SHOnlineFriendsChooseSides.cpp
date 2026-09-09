@@ -25,6 +25,7 @@
 #include "Game/SH/SHNavigation.h"
 #include "NL/nlstring_tmpl.h"
 
+#include "Game/FE/FEAudio.h"
 
 const char* gOnlineSideGroupNames[2] = { "home_group", "away_group" };
 int gOnlineSideSelectionSeconds = 30;
@@ -130,7 +131,7 @@ void SHOnlineFriendsChooseSides::SceneCreated()
             mSideInstances[1], nlStringLowerHash("over"),
             nlStringLowerHash(gOnlineSideGroupNames[1]), nlStringLowerHash(controller), 0, 0, 0);
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
-            mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher(friendName));
+            mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher(friendName));
 
         FEFinder<TLTextInstance, 3>::Find(home->GetActiveSlide(), InlineHasher("Text"));
         FEFinder<TLTextInstance, 3>::Find(homeOver->GetActiveSlide(), InlineHasher("Text"));
@@ -141,11 +142,11 @@ void SHOnlineFriendsChooseSides::SceneCreated()
         {
             if (!guest)
             {
-                UnidentifiedDraftEntry entry = mDraftMessage.mEntries[machine];
+                NetworkDraftMachineInfo entry = mDraftMessage.mEntries[machine];
                 nlStrNCpy(mPlayerNames[i], entry.mName, 14);
                 mOnlinePlayers[i].mMachineIndex = machine;
                 mOnlinePlayers[i].mIsGuest = false;
-                if (entry.mUnidentified7F != 0)
+                if (entry.mGuestEnabled != 0)
                 {
                     ++groups;
                     guest = true;
@@ -286,7 +287,7 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
         }
     }
 
-    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     bool disconnected = false;
     for (int i = 0; i < roster->GetMachineCount(); ++i)
     {
@@ -372,14 +373,14 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
             NetMessageSidesChanged message;
             message.mMachineIndex = mDraftMessage.mMachineIndex;
             message.mSide = -1;
-            message.mIsResponse = 0;
+            message.mAccepted = 0;
             if (HasOnlineTwoLocalPlayers())
             {
-                message.mIsGuest = pad == gOnlineLocalControllerIndices[1];
+                message.mGuest = pad == gOnlineLocalControllerIndices[1];
             }
             else
             {
-                message.mIsGuest = 0;
+                message.mGuest = 0;
             }
             g_pNetworkSession->SendSidesChangedToHost(&message);
         }
@@ -559,14 +560,14 @@ void SHOnlineFriendsChooseSides::OnSidePointerPress(int index, void* context)
     NetMessageSidesChanged message;
     message.mMachineIndex = mDraftMessage.mMachineIndex;
     message.mSide = side;
-    message.mIsResponse = 0;
+    message.mAccepted = 0;
     if (HasOnlineTwoLocalPlayers())
     {
-        message.mIsGuest = index == gOnlineLocalControllerIndices[1];
+        message.mGuest = index == gOnlineLocalControllerIndices[1];
     }
     else
     {
-        message.mIsGuest = 0;
+        message.mGuest = 0;
     }
     g_pNetworkSession->SendSidesChangedToHost(&message);
 }
@@ -724,7 +725,7 @@ int SHOnlineFriendsChooseSides::GetOnlinePlayerIndex(int pad)
 
 void SHOnlineFriendsChooseSides::OnSidesChanged(NetMessageSidesChanged* message)
 {
-    if (message->mIsResponse == 0)
+    if (message->mAccepted == 0)
     {
         if (mDraftStarted)
         {
@@ -732,7 +733,7 @@ void SHOnlineFriendsChooseSides::OnSidesChanged(NetMessageSidesChanged* message)
         }
         int index = -1;
         int machine = (s8)message->mMachineIndex;
-        unsigned int guest = message->mIsGuest;
+        unsigned int guest = message->mGuest;
         for (int i = 0; i < 4; ++i)
         {
             if (machine == mOnlinePlayers[i].mMachineIndex
@@ -760,14 +761,14 @@ void SHOnlineFriendsChooseSides::OnSidesChanged(NetMessageSidesChanged* message)
             }
         }
         NetMessageSidesChanged response(*message);
-        response.mIsResponse = 1;
+        response.mAccepted = 1;
         g_pNetworkSession->SendSidesChangedToEveryone(&response);
     }
     else
     {
         int index = -1;
         int machine = (s8)message->mMachineIndex;
-        unsigned int guest = message->mIsGuest;
+        unsigned int guest = message->mGuest;
         for (int i = 0; i < 4; ++i)
         {
             if (machine == mOnlinePlayers[i].mMachineIndex

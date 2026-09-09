@@ -2,17 +2,17 @@
 #define _SHPAUSEPOSTGAME_H_
 
 #include "Game/FE/feInput.h"
-#include "Game/SH/SHSceneBase.h"
+#include "Game/SH/SHStrikerTimesBase.h"
 #include "unclassified/tu_80209584.h"
 
-class PausePostGameScene : public UnidentifiedSHSceneBase
+class PausePostGameScene : public SHStrikerTimesBase
 {
 public:
     PausePostGameScene(int);
     virtual ~PausePostGameScene();
     virtual void Update(float dt);
     virtual void SceneCreated();
-    virtual void SHSceneVirtual30();
+    virtual void OnDoneTransitionComplete();
 
     void OnSelectRematch();
     void OnSelectQuit();

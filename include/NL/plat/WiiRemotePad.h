@@ -1,6 +1,7 @@
 #ifndef NL_PLAT_WII_REMOTE_PAD_H
 #define NL_PLAT_WII_REMOTE_PAD_H
 
+#include "NL/plat/WiiPad.h"
 #include "NL/plat/PlatPadStatus.h"
 #include "NL/plat/WiiPad.h"
 #include "NL/platpad.h"

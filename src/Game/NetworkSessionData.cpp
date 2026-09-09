@@ -1,18 +1,17 @@
-#include "Game/NetworkSession.h"
+#include "Game/NetworkSessionData.h"
 
-#include "unclassified/tu_80336B2C.h"
 
 int NetworkSessionData::GetNumMachines()
 {
     return mMachineCount;
 }
 
-UnidentifiedNetworkPeer* NetworkSessionData::GetPeer(s8 machine)
+NetworkPeer* NetworkSessionData::GetPeer(s8 machine)
 {
     return &mPeers[machine];
 }
 
-UnidentifiedNetworkPeer* NetworkSessionData::GetLocalPeer()
+NetworkPeer* NetworkSessionData::GetLocalPeer()
 {
     return &mPeers[mLocalMachineId];
 }
@@ -29,15 +28,15 @@ void NetworkSessionData::InitializeMachines(int machineCount, int playerCount)
 
     for (int machine = 0; machine < machineCount; ++machine)
     {
-        UnidentifiedNetworkPeer* peer = &mPeers[machine];
+        NetworkPeer* peer = &mPeers[machine];
         peer->mMachineId = machine;
-        peer->mUnidentified004 = playerCount;
+        peer->mPlayerCount = playerCount;
 
-        for (int player = 0; player < (int)peer->mUnidentified004; ++player)
+        for (int player = 0; player < (int)peer->mPlayerCount; ++player)
         {
-            fn_80336D50(fn_80336B6C(peer, player), peer, (s8)player, player);
+            (peer->GetNetworkPeerChannel(player))->Initialize(peer, (s8)player, player);
         }
 
-        fn_80336BE0(peer);
+        peer->ResetNetworkPeerInputs();
     }
 }

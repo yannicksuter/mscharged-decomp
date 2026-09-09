@@ -1,5 +1,5 @@
-#include <revolution/os/OSThread.h>
 #include "NL/plat/SocketNetwork.h"
+#include <revolution/os/OSThread.h>
 #include "Game/Sys/debug.h"
 #include <revolution/so.h>
 #include <string.h>
@@ -8,6 +8,10 @@
 #include "NL/MemAlloc.h"
 #include "NL/nlMemory.h"
 #include "types.h"
+
+extern MemoryAllocator* AllocatorStack[16];
+extern unsigned int AllocatorStackDepth;
+
 
 int g_nHardcodeIPAddr[4] = { 0x42, 0x77, 0xA7, 0x68 };
 int g_nHardcodeGatewayAddr[4] = { 0x42, 0x77, 0xA7, 0x61 };
@@ -23,7 +27,7 @@ namespace
 {
 extern MemoryAllocator sSocketAllocator;
 extern OSThread sSocketStartupThread;
-extern u8 sSocketStartupStack[0x4000];
+extern u8 sSocketStartupThreadStack[0x4000];
 }
 
 static inline void PushAllocator(MemoryAllocator* pAllocator)
@@ -39,17 +43,7 @@ static inline void PopAllocator()
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 }
 
-static void* SocketAlloc(u32, s32 size)
-{
-    return sSocketAllocator.Allocate(size, 32, false);
-}
-
-static void SocketFree(u32, void* memory, s32)
-{
-    sSocketAllocator.Free(memory);
-}
-
-void SocketNetworkInitializeMemory()
+static inline void InitializeSocketAllocatorImpl()
 {
     if (!sSocketMemoryInitialized)
     {
@@ -61,13 +55,28 @@ void SocketNetworkInitializeMemory()
     }
 }
 
+void* SocketAlloc(u32, s32 size)
+{
+    return sSocketAllocator.Allocate(size, 32, false);
+}
+
+void SocketFree(u32, void* memory, s32)
+{
+    sSocketAllocator.Free(memory);
+}
+
+void SocketNetworkInitializeMemory()
+{
+    InitializeSocketAllocatorImpl();
+}
+
 void SocketNetworkStartup()
 {
     if (!sSocketNetworkStarted)
     {
         if (!sSocketMemoryInitialized)
         {
-            SocketNetworkInitializeMemory();
+            InitializeSocketAllocatorImpl();
         }
 
         SOLibraryConfig config;
@@ -116,7 +125,7 @@ int SocketNetworkGetLastError()
     return sSocketNetworkLastError;
 }
 
-static void* SocketNetworkStartupThread(void*)
+void* SocketNetworkStartupThread(void*)
 {
     SocketNetworkStartup();
     return 0;
@@ -125,7 +134,7 @@ static void* SocketNetworkStartupThread(void*)
 void SocketNetworkStartupAsync()
 {
     OSCreateThread(&sSocketStartupThread, SocketNetworkStartupThread, 0,
-        sSocketStartupStack + sizeof(sSocketStartupStack), sizeof(sSocketStartupStack), 14,
+        sSocketStartupThreadStack + sizeof(sSocketStartupThreadStack), sizeof(sSocketStartupThreadStack), 14,
         OS_THREAD_DETACHED);
     OSResumeThread(&sSocketStartupThread);
 }
@@ -135,36 +144,36 @@ bool SocketNetworkIsStartupComplete()
     return OSIsThreadTerminated(&sSocketStartupThread) != 0;
 }
 
-static TweakValueBoolImpl_804F4538 sHardcodeIPTweak(
+static TweakBoolBinding sHardcodeIPTweak(
     "g_bHardcodeIP", "Network", &g_bHardcodeIP, true);
-static TweakValueIntImpl_804FD898 sHardcodeIPAddr0Tweak(
+static TweakIntBinding sHardcodeIPAddr0Tweak(
     "g_nHardcodeIPAddr0", "Network", &g_nHardcodeIPAddr[0], true);
-static TweakValueIntImpl_804FD898 sHardcodeIPAddr1Tweak(
+static TweakIntBinding sHardcodeIPAddr1Tweak(
     "g_nHardcodeIPAddr1", "Network", &g_nHardcodeIPAddr[1], true);
-static TweakValueIntImpl_804FD898 sHardcodeIPAddr2Tweak(
+static TweakIntBinding sHardcodeIPAddr2Tweak(
     "g_nHardcodeIPAddr2", "Network", &g_nHardcodeIPAddr[2], true);
-static TweakValueIntImpl_804FD898 sHardcodeIPAddr3Tweak(
+static TweakIntBinding sHardcodeIPAddr3Tweak(
     "g_nHardcodeIPAddr3", "Network", &g_nHardcodeIPAddr[3], true);
-static TweakValueIntImpl_804FD898 sHardcodeGatewayAddr0Tweak(
+static TweakIntBinding sHardcodeGatewayAddr0Tweak(
     "g_nHardcodeGatewayAddr0", "Network", &g_nHardcodeGatewayAddr[0], true);
-static TweakValueIntImpl_804FD898 sHardcodeGatewayAddr1Tweak(
+static TweakIntBinding sHardcodeGatewayAddr1Tweak(
     "g_nHardcodeGatewayAddr1", "Network", &g_nHardcodeGatewayAddr[1], true);
-static TweakValueIntImpl_804FD898 sHardcodeGatewayAddr2Tweak(
+static TweakIntBinding sHardcodeGatewayAddr2Tweak(
     "g_nHardcodeGatewayAddr2", "Network", &g_nHardcodeGatewayAddr[2], true);
-static TweakValueIntImpl_804FD898 sHardcodeGatewayAddr3Tweak(
+static TweakIntBinding sHardcodeGatewayAddr3Tweak(
     "g_nHardcodeGatewayAddr3", "Network", &g_nHardcodeGatewayAddr[3], true);
-static TweakValueIntImpl_804FD898 sHardcodedDNSAddr0Tweak(
+static TweakIntBinding sHardcodedDNSAddr0Tweak(
     "g_nHardcodedDNSAddr0", "Network", &g_nHardcodedDNSAddr[0], true);
-static TweakValueIntImpl_804FD898 sHardcodedDNSAddr1Tweak(
+static TweakIntBinding sHardcodedDNSAddr1Tweak(
     "g_nHardcodedDNSAddr1", "Network", &g_nHardcodedDNSAddr[1], true);
-static TweakValueIntImpl_804FD898 sHardcodedDNSAddr2Tweak(
+static TweakIntBinding sHardcodedDNSAddr2Tweak(
     "g_nHardcodedDNSAddr2", "Network", &g_nHardcodedDNSAddr[2], true);
-static TweakValueIntImpl_804FD898 sHardcodedDNSAddr3Tweak(
+static TweakIntBinding sHardcodedDNSAddr3Tweak(
     "g_nHardcodedDNSAddr3", "Network", &g_nHardcodedDNSAddr[3], true);
 
 namespace
 {
 MemoryAllocator sSocketAllocator;
 OSThread sSocketStartupThread;
-u8 sSocketStartupStack[0x4000];
+u8 sSocketStartupThreadStack[0x4000];
 }

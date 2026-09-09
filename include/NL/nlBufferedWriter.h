@@ -15,17 +15,14 @@ struct nlBufferedWriter
     /* 0x14 */ char* mCurrent;
 }; // size: 0x18
 
-extern "C"
-{
-    void nlBufferedWriterInitialize(nlBufferedWriter* writer);
-    void nlBufferedWriterAttach(nlBufferedWriter* writer, void* file,
-        bool buffered, unsigned int bufferSize, unsigned int flushThreshold);
-    // Flushes and frees the buffer; the caller owns the file handle.
-    void nlBufferedWriterFinish(nlBufferedWriter* writer);
-    void nlBufferedWriterWriteText(nlBufferedWriter* writer, const char* text);
-    void nlBufferedWriterWrite(nlBufferedWriter* writer, const void* data, int size);
-    void nlBufferedWriterFlushIfNeeded(nlBufferedWriter* writer);
-    void nlBufferedWriterFlush(nlBufferedWriter* writer);
-}
+void nlBufferedWriterInitialize(nlBufferedWriter* writer);
+void nlBufferedWriterAttach(nlBufferedWriter* writer, void* file,
+    bool buffered, unsigned int bufferSize, unsigned int flushThreshold);
+// Flushes and frees the buffer; the caller owns the file handle.
+void nlBufferedWriterFinish(nlBufferedWriter* writer);
+void nlBufferedWriterWriteText(nlBufferedWriter* writer, const char* text);
+void nlBufferedWriterWrite(nlBufferedWriter* writer, const void* data, int size);
+void nlBufferedWriterFlushIfNeeded(nlBufferedWriter* writer);
+void nlBufferedWriterFlush(nlBufferedWriter* writer);
 
 #endif // NL_NL_BUFFERED_WRITER_H

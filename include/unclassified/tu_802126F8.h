@@ -2,7 +2,7 @@
 #define UNCLASSIFIED_TU_802126F8_H
 
 #include "Game/BaseSceneHandler.h"
-#include "Game/FE/feCaptainComponent.h"
+#include "Game/FE/feScrollText.h"
 #include "Game/FE/feScrollBar.h"
 #include "Game/FE/fePointerButton.h"
 #include "Game/FE/feBackButton.h"
@@ -42,7 +42,7 @@ public:
     /* 0x3A0 */ TLComponentInstance* mUnidentified3A0;
     /* 0x3A4 */ FEPointerButton mUnidentified3A4;
     /* 0x458 */ FEPointerButton mUnidentified458[4];
-    /* 0x728 */ UnidentifiedTextFader mUnidentified728;
+    /* 0x728 */ FEScrollText mUnidentified728;
     /* 0x768 */ TLComponentInstance* mUnidentified768;
     /* 0x76C */ TLComponentInstance* mUnidentified76C;
     /* 0x770 */ int mUnidentified770;

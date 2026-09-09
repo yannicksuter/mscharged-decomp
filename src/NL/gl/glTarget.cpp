@@ -1,34 +1,34 @@
 #include "NL/gl/glTarget.h"
-#include "NL/glx/tu_8036D894.h"
+#include "NL/glx/glxTarget.h"
 
 #include "NL/gl/gl.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlString.h"
 
-typedef nlAVLTree<unsigned long, TargetPlatform_8036DE50*, DefaultKeyCompare<unsigned long> > TargetTree;
+typedef nlAVLTree<unsigned long, GLXTarget*, DefaultKeyCompare<unsigned long> > TargetTree;
 
 static TargetTree targets;
 
 static inline GLRenderPair GetBackBufferTarget()
 {
     static const unsigned long hash = glHash("target/backbuffer");
-    return GLRenderPair(hash, fn_8036D894());
+    return GLRenderPair(hash, glplatGetBackBufferTarget());
 }
 
 static inline GLRenderPair FindTarget(unsigned long hash)
 {
-    TargetPlatform_8036DE50** foundTarget = 0;
+    GLXTarget** foundTarget = 0;
     if (targets.FindGet(hash, &foundTarget))
         return GLRenderPair(hash, *foundTarget);
     return GLRenderPair(0, 0);
 }
 
-static inline GLRenderPair CreateTarget(unsigned long& hash, const TargetInfo_8036DE50* targetInfo)
+static inline GLRenderPair CreateTarget(unsigned long& hash, const GLTargetInfo* targetInfo)
 {
-    TargetPlatform_8036DE50* platformTarget = fn_8036DE50(targetInfo);
+    GLXTarget* platformTarget = glplatCreateTarget(targetInfo);
     if (platformTarget != 0)
     {
-        platformTarget->fn_8036D9AC(hash);
+        platformTarget->CreateTexture(hash);
         targets.Add(hash, platformTarget);
     }
     else
@@ -41,19 +41,19 @@ static inline GLRenderPair CreateTarget(unsigned long& hash, const TargetInfo_80
 void gl_TargetStartup()
 {
     GLRenderPair target = GetBackBufferTarget();
-    TargetPlatform_8036DE50* platformTarget = target.target;
+    GLXTarget* platformTarget = target.target;
     unsigned long hash = glHash("target/backbuffer");
     targets.Add(hash, platformTarget);
 }
 
-extern "C" GLRenderPair fn_802CD82C()
+GLRenderPair glGetBackBufferTarget()
 {
     return GetBackBufferTarget();
 }
 
-extern "C" GLRenderPair fn_802CD884(const char* name, const TargetInfo_8036DE50* targetInfo)
+GLRenderPair glCreateTarget(const char* name, const GLTargetInfo* targetInfo)
 {
-    fn_802C8280(name);
+    glBeginResource(name);
 
     char targetName[128];
     nlStrNCat(targetName, "target/", name, sizeof(targetName));
@@ -63,11 +63,11 @@ extern "C" GLRenderPair fn_802CD884(const char* name, const TargetInfo_8036DE50*
     if (!result)
         result = CreateTarget(hash, targetInfo);
 
-    fn_802C8288();
+    glEndResource();
     return result;
 }
 
-extern "C" void fn_802CDA14(GLRenderPair* target)
+void glDestroyTarget(GLRenderPair* target)
 {
     unsigned long hash = target->hash;
     TargetTree::Entry* entry = (TargetTree::Entry*)targets.RemoveAVLNode(
@@ -75,13 +75,13 @@ extern "C" void fn_802CDA14(GLRenderPair* target)
     if (entry != 0)
         delete entry;
 
-    target->target->fn_8036DBAC(target->hash);
+    target->target->DestroyTexture(target->hash);
     delete target->target;
     target->hash = 0;
     target->target = 0;
 }
 
-extern "C" unsigned long fn_802CDAA8(GLRenderPair target)
+unsigned long glGetTargetTexture(GLRenderPair target)
 {
     return target.hash;
 }

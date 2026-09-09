@@ -4,6 +4,8 @@
 #include "NL/nlFunction.h"
 #include "NL/nlTask.h"
 
+class GLResourcePool;
+
 class ParticleUpdateTask : public nlTask
 {
 public:
@@ -14,7 +16,7 @@ public:
     void Shutdown();
     void Initialize(void* context, int parameter1, int parameter2);
     void StartLoading(bool first, bool second, bool third, bool fourth);
-    bool FinishLoading(void* context);
+    bool FinishLoading(GLResourcePool* context);
     virtual const char* GetName()
     {
         return "Particle Update";

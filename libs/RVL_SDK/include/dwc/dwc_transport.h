@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dwc/dwc_match.h>
+#include <dwc/dwc_transport_fwd.h>
 #include <revolution/os/OSTime.h>
 #include <revolution/types.h>
 
@@ -46,7 +47,6 @@ extern "C"
     typedef struct DWCstTransportConnection DWCTransportConnection;
 
     typedef void (*DWCUserSendCallback)(int size, u8 aid);
-    typedef void (*DWCUserRecvCallback)(u8 aid, u8* buffer, int size);
     typedef void (*DWCUserRecvTimeoutCallback)(u8 aid);
     typedef void (*DWCUserPingCallback)(int latency, u8 aid);
 
@@ -85,10 +85,7 @@ extern "C"
         char magicStrings[DWC_MAGIC_STRINGS_LEN];
     };
 
-    BOOL DWC_SendUnreliable(u8 aid, const void* buffer, int size);
     BOOL DWC_Ping(u8 aid);
-    BOOL DWC_SetRecvBuffer(u8 aid, void* buffer, int size);
-    BOOL DWC_SetUserRecvCallback(DWCUserRecvCallback callback);
     void DWCi_InitTransport(DWCTransportInfo* info);
     void DWCi_ClearTransConnection(u8 aid);
     BOOL DWCi_IsSendableReliable(u8 aid, u16 type);

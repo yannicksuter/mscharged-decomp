@@ -7,44 +7,35 @@
 #include "Game/Render/RLView.h"
 #include "NL/gl/gl.h"
 #include "types.h"
-#include "unclassified/tu_801B369C.h"
-
-struct RenderContext
-{
-    u8 padding[0x33];
-    u8 enabled;
-    u32 flags;
-};
-
-extern u8 lbl_806E0FB0;
+#include "Game/Render/Warble.h"
 
 void EndFrameTask::Run(float)
 {
     if (gpHBMManager == 0 || !gpHBMManager->mActive || !gpHBMManager->mReady)
     {
-        u8 useFrameContexts = lbl_806E16D4;
+        bool useWarble = gWarbleEnabled;
 
-        RenderContext* context = (RenderContext*)GetLayerView(eCLV_PreWarble);
-        u32 contextFlags = 0;
-        if (useFrameContexts)
+        GLView* view = GetLayerView(eCLV_PreWarble);
+        unsigned long targetMode = GLViewTarget_None;
+        if (useWarble)
         {
-            contextFlags = 8;
+            targetMode = GLViewTarget_Mode8;
         }
-        context->flags = contextFlags;
+        view->m_Target = targetMode;
 
-        context = (RenderContext*)GetLayerView(eCLV_Warble);
-        contextFlags = 0;
-        if (useFrameContexts)
+        view = GetLayerView(eCLV_Warble);
+        targetMode = GLViewTarget_None;
+        if (useWarble)
         {
-            contextFlags = 8;
+            targetMode = GLViewTarget_Mode8;
         }
-        context->flags = contextFlags;
-        ((RenderContext*)GetLayerView(eCLV_Warble))->enabled = useFrameContexts;
+        view->m_Target = targetMode;
+        GetLayerView(eCLV_Warble)->m_ClearColour = useWarble;
 
-        if (useFrameContexts)
+        if (useWarble)
         {
-            fn_801B3EF4(&lbl_806E16D4);
-            fn_801B3F2C(&lbl_806E16D4);
+            UpdateWarbleTexture(&gWarbleEnabled);
+            RenderWarbleQuad(&gWarbleEnabled);
         }
 
         glEndFrame();
@@ -53,13 +44,13 @@ void EndFrameTask::Run(float)
 
         if (gpHBMManager != 0 && gpHBMManager->mReady && gpHBMManager->mActive)
         {
-            HBMManager::Draw();
-            fn_802C80FC();
+            HBMManager::Render();
+            glIsFrameActive();
         }
 
         g_FrameCounter.FinishTiming();
 
-        if (lbl_806E0FB0)
+        if (gDrawScreenBorder)
         {
             for (int x = 0; x < 640; ++x)
             {

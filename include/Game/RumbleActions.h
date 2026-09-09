@@ -12,7 +12,10 @@ enum eRumbleActionPreset
 bool IsRumbleActionActive(cGlobalPad* pad);
 void BeginRumbleAction(eRumbleActionPreset preset, cGlobalPad* pad);
 
+void StopRumbleAction(cGlobalPad* pad);
 void UpdateRumbleActions(float dt);
+void BeginRumbleAction(int preset, cGlobalPad* pad);
+void StopRumbleAction(cGlobalPad* pad);
 void PlayRumbleAction(int preset, DetInput* pad);
 
 #endif // GAME_RUMBLE_ACTIONS_H

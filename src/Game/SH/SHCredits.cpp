@@ -17,6 +17,9 @@
 #include "NL/nlFile.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/Render/RLViewLayers.h"
+#include "Game/SH/SHNavigation.h"
 
 
 
@@ -92,7 +95,7 @@ CreditScene::~CreditScene()
 {
     SetPointerEnabled(1);
     BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
-    pStadium->mUnidentified070 = true;
+    pStadium->m_bRenderingEnabled = true;
 }
 
 void CreditScene::SceneCreated()
@@ -138,7 +141,7 @@ void CreditScene::SetupForPhase()
         {
             mPresentation->SetActiveSlide("NLG 4:3", true);
         }
-        if (fn_803693B4() == 1)
+        if (glx_GetVideoMode() == 1)
         {
             SetMovieDetails("art/movies/nlgintro_pal.thp", true, false);
         }
@@ -146,22 +149,22 @@ void CreditScene::SetupForPhase()
         {
             SetMovieDetails("art/movies/nlgintrowide.thp", true, false);
         }
-        BasicStadium::GetCurrentStadium()->mUnidentified070 = false;
+        BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
         break;
     case 0:
         mPresentation->SetActiveSlide("NINTENDO", true);
         mPresentation->m_currentSlide->Update(0.0f);
         FEAudio::PlayAnimAudioEvent(0xF394C076, 0, 0, 1);
-        BasicStadium::GetCurrentStadium()->mUnidentified070 = false;
+        BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
         break;
     case 2:
         SetupForCredits();
-        BasicStadium::GetCurrentStadium()->mUnidentified070 = false;
+        BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
         break;
     case 3:
         mPresentation->SetActiveSlide("COPYRIGHTS", true);
         mPresentation->m_currentSlide->Update(0.0f);
-        BasicStadium::GetCurrentStadium()->mUnidentified070 = false;
+        BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
         break;
     case 4:
         FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
@@ -175,10 +178,10 @@ void CreditScene::SetupForPhase()
             FEMusic::StartStreamIfDifferent(0);
         }
         mNextScene = (SceneList)13;
-        BasicStadium::GetCurrentStadium()->mUnidentified070 = true;
+        BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = true;
         break;
     default:
-        BasicStadium::GetCurrentStadium()->mUnidentified070 = true;
+        BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = true;
         break;
     }
 }
@@ -194,7 +197,7 @@ void CreditScene::MoviePlayerVirtual3C()
 
 void CreditScene::SetupForCredits()
 {
-    if (fn_803693B4() == 1)
+    if (glx_GetVideoMode() == 1)
     {
         SetMovieDetails("art/movies/credits_pal.thp", true, false);
     }

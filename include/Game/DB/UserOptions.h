@@ -12,10 +12,10 @@ public:
     /* 0x4 */ float mCameraZoomLevel;
 };
 
-class PowerupSettings
+class CheatSettings
 {
 public:
-    PowerupSettings();
+    CheatSettings();
     void InitializeDefaults();
     void OnSettingsUpdated() const;
 
@@ -45,16 +45,16 @@ public:
     void OnSettingsUpdated() const;
 
     /* 0x00 */ eSkillLevel SkillLevel;
-    /* 0x04 */ int WinBy;
+    /* 0x04 */ int GameLimitType;
     /* 0x08 */ int GameTime;
-    /* 0x0C */ int GameGoals;
-    /* 0x10 */ int BestSeries;
-    /* 0x14 */ bool HomePowerUps;
-    /* 0x15 */ bool AwayPowerUps;
-    /* 0x16 */ bool HomeShoot2Score;
-    /* 0x17 */ bool AwayShoot2Score;
-    /* 0x18 */ bool HomeSkillShots;
-    /* 0x19 */ bool AwaySkillShots;
+    /* 0x0C */ int GoalLimit;
+    /* 0x10 */ int NumGames;
+    /* 0x14 */ bool mHomePowerupsEnabled;
+    /* 0x15 */ bool mAwayPowerupsEnabled;
+    /* 0x16 */ bool mHomeMegastrikeEnabled;
+    /* 0x17 */ bool mAwayMegastrikeEnabled;
+    /* 0x18 */ bool m_unk18;
+    /* 0x19 */ bool m_unk19;
     /* 0x1A */ bool m_unk1A;
 };
 
@@ -63,9 +63,9 @@ class AudioSettings
 public:
     AudioSettings();
     void ApplySettings();
-    void fn_80109A50();
-    void fn_80109ACC();
-    void fn_80109B48();
+    void ApplyMusicVolume();
+    void ApplySFXVolume();
+    void ApplyVoiceVolume();
 
     /* 0x00 */ int MusicVolume;
     /* 0x04 */ int SFXVolume;

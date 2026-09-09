@@ -21,7 +21,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
 #include "types.h"
-#include "unclassified/tu_80336B2C.h"
+#include "Game/NetworkInput.h"
 
 struct IndicatorControllerInfo
 {
@@ -154,24 +154,23 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
             return -1;
         }
 
-        UnidentifiedNetworkPeer* pPeer = g_pNetworkSessionBase->GetLocalPeer();
-        UnidentifiedNetworkPeerChannel* pOwner
-            = (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser;
+        NetworkPeer* pPeer = g_pNetworkSessionBase->GetLocalPeer();
+        NetworkPeerChannel* pOwner
+            = (NetworkPeerChannel*)pGlobalPad->m_pMyUser;
         int index = -1;
 
         if (pOwner->mPeer == pPeer)
         {
             *pSameMachine = true;
-            index = ((IndicatorControllerInfo*)GetLocalChannelPad(pOwner))->mPadIndex;
+            index = ((IndicatorControllerInfo*)pOwner->GetLocalChannelPad())->mPadIndex;
         }
         else
         {
             *pSameMachine = false;
             bool used[4] = { false, false, false, false };
-            for (int i = 0; i < (int)pPeer->mUnidentified004; ++i)
+            for (int i = 0; i < (int)pPeer->mPlayerCount; ++i)
             {
-                used[((IndicatorControllerInfo*)GetLocalChannelPad(
-                    fn_80336B6C(pPeer, i)))
+                used[((IndicatorControllerInfo*)(pPeer->GetNetworkPeerChannel(i))->GetLocalChannelPad())
                          ->mPadIndex]
                     = true;
             }
@@ -284,8 +283,8 @@ static void DrawOffscreenIndicator(const nlVector3& v3NormalizedScreenPos,
     IndicatorInfo* pInfo, cPlayer* pCharacter)
 {
     GLView* pView = GetLayerView(eCLV_UnsortedSquareOrtho);
-    float screenLimitX = fn_802CE76C(pView);
-    float screenLimitY = fn_802CE76C(pView);
+    float screenLimitX = glViewGetOrthographicWidth(pView);
+    float screenLimitY = glViewGetOrthographicWidth(pView);
     float screenPosX = v3NormalizedScreenPos.x;
     float screenPosY = v3NormalizedScreenPos.y;
     screenLimitX -= 32.0f;
@@ -388,7 +387,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
                 projectedPos.y = 0.95f;
             }
 
-            fn_802CE6DC(
+            glViewUnprojectOrthographicPoint(
                 GetLayerView(eCLV_UnsortedSquareOrtho), &projectedPos, &projectedPos);
             DrawOffscreenIndicator(
                 projectedPos, &indicatorInfo[i], pCharacter);
@@ -454,7 +453,7 @@ static void UpdateAndRenderPlayerIndicators(float)
 
         nlColour colour = GetIndicatorColour(pCharacter);
         nlVector3 v3ScreenPosition;
-        fn_802CEA40(GetLayerView(eCLV_Unshadowed), GetLayerView(eCLV_UnsortedSquareOrtho), &v3Position,
+        glViewProjectPointBetweenViews(GetLayerView(eCLV_Unshadowed), GetLayerView(eCLV_UnsortedSquareOrtho), &v3Position,
             &v3ScreenPosition);
         v3ScreenPosition.y -= lbl_806DCEF0;
 

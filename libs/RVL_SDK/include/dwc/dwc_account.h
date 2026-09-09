@@ -1,6 +1,7 @@
 #pragma once
 
 #include <revolution/types.h>
+#include <dwc/dwc_account_fwd.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -35,15 +36,15 @@ extern "C"
         u32 reserved;
     } DWCAccGsProfileId;
 
-    typedef union DWCstAccFriendData
+    union DWCstAccFriendData
     {
         DWCAccFlag flags;
         DWCAccLoginId login_id;
         DWCAccFriendKey friend_key;
         DWCAccGsProfileId gs_profile_id;
-    } DWCAccFriendData;
+    };
 
-    typedef struct DWCstAccUserData
+    struct DWCstAccUserData
     {
         int size;
         DWCAccLoginId pseudo;
@@ -53,10 +54,8 @@ extern "C"
         u32 gamecode;
         int reserved[5];
         u32 crc32;
-    } DWCAccUserData;
+    };
 
-    typedef DWCAccUserData DWCUserData;
-    typedef DWCAccFriendData DWCFriendData;
 
 #define DWC_ACC_USERDATA_BUFSIZE         64
 #define DWC_ACC_USERNAME_STRING_LENGTH   20
@@ -91,8 +90,6 @@ extern "C"
 #define DWC_FRIENDDATA_FRIEND_KEY    DWC_ACC_FRIENDDATA_FRIEND_KEY
 #define DWC_FRIENDDATA_GS_PROFILE_ID DWC_ACC_FRIENDDATA_GS_PROFILE_ID
 
-    void DWC_CreateUserData(DWCAccUserData* userdata);
-    BOOL DWC_CheckUserData(const DWCAccUserData* userdata);
     BOOL DWC_CheckHasProfile(const DWCAccUserData* userdata);
     BOOL DWC_CheckValidConsole(const DWCAccUserData* userdata);
     BOOL DWC_CheckDirtyFlag(const DWCAccUserData* userdata);
@@ -113,7 +110,6 @@ extern "C"
     int DWC_GetGsProfileId(const DWCAccUserData* userdata, const DWCAccFriendData* frienddata);
     void DWC_LoginIdToUserName(const DWCAccUserData* userdata, const DWCAccFriendData* frienddata, char* username);
     void DWC_ReportFriendData(const DWCAccUserData* userdata, const DWCAccFriendData* frienddata);
-    void DWC_ReportUserData(const DWCAccUserData* userdata);
 
     void DWCi_Acc_CreateUserData(DWCAccUserData* userdata, u32 gamecode);
     void DWCi_Acc_CreateTempLoginId(DWCAccLoginId* loginid);

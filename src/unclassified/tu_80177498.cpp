@@ -23,10 +23,9 @@ extern "C" UnidentifiedEventRegistry_80177498* g_pEventRegistry;
 extern "C" bool fn_802B6BC8(const nlVector3*, const nlVector3*,
     const nlVector3*, const nlVector3*, float*, float*);
 extern "C" void fn_8014A180(cFielder*);
-extern "C" void fn_802E8A2C(EmissionManager*, EffectsGroup*);
 
-extern "C" void fn_80179390(EmissionController&, int);
-extern "C" void fn_801793D8(EmissionController&);
+void OnWaluigiWallEffectFinished(EmissionController&, int);
+void UpdateWaluigiWallEmitter(EmissionController&);
 extern "C" void fn_80179490(cFielder*);
 extern "C" void fn_801794A4(cFielder*);
 extern "C" void fn_80179580(cFielder*);
@@ -347,7 +346,7 @@ WaluigiWallManager_80178400::~WaluigiWallManager_80178400()
         }
     }
     EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(lbl_80511054);
-    fn_802E8A2C(EmissionManager::Instance(), pGroup);
+    EmissionManager::Instance()->Destroy(pGroup);
     mUnidentified050 = 0;
     mUnidentified054 = 0;
 
@@ -403,7 +402,9 @@ PhysicsBox_80177498* WaluigiWallManager_80178400::fn_80178968(
                 pController->SetVelocity(pParam->mUnidentified024.m_v3Velocity);
                 pController->m_uUserData = (unsigned long)pObject;
                 pController->SetUpdateCallback(
-                    Function1<void, EmissionController&>(fn_801793D8));
+                    Function1<void, EmissionController&>(UpdateWaluigiWallEmitter));
+                pController->SetFinishedCallback(
+                    Function2<void, EmissionController&, int>(OnWaluigiWallEffectFinished));
                 pObject->mUnidentified054 = pController;
                 mUnidentified05C = true;
             }
@@ -423,7 +424,7 @@ void WaluigiWallManager_80178400::fn_80178D0C()
         }
     }
     EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(lbl_80511054);
-    fn_802E8A2C(EmissionManager::Instance(), pGroup);
+    EmissionManager::Instance()->Destroy(pGroup);
     mUnidentified050 = 0;
     mUnidentified054 = 0;
 }
@@ -509,15 +510,15 @@ PhysicsBox_80177498* WaluigiWallManager_80178400::fn_801792D0(
     return 0;
 }
 
-extern "C" void fn_80179390(
-    EmissionController& rController, int nParam)
+void OnWaluigiWallEffectFinished(
+    EmissionController& rController, int reason)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
         return;
     }
 
-    if (!rController.m_GlView && nParam == 2)
+    if (!rController.m_Replaying && reason == 2)
     {
         PhysicsBox_80177498* pObject
             = (PhysicsBox_80177498*)rController.m_uUserData;
@@ -528,7 +529,7 @@ extern "C" void fn_80179390(
     }
 }
 
-extern "C" void fn_801793D8(EmissionController& rController)
+void UpdateWaluigiWallEmitter(EmissionController& rController)
 {
     PhysicsBox_80177498* pObject
         = (PhysicsBox_80177498*)rController.m_uUserData;

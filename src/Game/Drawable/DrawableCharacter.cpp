@@ -1,4 +1,5 @@
 #include "Game/Drawable/DrawableCharacter.h"
+#include "Game/Render/StadiumLoading.h"
 #include "Game/GameObjectLighting.h"
 #include "Game/Character.h"
 #include "Game/Player.h"
@@ -12,15 +13,16 @@
 #include "Game/Render/RLView.h"
 #include "Game/Render/RenderShadow.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
-#include "Game/Render/tu_802DCDB4.h"
+#include "Game/Render/WorldNPC.h"
 #include "Game/Team.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/gl/glTexture.h"
 
 #pragma cpp_extensions on
 
@@ -118,20 +120,6 @@ union Colour
     };
 };
 
-struct Camera
-{
-    virtual void Reserved0() = 0;
-    virtual void Reserved1() = 0;
-    virtual void Reserved2() = 0;
-    virtual void Reserved3() = 0;
-    virtual void Reserved4() = 0;
-    virtual void Reserved5() = 0;
-    virtual void* GetView() = 0;
-
-    char _004[0x88];
-    nlVector3 position;
-};
-
 struct TaskManager
 {
     void* vtable;
@@ -217,8 +205,8 @@ bool DrawableCharacter::sCameraRelativeLighting;
 
 extern int lbl_806E0F54;
 extern TaskManager* m_pInstance__13nlTaskManager;
-extern u32 lbl_806E1F0C;
-extern u32 lbl_806E1F10;
+
+
 
 static inline float DegreesToRadians(float degrees)
 {
@@ -643,7 +631,7 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
     {
         isVisible = true;
     }
-    else if (fn_80277238())
+    else if (IsStadiumWorldLoaded())
     {
         float radius;
         if (characterClass == 3)
@@ -656,7 +644,7 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
         }
         const nlVector4* pPlanes
             = fn_8027261C()->m_Interface->GetShadowMatrix();
-        isVisible = fn_802DD1EC(pPlanes, &bip01Position, radius) != 0;
+        isVisible = ClassifySphereInFrustum(pPlanes, &bip01Position, radius) != 0;
     }
     else
     {
@@ -697,13 +685,13 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
         if ((lbl_806E13B1 || !flag5)
             && lbl_806E13B4 < packetCount)
         {
-            fn_802CC628((glModelPacket*)(model->packets + lbl_806E13B4),
+            glSetMaterialFloatParameter((glModelPacket*)(model->packets + lbl_806E13B4),
                 alphaValueHash, 0.0f);
         }
         if ((lbl_806E13B2 || !flag6)
             && lbl_806DCB80 < packetCount)
         {
-            fn_802CC628((glModelPacket*)(model->packets + lbl_806DCB80),
+            glSetMaterialFloatParameter((glModelPacket*)(model->packets + lbl_806DCB80),
                 alphaValueHash, 0.0f);
         }
     }
@@ -1183,11 +1171,11 @@ static inline void ApplyTexture(
          packet < model->packets + model->packetCount;
          ++packet)
     {
-        if (texture != fn_802CC7E4((glModelPacket*)packet, lbl_806E1F0C))
+        if (texture != glGetMaterialUnsignedParameter((glModelPacket*)packet, gDiffuseTextureSemantic))
         {
-            fn_802CC458((glModelPacket*)packet, lbl_806E1F0C, texture);
+            glSetMaterialTextureParameter((glModelPacket*)packet, gDiffuseTextureSemantic, texture);
             ResolvedTexture packetTexture = resolvedTexture;
-            fn_802CC4FC((glModelPacket*)packet, lbl_806E1F0C,
+            glSetMaterialTextureIndexParameter((glModelPacket*)packet, gDiffuseTextureSemantic,
                 (const unsigned long*)&packetTexture.value);
         }
     }
@@ -1228,20 +1216,20 @@ void DrawableCharacter::ApplyMaterialEffects(
 
             if (texturing->m_bDetail)
             {
-                fn_802CC458((glModelPacket*)packet, lbl_806E1F10,
+                glSetMaterialTextureParameter((glModelPacket*)packet, gDetailTextureSemantic,
                     texturing->m_uTexture);
                 ResolvedTexture texture = texturing->m_ResolvedTexture;
-                fn_802CC4FC((glModelPacket*)packet, lbl_806E1F10,
+                glSetMaterialTextureIndexParameter((glModelPacket*)packet, gDetailTextureSemantic,
                     (const unsigned long*)&texture.value);
-                fn_802CC628(
+                glSetMaterialFloatParameter(
                     (glModelPacket*)packet, blendAmountHash, lbl_806DCB88);
             }
             else
             {
-                fn_802CC458((glModelPacket*)packet, lbl_806E1F0C,
+                glSetMaterialTextureParameter((glModelPacket*)packet, gDiffuseTextureSemantic,
                     texturing->m_uTexture);
                 ResolvedTexture texture = texturing->m_ResolvedTexture;
-                fn_802CC4FC((glModelPacket*)packet, lbl_806E1F0C,
+                glSetMaterialTextureIndexParameter((glModelPacket*)packet, gDiffuseTextureSemantic,
                     (const unsigned long*)&texture.value);
             }
         }
@@ -1258,13 +1246,13 @@ void DrawableCharacter::ApplyMaterialEffects(
                      ++packet)
                 {
                     if (texture
-                        == fn_802CC7E4((glModelPacket*)packet, lbl_806E1F0C))
+                        == glGetMaterialUnsignedParameter((glModelPacket*)packet, gDiffuseTextureSemantic))
                     {
-                        fn_802CC458((glModelPacket*)packet, lbl_806E1F0C,
+                        glSetMaterialTextureParameter((glModelPacket*)packet, gDiffuseTextureSemantic,
                             source.mUnidentified104);
                         ResolvedTexture packetTexture =
                             source.mUnidentified110;
-                        fn_802CC4FC((glModelPacket*)packet, lbl_806E1F0C,
+                        glSetMaterialTextureIndexParameter((glModelPacket*)packet, gDiffuseTextureSemantic,
                             (const unsigned long*)&packetTexture.value);
                     }
                 }
@@ -1331,7 +1319,7 @@ void DrawableCharacter::ApplyDamageEffects(
     packet = model->packets;
     while (packet < model->packets + model->packetCount)
     {
-        fn_802CC6C0((glModelPacket*)packet, shadowLevelHash, shadowColourValue);
+        glSetMaterialUnsignedParameter((glModelPacket*)packet, shadowLevelHash, shadowColourValue);
         packet = (ModelPacket*)((char*)packet + 0x30);
     }
 
@@ -1345,7 +1333,7 @@ void DrawableCharacter::ApplyDamageEffects(
              packet < model->packets + model->packetCount;
              packet = (ModelPacket*)((char*)packet + 0x30))
         {
-            fn_802CC628((glModelPacket*)packet, blackHash, blackAmount);
+            glSetMaterialFloatParameter((glModelPacket*)packet, blackHash, blackAmount);
         }
     }
 
@@ -1359,10 +1347,10 @@ void DrawableCharacter::ApplyDamageEffects(
              packet < model->packets + model->packetCount;
              packet = (ModelPacket*)((char*)packet + 0x30))
         {
-            if (fn_802CC8FC((glModelPacket*)packet, megaBlendHash)
-                && fn_802CC758((glModelPacket*)packet, megaBlendHash) >= zero)
+            if (glHasMaterialParameter((glModelPacket*)packet, megaBlendHash)
+                && glGetMaterialFloatParameter((glModelPacket*)packet, megaBlendHash) >= zero)
             {
-                fn_802CC628((glModelPacket*)packet, megaBlendHash, megaAmount);
+                glSetMaterialFloatParameter((glModelPacket*)packet, megaBlendHash, megaAmount);
             }
         }
     }
@@ -1413,9 +1401,9 @@ void DrawableCharacter::ApplyDamageEffects(
              packet < model->packets + model->packetCount;
              packet = (ModelPacket*)((char*)packet + 0x30))
         {
-            if (fn_802CC8FC((glModelPacket*)packet, damage1EnabledHash))
+            if (glHasMaterialParameter((glModelPacket*)packet, damage1EnabledHash))
             {
-                fn_802CC6C0((glModelPacket*)packet, damage1EnabledHash, 1);
+                glSetMaterialUnsignedParameter((glModelPacket*)packet, damage1EnabledHash, 1);
                 if (useDamageTexture)
                 {
                     PacketUserData* userData = packet->userData;
@@ -1448,9 +1436,9 @@ void DrawableCharacter::ApplyDamageEffects(
              packet < model->packets + model->packetCount;
              packet = (ModelPacket*)((char*)packet + 0x30))
         {
-            if (fn_802CC8FC((glModelPacket*)packet, damage2EnabledHash))
+            if (glHasMaterialParameter((glModelPacket*)packet, damage2EnabledHash))
             {
-                fn_802CC6C0((glModelPacket*)packet, damage2EnabledHash, 1);
+                glSetMaterialUnsignedParameter((glModelPacket*)packet, damage2EnabledHash, 1);
             }
         }
     }
@@ -1462,7 +1450,7 @@ void DrawableCharacter::RenderCharacterShadow(
 {
     DrawableCharacter* drawable = this;
     ProjectedShadowParams params;
-    Camera* camera;
+    BasicStadium* stadium;
     const CharacterInfo* light;
     float height;
     float radius;
@@ -1475,7 +1463,7 @@ void DrawableCharacter::RenderCharacterShadow(
         return;
     }
 
-    camera = reinterpret_cast<Camera*>(BasicStadium::GetCurrentStadium());
+    stadium = BasicStadium::GetCurrentStadium();
     blackAmount = 1.0f != lbl_806DCB48
         ? lbl_806DCB48
         : drawable->blendAmount;
@@ -1492,9 +1480,9 @@ void DrawableCharacter::RenderCharacterShadow(
     float characterScale = source.mUnidentified024.m_fPlayerScale;
     nlVec4Set(
         params.vLight,
-        camera->position.x,
-        camera->position.y,
-        camera->position.z,
+        stadium->m_shadowLightPosition.x,
+        stadium->m_shadowLightPosition.y,
+        stadium->m_shadowLightPosition.z,
         one);
     params.vPosition = drawable->bip01Position;
     params.fRadius = characterScale * radius;
@@ -1525,7 +1513,7 @@ void DrawableCharacter::RenderCharacterShadow(
                          + params.pModel->numPackets;
                  ++packet)
             {
-                fn_802CC628((glModelPacket*)packet, blackHash, 1.0f);
+                glSetMaterialFloatParameter((glModelPacket*)packet, blackHash, 1.0f);
             }
         }
         RenderCharacterIntoTexture(params);

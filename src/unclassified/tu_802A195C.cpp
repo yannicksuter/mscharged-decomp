@@ -3,9 +3,8 @@
 
 #include "Game/GL/glModelBuilder.h"
 #include "types.h"
+#include "NL/gl/glMemory.h"
 
-extern "C" void* fn_802CC0A4(
-    unsigned long size, int memoryType, void* allocator);
 extern "C" void* fn_802CC0A8(unsigned long size, int memoryType);
 extern "C" void DCStoreRangeNoSync(const void* address, u32 size);
 extern "C" void PPCSync();
@@ -47,7 +46,7 @@ extern "C" bool fn_802A19B8(State_802A195C* writer,
 
     if (allocator != 0)
     {
-        newModel = (glModel*)fn_802CC0A4(sizeof(glModel), 0, allocator);
+        newModel = (glModel*)glResourceAlloc(sizeof(glModel), GLM_Header, allocator);
     }
     else
     {
@@ -69,8 +68,8 @@ extern "C" bool fn_802A19B8(State_802A195C* writer,
     {
         if (allocator != 0)
         {
-            positionData = (float*)fn_802CC0A4(
-                positionCount * sizeof(float), 3, allocator);
+            positionData = (float*)glResourceAlloc(
+                positionCount * sizeof(float), GLM_VertexData, allocator);
         }
         else
         {
@@ -92,8 +91,8 @@ extern "C" bool fn_802A19B8(State_802A195C* writer,
     {
         if (allocator != 0)
         {
-            value_10Data = (float*)fn_802CC0A4(
-                texcoordCount * sizeof(float), 3, allocator);
+            value_10Data = (float*)glResourceAlloc(
+                texcoordCount * sizeof(float), GLM_VertexData, allocator);
         }
         else
         {

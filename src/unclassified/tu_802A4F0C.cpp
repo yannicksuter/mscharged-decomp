@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
+#include "NL/gl/glLoadModel.h"
 
 struct RegistryBackend_802A4F0C
 {
@@ -14,10 +15,9 @@ extern u8 lbl_8052A980[];
 extern u8 lbl_8052A9A8[];
 extern RegistryBackend_802A4F0C* lbl_806E1D08;
 extern u8 lbl_806E1D0C;
-extern GXPrimitive lbl_80524470[];
+extern GXPrimitive glx_PrimitiveTypes[];
 
-extern "C" void fn_802CB790(RegistryBackend_802A4F0C*, u32);
-extern "C" void fn_8036BE88(int, u32);
+ void glx_BindTexture(int, u32);
 
 extern "C" RegistryBackend_802A4F0C* fn_802A4F0C(
     RegistryBackend_802A4F0C* backend)
@@ -27,7 +27,7 @@ extern "C" RegistryBackend_802A4F0C* fn_802A4F0C(
     backend->key = 0x46ABE398;
     backend->stateSize = 0x14;
     backend->descriptorCount = 3;
-    fn_802CB790(backend, 0x46ABE398);
+    glRegisterMaterialProgram(backend, 0x46ABE398);
     return backend;
 }
 
@@ -84,7 +84,7 @@ extern "C" void fn_802A508C(void*, const glModelPacket* packet)
 extern "C" void fn_802A50E4(void*, const glModelPacket* packet)
 {
     GXBegin(
-        lbl_80524470[static_cast<u8>(packet->primType)], GX_VTXFMT0, static_cast<u16>(packet->numVertices));
+        glx_PrimitiveTypes[static_cast<u8>(packet->primType)], GX_VTXFMT0, static_cast<u16>(packet->numVertices));
 
     u16* index = packet->indexBuffer;
     u16* end = index + packet->numVertices;
@@ -100,7 +100,7 @@ extern "C" void fn_802A50E4(void*, const glModelPacket* packet)
 extern "C" void fn_802A52D0(void*, const glModelPacket* packet)
 {
     GXBegin(
-        lbl_80524470[static_cast<u8>(packet->primType)], GX_VTXFMT0, packet->numUniqueVertices);
+        glx_PrimitiveTypes[static_cast<u8>(packet->primType)], GX_VTXFMT0, packet->numUniqueVertices);
 
     for (u16 i = 0; i < packet->numUniqueVertices; ++i)
     {
@@ -112,8 +112,8 @@ extern "C" void fn_802A52D0(void*, const glModelPacket* packet)
 
 extern "C" void fn_802A5344(void*, const glModelPacket* packet)
 {
-    fn_8036BE88(0, reinterpret_cast<u32>(packet->unknown20));
-    fn_8036BE88(1, reinterpret_cast<u32>(static_cast<u8*>(packet->unknown20) + 8));
+    glx_BindTexture(0, reinterpret_cast<u32>(packet->unknown20));
+    glx_BindTexture(1, reinterpret_cast<u32>(static_cast<u8*>(packet->unknown20) + 8));
 }
 
 extern "C" void* fn_802A5388()

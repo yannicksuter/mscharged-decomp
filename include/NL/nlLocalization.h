@@ -46,6 +46,7 @@ public:
     nlLanguage GetCurrentLanguage() const;
     const unsigned short* GetString(const char* name) const;
 
+
     LOCHeader* m_pFile;
     StringLookup* m_LookupTable;
     unsigned short* m_FirstString;
@@ -59,5 +60,7 @@ public:
 extern nlLocalization* g_pLocalization;
 extern const unsigned short LocalizationTableNotFound[];
 extern const unsigned short MissingLocString[];
+
+const unsigned short* GetString(nlLocalization* localization, const char* id);
 
 #endif // _NLLOCALIZATION_H_

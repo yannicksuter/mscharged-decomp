@@ -119,34 +119,34 @@ void CrowdRiot::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sCrowdRiotType == 0xFFFF)
     {
-        sCrowdRiotType = fn_80338EBC(cache, "CrowdRiot");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, 0, "mfStateTime");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&mfRiotTime - (u8*)this, "mfRiotTime");
-        fn_80338F88(cache, 22, lbl_80533C98[22].size, (u8*)&mv3Target - (u8*)this, "mv3Target");
-        fn_80338F88(cache, 22, lbl_80533C98[22].size, (u8*)&mv3Position - (u8*)this, "mv3Position");
-        fn_80338F88(cache, 22, lbl_80533C98[22].size, (u8*)&mv3Velocity - (u8*)this, "mv3Velocity");
-        fn_80338F88(cache, 19, lbl_80533C98[19].size, (u8*)&maDesiredFacingDirection - (u8*)this, "maDesiredFacingDirection");
-        fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&meState - (u8*)this, "meState");
-        fn_80338F78(cache);
+        sCrowdRiotType = cache->BeginType("CrowdRiot");
+        cache->AddField(17, gDebugFieldTypes[17].size, 0, "mfStateTime");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfRiotTime - (u8*)this, "mfRiotTime");
+        cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&mv3Target - (u8*)this, "mv3Target");
+        cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&mv3Position - (u8*)this, "mv3Position");
+        cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&mv3Velocity - (u8*)this, "mv3Velocity");
+        cache->AddField(19, gDebugFieldTypes[19].size, (u8*)&maDesiredFacingDirection - (u8*)this, "maDesiredFacingDirection");
+        cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&meState - (u8*)this, "meState");
+        cache->EndType();
     }
 
-    fn_80339450(cache, sCrowdRiotType, this, context);
-    fn_8033930C(cache, sCrowdRiotType, this, sizeof(CrowdRiot));
+    cache->ChecksumData(sCrowdRiotType, this, context);
+    cache->WriteData(sCrowdRiotType, this, sizeof(CrowdRiot));
 
     for (int i = 0; i < 6; i++)
     {
         Generators* generator = &lbl_8056B890[i];
         if (sGeneratorsType == 0xFFFF)
         {
-            sGeneratorsType = fn_80338EBC(cache, "Generators");
-            fn_80338F88(cache, 21, lbl_80533C98[21].size, 0, "v2Location");
-            fn_80338F88(cache, 16, lbl_80533C98[16].size, (u8*)&generator->bIsOn - (u8*)generator, "bIsOn");
-            fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&generator->fTimeToExplode - (u8*)generator, "fTimeToExplode");
-            fn_80338F78(cache);
+            sGeneratorsType = cache->BeginType("Generators");
+            cache->AddField(21, gDebugFieldTypes[21].size, 0, "v2Location");
+            cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&generator->bIsOn - (u8*)generator, "bIsOn");
+            cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&generator->fTimeToExplode - (u8*)generator, "fTimeToExplode");
+            cache->EndType();
         }
 
-        fn_80339450(cache, sGeneratorsType, generator, context);
-        fn_8033930C(cache, sGeneratorsType, generator, sizeof(Generators));
+        cache->ChecksumData(sGeneratorsType, generator, context);
+        cache->WriteData(sGeneratorsType, generator, sizeof(Generators));
     }
 }
 

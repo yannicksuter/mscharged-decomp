@@ -34,9 +34,9 @@
 #include "NL/nlString.h"
 #include "types.h"
 #include "Game/DetInput.h"
-#include "unclassified/tu_80332DC0.h"
-#include "unclassified/tu_80336B2C.h"
-#include "unclassified/tu_80338898.h"
+#include "Game/InputRouter.h"
+#include "Game/NetworkInput.h"
+#include "Game/NetworkSync.h"
 
 #include <math.h>
 
@@ -79,7 +79,7 @@ FixedUpdateTask* GetFixedUpdateTask()
     return &fixedUpdateTask;
 }
 
-EventDispatcher* fn_80111678()
+EventDispatcher* GetFixedUpdateEventDispatcher()
 {
     return &fixedUpdateTask.mEventDispatcher;
 }
@@ -144,61 +144,61 @@ static char sRemapAngleName[] = "m_aRemapAngle";
 
 u32 FixedUpdateTask::WriteSyncLog()
 {
-    DebugWriteCache* cache = fn_80338950(lbl_806E2168);
+    DebugWriteCache* cache = gNetworkSyncState->GetWriteCache();
     if (cache == 0)
     {
         return 0;
     }
 
-    fn_80339544(cache, GetFrame());
+    cache->BeginFrame(GetFrame());
 
     RunningChecksum checksum;
-    fn_80338D04(cache, &sSimulationTimeType, "simulationTime", &checksum,
+    cache->WriteFloat(&sSimulationTimeType, "simulationTime", &checksum,
         fixedUpdateTask.mSimulationTime);
-    fn_80338D04(cache, &sTimeScaleType, "timeScale", &checksum,
+    cache->WriteFloat(&sTimeScaleType, "timeScale", &checksum,
         fixedUpdateTask.mTargetTimeScale);
 
     int numGroups = g_pNetworkSessionBase->GetNumMachines();
     for (int groupIndex = 0; groupIndex < numGroups; groupIndex++)
     {
-        UnidentifiedNetworkPeer* group = g_pNetworkSessionBase->GetPeer((s8)groupIndex);
-        int numControllers = group->mUnidentified004;
+        NetworkPeer* group = g_pNetworkSessionBase->GetPeer((s8)groupIndex);
+        int numControllers = group->mPlayerCount;
         for (int controllerIndex = 0; controllerIndex < numControllers; controllerIndex++)
         {
-            DetInput* pad = fn_80336D68(fn_80336B6C(group, controllerIndex));
+            DetInput* pad = (group->GetNetworkPeerChannel(controllerIndex))->GetNetworkPeerChannelInput();
             if (lbl_806DF740 == 0xFFFF)
             {
-                lbl_806DF740 = fn_80338EBC(cache, sDetInputName);
-                fn_80338F88(cache, 17, lbl_80533C98[17].size, 0, sAnalogLeftXName);
-                fn_80338F88(cache, 17, lbl_80533C98[17].size, PAD_FIELD_OFFSET(pad, m_AnalogLeftY), sAnalogLeftYName);
-                fn_80338F88(cache, 17, lbl_80533C98[17].size, PAD_FIELD_OFFSET(pad, m_AnalogRightX), sAnalogRightXName);
-                fn_80338F88(cache, 17, lbl_80533C98[17].size, PAD_FIELD_OFFSET(pad, m_AnalogRightY), sAnalogRightYName);
-                fn_80338F88(cache, 0, lbl_80533C98[0].size, PAD_FIELD_OFFSET(pad, m_nConnected), sConnectedName);
-                fn_80338F88(cache, 1, lbl_80533C98[1].size, PAD_FIELD_OFFSET(pad, m_ButtonBitfield), sButtonBitfieldName);
-                fn_80338F88(cache, 0, lbl_80533C98[0].size, PAD_FIELD_OFFSET(pad, m_LeftTrigger), sLeftTriggerName);
-                fn_80338F88(cache, 0, lbl_80533C98[0].size, PAD_FIELD_OFFSET(pad, m_RightTrigger), sRightTriggerName);
-                fn_80338F88(cache, 22, lbl_80533C98[22].size, PAD_FIELD_OFFSET(pad, m_v3RevRemoteAccel), sRevRemoteAccelName);
-                fn_80338F88(cache, 22, lbl_80533C98[22].size, PAD_FIELD_OFFSET(pad, m_v3RevFreeStyleAccel), sRevFreeStyleAccelName);
-                fn_80338F88(cache, 0, lbl_80533C98[0].size, PAD_FIELD_OFFSET(pad, m_nRevDPDNumTargets), sRevDPDNumTargetsName);
-                fn_80338F88(cache, 21, lbl_80533C98[21].size, PAD_FIELD_OFFSET(pad, m_v2RevDPDCoord), sRevDPDCoordName);
-                fn_80338F88(cache, 15, lbl_80533C98[15].size, PAD_FIELD_OFFSET(pad, m_pPrevInput), sPrevInputName);
-                fn_80338F88(cache, 15, lbl_80533C98[15].size, PAD_FIELD_OFFSET(pad, m_pMyUser), sMyUserName);
-                fn_80338F88(cache, 19, lbl_80533C98[19].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.a), sPolarAnalogLeftAName);
-                fn_80338F88(cache, 17, lbl_80533C98[17].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.r), sPolarAnalogLeftRName);
-                fn_80338F88(cache, 19, lbl_80533C98[19].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.a), sPolarAnalogRightAName);
-                fn_80338F88(cache, 17, lbl_80533C98[17].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.r), sPolarAnalogRightRName);
-                fn_80339090(cache, 8, lbl_80533C98[8].size, 13, PAD_FIELD_OFFSET(pad, m_buttonStateTicks), sButtonStateTicksName);
-                fn_80338F88(cache, 19, lbl_80533C98[19].size, PAD_FIELD_OFFSET(pad, m_aRemapAngle), sRemapAngleName);
-                fn_80338F78(cache);
+                lbl_806DF740 = cache->BeginType(sDetInputName);
+                cache->AddField(17, gDebugFieldTypes[17].size, 0, sAnalogLeftXName);
+                cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogLeftY), sAnalogLeftYName);
+                cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogRightX), sAnalogRightXName);
+                cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogRightY), sAnalogRightYName);
+                cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_nConnected), sConnectedName);
+                cache->AddField(1, gDebugFieldTypes[1].size, PAD_FIELD_OFFSET(pad, m_ButtonBitfield), sButtonBitfieldName);
+                cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_LeftTrigger), sLeftTriggerName);
+                cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_RightTrigger), sRightTriggerName);
+                cache->AddField(22, gDebugFieldTypes[22].size, PAD_FIELD_OFFSET(pad, m_v3RevRemoteAccel), sRevRemoteAccelName);
+                cache->AddField(22, gDebugFieldTypes[22].size, PAD_FIELD_OFFSET(pad, m_v3RevFreeStyleAccel), sRevFreeStyleAccelName);
+                cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_nRevDPDNumTargets), sRevDPDNumTargetsName);
+                cache->AddField(21, gDebugFieldTypes[21].size, PAD_FIELD_OFFSET(pad, m_v2RevDPDCoord), sRevDPDCoordName);
+                cache->AddField(15, gDebugFieldTypes[15].size, PAD_FIELD_OFFSET(pad, m_pPrevInput), sPrevInputName);
+                cache->AddField(15, gDebugFieldTypes[15].size, PAD_FIELD_OFFSET(pad, m_pMyUser), sMyUserName);
+                cache->AddField(19, gDebugFieldTypes[19].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.a), sPolarAnalogLeftAName);
+                cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.r), sPolarAnalogLeftRName);
+                cache->AddField(19, gDebugFieldTypes[19].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.a), sPolarAnalogRightAName);
+                cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.r), sPolarAnalogRightRName);
+                cache->AddArrayField(8, gDebugFieldTypes[8].size, 13, PAD_FIELD_OFFSET(pad, m_buttonStateTicks), sButtonStateTicksName);
+                cache->AddField(19, gDebugFieldTypes[19].size, PAD_FIELD_OFFSET(pad, m_aRemapAngle), sRemapAngleName);
+                cache->EndType();
             }
 
             DetInput* copy =
-                (DetInput*)fn_8033930C(cache, lbl_806DF740, pad, sizeof(DetInput));
+                (DetInput*)cache->WriteData(lbl_806DF740, pad, sizeof(DetInput));
             if (copy != 0)
             {
                 copy->m_pPrevInput = 0;
                 copy->m_pMyUser = (void*)pad->GetPadID();
-                fn_80339450(cache, lbl_806DF740, copy, &checksum);
+                cache->ChecksumData(lbl_806DF740, copy, &checksum);
             }
         }
     }
@@ -216,33 +216,33 @@ u32 FixedUpdateTask::WriteSyncLog()
     nlSNPrintf(buffer, sizeof(buffer),
         "------------------------ END Frame:%d CRC:%x -------------------------\n\n",
         GetFrame(), crc);
-    fn_8033919C(cache, buffer);
+    cache->WriteText(buffer);
     return crc;
 }
 
 #undef PAD_FIELD_OFFSET
 
-void FixedUpdateTask::UnidentifiedVirtual10()
+void FixedUpdateTask::OnSyncError()
 {
     if (g_pNetworkSession->GetSessionMode())
     {
-        NetworkStatsManager_8012F378::Instance()->CalculateAndReportGameResult(2);
+        NetworkStatsManager::Instance()->CalculateAndReportGameResult(2);
     }
-    g_pNetworkSession->fn_80123FBC(1);
+    g_pNetworkSession->PopupNetworkError(1);
 }
 
-void FixedUpdateTask::UnidentifiedVirtual14()
+void FixedUpdateTask::OnInputQueueOverflow()
 {
-    NetworkStatsManager_8012F378::Instance()->CalculateAndReportGameResult(4);
-    g_pNetworkSession->fn_80123FBC(2);
+    NetworkStatsManager::Instance()->CalculateAndReportGameResult(4);
+    g_pNetworkSession->PopupNetworkError(2);
 }
 
-u16 FixedUpdateTask::UnidentifiedVirtual18()
+u16 FixedUpdateTask::GetInputRemapAngle()
 {
     return m_aJoystickRemap__14cCameraManager - 0x4000;
 }
 
-bool FixedUpdateTask::UnidentifiedVirtual1C()
+bool FixedUpdateTask::IsInPauseMenu()
 {
     return FrontEnd::m_bInPauseMenuState;
 }
@@ -314,7 +314,7 @@ void FixedUpdateTask::Run(float dt)
 
     if (runFixedUpdate
         && nlTaskManager::m_pInstance->mCurrentState == 2
-        && !g_pNetworkSession->fn_80123A00())
+        && !g_pNetworkSession->GetPausedMachineMask())
     {
         float simulationTick;
 
@@ -350,13 +350,13 @@ void FixedUpdateTask::Run(float dt)
                 mAccumulatedDeltaT = 0.0f;
             }
 
-            int updateCount = lbl_806E2138->fn_803328B4();
-            lbl_806E2138->fn_803328FC();
+            int updateCount = gInputManager->GetUpdateCount();
+            gInputManager->CaptureInputs();
 
             bool updated = false;
             for (int i = 0; i < updateCount; ++i)
             {
-                if (lbl_806E2138->fn_80332A00())
+                if (gInputManager->PrepareUpdate())
                 {
                     CallFixedUpdateTasks();
                     updated = true;
@@ -425,12 +425,12 @@ void FixedUpdateTask::CallFixedUpdateTasks()
     mSimulationTime += g_fSimulationTick;
 
     ClockManager::Update(g_fSimulationTick);
-    fn_803330AC();
-    fn_80333A18();
+    GetInputRouter();
+    DispatchDetermDataEvents();
 
     AIUpdateTask(g_fSimulationTick);
     fn_80142A1C();
-    lbl_806E1608->UpdateAINPCs(g_fSimulationTick);
+    gNPCManager->UpdateAINPCs(g_fSimulationTick);
     PrePhysicsAITask(g_fSimulationTick);
     PhysicsUpdate(g_PhysicsWorld, GetPhysicsUpdateTick());
     PostPhysicsAITask(g_fSimulationTick);

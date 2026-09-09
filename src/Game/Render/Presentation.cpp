@@ -6,6 +6,11 @@
 #include "Game/Render/RLViewLayers.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feModelManager.h"
+#include "Game/Render/StadiumLoading.h"
+#include "Game/BaseGameSceneManager.h"
+#include "Game/DB/GameProgress.h"
+#include "Game/DB/SaveLoad.h"
+#include "Game/FE/feCupFlow.h"
 
 #include "Game/BasicStadium.h"
 #include "Game/FE/feMusic.h"
@@ -13,6 +18,8 @@
 #include "Game/Camera/animcam.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/Effects/EmissionManager.h"
+#include "Game/Effects/EmissionController.h"
+#include "Game/Effects/EffectsGroup.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/GameInfo.h"
 #include "Game/NetTournManager.h"
@@ -24,6 +31,9 @@
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/Render/RLViewLayers.h"
+#include "Game/SH/SHNavigation.h"
 
 static char sPresentationByteCode[] = "art/Scripts/fe_presentation.byte_code";
 static char sBronzeFormat[] = "%sbronze";
@@ -34,20 +44,17 @@ static char sIdleFunctionName[] = "Idle";
 static const char* idleFun = sIdleFunctionName;
 static char sIdleAnimation[] = "fe_idle";
 
-extern "C" void fn_8010E294(void*);
-extern "C" void fn_802081C0();
-extern "C" void fn_80208458();
-extern "C" void fn_80208518();
-extern "C" void fn_80208594();
-extern "C" void fn_802092D0(bool);
-extern "C" void fn_80276D10();
-extern "C" bool fn_80276DE0();
-extern "C" void fn_80276E0C();
-extern "C" void fn_80277BB4(unsigned int, unsigned int, unsigned int);
-extern "C" void fn_802E8A2C(EmissionManager*, EffectsGroup*);
-extern "C" void fn_802E8B78(EmissionManager*, Function<void*>*);
-extern "C" void fn_80341E68(BasicStadium*, unsigned int);
-extern "C" void fn_802DEDE8(InterpreterCore*);
+extern "C" void ShowRoundNews(void*);
+extern "C" void ShowCupRulesPopup();
+extern "C" void ShowCupBrickWallNews();
+extern "C" void ShowCupGoldenBootNews();
+extern "C" void ShowCupAwardRewardsPopup();
+extern "C" void SetCupTrophiesVisible(bool);
+extern "C" void BeginLoadTournamentTrophy();
+extern "C" bool IsTournamentTrophyLoaded();
+extern "C" void FinishLoadTournamentTrophy();
+extern "C" void SetWorldAnimation(unsigned int, unsigned int, unsigned int);
+extern "C" void TriggerEffects(BasicStadium*, unsigned int);
 
 extern bool g_e3_Build;
 
@@ -118,7 +125,7 @@ void Presentation::Update(float deltaTime)
         mCameraFinished = false;
         mCameraTransitionFinished = false;
         nlStrNCpy(mCurrentFunction, functionName, 64);
-        fn_802DEDE8(this);
+        Reset();
         CallFunction(nlStringHash(functionName));
     }
 }
@@ -134,7 +141,7 @@ void Presentation::Call(const char* functionName)
     mWaitTime = 0.0f;
     mCameraTransitionFinished = false;
     nlStrNCpy(mCurrentFunction, functionName, 64);
-    fn_802DEDE8(this);
+    Reset();
     CallFunction(nlStringHash(functionName));
 }
 
@@ -146,30 +153,23 @@ void OnPresentationModelAnimationFinished(FEModelHandle* object)
     }
 }
 
-struct PresentationEmissionEvent
-{
-    void* data;
-    unsigned char unknown_0x04[0x3F];
-    bool active;
-};
-
-extern "C" void fn_801FF2A8(PresentationEmissionEvent* event)
+static void DisablePresentationEmission(EmissionController& controller)
 {
     Presentation& presentation = Presentation::Instance();
     unsigned int hash = nlStringLowerHash(presentation.mEmissionName);
-    if (hash == *(unsigned int*)event->data)
+    if (hash == controller.m_pGroup->GetHashID())
     {
-        event->active = true;
+        controller.m_bDisabled = true;
     }
 }
 
-extern "C" void fn_801FF42C(PresentationEmissionEvent* event)
+static void EnablePresentationEmission(EmissionController& controller)
 {
     Presentation& presentation = Presentation::Instance();
     unsigned int hash = nlStringLowerHash(presentation.mEmissionName);
-    if (hash == *(unsigned int*)event->data)
+    if (hash == controller.m_pGroup->GetHashID())
     {
-        event->active = false;
+        controller.m_bDisabled = false;
     }
 }
 
@@ -201,17 +201,17 @@ void Presentation::DoFunctionCall(unsigned int function)
             int opponent = GameInfoManager::Instance()->GetTeam((short)!side);
             alternate = CaptainsNeedAlternateColour(captain, opponent);
         }
-        fn_801C27C4(FEModelManager::Instance(), FE_MODEL_IMPOSTOR, (const char*)name, side, value != 0, 0, 0, alternate);
+        FEModelManager::Instance()->CreateModel(FE_MODEL_IMPOSTOR, (const char*)name, side, value != 0, 0, 0, alternate);
         break;
     }
     case 2:
-        fn_801C3014(FEModelManager::Instance());
+        FEModelManager::Instance()->ReleaseImpostors();
         break;
     case 3:
         NetTournManager::Instance()->DestroyTournamentTrophy();
         break;
     case 4:
-        fn_8010E294(g_pCupManager);
+        g_pCupManager->ShowRoundNews();
         break;
     case 5:
     {
@@ -219,7 +219,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         BasicStadium* stadium = BasicStadium::GetCurrentStadium();
         if (stadium != 0)
         {
-            fn_80341E68(stadium, value);
+            stadium->TriggerEffects(value);
         }
         break;
     }
@@ -234,7 +234,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 7:
-        fn_802092D0(false);
+        SetCupTrophiesVisible(false);
         break;
     case 8:
         StopWithUndo();
@@ -265,20 +265,20 @@ void Presentation::DoFunctionCall(unsigned int function)
         EffectsGroup* group = manager->GetEffectsGroup(name);
         if (group != 0)
         {
-            fn_802E8A2C(manager, group);
+            manager->Destroy(group);
         }
         break;
     }
     case 13:
-        fn_80276D10();
+        BeginLoadTournamentTrophy();
         break;
     case 14:
     {
         const char* name = (const char*)Pop();
         Presentation& presentation = Presentation::Instance();
         nlStrNCpy(presentation.mEmissionName, name, 64);
-        Function<void*> callback((void (*)(void*))fn_801FF2A8);
-        fn_802E8B78(EmissionManager::Instance(), &callback);
+        Function1<void, EmissionController&> callback(DisablePresentationEmission);
+        EmissionManager::Instance()->ForEachController(callback);
         break;
     }
     case 15:
@@ -292,10 +292,10 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 16:
     {
-        unsigned int value2 = Pop();
-        unsigned int value1 = Pop();
-        unsigned int value0 = Pop();
-        fn_80277BB4(value0, value1, value2);
+        ePlayMode playMode = (ePlayMode)Pop();
+        const char* animationName = (const char*)Pop();
+        const char* objectName = (const char*)Pop();
+        SetWorldAnimation(objectName, animationName, playMode);
         break;
     }
     case 17:
@@ -342,8 +342,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)objectName);
         if (object != 0)
         {
-            PresentationLookupResult* child = (PresentationLookupResult*)fn_801C2798(
-                FEModelManager::Instance(), childName);
+            PresentationLookupResult* child = (PresentationLookupResult*)FEModelManager::Instance()->GetObject(childName);
             if (child != 0)
             {
                 object->SetTransform(*(nlMatrix4*)child->GetValue());
@@ -402,7 +401,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
         if (object != 0)
         {
-            fn_801C2BD8(FEModelManager::Instance(), object);
+            FEModelManager::Instance()->DestroyModel(object);
         }
         break;
     }
@@ -436,8 +435,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
         if (object != 0)
         {
-            PresentationLookupResult* child = (PresentationLookupResult*)fn_801C2798(
-                FEModelManager::Instance(), childName);
+            PresentationLookupResult* child = (PresentationLookupResult*)FEModelManager::Instance()->GetObject(childName);
             if (child != 0)
             {
                 object->SetPosition(*(nlVector3*)((char*)child->GetValue() + 0x30));
@@ -479,19 +477,19 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 36:
-        fn_802092D0(true);
+        SetCupTrophiesVisible(true);
         break;
     case 37:
-        fn_80208594();
+        ShowCupAwardRewardsPopup();
         break;
     case 38:
-        fn_80208458();
+        ShowCupBrickWallNews();
         break;
     case 39:
-        fn_802081C0();
+        ShowCupRulesPopup();
         break;
     case 40:
-        fn_80208518();
+        ShowCupGoldenBootNews();
         break;
     case 41:
         if (SHNavigation* scene = GetNavigationScene())
@@ -516,8 +514,8 @@ void Presentation::DoFunctionCall(unsigned int function)
         const char* name = (const char*)Pop();
         Presentation& presentation = Presentation::Instance();
         nlStrNCpy(presentation.mEmissionName, name, 64);
-        Function<void*> callback((void (*)(void*))fn_801FF42C);
-        fn_802E8B78(EmissionManager::Instance(), &callback);
+        Function1<void, EmissionController&> callback(EnablePresentationEmission);
+        EmissionManager::Instance()->ForEachController(callback);
         break;
     }
     case 44:
@@ -570,8 +568,8 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 51:
-        if (fn_80276DE0())
-            fn_80276E0C();
+        if (IsTournamentTrophyLoaded())
+            FinishLoadTournamentTrophy();
         else
             StopWithUndo();
         break;

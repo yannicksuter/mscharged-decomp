@@ -1,13 +1,10 @@
+#include "Game/GameSceneManager.h"
 #include "Game/FE/feCupFlow.h"
 
-#include "Game/GameSceneManager.h"
-#include "Game/DB/SaveLoad.h"
+#include "Game/BaseGameSceneManager.h"
 #include "Game/DB/GameProgress.h"
+#include "Game/DB/SaveLoad.h"
 #include "Game/FE/feMusic.h"
-
-extern "C" void fn_8010C5C0(CupManager* manager);
-extern "C" void fn_8010D2D0(CupManager* manager);
-extern "C" void fn_80207354(bool value);
 
 bool gMainMenuInputResetPending;
 
@@ -68,7 +65,7 @@ void CycleCupRoundPage(int currentPage, bool advance)
     int pageCount = 0;
     const int* pages = 0;
 
-    int roundType = g_pCupManager->mUnidentified8680 == 0x10
+    int roundType = g_pCupManager->mState == 0x10
                       ? 0
                       : g_pCupManager->GetCurrentRoundType();
 
@@ -135,7 +132,7 @@ void ShowFirstCupPage()
 void ShowCurrentCupRoundPage()
 {
     int scene = -2;
-    int roundType = g_pCupManager->mUnidentified8680 == 0x10
+    int roundType = g_pCupManager->mState == 0x10
                       ? 0
                       : g_pCupManager->GetCurrentRoundType();
 
@@ -155,9 +152,9 @@ void ShowCurrentCupRoundPage()
     GameSceneManager::Instance()->Push((SceneList)scene, SCREEN_NOTHING, true);
 }
 
-extern "C" void fn_80207B8C()
+void ShowCupExitPopup()
 {
-    fn_80207354(false);
+    HandleCupBack(false);
 }
 
 void RequestMainMenuInputReset()
@@ -168,15 +165,15 @@ void RequestMainMenuInputReset()
 void SaveAndShowCupHub()
 {
     FEMusic::StartStreamIfDifferent(9);
-    fn_8010C5C0(g_pCupManager);
-    fn_8010D2D0(g_pCupManager);
+    g_pCupManager->RestoreCupRecord();
+    g_pCupManager->RestartCupSeries();
     GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, true);
     SaveLoad::StartSave(false);
 }
 
-const char* GetCupWaitingSlide()
+const char* GetCupTeamSlide(int teamType)
 {
-    return "waiting";
+    return "user";
 }
 
 void ShowCupHub()

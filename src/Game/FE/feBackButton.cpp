@@ -6,8 +6,11 @@
 #include "Game/GameSceneManager.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/tlComponentInstance.h"
+#include "Game/FE/tlImageInstance.h"
 #include "NL/nlBind.h"
 #include "NL/nlString.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/Render/RLViewLayers.h"
 
 
 extern BaseGameSceneManager* g_pOverlayManager;
@@ -118,7 +121,7 @@ bool FEBackButton::UpdateBackButton(FEPointerEvent event, float)
             MemFun(&FEBackButton::OnPointerInside), this, Placeholder<0>(), Placeholder<1>()));
         SetPointerInsideCallback(callback);
 
-        TLInstance* found = FEFindInstance(mButtonInstance,
+        TLInstance* found = (TLInstance*)FEFindInstance(mButtonInstance,
             nlStringLowerHash("over"),
             nlStringLowerHash("list_high_250x60"),
             0,

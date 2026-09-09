@@ -100,12 +100,12 @@ public:
     virtual void Update() = 0;
 };
 
-class NetworkStatsReporter_8012CE20 : public NetworkStatsInterface
+class NetworkStatsReporter : public NetworkStatsInterface
 {
 public:
     void* operator new(unsigned long size) { return nlMalloc(size, 8, false); }
 
-    NetworkStatsReporter_8012CE20();
+    NetworkStatsReporter();
 
     void Reset();
     void Close();
@@ -186,12 +186,12 @@ struct NetworkRankingIdentity
     /* 0x02 */ u16 mYear;
 }; // size: 0x4
 
-class NetworkRanking_8012D8F4 : public NetworkStatsInterface
+class NetworkRanking : public NetworkStatsInterface
 {
 public:
     void* operator new(unsigned long size) { return nlMalloc(size, 8, false); }
 
-    NetworkRanking_8012D8F4();
+    NetworkRanking();
 
     void Reset();
     void ShutdownRanking();

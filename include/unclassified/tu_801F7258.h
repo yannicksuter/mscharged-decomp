@@ -2,10 +2,9 @@
 #define UNCLASSIFIED_TU_801F7258_H
 
 #include "Game/FE/BaseOverlayHandler.h"
-#include "Game/FE/feCaptainComponent.h"
+#include "Game/FE/feScrollText.h"
 
 class AsyncImage;
-class TLComponentInstance;
 
 class TU801F7258Overlay : public BaseOverlayHandler
 {
@@ -18,8 +17,8 @@ public:
     void fn_801F79B0();
     void fn_801F8414(int iParam1, int iParam2);
 
-    /* 0x028 */ TLComponentInstance* mUnidentified028;
-    /* 0x02C */ UnidentifiedTextFader mUnidentified02C;
+    /* 0x028 */ FEScrollText* mUnidentified028;
+    /* 0x02C */ FEScrollText mUnidentified02C;
     /* 0x06C */ u32 mUnidentified06C[4];
     /* 0x07C */ bool mUnidentified07C;
     /* 0x07D */ u8 mUnidentified07D[3];

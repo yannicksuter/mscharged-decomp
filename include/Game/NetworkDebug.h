@@ -6,6 +6,7 @@ extern bool g_bDisplayNetworkVerbose;
 extern bool g_bDirectConnectMode;
 extern int g_nConnectToServerAddress[4];
 extern int g_nConnectToServerPort;
+extern int g_nConnectToServerAddress[4];
 
 void SetClientServerMode();
 void SetPeerToPeerMode();

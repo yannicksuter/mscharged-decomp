@@ -2,14 +2,14 @@
 #define GAME_FIXED_UPDATE_TASK_H
 
 #include "Game/Task/DispatchEventsTask.h"
-#include "Game/Task/FixedUpdateTaskBase.h"
+#include "Game/InputFrameProvider.h"
 #include "NL/nlTask.h"
 
 extern float g_fFixedUpdateTick;
 extern float g_fSimulationTick;
 extern bool g_bRunSimAndRenderInLockStep;
 
-class FixedUpdateTask : public nlTask, public UnidentifiedFixedUpdateTaskBase
+class FixedUpdateTask : public nlTask, public InputFrameProvider
 {
 public:
     FixedUpdateTask()
@@ -39,10 +39,10 @@ public:
     virtual float GetFixedUpdateMilliseconds();
     virtual u32 CalculateChecksum();
     virtual u32 WriteSyncLog();
-    virtual void UnidentifiedVirtual10();
-    virtual void UnidentifiedVirtual14();
-    virtual u16 UnidentifiedVirtual18();
-    virtual bool UnidentifiedVirtual1C();
+    virtual void OnSyncError();
+    virtual void OnInputQueueOverflow();
+    virtual u16 GetInputRemapAngle();
+    virtual bool IsInPauseMenu();
 
     void Reset();
 
@@ -72,7 +72,7 @@ public:
 
 
 FixedUpdateTask* GetFixedUpdateTask();
-EventDispatcher* fn_80111678();
+EventDispatcher* GetFixedUpdateEventDispatcher();
 void fn_80111654();
 void fn_80111658(bool);
 void fn_8011165C();

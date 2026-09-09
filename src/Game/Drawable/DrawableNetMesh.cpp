@@ -16,11 +16,6 @@
 
 #include <string.h>
 
-struct StreamDefinition
-{
-    u32 values[4];
-};
-
 struct RenderHeader
 {
     u32 state;
@@ -81,20 +76,6 @@ public:
     }
 };
 
-struct ModelHandle
-{
-    u32 first;
-    u32 second;
-};
-
-class MeshResource
-{
-public:
-    virtual void Unused();
-    virtual ModelHandle* Acquire();
-    virtual void Release(ModelHandle*);
-};
-
 struct LoadFrame
 {
     char _000[8];
@@ -135,12 +116,12 @@ u32 lbl_806E1320 = glGetTexture(LightTextureName);
 u32 lbl_806E1324 = glGetTexture(BlackTextureName);
 u32 lbl_806E1328 = glGetTexture(WhiteTextureName);
 
-MeshResource* lbl_80570938[2][2];
-ModelHandle* lbl_80570948[2][2];
+GLResourcePool* gNetMeshResourcePools[2][2];
+GLResourceMarker* gNetMeshResourceMarkers[2][2];
 
 bool lbl_806DCB38[2] = { true, true };
 u8 lbl_806DCB3A = 1;
-char lbl_806DCB40[8] = "NetMesh";
+char gNetMeshResourcePoolName[8] = "NetMesh";
 
 GLView* g_pNetMeshView;
 u32 g_NetMeshInvisiblePlaneView;
@@ -162,8 +143,6 @@ template <typename T>
 UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
-
-extern const StreamDefinition lbl_804DCCE0;
 
 static inline u8 KeepPacketFlagBit1(u8 value)
 {
@@ -288,7 +267,7 @@ void DrawableNetMesh::Render() const
 
     u16* indices = lbl_806E1348[mNetIndex];
     if ((!lbl_806E1368[mNetIndex] || mVisible == true)
-        && writer.Begin(mNumTriIndices, 1, lbl_80570938[mNetIndex][lbl_806E1370[mNetIndex]]))
+        && writer.Begin(mNumTriIndices, 1, gNetMeshResourcePools[mNetIndex][lbl_806E1370[mNetIndex]]))
     {
         if (!lbl_806DCB38[mNetIndex])
         {
@@ -297,20 +276,20 @@ void DrawableNetMesh::Render() const
             const volatile DrawableNetMesh* volatileThis = this;
             {
                 int index = volatileThis->mNetIndex;
-                lbl_80570938[index][lbl_806E1370[index]]->Release(
-                    lbl_80570948[index][lbl_806E1370[index]]);
+                gNetMeshResourcePools[index][lbl_806E1370[index]]->ReleaseResource(
+                    (unsigned long)gNetMeshResourceMarkers[index][lbl_806E1370[index]]);
             }
             ((volatile u8*)lbl_806DCB38)[volatileThis->mNetIndex] = true;
             {
                 int index = volatileThis->mNetIndex;
-                ModelHandle* handle = lbl_80570938[index][lbl_806E1370[index]]->Acquire();
-                ((ModelHandle* volatile*)lbl_80570948[(unsigned int)index])
+                GLResourceMarker* handle = (GLResourceMarker*)gNetMeshResourcePools[index][lbl_806E1370[index]]->MarkResource();
+                ((GLResourceMarker* volatile*)gNetMeshResourceMarkers[(unsigned int)index])
                     [lbl_806E1370[(unsigned int)index]] = handle;
             }
             {
                 int index = volatileThis->mNetIndex;
-                if (lbl_80570948[index][lbl_806E1370[index]]->first
-                    || lbl_80570948[index][lbl_806E1370[index]]->second)
+                if (gNetMeshResourceMarkers[index][lbl_806E1370[index]]->mUsedMemory[0]
+                    || gNetMeshResourceMarkers[index][lbl_806E1370[index]]->mUsedMemory[1])
                 {
                     nlBreak();
                 }
@@ -318,12 +297,12 @@ void DrawableNetMesh::Render() const
         }
         else
         {
-            lbl_80570938[mNetIndex][lbl_806E1370[mNetIndex]]->Release(
-                lbl_80570948[mNetIndex][lbl_806E1370[mNetIndex]]);
+            gNetMeshResourcePools[mNetIndex][lbl_806E1370[mNetIndex]]->ReleaseResource(
+                (unsigned long)gNetMeshResourceMarkers[mNetIndex][lbl_806E1370[mNetIndex]]);
             const volatile DrawableNetMesh* volatileThis = this;
             int index = volatileThis->mNetIndex;
-            ModelHandle* handle = lbl_80570938[index][lbl_806E1370[index]]->Acquire();
-            lbl_80570948[(unsigned int)index][lbl_806E1370[(unsigned int)index]] = handle;
+            GLResourceMarker* handle = (GLResourceMarker*)gNetMeshResourcePools[index][lbl_806E1370[index]]->MarkResource();
+            gNetMeshResourceMarkers[(unsigned int)index][lbl_806E1370[(unsigned int)index]] = handle;
         }
 
         float darkness = 1.0f - WorldDarkening::Instance().mPos;
@@ -390,16 +369,19 @@ void DrawableNetMesh::Initialize(int numVertices, int numTriIndices)
         lbl_806E1350[mNetIndex] = true;
         lbl_806E1358[mNetIndex] = numVertices;
 
-        StreamDefinition streams = lbl_804DCCE0;
+        GLMemoryRequirement requirements[2] = {
+            { GLM_Header, 0x100 },
+            { GLM_VertexData, 0x2EF8 },
+        };
         lbl_806E1370[mNetIndex] = 0;
         lbl_806DCB38[mNetIndex] = true;
         lbl_806E1368[mNetIndex] = false;
 
         for (int i = 0; i < 2; ++i)
         {
-            lbl_80570938[mNetIndex][i] =
-                (MeshResource*)fn_802CBFD8(&streams, 2, lbl_806DCB40);
-            lbl_80570948[mNetIndex][i] = lbl_80570938[mNetIndex][i]->Acquire();
+            gNetMeshResourcePools[mNetIndex][i] =
+                glCreateResourcePool(requirements, 2, gNetMeshResourcePoolName);
+            gNetMeshResourceMarkers[mNetIndex][i] = (GLResourceMarker*)gNetMeshResourcePools[mNetIndex][i]->MarkResource();
         }
     }
 }
@@ -420,9 +402,9 @@ void DrawableNetMesh::Destroy()
 
         for (int i = 0; i < 2; ++i)
         {
-            fn_802CC02C(
-                (ResourceInterface_802CC094*)lbl_80570938[mNetIndex][i]);
-            lbl_80570938[mNetIndex][i] = 0;
+            glDestroyResourcePool(
+                gNetMeshResourcePools[mNetIndex][i]);
+            gNetMeshResourcePools[mNetIndex][i] = 0;
         }
 
         lbl_806E1368[mNetIndex] = false;

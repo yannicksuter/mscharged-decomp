@@ -122,6 +122,13 @@ public:
     }
 };
 
+inline bool nlNear(const nlVector3& first, const nlVector3& second)
+{
+    return nlNear(first.x, second.x)
+        && nlNear(first.y, second.y)
+        && nlNear(first.z, second.z);
+}
+
 inline void nlVec2Set(nlVector2& v0, float _x, float _y)
 {
     v0.x = _x;

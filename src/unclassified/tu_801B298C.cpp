@@ -12,16 +12,17 @@
 #include "Game/Physics/PhysicsObject.h"
 #include "Game/Team.h"
 #include "NL/gl/glState.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/nlMath.h"
 #include "ode/objects.h"
 #include "unclassified/tu_80176EF4.h"
+#include "NL/gl/glTexture.h"
 
 extern "C"
 {
-    extern unsigned long lbl_806E1F0C;
-    extern unsigned long lbl_806E1F28;
+
+
 
     bool lbl_806DD0F8 = true;
     float lbl_806DD0FC = 2.0f;
@@ -61,18 +62,18 @@ static inline void ApplyTexture(ThwompObject* object,
 {
     if (object->mPacket48 != 0)
     {
-        fn_802CC458(object->mPacket48, lbl_806E1F0C, texture);
+        glSetMaterialTextureParameter(object->mPacket48, gDiffuseTextureSemantic, texture);
         unsigned long resolved = resolvedTexture;
-        fn_802CC4FC(
-            object->mPacket48, lbl_806E1F0C, &resolved);
+        glSetMaterialTextureIndexParameter(
+            object->mPacket48, gDiffuseTextureSemantic, &resolved);
     }
 
     if (object->mPacket4C != 0)
     {
-        fn_802CC458(object->mPacket4C, lbl_806E1F28, texture);
+        glSetMaterialTextureParameter(object->mPacket4C, gGlossTextureSemantic, texture);
         unsigned long resolved = resolvedTexture;
-        fn_802CC4FC(
-            object->mPacket4C, lbl_806E1F28, &resolved);
+        glSetMaterialTextureIndexParameter(
+            object->mPacket4C, gGlossTextureSemantic, &resolved);
     }
 }
 
@@ -117,19 +118,19 @@ extern "C" ThwompObject* fn_801B298C(
                 + object->mDrawable->m_pModel->numPackets;
          ++packet)
     {
-        if (fn_802CC8FC(packet, lbl_806E1F0C))
+        if (glHasMaterialParameter(packet, gDiffuseTextureSemantic))
         {
             unsigned long texture
-                = fn_802CC7E4(packet, lbl_806E1F0C);
+                = glGetMaterialUnsignedParameter(packet, gDiffuseTextureSemantic);
             if (texture == object->mTexture50)
             {
                 object->mPacket48 = packet;
             }
         }
-        if (fn_802CC8FC(packet, lbl_806E1F28))
+        if (glHasMaterialParameter(packet, gGlossTextureSemantic))
         {
             unsigned long texture
-                = fn_802CC7E4(packet, lbl_806E1F28);
+                = glGetMaterialUnsignedParameter(packet, gGlossTextureSemantic);
             if (texture == object->mTexture50)
             {
                 object->mPacket4C = packet;

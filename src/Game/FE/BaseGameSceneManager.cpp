@@ -2,27 +2,13 @@
 
 #include "Game/FE/feResourceManager.h"
 #include "Game/FE/feSceneManager.h"
-#include "Game/ResourceInterface_802CC094.h"
 #include "Game/SH/SHLoading.h"
 #include "NL/gl/glMemory.h"
 #include "NL/nlLocalization.h"
 
-FEMiniBundle* lbl_806E1828;
-ResourceInterface_802CC094* lbl_806E182C;
-unsigned long lbl_806E1830;
-
-struct ResourceConfiguration_801C4B7C
-{
-    unsigned long mUnidentified00;
-    unsigned long mUnidentified04;
-    unsigned long mUnidentified08;
-    unsigned long mUnidentified0C;
-};
-
-extern const ResourceConfiguration_801C4B7C lbl_804E7320
-    = { 0, 0x5000, 4, 0x2CCCCC };
-extern const ResourceConfiguration_801C4B7C lbl_804E7330
-    = { 0, 0x5000, 4, 0x200000 };
+FEMiniBundle* gFEMiniBundle;
+GLResourcePool* gFEResourcePool;
+unsigned long gFEResourceMarker;
 
 void BaseGameSceneManager::PushLoadingScene(bool popfirst)
 {
@@ -63,7 +49,7 @@ SceneList BaseGameSceneManager::GetSceneType(BaseSceneHandler* scene)
     return SCENE_INVALID;
 }
 
-void BaseGameSceneManager::fn_801C5FB8(SceneList scene)
+void BaseGameSceneManager::PopToScene(SceneList scene)
 {
     while (mCurrentStackDepth != 0)
     {
@@ -125,58 +111,66 @@ BaseGameSceneManager::BaseGameSceneManager()
     }
 }
 
-extern "C" ResourceInterface_802CC094* fn_801C4D4C()
+GLResourcePool* GetFEResourcePool()
 {
-    return lbl_806E182C;
+    return gFEResourcePool;
 }
 
-extern "C" bool fn_801C4D40()
+bool UnloadFEMiniBundle()
 {
-    return FEResourceManager::Instance()->fn_802FDF3C(lbl_806E1828);
+    return FEResourceManager::Instance()->UnloadMiniBundle(gFEMiniBundle);
 }
 
-extern "C" void fn_801C4D14(const char* bundleFileName)
+void LoadFEMiniBundle(const char* bundleFileName)
 {
-    lbl_806E1828
-        = FEResourceManager::Instance()->fn_802FDD8C(bundleFileName);
+    gFEMiniBundle
+        = FEResourceManager::Instance()->LoadMiniBundle(bundleFileName);
 }
 
-extern "C" void fn_801C4CBC()
+void DestroyFEResourcePool()
 {
-    if (lbl_806E182C != 0)
+    if (gFEResourcePool != 0)
     {
-        lbl_806E182C->ReleaseResource(lbl_806E1830);
-        FEResourceManager::Instance()->fn_802FD26C(0);
-        fn_802CC02C(lbl_806E182C);
-        lbl_806E182C = 0;
+        gFEResourcePool->ReleaseResource(gFEResourceMarker);
+        FEResourceManager::Instance()->SetResourcePool(0);
+        glDestroyResourcePool(gFEResourcePool);
+        gFEResourcePool = 0;
     }
 }
 
-extern "C" void fn_801C4C44()
-{
-    ResourceConfiguration_801C4B7C configuration
-        = { 0, 0xC800, 4, 0xA00000 };
-    lbl_806E182C
-        = fn_802CBFD8(&configuration, 2, "FEResourceManagerPool");
-    lbl_806E1830 = lbl_806E182C->MarkResource();
-    FEResourceManager::Instance()->fn_802FD26C(lbl_806E182C);
-}
-
-extern "C" void fn_801C4B7C()
+void CreateFEResourcePool()
 {
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
     {
-        ResourceConfiguration_801C4B7C configuration = lbl_804E7320;
-        lbl_806E182C
-            = fn_802CBFD8(&configuration, 2, "FEResourceManagerPool");
+        GLMemoryRequirement requirements[2] = {
+            { GLM_Header, 0x5000 },
+            { GLM_TextureData, 0x2CCCCC },
+        };
+        gFEResourcePool
+            = glCreateResourcePool(requirements, 2, "FEResourceManagerPool");
     }
     else
     {
-        ResourceConfiguration_801C4B7C configuration = lbl_804E7330;
-        lbl_806E182C
-            = fn_802CBFD8(&configuration, 2, "FEResourceManagerPool");
+        GLMemoryRequirement requirements[2] = {
+            { GLM_Header, 0x5000 },
+            { GLM_TextureData, 0x200000 },
+        };
+        gFEResourcePool
+            = glCreateResourcePool(requirements, 2, "FEResourceManagerPool");
     }
 
-    lbl_806E1830 = lbl_806E182C->MarkResource();
-    FEResourceManager::Instance()->fn_802FD26C(lbl_806E182C);
+    gFEResourceMarker = gFEResourcePool->MarkResource();
+    FEResourceManager::Instance()->SetResourcePool(gFEResourcePool);
+}
+
+void CreateLargeFEResourcePool()
+{
+    GLMemoryRequirement requirements[2] = {
+        { GLM_Header, 0xC800 },
+        { GLM_TextureData, 0xA00000 },
+    };
+    gFEResourcePool
+        = glCreateResourcePool(requirements, 2, "FEResourceManagerPool");
+    gFEResourceMarker = gFEResourcePool->MarkResource();
+    FEResourceManager::Instance()->SetResourcePool(gFEResourcePool);
 }

@@ -31,6 +31,7 @@
 #include <string.h>
 #include "Game/FE/fePageControls.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/FE/FEAudio.h"
 
 extern char lbl_80520808[];
 extern char lbl_80520814[];

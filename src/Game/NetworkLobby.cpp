@@ -2,6 +2,7 @@
 #include <dwc/dwc_match.h>
 #include <dwc/dwc_transport.h>
 #include <revolution/os/OSThread.h>
+#include "Game/NetworkMessageRegistry.h"
 
 #include "Game/NetworkLobby.h"
 #include "Game/OnlineMatchmaking.h"
@@ -45,7 +46,7 @@ NetworkLobby::NetworkLobby()
 
 void NetworkLobby::RegisterMessageReceiver()
 {
-    lbl_806E2100->fn_8032CA1C(0x16, static_cast<UnidentifiedNetworkMessageReceiver*>(this));
+    gNetworkMessageRegistry->RegisterReceiver(0x16, static_cast<NetworkMessageReceiver*>(this));
     mReceiverRegistered = true;
     Reset();
 }
@@ -89,7 +90,7 @@ void NetworkLobby::Reset()
 
 void NetworkLobby::UnregisterMessageReceiver()
 {
-    lbl_806E2100->fn_8032CA2C(0x16);
+    gNetworkMessageRegistry->UnregisterReceiver(0x16);
     Reset();
     mReceiverRegistered = false;
 }
@@ -132,12 +133,12 @@ int NetworkLobby::MachineIdxFromConnection(unsigned int connection)
     return *((u8*)connection + 0x27);
 }
 
-int NetworkLobby::RosterVirtual08()
+int NetworkLobby::GetTopology()
 {
     return 0;
 }
 
-void NetworkLobby::RosterVirtual0C(int)
+void NetworkLobby::SetTopology(int)
 {
 }
 
@@ -146,7 +147,7 @@ int NetworkLobby::GetMaxMachineCount()
     return 4;
 }
 
-void NetworkLobby::RosterVirtual14(int)
+void NetworkLobby::SetMaxMachineCount(int)
 {
 }
 
@@ -155,7 +156,7 @@ int NetworkLobby::GetMachineCount()
     return mMachineCount;
 }
 
-UnidentifiedTransportPlayer* NetworkLobby::GetPlayerInfo(int index)
+TransportPlayerInfo* NetworkLobby::GetPlayerInfo(int index)
 {
     if (index >= 0 && index < mMachineCount)
     {
@@ -173,7 +174,7 @@ int NetworkLobby::GetLocalMachineIndex()
     return DWC_GetMyAID();
 }
 
-UnidentifiedTransportPlayer* NetworkLobby::GetLocalPlayerInfo()
+TransportPlayerInfo* NetworkLobby::GetLocalPlayerInfo()
 {
     int index = GetLocalMachineIndex();
     if (index == -1)
@@ -325,14 +326,14 @@ void NetworkLobby::OnGameStarted()
 
 void NetworkLobby::CloseConnections()
 {
-    NetworkSocket_801246E4* socket = g_pNetworkSession->GetDirectSocket();
+    NetworkSocket* socket = g_pNetworkSession->GetDirectSocket();
     for (int i = 0; i < mMachineCount; ++i)
     {
         unsigned int connection = mPlayers[i].mConnection;
         if (connection != (unsigned int)-1 && connection != 0)
         {
-            socket->SocketVirtual24(
-                (UnidentifiedTransportConnection*)connection, true);
+            socket->Disconnect(
+                (TransportConnection*)connection, true);
         }
     }
 
@@ -396,12 +397,12 @@ static void ConnectionClosedCallback(
     (void)param;
 
     u8 address[4] = { 0, 0, 0, aid };
-    NetworkSocket_801246E4* socket = g_pNetworkSession->GetDirectSocket();
+    NetworkSocket* socket = g_pNetworkSession->GetDirectSocket();
     void* connection = socket->FindConnection(address);
     if (connection != 0 && connection != (void*)-1)
     {
-        socket->SocketVirtual24(
-            (UnidentifiedTransportConnection*)connection, true);
+        socket->Disconnect(
+            (TransportConnection*)connection, true);
     }
 }
 
@@ -713,10 +714,10 @@ void NetworkLobby::UpdatePeerConnectionState(int aid)
 }
 
 void NetworkLobby::BuildLocalMachineInfo(
-    UnidentifiedDraftEntry* info)
+    NetworkDraftMachineInfo* info)
 {
     info->mIndex = GetLocalMachineIndex();
-    info->mUnidentified7F = HasOnlineTwoLocalPlayers();
+    info->mGuestEnabled = HasOnlineTwoLocalPlayers();
 }
 
 void NetworkLobby::Update(float dt)
@@ -739,12 +740,12 @@ void NetworkLobby::MarkGameStarted()
     mGameStarted = 1;
 }
 
-UnidentifiedDraftEntry* NetworkLobby::GetLocalMachineInfo()
+NetworkDraftMachineInfo* NetworkLobby::GetLocalMachineInfo()
 {
     return mMachineInfo;
 }
 
-UnidentifiedDraftEntry* NetworkLobby::GetMachineInfo(int index)
+NetworkDraftMachineInfo* NetworkLobby::GetMachineInfo(int index)
 {
     if (!mMachineInfoReceived[index])
     {
@@ -753,22 +754,22 @@ UnidentifiedDraftEntry* NetworkLobby::GetMachineInfo(int index)
     return &mMachineInfo[index];
 }
 
-int NetworkLobby::ReceiverVirtual00(
-    UnidentifiedNetworkMessage* message)
+int NetworkLobby::ProcessMessage(
+    NetworkMessage* message)
 {
-    int machine = MachineIdxFromConnection(message->mUnidentified04);
+    int machine = MachineIdxFromConnection(message->mSource);
     if (machine < 0 || machine >= GetMachineCount())
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Discarded message type %d because from unknown connection %x\n",
             message->GetType(),
-            message->mUnidentified04);
+            message->mSource);
         return 1;
     }
 
     if (message->GetType() == 0x16)
     {
-        NetworkMessageType22_8050B7B4* machineInfo = (NetworkMessageType22_8050B7B4*)message;
+        NetMessageDraftMachineInfo* machineInfo = (NetMessageDraftMachineInfo*)message;
         int index = (s8)machineInfo->mEntry.mIndex;
         if (index >= 0 && index < GetMachineCount())
         {
@@ -788,7 +789,7 @@ int NetworkLobby::ReceiverVirtual00(
     return 1;
 }
 
-static TweakValueIntImpl_804FD898 sTimeoutFindingMaxPlayersAcceptMinTweak(
+static TweakIntBinding sTimeoutFindingMaxPlayersAcceptMinTweak(
     "s_nTimeoutFindingMaxPlayersAcceptMin", "Network/DWCLobby",
     &s_nTimeoutFindingMaxPlayersAcceptMin, true);
 

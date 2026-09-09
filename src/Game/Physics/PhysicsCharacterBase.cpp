@@ -164,17 +164,17 @@ void PhysicsCharacterBase::SyncLog(void* context, DebugWriteCache* cache)
         PhysicsBoneVolume* volume = entry->entry;
         if (s_BoneVolumeType.type == 0xFFFF)
         {
-            s_BoneVolumeType.type = fn_80338EBC(cache, s_BoneVolumeName);
-            fn_80338F88(cache, 9, lbl_80533C98[9].size, (unsigned char*)&volume->m_BoneIndex - (unsigned char*)volume, s_BoneIndexName);
-            fn_80338F88(cache, 26, lbl_80533C98[26].size, (unsigned char*)&volume->m_Transform - (unsigned char*)volume, s_TransformName);
-            fn_80338F88(cache, 9, lbl_80533C98[9].size, (unsigned char*)&volume->m_TransformHandle - (unsigned char*)volume, s_TransformHandleName);
-            fn_80338F88(cache, 22, lbl_80533C98[22].size, (unsigned char*)&volume->m_PrevPosition - (unsigned char*)volume, s_PrevPositionName);
-            fn_80338F88(cache, 8, lbl_80533C98[8].size, (unsigned char*)&volume->m_ID - (unsigned char*)volume, s_BoneIDName);
-            fn_80338F78(cache);
+            s_BoneVolumeType.type = cache->BeginType(s_BoneVolumeName);
+            cache->AddField(9, gDebugFieldTypes[9].size, (unsigned char*)&volume->m_BoneIndex - (unsigned char*)volume, s_BoneIndexName);
+            cache->AddField(26, gDebugFieldTypes[26].size, (unsigned char*)&volume->m_Transform - (unsigned char*)volume, s_TransformName);
+            cache->AddField(9, gDebugFieldTypes[9].size, (unsigned char*)&volume->m_TransformHandle - (unsigned char*)volume, s_TransformHandleName);
+            cache->AddField(22, gDebugFieldTypes[22].size, (unsigned char*)&volume->m_PrevPosition - (unsigned char*)volume, s_PrevPositionName);
+            cache->AddField(8, gDebugFieldTypes[8].size, (unsigned char*)&volume->m_ID - (unsigned char*)volume, s_BoneIDName);
+            cache->EndType();
         }
 
-        fn_80339450(cache, s_BoneVolumeType.type, volume, context);
-        fn_8033930C(cache, s_BoneVolumeType.type, volume, sizeof(PhysicsBoneVolume));
+        cache->ChecksumData(s_BoneVolumeType.type, volume, context);
+        cache->WriteData(s_BoneVolumeType.type, volume, sizeof(PhysicsBoneVolume));
     }
 }
 

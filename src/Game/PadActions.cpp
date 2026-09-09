@@ -1,4 +1,6 @@
 #include "NL/plat/PlatPadManager.h"
+#include "NL/plat/WiiPad.h"
+#include "NL/plat/GameCubePad.h"
 #include "Game/PadActions.h"
 
 #include "Game/Event.h"
@@ -6,7 +8,7 @@
 #include "Game/TweakRegistry.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/MemAlloc.h"
-#include "NL/glx/GXMaterialShadowTweaks.h"
+#include "Game/TweakValueInt.h"
 #include "NL/globalpad.h"
 #include "NL/nlFormat.h"
 #include "NL/nlMemory.h"
@@ -14,7 +16,7 @@
 #include "NL/plat/WiiPad.h"
 #include "types.h"
 
-extern int* lbl_806E22A8;
+extern int* gGameCubePadButtonMap;
 
 bool g_bEnableGamecubePadMonkey;
 
@@ -43,7 +45,7 @@ static int sFreestyleButtonRemapConfig2[51] = {
     0x00004000, 0x00002000, 0x00000100, 0x00000200, 0x00000010, 0x00002000, 0x00004000, 0x00000800, 0x00001000, 0x00002000, 0x00000400, 0x00000001, 0x00000002, 0x00000008, 0x00000004, 0x00000800, 0x00000400, 0x00000200, 0x00000100, 0x00000010, 0x00004000, 0x00002000, 0x00000000, 0x00004000, 0x00000000, 0x00000000, 0x00000800, 0x00000800, 0x00000400, 0x00000000, 0x00000800, 0x00000400, 0x00000010, 0x00000100, 0x00000100, 0x00000100, 0x00000400, 0x00000200, 0x00002000, 0x00004000, 0x00000200, 0x00000100, 0x00004000, 0x00002000, 0x00002000, 0x00004000, 0x00008000, 0x00000200, 0x00000010, 0x00001000, 0x00000010
 };
 
-static GXMaterialColourTweak_804FC520 sControllerConfig(
+static TweakValueInt sControllerConfig(
     "giControllerConfig", "Controller Config", 0);
 
 void UseDefaultFreestyleButtonRemap(bool useDefaultRemap)
@@ -122,7 +124,7 @@ void InitPads()
 
     g_pPadManager->Initialize(4, 2);
     g_pPadManager->SetActivePadSet(0);
-    lbl_806E22A8 = g_pPadRemapArray;
+    gGameCubePadButtonMap = g_pPadRemapArray;
     gWiiRemoteButtonRemap = sWiiRemoteButtonRemap;
 
     switch (sControllerConfig.value)

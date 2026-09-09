@@ -8,13 +8,13 @@
 #include "NL/nlString.h"
 #include "Game/FE/feBackButton.h"
 
-struct UnidentifiedDraftEntry;
+struct NetworkDraftMachineInfo;
 
 struct OnlineInviteSlot
 {
     /* 0x00 */ bool mLocal;
     /* 0x01 */ bool mGuest;
-    /* 0x04 */ UnidentifiedDraftEntry* mEntry;
+    /* 0x04 */ NetworkDraftMachineInfo* mEntry;
 }; // size 0x08
 
 class SHOnlineInvitePlayers : public BaseSceneHandler

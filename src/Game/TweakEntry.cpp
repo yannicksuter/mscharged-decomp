@@ -4,25 +4,25 @@
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 
-nlSlotPoolFixed<0x2C> lbl_8057C734(0x20);
+nlSlotPoolFixed<0x2C> gTweakEntryPool(0x20);
 
-TweakEntry_8052BF00::TweakEntry_8052BF00()
+TweakEntry::TweakEntry()
 {
     m_ChildHead = 0;
     m_ChildTail = 0;
     m_Unk28 = false;
-    m_Unk29 = false;
+    m_SortChildren = false;
 }
 
-TweakEntry_8052BF00::~TweakEntry_8052BF00()
+TweakEntry::~TweakEntry()
 {
-    fn_802C5B84(this);
+    ClearTweakChildren(this);
 }
 
-void fn_802C54CC(TweakEntry_8052BF00* entry, TweakNode_8052BEB0* child)
+void InsertTweakChildSorted(TweakEntry* entry, TweakNode* child)
 {
-    TweakNode_8052BEB0* current = entry->m_ChildHead;
-    TweakNode_8052BEB0* next = current->m_Next;
+    TweakNode* current = entry->m_ChildHead;
+    TweakNode* next = current->m_Next;
     bool found = false;
 
     while (!found)
@@ -31,19 +31,19 @@ void fn_802C54CC(TweakEntry_8052BF00* entry, TweakNode_8052BEB0* child)
         {
             found = true;
         }
-        else if (current == fn_802C0E3C())
+        else if (current == GetTweakPriorityNode())
         {
             found = false;
         }
-        else if (current == fn_802C0E44())
+        else if (current == GetUserTweakEntry())
         {
-            if (nlStrICmp(fn_802C3FDC(child), fn_802C3FDC(next)) < 0)
+            if (nlStrICmp(GetTweakNodeName(child), GetTweakNodeName(next)) < 0)
             {
                 found = true;
             }
         }
-        else if (nlStrICmp(fn_802C3FDC(child), fn_802C3FDC(current)) >= 0
-            && nlStrICmp(fn_802C3FDC(child), fn_802C3FDC(next)) < 0)
+        else if (nlStrICmp(GetTweakNodeName(child), GetTweakNodeName(current)) >= 0
+            && nlStrICmp(GetTweakNodeName(child), GetTweakNodeName(next)) < 0)
         {
             found = true;
         }
@@ -63,16 +63,16 @@ void fn_802C54CC(TweakEntry_8052BF00* entry, TweakNode_8052BEB0* child)
     child->m_Next = next;
 }
 
-void fn_802C56E8(TweakEntry_8052BF00* entry, TweakNode_8052BEB0* child)
+void AddTweakChild(TweakEntry* entry, TweakNode* child)
 {
     if (entry->m_ChildHead == 0)
     {
         entry->m_ChildHead = child;
         entry->m_ChildTail = child;
     }
-    else if (entry == fn_802C0E30() || entry->m_Unk29)
+    else if (entry == GetTweakRoot() || entry->m_SortChildren)
     {
-        fn_802C54CC(entry, child);
+        InsertTweakChildSorted(entry, child);
     }
     else
     {
@@ -81,25 +81,25 @@ void fn_802C56E8(TweakEntry_8052BF00* entry, TweakNode_8052BEB0* child)
     }
 
     child->m_Parent = entry;
-    fn_802C47E4(child);
-    child->m_Unk10 = entry->m_Unk10 + 1;
+    UpdateTweakNodePathHash(child);
+    child->m_Depth = entry->m_Depth + 1;
 }
 
-void fn_802C5780(TweakEntry_8052BF00* entry, TweakValueBase_8052BF70* value)
+void AddTweakValue(TweakEntry* entry, TweakValueBase* value)
 {
-    TweakNode_8052BEB0* child
-        = new (lbl_8057C6E4.Allocate()) TweakNode_8052BEB0;
+    TweakNode* child
+        = new (gTweakNodePool.Allocate()) TweakNode;
     child->m_Value = value;
-    fn_802C47E4(child);
-    fn_802C56E8(entry, child);
+    UpdateTweakNodePathHash(child);
+    AddTweakChild(entry, child);
 }
 
-TweakNode_8052BEB0* fn_802C5884(TweakEntry_8052BF00* entry, const char* name)
+TweakNode* FindTweakChild(TweakEntry* entry, const char* name)
 {
-    for (TweakNode_8052BEB0* child = entry->m_ChildHead; child != 0;
+    for (TweakNode* child = entry->m_ChildHead; child != 0;
         child = child->m_Next)
     {
-        if (nlStrNICmp(name, fn_802C3FDC(child), 0x40) == 0)
+        if (nlStrNICmp(name, GetTweakNodeName(child), 0x40) == 0)
         {
             return child;
         }
@@ -107,35 +107,35 @@ TweakNode_8052BEB0* fn_802C5884(TweakEntry_8052BF00* entry, const char* name)
     return 0;
 }
 
-void fn_802C595C(TweakEntry_8052BF00* entry, TweakValueBase_8052BF70* value)
+void RemoveTweakValue(TweakEntry* entry, TweakValueBase* value)
 {
     if (entry->UnidentifiedVirtual0C())
     {
-        TweakEntry_8052BF00* folder = entry->UnidentifiedVirtual18();
-        for (TweakNode_8052BEB0* child = folder->m_ChildHead; child != 0;)
+        TweakEntry* folder = entry->UnidentifiedVirtual18();
+        for (TweakNode* child = folder->m_ChildHead; child != 0;)
         {
-            TweakNode_8052BEB0* next = child->m_Next;
+            TweakNode* next = child->m_Next;
             if (child->m_Value == value)
             {
                 delete child;
             }
             else if (child->UnidentifiedVirtual0C())
             {
-                fn_802C595C(child->UnidentifiedVirtual18(), value);
+                RemoveTweakValue(child->UnidentifiedVirtual18(), value);
             }
             child = next;
         }
     }
 }
 
-void fn_802C5B84(TweakEntry_8052BF00* entry)
+void ClearTweakChildren(TweakEntry* entry)
 {
-    for (TweakNode_8052BEB0* child = entry->m_ChildHead; child != 0;)
+    for (TweakNode* child = entry->m_ChildHead; child != 0;)
     {
-        TweakNode_8052BEB0* next = child->m_Next;
+        TweakNode* next = child->m_Next;
         if (child->UnidentifiedVirtual0C())
         {
-            fn_802C5B84(child->UnidentifiedVirtual18());
+            ClearTweakChildren(child->UnidentifiedVirtual18());
         }
         delete child;
         child = next;
@@ -143,18 +143,18 @@ void fn_802C5B84(TweakEntry_8052BF00* entry)
     entry->m_ChildHead = 0;
 }
 
-void fn_802C5D74(TweakEntry_8052BF00* entry)
+void RemoveDynamicTweakChildren(TweakEntry* entry)
 {
-    for (TweakNode_8052BEB0* child = entry->m_ChildHead; child != 0;)
+    for (TweakNode* child = entry->m_ChildHead; child != 0;)
     {
-        TweakNode_8052BEB0* next = child->m_Next;
+        TweakNode* next = child->m_Next;
         if (child->m_State == 2)
         {
             delete child;
         }
         else if (child->UnidentifiedVirtual0C())
         {
-            fn_802C5D74(child->UnidentifiedVirtual18());
+            RemoveDynamicTweakChildren(child->UnidentifiedVirtual18());
         }
         child = next;
     }

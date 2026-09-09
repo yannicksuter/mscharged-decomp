@@ -12,122 +12,111 @@
 #include "NL/nlDLRing.h"
 #include "NL/nlString.h"
 #include "NL/gl/glModel.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxMatrix.h"
 
-static const unsigned long lbl_806E2400 = nlStringLowerHash("SkinMatrices");
-extern "C" void fn_8036F91C(ShaderSkinMesh*,
-    UnidentifiedShaderSkinData_80370808*, glModelPacket*, BoneMapList*);
-
-extern "C" void fn_80370194(ShaderSkinMesh*, glModel*);
-extern "C" void fn_80370088(ShaderSkinMesh*, unsigned long, unsigned long);
+static const unsigned long SkinMatricesHash = nlStringLowerHash("SkinMatrices");
 
 ShaderSkinMesh::~ShaderSkinMesh()
 {
     nlDeleteRing(&boneMaps);
-    if (m_Unknown2C != 0)
+    if (boneMatrices != 0)
     {
-        delete[] m_Unknown2C;
+        delete[] boneMatrices;
     }
-    if (m_Unknown24 != 0)
+    if (packetSkinData != 0)
     {
-        delete[] m_Unknown24;
+        delete[] packetSkinData;
     }
-    if (m_Unknown30 != 0)
+    if (poseMatrices != 0)
     {
-        delete[] m_Unknown30;
+        delete[] poseMatrices;
     }
-    if (m_Unknown3C != 0)
+    if (morphData != 0)
     {
-        delete[] (unsigned long*)m_Unknown3C;
+        delete[] morphData;
     }
 }
 
-void ShaderSkinMesh::fn_8036F768(unsigned long count)
+void ShaderSkinMesh::SetNumMorphPackets(unsigned long count)
 {
-    m_Unknown38 = count;
-    m_Unknown3C = nlMalloc(count * numMorphs * 8, 8, false);
+    numPackets = count;
+    morphData = (MorphDeltaList*)nlMalloc(
+        count * numMorphs * sizeof(MorphDeltaList), 8, false);
 }
 
-void ShaderSkinMesh::fn_8036F7B0(unsigned long firstIndex,
-    unsigned long secondIndex, unsigned long count, const void* data)
+void ShaderSkinMesh::SetMorphDeltas(unsigned long packetIndex,
+    unsigned long morphIndex, unsigned long count, const MorphDelta* data)
 {
-    unsigned long* entry = m_Unknown3C == 0
-                             ? 0
-                             : (unsigned long*)m_Unknown3C
-                                   + (firstIndex * numMorphs + secondIndex) * 2;
+    MorphDeltaList* entry = morphData == 0
+                               ? 0
+                               : morphData + (packetIndex * numMorphs + morphIndex);
 
-    entry[0] = count;
-    entry[1] = (unsigned long)data;
+    entry->numDeltas = count;
+    entry->deltas = data;
 }
 
-void ShaderSkinMesh::fn_8036F7E4()
+void ShaderSkinMesh::InitializeSkinData()
 {
-    m_Unknown24 = new (8, false)
-        UnidentifiedShaderSkinData_80370808[pModel->numPackets];
+    packetSkinData = new (8, false)
+        PacketSkinData[pModel->numPackets];
 
     glModelPacket* pPacket = pModel->packets;
     BoneMapList* node = nlDLRingGetStart(boneMaps);
-    m_Unknown45 = true;
+    rigidSkin = true;
 
     for (int i = 0; i < (int)pModel->numPackets; i++, pPacket++)
     {
         float (*pMatrices)[3][4] = (float (*)[3][4])node->m_pMatrices;
         for (unsigned long j = 0; j < node->m_nBones; j++)
         {
-            glxCopyMatrix(*pMatrices, m_Unknown30[node->m_pBoneIndices[j]]);
+            glxCopyMatrix(*pMatrices, poseMatrices[node->m_pBoneIndices[j]]);
             pMatrices++;
         }
 
-        fn_802CC59C(pPacket, lbl_806E2400, (unsigned long)node->m_pMatrices,
-            node->m_nBones * sizeof(*pMatrices));
-        UnidentifiedShaderSkinData_80370808* data = &m_Unknown24[i];
-        if (data->m_Unknown04 == 0)
+        glSetMaterialBufferParameter(pPacket, SkinMatricesHash,
+            (unsigned long)node->m_pMatrices, node->m_nBones * sizeof(*pMatrices));
+        PacketSkinData* data = &packetSkinData[i];
+        if (data->numBones == 0)
         {
-            fn_8036F91C(this, data, pPacket, node);
+            BuildPacketSkinData(data, pPacket, node);
         }
 
         node = node->m_next;
     }
 }
 
-struct UnidentifiedShaderSkinWeight_8036F91C
-{
-    unsigned long vertexIndex;
-    float vertexWeight;
-};
-
-extern "C" void fn_8036F91C(ShaderSkinMesh* mesh,
-    UnidentifiedShaderSkinData_80370808* data, glModelPacket* pPacket,
+void ShaderSkinMesh::BuildPacketSkinData(
+    PacketSkinData* data, glModelPacket* pPacket,
     BoneMapList* node)
 {
     unsigned long numVertices = pPacket->numUniqueVertices;
     unsigned long numBones = node->m_nBones;
-    UnidentifiedShaderSkinWeight_8036F91C* pairs =
-        (UnidentifiedShaderSkinWeight_8036F91C*)nlMalloc(
-            numVertices * 2 * sizeof(UnidentifiedShaderSkinWeight_8036F91C), 8, false);
-    data->m_Unknown00 = numVertices;
-    data->m_Unknown04 = numBones;
-    data->m_Unknown08 = new (8, false)
-        UnidentifiedShaderSkinEntry_80370868[numBones];
+    SkinWeight* pairs =
+        (SkinWeight*)nlMalloc(
+            numVertices * 2 * sizeof(SkinWeight), 8, false);
+    data->numVertices = numVertices;
+    data->numBones = numBones;
+    data->boneWeights = new (8, false)
+        BoneSkinWeights[numBones];
 
-    glModelStream* indexStream = fn_8036F99C(pPacket, 7);
-    glModelStream* weightStream = fn_8036F99C(pPacket, 5);
+    glModelStream* indexStream = glFindModelStream(pPacket, 7);
+    glModelStream* weightStream = glFindModelStream(pPacket, 5);
     const unsigned char (*indices)[4] = (const unsigned char (*)[4])indexStream->address;
     const float (*weights)[4] = (const float (*)[4])weightStream->address;
 
     for (unsigned long i = 0; i < numBones; i++)
     {
-        UnidentifiedShaderSkinEntry_80370868* entry = &data->m_Unknown08[i];
+        BoneSkinWeights* entry = &data->boneWeights[i];
         const unsigned char (*pIndices)[4] = indices;
         const float (*pWeights)[4] = weights;
-        UnidentifiedShaderSkinWeight_8036F91C* pPair = pairs;
+        SkinWeight* pPair = pairs;
         int numPairs = 0;
         for (unsigned long j = 0; j < numVertices; j++)
         {
             if (0.0f != (*pWeights)[1])
             {
-                mesh->m_Unknown45 = false;
+                rigidSkin = false;
             }
             for (unsigned long k = 0; k < 4; k++)
             {
@@ -149,55 +138,55 @@ extern "C" void fn_8036F91C(ShaderSkinMesh* mesh,
         }
         if (numPairs > 0)
         {
-            entry->m_Unknown00 = numPairs;
-            entry->m_Unknown04 = (unsigned char*)nlMalloc(
-                numPairs * sizeof(UnidentifiedShaderSkinWeight_8036F91C), 8, false);
-            memcpy(entry->m_Unknown04, pairs,
-                numPairs * sizeof(UnidentifiedShaderSkinWeight_8036F91C));
+            entry->numWeights = numPairs;
+            entry->weights = (SkinWeight*)nlMalloc(
+                numPairs * sizeof(SkinWeight), 8, false);
+            memcpy(entry->weights, pairs,
+                numPairs * sizeof(SkinWeight));
         }
     }
     delete[] pairs;
 }
 
-void ShaderSkinMesh::fn_8036FB74(cSHierarchy* hierarchy)
+void ShaderSkinMesh::SetHierarchy(cSHierarchy* hierarchy)
 {
-    m_Unknown08 = hierarchy->GetHashID();
-    m_Unknown34 = hierarchy->GetNumNodes();
+    hierarchySignature = hierarchy->GetHashID();
+    numBones = hierarchy->GetNumNodes();
 
-    m_Unknown30 = (nlMatrix4*)nlMalloc(
-        m_Unknown34 * sizeof(nlMatrix4), 8, false);
+    poseMatrices = (nlMatrix4*)nlMalloc(
+        numBones * sizeof(nlMatrix4), 8, false);
     for (int i = 0; i < hierarchy->GetNumNodes(); i++)
     {
-        m_Unknown30[i].SetIdentity();
+        poseMatrices[i].SetIdentity();
     }
 
-    m_Unknown2C = (nlMatrix4*)nlMalloc(
-        m_Unknown34 * sizeof(nlMatrix4), 8, false);
+    boneMatrices = (nlMatrix4*)nlMalloc(
+        numBones * sizeof(nlMatrix4), 8, false);
     for (int i = 0; i < hierarchy->GetNumNodes(); i++)
     {
-        m_Unknown2C[i].SetIdentity();
+        boneMatrices[i].SetIdentity();
     }
 }
 
-void ShaderSkinMesh::fn_8036FC4C(int nodeIndex, const nlMatrix4* matrix)
+void ShaderSkinMesh::SetBoneMatrix(int nodeIndex, const nlMatrix4* matrix)
 {
-    m_Unknown2C[nodeIndex] = *matrix;
+    boneMatrices[nodeIndex] = *matrix;
 }
 
 void ShaderSkinMesh::Pose(cPoseAccumulator* pPoseAccumulator)
 {
     for (int i = 0; i < pPoseAccumulator->GetNumNodes(); i++)
     {
-        nlMultMatrices(m_Unknown30[i], m_Unknown2C[i],
+        nlMultMatrices(poseMatrices[i], boneMatrices[i],
             pPoseAccumulator->GetNodeMatrix(i));
     }
 
-    GLSkinMesh::fn_802D4104(pPoseAccumulator);
+    GLSkinMesh::UpdateMorphWeights(pPoseAccumulator);
 }
 
-void ShaderSkinMesh::fn_Unknown5(nlMatrix4* matrix, int nodeIndex)
+void ShaderSkinMesh::GetPoseMatrix(nlMatrix4* matrix, int nodeIndex)
 {
-    *matrix = m_Unknown30[nodeIndex];
+    *matrix = poseMatrices[nodeIndex];
 }
 
 void ShaderSkinMesh::PrepareToRender()
@@ -209,30 +198,31 @@ void ShaderSkinMesh::PrepareToRender()
         float (*pMatrices)[3][4] = (float (*)[3][4])node->m_pMatrices;
         for (unsigned long j = 0; j < node->m_nBones; j++)
         {
-            glxCopyMatrix(*pMatrices, m_Unknown30[node->m_pBoneIndices[j]]);
+            glxCopyMatrix(*pMatrices, poseMatrices[node->m_pBoneIndices[j]]);
             pMatrices++;
         }
-        fn_802CC59C(pPacket, lbl_806E2400, (unsigned long)node->m_pMatrices,
-            node->m_nBones * sizeof(*pMatrices));
+        glSetMaterialBufferParameter(pPacket, SkinMatricesHash,
+            (unsigned long)node->m_pMatrices, node->m_nBones * sizeof(*pMatrices));
         node = node->m_next;
     }
 
-    if (m_Unknown18 != 0)
+    if (numActiveMorphs != 0)
     {
         unsigned long count = 0;
         for (unsigned long i = 0; i < pModel->numPackets; i++)
         {
-            count = count >= m_Unknown24[i].m_Unknown00
-                        ? count : m_Unknown24[i].m_Unknown00;
+            count = count >= packetSkinData[i].numVertices
+                        ? count : packetSkinData[i].numVertices;
         }
-        m_Unknown40 = glFrameAlloc(count * sizeof(nlVector3), GLM_VertexData);
+        morphBuffer = (nlVector3*)glFrameAlloc(
+            count * sizeof(nlVector3), GLM_VertexData);
     }
 
-    if (!m_Unknown45 && m_Unknown0C == 0)
+    if (!rigidSkin && m_Unknown0C == 0)
     {
-        fn_80370194(this, pModel);
+        SoftwareSkinModel(pModel);
         glModel* newModel = (glModel*)glFrameAlloc(sizeof(glModel), GLM_Header);
-        m_Unknown28 = newModel;
+        softwareModel = newModel;
         memcpy(newModel, pModel, sizeof(glModel));
         unsigned long numPackets = newModel->numPackets;
         glModelPacket* pPackets = (glModelPacket*)glFrameAlloc(
@@ -274,37 +264,25 @@ void ShaderSkinMesh::PrepareToRender()
     }
 }
 
-struct MorphDelta
-{
-    nlVector3 delta;
-    int index;
-};
-
-struct UnidentifiedShaderSkinMorph_80370088
-{
-    unsigned long m_Unknown00;
-    const MorphDelta* m_Unknown04;
-};
-
-extern "C" void fn_80370088(ShaderSkinMesh* mesh, unsigned long firstIndex,
+void ShaderSkinMesh::CreateMorphBuffer(unsigned long packetIndex,
     unsigned long count)
 {
-    if (mesh->m_Unknown18 != 0)
+    if (numActiveMorphs != 0)
     {
-        nlZeroMemory(mesh->m_Unknown40, count * sizeof(nlVector3));
-        for (unsigned long morphIndex = 0; morphIndex < mesh->numMorphs; morphIndex++)
+        nlZeroMemory(morphBuffer, count * sizeof(nlVector3));
+        for (unsigned long morphIndex = 0; morphIndex < numMorphs; morphIndex++)
         {
-            float w = mesh->m_Unknown10[morphIndex].morphWeight;
+            float w = morphWeights[morphIndex].morphWeight;
             if (0.0f != w)
             {
-                const UnidentifiedShaderSkinMorph_80370088* entry =
-                    mesh->m_Unknown3C == 0 ? 0
-                        : (UnidentifiedShaderSkinMorph_80370088*)mesh->m_Unknown3C
-                            + (firstIndex * mesh->numMorphs + morphIndex);
-                for (unsigned long i = 0; i < entry->m_Unknown00; i++)
+                const MorphDeltaList* entry =
+                    morphData == 0 ? 0
+                        : morphData
+                            + (packetIndex * numMorphs + morphIndex);
+                for (unsigned long i = 0; i < entry->numDeltas; i++)
                 {
-                    const MorphDelta* pCurrentMorph = &entry->m_Unknown04[i];
-                    nlVector3* dst = &((nlVector3*)mesh->m_Unknown40)[pCurrentMorph->index];
+                    const MorphDelta* pCurrentMorph = &entry->deltas[i];
+                    nlVector3* dst = &morphBuffer[pCurrentMorph->index];
                     nlVec3ScaleAdd(*dst, w, pCurrentMorph->delta, *dst);
                 }
             }
@@ -312,25 +290,24 @@ extern "C" void fn_80370088(ShaderSkinMesh* mesh, unsigned long firstIndex,
     }
 }
 
-// clang-format off
-extern "C" void fn_80370194(ShaderSkinMesh* mesh, glModel* model)
+void ShaderSkinMesh::SoftwareSkinModel(glModel* model)
 {
     nlMatrix4 tempMatrices[32];
-    BoneMapList* node = nlDLRingGetStart(mesh->boneMaps);
+    BoneMapList* node = nlDLRingGetStart(boneMaps);
     glModelPacket* pPacket = model->packets;
 
     for (unsigned long packetIndex = 0; packetIndex < model->numPackets;
          packetIndex++, pPacket++)
     {
-        UnidentifiedShaderSkinData_80370808* data = &mesh->m_Unknown24[packetIndex];
-        unsigned long numVertices = data->m_Unknown00;
+        PacketSkinData* data = &packetSkinData[packetIndex];
+        unsigned long numVertices = data->numVertices;
         unsigned long size = numVertices * sizeof(nlVector3);
         nlVector3* outVertices = (nlVector3*)glFrameAlloc(size, GLM_VertexData);
         nlZeroMemory(outVertices, size);
         pPacket->unknown28 = (unsigned long)outVertices;
 
         nlVector3* outNormals = 0;
-        glModelStream* pStream = fn_8036F99C(pPacket, 2);
+        glModelStream* pStream = glFindModelStream(pPacket, 2);
         const nlVector3* inNormals = 0;
         if (pStream != 0)
         {
@@ -340,20 +317,21 @@ extern "C" void fn_80370194(ShaderSkinMesh* mesh, glModel* model)
             pPacket->unknown2C = (unsigned long)outNormals;
         }
 
-        fn_80370088(mesh, packetIndex, numVertices);
-        const nlVector3* inVertices = (const nlVector3*)fn_8036F99C(pPacket, 1)->address;
+        CreateMorphBuffer(packetIndex, numVertices);
+        const nlVector3* inVertices = (const nlVector3*)glFindModelStream(pPacket, 1)->address;
         const float (*pMatrices)[3][4] =
-            *(const float (**)[3][4])fn_802CC870(pPacket, lbl_806E2400);
+            *(const float (**)[3][4])glGetMaterialParameterData(pPacket, SkinMatricesHash);
         for (unsigned long i = 0; i < node->m_nBones; i++)
         {
             glxCopyMatrix(tempMatrices[i], *pMatrices);
             pMatrices++;
         }
 
-        for (unsigned long matrixOffset = 0; matrixOffset < data->m_Unknown04; matrixOffset++)
+        for (unsigned long matrixOffset = 0; matrixOffset < data->numBones; matrixOffset++)
         {
-            UnidentifiedShaderSkinEntry_80370868* curr = &data->m_Unknown08[matrixOffset];
+            BoneSkinWeights* curr = &data->boneWeights[matrixOffset];
             register const nlMatrix4* pMatrix = &tempMatrices[matrixOffset];
+            // clang-format off
             asm {
                 psq_l f2, 0x0(pMatrix), 0, 0
                 psq_l f3, 0x8(pMatrix), 0, 0
@@ -364,18 +342,19 @@ extern "C" void fn_80370194(ShaderSkinMesh* mesh, glModel* model)
                 psq_l f8, 0x30(pMatrix), 0, 0
                 psq_l f9, 0x38(pMatrix), 0, 0
             }
+            // clang-format on
 
-            if (mesh->m_Unknown18 != 0)
+            if (numActiveMorphs != 0)
             {
-                for (unsigned long i = 0; i < curr->m_Unknown00; i++)
+                for (unsigned long i = 0; i < curr->numWeights; i++)
                 {
-                    const UnidentifiedShaderSkinWeight_8036F91C& pair =
-                        ((const UnidentifiedShaderSkinWeight_8036F91C*)curr->m_Unknown04)[i];
+                    const SkinWeight& pair = curr->weights[i];
                     float vertexWeight = pair.vertexWeight;
                     unsigned long index = pair.vertexIndex;
                     register const nlVector3& inVertex = inVertices[index];
-                    register const nlVector3& morph = ((const nlVector3*)mesh->m_Unknown40)[index];
+                    register const nlVector3& morph = morphBuffer[index];
                     register nlVector3& outVertex = outVertices[index];
+                    // clang-format off
                     asm {
                         lfs f12, vertexWeight
                         psq_l f0, 0x0(inVertex), 0, 0
@@ -399,18 +378,19 @@ extern "C" void fn_80370194(ShaderSkinMesh* mesh, glModel* model)
                         psq_st f10, 0x0(outVertex), 0, 0
                         psq_st f11, 0x8(outVertex), 1, 0
                     }
+                    // clang-format on
                 }
             }
             else
             {
-                for (unsigned long i = 0; i < curr->m_Unknown00; i++)
+                for (unsigned long i = 0; i < curr->numWeights; i++)
                 {
-                    const UnidentifiedShaderSkinWeight_8036F91C& pair =
-                        ((const UnidentifiedShaderSkinWeight_8036F91C*)curr->m_Unknown04)[i];
+                    const SkinWeight& pair = curr->weights[i];
                     float vertexWeight = pair.vertexWeight;
                     unsigned long index = pair.vertexIndex;
                     register const nlVector3& inVertex = inVertices[index];
                     register nlVector3& outVertex = outVertices[index];
+                    // clang-format off
                     asm {
                         lfs f12, vertexWeight
                         psq_l f0, 0x0(inVertex), 0, 0
@@ -430,19 +410,20 @@ extern "C" void fn_80370194(ShaderSkinMesh* mesh, glModel* model)
                         psq_st f10, 0x0(outVertex), 0, 0
                         psq_st f11, 0x8(outVertex), 1, 0
                     }
+                    // clang-format on
                 }
             }
 
             if (outNormals != 0)
             {
-                for (unsigned long i = 0; i < curr->m_Unknown00; i++)
+                for (unsigned long i = 0; i < curr->numWeights; i++)
                 {
-                    const UnidentifiedShaderSkinWeight_8036F91C& pair =
-                        ((const UnidentifiedShaderSkinWeight_8036F91C*)curr->m_Unknown04)[i];
+                    const SkinWeight& pair = curr->weights[i];
                     float vertexWeight = pair.vertexWeight;
                     unsigned long index = pair.vertexIndex;
                     register const nlVector3& inNormal = inNormals[index];
                     register nlVector3& outNormal = outNormals[index];
+                    // clang-format off
                     asm {
                         lfs f12, vertexWeight
                         psq_l f0, 0x0(inNormal), 0, 0
@@ -460,6 +441,7 @@ extern "C" void fn_80370194(ShaderSkinMesh* mesh, glModel* model)
                         psq_st f10, 0x0(outNormal), 0, 0
                         psq_st f11, 0x8(outNormal), 1, 0
                     }
+                    // clang-format on
                 }
             }
         }
@@ -472,41 +454,40 @@ extern "C" void fn_80370194(ShaderSkinMesh* mesh, glModel* model)
         node = node->m_next;
     }
 }
-// clang-format on
 
-UnidentifiedShaderSkinData_80370808::~UnidentifiedShaderSkinData_80370808()
+PacketSkinData::~PacketSkinData()
 {
-    delete[] m_Unknown08;
+    delete[] boneWeights;
 }
 
-UnidentifiedShaderSkinEntry_80370868::~UnidentifiedShaderSkinEntry_80370868()
+BoneSkinWeights::~BoneSkinWeights()
 {
-    delete[] m_Unknown04;
+    delete[] weights;
 }
 
-UnidentifiedShaderSkinData_80370808::UnidentifiedShaderSkinData_80370808()
-    : m_Unknown00(0)
-    , m_Unknown04(0)
-    , m_Unknown08(0)
+PacketSkinData::PacketSkinData()
+    : numVertices(0)
+    , numBones(0)
+    , boneWeights(0)
 {
 }
 
-UnidentifiedShaderSkinEntry_80370868::UnidentifiedShaderSkinEntry_80370868()
-    : m_Unknown00(0)
-    , m_Unknown04(0)
+BoneSkinWeights::BoneSkinWeights()
+    : numWeights(0)
+    , weights(0)
 {
 }
 
 glModel* ShaderSkinMesh::GetModel()
 {
-    bool unknown = false;
-    if (!m_Unknown45 && m_Unknown0C == 0)
+    bool softwareSkinning = false;
+    if (!rigidSkin && m_Unknown0C == 0)
     {
-        unknown = true;
+        softwareSkinning = true;
     }
-    if (unknown)
+    if (softwareSkinning)
     {
-        return (glModel*)m_Unknown28;
+        return softwareModel;
     }
     return pModel;
 }

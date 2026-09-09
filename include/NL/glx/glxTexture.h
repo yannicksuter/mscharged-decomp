@@ -7,6 +7,7 @@
 #include <string.h>
 
 class GLView;
+struct glTextureBinding;
 
 typedef unsigned long (*glxTextureLoadCallback_t)(unsigned long);
 
@@ -76,7 +77,7 @@ public:
         memset(m_TexObj, 0, sizeof(m_TexObj));
         memset(m_TlutObj, 0, sizeof(m_TlutObj));
         memset(m_Bits, 0xFF, sizeof(m_Bits));
-        unknown0E = 0xFFFF;
+        m_TextureIndex = 0xFFFF;
     }
 
     ~PlatTexture();
@@ -97,7 +98,7 @@ public:
     /* 0x06 */ u8 _pad06[2];
     /* 0x08 */ eGXTextureFormat m_Format;
     /* 0x0C */ s16 m_nPaletteEntries;
-    /* 0x0E */ u16 unknown0E;
+    /* 0x0E */ u16 m_TextureIndex;
     /* 0x10 */ bool m_bMissingTexture;
     /* 0x11 */ u8 _pad11[3];
     /* 0x14 */ void* m_SwizzledData;
@@ -123,17 +124,16 @@ int glplatTextureGetNumBits(int component);
 u32 glplatTextureGetHeight();
 u32 glplatTextureGetWidth();
 void glxInitTex();
+void glx_BindTexture(int textureMap, glTextureBinding* textureState);
 glxTextureLoadCallback_t glx_SetLoadCallback(
     glxTextureLoadCallback_t callback);
 
 
-extern "C" void fn_802CDEC0(unsigned long);
-extern "C" void fn_802CDF5C(PlatTexture* texture);
-extern "C" PlatTexture* fn_8036BBC0(glTexBundleDict* entry,
+PlatTexture* glplatTextureAddFromBundle(glTexBundleDict* entry,
     GXTextureHeader* header, void* allocator);
-extern "C" void fn_8036BBD4(void* data, void* allocator);
-extern "C" void fn_8036BBD8(void* data);
-extern "C" PlatTexture* fn_8036BBDC(unsigned long handle,
+void glplatBeginTextureBundle(void* data, void* allocator);
+void glplatEndTextureBundle(void* data);
+PlatTexture* glplatTextureAdd(unsigned long handle,
     const void* textureData, unsigned long size, void* allocator);
 
 #endif // _GLXTEXTURE_H_

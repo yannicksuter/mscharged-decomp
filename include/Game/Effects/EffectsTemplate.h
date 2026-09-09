@@ -18,7 +18,7 @@ enum eEffectsEmitter
     Emitter_Sphere = 1,
     Emitter_Spindle = 2,
     Emitter_Hemisphere = 3,
-    Emitter_Unidentified4 = 4,
+    Emitter_Disc = 4,
 };
 
 enum eEffectsBlend
@@ -36,34 +36,34 @@ enum eEffectsBillboard
 
 extern unsigned int uSeed;
 
-struct UnidentifiedEffectsKey_802E0010
+struct fxCurveKey
 {
-    /* 0x00 */ float mUnidentified000;
-    /* 0x04 */ float mUnidentified004;
-    /* 0x08 */ float mUnidentified008;
-    /* 0x0C */ float mUnidentified00C;
-    /* 0x10 */ float mUnidentified010;
+    /* 0x00 */ float mTime;
+    /* 0x04 */ float mCubic;
+    /* 0x08 */ float mQuadratic;
+    /* 0x0C */ float mLinear;
+    /* 0x10 */ float mConstant;
 }; // size: 0x14
 
-class Unidentified_802E0010
+class fxAnimatedRange
 {
 public:
-    float fn_802E0010(float value) const;
-    float fn_802E0108() const;
+    float Evaluate(float value) const;
+    float GetMaximum() const;
 
-    /* 0x00 */ unsigned long mUnidentified000;
+    /* 0x00 */ unsigned long mUseCurve;
     /* 0x04 */ float base;
     /* 0x08 */ float range;
-    /* 0x0C */ unsigned long mUnidentified00C;
-    /* 0x10 */ UnidentifiedEffectsKey_802E0010* mUnidentified010;
+    /* 0x0C */ unsigned long mNumKeys;
+    /* 0x10 */ fxCurveKey* mKeys;
 }; // size: 0x14
 
 class EffectsTemplate
 {
 public:
-    static EffectsTemplate* fn_802E01C8(nlChunk* chunk);
-    void fn_802E04C8();
-    float fn_802E04CC() const;
+    static EffectsTemplate* LoadFromChunk(nlChunk* chunk);
+    void Cleanup();
+    float GetBoundingRadius() const;
 
     /* 0x00 */ unsigned long m_uHashID;
     /* 0x04 */ float m_fFountainLife;
@@ -84,7 +84,7 @@ public:
     /* 0x48 */ unsigned long mUnidentified048;
     /* 0x4C */ fxRange m_rFPS;
     /* 0x54 */ unsigned long m_uModelID;
-    /* 0x58 */ Unidentified_802E0010* mUnidentified058[8];
+    /* 0x58 */ fxAnimatedRange* mProperties[8];
     /* 0x78 */ nlColour m_cColour[25];
 
     bool IsInFront() const { return (mUnidentified037 & 1) != 0; }

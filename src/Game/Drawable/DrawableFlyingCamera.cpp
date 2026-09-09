@@ -2,8 +2,8 @@
 #include "Game/Drawable/RenderObject.h"
 
 #include "Game/BasicStadium.h"
-#include "Game/Drawable/RenderObject.h"
-#include "Game/Drawable/ShadowProp.h"
+#include "Game/Render/RLView.h"
+#include "NL/gl/glDraw3.h"
 #include "NL/gl/glState.h"
 #include "NL/nlString.h"
 #include "NL/platqmath.h"
@@ -32,6 +32,7 @@ struct UnidentifiedStaticStorage
 };
 
 struct UnidentifiedStaticTag;
+
 
 static float gShadowScaleHigh = 0.5f;
 static int gShadowAlphaLow = 100;
@@ -68,12 +69,11 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
         alpha = 255;
     }
 
-    GroundInfo* ground =
-        reinterpret_cast<GroundInfo*>(BasicStadium::GetCurrentStadium());
+    BasicStadium* stadium = BasicStadium::GetCurrentStadium();
     float groundHeight = 0.0f;
-    if (ground != 0)
+    if (stadium != 0)
     {
-        groundHeight = ground->height;
+        groundHeight = stadium->m_shadowHeight;
     }
 
     position.x = matrix.m41;

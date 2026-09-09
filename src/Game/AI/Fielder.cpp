@@ -1,4 +1,7 @@
 #include "Game/AI/Fielder.h"
+#include "Game/DetInput.h"
+#include "Game/Audio/GameStreams.h"
+#include "Game/RumbleActions.h"
 #include "Game/AI/FielderDesireMachine.h"
 #include "Game/AI/FielderInput.h"
 #include "Game/AI/AIPad.h"
@@ -271,7 +274,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
 
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)19)
     {
-        mUnidentified420 = lbl_806E1608->fn_801A9D20();
+        mUnidentified420 = gNPCManager->fn_801A9D20();
     }
     else
     {
@@ -484,7 +487,7 @@ bool cFielder::CanDoCaptainShootToScore()
         bool bUnidentified0 = false;
         if (GameInfoManager::Instance()
                 ->GetCurrentSettings()
-                ->HomeShoot2Score
+                ->mHomeMegastrikeEnabled
             && m_pTeam->m_nSide == 0)
         {
             bUnidentified0 = true;
@@ -494,7 +497,7 @@ bool cFielder::CanDoCaptainShootToScore()
         if (bUnidentified0
             || (GameInfoManager::Instance()
                     ->GetCurrentSettings()
-                    ->AwayShoot2Score
+                    ->mAwayMegastrikeEnabled
                 && m_pTeam->m_nSide == 1))
         {
             bUnidentified1 = true;
@@ -3116,9 +3119,9 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         break;
 
     case ACTION_RUNNING_WB:
-        if (!lbl_806E1608->mpChainChomp->IsHidden())
+        if (!gNPCManager->mpChainChomp->IsHidden())
         {
-            m_pHeadTrack->m_v3OOI = lbl_806E1608->mpChainChomp->mv3Position;
+            m_pHeadTrack->m_v3OOI = gNPCManager->mpChainChomp->mv3Position;
             m_pHeadTrack->m_bTrackOOI = true;
         }
         else
@@ -3129,9 +3132,9 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
 
     case ACTION_IDLE_TURN:
     case ACTION_RUNNING:
-        if (!lbl_806E1608->mpChainChomp->IsHidden())
+        if (!gNPCManager->mpChainChomp->IsHidden())
         {
-            m_pHeadTrack->m_v3OOI = lbl_806E1608->mpChainChomp->mv3Position;
+            m_pHeadTrack->m_v3OOI = gNPCManager->mpChainChomp->mv3Position;
         }
         else
         {
@@ -3166,13 +3169,13 @@ void cFielder::UpdateController(float fDeltaT)
 {
     bool bUnidentified = false;
     if (GetGlobalPad() != NULL
-        && fn_80331C04(GetGlobalPad(), PAD_SWITCH, true))
+        && GetGlobalPad()->IsPressed(PAD_SWITCH, true))
     {
-        int nUnidentified = GetGlobalPad()->fn_80331ECC(PAD_SWITCH, true);
+        int nUnidentified = GetGlobalPad()->GetButtonStateTicks(PAD_SWITCH, true);
         if (nUnidentified * FixedUpdateTask::GetPhysicsUpdateTick() > 0.33f
             && m_pTeam->GetCaptain() != this)
         {
-            GetGlobalPad()->fn_80331F9C(PAD_SWITCH, true);
+            GetGlobalPad()->ResetButtonStateTicks(PAD_SWITCH, true);
             m_pTeam->GetCaptain()->mbIgnorePadSwitchRelease = true;
             bUnidentified = true;
         }
@@ -3183,7 +3186,7 @@ void cFielder::UpdateController(float fDeltaT)
         if (GetGlobalPad() != NULL
             && ((GetGlobalPad()->JustPressed(PAD_SWITCH, true)
                     && !(GetGlobalPad() != NULL
-                            ? fn_80331C04(GetGlobalPad(), 0x17, true)
+                            ? GetGlobalPad()->IsPressed(0x17, true)
                             : false))
                 || bUnidentified))
         {
@@ -3412,7 +3415,7 @@ struct UnidentifiedFielderDesireState
 };
 
 #define REGISTER_FIELDER_FIELD(type, base, field, name) \
-    fn_80338F88(cache, type, lbl_80533C98[type].size, \
+    cache->AddField(type, gDebugFieldTypes[type].size, \
         (u8*)&(field) - (u8*)&(base), name)
 
 void cFielder::Unknown11(void* context, DebugWriteCache* cache)
@@ -3421,7 +3424,7 @@ void cFielder::Unknown11(void* context, DebugWriteCache* cache)
 
     if (lbl_806DB842 == 0xFFFF)
     {
-        lbl_806DB842 = fn_80338EBC(cache, "DetFielder");
+        lbl_806DB842 = cache->BeginType("DetFielder");
         REGISTER_FIELDER_FIELD(16, m_bHasBeenUpdated,
             m_bHasBeenUpdated, "m_bHasBeenUpdated");
         REGISTER_FIELDER_FIELD(14, m_bHasBeenUpdated,
@@ -3455,10 +3458,10 @@ void cFielder::Unknown11(void* context, DebugWriteCache* cache)
             mbTangible, "mbTangible");
         REGISTER_FIELDER_FIELD(16, m_bHasBeenUpdated,
             mbIgnorePadSwitchRelease, "mbIgnorePadSwitchRelease");
-        fn_80338F78(cache);
+        cache->EndType();
     }
 
-    void* data = fn_8033930C(cache, lbl_806DB842, &m_bHasBeenUpdated,
+    void* data = cache->WriteData(lbl_806DB842, &m_bHasBeenUpdated,
         offsetof(cFielder, mUnidentified478) - offsetof(cFielder, m_bHasBeenUpdated));
     if (data != 0)
     {
@@ -3470,112 +3473,112 @@ void cFielder::Unknown11(void* context, DebugWriteCache* cache)
                 ? -1
                 : m_pMark[i]->mUnidentified120);
         }
-        fn_80339450(cache, lbl_806DB842, data, context);
+        cache->ChecksumData(lbl_806DB842, data, context);
     }
 
     if (lbl_806DB844 == 0xFFFF)
     {
-        lbl_806DB844 = fn_80338EBC(cache, "ActCrowdVars");
+        lbl_806DB844 = cache->BeginType("ActCrowdVars");
         REGISTER_FIELDER_FIELD(16, mUnidentified330,
             mUnidentified330.mUnidentified00, "bHasBeenSuckedToMiddle");
         REGISTER_FIELDER_FIELD(17, mUnidentified330,
             mUnidentified330.mUnidentified04, "fStuckInRiotTime");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB844, &mUnidentified330, context);
-    fn_8033930C(cache, lbl_806DB844, &mUnidentified330, sizeof(mUnidentified330));
+    cache->ChecksumData(lbl_806DB844, &mUnidentified330, context);
+    cache->WriteData(lbl_806DB844, &mUnidentified330, sizeof(mUnidentified330));
 
     if (lbl_806DB846 == 0xFFFF)
     {
-        lbl_806DB846 = fn_80338EBC(cache, "ActDekeVars");
+        lbl_806DB846 = cache->BeginType("ActDekeVars");
         REGISTER_FIELDER_FIELD(19, mUnidentified338,
             mUnidentified338, "aDekeDir");
         REGISTER_FIELDER_FIELD(16, mUnidentified338,
             mUnidentified33A, "bIsReset");
         REGISTER_FIELDER_FIELD(8, mUnidentified338,
             mUnidentified33C, "nDPadDownCounter");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB846, &mUnidentified338, context);
-    fn_8033930C(cache, lbl_806DB846, &mUnidentified338,
+    cache->ChecksumData(lbl_806DB846, &mUnidentified338, context);
+    cache->WriteData(lbl_806DB846, &mUnidentified338,
         offsetof(cFielder, mUnidentified340) - offsetof(cFielder, mUnidentified338));
 
     if (lbl_806DB848 == 0xFFFF)
     {
-        lbl_806DB848 = fn_80338EBC(cache, "ActElectVars");
+        lbl_806DB848 = cache->BeginType("ActElectVars");
         REGISTER_FIELDER_FIELD(17, mUnidentified340,
             mUnidentified340, "electrocutionTime");
         REGISTER_FIELDER_FIELD(17, mUnidentified340,
             mUnidentified344, "electrocutionLiftTime");
         REGISTER_FIELDER_FIELD(16, mUnidentified340,
             mUnidentified348, "bIsGroundElectrocution");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB848, &mUnidentified340, context);
-    fn_8033930C(cache, lbl_806DB848, &mUnidentified340,
+    cache->ChecksumData(lbl_806DB848, &mUnidentified340, context);
+    cache->WriteData(lbl_806DB848, &mUnidentified340,
         offsetof(cFielder, mUnidentified34C) - offsetof(cFielder, mUnidentified340));
 
     if (lbl_806DB84A == 0xFFFF)
     {
-        lbl_806DB84A = fn_80338EBC(cache, "ActFallVars");
+        lbl_806DB84A = cache->BeginType("ActFallVars");
         REGISTER_FIELDER_FIELD(17, mUnidentified34C,
             mUnidentified34C, "fallingTime");
         REGISTER_FIELDER_FIELD(22, mUnidentified34C,
             mUnidentified350, "v3SuckToSpot");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB84A, &mUnidentified34C, context);
-    fn_8033930C(cache, lbl_806DB84A, &mUnidentified34C,
+    cache->ChecksumData(lbl_806DB84A, &mUnidentified34C, context);
+    cache->WriteData(lbl_806DB84A, &mUnidentified34C,
         offsetof(cFielder, mUnidentified35C) - offsetof(cFielder, mUnidentified34C));
 
     if (lbl_806DB84C == 0xFFFF)
     {
-        lbl_806DB84C = fn_80338EBC(cache, "ActHitVars");
+        lbl_806DB84C = cache->BeginType("ActHitVars");
         REGISTER_FIELDER_FIELD(17, mUnidentified35C,
             mUnidentified35C, "fHitDistance");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB84C, &mUnidentified35C, context);
-    fn_8033930C(cache, lbl_806DB84C, &mUnidentified35C, sizeof(mUnidentified35C));
+    cache->ChecksumData(lbl_806DB84C, &mUnidentified35C, context);
+    cache->WriteData(lbl_806DB84C, &mUnidentified35C, sizeof(mUnidentified35C));
 
     if (lbl_806DB84E == 0xFFFF)
     {
-        lbl_806DB84E = fn_80338EBC(cache, "ActHitReactVars");
+        lbl_806DB84E = cache->BeginType("ActHitReactVars");
         REGISTER_FIELDER_FIELD(16, mUnidentified360,
             mUnidentified360, "bDoFrameLock");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB84E, &mUnidentified360, context);
-    fn_8033930C(cache, lbl_806DB84E, &mUnidentified360, sizeof(mUnidentified360));
+    cache->ChecksumData(lbl_806DB84E, &mUnidentified360, context);
+    cache->WriteData(lbl_806DB84E, &mUnidentified360, sizeof(mUnidentified360));
 
     if (lbl_806DB850 == 0xFFFF)
     {
-        lbl_806DB850 = fn_80338EBC(cache, "ActSuperVars");
+        lbl_806DB850 = cache->BeginType("ActSuperVars");
         REGISTER_FIELDER_FIELD(16, bYoshiInWindup,
             bYoshiInWindup, "bYoshiInWindup");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB850, &bYoshiInWindup, context);
-    fn_8033930C(cache, lbl_806DB850, &bYoshiInWindup, sizeof(bYoshiInWindup));
+    cache->ChecksumData(lbl_806DB850, &bYoshiInWindup, context);
+    cache->WriteData(lbl_806DB850, &bYoshiInWindup, sizeof(bYoshiInWindup));
 
     if (lbl_806DB852 == 0xFFFF)
     {
-        lbl_806DB852 = fn_80338EBC(cache, "ActShootPassCommon");
+        lbl_806DB852 = cache->BeginType("ActShootPassCommon");
         REGISTER_FIELDER_FIELD(16, bIsModified,
             bIsModified, "bIsModified");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB852, &bIsModified, context);
-    fn_8033930C(cache, lbl_806DB852, &bIsModified, sizeof(bIsModified));
+    cache->ChecksumData(lbl_806DB852, &bIsModified, context);
+    cache->WriteData(lbl_806DB852, &bIsModified, sizeof(bIsModified));
 
     if (lbl_806DB854 == 0xFFFF)
     {
-        lbl_806DB854 = fn_80338EBC(cache, "ActLooseBallPass");
+        lbl_806DB854 = cache->BeginType("ActLooseBallPass");
         REGISTER_FIELDER_FIELD(15, mActionLooseBallPassVars,
             mActionLooseBallPassVars.passTarget, "passTarget");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    data = fn_8033930C(cache, lbl_806DB854,
+    data = cache->WriteData(lbl_806DB854,
         &mActionLooseBallPassVars, sizeof(mActionLooseBallPassVars));
     if (data != 0)
     {
@@ -3583,31 +3586,31 @@ void cFielder::Unknown11(void* context, DebugWriteCache* cache)
         copy->passTarget = (cFielder*)(mActionLooseBallPassVars.passTarget == 0
             ? -1
             : mActionLooseBallPassVars.passTarget->mUnidentified120);
-        fn_80339450(cache, lbl_806DB854, data, context);
+        cache->ChecksumData(lbl_806DB854, data, context);
     }
 
     if (lbl_806DB856 == 0xFFFF)
     {
-        lbl_806DB856 = fn_80338EBC(cache, "ActOneTimerVars");
+        lbl_806DB856 = cache->BeginType("ActOneTimerVars");
         REGISTER_FIELDER_FIELD(17, mUnidentified368,
             mUnidentified368, "fOneTimerAnimTime");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB856, &mUnidentified368, context);
-    fn_8033930C(cache, lbl_806DB856, &mUnidentified368, sizeof(mUnidentified368));
+    cache->ChecksumData(lbl_806DB856, &mUnidentified368, context);
+    cache->WriteData(lbl_806DB856, &mUnidentified368, sizeof(mUnidentified368));
 
     if (lbl_806DB858 == 0xFFFF)
     {
-        lbl_806DB858 = fn_80338EBC(cache, "ActPassingVars");
+        lbl_806DB858 = cache->BeginType("ActPassingVars");
         REGISTER_FIELDER_FIELD(15, mUnidentified36C,
             mUnidentified36C, "pPassTarget");
         REGISTER_FIELDER_FIELD(16, mUnidentified36C,
             mUnidentified370, "bAllowLeadPass");
         REGISTER_FIELDER_FIELD(16, mUnidentified36C,
             mUnidentified371, "bIsOneTouchPass");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    data = fn_8033930C(cache, lbl_806DB858, &mUnidentified36C,
+    data = cache->WriteData(lbl_806DB858, &mUnidentified36C,
         offsetof(cFielder, mUnidentified374) - offsetof(cFielder, mUnidentified36C));
     if (data != 0)
     {
@@ -3615,111 +3618,111 @@ void cFielder::Unknown11(void* context, DebugWriteCache* cache)
         copy->mUnidentified36C = (cPlayer*)(mUnidentified36C == 0
             ? -1
             : mUnidentified36C->mUnidentified120);
-        fn_80339450(cache, lbl_806DB858, data, context);
+        cache->ChecksumData(lbl_806DB858, data, context);
     }
 
     if (lbl_806DB85A == 0xFFFF)
     {
-        lbl_806DB85A = fn_80338EBC(cache, "ActRunPassVars");
+        lbl_806DB85A = cache->BeginType("ActRunPassVars");
         REGISTER_FIELDER_FIELD(8, mUnidentified374,
             mUnidentified374.mUnidentified00, "nHeldTicks");
         REGISTER_FIELDER_FIELD(17, mUnidentified374,
             mUnidentified374.mUnidentified04, "fSpeed");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB85A, &mUnidentified374, context);
-    fn_8033930C(cache, lbl_806DB85A, &mUnidentified374, sizeof(mUnidentified374));
+    cache->ChecksumData(lbl_806DB85A, &mUnidentified374, context);
+    cache->WriteData(lbl_806DB85A, &mUnidentified374, sizeof(mUnidentified374));
 
     if (lbl_806DB85C == 0xFFFF)
     {
-        lbl_806DB85C = fn_80338EBC(cache, "ActRunningVars");
+        lbl_806DB85C = cache->BeginType("ActRunningVars");
         REGISTER_FIELDER_FIELD(14, mActionRunningVars,
             mActionRunningVars.eLastStrafeDirection, "eLastStrafeDirection");
         REGISTER_FIELDER_FIELD(16, mActionRunningVars,
             mActionRunningVars.bFirstCycleOfTurbo, "bFirstCycleOfTurbo");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB85C, &mActionRunningVars, context);
-    fn_8033930C(cache, lbl_806DB85C, &mActionRunningVars, sizeof(mActionRunningVars));
+    cache->ChecksumData(lbl_806DB85C, &mActionRunningVars, context);
+    cache->WriteData(lbl_806DB85C, &mActionRunningVars, sizeof(mActionRunningVars));
 
     if (lbl_806DB85E == 0xFFFF)
     {
-        lbl_806DB85E = fn_80338EBC(cache, "ActRunningWBVars");
+        lbl_806DB85E = cache->BeginType("ActRunningWBVars");
         REGISTER_FIELDER_FIELD(16, mActionRunningWBVars,
             mActionRunningWBVars.bWaitForAnimToFinish, "bWaitForAnimToFinish");
         REGISTER_FIELDER_FIELD(16, mActionRunningWBVars,
             mActionRunningWBVars.bCuePitch, "bCuePitch");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB85E, &mActionRunningWBVars, context);
-    fn_8033930C(cache, lbl_806DB85E, &mActionRunningWBVars, sizeof(mActionRunningWBVars));
+    cache->ChecksumData(lbl_806DB85E, &mActionRunningWBVars, context);
+    cache->WriteData(lbl_806DB85E, &mActionRunningWBVars, sizeof(mActionRunningWBVars));
 
     if (lbl_806DB860 == 0xFFFF)
     {
-        lbl_806DB860 = fn_80338EBC(cache, "ActSlideAttack");
+        lbl_806DB860 = cache->BeginType("ActSlideAttack");
         REGISTER_FIELDER_FIELD(14, mUnidentified388,
             mUnidentified388, "eSlideAttackState");
         REGISTER_FIELDER_FIELD(16, mUnidentified388,
             bAttackSucceeded, "bAttackSucceeded");
         REGISTER_FIELDER_FIELD(16, mUnidentified388,
             mUnidentified38D, "bIsReset");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB860, &mUnidentified388, context);
-    fn_8033930C(cache, lbl_806DB860, &mUnidentified388,
+    cache->ChecksumData(lbl_806DB860, &mUnidentified388, context);
+    cache->WriteData(lbl_806DB860, &mUnidentified388,
         offsetof(cFielder, mUnidentified390) - offsetof(cFielder, mUnidentified388));
 
     if (lbl_806DB862 == 0xFFFF)
     {
-        lbl_806DB862 = fn_80338EBC(cache, "ActMegaStrikeMeter");
+        lbl_806DB862 = cache->BeginType("ActMegaStrikeMeter");
         REGISTER_FIELDER_FIELD(17, mUnidentified390,
             mUnidentified390, "fNumBalls");
         REGISTER_FIELDER_FIELD(17, mUnidentified390,
             mUnidentified394, "fAccuracy");
         REGISTER_FIELDER_FIELD(17, mUnidentified390,
             mUnidentified398, "fReceivedTimestamp");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB862, &mUnidentified390, context);
-    fn_8033930C(cache, lbl_806DB862, &mUnidentified390,
+    cache->ChecksumData(lbl_806DB862, &mUnidentified390, context);
+    cache->WriteData(lbl_806DB862, &mUnidentified390,
         offsetof(cFielder, mUnidentified39C) - offsetof(cFielder, mUnidentified390));
 
     if (lbl_806DB864 == 0xFFFF)
     {
-        lbl_806DB864 = fn_80338EBC(cache, "ActStunned");
+        lbl_806DB864 = cache->BeginType("ActStunned");
         REGISTER_FIELDER_FIELD(10, mUnidentified3D8,
             mUnidentified3D8, "angAccel");
         REGISTER_FIELDER_FIELD(10, mUnidentified3D8,
             mUnidentified3DA, "angVel");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB864, &mUnidentified3D8, context);
-    fn_8033930C(cache, lbl_806DB864, &mUnidentified3D8,
+    cache->ChecksumData(lbl_806DB864, &mUnidentified3D8, context);
+    cache->WriteData(lbl_806DB864, &mUnidentified3D8,
         offsetof(cFielder, mUnidentified3DC) - offsetof(cFielder, mUnidentified3D8));
 
     if (lbl_806DB866 == 0xFFFF)
     {
-        lbl_806DB866 = fn_80338EBC(cache, "ActBowserSuper");
+        lbl_806DB866 = cache->BeginType("ActBowserSuper");
         REGISTER_FIELDER_FIELD(17, mUnidentified3E8,
             mUnidentified3E8.nextFireballTime, "nextFireballTime");
         REGISTER_FIELDER_FIELD(17, mUnidentified3E8,
             mUnidentified3E8.fireballStageTime, "fireballStageTime");
         REGISTER_FIELDER_FIELD(9, mUnidentified3E8,
             mUnidentified3E8.fireballStageNum, "fireballStageNum");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB866, &mUnidentified3E8, context);
-    fn_8033930C(cache, lbl_806DB866, &mUnidentified3E8, sizeof(mUnidentified3E8));
+    cache->ChecksumData(lbl_806DB866, &mUnidentified3E8, context);
+    cache->WriteData(lbl_806DB866, &mUnidentified3E8, sizeof(mUnidentified3E8));
 
     if (lbl_806DB868 == 0xFFFF)
     {
-        lbl_806DB868 = fn_80338EBC(cache, "ActWarioSuper");
+        lbl_806DB868 = cache->BeginType("ActWarioSuper");
         REGISTER_FIELDER_FIELD(17, mUnidentified3F4,
             mUnidentified3F4, "nextGasTime");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB868, &mUnidentified3F4, context);
-    fn_8033930C(cache, lbl_806DB868, &mUnidentified3F4, sizeof(mUnidentified3F4));
+    cache->ChecksumData(lbl_806DB868, &mUnidentified3F4, context);
+    cache->WriteData(lbl_806DB868, &mUnidentified3F4, sizeof(mUnidentified3F4));
 
     DesireSteering* steering = (DesireSteering*)fn_8002E08C(this, 34);
     fn_8000F324(steering->m_pAvoidance, context, cache);
@@ -3741,7 +3744,7 @@ void cFielder::Unknown11(void* context, DebugWriteCache* cache)
             state.m_fAge = desire->mUnidentifiedTimer.GetSeconds();
             if (lbl_806DC048 == 0xFFFF)
             {
-                lbl_806DC048 = fn_80338EBC(cache, "FielderDesireShdState");
+                lbl_806DC048 = cache->BeginType("FielderDesireShdState");
                 REGISTER_FIELDER_FIELD(2, state,
                     state.m_nTransitionFuncHash, "m_nTransitionFuncHash");
                 REGISTER_FIELDER_FIELD(2, state,
@@ -3751,10 +3754,10 @@ void cFielder::Unknown11(void* context, DebugWriteCache* cache)
                 REGISTER_FIELDER_FIELD(17, state,
                     state.m_fMinDuration, "m_fMinDuration");
                 REGISTER_FIELDER_FIELD(17, state, state.m_fAge, "m_fAge");
-                fn_80338F78(cache);
+                cache->EndType();
             }
-            fn_80339450(cache, lbl_806DC048, &state, context);
-            fn_8033930C(cache, lbl_806DC048, &state, sizeof(state));
+            cache->ChecksumData(lbl_806DC048, &state, context);
+            cache->WriteData(lbl_806DC048, &state, sizeof(state));
             desire->UnidentifiedVirtual7(context, cache);
         }
     }

@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glView.h"
@@ -24,8 +25,8 @@ extern "C"
 
 struct GXMaterialProgramParameters_802981F0
 {
-    /* 0x00 */ UnidentifiedTextureState texture0;
-    /* 0x08 */ UnidentifiedTextureState texture1;
+    /* 0x00 */ glTextureBinding texture0;
+    /* 0x08 */ glTextureBinding texture1;
     /* 0x10 */ const float (*matrices)[3][4];
     /* 0x14 */ unsigned long matricesSize;
     /* 0x18 */ float value24;
@@ -147,7 +148,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802981F0>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 struct FloatColour_8028A98C
@@ -203,7 +204,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802981F0>::Draw(
 
     if (lbl_806DEFE1 && lbl_806E1A50)
     {
-        UnidentifiedTextureState texture;
+        glTextureBinding texture;
         texture.texture = 0;
         texture.textureIndex = 0xFFFF;
         texture.flags = 0;
@@ -213,7 +214,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802981F0>::Draw(
         texture.SetWrapS(true);
         texture.SetWrapT(true);
         texture.unknown07 = 0;
-        fn_8036BE88(2, &texture);
+        glx_BindTexture(2, &texture);
     }
 
     nlMatrix4 model;
@@ -225,12 +226,12 @@ void GXMaterialProgramImpl<GXMaterialProgram_802981F0>::Draw(
     if (packet->unknown28 == 0)
     {
         fn_80364020()->fn_803640E0("CharacterSkinCustom - RLXLoadSkinMatrices");
-        fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 1);
+        glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, 1);
         fn_80364020()->fn_803640E0("CharacterSkinCustom - After RLXLoadSkinMatrices");
     }
     else
     {
-        fn_8036D774(&modelview);
+        glx_LoadDefaultSkinMatrices(&modelview);
     }
 
     fn_801837DC(1, parameters->value32);

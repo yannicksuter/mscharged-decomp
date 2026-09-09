@@ -1,4 +1,5 @@
 #include "Game/AI/DesireReceivePass.h"
+#include "Game/DetInput.h"
 #include "Game/Sys/debug.h"
 
 #include "Game/AI/DesireSteering.h"
@@ -113,7 +114,6 @@ extern "C" float fn_8002C6E8(PlayerTweaks*);
 extern "C" float fn_8002C678(PlayerTweaks*);
 extern "C" void fn_80097858(cPlayer*, cPlayer*, int,
     int, int, int, float, float);
-extern "C" bool fn_80331C04(DetInput*, int, bool);
 extern "C" void* fn_80311734(void*);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     InterpreterCore*, void*, int, cPlayer*, cPlayer*);
@@ -1327,73 +1327,73 @@ void DesireReceivePass::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field =
-        fn_80338EBC(cache, "DesireReceivePass");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        cache->BeginType("DesireReceivePass");
+    cache->AddField(22, gDebugFieldTypes[22].size,
         0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
         "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
         "mThinkTimer");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size,
+    cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&mbValidPassIntercept - (u8*)&mvDesiredPosition,
         "mbValidPassIntercept");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    cache->AddField(22, gDebugFieldTypes[22].size,
         (u8*)&mv3PassIntercept - (u8*)&mvDesiredPosition,
         "mv3PassIntercept");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&meReceiveAnimType - (u8*)&mvDesiredPosition,
         "meReceiveAnimType");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&meDesireSubState - (u8*)&mvDesiredPosition,
         "meDesireSubState");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size,
+    cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&mbOneTouchVolley - (u8*)&mvDesiredPosition,
         "mbOneTouchVolley");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size,
+    cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&mbOneTouchShot - (u8*)&mvDesiredPosition,
         "mbOneTouchShot");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size,
+    cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&mbOneTouchShotLate - (u8*)&mvDesiredPosition,
         "mbOneTouchShotLate");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size,
+    cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&mbOneTouchPass - (u8*)&mvDesiredPosition,
         "mbOneTouchPass");
-    fn_80338F88(cache, 15, lbl_80533C98[15].size,
+    cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpOneTouchPassTarget - (u8*)&mvDesiredPosition,
         "mpOneTouchPassTarget");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size,
+    cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&mEstimated.bLocked - (u8*)&mvDesiredPosition,
         "mEstimated.bLocked");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    cache->AddField(22, gDebugFieldTypes[22].size,
         (u8*)&mEstimated.v3BallContactPos - (u8*)&mvDesiredPosition,
         "mEstimated.v3BallContactPos");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    cache->AddField(22, gDebugFieldTypes[22].size,
         (u8*)&mEstimated.v3AnimStartPos - (u8*)&mvDesiredPosition,
         "mEstimated.v3AnimStartPos");
-    fn_80338F88(cache, 19, lbl_80533C98[19].size,
+    cache->AddField(19, gDebugFieldTypes[19].size,
         (u8*)&mEstimated.aFacingDirection - (u8*)&mvDesiredPosition,
         "mEstimated.aFacingDirection");
-    fn_80338F88(cache, 19, lbl_80533C98[19].size,
+    cache->AddField(19, gDebugFieldTypes[19].size,
         (u8*)&mEstimated.aFacingTargetDirection - (u8*)&mvDesiredPosition,
         "mEstimated.aFacingTargetDirection");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&mEstimated.fBallContactTime - (u8*)&mvDesiredPosition,
         "mEstimated.fBallContactTime");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&mEstimated.fAnimStartOffset - (u8*)&mvDesiredPosition,
         "mEstimated.fAnimStartOffset");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&mEstimated.fAnimStartTime - (u8*)&mvDesiredPosition,
         "mEstimated.fAnimStartTime");
-    fn_80338F88(cache, 8, lbl_80533C98[8].size,
+    cache->AddField(8, gDebugFieldTypes[8].size,
         (u8*)&mEstimated.nReceivePassAnim - (u8*)&mvDesiredPosition,
         "mEstimated.nReceivePassAnim");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&mEstimated.fReceivePassAnimTime - (u8*)&mvDesiredPosition,
         "mEstimated.fReceivePassAnimTime");
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 void DesireReceivePass::UnidentifiedVirtual7(
@@ -1405,7 +1405,7 @@ void DesireReceivePass::UnidentifiedVirtual7(
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = fn_8033930C(cache, sDesireReceivePassType,
+    void* data = cache->WriteData(sDesireReceivePassType,
         (u8*)this + offset, sizeof(DesireReceivePass) - offset);
     if (data != 0)
     {
@@ -1415,8 +1415,7 @@ void DesireReceivePass::UnidentifiedVirtual7(
             (cPlayer*)(mpOneTouchPassTarget == 0
                     ? -1
                     : mpOneTouchPassTarget->mUnidentified120);
-        fn_80339450(
-            cache, sDesireReceivePassType, data, context);
+        cache->ChecksumData(sDesireReceivePassType, data, context);
     }
 }
 
@@ -1443,7 +1442,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800C3448(
 {
     unsigned int localHash = functionHash;
     return UnidentifiedVariant_80054AB8(fn_80312360(
-        pInterpreter, fn_802DF3E4(pInterpreter, &localHash),
+        pInterpreter, pInterpreter->FindFunctionEntryPoint(localHash),
         2, pPlayer, pTarget));
 }
 

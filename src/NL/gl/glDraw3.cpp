@@ -1,11 +1,12 @@
 #include "NL/gl/glDraw3.h"
+#include "NL/gl/glTexture.h"
 
 #include "Game/GL/GLTexturedColourMeshWriter.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
+#include "NL/gl/glTexture.h"
 
-extern u32 lbl_806E1F34;
 
 bool glAttachQuad3(eGLView view, unsigned long count, glQuad3* quads)
 {
@@ -69,9 +70,9 @@ const glModel* glQuad3::GetModel() const
 
     if (texconfig == 0)
     {
-        UnidentifiedTextureState* state =
-            (UnidentifiedTextureState*)writer.model->packets->unknown20;
-        state->texture = lbl_806E1F34;
+        glTextureBinding* state =
+            (glTextureBinding*)writer.model->packets->unknown20;
+        state->texture = gWhiteTextureID;
         state->textureIndex = 0xFFFF;
         state->SetWrapS(true);
         state->SetWrapT(true);
@@ -97,8 +98,8 @@ const glModel* glQuad3::GetModel() const
         }
 
         u32 texture = glGetCurrentTexture(GLTT_Diffuse);
-        UnidentifiedTextureState* state =
-            (UnidentifiedTextureState*)writer.model->packets->unknown20;
+        glTextureBinding* state =
+            (glTextureBinding*)writer.model->packets->unknown20;
         state->texture = texture;
         state->textureIndex = 0xFFFF;
         state->SetWrapS(wrapS);

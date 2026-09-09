@@ -9,10 +9,12 @@
 
 class EmissionController;
 class EffectsGroup;
+class GLInventory;
+class GLResourcePool;
 class LoadFrame;
 class Particle;
 class SaveFrame;
-class TweakValueIntImpl_804FD898;
+class TweakIntBinding;
 
 class EffectsLight
 {
@@ -25,10 +27,11 @@ public:
 struct EmissionResourceStats
 {
     EmissionResourceStats();
+    void Initialize();
 
-    /* 0x00 */ TweakValueIntImpl_804FD898* mCount;
-    /* 0x04 */ TweakValueIntImpl_804FD898* mHighWaterMark;
-    /* 0x08 */ TweakValueIntImpl_804FD898* mBudgetTweak;
+    /* 0x00 */ TweakIntBinding* mCount;
+    /* 0x04 */ TweakIntBinding* mHighWaterMark;
+    /* 0x08 */ TweakIntBinding* mBudgetTweak;
     /* 0x0C */ char mName[0x20];
     /* 0x2C */ int mBudget;
     /* 0x30 */ u16 mId;
@@ -45,9 +48,15 @@ public:
     static EmissionManager* Instance();
     static EmissionManager& InstanceForReplayOnly();
 
+    float GetUnidentified1F4() const
+    {
+        return mTimeScale;
+    }
+
     EffectsGroup* GetEffectsGroup(const char* name);
     EmissionController* Create(EffectsGroup* pEffectsGroup, int view, bool addToEnd, unsigned short id);
 
+    void Startup(void* context, int numParticles, int maxRenderedParticles);
     void Shutdown();
     void Update(float dt);
     int GetNumLights();
@@ -57,18 +66,29 @@ public:
     nlDLListContainer<EmissionController*>* GetContainer();
     bool IsStillAlive(EmissionController* controller);
     void Destroy(unsigned long userData, const EffectsGroup* pEffectsGroup);
+    void Destroy(const EffectsGroup* pEffectsGroup);
+    void ForEachController(const Function1<void, EmissionController&>& callback);
     void DestroyAll(int view, bool exceptPersistent);
     void DestroyAll(bool exceptPersistent);
     void Kill(unsigned long userData, const EffectsGroup* pEffectsGroup);
-    void Kill(const EffectsGroup* pEffectsGroup);
     bool IsPlaying(
         unsigned long userData, const EffectsGroup* pEffectsGroup);
-    bool fn_802E8544(unsigned long userData, const EffectsGroup* pEffectsGroup);
     void AddError(const char* format, ...);
     void Replay(LoadFrame& frame);
     void Replay(SaveFrame& frame);
     void KillOldest(int num, bool lingeringOnly);
     void SetContext(void* context);
+    EmissionController* FindController(unsigned long userData, const EffectsGroup* pEffectsGroup);
+    void Kill(const EffectsGroup* pEffectsGroup);
+    bool IsDying(unsigned long userData, const EffectsGroup* pEffectsGroup);
+    void KillAll();
+    void PrepareForReplay();
+    static void SetResourceBudget(int resource, int budget);
+    static void ConfigureResource(int resource, const char* name, int budget);
+    static void RecordRenderedParticles(unsigned long resource, int numParticles);
+    static void StartLoading(bool first, bool second, bool third, bool fourth);
+    static bool FinishLoading(GLResourcePool* context);
+    static void LoadBundle(void* data, void* nonResidentData, GLResourcePool* context, int bundleType);
 
     /* 0x000 */ EmissionResourceStats mResourceStats[8];
     /* 0x1A0 */ void* mMemoryContext;
@@ -95,17 +115,10 @@ public:
 extern "C" EmissionController* fn_802E7DC4(
     EmissionManager*, const char*, int, bool, unsigned short);
 
-extern "C" void fn_802E6C20(EmissionManager*, void*, int, int);
+extern "C" void Startup(EmissionManager*, void*, int, int);
 EmissionManager* GetEmissionManager();
-extern "C" void fn_802E6620(bool, bool, bool, bool);
-extern "C" bool fn_802E6774(void*);
-extern "C" void fn_802E67E0(
-    void* data, void* allocated, void* context, int value);
-extern "C" void fn_802E9E0C(int resource, int budget);
-extern "C" void fn_802E9E9C(
-    int resource, const char* name, int budget);
-extern "C" void fn_802E9F94(
-    unsigned long resource, int numParticles);
+
+extern GLInventory* gEffectsModelInventory;
 
 void fxSetTerrain(unsigned long terrainID);
 u32 fxGetTerrain();

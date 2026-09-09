@@ -1,5 +1,6 @@
 #include "NL/nlSingleton.inl"
 #include <dwc/dwc_ranking.h>
+#include "Game/OnlinePlayer.h"
 #include "Game/Sys/debug.h"
 #include <revolution/net/NETDigest.h>
 
@@ -19,14 +20,13 @@
 #include <string.h>
 
 
-
 int g_nConnectToStatsAddress[4] = { 192, 168, 2, 188 };
 
 static int g_nConnectToStatsPort = 80;
 static float sReportSocketLifetime = 5000.0f;
 static char sStatsSeparators[] = " \t\r\n:,";
 
-NetworkStatsReporter_8012CE20::NetworkStatsReporter_8012CE20()
+NetworkStatsReporter::NetworkStatsReporter()
 {
     TransportSocketInitialize(&mSocket);
     Reset();
@@ -48,7 +48,7 @@ void NetworkStatsPlayer::CopyFrom(const NetworkStatsPlayer& other)
     memcpy(mData, other.mData, sizeof(mData));
 }
 
-void NetworkStatsReporter_8012CE20::Reset()
+void NetworkStatsReporter::Reset()
 {
     mListener = 0;
     mState = 0;
@@ -68,18 +68,18 @@ void NetworkStatsReporter_8012CE20::Reset()
     mReportStartTime = 0;
 }
 
-void NetworkStatsReporter_8012CE20::Close()
+void NetworkStatsReporter::Close()
 {
     TransportSocketClose(&mSocket);
 }
 
-void NetworkStatsReporter_8012CE20::SetListener(
+void NetworkStatsReporter::SetListener(
     NetworkStatsListener* listener)
 {
     mListener = listener;
 }
 
-bool NetworkStatsReporter_8012CE20::ReportGameResult(int,
+bool NetworkStatsReporter::ReportGameResult(int,
     const NetworkScoreSubmission*, const NetworkStatsPlayer* home,
     const NetworkStatsPlayer* away, bool reportHome, int homeScore,
     int awayScore, const NetworkScoreSubmission*)
@@ -136,18 +136,18 @@ bool NetworkStatsReporter_8012CE20::ReportGameResult(int,
     return true;
 }
 
-bool NetworkStatsReporter_8012CE20::SubmitScore(
+bool NetworkStatsReporter::SubmitScore(
     int, const NetworkRankingMeta*)
 {
     return false;
 }
 
-bool NetworkStatsReporter_8012CE20::StatsVirtual0C()
+bool NetworkStatsReporter::StatsVirtual0C()
 {
     return false;
 }
 
-bool NetworkStatsReporter_8012CE20::GetLeaderboardStats(int category,
+bool NetworkStatsReporter::GetLeaderboardStats(int category,
     int filter, int limit, NetworkStatsPlayer* players,
     NetworkRankingMeta* metadata)
 {
@@ -203,7 +203,7 @@ bool NetworkStatsReporter_8012CE20::GetLeaderboardStats(int category,
     return true;
 }
 
-void NetworkStatsReporter_8012CE20::ParseLeaderboardResponse(
+void NetworkStatsReporter::ParseLeaderboardResponse(
     char* data, int size)
 {
     SimpleParser parser;
@@ -263,7 +263,7 @@ void NetworkStatsReporter_8012CE20::ParseLeaderboardResponse(
     }
 }
 
-void NetworkStatsReporter_8012CE20::Update()
+void NetworkStatsReporter::Update()
 {
     if (mState == 1)
     {
@@ -360,13 +360,13 @@ static u8 sRankingHmacKey[32] = {
     0x91, 0x36, 0xC7, 0xBD, 0x2B, 0x58, 0xBC, 0x39,
 };
 
-NetworkRanking_8012D8F4::NetworkRanking_8012D8F4()
+NetworkRanking::NetworkRanking()
 {
     mInitialized = false;
     Reset();
 }
 
-void NetworkRanking_8012D8F4::Reset()
+void NetworkRanking::Reset()
 {
     mRequestComplete = false;
     mOperation = 0;
@@ -385,7 +385,7 @@ void NetworkRanking_8012D8F4::Reset()
     mCategory = 0;
 }
 
-void NetworkRanking_8012D8F4::ShutdownRanking()
+void NetworkRanking::ShutdownRanking()
 {
     if (mInitialized)
     {
@@ -394,7 +394,7 @@ void NetworkRanking_8012D8F4::ShutdownRanking()
     }
 }
 
-void NetworkRanking_8012D8F4::InitializeRanking()
+void NetworkRanking::InitializeRanking()
 {
     GameInfoSaveSlot* save =
         GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex);
@@ -417,12 +417,12 @@ void NetworkRanking_8012D8F4::InitializeRanking()
     }
 }
 
-void NetworkRanking_8012D8F4::SetListener(NetworkStatsListener* listener)
+void NetworkRanking::SetListener(NetworkStatsListener* listener)
 {
     mListener = listener;
 }
 
-bool NetworkRanking_8012D8F4::ReportGameResult(int category,
+bool NetworkRanking::ReportGameResult(int category,
     const NetworkScoreSubmission*, const NetworkStatsPlayer*,
     const NetworkStatsPlayer*, bool, int, int,
     const NetworkScoreSubmission* fallback)
@@ -486,7 +486,7 @@ void NetworkRankingIdentity::LoadLocal()
     mYear = 2000;
 }
 
-bool NetworkRanking_8012D8F4::SubmitScore(int category,
+bool NetworkRanking::SubmitScore(int category,
     const NetworkRankingMeta* submission)
 {
     int i = 0;
@@ -553,12 +553,12 @@ bool NetworkRanking_8012D8F4::SubmitScore(int category,
     return false;
 }
 
-bool NetworkRanking_8012D8F4::StatsVirtual0C()
+bool NetworkRanking::StatsVirtual0C()
 {
     return false;
 }
 
-bool NetworkRanking_8012D8F4::GetLeaderboardStats(int category,
+bool NetworkRanking::GetLeaderboardStats(int category,
     int filter, int limit, NetworkStatsPlayer* players,
     NetworkRankingMeta* metadata)
 {
@@ -618,7 +618,7 @@ bool NetworkRanking_8012D8F4::GetLeaderboardStats(int category,
     return false;
 }
 
-void NetworkRanking_8012D8F4::ProcessLeaderboardResults()
+void NetworkRanking::ProcessLeaderboardResults()
 {
     u32 rowCount = 0;
     DWCRnkError result = DWC_RnkResGetRowCount(&rowCount);
@@ -725,7 +725,7 @@ void NetworkRanking_8012D8F4::ProcessLeaderboardResults()
     }
 }
 
-void NetworkRanking_8012D8F4::FilterCurrentSeason(int count)
+void NetworkRanking::FilterCurrentSeason(int count)
 {
     NetworkRankingIdentity current;
     current.LoadLocal();
@@ -742,7 +742,7 @@ void NetworkRanking_8012D8F4::FilterCurrentSeason(int count)
     }
 }
 
-int NetworkRanking_8012D8F4::CompareLeaderboardRows(
+int NetworkRanking::CompareLeaderboardRows(
     const void* left, const void* right)
 {
     const NetworkRankingSortRow* a = (const NetworkRankingSortRow*)left;
@@ -811,7 +811,7 @@ int NetworkRanking_8012D8F4::CompareLeaderboardRows(
     return a->mMetadata.mWins < b->mMetadata.mWins;
 }
 
-void NetworkRanking_8012D8F4::AssignDisplayRanks(
+void NetworkRanking::AssignDisplayRanks(
     int count, NetworkRankingMeta* metadata, int firstRank)
 {
     int rank = firstRank;
@@ -829,7 +829,7 @@ void NetworkRanking_8012D8F4::AssignDisplayRanks(
     }
 }
 
-void NetworkRanking_8012D8F4::SortLeaderboardResults(int count)
+void NetworkRanking::SortLeaderboardResults(int count)
 {
     if (count > 1)
     {
@@ -855,7 +855,7 @@ NetworkRankingSortRow::NetworkRankingSortRow()
 {
 }
 
-void NetworkRanking_8012D8F4::Update()
+void NetworkRanking::Update()
 {
     if (!mInitialized || mRequestComplete || mOperation == 0)
     {
@@ -920,16 +920,16 @@ void NetworkRanking_8012D8F4::Update()
     }
 }
 
-static TweakValueIntImpl_804FD898 sConnectToStatsAddress0Tweak(
+static TweakIntBinding sConnectToStatsAddress0Tweak(
     "g_nConnectToStatsAddress0", "Network/Stats",
     &g_nConnectToStatsAddress[0], true);
-static TweakValueIntImpl_804FD898 sConnectToStatsAddress1Tweak(
+static TweakIntBinding sConnectToStatsAddress1Tweak(
     "g_nConnectToStatsAddress1", "Network/Stats",
     &g_nConnectToStatsAddress[1], true);
-static TweakValueIntImpl_804FD898 sConnectToStatsAddress2Tweak(
+static TweakIntBinding sConnectToStatsAddress2Tweak(
     "g_nConnectToStatsAddress2", "Network/Stats",
     &g_nConnectToStatsAddress[2], true);
-static TweakValueIntImpl_804FD898 sConnectToStatsAddress3Tweak(
+static TweakIntBinding sConnectToStatsAddress3Tweak(
     "g_nConnectToStatsAddress3", "Network/Stats",
     &g_nConnectToStatsAddress[3], true);
 

@@ -1,3 +1,4 @@
+#include "NL/gl/glPlat.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
@@ -7,8 +8,6 @@
 #include "Game/GL/GLShadowBlendMeshWriter.h"
 #include "unclassified/tu_8037091C.h"
 
-extern "C" u32 fn_80369D4C();
-extern "C" u32 fn_80369D54();
 
 static char sString_805356E0[] = "shadowvolume";
 static char sString_805356F0[] = "target/shadowvolume";
@@ -16,13 +15,13 @@ static GLRenderPair sRenderPair_806E2408;
 
 extern "C" void fn_8037091C()
 {
-    TargetInfo_8036DE50 info;
+    GLTargetInfo info;
     nlZeroMemory(&info, sizeof(info));
-    info.width = fn_80369D4C();
-    info.height = fn_80369D54();
+    info.width = glplatGetDefaultTargetWidth();
+    info.height = glplatGetDefaultTargetHeight();
     info.format = 6;
     info.unknown18 = 0;
-    sRenderPair_806E2408 = fn_802CD884(sString_805356E0, &info);
+    sRenderPair_806E2408 = glCreateTarget(sString_805356E0, &info);
 }
 
 extern "C" void fn_80370998(GLView* view, GLView*)
@@ -73,11 +72,11 @@ void RenderShadowVolumeBlend(GLView* view)
     float height = glGetOrthographicHeight();
     if (writer.Begin(4, GLP_TriStrip, 0))
     {
-        ((UnidentifiedTextureState*)writer.GetModel()
+        ((glTextureBinding*)writer.GetModel()
                 ->packets->unknown20)[1]
             .texture = 0;
-        UnidentifiedTextureState* state
-            = (UnidentifiedTextureState*)writer.GetModel()
+        glTextureBinding* state
+            = (glTextureBinding*)writer.GetModel()
                   ->packets->unknown20;
         state->texture = texture_806E2410;
         state->textureIndex = 0xFFFF;

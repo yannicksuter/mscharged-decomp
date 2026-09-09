@@ -74,11 +74,11 @@ TLTextInstance* FEFindTextInstance(TLSlide* pTopLevel, InlineHasher Level1,
     InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL),
     InlineHasher Level6 = InlineHasher(0UL));
 
-TLInstance* FEFindInstance(FEPresentation* pPresentation, unsigned long Level1, unsigned long Level2,
+void* FEFindInstance(FEPresentation* pPresentation, unsigned long Level1, unsigned long Level2,
     unsigned long Level3, unsigned long Level4, unsigned long Level5, unsigned long Level6);
-TLInstance* FEFindInstanceRecursive(TLInstance* pInstance, unsigned long Level1, unsigned long Level2,
+void* FEFindInstanceRecursive(TLInstance* pInstance, unsigned long Level1, unsigned long Level2,
     unsigned long Level3, unsigned long Level4, unsigned long Level5, unsigned long Level6);
-TLInstance* FEFindInstance(TLInstance* pInstance, unsigned long Level1, unsigned long Level2,
+void* FEFindInstance(TLInstance* pInstance, unsigned long Level1, unsigned long Level2,
     unsigned long Level3, unsigned long Level4, unsigned long Level5, unsigned long Level6);
 
 template <typename T, int N>
@@ -109,14 +109,14 @@ struct FEFinder
     static inline T* Find(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
         const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
 
-    static inline TLInstance* _Find(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+    static inline T* _Find(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
         const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
 
-    static inline TLInstance* _Find(TLComponentInstance* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+    static inline T* _Find(TLComponentInstance* pTopLevel, const unsigned long Level1, const unsigned long Level2,
         const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
 
     template <typename U>
-    static inline TLInstance* _Find(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+    static inline T* _Find(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
         const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
 };
 
@@ -124,7 +124,7 @@ template <typename T, int N>
 inline T* FEFinder<T, N>::Find(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
-    TLInstance* pResult = FEFindInstance(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    void* pResult = FEFindInstance(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
     if (pResult == 0)
         return 0;
     return (T*)pResult;
@@ -134,7 +134,7 @@ template <typename T, int N>
 inline T* FEFinder<T, N>::Find(TLSlide* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
-    TLInstance* pResult = _Find(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    void* pResult = _Find(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
     if (pResult == 0)
         return 0;
     return (T*)pResult;
@@ -144,7 +144,7 @@ template <typename T, int N>
 inline T* FEFinder<T, N>::Find(TLInstance* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
-    TLInstance* pResult = _Find(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    void* pResult = _Find(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
     if (pResult == 0)
         return 0;
     return (T*)pResult;
@@ -155,7 +155,7 @@ template <typename U>
 inline T* FEFinder<T, N>::Find(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
-    TLInstance* pResult = FEFindInstance((TLInstance*)pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    void* pResult = FEFindInstance((TLInstance*)pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
     if (pResult == 0)
         return 0;
     return (T*)pResult;
@@ -163,7 +163,7 @@ inline T* FEFinder<T, N>::Find(U* pTopLevel, const unsigned long Level1, const u
 
 template <typename T, int N>
 template <typename U>
-inline TLInstance* FEFinder<T, N>::_Find(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+inline T* FEFinder<T, N>::_Find(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
     if (pTopLevel == 0)
@@ -172,8 +172,8 @@ inline TLInstance* FEFinder<T, N>::_Find(U* pTopLevel, const unsigned long Level
     if (pChild == 0)
         return 0;
     if (Level2 == 0)
-        return pChild;
-    return FEFindInstanceRecursive(pChild, Level2, Level3, Level4, Level5, Level6, 0);
+        return (T*)pChild;
+    return (T*)FEFindInstanceRecursive(pChild, Level2, Level3, Level4, Level5, Level6, 0);
 }
 
 template <typename T, int N>
@@ -186,17 +186,17 @@ inline T* FEFinder<T, N>::FindOrDefault(U* pTopLevel, const unsigned long Level1
 }
 
 template <typename T, int N>
-inline TLInstance* FEFinder<T, N>::_Find(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+inline T* FEFinder<T, N>::_Find(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
-    return FEFindInstance(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    return (T*)FEFindInstance(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
 }
 
 template <typename T, int N>
-inline TLInstance* FEFinder<T, N>::_Find(TLComponentInstance* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+inline T* FEFinder<T, N>::_Find(TLComponentInstance* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
-    return FEFindInstance((TLInstance*)pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    return (T*)FEFindInstance((TLInstance*)pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
 }
 
 #endif // _FEFINDER_H_

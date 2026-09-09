@@ -264,11 +264,8 @@ public:
 
     bool IsEnd() const { return nlDLRingIsEnd(m_Head, m_Curr); }
 
-    void Step() { next(); }
-
-    Pointer next()
+    void Step()
     {
-        Pointer result = m_Curr;
         if (nlDLRingIsEnd(m_Head, m_Curr) || m_Curr == 0)
         {
             m_Curr = 0;
@@ -277,6 +274,12 @@ public:
         {
             m_Curr = m_Curr->m_next;
         }
+    }
+
+    Pointer next()
+    {
+        Pointer result = m_Curr;
+        Step();
         return result;
     }
 

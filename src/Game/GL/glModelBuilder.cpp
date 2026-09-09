@@ -1,8 +1,10 @@
+#include "NL/gl/glMaterialProgram.h"
 #include "Game/GL/glModelBuilder.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/glx/glxLoadModel.h"
+#include "NL/gl/glLoadModel.h"
 
 struct UnidentifiedMaterialProgram_802D38A4
 {

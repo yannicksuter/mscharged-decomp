@@ -1,139 +1,32 @@
 #ifndef GAME_NETWORK_MESSAGES_H
 #define GAME_NETWORK_MESSAGES_H
 
-#include <string.h>
-
 #include "Game/DB/BasicGameInfo.h"
+#include "Game/NetworkMessage.h"
 #include "types.h"
 #include "Game/NetworkStatsManager.h"
 
-class UnidentifiedMessageSerializer
-{
-public:
-    UnidentifiedMessageSerializer(int direction, u8* buffer, unsigned long size);
-    ~UnidentifiedMessageSerializer();
-
-    int UnidentifiedGetLength() const { return mPosition - mBuffer; }
-
-    void Transfer(void* value, unsigned long size)
-    {
-        if (mDirection == 0)
-        {
-            memcpy(value, mPosition, size);
-            mPosition += size;
-        }
-        else
-        {
-            memcpy(mPosition, value, size);
-            mPosition += size;
-        }
-    }
-
-    /* 0x00 */ int mDirection;
-    /* 0x04 */ u8* mPosition;
-    /* 0x08 */ u8* mBuffer;
-    /* 0x0C */ u8* mEnd;
-    /* 0x10 */ bool mOwnsBuffer;
-}; // size: 0x14
-
-extern "C" void* fn_8032C66C(unsigned long size, unsigned int alignment, bool);
-
-// Polymorphic network message family. The shared serializer at 0x8032C830
-// walks slot 2 of each message vtable; slot 1 is the pool deleting
-// destructor and slot 0 remains unidentified. Message class identities are
-// reconstructed from the retail send/dispatch log strings; each vtable is
-// emitted with the translation unit that retains its virtual definitions.
-class UnidentifiedNetworkMessage
-{
-public:
-    void* operator new(unsigned long size)
-    {
-        return fn_8032C66C(size, 8, false);
-    }
-    void operator delete(void* p);
-
-    UnidentifiedNetworkMessage()
-        : mUnidentified04(0)
-    {
-    }
-
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~UnidentifiedNetworkMessage() { }
-    virtual int GetType();
-
-    /* 0x04 */ u32 mUnidentified04;
-};
-
-class UnidentifiedNetworkMessageFactory
-{
-public:
-    virtual UnidentifiedNetworkMessage* Create(
-        UnidentifiedMessageSerializer* serializer) = 0;
-};
-
-template <class T>
-class NetworkMessageFactory : public UnidentifiedNetworkMessageFactory
-{
-public:
-    virtual UnidentifiedNetworkMessage* Create(
-        UnidentifiedMessageSerializer* serializer)
-    {
-        T* message = new T;
-        message->Serialize(serializer);
-        return message;
-    }
-};
-
-class UnidentifiedNetworkMessageReceiver
-{
-public:
-    virtual int ReceiverVirtual00(UnidentifiedNetworkMessage* message) = 0;
-};
-
-class UnidentifiedMessageRegistry_8032C7D0
-{
-public:
-    UnidentifiedMessageRegistry_8032C7D0()
-    {
-        memset(mUnidentified000, 0, sizeof(mUnidentified000));
-        memset(mUnidentified400, 0, sizeof(mUnidentified400));
-    }
-
-    int fn_8032C830(UnidentifiedNetworkMessage* message, u8* buffer,
-        unsigned long size);
-    void fn_8032C8CC(int source, u8* buffer, unsigned long size);
-    void fn_8032CA1C(u8 type, UnidentifiedNetworkMessageReceiver* receiver);
-    void fn_8032CA2C(u8 type);
-    void fn_8032CA40(u8 type, UnidentifiedNetworkMessageFactory* factory);
-
-    /* 0x000 */ UnidentifiedNetworkMessageFactory* mUnidentified000[256];
-    /* 0x400 */ UnidentifiedNetworkMessageReceiver* mUnidentified400[256];
-}; // size: 0x800
-
-extern UnidentifiedMessageRegistry_8032C7D0* lbl_806E2100;
-void fn_8032C7D0();
-
 // "Failed to SendTournamentStartToEveryone to %d because no connection".
-class NetMessageTournamentStart : public UnidentifiedNetworkMessage
+class NetMessageTournamentStart : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
+    virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessageTournamentStart() { }
     virtual int GetType();
 
     /* 0x08 */ u8 mMachineIndex;
     /* 0x09 */ u8 mMachineCount;
-    /* 0x0A */ u8 mStadium;
-    /* 0x0B */ u8 mUnidentified0B;
-    /* 0x0C */ u8 mUnidentified0C;
+    /* 0x0A */ u8 mCupPersona;
+    /* 0x0B */ u8 mFirstStadium;
+    /* 0x0C */ u8 mSecondStadium;
     /* 0x0D */ u8 mSeedings[8];
 };
 
 // "Failed to SendGameStartToEveryone to %d because no connection".
-class NetMessageGameStart : public UnidentifiedNetworkMessage
+class NetMessageGameStart : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
+    virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessageGameStart() { }
     virtual int GetType();
 
@@ -150,16 +43,16 @@ public:
     /* 0x24 */ u32 mUnidentified24;
 };
 
-struct UnidentifiedDraftFooter
+struct NetworkDraftSides
 {
     s8 mData[8];
 };
 
-struct UnidentifiedDraftEntry
+struct NetworkDraftMachineInfo
 {
-    UnidentifiedDraftEntry()
+    NetworkDraftMachineInfo()
     {
-        mUnidentified7F = 0;
+        mGuestEnabled = 0;
     }
 
     /* 0x00 */ NetworkRankingMeta mHead;
@@ -167,11 +60,11 @@ struct UnidentifiedDraftEntry
     /* 0x1C */ u16 mName[11];
     /* 0x32 */ u8 mUnidentified32[0x4C];
     /* 0x7E */ u8 mIndex;
-    /* 0x7F */ u8 mUnidentified7F;
+    /* 0x7F */ u8 mGuestEnabled;
 }; // size: 0x80
 
 // "Failed to SendDraftToEveryone to %d because no connection".
-class NetMessageDraft : public UnidentifiedNetworkMessage
+class NetMessageDraft : public NetworkMessage
 {
 public:
     NetMessageDraft()
@@ -185,43 +78,43 @@ public:
         }
     }
 
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
+    virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessageDraft() { }
     virtual int GetType();
 
     /* 0x008 */ s8 mMachineIndex;
     /* 0x009 */ s8 mMachineCount;
     /* 0x00A */ u8 mUnidentified0A;
-    /* 0x00B */ UnidentifiedDraftFooter mUnidentified0B;
-    /* 0x014 */ UnidentifiedDraftEntry mEntries[8];
+    /* 0x00B */ NetworkDraftSides mUnidentified0B;
+    /* 0x014 */ NetworkDraftMachineInfo mEntries[8];
 }; // size: 0x414
 
 // "Failed to SendCheckConnectionToEveryone to %d because no connection".
-class NetMessageCheckConnection : public UnidentifiedNetworkMessage
+class NetMessageCheckConnection : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
+    virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessageCheckConnection() { }
     virtual int GetType();
 
-    /* 0x08 */ u32 mUnidentified08[2];
+    /* 0x08 */ u32 mProfileIds[2];
 };
 
 // Message IDs 16 and 17 are registered by this translation unit, but no
 // surviving behavior-level name has yet been established for either payload.
-class NetworkMessageType16_8050AC38 : public UnidentifiedNetworkMessage
+class NetworkMessageType16 : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetworkMessageType16_8050AC38() { }
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetworkMessageType16() { }
     virtual int GetType();
 };
 
-class NetworkMessageType17_8050AC4C : public UnidentifiedNetworkMessage
+class NetworkMessageType17 : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetworkMessageType17_8050AC4C() { }
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetworkMessageType17() { }
     virtual int GetType();
 
     /* 0x08 */ u32 mUnidentified08;
@@ -229,45 +122,45 @@ public:
 
 // Payload-less loaded-game notifications. Every virtual is inline, so the
 // vtables and retained weak copies belong to the session translation unit.
-class NetMessageLoadedGame : public UnidentifiedNetworkMessage
+class NetMessageLoadedGame : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer*) { }
+    virtual void Serialize(NetworkMessageSerializer*) { }
     virtual ~NetMessageLoadedGame() { }
     virtual int GetType() { return 0xF; }
 };
 
-class NetMessageLoadedGameClient : public UnidentifiedNetworkMessage
+class NetMessageLoadedGameClient : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer*) { }
+    virtual void Serialize(NetworkMessageSerializer*) { }
     virtual ~NetMessageLoadedGameClient() { }
     virtual int GetType() { return 0x12; }
 };
 
-class NetMessageLoadedGameEveryone : public UnidentifiedNetworkMessage
+class NetMessageLoadedGameEveryone : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer*) { }
+    virtual void Serialize(NetworkMessageSerializer*) { }
     virtual ~NetMessageLoadedGameEveryone() { }
     virtual int GetType() { return 0x13; }
 };
 
-class NetworkMessageType22_8050B7B4 : public UnidentifiedNetworkMessage
+class NetMessageDraftMachineInfo : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetworkMessageType22_8050B7B4();
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetMessageDraftMachineInfo();
     virtual int GetType();
 
-    /* 0x008 */ UnidentifiedDraftEntry mEntry;
+    /* 0x008 */ NetworkDraftMachineInfo mEntry;
 }; // size: 0x88
 
 // "Sending NetworkDraftPickedCaptain team %d captain %d".
-class NetMessageDraftPickedCaptain : public UnidentifiedNetworkMessage
+class NetMessageDraftPickedCaptain : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
+    virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessageDraftPickedCaptain();
     virtual int GetType();
 
@@ -276,10 +169,10 @@ public:
 };
 
 // "Ignoring ReceivedDraftPickedSidekicks because in draft state %d".
-class NetMessageDraftPickedSidekicks : public UnidentifiedNetworkMessage
+class NetMessageDraftPickedSidekicks : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
+    virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessageDraftPickedSidekicks();
     virtual int GetType();
 
@@ -289,36 +182,35 @@ public:
     /* 0x0B */ u8 mSidekick2;
 };
 
-// "Failed to SendSidesChangedToEveryone to %d because no connection".
-class NetMessageSidesChanged : public UnidentifiedNetworkMessage
+class NetMessageSidesChanged : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
+    virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessageSidesChanged();
     virtual int GetType();
 
     /* 0x08 */ u8 mMachineIndex;
     /* 0x09 */ u8 mSide;
-    /* 0x0A */ u8 mIsGuest;
-    /* 0x0B */ u8 mIsResponse;
+    /* 0x0A */ u8 mGuest;
+    /* 0x0B */ u8 mAccepted;
 };
 
-class NetworkMessageType27_8050B750 : public UnidentifiedNetworkMessage
+class NetMessageConnectionDecision : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetworkMessageType27_8050B750();
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetMessageConnectionDecision();
     virtual int GetType();
 
-    /* 0x08 */ u8 mUnidentified08;
-    /* 0x09 */ s8 mUnidentified09;
+    /* 0x08 */ u8 mAccepted;
+    /* 0x09 */ s8 mMachineIndex;
 };
 
-class NetMessagePauseRequest_8050AD7C : public UnidentifiedNetworkMessage
+class NetMessagePauseRequest : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetMessagePauseRequest_8050AD7C();
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetMessagePauseRequest();
     virtual int GetType();
 
     /* 0x08 */ u8 mMachineIndex;
@@ -326,41 +218,41 @@ public:
 };
 
 // "HOST sending Pause Response to all clients and myself".
-class NetMessagePauseResponse_8050AD68 : public UnidentifiedNetworkMessage
+class NetMessagePauseResponse : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetMessagePauseResponse_8050AD68() { }
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetMessagePauseResponse() { }
     virtual int GetType();
 
     /* 0x08 */ u8 mMachineMask;
 };
 
-class NetworkMessageType30_8050ADA4 : public UnidentifiedNetworkMessage
+class NetworkMessageType30 : public NetworkMessage
 {
 public:
-    NetworkMessageType30_8050ADA4()
+    NetworkMessageType30()
         : mUnidentified08(0)
     {
     }
 
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetworkMessageType30_8050ADA4();
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetworkMessageType30();
     virtual int GetType();
 
     /* 0x08 */ u32 mUnidentified08;
 };
 
-class NetworkMessageType31_8050AD90 : public UnidentifiedNetworkMessage
+class NetworkMessageType31 : public NetworkMessage
 {
 public:
-    NetworkMessageType31_8050AD90()
+    NetworkMessageType31()
         : mUnidentified08(0)
     {
     }
 
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetworkMessageType31_8050AD90();
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetworkMessageType31();
     virtual int GetType();
 
     /* 0x08 */ u32 mUnidentified08;
@@ -368,7 +260,7 @@ public:
 
 // Periodic state for one game in the online tournament bracket. The message
 // carries a full BasicGameInfo only when mHasGameInfo is set.
-class NetMessageTournamentGameUpdate : public UnidentifiedNetworkMessage
+class NetMessageTournamentGameUpdate : public NetworkMessage
 {
 public:
     NetMessageTournamentGameUpdate() { }
@@ -385,7 +277,7 @@ public:
     {
     }
 
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
+    virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessageTournamentGameUpdate();
     virtual int GetType();
 
@@ -401,7 +293,7 @@ public:
 
 // Per-machine loading notification used while moving between a tournament
 // matchup and the knockout presentation.
-class NetMessageTournamentLoadingState : public UnidentifiedNetworkMessage
+class NetMessageTournamentLoadingState : public NetworkMessage
 {
 public:
     NetMessageTournamentLoadingState() { }
@@ -412,7 +304,7 @@ public:
     {
     }
 
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
+    virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessageTournamentLoadingState();
     virtual int GetType();
 
@@ -420,11 +312,11 @@ public:
     /* 0x09 */ u8 mFinishedLoadingToKnockout;
 };
 
-class NetworkMessageType34_8050ADCC : public UnidentifiedNetworkMessage
+class NetworkMessageType34 : public NetworkMessage
 {
 public:
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~NetworkMessageType34_8050ADCC() { }
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetworkMessageType34() { }
     virtual int GetType();
 
     /* 0x08 */ u16 mUnidentified08;
@@ -434,10 +326,10 @@ public:
     /* 0x0E */ u8 mUnidentified0E;
 };
 
-class UnidentifiedNetworkMessage_80126D84 : public UnidentifiedNetworkMessage
+class NetworkMessageType35 : public NetworkMessage
 {
 public:
-    UnidentifiedNetworkMessage_80126D84()
+    NetworkMessageType35()
         : mCount(0)
     {
         for (int i = 0; i < 8; ++i)
@@ -446,8 +338,8 @@ public:
         }
     }
 
-    virtual void Serialize(UnidentifiedMessageSerializer* serializer);
-    virtual ~UnidentifiedNetworkMessage_80126D84() { }
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetworkMessageType35() { }
     virtual int GetType();
 
     /* 0x08 */ u8 mCount;

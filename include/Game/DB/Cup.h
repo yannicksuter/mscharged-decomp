@@ -25,10 +25,10 @@ struct BaseCup
     virtual TeamStats* GetTeamStats(int index) = 0;
     virtual TeamStats* GetPreviousTeamStats() = 0;
     virtual u16 GetNumTeams() = 0;
-    virtual u16 GetNumGamesPerRound(int phase) = 0;
+    virtual u16 GetNumRounds(int phase) = 0;
     virtual u16 GetNumRounds() = 0;
-    virtual u16 GetNumRegularGames() = 0;
-    virtual u16 GetNumPlayoffGames() = 0;
+    virtual u16 GetNumRegularRounds() = 0;
+    virtual u16 GetNumPlayoffRounds() = 0;
     virtual u16 GetFirstRoundNumber() = 0;
     virtual void Reset() = 0;
     virtual void* SerializeData(void* dst) const;
@@ -45,10 +45,10 @@ struct Cup : public BaseCup
     virtual TeamStats* GetTeamStats(int index);
     virtual TeamStats* GetPreviousTeamStats();
     virtual u16 GetNumTeams();
-    virtual u16 GetNumGamesPerRound(int phase);
+    virtual u16 GetNumRounds(int phase);
     virtual u16 GetNumRounds();
-    virtual u16 GetNumRegularGames();
-    virtual u16 GetNumPlayoffGames();
+    virtual u16 GetNumRegularRounds();
+    virtual u16 GetNumPlayoffRounds();
     virtual u16 GetFirstRoundNumber();
     virtual void Reset();
     virtual void* SerializeData(void* dst) const;

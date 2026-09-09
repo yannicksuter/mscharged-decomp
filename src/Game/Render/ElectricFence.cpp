@@ -201,15 +201,15 @@ static void DrawPrimitive(const ElectricFenceGeometry& prim,
     colour[3] = 1.0f;
     if (mesh.Begin(prim.vertCount, nPrimType, 0))
     {
-        UnidentifiedTextureState* textureState =
-            (UnidentifiedTextureState*)mesh.model->packets->unknown20;
+        glTextureBinding* textureState =
+            (glTextureBinding*)mesh.model->packets->unknown20;
         textureState->texture = textureHandle;
         textureState->textureIndex = 0xFFFF;
         textureState->SetWrapS(false);
         textureState->SetWrapT(false);
         textureState->unknown07 = 0;
         memcpy((u8*)mesh.GetModel()->packets->unknown20
-                + sizeof(UnidentifiedTextureState),
+                + sizeof(glTextureBinding),
             colour, sizeof(colour));
 
         int index = 0;
@@ -269,7 +269,7 @@ static void RenderElectricFenceFlat(const nlVector3& position,
     glSetDefaultState(false);
 }
 
-static void ElectricFenceFinished(EmissionController& controller)
+static void ElectricFenceFinished(EmissionController& controller, int reason)
 {
     ElectricFenceData* node = ElectricFenceData::sActiveElectricFences.m_pStart;
     while (node != 0)
@@ -394,7 +394,7 @@ bool EmitElectricFenceBallEffect(const nlVector3& pos,
         controller->SetUpdateCallback(
             Function1<void, EmissionController&>(RenderElectricFence));
         controller->SetFinishedCallback(
-            Function1<void, EmissionController&>(ElectricFenceFinished));
+            Function2<void, EmissionController&, int>(ElectricFenceFinished));
         return true;
     }
     return false;
@@ -424,7 +424,7 @@ void EmitElectricFenceCharacterEffect(const nlVector3& pos,
         controller->SetUpdateCallback(
             Function1<void, EmissionController&>(RenderElectricFence));
         controller->SetFinishedCallback(
-            Function1<void, EmissionController&>(ElectricFenceFinished));
+            Function2<void, EmissionController&, int>(ElectricFenceFinished));
     }
 }
 

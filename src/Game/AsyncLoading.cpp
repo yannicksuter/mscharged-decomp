@@ -1,5 +1,13 @@
 #include "Game/Sys/audio.h"
+#include "Game/Render/StadiumLoading.h"
+#include "Game/Font/fontmanager.h"
 #include "Game/AsyncLoading.h"
+#include "Game/DB/GameProgress.h"
+#include "Game/GameInfo.h"
+#include "Game/NetTournManager.h"
+#include "Game/Render/NPCManager.h"
+#include "Game/TrophyInfo.h"
+#include "Game/GameTweaks.h"
 #include "NL/nlFunctionMemory.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Event.h"
@@ -11,7 +19,7 @@
 #include "Game/Task/DispatchEventsTask.h"
 #include "Game/Task/SmokeTestUpdateTask.h"
 #include "NL/globalpad.h"
-#include "unclassified/tu_801B369C.h"
+#include "Game/Render/Warble.h"
 
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioBankTable.h"
@@ -40,7 +48,7 @@
 #include "Game/Render/FlareHandler.h"
 #include "Game/ReplayChoreo.h"
 #include "Game/ReplayManager.h"
-#include "Game/ResourceInterface_802CC094.h"
+#include "NL/gl/glMemory.h"
 #include "Game/SAnim.h"
 #include "Game/SAnim/pnBlender.h"
 #include "Game/SAnim/pnFeather.h"
@@ -50,11 +58,11 @@
 #include "Game/Task/ParticleUpdateTask.h"
 #include "Game/Transitions/ScreenTransitionManager.h"
 #include "Game/TweakValue.h"
+#include "Game/TweakRegistry.h"
 #include "Game/Task/TweakerTask.h"
 #include "NL/gl/gl.h"
-#include "NL/gl/glMemory.h"
 #include "NL/nlPrint.h"
-#include "unclassified/tu_80332DC0.h"
+#include "Game/InputRouter.h"
 #include "NL/nlConfig.h"
 #include "NL/nlDebug.h"
 #include "NL/nlFile.h"
@@ -69,9 +77,9 @@
 #include "NL/nlTime.h"
 #include "types.h"
 #include "unclassified/tu_80188884.h"
-#include "unclassified/tu_80332770.h"
-#include "unclassified/tu_80336B2C.h"
-#include "unclassified/tu_80338898.h"
+#include "Game/InputManager.h"
+#include "Game/NetworkInput.h"
+#include "Game/NetworkSync.h"
 #include "NL/nlstring_tmpl.h"
 
 #define OS_BUS_CLOCK_SPEED           (*(volatile u32*)0x800000F8)
@@ -107,8 +115,7 @@ struct FrameTimingStat
 };
 
 extern "C" void fn_801CC114();
-extern "C" void fn_801A95F0(void*, const char*, int);
-extern "C" bool IsNetworkOrRecordedGame();
+bool IsNetworkOrRecordedGame();
 extern "C" u32 OSGetTick();
 extern "C" void OSYieldThread();
 
@@ -118,25 +125,18 @@ extern "C" void fn_8027E5D4();
 extern "C" void fn_800AA3E8(void*, int);
 extern "C" void fn_801AF97C(void*);
 extern "C" void fn_80013660(void*, int);
-extern "C" void fn_801AB9D4(void*);
 extern "C" void fn_801A01F8();
-extern "C" void fn_801AAD0C(void*);
-extern "C" void fn_80276F5C();
 extern "C" void fn_801440BC();
 extern "C" void fn_8013DB18();
-extern "C" void fn_801B4238(void*);
-extern "C" void fn_800741A4(void*);
+ void ShutdownWarbleRendering(void*);
 extern "C" void fn_8013DDD4();
 extern "C" void fn_802EC9D0(void*);
 
 extern "C" void fn_801ACFC4();
-extern "C" void fn_801A5328();
+ void FreeImpostorLighting();
 extern "C" void fn_80183E4C();
 extern "C" void fn_802DB9C4(void*);
-extern "C" bool fn_801C4D40();
-extern "C" void fn_801C4CBC();
 extern "C" void fn_802BDA28();
-extern "C" void fn_802C0CCC();
 extern "C" void fn_80143FD4();
 
 void fn_80056EA8();
@@ -147,9 +147,7 @@ extern FrameTimingStat* lbl_806E169C;
 extern FrameTimingStat* lbl_806E16A0;
 extern cBall* g_pBall;
 extern u8 lbl_80574148[];
-extern u8 gGameTweaks[];
-extern u8 lbl_805721E8[];
-extern UnidentifiedDeletable* lbl_806E2090;
+extern u8 gCrowdModelCollection[];
 extern SlotPool<cSAnimCallback> lbl_805840D8;
 extern SlotPoolBase lbl_8057AB80;
 extern bool g_e3_Build;
@@ -158,8 +156,6 @@ namespace Detail
 {
 extern SlotPoolBase sTempStringAllocatorPool;
 }
-
-extern void* lbl_806E1608;
 
 bool g_VerboseAudio;
 float g_fScriptBlockingWarningMS = 50.0f;
@@ -171,7 +167,7 @@ static u8 lbl_806E1044;
 static u32 lbl_806E1048;
 static float lbl_806E104C;
 static UnidentifiedDeletable* lbl_806E1050;
-static void* lbl_806E1054;
+static GLResourcePool* sPersistentResourcePool;
 static int lbl_806E1058;
 static float lbl_806E105C;
 static void* lbl_806E1060;
@@ -180,18 +176,18 @@ static bool lbl_806E1068;
 static bool lbl_806E1069;
 static bool lbl_806E106A;
 
-static TweakValueBoolImpl_804F4538 lbl_8056E458(
+static TweakBoolBinding lbl_8056E458(
     "g_VerboseAudio", "Audio", &g_VerboseAudio, true);
-static TweakValueBoolImpl_804F4538 lbl_8056E478(
+static TweakBoolBinding lbl_8056E478(
     "g_bDumpMemoryStatsOnLoad", "General/Memory",
     &g_e3_Build, true);
-static TweakValueImpl_804F4DC8 lbl_8056E498(
+static TweakFloatBinding lbl_8056E498(
     "g_fScriptBlockingWarningMS", "Loading",
     &g_fScriptBlockingWarningMS);
-static TweakValueImpl_804F4DC8 lbl_8056E4B8(
+static TweakFloatBinding lbl_8056E4B8(
     "g_fYieldScriptBlockingTimeMS", "Loading",
     &g_fYieldScriptBlockingTimeMS);
-static AsyncLoadingManager lbl_8056E4D8;
+static AsyncLoadingManager sAsyncLoadingManager;
 
 static inline void ReleaseUnidentifiedOwner(UnidentifiedOwnerHandle* handle)
 {
@@ -229,7 +225,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     switch (functionIndex)
     {
     case 0:
-        fn_8011B430(this);
+        LoadTrophyTemplates();
         break;
     case 6:
         fn_8011B2E4(this);
@@ -282,9 +278,9 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     }
 }
 
-extern "C" AsyncLoadingManager* fn_80118A74()
+AsyncLoadingManager* AsyncLoadingManager::Instance()
 {
-    return &lbl_8056E4D8;
+    return &sAsyncLoadingManager;
 }
 
 AsyncLoadingManager::~AsyncLoadingManager()
@@ -299,7 +295,7 @@ AsyncLoadingManager::~AsyncLoadingManager()
 
 extern "C" void fn_80118B38(void* data, unsigned long, void*)
 {
-    AsyncLoadingManager* manager = &lbl_8056E4D8;
+    AsyncLoadingManager* manager = &sAsyncLoadingManager;
     manager->mByteCode = data;
     manager->LoadByteCode(data);
 }
@@ -613,8 +609,8 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 {
     manager->mLoadingComment = "DestroyGameState";
 
-    nlPrintf("RL memory free: %dK\n", fn_802CC094()->GetFreeMemory() >> 10);
-    fn_802CC094();
+    nlPrintf("RL memory free: %dK\n", glGetCurrentResourcePool()->GetFreeMemory() >> 10);
+    glGetCurrentResourcePool();
 
     manager->mLoadingState = 3;
 
@@ -660,12 +656,12 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     DisconnectEventOwner(&manager->mLoadingHandle);
     FEMusic::StopStream();
     BeginFrameTask::s_FramerateLocked = false;
-    fn_80332EC8();
-    fn_80337FF0(lbl_806E2164, 0);
-    fn_80338900(lbl_806E2168, 0);
+    OnInputSessionReset();
+    gNetworkInputRecording->Reset(0);
+    gNetworkSyncState->Reset(0);
     g_pNetworkSessionBase->BaseVirtual48(5);
-    fn_803330AC()->Reset(0);
-    lbl_806E2138->fn_8033288C();
+    GetInputRouter()->Reset(0);
+    gInputManager->Reset();
     g_pNetworkSessionBase->Initialize(false);
 
     g_pTeams[0]->StopGameplayEffectsAndSounds();
@@ -679,11 +675,11 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     g_pBall = 0;
     FakeBallWorld::Destroy();
     cCameraManager::Shutdown();
-    fn_801AB9D4(lbl_806E1608);
+    gNPCManager->DestroyNPCs();
     fn_801A01F8();
-    fn_801AAD0C(lbl_806E1608);
+    gNPCManager->UnloadTransientNPCTemplates();
     ParticleUpdateTask::sInstance->Shutdown();
-    fn_80276F5C();
+    DestroyStadium();
     fn_80115FB4();
     GetFixedUpdateTask()->Reset();
     fn_801440BC();
@@ -692,7 +688,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     Jumbotron::instance.Uninitialize();
     CrowdManager::instance.Uninitialize();
     ShutdownWarble(&gWarble);
-    fn_801B4238(&lbl_806E16D4);
+    ShutdownWarbleRendering(&gWarbleEnabled);
 
     if (nlSingleton<UnidentifiedManager_80188928>::s_pInstance != 0)
     {
@@ -702,7 +698,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     FreeElectricFence();
     DestroyGame();
-    fn_800741A4(gGameTweaks);
+    DestroyGameTweaks(&gGameTweaks);
     fn_8013DDD4();
 
     fn_802B467C(&Detail::sTempStringAllocatorPool);
@@ -734,22 +730,22 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     StopCrowdReactions();
     fn_801ACFC4();
-    fn_801A5328();
+    FreeImpostorLighting();
     fn_80183E4C();
-    fn_802DB9C4(lbl_805721E8);
+    fn_802DB9C4(gCrowdModelCollection);
     CleanBoundingBoxCache();
     StatsTracker::Instance()->DestroyEventHandler();
     FEResourceManager::Instance()->UnloadPermanentResourceBundle();
-    fn_801C4D40();
+    UnloadFEMiniBundle();
     FEResourceManager::Instance()->Cleanup();
-    fn_801C4CBC();
+    DestroyFEResourcePool();
     ScreenTransitionManager::Instance()->CancelAllTransitions();
-    fn_802CC094()->ReleaseResource((unsigned long)manager->mUnidentified50);
+    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified50);
 
-    if (lbl_806E2090 != 0)
+    if (FontManager::s_pInstance != 0)
     {
-        delete lbl_806E2090;
-        lbl_806E2090 = 0;
+        delete FontManager::s_pInstance;
+        FontManager::s_pInstance = 0;
     }
 
     nlFree(g_pLocalization->m_pFile);
@@ -767,14 +763,14 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     {
         fn_802BDA28();
     }
-    fn_802C0CCC();
-    fn_802C8180();
+    ResetDynamicTweaks();
+    glCompact();
     fn_802B467C(&lbl_8057AB80);
     SlotPoolBase::BaseFreeBlocks(&lbl_8057AB80, 8);
     FreeFunctionMemoryPools();
-    fn_802CC094()->ReleaseResource((unsigned long)manager->mUnidentified4C);
-    fn_802CC02C(fn_802CC094());
-    fn_802CC08C(0);
+    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified4C);
+    glDestroyResourcePool(glGetCurrentResourcePool());
+    glSetCurrentResourcePool(0);
     FreeEventDataPools();
     fn_80143FD4();
     fn_80111658(true);
@@ -842,23 +838,39 @@ extern "C" void fn_8011B424(void*, unsigned long, unsigned long)
     lbl_806E1069 = true;
 }
 
-extern "C" void fn_8011B430(AsyncLoadingManager*)
+void AsyncLoadingManager::LoadTrophyTemplates()
 {
+    char trophyName[64];
     if (GetConfigBool(Config::Global(), "TrophyTest", false))
     {
-        fn_801A95F0(lbl_806E1608, "TrophyBanana", 0);
-        fn_801A95F0(lbl_806E1608, "TrophyCrystalCup", 0);
-        fn_801A95F0(lbl_806E1608, "TrophyFireCup", 0);
-        fn_801A95F0(lbl_806E1608, "TrophyFlower", 0);
-        fn_801A95F0(lbl_806E1608, "TrophyKonga", 0);
-        fn_801A95F0(lbl_806E1608, "TrophyLava", 0);
-        fn_801A95F0(lbl_806E1608, "TrophyMushroom", 0);
-        fn_801A95F0(lbl_806E1608, "TrophyNextlevelCup", 0);
-        fn_801A95F0(lbl_806E1608, "TrophyNintendo", 0);
-        fn_801A95F0(lbl_806E1608, "TrophySand", 0);
-        fn_801A95F0(lbl_806E1608, "TrophyStar", 0);
-        fn_801A95F0(lbl_806E1608, "TrophyStrikerCup", 0);
-        fn_801A95F0(lbl_806E1608, "TrophySunshine", 0);
+        gNPCManager->CreateNPCTemplate("TrophyBanana", false);
+        gNPCManager->CreateNPCTemplate("TrophyCrystalCup", false);
+        gNPCManager->CreateNPCTemplate("TrophyFireCup", false);
+        gNPCManager->CreateNPCTemplate("TrophyFlower", false);
+        gNPCManager->CreateNPCTemplate("TrophyKonga", false);
+        gNPCManager->CreateNPCTemplate("TrophyLava", false);
+        gNPCManager->CreateNPCTemplate("TrophyMushroom", false);
+        gNPCManager->CreateNPCTemplate("TrophyNextlevelCup", false);
+        gNPCManager->CreateNPCTemplate("TrophyNintendo", false);
+        gNPCManager->CreateNPCTemplate("TrophySand", false);
+        gNPCManager->CreateNPCTemplate("TrophyStar", false);
+        gNPCManager->CreateNPCTemplate("TrophyStrikerCup", false);
+        gNPCManager->CreateNPCTemplate("TrophySunshine", false);
+    }
+    else if (GameInfoManager::Instance()->IsOnline()
+        && GameInfoManager::Instance()->IsInMode1())
+    {
+        int cupPersona = NetTournManager::Instance()->GetCupPersona();
+        const char** names = GetCupPersonaTrophyNames();
+        nlSNPrintf(trophyName, sizeof(trophyName), "Trophy%s", names[cupPersona]);
+        gNPCManager->CreateNPCTemplate(trophyName, false);
+    }
+    else if (GameInfoManager::Instance()->IsInMode3())
+    {
+        int cup = CupManager::Instance()->GetCurrentMode();
+        const char** names = GetCupTrophyNames();
+        nlSNPrintf(trophyName, sizeof(trophyName), "Trophy%s", names[cup]);
+        gNPCManager->CreateNPCTemplate(trophyName, false);
     }
 }
 
@@ -869,9 +881,9 @@ extern "C" void fn_8011B6E8(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void* fn_8011B850()
+GLResourcePool* AsyncLoadingManager::GetPersistentResourcePool()
 {
-    return lbl_806E1054;
+    return sPersistentResourcePool;
 }
 
 extern "C" UnidentifiedOwnerHandle* fn_8011B858(
@@ -890,9 +902,4 @@ extern "C" UnidentifiedOwnerHandle* fn_8011B858(
         }
     }
     return handle;
-}
-
-extern "C" void* fn_8011B8D8(UnidentifiedLoadingStateProvider* provider)
-{
-    return provider->mUnidentified18;
 }

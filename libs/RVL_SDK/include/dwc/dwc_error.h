@@ -2,7 +2,7 @@
 
 #include <revolution/types.h>
 
-#include <dwc/dwci_error.h>
+#include <dwc/dwc_error_fwd.h>
 
 #define DWC_ECODE_SEQ_LOGIN      (-60000)
 #define DWC_ECODE_SEQ_FRIEND     (-70000)
@@ -37,16 +37,12 @@
 #define DWC_ECODE_TYPE_TRANS_BODY   (-620)
 #define DWC_ECODE_TYPE_UNEXPECTED   (-9)
 
-typedef DWCErrorType DWCError;
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    int DWC_GetLastError(int* errorCode);
-    s32 DWC_GetLastErrorEx(s32* errorCode, DWCErrorType* errorType);
-    void DWC_ClearError();
 
 #ifdef __cplusplus
 }

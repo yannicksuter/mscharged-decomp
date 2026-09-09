@@ -587,9 +587,8 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                     (SceneList)10, SCREEN_NOTHING, false);
-                Function<FnVoidVoid> callback(
-                    Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed), this));
-                popup->Create((ePopupMenu)error, callback);
+                popup->Create((ePopupMenu)error,
+                    Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed), this)));
                 mPopupActive = true;
             }
 

@@ -527,6 +527,13 @@ public:
         Base::operator=(other);
         return *this;
     }
+
+    template <typename Other>
+    Function& operator=(const Other& other)
+    {
+        Base::operator=(other);
+        return *this;
+    }
 };
 
 template <typename ReturnType, typename P1, typename P2>
@@ -662,6 +669,42 @@ private:
         ReturnType (*mFreeFunction)(P1, P2);
         FunctorBase* mFunctor;
     };
+};
+
+template <typename ReturnType, typename P1, typename P2>
+class Function<ReturnType(P1, P2)> : public Function2<ReturnType, P1, P2>
+{
+    typedef Function2<ReturnType, P1, P2> Base;
+
+public:
+    Function()
+        : Base()
+    {
+    }
+
+    Function(ReturnType (*function)(P1, P2))
+        : Base(function)
+    {
+    }
+
+    template <typename Callable>
+    Function(Callable callable)
+        : Base(callable)
+    {
+    }
+
+    Function& operator=(const Function& other)
+    {
+        Base::operator=(other);
+        return *this;
+    }
+
+    template <typename Other>
+    Function& operator=(const Other& other)
+    {
+        Base::operator=(other);
+        return *this;
+    }
 };
 
 template <typename ReturnType, typename P1, typename P2, typename P3>

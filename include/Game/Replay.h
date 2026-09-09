@@ -169,6 +169,58 @@ public:
     /* 0x44 */ int mActualMaxFrameSize;
 };
 
+class UnidentifiedReplayFramePool
+{
+public:
+    union Entry
+    {
+        Entry* next;
+        unsigned char storage[sizeof(Replay::Frame)];
+    };
+
+    UnidentifiedReplayFramePool(void* entries)
+        : mFree((Entry*)entries)
+        , mEntries((Entry*)entries)
+    {
+        Reset();
+    }
+
+    ~UnidentifiedReplayFramePool()
+    {
+    }
+
+    Replay::Frame* Allocate()
+    {
+        Entry* entry = mFree;
+        if (entry != 0)
+        {
+            mFree = entry->next;
+        }
+        return (Replay::Frame*)entry;
+    }
+
+    void Free(Replay::Frame* entry)
+    {
+        Entry* slot = (Entry*)entry;
+        slot->next = mFree;
+        mFree = slot;
+    }
+
+    void Reset()
+    {
+        for (int i = 0; i < 2000 - 1; ++i)
+        {
+            mEntries[i].next = &mEntries[i] + 1;
+        }
+        mEntries[2000 - 1].next = 0;
+    }
+
+    Entry* mFree;
+    Entry* mEntries;
+};
+
+extern "C" UnidentifiedReplayFramePool* lbl_806E1E9C;
+
 template <typename T>
 void Replay::Play(
     float time, T& previous, T& current, float* blend) const
@@ -239,6 +291,49 @@ void Replay::Play(
             rhs = Next(rhs, mReelIdx);
         }
     }
+}
+
+template <typename T>
+void Replay::Record(float time, T& snapshot, unsigned int events, unsigned int unidentifiedState)
+{
+    for (int interval = 1; interval <= 3; interval++)
+    {
+        if (mTick % interval == 0)
+        {
+            NewFrame();
+
+            SaveFrame frame;
+            char* storage = mFree->mBegin;
+            frame.mInterval = interval;
+            frame.mStream.mCount = 0;
+            frame.mStream.mStorage = storage;
+            snapshot.Replay(frame);
+
+            int frameSize = frame.mStream.mStorage - mFree->mBegin;
+            if (mActualMaxFrameSize < frameSize)
+            {
+                mActualMaxFrameSize = frameSize;
+            }
+
+            mReels[0].mLast = mFree;
+            mFree->mReelIdx = 0;
+            mFree->mTime = time;
+            mFree->mInterval = interval;
+            mFree->mEvents = events;
+            mFree->mUnidentifiedState = unidentifiedState;
+
+            Frame* allocated = lbl_806E1E9C->Allocate();
+            if (allocated != 0)
+            {
+                new (allocated) Frame(mFree->mBegin + frameSize, mFree->mSize - frameSize, mFree->mNext);
+            }
+            mFree->mNext = allocated;
+            mFree->mSize = frameSize;
+            mFree = mFree->mNext;
+        }
+    }
+
+    mTick++;
 }
 
 extern "C" void fn_802C7FA4(Replay*, Replay::Frame**, Replay::Frame**,

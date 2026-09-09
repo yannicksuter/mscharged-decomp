@@ -1,39 +1,38 @@
 #ifndef GAME_BASIC_STADIUM_H
 #define GAME_BASIC_STADIUM_H
 
+#include "Game/World.h"
 #include "NL/nlMath.h"
-#include "types.h"
 
-class DrawableObject;
-template <typename T> class DLListEntry;
+struct HighRangeTweakValues_801A2004;
 
-struct UnidentifiedStadiumShadowData
-{
-    /* 0x00 */ u8 unknown00[0x8C];
-    /* 0x8C */ nlVector3 unknown8C;
-    /* 0x98 */ float shadowHeight;
-};
-
-class BasicStadium
+class BasicStadium : public World
 {
 public:
-    static BasicStadium* GetCurrentStadium();
+    BasicStadium(GLResourcePool* pResource);
+    virtual ~BasicStadium();
+    virtual DrawableObject* HandleObjectCreation(
+        unsigned long uType, WorldObjectLoadContext* pContext);
+    virtual void Update(float fDeltaT, bool bUpdateState, bool bUpdateNPCs);
 
-    /* 0x00 */ u8 mUnidentified000[0x08];
-    /* 0x08 */ DLListEntry<DrawableObject*>* mUnidentified008;
-    /* 0x0C */ u8 mUnidentified00C[0x5C];
-    /* 0x68 */ void* mUnidentified068;
-    /* 0x6C */ void* mUnidentified06C;
-    /* 0x70 */ bool mUnidentified070;
+    static BasicStadium* GetCurrentStadium();
+    void SetEffectsActive(unsigned long uType, int active);
+
+    /* 0x7C */ nlAVLTree<unsigned long, DrawableObject*,
+        DefaultKeyCompare<unsigned long> > m_registeredDrawables;
+    /* 0x8C */ nlVector3 m_shadowLightPosition;
+    /* 0x98 */ float m_shadowHeight;
+    /* 0x9C */ float m_fTime;
+    /* 0xA0 */ HighRangeTweakValues_801A2004* m_pHighRangeTweaks;
+    /* 0xA4 */ HighRangeTweakValues_801A2004* m_pStadiumHighRangeTweaks;
+    /* 0xA8 */ HighRangeTweakValues_801A2004* m_pMegastrikeHighRangeTweaks;
 };
 
+typedef char BasicStadium_size_check[sizeof(BasicStadium) == 0xAC ? 1 : -1];
 
+bool SetWorldAnimation(const char* objectName, const char* animationName,
+    ePlayMode playMode);
 void UpdateHighRange();
 void RenderWorldNPCs();
-
-
-void fn_80276FB8(float fDeltaT);
-bool fn_80277238();
-void fn_80278A00(BasicStadium* stadium, int param2, int param3);
 
 #endif // GAME_BASIC_STADIUM_H

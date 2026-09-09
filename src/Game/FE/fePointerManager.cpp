@@ -36,5 +36,5 @@ void FEPointerManager::UnregisterListener(FEPointerListener* listener)
 
 static float sPositionRadius = 0.02f;
 static float sPositionSensitivity = 0.95f;
-static TweakValueImpl_804F4DC8 sPositionRadiusTweak("Pos Radius", "FE", &sPositionRadius);
-static TweakValueImpl_804F4DC8 sPositionSensitivityTweak("Pos Sensitivity", "FE", &sPositionSensitivity);
+static TweakFloatBinding sPositionRadiusTweak("Pos Radius", "FE", &sPositionRadius);
+static TweakFloatBinding sPositionSensitivityTweak("Pos Sensitivity", "FE", &sPositionSensitivity);

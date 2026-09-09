@@ -1,11 +1,12 @@
+#include "NL/nlPrint.h"
 #include "Game/AI/FielderInput.h"
 #include "Game/AI/TeamPlayMachine.h"
 
 #include "Game/MathHelpers.h"
 #include "NL/nlMath.h"
 #include "NL/nlTicker.h"
+#include "NL/nlPrint.h"
 
-extern void nlPrintf(const char*, ...);
 
 extern UnidentifiedVariant_80054AB8 lbl_80584250;
 
@@ -27,7 +28,7 @@ public:
 
 float fn_8030F5DC()
 {
-    return fn_802AAA28(nlGetTicker());
+    return nlTicksToMilliseconds(nlGetTicker());
 }
 
 UnidentifiedFielderInput::~UnidentifiedFielderInput()

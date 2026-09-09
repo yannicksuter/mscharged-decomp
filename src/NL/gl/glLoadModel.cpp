@@ -1,10 +1,13 @@
+#include "NL/nlPrint.h"
 #include "NL/gl/glLoadModel.h"
+#include "NL/gl/glMaterialProgram.h"
 
 #include "Game/GL/GLInventory.h"
 #include "Game/GL/GLVertexAnim.h"
 #include "Game/SAnim.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
+#include "NL/gl/glMemory.h"
 #include "NL/glx/glxLoadModel.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlFunction.h"
@@ -12,15 +15,9 @@
 
 #include <string.h>
 
-extern "C"
-{
-    void* fn_802CC0A4(unsigned long size, int memoryType, void* allocator);
-    int nlPrintf(const char* format, ...);
-}
 
 typedef nlAVLTree<unsigned long, void*, DefaultKeyCompare<unsigned long> >
     MaterialProgramTree;
-typedef Function2<bool, unsigned long&, void*&> MaterialProgramCallback;
 
 static bool glIgnoreDuplicateModels;
 static MaterialProgramTree sMaterialPrograms;
@@ -30,7 +27,7 @@ void glSetIgnoreDuplicateModels(bool ignore)
     glIgnoreDuplicateModels = ignore;
 }
 
-void RLGReader::fn_802CA778(nlChunk* chunk)
+void RLGReader::LoadSkinData(nlChunk* chunk)
 {
     unsigned char* data = (unsigned char*)chunk->GetAlignedData();
     unsigned char* unalignedData = (unsigned char*)chunk->GetUnalignedData();
@@ -38,11 +35,11 @@ void RLGReader::fn_802CA778(nlChunk* chunk)
                        + sizeof(nlChunk);
     nlChunk* skinData = (nlChunk*)nlMalloc(size, 32, false);
     memcpy(skinData, chunk, size);
-    m_pContext->m_pInventory->AddSkinData(
+    m_pResource->m_inventory->AddSkinData(
         m_pModels->unknown00, skinData);
 }
 
-void RLGReader::fn_802CA870(nlChunk* chunk)
+void RLGReader::LoadVertexAnimData(nlChunk* chunk)
 {
     unsigned char* data = (unsigned char*)chunk->GetData();
     unsigned long* extraData = (unsigned long*)((unsigned char*)chunk->GetData() + 0x18);
@@ -53,71 +50,71 @@ void RLGReader::fn_802CA870(nlChunk* chunk)
 
     unsigned long vertexDataSize = *(unsigned long*)(data + 4)
                                  * *(unsigned long*)(data + 8) * *(unsigned long*)(data + 0x0C);
-    model->m_pVertices = (u8*)fn_802CC0A4(vertexDataSize, 3, m_pContext);
+    model->m_pVertices = (u8*)glResourceAlloc(vertexDataSize, GLM_VertexData, m_pResource);
     memcpy(model->m_pVertices, vertexData, vertexDataSize);
-    model->m_pModel = m_pContext->m_pInventory->GetModel(
+    model->m_pModel = m_pResource->m_inventory->GetModel(
         *(unsigned long*)data);
-    m_pContext->m_pInventory->AddVertexAnim(
+    m_pResource->m_inventory->AddVertexAnim(
         *(unsigned long*)data, model);
 }
 
-void RLGReader::fn_802CAA00(void* data, unsigned long size)
+void RLGReader::LoadPacketData(void* data, unsigned long size)
 {
-    m_Unknown24 = fn_802CC0A4(size, 0, m_pContext);
-    memcpy(m_Unknown24, data, size);
+    m_pParameterData = glResourceAlloc(size, GLM_Header, m_pResource);
+    memcpy(m_pParameterData, data, size);
 }
 
-void RLGReader::fn_802CAA60(void* data, unsigned long size)
+void RLGReader::LoadStreams(void* data, unsigned long size)
 {
-    m_Unknown18 = size >> 3;
-    m_Unknown14 = fn_802CC0A4(size, 0, m_pContext);
-    memcpy(m_Unknown14, data, m_Unknown18 << 3);
+    m_numStreamEntries = size >> 3;
+    m_pStreamData = glResourceAlloc(size, GLM_Header, m_pResource);
+    memcpy(m_pStreamData, data, m_numStreamEntries << 3);
 }
 
-void RLGReader::fn_802CAAC0(void* data, unsigned long size)
+void RLGReader::LoadPackets(void* data, unsigned long size)
 {
-    m_Unknown08 = size / sizeof(glModelPacket);
-    m_Unknown04 = fn_802CC0A4(size, 0, m_pContext);
-    memcpy(m_Unknown04, data, size);
+    m_numPacketEntries = size / sizeof(glModelPacket);
+    m_pPackets = glResourceAlloc(size, GLM_Header, m_pResource);
+    memcpy(m_pPackets, data, size);
 }
 
-void RLGReader::fn_802CAB34(void* data, unsigned long size)
+void RLGReader::LoadModels(void* data, unsigned long size)
 {
     m_nModels = size / sizeof(glModel);
-    fn_802C8284(*(unsigned long*)data);
-    m_pModels = (glModel*)fn_802CC0A4(size, 0, m_pContext);
-    fn_802C8288();
+    glBeginResource(*(unsigned long*)data);
+    m_pModels = (glModel*)glResourceAlloc(size, GLM_Header, m_pResource);
+    glEndResource();
     memcpy(m_pModels, data, m_nModels * sizeof(glModel));
 }
 
-void RLGReader::fn_802CABBC(void* data, unsigned long size)
+void RLGReader::LoadMatrices(void* data, unsigned long size)
 {
     size &= ~0x3F;
-    m_Unknown28 = fn_802CC0A4(size, 1, m_pContext);
-    memcpy(m_Unknown28, data, size);
+    m_pMatrices = glResourceAlloc(size, GLM_Matrix, m_pResource);
+    memcpy(m_pMatrices, data, size);
 }
 
-void RLGReader::fn_802CAC1C()
+void RLGReader::RegisterModels()
 {
     for (unsigned long i = 0; i < m_nModels; ++i)
     {
         glModel* model = &m_pModels[i];
         if (!glIgnoreDuplicateModels
-            || m_pContext->m_pInventory->GetModel(model->unknown00) == 0)
+            || m_pResource->m_inventory->GetModel(model->unknown00) == 0)
         {
-            m_pContext->m_pInventory->AddModel(model->unknown00, model);
+            m_pResource->m_inventory->AddModel(model->unknown00, model);
         }
     }
 }
 
-void RLGReader::fn_802CACBC(nlChunk* chunk)
+void RLGReader::HandleUnknownChunk(nlChunk* chunk)
 {
     nlPrintf("Unknown chunk id %d in RLGReader", chunk->GetID());
 }
 
 static void FixupModelData(RLGReader* reader)
 {
-    glModelPacket* packets = (glModelPacket*)reader->m_Unknown04;
+    glModelPacket* packets = (glModelPacket*)reader->m_pPackets;
     glModel* model = reader->m_pModels;
     for (unsigned long modelIndex = 0; modelIndex < reader->m_nModels;
         ++modelIndex, ++model)
@@ -129,27 +126,27 @@ static void FixupModelData(RLGReader* reader)
             ++packetIndex)
         {
             glModelPacket* packet = &model->packets[packetIndex];
-            packet->unknown20 = (unsigned char*)reader->m_Unknown24
+            packet->unknown20 = (unsigned char*)reader->m_pParameterData
                               + (unsigned long)packet->unknown20;
-            packet->streams = (glModelStream*)((unsigned char*)reader->m_Unknown14
+            packet->streams = (glModelStream*)((unsigned char*)reader->m_pStreamData
                                                + (unsigned long)packet->streams);
-            packet->indexBuffer = (unsigned short*)((unsigned char*)reader->m_Unknown20
+            packet->indexBuffer = (unsigned short*)((unsigned char*)reader->m_pIndexData
                                                     + (unsigned long)packet->indexBuffer);
-            packet->matrix = (unsigned long)reader->m_Unknown28
+            packet->matrix = (unsigned long)reader->m_pMatrices
                            + packet->matrix * 64;
 
             for (int streamIndex = 0; streamIndex < packet->numStreams;
                 ++streamIndex)
             {
                 glModelStream* stream = &packet->streams[streamIndex];
-                stream->address = (unsigned char*)reader->m_Unknown1C
+                stream->address = (unsigned char*)reader->m_pVertexData
                                 + (unsigned long)stream->address;
             }
         }
     }
 }
 
-void RLGReader::fn_802CADC4(void* data)
+void RLGReader::Read(void* data)
 {
     nlChunk* outerEnd = 0;
     nlChunk* chunk;
@@ -171,46 +168,46 @@ void RLGReader::fn_802CADC4(void* data)
             switch (chunk->GetID())
             {
             case 0x8001B008:
-                fn_802CA778(chunk);
+                LoadSkinData(chunk);
                 break;
             case 0x1B016:
-                fn_802CAA00(chunk->GetData(),
+                LoadPacketData(chunk->GetData(),
                     chunk->GetSize()
                         - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B006:
-                fn_80369E5C(chunk->GetData(),
+                LoadVertices(chunk->GetData(),
                     chunk->GetSize()
                         - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B007:
-                fn_80369EC8(chunk->GetData(),
+                LoadIndices(chunk->GetData(),
                     chunk->GetSize()
                         - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B005:
-                fn_802CAA60(chunk->GetData(),
+                LoadStreams(chunk->GetData(),
                     chunk->GetSize()
                         - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B004:
-                fn_802CAAC0(chunk->GetData(),
+                LoadPackets(chunk->GetData(),
                     chunk->GetSize()
                         - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B002:
-                fn_802CAB34(chunk->GetData(),
+                LoadModels(chunk->GetData(),
                     chunk->GetSize()
                         - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
                 break;
             case 0x1B003:
-                fn_802CABBC(chunk->GetData(),
+                LoadMatrices(chunk->GetData(),
                     chunk->GetSize()
                         - ((unsigned char*)chunk->GetAlignedData()
                             - (unsigned char*)chunk->GetUnalignedData()));
@@ -220,22 +217,22 @@ void RLGReader::fn_802CADC4(void* data)
                 nlChunk* subChunk = chunk->GetFirstChunk();
                 while (subChunk != chunk->GetNextChunk())
                 {
-                    fn_80369F34(subChunk);
+                    LoadVertexAnim(subChunk);
                     subChunk = subChunk->GetNextChunk();
                 }
                 break;
             }
             default:
-                fn_802CACBC(chunk);
+                HandleUnknownChunk(chunk);
                 break;
             }
             chunk = chunk->GetNextChunk();
         }
 
         FixupModelData(this);
-        fn_8036A138();
-        fn_802CAC1C();
-        fn_802C8288();
+        FinalizeModels();
+        RegisterModels();
+        glEndResource();
 
         if (outerEnd == 0)
             return;
@@ -246,7 +243,7 @@ void RLGReader::fn_802CADC4(void* data)
     }
 }
 
-extern "C" void fn_802CB790(void* program, unsigned long hash)
+void glRegisterMaterialProgram(void* program, unsigned long hash)
 {
     sMaterialPrograms.Add(hash, program);
 }
@@ -259,7 +256,7 @@ void* glGetMaterialProgram(unsigned long hash)
     return 0;
 }
 
-extern "C" void fn_802CB848(MaterialProgramCallback* callback)
+void glForEachMaterialProgram(MaterialProgramCallback* callback)
 {
     MaterialProgramTree::Entry* entry = sMaterialPrograms.m_Root;
     while (entry != 0)

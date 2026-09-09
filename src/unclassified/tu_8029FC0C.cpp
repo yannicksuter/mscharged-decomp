@@ -1,3 +1,4 @@
+#include "NL/glx/glxTexture.h"
 #include "types.h"
 
 struct State_802A015C
@@ -8,7 +9,6 @@ struct State_802A015C
 
 extern u8 lbl_80525450[];
 extern u8 lbl_806DE90C;
-extern "C" void fn_8036BE88(int, u32);
 
 extern "C" void* fn_8029FC68(void* state, int shouldDelete)
 {
@@ -34,8 +34,8 @@ extern "C" void fn_8029FCC0()
 
 extern "C" void fn_802A015C(void*, const State_802A015C* state)
 {
-    fn_8036BE88(0, state->value_20);
-    fn_8036BE88(1, state->value_20 + 8);
+    glx_BindTexture(0, (glTextureBinding*)(state->value_20));
+    glx_BindTexture(1, (glTextureBinding*)(state->value_20 + 8));
 }
 
 extern "C" void* fn_802A01A0()

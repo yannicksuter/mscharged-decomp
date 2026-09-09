@@ -59,7 +59,7 @@ bool DesireFinishAction::UnidentifiedInitialize(void*)
     return true;
 }
 
-void DesireFinishAction::UnidentifiedUpdate(UnidentifiedDesireUpdate* update, float)
+void DesireFinishAction::Update(UnidentifiedDesireUpdate* update, float)
 {
     if (update->mData.i == 2)
     {
@@ -90,12 +90,12 @@ void Desire::UnidentifiedCleanup()
 
 void Desire::UnidentifiedVirtual8(void*, DebugWriteCache* cache)
 {
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
 }
 
-void Desire::UnidentifiedUpdate(UnidentifiedDesireUpdate*, float)
+void Desire::Update(UnidentifiedDesireUpdate*, float)
 {
 }
 
@@ -105,11 +105,11 @@ DesireCutAndBreak::~DesireCutAndBreak()
 
 void DesireCutAndBreak::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireCutAndBreak");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireCutAndBreak");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->EndType();
 }
 
 DesireDeke::~DesireDeke()
@@ -129,14 +129,14 @@ bool DesireDeke::UnidentifiedInitialize(void* context)
 
 void DesireDeke::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireDeke");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireDeke");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->EndType();
 }
 
-void DesireHit::UnidentifiedUpdate(UnidentifiedDesireUpdate*, float)
+void DesireHit::Update(UnidentifiedDesireUpdate*, float)
 {
 }
 
@@ -146,14 +146,14 @@ DesireHit::~DesireHit()
 
 void DesireHit::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireHit");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireHit");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->EndType();
 }
 
-void DesireGetOpen::UnidentifiedUpdate(UnidentifiedDesireUpdate*, float)
+void DesireGetOpen::Update(UnidentifiedDesireUpdate*, float)
 {
     fn_800401C0(mUnidentifiedFielder, mvDesiredPosition, 1.2f, 1.0f);
 }
@@ -164,11 +164,11 @@ DesireGetOpen::~DesireGetOpen()
 
 void DesireGetOpen::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireGetOpen");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireGetOpen");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->EndType();
 }
 
 bool DesireGetInPosition::UnidentifiedInitialize(void* context)
@@ -184,11 +184,11 @@ DesireGetInPosition::~DesireGetInPosition()
 
 void DesireGetInPosition::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireGetInPosition");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireGetInPosition");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->EndType();
 }
 
 bool DesireRunUpfield::UnidentifiedInitialize(void* context)
@@ -204,11 +204,11 @@ DesireRunUpfield::~DesireRunUpfield()
 
 void DesireRunUpfield::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireRunUpfield");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireRunUpfield");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->EndType();
 }
 
 bool DesireRunDownfield::UnidentifiedInitialize(void* context)
@@ -224,11 +224,11 @@ DesireRunDownfield::~DesireRunDownfield()
 
 void DesireRunDownfield::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireRunDownfield");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireRunDownfield");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->EndType();
 }
 
 void DesireRunInDirection::UnidentifiedCleanup()
@@ -241,17 +241,17 @@ DesireRunInDirection::~DesireRunInDirection()
 
 void DesireRunInDirection::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireRunInDirection");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F88(cache, 19, lbl_80533C98[19].size, (u8*)&m_aDirection - (u8*)&mvDesiredPosition, "m_aDirection");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&m_fMaxDistance - (u8*)&mvDesiredPosition, "m_fMaxDistance");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&m_fDistTravelled - (u8*)&mvDesiredPosition, "m_fDistTravelled");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&m_fSpeed - (u8*)&mvDesiredPosition, "m_fSpeed");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&m_eFieldDirection - (u8*)&mvDesiredPosition, "m_eFieldDirection");
-    fn_80338F88(cache, 15, lbl_80533C98[15].size, (u8*)&m_pTarget - (u8*)&mvDesiredPosition, "m_pTarget");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireRunInDirection");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->AddField(19, gDebugFieldTypes[19].size, (u8*)&m_aDirection - (u8*)&mvDesiredPosition, "m_aDirection");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fMaxDistance - (u8*)&mvDesiredPosition, "m_fMaxDistance");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fDistTravelled - (u8*)&mvDesiredPosition, "m_fDistTravelled");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fSpeed - (u8*)&mvDesiredPosition, "m_fSpeed");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&m_eFieldDirection - (u8*)&mvDesiredPosition, "m_eFieldDirection");
+    cache->AddField(15, gDebugFieldTypes[15].size, (u8*)&m_pTarget - (u8*)&mvDesiredPosition, "m_pTarget");
+    cache->EndType();
 }
 
 void DesireRunToTarget::UnidentifiedCleanup()
@@ -264,16 +264,16 @@ DesireRunToTarget::~DesireRunToTarget()
 
 void DesireRunToTarget::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireRunToTarget");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, 0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F88(cache, 15, lbl_80533C98[15].size, (u8*)&m_pTargetFielder - (u8*)&mvDesiredPosition, "m_pTargetFielder");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size, (u8*)&m_vTargetPos - (u8*)&mvDesiredPosition, "m_vTargetPos");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&m_eDirection - (u8*)&mvDesiredPosition, "m_eDirection");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&m_fDistOffset - (u8*)&mvDesiredPosition, "m_fDistOffset");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&m_fUrgency - (u8*)&mvDesiredPosition, "m_fUrgency");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&m_fSpeedCoeff - (u8*)&mvDesiredPosition, "m_fSpeedCoeff");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&m_fAvoidanceCoeff - (u8*)&mvDesiredPosition, "m_fAvoidanceCoeff");
-    fn_80338F78(cache);
+    *(unsigned short*)field = cache->BeginType("DesireRunToTarget");
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    cache->AddField(15, gDebugFieldTypes[15].size, (u8*)&m_pTargetFielder - (u8*)&mvDesiredPosition, "m_pTargetFielder");
+    cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&m_vTargetPos - (u8*)&mvDesiredPosition, "m_vTargetPos");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&m_eDirection - (u8*)&mvDesiredPosition, "m_eDirection");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fDistOffset - (u8*)&mvDesiredPosition, "m_fDistOffset");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fUrgency - (u8*)&mvDesiredPosition, "m_fUrgency");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fSpeedCoeff - (u8*)&mvDesiredPosition, "m_fSpeedCoeff");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fAvoidanceCoeff - (u8*)&mvDesiredPosition, "m_fAvoidanceCoeff");
+    cache->EndType();
 }

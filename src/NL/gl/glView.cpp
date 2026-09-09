@@ -1,5 +1,7 @@
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
+#include "NL/gl/glMemory.h"
+#include "NL/gl/glPacketCallback.h"
 #include "NL/gl/glPlat.h"
 #include "NL/gl/glStruct.h"
 #include "NL/gl/glView.h"
@@ -17,7 +19,7 @@ void glViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v3NDC
     if (!(diagonal && pProj->m41 == 0.0f && pProj->m42 == 0.0f
             && pProj->m43 == 0.0f && pProj->m44 == 1.0f))
     {
-        fn_80369D6C(view, v3world, v3NDC);
+        glplatViewProjectPoint(view, v3world, v3NDC);
     }
     else
     {
@@ -34,25 +36,25 @@ void glViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v3NDC
     }
 }
 
-extern "C" void fn_802CE6DC(GLView* view, const nlVector3* normalized, nlVector3* screen)
+void glViewUnprojectOrthographicPoint(GLView* view, const nlVector3* normalized, nlVector3* viewPosition)
 {
     const nlMatrix4* pProj = view->m_Interface->GetProjectionMatrix();
-    nlVec3Set(*screen, (normalized->x - pProj->m14) / pProj->m11, (normalized->y - pProj->m24) / pProj->m22, (normalized->z - pProj->m34) / pProj->m33);
+    nlVec3Set(*viewPosition, (normalized->x - pProj->m14) / pProj->m11, (normalized->y - pProj->m24) / pProj->m22, (normalized->z - pProj->m34) / pProj->m33);
 }
 
-extern "C" float fn_802CE76C(GLView* view)
+float glViewGetOrthographicWidth(GLView* view)
 {
     const nlMatrix4* pProj = view->m_Interface->GetProjectionMatrix();
     return fabsf(2.0f / pProj->m11);
 }
 
-float fn_802CE7B0(GLView* view)
+float glViewGetOrthographicHeight(GLView* view)
 {
     const nlMatrix4* pProj = view->m_Interface->GetProjectionMatrix();
     return fabsf(2.0f / pProj->m22);
 }
 
-extern "C" void fn_802CE7F4(GLView* view, const nlVector3* world, nlVector3* screen)
+void glViewProjectPointToViewport(GLView* view, const nlVector3* world, nlVector3* screen)
 {
     unsigned long vpWidth = view->m_ViewportWidth;
     unsigned long vpHeight = view->m_ViewportHeight;
@@ -64,49 +66,23 @@ extern "C" void fn_802CE7F4(GLView* view, const nlVector3* world, nlVector3* scr
     screen->y += (float)vpHeight * 0.5f;
 }
 
-extern "C" void fn_802CEA40(GLView* source, GLView* destination, const nlVector3* world, nlVector3* projected)
+void glViewProjectPointBetweenViews(GLView* source, GLView* destination, const nlVector3* world, nlVector3* projected)
 {
     glViewProjectPoint(source, *world, *projected);
     projected->y = -projected->y;
-    fn_802CE6DC(destination, projected, projected);
+    glViewUnprojectOrthographicPoint(destination, projected, projected);
 }
 
 void gl_ViewStartup()
 {
 }
 
-extern "C" void* fn_802CC0A8(unsigned long size, int memoryType);
-
-extern "C" void fn_802CCD1C(
-    void*, GLView*, GLViewPacketCallback);
-extern "C" void fn_802CCD3C(void*, const glModelPacket*, unsigned long);
-
-class PacketCallbackManager
-{
-public:
-    PacketCallbackManager(GLView* view, GLViewPacketCallback callback)
-    {
-        fn_802CCD1C(this, view, callback);
-    }
-
-    void DoCallback(const glModelPacket* packet, unsigned long count)
-    {
-        fn_802CCD3C(this, packet, count);
-    }
-
-    GLView* m_View;
-    GLViewPacketCallback m_Callback;
-    unsigned long m_LastRaster;
-    unsigned long m_LastMatrix;
-    void* m_LastState;
-};
-
 class GLPacketSorter
 {
 public:
     static void* operator new(unsigned long size)
     {
-        return fn_802CC0A8(size, 0);
+        return glFrameAlloc(size, GLM_Header);
     }
 
     virtual const glModelPacket* Begin() = 0;
@@ -152,7 +128,7 @@ int GLPacketTree::CompareKey(void* key, AVLTreeNode* node)
 
 AVLTreeNode* GLPacketTree::AllocateEntry(void* key, void* value)
 {
-    GLPacketTreeEntry* entry = (GLPacketTreeEntry*)fn_802CC0A8(sizeof(GLPacketTreeEntry), 0);
+    GLPacketTreeEntry* entry = (GLPacketTreeEntry*)glFrameAlloc(sizeof(GLPacketTreeEntry), GLM_Header);
     entry->node.left = 0;
     entry->node.right = 0;
     entry->node.heavy = 0;
@@ -251,8 +227,8 @@ const glModelPacket* GLPacketListSorter::Begin()
 void GLReversePacketSorter::Attach(
     GLView*, const glModelPacket* packet)
 {
-    ListEntry<const glModelPacket*>* entry = (ListEntry<const glModelPacket*>*)fn_802CC0A8(
-        sizeof(ListEntry<const glModelPacket*>), 0);
+    ListEntry<const glModelPacket*>* entry = (ListEntry<const glModelPacket*>*)glFrameAlloc(
+        sizeof(ListEntry<const glModelPacket*>), GLM_Header);
     entry->next = 0;
     entry->entry = packet;
     nlListAddStart(&m_Head, entry, &m_Tail);
@@ -261,8 +237,8 @@ void GLReversePacketSorter::Attach(
 void GLUnsortedPacketSorter::Attach(
     GLView*, const glModelPacket* packet)
 {
-    ListEntry<const glModelPacket*>* entry = (ListEntry<const glModelPacket*>*)fn_802CC0A8(
-        sizeof(ListEntry<const glModelPacket*>), 0);
+    ListEntry<const glModelPacket*>* entry = (ListEntry<const glModelPacket*>*)glFrameAlloc(
+        sizeof(ListEntry<const glModelPacket*>), GLM_Header);
     entry->entry = packet;
     entry->next = 0;
     nlListAddEnd(&m_Head, &m_Tail, entry);
@@ -341,27 +317,27 @@ inline void GLPacketSorterIterator::PushLeft(Entry* entry)
 
 static const char* s_UninitializedViewName = "<uninitialized>";
 
-extern "C" GLPacketSorter* fn_802CEF1C()
+GLPacketSorter* CreateGLTexturePacketSorter()
 {
     return new GLTexturePacketSorter;
 }
 
-extern "C" GLPacketSorter* fn_802CEF74()
+GLPacketSorter* CreateGLReversePacketSorter()
 {
     return new GLReversePacketSorter;
 }
 
-extern "C" GLPacketSorter* fn_802CEFC0()
+GLPacketSorter* CreateGLUnsortedPacketSorter()
 {
     return new GLUnsortedPacketSorter;
 }
 
-extern "C" GLPacketSorter* fn_802CF00C()
+GLPacketSorter* CreateGLMatrixDepthPacketSorter()
 {
     return new GLMatrixDepthPacketSorter;
 }
 
-extern "C" GLPacketSorter* fn_802CF068()
+GLPacketSorter* CreateGLDepthPacketSorter()
 {
     return new GLDepthPacketSorter;
 }
@@ -383,19 +359,19 @@ GLView::GLView(GLViewInterface* interface, const GLRenderPair& renderPair,
     switch (sortMode)
     {
     case GLViewSort_TransformedDepth:
-        createSorter = fn_802CF068;
+        createSorter = CreateGLDepthPacketSorter;
         break;
     case GLViewSort_TransformedMatrixDepth:
-        createSorter = fn_802CF00C;
+        createSorter = CreateGLMatrixDepthPacketSorter;
         break;
     case GLViewSort_None:
-        createSorter = fn_802CEFC0;
+        createSorter = CreateGLUnsortedPacketSorter;
         break;
     case GLViewSort_Reverse:
-        createSorter = fn_802CEF74;
+        createSorter = CreateGLReversePacketSorter;
         break;
     default:
-        createSorter = fn_802CEF1C;
+        createSorter = CreateGLTexturePacketSorter;
         break;
     }
 
@@ -406,9 +382,9 @@ GLView::GLView(GLViewInterface* interface, const GLRenderPair& renderPair,
     m_ViewportWidth = glGetScreenWidth();
     m_ViewportHeight = glGetScreenHeight();
     m_Enabled = true;
-    m_ClearColour = false;
     m_ClearDepth = false;
-    m_Unknown33 = false;
+    m_Unknown32 = false;
+    m_ClearColour = false;
     m_Target = 0;
     m_Visible = true;
 }
@@ -421,18 +397,18 @@ inline GLView::GLView()
     m_Name = s_UninitializedViewName;
     m_Unknown48 = 0;
     m_TriangleCount = 0;
-    m_Interface = &lbl_806E1F38;
+    m_Interface = &gDefaultViewInterface;
     m_Parent = 0;
-    m_CreateSorter = fn_802CEF1C;
+    m_CreateSorter = CreateGLTexturePacketSorter;
     m_Sorters = new GLPacketSorterTree(16, 16);
     m_ViewportX = 0;
     m_ViewportY = 0;
     m_ViewportWidth = glGetScreenWidth();
     m_ViewportHeight = glGetScreenHeight();
     m_Enabled = true;
-    m_ClearColour = false;
     m_ClearDepth = false;
-    m_Unknown33 = false;
+    m_Unknown32 = false;
+    m_ClearColour = false;
     m_Target = 0;
     m_Visible = true;
 }
@@ -563,7 +539,7 @@ GLRenderPair GLView::GetRenderPair() const
     {
         return m_RenderPair;
     }
-    return fn_802CD82C();
+    return glGetBackBufferTarget();
 }
 
 void GLView::BeginRender()
@@ -641,14 +617,12 @@ bool GLViewIterator::IsDone() const
     return m_Depth < 0;
 }
 
-extern "C" nlMatrix4 lbl_804EB2B8;
+extern const nlMatrix4 gGLViewIdentityMatrix;
 
-extern "C" GLViewInterface lbl_806E1F38;
-extern "C" GLView lbl_8057F250;
 
 void gl_ViewReset()
 {
-    GLViewIterator iterator(&lbl_8057F250);
+    GLViewIterator iterator(&gRootView);
     while (!iterator.IsDone())
     {
         GLView* view = iterator.Current();
@@ -659,7 +633,7 @@ void gl_ViewReset()
 
 void glViewCompact()
 {
-    GLViewIterator iterator(&lbl_8057F250);
+    GLViewIterator iterator(&gRootView);
     while (!iterator.IsDone())
     {
         GLView* view = iterator.Current();
@@ -669,10 +643,9 @@ void glViewCompact()
     }
 }
 
-GLViewInterface lbl_806E1F38;
+GLViewInterface gDefaultViewInterface;
 
-extern "C" GLView lbl_8057F250;
-GLView lbl_8057F250;
+GLView gRootView;
 
 void GLViewInterface::GetViewMatrix(nlMatrix4& matrix) const
 {
@@ -696,10 +669,10 @@ void GLViewInterface::GetViewProjectionMatrix(nlMatrix4& matrix) const
 
 const nlMatrix4* GLViewInterface::GetViewMatrix() const
 {
-    return &lbl_804EB2B8;
+    return &gGLViewIdentityMatrix;
 }
 
 const nlMatrix4* GLViewInterface::GetProjectionMatrix() const
 {
-    return &lbl_804EB2B8;
+    return &gGLViewIdentityMatrix;
 }

@@ -1,7 +1,8 @@
 #include "Game/Physics/PhysicsBirdoEgg.h"
+#include "Game/Render/BirdoEgg.h"
 
 #include "Game/AI/Fielder.h"
-#include "Game/BirdoEggObject.h"
+#include "Game/Render/BirdoEgg.h"
 #include "Game/AI/Powerups.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Physics/Physics.h"
@@ -75,7 +76,7 @@ ContactType PhysicsBirdoEgg::Contact(
             {
                 return NO_CONTACT;
             }
-            if (fielder == mBirdoEgg->unknown_3C)
+            if (fielder == mBirdoEgg->mShooter)
             {
                 break;
             }
@@ -87,7 +88,7 @@ ContactType PhysicsBirdoEgg::Contact(
             fn_80146FCC(eventData);
 
             if (!fn_8003E73C(fielder)
-                && mBirdoEgg->unknown_3C->m_pBall == 0)
+                && mBirdoEgg->mShooter->m_pBall == 0)
             {
                 QueueBirdoEggEnd(mBirdoEgg, false);
             }
@@ -108,7 +109,7 @@ ContactType PhysicsBirdoEgg::Contact(
         PowerupBase* powerup = other->GetObjectType() == 0x14
                                  ? ((PhysicsShell*)other)->m_pPowerupObject
                                  : ((PhysicsBanana*)other)->m_pPowerupObject;
-        if (powerup->m_pThrower == mBirdoEgg->unknown_3C
+        if (powerup->m_pThrower == mBirdoEgg->mShooter
             && powerup->mtNoHitTimer.m_uPackedTime != 0)
         {
             return NO_CONTACT;
@@ -178,7 +179,7 @@ ContactType PhysicsBirdoEgg::Contact(
     case 0x1F:
     {
         u8* hammer = *(u8**)((u8*)other + 0x38);
-        if (*(cFielder**)(hammer + 0x34) == mBirdoEgg->unknown_3C
+        if (*(cFielder**)(hammer + 0x34) == mBirdoEgg->mShooter
             && *(float*)(hammer + 0x1C) > 0.0f)
         {
             return NO_CONTACT;

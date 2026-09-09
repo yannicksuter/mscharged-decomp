@@ -310,8 +310,8 @@ void RenderPeachPhoto(PeachPhotoState* photo)
 
         if (writer.End())
         {
-            UnidentifiedTextureState* states =
-                static_cast<UnidentifiedTextureState*>(
+            glTextureBinding* states =
+                static_cast<glTextureBinding*>(
                     writer.model->packets->unknown20);
             states[0].texture = glGetTexture(
                 gPeachPhotoDisableImage ? sPeachPhotoWhiteTexture : sPeachPhotoTexture);

@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 #include <revolution/mtx.h>
 
 #include "NL/gl/gl.h"
@@ -13,9 +14,9 @@
 
 struct GXMaterialProgramParameters_8029BA04
 {
-    /* 0x000 */ UnidentifiedTextureState texture0;
-    /* 0x008 */ UnidentifiedTextureState texture1;
-    /* 0x010 */ UnidentifiedTextureState texture2;
+    /* 0x000 */ glTextureBinding texture0;
+    /* 0x008 */ glTextureBinding texture1;
+    /* 0x010 */ glTextureBinding texture2;
     /* 0x018 */ const float (*matrices)[3][4];
     /* 0x01C */ unsigned long matricesSize;
     /* 0x020 */ float value32;
@@ -60,7 +61,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029BA04>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 extern "C" void fn_802909E4(float value)
@@ -129,13 +130,13 @@ static inline void LoadValue_80290914(unsigned int index,
     {
         nlMultDirVectorMatrix(
             transformed, parameters->values40[index], viewMatrix);
-        fn_8036A800(index, &transformed, &parameters->values216[index]);
+        glx_LoadDirectionalLight(index, &transformed, &parameters->values216[index]);
     }
     else
     {
         nlMultPosVectorMatrix(
             transformed, parameters->values88[index].vector, viewMatrix);
-        fn_8036A9C4(index, &transformed, &parameters->values216[index], parameters->values88[index].value);
+        glx_LoadPointLight(index, &transformed, &parameters->values216[index], parameters->values88[index].value);
     }
 }
 
@@ -147,7 +148,7 @@ static inline void LoadValue2_80290914(unsigned int index,
     nlFloatColour value = parameters->values280[index];
     nlVector3 transformed;
     nlMultDirVectorMatrix(transformed, source, viewMatrix);
-    fn_8036AB40(index + 4, &transformed, &value, parameters->values152[index].value);
+    glx_LoadSpecular(index + 4, &transformed, &value, parameters->values152[index].value);
 }
 
 template <>
@@ -265,11 +266,11 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029BA04>::Draw(
 
     if (packet->unknown28 == 0)
     {
-        fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
+        glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }
     else
     {
-        fn_8036D774(&modelview);
+        glx_LoadDefaultSkinMatrices(&modelview);
     }
 
     GXCallDisplayList(packet->displayList->list, packet->displayList->size);

@@ -17,4 +17,6 @@ public:
     /* 0x08 */ f32 m_fadeDuration;
 }; // size 0x0C
 
+TLSlide* GetActiveSlide(FEPresentation* presentation);
+
 #endif // GAME_FE_PRESENTATION_H

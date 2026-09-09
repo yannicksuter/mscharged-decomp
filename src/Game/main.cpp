@@ -1,4 +1,6 @@
 #include "Game/main.h"
+#include "Game/TweakRegistry.h"
+#include "Game/TweakConfig.h"
 
 #include "Game/Task/FixedUpdateTask.h"
 
@@ -34,8 +36,9 @@
 #include "NL/MemAlloc.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"
-#include "NL/gl/tu_80368E00.h"
+#include "NL/gl/glMemoryInit.h"
 #include "NL/globalpad.h"
+#include "NL/plat/WiiPad.h"
 #include "NL/nlBind.h"
 #include "NL/nlConfig.h"
 #include "NL/nlDebug.h"
@@ -53,6 +56,7 @@
 
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
+#include "NL/gl/glPlat.h"
 
 class AudioUpdateTask : public nlTask
 {
@@ -102,19 +106,15 @@ extern "C"
     u32 SCGetSimpleAddressID();
     void fn_801BF87C(int);
     void fn_801BFA84(int);
-    void fn_802C7018(void*, char*, u32, const char*);
     void fn_802E22D8(void*, float*, void*, void*, int, int, int);
     void fn_802A8278(void*, int, int, void*);
 
     void fn_801BFB08();
     void fn_8013D7A0();
     void fn_8013D7E0();
-    void fn_802C0F24();
-    void fn_80369574();
     void fn_80272AB4();
     void fn_80184858();
     void OSYieldThread();
-    const char* GetTweakString(const char*, const char*);
 }
 
 void nlRegHandleDVDMessageCB(const Function<void(int)>&);
@@ -135,15 +135,12 @@ extern int lbl_806DF2F0;
 extern int lbl_806DF2F4;
 extern int lbl_806DF2F8;
 extern int lbl_806DF2FC;
-extern int lbl_806DEEBC;
-extern int lbl_806DEECC;
 
-extern "C" u8 GetTweakBool(const char*, u8);
 
 volatile int g_Region = 3;
 static u32 sPreviousTaskState = 1;
 
-static UnidentifiedMemoryRequirement_80376664 lbl_80509540[3] = {
+static GLMemoryRequirement sGlobalResourceRequirements[3] = {
     { GLM_TextureData, 0 },
     { GLM_VertexData, 0 },
     { GLM_Header, 0 },
@@ -176,12 +173,12 @@ static bool sWarbleTextureCached;
 
 FrameCounter g_FrameCounter("frame", "send");
 
-static TweakValueBoolImpl_804F4538 sDisableWriteOutTweak(
+static TweakBoolBinding sDisableWriteOutTweak(
     "g_bDisableWriteOut", "/General", &g_bDisableWriteOut, false);
-static TweakValueBoolImpl_804F4538 sMemoryLowWaterMarkCheckingTweak(
+static TweakBoolBinding sMemoryLowWaterMarkCheckingTweak(
     "g_bActivateMemoryLowWaterMarkChecking", "/General",
     &g_bActivateMemoryLowWaterMarkChecking, false);
-static TweakValueBoolImpl_804F4538 sPrintMemoryLowWaterMarksTweak(
+static TweakBoolBinding sPrintMemoryLowWaterMarksTweak(
     "g_bPrintMemoryNewLowWaterMarks", "/General",
     &g_bPrintMemoryNewLowWaterMarks, false);
 
@@ -202,14 +199,14 @@ static ProfilerTask profilerTask;
 static ResetTask resetTask;
 static UnidentifiedMemCheckTask memCheckTask;
 static TextWindowTask textWindowTask;
-static FEDPDTask unidentifiedTask_802196B0;
+static FEDPDTask feDPDTask;
 static FlashMemoryTask flashMemoryTask;
 
-static TweakValueBool_804F4578 sAllowWarble(
+static TweakValueBool sAllowWarble(
     "sbAllowWarble", "/Rendering/Effects/Warble", true);
-static TweakValueBool_804F4578 sRenderWarbleToParticleView(
+static TweakValueBool sRenderWarbleToParticleView(
     "sbRenderWarbleToParticleView", "/Rendering/Effects/Warble", false);
-static TweakValueBool_804F4578 sUseCheckerTextureForWarble(
+static TweakValueBool sUseCheckerTextureForWarble(
     "sbUseCheckerTextureForWarble", "/Rendering/Effects/Warble", false);
 
 static void PreInitFS();
@@ -310,13 +307,13 @@ void UnidentifiedMemCheckTask::Run(float)
 
 static void PreInitFS()
 {
-    UnidentifiedConfiguration_80368E00 config;
-    config.mUnidentified00 = 0x80000;
-    config.mUnidentified04 = 0x233333;
-    config.mUnidentified08 = lbl_80509540;
-    config.mUnidentified0C = 3;
-    config.mUnidentified10 = 1000;
-    if (!fn_80368E00(&config))
+    GLMemoryConfig config;
+    config.mFrameMemSize1 = 0x80000;
+    config.mFrameMemSize2 = 0x233333;
+    config.mResourceRequirements = sGlobalResourceRequirements;
+    config.mNumResourceRequirements = 3;
+    config.mMaxTextures = 1000;
+    if (!glInitMemory(&config))
     {
         nlBreak();
     }
@@ -331,7 +328,7 @@ extern "C" void fn_8011C4E8()
     }
 }
 
-extern "C" void fn_8011C508()
+void ConfigureTweakerButtons()
 {
     cGlobalPad* pad = 0;
     for (int i = 0; i < 4; ++i)
@@ -343,27 +340,27 @@ extern "C" void fn_8011C508()
         }
     }
 
-    void* provider = *reinterpret_cast<void**>(
-        reinterpret_cast<u8*>(pad) + 0x1C);
-    void** vtable = *reinterpret_cast<void***>(provider);
-    typedef int (*GetCountryCode)(void*);
-    const int country =
-        reinterpret_cast<GetCountryCode>(vtable[0x50 / sizeof(void*)])(
-            provider);
-
-    const bool specialCountry =
-        country == lbl_806DEEBC || country == lbl_806DEECC;
+    const int classID = pad->mBackend->GetClassID();
     const bool tweakerEnabled =
         GetTweakBool("/user/Tweaker with just Z Button", false);
+    const bool isWiiRemote =
+        classID == gWiiRemotePadClassID || classID == gWiiFreestylePadClassID;
 
     lbl_806DF2E0 = 9;
     lbl_806DF2E4 = 10;
     lbl_806DF2E8 = 8;
-    lbl_806DF2EC = !tweakerEnabled && !specialCountry ? 23 : -1;
     lbl_806DF2F0 = 11;
     lbl_806DF2F4 = 12;
     lbl_806DF2F8 = 13;
     lbl_806DF2FC = 14;
+    if (!tweakerEnabled && !isWiiRemote)
+    {
+        lbl_806DF2EC = 23;
+    }
+    else
+    {
+        lbl_806DF2EC = -1;
+    }
 }
 
 extern "C" void fn_8011C610(const char* buildInfo)
@@ -387,7 +384,7 @@ extern "C" void fn_8011C70C(
     void* destinationCopy = destination;
     unsigned long sizeCopy = size;
     void* dataCopy = data;
-    fn_802C7018(destinationCopy, static_cast<char*>(dataCopy), sizeCopy,
+    LoadTweakConfigBuffer(destinationCopy, static_cast<char*>(dataCopy), sizeCopy,
         static_cast<const char*>(destinationCopy));
     sDateTimeLoaded = true;
 }
@@ -405,7 +402,7 @@ static void Initialize()
     fn_8013D7E0();
     InitPads();
 
-    if (!fn_802C7FD0(PreInitFS))
+    if (!glStartup(PreInitFS))
     {
         nlBreak();
     }
@@ -417,9 +414,14 @@ static void Initialize()
         Bind<void>(MemFun<ResetTask, void>(&ResetTask::FSCheckForReset),
             &resetTask)));
 
-    fn_802C0F24();
-    fn_80369574();
-    if (!fn_802C820C("art/global.rlt", (MemoryAllocator*)fn_802CC094()))
+    unsigned int stringSizes[4];
+    stringSizes[0] = 0xA000;
+    stringSizes[1] = 0;
+    stringSizes[2] = 0x3000;
+    stringSizes[3] = 0;
+    InitializeTweakRegistry(0, 1, stringSizes);
+    glplatInitializeMaterialPrograms();
+    if (!glLoadTextureBundle("art/global.rlt", glGetCurrentResourcePool()))
     {
         nlBreak();
     }
@@ -445,9 +447,9 @@ static void Initialize()
     }
 
     GetEmissionManager();
-    fn_802E9E0C(1, 250);
-    fn_802E9E9C(3, "Character", 250);
-    fn_802E9E9C(2, "StadiumEffects", 250);
+    EmissionManager::SetResourceBudget(1, 250);
+    EmissionManager::ConfigureResource(3, "Character", 250);
+    EmissionManager::ConfigureResource(2, "StadiumEffects", 250);
 
     nlTaskManager::Startup(0x10000);
     sLoadingTask.Start();
@@ -485,7 +487,7 @@ static void AddTasks()
     nlTaskManager::AddTask(&endFrameTask, 16, (u32)-1);
     nlTaskManager::AddTask(&gTransitionTask, 1, (u32)-1);
     nlTaskManager::AddTask(&networkUpdateTask, 17, (u32)-1);
-    nlTaskManager::AddTask(&unidentifiedTask_802196B0, 13, 5);
+    nlTaskManager::AddTask(&feDPDTask, 13, 5);
     nlTaskManager::AddTask(
         &flashMemoryTask, 13, (u32)-1);
     nlTaskManager::AddTask(fn_803733D4(), 3, (u32)-1);

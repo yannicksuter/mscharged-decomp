@@ -1,4 +1,5 @@
 #include "Game/Sys/audio.h"
+#include "Game/DetInput.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/Audio/GameStreams.h"
 #include "Game/RumbleActions.h"
@@ -56,6 +57,7 @@
 #include "unclassified/tu_801A5F10.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Render/NPCManager.h"
+#include "Game/Render/BirdoEgg.h"
 #include "Game/Render/ShootToScoreMeter.h"
 #include "math.h"
 
@@ -110,7 +112,6 @@ extern "C" float fn_8002C0AC(PlayerTweaks* pTweaks);
 extern "C" void fn_800154FC(cBall* pBall, float fParam);
 extern "C" void fn_801B75C8(cFielder* pFielder, int, int, int, int);
 extern "C" void fn_800395C0(cFielder* pFielder);
-extern "C" void fn_8019A270(void* pParam, cFielder* pFielder);
 extern "C" float fn_8002C7E8(PlayerTweaks* pTweaks);
 extern "C" void fn_801BA034();
 
@@ -178,7 +179,7 @@ struct UnidentifiedTornado806E0C94
     /* 0x00 */ u8 mUnidentified00[0x0C];
     /* 0x0C */ bool mUnidentified0C;
 
-    virtual void UnidentifiedVirtual08() = 0;
+    virtual void Allocate() = 0;
     virtual void UnidentifiedVirtual0C() = 0;
 };
 extern "C" UnidentifiedTornado806E0C94* fn_800AA060(
@@ -188,7 +189,7 @@ extern "C" bool fn_802B6BC8(const nlVector3* v3Start,
     const nlVector3* v3End, const nlVector3* v3A, const nlVector3* v3B,
     float* fOut1, float* fOut2);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
-extern "C" void fn_80331F9C(void* pPad, int nParam, int nParam2);
+extern "C" void ResetButtonStateTicks(void* pPad, int nParam, int nParam2);
 
 struct UnidentifiedActionTarget806E0C94
 {
@@ -208,7 +209,7 @@ class UnidentifiedHandler8011166C
 public:
     virtual void UnidentifiedVirtual00();
     virtual void UnidentifiedVirtual04();
-    virtual void UnidentifiedVirtual08();
+    virtual void Allocate();
     virtual void UnidentifiedVirtual0C();
     virtual void UnidentifiedVirtual10();
     virtual void UnidentifiedVirtual14();
@@ -237,10 +238,10 @@ struct UnidentifiedOnlineState
     u8 mUnidentified000[4];
     bool mUnidentified004;
 };
-extern UnidentifiedOnlineState* lbl_806E2164;
-extern "C" bool fn_80123314(void* pParam);
+extern UnidentifiedOnlineState* gNetworkInputRecording;
+extern "C" bool IsLiveNetworkGame(void* pParam);
 extern "C" void fn_80057FD8(cGame* pGame, bool bParam);
-extern "C" bool IsNetworkOrRecordedGame(void);
+bool IsNetworkOrRecordedGame(void);
 extern "C" void fn_800AA3E8(void* pParam, int nParam);
 extern "C" void fn_8005F82C(cGame* pGame, cFielder* pFielder);
 extern void* g_pNetworkSession;
@@ -1629,7 +1630,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         event.pFielder = this;
         event.fMeterValue = mUnidentified3BC;
         nlVector3 v3Column;
-        fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
+        glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
         event.v3Position = v3Column;
         fn_8005F238(g_pGame, &event);
 
@@ -1786,14 +1787,14 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
     {
         if (nParam != 0)
         {
-            UnidentifiedNetworkMessage_80126D84 message;
-            if (fn_80123314(g_pNetworkSession))
+            NetworkMessageType35 message;
+            if (IsLiveNetworkGame(g_pNetworkSession))
             {
                 fn_80057FD8(g_pGame, bButtonPressed);
             }
             fn_80048FB0(fDeltaT, bButtonPressed, nParam);
         }
-        else if (fn_80123314(g_pNetworkSession)
+        else if (IsLiveNetworkGame(g_pNetworkSession)
             && g_pGame->mUnidentified0C0.mSize != 0)
         {
             fn_80048FB0(fDeltaT,
@@ -1801,7 +1802,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
                 nParam);
         }
     }
-    else if (fn_80123314(g_pNetworkSession) && nParam == 0
+    else if (IsLiveNetworkGame(g_pNetworkSession) && nParam == 0
         && g_pGame->mUnidentified0C0.mSize != 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,
@@ -1871,7 +1872,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
     event.pFielder = this;
     event.fMeterValue = mUnidentified3BC;
     nlVector3 v3Column;
-    fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
+    glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
     event.v3Position = v3Column;
     fn_8005F434(g_pGame, &event);
 
@@ -1945,19 +1946,19 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     event.pFielder = this;
     event.fMeterValue = mUnidentified3C0;
     nlVector3 v3Column;
-    fn_802CE7F4(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
+    glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
     event.v3Position = v3Column;
     fn_8005F630(g_pGame, &event);
 
     if (nParam != 0)
     {
-        if (fn_80123314(g_pNetworkSession)
+        if (IsLiveNetworkGame(g_pNetworkSession)
             && g_pGame->mUnidentified134.mSize > 0)
         {
             g_pGame->fn_80058180();
         }
 
-        if (!lbl_806E2164->mUnidentified004)
+        if (!gNetworkInputRecording->mUnidentified004)
         {
             g_pGame->fn_80059DEC(m_pTeam->m_nSide, m_ID,
                 mUnidentified3BC, mUnidentified3C0);
@@ -4346,7 +4347,7 @@ void cFielder::fn_8004B148()
                 lbl_806DB8E0,
                 (float)mUnidentified374.mUnidentified00
                     * FixedUpdateTask::GetPhysicsUpdateTick());
-        fn_80331F9C(GetGlobalPad(), 0x17, 1);
+        GetGlobalPad()->ResetButtonStateTicks(0x17, 1);
     }
     else
     {
@@ -4444,16 +4445,16 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
             }
             else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0E)
             {
-                if (lbl_806E1608->mUnidentified02C != 0)
+                if (gNPCManager->mUnidentified02C != 0)
                 {
-                    fn_801A6344(lbl_806E1608->mUnidentified02C, this);
+                    fn_801A6344(gNPCManager->mUnidentified02C, this);
                 }
             }
             else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0C)
             {
-                if (lbl_806E1608->mUnidentified028 != 0)
+                if (gNPCManager->mpBirdoEgg != 0)
                 {
-                    fn_8019A270(lbl_806E1608->mUnidentified028, this);
+                    gNPCManager->mpBirdoEgg->Show(this);
                 }
             }
         }
@@ -5190,7 +5191,7 @@ void cFielder::fn_8004E6B4()
 {
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
-        HammerObject* pProjectile = lbl_806E1608->fn_801AA3AC(-1);
+        HammerObject* pProjectile = gNPCManager->fn_801AA3AC(-1);
         if (pProjectile != 0)
         {
             fn_801A1B54(pProjectile, this);
@@ -5561,9 +5562,8 @@ int Print(eDEBUG_CHANNEL channel, const char* format, ...)
 
 bool gbUseTurboCharging = true;
 
-extern const char* lbl_806E1E90;
 
-static TweakValueBoolImpl_804F4538 s_UseTurboChargingTweak(
+static TweakBoolBinding s_UseTurboChargingTweak(
     "gbUseTurboCharging", "Game/Gameplay/Charging/Turbo",
     &gbUseTurboCharging, true);
 

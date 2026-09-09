@@ -45,7 +45,6 @@ static bool lbl_806DD1D8 = true;
 static float lbl_806DD1DC = 1.0f;
 static float lbl_806DD1E0 = -0.3f;
 extern "C" EffectsGroup* fn_802E7D54(EmissionManager* pManager, unsigned long uHashID);
-extern "C" void fn_802E8A2C(EmissionManager* pManager, const EffectsGroup* pEffectsGroup);
 static nlVector3 lbl_80515478 = { 0.0f, 0.0f, 1.0f };
 extern "C" void fn_800EDCE8(cPlayer* pPlayer);
 extern "C" bool fn_800EBBFC(int slotId, unsigned long cueId, const void* debugName, void* context);
@@ -55,7 +54,6 @@ extern "C" void fn_800152B4(cBall* pBall);
 extern "C" void fn_800189C4(cBall* pBall);
 extern "C" void fn_80036A38(cFielder* pFielder, int nParam, float fAmount);
 extern "C" void fn_802E83C4(EmissionManager* pManager, const EffectsGroup* pGroup);
-extern "C" void fn_802E8A2C(EmissionManager* pManager, const EffectsGroup* pGroup);
 extern "C" void fn_800F026C(const nlVector3& v3Shake, float fParam1, float fParam2);
 extern "C" {
 } // extern "C"
@@ -80,7 +78,7 @@ extern "C" void fn_800367B4(cFielder*);
 extern "C" void fn_80039CF0(cFielder*, int);
 extern "C" PhysicsSphere_80175F8C* fn_801765C8(cFielder*, const nlVector3*, float);
 
-extern "C" float fn_801BE138(TweakValueImpl_804F4DC8* pTweak);
+extern "C" float fn_801BE138(TweakFloatBinding* pTweak);
 extern "C" int fn_801BE130(cFielder* pFielder);
 extern "C" bool fn_801BE128(Desire* pDesire);
 extern "C" void fn_801BE120(cBall* pBall, bool bVisible);
@@ -575,7 +573,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
 
         case 0xC21A0381:
             fn_801765C8((cFielder*)lbl_806E0C34, fn_800D1450(lbl_806E0C34),
-                fn_801BE138(&gGameTweaks.m_unk14->mUnidentified414));
+                fn_801BE138(&gGameTweaks.mFielderTweaks->mUnidentified414));
             fn_801BB20C(lbl_806E0C34);
             break;
 
@@ -654,7 +652,7 @@ void GetAnimTriggerInfo(cCharacter* pCharacter, int animIndex,
 
     while (cb != 0)
     {
-        fn_80025E9C();
+        GetAnimScriptInterpreter();
         cSAnim* pTriggerAnim = (cSAnim*)cb->m_nParam1;
         float numKeys = (float)pAnim->m_nNumKeys;
         if (!callback(cb->m_fTime, numKeys / 30.0f, pTriggerAnim->GetHashID(), 0.0f, pData))
@@ -781,7 +779,7 @@ extern "C" void fn_801B79A4(const char* szEffectName, bool bReallyKill)
     {
         if (bReallyKill)
         {
-            fn_802E8A2C(EmissionManager::Instance(), pGroup);
+            EmissionManager::Instance()->Destroy(pGroup);
         }
         else
         {
@@ -1436,29 +1434,29 @@ extern "C" void fn_801BA034()
     static unsigned long sHashBallStsWindup =
         nlStringLowerHash("ball_sts_windup");
 
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindup0));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGround0));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindup1));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGround1));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindup2));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGround2));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindup3));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGround3));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupMax));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGroundMax));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashShootToScoreWindup));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallStsWindup));
 }
 
@@ -1475,22 +1473,22 @@ extern "C" void fn_801BA358()
     static unsigned long sHashBallShotWindupGlowMax =
         nlStringLowerHash("ball_shot_windup_glow_max");
 
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGlow0));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGlow1));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGlow2));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGlow3));
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGlowMax));
     g_pBall->m_CurrentGlowEffect = 0;
 }
 
 extern "C" void fn_801BA4C8(const char* szName)
 {
-    fn_802E8A2C(EmissionManager::Instance(),
+    EmissionManager::Instance()->Destroy(
         fn_802E7D54(EmissionManager::Instance(), nlStringLowerHash(szName)));
 }
 
@@ -2220,7 +2218,7 @@ extern "C" void fn_801BDCB4(bool bParam)
 {
     if (bParam)
     {
-        fn_802E8A2C(EmissionManager::Instance(),
+        EmissionManager::Instance()->Destroy(
             EmissionManager::Instance()->GetEffectsGroup("wind_dry"));
     }
     else
@@ -2373,7 +2371,7 @@ extern "C" int fn_801BE130(cFielder* pFielder)
     return pFielder->m_eActionState;
 }
 
-extern "C" float fn_801BE138(TweakValueImpl_804F4DC8* pTweak)
+extern "C" float fn_801BE138(TweakFloatBinding* pTweak)
 {
     return *pTweak->m_pValue;
 }

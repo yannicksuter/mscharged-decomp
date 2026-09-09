@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dwc/dwc_error.h>
+#include <dwc/dwc_match_fwd.h>
 #include <gamespy/GP/gp.h>
 #include <gamespy/qr2/qr2.h>
 #include <revolution/os/OSTime.h>
@@ -93,12 +94,6 @@ extern "C"
 
 #define DWC_SB_UPDATE_MAX_SERVERS 6
 
-    typedef void (*DWCMatchedCallback)(DWCError error, BOOL cancel,
-        void* param);
-    typedef void (*DWCMatchedSCCallback)(DWCError error, BOOL cancel,
-        BOOL self, BOOL isServer, int index, void* param);
-    typedef void (*DWCNewClientCallback)(int index, void* param);
-    typedef int (*DWCEvalPlayerCallback)(int index, void* param);
 
     typedef struct DWCstSBMessageHeader
     {
@@ -173,12 +168,6 @@ extern "C"
         DWC_MATCH_TYPE_NUM
     };
 
-    typedef enum DWCMatchOptType
-    {
-        DWC_MATCH_OPTION_MIN_COMPLETE,
-        DWC_MATCH_OPTION_SC_CONNECT_BLOCK,
-        DWC_MATCH_OPTION_NUM
-    } DWCMatchOptType;
 
     enum
     {
@@ -190,37 +179,19 @@ extern "C"
         DWC_SET_MATCH_OPT_RESULT_NUM
     };
 
-    typedef struct DWCMatchOptMinComplete
-    {
-        u8 valid;
-        u8 minEntry;
-        u8 pad[2];
-        u32 timeout;
-    } DWCMatchOptMinComplete;
 
     typedef struct DWCMatchOptSCConnectBlock
     {
         u32 valid;
     } DWCMatchOptSCConnectBlock;
 
-    typedef void (*DWCStopSCCallback)(void* param);
 
     BOOL DWC_RegisterMatchingStatus(void);
-    BOOL DWC_CancelMatching(void);
-    BOOL DWC_CancelMatchingAsync(void);
-    BOOL DWC_IsValidCancelMatching(void);
-    BOOL DWC_StopSCMatchingAsync(DWCStopSCCallback callback, void* param);
-    u8 DWC_AddMatchKeyInt(
-        u8 keyID, const char* keyString, const int* valueSrc);
     u8 DWC_AddMatchKeyString(u8 keyID, const char* keyString,
         const char* valueSrc);
-    int DWC_GetMatchIntValue(
-        int index, const char* keyString, int idefault);
     const char* DWC_GetMatchStringValue(
         int index, const char* keyString, const char* sdefault);
     int DWC_GetLastMatchingType(void);
-    int DWC_SetMatchingOption(
-        DWCMatchOptType opttype, const void* optval, int optlen);
     int DWC_GetMatchingOption(
         DWCMatchOptType opttype, void* optval, int* optlen);
     int DWC_GetMOMinCompState(u64* time);

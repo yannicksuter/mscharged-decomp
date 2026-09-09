@@ -14,6 +14,7 @@
 #include "NL/nlList.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlPrint.h"
 
 enum eGameState
 {
@@ -45,7 +46,6 @@ extern "C" void fn_800180F4(cBall*, nlVector3*, float);
 extern "C" float fn_800DFF1C();
 extern "C" void* memset(void*, int, unsigned long);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(InterpreterCore*, void*, int, cTeam*, int);
-int nlPrintf(const char*, ...);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static const float lbl_804DBF28[4][4] = {
@@ -1712,5 +1712,5 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80054B28(
 {
     unsigned int localHash = hash;
     return UnidentifiedVariant_80054AB8(fn_80312360(
-        context, fn_802DF3E4(context, &localHash), 1, team, 0));
+        context, context->FindFunctionEntryPoint(localHash), 1, team, 0));
 }

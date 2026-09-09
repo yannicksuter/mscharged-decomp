@@ -1,8 +1,6 @@
 #ifndef _FEMUSIC_H_
 #define _FEMUSIC_H_
 
-#include "types.h"
-
 namespace FEMusic
 {
 void SetInGame(bool value);

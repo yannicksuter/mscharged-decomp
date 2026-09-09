@@ -10,7 +10,7 @@
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glTexture.h"
 #include "NL/gl/glView.h"
-#include "NL/glx/GXMaterialCrystalTweaks.h"
+#include "Game/TweakValue.h"
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxMatrix.h"
@@ -18,7 +18,8 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/platvmath.h"
-#include "unclassified/Lookup_801A537C.h"
+#include "Game/Render/LightingLookup.h"
+#include "Game/TweakValueFloat.h"
 
 // GameRenderTask defines this flag as u8; this unit only matches closer when
 // it reads the byte as a bool.
@@ -83,7 +84,6 @@ extern u32 lbl_806DCC70;
 extern s32 lbl_806DCC74;
 extern f32 lbl_806DCC44;
 extern GLView* lbl_806E143C;
-extern Lookup_801A537C* lbl_806E1420;
 extern bool lbl_806E1413;
 extern bool lbl_806E1440;
 extern const u32 lbl_804DCD00[6];
@@ -116,10 +116,6 @@ GameObjectLight* fn_8018230C(s32, bool);
 
 extern Mtx lbl_80511490;
 extern nlMatrix4 lbl_80570C18;
-extern GXMaterialFloatTweak_804F4190 lbl_80570968;
-extern GXMaterialFloatTweak_804F4190 lbl_80570988;
-extern GXMaterialFloatTweak_804F4190 lbl_805709A8;
-extern GXMaterialFloatTweak_804F4190 lbl_805709C8;
 
 bool fn_80183C54();
 
@@ -139,15 +135,15 @@ nlColour fn_80183C9C(const nlVector2* arg0, bool arg1)
         return var0;
     }
 
-    f32 var0 = arg0->x * lbl_80570968.value;
-    var0 += lbl_805709A8.value;
-    f32 var1 = arg0->y * lbl_80570988.value;
-    var1 += lbl_805709C8.value;
+    f32 var0 = arg0->x * gShadowLookupScaleX.value;
+    var0 += gShadowLookupTransX.value;
+    f32 var1 = arg0->y * gShadowLookupScaleY.value;
+    var1 += gShadowLookupTransY.value;
     var0 = lbl_806E4D2C * var0 + lbl_806E4D2C;
     var1 = lbl_806E4D40 * var1 + lbl_806E4D2C;
-    var0 *= (f32)lbl_806E1420->mWidth;
-    var1 *= (f32)lbl_806E1420->mHeight;
-    return lbl_806E1420->fn_801A5760(var0, var1, arg1);
+    var0 *= (f32)gpShadowLightingLookup->mWidth;
+    var1 *= (f32)gpShadowLightingLookup->mHeight;
+    return gpShadowLightingLookup->SampleFilteredColour(var0, var1, arg1);
 }
 
 bool fn_80183C54()
@@ -158,7 +154,7 @@ bool fn_80183C54()
     if (lbl_806DCC6C == (u32)-1)
         return false;
 
-    if (lbl_806E1420 == 0)
+    if (gpShadowLightingLookup == 0)
         return false;
 
     if (!g_bRenderWorldEffects)
@@ -239,20 +235,20 @@ void fn_801837DC(s32 arg0, u32 arg1)
         gxSetTevColourIn(numTevStages, 15, 0, 8, 15);
         gxSetTevAlphaIn(numTevStages, 7, 7, 7, 0);
 
-        UnidentifiedTextureState textureState;
+        glTextureBinding textureState;
         textureState.texture = lbl_806DCC6C;
         textureState.textureIndex = 0xFFFF;
         textureState.flags = 0;
         textureState.unknown07 = 0;
         textureState.SetWrapS(!lbl_806E1413);
         textureState.SetWrapT(!lbl_806E1413);
-        fn_8036BE88(numTexGens, &textureState);
+        glx_BindTexture(numTexGens, &textureState);
 
         nlMatrix4 transform;
-        nlMakeScaleMatrix(transform, lbl_80570968.value,
-            lbl_80570988.value, lbl_806E4CD4);
-        transform.m41 = lbl_805709A8.value;
-        transform.m42 = lbl_805709C8.value;
+        nlMakeScaleMatrix(transform, gShadowLookupScaleX.value,
+            gShadowLookupScaleY.value, lbl_806E4CD4);
+        transform.m41 = gShadowLookupTransX.value;
+        transform.m42 = gShadowLookupTransY.value;
         transform.m43 = lbl_806E4CD8;
         transform.m44 = lbl_806E4CD4;
 
@@ -281,8 +277,8 @@ void fn_80183764(u32 textureHandle)
     if (textureHandle != (u32)-1 && glTextureLoad(textureHandle))
     {
         lbl_806DCC6C = textureHandle;
-        lbl_806E1420 = new (8, false) Lookup_801A537C;
-        lbl_806E1420->fn_801A53F0(textureHandle);
+        gpShadowLightingLookup = new (8, false) LightingLookup;
+        gpShadowLightingLookup->LoadTexture(textureHandle);
     }
     else
     {

@@ -1,9 +1,11 @@
 #ifndef NL_SMALL_BLOCK_ALLOCATOR_H
 #define NL_SMALL_BLOCK_ALLOCATOR_H
 
-#include "NL/nlSlotPool.h"
+#include "NL/nlPrint.h"
 
-int nlPrintf(const char*, ...);
+#include "NL/nlSlotPool.h"
+#include "NL/nlPrint.h"
+
 
 template <int kBlockSize>
 class nlSlotPoolFixed : public SlotPoolBase

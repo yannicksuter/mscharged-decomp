@@ -1,3 +1,4 @@
+#include "NL/nlPrint.h"
 #include "Game/Render/ImpostorCharacter.h"
 
 #include "Game/Render/Impostor.h"
@@ -9,10 +10,9 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
-extern "C" int nlSNPrintf(char*, unsigned long, const char*, ...);
-extern "C" double floor(double);
+#include <math.h>
 
-u32 lbl_806E1F68;
+u32 gNumImpostorSpritesCreated;
 
 ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     int numAngles, int numTextures, const ImpostorCharacterParams* params)
@@ -22,7 +22,7 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     , mWidth(0x40)
     , mHeight(0x40)
     , mUnidentified034(false)
-    , mUnidentified035(false)
+    , mUseIntensityAlpha(false)
     , mBaseAngle(0)
     , mName(name)
 {
@@ -31,7 +31,7 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
         mWidth = params->mWidth;
         mHeight = params->mHeight;
         mUnidentified034 = params->mUnidentified008;
-        mUnidentified035 = params->mUnidentified009;
+        mUseIntensityAlpha = params->mUseIntensityAlpha;
         mBaseAngle = params->mBaseAngle;
     }
 
@@ -42,7 +42,7 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     mfCameraLookatZ.BindWithDefault("mfCameraLookatZ", 1.2f, pathBuffer, true, 0.0f, 10.0f, 0.01f);
     mfCameraDistance.BindWithDefault("mfCameraDistance", 2.3f, pathBuffer, true, 0.0f, 40.0f, 0.01f);
 
-    fn_802C8280("ImpostorCharacter");
+    glBeginResource("ImpostorCharacter");
 
     u16 angleStep = (u16)((int)(65536.0f * (360.0f / (float)mNumAngles)) / 360);
     for (int i = 0; i < mNumTextures; ++i)
@@ -53,31 +53,31 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
         u16 angle = 0;
         for (int j = 0; j < mNumAngles; ++j)
         {
-            ImpostorSprite_802D4290* sprite = new ImpostorSprite_802D4290(
+            ImpostorSprite* sprite = new ImpostorSprite(
                 this, i, budget / (mNumAngles * mNumTextures), mWidth, mHeight);
-            sprite->mUnidentified088 = mUnidentified035;
+            sprite->mUseIntensityAlpha = mUseIntensityAlpha;
 
             char nameBuffer[0x40];
             nlSNPrintf(nameBuffer, 0x40, "Impostor-%s%d", mName, i * mNumAngles + j);
-            fn_802D4480(sprite, nameBuffer);
+            sprite->Initialize(nameBuffer);
 
             sprite->mAngle = mBaseAngle + angle;
             mSprites.AddEnd(sprite);
-            lbl_806E1F68++;
+            gNumImpostorSpritesCreated++;
             angle += angleStep;
         }
     }
-    fn_802C8288();
+    glEndResource();
 
     ImpostorManager::GetInstance()->AddCharacter(this);
 }
 
 ImpostorCharacter::~ImpostorCharacter()
 {
-    nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
     while (it.m_Curr != 0)
     {
-        ImpostorSprite_802D4290* sprite = it.m_Curr->entry;
+        ImpostorSprite* sprite = it.m_Curr->entry;
         delete sprite;
         mSprites.Remove(&it);
     }
@@ -86,7 +86,7 @@ ImpostorCharacter::~ImpostorCharacter()
     mSprites.m_Allocator.FreeBlocks();
 }
 
-extern "C" u16 fn_802D75AC(u16 target, int count)
+u16 QuantizeImpostorAngle(u16 target, int count)
 {
     u16 step = (u16)((int)(65536.0f * (360.0f / (float)count)) / 360);
     int angle;
@@ -109,18 +109,18 @@ extern "C" u16 fn_802D75AC(u16 target, int count)
 
 void ImpostorCharacter::Acquire(Impostor* impostor)
 {
-    ImpostorSprite_802D4290* best = 0;
+    ImpostorSprite* best = 0;
     float pick = floor(nlRandomf(0.0f, (float)mNumTextures, &nlDefaultSeed));
-    DLListEntry<ImpostorSprite_802D4290*>* head;
-    DLListEntry<ImpostorSprite_802D4290*>* entry;
+    DLListEntry<ImpostorSprite*>* head;
+    DLListEntry<ImpostorSprite*>* entry;
     int index = (int)pick;
     int current = 0;
-    nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
     head = it.m_Head;
     entry = it.m_Curr;
     while (entry != 0)
     {
-        ImpostorSprite_802D4290* sprite = entry->entry;
+        ImpostorSprite* sprite = entry->entry;
         if (sprite->mAngle == impostor->mAngle)
         {
             best = sprite;
@@ -140,18 +140,18 @@ void ImpostorCharacter::Acquire(Impostor* impostor)
         }
     }
 
-    fn_802D50D8(best, impostor->mSlot);
+    best->AddImpostorSlot(impostor->mSlot);
     impostor->mpSprite = best;
 }
 
 void ImpostorCharacter::ReleaseSprites()
 {
-    nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
-    DLListEntry<ImpostorSprite_802D4290*>* head = it.m_Head;
-    DLListEntry<ImpostorSprite_802D4290*>* entry = it.m_Curr;
+    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    DLListEntry<ImpostorSprite*>* head = it.m_Head;
+    DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        fn_802D5110(entry->entry);
+        entry->entry->ClearImpostorSlots();
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
@@ -163,15 +163,15 @@ void ImpostorCharacter::ReleaseSprites()
     }
 }
 
-void ImpostorCharacter::UnidentifiedVirtual2C(void* unidentified0,
-    void* unidentified1)
+void ImpostorCharacter::UpdateView(const nlVector3* direction,
+    const nlVector3* up)
 {
-    nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
-    DLListEntry<ImpostorSprite_802D4290*>* head = it.m_Head;
-    DLListEntry<ImpostorSprite_802D4290*>* entry = it.m_Curr;
+    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    DLListEntry<ImpostorSprite*>* head = it.m_Head;
+    DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        fn_802D4484(entry->entry, (const nlVector3*)unidentified0, (const nlVector3*)unidentified1);
+        entry->entry->UpdateView(direction, up);
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
@@ -185,33 +185,33 @@ void ImpostorCharacter::UnidentifiedVirtual2C(void* unidentified0,
 
 void ImpostorCharacter::UpdateSprites(int period, int slot)
 {
-    DLListEntry<ImpostorSprite_802D4290*>* head;
-    DLListEntry<ImpostorSprite_802D4290*>* entry;
+    DLListEntry<ImpostorSprite*>* head;
+    DLListEntry<ImpostorSprite*>* entry;
     int lastTexture = -1;
 
-    nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
     head = it.m_Head;
     entry = it.m_Curr;
     while (entry != 0)
     {
-        ImpostorSprite_802D4290* sprite = entry->entry;
-        if (sprite->mUnidentified044 % period == slot)
+        ImpostorSprite* sprite = entry->entry;
+        if (sprite->mID % period == slot)
         {
-            fn_802D4898(sprite);
-            if (sprite->mUnidentified084 > 0 || mUnidentified00C != 0)
+            sprite->ResumeCapture();
+            if (sprite->mNumRenderSlots > 0 || mUnidentified00C != 0)
             {
-                if (lastTexture != sprite->mUnidentified048)
+                if (lastTexture != sprite->mTextureIndex)
                 {
-                    UnidentifiedVirtual1C(sprite->mUnidentified048);
-                    lastTexture = sprite->mUnidentified048;
+                    EvaluatePose(sprite->mTextureIndex);
+                    lastTexture = sprite->mTextureIndex;
                 }
-                UnidentifiedVirtual20(sprite->mUnidentified068,
-                    sprite->mUnidentified048);
+                Render(sprite->mView,
+                    sprite->mTextureIndex);
             }
         }
         else
         {
-            fn_802D4874(sprite);
+            sprite->SuspendCapture();
         }
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
@@ -226,14 +226,14 @@ void ImpostorCharacter::UpdateSprites(int period, int slot)
 
 void ImpostorCharacter::EnableSprites(bool enable)
 {
-    nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
-    DLListEntry<ImpostorSprite_802D4290*>* head = it.m_Head;
-    DLListEntry<ImpostorSprite_802D4290*>* entry = it.m_Curr;
+    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    DLListEntry<ImpostorSprite*>* head = it.m_Head;
+    DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        ImpostorSprite_802D4290* sprite = entry->entry;
-        sprite->mUnidentified078 = enable;
-        fn_802D47F8(sprite);
+        ImpostorSprite* sprite = entry->entry;
+        sprite->mEnabled = enable;
+        sprite->UpdateViewport();
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
@@ -245,34 +245,16 @@ void ImpostorCharacter::EnableSprites(bool enable)
     }
 }
 
-void ImpostorCharacter::RegisterSprites(void* registry)
+void ImpostorCharacter::RegisterSprites(GLView* registry)
 {
-    nlDLListIterator<ImpostorSprite_802D4290*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
     GLView* target;
-    DLListEntry<ImpostorSprite_802D4290*>* head = it.m_Head;
-    DLListEntry<ImpostorSprite_802D4290*>* entry = it.m_Curr;
+    DLListEntry<ImpostorSprite*>* head = it.m_Head;
+    DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        target = entry->entry->mUnidentified068;
-        UnidentifiedRegistryNode_802D7AEC* node = (UnidentifiedRegistryNode_802D7AEC*)nlMalloc(8, 8, false);
-        if (node != 0)
-        {
-            node->mNext = 0;
-            node->mTarget = target;
-        }
-        node->mNext = 0;
-
-        UnidentifiedRegistry_802D7AEC* list = (UnidentifiedRegistry_802D7AEC*)registry;
-        if (list->mTail != 0)
-        {
-            list->mTail->mNext = node;
-            list->mTail = node;
-        }
-        else
-        {
-            list->mTail = node;
-            list->mHead = node;
-        }
+        target = entry->entry->mView;
+        registry->m_Children.AddEnd(target);
         target->m_Parent = registry;
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
@@ -285,35 +267,35 @@ void ImpostorCharacter::RegisterSprites(void* registry)
     }
 }
 
-void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual1C(int texture)
+void AnimatedImpostorCharacter::EvaluatePose(int texture)
 {
-    fn_802DB26C(mModels[texture]);
+    mModels[texture]->EvaluatePose();
 }
 
-void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual18(int index,
+void AnimatedImpostorCharacter::SetAnimationTime(int index,
     float phase)
 {
-    fn_802DB2B8(mModels[index], phase);
+    mModels[index]->SetAnimationTime(phase);
 }
 
-void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual20(void* target,
+void AnimatedImpostorCharacter::Render(GLView* target,
     int texture)
 {
-    mModels[texture]->UnidentifiedVirtual0C((GLView*)target, 0);
+    mModels[texture]->Render(target, 0);
 }
 
-ImpostorCharacterImpl_8052E9B8::ImpostorCharacterImpl_8052E9B8(
-    const char* name, ImpostorModel_802DAEE0* model, void* animations,
+AnimatedImpostorCharacter::AnimatedImpostorCharacter(
+    const char* name, ImpostorModel* model, void* animations,
     int budget, int numAngles, int numTextures,
     const ImpostorCharacterParams* params)
     : ImpostorCharacter(name, budget, numAngles, numTextures, params)
 {
     mNumModels = numTextures;
-    mModels = (ImpostorModel_802DAEE0**)nlMalloc(numTextures * 4, 8, false);
+    mModels = (ImpostorModel**)nlMalloc(numTextures * 4, 8, false);
     mModels[0] = model;
     for (int i = 1; i < numTextures; ++i)
     {
-        mModels[i] = fn_802DB0AC(model, fn_802CC094());
+        mModels[i] = model->Clone(glGetCurrentResourcePool());
     }
     for (int i = 0; i < numTextures; ++i)
     {
@@ -321,7 +303,7 @@ ImpostorCharacterImpl_8052E9B8::ImpostorCharacterImpl_8052E9B8(
     }
 }
 
-ImpostorCharacterImpl_8052E9B8::~ImpostorCharacterImpl_8052E9B8()
+AnimatedImpostorCharacter::~AnimatedImpostorCharacter()
 {
     for (int i = 1; i < mNumModels; ++i)
     {
@@ -333,15 +315,15 @@ ImpostorCharacterImpl_8052E9B8::~ImpostorCharacterImpl_8052E9B8()
     delete[] mModels;
 }
 
-void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual24(float dt)
+void AnimatedImpostorCharacter::UpdateAnimation(float dt)
 {
     for (int i = 0; i < mNumModels; ++i)
     {
-        fn_802DB22C(mModels[i], dt);
+        mModels[i]->UpdateAnimation(dt);
     }
 }
 
-void ImpostorCharacterImpl_8052E9B8::UnidentifiedVirtual28(float dt,
+void AnimatedImpostorCharacter::PlayAnimation(float dt,
     const char* unidentified)
 {
     for (int i = 0; i < mNumModels; ++i)

@@ -24,16 +24,26 @@ void* glplatResourceAlloc(
 void* glplatFrameAlloc(unsigned long size, eGLMemory memType);
 unsigned long glx_GetFreeMemory();
 
-struct UnidentifiedMemoryRequirement_80376664
+extern const char* szMemoryNames[GLM_Num];
+
+struct GLMemoryRequirement
 {
-    eGLMemory m_00;
-    unsigned long m_04;
+    eGLMemory mType;
+    unsigned long mSize;
 };
 
-class ResourceInterface_802CC094;
+class GLResourcePool;
+class GLXResourcePool;
 
-ResourceInterface_802CC094* fn_80376664(
-    const UnidentifiedMemoryRequirement_80376664* requirements,
+struct GLResourceMarker
+{
+    unsigned long mUsedMemory[2];
+    int mLevel;
+    GLXResourcePool* mPool;
+}; // size: 0x10
+
+GLResourcePool* glplatCreateResourcePool(
+    const GLMemoryRequirement* requirements,
     unsigned long count, const char* name);
 
 #endif // NL_GLX_GLXMEMORY_H

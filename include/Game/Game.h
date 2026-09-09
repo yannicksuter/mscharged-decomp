@@ -65,6 +65,7 @@ public:
     cGame(void* param1, int param2, bool param3);
 
     void fn_80057FC0();
+    void fn_80057FD8(u8 param1);
     void fn_80058180();
     void fn_8005830C();
     void fn_80058400();
@@ -78,6 +79,7 @@ public:
     float GetGameTime();
     void fn_800586C0();
     void fn_80058704();
+    void fn_80058748();
     void fn_80058A78(float seconds);
     void BlowUpPowerups(
         const UnidentifiedGameRegion& v3ExplosionPosition,
@@ -222,10 +224,7 @@ public:
     /* 0x10D8 */ Terrain* mpTerrain;
     /* 0x10DC */ TU800A9B78* mUnidentified10DC;
     /* 0x10E0 */ CrowdRiot* mUnidentified10E0;
-    /* 0x10E4 */ AvoidablePolygon* mUnidentified10E4;
-    /* 0x10E8 */ AvoidablePolygon* mUnidentified10E8;
-    /* 0x10EC */ AvoidablePolygon* mUnidentified10EC;
-    /* 0x10F0 */ AvoidablePolygon* mUnidentified10F0;
+    /* 0x10E4 */ AvoidablePolygon* mUnidentified10E4[4];
 };
 
 extern cGame* g_pGame;

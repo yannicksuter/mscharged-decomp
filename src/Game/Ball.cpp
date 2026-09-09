@@ -41,11 +41,12 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/utility.h"
-#include "unclassified/tu_80199E84.h"
+#include "Game/Render/BirdoEgg.h"
 #include "unclassified/tu_801A5F10.h"
 #include "Game/DB/StadiumInfo.h"
-#include "unclassified/tu_80276264.h"
+#include "Game/Render/StadiumLoading.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/Render/StadiumLoading.h"
 
 struct UnidentifiedBallRuntime
 {
@@ -120,7 +121,7 @@ class UnidentifiedEvent2View : public UnidentifiedEventBase
     typedef DLListEntry<Listener> ListenerEntry;
 
 public:
-    void UnidentifiedDeliver(P1 p1, P2 p2)
+    void Deliver(P1 p1, P2 p2)
     {
         nlDLListIterator<Listener> iterator = mListeners.Begin();
         while (iterator.hasNext())
@@ -182,7 +183,7 @@ extern "C" void fn_80019F10(void*);
 extern "C" void fn_8001A00C(void*);
 extern "C" void fn_8001A108(int, int);
 extern "C" void fn_8001AA0C(LiveBallTrail*, bool);
-extern "C" void fn_8019A434(BirdoEggObject*, bool);
+extern "C" void Hide(BirdoEggObject*, bool);
 extern "C" void fn_801BDDE4();
 extern "C" void fn_801BDF08(int);
 extern "C" void fn_80097358(cPlayer*, float);
@@ -194,7 +195,6 @@ extern "C" void fn_801B9FD0(cBall*, bool);
 void ReleaseAudioSoundOwner(void*, void*);
 extern "C" void fn_802B5370(
     nlQuaternion&, const nlVector3&, unsigned short);
-extern "C" DrawableObject* fn_8027638C(unsigned int);
 extern "C" UnidentifiedBallRuntime* fn_802ECB68(void*);
 float Exp(float);
 
@@ -271,15 +271,15 @@ extern float lbl_806DB54C;
 float lbl_806DB558 = 10.0f;
 float lbl_806DB55C = 10.0f;
 
-static TweakValueBoolImpl_804F4538 sUnidentifiedTweak_8056B478(
+static TweakBoolBinding sUnidentifiedTweak_8056B478(
     "gbUsePassCharging", "Game/Gameplay/Charging/Pass", &lbl_806DB500, true);
-static TweakValueBoolImpl_804F4538 sUnidentifiedTweak_8056B498(
+static TweakBoolBinding sUnidentifiedTweak_8056B498(
     "gbUseShotCharging", "Game/Gameplay/Charging/Shot", &lbl_806DB501, true);
-static TweakValueImpl_804F4DC8 sUnidentifiedTweak_8056B4B8(
+static TweakFloatBinding sUnidentifiedTweak_8056B4B8(
     "gfShotClockTime", "Game/Gameplay/Charging/Shot Clock", &lbl_806DB558, true);
-static TweakValueImpl_804F4DC8 sUnidentifiedTweak_8056B4D8(
+static TweakFloatBinding sUnidentifiedTweak_8056B4D8(
     "gfShotClockFrozenTime", "Game/Gameplay/Charging/Shot Clock", &lbl_806DB55C, true);
-static TweakValueBoolImpl_804F4538 sUnidentifiedTweak_8056B4F8(
+static TweakBoolBinding sUnidentifiedTweak_8056B4F8(
     "gbUseShotClock", "Game/Gameplay/Charging/Shot Clock", &lbl_806E0BDC, true);
 LiveBallTrail lbl_8056B518[10];
 
@@ -377,7 +377,7 @@ cBall::cBall()
 
     m_pBlurHandler = NULL;
     mUnidentifiedF0 = 0;
-    m_pDrawableBall = fn_8027725C(nlStringHash("gameplay/ball"));
+    m_pDrawableBall = FindStadiumDrawableObject(nlStringHash("gameplay/ball"));
 
     m_pPhysicsBall = new (8, false) PhysicsAIBall(0.18f);
     m_pPhysicsBall->m_pAIBall = this;
@@ -1156,18 +1156,18 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             m_v3Position, m_v3Velocity);
     }
 
-    KoopaShellObject* pKoopaShell = lbl_806E1608->mUnidentified02C;
+    KoopaShellObject* pKoopaShell = gNPCManager->mUnidentified02C;
     if (pKoopaShell != NULL && pKoopaShell->mVisible)
     {
         pKoopaShell->mVelocity = m_v3Velocity;
         fn_801A65D0(pKoopaShell, m_v3Position);
     }
 
-    BirdoEggObject* pState = lbl_806E1608->mUnidentified028;
-    if (pState != NULL && pState->visible)
+    BirdoEggObject* pState = gNPCManager->mpBirdoEgg;
+    if (pState != NULL && pState->mVisible)
     {
-        pState->unknown_40 = m_v3Velocity;
-        fn_8019A248(pState, m_v3Position);
+        pState->mVelocity = m_v3Velocity;
+        pState->SetPosition(m_v3Position);
     }
 }
 
@@ -1630,7 +1630,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
     UnidentifiedEvent2View<int, int>* event
         = (UnidentifiedEvent2View<int, int>*)
             &g_pGame->mUnidentified49C.mEvent14;
-    event->UnidentifiedDeliver(previousState, nBallState);
+    event->Deliver(previousState, nBallState);
 
     if (pBall->meBallState == 9)
     {
@@ -2632,95 +2632,94 @@ void cBall::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (lbl_806DB5C0 == 0xFFFF)
     {
-        lbl_806DB5C0 = fn_80338EBC(cache, "DetBall");
-        fn_80338F88(cache, 16, lbl_80533C98[16].size, 0,
+        lbl_806DB5C0 = cache->BeginType("DetBall");
+        cache->AddField(16, gDebugFieldTypes[16].size, 0,
             "m_bVisible");
-        fn_80338F88(cache, 9, lbl_80533C98[9].size,
+        cache->AddField(9, gDebugFieldTypes[9].size,
             (u8*)&m_bBallPathChangeCount - (u8*)this,
             "m_bBallPathChangeCount");
-        fn_80338F88(cache, 9, lbl_80533C98[9].size,
+        cache->AddField(9, gDebugFieldTypes[9].size,
             (u8*)&m_bBallDeflectCount - (u8*)this,
             "m_bBallDeflectCount");
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&m_tShotTimer - (u8*)this, "m_tShotTimer");
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&m_tLightningTimer - (u8*)this,
             "m_tLightningTimer");
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&m_tNoPickupTimer - (u8*)this,
             "m_tNoPickupTimer");
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&m_tPassTargetTimer - (u8*)this,
             "m_tPassTargetTimer");
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&mtNoChargeLossTimer - (u8*)this,
             "mtNoChargeLossTimer");
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&mtStuckInRiotTimer - (u8*)this,
             "mtStuckInRiotTimer");
-        fn_80338F88(cache, 20, lbl_80533C98[20].size,
+        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&mtShotClockTimer - (u8*)this,
             "mtShotClockTimer");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size,
+        cache->AddField(8, gDebugFieldTypes[8].size,
             (u8*)&mnShotClockTeam - (u8*)this, "mnShotClockTeam");
-        fn_80338F88(cache, 16, lbl_80533C98[16].size,
+        cache->AddField(16, gDebugFieldTypes[16].size,
             (u8*)&mbStuckInRiotDone - (u8*)this,
             "mbStuckInRiotDone");
-        fn_80338F88(cache, 16, lbl_80533C98[16].size,
+        cache->AddField(16, gDebugFieldTypes[16].size,
             (u8*)&mbBallOnFire - (u8*)this, "mbBallOnFire");
-        fn_80338F88(cache, 16, lbl_80533C98[16].size,
+        cache->AddField(16, gDebugFieldTypes[16].size,
             (u8*)&mbBallFrozen - (u8*)this, "mbBallFrozen");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size,
+        cache->AddField(17, gDebugFieldTypes[17].size,
             (u8*)&m_fTotalPassTime - (u8*)this, "m_fTotalPassTime");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size,
+        cache->AddField(8, gDebugFieldTypes[8].size,
             (u8*)&m_iConsecutiveVolleyPasses - (u8*)this,
             "m_iConsecutiveVolleyPasses");
-        fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        cache->AddField(22, gDebugFieldTypes[22].size,
             (u8*)&m_v3Position - (u8*)this, "m_v3Position");
-        fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        cache->AddField(22, gDebugFieldTypes[22].size,
             (u8*)&m_v3PrevPosition - (u8*)this, "m_v3PrevPosition");
-        fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        cache->AddField(22, gDebugFieldTypes[22].size,
             (u8*)&m_v3Velocity - (u8*)this, "m_v3Velocity");
-        fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        cache->AddField(22, gDebugFieldTypes[22].size,
             (u8*)&m_v3PassIntercept - (u8*)this, "m_v3PassIntercept");
-        fn_80338F88(cache, 24, lbl_80533C98[24].size,
+        cache->AddField(24, gDebugFieldTypes[24].size,
             (u8*)&m_qOrientation - (u8*)this, "m_qOrientation");
-        fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        cache->AddField(22, gDebugFieldTypes[22].size,
             (u8*)&m_v3ShotTarget - (u8*)this, "m_v3ShotTarget");
-        fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        cache->AddField(22, gDebugFieldTypes[22].size,
             (u8*)&m_v3ShotOrigin - (u8*)this, "m_v3ShotOrigin");
-        fn_80338F88(cache, 2, lbl_80533C98[2].size,
+        cache->AddField(2, gDebugFieldTypes[2].size,
             (u8*)&m_uGoalType - (u8*)this, "m_uGoalType");
-        fn_80338F88(cache, 2, lbl_80533C98[2].size,
+        cache->AddField(2, gDebugFieldTypes[2].size,
             (u8*)&m_uVoiceID - (u8*)this, "m_uVoiceID");
-        fn_80338F88(cache, 2, lbl_80533C98[2].size,
+        cache->AddField(2, gDebugFieldTypes[2].size,
             (u8*)&m_CurrentGlowEffect - (u8*)this,
             "m_CurrentGlowEffect");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size,
+        cache->AddField(17, gDebugFieldTypes[17].size,
             (u8*)&mfChargeValue - (u8*)this, "mfChargeValue");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size,
+        cache->AddField(17, gDebugFieldTypes[17].size,
             (u8*)&mfSkillShotTime - (u8*)this, "mfSkillShotTime");
-        fn_80338F88(cache, 14, lbl_80533C98[14].size,
+        cache->AddField(14, gDebugFieldTypes[14].size,
             (u8*)&meBallState - (u8*)this, "meBallState");
-        fn_80338F88(cache, 14, lbl_80533C98[14].size,
+        cache->AddField(14, gDebugFieldTypes[14].size,
             (u8*)&mePrevBallState - (u8*)this, "mePrevBallState");
-        fn_80338F88(cache, 15, lbl_80533C98[15].size,
+        cache->AddField(15, gDebugFieldTypes[15].size,
             (u8*)&m_pOwner - (u8*)this, "m_pOwner");
-        fn_80338F88(cache, 15, lbl_80533C98[15].size,
+        cache->AddField(15, gDebugFieldTypes[15].size,
             (u8*)&m_pPrevOwner - (u8*)this, "m_pPrevOwner");
-        fn_80338F88(cache, 15, lbl_80533C98[15].size,
+        cache->AddField(15, gDebugFieldTypes[15].size,
             (u8*)&m_pLastTouch - (u8*)this, "m_pLastTouch");
-        fn_80338F88(cache, 15, lbl_80533C98[15].size,
+        cache->AddField(15, gDebugFieldTypes[15].size,
             (u8*)&m_pPassTarget - (u8*)this, "m_pPassTarget");
-        fn_80338F88(cache, 15, lbl_80533C98[15].size,
+        cache->AddField(15, gDebugFieldTypes[15].size,
             (u8*)&m_pShooter - (u8*)this, "m_pShooter");
-        fn_80338F88(cache, 15, lbl_80533C98[15].size,
+        cache->AddField(15, gDebugFieldTypes[15].size,
             (u8*)&mpDamageTarget - (u8*)this, "mpDamageTarget");
-        fn_80338F78(cache);
+        cache->EndType();
     }
 
-    cBall* copy = (cBall*)fn_8033930C(
-        cache, lbl_806DB5C0, this, offsetof(cBall, m_pBlurHandler));
+    cBall* copy = (cBall*)cache->WriteData(lbl_806DB5C0, this, offsetof(cBall, m_pBlurHandler));
     if (copy != NULL)
     {
         *(int*)&copy->m_pOwner
@@ -2735,7 +2734,7 @@ void cBall::SyncLog(void* context, DebugWriteCache* cache)
             = m_pShooter == NULL ? -1 : m_pShooter->mUnidentified120;
         *(int*)&copy->mpDamageTarget
             = mpDamageTarget == NULL ? -1 : mpDamageTarget->mUnidentified120;
-        fn_80339450(cache, lbl_806DB5C0, copy, context);
+        cache->ChecksumData(lbl_806DB5C0, copy, context);
     }
 }
 
@@ -3491,16 +3490,16 @@ extern "C" void fn_8001A108(int previousState, int currentState)
         }
 
         KoopaShellObject* pKoopaShell
-            = lbl_806E1608->mUnidentified02C;
+            = gNPCManager->mUnidentified02C;
         if (pKoopaShell != NULL && pKoopaShell->mVisible)
         {
             fn_801A64A4(pKoopaShell, false);
         }
 
-        BirdoEggObject* pState = lbl_806E1608->mUnidentified028;
-        if (pState != NULL && pState->visible)
+        BirdoEggObject* pState = gNPCManager->mpBirdoEgg;
+        if (pState != NULL && pState->mVisible)
         {
-            fn_8019A434(pState, false);
+            pState->Hide(false);
         }
 
         g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
@@ -3757,7 +3756,7 @@ extern "C" void fn_8001B314(unsigned int nNumTrails)
         fn_8001AA0C(pBallTrail, false);
         pBallTrail->position = v3Unidentified;
         pBallTrail->velocity = v3Unidentified;
-        pBallTrail->drawable = fn_8027638C(i);
+        pBallTrail->drawable = GetBallRenderObject(i);
     }
 
     for (; i < 10; ++i)

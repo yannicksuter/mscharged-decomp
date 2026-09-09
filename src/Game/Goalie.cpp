@@ -39,7 +39,7 @@
 #include "NL/nlPrint.h"
 #include "unclassified/tu_800A9B78.h"
 #include "unclassified/tu_801A6AAC.h"
-#include "unclassified/tu_80336B2C.h"
+#include "Game/NetworkPeer.h"
 
 #include <math.h>
 
@@ -905,8 +905,7 @@ extern "C" void fn_8007F534(Goalie* pGoalie)
     DetInput* pGlobalPad = pGoalie->GetGlobalPad();
     if (pGlobalPad != 0)
     {
-        cGlobalPad* pPad = GetLocalChannelPad(
-            (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser);
+        cGlobalPad* pPad = ((NetworkPeerChannel*)pGlobalPad->m_pMyUser)->GetLocalChannelPad();
         if (pPad != 0)
         {
             g_pPlatPadManager->SetDPDEnabled(pPad->m_padIndex, false);

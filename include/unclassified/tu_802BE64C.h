@@ -443,7 +443,7 @@ public:
     virtual void UnidentifiedVirtual2C() = 0;
     virtual void UnidentifiedVirtual30() = 0;
     virtual void UnidentifiedVirtual34() = 0;
-    virtual void FreeValue(void* data) = 0;
+    virtual void FreeItem(void* data) = 0;
     virtual ~UnidentifiedRegistryOwner_802BF984();
 
     int UnidentifiedRelocate(UnidentifiedRegistryContainer* container);

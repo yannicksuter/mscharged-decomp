@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include "Game/Camera/CameraMan.h"
 #include "NL/gl/glView.h"
@@ -92,7 +93,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029EF54>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 struct FloatColour_80295E00
@@ -177,7 +178,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029EF54>::Draw(
 
     if (*(int*)((unsigned char*)packet->unknown20 + 36) == 1)
     {
-        UnidentifiedTextureState* texture = (UnidentifiedTextureState*)packet->unknown20;
+        glTextureBinding* texture = (glTextureBinding*)packet->unknown20;
         texture->SetWrapS(true);
         texture->SetWrapT(true);
     }

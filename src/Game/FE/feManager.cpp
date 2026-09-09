@@ -35,11 +35,12 @@
 #include "NL/nlFunction.h"
 #include "NL/nlPrint.h"
 #include "NL/nlTask.h"
-#include "unclassified/tu_80139B18.h"
+#include "NL/plat/PlatPadManager.h"
+#include "Game/RumbleActions.h"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
 #include "unclassified/tu_80284A58.h"
-#include "unclassified/tu_80332770.h"
+#include "Game/InputManager.h"
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
@@ -48,7 +49,6 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 extern "C"
 {
     void RestoreWorldRendering(UnidentifiedPresentationState* presentation);
-    bool IsIdleAndNoShotInProgress(UnidentifiedPresentationState* presentation);
     bool DuringEndOfGamePresentation(UnidentifiedPresentationState* presentation);
     void GoalieOnGameOver();
     void UpdateOverlayManager(BaseGameSceneManager* manager, float deltaTime);
@@ -417,7 +417,7 @@ void FrontEnd::UpdateForDemoMode(float fDeltaT)
     }
 }
 
-static TweakValueBool_804F4578 g_bAllowNetworkPausing(
+static TweakValueBool g_bAllowNetworkPausing(
     "g_bAllowNetworkPausing", "Network", false);
 
 void FrontEnd::UpdateForGame(float fDeltaT)

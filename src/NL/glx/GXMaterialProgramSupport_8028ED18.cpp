@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 #include <revolution/mtx.h>
 
 #include "NL/gl/glMatrix.h"
@@ -21,9 +22,9 @@ extern "C"
 
 struct GXMaterialProgramParameters_802997B8
 {
-    /* 0x00 */ UnidentifiedTextureState texture0;
-    /* 0x08 */ UnidentifiedTextureState texture1;
-    /* 0x10 */ UnidentifiedTextureState texture2;
+    /* 0x00 */ glTextureBinding texture0;
+    /* 0x08 */ glTextureBinding texture1;
+    /* 0x10 */ glTextureBinding texture2;
     /* 0x18 */ const float (*matrices)[3][4];
     /* 0x1C */ unsigned long matricesSize;
     /* 0x20 */ float value32;
@@ -82,12 +83,12 @@ void GXMaterialProgramImpl<GXMaterialProgram_802997B8>::Activate(GLView* view)
     unsigned int numTevStages;
     if (lbl_806DF039 && lbl_806E1AF8)
     {
-        UnidentifiedTextureState texture;
+        glTextureBinding texture;
         texture.texture = fn_80182EB8();
         texture.textureIndex = 0xFFFF;
         texture.flags = 3;
         texture.unknown07 = 0;
-        fn_8036BE88(4, &texture);
+        glx_BindTexture(4, &texture);
 
         numChans = 1;
         numTexGens = 5;
@@ -185,7 +186,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802997B8>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 struct FloatColour_8028ED18
@@ -237,12 +238,12 @@ void GXMaterialProgramImpl<GXMaterialProgram_802997B8>::Draw(
     unsigned long texture = lbl_8057AFC0[textureIndex];
     if (lbl_806E1B04 != texture)
     {
-        UnidentifiedTextureState textureState;
+        glTextureBinding textureState;
         textureState.texture = texture;
         textureState.textureIndex = 0xFFFF;
         textureState.flags = 3;
         textureState.unknown07 = 0;
-        fn_8036BE88(3, &textureState);
+        glx_BindTexture(3, &textureState);
         lbl_806E1B04 = texture;
     }
 
@@ -263,11 +264,11 @@ void GXMaterialProgramImpl<GXMaterialProgram_802997B8>::Draw(
 
     if (packet->unknown28 == 0)
     {
-        fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
+        glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }
     else
     {
-        fn_8036D774(&modelview);
+        glx_LoadDefaultSkinMatrices(&modelview);
     }
 
     if (lbl_806DF039 && value36 != 1.0f)

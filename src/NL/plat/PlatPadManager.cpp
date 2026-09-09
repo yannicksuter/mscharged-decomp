@@ -195,7 +195,7 @@ void PlatPadManager::UpdateChannel(int channel)
 
     if (newType != type[channel])
     {
-        deviceChanged.UnidentifiedDeliver(
+        deviceChanged.Deliver(
             channel, type[channel], newType);
         type[channel] = newType;
     }

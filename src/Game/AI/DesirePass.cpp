@@ -97,7 +97,7 @@ bool DesirePreparePass::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0x188 | 0x800BA704 | size: 0x6A0
  */
-void DesirePreparePass::UnidentifiedUpdate(
+void DesirePreparePass::Update(
     UnidentifiedDesireUpdate* update, float fDeltaT)
 {
     if (fn_800D9EC4(mpPassTarget) != 0.0f)
@@ -224,7 +224,7 @@ bool DesirePass::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0x9DC | 0x800BAF58 | size: 0x4
  */
-void DesirePass::UnidentifiedUpdate(
+void DesirePass::Update(
     UnidentifiedDesireUpdate*, float)
 {
 }
@@ -301,22 +301,22 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800BAF60(
 void DesirePass::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesirePass");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    *(unsigned short*)field = cache->BeginType("DesirePass");
+    cache->AddField(22, gDebugFieldTypes[22].size,
         0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
         "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
         "mThinkTimer");
-    fn_80338F88(cache, 15, lbl_80533C98[15].size,
+    cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpPassTarget - (u8*)&mvDesiredPosition,
         "mpPassTarget");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size,
+    cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&mbVolleyPass - (u8*)&mvDesiredPosition,
         "mbVolleyPass");
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 /**
@@ -331,7 +331,7 @@ void DesirePass::UnidentifiedVirtual7(
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = fn_8033930C(cache, lbl_806DC146,
+    void* data = cache->WriteData(lbl_806DC146,
         (u8*)this + offset, sizeof(DesirePass) - offset);
     if (data != 0)
     {
@@ -339,7 +339,7 @@ void DesirePass::UnidentifiedVirtual7(
             (DesirePass*)((u8*)data - offset);
         desire->mpPassTarget = (cPlayer*)(mpPassTarget == 0
                 ? -1 : mpPassTarget->mUnidentified120);
-        fn_80339450(cache, lbl_806DC146, data, context);
+        cache->ChecksumData(lbl_806DC146, data, context);
     }
 }
 
@@ -350,25 +350,25 @@ void DesirePreparePass::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field =
-        fn_80338EBC(cache, "DesirePreparePass");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        cache->BeginType("DesirePreparePass");
+    cache->AddField(22, gDebugFieldTypes[22].size,
         0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
         "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
         "mThinkTimer");
-    fn_80338F88(cache, 15, lbl_80533C98[15].size,
+    cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpPassTarget - (u8*)&mvDesiredPosition,
         "mpPassTarget");
-    fn_80338F88(cache, 16, lbl_80533C98[16].size,
+    cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&mbVolleyPass - (u8*)&mvDesiredPosition,
         "mbVolleyPass");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&mfAbortThreshold - (u8*)&mvDesiredPosition,
         "mfAbortThreshold");
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 /**
@@ -383,7 +383,7 @@ void DesirePreparePass::UnidentifiedVirtual7(
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = fn_8033930C(cache, lbl_806DC144,
+    void* data = cache->WriteData(lbl_806DC144,
         (u8*)this + offset, sizeof(DesirePreparePass) - offset);
     if (data != 0)
     {
@@ -391,8 +391,7 @@ void DesirePreparePass::UnidentifiedVirtual7(
             (DesirePreparePass*)((u8*)data - offset);
         desire->mpPassTarget = (cPlayer*)(mpPassTarget == 0
                 ? -1 : mpPassTarget->mUnidentified120);
-        fn_80339450(
-            cache, lbl_806DC144, data, context);
+        cache->ChecksumData(lbl_806DC144, data, context);
     }
 }
 

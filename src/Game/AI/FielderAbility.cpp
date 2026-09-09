@@ -81,7 +81,7 @@ extern "C" void fn_801B897C(cFielder* pFielder);
 extern "C" void fn_801BAF98(cFielder* pFielder);
 extern "C" void fn_801BB0DC(cFielder* pFielder);
 extern "C" void fn_801BB120(cFielder* pFielder);
-extern "C" bool IsNetworkOrRecordedGame(void);
+bool IsNetworkOrRecordedGame(void);
 
 void cFielder::fn_8004F828()
 {

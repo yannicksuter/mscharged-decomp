@@ -2,9 +2,9 @@
 
 #include <string.h>
 
-#include "Game/NetworkMessages.h"
+#include "Game/NetworkMessageSerializer.h"
 
-SlotPool<DetermDataEvent> lbl_805848E8(10, 0);
+SlotPool<DetermDataEvent> gDetermDataEventPool(10, 0);
 
 DetermDataEvent::DetermDataEvent()
     : mSize(0)
@@ -23,7 +23,7 @@ DetermDataEvent::DetermDataEvent(const void* data, u32 size)
     memcpy(mData, data, size);
 }
 
-void DetermDataEvent::fn_80331A34(UnidentifiedMessageSerializer* serializer)
+void DetermDataEvent::Serialize(NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mSize, 1);
     serializer->Transfer(mData, mSize);

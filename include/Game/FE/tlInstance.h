@@ -16,12 +16,10 @@ enum eTimeLineAssetType
     TLAT_MAX_TYPES = 6,
 };
 
-class TLComponent;
-
 class TLInstance
 {
 public:
-    TLInstance(TLComponent* component);
+    TLInstance(FELibObject* component);
 
     eTimeLineAssetType GetType() const;
     bool IsValidAtTime(float fCurrentTime);
@@ -55,7 +53,7 @@ public:
     /* 0x00 */ TLInstance* m_next;
     /* 0x04 */ TLInstance* m_prev;
     /* 0x08 */ TLInstance* pChildren;
-    /* 0x0C */ TLComponent* m_component;
+    /* 0x0C */ FELibObject* m_component;
     /* 0x10 */ f32 m_fStartTime;
     /* 0x14 */ f32 m_fDuration;
     /* 0x18 */ char m_szName[32];
@@ -66,5 +64,8 @@ public:
     /* 0x8C */ u16 m_priority;
     /* 0x8E */ bool m_bVisible;
 };
+
+extern TLInstance gDefaultTLGroupInstance;
+extern TLInstance gDefaultTLLayerInstance;
 
 #endif // _TLINSTANCE_H_

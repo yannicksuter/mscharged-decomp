@@ -1,9 +1,13 @@
 #include "unclassified/tu_80245F04.h"
+#include "Game/FE/tlTextInstance.h"
 #include "Game/FE/FEAudio.h"
 
-#include "Game/GameSceneManager.h"
+#include "Game/BaseGameSceneManager.h"
 #include "Game/FE/tlInstance.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/FE/FEAudio.h"
+
+extern BaseGameSceneManager* g_pGameSceneManager;
 
 
 /**
@@ -25,5 +29,5 @@ void TU80245F04Scene::fn_802466C0()
 {
     mUnidentified1FC = false;
     FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
-    GameSceneManager::Instance()->Push((SceneList)40, SCREEN_BACK, true);
+    g_pGameSceneManager->Push((SceneList)40, SCREEN_BACK, true);
 }

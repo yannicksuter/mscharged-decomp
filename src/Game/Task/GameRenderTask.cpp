@@ -31,8 +31,8 @@
 #include "Game/Render/ShootToScoreArrow.h"
 #include "Game/Render/ShootToScoreMeter.h"
 #include "Game/Render/depthoffield.h"
-#include "Game/Render/tu_802D88F4.h"
-#include "Game/Render/tu_802DCDB4.h"
+#include "Game/Render/CrowdImpostorManager.h"
+#include "Game/Render/WorldNPC.h"
 #include "Game/ReplayManager.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -52,12 +52,12 @@
 #include "NL/nlTask.h"
 #include "NL/nlTicker.h"
 #include "unclassified/tu_80188884.h"
-#include "unclassified/tu_801A4188.h"
+#include "Game/Render/CrowdImpostors.h"
 #include "unclassified/tu_801A6824.h"
 #include "unclassified/tu_801A6AAC.h"
 #include "Game/Render/PeachPhoto.h"
 #include "unclassified/tu_801AE530.h"
-#include "unclassified/tu_801B369C.h"
+#include "Game/Render/Warble.h"
 #include "unclassified/tu_802B7798.h"
 #include "unclassified/tu_8037091C.h"
 
@@ -101,9 +101,7 @@ static void WarbleTest(float fDeltaT)
         config.view = GetLayerView(eCLV_Unshadowed);
         config.position = g_pCharacters[0]->mUnidentified024.m_v3Position;
         config.position.z = (1.0f / 128.0f)
-            + reinterpret_cast<UnidentifiedStadiumShadowData*>(
-                  BasicStadium::GetCurrentStadium())
-                  ->shadowHeight;
+            + BasicStadium::GetCurrentStadium()->m_shadowHeight;
         config.blobScale = g_fWarbleBlobScale;
         config.duration = g_fWarbleDuration;
         config.values18[0] = lbl_806DC7E0;
@@ -140,7 +138,7 @@ static int sTriStripIndices[4] = { 3, 0, 2, 1 };
 static int sQuadIndices[4] = { 0, 1, 2, 3 };
 
 static void RenderImageQuad(GLView* view, unsigned long texture,
-    const UnidentifiedTextureState* pExtraTextureStates, const nlVector2* positions,
+    const glTextureBinding* pExtraTextureStates, const nlVector2* positions,
     const nlVector2* texcoords)
 {
     UnidentifiedMeshWriter_802A195C writer;
@@ -162,8 +160,8 @@ static void RenderImageQuad(GLView* view, unsigned long texture,
     {
         memcpy((u8*)writer.model->packets->unknown20 + 8, pExtraTextureStates, 0x10);
 
-        UnidentifiedTextureState* state
-            = (UnidentifiedTextureState*)writer.model->packets->unknown20;
+        glTextureBinding* state
+            = (glTextureBinding*)writer.model->packets->unknown20;
         state->texture = texture;
         state->textureIndex = 0xFFFF;
         state->SetWrapS(1);
@@ -216,8 +214,8 @@ void GameRenderTask::Run(float fDeltaT)
         void* save14F8;
         GLView* save19D8;
         int saveView;
-        void* saveStadium068;
-        void* saveStadium06C;
+        GLView* saveStadiumOpaqueView;
+        GLView* saveStadiumAlphaView;
         GLView* saveShapeView;
         GLView* save132C;
         u32 save1330;
@@ -228,16 +226,16 @@ void GameRenderTask::Run(float fDeltaT)
 
         pipView = GetLayerView(eCLV_PictureInPicture);
         pipAlphaView = GetLayerView(eCLV_PictureInPictureAlpha);
-        saveStadium068 = BasicStadium::GetCurrentStadium()->mUnidentified068;
-        saveStadium06C = BasicStadium::GetCurrentStadium()->mUnidentified06C;
+        saveStadiumOpaqueView = BasicStadium::GetCurrentStadium()->m_pOpaqueView;
+        saveStadiumAlphaView = BasicStadium::GetCurrentStadium()->m_pAlphaView;
         save14F8 = gpChainChompShadowView;
         gpChainChompShadowView = pipView;
         saveShapeView = g_ShapeRenderer.m_eView;
         g_ShapeRenderer.m_eView = pipView;
         save132C = g_pNetMeshView;
         save1330 = g_NetMeshInvisiblePlaneView;
-        BasicStadium::GetCurrentStadium()->mUnidentified068 = pipView;
-        BasicStadium::GetCurrentStadium()->mUnidentified06C = pipAlphaView;
+        BasicStadium::GetCurrentStadium()->m_pOpaqueView = pipView;
+        BasicStadium::GetCurrentStadium()->m_pAlphaView = pipAlphaView;
         save19D8 = g_pNisRenderView;
         saveView = g_nCharacterView;
         g_pNetMeshView = pipAlphaView;
@@ -268,8 +266,8 @@ void GameRenderTask::Run(float fDeltaT)
         g_pNetMeshView = save132C;
         g_NetMeshInvisiblePlaneView = save1330;
         g_ShapeRenderer.m_eView = saveShapeView;
-        BasicStadium::GetCurrentStadium()->mUnidentified068 = saveStadium068;
-        BasicStadium::GetCurrentStadium()->mUnidentified06C = saveStadium06C;
+        BasicStadium::GetCurrentStadium()->m_pOpaqueView = saveStadiumOpaqueView;
+        BasicStadium::GetCurrentStadium()->m_pAlphaView = saveStadiumAlphaView;
 
         NisPlayer::Instance()->Render(1);
         RenderFrame(0.0f, false);
@@ -380,7 +378,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
 
     if (!bCaptainShot)
     {
-        WorldNPCManager_802DD4F0* worldNPCs = gpWorldNPCManager;
+        WorldNPCManager* worldNPCs = gpWorldNPCManager;
         worldNPCs->Render(GetLayerView(eCLV_MoreCharacters));
     }
 
@@ -510,12 +508,11 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
         if (ImpostorManager::GetInstance()->mEnabled)
         {
             UpdateImpostorPositions();
-            UpdateCrowdVisibility(GetCrowdImpostorManager(),
-                GetLayerView(bPictureInPicture ? eCLV_PictureInPicture : eCLV_ImpostorOut));
+            (GetCrowdImpostorManager())->UpdateCrowdVisibility(GetLayerView(bPictureInPicture ? eCLV_PictureInPicture : eCLV_ImpostorOut));
 
             if (ImpostorManager::GetInstance()->mUnidentified037)
             {
-                ReleaseCrowdImpostors(GetCrowdImpostorManager());
+                GetCrowdImpostorManager()->ReleaseCrowdImpostors();
             }
 
             bool paused = nlTaskManager::m_pInstance->mCurrentState == 0x10;
@@ -524,8 +521,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
 
             if (ImpostorManager::GetInstance()->mUnidentified037)
             {
-                UpdateCrowdVisibility(GetCrowdImpostorManager(),
-                    GetLayerView(bPictureInPicture ? eCLV_PictureInPicture : eCLV_ImpostorOut));
+                (GetCrowdImpostorManager())->UpdateCrowdVisibility(GetLayerView(bPictureInPicture ? eCLV_PictureInPicture : eCLV_ImpostorOut));
             }
 
             ImpostorManager::GetInstance()->Render(

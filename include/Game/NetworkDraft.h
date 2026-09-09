@@ -11,7 +11,7 @@ struct NetworkDraftPlayer
     NetworkDraftPlayer()
         : mPeerIndex(-1)
         , mDisconnected(false)
-        , mUnidentified81(false)
+        , mGuest(false)
     {
         mName[0] = 0;
         memset(mData, 0, sizeof(mData));
@@ -23,7 +23,7 @@ struct NetworkDraftPlayer
     /* 0x7A */ u8 mPadding7A[2];
     /* 0x7C */ int mPeerIndex;
     /* 0x80 */ bool mDisconnected;
-    /* 0x81 */ bool mUnidentified81;
+    /* 0x81 */ bool mGuest;
     /* 0x82 */ u8 mPadding82[2];
 }; // size: 0x84
 
@@ -56,7 +56,7 @@ enum NetworkDraftState
     NET_DRAFT_DISCONNECTED = 5,
 };
 
-class NetworkDraft : public UnidentifiedNetworkMessageReceiver
+class NetworkDraft : public NetworkMessageReceiver
 {
 public:
     NetworkDraft() { Reset(true); }
@@ -71,6 +71,32 @@ public:
     static int CompareDraftTeams(const void* left, const void* right);
     bool HasDisconnectedPlayer(int team) const;
     void Update(float dt);
+    int GetCountdown() const
+    {
+        int countdown = 0;
+        switch (mState)
+        {
+        case NET_DRAFT_IDLE:
+            return -1;
+        case NET_DRAFT_CAPTAINS:
+            countdown = (int)mTimeBeforeDrafting;
+            break;
+        case NET_DRAFT_SIDEKICKS:
+            countdown = (int)mTimeToChangeDrafters;
+            break;
+        case NET_DRAFT_FINAL_COUNTDOWN:
+            countdown = (int)mFinalCountdown;
+            break;
+        case NET_DRAFT_STARTED:
+        case NET_DRAFT_DISCONNECTED:
+            countdown = 0;
+            break;
+        }
+        if (countdown < 0)
+            countdown = 0;
+        return countdown;
+    }
+
     void AdvanceDraftTeam();
     void UnregisterMessageReceivers();
     int GetCurrentDraftingTeam() const;
@@ -80,7 +106,7 @@ public:
     bool IsCaptainTaken(int captain) const;
     NetworkDraftTeam* GetDraftTeam(int team);
     NetworkDraftTeam* FindDraftTeamByPeerIndex(int peerIndex);
-    virtual int ReceiverVirtual00(UnidentifiedNetworkMessage* message);
+    virtual int ProcessMessage(NetworkMessage* message);
     void SendToAllDraftPlayers(void* data, int size);
 
     /* 0x004 */ NetworkDraftState mState;

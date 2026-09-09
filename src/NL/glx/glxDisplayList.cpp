@@ -2,7 +2,7 @@
 #include <revolution/base/PPCArch.h>
 
 #include "NL/glx/glxDisplayList.h"
-#include "NL/glx/tu_8036D774.h"
+#include "NL/glx/glxSkinMatrix.h"
 
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
@@ -93,7 +93,7 @@ DisplayList* dlMakeDisplayList(
         while (i < packet->numVertices)
         {
             unsigned char stitchIndex = stitchIndices[*pInd * 4];
-            *p8++ = (unsigned char)lbl_80535588[stitchIndex];
+            *p8++ = (unsigned char)glx_SkinMatrixSlots[stitchIndex];
 
             for (unsigned long j = 0; j < numStreams; ++j)
             {

@@ -1,9 +1,11 @@
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMemory.h"
+#include "Game/TweakRegistry.h"
+#include "NL/glx/GXMaterialShadowTweaks.h"
 
 void gxSetTevColourOp(int, int, int, int, bool, int);
 void gxSetTevAlphaOp(int, int, int, int, bool, int);
@@ -17,16 +19,6 @@ unsigned int gxSetNumTevStages(unsigned int);
 unsigned int gxSetNumTexGens(unsigned int);
 void gxSetTevOrder(int, int, int, int);
 
-struct TweakState_802A38A0
-{
-    void* vtable;
-    const char* name;
-    u8 unknown08;
-    u8 unknown09;
-    u8 pad_0A[2];
-    u32 value;
-};
-
 struct Parameters_802A39D4
 {
     u32 value;
@@ -35,34 +27,24 @@ struct Parameters_802A39D4
 };
 
 extern s32 lbl_806E1CE0;
-extern TweakState_802A38A0 lbl_8057B4C0;
-extern TweakState_802A38A0 lbl_8057B4E0;
-extern TweakState_802A38A0 lbl_8057B500;
-extern TweakState_802A38A0 lbl_8057B520;
 extern char lbl_806DF190[];
 extern char lbl_806DF194[];
 extern char lbl_806DF19C[];
 extern char lbl_806DF1A4[];
 extern char lbl_8052A878[];
-extern const char* lbl_806E1E90;
 extern u8 lbl_806E5FC0;
 extern u8 lbl_806E5FC1;
 extern u8 lbl_806E5FC2;
 extern u8 lbl_806E5FC3;
 
+extern "C" void fn_802C764C(TweakValueInt*);
 extern "C" void fn_802A7468(void*, bool);
 extern "C" void fn_802A7530(void*, const glModelPacket*);
 extern "C" void fn_802A7588(void*, const glModelPacket*);
 extern "C" void fn_802A7774(void*, const glModelPacket*);
 extern "C" void fn_802A77E8(void*, const glModelPacket*);
-extern "C" void fn_802C764C(TweakState_802A38A0*);
-extern "C" bool fn_802C0F04();
-extern "C" void* fn_802C0E30();
-extern "C" void fn_802C2DF4(void*, TweakState_802A38A0*, const char*);
-extern "C" void* fn_802C4504(void*, const char*, int);
-extern "C" void fn_802C5780(void*, TweakState_802A38A0*);
 
-extern "C" void fn_802A3738(s32 mode)
+extern "C" void SetShadowVolumeMode(s32 mode)
 {
     if (lbl_806E1CE0 == mode)
     {
@@ -95,19 +77,19 @@ extern "C" void fn_802A3738(s32 mode)
 
 extern "C" void fn_802A38A0(const GXColor* colour)
 {
-    lbl_8057B4C0.value = colour->r;
-    lbl_8057B4E0.value = colour->g;
-    lbl_8057B500.value = colour->b;
-    lbl_8057B520.value = colour->a;
+    sShadowVolumeRed.value = colour->r;
+    sShadowVolumeGreen.value = colour->g;
+    sShadowVolumeBlue.value = colour->b;
+    sShadowVolumeAlpha.value = colour->a;
 }
 
 extern "C" void fn_802A38E4(void* renderer)
 {
     GXColor colour;
-    colour.r = static_cast<u8>(lbl_8057B4C0.value);
-    colour.g = static_cast<u8>(lbl_8057B4E0.value);
-    colour.b = static_cast<u8>(lbl_8057B500.value);
-    colour.a = static_cast<u8>(lbl_8057B520.value);
+    colour.r = static_cast<u8>(sShadowVolumeRed.value);
+    colour.g = static_cast<u8>(sShadowVolumeGreen.value);
+    colour.b = static_cast<u8>(sShadowVolumeBlue.value);
+    colour.a = static_cast<u8>(sShadowVolumeAlpha.value);
     GXSetTevColor(GX_TEVREG0, colour);
 
     GXColor secondColour;
@@ -122,19 +104,19 @@ extern "C" void fn_802A38E4(void* renderer)
     gxSetNumTexGens(1);
     gxSetNumTevStages(1);
     gxSetTevOrder(0, 0, 0, 255);
-    fn_802A3738(3);
+    SetShadowVolumeMode(3);
 }
 
 extern "C" void fn_802A39CC()
 {
-    fn_802A3738(1);
+    SetShadowVolumeMode(1);
 }
 
 extern "C" void fn_802A39D4(
     void* renderer, const glModelPacket* packet)
 {
     Parameters_802A39D4* parameters = static_cast<Parameters_802A39D4*>(packet->unknown20);
-    fn_802CC978(renderer, packet, parameters->value);
+    glSetMaterialTextureAlphaState(renderer, packet, parameters->value);
 }
 
 extern "C" void fn_802A39E0(
@@ -143,11 +125,11 @@ extern "C" void fn_802A39E0(
     Parameters_802A39D4* parameters = static_cast<Parameters_802A39D4*>(packet->unknown20);
     if (parameters->mode == 0)
     {
-        fn_802A3738(2);
+        SetShadowVolumeMode(2);
     }
     else
     {
-        fn_802A3738(3);
+        SetShadowVolumeMode(3);
     }
 
     fn_802A7530(renderer, packet);
@@ -169,8 +151,8 @@ extern "C" void fn_802A39E0(
 
 extern "C" void fn_802A3A94()
 {
-    TweakState_802A38A0* states[4] = {
-        &lbl_8057B4C0, &lbl_8057B4E0, &lbl_8057B500, &lbl_8057B520
+    TweakValueInt* states[4] = {
+        &sShadowVolumeRed, &sShadowVolumeGreen, &sShadowVolumeBlue, &sShadowVolumeAlpha
     };
     const char* names[4] = {
         lbl_806DF190, lbl_806DF194, lbl_806DF19C, lbl_806DF1A4
@@ -178,29 +160,29 @@ extern "C" void fn_802A3A94()
 
     for (u32 i = 0; i < 4; ++i)
     {
-        TweakState_802A38A0* state = states[i];
+        TweakValueInt* state = states[i];
         fn_802C764C(state);
-        state->name = names[i];
+        state->mName = names[i];
         state->value = 0;
-        state->unknown09 = 0;
+        state->mUnidentified009 = 0;
 
-        if (!fn_802C0F04())
+        if (!IsTweakRegistryInitialized())
         {
-            void* entry = nlMalloc(0x18, 8, true);
+            TweakPendingValue* entry = (TweakPendingValue*)nlMalloc(0x18, 8, true);
             if (entry != 0)
             {
-                fn_802C2DF4(entry, state, lbl_8052A878);
+                QueueTweakValue(entry, state, lbl_8052A878);
             }
         }
         else
         {
-            void* entry = fn_802C4504(
-                fn_802C0E30(), lbl_8052A878, 0);
+            TweakEntry* entry = FindOrCreateTweakPath(
+                GetTweakRoot(), lbl_8052A878, 0);
             if (entry != 0)
             {
-                fn_802C5780(entry, state);
+                AddTweakValue(entry, state);
             }
         }
-        lbl_806E1E90 = lbl_8052A878;
+        gLastTweakCategory = lbl_8052A878;
     }
 }

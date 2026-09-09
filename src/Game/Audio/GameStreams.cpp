@@ -4,11 +4,12 @@
 #include "Game/Audio/AudioGlobals.h"
 
 #include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioGlobals.h"
 #include "Game/Player.h"
 #include "Game/TweakRegistry.h"
 #include "NL/globalpad.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_80336B2C.h"
+#include "Game/NetworkInput.h"
 
 
 struct AudioControllerOwner
@@ -214,8 +215,7 @@ void SetPlayerAudioController(cPlayer* player)
     AudioControllerOwner* owner = 0;
     if (globalPad != 0)
     {
-        owner = (AudioControllerOwner*)GetLocalChannelPad(
-            (UnidentifiedNetworkPeerChannel*)globalPad->m_pMyUser);
+        owner = (AudioControllerOwner*)((NetworkPeerChannel*)globalPad->m_pMyUser)->GetLocalChannelPad();
     }
 
     if (owner != 0)

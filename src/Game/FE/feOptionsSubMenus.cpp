@@ -11,6 +11,8 @@
 #include "Game/SH/SHMoviePlayer.h"
 #include "NL/nlColour.h"
 #include "NL/nlConfig.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/SH/SHNavigation.h"
 
 class SHNavigation;
 

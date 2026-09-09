@@ -8,48 +8,44 @@
 #include "NL/nlString.h"
 
 #include <string.h>
-#include "NL/nlstring_tmpl.h"
 
 typedef void (*InterpreterOperation)(InterpreterCore*);
 
-inline TweakValueIntImpl_804FD898::TweakValueIntImpl_804FD898(int* value)
+inline TweakIntBinding::TweakIntBinding(int* value)
     : m_pValue(value)
 {
 }
 
-inline TweakValueBoolImpl_804F4538::TweakValueBoolImpl_804F4538(bool* value)
+inline TweakBoolBinding::TweakBoolBinding(bool* value)
     : m_pValue(value)
 {
 }
 
-struct UnidentifiedInterpreterStorage
+struct InterpreterTweakStorage
 {
     /* 0x00 */ u32 unknown_0x00;
     /* 0x04 */ u32 unknown_0x04;
     /* 0x08 */ u32 unknown_0x08;
-    /* 0x0C */ TweakValueIntImpl_804FD898* unknown_0x0C;
-    /* 0x10 */ TweakValueImpl_804F4DC8* unknown_0x10;
-    /* 0x14 */ TweakValueBoolImpl_804F4538* unknown_0x14;
+    /* 0x0C */ TweakIntBinding* unknown_0x0C;
+    /* 0x10 */ TweakFloatBinding* unknown_0x10;
+    /* 0x14 */ TweakBoolBinding* unknown_0x14;
 };
 
-extern "C" void fn_802DEE14(InterpreterCore*);
-extern "C" void fn_802DFA1C(InterpreterCore*, unsigned int);
-extern "C" void fn_802DFC40(InterpreterCore*, unsigned int, unsigned int, const char*, u8, u32, u32, u32, u32);
-extern "C" u32 lbl_806DF460[2];
-extern "C" const float lbl_806E64A0;
+extern const char sInterpreterEmptyTweakGroup[8];
+extern const float sInterpreterDefaultTweakParameter;
 
 static inline float& StackFloat(u32* value)
 {
     return *(float*)value;
 }
 
-extern "C" void fn_802DE284(InterpreterCore* core)
+void InterpreterOpStop(InterpreterCore* core)
 {
     core->m_SP--;
     core->StopWithoutUndo();
 }
 
-extern "C" void fn_802DE294(InterpreterCore* core)
+void InterpreterOpAverageFloat(InterpreterCore* core)
 {
     u32 count = *--core->m_SP;
     float result = 0.0f;
@@ -64,7 +60,7 @@ extern "C" void fn_802DE294(InterpreterCore* core)
     core->m_SP++;
 }
 
-extern "C" void fn_802DE3CC(InterpreterCore* core)
+void InterpreterOpDotProductFloat(InterpreterCore* core)
 {
     u32 count = *--core->m_SP;
     float rhs;
@@ -84,22 +80,22 @@ extern "C" void fn_802DE3CC(InterpreterCore* core)
     core->m_SP++;
 }
 
-extern "C" void fn_802DE438(InterpreterCore* core)
+void InterpreterOpNegateFloat(InterpreterCore* core)
 {
     StackFloat(core->m_SP - 1) = -StackFloat(core->m_SP - 1);
 }
 
-extern "C" void fn_802DE44C(InterpreterCore* core)
+void InterpreterOpNegateInt(InterpreterCore* core)
 {
     core->m_SP[-1] = -core->m_SP[-1];
 }
 
-extern "C" void fn_802DE460(InterpreterCore* core)
+void InterpreterOpNot(InterpreterCore* core)
 {
     core->m_SP[-1] = !core->m_SP[-1];
 }
 
-extern "C" void fn_802DE478(InterpreterCore* core)
+void InterpreterOpMinFloat(InterpreterCore* core)
 {
     u32* stack = --core->m_SP;
     float rhs = StackFloat(stack);
@@ -108,7 +104,7 @@ extern "C" void fn_802DE478(InterpreterCore* core)
     stack[-1] = *(u32*)&result;
 }
 
-extern "C" void fn_802DE4B8(InterpreterCore* core)
+void InterpreterOpMinInt(InterpreterCore* core)
 {
     core->m_SP--;
     s32 result = core->m_SP[0];
@@ -120,7 +116,7 @@ extern "C" void fn_802DE4B8(InterpreterCore* core)
     core->m_SP[-1] = result;
 }
 
-extern "C" void fn_802DE4E0(InterpreterCore* core)
+void InterpreterOpMaxFloat(InterpreterCore* core)
 {
     u32* stack = --core->m_SP;
     float rhs = StackFloat(stack);
@@ -129,7 +125,7 @@ extern "C" void fn_802DE4E0(InterpreterCore* core)
     stack[-1] = *(u32*)&result;
 }
 
-extern "C" void fn_802DE520(InterpreterCore* core)
+void InterpreterOpMaxInt(InterpreterCore* core)
 {
     core->m_SP--;
     s32 result = core->m_SP[0];
@@ -141,13 +137,13 @@ extern "C" void fn_802DE520(InterpreterCore* core)
     core->m_SP[-1] = result;
 }
 
-extern "C" void fn_802DE548(InterpreterCore* core)
+void InterpreterOpModuloUnsignedInt(InterpreterCore* core)
 {
     core->m_SP--;
     core->m_SP[-1] %= core->m_SP[0];
 }
 
-extern "C" void fn_802DE570(InterpreterCore* core)
+void InterpreterOpDivideFloat(InterpreterCore* core)
 {
     core->m_SP--;
     float rhs = StackFloat(core->m_SP);
@@ -156,13 +152,13 @@ extern "C" void fn_802DE570(InterpreterCore* core)
     core->m_SP[-1] = *(u32*)&result;
 }
 
-extern "C" void fn_802DE5A0(InterpreterCore* core)
+void InterpreterOpDivideInt(InterpreterCore* core)
 {
     core->m_SP--;
     *(s32*)(core->m_SP - 1) /= *(s32*)core->m_SP;
 }
 
-extern "C" void fn_802DE5C0(InterpreterCore* core)
+void InterpreterOpMultiplyFloat(InterpreterCore* core)
 {
     core->m_SP--;
     float rhs = StackFloat(core->m_SP);
@@ -171,13 +167,13 @@ extern "C" void fn_802DE5C0(InterpreterCore* core)
     core->m_SP[-1] = *(u32*)&result;
 }
 
-extern "C" void fn_802DE5F0(InterpreterCore* core)
+void InterpreterOpMultiplyInt(InterpreterCore* core)
 {
     core->m_SP--;
     core->m_SP[-1] *= core->m_SP[0];
 }
 
-extern "C" void fn_802DE610(InterpreterCore* core)
+void InterpreterOpSubtractFloat(InterpreterCore* core)
 {
     core->m_SP--;
     float rhs = StackFloat(core->m_SP);
@@ -186,13 +182,13 @@ extern "C" void fn_802DE610(InterpreterCore* core)
     core->m_SP[-1] = *(u32*)&result;
 }
 
-extern "C" void fn_802DE640(InterpreterCore* core)
+void InterpreterOpSubtractInt(InterpreterCore* core)
 {
     core->m_SP--;
     core->m_SP[-1] -= core->m_SP[0];
 }
 
-extern "C" void fn_802DE660(InterpreterCore* core)
+void InterpreterOpAddFloat(InterpreterCore* core)
 {
     core->m_SP--;
     float rhs = StackFloat(core->m_SP);
@@ -201,13 +197,13 @@ extern "C" void fn_802DE660(InterpreterCore* core)
     core->m_SP[-1] = *(u32*)&result;
 }
 
-extern "C" void fn_802DE690(InterpreterCore* core)
+void InterpreterOpAddInt(InterpreterCore* core)
 {
     core->m_SP--;
     core->m_SP[-1] += core->m_SP[0];
 }
 
-extern "C" void fn_802DE6B0(InterpreterCore* core)
+void InterpreterOpGreaterEqualString(InterpreterCore* core)
 {
     core->m_SP--;
     const char* lhs = (const char*)core->m_SP[-1];
@@ -215,7 +211,7 @@ extern "C" void fn_802DE6B0(InterpreterCore* core)
     core->m_SP[-1] = nlStrICmp<char>(lhs, rhs) >= 0;
 }
 
-extern "C" void fn_802DE738(InterpreterCore* core)
+void InterpreterOpGreaterEqualFloat(InterpreterCore* core)
 {
     core->m_SP--;
     float rhs = StackFloat(core->m_SP);
@@ -223,13 +219,13 @@ extern "C" void fn_802DE738(InterpreterCore* core)
     core->m_SP[-1] = lhs >= rhs;
 }
 
-extern "C" void fn_802DE764(InterpreterCore* core)
+void InterpreterOpGreaterEqualInt(InterpreterCore* core)
 {
     core->m_SP--;
     core->m_SP[-1] = *(s32*)(core->m_SP - 1) >= *(s32*)core->m_SP;
 }
 
-extern "C" void fn_802DE790(InterpreterCore* core)
+void InterpreterOpGreaterString(InterpreterCore* core)
 {
     core->m_SP--;
     const char* lhs = (const char*)core->m_SP[-1];
@@ -237,7 +233,7 @@ extern "C" void fn_802DE790(InterpreterCore* core)
     core->m_SP[-1] = nlStrICmp<char>(lhs, rhs) > 0;
 }
 
-extern "C" void fn_802DE81C(InterpreterCore* core)
+void InterpreterOpGreaterFloat(InterpreterCore* core)
 {
     core->m_SP--;
     float rhs = StackFloat(core->m_SP);
@@ -245,13 +241,13 @@ extern "C" void fn_802DE81C(InterpreterCore* core)
     core->m_SP[-1] = lhs > rhs;
 }
 
-extern "C" void fn_802DE844(InterpreterCore* core)
+void InterpreterOpGreaterInt(InterpreterCore* core)
 {
     core->m_SP--;
     core->m_SP[-1] = *(s32*)(core->m_SP - 1) > *(s32*)core->m_SP;
 }
 
-extern "C" void fn_802DE874(InterpreterCore* core)
+void InterpreterOpLessEqualString(InterpreterCore* core)
 {
     core->m_SP--;
     const char* lhs = (const char*)core->m_SP[-1];
@@ -259,7 +255,7 @@ extern "C" void fn_802DE874(InterpreterCore* core)
     core->m_SP[-1] = nlStrICmp<char>(lhs, rhs) <= 0;
 }
 
-extern "C" void fn_802DE900(InterpreterCore* core)
+void InterpreterOpLessEqualFloat(InterpreterCore* core)
 {
     core->m_SP--;
     float rhs = StackFloat(core->m_SP);
@@ -267,13 +263,13 @@ extern "C" void fn_802DE900(InterpreterCore* core)
     core->m_SP[-1] = lhs <= rhs;
 }
 
-extern "C" void fn_802DE92C(InterpreterCore* core)
+void InterpreterOpLessEqualInt(InterpreterCore* core)
 {
     core->m_SP--;
     core->m_SP[-1] = *(s32*)(core->m_SP - 1) <= *(s32*)core->m_SP;
 }
 
-extern "C" void fn_802DE958(InterpreterCore* core)
+void InterpreterOpLessString(InterpreterCore* core)
 {
     core->m_SP--;
     const char* lhs = (const char*)core->m_SP[-1];
@@ -281,7 +277,7 @@ extern "C" void fn_802DE958(InterpreterCore* core)
     core->m_SP[-1] = nlStrICmp<char>(lhs, rhs) < 0;
 }
 
-extern "C" void fn_802DE9DC(InterpreterCore* core)
+void InterpreterOpLessFloat(InterpreterCore* core)
 {
     core->m_SP--;
     float rhs = StackFloat(core->m_SP);
@@ -289,13 +285,13 @@ extern "C" void fn_802DE9DC(InterpreterCore* core)
     core->m_SP[-1] = lhs < rhs;
 }
 
-extern "C" void fn_802DEA04(InterpreterCore* core)
+void InterpreterOpLessInt(InterpreterCore* core)
 {
     core->m_SP--;
     core->m_SP[-1] = *(s32*)(core->m_SP - 1) < *(s32*)core->m_SP;
 }
 
-extern "C" void fn_802DEA34(InterpreterCore* core)
+void InterpreterOpNotEqualString(InterpreterCore* core)
 {
     core->m_SP--;
     const char* lhs = (const char*)core->m_SP[-1];
@@ -314,7 +310,7 @@ extern "C" void fn_802DEA34(InterpreterCore* core)
     core->m_SP[-1] = nlStrICmp<char>(lhs, rhs) != 0;
 }
 
-extern "C" void fn_802DEAF0(InterpreterCore* core)
+void InterpreterOpNotEqualFloat(InterpreterCore* core)
 {
     core->m_SP--;
     float rhs = StackFloat(core->m_SP);
@@ -322,13 +318,13 @@ extern "C" void fn_802DEAF0(InterpreterCore* core)
     core->m_SP[-1] = lhs != rhs;
 }
 
-extern "C" void fn_802DEB1C(InterpreterCore* core)
+void InterpreterOpNotEqualInt(InterpreterCore* core)
 {
     core->m_SP--;
     core->m_SP[-1] = core->m_SP[-1] != core->m_SP[0];
 }
 
-extern "C" void fn_802DEB48(InterpreterCore* core)
+void InterpreterOpEqualString(InterpreterCore* core)
 {
     core->m_SP--;
     const char* lhs = (const char*)core->m_SP[-1];
@@ -347,7 +343,7 @@ extern "C" void fn_802DEB48(InterpreterCore* core)
     core->m_SP[-1] = nlStrICmp<char>(lhs, rhs) == 0;
 }
 
-extern "C" void fn_802DEC00(InterpreterCore* core)
+void InterpreterOpEqualFloat(InterpreterCore* core)
 {
     core->m_SP--;
     float rhs = StackFloat(core->m_SP);
@@ -355,65 +351,65 @@ extern "C" void fn_802DEC00(InterpreterCore* core)
     core->m_SP[-1] = lhs == rhs;
 }
 
-extern "C" void fn_802DEC28(InterpreterCore* core)
+void InterpreterOpEqualInt(InterpreterCore* core)
 {
     core->m_SP--;
     core->m_SP[-1] = core->m_SP[-1] == core->m_SP[0];
 }
 
-extern "C" void fn_802DEC50(InterpreterCore* core)
+void InterpreterOpAnd(InterpreterCore* core)
 {
     u32* stack = --core->m_SP;
     stack[-1] = stack[-1] && stack[0];
 }
 
-extern "C" void fn_802DEC84(InterpreterCore* core)
+void InterpreterOpOr(InterpreterCore* core)
 {
     u32* stack = --core->m_SP;
     stack[-1] = stack[-1] || stack[0];
 }
 
-extern "C" InterpreterOperation lbl_8052EDC8[] = {
-    fn_802DEC84,
-    fn_802DEC50,
-    fn_802DEC28,
-    fn_802DEC00,
-    fn_802DEB48,
-    fn_802DEB1C,
-    fn_802DEAF0,
-    fn_802DEA34,
-    fn_802DEA04,
-    fn_802DE9DC,
-    fn_802DE958,
-    fn_802DE92C,
-    fn_802DE900,
-    fn_802DE874,
-    fn_802DE844,
-    fn_802DE81C,
-    fn_802DE790,
-    fn_802DE764,
-    fn_802DE738,
-    fn_802DE6B0,
-    fn_802DE690,
-    fn_802DE660,
-    fn_802DE640,
-    fn_802DE610,
-    fn_802DE5F0,
-    fn_802DE5C0,
-    fn_802DE5A0,
-    fn_802DE570,
-    fn_802DE548,
-    fn_802DE520,
-    fn_802DE4E0,
-    fn_802DE4B8,
-    fn_802DE478,
+InterpreterOperation gInterpreterOperations[] = {
+    InterpreterOpOr,
+    InterpreterOpAnd,
+    InterpreterOpEqualInt,
+    InterpreterOpEqualFloat,
+    InterpreterOpEqualString,
+    InterpreterOpNotEqualInt,
+    InterpreterOpNotEqualFloat,
+    InterpreterOpNotEqualString,
+    InterpreterOpLessInt,
+    InterpreterOpLessFloat,
+    InterpreterOpLessString,
+    InterpreterOpLessEqualInt,
+    InterpreterOpLessEqualFloat,
+    InterpreterOpLessEqualString,
+    InterpreterOpGreaterInt,
+    InterpreterOpGreaterFloat,
+    InterpreterOpGreaterString,
+    InterpreterOpGreaterEqualInt,
+    InterpreterOpGreaterEqualFloat,
+    InterpreterOpGreaterEqualString,
+    InterpreterOpAddInt,
+    InterpreterOpAddFloat,
+    InterpreterOpSubtractInt,
+    InterpreterOpSubtractFloat,
+    InterpreterOpMultiplyInt,
+    InterpreterOpMultiplyFloat,
+    InterpreterOpDivideInt,
+    InterpreterOpDivideFloat,
+    InterpreterOpModuloUnsignedInt,
+    InterpreterOpMaxInt,
+    InterpreterOpMaxFloat,
+    InterpreterOpMinInt,
+    InterpreterOpMinFloat,
     0,
-    fn_802DE460,
-    fn_802DE44C,
-    fn_802DE438,
-    fn_802DE3CC,
-    fn_802DE294,
-    fn_802DE284,
+    InterpreterOpNot,
+    InterpreterOpNegateInt,
+    InterpreterOpNegateFloat,
+    InterpreterOpDotProductFloat,
+    InterpreterOpAverageFloat,
+    InterpreterOpStop,
 };
 
 InterpreterCore::InterpreterCore(unsigned int size)
@@ -434,7 +430,7 @@ InterpreterCore::~InterpreterCore()
 
     if (unknown_0x14 != 0)
     {
-        UnidentifiedInterpreterStorage* storage = unknown_0x14;
+        InterpreterTweakStorage* storage = unknown_0x14;
         delete[] storage->unknown_0x0C;
         delete[] storage->unknown_0x10;
         delete[] storage->unknown_0x14;
@@ -444,35 +440,35 @@ InterpreterCore::~InterpreterCore()
     nlFree(m_StackSegment);
 }
 
-extern "C" void fn_802DEDE8(InterpreterCore* core)
+void InterpreterCore::Reset()
 {
-    core->m_RunState = 2;
-    core->m_SP = core->m_StackSegment;
-    core->m_SavedSP = core->m_SP;
-    core->m_BP = 0;
-    core->m_IP = 0;
+    m_RunState = 2;
+    m_SP = m_StackSegment;
+    m_SavedSP = m_SP;
+    m_BP = 0;
+    m_IP = 0;
 }
 
-extern "C" void fn_802DEE14(InterpreterCore* core)
+void InterpreterCore::InitializeTweaks()
 {
-    u32 count = core->m_Header->unknown_0x28 - core->m_Header->unknown_0x1C;
+    u32 count = m_Header->unknown_0x28 - m_Header->unknown_0x1C;
     if (count != 0)
     {
-        fn_802DFA1C(core, count);
+        AllocateTweaks(count);
 
-        u8* data = core->m_Header->unknown_0x34;
+        u8* data = m_Header->unknown_0x34;
         for (u32 i = 0; i < count; i++)
         {
-            u32 valueIndex = core->m_Header->unknown_0x1C + i;
+            u32 valueIndex = m_Header->unknown_0x1C + i;
             u32 type;
-            if (valueIndex < core->m_Header->unknown_0x20)
+            if (valueIndex < m_Header->unknown_0x20)
             {
                 type = 0;
             }
             else
             {
                 type = 2;
-                if (valueIndex < core->m_Header->unknown_0x24)
+                if (valueIndex < m_Header->unknown_0x24)
                 {
                     type = 1;
                 }
@@ -507,7 +503,7 @@ extern "C" void fn_802DEE14(InterpreterCore* core)
                 data += 4;
             }
 
-            fn_802DFC40(core, i, type, name, flags, value0, value1, value2, value3);
+            RegisterTweak(i, type, name, flags, value0, value1, value2, value3);
         }
     }
 }
@@ -537,7 +533,7 @@ void InterpreterCore::LoadByteCode(void* data)
 
     if (unknown_0x14 != 0)
     {
-        UnidentifiedInterpreterStorage* storage = unknown_0x14;
+        InterpreterTweakStorage* storage = unknown_0x14;
         delete[] storage->unknown_0x0C;
         delete[] storage->unknown_0x10;
         delete[] storage->unknown_0x14;
@@ -564,46 +560,46 @@ void InterpreterCore::LoadByteCode(void* data)
 
     RelocateStringReferences(this);
 
-    fn_802DEE14(this);
-    fn_802DEDE8(this);
+    InitializeTweaks();
+    Reset();
 }
 
-extern "C" void fn_802DF11C(InterpreterCore* core, FunctionEntryPoint* entry, unsigned int count)
+void InterpreterCore::RunFunction(FunctionEntryPoint* entry, unsigned int count)
 {
-    core->m_SP[0] = 0;
-    core->m_SP[1] = (u32)core->m_BP;
-    core->m_BP = core->m_SP - count;
+    m_SP[0] = 0;
+    m_SP[1] = (u32)m_BP;
+    m_BP = m_SP - count;
 
     if (entry->unknown_0x0B == 3)
     {
-        core->m_BP--;
+        m_BP--;
     }
 
-    core->m_SP += entry->unknown_0x08;
-    if (core->m_RunState != 1)
+    m_SP += entry->unknown_0x08;
+    if (m_RunState != 1)
     {
-        core->m_RunState = 0;
+        m_RunState = 0;
     }
 
-    u16* saved_ip = core->m_IP;
-    core->m_IP = (u16*)entry->offset;
-    core->Step();
+    u16* saved_ip = m_IP;
+    m_IP = (u16*)entry->offset;
+    Step();
 
-    if (core->m_RunState != 3)
+    if (m_RunState != 3)
     {
-        core->m_IP = saved_ip;
+        m_IP = saved_ip;
         if (entry->unknown_0x0B & 1)
         {
-            core->m_SP--;
+            m_SP--;
         }
     }
 }
 
-bool InterpreterCore::UnidentifiedVirtual2(FunctionEntryPoint* entry, unsigned int count, u32 value0, u32 value1, u32 value2, u32 value3)
+bool InterpreterCore::ExecuteFunction(FunctionEntryPoint* entry, unsigned int count, u32 value0, u32 value1, u32 value2, u32 value3)
 {
     if (m_RunState == 3)
     {
-        fn_802DEDE8(this);
+        Reset();
     }
 
     if (entry == 0)
@@ -634,15 +630,15 @@ bool InterpreterCore::UnidentifiedVirtual2(FunctionEntryPoint* entry, unsigned i
         break;
     }
 
-    fn_802DF11C(this, entry, count);
+    RunFunction(entry, count);
     return true;
 }
 
-extern "C" bool fn_802DF314(InterpreterCore* core, FunctionEntryPoint* entry, unsigned int count, const u32* values)
+bool InterpreterCore::ExecuteFunction(FunctionEntryPoint* entry, unsigned int count, const unsigned int* values)
 {
-    if (core->m_RunState == 3)
+    if (m_RunState == 3)
     {
-        fn_802DEDE8(core);
+        Reset();
     }
 
     if (entry == 0)
@@ -652,24 +648,24 @@ extern "C" bool fn_802DF314(InterpreterCore* core, FunctionEntryPoint* entry, un
 
     if (entry->unknown_0x0B == 3)
     {
-        core->m_SP++;
+        m_SP++;
     }
 
-    memcpy(core->m_SP, values, count << 2);
-    core->m_SP += count;
-    fn_802DF11C(core, entry, count);
+    memcpy(m_SP, values, count << 2);
+    m_SP += count;
+    RunFunction(entry, count);
     return true;
 }
 
-extern "C" FunctionEntryPoint* fn_802DF3E4(InterpreterCore* core, u32* hash)
+FunctionEntryPoint* InterpreterCore::FindFunctionEntryPoint(const u32& hash)
 {
-    unsigned long value = *hash;
-    return nlBSearch<FunctionEntryPoint, unsigned long>(value, core->m_Header->m_FunctionTable, core->m_Header->numFunctions);
+    unsigned long value = hash;
+    return nlBSearch<FunctionEntryPoint, unsigned long>(value, m_Header->m_FunctionTable, m_Header->numFunctions);
 }
 
-extern "C" FunctionEntryPoint* fn_802DF41C(InterpreterCore* core, unsigned int index)
+FunctionEntryPoint* InterpreterCore::GetFunctionEntryPoint(unsigned int index)
 {
-    return &core->m_Header->m_FunctionTable[index];
+    return &m_Header->m_FunctionTable[index];
 }
 
 void InterpreterCore::Run()
@@ -776,7 +772,7 @@ void InterpreterCore::Step()
             break;
 
         case 13:
-            lbl_8052EDC8[operand](this);
+            gInterpreterOperations[operand](this);
             break;
 
         case 14:
@@ -788,7 +784,7 @@ void InterpreterCore::Step()
             }
             else
             {
-                UnidentifiedInterpreterStorage* storage = unknown_0x14;
+                InterpreterTweakStorage* storage = unknown_0x14;
                 u32 value;
                 u32 index = operand;
                 index -= m_Header->unknown_0x1C;
@@ -819,7 +815,7 @@ void InterpreterCore::Step()
             }
             else
             {
-                UnidentifiedInterpreterStorage* storage = unknown_0x14;
+                InterpreterTweakStorage* storage = unknown_0x14;
                 u32 value = Pop();
                 u32 index = operand;
                 index -= m_Header->unknown_0x1C;
@@ -909,56 +905,56 @@ void InterpreterCore::StopWithUndo()
     m_RunState = 3;
 }
 
-extern "C" int fn_802DF9FC(InterpreterCore* core)
+int InterpreterCore::GetInstructionOffset()
 {
-    return (core->m_IP - core->m_Header->m_CodeSegment);
+    return (m_IP - m_Header->m_CodeSegment);
 }
 
-extern "C" void fn_802DFA1C(InterpreterCore* core, unsigned int)
+void InterpreterCore::AllocateTweaks(unsigned int)
 {
-    UnidentifiedInterpreterStorage* storage = (UnidentifiedInterpreterStorage*)nlMalloc(sizeof(UnidentifiedInterpreterStorage), 8, false);
+    InterpreterTweakStorage* storage = (InterpreterTweakStorage*)nlMalloc(sizeof(InterpreterTweakStorage), 8, false);
 
-    storage->unknown_0x00 = core->m_Header->unknown_0x20 - core->m_Header->unknown_0x1C;
+    storage->unknown_0x00 = m_Header->unknown_0x20 - m_Header->unknown_0x1C;
     if (storage->unknown_0x00 != 0)
     {
-        storage->unknown_0x0C = new (8, false) TweakValueIntImpl_804FD898[storage->unknown_0x00];
+        storage->unknown_0x0C = new (8, false) TweakIntBinding[storage->unknown_0x00];
     }
     else
     {
         storage->unknown_0x0C = 0;
     }
 
-    storage->unknown_0x04 = core->m_Header->unknown_0x24 - core->m_Header->unknown_0x20;
+    storage->unknown_0x04 = m_Header->unknown_0x24 - m_Header->unknown_0x20;
     if (storage->unknown_0x04 != 0)
     {
-        storage->unknown_0x10 = new (8, false) TweakValueImpl_804F4DC8[storage->unknown_0x04];
+        storage->unknown_0x10 = new (8, false) TweakFloatBinding[storage->unknown_0x04];
     }
     else
     {
         storage->unknown_0x10 = 0;
     }
 
-    storage->unknown_0x08 = core->m_Header->unknown_0x28 - core->m_Header->unknown_0x24;
+    storage->unknown_0x08 = m_Header->unknown_0x28 - m_Header->unknown_0x24;
     if (storage->unknown_0x08 != 0)
     {
-        storage->unknown_0x14 = new (8, false) TweakValueBoolImpl_804F4538[storage->unknown_0x08];
+        storage->unknown_0x14 = new (8, false) TweakBoolBinding[storage->unknown_0x08];
     }
     else
     {
         storage->unknown_0x14 = 0;
     }
 
-    core->unknown_0x14 = storage;
+    unknown_0x14 = storage;
 }
 
-extern "C" const float lbl_806E64A0 = 0.0f;
+extern const float sInterpreterDefaultTweakParameter = 0.0f;
 
-extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned int type, const char* name, u8 flags, u32 value0, u32 value1, u32 value2, u32 value3)
+void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const char* name, u8 flags, unsigned int value0, unsigned int value1, unsigned int value2, unsigned int value3)
 {
-    float float1 = lbl_806E64A0;
-    float float2 = lbl_806E64A0;
-    float float3 = lbl_806E64A0;
-    UnidentifiedInterpreterStorage* storage = core->unknown_0x14;
+    float float1 = sInterpreterDefaultTweakParameter;
+    float float2 = sInterpreterDefaultTweakParameter;
+    float float3 = sInterpreterDefaultTweakParameter;
+    InterpreterTweakStorage* storage = unknown_0x14;
 
     switch (type)
     {
@@ -979,8 +975,8 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
 
         if (flags & 1)
         {
-            TweakValueIntImpl_804FD898* intTarget = &storage->unknown_0x0C[index];
-            bool result = intTarget->fn_802C4FEC(name, float1, (const char*)lbl_806DF460, false, float2, float3);
+            TweakIntBinding* intTarget = &storage->unknown_0x0C[index];
+            bool result = intTarget->Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3);
             if (result == 0)
             {
                 *intTarget->m_pValue = intTarget->UnidentifiedVirtual3C();
@@ -992,8 +988,8 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
         }
         else
         {
-            TweakValueIntImpl_804FD898* target = &storage->unknown_0x0C[index];
-            if (target->fn_802C4FEC(name, float1, (const char*)lbl_806DF460, false, float2, float3) == 0)
+            TweakIntBinding* target = &storage->unknown_0x0C[index];
+            if (target->Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3) == 0)
             {
                 *target->m_pValue = target->UnidentifiedVirtual3C();
             }
@@ -1018,9 +1014,9 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
 
         if (flags & 1)
         {
-            TweakValueImpl_804F4DC8& target = storage->unknown_0x10[index - storage->unknown_0x00];
+            TweakFloatBinding& target = storage->unknown_0x10[index - storage->unknown_0x00];
             float defaultValue = *(float*)&value0;
-            bool result = target.fn_802C4FEC(name, float1, (const char*)lbl_806DF460, false, float2, float3);
+            bool result = target.Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3);
             if (result == 0)
             {
                 *target.m_pValue = target.UnidentifiedVirtual3C();
@@ -1032,8 +1028,8 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
         }
         else
         {
-            TweakValueImpl_804F4DC8* target = &storage->unknown_0x10[index - storage->unknown_0x00];
-            if (target->fn_802C4FEC(name, float1, (const char*)lbl_806DF460, false, float2, float3) == 0)
+            TweakFloatBinding* target = &storage->unknown_0x10[index - storage->unknown_0x00];
+            if (target->Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3) == 0)
             {
                 *target->m_pValue = target->UnidentifiedVirtual3C();
             }
@@ -1046,18 +1042,18 @@ extern "C" void fn_802DFC40(InterpreterCore* core, unsigned int index, unsigned 
         unsigned int storageIndex = index - storage->unknown_0x00 - storage->unknown_0x04;
         if (flags & 1)
         {
-            TweakValueBoolImpl_804F4538* target;
+            TweakBoolBinding* target;
             bool defaultValue = value0 != 0;
             target = &storage->unknown_0x14[storageIndex];
-            if (target->fn_802C4F94(name) == 0)
+            if (target->Bind(name) == 0)
             {
                 *target->m_pValue = defaultValue;
             }
         }
         else
         {
-            TweakValueBoolImpl_804F4538* target = &storage->unknown_0x14[storageIndex];
-            if (target->fn_802C4F94(name) == 0)
+            TweakBoolBinding* target = &storage->unknown_0x14[storageIndex];
+            if (target->Bind(name) == 0)
             {
                 *target->m_pValue = target->UnidentifiedVirtual3C();
             }

@@ -2,27 +2,28 @@
 #include "Game/CharacterTemplate.h"
 #include "Game/DB/CharacterInfo.h"
 
-#include "unclassified/tu_801A4188.h"
+#include "Game/Render/CrowdImpostors.h"
 
 #include "Game/Render/RLView.h"
 
 #include "Game/Render/ImpostorCharacter.h"
 #include "Game/Render/ImpostorManager.h"
-#include "Game/ResourceInterface_802CC094.h"
+#include "NL/gl/glMemory.h"
+#include "NL/gl/gl.h"
+#include "NL/MemAlloc.h"
+#include "NL/nlFile.h"
 #include "Game/Render/SkinAnimatedNPC.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/TweakValue.h"
-#include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
-#include "NL/nlstring_tmpl.h"
 
-class FEModelType0_801C0960 : public FEModel
+class FESkinnedModel : public FEModel
 {
 public:
-    FEModelType0_801C0960(void* modelData)
+    FESkinnedModel(tCharacterTemplateInfo* modelData)
         : FEModel(modelData)
         , mModel(0)
     {
@@ -31,28 +32,19 @@ public:
     virtual void Update(float dt);
     virtual void Render();
     virtual void Initialize();
-    virtual FEAnimation_801C0704* GetCurrentAnimation();
+    virtual cSAnim* GetCurrentAnimation();
     virtual bool IsAnimationFinished();
-    virtual ~FEModelType0_801C0960();
+    virtual ~FESkinnedModel();
 
     /* 0x54 */ SkinAnimatedNPC* mModel;
 }; // size: 0x58
 
-class FEImpostorModelState_801C10DC
+class FEImpostorCharacter;
+
+class FEImpostorModel : public FEModel
 {
 public:
-    virtual ~FEImpostorModelState_801C10DC();
-
-    /* 0x04 */ u8 mUnidentified004[0x40];
-    /* 0x44 */ cPN_SAnimController* mAnimationState;
-};
-
-class FEImpostorCharacter_801C3100;
-
-class FEModelType1_801C0F58 : public FEModel
-{
-public:
-    FEModelType1_801C0F58(void* modelData)
+    FEImpostorModel(tCharacterTemplateInfo* modelData)
         : FEModel(modelData)
         , mModel(0)
         , mCharacter(0)
@@ -62,109 +54,96 @@ public:
     virtual void Update(float dt);
     virtual void Render();
     virtual void Initialize();
-    virtual FEAnimation_801C0704* GetCurrentAnimation();
+    virtual cSAnim* GetCurrentAnimation();
     virtual bool IsAnimationFinished();
-    virtual ~FEModelType1_801C0F58();
+    virtual ~FEImpostorModel();
 
-    /* 0x54 */ FEImpostorModelState_801C10DC* mModel;
+    /* 0x54 */ ImpostorModel* mModel;
     /* 0x58 */ u32 mUnidentified58;
-    /* 0x5C */ FEImpostorCharacter_801C3100* mCharacter;
+    /* 0x5C */ FEImpostorCharacter* mCharacter;
     /* 0x60 */ nlVector3 mPosition;
     /* 0x6C */ float mTime;
     /* 0x70 */ void* mModels[6];
 }; // size: 0x88
 
-class FEImpostorCharacter_801C3100
-    : public ImpostorCharacterImpl_8052E9B8
+class FEImpostorCharacter
+    : public AnimatedImpostorCharacter
 {
 public:
-    FEImpostorCharacter_801C3100(const char* name,
-        ImpostorModel_802DAEE0* model, void* animations, int budget,
+    FEImpostorCharacter(const char* name,
+        ImpostorModel* model, void* animations, int budget,
         bool animationFlag, bool alternate,
         const ImpostorCharacterParams* params, int modelType);
-    virtual ~FEImpostorCharacter_801C3100();
+    virtual ~FEImpostorCharacter();
 
     virtual void SetScale(float scale);
     virtual float GetScale();
     virtual float GetCameraDistance();
     virtual float GetCameraLookatZ();
-    virtual void UnidentifiedVirtual20(void* target, int texture);
-    virtual void UnidentifiedVirtual24(float dt);
+    virtual void Render(GLView* target, int texture);
+    virtual void UpdateAnimation(float dt);
 
     /* 0x74 */ bool mEnabled;
     /* 0x75 */ u8 mPadding75[3];
     /* 0x78 */ int mModelType;
-    /* 0x7C */ TweakValueImpl_804F4DC8 mfScaleInitialCup;
-    /* 0x8C */ TweakValueImpl_804F4DC8 mfScaleCup;
-    /* 0x9C */ TweakValueImpl_804F4DC8 mfCameraLookatZInitialCup;
-    /* 0xAC */ TweakValueImpl_804F4DC8 mfCameraLookatZCup;
-    /* 0xBC */ TweakValueImpl_804F4DC8 mfCameraDistanceInitialCup;
-    /* 0xCC */ TweakValueImpl_804F4DC8 mfCameraDistanceCup;
+    /* 0x7C */ TweakFloatBinding mfScaleInitialCup;
+    /* 0x8C */ TweakFloatBinding mfScaleCup;
+    /* 0x9C */ TweakFloatBinding mfCameraLookatZInitialCup;
+    /* 0xAC */ TweakFloatBinding mfCameraLookatZCup;
+    /* 0xBC */ TweakFloatBinding mfCameraDistanceInitialCup;
+    /* 0xCC */ TweakFloatBinding mfCameraDistanceCup;
 }; // size: 0xDC
 
 
-static const u32 sLoaderConfiguration[4] = { 0, 0x8000, 3, 0x100000 };
+static const GLMemoryRequirement sLoaderConfiguration[2] = {
+    { GLM_Header, 0x8000 },
+    { GLM_VertexData, 0x100000 },
+};
 static char sDefaultAnimation[] = "fe_idle";
 
-FEModel::FEModel(void* modelData)
+FEModel::FEModel(tCharacterTemplateInfo* modelData)
     : mType((FEModelType)-1)
     , mAnimations(0)
     , mHierarchies(0)
     , mLoader(0)
     , mLoaderHandle(0)
-    , mState(0)
+    , mModelID(0)
     , mUnidentified1C(0)
     , mModelData(modelData)
-    , mAnimationData(0)
-    , mAnimationDataSize(0)
-    , mHierarchyData(0)
-    , mHierarchyDataSize(0)
-    , mModelFileData(0)
-    , mModelFileDataSize(0)
     , mTextureFileData(0)
     , mTextureFileDataSize(0)
-    , mUnidentified44(0)
-    , mUnidentified48(0)
+    , mAlternateTextureFileData(0)
+    , mAlternateTextureFileDataSize(0)
+    , mModelFileData(0)
+    , mModelFileDataSize(0)
+    , mHierarchyFileData(0)
+    , mHierarchyFileDataSize(0)
+    , mAnimationFileData(0)
+    , mAnimationFileDataSize(0)
     , mPendingLoads(0)
     , mLoaded(false)
     , mSynchronousLoad(false)
     , mLoadQueued(false)
 {
-    mAnimations = new (8, false) FEAnimationInventory_801C0704;
-    if (mAnimations != 0)
-    {
-        mAnimations->mHead = 0;
-        mAnimations->mUnidentified08 = 0;
-        mAnimations->mUnidentified10 = 0;
-        mAnimations->mUnidentified14 = 0;
-        mAnimations->mUnidentified18 = 0;
-    }
+    mAnimations = new (8, false) cInventory<cSAnim>;
 
-    mHierarchies = new (8, false) FEAnimationInventory_801C0704;
-    if (mHierarchies != 0)
-    {
-        mHierarchies->mHead = 0;
-        mHierarchies->mUnidentified08 = 0;
-        mHierarchies->mUnidentified10 = 0;
-        mHierarchies->mUnidentified14 = 0;
-        mHierarchies->mUnidentified18 = 0;
-    }
+    mHierarchies = new (8, false) cInventory<cSHierarchy>;
 
-    mLoader = fn_802CBFD8(sLoaderConfiguration, 2, "FEModelManager");
+    mLoader = glCreateResourcePool(sLoaderConfiguration, 2, "FEModelManager");
     mLoaderHandle = mLoader->MarkResource();
 }
 
 FEModel::~FEModel()
 {
-    if (mAnimationData != 0)
+    if (mTextureFileData != 0)
     {
-        ::operator delete(mAnimationData);
-        mAnimationData = 0;
+        ::operator delete(mTextureFileData);
+        mTextureFileData = 0;
     }
-    if (mHierarchyData != 0)
+    if (mAlternateTextureFileData != 0)
     {
-        ::operator delete(mHierarchyData);
-        mHierarchyData = 0;
+        ::operator delete(mAlternateTextureFileData);
+        mAlternateTextureFileData = 0;
     }
     if (mModelFileData != 0)
     {
@@ -174,60 +153,101 @@ FEModel::~FEModel()
     if (mLoader != 0)
     {
         mLoader->ReleaseResource(mLoaderHandle);
-        fn_802CC02C(mLoader);
+        glDestroyResourcePool(mLoader);
     }
     delete mAnimations;
     delete mHierarchies;
 }
 
-void fn_801C0170(void* data, u32 size, FEModel* model)
+void FEModel::OnTexturesLoaded(void* data, unsigned long size, void* userData)
 {
-    model->mAnimationData = data;
-    model->mAnimationDataSize = size;
-    model->mPendingLoads &= ~8;
-    if (model->mSynchronousLoad)
-    {
-        model->mPendingLoads = 0x10;
-        model->mLoadQueued = false;
-    }
-}
+    FEModel* model = (FEModel*)userData;
+    CurrentAllocator = &VirtualAllocator;
+    AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
 
-void fn_801C0244(void* data, u32 size, FEModel* model)
-{
-    model->mHierarchyData = data;
-    model->mHierarchyDataSize = size;
-}
-
-void fn_801C0250(void* data, u32 size, FEModel* model)
-{
-    model->mModelFileData = data;
-    model->mModelFileDataSize = size;
-    model->mPendingLoads &= ~0x10;
-    if (model->mSynchronousLoad)
-    {
-        model->mPendingLoads = 0x10;
-        model->mLoadQueued = false;
-    }
-}
-
-void fn_801C0334(void* data, u32 size, FEModel* model)
-{
     model->mTextureFileData = data;
-    model->mTextureFileDataSize = size;
     model->mPendingLoads &= ~4;
+    model->mTextureFileDataSize = size;
     if (model->mSynchronousLoad)
     {
         model->mPendingLoads = 0x10;
         model->mLoadQueued = false;
     }
+    else
+    {
+        glBeginLoadModel(model->mModelData->szModelFilename, OnModelLoaded, model, model->mLoader);
+        model->mLoadQueued = true;
+    }
+
+    --AllocatorStackDepth;
+    AllocatorStack[AllocatorStackDepth] = 0;
+    CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 }
 
-void fn_801C0418(void* data, u32 size, FEModel* model)
+void FEModel::OnAlternateTexturesLoaded(void* data, unsigned long size, void* userData)
 {
+    FEModel* model = (FEModel*)userData;
+    model->mAlternateTextureFileData = data;
+    model->mAlternateTextureFileDataSize = size;
+}
+
+void FEModel::OnModelLoaded(void* data, unsigned long size, void* userData)
+{
+    FEModel* model = (FEModel*)userData;
+    CurrentAllocator = &VirtualAllocator;
+    AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
+
+    model->mModelFileData = data;
+    model->mPendingLoads &= ~8;
+    model->mModelFileDataSize = size;
+    if (model->mSynchronousLoad)
+    {
+        model->mPendingLoads = 0x10;
+        model->mLoadQueued = false;
+    }
+    else
+    {
+        nlLoadEntireFileAsync(model->mModelData->szHierarchyFilename, OnHierarchyLoaded, model, 32, AllocateEnd, 0, 0, 0);
+        model->mLoadQueued = true;
+    }
+
+    --AllocatorStackDepth;
+    AllocatorStack[AllocatorStackDepth] = 0;
+    CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+}
+
+void FEModel::OnHierarchyLoaded(void* data, unsigned long size, void* userData)
+{
+    FEModel* model = (FEModel*)userData;
+    CurrentAllocator = &VirtualAllocator;
+    AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
+
+    model->mHierarchyFileData = data;
+    model->mPendingLoads &= ~2;
+    model->mHierarchyFileDataSize = size;
+    if (model->mSynchronousLoad)
+    {
+        model->mPendingLoads = 0x10;
+        model->mLoadQueued = false;
+    }
+    else
+    {
+        nlLoadEntireFileAsync(model->mModelData->pUnidentified38, OnAnimationsLoaded, model, 32, AllocateEnd, 0, 0, 0);
+        model->mLoadQueued = true;
+    }
+
+    --AllocatorStackDepth;
+    AllocatorStack[AllocatorStackDepth] = 0;
+    CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+}
+
+void FEModel::OnAnimationsLoaded(void* data, unsigned long size, void* userData)
+{
+    FEModel* model = (FEModel*)userData;
     u32 pendingLoads = model->mPendingLoads & ~1;
-    model->mUnidentified44 = data;
+    model->mAnimationFileData = data;
     model->mPendingLoads = pendingLoads;
-    model->mUnidentified48 = size;
+    model->mAnimationFileDataSize = size;
     if (model->mSynchronousLoad)
     {
         model->mPendingLoads = 0x10;
@@ -236,7 +256,7 @@ void fn_801C0418(void* data, u32 size, FEModel* model)
 }
 
 FEModelHandle::FEModelHandle(FEModelType type, const char* name,
-    void* modelData, bool unidentified59, void* unidentified4C,
+    tCharacterTemplateInfo* modelData, bool unidentified59, void* unidentified4C,
     void* unidentified50, bool unidentified5A)
 {
     nlStrNCpy(mName, name, 64);
@@ -246,10 +266,10 @@ FEModelHandle::FEModelHandle(FEModelType type, const char* name,
     switch (type)
     {
     case FE_MODEL_SKINNED:
-        mModel = new (8, false) FEModelType0_801C0960(modelData);
+        mModel = new (8, false) FESkinnedModel(modelData);
         break;
     case FE_MODEL_IMPOSTOR:
-        mModel = new (8, false) FEModelType1_801C0F58(modelData);
+        mModel = new (8, false) FEImpostorModel(modelData);
         break;
     }
 
@@ -276,14 +296,14 @@ void FEModelHandle::SetTransform(const nlMatrix4& transform)
 {
     if (mModel->mType == FE_MODEL_SKINNED)
     {
-        FEModelType0_801C0960* model
-            = (FEModelType0_801C0960*)mModel;
+        FESkinnedModel* model
+            = (FESkinnedModel*)mModel;
         model->mModel->mWorldMatrix = transform;
     }
     else if (mModel->mType == FE_MODEL_IMPOSTOR)
     {
-        FEModelType1_801C0F58* model
-            = (FEModelType1_801C0F58*)mModel;
+        FEImpostorModel* model
+            = (FEImpostorModel*)mModel;
         model->mPosition.x = transform.m41;
         model->mPosition.y = transform.m42;
         model->mPosition.z = transform.m43;
@@ -294,18 +314,7 @@ void FEModelHandle::SetTransform(const nlMatrix4& transform)
 void FEModelHandle::PlayAnimation(const char* name, ePlayMode playMode,
     float blendTime, float speed, bool force)
 {
-    FEAnimation_801C0704* animation = 0;
-    u32 hash = nlStringHash(name);
-    FEAnimationListEntry_801C0704* entry = mModel->mAnimations->mHead;
-    while (entry != 0)
-    {
-        if (entry->mAnimation->mHash == hash)
-        {
-            animation = entry->mAnimation;
-            break;
-        }
-        entry = entry->mNext;
-    }
+    cSAnim* animation = mModel->mAnimations->Find(nlStringHash(name));
 
     if (animation == 0)
     {
@@ -315,10 +324,10 @@ void FEModelHandle::PlayAnimation(const char* name, ePlayMode playMode,
     bool changeAnimation = force || animation != mModel->GetCurrentAnimation();
     if (changeAnimation && mModel->mType == FE_MODEL_SKINNED)
     {
-        FEModelType0_801C0960* model
-            = (FEModelType0_801C0960*)mModel;
+        FESkinnedModel* model
+            = (FESkinnedModel*)mModel;
         model->mModel->SetAnimState(
-            *(cSAnim*)animation, blendTime, playMode);
+            *animation, blendTime, playMode);
     }
     mAnimationCompleteCallback = 0;
 }
@@ -341,36 +350,25 @@ void FEModelHandle::SetDefaultAnimation(const char* animation)
 
 bool FEModelHandle::IsPlayingAnimation(const char* name) const
 {
-    FEAnimation_801C0704* animation = 0;
-    u32 hash = nlStringHash(name);
-    FEAnimationListEntry_801C0704* entry = mModel->mAnimations->mHead;
-    while (entry != 0)
-    {
-        if (entry->mAnimation->mHash == hash)
-        {
-            animation = entry->mAnimation;
-            break;
-        }
-        entry = entry->mNext;
-    }
+    cSAnim* animation = mModel->mAnimations->Find(nlStringHash(name));
     return animation != 0 && animation == mModel->GetCurrentAnimation();
 }
 
-FEModelType0_801C0960::~FEModelType0_801C0960()
+FESkinnedModel::~FESkinnedModel()
 {
     delete mModel;
 }
 
-FEAnimation_801C0704* FEModelType0_801C0960::GetCurrentAnimation()
+cSAnim* FESkinnedModel::GetCurrentAnimation()
 {
     if (mModel != 0 && mModel->mpAnimController != 0)
     {
-        return (FEAnimation_801C0704*)mModel->mpAnimController->m_pSAnim;
+        return mModel->mpAnimController->m_pSAnim;
     }
     return 0;
 }
 
-bool FEModelType0_801C0960::IsAnimationFinished()
+bool FESkinnedModel::IsAnimationFinished()
 {
     if (mModel != 0 && mModel->mpAnimController != 0)
     {
@@ -381,7 +379,7 @@ bool FEModelType0_801C0960::IsAnimationFinished()
     return false;
 }
 
-void FEModelType0_801C0960::Update(float dt)
+void FESkinnedModel::Update(float dt)
 {
     if (mModel != 0)
     {
@@ -389,7 +387,7 @@ void FEModelType0_801C0960::Update(float dt)
     }
 }
 
-void FEModelType0_801C0960::Render()
+void FESkinnedModel::Render()
 {
     if (mModel != 0)
     {
@@ -397,41 +395,41 @@ void FEModelType0_801C0960::Render()
     }
 }
 
-FEModelType1_801C0F58::~FEModelType1_801C0F58()
+FEImpostorModel::~FEImpostorModel()
 {
     delete mCharacter;
     delete mModel;
 }
 
-FEImpostorCharacter_801C3100::~FEImpostorCharacter_801C3100()
+FEImpostorCharacter::~FEImpostorCharacter()
 {
 }
 
-void FEModelType1_801C0F58::Initialize()
+void FEImpostorModel::Initialize()
 {
 }
 
-FEAnimation_801C0704* FEModelType1_801C0F58::GetCurrentAnimation()
+cSAnim* FEImpostorModel::GetCurrentAnimation()
 {
-    if (mModel != 0 && mModel->mAnimationState != 0)
+    if (mModel != 0 && mModel->mAnimController != 0)
     {
-        return (FEAnimation_801C0704*)mModel->mAnimationState->m_pSAnim;
+        return mModel->mAnimController->m_pSAnim;
     }
     return 0;
 }
 
-bool FEModelType1_801C0F58::IsAnimationFinished()
+bool FEImpostorModel::IsAnimationFinished()
 {
-    if (mModel != 0 && mModel->mAnimationState != 0)
+    if (mModel != 0 && mModel->mAnimController != 0)
     {
-        cPN_SAnimController* state = mModel->mAnimationState;
+        cPN_SAnimController* state = mModel->mAnimController;
         return (state->m_ePlayMode == PM_HOLD && state->m_fTime == 1.0f)
             || state->m_bLooped;
     }
     return false;
 }
 
-void FEModelType1_801C0F58::Render()
+void FEImpostorModel::Render()
 {
 }
 
@@ -459,7 +457,7 @@ void FEModelManager::Update(float dt)
         }
         entry = entry->mNext;
     }
-    fn_801C2E10(this);
+    BeginLoadModels();
 }
 
 void FEModelManager::Render()
@@ -488,43 +486,43 @@ void FEModelManager::Render()
     }
 }
 
-struct FEModelData_801C2798
+struct FEModelObject
 {
     /* 0x00 */ u8 mUnidentified00[0x60];
     /* 0x60 */ int mUnidentified60;
 };
 
-struct FEModelListEntry_801C271C
+struct FEModelObjectListEntry
 {
-    FEModelListEntry_801C271C* mNext;
-    FEModelData_801C2798* mModel;
+    FEModelObjectListEntry* mNext;
+    FEModelObject* mModel;
 };
 
-void fn_801C271C(FEModelManager* manager, void* model)
+void FEModelManager::RegisterObject(void* model)
 {
-    FEModelListEntry_801C271C* entry
-        = new (8, false) FEModelListEntry_801C271C;
+    FEModelObjectListEntry* entry
+        = new (8, false) FEModelObjectListEntry;
     if (entry != 0)
     {
         entry->mNext = 0;
-        entry->mModel = (FEModelData_801C2798*)model;
+        entry->mModel = (FEModelObject*)model;
     }
 
-    if (&manager->mModelsTail != 0 && manager->mModelsHead == 0)
+    if (&mModelsTail != 0 && mModelsHead == 0)
     {
-        manager->mModelsTail = entry;
+        mModelsTail = entry;
     }
-    entry->mNext = (FEModelListEntry_801C271C*)manager->mModelsHead;
-    manager->mModelsHead = entry;
+    entry->mNext = (FEModelObjectListEntry*)mModelsHead;
+    mModelsHead = entry;
 }
 
-void* fn_801C2798(FEModelManager* manager, int id)
+void* FEModelManager::GetObject(int id)
 {
-    FEModelListEntry_801C271C* entry
-        = (FEModelListEntry_801C271C*)manager->mModelsHead;
+    FEModelObjectListEntry* entry
+        = (FEModelObjectListEntry*)mModelsHead;
     while (entry != 0)
     {
-        FEModelData_801C2798* model = entry->mModel;
+        FEModelObject* model = entry->mModel;
         if (id == model->mUnidentified60)
         {
             return model;
@@ -534,25 +532,25 @@ void* fn_801C2798(FEModelManager* manager, int id)
     return 0;
 }
 
-FEModelHandle* fn_801C27C4(FEModelManager* manager, FEModelType type,
+FEModelHandle* FEModelManager::CreateModel(FEModelType type,
     const char* name, int captain, bool unidentified59,
     void* unidentified4C, void* unidentified50, bool alternate)
 {
     int characterIndex = GetCharacterIndexFromCaptain(captain);
     if (characterIndex != -1)
     {
-        return fn_801C2844(manager, type, name,
+        return CreateModel(type, name,
             GetCharacterTemplateInfo((eCharacterClass)characterIndex), unidentified59,
             unidentified4C, unidentified50, alternate);
     }
     return 0;
 }
 
-FEModelHandle* fn_801C2844(FEModelManager* manager, FEModelType type,
-    const char* name, void* modelData, bool unidentified59,
+FEModelHandle* FEModelManager::CreateModel(FEModelType type,
+    const char* name, tCharacterTemplateInfo* modelData, bool unidentified59,
     void* unidentified4C, void* unidentified50, bool alternate)
 {
-    FEModelHandle* handle = manager->GetModel(name);
+    FEModelHandle* handle = GetModel(name);
     if (handle == 0)
     {
         handle = new (8, false) FEModelHandle(type, name, modelData,
@@ -561,12 +559,12 @@ FEModelHandle* fn_801C2844(FEModelManager* manager, FEModelType type,
             = new (8, false) FEModelHandleListEntry;
         if (entry != 0)
         {
-            entry->mNext = manager->mHandlesHead;
+            entry->mNext = mHandlesHead;
             entry->mHandle = handle;
-            manager->mHandlesHead = entry;
-            if (manager->mHandlesTail == 0)
+            mHandlesHead = entry;
+            if (mHandlesTail == 0)
             {
-                manager->mHandlesTail = entry;
+                mHandlesTail = entry;
             }
         }
     }
@@ -588,11 +586,11 @@ FEModelHandle* FEModelManager::GetModel(const char* name)
     return 0;
 }
 
-FEImpostorCharacter_801C3100::FEImpostorCharacter_801C3100(
-    const char* name, ImpostorModel_802DAEE0* model, void* animations,
+FEImpostorCharacter::FEImpostorCharacter(
+    const char* name, ImpostorModel* model, void* animations,
     int budget, bool mirror, bool alternate,
     const ImpostorCharacterParams* params, int modelType)
-    : ImpostorCharacterImpl_8052E9B8(
+    : AnimatedImpostorCharacter(
         name, model, animations, budget, 1, 1, params)
     , mModelType(modelType)
 {
@@ -628,7 +626,7 @@ FEImpostorCharacter_801C3100::FEImpostorCharacter_801C3100(
         "mfCameraDistanceCup", 2.3f, category, true, 0.0f, 40.0f, 0.01f);
 }
 
-void FEImpostorCharacter_801C3100::SetScale(float scale)
+void FEImpostorCharacter::SetScale(float scale)
 {
     switch (mModelType)
     {
@@ -644,7 +642,7 @@ void FEImpostorCharacter_801C3100::SetScale(float scale)
     }
 }
 
-float FEImpostorCharacter_801C3100::GetScale()
+float FEImpostorCharacter::GetScale()
 {
     switch (mModelType)
     {
@@ -657,7 +655,7 @@ float FEImpostorCharacter_801C3100::GetScale()
     }
 }
 
-float FEImpostorCharacter_801C3100::GetCameraDistance()
+float FEImpostorCharacter::GetCameraDistance()
 {
     switch (mModelType)
     {
@@ -670,7 +668,7 @@ float FEImpostorCharacter_801C3100::GetCameraDistance()
     }
 }
 
-float FEImpostorCharacter_801C3100::GetCameraLookatZ()
+float FEImpostorCharacter::GetCameraLookatZ()
 {
     switch (mModelType)
     {
@@ -683,22 +681,22 @@ float FEImpostorCharacter_801C3100::GetCameraLookatZ()
     }
 }
 
-extern "C" void fn_801C38D4(void*, void* entry)
+void FreeFEModelHandleListEntry(void*, void* entry)
 {
     ::operator delete(entry);
 }
 
-extern "C" void fn_801C38DC(void*, void* entry)
+void FreeFEModelDataListEntry(void*, void* entry)
 {
     ::operator delete(entry);
 }
 
-extern "C" void fn_801C38F4(void*, void* entry)
+void FreeFEModelHandleRingEntry(void*, void* entry)
 {
     ::operator delete(entry);
 }
 
-void FEImpostorCharacter_801C3100::UnidentifiedVirtual24(float)
+void FEImpostorCharacter::UpdateAnimation(float)
 {
 }
 

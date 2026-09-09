@@ -8,7 +8,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_80186524.h"
-#include "unclassified/tu_80276264.h"
+#include "Game/Render/StadiumLoading.h"
 
 struct UnidentifiedStaticState
 {
@@ -45,12 +45,6 @@ public:
     glModel* model;
     char _68[8];
     u32 flags;
-};
-
-struct ShadowHeight
-{
-    char _00[0x98];
-    float height;
 };
 
 u8 sDrawPowerupShadows = 1;
@@ -113,12 +107,11 @@ static void DrawShadow(float radius, float x, float y, float z)
         alpha = 0xFF;
     }
 
-    ShadowHeight* shadowHeight =
-        reinterpret_cast<ShadowHeight*>(BasicStadium::GetCurrentStadium());
+    BasicStadium* stadium = BasicStadium::GetCurrentStadium();
     float height = 0.0f;
-    if (shadowHeight != 0)
+    if (stadium != 0)
     {
-        height = shadowHeight->height;
+        height = stadium->m_shadowHeight;
     }
     height = 0.015625f + height;
 
@@ -203,7 +196,7 @@ void DrawablePowerup::Render(int idx) const
 {
     FindPowerUp(nlStringLowerHash(GetName(idx)));
     RenderObject* object =
-        (RenderObject*)fn_8027725C(nlStringLowerHash(GetName(idx)));
+        (RenderObject*)FindStadiumDrawableObject(nlStringLowerHash(GetName(idx)));
 
     if (object == 0)
     {

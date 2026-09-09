@@ -6,38 +6,38 @@
 class GLInventory;
 struct glModelPacket;
 
-class ResourceInterface_802CC094
+class GLResourcePool
 {
 public:
-    ResourceInterface_802CC094();
+    GLResourcePool();
 
     virtual void* Allocate(unsigned long size, eGLMemory memType) = 0;
     virtual unsigned long MarkResource() = 0;
     virtual void ReleaseResource(unsigned long marker) = 0;
     virtual unsigned long GetFreeMemory() = 0;
-    virtual unsigned long fn_18() = 0;
-    virtual unsigned long fn_1C();
+    virtual unsigned long GetTotalMemory() = 0;
+    virtual unsigned long GetPeakMemoryUsage();
     virtual unsigned long fn_20();
     virtual unsigned long fn_24();
     virtual unsigned long fn_28();
-    virtual bool fn_2C(unsigned long, const char**, unsigned long*,
+    virtual bool GetPoolMemoryInfo(unsigned long, const char**, unsigned long*,
         unsigned long*, unsigned long*, const char**);
-    virtual ~ResourceInterface_802CC094();
+    virtual ~GLResourcePool();
 
-    ResourceInterface_802CC094* m_next;
-    ResourceInterface_802CC094* m_prev;
+    GLResourcePool* m_next;
+    GLResourcePool* m_prev;
     GLInventory* m_inventory;
     int m_level;
 }; // size: 0x14
 
-void fn_802CBEC4();
-void fn_802CBEC8();
-ResourceInterface_802CC094* fn_802CBFD8(
-    const void* configuration, int count, const char* name);
-void fn_802CC02C(ResourceInterface_802CC094* resource);
-void fn_802CC08C(ResourceInterface_802CC094* resource);
-ResourceInterface_802CC094* fn_802CC094();
-ResourceInterface_802CC094* fn_802CC09C();
+void glResourceAllocationFailed();
+void glInitResourcePools();
+GLResourcePool* glCreateResourcePool(
+    const GLMemoryRequirement* requirements, int count, const char* name);
+void glDestroyResourcePool(GLResourcePool* resource);
+void glSetCurrentResourcePool(GLResourcePool* resource);
+GLResourcePool* glGetCurrentResourcePool();
+GLResourcePool* glGetResourcePools();
 
 // Platform hook applied after a packet and its material data have been cloned.
 void glplatOnPacketCloned(glModelPacket* packet, void* allocator);

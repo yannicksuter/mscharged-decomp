@@ -2,6 +2,7 @@
 #define GAME_NET_TOURN_MANAGER_H
 
 #include "Game/DB/BasicGameInfo.h"
+#include "Game/DB/CupInterface.h"
 #include "Game/NetworkMessages.h"
 #include "types.h"
 
@@ -46,25 +47,8 @@ struct NetworkTournamentGame
     /* 0x13C */ int mAwayUpdate;
 }; // size: 0x140
 
-class NetworkTournamentCupInterface
-{
-public:
-    virtual BasicGameInfo* GetGameInfo(int phase, int matchup) = 0;
-    virtual bool HasGameBeenPlayed(int phase, int matchup) = 0;
-    virtual NetworkTournamentGame* GetTournamentGame(int phase, int matchup) = 0;
-    virtual BasicGameInfo* GetCurrentGameInfo() = 0;
-    virtual int GetRoundMask(int phase, int round) const = 0;
-    virtual int GetNumTournamentGames() const = 0;
-    virtual int GetCurrentMode() const = 0;
-    virtual int GetStadium() const = 0;
-    virtual bool IsFinalRound() const = 0;
-    virtual s16 GetCurrentRoundNumber() const = 0;
-    virtual int IsTournamentMode() const = 0;
-    virtual u16 GetNumRounds() const = 0;
-};
-
-class NetTournManager : public NetworkTournamentCupInterface,
-                        public UnidentifiedNetworkMessageReceiver
+class NetTournManager : public CupInterface,
+                        public NetworkMessageReceiver
 {
 public:
     NetTournManager()
@@ -96,21 +80,21 @@ public:
     void NotifyOverlayPopped(int overlay);
     void NotifyGameOver();
     void ResetGameProgressUpdateTimer(int reason);
-    virtual int ReceiverVirtual00(UnidentifiedNetworkMessage* message);
+    virtual int ProcessMessage(NetworkMessage* message);
     void HandleTournamentGameUpdate(NetMessageTournamentGameUpdate* message);
 
     virtual BasicGameInfo* GetGameInfo(int phase, int matchup);
     virtual bool HasGameBeenPlayed(int phase, int matchup);
     virtual NetworkTournamentGame* GetTournamentGame(int phase, int matchup);
     virtual BasicGameInfo* GetCurrentGameInfo();
-    virtual int GetRoundMask(int phase, int round) const;
-    virtual int GetNumTournamentGames() const;
+    virtual u16 GetNumGamesPerRound(int phase, int round) const;
+    virtual u16 GetNumGames(int phase) const;
     virtual int GetCurrentMode() const;
-    virtual int GetStadium() const { return mStadium; }
-    virtual bool IsFinalRound() const;
+    virtual int GetCupPersona() const { return mCupPersona; }
+    virtual bool IsCupWinningGame(int team) const;
     virtual s16 GetCurrentRoundNumber() const;
-    virtual int IsTournamentMode() const;
-    virtual u16 GetNumRounds() const;
+    virtual int GetCurrentRoundType() const;
+    virtual u16 GetNumPlayoffRounds() const;
 
     void AttachTournamentTrophy(void* presentation);
     void DetachTournamentTrophy();
@@ -122,9 +106,9 @@ public:
     /* 0x010 */ int mLocalMachineIndex;
     /* 0x014 */ bool mLargeBracket;
     /* 0x015 */ u8 mPadding015[3];
-    /* 0x018 */ int mStadium;
-    /* 0x01C */ int mHomeTeam;
-    /* 0x020 */ int mAwayTeam;
+    /* 0x018 */ int mCupPersona;
+    /* 0x01C */ int mFirstStadium;
+    /* 0x020 */ int mSecondStadium;
     /* 0x024 */ int mSeedings[8];
     /* 0x044 */ s16 mCurrentRound;
     /* 0x046 */ u8 mPadding046[2];
@@ -147,5 +131,7 @@ public:
     /* 0x944 */ void* mTrophyPresentation;
     /* 0x948 */ void* mTrophyResource;
 }; // size: 0x94C
+
+extern int s_nOverrideCupPersona;
 
 #endif // GAME_NET_TOURN_MANAGER_H

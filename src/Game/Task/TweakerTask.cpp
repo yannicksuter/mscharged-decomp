@@ -2,7 +2,7 @@
 
 #include "Game/NetworkSession.h"
 #include "Game/NetworkDebug.h"
-#include "unclassified/tu_80338898.h"
+#include "Game/NetworkSync.h"
 
 #include "types.h"
 
@@ -32,8 +32,8 @@ void TweakerTask::Run(float)
         g_pNetworkSessionBase->DebugDraw();
     }
 
-    if (lbl_806E2168 != 0)
+    if (gNetworkSyncState != 0)
     {
-        fn_80338AE4(lbl_806E2168);
+        gNetworkSyncState->DebugDraw();
     }
 }

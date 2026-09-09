@@ -1,5 +1,6 @@
 #include "NL/gl/glTexture.h"
 #include "NL/gl/glDraw2.h"
+#include "NL/gl/glTexture.h"
 #include "NL/gl/glFont.h"
 #include "NL/gl/glView.h"
 #include "NL/gl/glMemory.h"
@@ -31,6 +32,7 @@ const char* lbl_806DF3D4 = sMediumFontName;
 const char* lbl_806DF3D8 = sSmallFontName;
 
 #include "NL/gl/font_data.h"
+#include "NL/gl/glTexture.h"
 
 int lbl_8052E1C8[3] = { 8, 9, 11 };
 int lbl_8052E1D4[3] = { 12, 15, 18 };
@@ -126,7 +128,7 @@ void fn_802C9A0C(int x, int y, char character, unsigned short* image, int imageW
 
 void gl_FontStartup()
 {
-    fn_802C8280(lbl_806DF3E4);
+    glBeginResource(lbl_806DF3E4);
 
     for (eGLFont font = GLFONT_Small; font < GLFONT_Count; font = (eGLFont)(font + 1))
     {
@@ -151,9 +153,9 @@ void gl_FontStartup()
         }
 
         unsigned long platformTexture = glplatCreateFont(width, height, image,
-            texture, (MemoryAllocator*)fn_802CC094());
+            texture, (MemoryAllocator*)glGetCurrentResourcePool());
         glRegisterTexture(texture, (PlatTexture*)platformTexture,
-            (MemoryAllocator*)fn_802CC094());
+            (MemoryAllocator*)glGetCurrentResourcePool());
         delete[] image;
     }
 
@@ -161,7 +163,7 @@ void gl_FontStartup()
     lbl_806E1ECE = true;
     lbl_806E1ECD = false;
     lbl_806E1ECF = true;
-    fn_802C8288();
+    glEndResource();
 }
 
 int glFontSetFont(int font)
@@ -177,7 +179,7 @@ int glFontSetFont(int font)
 
 int fn_802C9CC8(GLView* renderView)
 {
-    return ((int)fn_802CE7B0(renderView) - 100) / lbl_8052E1EC[lbl_806E1EC4];
+    return ((int)glViewGetOrthographicHeight(renderView) - 100) / lbl_8052E1EC[lbl_806E1EC4];
 }
 
 void glFontVirtualPosToScreenCoordPos(float x, float y, float& outX, float& outY)

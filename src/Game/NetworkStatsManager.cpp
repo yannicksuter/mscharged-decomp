@@ -1,32 +1,35 @@
 #include "NL/nlSingleton.inl"
 #include <dwc/dwc_nastime.h>
+#include "Game/OnlinePlayer.h"
+#include "Game/OnlineMatchmaking.h"
 #include "Game/Sys/debug.h"
+#include "Game/DB/SaveLoad.h"
 
 #include "Game/NetworkStatsManager.h"
 #include "Game/FriendManager.h"
 
 #include "Game/GameInfo.h"
-#include "Game/DB/SaveLoad.h"
 #include "Game/NetworkSession.h"
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/main.h"
+#include "Game/MatchSeries.h"
 #include "NL/nlMemory.h"
-#include "unclassified/tu_80336B2C.h"
+#include "Game/NetworkInput.h"
 
 #include <string.h>
 
-extern "C" bool fn_801EDC10();
 
 static int sLeaderboardJobs[5] = { 6, 7, 8, 9, 10 };
 
-static NetworkStatsManager_8012F378* sNetworkStatsManager;
+static NetworkStatsManager* sNetworkStatsManager;
 
 static float sSecondsPerMinute = 60.0f;
 static float sRankingRequestTimeout = 30.0f;
 
 extern NetworkSeasonDate sNetworkSeasonDates[52];
 extern int sMonthDays[12];
+extern NetworkSeasonDateTable sNetworkSeasonDateTable;
 
 int NetworkLeaderboardCategory::FindPlayer(int profileId) const
 {
@@ -40,18 +43,18 @@ int NetworkLeaderboardCategory::FindPlayer(int profileId) const
     return -1;
 }
 
-void NetworkStatsManager_8012F378::CreateInstance()
+void NetworkStatsManager::CreateInstance()
 {
-    sNetworkStatsManager = new (nlMalloc(sizeof(NetworkStatsManager_8012F378), 8, false))
-        NetworkStatsManager_8012F378;
+    sNetworkStatsManager = new (nlMalloc(sizeof(NetworkStatsManager), 8, false))
+        NetworkStatsManager;
 }
 
-NetworkStatsManager_8012F378* NetworkStatsManager_8012F378::Instance()
+NetworkStatsManager* NetworkStatsManager::Instance()
 {
     return sNetworkStatsManager;
 }
 
-void NetworkStatsManager_8012F378::Reset(bool)
+void NetworkStatsManager::Reset(bool)
 {
     mLeaderboardRequestComplete = false;
     mLeaderboardRequestSucceeded = false;
@@ -127,20 +130,20 @@ void NetworkStatsManager_8012F378::Reset(bool)
     }
 }
 
-bool NetworkStatsManager_8012F378::UsesEuropeanRankings() const
+bool NetworkStatsManager::UsesEuropeanRankings() const
 {
     return GetRegion() == 1;
 }
 
-NetworkLeaderboardCategory* NetworkStatsManager_8012F378::GetCategory(
+NetworkLeaderboardCategory* NetworkStatsManager::GetCategory(
     int category)
 {
     return &mCategories[category];
 }
 
-bool NetworkStatsManager_8012F378::RequestRankings(int category)
+bool NetworkStatsManager::RequestRankings(int category)
 {
-    g_pNetworkSession->fn_8012170C()->SetListener(this);
+    g_pNetworkSession->GetStatsInterface()->SetListener(this);
     if (mOperation != 0)
     {
         return false;
@@ -149,7 +152,7 @@ bool NetworkStatsManager_8012F378::RequestRankings(int category)
     mRequestedCategory = category;
     NetworkLeaderboardCategory& leaderboard = mCategories[category];
     leaderboard.mAvailable = false;
-    if (g_pNetworkSession->fn_8012170C()->GetLeaderboardStats(leaderboard.mPersistentCategory,
+    if (g_pNetworkSession->GetStatsInterface()->GetLeaderboardStats(leaderboard.mPersistentCategory,
             leaderboard.mFilter,
             65,
             leaderboard.mPlayers,
@@ -171,11 +174,11 @@ bool NetworkStatsManager_8012F378::RequestRankings(int category)
     return false;
 }
 
-void NetworkStatsManager_8012F378::StatsListenerVirtual00()
+void NetworkStatsManager::StatsListenerVirtual00()
 {
 }
 
-void NetworkStatsManager_8012F378::ApplyLeaderboardToSave(
+void NetworkStatsManager::ApplyLeaderboardToSave(
     NetworkLeaderboardCategory* leaderboard, bool updateProfile)
 {
     if (leaderboard == 0 || leaderboard->mCount <= 0)
@@ -194,7 +197,7 @@ void NetworkStatsManager_8012F378::ApplyLeaderboardToSave(
     }
 }
 
-void NetworkStatsManager_8012F378::CommitPendingOnlineTotals(
+void NetworkStatsManager::CommitPendingOnlineTotals(
     NetworkRankingMeta*)
 {
     GameInfoManager* gameInfo = GameInfoManager::GetInstance();
@@ -218,7 +221,7 @@ void NetworkStatsManager_8012F378::CommitPendingOnlineTotals(
     mSaveDataChanged = true;
 }
 
-void NetworkStatsManager_8012F378::UpdateFriendRankingNames(
+void NetworkStatsManager::UpdateFriendRankingNames(
     NetworkLeaderboardCategory* leaderboard)
 {
     if (leaderboard == 0)
@@ -235,7 +238,7 @@ void NetworkStatsManager_8012F378::UpdateFriendRankingNames(
     }
 }
 
-void NetworkStatsManager_8012F378::BuildFriendsLeaderboard(
+void NetworkStatsManager::BuildFriendsLeaderboard(
     NetworkLeaderboardCategory* leaderboard)
 {
     if (leaderboard == 0)
@@ -262,7 +265,7 @@ void NetworkStatsManager_8012F378::BuildFriendsLeaderboard(
     leaderboard->mCount = write;
 }
 
-void NetworkStatsManager_8012F378::OnLeaderboardResult(bool success,
+void NetworkStatsManager::OnLeaderboardResult(bool success,
     int category, int filter, int count, NetworkStatsPlayer*,
     NetworkRankingMeta*)
 {
@@ -311,7 +314,7 @@ void NetworkStatsManager_8012F378::OnLeaderboardResult(bool success,
     }
 }
 
-bool NetworkStatsManager_8012F378::PostResetMyPlayerStats(
+bool NetworkStatsManager::PostResetMyPlayerStats(
     int category, bool useExistingStats)
 {
     if (mOperation != 0)
@@ -333,7 +336,7 @@ bool NetworkStatsManager_8012F378::PostResetMyPlayerStats(
     mHasLocalStats[category] = true;
 
     const NetworkRankingMeta* submission = useExistingStats ? &mLocalStats[category] : 0;
-    NetworkRanking_8012D8F4* ranking = g_pNetworkSession->fn_80121754();
+    NetworkRanking* ranking = g_pNetworkSession->GetRankingReporter();
     if (ranking->SubmitScore(mPersistentCategories[category], submission))
     {
         mOperation = 1;
@@ -349,7 +352,7 @@ bool NetworkStatsManager_8012F378::PostResetMyPlayerStats(
     return true;
 }
 
-void NetworkStatsManager_8012F378::OnSubmitScoreResult(
+void NetworkStatsManager::OnSubmitScoreResult(
     bool success, int category)
 {
     mOperation = 0;
@@ -420,7 +423,7 @@ int CalculateResultPoints_80130684(int result, bool home, int homeScore,
     return *resultPoints + *scorePoints + *bonusPoints;
 }
 
-void NetworkStatsManager_8012F378::UpdateOnlineResultTotals(
+void NetworkStatsManager::UpdateOnlineResultTotals(
     int result, bool home, int homeScore, int awayScore)
 {
     if (IsOnlineRankedMatch())
@@ -447,9 +450,9 @@ void NetworkStatsManager_8012F378::UpdateOnlineResultTotals(
     mSaveDataChanged = true;
 }
 
-bool NetworkStatsManager_8012F378::ShouldRestoreDefaultDisconnectLoss()
+bool NetworkStatsManager::ShouldRestoreDefaultDisconnectLoss()
 {
-    if (g_pNetworkSession->fn_80121754() != 0)
+    if (g_pNetworkSession->GetRankingReporter() != 0)
     {
         int count = UsesEuropeanRankings() ? 3 : 2;
         for (int i = 0; i < count; ++i)
@@ -463,7 +466,7 @@ bool NetworkStatsManager_8012F378::ShouldRestoreDefaultDisconnectLoss()
     return false;
 }
 
-void NetworkStatsManager_8012F378::ReportDefaultDisconnectLoss()
+void NetworkStatsManager::ReportDefaultDisconnectLoss()
 {
     if (mGameResultReported)
     {
@@ -497,12 +500,12 @@ void NetworkStatsManager_8012F378::ReportDefaultDisconnectLoss()
     }
 }
 
-void NetworkStatsManager_8012F378::ReportGameResult(int result,
+void NetworkStatsManager::ReportGameResult(int result,
     const NetworkStatsPlayer* home, const NetworkStatsPlayer* away,
     bool reportHome, int homeScore, int awayScore,
     const NetworkScoreSubmission* fallback)
 {
-    if (g_pNetworkSession->fn_80121754() != 0)
+    if (g_pNetworkSession->GetRankingReporter() != 0)
     {
         int points = 0;
         bool won = false;
@@ -542,7 +545,7 @@ void NetworkStatsManager_8012F378::ReportGameResult(int result,
             mUnidentifiedC43C = 0;
         }
 
-        bool restoreDisconnectLoss = result == 0 ? fn_801EDC10() : true;
+        bool restoreDisconnectLoss = result == 0 ? IsCurrentSeriesComplete() : true;
         if (fallback != 0)
         {
             restoreDisconnectLoss = true;
@@ -670,17 +673,17 @@ void NetworkStatsManager_8012F378::ReportGameResult(int result,
             SubmitJob(2);
         }
     }
-    else if (g_pNetworkSession->fn_80121738() != 0)
+    else if (g_pNetworkSession->GetStatsReporter() != 0)
     {
-        NetworkStatsReporter_8012CE20* stats =
-            g_pNetworkSession->fn_80121738();
+        NetworkStatsReporter* stats =
+            g_pNetworkSession->GetStatsReporter();
         stats->ReportGameResult(0,
             reinterpret_cast<const NetworkScoreSubmission*>(result), home,
             away, reportHome, homeScore, awayScore, 0);
     }
 }
 
-void NetworkStatsManager_8012F378::OnReportGameResult(bool success, int category)
+void NetworkStatsManager::OnReportGameResult(bool success, int category)
 {
     mOperation = 0;
     if ((int)success != 1)
@@ -692,7 +695,7 @@ void NetworkStatsManager_8012F378::OnReportGameResult(bool success, int category
     }
 }
 
-void NetworkStatsManager_8012F378::SubmitJob(int job)
+void NetworkStatsManager::SubmitJob(int job)
 {
     if (mJobCount < mJobCapacity)
     {
@@ -702,17 +705,17 @@ void NetworkStatsManager_8012F378::SubmitJob(int job)
     tDebugPrintManager::Print(DC_NETWORK, "ERROR JobsQ full failed to submit %d\n", job);
 }
 
-void NetworkStatsManager_8012F378::RefreshSaveState_801314D0()
+void NetworkStatsManager::RefreshSaveState_801314D0()
 {
     mSaveState = g_pFriendManager->CountBuddies();
 }
 
-void NetworkStatsManager_8012F378::ClearGameResultReported()
+void NetworkStatsManager::ClearGameResultReported()
 {
     mGameResultReported = false;
 }
 
-void NetworkStatsManager_8012F378::ResetPregameDisconnectState()
+void NetworkStatsManager::ResetPregameDisconnectState()
 {
     mGameResultReported = false;
     mDisconnectPending = false;
@@ -728,12 +731,12 @@ void NetworkStatsManager_8012F378::ResetPregameDisconnectState()
     }
 }
 
-void NetworkStatsManager_8012F378::MarkDisconnectPending()
+void NetworkStatsManager::MarkDisconnectPending()
 {
     mDisconnectPending = true;
 }
 
-void NetworkStatsManager_8012F378::PreGameRestoreDefaultDisconnectLoss()
+void NetworkStatsManager::PreGameRestoreDefaultDisconnectLoss()
 {
     if (UsesEuropeanRankings())
     {
@@ -763,7 +766,7 @@ void NetworkStatsManager_8012F378::PreGameRestoreDefaultDisconnectLoss()
     }
 }
 
-bool NetworkStatsManager_8012F378::RefreshFriendStats_80131B50()
+bool NetworkStatsManager::RefreshFriendStats_80131B50()
 {
     if (mOperation == 0 && g_pNetworkSession->mLoginStage == 14)
     {
@@ -803,7 +806,7 @@ bool NetworkStatsManager_8012F378::RefreshFriendStats_80131B50()
     return true;
 }
 
-void NetworkStatsManager_8012F378::BeginOnlineGame_80131DB4()
+void NetworkStatsManager::BeginOnlineGame_80131DB4()
 {
     mGameResultReported = false;
     mDisconnectPending = false;
@@ -812,7 +815,7 @@ void NetworkStatsManager_8012F378::BeginOnlineGame_80131DB4()
     mDisconnectLossPending[2] = UsesEuropeanRankings();
 }
 
-void NetworkStatsManager_8012F378::Update(float dt)
+void NetworkStatsManager::Update(float dt)
 {
     mCurrentTime += dt;
     if (mOperation != 0 && mCurrentTime - mOperationStartTime > sRankingRequestTimeout)
@@ -888,11 +891,11 @@ void NetworkStatsManager_8012F378::Update(float dt)
 int GetLocalPlayingSide_801323F4()
 {
     s8 machine = g_pNetworkSessionBase->GetLocalMachineId();
-    s8 player = fn_80336F68(0, machine);
+    s8 player = GetNetworkPlayerId(0, machine);
     return GameInfoManager::GetInstance()->GetPlayingSide(player);
 }
 
-void NetworkStatsManager_8012F378::HandleDisconnect_8013243C(int result)
+void NetworkStatsManager::HandleDisconnect_8013243C(int result)
 {
     if (!IsOnlineRankedMatch())
     {
@@ -911,7 +914,7 @@ void NetworkStatsManager_8012F378::HandleDisconnect_8013243C(int result)
     mUnidentifiedC41C = result;
 }
 
-void NetworkStatsManager_8012F378::CalculateAndReportGameResult(int result)
+void NetworkStatsManager::CalculateAndReportGameResult(int result)
 {
     if (mDisconnectPending)
     {
@@ -1120,9 +1123,9 @@ NetworkSeasonDateTable sNetworkSeasonDateTable(
 int g_nAddHoursTime;
 int g_nAddMinsTime;
 
-static TweakValueIntImpl_804FD898 sAddHoursTimeTweak(
+static TweakIntBinding sAddHoursTimeTweak(
     "g_nAddHoursTime", "Network", &g_nAddHoursTime, true);
-static TweakValueIntImpl_804FD898 sAddMinsTimeTweak(
+static TweakIntBinding sAddMinsTimeTweak(
     "g_nAddMinsTime", "Network", &g_nAddMinsTime, true);
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

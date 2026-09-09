@@ -43,8 +43,8 @@ void Wiper::Initialize()
 {
     GLView* view = GetLayerView(eCLV_Transitions);
     ScreenTransitionManager::Instance()->m_eView = view;
-    fn_802C820C("art/transitions/transitions.rlt",
-        (MemoryAllocator*)fn_802CC094());
+    glLoadTextureBundle("art/transitions/transitions.rlt",
+        glGetCurrentResourcePool());
 
     unsigned long fileSize = 0;
     char* loadedData = (char*)fxLoadEntireFileHigh("art/transitions/transitions.fx", &fileSize);
@@ -120,7 +120,7 @@ void Wiper::Run(float dt)
 
 void Wiper::Render()
 {
-    GetLayerView(eCLV_Transitions3D)->m_ClearColour = wiperCallback.mTransitionActive;
+    GetLayerView(eCLV_Transitions3D)->m_ClearDepth = wiperCallback.mTransitionActive;
     ScreenTransitionManager::Instance()->Render();
 }
 

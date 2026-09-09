@@ -242,7 +242,7 @@ checkContact:
 
 void PhysicsWorld::LogBody(PhysicsObject* object)
 {
-    fn_80358B08(object->m_bodyID, m_SyncLogContext, m_SyncLogCache);
+    dBodySyncLog(object->m_bodyID, m_SyncLogContext, m_SyncLogCache);
     object->SyncLog(m_SyncLogContext, m_SyncLogCache);
 }
 
@@ -307,18 +307,18 @@ void PhysicsWorld::LogGeom(PhysicsObject* object)
     context = m_SyncLogContext;
     if (s_GenGeomType.type == 0xFFFF)
     {
-        s_GenGeomType.type = fn_80338EBC(cache, s_GenGeomName);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, 0, s_TypeName);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (unsigned char*)&geomData.m_gflags - (unsigned char*)&geomData, s_GeomFlagsName);
-        fn_80338F88(cache, 27, lbl_80533C98[27].size, (unsigned char*)&geomData.m_pos - (unsigned char*)&geomData, s_PositionName);
-        fn_80338F88(cache, 30, lbl_80533C98[30].size, (unsigned char*)&geomData.m_R - (unsigned char*)&geomData, s_RotationName);
-        fn_80338F88(cache, 13, lbl_80533C98[13].size, (unsigned char*)&geomData.m_catBits - (unsigned char*)&geomData, s_CategoryBitsName);
-        fn_80338F88(cache, 13, lbl_80533C98[13].size, (unsigned char*)&geomData.m_collBits - (unsigned char*)&geomData, s_CollideBitsName);
-        fn_80338F78(cache);
+        s_GenGeomType.type = cache->BeginType(s_GenGeomName);
+        cache->AddField(8, gDebugFieldTypes[8].size, 0, s_TypeName);
+        cache->AddField(8, gDebugFieldTypes[8].size, (unsigned char*)&geomData.m_gflags - (unsigned char*)&geomData, s_GeomFlagsName);
+        cache->AddField(27, gDebugFieldTypes[27].size, (unsigned char*)&geomData.m_pos - (unsigned char*)&geomData, s_PositionName);
+        cache->AddField(30, gDebugFieldTypes[30].size, (unsigned char*)&geomData.m_R - (unsigned char*)&geomData, s_RotationName);
+        cache->AddField(13, gDebugFieldTypes[13].size, (unsigned char*)&geomData.m_catBits - (unsigned char*)&geomData, s_CategoryBitsName);
+        cache->AddField(13, gDebugFieldTypes[13].size, (unsigned char*)&geomData.m_collBits - (unsigned char*)&geomData, s_CollideBitsName);
+        cache->EndType();
     }
 
-    fn_80339450(cache, s_GenGeomType.type, &geomData, context);
-    fn_8033930C(cache, s_GenGeomType.type, &geomData, sizeof(geomData));
+    cache->ChecksumData(s_GenGeomType.type, &geomData, context);
+    cache->WriteData(s_GenGeomType.type, &geomData, sizeof(geomData));
 }
 
 void PhysicsWorld::SyncLog(void* context, DebugWriteCache* cache)

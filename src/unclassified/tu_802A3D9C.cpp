@@ -1,7 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxDisplayList.h"
 
 unsigned int gxSetNumChans(unsigned int);
@@ -44,7 +44,7 @@ extern "C" void fn_802A3E20(
     void* renderer, const glModelPacket* packet)
 {
     Parameters_802A3E20* parameters = static_cast<Parameters_802A3E20*>(packet->unknown20);
-    fn_802CC978(renderer, packet, parameters->value);
+    glSetMaterialTextureAlphaState(renderer, packet, parameters->value);
 }
 
 extern "C" void fn_802A3E2C(

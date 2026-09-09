@@ -738,7 +738,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
     desire->m_fAvoidanceMult = 1.0f;
 }
 
-void DesireSteering::UnidentifiedUpdate(
+void DesireSteering::Update(
     UnidentifiedDesireUpdate*, float fDeltaT)
 {
     fn_8003E948(mUnidentifiedFielder);
@@ -784,7 +784,7 @@ void DesireSteering::UnidentifiedUpdate(
         }
 
         v3UnfilteredDesired = m_v3DesiredPos;
-        m_AvoidanceHistory.UnidentifiedUpdate(m_v3DesiredPos, m_v3DesiredPos, fDeltaT);
+        m_AvoidanceHistory.Update(m_v3DesiredPos, m_v3DesiredPos, fDeltaT);
 
         fn_800C66A4(this, m_v3DesiredPos,
             TR_FAR_DISTANCE, fDeltaT, m_fUrgency);
@@ -822,55 +822,55 @@ void DesireSteering::UnidentifiedUpdate(
 void DesireSteering::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireSteering");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    *(unsigned short*)field = cache->BeginType("DesireSteering");
+    cache->AddField(22, gDebugFieldTypes[22].size,
         0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
         "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
         "mThinkTimer");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&m_ePositionSeekState - (u8*)&mvDesiredPosition,
         "m_ePositionSeekState");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    cache->AddField(22, gDebugFieldTypes[22].size,
         (u8*)&m_v3DesiredPos - (u8*)&mvDesiredPosition,
         "m_v3DesiredPos");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&m_fDesiredFacingDirection - (u8*)&mvDesiredPosition,
         "m_fDesiredFacingDirection");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&m_fFacingTotalWeight - (u8*)&mvDesiredPosition,
         "m_fFacingTotalWeight");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    cache->AddField(22, gDebugFieldTypes[22].size,
         (u8*)&m_v3LastDesiredPos - (u8*)&mvDesiredPosition,
         "m_v3LastDesiredPos");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    cache->AddField(22, gDebugFieldTypes[22].size,
         (u8*)&m_v3DesiredVel - (u8*)&mvDesiredPosition,
         "m_v3DesiredVel");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    cache->AddField(22, gDebugFieldTypes[22].size,
         (u8*)&m_v3TempDesiredPos - (u8*)&mvDesiredPosition,
         "m_v3TempDesiredPos");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&m_fTotalWeight - (u8*)&mvDesiredPosition,
         "m_fTotalWeight");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&m_fUrgency - (u8*)&mvDesiredPosition,
         "m_fUrgency");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&m_fDesiredArrivalTime - (u8*)&mvDesiredPosition,
         "m_fDesiredArrivalTime");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&m_fForcedArrivalRadius - (u8*)&mvDesiredPosition,
         "m_fForcedArrivalRadius");
-    fn_80338F88(cache, 17, lbl_80533C98[17].size,
+    cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&m_fAvoidanceMult - (u8*)&mvDesiredPosition,
         "m_fAvoidanceMult");
-    fn_80338F88(cache, 8, lbl_80533C98[8].size,
+    cache->AddField(8, gDebugFieldTypes[8].size,
         (u8*)&m_ThingsToAvoid - (u8*)&mvDesiredPosition,
         "m_ThingsToAvoid");
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 void DesireSteering::UnidentifiedVirtual7(
@@ -883,8 +883,8 @@ void DesireSteering::UnidentifiedVirtual7(
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
     void* data = (u8*)this + offset;
-    fn_80339450(cache, sDesireSteeringType, data, context);
-    fn_8033930C(cache, sDesireSteeringType, data,
+    cache->ChecksumData(sDesireSteeringType, data, context);
+    cache->WriteData(sDesireSteeringType, data,
         sizeof(DesireSteering) - offset);
 }
 
@@ -897,7 +897,7 @@ bool UnidentifiedDesire35::UnidentifiedInitialize(void*)
     return true;
 }
 
-void UnidentifiedDesire35::UnidentifiedUpdate(
+void UnidentifiedDesire35::Update(
     UnidentifiedDesireUpdate* update, float fDeltaT)
 {
     cFielder* pFielder = mUnidentifiedFielder;

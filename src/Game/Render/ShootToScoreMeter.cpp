@@ -1,3 +1,4 @@
+#include "NL/gl/glPlat.h"
 #include "Game/Render/ShootToScoreMeter.h"
 
 #include "Game/AI/AiUtil.h"
@@ -17,9 +18,7 @@ extern "C"
 {
     extern BaseGameSceneManager* g_pOverlayManager;
     void fn_801E29C0(BaseGameSceneManager* manager, nlVector3 position);
-    u32 fn_80369D4C();
-    u32 fn_80369D54();
-}
+        }
 
 static u32 LightTexture = glGetTexture("global/lightramp");
 static u32 BlackTexture = glGetTexture("global/black");
@@ -355,26 +354,26 @@ void ShootToScoreMeter::DrawMeter()
     nlMakeRotationMatrixZ(matrix, (3.1415927f * rotation) / 180.0f);
 
     static nlVector3 screenPosition;
-    fn_802CEA40(GetLayerView(eCLV_Unshadowed),
+    glViewProjectPointBetweenViews(GetLayerView(eCLV_Unshadowed),
         GetLayerView(eCLV_UnsortedSquareOrtho), &m_v3MeterPosition,
         &screenPosition);
     screenPosition.z = -0.1f;
     screenPosition.y += -20.0f;
 
-    float screenWidth = (float)fn_80369D4C();
-    float screenHeight = (float)fn_80369D54();
+    float screenWidth = (float)glplatGetDefaultTargetWidth();
+    float screenHeight = (float)glplatGetDefaultTargetHeight();
     float scaledMeterWidth = MeterWidth * screenWidth;
     float screenMargin = 60.0f;
     float lowerY = 0.05f
-        * fn_802CE7B0(GetLayerView(eCLV_UnsortedSquareOrtho));
+        * glViewGetOrthographicHeight(GetLayerView(eCLV_UnsortedSquareOrtho));
     GLView* view = GetLayerView(eCLV_UnsortedSquareOrtho);
-    float upperY = 0.05f * fn_802CE7B0(view);
-    upperY = fn_802CE7B0(view) - upperY;
+    float upperY = 0.05f * glViewGetOrthographicHeight(view);
+    upperY = glViewGetOrthographicHeight(view) - upperY;
     view = GetLayerView(eCLV_UnsortedSquareOrtho);
-    float upperX = 0.05f * fn_802CE76C(view);
-    upperX = fn_802CE76C(view) - upperX - screenMargin;
+    float upperX = 0.05f * glViewGetOrthographicWidth(view);
+    upperX = glViewGetOrthographicWidth(view) - upperX - screenMargin;
     float lowerX = 0.05f
-        * fn_802CE76C(GetLayerView(eCLV_UnsortedSquareOrtho));
+        * glViewGetOrthographicWidth(GetLayerView(eCLV_UnsortedSquareOrtho));
     lowerX += screenMargin;
     screenPosition.x
         = clamp_le(clamp_ge(screenPosition.x, lowerX), upperX);
@@ -389,7 +388,7 @@ void ShootToScoreMeter::DrawMeter()
 
     nlVector3 projectedPosition = { 0.0f, 0.0f, 0.0f };
     glViewProjectPoint(GetLayerView(eCLV_UnsortedSquareOrtho), screenPosition, projectedPosition);
-    fn_802CE6DC(GetLayerView(eCLV_Anark), &projectedPosition,
+    glViewUnprojectOrthographicPoint(GetLayerView(eCLV_Anark), &projectedPosition,
         &projectedPosition);
     fn_801E29C0(g_pOverlayManager, projectedPosition);
 

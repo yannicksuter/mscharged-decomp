@@ -1,4 +1,5 @@
 #include "Game/AI/DesireUserControlled.h"
+#include "Game/DetInput.h"
 
 #include "Game/AI/DesireSteering.h"
 #include "Game/AI/DesireUpdate.h"
@@ -20,7 +21,6 @@ extern "C" bool fn_8003E948(cFielder*);
 extern "C" void fn_800368E4(cFielder*);
 extern "C" void fn_8003E0A8(cFielder*);
 extern "C" bool fn_80035F34(cFielder*);
-extern "C" bool fn_80331C04(DetInput*, int, bool);
 extern "C" void fn_800B6A1C(void*, int, const Variant&);
 extern "C" void fn_8003E168(cFielder*, float);
 
@@ -45,7 +45,7 @@ bool DesireUserControlled::UnidentifiedInitialize(void* context)
     mUnidentified078 = -1.0f;
 
     UnidentifiedVariant_80054AB8 update;
-    UnidentifiedUpdate(
+    Update(
         (UnidentifiedDesireUpdate*)&update, g_fSimulationTick);
 
     return result;
@@ -54,7 +54,7 @@ bool DesireUserControlled::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0x100 | 0x800D458C | size: 0x6BC
  */
-void DesireUserControlled::UnidentifiedUpdate(
+void DesireUserControlled::Update(
     UnidentifiedDesireUpdate* update, float fDeltaT)
 {
     bool bHasPad = (bool)mUnidentifiedFielder->GetGlobalPad();
@@ -129,8 +129,7 @@ void DesireUserControlled::UnidentifiedUpdate(
             }
             if (bIsShotActive)
             {
-                if (!fn_80331C04(
-                        mUnidentifiedFielder->GetGlobalPad(), 0x1C, true))
+                if (!mUnidentifiedFielder->GetGlobalPad()->IsPressed(0x1C, true))
                 {
                     mUnidentifiedFielder->fn_8004B86C(
                         mUnidentifiedFielder->bIsModified,
@@ -186,16 +185,16 @@ void DesireUserControlled::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
-        = fn_80338EBC(cache, "DesireUserControlled");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        = cache->BeginType("DesireUserControlled");
+    cache->AddField(22, gDebugFieldTypes[22].size,
         0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
         "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
         "mThinkTimer");
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 /**
@@ -211,8 +210,8 @@ void DesireUserControlled::UnidentifiedVirtual7(
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
     void* data = (u8*)this + offset;
-    fn_80339450(cache, sDesireUserControlledType, data, context);
-    fn_8033930C(cache, sDesireUserControlledType, data,
+    cache->ChecksumData(sDesireUserControlledType, data, context);
+    cache->WriteData(sDesireUserControlledType, data,
         sizeof(DesireUserControlled) - offset);
 }
 

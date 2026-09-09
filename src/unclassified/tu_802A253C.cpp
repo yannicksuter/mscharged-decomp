@@ -1,5 +1,5 @@
 #include "NL/gl/glModel.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
 
@@ -57,7 +57,7 @@ extern "C" void fn_802A2630(void*)
 extern "C" void fn_802A265C(void* renderer, const glModelPacket* packet)
 {
     u32* parameter = static_cast<u32*>(packet->unknown20);
-    fn_802CC978(renderer, packet, *parameter);
+    glSetMaterialTextureAlphaState(renderer, packet, *parameter);
 }
 
 extern "C" void fn_802A2668(void* renderer, const glModelPacket* packet)

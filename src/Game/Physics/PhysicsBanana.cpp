@@ -2,6 +2,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
 #include "Game/EventDataTypes.h"
+#include "Game/Render/NPCManager.h"
 #include "Game/Field.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
@@ -18,7 +19,6 @@
 #include "unclassified/tu_801A5F10.h"
 #include "math.h"
 
-extern void* lbl_806E1608;
 
 extern "C" bool fn_800167A8(cBall*);
 extern "C" bool fn_800977A4(cFielder*, float);
@@ -207,12 +207,12 @@ ContactType PhysicsBanana::Contact(
         }
 
         KoopaShellObject* koopaShell =
-            *(KoopaShellObject**)((u8*)lbl_806E1608 + 0x2C);
+            gNPCManager->mUnidentified02C;
         if (koopaShell != 0 && koopaShell->mVisible)
         {
             return NO_CONTACT;
         }
-        void* egg = *(void**)((u8*)lbl_806E1608 + 0x28);
+        void* egg = gNPCManager->mpBirdoEgg;
         if (egg != 0 && *(bool*)((u8*)egg + 0x30))
         {
             return NO_CONTACT;

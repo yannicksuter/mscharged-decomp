@@ -1,8 +1,9 @@
+#include "NL/glx/glxSkinMatrix.h"
 #include <revolution/gx.h>
 
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glModel.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/platvmath.h"
 
@@ -41,8 +42,6 @@ extern nlMatrix4 lbl_8057B470;
 extern "C" void fn_802A6280(void*, bool);
 extern "C" void fn_802A6348(void*, const glModelPacket*);
 extern "C" void fn_802A63A0(void*, const glModelPacket*);
-extern "C" void fn_8036D774(const nlMatrix4*);
-extern "C" void fn_8036D7EC(void*, u32, const nlMatrix4*, int);
 
 extern "C" void fn_802A2EDC(void* renderer, SetupContext_802A2EDC* context)
 {
@@ -69,7 +68,7 @@ extern "C" void fn_802A2FE0()
 extern "C" void fn_802A2FEC(void* renderer, const glModelPacket* packet)
 {
     u32* parameter = static_cast<u32*>(packet->unknown20);
-    fn_802CC978(renderer, packet, *parameter);
+    glSetMaterialTextureAlphaState(renderer, packet, *parameter);
 }
 
 extern "C" void fn_802A2FF8(void* renderer, const glModelPacket* packet)
@@ -86,11 +85,11 @@ extern "C" void fn_802A2FF8(void* renderer, const glModelPacket* packet)
     if (packet->unknown28 == 0)
     {
         SkinParameters_802A2FF8* parameters = static_cast<SkinParameters_802A2FF8*>(packet->unknown20);
-        fn_8036D7EC(parameters->matrices, parameters->matrixBytes / 0x30, &product, 0);
+        glx_LoadSkinMatrices((const float (*)[3][4])parameters->matrices, parameters->matrixBytes / 0x30, &product, 0);
     }
     else
     {
-        fn_8036D774(&product);
+        glx_LoadDefaultSkinMatrices(&product);
     }
 
     GXCallDisplayList(packet->displayList->list, packet->displayList->size);

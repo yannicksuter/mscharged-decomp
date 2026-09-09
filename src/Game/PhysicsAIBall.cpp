@@ -353,10 +353,10 @@ bool PhysicsAIBall::IsBallOutsideNet(const nlVector3& ballPosition)
 void PhysicsAIBall::RegisterDebugFields(
     unsigned short* type, DebugWriteCache* cache)
 {
-    *type = fn_80338EBC(cache, "PhysicsAIBall");
+    *type = cache->BeginType("PhysicsAIBall");
 
 #define REGISTER_FIELD(kind, field) \
-    fn_80338F88(cache, kind, lbl_80533C98[kind].size, (unsigned char*)&field - (unsigned char*)&mv3TiltForce, #field)
+    cache->AddField(kind, gDebugFieldTypes[kind].size, (unsigned char*)&field - (unsigned char*)&mv3TiltForce, #field)
 
     REGISTER_FIELD(22, mv3TiltForce);
     REGISTER_FIELD(22, mv3WindForce);
@@ -383,7 +383,7 @@ void PhysicsAIBall::RegisterDebugFields(
 
 #undef REGISTER_FIELD
 
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 void PhysicsAIBall::SyncLog(void* context, DebugWriteCache* cache)
@@ -396,6 +396,6 @@ void PhysicsAIBall::SyncLog(void* context, DebugWriteCache* cache)
     unsigned int offset
         = (unsigned char*)&mv3TiltForce - (unsigned char*)this;
     void* data = (unsigned char*)this + offset;
-    fn_80339450(cache, sPhysicsAIBallType, data, context);
-    fn_8033930C(cache, sPhysicsAIBallType, data, sizeof(PhysicsAIBall) - offset);
+    cache->ChecksumData(sPhysicsAIBallType, data, context);
+    cache->WriteData(sPhysicsAIBallType, data, sizeof(PhysicsAIBall) - offset);
 }

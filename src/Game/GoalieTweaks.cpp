@@ -1,13 +1,13 @@
 #include "Game/CharacterTweaks.h"
 
-#include "unclassified/tu_80073898.h"
+#include "Game/TweakFileLoader.h"
 
 GoalieTweaks::GoalieTweaks(const char* name, const char* category)
     : TweaksBase(name)
     , mUnidentified358(category)
 {
     Init();
-    fn_80073A48(&lbl_8056BA00, mszFileName, mUnidentified358);
+    gTweakFileLoader.LoadFileAsync(mszFileName, mUnidentified358);
 }
 
 GoalieTweaks::~GoalieTweaks()

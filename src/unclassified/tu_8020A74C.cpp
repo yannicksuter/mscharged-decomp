@@ -8,6 +8,8 @@
 #include "Game/NetworkSession.h"
 #include "NL/nlBind.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/SH/SHNavigation.h"
 
 class SHNavigation;
 

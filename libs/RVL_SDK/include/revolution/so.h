@@ -1,6 +1,7 @@
 #pragma once
 
 #include <revolution/types.h>
+#include <revolution/so_fwd.h>
 
 #include <revolution/os/OSTime.h>
 
@@ -205,7 +206,6 @@ int SOSocket2(int pf, int type, int protocol);
 
 int SOGetInterfaceOpt(IPInterface*, int, int, void*, int*);
 
-long SOGetHostID(void);
 SOHostEnt* SOGetHostByName(const char* name);
 SOHostEnt* SOGetHostByAddr(const void* addr, int len, int type);
 int SOGetNameInfo(const void* sockAddr, char* node, unsigned nodeLen,

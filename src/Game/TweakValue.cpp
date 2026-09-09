@@ -1,60 +1,35 @@
 #include "Game/TweakValue.h"
+#include "Game/TweakRegistry.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 
-extern "C"
-{
-    void fn_802C7480(const char* path, const char** name, char* group);
-    void fn_802C7534(const char* left, const char* right, char* destination);
-    int fn_802C75F4(const char* name);
-    const char* fn_802C1EBC(const char* name, int mode);
-    void* fn_802C278C(const char* name, int arg);
-    const char* fn_802C2914(const char* name, int arg);
-}
-
-typedef struct TweakEntryValue
-{
-    /* 0x00 */ u32 _unk0;
-    /* 0x04 */ u32 _unk4;
-    /* 0x08 */ u32 _unk8;
-    /* 0x0C */ TweakValueBase_8052BF70* value;
-} TweakEntryValue;
-
-// Pooled 0.0f owned by the neighbouring small-data gap object
-// (retail sdata2 0x806E62D0, always linked via the auto object). Retail
-// TweakValue loads this shared slot for the passthrough call instead of
-// emitting a private literal; referencing it keeps this TU free of .sdata2.
-extern const float lbl_806E62D0;
-
-extern bool lbl_806E1E42;
-
-bool UnidentifiedTweakValueImplBase::fn_802C4F94(const char* path)
+bool TweakBindingBase::Bind(const char* path)
 {
     const char* name;
     char group[0x100];
-    fn_802C7480(path, &name, group);
-    return fn_802C4FEC(name, lbl_806E62D0, group, false, lbl_806E62D0, lbl_806E62D0);
+    SplitTweakPath(path, &name, group);
+    return Bind(name, 0.0f, group, false, 0.0f, 0.0f);
 }
 
-bool UnidentifiedTweakValueImplBase::fn_802C4FEC(const char* name, float value,
+bool TweakBindingBase::Bind(const char* name, float value,
     const char* group, bool reload, float min, float max)
 {
     if (reload)
     {
-        if (fn_802C278C(name, 0) != 0)
+        if (NeedsTweakNameFormatting(name, 0) != 0)
         {
             const char* resolved;
-            if (lbl_806E1E42)
+            if (gTweakStatePushed)
             {
-                resolved = fn_802C2914(name, 1);
+                resolved = FormatTweakName(name, 1);
             }
             else
             {
-                resolved = fn_802C2914(name, 0);
+                resolved = FormatTweakName(name, 0);
             }
-            return fn_802C4FEC(resolved, value, group, false, min, max);
+            return Bind(resolved, value, group, false, min, max);
         }
     }
     if (nlStrChr(name, '/') != 0)
@@ -62,20 +37,20 @@ bool UnidentifiedTweakValueImplBase::fn_802C4FEC(const char* name, float value,
         const char* leaf;
         char path[0x100];
         char combined[0x100];
-        fn_802C7480(name, &leaf, path);
-        fn_802C7534(group, path, combined);
-        return fn_802C4FEC(leaf, value, combined, false, min, max);
+        SplitTweakPath(name, &leaf, path);
+        JoinTweakPath(group, path, combined);
+        return Bind(leaf, value, combined, false, min, max);
     }
     {
-        TweakEntry_8052BF00* entry = fn_802C4504(fn_802C0E30(), group, 0);
-        TweakEntryValue* found = (TweakEntryValue*)fn_802C5884(entry, name);
-        lbl_806E1E90 = group;
+        TweakEntry* entry = FindOrCreateTweakPath(GetTweakRoot(), group, 0);
+        TweakNode* found = FindTweakChild(entry, name);
+        gLastTweakCategory = group;
         if (found == 0)
         {
-            TweakValueBase_8052BF70* created;
-            if (fn_802C75F4(name) != 0)
+            TweakValueBase* created;
+            if (IsTweakNameOnStack(name) != 0)
             {
-                name = fn_802C1EBC(name, 5);
+                name = InternTweakString(name, 5);
             }
             created = UnidentifiedVirtual34(name, entry);
             UnidentifiedVirtual38(created->UnidentifiedVirtual20());
@@ -83,7 +58,7 @@ bool UnidentifiedTweakValueImplBase::fn_802C4FEC(const char* name, float value,
         }
         else
         {
-            TweakValueBase_8052BF70* existing = found->value;
+            TweakValueBase* existing = found->m_Value;
             UnidentifiedVirtual0C();
             existing->UnidentifiedVirtual0C();
             UnidentifiedVirtual38(existing->UnidentifiedVirtual20());

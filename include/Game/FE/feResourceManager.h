@@ -10,6 +10,7 @@ class FEScene;
 class FESceneResource;
 class FETextureResource;
 class MemoryAllocator;
+class GLResourcePool;
 
 enum eFEResourceType
 {
@@ -44,7 +45,7 @@ public:
     /* 0x0C */ unsigned long m_hashID;
     /* 0x10 */ bool m_bValid;
     /* 0x11 */ u8 pad_0x11[3];
-    /* 0x14 */ u32 field_0x14;
+    /* 0x14 */ u32 m_uFileBlock;
 }; // size 0x18
 
 enum ResourceResult
@@ -79,10 +80,10 @@ public:
     void UnloadResource(FEResourceHandle* pFeResourceHandle);
     void UnloadPermanentResourceBundle();
     void Update(float dt);
-    void fn_802FD26C(void* resourceInterface);
-    void* fn_802FDD84();
-    FEMiniBundle* fn_802FDD8C(const char* szBundleFileName);
-    bool fn_802FDF3C(FEMiniBundle* miniBundle);
+    void SetResourcePool(GLResourcePool* resourcePool);
+    GLResourcePool* GetResourcePool();
+    FEMiniBundle* LoadMiniBundle(const char* szBundleFileName);
+    bool UnloadMiniBundle(FEMiniBundle* miniBundle);
 
     static void TextureResourceLoadComplete(void* buffer, unsigned long uReadSize, unsigned long uParam);
 
@@ -92,9 +93,9 @@ private:
     FEResourceHandle* FindExistingResourceInResourceList(FEResourceHandle* pFEResourceHandle);
     void RemoveResourceFromResourceList(FEResourceHandle* pFEResourceHandle);
     void AddResourceToResourceList(FEResourceHandle* pFEResourceHandle);
-    static void fn_802FC850(void* buffer, unsigned long uReadSize, unsigned long uParam);
-    static int fn_802FC858(PermanentBundleLoadState* state);
-    static void fn_802FC9C4(void* buffer, unsigned long uReadSize, unsigned long uParam);
+    static void PermanentBundleOpenComplete(void* buffer, unsigned long uReadSize, unsigned long uParam);
+    static int LoadNextPermanentTexture(PermanentBundleLoadState* state);
+    static void PermanentTextureLoadComplete(void* buffer, unsigned long uReadSize, unsigned long uParam);
 
 protected:
     /* 0x1D */ char m_szPermanentBundleFileName[32];

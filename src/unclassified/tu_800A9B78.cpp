@@ -1,3 +1,4 @@
+#include "Game/Render/tu_801B43F8.h"
 #include "NL/utility.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 #include "Game/Goalie.h"
@@ -375,14 +376,14 @@ void UnidentifiedWeatherState::fn_800AA7D0(void* context, DebugWriteCache* cache
 {
     if (lbl_806DC010 == 0xFFFF)
     {
-        lbl_806DC010 = fn_80338EBC(cache, "Weather");
-        fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&field04 - (u8*)this, "meWeather");
-        fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&field08 - (u8*)this, "meState");
-        fn_80338F88(cache, 16, lbl_80533C98[16].size, (u8*)&field0C - (u8*)this, "mbPaused");
-        fn_80338F78(cache);
+        lbl_806DC010 = cache->BeginType("Weather");
+        cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&field04 - (u8*)this, "meWeather");
+        cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&field08 - (u8*)this, "meState");
+        cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&field0C - (u8*)this, "mbPaused");
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DC010, this, context);
-    fn_8033930C(cache, lbl_806DC010, this, sizeof(UnidentifiedWeatherState));
+    cache->ChecksumData(lbl_806DC010, this, context);
+    cache->WriteData(lbl_806DC010, this, sizeof(UnidentifiedWeatherState));
 }
 
 void UnidentifiedWeatherState::fn_800AA8C8()
@@ -423,13 +424,13 @@ void UnidentifiedWeatherExtendedStateA::fn_800AA7D0(void* context, DebugWriteCac
     UnidentifiedWeatherState::fn_800AA7D0(context, cache);
     if (lbl_806DC012 == 0xFFFF)
     {
-        lbl_806DC012 = fn_80338EBC(cache, "Lightning");
-        fn_80338F88(cache, 20, lbl_80533C98[20].size, 0, "mtLightingTimer");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field18 - (u8*)&field10, "mnAmountOfStrikes");
-        fn_80338F78(cache);
+        lbl_806DC012 = cache->BeginType("Lightning");
+        cache->AddField(20, gDebugFieldTypes[20].size, 0, "mtLightingTimer");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field18 - (u8*)&field10, "mnAmountOfStrikes");
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DC012, &field10, context);
-    fn_8033930C(cache, lbl_806DC012, &field10, sizeof(UnidentifiedWeatherExtendedStateA) - sizeof(UnidentifiedWeatherState));
+    cache->ChecksumData(lbl_806DC012, &field10, context);
+    cache->WriteData(lbl_806DC012, &field10, sizeof(UnidentifiedWeatherExtendedStateA) - sizeof(UnidentifiedWeatherState));
 }
 
 void UnidentifiedWeatherExtendedStateA::fn_800AA6A8()
@@ -544,23 +545,23 @@ void UnidentifiedWeatherExtendedStateB::fn_800AA7D0(void* context, DebugWriteCac
     UnidentifiedWeatherState::fn_800AA7D0(context, cache);
     if (lbl_806DC014 == 0xFFFF)
     {
-        lbl_806DC014 = fn_80338EBC(cache, "Windy");
-        fn_80338F88(cache, 20, lbl_80533C98[20].size, 0, "mtWindTimer");
-        fn_80338F88(cache, 19, lbl_80533C98[19].size, (u8*)&field18 - (u8*)&field10, "aWindDirection");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field1C - (u8*)&field10, "fWindStrength");
-        fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&field20 - (u8*)&field10, "eDebrisType");
-        fn_80338F88(cache, 14, lbl_80533C98[14].size, (u8*)&field24 - (u8*)&field10, "eLastDebrisType");
-        fn_80338F78(cache);
+        lbl_806DC014 = cache->BeginType("Windy");
+        cache->AddField(20, gDebugFieldTypes[20].size, 0, "mtWindTimer");
+        cache->AddField(19, gDebugFieldTypes[19].size, (u8*)&field18 - (u8*)&field10, "aWindDirection");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field1C - (u8*)&field10, "fWindStrength");
+        cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&field20 - (u8*)&field10, "eDebrisType");
+        cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&field24 - (u8*)&field10, "eLastDebrisType");
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DC014, &field10, context);
-    fn_8033930C(cache, lbl_806DC014, &field10, sizeof(UnidentifiedWeatherExtendedStateB) - sizeof(UnidentifiedWeatherState));
+    cache->ChecksumData(lbl_806DC014, &field10, context);
+    cache->WriteData(lbl_806DC014, &field10, sizeof(UnidentifiedWeatherExtendedStateB) - sizeof(UnidentifiedWeatherState));
 }
 
 void UnidentifiedWeatherExtendedStateB::fn_800AB1F4()
 {
     for (int i = 0; i < 3; i++)
     {
-        fn_801B4B24(lbl_806E1608->fn_801A9DE0(i), 0);
+        gNPCManager->fn_801A9DE0(i)->fn_801B4B24(false);
     }
 }
 
@@ -657,12 +658,12 @@ void UnidentifiedWeatherExtendedStateB::fn_800AA6A8()
             float index = 2.0f * nlRandomf(1.0f);
             index += index < 0.0f ? -0.5f : 0.5f;
             field20 = (int)index;
-            UnidentifiedNPC_801B43F8* npc = lbl_806E1608->fn_801A9DE0(field20);
+            UnidentifiedNPC_801B43F8* npc = gNPCManager->fn_801A9DE0(field20);
             int i = 0;
             while ((npc->mbIsVisible == 1 || field20 == field24) && i < 3)
             {
                 field20 = (field20 + 1) % 3;
-                npc = lbl_806E1608->fn_801A9DE0(field20);
+                npc = gNPCManager->fn_801A9DE0(field20);
                 i++;
             }
             UnidentifiedNPCConfig_801B532C* config = fn_801B532C(field20);
@@ -808,21 +809,21 @@ void UnidentifiedWeatherExtendedStateC::fn_800AA7D0(void* context, DebugWriteCac
     UnidentifiedWeatherState::fn_800AA7D0(context, cache);
     if (lbl_806DC016 == 0xFFFF)
     {
-        lbl_806DC016 = fn_80338EBC(cache, "SolarFlare");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, 0, "m_FlareTimer");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field14 - (u8*)&field10, "m_VaporizeTimer");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field18 - (u8*)&field10, "m_StartChance");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field1C - (u8*)&field10, "m_StartCount");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field20 - (u8*)&field10, "m_NumToVaporizePerTeam");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field24 - (u8*)&field10, "m_NextFlare");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field28 - (u8*)&field10, "m_NextVaporize");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field2C[0] - (u8*)&field10, "m_TargetIndicies[0]");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field2C[1] - (u8*)&field10, "m_TargetIndicies[1]");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field2C[2] - (u8*)&field10, "m_TargetIndicies[2]");
-        fn_80338F78(cache);
+        lbl_806DC016 = cache->BeginType("SolarFlare");
+        cache->AddField(17, gDebugFieldTypes[17].size, 0, "m_FlareTimer");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field14 - (u8*)&field10, "m_VaporizeTimer");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field18 - (u8*)&field10, "m_StartChance");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field1C - (u8*)&field10, "m_StartCount");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field20 - (u8*)&field10, "m_NumToVaporizePerTeam");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field24 - (u8*)&field10, "m_NextFlare");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field28 - (u8*)&field10, "m_NextVaporize");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field2C[0] - (u8*)&field10, "m_TargetIndicies[0]");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field2C[1] - (u8*)&field10, "m_TargetIndicies[1]");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field2C[2] - (u8*)&field10, "m_TargetIndicies[2]");
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DC016, &field10, context);
-    fn_8033930C(cache, lbl_806DC016, &field10, sizeof(UnidentifiedWeatherExtendedStateC) - sizeof(UnidentifiedWeatherState));
+    cache->ChecksumData(lbl_806DC016, &field10, context);
+    cache->WriteData(lbl_806DC016, &field10, sizeof(UnidentifiedWeatherExtendedStateC) - sizeof(UnidentifiedWeatherState));
 }
 
 void UnidentifiedWeatherExtendedStateC::fn_800AA6A8()
@@ -1132,14 +1133,14 @@ void UnidentifiedWeatherExtendedStateD::fn_800AA7D0(void* context, DebugWriteCac
     UnidentifiedWeatherState::fn_800AA7D0(context, cache);
     if (lbl_806DC018 == 0xFFFF)
     {
-        lbl_806DC018 = fn_80338EBC(cache, "BubblingLava");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, 0, "m_StartChance");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field14 - (u8*)&field10, "m_VolleyCountdown");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field18 - (u8*)&field10, "m_FlySoundCountdown");
-        fn_80338F78(cache);
+        lbl_806DC018 = cache->BeginType("BubblingLava");
+        cache->AddField(17, gDebugFieldTypes[17].size, 0, "m_StartChance");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field14 - (u8*)&field10, "m_VolleyCountdown");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field18 - (u8*)&field10, "m_FlySoundCountdown");
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DC018, &field10, context);
-    fn_8033930C(cache, lbl_806DC018, &field10, sizeof(UnidentifiedWeatherExtendedStateD) - sizeof(UnidentifiedWeatherState));
+    cache->ChecksumData(lbl_806DC018, &field10, context);
+    cache->WriteData(lbl_806DC018, &field10, sizeof(UnidentifiedWeatherExtendedStateD) - sizeof(UnidentifiedWeatherState));
 }
 
 extern "C" void fn_800B0358();
@@ -1325,23 +1326,23 @@ void UnidentifiedWeatherExtendedStateE::fn_800AA7D0(void* context, DebugWriteCac
     UnidentifiedWeatherState::fn_800AA7D0(context, cache);
     if (lbl_806DC01A == 0xFFFF)
     {
-        lbl_806DC01A = fn_80338EBC(cache, "StormShipWeather");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, 0, "m_StartWeatherTimer");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field14 - (u8*)&field10, "m_FirstStrikeTimer");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field18 - (u8*)&field10, "m_FirstStrikeElectrocuteTimer");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field1C - (u8*)&field10, "m_ChainTrainTimer");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field20 - (u8*)&field10, "m_StartChainTrainTimer");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field24 - (u8*)&field10, "m_DarkenTimer");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field28 - (u8*)&field10, "m_StopChainLightningSound");
-        fn_80338F88(cache, 16, lbl_80533C98[16].size, (u8*)&field2C - (u8*)&field10, "m_bRightSide");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field30 - (u8*)&field10, "m_PathIndex1");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field34 - (u8*)&field10, "m_PathIndex2");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field38 - (u8*)&field10, "m_LoopCount");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (u8*)&field3C - (u8*)&field10, "m_ChainCount");
-        fn_80338F78(cache);
+        lbl_806DC01A = cache->BeginType("StormShipWeather");
+        cache->AddField(17, gDebugFieldTypes[17].size, 0, "m_StartWeatherTimer");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field14 - (u8*)&field10, "m_FirstStrikeTimer");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field18 - (u8*)&field10, "m_FirstStrikeElectrocuteTimer");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field1C - (u8*)&field10, "m_ChainTrainTimer");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field20 - (u8*)&field10, "m_StartChainTrainTimer");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field24 - (u8*)&field10, "m_DarkenTimer");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field28 - (u8*)&field10, "m_StopChainLightningSound");
+        cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&field2C - (u8*)&field10, "m_bRightSide");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field30 - (u8*)&field10, "m_PathIndex1");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field34 - (u8*)&field10, "m_PathIndex2");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field38 - (u8*)&field10, "m_LoopCount");
+        cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&field3C - (u8*)&field10, "m_ChainCount");
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DC01A, &field10, context);
-    fn_8033930C(cache, lbl_806DC01A, &field10, sizeof(UnidentifiedWeatherExtendedStateE) - sizeof(UnidentifiedWeatherState));
+    cache->ChecksumData(lbl_806DC01A, &field10, context);
+    cache->WriteData(lbl_806DC01A, &field10, sizeof(UnidentifiedWeatherExtendedStateE) - sizeof(UnidentifiedWeatherState));
 }
 
 extern "C" int fn_800B045C();
@@ -1489,10 +1490,10 @@ float UnidentifiedWeatherExtendedStateF::fn_800AFFD8()
         bool available = true;
         for (int i = 0; i < 8; i++)
         {
-            if (lbl_806E1608->fn_801AA528(i)->mState != -1)
+            if (gNPCManager->fn_801AA528(i)->mState != -1)
                 available = false;
-            if (lbl_806E1608->fn_801AA528(i)->mState == 1)
-                fn_801B2E64(lbl_806E1608->fn_801AA528(i), false);
+            if (gNPCManager->fn_801AA528(i)->mState == 1)
+                fn_801B2E64(gNPCManager->fn_801AA528(i), false);
         }
         if (available == true)
             return 1.0f;
@@ -1615,15 +1616,15 @@ void UnidentifiedWeatherExtendedStateF::fn_800AA7D0(void* context, DebugWriteCac
     UnidentifiedWeatherState::fn_800AA7D0(context, cache);
     if (lbl_806DC01C == 0xFFFF)
     {
-        lbl_806DC01C = fn_80338EBC(cache, "SandTombWeather");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, 0, "m_NumActiveThwomps");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field14 - (u8*)&field10, "m_ThwompDropTimer");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (u8*)&field18 - (u8*)&field10, "m_ThwompSpawnTimer");
-        fn_80338F88(cache, 16, lbl_80533C98[16].size, (u8*)&field1C - (u8*)&field10, "m_bSandPatchesCreated");
-        fn_80338F78(cache);
+        lbl_806DC01C = cache->BeginType("SandTombWeather");
+        cache->AddField(8, gDebugFieldTypes[8].size, 0, "m_NumActiveThwomps");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field14 - (u8*)&field10, "m_ThwompDropTimer");
+        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&field18 - (u8*)&field10, "m_ThwompSpawnTimer");
+        cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&field1C - (u8*)&field10, "m_bSandPatchesCreated");
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DC01C, &field10, context);
-    fn_8033930C(cache, lbl_806DC01C, &field10,
+    cache->ChecksumData(lbl_806DC01C, &field10, context);
+    cache->WriteData(lbl_806DC01C, &field10,
         sizeof(UnidentifiedWeatherExtendedStateF) - sizeof(UnidentifiedWeatherState) - sizeof(field20));
 }
 
@@ -1776,7 +1777,7 @@ void UnidentifiedWeatherExtendedStateF::fn_800AF80C()
             float random = 8.0f * nlRandomf(1.0f);
             index = (int)(random + (random < 0.0f ? -0.5f : 0.5f));
         }
-        thwomp = lbl_806E1608->fn_801AA528(-1);
+        thwomp = gNPCManager->fn_801AA528(-1);
         field20[index] = thwomp;
         if (thwomp)
         {

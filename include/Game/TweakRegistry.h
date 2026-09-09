@@ -2,6 +2,7 @@
 #define GAME_TWEAK_REGISTRY_H
 
 #include "Game/TweakValue.h"
+#include "NL/nlPrint.h"
 #include "NL/nlSmallBlockAllocator.h"
 #include "types.h"
 
@@ -16,112 +17,111 @@ enum TweakStringKind
     kTweakStringCurrent = 5
 };
 
-class TweakEntry_8052BF00;
-class TweakNode_8052BEB0;
+class TweakEntry;
+class TweakNode;
 struct TweakPendingValue;
 struct TweakRecycledName;
 
-extern "C"
-{
-    extern nlSlotPoolFixed<0x10> lbl_8057C66C;
-    extern nlSlotPoolFixed<0x20> lbl_8057C6E4;
-    extern nlSlotPoolFixed<0x2C> lbl_8057C734;
+extern nlSlotPoolFixed<0x10> gTweakNamePool;
+extern nlSlotPoolFixed<0x20> gTweakNodePool;
+extern nlSlotPoolFixed<0x2C> gTweakEntryPool;
 
-    extern TweakValueAllocator3* lbl_806E1E58;
-    extern TweakValueAllocator2* lbl_806E1E5C;
-    extern TweakPendingValue* lbl_806E1E60;
-    extern TweakPendingValue* lbl_806E1E64;
-    extern TweakRecycledName* lbl_806E1E68;
-    extern TweakRecycledName* lbl_806E1E6C;
-    extern u8 lbl_806E1E42;
+extern TweakValueAllocator3* gTweakValueAllocator;
+extern TweakValueAllocator2* gTweakBindingAllocator;
+extern TweakPendingValue* gPendingTweakHead;
+extern TweakPendingValue* gPendingTweakTail;
+extern TweakRecycledName* gRecycledTweakNameHead;
+extern TweakRecycledName* gRecycledTweakNameTail;
+extern u8 gTweakStatePushed;
+extern u8 gDeletePersistentTweakValues;
 
-    void fn_802C0CCC(void);
-    void* fn_802C0E3C(void);
-    TweakEntry_8052BF00* fn_802C0E44(void);
-    TweakEntry_8052BF00* fn_802C0E4C(TweakValueBase_8052BF70* value, TweakEntry_8052BF00* parent);
-    void fn_802C0F24(int fromEnd, u8 flag, unsigned int* sizes);
-    void fn_802C1B98(void);
-    void fn_802C1BB0(void);
-    void fn_802C1D30(void);
-    const char* fn_802C1EBC(const char* str, int kind);
-    void fn_802C2080(TweakEntry_8052BF00* entry, const char* name, const char* valueStr);
-    int fn_802C250C(const char* str, bool* out);
-    int fn_802C269C(const char* str, unsigned int count, int index);
-    int fn_802C278C(const char* name, int* outLength);
-    const char* fn_802C2914(const char* name, int kind);
-    void fn_802C2B38(TweakValueBase_8052BF70* value);
-    float GetTweakFloat(const char* path, float defaultValue);
-    int GetTweakInt(const char* path, int defaultValue);
-    bool GetTweakBool(const char* path, bool defaultValue);
-    const char* GetTweakString(const char* path, const char* defaultValue);
-    int fn_802C2DBC(const char* path);
+void ResetDynamicTweaks(void);
+TweakNode* GetTweakPriorityNode(void);
+TweakEntry* GetUserTweakEntry(void);
+TweakEntry* CreateTweakEntry(TweakValueBase* value, TweakEntry* parent);
+void ClearTweakRegistryReset(void);
+void RegisterPendingTweaks(void);
+void BindPendingTweaks(void);
+const char* InternTweakString(const char* str, int kind);
+void CreateTweakValueFromString(TweakEntry* entry, const char* name, const char* valueStr);
+int ParseTweakBool(const char* str, bool* out);
+int IsTweakNamePrefix(const char* str, unsigned int count, int index);
+int NeedsTweakNameFormatting(const char* name, int* outLength);
+const char* FormatTweakName(const char* name, int kind);
+void UnregisterTweakValue(TweakValueBase* value);
 
-    // TU3: node and path management.
-    TweakEntry_8052BF00* fn_802C3FF8(TweakEntry_8052BF00* entry, const char* name, int noCreate);
-    const char* fn_802C3FDC(TweakNode_8052BEB0* node);
-    TweakEntry_8052BF00* fn_802C41B4(TweakEntry_8052BF00* entry, const char* path);
-    void fn_802C47E4(TweakNode_8052BEB0* node);
+// TU3: node and path management.
+TweakEntry* FindOrCreateTweakChildEntry(TweakEntry* entry, const char* name, int noCreate);
+const char* GetTweakNodeName(TweakNode* node);
+TweakNode* FindTweakNode(TweakNode* entry, const char* path);
+void UpdateTweakNodePathHash(TweakNode* node);
 
-    // Entry TU.
-    void fn_802C54CC(TweakEntry_8052BF00* entry, TweakNode_8052BEB0* child);
-    void fn_802C56E8(TweakEntry_8052BF00* entry, TweakNode_8052BEB0* child);
-    void fn_802C5D74(TweakEntry_8052BF00* entry);
-    TweakNode_8052BEB0* fn_802C5884(TweakEntry_8052BF00* entry, const char* name);
-    void fn_802C595C(TweakEntry_8052BF00* entry, TweakValueBase_8052BF70* value);
-    void fn_802C5B84(TweakEntry_8052BF00* entry);
-    void fn_802C7480(const char* path, const char** name, char* dir);
-    void fn_802C7534(const char* a, const char* b, char* out);
+// Entry TU.
+void InsertTweakChildSorted(TweakEntry* entry, TweakNode* child);
+void AddTweakChild(TweakEntry* entry, TweakNode* child);
+void RemoveDynamicTweakChildren(TweakEntry* entry);
+void RemoveTweakValue(TweakEntry* entry, TweakValueBase* value);
+void ClearTweakChildren(TweakEntry* entry);
+void SplitTweakPath(const char* path, const char** name, char* dir);
+void JoinTweakPath(const char* a, const char* b, char* out);
+int IsTweakNameOnStack(const char* name);
 
-    // Recycled-name TU.
-    void fn_802C3970(void);
+// Recycled-name TU.
+void RecycleTweakNames(void);
 
-    // Node TU.
-    void fn_802C46C0(TweakNode_8052BEB0* node, char* buffer, unsigned long size);
-}
+// Node TU.
+void GetTweakNodePath(TweakNode* node, char* buffer, unsigned long size);
 
-class TweakNode_8052BEB0
+void InitializeTweakRegistry(int fromEnd, u8 flag, unsigned int* sizes);
+float GetTweakFloat(const char* path, float defaultValue);
+int GetTweakInt(const char* path, int defaultValue);
+bool GetTweakBool(const char* path, bool defaultValue);
+const char* GetTweakString(const char* path, const char* defaultValue);
+bool TweakExists(const char* path);
+
+class TweakNode
 {
 public:
-    TweakNode_8052BEB0();
-    virtual ~TweakNode_8052BEB0();
+    TweakNode();
+    virtual ~TweakNode();
     virtual int UnidentifiedVirtual0C();
     virtual int UnidentifiedVirtual10() { return 1; }
     virtual int UnidentifiedVirtual14() { return 0; }
-    virtual TweakEntry_8052BF00* UnidentifiedVirtual18();
+    virtual TweakEntry* UnidentifiedVirtual18();
 
     static void operator delete(void* ptr);
 
-    /* 0x04 */ TweakNode_8052BEB0* m_Next;
-    /* 0x08 */ TweakEntry_8052BF00* m_Parent;
-    /* 0x0C */ TweakValueBase_8052BF70* m_Value;
-    /* 0x10 */ int m_Unk10;
+    /* 0x04 */ TweakNode* m_Next;
+    /* 0x08 */ TweakEntry* m_Parent;
+    /* 0x0C */ TweakValueBase* m_Value;
+    /* 0x10 */ int m_Depth;
     /* 0x14 */ u32 m_PathHash;
     /* 0x18 */ int m_State;
     /* 0x1C */ int m_Unk1C;
 }; // size: 0x20
 
-class TweakEntry_8052BF00 : public TweakNode_8052BEB0
+class TweakEntry : public TweakNode
 {
 public:
-    TweakEntry_8052BF00();
-    virtual ~TweakEntry_8052BF00();
+    TweakEntry();
+    virtual ~TweakEntry();
     virtual int UnidentifiedVirtual0C();
     virtual int UnidentifiedVirtual14();
-    virtual TweakEntry_8052BF00* UnidentifiedVirtual18();
+    virtual TweakEntry* UnidentifiedVirtual18();
     virtual void UnidentifiedVirtual1C();
 
-    static void operator delete(void* ptr) { lbl_8057C734.Free(ptr); }
+    static void operator delete(void* ptr) { gTweakEntryPool.Free(ptr); }
 
-    /* 0x20 */ TweakNode_8052BEB0* m_ChildHead;
-    /* 0x24 */ TweakNode_8052BEB0* m_ChildTail;
+    /* 0x20 */ TweakNode* m_ChildHead;
+    /* 0x24 */ TweakNode* m_ChildTail;
     /* 0x28 */ bool m_Unk28;
-    /* 0x29 */ bool m_Unk29;
+    /* 0x29 */ bool m_SortChildren;
     /* 0x2A */ u8 m_Pad2A[2];
 }; // size: 0x2C
 
 struct TweakPendingValue
 {
-    /* 0x00 */ TweakValueBase_8052BF70* m_Value;
+    /* 0x00 */ TweakValueBase* m_Value;
     /* 0x04 */ const char* m_Category;
     /* 0x08 */ int m_Unk8;
     /* 0x0C */ TweakPendingValue* m_Next;
@@ -135,17 +135,17 @@ struct TweakPendingValue
 
     static TweakPendingValue* PopHead()
     {
-        TweakPendingValue* head = lbl_806E1E60;
+        TweakPendingValue* head = gPendingTweakHead;
         if (head != 0)
         {
-            if (head == lbl_806E1E64)
+            if (head == gPendingTweakTail)
             {
-                lbl_806E1E60 = 0;
-                lbl_806E1E64 = 0;
+                gPendingTweakHead = 0;
+                gPendingTweakTail = 0;
             }
             else
             {
-                lbl_806E1E60 = head->m_Next;
+                gPendingTweakHead = head->m_Next;
             }
         }
         return head;
@@ -160,17 +160,16 @@ struct TweakRecycledName
     /* 0x0C */ TweakRecycledName* m_Next;
 }; // size: 0x10
 
-int nlSNPrintf(char* buffer, unsigned long size, const char* format, ...);
 
-class TweakValueString_8052BD48 : public TweakValueBase_8052BF70
+class TweakValueString : public TweakValueBase
 {
 public:
-    TweakValueString_8052BD48(const char* name, const char* value)
+    TweakValueString(const char* name, const char* value)
     {
         m_Value = value;
         mName = name;
     }
-    virtual ~TweakValueString_8052BD48() { }
+    virtual ~TweakValueString() { }
     virtual int UnidentifiedVirtual0C() { return 8; }
     virtual int UnidentifiedVirtual10() { return 1; }
     virtual void UnidentifiedVirtual14(float* value, float* min, float* max)
@@ -187,42 +186,42 @@ public:
     }
     virtual void UnidentifiedVirtual28(const char* str)
     {
-        m_Value = fn_802C1EBC(str, kTweakStringValue);
+        m_Value = InternTweakString(str, kTweakStringValue);
     }
-    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70* other)
+    virtual void UnidentifiedVirtual2C(TweakValueBase* other)
     {
         switch (other->UnidentifiedVirtual10())
         {
         case 1:
-            m_Value = ((TweakValueString_8052BD48*)other)->m_Value;
+            m_Value = ((TweakValueString*)other)->m_Value;
             break;
         case 2:
-            m_Value = *(const char**)((TweakValueImpl_804F4DC8*)other)->m_pValue;
+            m_Value = *(const char**)((TweakFloatBinding*)other)->m_pValue;
             break;
         }
     }
 
-    static void operator delete(void* ptr) { lbl_806E1E58->m_Pool1.Free(ptr); }
+    static void operator delete(void* ptr) { gTweakValueAllocator->m_Pool1.Free(ptr); }
 
     /* 0x0C */ const char* m_Value;
 }; // size: 0x10
 
 // Name-only value attached to folder entries.
-class TweakValueName_8052BE78 : public TweakValueBase_8052BF70
+class TweakValueName : public TweakValueBase
 {
 public:
-    TweakValueName_8052BE78(const char* name)
+    TweakValueName(const char* name)
     {
         mName = name;
     }
     static void* operator new(unsigned long size) { return nlMalloc(size, 8, false); }
-    virtual ~TweakValueName_8052BE78() { }
+    virtual ~TweakValueName() { }
     virtual int UnidentifiedVirtual0C() { return 1; }
     virtual int UnidentifiedVirtual10() { return 3; }
     virtual void* UnidentifiedVirtual20() { return 0; }
     virtual void UnidentifiedVirtual24(char*, unsigned long) { }
     virtual void UnidentifiedVirtual28(const char*) { }
-    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*) { }
+    virtual void UnidentifiedVirtual2C(TweakValueBase*) { }
     virtual int UnidentifiedVirtual30() { return 1; }
     virtual int UnidentifiedVirtual34() { return 0; }
 }; // size: 0x0C

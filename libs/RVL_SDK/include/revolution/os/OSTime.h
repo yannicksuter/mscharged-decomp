@@ -2,14 +2,13 @@
 #define REVOLUTION_OS_TIME_H
 
 #include <revolution/os/OSHardware.h>
+#include <revolution/os/OSTime_fwd.h>
 #include <revolution/types.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef u32 OSTick;
-typedef s64 OSTime;
 
 typedef struct OSCalendarTime {
     s32 sec;
@@ -46,10 +45,6 @@ typedef struct OSCalendarTime {
 #define OS_TICKS_DELTA(x, y) ((s32)(x) - (s32)(y))
 #define OSDiffTick(tick1, tick0) ((s32)(tick1) - (s32)(tick0))
 
-OSTime OSGetTime(void);
-OSTick OSGetTick(void);
-OSTime __OSGetSystemTime(void);
-OSTime __OSTimeToSystemTime(OSTime time);
 void OSTicksToCalendarTime(OSTime time, OSCalendarTime* calendar);
 OSTime OSCalendarTimeToTicks(const OSCalendarTime* calendar);
 

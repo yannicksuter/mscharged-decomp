@@ -7,7 +7,7 @@
 #include "NL/plat/nlFlash.h"
 #include "NL/nlstring_tmpl.h"
 
-extern "C" void nlBufferedWriterInitialize(nlBufferedWriter* writer)
+void nlBufferedWriterInitialize(nlBufferedWriter* writer)
 {
     writer->mFile = 0;
     writer->mBuffered = false;
@@ -18,7 +18,7 @@ extern "C" void nlBufferedWriterInitialize(nlBufferedWriter* writer)
     writer->mCurrent = 0;
 }
 
-extern "C" void nlBufferedWriterAttach(nlBufferedWriter* writer, void* file,
+void nlBufferedWriterAttach(nlBufferedWriter* writer, void* file,
     bool buffered, unsigned int bufferSize, unsigned int flushThreshold)
 {
     writer->mFile = file;
@@ -40,7 +40,7 @@ extern "C" void nlBufferedWriterAttach(nlBufferedWriter* writer, void* file,
     }
 }
 
-extern "C" void nlBufferedWriterFinish(nlBufferedWriter* writer)
+void nlBufferedWriterFinish(nlBufferedWriter* writer)
 {
     nlBufferedWriterFlush(writer);
 
@@ -70,7 +70,7 @@ extern "C" void nlBufferedWriterFinish(nlBufferedWriter* writer)
     writer->mCurrent = 0;
 }
 
-extern "C" void nlBufferedWriterWriteText(
+void nlBufferedWriterWriteText(
     nlBufferedWriter* writer, const char* text)
 {
     if (!writer->mBuffered)
@@ -93,7 +93,7 @@ extern "C" void nlBufferedWriterWriteText(
     }
 }
 
-extern "C" void nlBufferedWriterWrite(nlBufferedWriter* writer,
+void nlBufferedWriterWrite(nlBufferedWriter* writer,
     const void* data, int size)
 {
     if (!writer->mBuffered)
@@ -112,7 +112,7 @@ extern "C" void nlBufferedWriterWrite(nlBufferedWriter* writer,
     }
 }
 
-extern "C" void nlBufferedWriterFlushIfNeeded(nlBufferedWriter* writer)
+void nlBufferedWriterFlushIfNeeded(nlBufferedWriter* writer)
 {
     if (writer->mWriteToNAND)
     {
@@ -133,7 +133,7 @@ extern "C" void nlBufferedWriterFlushIfNeeded(nlBufferedWriter* writer)
     }
 }
 
-extern "C" void nlBufferedWriterFlush(nlBufferedWriter* writer)
+void nlBufferedWriterFlush(nlBufferedWriter* writer)
 {
     if (writer->mWriteToNAND)
     {

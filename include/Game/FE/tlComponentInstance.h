@@ -14,4 +14,6 @@ public:
     TLSlide* GetActiveSlide();
 };
 
+extern TLComponentInstance gDefaultTLComponentInstance;
+
 #endif // _TLCOMPONENTINSTANCE_H_

@@ -1,3 +1,4 @@
+#include "Game/World/WorldVisibility.h"
 #include "Game/World/worldanim.h"
 
 #include "Game/Physics/PhysicsBox.h"
@@ -13,6 +14,8 @@
 #include "Game/GL/GLVertexAnim.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/World.h"
+#include "Game/World/WorldEffect.h"
+#include "Game/Render/Frustum.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
@@ -26,13 +29,10 @@ extern "C" void fn_8030B038(cPoseAccumulator*, const cPoseNode*,
     const nlMatrix4*);
 extern "C" void fn_803438FC(WorldAnimObject_803437C8*);
 extern "C" void fn_803439A4(WorldAnimObject_803437C8*);
-extern "C" u8* fn_80340550(WorldObjectLoadContext_8034136C*);
 extern "C" void fn_802E4358(EmissionController*);
 extern "C" float fn_802E5A68(EmissionController*);
 extern "C" EffectsGroup* fn_802E7D54(
     EmissionManager*, unsigned long);
-extern "C" bool fn_802DD1EC(
-    const void*, const nlVector3&, float);
 
 struct WorldPhysicsDescription_80341EEC
 {
@@ -94,65 +94,18 @@ public:
     /* 0x88 */ float m_fAnimationTime;
 };
 
-class WorldAnimEffect_803441C8
-{
-public:
-    /* 0x00 */ void* m_pVTable;
-    /* 0x04 */ u8 m_pad04[0x0C];
-    /* 0x10 */ World* m_pWorld;
-    /* 0x14 */ int m_nAnimNode;
-    /* 0x18 */ WorldAnimController* m_pAnimController;
-    /* 0x1C */ u8 m_pad1C[0x44];
-    /* 0x60 */ float m_fEmissionInterval;
-    /* 0x64 */ u8 m_pad64[0x04];
-    /* 0x68 */ float m_fEmissionRadius;
-    /* 0x6C */ u8 m_pad6C[0x04];
-    /* 0x70 */ unsigned long m_uEffectHash;
-    /* 0x74 */ unsigned long m_uProbability;
-    /* 0x78 */ int m_nEmissionCount;
-    /* 0x7C */ int m_nTimingMode;
-    /* 0x80 */ float m_fEmissionTime;
-    /* 0x84 */ float m_fPreviousEmissionTime;
-    /* 0x88 */ u8 m_pad88[0x08];
-    /* 0x90 */ int m_nRemainingEmissions;
-    /* 0x94 */ int m_nEmissionID;
-    /* 0x98 */ int m_bActive;
-    /* 0x9C */ bool m_bAlwaysVisible;
-};
-
-struct WorldVertexAnimNode_80343F78
-{
-    /* 0x00 */ u8 m_pad00[0x1C];
-    /* 0x1C */ int m_nModelHashes;
-    /* 0x20 */ unsigned long* m_pModelHashes;
-    /* 0x24 */ WorldVertexAnimNode_80343F78* m_pChildren[2];
-};
-
 struct WorldVertexAnimDrawable_80343E3C
 {
     /* 0x00 */ u8 m_pad00[0x10];
     /* 0x10 */ World* m_pWorld;
     /* 0x14 */ u8 m_pad14[0x0C];
     /* 0x20 */ glModel* m_pModel;
-    /* 0x24 */ WorldVertexAnimNode_80343F78* m_pVertexAnimNode;
+    /* 0x24 */ WorldVisibilityNode* m_pVertexAnimNode;
 };
 
-extern "C" WorldVertexAnimNode_80343F78* fn_80343F78(
-    WorldVertexAnimDrawable_80343E3C*, WorldVertexAnimNode_80343F78*);
+extern "C" WorldVisibilityNode* fn_80343F78(
+    WorldVertexAnimDrawable_80343E3C*, WorldVisibilityNode*);
 
-extern "C" void fn_80344404(WorldAnimEffect_803441C8*);
-extern "C" void fn_803445F0(
-    WorldAnimEffect_803441C8*, EmissionController*);
-
-struct WorldAnimState_8034412C
-{
-    u8 m_pad00[0x24];
-    struct State
-    {
-        u8 m_pad00[0x18];
-        unsigned long m_uState;
-    }* m_pState;
-};
 
 extern "C" void fn_80341EE8(void*)
 {
@@ -244,19 +197,19 @@ extern "C" void* fn_80343A00(void* pObject, int shouldDelete)
 }
 
 extern "C" void fn_803437C8(WorldAnimObject_803437C8* pObject,
-    WorldObjectLoadContext_8034136C* pContext)
+    WorldObjectLoadContext* pContext)
 {
     WorldAnimManager* pManager
-        = &pContext->m_pWorld->mWorldAnimManager_02C;
+        = &pContext->m_pWorld->mWorldAnimManager;
     pObject->m_pAnimController
-        = pManager->fn_803426D8(pObject->m_uHashID);
+        = pManager->GetOrCreateController(pObject->m_uHashID);
 
-    u8* pData = fn_80340550(pContext);
+    u8* pData = pContext->GetParentData();
     pObject->m_pAnimationHashes = (unsigned long*)(pData
         + pObject->m_nBindings * sizeof(WorldAnimBinding_803438FC));
     pObject->m_pAnimController->m_pWorldAnimObject = pObject;
 
-    pManager->fn_80342630(
+    pManager->BindHierarchy(
         pObject->m_pAnimController, pObject->m_uHierarchyHash);
     pObject->m_pAnimController->SetWorldMatrix(
         ((DrawableObject*)pObject)->GetWorldMatrix());
@@ -284,7 +237,7 @@ extern "C" void fn_803437C8(WorldAnimObject_803437C8* pObject,
     pObject->m_pAnimController->SetAnimationTime(
         pObject->m_fAnimationTime);
     pObject->m_pBindings
-        = (WorldAnimBinding_803438FC*)fn_80340550(pContext);
+        = (WorldAnimBinding_803438FC*)pContext->GetParentData();
 }
 
 extern "C" void fn_803438FC(WorldAnimObject_803437C8* pObject)
@@ -356,8 +309,9 @@ extern "C" nlMatrix4* fn_80343B14(
 }
 
 extern "C" bool fn_80343B34(WorldAnimDrawable_80343A40* pObject,
-    const void* pCullData)
+    const nlVector4* pCullData)
 {
+    FrustumResult result;
     if (pObject->m_pAnimController != 0)
     {
         if (pObject->m_pAnimController->GetMorphWeight(
@@ -371,15 +325,18 @@ extern "C" bool fn_80343B34(WorldAnimDrawable_80343A40* pObject,
         nlMatrix4& matrix
             = pObject->m_pAnimController->GetNodeMatrix(
                 pObject->m_nAnimNode);
-        return fn_802DD1EC(pCullData,
-            *(nlVector3*)&matrix.e2[3][0], fRadius);
+        result = ClassifySphereInFrustum(pCullData,
+            (const nlVector3*)&matrix.e2[3][0], fRadius);
     }
-
-    float fRadius = pObject->m_fRadius;
-    nlMatrix4& matrix
-        = ((DrawableObject*)pObject)->GetWorldMatrix();
-    return fn_802DD1EC(pCullData,
-        *(nlVector3*)&matrix.e2[3][0], fRadius);
+    else
+    {
+        float fRadius = pObject->m_fRadius;
+        nlMatrix4& matrix
+            = ((DrawableObject*)pObject)->GetWorldMatrix();
+        result = ClassifySphereInFrustum(pCullData,
+            (const nlVector3*)&matrix.e2[3][0], fRadius);
+    }
+    return result != FRUSTUM_OUTSIDE;
 }
 
 extern "C" void fn_80343C00(WorldAnimDrawable_80343A40* pObject)
@@ -393,7 +350,7 @@ extern "C" void fn_80343C14(
     unsigned long uAnimationHash
         = *(unsigned long*)pObject->m_pModel;
     GLVertexAnim* pVertexAnim
-        = fn_802CC094()->m_inventory->GetVertexAnim(uAnimationHash);
+        = glGetCurrentResourcePool()->m_inventory->GetVertexAnim(uAnimationHash);
     glModel* pModel = (glModel*)pObject->m_pModel;
     if (pVertexAnim != 0)
     {
@@ -401,7 +358,7 @@ extern "C" void fn_80343C14(
         float fNumFrames = (float)nFrames;
         float fDuration = fNumFrames / 30.0f;
         float fFrameTime
-            = pObject->m_pWorld->mWorldAnimManager_02C.m_fTime
+            = pObject->m_pWorld->mWorldAnimManager.m_fTime
             / fDuration;
         float fFrameFraction
             = fFrameTime - (float)floor(fFrameTime);
@@ -422,8 +379,8 @@ extern "C" void fn_80343C14(
             ((DrawableObject*)pObject)->GetWorldMatrix());
     }
 
-    GLView* pOpaqueView = pObject->m_pWorld->m_pView68;
-    GLView* pAlphaView = pObject->m_pWorld->m_pView6C;
+    GLView* pOpaqueView = pObject->m_pWorld->m_pOpaqueView;
+    GLView* pAlphaView = pObject->m_pWorld->m_pAlphaView;
     if (pAlphaView == 0)
     {
         pAlphaView = pView;
@@ -450,10 +407,10 @@ extern "C" void fn_80343C14(
 }
 
 extern "C" void fn_80343DE4(WorldAnimDrawable_80343A40* pObject,
-    WorldObjectLoadContext_8034136C* pContext)
+    WorldObjectLoadContext* pContext)
 {
     glModel*& pMaterial = pObject->m_pModel;
-    pContext->m_pWorld->fn_803418C4(pMaterial);
+    pContext->m_pWorld->ResolveModel(pMaterial);
     pObject->m_pModel = glModelDupNoStreams(
         (glModel*)pObject->m_pModel, true,
         pContext->m_pWorld->m_pResource);
@@ -461,39 +418,38 @@ extern "C" void fn_80343DE4(WorldAnimDrawable_80343A40* pObject,
 
 extern "C" void fn_80343E3C(
     WorldVertexAnimDrawable_80343E3C* pObject,
-    WorldObjectLoadContext_8034136C* pContext)
+    WorldObjectLoadContext* pContext)
 {
     glModel*& pMaterial = pObject->m_pModel;
-    pContext->m_pWorld->fn_803418C4(pMaterial);
+    pContext->m_pWorld->ResolveModel(pMaterial);
     pObject->m_pModel = glModelDupNoStreams(pObject->m_pModel,
         true, pContext->m_pWorld->m_pResource);
 
-    WorldVertexAnimNode_80343F78* pNode
-        = (WorldVertexAnimNode_80343F78*)pContext->m_pWorld
-              ->m_pRenderable;
+    WorldVisibilityNode* pNode
+        = pContext->m_pWorld->m_pVisibilityTree;
     unsigned long uModelHash = pObject->m_pModel->unknown00;
-    for (int i = 0; i < pNode->m_nModelHashes; ++i)
+    for (int i = 0; i < pNode->mNumModelHashes; ++i)
     {
-        if (pNode->m_pModelHashes[i] == uModelHash)
+        if (pNode->mModelHashes[i] == uModelHash)
         {
             pObject->m_pVertexAnimNode = pNode;
             return;
         }
     }
 
-    WorldVertexAnimNode_80343F78* pFound = 0;
+    WorldVisibilityNode* pFound = 0;
     for (int i = 0; i < 2 && pFound == 0; ++i)
     {
-        WorldVertexAnimNode_80343F78* pChild
-            = pNode->m_pChildren[i];
+        WorldVisibilityNode* pChild
+            = pNode->mChildren[i];
         if (pChild == 0)
         {
             continue;
         }
 
-        for (int j = 0; j < pChild->m_nModelHashes; ++j)
+        for (int j = 0; j < pChild->mNumModelHashes; ++j)
         {
-            if (pChild->m_pModelHashes[j] == uModelHash)
+            if (pChild->mModelHashes[j] == uModelHash)
             {
                 pFound = pChild;
                 break;
@@ -502,24 +458,24 @@ extern "C" void fn_80343E3C(
 
         for (int j = 0; j < 2 && pFound == 0; ++j)
         {
-            if (pChild->m_pChildren[j] != 0)
+            if (pChild->mChildren[j] != 0)
             {
                 pFound = fn_80343F78(
-                    pObject, pChild->m_pChildren[j]);
+                    pObject, pChild->mChildren[j]);
             }
         }
     }
     pObject->m_pVertexAnimNode = pFound;
 }
 
-extern "C" WorldVertexAnimNode_80343F78* fn_80343F78(
+extern "C" WorldVisibilityNode* fn_80343F78(
     WorldVertexAnimDrawable_80343E3C* pObject,
-    WorldVertexAnimNode_80343F78* pNode)
+    WorldVisibilityNode* pNode)
 {
     unsigned long uModelHash = pObject->m_pModel->unknown00;
-    for (int i = 0; i < pNode->m_nModelHashes; ++i)
+    for (int i = 0; i < pNode->mNumModelHashes; ++i)
     {
-        if (pNode->m_pModelHashes[i] == uModelHash)
+        if (pNode->mModelHashes[i] == uModelHash)
         {
             return pNode;
         }
@@ -527,11 +483,11 @@ extern "C" WorldVertexAnimNode_80343F78* fn_80343F78(
 
     for (int i = 0; i < 2; ++i)
     {
-        WorldVertexAnimNode_80343F78* pChild
-            = pNode->m_pChildren[i];
+        WorldVisibilityNode* pChild
+            = pNode->mChildren[i];
         if (pChild != 0)
         {
-            WorldVertexAnimNode_80343F78* pFound
+            WorldVisibilityNode* pFound
                 = fn_80343F78(pObject, pChild);
             if (pFound != 0)
             {
@@ -545,8 +501,8 @@ extern "C" WorldVertexAnimNode_80343F78* fn_80343F78(
 extern "C" void fn_80344088(
     WorldVertexAnimDrawable_80343E3C* pObject)
 {
-    GLView* pOpaqueView = pObject->m_pWorld->m_pView68;
-    GLView* pAlphaView = pObject->m_pWorld->m_pView6C;
+    GLView* pOpaqueView = pObject->m_pWorld->m_pOpaqueView;
+    GLView* pAlphaView = pObject->m_pWorld->m_pAlphaView;
     if (pAlphaView == 0)
     {
         pAlphaView = pOpaqueView;
@@ -568,9 +524,9 @@ extern "C" void fn_80344088(
     }
 }
 
-extern "C" bool fn_8034412C(WorldAnimState_8034412C* pObject)
+extern "C" bool fn_8034412C(WorldVertexAnimDrawable_80343E3C* pObject)
 {
-    return pObject->m_pState->m_uState == 1;
+    return pObject->m_pVertexAnimNode->mVisible == 1;
 }
 
 extern "C" void fn_80344144(
@@ -601,8 +557,8 @@ static bool s_drawEffectBounds;
 static const nlColour s_effectBoundsColour
     = { 0xFF, 0xFF, 0x80, 0xFF };
 
-extern "C" void fn_803441C8(WorldAnimEffect_803441C8* pEffect,
-    WorldObjectLoadContext_8034136C* pContext)
+extern "C" void fn_803441C8(WorldEffect* pEffect,
+    WorldObjectLoadContext* pContext)
 {
     pEffect->m_bActive = true;
     if (pEffect->m_nTimingMode == 0)
@@ -617,11 +573,10 @@ extern "C" void fn_803441C8(WorldAnimEffect_803441C8* pEffect,
     }
     pEffect->m_fPreviousEmissionTime = pEffect->m_fEmissionTime;
     pEffect->m_nRemainingEmissions = pEffect->m_nEmissionCount;
-    pContext->m_pWorld->fn_80341D40(
-        (WorldEffect_80341D40*)pEffect);
+    pContext->m_pWorld->AddEffect(pEffect);
 }
 
-extern "C" void fn_80344218(WorldAnimEffect_803441C8* pEffect)
+extern "C" void fn_80344218(WorldEffect* pEffect)
 {
     nlDLListIterator<EmissionController*> iterator
         = EmissionManager::Instance()->GetContainer()->Begin();
@@ -646,38 +601,37 @@ extern "C" void fn_80344218(WorldAnimEffect_803441C8* pEffect)
     }
 }
 
-extern "C" void fn_80344308(
-    WorldAnimEffect_803441C8* pEffect, float fDeltaT)
+void WorldEffect::Update(float fDeltaT)
 {
-    if (fDeltaT != 0.0f && pEffect->m_bActive)
+    if (fDeltaT != 0.0f && m_bActive)
     {
         bool bEmit = false;
-        if (pEffect->m_nTimingMode == 0)
+        if (m_nTimingMode == 0)
         {
-            if (pEffect->m_nRemainingEmissions > 0
-                || pEffect->m_nRemainingEmissions == -1)
+            if (m_nRemainingEmissions > 0
+                || m_nRemainingEmissions == -1)
             {
-                float fEmissionTime = pEffect->m_fEmissionTime;
+                float fEmissionTime = m_fEmissionTime;
                 float fEmissionInterval
-                    = pEffect->m_fEmissionInterval;
+                    = m_fEmissionInterval;
                 fEmissionTime += fDeltaT;
-                pEffect->m_fEmissionTime = fEmissionTime;
+                m_fEmissionTime = fEmissionTime;
                 if (fEmissionInterval <= fEmissionTime
                     && nlRandom(100, &nlDefaultSeed)
-                        < pEffect->m_uProbability)
+                        < m_uProbability)
                 {
                     bEmit = true;
                 }
             }
         }
-        else if (pEffect->m_nRemainingEmissions > 0
-            || pEffect->m_nRemainingEmissions == -1)
+        else if (m_nRemainingEmissions > 0
+            || m_nRemainingEmissions == -1)
         {
-            float fEmissionTime = pEffect->m_fEmissionTime;
-            float fEmissionInterval = pEffect->m_fEmissionInterval;
+            float fEmissionTime = m_fEmissionTime;
+            float fEmissionInterval = m_fEmissionInterval;
             if (fEmissionInterval <= fEmissionTime
                 && nlRandom(100, &nlDefaultSeed)
-                    < pEffect->m_uProbability)
+                    < m_uProbability)
             {
                 bEmit = true;
             }
@@ -685,7 +639,7 @@ extern "C" void fn_80344308(
 
         if (bEmit)
         {
-            fn_80344404(pEffect);
+            Emit();
         }
     }
 }
@@ -693,33 +647,33 @@ extern "C" void fn_80344308(
 extern "C" void fn_8034470C(EmissionController& controller);
 extern "C" void fn_80344798(EmissionController& controller);
 
-extern "C" void fn_80344404(WorldAnimEffect_803441C8* pEffect)
+void WorldEffect::Emit()
 {
     EffectsGroup* pGroup
         = fn_802E7D54(EmissionManager::Instance(),
-            pEffect->m_uEffectHash);
+            m_uEffectHash);
     if (pGroup != 0)
     {
         EmissionController* pController
             = EmissionManager::Instance()->Create(pGroup,
                 1, true, 0);
-        pEffect->m_fEmissionRadius = fn_802E5A68(pController);
+        m_fEmissionRadius = fn_802E5A68(pController);
 
         nlVector3 velocity = { 0.0f, 0.0f, 0.0f };
         pController->SetVelocity(velocity);
         pController->m_fGround = 0.02f;
 
         nlMatrix4* pMatrix
-            = &((DrawableObject*)pEffect)->GetWorldMatrix();
+            = &((DrawableObject*)this)->GetWorldMatrix();
         pController->SetPosition(
             *(nlVector3*)&pMatrix->e2[3][0]);
-        pMatrix = &((DrawableObject*)pEffect)->GetWorldMatrix();
+        pMatrix = &((DrawableObject*)this)->GetWorldMatrix();
         nlVector3 direction
             = { pMatrix->e2[2][0], pMatrix->e2[2][1],
                   pMatrix->e2[2][2] };
         pController->SetDirection(direction);
 
-        if (pEffect->m_pAnimController != 0)
+        if (m_pAnimController != 0)
         {
             Function1<void, EmissionController&> callback(
                 fn_8034470C);
@@ -731,27 +685,27 @@ extern "C" void fn_80344404(WorldAnimEffect_803441C8* pEffect)
                 fn_80344798);
             pController->SetUpdateCallback(callback);
         }
-        pController->m_uUserData = (u32)pEffect;
-        pEffect->m_nEmissionID = pController->m_Id;
+        pController->m_uUserData = (u32)this;
+        m_nEmissionID = pController->m_Id;
     }
     else
     {
-        pEffect->m_nEmissionID = -1;
+        m_nEmissionID = -1;
     }
 
-    pEffect->m_fPreviousEmissionTime = pEffect->m_fEmissionTime;
-    pEffect->m_fEmissionTime = 0.0f;
-    --pEffect->m_nRemainingEmissions;
-    if (pEffect->m_nRemainingEmissions < -1)
+    m_fPreviousEmissionTime = m_fEmissionTime;
+    m_fEmissionTime = 0.0f;
+    --m_nRemainingEmissions;
+    if (m_nRemainingEmissions < -1)
     {
-        pEffect->m_nRemainingEmissions = -1;
+        m_nRemainingEmissions = -1;
     }
 }
 
 extern "C" void fn_8034470C(EmissionController& controller)
 {
-    WorldAnimEffect_803441C8* pEffect
-        = (WorldAnimEffect_803441C8*)controller.m_uUserData;
+    WorldEffect* pEffect
+        = (WorldEffect*)controller.m_uUserData;
     if (pEffect != 0
         && pEffect->m_pAnimController->GetAnimationTime() != 0.0f)
     {
@@ -760,47 +714,46 @@ extern "C" void fn_8034470C(EmissionController& controller)
                 pEffect->m_nAnimNode);
         controller.SetPosition(*(nlVector3*)&matrix.e2[3][0]);
         controller.SetDirection(*(nlVector3*)&matrix.e2[2][0]);
-        fn_803445F0(pEffect, &controller);
+        pEffect->UpdateVisibility(&controller);
     }
 }
 
 extern "C" void fn_80344798(EmissionController& controller)
 {
-    WorldAnimEffect_803441C8* pEffect
-        = (WorldAnimEffect_803441C8*)controller.m_uUserData;
+    WorldEffect* pEffect
+        = (WorldEffect*)controller.m_uUserData;
     if (pEffect != 0)
     {
-        fn_803445F0(pEffect, &controller);
+        pEffect->UpdateVisibility(&controller);
     }
 }
 
-extern "C" void fn_803445F0(WorldAnimEffect_803441C8* pEffect,
-    EmissionController* pController)
+void WorldEffect::UpdateVisibility(EmissionController* pController)
 {
     bool bVisible;
-    if (!pEffect->m_bActive)
+    if (!m_bActive)
     {
         bVisible = false;
     }
-    else if (pEffect->m_bAlwaysVisible == true)
+    else if (m_bAlwaysVisible == true)
     {
         bVisible = true;
     }
     else
     {
-        const nlVector4* pCullData = pEffect->m_pWorld->m_pView68
+        const nlVector4* pCullData = m_pWorld->m_pOpaqueView
                                          ->m_Interface->GetShadowMatrix();
-        bVisible = fn_802DD1EC(pCullData,
-                       pController->GetPosition(),
-                       pEffect->m_fEmissionRadius)
-            && pEffect->m_pWorld->m_bRenderingEnabled;
+        bVisible = ClassifySphereInFrustum(pCullData,
+                       &pController->GetPosition(),
+                       m_fEmissionRadius)
+            && m_pWorld->m_bRenderingEnabled;
     }
     pController->m_bVisible = bVisible;
 
     if (s_drawEffectBounds)
     {
         g_ShapeRenderer.DrawSphere(pController->GetPosition(),
-            s_effectBoundsColour, pEffect->m_fEmissionRadius);
+            s_effectBoundsColour, m_fEmissionRadius);
     }
 }
 
@@ -815,7 +768,7 @@ extern "C" void* fn_803447B4(void* pObject, int shouldDelete)
 
 static WorldAnimController* spCurrentWorldAnimController;
 
-class WorldAnimUpdate_80342D7C
+class WorldAnimUpdate
 {
 public:
     void Update(const unsigned long& uHashID,
@@ -840,7 +793,7 @@ void WorldAnimManager::fn_80342324()
 {
 }
 
-void WorldAnimManager::fn_80342328()
+void WorldAnimManager::Clear()
 {
     delete m_pHierarchyInventory;
     m_pHierarchyInventory = 0;
@@ -848,7 +801,7 @@ void WorldAnimManager::fn_80342328()
     m_animationControllerMap.DeleteValues();
 }
 
-void WorldAnimManager::fn_80342630(
+void WorldAnimManager::BindHierarchy(
     WorldAnimController* pController, unsigned long uHierarchyHash)
 {
     pController->m_pAnimationSet = FindAnimationSet(uHierarchyHash);
@@ -859,7 +812,7 @@ void WorldAnimManager::fn_80342630(
                 pController->m_pAnimationSet->m_pHierarchy, false);
 }
 
-WorldAnimController* WorldAnimManager::fn_803426D8(
+WorldAnimController* WorldAnimManager::GetOrCreateController(
     unsigned long uHashID)
 {
     WorldAnimController** ppController;
@@ -875,7 +828,7 @@ WorldAnimController* WorldAnimManager::fn_803426D8(
     return pController;
 }
 
-WorldAnimController* WorldAnimManager::fn_803427B0(
+WorldAnimController* WorldAnimManager::FindController(
     unsigned long uHashID)
 {
     WorldAnimController** ppController;
@@ -917,28 +870,28 @@ void WorldAnimManager::LoadAnimationSet(
         pChunk, pChunk->GetNextChunk());
 }
 
-void WorldAnimManager::fn_80342A74()
+void WorldAnimManager::BindObjects()
 {
     m_animationControllerMap.Walk(
-        this, &WorldAnimManager::fn_80342BDC);
+        this, &WorldAnimManager::BindControllerObjects);
 }
 
-void WorldAnimManager::fn_80342BDC(const unsigned long&,
+void WorldAnimManager::BindControllerObjects(const unsigned long&,
     WorldAnimController** ppController)
 {
     fn_803438FC((*ppController)->m_pWorldAnimObject);
 }
 
-void WorldAnimManager::fn_80342BE8(float fDeltaT)
+void WorldAnimManager::Update(float fDeltaT)
 {
-    WorldAnimUpdate_80342D7C update;
+    WorldAnimUpdate update;
     update.m_fDeltaT = fDeltaT;
     m_animationControllerMap.Walk(
-        &update, &WorldAnimUpdate_80342D7C::Update);
+        &update, &WorldAnimUpdate::Update);
     m_fTime += fDeltaT;
 }
 
-void WorldAnimUpdate_80342D7C::Update(const unsigned long&,
+void WorldAnimUpdate::Update(const unsigned long&,
     WorldAnimController** ppController)
 {
     WorldAnimController* pController = *ppController;

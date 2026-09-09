@@ -5,7 +5,7 @@ UnidentifiedRegistryNode_802BE64C::~UnidentifiedRegistryNode_802BE64C()
     if (mValue.mType == 2)
     {
         ((UnidentifiedRegistryDynamic_802BEA10*)mOwner)
-            ->mAllocator->FreeValue(GetData());
+            ->mAllocator->FreeItem(GetData());
     }
 }
 

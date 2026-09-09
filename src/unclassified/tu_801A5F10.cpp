@@ -225,7 +225,7 @@ extern "C" void fn_801A62C4(EmissionController& controller)
         return;
     }
 
-    if (controller.m_GlView == 0
+    if (controller.m_Replaying == 0
         && ReplayManager::Instance()->mRender != 0)
     {
         RenderSnapshot* snapshot = ReplayManager::Instance()->mRender;

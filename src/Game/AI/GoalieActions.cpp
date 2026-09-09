@@ -1,4 +1,5 @@
 #include "Game/Sys/audio.h"
+#include "Game/DetInput.h"
 #include "Game/Goalie.h"
 #include "Game/RumbleActions.h"
 
@@ -199,9 +200,6 @@ extern "C" void fn_8005E800(
     void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_80080638(
     Goalie* pGoalie, cFielder* pFielder, bool bParam);
-
-extern "C" bool fn_80331C04(
-    DetInput* pGlobalPad, int nButton, bool bRemap);
 extern "C" void fn_801BABEC(cPlayer* pPlayer);
 extern "C" void fn_801BAF0C(cPlayer* pPlayer);
 extern "C" void fn_801B8B38(cPlayer* pPlayer);
@@ -2892,7 +2890,7 @@ bool Goalie::fn_80090958(bool bParam)
             ReleaseBall(false);
         }
 
-        KoopaShellObject* pPowerup = lbl_806E1608->mUnidentified02C;
+        KoopaShellObject* pPowerup = gNPCManager->mUnidentified02C;
         if (pPowerup != 0 && pPowerup->mVisible)
         {
             fn_800156F8(g_pBall, mpSkillShooter);
@@ -4265,7 +4263,7 @@ void Goalie::InitActionPass(bool useTarget)
 
                 if (GetGlobalPad() != 0)
                 {
-                    if (fn_80331C04(GetGlobalPad(), 0x17, true))
+                    if (GetGlobalPad()->IsPressed(0x17, true))
                     {
                         animID = 2;
                     }

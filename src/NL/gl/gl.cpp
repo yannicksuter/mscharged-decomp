@@ -9,7 +9,7 @@
 #include "NL/gl/glStruct.h"
 #include "NL/gl/glTarget.h"
 #include "NL/gl/glView.h"
-#include "NL/glx/GXMaterialProgramRegistry_802A0A14.h"
+#include "NL/glx/GXMaterialProgramRegistry.h"
 #include "NL/glx/glxLoadModel.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/nlString.h"
@@ -18,15 +18,15 @@ static int gl_frameCounter;
 static int gl_nDiscard;
 static int gl_state;
 
-bool fn_802C7FD0(void (*startupCallback)())
+bool glStartup(void (*startupCallback)())
 {
     gl_frameCounter = 0;
     gl_nDiscard = 0;
     gl_state = 0;
 
-    fn_802CBEC8();
+    glInitResourcePools();
     startupCallback();
-    fn_802A0A14();
+    glInitMaterialPrograms();
 
     if (!glplatStartup(glGetScreenInfo()))
         return false;
@@ -78,7 +78,7 @@ void glEndFrame()
     gl_state = 2;
 }
 
-bool fn_802C80FC()
+bool glIsFrameActive()
 {
     return gl_state == 1;
 }
@@ -111,7 +111,7 @@ void glFinish()
     glplatFinish();
 }
 
-void fn_802C8180()
+void glCompact()
 {
     glViewCompact();
 }
@@ -137,60 +137,60 @@ unsigned long glGetNumTriangles(eGLPrimitive primitive, unsigned long count)
     }
 }
 
-void* fn_802C81FC(
+glModel* glEndLoadModel(
     void* data, unsigned long size, unsigned long* pNumModels, void* context)
 {
     return glplatEndLoadModel(data, size, pNumModels, context);
 }
 
-bool fn_802C8200(const char* filename,
+bool glBeginLoadModel(const char* filename,
     void (*callback)(void*, unsigned long, void*), void* userData,
     void* context)
 {
     return glplatBeginLoadModel(filename, callback, userData);
 }
 
-bool fn_802C8204(const char* filename,
+bool glBeginLoadTextureBundle(const char* filename,
     void (*callback)(void*, unsigned long, void*), void* param,
     void* context)
 {
     return glplatBeginLoadTextureBundle(filename, callback, param);
 }
 
-void* fn_802C8208(
+glModel* glLoadModel(
     const char* filename, unsigned long* pNumModels, void* context)
 {
     return glplatLoadModel(filename, pNumModels, context);
 }
 
-bool fn_802C820C(
-    const char* filename, MemoryAllocator* allocator)
+bool glLoadTextureBundle(
+    const char* filename, GLResourcePool* allocator)
 {
     return glplatLoadTextureBundle(filename, allocator);
 }
 
 float glGetOrthographicWidth()
 {
-    return fn_80369D5C();
+    return glplatGetOrthographicWidth();
 }
 
 float glGetOrthographicHeight()
 {
-    return fn_80369D64();
+    return glplatGetOrthographicHeight();
 }
 
-void fn_802C8280(const char*)
+void glBeginResource(const char*)
 {
 }
 
-void fn_802C8284(unsigned long)
+void glBeginResource(unsigned long)
 {
 }
 
-void fn_802C8288()
+void glEndResource()
 {
 }
 
-void fn_802C828C(const char* name, void* allocator)
+void glDumpResources(const char* name, GLResourcePool* resourcePool)
 {
 }

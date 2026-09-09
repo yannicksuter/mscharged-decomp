@@ -21,7 +21,7 @@ extern tCharacterTemplateInfo g_aCharacterTemplateInfo[20];
 extern tCharacterTemplateInfo g_GoalieTemplateInfo;
 extern SebringAnimTagScriptInterpreter* g_pAnimScriptInterp;
 
-SebringAnimTagScriptInterpreter* fn_80025E9C()
+SebringAnimTagScriptInterpreter* GetAnimScriptInterpreter()
 {
     if (g_pAnimScriptInterp == NULL)
     {
@@ -33,31 +33,31 @@ SebringAnimTagScriptInterpreter* fn_80025E9C()
     return g_pAnimScriptInterp;
 }
 
-tGoalieTemplateInfo* fn_80025F48(int goalieIdx)
+tGoalieTemplateInfo* GetGoalieTemplateInfo(int goalieIdx)
 {
     return &g_GoalieTextureInfo[goalieIdx];
 }
 
-extern "C" tCharacterTemplate* fn_80025F5C(int arg0, bool* arg1)
+tCharacterTemplate* GetCharacterTemplate(int nIndex, bool* pbCreated)
 {
-    *arg1 = false;
+    *pbCreated = false;
 
-    if (arg0 < 20)
+    if (nIndex < 20)
     {
-        if (g_aCharacterTemplates[arg0] == NULL)
+        if (g_aCharacterTemplates[nIndex] == NULL)
         {
-            g_aCharacterTemplates[arg0] = (tCharacterTemplate*)nlMalloc(
+            g_aCharacterTemplates[nIndex] = (tCharacterTemplate*)nlMalloc(
                 sizeof(tCharacterTemplate), 8, false);
-            *arg1 = true;
+            *pbCreated = true;
         }
-        return g_aCharacterTemplates[arg0];
+        return g_aCharacterTemplates[nIndex];
     }
 
     if (g_GoalieTemplate == NULL)
     {
         g_GoalieTemplate = (tCharacterTemplate*)nlMalloc(
             sizeof(tCharacterTemplate), 8, false);
-        *arg1 = true;
+        *pbCreated = true;
     }
     return g_GoalieTemplate;
 }

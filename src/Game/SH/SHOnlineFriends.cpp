@@ -118,7 +118,7 @@ void SHOnlineFriends::UpdateFriend(int index)
     }
     if (type == 1 || type == 2)
         row->mStatus = 7;
-    NetworkLeaderboardCategory* category = NetworkStatsManager_8012F378::Instance()->GetCategory(4);
+    NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(4);
     int player = category->FindPlayer(((int*)data)[1]);
     if (player != -1)
     {
@@ -676,7 +676,7 @@ void SHOnlineFriends::Update(float dt)
                 GameInfoManager* gameInfo = GameInfoManager::Instance();
                 int selected = mUnidentified2EA8[mUnidentified002C + mUnidentified0020]->mFriendIndex;
                 u8 stadium = gameInfo->GetStadium();
-                const PowerupSettings* rules = reinterpret_cast<const PowerupSettings*>(gameInfo->GetActiveRules());
+                const CheatSettings* rules = reinterpret_cast<const CheatSettings*>(gameInfo->GetActiveRules());
                 const GameplaySettings* settings = reinterpret_cast<const GameplaySettings*>(gameInfo->GetCurrentSettings());
                 g_pFriendManager->SetOwnStatusHostInvitingPlayer(selected, settings, rules, stadium);
             }
@@ -704,7 +704,7 @@ void SHOnlineFriends::Update(float dt)
         GameSceneManager::Instance()->Push((SceneList)52, SCREEN_FORWARD, true);
         return;
     }
-    if (!NetworkStatsManager_8012F378::Instance()->RefreshFriendStats_80131B50())
+    if (!NetworkStatsManager::Instance()->RefreshFriendStats_80131B50())
     {
         if (g_pNetworkSession->mDWCLastError == 0)
             g_pNetworkSession->ReadAndClearDWCError();

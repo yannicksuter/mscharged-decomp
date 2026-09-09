@@ -14,6 +14,7 @@
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
+#include "Game/NetworkSession.h"
 #include "Game/Task/ResetTask.h"
 #include "NL/nlPrint.h"
 #include "NL/nlBind.h"

@@ -4,6 +4,7 @@
 #include "Game/Player.h"
 #include "Game/Team.h"
 #include "NL/nlFormat.h"
+#include "NL/nlBasicString.inl"
 
 FuzzyVariant fvNotSet;
 

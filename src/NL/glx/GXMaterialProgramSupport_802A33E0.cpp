@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include "NL/gl/glPlat.h"
 #include "NL/glx/GXMaterialProgram.h"
@@ -23,7 +24,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>::Activate(
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>::Deactivate()
 {
-    GXSetScissor(0, 0, fn_80369394(), fn_803693A4());
+    GXSetScissor(0, 0, glplatGetFrameBufferWidth(), glplatGetFrameBufferHeight());
 }
 
 template <>
@@ -31,7 +32,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>::Prepare(
     const glModelPacket* packet)
 {
     GXMaterialProgramParameters_802A6B6C* parameters = (GXMaterialProgramParameters_802A6B6C*)packet->unknown20;
-    fn_802CC978(this, packet, parameters->texture);
+    glSetMaterialTextureAlphaState(this, packet, parameters->texture);
 }
 
 template <>
@@ -43,7 +44,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>::Draw(
 
     if (scissorX <= -0.1f)
     {
-        GXSetScissor(0, 0, fn_80369394(), fn_803693A4());
+        GXSetScissor(0, 0, glplatGetFrameBufferWidth(), glplatGetFrameBufferHeight());
     }
     else
     {

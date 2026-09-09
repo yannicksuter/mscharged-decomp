@@ -6,6 +6,8 @@
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/SH/SHNavigation.h"
 
 class SHNavigation;
 
@@ -42,7 +44,7 @@ CupHubScene::CupHubScene()
     }
 
     fn_80203B54();
-    if (g_pCupManager->mUnidentified8680 == 0x10
+    if (g_pCupManager->mState == 0x10
         || g_pCupManager->GetCurrentRoundType() == 0)
     {
         mUnidentified67D = false;

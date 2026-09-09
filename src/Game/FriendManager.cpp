@@ -257,21 +257,21 @@ void FriendManager::HandleFriendStatus(
                             == previous.mPowerupSettings.mEnvironmentCheat
                      && current.mPowerupSettings.mPlayerCheat
                             == previous.mPowerupSettings.mPlayerCheat
-                     && current.mGameplaySettings.WinBy
-                            == previous.mGameplaySettings.WinBy
-                     && current.mGameplaySettings.BestSeries
-                            == previous.mGameplaySettings.BestSeries;
+                     && current.mGameplaySettings.GameLimitType
+                            == previous.mGameplaySettings.GameLimitType
+                     && current.mGameplaySettings.NumGames
+                            == previous.mGameplaySettings.NumGames;
             if (unchanged)
             {
-                if (current.mGameplaySettings.WinBy == 0)
+                if (current.mGameplaySettings.GameLimitType == 0)
                 {
                     unchanged = current.mGameplaySettings.GameTime
                              == previous.mGameplaySettings.GameTime;
                 }
                 else
                 {
-                    unchanged = current.mGameplaySettings.GameGoals
-                             == previous.mGameplaySettings.GameGoals;
+                    unchanged = current.mGameplaySettings.GoalLimit
+                             == previous.mGameplaySettings.GoalLimit;
                 }
             }
         }
@@ -556,7 +556,7 @@ void FriendManager::
 
 void FriendManager::SetOwnStatusHostInvitingPlayer(
     int index, const GameplaySettings* gameplaySettings,
-    const PowerupSettings* powerupSettings, u8 value)
+    const CheatSettings* cheatSettings, u8 value)
 {
     mFriendStatusIndex = index;
     GameInfoManager* gameInfo = GameInfoManager::GetInstance();
@@ -565,7 +565,7 @@ void FriendManager::SetOwnStatusHostInvitingPlayer(
     mOwnStatus.mStatus = EFriendStatus_HostInvitingPlayer;
     mOwnStatus.mProfileId = friendData->gs_profile_id.id;
     mOwnStatus.mGameplaySettings = *gameplaySettings;
-    mOwnStatus.mPowerupSettings = *powerupSettings;
+    mOwnStatus.mPowerupSettings = *cheatSettings;
     mOwnStatus.mStadium = value;
     mOwnStatus.mNetworkVersion = GetNetworkVersionWord();
     tDebugPrintManager::Print(DC_NETWORK, "SetOwnStatusHostInvitingPlayer forPID %d\n", mOwnStatus.mProfileId);

@@ -1,3 +1,4 @@
+#include "NL/nlPrint.h"
 #include "Game/Audio/Plat3dSoundSrc.h"
 
 #include "Game/TweakValue.h"
@@ -8,9 +9,9 @@ float g_Pan;
 float g_Dist;
 float g_RelVel;
 
-static TweakValueImpl_804F4DC8 sPanTweak("g_Pan", "audio/Stats", &g_Pan, true);
-static TweakValueImpl_804F4DC8 sDistanceTweak("g_Dist", "audio/Stats", &g_Dist, true);
-static TweakValueImpl_804F4DC8 sRelativeVelocityTweak("g_RelVel", "audio/Stats", &g_RelVel, true);
+static TweakFloatBinding sPanTweak("g_Pan", "audio/Stats", &g_Pan, true);
+static TweakFloatBinding sDistanceTweak("g_Dist", "audio/Stats", &g_Dist, true);
+static TweakFloatBinding sRelativeVelocityTweak("g_RelVel", "audio/Stats", &g_RelVel, true);
 
 void Plat3dSoundSrc::Update(PlatAudioListener* listener, float deltaTime)
 {

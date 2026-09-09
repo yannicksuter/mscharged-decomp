@@ -19,8 +19,11 @@
 #include "NL/nlLocalization.h"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/FE/FEAudio.h"
+#include "NL/nlPrint.h"
 
 #include <string.h>
+#include "NL/nlBasicString.inl"
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
@@ -132,7 +135,7 @@ void SHOnlineInvitePreview::SceneCreated()
 {
     FriendStatusPayload* payload = GetFriendManager()->GetFriendStatusPayload(
         GetFriendManager()->GetHostInvitationIndex());
-    const PowerupSettings& settings = payload->mPowerupSettings;
+    const CheatSettings& settings = payload->mPowerupSettings;
     TLSlide* slide = GetPresentation()->GetActiveSlide();
     mContinueButtonInstance = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(slide, "Layer", "PREVIEW", "BTN_1");
     for (int i = 0; i < 4; ++i)
@@ -143,7 +146,7 @@ void SHOnlineInvitePreview::SceneCreated()
     TLTextInstance* text = FEFindTextInstance(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_0");
     unsigned short value0[4];
     unsigned short value1[4];
-    nlSNPrintf(value0, 4, (const unsigned short*)L"%d", payload->mGameplaySettings.BestSeries);
+    nlSNPrintf(value0, 4, (const unsigned short*)L"%d", payload->mGameplaySettings.NumGames);
     WideBasicString string = Format(WideBasicString(g_pLocalization->GetString("ONLINE_PREVIEW_OPTION_0")), value0);
     memcpy(mBestSeriesText, string.c_str(), sizeof(mBestSeriesText));
     text->SetString(mBestSeriesText);
@@ -151,7 +154,7 @@ void SHOnlineInvitePreview::SceneCreated()
     text = FEFindTextInstance(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_1");
     const char* id;
     int value;
-    if (payload->mGameplaySettings.WinBy == 0)
+    if (payload->mGameplaySettings.GameLimitType == 0)
     {
         id = "X_MINUTES";
         value = payload->mGameplaySettings.GameTime / 60;
@@ -159,7 +162,7 @@ void SHOnlineInvitePreview::SceneCreated()
     else
     {
         id = "X_GOALS";
-        value = payload->mGameplaySettings.GameGoals;
+        value = payload->mGameplaySettings.GoalLimit;
     }
     nlSNPrintf(value1, 4, (const unsigned short*)L"%d", value);
     const unsigned short* format = g_pLocalization->GetString("ONLINE_PREVIEW_OPTION_1");

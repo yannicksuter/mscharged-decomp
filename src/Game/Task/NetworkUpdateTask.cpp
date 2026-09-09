@@ -1,10 +1,11 @@
+#include "Game/NetworkMessageRegistry.h"
 #include "NL/plat/SocketNetwork.h"
 #include "Game/Task/NetworkUpdateTask.h"
 
-#include "unclassified/tu_80332DC0.h"
+#include "Game/InputRouter.h"
 
 #include "Game/Task/FixedUpdateTask.h"
-#include "unclassified/tu_80332770.h"
+#include "Game/InputManager.h"
 
 #include "Game/NetTournManager.h"
 #include "Game/NetworkDraft.h"
@@ -12,8 +13,8 @@
 #include "Game/NetworkStatsManager.h"
 #include "Game/FriendManager.h"
 #include "Game/main.h"
-#include "unclassified/tu_80336B2C.h"
-#include "unclassified/tu_80338898.h"
+#include "Game/NetworkInput.h"
+#include "Game/NetworkSync.h"
 
 #include "NL/nlMemory.h"
 #include "types.h"
@@ -25,16 +26,16 @@ void NetworkUpdateTask::Initialize()
 {
     SocketNetworkInitializeMemory();
     NetworkSession::Create();
-    fn_80338898();
-    fn_80337F68();
-    fn_8032C7D0();
+    InitializeNetworkSyncState();
+    InitializeNetworkInputRecording();
+    InitializeNetworkMessageRegistry();
     RegisterNetworkMessages_801258A8();
-    fn_803327DC();
+    InitializeInputManager();
 
-    UnidentifiedFixedUpdateTaskBase* handler = GetFixedUpdateTask();
-    lbl_806E2138->fn_803328AC(handler);
+    InputFrameProvider* handler = GetFixedUpdateTask();
+    gInputManager->SetFrameProvider(handler);
 
-    fn_80332EDC();
+    InitializeInputRouters();
     NetTournManager::CreateInstance();
     NetworkDraft::CreateInstance();
 
@@ -46,7 +47,7 @@ void NetworkUpdateTask::Initialize()
             = new (instance) FriendManager();
     }
 
-    NetworkStatsManager_8012F378::CreateInstance();
+    NetworkStatsManager::CreateInstance();
     if (GetRegion() == 2)
     {
         g_nAddHoursTime = 9;
@@ -57,8 +58,8 @@ void NetworkUpdateTask::Initialize()
     }
 
     lbl_806E1008 = 0;
-    lbl_806E2138->mEnabled = 1;
-    lbl_806E2168->mEnabled = false;
+    gInputManager->mEnabled = 1;
+    gNetworkSyncState->mEnabled = false;
 }
 
 void NetworkUpdateTask::Run(float)

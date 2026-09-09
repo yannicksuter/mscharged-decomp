@@ -3,16 +3,17 @@
 
 #include "Game/NetworkSession.h"
 #include <dwc/dwci_error.h>
+#include <dwc/dwc_main_fwd.h>
 
-struct NetworkLobbyPlayer : public UnidentifiedTransportPlayer
+struct NetworkLobbyPlayer : public TransportPlayerInfo
 {
     /* 0x14 */ unsigned int mConnection;
     /* 0x18 */ u8 mUnidentified18[4];
     /* 0x1C */ int mConnectionState;
 }; // size: 0x20
 
-class NetworkLobby : public UnidentifiedMachineRoster,
-                     public UnidentifiedNetworkMessageReceiver
+class NetworkLobby : public NetworkMachineRoster,
+                     public NetworkMessageReceiver
 {
 public:
     void* operator new(unsigned long size) { return nlMalloc(size, 8, false); }
@@ -25,14 +26,14 @@ public:
 
     virtual unsigned int GetMachineAid(int index);
     virtual int MachineIdxFromConnection(unsigned int connection);
-    virtual int RosterVirtual08();
-    virtual void RosterVirtual0C(int);
+    virtual int GetTopology();
+    virtual void SetTopology(int);
     virtual int GetMaxMachineCount();
-    virtual void RosterVirtual14(int);
+    virtual void SetMaxMachineCount(int);
     virtual int GetMachineCount();
-    virtual UnidentifiedTransportPlayer* GetPlayerInfo(int index);
+    virtual TransportPlayerInfo* GetPlayerInfo(int index);
     virtual int GetLocalMachineIndex();
-    virtual UnidentifiedTransportPlayer* GetLocalPlayerInfo();
+    virtual TransportPlayerInfo* GetLocalPlayerInfo();
     virtual void SetUserMatchData(u8 size, const void* data);
     virtual void* GetUserMatchData(u8* size);
     virtual void Update(float dt);
@@ -44,12 +45,14 @@ public:
     virtual void OnGameStarted();
     virtual void Shutdown(bool reset);
 
-    virtual int ReceiverVirtual00(UnidentifiedNetworkMessage* message);
+    virtual int ProcessMessage(NetworkMessage* message);
 
     bool AreAllConnectionsReady();
     void CloseConnections();
     void CloseConnectionsAndReset();
     bool CanCancelMatchmaking();
+    int GetConnectionCount() const { return DWC_GetNumConnectionHost(); }
+    bool IsMatchmaking() const { return mMatchmakingThreadRunning || mState != 0; }
     void CancelMatchmaking();
     bool StartMatchmaking();
     void StartMatchmakingThread();
@@ -61,11 +64,11 @@ public:
     void OnFriendMatchmakingResult(DWCErrorType error, int cancelled,
         int self, int isServer, int index, void* param);
     void UpdatePeerConnectionState(int aid);
-    void BuildLocalMachineInfo(UnidentifiedDraftEntry* info);
+    void BuildLocalMachineInfo(NetworkDraftMachineInfo* info);
     void MarkGameStarted();
     bool AllMachineInfoReceived();
-    UnidentifiedDraftEntry* GetLocalMachineInfo();
-    UnidentifiedDraftEntry* GetMachineInfo(int index);
+    NetworkDraftMachineInfo* GetLocalMachineInfo();
+    NetworkDraftMachineInfo* GetMachineInfo(int index);
 
     /* 0x0008 */ bool mReceiverRegistered;
     /* 0x0009 */ u8 mTournamentMode;
@@ -99,7 +102,7 @@ public:
     /* 0x00E5 */ u8 mUserMatchData[8];
     /* 0x00ED */ bool mMachineInfoReceived[4];
     /* 0x00F1 */ u8 mPadding0F1[3];
-    /* 0x00F4 */ UnidentifiedDraftEntry mMachineInfo[4];
+    /* 0x00F4 */ NetworkDraftMachineInfo mMachineInfo[4];
     /* 0x02F4 */ bool mMatchmakingThreadRunning;
     /* 0x02F5 */ u8 mPadding2F5[3];
     /* 0x02F8 */ u8 mMatchmakingThread[0x318];

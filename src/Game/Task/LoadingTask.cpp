@@ -13,7 +13,7 @@ extern bool g_bE3IdleReset;
 void LoadingTask::Start()
 {
     mElapsed = 0.0f;
-    fn_80118B50(fn_80118A74());
+    fn_80118B50(AsyncLoadingManager::Instance());
 }
 
 void LoadingTask::Run(float dt)
@@ -25,7 +25,7 @@ void LoadingTask::Run(float dt)
     g_pPadManager->Update(dt);
     FlickDetection::Update();
 
-    switch (fn_80118B7C(fn_80118A74()))
+    switch (fn_80118B7C(AsyncLoadingManager::Instance()))
     {
     case 3:
         nlTaskManager::SetNextState(0x00080000);
@@ -49,39 +49,39 @@ void LoadingTask::StateTransition(unsigned int from, unsigned int to)
 {
     if (to == 0x00100000 && from == 0x00010000)
     {
-        fn_80119054(fn_80118A74());
+        fn_80119054(AsyncLoadingManager::Instance());
     }
 
     if (to == 0x00080000)
     {
-        fn_801190A0(fn_80118A74());
+        fn_801190A0(AsyncLoadingManager::Instance());
     }
 
     if (to == 0x00200000 && from == 0x00000004)
     {
-        fn_801190EC(fn_80118A74());
+        fn_801190EC(AsyncLoadingManager::Instance());
     }
 
     if (to == 0x00800000 && from == 0x00010000)
     {
-        fn_801191D4(fn_80118A74());
+        fn_801191D4(AsyncLoadingManager::Instance());
     }
 
     if (to == 0x00400000 && from != 0x02000000)
     {
         if (g_e3_Build && g_bE3IdleReset)
         {
-            fn_80119184(fn_80118A74());
+            fn_80119184(AsyncLoadingManager::Instance());
         }
         else
         {
-            fn_80119138(fn_80118A74());
+            fn_80119138(AsyncLoadingManager::Instance());
         }
     }
 
     if (to == 0x01000000 && from == 0x00010000)
     {
-        fn_80119220(fn_80118A74());
+        fn_80119220(AsyncLoadingManager::Instance());
     }
 }
 

@@ -1,5 +1,6 @@
 #include "NL/glx/glxTexture.h"
 #include "Game/Sys/debug.h"
+#include "Game/TweakValue.h"
 
 #include "NL/gc/gcSwizzler.h"
 #include "NL/gl/glMemory.h"
@@ -11,6 +12,8 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 
+#include <revolution/os/OSCache_fwd.h>
+#include <stdio.h>
 #include <string.h>
 
 enum GXTexWrapMode
@@ -32,11 +35,6 @@ enum eGLTextureMode
 
 extern "C"
 {
-    void* fn_802CC0A4(
-        unsigned long size, int memoryType, void* allocator);
-    int fn_80383478(const char* format, ...);
-
-    void DCStoreRange(void* address, unsigned long length);
     void GXInitTlutObj(
         void* object, void* palette, int format, unsigned short entries);
     void GXInitTexObjCI(void* object, void* image, unsigned short width,
@@ -56,16 +54,7 @@ extern "C"
     void GXInvalidateTexAll();
 }
 
-struct TweakValueBool_804F4578
-{
-    /* 0x00 */ void* mVTable;
-    /* 0x04 */ const char* mName;
-    /* 0x08 */ unsigned char mUnidentified08;
-    /* 0x09 */ unsigned char mUnidentified09;
-    /* 0x0A */ bool mValue;
-};
-
-extern TweakValueBool_804F4578 gbReduceTextures;
+extern TweakValueBool gbReduceTextures;
 
 static glxTextureLoadCallback_t glxTextureLoad_cb;
 static unsigned long nGridMemory;
@@ -84,12 +73,12 @@ glxTextureLoadCallback_t glx_SetLoadCallback(
 
 static PlatTexture* glx_MakeGridTexture(int width, int height)
 {
-    fn_80383478("Creating grid texture %d x %d\n", width, height);
+    printf("Creating grid texture %d x %d\n", width, height);
 
     unsigned char bits[4] = { 5, 6, 5, 0 };
     PlatTexture* texture = new (nlMalloc(sizeof(PlatTexture), 8, false)) PlatTexture();
     texture->Create(width, height, GXTex_RGB565,
-        (MemoryAllocator*)fn_802CC094(), 1, true, true);
+        (MemoryAllocator*)glGetCurrentResourcePool(), 1, true, true);
     memcpy(texture->m_Bits, bits, sizeof(texture->m_Bits));
 
     unsigned short gridColor = 0xFFFF;
@@ -231,7 +220,7 @@ int glplatTextureGetNumBits(int component)
 
 PlatTexture* glx_CreatePlatTexture(void* allocator)
 {
-    return new (fn_802CC0A4(sizeof(PlatTexture), 0, allocator)) PlatTexture();
+    return new (glResourceAlloc(sizeof(PlatTexture), GLM_Header, allocator)) PlatTexture();
 }
 
 void PlatTexture::ClearData()
@@ -287,7 +276,7 @@ void PlatTexture::Create(int width, int height, eGXTextureFormat format,
     }
     else
     {
-        m_SwizzledData = fn_802CC0A4(textureSize, 4, allocator);
+        m_SwizzledData = glResourceAlloc(textureSize, GLM_TextureData, allocator);
     }
 
     if (linearData)
@@ -377,7 +366,7 @@ PlatTexture* glx_MakeTexture(GXTextureHeader* header,
 
     textureSize = GCTextureSize(
         header->format, width, height, numLevels, texhandle);
-    pTex = new (fn_802CC0A4(sizeof(PlatTexture), 0, allocator)) PlatTexture();
+    pTex = new (glResourceAlloc(sizeof(PlatTexture), GLM_Header, allocator)) PlatTexture();
 
     format = header->format;
     pTex->Create(width, height, format, allocator, numLevels, false, false);
@@ -388,7 +377,7 @@ PlatTexture* glx_MakeTexture(GXTextureHeader* header,
     if (numEntries != 0)
     {
         pTex->m_PaletteData =
-            (u16*)fn_802CC0A4(numEntries * 2, 4, allocator);
+            (u16*)glResourceAlloc(numEntries * 2, GLM_TextureData, allocator);
         pTex->m_nPaletteEntries = numEntries;
         memcpy(pTex->m_PaletteData, textureData + textureSize,
             header->numEntries * 2);
@@ -413,27 +402,27 @@ bool glplatLoadTextureBundle(
     void* data;
     unsigned long size;
     data = nlLoadEntireFile(filename, &size, 32, AllocateStart, 0, 0, 0);
-    result = fn_802CDD78(data, size, allocator, 0);
+    result = glEndLoadTextureBundle(data, size, allocator, 0);
     delete[] (unsigned char*)data;
     return result;
 }
 
-extern "C" PlatTexture* fn_8036BBC0(glTexBundleDict* entry,
+PlatTexture* glplatTextureAddFromBundle(glTexBundleDict* entry,
     GXTextureHeader* header, void* allocator)
 {
     return glx_MakeTexture(header, allocator, entry->hash);
 }
 
-extern "C" void fn_8036BBD4(void*, void*)
+void glplatBeginTextureBundle(void*, void*)
 {
 }
 
-extern "C" void fn_8036BBD8(void*)
+void glplatEndTextureBundle(void*)
 {
     GXInvalidateTexAll();
 }
 
-extern "C" PlatTexture* fn_8036BBDC(unsigned long handle,
+PlatTexture* glplatTextureAdd(unsigned long handle,
     const void* textureData, unsigned long, void* allocator)
 {
     return glx_MakeTexture((GXTextureHeader*)textureData, allocator, handle);
@@ -482,8 +471,8 @@ void glxInitTex()
 {
 }
 
-extern "C" void fn_8036BE88(
-    int textureMap, UnidentifiedTextureState* textureState)
+void glx_BindTexture(
+    int textureMap, glTextureBinding* textureState)
 {
     glTextureManager* textureManager;
     PlatTexture* pTex;

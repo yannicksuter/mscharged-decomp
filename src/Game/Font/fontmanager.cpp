@@ -1,6 +1,7 @@
+#include "NL/nlPrint.h"
 #include "Game/Font/fontmanager.h"
+#include "NL/nlPrint.h"
 
-extern void nlPrintf(const char*, ...);
 
 nlFont* FontManager::GetFontByHashID(unsigned long hashID)
 {

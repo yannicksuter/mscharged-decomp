@@ -16,6 +16,7 @@
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/fePointer.h"
+#include "Game/FE/FEAudio.h"
 
 SHOptionsCheatsList::SHOptionsCheatsList()
     : mComponents()

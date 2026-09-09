@@ -10,6 +10,7 @@
 #include "NL/platqmath.h"
 #include "NL/platvmath.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/Render/RLViewLayers.h"
 
 static float dofBehindTarget = 2.0f;
 static float lbl_806DC464 = 45.0f;

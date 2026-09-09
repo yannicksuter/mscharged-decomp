@@ -1,4 +1,5 @@
 #include "NL/gl/glDraw2.h"
+#include "NL/gl/glTexture.h"
 
 #include "Game/GL/GLTexturedColourMeshWriter.h"
 #include "Game/GL/GLFloatTexturedColourMeshWriter.h"
@@ -12,14 +13,14 @@
 #include "NL/gl/glState.h"
 #include "NL/gl/glStruct.h"
 #include "NL/gl/glView.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 
 #include <string.h>
+#include "NL/gl/glTexture.h"
 
 static int QuadMap[4] = { 0, 1, 2, 3 };
 static int TriListMap[6] = { 0, 1, 2, 3, 0, 2 };
 
-extern u32 lbl_806E1F34;
 
 extern "C" glModel* fn_802C834C(glPoly2* pPolys,
     unsigned long numPolys, unsigned long* pMatrixHandle, bool textured);
@@ -90,7 +91,7 @@ extern "C" glModel* fn_802C834C(glPoly2* pPolys,
             unsigned char wrapT = !clampT;
 
             u32 texture = glGetCurrentTexture(GLTT_Diffuse);
-            UnidentifiedTextureState* state = (UnidentifiedTextureState*)writer.model->packets->unknown20;
+            glTextureBinding* state = (glTextureBinding*)writer.model->packets->unknown20;
             state->texture = texture;
             state->textureIndex = 0xFFFF;
             state->SetWrapS(wrapS);
@@ -115,8 +116,8 @@ extern "C" glModel* fn_802C834C(glPoly2* pPolys,
                         pPoly->depth);
                 }
             }
-            UnidentifiedTextureState* state = (UnidentifiedTextureState*)writer.model->packets->unknown20;
-            state->texture = lbl_806E1F34;
+            glTextureBinding* state = (glTextureBinding*)writer.model->packets->unknown20;
+            state->texture = gWhiteTextureID;
             state->textureIndex = 0xFFFF;
             state->SetWrapS(true);
             state->SetWrapT(true);
@@ -167,7 +168,7 @@ bool glAttachPoly2(GLView* view, int layer, unsigned long numPolys,
     glModelPacket* packet = model->packets;
     while (packet < model->packets + model->numPackets)
     {
-        fn_802CC3C8(packet, scissorbox, data, 4);
+        glSetMaterialParameterArray(packet, scissorbox, data, 4);
         ++packet;
     }
     view->AttachModel(model, layer);
@@ -225,7 +226,7 @@ extern "C" glModel* fn_802C89F4(glPoly2* pPolys,
             unsigned char wrapT = !clampT;
 
             u32 texture = glGetCurrentTexture(GLTT_Diffuse);
-            UnidentifiedTextureState* state = (UnidentifiedTextureState*)writer.model->packets->unknown20;
+            glTextureBinding* state = (glTextureBinding*)writer.model->packets->unknown20;
             state->texture = texture;
             state->textureIndex = 0xFFFF;
             state->SetWrapS(wrapS);
@@ -250,8 +251,8 @@ extern "C" glModel* fn_802C89F4(glPoly2* pPolys,
                         pPoly->depth);
                 }
             }
-            UnidentifiedTextureState* state = (UnidentifiedTextureState*)writer.model->packets->unknown20;
-            state->texture = lbl_806E1F34;
+            glTextureBinding* state = (glTextureBinding*)writer.model->packets->unknown20;
+            state->texture = gWhiteTextureID;
             state->textureIndex = 0xFFFF;
             state->SetWrapS(true);
             state->SetWrapT(true);

@@ -16,6 +16,5 @@ glModel* glplatLoadModel(
 GLSkinMesh* glx_MakeSkinMesh(
     nlChunk* outerChunk, glModel* models, cSHierarchy* hierarchy);
 
-void* glGetMaterialProgram(unsigned long hash);
 
 #endif // NL_GLX_GLXLOADMODEL_H

@@ -7,8 +7,8 @@
 #include "Game/Game.h"
 #include "Game/GameTweaks.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/tu_802C6224.h"
-#include "unclassified/tu_80073898.h"
+#include "Game/TweakConfig.h"
+#include "Game/TweakFileLoader.h"
 
 extern "C" void fn_8002B934(PlayerTweaks*, const char*, const char*, bool);
 
@@ -22,7 +22,7 @@ FielderTweaks::FielderTweaks(const char* name, const char* category)
     , mUnidentified4E0(category)
 {
     Init();
-    fn_80073A48(&lbl_8056BA00, mszFileName, mUnidentified4E0);
+    gTweakFileLoader.LoadFileAsync(mszFileName, mUnidentified4E0);
 }
 
 FielderTweaks::~FielderTweaks()
@@ -155,11 +155,11 @@ void fn_8002B934(PlayerTweaks* tweaks, const char* name,
 
     if (registerTweaks)
     {
-        fn_80073A48(&lbl_8056BA00, name, category);
+        gTweakFileLoader.LoadFileAsync(name, category);
     }
     else
     {
-        fn_802C6CAC(name, category, true);
+        LoadTweakConfigFile(name, category, true);
     }
 }
 
@@ -244,7 +244,7 @@ extern "C" float fn_8002BFA8(PlayerTweaks* tweaks, float value)
 extern "C" float fn_8002BFB8(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified034;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified054;
     float minimum = fielderTweaks->mUnidentified044;
     float terrainMaximum = fielderTweaks->mUnidentified434;
@@ -257,7 +257,7 @@ extern "C" float fn_8002BFB8(PlayerTweaks* tweaks)
 extern "C" float fn_8002C08C(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified024;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     return Interpolate(fielderTweaks->mUnidentified48C,
         fielderTweaks->mUnidentified490,
         playerValue);
@@ -266,7 +266,7 @@ extern "C" float fn_8002C08C(PlayerTweaks* tweaks)
 extern "C" float fn_8002C0AC(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified024;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified0B4;
     float minimum = fielderTweaks->mUnidentified0A4;
     float terrainMaximum = fielderTweaks->mUnidentified434;
@@ -279,7 +279,7 @@ extern "C" float fn_8002C0AC(PlayerTweaks* tweaks)
 extern "C" float fn_8002C180(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified044;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified094;
     float minimum = fielderTweaks->mUnidentified084;
     float terrainMaximum = fielderTweaks->mUnidentified434;
@@ -292,7 +292,7 @@ extern "C" float fn_8002C180(PlayerTweaks* tweaks)
 extern "C" float fn_8002C254(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified034;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified0F4;
     float minimum = fielderTweaks->mUnidentified0E4;
     float terrainMaximum = fielderTweaks->mUnidentified434;
@@ -305,7 +305,7 @@ extern "C" float fn_8002C254(PlayerTweaks* tweaks)
 extern "C" float fn_8002C328(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified034;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified134;
     float minimum = fielderTweaks->mUnidentified124;
     float terrainMaximum = fielderTweaks->mUnidentified434;
@@ -318,7 +318,7 @@ extern "C" float fn_8002C328(PlayerTweaks* tweaks)
 extern "C" float fn_8002C3FC(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified044;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified154;
     float minimum = fielderTweaks->mUnidentified144;
     float terrainMaximum = fielderTweaks->mUnidentified434;
@@ -331,7 +331,7 @@ extern "C" float fn_8002C3FC(PlayerTweaks* tweaks)
 extern "C" float fn_8002C4D0(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified024;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified114;
     float minimum = fielderTweaks->mUnidentified104;
     float terrainMaximum = fielderTweaks->mUnidentified434;
@@ -344,7 +344,7 @@ extern "C" float fn_8002C4D0(PlayerTweaks* tweaks)
 extern "C" float fn_8002C5A4(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified034;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified174;
     float minimum = fielderTweaks->mUnidentified164;
     float terrainMaximum = fielderTweaks->mUnidentified434;
@@ -359,49 +359,49 @@ extern "C" float fn_8002C678(PlayerTweaks* tweaks)
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
     float scale = 0.25f * terrain + 0.75f;
     return Interpolate(
-        scale * gGameTweaks.m_unk14->mUnidentified184.UnidentifiedGetValue(),
-        scale * (float)gGameTweaks.m_unk14->mUnidentified194,
+        scale * gGameTweaks.mFielderTweaks->mUnidentified184.UnidentifiedGetValue(),
+        scale * (float)gGameTweaks.mFielderTweaks->mUnidentified194,
         tweaks->fPassing);
 }
 
 extern "C" float fn_8002C6E8(PlayerTweaks*)
 {
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
-    return gGameTweaks.m_unk14->mUnidentified4B8
+    return gGameTweaks.mFielderTweaks->mUnidentified4B8
          * (0.25f * terrain + 0.75f);
 }
 
 extern "C" float fn_8002C730(PlayerTweaks* tweaks)
 {
-    return Interpolate(gGameTweaks.m_unk14->mUnidentified1A4,
-        gGameTweaks.m_unk14->mUnidentified1B4,
+    return Interpolate(gGameTweaks.mFielderTweaks->mUnidentified1A4,
+        gGameTweaks.mFielderTweaks->mUnidentified1B4,
         tweaks->fPassing);
 }
 
 extern "C" float fn_8002C758(PlayerTweaks* tweaks)
 {
-    return Interpolate(gGameTweaks.m_unk14->mUnidentified224,
-        gGameTweaks.m_unk14->mUnidentified234,
+    return Interpolate(gGameTweaks.mFielderTweaks->mUnidentified224,
+        gGameTweaks.mFielderTweaks->mUnidentified234,
         tweaks->fShooting);
 }
 
 extern "C" float fn_8002C780(PlayerTweaks* tweaks)
 {
-    return Interpolate(gGameTweaks.m_unk14->mUnidentified1C4,
-        gGameTweaks.m_unk14->mUnidentified1D4,
+    return Interpolate(gGameTweaks.mFielderTweaks->mUnidentified1C4,
+        gGameTweaks.mFielderTweaks->mUnidentified1D4,
         tweaks->fShooting);
 }
 
 extern "C" float fn_8002C7A8(PlayerTweaks* tweaks)
 {
-    return Interpolate(gGameTweaks.m_unk14->mUnidentified1E4,
-        gGameTweaks.m_unk14->mUnidentified1F4,
+    return Interpolate(gGameTweaks.mFielderTweaks->mUnidentified1E4,
+        gGameTweaks.mFielderTweaks->mUnidentified1F4,
         tweaks->fShooting);
 }
 
 extern "C" float fn_8002C7D0()
 {
-    return gGameTweaks.m_unk14->mUnidentified3B4;
+    return gGameTweaks.mFielderTweaks->mUnidentified3B4;
 }
 
 extern "C" float fn_8002C7E8(PlayerTweaks* tweaks)
@@ -417,7 +417,7 @@ extern "C" float fn_8002C7F4(PlayerTweaks* tweaks)
 extern "C" float fn_8002C800(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified054;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified304;
     float minimum = fielderTweaks->mUnidentified2F4;
     float terrainMaximum = fielderTweaks->mUnidentified454;
@@ -430,7 +430,7 @@ extern "C" float fn_8002C800(PlayerTweaks* tweaks)
 extern "C" float fn_8002C8D4(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified054;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified344;
     float minimum = fielderTweaks->mUnidentified334;
     float terrainMaximum = fielderTweaks->mUnidentified454;
@@ -443,68 +443,68 @@ extern "C" float fn_8002C8D4(PlayerTweaks* tweaks)
 extern "C" float fn_8002C9A8(PlayerTweaks* tweaks)
 {
     float result = fn_8002C254(tweaks);
-    result *= Interpolate(gGameTweaks.m_unk14->mUnidentified314,
-        gGameTweaks.m_unk14->mUnidentified324,
+    result *= Interpolate(gGameTweaks.mFielderTweaks->mUnidentified314,
+        gGameTweaks.mFielderTweaks->mUnidentified324,
         tweaks->mUnidentified054);
     if (fn_8002BE84(tweaks) > 0.9f)
     {
         result *= 1.175f;
     }
-    return result * Interpolate(gGameTweaks.m_unk14->mUnidentified424, gGameTweaks.m_unk14->mUnidentified434, g_pGame->mpTerrain->GetSpeedFactor());
+    return result * Interpolate(gGameTweaks.mFielderTweaks->mUnidentified424, gGameTweaks.mFielderTweaks->mUnidentified434, g_pGame->mpTerrain->GetSpeedFactor());
 }
 
 extern "C" float fn_8002CB2C(PlayerTweaks*)
 {
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float terrainMaximum = fielderTweaks->mUnidentified434;
     float terrainMinimum = fielderTweaks->mUnidentified424;
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
     float terrainScale = Interpolate(terrainMinimum, terrainMaximum, terrain);
-    return terrainScale * (float)gGameTweaks.m_unk14->mUnidentified3C4;
+    return terrainScale * (float)gGameTweaks.mFielderTweaks->mUnidentified3C4;
 }
 
 extern "C" float fn_8002CBB8(PlayerTweaks*)
 {
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float terrainMaximum = fielderTweaks->mUnidentified434;
     float terrainMinimum = fielderTweaks->mUnidentified424;
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
     float terrainScale = Interpolate(terrainMinimum, terrainMaximum, terrain);
-    return terrainScale * (float)gGameTweaks.m_unk14->mUnidentified3E4;
+    return terrainScale * (float)gGameTweaks.mFielderTweaks->mUnidentified3E4;
 }
 
 extern "C" float fn_8002CC44(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified034;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified054;
     float minimum = fielderTweaks->mUnidentified044;
     float terrainMaximum = fielderTweaks->mUnidentified434;
     float terrainMinimum = fielderTweaks->mUnidentified424;
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
     float terrainScale = Interpolate(terrainMinimum, terrainMaximum, terrain);
-    return gGameTweaks.m_unk14->mUnidentified494 * terrainScale
+    return gGameTweaks.mFielderTweaks->mUnidentified494 * terrainScale
          * Interpolate(minimum, maximum, playerValue);
 }
 
 extern "C" float fn_8002CD2C(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified034;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified054;
     float minimum = fielderTweaks->mUnidentified044;
     float terrainMaximum = fielderTweaks->mUnidentified434;
     float terrainMinimum = fielderTweaks->mUnidentified424;
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
     float terrainScale = Interpolate(terrainMinimum, terrainMaximum, terrain);
-    return gGameTweaks.m_unk14->mUnidentified49C * terrainScale
+    return gGameTweaks.mFielderTweaks->mUnidentified49C * terrainScale
          * Interpolate(minimum, maximum, playerValue);
 }
 
 extern "C" float fn_8002CE14(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified034;
-    FielderTweaks* fielderTweaks = gGameTweaks.m_unk14;
+    FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified074;
     float minimum = fielderTweaks->mUnidentified064;
     float terrainMaximum = fielderTweaks->mUnidentified434;
@@ -516,93 +516,93 @@ extern "C" float fn_8002CE14(PlayerTweaks* tweaks)
 
 extern "C" float fn_8002CEE8(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified488;
+    return gGameTweaks.mFielderTweaks->mUnidentified488;
 }
 
 extern "C" float fn_8002CEFC(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified498;
+    return gGameTweaks.mFielderTweaks->mUnidentified498;
 }
 
 extern "C" float fn_8002CF10(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified474;
+    return gGameTweaks.mFielderTweaks->mUnidentified474;
 }
 
 extern "C" float fn_8002CF24(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified478;
+    return gGameTweaks.mFielderTweaks->mUnidentified478;
 }
 
 extern "C" float fn_8002CF38(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified480;
+    return gGameTweaks.mFielderTweaks->mUnidentified480;
 }
 
 extern "C" float fn_8002CF4C(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified484;
+    return gGameTweaks.mFielderTweaks->mUnidentified484;
 }
 
 extern "C" float fn_8002CF60(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified4AC;
+    return gGameTweaks.mFielderTweaks->mUnidentified4AC;
 }
 
 extern "C" float fn_8002CF74(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified4B0;
+    return gGameTweaks.mFielderTweaks->mUnidentified4B0;
 }
 
 extern "C" float fn_8002CF88(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified4C0;
+    return gGameTweaks.mFielderTweaks->mUnidentified4C0;
 }
 
 extern "C" float fn_8002CF9C(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified4C4;
+    return gGameTweaks.mFielderTweaks->mUnidentified4C4;
 }
 
 extern "C" float fn_8002CFB0(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified4C8;
+    return gGameTweaks.mFielderTweaks->mUnidentified4C8;
 }
 
 extern "C" float fn_8002CFC4(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified4BC;
+    return gGameTweaks.mFielderTweaks->mUnidentified4BC;
 }
 
 extern "C" float fn_8002CFD8(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified3D4;
+    return gGameTweaks.mFielderTweaks->mUnidentified3D4;
 }
 
 extern "C" float fn_8002CFF0(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->fGreenShellSpeed;
+    return gGameTweaks.mFielderTweaks->fGreenShellSpeed;
 }
 
 extern "C" float fn_8002D008(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified364;
+    return gGameTweaks.mFielderTweaks->mUnidentified364;
 }
 
 extern "C" float fn_8002D020(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified384;
+    return gGameTweaks.mFielderTweaks->mUnidentified384;
 }
 
 extern "C" float fn_8002D038(PlayerTweaks*)
 {
-    return gGameTweaks.m_unk14->mUnidentified374;
+    return gGameTweaks.mFielderTweaks->mUnidentified374;
 }
 
 extern "C" float fn_8002D050(PlayerTweaks* tweaks)
 {
-    return Interpolate(gGameTweaks.m_unk14->mUnidentified394,
-        gGameTweaks.m_unk14->mUnidentified3A4,
+    return Interpolate(gGameTweaks.mFielderTweaks->mUnidentified394,
+        gGameTweaks.mFielderTweaks->mUnidentified3A4,
         tweaks->mUnidentified074);
 }
 

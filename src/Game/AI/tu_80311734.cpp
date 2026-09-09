@@ -8,9 +8,8 @@
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlPrint.h"
 
-extern int nlPrintf(const char*, ...);
-extern "C" int fn_802DF9FC(InterpreterCore*);
 extern "C" void fn_800B6A1C(
     UnidentifiedVariant_80054AB8*, int, const Variant&);
 extern "C" void fn_8031A04C();
@@ -292,7 +291,7 @@ extern "C" int fn_80312208(unsigned long hash)
     return -1;
 }
 
-bool UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual2(
+bool UnidentifiedFuzzyRuntimeBase::ExecuteFunction(
     FunctionEntryPoint* function, unsigned int argumentCount,
     u32 arg1, u32 arg2, u32 arg3, u32 arg4)
 {
@@ -300,7 +299,7 @@ bool UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual2(
     UnidentifiedVariant_80054AB8* value;
 
     mUnidentified05C = function->hash;
-    bool result = InterpreterCore::UnidentifiedVirtual2(
+    bool result = InterpreterCore::ExecuteFunction(
         function, argumentCount, arg1, arg2, arg3, arg4);
 
     UnidentifiedVariant_80054AB8* returnValue =
@@ -336,15 +335,15 @@ extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     switch (argumentCount)
     {
     case 0:
-        runtime->UnidentifiedVirtual2(
+        runtime->ExecuteFunction(
             function, 0, 0, 0, 0, 0);
         break;
     case 1:
-        runtime->UnidentifiedVirtual2(
+        runtime->ExecuteFunction(
             function, 1, (u32)arg1, 0, 0, 0);
         break;
     case 2:
-        runtime->UnidentifiedVirtual2(
+        runtime->ExecuteFunction(
             function, 2, (u32)arg1, (u32)arg2, 0, 0);
         break;
     }
@@ -368,9 +367,9 @@ extern "C" UnidentifiedVariant_80054AB8* fn_8031243C(
         runtime->mUnidentified064 = action;
         void* value = runtime->mValue->mData.pointer;
         u32 localHash = hash;
-        FunctionEntryPoint* function = fn_802DF3E4(runtime, &localHash);
+        FunctionEntryPoint* function = runtime->FindFunctionEntryPoint(localHash);
         runtime->mUnidentified060 = true;
-        runtime->UnidentifiedVirtual2(
+        runtime->ExecuteFunction(
             function, 1, (u32)value, 0, 0, 0);
 
         UnidentifiedVariant_80054AB8* result =
@@ -808,7 +807,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_803152F0(
         new (lbl_805842C8.Allocate())
             UnidentifiedVariant_80054AB8(value);
     fn_800B6A1C(result, 4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = fn_802DF9FC(runtime) + 1;
+    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
 

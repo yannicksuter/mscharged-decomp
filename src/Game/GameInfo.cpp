@@ -1,10 +1,16 @@
+#include <RVLFaceLib/RFL_Database.h>
+#include <dwc/dwc_account.h>
+
 #include "Game/GameInfo.h"
-#include "Game/FE/feHelpFuncs.h"
 
 #include "Game/DB/SaveLoad.h"
 #include "Game/DB/UserOptions.h"
 #include "Game/DB/GameProgress.h"
+#include "Game/FE/feHelpFuncs.h"
 #include "Game/NetworkSession.h"
+#include "Game/TweakRegistry.h"
+#include "Game/main.h"
+#include "NL/nlDebug.h"
 #include "NL/nlMemory.h"
 #include "NL/nlMath.h"
 #include "NL/nlPrint.h"
@@ -13,26 +19,6 @@
 #include "Game/DB/StadiumInfo.h"
 
 #include <string.h>
-#include "NL/nlstring_tmpl.h"
-
-struct RFLCreateID;
-struct DWCstAccUserData;
-typedef DWCstAccUserData DWCAccUserData;
-
-extern "C" int RFLSearchOfficialData(const RFLCreateID*, u16*);
-extern "C" int DWC_CheckDirtyFlag(const DWCAccUserData*);
-extern "C" void DWC_ClearDirtyFlag(DWCAccUserData*);
-
-extern "C" void* fn_8010D668(void*);
-extern "C" void fn_800FBCB0(void*, int);
-extern "C" bool GetTweakBool(const char*, bool);
-extern "C" bool fn_802C2DBC(const char*);
-extern "C" const char* GetTweakString(const char*, const char*);
-extern "C" int GetTweakInt(const char*, int);
-extern "C" void nlBreak__Fv();
-extern "C" void* fn_8010D6F8(void*, void*);
-extern "C" void* fn_8010D794(void*, void*);
-extern bool g_e3_Build;
 
 static const GameRules kDefaultRules[12] = {
     { 1, 1, 7 },
@@ -73,13 +59,13 @@ GameInfoManager::GameInfoManager()
     mGameInfo[GM_MODE_4] = 0;
 
     mGameInfo[GM_FRIENDLY] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
-    fn_800FBCB0(mGameInfo[GM_FRIENDLY], 0);
+    mGameInfo[GM_FRIENDLY]->Reset(false);
     mGameInfo[GM_MODE_2] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
-    fn_800FBCB0(mGameInfo[GM_MODE_2], 0);
+    mGameInfo[GM_MODE_2]->Reset(false);
     mGameInfo[GM_MODE_1] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
-    fn_800FBCB0(mGameInfo[GM_MODE_1], 0);
+    mGameInfo[GM_MODE_1]->Reset(false);
     mGameInfo[GM_MODE_4] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
-    fn_800FBCB0(mGameInfo[GM_MODE_4], 0);
+    mGameInfo[GM_MODE_4]->Reset(false);
 
     if (GetTweakBool("User/skipfe", false)) {
         SetMode(GM_FRIENDLY, false);
@@ -104,17 +90,17 @@ GameInfoManager::GameInfoManager()
     }
 
     mUserInfo.mGameplayOptions.InitializeDefaults();
-    mUserInfo.mPowerupOptions.InitializeDefaults();
+    mUserInfo.mCheatOptions.InitializeDefaults();
 
     mDefaultSettings.SkillLevel = GameplaySettings::ROOKIE;
-    mDefaultSettings.BestSeries = 3;
-    mDefaultSettings.WinBy = 0;
-    mDefaultSettings.GameGoals = 5;
+    mDefaultSettings.NumGames = 3;
+    mDefaultSettings.GameLimitType = 0;
+    mDefaultSettings.GoalLimit = 5;
     mDefaultSettings.GameTime = 0xB4;
     mMode1Settings.SkillLevel = GameplaySettings::ROOKIE;
-    mMode1Settings.BestSeries = 1;
-    mMode1Settings.WinBy = 0;
-    mMode1Settings.GameGoals = 5;
+    mMode1Settings.NumGames = 1;
+    mMode1Settings.GameLimitType = 0;
+    mMode1Settings.GoalLimit = 5;
     mMode1Settings.GameTime = 0xB4;
     sThis = this;
 
@@ -198,16 +184,16 @@ void GameInfoManager::ResetPlayingSides()
     }
 }
 
-void GameInfoManager::SetMode(int mode, u8 isOnline)
+void GameInfoManager::SetMode(int mode, u8 flag)
 {
     mCurrentMode = mode;
     unknown_0x122 = 0;
-    mIsOnlineMode = isOnline;
+    mIsOnlineMode = flag;
 }
 
-void* GameInfoManager::GetUnknown806E0F90Block() const
+unsigned long GameInfoManager::GetSettingsDataSize() const
 {
-    return (u8*)fn_8010D668(g_pCupManager) + 0x144;
+    return g_pCupManager->GetSaveDataSize() + 0x144;
 }
 
 unsigned long GameInfoManager::GetMemoryCardDataSize() const
@@ -217,10 +203,10 @@ unsigned long GameInfoManager::GetMemoryCardDataSize() const
 
 void GameInfoManager::SerializeSettings(void* data) const
 {
-    memcpy(data, &mUserInfo, sizeof(UserInfo));
-    data = (u8*)data + sizeof(UserInfo);
+    memcpy(data, &mUserInfo, sizeof(mUserInfo));
+    data = (u8*)data + 0x80;
     memcpy(data, mRulesTable, sizeof(mRulesTable));
-    g_pStrikerChallenge->SerializeData(fn_8010D6F8(g_pCupManager, (u8*)data + sizeof(mRulesTable)));
+    g_pStrikerChallenge->SerializeData(g_pCupManager->SerializeData((u8*)data + sizeof(mRulesTable)));
 }
 
 void GameInfoManager::GetMemoryCardData(void* data) const
@@ -230,10 +216,10 @@ void GameInfoManager::GetMemoryCardData(void* data) const
 
 void GameInfoManager::DeserializeSettings(void* data)
 {
-    memcpy(&mUserInfo, data, sizeof(UserInfo));
-    data = (u8*)data + sizeof(UserInfo);
+    memcpy(&mUserInfo, data, sizeof(mUserInfo));
+    data = (u8*)data + 0x80;
     memcpy(mRulesTable, data, sizeof(mRulesTable));
-    g_pStrikerChallenge->DeserializeData(fn_8010D794(g_pCupManager, (u8*)data + sizeof(mRulesTable)));
+    g_pStrikerChallenge->DeserializeData(g_pCupManager->DeserializeData((u8*)data + sizeof(mRulesTable)));
 }
 
 void GameInfoManager::SetMemoryCardData(const void* data)
@@ -288,8 +274,8 @@ VisualSettings* GameInfoManager::GetVisualOptions()
 
 const GameplaySettings* GameInfoManager::GetCurrentSettings() const
 {
-    if (unknown_0x27C) {
-        const GameplaySettings* settings = &mCurGameSettings;
+    if (mUseCurGameSettings) {
+        const GameplaySettings* settings = &mCurGameGameplayOptions;
 
         return settings;
     }
@@ -324,18 +310,18 @@ const GameplaySettings* GameInfoManager::GetCurrentSettings() const
     return settings;
 }
 
-const PowerupSettings* GameInfoManager::GetActiveRules() const
+const CheatSettings* GameInfoManager::GetActiveRules() const
 {
     if (UseAltRules()) {
         return &mRulesA;
     }
 
-    return &mUserInfo.mPowerupOptions;
+    return &mUserInfo.mCheatOptions;
 }
 
 void GameInfoManager::ResetUnknown0xA0()
 {
-    unknown_0x27C = 0;
+    mUseCurGameSettings = 0;
     mUserInfo.mAudioOptions.ApplySettings();
 }
 
@@ -351,20 +337,31 @@ void GameInfoManager::SetupGameFromConfig()
     char name[64];
     const GameplaySettings* settings = GetCurrentSettings();
 
-    mCurGameSettings = *settings;
-    unknown_0x27C = 1;
+    mCurGameGameplayOptions.SkillLevel = settings->SkillLevel;
+    mCurGameGameplayOptions.GameLimitType = settings->GameLimitType;
+    mCurGameGameplayOptions.GameTime = settings->GameTime;
+    mCurGameGameplayOptions.GoalLimit = settings->GoalLimit;
+    mCurGameGameplayOptions.NumGames = settings->NumGames;
+    mCurGameGameplayOptions.mHomePowerupsEnabled = settings->mHomePowerupsEnabled;
+    mCurGameGameplayOptions.mAwayPowerupsEnabled = settings->mAwayPowerupsEnabled;
+    mCurGameGameplayOptions.mHomeMegastrikeEnabled = settings->mHomeMegastrikeEnabled;
+    mCurGameGameplayOptions.mAwayMegastrikeEnabled = settings->mAwayMegastrikeEnabled;
+    mCurGameGameplayOptions.m_unk18 = settings->m_unk18;
+    mCurGameGameplayOptions.m_unk19 = settings->m_unk19;
+    mCurGameGameplayOptions.m_unk1A = settings->m_unk1A;
+    mUseCurGameSettings = 1;
 
     for (int side = 0; side < 2; side++) {
         nlSNPrintf(name, sizeof(name), "user/team%d", side + 1);
 
-        if (fn_802C2DBC(name)) {
+        if (TweakExists(name)) {
             SetTeam(side, ConvertToTeamID(GetTweakString(name, kDefaultTeam)));
         }
 
         for (int sidekick = 0; sidekick < 3; sidekick++) {
             nlSNPrintf(name, sizeof(name), side == 0 ? "user/sidekickhome%d" : "user/sidekickaway%d", sidekick);
 
-            if (fn_802C2DBC(name)) {
+            if (TweakExists(name)) {
                 SetSidekick(side,
                     ConvertToSidekickID(GetTweakString(name, side == 0 ? kDefaultHomeSidekick : kDefaultAwaySidekick)),
                     sidekick);
@@ -372,14 +369,14 @@ void GameInfoManager::SetupGameFromConfig()
         }
     }
 
-    if (fn_802C2DBC("user/soak_diff")) {
-        mCurGameSettings.SkillLevel = static_cast<GameplaySettings::eSkillLevel>(GetTweakInt("user/soak_diff", 2));
+    if (TweakExists("user/soak_diff")) {
+        mCurGameGameplayOptions.SkillLevel = (GameplaySettings::eSkillLevel)GetTweakInt("user/soak_diff", 2);
     }
 
     for (int pad = 0; pad < 4; pad++) {
         nlSNPrintf(padName, sizeof(padName), "user/pad%d", pad);
 
-        if (fn_802C2DBC(padName)) {
+        if (TweakExists(padName)) {
             const char* value = GetTweakString(padName, kHomeSide);
 
             if (nlStrNCmp(value, kHomeSide, sizeof(padName)) == 0) {
@@ -391,33 +388,33 @@ void GameInfoManager::SetupGameFromConfig()
     }
 
     if (mCurrentMode == GM_MODE_2) {
-        mCurGameSettings.GameTime = 0x78;
-        mCurGameSettings.SkillLevel = GameplaySettings::PROFESSIONAL;
+        mCurGameGameplayOptions.GameTime = 0x78;
+        mCurGameGameplayOptions.SkillLevel = GameplaySettings::PROFESSIONAL;
     } else if (unknown_0x122) {
-        mCurGameSettings.GameTime = 0xEA24;
+        mCurGameGameplayOptions.GameTime = 0xEA24;
     } else if (g_e3_Build) {
-        mCurGameSettings.GameTime = 0xB4;
-        mCurGameSettings.SkillLevel = GameplaySettings::ROOKIE;
+        mCurGameGameplayOptions.GameTime = 0xB4;
+        mCurGameGameplayOptions.SkillLevel = GameplaySettings::ROOKIE;
     } else if (mCurrentMode == GM_MODE_4) {
         StrikerChallenge* other = g_pStrikerChallenge;
 
-        mCurGameSettings.GameTime = other->mRemainingTime;
-        mCurGameSettings.HomePowerUps = other->mHomePowerupsEnabled;
-        mCurGameSettings.AwayPowerUps = other->mAwayPowerupsEnabled;
-        mCurGameSettings.HomeShoot2Score = other->mHomeMegastrikeEnabled;
-        mCurGameSettings.AwayShoot2Score = other->mAwayMegastrikeEnabled;
-        mCurGameSettings.HomeSkillShots = other->mHomeSkillshotEnabled;
-        mCurGameSettings.AwaySkillShots = other->mAwaySkillshotEnabled;
-        mCurGameSettings.WinBy = 0;
-        mCurGameSettings.SkillLevel = static_cast<GameplaySettings::eSkillLevel>(other->mAIDifficulty);
-        mCurGameSettings.BestSeries = 1;
+        mCurGameGameplayOptions.GameTime = other->mRemainingTime;
+        mCurGameGameplayOptions.mHomePowerupsEnabled = other->mHomePowerupsEnabled;
+        mCurGameGameplayOptions.mAwayPowerupsEnabled = other->mAwayPowerupsEnabled;
+        mCurGameGameplayOptions.mHomeMegastrikeEnabled = other->mHomeMegastrikeEnabled;
+        mCurGameGameplayOptions.mAwayMegastrikeEnabled = other->mAwayMegastrikeEnabled;
+        mCurGameGameplayOptions.m_unk18 = other->mHomeSkillshotDisabled;
+        mCurGameGameplayOptions.m_unk19 = other->mAwaySkillshotDisabled;
+        mCurGameGameplayOptions.GameLimitType = 0;
+        mCurGameGameplayOptions.SkillLevel = (GameplaySettings::eSkillLevel)other->mAIDifficulty;
+        mCurGameGameplayOptions.NumGames = 1;
     }
 
     if (GetTweakBool("User/skipfe", false)) {
-        mCurGameSettings.BestSeries = 11;
+        mCurGameGameplayOptions.NumGames = 11;
     }
 
-    if (fn_802C2DBC("User/stadium")) {
+    if (TweakExists("User/stadium")) {
         const char* value = GetTweakString("User/stadium", 0);
 
         SetStadium(-1);
@@ -425,7 +422,7 @@ void GameInfoManager::SetupGameFromConfig()
         for (int stadium = 0; stadium < 18; stadium++) {
             if (nlStrICmp(GetStadiumName(stadium), value) == 0) {
                 if (IsStadiumEnabled(stadium) == 0) {
-                    nlBreak__Fv();
+                    nlBreak();
                 }
 
                 SetStadium(stadium);

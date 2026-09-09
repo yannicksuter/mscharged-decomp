@@ -3,11 +3,11 @@
 
 #include "types.h"
 
-class TargetPlatform_8036DE50;
+class GLXTarget;
 
-struct TargetInfo_8036DE50
+struct GLTargetInfo
 {
-    TargetInfo_8036DE50()
+    GLTargetInfo()
         : unknown08(0)
         , unknown0C(0)
     {
@@ -28,7 +28,7 @@ struct TargetInfo_8036DE50
 struct GLRenderPair
 {
     unsigned long hash;
-    TargetPlatform_8036DE50* target;
+    GLXTarget* target;
 
     GLRenderPair()
         : hash(0)
@@ -36,7 +36,7 @@ struct GLRenderPair
     {
     }
 
-    GLRenderPair(unsigned long targetHash, TargetPlatform_8036DE50* platformTarget)
+    GLRenderPair(unsigned long targetHash, GLXTarget* platformTarget)
         : hash(targetHash)
         , target(platformTarget)
     {
@@ -50,9 +50,9 @@ struct GLRenderPair
 
 void gl_TargetStartup();
 
-extern "C" GLRenderPair fn_802CD82C();
-extern "C" GLRenderPair fn_802CD884(const char* name, const TargetInfo_8036DE50* targetInfo);
-extern "C" void fn_802CDA14(GLRenderPair* target);
-extern "C" unsigned long fn_802CDAA8(GLRenderPair target);
+GLRenderPair glGetBackBufferTarget();
+GLRenderPair glCreateTarget(const char* name, const GLTargetInfo* targetInfo);
+void glDestroyTarget(GLRenderPair* target);
+unsigned long glGetTargetTexture(GLRenderPair target);
 
 #endif // NL_GL_GLTARGET_H

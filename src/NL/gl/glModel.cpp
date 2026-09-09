@@ -84,7 +84,7 @@ glModel* glModelDupArrayNoStreams(
     unsigned long numPackets;
     int i;
 
-    fn_802C8284(pModelArray->unknown00);
+    glBeginResource(pModelArray->unknown00);
 
     if (bPermanent)
     {
@@ -152,7 +152,7 @@ glModel* glModelDupArrayNoStreams(
         ++i;
     }
 
-    fn_802C8288();
+    glEndResource();
     return result;
 }
 

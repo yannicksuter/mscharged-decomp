@@ -10,7 +10,7 @@
 #include "NL/nlFileGC.h"
 #include "NL/nlMemory.h"
 #include "types.h"
-#include "unclassified/tu_80139B18.h"
+#include "Game/RumbleActions.h"
 
 struct LoadingTextEntry
 {
@@ -2294,7 +2294,7 @@ void DisplayDVDMessageSebring(int arg)
 
     if (g_pNetworkSession != 0)
     {
-        g_pNetworkSession->fn_801241C8();
+        g_pNetworkSession->DisconnectOnlineMatch();
     }
     ResetTask::s_checkCardRemoved = true;
 }

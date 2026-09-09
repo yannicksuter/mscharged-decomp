@@ -3,10 +3,9 @@
 
 #include "RVL_SDK/thp/THPSimple.h"
 
-#include "Game/ResourceInterface_802CC094.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glTexture.h"
 #include "NL/gc/gcSwizzler.h"
-#include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"
 #include "NL/glx/glxSwap.h"
 #include "NL/glx/glxTexture.h"
@@ -21,6 +20,7 @@
 
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
+#include "NL/gl/glTexture.h"
 
 static THPVideoInfo videoInfo;
 static PlatTexture* pTex[4];
@@ -87,7 +87,7 @@ bool MovieStart(
     }
 
     THPSimpleGetVideoInfo(&videoInfo);
-    ResourceInterface_802CC094* resourceInterface = fn_802CC094();
+    GLResourcePool* resourceInterface = glGetCurrentResourcePool();
     MemoryAllocator* allocator = (MemoryAllocator*)resourceInterface;
     resourceMarker = resourceInterface->MarkResource();
 
@@ -180,7 +180,7 @@ bool MovieStop()
     pTex[2] = 0;
     pTex[3] = 0;
 
-    fn_802CC094()->ReleaseResource(resourceMarker);
+    glGetCurrentResourcePool()->ReleaseResource(resourceMarker);
     return true;
 }
 

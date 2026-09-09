@@ -1,19 +1,19 @@
 #ifndef UNCLASSIFIED_TU_802337F4_H
 #define UNCLASSIFIED_TU_802337F4_H
 
-#include "Game/SH/SHSceneBase.h"
+#include "Game/SH/SHStrikerTimesBase.h"
 #include "Game/FE/feBackButton.h"
 
-class TU802337F4Scene : public UnidentifiedSHSceneBase
+class TU802337F4Scene : public SHStrikerTimesBase
 {
 public:
     TU802337F4Scene();
     virtual ~TU802337F4Scene();
     virtual void Update(float dt);
     virtual void SceneCreated();
-    virtual void SHSceneVirtual2C(unsigned int transition);
-    virtual void SHSceneVirtual30();
-    virtual void SHSceneVirtual34();
+    virtual void SetDisplayMode(unsigned int transition);
+    virtual void OnDoneTransitionComplete();
+    virtual void OnBackTransitionComplete();
 
     static void fn_80233948();
     static void fn_80233980();

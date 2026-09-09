@@ -2,10 +2,11 @@
 
 #include "Game/Drawable/DrawableModel.h"
 #include "Game/MathHelpers.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMemory.h"
-#include "unclassified/tu_80276264.h"
+#include "Game/Render/StadiumLoading.h"
+#include "NL/gl/glTexture.h"
 
 typedef NetMeshModelLoader::NetMeshVertex NetMeshVertex;
 typedef NetMeshModelLoader::NetMeshEdge NetMeshEdge;
@@ -20,7 +21,6 @@ typedef nlAVLTreeIterator<NetMeshEdge, int,
     DefaultKeyCompare<NetMeshEdge> >
     EdgeIterator;
 
-extern unsigned long lbl_806E1F0C;
 
 static int s_initialEdgeCount = 1;
 static int s_initialVertexCount = 1;
@@ -53,7 +53,7 @@ void NetMeshModelLoader::LoadGeometryFromModel()
     m_VertexList = new (nlMalloc(sizeof(VertexTree), 8, false))
         VertexTree(0x10, 0x10);
 
-    DrawableModel* pDrawable = (DrawableModel*)fn_8027725C(m_NetMeshDrawableObjectID);
+    DrawableModel* pDrawable = (DrawableModel*)FindStadiumDrawableObject(m_NetMeshDrawableObjectID);
     u16 numPackets = (u16)pDrawable->m_pModel->numPackets;
 
     m_NumTriStripIndices = 0;
@@ -107,7 +107,7 @@ void NetMeshModelLoader::ReadVerticesFromGeometryPacket(
         ++i;
     }
 
-    m_NetMesh.SetTexture(fn_802CC7E4(&packet, lbl_806E1F0C));
+    m_NetMesh.SetTexture(glGetMaterialUnsignedParameter(&packet, gDiffuseTextureSemantic));
 
     for (int i2 = 0; i2 < packet.numUniqueVertices; ++i2)
     {
@@ -311,7 +311,7 @@ void NetMeshModelLoader::CreateNetMeshFromVertexList()
     m_NetMesh.Allocate(
         m_NumParticles, numEdges, numConstrainedVertices);
 
-    DrawableModel* pObject = (DrawableModel*)fn_8027725C(m_NetMeshDrawableObjectID);
+    DrawableModel* pObject = (DrawableModel*)FindStadiumDrawableObject(m_NetMeshDrawableObjectID);
 
     nlVector3 minimum;
     minimum.x = 10000.0f;

@@ -1,18 +1,19 @@
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Render/RLViewLayers.h"
+#include "Game/SH/SHNavigation.h"
+#include "Game/FE/feMusic.h"
 #include "NL/plat/PlatPadManager.h"
 #include "Game/HBMManager.h"
 
 #include "unclassified/tu_80284A58.h"
 
-#include "Game/SH/SHNavigation.h"
-#include "Game/SH/SHBootLoading.h"
-#include "Game/SH/SHLoading.h"
+#include "Game/BaseGameSceneManager.h"
 #include "Game/GameSceneManager.h"
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
 #include "Game/GameInfo.h"
-#include "Game/Render/tu_80271960.h"
+#include "Game/Game.h"
+#include "Game/Render/HomeButtonFade.h"
 #include "Game/Task/ResetTask.h"
 #include "Game/Sys/audio.h"
 #include "Game/Sys/movie.h"
@@ -24,14 +25,22 @@
 #include "NL/nlMemory.h"
 #include "NL/nlTask.h"
 
-#include "Game/Game.h"
-#include "Game/FE/feMusic.h"
-
+#include <revolution/hbm/HBMCommon.h>
 #include <revolution/sc.h>
-#include <revolution/tpl/TPL.h>
+#include <revolution/tpl.h>
 #include <string.h>
 
-extern "C" bool IsIdleAndNoShotInProgress(UnidentifiedPresentationState* presentation);
+extern BaseGameSceneManager* g_pGameSceneManager;
+extern BaseGameSceneManager* g_pOverlayManager;
+
+extern MemoryAllocator* AllocatorStack[16];
+extern unsigned int AllocatorStackDepth;
+
+class UnidentifiedHBMScene : public BaseSceneHandler
+{
+public:
+    virtual void UnidentifiedVirtual2C();
+};
 
 class HBMHideEvent
     : public UnidentifiedStaticEvent<UnidentifiedEventNoData, 8>
@@ -49,7 +58,7 @@ static HBMHideEvent sHBMHideEvent;
 
 HBMManager* gpHBMManager;
 
-void HBMManager::ResourceLoaded(
+void HBMManager::OnFileLoaded(
     void* data, unsigned long, void* userData)
 {
     *(void**)userData = data;
@@ -139,11 +148,11 @@ void HBMManager::LoadResources()
     }
 
     nlSNPrintf(path, sizeof(path), "%s%s", "HomeButton2", archiveName);
-    nlLoadEntireFileAsync(path, ResourceLoaded, &mDataInfo.layoutBuf, 32,
+    nlLoadEntireFileAsync(path, OnFileLoaded, &mDataInfo.layoutBuf, 32,
         AllocateStart, 0, 0, &VirtualAllocator);
 
     nlSNPrintf(path, sizeof(path), "%s%s", "HomeButton2", "/SpeakerSe.arc");
-    nlLoadEntireFileAsync(path, ResourceLoaded, &mDataInfo.spkSeBuf, 32,
+    nlLoadEntireFileAsync(path, OnFileLoaded, &mDataInfo.spkSeBuf, 32,
         AllocateStart, 0, 0, &VirtualAllocator);
 
     nlSNPrintf(path, sizeof(path), "%s%s", "HomeButton2", "/home_nosave.csv");
@@ -163,7 +172,7 @@ void HBMManager::LoadResources()
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 
     memset(messageBuffer, 0, messageBufferSize);
-    nlLoadEntireFileAsync(path, ResourceLoaded, &mDataInfo.msgBuf, 32,
+    nlLoadEntireFileAsync(path, OnFileLoaded, &mDataInfo.msgBuf, 32,
         AllocateStart, messageBuffer, messageBufferSize, 0);
 
     nlSNPrintf(path, sizeof(path), "%s%s", "HomeButton2", "/config.txt");
@@ -183,19 +192,19 @@ void HBMManager::LoadResources()
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 
     memset(configBuffer, 0, configBufferSize);
-    nlLoadEntireFileAsync(path, ResourceLoaded, &mDataInfo.configBuf, 32,
+    nlLoadEntireFileAsync(path, OnFileLoaded, &mDataInfo.configBuf, 32,
         AllocateStart, configBuffer, configBufferSize, 0);
 
     nlSNPrintf(path, sizeof(path), "%s%s", "HomeButton2", "/homeBtnIcon.tpl");
-    nlLoadEntireFileAsync(path, ResourceLoaded, &mIconPalette, 32,
+    nlLoadEntireFileAsync(path, OnFileLoaded, &mIconPalette, 32,
         AllocateStart, 0, 0, &VirtualAllocator);
 
     nlSNPrintf(path, sizeof(path), "%s%s", "HomeButton2", "/HomeButtonSe.brsar");
-    nlLoadEntireFileAsync(path, ResourceLoaded, &mSoundData, 32,
+    nlLoadEntireFileAsync(path, OnFileLoaded, &mSoundData, 32,
         AllocateStart, 0, 0, &VirtualAllocator);
 }
 
-void HBMManager::SetupRenderState()
+void HBMManager::SetupGX()
 {
     Mtx44 projection;
 
@@ -237,13 +246,13 @@ void HBMManager::Show()
 
     if (IsBlocked())
     {
-        ShowBlockedWarning();
+        OnHomeButtonPressed();
         return;
     }
 
-    if (!fn_80271960()->mEnabled)
+    if (!HomeButtonFade::Instance()->mEnabled)
     {
-        fn_80271960()->fn_802719A0();
+        HomeButtonFade::Instance()->FadeOut();
     }
 
     HBMCreate(&mDataInfo);
@@ -317,11 +326,11 @@ void HBMManager::Update()
             {
                 FEMusic::ResumeStream();
             }
-            fn_80271960()->fn_80271A00();
+            HomeButtonFade::Instance()->FadeIn();
             gxInit();
             GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
             GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
-            sHBMHideEvent.UnidentifiedDeliver();
+            sHBMHideEvent.Deliver();
         }
         nlTaskManager::SetNextState(mPreviousTaskState);
         break;
@@ -332,11 +341,11 @@ void HBMManager::Update()
         if (gpHBMManager->mActive)
         {
             gpHBMManager->mActive = false;
-            fn_80271960()->fn_80271A00();
+            HomeButtonFade::Instance()->FadeIn();
             gxInit();
             GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
             GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
-            sHBMHideEvent.UnidentifiedDeliver();
+            sHBMHideEvent.Deliver();
         }
         ResetTask::s_ResetMode = 3;
         if (ResetTask::s_ResetState == RS_RUNNING)
@@ -351,11 +360,11 @@ void HBMManager::Update()
         if (gpHBMManager->mActive)
         {
             gpHBMManager->mActive = false;
-            fn_80271960()->fn_80271A00();
+            HomeButtonFade::Instance()->FadeIn();
             gxInit();
             GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
             GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
-            sHBMHideEvent.UnidentifiedDeliver();
+            sHBMHideEvent.Deliver();
         }
         ResetTask::s_ResetMode = 0;
         if (ResetTask::s_ResetState == RS_RUNNING)
@@ -366,9 +375,9 @@ void HBMManager::Update()
     }
 }
 
-void HBMManager::Draw()
+void HBMManager::Render()
 {
-    SetupRenderState();
+    SetupGX();
     HBMDraw();
 }
 
@@ -403,27 +412,27 @@ bool HBMManager::IsBlocked()
     return false;
 }
 
-void HBMManager::ShowBlockedWarning()
+void HBMManager::OnHomeButtonPressed()
 {
     unsigned int state = nlTaskManager::m_pInstance->mCurrentState;
     BaseSceneHandler* scene;
 
     if ((state & 0x00080000) != 0)
     {
-        if (GameSceneManager::Instance() != 0)
+        if (g_pGameSceneManager != 0)
         {
             if (g_pLocalization->m_CurrentLanguage
                 == nlLocalization::LangJapanese)
             {
-                scene = GameSceneManager::Instance()->GetScene(SCENE_BOOT_LOADING_JPN);
+                scene = g_pGameSceneManager->GetScene((SceneList)19);
             }
             else
             {
-                scene = GameSceneManager::Instance()->GetScene(SCENE_BOOT_LOADING);
+                scene = g_pGameSceneManager->GetScene((SceneList)18);
             }
             if (scene != 0)
             {
-                ((BootLoadingScene*)scene)->ShowHomeButtonWarning();
+                ((UnidentifiedHBMScene*)scene)->UnidentifiedVirtual2C();
             }
         }
     }
@@ -431,21 +440,21 @@ void HBMManager::ShowBlockedWarning()
     {
         if (g_pOverlayManager != 0)
         {
-            scene = g_pOverlayManager->GetScene(SCENE_ASYNC_LOADING);
+            scene = g_pOverlayManager->GetScene((SceneList)25);
             if (scene != 0)
             {
-                ((AsyncLoadingScene*)scene)->ShowHomeButtonWarning();
+                ((UnidentifiedHBMScene*)scene)->UnidentifiedVirtual2C();
             }
         }
     }
     else if ((state & 0x00400000) != 0)
     {
-        if (GameSceneManager::Instance() != 0)
+        if (g_pGameSceneManager != 0)
         {
-            scene = GameSceneManager::Instance()->GetScene(SCENE_ASYNC_LOADING);
+            scene = g_pGameSceneManager->GetScene((SceneList)25);
             if (scene != 0)
             {
-                ((AsyncLoadingScene*)scene)->ShowHomeButtonWarning();
+                ((UnidentifiedHBMScene*)scene)->UnidentifiedVirtual2C();
             }
         }
     }

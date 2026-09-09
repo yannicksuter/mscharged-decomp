@@ -4,14 +4,18 @@
 #include "unclassified/tu_80210600.h"
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/FEAudio.h"
+#include "Game/FE/feFinder.h"
 
 #include "Game/GameSceneManager.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"
+#include "Game/FE/tlImageInstance.h"
 #include "NL/nlBind.h"
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/SH/SHNavigation.h"
 
 class SHNavigation;
 
@@ -162,7 +166,7 @@ void TU80210600Scene::fn_80211FA4()
     mUnidentified55C.SetPointerLeaveCallback(componentOff);
     mUnidentified55C.SetPointerPressCallback(componentSelect);
 
-    TLInstance* upperOver = FEFindInstance(mUnidentified9AC,
+    TLInstance* upperOver = (TLInstance*)FEFindInstance(mUnidentified9AC,
         nlStringLowerHash("OVER"),
         nlStringLowerHash("list_high_250x60"),
         0,
@@ -182,7 +186,7 @@ void TU80210600Scene::fn_80211FA4()
     for (int i = 0; i < 5; ++i)
     {
         feVector3 position = mUnidentified1C[i]->GetAssetPosition();
-        TLInstance* over = FEFindInstance(mUnidentified1C[i],
+        TLInstance* over = (TLInstance*)FEFindInstance(mUnidentified1C[i],
             nlStringLowerHash("over"),
             nlStringLowerHash("CHALLENGE_0"),
             nlStringLowerHash("list_back_480x70 "),

@@ -2,42 +2,38 @@
 #define GAME_TWEAK_VALUE_H
 
 #include "NL/nlMemory.h"
+#include "NL/nlPrint.h"
 #include "NL/nlSmallBlockAllocator.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 #include "types.h"
 #include <stdlib.h>
 
-int nlSNPrintf(char* buffer, unsigned long size, const char* format, ...);
-
 class InterpreterCore;
-class TweakEntry_8052BF00;
-class TweakNode_8052BEB0;
-class TweakValueBase_8052BF70;
+class TweakEntry;
+class TweakNode;
+class TweakValueBase;
 struct TweakPendingValue;
 
-extern "C"
-{
-    int fn_802C0F04(void);
-    TweakEntry_8052BF00* fn_802C0E30(void);
-    void fn_802C2DF4(TweakPendingValue*, TweakValueBase_8052BF70*, const char*);
-    TweakEntry_8052BF00* fn_802C4504(TweakEntry_8052BF00*, const char*, int);
-    void fn_802C5780(TweakEntry_8052BF00*, TweakValueBase_8052BF70*);
-    TweakNode_8052BEB0* fn_802C5884(TweakEntry_8052BF00*, const char*);
-}
+int IsTweakRegistryInitialized(void);
+TweakEntry* GetTweakRoot(void);
+void QueueTweakValue(TweakPendingValue*, TweakValueBase*, const char*);
+TweakEntry* FindOrCreateTweakPath(TweakEntry*, const char*, int);
+void AddTweakValue(TweakEntry*, TweakValueBase*);
+TweakNode* FindTweakChild(TweakEntry*, const char*);
 
-extern const char* lbl_806E1E90;
+extern const char* gLastTweakCategory;
 
 typedef nlSmallBlockAllocator<0x10, 0x20, 0x40, 1> TweakValueAllocator3;
 typedef nlSmallBlockAllocator<0x10, 0x20, 1, 1> TweakValueAllocator2;
-extern TweakValueAllocator3* lbl_806E1E58;
-extern TweakValueAllocator2* lbl_806E1E5C;
+extern TweakValueAllocator3* gTweakValueAllocator;
+extern TweakValueAllocator2* gTweakBindingAllocator;
 
-class TweakValueBase_8052BF70
+class TweakValueBase
 {
 public:
-    TweakValueBase_8052BF70();
-    virtual ~TweakValueBase_8052BF70();
+    TweakValueBase();
+    virtual ~TweakValueBase();
     virtual int UnidentifiedVirtual0C();
     virtual int UnidentifiedVirtual10();
     virtual void UnidentifiedVirtual14(
@@ -62,7 +58,7 @@ public:
     virtual void UnidentifiedVirtual28(const char* value)
     {
     }
-    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
+    virtual void UnidentifiedVirtual2C(TweakValueBase*);
 
 public:
     /* 0x04 */ const char* mName;
@@ -75,73 +71,73 @@ public:
 // constructor elides its vtable store and every derived destructor inlines it.
 // It owns the type-independent registration entry points, which only use the
 // base fields and the virtuals below.
-class UnidentifiedTweakValueImplBase : public TweakValueBase_8052BF70
+class TweakBindingBase : public TweakValueBase
 {
 public:
     virtual int UnidentifiedVirtual30() = 0;
-    virtual TweakValueBase_8052BF70* UnidentifiedVirtual34(const char* name,
+    virtual TweakValueBase* UnidentifiedVirtual34(const char* name,
         void* entry) = 0;
     virtual void UnidentifiedVirtual38(void* value) = 0;
 
-    bool fn_802C4F94(const char* path);
-    bool fn_802C4FEC(const char*, float, const char*, bool, float, float);
+    bool Bind(const char* path);
+    bool Bind(const char*, float, const char*, bool, float, float);
 
     static void operator delete(void* pointer)
     {
-        lbl_806E1E5C->m_Pool1.Free(pointer);
+        gTweakBindingAllocator->m_Pool1.Free(pointer);
     }
 };
 
-class TweakValueImpl_804F4DC8 : public UnidentifiedTweakValueImplBase
+class TweakFloatBinding : public TweakBindingBase
 {
 public:
-    TweakValueImpl_804F4DC8(float* value = 0)
+    TweakFloatBinding(float* value = 0)
         : m_pValue(value)
     {
     }
-    TweakValueImpl_804F4DC8(const char* name, const char* category, float* value,
+    TweakFloatBinding(const char* name, const char* category, float* value,
         bool unidentified = false)
     {
         m_pValue = value;
         mName = name;
         mUnidentified009 = unidentified;
 
-        if (fn_802C0F04() == 0)
+        if (IsTweakRegistryInitialized() == 0)
         {
             void* entry = nlMalloc(0x18, 8, true);
             if (entry != 0)
             {
-                fn_802C2DF4((TweakPendingValue*)entry, this, category);
+                QueueTweakValue((TweakPendingValue*)entry, this, category);
             }
-            lbl_806E1E90 = category;
+            gLastTweakCategory = category;
         }
         else
         {
-            TweakEntry_8052BF00* config = fn_802C0E30();
-            TweakEntry_8052BF00* entry = fn_802C4504(config, category, 0);
+            TweakEntry* config = GetTweakRoot();
+            TweakEntry* entry = FindOrCreateTweakPath(config, category, 0);
             if (entry != 0)
             {
-                fn_802C5780(entry, this);
+                AddTweakValue(entry, this);
             }
         }
     }
     virtual int UnidentifiedVirtual0C();
     virtual int UnidentifiedVirtual10();
-    virtual float UnidentifiedVirtual3C();
-    virtual TweakValueBase_8052BF70* UnidentifiedVirtual34(const char* name,
-        void* entry);
-    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
+    virtual void UnidentifiedVirtual14(float*, float*, float*);
     virtual void* UnidentifiedVirtual20();
     virtual void UnidentifiedVirtual24(char*, unsigned long);
     virtual void UnidentifiedVirtual28(const char*);
+    virtual void UnidentifiedVirtual2C(TweakValueBase*);
     virtual int UnidentifiedVirtual30();
-    virtual void UnidentifiedVirtual14(float*, float*, float*);
+    virtual TweakValueBase* UnidentifiedVirtual34(const char* name,
+        void* entry);
     virtual void UnidentifiedVirtual38(void* value);
+    virtual float UnidentifiedVirtual3C();
 
     bool BindWithDefault(const char* name, float defaultValue,
         const char* group, bool reload, float value, float min, float max)
     {
-        bool found = fn_802C4FEC(name, value, group, reload, min, max);
+        bool found = Bind(name, value, group, reload, min, max);
         if (!found)
         {
             *m_pValue = GetDefaultValue();
@@ -180,32 +176,32 @@ public:
     friend class InterpreterCore;
 }; // total size: 0x10
 
-class TweakValueIntImpl_804FD898 : public UnidentifiedTweakValueImplBase
+class TweakIntBinding : public TweakBindingBase
 {
 public:
-    TweakValueIntImpl_804FD898(int* value = 0);
-    TweakValueIntImpl_804FD898(const char* name, const char* category, int* value,
+    TweakIntBinding(int* value = 0);
+    TweakIntBinding(const char* name, const char* category, int* value,
         bool unidentified = false)
     {
         m_pValue = value;
         mName = name;
         mUnidentified009 = unidentified;
-        if (fn_802C0F04() == 0)
+        if (IsTweakRegistryInitialized() == 0)
         {
             void* entry = nlMalloc(0x18, 8, true);
             if (entry != 0)
             {
-                fn_802C2DF4((TweakPendingValue*)entry, this, category);
+                QueueTweakValue((TweakPendingValue*)entry, this, category);
             }
-            lbl_806E1E90 = category;
+            gLastTweakCategory = category;
         }
         else
         {
-            TweakEntry_8052BF00* config = fn_802C0E30();
-            TweakEntry_8052BF00* entry = fn_802C4504(config, category, 0);
+            TweakEntry* config = GetTweakRoot();
+            TweakEntry* entry = FindOrCreateTweakPath(config, category, 0);
             if (entry != 0)
             {
-                fn_802C5780(entry, this);
+                AddTweakValue(entry, this);
             }
         }
     }
@@ -215,9 +211,9 @@ public:
     virtual void* UnidentifiedVirtual20();
     virtual void UnidentifiedVirtual24(char*, unsigned long);
     virtual void UnidentifiedVirtual28(const char*);
-    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
+    virtual void UnidentifiedVirtual2C(TweakValueBase*);
     virtual int UnidentifiedVirtual30();
-    virtual TweakValueBase_8052BF70* UnidentifiedVirtual34(const char* name,
+    virtual TweakValueBase* UnidentifiedVirtual34(const char* name,
         void* entry);
     virtual void UnidentifiedVirtual38(void* value);
     virtual int UnidentifiedVirtual3C();
@@ -235,42 +231,42 @@ public:
     friend class InterpreterCore;
 }; // total size: 0x10
 
-class TweakValueBoolImpl_804F4538 : public UnidentifiedTweakValueImplBase
+class TweakBoolBinding : public TweakBindingBase
 {
 public:
-    TweakValueBoolImpl_804F4538(bool* value = 0);
-    TweakValueBoolImpl_804F4538(const char* name, const char* category,
+    TweakBoolBinding(bool* value = 0);
+    TweakBoolBinding(const char* name, const char* category,
         bool* value, bool defaultValue)
         : m_pValue(value)
     {
         mName = name;
         mUnidentified009 = defaultValue;
 
-        if (fn_802C0F04() == 0)
+        if (IsTweakRegistryInitialized() == 0)
         {
             void* entry = nlMalloc(0x18, 8, true);
             if (entry != 0)
             {
-                fn_802C2DF4((TweakPendingValue*)entry, this, category);
+                QueueTweakValue((TweakPendingValue*)entry, this, category);
             }
-            lbl_806E1E90 = category;
+            gLastTweakCategory = category;
         }
         else
         {
-            TweakEntry_8052BF00* config = fn_802C0E30();
-            TweakEntry_8052BF00* entry = fn_802C4504(config, category, 0);
+            TweakEntry* config = GetTweakRoot();
+            TweakEntry* entry = FindOrCreateTweakPath(config, category, 0);
             if (entry != 0)
             {
-                fn_802C5780(entry, this);
+                AddTweakValue(entry, this);
             }
         }
     }
     virtual int UnidentifiedVirtual0C();
     virtual int UnidentifiedVirtual10();
     virtual bool UnidentifiedVirtual3C();
-    virtual TweakValueBase_8052BF70* UnidentifiedVirtual34(const char* name,
+    virtual TweakValueBase* UnidentifiedVirtual34(const char* name,
         void* entry);
-    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
+    virtual void UnidentifiedVirtual2C(TweakValueBase*);
     virtual void* UnidentifiedVirtual20();
     virtual void UnidentifiedVirtual24(char*, unsigned long);
     virtual void UnidentifiedVirtual28(const char*);
@@ -284,51 +280,51 @@ public:
     friend class InterpreterCore;
 }; // total size: 0x10
 
-class TweakValueBool_804F4578 : public TweakValueBase_8052BF70
+class TweakValueBool : public TweakValueBase
 {
 public:
-    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
+    virtual void UnidentifiedVirtual2C(TweakValueBase*);
     virtual int UnidentifiedVirtual10();
     virtual int UnidentifiedVirtual0C();
     virtual void* UnidentifiedVirtual20();
     virtual void UnidentifiedVirtual24(char*, unsigned long);
     virtual void UnidentifiedVirtual28(const char*);
-    virtual ~TweakValueBool_804F4578();
+    virtual ~TweakValueBool();
     virtual void UnidentifiedVirtual14(float*, float*, float*);
     virtual void UnidentifiedVirtual18();
 
     static void operator delete(void* pointer)
     {
-        lbl_806E1E58->m_Pool1.Free(pointer);
+        gTweakValueAllocator->m_Pool1.Free(pointer);
     }
 
-    TweakValueBool_804F4578(const char* name, const char* category, bool value,
+    TweakValueBool(const char* name, const char* category, bool value,
         bool unidentified = true)
     {
         mValue = value;
         mName = name;
         mUnidentified009 = unidentified;
-        if (fn_802C0F04() == 0)
+        if (IsTweakRegistryInitialized() == 0)
         {
             void* entry = nlMalloc(0x18, 8, true);
             if (entry != 0)
             {
-                fn_802C2DF4((TweakPendingValue*)entry, this, category);
+                QueueTweakValue((TweakPendingValue*)entry, this, category);
             }
         }
         else
         {
-            TweakEntry_8052BF00* config = fn_802C0E30();
-            TweakEntry_8052BF00* entry = fn_802C4504(config, category, 0);
+            TweakEntry* config = GetTweakRoot();
+            TweakEntry* entry = FindOrCreateTweakPath(config, category, 0);
             if (entry != 0)
             {
-                fn_802C5780(entry, this);
+                AddTweakValue(entry, this);
             }
         }
-        lbl_806E1E90 = category;
+        gLastTweakCategory = category;
     }
 
-    TweakValueBool_804F4578(const char* name, bool value)
+    TweakValueBool(const char* name, bool value)
     {
         mValue = value;
         mName = name;
@@ -351,57 +347,57 @@ public:
 // weak block behind its static initializer, in the order below, and no unit
 // defines them out of line.
 
-inline int TweakValueBoolImpl_804F4538::UnidentifiedVirtual0C()
+inline int TweakBoolBinding::UnidentifiedVirtual0C()
 {
     return 2;
 }
 
-inline int TweakValueBoolImpl_804F4538::UnidentifiedVirtual10()
+inline int TweakBoolBinding::UnidentifiedVirtual10()
 {
     return 2;
 }
 
-inline bool TweakValueBoolImpl_804F4538::UnidentifiedVirtual3C()
+inline bool TweakBoolBinding::UnidentifiedVirtual3C()
 {
     return false;
 }
 
-inline TweakValueBase_8052BF70* TweakValueBoolImpl_804F4538::UnidentifiedVirtual34(
+inline TweakValueBase* TweakBoolBinding::UnidentifiedVirtual34(
     const char* name, void* entry)
 {
-    TweakValueBool_804F4578* created = new (
-        lbl_806E1E58->Allocate(sizeof(TweakValueBool_804F4578)))
-        TweakValueBool_804F4578(name, false);
-    fn_802C5780((TweakEntry_8052BF00*)entry, created);
+    TweakValueBool* created = new (
+        gTweakValueAllocator->Allocate(sizeof(TweakValueBool)))
+        TweakValueBool(name, false);
+    AddTweakValue((TweakEntry*)entry, created);
     return created;
 }
 
-inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual2C(
-    TweakValueBase_8052BF70* other)
+inline void TweakBoolBinding::UnidentifiedVirtual2C(
+    TweakValueBase* other)
 {
     switch (other->UnidentifiedVirtual10())
     {
     case 1:
-        *m_pValue = ((TweakValueBool_804F4578*)other)->mValue;
+        *m_pValue = ((TweakValueBool*)other)->mValue;
         break;
     case 2:
-        *m_pValue = *((TweakValueBoolImpl_804F4538*)other)->m_pValue;
+        *m_pValue = *((TweakBoolBinding*)other)->m_pValue;
         break;
     }
 }
 
-inline void* TweakValueBoolImpl_804F4538::UnidentifiedVirtual20()
+inline void* TweakBoolBinding::UnidentifiedVirtual20()
 {
     return m_pValue;
 }
 
-inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual24(
+inline void TweakBoolBinding::UnidentifiedVirtual24(
     char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, *m_pValue ? "true" : "false");
 }
 
-inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual28(const char* value)
+inline void TweakBoolBinding::UnidentifiedVirtual28(const char* value)
 {
     if (nlStrICmp(value, "true") == 0)
     {
@@ -413,12 +409,12 @@ inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual28(const char* value
     }
 }
 
-inline int TweakValueBoolImpl_804F4538::UnidentifiedVirtual30()
+inline int TweakBoolBinding::UnidentifiedVirtual30()
 {
     return m_pValue != 0;
 }
 
-inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual14(
+inline void TweakBoolBinding::UnidentifiedVirtual14(
     float* minimum, float* maximum, float* increment)
 {
     *minimum = 0.0f;
@@ -426,47 +422,47 @@ inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual14(
     *increment = 0.0f;
 }
 
-inline void TweakValueBoolImpl_804F4538::UnidentifiedVirtual38(void* value)
+inline void TweakBoolBinding::UnidentifiedVirtual38(void* value)
 {
     m_pValue = (bool*)value;
 }
 
-inline void TweakValueBool_804F4578::UnidentifiedVirtual2C(
-    TweakValueBase_8052BF70* other)
+inline void TweakValueBool::UnidentifiedVirtual2C(
+    TweakValueBase* other)
 {
     switch (other->UnidentifiedVirtual10())
     {
     case 1:
-        mValue = ((TweakValueBool_804F4578*)other)->mValue;
+        mValue = ((TweakValueBool*)other)->mValue;
         break;
     case 2:
-        mValue = *((TweakValueBoolImpl_804F4538*)other)->m_pValue;
+        mValue = *((TweakBoolBinding*)other)->m_pValue;
         break;
     }
 }
 
-inline int TweakValueBool_804F4578::UnidentifiedVirtual10()
+inline int TweakValueBool::UnidentifiedVirtual10()
 {
     return 1;
 }
 
-inline int TweakValueBool_804F4578::UnidentifiedVirtual0C()
+inline int TweakValueBool::UnidentifiedVirtual0C()
 {
     return 2;
 }
 
-inline void* TweakValueBool_804F4578::UnidentifiedVirtual20()
+inline void* TweakValueBool::UnidentifiedVirtual20()
 {
     return &mValue;
 }
 
-inline void TweakValueBool_804F4578::UnidentifiedVirtual24(
+inline void TweakValueBool::UnidentifiedVirtual24(
     char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, mValue ? "true" : "false");
 }
 
-inline void TweakValueBool_804F4578::UnidentifiedVirtual28(const char* value)
+inline void TweakValueBool::UnidentifiedVirtual28(const char* value)
 {
     if (nlStrICmp(value, "true") == 0 || nlStrICmp(value, "triggered") == 0
         || nlStrICmp(value, "on") == 0)
@@ -479,11 +475,11 @@ inline void TweakValueBool_804F4578::UnidentifiedVirtual28(const char* value)
     }
 }
 
-inline TweakValueBool_804F4578::~TweakValueBool_804F4578()
+inline TweakValueBool::~TweakValueBool()
 {
 }
 
-inline void TweakValueBool_804F4578::UnidentifiedVirtual14(
+inline void TweakValueBool::UnidentifiedVirtual14(
     float* minimum, float* maximum, float* increment)
 {
     *minimum = 0.0f;
@@ -491,130 +487,14 @@ inline void TweakValueBool_804F4578::UnidentifiedVirtual14(
     *increment = 0.0f;
 }
 
-inline void TweakValueBool_804F4578::UnidentifiedVirtual18()
+inline void TweakValueBool::UnidentifiedVirtual18()
 {
 }
 
-class GXMaterialFloatTweak_804F4190 : public TweakValueBase_8052BF70
-{
-public:
-    GXMaterialFloatTweak_804F4190(
-        const char* name, const char* category, float initialValue = 1.0f)
-        : value(initialValue)
-    {
-        mName = name;
-        mUnidentified009 = true;
-
-        if (fn_802C0F04() == 0)
-        {
-            void* entry = nlMalloc(0x18, 8, true);
-            if (entry != 0)
-                fn_802C2DF4((TweakPendingValue*)entry, this, category);
-        }
-        else
-        {
-            TweakEntry_8052BF00* config = fn_802C0E30();
-            TweakEntry_8052BF00* entry = fn_802C4504(config, category, 0);
-            if (entry != 0)
-                fn_802C5780(entry, this);
-        }
-
-        lbl_806E1E90 = category;
-    }
-    GXMaterialFloatTweak_804F4190(const char* name, float initialValue)
-        : value(initialValue)
-    {
-        mName = name;
-    }
-    virtual ~GXMaterialFloatTweak_804F4190();
-    virtual int UnidentifiedVirtual0C();
-    virtual int UnidentifiedVirtual10();
-    virtual void UnidentifiedVirtual14(float*, float*, float*);
-    virtual void UnidentifiedVirtual18();
-    virtual void* UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24(char*, unsigned long);
-    virtual void UnidentifiedVirtual28(const char*);
-    virtual void UnidentifiedVirtual2C(TweakValueBase_8052BF70*);
-
-    static void operator delete(void* pointer)
-    {
-        lbl_806E1E58->m_Pool1.Free(pointer);
-    }
-
-    /* 0x0C */ float value;
-}; // size: 0x10
-
-inline int TweakValueImpl_804F4DC8::UnidentifiedVirtual0C()
-{
-    return 5;
-}
-
-inline int TweakValueImpl_804F4DC8::UnidentifiedVirtual10()
-{
-    return 2;
-}
-
-inline float TweakValueImpl_804F4DC8::UnidentifiedVirtual3C()
-{
-    return 0.0f;
-}
-
-inline TweakValueBase_8052BF70* TweakValueImpl_804F4DC8::UnidentifiedVirtual34(
-    const char* name, void* entry)
-{
-    GXMaterialFloatTweak_804F4190* created = new (
-        lbl_806E1E58->Allocate(sizeof(GXMaterialFloatTweak_804F4190)))
-        GXMaterialFloatTweak_804F4190(name, 0.0f);
-    fn_802C5780((TweakEntry_8052BF00*)entry, created);
-    return created;
-}
-
-inline void TweakValueImpl_804F4DC8::UnidentifiedVirtual2C(
-    TweakValueBase_8052BF70* other)
-{
-    switch (other->UnidentifiedVirtual10())
-    {
-    case 1:
-        *m_pValue = ((GXMaterialFloatTweak_804F4190*)other)->value;
-        break;
-    case 2:
-        *m_pValue = *((TweakValueImpl_804F4DC8*)other)->m_pValue;
-        break;
-    }
-}
-
-inline void* TweakValueImpl_804F4DC8::UnidentifiedVirtual20()
-{
-    return m_pValue;
-}
-
-inline void TweakValueImpl_804F4DC8::UnidentifiedVirtual24(
-    char* buffer, unsigned long size)
-{
-    nlSNPrintf(buffer, size, "%.3f", *m_pValue);
-}
-
-inline void TweakValueImpl_804F4DC8::UnidentifiedVirtual28(const char* value)
-{
-    *m_pValue = atof(value);
-}
-
-inline int TweakValueImpl_804F4DC8::UnidentifiedVirtual30()
-{
-    return m_pValue != 0;
-}
-
-inline void TweakValueImpl_804F4DC8::UnidentifiedVirtual14(
-    float* minimum, float* maximum, float* increment)
-{
-    *minimum = 0.0f;
-    *maximum = 0.0f;
-    *increment = 0.0f;
-}
-
-inline void TweakValueImpl_804F4DC8::UnidentifiedVirtual38(void* value)
-{
-    m_pValue = (float*)value;
-}
+// NOTE: removed stale GXMaterialFloatTweak_804F4190 / TweakValueImpl_804F4DC8 tail
+// (origin/main 30bf4de2) - superseded by TweakValueFloat.h (TweakValueFloat)
+// and TweakFloatBinding renames above; remote detail preserved in symbols.txt
+// (__sinit_Ball_cpp, __arraydtor, full UnidentifiedVirtual set) and in the
+// full TweakFloatBinding vtable declaration.
 
 #endif // GAME_TWEAK_VALUE_H

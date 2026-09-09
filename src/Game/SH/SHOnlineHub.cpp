@@ -245,7 +245,7 @@ void SHOnlineHub::Update(float dt)
         GameSceneManager::Instance()->Push((SceneList)52, SCREEN_FORWARD, true);
         return;
     }
-    if (!NetworkStatsManager_8012F378::Instance()->RefreshFriendStats_80131B50())
+    if (!NetworkStatsManager::Instance()->RefreshFriendStats_80131B50())
     {
         if (g_pNetworkSession->mDWCLastError == 0)
             g_pNetworkSession->ReadAndClearDWCError();
@@ -367,10 +367,10 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
 
 void SHOnlineHub::UpdateLocalStats()
 {
-    if (NetworkStatsManager_8012F378::Instance()->GetLocalStats(0) != 0)
-        mUnidentified5A8 = *NetworkStatsManager_8012F378::Instance()->GetLocalStats(0);
-    if (NetworkStatsManager_8012F378::Instance()->GetLocalStats(1) != 0)
-        mUnidentified590 = *NetworkStatsManager_8012F378::Instance()->GetLocalStats(1);
+    if (NetworkStatsManager::Instance()->GetLocalStats(0) != 0)
+        mUnidentified5A8 = *NetworkStatsManager::Instance()->GetLocalStats(0);
+    if (NetworkStatsManager::Instance()->GetLocalStats(1) != 0)
+        mUnidentified590 = *NetworkStatsManager::Instance()->GetLocalStats(1);
     TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
         InlineHasher("Layer"), InlineHasher("summary"));
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(summary, nlStringLowerHash("name"), 0, 0, 0, 0, 0);
@@ -388,7 +388,7 @@ void SHOnlineHub::UpdateLocalStats()
 
 void SHOnlineHub::UpdateStrikerOfTheDay()
 {
-    NetworkLeaderboardCategory* category = NetworkStatsManager_8012F378::Instance()->GetCategory(1);
+    NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(1);
     if (category != 0)
     {
         if (category->mCount >= 1 && category->mMetadata[0].mScore > 0)

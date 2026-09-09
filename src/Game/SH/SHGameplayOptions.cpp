@@ -56,12 +56,12 @@ SHGameplayOptions::SHGameplayOptions()
     if (gameInfo->mIsOnlineMode && !gameInfo->mOnlineRankedMatch)
     {
         mSettings = reinterpret_cast<const GameplaySettings&>(gameInfo->mUserInfo.mUnidentified4C);
-        mPowerupSettings = reinterpret_cast<const PowerupSettings&>(GameInfoManager::Instance()->mUserInfo.mUnidentified68);
+        mPowerupSettings = reinterpret_cast<const CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mUnidentified68);
     }
     else
     {
         mSettings = reinterpret_cast<const GameplaySettings&>(gameInfo->mUserInfo.mGameplayOptions);
-        mPowerupSettings = reinterpret_cast<const PowerupSettings&>(GameInfoManager::Instance()->mUserInfo.mPowerupOptions);
+        mPowerupSettings = reinterpret_cast<const CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mCheatOptions);
     }
     mNavigation.SetPushBackScene(false);
     mNavigation.SetPopScene(false);
@@ -347,11 +347,11 @@ void SHGameplayOptions::fn_80235CE4(bool value)
 
 void SHGameplayOptions::fn_80235FE0()
 {
-    int type = mSettings.WinBy;
+    int type = mSettings.GameLimitType;
     int skill = mSettings.SkillLevel;
-    int series = mSettings.BestSeries;
+    int series = mSettings.NumGames;
     int time = mSettings.GameTime;
-    int goals = mSettings.GameGoals;
+    int goals = mSettings.GoalLimit;
     int value = type == 1 ? goals : time / 60;
     TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(mPresentation,
         nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("SKILL LEVEL SETTINGS"), 0, 0, 0);
@@ -444,7 +444,7 @@ void SHGameplayOptions::fn_802365F0(int item)
     else if (item >= 5 && item < 10)
     {
         int series = lbl_804E8554[item - 5];
-        mSettings.BestSeries = series;
+        mSettings.NumGames = series;
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mPresentation,
             nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("SERIES SETTING"), 0, 0, 0);
         unsigned short number[4];
@@ -455,18 +455,18 @@ void SHGameplayOptions::fn_802365F0(int item)
     }
     else if (item == 10)
     {
-        mSettings.WinBy = 1;
-        fn_80236ADC(1, mSettings.GameGoals);
+        mSettings.GameLimitType = 1;
+        fn_80236ADC(1, mSettings.GoalLimit);
     }
     else if (item == 11)
     {
-        mSettings.WinBy = 0;
+        mSettings.GameLimitType = 0;
         fn_80236ADC(0, mSettings.GameTime / 60);
     }
     else if (item >= 12 && item < 20)
     {
-        mSettings.GameGoals = lbl_804E8568[item - 12];
-        fn_80236ADC(1, mSettings.GameGoals);
+        mSettings.GoalLimit = lbl_804E8568[item - 12];
+        fn_80236ADC(1, mSettings.GoalLimit);
     }
     else if (item >= 20 && item < 24)
     {
@@ -689,14 +689,14 @@ void SHGameplayOptions::fn_80238050()
     {
         reinterpret_cast<GameplaySettings&>(gameInfo->mUserInfo.mUnidentified4C) = mSettings;
         reinterpret_cast<GameplaySettings&>(GameInfoManager::Instance()->mNoCheatSettings) = mSettings;
-        reinterpret_cast<PowerupSettings&>(GameInfoManager::Instance()->mUserInfo.mUnidentified68) = mPowerupSettings;
-        reinterpret_cast<PowerupSettings&>(GameInfoManager::Instance()->mRulesA) = mPowerupSettings;
+        reinterpret_cast<CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mUnidentified68) = mPowerupSettings;
+        reinterpret_cast<CheatSettings&>(GameInfoManager::Instance()->mRulesA) = mPowerupSettings;
         GameSceneManager::Instance()->Push((SceneList)5, SCREEN_FORWARD, true);
     }
     else
     {
         reinterpret_cast<GameplaySettings&>(gameInfo->mUserInfo.mGameplayOptions) = mSettings;
-        reinterpret_cast<PowerupSettings&>(GameInfoManager::Instance()->mUserInfo.mPowerupOptions) = mPowerupSettings;
+        reinterpret_cast<CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mCheatOptions) = mPowerupSettings;
         GameSceneManager::Instance()->Push((SceneList)2, SCREEN_FORWARD, true);
     }
 }

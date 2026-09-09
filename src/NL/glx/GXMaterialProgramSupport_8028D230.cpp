@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glView.h"
@@ -22,9 +23,9 @@ extern "C"
 
 struct GXMaterialProgramParameters_80298EE0
 {
-    /* 0x00 */ UnidentifiedTextureState texture0;
-    /* 0x08 */ UnidentifiedTextureState texture1;
-    /* 0x10 */ UnidentifiedTextureState texture2;
+    /* 0x00 */ glTextureBinding texture0;
+    /* 0x08 */ glTextureBinding texture1;
+    /* 0x10 */ glTextureBinding texture2;
     /* 0x18 */ const float (*matrices)[3][4];
     /* 0x1C */ unsigned long matricesSize;
     /* 0x20 */ float value32;
@@ -126,7 +127,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80298EE0>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 struct FloatColour_8028D230
@@ -190,11 +191,11 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298EE0>::Draw(
 
     if (packet->unknown28 == 0)
     {
-        fn_8036D7EC(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
+        glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }
     else
     {
-        fn_8036D774(&modelview);
+        glx_LoadDefaultSkinMatrices(&modelview);
     }
 
     fn_801837DC(1, parameters->value44);

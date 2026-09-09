@@ -27,7 +27,7 @@ struct FriendStatusPayload
     /* 0x03 */ u8 mStatus;
     /* 0x04 */ int mProfileId;
     /* 0x08 */ GameplaySettings mGameplaySettings;
-    /* 0x24 */ PowerupSettings mPowerupSettings;
+    /* 0x24 */ CheatSettings mPowerupSettings;
     /* 0x30 */ u32 mNetworkVersion;
     /* 0x34 */ u8 mStadium;
     /* 0x35 */ u8 mPadding35[3];
@@ -55,7 +55,7 @@ public:
     void SetOwnStatusReceivedInvitation(int index);
     void SetOwnStatusHostInvitingPlayer(int index,
         const GameplaySettings* gameplaySettings,
-        const PowerupSettings* powerupSettings, u8 value);
+        const CheatSettings* cheatSettings, u8 value);
     void DeleteFriend(int index);
     int CountFriends();
     int CountBuddies();

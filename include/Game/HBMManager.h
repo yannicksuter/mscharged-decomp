@@ -1,7 +1,9 @@
 #ifndef GAME_HBM_MANAGER_H
 #define GAME_HBM_MANAGER_H
 
-#include <revolution/hbm/HBMCommon.h>
+#include <revolution/hbm/HBMTypes.h>
+
+#include "types.h"
 
 struct TPLPalette;
 
@@ -11,14 +13,15 @@ public:
     HBMManager();
     virtual ~HBMManager();
 
-    static void ResourceLoaded(void* data, unsigned long size, void* userData);
+    static void OnFileLoaded(void* data, unsigned long size, void* userData);
     void LoadResources();
-    static void SetupRenderState();
+    static void SetupGX();
     void Show();
     void Update();
-    static void Draw();
+    static void Render();
+    void SetBlocked(bool blocked) { mBlocked = blocked; }
     bool IsBlocked();
-    void ShowBlockedWarning();
+    void OnHomeButtonPressed();
 
     /* 0x004 */ HBMDataInfo mDataInfo;
     /* 0x040 */ HBMControllerData mControllerData;

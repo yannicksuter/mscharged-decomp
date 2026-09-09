@@ -1,4 +1,5 @@
 #include <revolution/pad.h>
+#include "Game/Render/StadiumLoading.h"
 
 #include "Game/Task/FrontEndTask.h"
 
@@ -17,7 +18,7 @@
 #include "Game/GameObjectLighting.h"
 #include "Game/HBMManager.h"
 #include "Game/Render/Presentation.h"
-#include "Game/Render/tu_80271960.h"
+#include "Game/Render/HomeButtonFade.h"
 #include "Game/TweakRegistry.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/main.h"
@@ -93,21 +94,21 @@ static void DrawFrontEndElements(float fDeltaT)
         FEModelManager::Instance()->Render();
     }
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 4 && fn_80277238()
+    if (nlTaskManager::m_pInstance->mCurrentState == 4 && IsStadiumWorldLoaded()
         && !IsHBMActive())
     {
         glx_Fog(true);
-        fn_802CC094()->m_inventory->Update(fDeltaT);
-        fn_80276FB8(fDeltaT);
+        glGetCurrentResourcePool()->m_inventory->Update(fDeltaT);
+        UpdateStadium(fDeltaT);
         RenderWorldNPCs();
         UpdateHighRange();
     }
 
-    fn_80271960()->fn_80271A64(fDeltaT);
+    HomeButtonFade::Instance()->Update(fDeltaT);
 
     if (!(gpHBMManager != 0 && gpHBMManager->mActive && gpHBMManager->mReady))
     {
-        fn_80271960()->fn_80271AEC();
+        HomeButtonFade::Instance()->Render();
     }
 }
 
@@ -229,7 +230,7 @@ void FrontEndTask::HandleE3IdleReset(float fDeltaT)
                 {
                     if (!GameSceneManager::Instance()->IsOnStack(SCENE_TITLE))
                     {
-                        GameSceneManager::Instance()->fn_801C5FB8((SceneList)0x19);
+                        GameSceneManager::Instance()->PopToScene((SceneList)0x19);
                         FESceneManager::Instance()->ForceImmediateStackProcessing();
                         GameSceneManager::Instance()->Push(SCENE_TITLE, SCREEN_NOTHING, false);
                         Presentation::GetInstance()->Call("StartTitleScreenSequence");

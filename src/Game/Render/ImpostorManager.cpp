@@ -3,32 +3,31 @@
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorCharacter.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/tu_802C6224.h"
+#include "Game/TweakConfig.h"
 #include "NL/gl/glMemory.h"
-#include "NL/glx/GXMaterialCrystalTweaks.h"
-#include "NL/glx/GXMaterialShadowTweaks.h"
+#include "Game/TweakValue.h"
 #include "NL/gl/glState.h"
 #include "NL/nlDebug.h"
+#include "Game/TweakValueFloat.h"
+#include "Game/TweakValueInt.h"
 
-u8 lbl_806E1F60;
-u8 lbl_806E1F61;
+u8 gDisableImpostorBlending;
+u8 gImpostorSpritesInvalid;
 
-static int lbl_806DF428 = 0x80;
-static int lbl_806DF42C = 1;
-static float lbl_806DF430 = 1.0f;
-extern int lbl_806DF434;
+static int sImpostorAlphaTestReference = 0x80;
+static int sImpostorUpdatePeriod = 1;
+static float sDefaultImpostorSizeScale = 1.0f;
+extern int sInitialRenderedImpostorCount;
 
-static UnidentifiedViewConfig_8052E828 sImpostorViewConfig = {
-    0x00000000,
-    0x0000C000,
-    0x00000003,
-    0x00050000,
+static GLMemoryRequirement sImpostorResourceRequirements[2] = {
+    { GLM_Header, 0xC000 },
+    { GLM_VertexData, 0x50000 },
 };
 
-GXMaterialFloatTweak_804F4190 sfImpostorSizeScale(
+TweakValueFloat sfImpostorSizeScale(
     "sfImpostorSizeScale", "Render/Impostor/Visual Tweaks");
-GXMaterialColourTweak_804FC520 sNumImpostorsRendered(
-    "sNumImpostorsRendered", lbl_806E1E90, 0);
+TweakValueInt sNumImpostorsRendered(
+    "sNumImpostorsRendered", gLastTweakCategory, 0);
 
 ImpostorManager::ImpostorManager()
     : mEnabled(false)
@@ -37,14 +36,14 @@ ImpostorManager::ImpostorManager()
     , mCapacity(0)
     , mUnidentified010(0)
 {
-    mpRegistry = 0;
+    mParentView = 0;
     mInitialized = false;
     mUnidentified035 = false;
     mUnidentified036 = false;
     mUnidentified037 = false;
-    mCurrentView = 0;
+    mCurrentResource = 0;
     mUnidentified04C = false;
-    mLastSpriteCount = 0;
+    mLastRenderChecksum = 0;
     mFrameCount = 0;
     mCaptured = false;
 
@@ -66,30 +65,30 @@ ImpostorManager::ImpostorManager()
     }
 }
 
-void ImpostorManager::Initialize(void* registry, int capacity,
-    const UnidentifiedViewConfig_8052E828* config, int layer, bool flag)
+void ImpostorManager::Initialize(GLView* registry, int capacity,
+    const GLMemoryRequirement* config, int numRequirements, bool flag)
 {
-    mpRegistry = registry;
+    mParentView = registry;
     mImpostors = new (8, false) Impostor[capacity];
     mCapacity = capacity;
     mNumUsed = 0;
     mInitialized = true;
-    sfImpostorSizeScale.value = lbl_806DF430;
-    lbl_806E1F61 = false;
+    sfImpostorSizeScale.value = sDefaultImpostorSizeScale;
+    gImpostorSpritesInvalid = false;
 
     for (int i = 0; i < 2; ++i)
     {
         if (config == 0)
         {
-            mViews[i] = (UnidentifiedView_802CBEC4*)fn_802CBFD8(
-                &sImpostorViewConfig, 2, "Impostors");
+            mResources[i] = glCreateResourcePool(
+                sImpostorResourceRequirements, 2, "Impostors");
         }
         else
         {
-            mViews[i] = (UnidentifiedView_802CBEC4*)fn_802CBFD8(
-                config, layer, "Impostors");
+            mResources[i] = glCreateResourcePool(
+                config, numRequirements, "Impostors");
         }
-        mCameras[i] = mViews[i]->UnidentifiedVirtual0C();
+        mResourceMarkers[i] = mResources[i]->MarkResource();
     }
 
     mUnidentified04C = false;
@@ -98,7 +97,7 @@ void ImpostorManager::Initialize(void* registry, int capacity,
     mUnidentified036 = false;
     mUnidentified035 = false;
     mUnidentified059 = flag;
-    fn_802C6CAC("ini/ImpostorCharacterTweaks.ini",
+    LoadTweakConfigFile("ini/ImpostorCharacterTweaks.ini",
         "/Render/Impostor/CharacterTweaks", false);
 }
 
@@ -121,15 +120,15 @@ void ImpostorManager::ResetImpostors()
         for (nlDLListIterator<ImpostorCharacter*> characters = mCharacters.Begin();
              characters.hasNext(); characters.next())
         {
-            for (nlDLListIterator<ImpostorSprite_802D4290*> sprites =
+            for (nlDLListIterator<ImpostorSprite*> sprites =
                      (*characters)->mSprites.Begin();
                  sprites.hasNext(); sprites.next())
             {
-                ImpostorSprite_802D4290* sprite = *sprites;
-                fn_802D5034(sprite);
-                if (lbl_806E1F61 != 0)
+                ImpostorSprite* sprite = *sprites;
+                sprite->ClearRenderSlots();
+                if (gImpostorSpritesInvalid != 0)
                 {
-                    fn_802D5040(sprite);
+                    sprite->QueueAllSlots();
                 }
             }
         }
@@ -153,8 +152,8 @@ void ImpostorManager::Uninitialize()
         &mCharacters.m_Allocator;
     pool->FreeBlocks();
 
-    fn_802CC02C((ResourceInterface_802CC094*)mViews[0]);
-    fn_802CC02C((ResourceInterface_802CC094*)mViews[1]);
+    glDestroyResourcePool(mResources[0]);
+    glDestroyResourcePool(mResources[1]);
     mInitialized = false;
 }
 
@@ -165,17 +164,17 @@ void ImpostorManager::ResetSpriteSlots()
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        nlDLListIterator<ImpostorSprite_802D4290*> sprites =
+        nlDLListIterator<ImpostorSprite*> sprites =
             entry->entry->mSprites.Begin();
-        DLListEntry<ImpostorSprite_802D4290*>* spriteHead = sprites.m_Head;
-        DLListEntry<ImpostorSprite_802D4290*>* spriteEntry = sprites.m_Curr;
+        DLListEntry<ImpostorSprite*>* spriteHead = sprites.m_Head;
+        DLListEntry<ImpostorSprite*>* spriteEntry = sprites.m_Curr;
         while (spriteEntry != 0)
         {
-            ImpostorSprite_802D4290* sprite = spriteEntry->entry;
-            fn_802D5034(sprite);
-            if (lbl_806E1F61 != 0)
+            ImpostorSprite* sprite = spriteEntry->entry;
+            sprite->ClearRenderSlots();
+            if (gImpostorSpritesInvalid != 0)
             {
-                fn_802D5040(sprite);
+                sprite->QueueAllSlots();
             }
             if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
             {
@@ -238,13 +237,13 @@ void ImpostorManager::Render(void* target, bool skipCapture)
         DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
         while (entry != 0)
         {
-            nlDLListIterator<ImpostorSprite_802D4290*> sprites =
+            nlDLListIterator<ImpostorSprite*> sprites =
                 entry->entry->mSprites.Begin();
-            DLListEntry<ImpostorSprite_802D4290*>* spriteHead = sprites.m_Head;
-            DLListEntry<ImpostorSprite_802D4290*>* spriteEntry = sprites.m_Curr;
+            DLListEntry<ImpostorSprite*>* spriteHead = sprites.m_Head;
+            DLListEntry<ImpostorSprite*>* spriteEntry = sprites.m_Curr;
             while (spriteEntry != 0)
             {
-                total += fn_802D536C(spriteEntry->entry);
+                total += spriteEntry->entry->CalculateRenderChecksum();
                 if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
                 {
                     spriteEntry = 0;
@@ -264,38 +263,38 @@ void ImpostorManager::Render(void* target, bool skipCapture)
             }
         }
 
-        if (total != mLastSpriteCount)
+        if (total != mLastRenderChecksum)
         {
             cached = false;
-            mLastSpriteCount = total;
+            mLastRenderChecksum = total;
         }
     }
 
     if (!cached && !skipCapture && mCaptured == 0)
     {
         ImpostorManager* instance = GetInstance();
-        instance->mCurrentView = (instance->mCurrentView + 1) % 2;
-        instance->mViews[instance->mCurrentView]->UnidentifiedVirtual10(
-            instance->mCameras[instance->mCurrentView]);
+        instance->mCurrentResource = (instance->mCurrentResource + 1) % 2;
+        instance->mResources[instance->mCurrentResource]->ReleaseResource(
+            instance->mResourceMarkers[instance->mCurrentResource]);
         instance->mCaptured = true;
-        instance->mCameras[instance->mCurrentView] =
-            instance->mViews[instance->mCurrentView]->UnidentifiedVirtual0C();
-        u32* camera = (u32*)instance->mCameras[instance->mCurrentView];
-        if (camera[0] != 0 || camera[1] != 0)
+        instance->mResourceMarkers[instance->mCurrentResource] =
+            instance->mResources[instance->mCurrentResource]->MarkResource();
+        u32* marker = (u32*)instance->mResourceMarkers[instance->mCurrentResource];
+        if (marker[0] != 0 || marker[1] != 0)
         {
             nlBreak();
         }
     }
 
-    sNumImpostorsRendered.value = lbl_806DF434;
+    sNumImpostorsRendered.value = sInitialRenderedImpostorCount;
     glSetDefaultState(true);
     glSetRasterState(GLS_DepthWrite, 1);
     glSetRasterState(GLS_Culling, 0);
     glSetRasterState(GLS_DepthTest, 1);
-    glSetRasterState(GLS_AlphaBlend, lbl_806E1F60 == 0);
-    if (lbl_806E1F60 == 0)
+    glSetRasterState(GLS_AlphaBlend, gDisableImpostorBlending == 0);
+    if (gDisableImpostorBlending == 0)
     {
-        glSetRasterState(GLS_AlphaTestRef, lbl_806DF428);
+        glSetRasterState(GLS_AlphaTestRef, sImpostorAlphaTestReference);
         glSetRasterState(GLS_AlphaTest, 1);
     }
     glSetCurrentRasterState(glHandleizeRasterState());
@@ -311,7 +310,7 @@ void ImpostorManager::Render(void* target, bool skipCapture)
             glSetRasterState(GLS_DepthTest, 1);
             glSetRasterState(GLS_DepthWrite, 0);
             u32 blend = 2;
-            if (lbl_806E1F60 != 0)
+            if (gDisableImpostorBlending != 0)
             {
                 blend = 0;
             }
@@ -321,18 +320,17 @@ void ImpostorManager::Render(void* target, bool skipCapture)
         else
         {
             glSetRasterState(GLS_DepthTest, 1);
-            glSetRasterState(GLS_AlphaBlend, lbl_806E1F60 == 0);
+            glSetRasterState(GLS_AlphaBlend, gDisableImpostorBlending == 0);
             glSetCurrentRasterState(glHandleizeRasterState());
         }
 
-        nlDLListIterator<ImpostorSprite_802D4290*> sprites =
+        nlDLListIterator<ImpostorSprite*> sprites =
             character->mSprites.Begin();
-        DLListEntry<ImpostorSprite_802D4290*>* spriteHead = sprites.m_Head;
-        DLListEntry<ImpostorSprite_802D4290*>* spriteEntry = sprites.m_Curr;
+        DLListEntry<ImpostorSprite*>* spriteHead = sprites.m_Head;
+        DLListEntry<ImpostorSprite*>* spriteEntry = sprites.m_Curr;
         while (spriteEntry != 0)
         {
-            sNumImpostorsRendered.value += fn_802D4AEC(spriteEntry->entry,
-                (GLView*)target, mImpostors, cached, skipCapture);
+            sNumImpostorsRendered.value += spriteEntry->entry->Render((GLView*)target, mImpostors, cached, skipCapture);
             if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
             {
                 spriteEntry = 0;
@@ -373,7 +371,7 @@ Impostor* ImpostorManager::AllocImpostor(int* outIndex)
 void ImpostorManager::AddCharacter(ImpostorCharacter* character)
 {
     mCharacters.AddEnd(character);
-    character->RegisterSprites(mpRegistry);
+    character->RegisterSprites(mParentView);
     if (character->mUnidentified00C != 0)
     {
         mUnidentified036 = true;
@@ -387,7 +385,7 @@ void ImpostorManager::UpdateCharacters(float dt, const char* unidentified)
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        entry->entry->UnidentifiedVirtual28(dt, unidentified);
+        entry->entry->PlayAnimation(dt, unidentified);
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
@@ -406,7 +404,7 @@ void ImpostorManager::UpdateAnimations(float dt)
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        entry->entry->UnidentifiedVirtual24(dt);
+        entry->entry->UpdateAnimation(dt);
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
@@ -432,7 +430,7 @@ void ImpostorManager::UpdateSprites()
         {
             break;
         }
-        character->UpdateSprites(lbl_806DF42C, sUpdateSlot);
+        character->UpdateSprites(sImpostorUpdatePeriod, sUpdateSlot);
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
@@ -443,7 +441,7 @@ void ImpostorManager::UpdateSprites()
         }
     }
 
-    sUpdateSlot = (sUpdateSlot + 1) % lbl_806DF42C;
+    sUpdateSlot = (sUpdateSlot + 1) % sImpostorUpdatePeriod;
 }
 
 float ImpostorManager::GetImpostorSizeScale()
@@ -456,14 +454,14 @@ void ImpostorManager::SetImpostorSizeScale(float scale)
     sfImpostorSizeScale.value = scale;
 }
 
-void ImpostorManager::UpdatePositions(void* unidentified0, void* unidentified1)
+void ImpostorManager::UpdatePositions(const nlVector3* direction, const nlVector3* up)
 {
     nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
     DLListEntry<ImpostorCharacter*>* head = it.m_Head;
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        entry->entry->UnidentifiedVirtual2C(unidentified0, unidentified1);
+        entry->entry->UpdateView(direction, up);
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
@@ -496,7 +494,7 @@ void ImpostorManager::StaggerAnimations()
             {
                 value -= 1.0f;
             }
-            character->UnidentifiedVirtual18(i, value);
+            character->SetAnimationTime(i, value);
         }
         phase += step;
         if (nlDLRingIsEnd(head, entry) || entry == 0)
@@ -532,12 +530,12 @@ void ImpostorManager::SetEnabled(bool enable)
 
 void ImpostorManager::SetSpritesInvalid()
 {
-    lbl_806E1F61 = true;
+    gImpostorSpritesInvalid = true;
 }
 
 void ImpostorManager::SetUpdatePeriod(int period)
 {
-    lbl_806DF42C = period;
+    sImpostorUpdatePeriod = period;
 }
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

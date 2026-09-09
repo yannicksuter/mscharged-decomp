@@ -1,141 +1,177 @@
-#include <dwc/dwc_main.h>
 #include "Game/SH/SHOnlineMatchmakingDraft.h"
-#include "Game/FE/FEAudio.h"
-#include "Game/FE/feHelpFuncs.h"
-#include "Game/OnlineMatchmaking.h"
-#include "Game/NetworkLobby.h"
+#include "Game/GameInfo.h"
 
-#include "Game/GameSceneManager.h"
+#include "Game/BaseGameSceneManager.h"
+#include "Game/FE/FEAudio.h"
 #include "Game/FE/feFinder.inl"
+#include "Game/FE/fePresentation.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/NetworkDraft.h"
-#include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkLobby.h"
+#include "Game/NetworkStatsManager.h"
+#include "Game/OnlinePlayer.h"
+#include "Game/FE/feOnlineError.h"
+#include "Game/OnlineMatchmaking.h"
 #include "Game/Render/Presentation.h"
 #include "NL/nlBind.h"
 #include "NL/nlPrint.h"
+#include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
-#include "Game/FE/feOnlineError.h"
+
+
+extern BaseGameSceneManager* g_pGameSceneManager;
+
+StaticCircularQueue<unsigned int, 3> gRejectedOpponentProfileIds;
+
+static inline bool CanCancelOnlineMatchmaking()
+{
+    if (!IsOnlineRankedMatch())
+        return false;
+    if (NetworkDraft::Instance()->mState != NET_DRAFT_IDLE)
+        return false;
+    NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
+    if (lobby != 0)
+    {
+        if (!lobby->IsMatchmaking())
+            return true;
+        if (lobby->CanCancelMatchmaking())
+            return true;
+    }
+    return false;
+}
 
 SHOnlineMatchmakingDraft::SHOnlineMatchmakingDraft()
-    : mUnidentified024(0)
-    , mUnidentified03C(false)
-    , mUnidentified040(-1)
-    , mUnidentified044(false)
+    : mScrollOffset(0)
+    , mIntroFinished(false)
+    , mCountdown(-1)
+    , mErrorPopupOpen(false)
 {
     if (gOnlineStartMatchmaking)
     {
-        mUnidentified01C = gOnlineMaxMatchmakingEntries;
-        mUnidentified02C = false;
-        mUnidentified030 = 0;
-        nlStrNCpy(mUnidentified574[0].mName, gNetworkMiiNameWide, 14);
-        memcpy(mUnidentified574[0].mMiiData, &gNetworkMiiData, 0x4C);
-        mUnidentified574[0].mSearchState = 4;
-        mUnidentified574[0].mStatus = 1;
-        if (NetworkStatsManager_8012F378::Instance()->GetLocalStats(0) != 0)
-            mUnidentified574[0].mStats = *NetworkStatsManager_8012F378::Instance()->GetLocalStats(0);
+        mPlayerCount = gOnlineMaxMatchmakingEntries;
+        mDraftStarted = false;
+        mConnectionCount = 0;
+        nlStrNCpy(mPlayers[0].mName, gNetworkMiiNameWide, 14);
+        memcpy(mPlayers[0].mMiiData, &gNetworkMiiData, sizeof(mPlayers[0].mMiiData));
+        mPlayers[0].mSearchState = 4;
+        mPlayers[0].mStatus = 1;
+        if (NetworkStatsManager::Instance()->GetLocalStats(0) != 0)
+            mPlayers[0].mStats = *NetworkStatsManager::Instance()->GetLocalStats(0);
         else
-            memset(&mUnidentified574[0].mStats, 0, sizeof(NetworkRankingMeta));
-        mUnidentified574[0].mSide = IsOnlineRankedMatch() && HasOnlineTwoLocalPlayers() ? 3 : 0;
-        mUnidentified574[0].mVisible = true;
+            memset(&mPlayers[0].mStats, 0, sizeof(NetworkRankingMeta));
+        if (IsOnlineRankedMatch() && HasOnlineTwoLocalPlayers())
+            mPlayers[0].mSide = 3;
+        else
+            mPlayers[0].mSide = 0;
+        mPlayers[0].mVisible = true;
         int i;
-        for (i = 1; i < mUnidentified01C; ++i)
+        for (i = 1; i < mPlayerCount; ++i)
         {
-            mUnidentified574[i].mName[0] = 0;
-            mUnidentified574[i].mSearchState = 0;
-            mUnidentified574[i].mStatus = 1;
-            memset(&mUnidentified574[i].mStats, 0, sizeof(NetworkRankingMeta));
-            mUnidentified574[i].mVisible = true;
+            mPlayers[i].mName[0] = 0;
+            mPlayers[i].mSearchState = 0;
+            mPlayers[i].mStatus = 1;
+            memset(&mPlayers[i].mStats, 0, sizeof(NetworkRankingMeta));
+            mPlayers[i].mVisible = true;
         }
         for (; i < 8; ++i)
         {
-            mUnidentified574[i].mName[0] = 0;
-            mUnidentified574[i].mSearchState = 0;
-            mUnidentified574[i].mStatus = 1;
-            memset(&mUnidentified574[i].mStats, 0, sizeof(NetworkRankingMeta));
-            mUnidentified574[i].mVisible = false;
+            mPlayers[i].mName[0] = 0;
+            mPlayers[i].mSearchState = 0;
+            mPlayers[i].mStatus = 1;
+            memset(&mPlayers[i].mStats, 0, sizeof(NetworkRankingMeta));
+            mPlayers[i].mVisible = false;
         }
         g_pNetworkSession->GetOnlineLobby()->StartMatchmakingThread();
         FEMusic::StopStream();
-        FEAudio::PlayAnimAudioEvent(0x89B1FC93, "FE_MATCHMAKING_DRAFT", (void*)42, 1);
+        FEAudio::PlayAnimAudioEvent(0x89B1FC93, "FE_MATCHMAKING_DRAFT", (void*)0x2A, true);
     }
     else
     {
-        mUnidentified01C = NetworkDraft::Instance()->mTeamCount;
-        mUnidentified02C = true;
-        mUnidentified030 = 0;
+        mPlayerCount = NetworkDraft::Instance()->mTeamCount;
+        mDraftStarted = true;
+        mConnectionCount = 0;
         FEMusic::StartStreamIfDifferent(8);
-        FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)42);
+        FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)0x2A);
         UpdateDraftTeams();
         UpdateDraftStatuses();
     }
-    mUnidentified1FC.SetBackScene(41);
-    mUnidentified038 = 41;
-    mUnidentified034 = CanCancelMatchmaking();
-    if (mUnidentified01C > 4)
+    mBackButton.SetBackScene(0x29);
+    mReturnScene = 0x29;
+    if (CanCancelOnlineMatchmaking())
+        mCanCancel = true;
+    else
+        mCanCancel = false;
+    if (mPlayerCount > 4)
     {
-        mUnidentified028 = mUnidentified01C - 4;
-        mUnidentified020 = true;
+        mScrollRange = mPlayerCount - 4;
+        mScrollingEnabled = true;
     }
     else
     {
-        mUnidentified028 = 0;
-        mUnidentified020 = false;
+        mScrollRange = 0;
+        mScrollingEnabled = false;
     }
 }
 
 void SHOnlineMatchmakingDraft::UpdateDraftTeams()
 {
     int count = NetworkDraft::Instance()->mTeamCount;
-    mUnidentified01C = count;
+    mPlayerCount = count;
     int i;
     for (i = 0; i < count; ++i)
     {
+        FEOnlinePlayerRow& row = mPlayers[i];
         NetworkDraftTeam* team = NetworkDraft::Instance()->GetDraftTeam(i);
-        FEOnlinePlayerRow& row = mUnidentified574[i];
         nlStrNCpy(row.mName, team->mPlayers[0].mName, 14);
-        memcpy(row.mMiiData, team->mPlayers[0].mData, 0x4C);
+        memcpy(row.mMiiData, team->mPlayers[0].mData, sizeof(row.mMiiData));
         row.mSearchState = 4;
         row.mStatus = 1;
         row.mStats = team->mPlayers[0].mHead;
-        row.mSide = IsOnlineRankedMatch() && HasOnlineTwoLocalPlayers() ? 3 : 0;
+        if (IsOnlineRankedMatch() && HasOnlineTwoLocalPlayers())
+            row.mSide = 3;
+        else
+            row.mSide = 0;
         row.mVisible = true;
     }
     for (; i < 8; ++i)
     {
-        mUnidentified574[i].mName[0] = 0;
-        mUnidentified574[i].mSearchState = 0;
-        mUnidentified574[i].mStatus = 1;
-        memset(&mUnidentified574[i].mStats, 0, sizeof(NetworkRankingMeta));
-        mUnidentified574[i].mVisible = false;
+        mPlayers[i].mName[0] = 0;
+        mPlayers[i].mSearchState = 0;
+        mPlayers[i].mStatus = 1;
+        memset(&mPlayers[i].mStats, 0, sizeof(NetworkRankingMeta));
+        mPlayers[i].mVisible = false;
     }
 }
 
 void SHOnlineMatchmakingDraft::UpdateDraftStatuses()
 {
     int count = NetworkDraft::Instance()->mTeamCount;
-    int current = NetworkDraft::Instance()->GetCurrentDraftingTeam();
+    int draftingTeam = NetworkDraft::Instance()->GetCurrentDraftingTeam();
     for (int i = 0; i < count; ++i)
     {
+        FEOnlinePlayerRow& row = mPlayers[i];
         if (NetworkDraft::Instance()->HasDisconnectedPlayer(i))
-            mUnidentified574[i].mStatus = 8;
+        {
+            row.mStatus = 8;
+        }
         else
         {
             NetworkDraftTeam* team = NetworkDraft::Instance()->GetDraftTeam(i);
-            if (i > current)
-                mUnidentified574[i].mStatus = 1;
-            else if (i == current)
-                mUnidentified574[i].mStatus = 4;
+            if (i > draftingTeam)
+                row.mStatus = 1;
+            else if (i == draftingTeam)
+                row.mStatus = 4;
             else
             {
-                mUnidentified574[i].mStatus = 6;
-                mUnidentified574[i].mCaptain = team->mCaptain;
+                row.mStatus = 6;
+                row.mCaptain = team->mCaptain;
             }
         }
     }
@@ -148,168 +184,164 @@ SHOnlineMatchmakingDraft::~SHOnlineMatchmakingDraft()
         scene->mTimer->m_bVisible = false;
 }
 
-bool SHOnlineMatchmakingDraft::CanCancelMatchmaking()
-{
-    if (!IsOnlineRankedMatch() || NetworkDraft::Instance()->mState != NET_DRAFT_IDLE)
-        return false;
-    NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
-    if (lobby == 0)
-        return false;
-    if (!lobby->mMatchmakingThreadRunning && lobby->mState == 0)
-        return true;
-    return lobby->CanCancelMatchmaking();
-}
-
-int SHOnlineMatchmakingDraft::GetRemainingDraftTime()
-{
-    NetworkDraft* draft = NetworkDraft::Instance();
-    int time = 0;
-    switch (draft->mState)
-    {
-    case NET_DRAFT_IDLE: return -1;
-    case NET_DRAFT_CAPTAINS: time = (int)draft->mTimeBeforeDrafting; break;
-    case NET_DRAFT_SIDEKICKS: time = (int)draft->mTimeToChangeDrafters; break;
-    case NET_DRAFT_FINAL_COUNTDOWN: time = (int)draft->mFinalCountdown; break;
-    case NET_DRAFT_STARTED:
-    case NET_DRAFT_DISCONNECTED: time = 0; break;
-    }
-    return time < 0 ? 0 : time;
-}
-
-void SHOnlineMatchmakingDraft::UpdateTimerText(int time)
-{
-    mUnidentified040 = time;
-    TLInstance* timer = FEFinder<TLInstance, 2>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("Timer"));
-    timer->m_bVisible = false;
-    TLTextInstance* overlayTimer = (TLTextInstance*)GetNavigationScene()->mTimer;
-    if (time == -1)
-        overlayTimer->m_bVisible = false;
-    else
-    {
-        overlayTimer->m_bVisible = true;
-        char buffer[8];
-        nlSNPrintf(buffer, sizeof(buffer), "%d", time);
-        nlStrToWcs(buffer, mUnidentified564, 8);
-        overlayTimer->SetString(mUnidentified564);
-    }
-}
-
 void SHOnlineMatchmakingDraft::SceneCreated()
 {
     for (int i = 0; i < 4; ++i)
     {
-        char name[32];
-        nlSNPrintf(name, sizeof(name), "FRIEND_%d", i);
-        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
-            InlineHasher("Layer"), InlineHasher(name));
-        mUnidentified2D4[i] = instance != 0 ? instance : &gDefaultTLComponentInstance;
+        char buffer[32];
+        nlSNPrintf(buffer, sizeof(buffer), "FRIEND_%d", i);
+        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(
+            mPresentation->GetActiveSlide(), "Layer",
+            buffer);
+        if (instance == 0)
+            instance = &gDefaultTLComponentInstance;
+        mPlayerInstances[i] = instance;
     }
-    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("scrollbar"));
-    if (scrollbar == 0)
-        scrollbar = &gDefaultTLComponentInstance;
-    mUnidentified048.SetComponent(scrollbar);
-    if (mUnidentified020)
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(
+        mPresentation->GetActiveSlide(), "Layer",
+        "scrollbar");
+    mScrollWidget.SetComponent(scrollbar == 0 ? &gDefaultTLComponentInstance : scrollbar);
+    if (mScrollingEnabled)
     {
-        mUnidentified048.SetRange(mUnidentified028);
-        mUnidentified048.SetValue(mUnidentified024);
+        mScrollWidget.SetRange(mScrollRange);
+        mScrollWidget.SetValue(mScrollOffset);
     }
     else
     {
-        mUnidentified048.SetRange(0);
-        mUnidentified048.SetValue(0);
+        mScrollWidget.SetRange(0);
+        mScrollWidget.SetValue(0);
     }
     SHNavigation* scene = GetNavigationScene();
-    scene->SetButtons(mUnidentified034 ? 4 : 0, true);
+    int pointerButtons = 0;
+    if (mCanCancel)
+        pointerButtons = 4;
+    scene->SetButtons(pointerButtons, true);
     for (int i = 0; i < 4; ++i)
-        UpdateOnlinePlayerRow(&mUnidentified574[i + mUnidentified024], mUnidentified2D4[i],
-            mUnidentified2E4[i], 32, mUnidentified3E4[i], 48, i, mUnidentified03C);
+        UpdateOnlinePlayerRow(&mPlayers[i + mScrollOffset], mPlayerInstances[i],
+            mPlayerNameBuffers[i], 0x20, mPlayerDescriptionBuffers[i], 0x30, i, mIntroFinished);
     for (int i = 0; i < 4; ++i)
         gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
-    TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("Title2"));
-    TLTextInstance* text0 = FEFinder<TLTextInstance, 3>::Find(title->GetActiveSlide(), InlineHasher("Title"));
-    TLTextInstance* text1 = FEFinder<TLTextInstance, 3>::Find(title->GetActiveSlide(), InlineHasher("Title2"));
-    TLTextInstance* text2 = FEFinder<TLTextInstance, 3>::Find(title->GetActiveSlide(), InlineHasher("Title3"));
-    if (g_pNetworkSession->mTournamentMode)
+
+    TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::Find(
+        mPresentation->GetActiveSlide(), "Layer",
+        "Title2");
+    TLTextInstance* title1 = FEFinder<TLTextInstance, 2>::Find(
+        title->GetActiveSlide(), "Title");
+    TLTextInstance* title2 = FEFinder<TLTextInstance, 2>::Find(
+        title->GetActiveSlide(), "Title2");
+    TLTextInstance* title3 = FEFinder<TLTextInstance, 2>::Find(
+        title->GetActiveSlide(), "Title3");
+    if (g_pNetworkSession->mCupMode)
     {
-        text0->SetStringId("TITLE_LW_CUP_DRAFT");
-        text1->SetStringId("TITLE_LW_CUP_DRAFT");
-        text2->SetStringId("TITLE_LW_CUP_DRAFT");
+        title1->SetStringId("TITLE_LW_CUP_DRAFT");
+        title2->SetStringId("TITLE_LW_CUP_DRAFT");
+        title3->SetStringId("TITLE_LW_CUP_DRAFT");
     }
     else
     {
-        text0->SetStringId("TITLE_LW_DOMINATION_DRAFT");
-        text1->SetStringId("TITLE_LW_DOMINATION_DRAFT");
-        text2->SetStringId("TITLE_LW_DOMINATION_DRAFT");
+        title1->SetStringId("TITLE_LW_DOMINATION_DRAFT");
+        title2->SetStringId("TITLE_LW_DOMINATION_DRAFT");
+        title3->SetStringId("TITLE_LW_DOMINATION_DRAFT");
     }
-    UpdateTimerText(GetRemainingDraftTime());
-    mUnidentified1FC.SetButtonInstance(scene->GetButton(4));
-    if (mUnidentified034)
-        mUnidentified1FC.Enable();
+
+    int countdown = NetworkDraft::Instance()->GetCountdown();
+    mCountdown = countdown;
+    TLSlide* timerSlide = mPresentation->GetActiveSlide();
+    FEFinder<TLInstance, 2>::Find(timerSlide,
+        "Layer", "Timer")->m_bVisible = false;
+    TLTextInstance* text = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
+    if (countdown == -1)
+        text->m_bVisible = false;
     else
-        mUnidentified1FC.Disable();
-    FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
+    {
+        text->m_bVisible = true;
+        char buffer[8];
+        nlSNPrintf(buffer, sizeof(buffer), "%d", countdown);
+        nlStrToWcs(buffer, mCountdownBuffer, 8);
+        text->SetString(mCountdownBuffer);
+    }
+    mBackButton.SetButtonInstance(scene->GetButton(4));
+    if (mCanCancel)
+        mBackButton.Enable();
+    else
+        mBackButton.Disable();
+    FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, true);
 }
 
-void SHOnlineMatchmakingDraft::Update(float dt)
+void SHOnlineMatchmakingDraft::Update(float fDeltaT)
 {
-    BaseSceneHandler::Update(dt);
-    if (mUnidentified044 && !g_pFEInput->HasInputLock(this))
+    BaseSceneHandler::Update(fDeltaT);
+    if (mErrorPopupOpen && !g_pFEInput->HasInputLock(this))
         return;
-    if (!mUnidentified03C)
+
+    if (!mIntroFinished)
     {
-        TLSlide* slide = mPresentation->m_currentSlide;
-        if (!(slide->m_time >= slide->m_start + slide->m_duration))
+        TLSlide* slide = mPresentation->GetActiveSlide();
+        if (slide->m_time >= slide->m_start + slide->m_duration)
+        {
+            if (mScrollingEnabled && !mScrollWidget.mInitialized)
+                mScrollWidget.Initialize();
+            mIntroFinished = true;
+            for (int i = 0; i < 4; ++i)
+                gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+        }
+        else
+        {
             return;
-        if (mUnidentified020 && !mUnidentified048.mInitialized)
-            mUnidentified048.Initialize();
-        mUnidentified03C = true;
-        for (int i = 0; i < 4; ++i)
-            gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+        }
     }
-    if (!mUnidentified02C)
+
+    if (!mDraftStarted)
     {
         if (NetworkDraft::Instance()->mState == NET_DRAFT_CAPTAINS)
         {
-            mUnidentified02C = true;
+            mDraftStarted = true;
             UpdateDraftTeams();
             FEMusic::StartStreamIfDifferent(8);
-            FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)42);
+            FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)0x2A);
         }
         else if (g_pNetworkSession->GetOnlineLobby()->mMatchFailed)
         {
             g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
             if (g_pNetworkSession->RequiresDisconnectAfterError())
-                mUnidentified038 = 1;
+                mReturnScene = SCENE_MAIN_MENU;
             int error = g_pNetworkSession->mDWCErrorCode;
-            error = GetOnlineErrorPopup(error, g_pNetworkSession->RequiresDisconnectAfterError(), 90);
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
-            {
-                FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)42);
-                FEMusic::StartStreamIfDifferent(3);
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)error, Bind<void>(MemFun(&SHOnlineMatchmakingDraft::OnErrorDismissed), this));
-                mUnidentified044 = true;
-            }
+            int popup = GetOnlineErrorPopup(error, g_pNetworkSession->RequiresDisconnectAfterError(), 0x5A);
+            if (g_pGameSceneManager->GetSceneType(g_pGameSceneManager->GetCurrentScene()) == (SceneList)10)
+                return;
+            FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)0x2A);
+            FEMusic::StartStreamIfDifferent(3);
+            FEPopupMenu* menu = static_cast<FEPopupMenu*>(
+                g_pGameSceneManager->Push((SceneList)10, SCREEN_NOTHING, false));
+            menu->Create((ePopupMenu)popup,
+                Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMatchmakingDraft::OnErrorDismissed), this)));
+            mErrorPopupOpen = true;
             return;
         }
         else
         {
-            g_pNetworkSession->GetOnlineLobby();
-            int connections = DWC_GetNumConnectionHost();
-            if (mUnidentified030 != connections)
+            int count = g_pNetworkSession->GetOnlineLobby()->GetConnectionCount();
+            if (mConnectionCount != count)
             {
-                mUnidentified030 = connections;
-                for (int i = 1; i < mUnidentified01C; ++i)
+                mConnectionCount = count;
+                for (int i = 1; i < mPlayerCount; ++i)
                 {
-                    FEOnlinePlayerRow& row = mUnidentified574[i];
-                    row.mName[0] = 0;
-                    row.mSearchState = i < mUnidentified030 ? 1 : 0;
-                    row.mStatus = 1;
-                    memset(&row.mStats, 0, sizeof(NetworkRankingMeta));
-                    row.mVisible = true;
+                    if (i < mConnectionCount)
+                    {
+                        mPlayers[i].mName[0] = 0;
+                        mPlayers[i].mSearchState = 1;
+                        mPlayers[i].mStatus = 1;
+                        memset(&mPlayers[i].mStats, 0, sizeof(NetworkRankingMeta));
+                        mPlayers[i].mVisible = true;
+                    }
+                    else
+                    {
+                        mPlayers[i].mName[0] = 0;
+                        mPlayers[i].mSearchState = 0;
+                        mPlayers[i].mStatus = 1;
+                        memset(&mPlayers[i].mStats, 0, sizeof(NetworkRankingMeta));
+                        mPlayers[i].mVisible = true;
+                    }
                 }
             }
         }
@@ -320,85 +352,106 @@ void SHOnlineMatchmakingDraft::Update(float dt)
         if (NetworkDraft::Instance()->mState == NET_DRAFT_DISCONNECTED)
         {
             g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
-            {
-                FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)42);
-                FEMusic::StartStreamIfDifferent(3);
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)96, Bind<void>(MemFun(&SHOnlineMatchmakingDraft::OnErrorDismissed), this));
-                mUnidentified044 = true;
-            }
+            if (g_pGameSceneManager->GetSceneType(g_pGameSceneManager->GetCurrentScene()) == (SceneList)10)
+                return;
+            FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)0x2A);
+            FEMusic::StartStreamIfDifferent(3);
+            FEPopupMenu* menu = static_cast<FEPopupMenu*>(
+                g_pGameSceneManager->Push((SceneList)10, SCREEN_NOTHING, false));
+            menu->Create((ePopupMenu)0x60,
+                Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMatchmakingDraft::OnErrorDismissed), this)));
+            mErrorPopupOpen = true;
             return;
         }
     }
-    int time = GetRemainingDraftTime();
-    if (mUnidentified040 != time)
-        UpdateTimerText(time);
-    if (mUnidentified034)
+
+    int countdown = NetworkDraft::Instance()->GetCountdown();
+    if (mCountdown != countdown)
     {
-        if (!CanCancelMatchmaking())
+        mCountdown = countdown;
+        TLSlide* timerSlide = mPresentation->GetActiveSlide();
+        FEFinder<TLInstance, 2>::Find(timerSlide,
+            "Layer", "Timer")->m_bVisible = false;
+        TLTextInstance* text = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
+        if (countdown == -1)
+            text->m_bVisible = false;
+        else
+        {
+            text->m_bVisible = true;
+            char buffer[8];
+            nlSNPrintf(buffer, sizeof(buffer), "%d", countdown);
+            nlStrToWcs(buffer, mCountdownBuffer, 8);
+            text->SetString(mCountdownBuffer);
+        }
+    }
+
+    if (mCanCancel)
+    {
+        if (!CanCancelOnlineMatchmaking())
         {
             GetNavigationScene()->SetButtons(0, true);
-            mUnidentified1FC.Disable();
-            mUnidentified034 = false;
+            mBackButton.Disable();
+            mCanCancel = false;
         }
     }
-    else if (CanCancelMatchmaking())
+    else if (CanCancelOnlineMatchmaking())
     {
         GetNavigationScene()->SetButtons(4, true);
-        mUnidentified1FC.Enable();
-        mUnidentified034 = true;
+        mBackButton.Enable();
+        mCanCancel = true;
     }
+
     for (int i = 0; i < 4; ++i)
     {
-        if ((unsigned int)i != gFEControllerIndex || !CanCancelMatchmaking())
+        TLComponentInstance* pointer = gFEPointerInstances[i];
+        if (i != gFEControllerIndex || !CanCancelOnlineMatchmaking())
+            pointer->SetActiveSlide("waiting", true, false);
+        else
         {
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
-            continue;
-        }
-        u8 valid = true;
-        FEPointerEvent event;
-        event.mIndex = i;
-        event.mPosition = GetPointerPosition(i, &valid);
-        event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 30, true, 0);
-        event.mReleased = g_pFEInput->JustReleased((eFEINPUT_PAD)i, 30, true, 0);
-        if (mUnidentified020)
-            mUnidentified048.Update(event, dt);
-        if (mUnidentified1FC.UpdateBackButton(event, dt))
-        {
-            NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
-            if (lobby != 0 && (lobby->mMatchmakingThreadRunning || lobby->mState != 0)
-                && lobby->CanCancelMatchmaking())
-                lobby->CancelMatchmaking();
-            FEMusic::StartStreamIfDifferent(8);
-            FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)42);
-            return;
+            FEPointerEvent event;
+            event.mIndex = i;
+            u8 valid = true;
+            event.mPosition = GetPointerPosition(i, &valid);
+            event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 30, true, 0);
+            event.mReleased = g_pFEInput->JustReleased((eFEINPUT_PAD)i, 30, true, 0);
+            if (mScrollingEnabled)
+                mScrollWidget.Update(event, fDeltaT);
+            if (mBackButton.UpdateBackButton(event, fDeltaT))
+            {
+                NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
+                if (lobby != 0 && lobby->IsMatchmaking()
+                    && lobby->CanCancelMatchmaking())
+                    lobby->CancelMatchmaking();
+                FEMusic::StartStreamIfDifferent(8);
+                FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)0x2A);
+                return;
+            }
         }
     }
-    if (mUnidentified020)
+    if (mScrollingEnabled)
     {
-        if (mUnidentified048.IsScrolling(1, 1))
-            ++mUnidentified024;
-        else if (mUnidentified048.IsScrolling(0, 1))
-            --mUnidentified024;
+        if (mScrollWidget.IsScrolling(1, 1))
+            ++mScrollOffset;
+        else if (mScrollWidget.IsScrolling(0, 1))
+            --mScrollOffset;
     }
     for (int i = 0; i < 4; ++i)
-        UpdateOnlinePlayerRow(&mUnidentified574[i + mUnidentified024], mUnidentified2D4[i],
-            mUnidentified2E4[i], 32, mUnidentified3E4[i], 48, i, mUnidentified03C);
+        UpdateOnlinePlayerRow(&mPlayers[i + mScrollOffset], mPlayerInstances[i],
+            mPlayerNameBuffers[i], 0x20, mPlayerDescriptionBuffers[i], 0x30, i, mIntroFinished);
 }
 
 void SHOnlineMatchmakingDraft::OnErrorDismissed()
 {
-    mUnidentified044 = false;
-    if (mUnidentified038 == 1)
+    mErrorPopupOpen = false;
+    if (mReturnScene == SCENE_MAIN_MENU)
     {
-        GameSceneManager::Instance()->Pop();
-        FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
+        g_pGameSceneManager->Pop();
+        FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, true);
         Presentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
     }
     else
     {
-        GameSceneManager::Instance()->Push((SceneList)mUnidentified038, SCREEN_BACK, true);
+        g_pGameSceneManager->Push((SceneList)mReturnScene, SCREEN_BACK, true);
         FEMusic::StartStreamIfDifferent(8);
     }
 }

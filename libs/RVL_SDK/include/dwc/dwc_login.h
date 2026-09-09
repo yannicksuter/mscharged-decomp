@@ -2,6 +2,7 @@
 
 #include <dwc/dwc_account.h>
 #include <dwc/dwc_error.h>
+#include <dwc/dwc_login_fwd.h>
 #include <gamespy/GP/gp.h>
 #include <revolution/os/OSTime.h>
 
@@ -24,8 +25,6 @@ extern "C"
         DWC_LOGIN_STATE_NUM
     } DWCLoginState;
 
-    typedef void (*DWCLoginCallback)(DWCError error, int profileID,
-        void* param);
 
     typedef struct DWCstLoginControl
     {

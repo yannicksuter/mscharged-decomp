@@ -70,4 +70,6 @@ private:
 extern FEInput* g_pFEInput;
 extern unsigned int gFEControllerIndex;
 
+extern unsigned int gFEControllerIndex;
+
 #endif // GAME_FE_INPUT_H

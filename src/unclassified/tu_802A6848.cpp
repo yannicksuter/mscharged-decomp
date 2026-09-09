@@ -1,6 +1,8 @@
+#include "NL/gl/glMaterialProgram.h"
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
+#include "NL/gl/glLoadModel.h"
 
 struct RegistryBackend_802A6848
 {
@@ -13,9 +15,8 @@ struct RegistryBackend_802A6848
 extern u8 lbl_8052AB78[];
 extern RegistryBackend_802A6848* lbl_806E1D38;
 extern u8 lbl_806E1D3C;
-extern GXPrimitive lbl_80524470[];
+extern GXPrimitive glx_PrimitiveTypes[];
 
-extern "C" void fn_802CB790(RegistryBackend_802A6848*, u32);
 
 extern "C" RegistryBackend_802A6848* fn_802A6848(
     RegistryBackend_802A6848* backend)
@@ -25,7 +26,7 @@ extern "C" RegistryBackend_802A6848* fn_802A6848(
     backend->key = 0xDC56470F;
     backend->stateSize = 0;
     backend->descriptorCount = 0;
-    fn_802CB790(backend, 0xDC56470F);
+    glRegisterMaterialProgram(backend, 0xDC56470F);
     return backend;
 }
 
@@ -74,7 +75,7 @@ extern "C" void fn_802A6964(void*, const glModelPacket* packet)
 extern "C" void fn_802A6978(void*, const glModelPacket* packet)
 {
     GXBegin(
-        lbl_80524470[static_cast<u8>(packet->primType)], GX_VTXFMT0, static_cast<u16>(packet->numVertices));
+        glx_PrimitiveTypes[static_cast<u8>(packet->primType)], GX_VTXFMT0, static_cast<u16>(packet->numVertices));
 
     u16* index = packet->indexBuffer;
     u16* end = index + packet->numVertices;
@@ -88,7 +89,7 @@ extern "C" void fn_802A6978(void*, const glModelPacket* packet)
 extern "C" void fn_802A6AD4(void*, const glModelPacket* packet)
 {
     GXBegin(
-        lbl_80524470[static_cast<u8>(packet->primType)], GX_VTXFMT0, packet->numUniqueVertices);
+        glx_PrimitiveTypes[static_cast<u8>(packet->primType)], GX_VTXFMT0, packet->numUniqueVertices);
 
     for (u16 i = 0; i < packet->numUniqueVertices; ++i)
     {

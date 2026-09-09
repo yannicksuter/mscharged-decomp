@@ -1,3 +1,4 @@
+#include "NL/gl/glMaterialProgram.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
@@ -16,10 +17,10 @@ void glplatSetMatrix(unsigned long matrix, const nlMatrix4& m)
     matrixPtr->Set(m);
 }
 
-extern "C" void glplatFinalizePacket(
+void glplatFinalizePacket(
     glModelPacket* packet, bool permanent, void* allocator)
 {
-    ((UnidentifiedPacketResource*)packet->unknown10)->fn_Unknown2(packet);
+    ((GLMaterialProgram*)packet->unknown10)->Configure(packet);
     packet->displayList = 0;
     if (permanent)
     {

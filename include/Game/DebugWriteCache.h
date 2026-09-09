@@ -15,9 +15,9 @@ struct DebugFieldType
     /* 0x4 */ DebugFieldWriter writer;
 }; // size: 0x8
 
-struct UnidentifiedDebugWriteField;
+struct DebugWriteField;
 
-struct UnidentifiedDebugWriteType
+struct DebugWriteType
 {
     /* 0x00 */ u16 mType;
     /* 0x02 */ u16 mKind;
@@ -26,7 +26,7 @@ struct UnidentifiedDebugWriteType
     {
         struct
         {
-            /* 0x14 */ UnidentifiedDebugWriteField* mLastField;
+            /* 0x14 */ DebugWriteField* mLastField;
             /* 0x18 */ u16 mFieldCount;
             /* 0x1A */ u16 mPadding1A;
         } mComposite;
@@ -40,19 +40,19 @@ struct UnidentifiedDebugWriteType
     } mData;
 }; // size: 0x1C
 
-struct UnidentifiedDebugWriteField
+struct DebugWriteField
 {
     /* 0x00 */ u16 mSize;
     /* 0x02 */ u16 mOffset;
-    /* 0x04 */ UnidentifiedDebugWriteField* mNext;
-    /* 0x08 */ UnidentifiedDebugWriteType* mOwner;
+    /* 0x04 */ DebugWriteField* mNext;
+    /* 0x08 */ DebugWriteType* mOwner;
     /* 0x0C */ char mName[16];
     /* 0x1C */ u16 mCount;
     /* 0x1E */ u8 mFieldType;
     /* 0x1F */ u8 mPadding1F;
 }; // size: 0x20
 
-struct UnidentifiedDebugWriteBuffer
+struct DebugWriteBuffer
 {
     /* 0x00 */ int mFrame;
     /* 0x04 */ u32 mSize;
@@ -63,34 +63,29 @@ struct UnidentifiedDebugWriteBuffer
 class DebugWriteCache
 {
 public:
+    void Reset();
+    void WriteFloat(u16* type, const char* name, RunningChecksum* checksum, float value);
+    u16 BeginType(const char* name);
+    void EndType();
+    void AddField(int fieldType, u16 size, unsigned int offset, const char* name);
+    void AddArrayField(int fieldType, u16 size, unsigned int count, unsigned int offset, const char* name);
+    void WriteText(const char* value);
+    void* WriteData(u16 type, void* value, unsigned int size);
+    void ChecksumData(u16 type, void* value, void* context);
+    void BeginFrame(unsigned int frame);
+
     /* 0x00 */ u16 mTypeCount;
     /* 0x02 */ u16 mCurrentType;
     /* 0x04 */ int mTypeCapacity;
-    /* 0x08 */ UnidentifiedDebugWriteType* mTypes;
+    /* 0x08 */ DebugWriteType* mTypes;
     /* 0x0C */ int mFieldCapacity;
     /* 0x10 */ int mFieldCount;
-    /* 0x14 */ UnidentifiedDebugWriteField* mFields;
+    /* 0x14 */ DebugWriteField* mFields;
     /* 0x18 */ int mBufferCount;
     /* 0x1C */ int mCurrentBuffer;
-    /* 0x20 */ UnidentifiedDebugWriteBuffer* mBuffers;
+    /* 0x20 */ DebugWriteBuffer* mBuffers;
 }; // size: 0x24
 
-extern "C" DebugFieldType lbl_80533C98[32];
-
-extern "C" void fn_80338CC4(DebugWriteCache* cache);
-extern "C" void fn_80338D04(DebugWriteCache* cache, u16* type,
-    const char* name, RunningChecksum* checksum, float value);
-extern "C" u16 fn_80338EBC(DebugWriteCache* cache, const char* name);
-extern "C" void fn_80338F78(DebugWriteCache* cache);
-extern "C" void fn_80338F88(DebugWriteCache* cache, int fieldType, u16 size,
-    u32 offset, const char* name);
-extern "C" void fn_80339090(DebugWriteCache* cache, int fieldType, u16 size,
-    u32 count, u32 offset, const char* name);
-extern "C" void fn_8033919C(DebugWriteCache* cache, const char* value);
-extern "C" void* fn_8033930C(
-    DebugWriteCache* cache, u16 type, void* value, u32 size);
-extern "C" void fn_80339450(DebugWriteCache* cache, u16 type,
-    void* value, void* context);
-extern "C" void fn_80339544(DebugWriteCache* cache, u32 frame);
+extern DebugFieldType gDebugFieldTypes[32];
 
 #endif // GAME_DEBUGWRITECACHE_H

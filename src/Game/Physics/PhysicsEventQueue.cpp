@@ -1,4 +1,7 @@
 #include "Game/Task/DispatchEventsTask.h"
+#include "Game/Render/BirdoEgg.h"
+#include "Game/Physics/PhysicsEventQueue.h"
+#include "Game/Audio/GameStreams.h"
 #include "Game/EventDispatcher.inl"
 
 #include "Game/AI/Fielder.h"
@@ -234,7 +237,6 @@ extern "C" void fn_800156F8(void*, void*);
 extern "C" void fn_80015B38(void*, int);
 extern "C" void fn_8002E5F4(void*, int);
 extern "C" void fn_8004AC68(void*, nlVector3*, void*);
-extern "C" void fn_8019A434(void*, int);
 extern "C" PhysicsSphere_80175F8C* fn_80176A60(const nlVector3*);
 
 extern "C" void fn_801452F4(void* object)
@@ -316,7 +318,7 @@ extern "C" void fn_8014545C(void* data)
     {
         fn_80015B38(g_pBall, 0);
     }
-    fn_8019A434(*(void**)bytes, 0);
+    (*(BirdoEggObject**)bytes)->Hide(false);
 }
 
 extern "C" void fn_80032534(cFielder*, const nlVector3&);

@@ -28,7 +28,7 @@ bool mInGame;
 
 bool FEMusic::IsPlayingCupResultStream()
 {
-    switch (mCurrentMusicCue)
+    switch (FEMusic::mCurrentMusicCue)
     {
     case (int)0xAE597F5E:
     case 0x2341D569:
@@ -42,12 +42,12 @@ bool FEMusic::IsPlayingCupResultStream()
 
 void FEMusic::ResumeStream()
 {
-    FEAudio::ResumeSound(mCurrentMusicCue, (void*)StartStreamIfDifferent);
+    FEAudio::ResumeSound(FEMusic::mCurrentMusicCue, (void*)FEMusic::StartStreamIfDifferent);
 }
 
 void FEMusic::PauseStream()
 {
-    FEAudio::PauseSound(mCurrentMusicCue, (void*)StartStreamIfDifferent);
+    FEAudio::PauseSound(FEMusic::mCurrentMusicCue, (void*)FEMusic::StartStreamIfDifferent);
 }
 
 void FEMusic::StopStream()

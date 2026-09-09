@@ -28,11 +28,11 @@ public:
     void Release()
     {
         m_pItems->InorderWalk(
-            m_pItems->m_Root, this, &freeing_GLInventory::fn_Unknown);
+            m_pItems->m_Root, this, &freeing_GLInventory::FreeItem);
         m_pItems->Clear();
     }
 
-    void fn_Unknown(const unsigned long&, ValueType** value)
+    void FreeItem(const unsigned long&, ValueType** value)
     {
         nlFree(*value);
     }
@@ -56,11 +56,11 @@ public:
     void Release()
     {
         m_pItems->InorderWalk(
-            m_pItems->m_Root, this, &deleting_GLInventory::fn_Unknown);
+            m_pItems->m_Root, this, &deleting_GLInventory::DeleteItem);
         m_pItems->Clear();
     }
 
-    void fn_Unknown(const unsigned long&, ValueType** value)
+    void DeleteItem(const unsigned long&, ValueType** value)
     {
         delete *value;
     }
@@ -69,7 +69,7 @@ public:
 };
 
 template <typename ValueType>
-class UnidentifiedInventory_802D3854
+class clearing_GLInventory
 {
 public:
     typedef nlAVLTree<unsigned long, ValueType*,
@@ -78,15 +78,15 @@ public:
 
     struct Callback
     {
-        void fn_Unknown(const unsigned long&, ValueType** value)
+        void Invoke(const unsigned long&, ValueType** value)
         {
-            m_00(*value);
+            mCallback(*value);
         }
 
-        void (*m_00)(ValueType*);
+        void (*mCallback)(ValueType*);
     };
 
-    ~UnidentifiedInventory_802D3854()
+    ~clearing_GLInventory()
     {
         m_pItems->Clear();
         delete m_pItems;
@@ -97,9 +97,9 @@ public:
         if (fn != 0)
         {
             Callback callback;
-            callback.m_00 = fn;
+            callback.mCallback = fn;
             m_pItems->InorderWalk(
-                m_pItems->m_Root, &callback, &Callback::fn_Unknown);
+                m_pItems->m_Root, &callback, &Callback::Invoke);
         }
         m_pItems->Clear();
     }
@@ -110,19 +110,21 @@ public:
 class GLInventory
 {
 public:
+    typedef void (*ModelReleaseCallback)(glModel*);
+
     GLInventory();
     ~GLInventory();
 
     void Create();
-    void fn_802D19C4(void* value);
+    void SetModelReleaseCallback(const ModelReleaseCallback& callback);
     void ResourceMark();
     void ResourceRelease(int nLevel);
     void ReleaseLevel(int nLevel);
 
     void AddModel(unsigned long key, glModel* model);
     glModel* GetModel(unsigned long id);
-    void fn_802D2324(unsigned long key, PlatTexture* texture);
-    PlatTexture* fn_802D2370(unsigned long id);
+    void AddTexture(unsigned long key, PlatTexture* texture);
+    PlatTexture* GetTexture(unsigned long id);
     void AddTextureAnim(unsigned long key, GLTextureAnim* anim);
     GLTextureAnim* GetTextureAnim(unsigned long id);
     void AddVertexAnim(unsigned long key, GLVertexAnim* vertexAnim);
@@ -131,13 +133,13 @@ public:
     GLSkinMesh* MakeSkinMesh(unsigned long hashID, cSHierarchy* hierarchy);
     void Update(float deltaTime);
 
-    /* 0x000 */ void (*m_Unknown000)(glModel*);
+    /* 0x000 */ ModelReleaseCallback mModelReleaseCallback;
     /* 0x004 */ nlListContainer<void*>* m_pFileData[16];
     /* 0x044 */ freeing_GLInventory<nlChunk>* m_pSkinData[16];
-    /* 0x084 */ UnidentifiedInventory_802D3854<glModel>* m_pModels[16];
-    /* 0x0C4 */ UnidentifiedInventory_802D3854<GLTextureAnim>* m_pTextureAnims[16];
+    /* 0x084 */ clearing_GLInventory<glModel>* m_pModels[16];
+    /* 0x0C4 */ clearing_GLInventory<GLTextureAnim>* m_pTextureAnims[16];
     /* 0x104 */ deleting_GLInventory<GLVertexAnim>* m_pVertexAnims[16];
-    /* 0x144 */ UnidentifiedInventory_802D3854<PlatTexture>* m_Unidentified144[16];
+    /* 0x144 */ clearing_GLInventory<PlatTexture>* m_pTextures[16];
     /* 0x184 */ int m_nLevel;
     /* 0x188 */ unsigned char m_bCreated;
 };

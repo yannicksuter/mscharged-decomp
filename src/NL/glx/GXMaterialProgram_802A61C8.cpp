@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/glx/GXMaterialProgram.h"
+#include "NL/gl/glLoadModel.h"
 
 GXMaterialProgram_802A61C8* GXMaterialProgram_802A61C8::Instance;
 bool GXMaterialProgram_802A61C8::Initialized;
@@ -16,7 +17,7 @@ GXMaterialProgram_802A61C8::GXMaterialProgram_802A61C8()
     programHash = 0x5D6C62BA;
     parameterDataSize = 16;
     parameterCount = 2;
-    fn_802CB790(this, programHash);
+    glRegisterMaterialProgram(this, programHash);
 }
 
 GXMaterialProgram_802A61C8::~GXMaterialProgram_802A61C8()
@@ -30,7 +31,7 @@ void GXMaterialProgram_802A61C8::Initialize()
     Initialized = true;
 }
 
-void GXMaterialProgram_802A61C8::Configure()
+void GXMaterialProgram_802A61C8::Configure(glModelPacket*)
 {
 }
 
@@ -65,7 +66,7 @@ void GXMaterialProgram_802A61C8::BindVertexArrays(const glModelPacket* packet)
 
 void GXMaterialProgram_802A61C8::BindParameters(const glModelPacket* packet)
 {
-    fn_8036BE88(0, packet->unknown20);
+    glx_BindTexture(0, (glTextureBinding*)(packet->unknown20));
 }
 
 const GXMaterialParameter* GXMaterialProgram_802A61C8::GetParameters()

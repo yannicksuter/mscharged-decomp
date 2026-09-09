@@ -4,6 +4,8 @@
 #include "Game/TweakRegistry.h"
 #include "NL/nlPrint.h"
 
+#include <string.h>
+
 struct StrikerChallengeDefinition
 {
     /* 0x00 */ const char* mConfigPath;
@@ -87,12 +89,17 @@ int CupManager::GetCurrentMode() const
     return mCurrentMode;
 }
 
-int CupManager::fn_8010F1C8() const
+int CupManager::GetCupPersona() const
 {
     return 10;
 }
 
-int CupManager::fn_8010F1E8() const
+u16 CupManager::GetNumPlayoffRounds() const
+{
+    return mCurrentCup->GetNumPlayoffRounds();
+}
+
+NetworkTournamentGame* CupManager::GetTournamentGame(int, int)
 {
     return 0;
 }
@@ -108,7 +115,7 @@ StrikerChallenge::StrikerChallenge()
     mCurrentChallenge = -1;
     mUnlockedChallenges = 0;
     memset(mCompletionDates, 0, sizeof(mCompletionDates));
-    mUnidentified6C = false;
+    mUnidentified6C = 0;
     mHeadlineVariant = -1;
     mHomeScore = 0;
     mAwayScore = 0;
@@ -118,8 +125,8 @@ StrikerChallenge::StrikerChallenge()
     mAwayPowerupsEnabled = true;
     mHomeMegastrikeEnabled = true;
     mAwayMegastrikeEnabled = true;
-    mHomeSkillshotEnabled = true;
-    mAwaySkillshotEnabled = true;
+    mHomeSkillshotDisabled = true;
+    mAwaySkillshotDisabled = true;
     mStunnedHomeGoalies = false;
     mStunnedAwayGoalies = false;
 }
@@ -185,8 +192,8 @@ void StrikerChallenge::LoadSettings()
     mAwayPowerupsEnabled = !GetTweakBool("challenge/awaypowerups", false);
     mHomeMegastrikeEnabled = !GetTweakBool("challenge/homemegastrike", false);
     mAwayMegastrikeEnabled = !GetTweakBool("challenge/awaymegastrike", false);
-    mHomeSkillshotEnabled = !GetTweakBool("challenge/homeskillshot", false);
-    mAwaySkillshotEnabled = !GetTweakBool("challenge/awayskillshot", false);
+    mHomeSkillshotDisabled = !GetTweakBool("challenge/homeskillshot", false);
+    mAwaySkillshotDisabled = !GetTweakBool("challenge/awayskillshot", false);
     mStunnedHomeGoalies = GetTweakBool("challenge/stunnedhomegoalies", false);
     mStunnedAwayGoalies = GetTweakBool("challenge/stunnedawaygoalies", false);
     mCustomPowerups = GetTweakInt("challenge/custompowerups", 0);
@@ -372,6 +379,16 @@ int fn_8011162C()
 {
     return 0;
 }
+
+template TeamStats* Cup<4, 8>::GetPreviousTeamStats();
+template TeamStats* Cup<6, 12>::GetPreviousTeamStats();
+template TeamStats* Cup<10, 11>::GetPreviousTeamStats();
+template u16 Cup<4, 8>::GetNumTeams();
+template u16 Cup<6, 12>::GetNumTeams();
+template u16 Cup<10, 11>::GetNumTeams();
+template int Cup<4, 8>::GetSaveDataSize() const;
+template int Cup<6, 12>::GetSaveDataSize() const;
+template int Cup<10, 11>::GetSaveDataSize() const;
 
 // Explicit specializations emit strong symbols matching R4QE01 (predecessor
 // keeps these weak). Bodies reproduce the retail immediates via sizeof and
@@ -573,7 +590,7 @@ BasicGameInfo* Cup<10, 11>::GetGameInfo(int phase, int round, int matchup)
 }
 
 template <>
-u16 Cup<4, 8>::GetNumGamesPerRound(int phase)
+u16 Cup<4, 8>::GetNumRounds(int phase)
 {
     if (phase == 0)
     {
@@ -590,7 +607,7 @@ u16 Cup<4, 8>::GetNumGamesPerRound(int phase)
     return 6;
 }
 template <>
-u16 Cup<6, 12>::GetNumGamesPerRound(int phase)
+u16 Cup<6, 12>::GetNumRounds(int phase)
 {
     if (phase == 0)
     {
@@ -607,7 +624,7 @@ u16 Cup<6, 12>::GetNumGamesPerRound(int phase)
     return 10;
 }
 template <>
-u16 Cup<10, 11>::GetNumGamesPerRound(int phase)
+u16 Cup<10, 11>::GetNumRounds(int phase)
 {
     if (phase == 0)
     {
@@ -641,33 +658,33 @@ u16 Cup<10, 11>::GetNumRounds()
 }
 
 template <>
-u16 Cup<4, 8>::GetNumRegularGames()
+u16 Cup<4, 8>::GetNumRegularRounds()
 {
     return 6;
 }
 template <>
-u16 Cup<6, 12>::GetNumRegularGames()
+u16 Cup<6, 12>::GetNumRegularRounds()
 {
     return 10;
 }
 template <>
-u16 Cup<10, 11>::GetNumRegularGames()
+u16 Cup<10, 11>::GetNumRegularRounds()
 {
     return 9;
 }
 
 template <>
-u16 Cup<4, 8>::GetNumPlayoffGames()
+u16 Cup<4, 8>::GetNumPlayoffRounds()
 {
     return 1;
 }
 template <>
-u16 Cup<6, 12>::GetNumPlayoffGames()
+u16 Cup<6, 12>::GetNumPlayoffRounds()
 {
     return 2;
 }
 template <>
-u16 Cup<10, 11>::GetNumPlayoffGames()
+u16 Cup<10, 11>::GetNumPlayoffRounds()
 {
     return 3;
 }

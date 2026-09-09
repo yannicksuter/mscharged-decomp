@@ -551,7 +551,7 @@ void PhysicsBall::RegisterDebugFields(
     unsigned short* type, DebugWriteCache* cache)
 {
 #define REGISTER_FIELD(kind, field) \
-    fn_80338F88(cache, kind, lbl_80533C98[kind].size, \
+    cache->AddField(kind, gDebugFieldTypes[kind].size, \
         (unsigned char*)&field - (unsigned char*)&mv3TiltForce, #field)
 
     REGISTER_FIELD(22, mv3TiltForce);

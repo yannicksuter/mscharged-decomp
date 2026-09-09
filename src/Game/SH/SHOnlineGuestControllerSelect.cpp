@@ -26,6 +26,8 @@
 #include <string.h>
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/FE/FEAudio.h"
+#include "NL/nlPrint.h"
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 

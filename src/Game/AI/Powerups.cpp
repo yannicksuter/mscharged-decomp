@@ -6,6 +6,8 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
+#include "Game/Render/NPCManager.h"
+#include "Game/Render/ChainChomp.h"
 #include "Game/DB/GameProgress.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
@@ -24,7 +26,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_80276264.h"
+#include "Game/Render/StadiumLoading.h"
 
 extern "C" void fn_802772A4(DrawableObject*);
 extern "C" bool fn_8003877C(cFielder*);
@@ -55,7 +57,6 @@ struct cGame
 };
 
 extern cGame* g_pGame;
-extern void* lbl_806E1608;
 
 u8 lbl_806DBDA0 = true;
 float lbl_806DBDA4 = 6.0f;
@@ -876,7 +877,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uGREEN_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(gGameTweaks.m_unk14->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->mUnidentified404);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -891,7 +892,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uRED_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(gGameTweaks.m_unk14->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->mUnidentified404);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -906,7 +907,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uSPINY_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(gGameTweaks.m_unk14->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->mUnidentified404);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -921,7 +922,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uFREEZE_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(gGameTweaks.m_unk14->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->mUnidentified404);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -1124,9 +1125,9 @@ void PowerupBase::Update(float dt)
  */
 int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
 {
-    if ((!GameInfoManager::Instance()->GetCurrentSettings()->HomePowerUps
+    if ((!GameInfoManager::Instance()->GetCurrentSettings()->mHomePowerupsEnabled
             && pTeam->m_nSide == 0)
-        || (!GameInfoManager::Instance()->GetCurrentSettings()->AwayPowerUps
+        || (!GameInfoManager::Instance()->GetCurrentSettings()->mAwayPowerupsEnabled
             && pTeam->m_nSide == 1)
         || GameInfoManager::Instance()->IsRule0x0Equal11())
     {
@@ -1198,7 +1199,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
         }
     }
 
-    if (!fn_8019C988(*(void**)((u8*)lbl_806E1608 + 0x20))
+    if (!gNPCManager->mpChainChomp->IsHidden()
         || fn_800AA060(*(void**)((u8*)g_pGame + 0x10DC), 7))
     {
         nChanceForChainChomp = 0;
@@ -2235,7 +2236,7 @@ void PowerupBase::UpdateTransform()
     {
         nlCartesianToPolar(pDirectionalSpeed, m_v3Velocity.x, m_v3Velocity.y);
         fSpeedNormalized = NormalizeVal(pDirectionalSpeed.r, 0.0f,
-            gGameTweaks.m_unk14->fGreenShellSpeed);
+            gGameTweaks.mFielderTweaks->fGreenShellSpeed);
 
         {
             float z = 250.0f;
@@ -3092,7 +3093,7 @@ inline void PowerupModelPool::Initialize(int type, unsigned long objHashName)
     int i;
     char name[32];
 
-    obj = fn_8027725C(objHashName);
+    obj = FindStadiumDrawableObject(objHashName);
     i = 0;
 
     obj->m_uObjectFlags &= ~1;

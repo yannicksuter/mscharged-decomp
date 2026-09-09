@@ -1,6 +1,7 @@
 #ifndef HOMEBUTTON_COMMON_H
 #define HOMEBUTTON_COMMON_H
 
+#include "revolution/hbm/HBMTypes.h"
 #include "revolution/kpad/KPAD.h"
 #include <revolution/mem/allocator.h>
 #include "revolution/mtx/mtx.h"
@@ -30,35 +31,6 @@ typedef enum HBMSoundEvent {
     HBM_SOUND_STOP,
     HBM_SOUND_PLAY,
 } HBMSoundEvent;
-
-typedef bool (*HBMSoundCallback)(s32 evt, s32 num);
-
-typedef struct HBMDataInfo {
-    /* 0x00 */ void* layoutBuf;
-    /* 0x04 */ void* spkSeBuf;
-    /* 0x08 */ void* msgBuf;
-    /* 0x0C */ void* configBuf;
-    /* 0x10 */ void* mem;
-    /* 0x14 */ HBMSoundCallback sound_callback;
-    /* 0x18 */ int backFlag;
-    /* 0x1C */ int region;
-    /* 0x20 */ int cursor;
-    /* 0x24 */ int messageFlag;
-    /* 0x28 */ u32 memSize;
-    /* 0x2C */ f32 frameDelta;
-    /* 0x30 */ Vec2 adjust;
-    /* 0x38 */ MEMAllocator* pAllocator;
-} HBMDataInfo; // size = 0x3C
-
-typedef struct HBMKPadData {
-    /* 0x00 */ KPADStatus* kpad;
-    /* 0x04 */ Vec2 pos;
-    /* 0x0C */ u32 use_devtype;
-} HBMKPadData; // size = 0x10
-
-typedef struct HBMControllerData {
-    /* 0x00 */ HBMKPadData wiiCon[WPAD_MAX_CONTROLLERS];
-} HBMControllerData; // size = 0x40
 
 void HBMCreate(const HBMDataInfo* pHBInfo);
 void HBMDelete(void);

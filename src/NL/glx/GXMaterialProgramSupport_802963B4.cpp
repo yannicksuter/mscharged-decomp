@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include <string.h>
 
@@ -95,7 +96,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 static inline float WrapTextureOffset_802963B4(float value)
@@ -198,7 +199,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Draw(
 
     if (*(int*)((unsigned char*)packet->unknown20 + 36) == 1)
     {
-        UnidentifiedTextureState* texture = (UnidentifiedTextureState*)packet->unknown20;
+        glTextureBinding* texture = (glTextureBinding*)packet->unknown20;
         texture->SetWrapS(true);
         texture->SetWrapT(true);
     }

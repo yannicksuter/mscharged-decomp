@@ -113,13 +113,13 @@ bool AsyncImage::Update(bool autoswap)
         {
             if (mTextureHandle != mImageInstance->m_pTextureResource->GetTextureHandle() && glTextureLoad(mTextureHandle) == 0)
             {
-                glTextureAdd(mTextureHandle, m_loadBuffer, mTextureSize, FEResourceManager::s_pInstance->fn_802FDD84());
+                glTextureAdd(mTextureHandle, m_loadBuffer, mTextureSize, FEResourceManager::s_pInstance->GetResourcePool());
                 mImageInstance->m_pTextureResource->SetTextureHandle(mTextureHandle);
             }
         }
         else if (glTextureLoad(mTextureHandle) == 0)
         {
-            glTextureAdd(mTextureHandle, m_loadBuffer, mTextureSize, FEResourceManager::s_pInstance->fn_802FDD84());
+            glTextureAdd(mTextureHandle, m_loadBuffer, mTextureSize, FEResourceManager::s_pInstance->GetResourcePool());
         }
     }
 

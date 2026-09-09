@@ -71,16 +71,15 @@ void ParticleUpdateTask::Initialize(void* context, int parameter1, int parameter
     mParameter1 = parameter1;
     mParameter2 = parameter2;
     EmissionManager::Instance();
-    fn_802E6C20(
-        EmissionManager::Instance(), context, parameter1, parameter2);
+    EmissionManager::Instance()->Startup(context, parameter1, parameter2);
 }
 
 void ParticleUpdateTask::StartLoading(bool first, bool second, bool third, bool fourth)
 {
-    fn_802E6620(first, second, third, fourth);
+    EmissionManager::StartLoading(first, second, third, fourth);
 }
 
-bool ParticleUpdateTask::FinishLoading(void* context)
+bool ParticleUpdateTask::FinishLoading(GLResourcePool* context)
 {
-    return fn_802E6774(context);
+    return EmissionManager::FinishLoading(context);
 }

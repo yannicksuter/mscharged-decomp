@@ -1,4 +1,5 @@
 #include "Game/FE/feResourceManager.h"
+#include "Game/Font/fontmanager.h"
 
 #include "Game/FE/feFontResource.h"
 #include "Game/FE/feScene.h"
@@ -15,6 +16,7 @@
 #include "NL/nlString.h"
 #include "NL/gl/glTexture.h"
 #include "NL/nlstring_tmpl.h"
+#include "NL/nlPrint.h"
 
 struct PendingResourceLoad
 {
@@ -39,7 +41,7 @@ static unsigned char* s_pResourceLoadBuffer;
 static nlDLListSlotPool<PendingResourceLoad> pendingResourceQueue(0x100, 0);
 static FEResourceHandle* s_pCurrentResourceBeingLoaded;
 FESceneResource* s_pCurrentFESceneResourceContext;
-static ResourceInterface_802CC094* s_pResourceInterface;
+static GLResourcePool* s_pResourcePool;
 static BundleFile* s_pPermanentBundle;
 static BundleFile* s_pOnDemandBundle;
 static FESceneResource* s_pPermanentBundleSceneResource;
@@ -100,7 +102,7 @@ ResourceResult FEResourceManager::IssueSceneContextSwitch(FESceneResource* pFeSc
         s_pCurrentFESceneResourceContext->m_pFESceneContext->AllResourcesLoadedCallback();
     }
 
-    pFeSceneResource->m_glResourceMarker = s_pResourceInterface->MarkResource();
+    pFeSceneResource->m_glResourceMarker = s_pResourcePool->MarkResource();
     pFeSceneResource->m_bValid = true;
     s_pCurrentFESceneResourceContext = pFeSceneResource;
     return FERR_WaitingForResource;
@@ -109,29 +111,29 @@ ResourceResult FEResourceManager::IssueSceneContextSwitch(FESceneResource* pFeSc
 FEResourceManager::FEResourceManager()
     : m_bPermanentBundleLoadInProgress(false)
 {
-    s_pResourceInterface = fn_802CC094();
+    s_pResourcePool = glGetCurrentResourcePool();
 }
 
-void FEResourceManager::fn_802FC9C4(void* buffer, unsigned long uReadSize, unsigned long uParam)
+void FEResourceManager::PermanentTextureLoadComplete(void* buffer, unsigned long uReadSize, unsigned long uParam)
 {
     PermanentBundleLoadState* state = (PermanentBundleLoadState*)uParam;
     FETextureResource* pTextureResource = new (8, false) FETextureResource();
     pTextureResource->m_hashID = state->uFileHashID;
     s_pResourceLoadBuffer = (unsigned char*)buffer;
-    ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
-    fn_802C8284(pTextureResource->m_hashID);
-    glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
-    fn_802C8288();
+    GLResourcePool* resourcePool = s_pResourcePool;
+    glBeginResource(pTextureResource->m_hashID);
+    glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uReadSize, resourcePool);
+    glEndResource();
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;
     unsigned long textureHandle = pTextureResource->m_hashID;
     pTextureResource->SetTextureHandle(textureHandle);
     FEResourceManager::Instance()->AddResourceToResourceList(pTextureResource);
     pTextureResource->m_bValid = true;
-    fn_802FC858(state);
+    LoadNextPermanentTexture(state);
 }
 
-int FEResourceManager::fn_802FC858(PermanentBundleLoadState* state)
+int FEResourceManager::LoadNextPermanentTexture(PermanentBundleLoadState* state)
 {
     BundleFileDirectoryEntry fileDirectoryEntry;
     FEResourceHandle** pPreExistingResourceHandle;
@@ -154,7 +156,7 @@ int FEResourceManager::fn_802FC858(PermanentBundleLoadState* state)
         state->uFileHashID = fileDirectoryEntry.m_hash;
         unsigned char* buffer = (unsigned char*)nlMalloc(fileDirectoryEntry.m_length, 0x20, true);
         unsigned long fileIndex = state->uFileIndex++;
-        state->pBundle->ReadFileAsyncByIndex(fileIndex, buffer, fileDirectoryEntry.m_length, fn_802FC9C4, (unsigned long)state);
+        state->pBundle->ReadFileAsyncByIndex(fileIndex, buffer, fileDirectoryEntry.m_length, PermanentTextureLoadComplete, (unsigned long)state);
         return true;
     }
 
@@ -170,9 +172,9 @@ int FEResourceManager::fn_802FC858(PermanentBundleLoadState* state)
     return false;
 }
 
-void FEResourceManager::fn_802FC850(void*, unsigned long, unsigned long uParam)
+void FEResourceManager::PermanentBundleOpenComplete(void*, unsigned long, unsigned long uParam)
 {
-    fn_802FC858((PermanentBundleLoadState*)uParam);
+    LoadNextPermanentTexture((PermanentBundleLoadState*)uParam);
 }
 
 void FEResourceManager::Cleanup()
@@ -242,7 +244,7 @@ void FEResourceManager::LoadPermanentResourceBundle(const char* szBundleFileName
     s_permanentBundleLoadState.bComplete = false;
     s_permanentBundleLoadState.callback = callback;
     s_permanentBundleLoadState.pBundle = s_pPermanentBundle;
-    s_pPermanentBundle->OpenAsync(szBundleFileName, fn_802FC850, (unsigned long)&s_permanentBundleLoadState, false);
+    s_pPermanentBundle->OpenAsync(szBundleFileName, PermanentBundleOpenComplete, (unsigned long)&s_permanentBundleLoadState, false);
 }
 
 void FEResourceManager::LoadPermanentTextures()
@@ -278,10 +280,10 @@ void FEResourceManager::LoadPermanentTextures()
 
                 s_pResourceLoadBuffer = (unsigned char*)nlMalloc(uFileLength, 0x20, true);
                 s_pPermanentBundle->ReadFileByIndex(i, s_pResourceLoadBuffer, uFileLength);
-                ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
-                fn_802C8284(pTextureResource->m_hashID);
-                glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uFileLength, resourceInterface);
-                fn_802C8288();
+                GLResourcePool* resourcePool = s_pResourcePool;
+                glBeginResource(pTextureResource->m_hashID);
+                glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uFileLength, resourcePool);
+                glEndResource();
                 delete[] s_pResourceLoadBuffer;
                 s_pResourceLoadBuffer = 0;
                 unsigned long textureHandle = pTextureResource->m_hashID;
@@ -311,9 +313,9 @@ bool FEResourceManager::OpenOnDemandResourceBundle(const char* szBundleFileName,
     return true;
 }
 
-void FEResourceManager::fn_802FD26C(void* resourceInterface)
+void FEResourceManager::SetResourcePool(GLResourcePool* resourcePool)
 {
-    s_pResourceInterface = (ResourceInterface_802CC094*)resourceInterface;
+    s_pResourcePool = resourcePool;
 }
 
 void FEResourceManager::QueueResourceLoad(FEResourceHandle* pHandle, MemoryAllocator* pAllocator)
@@ -329,10 +331,10 @@ void FEResourceManager::QueueResourceLoad(FEResourceHandle* pHandle, MemoryAlloc
         BundleFileDirectoryEntry fileDirectoryEntry;
         if (s_pOnDemandBundle->GetFileInfo(pHandle->m_hashID, &fileDirectoryEntry, false))
         {
-            pHandle->field_0x14 = fileDirectoryEntry.m_blockNumber;
+            pHandle->m_uFileBlock = fileDirectoryEntry.m_blockNumber;
             nlDLListIterator<PendingResourceLoad> insertAfter(
                 pendingResourceQueue.m_Head, nlDLRingGetEnd(pendingResourceQueue.m_Head));
-            if (pHandle->field_0x14 > (*insertAfter).pHandle->field_0x14)
+            if (pHandle->m_uFileBlock > (*insertAfter).pHandle->m_uFileBlock)
             {
                 pendingResourceQueue.AddEnd(pendingResource);
                 return;
@@ -340,7 +342,7 @@ void FEResourceManager::QueueResourceLoad(FEResourceHandle* pHandle, MemoryAlloc
             else
             {
                 while ((*insertAfter).pHandle->m_type != FERT_SCENE
-                       && pHandle->field_0x14 < (*insertAfter).pHandle->field_0x14)
+                       && pHandle->m_uFileBlock < (*insertAfter).pHandle->m_uFileBlock)
                 {
                     if (nlDLRingIsStart(insertAfter.m_Head, insertAfter.m_Curr))
                     {
@@ -357,7 +359,7 @@ void FEResourceManager::QueueResourceLoad(FEResourceHandle* pHandle, MemoryAlloc
         }
         else
         {
-            pHandle->field_0x14 = -1;
+            pHandle->m_uFileBlock = -1;
             pendingResourceQueue.AddEnd(pendingResource);
             return;
         }
@@ -373,7 +375,7 @@ void FEResourceManager::UnloadResource(FEResourceHandle* pFeResourceHandle)
         RemoveResourceFromResourceList(pFeResourceHandle);
         break;
     case FERT_SCENE:
-        s_pResourceInterface->ReleaseResource(((FESceneResource*)pFeResourceHandle)->m_glResourceMarker);
+        s_pResourcePool->ReleaseResource(((FESceneResource*)pFeResourceHandle)->m_glResourceMarker);
         break;
     default:
         break;
@@ -411,10 +413,10 @@ void FEResourceManager::UnloadPermanentResourceBundle()
 void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSize, unsigned long uParam)
 {
     FETextureResource* pHandle = (FETextureResource*)uParam;
-    ResourceInterface_802CC094* resourceInterface = s_pResourceInterface;
-    fn_802C8284(pHandle->m_hashID);
-    glTextureAdd(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourceInterface);
-    fn_802C8288();
+    GLResourcePool* resourcePool = s_pResourcePool;
+    glBeginResource(pHandle->m_hashID);
+    glTextureAdd(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourcePool);
+    glEndResource();
     delete[] s_pResourceLoadBuffer;
     s_pResourceLoadBuffer = 0;
     unsigned long textureHandle = pHandle->m_hashID;
@@ -513,12 +515,12 @@ ResourceResult FEResourceManager::IssueTextureLoadRequest(FETextureResource* pFe
     return FERR_WaitingForResource;
 }
 
-void* FEResourceManager::fn_802FDD84()
+GLResourcePool* FEResourceManager::GetResourcePool()
 {
-    return s_pResourceInterface;
+    return s_pResourcePool;
 }
 
-FEMiniBundle* FEResourceManager::fn_802FDD8C(const char* szBundleFileName)
+FEMiniBundle* FEResourceManager::LoadMiniBundle(const char* szBundleFileName)
 {
     FEMiniBundle* miniBundle = (FEMiniBundle*)nlMalloc(sizeof(FEMiniBundle), 8, false);
     nlStrNCpy(miniBundle->m_szBundleFileName, szBundleFileName, 0x20);
@@ -535,7 +537,7 @@ FEMiniBundle* FEResourceManager::fn_802FDD8C(const char* szBundleFileName)
     return miniBundle;
 }
 
-bool FEResourceManager::fn_802FDF3C(FEMiniBundle* miniBundle)
+bool FEResourceManager::UnloadMiniBundle(FEMiniBundle* miniBundle)
 {
     BundleFile* bundle = new (8, false) BundleFile();
     bundle->Open(miniBundle->m_szBundleFileName, false);

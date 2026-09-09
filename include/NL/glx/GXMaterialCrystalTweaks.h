@@ -1,12 +1,9 @@
 #ifndef NL_GLX_GX_MATERIAL_CRYSTAL_TWEAKS_H
 #define NL_GLX_GX_MATERIAL_CRYSTAL_TWEAKS_H
 
-#include "Game/TweakValue.h"
-#include "NL/nlMemory.h"
+#include "Game/TweakValueFloat.h"
 
-extern const char* lbl_806E1E90;
-
-extern GXMaterialFloatTweak_804F4190 sCrystalConfigTweak_8057B028;
-extern GXMaterialFloatTweak_804F4190 sCrystalConfigTweak_8057B048;
+extern TweakValueFloat sfSilhouetteLightingScale;
+extern TweakValueFloat sfEdgeTextureScale;
 
 #endif // NL_GLX_GX_MATERIAL_CRYSTAL_TWEAKS_H

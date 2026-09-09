@@ -6,6 +6,7 @@
 #include "Game/FE/tlSlide.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
+#include "Game/Render/RLViewLayers.h"
 
 
 GoalOverlay::~GoalOverlay()

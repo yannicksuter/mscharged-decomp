@@ -32,6 +32,6 @@ void UnidentifiedTeamDesire::UnidentifiedCleanup()
 {
 }
 
-void UnidentifiedTeamDesire::UnidentifiedUpdate(UnidentifiedDesireUpdate*, float)
+void UnidentifiedTeamDesire::Update(UnidentifiedDesireUpdate*, float)
 {
 }

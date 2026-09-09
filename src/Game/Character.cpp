@@ -24,7 +24,7 @@
 #include "Game/AnimInventory.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/Ball.h"
-#include "Game/BirdoEggObject.h"
+#include "Game/Render/BirdoEgg.h"
 #include "unclassified/tu_801B535C.h"
 #include "Game/Physics/PhysicsSphere_801798A8.h"
 #include "Game/BulletBill.h"
@@ -61,7 +61,7 @@
 #include "NL/gl/glState.h"
 #include "NL/gl/glTexture.h"
 #include "NL/gl/glTextureManager.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/GXMaterialProgram_80298B18.h"
 #include "math.h"
 #include <stddef.h>
@@ -188,7 +188,7 @@ bool cCharacter::IsPlayingEffect(const EffectsGroup* effectGroup) const
 
 bool cCharacter::fn_8001E2C0(const EffectsGroup* effectGroup) const
 {
-    return EmissionManager::Instance()->fn_802E8544(
+    return EmissionManager::Instance()->IsDying(
         (unsigned long)this, effectGroup);
 }
 
@@ -503,14 +503,14 @@ struct UnidentifiedCharacterAnimState
 };
 
 #define REGISTER_CHARACTER_FIELD(type, base, field, name) \
-    fn_80338F88(cache, type, lbl_80533C98[type].size, \
+    cache->AddField(type, gDebugFieldTypes[type].size, \
         (u8*)&(field) - (u8*)&(base), name)
 
 void cCharacter::Unknown11(void* context, DebugWriteCache* cache)
 {
     if (lbl_806DB604 == 0xFFFF)
     {
-        lbl_806DB604 = fn_80338EBC(cache, "DetChar");
+        lbl_806DB604 = cache->BeginType("DetChar");
         REGISTER_CHARACTER_FIELD(14, mUnidentified024.m_eCharacterClass,
             mUnidentified024.m_eCharacterClass, "m_eCharacterClass");
         REGISTER_CHARACTER_FIELD(14, mUnidentified024.m_eCharacterClass,
@@ -569,10 +569,10 @@ void cCharacter::Unknown11(void* context, DebugWriteCache* cache)
             mUnidentified024.m_fDesiredMovementScale, "m_fDesiredMovementScale");
         REGISTER_CHARACTER_FIELD(20, mUnidentified024.m_eCharacterClass,
             mUnidentified024.m_tScaleTimer, "m_tScaleTimer");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB604, &mUnidentified024.m_eCharacterClass, context);
-    fn_8033930C(cache, lbl_806DB604, &mUnidentified024.m_eCharacterClass,
+    cache->ChecksumData(lbl_806DB604, &mUnidentified024.m_eCharacterClass, context);
+    cache->WriteData(lbl_806DB604, &mUnidentified024.m_eCharacterClass,
         offsetof(cCharacter, m_pAnimInventory) - offsetof(cCharacter, mUnidentified024.m_eCharacterClass));
 
     UnidentifiedCharacterAnimState state;
@@ -590,7 +590,7 @@ void cCharacter::Unknown11(void* context, DebugWriteCache* cache)
 
     if (lbl_806DB602 == 0xFFFF)
     {
-        lbl_806DB602 = fn_80338EBC(cache, "CharAnim");
+        lbl_806DB602 = cache->BeginType("CharAnim");
         REGISTER_CHARACTER_FIELD(17, state, state.m_fFrame, "m_fFrame");
         REGISTER_CHARACTER_FIELD(17, state, state.m_fTotalFrames, "m_fTotalFrames");
         REGISTER_CHARACTER_FIELD(17, state, state.m_fPlaybackSpeedScale, "m_fPlaybackSpeedScale");
@@ -600,15 +600,15 @@ void cCharacter::Unknown11(void* context, DebugWriteCache* cache)
         REGISTER_CHARACTER_FIELD(17, state, state.m_fDuration, "m_fDuration");
         REGISTER_CHARACTER_FIELD(9, state, state.m_nNumRootKeys, "m_nNumRootKeys");
         REGISTER_CHARACTER_FIELD(17, state, state.m_fLinearSpeed, "m_fLinearSpeed");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DB602, &state, context);
-    fn_8033930C(cache, lbl_806DB602, &state, sizeof(state));
+    cache->ChecksumData(lbl_806DB602, &state, context);
+    cache->WriteData(lbl_806DB602, &state, sizeof(state));
 
     cHeadTrack* headTrack = m_pHeadTrack;
     if (lbl_806DBD68 == 0xFFFF)
     {
-        lbl_806DBD68 = fn_80338EBC(cache, "HeadTrack");
+        lbl_806DBD68 = cache->BeginType("HeadTrack");
         REGISTER_CHARACTER_FIELD(26, *headTrack,
             headTrack->m_m4HeadMatrix, "m_m4HeadMatrix");
         REGISTER_CHARACTER_FIELD(22, *headTrack,
@@ -629,10 +629,10 @@ void cCharacter::Unknown11(void* context, DebugWriteCache* cache)
             headTrack->m_fHeadTiltSeekVel, "m_fHeadTiltSeekVel");
         REGISTER_CHARACTER_FIELD(17, *headTrack,
             headTrack->m_fSmoothTime, "mfSmoothTime");
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DBD68, headTrack, context);
-    fn_8033930C(cache, lbl_806DBD68, headTrack, sizeof(cHeadTrack));
+    cache->ChecksumData(lbl_806DBD68, headTrack, context);
+    cache->WriteData(lbl_806DBD68, headTrack, sizeof(cHeadTrack));
 }
 
 #undef REGISTER_CHARACTER_FIELD
@@ -744,7 +744,7 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     {
         if (nModelID[i] != 0)
         {
-            GLInventory& glInventory = *fn_802CC094()->m_inventory;
+            GLInventory& glInventory = *glGetCurrentResourcePool()->m_inventory;
             m_pSkinMesh[i] = glInventory.MakeSkinMesh(
                 nModelID[i], pHierarchy);
         }
@@ -890,7 +890,7 @@ extern "C" void fn_80022824(UnidentifiedEventData_80067214*)
                 }
             }
         }
-        lbl_806E1608->fn_801AA348();
+        gNPCManager->fn_801AA348();
     }
 }
 extern "C" void fn_80022664(CollisionPlayerPlayerData* pEventData)
@@ -1050,7 +1050,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
             if (nlGetLengthSquared2D(pBall->m_v3Velocity.x, pBall->m_v3Velocity.y) < 0.01f)
             {
                 MakePerpendicularPlane(pBall->m_v3Position,
-                    (unsigned short)(pEventData->egg->unknown_3C->mUnidentified024.m_aActualFacingDirection + 0x4000), plane, 0.0f);
+                    (unsigned short)(pEventData->egg->mShooter->mUnidentified024.m_aActualFacingDirection + 0x4000), plane, 0.0f);
                 nlVec3Scale(v3Velocity, *(const nlVector3*)&plane, 40.0f);
             }
             else
@@ -1069,13 +1069,13 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
             nlVector3 v3Position;
             nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, pFielder->mUnidentified024.m_v3Position);
             pEventData->player->SetPosition(v3Position);
-            if (pEventData->player->fn_80047240(pEventData->egg->unknown_3C, aDirection, 2, false, false))
+            if (pEventData->player->fn_80047240(pEventData->egg->mShooter, aDirection, 2, false, false))
             {
                 pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.UnidentifiedGetValue());
             }
         }
     }
-    fn_800156F8(g_pBall, pEventData->egg->unknown_3C);
+    fn_800156F8(g_pBall, pEventData->egg->mShooter);
 }
 extern "C" void fn_80021D70(CollisionKoopaShellGoalieData* pEventData)
 {
@@ -1085,8 +1085,8 @@ extern "C" void fn_80021D70(CollisionKoopaShellGoalieData* pEventData)
 }
 extern "C" void fn_80021DCC(CollisionBirdoEggGoalieData* pEventData)
 {
-    ((Goalie*)pEventData->goalie)->fn_80090958(pEventData->egg->unknown_3C != NULL);
-    PlaySound(pEventData->egg->unknown_3C->mUnidentified318, 0x16BA5AE9UL, NULL, NULL);
+    ((Goalie*)pEventData->goalie)->fn_80090958(pEventData->egg->mShooter != NULL);
+    PlaySound(pEventData->egg->mShooter->mUnidentified318, 0x16BA5AE9UL, NULL, NULL);
 }
 extern "C" bool fn_8002F1E0(cFielder*);
 extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
@@ -2615,7 +2615,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
             unidentifiedSlide = 1.0f;
         }
         float unidentifiedBlend = InterpolateClamped(0.0f,
-            gGameTweaks.m_unk14->mUnidentified464, unidentifiedSlide);
+            gGameTweaks.mFielderTweaks->mUnidentified464, unidentifiedSlide);
         nlVector2 unidentifiedDelta;
         nlVec2Sub(unidentifiedDelta, *(const nlVector2*)&mUnidentified024.m_v3PrevVelocity,
             *(const nlVector2*)&mUnidentified024.m_v3Velocity);
@@ -2732,11 +2732,11 @@ void cCharacter::fn_80022E60()
                     {
                         for (int k = 0; k < 10; ++k)
                         {
-                            if (fn_802CC8FC(packet, lbl_8056B7B0[k]))
+                            if (glHasMaterialParameter(packet, lbl_8056B7B0[k]))
                             {
-                                unsigned long texture = fn_802CC7E4(packet, lbl_8056B7B0[k]);
+                                unsigned long texture = glGetMaterialUnsignedParameter(packet, lbl_8056B7B0[k]);
                                 unsigned long resolvedTexture = glGetTextureManager()->GetTextureIndex(texture);
-                                fn_802CC4FC(packet, lbl_8056B7B0[k], &resolvedTexture);
+                                glSetMaterialTextureIndexParameter(packet, lbl_8056B7B0[k], &resolvedTexture);
                             }
                         }
                         if (packet->unknown10 == GXMaterialProgram_80298B18::Instance)

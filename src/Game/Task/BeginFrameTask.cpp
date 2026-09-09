@@ -25,10 +25,10 @@ static bool g_bDrawSafeFrame;
 static s32 g_nGridDisplaySpacing;
 static s32 g_eWaitMode;
 
-static TweakValueBool_804F4578 g_bDisplayFrameRate(
+static TweakValueBool g_bDisplayFrameRate(
     "g_bDisplayFrameRate", "/Rendering/Statistics", false);
-static TweakValueBool_804F4578 g_bDisplayFrameTicker(
-    "g_bDisplayFrameTicker", lbl_806E1E90, false);
+static TweakValueBool g_bDisplayFrameTicker(
+    "g_bDisplayFrameTicker", gLastTweakCategory, false);
 
 extern const f32 lbl_806E45F8;
 extern const f32 lbl_806E45FC;

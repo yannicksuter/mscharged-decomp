@@ -4,7 +4,7 @@
 #include "Game/Debug/ShapeRender.h"
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/Render/RLView.h"
-#include "Game/Render/tu_802DCDB4.h"
+#include "Game/Render/Frustum.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMatrix.h"
@@ -194,12 +194,11 @@ static void DrawBallShadow(
         alpha = 0xFF;
     }
 
-    UnidentifiedStadiumShadowData* stadium
-        = (UnidentifiedStadiumShadowData*)BasicStadium::GetCurrentStadium();
+    BasicStadium* stadium = BasicStadium::GetCurrentStadium();
     float height = 0.0f;
     if (stadium != 0)
     {
-        height = stadium->shadowHeight;
+        height = stadium->m_shadowHeight;
     }
 
     nlVector3 position;
@@ -748,7 +747,7 @@ bool ShouldShadowBeUpdated(const ProjectedShadowParams& params)
     float radius = 2.0f * params.fRadius;
     RLView* view = fn_8027261C();
     bool visible
-        = fn_802DD1EC(view->m_Interface->GetShadowMatrix(), &position, radius);
+        = ClassifySphereInFrustum(view->m_Interface->GetShadowMatrix(), &position, radius);
     unsigned long interval;
     if (visible)
     {
@@ -771,12 +770,11 @@ bool ShouldShadowBeUpdated(const ProjectedShadowParams& params)
 extern "C" float fn_80184B08()
 {
     float previous = g_AntiFlimmer;
-    UnidentifiedStadiumShadowData* stadium
-        = (UnidentifiedStadiumShadowData*)BasicStadium::GetCurrentStadium();
+    BasicStadium* stadium = BasicStadium::GetCurrentStadium();
     float height = 0.0f;
     if (stadium != 0)
     {
-        height = stadium->shadowHeight;
+        height = stadium->m_shadowHeight;
     }
     g_AntiFlimmer = height + 0.015625f;
     return previous;

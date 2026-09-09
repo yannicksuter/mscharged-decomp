@@ -1,6 +1,7 @@
 #ifndef RVL_SDK_MTX_TYPES_H
 #define RVL_SDK_MTX_TYPES_H
 #include <revolution/types.h>
+#include <revolution/mtx/vec2.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,10 +13,6 @@ typedef f32 Mtx44[4][4];
 typedef struct Vec {
     f32 x, y, z;
 } Vec, Point3d;
-
-typedef struct Vec2 {
-    f32 x, y;
-} Vec2;
 
 typedef Vec* VecPtr;
 typedef f32 (*MtxPtr)[4];

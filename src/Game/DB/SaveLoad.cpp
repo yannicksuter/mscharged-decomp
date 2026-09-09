@@ -1,5 +1,6 @@
 #include "NL/nlSingleton.inl"
 #include "Game/DB/SaveLoad.h"
+#include "Game/TweakRegistry.h"
 
 #include "Game/GameSceneManager.h"
 #include "Game/FE/fePopupMenu.h"
@@ -65,8 +66,6 @@ struct TPLPalette
 extern "C" void TPLBind(TPLPalette* palette);
 
 
-extern "C" bool GetTweakBool(const char* path, bool create);
-extern void nlPrintf(const char* format, ...);
 
 extern BaseGameSceneManager* g_pOverlayManager;
 
@@ -148,7 +147,7 @@ static inline u32 SaveFileSize()
         return GameInfoManager::GetInstance()->GetMemoryCardDataSize()
             + sizeof(SaveFileHeader);
     }
-    return (u32)GameInfoManager::GetInstance()->GetUnknown806E0F90Block()
+    return GameInfoManager::GetInstance()->GetSettingsDataSize()
         + sizeof(SaveFileHeader);
 }
 
@@ -212,7 +211,7 @@ void SaveLoad::CheckSaveSpace()
     }
     else
     {
-        saveBlocks = (u32)GameInfoManager::GetInstance()->GetUnknown806E0F90Block() + sizeof(SaveFileHeader);
+        saveBlocks = GameInfoManager::GetInstance()->GetSettingsDataSize() + sizeof(SaveFileHeader);
     }
     saveBlocks = Align32(saveBlocks);
     saveBlocks = (u32)(float)ceil((float)saveBlocks / 16384.0f);
@@ -311,7 +310,7 @@ void SaveLoad::OpenSaveForReadCallback(s32 result)
         }
         else
         {
-            size = (u32)GameInfoManager::GetInstance()->GetUnknown806E0F90Block() + sizeof(SaveFileHeader);
+            size = GameInfoManager::GetInstance()->GetSettingsDataSize() + sizeof(SaveFileHeader);
         }
         size = Align32(size);
         SaveBuffer = nlMalloc(size, 0x20, true);
@@ -610,7 +609,7 @@ u32 SaveLoad::GetSaveBlockSize()
     }
     else
     {
-        size = (u32)GameInfoManager::GetInstance()->GetUnknown806E0F90Block() + sizeof(SaveFileHeader);
+        size = GameInfoManager::GetInstance()->GetSettingsDataSize() + sizeof(SaveFileHeader);
     }
     size = Align32(size);
     return Align32(size + NAND_BANNER_SIZE(8));

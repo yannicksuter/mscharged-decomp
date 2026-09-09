@@ -9,15 +9,15 @@ class GLView;
 
 struct HighRangeTweakValues_801A2004
 {
-    /* 0x00 */ TweakValueIntImpl_804FD898 miHighRangeIndex;
-    /* 0x10 */ TweakValueImpl_804F4DC8 mfHighRangeMult;
-    /* 0x20 */ TweakValueImpl_804F4DC8 mfHighRangeOffset;
-    /* 0x30 */ TweakValueIntImpl_804FD898 miHighRangeGray;
-    /* 0x40 */ TweakValueBoolImpl_804F4538 mbFineHighRange;
-    /* 0x50 */ TweakValueIntImpl_804FD898 miRed;
-    /* 0x60 */ TweakValueIntImpl_804FD898 miGreen;
-    /* 0x70 */ TweakValueIntImpl_804FD898 miBlue;
-    /* 0x80 */ TweakValueIntImpl_804FD898 miAlpha;
+    /* 0x00 */ TweakIntBinding miHighRangeIndex;
+    /* 0x10 */ TweakFloatBinding mfHighRangeMult;
+    /* 0x20 */ TweakFloatBinding mfHighRangeOffset;
+    /* 0x30 */ TweakIntBinding miHighRangeGray;
+    /* 0x40 */ TweakBoolBinding mbFineHighRange;
+    /* 0x50 */ TweakIntBinding miRed;
+    /* 0x60 */ TweakIntBinding miGreen;
+    /* 0x70 */ TweakIntBinding miBlue;
+    /* 0x80 */ TweakIntBinding miAlpha;
 };
 
 struct HighRangeState_801A2394

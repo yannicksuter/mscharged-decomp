@@ -9,7 +9,7 @@
 #include "NL/nlTimer.h"
 #include "NL/nlstring_tmpl.h"
 
-struct UnidentifiedDebugWriteHeader
+struct DebugWriteRecordHeader
 {
     /* 0x0 */ u16 mType;
     /* 0x2 */ u16 mSize;
@@ -17,7 +17,7 @@ struct UnidentifiedDebugWriteHeader
     /* 0x6 */ u16 mMarker;
 }; // size: 0x8
 
-static inline u16 GetUnidentifiedPaddedSize(u16 size)
+static inline u16 GetAlignedRecordSize(u16 size)
 {
     u16 remainder = size % 4;
     if (remainder == 0)
@@ -27,7 +27,7 @@ static inline u16 GetUnidentifiedPaddedSize(u16 size)
     return size + (4 - remainder);
 }
 
-static inline UnidentifiedDebugWriteBuffer* GetUnidentifiedCurrentBuffer(
+static inline DebugWriteBuffer* GetCurrentDebugBuffer(
     DebugWriteCache* cache)
 {
     if (cache->mCurrentBuffer >= 0
@@ -38,7 +38,7 @@ static inline UnidentifiedDebugWriteBuffer* GetUnidentifiedCurrentBuffer(
     return 0;
 }
 
-static inline UnidentifiedDebugWriteField* GetUnidentifiedNextField(
+static inline DebugWriteField* AllocateDebugField(
     DebugWriteCache* cache)
 {
     if (cache->mFieldCount >= cache->mFieldCapacity)
@@ -46,53 +46,53 @@ static inline UnidentifiedDebugWriteField* GetUnidentifiedNextField(
         nlBreak();
         return 0;
     }
-    UnidentifiedDebugWriteField* field = &cache->mFields[cache->mFieldCount];
+    DebugWriteField* field = &cache->mFields[cache->mFieldCount];
     cache->mFieldCount++;
     return field;
 }
 
-static inline void ResetUnidentifiedBuffer(
-    UnidentifiedDebugWriteBuffer* buffer, int frame)
+static inline void ResetDebugBuffer(
+    DebugWriteBuffer* buffer, int frame)
 {
     buffer->mCurrent = buffer->mData;
     buffer->mFrame = frame;
 }
 
-extern "C" void fn_80338CC4(DebugWriteCache* cache)
+void DebugWriteCache::Reset()
 {
-    cache->mCurrentBuffer = -1;
-    for (int i = 0; i < cache->mBufferCount; ++i)
+    mCurrentBuffer = -1;
+    for (int i = 0; i < mBufferCount; ++i)
     {
-        ResetUnidentifiedBuffer(&cache->mBuffers[i], -1);
+        ResetDebugBuffer(&mBuffers[i], -1);
     }
 }
 
-extern "C" void fn_80338D04(DebugWriteCache* cache, u16* type,
+void DebugWriteCache::WriteFloat(u16* type,
     const char* name, RunningChecksum* checksum, float value)
 {
     if (*type == 0xFFFF)
     {
-        if (cache->mTypeCount >= cache->mTypeCapacity)
+        if (mTypeCount >= mTypeCapacity)
         {
             nlBreak();
         }
 
-        u16 newType = cache->mTypeCount++;
+        u16 newType = mTypeCount++;
         *type = newType;
-        UnidentifiedDebugWriteType* entry = &cache->mTypes[newType];
+        DebugWriteType* entry = &mTypes[newType];
         entry->mType = newType;
         entry->mKind = 2;
         nlStrNCpy(entry->mName, name, sizeof(entry->mName));
         entry->mData.mScalar.mFieldType = 17;
-        entry->mData.mScalar.mSize = lbl_80533C98[17].size;
+        entry->mData.mScalar.mSize = gDebugFieldTypes[17].size;
         entry->mData.mScalar.mCount = 0;
     }
 
     checksum->ChecksumData(&value, sizeof(value));
 
-    UnidentifiedDebugWriteBuffer* buffer
-        = GetUnidentifiedCurrentBuffer(cache);
-    UnidentifiedDebugWriteHeader header;
+    DebugWriteBuffer* buffer
+        = GetCurrentDebugBuffer(this);
+    DebugWriteRecordHeader header;
     header.mType = *type;
     header.mSize = sizeof(value);
     header.mPaddedSize = sizeof(value);
@@ -113,36 +113,36 @@ extern "C" void fn_80338D04(DebugWriteCache* cache, u16* type,
     }
 }
 
-extern "C" u16 fn_80338EBC(DebugWriteCache* cache, const char* name)
+u16 DebugWriteCache::BeginType(const char* name)
 {
-    if (cache->mTypeCount >= cache->mTypeCapacity)
+    if (mTypeCount >= mTypeCapacity)
     {
         nlBreak();
     }
 
-    u16 type = cache->mTypeCount++;
-    cache->mCurrentType = type;
+    u16 type = mTypeCount++;
+    mCurrentType = type;
 
-    UnidentifiedDebugWriteType* entry = &cache->mTypes[type];
+    DebugWriteType* entry = &mTypes[type];
     entry->mKind = 1;
     entry->mType = type;
     nlStrNCpy(entry->mName, name, sizeof(entry->mName));
     entry->mData.mComposite.mLastField = 0;
     entry->mData.mComposite.mFieldCount = 0;
-    return cache->mCurrentType;
+    return mCurrentType;
 }
 
-extern "C" void fn_80338F78(DebugWriteCache* cache)
+void DebugWriteCache::EndType()
 {
-    cache->mCurrentType = 0xFFFF;
+    mCurrentType = 0xFFFF;
 }
 
-extern "C" void fn_80338F88(DebugWriteCache* cache, int fieldType, u16 size,
-    u32 offset, const char* name)
+void DebugWriteCache::AddField(int fieldType, u16 size,
+    unsigned int offset, const char* name)
 {
-    UnidentifiedDebugWriteType* owner
-        = &cache->mTypes[cache->mCurrentType];
-    UnidentifiedDebugWriteField* field = GetUnidentifiedNextField(cache);
+    DebugWriteType* owner
+        = &mTypes[mCurrentType];
+    DebugWriteField* field = AllocateDebugField(this);
 
     field->mSize = size;
     field->mOffset = offset;
@@ -166,12 +166,12 @@ extern "C" void fn_80338F88(DebugWriteCache* cache, int fieldType, u16 size,
     ++owner->mData.mComposite.mFieldCount;
 }
 
-extern "C" void fn_80339090(DebugWriteCache* cache, int fieldType, u16 size,
-    u32 count, u32 offset, const char* name)
+void DebugWriteCache::AddArrayField(int fieldType, u16 size,
+    unsigned int count, unsigned int offset, const char* name)
 {
-    UnidentifiedDebugWriteType* owner
-        = &cache->mTypes[cache->mCurrentType];
-    UnidentifiedDebugWriteField* field = GetUnidentifiedNextField(cache);
+    DebugWriteType* owner
+        = &mTypes[mCurrentType];
+    DebugWriteField* field = AllocateDebugField(this);
 
     field->mSize = size;
     field->mOffset = offset;
@@ -195,20 +195,20 @@ extern "C" void fn_80339090(DebugWriteCache* cache, int fieldType, u16 size,
     ++owner->mData.mComposite.mFieldCount;
 }
 
-extern "C" void fn_8033919C(DebugWriteCache* cache, const char* value)
+void DebugWriteCache::WriteText(const char* value)
 {
-    UnidentifiedDebugWriteBuffer* buffer
-        = GetUnidentifiedCurrentBuffer(cache);
+    DebugWriteBuffer* buffer
+        = GetCurrentDebugBuffer(this);
     if (buffer == 0)
     {
         return;
     }
 
     u16 size = nlStrLen(value) + 1;
-    UnidentifiedDebugWriteHeader header;
+    DebugWriteRecordHeader header;
     header.mType = 0xFFFE;
     header.mSize = size;
-    header.mPaddedSize = GetUnidentifiedPaddedSize(size);
+    header.mPaddedSize = GetAlignedRecordSize(size);
     header.mMarker = 0xDADA;
 
     if (buffer->mCurrent + sizeof(header) + size
@@ -226,15 +226,14 @@ extern "C" void fn_8033919C(DebugWriteCache* cache, const char* value)
     }
 }
 
-extern "C" void* fn_8033930C(
-    DebugWriteCache* cache, u16 type, void* value, u32 size)
+void* DebugWriteCache::WriteData(u16 type, void* value, unsigned int size)
 {
-    UnidentifiedDebugWriteBuffer* buffer
-        = GetUnidentifiedCurrentBuffer(cache);
-    UnidentifiedDebugWriteHeader header;
+    DebugWriteBuffer* buffer
+        = GetCurrentDebugBuffer(this);
+    DebugWriteRecordHeader header;
     header.mType = type;
     header.mSize = size;
-    header.mPaddedSize = GetUnidentifiedPaddedSize(size);
+    header.mPaddedSize = GetAlignedRecordSize(size);
     header.mMarker = 0xDADA;
 
     if (buffer->mCurrent + sizeof(header) + (u16)size
@@ -256,13 +255,13 @@ extern "C" void* fn_8033930C(
     return result;
 }
 
-extern "C" void fn_80339450(DebugWriteCache* cache, u16 type,
+void DebugWriteCache::ChecksumData(u16 type,
     void* value, void* context)
 {
-    UnidentifiedDebugWriteType* entry = &cache->mTypes[type];
+    DebugWriteType* entry = &mTypes[type];
     if (entry->mKind == 1)
     {
-        UnidentifiedDebugWriteField* field;
+        DebugWriteField* field;
         if (entry->mData.mComposite.mLastField == 0)
         {
             field = 0;
@@ -297,144 +296,144 @@ extern "C" void fn_80339450(DebugWriteCache* cache, u16 type,
     }
 }
 
-extern "C" void fn_80339544(DebugWriteCache* cache, u32 frame)
+void DebugWriteCache::BeginFrame(unsigned int frame)
 {
-    cache->mCurrentBuffer
-        = (cache->mCurrentBuffer + 1) % cache->mBufferCount;
-    ResetUnidentifiedBuffer(&cache->mBuffers[cache->mCurrentBuffer], frame);
+    mCurrentBuffer
+        = (mCurrentBuffer + 1) % mBufferCount;
+    ResetDebugBuffer(&mBuffers[mCurrentBuffer], frame);
 }
 
-extern "C" void fn_8033957C(
+void WriteDebugU8(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%u", *(const u8*)value);
 }
 
-extern "C" void fn_80339594(
+void WriteDebugU16(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%u", *(const u16*)value);
 }
 
-extern "C" void fn_803395AC(
+void WriteDebugU32(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%u", *(const u32*)value);
 }
 
-extern "C" void fn_803395C4(
+void WriteDebugU64(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%lu", *(const unsigned long long*)value);
 }
 
-extern "C" void fn_803395E4(
+void WriteDebugChar(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%d", *(const u8*)value);
 }
 
-extern "C" void fn_803395FC(
+void WriteDebugS16(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%d", *(const s16*)value);
 }
 
-extern "C" void fn_80339614(
+void WriteDebugS32(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%d", *(const s32*)value);
 }
 
-extern "C" void fn_8033962C(
+void WriteDebugS64(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%ld", *(const long long*)value);
 }
 
-extern "C" void fn_8033964C(
+void WriteDebugInt(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%d", *(const s32*)value);
 }
 
-extern "C" void fn_80339664(
+void WriteDebugUnsignedInt(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%u", *(const u32*)value);
 }
 
-extern "C" void fn_8033967C(
+void WriteDebugShort(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%d", *(const s16*)value);
 }
 
-extern "C" void fn_80339694(
+void WriteDebugUnsignedShort(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%u", *(const u16*)value);
 }
 
-extern "C" void fn_803396AC(
+void WriteDebugLong(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%ld", *(const s32*)value);
 }
 
-extern "C" void fn_803396C4(
+void WriteDebugUnsignedLong(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%lu", *(const u32*)value);
 }
 
-extern "C" void fn_803396DC(
+void WriteDebugEnum(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%d", *(const s32*)value);
 }
 
-extern "C" void fn_803396F4(
+void WriteDebugPointer(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "pointer converted to index 0x%x",
         *(const u32*)value);
 }
 
-extern "C" void fn_80339710(
+void WriteDebugBool(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%d", *(const u8*)value);
 }
 
-extern "C" void fn_80339728(
+void WriteDebugFloat(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%f (%x)", *(const float*)value,
         *(const u32*)value);
 }
 
-extern "C" void fn_80339748(
+void WriteDebugDouble(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%f (%lx)", *(const double*)value,
         *(const unsigned long long*)value);
 }
 
-extern "C" void fn_80339770(
+void WriteDebugAngle(
     const void* value, void*, char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%x", *(const u16*)value);
 }
 
-extern "C" void fn_80339788(
+void WriteDebugTimer(
     const void* value, void*, char* buffer, unsigned long size)
 {
     float seconds = ((const Timer*)value)->GetSeconds();
     nlSNPrintf(buffer, size, "%f (%x)", seconds, *(u32*)&seconds);
 }
 
-extern "C" void fn_803397E0(
+void WriteDebugVector2(
     const void* value, void*, char* buffer, unsigned long size)
 {
     const float* values = (const float*)value;
@@ -443,7 +442,7 @@ extern "C" void fn_803397E0(
         bits[0], bits[1]);
 }
 
-extern "C" void fn_8033980C(
+void WriteDebugVector3(
     const void* value, void*, char* buffer, unsigned long size)
 {
     const float* values = (const float*)value;
@@ -452,7 +451,7 @@ extern "C" void fn_8033980C(
         values[1], values[2], bits[0], bits[1], bits[2]);
 }
 
-extern "C" void fn_80339840(
+void WriteDebugVector4(
     const void* value, void*, char* buffer, unsigned long size)
 {
     const float* values = (const float*)value;
@@ -461,7 +460,7 @@ extern "C" void fn_80339840(
         values[1], values[2], values[3], bits[0], bits[1], bits[2], bits[3]);
 }
 
-extern "C" void fn_8033987C(
+void WriteDebugQuaternion(
     const void* value, void*, char* buffer, unsigned long size)
 {
     const float* values = (const float*)value;
@@ -470,7 +469,7 @@ extern "C" void fn_8033987C(
         values[1], values[2], values[3], bits[0], bits[1], bits[2], bits[3]);
 }
 
-static inline void WriteUnidentifiedFloatArray(
+static inline void WriteDebugFloatArray(
     const void* value, char* buffer, unsigned long size, int count)
 {
     buffer[0] = '\0';
@@ -486,19 +485,19 @@ static inline void WriteUnidentifiedFloatArray(
     }
 }
 
-extern "C" void fn_803398B8(
+void WriteDebugMatrix3(
     const void* value, void*, char* buffer, unsigned long size)
 {
-    WriteUnidentifiedFloatArray(value, buffer, size, 9);
+    WriteDebugFloatArray(value, buffer, size, 9);
 }
 
-extern "C" void fn_80339940(
+void WriteDebugMatrix4(
     const void* value, void*, char* buffer, unsigned long size)
 {
-    WriteUnidentifiedFloatArray(value, buffer, size, 16);
+    WriteDebugFloatArray(value, buffer, size, 16);
 }
 
-extern "C" void fn_803399C8(
+void WriteDebugODEVector3(
     const void* value, void*, char* buffer, unsigned long size)
 {
     const float* values = (const float*)value;
@@ -507,7 +506,7 @@ extern "C" void fn_803399C8(
         values[1], values[2], bits[0], bits[1], bits[2]);
 }
 
-extern "C" void fn_803399FC(
+void WriteDebugODEVector4(
     const void* value, void*, char* buffer, unsigned long size)
 {
     const float* values = (const float*)value;
@@ -516,7 +515,7 @@ extern "C" void fn_803399FC(
         values[1], values[2], values[3], bits[0], bits[1], bits[2], bits[3]);
 }
 
-extern "C" void fn_80339A38(
+void WriteDebugODEQuaternion(
     const void* value, void*, char* buffer, unsigned long size)
 {
     const float* values = (const float*)value;
@@ -525,49 +524,49 @@ extern "C" void fn_80339A38(
         values[1], values[2], values[3], bits[0], bits[1], bits[2], bits[3]);
 }
 
-extern "C" void fn_80339A74(
+void WriteDebugODEMatrix3(
     const void* value, void*, char* buffer, unsigned long size)
 {
-    WriteUnidentifiedFloatArray(value, buffer, size, 12);
+    WriteDebugFloatArray(value, buffer, size, 12);
 }
 
-extern "C" void fn_80339AFC(
+void WriteDebugODEMatrix4(
     const void* value, void*, char* buffer, unsigned long size)
 {
-    WriteUnidentifiedFloatArray(value, buffer, size, 16);
+    WriteDebugFloatArray(value, buffer, size, 16);
 }
 
-extern "C" DebugFieldType lbl_80533C98[32] = {
-    { 1, 0, fn_8033957C },
-    { 2, 0, fn_80339594 },
-    { 4, 0, fn_803395AC },
-    { 8, 0, fn_803395C4 },
-    { 1, 0, fn_803395E4 },
-    { 2, 0, fn_803395FC },
-    { 4, 0, fn_80339614 },
-    { 8, 0, fn_8033962C },
-    { 4, 0, fn_8033964C },
-    { 4, 0, fn_80339664 },
-    { 2, 0, fn_8033967C },
-    { 2, 0, fn_80339694 },
-    { 4, 0, fn_803396AC },
-    { 4, 0, fn_803396C4 },
-    { 4, 0, fn_803396DC },
-    { 4, 0, fn_803396F4 },
-    { 1, 0, fn_80339710 },
-    { 4, 0, fn_80339728 },
-    { 8, 0, fn_80339748 },
-    { 2, 0, fn_80339770 },
-    { 8, 0, fn_80339788 },
-    { 8, 0, fn_803397E0 },
-    { 12, 0, fn_8033980C },
-    { 16, 0, fn_80339840 },
-    { 16, 0, fn_8033987C },
-    { 36, 0, fn_803398B8 },
-    { 64, 0, fn_80339940 },
-    { 12, 0, fn_803399C8 },
-    { 16, 0, fn_803399FC },
-    { 16, 0, fn_80339A38 },
-    { 48, 0, fn_80339A74 },
-    { 64, 0, fn_80339AFC },
+DebugFieldType gDebugFieldTypes[32] = {
+    { 1, 0, WriteDebugU8 },
+    { 2, 0, WriteDebugU16 },
+    { 4, 0, WriteDebugU32 },
+    { 8, 0, WriteDebugU64 },
+    { 1, 0, WriteDebugChar },
+    { 2, 0, WriteDebugS16 },
+    { 4, 0, WriteDebugS32 },
+    { 8, 0, WriteDebugS64 },
+    { 4, 0, WriteDebugInt },
+    { 4, 0, WriteDebugUnsignedInt },
+    { 2, 0, WriteDebugShort },
+    { 2, 0, WriteDebugUnsignedShort },
+    { 4, 0, WriteDebugLong },
+    { 4, 0, WriteDebugUnsignedLong },
+    { 4, 0, WriteDebugEnum },
+    { 4, 0, WriteDebugPointer },
+    { 1, 0, WriteDebugBool },
+    { 4, 0, WriteDebugFloat },
+    { 8, 0, WriteDebugDouble },
+    { 2, 0, WriteDebugAngle },
+    { 8, 0, WriteDebugTimer },
+    { 8, 0, WriteDebugVector2 },
+    { 12, 0, WriteDebugVector3 },
+    { 16, 0, WriteDebugVector4 },
+    { 16, 0, WriteDebugQuaternion },
+    { 36, 0, WriteDebugMatrix3 },
+    { 64, 0, WriteDebugMatrix4 },
+    { 12, 0, WriteDebugODEVector3 },
+    { 16, 0, WriteDebugODEVector4 },
+    { 16, 0, WriteDebugODEQuaternion },
+    { 48, 0, WriteDebugODEMatrix3 },
+    { 64, 0, WriteDebugODEMatrix4 },
 };

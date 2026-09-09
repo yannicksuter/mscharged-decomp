@@ -30,7 +30,7 @@ public:
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
-    void SetDraftMessage(NetMessageDraft message) { mDraftMessage = message; }
+    void SetDraftMessage(NetMessageDraft message);
 
     void OnCountdownTick(FETimer* timer);
     void InitializeButtons();

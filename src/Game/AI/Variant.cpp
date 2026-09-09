@@ -2,6 +2,7 @@
 
 #include "NL/nlFormat.h"
 #include "runtime.h"
+#include "NL/nlBasicString.inl"
 
 Variant gvNotSet;
 

@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
+#include "NL/gl/glLoadModel.h"
 
 struct RegistryBackend_802A5D58
 {
@@ -14,10 +15,9 @@ extern u8 lbl_8052AA78[];
 extern u8 lbl_8052AAD8[];
 extern RegistryBackend_802A5D58* lbl_806E1D20;
 extern u8 lbl_806E1D24;
-extern GXPrimitive lbl_80524470[];
+extern GXPrimitive glx_PrimitiveTypes[];
 
-extern "C" void fn_802CB790(RegistryBackend_802A5D58*, u32);
-extern "C" void fn_8036BE88(int, u32);
+ void glx_BindTexture(int, u32);
 
 extern "C" RegistryBackend_802A5D58* fn_802A5D58(
     RegistryBackend_802A5D58* backend)
@@ -27,7 +27,7 @@ extern "C" RegistryBackend_802A5D58* fn_802A5D58(
     backend->key = 0x8D359080;
     backend->stateSize = 0x6C;
     backend->descriptorCount = 8;
-    fn_802CB790(backend, 0x8D359080);
+    glRegisterMaterialProgram(backend, 0x8D359080);
     return backend;
 }
 
@@ -84,7 +84,7 @@ extern "C" void fn_802A5ED8(void*, const glModelPacket* packet)
 extern "C" void fn_802A5F30(void*, const glModelPacket* packet)
 {
     GXBegin(
-        lbl_80524470[static_cast<u8>(packet->primType)], GX_VTXFMT0, static_cast<u16>(packet->numVertices));
+        glx_PrimitiveTypes[static_cast<u8>(packet->primType)], GX_VTXFMT0, static_cast<u16>(packet->numVertices));
 
     u16* index = packet->indexBuffer;
     u16* end = index + packet->numVertices;
@@ -100,7 +100,7 @@ extern "C" void fn_802A5F30(void*, const glModelPacket* packet)
 extern "C" void fn_802A611C(void*, const glModelPacket* packet)
 {
     GXBegin(
-        lbl_80524470[static_cast<u8>(packet->primType)], GX_VTXFMT0, packet->numUniqueVertices);
+        glx_PrimitiveTypes[static_cast<u8>(packet->primType)], GX_VTXFMT0, packet->numUniqueVertices);
 
     for (u16 i = 0; i < packet->numUniqueVertices; ++i)
     {
@@ -112,7 +112,7 @@ extern "C" void fn_802A611C(void*, const glModelPacket* packet)
 
 extern "C" void fn_802A6190(void*, const glModelPacket* packet)
 {
-    fn_8036BE88(0, reinterpret_cast<u32>(packet->unknown20));
+    glx_BindTexture(0, reinterpret_cast<u32>(packet->unknown20));
 }
 
 extern "C" void* fn_802A619C()

@@ -5,6 +5,7 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feInput.h"
 #include "NL/nlMemory.h"
+#include "Game/SH/SHNavigation.h"
 
 class SHNavigation;
 

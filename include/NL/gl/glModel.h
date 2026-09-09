@@ -6,7 +6,7 @@
 struct DisplayList;
 class nlMatrix4;
 
-struct UnidentifiedTextureState
+struct glTextureBinding
 {
     /* 0x00 */ u32 texture;
     /* 0x04 */ u16 textureIndex;
@@ -35,15 +35,6 @@ struct glModelStream
 
 struct glModelPacket;
 
-class UnidentifiedPacketResource
-{
-public:
-    virtual void fn_Unknown0();
-    virtual void fn_Unknown1();
-    virtual void fn_Unknown2(glModelPacket* packet);
-    virtual void fn_Unknown3(glModelPacket* packet);
-};
-
 struct glModelPacket
 {
     /* 0x00 */ u16* indexBuffer;
@@ -69,7 +60,20 @@ struct glModel
     /* 0x08 */ glModelPacket* packets;
 }; // size: 0xC
 
-inline glModelStream* fn_8036F99C(glModelPacket* pPacket, int id)
+inline glModelStream* glModelPacketGetStream(glModelPacket* pPacket, int id)
+{
+    for (unsigned long i = 0; i < pPacket->numStreams; i++)
+    {
+        glModelStream* stream = &pPacket->streams[i];
+        if (stream->id == id)
+        {
+            return stream;
+        }
+    }
+    return 0;
+}
+
+inline glModelStream* glFindModelStream(glModelPacket* pPacket, int id)
 {
     for (unsigned long i = 0; i < pPacket->numStreams; i++)
     {

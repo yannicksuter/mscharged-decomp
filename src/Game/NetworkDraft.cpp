@@ -1,3 +1,4 @@
+#include "Game/NetworkMessageRegistry.h"
 #include "Game/NetworkDraft.h"
 #include "Game/Sys/debug.h"
 
@@ -12,7 +13,7 @@
 #include <string.h>
 
 
-extern int lbl_80519920[12];
+extern int gCaptainSelectionOrder[12];
 
 static NetworkDraft* sNetworkDraft;
 
@@ -21,20 +22,20 @@ static float s_fDefaultTimeToChangeDrafters = 20.0f;
 static float s_fDefaultTimeToChooseSidekicks = 20.0f;
 static float s_fDefaultTimeFinalCountdown = 5.0f;
 
-static TweakValueImpl_804F4DC8 sDefaultTimeToWaitBeforeDraftingTweak(
+static TweakFloatBinding sDefaultTimeToWaitBeforeDraftingTweak(
     "s_fDefaultTimeToWaitBeforeDrafting", "Network/Draft",
     &s_fDefaultTimeToWaitBeforeDrafting);
-static TweakValueImpl_804F4DC8 sDefaultTimeToChangeDraftersTweak(
+static TweakFloatBinding sDefaultTimeToChangeDraftersTweak(
     "s_fDefaultTimeToChangeDrafters", "Network/Draft",
     &s_fDefaultTimeToChangeDrafters);
-static TweakValueImpl_804F4DC8 sDefaultTimeToChooseSidekicksTweak(
+static TweakFloatBinding sDefaultTimeToChooseSidekicksTweak(
     "s_fDefaultTimeToChooseSidekicks", "Network/Draft",
     &s_fDefaultTimeToChooseSidekicks);
-static TweakValueImpl_804F4DC8 sDefaultTimeFinalCountdownTweak(
+static TweakFloatBinding sDefaultTimeFinalCountdownTweak(
     "s_fDefaultTimeFinalCountdown", "Network/Draft",
     &s_fDefaultTimeFinalCountdown);
 
-void NetMessageDraft::Serialize(UnidentifiedMessageSerializer* serializer)
+void NetMessageDraft::Serialize(NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
     serializer->Transfer(&mMachineCount, sizeof(mMachineCount));
@@ -49,13 +50,13 @@ void NetMessageDraft::Serialize(UnidentifiedMessageSerializer* serializer)
         serializer->Transfer(
             mEntries[i].mUnidentified32, sizeof(mEntries[i].mUnidentified32));
         serializer->Transfer(&mEntries[i].mIndex, sizeof(mEntries[i].mIndex));
-        serializer->Transfer(&mEntries[i].mUnidentified7F,
-            sizeof(mEntries[i].mUnidentified7F));
+        serializer->Transfer(&mEntries[i].mGuestEnabled,
+            sizeof(mEntries[i].mGuestEnabled));
     }
 }
 
-void NetworkMessageType22_8050B7B4::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+void NetMessageDraftMachineInfo::Serialize(
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mEntry.mHead, sizeof(mEntry.mHead));
     serializer->Transfer(&mEntry.mUnidentified18, sizeof(mEntry.mUnidentified18));
@@ -63,18 +64,18 @@ void NetworkMessageType22_8050B7B4::Serialize(
     serializer->Transfer(mEntry.mUnidentified32, sizeof(mEntry.mUnidentified32));
     serializer->Transfer(&mEntry.mIndex, sizeof(mEntry.mIndex));
     serializer->Transfer(
-        &mEntry.mUnidentified7F, sizeof(mEntry.mUnidentified7F));
+        &mEntry.mGuestEnabled, sizeof(mEntry.mGuestEnabled));
 }
 
 void NetMessageDraftPickedCaptain::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mTeamIndex, sizeof(mTeamIndex));
     serializer->Transfer(&mCaptain, sizeof(mCaptain));
 }
 
 void NetMessageDraftPickedSidekicks::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mTeamIndex, sizeof(mTeamIndex));
     serializer->Transfer(&mSidekick0, sizeof(mSidekick0));
@@ -83,42 +84,42 @@ void NetMessageDraftPickedSidekicks::Serialize(
 }
 
 void NetMessageSidesChanged::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
     serializer->Transfer(&mSide, sizeof(mSide));
-    serializer->Transfer(&mIsGuest, sizeof(mIsGuest));
-    serializer->Transfer(&mIsResponse, sizeof(mIsResponse));
+    serializer->Transfer(&mGuest, sizeof(mGuest));
+    serializer->Transfer(&mAccepted, sizeof(mAccepted));
 }
 
 void NetMessageCheckConnection::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+    NetworkMessageSerializer* serializer)
 {
     for (int i = 0; i < 2; ++i)
     {
-        serializer->Transfer(&mUnidentified08[i], sizeof(mUnidentified08[i]));
+        serializer->Transfer(&mProfileIds[i], sizeof(mProfileIds[i]));
     }
 }
 
-void NetworkMessageType27_8050B750::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+void NetMessageConnectionDecision::Serialize(
+    NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
-    serializer->Transfer(&mUnidentified09, sizeof(mUnidentified09));
+    serializer->Transfer(&mAccepted, sizeof(mAccepted));
+    serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
 }
 
-NetworkMessageType22_8050B7B4::~NetworkMessageType22_8050B7B4() { }
+NetMessageDraftMachineInfo::~NetMessageDraftMachineInfo() { }
 NetMessageDraftPickedCaptain::~NetMessageDraftPickedCaptain() { }
 NetMessageDraftPickedSidekicks::~NetMessageDraftPickedSidekicks() { }
 NetMessageSidesChanged::~NetMessageSidesChanged() { }
-NetworkMessageType27_8050B750::~NetworkMessageType27_8050B750() { }
+NetMessageConnectionDecision::~NetMessageConnectionDecision() { }
 
-int NetworkMessageType27_8050B750::GetType() { return 27; }
+int NetMessageConnectionDecision::GetType() { return 27; }
 int NetMessageCheckConnection::GetType() { return 26; }
 int NetMessageSidesChanged::GetType() { return 25; }
 int NetMessageDraftPickedSidekicks::GetType() { return 24; }
 int NetMessageDraftPickedCaptain::GetType() { return 23; }
-int NetworkMessageType22_8050B7B4::GetType() { return 22; }
+int NetMessageDraftMachineInfo::GetType() { return 22; }
 int NetMessageDraft::GetType() { return 21; }
 
 void NetworkDraft::CreateInstance()
@@ -158,8 +159,8 @@ void NetworkDraft::Reset(bool)
 
 void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
 {
-    lbl_806E2100->fn_8032CA1C(23, this);
-    lbl_806E2100->fn_8032CA1C(24, this);
+    gNetworkMessageRegistry->RegisterReceiver(23, this);
+    gNetworkMessageRegistry->RegisterReceiver(24, this);
     mDraftMessage = *message;
     mTeamCount = message->mMachineCount;
     mLocalMachineIndex = message->mMachineIndex;
@@ -176,7 +177,7 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
     for (int teamIndex = 0; teamIndex < mTeamCount; ++teamIndex)
     {
         NetworkDraftTeam& team = mTeams[teamIndex];
-        const UnidentifiedDraftEntry& entry = message->mEntries[teamIndex];
+        const NetworkDraftMachineInfo& entry = message->mEntries[teamIndex];
         team = NetworkDraftTeam();
         team.mPlayerCount = 1;
         NetworkDraftPlayer& player = team.mPlayers[0];
@@ -225,8 +226,8 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
 
 void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
 {
-    lbl_806E2100->fn_8032CA1C(23, this);
-    lbl_806E2100->fn_8032CA1C(24, this);
+    gNetworkMessageRegistry->RegisterReceiver(23, this);
+    gNetworkMessageRegistry->RegisterReceiver(24, this);
     mDraftMessage = *message;
     mTeamCount = 2;
     mLocalMachineIndex = message->mMachineIndex;
@@ -239,8 +240,8 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
 
     for (int entryIndex = 0; entryIndex < message->mMachineCount; ++entryIndex)
     {
-        const UnidentifiedDraftEntry& entry = message->mEntries[entryIndex];
-        int playerCount = entry.mUnidentified7F ? 2 : 1;
+        const NetworkDraftMachineInfo& entry = message->mEntries[entryIndex];
+        int playerCount = entry.mGuestEnabled ? 2 : 1;
         for (int playerIndex = 0; playerIndex < playerCount; ++playerIndex)
         {
             int teamIndex = message->mUnidentified0B.mData[entryIndex * 2 + playerIndex];
@@ -263,7 +264,7 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
             player.mName[character] = 0;
             memcpy(player.mData, entry.mUnidentified32, sizeof(player.mData));
             player.mPeerIndex = (s8)entry.mIndex;
-            player.mUnidentified81 = playerIndex == 1;
+            player.mGuest = playerIndex == 1;
         }
     }
     AssignDraftSides();
@@ -390,8 +391,8 @@ void NetworkDraft::AdvanceDraftTeam()
 
 void NetworkDraft::UnregisterMessageReceivers()
 {
-    lbl_806E2100->fn_8032CA2C(23);
-    lbl_806E2100->fn_8032CA2C(24);
+    gNetworkMessageRegistry->UnregisterReceiver(23);
+    gNetworkMessageRegistry->UnregisterReceiver(24);
 }
 
 int NetworkDraft::GetCurrentDraftingTeam() const
@@ -407,7 +408,7 @@ int NetworkDraft::GetRandomAvailableCaptain() const
     {
         index = 0;
     }
-    int captain = lbl_80519920[index];
+    int captain = gCaptainSelectionOrder[index];
     while (IsCaptainTaken(captain) && attempts < 12)
     {
         ++attempts;
@@ -416,7 +417,7 @@ int NetworkDraft::GetRandomAvailableCaptain() const
         {
             index = 0;
         }
-        captain = lbl_80519920[index];
+        captain = gCaptainSelectionOrder[index];
     }
     return attempts < 12 ? captain : -1;
 }
@@ -427,7 +428,7 @@ void NetworkDraft::SendCaptainChoice()
     message.mTeamIndex = mCurrentDraftingTeam;
     message.mCaptain = GameInfoManager::Instance()->GetTeam(0);
     u8 buffer[0x20];
-    int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
+    int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
     tDebugPrintManager::Print(DC_NETWORK,
         "Sending NetworkDraftPickedCaptain team %d captain %d\n",
         message.mTeamIndex, message.mCaptain);
@@ -443,7 +444,7 @@ void NetworkDraft::SendSidekickChoice()
     message.mSidekick1 = team.mSidekick1;
     message.mSidekick2 = team.mSidekick2;
     u8 buffer[0x20];
-    int size = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
+    int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
     SendToAllDraftPlayers(buffer, size);
 }
 
@@ -483,7 +484,7 @@ NetworkDraftTeam* NetworkDraft::FindDraftTeamByPeerIndex(int peerIndex)
     return 0;
 }
 
-int NetworkDraft::ReceiverVirtual00(UnidentifiedNetworkMessage* message)
+int NetworkDraft::ProcessMessage(NetworkMessage* message)
 {
     int type = message->GetType();
     if (type == 23)
@@ -552,14 +553,14 @@ void NetworkDraft::SendToAllDraftPlayers(void* data, int size)
         return;
     }
 
-    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
-    NetworkSocket_801246E4* socket = g_pNetworkSessionBase->GetDirectSocket();
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    NetworkSocket* socket = g_pNetworkSessionBase->GetDirectSocket();
     for (int team = 0; team < mTeamCount; ++team)
     {
         for (int player = 0; player < mTeams[team].mPlayerCount; ++player)
         {
             NetworkDraftPlayer& draftPlayer = mTeams[team].mPlayers[player];
-            if (draftPlayer.mUnidentified81)
+            if (draftPlayer.mGuest)
             {
                 continue;
             }

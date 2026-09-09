@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include <string.h>
 
@@ -111,7 +112,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029D7E0>::Activate(GLView* view)
     fn_80182ED0(lbl_806E1B64, view, 0);
     gxSetNumChans(1);
 
-    UnidentifiedTextureState texture;
+    glTextureBinding texture;
     texture.texture = 0;
     texture.textureIndex = 0xFFFF;
     texture.flags = 0;
@@ -121,7 +122,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029D7E0>::Activate(GLView* view)
     texture.SetWrapS(true);
     texture.SetWrapT(true);
     texture.unknown07 = 0;
-    fn_8036BE88(3, &texture);
+    glx_BindTexture(3, &texture);
 }
 
 template <>
@@ -157,7 +158,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029D7E0>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 struct FloatColour_802938B8

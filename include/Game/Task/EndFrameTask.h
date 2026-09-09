@@ -13,4 +13,6 @@ public:
     }
 };
 
+extern unsigned char gDrawScreenBorder;
+
 #endif // GAME_END_FRAME_TASK_H

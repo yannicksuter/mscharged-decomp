@@ -10,47 +10,48 @@
 
 #include <string.h>
 
+class GLResourcePool;
 class ChainChomp;
 class SkinAnimatedNPC;
 class UnidentifiedNPC_801B43F8;
-class UnidentifiedSkinAnimatedNPC_80199880;
+class DiddyBanana;
 struct HammerObject;
 struct DaisyFistObject;
 struct BulletBillObject;
 struct BirdoEggObject;
 struct KoopaShellObject;
 struct ThwompObject;
-class UnidentifiedObject_801B535C;
+struct UnidentifiedObject_801B535C;
 
 struct NPCTemplate
 {
-    NPCTemplate(const char* pName, bool bType)
-        : mUnidentified000(false)
-        , mUnidentified001(false)
-        , mUnidentified002(false)
-        , mUnidentified003(false)
+    NPCTemplate(const char* pName, bool bPersistent)
+        : mAnimationLoadStarted(false)
+        , mAnimationsLoaded(false)
+        , mHierarchyLoaded(false)
+        , mTexturesLoaded(false)
         , loaded(false)
-        , mUnidentified005(false)
+        , mPersistent(false)
         , modelID(-1)
         , hierarchy(0)
-        , mUnidentified010(0)
+        , mResourcePool(0)
     {
         mName[0] = '\0';
         strcpy(mName, pName);
-        mUnidentified005 = bType;
+        mPersistent = bPersistent;
     }
 
-    /* 0x00 */ bool mUnidentified000;
-    /* 0x01 */ bool mUnidentified001;
-    /* 0x02 */ bool mUnidentified002;
-    /* 0x03 */ bool mUnidentified003;
+    /* 0x00 */ bool mAnimationLoadStarted;
+    /* 0x01 */ bool mAnimationsLoaded;
+    /* 0x02 */ bool mHierarchyLoaded;
+    /* 0x03 */ bool mTexturesLoaded;
     /* 0x04 */ bool loaded;
-    /* 0x05 */ bool mUnidentified005;
+    /* 0x05 */ bool mPersistent;
     /* 0x06 */ u8 mPadding006[2];
     /* 0x08 */ unsigned long modelID;
     /* 0x0C */ cSHierarchy* hierarchy;
-    /* 0x10 */ void* mUnidentified010;
-    /* 0x14 */ cInventory<cSAnim> mUnidentified014;
+    /* 0x10 */ GLResourcePool* mResourcePool;
+    /* 0x14 */ cInventory<cSAnim> mInventorySAnim;
     /* 0x30 */ char mName[40];
 }; // total size: 0x58
 
@@ -60,11 +61,11 @@ public:
     NPCManager();
     virtual ~NPCManager();
 
-    void CreateNPCTemplate(const char* pName, bool bType);
-    bool fn_801A977C();
-    void fn_801A9874();
+    void CreateNPCTemplate(const char* pName, bool bPersistent);
+    bool SelectNextNPCTemplate();
+    void CreateChainChomp();
     void fn_801A9AF8();
-    void fn_801A9B64();
+    void CreateBirdoEgg();
     void fn_801A9BD0();
     void fn_801A9C3C();
     DaisyFistObject* fn_801A9CA4(int nIndex);
@@ -72,17 +73,17 @@ public:
     BulletBillObject* fn_801A9D20();
     UnidentifiedNPC_801B43F8* fn_801A9DE0(int nIndex);
     void fn_801A9DF0();
-    void fn_801AA088();
+    void CreateDiddyBanana();
     void fn_801AA2C0();
     int fn_801AA32C();
     void fn_801AA348();
     HammerObject* fn_801AA3AC(int nIndex);
     void fn_801AA4C0();
     ThwompObject* fn_801AA528(int nIndex);
-    void fn_801AA9D8();
-    bool fn_801AABB0();
-    void fn_801AAD0C();
-    void fn_801AB9D4();
+    void BeginLoadNPCTemplate();
+    bool FinishLoadNPCTemplate();
+    void UnloadTransientNPCTemplates();
+    void DestroyNPCs();
     NPCTemplate* fn_801ABBDC(const char* pName);
 
     NPCTemplate* fn_801ABBDC_inline(const char* pName)
@@ -90,8 +91,8 @@ public:
         for (int i = 0; i < 2; ++i)
         {
             nlDLListIterator<NPCTemplate*> iterator
-                = i == 0 ? mUnidentified00C.Begin()
-                         : mUnidentified014.Begin();
+                = i == 0 ? mPersistentTemplates.Begin()
+                         : mTransientTemplates.Begin();
             while (iterator.hasNext())
             {
                 char name[40];
@@ -116,16 +117,16 @@ public:
     void UpdateAINPCs(float dt);
     void fn_801ABF8C();
 
-    /* 0x04 */ cInventory<cSHierarchy>* mUnidentified004;
-    /* 0x08 */ cInventory<cSHierarchy>* mUnidentified008;
+    /* 0x04 */ cInventory<cSHierarchy>* mPersistentHierarchies;
+    /* 0x08 */ cInventory<cSHierarchy>* mTransientHierarchies;
     /* 0x0C */ nlDLListContainer<NPCTemplate*>
-        mUnidentified00C;
+        mPersistentTemplates;
     /* 0x14 */ nlDLListContainer<NPCTemplate*>
-        mUnidentified014;
-    /* 0x1C */ NPCTemplate* mUnidentified01C;
+        mTransientTemplates;
+    /* 0x1C */ NPCTemplate* mPendingTemplate;
     /* 0x20 */ ChainChomp* mpChainChomp;
     /* 0x24 */ UnidentifiedObject_801B535C* mUnidentified024;
-    /* 0x28 */ BirdoEggObject* mUnidentified028;
+    /* 0x28 */ BirdoEggObject* mpBirdoEgg;
     /* 0x2C */ KoopaShellObject* mUnidentified02C;
     /* 0x30 */ unsigned int mUnidentified030;
     /* 0x34 */ DaisyFistObject* mDaisyFists[8];
@@ -134,12 +135,10 @@ public:
     /* 0x70 */ HammerObject* mUnidentified070[15];
     /* 0xAC */ ThwompObject* mUnidentified0AC[8];
     /* 0xCC */ UnidentifiedNPC_801B43F8* mUnidentified0CC[3];
-    /* 0xD8 */ UnidentifiedSkinAnimatedNPC_80199880* mUnidentified0D8;
+    /* 0xD8 */ DiddyBanana* mpDiddyBanana;
 }; // total size: 0xDC
 
-extern NPCManager* lbl_806E1608;
-extern NPCManager* lbl_806E160C;
-
-extern "C" void fn_801B4B24(SkinAnimatedNPC*, int);
+extern NPCManager* gNPCManager;
+extern NPCManager* gNPCManagerInstance;
 
 #endif // GAME_RENDER_NPCMANAGER_H

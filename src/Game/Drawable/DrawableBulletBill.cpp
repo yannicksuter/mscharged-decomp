@@ -6,7 +6,7 @@
 #include "Game/BulletBill.h"
 #include "Game/Drawable/DrawableBulletBill.h"
 #include "Game/Drawable/RenderObject.h"
-#include "Game/Drawable/ShadowProp.h"
+#include "NL/gl/glDraw3.h"
 #include "NL/gl/glState.h"
 #include "NL/platqmath.h"
 
@@ -51,12 +51,11 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
         alpha = 255;
     }
 
-    GroundInfo* ground =
-        reinterpret_cast<GroundInfo*>(BasicStadium::GetCurrentStadium());
+    BasicStadium* stadium = BasicStadium::GetCurrentStadium();
     float groundHeight = 0.0f;
-    if (ground != 0)
+    if (stadium != 0)
     {
-        groundHeight = ground->height;
+        groundHeight = stadium->m_shadowHeight;
     }
 
     groundHeight = 0.015625f + groundHeight;

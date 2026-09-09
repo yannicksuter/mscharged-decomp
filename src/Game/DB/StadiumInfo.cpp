@@ -188,14 +188,14 @@ const char* GetStadiumMoviePath(int stadium)
 {
     if (IsStadiumUnlocked(stadium))
     {
-        if (fn_803693B4() == 1)
+        if (glx_GetVideoMode() == 1)
         {
             return sStadiumInfo[stadium].mMoviePathPAL;
         }
         return sStadiumInfo[stadium].mMoviePath;
     }
 
-    if (fn_803693B4() == 1)
+    if (glx_GetVideoMode() == 1)
     {
         return "art/movies/stad_locked_pal.thp";
     }

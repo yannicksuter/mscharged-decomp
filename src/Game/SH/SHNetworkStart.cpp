@@ -1,25 +1,23 @@
 #include "Game/SH/SHNetworkStart.h"
 
 #include "Game/FE/feFinder.h"
+#include "Game/NetworkSession.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "NL/nlString.h"
 
-extern bool lbl_806E1888;
-extern bool lbl_806E1889;
-
-void UnidentifiedNetworkStartScene::fn_801FDF00(TLComponentInstance* component)
+void NetworkStartScene::DeselectMenuItem(TLComponentInstance* component)
 {
     component->SetActiveSlide("off", true, false);
     component->Update(0.0f);
 }
 
-void UnidentifiedNetworkStartScene::fn_801FDEB8(TLComponentInstance* component)
+void NetworkStartScene::SelectMenuItem(TLComponentInstance* component)
 {
     component->SetActiveSlide("on", true, false);
     component->Update(0.0f);
 }
 
-void UnidentifiedNetworkStartScene::fn_801FC680(int state)
+void NetworkStartScene::SetActionButtons(int state)
 {
     TLSlide* activeSlide = mPresentation->m_currentSlide;
     unsigned long buttonsHash = nlStringLowerHash("BUTTONS");
@@ -53,13 +51,35 @@ void UnidentifiedNetworkStartScene::fn_801FC680(int state)
     buttons->m_bVisible = visible;
 }
 
-extern "C" void fn_801FC4DC()
+NetworkStartScene::~NetworkStartScene()
 {
-    lbl_806E1888 = false;
+    LANLobby* lobby = g_pNetworkSessionBase->GetTransport();
+    if (lobby != 0)
+    {
+        lobby->SetLobbyListener(0);
+    }
 }
 
-extern "C" void fn_801FC4C8()
+NetworkStartScene::NetworkStartScene()
+    : mState(0)
+    , mUnidentified238(false)
 {
-    lbl_806E1888 = false;
-    lbl_806E1889 = true;
+    gNetworkStartWaitingForDialog = false;
+    gNetworkStartResetRequested = false;
+    for (int i = 0; i < 7; ++i)
+    {
+        mPlayerText[i] = 0;
+        mPlayerNames[i][0] = 0;
+    }
+}
+
+void ResumeNetworkStart()
+{
+    gNetworkStartWaitingForDialog = false;
+}
+
+void ResetNetworkStart()
+{
+    gNetworkStartWaitingForDialog = false;
+    gNetworkStartResetRequested = true;
 }

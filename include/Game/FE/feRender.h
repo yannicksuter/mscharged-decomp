@@ -8,12 +8,13 @@ class FEScene;
 class GLView;
 class TLImageInstance;
 class TLInstance;
-struct UnidentifiedTextureState;
+struct glTextureBinding;
 
 class FERender
 {
 public:
     static void Initialize();
+    static void BeginFrame();
     static void RenderScene(FEScene* scene);
     static void RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, const nlMatrix4& parentMatrix);
     static unsigned char RenderImageInstance(const TLImageInstance* pTLImageInstance, const nlMatrix4& matrix);
@@ -22,11 +23,10 @@ public:
     static FEScene* m_pRenderScene;
 };
 
-
 // Image-instance model callback installed by GameRenderTask and invoked from
 // FERender::RenderImageInstance.
 typedef void (*RenderImageCallback)(GLView* view, unsigned long texture,
-    const UnidentifiedTextureState* pExtraTextureStates,
+    const glTextureBinding* pExtraTextureStates,
     const nlVector2* positions, const nlVector2* texcoords);
 extern RenderImageCallback g_pfnRenderImage;
 

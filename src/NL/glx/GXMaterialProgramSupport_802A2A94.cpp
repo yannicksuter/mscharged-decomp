@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glView.h"
@@ -32,7 +33,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A58E8>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 template <>

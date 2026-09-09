@@ -3,7 +3,6 @@
 #include "NL/nlDLRing.h"
 #include "NL/nlPrint.h"
 
-extern void nlPrintf(const char*, ...);
 extern void nlBreak();
 
 char sTotalFreeMemoryFormat[] = "Total Free Memory: %d\n";

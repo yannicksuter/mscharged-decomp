@@ -61,7 +61,7 @@ public:
     void UpdateParticle(ParticleReturn* pReturn, Particle* pPart,
         EffectsTemplate* pTemplate, const nlVector3& viewRight,
         const nlVector3& viewUp, const nlMatrix4* pCoordSys);
-    void fn_802E2848();
+    void ClearParticles();
     int RenderAllParticles(GLView* view);
     void Die();
     bool Update(float dt);
@@ -103,6 +103,6 @@ public:
 
 bool fxParticleStartup(int maxNumParticles);
 bool fxParticleShutdown();
-void fn_802E3AC0(int maxNumParticles);
+void fxSetMaxNumParticles(int maxNumParticles);
 
 #endif // GAME_EFFECTS_PARTICLE_SYSTEM_H

@@ -1,5 +1,8 @@
+#include "NL/plat/WiiPad.h"
+#include "Game/TweakRegistry.h"
 #include "unclassified/tu_801A6AAC.h"
 #include "Game/Render/RLViewLayers.h"
+#include "Game/NetworkMessageRegistry.h"
 
 #include "Game/Render/RLView.h"
 
@@ -13,6 +16,7 @@
 #include "NL/nlTicker.h"
 #include "NL/plat/DPDData.h"
 #include "NL/plat/WiiPad.h"
+#include "Game/Render/RLViewLayers.h"
 
 struct UnidentifiedControllerInfo_801A7C48
 {
@@ -686,13 +690,13 @@ extern "C" void fn_801A7C48(float fDeltaT)
         lbl_80573498.mUnidentified018
             = 0.0000958738f * (float)nAngle;
 
-        if (g_pNetworkSession->fn_80123314())
+        if (g_pNetworkSession->IsLiveNetworkGame())
         {
             fn_801A8F1C(nAngle, lbl_80573498.mUnidentified024, nStatus, fX, fY);
         }
         DrawState(lbl_80573498);
     }
-    else if (g_pNetworkSession->fn_80123314() && lbl_806E15F4)
+    else if (g_pNetworkSession->IsLiveNetworkGame() && lbl_806E15F4)
     {
         UpdateStateTweens(lbl_80573498, fDeltaT);
         lbl_80573498.mUnidentified000 = lbl_806E15F8;
@@ -916,7 +920,7 @@ extern "C" void fn_801A8F1C(u16 nAngle, u32 nTextureIndex,
     }
     lbl_806E15F0 = nTicker;
 
-    NetworkMessageType34_8050ADCC message;
+    NetworkMessageType34 message;
     message.mUnidentified08 = (s16)(int)fX;
     message.mUnidentified0A = (s16)(int)fY;
     message.mUnidentified0C = (u8)(nAngle >> 8);
@@ -924,7 +928,7 @@ extern "C" void fn_801A8F1C(u16 nAngle, u32 nTextureIndex,
     message.mUnidentified0E = (u8)nStatus;
 
     u8 buffer[50];
-    int nSize = lbl_806E2100->fn_8032C830(&message, buffer, sizeof(buffer));
+    int nSize = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
     int nPlayerCount = g_pNetworkSessionBase->GetNumMachines();
     for (s8 i = 0; i < nPlayerCount; i++)
     {

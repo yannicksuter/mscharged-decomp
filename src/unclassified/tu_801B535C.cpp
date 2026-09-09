@@ -133,7 +133,7 @@ void UnidentifiedObject_801B535C::fn_801B57D8(EmissionController& param)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
         return;
-    if (param.m_GlView == 0 && ReplayManager::Instance()->mRender != 0)
+    if (param.m_Replaying == 0 && ReplayManager::Instance()->mRender != 0)
     {
         RenderSnapshot* snapshot = ReplayManager::Instance()->mRender;
         if (snapshot->_1BA0.mVisible)

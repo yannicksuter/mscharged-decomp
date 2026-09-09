@@ -1,9 +1,10 @@
+#include "Game/DB/GameProgress.h"
 #include "Game/DB/Simmer.h"
+#include "Game/DB/GameProgress.h"
 
 #include "Game/DB/StatsTracker.h"
 #include "NL/nlMath.h"
 
-extern void* g_pCupManager;
 extern "C" void fn_8010BCB8(void*, bool, int);
 
 /**

@@ -6,12 +6,12 @@
 
 struct GXMaterialProgramParameters_80298B18
 {
-    /* 0x00 */ UnidentifiedTextureState texture0;
-    /* 0x08 */ UnidentifiedTextureState texture1;
-    /* 0x10 */ UnidentifiedTextureState texture2;
-    /* 0x18 */ UnidentifiedTextureState texture3;
-    /* 0x20 */ UnidentifiedTextureState texture4;
-    /* 0x28 */ UnidentifiedTextureState texture5;
+    /* 0x00 */ glTextureBinding texture0;
+    /* 0x08 */ glTextureBinding texture1;
+    /* 0x10 */ glTextureBinding texture2;
+    /* 0x18 */ glTextureBinding texture3;
+    /* 0x20 */ glTextureBinding texture4;
+    /* 0x28 */ glTextureBinding texture5;
     /* 0x30 */ const float (*matrices)[3][4];
     /* 0x34 */ unsigned long matricesSize;
     /* 0x38 */ float value56;
@@ -33,7 +33,7 @@ class GXMaterialProgram_80298B18 : public GXMaterialProgramImpl<GXMaterialProgra
 public:
     GXMaterialProgram_80298B18();
     virtual ~GXMaterialProgram_80298B18();
-    virtual void Configure();
+    virtual void Configure(glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters();
     virtual void Initialize();
 

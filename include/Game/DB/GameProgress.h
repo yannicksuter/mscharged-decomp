@@ -1,7 +1,8 @@
-#ifndef GAME_DB_GAME_PROGRESS_H
-#define GAME_DB_GAME_PROGRESS_H
+#ifndef GAME_DB_CUP_MANAGER_H
+#define GAME_DB_CUP_MANAGER_H
 
 #include "Game/DB/Cup.h"
+#include "Game/DB/CupInterface.h"
 #include "types.h"
 
 struct CupHistoryRecord
@@ -19,43 +20,55 @@ struct CupHistoryRecord
     unsigned int mUnidentified39 : 7;
 };
 
-class CupManager
+class CupManager : public CupInterface
 {
 public:
     virtual BasicGameInfo* GetGameInfo(int phase, int matchup);
     virtual bool HasGameBeenPlayed(int phase, int matchup);
-    virtual int fn_8010F1E8() const;
+    virtual NetworkTournamentGame* GetTournamentGame(int phase, int matchup);
     virtual BasicGameInfo* GetCurrentGameInfo();
-    virtual s16 GetNextRoundNumber(int* roundType) const;
-    virtual s16 GetPreviousRoundNumber(int* roundType) const;
+    virtual u16 GetNumGamesPerRound(int phase, int round) const;
+    virtual u16 GetNumGames(int phase) const;
     virtual int GetCurrentMode() const;
-    virtual int fn_8010F1C8() const;
-    virtual void fn_8010D94C();
+    virtual int GetCupPersona() const;
+    virtual bool IsCupWinningGame(int team) const;
     virtual s16 GetCurrentRoundNumber() const;
     virtual int GetCurrentRoundType() const;
-    virtual int fn_8010F1D0() const;
+    virtual u16 GetNumPlayoffRounds() const;
     virtual ~CupManager();
 
+    static CupManager* Instance();
+    s16 GetNextRoundNumber(int* roundType) const;
+    int GetTeamRank(int team) const;
+    TeamStats GetTeamStats(int team) const;
+    u16 GetNumRegularRounds() const { return mCurrentCup->GetNumRegularRounds(); }
     u16 GetNumPlayingTeams() const;
     TeamStats GetTeamStatsByIndex(u16 index) const;
     TeamStats* pGetTeamStatsByIndex(u16 index) const;
     BasicGameInfo* GetMatchupInfo(int phase, short round, int matchup) const;
     int GetUserSelectedCupTeam() const;
-    int fn_80206B28(int index) const;
-    bool fn_80206B3C() const;
-    void fn_80206B48(bool value);
+    int GetPreviousGameTeam(int index) const;
+    bool ShouldShowCupPhasePopup() const;
+    void SetShowCupPhasePopup(bool value);
+    void RestoreCupRecord();
+    void RestartCupSeries();
+    void ShowRoundNews();
+
+    int GetSaveDataSize() const;
+    void* SerializeData(void* dst) const;
+    void* DeserializeData(void* src);
 
     /* 0x0004 */ Cup<4, 8> mFireCupSeries;
     /* 0x14F0 */ Cup<6, 12> mCrystalCupSeries;
     /* 0x41DC */ Cup<10, 11> mStrikerCupSeries;
-    /* 0x8680 */ int mUnidentified8680;
+    /* 0x8680 */ int mState;
     /* 0x8684 */ u8 unknown_0x8684[0x10];
-    /* 0x8694 */ int mUnidentified8694[2];
+    /* 0x8694 */ int mPreviousGameTeams[2];
     /* 0x869C */ bool mUnidentified869C;
     /* 0x869D */ u8 unknown_0x869D[0x37F];
     /* 0x8A1C */ int mCurrentMode;
     /* 0x8A20 */ BaseCup* mCurrentCup;
-    /* 0x8A24 */ bool unknown_0x8A24;
+    /* 0x8A24 */ bool mShowCupPhasePopup;
     /* 0x8A25 */ u8 unknown_0x8A25[3];
     /* 0x8A28 */ int unknown_0x8A28;
     /* 0x8A2C */ int unknown_0x8A2C;
@@ -65,6 +78,7 @@ public:
 };
 
 extern CupManager* g_pCupManager;
+inline CupManager* CupManager::Instance() { return g_pCupManager; }
 
 class StrikerChallenge
 {
@@ -98,8 +112,8 @@ public:
     /* 0x29 */ bool mAwayPowerupsEnabled;
     /* 0x2A */ bool mHomeMegastrikeEnabled;
     /* 0x2B */ bool mAwayMegastrikeEnabled;
-    /* 0x2C */ bool mHomeSkillshotEnabled;
-    /* 0x2D */ bool mAwaySkillshotEnabled;
+    /* 0x2C */ bool mHomeSkillshotDisabled;
+    /* 0x2D */ bool mAwaySkillshotDisabled;
     /* 0x2E */ bool mStunnedHomeGoalies;
     /* 0x2F */ bool mStunnedAwayGoalies;
     /* 0x30 */ int mCustomPowerups;
@@ -113,15 +127,10 @@ public:
 
 extern StrikerChallenge* g_pStrikerChallenge;
 
-void SetUnlockFlag(u32 unlockFlag);
-bool IsUnlockFlagSet(u32 unlockFlag);
-void RecordChallengeUnlock(u32* completionData, u32 unlockFlag);
+bool IsUnlockFlagSet(unsigned int flag);
+void SetUnlockFlag(unsigned int flag);
 
 int fn_8011162C();
-
-bool IsBowserJrUnlocked();
-bool IsDiddyKongUnlocked();
-bool IsPeteyUnlocked();
 
 bool IsWastelandsUnlocked();
 bool IsDumpUnlocked();
@@ -130,17 +139,34 @@ bool IsStormshipUnlocked();
 bool IsCrystalCanyonUnlocked();
 bool IsLavaPitUnlocked();
 
+bool IsBowserJrUnlocked();
+
+bool IsDiddyKongUnlocked();
+
+bool IsPeteyUnlocked();
+
 bool IsSecureEnvironmentCheatUnlocked();
+
 bool IsPowerEnvironmentCheatUnlocked();
+
 bool IsVoltageEnvironmentCheatUnlocked();
+
 bool IsTiltEnvironmentCheatUnlocked();
+
 bool IsWhiteBallEnvironmentCheatUnlocked();
+
 bool IsPowerupCheatsUnlocked();
+
 bool IsSuperPowerupsCheatUnlocked();
+
 bool IsDevastatingPlayerCheatUnlocked();
+
 bool IsSafePlayerCheatUnlocked();
+
 bool IsSkillShotPlayerCheatUnlocked();
+
 bool IsGlassJawPlayerCheatUnlocked();
+
 bool IsButterfingersPlayerCheatUnlocked();
 
-#endif // GAME_DB_GAME_PROGRESS_H
+#endif // GAME_DB_CUP_MANAGER_H

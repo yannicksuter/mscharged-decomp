@@ -1,10 +1,13 @@
+#include "Game/TweakQuery.h"
 #include "NL/gl/glPlat.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "NL/gl/glMaterialProgram.h"
 #include "Game/Sys/debug.h"
 #include "NL/gl/glView.h"
 #include "NL/gl/tu_80364020.h"
 
 #include "NL/glx/glxGX.h"
-#include "NL/glx/tu_8036D894.h"
+#include "NL/glx/glxTarget.h"
 #include "NL/glx/glxMemory.h"
 #include "NL/glx/glxSend.h"
 #include "NL/glx/glxSwap.h"
@@ -12,42 +15,6 @@
 #include "NL/nlFunction.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
-
-class PlatformStartupObject
-{
-public:
-    virtual void Reserved0() = 0;
-    virtual void Reserved1() = 0;
-    virtual void Reserved2() = 0;
-    virtual void Reserved3() = 0;
-    virtual void Reserved4() = 0;
-    virtual void Reserved5() = 0;
-    virtual void Startup() = 0;
-};
-
-struct PlatformStartupEntry
-{
-    PlatformStartupObject* object;
-    void* key;
-};
-
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
 
 extern "C"
 {
@@ -70,8 +37,7 @@ extern "C"
     u8 SCGetEuRgb60Mode();
     void OSReport(const char* format, ...);
 
-    bool fn_802C2DBC(const char* path);
-    s32 GetTweakInt(const char* path, s32 defaultValue);
+
     void GXAdjustForOverscan(const GXRenderModeObj* source, GXRenderModeObj* destination, u16 horizontal, u16 vertical);
     f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight);
     void fn_803A7828(f32 x, f32 y, f32 width, f32 height, f32 nearZ, f32 farZ);
@@ -83,7 +49,6 @@ extern "C"
     void fn_803A6FE8(u8 fieldMode, u8 halfAspectRatio);
     void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
 
-    void fn_802CB848(Function2<bool, PlatformStartupEntry&, PlatformStartupEntry&>* callback);
 
     extern GXRenderModeObj GXNtsc480IntDf;
     extern GXRenderModeObj GXNtsc480Prog;
@@ -140,22 +105,22 @@ static inline void ClearXFBInline(void* framebuffer)
     DCFlushRange(framebuffer, glx_FBSize);
 }
 
-u32 fn_80369394()
+u32 glplatGetFrameBufferWidth()
 {
     return glx_rmode.fbWidth;
 }
 
-u32 fn_803693A4()
+u32 glplatGetFrameBufferHeight()
 {
     return glx_rmode.efbHeight;
 }
 
-s32 fn_803693B4()
+s32 glx_GetVideoMode()
 {
     return glx_VideoMode;
 }
 
-extern "C" u32 fn_803693BC()
+u32 glx_GetScaledXFBWidth()
 {
     return glx_VIWidth;
 }
@@ -195,16 +160,16 @@ bool glplatPreStartup()
     return true;
 }
 
-static bool StartupObject(PlatformStartupEntry&, PlatformStartupEntry& entry)
+static bool InitializeMaterialProgram(unsigned long&, void*& program)
 {
-    entry.object->Startup();
+    ((GLMaterialProgram*)program)->Initialize();
     return true;
 }
 
-extern "C" void fn_80369574()
+void glplatInitializeMaterialPrograms()
 {
-    Function2<bool, PlatformStartupEntry&, PlatformStartupEntry&> callback(StartupObject);
-    fn_802CB848(&callback);
+    MaterialProgramCallback callback(InitializeMaterialProgram);
+    glForEachMaterialProgram(&callback);
 }
 
 bool glplatStartup(gl_ScreenInfo* screenInfo)
@@ -214,7 +179,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     {
     }
 
-    if (fn_802C2DBC("/user/gpu fifo"))
+    if (TweakExists("/user/gpu fifo"))
     {
         glx_FIFOSize = (u32)GetTweakInt("/user/gpu fifo", 0) << 10;
     }
@@ -329,7 +294,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     }
     glxInitSwap(glx_FrameBuffer[0], glx_FrameBuffer[1]);
     glxInitTex();
-    fn_8036D89C();
+    glxInitTargets();
     return true;
 }
 
@@ -355,14 +320,14 @@ void glplatEndFrame()
 {
 }
 
-extern "C" PlatformViewport* fn_80369A30()
+PlatformViewport* glplatGetViewport()
 {
     return &glx_viewport;
 }
 
 static void glx_SendViews()
 {
-    TargetPlatform_8036DE50* target;
+    GLXTarget* target;
     GLView* view;
 
     glx_viewport.x = 0;
@@ -377,7 +342,7 @@ static void glx_SendViews()
         1.0f);
     fn_803A78A4(0, 0, 640, 448);
 
-    GLViewIterator iterator(&lbl_8057F250);
+    GLViewIterator iterator(&gRootView);
     for (; !iterator.IsDone(); iterator.Next())
     {
         view = iterator.Current();
@@ -385,7 +350,7 @@ static void glx_SendViews()
         {
             GLRenderPair renderPair = view->GetRenderPair();
             target = renderPair.target;
-            target->fn_8036D9A0(0);
+            target->Activate(0);
 
             glx_viewport.x = view->m_ViewportX;
             glx_viewport.y = view->m_ViewportY;
@@ -399,7 +364,7 @@ static void glx_SendViews()
             fn_803A78A4(viewportX, viewportY, viewportWidth, viewportHeight);
             fn_80364020()->fn_803640E4(view->m_Name);
 
-            if (view->m_ClearColour || view->m_Unknown33 || view->m_ClearDepth)
+            if (view->m_ClearDepth || view->m_ClearColour || view->m_Unknown32)
             {
                 bool hasRenderTarget = false;
                 if (renderPair.hash != 0)
@@ -411,7 +376,7 @@ static void glx_SendViews()
                 }
                 if (hasRenderTarget)
                 {
-                    target->fn_8036DBCC(view->m_Unknown33, view->m_ClearColour, view->m_ClearDepth);
+                    target->ClearBuffers(view->m_ClearColour, view->m_ClearDepth, view->m_Unknown32);
                 }
             }
 
@@ -429,7 +394,7 @@ static void glx_SendViews()
                         }
                     }
                 }
-                fn_8036DF24(target, targetMode != 8, targetMode == 10);
+                glplatCopyTargetToTexture(target, targetMode != 8, targetMode == 10);
             }
         }
     }
@@ -458,44 +423,41 @@ void glplatFinish()
     glxSwapWaitDrawDone();
 }
 
-extern "C" u32 fn_80369D4C()
+u32 glplatGetDefaultTargetWidth()
 {
     return 640;
 }
 
-extern "C" u32 fn_80369D54()
+u32 glplatGetDefaultTargetHeight()
 {
     return 448;
 }
 
-u32 fn_80369D5C()
+u32 glplatGetOrthographicWidth()
 {
     return 640;
 }
 
-u32 fn_80369D64()
+u32 glplatGetOrthographicHeight()
 {
     return 480;
 }
 
-extern "C" void fn_80369D6C(GLView* view, const nlVector3& world, nlVector3& ndc)
+void glplatViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v3NDC)
 {
     nlMatrix4 viewMatrix;
     nlMatrix4 projectionMatrix;
-    nlVector3 viewPosition;
+    nlVector3 v_out;
 
     view->m_Interface->GetViewMatrix(viewMatrix);
     view->m_Interface->GetProjectionMatrix(projectionMatrix);
-    nlMultPosVectorMatrix(viewPosition, world, viewMatrix);
-    nlMultPosVectorMatrix(ndc, viewPosition, projectionMatrix);
+    nlMultPosVectorMatrix(v_out, v3world, viewMatrix);
+    nlMultPosVectorMatrix(v3NDC, v_out, projectionMatrix);
 
-    const f32 reciprocalW = 1.0f / -viewPosition.z;
-    ndc.x *= reciprocalW;
-    ndc.y = -ndc.y * reciprocalW;
-    ndc.z *= reciprocalW;
+    const f32 wc = 1.0f / -v_out.z;
+    v3NDC.x *= wc;
+    v3NDC.y = -v3NDC.y * wc;
+    v3NDC.z *= wc;
 }
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

@@ -11,4 +11,6 @@ extern u8 gOnlineSidekickChoiceSent;
 extern u8 gOnlineUnrankedMatch;
 extern StaticCircularQueue<unsigned int, 3> gRejectedOpponentProfileIds;
 
+extern unsigned char gOnlineLoginStarted;
+
 #endif // GAME_ONLINE_MATCHMAKING_H

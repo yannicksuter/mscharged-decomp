@@ -2,7 +2,7 @@
 
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glModel.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxDisplayList.h"
 
 unsigned int gxSetNumChans(unsigned int);
@@ -56,7 +56,7 @@ extern "C" void fn_802A2B6C()
 extern "C" void fn_802A2B8C(void* renderer, const glModelPacket* packet)
 {
     u32* parameter = static_cast<u32*>(packet->unknown20);
-    fn_802CC978(renderer, packet, *parameter);
+    glSetMaterialTextureAlphaState(renderer, packet, *parameter);
 }
 
 extern "C" void fn_802A2B98(void* renderer, const glModelPacket* packet)

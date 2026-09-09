@@ -66,10 +66,10 @@ struct tCharacterTemplateInfo
     /* 0x59 */ unsigned char pad_0x59[3];
 }; // total size: 0x5C
 
-extern "C" SebringAnimTagScriptInterpreter* fn_80025E9C();
-extern "C" tGoalieTemplateInfo* fn_80025F48(int goalieIdx);
+SebringAnimTagScriptInterpreter* GetAnimScriptInterpreter();
+tGoalieTemplateInfo* GetGoalieTemplateInfo(int goalieIdx);
 tCharacterTemplateInfo* GetCharacterTemplateInfo(eCharacterClass cc);
-extern "C" tCharacterTemplate* fn_80025F5C(int nIndex, bool* pbCreated);
+tCharacterTemplate* GetCharacterTemplate(int nIndex, bool* pbCreated);
 cAnimInventory* FindDuplicateAnimInventory(int nCurIndex, unsigned long uHashID);
 unsigned long GetHashFromTextureFile(const char* szTextureFileName);
 void DestroyCharacters();

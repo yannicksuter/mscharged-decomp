@@ -56,7 +56,7 @@ bool DesireDefendPos::UnidentifiedInitialize(void*)
 /**
  * Offset/Address/Size: 0x1CDC | 0x800B8A9C | size: 0x580
  */
-void DesireDefendPos::UnidentifiedUpdate(
+void DesireDefendPos::Update(
     UnidentifiedDesireUpdate*, float fDeltaT)
 {
     mThinkTimer.Countdown(fDeltaT, 0.0f);
@@ -217,14 +217,14 @@ void DesireDefendPos::UnidentifiedCleanup()
 void DesireDefendPos::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireDefendPos");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    *(unsigned short*)field = cache->BeginType("DesireDefendPos");
+    cache->AddField(22, gDebugFieldTypes[22].size,
         0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 /**
@@ -240,8 +240,8 @@ void DesireDefendPos::UnidentifiedVirtual7(
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
     void* data = (u8*)this + offset;
-    fn_80339450(cache, sDesireDefendPosType, data, context);
-    fn_8033930C(cache, sDesireDefendPosType, data,
+    cache->ChecksumData(sDesireDefendPosType, data, context);
+    cache->WriteData(sDesireDefendPosType, data,
         sizeof(DesireDefendPos) - offset);
 }
 
@@ -251,14 +251,14 @@ void DesireDefendPos::UnidentifiedVirtual7(
 void DesireMark::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
-    *(unsigned short*)field = fn_80338EBC(cache, "DesireMark");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+    *(unsigned short*)field = cache->BeginType("DesireMark");
+    cache->AddField(22, gDebugFieldTypes[22].size,
         0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 /**
@@ -274,8 +274,8 @@ void DesireMark::UnidentifiedVirtual7(
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
     void* data = (u8*)this + offset;
-    fn_80339450(cache, sDesireMarkType, data, context);
-    fn_8033930C(cache, sDesireMarkType, data,
+    cache->ChecksumData(sDesireMarkType, data, context);
+    cache->WriteData(sDesireMarkType, data,
         sizeof(DesireMark) - offset);
 }
 

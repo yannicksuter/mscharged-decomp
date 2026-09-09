@@ -56,7 +56,7 @@ public:
     }
     virtual void Pop();
     void PopEntireStack();
-    void fn_801C5FB8(SceneList scene);
+    void PopToScene(SceneList scene);
     SceneList GetSceneType(BaseSceneHandler* scene);
     bool IsOnStack(SceneList scene);
     const char* GetFileName(SceneList scene);
@@ -64,7 +64,7 @@ public:
 
     static const u32 MAX_SCENE_DEPTH = 32;
 
-    /* 0x04 */ u32 mCurrentStackDepth;
+    /* 0x04 */ unsigned long mCurrentStackDepth;
     /* 0x08 */ SceneList m_sceneStack[MAX_SCENE_DEPTH];
     /* 0x88 */ BaseSceneHandler* mBaseSceneHandlerStack[MAX_SCENE_DEPTH];
 }; // size 0x108
@@ -72,5 +72,14 @@ public:
 
 BaseGameSceneManager* GetOverlayManager();
 extern BaseGameSceneManager* g_pOverlayManager;
+
+class GLResourcePool;
+
+void CreateFEResourcePool();
+void CreateLargeFEResourcePool();
+void DestroyFEResourcePool();
+void LoadFEMiniBundle(const char* bundleFileName);
+bool UnloadFEMiniBundle();
+GLResourcePool* GetFEResourcePool();
 
 #endif // GAME_BASE_GAME_SCENE_MANAGER_H

@@ -178,7 +178,7 @@ public:
         RegisterEventConnection(this, listener, value, flags, target);
     }
 
-    void UnidentifiedDeliver(T* data)
+    void Deliver(T* data)
     {
         nlDLListIterator<Listener> iterator = mListeners.Begin();
         while (iterator.hasNext())
@@ -206,7 +206,7 @@ public:
         this->mCurrentConnection = 0;
     }
 
-    void UnidentifiedDeliver()
+    void Deliver()
     {
         nlDLListIterator<Listener> iterator = mListeners.Begin();
         while (iterator.hasNext())
@@ -238,7 +238,7 @@ public:
     {
         if (deliver)
         {
-            UnidentifiedDeliver(data);
+            Deliver(data);
         }
 
         if (disposer)
@@ -268,7 +268,7 @@ inline void UnidentifiedEvent<UnidentifiedEventNoData>::Dispatch(
 {
     if (deliver)
     {
-        UnidentifiedDeliver();
+        Deliver();
     }
 
     if (disposer)
@@ -406,7 +406,7 @@ public:
         RegisterEventConnection(this, listener, value, flags, target);
     }
 
-    void UnidentifiedDeliver(typename UnidentifiedEventCallback<T>::Parameter data)
+    void Deliver(typename UnidentifiedEventCallback<T>::Parameter data)
     {
         nlDLListIterator<Listener> iterator = mListeners.Begin();
         while (iterator.hasNext())
@@ -435,7 +435,7 @@ public:
         this->mCurrentConnection = 0;
     }
 
-    void UnidentifiedDeliver()
+    void Deliver()
     {
         nlDLListIterator<Listener> iterator = mListeners.Begin();
         while (iterator.hasNext())
@@ -571,7 +571,7 @@ public:
         RegisterEventConnection(this, listener, value, flags, target);
     }
 
-    void UnidentifiedDeliver(P1 p1, P2 p2, P3 p3)
+    void Deliver(P1 p1, P2 p2, P3 p3)
     {
         nlDLListIterator<Listener> iterator = mListeners.Begin();
         while (iterator.hasNext())

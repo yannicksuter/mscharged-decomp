@@ -7,7 +7,7 @@
 
 #include <string.h>
 
-extern "C" bool fn_802D3A08(const void* data, unsigned long size)
+bool glIsTextureAnim(const void* data, unsigned long size)
 {
     if (size < sizeof(GLTextureAnim))
     {
@@ -16,8 +16,8 @@ extern "C" bool fn_802D3A08(const void* data, unsigned long size)
     return *(const u32*)data == 0x5F6C6669;
 }
 
-extern "C" void fn_802D3A34(const void* data, unsigned long size,
-    ResourceInterface_802CC094* resource)
+void glAddTextureAnim(const void* data, unsigned long size,
+    GLResourcePool* resource)
 {
     GLTextureAnim* anim = (GLTextureAnim*)resource->Allocate(
         sizeof(GLTextureAnim), GLM_Header);
@@ -40,21 +40,21 @@ extern "C" void fn_802D3A34(const void* data, unsigned long size,
     anim->m_currentFrame = 0;
     for (int i = 0; i < anim->m_frameCount; ++i)
     {
-        anim->m_frames[i].textureHandle = fn_802CDFCC(anim->m_frames[i].textureHandle);
+        anim->m_frames[i].textureHandle = glGetTextureIndex(anim->m_frames[i].textureHandle);
     }
 
-    resource->m_inventory->AddTextureAnim(anim->m_unk_0x04, anim);
+    resource->m_inventory->AddTextureAnim(anim->m_hashID, anim);
     glGetTextureManager()->RegisterTextureAnim(anim);
 }
 
-extern "C" void fn_802D3B68(GLTextureAnim* anim)
+void glReleaseTextureAnim(GLTextureAnim* anim)
 {
     glTextureManager* manager = glGetTextureManager();
-    u32 textureHandle = anim->m_unk_0x18;
+    u32 textureHandle = anim->m_textureIndex;
     manager->mFreeIndices->AddEnd((u16)textureHandle);
 
     manager->mTextures[textureHandle] = 0;
-    anim->m_unk_0x18 = 0xFFFF;
+    anim->m_textureIndex = 0xFFFF;
 }
 
 GLAnimTex* GLTextureAnim::GetTexture(int frameIndex)

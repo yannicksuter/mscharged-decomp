@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include <string.h>
 
@@ -128,7 +129,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029DE3C>::Prepare(
     const glModelPacket* packet)
 {
     unsigned char* parameters = (unsigned char*)packet->unknown20;
-    fn_802CC978(this, packet, *(unsigned long*)parameters);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)parameters);
     unsigned int& rasterState = *(unsigned int*)&packet->rasterState;
 
     if (*(int*)(parameters + 28) != 0)
@@ -157,7 +158,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029DE3C>::Draw(
     unsigned char* parameters = (unsigned char*)packet->unknown20;
     if (*(int*)(parameters + 20) == 1)
     {
-        UnidentifiedTextureState* texture = (UnidentifiedTextureState*)parameters;
+        glTextureBinding* texture = (glTextureBinding*)parameters;
         texture->SetWrapS(true);
         texture->SetWrapT(true);
     }
@@ -206,7 +207,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029DE3C>::Draw(
 
     if (lbl_806E1B78 == 3)
     {
-        UnidentifiedTextureState texture;
+        glTextureBinding texture;
         texture.texture = 0;
         texture.textureIndex = 0xFFFF;
         texture.flags = 0;
@@ -216,7 +217,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029DE3C>::Draw(
         texture.SetWrapS(true);
         texture.SetWrapT(true);
         texture.unknown07 = 0;
-        fn_8036BE88(1, &texture);
+        glx_BindTexture(1, &texture);
     }
 
     float speedX = lbl_806DF091 ? *(float*)(parameters + 8) : 0.0f;

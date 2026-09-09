@@ -4,20 +4,20 @@
 #include "NL/nlDLRing.h"
 #include "NL/nlMemory.h"
 
-static ResourceInterface_802CC094* lbl_806E1ED8;
-static ResourceInterface_802CC094* lbl_806E1EDC;
+static GLResourcePool* sCurrentResourcePool;
+static GLResourcePool* sResourcePoolList;
 
-void fn_802CBEC4()
+void glResourceAllocationFailed()
 {
 }
 
-void fn_802CBEC8()
+void glInitResourcePools()
 {
-    lbl_806E1ED8 = 0;
-    lbl_806E1EDC = 0;
+    sCurrentResourcePool = 0;
+    sResourcePoolList = 0;
 }
 
-ResourceInterface_802CC094::ResourceInterface_802CC094()
+GLResourcePool::GLResourcePool()
 {
     m_level = 0;
     m_inventory = new (8, false) GLInventory;
@@ -26,7 +26,7 @@ ResourceInterface_802CC094::ResourceInterface_802CC094()
     m_next = 0;
 }
 
-ResourceInterface_802CC094::~ResourceInterface_802CC094()
+GLResourcePool::~GLResourcePool()
 {
     if (m_inventory != 0)
     {
@@ -34,42 +34,42 @@ ResourceInterface_802CC094::~ResourceInterface_802CC094()
         m_inventory = 0;
     }
 
-    if (this == lbl_806E1ED8)
+    if (this == sCurrentResourcePool)
     {
-        lbl_806E1ED8 = 0;
+        sCurrentResourcePool = 0;
     }
 }
 
-ResourceInterface_802CC094* fn_802CBFD8(
-    const void* configuration, int count, const char* name)
+GLResourcePool* glCreateResourcePool(
+    const GLMemoryRequirement* requirements, int count, const char* name)
 {
-    ResourceInterface_802CC094* resource
-        = fn_80376664(
-            (const UnidentifiedMemoryRequirement_80376664*)configuration,
+    GLResourcePool* resource
+        = glplatCreateResourcePool(
+            requirements,
             count, name);
-    nlDLRingAddEnd(&lbl_806E1EDC, resource);
+    nlDLRingAddEnd(&sResourcePoolList, resource);
     return resource;
 }
 
-void fn_802CC02C(ResourceInterface_802CC094* resource)
+void glDestroyResourcePool(GLResourcePool* resource)
 {
-    nlDLRingRemove(&lbl_806E1EDC, resource);
+    nlDLRingRemove(&sResourcePoolList, resource);
     delete resource;
 }
 
-void fn_802CC08C(ResourceInterface_802CC094* resource)
+void glSetCurrentResourcePool(GLResourcePool* resource)
 {
-    lbl_806E1ED8 = resource;
+    sCurrentResourcePool = resource;
 }
 
-ResourceInterface_802CC094* fn_802CC094()
+GLResourcePool* glGetCurrentResourcePool()
 {
-    return lbl_806E1ED8;
+    return sCurrentResourcePool;
 }
 
-ResourceInterface_802CC094* fn_802CC09C()
+GLResourcePool* glGetResourcePools()
 {
-    return lbl_806E1EDC;
+    return sResourcePoolList;
 }
 
 void* glResourceAlloc(

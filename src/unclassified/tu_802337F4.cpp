@@ -22,12 +22,12 @@
 #include "NL/glx/glxSwap.h"
 #include "NL/nlConfig.h"
 #include "NL/nlPrint.h"
-#include "unclassified/tu_80073898.h"
+#include "Game/TweakFileLoader.h"
 #include "Game/FE/feDPD.h"
 #include "unclassified/tu_80231118.h"
 #include "Game/SH/SHNavigation.h"
 
-extern "C" bool fn_80073BC0(void* loadState);
+extern "C" bool ProcessLoadedFiles(void* loadState);
 extern "C" void fn_80122DCC();
 
 /**
@@ -52,15 +52,15 @@ TU802337F4Scene::~TU802337F4Scene()
 /**
  * Offset/Address/Size: 0xEC | 0x802338E0 | size: 0x4
  */
-void TU802337F4Scene::SHSceneVirtual2C(unsigned int transition)
+void TU802337F4Scene::SetDisplayMode(unsigned int transition)
 {
-    UnidentifiedSHSceneBase::SHSceneVirtual2C(transition);
+    SHStrikerTimesBase::SetDisplayMode(transition);
 }
 
 /**
  * Offset/Address/Size: 0xF0 | 0x802338E4 | size: 0x64
  */
-void TU802337F4Scene::SHSceneVirtual34()
+void TU802337F4Scene::OnBackTransitionComplete()
 {
     SceneList sceneID = (SceneList)75;
     if (g_pStrikerChallenge->mCurrentChallenge < 10)
@@ -97,7 +97,7 @@ void TU802337F4Scene::fn_80233980()
  */
 void TU802337F4Scene::SceneCreated()
 {
-    if (mUnidentified28 == 9 && g_pStrikerChallenge->IsCurrentChallengeWon() == true)
+    if (mDisplayMode == 9 && g_pStrikerChallenge->IsCurrentChallengeWon() == true)
     {
         mUnidentified6B1 = g_pStrikerChallenge->UnlockCurrentChallenge();
         if (mUnidentified6B1)
@@ -107,34 +107,34 @@ void TU802337F4Scene::SceneCreated()
     StrikerChallenge* challenge = g_pStrikerChallenge;
     int captain = challenge->mCaptain;
     int mood = -1;
-    if (mUnidentified28 == 8)
+    if (mDisplayMode == 8)
     {
         if (challenge->mCurrentChallenge < 10)
         {
-            nlSNPrintf(mUnidentified71, 0x40, "ST_TUTORIAL_START_%s", challenge->GetTitle());
-            nlSNPrintf(mUnidentified31, 0x40, "STH_TUTORIAL_START_%s", challenge->GetTitle());
+            nlSNPrintf(mStoryStringID, 0x40, "ST_TUTORIAL_START_%s", challenge->GetTitle());
+            nlSNPrintf(mHeadlineStringID, 0x40, "STH_TUTORIAL_START_%s", challenge->GetTitle());
         }
         else
         {
-            nlSNPrintf(mUnidentified71, 0x40, "ST_%s_CHALLENGE_START", challenge->GetTitle());
-            nlSNPrintf(mUnidentified31, 0x40, "STH_%s_CHALLENGE_START", challenge->GetTitle());
+            nlSNPrintf(mStoryStringID, 0x40, "ST_%s_CHALLENGE_START", challenge->GetTitle());
+            nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_CHALLENGE_START", challenge->GetTitle());
         }
         mood = 1;
     }
-    else if (mUnidentified28 == 9)
+    else if (mDisplayMode == 9)
     {
         FEMusic::StartStreamIfDifferent(13);
         if (challenge->IsCurrentChallengeWon() == true)
         {
             if (challenge->mCurrentChallenge < 10)
             {
-                nlSNPrintf(mUnidentified71, 0x40, "ST_TUTORIAL_SUCCEED_%s", challenge->GetTitle());
-                nlSNPrintf(mUnidentified31, 0x40, "STH_TUTORIAL_SUCCEED_%s", challenge->GetTitle());
+                nlSNPrintf(mStoryStringID, 0x40, "ST_TUTORIAL_SUCCEED_%s", challenge->GetTitle());
+                nlSNPrintf(mHeadlineStringID, 0x40, "STH_TUTORIAL_SUCCEED_%s", challenge->GetTitle());
             }
             else
             {
-                nlSNPrintf(mUnidentified71, 0x40, "ST_CHALLENGE_SUCCEED_%s", challenge->GetTitle());
-                nlSNPrintf(mUnidentified31, 0x40, "STH_CHALLENGE_SUCCEED_%s", challenge->GetTitle());
+                nlSNPrintf(mStoryStringID, 0x40, "ST_CHALLENGE_SUCCEED_%s", challenge->GetTitle());
+                nlSNPrintf(mHeadlineStringID, 0x40, "STH_CHALLENGE_SUCCEED_%s", challenge->GetTitle());
             }
             mood = 0;
         }
@@ -142,26 +142,26 @@ void TU802337F4Scene::SceneCreated()
         {
             if (challenge->mCurrentChallenge < 10)
             {
-                nlSNPrintf(mUnidentified71, 0x40, "ST_TUTORIAL_FAILED_%s", challenge->GetTitle());
-                nlSNPrintf(mUnidentified31, 0x40, "STH_TUTORIAL_FAILED_%s", challenge->GetTitle());
+                nlSNPrintf(mStoryStringID, 0x40, "ST_TUTORIAL_FAILED_%s", challenge->GetTitle());
+                nlSNPrintf(mHeadlineStringID, 0x40, "STH_TUTORIAL_FAILED_%s", challenge->GetTitle());
             }
             else
             {
-                nlSNPrintf(mUnidentified71, 0x40, "ST_CHALLENGE_FAILED_%s", challenge->GetTitle());
-                nlSNPrintf(mUnidentified31, 0x40, "STH_CHALLENGE_FAILED_%s", challenge->GetTitle());
+                nlSNPrintf(mStoryStringID, 0x40, "ST_CHALLENGE_FAILED_%s", challenge->GetTitle());
+                nlSNPrintf(mHeadlineStringID, 0x40, "STH_CHALLENGE_FAILED_%s", challenge->GetTitle());
             }
             mood = 2;
         }
     }
     if (challenge->mCurrentChallenge == 2)
-        SHSceneVirtual38(captain, mood, 8);
+        SetArticleImageName(captain, mood, 8);
     else if (challenge->mCurrentChallenge == 4)
-        SHSceneVirtual38(captain, mood, 2);
+        SetArticleImageName(captain, mood, 2);
     else if (challenge->mCurrentChallenge == 5)
-        SHSceneVirtual38(captain, 1, 4);
+        SetArticleImageName(captain, 1, 4);
     else
-        SHSceneVirtual38(captain, mood, -1);
-    if (mUnidentified28 == 8)
+        SetArticleImageName(captain, mood, -1);
+    if (mDisplayMode == 8)
     {
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
@@ -172,7 +172,7 @@ void TU802337F4Scene::SceneCreated()
         }
         mUnidentified5D4.SetButtonInstance(mUnidentified6AC);
     }
-    UnidentifiedSHSceneBase::SceneCreated();
+    SHStrikerTimesBase::SceneCreated();
 }
 
 /**
@@ -182,32 +182,32 @@ void TU802337F4Scene::Update(float dt)
 {
     if (mUnidentified6B0)
     {
-        if (fn_80073BC0(&lbl_8056BA00))
+        if (ProcessLoadedFiles(&gTweakFileLoader))
         {
-            lbl_8056BA00.mCount = 0;
+            gTweakFileLoader.mCount = 0;
             g_pStrikerChallenge->LoadSettings();
             Presentation::GetInstance()->Call("TransitionToStrikerChallengeChooseSides");
             GameSceneManager::Instance()->Push((SceneList)78, SCREEN_FORWARD, true);
         }
         return;
     }
-    UnidentifiedSHSceneBase::Update(dt);
-    if (mUnidentified28 == 9)
+    SHStrikerTimesBase::Update(dt);
+    if (mDisplayMode == 9)
     {
         TLInstance* instance = FEFinder<TLInstance, 2>::Find(mPresentation->m_currentSlide,
             InlineHasher("Layer"), InlineHasher("blackbox2"));
         nlColour colour = instance->GetAssetColour();
-        if (mUnidentified100 == 2)
+        if (mState == 2)
             nlColourSet(colour, colour.c[0], colour.c[1], colour.c[2], 255);
         else
             nlColourSet(colour, colour.c[0], colour.c[1], colour.c[2], 178);
         instance->SetAssetColour(colour);
     }
-    if (mUnidentified100 != 1 || mUnidentified2C == 0)
+    if (mState != 1 || mPage == 0)
         return;
     for (int pad = 0; pad < 4; ++pad)
     {
-        if ((unsigned int)pad == gFEControllerIndex && mUnidentified28 == 8)
+        if ((unsigned int)pad == gFEControllerIndex && mDisplayMode == 8)
         {
             mUnidentified6AC->m_bVisible = true;
             FEPointerEvent event;
@@ -215,9 +215,9 @@ void TU802337F4Scene::Update(float dt)
             event.mIndex = pad;
             event.mPosition = GetPointerPosition(pad, &valid);
             event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 30, true, 0);
-            if (mUnidentified5D4.UpdateBackButton(event, dt) && mUnidentified28 == 8)
+            if (mUnidentified5D4.UpdateBackButton(event, dt) && mDisplayMode == 8)
             {
-                mUnidentified100 = 3;
+                mState = 3;
                 SHNavigation* scene = GetNavigationScene();
                 if (scene != 0)
                     scene->HideButtons();
@@ -237,13 +237,13 @@ void TU802337F4Scene::Update(float dt)
 /**
  * Offset/Address/Size: 0x960 | 0x80234154 | size: 0x59C
  */
-void TU802337F4Scene::SHSceneVirtual30()
+void TU802337F4Scene::OnDoneTransitionComplete()
 {
-    UnidentifiedSHSceneBase::SHSceneVirtual30();
-    if (mUnidentified28 == 8)
+    SHStrikerTimesBase::OnDoneTransitionComplete();
+    if (mDisplayMode == 8)
     {
         mUnidentified6B0 = true;
-        fn_80073A48(&lbl_8056BA00, g_pStrikerChallenge->GetName(), "/challenge");
+        gTweakFileLoader.LoadFileAsync(g_pStrikerChallenge->GetName(), "/challenge");
     }
     else
     {

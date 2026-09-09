@@ -26,7 +26,7 @@ struct glModelPacket;
 class GLView;
 class nlVector3;
 
-extern "C" void fn_80369D6C(GLView* view, const nlVector3& world, nlVector3& ndc);
+void glplatViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v3NDC);
 
 struct PlatformViewport
 {
@@ -36,12 +36,15 @@ struct PlatformViewport
     int height;
 };
 
-extern "C" PlatformViewport* fn_80369A30();
+PlatformViewport* glplatGetViewport();
 
 extern GXRenderModeObj glx_rmode;
-extern "C" void glplatFinalizePacket(glModelPacket* packet, bool permanent, void* allocator);
+void glplatFinalizePacket(glModelPacket* packet, bool permanent, void* allocator);
+
+void glplatInitializeMaterialPrograms();
 
 bool glplatPreStartup();
+void glplatInitializeMaterialPrograms();
 bool glplatStartup(gl_ScreenInfo* screenInfo);
 bool glplatPostStartup();
 void glplatBeginFrame();
@@ -51,10 +54,13 @@ void glplatAbortFrame();
 void glplatFinish();
 void glx_ClearXFB(void* framebuffer);
 
-u32 fn_80369394();
-u32 fn_803693A4();
-s32 fn_803693B4();
-u32 fn_80369D5C();
-u32 fn_80369D64();
+u32 glplatGetDefaultTargetWidth();
+u32 glplatGetDefaultTargetHeight();
+u32 glx_GetScaledXFBWidth();
+u32 glplatGetFrameBufferWidth();
+u32 glplatGetFrameBufferHeight();
+s32 glx_GetVideoMode();
+u32 glplatGetOrthographicWidth();
+u32 glplatGetOrthographicHeight();
 
 #endif // NL_GL_GLPLAT_H

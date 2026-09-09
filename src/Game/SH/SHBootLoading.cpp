@@ -17,6 +17,8 @@
 #include "NL/nlColour.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/Render/RLViewLayers.h"
 
 BootLoadingScene::BootLoadingScene()
     : mElapsedTime(0.0f)

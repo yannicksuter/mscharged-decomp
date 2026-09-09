@@ -1,9 +1,9 @@
 #include "Game/GameTweaks.h"
 #include "Game/GameInfo.h"
-#include "Game/tu_802C6224.h"
-#include "unclassified/tu_80073898.h"
+#include "Game/TweakConfig.h"
+#include "Game/TweakFileLoader.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "NL/glx/GXMaterialShadowTweaks.h"
+#include "Game/TweakValueInt.h"
 #include "NL/nlPrint.h"
 
 #include <stdlib.h>
@@ -23,20 +23,20 @@ GameTweaks::GameTweaks(const char* name, const char* category)
 void GameTweaks::RegisterTweaks(bool registerTweaks)
 {
     if (registerTweaks)
-        fn_80073A48(&lbl_8056BA00, mszFileName, mCategory);
+        gTweakFileLoader.LoadFileAsync(mszFileName, mCategory);
     else
-        fn_802C6CAC(mszFileName, mCategory, true);
+        LoadTweakConfigFile(mszFileName, mCategory, true);
 }
 
-TweakValueIntImpl_804FD898::TweakValueIntImpl_804FD898(int* value)
+TweakIntBinding::TweakIntBinding(int* value)
     : m_pValue(value)
 {
 }
 
-bool TweakValueIntImpl_804FD898::BindWithDefault(const char* name, int defaultValue,
+bool TweakIntBinding::BindWithDefault(const char* name, int defaultValue,
     const char* group, bool reload, float value, float min, float max)
 {
-    bool found = fn_802C4FEC(name, value, group, reload, min, max);
+    bool found = Bind(name, value, group, reload, min, max);
     if (!found)
     {
         *m_pValue = UnidentifiedVirtual3C();
@@ -48,22 +48,22 @@ bool TweakValueIntImpl_804FD898::BindWithDefault(const char* name, int defaultVa
     return found;
 }
 
-int TweakValueIntImpl_804FD898::UnidentifiedVirtual3C()
+int TweakIntBinding::UnidentifiedVirtual3C()
 {
     return 0;
 }
 
-int TweakValueIntImpl_804FD898::UnidentifiedVirtual0C()
+int TweakIntBinding::UnidentifiedVirtual0C()
 {
     return 3;
 }
 
-int TweakValueIntImpl_804FD898::UnidentifiedVirtual10()
+int TweakIntBinding::UnidentifiedVirtual10()
 {
     return 2;
 }
 
-void TweakValueIntImpl_804FD898::UnidentifiedVirtual14(
+void TweakIntBinding::UnidentifiedVirtual14(
     float* minimum, float* maximum, float* increment)
 {
     *minimum = 0.0f;
@@ -71,52 +71,52 @@ void TweakValueIntImpl_804FD898::UnidentifiedVirtual14(
     *increment = 0.0f;
 }
 
-TweakValueBase_8052BF70* TweakValueIntImpl_804FD898::UnidentifiedVirtual34(
+TweakValueBase* TweakIntBinding::UnidentifiedVirtual34(
     const char* name, void* entry)
 {
-    GXMaterialColourTweak_804FC520* created = new (
-        lbl_806E1E58->Allocate(sizeof(GXMaterialColourTweak_804FC520)))
-        GXMaterialColourTweak_804FC520(name, 0);
-    fn_802C5780((TweakEntry_8052BF00*)entry, created);
+    TweakValueInt* created = new (
+        gTweakValueAllocator->Allocate(sizeof(TweakValueInt)))
+        TweakValueInt(name, 0);
+    AddTweakValue((TweakEntry*)entry, created);
     return created;
 }
 
-void* TweakValueIntImpl_804FD898::UnidentifiedVirtual20()
+void* TweakIntBinding::UnidentifiedVirtual20()
 {
     return m_pValue;
 }
 
-void TweakValueIntImpl_804FD898::UnidentifiedVirtual24(
+void TweakIntBinding::UnidentifiedVirtual24(
     char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%d", *m_pValue);
 }
 
-void TweakValueIntImpl_804FD898::UnidentifiedVirtual28(const char* value)
+void TweakIntBinding::UnidentifiedVirtual28(const char* value)
 {
     *m_pValue = atoi(value);
 }
 
-void TweakValueIntImpl_804FD898::UnidentifiedVirtual2C(
-    TweakValueBase_8052BF70* other)
+void TweakIntBinding::UnidentifiedVirtual2C(
+    TweakValueBase* other)
 {
     switch (other->UnidentifiedVirtual10())
     {
     case 1:
-        *m_pValue = ((GXMaterialColourTweak_804FC520*)other)->value;
+        *m_pValue = ((TweakValueInt*)other)->value;
         break;
     case 2:
-        *m_pValue = *((TweakValueIntImpl_804FD898*)other)->m_pValue;
+        *m_pValue = *((TweakIntBinding*)other)->m_pValue;
         break;
     }
 }
 
-int TweakValueIntImpl_804FD898::UnidentifiedVirtual30()
+int TweakIntBinding::UnidentifiedVirtual30()
 {
     return m_pValue != 0;
 }
 
-void TweakValueIntImpl_804FD898::UnidentifiedVirtual38(void* value)
+void TweakIntBinding::UnidentifiedVirtual38(void* value)
 {
     m_pValue = (int*)value;
 }

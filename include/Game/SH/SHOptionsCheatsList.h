@@ -35,7 +35,7 @@ public:
     /* 0x655 */ unsigned char mPadding655[3];
     /* 0x658 */ int mState;
     /* 0x65C */ int mFirstVisibleCheat;
-    /* 0x660 */ PowerupSettings* mSettings;
+    /* 0x660 */ CheatSettings* mSettings;
     /* 0x664 */ int mCheatCategory;
 }; // size 0x668
 

@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include <string.h>
 
@@ -152,12 +153,12 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029E8F8>::Activate(GLView* view)
     lbl_806E1BA8 = fn_80182240(0, 1);
     fn_80182ED0(lbl_806E1BA8, view, 0);
 
-    UnidentifiedTextureState texture;
+    glTextureBinding texture;
     texture.texture = fn_80182EB8();
     texture.textureIndex = 0xFFFF;
     texture.flags = 3;
     texture.unknown07 = 0;
-    fn_8036BE88(4, &texture);
+    glx_BindTexture(4, &texture);
     GXLoadTexMtxImm(lbl_805243A0, 67, GX_MTX3x4);
 }
 
@@ -194,7 +195,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029E8F8>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 struct FloatColour_802951A4
@@ -285,12 +286,12 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029E8F8>::Draw(
 
     if (lbl_806E1BB0[0] != texture)
     {
-        UnidentifiedTextureState textureState;
+        glTextureBinding textureState;
         textureState.texture = texture;
         textureState.textureIndex = 0xFFFF;
         textureState.flags = 3;
         textureState.unknown07 = 0;
-        fn_8036BE88(3, &textureState);
+        glx_BindTexture(3, &textureState);
         lbl_806E1BB0[0] = texture;
     }
 

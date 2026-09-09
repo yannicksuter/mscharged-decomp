@@ -1,6 +1,7 @@
+#include "Game/NetworkMessageRegistry.h"
 #include "Game/NetworkMessages.h"
 
-void NetMessageGameStart::Serialize(UnidentifiedMessageSerializer* serializer)
+void NetMessageGameStart::Serialize(NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mRandomSeed, sizeof(mRandomSeed));
     serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
@@ -27,72 +28,72 @@ int NetMessageGameStart::GetType()
     return 13;
 }
 
-void NetworkMessageType17_8050AC4C::Serialize(
-    UnidentifiedMessageSerializer* serializer)
+void NetworkMessageType17::Serialize(
+    NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
 }
 
-void NetworkMessageType16_8050AC38::Serialize(UnidentifiedMessageSerializer*)
+void NetworkMessageType16::Serialize(NetworkMessageSerializer*)
 {
 }
 
-int NetworkMessageType16_8050AC38::GetType()
+int NetworkMessageType16::GetType()
 {
     return 16;
 }
 
-int NetworkMessageType17_8050AC4C::GetType()
+int NetworkMessageType17::GetType()
 {
     return 17;
 }
 
 static NetworkMessageFactory<NetMessageGameStart> sFactoryType13;
 static NetworkMessageFactory<NetMessageLoadedGame> sFactoryType15;
-static NetworkMessageFactory<NetworkMessageType16_8050AC38> sFactoryType16;
-static NetworkMessageFactory<NetworkMessageType17_8050AC4C> sFactoryType17;
+static NetworkMessageFactory<NetworkMessageType16> sFactoryType16;
+static NetworkMessageFactory<NetworkMessageType17> sFactoryType17;
 static NetworkMessageFactory<NetMessageLoadedGameClient> sFactoryType18;
 static NetworkMessageFactory<NetMessageLoadedGameEveryone> sFactoryType19;
 static NetworkMessageFactory<NetMessageTournamentStart> sFactoryType20;
-static NetworkMessageFactory<NetMessagePauseRequest_8050AD7C> sFactoryType28;
-static NetworkMessageFactory<NetMessagePauseResponse_8050AD68> sFactoryType29;
-static NetworkMessageFactory<NetworkMessageType30_8050ADA4> sFactoryType30;
-static NetworkMessageFactory<NetworkMessageType31_8050AD90> sFactoryType31;
+static NetworkMessageFactory<NetMessagePauseRequest> sFactoryType28;
+static NetworkMessageFactory<NetMessagePauseResponse> sFactoryType29;
+static NetworkMessageFactory<NetworkMessageType30> sFactoryType30;
+static NetworkMessageFactory<NetworkMessageType31> sFactoryType31;
 static NetworkMessageFactory<NetMessageTournamentGameUpdate> sFactoryType32;
 static NetworkMessageFactory<NetMessageTournamentLoadingState> sFactoryType33;
 static NetworkMessageFactory<NetMessageDraft> sFactoryType21;
-static NetworkMessageFactory<NetworkMessageType22_8050B7B4> sFactoryType22;
+static NetworkMessageFactory<NetMessageDraftMachineInfo> sFactoryType22;
 static NetworkMessageFactory<NetMessageDraftPickedCaptain> sFactoryType23;
 static NetworkMessageFactory<NetMessageDraftPickedSidekicks> sFactoryType24;
 static NetworkMessageFactory<NetMessageSidesChanged> sSidesChangedFactory;
 static NetworkMessageFactory<NetMessageCheckConnection> sFactoryType26;
-static NetworkMessageFactory<NetworkMessageType27_8050B750> sFactoryType27;
-static NetworkMessageFactory<NetworkMessageType34_8050ADCC> sFactoryType34;
-static NetworkMessageFactory<UnidentifiedNetworkMessage_80126D84>
+static NetworkMessageFactory<NetMessageConnectionDecision> sFactoryType27;
+static NetworkMessageFactory<NetworkMessageType34> sFactoryType34;
+static NetworkMessageFactory<NetworkMessageType35>
     sFactoryType35;
 
 void RegisterNetworkMessages_801258A8()
 {
-    lbl_806E2100->fn_8032CA40(13, &sFactoryType13);
-    lbl_806E2100->fn_8032CA40(15, &sFactoryType15);
-    lbl_806E2100->fn_8032CA40(16, &sFactoryType16);
-    lbl_806E2100->fn_8032CA40(17, &sFactoryType17);
-    lbl_806E2100->fn_8032CA40(18, &sFactoryType18);
-    lbl_806E2100->fn_8032CA40(19, &sFactoryType19);
-    lbl_806E2100->fn_8032CA40(20, &sFactoryType20);
-    lbl_806E2100->fn_8032CA40(21, &sFactoryType21);
-    lbl_806E2100->fn_8032CA40(22, &sFactoryType22);
-    lbl_806E2100->fn_8032CA40(23, &sFactoryType23);
-    lbl_806E2100->fn_8032CA40(24, &sFactoryType24);
-    lbl_806E2100->fn_8032CA40(25, &sSidesChangedFactory);
-    lbl_806E2100->fn_8032CA40(26, &sFactoryType26);
-    lbl_806E2100->fn_8032CA40(27, &sFactoryType27);
-    lbl_806E2100->fn_8032CA40(28, &sFactoryType28);
-    lbl_806E2100->fn_8032CA40(29, &sFactoryType29);
-    lbl_806E2100->fn_8032CA40(30, &sFactoryType30);
-    lbl_806E2100->fn_8032CA40(31, &sFactoryType31);
-    lbl_806E2100->fn_8032CA40(32, &sFactoryType32);
-    lbl_806E2100->fn_8032CA40(33, &sFactoryType33);
-    lbl_806E2100->fn_8032CA40(34, &sFactoryType34);
-    lbl_806E2100->fn_8032CA40(35, &sFactoryType35);
+    gNetworkMessageRegistry->RegisterFactory(13, &sFactoryType13);
+    gNetworkMessageRegistry->RegisterFactory(15, &sFactoryType15);
+    gNetworkMessageRegistry->RegisterFactory(16, &sFactoryType16);
+    gNetworkMessageRegistry->RegisterFactory(17, &sFactoryType17);
+    gNetworkMessageRegistry->RegisterFactory(18, &sFactoryType18);
+    gNetworkMessageRegistry->RegisterFactory(19, &sFactoryType19);
+    gNetworkMessageRegistry->RegisterFactory(20, &sFactoryType20);
+    gNetworkMessageRegistry->RegisterFactory(21, &sFactoryType21);
+    gNetworkMessageRegistry->RegisterFactory(22, &sFactoryType22);
+    gNetworkMessageRegistry->RegisterFactory(23, &sFactoryType23);
+    gNetworkMessageRegistry->RegisterFactory(24, &sFactoryType24);
+    gNetworkMessageRegistry->RegisterFactory(25, &sSidesChangedFactory);
+    gNetworkMessageRegistry->RegisterFactory(26, &sFactoryType26);
+    gNetworkMessageRegistry->RegisterFactory(27, &sFactoryType27);
+    gNetworkMessageRegistry->RegisterFactory(28, &sFactoryType28);
+    gNetworkMessageRegistry->RegisterFactory(29, &sFactoryType29);
+    gNetworkMessageRegistry->RegisterFactory(30, &sFactoryType30);
+    gNetworkMessageRegistry->RegisterFactory(31, &sFactoryType31);
+    gNetworkMessageRegistry->RegisterFactory(32, &sFactoryType32);
+    gNetworkMessageRegistry->RegisterFactory(33, &sFactoryType33);
+    gNetworkMessageRegistry->RegisterFactory(34, &sFactoryType34);
+    gNetworkMessageRegistry->RegisterFactory(35, &sFactoryType35);
 }

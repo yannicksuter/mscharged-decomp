@@ -4,7 +4,7 @@
 class cCharacter;
 class DrawableCharacter;
 class EmissionController;
-class ImpostorModel_802DAEE0;
+class ImpostorModel;
 
 DrawableCharacter* GetReplayDrawableCharacter(cCharacter* character);
 void UpdateEmitterFromCharacterUnculled(EmissionController& controller);
@@ -19,6 +19,6 @@ void UpdateEmitterFromCharacterHead(EmissionController& controller);
 void UpdateEmitterFromCharacterBackward(EmissionController& controller);
 void UpdateEmitterFromCharacterForward(EmissionController& controller);
 void UpdateEmitterFromImpostorModel(
-    EmissionController& controller, ImpostorModel_802DAEE0* model);
+    EmissionController& controller, ImpostorModel* model);
 
 #endif // GAME_EFFECTS_EMITTER_CALLBACKS_H

@@ -6,57 +6,6 @@
 namespace
 {
 const int kFrameCount = 2000;
-
-class UnidentifiedReplayFramePool
-{
-public:
-    union Entry
-    {
-        Entry* next;
-        unsigned char storage[sizeof(Replay::Frame)];
-    };
-
-    UnidentifiedReplayFramePool(void* entries)
-        : mFree((Entry*)entries)
-        , mEntries((Entry*)entries)
-    {
-        Reset();
-    }
-
-    ~UnidentifiedReplayFramePool()
-    {
-    }
-
-    Replay::Frame* Allocate()
-    {
-        Entry* entry = mFree;
-        if (entry != 0)
-        {
-            mFree = entry->next;
-        }
-        return (Replay::Frame*)entry;
-    }
-
-    void Free(Replay::Frame* entry)
-    {
-        Entry* slot = (Entry*)entry;
-        slot->next = mFree;
-        mFree = slot;
-    }
-
-    void Reset()
-    {
-        for (int i = 0; i < kFrameCount - 1; ++i)
-        {
-            mEntries[i].next = &mEntries[i] + 1;
-        }
-        mEntries[kFrameCount - 1].next = 0;
-    }
-
-    Entry* mFree;
-    Entry* mEntries;
-};
-
 bool renderMemoryLayout;
 } // namespace
 

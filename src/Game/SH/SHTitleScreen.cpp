@@ -20,6 +20,9 @@
 #include "NL/nlConfig.h"
 #include "NL/nlMath.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/Render/RLViewLayers.h"
+#include "Game/SH/SHNavigation.h"
 
 class SHNavigation;
 extern "C" int VISetTimeToDimming(int time);

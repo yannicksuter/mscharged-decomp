@@ -6,7 +6,7 @@
 #include "types.h"
 
 class ImpostorCharacter;
-class ImpostorSprite_802D4290;
+class ImpostorSprite;
 
 class Impostor
 {
@@ -20,7 +20,7 @@ public:
     void Release();
 
     /* 0x04 */ ImpostorCharacter* mpCharacter;
-    /* 0x08 */ ImpostorSprite_802D4290* mpSprite;
+    /* 0x08 */ ImpostorSprite* mpSprite;
     /* 0x0C */ nlVector3 mPosition;
     /* 0x18 */ float mWidth;
     /* 0x1C */ float mHeight;

@@ -11,9 +11,10 @@
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
+#include "NL/gl/glTexture.h"
 #include "NL/gl/glView.h"
-#include "NL/gl/tu_802CC370.h"
-#include "NL/glx/GXMaterialCrystalTweaks.h"
+#include "NL/gl/glMaterialParameters.h"
+#include "Game/TweakValueFloat.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
@@ -25,11 +26,11 @@ struct TextureFrame
     float mUnidentified008;
 }; // size: 0x0C
 
-static GXMaterialFloatTweak_804F4190 sfParticleRedScale(
+static TweakValueFloat sfParticleRedScale(
     "sfParticleRedScale", "Render/Particles/Colour Scaling", 1.0f);
-static GXMaterialFloatTweak_804F4190 sfParticleGreenScale(
+static TweakValueFloat sfParticleGreenScale(
     "sfParticleGreenScale", "Render/Particles/Colour Scaling", 1.0f);
-static GXMaterialFloatTweak_804F4190 sfParticleBlueScale(
+static TweakValueFloat sfParticleBlueScale(
     "sfParticleBlueScale", "Render/Particles/Colour Scaling", 1.0f);
 
 static TextureFrame* textureFrames[36];
@@ -49,10 +50,8 @@ static int MaxNumParticles;
 static int sUnidentified_806E1FAC;
 static unsigned short hackyFacingAngle;
 
-extern GLInventory* lbl_806E1FFC;
 extern const nlVector3 lbl_804EB340;
 
-extern "C" unsigned long fn_802CDFCC(unsigned long texture);
 
 ParticleSystem::ParticleSystem(EffectsTemplate* pTemplate,
     nlDLListSlotPool<Particle*>* pFreeParticles, EffectsSpec* spec,
@@ -79,7 +78,7 @@ ParticleSystem::ParticleSystem(EffectsTemplate* pTemplate,
     m_aFacing = 0;
     m_bAmDying = false;
     m_bVisible = false;
-    mUnidentified09C = fn_802CDFCC(m_pTemplate->m_hTexture);
+    mUnidentified09C = glGetTextureIndex(m_pTemplate->m_hTexture);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -153,7 +152,7 @@ static void EmitCircularPosition(nlVector3& pos, nlVector3& dir,
         (unsigned short)(int)(10430.378f * randomAngle));
 
     float radius
-        = pSystem->m_pTemplate->mUnidentified058[4]->fn_802E0010(
+        = pSystem->m_pTemplate->mProperties[4]->Evaluate(
             pSystem->mUnidentified014);
     nlVector3 localPos;
     localPos.x = cosVal * radius;
@@ -171,7 +170,7 @@ static void EmitCircularPosition(nlVector3& pos, nlVector3& dir,
         nlMultPosVectorMatrix(pos, localPos, mLocalToWorld);
 }
 
-static void fn_802E0CA4(nlVector3& pos, nlVector3& dir,
+static void EmitDiscPosition(nlVector3& pos, nlVector3& dir,
     ParticleSystem* pSystem, EffectsSpec* pSpec,
     const nlMatrix4& mLocalToWorld)
 {
@@ -182,7 +181,7 @@ static void fn_802E0CA4(nlVector3& pos, nlVector3& dir,
         (unsigned short)(int)(10430.378f * randomAngle));
 
     float radius
-        = pSystem->m_pTemplate->mUnidentified058[4]->fn_802E0010(
+        = pSystem->m_pTemplate->mProperties[4]->Evaluate(
             pSystem->mUnidentified014);
     radius = RandomizedValue(0.0f, radius);
 
@@ -219,7 +218,7 @@ static void EmitSphericalPosition(nlVector3& pos, nlVector3& dir,
     float y = xyRadius * sinVal;
     float z = randomZ;
     float radius
-        = pSystem->m_pTemplate->mUnidentified058[4]->fn_802E0010(
+        = pSystem->m_pTemplate->mProperties[4]->Evaluate(
             pSystem->mUnidentified014);
     nlVec3Set(localDir, x, y, z);
     nlVec3Set(localPos, radius * localDir.x, radius * localDir.y,
@@ -259,7 +258,7 @@ static void EmitHemisphericalPosition(nlVector3& pos, nlVector3& dir,
     float y = xyRadius * sinVal;
     float z = randomZ;
     float radius
-        = pSystem->m_pTemplate->mUnidentified058[4]->fn_802E0010(
+        = pSystem->m_pTemplate->mProperties[4]->Evaluate(
             pSystem->mUnidentified014);
     nlVec3Set(localDir, x, y, z);
     nlVec3Set(localPos, radius * localDir.x, radius * localDir.y,
@@ -307,12 +306,12 @@ static void EmitSpindularPosition(nlVector3& pos, nlVector3& dir,
         (unsigned short)(int)(10430.378f * randomAngle));
 
     float radius
-        = pSystem->m_pTemplate->mUnidentified058[4]->fn_802E0010(
+        = pSystem->m_pTemplate->mProperties[4]->Evaluate(
             pSystem->mUnidentified014);
     nlVector3 localPos;
     nlVec3Set(localPos, cos * radius, -sin * radius, 0.0f);
 
-    float tilt = pSystem->m_pTemplate->mUnidentified058[6]->fn_802E0010(
+    float tilt = pSystem->m_pTemplate->mProperties[6]->Evaluate(
         pSystem->mUnidentified014);
     if (tilt <= -90.0f)
         tilt = -89.9f;
@@ -327,7 +326,7 @@ static void EmitSpindularPosition(nlVector3& pos, nlVector3& dir,
         nlRecipSqrt(nlVec3LengthSquared(localDir), false));
 
     float tiltRotation
-        = pSystem->m_pTemplate->mUnidentified058[7]->fn_802E0010(
+        = pSystem->m_pTemplate->mProperties[7]->Evaluate(
         pSystem->mUnidentified014);
     tiltRotation = -tiltRotation * 3.14159265f / 180.0f;
     if (tiltRotation != 0.0f)
@@ -387,8 +386,8 @@ void ParticleSystem::CreateNewParticles(int numParticles)
     case Emitter_Hemisphere:
         emit = EmitHemisphericalPosition;
         break;
-    case Emitter_Unidentified4:
-        emit = fn_802E0CA4;
+    case Emitter_Disc:
+        emit = EmitDiscPosition;
         break;
     }
 
@@ -420,12 +419,12 @@ void ParticleSystem::CreateNewParticles(int numParticles)
             = RandomizedValue(m_pTemplate->m_rRotation);
         pPart->rot = pPart->mUnidentified05C + mUnidentified020;
         pPart->dRot
-            = m_pTemplate->mUnidentified058[3]->fn_802E0010(0.0f);
+            = m_pTemplate->mProperties[3]->Evaluate(0.0f);
         pPart->mass = RandomizedValue(m_pTemplate->m_rMass);
         pPart->size
-            = m_pTemplate->mUnidentified058[1]->fn_802E0010(0.0f);
+            = m_pTemplate->mProperties[1]->Evaluate(0.0f);
         pPart->mUnidentified040
-            = m_pTemplate->mUnidentified058[2]->fn_802E0010(0.0f);
+            = m_pTemplate->mProperties[2]->Evaluate(0.0f);
         pPart->mUnidentified060
             = nlRandomf(100.0f, &uSeed) < m_pTemplate->mUnidentified030;
 
@@ -434,7 +433,7 @@ void ParticleSystem::CreateNewParticles(int numParticles)
         nlVector3 velocity;
         nlVec3Scale(velocity, m_vVelocity, inheritVelocity);
         float vel
-            = m_pTemplate->mUnidentified058[5]->fn_802E0010(0.0f);
+            = m_pTemplate->mProperties[5]->Evaluate(0.0f);
         nlVec3ScaleAdd(velocity, vel, dir, velocity);
         float speedSquared = nlVec3LengthSquared(velocity);
         pPart->velocity = nlSqrt(speedSquared, true);
@@ -490,14 +489,14 @@ void ParticleSystem::UpdateLight(EffectsLight* pLight, Particle* pPart,
     pLight->m_Colour = pTemplate->m_cColour[colourIndex];
 
     float size;
-    if (pTemplate->mUnidentified058[1]->mUnidentified000 != 0)
-        size = pTemplate->mUnidentified058[1]->fn_802E0010(
+    if (pTemplate->mProperties[1]->mUseCurve != 0)
+        size = pTemplate->mProperties[1]->Evaluate(
             pPart->mUnidentified008);
     else
         size = pPart->size;
 
-    if (pTemplate->mUnidentified058[2]->mUnidentified000 != 0)
-        size *= pTemplate->mUnidentified058[2]->fn_802E0010(
+    if (pTemplate->mProperties[2]->mUseCurve != 0)
+        size *= pTemplate->mProperties[2]->Evaluate(
             mUnidentified014);
     else
         size *= pPart->mUnidentified040;
@@ -516,18 +515,18 @@ void ParticleSystem::fn_802E1EC0(Particle* pPart,
     const nlMatrix4* pCoordSys)
 {
     float velocityCurve = 0.0f;
-    if (pPart->mUnidentified000->mUnidentified058[5]->mUnidentified000 != 0)
+    if (pPart->mUnidentified000->mProperties[5]->mUseCurve != 0)
     {
         velocityCurve
-            = pPart->mUnidentified000->mUnidentified058[5]->fn_802E0010(
+            = pPart->mUnidentified000->mProperties[5]->Evaluate(
                 pPart->mUnidentified008);
     }
 
     float rotationDelta;
-    if (pPart->mUnidentified000->mUnidentified058[3]->mUnidentified000 != 0)
+    if (pPart->mUnidentified000->mProperties[3]->mUseCurve != 0)
     {
         rotationDelta
-            = pPart->mUnidentified000->mUnidentified058[3]->fn_802E0010(
+            = pPart->mUnidentified000->mProperties[3]->Evaluate(
                 pPart->mUnidentified008);
     }
     else
@@ -603,13 +602,13 @@ void ParticleSystem::UpdateParticle(ParticleReturn* pReturn,
     *(unsigned long*)&pReturn->c = fn_802E2034(pPart, pTemplate);
 
     float size;
-    if (pTemplate->mUnidentified058[1]->mUnidentified000 != 0)
-        size = pTemplate->mUnidentified058[1]->fn_802E0010(
+    if (pTemplate->mProperties[1]->mUseCurve != 0)
+        size = pTemplate->mProperties[1]->Evaluate(
             pPart->mUnidentified008);
     else
         size = pPart->size;
-    if (pTemplate->mUnidentified058[2]->mUnidentified000 != 0)
-        size *= pTemplate->mUnidentified058[2]->fn_802E0010(
+    if (pTemplate->mProperties[2]->mUseCurve != 0)
+        size *= pTemplate->mProperties[2]->Evaluate(
             mUnidentified014);
     else
         size *= pPart->mUnidentified040;
@@ -725,7 +724,7 @@ static void RenderLightOnField(GLView* view, const EffectsLight& light)
     view->AttachModel(q.GetModel(), 0);
 }
 
-void ParticleSystem::fn_802E2848()
+void ParticleSystem::ClearParticles()
 {
     nlDLListIterator<Particle*> iterator = m_Particles.Begin();
     while (iterator.hasNext())
@@ -744,7 +743,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
     if (!m_bVisible || !sUnidentified_806DF470 || mUnidentified0BC == 0)
         return 0;
 
-    fn_802E9F94(mUnidentified000, mUnidentified0BC);
+    EmissionManager::RecordRenderedParticles(mUnidentified000, mUnidentified0BC);
     if ((unsigned int)sUnidentified_806E1FAC
         > (unsigned int)MaxNumParticles)
         return 0;
@@ -820,7 +819,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
     }
     else if (m_pTemplate->m_uModelID != 0xFFFFFFFF)
     {
-        GLVertexAnim* pAnim = lbl_806E1FFC->GetVertexAnim(m_pTemplate->m_uModelID);
+        GLVertexAnim* pAnim = gEffectsModelInventory->GetVertexAnim(m_pTemplate->m_uModelID);
         nlDLListIterator<Particle*> iterator = m_Particles.Begin();
         while (iterator.hasNext())
         {
@@ -830,7 +829,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
             if (pAnim == 0)
             {
                 pModel = glModelDupNoStreams(
-                    lbl_806E1FFC->GetModel(m_pTemplate->m_uModelID),
+                    gEffectsModelInventory->GetModel(m_pTemplate->m_uModelID),
                     false,
                     0);
             }
@@ -876,14 +875,14 @@ int ParticleSystem::RenderAllParticles(GLView* view)
             glModelPacket* pPacket = pModel->packets;
             while (pPacket < pModel->packets + pModel->numPackets)
             {
-                if (fn_802CC8FC(pPacket, constantColourHash_806E1FBC))
+                if (glHasMaterialParameter(pPacket, constantColourHash_806E1FBC))
                 {
                     nlVector4 colour;
                     colour.x = (float)ret.c.c[0] / 255.0f;
                     colour.y = (float)ret.c.c[1] / 255.0f;
                     colour.z = (float)ret.c.c[2] / 255.0f;
                     colour.w = (float)ret.c.c[3] / 255.0f;
-                    fn_802CC3C8(pPacket, constantColourHash_806E1FBC,
+                    glSetMaterialParameterArray(pPacket, constantColourHash_806E1FBC,
                         &colour, 4);
                 }
                 glSetRasterState(pPacket->rasterState, GLS_Culling, 0);
@@ -998,7 +997,7 @@ bool ParticleSystem::Update(float dt)
             if (m_pSpec == 0 || m_pSpec->m_fLingerStart < 0.0f)
                 m_bAmDying = true;
             m_fNumParticlesToCreate
-                += m_pTemplate->mUnidentified058[0]->fn_802E0010(0.0f);
+                += m_pTemplate->mProperties[0]->Evaluate(0.0f);
         }
     }
     else
@@ -1014,7 +1013,7 @@ bool ParticleSystem::Update(float dt)
         if (m_fElapsedTime < m_pTemplate->m_fFountainLife)
         {
             m_fNumParticlesToCreate += dt
-                * m_pTemplate->mUnidentified058[0]->fn_802E0010(
+                * m_pTemplate->mProperties[0]->Evaluate(
                     mUnidentified014);
         }
     }
@@ -1090,7 +1089,7 @@ bool fxParticleShutdown()
     return true;
 }
 
-void fn_802E3AC0(int maxNumParticles)
+void fxSetMaxNumParticles(int maxNumParticles)
 {
     MaxNumParticles = maxNumParticles;
 }

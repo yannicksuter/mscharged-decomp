@@ -29,7 +29,7 @@ static void UpdateCameraFlash(EmissionController& controller)
         return;
     }
 
-    if (controller.m_GlView == 0
+    if (controller.m_Replaying == 0
         && ReplayManager::Instance()->mRender != 0)
     {
         WorldTriggerTransform_801BE238* transform = (WorldTriggerTransform_801BE238*)controller.m_uUserData;

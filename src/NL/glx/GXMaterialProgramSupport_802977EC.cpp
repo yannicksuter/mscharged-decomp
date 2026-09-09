@@ -1,4 +1,5 @@
 #include <revolution/gx.h>
+#include "NL/gl/glMaterialParameters.h"
 
 #include "NL/gl/glState.h"
 #include "NL/gl/glTexture.h"
@@ -144,7 +145,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A01CC>::Prepare(
     const glModelPacket* packet)
 {
-    fn_802CC978(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
 }
 
 static inline GXColor makeColor(float r, float g, float b, float a)
@@ -166,23 +167,23 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A01CC>::Draw(
 
     if (lbl_806DF0C8)
     {
-        UnidentifiedTextureState textureU;
+        glTextureBinding textureU;
         textureU.texture = lbl_806E1BEC;
         textureU.unknown07 = 0;
         textureU.textureIndex = 0xFFFF;
         textureU.flags = 0;
         textureU.SetWrapS(true);
         textureU.SetWrapT(true);
-        fn_8036BE88(1, &textureU);
+        glx_BindTexture(1, &textureU);
 
-        UnidentifiedTextureState textureV;
+        glTextureBinding textureV;
         textureV.texture = lbl_806E1BF0;
         textureV.textureIndex = 0xFFFF;
         textureV.flags = 0;
         textureV.SetWrapS(true);
         textureV.SetWrapT(true);
         textureV.unknown07 = 0;
-        fn_8036BE88(2, &textureV);
+        glx_BindTexture(2, &textureV);
     }
     else if (lbl_806DF0C9)
     {
@@ -196,14 +197,14 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A01CC>::Draw(
 
     static_cast<GXMaterialProgram_802A01CC*>(this)->BindVertexArrays(packet);
 
-    UnidentifiedTextureState textureY;
+    glTextureBinding textureY;
     textureY.texture = lbl_806E1BE8;
     textureY.textureIndex = 0xFFFF;
     textureY.flags = 0;
     textureY.unknown07 = 0;
     textureY.SetWrapS(true);
     textureY.SetWrapT(true);
-    fn_8036BE88(0, &textureY);
+    glx_BindTexture(0, &textureY);
 
     if (packet->displayList != 0)
         GXCallDisplayList(packet->displayList->list, packet->displayList->size);

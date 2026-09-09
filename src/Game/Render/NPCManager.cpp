@@ -1,6 +1,7 @@
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/tu_801B43F8.h"
 #include "Game/Render/tu_801B532C.h"
+#include "Game/AsyncLoading.h"
 #include "Game/Drawable/RenderObject.h"
 
 #include "NL/gl/gl.h"
@@ -12,10 +13,12 @@
 #include "Game/Render/SkinAnimatedNPC.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlFile.h"
+#include "NL/nlCompressedFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "unclassified/tu_801A0E64.h"
-#include "unclassified/tu_80199880.h"
+#include "Game/Render/DiddyBanana.h"
+#include "Game/Render/BirdoEgg.h"
 #include "unclassified/tu_801B298C.h"
 #include "unclassified/tu_801B535C.h"
 
@@ -29,10 +32,10 @@ extern "C"
     void fn_8019BF40(
         PhysicsObject*, PhysicsObject*, const nlVector3&);
 
-    BirdoEggObject* fn_80199E84(BirdoEggObject* pObject, RenderObject* pDrawable);
-    BirdoEggObject* fn_80199F6C(BirdoEggObject* pObject, int bDelete);
-    void fn_80199FDC(BirdoEggObject* pObject, float fDeltaT);
-    void fn_8019A584(BirdoEggObject* pObject);
+    BirdoEggObject* __ct(BirdoEggObject* pObject, RenderObject* pDrawable);
+    BirdoEggObject* __dt(BirdoEggObject* pObject, int bDelete);
+    void Update(BirdoEggObject* pObject, float fDeltaT);
+    void Reset(BirdoEggObject* pObject);
 
     KoopaShellObject* fn_801A5F30(
         KoopaShellObject* pObject, void* pDrawable);
@@ -50,48 +53,40 @@ extern "C"
 
     void fn_801A01F8();
     void fn_801A0208(float fDeltaT);
-
-    void* fn_80118A74(NPCTemplate* pTemplate);
-    void* fn_8011B850(void* pObject);
-    bool fn_802B3E94(const char* pPath, LoadAsyncCallback pCallback,
-        void* pUserData, unsigned int nAlignment, int nAllocType,
-        unsigned int nChunkSize, void* pReadBuffer0,
-        void* pReadBuffer1, void* pParam, unsigned long nParam,
-        MemoryAllocator* pAllocator);
 }
 
 int nlSNPrintf(char* pBuffer, unsigned long nSize, const char* pFormat, ...);
 
-static char lbl_805142BC[] = "ChainChomp";
-static char lbl_805142C8[] = "DiddyBanana";
-static char lbl_805142D4[] = "art/animation/%s.sanim.zlib";
-static char lbl_805142F0[] = "art/animation/%s.shier";
-static char lbl_80514308[] = "art/characters/npcs/%s/%s.rlt";
-static char lbl_80514328[] = "art/characters/npcs/%s/%s.rlg";
+static char sChainChompTemplateName[] = "ChainChomp";
+static char sDiddyBananaTemplateName[] = "DiddyBanana";
+static char sNPCAnimationPath[] = "art/animation/%s.sanim.zlib";
+static char sNPCHierarchyPath[] = "art/animation/%s.shier";
+static char sNPCTexturePath[] = "art/characters/npcs/%s/%s.rlt";
+static char sNPCModelPath[] = "art/characters/npcs/%s/%s.rlg";
 
 float lbl_806DD000 = 0.48f;
 const float lbl_806E5210 = 0.45f;
 const float lbl_806E5214 = 1.0f;
 
-NPCManager* lbl_806E1608;
-NPCManager* lbl_806E160C;
+NPCManager* gNPCManager;
+NPCManager* gNPCManagerInstance;
 
 NPCManager::NPCManager()
-    : mUnidentified004(0)
-    , mUnidentified008(0)
-    , mUnidentified01C(0)
+    : mPersistentHierarchies(0)
+    , mTransientHierarchies(0)
+    , mPendingTemplate(0)
     , mpChainChomp(0)
     , mUnidentified024(0)
-    , mUnidentified028(0)
+    , mpBirdoEgg(0)
     , mUnidentified02C(0)
     , mUnidentified030(0)
     , mUnidentified054(0)
-    , mUnidentified0D8(0)
+    , mpDiddyBanana(0)
 {
-    lbl_806E160C = this;
-    mUnidentified004 = new (nlMalloc(
+    gNPCManagerInstance = this;
+    mPersistentHierarchies = new (nlMalloc(
         sizeof(cInventory<cSHierarchy>), 8, false)) cInventory<cSHierarchy>();
-    mUnidentified008 = new (nlMalloc(
+    mTransientHierarchies = new (nlMalloc(
         sizeof(cInventory<cSHierarchy>), 8, false)) cInventory<cSHierarchy>();
 
     unsigned int i;
@@ -118,35 +113,35 @@ NPCManager::NPCManager()
 }
 
 void NPCManager::CreateNPCTemplate(
-    const char* pName, bool bType)
+    const char* pName, bool bPersistent)
 {
     NPCTemplate* pTemplate
         = new (nlMalloc(sizeof(NPCTemplate), 8, false))
-            NPCTemplate(pName, bType);
+            NPCTemplate(pName, bPersistent);
 
-    if (bType)
+    if (bPersistent)
     {
-        mUnidentified00C.AddEnd(pTemplate);
+        mPersistentTemplates.AddEnd(pTemplate);
     }
     else
     {
-        mUnidentified014.AddEnd(pTemplate);
+        mTransientTemplates.AddEnd(pTemplate);
     }
 }
 
-bool NPCManager::fn_801A977C()
+bool NPCManager::SelectNextNPCTemplate()
 {
-    mUnidentified01C = 0;
+    mPendingTemplate = 0;
     for (int i = 0; i < 2; ++i)
     {
         nlDLListIterator<NPCTemplate*> iterator
-            = i == 0 ? mUnidentified00C.Begin()
-                     : mUnidentified014.Begin();
+            = i == 0 ? mPersistentTemplates.Begin()
+                     : mTransientTemplates.Begin();
         while (iterator.hasNext())
         {
             if (!(*iterator)->loaded)
             {
-                mUnidentified01C = *iterator;
+                mPendingTemplate = *iterator;
                 return true;
             }
             iterator.next();
@@ -155,27 +150,20 @@ bool NPCManager::fn_801A977C()
     return false;
 }
 
-void NPCManager::fn_801A9874()
+void NPCManager::CreateChainChomp()
 {
     NPCTemplate* pTemplate
-        = fn_801ABBDC_inline(lbl_805142BC);
+        = fn_801ABBDC_inline(sChainChompTemplateName);
 
     PhysicsNPC* chainPhysics = new (nlMalloc(
         sizeof(PhysicsNPC), 8, false)) PhysicsNPC(
         gGameTweaks.m_pGameTweaks->fChainChompRadius);
 
-    void* chainChomp = nlMalloc(0xB4, 8, false);
-    if (chainChomp != 0)
-    {
-        chainChomp = fn_8019AE7C(chainChomp,
-            pTemplate->hierarchy,
-            pTemplate->modelID,
-            chainPhysics,
-            &pTemplate->mUnidentified014,
-            pTemplate->mUnidentified010);
-    }
-    mpChainChomp = (ChainChomp*)chainChomp;
-    chainPhysics->SetCallbackFunction(fn_8019BF40);
+    ChainChomp* chainChomp = new (nlMalloc(sizeof(ChainChomp), 8, false))
+        ChainChomp(*pTemplate->hierarchy, pTemplate->modelID,
+            *chainPhysics, &pTemplate->mInventorySAnim, pTemplate->mResourcePool);
+    mpChainChomp = chainChomp;
+    chainPhysics->SetCallbackFunction(&ChainChomp::CollisionCallback);
 }
 
 void NPCManager::fn_801A9AF8()
@@ -183,14 +171,11 @@ void NPCManager::fn_801A9AF8()
     mUnidentified024 = new (8, false) UnidentifiedObject_801B535C(GetRenderObject(3, 0));
 }
 
-void NPCManager::fn_801A9B64()
+void NPCManager::CreateBirdoEgg()
 {
-    BirdoEggObject* pObject = (BirdoEggObject*)nlMalloc(0x4C, 8, false);
-    if (pObject != 0)
-    {
-        pObject = fn_80199E84(pObject, GetRenderObject(4, 0));
-    }
-    mUnidentified028 = pObject;
+    BirdoEggObject* pObject = new (nlMalloc(sizeof(BirdoEggObject), 8, false))
+        BirdoEggObject(GetRenderObject(4, 0));
+    mpBirdoEgg = pObject;
 }
 
 void NPCManager::fn_801A9BD0()
@@ -278,22 +263,22 @@ void NPCManager::fn_801A9DF0()
         UnidentifiedNPC_801B43F8* pObject = new (8, false) UnidentifiedNPC_801B43F8(
             *pTemplate->hierarchy, pTemplate->modelID,
             pConfig->mUnidentified00C, pConfig->mUnidentified010,
-            *pPhysics, &pTemplate->mUnidentified014,
-            pTemplate->mUnidentified010);
+            *pPhysics, &pTemplate->mInventorySAnim,
+            pTemplate->mResourcePool);
         mUnidentified0CC[i] = pObject;
         pPhysics->SetCallbackFunction(UnidentifiedNPC_801B43F8::fn_801B4830);
     }
 }
 
-void NPCManager::fn_801AA088()
+void NPCManager::CreateDiddyBanana()
 {
     NPCTemplate* pTemplate
-        = fn_801ABBDC_inline(lbl_805142C8);
-    UnidentifiedSkinAnimatedNPC_80199880* pObject
-        = (UnidentifiedSkinAnimatedNPC_80199880*)nlMalloc(0x84, 8, false);
-    pObject = new (pObject) UnidentifiedSkinAnimatedNPC_80199880(
-        *pTemplate->hierarchy, pTemplate->modelID, pTemplate->mUnidentified014, pTemplate->mUnidentified010);
-    mUnidentified0D8 = pObject;
+        = fn_801ABBDC_inline(sDiddyBananaTemplateName);
+    DiddyBanana* pObject
+        = (DiddyBanana*)nlMalloc(0x84, 8, false);
+    pObject = new (pObject) DiddyBanana(
+        *pTemplate->hierarchy, pTemplate->modelID, pTemplate->mInventorySAnim, pTemplate->mResourcePool);
+    mpDiddyBanana = pObject;
 }
 
 void NPCManager::fn_801AA2C0()
@@ -377,111 +362,111 @@ ThwompObject* NPCManager::fn_801AA528(
     return 0;
 }
 
-extern "C" void fn_801AA648(
+void OnNPCAnimationsLoaded(
     void* pData, unsigned long nSize, void* pUserData)
 {
-    lbl_806E1608->mUnidentified01C->mUnidentified001 = true;
+    gNPCManager->mPendingTemplate->mAnimationsLoaded = true;
     ((cInventory<cSAnim>*)pUserData)->AddFile((char*)pData, nSize);
 }
 
-extern "C" void fn_801AA794(
+void OnNPCHierarchyLoaded(
     void* pData, unsigned long nSize, void* pUserData)
 {
-    lbl_806E1608->mUnidentified01C->mUnidentified002 = true;
+    gNPCManager->mPendingTemplate->mHierarchyLoaded = true;
     ((cInventory<cSHierarchy>*)pUserData)->AddFile((char*)pData, nSize);
 }
 
-extern "C" void fn_801AA8E0(
+void OnNPCTexturesLoaded(
     void* pData, unsigned long nSize, void* pUserData)
 {
-    NPCManager* pManager = lbl_806E1608;
+    NPCManager* pManager = gNPCManager;
     NPCTemplate* pTemplate
         = (NPCTemplate*)pUserData;
-    pTemplate->mUnidentified010 = fn_802CC094();
-    pManager->mUnidentified01C->mUnidentified003 = true;
-    fn_802CDD78(pData, nSize, (MemoryAllocator*)fn_802CC094(), 0);
+    pTemplate->mResourcePool = glGetCurrentResourcePool();
+    pManager->mPendingTemplate->mTexturesLoaded = true;
+    glEndLoadTextureBundle(pData, nSize, glGetCurrentResourcePool(), 0);
     nlFree(pData);
 }
 
-extern "C" void fn_801AA960(
+void OnNPCModelLoaded(
     void* pData, unsigned long nSize, void* pUserData)
 {
     NPCTemplate* pTemplate
         = (NPCTemplate*)pUserData;
-    pTemplate->mUnidentified010 = fn_802CC094();
+    pTemplate->mResourcePool = glGetCurrentResourcePool();
     unsigned long nNumModels = 0;
-    unsigned int* pModel = (unsigned int*)fn_802C81FC(
-        pData, nSize, &nNumModels, fn_802CC094());
+    unsigned int* pModel = (unsigned int*)glEndLoadModel(
+        pData, nSize, &nNumModels, glGetCurrentResourcePool());
     pTemplate->modelID = *pModel;
     nlFree(pData);
 }
 
-void NPCManager::fn_801AA9D8()
+void NPCManager::BeginLoadNPCTemplate()
 {
     CurrentAllocator = &VirtualAllocator;
     AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
 
-    void* pContext;
-    if (mUnidentified01C->mUnidentified005)
+    GLResourcePool* pContext;
+    if (mPendingTemplate->mPersistent)
     {
-        pContext = fn_8011B850(fn_80118A74(mUnidentified01C));
+        pContext = AsyncLoadingManager::Instance()->GetPersistentResourcePool();
     }
     else
     {
-        pContext = fn_802CC094();
+        pContext = glGetCurrentResourcePool();
     }
 
     char path[256];
-    nlSNPrintf(path, sizeof(path), lbl_805142D4, mUnidentified01C->mName, mUnidentified01C->mName);
-    if (fn_802B3E94(path, fn_801AA648, &mUnidentified01C->mUnidentified014, 0x20, 0, 0x40000, 0, 0, 0, 0, &StandardAllocator))
+    nlSNPrintf(path, sizeof(path), sNPCAnimationPath, mPendingTemplate->mName, mPendingTemplate->mName);
+    if (nlLoadCompressedFileAsync(path, OnNPCAnimationsLoaded, &mPendingTemplate->mInventorySAnim, 0x20, AllocateStart, 0x40000, 0, 0, 0, 0, &StandardAllocator))
     {
-        mUnidentified01C->mUnidentified000 = true;
+        mPendingTemplate->mAnimationLoadStarted = true;
     }
 
-    nlSNPrintf(path, sizeof(path), lbl_805142F0, mUnidentified01C->mName, mUnidentified01C->mName);
-    cInventory<cSHierarchy>* pInventory = mUnidentified01C->mUnidentified005
-                                            ? mUnidentified004
-                                            : mUnidentified008;
-    nlLoadEntireFileAsync(path, fn_801AA794, pInventory, 0x20, AllocateStart, 0, 0, &StandardAllocator);
+    nlSNPrintf(path, sizeof(path), sNPCHierarchyPath, mPendingTemplate->mName, mPendingTemplate->mName);
+    cInventory<cSHierarchy>* pInventory = mPendingTemplate->mPersistent
+                                            ? mPersistentHierarchies
+                                            : mTransientHierarchies;
+    nlLoadEntireFileAsync(path, OnNPCHierarchyLoaded, pInventory, 0x20, AllocateStart, 0, 0, &StandardAllocator);
 
-    nlSNPrintf(path, sizeof(path), lbl_80514308, mUnidentified01C->mName, mUnidentified01C->mName);
-    fn_802C8204(path, fn_801AA8E0, mUnidentified01C, pContext);
+    nlSNPrintf(path, sizeof(path), sNPCTexturePath, mPendingTemplate->mName, mPendingTemplate->mName);
+    glBeginLoadTextureBundle(path, OnNPCTexturesLoaded, mPendingTemplate, pContext);
 
-    nlSNPrintf(path, sizeof(path), lbl_80514328, mUnidentified01C->mName, mUnidentified01C->mName);
-    fn_802C8200(path, fn_801AA960, mUnidentified01C, pContext);
+    nlSNPrintf(path, sizeof(path), sNPCModelPath, mPendingTemplate->mName, mPendingTemplate->mName);
+    glBeginLoadModel(path, OnNPCModelLoaded, mPendingTemplate, pContext);
 }
 
-bool NPCManager::fn_801AABB0()
+bool NPCManager::FinishLoadNPCTemplate()
 {
-    if (mUnidentified01C->mUnidentified000
-        && !mUnidentified01C->mUnidentified001)
+    if (mPendingTemplate->mAnimationLoadStarted
+        && !mPendingTemplate->mAnimationsLoaded)
     {
         return false;
     }
-    if (!mUnidentified01C->mUnidentified002)
+    if (!mPendingTemplate->mHierarchyLoaded)
     {
         return false;
     }
-    if (!mUnidentified01C->mUnidentified003)
+    if (!mPendingTemplate->mTexturesLoaded)
     {
         return false;
     }
-    if (mUnidentified01C->modelID == -1)
+    if (mPendingTemplate->modelID == -1)
     {
         return false;
     }
 
-    if (mUnidentified01C->mUnidentified005)
+    if (mPendingTemplate->mPersistent)
     {
-        mUnidentified01C->hierarchy = mUnidentified004->Find(
-            nlStringLowerHash(mUnidentified01C->mName));
+        mPendingTemplate->hierarchy = mPersistentHierarchies->Find(
+            nlStringLowerHash(mPendingTemplate->mName));
     }
     else
     {
-        mUnidentified01C->hierarchy = mUnidentified008->Find(
-            nlStringLowerHash(mUnidentified01C->mName));
+        mPendingTemplate->hierarchy = mTransientHierarchies->Find(
+            nlStringLowerHash(mPendingTemplate->mName));
     }
-    mUnidentified01C->loaded = true;
+    mPendingTemplate->loaded = true;
 
     --AllocatorStackDepth;
     AllocatorStack[AllocatorStackDepth] = 0;
@@ -489,23 +474,23 @@ bool NPCManager::fn_801AABB0()
     return true;
 }
 
-void NPCManager::fn_801AAD0C()
+void NPCManager::UnloadTransientNPCTemplates()
 {
     nlDLListIterator<NPCTemplate*> iterator
-        = mUnidentified014.Begin();
+        = mTransientTemplates.Begin();
     while (iterator.hasNext())
     {
         delete *iterator;
         iterator.next();
     }
-    mUnidentified014.Clear();
-    mUnidentified008->Clear();
+    mTransientTemplates.Clear();
+    mTransientHierarchies->Clear();
 }
 
 NPCManager::~NPCManager()
 {
     nlDLListContainer<NPCTemplate*>* pLists[2]
-        = { &mUnidentified00C, &mUnidentified014 };
+        = { &mPersistentTemplates, &mTransientTemplates };
     for (int i = 0; i < 2; ++i)
     {
         nlDLListIterator<NPCTemplate*> iterator
@@ -520,18 +505,18 @@ NPCManager::~NPCManager()
 
     delete mpChainChomp;
     mpChainChomp = 0;
-    delete mUnidentified0D8;
-    mUnidentified0D8 = 0;
+    delete mpDiddyBanana;
+    mpDiddyBanana = 0;
 
     if (mUnidentified024 != 0)
     {
         delete mUnidentified024;
         mUnidentified024 = 0;
     }
-    if (mUnidentified028 != 0)
+    if (mpBirdoEgg != 0)
     {
-        fn_80199F6C(mUnidentified028, 1);
-        mUnidentified028 = 0;
+        delete mpBirdoEgg;
+        mpBirdoEgg = 0;
     }
     if (mUnidentified02C != 0)
     {
@@ -577,27 +562,27 @@ NPCManager::~NPCManager()
     }
 
     fn_801A01F8();
-    delete mUnidentified004;
-    delete mUnidentified008;
-    lbl_806E160C = 0;
+    delete mPersistentHierarchies;
+    delete mTransientHierarchies;
+    gNPCManagerInstance = 0;
 }
 
-void NPCManager::fn_801AB9D4()
+void NPCManager::DestroyNPCs()
 {
     delete mpChainChomp;
     mpChainChomp = 0;
-    delete mUnidentified0D8;
-    mUnidentified0D8 = 0;
+    delete mpDiddyBanana;
+    mpDiddyBanana = 0;
 
     if (mUnidentified024 != 0)
     {
         delete mUnidentified024;
         mUnidentified024 = 0;
     }
-    if (mUnidentified028 != 0)
+    if (mpBirdoEgg != 0)
     {
-        fn_80199F6C(mUnidentified028, 1);
-        mUnidentified028 = 0;
+        delete mpBirdoEgg;
+        mpBirdoEgg = 0;
     }
     if (mUnidentified02C != 0)
     {
@@ -649,8 +634,8 @@ NPCTemplate* NPCManager::fn_801ABBDC(const char* pName)
     for (int i = 0; i < 2; ++i)
     {
         nlDLListIterator<NPCTemplate*> iterator
-            = i == 0 ? mUnidentified00C.Begin()
-                     : mUnidentified014.Begin();
+            = i == 0 ? mPersistentTemplates.Begin()
+                     : mTransientTemplates.Begin();
         while (iterator.hasNext())
         {
             char name[40];
@@ -686,17 +671,17 @@ void NPCManager::UpdateAINPCs(float dt)
     {
         mUnidentified024->fn_801B5544(dt);
     }
-    if (mUnidentified028 != 0)
+    if (mpBirdoEgg != 0)
     {
-        fn_80199FDC(mUnidentified028, dt);
+        mpBirdoEgg->Update(dt);
     }
     if (mUnidentified02C != 0)
     {
         fn_801A6074(mUnidentified02C, dt);
     }
-    if (mUnidentified0D8 != 0)
+    if (mpDiddyBanana != 0)
     {
-        mUnidentified0D8->Update(dt);
+        mpDiddyBanana->Update(dt);
     }
 
     mUnidentified030 = 0;
@@ -751,17 +736,17 @@ void NPCManager::fn_801ABF8C()
     {
         mUnidentified024->fn_801B5D14();
     }
-    if (mUnidentified028 != 0)
+    if (mpBirdoEgg != 0)
     {
-        fn_8019A584(mUnidentified028);
+        mpBirdoEgg->Reset();
     }
     if (mUnidentified02C != 0)
     {
         fn_801A65F8(mUnidentified02C);
     }
-    if (mUnidentified0D8 != 0)
+    if (mpDiddyBanana != 0)
     {
-        mUnidentified0D8->fn_80199A88();
+        mpDiddyBanana->Hide();
     }
 
     unsigned int i;

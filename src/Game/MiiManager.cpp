@@ -14,6 +14,7 @@
 #include <RVLFaceLib/RFL_Icon.h>
 #include <RVLFaceLib/RFL_System.h>
 #include <revolution/arc.h>
+#include "NL/gl/glTexture.h"
 
 MiiManager* g_pMiiManager;
 
@@ -59,7 +60,7 @@ MiiManager::MiiManager()
         nlSNPrintf(name, sizeof(name), "mii icon %d", i);
         mIconTextureIds[i] = glGetTexture(name);
 
-        ResourceInterface_802CC094* resource = fn_802CC094();
+        GLResourcePool* resource = glGetCurrentResourcePool();
         mIconTextures[i] = glx_CreatePlatTexture((MemoryAllocator*)resource);
         glRegisterTexture(mIconTextureIds[i], mIconTextures[i], resource);
 

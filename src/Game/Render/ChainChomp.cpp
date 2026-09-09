@@ -11,7 +11,8 @@
 #include "Game/Camera/CameraMan.h"
 #include "Game/Camera/animcam.h"
 #include "Game/DB/StadiumInfo.h"
-#include "Game/Drawable/ShadowProp.h"
+#include "Game/Render/RLView.h"
+#include "NL/gl/glDraw3.h"
 #include "Game/Effects/EffectsGroup.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
@@ -31,7 +32,6 @@
 #include "Game/Player.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/Render/PeachPhoto.h"
-#include "Game/Render/RLView.h"
 #include "Game/RenderSnapshot.h"
 #include "Game/ReplayManager.h"
 #include "Game/RumbleActions.h"
@@ -810,11 +810,11 @@ void ChainChomp::DrawShadow(
             alpha = 255;
         }
 
-        GroundInfo* ground = reinterpret_cast<GroundInfo*>(BasicStadium::GetCurrentStadium());
+        BasicStadium* stadium = BasicStadium::GetCurrentStadium();
         float groundHeight = 0.0f;
-        if (ground != 0)
+        if (stadium != 0)
         {
-            groundHeight = ground->height;
+            groundHeight = stadium->m_shadowHeight;
         }
 
         nlVector3 position;

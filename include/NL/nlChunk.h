@@ -12,19 +12,19 @@ public:
     void* GetData();
     void* GetUnalignedData();
     void* GetAlignedData();
-    u32 GetChunkAlignment();
+    unsigned int GetChunkAlignment();
     bool IsAlignedChunk();
-    u32 GetSize();
-    u32 GetID();
+    unsigned int GetSize();
+    unsigned int GetID();
 
-    u32 m_ID;
-    u32 m_Size;
+    unsigned int m_ID;
+    unsigned int m_Size;
 };
 
 inline nlChunk* nlChunk::GetNextChunk()
 {
     u8* address = (u8*)GetUnalignedData() + GetSize();
-    u32 offset = (u32)address & 3;
+    unsigned int offset = (unsigned int)address & 3;
     return (nlChunk*)(address + (offset != 0) * (4 - offset));
 }
 
@@ -61,16 +61,16 @@ inline void* nlChunk::GetAlignedData()
         return GetUnalignedData();
     }
 
-    u32 alignment = GetChunkAlignment();
-    u32 address = (u32)GetUnalignedData();
-    u32 remainder = address % alignment;
+    unsigned int alignment = GetChunkAlignment();
+    unsigned int address = (unsigned int)GetUnalignedData();
+    unsigned int remainder = address % alignment;
     return (void*)(address
         + (remainder != 0) * (alignment - remainder));
 }
 
-inline u32 nlChunk::GetChunkAlignment()
+inline unsigned int nlChunk::GetChunkAlignment()
 {
-    u32 alignmentBits = m_ID & 0x0F000000;
+    unsigned int alignmentBits = m_ID & 0x0F000000;
     return alignmentBits != 0 ? 1u << (alignmentBits >> 24) : 0;
 }
 
@@ -79,12 +79,12 @@ inline bool nlChunk::IsAlignedChunk()
     return m_ID & 0x0F000000;
 }
 
-inline u32 nlChunk::GetSize()
+inline unsigned int nlChunk::GetSize()
 {
     return m_Size;
 }
 
-inline u32 nlChunk::GetID()
+inline unsigned int nlChunk::GetID()
 {
     return m_ID & 0x80FFFFFF;
 }

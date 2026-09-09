@@ -5,7 +5,7 @@
 
 class GLTextureAnim;
 class PlatTexture;
-struct UnidentifiedTextureState;
+struct glTextureBinding;
 
 struct glTextureIndexQueue
 {
@@ -63,9 +63,9 @@ class glTextureManager
 public:
     explicit glTextureManager(unsigned long count);
     unsigned long GetTextureIndex(unsigned long texture);
-    void ResolveTextureIndex(UnidentifiedTextureState* texture);
+    void ResolveTextureIndex(glTextureBinding* texture);
     PlatTexture* GetTextureAtIndex(const unsigned long* texture);
-    PlatTexture* GetTexture(UnidentifiedTextureState* texture);
+    PlatTexture* GetTexture(glTextureBinding* texture);
     void RegisterTexture(PlatTexture* texture);
     void RegisterTextureAnim(GLTextureAnim* anim);
     void RefreshTextureAnim(GLTextureAnim* anim);

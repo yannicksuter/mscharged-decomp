@@ -19,7 +19,7 @@
 #include "Game/SAnim/pnSingleAxisBlender.h"
 #include "Game/Sys/audio.h"
 #include "NL/nlMain.h"
-#include "unclassified/tu_80336B2C.h"
+#include "Game/NetworkInput.h"
 #include "unclassified/tu_801B535C.h"
 
 extern "C" cPlayer* fn_80096514(
@@ -112,8 +112,7 @@ void* cPlayer::fn_800972CC()
     void* pResult = NULL;
     if (pGlobalPad != NULL)
     {
-        pResult = GetLocalChannelPad(
-            (UnidentifiedNetworkPeerChannel*)pGlobalPad->m_pMyUser);
+        pResult = ((NetworkPeerChannel*)pGlobalPad->m_pMyUser)->GetLocalChannelPad();
     }
     return pResult;
 }
@@ -340,12 +339,12 @@ extern "C" void fn_80098A84(UnidentifiedEventData_800673FC* pData)
 
 extern "C" void fn_80099030(UnidentifiedEventData00*)
 {
-    if (lbl_806E1608 != NULL)
+    if (gNPCManager != NULL)
     {
-        lbl_806E1608->fn_801AA348();
-        if (lbl_806E1608->mUnidentified024 != NULL)
+        gNPCManager->fn_801AA348();
+        if (gNPCManager->mUnidentified024 != NULL)
         {
-            lbl_806E1608->mUnidentified024->fn_801B59DC(true);
+            gNPCManager->mUnidentified024->fn_801B59DC(true);
         }
     }
 }
@@ -357,7 +356,7 @@ extern "C" void fn_80099074(void)
 u16 lbl_806DBD96 = 0xFFFF;
 
 #define REGISTER_PLAYER_FIELD(type, field) \
-    fn_80338F88(cache, type, lbl_80533C98[type].size, \
+    cache->AddField(type, gDebugFieldTypes[type].size, \
         (u8*)&field - (u8*)&m_ID, #field)
 
 void cPlayer::Unknown11(void* context, DebugWriteCache* cache)
@@ -365,7 +364,7 @@ void cPlayer::Unknown11(void* context, DebugWriteCache* cache)
     cCharacter::Unknown11(context, cache);
     if (lbl_806DBD96 == 0xFFFF)
     {
-        lbl_806DBD96 = fn_80338EBC(cache, "DetPlayer");
+        lbl_806DBD96 = cache->BeginType("DetPlayer");
         REGISTER_PLAYER_FIELD(8, m_ID);
         REGISTER_PLAYER_FIELD(8, m_nFeatherAnimID);
         REGISTER_PLAYER_FIELD(16, m_bIsContactingWall);
@@ -390,10 +389,10 @@ void cPlayer::Unknown11(void* context, DebugWriteCache* cache)
         REGISTER_PLAYER_FIELD(19, m_aSwapFacingDirection);
         REGISTER_PLAYER_FIELD(20, m_tSwapFacingTimer);
         REGISTER_PLAYER_FIELD(17, m_UserControlledTime);
-        fn_80338F78(cache);
+        cache->EndType();
     }
-    fn_80339450(cache, lbl_806DBD96, &m_ID, context);
-    fn_8033930C(cache, lbl_806DBD96, &m_ID,
+    cache->ChecksumData(lbl_806DBD96, &m_ID, context);
+    cache->WriteData(lbl_806DBD96, &m_ID,
         offsetof(cPlayer, m_tSwapControllerTimer) - offsetof(cPlayer, m_ID));
 }
 

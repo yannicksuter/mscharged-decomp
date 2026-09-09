@@ -1,65 +1,62 @@
 #include "Game/TweakRegistry.h"
 
-#include "NL/UnknownHashTable_80307620.h"
+#include "NL/PointerEntryTable.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSmallBlockAllocator.h"
 
-class TweakNameAllocator_8052BE68
+class TweakNameAllocator
 {
 public:
-    virtual void* UnidentifiedVirtual08();
+    virtual void* Allocate();
     virtual void UnidentifiedVirtual0C(void* ptr);
 };
 
-class TweakNameTable_8052BE58 : public UnknownHashTable_80307620
+class TweakNameTable : public PointerEntryTable
 {
 public:
-    TweakNameTable_8052BE58(int capacity, TweakNameAllocator_8052BE68* allocator)
-        : UnknownHashTable_80307620(capacity, allocator)
+    TweakNameTable(int capacity, TweakNameAllocator* allocator)
+        : PointerEntryTable(capacity, allocator)
     {
     }
-    virtual ~TweakNameTable_8052BE58();
+    virtual ~TweakNameTable();
 };
 
-nlSlotPoolFixed<0x10> lbl_8057C66C;
+nlSlotPoolFixed<0x10> gTweakNamePool;
 
-TweakNameTable_8052BE58::~TweakNameTable_8052BE58()
+TweakNameTable::~TweakNameTable()
 {
 }
 
-void* TweakNameAllocator_8052BE68::UnidentifiedVirtual08()
+void* TweakNameAllocator::Allocate()
 {
-    if (fn_802C0F04() != 0)
+    if (IsTweakRegistryInitialized() != 0)
     {
-        return lbl_8057C66C.Allocate();
+        return gTweakNamePool.Allocate();
     }
     return nlMalloc(0x10, 8, false);
 }
 
-void TweakNameAllocator_8052BE68::UnidentifiedVirtual0C(void* ptr)
+void TweakNameAllocator::UnidentifiedVirtual0C(void* ptr)
 {
     nlFree(ptr);
 }
 
-void fn_802C3970(void)
+void RecycleTweakNames(void)
 {
-    TweakRecycledName* entry = lbl_806E1E68;
+    TweakRecycledName* entry = gRecycledTweakNameHead;
     TweakRecycledName* next = entry == 0 ? 0 : entry->m_Next;
     while (entry != 0)
     {
-        static TweakNameAllocator_8052BE68 sRecycledNameAllocator;
-        static TweakNameTable_8052BE58 sRecycledNameTable(2000, &sRecycledNameAllocator);
-        sRecycledNameTable.fn_80307748(entry);
-        lbl_8057C66C.Free(entry);
+        static TweakNameAllocator sRecycledNameAllocator;
+        static TweakNameTable sRecycledNameTable(2000, &sRecycledNameAllocator);
+        sRecycledNameTable.Remove(entry);
+        gTweakNamePool.Free(entry);
         entry = next;
         next = entry == 0 ? 0 : entry->m_Next;
     }
-    lbl_806E1E68 = 0;
-    lbl_806E1E6C = 0;
+    gRecycledTweakNameHead = 0;
+    gRecycledTweakNameTail = 0;
 }
 
-extern "C"
-{
-    TweakRecycledName* lbl_806E1E68;
-    TweakRecycledName* lbl_806E1E6C;
-}
+TweakRecycledName* gRecycledTweakNameHead;
+TweakRecycledName* gRecycledTweakNameTail;

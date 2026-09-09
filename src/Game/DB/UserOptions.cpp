@@ -86,7 +86,7 @@ void AudioSettings::ApplySettings()
     pValues->m_unk88 = 0.0f;
 }
 
-void AudioSettings::fn_80109A50()
+void AudioSettings::ApplyMusicVolume()
 {
     MusicVolume = MusicVolume < 0 ? 0 : MusicVolume;
     MusicVolume = MusicVolume > 10 ? 10 : MusicVolume;
@@ -107,7 +107,7 @@ void AudioSettings::fn_80109A50()
     pValues->m_unk60 = 0.0f;
 }
 
-void AudioSettings::fn_80109ACC()
+void AudioSettings::ApplySFXVolume()
 {
     SFXVolume = SFXVolume < 0 ? 0 : SFXVolume;
     SFXVolume = SFXVolume > 10 ? 10 : SFXVolume;
@@ -128,7 +128,7 @@ void AudioSettings::fn_80109ACC()
     pValues->m_unkB0 = 0.0f;
 }
 
-void AudioSettings::fn_80109B48()
+void AudioSettings::ApplyVoiceVolume()
 {
     VoiceVolume = VoiceVolume < 0 ? 0 : VoiceVolume;
     VoiceVolume = VoiceVolume > 10 ? 10 : VoiceVolume;
@@ -153,16 +153,16 @@ GameplaySettings::GameplaySettings()
 {
     memset(this, 0, sizeof(GameplaySettings));
     SkillLevel = ROOKIE;
-    BestSeries = 3;
-    WinBy = 0;
-    GameGoals = 5;
+    NumGames = 3;
+    GameLimitType = 0;
+    GoalLimit = 5;
     GameTime = 180;
-    HomePowerUps = true;
-    AwayPowerUps = true;
-    HomeShoot2Score = true;
-    AwayShoot2Score = true;
-    HomeSkillShots = true;
-    AwaySkillShots = true;
+    mHomePowerupsEnabled = true;
+    mAwayPowerupsEnabled = true;
+    mHomeMegastrikeEnabled = true;
+    mAwayMegastrikeEnabled = true;
+    m_unk18 = true;
+    m_unk19 = true;
     m_unk1A = true;
 }
 
@@ -174,22 +174,22 @@ void GameplaySettings::OnSettingsUpdated() const
 {
 }
 
-PowerupSettings::PowerupSettings()
+CheatSettings::CheatSettings()
 {
-    memset(this, 0, sizeof(PowerupSettings));
+    memset(this, 0, sizeof(CheatSettings));
     mCustomPowerups = 0;
     mEnvironmentCheat = 0;
     mPlayerCheat = 0;
 }
 
-void PowerupSettings::InitializeDefaults()
+void CheatSettings::InitializeDefaults()
 {
     mCustomPowerups = 0;
     mEnvironmentCheat = 0;
     mPlayerCheat = 0;
 }
 
-void PowerupSettings::OnSettingsUpdated() const
+void CheatSettings::OnSettingsUpdated() const
 {
 }
 

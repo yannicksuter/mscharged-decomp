@@ -5,7 +5,7 @@
 
 char lbl_80504000[] = "TutorialMegastrikeDesire";
 
-void TutorialMegastrikeDesire::UnidentifiedUpdate(
+void TutorialMegastrikeDesire::Update(
     UnidentifiedDesireUpdate*, float)
 {
 }

@@ -36,13 +36,7 @@ struct ByteCodeHeader
     /* 0x44 */ u8* m_StringSegment;
 };
 
-struct UnidentifiedInterpreterStorage;
-class InterpreterCore;
-
-extern "C" FunctionEntryPoint* fn_802DF3E4(
-    InterpreterCore* core, u32* hash);
-extern "C" FunctionEntryPoint* fn_802DF41C(
-    InterpreterCore* core, unsigned int index);
+struct InterpreterTweakStorage;
 
 class InterpreterCore
 {
@@ -50,26 +44,36 @@ public:
     InterpreterCore(unsigned int size);
     virtual ~InterpreterCore();
     virtual void DoFunctionCall(unsigned int) = 0;
-    virtual bool UnidentifiedVirtual2(FunctionEntryPoint*, unsigned int, u32, u32, u32, u32);
+    virtual bool ExecuteFunction(FunctionEntryPoint*, unsigned int, u32, u32, u32, u32);
 
     void LoadByteCode(void* data);
-    void CallFunction(u32 hash)
+    void Reset();
+    FunctionEntryPoint* FindFunctionEntryPoint(const u32& hash);
+    FunctionEntryPoint* GetFunctionEntryPoint(unsigned int index);
+    void RunFunction(FunctionEntryPoint* entry, unsigned int count);
+    bool ExecuteFunction(FunctionEntryPoint* entry, unsigned int count, const unsigned int* values);
+    int GetInstructionOffset();
+    void InitializeTweaks();
+    void AllocateTweaks(unsigned int count);
+    void RegisterTweak(unsigned int index, unsigned int type, const char* name, unsigned char flags,
+        unsigned int value0, unsigned int value1, unsigned int value2, unsigned int value3);
+    void CallFunction(unsigned int hash)
     {
-        FunctionEntryPoint* fnc_ptr = fn_802DF3E4(this, &hash);
-        UnidentifiedVirtual2(fnc_ptr, 0, 0, 0, 0, 0);
+        FunctionEntryPoint* fnc_ptr = FindFunctionEntryPoint(hash);
+        ExecuteFunction(fnc_ptr, 0, 0, 0, 0, 0);
     }
     void CallFunctionAt(unsigned long offset)
     {
-        FunctionEntryPoint* fnc_ptr = fn_802DF41C(this, offset);
-        UnidentifiedVirtual2(fnc_ptr, 0, 0, 0, 0, 0);
+        FunctionEntryPoint* fnc_ptr = GetFunctionEntryPoint(offset);
+        ExecuteFunction(fnc_ptr, 0, 0, 0, 0, 0);
     }
     void Run();
     void StopWithoutUndo();
     void StopWithUndo();
     void Step();
-    bool FunctionExists(u32 hash)
+    bool FunctionExists(unsigned int hash)
     {
-        return fn_802DF3E4(this, &hash) != 0;
+        return FindFunctionEntryPoint(hash) != 0;
     }
     bool IsFinished() const { return m_RunState == 2; }
 
@@ -85,7 +89,7 @@ public:
     /* 0x08 */ ByteCodeHeader* m_Header;
     /* 0x0C */ u32* m_StackSegment;
     /* 0x10 */ u32* unknown_0x10;
-    /* 0x14 */ UnidentifiedInterpreterStorage* unknown_0x14;
+    /* 0x14 */ InterpreterTweakStorage* unknown_0x14;
     /* 0x18 */ u16* m_IP;
     /* 0x1C */ u32* m_BP;
     /* 0x20 */ u32* m_SavedSP;

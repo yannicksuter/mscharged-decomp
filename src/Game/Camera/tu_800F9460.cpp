@@ -24,7 +24,7 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     UnidentifiedEventRegistry;
 
 extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
-extern "C" unsigned char* lbl_806E2164;
+extern "C" unsigned char* gNetworkInputRecording;
 extern "C" bool fn_8003C180(cPlayer*);
 
 
@@ -494,7 +494,7 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
         && mTransitionTime <= 0.0f)
     {
         if (g_pNetworkSessionBase->GetLocalMachineId() == 0
-            && lbl_806E2164[4] == 0)
+            && gNetworkInputRecording[4] == 0)
         {
             g_pGame->fn_80059FC4();
         }
@@ -659,7 +659,7 @@ void UnidentifiedCameraEffects::UpdateCameraFlags()
 void UnidentifiedCameraEffects::Reset()
 {
     if (mOwnsTimeScale && g_pNetworkSessionBase->GetLocalMachineId() == 0
-        && lbl_806E2164[4] == 0)
+        && gNetworkInputRecording[4] == 0)
     {
         g_pGame->fn_80059FC4();
     }

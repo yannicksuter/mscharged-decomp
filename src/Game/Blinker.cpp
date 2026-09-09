@@ -1,16 +1,18 @@
 #include "Game/Blinker.h"
+#include "NL/gl/glTexture.h"
 
 #include "Game/Effects/EffectsTemplate.h"
 #include "Game/NisPlayer.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxTexture.h"
 
 #include <string.h>
+#include "NL/gl/glTexture.h"
 
 extern "C"
 {
     bool lbl_806DCD60 = true;
-    extern unsigned long lbl_806E1F0C;
+
 
     bool fn_8027C12C(const NisPlayer* player);
 }
@@ -28,11 +30,11 @@ void Blinker::Blink(glModel* model)
         for (; packet < model->packets + model->numPackets; ++packet)
         {
             texture = m_Textures[0];
-            if (texture == fn_802CC7E4(packet, lbl_806E1F0C))
+            if (texture == glGetMaterialUnsignedParameter(packet, gDiffuseTextureSemantic))
             {
-                fn_802CC458(packet, lbl_806E1F0C, texture);
+                glSetMaterialTextureParameter(packet, gDiffuseTextureSemantic, texture);
                 unsigned long resolvedTexture = m_ResolvedTextures[(unsigned long)m_State];
-                fn_802CC4FC(packet, lbl_806E1F0C, &resolvedTexture);
+                glSetMaterialTextureIndexParameter(packet, gDiffuseTextureSemantic, &resolvedTexture);
             }
         }
     }

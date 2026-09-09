@@ -9,17 +9,17 @@
 #include "NL/nlString.h"
 
 glTextureManager* gTextureManager;
-u32 lbl_806E1F0C = nlStringLowerHash("NLG_DIFFUSE");
-u32 lbl_806E1F10 = nlStringLowerHash("NLG_DETAIL");
-u32 lbl_806E1F14 = nlStringLowerHash("NLG_SPECULAR");
-u32 lbl_806E1F18 = nlStringLowerHash("NLG_BUMPMAP");
-u32 lbl_806E1F1C = nlStringLowerHash("NLG_NORMALMAP");
-u32 lbl_806E1F20 = nlStringLowerHash("NLG_SHADOW");
-u32 lbl_806E1F24 = nlStringLowerHash("NLG_SELFILLUM");
-u32 lbl_806E1F28 = nlStringLowerHash("NLG_GLOSS");
-u32 lbl_806E1F2C = nlStringLowerHash("NLG_RAMP");
-u32 lbl_806E1F30 = nlStringLowerHash("NLG_MASK");
-u32 lbl_806E1F34 = nlStringLowerHash("global/white");
+u32 gDiffuseTextureSemantic = nlStringLowerHash("NLG_DIFFUSE");
+u32 gDetailTextureSemantic = nlStringLowerHash("NLG_DETAIL");
+u32 gSpecularTextureSemantic = nlStringLowerHash("NLG_SPECULAR");
+u32 gBumpMapTextureSemantic = nlStringLowerHash("NLG_BUMPMAP");
+u32 gNormalMapTextureSemantic = nlStringLowerHash("NLG_NORMALMAP");
+u32 gShadowTextureSemantic = nlStringLowerHash("NLG_SHADOW");
+u32 gSelfIllumTextureSemantic = nlStringLowerHash("NLG_SELFILLUM");
+u32 gGlossTextureSemantic = nlStringLowerHash("NLG_GLOSS");
+u32 gRampTextureSemantic = nlStringLowerHash("NLG_RAMP");
+u32 gMaskTextureSemantic = nlStringLowerHash("NLG_MASK");
+u32 gWhiteTextureID = nlStringLowerHash("global/white");
 
 bool glTextureLoad(unsigned long texture)
 {
@@ -49,16 +49,16 @@ int glTextureGetNumBits(int component)
 void glTextureAdd(unsigned long texture, const void* buffer,
     unsigned long length, void* resourceInterface)
 {
-    ResourceInterface_802CC094* resource = (ResourceInterface_802CC094*)resourceInterface;
-    if (fn_802D3A08(buffer, length))
+    GLResourcePool* resource = (GLResourcePool*)resourceInterface;
+    if (glIsTextureAnim(buffer, length))
     {
-        fn_802D3A34(buffer, length, resource);
+        glAddTextureAnim(buffer, length, resource);
     }
     else
     {
-        PlatTexture* pTex = fn_8036BBDC(
+        PlatTexture* pTex = glplatTextureAdd(
             texture, buffer, length, resourceInterface);
-        resource->m_inventory->fn_802D2324(texture, pTex);
+        resource->m_inventory->AddTexture(texture, pTex);
         gTextureManager->RegisterTexture(pTex);
     }
 }
@@ -69,12 +69,12 @@ void glTextureReplace(unsigned long texture, const void* buffer,
     glplatTextureReplace(glx_GetTex(texture), buffer, length);
 }
 
-extern "C" bool fn_802CDD78(
-    void* data, unsigned long size, void* allocator, int nParam)
+bool glEndLoadTextureBundle(
+    void* data, unsigned long size, void* allocator, int existingTextureMode)
 {
-    ResourceInterface_802CC094* resource = (ResourceInterface_802CC094*)allocator;
+    GLResourcePool* resource = (GLResourcePool*)allocator;
     BundleHeader* header = (BundleHeader*)data;
-    fn_8036BBD4(header, resource);
+    glplatBeginTextureBundle(header, resource);
     int numTextures = header->numTextures;
     glTexBundleDict* dict = (glTexBundleDict*)(header + 1);
     unsigned char* textureData = (unsigned char*)(dict + numTextures);
@@ -85,12 +85,12 @@ extern "C" bool fn_802CDD78(
     {
         glTexBundleDict* entry = dict + i;
         GXTextureHeader* texture = (GXTextureHeader*)(textureData + entry->offset);
-        if (!fn_802D3A08(texture, entry->fileSize))
+        if (!glIsTextureAnim(texture, entry->fileSize))
         {
-            PlatTexture* pTex = inventory->fn_802D2370(entry->hash);
+            PlatTexture* pTex = inventory->GetTexture(entry->hash);
             if (pTex != 0)
             {
-                switch (nParam)
+                switch (existingTextureMode)
                 {
                 case 0:
                 case 1:
@@ -103,11 +103,11 @@ extern "C" bool fn_802CDD78(
             else
             {
                 unsigned long handle = entry->hash;
-                fn_802C8284(handle);
-                pTex = fn_8036BBC0(entry, texture, allocator);
-                resource->m_inventory->fn_802D2324(handle, pTex);
+                glBeginResource(handle);
+                pTex = glplatTextureAddFromBundle(entry, texture, allocator);
+                resource->m_inventory->AddTexture(handle, pTex);
                 gTextureManager->RegisterTexture(pTex);
-                fn_802C8288();
+                glEndResource();
             }
         }
     }
@@ -115,17 +115,17 @@ extern "C" bool fn_802CDD78(
     for (i = 0; i < numTextures; ++dict, ++i)
     {
         const void* texture = textureData + dict->offset;
-        if (fn_802D3A08(texture, dict->fileSize))
+        if (glIsTextureAnim(texture, dict->fileSize))
         {
-            fn_802D3A34(texture, dict->fileSize, resource);
+            glAddTextureAnim(texture, dict->fileSize, resource);
         }
     }
 
-    fn_8036BBD8(header);
+    glplatEndTextureBundle(header);
     return true;
 }
 
-extern "C" void fn_802CDEC0(unsigned long count)
+void glInitTextureManager(unsigned long count)
 {
     gTextureManager = new (8, false) glTextureManager(count);
 }
@@ -138,22 +138,22 @@ glTextureManager* glGetTextureManager()
 void glRegisterTexture(unsigned long texture, PlatTexture* platformTexture,
     void* allocator)
 {
-    ResourceInterface_802CC094* resource = (ResourceInterface_802CC094*)allocator;
-    resource->m_inventory->fn_802D2324(texture, platformTexture);
+    GLResourcePool* resource = (GLResourcePool*)allocator;
+    resource->m_inventory->AddTexture(texture, platformTexture);
     gTextureManager->RegisterTexture(platformTexture);
 }
 
-extern "C" void fn_802CDF5C(PlatTexture* texture)
+void glReleaseTexture(PlatTexture* texture)
 {
     glTextureManager* manager = gTextureManager;
-    u32 index = texture->unknown0E;
+    u32 index = texture->m_TextureIndex;
     manager->mFreeIndices->AddEnd((u16)index);
     manager->mTextures[index] = 0;
-    texture->unknown0E = 0xFFFF;
+    texture->m_TextureIndex = 0xFFFF;
     texture->ClearData();
 }
 
-extern "C" unsigned long fn_802CDFCC(unsigned long texture)
+unsigned long glGetTextureIndex(unsigned long texture)
 {
     return gTextureManager->GetTextureIndex(texture);
 }

@@ -34,5 +34,7 @@ public:
 extern MemoryAllocator StandardAllocator;
 extern MemoryAllocator VirtualAllocator;
 extern MemoryAllocator* CurrentAllocator;
+extern MemoryAllocator* AllocatorStack[16];
+extern unsigned int AllocatorStackDepth;
 
 #endif // NL_MEM_ALLOC_H

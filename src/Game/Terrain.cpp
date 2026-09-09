@@ -19,20 +19,20 @@ Terrain::Terrain(int index)
 
 float Terrain::GetSpeedFactor()
 {
-    return gGameTweaks.mUnidentified04->mUnidentified04;
+    return gGameTweaks.mTerrainTweaks->mfField_Speed;
 }
 
 float Terrain::GetSlideFactor()
 {
-    return gGameTweaks.mUnidentified04->mUnidentified14;
+    return gGameTweaks.mTerrainTweaks->mfField_Slipperyness;
 }
 
 float Terrain::GetRollingResistance(float value)
 {
-    return Interpolate(0.25f, 0.008f * value, gGameTweaks.mUnidentified04->mUnidentified24);
+    return Interpolate(0.25f, 0.008f * value, gGameTweaks.mTerrainTweaks->mfField_Friction);
 }
 
 float Terrain::GetRestitution(float value)
 {
-    return Interpolate(0.07f, 2.0f * value, gGameTweaks.mUnidentified04->mUnidentified34);
+    return Interpolate(0.07f, 2.0f * value, gGameTweaks.mTerrainTweaks->mfField_Bounce);
 }

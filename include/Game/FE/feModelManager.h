@@ -2,12 +2,15 @@
 #define GAME_FE_FE_MODEL_MANAGER_H
 
 #include "Game/SAnim.h"
+#include "Game/Inventory.h"
+#include "Game/SHierarchy.h"
 #include "NL/nlMath.h"
 #include "NL/nlSingleton.h"
 #include "types.h"
 
 class FEModelManager;
-class ResourceInterface_802CC094;
+struct tCharacterTemplateInfo;
+class GLResourcePool;
 class SkinAnimatedNPC;
 
 enum FEModelType
@@ -16,58 +19,41 @@ enum FEModelType
     FE_MODEL_IMPOSTOR = 1,
 };
 
-struct FEAnimation_801C0704
-{
-    /* 0x00 */ u32 mUnidentified00;
-    /* 0x04 */ u32 mHash;
-};
-
-struct FEAnimationListEntry_801C0704
-{
-    /* 0x00 */ FEAnimationListEntry_801C0704* mNext;
-    /* 0x04 */ FEAnimation_801C0704* mAnimation;
-};
-
-struct FEAnimationInventory_801C0704
-{
-    /* 0x00 */ u32 mUnidentified00;
-    /* 0x04 */ FEAnimationListEntry_801C0704* mHead;
-    /* 0x08 */ u32 mUnidentified08;
-    /* 0x0C */ u32 mUnidentified0C;
-    /* 0x10 */ u32 mUnidentified10;
-    /* 0x14 */ u32 mUnidentified14;
-    /* 0x18 */ u32 mUnidentified18;
-}; // size: 0x1C
-
 class FEModel
 {
 public:
-    FEModel(void* modelData);
+    FEModel(tCharacterTemplateInfo* modelData);
     virtual void Update(float dt) = 0;
     virtual void Render() = 0;
     virtual void Initialize() = 0;
-    virtual FEAnimation_801C0704* GetCurrentAnimation() = 0;
+    virtual cSAnim* GetCurrentAnimation() = 0;
     virtual bool IsAnimationFinished() = 0;
     virtual ~FEModel();
 
+    static void OnTexturesLoaded(void* data, unsigned long size, void* userData);
+    static void OnAlternateTexturesLoaded(void* data, unsigned long size, void* userData);
+    static void OnModelLoaded(void* data, unsigned long size, void* userData);
+    static void OnHierarchyLoaded(void* data, unsigned long size, void* userData);
+    static void OnAnimationsLoaded(void* data, unsigned long size, void* userData);
+
     /* 0x04 */ FEModelType mType;
-    /* 0x08 */ FEAnimationInventory_801C0704* mAnimations;
-    /* 0x0C */ FEAnimationInventory_801C0704* mHierarchies;
-    /* 0x10 */ ResourceInterface_802CC094* mLoader;
+    /* 0x08 */ cInventory<cSAnim>* mAnimations;
+    /* 0x0C */ cInventory<cSHierarchy>* mHierarchies;
+    /* 0x10 */ GLResourcePool* mLoader;
     /* 0x14 */ unsigned long mLoaderHandle;
-    /* 0x18 */ int mState;
+    /* 0x18 */ int mModelID;
     /* 0x1C */ void* mUnidentified1C;
-    /* 0x20 */ void* mModelData;
-    /* 0x24 */ void* mAnimationData;
-    /* 0x28 */ u32 mAnimationDataSize;
-    /* 0x2C */ void* mHierarchyData;
-    /* 0x30 */ u32 mHierarchyDataSize;
+    /* 0x20 */ tCharacterTemplateInfo* mModelData;
+    /* 0x24 */ void* mTextureFileData;
+    /* 0x28 */ u32 mTextureFileDataSize;
+    /* 0x2C */ void* mAlternateTextureFileData;
+    /* 0x30 */ u32 mAlternateTextureFileDataSize;
     /* 0x34 */ void* mModelFileData;
     /* 0x38 */ u32 mModelFileDataSize;
-    /* 0x3C */ void* mTextureFileData;
-    /* 0x40 */ u32 mTextureFileDataSize;
-    /* 0x44 */ void* mUnidentified44;
-    /* 0x48 */ u32 mUnidentified48;
+    /* 0x3C */ void* mHierarchyFileData;
+    /* 0x40 */ u32 mHierarchyFileDataSize;
+    /* 0x44 */ void* mAnimationFileData;
+    /* 0x48 */ u32 mAnimationFileDataSize;
     /* 0x4C */ u32 mPendingLoads;
     /* 0x50 */ bool mLoaded;
     /* 0x51 */ bool mSynchronousLoad;
@@ -78,7 +64,7 @@ public:
 class FEModelHandle
 {
 public:
-    FEModelHandle(FEModelType type, const char* name, void* modelData,
+    FEModelHandle(FEModelType type, const char* name, tCharacterTemplateInfo* modelData,
         bool unidentified59, void* unidentified4C, void* unidentified50,
         bool unidentified5A);
 
@@ -120,7 +106,19 @@ public:
 
     void Update(float dt);
     void Render();
+    void FinishLoadModel(FEModelHandle* handle);
+    void RegisterObject(void* object);
+    void* GetObject(int id);
+    FEModelHandle* CreateModel(FEModelType type, const char* name,
+        int captain, bool unidentified59, void* unidentified4C,
+        void* unidentified50, bool alternate);
+    FEModelHandle* CreateModel(FEModelType type, const char* name,
+        tCharacterTemplateInfo* modelData, bool unidentified59, void* unidentified4C,
+        void* unidentified50, bool alternate);
+    void DestroyModel(FEModelHandle* handle);
+    void BeginLoadModels();
     FEModelHandle* GetModel(const char* name);
+    void ReleaseImpostors();
 
     /* 0x04 */ void* mUnidentified04;
     /* 0x08 */ FEModelHandleListEntry* mHandlesHead;
@@ -136,27 +134,5 @@ public:
     /* 0x30 */ void* mDanglingModels;
     /* 0x34 */ void* mResource;
 }; // size: 0x38
-
-extern "C"
-{
-    void fn_801C0170(void* data, u32 size, FEModel* model);
-    void fn_801C0244(void* data, u32 size, FEModel* model);
-    void fn_801C0250(void* data, u32 size, FEModel* model);
-    void fn_801C0334(void* data, u32 size, FEModel* model);
-    void fn_801C0418(void* data, u32 size, FEModel* model);
-
-    void fn_801C204C(FEModelManager* manager);
-    void fn_801C271C(FEModelManager* manager, void* model);
-    void* fn_801C2798(FEModelManager* manager, int id);
-    FEModelHandle* fn_801C27C4(FEModelManager* manager, FEModelType type,
-        const char* name, int captain, bool unidentified59,
-        void* unidentified4C, void* unidentified50, bool alternate);
-    FEModelHandle* fn_801C2844(FEModelManager* manager, FEModelType type,
-        const char* name, void* modelData, bool unidentified59,
-        void* unidentified4C, void* unidentified50, bool alternate);
-    void fn_801C2BD8(FEModelManager* manager, FEModelHandle* handle);
-    void fn_801C2E10(FEModelManager* manager);
-    void fn_801C3014(FEModelManager* manager);
-}
 
 #endif // GAME_FE_FE_MODEL_MANAGER_H

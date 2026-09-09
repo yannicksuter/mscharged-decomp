@@ -2,10 +2,12 @@
 
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EffectsGroup.h"
+#include "Game/Effects/ParticleSystem.h"
 #include "Game/TweakValue.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glTexture.h"
 #include "NL/nlFile.h"
+#include "NL/nlCompressedFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
@@ -16,29 +18,27 @@ static unsigned long fx_sTerrain;
 static unsigned int sResourceIdCounter;
 static const char* sDefaultResourceNames[2] = { "Default", "World" };
 
-extern u8 lbl_8057F6D4[0x0C];
-extern void* lbl_806E1FE8;
-extern void* lbl_806E1FEC;
-extern void* lbl_806E1FF0;
-extern void* lbl_806E1FF4;
-extern void* lbl_806E1FF8;
-extern void* lbl_806E1FFC;
+class EffectsBundle;
 
-extern "C" void fn_802E6444(
+class EffectsBundleManager
+{
+public:
+    void Load(void* data, void* nonResidentData, GLResourcePool* context, int bundleType);
+
+    EffectsBundle* mDefaultBundles;
+    EffectsBundle* mAdditionalBundles;
+    GLResourcePool* mResourcePool;
+};
+
+extern EffectsBundleManager gEffectsBundleManager;
+extern void* gEffectsData;
+extern void* gEffectsNonResidentData;
+extern void* lbl_806E1FF0;
+extern void* gEffectsGeometryData;
+extern void* gEffectsTextureData;
+
+void OnEffectsGeometryLoaded(
     void* data, unsigned long size, void* userData);
-extern "C" bool fn_802E3D4C(EffectsGroup* group);
-extern "C" void fn_802E4358(EmissionController* controller);
-extern "C" bool fn_802E5348(EmissionController* controller, float dt);
-extern "C" int fn_802E57B8(EmissionController* controller);
-extern "C" void fn_802E5BA0(void* parser, void* data, void* allocated,
-    void* context, int value);
-extern "C" void fxParticleStartup(int numParticles);
-extern "C" void fn_802E3AC0(int parameter);
-extern "C" void fn_802E99C4(EmissionResourceStats* stats);
-extern "C" bool fn_802B3E94(const char* path, LoadAsyncCallback callback,
-    void* userData, unsigned int alignment, int allocType,
-    unsigned int chunkSize, void* readBuffer0, void* readBuffer1,
-    void* param, unsigned long value, MemoryAllocator* allocator);
 
 inline EmissionResourceStats::EmissionResourceStats()
     : mCount(0)
@@ -58,7 +58,7 @@ inline EmissionResourceStats::EmissionResourceStats()
 /**
  * Offset/Address/Size: 0x8A0 | 0x802E643C | size: 0x8
  */
-extern "C" void fn_802E643C(
+void OnEffectsDataLoaded(
     void* data, unsigned long size, void* userData)
 {
     *(void**)userData = data;
@@ -67,85 +67,85 @@ extern "C" void fn_802E643C(
 /**
  * Offset/Address/Size: 0x710 | 0x802E65CC | size: 0x54
  */
-extern "C" void fn_802E65CC(void* data, unsigned long size)
+void OnEffectsTexturesLoaded(void* data, unsigned long size, void* userData)
 {
-    fn_802CDD78(data, size, fn_802CC094(), 0);
+    glEndLoadTextureBundle(data, size, glGetCurrentResourcePool(), 0);
     nlFree(data);
 }
 
 /**
  * Offset/Address/Size: 0x6BC | 0x802E6620 | size: 0x154
  */
-extern "C" void fn_802E6620(
+void EmissionManager::StartLoading(
     bool first, bool second, bool third, bool fourth)
 {
-    lbl_806E1FE8 = 0;
-    lbl_806E1FEC = 0;
+    gEffectsData = 0;
+    gEffectsNonResidentData = 0;
     lbl_806E1FF0 = 0;
-    lbl_806E1FF4 = 0;
-    lbl_806E1FF8 = 0;
+    gEffectsGeometryData = 0;
+    gEffectsTextureData = 0;
 
-    nlLoadEntireFileAsync("art/effects/effects.bun", fn_802E643C,
-        &lbl_806E1FE8, 0x20,
+    nlLoadEntireFileAsync("art/effects/effects.bun", OnEffectsDataLoaded,
+        &gEffectsData, 0x20,
         first ? AllocateStart : AllocateEnd, 0, 0, 0);
 
     if (fourth)
     {
-        fn_802B3E94("art/effects/effectsNonRes.bun.zlib", fn_802E643C,
-            &lbl_806E1FEC, 0x20,
+        nlLoadCompressedFileAsync("art/effects/effectsNonRes.bun.zlib", OnEffectsDataLoaded,
+            &gEffectsNonResidentData, 0x20,
             second ? AllocateStart : AllocateEnd, 0x40000,
             0, 0, 0, 0, 0);
     }
     else
     {
-        nlLoadEntireFileAsync("art/effects/effectsNonRes.bun", fn_802E643C,
-            &lbl_806E1FEC, 0x20,
+        nlLoadEntireFileAsync("art/effects/effectsNonRes.bun", OnEffectsDataLoaded,
+            &gEffectsNonResidentData, 0x20,
             second ? AllocateStart : AllocateEnd, 0, 0, 0);
     }
 
-    nlLoadEntireFileAsync("art/objects/effectsgeometry.bun", fn_802E6444,
-        &lbl_806E1FF4, 0x20,
+    nlLoadEntireFileAsync("art/objects/effectsgeometry.bun", OnEffectsGeometryLoaded,
+        &gEffectsGeometryData, 0x20,
         first ? AllocateStart : AllocateEnd, 0, 0, 0);
     nlLoadEntireFileAsync("art/objects/effectsgeometrytextures.rlt",
-        (LoadAsyncCallback)fn_802E65CC, &lbl_806E1FF8, 0x20,
+        OnEffectsTexturesLoaded, &gEffectsTextureData, 0x20,
         first ? AllocateStart : AllocateEnd, 0, 0, 0);
 
-    lbl_806E1FFC = *(void**)((u8*)fn_802CC094() + 0x0C);
+    gEffectsModelInventory = glGetCurrentResourcePool()->m_inventory;
 }
 
 /**
  * Offset/Address/Size: 0x568 | 0x802E6774 | size: 0x6C
  */
-extern "C" bool fn_802E6774(void* context)
+bool EmissionManager::FinishLoading(GLResourcePool* context)
 {
-    if (lbl_806E1FE8 == 0)
+    if (gEffectsData == 0)
     {
         return false;
     }
-    if (lbl_806E1FEC == 0)
+    if (gEffectsNonResidentData == 0)
     {
         return false;
     }
 
-    fn_802E5BA0(lbl_8057F6D4, lbl_806E1FE8, lbl_806E1FEC,
+    gEffectsBundleManager.Load(gEffectsData, gEffectsNonResidentData,
         context, 0);
-    nlFree(lbl_806E1FEC);
-    lbl_806E1FEC = 0;
+    nlFree(gEffectsNonResidentData);
+    gEffectsNonResidentData = 0;
     return true;
 }
 
 /**
  * Offset/Address/Size: 0x504 | 0x802E67E0 | size: 0x64
  */
-extern "C" void fn_802E67E0(void* data, void* allocated,
-    void* context, int value)
+void EmissionManager::LoadBundle(void* data, void* nonResidentData,
+    GLResourcePool* context, int bundleType)
 {
-    if (data != 0 || allocated != 0)
+    if (data != 0 || nonResidentData != 0)
     {
-        fn_802E5BA0(
-            lbl_8057F6D4, data, allocated, context, value);
+        gEffectsBundleManager.Load(
+            data, nonResidentData, context, bundleType);
     }
-    ::operator delete(allocated);
+    ::operator delete(nonResidentData);
 }
 
 /**
@@ -179,19 +179,19 @@ EmissionManager::~EmissionManager()
 /**
  * Offset/Address/Size: 0x0 | 0x802E6C20 | size: 0x1D8
  */
-extern "C" void fn_802E6C20(EmissionManager* manager, void* context,
-    int numParticles, int parameter)
+void EmissionManager::Startup(void* context,
+    int numParticles, int maxRenderedParticles)
 {
-    manager->mContext = context;
-    manager->mNumParticles = numParticles;
+    mContext = context;
+    mNumParticles = numParticles;
     fxParticleStartup(numParticles);
-    fn_802E3AC0(parameter);
+    fxSetMaxNumParticles(maxRenderedParticles);
 
     for (int i = 0; i < 8; ++i)
     {
-        fn_802E99C4(&manager->mResourceStats[i]);
+        mResourceStats[i].Initialize();
     }
-    manager->mUpdateEnabled = true;
+    mUpdateEnabled = true;
 }
 
 /**
@@ -266,7 +266,7 @@ void EmissionManager::Update(float dt)
     while (iterator.hasNext())
     {
         EmissionController* p = *iterator;
-        if (fn_802E5348(p, dt))
+        if (p->Update(dt))
         {
             iterator.Step();
         }
@@ -323,9 +323,9 @@ void EmissionManager::Render()
         EmissionController* current = *iterator;
         iterator.Step();
         if (!mRenderPersistentOnly
-            || fn_802E3D4C(current->m_pGroup))
+            || current->m_pGroup->IsPersistent())
         {
-            fn_802E57B8(current);
+            current->Render();
         }
     }
 }
@@ -341,11 +341,10 @@ nlDLListContainer<EmissionController*>* EmissionManager::GetContainer()
 /**
  * Offset/Address/Size: 0x0 | 0x802E81A0 | size: 0xAC
  */
-extern "C" EmissionController* fn_802E81A0(EmissionManager* manager,
-    unsigned long userData, const EffectsGroup* pEffectsGroup)
+EmissionController* EmissionManager::FindController(unsigned long userData, const EffectsGroup* pEffectsGroup)
 {
     nlDLListIterator<EmissionController*> iterator
-        = manager->mControllers.Begin();
+        = mControllers.Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
@@ -441,7 +440,7 @@ void EmissionManager::Kill(const EffectsGroup* pEffectsGroup)
         {
             current->Die();
         }
-        iterator.Step();
+        iterator.next();
     }
 }
 
@@ -480,7 +479,7 @@ bool EmissionManager::IsPlaying(
 /**
  * Offset/Address/Size: 0x0 | 0x802E8544 | size: 0xB8
  */
-bool EmissionManager::fn_802E8544(unsigned long userData, const EffectsGroup* pEffectsGroup)
+bool EmissionManager::IsDying(unsigned long userData, const EffectsGroup* pEffectsGroup)
 {
     if (pEffectsGroup != 0)
     {
@@ -494,7 +493,7 @@ bool EmissionManager::fn_802E8544(unsigned long userData, const EffectsGroup* pE
             if (controller->m_pGroup == pEffectsGroup
                 && (userData == 0 || userData == controller->m_uUserData))
             {
-                return controller->m_bPlaying;
+                return controller->m_bDying;
             }
             if (nlDLRingIsEnd(head, current) || current == 0)
             {
@@ -523,7 +522,7 @@ void EmissionManager::DestroyAll(int view, bool exceptPersistent)
         if (controller->m_pContext == mContext
             && controller->m_View == view
             && (!exceptPersistent
-                || !fn_802E3D4C(controller->m_pGroup)))
+                || !controller->m_pGroup->IsPersistent()))
         {
             DLListEntry<EmissionController*>* entry = current;
             if (nlDLRingIsEnd(head, current) || current == 0)
@@ -536,7 +535,7 @@ void EmissionManager::DestroyAll(int view, bool exceptPersistent)
             }
             nlDLRingRemove(&mControllers.m_Head, entry);
             delete entry;
-            fn_802E4358(controller);
+            controller->ClearParticles();
             delete controller;
         }
         else
@@ -566,7 +565,7 @@ void EmissionManager::DestroyAll(bool exceptPersistent)
         EmissionController* controller = current->entry;
         if (controller->m_pContext == mContext
             && (!exceptPersistent
-                || !fn_802E3D4C(controller->m_pGroup)))
+                || !controller->m_pGroup->IsPersistent()))
         {
             DLListEntry<EmissionController*>* entry = current;
             if (nlDLRingIsEnd(head, current) || current == 0)
@@ -621,7 +620,7 @@ void EmissionManager::Destroy(
             }
             nlDLRingRemove(&mControllers.m_Head, entry);
             delete entry;
-            fn_802E4358(controller);
+            controller->ClearParticles();
             delete controller;
         }
         else
@@ -641,8 +640,7 @@ void EmissionManager::Destroy(
 /**
  * Offset/Address/Size: 0x0 | 0x802E8A2C | size: 0x14C
  */
-extern "C" void fn_802E8A2C(
-    EmissionManager* manager, const EffectsGroup* pEffectsGroup)
+void EmissionManager::Destroy(const EffectsGroup* pEffectsGroup)
 {
     if (pEffectsGroup == 0)
     {
@@ -650,18 +648,18 @@ extern "C" void fn_802E8A2C(
     }
 
     nlDLListIterator<EmissionController*> iterator
-        = manager->mControllers.Begin();
+        = mControllers.Begin();
     while (iterator.hasNext())
     {
         EmissionController* current = *iterator;
         if (current->m_pGroup == pEffectsGroup)
         {
-            manager->mControllers.Remove(&iterator);
+            mControllers.Remove(&iterator);
             delete current;
         }
         else
         {
-            iterator.Step();
+            iterator.next();
         }
     }
 }
@@ -669,17 +667,17 @@ extern "C" void fn_802E8A2C(
 /**
  * Offset/Address/Size: 0x0 | 0x802E8B78 | size: 0xE4
  */
-extern "C" void fn_802E8B78(
-    EmissionManager* manager, Function<void*>* callback)
+void EmissionManager::ForEachController(
+    const Function1<void, EmissionController&>& callback)
 {
     nlDLListIterator<EmissionController*> iterator
-        = manager->mControllers.Begin();
+        = mControllers.Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
     {
         EmissionController* controller = current->entry;
-        (*callback)(controller);
+        callback(*controller);
         if (nlDLRingIsEnd(head, current) || current == 0)
         {
             current = 0;
@@ -759,16 +757,16 @@ void EmissionManager::KillOldest(int num, bool lingeringOnly)
 /**
  * Offset/Address/Size: 0x0 | 0x802E97C0 | size: 0xBC
  */
-extern "C" void fn_802E97C0(EmissionManager* manager)
+void EmissionManager::KillAll()
 {
     nlDLListIterator<EmissionController*> iterator
-        = manager->mControllers.Begin();
+        = mControllers.Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
     {
         EmissionController* controller = current->entry;
-        fn_802E4358(controller);
+        controller->ClearParticles();
         controller->Die();
         if (nlDLRingIsEnd(head, current) || current == 0)
         {
@@ -784,19 +782,19 @@ extern "C" void fn_802E97C0(EmissionManager* manager)
 /**
  * Offset/Address/Size: 0x0 | 0x802E987C | size: 0xBC
  */
-extern "C" void fn_802E987C(EmissionManager* manager)
+void EmissionManager::PrepareForReplay()
 {
-    while (manager->mReplayControllers.m_Head != 0)
+    while (mReplayControllers.m_Head != 0)
     {
         nlDLListIterator<EmissionController*> iterator
-            = manager->mReplayControllers.Begin();
+            = mReplayControllers.Begin();
         EmissionController* current = *iterator;
-        manager->mReplayControllers.Remove(&iterator);
+        mReplayControllers.Remove(&iterator);
         delete current;
     }
 
-    manager->mReplayControllers.m_Head = manager->mControllers.m_Head;
-    manager->mControllers.m_Head = 0;
+    mReplayControllers.m_Head = mControllers.m_Head;
+    mControllers.m_Head = 0;
 }
 
 /**
@@ -826,7 +824,7 @@ void EmissionManager::SetContext(void* context)
 /**
  * Offset/Address/Size: 0x0 | 0x802E9E0C | size: 0x90
  */
-extern "C" void fn_802E9E0C(int resource, int budget)
+void EmissionManager::SetResourceBudget(int resource, int budget)
 {
     if (resource != -1)
     {
@@ -839,7 +837,7 @@ extern "C" void fn_802E9E0C(int resource, int budget)
 /**
  * Offset/Address/Size: 0x0 | 0x802E9E9C | size: 0xF8
  */
-extern "C" void fn_802E9E9C(
+void EmissionManager::ConfigureResource(
     int resource, const char* name, int budget)
 {
     if (resource != -1)
@@ -857,7 +855,7 @@ extern "C" void fn_802E9E9C(
 /**
  * Offset/Address/Size: 0x0 | 0x802E9F94 | size: 0xC4
  */
-extern "C" void fn_802E9F94(
+void EmissionManager::RecordRenderedParticles(
     unsigned long resource, int numParticles)
 {
     if (resource != (unsigned long)-1)
@@ -865,8 +863,8 @@ extern "C" void fn_802E9F94(
         EmissionResourceStats* stats
             = EmissionManager::Instance()->mResourceStats;
         EmissionResourceStats& resourceStats = stats[resource];
-        TweakValueIntImpl_804FD898* count = resourceStats.mCount;
-        TweakValueIntImpl_804FD898* highWaterMark
+        TweakIntBinding* count = resourceStats.mCount;
+        TweakIntBinding* highWaterMark
             = resourceStats.mHighWaterMark;
         *count->m_pValue += numParticles;
         if (*count->m_pValue >= *highWaterMark->m_pValue)

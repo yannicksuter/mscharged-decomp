@@ -25,8 +25,10 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/FEAudio.h"
+#include "Game/Render/RLViewLayers.h"
+#include "Game/SH/SHNavigation.h"
 
-class SHNavigation;
 
 extern BaseGameSceneManager* g_pOverlayManager;
 
@@ -349,7 +351,7 @@ void SHChooseSides2::SceneCreated()
                     sidekick->GetActiveSlide(), nlStringLowerHash("00_dummy_texture"), 0, 0, 0, 0, 0);
                 if (image == 0)
                 {
-                    image = (TLImageInstance*)&gDefaultTLImageInstance;
+                    image = &gDefaultTLImageInstance;
                 }
 
                 fn_8021ED64(image, GameInfoManager::Instance()->GetSidekick(team, slot), team);
@@ -989,8 +991,8 @@ void SHChooseSides2::Proceed()
         FEAudio::PlayAnimAudioEvent(0xF8350154, 0, 0, 1);
         g_pCupManager->mUnidentified869C = 1;
         CupManager* info = g_pCupManager;
-        info->mUnidentified8694[0] = GameInfoManager::Instance()->GetTeam(0);
-        info->mUnidentified8694[1] = GameInfoManager::Instance()->GetTeam(1);
+        info->mPreviousGameTeams[0] = GameInfoManager::Instance()->GetTeam(0);
+        info->mPreviousGameTeams[1] = GameInfoManager::Instance()->GetTeam(1);
         GameSceneManager::Instance()->PushLoadingScene(true);
         SaveLoad::StartSave(false);
         object->SetButtons(0, true);
@@ -1213,7 +1215,7 @@ void SHChooseSides2::fn_8021ED64(TLImageInstance* image, int sidekick, int team)
             break;
         }
 
-        TLInstance* found = FEFindInstance(mPresentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(textureName), 0, 0, 0);
+        TLInstance* found = (TLInstance*)FEFindInstance(mPresentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(textureName), 0, 0, 0);
         TLImageInstance* texture = found == 0 ? 0 : (TLImageInstance*)found;
         if (texture != 0 && texture->m_pTextureResource != 0)
         {

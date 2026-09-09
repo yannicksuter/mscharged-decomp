@@ -99,45 +99,44 @@ extern "C" void fn_8000F324(AvoidController* controller,
 {
     if (sAvoidControllerType == 0xFFFF)
     {
-        sAvoidControllerType = fn_80338EBC(cache, "AvoidController");
-        fn_80338F88(cache, 15, lbl_80533C98[15].size, 0,
+        sAvoidControllerType = cache->BeginType("AvoidController");
+        cache->AddField(15, gDebugFieldTypes[15].size, 0,
             "m_pFielder");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size,
+        cache->AddField(8, gDebugFieldTypes[8].size,
             (u8*)&controller->m_ThingsToAvoid - (u8*)controller,
             "m_ThingsToAvoid");
-        fn_80338F88(cache, 8, lbl_80533C98[8].size,
+        cache->AddField(8, gDebugFieldTypes[8].size,
             (u8*)&controller->m_CurrentlyAvoiding - (u8*)controller,
             "m_CurrentlyAvoiding");
-        fn_80338F88(cache, 17, lbl_80533C98[17].size,
+        cache->AddField(17, gDebugFieldTypes[17].size,
             (u8*)&controller->m_fRepulsionMult - (u8*)controller,
             "m_fRepulsionMult");
-        fn_80338F88(cache, 16, lbl_80533C98[16].size,
+        cache->AddField(16, gDebugFieldTypes[16].size,
             (u8*)&controller->m_VeryCloseToSideline - (u8*)controller,
             "m_VeryCloseToSideline");
-        fn_80338F88(cache, 16, lbl_80533C98[16].size,
+        cache->AddField(16, gDebugFieldTypes[16].size,
             (u8*)&controller->m_SidelineUnavoidable - (u8*)controller,
             "m_SidelineUnavoidable");
-        fn_80338F88(cache, 21, lbl_80533C98[21].size,
+        cache->AddField(21, gDebugFieldTypes[21].size,
             (u8*)&controller->m_SidelineNormal - (u8*)controller,
             "m_SidelineNormal");
-        fn_80338F88(cache, 21, lbl_80533C98[21].size,
+        cache->AddField(21, gDebugFieldTypes[21].size,
             (u8*)&controller->m_SidelineDirection - (u8*)controller,
             "m_SidelineDirection");
-        fn_80339090(cache, 22, lbl_80533C98[22].size,
+        cache->AddArrayField(22, gDebugFieldTypes[22].size,
             NUM_AVOIDABLES,
             (u8*)&controller->m_LastRepulVec - (u8*)controller,
             "m_LastRepulVec[]");
-        fn_80338F78(cache);
+        cache->EndType();
     }
 
-    AvoidController* copy = (AvoidController*)fn_8033930C(
-        cache, sAvoidControllerType, controller, sizeof(AvoidController));
+    AvoidController* copy = (AvoidController*)cache->WriteData(sAvoidControllerType, controller, sizeof(AvoidController));
     if (copy != 0)
     {
         *(int*)&copy->m_pFielder = controller->m_pFielder == 0
             ? -1
             : controller->m_pFielder->mUnidentified120;
-        fn_80339450(cache, sAvoidControllerType, copy, context);
+        cache->ChecksumData(sAvoidControllerType, copy, context);
     }
 }
 
@@ -327,7 +326,7 @@ void AvoidController::Update(float fDeltaT)
             ++mUnidentified198;
             value = mUnidentified174.UnidentifiedAddOrGet((u32)pObject->mUnidentified008);
             value->UnidentifiedInitialize(pSelf, pObject);
-            value->UnidentifiedUpdate(fDeltaT);
+            value->Update(fDeltaT);
             float fWeight = value->UnidentifiedGetWeight();
             if (fWeight)
             {
@@ -411,7 +410,7 @@ void UnidentifiedAvoidanceCallback_800102A8::UnidentifiedCallback(
     float fWeight = 0.0f;
     if (controller->UnidentifiedCanAvoid(pObject->mType))
     {
-        value->UnidentifiedUpdate(mUnidentified000);
+        value->Update(mUnidentified000);
         fWeight = value->UnidentifiedGetWeight();
     }
     if (fWeight)
@@ -502,7 +501,7 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
         m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
 }
 
-void UnidentifiedAvoidanceValue::UnidentifiedUpdate(float fDeltaT)
+void UnidentifiedAvoidanceValue::Update(float fDeltaT)
 {
     float fUnidentifiedPrevious = mUnidentified018 > 0.0f;
     nlVector3 v3Repulsion = v3Zero;
@@ -548,7 +547,7 @@ void UnidentifiedAvoidanceValue::UnidentifiedUpdate(float fDeltaT)
             mUnidentified018 = fWeight * context.mUnidentified010;
             context.mUnidentified00C *= context.mUnidentified010;
             nlVec3Scale(v3Repulsion, context.mUnidentified000, context.mUnidentified00C);
-            mUnidentified02C.UnidentifiedUpdate(mUnidentified00C, v3Repulsion, fDeltaT);
+            mUnidentified02C.Update(mUnidentified00C, v3Repulsion, fDeltaT);
         }
         else
             fWeight = 0.0f;
@@ -566,7 +565,7 @@ void UnidentifiedAvoidanceValue::UnidentifiedUpdate(float fDeltaT)
         {
             nlVector3 value = mUnidentified02C.UnidentifiedLast();
             nlVec3Scale(value, mUnidentified024.GetSeconds() / 0.3f);
-            mUnidentified02C.UnidentifiedUpdate(mUnidentified00C, value, fDeltaT);
+            mUnidentified02C.Update(mUnidentified00C, value, fDeltaT);
         }
     }
     if (!fUnidentifiedPrevious && mUnidentified018)

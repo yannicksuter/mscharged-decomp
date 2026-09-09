@@ -11,17 +11,13 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
+#include "NL/nlPrint.h"
 
 template <>
 FESceneManager* nlSingleton<FESceneManager>::s_pInstance = 0;
 
 SlotPool<PackagePushPopMessage> PackagePushPopMessage::m_PushPopMessageSlotPool(0x14, 0);
 nlDLListSlotPool<PackagePushPopMessage*> m_pushPopMessageQueue(0x14, 0);
-
-extern int nlPrintf(const char* format, ...);
-
-extern "C" void fn_802FC280();
-extern "C" void fn_802FEA20(FEScene* scene);
 
 FESceneManager::FESceneManager()
     : m_sceneHandlerStack(0x14, 0)
@@ -105,7 +101,7 @@ BaseSceneHandler* FESceneManager::GetSceneHandler(unsigned long hashID)
     return 0;
 }
 
-BaseSceneHandler* FESceneManager::fn_802FECB0()
+BaseSceneHandler* FESceneManager::GetTopSceneHandler()
 {
     if (m_sceneHandlerStack.IsEmpty())
     {
@@ -168,7 +164,7 @@ void FESceneManager::ProcessPushPopQueue()
                 }
             }
 
-            fn_802FEA20(pPackagePushPopMessage->m_pSceneHandler->mFEScene);
+            pPackagePushPopMessage->m_pSceneHandler->mFEScene->ReleaseResourceHandles();
             pPackagePushPopMessage->m_pSceneHandler->mFEScene->UnloadPackage();
 
             FEScene* pFEScene = pPackagePushPopMessage->m_pSceneHandler->mFEScene;
@@ -242,7 +238,7 @@ void FESceneManager::QueueScenePop()
 
 void FESceneManager::RenderActiveScenes()
 {
-    fn_802FC280();
+    FERender::BeginFrame();
 
     if (m_topMostScene != 0)
     {
@@ -278,9 +274,9 @@ void FESceneManager::RenderActiveScenes()
     }
 }
 
-extern "C" void fn_802FF644(FESceneManager* pSceneManager, FEScene* pFEScene)
+void FESceneManager::InitializeScene(FEScene* pFEScene)
 {
-    BaseSceneHandler* pSceneHandler = pSceneManager->GetSceneHandler(pFEScene->m_uHashID);
+    BaseSceneHandler* pSceneHandler = GetSceneHandler(pFEScene->m_uHashID);
     pSceneHandler->SetPresentation(pFEScene->m_pFEPackage->GetPresentation());
     pSceneHandler->SceneCreated();
     pSceneHandler->InitializeSubHandlers();

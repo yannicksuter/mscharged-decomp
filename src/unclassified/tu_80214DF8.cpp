@@ -6,6 +6,7 @@
 #include "Game/NetworkStatsManager.h"
 #include "Game/Render/Presentation.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/FEAudio.h"
 
 
 
@@ -44,14 +45,14 @@ void TU80214DF8Scene::fn_80216048()
 
     int categoryIndex = mUnidentified105C;
     NetworkLeaderboardCategory* category =
-        NetworkStatsManager_8012F378::Instance()->GetCategory(categoryIndex);
+        NetworkStatsManager::Instance()->GetCategory(categoryIndex);
     mUnidentified34 = category->mFirstRank;
 
     if ((mUnidentified105C == 0 || mUnidentified105C == 2) && mUnidentified34 >= 0)
     {
         mUnidentified38 = mUnidentified34 - 5;
         categoryIndex = mUnidentified105C;
-        int maximum = NetworkStatsManager_8012F378::Instance()
+        int maximum = NetworkStatsManager::Instance()
                           ->GetCategory(categoryIndex)
                           ->mCount
             - 10;

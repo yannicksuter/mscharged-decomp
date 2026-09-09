@@ -1,10 +1,11 @@
 #include "Game/NetworkDebug.h"
+#include "Game/OnlinePlayer.h"
 
 #include "Game/NetworkSession.h"
-#include "Game/UnidentifiedTweakValue_8052BED0.h"
+#include "Game/TweakCallback.h"
 #include "NL/gl/glFont.h"
 #include "unclassified/tu_802B7798.h"
-#include "unclassified/tu_80332DC0.h"
+#include "Game/InputRouter.h"
 
 NetworkSessionBase* g_pNetworkSessionBase;
 u8 gNetworkMiiChanged;
@@ -24,7 +25,7 @@ int gNetworkDebugRow = 28;
 
 void NetworkSessionBase::DebugDraw()
 {
-    NetworkSocket_801246E4* socket = GetDirectSocket();
+    NetworkSocket* socket = GetDirectSocket();
     glFontSetFont(0);
     glFontBegin(false);
     int row = g_bDisplayNetworkVerbose ? gNetworkDebugVerboseRow : gNetworkDebugRow;
@@ -53,19 +54,19 @@ void NetworkSessionBase::DebugDraw()
         int state = GetSessionState();
         glFontPrintf(GetDebugFontView(), gNetworkDebugColumn, row++, "Mode: %s %s", mode, sNetworkSessionStateNames[state]);
     }
-    UnidentifiedMachineRoster* roster = GetMachineRoster();
+    NetworkMachineRoster* roster = GetMachineRoster();
     if (roster != 0)
     {
         roster->DebugDraw(gNetworkDebugColumn, &row);
     }
-    UnidentifiedInputRouter* router = fn_803330AC();
+    InputRouter* router = GetInputRouter();
     if (router != 0)
     {
-        router->RouterVirtual30(gNetworkDebugColumn, &row);
+        router->DebugDraw(gNetworkDebugColumn, &row);
     }
     if (socket != 0)
     {
-        socket->SocketVirtual44(gNetworkDebugColumn, &row, g_bDisplayNetworkVerbose);
+        socket->DebugDraw(gNetworkDebugColumn, &row, g_bDisplayNetworkVerbose);
     }
     glFontEnd();
     if (socket != 0)
@@ -76,29 +77,29 @@ void NetworkSessionBase::DebugDraw()
 
 void SetClientServerMode()
 {
-    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     if (roster != 0)
     {
-        roster->RosterVirtual0C(1);
+        roster->SetTopology(1);
     }
 }
 
 void SetPeerToPeerMode()
 {
-    UnidentifiedMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     if (roster != 0)
     {
-        roster->RosterVirtual0C(0);
+        roster->SetTopology(0);
     }
 }
 
-static TweakValueBoolImpl_804F4538 sDisplayNetworkTweak("g_bDisplayNetwork", "Network", &g_bDisplayNetwork, true);
-static TweakValueBoolImpl_804F4538 sDisplayNetworkVerboseTweak("g_bDisplayNetworkVerbose", "Network", &g_bDisplayNetworkVerbose, true);
-static TweakValueBoolImpl_804F4538 sDirectConnectModeTweak("g_bDirectConnectMode", "Network", &g_bDirectConnectMode, true);
-static TweakValueIntImpl_804FD898 sConnectToServerAddress0Tweak("g_nConnectToServerAddress0", "Network", &g_nConnectToServerAddress[0], true);
-static TweakValueIntImpl_804FD898 sConnectToServerAddress1Tweak("g_nConnectToServerAddress1", "Network", &g_nConnectToServerAddress[1], true);
-static TweakValueIntImpl_804FD898 sConnectToServerAddress2Tweak("g_nConnectToServerAddress2", "Network", &g_nConnectToServerAddress[2], true);
-static TweakValueIntImpl_804FD898 sConnectToServerAddress3Tweak("g_nConnectToServerAddress3", "Network", &g_nConnectToServerAddress[3], true);
-static TweakValueIntImpl_804FD898 sConnectToServerPortTweak("g_nConnectToServerPort", "Network", &g_nConnectToServerPort, true);
-static UnidentifiedTweakValue_8052BED0 sClientServerModeTweak("Set Client Server Mode", "Network", SetClientServerMode, true);
-static UnidentifiedTweakValue_8052BED0 sPeerToPeerModeTweak("Set Peer Peer Mode", "Network", SetPeerToPeerMode, true);
+static TweakBoolBinding sDisplayNetworkTweak("g_bDisplayNetwork", "Network", &g_bDisplayNetwork, true);
+static TweakBoolBinding sDisplayNetworkVerboseTweak("g_bDisplayNetworkVerbose", "Network", &g_bDisplayNetworkVerbose, true);
+static TweakBoolBinding sDirectConnectModeTweak("g_bDirectConnectMode", "Network", &g_bDirectConnectMode, true);
+static TweakIntBinding sConnectToServerAddress0Tweak("g_nConnectToServerAddress0", "Network", &g_nConnectToServerAddress[0], true);
+static TweakIntBinding sConnectToServerAddress1Tweak("g_nConnectToServerAddress1", "Network", &g_nConnectToServerAddress[1], true);
+static TweakIntBinding sConnectToServerAddress2Tweak("g_nConnectToServerAddress2", "Network", &g_nConnectToServerAddress[2], true);
+static TweakIntBinding sConnectToServerAddress3Tweak("g_nConnectToServerAddress3", "Network", &g_nConnectToServerAddress[3], true);
+static TweakIntBinding sConnectToServerPortTweak("g_nConnectToServerPort", "Network", &g_nConnectToServerPort, true);
+static TweakCallback sClientServerModeTweak("Set Client Server Mode", "Network", SetClientServerMode, true);
+static TweakCallback sPeerToPeerModeTweak("Set Peer Peer Mode", "Network", SetPeerToPeerMode, true);

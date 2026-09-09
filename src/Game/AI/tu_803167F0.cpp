@@ -49,7 +49,7 @@ public:
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void UnidentifiedUpdate(UnidentifiedDesireUpdate*, float);
+    virtual void Update(UnidentifiedDesireUpdate*, float);
 
     u32 mUnidentified088;
     u32 mUnidentified08C;
@@ -260,7 +260,7 @@ extern "C" void fn_80317010(
     }
     if (runUpdate && fn_800C2BD4(update) != 1)
     {
-        machine->UnidentifiedUpdate(
+        machine->Update(
             (UnidentifiedDesireUpdate*)update, deltaTime);
     }
 }
@@ -315,7 +315,7 @@ bool UnidentifiedStateMachine_803171D0::UnidentifiedInitialize(void*)
     return initialized;
 }
 
-void UnidentifiedStateMachine_803171D0::UnidentifiedUpdate(
+void UnidentifiedStateMachine_803171D0::Update(
     UnidentifiedDesireUpdate* update, float deltaTime)
 {
     if (update->mData.pointer != 0 || mUnidentified08C == 0)

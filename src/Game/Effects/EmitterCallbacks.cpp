@@ -143,7 +143,7 @@ void UpdateEmitterFromBallTrail(EmissionController& controller)
         return;
     }
 
-    if (controller.m_GlView == 0
+    if (controller.m_Replaying == 0
         && ReplayManager::Instance()->mRender != 0)
     {
         LiveBallTrail* trail
@@ -167,7 +167,7 @@ void UpdateEmitterFromBallLandingSpot(EmissionController& controller)
         return;
     }
 
-    if (controller.m_GlView == 0)
+    if (controller.m_Replaying == 0)
     {
         cBall* ball = (cBall*)controller.m_uUserData;
         if (ball->m_v3Position.z > lbl_806DB5A4)
@@ -188,7 +188,7 @@ void UpdateEmitterFromCharacterHead(EmissionController& controller)
         return;
     }
 
-    if (controller.m_GlView == 0
+    if (controller.m_Replaying == 0
         && ReplayManager::Instance()->mRender != 0)
     {
         cCharacter* character = (cCharacter*)controller.m_uUserData;
@@ -224,7 +224,7 @@ void UpdateEmitterFromCharacterBackward(EmissionController& controller)
         return;
     }
 
-    if (controller.m_GlView == 0
+    if (controller.m_Replaying == 0
         && ReplayManager::Instance()->mRender != 0)
     {
         cCharacter* character = (cCharacter*)controller.m_uUserData;
@@ -251,7 +251,7 @@ void UpdateEmitterFromCharacterForward(EmissionController& controller)
         return;
     }
 
-    if (controller.m_GlView == 0
+    if (controller.m_Replaying == 0
         && ReplayManager::Instance()->mRender != 0)
     {
         cCharacter* character = (cCharacter*)controller.m_uUserData;
@@ -272,7 +272,7 @@ void UpdateEmitterFromCharacterForward(EmissionController& controller)
 }
 
 void UpdateEmitterFromImpostorModel(EmissionController& controller,
-    ImpostorModel_802DAEE0* model)
+    ImpostorModel* model)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {

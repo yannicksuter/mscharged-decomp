@@ -1,9 +1,11 @@
 #include "NL/plat/PlatPadManager.h"
+#include "NL/plat/PlatPadStatus.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/BaseGameSceneManager.h"
 
 #include "Game/DB/CharacterInfo.h"
 #include "Game/FE/feFinder.h"
+#include "Game/SH/PointerFinders.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/feScene.h"
 #include "Game/FE/feSceneManager.h"
@@ -82,7 +84,7 @@ void SHNavigation::SceneCreated()
     mHomeWarning->SetVisible(false);
 
     TLComponentInstance* timer = FEFinder<TLComponentInstance, 4>::FindOrDefault(layer, "the_timer");
-    if (GameInfoManager::GetInstance()->GetUserInfo()->IsWidescreen())
+    if (GameInfoManager::GetInstance()->GetUserInfo().IsWidescreen())
     {
         mPlusButton = FEFinder<TLComponentInstance, 4>::FindOrDefault(layer, "+16:9");
         mMinusButton = FEFinder<TLComponentInstance, 4>::FindOrDefault(layer, "-16:9");

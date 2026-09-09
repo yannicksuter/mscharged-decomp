@@ -48,7 +48,7 @@ static inline void ClearCharacterEffectsTexturing()
     pGame = g_pGame;
     if (pGame != NULL)
     {
-        pGame->mUnidentified49C.mEvent10.UnidentifiedDeliver();
+        pGame->mUnidentified49C.mEvent10.Deliver();
         DrawableCharacter::RenderAllCharacters();
     }
 }
@@ -88,11 +88,11 @@ void TransitionTask::StateTransition(u32 from, u32 to)
     {
         if (to == 0x10 && GetPresentation()->mUnidentified164)
         {
-            fn_80278A00(BasicStadium::GetCurrentStadium(), 0x37, 1);
+            BasicStadium::GetCurrentStadium()->SetEffectsActive(0x37, 1);
         }
         else
         {
-            fn_80278A00(BasicStadium::GetCurrentStadium(), 0x37, 0);
+            BasicStadium::GetCurrentStadium()->SetEffectsActive(0x37, 0);
         }
     }
 
@@ -152,7 +152,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
             ClearCharacterEffectsTexturing();
 
             g_pGame->ResetPowerups(false);
-            lbl_806E1608->fn_801ABF8C();
+            gNPCManager->fn_801ABF8C();
             lbl_806E12C8->ResetEffects();
         }
     }
@@ -167,7 +167,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
             ClearCharacterEffectsTexturing();
 
             g_pGame->ResetPowerups(false);
-            lbl_806E1608->fn_801ABF8C();
+            gNPCManager->fn_801ABF8C();
             lbl_806E12C8->ResetEffects();
         }
         else if (to == 1)

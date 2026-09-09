@@ -20,6 +20,7 @@
 #include "NL/nlSlotPool.h"
 
 #include <string.h>
+#include "NL/nlPrint.h"
 
 extern float g_fSimulationTick;
 
@@ -29,8 +30,6 @@ extern "C" UnidentifiedCameraFilter* fn_800EF9F0(void*);
 extern "C" void fn_8005B330(nlVector3*, float, float);
 extern "C" void fn_80277BB0();
 extern "C" void fn_800F0990(float);
-extern void nlPrintf(const char*, ...);
-extern int nlSNPrintf(char*, unsigned long, const char*, ...);
 
 eCameraType g_eCurrentCameraType;
 

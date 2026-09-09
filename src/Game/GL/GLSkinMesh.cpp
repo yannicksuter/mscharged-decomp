@@ -3,50 +3,43 @@
 #include "Game/PoseAccumulator.h"
 #include "NL/nlMemory.h"
 
-extern "C"
-{
-    extern int lbl_806DF408;
-    extern float lbl_806DF40C;
-    extern unsigned char lbl_806E1F40;
-}
-
 GLSkinMesh::~GLSkinMesh()
 {
-    if (m_Unknown10 != 0)
+    if (morphWeights != 0)
     {
-        delete[] m_Unknown10;
+        delete[] morphWeights;
     }
 }
 
-void GLSkinMesh::fn_802D407C(unsigned long count)
+void GLSkinMesh::SetNumMorphs(unsigned long count)
 {
-    if (numMorphs != count || m_Unknown10 == 0)
+    if (numMorphs != count || morphWeights == 0)
     {
         numMorphs = count;
-        if (m_Unknown10 != 0)
+        if (morphWeights != 0)
         {
-            delete[] m_Unknown10;
+            delete[] morphWeights;
         }
-        m_Unknown10 = (UnidentifiedGLSkinMeshEntry*)nlMalloc(
-            count * sizeof(UnidentifiedGLSkinMeshEntry), 8, false);
+        morphWeights = (MorphWeight*)nlMalloc(
+            count * sizeof(MorphWeight), 8, false);
     }
 }
 
-void GLSkinMesh::fn_802D40F4(unsigned long index, unsigned long id)
+void GLSkinMesh::SetMorphID(unsigned long index, unsigned long id)
 {
-    m_Unknown10[index].morphID = id;
+    morphWeights[index].morphID = id;
 }
 
-void GLSkinMesh::fn_802D4104(cPoseAccumulator* pPoseAccumulator)
+void GLSkinMesh::UpdateMorphWeights(cPoseAccumulator* pPoseAccumulator)
 {
-    UnidentifiedGLSkinMeshEntry* morph;
+    MorphWeight* morph;
     bool changed = false;
 
-    if (!lbl_806E1F40)
+    if (!gMorphOverrideEnabled)
     {
         for (unsigned long i = 0; i < numMorphs; ++i)
         {
-            morph = &m_Unknown10[i];
+            morph = &morphWeights[i];
             float morphWeight =
                 pPoseAccumulator->m_MorphWeights.mData[morph->morphID];
             if (morphWeight != morph->morphWeight)
@@ -57,51 +50,51 @@ void GLSkinMesh::fn_802D4104(cPoseAccumulator* pPoseAccumulator)
         }
     }
 
-    m_Unknown1C = changed;
-    fn_802D41D4();
+    morphWeightsChanged = changed;
+    ApplyMorphOverride();
 
     unsigned long count = 0;
     for (unsigned long i = 0; i < numMorphs; ++i)
     {
-        if (m_Unknown10[i].morphWeight > 0.0f)
+        if (morphWeights[i].morphWeight > 0.0f)
         {
             ++count;
         }
     }
-    m_Unknown18 = count;
+    numActiveMorphs = count;
 }
 
-void GLSkinMesh::fn_802D41D4()
+void GLSkinMesh::ApplyMorphOverride()
 {
     bool changed = false;
 
-    if (!lbl_806E1F40)
+    if (!gMorphOverrideEnabled)
     {
         return;
     }
 
     for (unsigned long i = 0; i < numMorphs; ++i)
     {
-        if (lbl_806DF408 != -1
-            && (unsigned long)lbl_806DF408 == m_Unknown10[i].morphID)
+        if (gMorphOverrideID != -1
+            && (unsigned long)gMorphOverrideID == morphWeights[i].morphID)
         {
-            if (lbl_806DF40C != m_Unknown10[i].morphWeight)
+            if (gMorphOverrideWeight != morphWeights[i].morphWeight)
             {
-                m_Unknown10[i].morphWeight = lbl_806DF40C;
+                morphWeights[i].morphWeight = gMorphOverrideWeight;
                 changed = true;
             }
         }
-        else if (0.0f != m_Unknown10[i].morphWeight)
+        else if (0.0f != morphWeights[i].morphWeight)
         {
-            m_Unknown10[i].morphWeight = 0.0f;
+            morphWeights[i].morphWeight = 0.0f;
             changed = true;
         }
     }
 
-    m_Unknown1C = changed;
+    morphWeightsChanged = changed;
 }
 
-void GLSkinMesh::fn_802D4268(glModel* model)
+void GLSkinMesh::SetModel(glModel* model)
 {
     pModel = model;
 }

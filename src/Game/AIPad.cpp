@@ -1,20 +1,23 @@
 #include "Game/AI/AIPad.h"
 
 #include "Game/NetworkSession.h"
-#include "NL/glx/GXMaterialCrystalTweaks.h"
+#include "Game/TweakValueFloat.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFormat.h"
-#include "unclassified/tu_80336B2C.h"
+#include "Game/NetworkInput.h"
+#include "NL/nlPrint.h"
+
+#include <stdlib.h>
 
 static float g_fMovementDeadZone = 0.3f;
 static float g_fCStickDeadZone = 0.5f;
 float lbl_806DB3C8 = 0.5f;
 
-static GXMaterialFloatTweak_804F4190 sTweak_80568410(
+static TweakValueFloat sTweak_80568410(
     "DPD_Sensitivity", "Controller Config/DPD", 1.8f);
-static GXMaterialFloatTweak_804F4190 sTweak_80568430(
+static TweakValueFloat sTweak_80568430(
     "gfLeftShakeThreshold", "Controller Config", 2.5f);
-static GXMaterialFloatTweak_804F4190 sTweak_80568450(
+static TweakValueFloat sTweak_80568450(
     "gfRightShakeThreshold", "Controller Config", 1.33f);
 
 cAIPad AIPadManager::mAIPads[16];
@@ -70,16 +73,16 @@ void AIPadManager::Startup()
     int numGroups = g_pNetworkSessionBase->GetNumMachines();
     for (s8 groupIndex = 0; groupIndex < numGroups; ++groupIndex)
     {
-        UnidentifiedNetworkPeer* group = g_pNetworkSessionBase->GetPeer(groupIndex);
+        NetworkPeer* group = g_pNetworkSessionBase->GetPeer(groupIndex);
         for (s8 controllerIndex = 0;
-            controllerIndex < (int)group->mUnidentified004;
+            controllerIndex < (int)group->mPlayerCount;
             ++controllerIndex)
         {
-            UnidentifiedNetworkPeerChannel* controller
-                = fn_80336B6C(group, controllerIndex);
-            s8 padIndex = fn_80336F68(controllerIndex, groupIndex);
+            NetworkPeerChannel* controller
+                = group->GetNetworkPeerChannel(controllerIndex);
+            s8 padIndex = GetNetworkPlayerId(controllerIndex, groupIndex);
             cAIPad& pad = mAIPads[padIndex];
-            pad.m_pGlobalPad = fn_80336D68(controller);
+            pad.m_pGlobalPad = controller->GetNetworkPeerChannelInput();
 
             if (groupIndex == g_pNetworkSessionBase->GetLocalMachineId())
             {
@@ -94,52 +97,52 @@ cAIPad* GetAIPad(int index)
     return &AIPadManager::mAIPads[index];
 }
 
-GXMaterialFloatTweak_804F4190::~GXMaterialFloatTweak_804F4190()
+TweakValueFloat::~TweakValueFloat()
 {
 }
 
-void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual2C(
-    TweakValueBase_8052BF70* other)
+void TweakValueFloat::UnidentifiedVirtual2C(
+    TweakValueBase* other)
 {
     switch (other->UnidentifiedVirtual10())
     {
     case 1:
-        value = *(float*)((u8*)other + 0x0C);
+        value = ((TweakValueFloat*)other)->value;
         break;
     case 2:
-        value = **(float**)((u8*)other + 0x0C);
+        value = *((TweakFloatBinding*)other)->m_pValue;
         break;
     }
 }
 
-int GXMaterialFloatTweak_804F4190::UnidentifiedVirtual10()
+int TweakValueFloat::UnidentifiedVirtual10()
 {
     return 1;
 }
 
-int GXMaterialFloatTweak_804F4190::UnidentifiedVirtual0C()
+int TweakValueFloat::UnidentifiedVirtual0C()
 {
     return 5;
 }
 
-void* GXMaterialFloatTweak_804F4190::UnidentifiedVirtual20()
+void* TweakValueFloat::UnidentifiedVirtual20()
 {
     return &value;
 }
 
-void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual24(
+void TweakValueFloat::UnidentifiedVirtual24(
     char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%.3f", value);
 }
 
-void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual28(
+void TweakValueFloat::UnidentifiedVirtual28(
     const char* string)
 {
     value = (float)atof(string);
 }
 
-void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual14(
+void TweakValueFloat::UnidentifiedVirtual14(
     float* minimum, float* maximum, float* increment)
 {
     *minimum = 0.0f;
@@ -147,6 +150,6 @@ void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual14(
     *increment = 0.0f;
 }
 
-void GXMaterialFloatTweak_804F4190::UnidentifiedVirtual18()
+void TweakValueFloat::UnidentifiedVirtual18()
 {
 }

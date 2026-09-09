@@ -178,11 +178,11 @@ Game/Game.cpp:
 	.sbss       start:0x806E0C90 end:0x806E0D10
 	.sdata2     start:0x806E3738 end:0x806E37A0
 
-unclassified/tu_80073898.cpp:
+Game/TweakFileLoader.cpp:
 	.text       start:0x80073898 end:0x80073C98
 	.sdata2     start:0x806E37A0 end:0x806E37A8
 
-unclassified/tu_80073C98.cpp:
+Game/GameTweaksManager.cpp:
 	.text       start:0x80073C98 end:0x800742DC
 	.ctors      start:0x804DB528 end:0x804DB52C
 	.data       start:0x804FC7F0 end:0x804FC8C0
@@ -769,7 +769,7 @@ Game/NetworkSession.cpp:
 	.sbss       start:0x806E10E8 end:0x806E1100
 	.sdata2     start:0x806E4720 end:0x806E472C
 
-Game/NetworkSocket_801246E4.cpp:
+Game/NetworkSocket.cpp:
 	.text       start:0x801246E4 end:0x80125254
 	.ctors      start:0x804DB60C end:0x804DB610
 	.data       start:0x8050A938 end:0x8050AC20
@@ -906,9 +906,6 @@ Game/Physics/PhysicsBanana.cpp:
 	.data       start:0x8050E5E8 end:0x8050E680
 	.sdata2     start:0x806E4890 end:0x806E48BC
 
-unclassified/tu_80141AB0.cpp:
-	.text       start:0x80141AB0 end:0x80141B1C
-
 Game/Physics/PhysicsBirdoEgg.cpp:
 	.text       start:0x80141B3C end:0x8014234C
 	.data       start:0x8050E680 end:0x8050E758
@@ -1038,7 +1035,7 @@ Game/CharacterEffects.cpp:
 Game/Drawable/DrawableNetMesh.cpp:
 	.text       start:0x8017AB34 end:0x8017BA64
 	.ctors      start:0x804DB688 end:0x804DB68C
-	.rodata     start:0x804DCCD0 end:0x804DCCE0
+	.rodata     start:0x804DCCD0 end:0x804DCCF0
 	.data       start:0x80511240 end:0x80511298
 	.bss        start:0x80570938 end:0x80570958
 	.sdata      start:0x806DCB38 end:0x806DCB48
@@ -1186,7 +1183,7 @@ Game/EventDataTypes.cpp:
 	.ctors      start:0x804DB6D8 end:0x804DB6DC
 	.bss        start:0x80571248 end:0x80571A18
 
-unclassified/tu_80199880.cpp:
+Game/Render/DiddyBanana.cpp:
 	.text       start:0x80199880 end:0x80199AEC
 	.rodata     start:0x804DCD70 end:0x804DCD7C
 	.data       start:0x80511BB0 end:0x80511BD8
@@ -1200,7 +1197,7 @@ Game/Blinker.cpp:
 	.sdata      start:0x806DCD60 end:0x806DCD68
 	.sdata2     start:0x806E4EB8 end:0x806E4ED0
 
-unclassified/tu_80199E84.cpp:
+Game/Render/BirdoEgg.cpp:
 	.text       start:0x80199E84 end:0x8019A710
 	.ctors      start:0x804DB6E0 end:0x804DB6E4
 
@@ -1288,7 +1285,7 @@ Game/Render/Indicators.cpp:
 	.sbss       start:0x806E1570 end:0x806E1580
 	.sdata2     start:0x806E50C0 end:0x806E5108
 
-unclassified/tu_801A4188.cpp:
+Game/Render/CrowdImpostors.cpp:
 	.text       start:0x801A4188 end:0x801A4EC0
 	.ctors      start:0x804DB70C end:0x804DB710
 	.rodata     start:0x804DCEC0 end:0x804DCF08
@@ -1298,7 +1295,7 @@ unclassified/tu_801A4188.cpp:
 	.sbss       start:0x806E1580 end:0x806E15B8
 	.sdata2     start:0x806E5108 end:0x806E5148
 
-unclassified/tu_801A4EC0.cpp:
+Game/Render/ImpostorLighting.cpp:
 	.text       start:0x801A4EC0 end:0x801A5F10
 	.ctors      start:0x804DB710 end:0x804DB714
 	.data       start:0x80514140 end:0x805141C0
@@ -1420,7 +1417,7 @@ unclassified/tu_801B298C.cpp:
 	.sbss       start:0x806E16B8 end:0x806E16C0
 	.sdata2     start:0x806E5358 end:0x806E5388
 
-unclassified/tu_801B369C.cpp:
+Game/Render/Warble.cpp:
 	.text       start:0x801B369C end:0x801B43F8
 	.ctors      start:0x804DB744 end:0x804DB748
 	.data       start:0x80514750 end:0x805147D0
@@ -1759,7 +1756,7 @@ unclassified/tu_802126F8.cpp:
 	.sdata      start:0x806DDE48 end:0x806DDEA8
 	.sdata2     start:0x806E5898 end:0x806E58A8
 
-unclassified/tu_802141FC.cpp:
+Game/SH/SHCupNews.cpp:
 	.text       start:0x802141FC end:0x80214DF8
 	.rodata     start:0x804E84C0 end:0x804E8520
 	.data       start:0x8051C168 end:0x8051C448
@@ -1806,6 +1803,18 @@ Game/SH/SHMainMenu.cpp:
 	.data       start:0x8051CB80 end:0x8051CE60
 	.sdata      start:0x806DE0D8 end:0x806DE138
 	.sdata2     start:0x806E5910 end:0x806E5918
+
+Game/SH/SHChooseCaptains.cpp:
+	.text       start:0x80222098 end:0x802284B8
+	.data       start:0x8051CE60 end:0x8051D198
+	.sdata      start:0x806DE138 end:0x806DE1D0
+	.sdata2     start:0x806E5918 end:0x806E5938
+
+Game/SH/SHChooseSidekicks.cpp:
+	.text       start:0x802284B8 end:0x8022EF84
+	.data       start:0x8051D198 end:0x8051D5B0
+	.sdata      start:0x806DE1D0 end:0x806DE268
+	.sdata2     start:0x806E5938 end:0x806E5958
 
 Game/FE/feBackButton.cpp:
 	.text       start:0x8022EF84 end:0x8022F710
@@ -1865,15 +1874,12 @@ Game/SH/SHOnlineFriends.cpp:
 	.sdata2     start:0x806E5A20 end:0x806E5A48
 
 Game/SH/SHOnlineMatchmakingDraft.cpp:
-	.text       start:0x802441B4 end:0x80245DB4
-	.data       start:0x8051E3D0 end:0x8051E4A8
-	.sdata      start:0x806DE670 end:0x806DE6B0
-	.sdata2     start:0x806E5A48 end:0x806E5A50
-
-Game/OnlineMatchmakingData.cpp:
-	.text       start:0x80245DB4 end:0x80245DEC
+	.text       start:0x802441B4 end:0x80245F04
 	.ctors      start:0x804DB7AC end:0x804DB7B0
+	.data       start:0x8051E3D0 end:0x8051E4A8
 	.bss        start:0x80578480 end:0x805784A8
+	.sdata      start:0x806DE668 end:0x806DE6B0
+	.sdata2     start:0x806E5A48 end:0x806E5A50
 
 unclassified/tu_80245F04.cpp:
 	.text       start:0x80245F04 end:0x80247350
@@ -1980,7 +1986,7 @@ Game/SH/SHOnlineMiiSelectOverlay.cpp:
 	.text       start:0x802672D4 end:0x8026901C
 	.data       start:0x80520A14 end:0x80520A68
 
-Game/SH/SHSceneBase.cpp:
+Game/SH/SHStrikerTimesBase.cpp:
 	.text       start:0x80269078 end:0x8026B10C
 	.data       start:0x80520A68 end:0x80520CD8
 	.sdata      start:0x806DECB8 end:0x806DED40
@@ -1998,13 +2004,13 @@ Game/MiiManager.cpp:
 	.sdata      start:0x806DEDA0 end:0x806DEDA8
 	.sbss       start:0x806E1908 end:0x806E1910
 
-unclassified/tu_8026F444.cpp:
+Game/SH/SHOnlineConnectionQuality.cpp:
 	.text       start:0x8026F444 end:0x80271960
 	.data       start:0x80520E70 end:0x80520F88
 	.sdata      start:0x806DEDA8 end:0x806DEE20
 	.sdata2     start:0x806E5BF0 end:0x806E5BF4
 
-Game/Render/tu_80271960.cpp:
+Game/Render/HomeButtonFade.cpp:
 	.text       start:0x80271960 end:0x80271C48
 	.ctors      start:0x804DB7C4 end:0x804DB7C8
 	.data       start:0x80520F88 end:0x80520FC0
@@ -2032,14 +2038,21 @@ Game/Render/RLViewData.cpp:
 	.bss        start:0x80578670 end:0x8057A698
 	.sbss       start:0x806E1928 end:0x806E1960
 
-Game/Render/tu_80276264.cpp:
-	.text       start:0x80276724 end:0x80276D10
-	.data       start:0x8052220C end:0x805222A0
-	.bss        start:0x8057A7B8 end:0x8057A9C8
-	.sdata      start:0x806DEE38 end:0x806DEE60
-	.sbss       start:0x806E1970 end:0x806E19A8
+Game/Render/StadiumLoading.cpp:
+	.text       start:0x80276264 end:0x80277E28
+	.ctors      start:0x804DB7CC end:0x804DB7D0
+	.data       start:0x80521CA0 end:0x80522310
+	.bss        start:0x8057A698 end:0x8057AB50
+	.sdata      start:0x806DEE30 end:0x806DEE70
+	.sbss       start:0x806E1960 end:0x806E19A8
 
-Game/Render/tu_80278EA4.cpp:
+Game/BasicStadium.cpp:
+	.text       start:0x80277E28 end:0x80278EA4
+	.ctors      start:0x804DB7D0 end:0x804DB7D4
+	.data       start:0x80522310 end:0x80522428
+	.sdata2     start:0x806E5C48 end:0x806E5C70
+
+Game/Render/StadiumTweaks.cpp:
 	.text       start:0x80278EA4 end:0x8027942C
 	.data       start:0x80522428 end:0x80522528
 	.sdata      start:0x806DEE70 end:0x806DEE78
@@ -2068,6 +2081,21 @@ Game/Render/Nis.cpp:
 	.sdata      start:0x806DEF28 end:0x806DEF60
 	.sbss       start:0x806E19D8 end:0x806E1A20
 	.sdata2     start:0x806E5CF8 end:0x806E5D18
+
+Game/Render/tu_80283D9C.cpp:
+	.text       start:0x80283D9C end:0x80284A00
+	.data       start:0x805237F0 end:0x80523898
+	.sdata      start:0x806DEF60 end:0x806DEF80
+	.sdata2     start:0x806E5D18 end:0x806E5D40
+
+unclassified/tu_80284A58.cpp:
+	.text       start:0x80284A58 end:0x8028A98C
+	.ctors      start:0x804DB7F4 end:0x804DB7F8
+	.data       start:0x80523898 end:0x805240B0
+	.bss        start:0x8057ABB0 end:0x8057AD48
+	.sdata      start:0x806DEF80 end:0x806DEFE0
+	.sbss       start:0x806E1A20 end:0x806E1A50
+	.sdata2     start:0x806E5D40 end:0x806E5D98
 
 NL/glx/GXMaterialProgramSupport_8028A98C.cpp:
 	.text       start:0x8028A98C end:0x8028B1DC
@@ -2139,7 +2167,7 @@ NL/glx/GXMaterialProgramSupport_8028F79C.cpp:
 	.bss        start:0x8057AFD8 end:0x8057B018
 	.sbss       start:0x806E1B08 end:0x806E1B10
 
-NL/glx/GXMaterialProgramSupport_8028F9AC.cpp:
+NL/glx/GXCrystalMaterialProgramRender.cpp:
 	.text       start:0x8028F9AC end:0x8029003C
 	.ctors      start:0x804DB81C end:0x804DB820
 	.data       start:0x80524320 end:0x80524370
@@ -2260,7 +2288,7 @@ NL/glx/GXMaterialProgramSupport_802977EC.cpp:
 	.sbss       start:0x806E1BE8 end:0x806E1BF8
 	.sdata2     start:0x806E5F58 end:0x806E5F70
 
-NL/glx/GXMaterialProgramSupport_80298074.cpp:
+NL/glx/GXWarbleMaterialProgramRender.cpp:
 	.text       start:0x80297F70 end:0x802981D0
 	.data       start:0x80524420 end:0x80524470
 	.sbss       start:0x806E1BF8 end:0x806E1C00
@@ -2310,7 +2338,7 @@ NL/glx/GXMaterialProgram_80299A90.cpp:
 	.data       start:0x80524A60 end:0x80524AA0
 	.sbss       start:0x806E1C40 end:0x806E1C48
 
-NL/glx/GXMaterialProgram_80299CA0.cpp:
+NL/glx/GXCrystalMaterialProgram.cpp:
 	.text       start:0x80299CA0 end:0x8029A4A0
 	.ctors      start:0x804DB88C end:0x804DB890
 	.data       start:0x80524AA0 end:0x80524B28
@@ -2403,7 +2431,7 @@ NL/glx/GXMaterialProgram_802A01CC.cpp:
 	.data       start:0x805254F0 end:0x80525530
 	.sbss       start:0x806E1CD0 end:0x806E1CD8
 
-NL/glx/GXMaterialProgram_802A05A4.cpp:
+NL/glx/GXWarbleMaterialProgram.cpp:
 	.text       start:0x802A05A4 end:0x802A09F4
 	.data       start:0x80525530 end:0x80525568
 	.sbss       start:0x806E1CD8 end:0x806E1CE0
@@ -2416,7 +2444,7 @@ Game/AnimProps/goalieanimproperties.cpp:
 	.data       start:0x80527A18 end:0x8052A878
 	.sdata      start:0x806DF120 end:0x806DF190
 
-NL/glx/GXMaterialProgramRegistry_802A0A14.cpp:
+NL/glx/GXMaterialProgramRegistry.cpp:
 	.text       start:0x802A0A14 end:0x802A0EE4
 
 NL/gl/tu_802A0F04.cpp:
@@ -2428,7 +2456,7 @@ NL/gl/tu_802A12E4.cpp:
 NL/gl/glMultiTextureModelWriter.cpp:
 	.text       start:0x802A15D4 end:0x802A193C
 
-Game/GL/ModelWriter_802A1BF4.cpp:
+Game/GL/GLWarbleMeshWriter.cpp:
 	.text       start:0x802A1BF4 end:0x802A1EC4
 
 NL/glx/GXMaterialProgramSupport_802A1EE4.cpp:
@@ -2438,7 +2466,7 @@ NL/glx/GXMaterialProgramSupport_802A2054.cpp:
 	.text       start:0x802A2054 end:0x802A2200
 	.sdata2     start:0x806E5F80 end:0x806E5F84
 
-NL/glx/GXMaterialProgramSupport_802A2220.cpp:
+NL/glx/GXConstantColourMaterialProgramRender.cpp:
 	.text       start:0x802A2220 end:0x802A23D4
 	.sdata2     start:0x806E5F88 end:0x806E5F8C
 
@@ -2481,7 +2509,7 @@ NL/glx/GXMaterialProgramSupport_802A33E0.cpp:
 NL/glx/GXMaterialProgramSupport_802A362C.cpp:
 	.text       start:0x802A362C end:0x802A3718
 
-NL/glx/GXMaterialProgramSupport_802A3738.cpp:
+NL/glx/GXShadowVolumeMaterialProgramRender.cpp:
 	.text       start:0x802A3738 end:0x802A3D9C
 	.ctors      start:0x804DB924 end:0x804DB928
 	.data       start:0x8052A878 end:0x8052A890
@@ -2499,7 +2527,7 @@ NL/glx/GXMaterialProgram_802A3EF0.cpp:
 	.data       start:0x8052A890 end:0x8052A8C8
 	.sbss       start:0x806E1CE8 end:0x806E1CF0
 
-NL/glx/GXMaterialProgram_802A4360.cpp:
+NL/glx/GXConstantColourMaterialProgram.cpp:
 	.text       start:0x802A4360 end:0x802A4724
 	.data       start:0x8052A8C8 end:0x8052A908
 	.sbss       start:0x806E1CF0 end:0x806E1CF8
@@ -2559,7 +2587,7 @@ NL/glx/GXMaterialProgram_802A6FDC.cpp:
 	.data       start:0x8052ABE0 end:0x8052AC08
 	.sbss       start:0x806E1D48 end:0x806E1D50
 
-NL/glx/GXMaterialProgram_802A73B0.cpp:
+NL/glx/GXShadowVolumeMaterialProgram.cpp:
 	.text       start:0x802A73B0 end:0x802A7800
 	.data       start:0x8052AC08 end:0x8052AC48
 	.sbss       start:0x806E1D50 end:0x806E1D58
@@ -2590,7 +2618,7 @@ Game/GL/GLShadowBlendMeshWriter.cpp:
 NL/nlAVLTree.cpp:
 	.text       start:0x802A8D80 end:0x802A99D8
 
-NL/tu_802A99D8.cpp:
+NL/InflateStream.cpp:
 	.text       start:0x802A99D8 end:0x802A9B8C
 	.sdata      start:0x806DF1B8 end:0x806DF1C0
 	.sbss       start:0x806E1D60 end:0x806E1D70
@@ -2684,11 +2712,11 @@ NL/nlFile.cpp:
 	.data       start:0x8052B538 end:0x8052B54C
 	.sbss       start:0x806E1D98 end:0x806E1D9C
 
-NL/tu_802B3C28.cpp:
+NL/nlCompressedFile.cpp:
 	.text       start:0x802B3C28 end:0x802B41B4
 	.sbss       start:0x806E1D9C end:0x806E1DA0
 
-NL/tu_802B41B4.cpp:
+NL/nlAsyncFileBuffer.cpp:
 	.text       start:0x802B41B4 end:0x802B4474
 
 NL/nlTime.cpp:
@@ -2880,7 +2908,7 @@ Game/TweakNode.cpp:
 	.bss        start:0x8057C6D8 end:0x8057C728
 	.sdata      start:0x806DF350 end:0x806DF360
 
-Game/UnidentifiedTweakValue_8052BED0.cpp:
+Game/TweakCallback.cpp:
 	.text       start:0x802C4DF0 end:0x802C4F94
 	.ctors      start:0x804DB9C4 end:0x804DB9C8
 	.data       start:0x8052BED0 end:0x8052BF00
@@ -2890,6 +2918,7 @@ Game/UnidentifiedTweakValue_8052BED0.cpp:
 Game/TweakValue.cpp:
 	.text       start:0x802C4F94 end:0x802C5248
 	.ctors      start:0x804DB9C8 end:0x804DB9CC
+	.sdata2     start:0x806E62D0 end:0x806E62D8
 
 Game/TweakEntry.cpp:
 	.text       start:0x802C5248 end:0x802C6124
@@ -2897,7 +2926,7 @@ Game/TweakEntry.cpp:
 	.data       start:0x8052BF00 end:0x8052BF20
 	.bss        start:0x8057C728 end:0x8057C778
 
-Game/tu_802C6224.cpp:
+Game/TweakConfig.cpp:
 	.text       start:0x802C6224 end:0x802C7480
 	.ctors      start:0x804DB9D0 end:0x804DB9D4
 	.data       start:0x8052BF20 end:0x8052BF70
@@ -2955,7 +2984,7 @@ NL/gl/glMemory.cpp:
 NL/gl/glModel.cpp:
 	.text       start:0x802CC0EC end:0x802CC370
 
-NL/gl/tu_802CC370.cpp:
+NL/gl/glMaterialParameters.cpp:
 	.text       start:0x802CC370 end:0x802CCA58
 
 NL/gl/glStat.cpp:
@@ -2999,7 +3028,7 @@ NL/gl/glView.cpp:
 	.sbss       start:0x806E1F38 end:0x806E1F40
 	.sdata2     start:0x806E6350 end:0x806E6368
 
-NL/gl/tu_802D0458.cpp:
+NL/gl/glResourceLoader.cpp:
 	.text       start:0x802D0458 end:0x802D0864
 
 Game/GL/GLInventory.cpp:
@@ -3023,7 +3052,7 @@ Game/GL/GLSkinMesh.cpp:
 	.data       start:0x8052E758 end:0x8052E778
 	.sdata2     start:0x806E6388 end:0x806E6390
 
-Game/Render/tu_802D4290.cpp:
+Game/Render/ImpostorSprite.cpp:
 	.text       start:0x802D4290 end:0x802D5720
 	.data       start:0x8052E778 end:0x8052E818
 	.sdata      start:0x806DF410 end:0x806DF428
@@ -3053,7 +3082,7 @@ Game/Render/ImpostorCharacter.cpp:
 	.sbss       start:0x806E1F68 end:0x806E1F6C
 	.sdata2     start:0x806E63F0 end:0x806E642C
 
-Game/Render/tu_802D818C.cpp:
+Game/Render/ImpostorCluster.cpp:
 	.text       start:0x802D818C end:0x802D88F4
 	.ctors      start:0x804DBA08 end:0x804DBA0C
 	.rodata     start:0x804EB2F8 end:0x804EB310
@@ -3061,7 +3090,7 @@ Game/Render/tu_802D818C.cpp:
 	.bss        start:0x8057F350 end:0x8057F410
 	.sdata2     start:0x806E6430 end:0x806E6448
 
-Game/Render/tu_802D88F4.cpp:
+Game/Render/CrowdImpostorManager.cpp:
 	.text       start:0x802D88F4 end:0x802DAEE0
 	.ctors      start:0x804DBA0C end:0x804DBA10
 	.rodata     start:0x804EB310 end:0x804EB320
@@ -3071,20 +3100,20 @@ Game/Render/tu_802D88F4.cpp:
 	.sbss       start:0x806E1F70 end:0x806E1F80
 	.sdata2     start:0x806E6448 end:0x806E6478
 
-Game/Render/tu_802DAEE0.cpp:
+Game/Render/ImpostorModel.cpp:
 	.text       start:0x802DAEE0 end:0x802DB930
 	.ctors      start:0x804DBA10 end:0x804DBA14
 	.data       start:0x8052EC78 end:0x8052ECA8
 	.bss        start:0x8057F580 end:0x8057F5A8
 	.sdata2     start:0x806E6478 end:0x806E6480
 
-Game/Render/tu_802DB930.cpp:
+Game/Render/CrowdModelCollection.cpp:
 	.text       start:0x802DB930 end:0x802DCD94
 	.data       start:0x8052ECA8 end:0x8052ECF0
 	.sdata      start:0x806DF448 end:0x806DF450
 	.sbss       start:0x806E1F80 end:0x806E1F90
 
-Game/Render/tu_802DCDB4.cpp:
+Game/Render/WorldNPC.cpp:
 	.text       start:0x802DCDB4 end:0x802DE264
 	.rodata     start:0x804EB320 end:0x804EB350
 	.data       start:0x8052ECF0 end:0x8052EDC8
@@ -3114,8 +3143,9 @@ Game/Effects/ParticleSystem.cpp:
 	.sbss       start:0x806E1F98 end:0x806E1FC8
 	.sdata2     start:0x806E64C0 end:0x806E6550
 
-unclassified/tu_802E3D4C.cpp:
+Game/Effects/EffectsGroup.cpp:
 	.text       start:0x802E3D4C end:0x802E4338
+	.sdata2     start:0x806E6550 end:0x806E6558
 
 Game/Effects/EmissionController.cpp:
 	.text       start:0x802E4358 end:0x802E5B40
@@ -3144,14 +3174,6 @@ Game/Audio/Transition.cpp:
 Game/Audio/AudioBankTable.cpp:
 	.text       start:0x802EB644 end:0x802EBD54
 	.data       start:0x8052F3D8 end:0x8052F400
-
-Game/Audio/AudioSystem.cpp:
-	.text       start:0x802EBD54 end:0x802ED144
-	.ctors      start:0x804DBA3C end:0x804DBA40
-	.data       start:0x8052F400 end:0x8052F48A
-	.bss        start:0x8057F928 end:0x8057F960
-	.sbss       start:0x806E2018 end:0x806E2020
-	.sdata2     start:0x806E65B0 end:0x806E65B8
 
 Game/Audio/AudioResourceLoadOwner.cpp:
 	.text       start:0x802ED144 end:0x802ED678
@@ -3196,17 +3218,6 @@ unclassified/tu_802F2110.cpp:
 
 unclassified/tu_802F2C3C.cpp:
 	.text       start:0x802F2C3C end:0x802F39EC
-
-unclassified/tu_802F6BC4.cpp:
-	.text       start:0x802F6BC4 end:0x802F841C
-	.ctors      start:0x804DBA70 end:0x804DBA74
-	.data       start:0x8052F978 end:0x8052F998
-	.bss        start:0x8057FBC8 end:0x8057FBF0
-
-unclassified/tu_802F841C.cpp:
-	.text       start:0x802F841C end:0x802F98F4
-	.data       start:0x8052F998 end:0x8052F9EC
-	.sdata      start:0x806DF4F0 end:0x806DF4F1
 
 Game/Audio/AudioRuntimeGroup.cpp:
 	.text       start:0x802F98F4 end:0x802F9CD8
@@ -3288,10 +3299,10 @@ Game/FE/fePointer.cpp:
 Game/FE/tlComponent.cpp:
 	.text       start:0x80301D68 end:0x80301F3C
 
-Game/FE/tu_80301F3C.cpp:
+Game/FE/feGroup.cpp:
 	.text       start:0x80301F3C end:0x80301F74
 
-Game/FE/tu_80301FAC.cpp:
+Game/FE/feLayer.cpp:
 	.text       start:0x80301FAC end:0x80301FE4
 
 Game/FE/feLibObject.cpp:
@@ -3348,15 +3359,18 @@ Game/FE/BaseSceneHandler.cpp:
 	.text       start:0x803060FC end:0x8030616C
 	.data       start:0x8052FF10 end:0x8052FF40
 
+Game/FE/feFinder.cpp:
+	.text       start:0x8030677C end:0x80306B34
+
 Game/Font/fontmanager.cpp:
-	.text       start:0x8030616C end:0x80307564
+	.text       start:0x80306B34 end:0x80307564
 	.ctors      start:0x804DBA8C end:0x804DBA90
 	.data       start:0x8052FF64 end:0x8052FF98
 	.bss        start:0x80580748 end:0x80584048
 	.sbss       start:0x806E2090 end:0x806E2098
 	.sdata2     start:0x806E6768 end:0x806E6770
 
-NL/UnknownHashTable_80307620.cpp:
+NL/PointerEntryTable.cpp:
 	.text       start:0x80307620 end:0x803077B4
 	.data       start:0x8052FFA8 end:0x8052FFB8
 	.bss        start:0x80584048 end:0x805840C8
@@ -3554,16 +3568,16 @@ NL/blowfish.cpp:
 	.text       start:0x80322924 end:0x80323638
 	.data       start:0x80530780 end:0x805317C8
 
-Game/MessageSerializer_80323638.cpp:
+Game/NetworkMessageSerializer.cpp:
 	.text       start:0x80323638 end:0x803236CC
 
-Game/NetworkRandom_803236CC.cpp:
+Game/NetworkRandom.cpp:
 	.text       start:0x803236CC end:0x803239A8
 	.rodata     start:0x804EB428 end:0x804EB440
 	.sbss       start:0x806E20D0 end:0x806E20D8
 	.sdata2     start:0x806E6920 end:0x806E6928
 
-Game/NetworkDiagnostics_803239A8.cpp:
+Game/NetworkDiagnostics.cpp:
 	.text       start:0x803239A8 end:0x80323B2C
 	.data       start:0x805317C8 end:0x805317E8
 	.sdata      start:0x806DF628 end:0x806DF638
@@ -3576,34 +3590,34 @@ Game/NetworkDebug.cpp:
 	.sdata      start:0x806DF638 end:0x806DF6A0
 	.sbss       start:0x806E20D8 end:0x806E20E8
 
-unclassified/tu_8032452C.cpp:
+NL/plat/ReliableSocket.cpp:
 	.text       start:0x8032452C end:0x803263E4
 	.ctors      start:0x804DBAC4 end:0x804DBAC8
 
-unclassified/tu_803263E4.cpp:
+NL/plat/TransportPacket.cpp:
 	.text       start:0x803263E4 end:0x80326844
 	.ctors      start:0x804DBAC8 end:0x804DBACC
 	.bss        start:0x805847E0 end:0x80584808
 
-unclassified/tu_80326844.cpp:
+NL/plat/TransportConnection.cpp:
 	.text       start:0x80326844 end:0x8032B6D4
 	.ctors      start:0x804DBACC end:0x804DBAD0
 	.data       start:0x80531DE0 end:0x80532378
 	.bss        start:0x80584808 end:0x80584830
 	.sdata      start:0x806DF6F8 end:0x806DF708
 
-unclassified/tu_8032B6D4.cpp:
+NL/plat/TransportMessage.cpp:
 	.text       start:0x8032B6D4 end:0x8032C7D0
 	.ctors      start:0x804DBAD0 end:0x804DBAD4
 	.bss        start:0x80584830 end:0x80584858
 	.sbss       start:0x806E20F8 end:0x806E2100
 
-Game/MessageRegistry_8032C7D0.cpp:
+Game/NetworkMessageRegistry.cpp:
 	.text       start:0x8032C7D0 end:0x8032CA4C
 	.data       start:0x80532510 end:0x80532590
 	.sbss       start:0x806E2100 end:0x806E2108
 
-Game/NetworkTransport_8032CA4C.cpp:
+Game/LANLobby.cpp:
 	.text       start:0x8032CA4C end:0x80330430
 	.ctors      start:0x804DBAD4 end:0x804DBAD8
 	.data       start:0x80532590 end:0x80533358
@@ -3611,21 +3625,21 @@ Game/NetworkTransport_8032CA4C.cpp:
 	.sdata      start:0x806DF710 end:0x806DF740
 	.sdata2     start:0x806E6938 end:0x806E6940
 
-unclassified/tu_80330430.cpp:
+Game/LANMessageRegistry.cpp:
 	.text       start:0x80330430 end:0x80330978
 	.ctors      start:0x804DBAD8 end:0x804DBADC
 	.data       start:0x80533358 end:0x805333C8
 	.sbss       start:0x806E2108 end:0x806E212C
 
-Game/NetworkMessages_80330978.cpp:
+Game/LANDiscoveryMessages.cpp:
 	.text       start:0x80330978 end:0x80330BC8
 	.data       start:0x805333C8 end:0x805333F0
 
-Game/NetworkMessages_80330BC8.cpp:
+Game/LANConnectionMessages.cpp:
 	.text       start:0x80330BC8 end:0x80331668
 	.data       start:0x805333F0 end:0x80533480
 
-Game/NetworkInput_80331668.cpp:
+Game/PackedDetInput.cpp:
 	.text       start:0x80331668 end:0x803319AC
 	.sdata2     start:0x806E6940 end:0x806E6958
 
@@ -3637,14 +3651,14 @@ Game/DetermDataEvent.cpp:
 Game/DetInput.cpp:
 	.text       start:0x80331BE4 end:0x80332770
 
-unclassified/tu_80332770.cpp:
+Game/InputManager.cpp:
 	.text       start:0x80332770 end:0x80332DC0
 	.ctors      start:0x804DBAE0 end:0x804DBAE4
 	.data       start:0x80533480 end:0x80533508
 	.sbss       start:0x806E2138 end:0x806E214C
 	.sdata2     start:0x806E6970 end:0x806E6978
 
-unclassified/tu_80332DC0.cpp:
+Game/InputRouter.cpp:
 	.text       start:0x80332DC0 end:0x80336B6C
 	.ctors      start:0x804DBAE4 end:0x804DBAE8
 	.data       start:0x80533508 end:0x80533BB8
@@ -3652,7 +3666,7 @@ unclassified/tu_80332DC0.cpp:
 	.sdata      start:0x806DF748 end:0x806DF7A8
 	.sbss       start:0x806E2150 end:0x806E2160
 
-unclassified/tu_80336B2C.cpp:
+Game/NetworkInput.cpp:
 	.text       start:0x80336B6C end:0x80338898
 	.ctors      start:0x804DBAE8 end:0x804DBAEC
 	.data       start:0x80533BB8 end:0x80533C00
@@ -3660,7 +3674,7 @@ unclassified/tu_80336B2C.cpp:
 	.sdata      start:0x806DF7A8 end:0x806DF7B0
 	.sbss       start:0x806E2160 end:0x806E2168
 
-unclassified/tu_80338898.cpp:
+Game/NetworkSync.cpp:
 	.text       start:0x80338898 end:0x80338AE8
 	.data       start:0x80533C00 end:0x80533C18
 	.bss        start:0x80584B88 end:0x80584BA8
@@ -3959,6 +3973,12 @@ NL/plat/WiiClassicPad.cpp:
 	.sbss       start:0x806E2290 end:0x806E22A0
 	.sdata2     start:0x806E6CD0 end:0x806E6CE8
 
+NL/plat/GameCubePad.cpp:
+	.text       start:0x80365D90 end:0x80365E84
+	.ctors      start:0x804DBB3C end:0x804DBB40
+	.bss        start:0x80588F70 end:0x80589360
+	.sbss       start:0x806E22A0 end:0x806E22B0
+
 NL/plat/SwappablePad.cpp:
 	.text       start:0x80365E84 end:0x80366994
 	.ctors      start:0x804DBB40 end:0x804DBB44
@@ -3984,7 +4004,7 @@ NL/plat/platvmath.cpp:
 	.text       start:0x80368784 end:0x80368E00
 	.sdata2     start:0x806E6D08 end:0x806E6D14
 
-NL/gl/tu_80368E00.cpp:
+NL/gl/glMemoryInit.cpp:
 	.text       start:0x80368E00 end:0x80368E64
 	.sdata      start:0x806DFA58 end:0x806DFA60
 
@@ -4005,7 +4025,7 @@ NL/glx/glxLoadModel.cpp:
 	.data       start:0x805353B8 end:0x805353F0
 	.sdata2     start:0x806E6D30 end:0x806E6D38
 
-NL/glx/tu_8036A800.cpp:
+NL/glx/glxLight.cpp:
 	.text       start:0x8036A800 end:0x8036AC9C
 	.bss        start:0x80589DF8 end:0x8058A1F8
 	.sdata2     start:0x806E6D38 end:0x806E6D50
@@ -4037,11 +4057,11 @@ NL/nlEndian.cpp:
 unclassified/tu_8036D6F8.cpp:
 	.text       start:0x8036D6F8 end:0x8036D754
 
-NL/glx/tu_8036D774.cpp:
+NL/glx/glxSkinMatrix.cpp:
 	.text       start:0x8036D774 end:0x8036D894
 	.data       start:0x80535588 end:0x805355B0
 
-NL/glx/tu_8036D894.cpp:
+NL/glx/glxTarget.cpp:
 	.text       start:0x8036D894 end:0x8036DF68
 	.data       start:0x805355B0 end:0x805355D8
 	.bss        start:0x8058A520 end:0x8059BD20 align:32

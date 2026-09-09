@@ -9,11 +9,12 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
-#include "NL/gl/tu_802CC370.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
+#include "Game/Render/RLViewLayers.h"
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
@@ -428,9 +429,9 @@ void UnidentifiedNumberDisplay_801AE530::fn_801AEE80(
     glModelPacket* packet = model->packets;
     while (packet < model->packets + model->numPackets)
     {
-        if (fn_802CC8FC(packet, constantColourHash))
+        if (glHasMaterialParameter(packet, constantColourHash))
         {
-            fn_802CC3C8(packet, constantColourHash, &colour, 4);
+            glSetMaterialParameterArray(packet, constantColourHash, &colour, 4);
         }
         glSetRasterState(packet->rasterState, GLS_Culling, 0);
         glSetRasterState(packet->rasterState, GLS_AlphaBlend, 1);

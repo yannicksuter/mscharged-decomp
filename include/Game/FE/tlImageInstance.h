@@ -15,4 +15,6 @@ public:
     /* 0x94 */ unsigned long field_0x94;
 }; // size 0x98
 
+extern TLImageInstance gDefaultTLImageInstance;
+
 #endif // GAME_FE_TL_IMAGE_INSTANCE_H

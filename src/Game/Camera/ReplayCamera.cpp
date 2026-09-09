@@ -11,6 +11,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlTask.h"
 #include "NL/gl/glMatrix.h"
+#include "Game/Render/RLViewLayers.h"
 
 extern "C" float fn_800F2410(float fov);
 

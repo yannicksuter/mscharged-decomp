@@ -1,5 +1,5 @@
-#ifndef NL_PLAT_SOCKET_NETWORK_H
-#define NL_PLAT_SOCKET_NETWORK_H
+#ifndef NL_PLAT_SOCKET_STARTUP_H
+#define NL_PLAT_SOCKET_STARTUP_H
 
 void SocketNetworkInitializeMemory();
 void SocketNetworkStartup();
@@ -9,4 +9,4 @@ int SocketNetworkGetLastError();
 void SocketNetworkStartupAsync();
 bool SocketNetworkIsStartupComplete();
 
-#endif // NL_PLAT_SOCKET_NETWORK_H
+#endif // NL_PLAT_SOCKET_STARTUP_H

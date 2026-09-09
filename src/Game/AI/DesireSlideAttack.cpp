@@ -50,7 +50,7 @@ bool DesireSlideAttack::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0xB8 | 0x800C7E94 | size: 0x638
  */
-void DesireSlideAttack::UnidentifiedUpdate(
+void DesireSlideAttack::Update(
     UnidentifiedDesireUpdate* update, float)
 {
     cFielder* pFielder = mUnidentifiedFielder;
@@ -152,21 +152,21 @@ void DesireSlideAttack::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
-        = fn_80338EBC(cache, "DesireSlideAttack");
-    fn_80338F88(cache, 22, lbl_80533C98[22].size,
+        = cache->BeginType("DesireSlideAttack");
+    cache->AddField(22, gDebugFieldTypes[22].size,
         0, "mvDesiredPosition");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
         "mTurboRequest");
-    fn_80338F88(cache, 20, lbl_80533C98[20].size,
+    cache->AddField(20, gDebugFieldTypes[20].size,
         (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
         "mThinkTimer");
-    fn_80338F88(cache, 15, lbl_80533C98[15].size,
+    cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpTarget - (u8*)&mvDesiredPosition, "mpTarget");
-    fn_80338F88(cache, 14, lbl_80533C98[14].size,
+    cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&meDesireSubState - (u8*)&mvDesiredPosition,
         "meDesireSubState");
-    fn_80338F78(cache);
+    cache->EndType();
 }
 
 /**
@@ -181,7 +181,7 @@ void DesireSlideAttack::UnidentifiedVirtual7(
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = fn_8033930C(cache, sDesireSlideAttackType,
+    void* data = cache->WriteData(sDesireSlideAttackType,
         (u8*)this + offset, sizeof(DesireSlideAttack) - offset);
     if (data != NULL)
     {
@@ -189,7 +189,6 @@ void DesireSlideAttack::UnidentifiedVirtual7(
             = (DesireSlideAttack*)((u8*)data - offset);
         *(int*)&copy->mpTarget
             = mpTarget == NULL ? -1 : mpTarget->mUnidentified120;
-        fn_80339450(
-            cache, sDesireSlideAttackType, data, context);
+        cache->ChecksumData(sDesireSlideAttackType, data, context);
     }
 }

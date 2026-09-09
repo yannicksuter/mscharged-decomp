@@ -12,8 +12,8 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
-#include "unclassified/tu_80276264.h"
-#include "unclassified/tu_80338898.h"
+#include "Game/Render/StadiumLoading.h"
+#include "Game/NetworkSync.h"
 
 #include <math.h>
 #include <string.h>
@@ -233,14 +233,14 @@ void NetMesh::Reset(bool usePhysicsBall)
         mfMotion = 0.0f;
         mJolt = 0.0f;
 
-        DebugWriteCache* output = fn_80338950(lbl_806E2168);
+        DebugWriteCache* output = gNetworkSyncState->GetWriteCache();
         if (output != 0)
         {
             NetMeshFrameProvider* frameProvider = GetFixedUpdateTask();
             unsigned int frame = frameProvider->GetFrame();
             char buffer[256];
             nlSNPrintf(buffer, sizeof(buffer), sResetFormat, mbPositiveEnd, mbUsePhysicsBall, frame);
-            fn_8033919C(output, buffer);
+            output->WriteText(buffer);
         }
     }
 }
@@ -266,41 +266,41 @@ void NetMesh::SyncLog(void* context, DebugWriteCache* cache)
 
     if (s_GenDetNetMeshType.type == 0xFFFF)
     {
-        s_GenDetNetMeshType.type = fn_80338EBC(cache, sGenDetNetMeshName);
-        fn_80338F88(cache, 2, lbl_80533C98[2].size, 0, sPosCRCName);
-        fn_80338F88(cache, 2, lbl_80533C98[2].size, (unsigned char*)&crcs.previousPosition - (unsigned char*)&crcs, sPrevPosCRCName);
-        fn_80338F88(cache, 2, lbl_80533C98[2].size, (unsigned char*)&crcs.accel - (unsigned char*)&crcs, sAccelCRCName);
-        fn_80338F88(cache, 2, lbl_80533C98[2].size, (unsigned char*)&crcs.restPosition - (unsigned char*)&crcs, sRestPositionCRCName);
-        fn_80338F78(cache);
+        s_GenDetNetMeshType.type = cache->BeginType(sGenDetNetMeshName);
+        cache->AddField(2, gDebugFieldTypes[2].size, 0, sPosCRCName);
+        cache->AddField(2, gDebugFieldTypes[2].size, (unsigned char*)&crcs.previousPosition - (unsigned char*)&crcs, sPrevPosCRCName);
+        cache->AddField(2, gDebugFieldTypes[2].size, (unsigned char*)&crcs.accel - (unsigned char*)&crcs, sAccelCRCName);
+        cache->AddField(2, gDebugFieldTypes[2].size, (unsigned char*)&crcs.restPosition - (unsigned char*)&crcs, sRestPositionCRCName);
+        cache->EndType();
     }
 
-    fn_80339450(cache, s_GenDetNetMeshType.type, &crcs, context);
-    fn_8033930C(cache, s_GenDetNetMeshType.type, &crcs, sizeof(crcs));
+    cache->ChecksumData(s_GenDetNetMeshType.type, &crcs, context);
+    cache->WriteData(s_GenDetNetMeshType.type, &crcs, sizeof(crcs));
 
     if (s_DetMeshType.type == 0xFFFF)
     {
-        s_DetMeshType.type = fn_80338EBC(cache, sDetMeshName);
-        fn_80338F88(cache, 16, lbl_80533C98[16].size, 0, sPositiveEndName);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (unsigned char*)&m_NumParticles - (unsigned char*)&mbPositiveEnd, sNumParticlesName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (unsigned char*)&mfMinX - (unsigned char*)&mbPositiveEnd, sMinXName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (unsigned char*)&mfMaxX - (unsigned char*)&mbPositiveEnd, sMaxXName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (unsigned char*)&mfMinY - (unsigned char*)&mbPositiveEnd, sMinYName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (unsigned char*)&mfMaxY - (unsigned char*)&mbPositiveEnd, sMaxYName);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (unsigned char*)&m_NumPositionConstraints - (unsigned char*)&mbPositiveEnd, sNumPositionConstraintsName);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (unsigned char*)&m_NumDistanceConstraints - (unsigned char*)&mbPositiveEnd, sNumDistanceConstraintsName);
-        fn_80338F88(cache, 8, lbl_80533C98[8].size, (unsigned char*)&m_numAffectedParticles - (unsigned char*)&mbPositiveEnd, sAffectedParticlesName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (unsigned char*)&m_fBallPenetrationDepth - (unsigned char*)&mbPositiveEnd, sPenetrationDepthName);
-        fn_80338F88(cache, 16, lbl_80533C98[16].size, (unsigned char*)&m_bPenetratingFixedParticle - (unsigned char*)&mbPositiveEnd, sPenetratingFixedName);
-        fn_80338F88(cache, 22, lbl_80533C98[22].size, (unsigned char*)&m_v3BallPenetrationNormal - (unsigned char*)&mbPositiveEnd, sPenetrationNormalName);
-        fn_80338F88(cache, 16, lbl_80533C98[16].size, (unsigned char*)&mbIsActive - (unsigned char*)&mbPositiveEnd, sActiveName);
-        fn_80338F88(cache, 16, lbl_80533C98[16].size, (unsigned char*)&mbBallIsInsideNet - (unsigned char*)&mbPositiveEnd, sBallInsideName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (unsigned char*)&mfMotion - (unsigned char*)&mbPositiveEnd, sMotionName);
-        fn_80338F88(cache, 17, lbl_80533C98[17].size, (unsigned char*)&mJolt - (unsigned char*)&mbPositiveEnd, sJoltName);
-        fn_80338F78(cache);
+        s_DetMeshType.type = cache->BeginType(sDetMeshName);
+        cache->AddField(16, gDebugFieldTypes[16].size, 0, sPositiveEndName);
+        cache->AddField(8, gDebugFieldTypes[8].size, (unsigned char*)&m_NumParticles - (unsigned char*)&mbPositiveEnd, sNumParticlesName);
+        cache->AddField(17, gDebugFieldTypes[17].size, (unsigned char*)&mfMinX - (unsigned char*)&mbPositiveEnd, sMinXName);
+        cache->AddField(17, gDebugFieldTypes[17].size, (unsigned char*)&mfMaxX - (unsigned char*)&mbPositiveEnd, sMaxXName);
+        cache->AddField(17, gDebugFieldTypes[17].size, (unsigned char*)&mfMinY - (unsigned char*)&mbPositiveEnd, sMinYName);
+        cache->AddField(17, gDebugFieldTypes[17].size, (unsigned char*)&mfMaxY - (unsigned char*)&mbPositiveEnd, sMaxYName);
+        cache->AddField(8, gDebugFieldTypes[8].size, (unsigned char*)&m_NumPositionConstraints - (unsigned char*)&mbPositiveEnd, sNumPositionConstraintsName);
+        cache->AddField(8, gDebugFieldTypes[8].size, (unsigned char*)&m_NumDistanceConstraints - (unsigned char*)&mbPositiveEnd, sNumDistanceConstraintsName);
+        cache->AddField(8, gDebugFieldTypes[8].size, (unsigned char*)&m_numAffectedParticles - (unsigned char*)&mbPositiveEnd, sAffectedParticlesName);
+        cache->AddField(17, gDebugFieldTypes[17].size, (unsigned char*)&m_fBallPenetrationDepth - (unsigned char*)&mbPositiveEnd, sPenetrationDepthName);
+        cache->AddField(16, gDebugFieldTypes[16].size, (unsigned char*)&m_bPenetratingFixedParticle - (unsigned char*)&mbPositiveEnd, sPenetratingFixedName);
+        cache->AddField(22, gDebugFieldTypes[22].size, (unsigned char*)&m_v3BallPenetrationNormal - (unsigned char*)&mbPositiveEnd, sPenetrationNormalName);
+        cache->AddField(16, gDebugFieldTypes[16].size, (unsigned char*)&mbIsActive - (unsigned char*)&mbPositiveEnd, sActiveName);
+        cache->AddField(16, gDebugFieldTypes[16].size, (unsigned char*)&mbBallIsInsideNet - (unsigned char*)&mbPositiveEnd, sBallInsideName);
+        cache->AddField(17, gDebugFieldTypes[17].size, (unsigned char*)&mfMotion - (unsigned char*)&mbPositiveEnd, sMotionName);
+        cache->AddField(17, gDebugFieldTypes[17].size, (unsigned char*)&mJolt - (unsigned char*)&mbPositiveEnd, sJoltName);
+        cache->EndType();
     }
 
-    fn_80339450(cache, s_DetMeshType.type, &mbPositiveEnd, context);
-    fn_8033930C(cache, s_DetMeshType.type, &mbPositiveEnd, 0x44);
+    cache->ChecksumData(s_DetMeshType.type, &mbPositiveEnd, context);
+    cache->WriteData(s_DetMeshType.type, &mbPositiveEnd, 0x44);
 }
 
 inline static void AccumForces(NetMesh* self, nlVector3& newPos)
@@ -416,14 +416,14 @@ void NetMesh::Update(float dt, const nlVector3& ballPosition,
 
     if (!mbRelaxing && !noSphere)
     {
-        DebugWriteCache* output = fn_80338950(lbl_806E2168);
+        DebugWriteCache* output = gNetworkSyncState->GetWriteCache();
         if (output != 0)
         {
             NetMeshFrameProvider* frameProvider = GetFixedUpdateTask();
             unsigned int frame = frameProvider->GetFrame();
             char buffer[256];
             nlSNPrintf(buffer, sizeof(buffer), sUpdateFormat, mbPositiveEnd, logTimeScale, appliedForces, mbFirstUpdate, frame);
-            fn_8033919C(output, buffer);
+            output->WriteText(buffer);
         }
     }
 
@@ -674,7 +674,7 @@ void NetMesh::Initialize(unsigned long netMeshDrawableObjectID)
 {
     mNetMeshDrawableObjectID = netMeshDrawableObjectID;
     mJolt = 0.0f;
-    RenderObject* dobj = fn_8027725C(netMeshDrawableObjectID);
+    RenderObject* dobj = FindStadiumDrawableObject(netMeshDrawableObjectID);
     dobj->m_uObjectFlags = 0;
 
     int i;

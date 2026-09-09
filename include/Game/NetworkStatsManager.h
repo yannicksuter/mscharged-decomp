@@ -40,10 +40,10 @@ struct NetworkSeasonDateTable
     NetworkSeasonDate* mDates;
 }; // size: 0x8
 
-class NetworkStatsManager_8012F378 : public NetworkStatsListener
+class NetworkStatsManager : public NetworkStatsListener
 {
 public:
-    NetworkStatsManager_8012F378()
+    NetworkStatsManager()
     {
         mCurrentJob = 0;
         mUnidentifiedC430 = false;
@@ -59,7 +59,7 @@ public:
     }
 
     static void CreateInstance();
-    static NetworkStatsManager_8012F378* Instance();
+    static NetworkStatsManager* Instance();
 
     void Reset(bool initialize);
     bool UsesEuropeanRankings() const;

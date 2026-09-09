@@ -8,6 +8,8 @@
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
+#include "NL/nlPrint.h"
+#include "NL/nlBasicString.inl"
 
 extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
 
@@ -47,7 +49,7 @@ void TU80209584Summary::fn_802095D0(const TU80209584StatsSource* home, const TU8
     mTeamB = away->mTeam;
     mStatsB = away->mStats;
 
-    TLInstance* pSummary = FEFindInstance(mPresentation, nlStringLowerHash("game summary"), nlStringLowerHash("Layer"), nlStringLowerHash("game summary"), 0, 0, 0);
+    TLInstance* pSummary = (TLInstance*)FEFindInstance(mPresentation, nlStringLowerHash("game summary"), nlStringLowerHash("Layer"), nlStringLowerHash("game summary"), 0, 0, 0);
 
     unsigned long subHash = 0;
     const TU80209584Stats* stats[2] = { &mStatsA, &mStatsB };

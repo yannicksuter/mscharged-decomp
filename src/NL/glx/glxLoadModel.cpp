@@ -1,3 +1,5 @@
+#include <revolution/os/OSCache_fwd.h>
+
 #include "NL/glx/glxLoadModel.h"
 
 #include "Game/GL/GLInventory.h"
@@ -6,7 +8,9 @@
 #include "Game/SAnim.h"
 #include "Game/SHierarchy.h"
 #include "NL/gl/glLoadModel.h"
+#include "NL/gl/glMaterialProgram.h"
 #include "NL/gl/glModel.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
@@ -15,40 +19,35 @@
 
 #include <string.h>
 
-extern "C"
-{
-    void* fn_802CC0A4(unsigned long size, int memoryType, void* allocator);
-    void DCFlushRange(void* address, unsigned long size);
-}
 
-class RLGReader_80369E5C : public RLGReader
+class GLXRLGReader : public RLGReader
 {
 public:
-    RLGReader_80369E5C() { }
+    GLXRLGReader() { }
 
-    virtual void fn_80369E5C(void* data, unsigned long size);
-    virtual void fn_80369EC8(void* data, unsigned long size);
-    virtual void fn_80369F34(nlChunk* chunk);
-    virtual void fn_8036A138();
+    virtual void LoadVertices(void* data, unsigned long size);
+    virtual void LoadIndices(void* data, unsigned long size);
+    virtual void LoadVertexAnim(nlChunk* chunk);
+    virtual void FinalizeModels();
 };
 
-void RLGReader_80369E5C::fn_80369E5C(void* data, unsigned long size)
+void GLXRLGReader::LoadVertices(void* data, unsigned long size)
 {
-    m_Unknown1C = fn_802CC0A4(size, 3, m_pContext);
-    memcpy(m_Unknown1C, data, size);
-    DCFlushRange(m_Unknown1C, size);
+    m_pVertexData = glResourceAlloc(size, GLM_VertexData, m_pResource);
+    memcpy(m_pVertexData, data, size);
+    DCFlushRange(m_pVertexData, size);
 }
 
-void RLGReader_80369E5C::fn_80369EC8(void* data, unsigned long size)
+void GLXRLGReader::LoadIndices(void* data, unsigned long size)
 {
-    m_Unknown20 = fn_802CC0A4(size, 2, m_pContext);
-    memcpy(m_Unknown20, data, size);
-    DCFlushRange(m_Unknown20, size);
+    m_pIndexData = glResourceAlloc(size, GLM_IndexData, m_pResource);
+    memcpy(m_pIndexData, data, size);
+    DCFlushRange(m_pIndexData, size);
 }
 
-void RLGReader_80369E5C::fn_80369F34(nlChunk* chunk)
+void GLXRLGReader::LoadVertexAnim(nlChunk* chunk)
 {
-    fn_802CA870(chunk);
+    LoadVertexAnimData(chunk);
     void* data = chunk->GetData();
     unsigned long padding =
         (unsigned char*)chunk->GetAlignedData()
@@ -56,7 +55,7 @@ void RLGReader_80369E5C::fn_80369F34(nlChunk* chunk)
     DCFlushRange(data, chunk->GetSize() - padding);
 }
 
-static void fn_8036A038(glModelPacket* packet)
+static void MoveLargestBoneWeightFirst(glModelPacket* packet)
 {
     unsigned char* boneIndices = 0;
     float* boneWeights = 0;
@@ -128,7 +127,7 @@ static inline bool HasStream(
     return false;
 }
 
-void RLGReader_80369E5C::fn_8036A138()
+void GLXRLGReader::FinalizeModels()
 {
     for (unsigned long modelIndex = 0; modelIndex < m_nModels; ++modelIndex)
     {
@@ -142,14 +141,14 @@ void RLGReader_80369E5C::fn_8036A138()
 
             if (HasStream(packet, 7))
             {
-                fn_8036A038(packet);
+                MoveLargestBoneWeightFirst(packet);
             }
 
-            glplatFinalizePacket(packet, true, m_pContext);
-            ((UnidentifiedPacketResource*)packet->unknown10)->fn_Unknown3(packet);
+            glplatFinalizePacket(packet, true, m_pResource);
+            ((GLMaterialProgram*)packet->unknown10)->Prepare(packet);
         }
 
-        GLVertexAnim* loaded = m_pContext->m_pInventory->GetVertexAnim(model->unknown00);
+        GLVertexAnim* loaded = m_pResource->m_inventory->GetVertexAnim(model->unknown00);
         if (loaded != 0)
         {
             loaded->m_pModel = model;
@@ -160,9 +159,9 @@ void RLGReader_80369E5C::fn_8036A138()
 glModel* glplatEndLoadModel(
     void* data, unsigned long size, unsigned long* pNumModels, void* context)
 {
-    RLGReader_80369E5C reader;
-    reader.m_pContext = (UnidentifiedLoadContext*)context;
-    reader.fn_802CADC4(data);
+    GLXRLGReader reader;
+    reader.m_pResource = (GLResourcePool*)context;
+    reader.Read(data);
     if (pNumModels != 0)
     {
         *pNumModels = reader.m_nModels;
@@ -185,9 +184,9 @@ glModel* glplatLoadModel(
     void* data =
         nlLoadEntireFile(filename, &size, 32, AllocateStart, 0, 0, 0);
 
-    RLGReader_80369E5C reader;
-    reader.m_pContext = (UnidentifiedLoadContext*)context;
-    reader.fn_802CADC4(data);
+    GLXRLGReader reader;
+    reader.m_pResource = (GLResourcePool*)context;
+    reader.Read(data);
     delete[] (unsigned char*)data;
 
     if (pNumModels != 0)
@@ -209,8 +208,8 @@ GLSkinMesh* glx_MakeSkinMesh(
     ShaderSkinMesh* mesh =
         new (nlMalloc(sizeof(ShaderSkinMesh), 8, false)) ShaderSkinMesh();
 
-    mesh->fn_802D4268(models);
-    mesh->fn_8036FB74(hierarchy);
+    mesh->SetModel(models);
+    mesh->SetHierarchy(hierarchy);
 
     nlChunk* chunk = outerChunk->GetFirstChunk();
     nlChunk* chunkEnd = outerChunk->GetNextChunk();
@@ -241,7 +240,7 @@ GLSkinMesh* glx_MakeSkinMesh(
                 int nodeIndex = hierarchy->GetNodeIndexByID(boneID);
                 if (nodeIndex != -1)
                 {
-                    mesh->fn_8036FC4C(nodeIndex, &inv);
+                    mesh->SetBoneMatrix(nodeIndex, &inv);
                 }
             }
             break;
@@ -274,27 +273,27 @@ GLSkinMesh* glx_MakeSkinMesh(
             unsigned long* morphIDs = (unsigned long*)data;
             data += numMorphs * sizeof(unsigned long);
 
-            mesh->fn_802D407C(numMorphs);
+            mesh->SetNumMorphs(numMorphs);
             for (unsigned long i = 0; i < numMorphs; ++i)
             {
-                mesh->fn_802D40F4(i, morphIDs[i]);
+                mesh->SetMorphID(i, morphIDs[i]);
             }
 
             unsigned long elementSize = *(unsigned long*)data;
-            unsigned long numVertices = *(unsigned long*)(data + 4);
+            unsigned long numPackets = *(unsigned long*)(data + 4);
             data += 8;
-            mesh->fn_802D407C(numMorphs);
-            mesh->fn_8036F768(numVertices);
+            mesh->SetNumMorphs(numMorphs);
+            mesh->SetNumMorphPackets(numPackets);
 
-            for (unsigned long vertex = 0; vertex < numVertices; ++vertex)
+            for (unsigned long packetIndex = 0; packetIndex < numPackets; ++packetIndex)
             {
                 for (unsigned long morph = 0; morph < numMorphs; ++morph)
                 {
                     unsigned long count = *(unsigned long*)data;
                     data += sizeof(unsigned long);
-                    const void* values = data;
+                    const MorphDelta* values = (const MorphDelta*)data;
                     data += elementSize * count;
-                    mesh->fn_8036F7B0(vertex, morph, count, values);
+                    mesh->SetMorphDeltas(packetIndex, morph, count, values);
                 }
             }
             break;
@@ -308,6 +307,6 @@ GLSkinMesh* glx_MakeSkinMesh(
             + (nextOffset != 0) * (4 - nextOffset));
     }
 
-    mesh->fn_8036F7E4();
+    mesh->InitializeSkinData();
     return mesh;
 }

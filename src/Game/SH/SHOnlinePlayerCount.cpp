@@ -355,9 +355,9 @@ void SHOnlinePlayerCount::OnButtonPointerPress(int, void* context)
     }
 }
 
-static TweakValueIntImpl_804FD898 sTournamentLowBoundTweak(
+static TweakIntBinding sTournamentLowBoundTweak(
     "s_nTournamentLowBound", "Network/DWCLobby", &s_nTournamentLowBound, true);
-static TweakValueIntImpl_804FD898 sTournamentHiBoundTweak(
+static TweakIntBinding sTournamentHiBoundTweak(
     "s_nTournamentHiBound", "Network/DWCLobby", &s_nTournamentHiBound, true);
 
 template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

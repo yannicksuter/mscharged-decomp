@@ -297,7 +297,7 @@ void PauseMenuScene::Update(float fDeltaT)
             mUnidentified54A = true;
             PausePostGameScene* scene = static_cast<PausePostGameScene*>(g_pOverlayManager->Push((SceneList)92, SCREEN_FORWARD, true));
             scene->mUnidentified5D8 = mControllingInput;
-            scene->SHSceneVirtual2C(12);
+            scene->SetDisplayMode(12);
             break;
         }
         case 7:

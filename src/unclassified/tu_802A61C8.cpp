@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/gl/glModel.h"
+#include "NL/gl/glLoadModel.h"
 
 struct RegistryBackend_802A61C8
 {
@@ -15,8 +16,7 @@ extern u8 lbl_8052AB18[];
 extern RegistryBackend_802A61C8* lbl_806E1D28;
 extern u8 lbl_806E1D2C;
 
-extern "C" void fn_802CB790(RegistryBackend_802A61C8*, u32);
-extern "C" void fn_8036BE88(int, u32);
+ void glx_BindTexture(int, u32);
 
 extern "C" RegistryBackend_802A61C8* fn_802A61C8(
     RegistryBackend_802A61C8* backend)
@@ -26,7 +26,7 @@ extern "C" RegistryBackend_802A61C8* fn_802A61C8(
     backend->key = 0x5D6C62BA;
     backend->stateSize = 0x10;
     backend->descriptorCount = 2;
-    fn_802CB790(backend, 0x5D6C62BA);
+    glRegisterMaterialProgram(backend, 0x5D6C62BA);
     return backend;
 }
 
@@ -82,7 +82,7 @@ extern "C" void fn_802A6348(void*, const glModelPacket* packet)
 
 extern "C" void fn_802A63A0(void*, const glModelPacket* packet)
 {
-    fn_8036BE88(0, reinterpret_cast<u32>(packet->unknown20));
+    glx_BindTexture(0, reinterpret_cast<u32>(packet->unknown20));
 }
 
 extern "C" void* fn_802A63AC()

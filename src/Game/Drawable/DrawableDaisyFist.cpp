@@ -11,6 +11,7 @@
 // gameplay-object snapshots it spins the prop about Z from a 16-bit angle unit,
 // but it draws through a dedicated view instead of the default one.
 
+
 DrawableDaisyFist::DrawableDaisyFist()
 {
     mVisible = false;
@@ -72,14 +73,14 @@ void DrawableDaisyFist::Render(const DaisyFistObject* object) const
     matrix.m44 = 1.0f;
 
     World* pWorld = drawable->m_pWorldContext;
-    GLView* oldView68 = pWorld->m_pView68;
-    GLView* oldView6C = pWorld->m_pView6C;
-    pWorld->m_pView68 = GetLayerView(eCLV_ElectricFence);
-    pWorld->m_pView6C = pWorld->m_pView68;
+    GLView* oldView68 = pWorld->m_pOpaqueView;
+    GLView* oldView6C = pWorld->m_pAlphaView;
+    pWorld->m_pOpaqueView = GetLayerView(eCLV_ElectricFence);
+    pWorld->m_pAlphaView = pWorld->m_pOpaqueView;
     drawable->SetWorldMatrix(&matrix);
     drawable->Draw();
-    pWorld->m_pView68 = oldView68;
-    pWorld->m_pView6C = oldView6C;
+    pWorld->m_pOpaqueView = oldView68;
+    pWorld->m_pAlphaView = oldView6C;
 }
 
 void DrawableDaisyFist::Blend(const float* factors,

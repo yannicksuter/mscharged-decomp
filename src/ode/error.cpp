@@ -1,3 +1,4 @@
+#include "NL/nlPrint.h"
 /*************************************************************************
  *                                                                       *
  * Open Dynamics Engine, Copyright (C) 2001,2002 Russell L. Smith.       *
@@ -22,8 +23,8 @@
 
 #include <ode/config.h>
 #include <ode/error.h>
+#include "NL/nlPrint.h"
 
-extern void nlPrintf(const char*, ...);
 extern void nlBreak();
 
 static dMessageFunction* debug_function = 0;

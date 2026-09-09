@@ -16,7 +16,7 @@
 #include "NL/nlAVLTree.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
-#include "unclassified/tu_80338898.h"
+#include "Game/NetworkSync.h"
 
 #include <math.h>
 
@@ -28,10 +28,7 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
 
 extern CollisionSpace* g_CollisionSpace;
 extern UnidentifiedEventRegistry* g_pEventRegistry;
-extern "C" EmissionController* fn_802E81A0(
-    EmissionManager*, unsigned long, const EffectsGroup*);
 
-extern "C" UnidentifiedNetworkSyncState* lbl_806E2488;
 
 extern "C" void fn_8017472C(void*);
 
@@ -49,7 +46,7 @@ static void fn_8017498C(EmissionController& controller)
         return;
     }
 
-    if (controller.m_GlView == 0)
+    if (controller.m_Replaying == 0)
     {
         PhysicsPatch* patch = (PhysicsPatch*)controller.m_uUserData;
         if (patch->m_bVisible == true)
@@ -158,8 +155,7 @@ void PhysicsPatch::Unknown0()
             {
                 EmissionManager::Instance()->Kill(
                     (unsigned long)this, effects);
-                EmissionController* controller = fn_802E81A0(
-                    EmissionManager::Instance(), (unsigned long)this, effects);
+                EmissionController* controller = EmissionManager::Instance()->FindController( (unsigned long)this, effects);
                 if (controller != 0)
                 {
                     controller->mUpdateCallback.Clear();
@@ -312,8 +308,7 @@ void PhysicsPatch::fn_80173A10(float)
                 {
                     EmissionManager::Instance()->Destroy(
                         (unsigned long)this, effects);
-                    EmissionController* controller = fn_802E81A0(
-                        EmissionManager::Instance(), (unsigned long)this,
+                    EmissionController* controller = EmissionManager::Instance()->FindController( (unsigned long)this,
                         effects);
                     if (controller != 0)
                     {
@@ -493,13 +488,13 @@ PhysicsPatch* PhysicsPatchManager_801740D0::fn_801743A8(
     const nlVector3& velocity, float startRadius, float endRadius,
     float lifetime)
 {
-    DebugWriteCache* log = fn_80338950(lbl_806E2488);
+    DebugWriteCache* log = gNetworkSyncState->GetWriteCache();
     if (log != 0)
     {
         int ownerID = owner != 0 ? owner->mUnidentified120 : -1;
         char buffer[200];
         nlSNPrintf(buffer, sizeof(buffer), "Creating patch %d owner %d r1 %f r2 %f life %f at frame %d\n", type, ownerID, startRadius, endRadius, lifetime, GetFixedUpdateTask()->GetFrame());
-        fn_8033919C(log, buffer);
+        log->WriteText(buffer);
     }
 
     int index;
@@ -615,7 +610,7 @@ void PhysicsPatchManager_801740D0::fn_801748A0(
         {
             patch->SyncLog(&lbl_806DCAB8, cache);
         }
-        void* copy = fn_8033930C(cache, lbl_806DCAB8, &patch->m_Type, sizeof(PhysicsPatch) - 0x48);
+        void* copy = cache->WriteData(lbl_806DCAB8, &patch->m_Type, sizeof(PhysicsPatch) - 0x48);
         if (copy != 0)
         {
             PhysicsPatch* copiedPatch
@@ -626,17 +621,17 @@ void PhysicsPatchManager_801740D0::fn_801748A0(
             copiedPatch->m_pTarget = patch->m_pTarget == 0
                                        ? (cPlayer*)-1
                                        : (cPlayer*)patch->m_pTarget->mUnidentified120;
-            fn_80339450(cache, lbl_806DCAB8, copy, context);
+            cache->ChecksumData(lbl_806DCAB8, copy, context);
         }
     }
 }
 
 void PhysicsPatch::SyncLog(void* context, DebugWriteCache* cache)
 {
-    *(unsigned short*)context = fn_80338EBC(cache, "PhysicsPatch");
+    *(unsigned short*)context = cache->BeginType("PhysicsPatch");
 
 #define REGISTER_FIELD(kind, field) \
-    fn_80338F88(cache, kind, lbl_80533C98[kind].size, (unsigned char*)&field - (unsigned char*)&m_Type, #field)
+    cache->AddField(kind, gDebugFieldTypes[kind].size, (unsigned char*)&field - (unsigned char*)&m_Type, #field)
 
     REGISTER_FIELD(14, m_Type);
     REGISTER_FIELD(15, m_pOwner);
@@ -661,5 +656,5 @@ void PhysicsPatch::SyncLog(void* context, DebugWriteCache* cache)
 
 #undef REGISTER_FIELD
 
-    fn_80338F78(cache);
+    cache->EndType();
 }

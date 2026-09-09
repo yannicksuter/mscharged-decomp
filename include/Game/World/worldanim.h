@@ -73,8 +73,8 @@ public:
     ~WorldAnimManager();
 
     void fn_80342324();
-    void fn_80342328();
-    void fn_80342630(
+    void Clear();
+    void BindHierarchy(
         WorldAnimController* pController, unsigned long uHierarchyHash);
     AnimationSet* FindAnimationSet(unsigned long uHashID)
     {
@@ -85,14 +85,14 @@ public:
         }
         return 0;
     }
-    WorldAnimController* fn_803426D8(unsigned long uHashID);
-    WorldAnimController* fn_803427B0(unsigned long uHashID);
+    WorldAnimController* GetOrCreateController(unsigned long uHashID);
+    WorldAnimController* FindController(unsigned long uHashID);
     AnimationSet* LoadHierarchy(nlChunk* pChunk);
     void LoadAnimationSet(AnimationSet* pAnimationSet, nlChunk* pChunk);
-    void fn_80342A74();
-    void fn_80342BDC(const unsigned long& uHashID,
+    void BindObjects();
+    void BindControllerObjects(const unsigned long& uHashID,
         WorldAnimController** ppController);
-    void fn_80342BE8(float fDeltaT);
+    void Update(float fDeltaT);
 
     /* 0x00 */ cInventory<cSHierarchy>* m_pHierarchyInventory;
     /* 0x04 */ nlAVLTree<unsigned long, AnimationSet*,

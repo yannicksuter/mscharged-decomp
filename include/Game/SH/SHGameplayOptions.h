@@ -52,7 +52,7 @@ public:
     /* 0x15BC */ bool mUnidentified15BC;
     /* 0x15BD */ bool mUnidentified15BD;
     /* 0x15C0 */ GameplaySettings mSettings;
-    /* 0x15DC */ PowerupSettings mPowerupSettings;
+    /* 0x15DC */ CheatSettings mPowerupSettings;
     /* 0x15E8 */ int mUnidentified15E8;
     /* 0x15EC */ int mUnidentified15EC;
     /* 0x15F0 */ int mUnidentified15F0;

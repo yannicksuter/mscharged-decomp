@@ -1,11 +1,13 @@
 #ifndef GAME_INVENTORY_H
 #define GAME_INVENTORY_H
 
+#include "NL/nlPrint.h"
+
 #include "Game/SAnim.h"
 #include "NL/nlList.h"
 #include "NL/nlString.h"
+#include "NL/nlPrint.h"
 
-int nlPrintf(const char*, ...);
 
 template <typename T>
 class cInventory
