@@ -1,6 +1,6 @@
 // MSL math.h defines abs/labs; include it before stdlib.h.
 #include <math.h>
-#include "unclassified/tu_8024F4E0.h"
+#include "Game/SH/SHOnlineFriendCodeEntry.h"
 
 #include "Game/SH/SHNavigation.h"
 #include "Game/GameSceneManager.h"
@@ -23,52 +23,50 @@
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 
-extern char lbl_806DE80C[];
-
-TU80250754Scene::TU80250754Scene()
-    : mUnidentified001C(0)
-    , mUnidentified0020(false)
-    , mUnidentified0024(-1)
-    , mUnidentified0058()
-    , mUnidentified08C8()
-    , mUnidentified1138()
-    , mUnidentified1274(false)
-    , mUnidentified1278(0)
+SHOnlineFriendCodeEntry::SHOnlineFriendCodeEntry()
+    : mHoverCount(0)
+    , mButtonsInitialized(false)
+    , mSelectedDigit(-1)
+    , mKeypadButtons()
+    , mDigitButtons()
+    , mBackButton()
+    , mPopupActive(false)
+    , mState(0)
 {
     const unsigned short* empty = (const unsigned short*)L"";
 
     for (int i = 0; i < 12; ++i)
     {
-        mUnidentified0058[i].mContext = (void*)i;
+        mKeypadButtons[i].mContext = (void*)i;
     }
 
     for (int i = 0; i < 12; ++i)
     {
-        mUnidentified08C8[i].mContext = (void*)i;
-        nlStrNCpy(mUnidentified0028[i], empty, 2);
+        mDigitButtons[i].mContext = (void*)i;
+        nlStrNCpy(mDigits[i], empty, 2);
     }
 
-    mUnidentified1138.SetPopScene(false);
+    mBackButton.SetPopScene(false);
 }
 
-TU80250754Scene::~TU80250754Scene()
+SHOnlineFriendCodeEntry::~SHOnlineFriendCodeEntry()
 {
 }
 
-void TU80250754Scene::fn_8024F570()
+void SHOnlineFriendCodeEntry::InitializeButtons()
 {
     FEPointerListener::Callback padSelect(
-        Bind<void>(MemFun(&TU80250754Scene::fn_80251328), this, Placeholder<0>(), Placeholder<1>()));
+        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback padOver(
-        Bind<void>(MemFun(&TU80250754Scene::fn_8024FDD4), this, Placeholder<0>(), Placeholder<1>()));
+        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback padOff(
-        Bind<void>(MemFun(&TU80250754Scene::fn_8024FE6C), this, Placeholder<0>(), Placeholder<1>()));
+        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback codeSelect(
-        Bind<void>(MemFun(&TU80250754Scene::fn_8024FEEC), this, Placeholder<0>(), Placeholder<1>()));
+        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback codeOver(
-        Bind<void>(MemFun(&TU80250754Scene::fn_8025005C), this, Placeholder<0>(), Placeholder<1>()));
+        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback codeOff(
-        Bind<void>(MemFun(&TU80250754Scene::fn_80250100), this, Placeholder<0>(), Placeholder<1>()));
+        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 12; ++i)
     {
@@ -87,11 +85,11 @@ void TU80250754Scene::fn_8024F570()
         {
             scale = 0.7f;
         }
-        mUnidentified0058[i].SetInstanceBounds(
-            mUnidentified1210[i], true, position.f.x, position.f.y, scale, scale);
-        mUnidentified0058[i].SetPointerPressCallback(padSelect);
-        mUnidentified0058[i].SetPointerEnterCallback(padOver);
-        mUnidentified0058[i].SetPointerLeaveCallback(padOff);
+        mKeypadButtons[i].SetInstanceBounds(
+            mKeypadInstances[i], true, position.f.x, position.f.y, scale, scale);
+        mKeypadButtons[i].SetPointerPressCallback(padSelect);
+        mKeypadButtons[i].SetPointerEnterCallback(padOver);
+        mKeypadButtons[i].SetPointerLeaveCallback(padOff);
     }
 
     for (int i = 0; i < 12; ++i)
@@ -106,32 +104,32 @@ void TU80250754Scene::fn_8024F570()
         }
 
         feVector3 position = positionInstance->GetAssetPosition();
-        mUnidentified08C8[i].SetInstanceBounds(
-            mUnidentified1240[i], true, position.f.x, position.f.y, 0.8f, 0.8f);
-        mUnidentified08C8[i].SetPointerPressCallback(codeSelect);
-        mUnidentified08C8[i].SetPointerEnterCallback(codeOver);
-        mUnidentified08C8[i].SetPointerLeaveCallback(codeOff);
+        mDigitButtons[i].SetInstanceBounds(
+            mDigitInstances[i], true, position.f.x, position.f.y, 0.8f, 0.8f);
+        mDigitButtons[i].SetPointerPressCallback(codeSelect);
+        mDigitButtons[i].SetPointerEnterCallback(codeOver);
+        mDigitButtons[i].SetPointerLeaveCallback(codeOff);
     }
 }
 
-void TU80250754Scene::fn_8024FDD4(int index, void* context)
+void SHOnlineFriendCodeEntry::OnKeypadPointerEnter(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    ++mUnidentified001C;
-    mUnidentified1210[item]->SetActiveSlide("over", true, false);
-    mUnidentified0058[item].SetPointerState(1, index);
+    ++mHoverCount;
+    mKeypadInstances[item]->SetActiveSlide("over", true, false);
+    mKeypadButtons[item].SetPointerState(1, index);
     FEAudio::PlayAnimAudioEvent(0x0E2B7F90, 0, 0, 1);
 }
 
-void TU80250754Scene::fn_8024FE6C(int index, void* context)
+void SHOnlineFriendCodeEntry::OnKeypadPointerLeave(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    --mUnidentified001C;
-    mUnidentified1210[item]->SetActiveSlide("off", true, false);
-    mUnidentified0058[item].SetPointerState(0, index);
+    --mHoverCount;
+    mKeypadInstances[item]->SetActiveSlide("off", true, false);
+    mKeypadButtons[item].SetPointerState(0, index);
 }
 
-void TU80250754Scene::fn_8024FEEC(int, void* context)
+void SHOnlineFriendCodeEntry::OnDigitPointerPress(int, void* context)
 {
     FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
 
@@ -145,49 +143,49 @@ void TU80250754Scene::fn_8024FEEC(int, void* context)
         item = 0;
     }
 
-    if (mUnidentified0024 != item)
+    if (mSelectedDigit != item)
     {
-        mUnidentified1240[item]->SetActiveSlide("DOWN", true, false);
-        mUnidentified1240[mUnidentified0024]->SetActiveSlide("OFF", true, false);
+        mDigitInstances[item]->SetActiveSlide("DOWN", true, false);
+        mDigitInstances[mSelectedDigit]->SetActiveSlide("OFF", true, false);
 
-        mUnidentified08C8[item].mDisabled = true;
+        mDigitButtons[item].mDisabled = true;
         FEPointerEvent event;
-        mUnidentified08C8[item].mPreviousEvents[0] = event;
-        mUnidentified08C8[item].mPreviousEvents[1] = event;
-        mUnidentified08C8[item].mPreviousEvents[2] = event;
-        mUnidentified08C8[item].mPreviousEvents[3] = event;
+        mDigitButtons[item].mPreviousEvents[0] = event;
+        mDigitButtons[item].mPreviousEvents[1] = event;
+        mDigitButtons[item].mPreviousEvents[2] = event;
+        mDigitButtons[item].mPreviousEvents[3] = event;
 
-        mUnidentified08C8[mUnidentified0024].mDisabled = false;
-        mUnidentified0024 = item;
+        mDigitButtons[mSelectedDigit].mDisabled = false;
+        mSelectedDigit = item;
     }
 
-    --mUnidentified001C;
+    --mHoverCount;
 }
 
-void TU80250754Scene::fn_8025005C(int index, void* context)
+void SHOnlineFriendCodeEntry::OnDigitPointerEnter(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (item != mUnidentified0024)
+    if (item != mSelectedDigit)
     {
-        ++mUnidentified001C;
-        mUnidentified1240[item]->SetActiveSlide("over", true, false);
-        mUnidentified08C8[item].SetPointerState(1, index);
+        ++mHoverCount;
+        mDigitInstances[item]->SetActiveSlide("over", true, false);
+        mDigitButtons[item].SetPointerState(1, index);
         FEAudio::PlayAnimAudioEvent(0xFFC8A55D, 0, 0, 1);
     }
 }
 
-void TU80250754Scene::fn_80250100(int index, void* context)
+void SHOnlineFriendCodeEntry::OnDigitPointerLeave(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (item != mUnidentified0024)
+    if (item != mSelectedDigit)
     {
-        --mUnidentified001C;
-        mUnidentified1240[item]->SetActiveSlide("off", true, false);
-        mUnidentified08C8[item].SetPointerState(0, index);
+        --mHoverCount;
+        mDigitInstances[item]->SetActiveSlide("off", true, false);
+        mDigitButtons[item].SetPointerState(0, index);
     }
 }
 
-void TU80250754Scene::fn_8025018C()
+void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
 {
     unsigned short* friendCode =
         g_pFriendManager->mFriendCodeInput;
@@ -209,21 +207,21 @@ void TU80250754Scene::fn_8025018C()
                 item = 0;
             }
 
-            if (mUnidentified0024 != item)
+            if (mSelectedDigit != item)
             {
-                mUnidentified1240[item]->SetActiveSlide("DOWN", true, false);
-                mUnidentified1240[mUnidentified0024]->SetActiveSlide(
+                mDigitInstances[item]->SetActiveSlide("DOWN", true, false);
+                mDigitInstances[mSelectedDigit]->SetActiveSlide(
                     "OFF", true, false);
 
-                mUnidentified08C8[item].mDisabled = true;
+                mDigitButtons[item].mDisabled = true;
                 FEPointerEvent event;
-                mUnidentified08C8[item].mPreviousEvents[0] = event;
-                mUnidentified08C8[item].mPreviousEvents[1] = event;
-                mUnidentified08C8[item].mPreviousEvents[2] = event;
-                mUnidentified08C8[item].mPreviousEvents[3] = event;
+                mDigitButtons[item].mPreviousEvents[0] = event;
+                mDigitButtons[item].mPreviousEvents[1] = event;
+                mDigitButtons[item].mPreviousEvents[2] = event;
+                mDigitButtons[item].mPreviousEvents[3] = event;
 
-                mUnidentified08C8[mUnidentified0024].mDisabled = false;
-                mUnidentified0024 = item;
+                mDigitButtons[mSelectedDigit].mDisabled = false;
+                mSelectedDigit = item;
             }
             foundEmpty = true;
         }
@@ -232,77 +230,77 @@ void TU80250754Scene::fn_8025018C()
         int item = i;
         if (item < 0)
         {
-            item = mUnidentified0024;
+            item = mSelectedDigit;
         }
-        nlStrNCpy(mUnidentified0028[item], character, 2);
+        nlStrNCpy(mDigits[item], character, 2);
 
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[item], nlStringLowerHash("off"),
+            mDigitInstances[item], nlStringLowerHash("off"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[item]);
+        text->SetString(mDigits[item]);
 
         text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[item], nlStringLowerHash("over"),
+            mDigitInstances[item], nlStringLowerHash("over"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[item]);
+        text->SetString(mDigits[item]);
 
         text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[item], nlStringLowerHash("down"),
+            mDigitInstances[item], nlStringLowerHash("down"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[item]);
+        text->SetString(mDigits[item]);
     }
 
-    if (!foundEmpty && mUnidentified0024 != 11)
+    if (!foundEmpty && mSelectedDigit != 11)
     {
-        mUnidentified1240[11]->SetActiveSlide("DOWN", true, false);
-        mUnidentified1240[mUnidentified0024]->SetActiveSlide("OFF", true, false);
+        mDigitInstances[11]->SetActiveSlide("DOWN", true, false);
+        mDigitInstances[mSelectedDigit]->SetActiveSlide("OFF", true, false);
 
-        mUnidentified08C8[11].mDisabled = true;
+        mDigitButtons[11].mDisabled = true;
         FEPointerEvent event;
-        mUnidentified08C8[11].mPreviousEvents[0] = event;
-        mUnidentified08C8[11].mPreviousEvents[1] = event;
-        mUnidentified08C8[11].mPreviousEvents[2] = event;
-        mUnidentified08C8[11].mPreviousEvents[3] = event;
+        mDigitButtons[11].mPreviousEvents[0] = event;
+        mDigitButtons[11].mPreviousEvents[1] = event;
+        mDigitButtons[11].mPreviousEvents[2] = event;
+        mDigitButtons[11].mPreviousEvents[3] = event;
 
-        mUnidentified08C8[mUnidentified0024].mDisabled = false;
-        mUnidentified0024 = 11;
+        mDigitButtons[mSelectedDigit].mDisabled = false;
+        mSelectedDigit = 11;
     }
 
     memset(friendCode, 0, sizeof(g_pFriendManager->mFriendCodeInput));
 }
 
-void TU80250754Scene::fn_802505E8()
+void SHOnlineFriendCodeEntry::UpdateConfirmButton()
 {
-    mUnidentified1210[10]->m_bVisible = true;
-    mUnidentified0058[10].mDisabled = false;
-    mUnidentified1270->m_bVisible = true;
+    mKeypadInstances[10]->m_bVisible = true;
+    mKeypadButtons[10].mDisabled = false;
+    mOutConfirmButtonInstance->m_bVisible = true;
 
     bool valid = true;
     for (int i = 0; i < 12; ++i)
     {
-        if (mUnidentified0028[i][0] == 0)
+        if (mDigits[i][0] == 0)
         {
-            mUnidentified1270->m_bVisible = false;
-            mUnidentified1210[10]->m_bVisible = false;
-            mUnidentified0058[10].mDisabled = true;
+            mOutConfirmButtonInstance->m_bVisible = false;
+            mKeypadInstances[10]->m_bVisible = false;
+            mKeypadButtons[10].mDisabled = true;
 
             FEPointerEvent event;
-            mUnidentified0058[10].mPreviousEvents[0] = event;
-            mUnidentified0058[10].mPreviousEvents[1] = event;
-            mUnidentified0058[10].mPreviousEvents[2] = event;
-            mUnidentified0058[10].mPreviousEvents[3] = event;
+            mKeypadButtons[10].mPreviousEvents[0] = event;
+            mKeypadButtons[10].mPreviousEvents[1] = event;
+            mKeypadButtons[10].mPreviousEvents[2] = event;
+            mKeypadButtons[10].mPreviousEvents[3] = event;
             valid = false;
         }
     }
@@ -313,13 +311,13 @@ void TU80250754Scene::fn_802505E8()
     }
 }
 
-void TU80250754Scene::fn_80250718()
+void SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed()
 {
     g_pFriendManager->SetOwnStatusInitial(true);
-    mUnidentified1274 = false;
+    mPopupActive = false;
 }
 
-void TU80250754Scene::SceneCreated()
+void SHOnlineFriendCodeEntry::SceneCreated()
 {
     char name[12];
 
@@ -346,7 +344,7 @@ void TU80250754Scene::SceneCreated()
         {
             component = &gDefaultTLComponentInstance;
         }
-        mUnidentified1210[i] = component;
+        mKeypadInstances[i] = component;
     }
 
     for (int i = 0; i < 12; ++i)
@@ -360,10 +358,10 @@ void TU80250754Scene::SceneCreated()
         {
             component = &gDefaultTLComponentInstance;
         }
-        mUnidentified1240[i] = component;
+        mDigitInstances[i] = component;
     }
 
-    mUnidentified1270 = FEFinder<TLComponentInstance, 5>::Find(mPresentation,
+    mOutConfirmButtonInstance = FEFinder<TLComponentInstance, 5>::Find(mPresentation,
         nlStringLowerHash("out"), nlStringLowerHash("Layer"),
         nlStringLowerHash("Group"), nlStringLowerHash("PAD"),
         nlStringLowerHash("button_ok"), 0);
@@ -373,40 +371,40 @@ void TU80250754Scene::SceneCreated()
         int item = i;
         if (item < 0)
         {
-            item = mUnidentified0024;
+            item = mSelectedDigit;
         }
-        nlStrNCpy(mUnidentified0028[item], (const unsigned short*)L"", 2);
+        nlStrNCpy(mDigits[item], (const unsigned short*)L"", 2);
 
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[item], nlStringLowerHash("off"),
+            mDigitInstances[item], nlStringLowerHash("off"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[item]);
+        text->SetString(mDigits[item]);
 
         text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[item], nlStringLowerHash("over"),
+            mDigitInstances[item], nlStringLowerHash("over"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[item]);
+        text->SetString(mDigits[item]);
 
         text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[item], nlStringLowerHash("down"),
+            mDigitInstances[item], nlStringLowerHash("down"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[item]);
+        text->SetString(mDigits[item]);
     }
 
-    fn_8025018C();
-    fn_802505E8();
+    RestoreFriendCodeInput();
+    UpdateConfirmButton();
 
     for (int i = 0; i < 4; ++i)
     {
@@ -420,12 +418,12 @@ void TU80250754Scene::SceneCreated()
         object->SetButtons(0, true);
         screen = object->GetButton(4);
     }
-    mUnidentified1138.SetButtonInstance(screen);
+    mBackButton.SetButtonInstance(screen);
 
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
 }
 
-void TU80250754Scene::Update(float fDeltaT)
+void SHOnlineFriendCodeEntry::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
 
@@ -434,12 +432,12 @@ void TU80250754Scene::Update(float fDeltaT)
         return;
     }
 
-    if (mUnidentified1274 && !g_pFEInput->HasInputLock(this))
+    if (mPopupActive && !g_pFEInput->HasInputLock(this))
     {
         return;
     }
 
-    int state = mUnidentified1278;
+    int state = mState;
     if (state == 0 || (unsigned int)(state - 2) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
@@ -459,9 +457,9 @@ void TU80250754Scene::Update(float fDeltaT)
             {
                 object->SetButtons(4, true);
             }
-            mUnidentified1278 = 1;
-            fn_8024F570();
-            mUnidentified0020 = true;
+            mState = 1;
+            InitializeButtons();
+            mButtonsInitialized = true;
         }
         else if (state == 2)
         {
@@ -478,13 +476,13 @@ void TU80250754Scene::Update(float fDeltaT)
     if (!GameSceneManager::Instance()->IsOnStack((SceneList)0xA)
         && g_pFriendManager->FindHostInvitation())
     {
-        g_pFriendManager->mReturnScene = 0x30;
+        g_pFriendManager->mReturnScene = SCENE_ONLINE_FRIEND_CODE_ENTRY;
         g_pFriendManager->mPreviousRankedMode = 0;
         unsigned short* friendCode =
             g_pFriendManager->mFriendCodeInput;
         for (int i = 0; i < 12; ++i)
         {
-            friendCode[i] = mUnidentified0028[i][0];
+            friendCode[i] = mDigits[i][0];
         }
         GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_RESPONSE, SCREEN_FORWARD, true);
         return;
@@ -501,7 +499,7 @@ void TU80250754Scene::Update(float fDeltaT)
                 continue;
             }
 
-            if (mUnidentified001C > 0 || mUnidentified1138.mPointerInside[pad])
+            if (mHoverCount > 0 || mBackButton.mPointerInside[pad])
             {
                 controller->SetActiveSlide("A", true, false);
             }
@@ -522,16 +520,16 @@ void TU80250754Scene::Update(float fDeltaT)
 
         for (int i = 0; i < 12; ++i)
         {
-            mUnidentified0058[i].HandlePointerEvent(&event);
+            mKeypadButtons[i].HandlePointerEvent(&event);
         }
         for (int i = 0; i < 12; ++i)
         {
-            mUnidentified08C8[i].HandlePointerEvent(&event);
+            mDigitButtons[i].HandlePointerEvent(&event);
         }
 
-        if (mUnidentified1138.UpdateBackButton(event, fDeltaT))
+        if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
-            mUnidentified1278 = 3;
+            mState = 3;
             SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
@@ -544,7 +542,7 @@ void TU80250754Scene::Update(float fDeltaT)
     }
 }
 
-void TU80250754Scene::fn_80251328(int, void* context)
+void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
 {
     unsigned int item = (unsigned int)context;
 
@@ -552,18 +550,20 @@ void TU80250754Scene::fn_80251328(int, void* context)
     {
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
 
+        static char buffer[4] = "0";
+        char* digit = buffer;
         unsigned long long friendKey = 0;
         for (int i = 0; i < 12; ++i)
         {
-            nlWcsToStr(mUnidentified0028[i], lbl_806DE80C, 4);
-            friendKey += atoi(lbl_806DE80C) * pow(10.0, 11 - i);
+            nlWcsToStr(mDigits[i], digit, 4);
+            friendKey += atoi(digit) * pow(10.0, 11 - i);
         }
 
         int error = -1;
         if (g_pFriendManager->AddFriendKey(friendKey, &error))
         {
             SaveLoad::StartSave(true);
-            mUnidentified1278 = 2;
+            mState = 2;
 
             SHNavigation* object = GetNavigationScene();
             if (object != 0)
@@ -588,39 +588,39 @@ void TU80250754Scene::fn_80251328(int, void* context)
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                     (SceneList)10, SCREEN_NOTHING, false);
                 Function<FnVoidVoid> callback(
-                    Bind<void>(MemFun(&TU80250754Scene::fn_80250718), this));
+                    Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed), this));
                 popup->Create((ePopupMenu)error, callback);
-                mUnidentified1274 = true;
+                mPopupActive = true;
             }
 
             FEAudio::EnableSounds(true);
             FEAudio::PlayAnimAudioEvent(0xD642865E, 0, 0, 1);
             FEAudio::EnableSounds(false);
 
-            if (mUnidentified0024 != 0)
+            if (mSelectedDigit != 0)
             {
-                mUnidentified1240[0]->SetActiveSlide("DOWN", true, false);
-                mUnidentified1240[mUnidentified0024]->SetActiveSlide(
+                mDigitInstances[0]->SetActiveSlide("DOWN", true, false);
+                mDigitInstances[mSelectedDigit]->SetActiveSlide(
                     "OFF", true, false);
 
-                mUnidentified08C8[0].mDisabled = true;
+                mDigitButtons[0].mDisabled = true;
                 FEPointerEvent event;
-                mUnidentified08C8[0].mPreviousEvents[0] = event;
-                mUnidentified08C8[0].mPreviousEvents[1] = event;
-                mUnidentified08C8[0].mPreviousEvents[2] = event;
-                mUnidentified08C8[0].mPreviousEvents[3] = event;
+                mDigitButtons[0].mPreviousEvents[0] = event;
+                mDigitButtons[0].mPreviousEvents[1] = event;
+                mDigitButtons[0].mPreviousEvents[2] = event;
+                mDigitButtons[0].mPreviousEvents[3] = event;
 
-                mUnidentified08C8[mUnidentified0024].mDisabled = false;
-                mUnidentified0024 = 0;
+                mDigitButtons[mSelectedDigit].mDisabled = false;
+                mSelectedDigit = 0;
             }
         }
     }
     else if (item == 11)
     {
-        if (mUnidentified0028[mUnidentified0024][0] == 0
-            && mUnidentified0024 > 0)
+        if (mDigits[mSelectedDigit][0] == 0
+            && mSelectedDigit > 0)
         {
-            int nextItem = mUnidentified0024 - 1;
+            int nextItem = mSelectedDigit - 1;
             if (nextItem >= 12)
             {
                 nextItem = 11;
@@ -630,99 +630,99 @@ void TU80250754Scene::fn_80251328(int, void* context)
                 nextItem = 0;
             }
 
-            if (mUnidentified0024 != nextItem)
+            if (mSelectedDigit != nextItem)
             {
-                mUnidentified1240[nextItem]->SetActiveSlide(
+                mDigitInstances[nextItem]->SetActiveSlide(
                     "DOWN", true, false);
-                mUnidentified1240[mUnidentified0024]->SetActiveSlide(
+                mDigitInstances[mSelectedDigit]->SetActiveSlide(
                     "OFF", true, false);
 
-                mUnidentified08C8[nextItem].mDisabled = true;
+                mDigitButtons[nextItem].mDisabled = true;
                 FEPointerEvent event;
-                mUnidentified08C8[nextItem].mPreviousEvents[0] = event;
-                mUnidentified08C8[nextItem].mPreviousEvents[1] = event;
-                mUnidentified08C8[nextItem].mPreviousEvents[2] = event;
-                mUnidentified08C8[nextItem].mPreviousEvents[3] = event;
+                mDigitButtons[nextItem].mPreviousEvents[0] = event;
+                mDigitButtons[nextItem].mPreviousEvents[1] = event;
+                mDigitButtons[nextItem].mPreviousEvents[2] = event;
+                mDigitButtons[nextItem].mPreviousEvents[3] = event;
 
-                mUnidentified08C8[mUnidentified0024].mDisabled = false;
-                mUnidentified0024 = nextItem;
+                mDigitButtons[mSelectedDigit].mDisabled = false;
+                mSelectedDigit = nextItem;
             }
         }
 
         nlStrNCpy(
-            mUnidentified0028[mUnidentified0024], (const unsigned short*)L"", 2);
+            mDigits[mSelectedDigit], (const unsigned short*)L"", 2);
 
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[mUnidentified0024], nlStringLowerHash("off"),
+            mDigitInstances[mSelectedDigit], nlStringLowerHash("off"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[mUnidentified0024]);
+        text->SetString(mDigits[mSelectedDigit]);
 
         text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[mUnidentified0024], nlStringLowerHash("over"),
+            mDigitInstances[mSelectedDigit], nlStringLowerHash("over"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[mUnidentified0024]);
+        text->SetString(mDigits[mSelectedDigit]);
 
         text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[mUnidentified0024], nlStringLowerHash("down"),
+            mDigitInstances[mSelectedDigit], nlStringLowerHash("down"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[mUnidentified0024]);
+        text->SetString(mDigits[mSelectedDigit]);
     }
     else
     {
         if (item == 9)
         {
-            nlStrNCpy(mUnidentified0028[mUnidentified0024],
+            nlStrNCpy(mDigits[mSelectedDigit],
                 (const unsigned short*)L"0", 2);
         }
         else
         {
             unsigned short character[2];
             nlSNPrintf(character, 2, (const unsigned short*)L"%d", item + 1);
-            nlStrNCpy(mUnidentified0028[mUnidentified0024], character, 2);
+            nlStrNCpy(mDigits[mSelectedDigit], character, 2);
         }
 
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[mUnidentified0024], nlStringLowerHash("off"),
+            mDigitInstances[mSelectedDigit], nlStringLowerHash("off"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[mUnidentified0024]);
+        text->SetString(mDigits[mSelectedDigit]);
 
         text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[mUnidentified0024], nlStringLowerHash("over"),
+            mDigitInstances[mSelectedDigit], nlStringLowerHash("over"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[mUnidentified0024]);
+        text->SetString(mDigits[mSelectedDigit]);
 
         text = FEFinder<TLTextInstance, 3>::Find(
-            mUnidentified1240[mUnidentified0024], nlStringLowerHash("down"),
+            mDigitInstances[mSelectedDigit], nlStringLowerHash("down"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &gDefaultTLTextInstance;
         }
-        text->SetString(mUnidentified0028[mUnidentified0024]);
+        text->SetString(mDigits[mSelectedDigit]);
 
-        if (mUnidentified0024 < 11)
+        if (mSelectedDigit < 11)
         {
-            int nextItem = mUnidentified0024 + 1;
+            int nextItem = mSelectedDigit + 1;
             if (nextItem >= 12)
             {
                 nextItem = 11;
@@ -732,27 +732,27 @@ void TU80250754Scene::fn_80251328(int, void* context)
                 nextItem = 0;
             }
 
-            if (mUnidentified0024 != nextItem)
+            if (mSelectedDigit != nextItem)
             {
-                mUnidentified1240[nextItem]->SetActiveSlide(
+                mDigitInstances[nextItem]->SetActiveSlide(
                     "DOWN", true, false);
-                mUnidentified1240[mUnidentified0024]->SetActiveSlide(
+                mDigitInstances[mSelectedDigit]->SetActiveSlide(
                     "OFF", true, false);
 
-                mUnidentified08C8[nextItem].mDisabled = true;
+                mDigitButtons[nextItem].mDisabled = true;
                 FEPointerEvent event;
-                mUnidentified08C8[nextItem].mPreviousEvents[0] = event;
-                mUnidentified08C8[nextItem].mPreviousEvents[1] = event;
-                mUnidentified08C8[nextItem].mPreviousEvents[2] = event;
-                mUnidentified08C8[nextItem].mPreviousEvents[3] = event;
+                mDigitButtons[nextItem].mPreviousEvents[0] = event;
+                mDigitButtons[nextItem].mPreviousEvents[1] = event;
+                mDigitButtons[nextItem].mPreviousEvents[2] = event;
+                mDigitButtons[nextItem].mPreviousEvents[3] = event;
 
-                mUnidentified08C8[mUnidentified0024].mDisabled = false;
-                mUnidentified0024 = nextItem;
+                mDigitButtons[mSelectedDigit].mDisabled = false;
+                mSelectedDigit = nextItem;
             }
         }
     }
 
-    fn_802505E8();
+    UpdateConfirmButton();
 
     switch (item)
     {

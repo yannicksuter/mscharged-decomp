@@ -1,6 +1,7 @@
 #include "Game/SH/SHNavigation.h"
 #include "Game/GameSceneManager.h"
 #include "Game/DB/GameProgress.h"
+#include "Game/DB/SaveLoad.h"
 #include "Game/Render/Presentation.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/FE/FEAudio.h"
@@ -39,7 +40,6 @@ extern "C" void fn_80208458();
 extern "C" void fn_80208518();
 extern "C" void fn_80208594();
 extern "C" void fn_802092D0(bool);
-class SHNavigation;
 extern "C" void fn_80276D10();
 extern "C" bool fn_80276DE0();
 extern "C" void fn_80276E0C();
@@ -50,8 +50,6 @@ extern "C" void fn_80341E68(BasicStadium*, unsigned int);
 extern "C" void fn_802DEDE8(InterpreterCore*);
 
 extern bool g_e3_Build;
-extern "C" bool lbl_806DC704;
-extern "C" bool lbl_806E0F8B;
 
 class PresentationLookupResult
 {
@@ -544,7 +542,7 @@ void Presentation::DoFunctionCall(unsigned int function)
             mCameraTransitionFinished = false;
         break;
     case 47:
-        if (lbl_806DC704 && lbl_806E0F8B)
+        if (SaveEnabled && InOperation)
         {
             StopWithUndo();
         }

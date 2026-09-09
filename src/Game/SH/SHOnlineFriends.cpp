@@ -666,7 +666,7 @@ void SHOnlineFriends::Update(float dt)
         else if (mUnidentified2FAC == 2)
         {
             if (!IsOnlineFriendSelectionMode())
-                GameSceneManager::Instance()->Push((SceneList)48, SCREEN_FORWARD, true);
+                GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIEND_CODE_ENTRY, SCREEN_FORWARD, true);
             else
             {
                 SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_FORWARD, true);

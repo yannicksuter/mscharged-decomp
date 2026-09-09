@@ -902,7 +902,7 @@ config.libs = [
             Object(Matching, "Game/FE/feSlideMenu.cpp"),
             Object(NonMatching, "Game/HBMManager.cpp"),
             Object(NonMatching, "Game/SH/SHHallOfFame.cpp", extra_cflags=["-inline noauto", "-ipa file"]),
-            Object(NonMatching, "unclassified/tu_8024F4E0.cpp"),
+            Object(NonMatching, "Game/SH/SHOnlineFriendCodeEntry.cpp"),
             Object(NonMatching, "Game/SH/SHNavigation.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/SH/SHHallOfFameSummary.cpp"),
             Object(NonMatching, "Game/SH/SHOnlinePlayerCount.cpp"),

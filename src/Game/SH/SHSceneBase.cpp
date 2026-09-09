@@ -6,6 +6,7 @@
 
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/GameProgress.h"
+#include "Game/DB/SaveLoad.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
@@ -28,14 +29,6 @@ extern "C" void fn_801E3A88(UnidentifiedTextFader* fader, void* strings);
 extern "C" void fn_801E3B60(UnidentifiedTextFader* fader, const char* text);
 extern "C" void fn_801E3DB4(UnidentifiedTextFader* fader, float dt);
 extern "C" void fn_801E4460(UnidentifiedTextFader* fader, TLInstance* instance);
-
-// Scroll widget owned by the 0x8022Fxxx/0x80230xxx translation units.
-
-class SHNavigation;
-
-
-extern bool lbl_806DC704;
-extern bool lbl_806E0F8B;
 
 static inline TLInstance* FindInstance(TLSlide* slide, const char* item)
 {
@@ -323,7 +316,7 @@ void UnidentifiedSHSceneBase::SceneCreated()
 
 void UnidentifiedSHSceneBase::Update(float dt)
 {
-    if (lbl_806DC704 && lbl_806E0F8B)
+    if (SaveEnabled && InOperation)
         return;
     if (!mUnidentified109)
     {

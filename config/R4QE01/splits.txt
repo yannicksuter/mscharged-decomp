@@ -1899,7 +1899,7 @@ Game/SH/SHHallOfFame.cpp:
 	.sdata      start:0x806DE6F8 end:0x806DE7AC
 	.sbss       start:0x806E18E0 end:0x806E18F0
 
-unclassified/tu_8024F4E0.cpp:
+Game/SH/SHOnlineFriendCodeEntry.cpp:
 	.text       start:0x8024F4E0 end:0x80252180
 	.data       start:0x8051F758 end:0x8051F7AC
 
