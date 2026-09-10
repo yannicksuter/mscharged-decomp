@@ -3462,70 +3462,67 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
 
 void cFielder::fn_800451B0(const nlVector3& v3Position)
 {
-    if (m_eActionState == ACTION_ELECTROCUTION)
+    if (m_eActionState == ACTION_ELECTROCUTION || IsShattered() == true)
     {
         return;
     }
-    if (this->IsShattered() != true)
+
+    if (m_pBall != 0)
     {
+        ReleaseBall(0);
 
-        if (m_pBall != 0)
-        {
-            ReleaseBall(0);
-
-            float fSpread = 4.0f;
-            nlVector3 v3BallVelocity;
-            v3BallVelocity.x = nlRandomf(fSpread) - 0.5f * fSpread;
-            v3BallVelocity.y = nlRandomf(fSpread) - 0.5f * fSpread;
-            v3BallVelocity.z = nlRandomf(fSpread);
-            g_pBall->ShootRelease(v3BallVelocity, SPINTYPE_NONE);
-        }
-
-        fn_8002E3F8(this);
-        fn_8009750C();
-
-        if (m_pBall == 0)
-        {
-            nlVector3 v3Direction;
-            nlVec3Set(v3Direction,
-                v3Position.x - mUnidentified024.m_v3Position.x,
-                v3Position.y - mUnidentified024.m_v3Position.y,
-                v3Position.z - mUnidentified024.m_v3Position.z);
-            SetFacingDirection(nlVector3ToAngle(v3Direction), true);
-        }
-
-        InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction(ACTION_ELECTROCUTION);
-        SetAnimState(0x79, true, 0.2f, false, false);
-        InitMovementNone(0.0f, 0.0f);
-
-        nlVector3 jointPos = GetJointPosition(m_nBip01JointIndex_0xA4);
-
-        nlVector3 futureJointPos;
-        GetJointPositionFuture(&futureJointPos, 0, m_nBip01JointIndex_0xA4,
-            0.0f, false, false, false, true);
-
-        futureJointPos.z += 0.05f;
-        jointPos.z = (jointPos.z >= futureJointPos.z) ? jointPos.z
-                                                      : futureJointPos.z;
-
-        SetPosition(jointPos);
-
-        mUnidentified340 = lbl_806DB994 + nlRandomf(lbl_806DB998);
-        mUnidentified344 = lbl_806DB99C;
-        mUnidentified348 = true;
-        fn_801B968C(this);
-
-        PlayRumbleAction(4, GetGlobalPad());
-
-        bool bUnidentified = fn_8001E168();
-        unsigned long soundID = 0xBADF0EF9;
-        if (bUnidentified)
-        {
-            soundID = 0x1602CA52;
-        }
-        PlaySound(mUnidentified318, soundID, 0, 0);
+        float fSpread = 4.0f;
+        nlVector3 v3BallVelocity;
+        v3BallVelocity.x = nlRandomf(fSpread) - 0.5f * fSpread;
+        v3BallVelocity.y = nlRandomf(fSpread) - 0.5f * fSpread;
+        v3BallVelocity.z = nlRandomf(fSpread);
+        g_pBall->ShootRelease(v3BallVelocity, SPINTYPE_NONE);
     }
+
+    fn_8002E3F8(this);
+    fn_8009750C();
+
+    if (m_pBall == 0)
+    {
+        nlVector3 v3Direction;
+        nlVec3Set(v3Direction,
+            v3Position.x - mUnidentified024.m_v3Position.x,
+            v3Position.y - mUnidentified024.m_v3Position.y,
+            v3Position.z - mUnidentified024.m_v3Position.z);
+        SetFacingDirection(nlVector3ToAngle(v3Direction), true);
+    }
+
+    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    SetAction(ACTION_ELECTROCUTION);
+    SetAnimState(0x79, true, 0.2f, false, false);
+    InitMovementNone(0.0f, 0.0f);
+
+    nlVector3 jointPos = GetJointPosition(m_nBip01JointIndex_0xA4);
+
+    nlVector3 futureJointPos;
+    GetJointPositionFuture(&futureJointPos, 0, m_nBip01JointIndex_0xA4,
+        0.0f, false, false, false, true);
+
+    futureJointPos.z += 0.05f;
+    jointPos.z = (jointPos.z >= futureJointPos.z) ? jointPos.z
+                                                  : futureJointPos.z;
+
+    SetPosition(jointPos);
+
+    mUnidentified340 = lbl_806DB994 + nlRandomf(lbl_806DB998);
+    mUnidentified344 = lbl_806DB99C;
+    mUnidentified348 = true;
+    fn_801B968C(this);
+
+    PlayRumbleAction(4, GetGlobalPad());
+
+    bool bUnidentified = fn_8001E168();
+    unsigned long soundID = 0xBADF0EF9;
+    if (bUnidentified)
+    {
+        soundID = 0x1602CA52;
+    }
+    PlaySound(mUnidentified318, soundID, 0, 0);
 }
 
 void cFielder::fn_80043ADC()

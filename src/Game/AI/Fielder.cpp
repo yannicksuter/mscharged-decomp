@@ -3772,11 +3772,24 @@ void cFielder::Unknown12(RunningChecksum* pChecksum)
     pChecksum->ChecksumData(&m_eRole, sizeof(m_eRole));
 }
 
-void cFielder::SetPosition(const nlVector3& position)
+UnidentifiedScriptMachine* fn_8002E1A4(cFielder* pFielder)
 {
-    for (;;)
+    return pFielder->mUnidentified428->mUnidentified18;
+}
+
+eFielderDesireState cFielder::fn_8002E060()
+{
+    UnidentifiedScriptMachine* machine = mUnidentified428->mUnidentified18;
+    if (machine != 0 && machine->mUnidentified004 != 0)
     {
+        return (eFielderDesireState)machine->mUnidentified004->mUnidentifiedState;
     }
+    return (eFielderDesireState)-1;
+}
+
+void cFielder::SetPosition(const nlVector3& v3Position)
+{
+    cCharacter::SetPosition(v3Position);
 }
 
 float cNet::GetNetHeight()
@@ -3796,4 +3809,15 @@ void Desire::UnidentifiedVirtual7(void*, DebugWriteCache*)
 PlayerTweaks* cFielder::GetTweaks() const
 {
     return m_pTweaks;
+}
+
+extern "C" void fn_803198F4(UnidentifiedScriptMachine* machine);
+
+void cFielder::EndDesire()
+{
+    UnidentifiedScriptMachine* machine = mUnidentified428->mUnidentified18;
+    if (machine != 0)
+    {
+        fn_803198F4(machine);
+    }
 }

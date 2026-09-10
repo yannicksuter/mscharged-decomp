@@ -189,8 +189,8 @@ void ChooseSidekicksSceneV2::fn_8022B600(int index, void* context)
 void ChooseSidekicksSceneV2::fn_8022B400(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
-    int group = which >= 3;
-    int slot = group ? which - 3 : which;
+    bool group = which >= 3;
+    int slot = !group ? which : which - 3;
     int side = GetSide(index);
 
     if (mUnidentified20[group] != -1 || side != -1)
@@ -245,8 +245,8 @@ void ChooseSidekicksSceneV2::fn_8022B234(int index, void* context)
 void ChooseSidekicksSceneV2::fn_8022B494(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
-    int group = which >= 3;
-    int slot = group ? which - 3 : which;
+    bool group = which >= 3;
+    int slot = !group ? which : which - 3;
     int side = GetSide(index);
 
     if (mUnidentified20[group] != -1 || side != -1)

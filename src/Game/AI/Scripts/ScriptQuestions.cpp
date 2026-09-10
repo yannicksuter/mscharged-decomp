@@ -28,6 +28,21 @@ extern "C" float fn_800DAFCC(const nlVector3&, const nlVector3&, cPlayer*,
 
 extern float lbl_806E41B0;
 
+float Offensive(cTeam* pTeam)
+{
+    if (pTeam == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pTeam->mpCurrentSituation == SITUATION_OFFENSE)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
 static const nlVector2 g_vOpenToAdjust = { 0.0f, 0.8f };
 static const nlVector2 g_vPassCloseToDoneConfidence = { 0.0f, 0.5f };
 static const nlVector2 g_vStallingConfidenceTime = { 1.0f, 8.0f };

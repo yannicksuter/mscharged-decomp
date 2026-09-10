@@ -17,6 +17,7 @@ struct WarbleConfiguration
 struct WarbleInstance : public WarbleConfiguration
 {
     WarbleInstance(const WarbleConfiguration& configuration);
+    bool UnidentifiedQuery() const { return elapsed >= duration; }
 
     /* 0x30 */ float elapsed;
     /* 0x34 */ int active;

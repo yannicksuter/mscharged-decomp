@@ -680,11 +680,8 @@ extern "C" float fn_80314538(
     }
 
     maximum -= minimum;
-    if (nlAbs(maximum) >= 0.00001f)
-    {
-        second = first
-            + (value - minimum) / maximum * (second - first);
-    }
+    second = nlAbs(maximum) < 0.00001f ? second
+        : first + (value - minimum) / maximum * (second - first);
     return second;
 }
 

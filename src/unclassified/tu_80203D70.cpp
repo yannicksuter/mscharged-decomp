@@ -60,7 +60,7 @@ void TU80203D70Scene::fn_802066C8(int index, void* context)
         if (!mButtonComponent1.HasOtherPointerState(1, index))
         {
             mUnidentified5E0->SetActiveSlide("over", true, false);
-            FEAudio::PlayAnimAudioEvent(0x96DFB5C3, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
             mButtonComponent1.SetPointerState(1, index);
         }
     }
@@ -69,7 +69,7 @@ void TU80203D70Scene::fn_802066C8(int index, void* context)
         if (!mButtonComponent2.HasOtherPointerState(1, index))
         {
             mUnidentified5E4->SetActiveSlide("over", true, false);
-            FEAudio::PlayAnimAudioEvent(0x96DFB5C3, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
             mButtonComponent2.SetPointerState(1, index);
         }
     }
@@ -77,7 +77,7 @@ void TU80203D70Scene::fn_802066C8(int index, void* context)
         && !mButtonComponent3.HasOtherPointerState(1, index))
     {
         mUnidentified5E8->SetActiveSlide("over", true, false);
-        FEAudio::PlayAnimAudioEvent(0xACCECA48, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
         mButtonComponent3.SetPointerState(1, index);
     }
 }

@@ -1,4 +1,5 @@
 #include "Game/DB/GameProgress.h"
+
 #include "Game/GameInfo.h"
 #include "Game/FE/feHelpFuncs.h"
 #include "Game/TweakRegistry.h"
@@ -16,6 +17,21 @@ struct StrikerChallengeDefinition
 };
 
 extern const StrikerChallengeDefinition gStrikerChallengeDefinitions[22];
+
+bool CupManager::HasGameBeenPlayed(int phase, int matchup)
+{
+    BasicGameInfo* gameInfo = GetGameInfo(phase, matchup);
+    if (gameInfo->mFinalScore[0] != 0 || gameInfo->mFinalScore[1] != 0)
+    {
+        return true;
+    }
+    return false;
+}
+
+void CupManager::RestoreCupRecord()
+{
+    mUnidentified86A0 = mUnidentified86A6;
+}
 
 void* BaseCup::SerializeData(void* dst) const
 {

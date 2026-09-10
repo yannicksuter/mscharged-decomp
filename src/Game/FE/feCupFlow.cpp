@@ -5,6 +5,8 @@
 #include "Game/DB/GameProgress.h"
 #include "Game/DB/SaveLoad.h"
 #include "Game/FE/feMusic.h"
+#include "Game/Render/Presentation.h"
+#include "Game/SH/SHCupNews.h"
 
 bool gMainMenuInputResetPending;
 
@@ -179,4 +181,23 @@ const char* GetCupTeamSlide(int teamType)
 void ShowCupHub()
 {
     GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, false);
+}
+
+void FinishCupAwardPresentation()
+{
+    Presentation::GetInstance()->Call("TransitionCupToCentreAward");
+}
+
+void ShowCupBrickWallNews()
+{
+    CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
+        (SceneList)39, SCREEN_NOTHING, false);
+    scene->SetDisplayMode(7);
+}
+
+void ShowCupGoldenBootNews()
+{
+    CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
+        (SceneList)39, SCREEN_NOTHING, false);
+    scene->SetDisplayMode(6);
 }

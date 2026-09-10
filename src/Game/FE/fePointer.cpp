@@ -32,45 +32,42 @@ FEPointerListener::~FEPointerListener()
 
 void FEPointerListener::ProcessPointerEvent(const FEPointerEvent* event)
 {
-    if (mDisabled)
+    if (mDisabled || (g_pFEInput->m_InputLockDepth != 0 && !mIgnoreInputLock))
     {
         return;
     }
 
-    if (g_pFEInput->m_InputLockDepth == 0 || mIgnoreInputLock)
+    if (ContainsPoint(event->mPosition))
     {
-        if (ContainsPoint(event->mPosition))
+        if (!ContainsPoint(mPreviousEvents[event->mIndex].mPosition))
         {
-            if (!ContainsPoint(mPreviousEvents[event->mIndex].mPosition))
-            {
-                OnPointerEnter(event->mIndex, mContext);
-            }
-
-            OnPointerUpdate(event->mIndex, mContext);
-            OnPointerInside(event->mIndex, mContext);
-
-            if (event->mPressed)
-            {
-                OnPointerPress(event->mIndex, mContext);
-            }
-
-            if (event->mSecondaryAction)
-            {
-                OnPointerSecondaryAction(event->mIndex, mContext);
-            }
-        }
-        else if (ContainsPoint(mPreviousEvents[event->mIndex].mPosition))
-        {
-            OnPointerLeave(event->mIndex, mContext);
+            OnPointerEnter(event->mIndex, mContext);
         }
 
-        if (event->mReleased)
+        OnPointerUpdate(event->mIndex, mContext);
+        OnPointerInside(event->mIndex, mContext);
+
+        if (event->mPressed)
         {
-            OnPointerRelease(event->mIndex, mContext);
+            OnPointerPress(event->mIndex, mContext);
         }
 
-        mPreviousEvents[event->mIndex] = *event;
+        if (event->mSecondaryAction)
+        {
+            OnPointerSecondaryAction(event->mIndex, mContext);
+        }
     }
+    else if (ContainsPoint(mPreviousEvents[event->mIndex].mPosition))
+    {
+        OnPointerLeave(event->mIndex, mContext);
+    }
+
+    if (event->mReleased)
+    {
+        OnPointerRelease(event->mIndex, mContext);
+    }
+
+    mPreviousEvents[event->mIndex] = *event;
 }
 
 void FEPointerListener::SetPointerEnterCallback(const Callback& callback)

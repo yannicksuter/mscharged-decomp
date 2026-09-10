@@ -1,6 +1,7 @@
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/feOptionsSubMenus.h"
 #include "Game/FE/FEAudio.h"
+#include "Game/FE/feInput.h"
 
 #include "Game/DB/SaveLoad.h"
 #include "Game/DB/UserOptions.h"
@@ -267,19 +268,19 @@ void OptionsVisualMenuV2::fn_801D7A0C(int index, void* context)
 void OptionsVisualMenuV2::fn_801D7EC8(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if ((unsigned int)mSettings[0] != item)
+    if ((unsigned int)mSettings[0] == item
+        || mZoomButtonComponents[item].HasOtherPointerState(2, -1))
     {
-        if (!mZoomButtonComponents[item].HasOtherPointerState(2, -1))
-        {
-            mZoomButtonComponents[item].PlayHoverFeedback(index);
-            if (!mZoomButtonComponents[item].HasOtherPointerState(1, index))
-            {
-                mZoomButtons[item]->SetActiveSlide("over", true, false);
-                FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
-            }
-            mZoomButtonComponents[item].SetPointerState(1, index);
-        }
+        return;
     }
+
+    mZoomButtonComponents[item].PlayHoverFeedback(index);
+    if (!mZoomButtonComponents[item].HasOtherPointerState(1, index))
+    {
+        mZoomButtons[item]->SetActiveSlide("over", true, false);
+        FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
+    }
+    mZoomButtonComponents[item].SetPointerState(1, index);
 }
 
 void OptionsVisualMenuV2::fn_801D7F9C(int index, void* context)
@@ -332,6 +333,16 @@ void OptionsVisualMenuV2::fn_801D8538()
     FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
     mUnidentified6C6 = true;
     SaveLoad::StartSave(false);
+}
+
+void MoviePlayerScene::SceneCreated()
+{
+    OverrideMovieDimensions();
+}
+
+bool MoviePlayerScene::CheckMoviePlayerAbort()
+{
+    return g_pFEInput->JustPressed(FE_ALL_PADS, 30, true, 0);
 }
 
 void MoviePlayerScene::PlayScreenForwardSFX()

@@ -291,3 +291,8 @@ bool AudioSource::IsStream()
 {
     return false;
 }
+
+bool AudioSource::IsLooping()
+{
+    return m_Unknown14_00 == 0xFFFF;
+}

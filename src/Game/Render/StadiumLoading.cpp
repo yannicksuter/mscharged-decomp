@@ -58,7 +58,7 @@ extern "C"
     extern bool lbl_806E1961;
     extern int lbl_806E1968;
     extern StadiumTweaks* lbl_806E196C;
-    extern u8 lbl_8057AB20[4];
+    extern u8 lbl_8057AB20[];
 }
 
 bool gSkipGameplayModels;

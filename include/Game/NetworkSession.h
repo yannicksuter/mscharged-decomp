@@ -464,7 +464,7 @@ public:
     /* 0x2473 */ u8 mCupMode;
     /* 0x2474 */ u32 mUnidentified2474;
     /* 0x2478 */ u32 mUnidentified2478;
-    /* 0x247C */ u32 mUnidentified247C;
+    /* 0x247C */ int mUnidentified247C;
     /* 0x2480 */ int mOverlayRequest;
     /* 0x2484 */ int mPoppedOverlay;
     /* 0x2488 */ long mDWCErrorCode;

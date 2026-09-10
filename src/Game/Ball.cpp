@@ -1245,11 +1245,9 @@ void cBall::InitiateBallBlur(
 
     switch (effectType)
     {
-    case BALL_EFFECT_PERFECT_PASS:
-    case BALL_EFFECT_REGULAR_SHOT:
-    case BALL_EFFECT_ONETIMER_SHOT:
-    case BALL_EFFECT_CHIP_SHOT:
-        break;
+    case BALL_EFFECT_S2S_SUPER_SHOT:
+    case BALL_EFFECT_S2S_SHOT:
+    case BALL_EFFECT_PERFECT_SHOT:
     default:
         if (mfChargeValue >= 1.0f)
         {
@@ -1287,6 +1285,11 @@ void cBall::InitiateBallBlur(
             m_pBlurHandler = BlurManager::GetNewHandler(
                 textureName, 0.18f, nLength, true);
         }
+        break;
+    case BALL_EFFECT_PERFECT_PASS:
+    case BALL_EFFECT_REGULAR_SHOT:
+    case BALL_EFFECT_ONETIMER_SHOT:
+    case BALL_EFFECT_CHIP_SHOT:
         break;
     }
 }

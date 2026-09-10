@@ -592,11 +592,11 @@ void* nlLoadEntireHostFile(const char* fileName, unsigned long* outSize,
             }
             else if (type == AllocateEnd)
             {
-                buffer = nlMalloc(size, alignment, true);
+                buffer = operator new(size, alignment, true);
             }
             else
             {
-                buffer = nlMalloc(size, alignment, false);
+                buffer = operator new(size, alignment, false);
             }
             fread(buffer, 1, size, file);
         }

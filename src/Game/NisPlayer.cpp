@@ -1,6 +1,7 @@
 #include "Game/NisPlayer.h"
 
 #include "Game/Effects/EmissionManager.h"
+#include "Game/Render/tu_80283D9C.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
@@ -72,5 +73,9 @@ NisPlayer* NisPlayer::Instance()
 }
 
 void NisPlayer::fn_8027E5D0()
+{
+}
+
+void NisPlayerOverlay::Reset()
 {
 }

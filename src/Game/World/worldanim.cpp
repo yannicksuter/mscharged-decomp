@@ -240,6 +240,12 @@ extern "C" void fn_803437C8(WorldAnimObject_803437C8* pObject,
         = (WorldAnimBinding_803438FC*)pContext->GetParentData();
 }
 
+void WorldAnimManager::BindControllerObjects(const unsigned long&,
+    WorldAnimController** ppController)
+{
+    fn_803438FC((*ppController)->m_pWorldAnimObject);
+}
+
 extern "C" void fn_803438FC(WorldAnimObject_803437C8* pObject)
 {
     if (pObject->m_pBindings != 0)
@@ -874,12 +880,6 @@ void WorldAnimManager::BindObjects()
 {
     m_animationControllerMap.Walk(
         this, &WorldAnimManager::BindControllerObjects);
-}
-
-void WorldAnimManager::BindControllerObjects(const unsigned long&,
-    WorldAnimController** ppController)
-{
-    fn_803438FC((*ppController)->m_pWorldAnimObject);
 }
 
 void WorldAnimManager::Update(float fDeltaT)

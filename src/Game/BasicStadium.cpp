@@ -105,9 +105,8 @@ void fn_802785FC(BasicStadium* pStadium, float fDeltaT)
  */
 void fn_8027876C(BasicStadium* pStadium, DrawableObject* pObject)
 {
-    DrawableObject* pValue = pObject;
     unsigned long uKey = pObject->m_uHashID;
-    pStadium->m_registeredDrawables.Add(uKey, pValue);
+    pStadium->m_registeredDrawables.Add(uKey, pObject);
 }
 
 /**
@@ -156,7 +155,7 @@ void fn_80278860(BasicStadium* pStadium, int active)
 void fn_802788BC(BasicStadium* pStadium, float fTimeScale)
 {
     pStadium->m_shadowHeight = fTimeScale;
-    fn_80184AF8(fTimeScale);
+    fn_80184AF8(pStadium->m_shadowHeight);
     GetEmissionManager()->mTimeScale = pStadium->m_shadowHeight;
 }
 

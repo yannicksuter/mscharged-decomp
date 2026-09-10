@@ -1721,8 +1721,7 @@ static inline void RecordGameConfig(
     NetworkInputRecording* state = gNetworkInputRecording;
     if (state->mRecordingEnabled != 0)
     {
-        int count = session->GetNumMachines();
-        state->StartNetworkInputRecording((s8)session->GetLocalMachineId(), count, seed, config, 0x58);
+        state->StartNetworkInputRecording((s8)session->GetLocalMachineId(), session->GetNumMachines(), seed, config, 0x58);
     }
 }
 
@@ -2420,7 +2419,7 @@ int NetworkSession::Send(
         return 0;
     }
 
-    int machine = player;
+    s8 machine = player;
     if (NetTournManager::Instance()->mTournamentMachineMappingActive)
     {
         machine = (s8)NetTournManager::Instance()->MachineIdxToTournamentIdx(
@@ -2599,8 +2598,7 @@ void NetworkSession::SetTournamentMode(u8 value)
 
 bool NetworkSession::IsConnectedPeer(u32 connection)
 {
-    if (connection == 0 || connection == 0xFFFFFFFF
-        || connection == 0xFFFFFFFE)
+    if (!(connection != 0 && connection != 0xFFFFFFFF && connection != 0xFFFFFFFE))
     {
         return false;
     }

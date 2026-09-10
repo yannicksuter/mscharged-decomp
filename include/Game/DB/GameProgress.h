@@ -20,6 +20,11 @@ struct CupHistoryRecord
     unsigned int mUnidentified39 : 7;
 };
 
+struct CupRecord_8010C5C0
+{
+    u16 mValues[3];
+};
+
 class CupManager : public CupInterface
 {
 public:
@@ -65,7 +70,10 @@ public:
     /* 0x8684 */ u8 unknown_0x8684[0x10];
     /* 0x8694 */ int mPreviousGameTeams[2];
     /* 0x869C */ bool mUnidentified869C;
-    /* 0x869D */ u8 unknown_0x869D[0x37F];
+    /* 0x869D */ u8 unknown_0x869D[3];
+    /* 0x86A0 */ CupRecord_8010C5C0 mUnidentified86A0;
+    /* 0x86A6 */ CupRecord_8010C5C0 mUnidentified86A6;
+    /* 0x86AC */ u8 unknown_0x86AC[0x370];
     /* 0x8A1C */ int mCurrentMode;
     /* 0x8A20 */ BaseCup* mCurrentCup;
     /* 0x8A24 */ bool mShowCupPhasePopup;

@@ -4350,11 +4350,16 @@ void Goalie::fn_8008BBB0(
 
     switch (nPursueDekeType)
     {
+    case 0:
+        break;
     case 1:
     case 2:
         mpLooseBallInfo = &LooseBallAnims::mUnknownD0BC;
         break;
-    default:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
         break;
     }
 

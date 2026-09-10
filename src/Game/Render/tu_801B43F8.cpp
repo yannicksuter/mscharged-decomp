@@ -91,7 +91,8 @@ void UnidentifiedNPC_801B43F8::fn_801B4830(
     cPlayer* pPlayer = 0;
     UnidentifiedNPC_801B43F8* pDebris
         = (UnidentifiedNPC_801B43F8*)((PhysicsNPC*)pPhysObj)->mpAINPC;
-    if (pDebris->mUnidentified094 > 0.0f)
+    bool bUnidentified = pDebris->mUnidentified094 > 0.0f;
+    if (bUnidentified)
     {
         return;
     }

@@ -326,7 +326,7 @@ void SHGameplayOptions::fn_80235928()
 void SHGameplayOptions::fn_80235CE4(bool value)
 {
     mUnidentified15BD = value;
-    bool other = !value;
+    bool other = !mUnidentified15BD;
     mUnidentified1388->m_bVisible = value;
     mUnidentified138C->m_bVisible = other;
     for (int i = 12; i < 20; ++i)
@@ -676,7 +676,7 @@ void SHGameplayOptions::fn_80237F68(int index, void* context)
     mDoneButtonInstance->SetActiveSlide("down", true, false);
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     GameInfoManager* gameInfo = GameInfoManager::Instance();
-    if (gameInfo->mIsOnlineMode && !gameInfo->mOnlineRankedMatch)
+    if (gameInfo->UseAltRules())
         FEAudio::PlayAnimAudioEvent(0x64B85E8D, 0, 0, 1);
     else
         FEAudio::PlayAnimAudioEvent(0x5BCD337B, 0, 0, 1);
@@ -685,7 +685,7 @@ void SHGameplayOptions::fn_80237F68(int index, void* context)
 void SHGameplayOptions::fn_80238050()
 {
     GameInfoManager* gameInfo = GameInfoManager::Instance();
-    if (gameInfo->mIsOnlineMode && !gameInfo->mOnlineRankedMatch)
+    if (gameInfo->UseAltRules())
     {
         reinterpret_cast<GameplaySettings&>(gameInfo->mUserInfo.mUnidentified4C) = mSettings;
         reinterpret_cast<GameplaySettings&>(GameInfoManager::Instance()->mNoCheatSettings) = mSettings;

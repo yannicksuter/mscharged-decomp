@@ -511,7 +511,8 @@ void FriendManager::SetOwnStatusInitial(
 {
     mFriendStatusIndex = -1;
     int currentStatus = mOwnStatus.mStatus;
-    int status = available != 0;
+    EFriendStatus status = available ? EFriendStatus_Initial_Available
+                                    : EFriendStatus_Initial_NotAvailable;
     if (currentStatus != status)
     {
         mOwnStatus.mStatus = status;

@@ -24,6 +24,15 @@ extern unsigned char gRumbleSettings[];
 extern RumbleActionState gRumbleActionStates[4];
 extern bool gRumbleEnabledOverride;
 
+bool IsRumbleActionActive(cGlobalPad* pad)
+{
+    if (pad == 0)
+    {
+        return false;
+    }
+    return gRumbleActionStates[pad->m_padIndex].active;
+}
+
 void UpdateRumbleActions(float dt)
 {
     if (gRumbleSettings[0xA] || gRumbleEnabledOverride)

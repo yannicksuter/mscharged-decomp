@@ -84,7 +84,7 @@ void UpdateWarble(WarbleOwner* owner, float dt)
     if (instance == 0)
         return;
 
-    bool expired = instance->elapsed >= instance->duration;
+    bool expired = instance->UnidentifiedQuery();
     if (expired)
     {
         delete instance;

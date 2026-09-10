@@ -127,6 +127,11 @@ bool DesireDeke::UnidentifiedInitialize(void* context)
     return true;
 }
 
+void DesireDeke::UnidentifiedCleanup()
+{
+    mUnidentifiedFielder->m_eLastPadAction = 50;
+}
+
 void DesireDeke::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireDeke");

@@ -86,12 +86,15 @@ void SHOnlineFriends::UpdateFriend(int index)
     u16* name = GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, index);
     row->mFriendIndex = index;
     int type = DWC_GetFriendDataType(data);
-    if (!DWC_IsValidFriendData(data) || type == 0)
+    if (DWC_IsValidFriendData(data) && type != 0)
+    {
+        row->mVisible = true;
+    }
+    else
     {
         row->mVisible = false;
         return;
     }
-    row->mVisible = true;
     char status[256];
     switch (DWC_GetFriendStatus((DWCFriendData*)data, status))
     {
