@@ -108,12 +108,12 @@ inline void nlListAddEnd(T** head, T** tail, T* node)
 template <typename T>
 inline T* nlListRemoveStart(T** head, T** tail)
 {
-    T* first = *head;
-    if (first == 0)
+    if (*head == 0)
     {
         return 0;
     }
 
+    T* first = *head;
     if (tail != 0 && *tail == first)
     {
         *tail = 0;

@@ -13,6 +13,8 @@
 #include "math.h"
 #include "types.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 extern CollisionSpace* g_CollisionSpace;
 extern PhysicsWorld* g_PhysicsWorld;
 

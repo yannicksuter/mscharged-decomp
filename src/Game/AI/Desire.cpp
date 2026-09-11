@@ -7,12 +7,47 @@
 #include "Game/AI/Variant.h"
 #include "Game/DebugWriteCache.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 extern "C" void fn_80098098(cFielder*);
 extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
 
 float lbl_806DC04C = 60.0f;
 float lbl_806DC050 = 0.3f;
 extern float lbl_806DC054;
+
+extern "C" int fn_800B045C()
+{
+    return 6;
+}
+
+extern nlVector3* lbl_8056DA30[6];
+
+extern "C" nlVector3* fn_800B0464(int index)
+{
+    return lbl_8056DA30[index];
+}
+
+extern int lbl_8056DA48[6];
+
+extern "C" int fn_800B0478(int index)
+{
+    return lbl_8056DA48[index];
+}
+
+extern nlVector3* lbl_8056DA00[6];
+
+extern "C" nlVector3* fn_800B048C(int index)
+{
+    return lbl_8056DA00[index];
+}
+
+extern int lbl_8056DA18[6];
+
+extern "C" int fn_800B04A0(int index)
+{
+    return lbl_8056DA18[index];
+}
 
 Desire::Desire(int state, const UnidentifiedStateTransition& transition)
     : shdStateMachine(state, transition)
@@ -281,4 +316,11 @@ void DesireRunToTarget::UnidentifiedVirtual8(void* field, DebugWriteCache* cache
     cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fSpeedCoeff - (u8*)&mvDesiredPosition, "m_fSpeedCoeff");
     cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fAvoidanceCoeff - (u8*)&mvDesiredPosition, "m_fAvoidanceCoeff");
     cache->EndType();
+}
+
+class UnidentifiedWeatherExtendedStateF;
+
+extern "C" int fn_800B04B4(UnidentifiedWeatherExtendedStateF*)
+{
+    return 4;
 }

@@ -43,6 +43,36 @@ public:
     void fn_801D583C();
     void fn_801D58EC(int setting);
 
+    bool UnidentifiedVolumeButtonEnabled(unsigned int item) const
+    {
+        bool enabled;
+        switch (item)
+        {
+        case 0:
+            enabled = mSettings[0] > 0;
+            break;
+        case 1:
+            enabled = mSettings[0] < 10;
+            break;
+        case 2:
+            enabled = mSettings[1] > 0;
+            break;
+        case 3:
+            enabled = mSettings[1] < 10;
+            break;
+        case 4:
+            enabled = mSettings[2] > 0;
+            break;
+        case 5:
+            enabled = mSettings[2] < 10;
+            break;
+        default:
+            enabled = false;
+            break;
+        }
+        return enabled;
+    }
+
     /* 0x028 */ int mUnidentified28;
     /* 0x02C */ FEBackButton mNavigation;
     /* 0x104 */ TLComponentInstance* mButtons[6];

@@ -8,6 +8,8 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 namespace
 {
 char* replayTypeNames[8] = {

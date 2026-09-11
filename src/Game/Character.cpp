@@ -990,14 +990,13 @@ extern "C" void fn_80021BB4(CollisionBallGoalpostData* pEventData)
     }
 }
 extern "C" bool fn_8002F1E0(cFielder*);
-extern "C" bool fn_8003E73C(cFielder*);
 extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
 {
     if (!fn_8002F1E0(pEventData->player))
     {
         return;
     }
-    if (fn_8003E73C(pEventData->player))
+    if (pEventData->player->fn_8003E73C())
     {
         pEventData->player->fn_8004D480(v3Zero);
         return;
@@ -1039,7 +1038,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
 {
     if (fn_8002F1E0(pEventData->player))
     {
-        if (fn_8003E73C(pEventData->player))
+        if (pEventData->player->fn_8003E73C())
         {
             pEventData->player->fn_8004D480(v3Zero);
         }
@@ -2382,7 +2381,6 @@ void cCharacter::PoseSkinMesh(cPoseAccumulator* pPoseAccumulator, int modelType)
 
 extern "C" bool fn_80014D38(cBall*);
 extern "C" bool fn_800392D8(cFielder*);
-extern "C" bool fn_8003E72C(cFielder*);
 extern float lbl_806E0E40;
 float lbl_806DB5D8 = 12.5f;
 float lbl_806DB5DC = 0.4f;
@@ -2611,7 +2609,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
         && fn_800392D8(pFielder) && pFielder->m_eActionState != 28)
     {
         float unidentifiedSlide = g_pGame->mpTerrain->GetSlideFactor();
-        unidentifiedSlide += fn_8003E72C(pFielder) ? lbl_806E0E40 : 0.0f;
+        unidentifiedSlide += pFielder->fn_8003E72C() ? lbl_806E0E40 : 0.0f;
         if (unidentifiedSlide > 1.0f)
         {
             unidentifiedSlide = 1.0f;

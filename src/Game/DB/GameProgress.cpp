@@ -955,3 +955,8 @@ int Cup<10, 11>::GetSaveDataSize() const
 {
     return 0x1A + sizeof(mGameInfo) + sizeof(mTeamStats) + sizeof(mPreviousTeamStats);
 }
+
+extern "C" bool fn_8010FEF0(unsigned int flags)
+{
+    return (flags & CupManager::Instance()->unknown_0x8A38) == 0;
+}

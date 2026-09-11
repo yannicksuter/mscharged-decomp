@@ -149,7 +149,10 @@ void CreditScene::SetupForPhase()
         {
             SetMovieDetails("art/movies/nlgintrowide.thp", true, false);
         }
-        BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
+        {
+            BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
+            pStadium->m_bRenderingEnabled = false;
+        }
         break;
     case 0:
         mPresentation->SetActiveSlide("NINTENDO", true);
@@ -178,10 +181,16 @@ void CreditScene::SetupForPhase()
             FEMusic::StartStreamIfDifferent(0);
         }
         mNextScene = (SceneList)13;
-        BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = true;
+        {
+            BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
+            pStadium->m_bRenderingEnabled = true;
+        }
         break;
     default:
-        BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = true;
+        {
+            BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
+            pStadium->m_bRenderingEnabled = true;
+        }
         break;
     }
 }

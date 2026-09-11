@@ -724,9 +724,11 @@ void EmissionManager::KillOldest(int num, bool lingeringOnly)
 
     while (num > 0)
     {
-        EmissionController* bestController = 0;
-        float bestAge = 0.0f;
         nlDLListIterator<EmissionController*> iterator;
+        EmissionController* bestController;
+        float bestAge;
+        bestController = 0;
+        bestAge = 0.0f;
         iterator = mControllers.Begin();
 
         while (iterator.hasNext())

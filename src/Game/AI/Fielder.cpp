@@ -8,10 +8,12 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/FielderActions.h"
 #include "Game/AI/DesireSteering.h"
+#include "Game/AI/DesireReceivePass.h"
 #include "Game/AI/DesireUsePowerup.h"
 #include "Game/AI/HeadTrack.h"
 #include "Game/AI/AvoidableObject.h"
 #include "NL/nlMain.h"
+#include "NL/nlString.h"
 #include "NL/nlSlotPool.h"
 
 #include "Game/AI/FuzzyVariant.h"
@@ -544,6 +546,12 @@ bool cFielder::CanDoCaptainShootToScore()
     return false;
 }
 
+extern "C" UnidentifiedVariant_80054AB8 fn_80041AFC(
+    InterpreterCore* runtime, const char* name, cFielder* fielder)
+{
+    return fn_80041B0C(runtime, fielder, name);
+}
+
 cFielder* cFielder::DoFindBestHitTarget()
 {
     UnidentifiedVariant_80054AB8 vBestTarget = fn_80041AFC(
@@ -555,9 +563,44 @@ cFielder* cFielder::DoFindBestHitTarget()
     return 0;
 }
 
+bool cFielder::fn_8003E6EC() const
+{
+    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x17);
+}
+
+void cFielder::SetSlideAttackSuccessFlag()
+{
+    bAttackSucceeded = true;
+}
+
+UnidentifiedFuzzyRuntimeBase* cFielder::fn_8002E198() const
+{
+    return mUnidentified428->mUnidentified14;
+}
+
 bool cFielder::fn_8003E6FC() const
 {
     return fn_80319FEC(mUnidentified428->mUnidentified18, 0x18);
+}
+
+bool cFielder::fn_8003E70C() const
+{
+    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x1E);
+}
+
+bool cFielder::fn_8003E71C() const
+{
+    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x19);
+}
+
+bool cFielder::fn_8003E72C() const
+{
+    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x1A);
+}
+
+bool cFielder::fn_8003E73C() const
+{
+    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x1C);
 }
 
 bool cFielder::fn_8003E74C() const
@@ -3825,4 +3868,71 @@ void cFielder::EndDesire()
     {
         fn_803198F4(machine);
     }
+}
+
+extern "C" UnidentifiedVariant_80054AB8 fn_80041B6C(
+    void*, const unsigned int&, cFielder*);
+
+extern "C" UnidentifiedVariant_80054AB8 fn_80041B0C(
+    void* runtime, cFielder* fielder, const char* name)
+{
+    unsigned int functionHash = nlStringHash(name);
+    return fn_80041B6C(runtime, functionHash, fielder);
+}
+
+extern "C" void fn_8004257C(PenaltyData* data)
+{
+    g_PenaltyDataPool.Free(data);
+}
+
+void cFielder::fn_80036A38(int nParam, float fAmount)
+{
+    if (fAmount > 0.0f)
+    {
+        m_pTeam->IncrementPowerupMeter(fAmount, this, false);
+    }
+}
+
+extern "C" void fn_80319DA0(UnidentifiedScriptMachine* machine);
+
+void cFielder::fn_8002E0FC()
+{
+    UnidentifiedScriptMachine* machine = mUnidentified428->mUnidentified18;
+    if (machine != 0)
+    {
+        fn_803198F4(machine);
+        fn_80319DA0(mUnidentified428->mUnidentified18);
+    }
+}
+
+int cFielder::fn_8002E9D0() const
+{
+    UnidentifiedScriptMachine* machine = mUnidentified428->mUnidentified18;
+    if (machine != 0 && machine->mUnidentified008 != 0)
+    {
+        return machine->mUnidentified008->mUnidentifiedState;
+    }
+    return -1;
+}
+
+bool cFielder::fn_8003499C() const
+{
+    bool result = false;
+    int state;
+    if (mUnidentified428->mUnidentified18 != 0
+        && mUnidentified428->mUnidentified18->mUnidentified004 != 0)
+    {
+        state = mUnidentified428->mUnidentified18->mUnidentified004
+                    ->UnidentifiedGetState();
+    }
+    else
+    {
+        state = -1;
+    }
+    if (state == 0x16)
+    {
+        result = ((DesireReceivePass*)
+            mUnidentified428->mUnidentified18->mUnidentified004)->fn_800C0E54();
+    }
+    return result;
 }

@@ -87,9 +87,9 @@ extern "C" glModel* fn_802C834C(glPoly2* pPolys,
             unsigned long textureState = glGetTextureState(
                 currentTextureState, GLTS_DiffuseWrap);
             unsigned long clampS = textureState == 0 || textureState == 1;
-            unsigned char wrapS = !clampS;
+            unsigned char wrapS = clampS ? 0 : 1;
             unsigned long clampT = textureState == 2 || textureState == 0;
-            unsigned char wrapT = !clampT;
+            unsigned char wrapT = clampT ? 0 : 1;
 
             u32 texture = glGetCurrentTexture(GLTT_Diffuse);
             glTextureBinding* state = (glTextureBinding*)writer.model->packets->materialParameters;
@@ -222,9 +222,9 @@ extern "C" glModel* fn_802C89F4(glPoly2* pPolys,
             unsigned long textureState = glGetTextureState(
                 currentTextureState, GLTS_DiffuseWrap);
             unsigned long clampS = textureState == 0 || textureState == 1;
-            unsigned char wrapS = !clampS;
+            unsigned char wrapS = clampS ? 0 : 1;
             unsigned long clampT = textureState == 2 || textureState == 0;
-            unsigned char wrapT = !clampT;
+            unsigned char wrapT = clampT ? 0 : 1;
 
             u32 texture = glGetCurrentTexture(GLTT_Diffuse);
             glTextureBinding* state = (glTextureBinding*)writer.model->packets->materialParameters;

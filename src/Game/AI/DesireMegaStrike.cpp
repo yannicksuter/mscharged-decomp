@@ -15,6 +15,8 @@
 #include "Game/NetworkInput.h"
 #include <stdlib.h>
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 extern "C" cTeam* fn_800D6670(cFielder*);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E39C(cFielder*);

@@ -3,6 +3,8 @@
 #include "NL/glx/glxGX.h"
 #include "NL/nlColour.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 extern "C" void fn_801B5EE8(float value, const bool* flags, int stageCount, int texGenCount,
     int texture4, int texture5, int texCoord3, int texCoord4,
     int texCoord5, int finalTexture)

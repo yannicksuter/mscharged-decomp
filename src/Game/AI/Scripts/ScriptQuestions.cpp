@@ -986,7 +986,6 @@ extern "C" float fn_800D6D78(cPlayer* pPlayer)
     return 0.0f;
 }
 
-extern "C" bool fn_8003E71C(cFielder*);
 extern "C" float fn_800DED3C(cFielder* pFielder)
 {
     if (pFielder == NULL)
@@ -994,7 +993,7 @@ extern "C" float fn_800DED3C(cFielder* pFielder)
         return 0.0f;
     }
 
-    if (fn_8003E71C(pFielder))
+    if (pFielder->fn_8003E71C())
     {
         return 1.0f;
     }

@@ -116,6 +116,7 @@ public:
     virtual AXVPB* GetVoice();
     virtual void ReleaseVoice(bool);
 
+    static void* operator new(unsigned long);
     static void operator delete(void* pointer);
     static void OnVoiceDropped(void*);
 
@@ -176,8 +177,8 @@ public:
     virtual void SetSurroundPan(float);
     virtual void SetLowPassFilter(bool, unsigned int, bool);
     virtual void SetAuxiliaryVolume(int, int);
+    virtual unsigned int UnidentifiedVirtual70() = 0;
     virtual unsigned int GetChannelCount() = 0;
-    virtual int GetStreamPosition() = 0;
     virtual AudioStreamChannel* GetFirstChannel() = 0;
     virtual AudioStreamChannel* GetChannelIterator() = 0;
     virtual AudioStreamChannel* GetNextChannel(AudioStreamChannel*) = 0;
@@ -205,5 +206,12 @@ void CancelAudioReads(AudioReadState*);
 void OnAudioReadCancelled(nlFile*, void*, unsigned int, unsigned long, ReadAsyncCallback);
 
 void GetSoundSources(void* handle, AudioSource** sources, unsigned int* count);
+
+extern SlotPool<AudioSampleSource> gAudioSampleSourcePool;
+
+inline void* AudioSampleSource::operator new(unsigned long)
+{
+    return gAudioSampleSourcePool.Allocate();
+}
 
 #endif // GAME_AUDIO_AUDIO_SOURCE_H

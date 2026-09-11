@@ -37,10 +37,12 @@ public:
     }
 };
 
-typedef AVLTreeBase<UnidentifiedPacketSortKey, const glModelPacket*,
-    UnidentifiedFrameAllocator<UnidentifiedPacketTreeEntry>,
-    DefaultKeyCompare<UnidentifiedPacketSortKey> >
-    UnidentifiedPacketTree_8052E568;
+class UnidentifiedPacketTree_8052E568
+    : public AVLTreeBase<UnidentifiedPacketSortKey, const glModelPacket*,
+          UnidentifiedFrameAllocator<UnidentifiedPacketTreeEntry>,
+          DefaultKeyCompare<UnidentifiedPacketSortKey> >
+{
+};
 
 class UnidentifiedPacketSorter_802CCBBC : public UnidentifiedPacketSorter
 {

@@ -100,7 +100,8 @@ ChooseSidekicksSceneV2::ChooseSidekicksSceneV2(ChooseCaptainsSceneV2::SceneType 
  */
 ChooseSidekicksSceneV2::~ChooseSidekicksSceneV2()
 {
-    GetNavigationScene()->mTimer->m_bVisible = false;
+    TLInstance* timer = GetNavigationScene()->mTimer;
+    timer->m_bVisible = false;
 
     for (int i = 0; i < 8; ++i)
     {

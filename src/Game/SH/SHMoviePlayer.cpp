@@ -238,7 +238,8 @@ void IntroMovieScene::fn_801D9B84()
 void IntroMovieScene::MoviePlayerVirtual3C()
 {
     GameSceneManager::s_pInstance->Push(mNextScene, SCREEN_NOTHING, true);
-    BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = true;
+    BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
+    pStadium->m_bRenderingEnabled = true;
     fn_80370E90(false);
 }
 

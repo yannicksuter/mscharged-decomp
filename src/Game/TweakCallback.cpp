@@ -1,6 +1,8 @@
 #include "Game/TweakCallback.h"
 #include "NL/nlList.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 static bool sTweakCallbacksUninitialized = true;
 static TweakCallback* sTweakCallbackHead;
 static TweakCallback* sTweakCallbackTail;

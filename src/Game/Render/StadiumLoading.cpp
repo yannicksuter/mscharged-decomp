@@ -27,6 +27,8 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "unclassified/tu_801A2004.h"
+
+#include "Game/UnidentifiedStaticStorage.h"
 extern "C"
 {
     void fn_80182164();

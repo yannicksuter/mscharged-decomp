@@ -223,6 +223,7 @@ extern SlotPool<UnidentifiedVariant_80054AB8> lbl_805842C8;
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80054AB8(InterpreterCore*, const char*, cTeam*);
 extern "C" UnidentifiedVariant_80054AB8 fn_80041AFC(InterpreterCore*, const char*, cFielder*);
+extern "C" UnidentifiedVariant_80054AB8 fn_80041B0C(void*, cFielder*, const char*);
 
 inline void UnidentifiedFuzzyVariantData::operator delete(void* entry)
 {

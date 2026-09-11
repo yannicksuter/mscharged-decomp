@@ -186,12 +186,12 @@ class NetMessageSidesChanged : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageSidesChanged();
+    virtual ~NetMessageSidesChanged() { }
     virtual int GetType();
 
     /* 0x08 */ u8 mMachineIndex;
     /* 0x09 */ u8 mSide;
-    /* 0x0A */ u8 mGuest;
+    /* 0x0A */ bool mGuest;
     /* 0x0B */ u8 mAccepted;
 };
 
@@ -308,7 +308,7 @@ public:
     virtual ~NetMessageTournamentLoadingState();
     virtual int GetType();
 
-    /* 0x08 */ u8 mMachineIndex;
+    /* 0x08 */ s8 mMachineIndex;
     /* 0x09 */ u8 mFinishedLoadingToKnockout;
 };
 

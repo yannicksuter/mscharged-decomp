@@ -150,7 +150,6 @@ extern "C" bool fn_800167A8(cBall* pBall);
 extern "C" float fn_80038970(
     cFielder* pFielder, nlVector3* pTarget, int nParam);
 extern "C" float fn_8003C40C(cFielder* pFielder, int nParam);
-extern "C" bool fn_8003E70C(cFielder* pFielder);
 extern "C" float fn_8002C800(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CF24(PlayerTweaks* pTweaks);
 extern "C" void fn_8005EBF8(void* pParam, void* pNode);
@@ -629,7 +628,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
             pTarget = DoFindBestHitTarget();
         }
 
-        if (pTarget != 0 && !fn_8003E70C(this))
+        if (pTarget != 0 && !fn_8003E70C())
         {
             float distance = fMoveDistance / fTimeRange;
 
@@ -696,7 +695,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
             Unknown8(nlVector3ToAngle(v3Delta), false);
             SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
         }
-        else if (fn_8003E70C(this))
+        else if (fn_8003E70C())
         {
             SetFacingDirection(mUnidentified024.m_aActualFacingDirection, true);
         }
@@ -3158,7 +3157,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     }
     }
 
-    if (fn_8003E70C(this))
+    if (fn_8003E70C())
     {
         Unknown8(mUnidentified024.m_aActualFacingDirection, false);
         SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
@@ -4540,7 +4539,7 @@ void cFielder::InitActionSlideAttack(
         }
 
         float fSpeed = fn_8003C40C(this, nParam);
-        if (fn_8003E70C(this))
+        if (fn_8003E70C())
         {
             nlPolarToCartesian(
                 v3Velocity.x, v3Velocity.y, mUnidentified024.m_aActualFacingDirection, fSpeed);

@@ -13,6 +13,8 @@
 #include "Game/Player.h"
 #include "Game/Team.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 struct UnidentifiedPassCallbackValue
 {
     FuzzyVariant mValue;
@@ -26,8 +28,6 @@ extern "C" void fn_800401C0(
     cFielder*, const nlVector3&, float, float);
 extern "C" float fn_8004028C(cFielder*);
 extern "C" void* fn_80311734(void*);
-extern "C" UnidentifiedVariant_80054AB8 fn_80041B0C(
-    void*, cFielder*, const char*);
 extern "C" float fn_800DCF18(cFielder*);
 extern "C" void fn_800B6A1C(void*, int, const Variant&);
 extern "C" float fn_8002C328(PlayerTweaks*);

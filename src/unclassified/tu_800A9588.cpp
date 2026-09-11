@@ -1,6 +1,8 @@
 #include "NL/nlPrint.h"
 #include "types.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 class TweakValueBase;
 
 struct UnclassifiedTerrainProperty

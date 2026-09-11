@@ -54,7 +54,6 @@ extern "C" bool fn_8003877C(cFielder* pFielder);
 extern "C" bool fn_80014EA4(cBall* pBall, const EffectsGroup* pGroup);
 extern "C" void fn_800152B4(cBall* pBall);
 extern "C" void fn_800189C4(cBall* pBall);
-extern "C" void fn_80036A38(cFielder* pFielder, int nParam, float fAmount);
 extern "C" void fn_802E83C4(EmissionManager* pManager, const EffectsGroup* pGroup);
 extern "C" void fn_800F026C(const nlVector3& v3Shake, float fParam1, float fParam2);
 extern "C" {
@@ -747,7 +746,7 @@ extern "C" void fn_801B75C8(cFielder* pCharacter,
                     fAmount = 1.0f;
                 }
             }
-            fn_80036A38(pCharacter, 0, fAmount);
+            pCharacter->fn_80036A38(0, fAmount);
         }
     case BALL_EFFECT_PERFECT_SHOT:
         if (fn_800155A0(g_pBall, 0) >= 4.0f)
@@ -791,6 +790,8 @@ extern "C" void fn_801B79A4(const char* szEffectName, bool bReallyKill)
 
 extern "C" void fn_801B7A28(cBall* pBall)
 {
+    cBall* pGlowBall;
+
     if (!pBall->m_bVisible)
     {
         fn_801BA358();
@@ -809,7 +810,8 @@ extern "C" void fn_801B7A28(cBall* pBall)
             else
             {
                 fn_801BA358();
-                SetBallUpdateCallback(CreateBallEffect(uHash, g_pBall));
+                pGlowBall = g_pBall;
+                SetBallUpdateCallback(CreateBallEffect(uHash, pGlowBall));
                 g_pBall->m_CurrentGlowEffect = uHash;
             }
         }

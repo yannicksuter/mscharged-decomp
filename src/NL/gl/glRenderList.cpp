@@ -5,6 +5,7 @@
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glMaterialProgram.h"
 #include "NL/platvmath.h"
+#include "Game/MathHelpers.h"
 
 unsigned long UnidentifiedPacketSorter_8052E2D8::fn_14(
     GLView*, const glModelPacket* pPacket)
@@ -20,7 +21,7 @@ unsigned long UnidentifiedPacketSorter_8052E2C0::fn_14(
 
     nlVector3 pos = packetMatrix.GetTranslation();
     nlMultPosVectorMatrix(pos, *view->m_Interface->GetViewMatrix());
-    pos.z = 0.0f <= pos.z ? 0.0f : pos.z;
+    pos.z = nlMinEquals(0.0f, pos.z);
 
     return (unsigned long)(int)(-pos.z * 2147483648.0f);
 }

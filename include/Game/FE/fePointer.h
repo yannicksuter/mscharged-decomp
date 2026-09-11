@@ -53,13 +53,13 @@ public:
     virtual bool IsEnabled();
     virtual bool ContainsPoint(nlVector2 position) const = 0;
 
-    /* 0x04 */ Callback mUpdateCallback;
-    /* 0x0C */ Callback mEnterCallback;
-    /* 0x14 */ Callback mLeaveCallback;
-    /* 0x1C */ Callback mInsideCallback;
-    /* 0x24 */ Callback mPressCallback;
-    /* 0x2C */ Callback mReleaseCallback;
-    /* 0x34 */ Callback mSecondaryActionCallback;
+    /* 0x04 */ Function<void(int, void*)> mUpdateCallback;
+    /* 0x0C */ Function<void(int, void*)> mEnterCallback;
+    /* 0x14 */ Function<void(int, void*)> mLeaveCallback;
+    /* 0x1C */ Function<void(int, void*)> mInsideCallback;
+    /* 0x24 */ Function<void(int, void*)> mPressCallback;
+    /* 0x2C */ Function<void(int, void*)> mReleaseCallback;
+    /* 0x34 */ Function<void(int, void*)> mSecondaryActionCallback;
     /* 0x3C */ FEPointerEvent mPreviousEvents[4];
     /* 0x7C */ void* mContext;
     /* 0x80 */ bool mDisabled;

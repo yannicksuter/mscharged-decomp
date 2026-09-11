@@ -1943,7 +1943,7 @@ int dCollideRayPlane(dxGeom* o1, dxGeom* o2, int flags,
     dxRay* ray = (dxRay*)o1;
     dxPlane* plane = (dxPlane*)o2;
 
-    dReal alpha = plane->p[3] - dDOT(plane->p, ray->pos);
+    dReal alpha = plane->p[3] - dDOT(plane->p, o1->pos);
     // note: if alpha > 0 the starting point is below the plane
     dReal nsign = (alpha > 0) ? REAL(-1.0) : REAL(1.0);
     dReal k = dDOT14(plane->p, ray->R + 2);

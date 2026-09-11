@@ -27,6 +27,7 @@ public:
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
+    bool fn_800C0E54();
     bool CalcRoughEstimates(int);
     bool CalcExactEstimates(bool);
     bool StartPickupAnimation();
@@ -80,7 +81,6 @@ private:
         float fReceivePassAnimTime;
     };
 
-    bool fn_800C0E54();
     bool fn_800C0E74();
     const LooseBallContactAnimInfo* fn_800C1FA4(
         int, int&);

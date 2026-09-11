@@ -126,22 +126,6 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029E338>::Prepare(
     glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
-struct FloatColour_80294B28
-{
-    float c[4];
-};
-
-static inline GXColor ConvertColour_80294B28(
-    const FloatColour_80294B28& source)
-{
-    GXColor colour;
-    colour.r = (unsigned char)(source.c[0] * 255.0f);
-    colour.g = (unsigned char)(source.c[1] * 255.0f);
-    colour.b = (unsigned char)(source.c[2] * 255.0f);
-    colour.a = (unsigned char)(source.c[3] * 255.0f);
-    return colour;
-}
-
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029E338>::Draw(
     const glModelPacket* packet)
@@ -194,9 +178,10 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029E338>::Draw(
     }
 
     float value = *(float*)((unsigned char*)packet->materialParameters + 16);
-    FloatColour_80294B28 colour = { { value, value, value, value } };
-    GXColor gxColour = ConvertColour_80294B28(colour);
-    GXSetTevKColor(GX_KCOLOR0, gxColour);
+    nlFloatColour colour = { { value, value, value, value } };
+    nlColour gxColour;
+    ConvertColour(gxColour, colour);
+    GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&gxColour);
 
     fn_80183B40(packet->matrix);
 

@@ -10,13 +10,14 @@
 #include "NL/nlString.h"
 #include <stddef.h>
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 struct UnidentifiedDesireMachine
 {
     u8 mUnidentified000[0x18];
     void* mUnidentified018;
 };
 
-extern "C" int fn_8002E9D0(cFielder*);
 extern "C" bool fn_8002F858(cFielder*, bool);
 extern "C" bool fn_8003C180(cFielder*);
 extern "C" float fn_8002C7E8(PlayerTweaks*);
@@ -67,8 +68,8 @@ bool DesireShoot::UnidentifiedInitialize(void* context)
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
     mbLobShot = params->Get(16)->mData.b;
 
-    if (fn_8002E9D0(mUnidentifiedFielder) != 20
-        && fn_8002E9D0(mUnidentifiedFielder) != 19)
+    if (mUnidentifiedFielder->fn_8002E9D0() != 20
+        && mUnidentifiedFielder->fn_8002E9D0() != 19)
     {
         mUnidentifiedFielder->DoResetShotMeter(0.0f);
     }

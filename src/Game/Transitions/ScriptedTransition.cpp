@@ -64,17 +64,19 @@ public:
 
     virtual void ApplyModifier(glPoly2& poly, float time)
     {
-        float x = ((1.0f - time) * m_v2StartScale.x) + (time * m_v2EndScale.x);
-        float y = ((1.0f - time) * m_v2StartScale.y) + (time * m_v2EndScale.y);
+        nlVector2 scale = {
+            ((1.0f - time) * m_v2StartScale.x) + (time * m_v2EndScale.x),
+            ((1.0f - time) * m_v2StartScale.y) + (time * m_v2EndScale.y),
+        };
 
-        poly.m_pos[0].x *= x;
-        poly.m_pos[0].y *= y;
-        poly.m_pos[1].x *= x;
-        poly.m_pos[1].y *= y;
-        poly.m_pos[2].x *= x;
-        poly.m_pos[2].y *= y;
-        poly.m_pos[3].x *= x;
-        poly.m_pos[3].y *= y;
+        poly.m_pos[0].x *= scale.x;
+        poly.m_pos[0].y *= scale.y;
+        poly.m_pos[1].x *= scale.x;
+        poly.m_pos[1].y *= scale.y;
+        poly.m_pos[2].x *= scale.x;
+        poly.m_pos[2].y *= scale.y;
+        poly.m_pos[3].x *= scale.x;
+        poly.m_pos[3].y *= scale.y;
     }
 
     /* 0x4 */ nlVector2 m_v2StartScale;

@@ -20,6 +20,8 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 class FESkinnedModel : public FEModel
 {
 public:

@@ -3,6 +3,7 @@
 #include "NL/plat/WiiFreestylePad.h"
 
 #include "Game/ReplayManager.h"
+#include "Game/Character.h"
 
 #include "Game/Camera/CameraMan.h"
 #include "Game/Camera/DebugCam.h"
@@ -22,6 +23,8 @@
 #include "NL/nlTask.h"
 #include "Game/InputManager.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 extern float g_fSimulationTick;
 extern float g_fFixedUpdateTick;
 extern bool lbl_806E14B8;
@@ -38,6 +41,11 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     UnidentifiedEventRegistry;
 
 extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
+
+extern "C" bool fn_8019464C(cCharacter* character)
+{
+    return character->m_eClassType == FIELDER;
+}
 
 ReplayManager::ReplayManager()
     : mCurrent(mSnapshots)
@@ -98,6 +106,11 @@ UnidentifiedMakeReplayBinding(
     typedef BindExp1<void, CallbackMemFun, ReplayManager*> CallbackBind;
     CallbackMemFun function(callback);
     return CallbackBind(function, manager);
+}
+
+extern "C" bool fn_80194674(cCharacter* character)
+{
+    return character->mUnidentified024.m_eCharacterClass == 10;
 }
 
 void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
@@ -449,4 +462,9 @@ void ReplayManager::RenderSnapshotAt(float deltaTime)
     {
         mSnapshots[2].RenderDebugInfo(*mPrevious, *mCurrent, mBlend[0]);
     }
+}
+
+extern "C" bool fn_80194660(cCharacter* character)
+{
+    return character->mUnidentified024.m_eCharacterClass == 13;
 }

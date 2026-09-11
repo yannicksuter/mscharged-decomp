@@ -25,6 +25,8 @@
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 extern "C"
 {
     void* fn_8019AE7C(void* pObject, cSHierarchy* pHierarchy, int nModel,
@@ -321,8 +323,7 @@ HammerObject* NPCManager::fn_801AA3AC(int nIndex)
 
     for (int i = 0; i < 15; ++i)
     {
-        HammerObject* pObject = mUnidentified070[i];
-        if (pObject != 0 && !pObject->_024)
+        if (mUnidentified070[i] != 0 && !mUnidentified070[i]->_024)
         {
             return mUnidentified070[i];
         }

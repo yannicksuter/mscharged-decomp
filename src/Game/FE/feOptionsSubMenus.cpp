@@ -80,91 +80,35 @@ void OptionsAudioMenuV2::fn_801D4E9C(int setting)
 void OptionsAudioMenuV2::fn_801D4F70(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mButtonComponents[item].HasOtherPointerState(2, -1))
+    if (mButtonComponents[item].HasOtherPointerState(2, -1)
+        || !UnidentifiedVolumeButtonEnabled(item))
     {
-        bool enabled;
-        switch (item)
-        {
-        case 0:
-            enabled = mSettings[0] > 0;
-            break;
-        case 1:
-            enabled = mSettings[0] < 10;
-            break;
-        case 2:
-            enabled = mSettings[1] > 0;
-            break;
-        case 3:
-            enabled = mSettings[1] < 10;
-            break;
-        case 4:
-            enabled = mSettings[2] > 0;
-            break;
-        case 5:
-            enabled = mSettings[2] < 10;
-            break;
-        default:
-            enabled = false;
-            break;
-        }
-
-        if (!enabled)
-        {
-            return;
-        }
-
-        mButtonComponents[item].PlayHoverFeedback(index);
-        if (!mButtonComponents[item].HasOtherPointerState(1, index))
-        {
-            mButtons[item]->SetActiveSlide("over", true, false);
-            FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
-        }
-        mButtonComponents[item].SetPointerState(1, index);
+        return;
     }
+
+    mButtonComponents[item].PlayHoverFeedback(index);
+    if (!mButtonComponents[item].HasOtherPointerState(1, index))
+    {
+        mButtons[item]->SetActiveSlide("over", true, false);
+        FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
+    }
+    mButtonComponents[item].SetPointerState(1, index);
 }
 
 void OptionsAudioMenuV2::fn_801D5108(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mButtonComponents[item].HasOtherPointerState(2, -1))
+    if (mButtonComponents[item].HasOtherPointerState(2, -1)
+        || !UnidentifiedVolumeButtonEnabled(item))
     {
-        bool enabled;
-        switch (item)
-        {
-        case 0:
-            enabled = mSettings[0] > 0;
-            break;
-        case 1:
-            enabled = mSettings[0] < 10;
-            break;
-        case 2:
-            enabled = mSettings[1] > 0;
-            break;
-        case 3:
-            enabled = mSettings[1] < 10;
-            break;
-        case 4:
-            enabled = mSettings[2] > 0;
-            break;
-        case 5:
-            enabled = mSettings[2] < 10;
-            break;
-        default:
-            enabled = false;
-            break;
-        }
-
-        if (!enabled)
-        {
-            return;
-        }
-
-        if (!mButtonComponents[item].HasOtherPointerState(1, index))
-        {
-            mButtons[item]->SetActiveSlide("off", true, false);
-        }
-        mButtonComponents[item].SetPointerState(0, index);
+        return;
     }
+
+    if (!mButtonComponents[item].HasOtherPointerState(1, index))
+    {
+        mButtons[item]->SetActiveSlide("off", true, false);
+    }
+    mButtonComponents[item].SetPointerState(0, index);
 }
 
 void OptionsAudioMenuV2::fn_801D575C(int index)

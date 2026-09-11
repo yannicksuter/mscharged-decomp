@@ -9,6 +9,8 @@
 #include "Game/Player.h"
 #include "Game/Team.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
 extern "C" nlVector3* fn_80040234(cFielder*);
 extern "C" bool fn_800381B4(cFielder*, nlVector3*);

@@ -19,6 +19,8 @@
 #include "NL/nlTask.h"
 #include "NL/nlstring_tmpl.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 
 extern "C"
 {

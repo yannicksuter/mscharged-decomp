@@ -4,6 +4,8 @@
 #include "Game/Player.h"
 #include "NL/nlMemory.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 extern cPlayer* lbl_8056B800[10];
 
 RenderSnapshot::RenderSnapshot()

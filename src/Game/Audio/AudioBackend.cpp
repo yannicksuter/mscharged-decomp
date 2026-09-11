@@ -1,5 +1,5 @@
 #include "Game/Audio/AudioBackend.h"
-#include "Game/Audio/AudioSource.h"
+#include "Game/Audio/AudioStreamSource.h"
 #include "Game/Audio/AudioResourcePlatform.h"
 
 #include "Game/Audio/AudioEffect.h"
@@ -128,6 +128,23 @@ void AudioBackend::FreeAudioMemory(void* pointer)
     m_Unknown434.Free(pointer);
 }
 
+void AudioReadState::SetInputVolume(float value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    AudioStreamChannel* channel = GetChannelIterator();
+    while ((channel = GetNextChannel(channel)) != 0)
+    {
+        if (channel->m_Unknown04 != 0)
+            SetVoiceInputVolume(channel->m_Unknown04, value);
+    }
+    OSRestoreInterrupts(enabled);
+}
+
 void AudioBackend::ServiceReadQueue()
 {
     bool enabled = OSDisableInterrupts();
@@ -163,12 +180,51 @@ void UpdateAudioSources()
     }
 }
 
+AudioSource* AudioBackend::CreateSource(AudioSourceInfo* info, XSoundOwner*)
+{
+    AudioSource* source = 0;
+    if (info->m_Unknown18->m_Unknown10->m_Unknown08 != 0)
+    {
+        if (info->m_Unknown10 == 1)
+            source = new AudioReadState_8035D154;
+        else if (info->m_Unknown10 == 2)
+            source = new AudioReadState_80361920;
+    }
+    else
+    {
+        source = new AudioSampleSource;
+    }
+    source->Initialize(info);
+    bool enabled = OSDisableInterrupts();
+    m_Unknown004.AddEnd(source);
+    OSRestoreInterrupts(enabled);
+    g_pAudioSourceList = source;
+    return source;
+}
+
 void AudioBackend::ReleaseSource(AudioSource* source)
 {
     bool enabled = OSDisableInterrupts();
     m_Unknown004.RemoveEntry(source);
     OSRestoreInterrupts(enabled);
     delete source;
+}
+
+void AudioReadState::SetPitch(float value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    AudioStreamChannel* channel = GetChannelIterator();
+    while ((channel = GetNextChannel(channel)) != 0)
+    {
+        if (channel->m_Unknown04 != 0)
+            SetVoicePitch(channel->m_Unknown04, m_Unknown0C, value);
+        OSRestoreInterrupts(enabled);
+    }
 }
 
 void AudioBackend::QueueRead(nlFile* file, unsigned int offset,
@@ -189,6 +245,23 @@ void AudioBackend::QueueRead(nlFile* file, unsigned int offset,
     OSRestoreInterrupts(enabled);
 }
 
+void AudioReadState::SetMixVolume(float value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    AudioStreamChannel* channel = GetChannelIterator();
+    while ((channel = GetNextChannel(channel)) != 0)
+    {
+        if (channel->m_Unknown04 != 0)
+            SetVoiceMixVolume(channel->m_Unknown04, value);
+    }
+    OSRestoreInterrupts(enabled);
+}
+
 void AudioBackend::QueueReadCancellation(AudioReadState* state)
 {
     bool enabled = OSDisableInterrupts();
@@ -196,6 +269,23 @@ void AudioBackend::QueueReadCancellation(AudioReadState* state)
     request.m_Unknown14 = state;
     request.m_Unknown1B = true;
     m_Unknown024.AddEnd(request);
+    OSRestoreInterrupts(enabled);
+}
+
+void AudioReadState::SetLowPassFilter(bool on, unsigned int frequency, bool unchanged)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    AudioStreamChannel* channel = GetChannelIterator();
+    while ((channel = GetNextChannel(channel)) != 0)
+    {
+        if (channel->m_Unknown04 != 0)
+            SetVoiceLowPassFilter(channel->m_Unknown04, on, frequency, unchanged);
+    }
     OSRestoreInterrupts(enabled);
 }
 
@@ -224,6 +314,23 @@ void AudioBackend::SetOutputMode(unsigned int mode)
     }
     AXSetMode(axMode);
     MIXSetSoundMode(mixMode);
+}
+
+void AudioReadState::SetSurroundPan(float value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    AudioStreamChannel* channel = GetChannelIterator();
+    while ((channel = GetNextChannel(channel)) != 0)
+    {
+        if (channel->m_Unknown04 != 0)
+            SetVoiceSurroundPan(channel->m_Unknown04, value);
+    }
+    OSRestoreInterrupts(enabled);
 }
 
 void AudioBackend::InitializeAuxEffects()
@@ -297,4 +404,21 @@ bool AudioSource::IsStream()
 bool AudioSource::IsLooping()
 {
     return m_Unknown14_00 == 0xFFFF;
+}
+
+void AudioReadState::SetAuxiliaryVolume(int auxiliary, int value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    AudioStreamChannel* channel = GetChannelIterator();
+    while ((channel = GetNextChannel(channel)) != 0)
+    {
+        if (channel->m_Unknown04 != 0)
+            SetVoiceAuxiliaryVolume(channel->m_Unknown04, auxiliary, value);
+    }
+    OSRestoreInterrupts(enabled);
 }

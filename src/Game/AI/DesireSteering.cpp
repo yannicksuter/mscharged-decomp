@@ -28,7 +28,6 @@ extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_8002EDC8(cFielder*, int);
 extern "C" void fn_8003C7B0(cFielder*);
-extern "C" bool fn_8003E70C(cFielder*);
 extern "C" bool fn_8003E8A0(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" void fn_8006040C(cGame*, cFielder*);
@@ -624,7 +623,7 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
 {
     cFielder* pFielder = desire->mUnidentifiedFielder;
     bool bCanFaceBall = pFielder->m_pBall == NULL
-                     && !fn_8003E70C(pFielder)
+                     && !pFielder->fn_8003E70C()
                      && pFielder->GetGlobalPad() == NULL
                      && !(fn_8003E948(pFielder)
                           && pFielder->mUnidentified3DC)

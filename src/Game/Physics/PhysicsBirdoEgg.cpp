@@ -25,7 +25,6 @@ struct CollisionCrackEggData
 
 extern SlotPool<CollisionCrackEggData> lbl_80570188;
 
-extern "C" bool fn_8003E73C(cFielder*);
 extern "C" void fn_80146FCC(CollisionBirdoShotBallPlayerData*);
 extern "C" void fn_80147114(CollisionBirdoEggGoalieData*);
 extern "C" void fn_8014725C(CollisionBirdoEggEndData*);
@@ -88,7 +87,7 @@ ContactType PhysicsBirdoEgg::Contact(
             eventData->egg = mBirdoEgg;
             fn_80146FCC(eventData);
 
-            if (!fn_8003E73C(fielder)
+            if (!fielder->fn_8003E73C()
                 && mBirdoEgg->mShooter->m_pBall == 0)
             {
                 QueueBirdoEggEnd(mBirdoEgg, false);

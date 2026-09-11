@@ -853,23 +853,22 @@ int NetTournManager::ProcessMessage(NetworkMessage* message)
             destination = "Knockout";
         }
         tDebugPrintManager::Print(DC_NETWORK, "Received Tournament Loaded to %s from %d\n",
-            destination, (s8)loading->mMachineIndex);
-        u8 machine = loading->mMachineIndex;
-        if ((s8)machine >= 0 && (s8)machine < mMachineCount)
+            destination, loading->mMachineIndex);
+        if (loading->mMachineIndex >= 0 && loading->mMachineIndex < mMachineCount)
         {
             if (loading->mFinishedLoadingToKnockout)
             {
-                mLoadedToKnockout[(s8)machine] = true;
+                mLoadedToKnockout[loading->mMachineIndex] = true;
             }
             else
             {
-                mLoadedToGame[(s8)machine] = true;
+                mLoadedToGame[loading->mMachineIndex] = true;
             }
         }
         else
         {
             tDebugPrintManager::Print(DC_NETWORK, "Loaded from machine %d out of range [0,%d)\n",
-                (s8)machine, mMachineCount);
+                loading->mMachineIndex, mMachineCount);
         }
         break;
     }

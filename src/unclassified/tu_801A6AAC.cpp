@@ -1,5 +1,6 @@
 #include "NL/plat/WiiPad.h"
 #include "Game/TweakRegistry.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "unclassified/tu_801A6AAC.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/NetworkMessageRegistry.h"

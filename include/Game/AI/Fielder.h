@@ -174,6 +174,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
 class PhysicsObject;
 class ShotMeter;
 class UnidentifiedFielderInput;
+class UnidentifiedFuzzyRuntimeBase;
 struct BulletBillObject;
 
 class cFielder : public cPlayer
@@ -188,6 +189,7 @@ class cFielder : public cPlayer
 
 public:
     PlayerTweaks* GetTweaks() const;
+    UnidentifiedFuzzyRuntimeBase* fn_8002E198() const;
     float GetSpeedPowerupAdjusted(float fSpeed);
 
     unsigned int IsFrozen();
@@ -237,6 +239,8 @@ public:
         const CollisionPlayerWallData* eventData);
     bool CanDoCaptainShootToScore();
     bool CanReceivePass();
+    void SetSlideAttackSuccessFlag();
+    void fn_80036A38(int nParam, float fAmount);
     bool fn_8003E8F4() const;
     bool fn_8003E74C() const;
     bool CollideWithFreezeCallback();
@@ -293,7 +297,15 @@ public:
     bool fn_80038918() const;
     float fn_8002E058();
     eFielderDesireState fn_8002E060();
+    void fn_8002E0FC();
+    int fn_8002E9D0() const;
+    bool fn_8003499C() const;
+    bool fn_8003E6EC() const;
     bool fn_8003E6FC() const;
+    bool fn_8003E70C() const;
+    bool fn_8003E71C() const;
+    bool fn_8003E72C() const;
+    bool fn_8003E73C() const;
     bool fn_800470B4(cFielder* pFielder, cPlayer* pAttacker);
     bool fn_80047240(cPlayer* pParam0, unsigned short aParam1,
         int nParam2, bool bParam3, bool bParam4);

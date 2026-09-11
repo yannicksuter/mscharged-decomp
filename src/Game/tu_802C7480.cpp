@@ -24,19 +24,20 @@ void SplitTweakPath(const char* path, const char** name, char* dir)
 void JoinTweakPath(const char* a, const char* b, char* out)
 {
     nlStrNCpy(out, a, 0x100);
-    int length = nlStrLen(out);
-    if (out[length - 1] != '/')
+    const char* joined = out;
+    int length = nlStrLen(joined);
+    if (joined[length - 1] != '/')
     {
         out[length] = '/';
         out[length + 1] = '\0';
     }
     if (b[0] == '/')
     {
-        nlStrNCat(out, out, b + 1, 0x100);
+        nlStrNCat(out, joined, b + 1, 0x100);
     }
     else
     {
-        nlStrNCat(out, out, b, 0x100);
+        nlStrNCat(out, joined, b, 0x100);
     }
 }
 

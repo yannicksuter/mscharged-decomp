@@ -2,6 +2,7 @@
 
 #include "Game/Sys/audio.h"
 #include "Game/Goalie.h"
+#include "NL/nlString.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
@@ -49,7 +50,6 @@ extern "C" void fn_8005D948(
     void* pGame, const GoalieSaveData* pData);
 extern "C" void fn_8005E9FC(
     void* pManager, const PlayerAttackData* pData);
-extern "C" void fn_8002E0FC(cFielder* pFielder);
 extern "C" void fn_8003C5D8(
     cFielder* pFielder, bool bParam, unsigned short aDirection);
 extern "C" void fn_8003C6E0(cFielder* pFielder);
@@ -73,6 +73,15 @@ bool Goalie::mbPosGoalieNetCheck;
 bool Goalie::mbNegGoalieNetCheck;
 float lbl_806DBB1C = 0.5f;
 float lbl_806DBB2C = 9.5f;
+
+extern "C" UnidentifiedVariant_80054AB8 fn_80082150(
+    UnidentifiedFuzzyRuntimeBase*, cPlayer*, const char*);
+
+extern "C" UnidentifiedVariant_80054AB8 fn_80082140(
+    UnidentifiedFuzzyRuntimeBase* runtime, const char* name, cPlayer* player)
+{
+    return fn_80082150(runtime, player, name);
+}
 
 cPlayer* Goalie::FindOpenPassTarget()
 {
@@ -1459,7 +1468,7 @@ extern "C" void GoalieOnGameOver()
         else if (pPlayer->m_eClassType == FIELDER)
         {
             cFielder* pFielder = static_cast<cFielder*>(pPlayer);
-            fn_8002E0FC(pFielder);
+            pFielder->fn_8002E0FC();
             pFielder->EndAction();
         }
     }
@@ -1469,4 +1478,14 @@ extern "C" void GoalieOnGameOver()
 
     Goalie* pAwayGoalie = static_cast<Goalie*>(g_pCharacters[9]);
     pAwayGoalie->InitActionMove(false);
+}
+
+extern "C" UnidentifiedVariant_80054AB8 fn_800821B0(
+    UnidentifiedFuzzyRuntimeBase*, const unsigned int&, cPlayer*);
+
+extern "C" UnidentifiedVariant_80054AB8 fn_80082150(
+    UnidentifiedFuzzyRuntimeBase* runtime, cPlayer* player, const char* name)
+{
+    unsigned int functionHash = nlStringHash(name);
+    return fn_800821B0(runtime, functionHash, player);
 }

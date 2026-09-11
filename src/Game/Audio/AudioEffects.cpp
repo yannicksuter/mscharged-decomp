@@ -3,6 +3,7 @@
 #include "Game/Audio/AudioEffects.h"
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioSource.h"
+#include "Game/Audio/CueHandle_802F1758.h"
 #include "NL/nlString.h"
 #include "revolution/os/OSInterrupt.h"
 
@@ -93,6 +94,11 @@ void ControllerSpeaker::CreateParameter(unsigned int, void* context, bool,
 {
     *output = &m_Parameter;
     m_Unknown3C = *(int*)context - 1;
+}
+
+void Volume::ApplyToSound(void* handle)
+{
+    ((CueHandle_802F1758*)handle)->instance->field_70 = m_Final.m_Unknown10;
 }
 
 void Volume::OnParameterFinished(AudioEffectParameter* parameter)

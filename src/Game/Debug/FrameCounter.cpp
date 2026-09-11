@@ -85,13 +85,15 @@ void FrameCounter::FinishTiming()
 
     float totalFrameTime = 0.0f;
 
+    float (*history)[200] = m_ContinuousFrameHistory;
+
     totalFrameTime += m_CurrTimer[0];
     m_CurrFrame[0] += m_CurrTimer[0];
-    m_ContinuousFrameHistory[0][m_ContinuousFrameHistoryIndex] = m_CurrTimer[0];
+    history[0][m_ContinuousFrameHistoryIndex] = m_CurrTimer[0];
 
     totalFrameTime += m_CurrTimer[1];
     m_CurrFrame[1] += m_CurrTimer[1];
-    m_ContinuousFrameHistory[1][m_ContinuousFrameHistoryIndex] = m_CurrTimer[1];
+    history[1][m_ContinuousFrameHistoryIndex] = m_CurrTimer[1];
 
     if (m_Counter >= (u32)NUM_FRAMES_TO_AVERAGE_OVER)
     {

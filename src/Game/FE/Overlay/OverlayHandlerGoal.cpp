@@ -8,6 +8,8 @@
 #include "Game/GameInfo.h"
 #include "Game/Render/RLViewLayers.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 
 GoalOverlay::~GoalOverlay()
 {

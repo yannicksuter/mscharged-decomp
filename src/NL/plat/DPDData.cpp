@@ -2,6 +2,8 @@
 
 #include "NL/plat/DPDData.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 DPDData::DPDData()
 {
     mValidFlag = 0;

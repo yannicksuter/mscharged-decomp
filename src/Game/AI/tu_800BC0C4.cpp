@@ -14,7 +14,6 @@
 extern "C" float fn_8002C7D0(PlayerTweaks*);
 extern "C" float fn_8002CFD8(PlayerTweaks*);
 extern "C" void fn_8002E340(cFielder*);
-extern "C" bool fn_8003E73C(cFielder*);
 extern "C" void fn_80038158(cFielder*, bool);
 extern "C" void fn_801B8164(cFielder*);
 extern "C" void fn_801B7F8C(cFielder*);
@@ -113,7 +112,7 @@ void DesireMushroom::UnidentifiedCleanup()
 {
     KillMushroom(mUnidentifiedFielder);
     if (!mUnidentifiedFielder->fn_8003E74C()
-        && !fn_8003E73C(mUnidentifiedFielder))
+        && !mUnidentifiedFielder->fn_8003E73C())
     {
         mUnidentifiedFielder->fn_8001EE74(1.0f, 0.2f, -1.0f);
     }

@@ -8,6 +8,8 @@
 #include "Game/Player.h"
 #include "NL/nlMemory.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 extern "C" void fn_800401C0(
     cFielder*, const nlVector3&, float, float);
 

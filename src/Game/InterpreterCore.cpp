@@ -9,6 +9,8 @@
 
 #include <string.h>
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 typedef void (*InterpreterOperation)(InterpreterCore*);
 
 inline TweakIntBinding::TweakIntBinding(int* value)

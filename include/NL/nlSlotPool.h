@@ -116,6 +116,11 @@ public:
         return out;
     }
 
+    T* New(const T& data)
+    {
+        return new (Allocate()) T(data);
+    }
+
     void Free(T* entry)
     {
         SlotPoolEntry* e = (SlotPoolEntry*)entry;

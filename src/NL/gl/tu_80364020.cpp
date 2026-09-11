@@ -1,5 +1,7 @@
 #include "NL/gl/tu_80364020.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
+
 extern "C" Class_80364020* fn_80364020()
 {
     static Class_80364020 instance;

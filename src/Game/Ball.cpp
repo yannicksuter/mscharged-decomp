@@ -166,7 +166,6 @@ extern "C" void fn_8001847C(cBall*, bool);
 extern "C" float fn_8002BE64(PlayerTweaks*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
 extern "C" void fn_80031A30(cFielder*, int, float);
-extern "C" void fn_80035544(cFielder*);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" bool fn_80038660(cFielder*);
 float ReceivingPass(cFielder*);
@@ -765,7 +764,7 @@ void cBall::CollideWithCharacterCallback(
                             {
                                 pOwnerFielder->InitActionSlideAttackReact(
                                     pCharacterFielder, false);
-                                fn_80035544(pCharacterFielder);
+                                pCharacterFielder->SetSlideAttackSuccessFlag();
                                 pCharacterFielder->PickupBall(g_pBall);
                             }
                             else if (pOwnerFielder->GetTweaks()
@@ -776,14 +775,14 @@ void cBall::CollideWithCharacterCallback(
                                 pCharacterFielder
                                     ->InitActionSlideAttackReact(
                                         pOwnerFielder, false);
-                                fn_80035544(pOwnerFielder);
+                                pOwnerFielder->SetSlideAttackSuccessFlag();
                             }
                             else if (pOwnerFielder->mUnidentified024.m_fActualSpeed
                                 < pCharacterFielder->mUnidentified024.m_fActualSpeed)
                             {
                                 pOwnerFielder->InitActionSlideAttackReact(
                                     pCharacterFielder, false);
-                                fn_80035544(pCharacterFielder);
+                                pCharacterFielder->SetSlideAttackSuccessFlag();
                                 pCharacterFielder->PickupBall(g_pBall);
                             }
                             else
@@ -791,7 +790,7 @@ void cBall::CollideWithCharacterCallback(
                                 pCharacterFielder
                                     ->InitActionSlideAttackReact(
                                         pOwnerFielder, false);
-                                fn_80035544(pOwnerFielder);
+                                pOwnerFielder->SetSlideAttackSuccessFlag();
                             }
                         }
                         else
@@ -800,7 +799,7 @@ void cBall::CollideWithCharacterCallback(
                                 pCharacterFielder, false);
                             fn_80036594(
                                 pCharacterFielder, pOwnerFielder, 2);
-                            fn_80035544(pCharacterFielder);
+                            pCharacterFielder->SetSlideAttackSuccessFlag();
                             if (pCharacterFielder->CanPickupBall(
                                     g_pBall, false))
                             {
@@ -814,7 +813,7 @@ void cBall::CollideWithCharacterCallback(
                             pCharacterFielder, false);
                         fn_80036594(
                             pCharacterFielder, pOwnerFielder, 2);
-                        fn_80035544(pCharacterFielder);
+                        pCharacterFielder->SetSlideAttackSuccessFlag();
                         if (pCharacterFielder->CanPickupBall(
                                 g_pBall, false))
                         {
@@ -828,7 +827,7 @@ void cBall::CollideWithCharacterCallback(
             {
                 pCharacterFielder->InitActionSlideAttackReact(
                     pOwnerFielder, false);
-                fn_80035544(pOwnerFielder);
+                pOwnerFielder->SetSlideAttackSuccessFlag();
             }
         }
         else

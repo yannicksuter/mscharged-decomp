@@ -2353,7 +2353,7 @@ void PlaybackRecordedGame()
 
     NetworkGameStartInfo* info =
         (NetworkGameStartInfo*)&gNetworkInputRecording->mConfigSize;
-    SetNetworkRandomSeed(gNetworkInputRecording->mRandomSeed);
+    SetNetworkRandomSeed(info->mSeed);
     RecordedGameConfig* config = info->mConfig;
     ApplyRecordedGameConfig(config);
     tDebugPrintManager::Print(DC_NETWORK,
