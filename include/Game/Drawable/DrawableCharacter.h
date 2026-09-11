@@ -5,7 +5,7 @@
 #include "NL/nlMath.h"
 
 struct Model;
-struct PoseNode;
+class cPoseNode;
 class cCharacter;
 class cPoseAccumulator;
 class cPN_SAnimController;
@@ -35,7 +35,7 @@ public:
     void Grab(SkinAnimatedMovableNPC&);
     void Render(SkinAnimatedMovableNPC&);
     void Blend(float*, DrawableCharacter&, DrawableCharacter&);
-    void EvaluateFrom(PoseNode&, const nlVector3&, u16, float);
+    void EvaluateFrom(const cPoseNode&, const nlVector3&, u16, float);
     nlVector3 GetBallPosition() const;
     nlQuaternion GetBallOrientation();
 

@@ -2251,24 +2251,24 @@ Game/Render/tu_8027AE14.cpp:
 Game/NisPlayer.cpp:
 	.text       start:0x8027B138 end:0x80280C84
 	.ctors      start:0x804DB7E8 end:0x804DB7EC
-	.data       start:0x80523200 end:0x80523644
+	.data       start:0x80523200 end:0x805235C0
 	.bss        start:0x8057AB50 end:0x8057AB68
 	.sdata      start:0x806DEE98 end:0x806DEF28
 	.sbss       start:0x806E19C0 end:0x806E19D8
 	.sdata2     start:0x806E5CB8 end:0x806E5CF8
 
 Game/Render/Nis.cpp:
-	.text       start:0x80280C84 end:0x80283D9C
+	.text       start:0x80280C84 end:0x8028400C
 	.ctors      start:0x804DB7EC end:0x804DB7F0
 	.rodata     start:0x804E86E8 end:0x804E8700
-	.data       start:0x80523644 end:0x805237F0 align:4
+	.data       start:0x805235C0 end:0x805237F0 align:4
 	.bss        start:0x8057AB68 end:0x8057ABB0
 	.sdata      start:0x806DEF28 end:0x806DEF60
 	.sbss       start:0x806E19D8 end:0x806E1A20
 	.sdata2     start:0x806E5CF8 end:0x806E5D18
 
 Game/Render/tu_80283D9C.cpp:
-	.text       start:0x80283D9C end:0x80284A58
+	.text       start:0x8028400C end:0x80284A58
 	.ctors      start:0x804DB7F0 end:0x804DB7F4
 	.data       start:0x805237F0 end:0x805238B8
 	.sdata      start:0x806DEF60 end:0x806DEF80

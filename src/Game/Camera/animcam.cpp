@@ -89,7 +89,7 @@ cCameraData::~cCameraData()
     }
 }
 
-static bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAnimCameraData, bool ownsKeyData)
+bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAnimCameraData, bool ownsKeyData)
 {
     pAnimCameraData->ownsKeyData = ownsKeyData;
     while (outerChunk < outerEnd)

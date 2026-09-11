@@ -50,8 +50,9 @@ public:
     {
     }
 
-protected:
     const char* m_szName;
+
+protected:
     unsigned int m_uHashID;
 };
 

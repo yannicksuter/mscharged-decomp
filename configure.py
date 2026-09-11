@@ -522,7 +522,7 @@ config.libs = [
             Object(NonMatching, "Game/Render/tu_80279AC8.cpp"),
             Object(NonMatching, "Game/Render/tu_8027A4BC.cpp"),
             Object(NonMatching, "Game/Render/tu_8027AE14.cpp"),
-            Object(NonMatching, "Game/Render/Nis.cpp", extra_cflags=["-inline deferred"]),
+            Object(NonMatching, "Game/Render/Nis.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/Render/tu_80283D9C.cpp"),
             Object(NonMatching, "unclassified/tu_80284A58.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AnimProps/globalanimproperties.cpp"),

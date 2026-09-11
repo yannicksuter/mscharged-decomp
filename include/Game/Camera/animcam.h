@@ -22,6 +22,8 @@ public:
     /* 0x24 */ bool ownsKeyData;
 }; // total size: 0x28
 
+bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAnimCameraData, bool ownsKeyData);
+
 class cAnimCamera : public cBaseCamera
 {
 public:

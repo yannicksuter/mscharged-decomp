@@ -296,7 +296,7 @@ public:
     /* 0x124 */ nlMatrix4 m_m4WorldMatrix;
     /* 0x164 */ float m_Dirt;
     /* 0x168 */ float m_MinDirt;
-    /* 0x16C */ u32 mUnidentified16C;
+    /* 0x16C */ int mUnidentified16C;
     /* 0x170 */ BlurHandler* m_pBlurHandler;
     /* 0x174 */ Blinker* m_pBlinker;
     /* 0x178 */ float mUnidentified178;

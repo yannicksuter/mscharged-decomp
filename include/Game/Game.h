@@ -107,6 +107,7 @@ public:
     void SetDifficulty(int diff0, int diff1, int diff2, bool param4);
     void fn_8005DB44(int param1, bool param2);
     void fn_8005DF38();
+    void fn_8005E130(NISData* pData);
 
     inline bool IsGameplayOrOvertime()
     {

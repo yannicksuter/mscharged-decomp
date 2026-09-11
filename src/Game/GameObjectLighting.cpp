@@ -346,7 +346,7 @@ void fn_80183E8C(UnidentifiedLightingObject* arg0, glModel* arg1)
     }
 }
 
-void fn_80183F78(UnidentifiedLightingObject*, glModel* arg1)
+void fn_80183F78(ImpostorModel*, glModel* arg1)
 {
     static unsigned long var0 = nlStringLowerHash("shadowLevel");
     for (glModelPacket* var1 = arg1->packets; var1 < arg1->packets + arg1->numPackets; ++var1)

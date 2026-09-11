@@ -85,6 +85,7 @@ public:
 }; // total size: 0x174
 
 UnidentifiedPresentationState* GetPresentation();
+u32* fn_80287B2C(UnidentifiedPresentationState* state);
 bool IsIdleAndNoShotInProgress(UnidentifiedPresentationState* presentation);
 void fn_80285714(UnidentifiedPresentationState* state, u32 from, u32 to);
 bool fn_80287AB0(UnidentifiedPresentationState* state);

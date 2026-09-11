@@ -23,6 +23,8 @@ struct StadiumLoadResult
     bool mProcessed;
 };
 
+char* fn_802772C4();
+
 void BeginLoadStadium(const char* path, bool skipGameplayModels);
 bool IsStadiumResourceDataLoaded();
 void BeginLoadStadiumTemporaryResources();

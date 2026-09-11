@@ -10,6 +10,7 @@
 #include "Game/CharacterEffects.h"
 #include "Game/AI/HeadTrack.h"
 #include "Game/PoseAccumulator.h"
+#include "Game/PoseNode.h"
 #include "Game/Render/RLView.h"
 #include "Game/Render/RenderShadow.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
@@ -26,13 +27,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 #pragma cpp_extensions on
-
-struct PoseNode
-{
-    virtual void Reserved0() = 0;
-    virtual void Reserved1() = 0;
-    virtual void Evaluate(float, cPoseAccumulator*) = 0;
-};
 
 struct SkinMesh
 {
@@ -1012,7 +1006,7 @@ void DrawableCharacter::Blend(
 #pragma opt_unroll_count reset
 
 void DrawableCharacter::EvaluateFrom(
-    PoseNode& poseNode,
+    const cPoseNode& poseNode,
     const nlVector3& offset,
     u16 facingAngle,
     float poseScale)
