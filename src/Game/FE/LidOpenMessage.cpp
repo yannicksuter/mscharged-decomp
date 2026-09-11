@@ -11,6 +11,7 @@
 #include "NL/nlMemory.h"
 #include "types.h"
 #include "Game/RumbleActions.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 struct LoadingTextEntry
 {

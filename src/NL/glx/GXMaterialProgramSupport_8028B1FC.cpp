@@ -149,7 +149,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>
@@ -166,19 +166,19 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
     const float one = 1.0f;
     float value40 = one != lbl_806DEFF8
         ? lbl_806DEFF8
-        : ((GXMaterialProgramParameters_80298478*)packet->unknown20)->value40;
+        : ((GXMaterialProgramParameters_80298478*)packet->materialParameters)->value40;
     float value44 = one != lbl_806DEFFC
         ? lbl_806DEFFC
-        : ((GXMaterialProgramParameters_80298478*)packet->unknown20)->value44;
+        : ((GXMaterialProgramParameters_80298478*)packet->materialParameters)->value44;
     if (value44 == 0.0f)
         return;
 
-    float value48 = ((GXMaterialProgramParameters_80298478*)packet->unknown20)->value48;
-    float scaleX = ((GXMaterialProgramParameters_80298478*)packet->unknown20)->scaleX;
-    float scaleY = ((GXMaterialProgramParameters_80298478*)packet->unknown20)->scaleY;
+    float value48 = ((GXMaterialProgramParameters_80298478*)packet->materialParameters)->value48;
+    float scaleX = ((GXMaterialProgramParameters_80298478*)packet->materialParameters)->scaleX;
+    float scaleY = ((GXMaterialProgramParameters_80298478*)packet->materialParameters)->scaleY;
     int textureIndex = lbl_806DEFF4 >= 0
         ? lbl_806DEFF4
-        : ((GXMaterialProgramParameters_80298478*)packet->unknown20)->textureIndex;
+        : ((GXMaterialProgramParameters_80298478*)packet->materialParameters)->textureIndex;
 
     nlFloatColour source40 = { { value40, value40, value40, value40 } };
     nlColour colour40;
@@ -193,7 +193,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
     ConvertColour(colour48, source48);
     GXSetTevKColor(GX_KCOLOR2, *(GXColor*)&colour48);
 
-    bool enabled = ((GXMaterialProgramParameters_80298478*)packet->unknown20)->value68 == 1;
+    bool enabled = ((GXMaterialProgramParameters_80298478*)packet->materialParameters)->value68 == 1;
     if (lbl_806E1A74 != enabled)
     {
         lbl_806E1A74 = enabled;
@@ -260,11 +260,11 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
         GXLoadTexMtxImm(inverse, 30, GX_MTX3x4);
     }
 
-    if (packet->unknown28 == 0)
+    if (packet->skinnedVertices == 0)
     {
         glx_LoadSkinMatrices(
-            ((GXMaterialProgramParameters_80298478*)packet->unknown20)->matrices,
-            ((GXMaterialProgramParameters_80298478*)packet->unknown20)->matricesSize / 48,
+            ((GXMaterialProgramParameters_80298478*)packet->materialParameters)->matrices,
+            ((GXMaterialProgramParameters_80298478*)packet->materialParameters)->matricesSize / 48,
             &modelview, 0);
     }
     else
@@ -273,7 +273,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298478>::Draw(
     }
 
     fn_801837DC(
-        1, ((GXMaterialProgramParameters_80298478*)packet->unknown20)->value64);
+        1, ((GXMaterialProgramParameters_80298478*)packet->materialParameters)->value64);
     if (lbl_806DEFF1 && value44 != 1.0f)
     {
         gxSaveZMode();

@@ -5,6 +5,7 @@
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static float glx_WarbleMatrix[2][3] = {
     { 0.0f, 0.0f, 0.0625f },
@@ -74,7 +75,7 @@ template <>
 void GXMaterialProgramImpl<GXWarbleMaterialProgram>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>

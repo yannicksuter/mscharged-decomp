@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsSphere.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern const float lbl_806E4AF0;
 extern const float lbl_806E4AF4;

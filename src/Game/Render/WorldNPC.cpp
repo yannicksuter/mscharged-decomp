@@ -10,6 +10,7 @@
 #include "NL/platvmath.h"
 #include "Game/Render/CrowdImpostors.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 // Serialized world-NPC record used by the stadium/world object stream.
 class WorldNPC

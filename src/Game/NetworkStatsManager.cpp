@@ -19,7 +19,6 @@
 
 #include <string.h>
 
-
 static int sLeaderboardJobs[5] = { 6, 7, 8, 9, 10 };
 
 static NetworkStatsManager* sNetworkStatsManager;
@@ -946,22 +945,24 @@ bool IsNewNetworkSeason(const NetworkRankingMeta* previous)
     DWCTime time;
     GetAdjustedNetworkDate(&date, &time);
     NetworkSeasonDate current = { date.month, date.mday };
-    int currentSeason = FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, &current);
+    int currentYear = date.year;
+    int currentSeason = FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, current);
     NetworkSeasonDate old = { previous->mMonth, previous->mDay };
-    int previousSeason = FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, &old);
-    bool changed = date.year != previous->mYear || currentSeason != previousSeason;
-    if (changed)
+    int previousYear = previous->mYear;
+    int previousSeason = FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, old);
+    if (currentYear != previousYear || currentSeason != previousSeason)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Detected new season old %d %d %d new %d %d %d\n",
-            previous->mYear,
-            previous->mMonth,
-            previous->mDay,
-            date.year,
-            date.month,
-            date.mday);
+            previousYear,
+            old.mMonth,
+            old.mDay,
+            currentYear,
+            current.mMonth,
+            current.mDay);
+        return true;
     }
-    return changed;
+    return false;
 }
 
 bool IsNewNetworkDay(const NetworkRankingMeta* previous)
@@ -969,8 +970,7 @@ bool IsNewNetworkDay(const NetworkRankingMeta* previous)
     DWCDate date;
     DWCTime time;
     GetAdjustedNetworkDate(&date, &time);
-    bool changed = date.month != previous->mMonth || date.mday != previous->mDay || date.year != previous->mYear;
-    if (changed)
+    if (date.mday != previous->mDay || date.month != previous->mMonth || date.year != previous->mYear)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Detected Starting new day old %d %d %d new %d %d %d\n",
@@ -980,8 +980,9 @@ bool IsNewNetworkDay(const NetworkRankingMeta* previous)
             date.year,
             date.month,
             date.mday);
+        return true;
     }
-    return changed;
+    return false;
 }
 
 static int DaysInMonth(int month, int year)
@@ -1058,17 +1059,17 @@ bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time)
 }
 
 int FindNetworkSeasonBoundary(
-    const NetworkSeasonDateTable* dates, const NetworkSeasonDate* date)
+    const NetworkSeasonDateTable* dates, NetworkSeasonDate date)
 {
     int index = 0;
     for (; index < dates->mCount; ++index)
     {
-        if (date->mDay == dates->mDates[index].mDay && date->mMonth == dates->mDates[index].mMonth)
+        if (date.mDay == dates->mDates[index].mDay && date.mMonth == dates->mDates[index].mMonth)
         {
             return index;
         }
-        if (dates->mDates[index].mMonth > date->mMonth
-            || (date->mMonth == dates->mDates[index].mMonth && dates->mDates[index].mDay > date->mDay))
+        if (dates->mDates[index].mMonth > date.mMonth
+            || (date.mMonth == dates->mDates[index].mMonth && dates->mDates[index].mDay > date.mDay))
         {
             break;
         }
@@ -1128,4 +1129,3 @@ static TweakIntBinding sAddHoursTimeTweak(
 static TweakIntBinding sAddMinsTimeTweak(
     "g_nAddMinsTime", "Network", &g_nAddMinsTime, true);
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

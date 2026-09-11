@@ -15,6 +15,17 @@ struct FETextLibObjectAttributes
 class TLTextInstance : public TLInstance
 {
 public:
+    TLTextInstance(FELibObject* component)
+        : TLInstance(component)
+    {
+        m_LocStrId = 0;
+        m_pFontString = 0;
+        m_DrawOptions = 0;
+        m_wcUserString = 0;
+        m_UseScissorRect = false;
+        m_type = TLAT_TEXT;
+    }
+
     void SetMatrix(nlMatrix4* pMatrix)
     {
         m_DrawInfo.pMatrix = pMatrix;

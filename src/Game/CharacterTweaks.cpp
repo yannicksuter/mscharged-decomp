@@ -606,5 +606,3 @@ extern "C" float fn_8002D050(PlayerTweaks* tweaks)
         tweaks->mUnidentified074);
 }
 
-
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

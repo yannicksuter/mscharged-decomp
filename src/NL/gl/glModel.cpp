@@ -84,7 +84,7 @@ glModel* glModelDupArrayNoStreams(
     unsigned long numPackets;
     int i;
 
-    glBeginResource(pModelArray->unknown00);
+    glBeginResource(pModelArray->id);
 
     if (bPermanent)
     {
@@ -126,8 +126,8 @@ glModel* glModelDupArrayNoStreams(
         while (j < dst_model->numPackets)
         {
             packet = (glModelPacket*)((u8*)dst_model->packets + packetOffset);
-            info = (glModelPacketDataInfo*)packet->unknown10;
-            source = packet->unknown20;
+            info = (glModelPacketDataInfo*)packet->materialProgram;
+            source = packet->materialParameters;
             dataSize = info->size;
             if (bPermanent)
             {
@@ -139,7 +139,7 @@ glModel* glModelDupArrayNoStreams(
             }
 
             memcpy(data, source, dataSize);
-            packet->unknown20 = data;
+            packet->materialParameters = data;
             glplatOnPacketCloned(
                 (glModelPacket*)((u8*)dst_model->packets + packetOffset),
                 pAllocator);

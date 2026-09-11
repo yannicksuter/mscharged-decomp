@@ -1,4 +1,5 @@
 #include "Game/Effects/EffectsGroup.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 bool EffectsGroup::IsPersistent() const
 {

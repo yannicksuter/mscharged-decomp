@@ -229,7 +229,7 @@ void SHOnlineInvitePlayers::SceneCreated()
     TLComponentInstance* scrollbar = (TLComponentInstance*)FEFinder<TLComponentInstance, 4>::_Find(
         mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("scrollbar"), 0, 0, 0, 0);
     if (scrollbar == 0)
-        scrollbar = &gDefaultTLComponentInstance;
+        scrollbar = &UnidentifiedTLComponentDefault::sInstance;
     mScrollBar.SetComponent(scrollbar);
     mScrollBar.SetRange(0);
     mScrollBar.SetValue(0);

@@ -122,7 +122,7 @@ void FlareHandler::Render()
                 u32 texture = glGetTexture("global/flare_halo");
                 glTextureBinding* state =
                     (glTextureBinding*)writer.GetModel()
-                        ->packets->unknown20;
+                        ->packets->materialParameters;
                 state->texture = texture;
                 state->textureIndex = 0xFFFF;
                 state->SetWrapS(true);
@@ -159,7 +159,7 @@ void FlareHandler::Render()
                 u32 texture = glGetTexture("global/flare_glow");
                 glTextureBinding* state =
                     (glTextureBinding*)writer.GetModel()
-                        ->packets->unknown20;
+                        ->packets->materialParameters;
                 state->texture = texture;
                 state->textureIndex = 0xFFFF;
                 state->SetWrapS(true);
@@ -182,4 +182,3 @@ void FlareHandler::Render()
     }
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

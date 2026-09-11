@@ -1,5 +1,6 @@
 #include "unclassified/tu_80188884.h"
 
+template <>
 UnidentifiedManager_80188928*
     nlSingleton<UnidentifiedManager_80188928>::s_pInstance = 0;
 

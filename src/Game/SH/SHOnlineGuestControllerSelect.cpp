@@ -267,7 +267,7 @@ void SHOnlineGuestControllerSelect::SceneCreated()
         0);
     if (sideGroup == 0)
     {
-        sideGroup = &gDefaultTLComponentInstance;
+        sideGroup = &UnidentifiedTLComponentDefault::sInstance;
     }
     mHomeInstance = sideGroup;
     mHomeInstance->SetActiveSlide("controllers", true, false);

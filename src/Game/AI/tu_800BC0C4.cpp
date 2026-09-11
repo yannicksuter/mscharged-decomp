@@ -22,7 +22,7 @@ extern "C" void fn_801B865C(cFielder*);
 extern "C" UnidentifiedFielderInput* fn_80316974(void*);
 extern float lbl_806E0E40;
 extern const nlVector3 lbl_804DC1A0;
-extern UnidentifiedStateTransition lbl_806E20B8;
+extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 static unsigned short sDesireStarType = 0xFFFF;
 static unsigned short sDesireMushroomType = 0xFFFF;

@@ -2,6 +2,7 @@
 #include "Game/Render/StadiumLoading.h"
 #include "Game/Font/fontmanager.h"
 #include "Game/AsyncLoading.h"
+#include "Game/GameObjectLighting.h"
 #include "Game/DB/GameProgress.h"
 #include "Game/GameInfo.h"
 #include "Game/NetTournManager.h"
@@ -134,9 +135,7 @@ extern "C" void fn_802EC9D0(void*);
 
 extern "C" void fn_801ACFC4();
  void FreeImpostorLighting();
-extern "C" void fn_80183E4C();
 extern "C" void fn_802DB9C4(void*);
-extern "C" void fn_802BDA28();
 extern "C" void fn_80143FD4();
 
 void fn_80056EA8();

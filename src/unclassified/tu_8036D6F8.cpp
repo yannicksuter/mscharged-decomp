@@ -2,6 +2,7 @@
 
 #include "unclassified/tu_8036D6F8.h"
 #include "NL/nlMemory.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 
 void fn_8036D6F8(MemoryAllocator* allocator)

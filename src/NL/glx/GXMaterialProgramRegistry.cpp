@@ -1,6 +1,7 @@
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/GXMaterialProgramRegistry.h"
 #include "NL/nlMemory.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 void glInitMaterialPrograms()
 {

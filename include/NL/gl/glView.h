@@ -64,7 +64,7 @@ public:
     void Iterate(GLViewPacketCallback);
     void RemoveChild(GLView*);
     GLRenderPair GetRenderPair() const;
-    inline UnidentifiedPacketSorter* GetSorter(unsigned long);
+    inline UnidentifiedPacketSorter* GetSorter(long);
 
     void SetRenderPair(GLRenderPair renderPair)
     {

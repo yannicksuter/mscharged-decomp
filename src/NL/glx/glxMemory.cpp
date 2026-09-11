@@ -13,6 +13,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 class GLXResourcePool;
 

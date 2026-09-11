@@ -12,7 +12,7 @@ struct UnidentifiedGameState
 };
 
 extern UnidentifiedGameState* g_pGame;
-extern UnidentifiedStateTransition lbl_806E20B8;
+extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 float lbl_806DC448 = 1.1f;
 char lbl_80503FC0[] = "TeamPlayMachine";
@@ -27,7 +27,7 @@ void TeamPlayMachine::UnidentifiedVirtual2()
 
     TutorialMegastrikeDesire* desire =
         new (nlMalloc(sizeof(TutorialMegastrikeDesire), 8, false))
-            TutorialMegastrikeDesire(5, lbl_806E20B8);
+            TutorialMegastrikeDesire(5, UnidentifiedStateTransition(lbl_806E20B8));
     UnidentifiedAddState(5, desire, false);
 }
 

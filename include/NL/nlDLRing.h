@@ -10,7 +10,7 @@ public:
     DLListEntry()
         : m_next(0)
         , m_prev(0)
-        , entry(0)
+        , entry()
     {
     }
 

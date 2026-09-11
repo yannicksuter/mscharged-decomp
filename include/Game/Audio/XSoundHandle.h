@@ -35,7 +35,7 @@ public:
     virtual void Pause() = 0;
     virtual void Resume() = 0;
     virtual void SetCallbackEnabled(u8 enabled);
-    virtual bool IsCallbackEnabled();
+    virtual u8 IsCallbackEnabled();
     virtual void Release() = 0;
     virtual void Update(float dt);
     virtual bool IsValid() = 0;
@@ -47,7 +47,7 @@ public:
 
     u32** m_Slot;
     u32 m_CueIndex;
-    u32 m_State;
+    s32 m_State;
     u8 m_CallbackEnabled;
     u8 m_Unknown11[3];
     XSoundOwner* m_Owner;

@@ -9,6 +9,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C"
 {
@@ -96,7 +97,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 static inline float WrapTextureOffset_802963B4(float value)
@@ -129,8 +130,8 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Draw(
     static_cast<GXMaterialProgram_8029F5B0*>(this)->BindParameters(packet);
 
     const nlVector3& cameraPosition = cCameraManager::PeekCamera()->GetCameraPosition();
-    float scroll = *(float*)((unsigned char*)packet->unknown20 + 28);
-    float reciprocal = 1.0f / *(float*)((unsigned char*)packet->unknown20 + 24);
+    float scroll = *(float*)((unsigned char*)packet->materialParameters + 28);
+    float reciprocal = 1.0f / *(float*)((unsigned char*)packet->materialParameters + 24);
     Mtx cameraTextureMatrix;
     cameraTextureMatrix[0][1] = 0.0f;
     cameraTextureMatrix[0][2] = 0.0f;
@@ -151,16 +152,16 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Draw(
     GXLoadTexMtxImm(cameraTextureMatrix, 33, GX_MTX3x4);
 
     nlVector2 parameterSpeed;
-    parameterSpeed.x = *(float*)((unsigned char*)packet->unknown20 + 44);
-    parameterSpeed.y = *(float*)((unsigned char*)packet->unknown20 + 48);
+    parameterSpeed.x = *(float*)((unsigned char*)packet->materialParameters + 44);
+    parameterSpeed.y = *(float*)((unsigned char*)packet->materialParameters + 48);
     nlVector2 speed = { 0.0f, 0.0f };
-    if ((unsigned char*)packet->unknown20 + 52 != 0)
+    if ((unsigned char*)packet->materialParameters + 52 != 0)
         speed = parameterSpeed;
 
     LoadScrollingTextureMatrix_802963B4(30, parameterSpeed);
     LoadScrollingTextureMatrix_802963B4(36, speed);
 
-    if (*(int*)((unsigned char*)packet->unknown20 + 40) == 1)
+    if (*(int*)((unsigned char*)packet->materialParameters + 40) == 1)
     {
         if (!lbl_806E1BC4)
         {
@@ -179,7 +180,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Draw(
     fn_80183B40(packet->matrix);
 
     bool enableState = false;
-    if (*(int*)((unsigned char*)packet->unknown20 + 56) == 1
+    if (*(int*)((unsigned char*)packet->materialParameters + 56) == 1
         && lbl_806DF0BC)
         enableState = true;
 
@@ -197,14 +198,14 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029F5B0>::Draw(
         lbl_806E1BC5 = false;
     }
 
-    if (*(int*)((unsigned char*)packet->unknown20 + 36) == 1)
+    if (*(int*)((unsigned char*)packet->materialParameters + 36) == 1)
     {
-        glTextureBinding* texture = (glTextureBinding*)packet->unknown20;
+        glTextureBinding* texture = (glTextureBinding*)packet->materialParameters;
         texture->SetWrapS(true);
         texture->SetWrapT(true);
     }
 
-    float value = *(float*)((unsigned char*)packet->unknown20 + 32);
+    float value = *(float*)((unsigned char*)packet->materialParameters + 32);
     nlFloatColour colour = { { value, value, value, value } };
     nlColour gxColour;
     ConvertColour(gxColour, colour);

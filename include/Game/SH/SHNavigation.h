@@ -23,7 +23,10 @@ public:
     void HideButtons();
     void SetButtons(int value, bool enabled);
     TLComponentInstance* GetButton(int value);
-    FEPageControls* GetPageControls();
+    FEPageControls* GetPageControls()
+    {
+        return &mPageControls;
+    }
     void ShowHomeButtonWarning();
     void SetPointerTeamColours();
     void ResetButtons(bool enabled);

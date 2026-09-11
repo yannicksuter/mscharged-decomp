@@ -44,7 +44,7 @@ extern bool lbl_806E0C51;
 extern bool lbl_806E0C52;
 extern cGame* g_pGame;
 extern const nlVector3 lbl_804DC388;
-extern UnidentifiedStateTransition lbl_806E20B8;
+extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 char lbl_80502C28[] = "Kickoff Neutral";
 char lbl_80502C38[] = "Kickoff Advantage";

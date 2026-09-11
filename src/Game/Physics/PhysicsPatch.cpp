@@ -19,6 +19,8 @@
 #include "Game/NetworkSync.h"
 
 #include <math.h>
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 class EffectsGroup;
 

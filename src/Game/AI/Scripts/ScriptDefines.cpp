@@ -5,6 +5,7 @@
 #include "Game/GameTweaks.h"
 #include "Game/Team.h"
 #include "types.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 cFielder* g_pScriptCurrentFielder;
 cFielder* g_pScriptCurrentMark;

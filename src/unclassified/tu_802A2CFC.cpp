@@ -40,19 +40,19 @@ extern "C" void fn_802A2DB8()
 
 extern "C" void fn_802A2DD8(void* renderer, const glModelPacket* packet)
 {
-    u32* parameter = static_cast<u32*>(packet->unknown20);
+    u32* parameter = static_cast<u32*>(packet->materialParameters);
     glSetMaterialTextureAlphaState(renderer, packet, *parameter);
 }
 
 extern "C" void fn_802A2DE4(void* renderer, const glModelPacket* packet)
 {
-    u8* parameters = static_cast<u8*>(packet->unknown20);
+    u8* parameters = static_cast<u8*>(packet->materialParameters);
     glx_LoadDirectionalLight(0, (const nlVector3*)(parameters + 8), (const nlFloatColour*)(parameters + 0x2C));
-    parameters = static_cast<u8*>(packet->unknown20);
+    parameters = static_cast<u8*>(packet->materialParameters);
     glx_LoadDirectionalLight(1, (const nlVector3*)(parameters + 0x14), (const nlFloatColour*)(parameters + 0x3C));
-    parameters = static_cast<u8*>(packet->unknown20);
+    parameters = static_cast<u8*>(packet->materialParameters);
     glx_LoadDirectionalLight(2, (const nlVector3*)(parameters + 0x20), (const nlFloatColour*)(parameters + 0x4C));
-    parameters = static_cast<u8*>(packet->unknown20);
+    parameters = static_cast<u8*>(packet->materialParameters);
     glx_SetAmbientColour((const nlFloatColour*)(parameters + 0x5C));
 
     fn_802A5ED8(renderer, packet);

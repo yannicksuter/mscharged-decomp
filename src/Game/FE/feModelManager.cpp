@@ -700,4 +700,5 @@ void FEImpostorCharacter::UpdateAnimation(float)
 {
 }
 
+template <>
 FEModelManager* nlSingleton<FEModelManager>::s_pInstance = 0;

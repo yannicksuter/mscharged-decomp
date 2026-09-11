@@ -1,4 +1,5 @@
 #include "Game/Audio/AudioGlobals.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 #include "Game/Audio/XSoundHandle.h"
 #include "Game/Sys/debug.h"
 

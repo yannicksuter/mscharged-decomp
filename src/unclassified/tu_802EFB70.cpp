@@ -1,6 +1,7 @@
 #include "NL/nlDebugString.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioSystem.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 #include "NL/nlChunk.h"
 #include "Game/Sys/debug.h"
 #include "NL/nlMemory.h"
@@ -83,8 +84,8 @@ struct SliderState_802EFB70
 };
 
 extern char lbl_8052F668[0x16];
-extern SlotPoolBase lbl_8057F9E8;
-extern SlotPoolBase lbl_8057FA10;
+SlotPool<RpcRuntimeNode_802EFB70> lbl_8057F9E8(32, 16);
+SlotPool<RpcListEntry_802EFB70> lbl_8057FA10(16, 16);
 
 extern "C" SliderState_802EFB70* fn_802EED38(
     void* sliderTable, u32 sliderIndex, void* localOwner);
@@ -315,4 +316,11 @@ extern "C" void fn_802F04D4(
         else
             entry = next;
     }
+}
+
+extern "C" void fn_802F076C(RpcList_802EFB70* list, RpcListEntry_802EFB70* entry)
+{
+    SlotPoolBase* pool = list->pool;
+    entry->next = (RpcListEntry_802EFB70*)pool->m_FreeList;
+    pool->m_FreeList = (SlotPoolEntry*)entry;
 }

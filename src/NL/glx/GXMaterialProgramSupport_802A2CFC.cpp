@@ -6,6 +6,7 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlColour.h"
 #include "NL/nlMath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 struct GXMaterialProgramParameters_802A5D58
 {
@@ -40,17 +41,17 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A5D58>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->texture0.texture);
+    glSetMaterialTextureAlphaState(this, packet, static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->materialParameters)->texture0.texture);
 }
 
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A5D58>::Draw(
     const glModelPacket* packet)
 {
-    glx_LoadDirectionalLight(0, &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values8[0], &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values44[0]);
-    glx_LoadDirectionalLight(1, &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values8[1], &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values44[1]);
-    glx_LoadDirectionalLight(2, &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values8[2], &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->values44[2]);
-    glx_SetAmbientColour(&static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->unknown20)->value92);
+    glx_LoadDirectionalLight(0, &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->materialParameters)->values8[0], &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->materialParameters)->values44[0]);
+    glx_LoadDirectionalLight(1, &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->materialParameters)->values8[1], &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->materialParameters)->values44[1]);
+    glx_LoadDirectionalLight(2, &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->materialParameters)->values8[2], &static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->materialParameters)->values44[2]);
+    glx_SetAmbientColour(&static_cast<const GXMaterialProgramParameters_802A5D58*>(packet->materialParameters)->value92);
 
     static_cast<GXMaterialProgram_802A5D58*>(this)->BindVertexArrays(packet);
     static_cast<GXMaterialProgram_802A5D58*>(this)->BindParameters(packet);

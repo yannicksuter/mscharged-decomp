@@ -48,7 +48,7 @@ void ControllerSpeaker::ApplyToSound(void*)
 {
 }
 
-void ControllerSpeaker::OnSoundStopped()
+void ControllerSpeaker::OnSoundStopped(void*)
 {
     if (sControllerSpeakerEnabled)
     {

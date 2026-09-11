@@ -26,6 +26,8 @@ class LoadablePhysicsMesh : public PhysicsMesh
 public:
     typedef char* MemType;
 
+    virtual int GetObjectType() const;
+
     void Destroy();
 };
 

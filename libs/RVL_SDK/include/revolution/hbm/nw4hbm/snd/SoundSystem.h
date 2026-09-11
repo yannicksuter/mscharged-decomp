@@ -20,6 +20,7 @@ public:
                                 s32 dvdThreadPriority = DEFAULT_DVD_THREAD_PRIORITY);
 
     static void ShutdownSoundSystem();
+    static void WaitForResetReady();
 
     static void SetOutputMode(OutputMode mode) { detail::AxManager::GetInstance().SetOutputMode(mode); }
 

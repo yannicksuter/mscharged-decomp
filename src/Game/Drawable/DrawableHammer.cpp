@@ -4,6 +4,7 @@
 #include "NL/nlMath.h"
 #include "unclassified/tu_80186524.h"
 #include "unclassified/tu_801A0E64.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 u8 lbl_806DCBE8 = 1;
 

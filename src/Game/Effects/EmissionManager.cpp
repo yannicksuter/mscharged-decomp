@@ -11,6 +11,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static EffectsLight g_EffectsLights[3];
 static int g_nNumLights;

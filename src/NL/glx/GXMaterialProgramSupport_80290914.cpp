@@ -11,6 +11,7 @@
 #include "NL/glx/glxMatrix.h"
 #include "NL/nlMath.h"
 #include "NL/platvmath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 struct GXMaterialProgramParameters_8029BA04
 {
@@ -61,7 +62,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029BA04>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 extern "C" void fn_802909E4(float value)
@@ -163,7 +164,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029BA04>::Draw(
     glGetMatrix(packet->matrix, model);
     nlMultMatrices(modelview, model, lbl_8057B0D8);
 
-    GXMaterialProgramParameters_8029BA04* parameters = (GXMaterialProgramParameters_8029BA04*)packet->unknown20;
+    GXMaterialProgramParameters_8029BA04* parameters = (GXMaterialProgramParameters_8029BA04*)packet->materialParameters;
     int count360 = parameters->count360;
     int count364 = parameters->count364;
 
@@ -264,7 +265,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029BA04>::Draw(
         GXSetChanCtrl(GX_COLOR0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)(GX_LIGHT0 | GX_LIGHT1 | GX_LIGHT2 | GX_LIGHT3), GX_DF_NONE, GX_AF_SPOT);
     }
 
-    if (packet->unknown28 == 0)
+    if (packet->skinnedVertices == 0)
     {
         glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }

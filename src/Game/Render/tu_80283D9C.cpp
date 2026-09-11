@@ -5,6 +5,14 @@
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glState.h"
 #include "NL/nlColour.h"
+#include "NL/nlString.h"
+
+#include "Game/UnidentifiedStaticStorage.h"
+
+u32 lbl_806E1A20 = glGetTexture("global/checkers");
+u8 lbl_806E1A24;
+u8 lbl_806E1A25;
+u32 lbl_806E1A28 = nlStringLowerHash("Holotron_Bone01");
 
 static bool lbl_806DEF60 = true;
 static bool lbl_806DEF61 = true;

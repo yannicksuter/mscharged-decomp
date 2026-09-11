@@ -19,7 +19,6 @@
 
 #include <string.h>
 
-
 static int s_nTimeoutFindingMaxPlayersAcceptMin = 20;
 
 static void MatchmakingCallback(
@@ -757,20 +756,22 @@ NetworkDraftMachineInfo* NetworkLobby::GetMachineInfo(int index)
 int NetworkLobby::ProcessMessage(
     NetworkMessage* message)
 {
-    int machine = MachineIdxFromConnection(message->mSource);
+    s8 machine = MachineIdxFromConnection(message->mSource);
     if (machine < 0 || machine >= GetMachineCount())
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Discarded message type %d because from unknown connection %x\n",
-            message->GetType(),
+            (u8)message->GetType(),
             message->mSource);
         return 1;
     }
 
-    if (message->GetType() == 0x16)
+    switch ((u8)message->GetType())
+    {
+    case 0x16:
     {
         NetMessageDraftMachineInfo* machineInfo = (NetMessageDraftMachineInfo*)message;
-        int index = (s8)machineInfo->mEntry.mIndex;
+        int index = machineInfo->mEntry.mIndex;
         if (index >= 0 && index < GetMachineCount())
         {
             mMachineInfo[index] = machineInfo->mEntry;
@@ -785,6 +786,8 @@ int NetworkLobby::ProcessMessage(
                 "Ignored ReceivedDraftMachineInfo because from index %d\n",
                 index);
         }
+        break;
+    }
     }
     return 1;
 }
@@ -793,4 +796,3 @@ static TweakIntBinding sTimeoutFindingMaxPlayersAcceptMinTweak(
     "s_nTimeoutFindingMaxPlayersAcceptMin", "Network/DWCLobby",
     &s_nTimeoutFindingMaxPlayersAcceptMin, true);
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

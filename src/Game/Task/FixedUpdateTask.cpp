@@ -42,7 +42,6 @@
 
 extern u16 m_aJoystickRemap__14cCameraManager;
 extern u16 lbl_806DF740;
-extern int lbl_806E2130;
 
 float g_fFixedUpdateTick = 0.02f;
 bool g_bRunSimAndRenderInLockStep;
@@ -517,4 +516,3 @@ void EventDispatcherBase::Add(const EventCallback& callback)
     state.fields.callbackCount++;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

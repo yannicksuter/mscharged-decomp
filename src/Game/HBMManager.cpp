@@ -16,6 +16,7 @@
 #include "Game/Render/HomeButtonFade.h"
 #include "Game/Task/ResetTask.h"
 #include "Game/Sys/audio.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 #include "Game/Sys/movie.h"
 #include "NL/MemAlloc.h"
 #include "NL/glx/glxGX.h"

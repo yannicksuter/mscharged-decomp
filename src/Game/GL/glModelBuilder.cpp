@@ -27,7 +27,7 @@ void glCreateModel(glModel* pModel, int numVerts, int prim,
             sizeof(glModelPacket), GLM_Header);
     }
 
-    pModel->unknown00 = 0;
+    pModel->id = 0;
     pModel->numPackets = 1;
     pModel->packets = pPacket;
 
@@ -37,7 +37,7 @@ void glCreateModel(glModel* pModel, int numVerts, int prim,
     pPacket->primType = prim;
     pPacket->numStreams = numStreams;
     pPacket->matrix = glGetCurrentMatrix();
-    pPacket->unknown10 = glGetMaterialProgram(programHash);
+    pPacket->materialProgram = glGetMaterialProgram(programHash);
 
     glModelStream* pPktStreams;
     if (numStreams == 0)
@@ -59,7 +59,7 @@ void glCreateModel(glModel* pModel, int numVerts, int prim,
     pPacket->rasterState = glGetCurrentRasterState();
 
     unsigned long dataSize =
-        ((UnidentifiedMaterialProgram_802D38A4*)pPacket->unknown10)->dataSize;
+        ((UnidentifiedMaterialProgram_802D38A4*)pPacket->materialProgram)->dataSize;
     void* data;
     if (dataSize == 0)
     {
@@ -73,7 +73,7 @@ void glCreateModel(glModel* pModel, int numVerts, int prim,
     {
         data = glFrameAlloc(dataSize, GLM_Header);
     }
-    pPacket->unknown20 = data;
+    pPacket->materialParameters = data;
 }
 
 void glSetModelStream(glModelStream* pStream, int stream,
@@ -83,7 +83,7 @@ void glSetModelStream(glModelStream* pStream, int stream,
     pStream->stride = stride;
     pStream->id = type;
     pStream->unknown07 = 0;
-    pStream->unknown04 = stream;
+    pStream->index = stream;
 }
 
 void glSetModelPackets(

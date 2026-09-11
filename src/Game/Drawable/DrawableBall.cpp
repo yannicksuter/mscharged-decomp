@@ -6,27 +6,7 @@
 #include "Game/Drawable/DrawableCharacter.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/RenderSnapshot.h"
-
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
+#include "Game/UnidentifiedStaticStorage.h"
 
 struct CharacterState
 {
@@ -235,4 +215,3 @@ void DrawableBall::EvaluateFrom(DrawableCharacter& character)
     mScale = GetPresentation()->scale;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

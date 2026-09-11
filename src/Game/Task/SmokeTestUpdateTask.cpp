@@ -117,6 +117,4 @@ char sGraphUnitsFormat[] = " UNITS=\"%s\"";
 
 static SmokeTestUpdateTask sSmokeTestUpdateTask;
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
-
 char sSmokeLogBuffer[0x200];

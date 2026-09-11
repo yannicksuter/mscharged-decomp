@@ -7,6 +7,7 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
 #include "NL/nlMath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C"
 {
@@ -151,7 +152,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80299490>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 struct FloatColour_8028E318
@@ -174,7 +175,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80299490>::Draw(
     const glModelPacket* packet)
 {
-    GXMaterialProgramParameters_80299490* parameters = (GXMaterialProgramParameters_80299490*)packet->unknown20;
+    GXMaterialProgramParameters_80299490* parameters = (GXMaterialProgramParameters_80299490*)packet->materialParameters;
     float value44 = parameters->value44;
     FloatColour_8028E318 colour56 = { { parameters->colour56[0],
         parameters->colour56[1],
@@ -235,7 +236,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299490>::Draw(
     nlMultMatrices(modelview, model, lbl_8057AF40);
     fn_80183B40(packet->matrix);
 
-    if (packet->unknown28 == 0)
+    if (packet->skinnedVertices == 0)
     {
         glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }

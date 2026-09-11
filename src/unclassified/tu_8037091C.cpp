@@ -73,11 +73,11 @@ void RenderShadowVolumeBlend(GLView* view)
     if (writer.Begin(4, GLP_TriStrip, 0))
     {
         ((glTextureBinding*)writer.GetModel()
-                ->packets->unknown20)[1]
+                ->packets->materialParameters)[1]
             .texture = 0;
         glTextureBinding* state
             = (glTextureBinding*)writer.GetModel()
-                  ->packets->unknown20;
+                  ->packets->materialParameters;
         state->texture = texture_806E2410;
         state->textureIndex = 0xFFFF;
         state->SetWrapS(true);

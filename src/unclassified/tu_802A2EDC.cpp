@@ -67,7 +67,7 @@ extern "C" void fn_802A2FE0()
 
 extern "C" void fn_802A2FEC(void* renderer, const glModelPacket* packet)
 {
-    u32* parameter = static_cast<u32*>(packet->unknown20);
+    u32* parameter = static_cast<u32*>(packet->materialParameters);
     glSetMaterialTextureAlphaState(renderer, packet, *parameter);
 }
 
@@ -82,9 +82,9 @@ extern "C" void fn_802A2FF8(void* renderer, const glModelPacket* packet)
     glGetMatrix(packet->matrix, matrix);
     nlMultMatrices(product, matrix, lbl_8057B470);
 
-    if (packet->unknown28 == 0)
+    if (packet->skinnedVertices == 0)
     {
-        SkinParameters_802A2FF8* parameters = static_cast<SkinParameters_802A2FF8*>(packet->unknown20);
+        SkinParameters_802A2FF8* parameters = static_cast<SkinParameters_802A2FF8*>(packet->materialParameters);
         glx_LoadSkinMatrices((const float (*)[3][4])parameters->matrices, parameters->matrixBytes / 0x30, &product, 0);
     }
     else

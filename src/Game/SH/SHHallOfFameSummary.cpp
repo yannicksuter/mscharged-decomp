@@ -389,7 +389,7 @@ void SHHallOfFameSummary::UpdateTitle()
             subtitleComponentHash, 0, 0);
     if (titleText == 0)
     {
-        titleText = &gDefaultTLTextInstance;
+        titleText = &UnidentifiedTLTextDefault::sInstance;
     }
 
     switch (this->mMode)
@@ -436,7 +436,7 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
             stat0Hash, 0);
     if (rowText == 0)
     {
-        rowText = &gDefaultTLTextInstance;
+        rowText = &UnidentifiedTLTextDefault::sInstance;
     }
 
     unsigned long lockedUnlockedHash = nlStringLowerHash("lockedunlocked");
@@ -448,7 +448,7 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
             lockedUnlockedHash, 0);
     if (lockState == 0)
     {
-        lockState = &gDefaultTLComponentInstance;
+        lockState = &UnidentifiedTLComponentDefault::sInstance;
     }
 
     if (unlocked)
@@ -494,7 +494,7 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
                 challenge0Hash, lockedUnlockedHash, groupHash);
         if (statusText == 0)
         {
-            statusText = &gDefaultTLTextInstance;
+            statusText = &UnidentifiedTLTextDefault::sInstance;
         }
 
         if (unlocked)
@@ -523,7 +523,7 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
             nlStringLowerHash("Layer"), summaryHash, itemHash, challenge0Hash,
             numberHash, 0);
     TLTextInstance* displayedTournamentText = tournamentText == 0
-        ? &gDefaultTLTextInstance
+        ? &UnidentifiedTLTextDefault::sInstance
         : tournamentText;
     displayedTournamentText->SetStringId(tournamentName);
 }

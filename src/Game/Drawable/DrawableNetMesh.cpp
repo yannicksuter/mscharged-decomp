@@ -15,6 +15,7 @@
 #include "NL/nlMath.h"
 
 #include <string.h>
+#include "Game/UnidentifiedStaticStorage.h"
 
 struct RenderHeader
 {
@@ -88,24 +89,6 @@ struct SaveFrame
     u8* position;
 };
 
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
-
 __declspec(weak) char LightTextureName[] = "global/lightramp";
 __declspec(weak) char BlackTextureName[] = "global/black";
 __declspec(weak) char WhiteTextureName[] = "global/white";
@@ -138,11 +121,6 @@ int lbl_806E137C;
 
 u32 lbl_806E1380 = glGetTexture(NetMeshTextureName);
 u32 lbl_806E1384 = glGetTexture(CheckerTextureName);
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
-
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
 
 static inline u8 KeepPacketFlagBit1(u8 value)
 {

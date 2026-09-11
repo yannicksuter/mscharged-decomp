@@ -14,6 +14,7 @@
 
 #include <stdarg.h>
 #include "NL/nlstring_tmpl.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 enum eGLFont
 {
@@ -58,25 +59,6 @@ bool lbl_806E1ECC;
 bool lbl_806E1ECD;
 bool lbl_806E1ECE;
 bool lbl_806E1ECF;
-
-// The original type identity of this common weak static is not yet known.
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
 
 void fn_802C9A0C(int x, int y, char character, unsigned short* image, int imageWidth, int font)
 {
@@ -405,7 +387,3 @@ bool glFontVirtualCoordinates(bool virtualCoordinates)
     return previous;
 }
 
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
-
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

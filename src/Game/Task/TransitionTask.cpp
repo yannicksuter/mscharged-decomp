@@ -196,4 +196,3 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
 TransitionTask gTransitionTask;
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

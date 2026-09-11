@@ -39,11 +39,11 @@ public:
     /* 0x19 */ bool m_isConnected;
     /* 0x1C */ float* m_prevPressurePtr;
     /* 0x20 */ float* m_currPressurePtr;
-    /* 0x24 */ float m_unk_0x24;
-    /* 0x28 */ float m_unk_0x28;
-    /* 0x2C */ float m_unk_0x2C;
-    /* 0x30 */ float m_unk_0x30;
-    /* 0x34 */ float m_unk_0x34;
+    /* 0x24 */ float m_analogLeftX;
+    /* 0x28 */ float m_analogLeftY;
+    /* 0x2C */ float m_analogRightX;
+    /* 0x30 */ float m_analogRightY;
+    /* 0x34 */ float m_connectionChance;
     /* 0x38 */ float* m_buttonChance;
 }; // size 0x3C
 

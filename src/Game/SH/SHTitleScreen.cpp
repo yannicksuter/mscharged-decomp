@@ -23,6 +23,7 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 class SHNavigation;
 extern "C" int VISetTimeToDimming(int time);

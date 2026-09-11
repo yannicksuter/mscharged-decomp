@@ -5,6 +5,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Game.h"
 #include "Game/ReplayManager.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 class EffectsGroup;
 

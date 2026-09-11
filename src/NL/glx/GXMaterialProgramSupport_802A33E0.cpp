@@ -5,6 +5,7 @@
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>::Activate(
@@ -31,7 +32,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>::Prepare(
     const glModelPacket* packet)
 {
-    GXMaterialProgramParameters_802A6B6C* parameters = (GXMaterialProgramParameters_802A6B6C*)packet->unknown20;
+    GXMaterialProgramParameters_802A6B6C* parameters = (GXMaterialProgramParameters_802A6B6C*)packet->materialParameters;
     glSetMaterialTextureAlphaState(this, packet, parameters->texture);
 }
 
@@ -39,7 +40,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A6B6C>::Draw(
     const glModelPacket* packet)
 {
-    GXMaterialProgramParameters_802A6B6C& parameters = *(GXMaterialProgramParameters_802A6B6C*)packet->unknown20;
+    GXMaterialProgramParameters_802A6B6C& parameters = *(GXMaterialProgramParameters_802A6B6C*)packet->materialParameters;
     float scissorX = parameters.scissorX;
 
     if (scissorX <= -0.1f)

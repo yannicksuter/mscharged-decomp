@@ -71,6 +71,7 @@ static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 bool Goalie::mbPosGoalieNetCheck;
 bool Goalie::mbNegGoalieNetCheck;
+float lbl_806DBB1C = 0.5f;
 float lbl_806DBB2C = 9.5f;
 
 cPlayer* Goalie::FindOpenPassTarget()
@@ -130,6 +131,11 @@ Goalie::~Goalie()
             g_pBall->m_bVisible = true;
         }
     }
+}
+
+extern "C" float fn_800776B4()
+{
+    return lbl_806DBB1C;
 }
 
 bool Goalie::IsTargetViable(cPlayer* pTarget)

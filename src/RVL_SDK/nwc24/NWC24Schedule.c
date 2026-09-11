@@ -4,6 +4,7 @@
 #include <revolution/os.h>
 
 #include <string.h>
+#include <revolution/nand.h>
 
 #define CHECK_CALLING_STATUS(block) CheckCallingStatus(__FUNCTION__, block)
 
@@ -45,7 +46,7 @@ static OSMutex nwc24ScdCounterMutex;
 static CommonBuffer nwc24ScdCommonBuffer ALIGN(32);
 static CommonResult nwc24ScdCommonResult ALIGN(32);
 
-static u8 nwc24ScdStatBuf[256] ALIGN(32);
+static NWC24ScdStat nwc24ScdStatBuf ALIGN(32);
 
 // Forward declarations
 static NWC24Err ExecSuspendScheduler(void) DECOMP_DONT_INLINE;
@@ -102,6 +103,47 @@ s32 NWC24ResumeScheduler(void) {
     UnlockCounters();
 
     return count;
+}
+
+NWC24Err NWC24ExecDownloadTask(u32 flags, u16 taskId, u32 subTaskMask) {
+    static const char* pTempName = "dlcnt.bin";
+
+    NWC24Err result = NWC24_OK;
+
+    BOOL saveMail;
+    u32 numErrors;
+
+    NANDStatus status;
+
+    saveMail = result;
+
+    if (NANDPrivateGetStatus(pTempName, &status) == NAND_RESULT_OK) {
+        NANDPrivateDelete(pTempName);
+    }
+
+    result = NWC24iGetSchedulerStat(&nwc24ScdStatBuf, sizeof(nwc24ScdStatBuf));
+    if (result < NWC24_OK) {
+        return result;
+    }
+
+    numErrors = nwc24ScdStatBuf.numErrors;
+
+    result = NWC24iDownloadNowEx(&saveMail, flags, taskId, subTaskMask);
+    if (result >= NWC24_OK && saveMail) {
+        result = NWC24iSaveMailNow();
+    }
+
+    if (result < NWC24_OK) {
+        if (NWC24iGetSchedulerStat(&nwc24ScdStatBuf, sizeof(nwc24ScdStatBuf)) >= NWC24_OK) {
+            NWC24iSetErrorCode(nwc24ScdStatBuf.errorLog[numErrors]);
+        } else {
+            NWC24iSetErrorCode(result - 107200);
+        }
+    } else {
+        NWC24iSetErrorCode(0);
+    }
+
+    return result;
 }
 
 NWC24Err NWC24iRequestGenerateUserId(u64* pId, u32* arg1) {

@@ -32,6 +32,7 @@
 #include "Game/FE/fePageControls.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/FE/FEAudio.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern char lbl_80520808[];
 extern char lbl_80520814[];
@@ -111,7 +112,7 @@ void SHOnlineMiiSelect::SceneCreated()
             0);
         if (component == 0)
         {
-            component = &gDefaultTLComponentInstance;
+            component = &UnidentifiedTLComponentDefault::sInstance;
         }
         mMiiInstances[i] = component;
 
@@ -124,7 +125,7 @@ void SHOnlineMiiSelect::SceneCreated()
             0);
         if (off == 0)
         {
-            off = &gDefaultTLGroupInstance;
+            off = &UnidentifiedTLGroupDefault::sInstance;
         }
 
         TLInstance* over = FEFinder<TLInstance, 5>::Find(mMiiInstances[i],
@@ -136,7 +137,7 @@ void SHOnlineMiiSelect::SceneCreated()
             0);
         if (over == 0)
         {
-            over = &gDefaultTLGroupInstance;
+            over = &UnidentifiedTLGroupDefault::sInstance;
         }
 
         TLImageInstance* overBackground = FEFinder<TLImageInstance, 2>::Find(
@@ -428,14 +429,14 @@ void SHOnlineMiiSelect::UpdatePage()
             mMiiInstances[i], nlStringLowerHash("off"), nlStringLowerHash("Mii_btn"), 0, 0, 0, 0);
         if (off == 0)
         {
-            off = &gDefaultTLGroupInstance;
+            off = &UnidentifiedTLGroupDefault::sInstance;
         }
 
         TLInstance* over = FEFinder<TLInstance, 5>::Find(
             mMiiInstances[i], nlStringLowerHash("over"), nlStringLowerHash("Mii_btn"), 0, 0, 0, 0);
         if (over == 0)
         {
-            over = &gDefaultTLGroupInstance;
+            over = &UnidentifiedTLGroupDefault::sInstance;
         }
 
         int officialIndex = mOfficialIndices[mCurrentPage * 10 + i];
@@ -460,7 +461,7 @@ void SHOnlineMiiSelect::UpdatePage()
             off, nlStringLowerHash(lbl_805208A8), 0, 0, 0, 0, 0);
         if (logo == 0)
         {
-            logo = &gDefaultTLImageInstance;
+            logo = &UnidentifiedTLImageDefault::sInstance;
         }
         logo->SetAssetVisible(hasSaveSlot);
 
@@ -468,7 +469,7 @@ void SHOnlineMiiSelect::UpdatePage()
             over, nlStringLowerHash(lbl_805208A8), 0, 0, 0, 0, 0);
         if (logo == 0)
         {
-            logo = &gDefaultTLImageInstance;
+            logo = &UnidentifiedTLImageDefault::sInstance;
         }
         logo->SetAssetVisible(hasSaveSlot);
 
@@ -481,7 +482,7 @@ void SHOnlineMiiSelect::UpdatePage()
                 off, nlStringLowerHash("Mii"), 0, 0, 0, 0, 0);
         if (image == 0)
         {
-            image = &gDefaultTLImageInstance;
+            image = &UnidentifiedTLImageDefault::sInstance;
         }
         image->m_pTextureResource->SetTextureHandle(textureReference);
         image->SetAssetVisible(imageReady && mInitialized);
@@ -491,7 +492,7 @@ void SHOnlineMiiSelect::UpdatePage()
                 over, nlStringLowerHash("Mii"), 0, 0, 0, 0, 0);
         if (image == 0)
         {
-            image = &gDefaultTLImageInstance;
+            image = &UnidentifiedTLImageDefault::sInstance;
         }
         image->m_pTextureResource->SetTextureHandle(textureReference);
         image->SetAssetVisible(imageReady && mInitialized);
@@ -521,7 +522,7 @@ void SHOnlineMiiSelect::UpdatePage()
             mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("PAGES"), 0, 0, 0, 0);
     if (pages == 0)
     {
-        pages = &gDefaultTLTextInstance;
+        pages = &UnidentifiedTLTextDefault::sInstance;
     }
     pages->SetString(mPageText);
 

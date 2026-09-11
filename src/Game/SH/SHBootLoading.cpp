@@ -1,5 +1,6 @@
 #include <revolution/sc.h>
 #include "Game/FE/fePresentation.inl"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 #include "Game/SH/SHBootLoading.h"
 #include "Game/Render/RLViewLayers.h"
@@ -19,6 +20,7 @@
 #include "NL/nlString.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/Render/RLViewLayers.h"
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 BootLoadingScene::BootLoadingScene()
     : mElapsedTime(0.0f)
@@ -157,7 +159,7 @@ void BootLoadingScene::SetPhaseSlide()
         mHomeButtonWarning = FEFinder<TLComponentInstance, 4>::Find(mPresentation->GetActiveSlide(),
             InlineHasher("Layer"), InlineHasher("no home"));
         if (mHomeButtonWarning == 0)
-            mHomeButtonWarning = &gDefaultTLComponentInstance;
+            mHomeButtonWarning = &UnidentifiedTLComponentDefault::sInstance;
         if (mWidescreen)
             mHomeButtonWarning->SetActiveSlide("widescreen", true, false);
         else
@@ -239,7 +241,7 @@ void BootLoadingScene::SceneCreated()
             TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
                 nlStringLowerHash("Layer"), nlStringLowerHash("strap_jp"), 0, 0, 0);
             if (image == 0)
-                image = &gDefaultTLImageInstance;
+                image = &UnidentifiedTLImageDefault::sInstance;
             image->m_bVisible = false;
             mWidescreen = true;
         }
@@ -250,7 +252,7 @@ void BootLoadingScene::SceneCreated()
             TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
                 nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_jp"), 0, 0, 0);
             if (image == 0)
-                image = &gDefaultTLImageInstance;
+                image = &UnidentifiedTLImageDefault::sInstance;
             image->m_bVisible = false;
         }
     }
@@ -261,7 +263,7 @@ void BootLoadingScene::SceneCreated()
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
             nlStringLowerHash("Layer"), nlStringLowerHash("strap_us"), 0, 0, 0);
         if (image == 0)
-            image = &gDefaultTLImageInstance;
+            image = &UnidentifiedTLImageDefault::sInstance;
         image->m_bVisible = false;
         mWidescreen = true;
     }
@@ -272,7 +274,7 @@ void BootLoadingScene::SceneCreated()
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
             nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_us"), 0, 0, 0);
         if (image == 0)
-            image = &gDefaultTLImageInstance;
+            image = &UnidentifiedTLImageDefault::sInstance;
         image->m_bVisible = false;
     }
     TLImageInstance* image = 0;
@@ -328,33 +330,33 @@ void BootLoadingScene::SceneCreated()
     mHomeButtonWarning = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
         InlineHasher("Layer"), InlineHasher("no home"));
     if (mHomeButtonWarning == 0)
-        mHomeButtonWarning = &gDefaultTLComponentInstance;
+        mHomeButtonWarning = &UnidentifiedTLComponentDefault::sInstance;
     mHomeButtonWarning->m_bVisible = false;
     TLComponentInstance* component;
     component = FEFinder<TLComponentInstance, 4>::Find(presentation, nlStringLowerHash("Slide1"),
         nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0);
     if (component == 0)
-        component = &gDefaultTLComponentInstance;
+        component = &UnidentifiedTLComponentDefault::sInstance;
     component->m_bVisible = false;
     component = FEFinder<TLComponentInstance, 4>::Find(presentation, nlStringLowerHash("ESRB"),
         nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0);
     if (component == 0)
-        component = &gDefaultTLComponentInstance;
+        component = &UnidentifiedTLComponentDefault::sInstance;
     component->m_bVisible = false;
     component = FEFinder<TLComponentInstance, 4>::Find(presentation, nlStringLowerHash("strap"),
         nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0);
     if (component == 0)
-        component = &gDefaultTLComponentInstance;
+        component = &UnidentifiedTLComponentDefault::sInstance;
     component->m_bVisible = false;
     component = FEFinder<TLComponentInstance, 4>::Find(presentation, nlStringLowerHash("nunchuk"),
         nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0);
     if (component == 0)
-        component = &gDefaultTLComponentInstance;
+        component = &UnidentifiedTLComponentDefault::sInstance;
     component->m_bVisible = false;
     component = FEFinder<TLComponentInstance, 4>::Find(presentation, nlStringLowerHash("NLG"),
         nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0);
     if (component == 0)
-        component = &gDefaultTLComponentInstance;
+        component = &UnidentifiedTLComponentDefault::sInstance;
     component->m_bVisible = false;
     if (mWidescreen)
         mHomeButtonWarning->SetActiveSlide("widescreen", true, false);

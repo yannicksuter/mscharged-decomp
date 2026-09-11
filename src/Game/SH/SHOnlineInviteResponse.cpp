@@ -25,6 +25,7 @@
 #include "Game/SH/SHOnlinePlayerCount.h"
 #include "Game/SH/SHOnlineGuestControllerSelect.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 SHOnlineInviteResponse::~SHOnlineInviteResponse()
 {
@@ -82,7 +83,7 @@ void SHOnlineInviteResponse::SceneCreated()
         mButtonInstances[i] = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
             InlineHasher("Layer"), InlineHasher("INVITATION"), InlineHasher(name));
         if (mButtonInstances[i] == 0)
-            mButtonInstances[i] = &gDefaultTLComponentInstance;
+            mButtonInstances[i] = &UnidentifiedTLComponentDefault::sInstance;
     }
     int index = g_pFriendManager->mHostInvitationIndex;
     const unsigned short* name = GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, index);

@@ -5,6 +5,7 @@
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static bool sStateEnabled_806E1B18;
 
@@ -38,7 +39,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029AFC4>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>
@@ -48,7 +49,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029AFC4>::Draw(
     static_cast<GXMaterialProgram_8029AFC4*>(this)->BindVertexArrays(packet);
     static_cast<GXMaterialProgram_8029AFC4*>(this)->BindParameters(packet);
 
-    if (*(int*)((unsigned char*)packet->unknown20 + 8) == 1)
+    if (*(int*)((unsigned char*)packet->materialParameters + 8) == 1)
     {
         fn_80183B40(packet->matrix);
         if (!sStateEnabled_806E1B18)

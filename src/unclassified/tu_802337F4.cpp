@@ -26,6 +26,7 @@
 #include "Game/FE/feDPD.h"
 #include "unclassified/tu_80231118.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 extern "C" bool ProcessLoadedFiles(void* loadState);
 extern "C" void fn_80122DCC();
@@ -226,7 +227,7 @@ void TU802337F4Scene::Update(float dt)
                 TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(
                     mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("done"));
                 if (instance == 0)
-                    instance = &gDefaultTLComponentInstance;
+                    instance = &UnidentifiedTLComponentDefault::sInstance;
                 instance->m_bVisible = false;
                 break;
             }

@@ -9,6 +9,7 @@
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glState.h"
 #include "NL/platqmath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 // Charged-only shadow prop. It follows the same snapshot idiom as
 // DrawableBall: a compact replay-safe state that is grabbed from the live

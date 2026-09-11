@@ -700,4 +700,3 @@ static TweakIntBinding sDynamicStringCount("Num dynamic strings", gLastTweakCate
 static TweakIntBinding sValueStringCount("Num value strings", gLastTweakCategory, &gTweakStringCounts[kTweakStringValue]);
 static TweakIntBinding sFolderNameCount("Num folder names", gLastTweakCategory, &gTweakStringCounts[kTweakStringFolder]);
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

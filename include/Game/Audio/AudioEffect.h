@@ -53,7 +53,7 @@ public:
     virtual void OnParameterFinished(AudioEffectParameter*) { }
     virtual void OnSoundStarted(void*) { }
     virtual void ApplyToSound(void*) { }
-    virtual void OnSoundStopped() { }
+    virtual void OnSoundStopped(void*) { }
     virtual void Update(float);
     virtual void ReleaseParameter(AudioEffectParameter* state) { delete state; }
 

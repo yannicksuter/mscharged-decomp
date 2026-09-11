@@ -6,6 +6,7 @@
 #include "Game/FE/feDPD.h"
 #include "NL/nlBind.h"
 #include "Game/FE/FEAudio.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 SHHallOfFameRoom::~SHHallOfFameRoom()
 {

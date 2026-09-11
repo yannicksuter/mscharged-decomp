@@ -14,6 +14,8 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/nlString.h"
 
+const char* szMemoryNames[6] = { "header", "matrix", "index", "vertex", "texture", "target" };
+
 static int gl_frameCounter;
 static int gl_nDiscard;
 static int gl_state;

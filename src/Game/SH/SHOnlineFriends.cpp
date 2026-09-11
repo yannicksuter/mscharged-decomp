@@ -31,6 +31,7 @@
 #include "Game/MiiManager.h"
 
 #include <stdlib.h>
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 static const int sFriendStatusSortOrder[12] = { 5, 4, 0, 3, 6, 7, 8, 10, 9, 1, 2, 11 };
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
@@ -137,8 +138,8 @@ int SHOnlineFriends::CompareFriendStatus(const void* a, const void* b)
 {
     const FEOnlinePlayerRow* first = *(const FEOnlinePlayerRow* const*)a;
     const FEOnlinePlayerRow* second = *(const FEOnlinePlayerRow* const*)b;
-    int firstOrder = sFriendStatusSortOrder[first->mStatus];
     int secondOrder = sFriendStatusSortOrder[second->mStatus];
+    int firstOrder = sFriendStatusSortOrder[first->mStatus];
     if (firstOrder > secondOrder)
         return 1;
     return firstOrder < secondOrder ? -1 : 0;
@@ -321,7 +322,7 @@ void SHOnlineFriends::SceneCreated()
         InlineHasher("Layer"),
         InlineHasher("Group"),
         InlineHasher("FRIEND CODE"));
-    mUnidentified0594 = text != 0 ? text : &gDefaultTLTextInstance;
+    mUnidentified0594 = text != 0 ? text : &UnidentifiedTLTextDefault::sInstance;
     for (int i = 0; i < 4; ++i)
     {
         char name[9];
@@ -330,14 +331,14 @@ void SHOnlineFriends::SceneCreated()
             InlineHasher("Layer"),
             InlineHasher("Group"),
             InlineHasher(name));
-        mUnidentified0618[i] = instance != 0 ? instance : &gDefaultTLComponentInstance;
+        mUnidentified0618[i] = instance != 0 ? instance : &UnidentifiedTLComponentDefault::sInstance;
     }
     TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
         InlineHasher("Layer"),
         InlineHasher("Group"),
         InlineHasher("TITLE2"));
     if (title == 0)
-        title = &gDefaultTLComponentInstance;
+        title = &UnidentifiedTLComponentDefault::sInstance;
     if (IsOnlineFriendSelectionMode())
     {
         title->SetActiveSlide("friends2", true, false);
@@ -359,7 +360,7 @@ void SHOnlineFriends::SceneCreated()
         InlineHasher("Group"),
         InlineHasher("scrollbar"));
     if (scrollbar == 0)
-        scrollbar = &gDefaultTLComponentInstance;
+        scrollbar = &UnidentifiedTLComponentDefault::sInstance;
     mUnidentified0308.SetComponent(scrollbar);
     mUnidentified0308.SetValue(mUnidentified0020);
     UpdateScrollRange();
@@ -390,20 +391,20 @@ void SHOnlineFriends::UpdateAddFriendRow()
             0,
             0);
         if (views[i] == 0)
-            views[i] = &gDefaultTLGroupInstance;
+            views[i] = &UnidentifiedTLGroupDefault::sInstance;
     }
     for (int i = 0; i < 2; ++i)
     {
         TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("cancel"));
         if (component == 0)
-            component = &gDefaultTLComponentInstance;
+            component = &UnidentifiedTLComponentDefault::sInstance;
         component->m_bVisible = false;
     }
     for (int i = 0; i < 2; ++i)
     {
         TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("SEARCHING_ADD"));
         if (component == 0)
-            component = &gDefaultTLComponentInstance;
+            component = &UnidentifiedTLComponentDefault::sInstance;
         component->SetActiveSlide("ADD", true, false);
         component->m_bVisible = true;
     }
@@ -411,7 +412,7 @@ void SHOnlineFriends::UpdateAddFriendRow()
     {
         TLTextInstance* name = FEFinder<TLTextInstance, 3>::Find(views[i], InlineHasher("NAME"));
         if (name == 0)
-            name = &gDefaultTLTextInstance;
+            name = &UnidentifiedTLTextDefault::sInstance;
         name->m_bVisible = false;
     }
     const char* hidden[] = { "STATUS", "GUEST_HOME_AWAY", "PLAYER CLASS" };
@@ -421,7 +422,7 @@ void SHOnlineFriends::UpdateAddFriendRow()
         {
             TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher(hidden[j]));
             if (component == 0)
-                component = &gDefaultTLComponentInstance;
+                component = &UnidentifiedTLComponentDefault::sInstance;
             component->m_bVisible = false;
         }
     }
@@ -436,7 +437,7 @@ void SHOnlineFriends::UpdateAddFriendRow()
                 InlineHasher(stats[j]),
                 InlineHasher(stats[j]));
             if (text == 0)
-                text = &gDefaultTLTextInstance;
+                text = &UnidentifiedTLTextDefault::sInstance;
             text->m_bVisible = false;
         }
     }
@@ -444,7 +445,7 @@ void SHOnlineFriends::UpdateAddFriendRow()
     {
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(views[i], InlineHasher("00_dummy_texture"));
         if (image == 0)
-            image = &gDefaultTLImageInstance;
+            image = &UnidentifiedTLImageDefault::sInstance;
         image->m_bVisible = false;
     }
     const char* images[] = { "Mii", "logo_32x32", "shoulders", "Online_Mii_select_background" };
@@ -456,7 +457,7 @@ void SHOnlineFriends::UpdateAddFriendRow()
                 InlineHasher("Mii_btn"),
                 InlineHasher(images[j]));
             if (image == 0)
-                image = &gDefaultTLImageInstance;
+                image = &UnidentifiedTLImageDefault::sInstance;
             image->m_bVisible = false;
             image->SetAssetVisible(false);
         }
@@ -523,28 +524,28 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
     for (int i = 0; i < 2; ++i)
     {
         if (views[i] == 0)
-            views[i] = &gDefaultTLGroupInstance;
+            views[i] = &UnidentifiedTLGroupDefault::sInstance;
         views[i]->m_bVisible = row->mVisible;
     }
     for (int i = 0; i < 2; ++i)
     {
         TLComponentInstance* cancel = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("cancel"));
         if (cancel == 0)
-            cancel = &gDefaultTLComponentInstance;
+            cancel = &UnidentifiedTLComponentDefault::sInstance;
         cancel->m_bVisible = row->mShowCancel;
     }
     for (int i = 0; i < 2; ++i)
     {
         TLComponentInstance* searching = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("SEARCHING_ADD"));
         if (searching == 0)
-            searching = &gDefaultTLComponentInstance;
+            searching = &UnidentifiedTLComponentDefault::sInstance;
         searching->SetActiveSlide(sOnlinePlayerSearchSlides[row->mSearchState], false, false);
     }
     for (int i = 0; i < 2; ++i)
     {
         TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::Find(views[i], InlineHasher("NAME"));
         if (nameText == 0)
-            nameText = &gDefaultTLTextInstance;
+            nameText = &UnidentifiedTLTextDefault::sInstance;
         nameText->SetString(row->mName);
         nameText->m_bVisible = row->mSearchState == 4;
     }
@@ -552,7 +553,7 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
     {
         TLComponentInstance* status = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("STATUS"));
         if (status == 0)
-            status = &gDefaultTLComponentInstance;
+            status = &UnidentifiedTLComponentDefault::sInstance;
         status->SetActiveSlide(sOnlinePlayerStatusSlides[row->mStatus], false, false);
         status->m_bVisible = row->mSearchState == 4;
         if (row->mStatus == 6)
@@ -567,7 +568,7 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
     {
         TLComponentInstance* guest = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("GUEST_HOME_AWAY"));
         if (guest == 0)
-            guest = &gDefaultTLComponentInstance;
+            guest = &UnidentifiedTLComponentDefault::sInstance;
         guest->SetActiveSlide(sOnlinePlayerSideSlides[row->mSide], true, false);
         guest->m_bVisible = show && row->mSide != 0;
     }
@@ -575,7 +576,7 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
     {
         TLComponentInstance* playerClass = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("PLAYER CLASS"));
         if (playerClass == 0)
-            playerClass = &gDefaultTLComponentInstance;
+            playerClass = &UnidentifiedTLComponentDefault::sInstance;
         playerClass->m_bVisible = false;
     }
     WideString string = Format(WideString(LookupLocString("ONLINE_RANKING")), row->mStats.mDisplayRank);
@@ -588,7 +589,7 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
             InlineHasher("RANK"),
             InlineHasher("RANK"));
         if (rank == 0)
-            rank = &gDefaultTLTextInstance;
+            rank = &UnidentifiedTLTextDefault::sInstance;
         rank->SetString(name);
         rank->m_bVisible = show && !row->mGuest;
     }
@@ -602,7 +603,7 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
             InlineHasher("RECORD"),
             InlineHasher("RECORD"));
         if (record == 0)
-            record = &gDefaultTLTextInstance;
+            record = &UnidentifiedTLTextDefault::sInstance;
         record->SetString(description);
         record->m_bVisible = show && !row->mGuest;
     }
@@ -610,7 +611,7 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
     {
         TLImageInstance* dummy = FEFinder<TLImageInstance, 2>::Find(views[i], InlineHasher("00_dummy_texture"));
         if (dummy == 0)
-            dummy = &gDefaultTLImageInstance;
+            dummy = &UnidentifiedTLImageDefault::sInstance;
         dummy->m_bVisible = show;
     }
     for (int i = 0; i < 2; ++i)
@@ -619,7 +620,7 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
             InlineHasher("Mii_btn"),
             InlineHasher("Online_Mii_select_background"));
         if (background == 0)
-            background = &gDefaultTLImageInstance;
+            background = &UnidentifiedTLImageDefault::sInstance;
         background->SetAssetVisible(show);
     }
     bool valid = MiiManager::Instance()->CreateIcon((const RFLStoreData*)row->mMiiData, index, (RFLExpression)0);

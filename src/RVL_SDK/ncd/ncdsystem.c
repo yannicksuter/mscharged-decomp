@@ -21,7 +21,7 @@ OSMutex ncdMutex = {0};
 s32 ncdCommonResult[8] ALIGN(32);
 IPCIOVector ncdCommonVector[4] ALIGN(32);
 
-extern const char* __NCDVersion;
+const char* __NCDVersion = "<< RVL_SDK - NCD \trelease build: Mar  9 2007 15:08:17 (0x4199_60831) >>";
 
 static void LockRight(void);
 static NCDErr ExecConfigCommand(const char* name, NCDConfig* config, u32 command);

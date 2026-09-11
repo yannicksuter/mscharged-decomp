@@ -4,6 +4,7 @@
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static inline GXColor makeColor(float r, float g, float b, float a)
 {
@@ -46,7 +47,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A4F0C>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>
@@ -56,7 +57,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A4F0C>::Draw(
     static_cast<GXMaterialProgram_802A4F0C*>(this)->BindVertexArrays(packet);
     static_cast<GXMaterialProgram_802A4F0C*>(this)->BindParameters(packet);
 
-    float value = *(float*)((unsigned char*)packet->unknown20 + 16);
+    float value = *(float*)((unsigned char*)packet->materialParameters + 16);
     float values[4] = { value, value, value, value };
     GXSetTevKColor(
         GX_KCOLOR0, makeColor(values[0], values[1], values[2], values[3]));

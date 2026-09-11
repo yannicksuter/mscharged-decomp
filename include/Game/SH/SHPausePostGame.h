@@ -14,6 +14,7 @@ public:
     virtual void SceneCreated();
     virtual void OnDoneTransitionComplete();
 
+    void fn_801EDBF8();
     void OnSelectRematch();
     void OnSelectQuit();
     void OnSelectChangeTeams();

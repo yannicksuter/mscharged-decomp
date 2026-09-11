@@ -6,6 +6,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C"
 {
@@ -114,7 +115,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029D0E8>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 struct FloatColour_80293154
@@ -144,7 +145,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029D0E8>::Draw(
     static_cast<GXMaterialProgram_8029D0E8*>(this)->BindParameters(packet);
 
     int mode;
-    if (*(int*)((unsigned char*)packet->unknown20 + 60) != 0
+    if (*(int*)((unsigned char*)packet->materialParameters + 60) != 0
         && fn_801820FC() != 0)
         mode = 1;
     else
@@ -156,7 +157,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029D0E8>::Draw(
         fn_80293154(mode);
     }
 
-    unsigned char* parameters = (unsigned char*)packet->unknown20;
+    unsigned char* parameters = (unsigned char*)packet->materialParameters;
     float alpha = 1.0f - *(float*)(parameters + 32);
     float intensity = *(float*)(parameters + 36);
     float attenuation = *(float*)(parameters + 40);

@@ -3,11 +3,14 @@
 
 #include "Game/Audio/AudioGlobals.h"
 #include "NL/nlMath.h"
-#include "NL/nlSlotPool.h"
+#include "NL/nlDLListContainer.h"
+#include "NL/CircularQueue.h"
 #include "types.h"
 
 class AudioBundleManager;
 class XSoundHandle;
+class Plat3dSoundSrc;
+struct XSoundOwner;
 struct AudioHandleState;
 
 struct AudioValues
@@ -56,6 +59,8 @@ public:
     virtual void Shutdown();
     virtual void SetResourcePath(const char* path);
 
+    bool fn_802ECDC8(float dt, Plat3dSoundSrc& source);
+
     void PauseTrackedSound(
         const unsigned long& key, XSoundHandle** handle);
     void ResumeTrackedSound(
@@ -71,13 +76,10 @@ public:
         return m_Listener;
     }
 
-    /* 0x004 */ SlotPoolBase m_SoundInstancePool;
-    /* 0x01C */ u32 m_Unknown1C;
-    /* 0x020 */ SlotPoolBase m_SoundOwnerPool;
-    /* 0x038 */ u32 m_Unknown38;
+    /* 0x004 */ nlDLListSlotPool<Plat3dSoundSrc> m_SoundInstancePool;
+    /* 0x020 */ nlDLListSlotPool<XSoundOwner*> m_SoundOwnerPool;
     /* 0x03C */ class AudioListener* m_Listener;
-    /* 0x040 */ void* m_Unknown40;
-    /* 0x044 */ void* m_ActiveSoundList;
+    /* 0x040 */ nlDLListContainer<XSoundHandle*> m_ActiveSoundList;
     /* 0x048 */ bool m_Unknown48;
     /* 0x049 */ bool m_AsyncLoading;
     /* 0x04A */ char m_ResourcePath[0x80];
@@ -87,17 +89,21 @@ public:
         AudioRuntime* m_unkCC;
         AudioBundleManager* m_BundleManager;
     };
-    /* 0x0D0 */ void* m_UnknownD0;
-    /* 0x0D4 */ void* m_UnknownD4;
-    /* 0x0D8 */ void* m_UnknownD8;
-    /* 0x0DC */ u32 m_UnknownDC;
-    /* 0x0E0 */ u8 m_UnknownE0[0x200];
-    /* 0x2E0 */ void* m_Unknown2E0;
+    /* 0x0D0 */ StaticCircularQueue<XSoundHandle*, 128> m_UnknownD0;
+    /* 0x2E0 */ unsigned int m_Unknown2E0;
 };
 
 class AudioListener
 {
 public:
+    AudioListener()
+        : m_HasTransform(true), m_Enabled(true), m_TransformValid(true)
+    {
+        nlVec3Set(m_Position, 0.0f, 0.0f, 0.0f);
+        nlVec3Set(m_View, 0.0f, 1.0f, 0.0f);
+        nlVec3Set(m_Up, 0.0f, 0.0f, 1.0f);
+    }
+
     virtual void SetHasTransform(bool);
     virtual bool HasTransform();
     virtual bool IsTransformValid();
@@ -117,7 +123,7 @@ public:
 
 void DumpAudioSystem(AudioSystem* audio, const char* path);
 
-void FlushAudio(AudioSystem* audio, bool param2, bool param3);
+void FlushAudio(AudioSystem* audio, int param2, bool param3);
 
 static AudioBundleManager* GetAudioBundleManager()
 {

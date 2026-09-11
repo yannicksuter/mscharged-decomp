@@ -11,7 +11,9 @@
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/Effects/EmissionManager.h"
 #include "NL/gl/glMatrix.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/gl/glMemory.h"
+#include "NL/gl/glState.h"
 #include "NL/gl/glTexture.h"
 #include "NL/gl/glView.h"
 #include "Game/TweakValue.h"
@@ -21,10 +23,13 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
+#include "NL/nlString.h"
 #include "NL/platvmath.h"
 #include "Game/Render/LightingLookup.h"
 #include "Game/TweakValueFloat.h"
 #include "Game/TweakValueInt.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/UnidentifiedTweakAction.h"
 
 // GameRenderTask defines this flag as u8; this unit only matches closer when
 // it reads the byte as a bool.
@@ -52,6 +57,8 @@ struct StadiumLightingParams
 
 struct GameObjectLight
 {
+    GameObjectLight();
+
     /* 0x00 */ bool enabled;
     /* 0x01 */ u8 unknown01;
     /* 0x02 */ u8 unknown02;
@@ -63,6 +70,12 @@ struct GameObjectLight
     /* 0x1C */ u8 unknown1C[4];
     /* 0x20 */ f32 unknown20;
 }; // total size: 0x24
+
+struct UnidentifiedLightingObject
+{
+    /* 0x00 */ u8 mUnidentified00[0x34];
+    /* 0x34 */ nlVector3 mUnidentified34;
+};
 
 struct GameObjectLightArray
 {
@@ -78,16 +91,49 @@ struct UnidentifiedObject_80182168
     /* 0x70 */ nlFloatColour m_colour;
 };
 
+TweakValueFloat gShadowLookupScaleX(
+    "Scale X", "/Rendering/Lighting/Shadow Lookup", 0.042f, false);
+TweakValueFloat gShadowLookupScaleY(
+    "Scale Y", gLastTweakCategory, 0.073f, false);
+TweakValueFloat gShadowLookupTransX(
+    "Trans X", gLastTweakCategory, 0.0f, false);
+TweakValueFloat gShadowLookupTransY(
+    "Trans Y", gLastTweakCategory, 0.0f, false);
+
+u32 lbl_806E1414 = glGetTexture("global/lightramp");
+u32 lbl_806E1418 = glGetTexture("global/black");
+u32 lbl_806E141C = glGetTexture("global/white");
+
+StadiumLightingParams gStadiumGameObjectLightingParams = {
+    glGetTexture("ThePalaceStadiumPlayerLightRamp"),
+    0x28, 0x30, 0x28,
+    0xAF, 0xAF, 0xAF,
+    0.85f, 0.3f, 0.9f, 0.25f,
+    55.0f, 60.0f, 55.0f, -120.0f,
+    0,
+};
+
+GameObjectLight lbl_805709D8[8];
+GameObjectLight lbl_80570AF8[2];
+GameObjectLight lbl_80570B40;
+TweakValueInt lbl_80570B70(
+    "numCharacterInGameLights", "/Rendering/Lighting/Character", 2);
+GameObjectLight lbl_80570B80;
+TweakValueInt lbl_80570BB0(
+    "siCharacterLightRed", "/Rendering/Lighting/Character", 0);
+TweakValueInt lbl_80570BD0("siCharacterLightGreen", gLastTweakCategory, 0);
+TweakValueInt lbl_80570BF0("siCharacterLightBlue", gLastTweakCategory, 0);
+
+extern "C" void fn_80182128();
+
+UnidentifiedTweakAction lbl_806E1430(
+    "Character Light Red", gLastTweakCategory, Function0<void>(fn_80182128));
+UnidentifiedTweakAction lbl_806E1434(
+    "Character Light Green", gLastTweakCategory, Function0<void>(fn_80182128));
+UnidentifiedTweakAction lbl_806E1438(
+    "Character Light Blue", gLastTweakCategory, Function0<void>(fn_80182128));
+
 extern "C" {
-extern StadiumLightingParams gStadiumGameObjectLightingParams;
-extern GameObjectLightArray lbl_80570AF8;
-extern GameObjectLight lbl_805709D8[8];
-extern GameObjectLight lbl_80570B40;
-extern GameObjectLight lbl_80570B80;
-extern TweakValueInt lbl_80570B70;
-extern TweakValueInt lbl_80570BB0;
-extern TweakValueInt lbl_80570BD0;
-extern TweakValueInt lbl_80570BF0;
 extern bool lbl_806DCC40;
 extern bool lbl_806DCC48;
 extern s32 lbl_806DCC64;
@@ -146,33 +192,6 @@ extern nlMatrix4 lbl_80570C18;
 
 bool fn_80183C54();
 
-nlColour fn_80183C9C(const nlVector2* arg0, bool arg1)
-{
-    if (!fn_80183C54())
-    {
-        nlColour var0;
-        nlColourSet(var0, 0xFF, 0xFF, 0xFF, 0xFF);
-        return var0;
-    }
-
-    if (lbl_806DCC5C <= 0xFF)
-    {
-        nlColour var0;
-        nlColourSet(var0, 0xFF, 0xFF, 0xFF, 0xFF);
-        return var0;
-    }
-
-    f32 var0 = arg0->x * gShadowLookupScaleX.value;
-    var0 += gShadowLookupTransX.value;
-    f32 var1 = arg0->y * gShadowLookupScaleY.value;
-    var1 += gShadowLookupTransY.value;
-    var0 = lbl_806E4D2C * var0 + lbl_806E4D2C;
-    var1 = lbl_806E4D40 * var1 + lbl_806E4D2C;
-    var0 *= (f32)gpShadowLightingLookup->mWidth;
-    var1 *= (f32)gpShadowLightingLookup->mHeight;
-    return gpShadowLightingLookup->SampleFilteredColour(var0, var1, arg1);
-}
-
 bool fn_80183C54()
 {
     if (!lbl_806DCC58)
@@ -189,6 +208,172 @@ bool fn_80183C54()
 
     return true;
 }
+}
+
+GameObjectLight::GameObjectLight()
+{
+    enabled = false;
+    unknown01 = false;
+    unknown02 = false;
+}
+
+void FillInGameObjectLightRamp();
+
+extern "C" void fn_80182168(UnidentifiedObject_80182168* pLight)
+{
+    // This retained path prepares a light locally but does not publish it.
+    GameObjectLight var0;
+    var0.unknown02 = false;
+    var0.unknown01 = true;
+    var0.enabled = true;
+    const nlMatrix4& matrix = ((DrawableObject*)pLight)->GetWorldMatrix();
+    ConvertColour(*(nlColour*)var0.unknown1C, pLight->m_colour);
+    var0.worldPosition = matrix.GetTranslation();
+    var0.intensity = pLight->m_fIntensity;
+}
+
+void InitializeGameObjectLighting()
+{
+    StadiumLightingParams* pParams = &gStadiumGameObjectLightingParams;
+
+    lbl_806DCC64 = 2;
+    lbl_805709D8[0].intensity = pParams->inGameKeyIntensity;
+    lbl_805709D8[0].unknown08 = pParams->inGameKeyRotYDeg;
+    lbl_805709D8[0].unknown0C = pParams->inGameKeyRotZDeg;
+    lbl_805709D8[1].intensity = pParams->inGameFillIntensity;
+    lbl_805709D8[1].unknown08 = pParams->inGameFillRotYDeg;
+    lbl_805709D8[1].unknown0C = pParams->inGameFillRotZDeg;
+
+    lbl_80570B80.unknown01 = true;
+    lbl_80570B80.unknown02 = false;
+    lbl_80570B80.enabled = true;
+    lbl_80570B80.intensity = 1.0f;
+    nlColourSet(*(nlColour*)lbl_80570B80.unknown1C, 0, 0, 0, 255);
+    if (BasicStadium::GetCurrentStadium() != 0)
+    {
+        lbl_80570B80.worldPosition = BasicStadium::GetCurrentStadium()->m_shadowLightPosition;
+    }
+    lbl_80570B80.unknown1C[0] = lbl_80570BB0.value;
+    lbl_80570B80.unknown1C[1] = lbl_80570BD0.value;
+    lbl_80570B80.unknown1C[2] = lbl_80570BF0.value;
+
+    lbl_80570AF8[0].intensity = 1.0f;
+    lbl_80570AF8[1].intensity = 1.0f;
+    lbl_80570B40.intensity = 1.0f;
+    lbl_80570B40.enabled = true;
+    nlVec3Set(lbl_80570B40.worldPosition, 0.0f, 0.0f, -1.0f);
+
+    GLResourcePool* pResource = glGetCurrentResourcePool();
+    g_pGameObjectLightRamp = glx_CreatePlatTexture(pResource);
+    PlatTexture* pRampTexture = g_pGameObjectLightRamp;
+    glRegisterTexture(pParams->lightRamp, pRampTexture, pResource);
+    g_pGameObjectLightRamp->Create(0x100, 4, GXTex_RGBA8, pResource, 1, true, false);
+    FillInGameObjectLightRamp();
+}
+
+void SetCameraRelativeLightData(void* pLightData)
+{
+    static nlVector3 keyLightInViewSpace;
+    static nlVector3 fillLightInViewSpace;
+    static bool initedLightInViewSpace;
+    nlVector3 transformedDir;
+    nlVector3 viewVec;
+    nlMatrix4 viewRotMat;
+    nlMatrix4 matZ;
+    nlMatrix4 matY;
+
+    if (!initedLightInViewSpace)
+    {
+        nlVector3 initialDirection = { 1.0f, 0.0f, 0.0f };
+        nlVector3 fillDirection;
+        nlVector3 keyDirection;
+
+        nlMakeRotationMatrixY(matY, 0.7853982f);
+        nlMakeRotationMatrixZ(matZ, -0.69813174f);
+        nlMultDirVectorMatrix(keyLightInViewSpace, initialDirection, matY);
+        nlMultDirVectorMatrix(keyDirection, keyLightInViewSpace, matZ);
+        keyLightInViewSpace = keyDirection;
+
+        nlMakeRotationMatrixY(matY, 0.5235988f);
+        nlMakeRotationMatrixZ(matZ, 0.34906587f);
+        nlMultDirVectorMatrix(fillLightInViewSpace, initialDirection, matY);
+        nlMultDirVectorMatrix(fillDirection, fillLightInViewSpace, matZ);
+        fillLightInViewSpace = fillDirection;
+
+        initedLightInViewSpace = true;
+    }
+
+    cCameraManager::GetViewVector(viewVec);
+
+    f32 angle = nlATan2f(viewVec.y, viewVec.x);
+    u16 u16Angle = (u16)(s32)(angle * 10430.378f);
+    f32 radAngle = (f32)u16Angle * 0.0000958738f;
+
+    nlMakeRotationMatrixZ(viewRotMat, radAngle);
+
+    StadiumLightingParams* params = &gStadiumGameObjectLightingParams;
+    GameObjectLightArray* pLights = (GameObjectLightArray*)pLightData;
+
+    nlMultDirVectorMatrix(transformedDir, keyLightInViewSpace, viewRotMat);
+
+    pLights->lights[0].enabled = true;
+    nlVec3Set(pLights->lights[0].worldPosition, -transformedDir.x, -transformedDir.y, -transformedDir.z);
+    pLights->lights[0].intensity = params->keyLightIntensity;
+
+    nlMultDirVectorMatrix(transformedDir, fillLightInViewSpace, viewRotMat);
+
+    pLights->lights[1].enabled = true;
+    nlVec3Set(pLights->lights[1].worldPosition, -transformedDir.x, -transformedDir.y, -transformedDir.z);
+    pLights->lights[1].intensity = params->fillLightIntensity;
+}
+
+int fn_80183DEC(const nlVector3* arg0)
+{
+    nlColour var0 = fn_80183C9C((const nlVector2*)arg0, true);
+    return (var0.c[0] * 140 + var0.c[1] * 88 + var0.c[2] * 29) >> 8;
+}
+
+void fn_80183E8C(UnidentifiedLightingObject* arg0, glModel* arg1)
+{
+    int var0 = fn_80183DEC(&arg0->mUnidentified34);
+    nlColour var1;
+    nlColourSet(var1, var0, var0, var0, 1);
+    unsigned long var2 = *(unsigned long*)&var1;
+    static unsigned long var3 = nlStringLowerHash("shadowLevel");
+    for (glModelPacket* var4 = arg1->packets; var4 < arg1->packets + arg1->numPackets; ++var4)
+    {
+        glSetMaterialUnsignedParameter(var4, var3, var2);
+    }
+}
+
+void fn_80183F78(UnidentifiedLightingObject*, glModel* arg1)
+{
+    static unsigned long var0 = nlStringLowerHash("shadowLevel");
+    for (glModelPacket* var1 = arg1->packets; var1 < arg1->packets + arg1->numPackets; ++var1)
+    {
+        nlMatrix4 var2;
+        glGetMatrix(var1->matrix, var2);
+        nlVector3 var3 = var2.GetTranslation();
+        nlColour var4 = fn_80183C9C((const nlVector2*)&var3, false);
+        unsigned long var5 = *(unsigned long*)&var4;
+        if (glHasMaterialParameter(var1, var0))
+        {
+            glSetMaterialUnsignedParameter(var1, var0, var5);
+        }
+    }
+}
+
+void fn_80183E4C()
+{
+    if (gpShadowLightingLookup != 0)
+    {
+        delete gpShadowLightingLookup;
+        gpShadowLightingLookup = 0;
+    }
+    lbl_806DCC6C = -1;
+}
+
+extern "C" {
 
 void fn_80183BF4(const nlMatrix4* matrix)
 {
@@ -703,62 +888,6 @@ void FillInGameObjectLightRamp()
     g_pGameObjectLightRamp->Prepare();
 }
 
-void SetCameraRelativeLightData(void* pLightData)
-{
-    static nlVector3 keyLightInViewSpace;
-    static nlVector3 fillLightInViewSpace;
-    static bool initedLightInViewSpace;
-    nlVector3 transformedDir;
-    nlVector3 viewVec;
-    nlMatrix4 viewRotMat;
-    nlMatrix4 matZ;
-    nlMatrix4 matY;
-
-    if (!initedLightInViewSpace)
-    {
-        nlVector3 initialDirection = { 1.0f, 0.0f, 0.0f };
-        nlVector3 fillDirection;
-        nlVector3 keyDirection;
-
-        nlMakeRotationMatrixY(matY, 0.7853982f);
-        nlMakeRotationMatrixZ(matZ, -0.69813174f);
-        nlMultDirVectorMatrix(keyLightInViewSpace, initialDirection, matY);
-        nlMultDirVectorMatrix(keyDirection, keyLightInViewSpace, matZ);
-        keyLightInViewSpace = keyDirection;
-
-        nlMakeRotationMatrixY(matY, 0.5235988f);
-        nlMakeRotationMatrixZ(matZ, 0.34906587f);
-        nlMultDirVectorMatrix(fillLightInViewSpace, initialDirection, matY);
-        nlMultDirVectorMatrix(fillDirection, fillLightInViewSpace, matZ);
-        fillLightInViewSpace = fillDirection;
-
-        initedLightInViewSpace = true;
-    }
-
-    cCameraManager::GetViewVector(viewVec);
-
-    f32 angle = nlATan2f(viewVec.y, viewVec.x);
-    u16 u16Angle = (u16)(s32)(angle * 10430.378f);
-    f32 radAngle = (f32)u16Angle * 0.0000958738f;
-
-    nlMakeRotationMatrixZ(viewRotMat, radAngle);
-
-    StadiumLightingParams* params = &gStadiumGameObjectLightingParams;
-    GameObjectLightArray* pLights = (GameObjectLightArray*)pLightData;
-
-    nlMultDirVectorMatrix(transformedDir, keyLightInViewSpace, viewRotMat);
-
-    pLights->lights[0].enabled = true;
-    nlVec3Set(pLights->lights[0].worldPosition, -transformedDir.x, -transformedDir.y, -transformedDir.z);
-    pLights->lights[0].intensity = params->keyLightIntensity;
-
-    nlMultDirVectorMatrix(transformedDir, fillLightInViewSpace, viewRotMat);
-
-    pLights->lights[1].enabled = true;
-    nlVec3Set(pLights->lights[1].worldPosition, -transformedDir.x, -transformedDir.y, -transformedDir.z);
-    pLights->lights[1].intensity = params->fillLightIntensity;
-}
-
 void UpdateGameObjectLighting()
 {
     if (!lbl_806DCC68)
@@ -768,45 +897,6 @@ void UpdateGameObjectLighting()
         return;
 
     SetCameraRelativeLightData(&lbl_80570AF8);
-}
-
-void InitializeGameObjectLighting()
-{
-    StadiumLightingParams* pParams = &gStadiumGameObjectLightingParams;
-
-    lbl_806DCC64 = 2;
-    lbl_805709D8[0].intensity = pParams->inGameKeyIntensity;
-    lbl_805709D8[0].unknown08 = pParams->inGameKeyRotYDeg;
-    lbl_805709D8[0].unknown0C = pParams->inGameKeyRotZDeg;
-    lbl_805709D8[1].intensity = pParams->inGameFillIntensity;
-    lbl_805709D8[1].unknown08 = pParams->inGameFillRotYDeg;
-    lbl_805709D8[1].unknown0C = pParams->inGameFillRotZDeg;
-
-    lbl_80570B80.unknown01 = true;
-    lbl_80570B80.unknown02 = false;
-    lbl_80570B80.enabled = true;
-    lbl_80570B80.intensity = 1.0f;
-    nlColourSet(*(nlColour*)lbl_80570B80.unknown1C, 0, 0, 0, 255);
-    if (BasicStadium::GetCurrentStadium() != 0)
-    {
-        lbl_80570B80.worldPosition = BasicStadium::GetCurrentStadium()->m_shadowLightPosition;
-    }
-    lbl_80570B80.unknown1C[0] = lbl_80570BB0.value;
-    lbl_80570B80.unknown1C[1] = lbl_80570BD0.value;
-    lbl_80570B80.unknown1C[2] = lbl_80570BF0.value;
-
-    lbl_80570AF8.lights[0].intensity = 1.0f;
-    lbl_80570AF8.lights[1].intensity = 1.0f;
-    lbl_80570B40.intensity = 1.0f;
-    lbl_80570B40.enabled = true;
-    nlVec3Set(lbl_80570B40.worldPosition, 0.0f, 0.0f, -1.0f);
-
-    GLResourcePool* pResource = glGetCurrentResourcePool();
-    g_pGameObjectLightRamp = glx_CreatePlatTexture(pResource);
-    PlatTexture* pRampTexture = g_pGameObjectLightRamp;
-    glRegisterTexture(pParams->lightRamp, pRampTexture, pResource);
-    g_pGameObjectLightRamp->Create(0x100, 4, GXTex_RGBA8, pResource, 1, true, false);
-    FillInGameObjectLightRamp();
 }
 
 extern "C"
@@ -866,7 +956,7 @@ GameObjectLight* fn_8018230C(s32 arg0, bool arg1)
             var1->unknown20 = pLight->m_fRadius;
             return var1;
         }
-        return &lbl_80570AF8.lights[arg0];
+        return &lbl_80570AF8[arg0];
 
     case 2:
         return &lbl_80570B40;
@@ -895,19 +985,6 @@ int fn_80182240(int arg0, int arg1)
         lbl_806E1428 = 0;
         return 2;
     }
-}
-
-void fn_80182168(UnidentifiedObject_80182168* pLight)
-{
-    // This retained path prepares a light locally but does not publish it.
-    GameObjectLight var0;
-    var0.unknown02 = false;
-    var0.unknown01 = true;
-    var0.enabled = true;
-    const nlMatrix4& matrix = ((DrawableObject*)pLight)->GetWorldMatrix();
-    ConvertColour(*(nlColour*)var0.unknown1C, pLight->m_colour);
-    var0.worldPosition = matrix.GetTranslation();
-    var0.intensity = pLight->m_fIntensity;
 }
 
 void fn_80182164()
@@ -943,4 +1020,31 @@ int fn_801820FC()
 {
     return lbl_806DCC40;
 }
+}
+
+nlColour fn_80183C9C(const nlVector2* arg0, bool arg1)
+{
+    if (!fn_80183C54())
+    {
+        nlColour var0;
+        nlColourSet(var0, 0xFF, 0xFF, 0xFF, 0xFF);
+        return var0;
+    }
+
+    if (lbl_806DCC5C <= 0xFF)
+    {
+        nlColour var0;
+        nlColourSet(var0, 0xFF, 0xFF, 0xFF, 0xFF);
+        return var0;
+    }
+
+    f32 var0 = arg0->x * gShadowLookupScaleX.value;
+    var0 += gShadowLookupTransX.value;
+    f32 var1 = arg0->y * gShadowLookupScaleY.value;
+    var1 += gShadowLookupTransY.value;
+    var0 = lbl_806E4D2C * var0 + lbl_806E4D2C;
+    var1 = lbl_806E4D40 * var1 + lbl_806E4D2C;
+    var0 *= (f32)gpShadowLightingLookup->mWidth;
+    var1 *= (f32)gpShadowLightingLookup->mHeight;
+    return gpShadowLightingLookup->SampleFilteredColour(var0, var1, arg1);
 }

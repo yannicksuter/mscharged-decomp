@@ -1,6 +1,12 @@
+#include "NL/plat/PlatPadManager.h"
+#include "NL/plat/WiiPad.h"
 #include "Game/Camera/DebugCam.h"
 
 #include "Game/CharacterTemplate.h"
+#include "Game/Player.h"
+#include "Game/RenderSnapshot.h"
+#include "Game/ReplayManager.h"
+#include "Game/Team.h"
 #include "Game/MathHelpers.h"
 #include "Game/Task/ProfilerTask.h"
 #include "Game/Task/TweakerTask.h"
@@ -12,6 +18,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
+#include "Game/UnidentifiedTweakAction.h"
 
 struct UnidentifiedDebugCameraTarget
 {
@@ -19,15 +26,8 @@ struct UnidentifiedDebugCameraTarget
     nlVector3 mPosition;
 };
 
-struct UnidentifiedDebugCameraTargetEntry
-{
-    UnidentifiedDebugCameraTargetEntry* mNext;
-    UnidentifiedDebugCameraTargetEntry* mPrev;
-    UnidentifiedDebugCameraTarget* mTarget;
-};
+extern "C" void fn_800F2504();
 
-namespace
-{
 struct DebugCameraControlTweakValues
 {
     float speed0;
@@ -47,7 +47,7 @@ static DebugCameraControlTweakValues sControlTweakValues = {
     1.0f,
 };
 
-static float sfDebugCamFOV = 60.0f;
+float sfDebugCamFOV = 60.0f;
 static float sfControlSpeedScale = 100.0f;
 static float sfControlDistanceScale = 1.0f;
 static float sfControlHeightScale = 1.0f;
@@ -60,7 +60,9 @@ static u32 sWhiteTexture = glGetTexture("global/white");
 static TweakValueFloat gDebugCameraSensitivity(
     "gDebugCameraSensitivity", "Controller Config/DPD", 3.0f);
 
-static float sDebugCamFOVTweak;
+static float sDebugCamFOVTweak = sfDebugCamFOV;
+static UnidentifiedTweakAction sDebugCamFOVAction(
+    "Fov", gLastTweakCategory, Function0<void>(fn_800F2504));
 static TweakFloatBinding sSpeed0(
     "Speed 0", "Controller Config/DPD", &sControlTweakValues.speed0);
 static TweakFloatBinding sWeight0(
@@ -76,7 +78,6 @@ static TweakFloatBinding sWeight2(
 
 static u32 sSightTexture = nlStringLowerHash("global/sight");
 static u32 sLightBlobTexture = nlStringLowerHash("global/light_blob");
-} // namespace
 
 
 extern "C" void fn_800F2504()
@@ -85,89 +86,97 @@ extern "C" void fn_800F2504()
 }
 
 cDebugCamera::cDebugCamera(bool bUnidentified)
+    : m_fRadius(10.0f)
+    , m_fAzimuth(215.0f)
+    , m_fTheta(25.0f)
+    , m_fHeight(0.0f)
+    , m_pPad(0)
+    , mUnidentified8C(false)
+    , m_bEnableControls(true)
+    , mUnidentified8E(false)
+    , m_bRenderTarget(false)
+    , m_pTarget(0)
 {
-    (void)bUnidentified;
-
-    m_fRadius = 10.0f;
-    m_fAzimuth = 215.0f;
-    m_fTheta = 25.0f;
-    m_fHeight = 0.0f;
-    m_pPad = 0;
-    mUnidentified8C = false;
-    m_bEnableControls = true;
-    mUnidentified8E = false;
-    m_bRenderTarget = false;
-    m_pTarget = 0;
-    m_pTargets = 0;
     nlVec3Set(m_vecTarget, 0.0f, 0.0f, 0.0f);
     m_matView.SetIdentity();
     Update(0.0f);
 
-    m_pPad = g_pPadManager->GetPad(0);
+    cGlobalPad* pPad = g_pPadManager->GetPad(0);
+    const int classID = pPad->mBackend->GetClassID();
+    const bool bEnableDPD =
+        classID == gWiiRemotePadClassID || classID == gWiiFreestylePadClassID;
+    if (bEnableDPD)
+    {
+        g_pPlatPadManager->SetDPDEnabled(pPad->m_padIndex, true);
+    }
     mUnidentified8E = true;
 }
 
 cDebugCamera::~cDebugCamera()
 {
-    UnidentifiedDebugCameraTargetEntry* head = m_pTargets;
-    if (head != 0)
+    nlDLListIterator<UnidentifiedDebugCameraTarget*> iterator = m_Targets.Begin();
+    while (iterator.hasNext())
     {
-        UnidentifiedDebugCameraTargetEntry* entry = head->mNext;
-        for (;;)
-        {
-            UnidentifiedDebugCameraTargetEntry* next = entry->mNext;
-            delete entry->mTarget;
-            if (entry == head)
-            {
-                break;
-            }
-            entry = next;
-        }
+        delete *iterator;
+        iterator.Step();
     }
+    m_Targets.Clear();
 
-    while (m_pTargets != 0)
+    if (mUnidentified8C)
     {
-        UnidentifiedDebugCameraTargetEntry* entry = m_pTargets->mNext;
-        if (entry->mNext == entry)
-        {
-            m_pTargets = 0;
-        }
-        else
-        {
-            entry->mPrev->mNext = entry->mNext;
-            entry->mNext->mPrev = entry->mPrev;
-            if (m_pTargets == entry)
-            {
-                m_pTargets = entry->mPrev;
-            }
-        }
-        delete entry;
+        g_pPlatPadManager->SetDPDEnabled(m_pPad->m_padIndex, false);
     }
 }
 
 void cDebugCamera::RenderTarget() const
 {
-    if (!m_bRenderTarget || m_pTargets == 0)
+    if (!m_bRenderTarget)
     {
         return;
     }
 
-    UnidentifiedDebugCameraTargetEntry* entry = m_pTargets->mNext;
-    for (int i = 0; i < 10 && entry != 0; i++)
+    nlDLListIterator<UnidentifiedDebugCameraTarget*> iterator = m_Targets.Begin();
+    iterator.Step();
+
+    UnidentifiedDebugCameraTarget* target;
+    for (int i = 0; i < 10; i++)
     {
-        if (entry->mTarget != 0 && g_pCharacters[i] != 0)
+        target = *iterator;
+
+        nlVector3 position;
+        if (ReplayManager::Instance()->mRender != 0)
         {
-            entry->mTarget->mPosition = g_pCharacters[i]->mUnidentified024.m_v3Position;
+            cPlayer* player = (cPlayer*)g_pCharacters[i];
+            if (player->m_eClassType == FIELDER)
+            {
+                int index = player->m_ID + 4 * player->m_pTeam->m_nSide;
+                position = ReplayManager::Instance()->mRender->mCharacters[index].position;
+            }
+            else if (player->m_eClassType == GOALIE)
+            {
+                int side = player->m_pTeam->m_nSide;
+                position = ReplayManager::Instance()->mRender->mCharacters[side + 8].position;
+            }
         }
 
-        if (entry == m_pTargets)
+        if (target != 0)
         {
-            entry = 0;
+            target->mPosition = position;
+            iterator.Step();
         }
-        else
+    }
+
+    iterator.Step();
+    iterator.Step();
+    if (target != 0)
+    {
+        UnidentifiedDebugCameraTarget* ballTarget = *iterator;
+        nlVector3 position = { 0.0f, 0.0f, 0.0f };
+        if (ReplayManager::Instance()->mRender != 0)
         {
-            entry = entry->mNext;
+            position = ReplayManager::Instance()->mRender->mBall.mPosition;
         }
+        ballTarget->mPosition = position;
     }
 }
 
@@ -202,8 +211,24 @@ void cDebugCamera::fn_800F2A8C(float dt)
 
 void cDebugCamera::fn_800F2BD0(float dt, float controlSpeed)
 {
-    float x = m_pPad->AnalogLeftX();
-    float y = m_pPad->AnalogLeftY();
+    float x = 0.0f;
+    float y = 0.0f;
+
+    int classID = m_pPad->mBackend->GetClassID();
+    if (classID != gWiiFreestylePadClassID)
+    {
+        x = m_pPad->AnalogLeftX();
+        y = m_pPad->AnalogLeftY();
+    }
+    else
+    {
+        g_pPlatPadManager->GetFreestyleStatus(0);
+        if (m_pPad->IsPressed(0x400, false))
+        {
+            x = m_pPad->AnalogLeftX();
+            y = m_pPad->AnalogLeftY();
+        }
+    }
 
     if (x != 0.0f || y != 0.0f)
     {
@@ -275,12 +300,18 @@ void cDebugCamera::fn_800F2DA8(float dt, float controlSpeed)
 
 void cDebugCamera::Update(float dt)
 {
+    nlVector3 vecUp;
+    float sn;
+    float cs;
+
     float controlSpeed = sfControlDistanceScale *
         (1.0f + sfControlHeightScale * (m_fRadius + m_fHeight));
 
     if (!g_bTweaking && !IsProfiling())
     {
         m_pPad = g_pPadManager->GetPad(0);
+        int classID = m_pPad->mBackend->GetClassID();
+        mUnidentified8C = classID == gWiiRemotePadClassID || classID == gWiiFreestylePadClassID;
 
         float yPressure = m_pPad->GetPressure(3, true);
         float xPressure = m_pPad->GetPressure(2, true);
@@ -290,24 +321,24 @@ void cDebugCamera::Update(float dt)
             m_bEnableControls = !m_bEnableControls;
         }
 
-        if (m_pTargets != 0)
+        if (m_Targets.m_Head != 0)
         {
-            UnidentifiedDebugCameraTargetEntry* entry = m_pTargetEntry;
+            DLListEntry<UnidentifiedDebugCameraTarget*>* entry = m_pTargetEntry;
             if (m_pPad->PlatJustPressed(13, true))
             {
                 if (entry != 0)
                 {
-                    entry = entry->mPrev;
+                    entry = entry->m_prev;
                 }
-                m_pTarget = entry->mTarget;
+                m_pTarget = entry->entry;
             }
             if (m_pPad->PlatJustPressed(14, true))
             {
                 if (entry != 0)
                 {
-                    entry = entry->mNext;
+                    entry = entry->m_next;
                 }
-                m_pTarget = entry->mTarget;
+                m_pTarget = entry->entry;
             }
             m_pTargetEntry = entry;
         }
@@ -324,9 +355,10 @@ void cDebugCamera::Update(float dt)
 
     if (m_pTarget != 0)
     {
+        float stepSquared = sfTargetFollowStep * sfTargetFollowStep;
         float distanceSquared = CalculateDistanceSquared(
             m_vecTarget, m_pTarget->mPosition);
-        if (distanceSquared < sfTargetFollowStep * sfTargetFollowStep)
+        if (distanceSquared < stepSquared)
         {
             m_vecTarget = m_pTarget->mPosition;
         }
@@ -340,52 +372,18 @@ void cDebugCamera::Update(float dt)
         }
     }
 
-    nlVector3 vecUp;
     nlVec3Set(vecUp, 0.0f, 0.0f, 1.0f);
 
-    float sn;
-    float cs;
     nlSinCos(&sn, &cs,
-        (u16)(10430.378f * ((3.1415927f * m_fTheta) / 180.0f)));
+        (u16)(((3.1415927f * m_fTheta) / 180.0f) * 10430.378f));
     float z = m_fRadius * sn;
     float distance = m_fRadius * cs;
     nlSinCos(&sn, &cs,
-        (u16)(10430.378f * ((3.1415927f * m_fAzimuth) / 180.0f)));
+        (u16)(((3.1415927f * m_fAzimuth) / 180.0f) * 10430.378f));
 
     nlVec3Set(m_vecCamera, distance * cs, distance * sn, z);
     m_vecTarget.z = m_fHeight;
     nlVec3Add(m_vecCamera, m_vecCamera, m_vecTarget);
 
     glMatrixLookAt(m_matView, m_vecCamera, m_vecTarget, vecUp);
-}
-
-extern "C" void fn_800F33DC(
-    void*, UnidentifiedDebugCameraTargetEntry* entry)
-{
-    delete entry;
-}
-
-const nlMatrix4& cDebugCamera::GetViewMatrix() const
-{
-    return m_matView;
-}
-
-float cDebugCamera::GetFOV() const
-{
-    return sfDebugCamFOV;
-}
-
-const nlVector3& cDebugCamera::GetCameraPosition() const
-{
-    return m_vecCamera;
-}
-
-const nlVector3& cDebugCamera::GetTargetPosition() const
-{
-    return m_vecTarget;
-}
-
-eCameraType cDebugCamera::GetType()
-{
-    return eCameraType_Debug;
 }

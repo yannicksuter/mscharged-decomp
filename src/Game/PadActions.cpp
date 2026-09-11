@@ -175,7 +175,7 @@ void UpdateMonkeyState(int monkeySet)
         NLString monkeyPad = Format<NLString, int, int>(
             NLString("user/{0}_pad_monkey_{1}_"), monkeySet, j);
 
-        monkey->m_unk_0x34
+        monkey->m_connectionChance
             = GetTweakFloat(monkeyPad.Append("connected").c_str(), 100.0f);
         monkey->SetButtonChance(0x0001,
             GetTweakFloat(monkeyPad.Append("button_left").c_str(), 10.0f));
@@ -208,4 +208,3 @@ void UpdateMonkeyState(int monkeySet)
     }
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

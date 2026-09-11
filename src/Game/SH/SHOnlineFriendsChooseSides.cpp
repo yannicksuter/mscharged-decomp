@@ -26,6 +26,7 @@
 #include "NL/nlstring_tmpl.h"
 
 #include "Game/FE/FEAudio.h"
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 const char* gOnlineSideGroupNames[2] = { "home_group", "away_group" };
 int gOnlineSideSelectionSeconds = 30;
@@ -88,13 +89,13 @@ void SHOnlineFriendsChooseSides::SceneCreated()
         mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("home"));
     if (mSideInstances[0] == 0)
     {
-        mSideInstances[0] = &gDefaultTLComponentInstance;
+        mSideInstances[0] = &UnidentifiedTLComponentDefault::sInstance;
     }
     mSideInstances[1] = FEFinder<TLComponentInstance, 4>::Find(
         mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("away"));
     if (mSideInstances[1] == 0)
     {
-        mSideInstances[1] = &gDefaultTLComponentInstance;
+        mSideInstances[1] = &UnidentifiedTLComponentDefault::sInstance;
     }
     mSideInstances[0]->SetActiveSlide("controllers", true, false);
     mSideInstances[1]->SetActiveSlide("controllers", true, false);
@@ -200,7 +201,7 @@ void SHOnlineFriendsChooseSides::SceneCreated()
         mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("Text"));
     if (mSelectSideText == 0)
     {
-        mSelectSideText = &gDefaultTLTextInstance;
+        mSelectSideText = &UnidentifiedTLTextDefault::sInstance;
     }
     TLTextInstance* timer = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
     GetNavigationScene()->mTimer->m_bVisible = true;
@@ -833,13 +834,13 @@ void SHOnlineFriendsChooseSides::DoChangeSides(int newSide, int oldSide, int ind
             component->GetActiveSlide(), InlineHasher("Text"));
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         TLTextInstance* overText = FEFinder<TLTextInstance, 3>::Find(
             over->GetActiveSlide(), InlineHasher("Text"));
         if (overText == 0)
         {
-            overText = &gDefaultTLTextInstance;
+            overText = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mPlayerNames[index]);
         overText->SetString(mPlayerNames[index]);

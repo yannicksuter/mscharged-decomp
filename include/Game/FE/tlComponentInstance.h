@@ -7,6 +7,12 @@
 class TLComponentInstance : public TLInstance
 {
 public:
+    TLComponentInstance(FELibObject* component)
+        : TLInstance(component)
+    {
+        m_type = TLAT_COMPONENT;
+    }
+
     void Update(float dt);
     void SetActiveSlide(const char* name, bool arg2, bool arg3);
     void SetActiveSlide(unsigned long hash, bool arg2, bool arg3);
@@ -14,6 +20,5 @@ public:
     TLSlide* GetActiveSlide();
 };
 
-extern TLComponentInstance gDefaultTLComponentInstance;
 
 #endif // _TLCOMPONENTINSTANCE_H_

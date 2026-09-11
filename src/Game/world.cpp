@@ -11,6 +11,7 @@
 #include "NL/gl/glTexture.h"
 #include "NL/gl/glView.h"
 #include "NL/nlPrint.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 class WorldUpdateObject_80341BC8
 {
@@ -29,6 +30,16 @@ extern "C" void fn_80343E3C(
     DrawableObject*, WorldObjectLoadContext*);
 extern "C" void fn_80344144(
     DrawableObject*, WorldObjectLoadContext*);
+
+u8* WorldObjectLoadContext::GetParentData()
+{
+    if (m_pParent == 0)
+    {
+        return 0;
+    }
+
+    return m_pParent + 0x20;
+}
 
 World::World(GLResourcePool* pResource)
     : m_pResource(pResource)

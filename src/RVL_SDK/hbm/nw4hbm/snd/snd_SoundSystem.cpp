@@ -77,6 +77,19 @@ void SoundSystem::ShutdownSoundSystem() {
     sInitialized = false;
 }
 
+void SoundSystem::WaitForResetReady() {
+    if (!sInitialized) {
+        return;
+    }
+
+    u32 start = OSGetTick();
+    while (!detail::AxManager::GetInstance().IsResetReady()) {
+        if (OS_TICKS_TO_SEC(OSGetTick() - start) > 0) {
+            OSReport("SoundSystem::WaitForResetReady is TIME OUT.\n");
+            break;
+        }
+    }
+}
 
 } // namespace snd
 } // namespace nw4hbm

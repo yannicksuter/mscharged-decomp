@@ -1,4 +1,5 @@
 #include "NL/nlSingleton.inl"
+#include <dwc/dwc_nastime.h>
 #include <dwc/dwc_ranking.h>
 #include "Game/OnlinePlayer.h"
 #include "Game/Sys/debug.h"
@@ -8,6 +9,7 @@
 
 #include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkStatsManager.h"
 #include "Game/Sys/simpleparser.h"
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -18,7 +20,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-
 
 int g_nConnectToStatsAddress[4] = { 192, 168, 2, 188 };
 
@@ -441,8 +442,8 @@ bool NetworkRanking::ReportGameResult(int category,
     }
     mSubmission.mName[i] = 0;
     memcpy(mSubmission.mData, &gNetworkMiiData, sizeof(mSubmission.mData));
-    mSubmission.mMonth = fallback->mMonth;
     mSubmission.mDay = fallback->mDay;
+    mSubmission.mMonth = fallback->mMonth;
     mSubmission.mYear = fallback->mYear;
     mCategory = category;
     mReportGame = false;
@@ -481,9 +482,21 @@ bool NetworkRanking::ReportGameResult(int category,
 
 void NetworkRankingIdentity::LoadLocal()
 {
-    mMonth = 1;
-    mDay = 1;
-    mYear = 2000;
+    if (g_pNetworkSessionBase->GetSessionMode() == 1)
+    {
+        mDay = 1;
+        mMonth = 1;
+        mYear = 2000;
+    }
+    else
+    {
+        DWCDate date;
+        DWCTime time;
+        GetAdjustedNetworkDate(&date, &time);
+        mDay = date.mday;
+        mMonth = date.month;
+        mYear = date.year;
+    }
 }
 
 bool NetworkRanking::SubmitScore(int category,
@@ -506,19 +519,20 @@ bool NetworkRanking::SubmitScore(int category,
         mSubmission.mWins = 0;
         mSubmission.mLosses = 0;
         mSubmission.mUnidentified0C = (u16)GetOnlineRegion();
-        NetworkRankingIdentity identity;
-        identity.LoadLocal();
-        mSubmission.mMonth = identity.mMonth;
-        mSubmission.mDay = identity.mDay;
-        mSubmission.mYear = identity.mYear;
+        DWCDate date;
+        DWCTime time;
+        GetAdjustedNetworkDate(&date, &time);
+        mSubmission.mDay = date.mday;
+        mSubmission.mMonth = date.month;
+        mSubmission.mYear = date.year;
     }
     else
     {
         mSubmission.mWins = submission->mWins;
         mSubmission.mLosses = submission->mLosses;
         mSubmission.mUnidentified0C = (u16)submission->mUnidentified14;
-        mSubmission.mMonth = submission->mMonth;
         mSubmission.mDay = submission->mDay;
+        mSubmission.mMonth = submission->mMonth;
         mSubmission.mYear = submission->mYear;
     }
     mCategory = category;
@@ -683,8 +697,8 @@ void NetworkRanking::ProcessLeaderboardResults()
                 player.mName[name] = 0;
                 memcpy(player.mData, submission->mData,
                     sizeof(player.mData));
-                metadata.mMonth = submission->mMonth;
                 metadata.mDay = submission->mDay;
+                metadata.mMonth = submission->mMonth;
                 metadata.mYear = submission->mYear;
                 metadata.mWins = submission->mWins;
                 metadata.mLosses = submission->mLosses;
@@ -700,8 +714,8 @@ void NetworkRanking::ProcessLeaderboardResults()
 
         if (!valid)
         {
-            metadata.mMonth = 1;
             metadata.mDay = 1;
+            metadata.mMonth = 1;
             metadata.mYear = 2000;
             metadata.mWins = 0;
             metadata.mLosses = 0;
@@ -727,11 +741,12 @@ void NetworkRanking::ProcessLeaderboardResults()
 
 void NetworkRanking::FilterCurrentSeason(int count)
 {
-    NetworkRankingIdentity current;
-    current.LoadLocal();
+    DWCDate current;
+    DWCTime time;
+    GetAdjustedNetworkDate(&current, &time);
     for (int i = 0; i < count; ++i)
     {
-        if (mLeaderboardMetadata[i].mYear != current.mYear)
+        if (mLeaderboardMetadata[i].mYear != current.year)
         {
             mLeaderboardMetadata[i].mScore = 0;
             mLeaderboardMetadata[i].mDisplayRank = 0;
@@ -933,4 +948,3 @@ static TweakIntBinding sConnectToStatsAddress3Tweak(
     "g_nConnectToStatsAddress3", "Network/Stats",
     &g_nConnectToStatsAddress[3], true);
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

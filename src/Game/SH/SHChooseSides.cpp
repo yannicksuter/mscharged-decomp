@@ -137,7 +137,7 @@ void SHChooseSides2::SceneCreated()
         mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("home"), 0, 0, 0, 0);
     if (sideGroup == 0)
     {
-        sideGroup = &gDefaultTLComponentInstance;
+        sideGroup = &UnidentifiedTLComponentDefault::sInstance;
     }
     mSideGroups[0] = sideGroup;
 
@@ -145,7 +145,7 @@ void SHChooseSides2::SceneCreated()
         mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("away"), 0, 0, 0, 0);
     if (sideGroup == 0)
     {
-        sideGroup = &gDefaultTLComponentInstance;
+        sideGroup = &UnidentifiedTLComponentDefault::sInstance;
     }
     mSideGroups[1] = sideGroup;
 
@@ -334,7 +334,7 @@ void SHChooseSides2::SceneCreated()
                 mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash(componentName), 0, 0, 0, 0);
             if (component == 0)
             {
-                component = &gDefaultTLGroupInstance;
+                component = &UnidentifiedTLGroupDefault::sInstance;
             }
 
             const char** sidekickName = lbl_8051CAFC;
@@ -344,14 +344,14 @@ void SHChooseSides2::SceneCreated()
                     component, nlStringLowerHash(*sidekickName), 0, 0, 0, 0, 0);
                 if (sidekick == 0)
                 {
-                    sidekick = &gDefaultTLComponentInstance;
+                    sidekick = &UnidentifiedTLComponentDefault::sInstance;
                 }
 
                 TLImageInstance* image = (TLImageInstance*)FEFinder<TLImageInstance, 2>::_Find<TLSlide>(
                     sidekick->GetActiveSlide(), nlStringLowerHash("00_dummy_texture"), 0, 0, 0, 0, 0);
                 if (image == 0)
                 {
-                    image = &gDefaultTLImageInstance;
+                    image = &UnidentifiedTLImageDefault::sInstance;
                 }
 
                 fn_8021ED64(image, GameInfoManager::Instance()->GetSidekick(team, slot), team);
@@ -368,7 +368,7 @@ void SHChooseSides2::SceneCreated()
             0);
         if (instance == 0)
         {
-            instance = &gDefaultTLImageInstance;
+            instance = &UnidentifiedTLImageDefault::sInstance;
         }
         instance->SetAssetColour(mUnidentified3F0[team]);
 
@@ -381,7 +381,7 @@ void SHChooseSides2::SceneCreated()
             0);
         if (instance == 0)
         {
-            instance = &gDefaultTLImageInstance;
+            instance = &UnidentifiedTLImageDefault::sInstance;
         }
         instance->SetAssetColour(mUnidentified3F0[team]);
 
@@ -394,7 +394,7 @@ void SHChooseSides2::SceneCreated()
             0);
         if (instance == 0)
         {
-            instance = &gDefaultTLImageInstance;
+            instance = &UnidentifiedTLImageDefault::sInstance;
         }
         instance->SetAssetColour(mUnidentified3F0[team]);
     }
@@ -403,7 +403,7 @@ void SHChooseSides2::SceneCreated()
         mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("HELP_BUTTON"), 0, 0, 0, 0);
     if (help == 0)
     {
-        help = &gDefaultTLComponentInstance;
+        help = &UnidentifiedTLComponentDefault::sInstance;
     }
 
     if (IsWidescreen())
@@ -419,7 +419,7 @@ void SHChooseSides2::SceneCreated()
         help->GetActiveSlide(), nlStringLowerHash("HELP"), 0, 0, 0, 0, 0);
     if (helpButton == 0)
     {
-        helpButton = &gDefaultTLComponentInstance;
+        helpButton = &UnidentifiedTLComponentDefault::sInstance;
     }
     mHelpButton = helpButton;
 
@@ -692,7 +692,7 @@ void SHChooseSides2::BindChooseSideInstances()
     TLInstance* homeInstance;
     if (found == 0)
     {
-        homeInstance = &gDefaultTLImageInstance;
+        homeInstance = &UnidentifiedTLImageDefault::sInstance;
     }
     else
     {
@@ -712,7 +712,7 @@ void SHChooseSides2::BindChooseSideInstances()
     TLInstance* awayInstance;
     if (found == 0)
     {
-        awayInstance = &gDefaultTLImageInstance;
+        awayInstance = &UnidentifiedTLImageDefault::sInstance;
     }
     else
     {
@@ -753,7 +753,7 @@ void SHChooseSides2::BindChooseSideInstances()
     TLInstance* helpInstance;
     if (found == 0)
     {
-        helpInstance = &gDefaultTLImageInstance;
+        helpInstance = &UnidentifiedTLImageDefault::sInstance;
     }
     else
     {

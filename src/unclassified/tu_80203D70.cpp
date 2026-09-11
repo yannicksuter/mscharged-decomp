@@ -162,3 +162,18 @@ void TU80203D70Scene::fn_802069F0(int, void* context)
         FEAudio::PlayAnimAudioEvent(0x4A51F95D, 0, 0, 1);
     }
 }
+
+int CupManager::GetPreviousGameTeam(int index) const
+{
+    return mPreviousGameTeams[index];
+}
+
+bool CupManager::ShouldShowCupPhasePopup() const
+{
+    return mShowCupPhasePopup;
+}
+
+void CupManager::SetShowCupPhasePopup(bool value)
+{
+    mShowCupPhasePopup = value;
+}

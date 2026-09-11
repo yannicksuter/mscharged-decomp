@@ -12,6 +12,7 @@
 #include "NL/gl/glMultiTextureModelWriter.h"
 
 #include <string.h>
+#include "Game/UnidentifiedStaticStorage.h"
 
 char sPeachPhotoTexture[] = "target/grayscale";
 char sPeachPhotoWhiteTexture[] = "global/white";
@@ -312,7 +313,7 @@ void RenderPeachPhoto(PeachPhotoState* photo)
         {
             glTextureBinding* states =
                 static_cast<glTextureBinding*>(
-                    writer.model->packets->unknown20);
+                    writer.model->packets->materialParameters);
             states[0].texture = glGetTexture(
                 gPeachPhotoDisableImage ? sPeachPhotoWhiteTexture : sPeachPhotoTexture);
             states[0].textureIndex = 0xFFFF;

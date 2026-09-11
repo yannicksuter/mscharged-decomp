@@ -35,6 +35,7 @@
 #include "Game/SH/SHHallOfFame.h"
 #include "Game/FE/feOnlineError.h"
 #include "Game/MiiManager.h"
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 static const char* const sOnlineHubButtonNames[4] = {
     "BTN_UNRANKED", "BTN_RANKED", "BTN_LEADERBOARD", "BTN_FRIENDS"
@@ -147,16 +148,16 @@ void SHOnlineHub::SceneCreated()
     {
         TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
             InlineHasher("Layer"), InlineHasher(sOnlineHubButtonNames[i]));
-        mUnidentified2F0[i] = instance != 0 ? instance : &gDefaultTLComponentInstance;
+        mUnidentified2F0[i] = instance != 0 ? instance : &UnidentifiedTLComponentDefault::sInstance;
     }
     TLComponentInstance* help = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
         InlineHasher("Layer"), InlineHasher("HELP_BUTTON"));
     if (help == 0)
-        help = &gDefaultTLComponentInstance;
+        help = &UnidentifiedTLComponentDefault::sInstance;
     help->SetActiveSlide(IsWidescreen() ? "16:9" : "4:3", true, false);
     TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(help,
         nlStringLowerHash("HELP"), 0, 0, 0, 0, 0);
-    mUnidentified3B4 = instance != 0 ? instance : &gDefaultTLComponentInstance;
+    mUnidentified3B4 = instance != 0 ? instance : &UnidentifiedTLComponentDefault::sInstance;
     SHNavigation* scene = GetNavigationScene();
     TLComponentInstance* done = 0;
     if (scene != 0)
@@ -203,7 +204,7 @@ void SHOnlineHub::Update(float dt)
             TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(mPresentation->m_currentSlide,
                 InlineHasher("Layer"), InlineHasher("summary"), InlineHasher("Mii_btn"), InlineHasher("Mii"));
             if (image == 0)
-                image = &gDefaultTLImageInstance;
+                image = &UnidentifiedTLImageDefault::sInstance;
             unsigned long texture = g_pMiiManager->mIconTextureIds[0];
             image->SetAssetVisible(true);
             int profile = GameInfoManager::Instance()->GetSaveSlotName(gNetworkSaveSlotIndex);
@@ -295,7 +296,7 @@ void SHOnlineHub::Update(float dt)
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(mPresentation->m_currentSlide,
             InlineHasher("Layer"), InlineHasher("summary"), InlineHasher("Mii_btn"), InlineHasher("Mii"));
         if (image == 0)
-            image = &gDefaultTLImageInstance;
+            image = &UnidentifiedTLImageDefault::sInstance;
         unsigned long texture = g_pMiiManager->mIconTextureIds[0];
         image->SetAssetVisible(true);
         int profile = GameInfoManager::Instance()->GetSaveSlotName(gNetworkSaveSlotIndex);
@@ -331,7 +332,7 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide,
         InlineHasher("Layer"), InlineHasher("subheading2"));
     if (text == 0)
-        text = &gDefaultTLTextInstance;
+        text = &UnidentifiedTLTextDefault::sInstance;
     u16 onlineText[4];
     u16 friendsText[4];
     nlSNPrintf(onlineText, 4, (const u16*)L"%d", online);
@@ -343,7 +344,7 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
     DWCTime time;
     GetAdjustedNetworkDate(&date, &time);
     NetworkSeasonDate current = { date.month, date.mday };
-    int boundary = FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, &current);
+    int boundary = FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, current);
     int elapsed = GetDaysSinceSeasonBoundary(&sNetworkSeasonDateTable, boundary, &current, date.year) + 1;
     int days = GetDaysUntilNextSeasonBoundary(&sNetworkSeasonDateTable, boundary, date.year) - elapsed;
     int hours = 23 - time.hour;
@@ -434,7 +435,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
     TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(mPresentation->m_currentSlide,
         InlineHasher("Layer"), InlineHasher("summary"), InlineHasher("Mii_btn2"), InlineHasher("Mii"));
     if (image == 0)
-        image = &gDefaultTLImageInstance;
+        image = &UnidentifiedTLImageDefault::sInstance;
     unsigned long texture = g_pMiiManager->mIconTextureIds[1];
     image->SetAssetVisible(valid && mUnidentified4B4);
     image->m_pTextureResource->SetTextureHandle(texture);
@@ -455,7 +456,7 @@ void SHOnlineHub::InitializeButtons()
     TLInstance* instance = FEFinder<TLInstance, 2>::Find(mUnidentified3B4,
         nlStringLowerHash("OVER"), nlStringLowerHash("list_high_250x60"), 0, 0, 0, 0);
     if (instance == 0)
-        instance = &gDefaultTLImageInstance;
+        instance = &UnidentifiedTLImageDefault::sInstance;
     feVector3 position = mUnidentified3B4->GetAssetPosition();
     mUnidentified300.SetInstanceBounds(instance, true, position.f.x, position.f.y, 1.0f, 1.0f);
     mUnidentified300.SetPointerEnterCallback(over);

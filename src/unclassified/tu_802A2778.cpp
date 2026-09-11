@@ -45,7 +45,7 @@ extern "C" void fn_802A294C(void*)
 
 extern "C" void fn_802A2978(void* renderer, const glModelPacket* packet)
 {
-    u32* parameter = static_cast<u32*>(packet->unknown20);
+    u32* parameter = static_cast<u32*>(packet->materialParameters);
     glSetMaterialTextureAlphaState(renderer, packet, *parameter);
 }
 

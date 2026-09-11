@@ -8,6 +8,8 @@
 #include "Game/Audio/AudioSystem.h"
 #include "Game/NetworkSession.h"
 #include "NL/globalpad.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 #define OSSleepMilliseconds(msec) OSSleepTicks(OSMillisecondsToTicks((OSTime)msec))
 

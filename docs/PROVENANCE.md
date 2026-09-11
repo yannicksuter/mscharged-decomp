@@ -5,6 +5,26 @@ legally obtained copy of *Mario Strikers Charged*. It does not distribute game
 assets, Nintendo SDK binaries, extracted assembly, or original proprietary
 source code.
 
+`unclassified/tu_802F2C3C.cpp` reconstructs the playback-object family from
+R4QE01's factory, virtual tables, pool allocation/free paths, and global
+destructor registrations. Its initializer at `0x802F39EC` registers the three
+pool destructors in the tail ending at `0x802F3E20`; that tail belongs to the
+existing unit, not to a separate translation unit. The concrete objects retain
+neutral identities because their original class names are not established.
+Their pools use the shared `nlSlotPool` implementation with element sizes
+`0x34`, `0x18`, and `0x18`. The two additional shared-pool registrations in
+the initializer remain unreconstructed; no substitute element types are
+introduced for them.
+
+The Home Button Menu's `snd_PlayerHeap.cpp` object retains only its
+`PlayerHeapList` assertion strings in R4QE01 (`0x8055B8D0..0x8055B900`).
+Castaway R42P69 independently retains the same pair in `snd_PlayerHeap.cpp`
+(`0x804726B8..0x804726E8`), between the MmlSeqTrackAllocator and RemoteSpeaker
+objects, together with the matching PlayerHeap list helpers. R4QE01 also
+retains NandSoundArchive immediately before this object. The PlayerHeap source
+remains incomplete; its original data object is linked until its stripped API
+and natural weak emission are reconstructed.
+
 The project was built with or adapted source from the following projects:
 
 | Project | Use in this project |
@@ -13,7 +33,7 @@ The project was built with or adapted source from the following projects:
 | [SMGCommunity/Petari at `e789e52`](https://github.com/SMGCommunity/Petari/tree/e789e52e7774cf52cdf093002fc32035b6eab65d) | CodeWarrior runtime, MetroTRK, and RVL SDK reconstructions. |
 | [HaydnTrigg/Castaway at `f5c5dbcf`](https://github.com/HaydnTrigg/Castaway/tree/f5c5dbcf2b4a20eb797b1aa6eb03f6cf09a4dbbe) | RVL SDK reconstructions. |
 | [ThePlayerRolo/LegoCloneWarsWii at `b0ed795`](https://github.com/ThePlayerRolo/LegoCloneWarsWii/tree/b0ed795a586d1d921c536c991bf250bec39ae811) | CodeWarrior runtime reconstruction. |
-| [koopthekoopa/wii-ipl at `0b0cedd`](https://github.com/koopthekoopa/wii-ipl/tree/0b0cedd44d83fa187eb3f52748c3eecf0840865b) | RVL SDK and Metrowerks Standard Library reconstructions. |
+| [koopthekoopa/wii-ipl at `0b0cedd`](https://github.com/koopthekoopa/wii-ipl/tree/0b0cedd44d83fa187eb3f52748c3eecf0840865b) | RVL SDK and Metrowerks Standard Library reconstructions, plus the GameSpy time-conversion APIs and their static storage. |
 | [doldecomp/ogws at `a764c49`](https://github.com/doldecomp/ogws/tree/a764c49183610bce30ec79ca83e228b86d2ca0ab) | RVL SDK reconstructions at the same library revision as R4QE01. |
 | [doldecomp/Rhae at `35929a0`](https://github.com/doldecomp/Rhae/tree/35929a0bfcca6c55c6305a72cc86caef54203c1f) | Expanded RVL SDK AXFX reverb reconstructions. |
 | [doldecomp/mkw at `94585b8`](https://github.com/doldecomp/mkw/tree/94585b8a8fd7a2a52f30640ccff316e57880b6c1) | DWC allocator and initialization reconstructions, plus DWC GHTTP, common-utility, friend-unit, login-unit, main-unit, and transport-unit symbol and boundary references. |
@@ -55,6 +75,17 @@ predecessor's `SkillLevel`, `GameTime` and skill-level enum. The home/away
 powerup and special-shot flags follow the retail challenge settings and their
 gameplay consumers. `WinBy`, `GameGoals` and `BestSeries` follow the recorded-game
 diagnostics in `Game/NetworkSession.cpp`.
+
+`Game/SH/SHMoviePlayer.cpp` follows the predecessor's movie-player scene
+hierarchy and names, with R4QE01's Home Button Menu event connection, texture
+resource setter, sound-mode handling, and movie-to-title transition. The
+movie constructor at `0x801D90C0`, its callback and scene vtables, and the
+movie-only configuration references identify the unit independently of the
+former options-menu split. Its initializer at `0x801D9D84` precedes the
+callback and scene-destructor tail ending at `0x801DA134`. The three derived
+destructors reuse the base destructor and canonical event-disconnection
+behavior; the callback uses the shared `Function`, `Bind`, and `MemFun`
+templates.
 
 `Game/GameObjectLighting.cpp` includes the lighting-service prefix at
 `0x801820FC..0x801826D0`. Its light selectors, stadium parameters, camera-relative
@@ -738,3 +769,21 @@ Its four null virtual slots establish the corresponding pure virtual
 base declarations. The NLG string templates and SDK thread structure provide
 the shared implementations and layout. The source filename retains an address
 identity because the original filename is unavailable.
+
+The shared audio backend pointer at `0x806E2020` is provisionally grouped with
+the audio-system globals in `Game/Audio/AudioSystem.cpp`. Retail references and
+the existing `AudioGlobals.h` declaration establish a four-byte backend pointer;
+the next object's eight-byte alignment accounts for the following four bytes.
+The original defining translation unit is unknown. This grouping is a
+reconstruction choice, not a recovered object boundary; AudioSystem remains
+NonMatching.
+
+The four-byte scope counter at `0x806E2130` is provisionally grouped with
+`Game/DetInput.cpp` and declared through the shared `NetworkInput.h` interface.
+Retail code increments and decrements it around deterministic construction,
+reset and simulation, and temporarily leaves that scope when queueing input.
+Its existing address-based name is retained. Neither the original scope-class
+name nor the defining translation unit is known. This grouping is a
+reconstruction choice, not a recovered object boundary; DetInput remains
+NonMatching. Eight-byte input-section alignment accounts for the four bytes
+before and after the counter.

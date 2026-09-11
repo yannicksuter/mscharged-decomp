@@ -115,14 +115,14 @@ extern "C" void fn_802A39CC()
 extern "C" void fn_802A39D4(
     void* renderer, const glModelPacket* packet)
 {
-    Parameters_802A39D4* parameters = static_cast<Parameters_802A39D4*>(packet->unknown20);
+    Parameters_802A39D4* parameters = static_cast<Parameters_802A39D4*>(packet->materialParameters);
     glSetMaterialTextureAlphaState(renderer, packet, parameters->value);
 }
 
 extern "C" void fn_802A39E0(
     void* renderer, const glModelPacket* packet)
 {
-    Parameters_802A39D4* parameters = static_cast<Parameters_802A39D4*>(packet->unknown20);
+    Parameters_802A39D4* parameters = static_cast<Parameters_802A39D4*>(packet->materialParameters);
     if (parameters->mode == 0)
     {
         SetShadowVolumeMode(2);

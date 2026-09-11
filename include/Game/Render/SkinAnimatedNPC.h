@@ -27,12 +27,18 @@ class SkinAnimatedNPC
 public:
     SkinAnimatedNPC(cSHierarchy& pHierarchy, int nModelID, void* resource);
     virtual ~SkinAnimatedNPC();
-    virtual SkinAnimatedNPC_Type GetSkinAnimatedNPC_Type() const;
+    virtual SkinAnimatedNPC_Type GetSkinAnimatedNPC_Type() const
+    {
+        return SkinAnimatedNPC_BASE;
+    }
     virtual void Render();
     virtual void RenderFromReplay(
         const cPoseAccumulator& poseAccumulator,
         const nlMatrix4* pWorldMatrix);
-    virtual void SetPosition(const nlVector3& pos);
+    virtual void SetPosition(const nlVector3& pos)
+    {
+        mv3Position = pos;
+    }
     virtual void Update(float dt);
     virtual void DrawShadow(const glModel* pModel, const nlMatrix4& matrix);
     virtual void DrawShadow(

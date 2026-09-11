@@ -13,6 +13,7 @@
 #include "NL/nlString.h"
 #include "Game/FE/fePointerButton.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static const char* ModeToStringName[10] = {
     "FRIENDLY",
@@ -233,6 +234,8 @@ bool IsEnvironmentCheatUnlocked(int cheat)
     return unlocked;
 }
 
+// Retail leaves the result unspecified for an invalid cheat ID.
+#pragma warning off(10184) // return value expected
 const char* GetLOCPowerupCheatDescription(int cheat)
 {
     switch (cheat)
@@ -366,6 +369,8 @@ const char* GetLOCEnvironmentCheatName(int cheat)
         return "CHEATS_ENVIRONMENT_WHITE_BALL";
     }
 }
+
+#pragma warning reset(10184)
 
 static const float sDoneButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
 static const float sPlayButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };

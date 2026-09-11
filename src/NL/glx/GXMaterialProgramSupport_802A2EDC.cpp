@@ -7,6 +7,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/platvmath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 struct GXMaterialProgramParameters_802A61C8
 {
@@ -44,7 +45,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A61C8>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>
@@ -60,9 +61,9 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A61C8>::Draw(
     glGetMatrix(packet->matrix, model);
     nlMultMatrices(modelview, model, mview);
 
-    if (packet->unknown28 == 0)
+    if (packet->skinnedVertices == 0)
     {
-        GXMaterialProgramParameters_802A61C8* parameters = (GXMaterialProgramParameters_802A61C8*)packet->unknown20;
+        GXMaterialProgramParameters_802A61C8* parameters = (GXMaterialProgramParameters_802A61C8*)packet->materialParameters;
         glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, false);
     }
     else

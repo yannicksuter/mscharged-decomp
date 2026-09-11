@@ -18,6 +18,8 @@
 #include "ode/objects.h"
 #include "unclassified/tu_80176EF4.h"
 #include "NL/gl/glTexture.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 extern "C"
 {

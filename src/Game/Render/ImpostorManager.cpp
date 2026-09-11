@@ -538,4 +538,3 @@ void ImpostorManager::SetUpdatePeriod(int period)
     sImpostorUpdatePeriod = period;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

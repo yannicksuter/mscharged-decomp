@@ -16,6 +16,8 @@
 #include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -490,53 +492,3 @@ void UnidentifiedAbilityEffect::fn_800504A8()
     }
 }
 
-// The original template identities of these common weak pool statics are
-// not yet known.
-struct UnidentifiedPoolEntry14
-{
-    u8 mUnknown[0x14];
-};
-
-struct UnidentifiedPoolEntry40
-{
-    u8 mUnknown[0x40];
-};
-
-template <typename T>
-struct UnidentifiedPoolStorage
-{
-    static SlotPool<UnidentifiedPoolEntry14> pool14;
-    static SlotPool<UnidentifiedPoolEntry40> pool40;
-};
-
-template <typename T>
-SlotPool<UnidentifiedPoolEntry14> UnidentifiedPoolStorage<T>::pool14(
-    0x10, 0x10);
-template <typename T>
-SlotPool<UnidentifiedPoolEntry40> UnidentifiedPoolStorage<T>::pool40(
-    0x10, 0x10);
-
-// The original type identity of this common weak static is not yet known.
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
-
-struct UnidentifiedStaticTag;
-
-template struct UnidentifiedPoolStorage<UnidentifiedStaticTag>;
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

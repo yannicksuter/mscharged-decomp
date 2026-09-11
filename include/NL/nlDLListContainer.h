@@ -3,6 +3,7 @@
 
 #include "NL/nlDLRing.h"
 #include "NL/nlList.h"
+#include "NL/nlFunction.h"
 #include "NL/nlSlotPool.h"
 
 template <typename T, typename Adapter>
@@ -91,6 +92,19 @@ public:
     }
 
     T* AllocateAtEnd(unsigned long* outEntry);
+
+    struct WalkCallback
+    {
+        const Function1<bool, T&>& m_Callback;
+        WalkCallback(const Function1<bool, T&>& callback) : m_Callback(callback) { }
+        bool Call(DLListEntry<T>* entry) { return m_Callback(entry->entry); }
+    };
+
+    bool Walk(const Function1<bool, T&>& callback)
+    {
+        WalkCallback adapter(callback);
+        return nlWalkRing(m_Head, &adapter, &WalkCallback::Call);
+    }
 
     void DeleteEntry(DLListEntry<T>* entry);
 

@@ -291,6 +291,7 @@ public:
     bool IsHitting() const;
     bool fn_80038660() const;
     bool fn_80038918() const;
+    float fn_8002E058();
     eFielderDesireState fn_8002E060();
     bool fn_8003E6FC() const;
     bool fn_800470B4(cFielder* pFielder, cPlayer* pAttacker);

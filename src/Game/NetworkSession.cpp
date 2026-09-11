@@ -41,6 +41,7 @@
 #include "Game/NetworkSync.h"
 #include "Game/SH/SHOnlineFriendsChooseSides.h"
 #include "Game/SH/SHOnlineConnectionQuality.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
@@ -2711,31 +2712,8 @@ void SHOnlineFriendsChooseSides::SetDraftMessage(NetMessageDraft message)
 
 #include "Game/TweakValue.h"
 
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
-
 static TweakBoolBinding s_NoPopupNetworkErrorTweak(
     "g_bNoPopupNetworkError", "Network", &g_bNoPopupNetworkError, true);
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
-
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
 
 UnidentifiedNetworkDelegate* UnidentifiedNetworkDelegate::Clone()
 {

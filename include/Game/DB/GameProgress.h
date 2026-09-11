@@ -138,7 +138,6 @@ extern StrikerChallenge* g_pStrikerChallenge;
 bool IsUnlockFlagSet(unsigned int flag);
 void SetUnlockFlag(unsigned int flag);
 
-int fn_8011162C();
 
 bool IsWastelandsUnlocked();
 bool IsDumpUnlocked();

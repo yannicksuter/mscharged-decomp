@@ -6,10 +6,13 @@
 #include "Game/Ball.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
+#include "Game/Effects/EmitterCallbacks.h"
+#include "Game/Drawable/DrawableCharacter.h"
 #include "Game/Event.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Physics/Physics.h"
 #include "Game/Physics/PhysicsCharacter.h"
+#include "Game/ReplayManager.h"
 #include "Game/Team.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlMemory.h"
@@ -531,12 +534,25 @@ void OnWaluigiWallEffectFinished(
 
 void UpdateWaluigiWallEmitter(EmissionController& rController)
 {
-    PhysicsBox_80177498* pObject
-        = (PhysicsBox_80177498*)rController.m_uUserData;
-    if (pObject != 0 && pObject->mUnidentified050 != 0)
+    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
-        rController.SetPosition(pObject->mUnidentified050->mUnidentified024.m_v3Position);
-        rController.SetVelocity(pObject->mUnidentified050->mUnidentified024.m_v3Velocity);
+        return;
+    }
+
+    if (!rController.m_Replaying
+        && ReplayManager::Instance()->mRender != 0)
+    {
+        PhysicsBox_80177498* pObject
+            = (PhysicsBox_80177498*)rController.m_uUserData;
+        if (pObject != 0)
+        {
+            DrawableCharacter* pChar
+                = GetReplayDrawableCharacter(pObject->mUnidentified050);
+            rController.SetPosition(pChar->position);
+            rController.SetVelocity(pChar->velocity);
+            rController.SetPoseAccumulator(*pChar->poseAccumulator);
+            rController.SetAnimController(pChar->GetAnimController());
+        }
     }
 }
 

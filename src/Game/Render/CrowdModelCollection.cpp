@@ -14,6 +14,7 @@
 #include "NL/nlMemory.h"
 
 #include <string.h>
+#include "Game/UnidentifiedStaticStorage.h"
 
 
 static bool sLoadCrowdModelsSynchronously;

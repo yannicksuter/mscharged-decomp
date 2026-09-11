@@ -1,4 +1,5 @@
 #include "Game/Audio/AudioBackend.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 #include "Game/Audio/AudioSource.h"
 #include "Game/Audio/XSoundHandle.h"
 #include "NL/nlMath.h"
@@ -7,284 +8,129 @@
 
 #include <NMWException.h>
 
-struct WeightedEntry_802F2C3C
-{
-    u32 index;
-    u32 weight;
-};
+#include "unclassified/tu_802F2C3C.h"
 
-struct PlaybackDefinition_802F2C3C
-{
-    u32 field_00;
-    u32 soundId;
-    union
-    {
-        u32 choiceCount;
-        float value;
-    };
-    u8 mode;
-    u8 pad_0D[3];
-    WeightedEntry_802F2C3C* choices;
-    u8 randomPitch;
-    u8 randomVolume;
-    u8 pad_16[2];
-    float pitchMinimum;
-    float pitchMaximum;
-    float volumeMinimum;
-    float volumeMaximum;
-};
 
-struct PlaybackRequest_802F2C3C
-{
-    u32 kind;
-    PlaybackDefinition_802F2C3C* definition;
-};
+SlotPool<PlaybackObject_8052F7B0> lbl_8057FAE8(32, 16);
+SlotPool<PlaybackObject_8052F780> lbl_8057FB10(32, 16);
+SlotPool<PlaybackObject_8052F750> lbl_8057FB38(32, 16);
 
-struct ModifierDefinition_802F2C3C
+PlaybackObject_802F2C3C::~PlaybackObject_802F2C3C()
 {
-    u8 pad_00[0xC];
-    u32 kind;
-};
-
-struct ModifierNode_802F2C3C
-{
-    ModifierDefinition_802F2C3C* definition;
-    float value;
-};
-
-struct RpcListEntry_802F2C3C
-{
-    RpcListEntry_802F2C3C* next;
-    RpcListEntry_802F2C3C* previous;
-    ModifierNode_802F2C3C* node;
-};
-
-struct SoundDefinition_802F2C3C
-{
-    u8 pad_00[0x24];
-    u32 modifierCount;
-    ModifierNode_802F2C3C** modifiers;
-};
-
-struct SoundInstance_802F2C3C
-{
-    XSoundHandle* owner;
-    SoundDefinition_802F2C3C* definition;
-    void* voices;
-    SlotPoolBase* entryPool;
-    RpcListEntry_802F2C3C* rpcEntries;
-    s32 state;
-    float previousTime;
-    float currentTime;
-    u8 pad_20[0x30];
-    float pitch;
-};
-
-struct PlaybackOwner_802F2C3C
-{
-    void* field_00;
-    SoundInstance_802F2C3C* instance;
-    u8 pad_08[8];
-    float volumeOffset;
-    float pitchOffset;
-};
-
-struct PlaybackObject_802F2C3C
-{
-    void** vtable;
-    u32 field_04;
-    PlaybackOwner_802F2C3C* owner;
-    s32 state;
-    float startTime;
-    PlaybackDefinition_802F2C3C* definition;
-    u32 selection;
-    float volumeModifier;
-    float pitchModifier;
-    float currentVolume;
-    float currentPitch;
-    AudioSource* backend;
-    u32 flags : 16;
-    u32 savedState : 16;
-};
-
-extern void* lbl_8052F750[];
-extern void* lbl_8052F780[];
-extern void* lbl_8052F7B0[];
-extern void* lbl_8052F7E8[];
-extern SlotPoolBase lbl_8057FAE8;
-extern SlotPoolBase lbl_8057FB10;
-extern SlotPoolBase lbl_8057FB38;
+}
 
 extern "C" float fn_802F29F8(SoundInstance_802F2C3C*);
 extern "C" float fn_802F2A6C(SoundInstance_802F2C3C*);
 extern "C" void fn_802F4630(PlaybackOwner_802F2C3C*, float);
 extern "C" void fn_802F4638(PlaybackOwner_802F2C3C*, float);
 
-static inline void* AllocateFromPool_802F2C3C(SlotPoolBase* pool, u32 size)
-{
-    void* result = 0;
-    if (pool->m_FreeList == 0)
-        SlotPoolBase::BaseAddNewBlock(pool, size);
-    if (pool->m_FreeList != 0)
-    {
-        result = pool->m_FreeList;
-        pool->m_FreeList = pool->m_FreeList->next;
-    }
-    return result;
-}
-
 static inline float RandomRange_802F2C3C(float minimum, float maximum)
 {
     return nlRandomf(minimum, maximum, &nlDefaultSeed);
 }
 
-struct SlotPoolEntry_802F2C3C
-{
-    u8 data[0x7C];
-};
+extern "C" PlaybackObject_802F2C3C* fn_802F3114(PlaybackObject_8052F7B0* object);
 
-extern "C" SlotPool<SlotPoolEntry_802F2C3C>* fn_802F2C3C(
-    SlotPool<SlotPoolEntry_802F2C3C>* pool, int destroy)
+inline PlaybackObject_8052F7B0::PlaybackObject_8052F7B0(
+    PlaybackOwner_802F2C3C* owner, PlaybackRequest_802F2C3C* request)
+    : PlaybackObject_802F2C3C(owner)
 {
-    if (pool != 0)
-    {
-        pool->BasicSlotPool<SlotPoolEntry_802F2C3C>::~BasicSlotPool();
-        if (destroy > 0)
-            operator delete(pool);
-    }
-    return pool;
+    selection = 0;
+    volumeModifier = 0.0f;
+    pitchModifier = 0.0f;
+    currentVolume = 0.0f;
+    currentPitch = 0.0f;
+    backend = 0;
+    flags = 0;
+    definition = request->definition;
+    float maximum = request->definition->volumeMaximum;
+    float minimum = request->definition->volumeMinimum;
+    startTime = maximum == 0.0f
+                    ? minimum
+                    : RandomRange_802F2C3C(minimum, minimum + maximum);
+    selection = (u32)fn_802F3114(this);
+    backend = g_pAudioBackend->CreateSource(
+        (AudioSourceInfo*)selection, this->owner->instance->owner->m_Owner);
 }
 
-extern "C" PlaybackObject_802F2C3C* fn_802F3114(PlaybackObject_802F2C3C* object);
+inline PlaybackObject_8052F780::PlaybackObject_8052F780(
+    PlaybackOwner_802F2C3C* owner, PlaybackRequest_802F2C3C* request)
+    : PlaybackObject_802F2C3C(owner)
+{
+    definition = request->definition;
+    float maximum = request->definition->pitchMaximum;
+    float minimum = request->definition->pitchMinimum;
+    startTime = maximum == 0.0f
+                    ? minimum
+                    : RandomRange_802F2C3C(minimum, minimum + maximum);
+    state = 0;
+}
+
+inline PlaybackObject_8052F750::PlaybackObject_8052F750(
+    PlaybackOwner_802F2C3C* owner, PlaybackRequest_802F2C3C* request)
+    : PlaybackObject_802F2C3C(owner)
+{
+    definition = request->definition;
+    float maximum = request->definition->pitchMaximum;
+    float minimum = request->definition->pitchMinimum;
+    startTime = maximum == 0.0f
+                    ? minimum
+                    : RandomRange_802F2C3C(minimum, minimum + maximum);
+    state = 0;
+}
 
 extern "C" PlaybackObject_802F2C3C* fn_802F2CAC(PlaybackOwner_802F2C3C* owner,
     PlaybackRequest_802F2C3C* request)
 {
-    PlaybackObject_802F2C3C* object = 0;
     switch (request->kind)
     {
     case 1:
-        object = (PlaybackObject_802F2C3C*)AllocateFromPool_802F2C3C(
-            &lbl_8057FAE8, 0x34);
-        if (object != 0)
-        {
-            object->vtable = lbl_8052F7E8;
-            object->field_04 = 0;
-            object->owner = owner;
-            object->state = 0;
-            object->startTime = 0.0f;
-            object->vtable = lbl_8052F7B0;
-            object->selection = 0;
-            object->volumeModifier = 0.0f;
-            object->pitchModifier = 0.0f;
-            object->currentVolume = 0.0f;
-            object->currentPitch = 0.0f;
-            object->backend = 0;
-            object->flags = 0;
-            object->definition = request->definition;
-            float maximum = request->definition->volumeMaximum;
-            float minimum = request->definition->volumeMinimum;
-            object->startTime = maximum == 0.0f
-                                  ? minimum
-                                  : RandomRange_802F2C3C(minimum, minimum + maximum);
-            object->selection = (u32)fn_802F3114(object);
-            object->backend = g_pAudioBackend->CreateSource(
-                (AudioSourceInfo*)object->selection, object->owner->instance->owner->m_Owner);
-        }
-        return object;
+        return new PlaybackObject_8052F7B0(owner, request);
     case 3:
-        object = (PlaybackObject_802F2C3C*)AllocateFromPool_802F2C3C(
-            &lbl_8057FB10, 0x18);
-        if (object != 0)
-        {
-            object->vtable = lbl_8052F7E8;
-            object->field_04 = 0;
-            object->owner = owner;
-            object->state = 0;
-            object->startTime = 0.0f;
-            object->vtable = lbl_8052F780;
-            object->definition = request->definition;
-            float maximum = request->definition->pitchMaximum;
-            float minimum = request->definition->pitchMinimum;
-            object->startTime = maximum == 0.0f
-                                  ? minimum
-                                  : RandomRange_802F2C3C(minimum, minimum + maximum);
-            object->state = 0;
-        }
-        return object;
+        return new PlaybackObject_8052F780(owner, request);
     case 2:
-        object = (PlaybackObject_802F2C3C*)AllocateFromPool_802F2C3C(
-            &lbl_8057FB38, 0x18);
-        if (object != 0)
-        {
-            object->vtable = lbl_8052F7E8;
-            object->field_04 = 0;
-            object->owner = owner;
-            object->state = 0;
-            object->startTime = 0.0f;
-            object->vtable = lbl_8052F750;
-            object->definition = request->definition;
-            float maximum = request->definition->pitchMaximum;
-            float minimum = request->definition->pitchMinimum;
-            object->startTime = maximum == 0.0f
-                                  ? minimum
-                                  : RandomRange_802F2C3C(minimum, minimum + maximum);
-            object->state = 0;
-        }
-        return object;
+        return new PlaybackObject_8052F750(owner, request);
     default:
         return 0;
     }
 }
 
-extern "C" PlaybackObject_802F2C3C* fn_802F2F8C(
-    PlaybackObject_802F2C3C* object, int destroy)
+PlaybackObject_8052F7B0::~PlaybackObject_8052F7B0()
 {
-    if (object != 0)
-    {
-        object->vtable = lbl_8052F7B0;
-        if (object->backend != 0)
-            g_pAudioBackend->ReleaseSource(
-                (AudioSource*)object->backend);
-        if (destroy > 0)
-        {
-            object->vtable = (void**)lbl_8057FAE8.m_FreeList;
-            lbl_8057FAE8.m_FreeList = (SlotPoolEntry*)object;
-        }
-    }
-    return object;
+    if (backend != 0)
+        g_pAudioBackend->ReleaseSource(backend);
 }
 
-extern "C" void fn_802F34E4(PlaybackObject_802F2C3C*, bool);
+extern "C" void fn_802F34E4(PlaybackObject_8052F7B0*, bool);
 
-extern "C" void fn_802F3008(PlaybackObject_802F2C3C* object)
+void PlaybackObject_8052F7B0::UnidentifiedVirtual30()
 {
-    if (object->definition->randomVolume)
-        object->volumeModifier = nlRandomf(object->definition->volumeMinimum,
-            object->definition->volumeMaximum, &nlDefaultSeed);
+    if (definition->randomVolume)
+        volumeModifier = nlRandomf(definition->volumeMinimum,
+            definition->volumeMaximum, &nlDefaultSeed);
     else
-        object->volumeModifier = 0.0f;
+        volumeModifier = 0.0f;
 
-    if (object->definition->randomPitch)
-        object->pitchModifier = nlRandomf(object->definition->pitchMinimum,
-            object->definition->pitchMaximum, &nlDefaultSeed);
+    if (definition->randomPitch)
+        pitchModifier = nlRandomf(definition->pitchMinimum,
+            definition->pitchMaximum, &nlDefaultSeed);
     else
-        object->pitchModifier = 0.0f;
-    object->currentVolume = -96.0f;
-    object->currentPitch = 0.0f;
-    fn_802F34E4(object, true);
-    object->backend->Play(object->definition->soundId);
-    object->state = 4;
+        pitchModifier = 0.0f;
+    currentVolume = -96.0f;
+    currentPitch = 0.0f;
+    fn_802F34E4(this, true);
+    backend->Play(definition->soundId);
+    state = 4;
 }
 
-extern "C" void fn_802F30D0(PlaybackObject_802F2C3C* object)
+void PlaybackObject_8052F7B0::UnidentifiedVirtual10()
 {
-    object->backend->Prepare();
-    object->state = 2;
+    backend->Prepare();
+    state = 2;
 }
 
 extern "C" PlaybackObject_802F2C3C* fn_802F3114(
-    PlaybackObject_802F2C3C* object)
+    PlaybackObject_8052F7B0* object)
 {
     PlaybackDefinition_802F2C3C* definition = object->definition;
     u32 selectedIndex;
@@ -313,60 +159,59 @@ extern "C" PlaybackObject_802F2C3C* fn_802F3114(
                                       + selectedIndex * 0x1C);
 }
 
-extern "C" int fn_802F32A0(PlaybackObject_802F2C3C* object, float)
+int PlaybackObject_8052F7B0::UnidentifiedVirtual20(float)
 {
-    if (object->backend != 0)
-        object->backend->UpdateState();
+    if (backend != 0)
+        backend->UpdateState();
 
-    switch (object->state)
+    switch (state)
     {
     case 2:
-        if (object->backend->GetState() == 3)
-            object->state = 3;
+        if (backend->GetState() == 3)
+            state = 3;
         break;
     case 4:
     case 7:
-        if (object->backend->GetState() == 1)
+        if (backend->GetState() == 1)
         {
-            object->state = 8;
-            object->flags = 0;
+            state = 8;
+            flags = 0;
         }
         break;
     case 3:
     {
-        float previous = object->owner->instance->previousTime;
-        float current = object->owner->instance->currentTime;
-        if (previous < object->startTime && current >= object->startTime)
+        float previous = owner->instance->previousTime;
+        float current = owner->instance->currentTime;
+        if (previous < startTime && current >= startTime)
         {
-            typedef void (*Method)(PlaybackObject_802F2C3C*);
-            ((Method)object->vtable[12])(object);
+            UnidentifiedVirtual30();
         }
-        if (object->state == 4)
-            fn_802F34E4(object, false);
+        if (state == 4)
+            fn_802F34E4(this, false);
         break;
     }
     default:
         break;
     }
-    return object->state;
+    return state;
 }
 
-extern "C" void fn_802F3430(PlaybackObject_802F2C3C* object)
+void PlaybackObject_8052F7B0::UnidentifiedVirtual18()
 {
-    if (object->backend != 0)
-        object->backend->Pause();
-    object->savedState = object->state;
-    object->state = 5;
+    if (backend != 0)
+        backend->Pause();
+    savedState = state;
+    state = 5;
 }
 
-extern "C" void fn_802F3490(PlaybackObject_802F2C3C* object)
+void PlaybackObject_8052F7B0::UnidentifiedVirtual1C()
 {
-    if (object->backend != 0)
-        object->backend->Resume();
-    object->state = object->savedState;
+    if (backend != 0)
+        backend->Resume();
+    state = savedState;
 }
 
-extern "C" void fn_802F3648(PlaybackObject_802F2C3C* object,
+extern "C" void fn_802F3648(PlaybackObject_8052F7B0* object,
     u8* hasVolume, float* volume, u8* hasPitch, float* pitch)
 {
     u32 volumeCount = 0;
@@ -415,7 +260,7 @@ extern "C" void fn_802F3648(PlaybackObject_802F2C3C* object,
 }
 
 extern "C" void fn_802F34E4(
-    PlaybackObject_802F2C3C* object, bool force)
+    PlaybackObject_8052F7B0* object, bool force)
 {
     u8 hasVolume = false;
     u8 hasPitch = false;
@@ -444,56 +289,60 @@ extern "C" void fn_802F34E4(
     }
 }
 
-extern "C" void fn_802F37E8(PlaybackObject_802F2C3C* object)
+void PlaybackObject_8052F7B0::UnidentifiedVirtual14()
 {
-    object->backend->Stop();
-    object->state = 7;
-    object->flags = 0;
+    backend->Stop();
+    state = 7;
+    flags = 0;
 }
 
-extern "C" bool fn_802F3838(
-    PlaybackObject_802F2C3C* object, AudioSource** output)
+u32 PlaybackObject_8052F7B0::UnidentifiedVirtual2C(u32* results)
 {
-    if (object->backend != 0)
+    if (backend != 0)
     {
-        if (object->backend->HasVoice())
+        if (backend->HasVoice())
         {
-            *output = object->backend;
+            *results = (u32)backend;
             return true;
         }
     }
     return false;
 }
 
-extern "C" int fn_802F38A8(PlaybackObject_802F2C3C* object, float)
+int PlaybackObject_8052F780::UnidentifiedVirtual20(float)
 {
-    if (object->state == 2)
-        object->state = 3;
-    bool condition = object->owner->instance->previousTime < object->startTime
-                  && object->owner->instance->currentTime >= object->startTime;
+    if (state == 2)
+        state = 3;
+    bool condition = owner->instance->previousTime < startTime
+                  && owner->instance->currentTime >= startTime;
     if (condition)
     {
-        ((XSoundHandle*)object->owner->instance->owner)
-            ->OnHitMarker((void*)object->definition->soundId);
-        object->state = 8;
+        ((XSoundHandle*)owner->instance->owner)
+            ->OnHitMarker((void*)definition->soundId);
+        state = 8;
     }
-    return object->state;
+    return state;
 }
 
-extern "C" int fn_802F3938(PlaybackObject_802F2C3C* object, float)
+int PlaybackObject_8052F750::UnidentifiedVirtual20(float)
 {
-    if (object->state == 2)
-        object->state = 3;
-    PlaybackOwner_802F2C3C* owner = object->owner;
-    bool trigger = owner->instance->previousTime < object->startTime
-        && owner->instance->currentTime >= object->startTime;
+    if (state == 2)
+        state = 3;
+    PlaybackOwner_802F2C3C* owner = this->owner;
+    bool trigger = owner->instance->previousTime < startTime
+        && owner->instance->currentTime >= startTime;
     if (trigger)
     {
-        if (object->definition->mode == 0)
-            fn_802F4630(owner, object->definition->value);
-        else if (object->definition->mode == 1)
-            fn_802F4638(owner, object->definition->value);
-        object->state = 8;
+        if (definition->mode == 0)
+            fn_802F4630(owner, definition->value);
+        else if (definition->mode == 1)
+            fn_802F4638(owner, definition->value);
+        state = 8;
     }
-    return object->state;
+    return state;
+}
+
+unsigned int AudioSource::GetState()
+{
+    return m_Unknown04;
 }

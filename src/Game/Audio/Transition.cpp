@@ -1,7 +1,5 @@
 #include "Game/Audio/Transition.h"
 
-extern "C" const float lbl_806E65A8;
-
 void Transition::Update(float dt, float multiplier)
 {
     valid = enabled;
@@ -9,7 +7,7 @@ void Transition::Update(float dt, float multiplier)
     duration = multiplier;
     if (value == target)
     {
-        elapsed = lbl_806E65A8;
+        elapsed = 0.0f;
         return;
     }
 
@@ -17,7 +15,7 @@ void Transition::Update(float dt, float multiplier)
     if (elapsed <= dt)
     {
         value = target;
-        elapsed = lbl_806E65A8;
+        elapsed = 0.0f;
         return;
     }
 

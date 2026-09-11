@@ -37,7 +37,6 @@ extern "C"
     u8 SCGetEuRgb60Mode();
     void OSReport(const char* format, ...);
 
-
     void GXAdjustForOverscan(const GXRenderModeObj* source, GXRenderModeObj* destination, u16 horizontal, u16 vertical);
     f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight);
     void fn_803A7828(f32 x, f32 y, f32 width, f32 height, f32 nearZ, f32 farZ);
@@ -48,7 +47,6 @@ extern "C"
     void GXSetDispCopyGamma(s32 gamma);
     void fn_803A6FE8(u8 fieldMode, u8 halfAspectRatio);
     void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
-
 
     extern GXRenderModeObj GXNtsc480IntDf;
     extern GXRenderModeObj GXNtsc480Prog;
@@ -460,4 +458,3 @@ void glplatViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v
     v3NDC.z *= wc;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

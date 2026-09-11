@@ -4,6 +4,7 @@
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029B434>::Activate(GLView*)
@@ -37,7 +38,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029B434>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>

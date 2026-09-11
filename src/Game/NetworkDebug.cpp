@@ -1,11 +1,16 @@
 #include "Game/NetworkDebug.h"
 #include "Game/OnlinePlayer.h"
+#include <RVLFaceLib/RFL_Types.h>
 
 #include "Game/NetworkSession.h"
 #include "Game/TweakCallback.h"
 #include "NL/gl/glFont.h"
 #include "unclassified/tu_802B7798.h"
 #include "Game/InputRouter.h"
+
+char gNetworkMiiName[12];
+unsigned short gNetworkMiiNameWide[12];
+RFLStoreData gNetworkMiiData;
 
 NetworkSessionBase* g_pNetworkSessionBase;
 u8 gNetworkMiiChanged;

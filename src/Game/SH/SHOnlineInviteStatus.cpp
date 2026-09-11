@@ -18,6 +18,7 @@
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHOnlineInvitePlayers.h"
 #include "Game/FE/feOnlineError.h"
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 SHOnlineInviteStatus::SHOnlineInviteStatus()
     : mStatus(0)
@@ -39,12 +40,12 @@ void SHOnlineInviteStatus::SceneCreated()
     TLTextInstance* title = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide,
         InlineHasher("Layer"), InlineHasher("INVITATION"), InlineHasher("TITLE"));
     if (title == 0)
-        title = &gDefaultTLTextInstance;
+        title = &UnidentifiedTLTextDefault::sInstance;
     title->SetStringId("ONLINE_INVITATION_TITLE");
     mStatusInstance = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
         InlineHasher("Layer"), InlineHasher("INVITATION"), InlineHasher("LOGIN"));
     if (mStatusInstance == 0)
-        mStatusInstance = &gDefaultTLComponentInstance;
+        mStatusInstance = &UnidentifiedTLComponentDefault::sInstance;
     switch (mStatus)
     {
     case 1:
@@ -55,7 +56,7 @@ void SHOnlineInviteStatus::SceneCreated()
         mStatusInstance->SetActiveSlide("DECLINED", false, false);
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mStatusInstance->GetActiveSlide(), InlineHasher("INVITE"));
         if (text == 0)
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         text->SetStringId("LOC_ONLINE_CANCELED_INVITATION");
         break;
     }
@@ -109,7 +110,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
             mStatusInstance->SetActiveSlide("DECLINED", false, false);
             TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mStatusInstance->GetActiveSlide(), InlineHasher("INVITE"));
             if (text == 0)
-                text = &gDefaultTLTextInstance;
+                text = &UnidentifiedTLTextDefault::sInstance;
             text->SetStringId("LOC_ONLINE_CANCELED_INVITATION");
         }
         else if (gOnlineFourMachineFriendLobby && lobby->AreAllConnectionsReady())

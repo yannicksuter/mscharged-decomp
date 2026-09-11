@@ -65,7 +65,5 @@ public:
     /* 0x8E */ bool m_bVisible;
 };
 
-extern TLInstance gDefaultTLGroupInstance;
-extern TLInstance gDefaultTLLayerInstance;
 
 #endif // _TLINSTANCE_H_

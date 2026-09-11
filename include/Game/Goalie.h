@@ -21,6 +21,8 @@ class cPN_SAnimController;
 class cPN_SingleAxisBlender;
 struct UnidentifiedMegaBallState;
 
+extern "C" float fn_800776B4();
+
 enum eGoalieActionState
 {
     GOALIEACTION_MOVE = 0,

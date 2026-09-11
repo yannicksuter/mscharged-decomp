@@ -1,4 +1,5 @@
 #include "unclassified/tu_801F877C.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static const char* lbl_806DD95C = "art/fe/superabilityUI.res";
 

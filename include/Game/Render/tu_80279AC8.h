@@ -26,6 +26,8 @@ public:
     virtual void V8(GLView* view);
     virtual void V9(void* context);
 
+    float GetBlend() const { return m_fBlend; }
+
     /* 0x04 */ unsigned long m_uHashID;
     /* 0x08 */ u8 m_pad08[0x10];
     /* 0x18 */ void* m_pAnimController;

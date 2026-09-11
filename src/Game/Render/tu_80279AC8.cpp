@@ -325,7 +325,7 @@ extern "C" void fn_80279DD4(StadiumWorldObject_80279AC8* object)
     {
         if ((object->m_uFlags & 0x37) != 0)
             fn_80279E88(object);
-        if (0.0f != object->m_fBlend)
+        if (0.0f != object->GetBlend())
             fn_80343C00(object);
     }
 
@@ -345,7 +345,7 @@ static inline void SetObjectBlend(
     object->m_fBlend = blend;
     if (blend < 0.0f)
         object->m_fBlend = 0.0f;
-    if (object->m_fBlend > 1.0f)
+    if (object->GetBlend() > 1.0f)
         object->m_fBlend = 1.0f;
 }
 
@@ -405,15 +405,16 @@ extern "C" void fn_80279E88(StadiumWorldObject_80279AC8* object)
  */
 extern "C" void fn_8027A054(StadiumWorldObject_80279AC8* object)
 {
-    if (object->m_fLightRange > 0.0f)
+    if (object->m_fLightRange <= 0.0f)
+    {
+        nlMatrix4* transform = object->GetWorldMatrix();
+        BasicStadium* stadium = BasicStadium::GetCurrentStadium();
+        stadium->m_shadowLightPosition = *(nlVector3*)&transform->m41;
+    }
+    else
     {
         fn_80182168(object);
-        return;
     }
-
-    nlMatrix4* transform = object->GetWorldMatrix();
-    BasicStadium* stadium = BasicStadium::GetCurrentStadium();
-    stadium->m_shadowLightPosition = *(nlVector3*)&transform->m41;
 }
 
 /**
@@ -535,7 +536,7 @@ extern "C" void fn_8027A248(StadiumWorldObject_80279AC8* object)
     if ((object->m_uFlags & 0x37) != 0)
         fn_80279E88(object);
 
-    if (0.0f != object->m_fBlend)
+    if (0.0f != object->GetBlend())
     {
         if ((object->m_uFlags & 8) != 0)
         {

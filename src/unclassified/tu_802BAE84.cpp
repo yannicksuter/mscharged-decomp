@@ -158,4 +158,3 @@ struct UnidentifiedDebugPolyStorage_802BB300
 UnidentifiedDebugPolyStorage_802BB300 lbl_8057C1B8;
 SlotPool<glPoly2> lbl_8057C1E8(16, 16);
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

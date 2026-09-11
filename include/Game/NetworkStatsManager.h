@@ -154,7 +154,7 @@ bool IsNewNetworkSeason(const NetworkRankingMeta* previous);
 bool IsNewNetworkDay(const NetworkRankingMeta* previous);
 bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time);
 int FindNetworkSeasonBoundary(
-    const NetworkSeasonDateTable* dates, const NetworkSeasonDate* date);
+    const NetworkSeasonDateTable* dates, NetworkSeasonDate date);
 int GetDaysUntilNextSeasonBoundary(
     const NetworkSeasonDateTable* dates, int index, int year);
 int GetDaysSinceSeasonBoundary(const NetworkSeasonDateTable* dates, int index,

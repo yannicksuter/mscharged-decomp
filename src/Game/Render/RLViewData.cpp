@@ -1,25 +1,5 @@
 #include "Game/Render/RLViewLayers.h"
-
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
+#include "Game/UnidentifiedStaticStorage.h"
 
 TweakValueBool eCLV_ImpostorTextureEnabled("eCLV_ImpostorTextureEnabled", "/Rendering/RLView Toggles", true);
 TweakValueBool eCLV_ShadowTextureEnabled("eCLV_ShadowTextureEnabled", "/Rendering/RLView Toggles", true);
@@ -132,4 +112,3 @@ const nlMatrix4* RLViewOrthoCamera::GetViewMatrix() const
     return &sIdentityMatrix;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

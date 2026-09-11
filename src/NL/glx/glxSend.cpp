@@ -103,7 +103,7 @@ void glx_SendFrame_cb(
     if (p != 0)
     {
         GLMaterialProgram* program
-            = (GLMaterialProgram*)p->unknown10;
+            = (GLMaterialProgram*)p->materialProgram;
         if (glx_program != program)
         {
             if (glx_program != 0)
@@ -155,7 +155,7 @@ void glx_SendFrame_cb(
         }
         if ((flags & 0x80) != 0)
         {
-            ((GLMaterialProgram*)p->unknown10)->Draw(p);
+            ((GLMaterialProgram*)p->materialProgram)->Draw(p);
         }
     }
     else

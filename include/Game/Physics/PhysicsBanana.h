@@ -9,7 +9,7 @@ class PhysicsBanana : public PhysicsSphere
 {
 public:
     PhysicsBanana(float radius);
-    virtual ~PhysicsBanana();
+    virtual ~PhysicsBanana() { }
     virtual int GetObjectType() const { return 0x15; }
     virtual bool SetContactInfo(dContact* contact, PhysicsObject* other, bool first);
     virtual void PreUpdate();

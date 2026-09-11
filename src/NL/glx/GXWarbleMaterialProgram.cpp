@@ -2,6 +2,7 @@
 
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/gl/glLoadModel.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 GXWarbleMaterialProgram* GXWarbleMaterialProgram::Instance;
 bool GXWarbleMaterialProgram::Initialized;
@@ -92,7 +93,7 @@ void GXWarbleMaterialProgram::DrawDirect(const glModelPacket* packet)
 
 void GXWarbleMaterialProgram::BindParameters(const glModelPacket* packet)
 {
-    glx_BindTexture(0, (glTextureBinding*)(packet->unknown20));
+    glx_BindTexture(0, (glTextureBinding*)(packet->materialParameters));
 }
 
 const GXMaterialParameter* GXWarbleMaterialProgram::GetParameters()

@@ -25,6 +25,7 @@
 #include "NL/glx/glxSwap.h"
 #include "NL/nlBind.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 
 static const char* MENU_NAMES[7] = {
@@ -186,7 +187,7 @@ static inline TLTextInstance* FindOptionText(TLComponentInstance* instance, cons
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(instance,
         nlStringLowerHash(slide), nlStringLowerHash("option"), 0, 0, 0, 0);
     if (text == 0)
-        text = &gDefaultTLTextInstance;
+        text = &UnidentifiedTLTextDefault::sInstance;
     return text;
 }
 
@@ -202,7 +203,7 @@ void PauseMenuScene::SceneCreated()
         TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(
             presentation->m_currentSlide, InlineHasher("Layer"), InlineHasher(MENU_NAMES[i]));
         if (instance == 0)
-            instance = &gDefaultTLComponentInstance;
+            instance = &UnidentifiedTLComponentDefault::sInstance;
         mUnidentified028[i] = instance;
     }
     FEAudio::EnableSounds(true);

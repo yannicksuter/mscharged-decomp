@@ -34,6 +34,7 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static char sPresentationByteCode[] = "art/Scripts/fe_presentation.byte_code";
 static char sBronzeFormat[] = "%sbronze";

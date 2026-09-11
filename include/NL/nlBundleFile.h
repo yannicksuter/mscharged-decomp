@@ -13,7 +13,7 @@ struct nlFile;
 typedef void (*FileReadAsyncCallback)(void*, unsigned long, unsigned long);
 typedef void (*FileOpenAsyncCallback)(void*, unsigned long, unsigned long);
 
-extern char lbl_8052BA40[];
+extern char gBundleFileNotFoundFormat[];
 
 struct BundleFileHeader
 {
@@ -91,7 +91,7 @@ public:
                 return i;
             }
         }
-        nlPrintf(lbl_8052BA40, hash);
+        nlPrintf(gBundleFileNotFoundFormat, hash);
         return -1U;
     }
 
@@ -106,7 +106,7 @@ public:
         }
         if (printError)
         {
-            nlPrintf(lbl_8052BA40, hash);
+            nlPrintf(gBundleFileNotFoundFormat, hash);
         }
         return -1U;
     }

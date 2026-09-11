@@ -114,8 +114,8 @@ void UnidentifiedPacketSorter_8052E554::fn_10(
 }
 
 class UnidentifiedPacketSorterTree_8052E504
-    : public nlAVLTreeSlotPool<unsigned long, UnidentifiedPacketSorter*,
-          DefaultKeyCompare<unsigned long> >
+    : public nlAVLTreeSlotPool<long, UnidentifiedPacketSorter*,
+          DefaultKeyCompare<long> >
 {
 public:
     static void* operator new(unsigned long size)
@@ -124,8 +124,8 @@ public:
     }
 
     UnidentifiedPacketSorterTree_8052E504(int initial, int delta)
-        : nlAVLTreeSlotPool<unsigned long, UnidentifiedPacketSorter*,
-              DefaultKeyCompare<unsigned long> >(initial, delta)
+        : nlAVLTreeSlotPool<long, UnidentifiedPacketSorter*,
+              DefaultKeyCompare<long> >(initial, delta)
     {
     }
 };
@@ -133,7 +133,7 @@ public:
 class UnidentifiedPacketSorterIterator
 {
 public:
-    typedef AVLTreeEntry<unsigned long, UnidentifiedPacketSorter*> Entry;
+    typedef AVLTreeEntry<long, UnidentifiedPacketSorter*> Entry;
 
     UnidentifiedPacketSorterIterator()
         : m_NumStackEntries(0)
@@ -282,7 +282,7 @@ inline GLView::GLView()
     m_Visible = true;
 }
 
-inline UnidentifiedPacketSorter* GLView::GetSorter(unsigned long sortKey)
+inline UnidentifiedPacketSorter* GLView::GetSorter(long sortKey)
 {
     UnidentifiedPacketSorter* sorter;
     UnidentifiedPacketSorter** foundSorter;

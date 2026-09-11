@@ -4,6 +4,7 @@
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static bool glx_CompiledDraw = true;
 static bool glx_AllowUncompiledDraws = true;
@@ -30,7 +31,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A7820>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>

@@ -6,7 +6,13 @@
 #include "Game/FE/feManager.h"
 #include "Game/GameInfo.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
+void PausePostGameScene::fn_801EDBF8()
+{
+    mUnidentified60C = true;
+    --mUnidentified610;
+}
 
 void PausePostGameScene::OnSelectChangeTeams()
 {

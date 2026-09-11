@@ -973,6 +973,9 @@ int dCollideCylS (dxGeom *o1, dxGeom *o2, int flags,
 
   int i,invert_normal;
 
+  normal[0] = 0;
+  normal[1] = 0;
+  normal[2] = 0;
   // get vector from centers of cyl to shere
   p[0] = p2[0] - p1[0];
   p[1] = p2[1] - p1[1];
@@ -1334,7 +1337,7 @@ int dCollideCylRay(dxGeom *o1, dxGeom *o2, int flags,
       q[1] = contact->pos[1] - p[1];
       q[2] = contact->pos[2] - p[2];
       k = dDOT14(q,R+1);
-      dReal nsign = inside_cyl ? -1 : 1;
+      dReal nsign = inside_cyl ? REAL(-1.0) : REAL(1.0);
       if (k >= -lz2 && k <= lz2) {
 	contact->normal[0] = nsign * (contact->pos[0] -
 				      (p[0] + k*R[0*4+1]));
@@ -1366,7 +1369,7 @@ int dCollideCylRay(dxGeom *o1, dxGeom *o2, int flags,
   contact->pos[0]=start[0]+alpha*dir[0];
   contact->pos[1]=start[1]+alpha*dir[1];
   contact->pos[2]=start[2]+alpha*dir[2];
-  dReal nsign = (k<0)?-1:1;
+  dReal nsign = (k<0)?REAL(-1.0):REAL(1.0);
   contact->normal[0]=nsign*R[0*4+1];
   contact->normal[1]=nsign*R[1*4+1];
   contact->normal[2]=nsign*R[2*4+1];

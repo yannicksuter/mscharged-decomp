@@ -8,6 +8,7 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
 #include "NL/nlMath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C"
 {
@@ -148,7 +149,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802981F0>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 struct FloatColour_8028A98C
@@ -174,7 +175,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802981F0>::Draw(
     if (!lbl_806DEFE0)
         return;
 
-    GXMaterialProgramParameters_802981F0* parameters = (GXMaterialProgramParameters_802981F0*)packet->unknown20;
+    GXMaterialProgramParameters_802981F0* parameters = (GXMaterialProgramParameters_802981F0*)packet->materialParameters;
     float value24 = lbl_806DEFE4;
     if (value24 == 1.0f)
         value24 = parameters->value24;
@@ -223,7 +224,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802981F0>::Draw(
     nlMultMatrices(modelview, model, lbl_8057AD48);
     fn_80183B40(packet->matrix);
 
-    if (packet->unknown28 == 0)
+    if (packet->skinnedVertices == 0)
     {
         fn_80364020()->fn_803640E0("CharacterSkinCustom - RLXLoadSkinMatrices");
         glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, 1);

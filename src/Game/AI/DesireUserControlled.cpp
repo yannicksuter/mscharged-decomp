@@ -9,6 +9,7 @@
 #include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
 #include <stddef.h>
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" void fn_80098098(cFielder*);
 extern "C" void fn_80095870(cFielder*);

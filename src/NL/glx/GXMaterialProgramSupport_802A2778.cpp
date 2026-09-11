@@ -3,6 +3,7 @@
 
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/glxGX.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static inline GXColor makeColor(float r, float g, float b, float a)
 {
@@ -55,7 +56,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A53B4>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>
@@ -66,7 +67,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A53B4>::Draw(
     static_cast<GXMaterialProgram_802A53B4*>(this)->BindParameters(packet);
 
     float values[4] = { 0.0f, 0.0f, 0.0f, 255.0f };
-    float value = *(float*)((unsigned char*)packet->unknown20 + 16);
+    float value = *(float*)((unsigned char*)packet->materialParameters + 16);
     values[0] = value;
     values[1] = value;
     values[2] = value;

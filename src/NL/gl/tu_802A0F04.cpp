@@ -5,6 +5,7 @@
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
 #include "Game/GL/glModelBuilder.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 
 State_802A0F04::State_802A0F04()

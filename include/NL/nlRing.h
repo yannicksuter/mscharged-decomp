@@ -99,4 +99,22 @@ inline void nlWalkRing(T* head, CallbackType* callback, void (CallbackType::*cal
     }
 }
 
+template <typename T, typename CallbackType>
+inline bool nlWalkRing(T* head, CallbackType* callback, bool (CallbackType::*callbackFunc)(T*))
+{
+    if (head == 0)
+        return true;
+    T* current = head->m_next;
+    while (true)
+    {
+        T* next = current->m_next;
+        if (!(callback->*callbackFunc)(current))
+            return false;
+        if (current == head)
+            break;
+        current = next;
+    }
+    return true;
+}
+
 #endif // NL_RING_H

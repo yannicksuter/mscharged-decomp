@@ -5,7 +5,7 @@
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 
-char lbl_8052BA40[] = "ERROR: Failed to find file with hash ID: %d\n";
+char gBundleFileNotFoundFormat[] = "ERROR: Failed to find file with hash ID: %d\n";
 
 struct AsyncReadCallbackData
 {
@@ -13,18 +13,18 @@ struct AsyncReadCallbackData
     unsigned long userParam;
 };
 
-static void fn_802BDBEC(nlFile*, void* buffer, unsigned int size, unsigned long userParam);
-static void fn_802BDC38(nlFile*, void* buffer, unsigned int size, unsigned long userParam);
+static void cbBundleDirectoryReadAsyncCallback(nlFile*, void* buffer, unsigned int size, unsigned long userParam);
+static void cbFileReadAsyncCallback(nlFile*, void* buffer, unsigned int size, unsigned long userParam);
 
-static void fn_802BDB70(nlFile*, void*, unsigned int, unsigned long userParam)
+static void cbBundleHeaderReadAsyncCallback(nlFile*, void*, unsigned int, unsigned long userParam)
 {
     BundleFile* bundle = (BundleFile*)userParam;
     nlSeek(bundle->m_pFile, bundle->nDirectoryOffsetInSectors * bundle->nSectorSize, 0);
     bundle->m_pDirectory = (BundleFileDirectoryEntry*)nlMalloc(bundle->nNumFiles * sizeof(BundleFileDirectoryEntry), 0x20, true);
-    nlReadAsync(bundle->m_pFile, bundle->m_pDirectory, bundle->nNumFiles * sizeof(BundleFileDirectoryEntry), fn_802BDBEC, (unsigned long)bundle, 0);
+    nlReadAsync(bundle->m_pFile, bundle->m_pDirectory, bundle->nNumFiles * sizeof(BundleFileDirectoryEntry), cbBundleDirectoryReadAsyncCallback, (unsigned long)bundle, 0);
 }
 
-static void fn_802BDBEC(nlFile*, void* buffer, unsigned int size, unsigned long userParam)
+static void cbBundleDirectoryReadAsyncCallback(nlFile*, void* buffer, unsigned int size, unsigned long userParam)
 {
     BundleFile* bundle = (BundleFile*)userParam;
     bundle->m_pOpenCallback(buffer, size, bundle->m_openUserParam);
@@ -32,7 +32,7 @@ static void fn_802BDBEC(nlFile*, void* buffer, unsigned int size, unsigned long 
     bundle->m_openUserParam = 0;
 }
 
-static void fn_802BDC38(nlFile*, void* buffer, unsigned int size, unsigned long userParam)
+static void cbFileReadAsyncCallback(nlFile*, void* buffer, unsigned int size, unsigned long userParam)
 {
     AsyncReadCallbackData* data = (AsyncReadCallbackData*)userParam;
     data->callback(buffer, size, data->userParam);
@@ -152,7 +152,7 @@ bool BundleFile::OpenAsync(const char* filename, FileOpenAsyncCallback callback,
     copy_done:
         copy[n] = 0;
     }
-    nlReadAsync(m_pFile, this, sizeof(BundleFileHeader), fn_802BDB70, (unsigned long)this, 0);
+    nlReadAsync(m_pFile, this, sizeof(BundleFileHeader), cbBundleHeaderReadAsyncCallback, (unsigned long)this, 0);
     return true;
 }
 
@@ -230,7 +230,7 @@ void BundleFile::ReadFileAsync(const char* filename, void* buffer, unsigned long
     data->userParam = userParam;
     BundleFileDirectoryEntry* entry = &m_pDirectory[index];
     nlSeek(m_pFile, entry->m_blockNumber * nSectorSize, 0);
-    nlReadAsync(m_pFile, buffer, size, fn_802BDC38, (unsigned long)data, 0);
+    nlReadAsync(m_pFile, buffer, size, cbFileReadAsyncCallback, (unsigned long)data, 0);
 }
 
 void BundleFile::ReadFileAsync(unsigned long hash, void* buffer, unsigned long size, FileReadAsyncCallback callback, unsigned long userParam)
@@ -241,7 +241,7 @@ void BundleFile::ReadFileAsync(unsigned long hash, void* buffer, unsigned long s
     data->userParam = userParam;
     BundleFileDirectoryEntry* entry = &m_pDirectory[index];
     nlSeek(m_pFile, entry->m_blockNumber * nSectorSize, 0);
-    nlReadAsync(m_pFile, buffer, size, fn_802BDC38, (unsigned long)data, 0);
+    nlReadAsync(m_pFile, buffer, size, cbFileReadAsyncCallback, (unsigned long)data, 0);
 }
 
 void BundleFile::ReadFileAsyncByIndex(unsigned long index, void* buffer, unsigned long size, FileReadAsyncCallback callback, unsigned long userParam)
@@ -251,5 +251,5 @@ void BundleFile::ReadFileAsyncByIndex(unsigned long index, void* buffer, unsigne
     data->userParam = userParam;
     BundleFileDirectoryEntry* entry = &m_pDirectory[index];
     nlSeek(m_pFile, entry->m_blockNumber * nSectorSize, 0);
-    nlReadAsync(m_pFile, buffer, size, fn_802BDC38, (unsigned long)data, 0);
+    nlReadAsync(m_pFile, buffer, size, cbFileReadAsyncCallback, (unsigned long)data, 0);
 }

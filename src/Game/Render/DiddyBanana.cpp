@@ -1,6 +1,7 @@
 #include "Game/Render/DiddyBanana.h"
 
 #include "Game/Render/RLView.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static RLView* sDiddyBananaShadowView;
 static const nlVector3 sHiddenPosition = { 0.0f, 0.0f, -15.0f };

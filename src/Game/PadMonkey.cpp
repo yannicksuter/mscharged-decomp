@@ -11,11 +11,11 @@ PadMonkey::PadMonkey(int padIndex)
     , m_isConnected(false)
     , m_prevPressurePtr(0)
     , m_currPressurePtr(0)
-    , m_unk_0x24(0.0f)
-    , m_unk_0x28(0.0f)
-    , m_unk_0x2C(0.0f)
-    , m_unk_0x30(0.0f)
-    , m_unk_0x34(100.0f)
+    , m_analogLeftX(0.0f)
+    , m_analogLeftY(0.0f)
+    , m_analogRightX(0.0f)
+    , m_analogRightY(0.0f)
+    , m_connectionChance(100.0f)
     , m_buttonChance(0)
 {
 }
@@ -27,7 +27,7 @@ void PadMonkey::Update(float dt)
     m_currPressurePtr = p;
 
     float r = nlRandomf(100.0f, &nlDefaultSeed);
-    m_isConnected = m_unk_0x34 > r;
+    m_isConnected = m_connectionChance > r;
 
     if (m_isConnected)
     {
@@ -45,18 +45,18 @@ void PadMonkey::Update(float dt)
             }
         }
 
-        m_unk_0x24 = nlRandomf(2.0f, &nlDefaultSeed) - 1.0f;
-        m_unk_0x28 = nlRandomf(2.0f, &nlDefaultSeed) - 1.0f;
-        m_unk_0x2C = nlRandomf(2.0f, &nlDefaultSeed) - 1.0f;
-        m_unk_0x30 = nlRandomf(2.0f, &nlDefaultSeed) - 1.0f;
+        m_analogLeftX = nlRandomf(2.0f, &nlDefaultSeed) - 1.0f;
+        m_analogLeftY = nlRandomf(2.0f, &nlDefaultSeed) - 1.0f;
+        m_analogRightX = nlRandomf(2.0f, &nlDefaultSeed) - 1.0f;
+        m_analogRightY = nlRandomf(2.0f, &nlDefaultSeed) - 1.0f;
     }
     else
     {
         memset(m_currPressurePtr, 0, GetButtonCount() * sizeof(float));
-        m_unk_0x24 = 0.0f;
-        m_unk_0x28 = 0.0f;
-        m_unk_0x2C = 0.0f;
-        m_unk_0x30 = 0.0f;
+        m_analogLeftX = 0.0f;
+        m_analogLeftY = 0.0f;
+        m_analogRightX = 0.0f;
+        m_analogRightY = 0.0f;
     }
 
     PadBackend::Update(dt);
@@ -113,22 +113,22 @@ float PadMonkey::GetButtonStateTime(int button, bool remap)
 
 float PadMonkey::AnalogLeftX()
 {
-    return m_unk_0x24;
+    return m_analogLeftX;
 }
 
 float PadMonkey::AnalogLeftY()
 {
-    return m_unk_0x28;
+    return m_analogLeftY;
 }
 
 float PadMonkey::AnalogRightX()
 {
-    return m_unk_0x2C;
+    return m_analogRightX;
 }
 
 float PadMonkey::AnalogRightY()
 {
-    return m_unk_0x30;
+    return m_analogRightY;
 }
 
 bool PadMonkey::RumbleActive()

@@ -22,9 +22,9 @@ GLVertexAnim::GLVertexAnim(const void* data, const void* extraData)
     m_uHashID = header->m_00;
     m_nNumFrames = header->m_04;
     m_nNumVertices = header->m_08;
-    m_Unknown0C = header->m_0C;
+    m_nVertexStride = header->m_0C;
     m_Unknown10 = header->m_10;
-    m_Unknown14 = header->m_14;
+    m_nNumAnimatedStreams = header->m_14;
 
     m_eMode = GLVAnimMode_Loop;
     m_bDone = false;
@@ -34,13 +34,13 @@ GLVertexAnim::GLVertexAnim(const void* data, const void* extraData)
     m_pVertices = 0;
     m_pModel = 0;
 
-    m_Unknown18 = (s32*)nlMalloc(m_Unknown14 * sizeof(s32), 8, false);
-    memcpy(m_Unknown18, extraData, m_Unknown14 * sizeof(s32));
+    m_pAnimatedStreamIDs = (s32*)nlMalloc(m_nNumAnimatedStreams * sizeof(s32), 8, false);
+    memcpy(m_pAnimatedStreamIDs, extraData, m_nNumAnimatedStreams * sizeof(s32));
 }
 
 GLVertexAnim::~GLVertexAnim()
 {
-    delete m_Unknown18;
+    delete m_pAnimatedStreamIDs;
 }
 
 glModel* GLVertexAnim::GetModel(int frame)
@@ -49,7 +49,7 @@ glModel* GLVertexAnim::GetModel(int frame)
 
     glModel* model = glModelDupNoStreams(m_pModel, false, 0);
     u8* vertices = m_pVertices
-                 + actualFrame * m_Unknown0C * m_nNumVertices;
+                 + actualFrame * m_nVertexStride * m_nNumVertices;
 
     for (glModelPacket* packet = model->packets;
          packet < model->packets + model->numPackets; packet++)
@@ -59,9 +59,9 @@ glModel* GLVertexAnim::GetModel(int frame)
         u32 offset = 0;
         for (int i = 0; streams + i < endVertexData; i++)
         {
-            for (int j = 0; j < m_Unknown14; j++)
+            for (int j = 0; j < m_nNumAnimatedStreams; j++)
             {
-                if (m_Unknown18[j] == streams[i].id)
+                if (m_pAnimatedStreamIDs[j] == streams[i].id)
                 {
                     glSetStreamAddress(&streams[i],
                         vertices + offset * packet->numUniqueVertices);

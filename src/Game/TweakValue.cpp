@@ -67,4 +67,3 @@ bool TweakBindingBase::Bind(const char* name, float value,
     }
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

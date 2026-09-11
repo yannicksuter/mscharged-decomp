@@ -881,7 +881,7 @@ void SHHallOfFameHistory::UpdateTitle()
             nlStringLowerHash("Layer"), historyHash, titleHash, titlesHash, 0, 0);
     if (titleText == 0)
     {
-        titleText = &gDefaultTLTextInstance;
+        titleText = &UnidentifiedTLTextDefault::sInstance;
     }
 
     switch (mMode)
@@ -928,7 +928,7 @@ void SHHallOfFameHistory::UpdateCupRecordText()
             nlStringLowerHash("Layer"), historyHash, recordHash, 0, 0, 0);
     if (recordText == 0)
     {
-        recordText = &gDefaultTLTextInstance;
+        recordText = &UnidentifiedTLTextDefault::sInstance;
     }
 
     char monthString[4];
@@ -987,7 +987,7 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
                 nlStringLowerHash("Layer"), historyHash, goalsForHash, 0, 0, 0);
         if (goalsText == 0)
         {
-            goalsText = &gDefaultTLTextInstance;
+            goalsText = &UnidentifiedTLTextDefault::sInstance;
         }
         goalsText->m_bVisible = false;
 
@@ -997,7 +997,7 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
                 nlStringLowerHash("Layer"), historyHash, goalsAgainstHash, 0, 0, 0);
         if (goalsText == 0)
         {
-            goalsText = &gDefaultTLTextInstance;
+            goalsText = &UnidentifiedTLTextDefault::sInstance;
         }
         break;
     }
@@ -1013,7 +1013,7 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
                 nlStringLowerHash("Layer"), historyHash, goalsAgainstHash, 0, 0, 0);
         if (goalsText == 0)
         {
-            goalsText = &gDefaultTLTextInstance;
+            goalsText = &UnidentifiedTLTextDefault::sInstance;
         }
         goalsText->m_bVisible = false;
 
@@ -1023,7 +1023,7 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
                 nlStringLowerHash("Layer"), historyHash, goalsForHash, 0, 0, 0);
         if (goalsText == 0)
         {
-            goalsText = &gDefaultTLTextInstance;
+            goalsText = &UnidentifiedTLTextDefault::sInstance;
         }
         break;
     }
@@ -1050,7 +1050,7 @@ void SHHallOfFameHistory::UpdateDateText()
             nlStringLowerHash("Layer"), historyHash, dateHash, 0, 0, 0);
     if (dateText == 0)
     {
-        dateText = &gDefaultTLTextInstance;
+        dateText = &UnidentifiedTLTextDefault::sInstance;
     }
 
     WideBasicString unformatted;
@@ -1215,7 +1215,7 @@ void SHHallOfFamePlayerCard::SceneCreated()
             nlStringLowerHash("Layer"), nlStringLowerHash("player card"), 0, 0, 0, 0);
     if (playerCard == 0)
     {
-        playerCard = &gDefaultTLComponentInstance;
+        playerCard = &UnidentifiedTLComponentDefault::sInstance;
     }
 
     if (mIsUnlocked)
@@ -1462,7 +1462,7 @@ void SHHallOfFamePlayerCard::UpdateImages()
     }
     if (image0 == 0)
     {
-        image0 = &gDefaultTLImageInstance;
+        image0 = &UnidentifiedTLImageDefault::sInstance;
     }
 
     {
@@ -1473,7 +1473,7 @@ void SHHallOfFamePlayerCard::UpdateImages()
     }
     if (image1 == 0)
     {
-        image1 = &gDefaultTLImageInstance;
+        image1 = &UnidentifiedTLImageDefault::sInstance;
     }
 
     name0 = 0;

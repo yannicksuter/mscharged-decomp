@@ -1,4 +1,5 @@
 #include "unclassified/tu_801FADB4.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlSlide.h"

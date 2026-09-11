@@ -65,6 +65,8 @@
 #include "NL/glx/GXMaterialProgram_80298B18.h"
 #include "math.h"
 #include <stddef.h>
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 extern PhysicsWorld* g_PhysicsWorld;
 
@@ -2739,14 +2741,14 @@ void cCharacter::fn_80022E60()
                                 glSetMaterialTextureIndexParameter(packet, lbl_8056B7B0[k], &resolvedTexture);
                             }
                         }
-                        if (packet->unknown10 == GXMaterialProgram_80298B18::Instance)
+                        if (packet->materialProgram == GXMaterialProgram_80298B18::Instance)
                         {
                             glGetTextureManager()->ResolveTextureIndex(
-                                &((GXMaterialProgramParameters_80298B18*)packet->unknown20)->texture4);
+                                &((GXMaterialProgramParameters_80298B18*)packet->materialParameters)->texture4);
                             glGetTextureManager()->ResolveTextureIndex(
-                                &((GXMaterialProgramParameters_80298B18*)packet->unknown20)->texture5);
+                                &((GXMaterialProgramParameters_80298B18*)packet->materialParameters)->texture5);
                             glGetTextureManager()->ResolveTextureIndex(
-                                &((GXMaterialProgramParameters_80298B18*)packet->unknown20)->texture3);
+                                &((GXMaterialProgramParameters_80298B18*)packet->materialParameters)->texture3);
                         }
                     }
                 }

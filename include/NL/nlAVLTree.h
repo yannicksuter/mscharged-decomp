@@ -143,6 +143,15 @@ public:
         return &((Entry*)existingNode)->value;
     }
 
+    ValueType* UnidentifiedAddOrGet(const KeyType& key, bool& added)
+    {
+        AVLTreeNode* existingNode;
+        AVLTreeNode* node = AddAVLNode(
+            (AVLTreeNode**)&m_Root, (void*)&key, 0, &existingNode);
+        added = existingNode == 0;
+        return &((Entry*)node)->value;
+    }
+
     void Remove(const KeyType& key)
     {
         AVLTreeNode* removedNode = RemoveAVLNode((AVLTreeNode**)&m_Root, (void*)&key);

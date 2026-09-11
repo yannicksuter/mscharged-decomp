@@ -2,12 +2,15 @@
 
 #include "Game/Task/EndFrameTask.h"
 
+unsigned char gDrawScreenBorder;
+
 #include "Game/Debug/FrameCounter.h"
 #include "Game/HBMManager.h"
 #include "Game/Render/RLView.h"
 #include "NL/gl/gl.h"
 #include "types.h"
 #include "Game/Render/Warble.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 void EndFrameTask::Run(float)
 {

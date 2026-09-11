@@ -68,4 +68,3 @@ void Impostor::Release()
     }
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

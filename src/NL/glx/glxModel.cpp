@@ -20,14 +20,14 @@ void glplatSetMatrix(unsigned long matrix, const nlMatrix4& m)
 void glplatFinalizePacket(
     glModelPacket* packet, bool permanent, void* allocator)
 {
-    ((GLMaterialProgram*)packet->unknown10)->Configure(packet);
+    ((GLMaterialProgram*)packet->materialProgram)->Configure(packet);
     packet->displayList = 0;
     if (permanent)
     {
         packet->displayList = dlMakeDisplayList(packet, allocator, permanent);
     }
-    packet->unknown2C = 0;
-    packet->unknown28 = 0;
+    packet->skinnedNormals = 0;
+    packet->skinnedVertices = 0;
 }
 
 void glplatOnPacketCloned(glModelPacket*, void*)

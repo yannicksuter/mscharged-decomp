@@ -44,7 +44,7 @@ extern "C" void fn_802A20F0(void*, const glModelPacket*)
 
 extern "C" void fn_802A20F4(void* renderer, const glModelPacket* packet)
 {
-    Parameter_802A20F4* parameter = static_cast<Parameter_802A20F4*>(packet->unknown20);
+    Parameter_802A20F4* parameter = static_cast<Parameter_802A20F4*>(packet->materialParameters);
     GXColor colour;
     colour.r = static_cast<u8>(lbl_806E5F80 * parameter->red);
     colour.g = static_cast<u8>(lbl_806E5F80 * parameter->green);

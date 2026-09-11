@@ -5,6 +5,9 @@
 
 extern void nlBreak();
 
+bool g_bPrintMemoryNewLowWaterMarks;
+bool g_bActivateMemoryLowWaterMarkChecking;
+
 char sTotalFreeMemoryFormat[] = "Total Free Memory: %d\n";
 char sLargestFreeBlockFormat[] = "Largest Free Block: %d\n";
 char sFreePanicDumpFilename[] = "FreePanicDump.txt";

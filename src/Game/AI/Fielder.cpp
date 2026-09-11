@@ -298,6 +298,11 @@ cFielder::~cFielder()
     delete mUnidentified428;
 }
 
+float cFielder::fn_8002E058()
+{
+    return mUnidentified3A8;
+}
+
 extern "C" Desire* fn_8002E08C(cFielder* pFielder, int nAction)
 {
     shdStateMachine* pAction

@@ -3,7 +3,7 @@
 
 #include "Game/AI/Desire.h"
 
-extern UnidentifiedStateTransition lbl_806E20B8;
+extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 class DesireSuperPower;
 extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);

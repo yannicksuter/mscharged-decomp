@@ -31,6 +31,9 @@ public:
     u32 m_14;
 };
 
+extern bool g_bPrintMemoryNewLowWaterMarks;
+extern bool g_bActivateMemoryLowWaterMarkChecking;
+
 extern MemoryAllocator StandardAllocator;
 extern MemoryAllocator VirtualAllocator;
 extern MemoryAllocator* CurrentAllocator;

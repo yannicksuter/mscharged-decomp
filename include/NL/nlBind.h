@@ -120,17 +120,36 @@ public:
     }
 
     template <typename P0, typename P1>
-    R operator()(P0 p0, P1 p1)
+    R operator()(P0& p0, P1& p1)
     {
         return DoCall(p0, p1, mT0, mT1, mT2);
     }
 
+    template <typename P>
+    R operator()(P& p0)
+    {
+        return DoCall(p0, mT0, mT1, mT2);
+    }
+
 private:
+    template <typename P, typename A1, typename B1>
+    R DoCall(P& p0, const A1& t0, const B1& t1, const Placeholder<0>&)
+    {
+        return mFunction(t0, t1, p0);
+    }
+
     template <typename P0, typename P1, typename A1>
-    R DoCall(P0 p0, P1 p1, const A1& t0, const Placeholder<0>&,
+    R DoCall(P0& p0, P1& p1, const A1& t0, const Placeholder<0>&,
         const Placeholder<1>&)
     {
         return mFunction(t0, p0, p1);
+    }
+
+    template <typename P0, typename P1, typename C1>
+    R DoCall(P0& p0, P1& p1, const Placeholder<0>&,
+        const Placeholder<1>&, const C1& t2)
+    {
+        return mFunction(p0, p1, t2);
     }
 };
 
@@ -173,7 +192,20 @@ public:
         return DoCall(p0, mT0, mT1, mT2, mT3);
     }
 
+    template <typename P0, typename P1>
+    R operator()(P0& p0, P1& p1)
+    {
+        return DoCall(p0, p1, mT0, mT1, mT2, mT3);
+    }
+
 private:
+    template <typename P0, typename P1, typename A1, typename D1>
+    R DoCall(P0& p0, P1& p1, const A1& t0, const Placeholder<0>&,
+        const Placeholder<1>&, const D1& t3)
+    {
+        return mFunction(t0, p0, p1, t3);
+    }
+
     template <typename P, typename B1, typename C1, typename D1>
     R DoCall(P& p0, const Placeholder<0>&, const B1& t1, const C1& t2,
         const D1& t3)

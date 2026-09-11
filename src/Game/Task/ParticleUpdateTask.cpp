@@ -1,6 +1,7 @@
 #include "Game/Task/ParticleUpdateTask.h"
 
 #include "Game/Effects/EmissionManager.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 ParticleUpdateTask* ParticleUpdateTask::sInstance;
 

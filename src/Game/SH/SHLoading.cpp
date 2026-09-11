@@ -197,7 +197,7 @@ void BaseLoadingScene::SceneCreated()
             mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0, 0);
     if (transitionComponent == 0)
     {
-        transitionComponent = &gDefaultTLComponentInstance;
+        transitionComponent = &UnidentifiedTLComponentDefault::sInstance;
     }
     mTransitionComponent = (TLComponentInstance*)transitionComponent;
     mTransitionComponent->m_bVisible = false;

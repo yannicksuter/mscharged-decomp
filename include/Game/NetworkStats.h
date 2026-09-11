@@ -28,8 +28,8 @@ struct NetworkRankingMeta
 {
     NetworkRankingMeta()
     {
-        mMonth = 1;
         mDay = 1;
+        mMonth = 1;
         mYear = 2000;
         mScore = 0;
         mDisplayRank = 0;
@@ -47,8 +47,8 @@ struct NetworkRankingMeta
         mUnidentified14 = 0;
     }
 
-    /* 0x00 */ u8 mMonth;
-    /* 0x01 */ u8 mDay;
+    /* 0x00 */ u8 mDay;
+    /* 0x01 */ u8 mMonth;
     /* 0x02 */ u16 mYear;
     /* 0x04 */ int mScore;
     /* 0x08 */ int mDisplayRank;
@@ -59,8 +59,8 @@ struct NetworkRankingMeta
 
 struct NetworkScoreSubmission
 {
-    /* 0x00 */ u8 mMonth;
-    /* 0x01 */ u8 mDay;
+    /* 0x00 */ u8 mDay;
+    /* 0x01 */ u8 mMonth;
     /* 0x02 */ u16 mYear;
     /* 0x04 */ int mScore;
     /* 0x08 */ int mUnidentified08;
@@ -146,8 +146,8 @@ public:
 struct NetworkRankingSubmission
 {
     NetworkRankingSubmission()
-        : mMonth(1)
-        , mDay(1)
+        : mDay(1)
+        , mMonth(1)
         , mYear(2000)
         , mWins(0)
         , mLosses(0)
@@ -158,8 +158,8 @@ struct NetworkRankingSubmission
         memset(mDigest, 0, sizeof(mDigest));
     }
 
-    /* 0x00 */ u8 mMonth;
-    /* 0x01 */ u8 mDay;
+    /* 0x00 */ u8 mDay;
+    /* 0x01 */ u8 mMonth;
     /* 0x02 */ u16 mYear;
     /* 0x04 */ int mWins;
     /* 0x08 */ int mLosses;
@@ -181,8 +181,8 @@ struct NetworkRankingIdentity
 {
     void LoadLocal();
 
-    /* 0x00 */ u8 mMonth;
-    /* 0x01 */ u8 mDay;
+    /* 0x00 */ u8 mDay;
+    /* 0x01 */ u8 mMonth;
     /* 0x02 */ u16 mYear;
 }; // size: 0x4
 

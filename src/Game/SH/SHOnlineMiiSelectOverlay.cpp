@@ -422,7 +422,7 @@ void SHOnlineMiiSelectOverlay::Update(float fDeltaT)
             0);
         if (image == 0)
         {
-            image = &gDefaultTLImageInstance;
+            image = &UnidentifiedTLImageDefault::sInstance;
         }
 
         unsigned long textureReference = g_pMiiManager->mIconTextureIds[mIconIndex];

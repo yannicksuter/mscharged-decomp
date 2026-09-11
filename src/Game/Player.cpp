@@ -21,6 +21,8 @@
 #include "NL/nlMain.h"
 #include "Game/NetworkInput.h"
 #include "unclassified/tu_801B535C.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 extern "C" cPlayer* fn_80096514(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,

@@ -44,10 +44,10 @@ public:
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual void PreUpdate();
     virtual void PostUpdate();
-    virtual void PreCollide();
+    virtual void PreCollide() { }
     virtual ContactType Contact(PhysicsObject*, dContact*, int);
     virtual ContactType Contact(PhysicsObject*, dContact*, int, PhysicsObject*);
-    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void SyncLog(void*, DebugWriteCache*) { }
 
     void CloneObject(const PhysicsObject&);
     void MakeStatic();

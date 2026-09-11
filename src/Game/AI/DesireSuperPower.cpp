@@ -20,6 +20,8 @@
 #include "NL/nlString.h"
 #include "unclassified/tu_801B535C.h"
 #include <stdlib.h>
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >

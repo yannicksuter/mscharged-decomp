@@ -10,6 +10,7 @@
 #include "Game/Physics/PhysicsFakeBall.h"
 #include "math.h"
 #include "types.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 float g_BallFriction = 5.0f;
 float g_BallFrictionWall = 4.0f;

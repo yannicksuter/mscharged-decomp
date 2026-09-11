@@ -23,10 +23,10 @@ public:
     /* 0x00 */ u32 m_uHashID;
     /* 0x04 */ u32 m_nNumFrames;
     /* 0x08 */ s32 m_nNumVertices;
-    /* 0x0C */ u32 m_Unknown0C;
+    /* 0x0C */ u32 m_nVertexStride;
     /* 0x10 */ u32 m_Unknown10;
-    /* 0x14 */ u32 m_Unknown14;
-    /* 0x18 */ s32* m_Unknown18;
+    /* 0x14 */ u32 m_nNumAnimatedStreams;
+    /* 0x18 */ s32* m_pAnimatedStreamIDs;
     /* 0x1C */ eGLVertAnimMode m_eMode;
     /* 0x20 */ bool m_bDone;
     /* 0x21 */ u8 m_pad21[3];

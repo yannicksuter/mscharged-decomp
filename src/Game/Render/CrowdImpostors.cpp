@@ -229,8 +229,6 @@ static ImpostorCluster* sCrowdCluster;
 static bool sLockCrowdImpostorAnimation;
 CrowdModelCollection gCrowdModelCollection;
 
-
-
 void UpdateImpostorPositions()
 {
     nlVector3 viewVector;
@@ -283,7 +281,6 @@ void LoadCrowdCharacterList()
 
     gCrowdModelCollection.Initialize(sCrowdLoadDefinitions.data, sNumCrowdCharacters);
 }
-
 
 void InitializeCrowdImpostors(bool alternateView)
 {
@@ -491,4 +488,3 @@ CrowdImpostorCharacter::~CrowdImpostorCharacter()
 {
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

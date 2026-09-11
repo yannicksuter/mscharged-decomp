@@ -31,7 +31,6 @@ static bool sCrowdRegistrationDisabled;
 static int sNumGeneratedCrowdMembers;
 static int sNumVisibleCrowdMembers;
 
-
 class CrowdPointCallback
 {
 public:
@@ -49,8 +48,6 @@ public:
     /* 0x09 */ u8 mPadding009[3];
     /* 0x0C */ CrowdLayoutRecord* mLayout;
 }; // size: 0x10
-
-
 
 extern "C" void fn_802D88F4(
     CrowdLayoutObject* object)
@@ -489,4 +486,3 @@ void CrowdPointCallback::Place(
         mLayout->mBoundsMax.z = boundsMax.z;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

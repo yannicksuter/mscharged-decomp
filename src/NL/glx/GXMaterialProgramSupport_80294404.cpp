@@ -9,6 +9,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C"
 {
@@ -128,7 +129,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029DE3C>::Prepare(
     const glModelPacket* packet)
 {
-    unsigned char* parameters = (unsigned char*)packet->unknown20;
+    unsigned char* parameters = (unsigned char*)packet->materialParameters;
     glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)parameters);
     unsigned int& rasterState = *(unsigned int*)&packet->rasterState;
 
@@ -155,7 +156,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029DE3C>::Draw(
     program->BindVertexArrays(packet);
     program->BindParameters(packet);
 
-    unsigned char* parameters = (unsigned char*)packet->unknown20;
+    unsigned char* parameters = (unsigned char*)packet->materialParameters;
     if (*(int*)(parameters + 20) == 1)
     {
         glTextureBinding* texture = (glTextureBinding*)parameters;

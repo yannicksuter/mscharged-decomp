@@ -23,29 +23,9 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/gl/glTexture.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 #pragma cpp_extensions on
-
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
 
 struct PoseNode
 {
@@ -139,7 +119,6 @@ extern "C" SkinMesh* fn_8001C550(cCharacter*, int);
 extern "C" void fn_8001EFCC(cCharacter*, SkinMesh*, Model*);
 extern "C" void fn_80182EC8(int);
 extern "C" int fn_800FC748(int);
-extern "C" int fn_80183DEC(const nlVector3*);
 extern "C" RLView* fn_8027261C();
 extern "C" void fn_80273A4C(int, Model*, int);
 
@@ -205,8 +184,6 @@ bool DrawableCharacter::sCameraRelativeLighting;
 
 extern int lbl_806E0F54;
 extern TaskManager* m_pInstance__13nlTaskManager;
-
-
 
 static inline float DegreesToRadians(float degrees)
 {
@@ -1529,4 +1506,3 @@ bool DrawableCharacter::NoShadowCallback()
     return false;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

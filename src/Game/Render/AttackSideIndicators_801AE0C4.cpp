@@ -5,6 +5,7 @@
 #include "Game/Team.h"
 #include "NL/nlList.h"
 #include "NL/nlTask.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 // Stadium drawables that are revealed in index order on the half of the field
 // a team attacks. The world loader registers every such object through

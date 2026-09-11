@@ -4,6 +4,8 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/Character.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 // Render object table type 6 is "art/objects/gameplay/daisy_fist".
 

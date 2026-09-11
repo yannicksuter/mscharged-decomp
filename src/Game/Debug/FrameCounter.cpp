@@ -18,9 +18,6 @@
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 
-extern "C" const char lbl_8052B590[];
-extern "C" const char lbl_8052B5A0[];
-
 FrameCounter* lbl_806E1DC0;
 
 int FrameCounter::NUM_FRAMES_TO_AVERAGE_OVER = 30;
@@ -38,6 +35,9 @@ static nlColour sMediumColour = { 192, 192, 0, 255 };
 static nlColour sHappyColour = { 0, 192, 0, 255 };
 static nlColour FrameBackgroundColour = { 0, 0, 0, 128 };
 static const char* FrameCounterOutputString = "%2.2fFPS %0.3fms [%0.3fms %s, %0.3fms %s]";
+
+const float lbl_806E6178 = 17.0f;
+const float lbl_806E617C = 10.0f;
 
 nlListContainer<TimeRegion*> TimeRegion::sTimeRegionList;
 
@@ -159,7 +159,7 @@ void FrameCounter::fn_802B7FD4()
     while (entry != 0)
     {
         TimeRegion* current = entry->entry;
-        if (nlStrICmp(current->m_pName, lbl_8052B590) == 0)
+        if (nlStrICmp(current->m_pName, "during gameplay") == 0)
         {
             region = current;
             break;
@@ -186,7 +186,7 @@ void FrameCounter::fn_802B80C4()
     while (entry != 0)
     {
         TimeRegion* current = entry->entry;
-        if (nlStrICmp(current->m_pName, lbl_8052B590) == 0)
+        if (nlStrICmp(current->m_pName, "during gameplay") == 0)
         {
             region = current;
             break;
@@ -202,7 +202,7 @@ void FrameCounter::fn_802B80C4()
         {
             float threshold = fn_802B98C8(data, index);
             int count = fn_802B974C(data, index);
-            nlSNPrintf(name, sizeof(name), lbl_8052B5A0, threshold);
+            nlSNPrintf(name, sizeof(name), "percent of gameplay frames below %0.0f ms", threshold);
             fn_802BD718(name, 0, (float)count);
         }
     }

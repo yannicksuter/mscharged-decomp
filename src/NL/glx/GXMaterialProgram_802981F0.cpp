@@ -2,6 +2,11 @@
 
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/gl/glLoadModel.h"
+#include "Game/UnidentifiedStaticStorage.h"
+
+GXPrimitive glx_PrimitiveTypes[6] = {
+    GX_TRIANGLES, GX_TRIANGLESTRIP, GX_TRIANGLEFAN, GX_QUADS, GX_LINES, GX_LINESTRIP
+};
 
 GXMaterialProgram_802981F0* GXMaterialProgram_802981F0::Instance;
 bool GXMaterialProgram_802981F0::Initialized;
@@ -75,8 +80,8 @@ void GXMaterialProgram_802981F0::BindVertexArrays(const glModelPacket* packet)
 
 void GXMaterialProgram_802981F0::BindParameters(const glModelPacket* packet)
 {
-    glx_BindTexture(0, (glTextureBinding*)(packet->unknown20));
-    glx_BindTexture(1, (glTextureBinding*)((unsigned char*)packet->unknown20 + 8));
+    glx_BindTexture(0, (glTextureBinding*)(packet->materialParameters));
+    glx_BindTexture(1, (glTextureBinding*)((unsigned char*)packet->materialParameters + 8));
 }
 
 const GXMaterialParameter* GXMaterialProgram_802981F0::GetParameters()

@@ -4,6 +4,7 @@
 #include "Game/NetworkSession.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "NL/nlString.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 void NetworkStartScene::DeselectMenuItem(TLComponentInstance* component)
 {

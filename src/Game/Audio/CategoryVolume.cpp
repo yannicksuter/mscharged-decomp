@@ -2,12 +2,13 @@
 #include "Game/Audio/AudioSystem.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioEffect.h"
-#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlAlgorithm.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
 #include "types.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 class CategoryVolumeParameter
     : public AudioEffectParameter
@@ -118,34 +119,6 @@ SlotPool<CategoryVolume> CategoryVolume::s_Pool(16, 16);
 extern bool gCategoryVolumeOverrideEnabled;
 extern s32 gCategoryVolumeOverride;
 
-AuxEffectMap::AuxEffectMap()
-{
-    m_Effects[0] = -1;
-    m_Effects[1] = -1;
-    m_Indices[0] = -1;
-    m_Indices[1] = -1;
-}
-
-int AuxEffectMap::AssignAuxiliary(const int& effect)
-{
-    int& effectIndex = m_Indices[effect];
-    for (u16 index = 0; index < 2; ++index)
-    {
-        if (m_Effects[index] == -1)
-        {
-            m_Effects[index] = effect;
-            effectIndex = index;
-            break;
-        }
-    }
-    return effectIndex;
-}
-
-int AuxEffectMap::GetAuxiliary(const int& effect) const
-{
-    return m_Indices[effect];
-}
-
 CategoryVolumeParameter::CategoryVolumeParameter()
     : m_Volume(0.0f)
     , m_Category(0)
@@ -225,4 +198,3 @@ CategoryVolume::~CategoryVolume()
 {
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

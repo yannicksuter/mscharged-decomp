@@ -17,6 +17,7 @@
 
 #include <string.h>
 #include "NL/gl/glTexture.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static int QuadMap[4] = { 0, 1, 2, 3 };
 static int TriListMap[6] = { 0, 1, 2, 3, 0, 2 };
@@ -91,7 +92,7 @@ extern "C" glModel* fn_802C834C(glPoly2* pPolys,
             unsigned char wrapT = !clampT;
 
             u32 texture = glGetCurrentTexture(GLTT_Diffuse);
-            glTextureBinding* state = (glTextureBinding*)writer.model->packets->unknown20;
+            glTextureBinding* state = (glTextureBinding*)writer.model->packets->materialParameters;
             state->texture = texture;
             state->textureIndex = 0xFFFF;
             state->SetWrapS(wrapS);
@@ -116,7 +117,7 @@ extern "C" glModel* fn_802C834C(glPoly2* pPolys,
                         pPoly->depth);
                 }
             }
-            glTextureBinding* state = (glTextureBinding*)writer.model->packets->unknown20;
+            glTextureBinding* state = (glTextureBinding*)writer.model->packets->materialParameters;
             state->texture = gWhiteTextureID;
             state->textureIndex = 0xFFFF;
             state->SetWrapS(true);
@@ -226,7 +227,7 @@ extern "C" glModel* fn_802C89F4(glPoly2* pPolys,
             unsigned char wrapT = !clampT;
 
             u32 texture = glGetCurrentTexture(GLTT_Diffuse);
-            glTextureBinding* state = (glTextureBinding*)writer.model->packets->unknown20;
+            glTextureBinding* state = (glTextureBinding*)writer.model->packets->materialParameters;
             state->texture = texture;
             state->textureIndex = 0xFFFF;
             state->SetWrapS(wrapS);
@@ -251,7 +252,7 @@ extern "C" glModel* fn_802C89F4(glPoly2* pPolys,
                         pPoly->depth);
                 }
             }
-            glTextureBinding* state = (glTextureBinding*)writer.model->packets->unknown20;
+            glTextureBinding* state = (glTextureBinding*)writer.model->packets->materialParameters;
             state->texture = gWhiteTextureID;
             state->textureIndex = 0xFFFF;
             state->SetWrapS(true);

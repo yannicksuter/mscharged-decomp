@@ -74,7 +74,7 @@ UnidentifiedFuzzyRuntimeList lbl_806E20A8(0, 0);
 nlAVLTreeSlotPool<unsigned long, UnidentifiedVariant_80054AB8,
     DefaultKeyCompare<unsigned long> > lbl_805842EC(16, 16);
 UnidentifiedRuntimeTypeList lbl_806E20B0;
-BasicSlotPool<UnidentifiedRuntimeActionQueue> lbl_80584328(16, 16);
+SlotPool<UnidentifiedRuntimeActionQueue> lbl_80584328(16, 16);
 
 extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311734(
     UnidentifiedFuzzyRuntimeReference* reference)
@@ -548,18 +548,20 @@ extern "C" void fn_80313FA0(
     UnidentifiedFuzzyRuntimeBase* runtime, bool value,
     unsigned long hash, UnidentifiedVariant_80054AB8* action)
 {
+    int index = fn_80312208(hash);
     FuzzyVariant variant(FT_BOOL, value);
     runtime->UnidentifiedVirtual14(
-        action, fn_80312208(hash), variant);
+        action, index, variant);
 }
 
 extern "C" void fn_80314034(
     UnidentifiedFuzzyRuntimeBase* runtime, unsigned long hash,
     float value, UnidentifiedVariant_80054AB8* action)
 {
+    int index = fn_80312208(hash);
     FuzzyVariant variant(FT_FLOAT, value);
     runtime->UnidentifiedVirtual14(
-        action, fn_80312208(hash), variant);
+        action, index, variant);
 }
 
 extern "C" void fn_803140CC(

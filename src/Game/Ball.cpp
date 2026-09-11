@@ -47,6 +47,8 @@
 #include "Game/Render/StadiumLoading.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/Render/StadiumLoading.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 struct UnidentifiedBallRuntime
 {

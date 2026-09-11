@@ -14,6 +14,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 
 static int sImpostorTriangleIndices[6] = { 0, 1, 2, 0, 2, 3 };
@@ -397,7 +398,7 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
             texture = checkerTexture;
         }
         glTextureBinding* textureState =
-            (glTextureBinding*)writer->model->packets->unknown20;
+            (glTextureBinding*)writer->model->packets->materialParameters;
         textureState->texture = texture;
         textureState->textureIndex = 0xFFFF;
         textureState->SetWrapS(true);

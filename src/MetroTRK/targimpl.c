@@ -536,7 +536,7 @@ L_802CF694:
 // clang-format on
 
 // clang-format off
-static ASM void TRKExceptionHandler(u16 r3) {
+static ASM void TRKExceptionHandler(u16 exceptionID) {
     nofralloc
 
     addis         r2, r0, gTRKExceptionStatus@h

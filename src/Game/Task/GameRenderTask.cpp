@@ -158,10 +158,10 @@ static void RenderImageQuad(GLView* view, unsigned long texture,
 
     if (writer.Begin(4, primitive, 0))
     {
-        memcpy((u8*)writer.model->packets->unknown20 + 8, pExtraTextureStates, 0x10);
+        memcpy((u8*)writer.model->packets->materialParameters + 8, pExtraTextureStates, 0x10);
 
         glTextureBinding* state
-            = (glTextureBinding*)writer.model->packets->unknown20;
+            = (glTextureBinding*)writer.model->packets->materialParameters;
         state->texture = texture;
         state->textureIndex = 0xFFFF;
         state->SetWrapS(1);
@@ -554,4 +554,3 @@ bool fn_80115EB0()
     return lbl_806DC7F5;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

@@ -5,6 +5,7 @@
 #include "Game/DebugWriteCache.h"
 #include "Game/Team.h"
 #include <stddef.h>
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" bool fn_8002EDC8(cFielder*, int);
 static unsigned short sDesireUsePowerupType = 0xFFFF;

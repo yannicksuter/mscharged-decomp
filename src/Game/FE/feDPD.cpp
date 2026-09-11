@@ -18,6 +18,7 @@
 #include "NL/plat/DPDData.h"
 #include "decomp.h"
 #include "Game/Render/RLViewLayers.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 TLComponentInstance* gFEPointerInstances[4];
 nlVector2 gFEPointerPositions[4];

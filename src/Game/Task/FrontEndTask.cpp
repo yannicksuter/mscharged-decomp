@@ -32,7 +32,6 @@
 
 #include <math.h>
 
-
 float g_fE3DebugTime;
 float g_fUpTime;
 float g_fIdleGameTime;
@@ -320,4 +319,3 @@ void FEResourceManager::Run(float dt)
     Update(dt);
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

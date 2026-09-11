@@ -1,4 +1,5 @@
 #include "NL/nlDebugString.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 #include "Game/Audio/SoundMap.h"
 #include "Game/Sys/debug.h"
 

@@ -5,8 +5,8 @@
 #include "Game/Sys/debug.h"
 
 #include "NL/nlChunk.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedSoundPools.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlDebugFile.h"
@@ -187,5 +187,3 @@ void AudioFileLoader::Unload()
     m_File = 0;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
-template struct UnidentifiedSoundPools<UnidentifiedSoundPoolTag>;

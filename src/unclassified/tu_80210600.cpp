@@ -175,7 +175,7 @@ void TU80210600Scene::fn_80211FA4()
         0);
     if (upperOver == 0)
     {
-        upperOver = &gDefaultTLImageInstance;
+        upperOver = &UnidentifiedTLImageDefault::sInstance;
     }
     feVector3 upperPosition = mUnidentified9AC->GetAssetPosition();
     mUnidentified4A8.SetInstanceBounds(
@@ -195,7 +195,7 @@ void TU80210600Scene::fn_80211FA4()
             0);
         if (over == 0)
         {
-            over = &gDefaultTLImageInstance;
+            over = &UnidentifiedTLImageDefault::sInstance;
         }
         mUnidentified610[i].SetInstanceBounds(
             over, true, position.f.x, position.f.y, 0.95f, 0.6f);

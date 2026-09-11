@@ -1,7 +1,7 @@
 #include "Game/AI/FuzzyVariant.h"
 
 UnidentifiedFuzzyVariantData lbl_805841D8;
-BasicSlotPool<UnidentifiedFuzzyVariantData> lbl_80584200(16, 16);
+SlotPool<UnidentifiedFuzzyVariantData> lbl_80584200(16, 16);
 
 UnidentifiedVariantCollection::UnidentifiedVariantCollection()
 {

@@ -1,5 +1,6 @@
 #include "Game/World/WorldVisibility.h"
 #include "Game/World/worldanim.h"
+#include "Game/World/WorldPhysicsDescription.h"
 
 #include "Game/Physics/PhysicsBox.h"
 #include "Game/Physics/PhysicsCapsule.h"
@@ -33,16 +34,6 @@ extern "C" void fn_802E4358(EmissionController*);
 extern "C" float fn_802E5A68(EmissionController*);
 extern "C" EffectsGroup* fn_802E7D54(
     EmissionManager*, unsigned long);
-
-struct WorldPhysicsDescription_80341EEC
-{
-    /* 0x00 */ nlMatrix4 m_transform;
-    /* 0x40 */ unsigned long m_uType;
-    /* 0x44 */ float m_f44;
-    /* 0x48 */ float m_f48;
-    /* 0x4C */ float m_f4C;
-    /* 0x50 */ float m_f50;
-};
 
 struct WorldPhysicsOwner_80342170
 {
@@ -105,7 +96,6 @@ struct WorldVertexAnimDrawable_80343E3C
 
 extern "C" WorldVisibilityNode* fn_80343F78(
     WorldVertexAnimDrawable_80343E3C*, WorldVisibilityNode*);
-
 
 extern "C" void fn_80341EE8(void*)
 {
@@ -433,7 +423,7 @@ extern "C" void fn_80343E3C(
 
     WorldVisibilityNode* pNode
         = pContext->m_pWorld->m_pVisibilityTree;
-    unsigned long uModelHash = pObject->m_pModel->unknown00;
+    unsigned long uModelHash = pObject->m_pModel->id;
     for (int i = 0; i < pNode->mNumModelHashes; ++i)
     {
         if (pNode->mModelHashes[i] == uModelHash)
@@ -478,7 +468,7 @@ extern "C" WorldVisibilityNode* fn_80343F78(
     WorldVertexAnimDrawable_80343E3C* pObject,
     WorldVisibilityNode* pNode)
 {
-    unsigned long uModelHash = pObject->m_pModel->unknown00;
+    unsigned long uModelHash = pObject->m_pModel->id;
     for (int i = 0; i < pNode->mNumModelHashes; ++i)
     {
         if (pNode->mModelHashes[i] == uModelHash)
@@ -972,4 +962,3 @@ void WorldAnimController::SetWorldMatrix(
     m_worldMatrix = worldMatrix;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

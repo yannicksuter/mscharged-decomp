@@ -31,7 +31,7 @@ inline TLComponentInstance* CreditScene::GetWhiteFadeComponent()
         mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("WHITE FADE"), 0, 0, 0, 0);
     if (result == 0)
     {
-        result = &gDefaultTLComponentInstance;
+        result = &UnidentifiedTLComponentDefault::sInstance;
     }
     return result;
 }

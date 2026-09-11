@@ -15,4 +15,6 @@ public:
 
 extern bool g_bTweaking;
 
+void fn_802BDA28();
+
 #endif // GAME_TWEAKER_TASK_H

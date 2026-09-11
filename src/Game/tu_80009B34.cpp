@@ -1,7 +1,8 @@
 #include "Game/AI/Fielder.h"
 #include "Game/FE/feHelpFuncs.h"
 #include "Game/AnimInventory.h"
-#include "Game/Audio/UnidentifiedSoundPools.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/DB/CharacterInfo.h"
@@ -17,7 +18,6 @@
 #include "Game/Triggers/SebringAnimScript.h"
 #include "Game/TweakRegistry.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/MemAlloc.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"
@@ -656,7 +656,7 @@ bool CharacterLoader_8056B290::fn_8000A9A4(int nModel)
         mModelSize[nModel], &numModels, glGetCurrentResourcePool());
     nlFree(mModelData[nModel]);
     mModelData[nModel] = 0;
-    mTemplate->nCharacterModelID[nModel] = pModel->unknown00;
+    mTemplate->nCharacterModelID[nModel] = pModel->id;
     return true;
 }
 
@@ -1268,7 +1268,9 @@ static TweakBoolBinding sUnidentifiedLoadAnimsCachedTweak(
 
 CharacterLoader_8056B290 CharacterLoader_8056B290::sUnidentifiedInstance;
 
-template struct UnidentifiedSoundPools<UnidentifiedSoundPoolTag>;
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;
-
 #include "NL/nlstring_impl.h"
+
+int nlPrintf(const char* format, ...)
+{
+    return 0;
+}

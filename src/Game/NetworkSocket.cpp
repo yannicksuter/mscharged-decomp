@@ -16,7 +16,6 @@ struct NetworkSocketInitializeInfo
     bool mDirectMode;
 };
 
-
 int g_nLocalDirectPort = 1000;
 static int sLocalAddressColumn = 2;
 static int sLocalAddressRow = 5;
@@ -394,4 +393,3 @@ TweakValueBool g_bDisplayLocAddr(
 static TweakIntBinding sLocalDirectPortTweak(
     "g_nLocalDirectPort", "Network", &g_nLocalDirectPort, true);
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

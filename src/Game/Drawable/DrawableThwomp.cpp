@@ -8,6 +8,7 @@
 #include "NL/nlMath.h"
 #include "NL/platqmath.h"
 #include "unclassified/tu_801B298C.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 // Charged-only shadow prop, second of the run described beside
 // DrawableBulletBill. This one is backed by a PhysicsObject rather than a

@@ -2,6 +2,7 @@
 
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/gl/glLoadModel.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 GXMaterialProgram_802A6FDC* GXMaterialProgram_802A6FDC::Instance;
 bool GXMaterialProgram_802A6FDC::Initialized;

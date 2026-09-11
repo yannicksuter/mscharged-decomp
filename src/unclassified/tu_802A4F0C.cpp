@@ -112,8 +112,8 @@ extern "C" void fn_802A52D0(void*, const glModelPacket* packet)
 
 extern "C" void fn_802A5344(void*, const glModelPacket* packet)
 {
-    glx_BindTexture(0, reinterpret_cast<u32>(packet->unknown20));
-    glx_BindTexture(1, reinterpret_cast<u32>(static_cast<u8*>(packet->unknown20) + 8));
+    glx_BindTexture(0, reinterpret_cast<u32>(packet->materialParameters));
+    glx_BindTexture(1, reinterpret_cast<u32>(static_cast<u8*>(packet->materialParameters) + 8));
 }
 
 extern "C" void* fn_802A5388()

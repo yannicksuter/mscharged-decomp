@@ -24,6 +24,7 @@
 #include "NL/nlstring_tmpl.h"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 
 extern BaseGameSceneManager* g_pGameSceneManager;
@@ -194,13 +195,13 @@ void SHOnlineMatchmakingDraft::SceneCreated()
             mPresentation->GetActiveSlide(), "Layer",
             buffer);
         if (instance == 0)
-            instance = &gDefaultTLComponentInstance;
+            instance = &UnidentifiedTLComponentDefault::sInstance;
         mPlayerInstances[i] = instance;
     }
     TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(
         mPresentation->GetActiveSlide(), "Layer",
         "scrollbar");
-    mScrollWidget.SetComponent(scrollbar == 0 ? &gDefaultTLComponentInstance : scrollbar);
+    mScrollWidget.SetComponent(scrollbar == 0 ? &UnidentifiedTLComponentDefault::sInstance : scrollbar);
     if (mScrollingEnabled)
     {
         mScrollWidget.SetRange(mScrollRange);

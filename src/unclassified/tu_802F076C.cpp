@@ -1,4 +1,5 @@
 #include "Game/Audio/AudioResourceLoader.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioSystem.h"
 #include "NL/nlChunk.h"
@@ -6,27 +7,6 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
-
-struct ChainNode_802F076C
-{
-    ChainNode_802F076C* next;
-};
-
-struct ChainOwner_802F076C
-{
-    u8 pad_00[0xC];
-    ChainNode_802F076C* head;
-};
-
-struct SlotPoolEntry_802F0780
-{
-    u8 data[0x10];
-};
-
-struct SlotPoolEntry_802F07F0
-{
-    u8 data[0xC];
-};
 
 struct ResourceEntry_802F0860
 {
@@ -140,38 +120,6 @@ struct AudioResources_802F1548
 };
 
 extern "C" void fn_802F1548(ResourceGroupB_802F0860* group);
-
-extern "C" void fn_802F076C(
-    ChainOwner_802F076C** owner, ChainNode_802F076C* node)
-{
-    ChainOwner_802F076C* chain = *owner;
-    node->next = chain->head;
-    chain->head = node;
-}
-
-extern "C" SlotPool<SlotPoolEntry_802F0780>* fn_802F0780(
-    SlotPool<SlotPoolEntry_802F0780>* pool, int destroy)
-{
-    if (pool != 0)
-    {
-        pool->BasicSlotPool<SlotPoolEntry_802F0780>::~BasicSlotPool();
-        if (destroy > 0)
-            operator delete(pool);
-    }
-    return pool;
-}
-
-extern "C" SlotPool<SlotPoolEntry_802F07F0>* fn_802F07F0(
-    SlotPool<SlotPoolEntry_802F07F0>* pool, int destroy)
-{
-    if (pool != 0)
-    {
-        pool->BasicSlotPool<SlotPoolEntry_802F07F0>::~BasicSlotPool();
-        if (destroy > 0)
-            operator delete(pool);
-    }
-    return pool;
-}
 
 ResourceBundle* ParseAudioResourceBundle(nlChunk* outer)
 {

@@ -2,6 +2,12 @@
 
 #include "NL/MemAlloc.h"
 
+MemoryAllocator VirtualAllocator;
+MemoryAllocator* AllocatorStack[16] = { &StandardAllocator };
+MemoryAllocator* CurrentAllocator = &StandardAllocator;
+unsigned int AllocatorStackDepth = 1;
+u8 gMemoryInitialized;
+
 static inline void FreeMemory(void* ptr)
 {
     if (CurrentAllocator != &StandardAllocator && CurrentAllocator != &VirtualAllocator)

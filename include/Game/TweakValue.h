@@ -343,7 +343,7 @@ public:
     /* 0x0A */ bool mValue;
 }; // total size: 0x0C
 
-// Retail Game/tu_80009B88.cpp keeps the bool family's virtual bodies as a
+// Retail Game/tu_80009B34.cpp keeps the bool family's virtual bodies as a
 // weak block behind its static initializer, in the order below, and no unit
 // defines them out of line.
 

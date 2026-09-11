@@ -3,6 +3,7 @@
 #include "Game/GL/GLInventory.h"
 #include "NL/nlDLRing.h"
 #include "NL/nlMemory.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static GLResourcePool* sCurrentResourcePool;
 static GLResourcePool* sResourcePoolList;
@@ -81,4 +82,24 @@ void* glResourceAlloc(
 void* glFrameAlloc(unsigned long size, eGLMemory memType)
 {
     return glplatFrameAlloc(size, memType);
+}
+
+unsigned long GLResourcePool::fn_28()
+{
+    return 0;
+}
+
+unsigned long GLResourcePool::fn_24()
+{
+    return 0;
+}
+
+unsigned long GLResourcePool::fn_20()
+{
+    return 0;
+}
+
+unsigned long GLResourcePool::GetPeakMemoryUsage()
+{
+    return 0;
 }

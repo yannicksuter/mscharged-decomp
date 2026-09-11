@@ -145,7 +145,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_802A01CC>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 static inline GXColor makeColor(float r, float g, float b, float a)
@@ -187,7 +187,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_802A01CC>::Draw(
     }
     else if (lbl_806DF0C9)
     {
-        float* values = (float*)((unsigned char*)packet->unknown20 + 8);
+        float* values = (float*)((unsigned char*)packet->materialParameters + 8);
         float r = values[0];
         float g = values[1];
         float b = values[2];

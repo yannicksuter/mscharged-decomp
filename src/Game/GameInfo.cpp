@@ -36,6 +36,7 @@ static const GameRules kDefaultRules[12] = {
 };
 
 GameInfoManager* GameInfoManager::sThis;
+template <>
 GameInfoManager* nlSingleton<GameInfoManager>::s_pInstance = 0;
 
 GameInfoManager::GameInfoManager()

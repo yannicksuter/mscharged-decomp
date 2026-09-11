@@ -19,6 +19,7 @@
 #include "Game/SH/SHNavigation.h"
 #include <stdlib.h>
 #include "Game/FE/feDPD.h"
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 SHOnlineLogin::SHOnlineLogin()
     : mPopupActive(false)
@@ -41,7 +42,7 @@ void SHOnlineLogin::SceneCreated()
     mLoginComponent = FEFinder<TLComponentInstance, 4>::Find(
         presentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("INVITATION"), InlineHasher("LOGIN"));
     if (mLoginComponent == 0)
-        mLoginComponent = &gDefaultTLComponentInstance;
+        mLoginComponent = &UnidentifiedTLComponentDefault::sInstance;
     mLoginComponent->SetActiveSlide("CONNECTING", false, false);
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)

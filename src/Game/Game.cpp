@@ -149,9 +149,7 @@ extern Unidentified0C74* lbl_806E0C74;
 
 extern UnidentifiedGameStatic lbl_8056B9A0;
 extern cPlayer* lbl_806E0C9C;
-extern int lbl_806E2130;
 extern BaseGameSceneManager* g_pOverlayManager;
-extern AISandbox* lbl_806E0B88;
 extern cPlayer* lbl_8056B800[10];
 extern "C" char lbl_804FB2F4[];
 extern "C" char lbl_804FB318[];
@@ -214,9 +212,9 @@ void fn_80056CF4(void* param1, int param2, bool param3)
 
     cField::Init(g_pTeams[0]->m_pNet, g_pTeams[1]->m_pNet);
 
-    if (lbl_806E0B88 == 0)
+    if (AISandbox::s_pInstance == 0)
     {
-        lbl_806E0B88 = new (8, false) AISandbox();
+        AISandbox::s_pInstance = new (8, false) AISandbox();
     }
     if (lbl_806E12C8 == 0)
     {
@@ -373,10 +371,10 @@ void DestroyGame()
             g_pGame->m_fGameDuration, lbl_806E3740, 0);
     }
 
-    if (lbl_806E0B88 != 0)
+    if (AISandbox::s_pInstance != 0)
     {
-        delete lbl_806E0B88;
-        lbl_806E0B88 = 0;
+        delete AISandbox::s_pInstance;
+        AISandbox::s_pInstance = 0;
     }
     if (lbl_806E12C8 != 0)
     {

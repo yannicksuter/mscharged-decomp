@@ -1,5 +1,7 @@
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/FielderInput.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 UnidentifiedTeamDesire::UnidentifiedTeamDesire(
     int state, const UnidentifiedStateTransition& transition)

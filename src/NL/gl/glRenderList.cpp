@@ -9,7 +9,7 @@
 unsigned long UnidentifiedPacketSorter_8052E2D8::fn_14(
     GLView*, const glModelPacket* pPacket)
 {
-    return ((GLMaterialProgram*)pPacket->unknown10)->programHash;
+    return ((GLMaterialProgram*)pPacket->materialProgram)->programHash;
 }
 
 unsigned long UnidentifiedPacketSorter_8052E2C0::fn_14(
@@ -89,10 +89,10 @@ void PacketCallbackManager::DoCallback(
         m_LastMatrix = p->matrix;
     }
 
-    if (p->unknown10 != m_LastProgram)
+    if (p->materialProgram != m_LastProgram)
     {
         flags |= 8;
-        m_LastProgram = p->unknown10;
+        m_LastProgram = p->materialProgram;
     }
 
     unsigned long stage = flags | 0x80;

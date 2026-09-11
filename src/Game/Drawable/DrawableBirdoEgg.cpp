@@ -10,6 +10,7 @@
 #include "NL/nlMath.h"
 #include "math.h"
 #include "Game/Render/BirdoEgg.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 // Charged-only shadow prop, fourth of the run described beside
 // DrawableBulletBill. The live object's translation unit spells

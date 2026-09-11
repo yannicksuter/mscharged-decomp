@@ -27,6 +27,15 @@ struct UnidentifiedStateTransition
     void* mUnidentifiedFunction;
 };
 
+struct UnidentifiedUnsetTransition : public UnidentifiedStateTransition
+{
+    UnidentifiedUnsetTransition()
+    {
+        mUnidentifiedFunction = 0;
+        mUnidentifiedHash = (u32)-1;
+    }
+};
+
 class shdStateMachine
 {
 public:

@@ -797,4 +797,3 @@ bool AvoidablePolygon::UnidentifiedVirtual20(
     return bInside;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

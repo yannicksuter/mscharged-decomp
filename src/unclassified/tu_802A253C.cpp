@@ -56,7 +56,7 @@ extern "C" void fn_802A2630(void*)
 
 extern "C" void fn_802A265C(void* renderer, const glModelPacket* packet)
 {
-    u32* parameter = static_cast<u32*>(packet->unknown20);
+    u32* parameter = static_cast<u32*>(packet->materialParameters);
     glSetMaterialTextureAlphaState(renderer, packet, *parameter);
 }
 
@@ -65,7 +65,7 @@ extern "C" void fn_802A2668(void* renderer, const glModelPacket* packet)
     fn_802A508C(renderer, packet);
     fn_802A5344(renderer, packet);
 
-    DetailParameters_802A2668* parameters = static_cast<DetailParameters_802A2668*>(packet->unknown20);
+    DetailParameters_802A2668* parameters = static_cast<DetailParameters_802A2668*>(packet->materialParameters);
     u8 blend = static_cast<u8>(lbl_806E5F90 * parameters->blendAmount);
     GXColor_802A2668 colour = { blend, blend, blend, blend };
     GXSetTevKColor(0, colour);

@@ -88,14 +88,14 @@ template <>
 void GXMaterialProgramImpl<GXShadowVolumeMaterialProgram>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>
 void GXMaterialProgramImpl<GXShadowVolumeMaterialProgram>::Draw(
     const glModelPacket* packet)
 {
-    if (*(int*)((unsigned char*)packet->unknown20 + 8) == 0)
+    if (*(int*)((unsigned char*)packet->materialParameters + 8) == 0)
         SetShadowVolumeMode(2);
     else
         SetShadowVolumeMode(3);

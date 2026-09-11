@@ -333,4 +333,3 @@ void AnimatedImpostorCharacter::PlayAnimation(float dt,
     }
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

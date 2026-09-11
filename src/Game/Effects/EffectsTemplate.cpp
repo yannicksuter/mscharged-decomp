@@ -4,6 +4,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "NL/nlChunk.h"
 #include "NL/gl/glState.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 unsigned int uSeed = 0x9184EB0C;
 

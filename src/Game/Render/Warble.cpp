@@ -263,7 +263,7 @@ void RenderWarbleQuad(bool*)
         WriteWarbleVertex(writer, right, top, 0x400, 0);
 
         glTextureBinding* textureState = static_cast<glTextureBinding*>(
-            writer.model->packets->unknown20);
+            writer.model->packets->materialParameters);
         textureState->texture = colourHandle;
         textureState->textureIndex = 0xFFFF;
         textureState->SetWrapS(true);

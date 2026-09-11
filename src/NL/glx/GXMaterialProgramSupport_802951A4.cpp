@@ -195,7 +195,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029E8F8>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 struct FloatColour_802951A4
@@ -225,7 +225,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029E8F8>::Draw(
     program->BindVertexArrays(packet);
     program->BindParameters(packet);
 
-    unsigned char* parameters = (unsigned char*)packet->unknown20;
+    unsigned char* parameters = (unsigned char*)packet->materialParameters;
     float colourValue = *(float*)(parameters + 24);
     float scaleX = *(float*)(parameters + 28);
     float scaleY = *(float*)(parameters + 32);

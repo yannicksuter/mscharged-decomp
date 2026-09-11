@@ -57,6 +57,8 @@
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 #include "NL/gl/glPlat.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 class AudioUpdateTask : public nlTask
 {
@@ -123,8 +125,6 @@ void nlRegHandleDVDRetryingCB(const Function<void(int)>&);
 void nlRegCheckForResetFromFSCB(const Function<FnVoidVoid>&);
 
 extern bool g_bDisableWriteOut;
-extern bool g_bActivateMemoryLowWaterMarkChecking;
-extern bool g_bPrintMemoryNewLowWaterMarks;
 extern void* lbl_806E1C20;
 
 extern int lbl_806DF2E0;

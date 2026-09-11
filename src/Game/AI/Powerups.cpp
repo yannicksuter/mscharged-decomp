@@ -27,6 +27,8 @@
 #include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
 #include "Game/Render/StadiumLoading.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 extern "C" void fn_802772A4(DrawableObject*);
 extern "C" bool fn_8003877C(cFielder*);

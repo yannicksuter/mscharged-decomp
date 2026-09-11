@@ -8,8 +8,13 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/nlMath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
-extern float lbl_80524370[3][4];
+float lbl_80524370[3][4] = {
+    { 0.5f, 0.0f, 0.0f, 0.5f },
+    { 0.0f, -0.5f, 0.0f, 0.5f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
 
 static nlMatrix4 sViewMatrix;
 static unsigned long sLoadedMatrix;
@@ -48,7 +53,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029AB0C>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>

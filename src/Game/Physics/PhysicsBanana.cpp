@@ -18,6 +18,7 @@
 #include "NL/nlSlotPool.h"
 #include "unclassified/tu_801A5F10.h"
 #include "math.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 
 extern "C" bool fn_800167A8(cBall*);
@@ -382,8 +383,4 @@ bool PhysicsBanana::SetContactInfo(dContact* contact, PhysicsObject* other, bool
     contact->surface.bounce_vel = 0.0f;
     contact->surface.mu = 100.0f;
     return true;
-}
-
-PhysicsBanana::~PhysicsBanana()
-{
 }

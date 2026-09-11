@@ -68,6 +68,18 @@ public:
         }
     }
 
+    ListEntry<T>* Allocate(const T& data)
+    {
+        ListEntry<T> localEntry(data);
+        ListEntry<T>* entry;
+        m_Allocator.AllocateForReturn(entry);
+        if (entry != NULL)
+        {
+            *entry = localEntry;
+        }
+        return entry;
+    }
+
     void AddEntry(const T& value)
     {
         ListEntry<T> local(value);
@@ -182,6 +194,28 @@ public:
 
     nlListSlotPool(int initial, int delta)
         : ListContainerBase<T, BasicSlotPool<ListEntry<T> > >()
+    {
+        this->m_Allocator.Initialize(initial, delta);
+    }
+};
+
+template <typename T>
+class nlListSlotPoolHigh
+    : public ListContainerBase<T, BasicSlotPoolHigh<ListEntry<T> > >
+{
+public:
+    nlListSlotPoolHigh()
+        : ListContainerBase<T, BasicSlotPoolHigh<ListEntry<T> > >()
+    {
+    }
+
+    ~nlListSlotPoolHigh()
+    {
+        this->m_Allocator.FreeBlocks();
+    }
+
+    nlListSlotPoolHigh(int initial, int delta)
+        : ListContainerBase<T, BasicSlotPoolHigh<ListEntry<T> > >()
     {
         this->m_Allocator.Initialize(initial, delta);
     }

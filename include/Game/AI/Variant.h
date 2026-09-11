@@ -91,6 +91,7 @@ public:
     virtual bool IsPointerType() const;
 
     bool IsSet() const;
+    bool fn_800C2BF8() const;
 
     bool operator==(const Variant& other) const
     {

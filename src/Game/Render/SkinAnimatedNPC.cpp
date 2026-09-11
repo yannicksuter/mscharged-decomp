@@ -19,6 +19,7 @@
 #include "NL/nlColour.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static char ShadowLevelName[] = "shadowLevel";
 static char AlphaValueName[] = "alphaValue";
@@ -27,112 +28,97 @@ static float ShadowRadius = 7.0f;
 static float ShadowHeight = 7.0f;
 static float SidelineShadowMargin = 2.5f;
 
-void SkinAnimatedNPC::DrawShadow(
-    const glModel* pModel, const nlMatrix4& matrix)
+SkinAnimatedNPC::SkinAnimatedNPC(
+    cSHierarchy& pHierarchy, int nModelID, void* resource)
 {
-    RLView* pView = GetLayerView(eCLV_Characters);
-    float shadowLevel = 0.75f;
-    BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
-    float alphaValue = 0.75f;
-    static u32 alphaValueHash = nlStringLowerHash(AlphaValueName);
+    maFacingDirection = 0;
+    mpAnimController = 0;
+    mpPoseAccumulator = 0;
+    mpSkinMesh = 0;
+    mpPoseTree = 0;
+    mbIsVisible = 0;
 
-    ProjectedShadowParams params;
-    params.fScalar = 1.0f;
-    nlVec4Set(params.vLight, pStadium->m_shadowLightPosition.x,
-        pStadium->m_shadowLightPosition.y, pStadium->m_shadowLightPosition.z, 1.0f);
-    params.vPosition = matrix.GetTranslation();
-    params.fRadius = ShadowRadius;
-    params.fHeight = ShadowHeight;
-    params.pModel = 0;
-    params.fScalar = shadowLevel;
-    params.nPartitionIndex = 10;
-    params.nVisibleInterval = 2;
-    params.nInvisibleInterval = 3;
-
-    if (ShouldShadowBeUpdated(params))
+    if ((u32)nModelID == (u32)-1)
     {
-        params.pModel = glModelDupNoStreams(pModel, false, 0);
-        if (1.0f != alphaValue)
-        {
-            for (glModelPacket* pPacket = params.pModel->packets;
-                 pPacket < params.pModel->packets + params.pModel->numPackets;
-                 ++pPacket)
-            {
-                glSetMaterialFloatParameter(pPacket, alphaValueHash, 1.0f);
-            }
-        }
-        RenderCharacterIntoTexture(params);
-    }
-
-    RLView* pOldView = SetCharacterShadowView(pView);
-    RenderProjectedShadow(params);
-    SetCharacterShadowView(pOldView);
-}
-
-void SkinAnimatedNPC::SetAnimState(
-    cSAnim& pAnim, float fBlendTime, ePlayMode playMode)
-{
-    cPN_SAnimController* controller = new cPN_SAnimController(
-        &pAnim, 0, playMode, 0, 0, false);
-
-    if (mpPoseTree != 0 && fBlendTime > 0.0f)
-    {
-        cPN_Blender* blender =
-            new cPN_Blender(mpPoseTree, controller, fBlendTime);
-        mpPoseTree = blender;
+        mpSkinMesh = 0;
     }
     else
     {
-        mpPoseTree = controller;
-        delete mpAnimController;
+        GLInventory* pInventory =
+            static_cast<GLInventory*>(
+                static_cast<MemoryAllocator*>(resource)->m_0C);
+        mpSkinMesh = pInventory->MakeSkinMesh(
+            (unsigned long)nModelID, &pHierarchy);
     }
 
-    mpAnimController = controller;
+    cPoseAccumulator* pAccum = new (
+        nlMalloc(sizeof(cPoseAccumulator), 8, false))
+        cPoseAccumulator(&pHierarchy, true);
+    mpPoseAccumulator = pAccum;
+
+    mWorldMatrix.SetIdentity();
+    mbIsVisible = true;
+    mv3Position.x = 0.0f;
+    mv3Position.y = 0.0f;
+    mv3Position.z = 0.0f;
 }
 
-void SkinAnimatedNPC::DrawShadow(
-    const cPoseAccumulator& poseAccumulator,
-    const nlMatrix4& worldMatrix)
+SkinAnimatedNPC::~SkinAnimatedNPC()
 {
-    RLView* pView = GetLayerView(eCLV_Characters);
-    glModel* pModel = glModelDupNoStreams(
-        mpSkinMesh->GetModel(), false, 0);
-    float shadowLevel = 0.5f;
-    BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
-    float alphaValue = 0.5f;
-    static u32 alphaValueHash = nlStringLowerHash(AlphaValueName);
-
-    ProjectedShadowParams params;
-    params.fScalar = 1.0f;
-    nlVec4Set(params.vLight, pStadium->m_shadowLightPosition.x,
-        pStadium->m_shadowLightPosition.y, pStadium->m_shadowLightPosition.z, 1.0f);
-    params.vPosition = mWorldMatrix.GetTranslation();
-    params.fRadius = ShadowRadius;
-    params.fHeight = ShadowHeight;
-    params.pModel = 0;
-    params.fScalar = shadowLevel;
-    params.nPartitionIndex = 10;
-    params.nVisibleInterval = 2;
-    params.nInvisibleInterval = 3;
-
-    if (ShouldShadowBeUpdated(params))
+    delete mpPoseTree;
+    delete mpPoseAccumulator;
+    if (mpSkinMesh != 0)
     {
-        params.pModel = glModelDupNoStreams(pModel, false, 0);
-        if (1.0f != alphaValue)
-        {
-            for (glModelPacket* pPacket = params.pModel->packets;
-                 pPacket < params.pModel->packets + params.pModel->numPackets;
-                 ++pPacket)
-            {
-                glSetMaterialFloatParameter(pPacket, alphaValueHash, 1.0f);
-            }
-        }
-        RenderCharacterIntoTexture(params);
+        delete mpSkinMesh;
+    }
+}
+
+void SkinAnimatedNPC::Update(float dt)
+{
+    mpPoseTree = mpPoseTree->Update(dt);
+    mpPoseAccumulator->InitAccumulators();
+    mpPoseTree->Evaluate(1.0f, mpPoseAccumulator);
+}
+
+void SkinAnimatedNPC::Render()
+{
+    mpPoseAccumulator->BuildNodeMatrices(mWorldMatrix);
+    RenderFromReplay(*mpPoseAccumulator, &mWorldMatrix);
+}
+
+void SkinAnimatedNPC::RenderFromReplay(
+    const cPoseAccumulator& poseAccumulator,
+    const nlMatrix4* pWorldMatrix)
+{
+    if (!mbIsVisible)
+    {
+        return;
+    }
+    if (mpSkinMesh == 0)
+    {
+        return;
     }
 
-    RLView* pOldView = SetCharacterShadowView(pView);
-    RenderProjectedShadow(params);
-    SetCharacterShadowView(pOldView);
+    mpSkinMesh->Pose(
+        const_cast<cPoseAccumulator*>(&poseAccumulator));
+    SendToGL();
+
+    if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+    {
+        float positionY = mv3Position.y;
+        if (positionY
+            > cField::GetSidelineY(1) - SidelineShadowMargin)
+        {
+            return;
+        }
+        if (positionY
+            < -(cField::GetSidelineY(1) + SidelineShadowMargin))
+        {
+            return;
+        }
+    }
+
+    DrawShadow(poseAccumulator, *pWorldMatrix);
 }
 
 void SkinAnimatedNPC::SendToGL() const
@@ -193,95 +179,110 @@ void SkinAnimatedNPC::SendToGL() const
     const_cast<SkinAnimatedNPC*>(this)->mpLastModel = pModel;
 }
 
-void SkinAnimatedNPC::RenderFromReplay(
+void SkinAnimatedNPC::DrawShadow(
     const cPoseAccumulator& poseAccumulator,
-    const nlMatrix4* pWorldMatrix)
+    const nlMatrix4& worldMatrix)
 {
-    if (!mbIsVisible)
-    {
-        return;
-    }
-    if (mpSkinMesh == 0)
-    {
-        return;
-    }
+    RLView* pView = GetLayerView(eCLV_Characters);
+    glModel* pModel = glModelDupNoStreams(
+        mpSkinMesh->GetModel(), false, 0);
+    float shadowLevel = 0.5f;
+    BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
+    float alphaValue = 0.5f;
+    static u32 alphaValueHash = nlStringLowerHash(AlphaValueName);
 
-    mpSkinMesh->Pose(
-        const_cast<cPoseAccumulator*>(&poseAccumulator));
-    SendToGL();
+    ProjectedShadowParams params;
+    params.fScalar = 1.0f;
+    nlVec4Set(params.vLight, pStadium->m_shadowLightPosition.x,
+        pStadium->m_shadowLightPosition.y, pStadium->m_shadowLightPosition.z, 1.0f);
+    params.vPosition = mWorldMatrix.GetTranslation();
+    params.fRadius = ShadowRadius;
+    params.fHeight = ShadowHeight;
+    params.pModel = 0;
+    params.fScalar = shadowLevel;
+    params.nPartitionIndex = 10;
+    params.nVisibleInterval = 2;
+    params.nInvisibleInterval = 3;
 
-    if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+    if (ShouldShadowBeUpdated(params))
     {
-        float positionY = mv3Position.y;
-        if (positionY
-            > cField::GetSidelineY(1) - SidelineShadowMargin)
+        params.pModel = glModelDupNoStreams(pModel, false, 0);
+        if (1.0f != alphaValue)
         {
-            return;
+            for (glModelPacket* pPacket = params.pModel->packets;
+                 pPacket < params.pModel->packets + params.pModel->numPackets;
+                 ++pPacket)
+            {
+                glSetMaterialFloatParameter(pPacket, alphaValueHash, 1.0f);
+            }
         }
-        if (positionY
-            < -(cField::GetSidelineY(1) + SidelineShadowMargin))
-        {
-            return;
-        }
+        RenderCharacterIntoTexture(params);
     }
 
-    DrawShadow(poseAccumulator, *pWorldMatrix);
+    RLView* pOldView = SetCharacterShadowView(pView);
+    RenderProjectedShadow(params);
+    SetCharacterShadowView(pOldView);
 }
 
-void SkinAnimatedNPC::Render()
+void SkinAnimatedNPC::SetAnimState(
+    cSAnim& pAnim, float fBlendTime, ePlayMode playMode)
 {
-    mpPoseAccumulator->BuildNodeMatrices(mWorldMatrix);
-    RenderFromReplay(*mpPoseAccumulator, &mWorldMatrix);
-}
+    cPN_SAnimController* controller = new cPN_SAnimController(
+        &pAnim, 0, playMode, 0, 0, false);
 
-void SkinAnimatedNPC::Update(float dt)
-{
-    mpPoseTree = mpPoseTree->Update(dt);
-    mpPoseAccumulator->InitAccumulators();
-    mpPoseTree->Evaluate(1.0f, mpPoseAccumulator);
-}
-
-SkinAnimatedNPC::~SkinAnimatedNPC()
-{
-    delete mpPoseTree;
-    delete mpPoseAccumulator;
-    if (mpSkinMesh != 0)
+    if (mpPoseTree != 0 && fBlendTime > 0.0f)
     {
-        delete mpSkinMesh;
-    }
-}
-
-SkinAnimatedNPC::SkinAnimatedNPC(
-    cSHierarchy& pHierarchy, int nModelID, void* resource)
-{
-    maFacingDirection = 0;
-    mpAnimController = 0;
-    mpPoseAccumulator = 0;
-    mpSkinMesh = 0;
-    mpPoseTree = 0;
-    mbIsVisible = 0;
-
-    if ((u32)nModelID == (u32)-1)
-    {
-        mpSkinMesh = 0;
+        cPN_Blender* blender =
+            new cPN_Blender(mpPoseTree, controller, fBlendTime);
+        mpPoseTree = blender;
     }
     else
     {
-        GLInventory* pInventory =
-            static_cast<GLInventory*>(
-                static_cast<MemoryAllocator*>(resource)->m_0C);
-        mpSkinMesh = pInventory->MakeSkinMesh(
-            (unsigned long)nModelID, &pHierarchy);
+        mpPoseTree = controller;
+        delete mpAnimController;
     }
 
-    cPoseAccumulator* pAccum = new (
-        nlMalloc(sizeof(cPoseAccumulator), 8, false))
-        cPoseAccumulator(&pHierarchy, true);
-    mpPoseAccumulator = pAccum;
+    mpAnimController = controller;
+}
 
-    mWorldMatrix.SetIdentity();
-    mbIsVisible = true;
-    mv3Position.x = 0.0f;
-    mv3Position.y = 0.0f;
-    mv3Position.z = 0.0f;
+void SkinAnimatedNPC::DrawShadow(
+    const glModel* pModel, const nlMatrix4& matrix)
+{
+    RLView* pView = GetLayerView(eCLV_Characters);
+    float shadowLevel = 0.75f;
+    BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
+    float alphaValue = 0.75f;
+    static u32 alphaValueHash = nlStringLowerHash(AlphaValueName);
+
+    ProjectedShadowParams params;
+    params.fScalar = 1.0f;
+    nlVec4Set(params.vLight, pStadium->m_shadowLightPosition.x,
+        pStadium->m_shadowLightPosition.y, pStadium->m_shadowLightPosition.z, 1.0f);
+    params.vPosition = matrix.GetTranslation();
+    params.fRadius = ShadowRadius;
+    params.fHeight = ShadowHeight;
+    params.pModel = 0;
+    params.fScalar = shadowLevel;
+    params.nPartitionIndex = 10;
+    params.nVisibleInterval = 2;
+    params.nInvisibleInterval = 3;
+
+    if (ShouldShadowBeUpdated(params))
+    {
+        params.pModel = glModelDupNoStreams(pModel, false, 0);
+        if (1.0f != alphaValue)
+        {
+            for (glModelPacket* pPacket = params.pModel->packets;
+                 pPacket < params.pModel->packets + params.pModel->numPackets;
+                 ++pPacket)
+            {
+                glSetMaterialFloatParameter(pPacket, alphaValueHash, 1.0f);
+            }
+        }
+        RenderCharacterIntoTexture(params);
+    }
+
+    RLView* pOldView = SetCharacterShadowView(pView);
+    RenderProjectedShadow(params);
+    SetCharacterShadowView(pOldView);
 }

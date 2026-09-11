@@ -27,7 +27,7 @@ struct glTextureBinding
 struct glModelStream
 {
     /* 0x00 */ void* address;
-    /* 0x04 */ u8 unknown04;
+    /* 0x04 */ u8 index;
     /* 0x05 */ u8 stride;
     /* 0x06 */ u8 id;
     /* 0x07 */ u8 unknown07;
@@ -43,19 +43,19 @@ struct glModelPacket
     /* 0x0A */ char primType;
     /* 0x0B */ u8 numStreams;
     /* 0x0C */ glModelStream* streams;
-    /* 0x10 */ void* unknown10;
+    /* 0x10 */ void* materialProgram;
     /* 0x14 */ u32 unknown14;
     /* 0x18 */ u32 matrix;
     /* 0x1C */ u32 rasterState;
-    /* 0x20 */ void* unknown20;
+    /* 0x20 */ void* materialParameters;
     /* 0x24 */ DisplayList* displayList;
-    /* 0x28 */ u32 unknown28;
-    /* 0x2C */ u32 unknown2C;
+    /* 0x28 */ u32 skinnedVertices;
+    /* 0x2C */ u32 skinnedNormals;
 }; // size: 0x30
 
 struct glModel
 {
-    /* 0x00 */ u32 unknown00;
+    /* 0x00 */ u32 id;
     /* 0x04 */ u32 numPackets;
     /* 0x08 */ glModelPacket* packets;
 }; // size: 0xC

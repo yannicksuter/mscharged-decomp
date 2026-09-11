@@ -36,7 +36,7 @@ char lbl_80530248[] = "Cleanup_";
 char lbl_806DF5A0[] = "Init_";
 char lbl_806DF5A8[] = "Update_";
 
-extern UnidentifiedStateTransition lbl_806E20B8;
+UnidentifiedUnsetTransition lbl_806E20B8;
 
 class UnidentifiedStateMachine_803171D0 : public shdStateMachine
 {

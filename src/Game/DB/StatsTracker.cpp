@@ -811,45 +811,46 @@ void StatsTracker::Track(ePlayerStats stat, int homeaway, int playerindex,
 
 static int GetStatValue(const PlayerStats& stats, ePlayerStats stat)
 {
+    int value = -1;
     switch (stat)
     {
-    case STATS_00: return stats.unknown_0x00;
-    case STATS_01: return stats.unknown_0x02;
-    case STATS_02: return stats.unknown_0x04;
-    case STATS_SHOTS_ON_GOAL: return stats.mNumShotsOnGoal;
-    case STATS_04: return stats.unknown_0x14;
-    case STATS_05: return stats.unknown_0x08;
-    case STATS_06: return stats.unknown_0x0A;
-    case STATS_07: return stats.unknown_0x0C;
-    case STATS_08: return stats.unknown_0x0E;
-    case STATS_09: return stats.unknown_0x16;
-    case STATS_0A: return stats.unknown_0x18;
-    case STATS_GOALS_FOR: return stats.mNumGoalsFor;
-    case STATS_0C: return stats.unknown_0x12;
-    case STATS_PASSES_MADE: return stats.mNumPassesMade;
-    case STATS_0E: return stats.unknown_0x2C;
-    case STATS_0F: return stats.unknown_0x2E;
-    case STATS_PASSES_RECEIVED: return stats.mNumPassesReceived;
-    case STATS_FOULS: return stats.mNumFouls;
-    case STATS_12: return stats.mNumHitsMade;
-    case STATS_ATTACK_ATTEMPTS: return stats.unknown_0x34;
-    case STATS_ATTACK_SUCCESSES: return stats.mNumSteals;
-    case STATS_15: return stats.unknown_0x38;
-    case STATS_16: return stats.unknown_0x3C;
-    case STATS_17: return stats.mNumButtonPresses;
-    case STATS_18: return stats.unknown_0x1C;
-    case STATS_19: return stats.mNumPowerupsUsed;
-    case STATS_1A: return stats.unknown_0x20;
-    case STATS_1B: return stats.unknown_0x22;
-    case STATS_1C: return stats.unknown_0x24;
-    case STATS_1D: return stats.unknown_0x26;
-    case STATS_POWERUPS_USED: return stats.unknown_0x28;
-    case STATS_PERFECT_PASSES: return stats.mNumPerfectPasses;
-    case STATS_PASSES_INTERCEPTED: return stats.mNumPassesIntercepted;
-    case STATS_25: return stats.unknown_0x46;
-    case STATS_26: return stats.unknown_0x48;
-    default: return -1;
+    case STATS_00: value = stats.unknown_0x00; break;
+    case STATS_01: value = stats.unknown_0x02; break;
+    case STATS_02: value = stats.unknown_0x04; break;
+    case STATS_SHOTS_ON_GOAL: value = stats.mNumShotsOnGoal; break;
+    case STATS_05: value = stats.unknown_0x08; break;
+    case STATS_06: value = stats.unknown_0x0A; break;
+    case STATS_07: value = stats.unknown_0x0C; break;
+    case STATS_08: value = stats.unknown_0x0E; break;
+    case STATS_GOALS_FOR: value = stats.mNumGoalsFor; break;
+    case STATS_0C: value = stats.unknown_0x12; break;
+    case STATS_04: value = stats.unknown_0x14; break;
+    case STATS_09: value = stats.unknown_0x16; break;
+    case STATS_0A: value = stats.unknown_0x18; break;
+    case STATS_FOULS: value = stats.mNumFouls; break;
+    case STATS_18: value = stats.unknown_0x1C; break;
+    case STATS_19: value = stats.mNumPowerupsUsed; break;
+    case STATS_1A: value = stats.unknown_0x20; break;
+    case STATS_1B: value = stats.unknown_0x22; break;
+    case STATS_1C: value = stats.unknown_0x24; break;
+    case STATS_1D: value = stats.unknown_0x26; break;
+    case STATS_PASSES_MADE: value = stats.mNumPassesMade; break;
+    case STATS_0E: value = stats.unknown_0x2C; break;
+    case STATS_0F: value = stats.unknown_0x2E; break;
+    case STATS_PASSES_RECEIVED: value = stats.mNumPassesReceived; break;
+    case STATS_12: value = stats.mNumHitsMade; break;
+    case STATS_ATTACK_ATTEMPTS: value = stats.unknown_0x34; break;
+    case STATS_ATTACK_SUCCESSES: value = stats.mNumSteals; break;
+    case STATS_15: value = stats.unknown_0x38; break;
+    case STATS_16: value = stats.unknown_0x3C; break;
+    case STATS_17: value = stats.mNumButtonPresses; break;
+    case STATS_PERFECT_PASSES: value = stats.mNumPerfectPasses; break;
+    case STATS_25: value = stats.unknown_0x46; break;
+    case STATS_26: value = stats.unknown_0x48; break;
+    case STATS_POWERUPS_USED: value = stats.unknown_0x28; break;
+    case STATS_PASSES_INTERCEPTED: value = stats.mNumPassesIntercepted; break;
     }
+    return value;
 }
 
 void StatsTracker::WriteCurrentlyPlaying() const

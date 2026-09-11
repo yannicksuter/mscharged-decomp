@@ -157,4 +157,3 @@ void DestroyGameTweaks(GameTweaksManager* state)
 
 char sUnidentifiedTerrainCategory[] = "Game/Terrain/";
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

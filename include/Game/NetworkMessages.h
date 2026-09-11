@@ -59,7 +59,7 @@ struct NetworkDraftMachineInfo
     /* 0x18 */ u32 mUnidentified18;
     /* 0x1C */ u16 mName[11];
     /* 0x32 */ u8 mUnidentified32[0x4C];
-    /* 0x7E */ u8 mIndex;
+    /* 0x7E */ s8 mIndex;
     /* 0x7F */ u8 mGuestEnabled;
 }; // size: 0x80
 

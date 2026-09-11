@@ -1,6 +1,7 @@
 #include "Game/Task/ParticleUpdateTask.h"
 
 #include "Game/Task/GameRenderTask.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 u8 lbl_806DCC98 = 1;
 

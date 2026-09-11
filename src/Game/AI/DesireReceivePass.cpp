@@ -1419,6 +1419,11 @@ void DesireReceivePass::UnidentifiedVirtual7(
     }
 }
 
+bool Variant::fn_800C2BF8() const
+{
+    return mData.b;
+}
+
 extern "C" UnidentifiedVariant_80054AB8 fn_800C33C8(
     InterpreterCore* pInterpreter, const char* pFunctionName,
     cPlayer* pPlayer, cPlayer* pTarget)

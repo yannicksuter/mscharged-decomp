@@ -40,9 +40,11 @@ static inline GLRenderPair CreateTarget(unsigned long& hash, const GLTargetInfo*
 
 void gl_TargetStartup()
 {
+    unsigned long hash;
+    GLXTarget* platformTarget;
     GLRenderPair target = GetBackBufferTarget();
-    GLXTarget* platformTarget = target.target;
-    unsigned long hash = glHash("target/backbuffer");
+    platformTarget = target.target;
+    hash = glHash("target/backbuffer");
     targets.Add(hash, platformTarget);
 }
 

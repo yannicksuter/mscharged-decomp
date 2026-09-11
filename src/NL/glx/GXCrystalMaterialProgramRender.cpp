@@ -90,7 +90,7 @@ template <>
 void GXMaterialProgramImpl<GXCrystalMaterialProgram>::Prepare(
     const glModelPacket* packet)
 {
-    GXCrystalMaterialParameters* parameters = (GXCrystalMaterialParameters*)packet->unknown20;
+    GXCrystalMaterialParameters* parameters = (GXCrystalMaterialParameters*)packet->materialParameters;
     glSetMaterialTextureAlphaState(this, packet, parameters->texture1.texture);
     unsigned int& rasterState = *(unsigned int*)&packet->rasterState;
     glSetRasterState(rasterState, GLS_Culling, 1);
@@ -112,7 +112,7 @@ void GXMaterialProgramImpl<GXCrystalMaterialProgram>::Draw(
     GXSetTevKColor(GX_KCOLOR0, silhouetteColour);
     GXSetTevKColor(GX_KCOLOR1, edgeColour);
 
-    GXCrystalMaterialParameters* parameters = (GXCrystalMaterialParameters*)packet->unknown20;
+    GXCrystalMaterialParameters* parameters = (GXCrystalMaterialParameters*)packet->materialParameters;
     parameters->texture2.SetWrapS(1);
 
     nlMatrix4 model;

@@ -131,7 +131,7 @@ bool FEBackButton::UpdateBackButton(FEPointerEvent event, float)
         TLInstance* over;
         if (found == 0)
         {
-            over = &gDefaultTLImageInstance;
+            over = &UnidentifiedTLImageDefault::sInstance;
         }
         else
         {

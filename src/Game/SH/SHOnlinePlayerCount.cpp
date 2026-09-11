@@ -72,7 +72,7 @@ void SHOnlinePlayerCount::SceneCreated()
                     nlStringLowerHash(groupName), nlStringLowerHash(name), 0, 0, 0);
             if (button == 0)
             {
-                button = &gDefaultTLComponentInstance;
+                button = &UnidentifiedTLComponentDefault::sInstance;
             }
             mButtonInstances[i] = button;
         }
@@ -360,4 +360,3 @@ static TweakIntBinding sTournamentLowBoundTweak(
 static TweakIntBinding sTournamentHiBoundTweak(
     "s_nTournamentHiBound", "Network/DWCLobby", &s_nTournamentHiBound, true);
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

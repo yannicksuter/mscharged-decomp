@@ -1,4 +1,5 @@
 #include "Game/Audio/AudioBackend.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "NL/nlDebugString.h"
 #include "Game/Audio/AudioBankLoader.h"
@@ -7,6 +8,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
+#include "unclassified/tu_802F2C3C.h"
 #include "types.h"
 
 #include <NMWException.h>
@@ -106,7 +108,7 @@ struct SliderManager_802EFA14
     void* rpcController;
 };
 
-extern void* lbl_8052F3C8[4];
+extern void* __vt__10Transition[4];
 extern char lbl_8052F5D0[0x11];
 extern char lbl_8052F5E8[0x18];
 extern char lbl_8052F600[0x17];
@@ -117,9 +119,6 @@ extern SlotPoolBase lbl_8057F9E8;
 extern SlotPoolBase lbl_8057FA10;
 extern SlotPoolBase lbl_8057FA68;
 extern SlotPoolBase lbl_8057FAA8;
-extern SlotPoolBase lbl_8057FAE8;
-extern SlotPoolBase lbl_8057FB10;
-extern SlotPoolBase lbl_8057FB38;
 extern SlotPoolBase lbl_8057FB78;
 
 extern "C" void* fn_802EFB70(nlChunk* chunk);
@@ -385,7 +384,7 @@ extern "C" void fn_802EF5D0(SliderState_802EE964* slider)
 {
     slider->value = 0.0f;
     slider->reportValue = true;
-    slider->vtable = lbl_8052F3C8;
+    slider->vtable = __vt__10Transition;
     slider->elapsed = -1.0f;
     slider->duration = 1.0f;
     slider->enabled = true;

@@ -8,6 +8,7 @@
 
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 static int numLingeringSystems;
 

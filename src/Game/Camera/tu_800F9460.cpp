@@ -18,6 +18,7 @@
 #include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
 #include "NL/nlTask.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >

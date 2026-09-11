@@ -1,8 +1,27 @@
 #include "Game/DB/UserOptions.h"
 
 #include "Game/Audio/AudioSystem.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 #include <string.h>
+
+// Audio category names hashed with nlStringLowerHash, kept in hash order, and
+// the index of each category's volume block in AudioValues.
+struct UnidentifiedAudioCategoryLookup
+{
+    UnidentifiedAudioCategoryLookup(u32 hash, s16 index) : mHash(hash), mIndex(index) {}
+
+    u32 mHash;
+    s16 mIndex;
+};
+
+static UnidentifiedAudioCategoryLookup sUnidentifiedAudioCategoryLookup[] = {
+    UnidentifiedAudioCategoryLookup(0x00016A70, 4), // "sfx"
+    UnidentifiedAudioCategoryLookup(0x05A165C0, 2), // "music"
+    UnidentifiedAudioCategoryLookup(0x1883E244, 1), // "default"
+    UnidentifiedAudioCategoryLookup(0x52030129, 3), // "dialogue"
+    UnidentifiedAudioCategoryLookup(0xAB29FE50, 0), // "global"
+};
 
 static const float VOLUME_TABLE[] = {
     -96.0f,

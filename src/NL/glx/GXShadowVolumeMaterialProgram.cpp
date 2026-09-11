@@ -2,6 +2,7 @@
 
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/gl/glLoadModel.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 GXShadowVolumeMaterialProgram* GXShadowVolumeMaterialProgram::Instance;
 bool GXShadowVolumeMaterialProgram::Initialized;
@@ -93,7 +94,7 @@ void GXShadowVolumeMaterialProgram::DrawDirect(const glModelPacket* packet)
 
 void GXShadowVolumeMaterialProgram::BindParameters(const glModelPacket* packet)
 {
-    glx_BindTexture(0, (glTextureBinding*)(packet->unknown20));
+    glx_BindTexture(0, (glTextureBinding*)(packet->materialParameters));
 }
 
 const GXMaterialParameter* GXShadowVolumeMaterialProgram::GetParameters()

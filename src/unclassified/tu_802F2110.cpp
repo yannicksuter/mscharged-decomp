@@ -1,6 +1,7 @@
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/XSoundHandle.h"
 #include "Game/Audio/AudioSystem.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 #include "Game/Audio/Transition.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
@@ -111,9 +112,11 @@ struct CalculationEntry_802F2110
     u8 pad_04[0x24];
 };
 
-extern void* lbl_8052F3C8[];
+extern void* __vt__10Transition[];
 extern SlotPoolBase lbl_8057FA10;
-extern SlotPoolBase lbl_8057FB78;
+extern SlotPoolBase sPlaybackOwnerPool_802F3E20;
+
+SlotPool<SoundInstance_802F2110> lbl_8057FAA8(32, 16);
 
 extern "C" void* fn_802F0394(RpcController_802F2110*, RpcDefinition_802F2110*, SoundInstance_802F2110*);
 extern "C" void fn_802F04D4(RpcController_802F2110*, SoundInstance_802F2110*);
@@ -130,12 +133,12 @@ extern "C" void fn_802F4640(VoiceNode_802F2110*, AudioSource**, u32*);
 static inline VoiceNode_802F2110* AllocateVoice_802F2110()
 {
     VoiceNode_802F2110* voice = 0;
-    if (lbl_8057FB78.m_FreeList == 0)
-        SlotPoolBase::BaseAddNewBlock(&lbl_8057FB78, sizeof(VoiceNode_802F2110));
-    if (lbl_8057FB78.m_FreeList != 0)
+    if (sPlaybackOwnerPool_802F3E20.m_FreeList == 0)
+        SlotPoolBase::BaseAddNewBlock(&sPlaybackOwnerPool_802F3E20, sizeof(VoiceNode_802F2110));
+    if (sPlaybackOwnerPool_802F3E20.m_FreeList != 0)
     {
-        voice = (VoiceNode_802F2110*)lbl_8057FB78.m_FreeList;
-        lbl_8057FB78.m_FreeList = lbl_8057FB78.m_FreeList->next;
+        voice = (VoiceNode_802F2110*)sPlaybackOwnerPool_802F3E20.m_FreeList;
+        sPlaybackOwnerPool_802F3E20.m_FreeList = sPlaybackOwnerPool_802F3E20.m_FreeList->next;
     }
     return voice;
 }
@@ -191,28 +194,6 @@ static inline void DestroyVoices_802F2110(SoundInstance_802F2110* instance)
     instance->voices = 0;
 }
 
-bool IsSoundHandleValid()
-{
-    return true;
-}
-
-struct SlotPoolEntry_802F2118
-{
-    u8 data[0x40];
-};
-
-extern "C" SlotPool<SlotPoolEntry_802F2118>* fn_802F2118(
-    SlotPool<SlotPoolEntry_802F2118>* pool, int destroy)
-{
-    if (pool != 0)
-    {
-        pool->BasicSlotPool<SlotPoolEntry_802F2118>::~BasicSlotPool();
-        if (destroy > 0)
-            operator delete(pool);
-    }
-    return pool;
-}
-
 extern "C" SoundInstance_802F2110* fn_802F2188(SoundInstance_802F2110* instance,
     CueHandle_802F2110* owner, VoiceDefinition_802F2110* definition)
 {
@@ -231,11 +212,11 @@ extern "C" SoundInstance_802F2110* fn_802F2188(SoundInstance_802F2110* instance,
     instance->currentTime = 0.0f;
     instance->activeRpc = 0;
     instance->transitionTime = 0.0f;
-    *(void***)&instance->volume = lbl_8052F3C8;
+    *(void***)&instance->volume = __vt__10Transition;
     instance->volume.elapsed = -1.0f;
     instance->volume.duration = 1.0f;
     instance->volume.enabled = true;
-    *(void***)&instance->pitch = lbl_8052F3C8;
+    *(void***)&instance->pitch = __vt__10Transition;
     instance->pitch.elapsed = -1.0f;
     instance->pitch.duration = 1.0f;
     instance->pitch.enabled = true;

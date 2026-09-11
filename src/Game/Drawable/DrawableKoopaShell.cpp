@@ -7,6 +7,7 @@
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "unclassified/tu_801A5F10.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 // Charged-only shadow prop, third of the run described beside
 // DrawableBulletBill. The live object's translation unit spells

@@ -5,6 +5,7 @@
 #include "NL/nlTicker.h"
 
 #include "Game/Sys/movie.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 float g_fTaskTimeUpperBound = 0.1f;
 nlTaskManager* nlTaskManager::m_pInstance;

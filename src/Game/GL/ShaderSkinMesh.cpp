@@ -237,17 +237,17 @@ void ShaderSkinMesh::PrepareToRender()
             glModelStream* pStreams = (glModelStream*)glFrameAlloc(
                 numStreams * sizeof(glModelStream), GLM_Header);
             memcpy(pStreams, pPacket->streams, numStreams * sizeof(glModelStream));
-            glSetModelStream(pStreams, pStreams->unknown04,
-                (void*)pPacket->unknown28, pStreams->stride, pStreams->id);
-            if (pPacket->unknown2C != 0)
+            glSetModelStream(pStreams, pStreams->index,
+                (void*)pPacket->skinnedVertices, pStreams->stride, pStreams->id);
+            if (pPacket->skinnedNormals != 0)
             {
                 glModelStream* pStream = pStreams + 1;
                 for (unsigned long j = 1; j < pPacket->numStreams; j++)
                 {
                     if (pStream->id == 2)
                     {
-                        glSetModelStream(pStream, pStream->unknown04,
-                            (void*)pPacket->unknown2C, sizeof(nlVector3), 2);
+                        glSetModelStream(pStream, pStream->index,
+                            (void*)pPacket->skinnedNormals, sizeof(nlVector3), 2);
                         break;
                     }
                 }
@@ -259,7 +259,7 @@ void ShaderSkinMesh::PrepareToRender()
     {
         for (unsigned long i = 0; i < pModel->numPackets; i++)
         {
-            pModel->packets[i].unknown28 = 0;
+            pModel->packets[i].skinnedVertices = 0;
         }
     }
 }
@@ -304,7 +304,7 @@ void ShaderSkinMesh::SoftwareSkinModel(glModel* model)
         unsigned long size = numVertices * sizeof(nlVector3);
         nlVector3* outVertices = (nlVector3*)glFrameAlloc(size, GLM_VertexData);
         nlZeroMemory(outVertices, size);
-        pPacket->unknown28 = (unsigned long)outVertices;
+        pPacket->skinnedVertices = (unsigned long)outVertices;
 
         nlVector3* outNormals = 0;
         glModelStream* pStream = glFindModelStream(pPacket, 2);
@@ -314,7 +314,7 @@ void ShaderSkinMesh::SoftwareSkinModel(glModel* model)
             outNormals = (nlVector3*)glFrameAlloc(size, GLM_VertexData);
             nlZeroMemory(outNormals, size);
             inNormals = (const nlVector3*)pStream->address;
-            pPacket->unknown2C = (unsigned long)outNormals;
+            pPacket->skinnedNormals = (unsigned long)outNormals;
         }
 
         CreateMorphBuffer(packetIndex, numVertices);

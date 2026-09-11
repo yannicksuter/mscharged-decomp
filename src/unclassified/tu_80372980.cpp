@@ -11,6 +11,8 @@
 #include "NL/MemAlloc.h"
 #include "NL/nlMemory.h"
 
+MemoryAllocator StandardAllocator;
+
 void nlInitMemory()
 {
     u32 simulatedSize = OSGetConsoleSimulatedMem2Size();

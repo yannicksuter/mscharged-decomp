@@ -16,6 +16,39 @@ add_relocations:
   - { source: .text:0x8009A814, type: l, target: __vt__10GreenShell }
   - { source: .text:0x8009A834, type: l, target: __vt__11FreezeShell }
   - { source: .text:0x8009A854, type: l, target: __vt__8RedShell }
+  # inflate hoists these literal addresses through r0 and stack slots.
+  - { source: .text:0x802AC9F8, type: ha, target: .data:0x8052B1B0 }
+  - { source: .text:0x802ACA04, type: ha, target: .rodata:0x804EA900 }
+  - { source: .text:0x802ACA2C, type: ha, target: .rodata:0x804EB100 }
+  - { source: .text:0x802ACA30, type: l, target: .data:0x8052B1B0 }
+  - { source: .text:0x802ACA4C, type: ha, target: .data:0x8052B138 }
+  - { source: .text:0x802ACA50, type: l, target: .rodata:0x804EA900 }
+  - { source: .text:0x802ACA6C, type: ha, target: .data:0x8052B16C }
+  - { source: .text:0x802ACA70, type: l, target: .rodata:0x804EB100 }
+  - { source: .text:0x802ACA8C, type: ha, target: .data:0x8052B180 }
+  - { source: .text:0x802ACA90, type: l, target: .data:0x8052B138 }
+  - { source: .text:0x802ACAA0, type: ha, target: .data:0x8052B19C }
+  - { source: .text:0x802ACAA4, type: l, target: .data:0x8052B16C }
+  - { source: .text:0x802ACAB4, type: ha, target: .data:0x8052B1C4 }
+  - { source: .text:0x802ACAB8, type: l, target: .data:0x8052B180 }
+  - { source: .text:0x802ACAC8, type: ha, target: .data:0x8052B1E4 }
+  - { source: .text:0x802ACACC, type: l, target: .data:0x8052B19C }
+  - { source: .text:0x802ACADC, type: ha, target: .data:0x8052B208 }
+  - { source: .text:0x802ACAE0, type: l, target: .data:0x8052B1C4 }
+  - { source: .text:0x802ACAF0, type: ha, target: .data:0x8052B240 }
+  - { source: .text:0x802ACAF4, type: l, target: .data:0x8052B1E4 }
+  - { source: .text:0x802ACB04, type: ha, target: .data:0x8052B25C }
+  - { source: .text:0x802ACB08, type: l, target: .data:0x8052B208 }
+  - { source: .text:0x802ACB18, type: ha, target: .data:0x8052B274 }
+  - { source: .text:0x802ACB1C, type: l, target: .data:0x8052B240 }
+  - { source: .text:0x802ACB2C, type: ha, target: .data:0x8052B290 }
+  - { source: .text:0x802ACB30, type: l, target: .data:0x8052B25C }
+  - { source: .text:0x802ACB40, type: ha, target: .data:0x8052B2A8 }
+  - { source: .text:0x802ACB44, type: l, target: .data:0x8052B274 }
+  - { source: .text:0x802ACB54, type: ha, target: .data:0x8052B2C8 }
+  - { source: .text:0x802ACB58, type: l, target: .data:0x8052B290 }
+  - { source: .text:0x802ACB6C, type: l, target: .data:0x8052B2A8 }
+  - { source: .text:0x802ACB7C, type: l, target: .data:0x8052B2C8 }
 block_relocations:
   # Chunk IDs 0x8001B000 and 0x8001B100 are values, not code pointers.
   - { source: 0x802D0474 }
@@ -48,3 +81,7 @@ force_active:
   - __init_cpp_exceptions_reference
   - __destroy_global_chain_reference
   - __fini_cpp_exceptions_reference
+  # Game/tu_8013E2EC.cpp is a code-less unit whose only content is its static
+  # initializer; nothing references its globals, so the linker would drop the
+  # compiled object although retail retains it. Root it through one of them.
+  - lbl_806E11D8

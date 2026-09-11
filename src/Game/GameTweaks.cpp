@@ -275,4 +275,3 @@ void GameTweaks::Init()
     fShotHeightVariance.BindWithDefault("Shot Height Variance", 0.06f, mCategory, false, 0.0f, 0.0f, 0.0f);
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

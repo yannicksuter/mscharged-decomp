@@ -12,6 +12,7 @@
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Ball.h"
 #include "Game/Field.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" int GetAvoidableIndex(eAvoidableThings);
 extern "C" AvoidController* fn_8002E144(cFielder*);

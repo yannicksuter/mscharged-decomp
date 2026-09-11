@@ -2,6 +2,8 @@
 
 #include "Game/TweakValue.h"
 
+FEPointerManager* g_pFEPointerManager;
+
 FEPointerManager::FEPointerManager()
     : mUnidentified01C(0)
     , mListenerCount(0)

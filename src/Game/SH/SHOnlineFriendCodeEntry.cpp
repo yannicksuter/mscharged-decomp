@@ -77,7 +77,7 @@ void SHOnlineFriendCodeEntry::InitializeButtons()
                 nlStringLowerHash("Group"), nlStringLowerHash("PAD"), 0, 0, 0);
         if (positionInstance == 0)
         {
-            positionInstance = &gDefaultTLGroupInstance;
+            positionInstance = &UnidentifiedTLGroupDefault::sInstance;
         }
 
         feVector3 position = positionInstance->GetAssetPosition();
@@ -100,7 +100,7 @@ void SHOnlineFriendCodeEntry::InitializeButtons()
                 nlStringLowerHash("Group"), nlStringLowerHash("CODE"), 0, 0, 0);
         if (positionInstance == 0)
         {
-            positionInstance = &gDefaultTLGroupInstance;
+            positionInstance = &UnidentifiedTLGroupDefault::sInstance;
         }
 
         feVector3 position = positionInstance->GetAssetPosition();
@@ -239,7 +239,7 @@ void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[item]);
 
@@ -248,7 +248,7 @@ void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[item]);
 
@@ -257,7 +257,7 @@ void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[item]);
     }
@@ -342,7 +342,7 @@ void SHOnlineFriendCodeEntry::SceneCreated()
             nlStringLowerHash(name), 0, 0);
         if (component == 0)
         {
-            component = &gDefaultTLComponentInstance;
+            component = &UnidentifiedTLComponentDefault::sInstance;
         }
         mKeypadInstances[i] = component;
     }
@@ -356,7 +356,7 @@ void SHOnlineFriendCodeEntry::SceneCreated()
             nlStringLowerHash(name), 0, 0);
         if (component == 0)
         {
-            component = &gDefaultTLComponentInstance;
+            component = &UnidentifiedTLComponentDefault::sInstance;
         }
         mDigitInstances[i] = component;
     }
@@ -380,7 +380,7 @@ void SHOnlineFriendCodeEntry::SceneCreated()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[item]);
 
@@ -389,7 +389,7 @@ void SHOnlineFriendCodeEntry::SceneCreated()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[item]);
 
@@ -398,7 +398,7 @@ void SHOnlineFriendCodeEntry::SceneCreated()
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[item]);
     }
@@ -656,7 +656,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[mSelectedDigit]);
 
@@ -665,7 +665,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[mSelectedDigit]);
 
@@ -674,7 +674,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[mSelectedDigit]);
     }
@@ -697,7 +697,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[mSelectedDigit]);
 
@@ -706,7 +706,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[mSelectedDigit]);
 
@@ -715,7 +715,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
-            text = &gDefaultTLTextInstance;
+            text = &UnidentifiedTLTextDefault::sInstance;
         }
         text->SetString(mDigits[mSelectedDigit]);
 

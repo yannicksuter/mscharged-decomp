@@ -4,7 +4,7 @@
 #include "Game/AI/Desire.h"
 #include "Game/AI/Powerups.h"
 
-extern UnidentifiedStateTransition lbl_806E20B8;
+extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 class DesireUsePowerup : public Desire
 {

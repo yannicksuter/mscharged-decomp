@@ -23,6 +23,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include "NL/nlstring_tmpl.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 GLView* ModeledScreenTransition::s_3DView;
 void (*lbl_806E217C)(glModel*);
@@ -464,6 +465,8 @@ void ModeledScreenTransition::Cancel()
     m_Effects = NULL;
 }
 
+// The original parser does not define a return value; callers discard it.
+#pragma warning off(10184) // return value expected
 ModeledScreenTransition* ModeledScreenTransition::LoadFromParser(
     SimpleParser* parser)
 {
@@ -519,6 +522,7 @@ ModeledScreenTransition* ModeledScreenTransition::LoadFromParser(
 
     FixupModel();
 }
+#pragma warning reset(10184)
 
 void ModeledScreenTransition::CreateInstance(
     TransitionModelStore& modelInfo)
@@ -570,7 +574,7 @@ void ModeledScreenTransition::Load(const char* szName)
     for (unsigned long i = 0; i < m_nModels; i++)
     {
         m_pModelMap[i]
-            = m_pSkeleton->GetNodeIndexByID(m_pModels[i].unknown00);
+            = m_pSkeleton->GetNodeIndexByID(m_pModels[i].id);
     }
 }
 

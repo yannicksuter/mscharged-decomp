@@ -46,13 +46,13 @@ extern "C" void fn_802A34A8()
 
 extern "C" void fn_802A34EC(void* renderer, const glModelPacket* packet)
 {
-    ScissorParameters_802A34F8* parameters = static_cast<ScissorParameters_802A34F8*>(packet->unknown20);
+    ScissorParameters_802A34F8* parameters = static_cast<ScissorParameters_802A34F8*>(packet->materialParameters);
     glSetMaterialTextureAlphaState(renderer, packet, parameters->value);
 }
 
 extern "C" void fn_802A34F8(void* renderer, const glModelPacket* packet)
 {
-    ScissorParameters_802A34F8* parameters = static_cast<ScissorParameters_802A34F8*>(packet->unknown20);
+    ScissorParameters_802A34F8* parameters = static_cast<ScissorParameters_802A34F8*>(packet->materialParameters);
     if (parameters->x <= lbl_806E5FB8)
     {
         u32 height = glplatGetFrameBufferHeight();

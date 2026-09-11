@@ -13,7 +13,7 @@ namespace
 inline const GXMaterialParameter* FindParameter(
     const glModelPacket* packet, unsigned long hash)
 {
-    GLMaterialProgram* program = (GLMaterialProgram*)packet->unknown10;
+    GLMaterialProgram* program = (GLMaterialProgram*)packet->materialProgram;
     unsigned long count = program->parameterCount;
     const GXMaterialParameter* parameter = program->GetParameters();
 
@@ -31,14 +31,14 @@ inline const GXMaterialParameter* FindParameter(
 inline unsigned char* GetParameterData(
     const glModelPacket* packet, const GXMaterialParameter* parameter)
 {
-    return (unsigned char*)packet->unknown20 + parameter->offset;
+    return (unsigned char*)packet->materialParameters + parameter->offset;
 }
 } // namespace
 
 const GXMaterialParameter* glGetMaterialParameterInfo(
     const glModelPacket* packet, unsigned long index)
 {
-    GLMaterialProgram* program = (GLMaterialProgram*)packet->unknown10;
+    GLMaterialProgram* program = (GLMaterialProgram*)packet->materialProgram;
     if (index < program->parameterCount)
     {
         return program->GetParameters() + index;

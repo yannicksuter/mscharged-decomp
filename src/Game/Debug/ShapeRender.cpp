@@ -507,7 +507,7 @@ extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
     {
         glModelPacket* packet = &pModel->packets[index];
         packet->matrix = matrix;
-        memcpy((u8*)packet->unknown20 + sizeof(glTextureBinding),
+        memcpy((u8*)packet->materialParameters + sizeof(glTextureBinding),
             &local_08,
             sizeof(local_08));
 
@@ -716,13 +716,13 @@ extern "C" void fn_802BD2C8(PrimitiveShape* shape, int arg1, void* arg2)
             index++;
         }
 
-        glTextureBinding* textureState = (glTextureBinding*)mesh.GetModel()->packets->unknown20;
+        glTextureBinding* textureState = (glTextureBinding*)mesh.GetModel()->packets->materialParameters;
         textureState->texture = WhiteTexture;
         textureState->textureIndex = 0xFFFF;
         textureState->SetWrapS(true);
         textureState->SetWrapT(true);
         textureState->unknown07 = 0;
-        memcpy((u8*)mesh.GetModel()->packets->unknown20
+        memcpy((u8*)mesh.GetModel()->packets->materialParameters
                    + sizeof(glTextureBinding),
             &colour,
             sizeof(colour));
@@ -734,4 +734,3 @@ extern "C" void fn_802BD2C8(PrimitiveShape* shape, int arg1, void* arg2)
     }
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

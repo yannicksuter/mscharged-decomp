@@ -8,6 +8,13 @@ class FETextureResource;
 class TLImageInstance : public TLInstance
 {
 public:
+    TLImageInstance(FELibObject* component)
+        : TLInstance(component)
+    {
+        m_pTextureResource = 0;
+        m_type = TLAT_IMAGE;
+    }
+
     FETextureResource*& fn_802332D0();
     void fn_802332D8(FETextureResource* resource);
 
@@ -15,6 +22,5 @@ public:
     /* 0x94 */ unsigned long field_0x94;
 }; // size 0x98
 
-extern TLImageInstance gDefaultTLImageInstance;
 
 #endif // GAME_FE_TL_IMAGE_INSTANCE_H

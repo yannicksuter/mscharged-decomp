@@ -60,6 +60,8 @@
 #include "Game/Render/BirdoEgg.h"
 #include "Game/Render/ShootToScoreMeter.h"
 #include "math.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/UnidentifiedRegistryPools.h"
 
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 static const nlVector3 v3ElectrocutionLaunch = { -5.0f, 0.0f, 5.0f };
@@ -1527,7 +1529,7 @@ float cFielder::fn_80048A08()
 void cFielder::InitActionMegaStrikeMeter(bool bParam)
 {
     tDebugPrintManager::Print(DC_NETWORK, "InitActionMegaStrikeMeter at frame %d\n",
-        ((UnidentifiedHandler8011166C*)GetFixedUpdateTask())->UnidentifiedVirtual34());
+        GetFixedUpdateTask()->GetFrame());
 
     mUnidentified390 = 0.0f;
     mUnidentified394 = 0.0f;
@@ -5551,14 +5553,16 @@ extern "C" float fn_8004F58C(void)
 namespace tDebugPrintManager
 {
 
+// The retail debug-print stub leaves its return value unspecified.
+#pragma warning off(10184) // return value expected
 int Print(eDEBUG_CHANNEL channel, const char* format, ...)
 {
 }
+#pragma warning reset(10184)
 
 } // namespace tDebugPrintManager
 
 bool gbUseTurboCharging = true;
-
 
 static TweakBoolBinding s_UseTurboChargingTweak(
     "gbUseTurboCharging", "Game/Gameplay/Charging/Turbo",
@@ -5566,53 +5570,3 @@ static TweakBoolBinding s_UseTurboChargingTweak(
 
 u16 g_IdleTurnCompletionDelta = (u16)(65536.0f / 36.0f);
 
-// The original template identities of these common weak pool statics are
-// not yet known.
-struct UnidentifiedPoolEntry14
-{
-    u8 mUnknown[0x14];
-};
-
-struct UnidentifiedPoolEntry40
-{
-    u8 mUnknown[0x40];
-};
-
-template <typename T>
-struct UnidentifiedPoolStorage
-{
-    static SlotPool<UnidentifiedPoolEntry14> pool14;
-    static SlotPool<UnidentifiedPoolEntry40> pool40;
-};
-
-template <typename T>
-SlotPool<UnidentifiedPoolEntry14> UnidentifiedPoolStorage<T>::pool14(
-    0x10, 0x10);
-template <typename T>
-SlotPool<UnidentifiedPoolEntry40> UnidentifiedPoolStorage<T>::pool40(
-    0x10, 0x10);
-
-// The original type identity of this common weak static is not yet known.
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
-
-struct UnidentifiedStaticTag;
-
-template struct UnidentifiedPoolStorage<UnidentifiedStaticTag>;
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

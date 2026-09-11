@@ -202,13 +202,13 @@ static void DrawPrimitive(const ElectricFenceGeometry& prim,
     if (mesh.Begin(prim.vertCount, nPrimType, 0))
     {
         glTextureBinding* textureState =
-            (glTextureBinding*)mesh.model->packets->unknown20;
+            (glTextureBinding*)mesh.model->packets->materialParameters;
         textureState->texture = textureHandle;
         textureState->textureIndex = 0xFFFF;
         textureState->SetWrapS(false);
         textureState->SetWrapT(false);
         textureState->unknown07 = 0;
-        memcpy((u8*)mesh.GetModel()->packets->unknown20
+        memcpy((u8*)mesh.GetModel()->packets->materialParameters
                 + sizeof(glTextureBinding),
             colour, sizeof(colour));
 

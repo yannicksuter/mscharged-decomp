@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsSphere.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 struct KoopaShellObject;
 

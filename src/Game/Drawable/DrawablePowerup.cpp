@@ -9,27 +9,7 @@
 #include "NL/nlString.h"
 #include "unclassified/tu_80186524.h"
 #include "Game/Render/StadiumLoading.h"
-
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
-
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
+#include "Game/UnidentifiedStaticStorage.h"
 
 class RenderObject
 {
@@ -271,4 +251,3 @@ void DrawablePowerup::Blend(const float* blendFactors, const DrawablePowerup& lh
     nlVecLerp(mPosition, lhs.mPosition, rhs.mPosition, factor);
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

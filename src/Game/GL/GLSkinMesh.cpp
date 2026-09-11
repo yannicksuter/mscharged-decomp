@@ -2,6 +2,7 @@
 
 #include "Game/PoseAccumulator.h"
 #include "NL/nlMemory.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 GLSkinMesh::~GLSkinMesh()
 {

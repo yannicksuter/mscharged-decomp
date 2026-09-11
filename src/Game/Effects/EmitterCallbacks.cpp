@@ -12,6 +12,7 @@
 #include "Game/SHierarchy.h"
 #include "Game/Team.h"
 #include "NL/nlTask.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern float lbl_806DB5A4;
 

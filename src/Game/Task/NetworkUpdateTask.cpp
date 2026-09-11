@@ -19,7 +19,8 @@
 #include "NL/nlMemory.h"
 #include "types.h"
 
-extern u8 lbl_806E1008;
+u8 lbl_806E1008;
+bool gOnlineFourMachineFriendLobby;
 
 void RegisterNetworkMessages_801258A8();
 void NetworkUpdateTask::Initialize()

@@ -2,6 +2,7 @@
 
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/gl/glLoadModel.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 GXMaterialProgram_80299490* GXMaterialProgram_80299490::Instance;
 bool GXMaterialProgram_80299490::Initialized;
@@ -89,10 +90,10 @@ void GXMaterialProgram_80299490::BindVertexArrays(const glModelPacket* packet)
 
 void GXMaterialProgram_80299490::BindParameters(const glModelPacket* packet)
 {
-    glx_BindTexture(0, (glTextureBinding*)(packet->unknown20));
-    glx_BindTexture(1, (glTextureBinding*)((unsigned char*)packet->unknown20 + 8));
-    glx_BindTexture(2, (glTextureBinding*)((unsigned char*)packet->unknown20 + 16));
-    glx_BindTexture(3, (glTextureBinding*)((unsigned char*)packet->unknown20 + 24));
+    glx_BindTexture(0, (glTextureBinding*)(packet->materialParameters));
+    glx_BindTexture(1, (glTextureBinding*)((unsigned char*)packet->materialParameters + 8));
+    glx_BindTexture(2, (glTextureBinding*)((unsigned char*)packet->materialParameters + 16));
+    glx_BindTexture(3, (glTextureBinding*)((unsigned char*)packet->materialParameters + 24));
 }
 
 const GXMaterialParameter* GXMaterialProgram_80299490::GetParameters()

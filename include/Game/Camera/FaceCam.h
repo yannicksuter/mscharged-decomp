@@ -15,7 +15,6 @@ public:
     virtual const nlVector3& GetCameraPosition() const;
     virtual const nlVector3& GetTargetPosition() const;
 
-    void SetToUserCharacter();
 
     /* 0x20 */ cCharacter* mpCharacter;
     /* 0x24 */ float mDistance;

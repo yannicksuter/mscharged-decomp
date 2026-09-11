@@ -13,7 +13,10 @@ public:
     DiddyBanana(cSHierarchy& hierarchy, int modelID,
         cInventory<cSAnim>& animInventory, void* resource);
     virtual ~DiddyBanana();
-    virtual SkinAnimatedNPC_Type GetSkinAnimatedNPC_Type() const;
+    virtual SkinAnimatedNPC_Type GetSkinAnimatedNPC_Type() const
+    {
+        return (SkinAnimatedNPC_Type)5;
+    }
     virtual void Update(float dt);
     virtual void DrawShadow(const cPoseAccumulator& poseAccumulator,
         const nlMatrix4& worldMatrix);

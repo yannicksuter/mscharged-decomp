@@ -4,7 +4,6 @@ extern void* OSGetArenaLo();
 extern void* OSGetArenaHi();
 extern void* OSInitAlloc(void *, void *, int);
 extern volatile int __OSCurrHeap;
-extern const char lbl_804EC5F8[];
 
 #define OSRoundUp32B(x) (((unsigned int)(x) + 32 - 1) & ~(32 - 1))
 #define OSRoundDown32B(x) (((unsigned int)(x)) & ~(32 - 1))
@@ -14,8 +13,8 @@ static inline void InitDefaultHeap()
 	void* arenaLo;
 	void* arenaHi;
 
-	OSReport(lbl_804EC5F8);
-	OSReport(lbl_804EC5F8 + 0x36);
+	OSReport("GCN_Mem_Alloc.c : InitDefaultHeap. No Heap Available\n");
+	OSReport("Metrowerks CW runtime library initializing default heap\n");
 
 	arenaLo = OSGetArenaLo();
 	arenaHi = OSGetArenaHi();

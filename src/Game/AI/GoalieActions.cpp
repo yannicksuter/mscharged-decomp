@@ -156,7 +156,6 @@ extern "C" void fn_800797DC(
     Goalie* pGoalie, int nParam, float fDeltaT, float fParam);
 extern "C" void fn_8007B680(Goalie* pGoalie, bool bParam);
 extern "C" void fn_80013898(cBall* pBall);
-extern "C" float fn_800776B4();
 extern "C" void fn_8005DB44(
     UnidentifiedGoalieActionState* pState, unsigned int nParam, bool bParam);
 extern "C" EmissionController* fn_801B64E8(

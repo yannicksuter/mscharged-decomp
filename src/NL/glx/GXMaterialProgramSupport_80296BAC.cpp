@@ -6,6 +6,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C"
 {
@@ -200,7 +201,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 static inline float WrapTextureOffset_80296BAC(float value)
@@ -237,7 +238,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Draw(
     program->BindParameters(packet);
 
     MaterialMode_80296BAC mode;
-    if (((GXMaterialProgramParameters_8029FC0C*)packet->unknown20)->value52 == 0
+    if (((GXMaterialProgramParameters_8029FC0C*)packet->materialParameters)->value52 == 0
         || fn_801820FC() == 0)
     {
         mode = MATERIAL_MODE_0_80296BAC;
@@ -275,10 +276,10 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Draw(
     }
 
     float alpha = lbl_806DF0C1
-        ? ((GXMaterialProgramParameters_8029FC0C*)packet->unknown20)->value16
+        ? ((GXMaterialProgramParameters_8029FC0C*)packet->materialParameters)->value16
         : 0.0f;
     GXMaterialProgramParameters_8029FC0C* parameters =
-        (GXMaterialProgramParameters_8029FC0C*)packet->unknown20;
+        (GXMaterialProgramParameters_8029FC0C*)packet->materialParameters;
     float lighting = parameters->value20;
     int useTextureMatrix = parameters->value48;
 
@@ -319,7 +320,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029FC0C>::Draw(
     fn_80183B40(packet->matrix);
 
     bool enableState = false;
-    if (((GXMaterialProgramParameters_8029FC0C*)packet->unknown20)->value56 == 1
+    if (((GXMaterialProgramParameters_8029FC0C*)packet->materialParameters)->value56 == 1
         && lbl_806DF0C3)
         enableState = true;
 

@@ -16,6 +16,7 @@
 #include "NL/nlSlotPool.h"
 
 #include <math.h>
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" void fn_80147C9C(CollisionBulletBillData*);
 extern "C" void fn_80147DE4(CollisionBulletBillData*);

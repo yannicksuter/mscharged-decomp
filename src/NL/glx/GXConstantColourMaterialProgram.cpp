@@ -2,6 +2,7 @@
 
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/gl/glLoadModel.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 GXConstantColourMaterialProgram* GXConstantColourMaterialProgram::Instance;
 bool GXConstantColourMaterialProgram::Initialized;
@@ -87,7 +88,7 @@ void GXConstantColourMaterialProgram::DrawDirect(const glModelPacket* packet)
 
 void GXConstantColourMaterialProgram::BindParameters(const glModelPacket* packet)
 {
-    glx_BindTexture(0, (glTextureBinding*)(packet->unknown20));
+    glx_BindTexture(0, (glTextureBinding*)(packet->materialParameters));
 }
 
 const GXMaterialParameter* GXConstantColourMaterialProgram::GetParameters()

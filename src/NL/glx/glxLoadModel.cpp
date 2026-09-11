@@ -136,8 +136,8 @@ void GLXRLGReader::FinalizeModels()
             ++packetIndex)
         {
             glModelPacket* packet = &model->packets[packetIndex];
-            packet->unknown10 =
-                glGetMaterialProgram((unsigned long)packet->unknown10);
+            packet->materialProgram =
+                glGetMaterialProgram((unsigned long)packet->materialProgram);
 
             if (HasStream(packet, 7))
             {
@@ -145,10 +145,10 @@ void GLXRLGReader::FinalizeModels()
             }
 
             glplatFinalizePacket(packet, true, m_pResource);
-            ((GLMaterialProgram*)packet->unknown10)->Prepare(packet);
+            ((GLMaterialProgram*)packet->materialProgram)->Prepare(packet);
         }
 
-        GLVertexAnim* loaded = m_pResource->m_inventory->GetVertexAnim(model->unknown00);
+        GLVertexAnim* loaded = m_pResource->m_inventory->GetVertexAnim(model->id);
         if (loaded != 0)
         {
             loaded->m_pModel = model;

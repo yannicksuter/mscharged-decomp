@@ -15,6 +15,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlPrint.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 enum eGameState
 {

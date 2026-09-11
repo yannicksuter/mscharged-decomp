@@ -1,5 +1,8 @@
 #include "Game/GameSceneManager.h"
 
+template <>
+GameSceneManager* nlSingleton<GameSceneManager>::s_pInstance = 0;
+
 GameSceneManager::GameSceneManager()
 {
 }

@@ -2,6 +2,7 @@
 
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/gl/glLoadModel.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 GXMaterialProgram_802A3EF0* GXMaterialProgram_802A3EF0::Instance;
 bool GXMaterialProgram_802A3EF0::Initialized;
@@ -92,7 +93,7 @@ void GXMaterialProgram_802A3EF0::DrawDirect(const glModelPacket* packet)
 
 void GXMaterialProgram_802A3EF0::BindParameters(const glModelPacket* packet)
 {
-    glx_BindTexture(0, (glTextureBinding*)(packet->unknown20));
+    glx_BindTexture(0, (glTextureBinding*)(packet->materialParameters));
 }
 
 const GXMaterialParameter* GXMaterialProgram_802A3EF0::GetParameters()

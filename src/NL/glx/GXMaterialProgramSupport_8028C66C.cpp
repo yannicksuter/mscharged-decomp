@@ -167,7 +167,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80298B18>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 struct FloatColour_8028C66C
@@ -196,7 +196,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298B18>::Draw(
     GXMaterialProgram_80298B18* program = static_cast<GXMaterialProgram_80298B18*>(this);
     program->BindVertexArrays(packet);
     program->BindParameters(packet);
-    GXMaterialProgramParameters_80298B18* parameters = (GXMaterialProgramParameters_80298B18*)packet->unknown20;
+    GXMaterialProgramParameters_80298B18* parameters = (GXMaterialProgramParameters_80298B18*)packet->materialParameters;
 
     float value76 = parameters->value76;
     if (lbl_806E1AA4 > 0.0f)
@@ -308,7 +308,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80298B18>::Draw(
         GXLoadTexMtxImm(texturePlane, 33, GX_MTX2x4);
     }
 
-    if (packet->unknown28 == 0)
+    if (packet->skinnedVertices == 0)
     {
         glx_LoadSkinMatrices(parameters->matrices, parameters->matricesSize / 48, &modelview, 0);
     }

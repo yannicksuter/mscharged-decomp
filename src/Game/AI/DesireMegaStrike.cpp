@@ -18,7 +18,6 @@
 extern "C" cTeam* fn_800D6670(cFielder*);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E39C(cFielder*);
-extern "C" float fn_8002E058(cFielder*);
 extern "C" void fn_8003A0E4(cFielder*);
 extern "C" float fn_800499EC(cFielder*, int);
 extern "C" float fn_80049CC0(cFielder*, int);
@@ -280,7 +279,7 @@ bool DesireMegaStrike::fn_800B9D84(
 
         if (nMeterResult >= mUnidentifiedA4 && !bAtRequestedValue)
         {
-            if (fn_8002E058(mUnidentifiedFielder) <= 0.225f)
+            if (mUnidentifiedFielder->fn_8002E058() <= 0.225f)
             {
                 break;
             }
@@ -291,7 +290,7 @@ bool DesireMegaStrike::fn_800B9D84(
             if (nlRandomf(1.0f) > fChance)
             {
                 bButtonPressed = true;
-                if (fn_8002E058(mUnidentifiedFielder) <= 0.225f)
+                if (mUnidentifiedFielder->fn_8002E058() <= 0.225f)
                 {
                     mUnidentifiedB4 = 2;
                 }

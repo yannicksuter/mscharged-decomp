@@ -37,7 +37,3 @@ FaceCam::FaceCam(float distance)
     mpCharacter = 0;
     mDistance = distance;
 }
-
-void FaceCam::SetToUserCharacter()
-{
-}

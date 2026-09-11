@@ -12,6 +12,7 @@
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Render/SkinAnimatedNPC.h"
 #include "NL/nlSlotPool.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 struct CollisionCrackEggData
 {

@@ -60,10 +60,11 @@ public:
         GlyphInfo() { nlVec2Set(uv, -1.0f, -1.0f); }
 
         /* 0x00 */ nlVector2 uv;
-        /* 0x08 */ unsigned char _pad_08[8];
+        /* 0x08 */ nlVector2 Unidentified_08;
         /* 0x10 */ unsigned char Advance;
         /* 0x11 */ unsigned char RenderWidth;
-        /* 0x12 */ unsigned char _pad_12[2];
+        /* 0x12 */ unsigned char Unidentified_12;
+        /* 0x13 */ unsigned char Unidentified_13;
         /* 0x14 */ signed char Offset;
         /* 0x15 */ unsigned char Page : 4;
         /* 0x15 */ unsigned char HasKernPairs : 1;
@@ -74,6 +75,7 @@ public:
         };
 
         operator unsigned long() const { return UnicodeChar; }
+        static int SortProc(const GlyphInfo* pa, const GlyphInfo* pb) { return pa->UnicodeChar - pb->UnicodeChar; }
     };
 
     struct KernPair
@@ -90,6 +92,7 @@ public:
         /* 0x4 */ int Kern;
 
         operator unsigned long() const { return hash; }
+        static int SortProc(const KernPair* pa, const KernPair* pb) { return pa->hash - pb->hash; }
     };
 
     unsigned long GetStringWidth(const FontCharString& Text, bool SingleLine, unsigned long Width, bool WordWrap) const;

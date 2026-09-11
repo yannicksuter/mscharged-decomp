@@ -5,6 +5,7 @@
 #include "NL/nlDebug.h"
 #include "NL/nlMemory.h"
 #include "Game/InputManager.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 NetworkSyncState* gNetworkSyncState;
 bool g_bBreakOnSyncError;

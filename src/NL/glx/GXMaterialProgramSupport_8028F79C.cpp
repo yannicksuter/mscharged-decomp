@@ -9,6 +9,7 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
 #include "unclassified/tu_801820FC.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 struct GXMaterialProgramParameters_80299A90
 {
@@ -17,7 +18,7 @@ struct GXMaterialProgramParameters_80299A90
     /* 0x0C */ unsigned long matricesSize;
 }; // size: 0x10
 
-extern bool lbl_806DF050;
+bool lbl_806DF050 = true;
 
 static nlMatrix4 sViewMatrix;
 static int sUnidentifiedState;
@@ -50,7 +51,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, static_cast<const GXMaterialProgramParameters_80299A90*>(packet->unknown20)->texture0.texture);
+    glSetMaterialTextureAlphaState(this, packet, static_cast<const GXMaterialProgramParameters_80299A90*>(packet->materialParameters)->texture0.texture);
 }
 
 template <>
@@ -69,9 +70,9 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Draw(
     glGetMatrix(packet->matrix, model);
     nlMultMatrices(modelview, model, sViewMatrix);
 
-    if (packet->unknown28 == 0)
+    if (packet->skinnedVertices == 0)
     {
-        const GXMaterialProgramParameters_80299A90* parameters = static_cast<const GXMaterialProgramParameters_80299A90*>(packet->unknown20);
+        const GXMaterialProgramParameters_80299A90* parameters = static_cast<const GXMaterialProgramParameters_80299A90*>(packet->materialParameters);
         glx_LoadSkinMatrices(parameters->matrices,
             parameters->matricesSize / 48,
             &modelview,

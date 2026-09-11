@@ -7,6 +7,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C"
 {
@@ -93,7 +94,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029EF54>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 struct FloatColour_80295E00
@@ -120,8 +121,8 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029EF54>::Draw(
     static_cast<GXMaterialProgram_8029EF54*>(this)->BindParameters(packet);
 
     const nlVector3& cameraPosition = cCameraManager::PeekCamera()->GetCameraPosition();
-    float scale = *(float*)((unsigned char*)packet->unknown20 + 24);
-    float scroll = *(float*)((unsigned char*)packet->unknown20 + 28);
+    float scale = *(float*)((unsigned char*)packet->materialParameters + 24);
+    float scroll = *(float*)((unsigned char*)packet->materialParameters + 28);
     float reciprocal = scale == 0.0f ? 1.0f : 1.0f / scale;
 
     Mtx textureMatrix;
@@ -139,7 +140,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029EF54>::Draw(
     textureMatrix[2][3] = 0.0f;
     GXLoadTexMtxImm(textureMatrix, 33, GX_MTX3x4);
 
-    if (*(int*)((unsigned char*)packet->unknown20 + 40) == 1)
+    if (*(int*)((unsigned char*)packet->materialParameters + 40) == 1)
     {
         if (!lbl_806E1BBC)
         {
@@ -158,7 +159,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029EF54>::Draw(
     fn_80183B40(packet->matrix);
 
     bool enableState = false;
-    if (*(int*)((unsigned char*)packet->unknown20 + 44) == 1
+    if (*(int*)((unsigned char*)packet->materialParameters + 44) == 1
         && lbl_806DF0B4)
         enableState = true;
 
@@ -176,14 +177,14 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029EF54>::Draw(
         lbl_806E1BBD = false;
     }
 
-    if (*(int*)((unsigned char*)packet->unknown20 + 36) == 1)
+    if (*(int*)((unsigned char*)packet->materialParameters + 36) == 1)
     {
-        glTextureBinding* texture = (glTextureBinding*)packet->unknown20;
+        glTextureBinding* texture = (glTextureBinding*)packet->materialParameters;
         texture->SetWrapS(true);
         texture->SetWrapT(true);
     }
 
-    float value = *(float*)((unsigned char*)packet->unknown20 + 32);
+    float value = *(float*)((unsigned char*)packet->materialParameters + 32);
     FloatColour_80295E00 colour = { { value, value, value, value } };
     GXColor gxColour = ConvertColour_80295E00(colour);
     GXSetTevKColor(GX_KCOLOR0, gxColour);

@@ -10,6 +10,9 @@
 #include "NL/plat/GameCubePad.h"
 #include "Game/NetworkInput.h"
 
+u16 lbl_806DF740 = 0xFFFF;
+int lbl_806E2130;
+
 u8 DetInput::GetConnectionStatus()
 {
     return m_nConnected;

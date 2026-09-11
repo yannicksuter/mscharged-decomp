@@ -293,4 +293,3 @@ void Delay::EndBlend()
         m_Enabled = true;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

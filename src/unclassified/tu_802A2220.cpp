@@ -51,13 +51,13 @@ extern "C" void fn_802A22B8(void*)
 
 extern "C" void fn_802A22BC(void* renderer, const glModelPacket* packet)
 {
-    u32* parameter = static_cast<u32*>(packet->unknown20);
+    u32* parameter = static_cast<u32*>(packet->materialParameters);
     glSetMaterialTextureAlphaState(renderer, packet, *parameter);
 }
 
 extern "C" void fn_802A22C8(void* renderer, const glModelPacket* packet)
 {
-    Parameter_802A22C8* parameter = static_cast<Parameter_802A22C8*>(packet->unknown20);
+    Parameter_802A22C8* parameter = static_cast<Parameter_802A22C8*>(packet->materialParameters);
     GXColor_802A22C8 colour;
     colour.r = static_cast<u8>(lbl_806E5F88 * parameter->red);
     colour.g = static_cast<u8>(lbl_806E5F88 * parameter->green);

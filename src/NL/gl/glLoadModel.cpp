@@ -36,7 +36,7 @@ void RLGReader::LoadSkinData(nlChunk* chunk)
     nlChunk* skinData = (nlChunk*)nlMalloc(size, 32, false);
     memcpy(skinData, chunk, size);
     m_pResource->m_inventory->AddSkinData(
-        m_pModels->unknown00, skinData);
+        m_pModels->id, skinData);
 }
 
 void RLGReader::LoadVertexAnimData(nlChunk* chunk)
@@ -100,9 +100,9 @@ void RLGReader::RegisterModels()
     {
         glModel* model = &m_pModels[i];
         if (!glIgnoreDuplicateModels
-            || m_pResource->m_inventory->GetModel(model->unknown00) == 0)
+            || m_pResource->m_inventory->GetModel(model->id) == 0)
         {
-            m_pResource->m_inventory->AddModel(model->unknown00, model);
+            m_pResource->m_inventory->AddModel(model->id, model);
         }
     }
 }
@@ -126,8 +126,8 @@ static void FixupModelData(RLGReader* reader)
             ++packetIndex)
         {
             glModelPacket* packet = &model->packets[packetIndex];
-            packet->unknown20 = (unsigned char*)reader->m_pParameterData
-                              + (unsigned long)packet->unknown20;
+            packet->materialParameters = (unsigned char*)reader->m_pParameterData
+                              + (unsigned long)packet->materialParameters;
             packet->streams = (glModelStream*)((unsigned char*)reader->m_pStreamData
                                                + (unsigned long)packet->streams);
             packet->indexBuffer = (unsigned short*)((unsigned char*)reader->m_pIndexData

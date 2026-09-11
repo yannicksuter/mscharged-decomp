@@ -179,7 +179,7 @@ void FEPageControls::InitializeButtons()
     {
         mButtonInstances[i]->SetActiveSlide("over", true, false);
         TLSlide* slide = mButtonInstances[i]->GetActiveSlide();
-        float end = slide->m_start + slide->m_duration;
+        float end = slide->GetStartTime() + slide->GetDuration();
         mButtonInstances[i]->GetActiveSlide()->m_time = end;
         mButtons[i].SetInstanceBounds(mButtonInstances[i], true, 0.0f, 0.0f, 1.0f, 1.0f);
         mButtonInstances[i]->SetActiveSlide("off", true, false);

@@ -6,6 +6,7 @@
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
 #include "NL/gl/glTexture.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 
 bool glAttachQuad3(eGLView view, unsigned long count, glQuad3* quads)
@@ -71,7 +72,7 @@ const glModel* glQuad3::GetModel() const
     if (texconfig == 0)
     {
         glTextureBinding* state =
-            (glTextureBinding*)writer.model->packets->unknown20;
+            (glTextureBinding*)writer.model->packets->materialParameters;
         state->texture = gWhiteTextureID;
         state->textureIndex = 0xFFFF;
         state->SetWrapS(true);
@@ -99,7 +100,7 @@ const glModel* glQuad3::GetModel() const
 
         u32 texture = glGetCurrentTexture(GLTT_Diffuse);
         glTextureBinding* state =
-            (glTextureBinding*)writer.model->packets->unknown20;
+            (glTextureBinding*)writer.model->packets->materialParameters;
         state->texture = texture;
         state->textureIndex = 0xFFFF;
         state->SetWrapS(wrapS);

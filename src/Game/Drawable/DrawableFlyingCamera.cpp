@@ -8,31 +8,12 @@
 #include "NL/nlString.h"
 #include "NL/platqmath.h"
 #include "unclassified/tu_8019FE24.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 // Charged-only shadow prop, sixth of the run described beside
 // DrawableBulletBill. This one carries the index of its live camera instead of
 // a pointer, and owns a lowercase hash of the flying-camera model name. The
 // live object and the render-object lookup stay address-named.
-
-// The original type identity of this common weak static is not yet known.
-struct UnidentifiedStaticState
-{
-    UnidentifiedStaticState()
-        : value(0)
-    {
-    }
-
-    void* value;
-};
-
-template <typename T>
-struct UnidentifiedStaticStorage
-{
-    static UnidentifiedStaticState state;
-};
-
-struct UnidentifiedStaticTag;
-
 
 static float gShadowScaleHigh = 0.5f;
 static int gShadowAlphaLow = 100;
@@ -207,7 +188,3 @@ void DrawableFlyingCamera::Blend(const float* factors, const DrawableFlyingCamer
 
 static u32 gFlyingCameraNameHash = nlStringLowerHash("gameplay/flyingcamera3");
 
-template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
-
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

@@ -7,27 +7,22 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/FE/tlSlide.h"
-
-extern TLImageInstance gDefaultTLImageInstance;
-extern TLComponentInstance gDefaultTLComponentInstance;
-extern TLTextInstance gDefaultTLTextInstance;
-extern TLInstance gDefaultTLGroupInstance;
-extern TLInstance gDefaultTLLayerInstance;
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 inline TLInstance* FEGetDefaultInstance(eTimeLineAssetType type)
 {
     switch (type)
     {
     case TLAT_LAYER:
-        return &gDefaultTLLayerInstance;
+        return &UnidentifiedTLLayerDefault::sInstance;
     case TLAT_IMAGE:
-        return &gDefaultTLImageInstance;
+        return &UnidentifiedTLImageDefault::sInstance;
     case TLAT_TEXT:
-        return &gDefaultTLTextInstance;
+        return &UnidentifiedTLTextDefault::sInstance;
     case TLAT_COMPONENT:
-        return &gDefaultTLComponentInstance;
+        return &UnidentifiedTLComponentDefault::sInstance;
     case TLAT_GROUP:
-        return &gDefaultTLGroupInstance;
+        return &UnidentifiedTLGroupDefault::sInstance;
     default:
         return 0;
     }

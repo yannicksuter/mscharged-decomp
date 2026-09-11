@@ -165,14 +165,14 @@ void TU80231118Scene::SceneCreated()
             nlStringLowerHash(challengeName), 0, 0, 0);
         if (challenge == 0)
         {
-            challenge = &gDefaultTLComponentInstance;
+            challenge = &UnidentifiedTLComponentDefault::sInstance;
         }
         mChallengeSlides[i] = challenge;
     }
     TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 3>::Find(
         mPresentation->GetActiveSlide(), nlStringLowerHash(lbl_806DE2B8), nlStringLowerHash(lbl_8051D6D0),
         nlStringLowerHash(lbl_8051D6F4), 0, 0, 0);
-    mScrollWidget.SetComponent(scrollbar != 0 ? scrollbar : &gDefaultTLComponentInstance);
+    mScrollWidget.SetComponent(scrollbar != 0 ? scrollbar : &UnidentifiedTLComponentDefault::sInstance);
     mScrollWidget.SetRange(mChallengeCount);
     mScrollWidget.SetValue(mChallengeOffset);
 
@@ -209,7 +209,7 @@ void TU80231118Scene::SceneCreated()
         nlStringLowerHash(lbl_806DE2C8), 0, 0, 0);
     if (title == 0)
     {
-        title = &gDefaultTLComponentInstance;
+        title = &UnidentifiedTLComponentDefault::sInstance;
     }
     if (mTutorial)
     {
@@ -438,7 +438,7 @@ void TU80231118Scene::fn_80232E08()
             nlStringLowerHash("list_back_480x90"), 0, 0, 0);
         if (image == 0)
         {
-            image = &gDefaultTLImageInstance;
+            image = &UnidentifiedTLImageDefault::sInstance;
         }
         feVector3 position = mChallengeSlides[i]->GetAssetPosition();
         mChallengeComponents[i].SetInstanceBounds(image, true, position.f.x, position.f.y, 0.95f, 0.75f);

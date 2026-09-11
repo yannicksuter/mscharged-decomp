@@ -6,6 +6,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C"
 {
@@ -161,7 +162,7 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029C2F8>::Prepare(
     const glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->unknown20);
+    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }
 
 template <>
@@ -172,10 +173,10 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029C2F8>::Draw(
         return;
 
     float alpha =
-        1.0f - *(float*)((unsigned char*)packet->unknown20 + 32);
+        1.0f - *(float*)((unsigned char*)packet->materialParameters + 32);
 
     int mode;
-    if (*(int*)((unsigned char*)packet->unknown20 + 36) == 0
+    if (*(int*)((unsigned char*)packet->materialParameters + 36) == 0
         || fn_801820FC() == 0)
     {
         mode = 0;
@@ -199,7 +200,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029C2F8>::Draw(
     ConvertColour(gxColour0, colour0);
     GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&gxColour0);
 
-    float value = *(float*)((unsigned char*)packet->unknown20 + 40);
+    float value = *(float*)((unsigned char*)packet->materialParameters + 40);
     nlFloatColour colour1 = { { value, value, value, value } };
     nlColour gxColour1;
     ConvertColour(gxColour1, colour1);
@@ -210,7 +211,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_8029C2F8>::Draw(
     fn_80183B40(packet->matrix);
 
     bool enableState = false;
-    if (*(int*)((unsigned char*)packet->unknown20 + 44) == 1
+    if (*(int*)((unsigned char*)packet->materialParameters + 44) == 1
         && lbl_806DF071)
         enableState = true;
 

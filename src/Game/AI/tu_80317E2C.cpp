@@ -49,7 +49,7 @@ extern "C" void fn_80317010(
 extern "C" float fn_80314538(float, float, float, float, float);
 
 extern float (*lbl_806DF560)();
-extern UnidentifiedStateTransition lbl_806E20B8;
+extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 char lbl_805302A0[]
     = "WARNING! shdStateMachine transition function returned nothing, funcHash=%d\n";

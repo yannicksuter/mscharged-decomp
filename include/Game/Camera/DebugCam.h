@@ -2,23 +2,25 @@
 #define _DEBUGCAM_H_
 
 #include "Game/Camera/BaseCamera.h"
+#include "NL/nlDLListContainer.h"
 #include "types.h"
 
 class cGlobalPad;
 struct UnidentifiedDebugCameraTarget;
-struct UnidentifiedDebugCameraTargetEntry;
+
+extern float sfDebugCamFOV;
 
 class cDebugCamera : public cBaseCamera
 {
 public:
     cDebugCamera(bool bUnidentified);
-    virtual ~cDebugCamera();
-    virtual eCameraType GetType();
-    virtual void Update(float dt);
-    virtual const nlMatrix4& GetViewMatrix() const;
-    virtual float GetFOV() const;
-    virtual const nlVector3& GetTargetPosition() const;
-    virtual const nlVector3& GetCameraPosition() const;
+    /* 0x08 */ virtual ~cDebugCamera();
+    /* 0x14 */ virtual const nlMatrix4& GetViewMatrix() const { return m_matView; };
+    /* 0x18 */ virtual float GetFOV() const { return sfDebugCamFOV; };
+    /* 0x24 */ virtual const nlVector3& GetCameraPosition() const { return m_vecCamera; };
+    /* 0x20 */ virtual const nlVector3& GetTargetPosition() const { return m_vecTarget; };
+    /* 0x0C */ virtual eCameraType GetType() { return eCameraType_Debug; };
+    /* 0x10 */ virtual void Update(float dt);
 
     void RenderTarget() const;
     void fn_800F2A8C(float dt);
@@ -38,9 +40,8 @@ public:
     /* 0x8E */ bool mUnidentified8E;
     /* 0x8F */ bool m_bRenderTarget;
     /* 0x90 */ UnidentifiedDebugCameraTarget* m_pTarget;
-    /* 0x94 */ UnidentifiedDebugCameraTargetEntry* m_pTargetEntry;
-    /* 0x98 */ u32 mUnidentified98;
-    /* 0x9C */ UnidentifiedDebugCameraTargetEntry* m_pTargets;
+    /* 0x94 */ DLListEntry<UnidentifiedDebugCameraTarget*>* m_pTargetEntry;
+    /* 0x98 */ nlDLListContainer<UnidentifiedDebugCameraTarget*> m_Targets;
 }; // total size: 0xA0
 
 #endif // _DEBUGCAM_H_

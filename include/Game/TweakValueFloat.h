@@ -7,12 +7,12 @@
 class TweakValueFloat : public TweakValueBase
 {
 public:
-    TweakValueFloat(
-        const char* name, const char* category, float initialValue = 1.0f)
+    TweakValueFloat(const char* name, const char* category,
+        float initialValue = 1.0f, bool unidentified = true)
         : value(initialValue)
     {
         mName = name;
-        mUnidentified009 = true;
+        mUnidentified009 = unidentified;
 
         if (IsTweakRegistryInitialized() == 0)
         {

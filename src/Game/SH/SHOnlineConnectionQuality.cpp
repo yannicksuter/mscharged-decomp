@@ -25,6 +25,7 @@
 #include "NL/plat/TransportConnection.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/FE/FEAudio.h"
+#include "Game/FE/UnidentifiedTLDefault.h"
 
 
 const char* sConnectionDecisionComponentNames[2] = { "ACCEPT", "REJECT" };
@@ -129,7 +130,7 @@ void OnlineConnectionQualityScene::OnDecisionPointerPress(int index, void* conte
         mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("WAITING"));
     if (component == 0)
     {
-        component = &gDefaultTLComponentInstance;
+        component = &UnidentifiedTLComponentDefault::sInstance;
     }
     component->m_bVisible = true;
 
@@ -216,7 +217,7 @@ void OnlineConnectionQualityScene::SceneCreated()
             mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher(sConnectionDecisionComponentNames[i]));
         if (component == 0)
         {
-            component = &gDefaultTLComponentInstance;
+            component = &UnidentifiedTLComponentDefault::sInstance;
         }
         mUnidentified2F4[i] = component;
     }
@@ -228,7 +229,7 @@ void OnlineConnectionQualityScene::SceneCreated()
         mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("WAITING"));
     if (component == 0)
     {
-        component = &gDefaultTLComponentInstance;
+        component = &UnidentifiedTLComponentDefault::sInstance;
     }
     component->m_bVisible = false;
 
@@ -262,7 +263,7 @@ void OnlineConnectionQualityScene::UpdateConnectionQuality()
             = (TransportConnection*)roster->GetMachineAid(i);
         if (connection != 0 && connection != (TransportConnection*)-1)
         {
-            value = value < connection->mRoundTripTimeMS ? connection->mRoundTripTimeMS : value;
+            value = value >= connection->mRoundTripTimeMS ? value : connection->mRoundTripTimeMS;
         }
     }
 
@@ -271,23 +272,23 @@ void OnlineConnectionQualityScene::UpdateConnectionQuality()
         InlineHasher("RATING"), InlineHasher("stars"));
     if (component == 0)
     {
-        component = &gDefaultTLComponentInstance;
+        component = &UnidentifiedTLComponentDefault::sInstance;
     }
     mUnidentified2FC = component;
-    value >>= 1;
-    if (value > 200)
+    unsigned int latency = value >> 1;
+    if (latency > 200)
     {
         component->SetActiveSlide("1", true, false);
     }
-    else if (value > 160)
+    else if (latency > 160)
     {
         component->SetActiveSlide("2", true, false);
     }
-    else if (value > 80)
+    else if (latency > 80)
     {
         component->SetActiveSlide("3", true, false);
     }
-    else if (value != 0)
+    else if (latency != 0)
     {
         component->SetActiveSlide("4", true, false);
     }
@@ -345,7 +346,7 @@ void OnlineConnectionQualityScene::Update(float dt)
             mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("WAITING"));
         if (component == 0)
         {
-            component = &gDefaultTLComponentInstance;
+            component = &UnidentifiedTLComponentDefault::sInstance;
         }
         component->m_bVisible = true;
     }

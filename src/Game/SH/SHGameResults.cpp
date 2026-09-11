@@ -74,7 +74,7 @@ void GameResultsScene::SceneCreated()
     layerHash = nlStringLowerHash("Layer");
     TLTextInstance* text = AsTextInstance(FEFindInstance(presentation, nlStringLowerHash("game summary"), layerHash, summaryHash, titleHash, 0, 0));
     if (text == 0)
-        text = &gDefaultTLTextInstance;
+        text = &UnidentifiedTLTextDefault::sInstance;
     mTitleText = text;
     mTitleText->SetStringId("CUP_GAME_RESULTS");
     SHNavigation* scene = GetNavigationScene();

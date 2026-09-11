@@ -189,4 +189,3 @@ void LowPassFilter::OnParameterFinished(AudioEffectParameter* parameter)
     m_Initial.m_On = m_Initial.m_Frequency != 0;
 }
 
-template struct UnidentifiedStaticStorage<UnidentifiedStaticTag>;

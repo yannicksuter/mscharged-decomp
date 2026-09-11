@@ -89,7 +89,7 @@ public:
     virtual void OnParameterFinished(AudioEffectParameter*);
     virtual void OnSoundStarted(void*);
     virtual void ApplyToSound(void*);
-    virtual void OnSoundStopped();
+    virtual void OnSoundStopped(void*);
 
     static void* operator new(unsigned long)
     {

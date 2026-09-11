@@ -5,6 +5,7 @@
 #include "Game/GL/glModelBuilder.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 UnidentifiedMeshWriter_802A195C::UnidentifiedMeshWriter_802A195C()
     : count(0)
