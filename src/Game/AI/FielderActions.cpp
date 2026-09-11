@@ -29,6 +29,8 @@
 #include "Game/Physics/PhysicsObject.h"
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Team.h"
+#include "unclassified/tu_800A9B78.h"
+#include "Game/NetworkSession.h"
 #include "Game/TweakValue.h"
 #include "unclassified/tu_80177498.h"
 #include "Game/Ball.h"
@@ -241,12 +243,8 @@ struct UnidentifiedOnlineState
     bool mUnidentified004;
 };
 extern UnidentifiedOnlineState* gNetworkInputRecording;
-extern "C" bool IsLiveNetworkGame(void* pParam);
-extern "C" void fn_80057FD8(cGame* pGame, bool bParam);
 bool IsNetworkOrRecordedGame(void);
-extern "C" void fn_800AA3E8(void* pParam, int nParam);
 extern "C" void fn_8005F82C(cGame* pGame, cFielder* pFielder);
-extern void* g_pNetworkSession;
 extern BaseGameSceneManager* g_pOverlayManager;
 
 struct UnidentifiedMegaStrikeScene
@@ -1790,13 +1788,13 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
         if (nParam != 0)
         {
             NetworkMessageType35 message;
-            if (IsLiveNetworkGame(g_pNetworkSession))
+            if (g_pNetworkSession->IsLiveNetworkGame())
             {
-                fn_80057FD8(g_pGame, bButtonPressed);
+                g_pGame->fn_80057FD8(bButtonPressed);
             }
             fn_80048FB0(fDeltaT, bButtonPressed, nParam);
         }
-        else if (IsLiveNetworkGame(g_pNetworkSession)
+        else if (g_pNetworkSession->IsLiveNetworkGame()
             && g_pGame->mUnidentified0C0.mSize != 0)
         {
             fn_80048FB0(fDeltaT,
@@ -1804,7 +1802,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
                 nParam);
         }
     }
-    else if (IsLiveNetworkGame(g_pNetworkSession) && nParam == 0
+    else if (g_pNetworkSession->IsLiveNetworkGame() && nParam == 0
         && g_pGame->mUnidentified0C0.mSize != 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,
@@ -1837,10 +1835,10 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
     }
     else if (mUnidentified478 == 3)
     {
-        ((UnidentifiedMegaStrikeScene*)g_pOverlayManager->GetScene(
-             (SceneList)0x64))
-            ->mUnidentified36
-            = true;
+        UnidentifiedMegaStrikeScene* pScene
+            = (UnidentifiedMegaStrikeScene*)g_pOverlayManager->GetScene(
+                (SceneList)0x64);
+        pScene->mUnidentified36 = true;
         SetAction((eFielderActionState)0xB);
         fn_80048870(0);
 
@@ -1852,7 +1850,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
 
         m_pTeam->GetOtherTeam()->GetGoalie()->fn_8008EF58();
 
-        fn_800AA3E8(g_pGame->mUnidentified10DC, 0);
+        g_pGame->mUnidentified10DC->fn_800AA3E8(false);
         g_pGame->fn_80058704();
         g_pGame->mUnidentified03C = this;
         fn_8005F82C(g_pGame, this);
@@ -1954,7 +1952,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
 
     if (nParam != 0)
     {
-        if (IsLiveNetworkGame(g_pNetworkSession)
+        if (g_pNetworkSession->IsLiveNetworkGame()
             && g_pGame->mUnidentified134.mSize > 0)
         {
             g_pGame->fn_80058180();

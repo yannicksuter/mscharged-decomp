@@ -16,7 +16,6 @@
 extern void* lbl_8052F6D0[];
 extern char lbl_8052F680[0x38];
 SlotPool<CueHandle_802F1758> lbl_8057FA68(32, 16);
-extern SlotPoolBase lbl_8057FAA8;
 
 extern "C" CueHandle_802F1758* fn_802ED74C(CueHandle_802F1758*, void*, CueOwner_802F1758*, void*, void (*)(void*, CueHandle_802F1758*, void*), void*);
 extern "C" CueHandle_802F1758* fn_802ED7F0(CueHandle_802F1758*, int);
@@ -34,29 +33,6 @@ extern "C" void fn_802F2648(SoundInstance_802F1758*);
 extern "C" void fn_802F2650(SoundInstance_802F1758*, PlaybackBackend_802F2C3C**, u32*);
 extern "C" void fn_802F26B0(SoundInstance_802F1758*, float);
 void DumpAudioMemory();
-
-static inline SoundInstance_802F1758* AllocateInstance_802F1758()
-{
-    SoundInstance_802F1758* instance = 0;
-    if (lbl_8057FAA8.m_FreeList == 0)
-        SlotPoolBase::BaseAddNewBlock(&lbl_8057FAA8, sizeof(SoundInstance_802F1758));
-    if (lbl_8057FAA8.m_FreeList != 0)
-    {
-        instance = (SoundInstance_802F1758*)lbl_8057FAA8.m_FreeList;
-        lbl_8057FAA8.m_FreeList = lbl_8057FAA8.m_FreeList->next;
-    }
-    return instance;
-}
-
-static inline void FreeInstance_802F1758(SoundInstance_802F1758* instance)
-{
-    if (instance != 0)
-    {
-        instance->~SoundInstance_802F1758();
-        instance->owner = lbl_8057FAA8.m_FreeList;
-        lbl_8057FAA8.m_FreeList = (SlotPoolEntry*)instance;
-    }
-}
 
 extern "C" CueHandle_802F1758* fn_802F1758(CueHandle_802F1758* handle,
     void* value, CueOwner_802F1758* owner, u32 cueIndex,
@@ -98,7 +74,7 @@ extern "C" CueHandle_802F1758* fn_802F1758(CueHandle_802F1758* handle,
                        : fn_802F11A0(handle->definition);
     tDebugPrintManager::Print(DC_SOUND, lbl_8052F680, nlLookupDebugString(g_pDebugStringTable, (unsigned long)*(const char**)selected), nlLookupDebugString(g_pDebugStringTable, (unsigned long)handle->definition->name));
 
-    SoundInstance_802F1758* instance = AllocateInstance_802F1758();
+    SoundInstance_802F1758* instance = lbl_8057FAA8.Allocate();
     if (instance != 0)
         instance = fn_802F2188(instance, handle, selected);
     handle->instance = instance;
@@ -116,15 +92,7 @@ extern "C" CueHandle_802F1758* fn_802F194C(CueHandle_802F1758* handle, int destr
 
         if (handle->instance != 0)
         {
-            fn_802F2A74(handle->instance);
-            SoundInstance_802F1758* instance = handle->instance;
-            while (instance != 0)
-            {
-                SoundInstance_802F1758* next = instance->nextInstance;
-                FreeInstance_802F1758(instance);
-                instance = next;
-            }
-            handle->instance = 0;
+            delete handle->instance;
         }
         fn_802ED7F0(handle, 0);
         if (destroy > 0)
@@ -280,7 +248,7 @@ extern "C" void fn_802F1DC4(CueHandle_802F1758* handle, float dt)
                 fn_802F2594(oldInstance, false, 0.0f, 0.5f);
                 oldInstance->field_74 = 0.5f;
             }
-            SoundInstance_802F1758* instance = AllocateInstance_802F1758();
+            SoundInstance_802F1758* instance = lbl_8057FAA8.Allocate();
             if (instance != 0)
                 instance = fn_802F2188(instance, handle, selected);
             handle->instance = instance;
@@ -298,7 +266,7 @@ extern "C" void fn_802F1DC4(CueHandle_802F1758* handle, float dt)
         if (instance->state == 8 && instance->nextInstance == 0)
         {
             previous->nextInstance = 0;
-            FreeInstance_802F1758(instance);
+            delete instance;
             instance = 0;
         }
         if (instance != 0)

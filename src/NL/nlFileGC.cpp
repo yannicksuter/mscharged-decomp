@@ -521,7 +521,7 @@ void nlServiceFileSystem()
 AsyncEntry* nlReadAsync(nlFile* file, void* buffer, unsigned int size,
     ReadAsyncCallback callback, unsigned long uParam, unsigned long bufferSize)
 {
-    DolphinFile* pFile = (DolphinFile*)file;
+    unsigned long position;
     unsigned long alignedSize;
     unsigned long tailSize;
 
@@ -532,26 +532,26 @@ AsyncEntry* nlReadAsync(nlFile* file, void* buffer, unsigned int size,
     }
     else
     {
-        tailSize = size & 31;
-        alignedSize = size - tailSize;
+        alignedSize = size - (size & 31);
+        tailSize = size - alignedSize;
     }
 
-    unsigned long position = pFile->m_Position;
+    position = ((DolphinFile*)file)->m_Position;
     AsyncEntry* firstEntry;
     if (alignedSize != 0)
     {
-        firstEntry = s_pAsyncManager->AddEntry(pFile, callback, buffer, position, alignedSize, uParam, tailSize == 0 ? READ_COMPLETE : READ_HEAD);
+        firstEntry = s_pAsyncManager->AddEntry((DolphinFile*)file, callback, buffer, position, alignedSize, uParam, tailSize == 0 ? READ_COMPLETE : READ_HEAD);
         if (tailSize != 0)
         {
-            s_pAsyncManager->AddEntry(pFile, 0, (unsigned char*)buffer + alignedSize, position + alignedSize, tailSize, 0, READ_TAIL);
+            s_pAsyncManager->AddEntry((DolphinFile*)file, 0, (unsigned char*)buffer + alignedSize, position + alignedSize, tailSize, 0, READ_TAIL);
         }
     }
     else
     {
-        firstEntry = s_pAsyncManager->AddEntry(pFile, callback, buffer, position, tailSize, uParam, READ_TAIL_ONLY);
+        firstEntry = s_pAsyncManager->AddEntry((DolphinFile*)file, callback, buffer, position, tailSize, uParam, READ_TAIL_ONLY);
     }
 
-    pFile->m_Position += size;
+    ((DolphinFile*)file)->m_Position += size;
     return firstEntry;
 }
 

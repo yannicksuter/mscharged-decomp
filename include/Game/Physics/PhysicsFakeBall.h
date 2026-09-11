@@ -78,7 +78,7 @@ class PhysicsGoaliePlane : public PhysicsWall
 {
 public:
     PhysicsGoaliePlane(
-        float a, float b, float c, FakeBallWorld& fakeBallWorld);
+        const nlVector4& plane, FakeBallWorld& fakeBallWorld);
     virtual int GetObjectType() const { return 0x16; }
 
     /* 0x38 */ FakeBallWorld& mWorld;

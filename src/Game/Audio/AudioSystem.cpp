@@ -216,7 +216,7 @@ extern "C" void fn_802EC9D0(AudioSystem* audio)
     while (it.hasNext())
     {
         (*it)->PrintState();
-        it.next();
+        it.Step();
     }
 }
 
@@ -231,7 +231,7 @@ void DumpAudioSystem(AudioSystem* audio, const char* path)
             char buffer[256];
             (*it)->FormatState(buffer, sizeof(buffer));
             nlWriteLineDebug(file, buffer, false);
-            it.next();
+            it.Step();
         }
         nlCloseFileDebug(file);
     }

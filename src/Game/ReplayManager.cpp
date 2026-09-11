@@ -15,6 +15,7 @@
 #include "Game/Task/TweakerTask.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlConfig.h"
 #include "NL/globalpad.h"
 #include "NL/nlMemory.h"

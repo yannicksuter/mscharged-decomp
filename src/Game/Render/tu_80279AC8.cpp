@@ -215,7 +215,8 @@ extern "C" void fn_80279AC8(
 
     for (unsigned int i = 0; i < 0x89; i++)
     {
-        if (object->m_uHashID == nlStringHash(sBannerProxyObjects[i]))
+        unsigned long hash = nlStringHash(sBannerProxyObjects[i]);
+        if (hash == object->m_uHashID)
             object->m_uFlags |= 2;
     }
 

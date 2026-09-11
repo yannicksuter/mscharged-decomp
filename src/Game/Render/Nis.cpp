@@ -40,6 +40,8 @@
 #include "NL/nlstring_tmpl.h"
 #include "unclassified/tu_80284A58.h"
 
+GLView* g_pNisRenderView;
+
 bool lbl_8057AB68[Nis::MAX_NUM_CHARACTERS];
 
 struct Unidentified83B88
@@ -73,7 +75,6 @@ Nis::Nis(NisHeader& header, char* data, int size)
     , mUnidentified860(0)
     , mUnidentifiedBAC(false)
 {
-    cSAnim* anim;
     int i;
     for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
     {
@@ -109,7 +110,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
     {
         if (chunk->GetID() == 0x80017000)
         {
-            anim = cSAnim::Initialize(chunk);
+            cSAnim* anim = cSAnim::Initialize(chunk);
             NPCTemplate* npcTemplate = gNPCManager->fn_801ABBDC(anim->m_szName);
             if (npcTemplate != 0)
             {
@@ -140,7 +141,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
                 else if (nlStrCmp(npcTemplate->mName, "mario_mega_orange_bg") == 0)
                 {
                     int charIdx = fn_80282DD8(mTarget, mWinnerType, true);
-                    int captain = GameInfoManager::Instance()->GetTeam((short)!(charIdx < 4 || charIdx == 8));
+                    int captain = GameInfoManager::Instance()->GetTeam((short)((charIdx < 4 || charIdx == 8) == false));
                     nlSNPrintf(textureName, sizeof(textureName), "%s/mega_cone_colour", GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).mName);
                     unsigned long texture = nlStringLowerHash(textureName);
                     if (glTextureLoad(texture))
@@ -370,8 +371,9 @@ void Nis::Render(int param1)
         if (index >= 0)
         {
             mCharacterControllers[i]->GetRootTrans(&rootTrans, mUnidentified0F8[index], 1.0f);
-            mUnidentified0B8[index].x += rootTrans.x;
-            mUnidentified0B8[index].y += rootTrans.y;
+            nlVec2Set(mUnidentified0B8[index],
+                mUnidentified0B8[index].x + rootTrans.x,
+                mUnidentified0B8[index].y + rootTrans.y);
             nlVec3Set(rootTrans, mUnidentified0B8[index].x, mUnidentified0B8[index].y, 0.0f);
             mCharacterControllers[i]->GetRootRot(&angle);
             mUnidentified0F8[index] += angle;
@@ -961,6 +963,7 @@ ImpostorModel* Nis::fn_8028350C(eCharacterClass param1, const char* param2,
 
 void Nis::fn_80283670(glModel* model, DrawableCharacter* character)
 {
+    glModelPacket* packet;
     static u32 hash1 = nlStringLowerHash("damage1Enabled");
     static u32 hash2 = nlStringLowerHash("damage2Enabled");
 
@@ -982,7 +985,7 @@ void Nis::fn_80283670(glModel* model, DrawableCharacter* character)
 
     if (character->character->m_Dirt > 0.0f || character->character->m_MinDirt > 0.0f)
     {
-        for (glModelPacket* packet = model->packets; packet < model->packets + model->numPackets; ++packet)
+        for (packet = model->packets; packet < model->packets + model->numPackets; ++packet)
         {
             if (glHasMaterialParameter(packet, hash1) && character->character->m_Dirt > 0.0f)
             {

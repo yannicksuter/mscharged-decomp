@@ -65,7 +65,7 @@ public:
     cGame(void* param1, int param2, bool param3);
 
     void fn_80057FC0();
-    void fn_80057FD8(u8 param1);
+    void fn_80057FD8(bool param1);
     void fn_80058180();
     void fn_8005830C();
     void fn_80058400();

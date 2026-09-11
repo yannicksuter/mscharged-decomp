@@ -56,6 +56,7 @@ struct RpcRuntimeNode_802F1758;
 struct SoundInstance_802F1758;
 
 extern "C" void fn_802F2A74(SoundInstance_802F1758*);
+extern SlotPool<SoundInstance_802F1758> lbl_8057FAA8;
 
 struct SoundInstance_802F1758
 {
@@ -64,11 +65,15 @@ struct SoundInstance_802F1758
         fn_802F2A74(this);
     }
 
+    static void operator delete(void* instance)
+    {
+        lbl_8057FAA8.Free((SoundInstance_802F1758*)instance);
+    }
+
     void* owner;
     void* definition;
     void* voices;
-    DLListContainerBase<RpcRuntimeNode_802F1758*,
-        BasicSlotPool<DLListEntry<RpcRuntimeNode_802F1758*> >&> rpcEntries;
+    UnidentifiedDLListPool_802F2188<RpcRuntimeNode_802F1758*> rpcEntries;
     s32 state;
     float previousTime;
     float currentTime;

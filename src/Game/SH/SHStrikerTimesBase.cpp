@@ -97,7 +97,7 @@ void SHStrikerTimesBase::ShowPreviousPage()
         {
             mPage = 1;
             presentation->SetActiveSlide("headline pic", true);
-            presentation->Update(presentation->m_currentSlide->m_start + presentation->m_currentSlide->m_duration);
+            presentation->Update(presentation->m_currentSlide->GetStartTime() + presentation->m_currentSlide->GetDuration());
         }
         else if (mPage == 3)
         {
@@ -110,7 +110,7 @@ void SHStrikerTimesBase::ShowPreviousPage()
     {
         mPage = 1;
         presentation->SetActiveSlide("headline pic", true);
-        presentation->Update(presentation->m_currentSlide->m_start + presentation->m_currentSlide->m_duration);
+        presentation->Update(presentation->m_currentSlide->GetStartTime() + presentation->m_currentSlide->GetDuration());
     }
 }
 

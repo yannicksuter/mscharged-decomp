@@ -45,6 +45,7 @@
 #include "NL/nlFile.h"
 #include "NL/nlFileGC.h"
 #include "NL/nlFunction.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlTask.h"

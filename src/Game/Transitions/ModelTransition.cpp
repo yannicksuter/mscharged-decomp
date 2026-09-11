@@ -447,10 +447,9 @@ void ModeledScreenTransition::Reset()
         for (int i = 0; i < numLeafNodes; i++)
         {
             EmissionManager* manager = EmissionManager::Instance();
-            EffectsGroup* group = manager->GetEffectsGroup(m_EffectName);
             m_Effects[i]
-                = EmissionManager::Instance()->Create(group,
-                    0, true, 0);
+                = EmissionManager::Instance()->Create(
+                    manager->GetEffectsGroup(m_EffectName), 0, true, 0);
             m_Effects[i]->m_pContext = s_3DView;
         }
     }

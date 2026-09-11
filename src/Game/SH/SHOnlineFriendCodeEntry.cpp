@@ -15,6 +15,7 @@
 #include "Game/FE/tlTextInstance.h"
 #include "Game/FriendManager.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"

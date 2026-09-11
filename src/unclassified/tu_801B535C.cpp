@@ -230,10 +230,13 @@ void UnidentifiedObject_801B535C::fn_801B5B38(float param)
         nlVector3 displacement;
         float sine, cosine;
         nlSinCos(&sine, &cosine, player->mUnidentified024.m_aActualFacingDirection + 0x4000);
-        nlVec3Set(axis, cosine, sine, 0.0f);
+        axis.x = cosine;
+        axis.y = sine;
+        axis.z = 0.0f;
         nlVec3Scale(displacement, player->mUnidentified024.m_v3Velocity, param);
-        float angle = nlVec3Length(displacement) * lbl_806DD148 / mUnidentified1C;
-        fn_802B5370(rotation, axis, (unsigned short)(10430.378f * angle));
+        float length = nlVec3Length(displacement);
+        float angle = length * lbl_806DD148 / mUnidentified1C;
+        fn_802B5370(rotation, axis, (unsigned short)(int)(10430.378f * angle));
         nlMultQuat(mUnidentified00, rotation, mUnidentified00);
     }
     else

@@ -176,19 +176,19 @@ void BootLoadingScene::SetPhaseSlide()
 
 void BootLoadingScene::ShowHomeButtonWarning()
 {
-    if (mFEScene != 0 && mFEScene->mState == 6)
+    if (mFEScene == 0 || mFEScene->mState != 6 || mHomeButtonWarningActive)
     {
-        if (mHomeButtonWarningActive)
-            return;
-        if (mPhase != 1 || !(mElapsedTime <= 2.0f))
-        {
-            mHomeButtonWarning->m_bVisible = true;
-            if (mWidescreen)
-                mHomeButtonWarning->SetActiveSlide("widescreen", true, false);
-            else
-                mHomeButtonWarning->SetActiveSlide("Slide1", true, false);
-            mHomeButtonWarningActive = true;
-        }
+        return;
+    }
+
+    if (mPhase != 1 || !(mElapsedTime <= 2.0f))
+    {
+        mHomeButtonWarning->m_bVisible = true;
+        if (mWidescreen)
+            mHomeButtonWarning->SetActiveSlide("widescreen", true, false);
+        else
+            mHomeButtonWarning->SetActiveSlide("Slide1", true, false);
+        mHomeButtonWarningActive = true;
     }
 }
 

@@ -1,4 +1,5 @@
 #include "Game/Render/tu_801B43F8.h"
+#include "NL/nlFunction.inl"
 #include "NL/utility.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 #include "Game/Goalie.h"
@@ -110,7 +111,7 @@ UnidentifiedWeatherState* TU800A9B78::fn_800AA060(int value)
             {
                 return state;
             }
-            it.next();
+            it.Step();
         }
     }
     return 0;

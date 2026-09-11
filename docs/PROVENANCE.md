@@ -31,6 +31,7 @@ The project was built with or adapted source from the following projects:
 | --- | --- |
 | [encounter/dtk-template](https://github.com/encounter/dtk-template) | Project and build-system foundation. |
 | [SMGCommunity/Petari at `e789e52`](https://github.com/SMGCommunity/Petari/tree/e789e52e7774cf52cdf093002fc32035b6eab65d) | CodeWarrior runtime, MetroTRK, and RVL SDK reconstructions. |
+| [SMGCommunity/Petari at `99f4f697`](https://github.com/SMGCommunity/Petari/tree/99f4f6973b6c764b7f6de0395d3afc2761661201) | RVL SDK `dvd_broadway.c` routine definitions and DI command/response structures, adapted to the earlier retained API and five-vector partition interface. |
 | [HaydnTrigg/Castaway at `f5c5dbcf`](https://github.com/HaydnTrigg/Castaway/tree/f5c5dbcf2b4a20eb797b1aa6eb03f6cf09a4dbbe) | RVL SDK reconstructions. |
 | [ThePlayerRolo/LegoCloneWarsWii at `b0ed795`](https://github.com/ThePlayerRolo/LegoCloneWarsWii/tree/b0ed795a586d1d921c536c991bf250bec39ae811) | CodeWarrior runtime reconstruction. |
 | [koopthekoopa/wii-ipl at `0b0cedd`](https://github.com/koopthekoopa/wii-ipl/tree/0b0cedd44d83fa187eb3f52748c3eecf0840865b) | RVL SDK and Metrowerks Standard Library reconstructions, plus the GameSpy time-conversion APIs and their static storage. |

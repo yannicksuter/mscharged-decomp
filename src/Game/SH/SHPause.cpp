@@ -24,6 +24,7 @@
 #include "Game/main.h"
 #include "NL/glx/glxSwap.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "Game/FE/feDPD.h"
 #include "Game/FE/UnidentifiedTLDefault.h"
 

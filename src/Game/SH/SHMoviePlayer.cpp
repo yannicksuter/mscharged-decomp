@@ -1,4 +1,5 @@
 #include "Game/SH/SHMoviePlayer.h"
+#include "NL/nlFunction.inl"
 #include "Game/BasicStadium.h"
 #include "Game/EventRegistry.h"
 #include "Game/FE/feFinder.inl"
@@ -227,7 +228,8 @@ void IntroMovieScene::fn_801D9B84()
         MovieStop();
         mMovieStarted = false;
     }
-    BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
+    BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
+    pStadium->m_bRenderingEnabled = false;
     mUnidentifiedB4 = 0.0f;
     mUnidentifiedB8 = false;
     mUnidentifiedB9 = false;

@@ -238,8 +238,9 @@ static inline void SetZeroVelocity(EmissionController* pController)
 static inline EmissionController* CreateBallEffect(
     unsigned long uEffectHash, cBall* pBall)
 {
-    EmissionController* pControl = EmissionManager::Instance()->Create(
-        fn_802E7D54(EmissionManager::Instance(), uEffectHash), 3, true, 0);
+    EffectsGroup* pGroup = fn_802E7D54(EmissionManager::Instance(), uEffectHash);
+    EmissionController* pControl
+        = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
     pControl->m_uUserData = (unsigned long)pBall;
 
     nlVector3 v3Direction = lbl_80515478;
@@ -701,12 +702,10 @@ extern "C" void fn_801B75C8(cFielder* pCharacter,
     {
     case BALL_EFFECT_PERFECT_PASS:
     {
-        cBall* pBall;
         fn_801BA034();
         fn_801BA358();
         static unsigned long uHash = nlStringLowerHash("skillshot_ball_meteor");
-        pBall = g_pBall;
-        pGlowControl = CreateBallEffect(uHash, pBall);
+        pGlowControl = CreateBallEffect(uHash, g_pBall);
         g_pBall->InitiateBallBlur(eNewBallEffect, 0);
         PlayRumbleAction(2, pCharacter->GetGlobalPad());
         break;

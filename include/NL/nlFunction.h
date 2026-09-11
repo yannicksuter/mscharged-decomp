@@ -482,10 +482,7 @@ public:
     }
 
     template <typename Callable>
-    Function(Callable callable)
-        : Base(callable)
-    {
-    }
+    Function(Callable callable);
 
     operator bool() const
     {

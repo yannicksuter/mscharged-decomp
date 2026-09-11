@@ -135,10 +135,7 @@ void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, 
         TLTextInstance* textInstance = (TLTextInstance*)pTLInstance;
         textInstance->SetMatrix(&textMatrix);
         nlColour colour;
-        for (unsigned long i = 0; i < 4; i++)
-        {
-            colour.c[i] = (unsigned char)(255.0f * s_currentAssetColour.c[i]);
-        }
+        ConvertColour(colour, s_currentAssetColour);
         textInstance->Render((eGLView)m_pRenderScene->m_uRenderView, colour);
         break;
     }
@@ -155,7 +152,7 @@ void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, 
                 {
                     TLInstance* next = curr->m_next;
                     nlFloatColour colour = s_currentAssetColour;
-                    RenderTimeLineAsset(curr, slide->m_time, combinedMatrix);
+                    RenderTimeLineAsset(curr, slide->GetCurrentTime(), combinedMatrix);
                     s_currentAssetColour = colour;
                     if (curr == slide->m_instances)
                     {

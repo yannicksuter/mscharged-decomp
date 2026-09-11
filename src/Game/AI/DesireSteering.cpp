@@ -532,28 +532,33 @@ extern "C" float fn_800C6EB0(cFielder* pFielder)
     float result = 0.0f;
     if (fn_800D6E54(pFielder) >= 0.5f)
     {
-        return result;
+        if (g_pBall->GetOwnerGoalie() != NULL)
+        {
+            result = 1.0f;
+        }
+        else
+        {
+            bool bHasPad = pFielder->GetGlobalPad() != NULL;
+            if (!bHasPad && fn_800D6A90(pFielder) >= 0.5f)
+            {
+                result = 1.0f;
+            }
+            else if (Defensive(fn_800D6670(pFielder)) >= 0.5f)
+            {
+                result = 1.0f - fn_800D8E3C(pFielder);
+                result = result * 0.5f + fn_800DC19C(pFielder, g_pBall) * 0.5f;
+            }
+            else if (Offensive(fn_800D6670(pFielder)) >= 0.5f)
+            {
+                result = 1.0f - fn_800D9070(pFielder);
+            }
+            else
+            {
+                result = 1.0f - FarToBall(pFielder);
+            }
+        }
     }
-    if (g_pBall->GetOwnerGoalie() != NULL)
-    {
-        return 1.0f;
-    }
-    if (pFielder->GetGlobalPad() == NULL
-        && fn_800D6A90(pFielder) >= 0.5f)
-    {
-        return 1.0f;
-    }
-    if (fn_800DFD74(fn_800D6670(pFielder)) >= 0.5f)
-    {
-        float fUnmarked = 1.0f - fn_800D8E3C(pFielder);
-        return 0.5f * fUnmarked
-             + 0.5f * fn_800DC19C(pFielder, g_pBall);
-    }
-    if (Offensive(fn_800D6670(pFielder)) >= 0.5f)
-    {
-        return 1.0f - fn_800D9070(pFielder);
-    }
-    return 1.0f - fn_800D8C84(pFielder);
+    return result;
 }
 
 extern "C" eStrafeDirection fn_800C7348(DesireSteering* desire,

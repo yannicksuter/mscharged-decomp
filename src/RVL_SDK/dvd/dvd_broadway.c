@@ -1,1303 +1,1053 @@
 #include <revolution/dvd.h>
+#include <string.h>
 #include <revolution/esp.h>
 #include <revolution/ipc.h>
 #include <revolution/os.h>
 
-#include <string.h>
-
-#define DVD_LOW_CTX_MAX 4
-#define DVD_LOW_CMD_MAX 4
-#define DVD_LOW_CTX_MAGIC 0xFEEBDAED
-
-// Your guess is as good as mine
-#define DVD_LOW_CTX_IN_USE(ctx) ((u8)((ctx).inUse != FALSE))
-
-typedef enum {
-    DVD_IOCTL_INQUIRY = 0x12,
-    DVD_IOCTL_READ_DISK_ID = 0x70,
-    DVD_IOCTL_READ = 0x71,
-    DVD_IOCTL_WAIT_FOR_COVER_CLOSE = 0x79,
-    DVD_IOCTL_PREPARE_COVER_REGISTER = 0x7A,
-    DVD_IOCTL_NOTIFY_RESET = 0x7E,
-    DVD_IOCTL_READ_DVD_PHYSICAL = 0x80,
-    DVD_IOCTL_READ_DVD_COPYRIGHT = 0x81,
-    DVD_IOCTL_READ_DVD_DISC_KEY = 0x82,
-    DVD_IOCTL_CLEAR_COVER_INTERRUPT = 0x86,
-    DVD_IOCTL_GET_COVER_STATUS = 0x88,
-    DVD_IOCTL_RESET = 0x8A,
-    DVD_IOCTL_CLOSE_PARTITION = 0x8C,
-    DVD_IOCTL_UNENCRYPTED_READ = 0x8D,
-    DVD_IOCTL_ENABLE_DVD_VIDEO = 0x8E,
-    DVD_IOCTL_REPORT_KEY = 0xA4,
-    DVD_IOCTL_SEEK = 0xAB,
-    DVD_IOCTL_READ_DVD = 0xD0,
-    DVD_IOCTL_READ_DVD_CONFIG = 0xD1,
-    DVD_IOCTL_STOP_LASER = 0xD2,
-    DVD_IOCTL_OFFSET = 0xD9,
-    DVD_IOCTL_READ_DISK_BCA = 0xDA,
-    DVD_IOCTL_REQUEST_DISC_STATUS = 0xDB,
-    DVD_IOCTL_REQUEST_RETRY_NUMBER = 0xDC,
-    DVD_IOCTL_SET_MAX_ROTATION = 0xDD,
-    DVD_IOCTL_SER_MEAS_CONTROL = 0xDF,
-    DVD_IOCTL_REQUEST_ERROR = 0xE0,
-    DVD_IOCTL_STOP_MOTOR = 0xE3,
-    DVD_IOCTL_AUDIO_BUFFER_CONFIG = 0xE4,
-} DVDLowIoctl;
-
-typedef enum {
-    DVD_IOCTLV_OPEN_PARTITION = 0x8B,
-} DVDLowIoctlv;
-
-typedef struct DVDLowContext {
-    DVDLowCallback callback; // at 0x0
-    UNKWORD WORD_0x4;
-    u8 inUse;  // at 0x8
-    u32 magic; // at 0xC
-    u32 id;    // at 0x10
-    char padding[32 - 0x14];
-} DVDLowContext;
-
-typedef struct DVDLowDICommand {
-    u8 command; // at 0x0
-    u32 arg1;   // at 0x4
-    u32 arg2;   // at 0x8
-    u32 arg3;   // at 0xC
-    u32 arg4;   // at 0x10
-    u32 arg5;   // at 0x14
-    u32 arg6;   // at 0x18
-    u32 arg7;   // at 0x1C
-} DVDLowDICommand;
-
-typedef struct DVDLowDiRegs {
-    u32 diimmbuf; // at 0x0
-    u32 dicvr;    // at 0x4
-    char padding[32 - 0x8];
-} DVDLowDiRegs;
-
-typedef struct DVDLowRegBuffer {
-    u32 reg; // at 0x0
-    char padding[32 - 0x4];
-} DVDLowRegBuffer;
-
-typedef struct DVDVideoReportKey {
-    u8 data[32];
-} DVDVideoReportKey;
-
-static s32 DiFD = -1;
-
+static volatile u8 requestInProgress = false;
 static u8 breakRequested;
-static DVDLowDICommand* diCommand;
+static u8 callbackInProgress = false;
+
+s32 DiFD = -1;
+
+static int freeCommandBuf = 0;
+
+static int freeDvdContext = 0;
+static u8 dvdContextsInited = false;
+static u8 DVDLowInitCalled = false;
+static diCommand_t* diCommand;
 static char* pathBuf;
+
 static u32 readLength;
-static BOOL spinUpValue;
-static u8 DVDLowInitCalled;
-static u8 dvdContextsInited;
-static s32 freeDvdContext;
-static s32 freeCommandBuf;
-static u8 callbackInProgress;
-static u8 requestInProgress;
+static u32 spinUpValue;
 
-static DVDLowContext dvdContexts[DVD_LOW_CTX_MAX] ALIGN(32);
-static DVDLowDiRegs diRegValCache ALIGN(32);
-static DVDLowRegBuffer registerBuf ALIGN(32);
-static IPCIOVector ioVec[5] ALIGN(32);
-static u8 lastTicketError[32] ALIGN(32);
+typedef enum callbackType { BOGUS_TYPE = 0, TRANSACTION_CB, COVER_CB, COVER_REG_CB } callbackType_t;
 
-static void nextCommandBuf(void);
-static DVDLowContext* newContext(DVDLowCallback callback, UNKWORD arg2);
+typedef struct dvdContext {
+    DVDLowCallback callback;
+    callbackType_t callbackType;
+    u8 inUse;
+    u32 contextMagic;
+    u32 contextNum;
+    u32 pad[3];
+} dvdContext_t;
 
-static void* ddrAllocAligned32(size_t size) {
-    u8* lo = IPCGetBufferLo();
-    u8* hi = IPCGetBufferHi();
+static dvdContext_t dvdContexts[4] __attribute__((aligned(32)));
+static diRegVals_t diRegValCache __attribute__((aligned(32)));
+static u32 registerBuf[8] __attribute__((aligned(32)));
 
-    // @bug Incorrect rounding (& 31) results in pointer mod 32
-    if ((u32)lo % 32 != 0) {
-        lo = (u8*)(((u32)lo + 31) & 31);
+static u32 coverRegister[8] __attribute__((aligned(32)));
+static u32 coverStatus[8] __attribute__((aligned(32)));
+static s32 lastTicketError[8] __attribute__((aligned(32)));
+
+static IPCIOVector ioVec[5] __attribute__((aligned(32)));
+
+static void* ddrAllocAligned32(const int size) {
+    void *low, *high;
+
+    if ((size & 0x1F) != 0) {
+        return 0;
     }
 
-    if (lo + size > hi) {
-        OSReport("(ddrAllocAligned32) Not enough space to allocate %d bytes\n",
-                 size);
+    low = IPCGetBufferLo();
+    high = IPCGetBufferHi();
+
+    if (((u32)low & 0x1F) != 0) {
+        low = (void*)(((u32)low + 31) & 0x1F);
     }
 
-    IPCSetBufferLo(lo + size);
-    return lo;
+    if ((u32)low + size > (u32)high) {
+        OSReport("(ddrAllocAligned32) Not enough space to allocate %d bytes\n", size);
+    }
+
+    IPCSetBufferLo((void*)((u32)low + size));
+    return low;
 }
 
 static BOOL allocateStructures(void) {
-    diCommand = ddrAllocAligned32(sizeof(DVDLowDICommand) * DVD_LOW_CMD_MAX);
-    if (diCommand == NULL) {
+    if ((diCommand = ddrAllocAligned32(sizeof(diCommand_t) * 4)) == 0) {
         OSReport("Allocation of diCommand blocks failed\n");
-        return FALSE;
+        return false;
     }
 
-    pathBuf = ddrAllocAligned32(32);
-    if (pathBuf == NULL) {
+    if ((pathBuf = ddrAllocAligned32(32)) == 0) {
         OSReport("Allocation of pathBuf failed\n");
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-/**
- * Emitted standalone and then dead-stripped: retail allocates dvdContexts at
- * this unit's first .bss offset, before doPrepareCoverRegisterCallback's
- * diRegValCache and registerBuf, which requires a surviving pre-callback
- * reference from this routine's own emission. A fully inlined static is
- * dropped before allocation and orders the section wrongly, so this helper
- * had external linkage; the call below is still inlined, and the link strips
- * this copy.
- */
 void initDvdContexts(void) {
-    int i;
-    for (i = 0; i < DVD_LOW_CTX_MAX; i++) {
-        dvdContexts[i].callback = NULL;
-        dvdContexts[i].WORD_0x4 = 0;
-        dvdContexts[i].inUse = FALSE;
-        dvdContexts[i].magic = DVD_LOW_CTX_MAGIC;
-        dvdContexts[i].id = i;
+    u32 i;
+
+    for (i = 0; i < 4; i++) {
+        dvdContexts[i].callback = 0;
+        dvdContexts[i].callbackType = 0;
+        dvdContexts[i].inUse = false;
+        dvdContexts[i].contextMagic = 0xFEEBDAED;
+        dvdContexts[i].contextNum = i;
     }
 
     freeDvdContext = 0;
 }
 
-static s32 doTransactionCallback(s32 intType, void* arg) {
-    DVDLowContext* ctx = (DVDLowContext*)arg;
+static inline dvdContext_t* newContext(const DVDLowCallback callback, const callbackType_t type) {
+    int returnIndex;
+    u8 use = dvdContexts[freeDvdContext].inUse != 0;
 
-    if (ctx->magic != DVD_LOW_CTX_MAGIC) {
-        OSReport("(doTransactionCallback) Error - context mangled!\n");
-        ctx->magic = DVD_LOW_CTX_MAGIC;
-    } else {
-        requestInProgress = FALSE;
-
-        if (ctx->callback != NULL) {
-            callbackInProgress = TRUE;
-
-            if (breakRequested == TRUE) {
-                breakRequested = FALSE;
-                intType |= DVD_INTTYPE_BR;
-            }
-
-            if (intType & DVD_INTTYPE_TC) {
-                readLength = 0;
-            }
-
-            ctx->callback(intType);
-
-            callbackInProgress = FALSE;
-        }
-    }
-
-    ctx->inUse = FALSE;
-    return IPC_RESULT_OK;
-}
-
-/**
- * Cover-close completion callback.
- *
- * R4QE01 never calls DVDLowWaitForCoverClose, so the link drops both that
- * routine and this callback. Their messages still occupy the pooled string
- * block, which is what places every later string at the offset the retained
- * DVDLow* routines reference.
- */
-static s32 doCoverCallback(s32 intType, void* arg) {
-    DVDLowContext* ctx = (DVDLowContext*)arg;
-
-    requestInProgress = FALSE;
-
-    if (ctx->magic != DVD_LOW_CTX_MAGIC) {
-        OSReport("(doCoverCallback) Error - context mangled!\n");
-        ctx->magic = DVD_LOW_CTX_MAGIC;
-    } else {
-        if (ctx->callback != NULL) {
-            callbackInProgress = TRUE;
-
-            if (breakRequested == TRUE) {
-                breakRequested = FALSE;
-                intType |= DVD_INTTYPE_BR;
-            }
-
-            ctx->callback(intType);
-
-            callbackInProgress = FALSE;
-        }
-    }
-
-    ctx->inUse = FALSE;
-    return IPC_RESULT_OK;
-}
-
-static s32 doPrepareCoverRegisterCallback(s32 intType, void* arg) {
-    DVDLowContext* ctx = (DVDLowContext*)arg;
-
-    requestInProgress = FALSE;
-    diRegValCache.dicvr = registerBuf.reg;
-
-    if (ctx->magic != DVD_LOW_CTX_MAGIC) {
-        OSReport("(doTransactionCallback) Error - context mangled!\n");
-        ctx->magic = DVD_LOW_CTX_MAGIC;
-    } else {
-        if (ctx->callback != NULL) {
-            callbackInProgress = TRUE;
-
-            if (breakRequested == TRUE) {
-                breakRequested = FALSE;
-                intType |= DVD_INTTYPE_BR;
-            }
-
-            ctx->callback(intType);
-
-            callbackInProgress = FALSE;
-        }
-    }
-
-    ctx->inUse = FALSE;
-    return IPC_RESULT_OK;
-}
-
-BOOL DVDLowInit(void) {
-    IPCResult result;
-
-    if (!DVDLowInitCalled) {
-        DVDLowInitCalled = TRUE;
-
-        result = IPCCltInit();
-        if (result != IPC_RESULT_OK) {
-            OSReport("IPCCltInit returned error: %d\n", result);
-            return FALSE;
-        }
-
-        if (!allocateStructures()) {
-            return FALSE;
-        }
-
-        if (!dvdContextsInited) {
-            initDvdContexts();
-            dvdContextsInited = TRUE;
-        }
-    }
-
-    strncpy(pathBuf, "/dev/di", 32);
-    DiFD = IOS_Open(pathBuf, IPC_OPEN_NONE);
-
-    if (DiFD >= 0) {
-        return TRUE;
-    }
-
-    switch (DiFD) {
-    case IPC_RESULT_NOEXISTS_INTERNAL:
-        OSReport("(DVDLowInit) Error: IOS_Open failed - pathname '/dev/di' "
-                 "does not exist\n");
-        return FALSE;
-    case IPC_RESULT_ACCESS_INTERNAL:
-        OSReport("(DVDLowInit) Error: IOS_Open failed - calling thread lacks "
-                 "permission\n");
-        return FALSE;
-    case IPC_RESULT_CONN_MAX_INTERNAL:
-        OSReport("(DVDLowInit) Error: IOS_Open failed - connection limit has "
-                 "been reached\n");
-        return FALSE;
-    default:
-        OSReport("(DVDLowInit) IOS_Open failed, errorcode = %d\n", DiFD);
-        return FALSE;
-    }
-}
-
-BOOL DVDLowReadDiskID(DVDDiskID* out, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
-
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
-
-    if (out == NULL) {
-        OSReport("@@@@@@ WARNING - Calling DVDLowReadDiskId with NULL ptr\n");
-    }
-
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_READ_DISK_ID;
-
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_READ_DISK_ID,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            out, sizeof(DVDDiskID), doTransactionCallback, ctx);
-
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowReadDiskID) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
-    }
-
-    return TRUE;
-}
-
-static void nextCommandBuf(void) {
-    if (++freeCommandBuf >= DVD_LOW_CMD_MAX) {
-        freeCommandBuf = 0;
-    }
-}
-
-static DECOMP_INLINE DVDLowContext* newContext(DVDLowCallback callback,
-                                               UNKWORD arg2) {
-    s32 id;
-
-    // The last operation somehow did not complete
-    if (DVD_LOW_CTX_IN_USE(dvdContexts[freeDvdContext]) == TRUE) {
-        OSReport("(newContext) ERROR: freeDvdContext.inUse (#%d) is true\n",
-                 freeDvdContext);
+    if (use == 1) {
+        OSReport("(newContext) ERROR: freeDvdContext.inUse (#%d) is true\n", freeDvdContext);
         OSReport("(newContext) Now spinning in infinite loop\n");
 
-        while (TRUE) {
-            ;
+        while (1) {
         }
     }
 
-    // Memory corruption
-    if (dvdContexts[freeDvdContext].magic != DVD_LOW_CTX_MAGIC) {
-        OSReport(
-            "(newContext) Something overwrote the context magic - spinning \n");
+    if (dvdContexts[freeDvdContext].contextMagic != 0xFEEBDAED) {
+        OSReport("(newContext) Something overwrote the context magic - spinning \n");
 
-        while (TRUE) {
-            ;
+        while (1) {
         }
     }
 
     dvdContexts[freeDvdContext].callback = callback;
-    dvdContexts[freeDvdContext].WORD_0x4 = arg2;
-    dvdContexts[freeDvdContext].inUse = TRUE;
+    dvdContexts[freeDvdContext].callbackType = type;
+    dvdContexts[freeDvdContext].inUse = true;
+    returnIndex = freeDvdContext;
+    freeDvdContext++;
 
-    id = freeDvdContext;
-
-    if (++freeDvdContext >= DVD_LOW_CTX_MAX) {
+    if (freeDvdContext >= 4) {
         freeDvdContext = 0;
     }
 
-    return &dvdContexts[id];
+    return dvdContexts + returnIndex;
 }
 
-BOOL DVDLowOpenPartition(u32 offset, const ESPTicket* ticket, u32 certsSize,
-                         const void* certs, ESPTmd* tmd,
-                         DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+static inline void nextCommandBuf(int* bufNum) {
+    (*bufNum)++;
 
-    if (ticket != NULL && (u32)ticket % 32 != 0) {
+    if (*bufNum >= 4) {
+        *bufNum = 0;
+    }
+}
+
+s32 doTransactionCallback(s32 ret, void* context) {
+    dvdContext_t* dvdContext = context;
+
+    if (dvdContext->contextMagic != 0xFEEBDAED) {
+        OSReport("(doTransactionCallback) Error - context mangled!\n");
+        dvdContext->contextMagic = 0xFEEBDAED;
+        goto out;
+    }
+
+    requestInProgress = false;
+
+    if (dvdContext->callback != NULL) {
+        int callbackArg;
+        callbackInProgress = TRUE;
+        callbackArg = ret;
+
+        if (breakRequested == TRUE) {
+            breakRequested = false;
+            callbackArg |= 8;
+        }
+
+        if (callbackArg & 1) {
+            readLength = 0;
+        }
+
+        dvdContext->callback((u32)callbackArg);
+        callbackInProgress = false;
+    }
+
+out:
+    dvdContext->inUse = false;
+    return 0;
+}
+
+static s32 doCoverCallback(s32 ret, void* context) {
+    dvdContext_t* dvdContext;
+
+    requestInProgress = false;
+    dvdContext = (dvdContext_t*)context;
+    if (dvdContext->contextMagic != 0xfeebdaed) {
+        OSReport("(doCoverCallback) Error - context mangled!\n");
+        dvdContext->contextMagic = 0xfeebdaed;
+        goto out;
+    }
+    if (dvdContext->callback != NULL) {
+        s32 callbackArg;
+        callbackInProgress = true;
+        callbackArg = ret;
+        if (breakRequested == true) {
+            breakRequested = false;
+            callbackArg |= 0x00000008;
+        }
+        dvdContext->callback((u32)callbackArg);
+        callbackInProgress = false;
+    }
+out:
+    dvdContext->inUse = false;
+
+    return 0;
+}
+
+s32 doPrepareCoverRegisterCallback(s32 ret, void* context) {
+    dvdContext_t* dvdContext;
+    requestInProgress = false;
+
+    diRegValCache.CoverRegVal = registerBuf[0];
+    dvdContext = (dvdContext_t*)context;
+
+    if (dvdContext->contextMagic != 0xFEEBDAED) {
+        OSReport("(doTransactionCallback) Error - context mangled!\n");
+        dvdContext->contextMagic = 0xFEEBDAED;
+    } else {
+        if (dvdContext->callback != 0) {
+            callbackInProgress = true;
+
+            if (breakRequested == true) {
+                breakRequested = false;
+                ret |= 8;
+            }
+
+            dvdContext->callback(ret);
+            callbackInProgress = false;
+        }
+    }
+
+    dvdContext->inUse = false;
+    return 0;
+}
+
+BOOL DVDLowInit(void) {
+    s32 retVal;
+
+    if (DVDLowInitCalled == false) {
+        DVDLowInitCalled = true;
+        retVal = IPCCltInit();
+
+        if (retVal != IPC_RESULT_OK) {
+            OSReport("IPCCltInit returned error: %d\n", retVal);
+            return false;
+        }
+
+        if (allocateStructures() == false) {
+            return false;
+        }
+
+        if (dvdContextsInited == false) {
+            initDvdContexts();
+            dvdContextsInited = true;
+        }
+    }
+
+    strncpy(pathBuf, "/dev/di", 32);
+    DiFD = IOS_Open(pathBuf, 0);
+
+    if (DiFD >= 0) {
+        return true;
+    } else {
+        switch (DiFD) {
+        case IPC_RESULT_NOEXISTS_INTERNAL:
+            OSReport("(DVDLowInit) Error: IOS_Open failed - pathname '/dev/di' does not exist\n");
+            return false;
+            break;
+        case IPC_RESULT_ACCESS_INTERNAL:
+            OSReport("(DVDLowInit) Error: IOS_Open failed - calling thread lacks permission\n");
+            return false;
+            break;
+        case IPC_RESULT_CONN_MAX_INTERNAL:
+            OSReport("(DVDLowInit) Error: IOS_Open failed - connection limit has been reached\n");
+            return false;
+            break;
+        default:
+            OSReport("(DVDLowInit) IOS_Open failed, errorcode = %d\n", DiFD);
+            return false;
+            break;
+        }
+    }
+}
+
+BOOL DVDLowReadDiskID(DVDDiskID* diskID, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
+
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
+
+    if (diskID == 0) {
+        OSReport("@@@@@@ WARNING - Calling DVDLowReadDiskId with NULL ptr\n");
+    }
+
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x70;
+
+    rv = IOS_IoctlAsync(DiFD, 0x70, &diCommand[freeCommandBuf], sizeof(diCommand_t), diskID, sizeof(DVDDiskID), doTransactionCallback, dvdContext);
+
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowReadDiskID) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
+    }
+
+    return true;
+}
+
+BOOL DVDLowOpenPartition(const u32 partitionWordOffset, const ESPTicket* const eTicket, const u32 numCertBytes, const void* const certificates,
+                         ESPTmd* tmd, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
+
+    if (eTicket != 0 && ((u32)eTicket & 0x1F)) {
         OSReport("(DVDLowOpenPartition) eTicket memory is unaligned\n");
-        return FALSE;
+        return false;
     }
 
-    if (certs != NULL && (u32)certs % 32 != 0) {
+    if (certificates != 0 && ((u32)certificates & 0x1F)) {
         OSReport("(DVDLowOpenPartition) certificates memory is unaligned\n");
-        return FALSE;
+        return false;
     }
 
-    if (tmd != NULL && (u32)tmd % 32 != 0) {
+    if (tmd != 0 && ((u32)tmd & 0x1F)) {
         OSReport("(DVDLowOpenPartition) certificates memory is unaligned\n");
-        return FALSE;
+        return false;
     }
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTLV_OPEN_PARTITION;
-    diCommand[freeCommandBuf].arg1 = offset;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x8B;
+    diCommand[freeCommandBuf].arg[0] = partitionWordOffset;
+    ioVec[0].base = (u8*)&diCommand[freeCommandBuf];
+    ioVec[0].length = sizeof(diCommand_t);
 
-    // Input vector 1: DI command
-    ioVec[0].base = &diCommand[freeCommandBuf];
-    ioVec[0].length = sizeof(DVDLowDICommand);
-
-    // Input vector 2: eTicket
-    ioVec[1].base = (void*)ticket;
-    if (ticket == NULL) {
+    ioVec[1].base = (u8*)eTicket;
+    if (eTicket == 0) {
         ioVec[1].length = 0;
     } else {
         ioVec[1].length = sizeof(ESPTicket);
     }
 
-    // Input vector 3: Shared certs
-    ioVec[2].base = (void*)certs;
-    if (certs == NULL) {
+    ioVec[2].base = (u8*)certificates;
+    if (certificates == 0) {
         ioVec[2].length = 0;
     } else {
-        ioVec[2].length = certsSize;
+        ioVec[2].length = numCertBytes;
     }
 
-    // Output vector 1: TMD
-    ioVec[3].base = tmd;
+    ioVec[3].base = (u8*)tmd;
     ioVec[3].length = sizeof(ESPTmd);
 
-    // Output vector 2: Ticket error
-    ioVec[4].base = &lastTicketError;
+    ioVec[4].base = (u8*)&lastTicketError[0];
     ioVec[4].length = sizeof(lastTicketError);
 
-    result = IOS_IoctlvAsync(DiFD, DVD_IOCTLV_OPEN_PARTITION, 3, 2, ioVec,
-                             doTransactionCallback, ctx);
+    rv = IOS_IoctlvAsync(DiFD, 0x8B, 3, 2, ioVec, doTransactionCallback, dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowOpenPartition) IOS_IoctlvAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowOpenPartition) IOS_IoctlvAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 BOOL DVDLowClosePartition(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_CLOSE_PARTITION;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x8C;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_CLOSE_PARTITION,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            NULL, 0, doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0x8C, &diCommand[freeCommandBuf], sizeof(diCommand_t), 0, 0, doTransactionCallback, dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowClosePartition) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowClosePartition) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowUnencryptedRead(void* dst, u32 size, u32 offset,
-                           DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowUnencryptedRead(void* destAddr, u32 length, u32 wordOffset, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
+    readLength = length;
 
-    readLength = size;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x8D;
+    diCommand[freeCommandBuf].arg[0] = length;
+    diCommand[freeCommandBuf].arg[1] = wordOffset;
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_UNENCRYPTED_READ;
-    diCommand[freeCommandBuf].arg1 = size;
-    diCommand[freeCommandBuf].arg2 = offset;
+    rv = IOS_IoctlAsync(DiFD, 0x8D, &diCommand[freeCommandBuf], sizeof(diCommand_t), destAddr, length, doTransactionCallback, dvdContext);
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_UNENCRYPTED_READ,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            dst, size, doTransactionCallback, ctx);
-
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowUnencryptedRead) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowUnencryptedRead) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowStopMotor(BOOL eject, BOOL kill, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowStopMotor(BOOL eject, BOOL saving, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_STOP_MOTOR;
-    diCommand[freeCommandBuf].arg1 = eject;
-    diCommand[freeCommandBuf].arg2 = kill;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xE3;
+    diCommand[freeCommandBuf].arg[0] = eject;
+    diCommand[freeCommandBuf].arg[1] = saving;
 
-    result =
-        IOS_IoctlAsync(DiFD, DVD_IOCTL_STOP_MOTOR, &diCommand[freeCommandBuf],
-                       sizeof(DVDLowDICommand), &diRegValCache,
-                       sizeof(DVDLowDiRegs), doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xE3, &diCommand[freeCommandBuf], sizeof(diCommand_t), &diRegValCache, sizeof(diRegVals_t), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowStopMotor) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowStopMotor) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 BOOL DVDLowWaitForCoverClose(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, COVER_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_WAIT_FOR_COVER_CLOSE;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x79;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_WAIT_FOR_COVER_CLOSE,
-                            &diCommand[freeCommandBuf],
-                            sizeof(DVDLowDICommand), NULL, 0, doCoverCallback,
-                            ctx);
+    rv = IOS_IoctlAsync(DiFD, 0x79, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), NULL, 0, doCoverCallback, dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowWaitForCoverClose) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowWaitForCoverClose) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowInquiry(DVDDriveInfo* out, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowInquiry(DVDDriveInfo* info, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_INQUIRY;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x12;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_INQUIRY, &diCommand[freeCommandBuf],
-                            sizeof(DVDLowDICommand), out, sizeof(DVDDriveInfo),
-                            doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0x12, &diCommand[freeCommandBuf], sizeof(diCommand_t), info, sizeof(DVDDriveInfo), doTransactionCallback, dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowInquiry) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowInquiry) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 BOOL DVDLowRequestError(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_REQUEST_ERROR;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xE0;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_REQUEST_ERROR,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            &diRegValCache, sizeof(DVDLowDiRegs),
-                            doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xE0, &diCommand[freeCommandBuf], sizeof(diCommand_t), &diRegValCache, sizeof(diRegVals_t), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowRequestError) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowRequestError) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowSetSpinupFlag(BOOL enable) {
-    spinUpValue = enable;
-    return TRUE;
+BOOL DVDLowSetSpinupFlag(BOOL spinUp) {
+    spinUpValue = spinUp;
+    return true;
 }
 
-/*
- * The DI routines below are dead code in R4QE01: nothing references them, so
- * the link strips their text, exactly as it strips DVDLowWaitForCoverClose
- * and doCoverCallback above. Their OSReport messages still enter this unit's
- * pooled string block in source order, which is what places every later
- * string at the offset the retained routines reference. The DOL evidences
- * each routine's name (each message names its owner), its pool position, and
- * the stripping itself; the stripped bodies cannot be byte-verified, so they
- * are reconstructed minimally from this file's own wrapper template.
- */
+BOOL DVDLowNotifyReset(void) {
+    s32 rv;
 
-/**
- * Owner of the pooled spin-up-flag guard message.
- *
- * The retained 12-byte DVDLowSetSpinupFlag above never references this
- * string, and every known link (including the IPL-era SDK, whose pool shows
- * the same orphaned message beside the same 12-byte setter) strips the owner,
- * so the routine's original name is unrecoverable; this identifier is a
- * reconstruction placeholder. The synchronous-guard shape follows this file's
- * other synchronous routines.
- */
-BOOL DVDLowSetSpinupFlagSync(BOOL enable) {
-    if (callbackInProgress == TRUE) {
-        OSReport("(DVDLowSetSpinupFlag): Synch functions can't be called in "
-                 "callbacks\n");
-        return FALSE;
+    if (callbackInProgress == true) {
+        OSReport("(DVDLowSetSpinupFlag): Synch functions can't be called in callbacks\n");
+        return false;
     }
 
-    spinUpValue = enable;
-    return TRUE;
-}
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x7E;
 
-BOOL DVDLowNotifyReset(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    rv = IOS_Ioctl(DiFD, 0x7E, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), NULL, 0);
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
-
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_NOTIFY_RESET;
-
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_NOTIFY_RESET,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            NULL, 0, doTransactionCallback, ctx);
-
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowNotifyReset) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowNotifyReset) IOS_IoctlAsync returned error: %d\n", rv);
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 BOOL DVDLowReset(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_RESET;
-    diCommand[freeCommandBuf].arg1 = spinUpValue;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x8A;
+    diCommand[freeCommandBuf].arg[0] = spinUpValue;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_RESET, &diCommand[freeCommandBuf],
-                            sizeof(DVDLowDICommand), NULL, 0,
-                            doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0x8A, &diCommand[freeCommandBuf], sizeof(diCommand_t), 0, 0, doTransactionCallback, dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowReset) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowReset) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 BOOL DVDLowAudioBufferConfig(BOOL enable, u32 size, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_AUDIO_BUFFER_CONFIG;
-    diCommand[freeCommandBuf].arg1 = enable;
-    diCommand[freeCommandBuf].arg2 = size;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xE4;
+    diCommand[freeCommandBuf].arg[0] = enable;
+    diCommand[freeCommandBuf].arg[1] = size;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_AUDIO_BUFFER_CONFIG,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            &diRegValCache, sizeof(DVDLowDiRegs),
-                            doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xE4, &diCommand[freeCommandBuf], sizeof(diCommand_t), &diRegValCache, sizeof(diRegVals_t), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowAudioBufferConfig) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowAudioBufferConfig) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-/**
- * Synchronous cover-status query. Dead-stripped by the link; see the note
- * above DVDLowSetSpinupFlagSync. The synchronous shape follows the rhf
- * reference reconstruction of this file.
- */
 u32 DVDLowGetCoverStatus(void) {
-    u32 status;
-    IPCResult result;
+    s32 rv;
 
-    if (callbackInProgress == TRUE) {
-        OSReport("(DVDLowGetCoverStatus): Synch functions can't be called in "
-                 "callbacks\n");
-        return 0;
+    if (callbackInProgress == true) {
+        OSReport("(DVDLowGetCoverStatus): Synch functions can't be called in callbacks\n");
+        return false;
     }
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_GET_COVER_STATUS;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x88;
 
-    result = IOS_Ioctl(DiFD, DVD_IOCTL_GET_COVER_STATUS,
-                       &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                       &registerBuf, sizeof(DVDLowRegBuffer));
-    status = registerBuf.reg;
+    rv = IOS_Ioctl(DiFD, 0x88, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), coverStatus, sizeof(u32) * 8);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowGetCoverStatus) IOS_Ioctl returned error: %d\n",
-                 result);
-        status = 0xDEADDEAD;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowGetCoverStatus) IOS_Ioctl returned error: %d\n", rv);
+        return 0xdeaddead;
     }
 
-    return status;
+    return coverStatus[0];
 }
 
-BOOL DVDLowReadDVD(void* dst, u32 size, u32 offset, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowReadDvd(u32 strm, u32 retry, void* destAddr, u32 lengthInSectors, u32 lsn, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_READ_DVD;
-    diCommand[freeCommandBuf].arg1 = size;
-    diCommand[freeCommandBuf].arg2 = offset;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xD0;
+    if (strm == 0) {
+        diCommand[freeCommandBuf].arg[0] = 0x0;
+    } else {
+        diCommand[freeCommandBuf].arg[0] = 0x1;
+    }
+    if (retry == 0) {
+        diCommand[freeCommandBuf].arg[1] = 0x0;
+    } else {
+        diCommand[freeCommandBuf].arg[1] = 0x1;
+    }
+    diCommand[freeCommandBuf].arg[2] = lengthInSectors;
+    diCommand[freeCommandBuf].arg[3] = lsn;
+    readLength = lengthInSectors * 2048;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_READ_DVD,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            dst, size, doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xD0, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), destAddr, lengthInSectors * 2048, doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowReadDVD) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowReadDVD) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowReadDVDConfig(void* out, u32 size, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowReadDvdConfig(u8 set, u32 type, u32 config, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_READ_DVD_CONFIG;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xD1;
+    diCommand[freeCommandBuf].arg[0] = set;
+    diCommand[freeCommandBuf].arg[1] = type;
+    diCommand[freeCommandBuf].arg[2] = config;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_READ_DVD_CONFIG,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            out, size, doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xD1, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), &diRegValCache, sizeof(diRegVals_t), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowReadDVDConfig) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowReadDVDConfig) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowReadDvdCopyright(void* out, u32 size, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowReadDvdCopyright(u32 layer, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_READ_DVD_COPYRIGHT;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x81;
+    diCommand[freeCommandBuf].arg[0] = layer;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_READ_DVD_COPYRIGHT,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            out, size, doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0x81, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), &diRegValCache, sizeof(diRegVals_t), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowReadDvdCopyright) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowReadDvdCopyright) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowReadDvdPhysical(void* out, u32 size, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowReadDvdPhysical(DVDVideoPhysical* physical, u32 layer, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_READ_DVD_PHYSICAL;
-
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_READ_DVD_PHYSICAL,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            out, size, doTransactionCallback, ctx);
-
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowReadDvdPhysical) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x80;
+    diCommand[freeCommandBuf].arg[0] = layer;
+    if ((sizeof(DVDVideoPhysical) & 0x1F) != 0) {
+        OSReport("Size of DVDVideoPhysical is not a multiple of 32!\n");
+        return false;
     }
 
-    return TRUE;
+    rv = IOS_IoctlAsync(DiFD, 0x80, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), physical, sizeof(DVDVideoPhysical), doTransactionCallback,
+                        dvdContext);
+
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowReadDvdPhysical) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
+    }
+
+    return true;
 }
 
-BOOL DVDLowReadDvdDiscKey(void* out, u32 size, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowReadDvdDiscKey(DVDVideoDiscKey* diskKey, u32 layer, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_READ_DVD_DISC_KEY;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x82;
+    diCommand[freeCommandBuf].arg[0] = layer;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_READ_DVD_DISC_KEY,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            out, size, doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0x82, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), diskKey, sizeof(DVDVideoDiscKey), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowReadDvdDiscKey) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowReadDvdDiscKey) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-/**
- * Dead-stripped by the link. The signature follows the rhf and xenoblade
- * reference reconstructions of this file.
- */
-BOOL DVDLowReportKey(DVDVideoReportKey* reportKey, u32 format, u32 lsn,
-                     DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowReportKey(DVDVideoReportKey* reportKey, u32 format, u32 lsn, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_REPORT_KEY;
-    diCommand[freeCommandBuf].arg1 = format >> 16;
-    diCommand[freeCommandBuf].arg2 = lsn;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xA4;
+    diCommand[freeCommandBuf].arg[0] = format >> 16;
+    diCommand[freeCommandBuf].arg[1] = lsn;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_REPORT_KEY,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            reportKey, sizeof(DVDVideoReportKey),
-                            doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xA4, &diCommand[freeCommandBuf], sizeof(diCommand_t), reportKey, sizeof(DVDVideoReportKey), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowReportKey) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowReportKey) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowOffset(u32 offset, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowOffset(u32 subcmd, u32 offset_4_byte, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_OFFSET;
-    diCommand[freeCommandBuf].arg1 = offset;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xD9;
+    if (subcmd == 0) {
+        diCommand[freeCommandBuf].arg[0] = 0x0;
+    } else {
+        diCommand[freeCommandBuf].arg[0] = 0x1;
+    }
+    diCommand[freeCommandBuf].arg[1] = offset_4_byte;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_OFFSET, &diCommand[freeCommandBuf],
-                            sizeof(DVDLowDICommand), NULL, 0,
-                            doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xD9, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), &diRegValCache, sizeof(diRegVals_t), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowOffset) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowOffset) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 BOOL DVDLowStopLaser(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_STOP_LASER;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xD2;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_STOP_LASER,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            NULL, 0, doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xD2, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), &diRegValCache, sizeof(diRegVals_t), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowStopLaser) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowStopLaser) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowReadDiskBca(void* out, u32 size, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowReadDiskBca(DVDDiskBca* diskBca, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_READ_DISK_BCA;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xDA;
+    rv =
+        IOS_IoctlAsync(DiFD, 0xDA, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), diskBca, sizeof(DVDDiskBca), doTransactionCallback, dvdContext);
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_READ_DISK_BCA,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            out, size, doTransactionCallback, ctx);
-
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowReadDiskBca) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowReadDiskBca) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowSerMeasControl(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowSerMeasControl(DVDLowDriveSer* ser, u8 clear, u8 enable, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_SER_MEAS_CONTROL;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xDF;
+    diCommand[freeCommandBuf].arg[0] = clear;
+    diCommand[freeCommandBuf].arg[1] = enable;
+    rv =
+        IOS_IoctlAsync(DiFD, 0xDF, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), ser, sizeof(DVDLowDriveSer), doTransactionCallback, dvdContext);
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_SER_MEAS_CONTROL,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            NULL, 0, doTransactionCallback, ctx);
-
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowSerMeasControl) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowSerMeasControl) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 BOOL DVDLowRequestDiscStatus(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_REQUEST_DISC_STATUS;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xDB;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_REQUEST_DISC_STATUS,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            NULL, 0, doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xDB, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), &diRegValCache, sizeof(diRegVals_t), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowRequestDiscStatus) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowRequestDiscStatus) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 BOOL DVDLowRequestRetryNumber(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_REQUEST_RETRY_NUMBER;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xDC;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_REQUEST_RETRY_NUMBER,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            NULL, 0, doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xDC, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), &diRegValCache, sizeof(diRegVals_t), doTransactionCallback,
+                        dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowRequestRetryNumber) IOS_IoctlAsync returned "
-                 "error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowRequestRetryNumber) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowSetMaximumRotation(u32 speed, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowSetMaximumRotation(u32 subcmd, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_SET_MAX_ROTATION;
-    diCommand[freeCommandBuf].arg1 = speed >> 16 & 3;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xDD;
+    diCommand[freeCommandBuf].arg[0] = (subcmd >> 16) & 3;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_SET_MAX_ROTATION,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            NULL, 0, doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xDD, &diCommand[freeCommandBuf], sizeof(diCommand_t), 0, 0, doTransactionCallback, dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowSetMaxRotation) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowSetMaxRotation) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowRead(void* dst, u32 size, u32 offset, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowRead(void* destAddr, u32 length, u32 wordOffset, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    if ((u32)dst % 32 != 0) {
-        OSReport(
-            "(DVDLowRead): ERROR - destAddr buffer is not 32 byte aligned\n");
-        return FALSE;
+    if (((u32)destAddr & 0x1F) != 0) {
+        OSReport("(DVDLowRead): ERROR - destAddr buffer is not 32 byte aligned\n");
+        return false;
     }
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
+    readLength = length;
 
-    readLength = size;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x71;
+    diCommand[freeCommandBuf].arg[0] = length;
+    diCommand[freeCommandBuf].arg[1] = wordOffset;
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_READ;
-    diCommand[freeCommandBuf].arg1 = size;
-    diCommand[freeCommandBuf].arg2 = offset;
+    rv = IOS_IoctlAsync(DiFD, 0x71, &diCommand[freeCommandBuf], sizeof(diCommand_t), destAddr, length, doTransactionCallback, dvdContext);
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_READ, &diCommand[freeCommandBuf],
-                            sizeof(DVDLowDICommand), dst, size,
-                            doTransactionCallback, ctx);
-
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowRead) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowRead) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL DVDLowSeek(u32 offset, DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowSeek(u32 wordOffset, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_SEEK;
-    diCommand[freeCommandBuf].arg1 = offset;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0xAB;
+    diCommand[freeCommandBuf].arg[0] = wordOffset;
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_SEEK, &diCommand[freeCommandBuf],
-                            sizeof(DVDLowDICommand), NULL, 0,
-                            doTransactionCallback, ctx);
+    rv = IOS_IoctlAsync(DiFD, 0xAB, &diCommand[freeCommandBuf], sizeof(diCommand_t), 0, 0, doTransactionCallback, dvdContext);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowSeek) IOS_IoctlAsync returned error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowSeek) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-/**
- * Synchronous cover-register query. Dead-stripped by the link; see the note
- * above DVDLowSetSpinupFlagSync. The synchronous shape follows the rhf
- * reference reconstruction of this file.
- */
 u32 DVDLowGetCoverReg(void) {
-    u32 val;
-    IPCResult result;
+    s32 rv;
 
-    if (callbackInProgress == TRUE) {
-        OSReport("(DVDLowGetCoverReg): Synch functions can't be called in "
-                 "callbacks\n");
-        return 0;
+    if (callbackInProgress == true) {
+        OSReport("(DVDLowGetCoverReg): Synch functions can't be called in callbacks\n");
+        return false;
     }
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_PREPARE_COVER_REGISTER;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x7A;
 
-    result = IOS_Ioctl(DiFD, DVD_IOCTL_PREPARE_COVER_REGISTER,
-                       &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                       &registerBuf, sizeof(DVDLowRegBuffer));
-    val = registerBuf.reg;
+    rv = IOS_Ioctl(DiFD, 0x7A, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), coverRegister, sizeof(u32) * 8);
 
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowGetCoverReg) IOS_Ioctl returned error: %d\n",
-                 result);
-        val = 0;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowGetCoverReg) IOS_Ioctl returned error: %d\n", rv);
+        return false;
     }
 
-    return val;
+    return coverRegister[0];
 }
 
 u32 DVDLowGetCoverRegister(void) {
-    return diRegValCache.dicvr;
+    return diRegValCache.CoverRegVal;
 }
 
 BOOL DVDLowPrepareCoverRegister(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_PREPARE_COVER_REGISTER;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x7A;
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    rv = IOS_IoctlAsync(DiFD, 0x7A, &diCommand[freeCommandBuf], sizeof(diCommand_t), registerBuf, sizeof(registerBuf), doPrepareCoverRegisterCallback,
+                        dvdContext);
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_PREPARE_COVER_REGISTER,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            &registerBuf, sizeof(DVDLowRegBuffer),
-                            doPrepareCoverRegisterCallback, ctx);
-
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowPrepareCoverRegsiter) IOS_IoctlAsync returned "
-                 "error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowPrepareCoverRegsiter) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 u32 DVDLowGetImmBufferReg(void) {
-    return diRegValCache.diimmbuf;
+    return diRegValCache.ImmRegVal;
 }
 
 BOOL DVDLowUnmaskStatusInterrupts(void) {
-    return TRUE;
+    return true;
 }
 
 BOOL DVDLowMaskCoverInterrupt(void) {
-    return TRUE;
+    return true;
 }
 
 BOOL DVDLowClearCoverInterrupt(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_CLEAR_COVER_INTERRUPT;
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x86;
+    requestInProgress = true;
+    dvdContext = newContext(callback, 1);
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    rv = IOS_IoctlAsync(DiFD, 0x86, &diCommand[freeCommandBuf], sizeof(diCommand_t), 0, 0, doTransactionCallback, dvdContext);
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_CLEAR_COVER_INTERRUPT,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            NULL, 0, doTransactionCallback, ctx);
-
-    if (result != IPC_RESULT_OK) {
-        OSReport("@@@ (DVDLowClearCoverInterrupt) IOS_IoctlAsync returned "
-                 "error: %d\n",
-                 result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowClearCoverInterrupt) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
-BOOL __DVDLowTestAlarm(const OSAlarm* alarm) {
-#pragma unused(alarm)
-
+BOOL __DVDLowTestAlarm(const OSAlarm*) {
     return FALSE;
 }
 
-/**
- * Dead-stripped by the link; see the note above DVDLowSetSpinupFlagSync.
- */
-BOOL DVDLowEnableDvdVideo(DVDLowCallback callback) {
-    DVDLowContext* ctx;
-    IPCResult result;
+BOOL DVDLowEnableDvdVideo(const u8 enable, DVDLowCallback callback) {
+    dvdContext_t* dvdContext;
+    s32 rv;
 
-    requestInProgress = TRUE;
-    ctx = newContext(callback, 1);
+    nextCommandBuf(&freeCommandBuf);
+    diCommand[freeCommandBuf].theCommand = 0x8E;
+    diCommand[freeCommandBuf].arg[0] = enable;
+    requestInProgress = true;
+    dvdContext = newContext(callback, TRANSACTION_CB);
 
-    nextCommandBuf();
-    diCommand[freeCommandBuf].command = DVD_IOCTL_ENABLE_DVD_VIDEO;
+    rv = IOS_IoctlAsync(DiFD, 0x8E, &(diCommand[freeCommandBuf]), sizeof(diCommand_t), NULL, 0, doTransactionCallback, dvdContext);
 
-    result = IOS_IoctlAsync(DiFD, DVD_IOCTL_ENABLE_DVD_VIDEO,
-                            &diCommand[freeCommandBuf], sizeof(DVDLowDICommand),
-                            NULL, 0, doTransactionCallback, ctx);
-
-    if (result != IPC_RESULT_OK) {
-        OSReport(
-            "@@@ (DVDLowEnableDvdVideo) IOS_IoctlAsync returned error: %d\n",
-            result);
-        ctx->inUse = FALSE;
-
-        return FALSE;
+    if (rv != IPC_RESULT_OK) {
+        OSReport("@@@ (DVDLowEnableDvdVideo) IOS_IoctlAsync returned error: %d\n", rv);
+        dvdContext->inUse = false;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }

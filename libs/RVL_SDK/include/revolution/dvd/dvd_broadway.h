@@ -31,6 +31,46 @@ typedef enum {
 #define DVD_DICVR_CVRINTMASK (1 << 1)
 #define DVD_DICVR_CVRINT (1 << 2)
 
+typedef struct diRegVals {
+    u32 ImmRegVal;
+    u32 CoverRegVal;
+    u32 pad[6];
+} diRegVals_t;
+
+typedef struct diCommand {
+    u8 theCommand;
+    u8 pad1[3];
+    u32 arg[5];
+    u32 pad2[2];
+} diCommand_t;
+
+typedef struct DVDVideoPhysical {
+    u8 data[2048];
+} DVDVideoPhysical;
+
+typedef struct DVDVideoDiscKey {
+    u8 data[2048];
+} DVDVideoDiscKey;
+
+typedef struct DVDDiskBca {
+    u8 optionalInfo[52];
+    u8 manufacturerCode[2];
+    u8 recorderDeviceCode[2];
+    u8 APMRecorderDeviceCode[1];
+    u8 discManufactureDate[2];
+    u8 discManufactureTime[2];
+    u8 discNumber[3];
+} DVDDiskBca;
+
+typedef struct DVDLowDriveSer {
+    u8 data[12];
+    u8 padding[20];
+} DVDLowDriveSer;
+
+typedef struct DVDVideoReportKey {
+    u8 data[32];
+} DVDVideoReportKey;
+
 typedef void (*DVDLowCallback)(u32 intType);
 
 BOOL DVDLowInit(void);

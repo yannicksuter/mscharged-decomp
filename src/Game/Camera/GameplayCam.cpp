@@ -267,17 +267,15 @@ void GameplayCameraZoomLevel::CalcDesiredTarget()
         v3OOIPos = ReplayManager::Instance()->mRender->mBall.mPosition;
     }
 
-    pKnotTableBlendWeights = fKnotTableBlendWeights;
-
-    pKnotTableBlendWeights[0] = 0.0f;
-    pKnotTableBlendWeights[1] = 0.0f;
-    pKnotTableBlendWeights[2] = 0.0f;
+    fKnotTableBlendWeights[0] = 0.0f;
+    fKnotTableBlendWeights[1] = 0.0f;
+    fKnotTableBlendWeights[2] = 0.0f;
 
     fCurrWeight = 1.0f;
     for (int j = 0; j < 5; j++)
     {
         fDampenedBlendRiser = m_KnotTableBlendQueue[j].fBlendRiser;
-        pKnotTableBlendWeights[m_KnotTableBlendQueue[j].nKnotTable] += fCurrWeight * fDampenedBlendRiser;
+        fKnotTableBlendWeights[m_KnotTableBlendQueue[j].nKnotTable] += fCurrWeight * fDampenedBlendRiser;
         if (fDampenedBlendRiser == 1.0f)
         {
             break;
@@ -289,6 +287,7 @@ void GameplayCameraZoomLevel::CalcDesiredTarget()
     m_fDesiredTargetX = 0.0f;
     m_fDesiredTargetY = 0.0f;
 
+    pKnotTableBlendWeights = fKnotTableBlendWeights;
     i = 0;
     for (; i < 3; pKnotTableBlendWeights++, i++)
     {
@@ -348,6 +347,11 @@ static void CalcCurrentKnotTable(GameplayCameraZoomLevel* self, bool forceNeutra
         self->m_KnotTableBlendQueue[0].nKnotTable = nNewKnotTable;
         self->m_KnotTableBlendQueue[0].fBlendRiser = 0.0f;
     }
+
+    if (forceNeutral)
+    {
+        self->m_KnotTableBlendQueue[0].fBlendRiser = 1.0f;
+    }
 }
 
 void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
@@ -358,11 +362,6 @@ void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
     }
 
     CalcCurrentKnotTable(this, forceNeutral);
-
-    if (forceNeutral)
-    {
-        m_KnotTableBlendQueue[0].fBlendRiser = 1.0f;
-    }
 
     float t = fDeltaT / 0.75f;
     for (int i = 0; i < 5; i++)

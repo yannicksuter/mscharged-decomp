@@ -277,6 +277,6 @@ void FEPageControls::ClearButtonHighlight(int index)
     {
         mButtonInstances[index]->SetActiveSlide("off", true, false);
         mPointerInside[index] = false;
-        mButtonInstances[index]->Update(mButtonInstances[!index]->GetActiveSlide()->m_time);
+        mButtonInstances[index]->Update(mButtonInstances[!index]->GetActiveSlide()->GetCurrentTime());
     }
 }

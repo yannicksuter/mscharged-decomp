@@ -288,7 +288,7 @@ void HealthWarningSceneV2::Update(float fDeltaT)
     case 1:
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() >= slide->m_duration)
+        if (slide->GetCurrentTime() >= slide->GetDuration())
         {
             for (int pad = 0; pad < 4; ++pad)
             {
@@ -316,7 +316,7 @@ void HealthWarningSceneV2::Update(float fDeltaT)
     case 2:
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() >= slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             mState = 3;
             GameSceneManager::Instance()->Push(SCENE_MAIN_MENU, SCREEN_FORWARD, true);

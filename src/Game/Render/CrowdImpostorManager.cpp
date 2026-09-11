@@ -398,19 +398,24 @@ void CrowdPointCallback::Place(
     CrowdImpostorManager* manager = GetCrowdImpostorManager();
     nlDLListIterator<CrowdLayoutObject*> occlusionIt
         = manager->mOcclusionObjects.Begin();
+    bool occluded = false;
     while (occlusionIt.m_Curr != 0)
     {
+        CrowdLayoutObject* object = occlusionIt.m_Curr->entry;
         nlVector4 occlusionPoint;
         nlMultVectorMatrix(
             occlusionPoint, worldPoint, manager->mInverseMatrices[0]);
-        if (occlusionIt.m_Curr->entry->ContainsLocalPoint(
-                (nlVector3*)&occlusionPoint))
+        if (object->ContainsLocalPoint((nlVector3*)&occlusionPoint))
         {
-            return;
+            occluded = true;
+            break;
         }
         occlusionIt.Step();
     }
+    if (occluded)
+        return;
 
+    manager = GetCrowdImpostorManager();
     int numCharacters
         = nlDLRingCountElements(manager->mCharacters.m_Head);
     int characterIndex = nlRandom(numCharacters, &nlDefaultSeed);
@@ -420,15 +425,14 @@ void CrowdPointCallback::Place(
         characterIt.Step();
     ImpostorCharacter* character = characterIt.m_Curr->entry;
 
-    if (manager->mNumAngles == 0)
-        manager->mNumAngles = character->mNumAngles;
+    if (GetCrowdImpostorManager()->mNumAngles == 0)
+        GetCrowdImpostorManager()->mNumAngles = character->mNumAngles;
 
-    static const nlVector4 facing = { 0.0f, -1.0f, 0.0f, 0.0f };
-    nlVector4 worldFacing;
-    nlMultVectorMatrix(
-        worldFacing, facing, *mObject->UnidentifiedVirtual10());
-    u16 angle = QuantizeImpostorAngle(nlVector3ToAngle(*(nlVector3*)&worldFacing),
-        manager->mNumAngles);
+    int numAngles = GetCrowdImpostorManager()->mNumAngles;
+    nlVector4 facing = { 0.0f, -1.0f, 0.0f, 0.0f };
+    nlMultVectorMatrix(facing, *mObject->UnidentifiedVirtual10());
+    u16 angle = QuantizeImpostorAngle(nlVector3ToAngle(*(nlVector3*)&facing),
+        numAngles);
 
     int impostorIndex = -1;
     Impostor* impostor
@@ -441,15 +445,18 @@ void CrowdPointCallback::Place(
 
     nlDLListIterator<CrowdLayoutObject*> enabledIt
         = GetCrowdImpostorManager()->mEnabledObjects.Begin();
+    bool enabled = false;
     while (enabledIt.m_Curr != 0)
     {
         if (mObject == enabledIt.m_Curr->entry)
         {
-            impostor->mUnidentified02C = true;
+            enabled = true;
             break;
         }
         enabledIt.Step();
     }
+    if (enabled)
+        impostor->mUnidentified02C = true;
 
     if (mFirst)
     {
@@ -457,32 +464,34 @@ void CrowdPointCallback::Place(
         mLayout->mNumImpostors = 0;
     }
     ++mLayout->mNumImpostors;
+    CrowdLayoutRecord* layout = mLayout;
 
-    nlVector3 boundsMin = { worldPoint.x - sfImpostorWidth.value,
-        worldPoint.y - sfImpostorWidth.value, worldPoint.z };
-    nlVector3 boundsMax = { worldPoint.x + sfImpostorWidth.value,
-        worldPoint.y + sfImpostorWidth.value,
-        worldPoint.z + sfImpostorHeight.value };
+    nlVector3 boundsMin = *(nlVector3*)&worldPoint;
+    boundsMin.x -= sfImpostorWidth.value;
+    boundsMin.y -= sfImpostorWidth.value;
+    nlVector3 boundsMax = *(nlVector3*)&worldPoint;
+    boundsMax.x += sfImpostorWidth.value;
+    boundsMax.y += sfImpostorWidth.value;
+    boundsMax.z += sfImpostorHeight.value;
 
     if (mFirst)
     {
-        mLayout->mBoundsMin = boundsMin;
-        mLayout->mBoundsMax = boundsMax;
+        layout->mBoundsMin = boundsMin;
+        layout->mBoundsMax = boundsMax;
         mFirst = false;
         return;
     }
 
-    if (boundsMin.x < mLayout->mBoundsMin.x)
-        mLayout->mBoundsMin.x = boundsMin.x;
-    if (boundsMin.y < mLayout->mBoundsMin.y)
-        mLayout->mBoundsMin.y = boundsMin.y;
-    if (boundsMin.z < mLayout->mBoundsMin.z)
-        mLayout->mBoundsMin.z = boundsMin.z;
-    if (boundsMax.x > mLayout->mBoundsMax.x)
-        mLayout->mBoundsMax.x = boundsMax.x;
-    if (boundsMax.y > mLayout->mBoundsMax.y)
-        mLayout->mBoundsMax.y = boundsMax.y;
-    if (boundsMax.z > mLayout->mBoundsMax.z)
-        mLayout->mBoundsMax.z = boundsMax.z;
+    if (boundsMin.x < layout->mBoundsMin.x)
+        layout->mBoundsMin.x = boundsMin.x;
+    if (boundsMin.y < layout->mBoundsMin.y)
+        layout->mBoundsMin.y = boundsMin.y;
+    if (boundsMin.z < layout->mBoundsMin.z)
+        layout->mBoundsMin.z = boundsMin.z;
+    if (boundsMax.x > layout->mBoundsMax.x)
+        layout->mBoundsMax.x = boundsMax.x;
+    if (boundsMax.y > layout->mBoundsMax.y)
+        layout->mBoundsMax.y = boundsMax.y;
+    if (boundsMax.z > layout->mBoundsMax.z)
+        layout->mBoundsMax.z = boundsMax.z;
 }
-

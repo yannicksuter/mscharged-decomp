@@ -36,7 +36,6 @@ extern "C" void fn_80319E84(
     UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
 extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
 extern "C" float fn_800D85F8(cFielder*);
-extern "C" float fn_800D9EC4(cPlayer*);
 extern "C" void fn_800D2074();
 
 extern bool lbl_806E0C50;
@@ -405,7 +404,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
             bool shouldRunToTarget;
             if ((outOfBoundsFielder->mUnidentified024.m_v3Position.x > 20.6f
                     || outOfBoundsFielder->mUnidentified024.m_v3Position.x < -20.6f)
-                && !fn_800D9EC4(outOfBoundsFielder)
+                && !Incapacitated(outOfBoundsFielder)
                 && !outOfBoundsFielder->fn_800344B0()
                 && !outOfBoundsFielder->IsShattered())
             {
@@ -429,7 +428,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
             }
         }
     }
-    else if (g_pGame->m_eGameState == 2)
+    else if (g_pGame->GetGameState() == 2)
     {
         cTeam* team = fielder->m_pTeam;
         FormationSpec* formation;

@@ -7,7 +7,7 @@ public:
     SimpleLineReader();
     void SetBuffer(char* data, int size);
     char* GetLine();
-    unsigned int GetSize() const;
+    unsigned int GetSize() const { return mLineLength; }
 
 private:
     /* 0x000 */ char mLine[256];
@@ -24,7 +24,7 @@ public:
     char* NextToken(bool toLower);
     char* NextTokenOnLine(bool toLower);
     bool AdvanceLine();
-    int GetTokenLength() const;
+    int GetTokenLength() const { return mTokenLength; }
 
 private:
     inline bool AdvanceEnd();

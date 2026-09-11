@@ -15,6 +15,7 @@
 #include "Game/Render/Presentation.h"
 #include "Game/FriendManager.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlPrint.h"
 #include "Game/SH/SHNavigation.h"
 #include <stdlib.h>

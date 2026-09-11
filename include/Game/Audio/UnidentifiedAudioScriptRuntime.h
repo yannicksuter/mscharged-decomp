@@ -159,7 +159,7 @@ public:
     void Unidentified6BC4();
     void Unidentified6DF8(const u32&, UnidentifiedAudioEffectBinding*);
     bool Unidentified6E00(void* data, unsigned int size);
-    int Unidentified6E98(u32 hash, int index);
+    int Unidentified6E98(u32 hash, UnidentifiedAudioEffectSetState* value);
     void Unidentified6F00(u32 hash, u32 instance);
     bool Unidentified77C8(u32 instance);
     void Unidentified78C0(float deltaTime);

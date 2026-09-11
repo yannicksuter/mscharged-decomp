@@ -58,16 +58,18 @@ FakeBallWorld::FakeBallWorld(cBall* pBall)
             PhysicsGroundPlane(mpCollisionSpace);
     mpPhysicsBall = new (nlMalloc(sizeof(FakePhysicsBall), 8, false))
         FakePhysicsBall(0.18f, *this);
+    nlVector4 plane;
+    nlVec4Set(plane, 1.0f, 0.0f, 0.0f, 20.6f);
     mpGoaliePlane1
         = new (nlMalloc(sizeof(PhysicsGoaliePlane), 8, false))
-            PhysicsGoaliePlane(1.0f, 0.0f, 20.6f, *this);
+            PhysicsGoaliePlane(plane, *this);
+    plane.x = -1.0f;
     mpGoaliePlane2
         = new (nlMalloc(sizeof(PhysicsGoaliePlane), 8, false))
-            PhysicsGoaliePlane(-1.0f, 0.0f, 20.6f, *this);
+            PhysicsGoaliePlane(plane, *this);
     mpGoaliePlane1->DisableCollisions();
     mpGoaliePlane2->DisableCollisions();
     mbHitSuccess = false;
-    mUnidentified1D = false;
 }
 
 FakeBallWorld::~FakeBallWorld()
@@ -736,9 +738,9 @@ ContactType FakePhysicsBall::Contact(
     return PhysicsBall::Contact(object, contact, numContacts);
 }
 
-PhysicsGoaliePlane::PhysicsGoaliePlane(float a, float b, float c,
+PhysicsGoaliePlane::PhysicsGoaliePlane(const nlVector4& plane,
     FakeBallWorld& fakeBallWorld)
-    : PhysicsWall(fakeBallWorld.mpCollisionSpace, a, b, c)
+    : PhysicsWall(fakeBallWorld.mpCollisionSpace, plane.x, plane.y, plane.w)
     , mWorld(fakeBallWorld)
 {
 }

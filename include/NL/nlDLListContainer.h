@@ -23,6 +23,12 @@ public:
     {
     }
 
+    DLListContainerBase(Adapter allocator)
+        : m_Allocator(allocator)
+        , m_Head(0)
+    {
+    }
+
     ~DLListContainerBase()
     {
         Clear();
@@ -179,5 +185,17 @@ void DLListContainerBase<T, Adapter>::DeleteEntry(
     }
     m_Allocator.DeleteEntry(entry);
 }
+
+// The list borrows its node pool and does not free the pool's blocks.
+template <typename T>
+class UnidentifiedDLListPool_802F2188
+    : public DLListContainerBase<T, BasicSlotPool<DLListEntry<T> >&>
+{
+public:
+    UnidentifiedDLListPool_802F2188(BasicSlotPool<DLListEntry<T> >& allocator)
+        : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> >&>(allocator)
+    {
+    }
+};
 
 #endif

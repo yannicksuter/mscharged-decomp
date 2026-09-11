@@ -23,6 +23,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHOnlineMiiSelectOverlay.h"
@@ -318,7 +319,7 @@ void SHOnlineMiiSelect::Update(float fDeltaT)
     if (!mInitialized)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             return;
         }

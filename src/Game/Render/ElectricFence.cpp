@@ -379,12 +379,14 @@ bool EmitElectricFenceBallEffect(const nlVector3& pos,
     if (!EmissionManager::Instance()->IsPlaying(emitterID,
             EmissionManager::Instance()->GetEffectsGroup(groupName)))
     {
-        controller = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(groupName),
-            3, true, 0);
+        EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(groupName);
+        controller = EmissionManager::Instance()->Create(group, 3, true, 0);
         controller->m_uUserData = emitterID;
         controller->SetPosition(clampedPos);
 
-        float angle = nlATan2f(dir.y, dir.x);
+        float dirX = dir.x;
+        float dirY = dir.y;
+        float angle = nlATan2f(dirY, dirX);
         controller->m_aFacing = (u16)(10430.378f * angle);
 
         data = 0;
@@ -409,12 +411,14 @@ void EmitElectricFenceCharacterEffect(const nlVector3& pos,
     if (!EmissionManager::Instance()->IsPlaying(emitterID,
             EmissionManager::Instance()->GetEffectsGroup("electric_fence_character")))
     {
-        controller = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("electric_fence_character"),
-            3, true, 0);
+        EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("electric_fence_character");
+        controller = EmissionManager::Instance()->Create(group, 3, true, 0);
         controller->m_uUserData = emitterID;
         controller->SetPosition(pos);
 
-        float angle = nlATan2f(dir.y, dir.x);
+        float dirX = dir.x;
+        float dirY = dir.y;
+        float angle = nlATan2f(dirY, dirX);
         controller->m_aFacing = (u16)(10430.378f * angle);
 
         data = 0;

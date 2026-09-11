@@ -13,7 +13,7 @@
 #include "NL/MemAlloc.h"
 #include "NL/nlAlgorithm.h"
 #include "NL/nlFile.h"
-#include "NL/nlLocalization.h"
+#include "NL/nlLocalizationLookup.h"
 #include "NL/nlMain.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
@@ -152,24 +152,6 @@ static inline u32 SaveFileSize()
         + sizeof(SaveFileHeader);
 }
 
-static inline const unsigned short* LocalizedString(const char* name)
-{
-    nlLocalization* localization = g_pLocalization;
-    u32 hash = nlStringLowerHash(name);
-    if (localization->m_LookupTable == 0)
-    {
-        return LocalizationTableNotFound;
-    }
-
-    nlLocalization::StringLookup* lookup = nlBSearch<nlLocalization::StringLookup, unsigned long>(
-        hash, localization->m_LookupTable, localization->m_pFile->StringCount);
-    if (lookup != 0)
-    {
-        return localization->m_FirstString + lookup->StringOffset;
-    }
-    return MissingLocString;
-}
-
 static inline FEPopupMenu* PushSavePopup()
 {
     return (FEPopupMenu*)SaveSceneManager->Push((SceneList)10, SCREEN_NOTHING, false);
@@ -177,8 +159,8 @@ static inline FEPopupMenu* PushSavePopup()
 
 static inline void WriteLocalizedBanner(NANDResultCallback callback)
 {
-    const unsigned short* title = LocalizedString("SAVE_BANNER_TITLE");
-    const unsigned short* comment = LocalizedString("SAVE_BANNER_COMMENT");
+    const unsigned short* title = LookupLocString("SAVE_BANNER_TITLE");
+    const unsigned short* comment = LookupLocString("SAVE_BANNER_COMMENT");
 
     memset(BannerBuffer->title, 0, sizeof(BannerBuffer->title));
     memset(BannerBuffer->subtitle, 0, sizeof(BannerBuffer->subtitle));
@@ -711,7 +693,8 @@ void SaveLoad::OpenBannerCallback(s32 result)
     }
     else
     {
-        u32 blocks = (u32)ceil((float)NAND_BANNER_SIZE(8) / 16384.0f);
+        u32 blocks = NAND_BANNER_SIZE(8);
+        blocks = (u32)(float)ceil((float)blocks / 16384.0f);
         HandleNANDResult(nlFlashCheck(blocks, 1, &CheckAnswer, CheckBannerSpaceCallback));
     }
 }
@@ -830,18 +813,18 @@ void LoadMemoryCardIconData()
     NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 0, 2);
     NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 1, 2);
     NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 2, 2);
-    NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 3, 2);
-    NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 4, 2);
-    NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 5, 2);
-    NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 6, 2);
-    NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 7, 2);
+    NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 3, 1);
+    NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 4, 1);
+    NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 5, 1);
+    NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 6, 1);
+    NAND_BANNER_SET_ICON_SPEED(BannerBuffer, 7, 1);
 
     memset(BannerBuffer->title, 0, sizeof(BannerBuffer->title) + sizeof(BannerBuffer->subtitle));
     memset(BannerBuffer->bannerTexture, 0, sizeof(BannerBuffer->bannerTexture));
     memset(BannerBuffer->iconTexture, 0, sizeof(BannerBuffer->iconTexture));
 
-    const unsigned short* title = LocalizedString("SAVE_BANNER_TITLE");
-    const unsigned short* comment = LocalizedString("SAVE_BANNER_COMMENT");
+    const unsigned short* title = LookupLocString("SAVE_BANNER_TITLE");
+    const unsigned short* comment = LookupLocString("SAVE_BANNER_COMMENT");
     memcpy(BannerBuffer->title, title, wcslen((const wchar_t*)title) * sizeof(unsigned short));
     memcpy(BannerBuffer->subtitle, comment, wcslen((const wchar_t*)comment) * sizeof(unsigned short));
 

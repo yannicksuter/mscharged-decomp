@@ -23,6 +23,7 @@
 #include "Game/FE/tlTextInstance.h"
 #include "Game/Render/Presentation.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlLocalization.h"
 #include "NL/plat/nlFlash.h"
 #include "Game/FE/feCupFlow.h"

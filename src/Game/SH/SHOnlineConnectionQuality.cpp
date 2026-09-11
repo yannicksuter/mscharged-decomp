@@ -15,6 +15,7 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlFormat.h"
 #include "NL/nlLocalizationLookup.h"
 #include "NL/nlString.h"

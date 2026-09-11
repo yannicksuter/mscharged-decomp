@@ -15,6 +15,7 @@
 #include "Game/Render/Presentation.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlLexicalCast.h"
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
@@ -78,15 +79,14 @@ void CupCheaterScene::SceneCreated()
     typedef Detail::MemFunImpl<void, void (CupCheaterScene::*)()> MemFunImpl_CupCheaterScene_v;
     typedef BindExp1<void, MemFunImpl_CupCheaterScene_v, CupCheaterScene*> BindExp1_vfmfcp;
 
-    void* presentation = mFEScene->m_pFEPackage->GetPresentation();
+    unsigned long menuHash;
+    unsigned long layerHash;
+    void* presentation;
+    presentation = mFEScene->m_pFEPackage->GetPresentation();
+    menuHash = nlStringLowerHash("Menu");
+    layerHash = nlStringLowerHash("Layer");
     TLComponentInstance* comp = FEFinder<TLComponentInstance, 4>::Find(
-        (FEPresentation*)presentation,
-        nlStringLowerHash("Slide1"),
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("Menu"),
-        0,
-        0,
-        0);
+        (FEPresentation*)presentation, nlStringLowerHash("Slide1"), layerHash, menuHash, 0, 0, 0);
 
     m_SlideMenu = new ((FESlideMenu*)nlMalloc(sizeof(FESlideMenu), 8, false)) FESlideMenu(comp);
 

@@ -201,9 +201,12 @@ void SHOnlineInviteResponse::ApplySelectedAction()
         JoinOnlineFriendInvitation();
         break;
     case 1:
+    {
         GameSceneManager::Instance()->Push(SCENE_ONLINE_GUEST_CONTROLLER_SELECT, SCREEN_FORWARD, true);
-        ((SHOnlineGuestControllerSelect*)GameSceneManager::Instance()->GetScene(SCENE_ONLINE_GUEST_CONTROLLER_SELECT))->mRespondingToInvitation = true;
+        SHOnlineGuestControllerSelect* scene = (SHOnlineGuestControllerSelect*)GameSceneManager::Instance()->GetScene(SCENE_ONLINE_GUEST_CONTROLLER_SELECT);
+        scene->mRespondingToInvitation = true;
         break;
+    }
     case 2:
     {
         g_pFriendManager->SetOwnStatusDecline(g_pFriendManager->mHostInvitationIndex);

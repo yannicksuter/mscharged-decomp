@@ -176,7 +176,7 @@ public:
 
     struct Parser
     {
-        virtual void EmptyLine() { }
+        virtual void EmptyLine();
         virtual void Comment(const char*, unsigned int) { }
         virtual void Section(const String&) { }
         virtual void TagValuePair(const String&, const String&) { }
@@ -218,7 +218,7 @@ public:
         return tvp.Get<T>();
     }
     void Parse(const char* data, int size, Parser& parser);
-    bool IsBool(const char* string, bool& value) const;
+    bool IsBool(const char* str, bool& b) const;
 
     TagValuePair* mTvpHash;
     char* mStringMemory;

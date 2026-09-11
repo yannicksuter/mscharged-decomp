@@ -14,6 +14,7 @@
 #include "Game/Render/Presentation.h"
 #include "Game/FriendManager.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHOnlineInvitePlayers.h"
@@ -26,7 +27,7 @@ SHOnlineInviteStatus::SHOnlineInviteStatus()
     , mCanCancel(false)
     , mPopupActive(false)
     , mElapsedTime(0.0f)
-    , mPointersInitialized(0)
+    , mPointersInitialized(false)
 {
 }
 
@@ -130,7 +131,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
         }
         break;
     }
-    if (mPointersInitialized == 0)
+    if (!mPointersInitialized)
     {
         if (mCanCancel)
         {
@@ -142,7 +143,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
                     gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
             }
         }
-        mPointersInitialized = 1;
+        mPointersInitialized = true;
     }
     if (mCanCancel)
     {

@@ -15,6 +15,7 @@
 #include "Game/main.h"
 #include "Game/MatchSeries.h"
 #include "NL/nlMemory.h"
+#include "NL/nlstring_tmpl.h"
 #include "Game/NetworkInput.h"
 
 #include <string.h>
@@ -77,55 +78,72 @@ void NetworkStatsManager::Reset(bool)
     mGameResultReported = false;
     mDisconnectPending = false;
     mUnidentifiedC41C = 0;
-    mUnidentifiedC420 = 0;
-    mUnidentifiedC424 = 0;
     mDisconnectLossPending[0] = false;
+    mUnidentifiedC420 = 0;
     mDisconnectLossPending[1] = false;
+    mUnidentifiedC424 = 0;
     mDisconnectLossPending[2] = false;
     mJobReadIndex = 0;
     mJobCount = 0;
-
-    bool european = GetRegion() == 1;
-    bool alternate = european && IsAlternateOnlineCountryGroup();
-    if (european)
-    {
-        mPersistentCategories[0] = alternate ? 3 : 0;
-        mPersistentCategories[1] = alternate ? 4 : 1;
-        mPersistentCategories[2] = 2;
-    }
-    else
-    {
-        mPersistentCategories[0] = 0;
-        mPersistentCategories[1] = 1;
-        mPersistentCategories[2] = 2;
-    }
-
-    int seasonalCategory = alternate ? 4 : 1;
-    int dailyCategory = alternate ? 3 : 0;
-    mCategories[0].mPersistentCategory = seasonalCategory;
-    mCategories[0].mFilter = 0;
-    mCategories[0].mResultType = 1;
-    mCategories[1].mPersistentCategory = seasonalCategory;
-    mCategories[1].mFilter = 2;
-    mCategories[1].mResultType = 1;
-    mCategories[2].mPersistentCategory = dailyCategory;
-    mCategories[2].mFilter = 0;
-    mCategories[2].mResultType = 0;
-    mCategories[3].mPersistentCategory = dailyCategory;
-    mCategories[3].mFilter = 2;
-    mCategories[3].mResultType = 0;
-    mCategories[4].mPersistentCategory = european ? 2 : 0;
-    mCategories[4].mFilter = 1;
-    mCategories[4].mResultType = european ? 2 : 0;
-    mCategories[5].mPersistentCategory = european ? 2 : 0;
-    mCategories[5].mFilter = 1;
-    mCategories[5].mResultType = european ? 2 : 0;
 
     for (int i = 0; i < 6; ++i)
     {
         mCategories[i].mAvailable = false;
         mCategories[i].mCount = 0;
         mCategories[i].mFirstRank = -1;
+    }
+
+    bool european = GetRegion() == 1;
+    if (european)
+    {
+        int alternate = UsesEuropeanRankings() ? IsAlternateOnlineCountryGroup() : 0;
+        mPersistentCategories[0] = alternate == 1 ? 3 : 0;
+        mPersistentCategories[1] = alternate == 1 ? 4 : 1;
+        mPersistentCategories[2] = 2;
+
+        mCategories[0].mPersistentCategory = alternate == 1 ? 4 : 1;
+        mCategories[0].mFilter = 0;
+        mCategories[0].mResultType = 1;
+        mCategories[1].mPersistentCategory = alternate == 1 ? 4 : 1;
+        mCategories[1].mFilter = 2;
+        mCategories[1].mResultType = 1;
+        mCategories[2].mPersistentCategory = alternate == 1 ? 3 : 0;
+        mCategories[2].mFilter = 0;
+        mCategories[2].mResultType = 0;
+        mCategories[3].mPersistentCategory = alternate == 1 ? 3 : 0;
+        mCategories[3].mFilter = 2;
+        mCategories[3].mResultType = 0;
+        mCategories[4].mPersistentCategory = 2;
+        mCategories[4].mFilter = 1;
+        mCategories[4].mResultType = 2;
+        mCategories[5].mPersistentCategory = 2;
+        mCategories[5].mFilter = 1;
+        mCategories[5].mResultType = 2;
+    }
+    else
+    {
+        mPersistentCategories[0] = 0;
+        mPersistentCategories[1] = 1;
+        mPersistentCategories[2] = 2;
+
+        mCategories[0].mPersistentCategory = 1;
+        mCategories[0].mFilter = 0;
+        mCategories[0].mResultType = 1;
+        mCategories[1].mPersistentCategory = 1;
+        mCategories[1].mFilter = 2;
+        mCategories[1].mResultType = 1;
+        mCategories[2].mPersistentCategory = 0;
+        mCategories[2].mFilter = 0;
+        mCategories[2].mResultType = 0;
+        mCategories[3].mPersistentCategory = 0;
+        mCategories[3].mFilter = 2;
+        mCategories[3].mResultType = 0;
+        mCategories[4].mPersistentCategory = 0;
+        mCategories[4].mFilter = 1;
+        mCategories[4].mResultType = 0;
+        mCategories[5].mPersistentCategory = 0;
+        mCategories[5].mFilter = 1;
+        mCategories[5].mResultType = 0;
     }
 }
 
@@ -180,18 +198,68 @@ void NetworkStatsManager::StatsListenerVirtual00()
 void NetworkStatsManager::ApplyLeaderboardToSave(
     NetworkLeaderboardCategory* leaderboard, bool updateProfile)
 {
-    if (leaderboard == 0 || leaderboard->mCount <= 0)
+    if (g_pNetworkSessionBase->GetSessionMode() == 2)
     {
-        return;
-    }
-
-    if (updateProfile)
-    {
-        int category = leaderboard->mResultType;
-        if (category >= 0 && category < 3)
+        GameInfoSaveSlot* slot = GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex);
+        for (int i = 0; i < leaderboard->mCount; ++i)
         {
-            mHasLocalStats[category] = true;
-            mLocalStats[category] = leaderboard->mMetadata[0];
+            if (slot->unknown_0x01C == leaderboard->mPlayers[i].mProfileId
+                && leaderboard->mPlayers[i].mName[0] != 0)
+            {
+                leaderboard->mFirstRank = i;
+                bool apply = false;
+                if (updateProfile)
+                {
+                    if (leaderboard->mResultType == 2)
+                    {
+                        apply = true;
+                    }
+                    else
+                    {
+                        apply = leaderboard->mFilter == 0;
+                    }
+                }
+                if (apply)
+                {
+                    mHasLocalStats[leaderboard->mResultType] = true;
+                    mLocalStats[leaderboard->mResultType] = leaderboard->mMetadata[i];
+                    if (leaderboard->mResultType == 0 && leaderboard->mFilter == 0)
+                    {
+                        NetworkRankingMeta& record = mLocalStats[leaderboard->mResultType];
+                        int* pendingWins = GameInfoManager::GetInstance()->GetUnknown0xA98(gNetworkSaveSlotIndex);
+                        int* pendingLosses = GameInfoManager::GetInstance()->GetUnknown0xA9C(gNetworkSaveSlotIndex);
+                        int wins = *pendingWins;
+                        int losses = *pendingLosses;
+                        if (wins != record.mWins)
+                        {
+                            *pendingWins = record.mWins;
+                            mSaveDataChanged = true;
+                        }
+                        if (losses != record.mLosses)
+                        {
+                            *pendingLosses = record.mLosses;
+                            mSaveDataChanged = true;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < leaderboard->mCount; ++i)
+        {
+            if (nlStrICmp(gNetworkMiiNameWide, leaderboard->mPlayers[i].mName) == 0)
+            {
+                leaderboard->mFirstRank = i;
+                if (leaderboard->mFilter == 0)
+                {
+                    mHasLocalStats[leaderboard->mPersistentCategory] = true;
+                    mLocalStats[leaderboard->mPersistentCategory] = leaderboard->mMetadata[i];
+                }
+                break;
+            }
         }
     }
 }

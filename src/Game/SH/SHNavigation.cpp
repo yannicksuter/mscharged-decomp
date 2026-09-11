@@ -161,7 +161,7 @@ void SHNavigation::Update(float fDeltaT)
     if (mHomeWarningPlaying)
     {
         TLSlide* slide = mHomeWarning->GetActiveSlide();
-        if (slide->m_time >= slide->m_duration + slide->m_start)
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             mHomeWarning->m_bVisible = false;
             mHomeWarningPlaying = false;
@@ -475,37 +475,39 @@ void SHNavigation::SetBackButtonText(int value)
 
 void SHNavigation::ShowHomeButtonWarning()
 {
-    if (this->mFEScene != 0 && this->mFEScene->mState == 6 &&
-        !this->mHomeWarningPlaying)
+    if (this->mFEScene == 0 || this->mFEScene->mState != 6
+        || this->mHomeWarningPlaying)
     {
-        if (!sPointerInputEnabled)
-        {
-            if ((nlTaskManager::m_pInstance->mCurrentState & 4) == 0)
-            {
-                this->mPlusButton->m_bVisible = false;
-                this->mMinusButton->m_bVisible = false;
-                this->mBackButton->m_bVisible = false;
-                this->mBreadcrumbs->m_bVisible = false;
-                this->mPlayButton->m_bVisible = false;
-                this->mDoneButton->m_bVisible = false;
-                this->mLowerDoneButton->m_bVisible = false;
-                this->mProgressButton->m_bVisible = false;
-            }
-            sPointerInputEnabled = true;
-            sPointerHidden = true;
-        }
-
-        this->mHomeWarning->m_bVisible = true;
-        if (this->mIsWidescreen)
-        {
-            this->mHomeWarning->SetActiveSlide("widescreen", true, false);
-        }
-        else
-        {
-            this->mHomeWarning->SetActiveSlide("Slide1", true, false);
-        }
-        this->mHomeWarningPlaying = true;
+        return;
     }
+
+    if (!sPointerInputEnabled)
+    {
+        if ((nlTaskManager::m_pInstance->mCurrentState & 4) == 0)
+        {
+            this->mPlusButton->m_bVisible = false;
+            this->mMinusButton->m_bVisible = false;
+            this->mBackButton->m_bVisible = false;
+            this->mBreadcrumbs->m_bVisible = false;
+            this->mPlayButton->m_bVisible = false;
+            this->mDoneButton->m_bVisible = false;
+            this->mLowerDoneButton->m_bVisible = false;
+            this->mProgressButton->m_bVisible = false;
+        }
+        sPointerInputEnabled = true;
+        sPointerHidden = true;
+    }
+
+    this->mHomeWarning->m_bVisible = true;
+    if (this->mIsWidescreen)
+    {
+        this->mHomeWarning->SetActiveSlide("widescreen", true, false);
+    }
+    else
+    {
+        this->mHomeWarning->SetActiveSlide("Slide1", true, false);
+    }
+    this->mHomeWarningPlaying = true;
 }
 
 void SHNavigation::StartTransition()

@@ -19,6 +19,7 @@
 #include "Game/OnlineMatchmaking.h"
 #include "Game/Render/Presentation.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"

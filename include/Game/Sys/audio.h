@@ -13,7 +13,10 @@ struct AudioHandleState
 {
     unsigned long m_CueId;
     void* m_Context;
-    unsigned long m_Flags;
+    unsigned long m_FlagsHi16 : 16;
+    unsigned long m_FlagsBit15 : 1;
+    unsigned long m_FlagsBits12_14 : 3;
+    unsigned long : 12;
 };
 
 class GameAudio : public AudioSystem

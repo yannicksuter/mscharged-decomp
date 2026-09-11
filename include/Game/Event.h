@@ -247,6 +247,19 @@ public:
         }
     }
 
+    void Dispatch(Callback disposer, unsigned char deliver)
+    {
+        if (deliver)
+        {
+            Deliver();
+        }
+
+        if (disposer)
+        {
+            disposer();
+        }
+    }
+
 protected:
     void Remove(Listener* listener);
     ListenerEntry* UnidentifiedGetEntry(Listener* listener);
@@ -258,24 +271,6 @@ protected:
     // whose destructor tears down twice (see Game/Render/ImpostorCharacter.cpp).
     DLListContainerBase<Listener, BasicSlotPool<ListenerEntry> > mListeners;
 };
-
-// No-data events deliver with no argument; the queued dispatch therefore
-// calls the no-argument walk while retaining the generic disposer shape.
-template <>
-inline void UnidentifiedEvent<UnidentifiedEventNoData>::Dispatch(
-    UnidentifiedEventNoData* data, Function<UnidentifiedEventNoData*> disposer,
-    unsigned char deliver)
-{
-    if (deliver)
-    {
-        Deliver();
-    }
-
-    if (disposer)
-    {
-        disposer(data);
-    }
-}
 
 // The callback may have changed the list while it ran, so the walk is
 // re-anchored on the current list head before it continues past the entry
@@ -631,6 +626,8 @@ template <typename T>
 class UnidentifiedQueuedEvent : public UnidentifiedEvent<T>
 {
 public:
+    typedef typename UnidentifiedEvent<T>::Callback Callback;
+
     UnidentifiedQueuedEvent(EventDispatcher*, const char*, int);
 
     virtual ~UnidentifiedQueuedEvent();
@@ -643,8 +640,21 @@ public:
 
     void Queue(T* data, const Function<T*>& disposer)
     {
+        typedef void (UnidentifiedEvent<T>::*DispatchFunction)(
+            T*, Function<T*>, unsigned char);
         Function<bool> callback(
-            Bind<void>(MemFun(&UnidentifiedEvent<T>::Dispatch), this, data, disposer, placeholder0));
+            Bind<void>(MemFun((DispatchFunction)&UnidentifiedEvent<T>::Dispatch),
+                this, data, disposer, placeholder0));
+        mDispatcher->Add(callback);
+    }
+
+    void Queue(const Callback& disposer)
+    {
+        typedef void (UnidentifiedEvent<T>::*DispatchFunction)(
+            Callback, unsigned char);
+        Function<bool> callback(
+            Bind<void>(MemFun((DispatchFunction)&UnidentifiedEvent<T>::Dispatch),
+                this, disposer, placeholder0));
         mDispatcher->Add(callback);
     }
 

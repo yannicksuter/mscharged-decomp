@@ -23,7 +23,8 @@ public:
     /* 0x0FD */ bool mPopupActive;
     /* 0x0FE */ u8 mPaddingFE[2];
     /* 0x100 */ float mElapsedTime;
-    /* 0x104 */ int mPointersInitialized;
+    /* 0x104 */ bool mPointersInitialized;
+    /* 0x105 */ u8 mPadding105[3];
     /* 0x108 */ TLComponentInstance* mStatusInstance;
 }; // size 0x10C
 

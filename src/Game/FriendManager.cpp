@@ -434,27 +434,30 @@ bool FriendManager::HasFriendDeclined()
 int FriendManager::GetFriendInvitationResponse()
 {
     int index = mFriendStatusIndex;
-    if (index < 0 || index >= 64)
+    if (index >= 0 && index < 64)
     {
-        return 0;
+        DWCFriendData* friendData = reinterpret_cast<DWCFriendData*>(
+            GameInfoManager::GetInstance()->GetUnknown0x40(gNetworkSaveSlotIndex, index));
+        if (DWC_IsValidFriendData(friendData))
+        {
+            if (DWC_GetFriendStatus(friendData, 0) == 0)
+            {
+                return 0;
+            }
+            if ((int)mFriendStatus[index].mStatus == EFriendStatus_ClientReceivedInvitation)
+            {
+                DWCUserData* userData = reinterpret_cast<DWCUserData*>(
+                    GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
+                int response = 2;
+                if (userData->gs_profile_id == mFriendStatus[index].mProfileId)
+                {
+                    response = 1;
+                }
+                return response;
+            }
+        }
     }
-
-    DWCFriendData* friendData = reinterpret_cast<DWCFriendData*>(
-        GameInfoManager::GetInstance()->GetUnknown0x40(gNetworkSaveSlotIndex, index));
-    if (!DWC_IsValidFriendData(friendData)
-        || DWC_GetFriendStatus(friendData, 0) == 0
-        || mFriendStatus[index].mStatus != EFriendStatus_ClientReceivedInvitation)
-    {
-        return 0;
-    }
-
-    DWCUserData* userData = reinterpret_cast<DWCUserData*>(
-        GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
-    if (userData->gs_profile_id == mFriendStatus[index].mProfileId)
-    {
-        return 1;
-    }
-    return 2;
+    return 0;
 }
 
 void FriendManager::Update(float dt)

@@ -171,7 +171,7 @@ void UnidentifiedPresentationState::UpdateAllowedToSkip()
     {
         NetworkPeerChannel* channel = peer->GetNetworkPeerChannel(i);
         int pad = channel->mGlobalPadIndex;
-        int side = NisPlayer::Instance()->mUnidentified34230;
+        int side = NisPlayer::Instance()->mWinnerSide[NIS_GAME_WINNER];
         if (side
             == nlSingleton<GameInfoManager>::Instance()->GetPlayingSide(
                 channel->GetNetworkPeerChannelId()))
@@ -248,7 +248,7 @@ void UnidentifiedPresentationState::Finish()
     if (strcmp("PlayHighlight", mCurrentFunction) == 0 || sLoopPresentation)
     {
         fadeToStrikerTimes = true;
-        if (((NetworkSessionControl*)g_pNetworkSessionBase)->GetSessionMode() != 0)
+        if (g_pNetworkSessionBase->GetSessionMode() != 0)
         {
             if (mHighlightsLeft > 0)
             {
@@ -259,7 +259,7 @@ void UnidentifiedPresentationState::Finish()
                 mHighlightsLeft--;
             }
         }
-        else if (GetTweakBool("/user/dosoak", false))
+        else if (GetTweakBool("/user/dosoak", false) == true)
         {
             if (mHighlightsLeft > 0)
             {
@@ -307,6 +307,8 @@ void UnidentifiedPresentationState::Finish()
             if (DuringEndOfGamePresentation(this))
             {
                 fn_8027ED18(NisPlayer::Instance());
+                g_pGame->mUnidentified49C.mEvent02.Queue(
+                    Function<FnVoidVoid>());
                 nlTaskManager::SetNextState(1);
             }
             else
@@ -314,7 +316,8 @@ void UnidentifiedPresentationState::Finish()
                 if (nlStrCmp<char>(mCurrentFunction, "GameBegin") == 0)
                 {
                     g_pGame->ChangeGameState(1);
-                    GetFixedUpdateTask()->mUnidentified38 = true;
+                    FixedUpdateTask* task = GetFixedUpdateTask();
+                    task->mUnidentified38 = true;
                 }
                 nlTaskManager::SetNextState(2);
             }

@@ -482,7 +482,6 @@ void Config::Set(const char* tag, const String& value)
 
 void* ConfigParserAllocate(unsigned long size, unsigned int alignment, bool fromEnd);
 
-#pragma dont_inline on
 void Config::Parse(const char* data, int size, Parser& parser)
 {
     if (size == 0)
@@ -569,10 +568,7 @@ void Config::Parse(const char* data, int size, Parser& parser)
 
     nlFree(copy);
 }
-#pragma dont_inline reset
 
-#pragma inline_depth(8)
-#pragma inline_max_size(0x10000)
 void SetTagValuePair::TagValuePair(const BString& tag, const BString& value)
 {
     BString tagWithSection(tag);
@@ -592,8 +588,6 @@ void SetTagValuePair::Section(const BString& section)
 void SetTagValuePair::Comment(const char*, unsigned int)
 {
 }
-#pragma inline_depth()
-#pragma inline_max_size()
 
 void* ConfigParserAllocate(unsigned long size, unsigned int alignment, bool fromEnd)
 {
@@ -605,6 +599,10 @@ inline Config::TagValuePair::TagValuePair()
 {
 }
 
+void Config::Parser::EmptyLine()
+{
+}
+
 template <typename T>
 void Config::Set(const char* tag, T value)
 {
@@ -613,81 +611,22 @@ void Config::Set(const char* tag, T value)
 
 template void Config::Set<BString>(const char*, BString);
 
-#pragma inline_depth(8)
-#pragma inline_max_size(0x10000)
-static inline char& ConfigStringAt(BString& string, int index)
+bool Config::IsBool(const char* str, bool& b) const
 {
-    if (string.mData == 0)
+    BString s(str);
+    for (int i = 0; i < s.size(); ++i)
     {
-        string.mData = new BString::Data((const char*)0, (const char*)0);
+        s[i] = tolower(s[i]);
     }
-    else
+    if (s == sBoolTrue || s == sBoolYes || s == sBoolOn || s == sBoolEnable)
     {
-        string.mData = string.mData->Cow();
-    }
-    return string.mData->mData.mData[index];
-}
-
-static inline bool ConfigStringEquals(const BString& lhs, const char* rhs, int dataIsNull)
-{
-    unsigned int c;
-    BString::Data* data = lhs.mData;
-    int i = 0;
-    while (i < (dataIsNull == 0 ? data->mData.mSize - 1 : 0))
-    {
-        c = (u8)*rhs;
-        if ((char)c == 0)
-        {
-            return false;
-        }
-        if ((char)c != data->mData.mData[i])
-        {
-            return false;
-        }
-        ++rhs;
-        ++i;
-    }
-    return *rhs == 0;
-}
-
-bool Config::IsBool(const char* string, bool& value) const
-{
-    BString lowered(string);
-    int dataIsNull;
-    for (int i = 0;
-        i < ((dataIsNull = lowered.mData == 0) == 0 ? lowered.mData->mData.mSize - 1 : 0);
-        ++i)
-    {
-        ConfigStringAt(lowered, i) = tolower(ConfigStringAt(lowered, i));
-    }
-
-    if (ConfigStringEquals(lowered, sBoolTrue, dataIsNull)
-        || ConfigStringEquals(lowered, sBoolYes, dataIsNull)
-        || ConfigStringEquals(lowered, sBoolOn, dataIsNull)
-        || ConfigStringEquals(lowered, sBoolEnable, dataIsNull))
-    {
-        value = true;
+        b = true;
         return true;
     }
-    if (ConfigStringEquals(lowered, sBoolFalse, dataIsNull)
-        || ConfigStringEquals(lowered, sBoolNo, dataIsNull)
-        || ConfigStringEquals(lowered, sBoolOff, dataIsNull)
-        || ConfigStringEquals(lowered, sBoolDisable, dataIsNull))
+    if (s == sBoolFalse || s == sBoolNo || s == sBoolOff || s == sBoolDisable)
     {
-        value = false;
+        b = false;
         return false;
     }
     return false;
-}
-#pragma inline_depth()
-#pragma inline_max_size()
-
-unsigned int SimpleLineReader::GetSize() const
-{
-    return mLineLength;
-}
-
-int SimpleParser::GetTokenLength() const
-{
-    return mTokenLength;
 }

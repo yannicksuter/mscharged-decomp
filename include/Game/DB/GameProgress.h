@@ -60,6 +60,11 @@ public:
     void ShowRoundNews();
 
     int GetSaveDataSize() const;
+    int UnidentifiedSize_8010D6CC() const
+    {
+        return (const char*)&mCurrentMode - (const char*)&mState + sizeof(mCurrentMode);
+    }
+
     void* SerializeData(void* dst) const;
     void* DeserializeData(void* src);
 

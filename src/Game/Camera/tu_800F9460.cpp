@@ -17,6 +17,7 @@
 #include "Game/Team.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlTask.h"
 #include "Game/UnidentifiedStaticStorage.h"
 

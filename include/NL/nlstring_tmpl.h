@@ -81,24 +81,30 @@ inline int nlStrCmp(const CharT* a, const CharT* b)
 }
 
 template <typename CharT>
-inline int nlStrICmp(const CharT* lhs, const CharT* rhs)
+inline int nlStrICmp(const CharT* str1, const CharT* str2)
 {
-    CharT left;
-    CharT right;
+    CharT c1;
+    CharT c2;
     do
     {
-        left = *lhs++;
-        if (left >= 0x61 && left <= 0x7A)
+        c1 = *str1++;
+        if (c1 >= 0x61)
         {
-            left = (CharT)(left & 0x5F);
+            if (c1 <= 0x7A)
+                c1 = (CharT)(c1 & 0x5F);
         }
-        right = *rhs++;
-        if (right >= 0x61 && right <= 0x7A)
+        c2 = *str2++;
+        if (c2 >= 0x61)
         {
-            right = (CharT)(right & 0x5F);
+            if (c2 <= 0x7A)
+                c2 = (CharT)(c2 & 0x5F);
         }
-    } while (left != 0 && right != 0 && left == right);
-    return left - right;
+        if (c1 == 0)
+            break;
+        if (c2 == 0)
+            break;
+    } while (c1 == c2);
+    return c1 - c2;
 }
 
 template <typename CharT>
@@ -151,13 +157,16 @@ inline CharT* nlStrChr(const CharT* str, CharT c)
 }
 
 template <typename CharT>
-CharT nlToUpper(CharT value)
+CharT nlToUpper(CharT c)
 {
-    if (value >= 0x61 && value <= 0x7A)
+    if (c >= 0x61)
     {
-        return (CharT)(value & 0x5F);
+        if (c <= 0x7A)
+        {
+            return c & 0x5F;
+        }
     }
-    return value;
+    return c;
 }
 
 #endif // NL_STRING_TMPL_H

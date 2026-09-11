@@ -79,8 +79,9 @@ static inline void AddAudioHandleState(int slotId, unsigned long cueId,
     AudioHandleState state;
     state.m_CueId = cueId;
     state.m_Context = context;
-    state.m_Flags = ((unsigned long)slotId << 16)
-        | (restartable ? 0x8000 : 0);
+    state.m_FlagsHi16 = slotId;
+    state.m_FlagsBit15 = restartable;
+    state.m_FlagsBits12_14 = 0;
     unsigned long key = MakeAudioHandleKey(cueId, context);
     sAudioHandleStates.Add(key, state);
 }
@@ -279,7 +280,9 @@ XSoundHandle* FindSoundHandle(
     {
         return 0;
     }
-    XSoundHandle** slot = FindAudioHandleSlot(cueId, context);
+    XSoundHandle** slot = 0;
+    unsigned long key = MakeAudioHandleKey(cueId, context);
+    sAudioHandles.FindGet(key, &slot);
     return slot != 0 ? *slot : 0;
 }
 
@@ -305,35 +308,21 @@ bool PlayTrackedSound(int slotId, unsigned long cueId,
     if (played)
     {
         AddAudioHandleState(slotId, cueId, context, restartable);
+        return true;
     }
-    return played;
+    return false;
 }
 
 bool PlayTrackedOwnedSound(int slotId, unsigned long cueId,
     XSoundOwner* owner, const void* debugName,
     void* context, bool restartable)
 {
-    bool played;
-    if (cueId == 0xFFFFFFFF)
-    {
-        played = true;
-    }
-    else
-    {
-        XSoundHandle* handle = CreateSoundHandle(
-            slotId, cueId, owner, debugName, context, false);
-        if (handle != 0)
-        {
-            handle->Play(context == 0);
-        }
-        played = handle != 0;
-    }
-
-    if (played)
+    if (PlayOwnedSound(slotId, cueId, owner, debugName, context))
     {
         AddAudioHandleState(slotId, cueId, context, restartable);
+        return true;
     }
-    return played;
+    return false;
 }
 
 void StopSound(unsigned long cueId, void* context)
@@ -390,7 +379,7 @@ void PauseSound(unsigned long cueId, void* context)
     }
 
     XSoundHandle* handle = *slot;
-    if ((state->m_Flags & 0x8000) != 0)
+    if (state->m_FlagsBit15 != 0)
     {
         if (handle != 0 && handle->m_State == 8)
         {
@@ -408,9 +397,9 @@ void PauseSound(unsigned long cueId, void* context)
         *slot = 0;
     }
 
-    if ((state->m_Flags & 0x7000) == 0)
+    if (state->m_FlagsBits12_14 == 0)
     {
-        state->m_Flags |= (sAudioPauseDepth & 7) << 12;
+        state->m_FlagsBits12_14 = sAudioPauseDepth;
     }
 }
 
@@ -425,12 +414,12 @@ void ResumeSound(unsigned long cueId, void* context)
     XSoundHandle** slot = FindAudioHandleSlot(cueId, context);
     AudioHandleState* state = FindAudioHandleState(key);
     if (slot == 0 || state == 0
-        || ((state->m_Flags >> 12) & 7) < sAudioPauseDepth)
+        || state->m_FlagsBits12_14 < sAudioPauseDepth)
     {
         return;
     }
 
-    if ((state->m_Flags & 0x8000) != 0)
+    if (state->m_FlagsBit15 != 0)
     {
         if (*slot != 0)
         {
@@ -439,14 +428,14 @@ void ResumeSound(unsigned long cueId, void* context)
     }
     else
     {
-        *slot = CreateSoundHandle((int)(state->m_Flags >> 16),
+        *slot = CreateSoundHandle(state->m_FlagsHi16,
             state->m_CueId, 0, sResumedCue, context, true);
         if (*slot != 0)
         {
             (*slot)->Play(false);
         }
     }
-    state->m_Flags &= ~0x7000;
+    state->m_FlagsBits12_14 = 0;
 }
 
 void SetLastSoundParameter(unsigned long parameter, float value)

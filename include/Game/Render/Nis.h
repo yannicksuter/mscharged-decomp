@@ -65,12 +65,24 @@ enum NisWinnerType
     NIS_DO_NOT_CARE = 3,
 };
 
+enum NisUseStadiumOffset
+{
+    NIS_NO_STADIUM_OFFSET = 0,
+    NIS_AWAY_STADIUM_OFFSET = 1,
+    NIS_HOME_STADIUM_OFFSET = 2,
+};
+
 struct NisHeader
 {
     /* 0x000 */ char name[64];
     /* 0x040 */ int size;
     /* 0x044 */ int numBalls;
-    /* 0x048 */ u8 unknown_0x048[0x5C];
+    /* 0x048 */ int numAnimations;
+    /* 0x04C */ int numCameras;
+    /* 0x050 */ nlVector3 center;
+    /* 0x05C */ nlVector3 minBounds;
+    /* 0x068 */ nlVector3 maxBounds;
+    /* 0x074 */ nlVector3 beginPositions[4];
     /* 0x0A4 */ int mUnidentified0A4;
     /* 0x0A8 */ char mUnidentified0A8[8][16];
     /* 0x128 */ nlVector2 mUnidentified128[8];
@@ -79,10 +91,11 @@ struct NisHeader
     /* 0x17C */ NisWinnerType winnerType;
     /* 0x180 */ u32 unknown_0x180;
     /* 0x184 */ nlVector3 stadiumOffset;
-    /* 0x190 */ u8 unknown_0x190[0x05];
+    /* 0x190 */ float mTime;
+    /* 0x194 */ bool mUnidentified194;
     /* 0x195 */ bool mUnidentified195;
     /* 0x196 */ u8 unknown_0x196[0x02];
-    /* 0x198 */ u32 unknown_0x198;
+    /* 0x198 */ char* unknown_0x198;
     /* 0x19C */ u32 unknown_0x19C;
 };
 

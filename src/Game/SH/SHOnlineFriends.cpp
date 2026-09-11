@@ -21,6 +21,7 @@
 #include "Game/Render/Presentation.h"
 #include "Game/FriendManager.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlFormat.h"
 #include "NL/nlLocalizationLookup.h"
 #include "NL/nlPrint.h"
@@ -243,7 +244,7 @@ void SHOnlineFriends::OnPointerLeave(int index, void* context)
     mUnidentified0038[item].SetPointerState(0, index);
 }
 
-void SHOnlineFriends::UpdateVisibleRows()
+inline void SHOnlineFriends::UpdateVisibleRows()
 {
     for (int i = 0; i < 4; ++i)
     {
@@ -255,9 +256,8 @@ void SHOnlineFriends::UpdateVisibleRows()
         int selected = i + mUnidentified0020;
         if (!IsOnlineFriendSelectionMode())
             --selected;
-        FEOnlinePlayerRow* row = mUnidentified2EA8[selected];
-        UpdateOnlinePlayerRow(row, mUnidentified0618[i], mUnidentified0628[i], 32, mUnidentified0728[i], 48, i, mUnidentified0030);
-        if (!row->mVisible || (IsOnlineFriendSelectionMode() && row->mStatus != 2))
+        UpdateOnlinePlayerRow(mUnidentified2EA8[selected], mUnidentified0618[i], mUnidentified0628[i], 32, mUnidentified0728[i], 48, i, mUnidentified0030);
+        if (!mUnidentified2EA8[selected]->mVisible || (IsOnlineFriendSelectionMode() && mUnidentified2EA8[selected]->mStatus != 2))
             mUnidentified0038[i].Disable();
         else
             mUnidentified0038[i].Enable();
@@ -655,7 +655,7 @@ void SHOnlineFriends::Update(float dt)
         if (slide->m_time < slide->m_start + slide->m_duration)
         {
             for (int i = 0; i < 4; ++i)
-                gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
         if (mUnidentified2FAC == 0)
@@ -734,12 +734,13 @@ void SHOnlineFriends::Update(float dt)
     }
     for (int i = 0; i < 4; ++i)
     {
+        TLComponentInstance* controller = GetPointerInstance(i);
         if ((unsigned int)i != gFEControllerIndex)
         {
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+            controller->SetActiveSlide("waiting", true, false);
             continue;
         }
-        gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+        controller->SetActiveSlide("cursor", true, false);
         u8 valid = true;
         FEPointerEvent event;
         event.mIndex = i;
@@ -754,7 +755,7 @@ void SHOnlineFriends::Update(float dt)
         if (mUnidentified04BC.UpdateBackButton(event, dt))
         {
             for (int j = 0; j < 4; ++j)
-                gFEPointerInstances[j]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(j)->SetActiveSlide("waiting", true, false);
             mUnidentified2FAC = 3;
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)

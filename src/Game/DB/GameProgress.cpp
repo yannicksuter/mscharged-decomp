@@ -35,6 +35,16 @@ void CupManager::RestoreCupRecord()
     mUnidentified86A0 = mUnidentified86A6;
 }
 
+void* CupManager::SerializeData(void* dst) const
+{
+    dst = mFireCupSeries.SerializeData(dst);
+    dst = mCrystalCupSeries.SerializeData(dst);
+    dst = mStrikerCupSeries.SerializeData(dst);
+    int size = UnidentifiedSize_8010D6CC();
+    memcpy(dst, &mState, size);
+    return (char*)dst + size;
+}
+
 void* BaseCup::SerializeData(void* dst) const
 {
     memcpy(dst, &mUserSelectedTeam, sizeof(mUserSelectedTeam));
@@ -49,6 +59,16 @@ void* BaseCup::SerializeData(void* dst) const
     dst = (u8*)dst + sizeof(mGameNumber);
     memcpy(dst, &mHumanTeams, sizeof(mHumanTeams));
     return (u8*)dst + sizeof(mHumanTeams);
+}
+
+void* CupManager::DeserializeData(void* src)
+{
+    src = mFireCupSeries.DeserializeData(src);
+    src = mCrystalCupSeries.DeserializeData(src);
+    src = mStrikerCupSeries.DeserializeData(src);
+    int size = UnidentifiedSize_8010D6CC();
+    memcpy(&mState, src, size);
+    return (char*)src + size;
 }
 
 void* BaseCup::DeserializeData(void* src)
@@ -67,9 +87,47 @@ void* BaseCup::DeserializeData(void* src)
     return (u8*)src + sizeof(mHumanTeams);
 }
 
+int CupManager::GetSaveDataSize() const
+{
+    int size = mFireCupSeries.GetSaveDataSize();
+    size += mCrystalCupSeries.GetSaveDataSize();
+    size += mStrikerCupSeries.GetSaveDataSize();
+    return size + UnidentifiedSize_8010D6CC();
+}
+
 int BaseCup::GetSaveDataSize() const
 {
     return 0x1A;
+}
+
+u16 CupManager::GetNumGamesPerRound(int phase, int round) const
+{
+    u16 returnValue;
+    if (phase == 1)
+    {
+        u16 numRounds = mCurrentCup->GetNumPlayoffRounds();
+        if (round == numRounds - 1)
+        {
+            returnValue = 1;
+        }
+        else if (round == numRounds - 2)
+        {
+            returnValue = 2;
+        }
+        else if (round == numRounds - 3)
+        {
+            returnValue = 4;
+        }
+    }
+    else if (phase == 0)
+    {
+        returnValue = mCurrentCup->GetNumTeams() >> 1;
+    }
+    else if (phase == 2)
+    {
+        returnValue = 1;
+    }
+    return returnValue;
 }
 
 u16 CupManager::GetNumPlayingTeams() const
@@ -90,6 +148,15 @@ BasicGameInfo* CupManager::GetCurrentGameInfo()
 int CupManager::GetUserSelectedCupTeam() const
 {
     return mCurrentCup->mUserSelectedTeam;
+}
+
+bool CupManager::IsCupWinningGame(int team) const
+{
+    if (GetCurrentRoundType() == 2 && team == mCurrentCup->mUserSelectedTeam)
+    {
+        return mState == 4;
+    }
+    return false;
 }
 
 s16 CupManager::GetCurrentRoundNumber() const

@@ -18,6 +18,7 @@
 #include "Game/Task/ResetTask.h"
 #include "NL/nlPrint.h"
 #include "NL/nlBind.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"

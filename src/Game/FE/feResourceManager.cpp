@@ -114,22 +114,28 @@ FEResourceManager::FEResourceManager()
     s_pResourcePool = glGetCurrentResourcePool();
 }
 
+void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSize, unsigned long uParam)
+{
+    FETextureResource* pHandle = (FETextureResource*)uParam;
+    GLResourcePool* resourcePool = s_pResourcePool;
+    glBeginResource(pHandle->m_hashID);
+    glTextureAdd(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourcePool);
+    glEndResource();
+    delete[] s_pResourceLoadBuffer;
+    s_pResourceLoadBuffer = 0;
+    unsigned long textureHandle = pHandle->m_hashID;
+    pHandle->SetTextureHandle(textureHandle);
+    FEResourceManager::Instance()->AddResourceToResourceList(pHandle);
+    pHandle->m_bValid = true;
+}
+
 void FEResourceManager::PermanentTextureLoadComplete(void* buffer, unsigned long uReadSize, unsigned long uParam)
 {
     PermanentBundleLoadState* state = (PermanentBundleLoadState*)uParam;
     FETextureResource* pTextureResource = new (8, false) FETextureResource();
     pTextureResource->m_hashID = state->uFileHashID;
     s_pResourceLoadBuffer = (unsigned char*)buffer;
-    GLResourcePool* resourcePool = s_pResourcePool;
-    glBeginResource(pTextureResource->m_hashID);
-    glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uReadSize, resourcePool);
-    glEndResource();
-    delete[] s_pResourceLoadBuffer;
-    s_pResourceLoadBuffer = 0;
-    unsigned long textureHandle = pTextureResource->m_hashID;
-    pTextureResource->SetTextureHandle(textureHandle);
-    FEResourceManager::Instance()->AddResourceToResourceList(pTextureResource);
-    pTextureResource->m_bValid = true;
+    TextureResourceLoadComplete(NULL, uReadSize, (unsigned long)pTextureResource);
     LoadNextPermanentTexture(state);
 }
 
@@ -347,9 +353,11 @@ void FEResourceManager::QueueResourceLoad(FEResourceHandle* pHandle, MemoryAlloc
                     if (nlDLRingIsStart(insertAfter.m_Head, insertAfter.m_Curr))
                     {
                         insertAfter.m_Curr = 0;
-                        break;
                     }
-                    insertAfter.m_Curr = insertAfter.m_Curr->m_prev;
+                    else
+                    {
+                        insertAfter.m_Curr = insertAfter.m_Curr->m_prev;
+                    }
                 }
 
                 DLListEntry<PendingResourceLoad>* entry = pendingResourceQueue.Allocate(pendingResource);
@@ -408,21 +416,6 @@ void FEResourceManager::UnloadPermanentResourceBundle()
     s_pPermanentBundle = 0;
     delete s_pPermanentBundleSceneResource;
     s_pPermanentBundleSceneResource = 0;
-}
-
-void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSize, unsigned long uParam)
-{
-    FETextureResource* pHandle = (FETextureResource*)uParam;
-    GLResourcePool* resourcePool = s_pResourcePool;
-    glBeginResource(pHandle->m_hashID);
-    glTextureAdd(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourcePool);
-    glEndResource();
-    delete[] s_pResourceLoadBuffer;
-    s_pResourceLoadBuffer = 0;
-    unsigned long textureHandle = pHandle->m_hashID;
-    pHandle->SetTextureHandle(textureHandle);
-    FEResourceManager::Instance()->AddResourceToResourceList(pHandle);
-    pHandle->m_bValid = true;
 }
 
 void FEResourceManager::Update(float dt)

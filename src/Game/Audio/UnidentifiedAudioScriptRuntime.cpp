@@ -30,17 +30,16 @@ bool UnidentifiedAudioScriptRuntime::Unidentified6E00(void* data, unsigned int s
     mUnidentified04 = header[2];
     mUnidentified00 = (UnidentifiedAudioScriptEntry*)(header + 4);
     for (u32 i = 0; i < mUnidentified04; ++i)
-        mUnidentified00[i].mData = (u8*)data + (u32)mUnidentified00[i].mData;
+        mUnidentified00[i].mData = (u8*)mUnidentified00[i].mData + (u32)data;
     mUnidentified08 = (UnidentifiedAudioScriptList*)(mUnidentified00 + mUnidentified04);
-    mUnidentified08->mValues = (u32*)((u8*)data + (u32)mUnidentified08->mValues);
+    mUnidentified08->mValues = (u32*)((u8*)mUnidentified08->mValues + (u32)data);
     if (header[3] != 0)
         mInterpreter.LoadByteCode((u8*)data + header[3]);
     return true;
 }
 
-int UnidentifiedAudioScriptRuntime::Unidentified6E98(u32 hash, int index)
+int UnidentifiedAudioScriptRuntime::Unidentified6E98(u32 hash, UnidentifiedAudioEffectSetState* value)
 {
-    UnidentifiedAudioEffectSetState* value = (UnidentifiedAudioEffectSetState*)index;
     UnidentifiedAudioEffectSetState** previous = mEffectSets.Add(hash, value);
     if (previous != 0)
         *previous = value;

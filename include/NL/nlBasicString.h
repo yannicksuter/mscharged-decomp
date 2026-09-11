@@ -112,6 +112,11 @@ public:
             return mData.mData;
         }
 
+        const CharT* c_str() const
+        {
+            return mData.mData;
+        }
+
         CharT* end()
         {
             return mData.mData + mData.mSize - 1;
@@ -171,7 +176,7 @@ public:
     const CharT* c_str() const
     {
         static CharT emptyString = 0;
-        return mData ? mData->mData.mData : &emptyString;
+        return mData ? mData->c_str() : &emptyString;
     }
 
     int size() const
@@ -392,16 +397,15 @@ template <typename CharT, typename Allocator>
 inline bool operator==(const BasicString<CharT, Allocator>& lhs, const char* rhs)
 {
     unsigned int c;
-    typename BasicString<CharT, Allocator>::Data* data = lhs.mData;
     int i = 0;
-    while (i < (data != 0 ? data->mData.mSize - 1 : 0))
+    while (i < lhs.size())
     {
         c = (u8)*rhs;
         if ((CharT)c == 0)
         {
             return false;
         }
-        if ((CharT)c != data->mData.mData[i])
+        if ((CharT)c != lhs[i])
         {
             return false;
         }

@@ -350,6 +350,7 @@ void SHOnlinePlayerCount::OnButtonPointerPress(int, void* context)
             GameSceneManager::Instance()->Push((SceneList)0x18, SCREEN_FORWARD, true);
         }
         break;
+    case 2:
     default:
         break;
     }

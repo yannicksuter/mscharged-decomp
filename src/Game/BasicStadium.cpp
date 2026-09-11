@@ -173,7 +173,7 @@ void fn_8027890C(BasicStadium* pStadium, const char* effects, unsigned long uTyp
         WorldEffect* pEffect = iterator.Current();
         if (uType == (unsigned long)pEffect->m_nTimingMode && pGroup != 0)
         {
-            pManager->Kill(uType, pGroup);
+            pManager->Kill((unsigned long)pEffect, pGroup);
         }
     }
 }
