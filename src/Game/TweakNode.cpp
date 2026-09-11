@@ -125,14 +125,14 @@ TweakNode* FindTweakNode(TweakNode* entry, const char* path)
     {
         search = path + 1;
     }
-    if (nlStrICmp(search, full) == 0)
+    if (nlStrICmp(path, full) == 0)
     {
         return entry;
     }
     if (entry->UnidentifiedVirtual0C() != 0)
     {
         unsigned long length = nlStrLen(full);
-        if (length == 0 || nlStrNCmp(search, full, length) == 0)
+        if (length == 0 || nlStrNICmp(search, full, length) == 0)
         {
             TweakEntry* folder = entry->UnidentifiedVirtual18();
             for (TweakNode* child = folder->m_ChildHead; child != 0;

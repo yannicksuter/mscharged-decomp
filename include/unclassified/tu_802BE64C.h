@@ -440,9 +440,9 @@ public:
     virtual bool UnidentifiedVirtual20();
     virtual UnidentifiedRegistryContainer* AllocContainer() = 0;
     virtual UnidentifiedRegistryNode_802BE64C* AllocNode() = 0;
-    virtual void UnidentifiedVirtual2C() = 0;
-    virtual void UnidentifiedVirtual30() = 0;
-    virtual void UnidentifiedVirtual34() = 0;
+    virtual void* UnidentifiedVirtual2C(unsigned int size) = 0;
+    virtual void UnidentifiedVirtual30(void* container) = 0;
+    virtual void UnidentifiedVirtual34(void* node) = 0;
     virtual void FreeItem(void* data) = 0;
     virtual ~UnidentifiedRegistryOwner_802BF984();
 

@@ -187,7 +187,7 @@ void SHOnlineInvitePlayers::OnStartPointerPress(int, void*)
     mStartingMatch = true;
     g_pNetworkSession->GetOnlineLobby()->SetFriendHostInviting();
     for (int i = 0; i < 4; ++i)
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
 }
 
 void SHOnlineInvitePlayers::OnInvitationErrorDismissed()

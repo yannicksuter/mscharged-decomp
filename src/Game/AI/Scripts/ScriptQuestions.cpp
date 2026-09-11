@@ -1,4 +1,5 @@
 #include "Game/AI/Scripts/ScriptQuestions.h"
+#include "Game/AI/Desire.h"
 #include "Game/AI/Scripts/ScriptCaching.h"
 #include "Game/FormationDefines.h"
 #include "Game/AI/AiUtil.h"
@@ -25,8 +26,6 @@ extern "C" float fn_800DB298(const nlVector3&, const nlVector3&, cFielder*,
     float, float, float, float, bool);
 extern "C" float fn_800DAFCC(const nlVector3&, const nlVector3&, cPlayer*,
     cPlayer*, float, float, float, float);
-
-extern float lbl_806E41B0;
 
 float Offensive(cTeam* pTeam)
 {
@@ -528,5 +527,706 @@ float GonnaGetBall(cTeam* team)
 
 float GenerateFilteredRandom()
 {
-    return nlRandomf(lbl_806E41B0);
+    return nlRandomf(1.0f);
+}
+
+float RandomChance(float fChance)
+{
+    return FGREATER(fChance, GenerateFilteredRandom());
+}
+
+float ReceivingPass(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    float fScore = 0.0f;
+    if (pFielder->fn_8002E060() == 22)
+    {
+        fScore = 1.0f;
+    }
+
+    return fScore;
+}
+
+extern "C" cTeam* fn_800D6670(cFielder* pFielder)
+{
+    if (pFielder != NULL)
+    {
+        return pFielder->GetTeam();
+    }
+    return NULL;
+}
+
+extern "C" cTeam* fn_800D6688(cFielder* pFielder)
+{
+    if (pFielder != NULL)
+    {
+        return pFielder->GetTeam()->GetOtherTeam();
+    }
+    return NULL;
+}
+
+extern "C" cFielder* fn_800D674C(cPlayer* player)
+{
+    return player->GetClosestOpponentFielder(NULL, true);
+}
+
+extern "C" cFielder* fn_800D6734(cFielder* pFielder)
+{
+    return NULL;
+}
+
+extern "C" void* fn_800D673C(void*)
+{
+    return NULL;
+}
+
+extern "C" cPlayer* fn_800D6744(cBall* ball)
+{
+    return ball->m_pPassTarget;
+}
+
+extern "C" cFielder* fn_800D6708(cTeam* team)
+{
+    if (team != NULL)
+    {
+        return team->GetCaptain();
+    }
+    return NULL;
+}
+
+extern "C" cFielder* fn_800D671C(cTeam* team)
+{
+    if (team != NULL)
+    {
+        return team->mpBestBallInterceptor;
+    }
+    return NULL;
+}
+
+extern "C" Goalie* fn_800D66A0(cFielder* pFielder)
+{
+    if (pFielder != NULL)
+    {
+        return fn_800D6670(pFielder)->GetGoalie();
+    }
+    return NULL;
+}
+
+extern "C" Goalie* fn_800D66C4(cFielder* pFielder)
+{
+    if (pFielder != NULL)
+    {
+        return fn_800D6688(pFielder)->GetGoalie();
+    }
+    return NULL;
+}
+
+float High(cBall* ball)
+{
+    if (ball == NULL)
+    {
+        return 0.0f;
+    }
+
+    return NormalizeVal(ball->m_v3Position.z,
+        g_pGame->m_pFuzzyTweaks->mUnidentified364,
+        g_pGame->m_pFuzzyTweaks->mUnidentified374);
+}
+
+float ReallyHigh(cBall* ball)
+{
+    if (ball == NULL)
+    {
+        return 0.0f;
+    }
+
+    return NormalizeVal(ball->m_v3Position.z,
+        g_pGame->m_pFuzzyTweaks->mUnidentified384,
+        g_pGame->m_pFuzzyTweaks->mUnidentified394);
+}
+
+float AggressiveT(cTeam* team)
+{
+    if (team == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (team->meCurrentTeamStyle == TEAM_STYLE_AGGRESSIVE)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+float Moderate(cTeam* team)
+{
+    if (team == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (team->meCurrentTeamStyle == TEAM_STYLE_MODERATE)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+float Passive(cTeam* team)
+{
+    if (team == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (team->meCurrentTeamStyle == TEAM_STYLE_PASSIVE)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot, bool bWasPerfectPass);
+
+extern "C" float fn_800DA310(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    return fn_800A0508(pFielder, false, false);
+}
+
+extern "C" float fn_800DA330(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    return fn_800A0508(pFielder, true, false);
+}
+
+float InFrontOfMyNet(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    return PositionIsInFrontOfNet(pFielder->mUnidentified024.m_v3Position, pFielder->m_pTeam->m_pNet);
+}
+
+float Loose(cTeam* pTeam)
+{
+    if (pTeam == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pTeam->mpCurrentSituation == SITUATION_LOOSE)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+float Defensive(cTeam* pTeam)
+{
+    if (pTeam == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pTeam->mpCurrentSituation == SITUATION_DEFENSE)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+float CloseToSideline(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    return CloseToSideline(pFielder->mUnidentified024.m_v3Position, NULL, false, NULL);
+}
+
+float DoingS2S(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" float fn_800DE7D8(Goalie* pGoalie)
+{
+    if (pGoalie == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pGoalie->mbIsDown)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" float fn_800DD99C(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pFielder->m_eActionState == 0x1D)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" float fn_800DEBBC(cPlayer* pPlayer)
+{
+    if (pPlayer == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pPlayer->m_eClassType == FIELDER && ((cFielder*)pPlayer)->m_eActionState == ACTION_SHOOT_TO_SCORE)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" float fn_800D6CD4(cPlayer* pPlayer1, cPlayer* pPlayer2)
+{
+    if (pPlayer1 == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pPlayer2 == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pPlayer1->m_pTeam == pPlayer2->m_pTeam)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+float ReallyCloseToBall(cPlayer* pPlayer)
+{
+    if (pPlayer == NULL)
+    {
+        return 0.0f;
+    }
+
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+        g_pGame->m_pFuzzyTweaks->mUnidentified104,
+        g_pGame->m_pFuzzyTweaks->mUnidentified114);
+}
+
+float CloseToBall(cPlayer* pPlayer)
+{
+    if (pPlayer == NULL)
+    {
+        return 0.0f;
+    }
+
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+        g_pGame->m_pFuzzyTweaks->mUnidentified124,
+        g_pGame->m_pFuzzyTweaks->mUnidentified134);
+}
+
+float NearToBall(cPlayer* pPlayer)
+{
+    if (pPlayer == NULL)
+    {
+        return 0.0f;
+    }
+
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+        g_pGame->m_pFuzzyTweaks->mUnidentified144,
+        g_pGame->m_pFuzzyTweaks->mUnidentified154);
+}
+
+float FarToBall(cPlayer* pPlayer)
+{
+    if (pPlayer == NULL)
+    {
+        return 0.0f;
+    }
+
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+        g_pGame->m_pFuzzyTweaks->mUnidentified164,
+        g_pGame->m_pFuzzyTweaks->mUnidentified174);
+}
+
+extern "C" float fn_8004028C(cFielder*);
+static const nlVector2 lbl_806E4270 = { 2.5f, 0.4f };
+
+extern "C" float fn_800DD45C(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    return NormalizeVal(fn_8004028C(pFielder), lbl_806E4270);
+}
+
+static const nlVector2 lbl_806E4278 = { 10.0f, 1.0f };
+
+extern "C" float fn_800DD494(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    return NormalizeVal(fn_8004028C(pFielder), lbl_806E4278);
+}
+
+static const nlVector2 lbl_806E4280 = { 4.0f, 10.0f };
+
+extern "C" float fn_800DD4CC(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    return NormalizeVal(fn_8004028C(pFielder), lbl_806E4280);
+}
+
+extern "C" float fn_800D9FC8(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pFielder->IsStuck())
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" float fn_800DD2F4(cBall* ball)
+{
+    if (ball == NULL)
+    {
+        return 0.0f;
+    }
+
+    return CloseToSideline(ball->m_v3Position, NULL, false, NULL);
+}
+
+float FallenDown(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pFielder->IsFallenDown())
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" float fn_800D6D78(cPlayer* pPlayer)
+{
+    if (pPlayer == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pPlayer->fn_8001E160())
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" bool fn_8003E71C(cFielder*);
+extern "C" float fn_800DED3C(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (fn_8003E71C(pFielder))
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" bool fn_8002F858(cFielder*, bool);
+extern "C" float fn_800D7AB8(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (fn_8002F858(pFielder, false))
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" float fn_800DACF4(cPlayer* pPlayer)
+{
+    if (pPlayer == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (cField::IsOnField(pPlayer->mUnidentified024.m_v3Position) == false)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" float fn_800DAD3C(cBall* ball)
+{
+    if (ball == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (cField::IsOnField(ball->m_v3Position) == false)
+    {
+        return 1.0f;
+    }
+
+    return 0.0f;
+}
+
+extern "C" float fn_8002BE38(PlayerTweaks*);
+
+extern "C" float fn_800D7910(cFielder* fielder)
+{
+    if (fielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    PlayerTweaks* pTweaks = fielder->GetTweaks();
+    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE38(pTweaks));
+}
+
+extern "C" float fn_8002BE18(PlayerTweaks*);
+
+extern "C" float fn_800D78C4(cFielder* fielder)
+{
+    if (fielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    PlayerTweaks* pTweaks = fielder->GetTweaks();
+    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE18(pTweaks));
+}
+
+extern "C" float fn_8002BE84(PlayerTweaks*);
+
+extern "C" float fn_800D7878(cFielder* fielder)
+{
+    if (fielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    PlayerTweaks* pTweaks = fielder->GetTweaks();
+    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE84(pTweaks));
+}
+
+extern "C" float fn_8002BE64(PlayerTweaks*);
+
+extern "C" float fn_800D782C(cFielder* fielder)
+{
+    if (fielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    PlayerTweaks* pTweaks = fielder->GetTweaks();
+    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE64(pTweaks));
+}
+
+float InOffensiveZone(const nlVector3& v3Position, eTeamSide teamside)
+{
+    nlVector3 aiLoc;
+    FieldLocToAILoc(aiLoc, v3Position, teamside);
+
+    return NormalizeVal(aiLoc.x, g_pGame->m_pFuzzyTweaks->mUnidentified754,
+        g_pGame->m_pFuzzyTweaks->mUnidentified764);
+}
+
+float NearToSideline(const nlVector3& v3Position)
+{
+    nlVector2 vDistanceConfidence;
+    nlVec2Set(vDistanceConfidence,
+        g_pGame->m_pFuzzyTweaks->mUnidentified324,
+        g_pGame->m_pFuzzyTweaks->mUnidentified334);
+    return CloseToSideline(v3Position, &vDistanceConfidence, false, NULL);
+}
+
+extern "C" float fn_800DF838(cPlayer* pPlayer)
+{
+    if (pPlayer == NULL)
+    {
+        return 0.0f;
+    }
+
+    float fScore = 0.0f;
+    if (pPlayer->m_pBall != NULL)
+    {
+        fScore = NormalizeVal(pPlayer->m_tBallPossessionTimer.GetSeconds(), 1.0f, 5.0f);
+    }
+    return fScore;
+}
+
+float InFrontOfTheirNet(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    cTeam* pOtherTeam = pFielder->m_pTeam->GetOtherTeam();
+    cNet* pNet = pOtherTeam->m_pNet;
+    return PositionIsInFrontOfNet(pFielder->mUnidentified024.m_v3Position, pNet);
+}
+
+float InControlOfBall(cFielder* fielder)
+{
+    if (fielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (fielder != g_pBall->m_pOwner)
+    {
+        return 0.0f;
+    }
+
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[fielder->mUnidentified120],
+        g_pGame->m_pFuzzyTweaks->mUnidentified3C4,
+        g_pGame->m_pFuzzyTweaks->mUnidentified3D4);
+}
+
+extern "C" bool fn_8003E6EC(cFielder* pFielder);
+
+extern "C" float fn_800DD944(cPlayer* pPlayer)
+{
+    if (pPlayer == NULL)
+    {
+        return 0.0f;
+    }
+
+    if (pPlayer->m_eClassType == FIELDER)
+    {
+        if (fn_8003E6EC((cFielder*)pPlayer))
+        {
+            return 1.0f;
+        }
+        return 0.0f;
+    }
+    return 0.0f;
+}
+
+float TimeCloseToOver(cGame* pGame)
+{
+    if (!pGame)
+    {
+        return 0.0f;
+    }
+
+    FuzzyTweaks* pTweaks = g_pGame->m_pFuzzyTweaks;
+    return NormalizeVal(pGame->GetNormalizedGameTime(), pTweaks->mUnidentified704, 1.0f);
+}
+
+float TimeNearlyOver(cGame* pGame)
+{
+    if (!pGame)
+    {
+        return 0.0f;
+    }
+
+    FuzzyTweaks* pTweaks = g_pGame->m_pFuzzyTweaks;
+    return NormalizeVal(pGame->GetNormalizedGameTime(), pTweaks->mUnidentified714, 1.0f);
+}
+
+float TimeFarFromOver(cGame* pGame)
+{
+    if (!pGame)
+    {
+        return 0.0f;
+    }
+
+    FuzzyTweaks* pTweaks = g_pGame->m_pFuzzyTweaks;
+    return NormalizeVal(pGame->GetNormalizedGameTime(), 1.0f, pTweaks->mUnidentified724);
+}
+
+extern "C" float fn_800DA0C8(cFielder* pFielder)
+{
+    if (pFielder == NULL)
+    {
+        return 0.0f;
+    }
+
+    float fScore = 0.0f;
+    DesireGooey* pDesire = (DesireGooey*)fn_8002E08C(pFielder, 27);
+    if (pDesire != NULL && pDesire->UnidentifiedIsActive())
+    {
+        fScore = pDesire->fn_800BD1F0();
+    }
+    return fScore;
 }

@@ -39,10 +39,8 @@ unsigned long nlFont::GetCharWidth(unsigned short FontChar, unsigned short PrevF
         pGlyph = &m_GlyphLookup[c - 0x20];
     }
 
-    if (pGlyph->uv.x == -1.0f)
-    {
-        pGlyph = &m_GlyphLookup['?' - 0x20];
-    }
+    bool valid = -1.0f != pGlyph->uv.x;
+    pGlyph = valid ? pGlyph : &m_GlyphLookup['?' - 0x20];
 
     signed char offset = pGlyph->Offset;
     unsigned short prevChar = PrevFontChar;
@@ -61,10 +59,8 @@ unsigned long nlFont::GetCharWidth(unsigned short FontChar, unsigned short PrevF
             pPrevGlyph = &m_GlyphLookup[prevChar - 0x20];
         }
 
-        if (pPrevGlyph->uv.x == -1.0f)
-        {
-            pPrevGlyph = &m_GlyphLookup['?' - 0x20];
-        }
+        bool valid = -1.0f != pPrevGlyph->uv.x;
+        pPrevGlyph = valid ? pPrevGlyph : &m_GlyphLookup['?' - 0x20];
 
         if (pPrevGlyph->HasKernPairs)
         {

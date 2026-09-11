@@ -6,8 +6,8 @@
 #include "NL/nlList.h"
 #include "NL/nlMath.h"
 
-class GLPacketSorter;
-class GLPacketSorterTree;
+class UnidentifiedPacketSorter;
+class UnidentifiedPacketSorterTree_8052E504;
 class GLView;
 
 typedef void (*GLViewPacketCallback)(
@@ -38,7 +38,7 @@ public:
     }
 };
 
-typedef GLPacketSorter* (*GLPacketSorterFactory)();
+typedef UnidentifiedPacketSorter* (*UnidentifiedPacketSorterFactory)();
 
 // GLView::m_Target selects the platform copy issued after the view is drawn.
 // glPlat only acts on 8, 9 and 10; any other value skips the copy entirely.
@@ -64,7 +64,7 @@ public:
     void Iterate(GLViewPacketCallback);
     void RemoveChild(GLView*);
     GLRenderPair GetRenderPair() const;
-    inline GLPacketSorter* GetSorter(unsigned long);
+    inline UnidentifiedPacketSorter* GetSorter(unsigned long);
 
     void SetRenderPair(GLRenderPair renderPair)
     {
@@ -77,8 +77,8 @@ public:
     virtual void EndPacket(const glModelPacket*);
 
     nlListContainer<GLView*> m_Children;
-    GLPacketSorterFactory m_CreateSorter;
-    GLPacketSorterTree* m_Sorters;
+    UnidentifiedPacketSorterFactory m_CreateSorter;
+    UnidentifiedPacketSorterTree_8052E504* m_Sorters;
     unsigned long m_ViewportX;
     unsigned long m_ViewportY;
     unsigned long m_ViewportWidth;

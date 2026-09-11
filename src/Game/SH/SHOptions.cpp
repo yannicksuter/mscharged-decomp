@@ -40,19 +40,14 @@ OptionsScene::~OptionsScene()
 
 void OptionsScene::fn_801D2A08(int, void* context)
 {
-    FEPointerEvent event;
     for (int i = 0; i < 3; ++i)
     {
-        mUnidentified28[i].mDisabled = true;
-        mUnidentified28[i].mPreviousEvents[0] = event;
-        mUnidentified28[i].mPreviousEvents[1] = event;
-        mUnidentified28[i].mPreviousEvents[2] = event;
-        mUnidentified28[i].mPreviousEvents[3] = event;
+        mUnidentified28[i].Disable();
     }
 
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
@@ -67,7 +62,7 @@ void OptionsScene::fn_801D2A08(int, void* context)
         FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
         mUnidentified324 = (SceneList)15;
         break;
-    case 3:
+    case 2:
         mUnidentified324 = (SceneList)23;
         break;
     }

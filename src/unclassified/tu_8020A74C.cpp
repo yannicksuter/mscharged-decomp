@@ -110,11 +110,12 @@ void TU8020A74CScene::fn_8020DCF4(int, void* context)
     mUnidentified2F9 = true;
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    if (context == 0)
+    switch ((int)context)
     {
+    case 0:
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0x2ECB0035, 0, 0, 1);
         mState = 2;
@@ -126,6 +127,7 @@ void TU8020A74CScene::fn_8020DCF4(int, void* context)
         }
 
         mPresentation->SetActiveSlide("out", true);
+        break;
     }
 }
 

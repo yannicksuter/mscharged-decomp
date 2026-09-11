@@ -5,9 +5,13 @@
 
 #include "Game/GameObjectLighting.h"
 
+#include "Game/BasicStadium.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Drawable/DrawableCharacter.h"
+#include "Game/Drawable/DrawableObj.h"
+#include "Game/Effects/EmissionManager.h"
 #include "NL/gl/glMatrix.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/glTexture.h"
 #include "NL/gl/glView.h"
 #include "Game/TweakValue.h"
@@ -20,6 +24,7 @@
 #include "NL/platvmath.h"
 #include "Game/Render/LightingLookup.h"
 #include "Game/TweakValueFloat.h"
+#include "Game/TweakValueInt.h"
 
 // GameRenderTask defines this flag as u8; this unit only matches closer when
 // it reads the byte as a bool.
@@ -64,9 +69,31 @@ struct GameObjectLightArray
     GameObjectLight lights[2];
 }; // total size: 0x48
 
+struct UnidentifiedObject_80182168
+{
+    /* 0x00 */ u8 mUnidentified00[0x64];
+    /* 0x64 */ float m_fIntensity;
+    /* 0x68 */ float m_fFarAttenuationStart;
+    /* 0x6C */ float m_fFarAttenuationEnd;
+    /* 0x70 */ nlFloatColour m_colour;
+};
+
 extern "C" {
 extern StadiumLightingParams gStadiumGameObjectLightingParams;
 extern GameObjectLightArray lbl_80570AF8;
+extern GameObjectLight lbl_805709D8[8];
+extern GameObjectLight lbl_80570B40;
+extern GameObjectLight lbl_80570B80;
+extern TweakValueInt lbl_80570B70;
+extern TweakValueInt lbl_80570BB0;
+extern TweakValueInt lbl_80570BD0;
+extern TweakValueInt lbl_80570BF0;
+extern bool lbl_806DCC40;
+extern bool lbl_806DCC48;
+extern s32 lbl_806DCC64;
+extern bool lbl_806E1410;
+extern bool lbl_806E1411;
+extern bool lbl_806E1412;
 extern u8 lbl_806DCC68;
 extern s32 lbl_806E1428;
 extern bool gAlwaysUseCameraRelativeCharacterLighting;
@@ -741,4 +768,179 @@ void UpdateGameObjectLighting()
         return;
 
     SetCameraRelativeLightData(&lbl_80570AF8);
+}
+
+void InitializeGameObjectLighting()
+{
+    StadiumLightingParams* pParams = &gStadiumGameObjectLightingParams;
+
+    lbl_806DCC64 = 2;
+    lbl_805709D8[0].intensity = pParams->inGameKeyIntensity;
+    lbl_805709D8[0].unknown08 = pParams->inGameKeyRotYDeg;
+    lbl_805709D8[0].unknown0C = pParams->inGameKeyRotZDeg;
+    lbl_805709D8[1].intensity = pParams->inGameFillIntensity;
+    lbl_805709D8[1].unknown08 = pParams->inGameFillRotYDeg;
+    lbl_805709D8[1].unknown0C = pParams->inGameFillRotZDeg;
+
+    lbl_80570B80.unknown01 = true;
+    lbl_80570B80.unknown02 = false;
+    lbl_80570B80.enabled = true;
+    lbl_80570B80.intensity = 1.0f;
+    nlColourSet(*(nlColour*)lbl_80570B80.unknown1C, 0, 0, 0, 255);
+    if (BasicStadium::GetCurrentStadium() != 0)
+    {
+        lbl_80570B80.worldPosition = BasicStadium::GetCurrentStadium()->m_shadowLightPosition;
+    }
+    lbl_80570B80.unknown1C[0] = lbl_80570BB0.value;
+    lbl_80570B80.unknown1C[1] = lbl_80570BD0.value;
+    lbl_80570B80.unknown1C[2] = lbl_80570BF0.value;
+
+    lbl_80570AF8.lights[0].intensity = 1.0f;
+    lbl_80570AF8.lights[1].intensity = 1.0f;
+    lbl_80570B40.intensity = 1.0f;
+    lbl_80570B40.enabled = true;
+    nlVec3Set(lbl_80570B40.worldPosition, 0.0f, 0.0f, -1.0f);
+
+    GLResourcePool* pResource = glGetCurrentResourcePool();
+    g_pGameObjectLightRamp = glx_CreatePlatTexture(pResource);
+    PlatTexture* pRampTexture = g_pGameObjectLightRamp;
+    glRegisterTexture(pParams->lightRamp, pRampTexture, pResource);
+    g_pGameObjectLightRamp->Create(0x100, 4, GXTex_RGBA8, pResource, 1, true, false);
+    FillInGameObjectLightRamp();
+}
+
+extern "C"
+{
+GameObjectLight* fn_8018230C(s32 arg0, bool arg1)
+{
+    s32 var0 = arg1 ? lbl_80570B70.value : lbl_806DCC64;
+    if (!lbl_806DCC68 && lbl_806E1428 == 1)
+    {
+        lbl_806E1428 = 0;
+    }
+
+    switch (lbl_806E1428)
+    {
+    case 0:
+        if (arg0 >= var0)
+        {
+            EffectsLight* pLight = GetEmissionManager()->GetLight(arg0 - lbl_806DCC64);
+            GameObjectLight* var1 = &lbl_805709D8[arg0];
+            var1->enabled = true;
+            var1->unknown01 = true;
+            var1->unknown02 = true;
+            var1->intensity = 1.0f;
+            var1->worldPosition = pLight->m_v3Position;
+            var1->unknown1C[0] = pLight->m_Colour.c[0];
+            var1->unknown1C[1] = pLight->m_Colour.c[1];
+            var1->unknown1C[2] = pLight->m_Colour.c[2];
+            var1->unknown1C[3] = pLight->m_Colour.c[3];
+            var1->unknown20 = pLight->m_fRadius;
+            return var1;
+        }
+        if (arg1)
+        {
+            if (arg0 == 0)
+                return &lbl_80570B80;
+            s32 var1 = lbl_80570B70.value;
+            if (arg0 < var1)
+                return &lbl_805709D8[arg0];
+            return &lbl_805709D8[arg0 - var1 + lbl_806DCC64];
+        }
+        return &lbl_805709D8[arg0];
+
+    case 1:
+        if (arg0 >= var0)
+        {
+            EffectsLight* pLight = GetEmissionManager()->GetLight(arg0 - lbl_806DCC64);
+            GameObjectLight* var1 = &lbl_805709D8[arg0];
+            var1->enabled = true;
+            var1->unknown01 = true;
+            var1->unknown02 = true;
+            var1->intensity = 1.0f;
+            var1->worldPosition = pLight->m_v3Position;
+            var1->unknown1C[0] = pLight->m_Colour.c[0];
+            var1->unknown1C[1] = pLight->m_Colour.c[1];
+            var1->unknown1C[2] = pLight->m_Colour.c[2];
+            var1->unknown1C[3] = pLight->m_Colour.c[3];
+            var1->unknown20 = pLight->m_fRadius;
+            return var1;
+        }
+        return &lbl_80570AF8.lights[arg0];
+
+    case 2:
+        return &lbl_80570B40;
+
+    default:
+        return lbl_805709D8;
+    }
+}
+
+int fn_80182240(int arg0, int arg1)
+{
+    bool var0 = arg1 && lbl_806DCC48;
+    int var1 = var0 ? GetEmissionManager()->GetNumLights() : 0;
+
+    switch (lbl_806E1428)
+    {
+    case 0:
+        if (arg0)
+            return var1 + lbl_80570B70.value;
+        return lbl_806DCC64 + var1;
+    case 1:
+        return lbl_806DCC64 + var1;
+    case 2:
+        return 1;
+    default:
+        lbl_806E1428 = 0;
+        return 2;
+    }
+}
+
+void fn_80182168(UnidentifiedObject_80182168* pLight)
+{
+    // This retained path prepares a light locally but does not publish it.
+    GameObjectLight var0;
+    var0.unknown02 = false;
+    var0.unknown01 = true;
+    var0.enabled = true;
+    const nlMatrix4& matrix = ((DrawableObject*)pLight)->GetWorldMatrix();
+    ConvertColour(*(nlColour*)var0.unknown1C, pLight->m_colour);
+    var0.worldPosition = matrix.GetTranslation();
+    var0.intensity = pLight->m_fIntensity;
+}
+
+void fn_80182164()
+{
+}
+
+void fn_80182128()
+{
+    lbl_80570B80.unknown1C[0] = lbl_80570BB0.value;
+    lbl_80570B80.unknown1C[1] = lbl_80570BD0.value;
+    lbl_80570B80.unknown1C[2] = lbl_80570BF0.value;
+}
+}
+
+bool AlwaysUseCameraRelativeCharacterLighting()
+{
+    return gAlwaysUseCameraRelativeCharacterLighting;
+}
+
+extern "C"
+{
+int fn_80182118()
+{
+    return lbl_806E1412;
+}
+
+int fn_80182104(int arg0)
+{
+    return arg0 ? lbl_806E1411 : lbl_806E1410;
+}
+
+int fn_801820FC()
+{
+    return lbl_806DCC40;
+}
 }

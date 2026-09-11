@@ -2,6 +2,7 @@
 
 #include "Game/BasicStadium.h"
 #include "Game/Debug/ShapeRender.h"
+#include "Game/Drawable/DrawableModel.h"
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/Render/RLView.h"
 #include "Game/Render/Frustum.h"
@@ -29,7 +30,6 @@ RLView* fn_8027261C();
 void fn_80273A4C(eCLV, const glModel*, unsigned long);
 }
 
-extern const unsigned long WhiteTexture;
 
 int fn_802721BC();
 void fn_802721C4(int partition, bool enabled);
@@ -46,6 +46,8 @@ static float g_fBallShadowR1 = 0.65f;
 static int g_nBallShadowA0 = 10;
 static int g_nBallShadowA1 = 50;
 static bool g_bBallGlow = true;
+static bool g_bPlanarShadows = true;
+static bool g_bProjectedShadows = true;
 static float g_fBallGlowH = 4.0f;
 static float g_fBallGlowR0 = 2.0f;
 static float g_fBallGlowR1 = 2.0f;
@@ -57,9 +59,19 @@ int MaxProjectedShadows;
 static u8 g_bShadowBlobs;
 static u8 g_bShadowPositionOverride;
 static RLView* g_CharacterShadowView;
-static float g_AntiFlimmer;
+static const unsigned long CoPlanarTexture = glGetTexture("global/black_coplanar");
+static const unsigned long LightRampTexture = glGetTexture("global/lightramp");
+static const unsigned long BlackTexture = glGetTexture("global/black");
+const unsigned long WhiteTexture = glGetTexture("global/white");
+static float g_AntiFlimmer = 0.015625f
+    + (BasicStadium::GetCurrentStadium() != 0
+              ? BasicStadium::GetCurrentStadium()->m_shadowHeight
+              : 0.0f);
 static int lbl_806E1480;
 static u8 g_bShadowBounds;
+static bool g_bShadowBoundingBox;
+static bool g_bCoPlanarBlend;
+static bool g_bSkipUntransformed;
 static int g_Alpha[3] = { 180, 80, 32 };
 
 static inline void CastDirectional(nlVector3& p, const nlVector3& lightPos)
@@ -807,4 +819,200 @@ void SetCoPlanarZ(float z)
 float GetCoPlanarZ()
 {
     return sfCoPlanarZ;
+}
+
+
+/**
+ * Address/Size: 0x80186524 | size: 0x12C
+ *
+ * Flattens a transform onto the ground plane along the stadium's shadow light
+ * direction.
+ */
+extern "C" void fn_80186524(nlMatrix4& out, const nlMatrix4& in)
+{
+    const nlVector3& light = BasicStadium::GetCurrentStadium()->m_shadowLightPosition;
+    float x = -light.x / light.z;
+    float y = -light.y / light.z;
+
+    out.m11 = x * in.m13 + in.m11;
+    out.m21 = x * in.m23 + in.m21;
+    out.m31 = x * in.m33 + in.m31;
+    out.m41 = x * in.m43 + in.m41;
+    out.m12 = y * in.m13 + in.m12;
+    out.m22 = y * in.m23 + in.m22;
+    out.m32 = y * in.m33 + in.m32;
+    out.m42 = y * in.m43 + in.m42;
+    out.m13 = 0.0f;
+    out.m23 = 0.0f;
+    out.m33 = 0.0f;
+    out.m43 = 0.0f;
+    out.m14 = 0.0f;
+    out.m24 = 0.0f;
+    out.m34 = 0.0f;
+    out.m44 = 1.0f;
+}
+
+/**
+ * Address/Size: 0x80186650 | size: 0x1BC
+ *
+ * Projects the model's bounding box onto the ground plane and returns the
+ * screen-space extent the flattened corners span.
+ */
+extern "C" void fn_80186650(const glModel* model, const nlMatrix4& transform,
+    float* minX, float* maxX, float* minY, float* maxY,
+    unsigned long boundingBoxCacheKey)
+{
+    AABBDimensions dimensions;
+    GetAABBDimensions(model, dimensions, boundingBoxCacheKey);
+
+    nlVector4 corners[8];
+    corners[0].x = dimensions.mMin.x;
+    corners[0].y = dimensions.mMin.y;
+    corners[0].z = dimensions.mMin.z;
+    corners[0].w = 1.0f;
+    corners[1].x = dimensions.mMin.x;
+    corners[1].y = dimensions.mMin.y;
+    corners[1].z = dimensions.mMax.z;
+    corners[1].w = 1.0f;
+    corners[2].x = dimensions.mMin.x;
+    corners[2].y = dimensions.mMax.y;
+    corners[2].z = dimensions.mMin.z;
+    corners[2].w = 1.0f;
+    corners[3].x = dimensions.mMin.x;
+    corners[3].y = dimensions.mMax.y;
+    corners[3].z = dimensions.mMax.z;
+    corners[3].w = 1.0f;
+    corners[4].x = dimensions.mMax.x;
+    corners[4].y = dimensions.mMin.y;
+    corners[4].z = dimensions.mMin.z;
+    corners[4].w = 1.0f;
+    corners[5].x = dimensions.mMax.x;
+    corners[5].y = dimensions.mMin.y;
+    corners[5].z = dimensions.mMax.z;
+    corners[5].w = 1.0f;
+    corners[6].x = dimensions.mMax.x;
+    corners[6].y = dimensions.mMax.y;
+    corners[6].z = dimensions.mMin.z;
+    corners[6].w = 1.0f;
+    corners[7].x = dimensions.mMax.x;
+    corners[7].y = dimensions.mMax.y;
+    corners[7].z = dimensions.mMax.z;
+    corners[7].w = 1.0f;
+
+    nlMatrix4 projection;
+    fn_80186524(projection, transform);
+
+    for (int i = 0; i < 8; i++)
+    {
+        nlVector4 projected;
+        nlMultVectorMatrix(projected, corners[i], projection);
+        corners[i] = projected;
+
+        if (i == 0 || corners[i].x < *minX)
+            *minX = corners[i].x;
+        if (i == 0 || corners[i].x > *maxX)
+            *maxX = corners[i].x;
+        if (i == 0 || corners[i].y < *minY)
+            *minY = corners[i].y;
+        if (i == 0 || corners[i].y > *maxY)
+            *maxY = corners[i].y;
+    }
+}
+
+/**
+ * Address/Size: 0x8018680C | size: 0x1A0
+ *
+ * Draws the flattened bounding box of a model as one white co-planar quad.
+ */
+extern "C" void fn_8018680C(eCLV layer, const glModel* model,
+    const nlMatrix4& transform, unsigned long boundingBoxCacheKey)
+{
+    float minX;
+    float maxX;
+    float minY;
+    float maxY;
+    float z = sfCoPlanarZ;
+    fn_80186650(model, transform, &minX, &maxX, &minY, &maxY,
+        boundingBoxCacheKey);
+
+    glQuad3 quad;
+    quad.m_pos[0].x = maxY;
+    quad.m_pos[0].y = maxX;
+    quad.m_pos[0].z = z;
+    quad.m_pos[1].x = minY;
+    quad.m_pos[1].y = maxX;
+    quad.m_pos[1].z = z;
+    quad.m_pos[2].x = minY;
+    quad.m_pos[2].y = minX;
+    quad.m_pos[2].z = z;
+    quad.m_pos[3].x = maxY;
+    quad.m_pos[3].y = minX;
+    quad.m_pos[3].z = z;
+    if (maxY + minY < 0.0f)
+    {
+        quad.m_pos[0].x = minY;
+        quad.m_pos[1].x = maxY;
+        quad.m_pos[2].x = maxY;
+        quad.m_pos[3].x = minY;
+    }
+
+    glSetDefaultState(false);
+    glSetRasterState((eGLState)6, g_bCoPlanarBlend ? 0 : 3);
+    glSetRasterState((eGLState)0, 0);
+    glSetRasterState((eGLState)1, 0);
+    glSetCurrentRasterState(glHandleizeRasterState());
+    glSetCurrentTexture(WhiteTexture, (eGLTextureType)0);
+
+    quad.m_uv[0].x = 0.0f;
+    quad.m_uv[0].y = 0.0f;
+    quad.m_uv[1].x = 0.0f;
+    quad.m_uv[1].y = 0.0f;
+    quad.m_uv[2].x = 0.0f;
+    quad.m_uv[2].y = 0.0f;
+    quad.m_uv[3].x = 0.0f;
+    quad.m_uv[3].y = 0.0f;
+    quad.SetColour(0xAA, 0xAA, 0xAA, 0xFF);
+    quad.Attach((eGLView)GetLayerView(layer), 0);
+}
+
+/**
+ * Address/Size: 0x801869AC | size: 0x2D8
+ *
+ * Draws one model's ground shadow: the flattened bounding box for the
+ * projected pass and the co-planar geometry for the planar pass.
+ */
+extern "C" void fn_801869AC(const glModel* model, const nlMatrix4& transform,
+    int hasTransform, unsigned long boundingBoxCacheKey, const void* owner,
+    float opacity)
+{
+    if (g_bShadowBoundingBox)
+        RenderBoundingBox(model, transform);
+
+    if (!g_bPlanarShadows)
+        return;
+
+    if (g_bProjectedShadows)
+    {
+        if (g_bSkipUntransformed && transform.m41 == 0.0f
+            && transform.m42 == 0.0f && transform.m43 == 0.0f)
+        {
+            return;
+        }
+
+        nlMatrix4 projected;
+        if (hasTransform != 0)
+        {
+            projected = transform;
+        }
+        else
+        {
+            nlMatrix4 modelMatrix;
+            glModelGetMatrix(model, modelMatrix);
+            nlMultMatrices(projected, transform, modelMatrix);
+        }
+        fn_8018680C((eCLV)0x1B, model, projected, boundingBoxCacheKey);
+    }
+
+    nlMatrix4 modelMatrix;
+    glModelGetMatrix(model, modelMatrix);
 }

@@ -20,7 +20,7 @@ struct GXMaterialProgramParameters_80299A90
 extern bool lbl_806DF050;
 
 static nlMatrix4 sViewMatrix;
-static void* sUnidentifiedState;
+static int sUnidentifiedState;
 
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Activate(GLView* view)
@@ -28,8 +28,8 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Activate(GLView* view)
     static_cast<GXMaterialProgram_80299A90*>(this)->ConfigureVertexFormat(true);
     view->m_Interface->GetViewMatrix(sViewMatrix);
     sUnidentifiedState = fn_80182240(0, 1);
-    fn_80182ED0((s32)sUnidentifiedState, view, 0);
-    fn_801832F4(1, (s32)sUnidentifiedState, 0);
+    fn_80182ED0(sUnidentifiedState, view, 0);
+    fn_801832F4(1, sUnidentifiedState, 0);
     GXSetVtxDesc(GX_VA_PNMTXIDX, GX_DIRECT);
     gxSetNumChans(1);
     gxSetNumTexGens(1);
@@ -42,7 +42,7 @@ void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Activate(GLView* view)
 template <>
 void GXMaterialProgramImpl<GXMaterialProgram_80299A90>::Deactivate()
 {
-    fn_801832F4(0, (s32)sUnidentifiedState, 1);
+    fn_801832F4(0, sUnidentifiedState, 1);
     gxSetCurrentMtx(0, true);
 }
 

@@ -56,6 +56,25 @@ powerup and special-shot flags follow the retail challenge settings and their
 gameplay consumers. `WinBy`, `GameGoals` and `BestSeries` follow the recorded-game
 diagnostics in `Game/NetworkSession.cpp`.
 
+`Game/GameObjectLighting.cpp` includes the lighting-service prefix at
+`0x801820FC..0x801826D0`. Its light selectors, stadium parameters, camera-relative
+light array, and texture-ramp initialization share the state used by the
+following update and rendering routines. The preceding guarded initializer at
+`0x801820DC` is separate. `AlwaysUseCameraRelativeCharacterLighting` and
+`InitializeGameObjectLighting` retain the predecessor's names; the additional
+Wii services retain address identities. Their first-use literals establish the
+four-float pool at `0x806E4CD0..0x806E4CE0` before the existing camera constants.
+
+`fn_80182168` reads a world object's matrix, intensity, and colour and prepares
+an unpublished light snapshot. The intensity, attenuation, and colour fields
+follow the predecessor's `LightObject` names at the Wii offsets; the object
+type and earlier fields remain unidentified. The retail routine retains several
+discarded stack temporaries whose original source structure is unresolved, so
+this implementation remains NonMatching. The current reconstructed range ends
+at `0x80183DEC`; later lighting helpers and the initializer through `0x8018480C`
+remain separate automatic fragments, and this is not asserted as an original
+translation-unit boundary.
+
 `Game/SH/SHOnlineFriendsChooseSides.cpp` names the scene constructed at
 `0x8026B10C` for scene 56 and `art/fe/online_friends_choose_sides.fen`. Its
 callback and member names describe the retail home/away selection, guest-player
@@ -237,6 +256,16 @@ retained removal method searches entries by pointer equality. These names
 describe R4QE01 behavior and do not establish original source filenames
 or debug identifiers.
 
+`Game/TweakNode.cpp` also owns the trailing block through `0x802C4DF0`.
+Its initializer registers the `nlSlotPoolFixed<32>` destructor at
+`0x802C4D08`, and its `TweakValueName` vtable references the eight small
+virtual methods at `0x802C4CD4..0x802C4D08`. The intervening string helpers
+use the canonical `nlStrCmp<char>` and `nlStrNCpy<char>` implementations.
+The four external comparison calls in `ScreenTransitionManager::AddTransitions`
+agree with the predecessor's same token tests. The unit remains incomplete:
+its current source does not emit the two retained string-helper copies,
+and the pool destructor's inherited cleanup structure still differs.
+
 `Game/TweakConfig` names the configuration parser and synchronous file
 and buffer-loading entry points by their retained behavior. Its
 `Config::Parser` callbacks preserve the predecessor interface names,
@@ -315,6 +344,16 @@ not recovered retail symbols. Packet finalization takes the allocator as
 its third argument, as confirmed by the implementation at `0x8036E438`
 and the model loader.
 
+`Game/GL/UnidentifiedMeshWriter_802A195C.cpp` contains the four writer methods
+at `0x802A195C..0x802A1BD4`. The image-quad caller and material program
+`0xEC35CAAB` establish float XYZ and float UV streams with strides 12 and 8.
+The five-field layout and two-stream setup distinguish it from the neighboring
+multi-texture and warble writers. The predecessor supplies the mesh-writer
+`Begin`, `End`, `Texcoord`, and `Vertex` API ancestry, but does not establish
+this variant's original class or filename. The adjacent shared-static
+initializer at `0x802A1BD4` retains separate ownership pending identification
+of its shared definition.
+
 `Game/GL/MeshWriter.cpp` contains the writer at
 `0x802A7F80..0x802A81F8` for its float XYZ and signed 16-bit UV streams.
 Material `0xEE9D919D` uses twelve fractional UV bits and a uniform colour
@@ -378,6 +417,17 @@ the latter is not a resource-release operation.
 array with a view hierarchy, adds the orthographic projection path, and resets
 the per-view sorter trees each frame. Retail callers establish the additional
 projection helper parameters; those functions retain address-based names.
+
+`NL/gl/glRenderList.cpp` contains the packet sort keys, AVL traversal and
+attachment, and `PacketCallbackManager`. The predecessor retail map places
+that callback manager in `glRenderList.o` before `glStat.o`, and supplies the
+`unsigned int count` callback parameter. Charged's consecutive sorter vtables,
+construction sites, and packet traversal establish the new hierarchy and
+layouts. The sorter classes and virtual methods keep neutral address and slot
+names because their original spellings are not established by the predecessor.
+The packet tree uses the shared AVL implementation with a stateless frame
+allocator: retail allocation sites select `GLM_Header`, and frame submission
+reclaims the arena storage.
 
 `NL/InflateStream.cpp` contains the incremental inflate wrapper at
 `0x802A99D8..0x802A9B8C`. Its stream layout and allocator callbacks use the
@@ -678,3 +728,13 @@ completion flags, effect requests and double buffers retain their existing
 storage and ownership. These operation, file and data names describe retail
 behavior; they are not recovered debug names. Existing split boundaries
 and the source-link status are unchanged.
+
+`Game/tu_802C7480.cpp` reconstructs the Tweak path helpers, current-thread
+stack-name check, and `TweakValueBase` constructor/destructor at
+`0x802C7480..0x802C76F8`. The registry and binding methods independently use
+these helpers; the next retained method is the Replay constructor. The base
+lifecycle methods reference its complete vtable at `0x8052BF70..0x8052BFA0`.
+Its four null virtual slots establish the corresponding pure virtual
+base declarations. The NLG string templates and SDK thread structure provide
+the shared implementations and layout. The source filename retains an address
+identity because the original filename is unavailable.

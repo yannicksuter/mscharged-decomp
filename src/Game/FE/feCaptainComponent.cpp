@@ -285,8 +285,8 @@ extern "C" void fn_801DCCEC(TU801DA134Component* comp)
     {
         team = nlSingleton<GameInfoManager>::Instance()->GetTeam((short)comp->mSide);
     }
-    GameRules* rules = &nlSingleton<GameInfoManager>::Instance()->mRulesTable[team];
-    comp->mSidekicks[0] = rules->unknown_0x0;
-    comp->mSidekicks[1] = rules->unknown_0x4;
-    comp->mSidekicks[2] = rules->unknown_0x8;
+    GameRules rules = nlSingleton<GameInfoManager>::Instance()->mRulesTable[team];
+    comp->mSidekicks[0] = rules.unknown_0x0;
+    comp->mSidekicks[1] = rules.unknown_0x4;
+    comp->mSidekicks[2] = rules.unknown_0x8;
 }

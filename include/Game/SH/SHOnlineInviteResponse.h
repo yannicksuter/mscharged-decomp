@@ -24,7 +24,7 @@ public:
     /* 0x2FC */ unsigned short mInvitationText[0x80];
     /* 0x3FC */ int mHoverCounts[4];
     /* 0x40C */ int mSelectedAction;
-    /* 0x410 */ int mButtonsInitialized;
+    /* 0x410 */ bool mButtonsInitialized;
     /* 0x414 */ int mState;
 }; // size 0x418
 

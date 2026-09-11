@@ -67,7 +67,7 @@ SHOnlineInviteResponse::SHOnlineInviteResponse()
         mButtons[i].mContext = (void*)i;
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
         mHoverCounts[i] = 0;
     }
 }
@@ -105,10 +105,10 @@ void SHOnlineInviteResponse::Update(float fDeltaT)
     if (mState == 0 || mState == 2 || mState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int i = 0; i < 4; ++i)
-                gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
         if (mState == 0)
@@ -126,7 +126,7 @@ void SHOnlineInviteResponse::Update(float fDeltaT)
     if (!g_pFriendManager->ValidateHostInvitation())
     {
         for (int i = 0; i < 4; ++i)
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+            GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
         GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_STATUS, SCREEN_FORWARD, true);
         SHOnlineInviteStatus* scene = (SHOnlineInviteStatus*)GameSceneManager::Instance()->GetScene(SCENE_ONLINE_INVITE_STATUS);
         scene->mStatus = 2;
@@ -136,14 +136,15 @@ void SHOnlineInviteResponse::Update(float fDeltaT)
     }
     for (int pad = 0; pad < 4; ++pad)
     {
+        TLComponentInstance* controller = GetPointerInstance(pad);
         if (g_pFEInput->m_InputLockDepth == 0)
         {
             if ((unsigned int)pad != gFEControllerIndex)
             {
-                gFEPointerInstances[pad]->SetActiveSlide("waiting", true, false);
+                controller->SetActiveSlide("waiting", true, false);
                 continue;
             }
-            gFEPointerInstances[pad]->SetActiveSlide("cursor", true, false);
+            controller->SetActiveSlide("cursor", true, false);
         }
         u8 valid = true;
         FEPointerEvent event;
@@ -180,7 +181,7 @@ void SHOnlineInviteResponse::OnPointerLeave(int index, void* context)
 void SHOnlineInviteResponse::OnPointerPress(int, void* context)
 {
     for (int i = 0; i < 4; ++i)
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     mSelectedAction = (int)context;
     mState = 2;
     mPresentation->SetActiveSlide("out", true);

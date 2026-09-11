@@ -6,12 +6,9 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/Render/Presentation.h"
 #include "Game/FE/feDPD.h"
+#include "Game/FE/feCupFlow.h"
 
 
-extern "C" void fn_802083A0();
-extern "C" void fn_802084A8();
-extern "C" void fn_80208568();
-extern "C" void fn_80208718();
 
 int GetCupState(CupManager* cupManager)
 {
@@ -44,7 +41,7 @@ void CupNewsScene::OnDoneTransitionComplete()
 
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
     if (mDisplayMode == 1)
@@ -62,23 +59,23 @@ void CupNewsScene::OnDoneTransitionComplete()
     else if (mDisplayMode == 7)
     {
         GameSceneManager::Instance()->Pop();
-        fn_802084A8();
+        AdvanceCupAwardPresentation();
     }
     else if (mDisplayMode == 6)
     {
         GameSceneManager::Instance()->Pop();
-        fn_80208568();
+        FinishCupAwardPresentation();
     }
     else if (mShowAwardsOnClose)
     {
         GameSceneManager::Instance()->Pop();
-        fn_802083A0();
+        BeginCupAwardPresentation();
         mShowAwardsOnClose = false;
     }
     else if (mShowWinnerRewardsOnClose)
     {
         GameSceneManager::Instance()->Pop();
-        fn_80208718();
+        ShowCupTrophyRewardsPopup();
         mShowWinnerRewardsOnClose = false;
     }
     else

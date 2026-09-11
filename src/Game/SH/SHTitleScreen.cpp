@@ -41,7 +41,7 @@ void StartMovieCB()
 {
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
     Presentation::GetInstance()->Call("TransitionTitleScreenToMainMenu");
     FEAudio::PlayAnimAudioEvent(0x80060B2D, 0, 0, 1);

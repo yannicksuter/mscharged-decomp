@@ -223,26 +223,12 @@ void SHOnlineGuestControllerSelect::OnDonePointerInside(int index, void*)
 
 void SHOnlineGuestControllerSelect::OnDonePointerPress(int, void*)
 {
-    {
-        mControllerButton.mDisabled = true;
-        FEPointerEvent event;
-        mControllerButton.mPreviousEvents[0] = event;
-        mControllerButton.mPreviousEvents[1] = event;
-        mControllerButton.mPreviousEvents[2] = event;
-        mControllerButton.mPreviousEvents[3] = event;
-    }
-    {
-        mDoneButton.mDisabled = true;
-        FEPointerEvent event;
-        mDoneButton.mPreviousEvents[0] = event;
-        mDoneButton.mPreviousEvents[1] = event;
-        mDoneButton.mPreviousEvents[2] = event;
-        mDoneButton.mPreviousEvents[3] = event;
-    }
+    mControllerButton.Disable();
+    mDoneButton.Disable();
 
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
     mSelectionConfirmed = true;

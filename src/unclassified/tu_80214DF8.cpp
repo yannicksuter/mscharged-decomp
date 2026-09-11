@@ -98,7 +98,7 @@ void TU80214DF8Scene::fn_80216838(int, void*)
 {
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 }
 

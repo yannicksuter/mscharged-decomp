@@ -59,7 +59,7 @@ void TU801F8CB0Overlay::fn_801F9CDC(int index, void*)
 
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
     mState = 2;

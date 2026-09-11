@@ -97,7 +97,7 @@ float StuckOnSidelines(cFielder* pFielder);
 float FacingSideline(cFielder* pFielder);
 float CloseToSideline(cFielder* pFielder);
 float NearToSideline(const nlVector3& v3Position);
-float CloseToSideline(const nlVector3& v3Position, const nlVector2* vDistanceConfidence, bool bInvert);
+float CloseToSideline(const nlVector3& v3Position, const nlVector2* vDistanceConfidence, bool bInvert, nlVector2* pUnidentified);
 float FarToTheirGoalie(cPlayer* pPlayer);
 float NearToTheirGoalie(cPlayer* pPlayer);
 float CloseToTheirGoalie(cPlayer* pPlayer);

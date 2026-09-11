@@ -34,8 +34,8 @@ class TweakValueBase
 public:
     TweakValueBase();
     virtual ~TweakValueBase();
-    virtual int UnidentifiedVirtual0C();
-    virtual int UnidentifiedVirtual10();
+    virtual int UnidentifiedVirtual0C() = 0;
+    virtual int UnidentifiedVirtual10() = 0;
     virtual void UnidentifiedVirtual14(
         float* minimum, float* maximum, float* increment)
     {
@@ -50,7 +50,7 @@ public:
     {
         return 0;
     }
-    virtual void* UnidentifiedVirtual20();
+    virtual void* UnidentifiedVirtual20() = 0;
     virtual void UnidentifiedVirtual24(char* buffer, unsigned long size)
     {
         buffer[0] = '\0';
@@ -58,7 +58,7 @@ public:
     virtual void UnidentifiedVirtual28(const char* value)
     {
     }
-    virtual void UnidentifiedVirtual2C(TweakValueBase*);
+    virtual void UnidentifiedVirtual2C(TweakValueBase*) = 0;
 
 public:
     /* 0x04 */ const char* mName;

@@ -123,19 +123,19 @@ void TU80203D70Scene::fn_802069F0(int, void* context)
     mUnidentified21D = true;
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    int value = (int)context;
+    unsigned int value = (unsigned int)context;
     if (value != 0)
     {
-        FEAudio::PlayAnimAudioEvent(0xF0B0D586, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     }
 
     if ((unsigned int)(value - 1) <= 1)
     {
         FEAudio::PlayAnimAudioEvent(0xE4023EE3, 0, 0, 1);
-        FEAudio::PlayAnimAudioEvent(0xEA7BD449, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xEA7AD449, 0, 0, 1);
     }
 
     if (value != 3)
@@ -159,6 +159,6 @@ void TU80203D70Scene::fn_802069F0(int, void* context)
 
     if (value == 0)
     {
-        FEAudio::PlayAnimAudioEvent(0x4A52995D, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0x4A51F95D, 0, 0, 1);
     }
 }

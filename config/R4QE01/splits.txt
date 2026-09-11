@@ -1111,21 +1111,22 @@ Game/Drawable/DrawableYoshiEgg.cpp:
 	.sdata2     start:0x806E4CB0 end:0x806E4CD0
 
 Game/GameObjectLighting.cpp:
-	.text       start:0x801826D0 end:0x80183DEC
+	.text       start:0x801820FC end:0x80183DEC
 	.rodata     start:0x804DCCF0 end:0x804DCD00
 	.bss        start:0x80570C00 end:0x80570C18
-	.sdata2     start:0x806E4CE0 end:0x806E4D10
+	.sdata2     start:0x806E4CD0 end:0x806E4D10
 
 unclassified/tu_8018480C.cpp:
 	.text       start:0x8018480C end:0x80184AAC
 	.sdata      start:0x806DCC98 end:0x806DCCA0
 
 Game/Render/RenderShadow.cpp:
-	.text       start:0x80184ACC end:0x80186524
+	.text       start:0x80184ACC end:0x80186D0C
+	.ctors      start:0x804DB6C0 end:0x804DB6C4
 	.rodata     start:0x804DCD48 end:0x804DCD60
-	.data       start:0x80511610 end:0x80511658
-	.sdata      start:0x806DCCB0 end:0x806DCCF0
-	.sbss       start:0x806E1470 end:0x806E1488
+	.data       start:0x80511610 end:0x805116A8
+	.sdata      start:0x806DCCA0 end:0x806DCCF0
+	.sbss       start:0x806E1460 end:0x806E1490
 	.sdata2     start:0x806E4D50 end:0x806E4D8C
 
 Game/RenderSnapshot.cpp:
@@ -2058,6 +2059,11 @@ Game/Render/StadiumTweaks.cpp:
 	.sdata      start:0x806DEE70 end:0x806DEE78
 	.sdata2     start:0x806E5C70 end:0x806E5C80
 
+Game/Render/tu_80279AC8.cpp:
+	.text       start:0x80279AC8 end:0x8027A4BC
+	.ctors      start:0x804DB7DC end:0x804DB7E0
+	.sbss       start:0x806E19A8 end:0x806E19B8
+
 Game/Render/tu_8027AE14.cpp:
 	.text       start:0x8027AE14 end:0x8027B0D8
 	.data       start:0x805231F0 end:0x80523200
@@ -2455,6 +2461,9 @@ NL/gl/tu_802A12E4.cpp:
 
 NL/gl/glMultiTextureModelWriter.cpp:
 	.text       start:0x802A15D4 end:0x802A193C
+
+Game/GL/UnidentifiedMeshWriter_802A195C.cpp:
+	.text       start:0x802A195C end:0x802A1BD4
 
 Game/GL/GLWarbleMeshWriter.cpp:
 	.text       start:0x802A1BF4 end:0x802A1EC4
@@ -2902,7 +2911,7 @@ Game/TweakNameRecycler.cpp:
 	.sbss       start:0x806E1E68 end:0x806E1E80
 
 Game/TweakNode.cpp:
-	.text       start:0x802C3CF4 end:0x802C4C5C
+	.text       start:0x802C3CF4 end:0x802C4DF0
 	.ctors      start:0x804DB9C0 end:0x804DB9C4
 	.data       start:0x8052BE78 end:0x8052BED0
 	.bss        start:0x8057C6D8 end:0x8057C728
@@ -2934,6 +2943,10 @@ Game/TweakConfig.cpp:
 	.sdata      start:0x806DF368 end:0x806DF3A0
 	.sbss       start:0x806E1E88 end:0x806E1E98
 	.sdata2     start:0x806E62D8 end:0x806E62E0
+
+Game/tu_802C7480.cpp:
+	.text       start:0x802C7480 end:0x802C76F8
+	.data       start:0x8052BF70 end:0x8052BFA0
 
 Game/Replay.cpp:
 	.text       start:0x802C76F8 end:0x802C7FD0
@@ -2986,6 +2999,11 @@ NL/gl/glModel.cpp:
 
 NL/gl/glMaterialParameters.cpp:
 	.text       start:0x802CC370 end:0x802CCA58
+
+NL/gl/glRenderList.cpp:
+	.text       start:0x802CCA58 end:0x802CCDFC
+	.data       start:0x8052E2A8 end:0x8052E2F0
+	.sdata2     start:0x806E6330 end:0x806E6340
 
 NL/gl/glStat.cpp:
 	.text       start:0x802CCDFC end:0x802CCE00
@@ -3218,6 +3236,11 @@ unclassified/tu_802F2110.cpp:
 
 unclassified/tu_802F2C3C.cpp:
 	.text       start:0x802F2C3C end:0x802F39EC
+
+Game/Audio/AudioResourceRuntime.cpp:
+	.text       start:0x802F479C end:0x802F68F0
+	.ctors      start:0x804DBA6C end:0x804DBA70
+	.sdata      start:0x806DF4E0 end:0x806DF4F0
 
 Game/Audio/AudioRuntimeGroup.cpp:
 	.text       start:0x802F98F4 end:0x802F9CD8

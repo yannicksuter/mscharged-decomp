@@ -73,7 +73,7 @@ void TU801FA324Overlay::fn_801FABF8(int index, void*)
 
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
     g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);

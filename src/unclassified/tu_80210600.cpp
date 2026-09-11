@@ -104,7 +104,7 @@ void TU80210600Scene::fn_80210984(int, void* context)
     mUnidentified205 = true;
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
     switch ((unsigned int)context)

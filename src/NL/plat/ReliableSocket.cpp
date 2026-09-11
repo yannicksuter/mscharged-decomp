@@ -18,16 +18,10 @@ extern char sOutgoingConnectionLogFormat[];
 ReliableSocket::ReliableSocket()
 {
     nlBufferedWriterInitialize(&mLogWriter);
-    mScreenPrinter.mLines[0][0] = '\0';
-    mScreenPrinter.mLines[1][0] = '\0';
-    mScreenPrinter.mLines[2][0] = '\0';
-    mScreenPrinter.mLines[3][0] = '\0';
-    mScreenPrinter.mLines[4][0] = '\0';
-    mScreenPrinter.mLines[5][0] = '\0';
-    mScreenPrinter.mLines[6][0] = '\0';
-    mScreenPrinter.mLines[7][0] = '\0';
-    mScreenPrinter.mLines[8][0] = '\0';
-    mScreenPrinter.mLines[9][0] = '\0';
+    for (int i = 0; i < 10; ++i)
+    {
+        mScreenPrinter.mLines[i][0] = '\0';
+    }
     mScreenPrinter.mNextLine = 0;
 
     InitializeTransportChallengeCipher();
@@ -39,16 +33,10 @@ ReliableSocket::ReliableSocket()
     mLastUpdateTick = 0;
     mSentBytes = 0;
     mReceivedBytes = 0;
-    mScreenPrinter.mLines[0][0] = '\0';
-    mScreenPrinter.mLines[1][0] = '\0';
-    mScreenPrinter.mLines[2][0] = '\0';
-    mScreenPrinter.mLines[3][0] = '\0';
-    mScreenPrinter.mLines[4][0] = '\0';
-    mScreenPrinter.mLines[5][0] = '\0';
-    mScreenPrinter.mLines[6][0] = '\0';
-    mScreenPrinter.mLines[7][0] = '\0';
-    mScreenPrinter.mLines[8][0] = '\0';
-    mScreenPrinter.mLines[9][0] = '\0';
+    for (int i = 0; i < 10; ++i)
+    {
+        mScreenPrinter.mLines[i][0] = '\0';
+    }
     mScreenPrinter.mNextLine = 0;
 }
 
