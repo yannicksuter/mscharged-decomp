@@ -37,7 +37,6 @@ extern "C"
     DrawableObject* fn_8027A7F0(void* storage,
         WorldObjectLoadContext* context, glModel* model, u32 hash);
     RLView* fn_8027261C();
-    void fn_802785FC(BasicStadium* stadium, float fDeltaT);
     DrawableObject* fn_802787AC(BasicStadium* stadium, unsigned long uHashID);
     void fn_80278818(BasicStadium* stadium);
     float fn_802789A0(BasicStadium* stadium);
@@ -61,6 +60,7 @@ extern "C"
     extern StadiumTweaks* lbl_806E196C;
     extern DrawableObject* lbl_8057AB20[12];
 }
+void fn_802785FC(BasicStadium* stadium, float fDeltaT);
 void fn_8027876C(BasicStadium* stadium, DrawableObject* object);
 
 bool gSkipGameplayModels;
@@ -120,7 +120,7 @@ DrawableObject* GetRenderObject(int entry, int instance)
     return gStadiumModelEntries[entry].mInstances[instance];
 }
 
-DrawableObject** fn_80276380()
+DrawableObject** GetNumberRenderObjects()
 {
     return lbl_8057AB20;
 }
@@ -522,13 +522,13 @@ void UpdateStadium(float fDeltaT)
     }
 
     unsigned int state = nlTaskManager::m_pInstance->mCurrentState;
-    if (state == 8 || state == 0x20000 || state == 0x10)
+    if (state != 8 && state != 0x20000 && state != 0x10)
     {
-        fn_802785FC(pBasicStadiumInstance, fDeltaT);
+        pBasicStadiumInstance->Update(fDeltaT, bUpdateNPCs, true);
     }
     else
     {
-        pBasicStadiumInstance->Update(fDeltaT, bUpdateNPCs, true);
+        fn_802785FC(pBasicStadiumInstance, fDeltaT);
     }
 
     if (gNPCManager != 0)
@@ -694,7 +694,7 @@ bool ShouldLoadStadiumModel(const StadiumModelEntry* entry)
         && entry->mStadium == -1;
 }
 
-float fn_80277DB0()
+float GetStadiumTime()
 {
     if (pBasicStadiumInstance != 0)
     {

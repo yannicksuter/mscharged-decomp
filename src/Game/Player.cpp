@@ -30,6 +30,7 @@ extern "C" cPlayer* fn_80096514(
 extern "C" void fn_801BCC38(cCharacter*);
 extern "C" void fn_801BCE2C(cCharacter*);
 extern "C" void fn_80095DF4(cPlayer* self, float fDeltaT);
+extern "C" void fn_80097BE0(unsigned int, unsigned int, cPoseAccumulator*, unsigned int, int);
 
 void cPlayer::SetSpaceSearch(SpaceSearch* pSpaceSearch)
 {
@@ -162,6 +163,39 @@ void cPlayer::fn_800974B0()
     }
     m_tFireTimer.m_unk0 = m_tFireTimer.m_uPackedTime != 0;
     m_tFireTimer.m_uPackedTime = 0;
+}
+
+void cPlayer::fn_8009750C()
+{
+    if (m_tFireTimer.m_uPackedTime != 0)
+    {
+        fn_800974B0();
+    }
+}
+
+void cPlayer::SetPowerupAnimState(int nodeIndex, int animID, float blendTime)
+{
+    cPN_SAnimController* controller = NewAnimController(animID, false, false, NULL, 0);
+    if (m_pPowerupLayer->GetChild(1) != NULL)
+    {
+        m_pPowerupLayer->BeginBlendOut(-1.0f);
+    }
+    m_pPowerupLayer->ClearNodeWeights();
+    m_pPowerupLayer->SetNodeWeight(nodeIndex, 1.0f, 0.2f);
+    m_pPowerupLayer->SetChild(1, controller);
+    m_pPowerupLayer->BeginBlendIn(blendTime);
+    m_nFeatherAnimID = animID;
+}
+
+void cPlayer::fn_80097648(float duration)
+{
+    if (m_pPowerupLayer->GetChild(1) != NULL)
+    {
+        if (duration <= 0.0f || m_pPowerupLayer->m_eFeatherBlendMode != FEATHER_BLEND_OUT)
+        {
+            m_pPowerupLayer->BeginBlendOut(duration);
+        }
+    }
 }
 
 bool cPlayer::fn_800976C4()
@@ -301,6 +335,17 @@ void cPlayer::PreUpdate(float dt)
 {
     cCharacter::PreUpdate(dt);
     m_bCanTestController = true;
+}
+
+void cPlayer::Unknown7(float)
+{
+    m_pPoseAccumulator->SetBuildNodeMatrixCallback(
+        m_nHeadJointIndex, fn_80097BE0, (unsigned int)this, 0);
+    if (m_pBall != NULL)
+    {
+        m_pBall->m_pPhysicsBall->EnableCollisions();
+        m_pPhysicsCharacter->ContainObject(m_pBall->m_pPhysicsBall);
+    }
 }
 
 void cPlayer::PrePhysicsUpdate()

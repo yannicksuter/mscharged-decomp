@@ -21,7 +21,7 @@ public:
     void OnPointerRelease(int index, void* context);
     void OnPadPress(int index, void* context);
     void OnPadRelease(int index, void* context);
-    void SetOffset(const nlVector3& value);
+    void SetOffset(const feVector3& value);
     void ResetScrolling();
     void OnPointerEnter(int index, void* context);
     void Update(FEPointerEvent event, float fDeltaT);

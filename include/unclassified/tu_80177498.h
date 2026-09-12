@@ -1,6 +1,7 @@
 #ifndef TU_80177498_H
 #define TU_80177498_H
 
+#include "Game/EventConnection.h"
 #include "Game/Physics/PhysicsBox.h"
 #include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
@@ -71,10 +72,10 @@ public:
     /* 0x5C */ bool mUnidentified05C;
     /* 0x5D */ unsigned char mPadding05D[3];
     /* 0x60 */ float mUnidentified060;
-    /* 0x64 */ void* mUnidentified064;
-    /* 0x68 */ void* mUnidentified068;
-    /* 0x6C */ void* mUnidentified06C;
-    /* 0x70 */ void* mUnidentified070;
+    /* 0x64 */ UnidentifiedEventConnectionOwner mUnidentified064;
+    /* 0x68 */ UnidentifiedEventConnectionOwner mUnidentified068;
+    /* 0x6C */ UnidentifiedEventConnectionOwner mUnidentified06C;
+    /* 0x70 */ UnidentifiedEventConnectionOwner mUnidentified070;
 }; // size: 0x74
 
 #endif // TU_80177498_H

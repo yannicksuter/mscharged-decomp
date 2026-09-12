@@ -20,9 +20,7 @@ T* FEFinder<T, N>::FindOrDefault(U* pTopLevel, InlineHasher Level1, InlineHasher
     InlineHasher Level4, InlineHasher Level5, InlineHasher Level6)
 {
     T* pResult = Find(pTopLevel, Level1.m_Hash, Level2.m_Hash, Level3.m_Hash, Level4.m_Hash, Level5.m_Hash, Level6.m_Hash);
-    if (pResult == 0)
-        pResult = (T*)FEGetDefaultInstance((eTimeLineAssetType)N);
-    return pResult;
+    return pResult == 0 ? (T*)FEGetDefaultInstance((eTimeLineAssetType)N) : pResult;
 }
 
 #endif // _FEFINDER_IMPL_H_

@@ -15,6 +15,15 @@ extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
 float lbl_806DC04C = 60.0f;
 float lbl_806DC050 = 0.3f;
 extern float lbl_806DC054;
+extern unsigned short lbl_806DC05C;
+extern unsigned short lbl_806DC060;
+extern unsigned short lbl_806DC06C;
+extern unsigned short lbl_806DC06A;
+extern unsigned short lbl_806DC068;
+extern unsigned short lbl_806DC094;
+extern unsigned short lbl_806DC0A0;
+extern unsigned short lbl_806DC070;
+extern unsigned short lbl_806DC06E;
 
 extern "C" int fn_800B045C()
 {
@@ -141,6 +150,15 @@ void Desire::Update(UnidentifiedDesireUpdate*, float)
 {
 }
 
+void DesireCutAndBreak::UnidentifiedCleanup()
+{
+    if (mUnidentifiedA4 == mUnidentifiedFielder->m_pSpaceSearch)
+    {
+        mUnidentifiedFielder->SetSpaceSearch(0);
+    }
+    mUnidentifiedA4 = 0;
+}
+
 DesireCutAndBreak::~DesireCutAndBreak()
 {
 }
@@ -152,6 +170,19 @@ void DesireCutAndBreak::UnidentifiedVirtual8(void* field, DebugWriteCache* cache
     cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
     cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
     cache->EndType();
+}
+
+void DesireCutAndBreak::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DC05C == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&lbl_806DC05C, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(lbl_806DC05C, data, context);
+    cache->WriteData(lbl_806DC05C, data, sizeof(DesireCutAndBreak) - offset);
 }
 
 DesireDeke::~DesireDeke()
@@ -183,6 +214,19 @@ void DesireDeke::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
     cache->EndType();
 }
 
+void DesireDeke::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DC060 == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&lbl_806DC060, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(lbl_806DC060, data, context);
+    cache->WriteData(lbl_806DC060, data, sizeof(DesireDeke) - offset);
+}
+
 void DesireHit::Update(UnidentifiedDesireUpdate*, float)
 {
 }
@@ -200,9 +244,31 @@ void DesireHit::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
     cache->EndType();
 }
 
+void DesireHit::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DC0A0 == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&lbl_806DC0A0, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(lbl_806DC0A0, data, context);
+    cache->WriteData(lbl_806DC0A0, data, sizeof(DesireHit) - offset);
+}
+
 void DesireGetOpen::Update(UnidentifiedDesireUpdate*, float)
 {
     fn_800401C0(mUnidentifiedFielder, mvDesiredPosition, 1.2f, 1.0f);
+}
+
+void DesireGetOpen::UnidentifiedCleanup()
+{
+    if (mUnidentifiedA4 == mUnidentifiedFielder->m_pSpaceSearch)
+    {
+        mUnidentifiedFielder->SetSpaceSearch(0);
+    }
+    mUnidentifiedA4 = 0;
 }
 
 DesireGetOpen::~DesireGetOpen()
@@ -216,6 +282,19 @@ void DesireGetOpen::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
     cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
     cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
     cache->EndType();
+}
+
+void DesireGetOpen::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DC094 == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&lbl_806DC094, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(lbl_806DC094, data, context);
+    cache->WriteData(lbl_806DC094, data, sizeof(DesireGetOpen) - offset);
 }
 
 bool DesireGetInPosition::UnidentifiedInitialize(void* context)
@@ -238,6 +317,19 @@ void DesireGetInPosition::UnidentifiedVirtual8(void* field, DebugWriteCache* cac
     cache->EndType();
 }
 
+void DesireGetInPosition::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DC068 == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&lbl_806DC068, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(lbl_806DC068, data, context);
+    cache->WriteData(lbl_806DC068, data, sizeof(DesireGetInPosition) - offset);
+}
+
 bool DesireRunUpfield::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
@@ -258,6 +350,19 @@ void DesireRunUpfield::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
     cache->EndType();
 }
 
+void DesireRunUpfield::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DC06A == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&lbl_806DC06A, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(lbl_806DC06A, data, context);
+    cache->WriteData(lbl_806DC06A, data, sizeof(DesireRunUpfield) - offset);
+}
+
 bool DesireRunDownfield::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
@@ -276,6 +381,19 @@ void DesireRunDownfield::UnidentifiedVirtual8(void* field, DebugWriteCache* cach
     cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
     cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
     cache->EndType();
+}
+
+void DesireRunDownfield::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DC06C == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&lbl_806DC06C, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(lbl_806DC06C, data, context);
+    cache->WriteData(lbl_806DC06C, data, sizeof(DesireRunDownfield) - offset);
 }
 
 void DesireRunInDirection::UnidentifiedCleanup()
@@ -301,6 +419,25 @@ void DesireRunInDirection::UnidentifiedVirtual8(void* field, DebugWriteCache* ca
     cache->EndType();
 }
 
+void DesireRunInDirection::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DC06E == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&lbl_806DC06E, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = cache->WriteData(lbl_806DC06E,
+        (u8*)this + offset, sizeof(DesireRunInDirection) - offset);
+    if (data != 0)
+    {
+        DesireRunInDirection* desire = (DesireRunInDirection*)((u8*)data - offset);
+        desire->m_pTarget = (cFielder*)(m_pTarget == 0
+                ? -1 : m_pTarget->mUnidentified120);
+        cache->ChecksumData(lbl_806DC06E, data, context);
+    }
+}
+
 void DesireRunToTarget::UnidentifiedCleanup()
 {
 }
@@ -323,6 +460,25 @@ void DesireRunToTarget::UnidentifiedVirtual8(void* field, DebugWriteCache* cache
     cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fSpeedCoeff - (u8*)&mvDesiredPosition, "m_fSpeedCoeff");
     cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fAvoidanceCoeff - (u8*)&mvDesiredPosition, "m_fAvoidanceCoeff");
     cache->EndType();
+}
+
+void DesireRunToTarget::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DC070 == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&lbl_806DC070, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = cache->WriteData(lbl_806DC070,
+        (u8*)this + offset, sizeof(DesireRunToTarget) - offset);
+    if (data != 0)
+    {
+        DesireRunToTarget* desire = (DesireRunToTarget*)((u8*)data - offset);
+        desire->m_pTargetFielder = (cFielder*)(m_pTargetFielder == 0
+                ? -1 : m_pTargetFielder->mUnidentified120);
+        cache->ChecksumData(lbl_806DC070, data, context);
+    }
 }
 
 class UnidentifiedWeatherExtendedStateF;

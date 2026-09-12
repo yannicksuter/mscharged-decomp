@@ -1,10 +1,12 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/Terrain.h"
+#include "Game/TweakConfig.h"
 #include "Game/GameTweaks.h"
 #include "NL/nlPrint.h"
 
 extern const char* gTerrainNames[6];
 extern const char sTerrainConfigPathFormat[];
+extern char sUnidentifiedTerrainCategory[];
 
 int GetTerrainConfigFilename(int index, char* buffer, unsigned long size)
 {
@@ -19,6 +21,13 @@ Terrain::Terrain(int index)
 
 Terrain::~Terrain()
 {
+}
+
+void Terrain::Load(int index)
+{
+    mIndex = index;
+    nlSNPrintf(mName, 0x3F, sTerrainConfigPathFormat, gTerrainNames[index]);
+    LoadTweakConfigFile(mName, sUnidentifiedTerrainCategory, true);
 }
 
 float Terrain::GetSpeedFactor()

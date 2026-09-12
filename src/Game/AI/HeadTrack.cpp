@@ -14,27 +14,15 @@ void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
     if (m_bTrackOOI)
     {
         m4Constrain = m4ConstraintMatrix;
-        float headM41 = m4HeadMatrix.m41;
-        float headM42 = m4HeadMatrix.m42;
-        float headM43 = m4HeadMatrix.m43;
-
-        m4Constrain.m41 = headM41;
-        m4Constrain.m42 = headM42;
-        m4Constrain.m43 = headM43;
-        m4Constrain.m44 = 1.0f;
+        m4Constrain.SetRow4_(3,
+            m4HeadMatrix.m41, m4HeadMatrix.m42, m4HeadMatrix.m43, 1.0f);
 
         nlInvertRotTransMatrix(
             m4WorldSpaceToConstraintSpace, m4Constrain);
         nlMultPosVectorMatrix(v3OOIConstraintSpace, m_v3OOI, m4WorldSpaceToConstraintSpace);
 
-        {
-            float invLen = nlRecipSqrt(
-                v3OOIConstraintSpace.x * v3OOIConstraintSpace.x
-                    + v3OOIConstraintSpace.y * v3OOIConstraintSpace.y
-                    + v3OOIConstraintSpace.z * v3OOIConstraintSpace.z,
-                true);
-            nlVec3Scale(v3OOIConstraintSpace, invLen);
-        }
+        nlVec3Scale(v3OOIConstraintSpace,
+            nlRecipSqrt(nlVec3LengthSquared(v3OOIConstraintSpace), true));
 
         nHeadSpin = ((int)(10430.378f
                            * nlATan2f(v3OOIConstraintSpace.z,
@@ -135,28 +123,22 @@ void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
 
         spinChange = m_fHeadSpin - m_fDesiredHeadSpin;
         spinVel = m_fHeadSpinSeekVel;
+        float spinTemp = fDeltaT * ((omega * spinChange) + spinVel);
 
         m_fHeadSpinSeekVel = exp
-                           * (spinVel
-                               - (omega
-                                   * (fDeltaT * ((omega * spinChange) + spinVel))));
+                           * (spinVel - (omega * spinTemp));
         m_fHeadSpin
-            = (exp
-                  * (spinChange
-                      + (fDeltaT * ((omega * spinChange) + spinVel))))
+            = (exp * (spinChange + spinTemp))
             + m_fDesiredHeadSpin;
 
         float tiltChange = m_fHeadTilt - m_fDesiredHeadTilt;
         float tiltVel = m_fHeadTiltSeekVel;
+        float tiltTemp = fDeltaT * ((omega * tiltChange) + tiltVel);
 
         m_fHeadTiltSeekVel = exp
-                           * (tiltVel
-                               - (omega
-                                   * (fDeltaT * ((omega * tiltChange) + tiltVel))));
+                           * (tiltVel - (omega * tiltTemp));
         m_fHeadTilt
-            = (exp
-                  * (tiltChange
-                      + (fDeltaT * ((omega * tiltChange) + tiltVel))))
+            = (exp * (tiltChange + tiltTemp))
             + m_fDesiredHeadTilt;
     }
 }

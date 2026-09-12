@@ -133,14 +133,7 @@ static inline nlColour GetIndicatorColour(cPlayer* pCharacter)
         = ((IndicatorCharacterInfoState*)pCaptain)->mCharacterInfo;
     CharacterInfo* pOtherInfo
         = ((IndicatorCharacterInfoState*)pOtherCaptain)->mCharacterInfo;
-    unsigned long packed = GetTeamColour(*pInfo, *pOtherInfo, true);
-
-    nlColour colour;
-    colour.c[0] = packed >> 24;
-    colour.c[1] = packed >> 16;
-    colour.c[2] = packed >> 8;
-    colour.c[3] = packed;
-    return colour;
+    return GetTeamColour(*pInfo, *pOtherInfo, true);
 }
 
 extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)

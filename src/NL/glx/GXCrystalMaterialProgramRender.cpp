@@ -88,11 +88,11 @@ void GXMaterialProgramImpl<GXCrystalMaterialProgram>::Deactivate()
 
 template <>
 void GXMaterialProgramImpl<GXCrystalMaterialProgram>::Prepare(
-    const glModelPacket* packet)
+    glModelPacket* packet)
 {
     GXCrystalMaterialParameters* parameters = (GXCrystalMaterialParameters*)packet->materialParameters;
     glSetMaterialTextureAlphaState(this, packet, parameters->texture1.texture);
-    unsigned int& rasterState = *(unsigned int*)&packet->rasterState;
+    unsigned int& rasterState = packet->rasterState;
     glSetRasterState(rasterState, GLS_Culling, 1);
     glSetRasterState(rasterState, GLS_AlphaTest, 0);
     glSetRasterState(rasterState, GLS_AlphaBlend, 1);

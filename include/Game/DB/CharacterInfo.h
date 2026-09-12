@@ -2,6 +2,7 @@
 #define GAME_DB_CHARACTERINFO_H
 
 #include "types.h"
+#include "NL/nlColour.h"
 
 /**
  * The eight-byte pair at CharacterInfo+0x30. R4QE01 copies it as two raw words
@@ -55,7 +56,7 @@ int GetCharacterIndexFromCaptain(int captain);
 int GetCharacterIndexFromSidekick(int sidekick);
 int GetCharacterIndexFromName(const char* name);
 int GetGoalieCharacterIndex(const CharacterInfo& character);
-u32 GetTeamColour(const CharacterInfo& team, const CharacterInfo& opponent, bool useAlternate);
+nlColour GetTeamColour(const CharacterInfo& team, const CharacterInfo& opponent, bool useAlternate);
 bool NeedsAlternateColour(const CharacterInfo& team, const CharacterInfo& opponent);
 bool CaptainsNeedAlternateColour(int captain, int opponentCaptain);
 

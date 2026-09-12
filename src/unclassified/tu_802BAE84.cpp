@@ -6,6 +6,7 @@
 #include "NL/nlDLListContainer.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "unclassified/UnidentifiedDebugPolyStorage_802BB300.h"
 #include "unclassified/tu_802B7798.h"
 #include "unclassified/tu_802BAE84.h"
 
@@ -124,37 +125,8 @@ extern "C" void fn_802BB11C(GLView* view, const nlColour& colour,
     poly.Attach(view, layer, 0);
 }
 
-static u32 lbl_806E1DE4 = glGetTexture("global/white");
-
-struct UnidentifiedDebugPolyStorage_802BB300;
-
-extern SlotPool<glPoly2> lbl_8057C1E8;
-
-struct UnidentifiedDebugPolyStorage_802BB300
-{
-    UnidentifiedDebugPolyStorage_802BB300()
-        : mCurrent(0)
-    {
-    }
-
-    ~UnidentifiedDebugPolyStorage_802BB300()
-    {
-        glPoly2* poly = 0;
-        while (mPolys.m_Head != 0)
-        {
-            DLListEntry<glPoly2*>* entry = mPolys.m_Head;
-            nlDLRingRemove(&mPolys.m_Head, entry);
-            mPolys.Deallocate(entry, &poly);
-            lbl_8057C1E8.DeleteEntry(poly);
-        }
-        mPolys.m_Allocator.FreeBlocks();
-        lbl_8057C1E8.FreeBlocks();
-    }
-
-    glPoly2* mCurrent;
-    nlDLListSlotPool<glPoly2*> mPolys;
-};
+static char lbl_8052B640[] = "global/white";
+static u32 lbl_806E1DE4 = glGetTexture(lbl_8052B640);
 
 UnidentifiedDebugPolyStorage_802BB300 lbl_8057C1B8;
 SlotPool<glPoly2> lbl_8057C1E8(16, 16);
-

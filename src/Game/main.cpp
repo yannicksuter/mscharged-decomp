@@ -469,6 +469,7 @@ static void Initialize()
     fn_80272AB4();
     Wiper::Instance().Initialize();
     fn_80184858();
+    Detail::sTempStringAllocatorPool.allocator.pool.PushState();
 }
 
 static void AddTasks()

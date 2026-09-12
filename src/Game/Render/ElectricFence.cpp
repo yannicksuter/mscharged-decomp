@@ -54,8 +54,8 @@ static void GetWallPoint(const nlVector3& impactPosition, float xOffset,
     bool yIsPositive = impactPosition.y > 0.0f;
 
     nlVector3 impactPositionPositive = { {
-        (float)__fabs(impactPosition.x),
-        (float)__fabs(impactPosition.y),
+        nlAbs(impactPosition.x),
+        nlAbs(impactPosition.y),
         impactPosition.z,
     } };
 
@@ -101,15 +101,16 @@ static void GetWallPoint(const nlVector3& impactPosition, float xOffset,
     else
     {
         float ratio_8019DEA0 = outCoordinate / radius;
-        inCoordinate =
-            nlSin((u16)(s32)(10430.378f * ratio_8019DEA0));
         nlVec3Set(outPosition,
             (goalLineX - radius)
                 + (radius
                     * nlSin((u16)((u16)(s32)(10430.378f
                                           * ratio_8019DEA0)
                         + 0x4000))),
-            (sideLineY - radius) + (radius * inCoordinate),
+            (sideLineY - radius)
+                + (radius
+                    * nlSin((u16)(s32)(10430.378f
+                                      * ratio_8019DEA0))),
             impactPositionPositive.z + zOffset);
     }
 

@@ -179,11 +179,6 @@ bool DrawableCharacter::sCameraRelativeLighting;
 extern int lbl_806E0F54;
 extern TaskManager* m_pInstance__13nlTaskManager;
 
-static inline float DegreesToRadians(float degrees)
-{
-    return (3.1415927f * degrees) / 180.0f;
-}
-
 static inline double BoolAsDouble(bool value)
 {
     return value ? 1.0f : 0.0f;

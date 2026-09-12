@@ -55,11 +55,11 @@ struct NetworkDraftMachineInfo
         mGuestEnabled = 0;
     }
 
-    /* 0x00 */ NetworkRankingMeta mHead;
-    /* 0x18 */ u32 mUnidentified18;
+    /* 0x00 */ NetworkRankingMeta mStats;
+    /* 0x18 */ u32 mProfileId;
     /* 0x1C */ u16 mName[11];
-    /* 0x32 */ u8 mUnidentified32[0x4C];
-    /* 0x7E */ s8 mIndex;
+    /* 0x32 */ u8 mMiiData[0x4C];
+    /* 0x7E */ s8 mMachineIndex;
     /* 0x7F */ u8 mGuestEnabled;
 }; // size: 0x80
 
@@ -74,7 +74,7 @@ public:
     {
         for (int i = 0; i < 8; ++i)
         {
-            mUnidentified0B.mData[i / 2][i % 2] = -1;
+            mPlayerSides.mData[i / 2][i % 2] = -1;
         }
     }
 
@@ -85,7 +85,7 @@ public:
     /* 0x008 */ s8 mMachineIndex;
     /* 0x009 */ s8 mMachineCount;
     /* 0x00A */ u8 mUnidentified0A;
-    /* 0x00B */ NetworkDraftSides mUnidentified0B;
+    /* 0x00B */ NetworkDraftSides mPlayerSides;
     /* 0x014 */ NetworkDraftMachineInfo mEntries[8];
 }; // size: 0x414
 
@@ -235,10 +235,13 @@ public:
         : mUnidentified08(0)
     {
     }
+    NetworkMessageType30(u32 value)
+        : mUnidentified08(value)
+    {
+    }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetworkMessageType30();
-    virtual int GetType();
+    virtual int GetType() { return 30; }
 
     /* 0x08 */ u32 mUnidentified08;
 };
@@ -250,10 +253,13 @@ public:
         : mUnidentified08(0)
     {
     }
+    NetworkMessageType31(u32 value)
+        : mUnidentified08(value)
+    {
+    }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetworkMessageType31();
-    virtual int GetType();
+    virtual int GetType() { return 31; }
 
     /* 0x08 */ u32 mUnidentified08;
 };

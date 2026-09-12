@@ -274,10 +274,6 @@ WaluigiWallManager_80178400::WaluigiWallManager_80178400()
     , mUnidentified058(0)
     , mUnidentified05C(false)
     , mUnidentified060(0.0f)
-    , mUnidentified064(0)
-    , mUnidentified068(0)
-    , mUnidentified06C(0)
-    , mUnidentified070(0)
 {
     {
         Function<cPlayer*> callback(fn_80179490);
@@ -352,11 +348,6 @@ WaluigiWallManager_80178400::~WaluigiWallManager_80178400()
         PhysicsBox_80177498::pool.FreeBlocks();
         lbl_806E12EC = 0;
     }
-
-    UnidentifiedDisconnectOwner(&mUnidentified070);
-    UnidentifiedDisconnectOwner(&mUnidentified06C);
-    UnidentifiedDisconnectOwner(&mUnidentified068);
-    UnidentifiedDisconnectOwner(&mUnidentified064);
 }
 
 PhysicsBox_80177498* WaluigiWallManager_80178400::fn_80178968(

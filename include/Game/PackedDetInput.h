@@ -1,12 +1,19 @@
 #ifndef GAME_PACKED_DET_INPUT_H
 #define GAME_PACKED_DET_INPUT_H
 
+#include <string.h>
+
 #include "types.h"
 
 class DetInput;
 
 struct PackedDetInput
 {
+    PackedDetInput()
+    {
+        memset(this, 0, sizeof(PackedDetInput));
+    }
+
     /* 0x00 */ u16 mButtonBitfield;
     /* 0x02 */ u8 mTriggers;
     /* 0x03 */ s8 mRemoteAccel[3];

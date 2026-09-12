@@ -161,11 +161,6 @@ extern SlotPool<cSAnimCallback> lbl_805840D8;
 extern SlotPoolBase lbl_8057AB80;
 extern bool g_e3_Build;
 
-namespace Detail
-{
-extern SlotPoolBase sTempStringAllocatorPool;
-}
-
 bool g_VerboseAudio;
 float g_fScriptBlockingWarningMS = 50.0f;
 float g_fYieldScriptBlockingTimeMS = 45.0f;
@@ -1558,8 +1553,8 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     DestroyGameTweaks(&gGameTweaks);
     fn_8013DDD4();
 
-    fn_802B467C(&Detail::sTempStringAllocatorPool);
-    SlotPoolBase::BaseFreeBlocks(&Detail::sTempStringAllocatorPool, 0x40);
+    fn_802B467C(&Detail::sTempStringAllocatorPool.allocator.pool);
+    SlotPoolBase::BaseFreeBlocks(&Detail::sTempStringAllocatorPool.allocator.pool, 0x40);
 
     FlushAudio(g_pAudioSystem, true, true);
     u32 startTick = OSGetTick();

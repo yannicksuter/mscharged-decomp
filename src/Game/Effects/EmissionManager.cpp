@@ -4,6 +4,7 @@
 #include "Game/Effects/EffectsGroup.h"
 #include "Game/Effects/ParticleSystem.h"
 #include "Game/TweakValue.h"
+#include "NL/gl/glFont.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glTexture.h"
 #include "NL/nlFile.h"
@@ -14,6 +15,7 @@
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "unclassified/tu_802B7798.h"
 
 static EffectsLight g_EffectsLights[3];
 static int g_nNumLights;
@@ -22,6 +24,20 @@ static unsigned int sResourceIdCounter;
 static const char* sDefaultResourceNames[2] = { "Default", "World" };
 
 class EffectsBundle;
+
+struct LingerMessage
+{
+    char szMessage[256];
+    int nLingers;
+    int nParticles;
+};
+
+typedef nlAVLTree<unsigned long, LingerMessage*,
+    DefaultKeyCompare<unsigned long> > LingerTree;
+typedef nlAVLTreeIterator<unsigned long, LingerMessage*,
+    DefaultKeyCompare<unsigned long> > LingerTreeIterator;
+
+static LingerTree* lingerers;
 
 class EffectsBundleManager
 {
@@ -39,6 +55,7 @@ extern void* gEffectsNonResidentData;
 extern void* lbl_806E1FF0;
 extern void* gEffectsGeometryData;
 extern void* gEffectsTextureData;
+extern int lbl_806E1FD8;
 extern nlAVLTree<unsigned long, EffectsGroup*, DefaultKeyCompare<unsigned long> > lbl_8057F6B8;
 
 void OnEffectsGeometryLoaded(
@@ -266,6 +283,11 @@ void EmissionManager::Update(float dt)
         return;
     }
 
+    MemoryAllocator* allocator = mMemoryContext;
+    AllocatorStack[AllocatorStackDepth++] = allocator;
+    CurrentAllocator = allocator;
+    lbl_806E1FD8 = 0;
+
     nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
     while (iterator.hasNext())
     {
@@ -280,6 +302,40 @@ void EmissionManager::Update(float dt)
             delete p;
         }
     }
+
+    if (lingerers != 0 && lingerers->m_Root != 0)
+    {
+        nlColour colour = { 0xFF, 0xFF, 0x40, 0xFF };
+        LingerTreeIterator* iter;
+        int y = 3;
+        glFontBegin(false);
+
+        iter = lingerers->GetIterator();
+        while (iter->IsValid())
+        {
+            LingerTree::Entry* entry = iter->Current();
+            LingerMessage* l = entry->value;
+            glFontPrintf(GetDebugFontView(), 0, y, colour,
+                "%s lingers (%d .. %d)",
+                l->szMessage, l->nLingers, l->nParticles);
+            iter->Next();
+            ++y;
+        }
+
+        if (iter != 0)
+        {
+            delete iter;
+        }
+        glFontEnd();
+        if (lingerers != 0)
+        {
+            lingerers->DeleteValues();
+        }
+    }
+
+    --AllocatorStackDepth;
+    AllocatorStack[AllocatorStackDepth] = 0;
+    CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 }
 
 /**

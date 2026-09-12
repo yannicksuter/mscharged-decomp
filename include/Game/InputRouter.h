@@ -1,10 +1,9 @@
 #ifndef GAME_NETWORK_INPUT_ROUTER_H
 #define GAME_NETWORK_INPUT_ROUTER_H
 
-#include <string.h>
-
 #include "Game/PackedDetInput.h"
 #include "Game/NetworkSession.h"
+#include "NL/CircularQueue.h"
 #include "NL/nlMemory.h"
 #include "types.h"
 #include "Game/InputManager.h"
@@ -18,15 +17,7 @@ public:
     }
 
     InputRouter()
-        : mOutgoingDetermData(mOutgoingDetermDataStorage)
-        , mOutgoingHead(0)
-        , mOutgoingCount(0)
-        , mOutgoingCapacity(10)
     {
-        for (int i = 0; i < 16; ++i)
-        {
-            memset(&mInputRecords[i], 0, sizeof(PackedDetInput));
-        }
         Reset(1);
     }
     virtual ~InputRouter();
@@ -60,11 +51,7 @@ public:
     /* 0x150 */ u32 mCurrentCRC;
     /* 0x154 */ s32 mLastGameFrame;
     /* 0x158 */ u32 mPadding158;
-    /* 0x15C */ DetermDataEvent** mOutgoingDetermData;
-    /* 0x160 */ u32 mOutgoingHead;
-    /* 0x164 */ u32 mOutgoingCount;
-    /* 0x168 */ u32 mOutgoingCapacity;
-    /* 0x16C */ DetermDataEvent* mOutgoingDetermDataStorage[10];
+    /* 0x15C */ StaticCircularQueue<DetermDataEvent*, 10> m_OutgoingCustomDetermDataQ;
     /* 0x194 */ NetworkSessionBase* mSession;
 }; // size: 0x198
 

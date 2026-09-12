@@ -16,7 +16,7 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/nlMath.h"
 #include "ode/objects.h"
-#include "unclassified/tu_80176EF4.h"
+#include "Game/Physics/PhysicsThwomp.h"
 #include "NL/gl/glTexture.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/UnidentifiedRegistryPools.h"
@@ -99,7 +99,7 @@ extern "C" ThwompObject* fn_801B298C(
     object->mDrawable = GetRenderObject(8, index);
 
     PhysicsObject* physics
-        = new PhysicsBox_80176EF4(object, 3.14f, 2.88f, 3.5f);
+        = new PhysicsThwomp(object, 3.14f, 2.88f, 3.5f);
     object->mPhysics = physics;
     physics->SetPosition(
         lbl_804DCF74, PhysicsObject::WORLD_COORDINATES);

@@ -29,6 +29,12 @@ void nlMultVectorMatrix(nlVector2& v_out, const nlVector2& v_in, const nlMatrix3
 nlMatrix4& nlInvertMatrix(nlMatrix4& out, const nlMatrix4& in);
 nlMatrix4& nlTransposeMatrix(nlMatrix4& out, const nlMatrix4& in);
 nlMatrix4& nlMultMatrices(nlMatrix4& out, const nlMatrix4& a, const nlMatrix4& b);
+inline void nlMultMatrices(nlMatrix4& a, const nlMatrix4& b)
+{
+    nlMatrix4 result;
+    nlMultMatrices(result, a, b);
+    a = result;
+}
 
 inline void nlMultVectorMatrix(nlVector3& v_out, const nlVector3& v_in, const nlMatrix3& m)
 {

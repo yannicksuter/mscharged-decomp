@@ -3,7 +3,10 @@
 
 #include "NL/MemAlloc.h"
 #include "NL/nlMemory.h"
+#include "NL/nlSmallBlockAllocator.h"
 #include "types.h"
+
+#include <cstring>
 
 
 namespace Detail
@@ -74,6 +77,19 @@ private:
 
 extern StringBlockAllocator sStringBlockAllocator;
 
+class TempStringAllocatorStorage
+{
+public:
+    struct Layer
+    {
+        TempStringAllocatorPool pool;
+    };
+
+    Layer allocator;
+};
+
+extern TempStringAllocatorStorage sTempStringAllocatorPool;
+
 class TempStringAllocator
 {
 public:
@@ -102,6 +118,42 @@ public:
     static void Free(void* ptr)
     {
         sStringBlockAllocator.Free(ptr);
+    }
+};
+
+class TempStringPoolAllocator
+{
+public:
+    enum
+    {
+        kAtEnd = false
+    };
+
+    template <typename T>
+    static T* New(int count, const char*)
+    {
+        return (T*)Alloc(count * sizeof(T));
+    }
+
+    template <typename T>
+    static void Delete(T* ptr)
+    {
+        Free(ptr);
+    }
+
+    static void* Alloc(int size)
+    {
+        void* ptr = sTempStringAllocatorPool.allocator.pool.Allocate(size + 4);
+        memcpy(ptr, &size, 4);
+        return (char*)ptr + 4;
+    }
+
+    static void Free(void* ptr)
+    {
+        unsigned long size;
+        memcpy(&size, (char*)ptr - 4, 4);
+        sTempStringAllocatorPool.allocator.pool.Free(
+            (char*)ptr - 4, size);
     }
 };
 } // namespace Detail

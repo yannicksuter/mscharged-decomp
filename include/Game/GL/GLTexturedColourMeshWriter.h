@@ -21,7 +21,12 @@ public:
 
     void Colour(const nlColour& c)
     {
-        *colour++ = *(const u32*)&c;
+        ColourPlat(*(const unsigned long*)&c);
+    }
+
+    void ColourPlat(unsigned long nColourPlat)
+    {
+        *colour++ = nColourPlat;
     }
 
     void Texcoord(const nlVector2& uv)

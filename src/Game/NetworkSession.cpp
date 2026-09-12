@@ -529,7 +529,7 @@ void NetworkSession::SendCheckConnectionToEveryone()
     for (int machine = 0; machine < mLobby->GetPlayerCount(); ++machine)
     {
         message.mProfileIds[machine] =
-            mLobby->GetMachineInfo(machine)->mUnidentified18;
+            mLobby->GetMachineInfo(machine)->mProfileId;
     }
 
     for (int machine = 0; machine < mLobby->GetPlayerCount(); ++machine)
@@ -666,18 +666,18 @@ void NetworkSession::Update()
                     TransportPlayerInfo* info =
                         mTransport->GetPlayerInfo(player);
                     nlStrToWcs(info->mName, entries[player].mName, 0xB);
-                    memset(entries[player].mUnidentified32, 0, 0x4C);
-                    entries[player].mIndex = player;
-                    entries[player].mHead.mScore = 0;
-                    entries[player].mHead.mDisplayRank = 0;
-                    entries[player].mHead.mWins = 0;
-                    entries[player].mHead.mLosses = 0;
-                    entries[player].mHead.mUnidentified14 = 0;
-                    entries[player].mHead.mDisplayRank =
+                    memset(entries[player].mMiiData, 0, 0x4C);
+                    entries[player].mMachineIndex = player;
+                    entries[player].mStats.mScore = 0;
+                    entries[player].mStats.mDisplayRank = 0;
+                    entries[player].mStats.mWins = 0;
+                    entries[player].mStats.mLosses = 0;
+                    entries[player].mStats.mUnidentified14 = 0;
+                    entries[player].mStats.mDisplayRank =
                         info->mUnidentified0C;
-                    entries[player].mHead.mWins =
+                    entries[player].mStats.mWins =
                         info->mUnidentified10;
-                    entries[player].mHead.mLosses =
+                    entries[player].mStats.mLosses =
                         info->mUnidentified12;
                 }
                 SendDraftToEveryone(mTransport->GetPlayerCount(), entries,

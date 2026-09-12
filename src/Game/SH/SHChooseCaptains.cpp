@@ -494,7 +494,7 @@ bool fn_80223D08(int pad)
         return pad == gOnlineLocalControllerIndices[0];
     }
 
-    if (NetworkDraft::Instance()->mCurrentDrafterIsLocal)
+    if (NetworkDraft::Instance()->mCurrentDrafterIsGuest)
     {
         return pad == gOnlineLocalControllerIndices[1];
     }

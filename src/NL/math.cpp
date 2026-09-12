@@ -129,7 +129,7 @@ extern "C" void fn_802B5CC0(nlVector4& out, const nlVector2& point, const nlVect
     out.w = nlVec2DotProduct(negativeNormal, point);
 }
 
-void nlMakeRotTransMatrix(
+nlMatrix4& nlMakeRotTransMatrix(
     nlMatrix4& out,
     const nlVector3& v3ForwardVector,
     const nlVector3& v3UpVector,
@@ -157,13 +157,17 @@ void nlMakeRotTransMatrix(
     nlVec3Scale(v3Right, nlRecipSqrt(nlVec3LengthSquared(v3Right), true));
     nlVec3CrossProduct(v3Up, v3Forward, v3Right);
 
-    out.SetRow4_(0, v3Forward.x, v3Forward.y, v3Forward.z, 0.0f);
-    out.SetRow4_(1, v3Right.x, v3Right.y, v3Right.z, 0.0f);
-    out.SetRow4_(2, v3Up.x, v3Up.y, v3Up.z, 0.0f);
-    out.SetRow4_(3, v3Translation.x, v3Translation.y, v3Translation.z, 1.0f);
+    out.SetRow_(0, v3Forward);
+    out.e2[0][3] = 0.0f;
+    out.SetRow_(1, v3Right);
+    out.e2[1][3] = 0.0f;
+    out.SetRow_(2, v3Up);
+    out.e2[2][3] = 0.0f;
+    out.SetTranslation(v3Translation);
+    return out;
 }
 
-void nlInvertRotTransMatrix(nlMatrix4& out, const nlMatrix4& in)
+nlMatrix4& nlInvertRotTransMatrix(nlMatrix4& out, const nlMatrix4& in)
 {
     nlVector3 negResult;
     nlVector3 translation;
@@ -185,6 +189,7 @@ void nlInvertRotTransMatrix(nlMatrix4& out, const nlMatrix4& in)
     out.e2[3][1] = negResult.y;
     out.e2[3][2] = negResult.z;
     out.e2[3][3] = 1.0f;
+    return out;
 }
 
 void RotateVector(nlVector3& result, const nlVector3& v, nlQuaternion& q)

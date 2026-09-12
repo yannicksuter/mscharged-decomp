@@ -73,7 +73,7 @@ void GXMaterialProgramImpl<GXWarbleMaterialProgram>::Deactivate()
 
 template <>
 void GXMaterialProgramImpl<GXWarbleMaterialProgram>::Prepare(
-    const glModelPacket* packet)
+    glModelPacket* packet)
 {
     glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }

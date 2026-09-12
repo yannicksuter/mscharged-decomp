@@ -48,6 +48,11 @@ inline float AngUnitsToRad_fromUnsignedShort(unsigned short sUnits)
     return (float)sUnits * 0.0000958738f;
 }
 
+inline float DegreesToRadians(float degrees)
+{
+    return 3.1415927f * degrees / 180.0f;
+}
+
 inline int DegreesToAngle(float degrees)
 {
     return (int)(65536.0f * degrees / 360.0f);
@@ -504,8 +509,8 @@ struct nlPolar
     /* 0x04 */ float r;
 }; // size: 0x8
 
-void nlInvertRotTransMatrix(nlMatrix4& out, const nlMatrix4& in);
-void nlMakeRotTransMatrix(nlMatrix4& out, const nlVector3& v3ForwardVector,
+nlMatrix4& nlInvertRotTransMatrix(nlMatrix4& out, const nlMatrix4& in);
+nlMatrix4& nlMakeRotTransMatrix(nlMatrix4& out, const nlVector3& v3ForwardVector,
     const nlVector3& v3UpVector, const nlVector3& v3AlternateUpVector,
     const nlVector3& v3Translation);
 void nlMakeRotationMatrixAxisAngle(

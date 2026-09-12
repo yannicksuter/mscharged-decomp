@@ -66,33 +66,44 @@ void StartPeachPhoto(PeachPhotoState* photo,
     float halfHeight)
 {
     photo->centre = *centre;
+    const float negativeHalfWidth = -halfWidth;
+    const float negativeHalfHeight = -halfHeight;
+    nlVector3 topLeft = { 0.0f, 0.0f, 0.0f };
+    const float cellZ = topLeft.z;
+    const nlVector3& photoCentre = photo->centre;
+    const float xStep = (float)((2.0 * halfWidth) / 3.0);
+    const float yStep = (float)((2.0 * negativeHalfHeight) / 3.0);
 
-    const float left = photo->centre.x - halfWidth;
-    const float right = photo->centre.x + halfWidth;
-    const float top = photo->centre.y + halfHeight;
-    const float bottom = photo->centre.y - halfHeight;
-    const float z = photo->centre.z;
+    const float z = photoCentre.z;
+    const float bottom = photoCentre.y + negativeHalfHeight;
+    const float right = photoCentre.x + halfWidth;
+    const float top = photoCentre.y + halfHeight;
+    const float left = photoCentre.x + negativeHalfWidth;
 
+    photo->delay = delay;
     nlVec3Set(photo->corners[0], left, bottom, z);
     nlVec3Set(photo->corners[1], right, bottom, z);
     nlVec3Set(photo->corners[2], right, top, z);
     nlVec3Set(photo->corners[3], left, top, z);
+    nlVec2Set(*(nlVector2*)&topLeft, photo->centre.x - halfWidth,
+        photo->centre.y - negativeHalfHeight);
 
-    const float xStep = (float)((2.0 * halfWidth) / 3.0);
-    const float yStep = (float)((-2.0 * halfHeight) / 3.0);
-    for (int y = 0; y < 3; ++y)
+    for (int x = 0; x < 3; ++x)
     {
-        for (int x = 0; x < 3; ++x)
+        for (int y = 0; y < 3; ++y)
         {
-            PeachPhotoCell& cell = photo->cells[y][x];
-            const float x0 = left + xStep * (float)x;
-            const float x1 = left + xStep * (float)(x + 1);
-            const float y0 = top + yStep * (float)y;
-            const float y1 = top + yStep * (float)(y + 1);
-            nlVec3Set(cell.world[0], x0, y0, 0.0f);
-            nlVec3Set(cell.world[1], x1, y0, 0.0f);
-            nlVec3Set(cell.world[2], x1, y1, 0.0f);
-            nlVec3Set(cell.world[3], x0, y1, 0.0f);
+            nlVec3Set(photo->cells[x][y].world[0],
+                topLeft.x + xStep * (float)x,
+                topLeft.y + yStep * (float)(y + 1), cellZ);
+            nlVec3Set(photo->cells[x][y].world[1],
+                topLeft.x + xStep * (float)(x + 1),
+                topLeft.y + yStep * (float)(y + 1), cellZ);
+            nlVec3Set(photo->cells[x][y].world[2],
+                topLeft.x + xStep * (float)(x + 1),
+                topLeft.y + yStep * (float)y, cellZ);
+            nlVec3Set(photo->cells[x][y].world[3],
+                topLeft.x + xStep * (float)x,
+                topLeft.y + yStep * (float)y, cellZ);
         }
     }
 
@@ -104,8 +115,8 @@ void StartPeachPhoto(PeachPhotoState* photo,
     photo->lastFrame = glGetCurrentFrame();
     photo->projected = false;
     photo->fadeTime = 0.0f;
-    photo->delay = delay;
-    GetLayerView(eCLV_Characters)->m_Target = 8;
+    RLView* view = GetLayerView(eCLV_Characters);
+    view->m_Target = 8;
 }
 
 void EndPeachPhoto(PeachPhotoState* photo, bool immediate)
@@ -183,7 +194,8 @@ void UpdatePeachPhoto(
             {
                 photo->lastFrame = currentFrame;
                 photo->textureReady = true;
-                GetLayerView(eCLV_Characters)->m_Target = 0;
+                RLView* view = GetLayerView(eCLV_Characters);
+                view->m_Target = 0;
             }
             else
             {

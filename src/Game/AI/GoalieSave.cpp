@@ -607,72 +607,26 @@ struct MyMiniData
 static inline void InsertSorted(
     nlDLListContainer<MyMiniData*>& list, MyMiniData* data)
 {
-    DLListEntry<MyMiniData*>* head;
     nlDLListIterator<MyMiniData*> iterator = list.Begin();
-    DLListEntry<MyMiniData*>* current = iterator.CurrentEntry();
-    head = iterator.m_Head;
-
-    while (current != 0)
+    while (iterator.hasNext())
     {
-        if (current->entry->dist > data->dist)
+        if ((*iterator)->dist > data->dist)
         {
-            if (nlDLRingIsStart(head, current))
+            if (iterator.IsStart())
             {
-                DLListEntry<MyMiniData*>* entry =
-                    (DLListEntry<MyMiniData*>*)nlMalloc(
-                        sizeof(DLListEntry<MyMiniData*>), 8, 0);
-                if (entry != 0)
-                {
-                    entry->m_next = 0;
-                    entry->m_prev = 0;
-                    entry->entry = data;
-                }
-                nlDLRingAddStart(&list.m_Head, entry);
+                list.AddStart(data);
                 return;
             }
 
-            if (nlDLRingIsStart(head, current))
-            {
-                head = 0;
-            }
-            else
-            {
-                head = current->m_prev;
-            }
-
-            DLListEntry<MyMiniData*>* entry =
-                (DLListEntry<MyMiniData*>*)nlMalloc(
-                    sizeof(DLListEntry<MyMiniData*>), 8, 0);
-            if (entry != 0)
-            {
-                entry->m_next = 0;
-                entry->m_prev = 0;
-                entry->entry = data;
-            }
-            nlDLRingInsert(&list.m_Head, head, entry);
+            iterator.Retreat();
+            list.AddAfter(iterator, data);
             return;
         }
 
-        if (nlDLRingIsEnd(head, current) || current == 0)
-        {
-            current = 0;
-        }
-        else
-        {
-            current = current->m_next;
-        }
+        iterator.Step();
     }
 
-    DLListEntry<MyMiniData*>* entry =
-        (DLListEntry<MyMiniData*>*)nlMalloc(
-            sizeof(DLListEntry<MyMiniData*>), 8, 0);
-    if (entry != 0)
-    {
-        entry->m_next = 0;
-        entry->m_prev = 0;
-        entry->entry = data;
-    }
-    nlDLRingAddEnd(&list.m_Head, entry);
+    list.AddEnd(data);
 }
 
 SaveData* GoalieSave::FindBestSave(SaveBlendInfo& blendInfo,
@@ -844,10 +798,10 @@ SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
                 }
 
                 {
-                    fTimeDelta = fThisTime - fTime;
-                    nlVec3ScaleAdd(v3AdjLocalPos, fTimeDelta,
+                    nlVec3ScaleAdd(v3AdjLocalPos, fThisTime - fTime,
                         v3LocalVelocity, v3LocalPos);
-                    fTimeOffsetSq = fTimeDelta * fTimeDelta;
+                    fTimeOffsetSq = (fThisTime - fTime)
+                        * (fThisTime - fTime);
                     v3AdjLocalPos.z -=
                         10.0f * fTimeOffsetSq;
                 }
@@ -877,12 +831,9 @@ SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
                 {
                     float fDistY = v3AdjLocalPos.y
                         - candidateBlendInfo.mv3BlendedSavePos.y;
-                    float fDistSq =
-                        fDistY * fDistY
-                        + (v3AdjLocalPos.z
-                              - candidateBlendInfo.mv3BlendedSavePos.z)
-                            * (v3AdjLocalPos.z
-                                - candidateBlendInfo.mv3BlendedSavePos.z);
+                    float fDistSq = nlGetLengthSquared2D(fDistY,
+                        v3AdjLocalPos.z
+                            - candidateBlendInfo.mv3BlendedSavePos.z);
 
                     if (fDistSq < fClosest)
                     {
@@ -894,11 +845,12 @@ SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
 
                             blendInfo = candidateBlendInfo;
 
+                            float fMilestoneTime =
+                                blendInfo.mfMilestoneTime[2];
                             blendInfo.mfStartTime =
-                                (0.0f
-                                    >= blendInfo.mfMilestoneTime[2] - fThisTime)
+                                (0.0f >= fMilestoneTime - fThisTime)
                                 ? 0.0f
-                                : blendInfo.mfMilestoneTime[2] - fThisTime;
+                                : fMilestoneTime - fThisTime;
 
                             if (bFromTakeoff)
                             {
@@ -1704,11 +1656,9 @@ void GoalieSave::FindVerticalBoundingPoints(SaveData* pSaveData,
 
 void GoalieSave::ClearGrid()
 {
-    int j;
-    int i;
-    for (i = 0; i < 6; ++i)
+    for (int i = 0; i < 6; ++i)
     {
-        for (j = 0; j < 4; ++j)
+        for (int j = 0; j < 4; ++j)
         {
             gSaveGrid[i][j].Clear();
         }

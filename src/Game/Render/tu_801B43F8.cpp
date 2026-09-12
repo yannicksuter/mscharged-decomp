@@ -66,7 +66,8 @@ void UnidentifiedNPC_801B43F8::Update(float fDeltaT)
     }
 
     float x = cField::GetGoalLineX(1U);
-    float y = (2.0f * cField::mv3FieldPosition.y) * 0.5f;
+    float width = 2.0f * cField::mv3FieldPosition.y;
+    float y = 0.5f * width;
     if (mv3Velocity.x > 0.0f && mv3Position.x > 2.0f * x)
     {
         fn_801B4B24(false);

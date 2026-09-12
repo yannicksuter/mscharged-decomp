@@ -340,7 +340,8 @@ void UnidentifiedStateMachine_803171D0::UnidentifiedCleanup()
 
     float start = lbl_806DF560();
     void* context = mUnidentified018->mUnidentified064->mData.pointer;
-    fn_80317EFC(fn_80311734(this), &mUnidentified090, context);
+    u32 hash = mUnidentified090;
+    fn_80317EFC(fn_80311734(this), &hash, context);
     fn_8031A0C8(start, lbl_806DF560());
 }
 

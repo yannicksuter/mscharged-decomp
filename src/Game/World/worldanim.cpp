@@ -31,7 +31,6 @@ extern "C" void fn_8030B038(cPoseAccumulator*, const cPoseNode*,
 extern "C" void fn_803438FC(WorldAnimObject_803437C8*);
 extern "C" void fn_803439A4(WorldAnimObject_803437C8*);
 extern "C" void fn_802E4358(EmissionController*);
-extern "C" float fn_802E5A68(EmissionController*);
 extern "C" EffectsGroup* fn_802E7D54(
     EmissionManager*, unsigned long);
 
@@ -653,7 +652,7 @@ void WorldEffect::Emit()
         EmissionController* pController
             = EmissionManager::Instance()->Create(pGroup,
                 1, true, 0);
-        m_fEmissionRadius = fn_802E5A68(pController);
+        m_fEmissionRadius = pController->GetBoundingRadius();
 
         nlVector3 velocity = { 0.0f, 0.0f, 0.0f };
         pController->SetVelocity(velocity);
@@ -664,24 +663,23 @@ void WorldEffect::Emit()
         pController->SetPosition(
             *(nlVector3*)&pMatrix->e2[3][0]);
         pMatrix = &((DrawableObject*)this)->GetWorldMatrix();
-        nlVector3 direction
-            = { pMatrix->e2[2][0], pMatrix->e2[2][1],
-                  pMatrix->e2[2][2] };
+        nlVector3 direction;
+        nlVec3Set(direction, pMatrix->e2[2][0], pMatrix->e2[2][1],
+            pMatrix->e2[2][2]);
         pController->SetDirection(direction);
 
         if (m_pAnimController != 0)
         {
-            Function1<void, EmissionController&> callback(
-                fn_8034470C);
-            pController->SetUpdateCallback(callback);
+            pController->SetUpdateCallback(
+                Function1<void, EmissionController&>(fn_8034470C));
+            pController->m_uUserData = (u32)this;
         }
         else
         {
-            Function1<void, EmissionController&> callback(
-                fn_80344798);
-            pController->SetUpdateCallback(callback);
+            pController->SetUpdateCallback(
+                Function1<void, EmissionController&>(fn_80344798));
+            pController->m_uUserData = (u32)this;
         }
-        pController->m_uUserData = (u32)this;
         m_nEmissionID = pController->m_Id;
     }
     else

@@ -20,7 +20,12 @@ public:
 
     void Colour(const nlColour& c)
     {
-        *colour++ = *(const u32*)&c;
+        ColourPlat(*(const unsigned long*)&c);
+    }
+
+    void ColourPlat(unsigned long nColourPlat)
+    {
+        *colour++ = nColourPlat;
     }
 
     void Colour(unsigned char r, unsigned char g, unsigned char b, unsigned char a)

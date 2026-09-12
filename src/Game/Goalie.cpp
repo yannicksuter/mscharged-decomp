@@ -121,6 +121,14 @@ cPlayer* Goalie::FindOpenPassTarget()
     return pPassTarget;
 }
 
+void Goalie::UnidentifiedVirtual1C()
+{
+    fn_80097648(-1.0f);
+    SetAnimState(5, false, 0.0f, false, false);
+    m_pCurrentAnimController->SetTime(0.0f);
+    InitMovementNone(0.0f, 0.0f);
+}
+
 Goalie::~Goalie()
 {
     GoalieSave::ClearData();

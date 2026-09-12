@@ -1,0 +1,39 @@
+#ifndef NL_GLX_GX_MEGA_DIFFUSE_MATERIAL_PROGRAM_H
+#define NL_GLX_GX_MEGA_DIFFUSE_MATERIAL_PROGRAM_H
+
+#include "NL/gl/glModel.h"
+#include "NL/glx/GXMaterialProgramBase.h"
+
+struct GXMegaDiffuseParameters
+{
+    /* 0x00 */ glTextureBinding diffuseTexture;
+    /* 0x08 */ glTextureBinding detailTexture;
+    /* 0x10 */ glTextureBinding megaTexture;
+    /* 0x18 */ const float (*skinMatrices)[3][4];
+    /* 0x1C */ unsigned long skinMatricesSize;
+    /* 0x20 */ float blendAmount;
+    /* 0x24 */ float alphaValue;
+    /* 0x28 */ float megaBlend;
+    /* 0x2C */ unsigned long shadowLevel;
+    /* 0x30 */ int lightingEnabled;
+}; // size: 0x34
+
+class GXMegaDiffuseMaterialProgram : public GXMaterialProgramImpl<GXMegaDiffuseMaterialProgram>
+{
+public:
+    GXMegaDiffuseMaterialProgram();
+    virtual ~GXMegaDiffuseMaterialProgram();
+    virtual void Configure(glModelPacket* packet);
+    virtual const GXMaterialParameter* GetParameters();
+    virtual void Initialize();
+
+    void ConfigureVertexFormat(bool indexed);
+    void BindVertexArrays(const glModelPacket* packet);
+    void BindParameters(const glModelPacket* packet);
+
+    static GXMegaDiffuseMaterialProgram* Instance;
+    static bool Initialized;
+    static GXMaterialParameter Parameters[9];
+};
+
+#endif // NL_GLX_GX_MEGA_DIFFUSE_MATERIAL_PROGRAM_H

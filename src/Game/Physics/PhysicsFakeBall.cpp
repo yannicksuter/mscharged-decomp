@@ -2,6 +2,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/Field.h"
+#include "Game/MathHelpers.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Physics/Physics.h"
 #include "Game/Physics/PhysicsAIBall.h"
@@ -134,14 +135,15 @@ void FakeBallWorld::InvalidateBallCache()
 BallCacheInfo* FakeBallWorld::AddCacheEntry(
     float fTime, PhysicsBall* pPhysicsBall)
 {
+    DLListEntry<BallCacheInfo*>* pNewEntry;
     BallCacheInfo* pNewInfo;
     BallCacheInfo::mBallCacheInfoSlotPool.AllocateForReturn(pNewInfo);
-    pNewInfo->mfTime = fTime;
-    pNewInfo->mv3Position = pPhysicsBall->GetPosition();
-    pNewInfo->mv3LinearVelocity = pPhysicsBall->GetLinearVelocity();
+    pNewInfo->mfTime = FakeBallWorld::mfLastCacheTime;
+    pNewInfo->mv3Position = ((PhysicsObject*)pPhysicsBall)->GetPosition();
+    pNewInfo->mv3LinearVelocity
+        = ((PhysicsObject*)pPhysicsBall)->GetLinearVelocity();
 
-    DLListEntry<BallCacheInfo*>* pNewEntry
-        = mBallCacheList.m_Allocator.Allocate();
+    pNewEntry = mBallCacheList.m_Allocator.Allocate();
     if (pNewEntry != 0)
     {
         pNewEntry->m_next = 0;
@@ -149,27 +151,39 @@ BallCacheInfo* FakeBallWorld::AddCacheEntry(
         pNewEntry->entry = pNewInfo;
     }
     nlDLRingAddEnd(&mBallCacheList.m_Head, pNewEntry);
+
+    float fUnidentified0 = (float)fabs(pPhysicsBall->GetPosition().x);
+    float fUnidentified1
+        = cField::GetGoalLineX(1U) - pPhysicsBall->GetRadius();
+    if (fUnidentified0 >= fUnidentified1)
+    {
+        mpPredictWorld->mUnidentified1D = true;
+    }
+
     return pNewInfo;
 }
 
 bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
     nlVector3& v3Position, nlVector3& v3Velocity)
 {
-    cBall* pBall = mpPredictWorld->GetBall();
+    FakeBallWorld* predictWorld = mpPredictWorld;
+    cBall* pBall = predictWorld->GetBall();
     if (pBall->m_pOwner != 0)
     {
         v3Position = pBall->m_v3Position;
-        v3Velocity = pBall->m_pOwner->mUnidentified024.m_v3Velocity;
+        v3Velocity
+            = predictWorld->mpBall->m_pOwner->mUnidentified024.m_v3Velocity;
         return false;
     }
 
+    float fSimTime;
     float fPhysicsTick = FixedUpdateTask::GetPhysicsUpdateTick();
-    float fSimTime = GetFixedUpdateTask()->mSimulationTime;
+    fSimTime = GetFixedUpdateTask()->mSimulationTime;
     if (mfLastCacheTime < fSimTime)
     {
         ClearBallCache();
     }
-    else if (mBallCacheList.m_Head != 0)
+    else if (!mBallCacheList.IsEmpty())
     {
         BallCacheInfo* pLast = 0;
         nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
@@ -195,10 +209,9 @@ bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
                     pCur = pLast;
                 }
 
-                float distSq = nlGetLengthSquared3D(
-                    pCur->mv3Position.x - pBall->m_v3Position.x,
-                    pCur->mv3Position.y - pBall->m_v3Position.y,
-                    pCur->mv3Position.z - pBall->m_v3Position.z);
+                float distSq = CalculateDistanceSquared(
+                    pCur->mv3Position,
+                    mpPredictWorld->mpBall->m_v3Position);
                 if (!(distSq > 0.0025f))
                 {
                     break;
@@ -210,22 +223,24 @@ bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
     }
 
     float fTargetTime = fSimTime + fDeltaTime;
-    while (mfLastCacheTime < fTargetTime)
+    if (mfLastCacheTime < fTargetTime)
     {
-        if (mfLastCacheTime < fSimTime)
+        while (mfLastCacheTime < fTargetTime)
         {
-            mpPredictWorld->mbHitSuccess = false;
-            mpPredictWorld->mUnidentified1D = false;
-            mpPredictWorld->mpPhysicsBall->CloneBall(
-                *mpPredictWorld->mpBall->m_pPhysicsBall);
-            mfLastCacheTime = fSimTime;
+            if (mfLastCacheTime < fSimTime)
+            {
+                mpPredictWorld->mpPhysicsBall->CloneBall(
+                    *mpPredictWorld->mpBall->m_pPhysicsBall);
+                mfLastCacheTime = fSimTime;
+            }
+            else
+            {
+                PhysicsUpdate(mpPredictWorld->mpPhysicsWorld, fPhysicsTick);
+                mfLastCacheTime += fPhysicsTick;
+            }
+            AddCacheEntry(mfLastCacheTime,
+                (PhysicsBall*)mpPredictWorld->mpPhysicsBall);
         }
-        else
-        {
-            PhysicsUpdate(mpPredictWorld->mpPhysicsWorld, fPhysicsTick);
-            mfLastCacheTime += fPhysicsTick;
-        }
-        AddCacheEntry(mfLastCacheTime, mpPredictWorld->mpPhysicsBall);
     }
 
     float overshoot = mfLastCacheTime - fTargetTime;
@@ -236,7 +251,8 @@ bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
         nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
         pNext = *iter;
         pPrev = pNext;
-        while (!iter.IsEnd() && pNext->mfTime < fTargetTime)
+        while (!nlDLRingIsEnd(iter.m_Head, iter.m_Curr)
+               && pNext->mfTime < fTargetTime)
         {
             pPrev = pNext;
             iter.next();
@@ -245,17 +261,14 @@ bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
     }
     else
     {
-        DLListEntry<BallCacheInfo*>* pEntry
-            = nlDLRingGetEnd(mBallCacheList.m_Head);
-        nlDLListIterator<BallCacheInfo*> iter(
-            mBallCacheList.m_Head, pEntry);
+        nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.End();
         pNext = *iter;
         pPrev = pNext;
         while (!nlDLRingIsStart(iter.m_Head, iter.m_Curr)
                && pPrev->mfTime >= fTargetTime)
         {
             pNext = pPrev;
-            iter.m_Curr = iter.m_Curr->m_prev;
+            iter.Retreat();
             pPrev = *iter;
         }
     }
@@ -312,75 +325,129 @@ float FakeBallWorld::GetPredictedPlaneIntersectTime(
         return -2.5f;
     }
 
-    float fSimulationTime = GetFixedUpdateTask()->mSimulationTime;
+    float fSimulationTime;
     float fPhysicsTick = FixedUpdateTask::GetPhysicsUpdateTick();
-    nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
-    BallCacheInfo* pNext = *iter;
-    float fDistanceNext = pNext->mv3Position.x * v4Plane.x
-                        + pNext->mv3Position.y * v4Plane.y
-                        + pNext->mv3Position.z * v4Plane.z - v4Plane.w;
+    fSimulationTime = GetFixedUpdateTask()->mSimulationTime;
 
-    while (!iter.IsEnd())
+    if (!mBallCacheList.IsEmpty())
     {
-        BallCacheInfo* pPrev = pNext;
-        float fDistancePrev = fDistanceNext;
-        iter.next();
-        pNext = *iter;
-        fDistanceNext = pNext->mv3Position.x * v4Plane.x
-                      + pNext->mv3Position.y * v4Plane.y
-                      + pNext->mv3Position.z * v4Plane.z - v4Plane.w;
-        if (fDistanceNext < 0.0f)
+        nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
+        BallCacheInfo* pPrev;
+        BallCacheInfo* pNext = *iter;
+
+        float fDistanceNext = pNext->mv3Position.x * v4Plane.x
+                            + pNext->mv3Position.y * v4Plane.y
+                            + pNext->mv3Position.z * v4Plane.z
+                            - v4Plane.w;
+
+        while (!nlDLRingIsEnd(iter.m_Head, iter.m_Curr))
         {
-            float fPercent
-                = fDistancePrev / (fDistancePrev - fDistanceNext);
-            nlVecLerp(v3ContactPoint,
-                pPrev->mv3Position,
-                pNext->mv3Position,
-                fPercent);
-            nlVecLerp(v3ContactVelocity, pPrev->mv3LinearVelocity, pNext->mv3LinearVelocity, fPercent);
-            return Interpolate(
-                       pPrev->mfTime, pNext->mfTime, fPercent)
-                 - fSimulationTime;
-        }
-        if (fDistanceNext >= fDistancePrev)
-        {
-            v3ContactPoint = pPrev->mv3Position;
-            v3ContactVelocity = pPrev->mv3LinearVelocity;
-            return -3.0f;
+            iter.next();
+            pPrev = pNext;
+            pNext = *iter;
+            float fDistancePrev = fDistanceNext;
+
+            float fDistanceNew = pNext->mv3Position.x * v4Plane.x
+                               + pNext->mv3Position.y * v4Plane.y
+                               + pNext->mv3Position.z * v4Plane.z
+                               - v4Plane.w;
+            fDistanceNext = fDistanceNew;
+
+            if (fDistanceNew < 0.0f)
+            {
+                float fPercent
+                    = fDistancePrev / (fDistancePrev - fDistanceNew);
+                float fTime
+                    = Interpolate(pPrev->mfTime, pNext->mfTime, fPercent)
+                    - fSimulationTime;
+
+                float fInvPercent = 1.0f - fPercent;
+                v3ContactPoint.x = fInvPercent * pPrev->mv3Position.x
+                                 + fPercent * pNext->mv3Position.x;
+                v3ContactPoint.y = fInvPercent * pPrev->mv3Position.y
+                                 + fPercent * pNext->mv3Position.y;
+                v3ContactPoint.z = fInvPercent * pPrev->mv3Position.z
+                                 + fPercent * pNext->mv3Position.z;
+                v3ContactVelocity.x
+                    = fInvPercent * pPrev->mv3LinearVelocity.x
+                    + fPercent * pNext->mv3LinearVelocity.x;
+                v3ContactVelocity.y
+                    = fInvPercent * pPrev->mv3LinearVelocity.y
+                    + fPercent * pNext->mv3LinearVelocity.y;
+                v3ContactVelocity.z
+                    = fInvPercent * pPrev->mv3LinearVelocity.z
+                    + fPercent * pNext->mv3LinearVelocity.z;
+
+                return fTime;
+            }
+
+            if (fDistanceNew >= fDistancePrev)
+            {
+                v3ContactPoint = pPrev->mv3Position;
+                v3ContactVelocity = pPrev->mv3LinearVelocity;
+                return -3.0f;
+            }
         }
     }
 
-    BallCacheInfo* pCurCache
-        = nlDLRingGetEnd(mBallCacheList.m_Head)->entry;
+    BallCacheInfo* pLastCache;
+    nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.End();
+    BallCacheInfo* pCurCache = *iter;
+
     float fDistanceCur = pCurCache->mv3Position.x * v4Plane.x
                        + pCurCache->mv3Position.y * v4Plane.y
-                       + pCurCache->mv3Position.z * v4Plane.z - v4Plane.w;
-    float fMaxTime = fSimulationTime + 6.0f;
-    while (mfLastCacheTime < fMaxTime)
+                       + pCurCache->mv3Position.z * v4Plane.z
+                       - v4Plane.w;
+
+    while (mfLastCacheTime < 6.0f + fSimulationTime)
     {
-        BallCacheInfo* pLastCache = pCurCache;
+        pLastCache = pCurCache;
         float fDistanceLast = fDistanceCur;
+
         PhysicsUpdate(mpPredictWorld->mpPhysicsWorld, fPhysicsTick);
+
         mfLastCacheTime += fPhysicsTick;
-        pCurCache = AddCacheEntry(
-            mfLastCacheTime, mpPredictWorld->mpPhysicsBall);
-        fDistanceCur = pCurCache->mv3Position.x * v4Plane.x
-                     + pCurCache->mv3Position.y * v4Plane.y
-                     + pCurCache->mv3Position.z * v4Plane.z - v4Plane.w;
-        if (fDistanceCur < 0.0f)
+        BallCacheInfo* pNewInfo = AddCacheEntry(
+            mfLastCacheTime, (PhysicsBall*)mpPredictWorld->mpPhysicsBall);
+
+        pCurCache = pNewInfo;
+
+        float fDistanceNewCache
+            = pNewInfo->mv3Position.x * v4Plane.x
+            + pNewInfo->mv3Position.y * v4Plane.y
+            + pNewInfo->mv3Position.z * v4Plane.z - v4Plane.w;
+        fDistanceCur = fDistanceNewCache;
+
+        if (fDistanceNewCache < 0.0f)
         {
             float fPercent
-                = fDistanceLast / (fDistanceLast - fDistanceCur);
-            nlVecLerp(v3ContactPoint, pLastCache->mv3Position, pCurCache->mv3Position, fPercent);
-            nlVecLerp(v3ContactVelocity,
-                pLastCache->mv3LinearVelocity,
-                pCurCache->mv3LinearVelocity,
-                fPercent);
-            return Interpolate(
-                       pLastCache->mfTime, pCurCache->mfTime, fPercent)
-                 - fSimulationTime;
+                = fDistanceLast / (fDistanceLast - fDistanceNewCache);
+            float fTime
+                = Interpolate(
+                      pLastCache->mfTime, pNewInfo->mfTime, fPercent)
+                - fSimulationTime;
+
+            float fInvPercent = 1.0f - fPercent;
+            v3ContactPoint.x = fInvPercent * pLastCache->mv3Position.x
+                             + fPercent * pNewInfo->mv3Position.x;
+            v3ContactPoint.y = fInvPercent * pLastCache->mv3Position.y
+                             + fPercent * pNewInfo->mv3Position.y;
+            v3ContactPoint.z = fInvPercent * pLastCache->mv3Position.z
+                             + fPercent * pNewInfo->mv3Position.z;
+            v3ContactVelocity.x
+                = fInvPercent * pLastCache->mv3LinearVelocity.x
+                + fPercent * pNewInfo->mv3LinearVelocity.x;
+            v3ContactVelocity.y
+                = fInvPercent * pLastCache->mv3LinearVelocity.y
+                + fPercent * pNewInfo->mv3LinearVelocity.y;
+            v3ContactVelocity.z
+                = fInvPercent * pLastCache->mv3LinearVelocity.z
+                + fPercent * pNewInfo->mv3LinearVelocity.z;
+
+            return fTime;
         }
-        if (fDistanceCur >= fDistanceLast)
+
+        if (fDistanceNewCache >= fDistanceLast)
         {
             v3ContactPoint = pLastCache->mv3Position;
             v3ContactVelocity = pLastCache->mv3LinearVelocity;
@@ -603,14 +670,6 @@ void FakeBallWorld::GetNextBallPosition(nlVector3& v3BallPos)
     mfLastCacheTime += fPhysicsTick;
     BallCacheInfo* newInfo
         = AddCacheEntry(mfLastCacheTime, mpPredictWorld->mpPhysicsBall);
-
-    float fUnidentified0 = (float)fabs(newInfo->mv3Position.x);
-    float fUnidentified1 = cField::GetGoalLineX(1U)
-                         - mpPredictWorld->mpPhysicsBall->GetRadius();
-    if (fUnidentified0 >= fUnidentified1)
-    {
-        mpPredictWorld->mUnidentified1D = true;
-    }
     v3BallPos = newInfo->mv3Position;
 }
 

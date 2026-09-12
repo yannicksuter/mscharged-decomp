@@ -37,6 +37,7 @@ bool FinishLoadStadiumEffects();
 void DestroyStadium();
 void UpdateStadium(float fDeltaT);
 bool IsStadiumWorldLoaded();
+float GetStadiumTime();
 
 void BeginLoadTournamentTrophy();
 bool IsTournamentTrophyLoaded();
@@ -44,6 +45,7 @@ void FinishLoadTournamentTrophy();
 
 DrawableObject* FindStadiumDrawableObject(unsigned long uHashID);
 DrawableObject* GetBallRenderObject(unsigned int index);
+DrawableObject** GetNumberRenderObjects();
 bool ShouldLoadStadiumModel(const StadiumModelEntry* entry);
 bool CreateStadiumModelInstances(int index, glModel* models, unsigned long numModels);
 bool CreatePowerupDrawables(glModel* models, unsigned long numModels);

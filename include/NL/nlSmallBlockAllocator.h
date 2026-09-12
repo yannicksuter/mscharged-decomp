@@ -6,7 +6,6 @@
 #include "NL/nlSlotPool.h"
 #include "NL/nlPrint.h"
 
-
 template <int kBlockSize>
 class nlSlotPoolFixed : public SlotPoolBase
 {
@@ -241,5 +240,179 @@ public:
     int m_Unidentified;
     int m_MaxBlockSize;
 };
+
+namespace Detail
+{
+struct SavedSlotPool
+{
+    SavedSlotPool()
+        : blockList(0)
+        , freeList(0)
+    {
+    }
+
+    SlotPoolBlock* blockList;
+    SlotPoolEntry* freeList;
+};
+
+class TempStringSlotPool : public SlotPoolBase
+{
+public:
+    TempStringSlotPool()
+        : SlotPoolBase()
+    {
+    }
+
+    ~TempStringSlotPool()
+    {
+        fn_802B467C(this);
+        BaseFreeBlocks(this, 0x40);
+    }
+};
+
+class TempStringAllocatorPool : public TempStringSlotPool
+{
+public:
+    TempStringAllocatorPool()
+        : TempStringSlotPool()
+        , mDepth(0)
+    {
+        m_Delta = 0x10;
+        m_Initial = 0x10;
+        if (m_Initial == 0)
+        {
+            BaseAddNewBlock(this, 0x40);
+        }
+
+        mMaxAllocationSize = 0x40;
+        if (mMaxAllocationSize < 0x8000)
+        {
+            mMaxAllocationSize = 0x8000;
+        }
+        if (mMaxAllocationSize < 1)
+        {
+            mMaxAllocationSize = 1;
+        }
+        if (mMaxAllocationSize < 1)
+        {
+            mMaxAllocationSize = 1;
+        }
+    }
+
+    ~TempStringAllocatorPool()
+    {
+        while (mDepth > 0)
+        {
+            fn_802B467C(this);
+            BaseFreeBlocks(this, 0x40);
+            fn_802B467C(this);
+
+            SavedSlotPool& saved = mSavedPools[mDepth - 1];
+            m_BlockList = saved.blockList;
+            m_FreeList = saved.freeList;
+            saved.blockList = 0;
+            saved.freeList = 0;
+            --mDepth;
+        }
+    }
+
+    void PushState()
+    {
+        SavedSlotPool& saved = mSavedPools[mDepth];
+        saved.blockList = m_BlockList;
+        saved.freeList = m_FreeList;
+        ++mDepth;
+        m_BlockList = 0;
+        m_FreeList = 0;
+    }
+
+    void* Allocate(unsigned long size)
+    {
+        void* result = 0;
+        if (size <= 0x40)
+        {
+            if (m_FreeList == 0)
+            {
+                BaseAddNewBlock(this, 0x40);
+            }
+            if (m_FreeList != 0)
+            {
+                result = m_FreeList;
+                m_FreeList = m_FreeList->next;
+            }
+        }
+        else if (size <= 0x8000)
+        {
+            result = nlMalloc(0x8000, 8, false);
+        }
+        else if (size <= 1)
+        {
+            result = 0;
+        }
+        else if (size <= 1)
+        {
+            result = 0;
+        }
+        else
+        {
+            nlPrintf("SBA %s: Trying to alloc %d bytes, blocks are %d %d %d %d\n",
+                __FILE__,
+                size,
+                0x40,
+                0x8000,
+                1,
+                1);
+            result = 0;
+        }
+        if (result == 0)
+        {
+            nlPrintf("SBA %s: Allocator returned NULL for size %d, blocks are %d %d %d %d\n",
+                __FILE__,
+                size,
+                0x40,
+                0x8000,
+                1,
+                1);
+        }
+        return result;
+    }
+
+    void Free(void* ptr, unsigned long size)
+    {
+        if (size <= 0x40)
+        {
+            SlotPoolEntry* slot = (SlotPoolEntry*)ptr;
+            slot->next = m_FreeList;
+            m_FreeList = slot;
+        }
+        else if (size <= 0x8000)
+        {
+            nlFree(ptr);
+        }
+        else if (size <= 1)
+        {
+        }
+        else if (size <= 1)
+        {
+        }
+        else
+        {
+            nlPrintf("SBA %s: Trying to free %d bytes, blocks are %d %d %d %d\n",
+                __FILE__,
+                size,
+                0x40,
+                0x8000,
+                1,
+                1);
+        }
+    }
+
+private:
+    SavedSlotPool mSavedPools[5];
+    int mDepth;
+    u32 mUnused;
+    int mMaxAllocationSize;
+};
+} // namespace Detail
 
 #endif // NL_SMALL_BLOCK_ALLOCATOR_H

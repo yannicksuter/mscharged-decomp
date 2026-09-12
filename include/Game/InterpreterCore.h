@@ -3,6 +3,18 @@
 
 #include "types.h"
 
+struct UnidentifiedFunctionHash_8027F9CC
+{
+    UnidentifiedFunctionHash_8027F9CC(unsigned int hash)
+        : unknown_0x00(hash)
+    {
+    }
+
+    operator unsigned int() const { return unknown_0x00; }
+
+    unsigned int unknown_0x00;
+};
+
 struct FunctionEntryPoint
 {
     /* 0x00 */ u32 hash;
@@ -44,7 +56,7 @@ public:
     InterpreterCore(unsigned int size);
     virtual ~InterpreterCore();
     virtual void DoFunctionCall(unsigned int) = 0;
-    virtual bool ExecuteFunction(FunctionEntryPoint*, unsigned int, u32, u32, u32, u32);
+    virtual bool ExecuteFunction(FunctionEntryPoint*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 
     void LoadByteCode(void* data);
     void Reset();
@@ -57,7 +69,7 @@ public:
     void AllocateTweaks(unsigned int count);
     void RegisterTweak(unsigned int index, unsigned int type, const char* name, unsigned char flags,
         unsigned int value0, unsigned int value1, unsigned int value2, unsigned int value3);
-    void CallFunction(unsigned int hash)
+    void CallFunction(UnidentifiedFunctionHash_8027F9CC hash)
     {
         FunctionEntryPoint* fnc_ptr = FindFunctionEntryPoint(hash);
         ExecuteFunction(fnc_ptr, 0, 0, 0, 0, 0);
@@ -71,7 +83,7 @@ public:
     void StopWithoutUndo();
     void StopWithUndo();
     void Step();
-    bool FunctionExists(unsigned int hash)
+    bool FunctionExists(UnidentifiedFunctionHash_8027F9CC hash)
     {
         return FindFunctionEntryPoint(hash) != 0;
     }

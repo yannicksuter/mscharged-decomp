@@ -425,21 +425,23 @@ extern "C" void fn_803198F4(UnidentifiedScriptMachine* machine)
     machine->UnidentifiedVirtual6();
 }
 
+extern "C" shdStateMachine* fn_80319FC0(UnidentifiedScriptMachine*, int);
+extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
+
 extern "C" void fn_80319904(
     UnidentifiedScriptMachine* machine, shdStateMachine* state)
 {
-    if (machine->mUnidentified004 == state)
+    if (state == machine->mUnidentified004)
     {
         machine->UnidentifiedVirtual6();
         return;
     }
 
     int index = state->mUnidentifiedState;
-    if (index >= 0 && index < machine->mUnidentified074
-        && machine->mUnidentified070[index] == state
+    if (fn_80319FC0(machine, index) == state
         && state->UnidentifiedIsActive())
     {
-        fn_80316980(state, true);
+        fn_80319E58(machine, index);
     }
 }
 

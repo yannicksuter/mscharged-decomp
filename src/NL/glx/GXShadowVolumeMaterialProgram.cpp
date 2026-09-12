@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
-#include "NL/glx/GXMaterialProgram.h"
+#include "NL/glx/GXShadowVolumeMaterialProgram.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/gl/glLoadModel.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -9,7 +10,7 @@ GXShadowVolumeMaterialProgram* GXShadowVolumeMaterialProgram::Instance;
 bool GXShadowVolumeMaterialProgram::Initialized;
 
 GXMaterialParameter GXShadowVolumeMaterialProgram::Parameters[2] = {
-    { 0x69F44DC5, 0x01010103, 0 },
+    { 0x69F44DC5, 0x01010103, 0 }, // NLG_DIFFUSE
     { 0x4035762A, 0x01010102, 8 },
 };
 
@@ -68,22 +69,22 @@ void GXShadowVolumeMaterialProgram::BindVertexArrays(const glModelPacket* packet
 
 void GXShadowVolumeMaterialProgram::DrawIndexed(const glModelPacket* packet)
 {
-    unsigned short* idxPtr = packet->indexBuffer;
-    unsigned short* end = idxPtr + packet->numVertices;
-    GXBegin(UnidentifiedGetPrimitiveType((unsigned char)packet->primType), GX_VTXFMT0, (unsigned short)packet->numVertices);
+    unsigned short* index = packet->indexBuffer;
+    unsigned short* end = index + packet->numVertices;
+    GXBegin(glxGetPrimitiveType((unsigned char)packet->primType), GX_VTXFMT0, (unsigned short)packet->numVertices);
 
-    while (idxPtr < end)
+    while (index < end)
     {
-        WGPIPE.us = *idxPtr;
-        WGPIPE.us = *idxPtr;
-        WGPIPE.us = *idxPtr;
-        ++idxPtr;
+        WGPIPE.us = *index;
+        WGPIPE.us = *index;
+        WGPIPE.us = *index;
+        ++index;
     }
 }
 
 void GXShadowVolumeMaterialProgram::DrawDirect(const glModelPacket* packet)
 {
-    GXBegin(UnidentifiedGetPrimitiveType((unsigned char)packet->primType), GX_VTXFMT0, packet->numUniqueVertices);
+    GXBegin(glxGetPrimitiveType((unsigned char)packet->primType), GX_VTXFMT0, packet->numUniqueVertices);
 
     for (unsigned short i = 0; i < packet->numUniqueVertices; ++i)
     {
@@ -95,7 +96,7 @@ void GXShadowVolumeMaterialProgram::DrawDirect(const glModelPacket* packet)
 
 void GXShadowVolumeMaterialProgram::BindParameters(const glModelPacket* packet)
 {
-    glx_BindTexture(0, (glTextureBinding*)(packet->materialParameters));
+    glx_BindTexture(0, &static_cast<GXShadowVolumeParameters*>(packet->materialParameters)->diffuseTexture);
 }
 
 const GXMaterialParameter* GXShadowVolumeMaterialProgram::GetParameters()

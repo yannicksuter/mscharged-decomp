@@ -10,6 +10,8 @@
 
 struct nlColour;
 class FontCharString;
+template <typename CharT, typename Allocator>
+class BasicString;
 
 struct TextMetrics
 {
@@ -96,6 +98,9 @@ public:
     };
 
     unsigned long GetStringWidth(const FontCharString& Text, bool SingleLine, unsigned long Width, bool WordWrap) const;
+    unsigned long GetStringWidth(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, bool SingleLine, unsigned long Width, bool WordWrap) const;
+    unsigned long fn_80305278(const FontCharString& Text, unsigned long Width, bool WordWrap) const;
+    unsigned long fn_80305278(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, unsigned long Width, bool WordWrap) const;
     unsigned long GetCharWidth(unsigned short FontChar, unsigned short PrevFontChar) const;
     void DisableScissorBox() const;
     void SetScissorBox(const ScissorBox& other) const;

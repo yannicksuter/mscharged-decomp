@@ -141,6 +141,10 @@ bool IsWidescreen();
 
 extern const nlMatrix4 sIdentityMatrix;
 
+void fn_80273144(const nlMatrix4& view, const nlMatrix4& pipView, float aspect,
+    float fov, float pipAspect, float pipFov);
+void fn_80273A30(eCLV layer);
+
 void rlSetWidescreen(bool widescreen);
 bool IsWidescreen();
 

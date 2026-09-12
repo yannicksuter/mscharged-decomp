@@ -570,8 +570,8 @@ void dxQuickStepper(dxWorld* world, dxBody* const* body, int nb,
         int tag = 0;
         if (nb > 0)
         {
-            for (; tag != nb; tag++, bp++)
-                (*bp)->tag = tag;
+            for (; tag < nb; bp++)
+                (*bp)->tag = tag++;
         }
     }
 

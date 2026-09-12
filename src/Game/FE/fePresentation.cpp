@@ -19,10 +19,8 @@ void FEPresentation::Update(float deltaTime)
 {
     if (m_currentSlide != 0)
     {
-        f32 end;
         m_fadeDuration += deltaTime;
-        end = m_currentSlide->m_duration;
-        end += m_currentSlide->m_start;
+        f32 end = m_currentSlide->GetStartTime() + m_currentSlide->GetDuration();
         if (m_fadeDuration > end)
         {
             switch (m_currentSlide->m_uPlayMode)
@@ -33,6 +31,7 @@ void FEPresentation::Update(float deltaTime)
             case TLPM_STOP_AT_END:
                 m_fadeDuration = end;
                 break;
+            case 2:
             default:
                 break;
             }

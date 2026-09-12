@@ -3,7 +3,7 @@
 
 #include <revolution/gx/GXTypes.h>
 
-inline GXPrimitive UnidentifiedGetPrimitiveType(unsigned char primType)
+inline GXPrimitive glxGetPrimitiveType(unsigned char primType)
 {
     static GXPrimitive primitives[6] = {
         GX_TRIANGLES, GX_TRIANGLESTRIP, GX_TRIANGLEFAN, GX_QUADS, GX_LINES, GX_LINESTRIP

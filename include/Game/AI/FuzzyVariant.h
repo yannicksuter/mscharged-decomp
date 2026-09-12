@@ -269,29 +269,9 @@ inline void UnidentifiedActionQueue::operator delete(void* entry)
 inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
     const UnidentifiedVariant_80054AB8& other)
     : FuzzyVariant(other)
+    , mTemporary(false)
 {
-    for (int i = 0; i < 19; i++)
-    {
-        if (other.ExtraData.IsSet(i))
-        {
-            if (ExtraData.mData[i] == 0)
-            {
-                ExtraData.mData[i] = new (lbl_80584200.Allocate())
-                    UnidentifiedFuzzyVariantData(
-                        i, FuzzyVariant(*other.ExtraData.mData[i]));
-            }
-            else
-            {
-                *ExtraData.mData[i] = *other.ExtraData.mData[i];
-            }
-        }
-        else if (ExtraData.IsSet(i))
-        {
-            ExtraData.Remove(i);
-        }
-    }
-
-    mTemporary = false;
+    ExtraData = other.ExtraData;
 }
 
 inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(

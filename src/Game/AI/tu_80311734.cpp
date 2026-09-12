@@ -1,5 +1,6 @@
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/AI/FielderInput.h"
+#include "Game/AI/Scripts/ScriptCaching.h"
 
 #include "Game/AI/Desire.h"
 #include "Game/AI/UnidentifiedStringHash.h"
@@ -71,8 +72,7 @@ char lbl_806DF598[] = "%f";
 
 void* lbl_806E20A0;
 UnidentifiedFuzzyRuntimeList lbl_806E20A8(0, 0);
-nlAVLTreeSlotPool<unsigned long, UnidentifiedVariant_80054AB8,
-    DefaultKeyCompare<unsigned long> > lbl_805842EC(16, 16);
+ScriptQuestionCache lbl_805842EC;
 UnidentifiedRuntimeTypeList lbl_806E20B0;
 SlotPool<UnidentifiedRuntimeActionQueue> lbl_80584328(16, 16);
 
@@ -130,7 +130,7 @@ UnidentifiedFuzzyRuntimeBase::~UnidentifiedFuzzyRuntimeBase()
         lbl_806E20A0 = 0;
 
         lbl_805842EC.Clear();
-        lbl_805842EC.m_Allocator.FreeBlocks();
+        lbl_805842EC.mQuestionCacheMap.m_Allocator.FreeBlocks();
         lbl_80584200.FreeBlocks();
         lbl_80584228.FreeBlocks();
         lbl_80584328.FreeBlocks();

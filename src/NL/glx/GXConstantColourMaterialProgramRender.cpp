@@ -38,7 +38,7 @@ void GXMaterialProgramImpl<GXConstantColourMaterialProgram>::Deactivate()
 
 template <>
 void GXMaterialProgramImpl<GXConstantColourMaterialProgram>::Prepare(
-    const glModelPacket* packet)
+    glModelPacket* packet)
 {
     glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
 }

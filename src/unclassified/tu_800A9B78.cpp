@@ -514,11 +514,16 @@ void UnidentifiedWeatherExtendedStateA::fn_800AA7C4(bool value)
 
 UnidentifiedWeatherExtendedStateB::UnidentifiedWeatherExtendedStateB()
 {
+    typedef Detail::MemFunImpl<void, void (UnidentifiedWeatherExtendedStateB::*)()> MemFunImpl_UnidentifiedWeatherExtendedStateB_v;
+    typedef BindExp1<void, MemFunImpl_UnidentifiedWeatherExtendedStateB_v, UnidentifiedWeatherExtendedStateB*>
+        BindExp1_UnidentifiedWeatherExtendedStateB_v;
     field04 = 2;
     fn_800AA8C8();
-    Function<FnVoidVoid> callback(Bind<void>(MemFun(&UnidentifiedWeatherExtendedStateB::fn_800AB1F4), this));
+    Function<FnVoidVoid> callback(BindExp1_UnidentifiedWeatherExtendedStateB_v(
+        MemFun(&UnidentifiedWeatherExtendedStateB::fn_800AB1F4), this));
+    EventRegistryValue* foundEvent;
     unsigned int hash = HashEventName("GetReadyForKickoff", -1);
-    EventRegistryValue* foundEvent = 0;
+    foundEvent = 0;
     g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event = foundEvent != 0 ? foundEvent->event : 0;
     ((UnidentifiedTypedEvent<UnidentifiedEventNoData>*)event)->Add(callback, 0, -1);
@@ -703,9 +708,13 @@ void UnidentifiedWeatherExtendedStateB::fn_800AA6A8()
 
 UnidentifiedWeatherExtendedStateC::UnidentifiedWeatherExtendedStateC()
 {
+    typedef Detail::MemFunImpl<void, void (UnidentifiedWeatherExtendedStateC::*)()> MemFunImpl_UnidentifiedWeatherExtendedStateC_v;
+    typedef BindExp1<void, MemFunImpl_UnidentifiedWeatherExtendedStateC_v, UnidentifiedWeatherExtendedStateC*>
+        BindExp1_UnidentifiedWeatherExtendedStateC_v;
     field04 = 4;
     {
-        Function<FnVoidVoid> callback(Bind<void>(MemFun(&UnidentifiedWeatherExtendedStateC::fn_800AC6D8), this));
+        Function<FnVoidVoid> callback(BindExp1_UnidentifiedWeatherExtendedStateC_v(
+            MemFun(&UnidentifiedWeatherExtendedStateC::fn_800AC6D8), this));
         EventRegistryValue* foundEvent;
         unsigned int hash = HashEventName("GetReadyForKickoff", -1);
         foundEvent = 0;
@@ -714,7 +723,8 @@ UnidentifiedWeatherExtendedStateC::UnidentifiedWeatherExtendedStateC()
         ((UnidentifiedTypedEvent<UnidentifiedEventNoData>*)event)->Add(callback, 0, -1);
     }
     {
-        Function<FnVoidVoid> callback(Bind<void>(MemFun(&UnidentifiedWeatherExtendedStateC::fn_800AC8A4), this));
+        Function<FnVoidVoid> callback(BindExp1_UnidentifiedWeatherExtendedStateC_v(
+            MemFun(&UnidentifiedWeatherExtendedStateC::fn_800AC8A4), this));
         EventRegistryValue* foundEvent;
         unsigned int hash = HashEventName("Kickoff", -1);
         foundEvent = 0;
@@ -1473,9 +1483,13 @@ void UnidentifiedWeatherExtendedStateE::fn_800AA6B4(float value)
 UnidentifiedWeatherExtendedStateF::UnidentifiedWeatherExtendedStateF()
     : field20()
 {
+    typedef Detail::MemFunImpl<void, void (UnidentifiedWeatherExtendedStateF::*)()> MemFunImpl_UnidentifiedWeatherExtendedStateF_v;
+    typedef BindExp1<void, MemFunImpl_UnidentifiedWeatherExtendedStateF_v, UnidentifiedWeatherExtendedStateF*>
+        BindExp1_UnidentifiedWeatherExtendedStateF_v;
     field04 = 7;
     fn_800AA8C8();
-    Function<FnVoidVoid> callback(Bind<void>(MemFun(&UnidentifiedWeatherExtendedStateF::fn_800AF3B4), this));
+    Function<FnVoidVoid> callback(BindExp1_UnidentifiedWeatherExtendedStateF_v(
+        MemFun(&UnidentifiedWeatherExtendedStateF::fn_800AF3B4), this));
     EventRegistryValue* foundEvent;
     unsigned int hash = HashEventName("Kickoff", -1);
     foundEvent = 0;

@@ -206,12 +206,12 @@ int GetGoalieCharacterIndex(const CharacterInfo& character)
     }
 }
 
-u32 GetTeamColour(const CharacterInfo& team, const CharacterInfo& opponent, bool useAlternate)
+nlColour GetTeamColour(const CharacterInfo& team, const CharacterInfo& opponent, bool useAlternate)
 {
     u8 red;
     u8 green;
     u8 blue;
-    u8 rgba[4];
+    nlColour rgba;
 
     if (useAlternate && NeedsAlternateColour(team, opponent)) {
         red = (u8)((team.mAlternateColour >> 16) & 0xFF);
@@ -223,12 +223,12 @@ u32 GetTeamColour(const CharacterInfo& team, const CharacterInfo& opponent, bool
         blue = (u8)(team.mPrimaryColour & 0xFF);
     }
 
-    rgba[0] = red;
-    rgba[1] = green;
-    rgba[2] = blue;
-    rgba[3] = 0xFF;
+    rgba.c[0] = red;
+    rgba.c[1] = green;
+    rgba.c[2] = blue;
+    rgba.c[3] = 0xFF;
 
-    return *(u32*)rgba;
+    return rgba;
 }
 
 bool NeedsAlternateColour(const CharacterInfo& team, const CharacterInfo& opponent)

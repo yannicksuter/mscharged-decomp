@@ -158,7 +158,7 @@ int FindNetworkSeasonBoundary(
 int GetDaysUntilNextSeasonBoundary(
     const NetworkSeasonDateTable* dates, int index, int year);
 int GetDaysSinceSeasonBoundary(const NetworkSeasonDateTable* dates, int index,
-    const NetworkSeasonDate* date, int year);
+    NetworkSeasonDate date, int year);
 
 extern NetworkSeasonDateTable sNetworkSeasonDateTable;
 

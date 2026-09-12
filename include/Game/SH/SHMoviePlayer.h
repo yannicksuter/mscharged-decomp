@@ -1,6 +1,7 @@
 #ifndef GAME_SH_SHMOVIEPLAYER_H
 #define GAME_SH_SHMOVIEPLAYER_H
 
+#include "Game/EventConnection.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/BaseSceneHandler.h"
 #include "Game/FE/feButtonComponent.h"
@@ -31,7 +32,7 @@ public:
     /* 0x0A9 */ bool mLoopMovie;
     /* 0x0AA */ bool mPushWithPop;
     /* 0x0AC */ BaseGameSceneManager* mGameSceneManager;
-    /* 0x0B0 */ void* mUnidentified0B0;
+    /* 0x0B0 */ UnidentifiedEventConnectionOwner mUnidentified0B0;
 }; // size 0xB4
 
 class LessonMoviePlayerScene : public MoviePlayerScene

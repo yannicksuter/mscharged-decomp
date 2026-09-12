@@ -1,6 +1,0 @@
-#ifndef UNCLASSIFIED_TU_801820FC_H
-#define UNCLASSIFIED_TU_801820FC_H
-
-extern "C" int fn_80182240(int, int);
-
-#endif // UNCLASSIFIED_TU_801820FC_H

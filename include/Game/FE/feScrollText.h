@@ -23,7 +23,7 @@ public:
     void SetEndBehavior(int behavior);
     void SetMetrics(int pos);
     void SetClippingTextInstance(TLTextInstance* controlText);
-    int GetScrollSteps(float fDeltaT);
+    int GetScrollSteps(float fDeltaT) const;
 
     /* 0x00 */ TLTextInstance* m_controlText;
     /* 0x04 */ BasicString<unsigned short, Detail::TempStringAllocator> m_message;

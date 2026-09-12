@@ -504,7 +504,7 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
             g_pLocalization->GetString("ONLINE_CONTROLLERS_GUEST"));
         nlStrNCpy(row.mName, string.c_str(), 14);
         if (value == 6)
-            memcpy(row.mMiiData, mSlots[index].mEntry->mUnidentified32, sizeof(row.mMiiData));
+            memcpy(row.mMiiData, mSlots[index].mEntry->mMiiData, sizeof(row.mMiiData));
         else
             memcpy(row.mMiiData, &gNetworkMiiData, sizeof(row.mMiiData));
         row.mSearchState = 4;
@@ -523,14 +523,14 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
         row.Reset();
         NetworkDraftMachineInfo* entry = mSlots[index].mEntry;
         nlStrNCpy(row.mName, entry->mName, 14);
-        memcpy(row.mMiiData, entry->mUnidentified32, sizeof(row.mMiiData));
+        memcpy(row.mMiiData, entry->mMiiData, sizeof(row.mMiiData));
         row.mSearchState = 4;
         row.mStatus = 1;
-        row.mStats = entry->mHead;
+        row.mStats = entry->mStats;
         NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(4);
         if (category != 0)
         {
-            int player = category->FindPlayer(entry->mUnidentified18);
+            int player = category->FindPlayer(entry->mProfileId);
             if (player != -1)
                 row.mStats.mDisplayRank = category->mMetadata[player].mDisplayRank;
         }

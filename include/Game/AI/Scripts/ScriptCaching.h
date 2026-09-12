@@ -7,6 +7,17 @@
 class ScriptQuestionCache
 {
 public:
+    ScriptQuestionCache()
+        : mQuestionCacheMap(16, 16)
+    {
+    }
+
+    ~ScriptQuestionCache()
+    {
+        Clear();
+        mQuestionCacheMap.GetAllocator()->FreeBlocks();
+    }
+
     void Clear()
     {
         mQuestionCacheMap.Clear();

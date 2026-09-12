@@ -453,7 +453,6 @@ void PhysicsPatch::fn_80173DA4(float dt)
 }
 
 PhysicsPatchManager_801740D0::PhysicsPatchManager_801740D0()
-    : mUnidentified0F0(0)
 {
     for (int i = 0; i < 60; ++i)
     {
@@ -481,8 +480,6 @@ PhysicsPatchManager_801740D0::~PhysicsPatchManager_801740D0()
         }
     }
     PhysicsPatch::lbl_805705D0.FreeBlocks();
-
-    UnidentifiedDisconnectOwner(&mUnidentified0F0);
 }
 
 PhysicsPatch* PhysicsPatchManager_801740D0::fn_801743A8(

@@ -5,11 +5,13 @@
 
 class cBaseCamera;
 class nlMatrix4;
+struct glModel;
 
 void SetupMatrices(cBaseCamera*, const nlMatrix4*);
 
 extern bool g_bFrameSmiler;
 extern bool g_bFrameStatsOnScreen;
+extern float lbl_806DC7C8;
 
 enum eModelSkinMethod
 {
@@ -36,6 +38,6 @@ public:
 
 float fn_80112E0C();
 float fn_80112E14();
-bool fn_80112E1C();
+glModel* fn_80112E1C(glModel* model);
 
 #endif // GAME_BEGIN_FRAME_TASK_H

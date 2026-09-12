@@ -210,9 +210,9 @@ void FEScrollBar::OnPadRelease(int index, void* context)
         mButtonInstances[other]->SetActiveSlide("over", true, false);
 }
 
-void FEScrollBar::SetOffset(const nlVector3& value)
+void FEScrollBar::SetOffset(const feVector3& value)
 {
-    nlVec3Set(mUnidentified03C, value.x, value.y, value.z);
+    nlVec3Set(mUnidentified03C, value.f.x, value.f.y, value.f.z);
     mAssetPosition.f.x += mUnidentified03C.x;
     mAssetPosition.f.y += mUnidentified03C.y;
     mAssetPosition.f.z += mUnidentified03C.z;

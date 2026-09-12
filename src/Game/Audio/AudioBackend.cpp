@@ -232,16 +232,15 @@ void AudioBackend::QueueRead(nlFile* file, unsigned int offset,
     unsigned long userParam, AudioReadState* state)
 {
     bool enabled = OSDisableInterrupts();
-    AudioRead request;
-    request.m_Unknown00 = file;
-    request.m_Unknown04 = offset;
-    request.m_Unknown08 = buffer;
-    request.m_Unknown0C = callback;
-    request.m_Unknown10 = userParam;
-    request.m_Unknown14 = state;
-    request.m_Unknown18 = size;
-    request.m_Unknown1B = false;
-    m_Unknown024.AddEnd(request);
+    AudioRead* request = m_Unknown024.AllocateAtEnd(0);
+    request->m_Unknown00 = file;
+    request->m_Unknown04 = offset;
+    request->m_Unknown08 = buffer;
+    request->m_Unknown18 = size;
+    request->m_Unknown0C = callback;
+    request->m_Unknown10 = userParam;
+    request->m_Unknown14 = state;
+    request->m_Unknown1B = false;
     OSRestoreInterrupts(enabled);
 }
 
@@ -265,10 +264,9 @@ void AudioReadState::SetMixVolume(float value)
 void AudioBackend::QueueReadCancellation(AudioReadState* state)
 {
     bool enabled = OSDisableInterrupts();
-    AudioRead request;
-    request.m_Unknown14 = state;
-    request.m_Unknown1B = true;
-    m_Unknown024.AddEnd(request);
+    AudioRead* request = m_Unknown024.AllocateAtEnd(0);
+    request->m_Unknown1B = true;
+    request->m_Unknown14 = state;
     OSRestoreInterrupts(enabled);
 }
 

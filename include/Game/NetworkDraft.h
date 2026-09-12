@@ -9,12 +9,22 @@
 struct NetworkDraftPlayer
 {
     NetworkDraftPlayer()
-        : mPeerIndex(-1)
-        , mDisconnected(false)
-        , mGuest(false)
     {
         mName[0] = 0;
         memset(mData, 0, sizeof(mData));
+        mPeerIndex = -1;
+        mDisconnected = false;
+        mGuest = false;
+    }
+
+    void Reset()
+    {
+        mHead.Reset();
+        mName[0] = 0;
+        memset(mData, 0, sizeof(mData));
+        mPeerIndex = -1;
+        mDisconnected = false;
+        mGuest = false;
     }
 
     /* 0x00 */ NetworkRankingMeta mHead;
@@ -30,12 +40,20 @@ struct NetworkDraftPlayer
 struct NetworkDraftTeam
 {
     NetworkDraftTeam()
-        : mPlayerCount(0)
-        , mCaptain(-1)
-        , mSidekick0(-1)
-        , mSidekick1(-1)
-        , mSidekick2(-1)
     {
+        Reset();
+    }
+
+    void Reset()
+    {
+        mCaptain = -1;
+        mSidekick0 = -1;
+        mSidekick1 = -1;
+        mSidekick2 = -1;
+        mPlayerCount = 0;
+        mPlayers[0].Reset();
+        mPlayers[1].Reset();
+        mPlayers[2].Reset();
     }
 
     NetworkDraftPlayer* FindPlayer(int peer, bool guest)
@@ -112,6 +130,7 @@ public:
     void AdvanceDraftTeam();
     void UnregisterMessageReceivers();
     int GetCurrentDraftingTeam() const;
+    int GetLocalMachineIndex() const { return mLocalMachineIndex; }
     int GetRandomAvailableCaptain() const;
     void SendCaptainChoice();
     void SendSidekickChoice();
@@ -126,7 +145,7 @@ public:
     /* 0x00C */ int mMyTeamIndex;
     /* 0x010 */ int mCurrentDraftingTeam;
     /* 0x014 */ int mCurrentDraftingPeer;
-    /* 0x018 */ bool mCurrentDrafterIsLocal;
+    /* 0x018 */ bool mCurrentDrafterIsGuest;
     /* 0x019 */ u8 mPadding019[3];
     /* 0x01C */ int mSideToTeam[2];
     /* 0x024 */ bool mSideDrafted[2];

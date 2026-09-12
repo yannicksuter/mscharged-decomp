@@ -109,7 +109,7 @@ static inline int UpdateEffectsFromLeafNodes(cPoseAccumulator& pa,
         EmissionController* ec = ecs[leaf];
         if (ec != NULL)
         {
-            if (EmissionManager::Instance()->IsStillAlive(ec))
+            if (EmissionManager::Instance()->IsStillAlive(ecs[leaf]))
             {
                 ecs[leaf]->SetPosition(
                     pa.GetNodeMatrix(node).GetTranslation());

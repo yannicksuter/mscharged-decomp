@@ -1,5 +1,6 @@
 #include "Game/Render/depthoffield.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Render/RLView.h"
 
 #include "NL/gl/glDraw2.h"

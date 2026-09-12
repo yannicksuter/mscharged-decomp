@@ -264,6 +264,15 @@ inline void SHOnlineFriends::UpdateVisibleRows()
     }
 }
 
+static inline void RefreshFriends(SHOnlineFriends* self)
+{
+    for (int i = 0; i < 64; ++i)
+        self->UpdateFriend(i);
+    for (int i = 0; i < 64; ++i)
+        self->mUnidentified2EA8[i] = &self->mUnidentified08A8[i];
+    qsort(self->mUnidentified2EA8, 64, sizeof(self->mUnidentified2EA8[0]), SHOnlineFriends::CompareFriendStatus);
+}
+
 void SHOnlineFriends::DeleteFriend(int index)
 {
     mUnidentified2FA8 = false;
@@ -274,11 +283,7 @@ void SHOnlineFriends::DeleteFriend(int index)
     mUnidentified2EA8[selected]->mStatus = 11;
     if (mUnidentified0020 == mUnidentified0024 && mUnidentified0020 > 0)
         --mUnidentified0020;
-    for (int i = 0; i < 64; ++i)
-        UpdateFriend(i);
-    for (int i = 0; i < 64; ++i)
-        mUnidentified2EA8[i] = &mUnidentified08A8[i];
-    qsort(mUnidentified2EA8, 64, sizeof(mUnidentified2EA8[0]), CompareFriendStatus);
+    RefreshFriends(this);
     UpdateScrollRange();
     UpdateVisibleRows();
     g_pFriendManager->SetOwnStatusInitial(1);
@@ -349,11 +354,7 @@ void SHOnlineFriends::SceneCreated()
         title->SetActiveSlide("friends", true, false);
         UpdateFriendCode();
     }
-    for (int i = 0; i < 64; ++i)
-        UpdateFriend(i);
-    for (int i = 0; i < 64; ++i)
-        mUnidentified2EA8[i] = &mUnidentified08A8[i];
-    qsort(mUnidentified2EA8, 64, sizeof(mUnidentified2EA8[0]), CompareFriendStatus);
+    RefreshFriends(this);
     UpdateVisibleRows();
     TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
         InlineHasher("Layer"),
@@ -724,11 +725,7 @@ void SHOnlineFriends::Update(float dt)
     mUnidentified0034 -= dt;
     if (mUnidentified0034 <= 0.0f)
     {
-        for (int i = 0; i < 64; ++i)
-            UpdateFriend(i);
-        for (int i = 0; i < 64; ++i)
-            mUnidentified2EA8[i] = &mUnidentified08A8[i];
-        qsort(mUnidentified2EA8, 64, sizeof(mUnidentified2EA8[0]), CompareFriendStatus);
+        RefreshFriends(this);
         UpdateVisibleRows();
         mUnidentified0034 = 0.5f;
     }

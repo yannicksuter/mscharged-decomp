@@ -1,6 +1,7 @@
 #include "NL/gl/glPlat.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
+#include "NL/glx/GXShadowVolumeMaterialProgram.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glTarget.h"
 #include "NL/gl/glView.h"
@@ -72,12 +73,11 @@ void RenderShadowVolumeBlend(GLView* view)
     float height = glGetOrthographicHeight();
     if (writer.Begin(4, GLP_TriStrip, 0))
     {
-        ((glTextureBinding*)writer.GetModel()
-                ->packets->materialParameters)[1]
-            .texture = 0;
+        static_cast<GXShadowVolumeParameters*>(writer.GetModel()
+                ->packets->materialParameters)->useFixedColour = 0;
         glTextureBinding* state
-            = (glTextureBinding*)writer.GetModel()
-                  ->packets->materialParameters;
+            = &static_cast<GXShadowVolumeParameters*>(writer.GetModel()
+                   ->packets->materialParameters)->diffuseTexture;
         state->texture = texture_806E2410;
         state->textureIndex = 0xFFFF;
         state->SetWrapS(true);

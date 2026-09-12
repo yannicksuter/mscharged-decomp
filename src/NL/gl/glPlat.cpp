@@ -4,7 +4,7 @@
 #include "NL/gl/glMaterialProgram.h"
 #include "Game/Sys/debug.h"
 #include "NL/gl/glView.h"
-#include "NL/gl/tu_80364020.h"
+#include "NL/gl/glDrawSyncLog.h"
 
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxTarget.h"
@@ -360,7 +360,7 @@ static void glx_SendViews()
             const s32 viewportX = view->m_ViewportX;
             fn_803A7828((f32)viewportX, (f32)viewportY, (f32)viewportWidth, (f32)viewportHeight, 0.0f, 1.0f);
             fn_803A78A4(viewportX, viewportY, viewportWidth, viewportHeight);
-            fn_80364020()->fn_803640E4(view->m_Name);
+            glGetDrawSyncLog()->SetCurrentView(view->m_Name);
 
             if (view->m_ClearDepth || view->m_ClearColour || view->m_Unknown32)
             {
@@ -397,7 +397,7 @@ static void glx_SendViews()
         }
     }
 
-    fn_80364020()->fn_803640DC();
+    glGetDrawSyncLog()->EndFrame();
     glx_SendEnd();
 }
 

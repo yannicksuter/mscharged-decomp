@@ -1,7 +1,8 @@
 #include "Game/Debug/FrameCounter.h"
-#include "Game/Debug/ProfilerDisplay_802B9A3C.h"
+#include "Game/Debug/Histogram.h"
 #include "Game/GL/GLColourMeshWriter.h"
 #include "Game/Task/SmokeTestUpdateTask.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/glFont.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
@@ -115,7 +116,7 @@ void FrameCounter::FinishTiming()
         if (region->m_pConditionFunc())
         {
             region->m_unk10++;
-            fn_802B9670(&region->m_unk14, totalFrameTime);
+            region->m_Histogram.AddSample(totalFrameTime);
             region->m_fThreshold += totalFrameTime;
         }
 
@@ -154,56 +155,47 @@ void FrameCounter::DisplayFrameRate()
     glFontEnd();
 }
 
-void FrameCounter::fn_802B7FD4()
+static inline TimeRegion* FindGameplayRegion()
 {
     ListEntry<TimeRegion*>* entry = TimeRegion::sTimeRegionList.m_Head;
-    TimeRegion* region = 0;
     while (entry != 0)
     {
-        TimeRegion* current = entry->entry;
-        if (nlStrICmp(current->m_pName, "during gameplay") == 0)
+        TimeRegion* region = entry->entry;
+        if (nlStrICmp(region->m_pName, "during gameplay") == 0)
         {
-            region = current;
-            break;
+            return region;
         }
         entry = entry->next;
     }
+    return 0;
+}
 
+void FrameCounter::fn_802B7FD4()
+{
+    TimeRegion* region = FindGameplayRegion();
     if (region != 0)
     {
         static bool initialized = false;
         if (!initialized)
         {
-            fn_802B9A6C(fn_802B9A3C(), &region->m_unk14);
+            HistogramDisplay::GetInstance()->AddHistogram(&region->m_Histogram);
             initialized = true;
         }
-        fn_802B9A88(fn_802B9A3C());
+        HistogramDisplay::GetInstance()->Draw();
     }
 }
 
 void FrameCounter::fn_802B80C4()
 {
-    ListEntry<TimeRegion*>* entry = TimeRegion::sTimeRegionList.m_Head;
-    TimeRegion* region = 0;
-    while (entry != 0)
-    {
-        TimeRegion* current = entry->entry;
-        if (nlStrICmp(current->m_pName, "during gameplay") == 0)
-        {
-            region = current;
-            break;
-        }
-        entry = entry->next;
-    }
-
+    TimeRegion* region = FindGameplayRegion();
     if (region != 0)
     {
         char name[128];
-        UnidentifiedTimeRegionData_802B9570* data = &region->m_unk14;
-        for (int index = 0; index < data->m_unk08 - 1; ++index)
+        Histogram* data = &region->m_Histogram;
+        for (int index = 0; index < data->m_NumBins - 1; ++index)
         {
-            float threshold = fn_802B98C8(data, index);
-            int count = fn_802B974C(data, index);
+            float threshold = data->GetBinBoundary(index);
+            int count = data->GetCumulativePercentage(index);
             nlSNPrintf(name, sizeof(name), "percent of gameplay frames below %0.0f ms", threshold);
             fn_802BD718(name, 0, (float)count);
         }
@@ -249,7 +241,7 @@ void FrameCounter::DisplayFrameTicker()
     {
         for (unsigned int i = 0; i < 640; i++)
         {
-            unsigned int historyLoc = (m_NextHistoryPos + i) % 640;
+            unsigned int historyLoc = (i + m_NextHistoryPos) % 640;
             m1.Colour(255, 255, 255, 255);
             m1.Vertex((float)i, 1.25f * m_FrameHistory[historyLoc] + 32.0f, 0.0f);
         }
@@ -336,6 +328,7 @@ static void DrawSmile(nlVector3 p0, float fRadius, float fScaleX, nlColour colou
         float fYTop = p0.y + fRadius;
         float middleY = 0.5f * (fYFromAngle + fYTop);
 
+        degrees = (3.1415927f * degrees) / 180.0f;
         int i = 0;
         while (i < numVerts)
         {
@@ -349,15 +342,15 @@ static void DrawSmile(nlVector3 p0, float fRadius, float fScaleX, nlColour colou
             v3point.y = v3point.y + middleY;
 
             mesh.Colour(colour);
-            mesh.Vertex(v3point.x, v3point.y, v3point.z);
+            mesh.Vertex(v3point);
 
             v3point.y += fLineThickness;
 
             mesh.Colour(colour);
-            mesh.Vertex(v3point.x, v3point.y, v3point.z);
+            mesh.Vertex(v3point);
 
             i++;
-            fRadians += ((3.1415927f * degrees) / 180.0f) / (numVerts - 1);
+            fRadians += degrees / (numVerts - 1);
         }
 
         if (mesh.End() == 0)
@@ -448,23 +441,21 @@ void FrameCounter::DisplayFrameSmiler()
     nlColour black = { 0, 0, 0, 255 };
 
     nlColour colour;
-    if (happiness < 0.5f)
+    if (sfHappiness < 0.5f)
     {
-        float alpha = 2.0f * happiness;
-        nlColourSet(colour,
-            (int)((float)sMediumColour.c[0] * alpha + (float)sMadColour.c[0] * (1.0f - alpha)),
-            (int)((float)sMediumColour.c[1] * alpha + (float)sMadColour.c[1] * (1.0f - alpha)),
-            (int)((float)sMediumColour.c[2] * alpha + (float)sMadColour.c[2] * (1.0f - alpha)),
-            (int)((float)sMediumColour.c[3] * alpha + (float)sMadColour.c[3] * (1.0f - alpha)));
+        for (i = 0; i < 4; i++)
+        {
+            float alpha = 2.0f * sfHappiness;
+            colour.c[i] = (int)((float)sMediumColour.c[i] * alpha + (float)sMadColour.c[i] * (1.0f - alpha));
+        }
     }
     else
     {
-        float alpha = 2.0f * (happiness - 0.5f);
-        nlColourSet(colour,
-            (int)((float)sHappyColour.c[0] * alpha + (float)sMediumColour.c[0] * (1.0f - alpha)),
-            (int)((float)sHappyColour.c[1] * alpha + (float)sMediumColour.c[1] * (1.0f - alpha)),
-            (int)((float)sHappyColour.c[2] * alpha + (float)sMediumColour.c[2] * (1.0f - alpha)),
-            (int)((float)sHappyColour.c[3] * alpha + (float)sMediumColour.c[3] * (1.0f - alpha)));
+        for (i = 0; i < 4; i++)
+        {
+            float alpha = 2.0f * (sfHappiness - 0.5f);
+            colour.c[i] = (int)((float)sHappyColour.c[i] * alpha + (float)sMediumColour.c[i] * (1.0f - alpha));
+        }
     }
 
     nlVector3 leftEyeCentre = { 0, 0, 0 };

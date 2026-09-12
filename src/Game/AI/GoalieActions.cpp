@@ -1985,7 +1985,7 @@ void Goalie::ActionMove(float deltaTime)
         targetPos = g_pBall->m_v3PassIntercept;
         FindDesiredGoaliePosition(mv3TargetPosition, desiredDir, desiredOffset, desiredFacing, &targetPos);
 
-        if (fn_800DF028(pPassTarget) != 0.0f)
+        if (fn_800DF028(pPassTarget))
         {
             float crouchDuration = GoalieSave::mfCrouchDuration;
             if (g_pBall->m_tPassTargetTimer.GetSeconds()
@@ -2070,11 +2070,11 @@ void Goalie::ActionMove(float deltaTime)
                 v3WallNormal.y = wallPlane.y;
                 float fAlignment = nlVec3DotProduct(
                     v3NormalizedDir, v3WallNormal);
-                fAlignment = nlAbs(fAlignment);
+                fAlignment = fabsf(fAlignment);
                 if (fAlignment > 0.5f)
                 {
                     float fScale
-                        = -((1.2f + nlAbs(fTargetDistance))
+                        = -((1.2f + fabsf(fTargetDistance))
                             / fAlignment);
                     nlVec3ScaleAdd(mv3TargetPosition, fScale, v3NormalizedDir, mv3TargetPosition);
 
@@ -2088,7 +2088,7 @@ void Goalie::ActionMove(float deltaTime)
                 else
                 {
                     float fScale
-                        = 1.2f + nlAbs(fTargetDistance);
+                        = 1.2f + fabsf(fTargetDistance);
                     if (fTargetDistance < 0.0f)
                     {
                         fScale *= -1.0f;
@@ -2182,11 +2182,14 @@ void Goalie::ActionMove(float deltaTime)
             return;
         }
 
+        bool shouldPreCrouch = true;
         eShotMeterState shotMeterState
             = pOwnerFielder->m_pShotMeter->m_eShotMeterState;
-        bool shouldPreCrouch
-            = !(shotMeterState != SHOT_METER_ACTIVE
-                && shotMeterState != SHOT_METER_STS_ACTIVE);
+        if (shotMeterState != SHOT_METER_ACTIVE
+            && shotMeterState != SHOT_METER_STS_ACTIVE)
+        {
+            shouldPreCrouch = false;
+        }
 
         if (shouldPreCrouch
             && pOwnerFielder->mUnidentified024.m_eCharacterClass

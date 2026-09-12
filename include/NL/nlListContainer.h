@@ -125,6 +125,7 @@ public:
     }
 
     nlListIterator<T> Begin();
+    T* AllocateAtEnd(unsigned long* outEntry);
 
     /* 0x00 */ Adapter m_Allocator;
     /* 0x04 */ ListEntry<T>* m_Head;
@@ -168,6 +169,23 @@ template <typename T, typename Adapter>
 inline nlListIterator<T> ListContainerBase<T, Adapter>::Begin()
 {
     return nlListIterator<T>(m_Head);
+}
+
+template <typename T, typename Adapter>
+inline T* ListContainerBase<T, Adapter>::AllocateAtEnd(
+    unsigned long* outEntry)
+{
+    ListEntry<T> value;
+    ListEntry<T>* result = m_Allocator.Allocate();
+    result = new (result) ListEntry<T>(value);
+    nlListAddEnd(&m_Head, &m_Tail, result);
+
+    if (outEntry != 0)
+    {
+        *outEntry = (unsigned long)result;
+    }
+
+    return &result->entry;
 }
 
 template <typename T, typename Adapter>

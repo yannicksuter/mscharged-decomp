@@ -185,6 +185,7 @@ void UnidentifiedObject_801B535C::fn_801B59DC(bool param)
         }
         if (!param)
         {
+            mUnidentified34->IsFallenDown();
             PlaySound(mUnidentified34->mUnidentified318, 0x1B274A7A, 0, 0);
         }
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("yoshi_egg_trail");

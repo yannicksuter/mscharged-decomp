@@ -23,6 +23,21 @@ bool EffectsGroup::IsPersistent() const
     return false;
 }
 
+void EffectsGroup::DestroyUserSpecs()
+{
+    if (m_userSpecs != 0)
+    {
+        for (unsigned long i = 0; i < m_userSpecs; ++i)
+        {
+            if (m_userSpecsPtr[i] != 0)
+            {
+                delete m_userSpecsPtr[i];
+            }
+        }
+        delete[] m_userSpecsPtr;
+    }
+}
+
 void EffectsGroup::ResolveTemplates(EffectsTemplate** table)
 {
     for (unsigned long i = 0; i < m_numSpecs; ++i)

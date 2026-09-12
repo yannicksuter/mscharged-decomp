@@ -597,7 +597,7 @@ void InterpreterCore::RunFunction(FunctionEntryPoint* entry, unsigned int count)
     }
 }
 
-bool InterpreterCore::ExecuteFunction(FunctionEntryPoint* entry, unsigned int count, u32 value0, u32 value1, u32 value2, u32 value3)
+bool InterpreterCore::ExecuteFunction(FunctionEntryPoint* entry, unsigned int count, unsigned int value0, unsigned int value1, unsigned int value2, unsigned int value3)
 {
     if (m_RunState == 3)
     {

@@ -22,6 +22,6 @@ unsigned long glGetMaterialUnsignedParameter(const glModelPacket* packet, unsign
 void* glGetMaterialParameterData(const glModelPacket* packet, unsigned long hash);
 bool glHasMaterialParameter(const glModelPacket* packet, unsigned long hash);
 void glSetMaterialTextureAlphaState(
-    void* program, const glModelPacket* packet, unsigned long texture);
+    void* program, glModelPacket* packet, unsigned long texture);
 
 #endif // NL_GL_MODEL_PARAMETERS_H

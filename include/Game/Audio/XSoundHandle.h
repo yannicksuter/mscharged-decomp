@@ -35,7 +35,7 @@ public:
     virtual void Pause() = 0;
     virtual void Resume() = 0;
     virtual void SetCallbackEnabled(u8 enabled);
-    virtual u8 IsCallbackEnabled();
+    virtual int IsCallbackEnabled();
     virtual void Release() = 0;
     virtual void Update(float dt);
     virtual bool IsValid() = 0;

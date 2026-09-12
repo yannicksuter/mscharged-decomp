@@ -1172,10 +1172,10 @@ int GetDaysUntilNextSeasonBoundary(
 }
 
 int GetDaysSinceSeasonBoundary(const NetworkSeasonDateTable* dates, int index,
-    const NetworkSeasonDate* date, int year)
+    NetworkSeasonDate date, int year)
 {
     const NetworkSeasonDate& boundary = dates->mDates[index];
-    return DayOfYear(*date, year) - DayOfYear(boundary, year);
+    return DayOfYear(date, year) - DayOfYear(boundary, year);
 }
 
 NetworkSeasonDate sNetworkSeasonDates[52] = {

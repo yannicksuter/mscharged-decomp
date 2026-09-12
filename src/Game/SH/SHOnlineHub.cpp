@@ -321,17 +321,25 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
     {
         DWCAccFriendData* data = (DWCAccFriendData*)GameInfoManager::Instance()->GetUnknown0x40(gNetworkSaveSlotIndex, i);
         int type = DWC_GetFriendDataType(data);
-        if (DWC_IsValidFriendData(data) && type == 3)
+        if (DWC_IsValidFriendData(data) && type == DWC_FRIENDDATA_GS_PROFILE_ID)
         {
             char status[256];
             ++friends;
-            u8 state = DWC_GetFriendStatus((DWCFriendData*)data, status);
-            if (state >= 1 && state < 7)
+            switch (DWC_GetFriendStatus((DWCFriendData*)data, status))
+            {
+            case DWC_STATUS_ONLINE:
+            case DWC_STATUS_PLAYING:
+            case DWC_STATUS_MATCH_ANYBODY:
+            case DWC_STATUS_MATCH_FRIEND:
+            case DWC_STATUS_MATCH_SC_CL:
+            case DWC_STATUS_MATCH_SC_SV:
                 ++online;
+                break;
+            }
         }
     }
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("subheading2"));
+        nlStringLowerHash("Layer"), nlStringLowerHash("subheading2"), 0, 0, 0, 0);
     if (text == 0)
         text = &UnidentifiedTLTextDefault::sInstance;
     u16 onlineText[4];
@@ -345,9 +353,10 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
     DWCTime time;
     GetAdjustedNetworkDate(&date, &time);
     NetworkSeasonDate current = { date.month, date.mday };
+    int year = date.year;
     int boundary = FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, current);
-    int elapsed = GetDaysSinceSeasonBoundary(&sNetworkSeasonDateTable, boundary, &current, date.year) + 1;
-    int days = GetDaysUntilNextSeasonBoundary(&sNetworkSeasonDateTable, boundary, date.year) - elapsed;
+    int elapsed = GetDaysSinceSeasonBoundary(&sNetworkSeasonDateTable, boundary, current, year) + 1;
+    int days = GetDaysUntilNextSeasonBoundary(&sNetworkSeasonDateTable, boundary, year) - elapsed;
     int hours = 23 - time.hour;
     int minutes = 60 - time.min;
     if (minutes == 60)
@@ -361,7 +370,7 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
         }
     }
     text = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("subheading"));
+        nlStringLowerHash("Layer"), nlStringLowerHash("subheading"), 0, 0, 0, 0);
     WideString string = Format(WideString(LookupLocString("ONLINE_HUB_DAYS_REMAIN")), days, hours, minutes);
     memcpy(mUnidentified528, string.c_str(), sizeof(mUnidentified528));
     text->SetString(mUnidentified528);

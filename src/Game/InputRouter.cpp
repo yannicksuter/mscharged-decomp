@@ -118,8 +118,8 @@ void InputRouter::Reset(int)
 
     mCurrentCRC = 0;
     mLastGameFrame = -1;
-    mOutgoingHead = 0;
-    mOutgoingCount = 0;
+    m_OutgoingCustomDetermDataQ.mHead = 0;
+    m_OutgoingCustomDetermDataQ.mCount = 0;
     mSyncMismatch = false;
     mSyncMismatchReported = false;
     mOutgoingQueueOverflowed = false;
@@ -151,11 +151,9 @@ void InputRouter::CheckSyncMismatch()
 
 bool InputRouter::ProcessPlaybackFrame()
 {
-    while (mOutgoingCount != 0)
+    while (m_OutgoingCustomDetermDataQ.GetCount() != 0)
     {
-        DetermDataEvent* event = mOutgoingDetermData[mOutgoingHead];
-        mOutgoingHead = (mOutgoingHead + 1) % mOutgoingCapacity;
-        --mOutgoingCount;
+        DetermDataEvent* event = m_OutgoingCustomDetermDataQ.Pop();
 
         Function<DetermDataEvent*> disposer(
             (void (*)(DetermDataEvent*))DetermDataEvent::operator delete);
@@ -178,12 +176,9 @@ void InputRouter::QueueDetermData(const void* data, u32 size)
 {
     DetermDataEvent* event = new DetermDataEvent(data, size);
 
-    if (mOutgoingCount < mOutgoingCapacity)
+    if (!m_OutgoingCustomDetermDataQ.IsFull())
     {
-        u32 position = (mOutgoingHead + mOutgoingCount)
-            % mOutgoingCapacity;
-        mOutgoingDetermData[position] = event;
-        ++mOutgoingCount;
+        m_OutgoingCustomDetermDataQ.Push(event);
     }
     else
     {
@@ -232,7 +227,59 @@ void SimpleInputRouter::OnInputCaptured()
 
 void SimpleInputRouter::OnInputReady()
 {
-    CheckSyncMismatch();
+    NetworkPeer* peer = mSession->GetLocalPeer();
+    s8 machine = mSession->GetLocalMachineId();
+    int playerCount = peer->mPlayerCount;
+
+    mNetworkTicks[machine]
+        = peer->GetNetworkPeerChannel(0)->GetNetworkPeerChannelRemapAngle();
+
+    int eventCount = m_OutgoingCustomDetermDataQ.GetCount();
+    if (gNetworkInputRecording->mRecording)
+    {
+        int frame = gInputManager->mFrameProvider->GetFrame();
+        NetworkInputRecording* recording = gNetworkInputRecording;
+        u32 seed = GetNetworkRandomSeed();
+        recording->WriteNetworkInputPacketHeader(machine,
+            mNetworkTicks[machine], mCurrentCRC, frame, seed, eventCount, 0);
+    }
+
+    for (int i = 0; i < eventCount; ++i)
+    {
+        DetermDataEvent* event = m_OutgoingCustomDetermDataQ.Pop();
+        if (gNetworkInputRecording->mRecording)
+        {
+            gNetworkInputRecording->WriteNetworkInputEvent(event);
+        }
+
+        Function<DetermDataEvent*> disposer(
+            (void (*)(DetermDataEvent*))DetermDataEvent::operator delete);
+        sDetermDataEventQueue.Queue(event, disposer);
+    }
+
+    for (s8 player = 0; player < playerCount; ++player)
+    {
+        NetworkPeerChannel* channel = peer->GetNetworkPeerChannel(player);
+        s8 playerId = GetNetworkPlayerId(player, machine);
+
+        channel->PackNetworkPeerChannelInput(&mInputRecords[playerId]);
+        mInputStates[playerId]
+            = channel->GetNetworkPeerChannelConnectionStatus();
+        PackedDetInput* input = &mInputRecords[playerId];
+        channel->ApplyNetworkPeerChannelInput(
+            input, mNetworkTicks[machine], mInputStates[playerId]);
+
+        if (gNetworkInputRecording->mRecording)
+        {
+            gNetworkInputRecording->WriteNetworkInputRecord(
+                player, input, mInputStates[playerId]);
+        }
+    }
+
+    if (gNetworkInputRecording->mRecording)
+    {
+        gNetworkInputRecording->Flush();
+    }
 }
 
 NetworkInputRouter::~NetworkInputRouter()

@@ -332,7 +332,8 @@ extern "C" void fn_80279DD4(StadiumWorldObject_80279AC8* object)
 
     if (sShowObjectBounds && object->m_pAnimController == 0)
     {
-        nlColour colour = { { 0xFF, 0xFF, 0xFF, 0xFF } };
+        nlColour colour;
+        nlColourSet(colour, 0xFF, 0xFF, 0xFF, 0xFF);
         fn_802BC678(&g_ShapeRenderer, object->m_boundsMin,
             object->m_boundsMax, colour);
     }

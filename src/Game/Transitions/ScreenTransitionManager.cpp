@@ -11,6 +11,7 @@
 
 #include "NL/gl/gl.h"
 #include "NL/nlMath.h"
+#include "NL/nlBasicString.inl"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 
@@ -116,7 +117,7 @@ void ScreenTransitionManager::AddTransitionToMap(char* name, ScreenTransition* p
     unsigned long transitionHash = glHash(name);
     m_TransitionMap.Add(transitionHash, pTransition);
 
-    BasicString<char, Detail::TempStringAllocator> nameString(name);
+    BasicString<char, Detail::TempStringPoolAllocator> nameString(name);
     m_Transitions.push_back(nameString);
 }
 
@@ -152,7 +153,7 @@ void ScreenTransitionManager::SelectRandomTransition(const char* filter)
     {
         const char* transitionName = m_Transitions.mData[i].c_str();
 
-        if (strstr(transitionName, filter) != 0)
+        if (nlStrNICmp<char>(transitionName, filter, nlStrLen<char>(filter)) == 0)
         {
             candidates.push_back(m_Transitions.mData[i]);
         }

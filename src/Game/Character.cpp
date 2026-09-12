@@ -62,7 +62,7 @@
 #include "NL/gl/glTexture.h"
 #include "NL/gl/glTextureManager.h"
 #include "NL/gl/glMaterialParameters.h"
-#include "NL/glx/GXMaterialProgram_80298B18.h"
+#include "NL/glx/GXCharacterDamageMaterialProgram.h"
 #include "math.h"
 #include <stddef.h>
 #include "Game/UnidentifiedStaticStorage.h"
@@ -719,7 +719,7 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     , mUnidentified1AC(0.0f)
     , mUnidentified1C0(16, 16)
 {
-
+    cSHierarchy* hierarchy0;
     mUnidentified024.m_eCharacterClass = cc;
     mUnidentified11C = &GetCharacterInfo(cc);
     if (pPhysicsData != 0)
@@ -764,17 +764,17 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
         m_szEffectsName = 0;
     }
     m_pHeadTrack = new (8, false) cHeadTrack();
-    cSHierarchy* hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
+    hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
     m_nHeadJointIndex = hierarchy0->GetNodeIndexByID(nlStringLowerHash("bip01 head"));
-    cSHierarchy* hierarchy1 = m_pPoseAccumulator->m_BaseSHierarchy;
-    m_nBip01JointIndex_0xA4 = hierarchy1->GetNodeIndexByID(nlStringLowerHash("bip01"));
-    cSHierarchy* hierarchy2 = m_pPoseAccumulator->m_BaseSHierarchy;
-    m_nSpine1JointIndex = hierarchy2->GetNodeIndexByID(nlStringLowerHash("bip01 spine1"));
-    cSHierarchy* hierarchy3 = m_pPoseAccumulator->m_BaseSHierarchy;
-    mUnidentified0E4 = hierarchy3->GetNodeIndexByID(
+    hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
+    m_nBip01JointIndex_0xA4 = hierarchy0->GetNodeIndexByID(nlStringLowerHash("bip01"));
+    hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
+    m_nSpine1JointIndex = hierarchy0->GetNodeIndexByID(nlStringLowerHash("bip01 spine1"));
+    hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
+    mUnidentified0E4 = hierarchy0->GetNodeIndexByID(
         nlStringLowerHash("bip01 l foot"));
-    cSHierarchy* hierarchy4 = m_pPoseAccumulator->m_BaseSHierarchy;
-    mUnidentified0E8 = hierarchy4->GetNodeIndexByID(
+    hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
+    mUnidentified0E8 = hierarchy0->GetNodeIndexByID(
         nlStringLowerHash("bip01 r foot"));
     mUnidentified0F8 = new (8, false) UnidentifiedCharacterObject_8001C158;
     m_pEffectsTexturing = 0;
@@ -2739,14 +2739,14 @@ void cCharacter::fn_80022E60()
                                 glSetMaterialTextureIndexParameter(packet, lbl_8056B7B0[k], &resolvedTexture);
                             }
                         }
-                        if (packet->materialProgram == GXMaterialProgram_80298B18::Instance)
+                        if (packet->materialProgram == GXCharacterDamageMaterialProgram::Instance)
                         {
                             glGetTextureManager()->ResolveTextureIndex(
-                                &((GXMaterialProgramParameters_80298B18*)packet->materialParameters)->texture4);
+                                &static_cast<GXCharacterDamageParameters*>(packet->materialParameters)->damage1Texture);
                             glGetTextureManager()->ResolveTextureIndex(
-                                &((GXMaterialProgramParameters_80298B18*)packet->materialParameters)->texture5);
+                                &static_cast<GXCharacterDamageParameters*>(packet->materialParameters)->damage2Texture);
                             glGetTextureManager()->ResolveTextureIndex(
-                                &((GXMaterialProgramParameters_80298B18*)packet->materialParameters)->texture3);
+                                &static_cast<GXCharacterDamageParameters*>(packet->materialParameters)->megaTexture);
                         }
                     }
                 }

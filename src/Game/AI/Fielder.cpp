@@ -284,6 +284,14 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     }
 }
 
+void cFielder::UnidentifiedVirtual1C()
+{
+    fn_80097648(-1.0f);
+    SetAnimState(0, false, 0.0f, false, false);
+    m_pCurrentAnimController->SetTime(0.0f);
+    InitMovementNone(0.0f, 0.0f);
+}
+
 cFielder::~cFielder()
 {
     CleanUpAction(ACTION_NEED_ACTION);

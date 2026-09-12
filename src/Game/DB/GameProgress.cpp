@@ -100,6 +100,38 @@ int BaseCup::GetSaveDataSize() const
     return 0x1A;
 }
 
+s16 CupManager::GetNextRoundNumber(int* roundType)
+{
+    int currentType = mCurrentCup->mRoundType;
+    s16 currentRound = mCurrentCup->mRoundNumber;
+    int numRounds = mCurrentCup->GetNumRounds(currentType);
+    if (currentRound == -5)
+    {
+        *roundType = currentType;
+        return -5;
+    }
+    if (currentRound < numRounds - 1)
+    {
+        *roundType = currentType;
+        return currentRound + 1;
+    }
+
+    s16 nextRound = 0;
+    if (currentType == 0)
+    {
+        *roundType = 1;
+    }
+    else if (currentType == 1)
+    {
+        *roundType = 2;
+    }
+    else if (currentType == 2)
+    {
+        nextRound = -5;
+    }
+    return nextRound;
+}
+
 u16 CupManager::GetNumGamesPerRound(int phase, int round) const
 {
     u16 returnValue;

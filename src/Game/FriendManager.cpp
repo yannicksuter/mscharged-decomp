@@ -345,15 +345,14 @@ bool FriendManager::FindHostInvitation()
 
         DWCFriendData* friendData = reinterpret_cast<DWCFriendData*>(
             GameInfoManager::GetInstance()->GetUnknown0x40(gNetworkSaveSlotIndex, i));
-        FriendStatusPayload& status = mFriendStatus[i];
-        if (!DWC_IsValidFriendData(friendData) || status.mStatus != EFriendStatus_HostInvitingPlayer)
+        if (!DWC_IsValidFriendData(friendData) || (int)mFriendStatus[i].mStatus != EFriendStatus_HostInvitingPlayer)
         {
             continue;
         }
 
         DWCUserData* userData = reinterpret_cast<DWCUserData*>(
             GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
-        if (userData->gs_profile_id != status.mProfileId)
+        if (userData->gs_profile_id != mFriendStatus[i].mProfileId)
         {
             continue;
         }
@@ -362,12 +361,13 @@ bool FriendManager::FindHostInvitation()
         unsigned int length = 0;
         if (name != 0)
         {
-            while (*name++ != 0)
+            while (*name != 0)
             {
+                ++name;
                 ++length;
             }
         }
-        if (length > 11 || status.mNetworkVersion != GetNetworkVersionWord())
+        if (length > 11 || mFriendStatus[i].mNetworkVersion != GetNetworkVersionWord())
         {
             continue;
         }

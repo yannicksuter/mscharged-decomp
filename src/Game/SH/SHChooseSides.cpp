@@ -157,15 +157,8 @@ void SHChooseSides2::SceneCreated()
     const CharacterInfo& info0 = GetCharacterInfo(GetCharacterIndexFromCaptain(team0));
     const CharacterInfo& info1 = GetCharacterInfo(GetCharacterIndexFromCaptain(team1));
 
-    unsigned long packedColour = GetTeamColour(info0, info1, true);
-    nlColour colour0;
-    nlColourSet(colour0, packedColour >> 24, packedColour >> 16, packedColour >> 8, packedColour);
-    mUnidentified3F0[0] = colour0;
-
-    packedColour = GetTeamColour(info1, info0, true);
-    nlColour colour1;
-    nlColourSet(colour1, packedColour >> 24, packedColour >> 16, packedColour >> 8, packedColour);
-    mUnidentified3F0[1] = colour1;
+    mUnidentified3F0[0] = GetTeamColour(info0, info1, true);
+    mUnidentified3F0[1] = GetTeamColour(info1, info0, true);
 
     TLComponentInstance* screen = 0;
     SHNavigation* object = GetNavigationScene();

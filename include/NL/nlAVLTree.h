@@ -221,7 +221,8 @@ public:
 
     static void DeleteEntry(AVLTreeUntemplated* tree, AVLTreeNode* entry)
     {
-        ((AVLTreeBase*)tree)->m_Allocator.Delete((Entry*)entry);
+        Entry* e = (Entry*)entry;
+        ((AVLTreeBase*)tree)->m_Allocator.Delete(e);
     }
 
     static void DeleteValue(AVLTreeUntemplated* tree, AVLTreeNode* entry)

@@ -53,7 +53,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
-#include "unclassified/tu_801AE530.h"
+#include "Game/Render/NumberDisplay.h"
 #include "Game/InputRouter.h"
 #include "Game/NetworkInput.h"
 #include "Game/NetworkSync.h"
@@ -230,11 +230,11 @@ void fn_80056CF4(void* param1, int param2, bool param3)
     }
     if (gpNumberDisplay == 0)
     {
-        UnidentifiedNumberDisplay_801AE530* numberDisplay
-            = static_cast<UnidentifiedNumberDisplay_801AE530*>(
+        NumberDisplay* numberDisplay
+            = static_cast<NumberDisplay*>(
                 nlMalloc(0x28, 8, false));
         numberDisplay
-            = new (numberDisplay) UnidentifiedNumberDisplay_801AE530();
+            = new (numberDisplay) NumberDisplay();
         gpNumberDisplay = numberDisplay;
     }
 
@@ -595,7 +595,7 @@ void cGame::fn_80058528(float timeScale, float transitionTime)
             }
 
             g_pOverlayManager->GetScene((SceneList)89)->SetVisible(false);
-            gpNumberDisplay->mUnidentified004 = false;
+            gpNumberDisplay->mVisible = false;
 
             if (transitionTime <= kGameTweakZero)
             {

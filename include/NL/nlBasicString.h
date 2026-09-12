@@ -167,6 +167,14 @@ public:
     {
     }
 
+    template <typename OtherAllocator>
+    BasicString(const BasicString<CharT, OtherAllocator>& other)
+        : mData(new Data(
+            other.mData != 0 ? other.mData->mData.mData : 0,
+            other.mData != 0 ? other.mData->mData.mData + other.mData->mData.mSize - 1 : 0))
+    {
+    }
+
     ~BasicString()
     {
         if (mData != 0)

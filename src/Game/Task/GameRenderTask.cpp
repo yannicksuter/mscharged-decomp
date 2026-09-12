@@ -56,7 +56,7 @@
 #include "unclassified/tu_801A6824.h"
 #include "unclassified/tu_801A6AAC.h"
 #include "Game/Render/PeachPhoto.h"
-#include "unclassified/tu_801AE530.h"
+#include "Game/Render/NumberDisplay.h"
 #include "Game/Render/Warble.h"
 #include "unclassified/tu_802B7798.h"
 #include "unclassified/tu_8037091C.h"

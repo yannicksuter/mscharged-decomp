@@ -46,7 +46,7 @@ struct glModelPacket
     /* 0x10 */ void* materialProgram;
     /* 0x14 */ u32 unknown14;
     /* 0x18 */ u32 matrix;
-    /* 0x1C */ u32 rasterState;
+    /* 0x1C */ unsigned int rasterState;
     /* 0x20 */ void* materialParameters;
     /* 0x24 */ DisplayList* displayList;
     /* 0x28 */ u32 skinnedVertices;

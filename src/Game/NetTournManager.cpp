@@ -37,63 +37,6 @@ static TweakIntBinding sOverrideCupPersonaTweak(
     "s_nOverrideCupPersona", "Network/Tournament", &s_nOverrideCupPersona,
     true);
 
-void NetMessagePauseRequest::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
-    serializer->Transfer(&mPaused, sizeof(mPaused));
-}
-
-void NetMessagePauseResponse::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mMachineMask, sizeof(mMachineMask));
-}
-
-int NetMessagePauseResponse::GetType()
-{
-    return 29;
-}
-
-int NetMessagePauseRequest::GetType()
-{
-    return 28;
-}
-
-NetMessagePauseRequest::~NetMessagePauseRequest()
-{
-}
-
-void NetworkMessageType30::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
-}
-
-void NetworkMessageType31::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
-}
-
-NetworkMessageType30::~NetworkMessageType30()
-{
-}
-
-NetworkMessageType31::~NetworkMessageType31()
-{
-}
-
-int NetworkMessageType31::GetType()
-{
-    return 31;
-}
-
-int NetworkMessageType30::GetType()
-{
-    return 30;
-}
-
 void NetworkMessageType34::Serialize(
     NetworkMessageSerializer* serializer)
 {

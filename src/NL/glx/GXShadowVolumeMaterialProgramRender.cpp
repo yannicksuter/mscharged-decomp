@@ -1,11 +1,20 @@
 #include <revolution/gx/GXTev.h>
 #include <revolution/gx/GXDisplayList.h>
 
-#include "NL/glx/GXMaterialProgram.h"
+#include "NL/glx/GXShadowVolumeMaterialProgram.h"
+#include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/GXMaterialShadowTweaks.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMemory.h"
+#include "Game/UnidentifiedStaticStorage.h"
+
+enum ShadowVolumeMode
+{
+    SHADOW_VOLUME_DISABLED = 1,
+    SHADOW_VOLUME_TEXTURE_MASK = 2,
+    SHADOW_VOLUME_FIXED_COLOUR = 3,
+};
 
 static int sShadowVolumeMode;
 
@@ -14,26 +23,26 @@ static void SetShadowVolumeMode(int mode)
     if (sShadowVolumeMode == mode)
         return;
 
-    gxSetTevAlphaOp(0, 0, 0, 0, true, 0);
-    gxSetTevAlphaIn(0, 7, 7, 7, 7);
-    gxSetTevColourOp(0, 0, 0, 0, true, 0);
-    gxSetTevColourIn(0, 15, 15, 15, 15);
+    gxSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+    gxSetTevColourOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
+    gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO);
 
     switch (mode)
     {
-    case 1:
+    case SHADOW_VOLUME_DISABLED:
         break;
-    case 3:
-        gxSetTevColourIn(0, 15, 15, 15, 4);
-        gxSetTevAlphaIn(0, 7, 7, 7, 2);
+    case SHADOW_VOLUME_FIXED_COLOUR:
+        gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C1);
+        gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A1);
         break;
-    case 2:
-        gxSetTexCoordGen(0, 1, 4, 60);
-        gxSetZMode(false, 4, false);
-        gxSetAlphaCompare(7, 0);
-        gxSetTevAlphaOp(0, 14, 0, 0, true, 0);
-        gxSetTevAlphaIn(0, 4, 7, 1, 7);
-        gxSetTevColourIn(0, 15, 15, 15, 2);
+    case SHADOW_VOLUME_TEXTURE_MASK:
+        gxSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+        gxSetZMode(false, GX_GREATER, false);
+        gxSetAlphaCompare(GX_ALWAYS, 0);
+        gxSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_COMP_A8_GT, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
+        gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_TEXA, GX_CA_ZERO, GX_CA_A0, GX_CA_ZERO);
+        gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
         break;
     }
 
@@ -74,31 +83,31 @@ void GXMaterialProgramImpl<GXShadowVolumeMaterialProgram>::Activate(GLView*)
     gxSetNumChans(0);
     gxSetNumTexGens(1);
     gxSetNumTevStages(1);
-    gxSetTevOrder(0, 0, 0, 255);
-    SetShadowVolumeMode(3);
+    gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    SetShadowVolumeMode(SHADOW_VOLUME_FIXED_COLOUR);
 }
 
 template <>
 void GXMaterialProgramImpl<GXShadowVolumeMaterialProgram>::Deactivate()
 {
-    SetShadowVolumeMode(1);
+    SetShadowVolumeMode(SHADOW_VOLUME_DISABLED);
 }
 
 template <>
 void GXMaterialProgramImpl<GXShadowVolumeMaterialProgram>::Prepare(
-    const glModelPacket* packet)
+    glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
+    glSetMaterialTextureAlphaState(this, packet, static_cast<const GXShadowVolumeParameters*>(packet->materialParameters)->diffuseTexture.texture);
 }
 
 template <>
 void GXMaterialProgramImpl<GXShadowVolumeMaterialProgram>::Draw(
     const glModelPacket* packet)
 {
-    if (*(int*)((unsigned char*)packet->materialParameters + 8) == 0)
-        SetShadowVolumeMode(2);
+    if (static_cast<const GXShadowVolumeParameters*>(packet->materialParameters)->useFixedColour == 0)
+        SetShadowVolumeMode(SHADOW_VOLUME_TEXTURE_MASK);
     else
-        SetShadowVolumeMode(3);
+        SetShadowVolumeMode(SHADOW_VOLUME_FIXED_COLOUR);
 
     static_cast<GXShadowVolumeMaterialProgram*>(this)->BindVertexArrays(packet);
     static_cast<GXShadowVolumeMaterialProgram*>(this)->BindParameters(packet);

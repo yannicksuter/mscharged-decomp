@@ -715,7 +715,7 @@ void NetworkLobby::UpdatePeerConnectionState(int aid)
 void NetworkLobby::BuildLocalMachineInfo(
     NetworkDraftMachineInfo* info)
 {
-    info->mIndex = GetLocalMachineIndex();
+    info->mMachineIndex = GetLocalMachineIndex();
     info->mGuestEnabled = HasOnlineTwoLocalPlayers();
 }
 
@@ -771,7 +771,7 @@ int NetworkLobby::ProcessMessage(
     case 0x16:
     {
         NetMessageDraftMachineInfo* machineInfo = (NetMessageDraftMachineInfo*)message;
-        int index = machineInfo->mEntry.mIndex;
+        int index = machineInfo->mEntry.mMachineIndex;
         if (index >= 0 && index < GetMachineCount())
         {
             mMachineInfo[index] = machineInfo->mEntry;

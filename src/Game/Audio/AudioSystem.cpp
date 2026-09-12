@@ -197,8 +197,8 @@ void FlushAudio(AudioSystem* audio, int param2, bool param3)
     while (it.hasNext())
     {
         XSoundHandle* handle = *it;
-        u32 state = handle->m_State;
-        if ((param3 && state == 7) || (state >= 2 && state <= 5))
+        int state = handle->m_State;
+        if ((param3 && state == 7) || (unsigned int)(state - 2) <= 3)
         {
             if (param2 == 2)
                 param2 = handle->IsCallbackEnabled();
@@ -206,7 +206,7 @@ void FlushAudio(AudioSystem* audio, int param2, bool param3)
         }
         else if (state == 8 && param2 == 1)
             handle->Release();
-        it.next();
+        it.Step();
     }
 }
 
@@ -272,5 +272,5 @@ void XSoundHandle::Update(float dt)
     }
 }
 
-u8 XSoundHandle::IsCallbackEnabled() { return m_CallbackEnabled; }
+int XSoundHandle::IsCallbackEnabled() { return m_CallbackEnabled; }
 Plat3dSoundSrc::~Plat3dSoundSrc() { }

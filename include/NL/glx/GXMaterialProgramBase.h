@@ -10,7 +10,7 @@ public:
     virtual void Activate(GLView* view);
     virtual void Deactivate();
     virtual void Configure(glModelPacket* packet) = 0;
-    virtual void Prepare(const glModelPacket* packet);
+    virtual void Prepare(glModelPacket* packet);
     virtual void Draw(const glModelPacket* packet);
     virtual const GXMaterialParameter* GetParameters() = 0;
     virtual void Initialize() = 0;

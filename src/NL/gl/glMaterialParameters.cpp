@@ -123,7 +123,7 @@ bool glHasMaterialParameter(
 }
 
 void glSetMaterialTextureAlphaState(
-    void*, const glModelPacket* packet, unsigned long texture)
+    void*, glModelPacket* packet, unsigned long texture)
 {
     if (texture == 0xFFFFFFFF)
     {
@@ -140,14 +140,14 @@ void glSetMaterialTextureAlphaState(
         break;
     case 1:
     {
-        unsigned int* rasterState = (unsigned int*)&packet->rasterState;
+        unsigned int* rasterState = &packet->rasterState;
         glSetRasterState(*rasterState, GLS_AlphaTest, 1);
         glSetRasterState(*rasterState, GLS_AlphaTestRef, 0x80);
         break;
     }
     default:
     {
-        unsigned int* rasterState = (unsigned int*)&packet->rasterState;
+        unsigned int* rasterState = &packet->rasterState;
         glSetRasterState(*rasterState, GLS_AlphaTest, 1);
         glSetRasterState(*rasterState, GLS_AlphaTestRef, 0);
         glSetRasterState(*rasterState, GLS_AlphaBlend, 1);

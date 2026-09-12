@@ -3,6 +3,7 @@
 
 #include "Game/DB/Cup.h"
 #include "Game/DB/CupInterface.h"
+#include "Game/GameInfo.h"
 #include "types.h"
 
 struct CupHistoryRecord
@@ -43,7 +44,7 @@ public:
     virtual ~CupManager();
 
     static CupManager* Instance();
-    s16 GetNextRoundNumber(int* roundType) const;
+    s16 GetNextRoundNumber(int* roundType);
     int GetTeamRank(int team) const;
     TeamStats GetTeamStats(int team) const;
     u16 GetNumRegularRounds() const { return mCurrentCup->GetNumRegularRounds(); }
@@ -84,9 +85,7 @@ public:
     /* 0x8A24 */ bool mShowCupPhasePopup;
     /* 0x8A25 */ u8 unknown_0x8A25[3];
     /* 0x8A28 */ int unknown_0x8A28;
-    /* 0x8A2C */ int unknown_0x8A2C;
-    /* 0x8A30 */ int unknown_0x8A30;
-    /* 0x8A34 */ int unknown_0x8A34;
+    /* 0x8A2C */ GameRules unknown_0x8A2C;
     /* 0x8A38 */ u32 unknown_0x8A38;
 };
 

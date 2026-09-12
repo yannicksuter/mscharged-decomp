@@ -26,7 +26,7 @@ struct AudioRead
     unsigned long m_Unknown10;
     AudioReadState* m_Unknown14;
     unsigned int m_Unknown18 : 31;
-    unsigned int m_Unknown1B : 1;
+    bool m_Unknown1B : 1;
 };
 
 class AudioBackendBase

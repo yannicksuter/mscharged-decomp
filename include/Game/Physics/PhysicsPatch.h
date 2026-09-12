@@ -1,6 +1,7 @@
 #ifndef GAME_PHYSICS_PHYSICS_PATCH_H
 #define GAME_PHYSICS_PHYSICS_PATCH_H
 
+#include "Game/EventConnection.h"
 #include "Game/Physics/PhysicsSphere.h"
 #include "NL/nlFunction.h"
 #include "NL/nlSlotPool.h"
@@ -98,7 +99,7 @@ public:
     void fn_801748A0(void* context, DebugWriteCache* cache);
 
     /* 0x00 */ PhysicsPatch* mUnidentified000[60];
-    /* 0xF0 */ void* mUnidentified0F0;
+    /* 0xF0 */ UnidentifiedEventConnectionOwner mUnidentified0F0;
     /* 0xF4 */ unsigned int mUnidentified0F4;
 }; // total size: 0xF8
 

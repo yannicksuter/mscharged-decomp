@@ -13,7 +13,6 @@ public:
 
     ListEntry()
         : next(0)
-        , entry(0)
     {
     }
 

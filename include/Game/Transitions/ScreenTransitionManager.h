@@ -59,7 +59,7 @@ public:
     /* 0x20 */ ScreenTransition* m_SelectedTransition;
     /* 0x24 */ float m_fCurrentTime;
     /* 0x28 */ float m_fCurrentLength;
-    /* 0x2C */ Vector<BasicString<char, Detail::TempStringAllocator>, DefaultAllocator> m_Transitions;
+    /* 0x2C */ Vector<BasicString<char, Detail::TempStringPoolAllocator>, DefaultAllocator> m_Transitions;
     /* 0x38 */ bool m_Cut;
 }; // total size: 0x3C
 

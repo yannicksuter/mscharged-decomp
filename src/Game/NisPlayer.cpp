@@ -1,10 +1,12 @@
 #include "Game/NisPlayer.h"
+#include "NL/nlBasicString.h"
 #include "Game/Render/StadiumLoading.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/EventDataTypes.h"
 #include "Game/EventRegistry.h"
 #include "NL/nlFunction.inl"
 #include "unclassified/tu_80284A58.h"
+#include "unclassified/tu_802BAE84.h"
 #include "Game/Player.h"
 #include "Game/ReplayManager.h"
 #include "Game/Game.h"
@@ -1742,4 +1744,89 @@ void NisPlayer::HideAllActors() const
     snapshot._1BA0.mVisible = false;
     snapshot.mBall.mFlags.bits.visible = false;
     snapshot.mChainChomp.visible = false;
+}
+
+void NisPlayer::Render(int pass) const
+{
+    nlTaskManager* taskManager = nlTaskManager::m_pInstance;
+    unsigned long currentState = taskManager->mCurrentState;
+
+    if (currentState != 0x10 || ((taskManager->mPreviousState == 0x10) && (currentState != 1)))
+    {
+        return;
+    }
+
+    HideAllActors();
+
+    bool renderPass = false;
+    if (fn_8027E64C() && pass == 0)
+    {
+        renderPass = true;
+    }
+    for (int i = 0; i < 8; i++)
+    {
+        if (mPlaying[i] != NULL)
+        {
+            if (mPlaying[i]->unknown_0x034 == renderPass || mPlaying[i]->unknown_0x034 == 2)
+            {
+                mPlaying[i]->Render(renderPass);
+            }
+        }
+    }
+    if (mUnidentified34359 && renderPass == 0)
+    {
+        int line = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            if (mPlaying[i] != NULL)
+            {
+                fn_802BB048(0, line++, false, 4, "Mirrored: %s", mPlaying[i]->mMirrored ? "True" : "False");
+                if (mPlaying[i]->mCamera != NULL && mPlaying[i]->mCamera->m_pActiveCameraData != NULL)
+                {
+                    fn_802BB048(0, line++, false, 4, "Camera: %s", mPlaying[i]->mCamera->m_pActiveCameraData->field_0x0C);
+                }
+                fn_802BB048(0, line++, false, 4, "Name: %s", mPlaying[i]->Name());
+            }
+        }
+    }
+    if (pass == 0 && fn_8027E64C())
+    {
+        mUnidentified3433C[mUnidentified34338]->Render();
+    }
+}
+
+void NisPlayer::LoadTriggers(Nis& nis)
+{
+    BasicString<char, Detail::TempStringAllocator> name(nis.Name());
+    for (int i = name.size() - 1; i >= 0; --i)
+    {
+        if (name[i] == '.')
+        {
+            name[i] = '\0';
+            break;
+        }
+    }
+    unsigned long nisHash = nlStringHash(name.c_str());
+    if (!FunctionExists(nisHash))
+    {
+        for (int i = 0; i < name.size(); ++i)
+        {
+            if (name[i] == '_')
+            {
+                name.erase(name.begin(), name.begin() + i);
+                char unknown_18[] = "all";
+                BasicString<char, Detail::TempStringAllocator> all("all");
+                name.insert(name.begin(), unknown_18, unknown_18 + sizeof(unknown_18) - 1);
+                break;
+            }
+        }
+        nisHash = nlStringHash(name.c_str());
+        if (!FunctionExists(nisHash))
+        {
+            return;
+        }
+    }
+    mNisForTriggerLoading = &nis;
+    CallFunction(nisHash);
+    mNisForTriggerLoading = NULL;
 }

@@ -138,11 +138,7 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
     if (!GameSceneManager::Instance()->IsOnStack((SceneList)0xA)
         && g_pFriendManager->FindHostInvitation())
     {
-        int invitationScene = 0x2A;
-        if (mMode == 0)
-        {
-            invitationScene = 0x29;
-        }
+        SceneList invitationScene = (mMode == 0) ? (SceneList)0x29 : (SceneList)0x2A;
         FriendManager* friendManager = g_pFriendManager;
         friendManager->mReturnScene = invitationScene;
         friendManager->mPreviousRankedMode = 0;

@@ -634,11 +634,11 @@ void SHOnlineFriendsChooseSides::OnDonePointerPress(int index, void* context)
             int machine = mOnlinePlayers[i].mMachineIndex;
             if (!mOnlinePlayers[i].mIsGuest)
             {
-                mDraftMessage.mUnidentified0B.mData[machine][0] = mPlayerSides[i];
+                mDraftMessage.mPlayerSides.mData[machine][0] = mPlayerSides[i];
             }
             else
             {
-                mDraftMessage.mUnidentified0B.mData[machine][1] = mPlayerSides[i];
+                mDraftMessage.mPlayerSides.mData[machine][1] = mPlayerSides[i];
             }
         }
     }

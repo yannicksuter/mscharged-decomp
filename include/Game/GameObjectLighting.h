@@ -5,6 +5,8 @@
 #include "types.h"
 
 class GLView;
+struct GameObjectLight;
+class nlMatrix4;
 class ImpostorModel;
 class LightingLookup;
 class TweakValueFloat;
@@ -29,15 +31,24 @@ void UpdateGameObjectLighting();
 void InitializeGameObjectLighting();
 bool AlwaysUseCameraRelativeCharacterLighting();
 
-// Lighting hooks called from the material programs; the programs disagree on
-// the parameter spellings, so they keep C linkage.
+// Shared lighting hooks used by the material programs.
 extern "C"
 {
-    void fn_80182ED0(s32, GLView*, bool);
-    void fn_801832F4(s32, s32, s32);
-    void fn_801837DC(s32, u32);
-    void fn_80183A98();
-    void fn_80183B40(u32 matrix);
+    int IsGameObjectLightingEnabled();
+    int ShouldUseGameObjectLightTexture(int character);
+    int ShouldDoubleGameObjectLighting();
+    int GetGameObjectLightCount(int character, int includeEffects);
+    GameObjectLight* GetGameObjectLight(s32 index, bool character);
+    void LoadGameObjectSpecularLight(s32 index, GameObjectLight* light, f32 exponent, const nlMatrix4& viewMatrix);
+    void SetGameObjectSpecularLightingEnabled(s32 enabled, s32 count);
+    unsigned long GetGameObjectLightTexture();
+    void LoadGameObjectLights(s32 count, GLView* view, bool character);
+    void SetGameObjectLightingEnabled(s32 enabled, s32 count, s32 useVertexColour);
+    void SetGameObjectAmbientLightingEnabled(s32 enabled);
+    void ApplyGameObjectShadowLighting(s32 skinned, u32 shadowLevel);
+    void RestoreGameObjectShadowLighting();
+    void SetGameObjectShadowModelMatrix(u32 matrix);
+    void SetGameObjectShadowViewMatrix(const nlMatrix4* matrix);
 }
 
 #endif // _GAMEOBJECTLIGHTING_H_

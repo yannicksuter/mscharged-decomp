@@ -322,21 +322,8 @@ void SHNavigation::SetPointerTeamColours()
     const CharacterInfo& info0 = GetCharacterInfo(GetCharacterIndexFromCaptain(team0));
     const CharacterInfo& info1 = GetCharacterInfo(GetCharacterIndexFromCaptain(team1));
 
-    unsigned long packedColour = GetTeamColour(info0, info1, true);
-    nlColour colour0;
-    colour0.c[0] = packedColour >> 24;
-    colour0.c[1] = packedColour >> 16;
-    colour0.c[2] = packedColour >> 8;
-    colour0.c[3] = packedColour;
-    teamColours[0] = colour0;
-
-    packedColour = GetTeamColour(info1, info0, true);
-    nlColour colour1;
-    colour1.c[0] = packedColour >> 24;
-    colour1.c[1] = packedColour >> 16;
-    colour1.c[2] = packedColour >> 8;
-    colour1.c[3] = packedColour;
-    teamColours[1] = colour1;
+    teamColours[0] = GetTeamColour(info0, info1, true);
+    teamColours[1] = GetTeamColour(info1, info0, true);
 
     for (int index = 0; index < 4; ++index)
     {

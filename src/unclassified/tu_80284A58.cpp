@@ -29,7 +29,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/Camera/tu_800F9460.h"
 #include "Game/Team.h"
-#include "unclassified/tu_801AE530.h"
+#include "Game/Render/NumberDisplay.h"
 #include "Game/TweakQuery.h"
 #include "NL/gl/gl.h"
 #include "NL/globalpad.h"
@@ -56,8 +56,8 @@ extern "C"
 // codegen, so it is a real source-level helper.
 static inline bool IsNumberDisplayCounting()
 {
-    return gpNumberDisplay->mUnidentified025
-        && gpNumberDisplay->mUnidentified018 > 0.0f;
+    return gpNumberDisplay->mShowAccumulatedScore
+        && gpNumberDisplay->mScoreUpdateTimer > 0.0f;
 }
 
 static const char* sIdleFunction = "Idle";
@@ -66,9 +66,23 @@ static nlColour sLetterBoxColour = { { 0x00, 0x00, 0x00, 0xFF } };
 
 static inline bool IsDuringGamePauseState()
 {
-    return !FrontEnd::m_bGameOver
-        && GetFixedUpdateTask()->mfFrameLockTime <= 0.0f
-        && nlTaskManager::m_pInstance->mCurrentState == 1;
+    bool bDuringGamePauseState = false;
+    bool bGameFrameUnlocked = false;
+    if (!FrontEnd::m_bGameOver)
+    {
+        bool bFrameLocked
+            = GetFixedUpdateTask()->mfFrameLockTime > 0.0f;
+        if (!bFrameLocked)
+        {
+            bGameFrameUnlocked = true;
+        }
+    }
+    if (bGameFrameUnlocked
+        && nlTaskManager::m_pInstance->mCurrentState == 1)
+    {
+        bDuringGamePauseState = true;
+    }
+    return bDuringGamePauseState;
 }
 
 /**
@@ -208,9 +222,10 @@ bool UnidentifiedPresentationState::DetectSkipPress()
         return false;
     }
 
-    if (((NetworkSessionControl*)g_pNetworkSessionBase)->GetSessionMode() != 0)
+    bool networkGame = g_pNetworkSessionBase->GetSessionMode();
+    if (networkGame)
     {
-        if (nlStrCmp<char>(mCurrentFunction, "GameBegin") != 0)
+        if (nlStrCmp<char>(mCurrentFunction, "GameBegin") == 0)
         {
             return false;
         }
@@ -226,7 +241,7 @@ bool UnidentifiedPresentationState::DetectSkipPress()
         {
             continue;
         }
-        if (g_pPadManager->GetPad(i)->PlatJustPressed(7, true))
+        if (g_pPadManager->GetPad(i)->PlatJustReleased(7, true))
         {
             return true;
         }
@@ -364,7 +379,7 @@ void UnidentifiedPresentationState::Update(float deltaTime)
 
     if (gpNumberDisplay != 0)
     {
-        gpNumberDisplay->fn_801AE728(deltaTime);
+        gpNumberDisplay->Update(deltaTime);
     }
 
     NisPlayer::Instance()->fn_8027CA44();
@@ -382,8 +397,9 @@ void UnidentifiedPresentationState::Update(float deltaTime)
         mDisplayLetterBox -= deltaTime;
         if (mDisplayLetterBox <= 0.0f)
         {
+            int replayTime = -30;
             fn_801959F0(&ReplayChoreo::Instance(),
-                fn_8018A16C(ReplayManager::Instance(), -30.0f));
+                fn_8018A16C(ReplayManager::Instance(), replayTime));
             mDisplayLetterBox = 0.0f;
         }
     }
@@ -392,7 +408,7 @@ void UnidentifiedPresentationState::Update(float deltaTime)
     {
         if (nlStrCmp<char>(mCurrentFunction, "GameBegin") == 0)
         {
-            if (nlTaskManager::m_pInstance->mCurrentState != 0x100)
+            if (nlTaskManager::m_pInstance->mCurrentState != 0x10)
             {
                 glDiscardFrame(1);
             }
@@ -425,12 +441,14 @@ void UnidentifiedPresentationState::Update(float deltaTime)
             mByPassing = true;
             mSkipPressed = false;
 
-            if (!skipPastByPass && g_pNetworkSession->IsLiveNetworkGame())
+            if (!skipPastByPass)
             {
                 SendSkipNis();
             }
 
             tDebugPrintManager::Print(DC_NETWORK, "Bypassing...\n");
+            g_pGame->mUnidentified49C.mEvent04.Queue(
+                Function<FnVoidVoid>());
         }
     }
 
@@ -442,12 +460,12 @@ void UnidentifiedPresentationState::Update(float deltaTime)
     Wiper::Instance().Render();
     UpdateAndRenderLetterBox();
 
-    if (mUnidentified163)
+    if (mUnidentified163 == true)
     {
         RLView* view = GetLayerView(eCLV_FrontEnd);
         RLView* previous = (RLView*)g_ShapeRenderer.m_eView;
-        nlColour colour = sLetterBoxColour;
         g_ShapeRenderer.m_eView = (GLView*)view;
+        nlColour colour = sLetterBoxColour;
         g_ShapeRenderer.DrawRectangle2D(0.0f, 0.0f, glGetOrthographicWidth(),
             glGetOrthographicHeight(), -2.0f, colour, 0);
         g_ShapeRenderer.m_eView = (GLView*)previous;
@@ -587,12 +605,14 @@ void UnidentifiedPresentationState::OnGoalieSave(void* data)
  */
 void UnidentifiedPresentationState::OnSuddenDeath(void* data)
 {
-    EffectsGroup* suddenDeath
+    EffectsGroup* endGame;
+    EffectsGroup* score;
+    EffectsGroup* suddenDeath;
+
+    suddenDeath
         = EmissionManager::Instance()->GetEffectsGroup("Goal_suddendeath");
-    EffectsGroup* score
-        = EmissionManager::Instance()->GetEffectsGroup("Goal_score");
-    EffectsGroup* endGame
-        = EmissionManager::Instance()->GetEffectsGroup("Goal_endgame");
+    score = EmissionManager::Instance()->GetEffectsGroup("Goal_score");
+    endGame = EmissionManager::Instance()->GetEffectsGroup("Goal_endgame");
 
     EmissionManager::Instance()->Destroy(suddenDeath);
     EmissionManager::Instance()->Destroy(score);
@@ -674,8 +694,7 @@ void UnidentifiedPresentationState::SendSkipNis()
             "Sending NetworkSkipNIS message bypass# %d in peer-peer mode\n",
             mByPassNumber);
 
-        NetworkMessageType30 message;
-        message.mUnidentified08 = mByPassNumber;
+        NetworkMessageType30 message(mByPassNumber);
         u8 buffer[12];
         int size = gNetworkMessageRegistry->Serialize(&message, buffer, 10);
         int machines = g_pNetworkSessionBase->GetNumMachines();
@@ -690,9 +709,8 @@ void UnidentifiedPresentationState::SendSkipNis()
             "Sending NetworkSkipNISClient message bypass# %d in client-server mode\n",
             mByPassNumber);
 
-        NetworkMessageType31 message;
-        message.mUnidentified08 = mByPassNumber;
         u8 buffer[12];
+        NetworkMessageType31 message(mByPassNumber);
         int size = gNetworkMessageRegistry->Serialize(&message, buffer, 10);
         g_pNetworkSessionBase->Send(0, buffer, size, true);
     }
@@ -742,10 +760,9 @@ int UnidentifiedPresentationState::ProcessMessage(NetworkMessage* message)
                 "Host relaying origin machine %d sending NetworkSkipNIS message bypass# %d to all\n",
                 machine, ((NetworkMessageType31*)message)->mUnidentified08);
 
-            NetworkMessageType30 relay;
-            relay.mUnidentified08
-                = ((NetworkMessageType31*)message)->mUnidentified08;
             u8 buffer[12];
+            NetworkMessageType30 relay(
+                ((NetworkMessageType31*)message)->mUnidentified08);
             int size
                 = gNetworkMessageRegistry->Serialize(&relay, buffer, 10);
             int machines = g_pNetworkSessionBase->GetNumMachines();

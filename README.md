@@ -118,15 +118,12 @@ This project is based on
 [encounter/dtk-template](https://github.com/encounter/dtk-template) and uses
 [decomp-toolkit](https://github.com/encounter/decomp-toolkit). Thanks to the
 GameCube/Wii decompilation community for the tools and documentation that make
-projects like this possible. The initial CodeWarrior runtime sources were
-adapted from [Petari](https://github.com/SMGCommunity/Petari). See
-[docs/PROVENANCE.md](docs/PROVENANCE.md) for the pinned reference revisions and
-the reconstructed source areas adapted from them.
+projects like this possible.
 
 ## License
 
 The repository's original source contributions are dedicated to the public
 domain under [CC0 1.0](LICENSE). Third-party source retains its own terms; see
-[LICENSES](LICENSES) and the [source provenance record](docs/PROVENANCE.md).
+[LICENSES](LICENSES).
 Game assets and other copyrighted material are not covered and must not be
 committed.
