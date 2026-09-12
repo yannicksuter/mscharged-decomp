@@ -101,10 +101,10 @@ TweakValueFloat::~TweakValueFloat()
 {
 }
 
-void TweakValueFloat::UnidentifiedVirtual2C(
+void TweakValueFloat::CopyValueFrom(
     TweakValueBase* other)
 {
-    switch (other->UnidentifiedVirtual10())
+    switch (other->GetStorageKind())
     {
     case 1:
         value = ((TweakValueFloat*)other)->value;
@@ -115,28 +115,28 @@ void TweakValueFloat::UnidentifiedVirtual2C(
     }
 }
 
-int TweakValueFloat::UnidentifiedVirtual10()
+int TweakValueFloat::GetStorageKind()
 {
     return 1;
 }
 
-int TweakValueFloat::UnidentifiedVirtual0C()
+int TweakValueFloat::GetValueType()
 {
     return 5;
 }
 
-void* TweakValueFloat::UnidentifiedVirtual20()
+void* TweakValueFloat::GetValueAddress()
 {
     return &value;
 }
 
-void TweakValueFloat::UnidentifiedVirtual24(
+void TweakValueFloat::FormatValue(
     char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%.3f", value);
 }
 
-void TweakValueFloat::UnidentifiedVirtual28(
+void TweakValueFloat::ParseValue(
     const char* string)
 {
     value = (float)atof(string);

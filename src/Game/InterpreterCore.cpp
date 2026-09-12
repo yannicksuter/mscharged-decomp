@@ -981,7 +981,7 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
             bool result = intTarget->Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3);
             if (result == 0)
             {
-                *intTarget->m_pValue = intTarget->UnidentifiedVirtual3C();
+                *intTarget->m_pValue = intTarget->GetDefault();
             }
             if (result == 0)
             {
@@ -993,7 +993,7 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
             TweakIntBinding* target = &storage->unknown_0x0C[index];
             if (target->Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3) == 0)
             {
-                *target->m_pValue = target->UnidentifiedVirtual3C();
+                *target->m_pValue = target->GetDefault();
             }
         }
         break;
@@ -1021,7 +1021,7 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
             bool result = target.Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3);
             if (result == 0)
             {
-                *target.m_pValue = target.UnidentifiedVirtual3C();
+                *target.m_pValue = target.GetDefault();
             }
             if (result == 0)
             {
@@ -1033,7 +1033,7 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
             TweakFloatBinding* target = &storage->unknown_0x10[index - storage->unknown_0x00];
             if (target->Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3) == 0)
             {
-                *target->m_pValue = target->UnidentifiedVirtual3C();
+                *target->m_pValue = target->GetDefault();
             }
         }
         break;
@@ -1057,7 +1057,7 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
             TweakBoolBinding* target = &storage->unknown_0x14[storageIndex];
             if (target->Bind(name) == 0)
             {
-                *target->m_pValue = target->UnidentifiedVirtual3C();
+                *target->m_pValue = target->GetDefault();
             }
         }
         break;

@@ -17,10 +17,10 @@ TweakValueInt::~TweakValueInt()
 {
 }
 
-void TweakValueInt::UnidentifiedVirtual2C(
+void TweakValueInt::CopyValueFrom(
     TweakValueBase* other)
 {
-    switch (other->UnidentifiedVirtual10())
+    switch (other->GetStorageKind())
     {
     case 1:
         value = ((TweakValueInt*)other)->value;
@@ -31,28 +31,28 @@ void TweakValueInt::UnidentifiedVirtual2C(
     }
 }
 
-int TweakValueInt::UnidentifiedVirtual10()
+int TweakValueInt::GetStorageKind()
 {
     return 1;
 }
 
-int TweakValueInt::UnidentifiedVirtual0C()
+int TweakValueInt::GetValueType()
 {
     return 3;
 }
 
-void* TweakValueInt::UnidentifiedVirtual20()
+void* TweakValueInt::GetValueAddress()
 {
     return &value;
 }
 
-void TweakValueInt::UnidentifiedVirtual24(
+void TweakValueInt::FormatValue(
     char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%d", value);
 }
 
-void TweakValueInt::UnidentifiedVirtual28(
+void TweakValueInt::ParseValue(
     const char* string)
 {
     value = atoi(string);

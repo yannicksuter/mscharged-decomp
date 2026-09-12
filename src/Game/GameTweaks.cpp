@@ -39,7 +39,7 @@ bool TweakIntBinding::BindWithDefault(const char* name, int defaultValue,
     bool found = Bind(name, value, group, reload, min, max);
     if (!found)
     {
-        *m_pValue = UnidentifiedVirtual3C();
+        *m_pValue = GetDefault();
     }
     if (!found)
     {
@@ -48,17 +48,17 @@ bool TweakIntBinding::BindWithDefault(const char* name, int defaultValue,
     return found;
 }
 
-int TweakIntBinding::UnidentifiedVirtual3C()
+int TweakIntBinding::GetDefault()
 {
     return 0;
 }
 
-int TweakIntBinding::UnidentifiedVirtual0C()
+int TweakIntBinding::GetValueType()
 {
     return 3;
 }
 
-int TweakIntBinding::UnidentifiedVirtual10()
+int TweakIntBinding::GetStorageKind()
 {
     return 2;
 }
@@ -71,7 +71,7 @@ void TweakIntBinding::UnidentifiedVirtual14(
     *increment = 0.0f;
 }
 
-TweakValueBase* TweakIntBinding::UnidentifiedVirtual34(
+TweakValueBase* TweakIntBinding::CreateValue(
     const char* name, void* entry)
 {
     TweakValueInt* created = new (
@@ -81,26 +81,26 @@ TweakValueBase* TweakIntBinding::UnidentifiedVirtual34(
     return created;
 }
 
-void* TweakIntBinding::UnidentifiedVirtual20()
+void* TweakIntBinding::GetValueAddress()
 {
     return m_pValue;
 }
 
-void TweakIntBinding::UnidentifiedVirtual24(
+void TweakIntBinding::FormatValue(
     char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, "%d", *m_pValue);
 }
 
-void TweakIntBinding::UnidentifiedVirtual28(const char* value)
+void TweakIntBinding::ParseValue(const char* value)
 {
     *m_pValue = atoi(value);
 }
 
-void TweakIntBinding::UnidentifiedVirtual2C(
+void TweakIntBinding::CopyValueFrom(
     TweakValueBase* other)
 {
-    switch (other->UnidentifiedVirtual10())
+    switch (other->GetStorageKind())
     {
     case 1:
         *m_pValue = ((TweakValueInt*)other)->value;
@@ -111,12 +111,12 @@ void TweakIntBinding::UnidentifiedVirtual2C(
     }
 }
 
-int TweakIntBinding::UnidentifiedVirtual30()
+int TweakIntBinding::IsBound()
 {
     return m_pValue != 0;
 }
 
-void TweakIntBinding::UnidentifiedVirtual38(void* value)
+void TweakIntBinding::BindValueAddress(void* value)
 {
     m_pValue = (int*)value;
 }

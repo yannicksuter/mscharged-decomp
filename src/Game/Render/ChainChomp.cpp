@@ -156,7 +156,7 @@ static inline void EmitTrail(ChainChomp* pChomp)
 
 static inline void StartChasing(ChainChomp* pChomp)
 {
-    pChomp->mfChaseSpeed = gGameTweaks.m_pGameTweaks->fChainChompSpeed.UnidentifiedGetValue();
+    pChomp->mfChaseSpeed = gGameTweaks.m_pGameTweaks->fChainChompSpeed.GetValue();
     if (pChomp->mfChaseSpeed > 25.0f)
     {
         pChomp->mfChaseSpeed = 25.0f;
@@ -191,7 +191,7 @@ void ChainChomp::Update(float fDeltaT)
 
             EmitTrail(this);
             StartChasing(this);
-            mtStateTimer.SetSeconds(0.5f * gGameTweaks.m_pGameTweaks->fChainChompActiveTime.UnidentifiedGetValue());
+            mtStateTimer.SetSeconds(0.5f * gGameTweaks.m_pGameTweaks->fChainChompActiveTime.GetValue());
         }
         break;
 
@@ -243,7 +243,7 @@ void ChainChomp::Update(float fDeltaT)
             }
             v3RecoverPosition.z = gfChainChompGroundHeight;
             cField::FixOutOfBoundsPosition(v3RecoverPosition,
-                gGameTweaks.m_pGameTweaks->fChainChompRadius.UnidentifiedGetValue(),
+                gGameTweaks.m_pGameTweaks->fChainChompRadius.GetValue(),
                 true);
             SetPosition(v3RecoverPosition);
         }
@@ -297,7 +297,7 @@ void ChainChomp::Update(float fDeltaT)
                     0.0f,
                     0);
                 StartChasing(this);
-                mtStateTimer.SetSeconds(gGameTweaks.m_pGameTweaks->fChainChompActiveTime.UnidentifiedGetValue());
+                mtStateTimer.SetSeconds(gGameTweaks.m_pGameTweaks->fChainChompActiveTime.GetValue());
             }
         }
         break;
@@ -326,10 +326,10 @@ void ChainChomp::Update(float fDeltaT)
                 if (absDelta < 0x1800)
                 {
                     const nlVector3& v3ChompPosition = mv3Position;
-                    float fRadius = gfChainChompAttackRange + gGameTweaks.m_pGameTweaks->fChainChompRadius.UnidentifiedGetValue();
+                    float fRadius = gfChainChompAttackRange + gGameTweaks.m_pGameTweaks->fChainChompRadius.GetValue();
                     if (nlVec3DistanceSquared2D(v3ChompPosition, mpTarget->mUnidentified024.m_v3Position) < fRadius * fRadius)
                     {
-                        mfDesiredSpeed = gfChainChompWindupSpeedScale * gGameTweaks.m_pGameTweaks->fChainChompSpeed.UnidentifiedGetValue();
+                        mfDesiredSpeed = gfChainChompWindupSpeedScale * gGameTweaks.m_pGameTweaks->fChainChompSpeed.GetValue();
                         PowerupBase::PlayPowerupSound(POWER_UP_CHAIN_CHOMP,
                             PowerupBase::PWRUP_SOUND_IN_EFFECT,
                             v3ChompPosition,
@@ -357,7 +357,7 @@ void ChainChomp::Update(float fDeltaT)
         Move(fDeltaT);
         if (mpAnimController->TestFrameTrigger(3.0f))
         {
-            mfDesiredSpeed = gfChainChompAttackSpeedScale * gGameTweaks.m_pGameTweaks->fChainChompSpeed.UnidentifiedGetValue();
+            mfDesiredSpeed = gfChainChompAttackSpeedScale * gGameTweaks.m_pGameTweaks->fChainChompSpeed.GetValue();
         }
         if (mpAnimController->TestFrameTrigger(6.0f))
         {
@@ -423,7 +423,7 @@ void ChainChomp::Update(float fDeltaT)
     if (GameInfoManager::Instance()->GetStadium() != 0xB && meChainChompState != CHAIN_STATE_LEAVE)
     {
         cField::FixOutOfBoundsPosition(v3UpdatedPosition,
-            gGameTweaks.m_pGameTweaks->fChainChompRadius.UnidentifiedGetValue(),
+            gGameTweaks.m_pGameTweaks->fChainChompRadius.GetValue(),
             true);
     }
     SetPosition(v3UpdatedPosition);
@@ -795,7 +795,7 @@ void ChainChomp::DrawShadow(
             frac = 1.0f;
         }
 
-        float radius = gGameTweaks.m_pGameTweaks->fChainChompRadius.UnidentifiedGetValue();
+        float radius = gGameTweaks.m_pGameTweaks->fChainChompRadius.GetValue();
         radius = 1.5f * radius;
         float fAlpha = 150.0f * (1.0f - frac) + 60.0f * frac;
         half_dim = 6.0f * frac + (1.0f - frac) * radius;

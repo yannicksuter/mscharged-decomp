@@ -1425,10 +1425,10 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     case POWER_UP_FREEZE_SHELL:
     {
         const float fFiveChance
-            = gGameTweaks.m_pGameTweaks->fShellFiveChance.UnidentifiedGetValue();
+            = gGameTweaks.m_pGameTweaks->fShellFiveChance.GetValue();
         const float fThreeChance
             = fFiveChance
-            + gGameTweaks.m_pGameTweaks->fShellThreeChance.UnidentifiedGetValue();
+            + gGameTweaks.m_pGameTweaks->fShellThreeChance.GetValue();
         if (fRandom < fFiveChance)
         {
             nNumOfPowerups = 5;
@@ -1452,10 +1452,10 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     case POWER_UP_BOBOMB:
     {
         const float fFiveChance
-            = gGameTweaks.m_pGameTweaks->fBobombFiveChance.UnidentifiedGetValue();
+            = gGameTweaks.m_pGameTweaks->fBobombFiveChance.GetValue();
         const float fThreeChance
             = fFiveChance
-            + gGameTweaks.m_pGameTweaks->fBobombThreeChance.UnidentifiedGetValue();
+            + gGameTweaks.m_pGameTweaks->fBobombThreeChance.GetValue();
         if (fRandom < fFiveChance)
         {
             nNumOfPowerups = 5;
@@ -1469,10 +1469,10 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     case POWER_UP_BANANA:
     {
         const float fFiveChance
-            = gGameTweaks.m_pGameTweaks->fBananaFiveChance.UnidentifiedGetValue();
+            = gGameTweaks.m_pGameTweaks->fBananaFiveChance.GetValue();
         const float fThreeChance
             = fFiveChance
-            + gGameTweaks.m_pGameTweaks->fBananaThreeChance.UnidentifiedGetValue();
+            + gGameTweaks.m_pGameTweaks->fBananaThreeChance.GetValue();
         if (fRandom < fFiveChance)
         {
             nNumOfPowerups = 5;

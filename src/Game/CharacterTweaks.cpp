@@ -165,30 +165,30 @@ void fn_8002B934(PlayerTweaks* tweaks, const char* name,
 
 extern "C" float fn_8002BE18(PlayerTweaks* tweaks)
 {
-    return (tweaks->fPassing.UnidentifiedGetValue()
-               + tweaks->fShooting.UnidentifiedGetValue())
+    return (tweaks->fPassing.GetValue()
+               + tweaks->fShooting.GetValue())
          / 2.0f;
 }
 
 extern "C" float fn_8002BE38(PlayerTweaks* tweaks)
 {
-    float result = tweaks->mUnidentified054.UnidentifiedGetValue()
-                 + tweaks->mUnidentified034.UnidentifiedGetValue();
-    return (result + tweaks->mUnidentified074.UnidentifiedGetValue()) / 3.0f;
+    float result = tweaks->mUnidentified054.GetValue()
+                 + tweaks->mUnidentified034.GetValue();
+    return (result + tweaks->mUnidentified074.GetValue()) / 3.0f;
 }
 
 extern "C" float fn_8002BE64(PlayerTweaks* tweaks)
 {
-    return (tweaks->fPassing.UnidentifiedGetValue()
-               + tweaks->mUnidentified034.UnidentifiedGetValue())
+    return (tweaks->fPassing.GetValue()
+               + tweaks->mUnidentified034.GetValue())
          / 2.0f;
 }
 
 extern "C" float fn_8002BE84(PlayerTweaks* tweaks)
 {
-    float result = tweaks->mUnidentified074.UnidentifiedGetValue()
-                 + tweaks->mUnidentified054.UnidentifiedGetValue();
-    return (result + tweaks->fShooting.UnidentifiedGetValue()) / 3.0f;
+    float result = tweaks->mUnidentified074.GetValue()
+                 + tweaks->mUnidentified054.GetValue();
+    return (result + tweaks->fShooting.GetValue()) / 3.0f;
 }
 
 float PlayerTweaks::GetSkillRating(unsigned int index)
@@ -212,25 +212,25 @@ float PlayerTweaks::GetSkillRating(unsigned int index)
         result = fPassing;
         break;
     case 6:
-        result = mUnidentified054.UnidentifiedGetValue()
-               + mUnidentified034.UnidentifiedGetValue();
-        result = (result + mUnidentified074.UnidentifiedGetValue())
+        result = mUnidentified054.GetValue()
+               + mUnidentified034.GetValue();
+        result = (result + mUnidentified074.GetValue())
                / 3.0f;
         break;
     case 7:
-        result = (fPassing.UnidentifiedGetValue()
-                     + fShooting.UnidentifiedGetValue())
+        result = (fPassing.GetValue()
+                     + fShooting.GetValue())
                / 2.0f;
         break;
     case 8:
-        result = (fPassing.UnidentifiedGetValue()
-                     + mUnidentified034.UnidentifiedGetValue())
+        result = (fPassing.GetValue()
+                     + mUnidentified034.GetValue())
                / 2.0f;
         break;
     case 9:
-        result = mUnidentified074.UnidentifiedGetValue()
-               + mUnidentified054.UnidentifiedGetValue();
-        result = (result + fShooting.UnidentifiedGetValue()) / 3.0f;
+        result = mUnidentified074.GetValue()
+               + mUnidentified054.GetValue();
+        result = (result + fShooting.GetValue()) / 3.0f;
         break;
     }
     return result;
@@ -359,7 +359,7 @@ extern "C" float fn_8002C678(PlayerTweaks* tweaks)
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
     float scale = 0.25f * terrain + 0.75f;
     return Interpolate(
-        scale * gGameTweaks.mFielderTweaks->mUnidentified184.UnidentifiedGetValue(),
+        scale * gGameTweaks.mFielderTweaks->mUnidentified184.GetValue(),
         scale * (float)gGameTweaks.mFielderTweaks->mUnidentified194,
         tweaks->fPassing);
 }

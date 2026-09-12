@@ -585,7 +585,7 @@ config.libs = [
             Object(Matching, "Game/TweakValue.cpp"),
             Object(NonMatching, "Game/TweakEntry.cpp"),
             Object(NonMatching, "Game/TweakConfig.cpp", extra_cflags=["-ipa file"]),
-            Object(Matching, "Game/tu_802C7480.cpp"),
+            Object(Matching, "Game/TweakValueBase.cpp"),
             Object(NonMatching, "Game/Replay.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "NL/nlFont.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "NL/nlTextBox.cpp"),

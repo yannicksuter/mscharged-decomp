@@ -262,21 +262,15 @@ extern "C" PhysicsSphere_80175F8C* fn_801768E0(
 static char sBowserExplodeEffect[] = "bowser_explode";
 static char sDaisyFistExitEffect[] = "daisy_fist_exit";
 
-static inline void EmitSphereEffect(
-    const char* name, const nlVector3& position)
-{
-    EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(name);
-    if (group != 0)
-    {
-        EmissionController* controller = EmissionManager::Instance()->Create(group, 3, true, 0);
-        controller->SetPosition(position);
-    }
-}
-
 extern "C" PhysicsSphere_80175F8C* fn_80176A60(
     const nlVector3* position)
 {
-    EmitSphereEffect(sBowserExplodeEffect, *position);
+    EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(sBowserExplodeEffect);
+    if (group != 0)
+    {
+        EmissionController* controller = EmissionManager::Instance()->Create(group, 3, true, 0);
+        controller->SetPosition(*position);
+    }
     return CreateSphere(
         0, *position, 0, lbl_806DCAE0, lbl_806DCAF4);
 }
@@ -284,7 +278,12 @@ extern "C" PhysicsSphere_80175F8C* fn_80176A60(
 PhysicsSphere_80175F8C* CreateDaisyFistImpact(
     const nlVector3* position, cCharacter* owner)
 {
-    EmitSphereEffect(sDaisyFistExitEffect, *position);
+    EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(sDaisyFistExitEffect);
+    if (group != 0)
+    {
+        EmissionController* controller = EmissionManager::Instance()->Create(group, 3, true, 0);
+        controller->SetPosition(*position);
+    }
     fn_800F026C(sDaisyCameraShake, lbl_806DCAFC, lbl_806DCB00);
     return CreateSphere(
         owner, *position, 5, lbl_806DCAE4, lbl_806DCAF8);

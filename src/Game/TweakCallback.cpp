@@ -24,7 +24,7 @@ void TweakCallback::Register()
     nlListAddEnd(&sTweakCallbackHead, &sTweakCallbackTail, this);
 }
 
-int TweakCallback::UnidentifiedVirtual0C()
+int TweakCallback::GetValueType()
 {
     int result = 6;
     if (mUnidentified010)

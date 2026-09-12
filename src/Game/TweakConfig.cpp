@@ -105,7 +105,7 @@ void TweakConfigParser::TagValuePair(
     }
     else
     {
-        node->m_Value->UnidentifiedVirtual28(value.c_str());
+        node->m_Value->ParseValue(value.c_str());
     }
 }
 

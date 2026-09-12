@@ -340,7 +340,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
             {
                 continue;
             }
-            worldPos.z += ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.UnidentifiedGetValue()
+            worldPos.z += ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue()
                 * 0.5f;
         }
         else
@@ -440,7 +440,7 @@ static void UpdateAndRenderPlayerIndicators(float)
                 continue;
             }
             fVerticalOffset
-                = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.UnidentifiedGetValue() * 0.5f
+                = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue() * 0.5f
                 * pCharacter->mUnidentified024.m_fPlayerScale;
         }
         else

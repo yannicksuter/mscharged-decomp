@@ -12,7 +12,7 @@ public:
         : value(0)
     {
         mName = name;
-        mUnidentified009 = false;
+        mFormatName = false;
 
         if (IsTweakRegistryInitialized() == 0)
         {
@@ -36,7 +36,7 @@ public:
         : value(initialValue)
     {
         mName = name;
-        mUnidentified009 = true;
+        mFormatName = true;
 
         if (IsTweakRegistryInitialized() == 0)
         {
@@ -60,14 +60,14 @@ public:
         mName = name;
     }
     virtual ~TweakValueInt();
-    virtual int UnidentifiedVirtual0C();
-    virtual int UnidentifiedVirtual10();
+    virtual int GetValueType();
+    virtual int GetStorageKind();
     virtual void UnidentifiedVirtual14(float*, float*, float*);
     virtual void UnidentifiedVirtual18();
-    virtual void* UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24(char*, unsigned long);
-    virtual void UnidentifiedVirtual28(const char*);
-    virtual void UnidentifiedVirtual2C(TweakValueBase*);
+    virtual void* GetValueAddress();
+    virtual void FormatValue(char*, unsigned long);
+    virtual void ParseValue(const char*);
+    virtual void CopyValueFrom(TweakValueBase*);
 
     static void operator delete(void* pointer)
     {

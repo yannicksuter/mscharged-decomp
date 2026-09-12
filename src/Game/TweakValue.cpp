@@ -52,16 +52,16 @@ bool TweakBindingBase::Bind(const char* name, float value,
             {
                 name = InternTweakString(name, 5);
             }
-            created = UnidentifiedVirtual34(name, entry);
-            UnidentifiedVirtual38(created->UnidentifiedVirtual20());
+            created = CreateValue(name, entry);
+            BindValueAddress(created->GetValueAddress());
             return false;
         }
         else
         {
             TweakValueBase* existing = found->m_Value;
-            UnidentifiedVirtual0C();
-            existing->UnidentifiedVirtual0C();
-            UnidentifiedVirtual38(existing->UnidentifiedVirtual20());
+            GetValueType();
+            existing->GetValueType();
+            BindValueAddress(existing->GetValueAddress());
             return true;
         }
     }

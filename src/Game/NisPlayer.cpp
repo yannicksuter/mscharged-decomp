@@ -1,5 +1,7 @@
 #include "Game/NisPlayer.h"
 #include "unclassified/tu_80284A58.h"
+#include "Game/CharacterTemplate.h"
+#include "Game/Player.h"
 #include "Game/Game.h"
 #include "Game/Render/ShootToScoreArrow.h"
 #include "unclassified/tu_800A9B78.h"
@@ -44,6 +46,7 @@ void fn_8027F174(glModel*);
 extern void (*lbl_806E217C)(glModel*);
 
 NisPlayer* NisPlayer::sInstance;
+bool g_ForceDoubleBallTransition;
 
 bool NisPlayer::WorldIsFrozen() const
 {
@@ -141,6 +144,24 @@ void NisPlayer::fn_802805B4(NisHeader& nisHeader, NisTarget target, NisUseStadiu
                 break;
             }
         }
+    }
+}
+
+void NisPlayer::fn_8027DFE4(cPlayer* param1)
+{
+    if (g_pGame == NULL)
+    {
+        return;
+    }
+    if (g_pGame->m_eGameState == 3)
+    {
+        return;
+    }
+    g_ForceDoubleBallTransition = false;
+    if (param1 != NULL)
+    {
+        mUnidentified34238 = param1->m_pTeam->m_nSide;
+        mUnidentified340C0 = GetCharacterIndex(param1);
     }
 }
 

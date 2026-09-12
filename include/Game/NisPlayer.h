@@ -8,6 +8,7 @@
 
 class NisPlayerOverlay;
 class nlFile;
+class cPlayer;
 struct glModel;
 
 class NisPlayer : public InterpreterCore
@@ -29,6 +30,7 @@ public:
     void fn_8027D11C();
     void fn_8027D994();
     void fn_8027D1EC();
+    void fn_8027DFE4(cPlayer* param1);
     void fn_8027E5D4();
     void SetExtraNameFilter(const char* filter);
     bool WorldIsFrozen() const;

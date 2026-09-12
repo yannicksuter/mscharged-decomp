@@ -62,8 +62,8 @@ void AddTweakChild(TweakEntry* entry, TweakNode* child);
 void RemoveDynamicTweakChildren(TweakEntry* entry);
 void RemoveTweakValue(TweakEntry* entry, TweakValueBase* value);
 void ClearTweakChildren(TweakEntry* entry);
-void SplitTweakPath(const char* path, const char** name, char* dir);
-void JoinTweakPath(const char* a, const char* b, char* out);
+void SplitTweakPath(const char* path, const char** leafName, char* directory);
+void JoinTweakPath(const char* parentPath, const char* childPath, char* buffer);
 int IsTweakNameOnStack(const char* name);
 
 // Recycled-name TU.
@@ -170,8 +170,8 @@ public:
         mName = name;
     }
     virtual ~TweakValueString() { }
-    virtual int UnidentifiedVirtual0C() { return 8; }
-    virtual int UnidentifiedVirtual10() { return 1; }
+    virtual int GetValueType() { return 8; }
+    virtual int GetStorageKind() { return 1; }
     virtual void UnidentifiedVirtual14(float* value, float* min, float* max)
     {
         *value = 0.0f;
@@ -179,18 +179,18 @@ public:
         *max = 0.0f;
     }
     virtual void UnidentifiedVirtual18() { }
-    virtual void* UnidentifiedVirtual20() { return &m_Value; }
-    virtual void UnidentifiedVirtual24(char* buffer, unsigned long size)
+    virtual void* GetValueAddress() { return &m_Value; }
+    virtual void FormatValue(char* buffer, unsigned long size)
     {
         nlSNPrintf(buffer, size, "%s", m_Value);
     }
-    virtual void UnidentifiedVirtual28(const char* str)
+    virtual void ParseValue(const char* str)
     {
         m_Value = InternTweakString(str, kTweakStringValue);
     }
-    virtual void UnidentifiedVirtual2C(TweakValueBase* other)
+    virtual void CopyValueFrom(TweakValueBase* other)
     {
-        switch (other->UnidentifiedVirtual10())
+        switch (other->GetStorageKind())
         {
         case 1:
             m_Value = ((TweakValueString*)other)->m_Value;
@@ -216,12 +216,12 @@ public:
     }
     static void* operator new(unsigned long size) { return nlMalloc(size, 8, false); }
     virtual ~TweakValueName() { }
-    virtual int UnidentifiedVirtual0C() { return 1; }
-    virtual int UnidentifiedVirtual10() { return 3; }
-    virtual void* UnidentifiedVirtual20() { return 0; }
-    virtual void UnidentifiedVirtual24(char*, unsigned long) { }
-    virtual void UnidentifiedVirtual28(const char*) { }
-    virtual void UnidentifiedVirtual2C(TweakValueBase*) { }
+    virtual int GetValueType() { return 1; }
+    virtual int GetStorageKind() { return 3; }
+    virtual void* GetValueAddress() { return 0; }
+    virtual void FormatValue(char*, unsigned long) { }
+    virtual void ParseValue(const char*) { }
+    virtual void CopyValueFrom(TweakValueBase*) { }
     virtual int UnidentifiedVirtual30() { return 1; }
     virtual int UnidentifiedVirtual34() { return 0; }
 }; // size: 0x0C

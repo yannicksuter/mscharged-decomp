@@ -33,7 +33,7 @@ extern "C" void fn_801A2004(
     if (!registered)
     {
         *values->miHighRangeIndex.m_pValue
-            = values->miHighRangeIndex.UnidentifiedVirtual3C();
+            = values->miHighRangeIndex.GetDefault();
     }
     if (!registered)
     {
@@ -51,7 +51,7 @@ extern "C" void fn_801A2004(
     if (!registered)
     {
         *values->miHighRangeGray.m_pValue
-            = values->miHighRangeGray.UnidentifiedVirtual3C();
+            = values->miHighRangeGray.GetDefault();
     }
     if (!registered)
     {
@@ -64,7 +64,7 @@ extern "C" void fn_801A2004(
     if (!registered)
     {
         *values->mbFineHighRange.m_pValue
-            = values->mbFineHighRange.UnidentifiedVirtual3C();
+            = values->mbFineHighRange.GetDefault();
     }
     if (!registered)
     {
@@ -75,7 +75,7 @@ extern "C" void fn_801A2004(
             "miRed", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
-        *values->miRed.m_pValue = values->miRed.UnidentifiedVirtual3C();
+        *values->miRed.m_pValue = values->miRed.GetDefault();
     }
     if (!registered)
     {
@@ -87,7 +87,7 @@ extern "C" void fn_801A2004(
     if (!registered)
     {
         *values->miGreen.m_pValue
-            = values->miGreen.UnidentifiedVirtual3C();
+            = values->miGreen.GetDefault();
     }
     if (!registered)
     {
@@ -99,7 +99,7 @@ extern "C" void fn_801A2004(
     if (!registered)
     {
         *values->miBlue.m_pValue
-            = values->miBlue.UnidentifiedVirtual3C();
+            = values->miBlue.GetDefault();
     }
     if (!registered)
     {
@@ -111,7 +111,7 @@ extern "C" void fn_801A2004(
     if (!registered)
     {
         *values->miAlpha.m_pValue
-            = values->miAlpha.UnidentifiedVirtual3C();
+            = values->miAlpha.GetDefault();
     }
     if (!registered)
     {

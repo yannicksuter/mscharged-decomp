@@ -1030,7 +1030,7 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
     pEventData->player->SetPosition(v3Position);
     if (pEventData->player->fn_80047240(pEventData->shell->mOwner, aDirection, 2, false, false))
     {
-        pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.UnidentifiedGetValue());
+        pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
     }
 }
 extern "C" void fn_800156F8(cBall*, cPlayer*);
@@ -1072,7 +1072,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
             pEventData->player->SetPosition(v3Position);
             if (pEventData->player->fn_80047240(pEventData->egg->mShooter, aDirection, 2, false, false))
             {
-                pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.UnidentifiedGetValue());
+                pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
             }
         }
     }
@@ -1124,7 +1124,7 @@ extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
             pEventData->pFielder->SetPosition(v3Position);
             if (pEventData->pFielder->fn_80047240(pEventData->pBall->m_pPrevOwner, aDirection, 2, false, false))
             {
-                pEventData->pFielder->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.UnidentifiedGetValue());
+                pEventData->pFielder->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
             }
 
             pEventData->pFielder->SetNoPickUpTime(0.06f);

@@ -13,12 +13,12 @@ public:
         , mUnidentified010(arg3)
         , mCallback(callback)
     {
-        mUnidentified009 = false;
+        mFormatName = false;
         Register();
     }
 
     virtual ~TweakCallback();
-    virtual int UnidentifiedVirtual0C();
+    virtual int GetValueType();
     void Register();
 
     static void operator delete(void* pointer)

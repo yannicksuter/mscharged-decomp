@@ -41,7 +41,7 @@ TweakNode::~TweakNode()
     {
         TweakEntry* parent = m_Parent;
         TweakNodeListRemove(&parent->m_ChildHead, this, &parent->m_ChildTail);
-        if (m_Unk1C == 0 && m_Value->mUnidentified008 && (m_State == 2 || (m_State == 1 && gDeletePersistentTweakValues)))
+        if (m_Unk1C == 0 && m_Value->mCreatedAfterRegistryInit && (m_State == 2 || (m_State == 1 && gDeletePersistentTweakValues)))
         {
             char buffer[0x100];
             nlStrNCpy(buffer, "", sizeof(buffer));

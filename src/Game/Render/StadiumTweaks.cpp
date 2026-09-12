@@ -35,7 +35,7 @@ StadiumTweaks::StadiumTweaks(
         "dont use lowest net texture LOD", 0.0f, category, false, 0.0f, 0.0f);
     if (!registered)
     {
-        *bDontUseLowest.m_pValue = bDontUseLowest.UnidentifiedVirtual3C();
+        *bDontUseLowest.m_pValue = bDontUseLowest.GetDefault();
     }
     if (!registered)
     {

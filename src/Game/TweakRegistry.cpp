@@ -218,11 +218,11 @@ void RegisterPendingTweaks(void)
     while (pending != 0)
     {
         value = pending->m_Value;
-        value->UnidentifiedVirtual0C();
-        int kind = value->UnidentifiedVirtual10();
-        if ((!pending->m_Registered && kind == 1) || (kind == 2 && ((TweakBindingBase*)value)->UnidentifiedVirtual30()))
+        value->GetValueType();
+        int kind = value->GetStorageKind();
+        if ((!pending->m_Registered && kind == 1) || (kind == 2 && ((TweakBindingBase*)value)->IsBound()))
         {
-            if (value->mUnidentified009)
+            if (value->mFormatName)
             {
                 if (NeedsTweakNameFormatting(value->mName, 0))
                 {
@@ -260,11 +260,11 @@ void BindPendingTweaks(void)
     for (; pending != 0; pending = pending->m_Next)
     {
         TweakValueBase* value = pending->m_Value;
-        int type = value->UnidentifiedVirtual0C();
-        int kind = value->UnidentifiedVirtual10();
+        int type = value->GetValueType();
+        int kind = value->GetStorageKind();
         if (!pending->m_Registered && kind == 2)
         {
-            if (value->mUnidentified009)
+            if (value->mFormatName)
             {
                 if (NeedsTweakNameFormatting(value->mName, 0))
                 {
@@ -400,7 +400,7 @@ scannedInt:
                 value = UnidentifiedCreateValue<TweakValueString>(entry, name, "");
         }
     }
-    value->UnidentifiedVirtual28(valueStr);
+    value->ParseValue(valueStr);
 }
 
 static const char* sTweakBoolStrings[] = {
@@ -588,7 +588,7 @@ float GetTweakFloat(const char* path, float defaultValue)
     {
         return defaultValue;
     }
-    int kind = entry->m_Value->UnidentifiedVirtual10();
+    int kind = entry->m_Value->GetStorageKind();
     if (kind == 1)
     {
         return ((TweakValueFloat*)entry->m_Value)->value;
@@ -607,7 +607,7 @@ int GetTweakInt(const char* path, int defaultValue)
     {
         return defaultValue;
     }
-    int kind = entry->m_Value->UnidentifiedVirtual10();
+    int kind = entry->m_Value->GetStorageKind();
     if (kind == 1)
     {
         return ((TweakValueInt*)entry->m_Value)->value;
@@ -626,7 +626,7 @@ bool GetTweakBool(const char* path, bool defaultValue)
     {
         return defaultValue;
     }
-    int kind = entry->m_Value->UnidentifiedVirtual10();
+    int kind = entry->m_Value->GetStorageKind();
     if (kind == 1)
     {
         return ((TweakValueBool*)entry->m_Value)->mValue;
@@ -645,7 +645,7 @@ const char* GetTweakString(const char* path, const char* defaultValue)
     {
         return defaultValue;
     }
-    int kind = entry->m_Value->UnidentifiedVirtual10();
+    int kind = entry->m_Value->GetStorageKind();
     if (kind == 1)
     {
         return ((TweakValueString*)entry->m_Value)->m_Value;

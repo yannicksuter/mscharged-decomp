@@ -761,15 +761,21 @@ storage and ownership. These operation, file and data names describe retail
 behavior; they are not recovered debug names. Existing split boundaries
 and the source-link status are unchanged.
 
-`Game/tu_802C7480.cpp` reconstructs the Tweak path helpers, current-thread
+`Game/TweakValueBase.cpp` reconstructs the Tweak path helpers, current-thread
 stack-name check, and `TweakValueBase` constructor/destructor at
 `0x802C7480..0x802C76F8`. The registry and binding methods independently use
 these helpers; the next retained method is the Replay constructor. The base
 lifecycle methods reference its complete vtable at `0x8052BF70..0x8052BFA0`.
 Its four null virtual slots establish the corresponding pure virtual
 base declarations. The NLG string templates and SDK thread structure provide
-the shared implementations and layout. The source filename retains an address
-identity because the original filename is unavailable.
+the shared implementations and layout. `Game/TweakValueBase.h` owns the
+base interface. The value and storage queries, string conversions, copying,
+binding operations, and name-formatting flag are named from their
+implementations and registry consumers. The other base flag records whether
+the registry was initialized at construction. Slots `0x14`, `0x18` and
+`0x1C` remain unidentified: zero outputs and empty defaults do not establish
+their full contracts. These file and API names are descriptive
+reconstructions, not recovered original names.
 
 The shared audio backend pointer at `0x806E2020` is provisionally grouped with
 the audio-system globals in `Game/Audio/AudioSystem.cpp`. Retail references and

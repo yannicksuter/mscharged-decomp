@@ -1,6 +1,7 @@
 #ifndef GAME_TWEAK_VALUE_H
 #define GAME_TWEAK_VALUE_H
 
+#include "Game/TweakValueBase.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSmallBlockAllocator.h"
@@ -12,7 +13,6 @@
 class InterpreterCore;
 class TweakEntry;
 class TweakNode;
-class TweakValueBase;
 struct TweakPendingValue;
 
 int IsTweakRegistryInitialized(void);
@@ -29,43 +29,6 @@ typedef nlSmallBlockAllocator<0x10, 0x20, 1, 1> TweakValueAllocator2;
 extern TweakValueAllocator3* gTweakValueAllocator;
 extern TweakValueAllocator2* gTweakBindingAllocator;
 
-class TweakValueBase
-{
-public:
-    TweakValueBase();
-    virtual ~TweakValueBase();
-    virtual int UnidentifiedVirtual0C() = 0;
-    virtual int UnidentifiedVirtual10() = 0;
-    virtual void UnidentifiedVirtual14(
-        float* minimum, float* maximum, float* increment)
-    {
-        *minimum = 0.0f;
-        *maximum = 0.0f;
-        *increment = 0.0f;
-    }
-    virtual void UnidentifiedVirtual18()
-    {
-    }
-    virtual void* UnidentifiedVirtual1C()
-    {
-        return 0;
-    }
-    virtual void* UnidentifiedVirtual20() = 0;
-    virtual void UnidentifiedVirtual24(char* buffer, unsigned long size)
-    {
-        buffer[0] = '\0';
-    }
-    virtual void UnidentifiedVirtual28(const char* value)
-    {
-    }
-    virtual void UnidentifiedVirtual2C(TweakValueBase*) = 0;
-
-public:
-    /* 0x04 */ const char* mName;
-    /* 0x08 */ u8 mUnidentified008;
-    /* 0x09 */ bool mUnidentified009;
-}; // total size: 0x0C (0x0A..0x0C tail padding, reused by derived classes)
-
 // Shared base of the pool-allocated pointer-backed values. Retail keeps no
 // vtable for it: its constructor and destructor are implicit, so every derived
 // constructor elides its vtable store and every derived destructor inlines it.
@@ -74,10 +37,10 @@ public:
 class TweakBindingBase : public TweakValueBase
 {
 public:
-    virtual int UnidentifiedVirtual30() = 0;
-    virtual TweakValueBase* UnidentifiedVirtual34(const char* name,
+    virtual int IsBound() = 0;
+    virtual TweakValueBase* CreateValue(const char* name,
         void* entry) = 0;
-    virtual void UnidentifiedVirtual38(void* value) = 0;
+    virtual void BindValueAddress(void* value) = 0;
 
     bool Bind(const char* path);
     bool Bind(const char*, float, const char*, bool, float, float);
@@ -96,11 +59,11 @@ public:
     {
     }
     TweakFloatBinding(const char* name, const char* category, float* value,
-        bool unidentified = false)
+        bool formatName = false)
     {
         m_pValue = value;
         mName = name;
-        mUnidentified009 = unidentified;
+        mFormatName = formatName;
 
         if (IsTweakRegistryInitialized() == 0)
         {
@@ -121,18 +84,18 @@ public:
             }
         }
     }
-    virtual int UnidentifiedVirtual0C();
-    virtual int UnidentifiedVirtual10();
+    virtual int GetValueType();
+    virtual int GetStorageKind();
     virtual void UnidentifiedVirtual14(float*, float*, float*);
-    virtual void* UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24(char*, unsigned long);
-    virtual void UnidentifiedVirtual28(const char*);
-    virtual void UnidentifiedVirtual2C(TweakValueBase*);
-    virtual int UnidentifiedVirtual30();
-    virtual TweakValueBase* UnidentifiedVirtual34(const char* name,
+    virtual void* GetValueAddress();
+    virtual void FormatValue(char*, unsigned long);
+    virtual void ParseValue(const char*);
+    virtual void CopyValueFrom(TweakValueBase*);
+    virtual int IsBound();
+    virtual TweakValueBase* CreateValue(const char* name,
         void* entry);
-    virtual void UnidentifiedVirtual38(void* value);
-    virtual float UnidentifiedVirtual3C();
+    virtual void BindValueAddress(void* value);
+    virtual float GetDefault();
 
     bool BindWithDefault(const char* name, float defaultValue,
         const char* group, bool reload, float value, float min, float max)
@@ -157,10 +120,10 @@ public:
 
     float GetDefaultValue()
     {
-        return UnidentifiedVirtual3C();
+        return GetDefault();
     }
 
-    const float& UnidentifiedGetValue() const
+    const float& GetValue() const
     {
         return *m_pValue;
     }
@@ -181,11 +144,11 @@ class TweakIntBinding : public TweakBindingBase
 public:
     TweakIntBinding(int* value = 0);
     TweakIntBinding(const char* name, const char* category, int* value,
-        bool unidentified = false)
+        bool formatName = false)
     {
         m_pValue = value;
         mName = name;
-        mUnidentified009 = unidentified;
+        mFormatName = formatName;
         if (IsTweakRegistryInitialized() == 0)
         {
             void* entry = nlMalloc(0x18, 8, true);
@@ -205,18 +168,18 @@ public:
             }
         }
     }
-    virtual int UnidentifiedVirtual0C();
-    virtual int UnidentifiedVirtual10();
+    virtual int GetValueType();
+    virtual int GetStorageKind();
     virtual void UnidentifiedVirtual14(float*, float*, float*);
-    virtual void* UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24(char*, unsigned long);
-    virtual void UnidentifiedVirtual28(const char*);
-    virtual void UnidentifiedVirtual2C(TweakValueBase*);
-    virtual int UnidentifiedVirtual30();
-    virtual TweakValueBase* UnidentifiedVirtual34(const char* name,
+    virtual void* GetValueAddress();
+    virtual void FormatValue(char*, unsigned long);
+    virtual void ParseValue(const char*);
+    virtual void CopyValueFrom(TweakValueBase*);
+    virtual int IsBound();
+    virtual TweakValueBase* CreateValue(const char* name,
         void* entry);
-    virtual void UnidentifiedVirtual38(void* value);
-    virtual int UnidentifiedVirtual3C();
+    virtual void BindValueAddress(void* value);
+    virtual int GetDefault();
 
     bool BindWithDefault(const char*, int, const char*, bool, float, float, float);
 
@@ -236,11 +199,11 @@ class TweakBoolBinding : public TweakBindingBase
 public:
     TweakBoolBinding(bool* value = 0);
     TweakBoolBinding(const char* name, const char* category,
-        bool* value, bool defaultValue)
+        bool* value, bool formatName)
         : m_pValue(value)
     {
         mName = name;
-        mUnidentified009 = defaultValue;
+        mFormatName = formatName;
 
         if (IsTweakRegistryInitialized() == 0)
         {
@@ -261,18 +224,18 @@ public:
             }
         }
     }
-    virtual int UnidentifiedVirtual0C();
-    virtual int UnidentifiedVirtual10();
-    virtual bool UnidentifiedVirtual3C();
-    virtual TweakValueBase* UnidentifiedVirtual34(const char* name,
+    virtual int GetValueType();
+    virtual int GetStorageKind();
+    virtual bool GetDefault();
+    virtual TweakValueBase* CreateValue(const char* name,
         void* entry);
-    virtual void UnidentifiedVirtual2C(TweakValueBase*);
-    virtual void* UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24(char*, unsigned long);
-    virtual void UnidentifiedVirtual28(const char*);
-    virtual int UnidentifiedVirtual30();
+    virtual void CopyValueFrom(TweakValueBase*);
+    virtual void* GetValueAddress();
+    virtual void FormatValue(char*, unsigned long);
+    virtual void ParseValue(const char*);
+    virtual int IsBound();
     virtual void UnidentifiedVirtual14(float*, float*, float*);
-    virtual void UnidentifiedVirtual38(void* value);
+    virtual void BindValueAddress(void* value);
 
 public:
     /* 0x0C */ bool* m_pValue;
@@ -283,12 +246,12 @@ public:
 class TweakValueBool : public TweakValueBase
 {
 public:
-    virtual void UnidentifiedVirtual2C(TweakValueBase*);
-    virtual int UnidentifiedVirtual10();
-    virtual int UnidentifiedVirtual0C();
-    virtual void* UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24(char*, unsigned long);
-    virtual void UnidentifiedVirtual28(const char*);
+    virtual void CopyValueFrom(TweakValueBase*);
+    virtual int GetStorageKind();
+    virtual int GetValueType();
+    virtual void* GetValueAddress();
+    virtual void FormatValue(char*, unsigned long);
+    virtual void ParseValue(const char*);
     virtual ~TweakValueBool();
     virtual void UnidentifiedVirtual14(float*, float*, float*);
     virtual void UnidentifiedVirtual18();
@@ -299,11 +262,11 @@ public:
     }
 
     TweakValueBool(const char* name, const char* category, bool value,
-        bool unidentified = true)
+        bool formatName = true)
     {
         mValue = value;
         mName = name;
-        mUnidentified009 = unidentified;
+        mFormatName = formatName;
         if (IsTweakRegistryInitialized() == 0)
         {
             void* entry = nlMalloc(0x18, 8, true);
@@ -347,22 +310,22 @@ public:
 // weak block behind its static initializer, in the order below, and no unit
 // defines them out of line.
 
-inline int TweakBoolBinding::UnidentifiedVirtual0C()
+inline int TweakBoolBinding::GetValueType()
 {
     return 2;
 }
 
-inline int TweakBoolBinding::UnidentifiedVirtual10()
+inline int TweakBoolBinding::GetStorageKind()
 {
     return 2;
 }
 
-inline bool TweakBoolBinding::UnidentifiedVirtual3C()
+inline bool TweakBoolBinding::GetDefault()
 {
     return false;
 }
 
-inline TweakValueBase* TweakBoolBinding::UnidentifiedVirtual34(
+inline TweakValueBase* TweakBoolBinding::CreateValue(
     const char* name, void* entry)
 {
     TweakValueBool* created = new (
@@ -372,10 +335,10 @@ inline TweakValueBase* TweakBoolBinding::UnidentifiedVirtual34(
     return created;
 }
 
-inline void TweakBoolBinding::UnidentifiedVirtual2C(
+inline void TweakBoolBinding::CopyValueFrom(
     TweakValueBase* other)
 {
-    switch (other->UnidentifiedVirtual10())
+    switch (other->GetStorageKind())
     {
     case 1:
         *m_pValue = ((TweakValueBool*)other)->mValue;
@@ -386,18 +349,18 @@ inline void TweakBoolBinding::UnidentifiedVirtual2C(
     }
 }
 
-inline void* TweakBoolBinding::UnidentifiedVirtual20()
+inline void* TweakBoolBinding::GetValueAddress()
 {
     return m_pValue;
 }
 
-inline void TweakBoolBinding::UnidentifiedVirtual24(
+inline void TweakBoolBinding::FormatValue(
     char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, *m_pValue ? "true" : "false");
 }
 
-inline void TweakBoolBinding::UnidentifiedVirtual28(const char* value)
+inline void TweakBoolBinding::ParseValue(const char* value)
 {
     if (nlStrICmp(value, "true") == 0)
     {
@@ -409,7 +372,7 @@ inline void TweakBoolBinding::UnidentifiedVirtual28(const char* value)
     }
 }
 
-inline int TweakBoolBinding::UnidentifiedVirtual30()
+inline int TweakBoolBinding::IsBound()
 {
     return m_pValue != 0;
 }
@@ -422,15 +385,15 @@ inline void TweakBoolBinding::UnidentifiedVirtual14(
     *increment = 0.0f;
 }
 
-inline void TweakBoolBinding::UnidentifiedVirtual38(void* value)
+inline void TweakBoolBinding::BindValueAddress(void* value)
 {
     m_pValue = (bool*)value;
 }
 
-inline void TweakValueBool::UnidentifiedVirtual2C(
+inline void TweakValueBool::CopyValueFrom(
     TweakValueBase* other)
 {
-    switch (other->UnidentifiedVirtual10())
+    switch (other->GetStorageKind())
     {
     case 1:
         mValue = ((TweakValueBool*)other)->mValue;
@@ -441,28 +404,28 @@ inline void TweakValueBool::UnidentifiedVirtual2C(
     }
 }
 
-inline int TweakValueBool::UnidentifiedVirtual10()
+inline int TweakValueBool::GetStorageKind()
 {
     return 1;
 }
 
-inline int TweakValueBool::UnidentifiedVirtual0C()
+inline int TweakValueBool::GetValueType()
 {
     return 2;
 }
 
-inline void* TweakValueBool::UnidentifiedVirtual20()
+inline void* TweakValueBool::GetValueAddress()
 {
     return &mValue;
 }
 
-inline void TweakValueBool::UnidentifiedVirtual24(
+inline void TweakValueBool::FormatValue(
     char* buffer, unsigned long size)
 {
     nlSNPrintf(buffer, size, mValue ? "true" : "false");
 }
 
-inline void TweakValueBool::UnidentifiedVirtual28(const char* value)
+inline void TweakValueBool::ParseValue(const char* value)
 {
     if (nlStrICmp(value, "true") == 0 || nlStrICmp(value, "triggered") == 0
         || nlStrICmp(value, "on") == 0)
