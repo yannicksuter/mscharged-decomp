@@ -70,7 +70,7 @@ static inline void LoadFontsJapanese101()
     FontManager::Instance()->LoadFont(headingfontbundlename, headingfontfilename, HEADING_FONT_NAME);
 }
 
-extern "C" bool fn_8020078C()
+extern "C" bool fn_8020078C(bool*)
 {
     if (g_pLocalization->m_pFile == 0)
     {

@@ -864,7 +864,7 @@ extern "C" void fn_80022908()
     }
 }
 extern "C" void fn_8002E5F4(cFielder*, int);
-extern "C" void fn_80022824(UnidentifiedEventData_80067214*)
+extern "C" void fn_80022824(cPlayer*)
 {
     if (g_pGame != NULL)
     {
@@ -1363,7 +1363,7 @@ bool lbl_806E0C21;
 
 extern "C" void fn_80020CDC(GoalScoredData* pEventData)
 {
-    if (pEventData != NULL && (pEventData->mUnidentified000 & 0xFFFF) != 6)
+    if (pEventData != NULL && pEventData->uGoalType != 6)
     {
         PlaySound(11, 0x8CEE6665UL, NULL, NULL);
     }
@@ -1378,7 +1378,7 @@ extern "C" void fn_80020CDC(GoalScoredData* pEventData)
                 pTeam->ClearAllPowerUps();
             }
             else if (lbl_806E0C21
-                && (pEventData->mUnidentified000 >> 24) == pTeam->m_nSide)
+                && pEventData->uTeamIndex == pTeam->m_nSide)
             {
                 pTeam->ClearAllPowerUps();
             }
@@ -1603,8 +1603,8 @@ extern "C" void fn_8001FE80()
             "MegaStrikeMeterEnd", -1)->Add(callback, 0, -1);
     }
     {
-        Function<UnidentifiedEventData_80067214*> callback(fn_80022824);
-        UnidentifiedFindEvent<UnidentifiedEventData_80067214>(
+        Function<cPlayer*> callback(fn_80022824);
+        UnidentifiedFindEvent<cPlayer>(
             "MegaStrikeIntro", -1)->Add(callback, 0, -1);
     }
     {

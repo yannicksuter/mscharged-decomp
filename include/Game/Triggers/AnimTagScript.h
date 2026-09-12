@@ -48,7 +48,7 @@ public:
         AnimTagCBInfo* pInfo = (AnimTagCBInfo*)ref;
         unsigned long address = pInfo->ScriptInfo.ScriptFuncOffset;
         AnimTagScriptInterpreter* pScript = pInfo->pAnimTagScript;
-        if ((address + 0x10000) != 0xFFFF)
+        if (address != 0xFFFFFFFF)
         {
             pScript->CallFunctionAt(address);
         }

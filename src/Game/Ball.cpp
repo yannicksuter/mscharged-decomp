@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdlib.h>
 #include "Game/Audio/GameStreams.h"
 #include "Game/RumbleActions.h"
 #include <math.h>
@@ -35,6 +36,7 @@
 #include "Game/SHierarchy.h"
 #include "Game/Sys/audio.h"
 #include "Game/Team.h"
+#include "Game/TweakValueFloat.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlMain.h"
 #include "NL/nlMemory.h"
@@ -3768,4 +3770,71 @@ extern "C" void fn_8001B314(unsigned int nNumTrails)
         LiveBallTrail* pBallTrail = &lbl_8056B518[i];
         fn_8001AA0C(pBallTrail, false);
     }
+}
+
+int TweakFloatBinding::GetValueType()
+{
+    return 5;
+}
+
+int TweakFloatBinding::GetStorageKind()
+{
+    return 2;
+}
+
+float TweakFloatBinding::GetDefault()
+{
+    return 0.0f;
+}
+
+void* TweakFloatBinding::GetValueAddress()
+{
+    return m_pValue;
+}
+
+int TweakFloatBinding::IsBound()
+{
+    return m_pValue != 0;
+}
+
+void TweakFloatBinding::BindValueAddress(void* value)
+{
+    m_pValue = (float*)value;
+}
+
+void TweakFloatBinding::UnidentifiedVirtual14(float* minimum, float* maximum, float* increment)
+{
+    *minimum = 0.0f;
+    *maximum = 0.0f;
+    *increment = 0.0f;
+}
+
+void TweakFloatBinding::FormatValue(char* buffer, unsigned long size)
+{
+    nlSNPrintf(buffer, size, "%.3f", *m_pValue);
+}
+
+void TweakFloatBinding::ParseValue(const char* string)
+{
+    *m_pValue = (float)atof(string);
+}
+
+void TweakFloatBinding::CopyValueFrom(TweakValueBase* other)
+{
+    switch (other->GetStorageKind())
+    {
+    case 1:
+        *m_pValue = ((TweakValueFloat*)other)->value;
+        break;
+    case 2:
+        *m_pValue = *((TweakFloatBinding*)other)->m_pValue;
+        break;
+    }
+}
+
+TweakValueBase* TweakFloatBinding::CreateValue(const char* name, void* entry)
+{
+    TweakValueFloat* created = new (gTweakValueAllocator->Allocate(sizeof(TweakValueFloat))) TweakValueFloat(name, 0.0f);
+    AddTweakValue((TweakEntry*)entry, created);
+    return created;
 }

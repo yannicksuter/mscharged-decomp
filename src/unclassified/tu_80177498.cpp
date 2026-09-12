@@ -8,30 +8,24 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Drawable/DrawableCharacter.h"
-#include "Game/Event.h"
+#include "Game/EventRegistry.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Physics/Physics.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/ReplayManager.h"
 #include "Game/Team.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlMemory.h"
 #include "NL/platvmath.h"
 
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry_80177498;
-
-extern "C" UnidentifiedEventRegistry_80177498* g_pEventRegistry;
 extern "C" bool fn_802B6BC8(const nlVector3*, const nlVector3*,
     const nlVector3*, const nlVector3*, float*, float*);
 extern "C" void fn_8014A180(cFielder*);
 
 void OnWaluigiWallEffectFinished(EmissionController&, int);
 void UpdateWaluigiWallEmitter(EmissionController&);
-extern "C" void fn_80179490(cFielder*);
-extern "C" void fn_801794A4(cFielder*);
-extern "C" void fn_80179580(cFielder*);
+extern "C" void fn_80179490(cPlayer*);
+extern "C" void fn_801794A4(cPlayer*);
+extern "C" void fn_80179580(cPlayer*);
 extern "C" void fn_80179670(void*);
 
 extern char lbl_80511054[];
@@ -286,46 +280,46 @@ WaluigiWallManager_80178400::WaluigiWallManager_80178400()
     , mUnidentified070(0)
 {
     {
-        Function<void*> callback((void (*)(void*))fn_80179490);
-        UnidentifiedEventBase** ppEvent;
+        Function<cPlayer*> callback(fn_80179490);
+        EventRegistryValue* ppEvent;
         unsigned int uHash;
         uHash = HashEventName(lbl_8051106C, -1);
         ppEvent = 0;
         g_pEventRegistry->Find(uHash, &ppEvent, 0);
-        UnidentifiedEventBase* pEvent = ppEvent != 0 ? *ppEvent : 0;
-        ((UnidentifiedTypedEvent<void>*)pEvent)
+        UnidentifiedEventBase* pEvent = ppEvent != 0 ? ppEvent->event : 0;
+        ((UnidentifiedTypedEvent<cPlayer>*)pEvent)
             ->Add(callback, (unsigned int)&mUnidentified064, -1);
     }
     {
-        Function<void*> callback((void (*)(void*))fn_801794A4);
-        UnidentifiedEventBase** ppEvent;
+        Function<cPlayer*> callback(fn_801794A4);
+        EventRegistryValue* ppEvent;
         unsigned int uHash;
         uHash = HashEventName(lbl_80511080, -1);
         ppEvent = 0;
         g_pEventRegistry->Find(uHash, &ppEvent, 0);
-        UnidentifiedEventBase* pEvent = ppEvent != 0 ? *ppEvent : 0;
-        ((UnidentifiedTypedEvent<void>*)pEvent)
+        UnidentifiedEventBase* pEvent = ppEvent != 0 ? ppEvent->event : 0;
+        ((UnidentifiedTypedEvent<cPlayer>*)pEvent)
             ->Add(callback, (unsigned int)&mUnidentified068, -1);
     }
     {
-        Function<void*> callback((void (*)(void*))fn_80179580);
-        UnidentifiedEventBase** ppEvent;
+        Function<cPlayer*> callback(fn_80179580);
+        EventRegistryValue* ppEvent;
         unsigned int uHash;
         uHash = HashEventName(lbl_80511090, -1);
         ppEvent = 0;
         g_pEventRegistry->Find(uHash, &ppEvent, 0);
-        UnidentifiedEventBase* pEvent = ppEvent != 0 ? *ppEvent : 0;
-        ((UnidentifiedTypedEvent<void>*)pEvent)
+        UnidentifiedEventBase* pEvent = ppEvent != 0 ? ppEvent->event : 0;
+        ((UnidentifiedTypedEvent<cPlayer>*)pEvent)
             ->Add(callback, (unsigned int)&mUnidentified06C, -1);
     }
     {
         Function<void*> callback(fn_80179670);
-        UnidentifiedEventBase** ppEvent;
+        EventRegistryValue* ppEvent;
         unsigned int uHash;
         uHash = HashEventName(lbl_805110A8, -1);
         ppEvent = 0;
         g_pEventRegistry->Find(uHash, &ppEvent, 0);
-        UnidentifiedEventBase* pEvent = ppEvent != 0 ? *ppEvent : 0;
+        UnidentifiedEventBase* pEvent = ppEvent != 0 ? ppEvent->event : 0;
         ((UnidentifiedTypedEvent<void>*)pEvent)
             ->Add(callback, (unsigned int)&mUnidentified070, -1);
     }
@@ -556,30 +550,30 @@ void UpdateWaluigiWallEmitter(EmissionController& rController)
     }
 }
 
-extern "C" void fn_80179490(cFielder* pParam)
+extern "C" void fn_80179490(cPlayer* pParam)
 {
-    pParam->mUnidentified3F8.mUnidentified08->fn_80178968(
-        pParam, lbl_806DCB10, lbl_806DCB14);
+    static_cast<cFielder*>(pParam)->mUnidentified3F8.mUnidentified08->fn_80178968(
+        static_cast<cFielder*>(pParam), lbl_806DCB10, lbl_806DCB14);
 }
 
-extern "C" void fn_801794A4(cFielder* pParam)
+extern "C" void fn_801794A4(cPlayer* pParam)
 {
-    WaluigiWallManager_80178400* pManager = pParam->mUnidentified3F8.mUnidentified08;
-    PhysicsBox_80177498* pObject = pManager->mUnidentified050;
-    if (pObject != 0)
+    WaluigiWallManager_80178400* pManager = static_cast<cFielder*>(pParam)->mUnidentified3F8.mUnidentified08;
+    if (pManager->mUnidentified050 != 0)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(lbl_80511054);
         if (EmissionManager::Instance()->IsPlaying(
-                (unsigned long)pObject, pGroup))
+                (unsigned long)pManager->mUnidentified050, pGroup))
         {
             EmissionManager::Instance()->Kill(
-                (unsigned long)pObject, pGroup);
+                (unsigned long)pManager->mUnidentified050, pGroup);
         }
         pManager->mUnidentified05C = false;
-        pObject->mUnidentified05C = 0.0f;
+        pManager->mUnidentified050->mUnidentified05C = 0.0f;
 
+        PhysicsBox_80177498* pObject = pManager->mUnidentified050;
         nlVector3 v3Direction;
-        nlVec3Sub(v3Direction,
+        v3Direction.Sub2D(
             pObject->mUnidentified038, pObject->mUnidentified044);
         if (v3Direction.GetLengthSq2D() < sMinimumLengthSquared)
         {
@@ -593,9 +587,9 @@ extern "C" void fn_801794A4(cFielder* pParam)
     }
 }
 
-extern "C" void fn_80179580(cFielder* pParam)
+extern "C" void fn_80179580(cPlayer* pParam)
 {
-    WaluigiWallManager_80178400* pManager = pParam->mUnidentified3F8.mUnidentified08;
+    WaluigiWallManager_80178400* pManager = static_cast<cFielder*>(pParam)->mUnidentified3F8.mUnidentified08;
     PhysicsBox_80177498* pObject = pManager->mUnidentified050;
     if (pObject != 0)
     {
@@ -621,7 +615,7 @@ extern "C" void fn_80179580(cFielder* pParam)
             pManager->mUnidentified054 = pObject;
         }
         pManager->mUnidentified050 = 0;
-        fn_8014A180(pParam);
+        fn_8014A180(static_cast<cFielder*>(pParam));
     }
 }
 

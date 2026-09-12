@@ -220,11 +220,25 @@ SSearchOpenLane::SSearchOpenLane(cPlayer* pPlayer1, cPlayer* pPlayer2)
 }
 
 /**
+ * Offset/Address/Size: 0x1C78 | 0x800A5C54 | size: 0x40
+ */
+SSearchBestPass::~SSearchBestPass()
+{
+}
+
+/**
  * Offset/Address/Size: 0x16D8 | 0x800A56A0 | size: 0x12C
  */
 SSearchRunToNet::SSearchRunToNet(cPlayer* pPlayer)
     : SpaceSearch(pPlayer->m_pTeam->m_pNet->m_fDirection)
     , m_SSearchIdealShot(pPlayer)
+{
+}
+
+/**
+ * Offset/Address/Size: 0x1CB8 | 0x800A5C94 | size: 0x40
+ */
+SSearchRunToNet::~SSearchRunToNet()
 {
 }
 

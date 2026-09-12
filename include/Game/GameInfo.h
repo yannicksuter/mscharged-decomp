@@ -143,6 +143,7 @@ public:
     int GetMappedRule0x0() const;
     int GetRule0x0() const;
     void ResetRules(int index);
+    void SetRules(int index, GameRules rules) { mRulesTable[index] = rules; }
 
     u8 IsOnline() const { return mIsOnlineMode; }
 

@@ -24,6 +24,7 @@ struct StadiumLoadResult
 };
 
 char* fn_802772C4();
+void fn_802772D0(const char* name, bool stadiumViewer);
 
 void BeginLoadStadium(const char* path, bool skipGameplayModels);
 bool IsStadiumResourceDataLoaded();

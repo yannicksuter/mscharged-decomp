@@ -111,6 +111,13 @@ bool DesireWait::UnidentifiedInitialize(void*)
     return true;
 }
 
+void DesireWait::Update(UnidentifiedDesireUpdate*, float)
+{
+    mUnidentifiedFielder->fn_8003057C(0);
+    fn_800401C0(mUnidentifiedFielder,
+        mUnidentifiedFielder->mUnidentified024.m_v3Position, 1.0f, 1.0f);
+}
+
 DesireFinishAction::~DesireFinishAction()
 {
 }

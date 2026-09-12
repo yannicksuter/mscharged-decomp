@@ -169,9 +169,7 @@ void SHStrikerTimesBase::InitializeControls()
 }
 
 SHStrikerTimesBase::SHStrikerTimesBase()
-    : mUnidentified1C(0xC)
-    , mUnidentified20(1)
-    , mUnidentified24(0)
+    : BaseOverlayHandler(1, POSITION_ALL)
     , mDisplayMode(-1)
     , mPage(-1)
     , mDonePressed(false)

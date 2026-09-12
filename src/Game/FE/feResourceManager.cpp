@@ -324,6 +324,26 @@ void FEResourceManager::SetResourcePool(GLResourcePool* resourcePool)
     s_pResourcePool = resourcePool;
 }
 
+static inline void InsertSorted(
+    nlDLListSlotPool<PendingResourceLoad>& list,
+    PendingResourceLoad pendingResource)
+{
+    nlDLListIterator<PendingResourceLoad> insertAfter = list.End();
+    if (pendingResource.pHandle->m_uFileBlock > (*insertAfter).pHandle->m_uFileBlock)
+    {
+        list.AddEnd(pendingResource);
+        return;
+    }
+
+    while ((*insertAfter).pHandle->m_type != FERT_SCENE
+           && pendingResource.pHandle->m_uFileBlock < (*insertAfter).pHandle->m_uFileBlock)
+    {
+        insertAfter.Retreat();
+    }
+
+    list.AddAfter(insertAfter, pendingResource);
+}
+
 void FEResourceManager::QueueResourceLoad(FEResourceHandle* pHandle, MemoryAllocator* pAllocator)
 {
     if (pAllocator == 0)
@@ -338,32 +358,8 @@ void FEResourceManager::QueueResourceLoad(FEResourceHandle* pHandle, MemoryAlloc
         if (s_pOnDemandBundle->GetFileInfo(pHandle->m_hashID, &fileDirectoryEntry, false))
         {
             pHandle->m_uFileBlock = fileDirectoryEntry.m_blockNumber;
-            nlDLListIterator<PendingResourceLoad> insertAfter(
-                pendingResourceQueue.m_Head, nlDLRingGetEnd(pendingResourceQueue.m_Head));
-            if (pHandle->m_uFileBlock > (*insertAfter).pHandle->m_uFileBlock)
-            {
-                pendingResourceQueue.AddEnd(pendingResource);
-                return;
-            }
-            else
-            {
-                while ((*insertAfter).pHandle->m_type != FERT_SCENE
-                       && pHandle->m_uFileBlock < (*insertAfter).pHandle->m_uFileBlock)
-                {
-                    if (nlDLRingIsStart(insertAfter.m_Head, insertAfter.m_Curr))
-                    {
-                        insertAfter.m_Curr = 0;
-                    }
-                    else
-                    {
-                        insertAfter.m_Curr = insertAfter.m_Curr->m_prev;
-                    }
-                }
-
-                DLListEntry<PendingResourceLoad>* entry = pendingResourceQueue.Allocate(pendingResource);
-                nlDLRingInsert(&pendingResourceQueue.m_Head, insertAfter.CurrentEntry(), entry);
-                return;
-            }
+            InsertSorted(pendingResourceQueue, pendingResource);
+            return;
         }
         else
         {

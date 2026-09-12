@@ -17,6 +17,10 @@ Terrain::Terrain(int index)
     nlSNPrintf(mName, 0x3F, sTerrainConfigPathFormat, gTerrainNames[index]);
 }
 
+Terrain::~Terrain()
+{
+}
+
 float Terrain::GetSpeedFactor()
 {
     return gGameTweaks.mTerrainTweaks->mfField_Speed;

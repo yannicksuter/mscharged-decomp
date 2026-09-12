@@ -308,7 +308,7 @@ void ReplayManager::fn_801895E0(UnidentifiedEventData_800663A8* event)
 
 void ReplayManager::fn_801895F0(GoalScoredData* event)
 {
-    if ((event->mUnidentified000 & 0xFFFF) != 6)
+    if (event->uGoalType != 6)
     {
         mEvents |= 1;
     }

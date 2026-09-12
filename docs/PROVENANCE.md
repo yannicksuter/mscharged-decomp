@@ -77,6 +77,19 @@ powerup and special-shot flags follow the retail challenge settings and their
 gameplay consumers. `WinBy`, `GameGoals` and `BestSeries` follow the recorded-game
 diagnostics in `Game/NetworkSession.cpp`.
 
+`Game/OverlayManager.h` retains the predecessor's `OverlayManager` and
+`ShowDemoSlide`, `Update` and `SetVisible` names. R4QE01's allocation and
+constructor establish a `0x124`-byte object with a `BaseGameSceneManager` prefix; the demo-visible flag
+remains at `0x10F`. The method at `0x801E2504` retains the predecessor's scene
+lookup and virtual visibility update, using Charged's demo scene ID 96. The
+HUD flags at `0x10C`/`0x10D` and delay at `0x110` retain their predecessor roles;
+Charged also synchronizes the number display when the HUD slides in or out.
+The delayed slide-in method retains its address identity `fn_801E2498`.
+`SlideHUDOut` names the immediate transition repeated in the timer update and
+event callbacks; its spelling is reconstructed. Other derived fields remain
+explicitly unidentified. `SetVisible` uses the Charged filename pointer API and
+guards an absent scene before applying the predecessor's visibility-mask rule.
+
 `Game/SH/SHMoviePlayer.cpp` follows the predecessor's movie-player scene
 hierarchy and names, with R4QE01's Home Button Menu event connection, texture
 resource setter, sound-mode handling, and movie-to-title transition. The
@@ -719,6 +732,14 @@ is a descriptive reconstruction name. The lighting and skin-matrix helpers
 under `NL/glx` likewise use behavior-supported filenames; the applicable
 `glx_LoadDirectionalLight` and `glx_LoadSpecular` names follow the predecessor,
 with the Wii argument and cache layouts established from R4QE01.
+
+The material-program primitive conversion keeps the predecessor
+`glx_DrawPacket` function's six-entry `primitives` table and element order.
+R4QE01 places the corresponding mutable table at `0x80524470`, at the start of
+the material-program implementation data, and all 32 indexed draw methods use
+it directly. Its implementation-only inline definition reproduces the weak
+coalesced table, the indexed-load scheduling, and the linked retail layout. The
+helper's original identifier is unavailable and remains unidentified.
 
 The repository's [CC0 license](../LICENSE) applies only to contributions whose
 authors have the right to make that dedication. Nintendo, Next Level Games,

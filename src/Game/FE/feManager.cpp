@@ -41,6 +41,7 @@
 #include "Game/SH/SHNavigation.h"
 #include "unclassified/tu_80284A58.h"
 #include "Game/InputManager.h"
+#include "Game/OverlayManager.h"
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
@@ -51,8 +52,6 @@ extern "C"
     void RestoreWorldRendering(UnidentifiedPresentationState* presentation);
     bool DuringEndOfGamePresentation(UnidentifiedPresentationState* presentation);
     void GoalieOnGameOver();
-    void UpdateOverlayManager(BaseGameSceneManager* manager, float deltaTime);
-    void ShowDemoSlide(BaseGameSceneManager* manager);
     void GetMaxRemoteAccelDelta(cAIPad* pad, int index, nlVector3* out);
 
     extern UnidentifiedEventRegistry* g_pEventRegistry;
@@ -325,7 +324,7 @@ void FrontEnd::Update(float fTimeDelta)
         UpdateForGame(fTimeDelta);
     }
 
-    UpdateOverlayManager(g_pOverlayManager, fTimeDelta);
+    static_cast<OverlayManager*>(g_pOverlayManager)->Update(fTimeDelta);
     m_feStateCurrent = m_feStatePending;
 
     switch (m_feStateCurrent)
@@ -384,7 +383,7 @@ void FrontEnd::UpdateForDemoMode(float fDeltaT)
     m_fDemoTimeElapsed += fDeltaT;
     if (!(m_fDemoTimeElapsed < 3.0f))
     {
-        ShowDemoSlide(g_pOverlayManager);
+        static_cast<OverlayManager*>(g_pOverlayManager)->ShowDemoSlide();
         if (g_pFEInput->JustPressed(FE_ALL_PADS, 0x3F, true, 0))
         {
             ReturnToFE();
@@ -629,4 +628,3 @@ void FrontEnd::OnPresentationBypass()
         nlSingleton<FESceneManager>::Instance()->ForceImmediateStackProcessing();
     }
 }
-

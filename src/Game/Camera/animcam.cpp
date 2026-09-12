@@ -450,47 +450,22 @@ float cAnimCamera::ManualUpdate(float dt)
         else
         {
             UnidentifiedSimulationTimeProvider* provider = GetFixedUpdateTask();
-            cCameraData* pData = m_pActiveCameraData;
             float simTime = provider->mSimulationTime;
             float delta = simTime - m_fLastSimulationTime;
-            float duration;
-            if (pData != NULL)
-            {
-                duration = (float)pData->m_uKeyCount / 30.0f;
-            }
-            else
-            {
-                duration = 0.0f;
-            }
+            float duration = GetUnidentifiedDuration();
             m_fAnimationTime += (delta * m_fAnimationSpeed) / duration;
             m_fLastSimulationTime = simTime;
         }
     }
     else
     {
-        float duration;
-        if (m_pActiveCameraData != NULL)
-        {
-            duration = (float)m_pActiveCameraData->m_uKeyCount / 30.0f;
-        }
-        else
-        {
-            duration = 0.0f;
-        }
+        float duration = GetUnidentifiedDuration();
         m_fAnimationTime += (dt * m_fAnimationSpeed) / duration;
     }
 
     if (m_fAnimationTime >= 1.0f)
     {
-        float duration;
-        if (m_pActiveCameraData != NULL)
-        {
-            duration = (float)m_pActiveCameraData->m_uKeyCount / 30.0f;
-        }
-        else
-        {
-            duration = 0.0f;
-        }
+        float duration = GetUnidentifiedDuration();
         overrun = (m_fAnimationTime - 1.0f) * duration;
         if (m_bCyclic)
         {

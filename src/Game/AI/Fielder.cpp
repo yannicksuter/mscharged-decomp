@@ -2210,7 +2210,8 @@ void cFielder::DoRegularShooting(bool bParam)
         spinType = SPINTYPE_PARAMETER;
         float fXSpin = 8.0f * fSpinScale;
         float fZSpin = 15.0f * fSpinScale;
-        v3AngVel.x = 0.5f * fXSpin - nlRandomf(fXSpin);
+        float fHalfXSpin = 0.5f * fXSpin;
+        v3AngVel.x = fHalfXSpin - nlRandomf(fXSpin);
         v3AngVel.y = 0.0f;
 
         if (!m_pTeam->GetOtherTeam()->GetGoalie()->mbShouldMiss
@@ -3883,6 +3884,13 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80041B0C(
 extern "C" void fn_8004257C(PenaltyData* data)
 {
     g_PenaltyDataPool.Free(data);
+}
+
+bool FuzzyVariant::IsPointerType() const
+{
+    return ((mType == FT_POINTER || mType == FT_STRING)
+        || ((unsigned int)(mType - FT_PLAYER)
+            <= (unsigned int)(FT_BALL - FT_PLAYER)));
 }
 
 void cFielder::fn_80036A38(int nParam, float fAmount)

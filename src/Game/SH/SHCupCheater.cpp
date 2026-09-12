@@ -3,7 +3,7 @@
 #include "Game/DB/SaveLoad.h"
 #include "Game/DB/StatsTracker.h"
 #include "Game/DB/GameProgress.h"
-#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"
@@ -44,7 +44,7 @@ void CupCheaterScene::UpdateSlides()
 
         TLTextInstance* foundText;
         foundText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(
-            pSlide, InlineHasher(nlStringLowerHash("number1")));
+            pSlide, "number1");
         locals.text = foundText;
 
         BasicString<char, Detail::TempStringAllocator> Sniper(
@@ -53,7 +53,7 @@ void CupCheaterScene::UpdateSlides()
         locals.text->SetString(self->mSniperBuffer);
 
         locals.text = FEFinder<TLTextInstance, 3>::Find<TLSlide>(
-            pSlide, InlineHasher(nlStringLowerHash("number2")));
+            pSlide, "number2");
 
         BasicString<char, Detail::TempStringAllocator> Striker(
             LexicalCast<BasicString<char, Detail::TempStringAllocator>, int>(self->mStriker));
@@ -61,8 +61,15 @@ void CupCheaterScene::UpdateSlides()
         locals.text->SetString(self->mStrikerBuffer);
 
         locals.text = FEFinder<TLTextInstance, 3>::Find<TLSlide>(
-            pSlide, InlineHasher(nlStringLowerHash("number5")));
-        locals.text->SetStringId(self->mUnidentified50 ? "AWAY" : "HOME");
+            pSlide, "number5");
+        if (!self->mUnidentified50)
+        {
+            locals.text->SetStringId("HOME");
+        }
+        else
+        {
+            locals.text->SetStringId("AWAY");
+        }
     }
 
     self->m_SlideMenu->SetSlideByIndex(currentSlide);
@@ -307,5 +314,3 @@ CupCheaterScene::CupCheaterScene()
     int team = gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode]->mTeamIndex[0];
     mUnidentified50 = team != g_pCupManager->GetUserSelectedCupTeam();
 }
-
-#include "Game/FE/feFinder_impl.h"

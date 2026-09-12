@@ -38,12 +38,12 @@ struct AudioBankTable
 {
     static AudioBankTable* ParseChunk(nlChunk* chunk);
     void Initialize();
-    void SelectGroup(u32 index);
+    void SelectGroup(unsigned int index);
     void ClearSelectedGroups();
     void LoadBank(int slotId, unsigned long cueId,
         AudioResourceLoadCallback callback, void* context,
         MemoryAllocator* allocator);
-    void UnloadBank(u32 index);
+    void UnloadBank(unsigned int index);
     void UnloadAllBanks();
 
     u32 count_00;

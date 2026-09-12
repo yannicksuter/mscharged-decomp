@@ -151,6 +151,7 @@ TweakNode* FindTweakNode(TweakNode* entry, const char* path)
 
 TweakEntry* FindOrCreateTweakPath(TweakEntry* entry, const char* path, int noCreate)
 {
+    char* copy;
     TweakEntry* result = 0;
     const char* start = path;
     if (*path == '/')
@@ -158,7 +159,7 @@ TweakEntry* FindOrCreateTweakPath(TweakEntry* entry, const char* path, int noCre
         start = path + 1;
     }
     unsigned long length = nlStrLen(path) + 1;
-    char* copy = (char*)nlMalloc(length, 8, false);
+    copy = (char*)nlMalloc(length, 8, false);
     nlStrNCpy(copy, start, length);
     if (copy[nlStrLen(copy) - 1] == '/')
     {
@@ -167,13 +168,9 @@ TweakEntry* FindOrCreateTweakPath(TweakEntry* entry, const char* path, int noCre
 
     char* rest = copy;
     int split = 0;
-    while (split == 0)
+    while (split == 0 && *rest != '\0')
     {
         char c = *rest;
-        if (c == '\0')
-        {
-            break;
-        }
         if (c == '/')
         {
             split = 1;

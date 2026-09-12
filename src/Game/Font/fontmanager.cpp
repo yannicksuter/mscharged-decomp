@@ -1,5 +1,6 @@
 #include "NL/nlPrint.h"
 #include "Game/Font/fontmanager.h"
+#include "NL/gl/glMemory.h"
 #include "NL/nlPrint.h"
 
 class BundleFile;
@@ -35,6 +36,12 @@ struct Unidentified_80307564
 };
 
 Unidentified_80307564 lbl_80580748[16];
+
+FontManager::FontManager()
+    : m_fonts(8)
+{
+    field_0x20 = (unsigned long)glGetCurrentResourcePool();
+}
 
 FontManager::~FontManager()
 {

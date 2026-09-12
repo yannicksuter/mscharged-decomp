@@ -31,6 +31,7 @@ nlAsyncFileBuffer* nlAsyncFileBufferInitialize(nlAsyncFileBuffer* fileBuffer);
 void nlAsyncFileBufferFinish(nlAsyncFileBuffer* fileBuffer);
 void nlAsyncFileBufferReset(nlAsyncFileBuffer* fileBuffer, bool constructing);
 int nlAsyncFileBufferGetRemaining(nlAsyncFileBuffer* fileBuffer);
-void nlAsyncFileBufferRead(nlAsyncFileBuffer* fileBuffer, void* output, unsigned int size);
+unsigned int nlAsyncFileBufferRead(
+    nlAsyncFileBuffer* fileBuffer, void* output, unsigned int size);
 
 #endif // NL_ASYNC_FILE_BUFFER_H

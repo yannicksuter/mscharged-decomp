@@ -283,6 +283,18 @@ public:
         return result;
     }
 
+    void Retreat()
+    {
+        if (nlDLRingIsStart(m_Head, m_Curr))
+        {
+            m_Curr = 0;
+        }
+        else
+        {
+            m_Curr = m_Curr->m_prev;
+        }
+    }
+
     Pointer m_Head;
     Pointer m_Curr;
 };

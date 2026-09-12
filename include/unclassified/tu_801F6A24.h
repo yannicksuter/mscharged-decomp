@@ -18,7 +18,7 @@ public:
     void fn_801F6D94(float fParam1);
     void fn_801F6E18(float fParam1);
     void fn_801F6E2C(cFielder* pParam1);
-    void fn_801F6E8C(const nlVector3& vParam1);
+    void fn_801F6E8C(nlVector3 vParam1);
 
     /* 0x28 */ TLComponentInstance* mUnidentified28;
     /* 0x2C */ TLComponentInstance* mUnidentified2C;

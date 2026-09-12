@@ -12,6 +12,14 @@ typedef DrawableObject RenderObject;
 // eight of them; DesireSuperPower spawns a ring of fists around Daisy, and each
 // fist rises out of the ground in front of its owner, creates the impact sphere
 // when it breaks the surface, then sinks back below the field.
+//
+// The drawable snapshot reads this object only through const pointers
+// (DrawableDaisyFist::Grab/Render). R4QE01's Render prologue keeps the
+// mDrawable load below the callee saves, which GC/3.0a5 emits only when the
+// pointed-to type carries a mutable non-pointer member; a plain struct lets the
+// scheduler treat the const load as read-only and hoist it. Which member held
+// the qualifier is not recoverable from the stripped DOL; the visibility flag
+// is the field those const readers consume.
 struct DaisyFistObject
 {
     DaisyFistObject(int index);
@@ -29,7 +37,7 @@ struct DaisyFistObject
     /* 0x14 */ float mTargetScale;
     /* 0x18 */ float mScaleTimer;
     /* 0x1C */ float mRiseTimer;
-    /* 0x20 */ bool mVisible;
+    /* 0x20 */ mutable bool mVisible;
     /* 0x21 */ u8 mPadding021[3];
     /* 0x24 */ RenderObject* mDrawable;
     /* 0x28 */ cCharacter* mOwner;

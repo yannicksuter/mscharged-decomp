@@ -6,6 +6,7 @@
 #include "Game/DB/SaveLoad.h"
 #include "Game/FE/feMusic.h"
 #include "Game/Render/Presentation.h"
+#include "Game/Render/tu_80279AC8.h"
 #include "Game/SH/SHCupNews.h"
 
 bool gMainMenuInputResetPending;
@@ -13,6 +14,19 @@ bool gMainMenuInputResetPending;
 extern const int sCupPageOrder[3] = { 4, 5, 6 };
 extern const int sCupRoundPageOrderThree[3] = { 3, 2, 1 };
 extern const int sCupRoundPageOrderTwo[2] = { 2, 1 };
+
+extern "C" int fn_8010D9C4(CupManager* cupManager, int* statistic);
+
+extern StadiumGoalObject_8027A2C8* gCupAwardModels[];
+extern int gCupAwardModelCount;
+
+struct CupTrophyUnlock_8051B770
+{
+    unsigned long key;
+    unsigned int flag;
+};
+
+extern CupTrophyUnlock_8051B770 lbl_8051B770[];
 
 void CycleCupPage(int currentPage, bool advance)
 {
@@ -188,6 +202,20 @@ void FinishCupAwardPresentation()
     Presentation::GetInstance()->Call("TransitionCupToCentreAward");
 }
 
+void AdvanceCupAwardPresentation()
+{
+    int statistic = 0;
+    int team = fn_8010D9C4(g_pCupManager, &statistic);
+    if (team == g_pCupManager->GetUserSelectedCupTeam())
+    {
+        Presentation::GetInstance()->Call("TransitionCupLeftToRightAward");
+    }
+    else
+    {
+        Presentation::GetInstance()->Call("TransitionCupToCentreAward");
+    }
+}
+
 void ShowCupBrickWallNews()
 {
     CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
@@ -200,4 +228,49 @@ void ShowCupGoldenBootNews()
     CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
         (SceneList)39, SCREEN_NOTHING, false);
     scene->SetDisplayMode(6);
+}
+
+void SetCupTrophiesVisible(bool visible)
+{
+    for (int i = 0; i < gCupAwardModelCount; ++i)
+    {
+        float opacity = visible ? 1.0f : 0.0f;
+        gCupAwardModels[i]->SetOpacity(opacity);
+    }
+}
+
+void SetLockedTrophyVisibility(bool visible)
+{
+    for (int i = 0; i < gCupAwardModelCount; ++i)
+    {
+        unsigned int flag = 0x200000;
+        for (int j = 0; j < gCupAwardModelCount; ++j)
+        {
+            if (lbl_8051B770[j].key == gCupAwardModels[i]->m_uCupTrophyKey)
+            {
+                flag = lbl_8051B770[j].flag;
+                break;
+            }
+        }
+
+        if (IsUnlockFlagSet(flag))
+        {
+            gCupAwardModels[i]->SetOpacity(1.0f);
+        }
+        else
+        {
+            float opacity = visible ? 1.0f : 0.0f;
+            gCupAwardModels[i]->SetOpacity(opacity);
+        }
+    }
+}
+
+extern "C" void fn_802092A4(StadiumGoalObject_8027A2C8* object)
+{
+    if (gCupAwardModelCount == 9)
+    {
+        gCupAwardModelCount = 0;
+    }
+    gCupAwardModels[gCupAwardModelCount] = object;
+    ++gCupAwardModelCount;
 }

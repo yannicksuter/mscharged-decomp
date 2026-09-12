@@ -48,10 +48,18 @@ public:
         return entry;
     }
 
-    void AddEnd(const T& data)
+    unsigned long AddEnd(const T& data)
     {
         DLListEntry<T>* entry = Allocate(data);
         nlDLRingAddEnd(&m_Head, entry);
+        return (unsigned long)entry;
+    }
+
+    unsigned long AddAfter(nlDLListIterator<T>& position, const T& data)
+    {
+        DLListEntry<T>* entry = Allocate(data);
+        nlDLRingInsert(&m_Head, position.CurrentEntry(), entry);
+        return (unsigned long)entry;
     }
 
     void AddStart(const T& data)
@@ -90,6 +98,11 @@ public:
     nlDLListIterator<T> Begin(DLListEntry<T>* current) const
     {
         return nlDLListIterator<T>(m_Head, current);
+    }
+
+    nlDLListIterator<T> End() const
+    {
+        return nlDLListIterator<T>(m_Head, nlDLRingGetEnd(m_Head));
     }
 
     bool IsEmpty() const

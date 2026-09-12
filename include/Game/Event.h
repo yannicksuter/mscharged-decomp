@@ -173,8 +173,7 @@ public:
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
-        void* target = callback.UnidentifiedTarget();
-        listener->callback.UnidentifiedTransfer(callback);
+        void* target = listener->callback.UnidentifiedTransfer(callback);
         RegisterEventConnection(this, listener, value, flags, target);
     }
 
@@ -396,8 +395,7 @@ public:
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
-        void* target = callback.UnidentifiedTarget();
-        listener->callback.UnidentifiedTransfer(callback);
+        void* target = listener->callback.UnidentifiedTransfer(callback);
         RegisterEventConnection(this, listener, value, flags, target);
     }
 
@@ -561,8 +559,7 @@ public:
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
-        void* target = callback.UnidentifiedTarget();
-        listener->callback.UnidentifiedTransfer(callback);
+        void* target = listener->callback.UnidentifiedTransfer(callback);
         RegisterEventConnection(this, listener, value, flags, target);
     }
 

@@ -3,6 +3,7 @@
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/BaseGameSceneManager.h"
+#include "Game/OverlayManager.h"
 #include "Game/DB/BasicGameInfo.h"
 #include "Game/DB/StatsTracker.h"
 #include "Game/FE/feFinder.h"
@@ -26,9 +27,6 @@
 #include "NL/nlBasicString.inl"
 
 extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
-extern "C" void fn_801E230C(
-    BaseGameSceneManager* manager, SceneList scene, bool visibility,
-    bool overrideStateSettings);
 extern BaseGameSceneManager* g_pOverlayManager;
 
 
@@ -164,7 +162,7 @@ void InGameTextOverlay::Update(float fDeltaT)
     if (mCurrentSlideName == SLIDE_NAME_TEXT_WINNER
         && g_pFEInput->JustPressed(FE_ALL_PADS, 0x1E, true, 0) && mVisible)
     {
-        fn_801E230C(g_pOverlayManager, (SceneList)90, false, false);
+        static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible((SceneList)90, false, false);
         g_pOverlayManager->Push((SceneList)91, SCREEN_NOTHING, false);
     }
 }

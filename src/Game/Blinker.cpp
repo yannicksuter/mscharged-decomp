@@ -12,9 +12,6 @@
 extern "C"
 {
     bool lbl_806DCD60 = true;
-
-
-    bool fn_8027C12C(const NisPlayer* player);
 }
 
 const float BlinkTimes[4] = {
@@ -50,7 +47,7 @@ void Blinker::Update(float fDeltaT)
     }
 
     float deltaTime = fDeltaT;
-    if (fn_8027C12C(NisPlayer::Instance()))
+    if (NisPlayer::Instance()->WorldIsFrozen())
     {
         deltaTime = 0.0f;
     }

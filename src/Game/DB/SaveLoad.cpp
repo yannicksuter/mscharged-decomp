@@ -605,15 +605,14 @@ void SaveLoad::WriteSaveData()
     u32 alignedSize = Align32(dataSize);
     SaveBuffer = nlMalloc(alignedSize, 0x20, true);
 
-    GameInfoManager* gameInfo = GameInfoManager::GetInstance();
-    gameInfo->mUserInfo.mSaveID = nlRandom(0xFFFFFFFF, &nlDefaultSeed);
+    GameInfoManager::GetInstance()->mUserInfo.mSaveID = nlRandom(0xFFFFFFFF, &nlDefaultSeed);
     if (OnlineMode)
     {
-        gameInfo->GetMemoryCardData((u8*)SaveBuffer + sizeof(SaveFileHeader));
+        GameInfoManager::GetInstance()->GetMemoryCardData((u8*)SaveBuffer + sizeof(SaveFileHeader));
     }
     else
     {
-        gameInfo->SerializeSettings((u8*)SaveBuffer + sizeof(SaveFileHeader));
+        GameInfoManager::GetInstance()->SerializeSettings((u8*)SaveBuffer + sizeof(SaveFileHeader));
     }
 
     SaveFileHeader* header = (SaveFileHeader*)SaveBuffer;

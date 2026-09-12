@@ -4,6 +4,7 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Game.h"
+#include "Game/OverlayManager.h"
 #include "Game/Render/RLView.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glState.h"
@@ -11,14 +12,6 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
-
-class BaseGameSceneManager;
-
-extern "C"
-{
-    extern BaseGameSceneManager* g_pOverlayManager;
-    void fn_801E29C0(BaseGameSceneManager* manager, nlVector3 position);
-        }
 
 static u32 LightTexture = glGetTexture("global/lightramp");
 static u32 BlackTexture = glGetTexture("global/black");
@@ -390,7 +383,7 @@ void ShootToScoreMeter::DrawMeter()
     glViewProjectPoint(GetLayerView(eCLV_UnsortedSquareOrtho), screenPosition, projectedPosition);
     glViewUnprojectOrthographicPoint(GetLayerView(eCLV_Anark), &projectedPosition,
         &projectedPosition);
-    fn_801E29C0(g_pOverlayManager, projectedPosition);
+    static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E29C0(projectedPosition);
 
     glQuad3 quad;
     quad.SetupRotatedRectangle(

@@ -1,6 +1,7 @@
 #ifndef GAME_RENDER_TU_80279AC8_H
 #define GAME_RENDER_TU_80279AC8_H
 
+#include "Game/MathHelpers.h"
 #include "NL/nlMath.h"
 #include "types.h"
 
@@ -48,6 +49,11 @@ public:
             /* 0x7C */ nlVector3 m_boundsMax;
         };
         /* 0x70 */ glModel* m_pLayerModels[2];
+        struct
+        {
+            /* 0x70 */ unsigned long m_uCupTrophyKey;
+            /* 0x74 */ float m_fCupTrophyOpacity;
+        };
     };
     /* 0x88 */ unsigned long m_uFlags;
     /* 0x8C */ float m_fBlend;
@@ -60,6 +66,13 @@ class StadiumGoalObject_8027A2C8 : public StadiumWorldObject_80279AC8
 {
 public:
     virtual ~StadiumGoalObject_8027A2C8();
+
+    void SetOpacity(float opacity)
+    {
+        float clamped = nlMaxEquals(opacity, 0.0f);
+        clamped = nlMinEquals(clamped, 1.0f);
+        m_fCupTrophyOpacity = clamped;
+    }
 };
 
 class StadiumLayerObject_8027A130 : public StadiumWorldObject_80279AC8

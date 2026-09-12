@@ -49,7 +49,7 @@ bool g_bRunSimAndRenderInLockStep;
 static u16 sSimulationTimeType = 0xFFFF;
 static u16 sTimeScaleType = 0xFFFF;
 
-void fn_80111654()
+void fn_80111654(int)
 {
 }
 
@@ -57,11 +57,11 @@ void fn_80111658(bool)
 {
 }
 
-void fn_8011165C()
+void fn_8011165C(int)
 {
 }
 
-void fn_80111660()
+void fn_80111660(int)
 {
 }
 
@@ -515,4 +515,3 @@ void EventDispatcherBase::Add(const EventCallback& callback)
     callbacks.AddEnd(callback);
     state.fields.callbackCount++;
 }
-

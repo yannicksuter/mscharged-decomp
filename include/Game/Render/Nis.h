@@ -167,7 +167,7 @@ public:
     /* 0x028 */ NisHeader* mHeader;
     /* 0x02C */ NisTarget mTarget;
     /* 0x030 */ NisWinnerType mWinnerType;
-    /* 0x034 */ u32 unknown_0x034;
+    /* 0x034 */ int unknown_0x034;
     /* 0x038 */ char* mData;
     /* 0x03C */ int mSize;
     /* 0x040 */ int mBallId[MAX_NUM_CHARACTERS];

@@ -4,6 +4,7 @@
 #include "Game/InterpreterCore.h"
 
 class GLResourcePool;
+struct AudioResourceLoadOwner;
 
 struct UnidentifiedOwnerTarget
 {
@@ -94,7 +95,7 @@ extern float g_fScriptBlockingWarningMS;
 extern float g_fYieldScriptBlockingTimeMS;
 
 extern "C" {
-void fn_80116988(void*, const char* bankName);
+void fn_80116988(AudioResourceLoadOwner*, void* bankName);
 void fn_80118B38(void* data, unsigned long size, void* userData);
 void fn_80118B50(AsyncLoadingManager* manager);
 u32 fn_80118B7C(AsyncLoadingManager* manager);
@@ -111,7 +112,7 @@ void fn_80119528(AsyncLoadingManager* manager);
 void fn_80119B0C(AsyncLoadingManager* manager);
 void fn_80119EC0(AsyncLoadingManager* manager);
 void fn_8011A0A8(AsyncLoadingManager* manager);
-void fn_8011A2DC(void* value0, void* value1);
+void fn_8011A2DC(void* value0, unsigned long value1, void*);
 void fn_8011A2E8(AsyncLoadingManager* manager);
 void fn_8011A570(AsyncLoadingManager* manager);
 void fn_8011A800(AsyncLoadingManager* manager);
@@ -119,7 +120,7 @@ void fn_8011A9DC(AsyncLoadingManager* manager);
 void fn_8011B02C(AsyncLoadingManager* manager);
 void fn_8011B178(AsyncLoadingManager* manager);
 void fn_8011B2E4(AsyncLoadingManager* manager);
-void fn_8011B40C(void*, unsigned long, unsigned long);
+void fn_8011B40C(AudioResourceLoadOwner*, void*);
 void fn_8011B418(void*, unsigned long, unsigned long);
 void fn_8011B424(void*, unsigned long, unsigned long);
 void fn_8011B6E8(AsyncLoadingManager* manager);

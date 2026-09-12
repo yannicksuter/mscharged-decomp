@@ -252,13 +252,6 @@ struct UnidentifiedMegaStrikeScene
     /* 0x36 */ bool mUnidentified36;
 };
 
-struct UnidentifiedMegaStrikeEvent
-{
-    /* 0x00 */ cFielder* pFielder;
-    /* 0x04 */ float fMeterValue;
-    /* 0x08 */ nlVector3 v3Position;
-};
-
 struct UnidentifiedSkillshotNode
 {
     /* 0x0 */ cFielder* mUnidentified0;
@@ -1625,7 +1618,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
             PlaySound(0, 0xC4534945, 0, 0);
         }
 
-        UnidentifiedMegaStrikeEvent event;
+        UnidentifiedEventData_8006701C event;
         event.pFielder = this;
         event.fMeterValue = mUnidentified3BC;
         nlVector3 v3Column;
@@ -1867,7 +1860,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 
     PlayRumbleAction(1, GetGlobalPad());
 
-    UnidentifiedMegaStrikeEvent event;
+    UnidentifiedEventData_8006701C event;
     event.pFielder = this;
     event.fMeterValue = mUnidentified3BC;
     nlVector3 v3Column;
@@ -1941,7 +1934,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
         }
     }
 
-    UnidentifiedMegaStrikeEvent event;
+    UnidentifiedEventData_8006701C event;
     event.pFielder = this;
     event.fMeterValue = mUnidentified3C0;
     nlVector3 v3Column;

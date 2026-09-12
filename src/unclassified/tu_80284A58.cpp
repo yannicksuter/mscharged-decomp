@@ -2,6 +2,7 @@
 
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
+#include "Game/OverlayManager.h"
 #include "Game/BasicStadium.h"
 #include "Game/Debug/ShapeRender.h"
 #include "Game/Effects/EmissionController.h"
@@ -43,10 +44,7 @@ extern "C"
 {
     void fn_801B9DAC(const char* name);
     void fn_801BA358();
-    void fn_801E230C(void* manager, int scene, bool visible, bool immediate);
     void fn_801E2564(void* manager);
-    void fn_8027CA44(NisPlayer* player);
-    void fn_8027ED18(NisPlayer* player);
     void fn_80195868(ReplayChoreo* choreo, float deltaTime);
     void fn_801959F0(ReplayChoreo* choreo, int quality);
     int fn_8018A16C(ReplayManager* manager, float time);
@@ -306,7 +304,7 @@ void UnidentifiedPresentationState::Finish()
         {
             if (DuringEndOfGamePresentation(this))
             {
-                fn_8027ED18(NisPlayer::Instance());
+                NisPlayer::Instance()->fn_8027ED18();
                 g_pGame->mUnidentified49C.mEvent02.Queue(
                     Function<FnVoidVoid>());
                 nlTaskManager::SetNextState(1);
@@ -369,7 +367,7 @@ void UnidentifiedPresentationState::Update(float deltaTime)
         gpNumberDisplay->fn_801AE728(deltaTime);
     }
 
-    fn_8027CA44(NisPlayer::Instance());
+    NisPlayer::Instance()->fn_8027CA44();
 
     mUnidentified15C -= deltaTime;
     if (mUnidentified15C < 0.0f)
@@ -470,7 +468,7 @@ void UnidentifiedPresentationState::Update(float deltaTime)
         mOverlayDelay -= deltaTime;
         if (mOverlayDelay <= 0.0)
         {
-            fn_801E230C(g_pOverlayManager, mOverlayToDisplay, true, true);
+            static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible((SceneList)mOverlayToDisplay, true, true);
             if (mOverlayToDisplay == 0x5F)
             {
                 fn_801E2564(g_pOverlayManager);
@@ -486,7 +484,7 @@ void UnidentifiedPresentationState::Update(float deltaTime)
         {
             if (mOverlayDisplayed)
             {
-                fn_801E230C(g_pOverlayManager, mOverlayToDisplay, false, false);
+                static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible((SceneList)mOverlayToDisplay, false, false);
             }
             mOverlayDisplayed = false;
             mOverlayToDisplay = -2;
@@ -815,7 +813,7 @@ void UnidentifiedPresentationState::StopOverlay()
 {
     if (mOverlayDisplayed)
     {
-        fn_801E230C(g_pOverlayManager, mOverlayToDisplay, false, false);
+        static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible((SceneList)mOverlayToDisplay, false, false);
     }
     mOverlayDisplayed = false;
     mOverlayToDisplay = -2;

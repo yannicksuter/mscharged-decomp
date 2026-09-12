@@ -778,7 +778,7 @@ Game/AsyncLoading.cpp:
 	.text       start:0x80116988 end:0x8011BD0C
 	.ctors      start:0x804DB5FC end:0x804DB600
 	.rodata     start:0x804DCBF8 end:0x804DCC30
-	.data       start:0x805081E4 end:0x80509528 align:4
+	.data       start:0x805081E8 end:0x80509528
 	.bss        start:0x8056E448 end:0x8056E548
 	.sdata      start:0x806DC7F8 end:0x806DC858
 	.sbss       start:0x806E1038 end:0x806E1070

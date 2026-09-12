@@ -16,6 +16,7 @@
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
+#include "Game/OverlayManager.h"
 #include "Game/Camera/tu_800F9460.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/EventDataTypes.h"
@@ -110,9 +111,6 @@ extern "C" int fn_800A9210(void* param1, int param2);
 extern "C" int GetAudioPauseDepth();
 extern "C" void ResumeAllAudio();
 extern "C" void fn_800EDC2C();
-extern "C" void fn_801E230C(
-    BaseGameSceneManager* manager, SceneList scene, bool param3, bool param4);
-extern "C" void fn_801E2498(BaseGameSceneManager* manager, float param2);
 extern "C" void fn_801E999C(BaseSceneHandler* scene);
 extern "C" void* fn_800AA060(void* param1, int param2);
 extern "C" void fn_800AF404(void* param1);
@@ -1184,8 +1182,8 @@ void cGame::fn_8005DF38()
     }
     fn_800EDC2C();
 
-    fn_801E230C(g_pOverlayManager, (SceneList)89, true, true);
-    fn_801E2498(g_pOverlayManager, lbl_806E3770);
+    static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible(OVERLAY_HUD, true, true);
+    static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E2498(lbl_806E3770);
     fn_801E999C(g_pOverlayManager->GetScene((SceneList)89));
 
     if (mUnidentified10DC != 0)

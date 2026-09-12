@@ -26,6 +26,12 @@ public:
     virtual void Read(void* buffer, unsigned int size, unsigned long bufferSize) = 0;
 };
 
+inline unsigned long AlignUp32(unsigned long value)
+{
+    unsigned long remainder = value & 31;
+    return value + (remainder != 0) * (32 - remainder);
+}
+
 nlFile* nlOpen(const char* filename);
 AsyncEntry* nlReadAsync(nlFile* file, void* buffer, unsigned int size, ReadAsyncCallback callback, unsigned long userParam, unsigned long bufferSize);
 

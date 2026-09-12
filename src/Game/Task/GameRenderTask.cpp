@@ -209,7 +209,7 @@ void GameRenderTask::Run(float fDeltaT)
         UnidentifiedManager_80188928::Instance()->Update(fDeltaT);
     }
 
-    if (NisPlayer::Instance()->WorldIsFrozen())
+    if (NisPlayer::Instance()->fn_8027E64C())
     {
         void* save14F8;
         GLView* save19D8;

@@ -129,14 +129,13 @@ template <>
 void GXMaterialProgramImpl<GXMaterialProgram_8029DE3C>::Prepare(
     const glModelPacket* packet)
 {
-    unsigned char* parameters = (unsigned char*)packet->materialParameters;
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)parameters);
-    unsigned int& rasterState = *(unsigned int*)&packet->rasterState;
+    glSetMaterialTextureAlphaState(
+        this, packet, *(unsigned long*)packet->materialParameters);
 
-    if (*(int*)(parameters + 28) != 0)
-        glSetRasterState(rasterState, GLS_Culling, 0);
-    if (*(int*)(parameters + 32) != 0)
-        glSetRasterState(rasterState, GLS_DepthWrite, 1);
+    if (*(int*)((unsigned char*)packet->materialParameters + 28) != 0)
+        glSetRasterState(*(unsigned int*)&packet->rasterState, GLS_Culling, 0);
+    if (*(int*)((unsigned char*)packet->materialParameters + 32) != 0)
+        glSetRasterState(*(unsigned int*)&packet->rasterState, GLS_DepthWrite, 1);
 }
 
 static inline float WrapTextureOffset_80294404(float value)

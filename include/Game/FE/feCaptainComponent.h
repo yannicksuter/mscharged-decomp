@@ -3,7 +3,6 @@
 
 #include "types.h"
 
-class BaseGameSceneManager;
 class TLComponentInstance;
 
 class TU801DA134Component
@@ -40,9 +39,9 @@ public:
     void fn_801DEDD0(int captain, int index, unsigned long flag);
     void fn_801E0280(int value);
 
-    /* 0x004 */ u8 mUnidentified04[0x2A8];
+    /* 0x004 */ u8 mUnidentified04[0x84];
+    /* 0x088 */ TLComponentInstance* mUnidentified88;
+    /* 0x08C */ u8 mUnidentified8C[0x220];
 }; // size 0x2AC
-
-void fn_801E23A4(BaseGameSceneManager* manager, u32 from, u32 to);
 
 #endif // GAME_FE_FE_CAPTAIN_COMPONENT_H

@@ -12,6 +12,7 @@ class EffectsGroup;
 class GLInventory;
 class GLResourcePool;
 class LoadFrame;
+class MemoryAllocator;
 class Particle;
 class SaveFrame;
 class TweakIntBinding;
@@ -91,8 +92,8 @@ public:
     static void LoadBundle(void* data, void* nonResidentData, GLResourcePool* context, int bundleType);
 
     /* 0x000 */ EmissionResourceStats mResourceStats[8];
-    /* 0x1A0 */ void* mMemoryContext;
-    /* 0x1A4 */ u32 mNextControllerId;
+    /* 0x1A0 */ MemoryAllocator* mMemoryContext;
+    /* 0x1A4 */ int mNextControllerId;
     /* 0x1A8 */ bool m_bRecording;
     /* 0x1A9 */ u8 unknown_0x1A9[0x03];
     /* 0x1AC */ void* mContext;

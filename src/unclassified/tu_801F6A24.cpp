@@ -50,7 +50,7 @@ void TU801F6A24Overlay::fn_801F6E2C(cFielder* pParam1)
     mUnidentified35 = true;
 }
 
-void TU801F6A24Overlay::fn_801F6E8C(const nlVector3& vParam1)
+void TU801F6A24Overlay::fn_801F6E8C(nlVector3 vParam1)
 {
     if (mUnidentified35 == true)
     {

@@ -41,7 +41,7 @@ public:
     virtual ImpostorModel* CreateNPC(
         unsigned long templateHash, const nlMatrix4& transform);
 
-    void LoadTemplates();
+    void LoadTemplates(const char* filename);
     void AddTemplate(TweakNode* entry, const char* name);
     void BeginModelLoading();
     bool UpdateModelLoading();

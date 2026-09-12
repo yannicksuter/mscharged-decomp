@@ -36,7 +36,7 @@ extern "C"
     void fn_80343C14(StadiumWorldObject_80279AC8* object, GLView* view);
     void fn_80341EE8(StadiumWorldObject_80279AC8* object, const nlMatrix4* transform);
     void fn_80182168(StadiumWorldObject_80279AC8* object);
-    void fn_802092A4(StadiumWorldObject_80279AC8* object);
+    void fn_802092A4(StadiumGoalObject_8027A2C8* object);
     void fn_802BC678(const ShapeRender* renderer, const nlVector3& boundsMin,
         const nlVector3& boundsMax, const nlColour& colour);
     void fn_803709C4(glModel* first, glModel* second, GLView* nearView, GLView* farView);
@@ -556,7 +556,7 @@ extern "C" void fn_8027A248(StadiumWorldObject_80279AC8* object)
  * Address/Size: 0x8027A2C8 | size: 0x34
  */
 extern "C" void fn_8027A2C8(
-    StadiumWorldObject_80279AC8* object, void* context)
+    StadiumGoalObject_8027A2C8* object, void* context)
 {
     fn_80343DE4(object, context);
     fn_802092A4(object);
@@ -572,9 +572,9 @@ extern "C" void fn_8027A2FC(StadiumWorldObject_80279AC8*)
 /**
  * Address/Size: 0x8027A300 | size: 0x18
  */
-extern "C" void fn_8027A300(StadiumWorldObject_80279AC8* object)
+extern "C" void fn_8027A300(StadiumGoalObject_8027A2C8* object)
 {
-    if (*(float*)&object->m_pLayerModels[1] != 0.0f)
+    if (object->m_fCupTrophyOpacity != 0.0f)
         fn_80343C00(object);
 }
 

@@ -33,14 +33,12 @@ static inline void ResetBallIteratorState()
     static nlDLListIterator<BallCacheInfo*> iter
         = FakeBallWorld::mBallCacheList.Begin();
 
-    iter.m_Curr
-        = nlDLRingGetStart(FakeBallWorld::mBallCacheList.m_Head);
-    iter.m_Head = FakeBallWorld::mBallCacheList.m_Head;
+    iter = FakeBallWorld::mBallCacheList.Begin();
     FakeBallWorld::mpCacheIterator = &iter;
 
-    if (iter.m_Curr != 0)
+    if (FakeBallWorld::mpCacheIterator->m_Curr != 0)
     {
-        iter.next();
+        FakeBallWorld::mpCacheIterator->next();
     }
 }
 

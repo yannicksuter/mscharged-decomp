@@ -212,7 +212,10 @@ void GXMaterialProgramImpl<GXMaterialProgram_802987A0>::Draw(
     if (lbl_806E1A88[0] != scaleX || lbl_806E1A88[1] != scaleY)
     {
         Mtx textureMatrix;
-        memcpy(textureMatrix, lbl_804E8730, sizeof(Mtx));
+        for (int i = 0; i < 12; ++i)
+        {
+            ((u32*)textureMatrix)[i] = ((const u32*)lbl_804E8730)[i];
+        }
         textureMatrix[0][0] = 0.5f * scaleX;
         textureMatrix[1][1] = -0.5f * scaleY;
         GXLoadTexMtxImm(textureMatrix, 64, GX_MTX3x4);

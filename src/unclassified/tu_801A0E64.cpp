@@ -292,7 +292,43 @@ extern "C" void fn_801A1B54(HammerObject* object, cFielder* fielder)
     }
 
     nlVector3 velocity = { 0.0f, 0.0f, 0.0f };
-    SetVelocity(object, velocity);
+    object->_028->SetLinearVelocity(velocity);
+
+    dQuaternion bodyOrientation;
+    nlVector3 forward;
+    nlVector3 planarVelocity;
+    nlVector3 angularVelocity;
+    nlQuaternion orientation;
+
+    nlVec3Set(angularVelocity,
+        lbl_806E505C,
+        lbl_806DCE48,
+        lbl_806E505C);
+    nlVec3Set(planarVelocity,
+        velocity.x,
+        velocity.y,
+        lbl_806E505C);
+
+    if (planarVelocity.GetLengthSq3D() > lbl_806E5060)
+    {
+        forward = *(nlVector3*)&lbl_80511E28;
+        GetRotationBetweenVectors(orientation, forward, planarVelocity);
+    }
+    else
+    {
+        orientation.z = lbl_806E505C;
+        orientation.y = lbl_806E505C;
+        orientation.x = lbl_806E505C;
+        orientation.w = lbl_806E5058;
+    }
+
+    bodyOrientation[0] = orientation.x;
+    bodyOrientation[1] = orientation.y;
+    bodyOrientation[2] = orientation.z;
+    bodyOrientation[3] = orientation.w;
+    dBodySetQuaternion(object->_028->m_bodyID, bodyOrientation);
+    object->_028->SetAngularVelocity(angularVelocity);
+    object->_000 = orientation;
 }
 
 extern "C" void fn_801A1CFC(HammerObject* object, int)

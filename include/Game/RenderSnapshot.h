@@ -41,6 +41,11 @@ public:
         return mCharacters[index];
     }
 
+    DrawablePowerup& GetUnidentifiedPowerup(int index)
+    {
+        return mPowerups[index];
+    }
+
     unsigned int mEvents;
     bool mValid;
     bool mGoalLight;

@@ -278,7 +278,7 @@ WorldNPCManager::~WorldNPCManager()
     gpWorldNPCManager = 0;
 }
 
-void WorldNPCManager::LoadTemplates()
+void WorldNPCManager::LoadTemplates(const char*)
 {
     LoadTweakConfigFile("ini/WorldNPCs.ini", sWorldNPCTweakPath, false);
     TweakEntry* entry

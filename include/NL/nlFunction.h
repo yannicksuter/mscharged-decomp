@@ -208,12 +208,14 @@ public:
         mTag = FUNCTION_EMPTY;
     }
 
-    void UnidentifiedTransfer(Function0& other)
+    void* UnidentifiedTransfer(Function0& other)
     {
+        void* target = (void*)other.mFreeFunction;
         mTag = other.mTag;
-        mFreeFunction = other.mFreeFunction;
+        mFunctor = (FunctorBase*)target;
         other.mTag = FUNCTION_EMPTY;
         other.mFreeFunction = 0;
+        return target;
     }
 
     operator bool() const
@@ -372,12 +374,14 @@ public:
         return *this;
     }
 
-    void UnidentifiedTransfer(Function1& other)
+    void* UnidentifiedTransfer(Function1& other)
     {
+        void* target = (void*)other.mFreeFunction;
         mTag = other.mTag;
-        mFreeFunction = other.mFreeFunction;
+        mFunctor = (FunctorBase*)target;
         other.mTag = FUNCTION_EMPTY;
         other.mFreeFunction = 0;
+        return target;
     }
 
     operator bool() const
@@ -817,12 +821,14 @@ public:
         mTag = FUNCTION_EMPTY;
     }
 
-    void UnidentifiedTransfer(Function3& other)
+    void* UnidentifiedTransfer(Function3& other)
     {
+        void* target = (void*)other.mFreeFunction;
         mTag = other.mTag;
-        mFreeFunction = other.mFreeFunction;
+        mFunctor = (FunctorBase*)target;
         other.mTag = FUNCTION_EMPTY;
         other.mFreeFunction = 0;
+        return target;
     }
 
     operator bool() const

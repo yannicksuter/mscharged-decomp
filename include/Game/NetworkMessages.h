@@ -45,7 +45,7 @@ public:
 
 struct NetworkDraftSides
 {
-    s8 mData[8];
+    s8 mData[4][2];
 };
 
 struct NetworkDraftMachineInfo
@@ -74,7 +74,7 @@ public:
     {
         for (int i = 0; i < 8; ++i)
         {
-            mUnidentified0B.mData[i] = -1;
+            mUnidentified0B.mData[i / 2][i % 2] = -1;
         }
     }
 

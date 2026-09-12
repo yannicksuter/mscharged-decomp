@@ -150,12 +150,6 @@ public:
 static AsyncManager* s_pAsyncManager;
 static bool sServicingReads;
 
-static unsigned long AlignUp32(unsigned long value)
-{
-    unsigned long remainder = value & 31;
-    return value + (remainder != 0) * (32 - remainder);
-}
-
 bool IsAsyncReadBusy(AsyncEntry* entry);
 
 static bool CheckDVDStatus()

@@ -11,6 +11,11 @@ public:
     void Render(int) const;
     void Blend(const float*, const DrawablePowerup&, const DrawablePowerup&);
 
+    void SetUnidentifiedVisible(bool visible)
+    {
+        mVisible = visible;
+    }
+
     s8 mType;
     char _01[3];
     float mScale;

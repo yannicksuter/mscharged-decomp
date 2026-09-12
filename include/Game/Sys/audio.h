@@ -57,7 +57,7 @@ void StopSound(unsigned long cueId, void* context);
 void PauseSound(unsigned long cueId, void* context);
 void ResumeSound(unsigned long cueId, void* context);
 void SetLastSoundParameter(unsigned long parameter, float value);
-unsigned long GetSoundState(unsigned long cueId, void* context);
+int GetSoundState(unsigned long cueId, void* context);
 void SetSoundCallbackEnabled(
     unsigned long cueId, void* context, unsigned char enabled);
 bool PrepareTrackedSound(int slotId, unsigned long cueId,

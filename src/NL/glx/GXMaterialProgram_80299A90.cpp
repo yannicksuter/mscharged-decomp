@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/glx/GXMaterialProgram.h"
+#include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/gl/glLoadModel.h"
 #include "Game/UnidentifiedStaticStorage.h"
 

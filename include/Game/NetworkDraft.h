@@ -38,6 +38,16 @@ struct NetworkDraftTeam
     {
     }
 
+    NetworkDraftPlayer* FindPlayer(int peer, bool guest)
+    {
+        for (int i = 0; i < mPlayerCount; ++i)
+        {
+            if (mPlayers[i].mPeerIndex == peer && mPlayers[i].mGuest == guest)
+                return &mPlayers[i];
+        }
+        return 0;
+    }
+
     /* 0x000 */ int mPlayerCount;
     /* 0x004 */ int mCaptain;
     /* 0x008 */ int mSidekick0;
@@ -63,6 +73,8 @@ public:
 
     static void CreateInstance();
     static NetworkDraft* Instance();
+
+    NetMessageDraft& GetDraftMessage() { return mDraftMessage; }
 
     void Reset(bool initialize);
     void BeginSortedDraft(NetMessageDraft* message);

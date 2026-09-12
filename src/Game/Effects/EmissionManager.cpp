@@ -9,6 +9,8 @@
 #include "NL/nlFile.h"
 #include "NL/nlCompressedFile.h"
 #include "NL/nlMemory.h"
+#include "NL/MemAlloc.h"
+#include "NL/nlAVLTree.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -37,6 +39,7 @@ extern void* gEffectsNonResidentData;
 extern void* lbl_806E1FF0;
 extern void* gEffectsGeometryData;
 extern void* gEffectsTextureData;
+extern nlAVLTree<unsigned long, EffectsGroup*, DefaultKeyCompare<unsigned long> > lbl_8057F6B8;
 
 void OnEffectsGeometryLoaded(
     void* data, unsigned long size, void* userData);
@@ -337,6 +340,59 @@ void EmissionManager::Render()
 nlDLListContainer<EmissionController*>* EmissionManager::GetContainer()
 {
     return &mControllers;
+}
+
+EffectsGroup* EmissionManager::GetEffectsGroup(const char* name)
+{
+    unsigned long hash = nlStringLowerHash(name);
+    EffectsGroup** group;
+    if (lbl_8057F6B8.FindGet(hash, &group))
+    {
+        return *group;
+    }
+    return 0;
+}
+
+extern "C" EffectsGroup* fn_802E7D54(EmissionManager*, unsigned long hash)
+{
+    EffectsGroup** group;
+    if (!lbl_8057F6B8.FindGet(hash, &group))
+    {
+        return 0;
+    }
+    return *group;
+}
+
+EmissionController* EmissionManager::Create(EffectsGroup* group, int view, bool addToEnd, unsigned short id)
+{
+    MemoryAllocator* allocator = mMemoryContext;
+    AllocatorStack[AllocatorStackDepth++] = allocator;
+    CurrentAllocator = allocator;
+
+    if (id == 0)
+    {
+        id = mNextControllerId++;
+    }
+    if (mNextControllerId > 0x7E16)
+    {
+        mNextControllerId = 1;
+    }
+
+    EmissionController* controller = new (nlMalloc(sizeof(EmissionController), 8, false))
+        EmissionController(group, this, id, mContext, view);
+    if (addToEnd)
+    {
+        mControllers.AddEnd(controller);
+    }
+    else
+    {
+        mControllers.AddStart(controller);
+    }
+
+    --AllocatorStackDepth;
+    AllocatorStack[AllocatorStackDepth] = 0;
+    CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+    return controller;
 }
 
 /**

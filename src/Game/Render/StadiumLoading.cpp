@@ -619,7 +619,7 @@ char* fn_802772C4()
     return gStadiumName;
 }
 
-void fn_802772D0(const char* name)
+void fn_802772D0(const char* name, bool)
 {
     char path[255];
 

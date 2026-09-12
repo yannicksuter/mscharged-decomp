@@ -7,7 +7,7 @@
 #include "Game/Character.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/Drawable/DrawableCharacter.h"
-#include "Game/FE/feCaptainComponent.h"
+#include "Game/OverlayManager.h"
 #include "Game/Game.h"
 #include "Game/NisPlayer.h"
 #include "Game/PadActions.h"
@@ -132,7 +132,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (g_pOverlayManager != NULL)
     {
-        fn_801E23A4(g_pOverlayManager, from, to);
+        static_cast<OverlayManager*>(g_pOverlayManager)->HandleStateTransition(from, to);
     }
 
     if ((to & 0x18) || to == 0x20000)

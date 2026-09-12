@@ -1,12 +1,9 @@
 #include <revolution/gx.h>
 
 #include "NL/glx/GXMaterialProgram.h"
+#include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/gl/glLoadModel.h"
 #include "Game/UnidentifiedStaticStorage.h"
-
-GXPrimitive glx_PrimitiveTypes[6] = {
-    GX_TRIANGLES, GX_TRIANGLESTRIP, GX_TRIANGLEFAN, GX_QUADS, GX_LINES, GX_LINESTRIP
-};
 
 GXMaterialProgram_802981F0* GXMaterialProgram_802981F0::Instance;
 bool GXMaterialProgram_802981F0::Initialized;

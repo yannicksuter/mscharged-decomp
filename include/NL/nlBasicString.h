@@ -117,6 +117,11 @@ public:
             return mData.mData;
         }
 
+        int size() const
+        {
+            return mData.mSize - 1;
+        }
+
         CharT* end()
         {
             return mData.mData + mData.mSize - 1;
@@ -181,7 +186,7 @@ public:
 
     int size() const
     {
-        return mData ? mData->mData.mSize - 1 : 0;
+        return mData ? mData->size() : 0;
     }
 
     CharT* begin()

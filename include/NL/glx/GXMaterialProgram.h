@@ -15,10 +15,6 @@ class GLView;
 
 void glx_EnableWarble(bool enabled);
 
-extern GXPrimitive glx_PrimitiveTypes[6];
-
-
-
 struct GXMaterialProgramParameters_802A6B6C
 {
     /* 0x00 */ unsigned long texture;

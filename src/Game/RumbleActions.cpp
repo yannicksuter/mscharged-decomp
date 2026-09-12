@@ -1,5 +1,6 @@
 #include "Game/RumbleActions.h"
 
+#include "Game/NetworkPeer.h"
 #include "NL/globalpad.h"
 #include "types.h"
 
@@ -23,6 +24,16 @@ struct RumbleActionState
 extern unsigned char gRumbleSettings[];
 extern RumbleActionState gRumbleActionStates[4];
 extern bool gRumbleEnabledOverride;
+
+void PlayRumbleAction(int preset, DetInput* input)
+{
+    cGlobalPad* pad = 0;
+    if (input != 0)
+    {
+        pad = ((NetworkPeerChannel*)input->m_pMyUser)->GetLocalChannelPad();
+    }
+    BeginRumbleAction((eRumbleActionPreset)preset, pad);
+}
 
 bool IsRumbleActionActive(cGlobalPad* pad)
 {

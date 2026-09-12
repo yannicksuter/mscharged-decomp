@@ -1,6 +1,7 @@
 #include <revolution/gx.h>
 
 #include "NL/glx/GXMaterialProgram.h"
+#include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/gl/glLoadModel.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -70,7 +71,7 @@ void GXMaterialProgram_802A4F0C::DrawIndexed(const glModelPacket* packet)
 {
     unsigned short* idxPtr = packet->indexBuffer;
     unsigned short* end = idxPtr + packet->numVertices;
-    GXBegin(glx_PrimitiveTypes[(unsigned char)packet->primType], GX_VTXFMT0, (unsigned short)packet->numVertices);
+    GXBegin(UnidentifiedGetPrimitiveType((unsigned char)packet->primType), GX_VTXFMT0, (unsigned short)packet->numVertices);
 
     while (idxPtr < end)
     {
@@ -83,7 +84,7 @@ void GXMaterialProgram_802A4F0C::DrawIndexed(const glModelPacket* packet)
 
 void GXMaterialProgram_802A4F0C::DrawDirect(const glModelPacket* packet)
 {
-    GXBegin(glx_PrimitiveTypes[(unsigned char)packet->primType], GX_VTXFMT0, packet->numUniqueVertices);
+    GXBegin(UnidentifiedGetPrimitiveType((unsigned char)packet->primType), GX_VTXFMT0, packet->numUniqueVertices);
 
     for (unsigned short i = 0; i < packet->numUniqueVertices; ++i)
     {

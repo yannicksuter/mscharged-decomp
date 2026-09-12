@@ -47,6 +47,27 @@ public:
     void SelectCameraAnimation(const char* name);
     float ManualUpdate(float dt);
 
+    float GetUnidentifiedDuration() const
+    {
+        if (m_pActiveCameraData != 0)
+        {
+            return (float)m_pActiveCameraData->m_uKeyCount / 30.0f;
+        }
+        return 0.0f;
+    }
+
+    float GetUnidentifiedTimeLeft() const
+    {
+        float animTime = GetUnidentifiedAnimationTime();
+        float duration = GetUnidentifiedDuration();
+        return (1.0f - animTime) * duration;
+    }
+
+    float GetUnidentifiedAnimationTime() const
+    {
+        return m_fAnimationTime;
+    }
+
     static cCameraData* m_cameraDataList;
 
     /* 0x20 */ bool m_bCyclic;

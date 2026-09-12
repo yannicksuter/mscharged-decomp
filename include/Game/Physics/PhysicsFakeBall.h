@@ -60,7 +60,7 @@ public:
     /* 0x04 */ FakePhysicsBall* mpPhysicsBall;
     /* 0x08 */ CollisionSpace* mpCollisionSpace;
     /* 0x0C */ PhysicsWorld* mpPhysicsWorld;
-    /* 0x10 */ PhysicsGroundPlane* mpGroundPlane;
+    /* 0x10 */ PhysicsPlane* mpGroundPlane;
     /* 0x14 */ PhysicsGoaliePlane* mpGoaliePlane1;
     /* 0x18 */ PhysicsGoaliePlane* mpGoaliePlane2;
     /* 0x1C */ bool mbHitSuccess;

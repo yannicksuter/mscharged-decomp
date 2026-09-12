@@ -190,7 +190,6 @@ extern "C" void fn_8007EB90(Goalie* pGoalie);
 extern "C" void fn_8003C5D8(
     cFielder* pFielder, bool bParam, unsigned short aParam);
 extern "C" void fn_80098098(Goalie* pGoalie);
-extern "C" void fn_8004F204(cFielder* pFielder);
 extern "C" void fn_8005E408(
     void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_8005E604(
@@ -639,9 +638,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
                            + v3BallVel.z * v3BallVel.z;
             if (fSpeedSq > 64.0f)
             {
-                v3BallVel.x = 0.3f * v3BallVel.x;
-                v3BallVel.y = 0.3f * v3BallVel.y;
-                v3BallVel.z = 0.3f * v3BallVel.z;
+                nlVec3Scale(v3BallVel, 0.3f);
                 g_pBall->SetVelocity(
                     v3BallVel, SPINTYPE_NONE, 0);
             }
@@ -837,9 +834,8 @@ void Goalie::fn_80083960(float)
         {
             nlVector3 v3BallPosition;
             nlVector3 v3Facing;
-            v3Facing.z = m_m4WorldMatrix.e2[0][2];
-            v3Facing.y = m_m4WorldMatrix.e2[0][1];
-            v3Facing.x = m_m4WorldMatrix.e2[0][0];
+            nlVec3Set(v3Facing, m_m4WorldMatrix.e2[0][0],
+                m_m4WorldMatrix.e2[0][1], m_m4WorldMatrix.e2[0][2]);
 
             nlVec3ScaleAdd(
                 v3BallPosition, 1.5f, v3Facing, mUnidentified024.m_v3Position);
@@ -871,7 +867,7 @@ void Goalie::fn_80083960(float)
     }
     else
     {
-        if (g_pBall->GetOwnerFielder() != mpMonty
+        if (mpMonty != g_pBall->GetOwnerFielder()
             || m_tFireTimer.m_uPackedTime != 0
             || mpMonty->fn_8003E6FC()
             || mpMonty->mbTangible
@@ -900,7 +896,7 @@ void Goalie::fn_80083960(float)
                     g_pBall->m_bVisible = 0;
                 }
 
-                fn_8004F204(mpMonty);
+                mpMonty->fn_8004F204();
                 PlaySound(mUnidentified318, 0x76520305, 0, 0);
 
                 nlVector3 v3Position
@@ -3785,7 +3781,7 @@ void Goalie::fn_8008A610(float fDeltaT)
             SetGoalieAction((eGoalieActionState)0x1F, 0);
             mbGrabMonty = true;
             mpMonty = mpTarget;
-            fn_8004F204(mpTarget);
+            mpTarget->fn_8004F204();
             g_pBall->m_bVisible = 0;
             mUnidentified024.m_fDesiredSpeed = 0.0f;
             mUnidentified024.m_fActualSpeed = 0.0f;

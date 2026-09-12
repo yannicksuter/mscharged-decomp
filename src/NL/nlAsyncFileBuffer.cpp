@@ -59,11 +59,10 @@ int nlAsyncFileBufferGetRemaining(nlAsyncFileBuffer* fileBuffer)
     return fileBuffer->fileSize - fileBuffer->position;
 }
 
-void nlAsyncFileBufferRead(
+unsigned int nlAsyncFileBufferRead(
     nlAsyncFileBuffer* fileBuffer, void* output, unsigned int size)
 {
-    int loadBuffer = fileBuffer->loadBuffer;
-    if (fileBuffer->bufferStates[loadBuffer] == AsyncBufferAvailable
+    if (fileBuffer->bufferStates[fileBuffer->loadBuffer] == AsyncBufferAvailable
         && fileBuffer->readPosition != fileBuffer->fileSize)
     {
         int readSize = fileBuffer->bufferSize;
@@ -73,42 +72,43 @@ void nlAsyncFileBufferRead(
             readSize = remaining;
         }
 
-        nlReadAsync(fileBuffer->file, fileBuffer->buffers[loadBuffer], readSize,
+        nlReadAsync(fileBuffer->file, fileBuffer->buffers[fileBuffer->loadBuffer], readSize,
             nlAsyncFileBufferReadComplete, (unsigned long)fileBuffer, 0);
-        fileBuffer->bufferDataSizes[loadBuffer] = readSize;
-        fileBuffer->bufferStates[loadBuffer] = AsyncBufferPending;
+        fileBuffer->bufferDataSizes[fileBuffer->loadBuffer] = readSize;
+        fileBuffer->bufferStates[fileBuffer->loadBuffer] = AsyncBufferPending;
     }
 
-    int currentBuffer = fileBuffer->currentBuffer;
-    int available = fileBuffer->buffers[currentBuffer]
-        + fileBuffer->bufferDataSizes[currentBuffer]
-        - fileBuffer->bufferPositions[currentBuffer];
+    int available = fileBuffer->buffers[fileBuffer->currentBuffer]
+        + fileBuffer->bufferDataSizes[fileBuffer->currentBuffer]
+        - fileBuffer->bufferPositions[fileBuffer->currentBuffer];
     if (size <= available)
     {
-        memcpy(output, fileBuffer->bufferPositions[currentBuffer], size);
-        fileBuffer->bufferPositions[currentBuffer] += size;
+        memcpy(output, fileBuffer->bufferPositions[fileBuffer->currentBuffer], size);
+        fileBuffer->bufferPositions[fileBuffer->currentBuffer] += size;
         fileBuffer->position += size;
+        return size;
     }
     else
     {
         if (available > 0)
         {
-            memcpy(output, fileBuffer->bufferPositions[currentBuffer], available);
+            memcpy(output, fileBuffer->bufferPositions[fileBuffer->currentBuffer], available);
         }
 
         if (fileBuffer->readPosition < fileBuffer->fileSize)
         {
-            fileBuffer->bufferStates[currentBuffer] = AsyncBufferAvailable;
+            fileBuffer->bufferStates[fileBuffer->currentBuffer] = AsyncBufferAvailable;
         }
 
         unsigned int remaining = size - available;
         fileBuffer->currentBuffer = 1 - fileBuffer->currentBuffer;
-        currentBuffer = fileBuffer->currentBuffer;
-        fileBuffer->bufferPositions[currentBuffer] = fileBuffer->buffers[currentBuffer];
+        fileBuffer->bufferPositions[fileBuffer->currentBuffer]
+            = fileBuffer->buffers[fileBuffer->currentBuffer];
 
         memcpy((unsigned char*)output + available,
-            fileBuffer->bufferPositions[currentBuffer], remaining);
-        fileBuffer->bufferPositions[currentBuffer] += remaining;
+            fileBuffer->bufferPositions[fileBuffer->currentBuffer], remaining);
+        fileBuffer->bufferPositions[fileBuffer->currentBuffer] += remaining;
         fileBuffer->position += size;
+        return size;
     }
 }

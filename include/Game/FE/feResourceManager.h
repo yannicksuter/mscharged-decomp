@@ -97,7 +97,7 @@ private:
     static int LoadNextPermanentTexture(PermanentBundleLoadState* state);
     static void PermanentTextureLoadComplete(void* buffer, unsigned long uReadSize, unsigned long uParam);
 
-protected:
+public:
     /* 0x1D */ char m_szPermanentBundleFileName[32];
     /* 0x3D */ char m_szOnDemandBundleFileName[32];
     /* 0x5D */ bool m_bPermanentBundleLoadInProgress;

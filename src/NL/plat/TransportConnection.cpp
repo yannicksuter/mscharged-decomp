@@ -880,6 +880,7 @@ void TransportConnection::Deliver(
     }
 
     NetworkMessageSerializer serializer(0, packet->mPayload, packet->mSize);
+    unsigned long long now;
     switch (packet->mType)
     {
     case 0xE0:
@@ -951,7 +952,7 @@ void TransportConnection::Deliver(
     {
         TransportKeepAlive payload;
         payload.Serialize(&serializer);
-        unsigned long long now = nlGetTime();
+        now = nlGetTime();
         if (g_TransportLayerLog >= 2)
         {
             tDebugPrintManager::Print(DC_NETWORK,

@@ -111,7 +111,7 @@ class SSearchRunToNet : public SpaceSearch
 {
 public:
     SSearchRunToNet(cPlayer* pPlayer);
-    virtual ~SSearchRunToNet() { }
+    virtual ~SSearchRunToNet();
     virtual float EvaluatePosition(
         const nlVector3& v3TestPosition,
         const nlVector3& v3CenterPos,
@@ -126,7 +126,7 @@ class SSearchBestPass : public SpaceSearch
 public:
     SSearchBestPass(cPlayer* pBallOwner, cPlayer* pPassTarget,
         bool bAllowLeadPass, bool bIsPerfectPass, float fPassSpeed);
-    virtual ~SSearchBestPass() { }
+    virtual ~SSearchBestPass();
     virtual float EvaluatePosition(
         const nlVector3& position,
         const nlVector3& v3OtherPosition,

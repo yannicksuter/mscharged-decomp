@@ -22,12 +22,21 @@ public:
         NUM_QUALITY_LEVELS = 5,
     };
 
+    struct UnidentifiedReplayGoalData
+    {
+        /* 0x00 */ unsigned int uTeamIndex : 8;
+        /* 0x00 */ unsigned int uGoalType : 16;
+        /* 0x00 */ unsigned int mUnidentified003 : 8;
+        /* 0x04 */ nlVector3 v3ShotPosition;
+        /* 0x10 */ cPlayer* pScorer;
+    }; // size: 0x14
+
     struct Highlight
     {
         /* 0x00 */ int mUnidentified000;
         /* 0x04 */ float mTime;
         /* 0x08 */ int mReplayPad;
-        /* 0x0C */ GoalScoredData mGoalScoredData;
+        /* 0x0C */ UnidentifiedReplayGoalData mGoalScoredData;
         /* 0x20 */ int mUnidentified020;
         /* 0x24 */ void* mUnidentified024;
         /* 0x28 */ void* mUnidentified028;
@@ -63,7 +72,7 @@ public:
     /* 0x334 */ void* mByteCode;
     /* 0x338 */ bool mUnidentified338;
     /* 0x339 */ u8 mPadding339[3];
-    /* 0x33C */ GoalScoredData mGoalScoredData;
+    /* 0x33C */ UnidentifiedReplayGoalData mGoalScoredData;
     /* 0x350 */ Highlight mHighlights[3];
     /* 0x3EC */ Highlight* mUnidentified3EC;
     /* 0x3F0 */ Highlight* mUnidentified3F0;

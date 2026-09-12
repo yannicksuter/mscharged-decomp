@@ -462,7 +462,7 @@ void SetLastSoundParameter(unsigned long parameter, float value)
     audioParameter->m_Time = 0.0f;
 }
 
-unsigned long GetSoundState(
+int GetSoundState(
     unsigned long cueId, void* context)
 {
     XSoundHandle* handle = FindSoundHandle(cueId, context);

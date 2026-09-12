@@ -1,7 +1,7 @@
 #ifndef GAME_SH_SH_STRIKER_TIMES_BASE_H
 #define GAME_SH_SH_STRIKER_TIMES_BASE_H
 
-#include "Game/BaseSceneHandler.h"
+#include "Game/FE/BaseOverlayHandler.h"
 #include "Game/FE/feAsyncImage.h"
 #include "Game/FE/feScrollText.h"
 #include "NL/nlBasicString.h"
@@ -13,7 +13,7 @@ class TLComponentInstance;
 class TLInstance;
 class TLTextInstance;
 
-class SHStrikerTimesBase : public BaseSceneHandler
+class SHStrikerTimesBase : public BaseOverlayHandler
 {
 public:
     SHStrikerTimesBase();
@@ -33,9 +33,6 @@ public:
     void OnDonePointerLeave(int index, void* context);
     void OnDonePointerPress(int index, void* context);
 
-    /* 0x01C */ int mUnidentified1C;
-    /* 0x020 */ int mUnidentified20;
-    /* 0x024 */ u8 mUnidentified24;
     /* 0x028 */ int mDisplayMode;
     /* 0x02C */ int mPage;
     /* 0x030 */ bool mDonePressed;

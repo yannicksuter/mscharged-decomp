@@ -243,7 +243,7 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
         int playerCount = entry.mGuestEnabled ? 2 : 1;
         for (int playerIndex = 0; playerIndex < playerCount; ++playerIndex)
         {
-            int teamIndex = message->mUnidentified0B.mData[entryIndex * 2 + playerIndex];
+            int teamIndex = message->mUnidentified0B.mData[entryIndex][playerIndex];
             if (teamIndex < 0 || teamIndex >= mTeamCount)
             {
                 continue;

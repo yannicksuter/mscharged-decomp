@@ -57,6 +57,7 @@ struct dxSphere : public dxGeom
 {
     dReal radius; // sphere radius
     dxSphere(dSpaceID space, dReal _radius);
+    ~dxSphere();
     void computeAABB();
 };
 
@@ -64,6 +65,7 @@ struct dxBox : public dxGeom
 {
     dVector3 side; // side lengths (x,y,z)
     dxBox(dSpaceID space, dReal lx, dReal ly, dReal lz);
+    ~dxBox();
     void computeAABB();
 };
 
@@ -71,6 +73,7 @@ struct dxCCylinder : public dxGeom
 {
     dReal radius, lz; // radius, length along z axis
     dxCCylinder(dSpaceID space, dReal _radius, dReal _length);
+    ~dxCCylinder();
     void computeAABB();
 };
 
@@ -78,6 +81,7 @@ struct dxPlane : public dxGeom
 {
     dReal p[4];
     dxPlane(dSpaceID space, dReal a, dReal b, dReal c, dReal d);
+    ~dxPlane();
     void computeAABB();
 };
 
@@ -1962,4 +1966,20 @@ int dCollideRayPlane(dxGeom* o1, dxGeom* o2, int flags,
     contact->g1 = ray;
     contact->g2 = plane;
     return 1;
+}
+
+dxSphere::~dxSphere()
+{
+}
+
+dxBox::~dxBox()
+{
+}
+
+dxCCylinder::~dxCCylinder()
+{
+}
+
+dxPlane::~dxPlane()
+{
 }

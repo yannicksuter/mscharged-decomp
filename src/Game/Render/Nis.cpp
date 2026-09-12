@@ -777,7 +777,7 @@ int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3)
     }
     if (target == NIS_TARGET_UNIDENTIFIED_14)
     {
-        return NisPlayer::Instance()->mUnidentified340C0;
+        return NisPlayer::Instance()->mGoalScorerCharIndex;
     }
     if (target == NIS_TARGET_LOSER_SIDEKICK)
     {
