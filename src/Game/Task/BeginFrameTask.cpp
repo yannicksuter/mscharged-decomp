@@ -30,7 +30,7 @@
 #include "NL/platvmath.h"
 #include "types.h"
 #include "unclassified/tu_80284A58.h"
-#include "unclassified/tu_802BAE84.h"
+#include "Game/Sys/tweak.h"
 
 extern "C" {
 extern bool lbl_806DCCA1;
@@ -82,11 +82,6 @@ float fn_80112E14()
 glModel* fn_80112E1C(glModel* model)
 {
     return NULL;
-}
-
-static inline float DegreesToRadians(float degrees)
-{
-    return degrees * 3.1415927f / 180.0f;
 }
 
 static inline float RadiansToDegrees(float radians)
@@ -512,6 +507,6 @@ void BeginFrameTask::Run(float dt)
     static bool showRegion = Config::Global().Get<bool>("show_region", false);
     if (showRegion)
     {
-        fn_802BB048(0, 0, false, 4, "Region %d", GetRegion());
+        nlScreenPrintf(0, 0, false, 4, "Region %d", GetRegion());
     }
 }

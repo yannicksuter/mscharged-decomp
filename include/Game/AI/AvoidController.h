@@ -32,10 +32,10 @@ enum eAvoidableThings
 class UnidentifiedAvoidanceHistoryBase
 {
 public:
-    UnidentifiedAvoidanceHistoryBase(float duration = 0.3f)
+    UnidentifiedAvoidanceHistoryBase(float duration, float sampleRate)
     {
         mUnidentified004 = duration;
-        int count = (int)(float)ceil(duration * 60.0f) + 2;
+        int count = (int)(float)ceil(duration * sampleRate) + 2;
         mUnidentified014 = (nlVector3*)nlMalloc(
             count * sizeof(nlVector3), 8, false);
         mUnidentified018 = (float*)nlMalloc(
@@ -140,7 +140,7 @@ class UnidentifiedAvoidanceHistory : public UnidentifiedAvoidanceHistoryBase
 {
 public:
     UnidentifiedAvoidanceHistory(float duration = 0.3f)
-        : UnidentifiedAvoidanceHistoryBase(duration)
+        : UnidentifiedAvoidanceHistoryBase(duration, 60.0f)
     {
     }
     virtual ~UnidentifiedAvoidanceHistory()

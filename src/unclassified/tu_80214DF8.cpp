@@ -51,7 +51,6 @@ void TU80214DF8Scene::fn_80216048()
     if ((mUnidentified105C == 0 || mUnidentified105C == 2) && mUnidentified34 >= 0)
     {
         mUnidentified38 = mUnidentified34 - 5;
-        categoryIndex = mUnidentified105C;
         int maximum = NetworkStatsManager::Instance()
                           ->GetCategory(categoryIndex)
                           ->mCount

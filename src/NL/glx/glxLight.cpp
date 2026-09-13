@@ -14,9 +14,10 @@ void glx_LoadDirectionalLight(unsigned int index, const nlVector3* vector, const
     GXLightObj* light = &glx_LightObjects[index];
     nlColour colour;
     ConvertColour(colour, *pColour);
+    GXColor lightColour = *(GXColor*)&colour;
     GXInitLightDir(light, vector->x, vector->y, vector->z);
     GXInitLightPos(light, 100000.0f * vector->x, 100000.0f * vector->y, 100000.0f * vector->z);
-    GXInitLightColor(light, *(GXColor*)&colour);
+    GXInitLightColor(light, lightColour);
 
     if (memcmp(light, &glx_LoadedLightObjects[index], sizeof(GXLightObj)) != 0)
     {
@@ -27,8 +28,12 @@ void glx_LoadDirectionalLight(unsigned int index, const nlVector3* vector, const
 
 void glx_SetAmbientColour(const nlFloatColour* pColour)
 {
-    nlColour colour;
-    ConvertColour(colour, *pColour);
+    nlColour colour = { {
+        (s32)(pColour->c[0] * 255.0f),
+        (s32)(pColour->c[1] * 255.0f),
+        (s32)(pColour->c[2] * 255.0f),
+        (s32)(pColour->c[3] * 255.0f),
+    } };
     gxSetChanAmbColour(0, colour);
 }
 

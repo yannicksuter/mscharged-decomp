@@ -8,12 +8,17 @@ class FEScene;
 class GLView;
 class TLImageInstance;
 class TLInstance;
+class TLSlide;
+class TLComponentInstance;
 struct glTextureBinding;
 
 class FERender
 {
 public:
     static void Initialize();
+    static void CalculateCurrentAssetColour(const TLInstance* instance);
+    static void RenderSlide(const TLSlide* slide, const nlMatrix4& matrix);
+    static void RenderComponentInstance(TLComponentInstance* instance, const nlMatrix4& matrix);
     static void BeginFrame();
     static void RenderScene(FEScene* scene);
     static void RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, const nlMatrix4& parentMatrix);

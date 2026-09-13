@@ -63,7 +63,8 @@ public:
     virtual void SendBroadcast(void* buffer, int size) = 0;
     virtual void SocketVirtual10(bool enabled) = 0;
     virtual bool SocketVirtual14() = 0;
-    virtual bool Connect(void* connection, const u8* address, u16 port) = 0;
+    virtual bool Connect(void* connection, const u8* address, u16 port,
+        int p4 = 0, int p5 = 0) = 0;
     virtual void AcceptConnection(u32 connection) = 0;
     virtual void RejectConnection(u32 connection) = 0;
     virtual void Disconnect(
@@ -165,7 +166,8 @@ public:
     virtual void SendBroadcast(void* buffer, int size);
     virtual void SocketVirtual10(bool enabled);
     virtual bool SocketVirtual14();
-    virtual bool Connect(void* connection, const u8* address, u16 port);
+    virtual bool Connect(void* connection, const u8* address, u16 port,
+        int p4 = 0, int p5 = 0);
     virtual void AcceptConnection(u32 connection);
     virtual void RejectConnection(u32 connection);
     virtual void Disconnect(

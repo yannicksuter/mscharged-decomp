@@ -14,7 +14,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
-#include "unclassified/tu_802BAE84.h"
+#include "Game/Sys/tweak.h"
 
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
@@ -148,7 +148,7 @@ void FrameCounter::DisplayFrameRate()
         m_LastFrame[0], m_FirstName, m_LastFrame[1], m_SecondName);
 
     unsigned long length = nlStrLen(str);
-    fn_802BB11C(GetDebugFontView(), FrameBackgroundColour, 0.0f, 0.0f,
+    DrawTextRectangle(GetDebugFontView(), FrameBackgroundColour, 0.0f, 0.0f,
         (float)length, 1.0f, 0.0f, 0, true, true);
     glFontBegin(false);
     glFontPrint(GetDebugFontView(), (eGLView)0, 0, 0, str);

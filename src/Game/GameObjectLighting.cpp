@@ -67,7 +67,7 @@ struct GameObjectLight
     /* 0x08 */ f32 unknown08;
     /* 0x0C */ f32 unknown0C;
     /* 0x10 */ nlVector3 worldPosition;
-    /* 0x1C */ u8 unknown1C[4];
+    /* 0x1C */ nlColour colour;
     /* 0x20 */ f32 unknown20;
 }; // total size: 0x24
 
@@ -221,11 +221,10 @@ extern "C" void fn_80182168(UnidentifiedObject_80182168* pLight)
 {
     // This retained path prepares a light locally but does not publish it.
     GameObjectLight var0;
-    var0.unknown02 = false;
     var0.unknown01 = true;
     var0.enabled = true;
     const nlMatrix4& matrix = ((DrawableObject*)pLight)->GetWorldMatrix();
-    ConvertColour(*(nlColour*)var0.unknown1C, pLight->m_colour);
+    ConvertColour(var0.colour, pLight->m_colour);
     var0.worldPosition = matrix.GetTranslation();
     var0.intensity = pLight->m_fIntensity;
 }
@@ -246,14 +245,14 @@ void InitializeGameObjectLighting()
     lbl_80570B80.unknown02 = false;
     lbl_80570B80.enabled = true;
     lbl_80570B80.intensity = 1.0f;
-    nlColourSet(*(nlColour*)lbl_80570B80.unknown1C, 0, 0, 0, 255);
+    nlColourSet(lbl_80570B80.colour, 0, 0, 0, 255);
     if (BasicStadium::GetCurrentStadium() != 0)
     {
         lbl_80570B80.worldPosition = BasicStadium::GetCurrentStadium()->m_shadowLightPosition;
     }
-    lbl_80570B80.unknown1C[0] = lbl_80570BB0.value;
-    lbl_80570B80.unknown1C[1] = lbl_80570BD0.value;
-    lbl_80570B80.unknown1C[2] = lbl_80570BF0.value;
+    lbl_80570B80.colour.c[0] = lbl_80570BB0.value;
+    lbl_80570B80.colour.c[1] = lbl_80570BD0.value;
+    lbl_80570B80.colour.c[2] = lbl_80570BF0.value;
 
     lbl_80570AF8[0].intensity = 1.0f;
     lbl_80570AF8[1].intensity = 1.0f;
@@ -671,9 +670,9 @@ void fn_80182F74(s32 lightId, GameObjectLight* pLight, const nlMatrix4& mview)
             var3 = 255;
 
         GXColor colour = {
-            (u8)((var3 * pLight->unknown1C[0]) >> 8),
-            (u8)((var3 * pLight->unknown1C[1]) >> 8),
-            (u8)((var3 * pLight->unknown1C[2]) >> 8),
+            (u8)((var3 * pLight->colour.c[0]) >> 8),
+            (u8)((var3 * pLight->colour.c[1]) >> 8),
+            (u8)((var3 * pLight->colour.c[2]) >> 8),
             lbl_806E4D1B,
         };
         GXInitLightColor(&light, colour);
@@ -919,10 +918,10 @@ GameObjectLight* GetGameObjectLight(s32 arg0, bool arg1)
             var1->unknown02 = true;
             var1->intensity = 1.0f;
             var1->worldPosition = pLight->m_v3Position;
-            var1->unknown1C[0] = pLight->m_Colour.c[0];
-            var1->unknown1C[1] = pLight->m_Colour.c[1];
-            var1->unknown1C[2] = pLight->m_Colour.c[2];
-            var1->unknown1C[3] = pLight->m_Colour.c[3];
+            var1->colour.c[0] = pLight->m_Colour.c[0];
+            var1->colour.c[1] = pLight->m_Colour.c[1];
+            var1->colour.c[2] = pLight->m_Colour.c[2];
+            var1->colour.c[3] = pLight->m_Colour.c[3];
             var1->unknown20 = pLight->m_fRadius;
             return var1;
         }
@@ -947,10 +946,10 @@ GameObjectLight* GetGameObjectLight(s32 arg0, bool arg1)
             var1->unknown02 = true;
             var1->intensity = 1.0f;
             var1->worldPosition = pLight->m_v3Position;
-            var1->unknown1C[0] = pLight->m_Colour.c[0];
-            var1->unknown1C[1] = pLight->m_Colour.c[1];
-            var1->unknown1C[2] = pLight->m_Colour.c[2];
-            var1->unknown1C[3] = pLight->m_Colour.c[3];
+            var1->colour.c[0] = pLight->m_Colour.c[0];
+            var1->colour.c[1] = pLight->m_Colour.c[1];
+            var1->colour.c[2] = pLight->m_Colour.c[2];
+            var1->colour.c[3] = pLight->m_Colour.c[3];
             var1->unknown20 = pLight->m_fRadius;
             return var1;
         }
@@ -991,9 +990,9 @@ void fn_80182164()
 
 void fn_80182128()
 {
-    lbl_80570B80.unknown1C[0] = lbl_80570BB0.value;
-    lbl_80570B80.unknown1C[1] = lbl_80570BD0.value;
-    lbl_80570B80.unknown1C[2] = lbl_80570BF0.value;
+    lbl_80570B80.colour.c[0] = lbl_80570BB0.value;
+    lbl_80570B80.colour.c[1] = lbl_80570BD0.value;
+    lbl_80570B80.colour.c[2] = lbl_80570BF0.value;
 }
 }
 

@@ -184,14 +184,13 @@ void NetTournManager::Reset(bool)
 
     for (int i = 0; i < 7; ++i)
     {
-        NetworkTournamentGame& game = mGames[i];
-        game.mState = NET_TOURN_GAME_EMPTY;
-        game.mHomeMachine = -1;
-        game.mAwayMachine = -1;
-        game.mBracketIndex = i;
-        game.mHomeUpdate = 0;
-        game.mAwayUpdate = 0;
-        game.mGameInfo.Reset(true);
+        mGames[i].mState = NET_TOURN_GAME_EMPTY;
+        mGames[i].mHomeMachine = -1;
+        mGames[i].mAwayMachine = -1;
+        mGames[i].mBracketIndex = i;
+        mGames[i].mHomeUpdate = 0;
+        mGames[i].mAwayUpdate = 0;
+        mGames[i].mGameInfo.Reset(true);
     }
 
     mWinningMachine = -1;

@@ -1,19 +1,19 @@
-#ifndef UNCLASSIFIED_UNIDENTIFIEDDEBUGPOLYSTORAGE_802BB300_H
-#define UNCLASSIFIED_UNIDENTIFIEDDEBUGPOLYSTORAGE_802BB300_H
+#ifndef GAME_SYS_DEBUG_POLY_LIST_H
+#define GAME_SYS_DEBUG_POLY_LIST_H
 
 #include "NL/gl/glDraw2.h"
 #include "NL/nlDLListContainer.h"
 
-extern SlotPool<glPoly2> lbl_8057C1E8;
+extern SlotPool<glPoly2> g_DebugPolySlotPool;
 
-struct UnidentifiedDebugPolyStorage_802BB300
+struct DebugPolyList
 {
-    UnidentifiedDebugPolyStorage_802BB300()
+    DebugPolyList()
         : mCurrent(0)
     {
     }
 
-    ~UnidentifiedDebugPolyStorage_802BB300()
+    ~DebugPolyList()
     {
         glPoly2* poly = 0;
         while (mPolys.m_Head != 0)
@@ -21,14 +21,14 @@ struct UnidentifiedDebugPolyStorage_802BB300
             DLListEntry<glPoly2*>* entry = mPolys.m_Head;
             nlDLRingRemove(&mPolys.m_Head, entry);
             mPolys.Deallocate(entry, &poly);
-            lbl_8057C1E8.DeleteEntry(poly);
+            g_DebugPolySlotPool.DeleteEntry(poly);
         }
         mPolys.m_Allocator.FreeBlocks();
-        lbl_8057C1E8.FreeBlocks();
+        g_DebugPolySlotPool.FreeBlocks();
     }
 
     glPoly2* mCurrent;
     nlDLListSlotPool<glPoly2*> mPolys;
 };
 
-#endif // UNCLASSIFIED_UNIDENTIFIEDDEBUGPOLYSTORAGE_802BB300_H
+#endif // GAME_SYS_DEBUG_POLY_LIST_H

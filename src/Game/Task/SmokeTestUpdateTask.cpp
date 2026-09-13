@@ -6,7 +6,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "types.h"
-#include "unclassified/tu_802BAE84.h"
+#include "Game/Sys/tweak.h"
 
 #include <stdarg.h>
 
@@ -36,7 +36,7 @@ void SmokeTestUpdateTask::Run(float dt)
 
     if (mComplete)
     {
-        fn_802BB048(0, 0, 0, 4, sSmokeTestCompleted, mDuration - mElapsed);
+        nlScreenPrintf(0, 0, 0, 4, sSmokeTestCompleted, mDuration - mElapsed);
         return;
     }
 
@@ -57,7 +57,7 @@ void SmokeTestUpdateTask::Run(float dt)
         return;
     }
 
-    fn_802BB048(0, 0, 0, 4, sSmokeTestRunning, mDuration - mElapsed);
+    nlScreenPrintf(0, 0, 0, 4, sSmokeTestRunning, mDuration - mElapsed);
     mElapsed += dt;
 
     if (lbl_806E1DF8 != 0)

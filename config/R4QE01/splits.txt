@@ -3111,7 +3111,7 @@ Game/Debug/Histogram.cpp:
 	.sbss       start:0x806E1DD0 end:0x806E1DE0
 	.sdata2     start:0x806E61F0 end:0x806E6238
 
-unclassified/tu_802BAE84.cpp:
+Game/Sys/tweak.cpp:
 	.text       start:0x802BAE84 end:0x802BB668
 	.ctors      start:0x804DB998 end:0x804DB99C
 	.data       start:0x8052B640 end:0x8052B668

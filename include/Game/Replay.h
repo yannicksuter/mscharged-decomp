@@ -192,10 +192,11 @@ public:
     Replay::Frame* Allocate()
     {
         Entry* entry = mFree;
-        if (entry != 0)
+        if (entry == 0)
         {
-            mFree = entry->next;
+            return 0;
         }
+        mFree = entry->next;
         return (Replay::Frame*)entry;
     }
 
@@ -323,10 +324,7 @@ void Replay::Record(float time, T& snapshot, unsigned int events, unsigned int u
             mFree->mUnidentifiedState = unidentifiedState;
 
             Frame* allocated = lbl_806E1E9C->Allocate();
-            if (allocated != 0)
-            {
-                new (allocated) Frame(mFree->mBegin + frameSize, mFree->mSize - frameSize, mFree->mNext);
-            }
+            new (allocated) Frame(mFree->mBegin + frameSize, mFree->mSize - frameSize, mFree->mNext);
             mFree->mNext = allocated;
             mFree->mSize = frameSize;
             mFree = mFree->mNext;

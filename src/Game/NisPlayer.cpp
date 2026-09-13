@@ -6,7 +6,7 @@
 #include "Game/EventRegistry.h"
 #include "NL/nlFunction.inl"
 #include "unclassified/tu_80284A58.h"
-#include "unclassified/tu_802BAE84.h"
+#include "Game/Sys/tweak.h"
 #include "Game/Player.h"
 #include "Game/ReplayManager.h"
 #include "Game/Game.h"
@@ -1780,12 +1780,12 @@ void NisPlayer::Render(int pass) const
         {
             if (mPlaying[i] != NULL)
             {
-                fn_802BB048(0, line++, false, 4, "Mirrored: %s", mPlaying[i]->mMirrored ? "True" : "False");
+                nlScreenPrintf(0, line++, false, 4, "Mirrored: %s", mPlaying[i]->mMirrored ? "True" : "False");
                 if (mPlaying[i]->mCamera != NULL && mPlaying[i]->mCamera->m_pActiveCameraData != NULL)
                 {
-                    fn_802BB048(0, line++, false, 4, "Camera: %s", mPlaying[i]->mCamera->m_pActiveCameraData->field_0x0C);
+                    nlScreenPrintf(0, line++, false, 4, "Camera: %s", mPlaying[i]->mCamera->m_pActiveCameraData->field_0x0C);
                 }
-                fn_802BB048(0, line++, false, 4, "Name: %s", mPlaying[i]->Name());
+                nlScreenPrintf(0, line++, false, 4, "Name: %s", mPlaying[i]->Name());
             }
         }
     }

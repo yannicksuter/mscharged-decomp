@@ -879,13 +879,12 @@ void LANLobby::ProcessJoinResponse(int index, NetMessageJoinResponse* message)
 
 void LANLobby::ProcessGamePeerAdded(NetMessageGamePeerAdded* message)
 {
-    LANPeerMessageInfo& info = message->mUnidentified08;
-    int peer = info.mUnidentified11;
-    *(u32*)mPeerInfoList[peer].mUnidentified14 = *(u32*)info.mUnidentified00;
-    mPeerInfoList[peer].mUnidentified20 = info.mUnidentified04;
-    nlStrNCpy(mPeerInfoList[peer].mName, info.mUnidentified06, 11);
-    mPeerInfoList[peer].mUnidentified0B = info.mUnidentified12;
-    memcpy(&mPeerInfoList[peer].mUnidentified0C, info.mUnidentified13, info.mUnidentified12);
+    s8 peer = message->mUnidentified08.mUnidentified11;
+    *(u32*)mPeerInfoList[peer].mUnidentified14 = *(u32*)message->mUnidentified08.mUnidentified00;
+    mPeerInfoList[peer].mUnidentified20 = message->mUnidentified08.mUnidentified04;
+    nlStrNCpy(mPeerInfoList[peer].mName, message->mUnidentified08.mUnidentified06, 11);
+    mPeerInfoList[peer].mUnidentified0B = message->mUnidentified08.mUnidentified12;
+    memcpy(&mPeerInfoList[peer].mUnidentified0C, message->mUnidentified08.mUnidentified13, message->mUnidentified08.mUnidentified12);
     mPeerInfoList[peer].mUnidentified18 = 0;
     mPeerInfoList[peer].mUnidentified22 = false;
     mPeerInfoList[peer].mUnidentified1C = -1;
@@ -903,8 +902,8 @@ void LANLobby::ProcessGamePeerAdded(NetMessageGamePeerAdded* message)
         mPeerInfoList[peer].mUnidentified1C = index;
         m_ConnectionPool[index].mUnidentified04 = 1;
         if (mSocket->Connect(&m_ConnectionPool[index].m_Connection,
-                info.mUnidentified00,
-                info.mUnidentified04))
+                message->mUnidentified08.mUnidentified00,
+                message->mUnidentified08.mUnidentified04))
             tDebugPrintManager::Print(DC_NETWORK, "Attempting peer-peer connection to other client\n");
         else
         {

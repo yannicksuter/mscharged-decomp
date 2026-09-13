@@ -5,6 +5,7 @@
 #include "Game/FE/feScene.h"
 #include "Game/FE/feTextureResource.h"
 #include "Game/FE/tlComponent.h"
+#include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/FE/tlSlide.h"
@@ -100,6 +101,43 @@ void FERender::PushTransformMatrix(const TLInstance* instance, const nlMatrix4& 
     nlMultMatrices(combinedMatrix, localMatrix, parentMatrix);
 }
 
+void FERender::RenderSlide(const TLSlide* slide, const nlMatrix4& matrix)
+{
+    if (slide == 0)
+        return;
+    if (slide->m_instances == 0)
+        return;
+    TLInstance* curr = slide->m_instances->m_next;
+    for (;;)
+    {
+        TLInstance* next = curr->m_next;
+        nlFloatColour colour = s_currentAssetColour;
+        RenderTimeLineAsset(curr, slide->GetCurrentTime(), matrix);
+        s_currentAssetColour = colour;
+        if (curr == slide->m_instances)
+            break;
+        curr = next;
+    }
+}
+
+void FERender::RenderComponentInstance(TLComponentInstance* instance, const nlMatrix4& matrix)
+{
+    TLComponent* component = static_cast<TLComponent*>(instance->m_component);
+    if (component == 0)
+        return;
+    if (component->GetActiveSlide() == 0)
+        return;
+    RenderSlide(component->GetActiveSlide(), matrix);
+}
+
+void FERender::CalculateCurrentAssetColour(const TLInstance* instance)
+{
+    for (unsigned long i = 0; i < 4; i++)
+    {
+        s_currentAssetColour.c[i] = (instance->GetColour().c[i] * s_currentAssetColour.c[i]) / 255.0f;
+    }
+}
+
 void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, const nlMatrix4& parentMatrix)
 {
     if (!pTLInstance->IsValidAtTime(fCurrentTime))
@@ -118,10 +156,7 @@ void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, 
     nlMatrix4 combinedMatrix;
     PushTransformMatrix(pTLInstance, parentMatrix, combinedMatrix);
 
-    for (unsigned long i = 0; i < 4; i++)
-    {
-        s_currentAssetColour.c[i] = (pTLInstance->GetColour().c[i] * s_currentAssetColour.c[i]) / 255.0f;
-    }
+    CalculateCurrentAssetColour(pTLInstance);
 
     switch (pTLInstance->m_type)
     {
@@ -140,30 +175,8 @@ void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, 
         break;
     }
     case TLAT_COMPONENT:
-    {
-        TLComponent* component = static_cast<TLComponent*>(pTLInstance->m_component);
-        if (component != 0)
-        {
-            TLSlide* slide = component->GetActiveSlide();
-            if (slide != 0 && slide->m_instances != 0)
-            {
-                TLInstance* curr = slide->m_instances->m_next;
-                for (;;)
-                {
-                    TLInstance* next = curr->m_next;
-                    nlFloatColour colour = s_currentAssetColour;
-                    RenderTimeLineAsset(curr, slide->GetCurrentTime(), combinedMatrix);
-                    s_currentAssetColour = colour;
-                    if (curr == slide->m_instances)
-                    {
-                        break;
-                    }
-                    curr = next;
-                }
-            }
-        }
+        RenderComponentInstance(static_cast<TLComponentInstance*>(pTLInstance), combinedMatrix);
         break;
-    }
     default:
         break;
     }
