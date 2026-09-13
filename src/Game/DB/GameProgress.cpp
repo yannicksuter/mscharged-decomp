@@ -1,7 +1,7 @@
 #include "Game/DB/GameProgress.h"
 
 #include "Game/GameInfo.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/TweakRegistry.h"
 #include "NL/gl/glMemory.h"
 #include "NL/nlPrint.h"
@@ -234,8 +234,8 @@ StrikerChallenge::StrikerChallenge()
     memset(mCompletionDates, 0, sizeof(mCompletionDates));
     mUnidentified6C = 0;
     mHeadlineVariant = -1;
-    mHomeScore = 0;
-    mAwayScore = 0;
+    mScore[0] = 0;
+    mScore[1] = 0;
     mMissingSidekicks[0] = 0;
     mMissingSidekicks[1] = 0;
     mHomePowerupsEnabled = true;
@@ -301,8 +301,8 @@ void StrikerChallenge::LoadSettings()
     mAIDifficulty = GetTweakInt("challenge/ai", 1);
     mCondition = GetTweakInt("challenge/condition", 0);
     mWinParameter = GetTweakInt("challenge/winparameter", 0);
-    mHomeScore = GetTweakInt("challenge/homescore", 0);
-    mAwayScore = GetTweakInt("challenge/awayscore", 0);
+    mScore[0] = GetTweakInt("challenge/homescore", 0);
+    mScore[1] = GetTweakInt("challenge/awayscore", 0);
     mMissingSidekicks[0] = GetTweakInt("challenge/homemissingsidekicks", 0);
     mMissingSidekicks[1] = GetTweakInt("challenge/awaymissingsidekicks", 0);
     mHomePowerupsEnabled = !GetTweakBool("challenge/homepowerups", false);

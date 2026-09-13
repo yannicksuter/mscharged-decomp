@@ -15,7 +15,7 @@
 #include "Game/GameInfo.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/DB/CharacterInfo.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "NL/nlConfig.h"
 
 #include <string.h>

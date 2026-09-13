@@ -1,5 +1,5 @@
 #include "Game/Camera/CameraMan.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/Camera/AnimViewerCam.h"
 #include "Game/Camera/DebugCam.h"

@@ -1,5 +1,5 @@
 #include "Game/SH/SHNavigation.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feFinder.h"
 #include "unclassified/tu_80210600.h"
 #include "Game/FE/tlImageInstance.h"

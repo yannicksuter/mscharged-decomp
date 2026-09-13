@@ -4,6 +4,7 @@
 #include "Game/DB/GameProgress.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/feScene.h"
@@ -153,9 +154,7 @@ void SHHallOfFameSummary::SceneCreated()
     SetHallOfFameBreadcrumbs(mMode, breadcrumbs);
 
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
-            nlStringLowerHash("Layer"), nlStringLowerHash("summary"),
-            nlStringLowerHash("scrollbar"), 0, 0, 0);
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide, "Layer", "summary", "scrollbar");
     mScrollBar.SetComponent(scrollbar);
     mScrollBar.SetRange(mItemCount - 7);
     mScrollBar.SetValue(mFirstVisibleItem);
@@ -381,16 +380,7 @@ void SHHallOfFameSummary::UpdateTitle()
     WideBasicString title;
 
     FEPresentation* presentation = this->mFEScene->m_pFEPackage->GetPresentation();
-    unsigned long subtitleComponentHash = nlStringLowerHash("SUBtitle");
-    unsigned long subtitleHash = nlStringLowerHash("subtitle");
-    unsigned long summaryHash = nlStringLowerHash("summary");
-    TLTextInstance* titleText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
-            nlStringLowerHash("Layer"), summaryHash, subtitleHash,
-            subtitleComponentHash, 0, 0);
-    if (titleText == 0)
-    {
-        titleText = &UnidentifiedTLTextDefault::sInstance;
-    }
+    TLTextInstance* titleText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", "subtitle", "SUBtitle");
 
     switch (this->mMode)
     {
@@ -427,29 +417,9 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
     nlSNPrintf(itemComponentName, sizeof(itemComponentName), "ITEM_%d", index);
 
     FEPresentation* presentation = this->mFEScene->m_pFEPackage->GetPresentation();
-    unsigned long stat0Hash = nlStringLowerHash("stat_0");
-    unsigned long challenge0Hash = nlStringLowerHash("CHALLENGE_0");
-    unsigned long itemHash = nlStringLowerHash(itemComponentName);
-    unsigned long summaryHash = nlStringLowerHash("summary");
-    TLTextInstance* rowText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
-            nlStringLowerHash("Layer"), summaryHash, itemHash, challenge0Hash,
-            stat0Hash, 0);
-    if (rowText == 0)
-    {
-        rowText = &UnidentifiedTLTextDefault::sInstance;
-    }
+    TLTextInstance* rowText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "stat_0");
 
-    unsigned long lockedUnlockedHash = nlStringLowerHash("lockedunlocked");
-    challenge0Hash = nlStringLowerHash("CHALLENGE_0");
-    itemHash = nlStringLowerHash(itemComponentName);
-    summaryHash = nlStringLowerHash("summary");
-    TLComponentInstance* lockState = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
-            nlStringLowerHash("Layer"), summaryHash, itemHash, challenge0Hash,
-            lockedUnlockedHash, 0);
-    if (lockState == 0)
-    {
-        lockState = &UnidentifiedTLComponentDefault::sInstance;
-    }
+    TLComponentInstance* lockState = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "lockedunlocked");
 
     if (unlocked)
     {
@@ -484,18 +454,7 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
 
     if (this->mMode == 16)
     {
-        unsigned long groupHash = nlStringLowerHash("stat_1");
-        lockedUnlockedHash = nlStringLowerHash("lockedunlocked");
-        challenge0Hash = nlStringLowerHash("CHALLENGE_0");
-        itemHash = nlStringLowerHash(itemComponentName);
-        summaryHash = nlStringLowerHash("summary");
-        TLTextInstance* statusText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
-                nlStringLowerHash("Layer"), summaryHash, itemHash,
-                challenge0Hash, lockedUnlockedHash, groupHash);
-        if (statusText == 0)
-        {
-            statusText = &UnidentifiedTLTextDefault::sInstance;
-        }
+        TLTextInstance* statusText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "lockedunlocked", "stat_1");
 
         if (unlocked)
         {
@@ -515,13 +474,7 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
     nlSNPrintf(tournamentName, sizeof(tournamentName), "TOURNAMENT_%d",
         index + this->mFirstVisibleItem + 1);
 
-    unsigned long numberHash = nlStringLowerHash("number");
-    challenge0Hash = nlStringLowerHash("CHALLENGE_0");
-    itemHash = nlStringLowerHash(itemComponentName);
-    summaryHash = nlStringLowerHash("summary");
-    TLTextInstance* tournamentText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
-            nlStringLowerHash("Layer"), summaryHash, itemHash, challenge0Hash,
-            numberHash, 0);
+    TLTextInstance* tournamentText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "number");
     TLTextInstance* displayedTournamentText = tournamentText == 0
         ? &UnidentifiedTLTextDefault::sInstance
         : tournamentText;

@@ -22,7 +22,7 @@ public:
     void UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2S, int numGoals);
     void SetHighlightNumber(int highlight);
     void DoMatchEndOverlay();
-    void SetWinnerTitle();
+    void SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals);
     void DoCupWinOverlay(int cup);
 
     /* 0x028 */ int mCaptainGoals[2];

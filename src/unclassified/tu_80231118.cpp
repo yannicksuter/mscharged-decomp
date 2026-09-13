@@ -1,6 +1,6 @@
 #include "unclassified/tu_80231118.h"
 #include "Game/FE/fePresentation.inl"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
 
 #include "Game/BaseSceneHandler.h"

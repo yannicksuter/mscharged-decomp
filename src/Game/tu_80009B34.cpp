@@ -1,5 +1,5 @@
 #include "Game/AI/Fielder.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/AnimInventory.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/UnidentifiedRegistryPools.h"

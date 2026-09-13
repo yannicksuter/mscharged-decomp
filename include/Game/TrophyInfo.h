@@ -1,6 +1,11 @@
 #ifndef _TROPHYINFO_H_
 #define _TROPHYINFO_H_
 
+enum eTrophyType
+{
+    TROPHY_SNIPER_CUP = 9,
+};
+
 const char** GetCupTrophyNames();
 const char** GetCupPersonaTrophyNames();
 

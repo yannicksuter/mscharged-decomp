@@ -1,6 +1,7 @@
 #ifndef GAME_GAMEINFO_H
 #define GAME_GAMEINFO_H
 
+#include "Game/TrophyInfo.h"
 #include "Game/DB/BasicGameInfo.h"
 #include "Game/DB/UserOptions.h"
 #include "NL/nlSingleton.h"
@@ -122,7 +123,7 @@ public:
     unsigned long GetMemoryCardDataSize() const;
     void GetMemoryCardData(void* data) const;
     void SetMemoryCardData(const void* data);
-    u8 CheckSaveIDChanged(const void* data) const;
+    bool HasTrophy(eTrophyType trophyType) const;
 
     bool IsInMode3() const;
     bool IsInOddCupMode() const;
@@ -145,7 +146,7 @@ public:
     void ResetRules(int index);
     void SetRules(int index, GameRules rules) { mRulesTable[index] = rules; }
 
-    u8 IsOnline() const { return mIsOnlineMode; }
+    bool IsOnline() const { return mIsOnlineMode; }
 
     bool UseAltRules() const { return mIsOnlineMode != 0 && mOnlineRankedMatch == 0; }
     const CheatSettings* GetActiveRules() const;

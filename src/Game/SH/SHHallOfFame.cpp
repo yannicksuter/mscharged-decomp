@@ -2,7 +2,7 @@
 #include "Game/SH/SHNavigation.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/FE/feCupFlow.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/SH/SHHallOfFameHistory.h"
 #include "Game/SH/SHHallOfFamePlayerCard.h"

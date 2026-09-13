@@ -4,7 +4,7 @@
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/FE/feFinder.inl"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feDPD.h"
 #include "Game/BaseGameSceneManager.h"
@@ -28,6 +28,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlFunctionMemory.h"
 #include "NL/nlFunction.inl"
+#include "NL/nlBindMember.h"
 #include "NL/nlBind_impl.h"
 #include "NL/nlTask.h"
 #include "NL/nlString.h"
@@ -358,6 +359,16 @@ static inline bool SidekickFacingFlag(int sidekick)
     }
 }
 
+static inline TLImageInstance* FindSidekickImage(int sidekick, int captain)
+{
+    FEPresentation* presentation = GameSceneManager::Instance()->GetCurrentScene()->mPresentation;
+    const CharacterInfo& sidekickInfo = GetCharacterInfo(GetCharacterIndexFromSidekick(sidekick));
+    const CharacterInfo& captainInfo = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
+    char name[64];
+    nlSNPrintf(name, sizeof(name), "position_%s_%s", sidekickInfo.mName, captainInfo.mName);
+    return FEFinder<TLImageInstance, TLAT_IMAGE>::Find(presentation, "art", "Layer", name);
+}
+
 static inline void SetSidekickImage(const TU801DA134Component* component, TLImageInstance* image, int sidekick)
 {
     if (image != 0 && sidekick != -1)
@@ -367,12 +378,7 @@ static inline void SetSidekickImage(const TU801DA134Component* component, TLImag
         {
             captain = 0;
         }
-        FEPresentation* presentation = GameSceneManager::Instance()->GetCurrentScene()->mPresentation;
-        const CharacterInfo& sidekickInfo = GetCharacterInfo(GetCharacterIndexFromSidekick(sidekick));
-        const CharacterInfo& captainInfo = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
-        char name[64];
-        nlSNPrintf(name, sizeof(name), "position_%s_%s", sidekickInfo.mName, captainInfo.mName);
-        TLImageInstance* source = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(presentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(name), 0, 0, 0);
+        TLImageInstance* source = FindSidekickImage(sidekick, captain);
         if (source->m_pTextureResource != 0)
         {
             image->m_pTextureResource = source->m_pTextureResource;
@@ -397,12 +403,12 @@ static inline TLImageInstance* FindCaptainImage(int captain, bool left)
     if (!left)
     {
         nlSNPrintf(name, sizeof(name), "%s_right", captainInfo.mName);
-        source = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(presentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(name), 0, 0, 0);
+        source = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(presentation, "art", "Layer", name);
     }
     if (source == 0)
     {
         nlSNPrintf(name, sizeof(name), "positions_%s", captainInfo.mName);
-        source = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(presentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(name), 0, 0, 0);
+        source = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(presentation, "art", "Layer", name);
     }
     return source;
 }
@@ -558,14 +564,14 @@ void TU801DCD9CComponent::fn_801DCFD8(TLComponentInstance* component, int side, 
     mUnidentified74 = component;
     mUnidentified24 = value;
     mUnidentified2A0 = side;
-    mUnidentified78 = fn_801CA694(mUnidentified74->GetActiveSlide(), "pda_screens");
-    mUnidentified7C = fn_801CA694(mUnidentified78->GetActiveSlide(), "attributes_captains");
-    mUnidentified80 = fn_801CA694(mUnidentified78->GetActiveSlide(), "positions");
-    mUnidentified84 = fn_801CA694(mUnidentified78->GetActiveSlide(), "A to join");
-    mUnidentified88 = fn_801CA694(mUnidentified78->GetActiveSlide(), "ready_prompt");
-    mUnidentified90 = fn_801CA694(mUnidentified74->GetActiveSlide(), "attributes_sidekicks");
+    mUnidentified78 = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified74->GetActiveSlide(), "pda_screens");
+    mUnidentified7C = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified78->GetActiveSlide(), "attributes_captains");
+    mUnidentified80 = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified78->GetActiveSlide(), "positions");
+    mUnidentified84 = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified78->GetActiveSlide(), "A to join");
+    mUnidentified88 = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified78->GetActiveSlide(), "ready_prompt");
+    mUnidentified90 = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified74->GetActiveSlide(), "attributes_sidekicks");
     mUnidentified8C = FEFinder<UnidentifiedTLGroupInstance, TLAT_GROUP>::FindOrDefault(mUnidentified80->GetActiveSlide(), "positions");
-    mUnidentified94 = fn_801CA694(mUnidentified80->GetActiveSlide(), "team_logos");
+    mUnidentified94 = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified80->GetActiveSlide(), "team_logos");
 
     mUnidentified98[0] = FEFinder<TLImageInstance, 2>::FindOrDefault(mUnidentified90->GetActiveSlide(), "attributes_sidekicks", "white_8x8");
     mUnidentified98[1] = FEFinder<TLImageInstance, 2>::FindOrDefault(mUnidentified90->GetActiveSlide(), "attributes_sidekicks", "white_8x9");
@@ -585,12 +591,12 @@ void TU801DCD9CComponent::fn_801DCFD8(TLComponentInstance* component, int side, 
     for (int i = 0; i < 4; ++i)
     {
         mUnidentified04[i] = new (8, false) TU801DE42CComponent(
-            fn_801CA694(mUnidentified7C->GetActiveSlide(), "attributes_captains", captainAttributes[i]));
+            (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified7C->GetActiveSlide(), "attributes_captains", captainAttributes[i]));
     }
     for (int i = 0; i < 4; ++i)
     {
         mUnidentified14[i] = new (8, false) TU801DE42CComponent(
-            fn_801CA694(mUnidentified90->GetActiveSlide(), "attributes_sidekicks", sidekickAttributes[i]));
+            (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified90->GetActiveSlide(), "attributes_sidekicks", sidekickAttributes[i]));
     }
 
     if (side == 0)
@@ -615,8 +621,8 @@ void TU801DCD9CComponent::fn_801DCFD8(TLComponentInstance* component, int side, 
         }
     }
 
-    mUnidentifiedD0 = fn_801CA694(mUnidentified78->GetActiveSlide(), "descriptions");
-    mUnidentifiedD4 = fn_801CA694(mUnidentified78->GetActiveSlide(), "scroll arrows");
+    mUnidentifiedD0 = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified78->GetActiveSlide(), "descriptions");
+    mUnidentifiedD4 = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mUnidentified78->GetActiveSlide(), "scroll arrows");
     mUnidentifiedD8 = FEFinder<UnidentifiedTLGroupInstance, TLAT_GROUP>::FindOrDefault(mUnidentified78->GetActiveSlide(), "cONTINUE");
     fn_801DE570(false);
     fn_801E0F14(false, false, false);
@@ -737,6 +743,8 @@ void TU801DCD9CComponent::fn_801DEB50(FETimer* timer, TU801DE42CComponent* compo
     }
 }
 
+static void StartAttributeAnimation(TU801DCD9CComponent* owner, TU801DE42CComponent* component, float value);
+
 void TU801DCD9CComponent::fn_801DEDD0(int captain, int, unsigned long flag)
 {
     if (captain == -1)
@@ -763,12 +771,12 @@ void TU801DCD9CComponent::fn_801DEDD0(int captain, int, unsigned long flag)
     {
         mUnidentifiedD0->SetActiveSlide(GetTeamName((eTeamID)captain), false, false);
         mScrollText.SetScrollDirection(-1);
-        mScrollText.ApplyNewTextInstancePointer(FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified78, nlStringLowerHash("descriptions"), nlStringLowerHash("text"), 0, 0, 0, 0), -1, -1, 0);
+        mScrollText.ApplyNewTextInstancePointer(FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified78, "descriptions", "text"), -1, -1, 0);
         BaseSceneHandler* scene = GameSceneManager::Instance()->GetScene(SCENE_CHOOSE_CAPTAINS_STRIKER_CUP);
         if (scene != 0)
         {
             TLSlide* slide = scene->mPresentation->m_currentSlide;
-            mScrollText.SetClippingTextInstance(FEFinder<TLTextInstance, 3>::FindOrDefault(slide, nlStringLowerHash("Layer"), nlStringLowerHash("Description_clip"), 0, 0, 0, 0));
+            mScrollText.SetClippingTextInstance(FEFinder<TLTextInstance, 3>::FindOrDefault(slide, "Layer", "Description_clip"));
         }
         return;
     }
@@ -776,7 +784,7 @@ void TU801DCD9CComponent::fn_801DEDD0(int captain, int, unsigned long flag)
     const CharacterInfo& info = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     if (flag == 1)
     {
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified7C->GetActiveSlide(), nlStringLowerHash("attributes_captains"), nlStringLowerHash("captains_pda"), 0, 0, 0, 0);
+        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified7C->GetActiveSlide(), "attributes_captains", "captains_pda");
         if (component != 0)
         {
             component->SetActiveSlide(GetTeamName((eTeamID)captain), true, false);
@@ -785,24 +793,12 @@ void TU801DCD9CComponent::fn_801DEDD0(int captain, int, unsigned long flag)
     mTimers.fn_80306524();
     if (!mUnidentified2A6)
     {
-        {
-            Function<FETimer*> callback(Bind<void>(MemFun(&TU801DCD9CComponent::fn_801DEB50), this, placeholder0, mUnidentified04[0], (int)(0.5 + info.unknown_0x38 * 10.0f)));
-            mTimers.fn_8030639C(0.07f, callback);
-        }
-        {
-            Function<FETimer*> callback(Bind<void>(MemFun(&TU801DCD9CComponent::fn_801DEB50), this, placeholder0, mUnidentified04[1], (int)(0.5 + info.unknown_0x3C * 10.0f)));
-            mTimers.fn_8030639C(0.07f, callback);
-        }
-        {
-            Function<FETimer*> callback(Bind<void>(MemFun(&TU801DCD9CComponent::fn_801DEB50), this, placeholder0, mUnidentified04[2], (int)(0.5 + info.unknown_0x40 * 10.0f)));
-            mTimers.fn_8030639C(0.07f, callback);
-        }
-        {
-            Function<FETimer*> callback(Bind<void>(MemFun(&TU801DCD9CComponent::fn_801DEB50), this, placeholder0, mUnidentified04[3], (int)(0.5 + info.unknown_0x44 * 10.0f)));
-            mTimers.fn_8030639C(0.07f, callback);
-        }
+        StartAttributeAnimation(this, mUnidentified04[0], info.unknown_0x38);
+        StartAttributeAnimation(this, mUnidentified04[1], info.unknown_0x3C);
+        StartAttributeAnimation(this, mUnidentified04[2], info.unknown_0x40);
+        StartAttributeAnimation(this, mUnidentified04[3], info.unknown_0x44);
     }
-    TLComponentInstance* overall = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified7C->GetActiveSlide(), nlStringLowerHash("attributes_captains"), nlStringLowerHash("overall"), 0, 0, 0, 0);
+    TLComponentInstance* overall = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified7C->GetActiveSlide(), "attributes_captains", "overall");
     if (overall != 0)
     {
         switch (info.unknown_0x48)
@@ -824,8 +820,14 @@ void TU801DCD9CComponent::fn_801DEDD0(int captain, int, unsigned long flag)
             break;
         }
     }
-    TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified7C->GetActiveSlide(), nlStringLowerHash("attributes_captains"), nlStringLowerHash("names"), 0, 0, 0, 0);
+    TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified7C->GetActiveSlide(), "attributes_captains", "names");
     names->SetActiveSlide(GetTeamName((eTeamID)captain), false, false);
+}
+
+static void StartAttributeAnimation(TU801DCD9CComponent* owner, TU801DE42CComponent* component, float value)
+{
+    Function<FETimer*> callback(Bind<void>(MemFun(&TU801DCD9CComponent::fn_801DEB50), owner, placeholder0, component, (int)(0.5 + value * 10.0f)));
+    owner->mTimers.fn_8030639C(0.07f, callback);
 }
 
 void TU801DCD9CComponent::fn_801DF85C(int sidekick, int, unsigned long)
@@ -846,29 +848,17 @@ void TU801DCD9CComponent::fn_801DF85C(int sidekick, int, unsigned long)
         return;
     }
     const CharacterInfo& info = GetCharacterInfo(GetCharacterIndexFromSidekick(sidekick));
-    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified90->GetActiveSlide(), nlStringLowerHash("attributes_sidekicks"), nlStringLowerHash("sidekicks_pda"), 0, 0, 0, 0);
+    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified90->GetActiveSlide(), "attributes_sidekicks", "sidekicks_pda");
     if (component != 0)
     {
         component->SetActiveSlide(GetSidekickName((eSidekickID)sidekick), true, false);
     }
     mTimers.fn_80306524();
-    {
-        Function<FETimer*> callback(Bind<void>(MemFun(&TU801DCD9CComponent::fn_801DEB50), this, placeholder0, mUnidentified14[0], (int)(0.5 + info.unknown_0x38 * 10.0f)));
-        mTimers.fn_8030639C(0.07f, callback);
-    }
-    {
-        Function<FETimer*> callback(Bind<void>(MemFun(&TU801DCD9CComponent::fn_801DEB50), this, placeholder0, mUnidentified14[1], (int)(0.5 + info.unknown_0x3C * 10.0f)));
-        mTimers.fn_8030639C(0.07f, callback);
-    }
-    {
-        Function<FETimer*> callback(Bind<void>(MemFun(&TU801DCD9CComponent::fn_801DEB50), this, placeholder0, mUnidentified14[2], (int)(0.5 + info.unknown_0x40 * 10.0f)));
-        mTimers.fn_8030639C(0.07f, callback);
-    }
-    {
-        Function<FETimer*> callback(Bind<void>(MemFun(&TU801DCD9CComponent::fn_801DEB50), this, placeholder0, mUnidentified14[3], (int)(0.5 + info.unknown_0x44 * 10.0f)));
-        mTimers.fn_8030639C(0.07f, callback);
-    }
-    TLComponentInstance* overall = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified90->GetActiveSlide(), nlStringLowerHash("attributes_sidekicks"), nlStringLowerHash("overall"), 0, 0, 0, 0);
+    StartAttributeAnimation(this, mUnidentified14[0], info.unknown_0x38);
+    StartAttributeAnimation(this, mUnidentified14[1], info.unknown_0x3C);
+    StartAttributeAnimation(this, mUnidentified14[2], info.unknown_0x40);
+    StartAttributeAnimation(this, mUnidentified14[3], info.unknown_0x44);
+    TLComponentInstance* overall = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified90->GetActiveSlide(), "attributes_sidekicks", "overall");
     if (overall != 0)
     {
         switch (info.unknown_0x48)
@@ -890,7 +880,7 @@ void TU801DCD9CComponent::fn_801DF85C(int sidekick, int, unsigned long)
             break;
         }
     }
-    TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified90->GetActiveSlide(), nlStringLowerHash("attributes_sidekicks"), nlStringLowerHash("names"), 0, 0, 0, 0);
+    TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified90->GetActiveSlide(), "attributes_sidekicks", "names");
     if (names != 0)
     {
         names->SetActiveSlide(GetSidekickName((eSidekickID)sidekick), true, false);
@@ -1191,7 +1181,7 @@ void TU801DCD9CComponent::fn_801E0B8C(int captain, int opponent)
     if (captain != -1)
     {
         TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
-            mUnidentified7C->GetActiveSlide(), nlStringLowerHash("attributes_captains"), nlStringLowerHash("captains_pda"), 0, 0, 0, 0);
+            mUnidentified7C->GetActiveSlide(), "attributes_captains", "captains_pda");
         if (alternate)
         {
             char slide[20];
@@ -1250,43 +1240,43 @@ void TU801DCD9CComponent::fn_801E0F14(bool fire, bool crystal, bool striker)
 void OverlayManager::fn_801E1514()
 {
     {
-        Function<FnVoidVoid> callback(Bind<void>(MemFun(&OverlayManager::fn_801E258C), this));
+        Function<FnVoidVoid> callback(BindMember(this, &OverlayManager::fn_801E258C));
         UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(callback, 0, -1);
     }
     {
-        Function<FnVoidVoid> callback(Bind<void>(MemFun(&OverlayManager::fn_801E2590), this));
+        Function<FnVoidVoid> callback(BindMember(this, &OverlayManager::fn_801E2590));
         UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(callback, 0, -1);
     }
     {
-        Function<FnVoidVoid> callback(Bind<void>(MemFun(&OverlayManager::fn_801E2608), this));
+        Function<FnVoidVoid> callback(BindMember(this, &OverlayManager::fn_801E2608));
         UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(callback, 0, -1);
     }
     {
-        Function<UnidentifiedEventData_8006701C*> callback(Bind<void>(MemFun(&OverlayManager::fn_801E2784), this, placeholder0));
+        Function<UnidentifiedEventData_8006701C*> callback(BindMember(this, &OverlayManager::fn_801E2784));
         UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterStart", -1)->Add(callback, 0, -1);
     }
     {
-        Function<FnVoidVoid> callback(Bind<void>(MemFun(&OverlayManager::fn_801E281C), this));
+        Function<FnVoidVoid> callback(BindMember(this, &OverlayManager::fn_801E281C));
         UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(callback, 0, -1);
     }
     {
-        Function<UnidentifiedEventData_8006701C*> callback(Bind<void>(MemFun(&OverlayManager::fn_801E28A8), this, placeholder0));
+        Function<UnidentifiedEventData_8006701C*> callback(BindMember(this, &OverlayManager::fn_801E28A8));
         UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterFirst", -1)->Add(callback, 0, -1);
     }
     {
-        Function<UnidentifiedEventData_8006701C*> callback(Bind<void>(MemFun(&OverlayManager::fn_801E28E4), this, placeholder0));
+        Function<UnidentifiedEventData_8006701C*> callback(BindMember(this, &OverlayManager::fn_801E28E4));
         UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterSecond", -1)->Add(callback, 0, -1);
     }
     {
-        Function<FnVoidVoid> callback(Bind<void>(MemFun(&OverlayManager::fn_801E2920), this));
+        Function<FnVoidVoid> callback(BindMember(this, &OverlayManager::fn_801E2920));
         UnidentifiedFindEvent<UnidentifiedEventNoData>("MegastrikeStart", -1)->Add(callback, 0, -1);
     }
     {
-        Function<MegaStrikeEndData*> callback(Bind<void>(MemFun(&OverlayManager::fn_801E2988), this, placeholder0));
+        Function<MegaStrikeEndData*> callback(BindMember(this, &OverlayManager::fn_801E2988));
         UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(callback, 0, -1);
     }
     {
-        Function<GoalScoredData*> callback(Bind<void>(MemFun(&OverlayManager::fn_801E2A28), this, placeholder0));
+        Function<GoalScoredData*> callback(BindMember(this, &OverlayManager::fn_801E2A28));
         UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(callback, 0, -1);
     }
 }
@@ -1486,9 +1476,9 @@ OverlayManager::OverlayManager()
     mIsDemoSlideVisible = false;
     mHUDDelay = 0.0f;
     mUnidentified120 = 0;
-    mUnidentified114 = 0xFFFFFFFF;
-    mUnidentified118 = 0xFFFFFFFF;
-    mUnidentified11C = 0xFFFFFFFF;
+    mStrikerTimesStoryVariant = -1;
+    mStrikerTimesHeadlineVariant = -1;
+    mStrikerTimesImageVariant = -1;
 }
 
 OverlayManager::~OverlayManager()

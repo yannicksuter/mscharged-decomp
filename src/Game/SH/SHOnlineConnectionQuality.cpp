@@ -127,12 +127,7 @@ void OnlineConnectionQualityScene::OnDecisionPointerPress(int index, void* conte
     mUnidentified2F4[1]->m_bVisible = false;
     mUnidentified18C[1].Disable();
 
-    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
-        mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("WAITING"));
-    if (component == 0)
-    {
-        component = &UnidentifiedTLComponentDefault::sInstance;
-    }
+    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "WAITING");
     component->m_bVisible = true;
 
     if (!mUnidentified031)
@@ -214,28 +209,16 @@ void OnlineConnectionQualityScene::SceneCreated()
 {
     for (int i = 0; i < 2; ++i)
     {
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
-            mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher(sConnectionDecisionComponentNames[i]));
-        if (component == 0)
-        {
-            component = &UnidentifiedTLComponentDefault::sInstance;
-        }
+        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", sConnectionDecisionComponentNames[i]);
         mUnidentified2F4[i] = component;
     }
 
-    FEFinder<TLComponentInstance, 4>::Find(
-        mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("QUALITY"));
+    FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide, "Layer", "QUALITY");
 
-    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
-        mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("WAITING"));
-    if (component == 0)
-    {
-        component = &UnidentifiedTLComponentDefault::sInstance;
-    }
+    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "WAITING");
     component->m_bVisible = false;
 
-    TLTextInstance* timer = FEFinder<TLTextInstance, 3>::Find(
-        mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("TIMER"));
+    TLTextInstance* timer = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide, "Layer", "TIMER");
     typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
     timer->SetString(nlStrNCpy(mUnidentified044,
         Format(WideBasicString(LookupLocString("ONLINE_CONNECTION_QUALITY_TIME")),
@@ -268,13 +251,7 @@ void OnlineConnectionQualityScene::UpdateConnectionQuality()
         }
     }
 
-    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
-        mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("QUALITY"),
-        InlineHasher("RATING"), InlineHasher("stars"));
-    if (component == 0)
-    {
-        component = &UnidentifiedTLComponentDefault::sInstance;
-    }
+    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "QUALITY", "RATING", "stars");
     mUnidentified2FC = component;
     unsigned int latency = value >> 1;
     if (latency > 200)
@@ -329,8 +306,7 @@ void OnlineConnectionQualityScene::Update(float dt)
     mUnidentified144.Update(dt);
     if (mUnidentified17C)
     {
-        TLTextInstance* timer = FEFinder<TLTextInstance, 3>::Find(
-            mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("TIMER"));
+        TLTextInstance* timer = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide, "Layer", "TIMER");
         typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
         timer->SetString(nlStrNCpy(mUnidentified044,
             Format(WideBasicString(LookupLocString("ONLINE_CONNECTION_QUALITY_TIME")),
@@ -343,12 +319,7 @@ void OnlineConnectionQualityScene::Update(float dt)
         mUnidentified18C[0].Disable();
         mUnidentified2F4[1]->m_bVisible = false;
         mUnidentified18C[1].Disable();
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
-            mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("WAITING"));
-        if (component == 0)
-        {
-            component = &UnidentifiedTLComponentDefault::sInstance;
-        }
+        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "WAITING");
         component->m_bVisible = true;
     }
 

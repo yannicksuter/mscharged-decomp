@@ -40,6 +40,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlFunctionMemory.h"
 #include "NL/nlDLListContainer.h"
+#include "NL/nlConfig.h"
 #include "unclassified/tu_800A9B78.h"
 
 #include "Game/Physics/PhysicsPatch.h"
@@ -345,6 +346,65 @@ void UnidentifiedWeatherState::fn_800AA6A8()
 }
 
 extern "C" bool lbl_806E0E1C;
+
+void TU800A9B78::fn_800A9E48(unsigned int type)
+{
+    fn_800AA29C();
+    switch (type)
+    {
+    case 3:
+    {
+        UnidentifiedWeatherState* state = new (8, false) UnidentifiedWeatherExtendedStateA();
+        field00.AddEnd(state);
+        state = new (8, false) UnidentifiedWeatherExtendedStateB();
+        field00.AddEnd(state);
+        break;
+    }
+    case 1:
+    {
+        UnidentifiedWeatherState* state = new (8, false) UnidentifiedWeatherExtendedStateA();
+        field00.AddEnd(state);
+        break;
+    }
+    case 2:
+    {
+        UnidentifiedWeatherState* state = new (8, false) UnidentifiedWeatherExtendedStateB();
+        field00.AddEnd(state);
+        break;
+    }
+    case 4:
+    {
+        UnidentifiedWeatherState* state = new (8, false) UnidentifiedWeatherExtendedStateC();
+        field00.AddEnd(state);
+        break;
+    }
+    case 5:
+    {
+        UnidentifiedWeatherState* state = new (8, false) UnidentifiedWeatherExtendedStateD();
+        field00.AddEnd(state);
+        break;
+    }
+    case 6:
+    {
+        UnidentifiedWeatherState* state = new (8, false) UnidentifiedWeatherExtendedStateE();
+        field00.AddEnd(state);
+        break;
+    }
+    case 7:
+    {
+        UnidentifiedWeatherState* state = new (8, false) UnidentifiedWeatherExtendedStateF();
+        field00.AddEnd(state);
+        break;
+    }
+    default:
+    {
+        UnidentifiedWeatherState* state = new (8, false) UnidentifiedWeatherState();
+        field00.AddEnd(state);
+        break;
+    }
+    }
+    lbl_806E0E1C = Config::Global().Get<bool>("no_weather", false);
+}
 
 void UnidentifiedWeatherState::fn_800AA6B4(float)
 {
@@ -962,9 +1022,10 @@ void UnidentifiedWeatherExtendedStateC::fn_800AD400(bool initialize)
         if (g_pGame == 0 || g_pGame->m_eGameState == 0)
         {
             field1C = 0;
-            field2C[0] = -1;
-            field2C[1] = -1;
-            field2C[2] = -1;
+            for (int i = 0; i < 3; ++i)
+            {
+                field2C[i] = -1;
+            }
         }
     }
 }
@@ -1285,7 +1346,7 @@ void UnidentifiedWeatherExtendedStateE::fn_800AE5B0(int index)
     for (int i = 1; i < count; i++)
     {
         nlVector3 delta;
-        nlVec3Sub(delta, points[i], points[i - 1]);
+        nlVec3Set(delta, points[i].x - points[i - 1].x, points[i].y - points[i - 1].y, points[i].z - points[i - 1].z);
         length += nlVec3Length(delta);
     }
     float lifetime = length / lbl_806DBFD8;
@@ -1641,11 +1702,6 @@ void UnidentifiedWeatherExtendedStateF::fn_800AA7D0(void* context, DebugWriteCac
     cache->ChecksumData(lbl_806DC01C, &field10, context);
     cache->WriteData(lbl_806DC01C, &field10,
         sizeof(UnidentifiedWeatherExtendedStateF) - sizeof(UnidentifiedWeatherState) - sizeof(field20));
-}
-
-extern "C" void* fn_800AFEF4(unsigned long size, unsigned int alignment, bool fromEnd)
-{
-    return nlMalloc(size, alignment, fromEnd);
 }
 
 float UnidentifiedWeatherState::fn_800AFFD8()

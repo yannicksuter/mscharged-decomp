@@ -49,6 +49,7 @@ public:
     virtual void Update(float dt);
     virtual void SceneCreated();
 
+    inline void DisplayBestOfText(TLTextInstance* text, int numGames);
     void DisplayOnlineInfo();
     void DisplayStadiumName(TLTextInstance* stadiumText);
     void DisplayFriendlyInfo();

@@ -8,6 +8,7 @@
 #include "NL/glx/glxSkinMatrix.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxGXColour.h"
 #include "NL/nlMath.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -119,21 +120,15 @@ void GXMaterialProgramImpl<GXMegaDiffuseMaterialProgram>::Draw(
 
     nlFloatColour blendColour;
     nlFloatColourSet(blendColour, blendAmount, blendAmount, blendAmount, blendAmount);
-    nlColour blendColour8;
-    ConvertColour(blendColour8, blendColour);
-    GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&blendColour8);
+    gxSetTevKColour(GX_KCOLOR0, blendColour);
 
     nlFloatColour alphaColour;
     nlFloatColourSet(alphaColour, alphaValue, alphaValue, alphaValue, alphaValue);
-    nlColour alphaColour8;
-    ConvertColour(alphaColour8, alphaColour);
-    GXSetTevKColor(GX_KCOLOR1, *(GXColor*)&alphaColour8);
+    gxSetTevKColour(GX_KCOLOR1, alphaColour);
 
     nlFloatColour megaColour;
     nlFloatColourSet(megaColour, megaBlend, megaBlend, megaBlend, megaBlend);
-    nlColour megaColour8;
-    ConvertColour(megaColour8, megaColour);
-    GXSetTevKColor(GX_KCOLOR2, *(GXColor*)&megaColour8);
+    gxSetTevKColour(GX_KCOLOR2, megaColour);
 
     static_cast<GXMegaDiffuseMaterialProgram*>(this)->BindVertexArrays(packet);
     static_cast<GXMegaDiffuseMaterialProgram*>(this)->BindParameters(packet);

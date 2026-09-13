@@ -7,6 +7,7 @@
 #include "NL/glx/GXMaterialProgramTextureAnimation.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxGXColour.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -233,16 +234,10 @@ void GXMaterialProgramImpl<GXScrollingSpecularMaterialProgram>::Draw(
     int scrollSpecularTexture = parameters->scrollSpecularTexture;
 
     nlFloatColour levelColour = { { specularLevel, specularLevel, specularLevel, specularLevel } };
-    nlColour levelColour8;
-    ConvertColour(levelColour8, levelColour);
-    GXColor levelGXColour = { levelColour8.c[0], levelColour8.c[1], levelColour8.c[2], levelColour8.c[3] };
-    GXSetTevKColor(GX_KCOLOR0, levelGXColour);
+    gxSetTevKColour(GX_KCOLOR0, levelColour);
 
     const nlFloatColour& specularColour = parameters->specularColour;
-    nlColour specularColour8;
-    ConvertColour(specularColour8, specularColour);
-    GXColor specularGXColour = { specularColour8.c[0], specularColour8.c[1], specularColour8.c[2], specularColour8.c[3] };
-    GXSetTevKColor(GX_KCOLOR1, specularGXColour);
+    gxSetTevKColour(GX_KCOLOR1, specularColour);
 
     nlVector2 scrollSpeed;
     scrollSpeed.x = gScrollingSpecularAnimationEnabled

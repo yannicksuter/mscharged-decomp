@@ -142,7 +142,7 @@ void FEPointerRegion::SetInstanceBounds(TLInstance* instance, bool useRotation, 
         break;
     }
     case TLAT_COMPONENT:
-        measuredSize = MeasurePointerInstanceList(((TLComponentInstance*)instance)->GetActiveSlide()->m_instances);
+        measuredSize = MeasurePointerInstanceList(((TLComponentInstance*)instance)->GetActiveSlide()->pChildren);
         break;
     case TLAT_GROUP:
         measuredSize = MeasurePointerInstanceList(instance->pChildren);
@@ -256,7 +256,7 @@ nlVector2 MeasurePointerInstanceList(TLInstance* first)
             measuredSize = MeasurePointerText((TLTextInstance*)instance);
             break;
         case TLAT_COMPONENT:
-            measuredSize = MeasurePointerInstanceList(((TLComponentInstance*)instance)->GetActiveSlide()->m_instances);
+            measuredSize = MeasurePointerInstanceList(((TLComponentInstance*)instance)->GetActiveSlide()->pChildren);
             break;
         case TLAT_GROUP:
             measuredSize = MeasurePointerInstanceList(instance->pChildren);

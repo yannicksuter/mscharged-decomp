@@ -12,6 +12,7 @@
 #include "NL/nlFormat.h"
 #include <string.h>
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/feScene.h"
@@ -125,10 +126,8 @@ void MatchLoadingScene::Update(float dt)
     }
 }
 
-void MatchLoadingScene::DisplayOnlineInfo()
+inline void MatchLoadingScene::DisplayBestOfText(TLTextInstance* text, int numGames)
 {
-    int numGames = GameInfoManager::Instance()->GetCurrentSettings()->NumGames;
-    TLTextInstance* text = mTextInstances[0];
     const unsigned short* unformatted = g_pLocalization->GetString("BEST_OF_X");
     unsigned short games[4];
     nlSNPrintf(games, 4, (const unsigned short*)L"%d", numGames);
@@ -143,6 +142,12 @@ void MatchLoadingScene::DisplayOnlineInfo()
     mTextInstances[3]->m_bVisible = false;
     mTextInstances[4]->m_bVisible = false;
     mTextInstances[5]->m_bVisible = false;
+}
+
+void MatchLoadingScene::DisplayOnlineInfo()
+{
+    int numGames = GameInfoManager::Instance()->GetCurrentSettings()->NumGames;
+    DisplayBestOfText(mTextInstances[0], numGames);
 }
 
 void MatchLoadingScene::DisplayStadiumName(TLTextInstance* stadiumText)
@@ -192,14 +197,7 @@ void SuperLoadingScene::SceneCreated()
 
 void BaseLoadingScene::SceneCreated()
 {
-    TLInstance* transitionComponent
-        = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(
-            mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0, 0);
-    if (transitionComponent == 0)
-    {
-        transitionComponent = &UnidentifiedTLComponentDefault::sInstance;
-    }
-    mTransitionComponent = (TLComponentInstance*)transitionComponent;
+    mTransitionComponent = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "no home");
     mTransitionComponent->m_bVisible = false;
 
     if (IsWidescreen())
@@ -326,21 +324,7 @@ void MatchLoadingScene::SceneCreated()
 void MatchLoadingScene::DisplayFriendlyInfo()
 {
     int numGames = GameInfoManager::Instance()->GetCurrentSettings()->NumGames;
-    TLTextInstance* text = mTextInstances[0];
-    const unsigned short* unformatted = g_pLocalization->GetString("BEST_OF_X");
-    unsigned short games[4];
-    nlSNPrintf(games, 4, (const unsigned short*)L"%d", numGames);
-    {
-        typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
-        WideString formatted = Format(WideString(unformatted), games);
-        memcpy(mTextBuffers[0], formatted.c_str(), 128);
-        text->SetString(mTextBuffers[0]);
-    }
-    DisplayStadiumName(mTextInstances[1]);
-    mTextInstances[2]->m_bVisible = false;
-    mTextInstances[3]->m_bVisible = false;
-    mTextInstances[4]->m_bVisible = false;
-    mTextInstances[5]->m_bVisible = false;
+    DisplayBestOfText(mTextInstances[0], numGames);
 }
 
 void MatchLoadingScene::DisplayCupInfo()
@@ -457,12 +441,12 @@ void MatchLoadingScene::SetTeamLogo(int side, CharacterInfo character)
 {
     TLImageInstance* image;
     if (side == 0)
-        image = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(mPresentation, nlStringLowerHash("Slide1"), nlStringLowerHash("Layer"), nlStringLowerHash("logos_TEAM_LUIGI"), 0, 0, 0);
+        image = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(mPresentation, "Slide1", "Layer", "logos_TEAM_LUIGI");
     else
-        image = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(mPresentation, nlStringLowerHash("Slide1"), nlStringLowerHash("Layer"), nlStringLowerHash("logos_TEAM_MARIO"), 0, 0, 0);
+        image = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(mPresentation, "Slide1", "Layer", "logos_TEAM_MARIO");
     char name[25];
     nlSNPrintf(name, sizeof(name), "logos_TEAM_%s", character.mName);
-    TLImageInstance* source = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(mPresentation, nlStringLowerHash("art"), nlStringLowerHash("Layer"), nlStringLowerHash(name), 0, 0, 0);
+    TLImageInstance* source = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(mPresentation, "art", "Layer", name);
     if (source->m_pTextureResource != 0)
         image->m_pTextureResource = source->m_pTextureResource;
 }

@@ -1,5 +1,5 @@
 #include "Game/SH/SHNavigation.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/SH/SHStrikerTimesBase.h"
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/FEAudio.h"
@@ -8,6 +8,7 @@
 #include "Game/DB/GameProgress.h"
 #include "Game/DB/SaveLoad.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"
@@ -226,10 +227,7 @@ void SHStrikerTimesBase::SceneCreated()
 
     if (mDisplayMode != 0xA)
     {
-        TLInstance* more = FEFinder<TLComponentInstance, 4>::Find(mPresentation, nlStringLowerHash("story"),
-            nlStringLowerHash("Layer"), nlStringLowerHash("more"), 0, 0, 0);
-        if (more == 0)
-            more = &UnidentifiedTLComponentDefault::sInstance;
+        TLInstance* more = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation, "story", "Layer", "more");
         more->m_bVisible = false;
     }
 
@@ -420,15 +418,9 @@ void SHStrikerTimesBase::InitializeContent()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
 
-    TLTextInstance* headlineText = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("headline pic"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("HEADLINE"), 0, 0, 0);
-    if (headlineText == 0)
-        headlineText = &UnidentifiedTLTextDefault::sInstance;
+    TLTextInstance* headlineText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation, "headline pic", "Layer", "HEADLINE");
 
-    TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("Description_clip"), 0, 0, 0);
-    if (descriptionText == 0)
-        descriptionText = &UnidentifiedTLTextDefault::sInstance;
+    TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation, "story", "Layer", "Description_clip");
 
     mHeadlineScroller.ApplyNewTextInstancePointer(headlineText, -1, -1, -300);
     if (mUseCustomText)
@@ -438,10 +430,7 @@ void SHStrikerTimesBase::InitializeContent()
     mHeadlineScroller.SetClippingTextInstance(descriptionText);
     descriptionText->m_bVisible = false;
 
-    TLTextInstance* storyHeadline = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("HEADLINE"), 0, 0, 0);
-    if (storyHeadline == 0)
-        storyHeadline = &UnidentifiedTLTextDefault::sInstance;
+    TLTextInstance* storyHeadline = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation, "story", "Layer", "HEADLINE");
     mStoryHeadlineScroller.ApplyNewTextInstancePointer(storyHeadline, -1, -1, -300);
     if (mUseCustomText)
         mStoryHeadlineScroller.SetDisplayMessage(mHeadlineText);
@@ -449,10 +438,7 @@ void SHStrikerTimesBase::InitializeContent()
         mStoryHeadlineScroller.SetDisplayMessage(mHeadlineStringID);
     mStoryHeadlineScroller.SetClippingTextInstance(descriptionText);
 
-    TLTextInstance* bodyText = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("BODY"), 0, 0, 0);
-    if (bodyText == 0)
-        bodyText = &UnidentifiedTLTextDefault::sInstance;
+    TLTextInstance* bodyText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation, "story", "Layer", "BODY");
     if (mUseCustomText)
         bodyText->SetString(mStoryText.c_str());
     else
@@ -463,16 +449,10 @@ void SHStrikerTimesBase::InitializeContent()
     mHeadlineScroller.m_nextDeltaT = 2.0f;
     mStoryHeadlineScroller.m_nextDeltaT = 2.0f;
 
-    TLInstance* storyTexture = FEFinder<TLInstance, 2>::Find(mPresentation, nlStringLowerHash("story"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("00_dummy_texture"), 0, 0, 0);
-    if (storyTexture == 0)
-        storyTexture = &UnidentifiedTLImageDefault::sInstance;
+    TLInstance* storyTexture = FEFinder<TLInstance, 2>::FindOrDefault(mPresentation, "story", "Layer", "00_dummy_texture");
     mStoryImage.mImageInstance = (TLImageInstance*)storyTexture;
 
-    TLInstance* headlineTexture = FEFinder<TLInstance, 2>::Find(mPresentation, nlStringLowerHash("headline pic"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("00_dummy_texture"), 0, 0, 0);
-    if (headlineTexture == 0)
-        headlineTexture = &UnidentifiedTLImageDefault::sInstance;
+    TLInstance* headlineTexture = FEFinder<TLInstance, 2>::FindOrDefault(mPresentation, "headline pic", "Layer", "00_dummy_texture");
     mHeadlineImage.mImageInstance = (TLImageInstance*)headlineTexture;
 
     mHeadlineImage.QueueLoad(mArticleImageName, false);

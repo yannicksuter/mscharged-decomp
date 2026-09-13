@@ -47,7 +47,7 @@
 #include "Game/Debug/TimeRegions.h"
 #include "Game/Drawable/DrawableModel.h"
 #include "Game/FE/feManager.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feSceneManager.h"
 #include "Game/SH/SHPause.h"
 #include "Game/Task/FixedUpdateTask.h"

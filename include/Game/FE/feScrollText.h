@@ -11,7 +11,6 @@ class FEScrollText
 {
 public:
     FEScrollText(int axis);
-    ~FEScrollText() { }
 
     void ApplyNewTextInstancePointer(TLTextInstance* controltext, int pos, int width, int);
     void RefreshText();
@@ -24,6 +23,7 @@ public:
     void SetMetrics(int pos);
     void SetClippingTextInstance(TLTextInstance* controlText);
     int GetScrollSteps(float fDeltaT) const;
+    void SetScrollSpeed(float speed) { m_scrollSpeed = speed; }
 
     /* 0x00 */ TLTextInstance* m_controlText;
     /* 0x04 */ BasicString<unsigned short, Detail::TempStringAllocator> m_message;

@@ -1,7 +1,7 @@
 #include "Game/SH/SHOnlineInvitePreview.h"
 #include "Game/SH/SHOnlineInviteStatus.h"
 #include "Game/FE/FEAudio.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 
 #include "Game/GameSceneManager.h"
 #include "Game/DB/StadiumInfo.h"

@@ -77,6 +77,7 @@ public:
     void fn_80058528(float timeScale, float transitionTime);
     float GetNormalizedGameTime();
     float GetGameTime();
+    float GetGameDuration() const { return m_fGameDuration; }
     void fn_800586C0();
     void fn_80058704();
     void fn_80058748();

@@ -9,8 +9,8 @@ class TLTextInstance;
 struct UnidentifiedGameResultsData
 {
     /* 0x00 */ u8 mUnidentified00[0x24];
-    /* 0x24 */ TU80209584StatsSource mHome;
-    /* 0x94 */ TU80209584StatsSource mAway;
+    /* 0x24 */ TeamStats mHome;
+    /* 0x94 */ TeamStats mAway;
 }; // size 0x104
 
 class UnidentifiedResultsListener

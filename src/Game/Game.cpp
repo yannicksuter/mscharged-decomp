@@ -1,5 +1,6 @@
 #include "Game/NetworkMessageRegistry.h"
 #include "Game/Game.h"
+#include "unclassified/tu_800A9B78.h"
 #include "Game/Sys/debug.h"
 #include "Game/NetworkDiagnostics.h"
 
@@ -130,7 +131,6 @@ extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" void fn_800EC2A4(unsigned long soundID, cGame* game);
 extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
 extern "C" void fn_800A9B78(void* param1);
-extern "C" void fn_800A9E48(int param1);
 extern "C" void fn_80061AF0();
 extern "C" void fn_80061AF4();
 extern "C" void fn_8005B330(nlVector3* pVector, float fXAxisTilt, float fYAxisTilt);
@@ -267,7 +267,7 @@ cGame::cGame(void* param1, int param2, bool param3)
     }
     mUnidentified10DC = (TU800A9B78*)mem28;
 
-    fn_800A9E48(param2);
+    mUnidentified10DC->fn_800A9E48(param2);
 
     mUnidentified10E0 = new (nlMalloc(sizeof(CrowdRiot), 8, false))
         CrowdRiot(param3);

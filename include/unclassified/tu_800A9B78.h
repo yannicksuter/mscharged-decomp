@@ -11,6 +11,7 @@ class TU800A9B78
 public:
     TU800A9B78();
     ~TU800A9B78();
+    void fn_800A9E48(unsigned int type);
     void fn_800AA29C();
     UnidentifiedWeatherState* fn_800AA060(int value);
     void fn_800AA0FC(void* context, DebugWriteCache* cache);

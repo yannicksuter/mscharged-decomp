@@ -1,5 +1,5 @@
 #include "unclassified/tu_8020A74C.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/FEAudio.h"
 

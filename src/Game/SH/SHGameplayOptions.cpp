@@ -1,5 +1,5 @@
 #include "Game/SH/SHGameplayOptions.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
 
 #include "Game/GameSceneManager.h"

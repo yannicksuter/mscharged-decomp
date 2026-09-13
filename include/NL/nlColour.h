@@ -7,6 +7,11 @@ struct nlColour
 {
     unsigned char c[4];
 
+    unsigned char& operator[](int index)
+    {
+        return c[index];
+    }
+
     bool operator==(const nlColour& other) const
     {
         return *(u32*)&c[0] == *(u32*)&other.c[0];

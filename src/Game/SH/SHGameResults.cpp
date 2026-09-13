@@ -21,13 +21,6 @@ static inline TLTextInstance* AsTextInstance(void* instance)
     return (TLTextInstance*)instance;
 }
 
-static inline void FillSummary(TU80209584Summary* summary, TU80209584StatsSource home, TU80209584StatsSource away,
-    FEPresentation* presentation)
-{
-    summary->fn_802095D0(&home, &away, presentation);
-}
-
-
 GameResultsScene::GameResultsScene()
     : mTitleText(0)
     , mUnidentified5D8(false)
@@ -87,7 +80,8 @@ void GameResultsScene::Update(float dt)
     SHStrikerTimesBase::Update(dt);
     if (!mUnidentified5D8 && mUnidentifiedA10 != 0)
     {
-        FillSummary(&mSummary, mUnidentifiedA10->mHome, mUnidentifiedA10->mAway, mFEScene->m_pFEPackage->GetPresentation());
+        FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
+        mSummary.fn_802095D0(mUnidentifiedA10->mHome, mUnidentifiedA10->mAway, presentation);
     }
     UnidentifiedGameClock* clock = mUnidentifiedA18;
     if (clock != 0)

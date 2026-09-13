@@ -1,5 +1,5 @@
 #include "Game/SH/SHNavigation.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/GameSceneManager.h"
 #include "Game/SH/SHChooseSides.h"
 #include "Game/Render/RLViewLayers.h"

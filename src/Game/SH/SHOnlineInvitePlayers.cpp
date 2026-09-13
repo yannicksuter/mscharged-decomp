@@ -1,7 +1,7 @@
 #include "NL/nlSingleton.inl"
 #include "Game/SH/SHOnlineInvitePlayers.h"
 #include "Game/FE/feOnlineError.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/Sys/debug.h"
 

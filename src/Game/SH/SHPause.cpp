@@ -2,7 +2,7 @@
 
 #include "Game/SH/SHPause.h"
 #include "NL/nlPrint.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 
 #include "Game/GameSceneManager.h"
 #include "Game/DB/StatsTracker.h"

@@ -1,7 +1,7 @@
 #include "Game/SH/SHOnlineGuestControllerSelect.h"
 #include "Game/SH/SHOnlineInviteStatus.h"
 #include "Game/SH/SHOnlineInviteResponse.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/NetworkSession.h"
 #include "Game/Sys/debug.h"

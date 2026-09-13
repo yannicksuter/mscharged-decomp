@@ -1,7 +1,7 @@
 #include "Game/HBMManager.h"
 
 #include "unclassified/tu_802337F4.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
 
 #include "Game/GameSceneManager.h"

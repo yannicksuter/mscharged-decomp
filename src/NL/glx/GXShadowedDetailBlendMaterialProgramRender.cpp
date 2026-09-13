@@ -6,6 +6,7 @@
 #include "NL/glx/GXShadowedDetailBlendMaterialProgram.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxGXColour.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -191,17 +192,11 @@ void GXMaterialProgramImpl<GXShadowedDetailBlendMaterialProgram>::Draw(
     }
 
     nlFloatColour detailColour = { { detailWeight, detailWeight, detailWeight, detailWeight } };
-    nlColour detailColour8;
-    ConvertColour(detailColour8, detailColour);
-    GXColor detailGXColour = { detailColour8.c[0], detailColour8.c[1], detailColour8.c[2], detailColour8.c[3] };
-    GXSetTevKColor(GX_KCOLOR0, detailGXColour);
+    gxSetTevKColour(GX_KCOLOR0, detailColour);
 
     float shadowLevel = static_cast<const GXShadowedDetailBlendParameters*>(packet->materialParameters)->shadowLevel;
     nlFloatColour shadowColour = { { shadowLevel, shadowLevel, shadowLevel, shadowLevel } };
-    nlColour shadowColour8;
-    ConvertColour(shadowColour8, shadowColour);
-    GXColor shadowGXColour = { shadowColour8.c[0], shadowColour8.c[1], shadowColour8.c[2], shadowColour8.c[3] };
-    GXSetTevKColor(GX_KCOLOR1, shadowGXColour);
+    gxSetTevKColour(GX_KCOLOR1, shadowColour);
 
     static_cast<GXShadowedDetailBlendMaterialProgram*>(this)->BindVertexArrays(packet);
     static_cast<GXShadowedDetailBlendMaterialProgram*>(this)->BindParameters(packet);

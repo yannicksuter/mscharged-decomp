@@ -1,6 +1,7 @@
 #include "Game/SH/SHNetworkStart.h"
 
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/NetworkSession.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "NL/nlString.h"
@@ -21,16 +22,7 @@ void NetworkStartScene::SelectMenuItem(TLComponentInstance* component)
 void NetworkStartScene::SetActionButtons(int state)
 {
     TLSlide* activeSlide = mPresentation->m_currentSlide;
-    unsigned long buttonsHash = nlStringLowerHash("BUTTONS");
-    unsigned long layerHash = nlStringLowerHash("Layer");
-    TLComponentInstance* buttons = FEFinder<TLComponentInstance, 2>::Find(
-        activeSlide,
-        layerHash,
-        buttonsHash,
-        0,
-        0,
-        0,
-        0);
+    TLComponentInstance* buttons = FEFinder<TLComponentInstance, 2>::Find(activeSlide, "Layer", "BUTTONS");
 
     bool visible = true;
     if (state == 0)

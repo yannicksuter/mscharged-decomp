@@ -249,7 +249,7 @@ void ShotMeter::Abort()
 
 void ShotMeter::Update(float fDeltaT)
 {
-    m_fTime = m_fTime + fDeltaT;
+    m_fTime += fDeltaT;
 
     switch (m_eShotMeterState)
     {
@@ -290,7 +290,7 @@ void ShotMeter::Update(float fDeltaT)
         break;
     }
     case SHOT_METER_STS_ACTIVE:
-        if (m_fTime >= mUnidentified00C)
+        if (m_fTime >= GetTotalDuration())
         {
             m_eShotMeterState = SHOT_METER_RELEASED;
             if (g_pBall->GetOwnerFielder() != 0)

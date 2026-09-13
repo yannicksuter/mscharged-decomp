@@ -6,7 +6,7 @@
 #include "Game/DB/SaveLoad.h"
 #include "Game/DB/UserOptions.h"
 #include "Game/DB/GameProgress.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/NetworkSession.h"
 #include "Game/TweakRegistry.h"
 #include "Game/main.h"
@@ -228,9 +228,9 @@ void GameInfoManager::SetMemoryCardData(const void* data)
     memcpy(mSaveSlots, data, sizeof(mSaveSlots));
 }
 
-u8 GameInfoManager::CheckSaveIDChanged(const void* data) const
+bool GameInfoManager::HasTrophy(eTrophyType trophyType) const
 {
-    return 0;
+    return false;
 }
 
 bool GameInfoManager::IsInMode3() const

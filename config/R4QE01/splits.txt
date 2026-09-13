@@ -1785,7 +1785,7 @@ unclassified/tu_801F6F60.cpp:
 	.sdata      start:0x806DD900 end:0x806DD928
 	.sdata2     start:0x806E5760 end:0x806E5768
 
-unclassified/tu_801F7258.cpp:
+Game/FE/Overlay/OverlayHandlerStrikerTimes.cpp:
 	.text       start:0x801F7258 end:0x801F877C
 	.data       start:0x8051A7B8 end:0x8051A960
 	.sdata      start:0x806DD928 end:0x806DD958
@@ -1811,7 +1811,7 @@ unclassified/tu_801FA28C.cpp:
 	.sdata      start:0x806DDA00 end:0x806DDA30
 	.sdata2     start:0x806E5790 end:0x806E5798
 
-unclassified/tu_801FADB4.cpp:
+Game/FE/Overlay/OverlayHandlerDefensivePlay.cpp:
 	.text       start:0x801FADB4 end:0x801FB2D4
 	.ctors      start:0x804DB794 end:0x804DB798
 	.data       start:0x8051ACC8 end:0x8051AD18

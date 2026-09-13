@@ -1,6 +1,6 @@
 #include "Game/FE/fePageControls.h"
 #include "NL/nlPrint.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
 
 #include "Game/FE/feInput.h"

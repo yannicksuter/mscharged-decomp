@@ -89,10 +89,24 @@ struct LexicalCastImpl<To, From[N]>
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
 template <>
+inline WideBasicString Detail::LexicalCastImpl<WideBasicString, WideBasicString>::Do(
+    const WideBasicString& f)
+{
+    return f;
+}
+
+template <>
 inline WideBasicString Detail::LexicalCastImpl<WideBasicString, const unsigned short*>::Do(
     const unsigned short* const& f)
 {
     return WideBasicString(f);
+}
+
+template <>
+inline WideBasicString LexicalCast<WideBasicString, WideBasicString>(
+    const WideBasicString& from)
+{
+    return Detail::LexicalCastImpl<WideBasicString, WideBasicString>::Do(from);
 }
 
 template <>

@@ -16,6 +16,9 @@ add_relocations:
   - { source: .text:0x8009A814, type: l, target: __vt__10GreenShell }
   - { source: .text:0x8009A834, type: l, target: __vt__11FreezeShell }
   - { source: .text:0x8009A854, type: l, target: __vt__8RedShell }
+  # The HUD power-up name table is hoisted through r0 and a stack slot.
+  - { source: .text:0x801EB5D8, type: ha, target: POWER_UP_IMAGE_NAMES }
+  - { source: .text:0x801EB620, type: l, target: POWER_UP_IMAGE_NAMES }
   # inflate hoists these literal addresses through r0 and stack slots.
   - { source: .text:0x802AC9F8, type: ha, target: .data:0x8052B1B0 }
   - { source: .text:0x802ACA04, type: ha, target: .rodata:0x804EA900 }

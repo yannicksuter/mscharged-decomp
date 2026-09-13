@@ -1,6 +1,6 @@
 #include "Game/SH/SHOnlineFriendsChooseSides.h"
 #include "Game/FE/fePresentation.inl"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/Sys/debug.h"
 

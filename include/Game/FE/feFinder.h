@@ -47,29 +47,16 @@ inline T* FindItemByHashID(T* list, unsigned long hashID)
     return 0;
 }
 
-static inline TLInstance* FEGetChildren(TLSlide* p)
-{
-    return p->m_instances;
-}
-
-static inline TLInstance* FEGetChildren(TLInstance* p)
-{
-    return p->pChildren;
-}
-
 struct InlineHasher
 {
     unsigned long m_Hash;
     InlineHasher(unsigned long h);
     InlineHasher(const char* string);
+
+    operator unsigned long() const { return m_Hash; }
 };
 
 TLTextInstance* FEFindTextInstance(TLSlide* pTopLevel, InlineHasher Level1,
-    InlineHasher Level2 = InlineHasher(0UL), InlineHasher Level3 = InlineHasher(0UL),
-    InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL),
-    InlineHasher Level6 = InlineHasher(0UL));
-
-TLComponentInstance* fn_801CA694(TLSlide* pTopLevel, InlineHasher Level1,
     InlineHasher Level2 = InlineHasher(0UL), InlineHasher Level3 = InlineHasher(0UL),
     InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL),
     InlineHasher Level6 = InlineHasher(0UL));
@@ -85,12 +72,37 @@ template <typename T, int N>
 struct FEFinder
 {
     static inline T* Find(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
-        const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
+        const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
+    {
+        return FindChecked(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    }
 
     static inline T* Find(TLSlide* pTopLevel, const unsigned long Level1, const unsigned long Level2,
-        const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
+        const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
+    {
+        return FindChecked(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    }
 
     static inline T* Find(TLInstance* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+        const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
+    {
+        return FindChecked(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    }
+
+    template <typename U>
+    static inline T* Find(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+        const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
+    {
+        return FindChecked(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    }
+
+    static inline T* FindChecked(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+        const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
+
+    static inline T* FindChecked(TLSlide* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+        const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
+
+    static inline T* FindChecked(TLInstance* pTopLevel, const unsigned long Level1, const unsigned long Level2,
         const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
 
     template <typename U>
@@ -106,7 +118,7 @@ struct FEFinder
         InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL), InlineHasher Level6 = InlineHasher(0UL));
 
     template <typename U>
-    static inline T* Find(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+    static inline T* FindChecked(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
         const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6);
 
     static inline T* _Find(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
@@ -121,7 +133,7 @@ struct FEFinder
 };
 
 template <typename T, int N>
-inline T* FEFinder<T, N>::Find(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+inline T* FEFinder<T, N>::FindChecked(FEPresentation* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
     void* pResult = FEFindInstance(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
@@ -131,7 +143,7 @@ inline T* FEFinder<T, N>::Find(FEPresentation* pTopLevel, const unsigned long Le
 }
 
 template <typename T, int N>
-inline T* FEFinder<T, N>::Find(TLSlide* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+inline T* FEFinder<T, N>::FindChecked(TLSlide* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
     void* pResult = _Find(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
@@ -141,7 +153,7 @@ inline T* FEFinder<T, N>::Find(TLSlide* pTopLevel, const unsigned long Level1, c
 }
 
 template <typename T, int N>
-inline T* FEFinder<T, N>::Find(TLInstance* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+inline T* FEFinder<T, N>::FindChecked(TLInstance* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
     void* pResult = _Find(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
@@ -152,7 +164,7 @@ inline T* FEFinder<T, N>::Find(TLInstance* pTopLevel, const unsigned long Level1
 
 template <typename T, int N>
 template <typename U>
-inline T* FEFinder<T, N>::Find(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
+inline T* FEFinder<T, N>::FindChecked(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
     void* pResult = FEFindInstance((TLInstance*)pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
@@ -168,7 +180,7 @@ inline T* FEFinder<T, N>::_Find(U* pTopLevel, const unsigned long Level1, const 
 {
     if (pTopLevel == 0)
         return 0;
-    TLInstance* pChild = FindItemByHashID(FEGetChildren(pTopLevel), Level1);
+    TLInstance* pChild = FindItemByHashID(pTopLevel->pChildren, Level1);
     if (pChild == 0)
         return 0;
     if (Level2 == 0)
@@ -181,7 +193,7 @@ template <typename U>
 inline T* FEFinder<T, N>::FindOrDefault(U* pTopLevel, const unsigned long Level1, const unsigned long Level2,
     const unsigned long Level3, const unsigned long Level4, const unsigned long Level5, const unsigned long Level6)
 {
-    T* pResult = Find(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
+    T* pResult = FindChecked(pTopLevel, Level1, Level2, Level3, Level4, Level5, Level6);
     return pResult == 0 ? (T*)FEGetDefaultInstance((eTimeLineAssetType)N) : pResult;
 }
 

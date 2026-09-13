@@ -7,7 +7,7 @@
 
 #include "Game/GameSceneManager.h"
 #include "Game/BasicStadium.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feManager.h"
 #include "Game/FE/feModelManager.h"

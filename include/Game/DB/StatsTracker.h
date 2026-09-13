@@ -110,7 +110,6 @@ struct PlayerStats
     /* 0x34 */ u16 unknown_0x34;
     /* 0x36 */ u16 mNumSteals;
     /* 0x38 */ u16 unknown_0x38;
-    /* 0x3A */ u16 padding_0x3A;
     /* 0x3C */ u32 unknown_0x3C;
     /* 0x40 */ u32 mNumButtonPresses;
     /* 0x44 */ u16 mNumPerfectPasses;
@@ -125,9 +124,9 @@ struct TeamStats
 {
     TeamStats()
     {
-        unknown_0x04 = 0;
-        unknown_0x08 = 0;
-        unknown_0x0C = 0;
+        unknown_0x04[0] = 0;
+        unknown_0x04[1] = 0;
+        unknown_0x04[2] = 0;
         memset(&mPlayerTotalStats, 0, sizeof(mPlayerTotalStats));
         mPlayerTotalStats.mRecordType.mTeamID = (eTeamID)0;
         mPlayerTotalStats.mType = TYPE_TEAM;
@@ -136,16 +135,14 @@ struct TeamStats
         unknown_0x12 = 0;
         unknown_0x14 = 0;
         unknown_0x16 = 0;
-        unknown_0x04 = 0;
-        unknown_0x08 = 0;
-        unknown_0x0C = 0;
+        unknown_0x04[0] = 0;
+        unknown_0x04[1] = 0;
+        unknown_0x04[2] = 0;
         mType = TYPE_TEAM;
     }
 
     /* 0x00 */ eTeamID mTeamIndex;
-    /* 0x04 */ int unknown_0x04;
-    /* 0x08 */ int unknown_0x08;
-    /* 0x0C */ int unknown_0x0C;
+    /* 0x04 */ int unknown_0x04[3];
     /* 0x10 */ u16 unknown_0x10;
     /* 0x12 */ u16 unknown_0x12;
     /* 0x14 */ u16 unknown_0x14;
@@ -206,6 +203,7 @@ public:
     bool MoveTeamBUp(TeamStats b, TeamStats a);
 
     bool IsOvertime() const { return mIsOvertime; }
+    int GetNumGamesWon(int side) const { return mNumGamesWon[side]; }
 
     /* 0x000 */ BasicGameInfo* mBasicGameInfo;
     /* 0x004 */ TeamStats* mCumulativeTeamStats[2];

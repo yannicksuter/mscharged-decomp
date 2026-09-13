@@ -1,5 +1,5 @@
 #include "Game/DB/StatsTracker.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 
 #include <stdio.h>
 
@@ -118,9 +118,9 @@ static inline void InitializeTeamStats(TeamStats& stats, eTeamID team)
     stats.unknown_0x12 = 0;
     stats.unknown_0x14 = 0;
     stats.unknown_0x16 = 0;
-    stats.unknown_0x04 = 0;
-    stats.unknown_0x08 = 0;
-    stats.unknown_0x0C = 0;
+    stats.unknown_0x04[0] = 0;
+    stats.unknown_0x04[1] = 0;
+    stats.unknown_0x04[2] = 0;
     stats.mType = TYPE_TEAM;
 }
 

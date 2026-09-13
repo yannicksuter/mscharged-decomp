@@ -4,7 +4,7 @@
 #include "Game/SH/SHOnlineFriends.h"
 #include "Game/SH/SHOnlineInvitePlayers.h"
 #include "Game/FE/FEAudio.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/OnlineMatchmaking.h"
 #include "Game/NetworkLobby.h"
 

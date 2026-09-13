@@ -326,21 +326,23 @@ void CrowdModelCollection::AnimationLoadCallback(
 
 WorldVisibilityNode* LoadWorldVisibilityNode(nlChunk* chunk)
 {
+    int i;
+    WorldVisibilityNode* node;
+
     spWorldVisibilityChunk = chunk;
-    WorldVisibilityNode* node
-        = (WorldVisibilityNode*)chunk->GetData();
+    node = (WorldVisibilityNode*)chunk->GetData();
 
     if (node->mNumModelHashes != 0)
     {
         node->mModelHashes = node->mModelHashData;
     }
 
-    for (int i = 0; i < 2; ++i)
+    for (i = 0; i < 2; ++i)
     {
         if (node->mChildren[i] != 0)
         {
-            spWorldVisibilityChunk = spWorldVisibilityChunk->GetNextChunk();
-            node->mChildren[i] = LoadWorldVisibilityNode(spWorldVisibilityChunk);
+            node->mChildren[i] = LoadWorldVisibilityNode(
+                spWorldVisibilityChunk->GetNextChunk());
         }
     }
     return node;

@@ -27,6 +27,9 @@ struct BasicGameInfo
 
     void Reset(bool clearTeams);
 
+    int GetTeam(short side) const { return mTeamIndex[side]; }
+    short GetFinalScore(short side) const { return mFinalScore[side]; }
+
     /* 0x000 */ int mTeamIndex[2];
     /* 0x008 */ int mSidekickIndex[2][3];
     /* 0x020 */ int mStadiumIndex;

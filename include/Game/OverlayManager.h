@@ -35,15 +35,29 @@ public:
     void fn_801E29C0(nlVector3 position);
     void fn_801E2A28(GoalScoredData* eventData);
 
+    void GetStrikerTimesVariants(int* story, int* headline, int* image)
+    {
+        *story = mStrikerTimesStoryVariant;
+        *headline = mStrikerTimesHeadlineVariant;
+        *image = mStrikerTimesImageVariant;
+    }
+
+    void SetStrikerTimesVariants(int story, int headline, int image)
+    {
+        mStrikerTimesStoryVariant = story;
+        mStrikerTimesHeadlineVariant = headline;
+        mStrikerTimesImageVariant = image;
+    }
+
     /* 0x108 */ InGameTextOverlay* mInGameTextOverlay;
     /* 0x10C */ bool mIsHUDSlideIn;
     /* 0x10D */ bool mDoHUDSlideIn;
     /* 0x10E */ u8 mUnidentified10E;
     /* 0x10F */ bool mIsDemoSlideVisible;
     /* 0x110 */ float mHUDDelay;
-    /* 0x114 */ u32 mUnidentified114;
-    /* 0x118 */ u32 mUnidentified118;
-    /* 0x11C */ u32 mUnidentified11C;
+    /* 0x114 */ int mStrikerTimesStoryVariant;
+    /* 0x118 */ int mStrikerTimesHeadlineVariant;
+    /* 0x11C */ int mStrikerTimesImageVariant;
     /* 0x120 */ u32 mUnidentified120;
 
 private:

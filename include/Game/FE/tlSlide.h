@@ -37,7 +37,7 @@ public:
 
     /* 0x00 */ TLSlide* m_next;
     /* 0x04 */ char pad0[0x4];
-    /* 0x08 */ TLInstance* m_instances;
+    /* 0x08 */ TLInstance* pChildren;
     /* 0x0C */ FEAnimation* m_animations;
     /* 0x10 */ f32 m_start;
     /* 0x14 */ f32 m_duration;

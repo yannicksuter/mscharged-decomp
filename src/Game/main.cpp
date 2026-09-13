@@ -11,7 +11,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Task/FrontEndTask.h"
 #include "Game/FE/feMusic.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/Task/ResetTask.h"
 #include "Game/Render/Wiper.h"
 #include "Game/Sys/audio.h"

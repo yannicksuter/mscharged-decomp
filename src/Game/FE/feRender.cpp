@@ -105,16 +105,16 @@ void FERender::RenderSlide(const TLSlide* slide, const nlMatrix4& matrix)
 {
     if (slide == 0)
         return;
-    if (slide->m_instances == 0)
+    if (slide->pChildren == 0)
         return;
-    TLInstance* curr = slide->m_instances->m_next;
+    TLInstance* curr = slide->pChildren->m_next;
     for (;;)
     {
         TLInstance* next = curr->m_next;
         nlFloatColour colour = s_currentAssetColour;
         RenderTimeLineAsset(curr, slide->GetCurrentTime(), matrix);
         s_currentAssetColour = colour;
-        if (curr == slide->m_instances)
+        if (curr == slide->pChildren)
             break;
         curr = next;
     }
@@ -226,9 +226,9 @@ void FERender::RenderScene(FEScene* scene)
     if (presentation != 0 && presentation->m_slides != 0)
     {
         slide = presentation->m_currentSlide;
-        if (slide != 0 && slide->m_instances != 0)
+        if (slide != 0 && slide->pChildren != 0)
         {
-            curr = slide->m_instances->m_next;
+            curr = slide->pChildren->m_next;
             for (;;)
             {
                 float fCurrentTime = slide->m_time;
@@ -236,7 +236,7 @@ void FERender::RenderScene(FEScene* scene)
                 nlFloatColour colour = s_currentAssetColour;
                 RenderTimeLineAsset(curr, fCurrentTime, identity);
                 s_currentAssetColour = colour;
-                if (curr == slide->m_instances)
+                if (curr == slide->pChildren)
                 {
                     break;
                 }

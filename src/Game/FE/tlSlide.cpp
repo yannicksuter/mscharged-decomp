@@ -133,7 +133,7 @@ void TLSlide::Update(float time)
         anim = anim->m_next;
     }
 
-    TLComponentInstance* var_r31_2 = (TLComponentInstance*)nlDLRingGetStart<TLInstance>(this->m_instances);
+    TLComponentInstance* var_r31_2 = (TLComponentInstance*)nlDLRingGetStart<TLInstance>(this->pChildren);
     for (;;)
     {
         if (var_r31_2 == 0)
@@ -218,7 +218,7 @@ void TLSlide::Update(float time)
             }
         }
 
-        if (nlDLRingIsEnd<TLInstance>(this->m_instances, var_r31_2) != 0)
+        if (nlDLRingIsEnd<TLInstance>(this->pChildren, var_r31_2) != 0)
         {
             break;
         }

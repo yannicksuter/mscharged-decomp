@@ -1,5 +1,6 @@
 #include "unclassified/tu_801E4630.h"
 #include "NL/nlFunction.inl"
+#include "NL/nlBindMember.h"
 #include "Game/EventRegistry.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/feScrollText.h"
@@ -12,7 +13,7 @@
 #include "NL/nlFunctionMemory.h"
 #include "NL/nlBind.h"
 #include "Game/GameInfo.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feDPD.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/DB/SaveLoad.h"
@@ -76,7 +77,7 @@ TU801E4630Scene::TU801E4630Scene()
         mUnidentified1C4.SetBackScene(4);
     }
     fn_801E4F40();
-    Function<FnVoidVoid> callback(Bind<void>(MemFun(&TU801E4630Scene::fn_801E68DC), this));
+    Function<FnVoidVoid> callback(BindMember(this, &TU801E4630Scene::fn_801E68DC));
     UnidentifiedFindEvent<UnidentifiedEventNoData>("HBMHide", -1)->Add(
         callback, (unsigned int)&mUnidentifiedB8, -1);
 }
@@ -197,9 +198,12 @@ void TU801E4630Scene::fn_801E4F40()
     }
 }
 
+static const unsigned short stadiumCount[] = { '1', '7', 0 };
+
+static void UpdateStadiumLabel(TU801E4630Scene* scene);
+
 void TU801E4630Scene::Update(float deltaTime)
 {
-    static const unsigned short stadiumCount[] = { '1', '7', 0 };
     switch (mUnidentifiedBC)
     {
     case 0:
@@ -220,11 +224,7 @@ void TU801E4630Scene::Update(float deltaTime)
         {
             mUnidentified448->m_bVisible = true;
             mUnidentified448->SetActiveSlide(GetStadiumName(mUnidentifiedC8[mUnidentifiedC0]), true, false);
-            unsigned short number[4];
-            nlSNPrintf(number, 4, (const unsigned short*)L"%d", mUnidentifiedC4 + 1);
-            WideBasicString text(Format(WideBasicString(LookupLocString("X_OF_X")), number, stadiumCount));
-            nlStrNCpy(mUnidentified424, text.c_str(), 16);
-            FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(mUnidentified448->GetActiveSlide(), "quantity")->SetString(mUnidentified424);
+            UpdateStadiumLabel(this);
         }
         mUnidentifiedBC = 2;
         break;
@@ -249,11 +249,7 @@ void TU801E4630Scene::Update(float deltaTime)
         {
             mUnidentified448->m_bVisible = true;
             mUnidentified448->SetActiveSlide(GetStadiumName(mUnidentifiedC8[mUnidentifiedC0]), true, false);
-            unsigned short number[4];
-            nlSNPrintf(number, 4, (const unsigned short*)L"%d", mUnidentifiedC4 + 1);
-            WideBasicString text(Format(WideBasicString(LookupLocString("X_OF_X")), number, stadiumCount));
-            nlStrNCpy(mUnidentified424, text.c_str(), 16);
-            FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(mUnidentified448->GetActiveSlide(), "quantity")->SetString(mUnidentified424);
+            UpdateStadiumLabel(this);
         }
         break;
     case 4:
@@ -275,7 +271,8 @@ void TU801E4630Scene::Update(float deltaTime)
     BaseSceneHandler::Update(deltaTime);
     if (!mUnidentifiedB4)
     {
-        TLSlide* slide = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "SCREEN_TITLES")->GetActiveSlide();
+        TLInstance* titles = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(mPresentation->m_currentSlide, "Layer", "SCREEN_TITLES");
+        TLSlide* slide = ((TLComponentInstance*)(titles == 0 ? &UnidentifiedTLComponentDefault::sInstance : titles))->GetActiveSlide();
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             return;
@@ -304,8 +301,9 @@ void TU801E4630Scene::Update(float deltaTime)
 
     if (mUnidentifiedBC > 2)
     {
+        TLSlide* activeSlide = mUnidentified448->GetActiveSlide();
         bool finished = true;
-        if (mUnidentified448->GetActiveSlide() != 0)
+        if (activeSlide != 0)
         {
             TLSlide* slide = mUnidentified448->GetActiveSlide();
             float endTime = slide->GetStartTime() + slide->GetDuration();
@@ -413,6 +411,15 @@ void TU801E4630Scene::Update(float deltaTime)
     {
         mUnidentifiedB0->Update(deltaTime);
     }
+}
+
+static void UpdateStadiumLabel(TU801E4630Scene* scene)
+{
+    unsigned short number[4];
+    nlSNPrintf(number, 4, (const unsigned short*)L"%d", scene->mUnidentifiedC4 + 1);
+    WideBasicString text(Format(WideBasicString(LookupLocString("X_OF_X")), number, stadiumCount));
+    nlStrNCpy(scene->mUnidentified424, text.c_str(), 16);
+    FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(scene->mUnidentified448->GetActiveSlide(), "quantity")->SetString(scene->mUnidentified424);
 }
 
 void TU801E4630Scene::fn_801E6170()

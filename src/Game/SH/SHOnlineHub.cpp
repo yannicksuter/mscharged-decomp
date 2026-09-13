@@ -4,7 +4,7 @@
 
 #include "Game/SH/SHOnlineHub.h"
 #include "Game/FE/FEAudio.h"
-#include "Game/FE/feHelpFuncs.h"
+#include "Game/FE/feHelpFuncs_decl.h"
 #include "NL/nlPrint.h"
 #include "Game/OnlineMatchmaking.h"
 #include "Game/NetworkLobby.h"
@@ -147,17 +147,12 @@ void SHOnlineHub::SceneCreated()
     }
     for (int i = 0; i < 4; ++i)
     {
-        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
-            InlineHasher("Layer"), InlineHasher(sOnlineHubButtonNames[i]));
+        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide, "Layer", sOnlineHubButtonNames[i]);
         mUnidentified2F0[i] = instance != 0 ? instance : &UnidentifiedTLComponentDefault::sInstance;
     }
-    TLComponentInstance* help = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("HELP_BUTTON"));
-    if (help == 0)
-        help = &UnidentifiedTLComponentDefault::sInstance;
+    TLComponentInstance* help = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "HELP_BUTTON");
     help->SetActiveSlide(IsWidescreen() ? "16:9" : "4:3", true, false);
-    TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(help,
-        nlStringLowerHash("HELP"), 0, 0, 0, 0, 0);
+    TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(help, "HELP");
     mUnidentified3B4 = instance != 0 ? instance : &UnidentifiedTLComponentDefault::sInstance;
     SHNavigation* scene = GetNavigationScene();
     TLComponentInstance* done = 0;
@@ -202,10 +197,7 @@ void SHOnlineHub::Update(float dt)
             mUnidentified4B4 = true;
             for (int i = 0; i < 4; ++i)
                 gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
-            TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(mPresentation->m_currentSlide,
-                InlineHasher("Layer"), InlineHasher("summary"), InlineHasher("Mii_btn"), InlineHasher("Mii"));
-            if (image == 0)
-                image = &UnidentifiedTLImageDefault::sInstance;
+            TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn", "Mii");
             unsigned long texture = g_pMiiManager->mIconTextureIds[0];
             image->SetAssetVisible(true);
             int profile = GameInfoManager::Instance()->GetSaveSlotName(gNetworkSaveSlotIndex);
@@ -294,10 +286,7 @@ void SHOnlineHub::Update(float dt)
         UpdateFriendAndSeasonText();
         UpdateLocalStats();
         UpdateStrikerOfTheDay();
-        TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(mPresentation->m_currentSlide,
-            InlineHasher("Layer"), InlineHasher("summary"), InlineHasher("Mii_btn"), InlineHasher("Mii"));
-        if (image == 0)
-            image = &UnidentifiedTLImageDefault::sInstance;
+        TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn", "Mii");
         unsigned long texture = g_pMiiManager->mIconTextureIds[0];
         image->SetAssetVisible(true);
         int profile = GameInfoManager::Instance()->GetSaveSlotName(gNetworkSaveSlotIndex);
@@ -338,10 +327,7 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
             }
         }
     }
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide,
-        nlStringLowerHash("Layer"), nlStringLowerHash("subheading2"), 0, 0, 0, 0);
-    if (text == 0)
-        text = &UnidentifiedTLTextDefault::sInstance;
+    TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "subheading2");
     u16 onlineText[4];
     u16 friendsText[4];
     nlSNPrintf(onlineText, 4, (const u16*)L"%d", online);
@@ -369,8 +355,7 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
             ++days;
         }
     }
-    text = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide,
-        nlStringLowerHash("Layer"), nlStringLowerHash("subheading"), 0, 0, 0, 0);
+    text = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide, "Layer", "subheading");
     WideString string = Format(WideString(LookupLocString("ONLINE_HUB_DAYS_REMAIN")), days, hours, minutes);
     memcpy(mUnidentified528, string.c_str(), sizeof(mUnidentified528));
     text->SetString(mUnidentified528);
@@ -382,16 +367,15 @@ void SHOnlineHub::UpdateLocalStats()
         mUnidentified5A8 = *NetworkStatsManager::Instance()->GetLocalStats(0);
     if (NetworkStatsManager::Instance()->GetLocalStats(1) != 0)
         mUnidentified590 = *NetworkStatsManager::Instance()->GetLocalStats(1);
-    TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("summary"));
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(summary, nlStringLowerHash("name"), 0, 0, 0, 0, 0);
+    TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide, "Layer", "summary");
+    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(summary, "name");
     nlStrNCpy(mUnidentified640, gNetworkMiiNameWide, 24);
     text->SetString(mUnidentified640);
-    text = FEFinder<TLTextInstance, 3>::Find(summary, nlStringLowerHash("therecord"), 0, 0, 0, 0, 0);
+    text = FEFinder<TLTextInstance, 3>::Find(summary, "therecord");
     WideString points = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_POINTS_TODAY")), mUnidentified590.mScore);
     nlStrNCpy(mUnidentified6D0, points.c_str(), 48);
     text->SetString(mUnidentified6D0);
-    text = FEFinder<TLTextInstance, 3>::Find(summary, nlStringLowerHash("Rank"), 0, 0, 0, 0, 0);
+    text = FEFinder<TLTextInstance, 3>::Find(summary, "Rank");
     WideString rank = Format(WideString(LookupLocString("ONLINE_HUB_CURRENT_RANK")), mUnidentified5A8.mDisplayRank);
     nlStrNCpy(mUnidentified670, rank.c_str(), 48);
     text->SetString(mUnidentified670);
@@ -417,9 +401,8 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
             mUnidentified58D = false;
         }
     }
-    TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("summary"));
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(summary, nlStringLowerHash("therecord2"), 0, 0, 0, 0, 0);
+    TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide, "Layer", "summary");
+    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(summary, "therecord2");
     if (mUnidentified58D)
     {
         WideString string = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_POINTS")), mUnidentified628.mScore);
@@ -429,7 +412,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
     }
     else
         text->m_bVisible = false;
-    text = FEFinder<TLTextInstance, 3>::Find(summary, nlStringLowerHash("sotd description"), 0, 0, 0, 0, 0);
+    text = FEFinder<TLTextInstance, 3>::Find(summary, "sotd description");
     if (mUnidentified58D)
     {
         WideString string = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_DESCRIPTION")), mUnidentified5C0.mName);
@@ -442,10 +425,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
     bool valid = false;
     if (mUnidentified58D)
         valid = g_pMiiManager->CreateIcon((const RFLStoreData*)mUnidentified5C0.mData, 1, (RFLExpression)0);
-    TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("summary"), InlineHasher("Mii_btn2"), InlineHasher("Mii"));
-    if (image == 0)
-        image = &UnidentifiedTLImageDefault::sInstance;
+    TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn2", "Mii");
     unsigned long texture = g_pMiiManager->mIconTextureIds[1];
     image->SetAssetVisible(valid && mUnidentified4B4);
     image->m_pTextureResource->SetTextureHandle(texture);
@@ -463,10 +443,7 @@ void SHOnlineHub::InitializeButtons()
         mUnidentified020[i].SetPointerLeaveCallback(off);
         mUnidentified020[i].SetPointerPressCallback(down);
     }
-    TLInstance* instance = FEFinder<TLInstance, 2>::Find(mUnidentified3B4,
-        nlStringLowerHash("OVER"), nlStringLowerHash("list_high_250x60"), 0, 0, 0, 0);
-    if (instance == 0)
-        instance = &UnidentifiedTLImageDefault::sInstance;
+    TLInstance* instance = FEFinder<TLInstance, 2>::FindOrDefault(mUnidentified3B4, "OVER", "list_high_250x60");
     feVector3 position = mUnidentified3B4->GetAssetPosition();
     mUnidentified300.SetInstanceBounds(instance, true, position.f.x, position.f.y, 1.0f, 1.0f);
     mUnidentified300.SetPointerEnterCallback(over);

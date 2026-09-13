@@ -41,24 +41,24 @@ TU80209584Summary::~TU80209584Summary()
 {
 }
 
-void TU80209584Summary::fn_802095D0(const TU80209584StatsSource* home, const TU80209584StatsSource* away, FEPresentation* presentation)
+void TU80209584Summary::fn_802095D0(TeamStats home, TeamStats away, FEPresentation* presentation)
 {
-    mStatsA = home->mStats;
+    mStatsA = home.mPlayerTotalStats;
     mPresentation = presentation;
-    mTeamA = home->mTeam;
-    mTeamB = away->mTeam;
-    mStatsB = away->mStats;
+    mTeamA = home.mTeamIndex;
+    mTeamB = away.mTeamIndex;
+    mStatsB = away.mPlayerTotalStats;
 
     TLInstance* pSummary = (TLInstance*)FEFindInstance(mPresentation, nlStringLowerHash("game summary"), nlStringLowerHash("Layer"), nlStringLowerHash("game summary"), 0, 0, 0);
 
     unsigned long subHash = 0;
-    const TU80209584Stats* stats[2] = { &mStatsA, &mStatsB };
+    const PlayerStats* stats[2] = { &mStatsA, &mStatsB };
     int percents[2] = { 0, 0 };
 
-    unsigned int total = mStatsA.mValue3C + mStatsB.mValue3C;
+    unsigned int total = mStatsA.unknown_0x3C + mStatsB.unknown_0x3C;
     if ((float)total != 0.0f)
     {
-        int percent = (int)(100.0f * ((float)mStatsA.mValue3C / (float)total));
+        int percent = (int)(100.0f * ((float)mStatsA.unknown_0x3C / (float)total));
         percents[0] = percent;
         percents[1] = 100 - percent;
     }
@@ -84,26 +84,26 @@ void TU80209584Summary::fn_802095D0(const TU80209584StatsSource* home, const TU8
             switch (row)
             {
             case 0:
-                value = stats[side]->mValue06;
+                value = stats[side]->mNumShotsOnGoal;
                 break;
             case 1:
-                value = stats[side]->mValue14;
+                value = stats[side]->unknown_0x14;
                 break;
             case 2:
-                value = stats[side]->mValue32;
+                value = stats[side]->mNumHitsMade;
                 break;
             case 3:
-                value = stats[side]->mValue36;
+                value = stats[side]->mNumSteals;
                 break;
             case 4:
-                value = stats[side]->mValue18;
-                extra = stats[side]->mValue16;
+                value = stats[side]->unknown_0x18;
+                extra = stats[side]->unknown_0x16;
                 break;
             case 5:
                 value = percents[side];
                 break;
             case 6:
-                value = stats[side]->mValue10;
+                value = stats[side]->mNumGoalsFor;
                 break;
             default:
                 break;
