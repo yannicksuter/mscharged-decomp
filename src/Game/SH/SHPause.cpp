@@ -103,7 +103,7 @@ void PauseMenuScene::OnSelectQUIT()
         popup->mUnidentifiedC0C = mQuittingController;
         popup->mUnidentified9A1 = true;
         WorldDarkening::Instance().Fade(100.0f, 1.0f);
-        if (GameInfoManager::Instance()->unknown_0x122)
+        if (GameInfoManager::Instance()->mIsInStrikers101Mode)
         {
             popup->Create((ePopupMenu)11,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
@@ -146,11 +146,11 @@ void PauseMenuScene::OnSelectPopupNOFORFEIT()
  */
 void PauseMenuScene::OnSelectPopupYESFORFEIT()
 {
-    FEFinder<TLInstance, 2>::Find(mPresentation->m_currentSlide, InlineHasher("Layer"))->m_bVisible = false;
+    FEFinder<TLInstance, 2>::Find<>(mPresentation->m_currentSlide, InlineHasher("Layer"))->m_bVisible = false;
     mUnidentified54A = true;
     GameInfoManager* gameInfoManager = GameInfoManager::Instance();
     CupManager* cupManager = g_pCupManager;
-    if (gameInfoManager->unknown_0x122)
+    if (gameInfoManager->mIsInStrikers101Mode)
     {
         gpHBMManager->mBlocked = true;
         mQuitDelay = 1.0f;
@@ -362,7 +362,7 @@ void PauseMenuScene::Update(float fDeltaT)
  */
 void PauseMenuScene::fn_8023A85C()
 {
-    typedef Detail::MemFunImpl<void, void (PauseMenuScene::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (PauseMenuScene::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, PauseMenuScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback callback0(PointerBinding(MemFun(&PauseMenuScene::fn_8023AB94), this, Placeholder<0>(), Placeholder<1>()));
@@ -380,7 +380,7 @@ void PauseMenuScene::fn_8023A85C()
 /**
  * Offset/Address/Size: 0x1740 | 0x8023AB94 | size: 0xC4
  */
-void PauseMenuScene::fn_8023AB94(int index, void* context)
+void PauseMenuScene::fn_8023AB94(unsigned int index, void* context)
 {
     unsigned int which = (unsigned int)context;
     ++mUnidentified534[index];
@@ -395,7 +395,7 @@ void PauseMenuScene::fn_8023AB94(int index, void* context)
 /**
  * Offset/Address/Size: 0x1804 | 0x8023AC58 | size: 0xAC
  */
-void PauseMenuScene::fn_8023AC58(int index, void* context)
+void PauseMenuScene::fn_8023AC58(unsigned int index, void* context)
 {
     unsigned int which = (unsigned int)context;
     --mUnidentified534[index];
@@ -407,7 +407,7 @@ void PauseMenuScene::fn_8023AC58(int index, void* context)
 /**
  * Offset/Address/Size: 0x18B0 | 0x8023AD04 | size: 0x280
  */
-void PauseMenuScene::fn_8023AD04(int index, void* context)
+void PauseMenuScene::fn_8023AD04(unsigned int index, void* context)
 {
     if (mUnidentified54A)
         return;

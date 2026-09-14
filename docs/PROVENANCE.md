@@ -1,5 +1,26 @@
 # Source provenance
 
+`NL/nlIntersection.cpp` reconstructs the two-dimensional segment intersection
+routine at R4QE01 address `0x802B6BC8`. Its determinant arithmetic, tolerance,
+output parameters and polygon/wall callers establish the API and vector width.
+The file and function names describe that behavior; original Charged spellings
+are unknown.
+
+`Game/Render/TimedObject.cpp` reconstructs the timed-object manager at
+`0x80188884`: construction registers an enabled object with zero elapsed time,
+the render task advances enabled objects until expiry, and the manager owns
+the objects and list nodes. `TimedObject`, its manager/list and member names
+describe those R4QE01 behaviors; original Charged spellings are unknown.
+
+`Game/AI/Scripts/FuzzyAIRuntime.cpp` reconstructs the 305-case R4QE01
+interpreter dispatcher from its jump table, stack operations, and called APIs.
+The stack-based call convention is also present in the predecessor's
+[generated interpreter](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/ReplayChoreo_interp.cpp).
+`Variant::GetPlayer` preserves the predecessor's
+[accessor name and field](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/include/Game/AI/Variant.h);
+`GetTeam` exposes the corresponding team field used by R4QE01's runtime.
+These source names do not establish original Charged spellings.
+
 The light setup in `NL/glx/glxLight.cpp` follows the GX lighting operations in
 [Super Mario Strikers' glxSend](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/NL/glx/glxSend.cpp).
 R4QE01 supplies the indexed light cache, directional scale, point attenuation,
@@ -181,3 +202,26 @@ as ancestry references, together with its cup and statistics interfaces.
 Charged's cup phases, three-sidekick records, packed history and challenge-unlock
 mappings follow R4QE01. The reference licensing notice above also applies
 to this source ancestry.
+
+`Game/Render/MegastrikeBackgroundOverlay.cpp` reconstructs R4QE01's full-screen
+Mega Strike background fade. The render layer, character texture format,
+team-indexed character lookup and intensity arithmetic establish its role.
+The source, class, global and field names describe that behavior; they do not
+claim original source spellings. Character data uses the existing shared
+`cCharacter`, `CharacterInfo` and `g_pCharacters` interfaces.
+
+`Game/Render/ShadowVolume.cpp` reconstructs R4QE01's shadow-volume target,
+model submission and full-screen blend. Its descriptive source and API names
+follow the retained render-target strings, raster states, view-layer callers
+and mesh-writer streams; they do not claim original source spellings.
+
+`Game/Font/FontLoading.cpp` reconstructs R4QE01's localization and frontend,
+in-game and Strikers 101 font loading. The helper and local names follow the
+corresponding [Super Mario Strikers transition code](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/TransitionTask.cpp);
+font resource paths and loading checks follow R4QE01. Each four-byte font
+language code is copied from its default record before per-call adjustment;
+the separate records and their byte copies follow the retained R4QE01 accesses.
+The Strikers 101 mode field name follows the corresponding predecessor GameInfoManager field and
+its retained Charged uses. The loading API and source filename are descriptive
+names, not claims about original Charged spellings. The reference licensing
+notice above also applies to this source ancestry.

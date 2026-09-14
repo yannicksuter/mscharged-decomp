@@ -34,14 +34,14 @@ public:
 
     void OnCountdownTick(FETimer* timer);
     void InitializeButtons();
-    void OnSidePointerEnter(int index, void* context);
-    void OnSidePointerLeave(int index, void* context);
-    void OnSidePointerInside(int index, void* context);
-    void OnSidePointerPress(int index, void* context);
-    void OnDonePointerEnter(int index, void* context);
-    void OnDonePointerInside(int index, void* context);
-    void OnDonePointerLeave(int index, void* context);
-    void OnDonePointerPress(int index, void* context);
+    void OnSidePointerEnter(unsigned int index, void* context);
+    void OnSidePointerLeave(unsigned int index, void* context);
+    void OnSidePointerInside(unsigned int index, void* context);
+    void OnSidePointerPress(unsigned int index, void* context);
+    void OnDonePointerEnter(unsigned int index, void* context);
+    void OnDonePointerInside(unsigned int index, void* context);
+    void OnDonePointerLeave(unsigned int index, void* context);
+    void OnDonePointerPress(unsigned int index, void* context);
     void UpdateDoneButton();
     int GetOnlinePlayerIndex(int pad);
     void OnSidesChanged(NetMessageSidesChanged* message);

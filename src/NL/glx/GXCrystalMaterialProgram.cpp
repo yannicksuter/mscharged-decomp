@@ -8,7 +8,6 @@
 #include "NL/gl/glLoadModel.h"
 
 GXCrystalMaterialProgram* GXCrystalMaterialProgram::Instance;
-bool GXCrystalMaterialProgram::Initialized;
 
 GXMaterialParameter GXCrystalMaterialProgram::Parameters[3] = {
     { 0xEBAF55D2, 0x01010103, 0 }, // NLG_DETAIL
@@ -34,7 +33,8 @@ GXCrystalMaterialProgram::~GXCrystalMaterialProgram()
 
 void GXCrystalMaterialProgram::Initialize()
 {
-    if (Initialized)
+    static bool initialized;
+    if (initialized)
         return;
 
     sCrystalSilhouetteGlowMultiplier.BindWithDefault("SilhouetteGlowMultiplier", 1.0f,
@@ -42,7 +42,7 @@ void GXCrystalMaterialProgram::Initialize()
     sCrystalEdgeGlowMultiplier.BindWithDefault("EdgeGlowMultiplier", 1.0f,
         "Materials/", false, 0.0f, 1.0f, 0.05f);
 
-    Initialized = true;
+    initialized = true;
 }
 
 void GXCrystalMaterialProgram::Configure(glModelPacket*)

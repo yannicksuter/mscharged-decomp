@@ -35,7 +35,7 @@ SHOnlineInviteResponse::~SHOnlineInviteResponse()
 
 void SHOnlineInviteResponse::InitializeButtons()
 {
-    typedef Detail::MemFunImpl<void, void (SHOnlineInviteResponse::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHOnlineInviteResponse::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHOnlineInviteResponse*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineInviteResponse::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
@@ -163,7 +163,7 @@ void SHOnlineInviteResponse::Update(float fDeltaT)
     }
 }
 
-void SHOnlineInviteResponse::OnPointerEnter(int index, void* context)
+void SHOnlineInviteResponse::OnPointerEnter(unsigned int index, void* context)
 {
     ++mHoverCounts[index];
     if (!mButtons[(int)context].HasOtherPointerState(1, index))
@@ -174,7 +174,7 @@ void SHOnlineInviteResponse::OnPointerEnter(int index, void* context)
     }
 }
 
-void SHOnlineInviteResponse::OnPointerLeave(int index, void* context)
+void SHOnlineInviteResponse::OnPointerLeave(unsigned int index, void* context)
 {
     --mHoverCounts[index];
     if (!mButtons[(int)context].HasOtherPointerState(1, index))
@@ -184,7 +184,7 @@ void SHOnlineInviteResponse::OnPointerLeave(int index, void* context)
     }
 }
 
-void SHOnlineInviteResponse::OnPointerPress(int, void* context)
+void SHOnlineInviteResponse::OnPointerPress(unsigned int, void* context)
 {
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);

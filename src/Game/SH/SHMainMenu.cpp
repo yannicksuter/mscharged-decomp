@@ -71,13 +71,13 @@ void SHMainMenu::SceneCreated()
     TLComponentInstance* hiddenItem;
     if (g_pLocalization->GetCurrentLanguage() == nlLocalization::LangJapanese)
     {
-        hiddenItem = FEFinder<TLComponentInstance, 4>::Find(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item");
-        mMenuItemInstances[4] = FEFinder<TLComponentInstance, 4>::Find(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item_jp");
+        hiddenItem = FEFinder<TLComponentInstance, 4>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item");
+        mMenuItemInstances[4] = FEFinder<TLComponentInstance, 4>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item_jp");
     }
     else
     {
-        hiddenItem = FEFinder<TLComponentInstance, 4>::Find(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item_jp");
-        mMenuItemInstances[4] = FEFinder<TLComponentInstance, 4>::Find(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item");
+        hiddenItem = FEFinder<TLComponentInstance, 4>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item_jp");
+        mMenuItemInstances[4] = FEFinder<TLComponentInstance, 4>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item");
     }
 
     hiddenItem->SetVisible(false);
@@ -97,13 +97,13 @@ void SHMainMenu::SceneCreated()
     mMenuHighlights[4] = FEFinder<TLComponentInstance, 4>::FindOrDefault(mMenuItemInstances[4]->GetActiveSlide(), "HOF");
     mMenuHighlights[5] = FEFinder<TLComponentInstance, 4>::FindOrDefault(mMenuItemInstances[5]->GetActiveSlide(), "HOF");
 
-    mMenuGroups[0] = FEFinder<TLInstance, 5>::Find(mMenuHighlights[0], "off", "group");
-    mMenuGroups[1] = FEFinder<TLInstance, 5>::Find(mMenuHighlights[1], "off", "group");
-    mMenuGroups[2] = FEFinder<TLInstance, 5>::Find(mMenuHighlights[2], "off", "group");
-    mMenuGroups[3] = FEFinder<TLInstance, 5>::Find(mMenuHighlights[3], "off", "group");
-    mMenuGroups[6] = FEFinder<TLInstance, 5>::Find(mMenuHighlights[6], "off", "group");
-    mMenuGroups[4] = FEFinder<TLInstance, 5>::Find(mMenuHighlights[4], "off", "group");
-    mMenuGroups[5] = FEFinder<TLInstance, 5>::Find(mMenuHighlights[5], "off", "group");
+    mMenuGroups[0] = FEFinder<TLInstance, 5>::Find<>(mMenuHighlights[0], "off", "group");
+    mMenuGroups[1] = FEFinder<TLInstance, 5>::Find<>(mMenuHighlights[1], "off", "group");
+    mMenuGroups[2] = FEFinder<TLInstance, 5>::Find<>(mMenuHighlights[2], "off", "group");
+    mMenuGroups[3] = FEFinder<TLInstance, 5>::Find<>(mMenuHighlights[3], "off", "group");
+    mMenuGroups[6] = FEFinder<TLInstance, 5>::Find<>(mMenuHighlights[6], "off", "group");
+    mMenuGroups[4] = FEFinder<TLInstance, 5>::Find<>(mMenuHighlights[4], "off", "group");
+    mMenuGroups[5] = FEFinder<TLInstance, 5>::Find<>(mMenuHighlights[5], "off", "group");
 
     mMenuHitImages[0] = FEFinder<TLImageInstance, 2>::FindOrDefault(mMenuGroups[0], "btn_main_domination");
     mMenuHitImages[1] = FEFinder<TLImageInstance, 2>::FindOrDefault(mMenuGroups[1], "btn_main_online");
@@ -254,7 +254,7 @@ void SHMainMenu::Update(float fDeltaT)
  */
 void SHMainMenu::InitializeMenuItems()
 {
-    typedef Detail::MemFunImpl<void, void (SHMainMenu::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHMainMenu::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHMainMenu*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback openFunc(PointerBinding(MemFun(&SHMainMenu::OpenItem), this, Placeholder<0>(), Placeholder<1>()));
@@ -277,7 +277,7 @@ void SHMainMenu::InitializeMenuItems()
 /**
  * Offset/Address/Size: 0x4FC | 0x8021F5F0 | size: 0xC4
  */
-void SHMainMenu::CloseItem(int index, void* context)
+void SHMainMenu::CloseItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mHighlightedItemCounts[index];
@@ -301,7 +301,7 @@ void SHMainMenu::ReturnToWiiMenu()
 /**
  * Offset/Address/Size: 0x1E18 | 0x80220F0C | size: 0xDC
  */
-void SHMainMenu::OpenItem(int index, void* context)
+void SHMainMenu::OpenItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mHighlightedItemCounts[index];
@@ -317,7 +317,7 @@ void SHMainMenu::OpenItem(int index, void* context)
 /**
  * Offset/Address/Size: 0x1EF4 | 0x80220FE8 | size: 0x2D0
  */
-void SHMainMenu::SelectItem(int index, void* context)
+void SHMainMenu::SelectItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     if (GetTweakBool("/user/media_build", false) && (item == 3 || item == 5 || item == 6))

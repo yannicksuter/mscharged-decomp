@@ -16,9 +16,9 @@ public:
     virtual void SceneCreated();
 
     void OnPreviewDelayElapsed(FETimer* timer);
-    void OnContinuePointerEnter(int index, void* context);
-    void OnContinuePointerLeave(int index, void* context);
-    void OnContinuePointerPress(int index, void* context);
+    void OnContinuePointerEnter(unsigned int index, void* context);
+    void OnContinuePointerLeave(unsigned int index, void* context);
+    void OnContinuePointerPress(unsigned int index, void* context);
 
     /* 0x01C */ FEPointerButton mContinueButton;
     /* 0x0D0 */ TLComponentInstance* mContinueButtonInstance;

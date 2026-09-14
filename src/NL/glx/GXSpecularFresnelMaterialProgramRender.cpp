@@ -18,6 +18,7 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/nlColour.h"
 #include "NL/nlMath.h"
+#include "NL/glx/glxFresnelTexture.h"
 
 static bool sRenderSpecularFresnel = true;
 static bool sEnableSpecularFresnelLighting = true;
@@ -182,28 +183,8 @@ void GXMaterialProgramImpl<GXSpecularFresnelMaterialProgram>::Draw(
     unsigned long fresnelTexture = sSpecularFresnelTextures[fresnelRamp];
     if (sSpecularFresnelBoundTexture != fresnelTexture)
     {
-        if (!sSpecularFresnelIndicesInitialized)
-        {
-            sSpecularFresnelTextureIndices[0] = 0xFFFF;
-            sSpecularFresnelTextureIndices[1] = 0xFFFF;
-            sSpecularFresnelTextureIndices[2] = 0xFFFF;
-            sSpecularFresnelTextureIndices[3] = 0xFFFF;
-            sSpecularFresnelTextureIndices[4] = 0xFFFF;
-            sSpecularFresnelIndicesInitialized = true;
-        }
-        if (sSpecularFresnelTextureIndices[fresnelRamp] == 0xFFFF
-            || sSpecularFresnelTextureIndices[fresnelRamp] == 0)
-        {
-            sSpecularFresnelTextureIndices[fresnelRamp] = glGetTextureManager()->GetTextureIndex(fresnelTexture);
-        }
-        glTextureBinding fresnelBinding;
-        fresnelBinding.texture = fresnelTexture;
-        fresnelBinding.flags = 0;
-        fresnelBinding.SetWrapS(true);
-        fresnelBinding.SetWrapT(true);
-        fresnelBinding.unknown07 = 0;
-        fresnelBinding.textureIndex = sSpecularFresnelTextureIndices[fresnelRamp];
-        glx_BindTexture(4, &fresnelBinding);
+        glxBindFresnelTexture(4, fresnelTexture, fresnelRamp,
+            sSpecularFresnelTextureIndices, sSpecularFresnelIndicesInitialized);
         sSpecularFresnelBoundTexture = fresnelTexture;
     }
 

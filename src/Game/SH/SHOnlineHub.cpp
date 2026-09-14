@@ -72,7 +72,7 @@ SHOnlineHub::~SHOnlineHub()
 {
 }
 
-void SHOnlineHub::OnPointerPress(int index, void* context)
+void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
 {
     int item = (int)context;
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
@@ -148,12 +148,12 @@ void SHOnlineHub::SceneCreated()
     }
     for (int i = 0; i < 4; ++i)
     {
-        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide, "Layer", sOnlineHubButtonNames[i]);
+        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(presentation->m_currentSlide, "Layer", sOnlineHubButtonNames[i]);
         mUnidentified2F0[i] = instance != 0 ? instance : &UnidentifiedTLComponentDefault::sInstance;
     }
     TLComponentInstance* help = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "HELP_BUTTON");
     help->SetActiveSlide(IsWidescreen() ? "16:9" : "4:3", true, false);
-    TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(help, "HELP");
+    TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(help, "HELP");
     mUnidentified3B4 = instance != 0 ? instance : &UnidentifiedTLComponentDefault::sInstance;
     SHNavigation* scene = GetNavigationScene();
     TLComponentInstance* done = 0;
@@ -356,7 +356,7 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
             ++days;
         }
     }
-    text = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide, "Layer", "subheading");
+    text = FEFinder<TLTextInstance, 3>::Find<>(mPresentation->m_currentSlide, "Layer", "subheading");
     WideString string = Format(WideString(LookupLocString("ONLINE_HUB_DAYS_REMAIN")), days, hours, minutes);
     memcpy(mUnidentified528, string.c_str(), sizeof(mUnidentified528));
     text->SetString(mUnidentified528);
@@ -368,15 +368,15 @@ void SHOnlineHub::UpdateLocalStats()
         mUnidentified5A8 = *NetworkStatsManager::Instance()->GetLocalStats(0);
     if (NetworkStatsManager::Instance()->GetLocalStats(1) != 0)
         mUnidentified590 = *NetworkStatsManager::Instance()->GetLocalStats(1);
-    TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide, "Layer", "summary");
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(summary, "name");
+    TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find<>(mPresentation->m_currentSlide, "Layer", "summary");
+    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(summary, "name");
     nlStrNCpy(mUnidentified640, gNetworkMiiNameWide, 24);
     text->SetString(mUnidentified640);
-    text = FEFinder<TLTextInstance, 3>::Find(summary, "therecord");
+    text = FEFinder<TLTextInstance, 3>::Find<>(summary, "therecord");
     WideString points = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_POINTS_TODAY")), mUnidentified590.mScore);
     nlStrNCpy(mUnidentified6D0, points.c_str(), 48);
     text->SetString(mUnidentified6D0);
-    text = FEFinder<TLTextInstance, 3>::Find(summary, "Rank");
+    text = FEFinder<TLTextInstance, 3>::Find<>(summary, "Rank");
     WideString rank = Format(WideString(LookupLocString("ONLINE_HUB_CURRENT_RANK")), mUnidentified5A8.mDisplayRank);
     nlStrNCpy(mUnidentified670, rank.c_str(), 48);
     text->SetString(mUnidentified670);
@@ -402,8 +402,8 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
             mUnidentified58D = false;
         }
     }
-    TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide, "Layer", "summary");
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(summary, "therecord2");
+    TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find<>(mPresentation->m_currentSlide, "Layer", "summary");
+    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(summary, "therecord2");
     if (mUnidentified58D)
     {
         WideString string = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_POINTS")), mUnidentified628.mScore);
@@ -413,7 +413,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
     }
     else
         text->m_bVisible = false;
-    text = FEFinder<TLTextInstance, 3>::Find(summary, "sotd description");
+    text = FEFinder<TLTextInstance, 3>::Find<>(summary, "sotd description");
     if (mUnidentified58D)
     {
         WideString string = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_DESCRIPTION")), mUnidentified5C0.mName);
@@ -434,7 +434,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
 
 void SHOnlineHub::InitializeButtons()
 {
-    typedef Detail::MemFunImpl<void, void (SHOnlineHub::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHOnlineHub::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHOnlineHub*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineHub::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
@@ -455,7 +455,7 @@ void SHOnlineHub::InitializeButtons()
     mUnidentified300.SetPointerPressCallback(down);
 }
 
-void SHOnlineHub::OnPointerEnter(int index, void* context)
+void SHOnlineHub::OnPointerEnter(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mUnidentified4B8[index];
@@ -476,7 +476,7 @@ void SHOnlineHub::OnPointerEnter(int index, void* context)
     }
 }
 
-void SHOnlineHub::OnPointerLeave(int index, void* context)
+void SHOnlineHub::OnPointerLeave(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mUnidentified4B8[index];

@@ -97,6 +97,9 @@ public:
 
     virtual bool IsPointerType() const;
 
+    cPlayer* GetPlayer() const { return mData.pPlayer; }
+    cTeam* GetTeam() const { return mData.pTeam; }
+
     bool IsSet() const;
     int fn_800C2BD4() const;
     bool fn_800C2BF8() const;

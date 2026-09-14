@@ -62,7 +62,7 @@ SHOptionsCheatsList::~SHOptionsCheatsList()
     }
 }
 
-void SHOptionsCheatsList::OnCheatPointerInside(int index, void* context)
+void SHOptionsCheatsList::OnCheatPointerInside(unsigned int index, void* context)
 {
     bool unlocked = false;
     int item = (int)context;
@@ -92,7 +92,7 @@ void SHOptionsCheatsList::OnCheatPointerInside(int index, void* context)
     }
 }
 
-void SHOptionsCheatsList::OnCheatPointerLeave(int index, void* context)
+void SHOptionsCheatsList::OnCheatPointerLeave(unsigned int index, void* context)
 {
     bool unlocked = false;
     unsigned int item = (unsigned int)context;
@@ -373,7 +373,7 @@ void SHOptionsCheatsList::SceneCreated()
 
 void SHOptionsCheatsList::InitializeButtons()
 {
-    typedef Detail::MemFunImpl<void, void (SHOptionsCheatsList::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHOptionsCheatsList::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHOptionsCheatsList*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback over(
@@ -413,7 +413,7 @@ void SHOptionsCheatsList::InitializeButtons()
     }
 }
 
-void SHOptionsCheatsList::OnCheatPointerEnter(int index, void* context)
+void SHOptionsCheatsList::OnCheatPointerEnter(unsigned int index, void* context)
 {
     bool unlocked = false;
     unsigned int item = (unsigned int)context;
@@ -444,7 +444,7 @@ void SHOptionsCheatsList::OnCheatPointerEnter(int index, void* context)
     }
 }
 
-void SHOptionsCheatsList::OnCheatPointerPress(int, void* context)
+void SHOptionsCheatsList::OnCheatPointerPress(unsigned int, void* context)
 {
     bool unlocked = false;
     int item = (int)context;

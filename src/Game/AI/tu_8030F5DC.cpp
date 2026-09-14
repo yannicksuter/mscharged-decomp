@@ -65,7 +65,7 @@ void UnidentifiedFielderInput::fn_8030F800(
 }
 
 unsigned long UnidentifiedFielderInput::fn_8030F9B4(
-    unsigned long key, bool concurrent) const
+    unsigned long key, unsigned long concurrent) const
 {
     return concurrent * key;
 }

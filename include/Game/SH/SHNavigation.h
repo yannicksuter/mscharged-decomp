@@ -28,6 +28,7 @@ public:
     {
         return &mPageControls;
     }
+    TLInstance* GetTimer() { return mTimer; }
     void ShowHomeButtonWarning();
     void SetPointerTeamColours();
     void ResetButtons(bool enabled);

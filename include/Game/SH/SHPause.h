@@ -26,9 +26,9 @@ public:
     inline void OnSelectRESUME(TLComponentInstance* instance);
     inline void TransitionOut(TransitionType newtype);
     void fn_8023A85C();
-    void fn_8023AB94(int index, void* context);
-    void fn_8023AC58(int index, void* context);
-    void fn_8023AD04(int index, void* context);
+    void fn_8023AB94(unsigned int index, void* context);
+    void fn_8023AC58(unsigned int index, void* context);
+    void fn_8023AD04(unsigned int index, void* context);
 
     /* 0x01C */ bool mGameIsOver;
     /* 0x020 */ float mQuitDelay;

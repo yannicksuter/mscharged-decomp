@@ -51,7 +51,7 @@ void GXMaterialProgramImpl<GXFloatTexturedColourMaterialProgram>::Draw(
                 static_cast<GXFloatTexturedColourMaterialProgram*>(this)->DrawIndexed(packet);
         }
     }
-    else
+    else if (sUseFloatTexturedColourDisplayLists)
     {
         GXCallDisplayList(packet->displayList->list, packet->displayList->size);
     }

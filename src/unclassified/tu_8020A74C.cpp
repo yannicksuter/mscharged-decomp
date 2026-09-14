@@ -57,7 +57,7 @@ TU8020A74CScene::~TU8020A74CScene()
 
 void TU8020A74CScene::fn_8020D5C8()
 {
-    typedef Detail::MemFunImpl<void, void (TU8020A74CScene::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (TU8020A74CScene::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, TU8020A74CScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback matchupOver(
@@ -88,7 +88,7 @@ void TU8020A74CScene::fn_8020D5C8()
     }
 }
 
-void TU8020A74CScene::fn_8020DBC4(int index, void* context)
+void TU8020A74CScene::fn_8020DBC4(unsigned int index, void* context)
 {
     ++mSelectionCounts[index];
     if (context == 0 && !mBracketComponent.HasOtherPointerState(1, index))
@@ -99,7 +99,7 @@ void TU8020A74CScene::fn_8020DBC4(int index, void* context)
     }
 }
 
-void TU8020A74CScene::fn_8020DC68(int index, void* context)
+void TU8020A74CScene::fn_8020DC68(unsigned int index, void* context)
 {
     --mSelectionCounts[index];
     if (context == 0 && !mBracketComponent.HasOtherPointerState(1, index))
@@ -109,7 +109,7 @@ void TU8020A74CScene::fn_8020DC68(int index, void* context)
     }
 }
 
-void TU8020A74CScene::fn_8020DCF4(int, void* context)
+void TU8020A74CScene::fn_8020DCF4(unsigned int, void* context)
 {
     mUnidentified2F9 = true;
     for (int i = 0; i < 4; ++i)
@@ -135,7 +135,7 @@ void TU8020A74CScene::fn_8020DCF4(int, void* context)
     }
 }
 
-void TU8020A74CScene::fn_8020DDC0(int index, void* context)
+void TU8020A74CScene::fn_8020DDC0(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mSelectionCounts[index];
@@ -144,7 +144,7 @@ void TU8020A74CScene::fn_8020DDC0(int index, void* context)
     mMatchupComponents[item].SetPointerState(1, index);
 }
 
-void TU8020A74CScene::fn_8020DE60(int index, void* context)
+void TU8020A74CScene::fn_8020DE60(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mSelectionCounts[index];

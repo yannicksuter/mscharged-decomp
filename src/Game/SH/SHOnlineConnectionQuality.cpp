@@ -104,7 +104,7 @@ void OnlineConnectionQualityScene::OnReturnTimer(FETimer* timer)
 
 void OnlineConnectionQualityScene::InitializeInput()
 {
-    typedef Detail::MemFunImpl<void, void (OnlineConnectionQualityScene::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (OnlineConnectionQualityScene::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, OnlineConnectionQualityScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback over(
@@ -124,7 +124,7 @@ void OnlineConnectionQualityScene::InitializeInput()
     }
 }
 
-void OnlineConnectionQualityScene::OnDecisionPointerPress(int index, void* context)
+void OnlineConnectionQualityScene::OnDecisionPointerPress(unsigned int index, void* context)
 {
     mUnidentified2F4[0]->m_bVisible = false;
     mUnidentified18C[0].Disable();
@@ -437,7 +437,7 @@ void OnlineConnectionQualityScene::Update(float dt)
     }
 }
 
-void OnlineConnectionQualityScene::OnDecisionPointerEnter(int index, void* context)
+void OnlineConnectionQualityScene::OnDecisionPointerEnter(unsigned int index, void* context)
 {
     ++mUnidentified020[index];
     mUnidentified2F4[(int)context]->SetActiveSlide("OVER", true, false);
@@ -445,7 +445,7 @@ void OnlineConnectionQualityScene::OnDecisionPointerEnter(int index, void* conte
     FEAudio::PlayAnimAudioEvent(0xDE912775, 0, 0, true);
 }
 
-void OnlineConnectionQualityScene::OnDecisionPointerLeave(int index, void* context)
+void OnlineConnectionQualityScene::OnDecisionPointerLeave(unsigned int index, void* context)
 {
     --mUnidentified020[index];
     mUnidentified2F4[(int)context]->SetActiveSlide("OFF", true, false);

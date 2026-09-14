@@ -29,10 +29,7 @@ void glSetIgnoreDuplicateModels(bool ignore)
 
 void RLGReader::LoadSkinData(nlChunk* chunk)
 {
-    unsigned char* data = (unsigned char*)chunk->GetAlignedData();
-    unsigned char* unalignedData = (unsigned char*)chunk->GetUnalignedData();
-    unsigned long size = chunk->GetSize() - (data - unalignedData)
-                       + sizeof(nlChunk);
+    unsigned long size = chunk->GetDataSize() + sizeof(nlChunk);
     nlChunk* skinData = (nlChunk*)nlMalloc(size, 32, false);
     memcpy(skinData, chunk, size);
     m_pResource->m_inventory->AddSkinData(
@@ -172,45 +169,31 @@ void RLGReader::Read(void* data)
                 break;
             case 0x1B016:
                 LoadPacketData(chunk->GetData(),
-                    chunk->GetSize()
-                        - ((unsigned char*)chunk->GetAlignedData()
-                            - (unsigned char*)chunk->GetUnalignedData()));
+                    chunk->GetDataSize());
                 break;
             case 0x1B006:
                 LoadVertices(chunk->GetData(),
-                    chunk->GetSize()
-                        - ((unsigned char*)chunk->GetAlignedData()
-                            - (unsigned char*)chunk->GetUnalignedData()));
+                    chunk->GetDataSize());
                 break;
             case 0x1B007:
                 LoadIndices(chunk->GetData(),
-                    chunk->GetSize()
-                        - ((unsigned char*)chunk->GetAlignedData()
-                            - (unsigned char*)chunk->GetUnalignedData()));
+                    chunk->GetDataSize());
                 break;
             case 0x1B005:
                 LoadStreams(chunk->GetData(),
-                    chunk->GetSize()
-                        - ((unsigned char*)chunk->GetAlignedData()
-                            - (unsigned char*)chunk->GetUnalignedData()));
+                    chunk->GetDataSize());
                 break;
             case 0x1B004:
                 LoadPackets(chunk->GetData(),
-                    chunk->GetSize()
-                        - ((unsigned char*)chunk->GetAlignedData()
-                            - (unsigned char*)chunk->GetUnalignedData()));
+                    chunk->GetDataSize());
                 break;
             case 0x1B002:
                 LoadModels(chunk->GetData(),
-                    chunk->GetSize()
-                        - ((unsigned char*)chunk->GetAlignedData()
-                            - (unsigned char*)chunk->GetUnalignedData()));
+                    chunk->GetDataSize());
                 break;
             case 0x1B003:
                 LoadMatrices(chunk->GetData(),
-                    chunk->GetSize()
-                        - ((unsigned char*)chunk->GetAlignedData()
-                            - (unsigned char*)chunk->GetUnalignedData()));
+                    chunk->GetDataSize());
                 break;
             case 0x8001B200:
             {

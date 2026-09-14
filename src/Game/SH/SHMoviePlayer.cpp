@@ -52,7 +52,7 @@ MoviePlayerScene::MoviePlayerScene()
 
 MoviePlayerScene::~MoviePlayerScene()
 {
-    if (GameInfoManager::Instance()->unknown_0x122)
+    if (GameInfoManager::Instance()->mIsInStrikers101Mode)
     {
         g_bRenderWorld = true;
     }
@@ -105,7 +105,7 @@ void MoviePlayerScene::Update(float fDeltaT)
         int fadeIn = GetConfigInt(gMovieConfig, var_68, 500);
         THPSimpleSetVolume(0, 0);
         THPSimpleSetVolume((int)(127.0f * volume), fadeIn);
-        if (GameInfoManager::Instance()->unknown_0x122)
+        if (GameInfoManager::Instance()->mIsInStrikers101Mode)
         {
             g_bRenderWorld = false;
         }

@@ -1186,9 +1186,13 @@ extern "C" void fn_8010EFDC(CupHistory* history, int index, OSCalendarTime* date
     history->mRecords[index][history->mWriteIndex[index]].mDay = date->mday - 1;
     history->mRecords[index][history->mWriteIndex[index]].mMonth = date->month;
     history->mRecords[index][history->mWriteIndex[index]].mYearOffset = date->year - 2000;
-    history->mRecords[index][history->mWriteIndex[index]].mUnidentified2B = records.mUnidentified86A0.mValues[0] - records.mUnidentified86A6.mValues[0];
-    history->mRecords[index][history->mWriteIndex[index]].mUnidentified32 = records.mUnidentified86A0.mValues[1] - records.mUnidentified86A6.mValues[1];
-    history->mRecords[index][history->mWriteIndex[index]].mUnidentified39 = records.mUnidentified86A0.mValues[2] - records.mUnidentified86A6.mValues[2];
+    CupRecord_8010C5C0 difference(
+        records.mUnidentified86A0.mValues[0] - records.mUnidentified86A6.mValues[0],
+        records.mUnidentified86A0.mValues[1] - records.mUnidentified86A6.mValues[1],
+        records.mUnidentified86A0.mValues[2] - records.mUnidentified86A6.mValues[2]);
+    history->mRecords[index][history->mWriteIndex[index]].mUnidentified2B = difference.mValues[0];
+    history->mRecords[index][history->mWriteIndex[index]].mUnidentified32 = difference.mValues[1];
+    history->mRecords[index][history->mWriteIndex[index]].mUnidentified39 = difference.mValues[2];
     switch (index)
     {
     case 4:
@@ -1597,7 +1601,8 @@ void CupManager::fn_8010BCB8(bool overtime, int winningSide)
             next->mTeamIndex[side] = winner;
             for (int i = 0; i < 3; i++)
             {
-                next->SetSidekick(side, info->GetSidekick(winningSide, i), i);
+                eSidekickID sidekick = info->GetSidekick(winningSide, i);
+                next->SetSidekick(side, sidekick, i);
             }
             next->mStadiumIndex = fn_8010B25C(false);
         }

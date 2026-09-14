@@ -37,9 +37,9 @@ public:
     void CentrePopup(float totalHeight, float topOfMessageBox);
     void fn_801C83AC(bool visible);
     void fn_801C8494();
-    void fn_801C87E0(int index, void* context);
-    void fn_801C88B4(int index, void* context);
-    void fn_801C8960(int index, void* context);
+    void fn_801C87E0(unsigned int index, void* context);
+    void fn_801C88B4(unsigned int index, void* context);
+    void fn_801C8960(unsigned int index, void* context);
     ePopupMenu fn_801CA644() const { return mType; }
     void SetBackButtonCallback(_FEPopupMenuCB callback);
 

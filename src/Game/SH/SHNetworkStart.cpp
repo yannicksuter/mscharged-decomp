@@ -58,7 +58,7 @@ NetworkStartScene::~NetworkStartScene()
 void NetworkStartScene::SetActionButtons(int state)
 {
     TLSlide* activeSlide = mPresentation->m_currentSlide;
-    TLComponentInstance* buttons = FEFinder<TLComponentInstance, 2>::Find(activeSlide, "Layer", "BUTTONS");
+    TLComponentInstance* buttons = FEFinder<TLComponentInstance, 2>::Find<>(activeSlide, "Layer", "BUTTONS");
 
     bool visible = true;
     if (state == 0)
@@ -111,7 +111,7 @@ void NetworkStartScene::fn_801FC7E4(int state)
     {
         char name[100];
         nlSNPrintf(name, sizeof(name), "Player%dTxt", i + 1);
-        mPlayerText[i] = FEFinder<TLTextInstance, 3>::Find(slide, "Layer", name);
+        mPlayerText[i] = FEFinder<TLTextInstance, 3>::Find<>(slide, "Layer", name);
         if (mPlayerText[i] != 0)
             mPlayerText[i]->SetString(mPlayerNames[i]);
     }
@@ -245,7 +245,7 @@ void NetworkStartScene::SceneCreated()
     presentation->SetActiveSlide("online options", true);
     for (int i = 0; i < 2; ++i)
     {
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 2>::Find(presentation->m_currentSlide, "Layer", menuNames[i]);
+        TLComponentInstance* component = FEFinder<TLComponentInstance, 2>::Find<>(presentation->m_currentSlide, "Layer", menuNames[i]);
         MenuItem<TLComponentInstance>* item = mMenuItems.AddItem(component);
         {
             MenuItem<TLComponentInstance>::Callback callback(Bind<void>(MemFun(&NetworkStartScene::SelectMenuItem), this, placeholder0));

@@ -101,6 +101,16 @@ public:
     static int CompareDraftTeams(const void* left, const void* right);
     bool HasDisconnectedPlayer(int team) const;
     void Update(float dt);
+    bool fn_8022819C() const { return mState != NET_DRAFT_IDLE; }
+    int fn_8022ED88()
+    {
+        if (mState != NET_DRAFT_SIDEKICKS)
+            return -1;
+        int countdown = (int)mTimeToChangeDrafters;
+        if (countdown < 0)
+            countdown = 0;
+        return countdown;
+    }
     int GetCountdown() const
     {
         int countdown = 0;

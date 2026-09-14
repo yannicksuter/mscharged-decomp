@@ -34,4 +34,6 @@ public:
     /* 0x614 */ TU80209584Summary mSummary;
 }; // size 0xA48
 
+void fn_801EDC90(bool online);
+
 #endif // _SHPAUSEPOSTGAME_H_

@@ -13,7 +13,7 @@
 
 extern "C" void fn_800B6A1C(
     UnidentifiedVariant_80054AB8*, int, const Variant&);
-extern "C" void fn_8031A04C();
+extern "C" bool fn_8031A04C();
 extern "C" void fn_80311C54(void*, unsigned long, void*);
 
 struct UnidentifiedFuzzyRuntimeReference
@@ -321,7 +321,7 @@ bool UnidentifiedFuzzyRuntimeBase::ExecuteFunction(
     return result;
 }
 
-extern "C" void* fn_80312358(void*, void* value)
+extern "C" char fn_80312358(void*, char value)
 {
     return value;
 }
@@ -423,7 +423,7 @@ float UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual6(float value)
 }
 
 float UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual7(
-    float first, float second, float third)
+    float first, float second, float third, bool)
 {
     third = third <= first ? third : first;
     if (third < first && first < 0.5f)
@@ -555,8 +555,8 @@ extern "C" void fn_80313FA0(
 }
 
 extern "C" void fn_80314034(
-    UnidentifiedFuzzyRuntimeBase* runtime, unsigned long hash,
-    float value, UnidentifiedVariant_80054AB8* action)
+    UnidentifiedFuzzyRuntimeBase* runtime, float value,
+    unsigned long hash, UnidentifiedVariant_80054AB8* action)
 {
     int index = fn_80312208(hash);
     FuzzyVariant variant(FT_FLOAT, value);
@@ -604,21 +604,22 @@ extern "C" float fn_80314428(
     return runtime->mCollection.mHead->mConfidence;
 }
 
-extern "C" void fn_80314434()
+extern "C" void fn_80314434(void*, UnidentifiedVariant_80054AB8*, float)
 {
 }
 
-extern "C" void fn_80314438()
+extern "C" void fn_80314438(void*, UnidentifiedVariant_80054AB8*)
 {
 }
 
-extern "C" void* fn_8031443C(void*, void* value)
+extern "C" void* fn_8031443C(void*, void* value, bool)
 {
     return value;
 }
 
-extern "C" void fn_80314444()
+extern "C" float fn_80314444(void*, float value, bool)
 {
+    return value;
 }
 
 extern "C" float fn_80314448(
@@ -688,7 +689,7 @@ extern "C" float fn_80314538(
 }
 
 extern "C" bool fn_803145C8(
-    UnidentifiedFuzzyRuntimeBase* runtime, bool concurrent)
+    UnidentifiedFuzzyRuntimeBase* runtime, unsigned long concurrent)
 {
     UnidentifiedFielderInput* value = runtime->mValue;
     unsigned long key = value->fn_8030F9B4(
@@ -698,7 +699,7 @@ extern "C" bool fn_803145C8(
 }
 
 extern "C" bool fn_8031462C(
-    UnidentifiedFuzzyRuntimeBase* runtime, bool concurrent)
+    UnidentifiedFuzzyRuntimeBase* runtime, unsigned long concurrent)
 {
     UnidentifiedFielderInput* value = runtime->mValue;
     unsigned long key = value->fn_8030F9B4(
@@ -708,7 +709,7 @@ extern "C" bool fn_8031462C(
 }
 
 extern "C" float fn_80314690(
-    UnidentifiedFuzzyRuntimeBase* runtime, bool concurrent)
+    UnidentifiedFuzzyRuntimeBase* runtime, unsigned long concurrent)
 {
     UnidentifiedFielderInput* value = runtime->mValue;
     unsigned long key = value->fn_8030F9B4(
@@ -718,7 +719,7 @@ extern "C" float fn_80314690(
 }
 
 extern "C" float fn_803146E8(
-    UnidentifiedFuzzyRuntimeBase* runtime, bool concurrent,
+    UnidentifiedFuzzyRuntimeBase* runtime, unsigned long concurrent,
     float seconds)
 {
     UnidentifiedFielderInput* value = runtime->mValue;
@@ -727,7 +728,7 @@ extern "C" float fn_803146E8(
     return value->fn_8030FA10(key, seconds)->GetSeconds();
 }
 
-extern "C" void fn_80314740()
+extern "C" void fn_80314740(void*, bool)
 {
 }
 
@@ -745,9 +746,9 @@ extern "C" void fn_80314750(
     reference->mOwner->mTransition = transition;
 }
 
-extern "C" void fn_80314798()
+extern "C" bool fn_80314798(void*)
 {
-    fn_8031A04C();
+    return fn_8031A04C();
 }
 
 extern "C" UnidentifiedFuzzyRuntimeValue* fn_8031479C(

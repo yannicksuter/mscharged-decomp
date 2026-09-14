@@ -1,3 +1,4 @@
+#include "NL/nlIntersection.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 
@@ -29,8 +30,6 @@
 #include "NL/nlMemory.h"
 #include "NL/platvmath.h"
 
-extern "C" bool fn_802B6BC8(const nlVector3*, const nlVector3*,
-    const nlVector3*, const nlVector3*, float*, float*);
 extern "C" void fn_8014A180(cFielder*);
 extern "C" bool fn_800167A8(cBall*);
 extern "C" float fn_800156A8(cBall*);
@@ -278,8 +277,8 @@ void PhysicsWaluigiWall::PreCollide()
             nlVec2Set(c, mEndPoint.x + halfWidth * normal.x, mEndPoint.y + halfWidth * normal.y);
             nlVec2Set(d, mEndPoint.x + -halfWidth * normal.x, mEndPoint.y + -halfWidth * normal.y);
             float time1, wallTime1, time2, wallTime2;
-            bool hit1 = fn_802B6BC8(&start, &end, (const nlVector3*)&a, (const nlVector3*)&c, &time1, &wallTime1);
-            bool hit2 = fn_802B6BC8(&start, &end, (const nlVector3*)&b, (const nlVector3*)&d, &time2, &wallTime2);
+            bool hit1 = nlIntersectLineSegments2D((const nlVector2*)&start, (const nlVector2*)&end, &a, &c, &time1, &wallTime1);
+            bool hit2 = nlIntersectLineSegments2D((const nlVector2*)&start, (const nlVector2*)&end, &b, &d, &time2, &wallTime2);
             if (hit1 || hit2)
             {
                 float time = nlMinEquals(time1, time2);

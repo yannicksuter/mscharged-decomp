@@ -30,7 +30,6 @@ public:
     void BindParameters(const glModelPacket* packet);
 
     static GXCrystalMaterialProgram* Instance;
-    static bool Initialized;
     static GXMaterialParameter Parameters[3];
 };
 

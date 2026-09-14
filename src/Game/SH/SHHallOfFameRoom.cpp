@@ -47,7 +47,7 @@ void SHHallOfFameCup::HandlePointerEvent(
 
 void SHHallOfFameCup::InitializeButtons()
 {
-    typedef Detail::MemFunImpl<void, void (SHHallOfFameCup::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHHallOfFameCup::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHHallOfFameCup*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback enterFunc(PointerBinding(MemFun(&SHHallOfFameCup::OnItemPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
@@ -85,11 +85,11 @@ void SHHallOfFameCup::InitializeButtons()
     }
 }
 
-void SHHallOfFameCup::OnItemPointerInside(int, void*)
+void SHHallOfFameCup::OnItemPointerInside(unsigned int, void*)
 {
 }
 
-void SHHallOfFameCup::OnItemPointerLeave(int index, void* context)
+void SHHallOfFameCup::OnItemPointerLeave(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
 
@@ -110,7 +110,7 @@ void SHHallOfFameCup::OnItemPointerLeave(int index, void* context)
     }
 }
 
-void SHHallOfFameCup::OnProgressPointerEnter(int index, void*)
+void SHHallOfFameCup::OnProgressPointerEnter(unsigned int index, void*)
 {
     ++mPointerHoverCounts[index];
     if (!mProgressButton.HasOtherPointerState(1, index))
@@ -121,7 +121,7 @@ void SHHallOfFameCup::OnProgressPointerEnter(int index, void*)
     }
 }
 
-void SHHallOfFameCup::OnProgressPointerLeave(int index, void*)
+void SHHallOfFameCup::OnProgressPointerLeave(unsigned int index, void*)
 {
     --mPointerHoverCounts[index];
     if (!mProgressButton.HasOtherPointerState(1, index))
@@ -131,7 +131,7 @@ void SHHallOfFameCup::OnProgressPointerLeave(int index, void*)
     }
 }
 
-void SHHallOfFameCup::OnProgressPointerPress(int, void*)
+void SHHallOfFameCup::OnProgressPointerPress(unsigned int, void*)
 {
     for (int i = 0; i < 4; ++i)
     {
@@ -149,7 +149,7 @@ void SHHallOfFameProfile::HandlePointerEvent(
 
 void SHHallOfFameProfile::InitializeButtons()
 {
-    typedef Detail::MemFunImpl<void, void (SHHallOfFameProfile::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHHallOfFameProfile::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHHallOfFameProfile*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback enterFunc(PointerBinding(MemFun(&SHHallOfFameProfile::OnSummaryPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
@@ -162,7 +162,7 @@ void SHHallOfFameProfile::InitializeButtons()
     mSummaryButton.SetPointerPressCallback(pressFunc);
 }
 
-void SHHallOfFameProfile::OnSummaryPointerEnter(int index, void*)
+void SHHallOfFameProfile::OnSummaryPointerEnter(unsigned int index, void*)
 {
     ++mPointerHoverCounts[index];
     if (!mSummaryButton.HasOtherPointerState(1, index))
@@ -174,7 +174,7 @@ void SHHallOfFameProfile::OnSummaryPointerEnter(int index, void*)
     }
 }
 
-void SHHallOfFameProfile::OnSummaryPointerLeave(int index, void*)
+void SHHallOfFameProfile::OnSummaryPointerLeave(unsigned int index, void*)
 {
     --mPointerHoverCounts[index];
     if (!mSummaryButton.HasOtherPointerState(1, index))
@@ -186,7 +186,7 @@ void SHHallOfFameProfile::OnSummaryPointerLeave(int index, void*)
     }
 }
 
-void SHHallOfFameProfile::OnSummaryPointerPress(int, void*)
+void SHHallOfFameProfile::OnSummaryPointerPress(unsigned int, void*)
 {
     for (int i = 0; i < 4; ++i)
     {

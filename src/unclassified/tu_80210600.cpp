@@ -54,7 +54,7 @@ TU80210600Scene::~TU80210600Scene()
 {
 }
 
-void TU80210600Scene::fn_802107AC(int index, void* context)
+void TU80210600Scene::fn_802107AC(unsigned int index, void* context)
 {
     ++mUnidentified208[index];
     if (context == 0)
@@ -78,7 +78,7 @@ void TU80210600Scene::fn_802107AC(int index, void* context)
     }
 }
 
-void TU80210600Scene::fn_802108B0(int index, void* context)
+void TU80210600Scene::fn_802108B0(unsigned int index, void* context)
 {
     --mUnidentified208[index];
     if (context == 0)
@@ -100,7 +100,7 @@ void TU80210600Scene::fn_802108B0(int index, void* context)
     }
 }
 
-void TU80210600Scene::fn_80210984(int, void* context)
+void TU80210600Scene::fn_80210984(unsigned int, void* context)
 {
     mUnidentified205 = true;
     for (int i = 0; i < 4; ++i)
@@ -137,12 +137,12 @@ void TU80210600Scene::fn_80210984(int, void* context)
     }
 }
 
-void TU80210600Scene::fn_80210B00(int index, void* context)
+void TU80210600Scene::fn_80210B00(unsigned int index, void* context)
 {
     mUnidentified610[(unsigned int)context].SetPointerState(1, index);
 }
 
-void TU80210600Scene::fn_80210B1C(int index, void* context)
+void TU80210600Scene::fn_80210B1C(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     mUnidentified1C[item]->SetActiveSlide("off", true, false);
@@ -151,7 +151,7 @@ void TU80210600Scene::fn_80210B1C(int index, void* context)
 
 void TU80210600Scene::fn_80211FA4()
 {
-    typedef Detail::MemFunImpl<void, void (TU80210600Scene::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (TU80210600Scene::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, TU80210600Scene*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback componentOver(

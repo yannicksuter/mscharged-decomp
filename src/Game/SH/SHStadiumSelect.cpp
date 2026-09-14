@@ -112,11 +112,11 @@ void StadiumSelectScene::SceneCreated()
 {
     mMoviePlayer.Initialize("art/movies/stadiumtest.thp");
 
-    mStadiumNames = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(mPresentation->m_currentSlide, "Layer", "stadium_names");
-    mLockedIcon = FEFinder<TLInstance, TLAT_UNKNOWN>::Find(mPresentation->m_currentSlide, "Layer", "locked");
+    mStadiumNames = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<>(mPresentation->m_currentSlide, "Layer", "stadium_names");
+    mLockedIcon = FEFinder<TLInstance, TLAT_UNKNOWN>::Find<>(mPresentation->m_currentSlide, "Layer", "locked");
     mLockedIcon->m_bVisible = false;
 
-    TLTextInstance* tickerText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(mPresentation->m_currentSlide, "Layer", "TickerText");
+    TLTextInstance* tickerText = FEFinder<TLTextInstance, TLAT_TEXT>::Find<>(mPresentation->m_currentSlide, "Layer", "TickerText");
     if (tickerText != 0)
     {
         glGetScreenInfo();
@@ -274,7 +274,7 @@ void StadiumSelectScene::Update(float deltaTime)
     BaseSceneHandler::Update(deltaTime);
     if (!mControlsInitialized)
     {
-        TLInstance* titles = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(mPresentation->m_currentSlide, "Layer", "SCREEN_TITLES");
+        TLInstance* titles = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<>(mPresentation->m_currentSlide, "Layer", "SCREEN_TITLES");
         TLSlide* slide = ((TLComponentInstance*)(titles == 0 ? &UnidentifiedTLComponentDefault::sInstance : titles))->GetActiveSlide();
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {

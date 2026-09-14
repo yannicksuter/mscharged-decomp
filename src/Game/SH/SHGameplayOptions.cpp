@@ -479,9 +479,9 @@ void SHGameplayOptions::fn_802365F0(int item)
 
 void SHGameplayOptions::fn_80236ADC(int type, int value)
 {
-    TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(mPresentation,
+    TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(mPresentation,
         nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("GAMEPLAYOPTIONS SETTING"), 0, 0, 0);
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(instance->GetActiveSlide(), InlineHasher("GAMEPLAY OPTIONS SETTING"));
+    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(instance->GetActiveSlide(), InlineHasher("GAMEPLAY OPTIONS SETTING"));
     unsigned short number[4];
     nlSNPrintf(number, 4, (const unsigned short*)L"%d", value);
     const char* id = "X_GOALS";
@@ -494,7 +494,7 @@ void SHGameplayOptions::fn_80236ADC(int type, int value)
 
 void SHGameplayOptions::fn_80236E54()
 {
-    typedef Detail::MemFunImpl<void, void (SHGameplayOptions::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHGameplayOptions::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHGameplayOptions*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback over(PointerBinding(MemFun(&SHGameplayOptions::fn_802378F8), this, Placeholder<0>(), Placeholder<1>()));
@@ -542,7 +542,7 @@ void SHGameplayOptions::fn_80236E54()
     mDoneButton.SetPointerPressCallback(nextDown);
 }
 
-void SHGameplayOptions::fn_802378F8(int index, void* context)
+void SHGameplayOptions::fn_802378F8(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     if (!mOptionButtons[item].HasOtherPointerState(2, -1))
@@ -558,7 +558,7 @@ void SHGameplayOptions::fn_802378F8(int index, void* context)
     }
 }
 
-void SHGameplayOptions::fn_802379D0(int index, void* context)
+void SHGameplayOptions::fn_802379D0(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     if (!mOptionButtons[item].HasOtherPointerState(2, -1))
@@ -572,7 +572,7 @@ void SHGameplayOptions::fn_802379D0(int index, void* context)
     }
 }
 
-void SHGameplayOptions::fn_80237A80(int index, void* context)
+void SHGameplayOptions::fn_80237A80(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     if (mOptionButtons[item].HasOtherPointerState(2, -1))
@@ -619,7 +619,7 @@ void SHGameplayOptions::fn_80237A80(int index, void* context)
         mOptionButtons[previous].SetPointerState(0, j);
 }
 
-void SHGameplayOptions::fn_80237C7C(int index, void* context)
+void SHGameplayOptions::fn_80237C7C(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mPointerInsideCounts[index];
@@ -632,7 +632,7 @@ void SHGameplayOptions::fn_80237C7C(int index, void* context)
     }
 }
 
-void SHGameplayOptions::fn_80237D34(int index, void* context)
+void SHGameplayOptions::fn_80237D34(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mPointerInsideCounts[index];
@@ -643,7 +643,7 @@ void SHGameplayOptions::fn_80237D34(int index, void* context)
     }
 }
 
-void SHGameplayOptions::fn_80237DE0(int index, void* context)
+void SHGameplayOptions::fn_80237DE0(unsigned int index, void* context)
 {
     SHOptionsCheatsList* scene = (SHOptionsCheatsList*)GameSceneManager::Instance()->Push((SceneList)28, SCREEN_NOTHING, false);
     scene->mCheatCategory = (int)context;
@@ -652,7 +652,7 @@ void SHGameplayOptions::fn_80237DE0(int index, void* context)
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
 }
 
-void SHGameplayOptions::fn_80237E70(int index, void* context)
+void SHGameplayOptions::fn_80237E70(unsigned int index, void* context)
 {
     ++mPointerInsideCounts[index];
     mDoneButton.SetPointerState(1, index);
@@ -663,7 +663,7 @@ void SHGameplayOptions::fn_80237E70(int index, void* context)
     }
 }
 
-void SHGameplayOptions::fn_80237EF8(int index, void* context)
+void SHGameplayOptions::fn_80237EF8(unsigned int index, void* context)
 {
     --mPointerInsideCounts[index];
     mDoneButton.SetPointerState(0, index);
@@ -671,7 +671,7 @@ void SHGameplayOptions::fn_80237EF8(int index, void* context)
         mDoneButtonInstance->SetActiveSlide("off", true, false);
 }
 
-void SHGameplayOptions::fn_80237F68(int index, void* context)
+void SHGameplayOptions::fn_80237F68(unsigned int index, void* context)
 {
     mUnidentified15FC = 2;
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);

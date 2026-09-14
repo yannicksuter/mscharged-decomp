@@ -34,13 +34,13 @@ public:
     virtual void InitializeButtons();
     virtual void HandlePointerEvent(const FEPointerEvent* event, int index, float fDeltaT);
 
-    void OnItemPointerInside(int index, void* context);
-    void OnItemPointerEnter(int index, void* context);
-    void OnItemPointerLeave(int index, void* context);
-    void OnItemPointerPress(int index, void* context);
-    void OnProgressPointerEnter(int index, void* context);
-    void OnProgressPointerLeave(int index, void* context);
-    void OnProgressPointerPress(int index, void* context);
+    void OnItemPointerInside(unsigned int index, void* context);
+    void OnItemPointerEnter(unsigned int index, void* context);
+    void OnItemPointerLeave(unsigned int index, void* context);
+    void OnItemPointerPress(unsigned int index, void* context);
+    void OnProgressPointerEnter(unsigned int index, void* context);
+    void OnProgressPointerLeave(unsigned int index, void* context);
+    void OnProgressPointerPress(unsigned int index, void* context);
     void ShowLockedItemMessage(unsigned int index);
 
     /* 0x12C */ FEPointerButton mCupButton;
@@ -63,9 +63,9 @@ public:
     virtual void InitializeButtons();
     virtual void HandlePointerEvent(const FEPointerEvent* event, int index, float fDeltaT);
 
-    void OnSummaryPointerEnter(int index, void* context);
-    void OnSummaryPointerLeave(int index, void* context);
-    void OnSummaryPointerPress(int index, void* context);
+    void OnSummaryPointerEnter(unsigned int index, void* context);
+    void OnSummaryPointerLeave(unsigned int index, void* context);
+    void OnSummaryPointerPress(unsigned int index, void* context);
 
     /* 0x12C */ FEPointerButton mSummaryButton;
     /* 0x1E0 */ TLComponentInstance* mSummaryButtonInstance;

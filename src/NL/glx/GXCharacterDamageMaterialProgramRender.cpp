@@ -15,6 +15,7 @@
 #include "NL/glx/glxGXColour.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/glx/glxTexture.h"
+#include "NL/glx/glxFresnelTexture.h"
 
 static int sCharacterDamageStageCount = 5;
 static int sCharacterDamageTexGenCount = 4;
@@ -228,30 +229,9 @@ void GXMaterialProgramImpl<GXCharacterDamageMaterialProgram>::Draw(
 
     if (megaBlend == 0.0f)
     {
-        int fresnelTextureSlot = sCharacterDamageFresnelTextureSlot;
         unsigned long fresnelTexture = sCharacterDamageFresnelTextures[fresnelRamp];
-        if (!sCharacterDamageFresnelIndicesInitialized)
-        {
-            sCharacterDamageFresnelTextureIndices[0] = 0xFFFF;
-            sCharacterDamageFresnelTextureIndices[1] = 0xFFFF;
-            sCharacterDamageFresnelTextureIndices[2] = 0xFFFF;
-            sCharacterDamageFresnelTextureIndices[3] = 0xFFFF;
-            sCharacterDamageFresnelTextureIndices[4] = 0xFFFF;
-            sCharacterDamageFresnelIndicesInitialized = true;
-        }
-        if (sCharacterDamageFresnelTextureIndices[fresnelRamp] == 0xFFFF
-            || sCharacterDamageFresnelTextureIndices[fresnelRamp] == 0)
-        {
-            sCharacterDamageFresnelTextureIndices[fresnelRamp] = glGetTextureManager()->GetTextureIndex(fresnelTexture);
-        }
-        glTextureBinding fresnelBinding;
-        fresnelBinding.texture = fresnelTexture;
-        fresnelBinding.flags = 0;
-        fresnelBinding.SetWrapS(true);
-        fresnelBinding.SetWrapT(true);
-        fresnelBinding.unknown07 = 0;
-        fresnelBinding.textureIndex = sCharacterDamageFresnelTextureIndices[fresnelRamp];
-        glx_BindTexture(fresnelTextureSlot, &fresnelBinding);
+        glxBindFresnelTexture(sCharacterDamageFresnelTextureSlot, fresnelTexture, fresnelRamp,
+            sCharacterDamageFresnelTextureIndices, sCharacterDamageFresnelIndicesInitialized);
     }
 
     nlMatrix4 model;

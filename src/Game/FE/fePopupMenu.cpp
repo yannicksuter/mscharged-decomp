@@ -681,7 +681,7 @@ void FEPopupMenu::fn_801C83AC(bool visible)
 
 void FEPopupMenu::fn_801C8494()
 {
-    typedef Detail::MemFunImpl<void, void (FEPopupMenu::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (FEPopupMenu::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, FEPopupMenu*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback enterCallback(PointerBinding(
@@ -701,7 +701,7 @@ void FEPopupMenu::fn_801C8494()
     }
 }
 
-void FEPopupMenu::fn_801C87E0(int index, void* context)
+void FEPopupMenu::fn_801C87E0(unsigned int index, void* context)
 {
     int optionIndex = (int)context;
     ++mUnidentifiedBF8[index];
@@ -715,7 +715,7 @@ void FEPopupMenu::fn_801C87E0(int index, void* context)
     mControllerComponents[optionIndex].SetPointerState(1, index);
 }
 
-void FEPopupMenu::fn_801C88B4(int index, void* context)
+void FEPopupMenu::fn_801C88B4(unsigned int index, void* context)
 {
     int optionIndex = (int)context;
     --mUnidentifiedBF8[index];
@@ -726,7 +726,7 @@ void FEPopupMenu::fn_801C88B4(int index, void* context)
     mControllerComponents[optionIndex].SetPointerState(0, index);
 }
 
-void FEPopupMenu::fn_801C8960(int index, void* context)
+void FEPopupMenu::fn_801C8960(unsigned int index, void* context)
 {
     FEAudio::EnableSounds(true);
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, true);

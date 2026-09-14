@@ -76,7 +76,7 @@ void SHOnlineGuestControllerSelect::UpdateDoneButtonVisibility()
             mDoneButton.mPreviousEvents[2] = event;
             mDoneButton.mPreviousEvents[3] = event;
 
-            for (unsigned int i = 0; i < 4; ++i)
+            for (int i = 0; i < 4; ++i)
             {
                 if (mDoneButton.GetPointerState(i) == 1)
                 {

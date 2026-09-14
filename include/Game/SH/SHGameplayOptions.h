@@ -21,15 +21,15 @@ public:
     void fn_802365F0(int item);
     void fn_80236ADC(int type, int value);
     void fn_80236E54();
-    void fn_802378F8(int index, void* context);
-    void fn_802379D0(int index, void* context);
-    void fn_80237A80(int index, void* context);
-    void fn_80237C7C(int index, void* context);
-    void fn_80237D34(int index, void* context);
-    void fn_80237DE0(int index, void* context);
-    void fn_80237E70(int index, void* context);
-    void fn_80237EF8(int index, void* context);
-    void fn_80237F68(int index, void* context);
+    void fn_802378F8(unsigned int index, void* context);
+    void fn_802379D0(unsigned int index, void* context);
+    void fn_80237A80(unsigned int index, void* context);
+    void fn_80237C7C(unsigned int index, void* context);
+    void fn_80237D34(unsigned int index, void* context);
+    void fn_80237DE0(unsigned int index, void* context);
+    void fn_80237E70(unsigned int index, void* context);
+    void fn_80237EF8(unsigned int index, void* context);
+    void fn_80237F68(unsigned int index, void* context);
     void fn_80238050();
     void UpdateCheatText();
 

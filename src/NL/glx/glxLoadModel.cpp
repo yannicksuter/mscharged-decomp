@@ -49,10 +49,7 @@ void GLXRLGReader::LoadVertexAnim(nlChunk* chunk)
 {
     LoadVertexAnimData(chunk);
     void* data = chunk->GetData();
-    unsigned long padding =
-        (unsigned char*)chunk->GetAlignedData()
-        - (unsigned char*)chunk->GetUnalignedData();
-    DCFlushRange(data, chunk->GetSize() - padding);
+    DCFlushRange(data, chunk->GetDataSize());
 }
 
 static void MoveLargestBoneWeightFirst(glModelPacket* packet)
@@ -200,10 +197,9 @@ GLSkinMesh* glx_MakeSkinMesh(
     nlChunk* outerChunk, glModel* models, cSHierarchy* hierarchy)
 {
     unsigned long i;
-    unsigned long count;
+    unsigned long num;
     unsigned long chunkSize;
-    unsigned char* unalignedData;
-    unsigned char* data;
+    char* pData;
 
     ShaderSkinMesh* mesh =
         new (nlMalloc(sizeof(ShaderSkinMesh), 8, false)) ShaderSkinMesh();
@@ -211,16 +207,13 @@ GLSkinMesh* glx_MakeSkinMesh(
     mesh->SetModel(models);
     mesh->SetHierarchy(hierarchy);
 
-    nlChunk* chunk = outerChunk->GetFirstChunk();
+    nlChunk* pChunk = outerChunk->GetFirstChunk();
     nlChunk* chunkEnd = outerChunk->GetLastChunk();
-    while (chunk != chunkEnd)
+    while (pChunk != chunkEnd)
     {
-        unsigned long chunkType = chunk->GetID();
-        unsigned char* result =
-            (unsigned char*)chunk->GetAlignedData();
-        unalignedData = (unsigned char*)chunk->GetUnalignedData();
-        chunkSize = chunk->GetSize() - (result - unalignedData);
-        data = (unsigned char*)chunk->GetData();
+        unsigned long chunkType = pChunk->GetID();
+        chunkSize = pChunk->GetDataSize();
+        pData = (char*)pChunk->GetData();
 
         switch (chunkType)
         {
@@ -228,50 +221,50 @@ GLSkinMesh* glx_MakeSkinMesh(
             break;
         case 0x1B00A:
         {
-            count = chunkSize / 0x44;
-            for (i = 0; i < count; ++i)
+            num = chunkSize / 0x44;
+            for (i = 0; i < num; ++i)
             {
-                unsigned long boneID = *(unsigned long*)data;
-                nlMatrix4 src;
-                nlMatrix4 inv;
-                memcpy(&src, data + 4, sizeof(nlMatrix4));
-                data += 0x44;
-                nlInvertMatrix(inv, src);
-                int nodeIndex = hierarchy->GetNodeIndexByID(boneID);
+                unsigned long boneid = *(unsigned long*)pData;
+                nlMatrix4 m0;
+                nlMatrix4 m1;
+                memcpy(&m0, pData + 4, sizeof(nlMatrix4));
+                pData += 0x44;
+                nlInvertMatrix(m1, m0);
+                int nodeIndex = hierarchy->GetNodeIndexByID(boneid);
                 if (nodeIndex != -1)
                 {
-                    mesh->SetBoneMatrix(nodeIndex, &inv);
+                    mesh->SetBoneMatrix(nodeIndex, &m1);
                 }
             }
             break;
         }
         case 0x1B00B:
         {
-            count = chunkSize >> 2;
+            num = chunkSize >> 2;
             BoneMapList* node =
                 new (nlMalloc(sizeof(BoneMapList), 8, false)) BoneMapList();
-            node->m_nBones = count;
+            node->m_nBones = num;
             node->m_pBoneIndices =
-                (int*)nlMalloc(count * sizeof(int), 8, false);
+                (int*)nlMalloc(num * sizeof(int), 8, false);
             node->m_pMatrices =
-                (nlMatrix4*)nlMalloc(count * sizeof(nlMatrix4), 8, false);
+                (nlMatrix4*)nlMalloc(num * sizeof(nlMatrix4), 8, false);
 
-            for (i = 0; i < count; ++i)
+            for (i = 0; i < num; ++i)
             {
-                unsigned long boneID = *(unsigned long*)data;
-                data += sizeof(unsigned long);
+                unsigned long boneid = *(unsigned long*)pData;
+                pData += sizeof(unsigned long);
                 node->m_pBoneIndices[i] =
-                    hierarchy->GetNodeIndexByID(boneID);
+                    hierarchy->GetNodeIndexByID(boneid);
             }
             nlRingAddEnd(&mesh->boneMaps, node);
             break;
         }
         case 0x1B00C:
         {
-            unsigned long numMorphs = *(unsigned long*)data;
-            data += sizeof(unsigned long);
-            unsigned long* morphIDs = (unsigned long*)data;
-            data += numMorphs * sizeof(unsigned long);
+            unsigned long numMorphs = *(unsigned long*)pData;
+            pData += sizeof(unsigned long);
+            unsigned long* morphIDs = (unsigned long*)pData;
+            pData += numMorphs * sizeof(unsigned long);
 
             mesh->SetNumMorphs(numMorphs);
             for (unsigned long i = 0; i < numMorphs; ++i)
@@ -279,9 +272,9 @@ GLSkinMesh* glx_MakeSkinMesh(
                 mesh->SetMorphID(i, morphIDs[i]);
             }
 
-            unsigned long elementSize = *(unsigned long*)data;
-            unsigned long numPackets = *(unsigned long*)(data + 4);
-            data += 8;
+            unsigned long elementSize = *(unsigned long*)pData;
+            unsigned long numPackets = *(unsigned long*)(pData + 4);
+            pData += 8;
             mesh->SetNumMorphs(numMorphs);
             mesh->SetNumMorphPackets(numPackets);
 
@@ -289,10 +282,10 @@ GLSkinMesh* glx_MakeSkinMesh(
             {
                 for (unsigned long morph = 0; morph < numMorphs; ++morph)
                 {
-                    unsigned long count = *(unsigned long*)data;
-                    data += sizeof(unsigned long);
-                    const MorphDelta* values = (const MorphDelta*)data;
-                    data += elementSize * count;
+                    unsigned long count = *(unsigned long*)pData;
+                    pData += sizeof(unsigned long);
+                    const MorphDelta* values = (const MorphDelta*)pData;
+                    pData += elementSize * count;
                     mesh->SetMorphDeltas(packetIndex, morph, count, values);
                 }
             }
@@ -300,11 +293,7 @@ GLSkinMesh* glx_MakeSkinMesh(
         }
         }
 
-        unsigned long nextOffset;
-        unsigned char* nextChunk = unalignedData + chunk->GetSize();
-        nextOffset = (unsigned long)nextChunk & 3;
-        chunk = (nlChunk*)(nextChunk
-            + (nextOffset != 0) * (4 - nextOffset));
+        pChunk = pChunk->GetNextChunk();
     }
 
     mesh->InitializeSkinData();

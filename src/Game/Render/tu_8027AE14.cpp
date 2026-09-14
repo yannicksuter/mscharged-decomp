@@ -32,7 +32,7 @@ extern "C" void fn_8027ADF4(StadiumDrawable_8027ADC0* object)
 }
 
 UnidentifiedObject_8027AE14::UnidentifiedObject_8027AE14(const nlVector3& param1)
-    : UnidentifiedObject_80188884(lbl_806DEE88
+    : TimedObject(lbl_806DEE88
           + nlRandomf(-lbl_806DEE8C, lbl_806DEE8C, &nlDefaultSeed))
     , mUnidentified010(param1)
     , mUnidentified020(false)

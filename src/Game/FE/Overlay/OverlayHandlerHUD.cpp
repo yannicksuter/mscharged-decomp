@@ -102,7 +102,7 @@ void HUDOverlay::SceneCreated()
     mUnidentified054.fn_801E8CD0(presentation);
     mUnidentified0AC.fn_801EB5CC(presentation, &mUnidentified054);
     SetTeamIcons();
-    if (nlSingleton<GameInfoManager>::Instance()->unknown_0x122)
+    if (nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode)
     {
         mUnidentified140.m_pTextInstanceClock[0]->m_bVisible = false;
         mUnidentified140.m_pTextInstanceClock[1]->m_bVisible = false;

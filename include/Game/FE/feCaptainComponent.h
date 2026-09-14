@@ -35,6 +35,7 @@ public:
     void fn_801DB69C(float dt);
     void fn_801DCB28();
     void fn_801DCC28();
+    void fn_801DCCEC();
     void fn_801DC824(bool visible0, bool visible1, bool visible2);
     int fn_801DCD74(int index);
     void fn_801DCD84(int value);
@@ -64,6 +65,7 @@ public:
     void fn_801DEDD0(int captain, int index, unsigned long flag);
     void fn_801DF85C(int sidekick, int index, unsigned long flag);
     void fn_801E0280(int value);
+    void fn_801E0AD0();
     void fn_801E0B8C(int captain, int opponent);
     void fn_801E0D8C(TLInstance* instance, int captain, unsigned char alpha);
     void fn_801E0F14(bool fire, bool crystal, bool striker);

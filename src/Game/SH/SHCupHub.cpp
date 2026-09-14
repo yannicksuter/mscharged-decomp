@@ -102,9 +102,9 @@ void CupHubScene::SceneCreated()
         highlight->SetActiveSlide("off", true, false);
     }
 
-    mUnidentified1C = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide, "Layer", "schedule screen", "MOVING_HIGHLIGHT");
+    mUnidentified1C = FEFinder<TLComponentInstance, 4>::Find<>(presentation->m_currentSlide, "Layer", "schedule screen", "MOVING_HIGHLIGHT");
     mUnidentified1C->m_bVisible = false;
-    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide, "Layer", "schedule screen", "scrollbar");
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find<>(presentation->m_currentSlide, "Layer", "schedule screen", "scrollbar");
 
     SHNavigation* navigation = GetNavigationScene();
     TLComponentInstance* backButton = 0;
@@ -353,7 +353,7 @@ void CupHubScene::fn_80201BE0(int index)
 
     TLTextInstance* roundText = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified20[index]->GetActiveSlide(), "matchup_content", "ROUND");
     TLTextInstance* gameText = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified20[index]->GetActiveSlide(), "matchup_content", "GAME");
-    FEFinder<TLImageInstance, 2>::Find(mUnidentified20[index]->GetActiveSlide(), "matchup_content", "round_bar");
+    FEFinder<TLImageInstance, 2>::Find<>(mUnidentified20[index]->GetActiveSlide(), "matchup_content", "round_bar");
     fn_802025F4(roundText, round + 1, gameText, matchup + 1, index);
 }
 
@@ -383,7 +383,7 @@ void CupHubScene::fn_802025F4(TLTextInstance* roundText, int round, TLTextInstan
 
 void CupHubScene::fn_80202C34()
 {
-    typedef Detail::MemFunImpl<void, void (CupHubScene::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (CupHubScene::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, CupHubScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback enter(PointerBinding(MemFun(&CupHubScene::fn_80203498), this, Placeholder<0>(), Placeholder<1>()));
@@ -408,7 +408,7 @@ void CupHubScene::fn_80202C34()
     mRulesComponent.SetPointerPressCallback(rulesPress);
 }
 
-void CupHubScene::fn_80203320(int index, void* context)
+void CupHubScene::fn_80203320(unsigned int index, void* context)
 {
     int row = (int)context;
     int round = mMatchupStates[mUnidentified304 + row][0];
@@ -432,7 +432,7 @@ void CupHubScene::fn_80203320(int index, void* context)
     }
 }
 
-void CupHubScene::fn_80203498(int index, void* context)
+void CupHubScene::fn_80203498(unsigned int index, void* context)
 {
     int row = (int)context;
     if (mMatchupStates[mUnidentified304 + row][1] == -1)
@@ -455,7 +455,7 @@ void CupHubScene::fn_80203498(int index, void* context)
     mUnidentified1C->SetActiveSlide(buffer, true, false);
 }
 
-void CupHubScene::fn_80203674(int index, void* context)
+void CupHubScene::fn_80203674(unsigned int index, void* context)
 {
     int row = (int)context;
     if (mMatchupStates[mUnidentified304 + row][1] != -1)
@@ -468,7 +468,7 @@ void CupHubScene::fn_80203674(int index, void* context)
     }
 }
 
-void CupHubScene::fn_802037E8(int index, void* context)
+void CupHubScene::fn_802037E8(unsigned int index, void* context)
 {
     int matchup = mMatchupStates[mUnidentified304 + (int)context][1];
     int state = mMatchupComponents[(int)context].GetPointerState(index);
@@ -486,7 +486,7 @@ void CupHubScene::fn_802037E8(int index, void* context)
     }
 }
 
-void CupHubScene::fn_80203980(int index, void* context)
+void CupHubScene::fn_80203980(unsigned int index, void* context)
 {
     if (context == 0 && !mRulesComponent.HasOtherPointerState(1, index))
     {
@@ -496,7 +496,7 @@ void CupHubScene::fn_80203980(int index, void* context)
     }
 }
 
-void CupHubScene::fn_80203A10(int index, void* context)
+void CupHubScene::fn_80203A10(unsigned int index, void* context)
 {
     if (context == 0 && !mRulesComponent.HasOtherPointerState(1, index))
     {
@@ -505,7 +505,7 @@ void CupHubScene::fn_80203A10(int index, void* context)
     }
 }
 
-void CupHubScene::fn_80203A88(int, void* context)
+void CupHubScene::fn_80203A88(unsigned int, void* context)
 {
     mUnidentified67C = true;
     for (int i = 0; i < 4; ++i)

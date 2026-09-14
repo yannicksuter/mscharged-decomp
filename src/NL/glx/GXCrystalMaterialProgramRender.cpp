@@ -147,7 +147,7 @@ void GXMaterialProgramImpl<GXCrystalMaterialProgram>::Draw(
                 static_cast<GXCrystalMaterialProgram*>(this)->DrawIndexed(packet);
         }
     }
-    else
+    else if (sUseCrystalDisplayLists)
     {
         GXCallDisplayList(packet->displayList->list, packet->displayList->size);
     }

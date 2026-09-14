@@ -765,7 +765,7 @@ void SHChooseSides2::BindChooseSideInstances()
 /**
  * Offset/Address/Size: 0x2A3C | 0x8021DC28 | size: 0xD4
  */
-void SHChooseSides2::fn_8021DC28(int index, void* context)
+void SHChooseSides2::fn_8021DC28(unsigned int index, void* context)
 {
     unsigned long side = (unsigned long)context;
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
@@ -785,7 +785,7 @@ void SHChooseSides2::fn_8021DC28(int index, void* context)
 /**
  * Offset/Address/Size: 0x2B10 | 0x8021DCFC | size: 0xB0
  */
-void SHChooseSides2::fn_8021DCFC(int index, void* context)
+void SHChooseSides2::fn_8021DCFC(unsigned int index, void* context)
 {
     unsigned long side = (unsigned long)context;
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
@@ -803,7 +803,7 @@ void SHChooseSides2::fn_8021DCFC(int index, void* context)
 /**
  * Offset/Address/Size: 0x2BC0 | 0x8021DDAC | size: 0x220
  */
-void SHChooseSides2::fn_8021DDAC(int index, void* context)
+void SHChooseSides2::fn_8021DDAC(unsigned int index, void* context)
 {
     unsigned long side = (unsigned long)context;
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
@@ -858,7 +858,7 @@ void SHChooseSides2::fn_8021DDAC(int index, void* context)
 /**
  * Offset/Address/Size: 0x2DE0 | 0x8021DFCC | size: 0xCC
  */
-void SHChooseSides2::fn_8021DFCC(int index, void*)
+void SHChooseSides2::fn_8021DFCC(unsigned int index, void*)
 {
     ++mControllerCounts[index];
     mHomeAwayComponent.SetPointerState(1, index);
@@ -880,7 +880,7 @@ void SHChooseSides2::fn_8021DFCC(int index, void*)
 /**
  * Offset/Address/Size: 0x2EAC | 0x8021E098 | size: 0xD8
  */
-void SHChooseSides2::fn_8021E098(int index, void*)
+void SHChooseSides2::fn_8021E098(unsigned int index, void*)
 {
     if (mHomeAwayComponent.GetPointerState(index) != 0)
         return;
@@ -905,7 +905,7 @@ void SHChooseSides2::fn_8021E098(int index, void*)
 /**
  * Offset/Address/Size: 0x2F84 | 0x8021E170 | size: 0x70
  */
-void SHChooseSides2::fn_8021E170(int index, void*)
+void SHChooseSides2::fn_8021E170(unsigned int index, void*)
 {
     --mControllerCounts[index];
     mHomeAwayComponent.SetPointerState(0, index);
@@ -918,7 +918,7 @@ void SHChooseSides2::fn_8021E170(int index, void*)
 /**
  * Offset/Address/Size: 0x2FF4 | 0x8021E1E0 | size: 0x27C
  */
-void SHChooseSides2::fn_8021E1E0(int, void*)
+void SHChooseSides2::fn_8021E1E0(unsigned int, void*)
 {
     if (mContext == PAUSE && fn_8021EED8(true))
         return;
@@ -1023,7 +1023,7 @@ const char* lbl_8051CAFC[3] = { "sk_2", "sk_1", "sk_0" };
 /**
  * Offset/Address/Size: 0x3460 | 0x8021E64C | size: 0x9C
  */
-void SHChooseSides2::fn_8021E64C(int index, void*)
+void SHChooseSides2::fn_8021E64C(unsigned int index, void*)
 {
     ++mControllerCounts[index];
     if (!mHelpComponent.HasOtherPointerState(1, index))
@@ -1037,7 +1037,7 @@ void SHChooseSides2::fn_8021E64C(int index, void*)
 /**
  * Offset/Address/Size: 0x34FC | 0x8021E6E8 | size: 0x84
  */
-void SHChooseSides2::fn_8021E6E8(int index, void*)
+void SHChooseSides2::fn_8021E6E8(unsigned int index, void*)
 {
     --mControllerCounts[index];
     if (!mHelpComponent.HasOtherPointerState(1, index))
@@ -1050,7 +1050,7 @@ void SHChooseSides2::fn_8021E6E8(int index, void*)
 /**
  * Offset/Address/Size: 0x3580 | 0x8021E76C | size: 0x1A4
  */
-void SHChooseSides2::fn_8021E76C(int, void*)
+void SHChooseSides2::fn_8021E76C(unsigned int, void*)
 {
     for (int i = 0; i < 4; ++i)
     {
@@ -1148,7 +1148,7 @@ void SHChooseSides2::fn_8021EB18()
             mHomeAwayComponent.mPreviousEvents[2] = event;
             mHomeAwayComponent.mPreviousEvents[3] = event;
 
-            for (unsigned int i = 0; i < 4; ++i)
+            for (int i = 0; i < 4; ++i)
             {
                 if (mHomeAwayComponent.GetPointerState(i) == 1)
                 {

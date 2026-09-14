@@ -1,3 +1,4 @@
+#include "NL/nlIntersection.h"
 #include "Game/Sys/audio.h"
 #include "Game/DetInput.h"
 #include "Game/AI/AvoidableObject.h"
@@ -174,9 +175,6 @@ extern "C" void fn_8002E2E4(cFielder* pFielder);
 extern "C" void fn_801BB640(cFielder* pFielder, int nParam);
 extern "C" void fn_8001458C(cBall* pBall);
 
-extern "C" bool fn_802B6BC8(const nlVector3* v3Start,
-    const nlVector3* v3End, const nlVector3* v3A, const nlVector3* v3B,
-    float* fOut1, float* fOut2);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern "C" void ResetButtonStateTicks(void* pPad, int nParam, int nParam2);
 
@@ -759,9 +757,9 @@ void cFielder::ActionHit(float fDeltaT)
                 PhysicsWaluigiWall* pObject
                     = pCaptain->mUnidentified3F8.mUnidentified08->GetWall(i);
                 if (pObject != 0
-                    && fn_802B6BC8(&rv3Position, &v3Target,
-                        &pObject->mStartPoint,
-                        &pObject->mEndPoint, &fT1, &fT2))
+                    && nlIntersectLineSegments2D((const nlVector2*)&rv3Position, (const nlVector2*)&v3Target,
+                        (const nlVector2*)&pObject->mStartPoint,
+                        (const nlVector2*)&pObject->mEndPoint, &fT1, &fT2))
                 {
                     bBlocked = true;
                 }

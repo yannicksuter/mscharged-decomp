@@ -15,15 +15,15 @@ public:
     virtual ~SHOnlineHub();
     virtual void SceneCreated();
     virtual void Update(float dt);
-    void OnPointerPress(int index, void* context);
+    void OnPointerPress(unsigned int index, void* context);
     void OnDialogDismissed();
     void OnErrorDismissed();
     void UpdateFriendAndSeasonText();
     void UpdateLocalStats();
     void UpdateStrikerOfTheDay();
     void InitializeButtons();
-    void OnPointerEnter(int index, void* context);
-    void OnPointerLeave(int index, void* context);
+    void OnPointerEnter(unsigned int index, void* context);
+    void OnPointerLeave(unsigned int index, void* context);
 
     /* 0x01C */ u32 mUnidentified01C;
     /* 0x020 */ FEPointerButton mUnidentified020[4];

@@ -16,11 +16,11 @@ public:
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
-    void fn_802107AC(int index, void* context);
-    void fn_802108B0(int index, void* context);
-    void fn_80210984(int index, void* context);
-    void fn_80210B00(int index, void* context);
-    void fn_80210B1C(int index, void* context);
+    void fn_802107AC(unsigned int index, void* context);
+    void fn_802108B0(unsigned int index, void* context);
+    void fn_80210984(unsigned int index, void* context);
+    void fn_80210B00(unsigned int index, void* context);
+    void fn_80210B1C(unsigned int index, void* context);
     void fn_802119C8();
     bool fn_80211B18(int value0, int value1);
     void fn_80211FA4();

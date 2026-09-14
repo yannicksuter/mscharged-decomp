@@ -28,17 +28,17 @@ public:
 
     void fn_8021CBD0();
     void BindChooseSideInstances();
-    void fn_8021DC28(int index, void* context);
-    void fn_8021DCFC(int index, void* context);
-    void fn_8021DDAC(int index, void* context);
-    void fn_8021DFCC(int index, void* context);
-    void fn_8021E098(int index, void* context);
-    void fn_8021E170(int index, void* context);
-    void fn_8021E1E0(int index, void* context);
+    void fn_8021DC28(unsigned int index, void* context);
+    void fn_8021DCFC(unsigned int index, void* context);
+    void fn_8021DDAC(unsigned int index, void* context);
+    void fn_8021DFCC(unsigned int index, void* context);
+    void fn_8021E098(unsigned int index, void* context);
+    void fn_8021E170(unsigned int index, void* context);
+    void fn_8021E1E0(unsigned int index, void* context);
     void Proceed();
-    void fn_8021E64C(int index, void* context);
-    void fn_8021E6E8(int index, void* context);
-    void fn_8021E76C(int index, void* context);
+    void fn_8021E64C(unsigned int index, void* context);
+    void fn_8021E6E8(unsigned int index, void* context);
+    void fn_8021E76C(unsigned int index, void* context);
     void fn_8021E910(int index);
     void fn_8021EB18();
     void fn_8021ED64(TLImageInstance* image, int sidekick, int team);

@@ -564,7 +564,7 @@ void SHOnlineMiiSelect::UpdatePage()
 
 void SHOnlineMiiSelect::InitializeButtons()
 {
-    typedef Detail::MemFunImpl<void, void (SHOnlineMiiSelect::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHOnlineMiiSelect::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHOnlineMiiSelect*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback over(
@@ -584,7 +584,7 @@ void SHOnlineMiiSelect::InitializeButtons()
     }
 }
 
-void SHOnlineMiiSelect::OpenItem(int index, void* context)
+void SHOnlineMiiSelect::OpenItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mHoverCounts[index];
@@ -596,7 +596,7 @@ void SHOnlineMiiSelect::OpenItem(int index, void* context)
     }
 }
 
-void SHOnlineMiiSelect::CloseItem(int index, void* context)
+void SHOnlineMiiSelect::CloseItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mHoverCounts[index];
@@ -604,7 +604,7 @@ void SHOnlineMiiSelect::CloseItem(int index, void* context)
     mMiiButtons[item].SetPointerState(0, index);
 }
 
-void SHOnlineMiiSelect::SelectMii(int, void* context)
+void SHOnlineMiiSelect::SelectMii(unsigned int, void* context)
 {
     for (int i = 0; i < 4; ++i)
     {

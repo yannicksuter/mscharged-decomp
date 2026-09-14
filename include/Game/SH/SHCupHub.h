@@ -23,13 +23,13 @@ public:
     void fn_80201BE0(int index);
     void fn_802025F4(TLTextInstance* roundText, int round, TLTextInstance* gameText, int game, int index);
     void fn_80202C34();
-    void fn_80203320(int index, void* context);
-    void fn_80203498(int index, void* context);
-    void fn_80203674(int index, void* context);
-    void fn_802037E8(int index, void* context);
-    void fn_80203980(int index, void* context);
-    void fn_80203A10(int index, void* context);
-    void fn_80203A88(int index, void* context);
+    void fn_80203320(unsigned int index, void* context);
+    void fn_80203498(unsigned int index, void* context);
+    void fn_80203674(unsigned int index, void* context);
+    void fn_802037E8(unsigned int index, void* context);
+    void fn_80203980(unsigned int index, void* context);
+    void fn_80203A10(unsigned int index, void* context);
+    void fn_80203A88(unsigned int index, void* context);
     void fn_80203B54();
 
     /* 0x01C */ TLComponentInstance* mUnidentified1C;

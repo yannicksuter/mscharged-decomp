@@ -16,7 +16,8 @@ public:
     unsigned int GetChunkAlignment();
     bool IsAlignedChunk();
     unsigned int GetSize();
-    unsigned int GetID();
+    unsigned long GetDataSize();
+    unsigned long GetID();
 
     unsigned int m_ID;
     unsigned int m_Size;
@@ -86,7 +87,14 @@ inline unsigned int nlChunk::GetSize()
     return m_Size;
 }
 
-inline unsigned int nlChunk::GetID()
+inline unsigned long nlChunk::GetDataSize()
+{
+    unsigned long size = (u8*)GetAlignedData() - (u8*)GetUnalignedData();
+    size = m_Size - size;
+    return size;
+}
+
+inline unsigned long nlChunk::GetID()
 {
     return m_ID & 0x80FFFFFF;
 }

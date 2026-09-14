@@ -51,15 +51,15 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "NL/nlTicker.h"
-#include "unclassified/tu_80188884.h"
+#include "Game/Render/TimedObject.h"
 #include "Game/Render/CrowdImpostors.h"
-#include "unclassified/tu_801A6824.h"
+#include "Game/Render/MegastrikeBackgroundOverlay.h"
 #include "unclassified/tu_801A6AAC.h"
 #include "Game/Render/PeachPhoto.h"
 #include "Game/Render/NumberDisplay.h"
 #include "Game/Render/Warble.h"
 #include "unclassified/tu_802B7798.h"
-#include "unclassified/tu_8037091C.h"
+#include "Game/Render/ShadowVolume.h"
 
 #include <string.h>
 
@@ -204,9 +204,9 @@ void GameRenderTask::Run(float fDeltaT)
     ImpostorManager::GetInstance()->InvalidateCapture();
     DrawableNetMesh::Reset();
 
-    if (UnidentifiedManager_80188928::Instance() != 0)
+    if (TimedObjectManager::Instance() != 0)
     {
-        UnidentifiedManager_80188928::Instance()->Update(fDeltaT);
+        TimedObjectManager::Instance()->Update(fDeltaT);
     }
 
     if (NisPlayer::Instance()->fn_8027E64C())
@@ -467,7 +467,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
         }
 
         ShootToScoreMeter::instance.UpdateAndRender(fDeltaT);
-        gScreenOverlay_801A6824.UpdateAndRender(fDeltaT);
+        gMegastrikeBackgroundOverlay.UpdateAndRender(fDeltaT);
     }
     else if (currState == 0x10)
     {

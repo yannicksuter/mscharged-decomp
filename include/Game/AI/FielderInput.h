@@ -66,7 +66,7 @@ public:
 
     void fn_8030F74C(bool deleteOwner, bool deleteController);
     void fn_8030F800(bool updateController, float dt);
-    unsigned long fn_8030F9B4(unsigned long key, bool concurrent) const;
+    unsigned long fn_8030F9B4(unsigned long key, unsigned long concurrent) const;
     Timer* fn_8030F9BC(unsigned long key);
     Timer* fn_8030FA10(unsigned long key, float seconds);
     bool fn_8030FB7C(unsigned long key);

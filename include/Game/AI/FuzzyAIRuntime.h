@@ -82,7 +82,7 @@ public:
     virtual float UnidentifiedVirtual4(float, float);
     virtual float UnidentifiedVirtual5(float);
     virtual float UnidentifiedVirtual6(float);
-    virtual float UnidentifiedVirtual7(float, float, float);
+    virtual float UnidentifiedVirtual7(float, float, float, bool);
     virtual float UnidentifiedVirtual8();
     virtual UnidentifiedVariant_80054AB8* UnidentifiedVirtual9();
     virtual float UnidentifiedVirtual10(float);
@@ -109,6 +109,7 @@ class UnidentifiedFuzzyRuntime : public UnidentifiedFuzzyRuntimeBase
 {
 public:
     UnidentifiedFuzzyRuntime();
+    float fn_800E34F4(unsigned long hash);
     virtual ~UnidentifiedFuzzyRuntime();
     virtual void DoFunctionCall(unsigned int);
     virtual float UnidentifiedVirtual8();

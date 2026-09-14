@@ -136,13 +136,13 @@ void SHOnlineFriendsDraft::SceneCreated()
     {
         char buffer[32];
         nlSNPrintf(buffer, sizeof(buffer), "FRIEND_%d", i);
-        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(
             mPresentation->GetActiveSlide(), "Layer", buffer);
         if (instance == 0)
             instance = &UnidentifiedTLComponentDefault::sInstance;
         mPlayerRowInstances[i] = instance;
     }
-    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find<>(
         mPresentation->GetActiveSlide(), "Layer", "scrollbar");
     mScrollBar.SetComponent(scrollbar == 0 ? &UnidentifiedTLComponentDefault::sInstance : scrollbar);
     mScrollBar.SetRange(0);
@@ -152,11 +152,11 @@ void SHOnlineFriendsDraft::SceneCreated()
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
 
-    TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::Find(
+    TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::Find<>(
         mPresentation->GetActiveSlide(), "Layer", "Title2");
-    TLTextInstance* title1 = FEFinder<TLTextInstance, TLAT_TEXT>::Find(title->GetActiveSlide(), "Title");
-    TLTextInstance* title2 = FEFinder<TLTextInstance, TLAT_TEXT>::Find(title->GetActiveSlide(), "Title2");
-    TLTextInstance* title3 = FEFinder<TLTextInstance, TLAT_TEXT>::Find(title->GetActiveSlide(), "Title3");
+    TLTextInstance* title1 = FEFinder<TLTextInstance, TLAT_TEXT>::Find<>(title->GetActiveSlide(), "Title");
+    TLTextInstance* title2 = FEFinder<TLTextInstance, TLAT_TEXT>::Find<>(title->GetActiveSlide(), "Title2");
+    TLTextInstance* title3 = FEFinder<TLTextInstance, TLAT_TEXT>::Find<>(title->GetActiveSlide(), "Title3");
     title1->SetStringId("TITLE_LW_DOMINATION_DRAFT");
     title2->SetStringId("TITLE_LW_DOMINATION_DRAFT");
     title3->SetStringId("TITLE_LW_DOMINATION_DRAFT");
@@ -176,7 +176,7 @@ void SHOnlineFriendsDraft::UpdateCountdown(int countdown)
 {
     mCountdownSeconds = countdown;
     TLSlide* timerSlide = mPresentation->GetActiveSlide();
-    FEFinder<TLTextInstance, TLAT_TEXT>::Find(timerSlide, "Layer", "Timer")->m_bVisible = false;
+    FEFinder<TLTextInstance, TLAT_TEXT>::Find<TLSlide>(timerSlide, "Layer", "Timer")->m_bVisible = false;
     TLTextInstance* text = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
     if (countdown == -1)
         text->m_bVisible = false;

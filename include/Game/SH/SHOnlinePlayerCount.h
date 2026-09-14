@@ -16,9 +16,9 @@ public:
     virtual void SceneCreated();
 
     void InitializeButtons();
-    void OnButtonPointerEnter(int index, void* context);
-    void OnButtonPointerLeave(int index, void* context);
-    void OnButtonPointerPress(int index, void* context);
+    void OnButtonPointerEnter(unsigned int index, void* context);
+    void OnButtonPointerLeave(unsigned int index, void* context);
+    void OnButtonPointerPress(unsigned int index, void* context);
 
     /* 0x01C */ FEBackButton mBackButton;
     /* 0x0F4 */ FEPointerButton mButtons[2];

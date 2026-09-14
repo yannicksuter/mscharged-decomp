@@ -204,7 +204,7 @@ void SHOnlineInvitePreview::SceneCreated()
     mPreviewDelayTimer.SetEnabled(true);
 }
 
-void SHOnlineInvitePreview::OnContinuePointerEnter(int index, void*)
+void SHOnlineInvitePreview::OnContinuePointerEnter(unsigned int index, void*)
 {
     mContinueButtonInstance->SetActiveSlide("over", true, false);
     mContinueButton.SetPointerState(1, index);
@@ -212,14 +212,14 @@ void SHOnlineInvitePreview::OnContinuePointerEnter(int index, void*)
     FEAudio::PlayAnimAudioEvent(0xDE912775, 0, 0, 1);
 }
 
-void SHOnlineInvitePreview::OnContinuePointerLeave(int index, void*)
+void SHOnlineInvitePreview::OnContinuePointerLeave(unsigned int index, void*)
 {
     mContinueButtonInstance->SetActiveSlide("off", true, false);
     mContinueButton.SetPointerState(0, index);
     gFEPointerInstances[index]->SetActiveSlide("cursor", true, false);
 }
 
-void SHOnlineInvitePreview::OnContinuePointerPress(int index, void*)
+void SHOnlineInvitePreview::OnContinuePointerPress(unsigned int index, void*)
 {
     mContinueButtonInstance->SetActiveSlide("down", true, false);
     mContinueButton.SetPointerState(2, index);

@@ -16,15 +16,15 @@ public:
     SHOnlineMiiSelectOverlay();
     virtual ~SHOnlineMiiSelectOverlay();
     void InitializeButtons();
-    void SelectOption(int, void*);
+    void SelectOption(unsigned int, void*);
     bool SelectMii();
     void DeleteSaveSlot();
     void CancelDeleteSaveSlot();
     void ReturnToMiiSelect();
     void ReturnToWiiMenu();
     void SanitizeMiiName(unsigned short* name);
-    void OpenItem(int index, void* context);
-    void CloseItem(int index, void* context);
+    void OpenItem(unsigned int index, void* context);
+    void CloseItem(unsigned int index, void* context);
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 

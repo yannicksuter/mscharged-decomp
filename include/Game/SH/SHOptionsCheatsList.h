@@ -17,12 +17,12 @@ public:
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
-    void OnCheatPointerInside(int index, void* context);
-    void OnCheatPointerLeave(int index, void* context);
+    void OnCheatPointerInside(unsigned int index, void* context);
+    void OnCheatPointerLeave(unsigned int index, void* context);
     void UpdateCheatText(int item);
     void InitializeButtons();
-    void OnCheatPointerEnter(int index, void* context);
-    void OnCheatPointerPress(int index, void* context);
+    void OnCheatPointerEnter(unsigned int index, void* context);
+    void OnCheatPointerPress(unsigned int index, void* context);
 
     /* 0x01C */ FEPointerButton mComponents[5];
     /* 0x3A0 */ FEScrollBar mScrollWidget;

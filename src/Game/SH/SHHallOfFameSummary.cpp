@@ -155,7 +155,7 @@ void SHHallOfFameSummary::SceneCreated()
     SetHallOfFameBreadcrumbs(mMode, breadcrumbs);
 
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide, "Layer", "summary", "scrollbar");
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find<>(presentation->m_currentSlide, "Layer", "summary", "scrollbar");
     mScrollBar.SetComponent(scrollbar);
     mScrollBar.SetRange(mItemCount - 7);
     mScrollBar.SetValue(mFirstVisibleItem);
@@ -475,7 +475,7 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
     nlSNPrintf(tournamentName, sizeof(tournamentName), "TOURNAMENT_%d",
         index + this->mFirstVisibleItem + 1);
 
-    TLTextInstance* tournamentText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "number");
+    TLTextInstance* tournamentText = FEFinder<TLTextInstance, 3>::Find<>(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "number");
     TLTextInstance* displayedTournamentText = tournamentText == 0
         ? &UnidentifiedTLTextDefault::sInstance
         : tournamentText;

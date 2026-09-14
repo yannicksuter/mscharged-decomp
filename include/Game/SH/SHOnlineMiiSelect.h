@@ -18,9 +18,9 @@ public:
     void BuildMiiList();
     void UpdatePage();
     void InitializeButtons();
-    void OpenItem(int index, void* context);
-    void CloseItem(int index, void* context);
-    void SelectMii(int, void* context);
+    void OpenItem(unsigned int index, void* context);
+    void CloseItem(unsigned int index, void* context);
+    void SelectMii(unsigned int, void* context);
     void ReturnToWiiMenu();
 
     /* 0x01C */ int mMiiCount;

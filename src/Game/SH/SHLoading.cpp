@@ -308,7 +308,7 @@ void MatchLoadingScene::SceneCreated()
     else
         DisplayFriendlyInfo();
 
-    TLComponentInstance* versus = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(GetPresentation()->GetActiveSlide(), "Layer", "VS");
+    TLComponentInstance* versus = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "VS");
     if (g_pLocalization->GetCurrentLanguage() == nlLocalization::LangSpanish
         || g_pLocalization->GetCurrentLanguage() == nlLocalization::LangNASpanish)
         versus->SetActiveSlide("contra", true, false);
@@ -451,9 +451,6 @@ void MatchLoadingScene::SetTeamLogo(int side, CharacterInfo character)
         image->m_pTextureResource = source->m_pTextureResource;
 }
 
-FEPresentation* BaseSceneHandler::GetPresentation()
-{
-    return mPresentation;
-}
+#include "Game/BaseSceneHandler.inl"
 
 #include "Game/FE/feFinder_impl.h"

@@ -40,7 +40,7 @@ TU8020E1B0Scene::~TU8020E1B0Scene()
 
 void TU8020E1B0Scene::fn_8020E300()
 {
-    typedef Detail::MemFunImpl<void, void (TU8020E1B0Scene::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (TU8020E1B0Scene::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, TU8020E1B0Scene*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback bracketOver(
@@ -71,7 +71,7 @@ void TU8020E1B0Scene::fn_8020E300()
     }
 }
 
-void TU8020E1B0Scene::fn_8020E8FC(int, void* context)
+void TU8020E1B0Scene::fn_8020E8FC(unsigned int, void* context)
 {
     mUnidentifiedCD = true;
     for (int i = 0; i < 4; ++i)
@@ -97,7 +97,7 @@ void TU8020E1B0Scene::fn_8020E8FC(int, void* context)
     }
 }
 
-void TU8020E1B0Scene::fn_802102C0(int index, void* context)
+void TU8020E1B0Scene::fn_802102C0(unsigned int index, void* context)
 {
     ++mSelectionCounts[index];
     if (context == 0 && !mBracketComponent.HasOtherPointerState(1, index))
@@ -108,7 +108,7 @@ void TU8020E1B0Scene::fn_802102C0(int index, void* context)
     }
 }
 
-void TU8020E1B0Scene::fn_80210364(int index, void* context)
+void TU8020E1B0Scene::fn_80210364(unsigned int index, void* context)
 {
     --mSelectionCounts[index];
     if (context == 0 && !mBracketComponent.HasOtherPointerState(1, index))
@@ -118,7 +118,7 @@ void TU8020E1B0Scene::fn_80210364(int index, void* context)
     }
 }
 
-void TU8020E1B0Scene::fn_802103F0(int index, void* context)
+void TU8020E1B0Scene::fn_802103F0(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mSelectionCounts[index];
@@ -127,7 +127,7 @@ void TU8020E1B0Scene::fn_802103F0(int index, void* context)
     mMatchupComponents[item].SetPointerState(1, index);
 }
 
-void TU8020E1B0Scene::fn_80210490(int index, void* context)
+void TU8020E1B0Scene::fn_80210490(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mSelectionCounts[index];

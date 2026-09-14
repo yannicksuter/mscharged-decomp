@@ -11,4 +11,12 @@ inline T* FEFinder<T, N>::Find(U* pTopLevel, InlineHasher Level1, InlineHasher L
     return FindChecked(pTopLevel, (unsigned long)Level1, (unsigned long)Level2, (unsigned long)Level3, (unsigned long)Level4, (unsigned long)Level5, (unsigned long)Level6);
 }
 
+template <typename T, int N>
+inline T* FEFinder<T, N>::Find(TLSlide* pTopLevel, const InlineHasher& Level1, const InlineHasher& Level2,
+    const InlineHasher& Level3, const InlineHasher& Level4, const InlineHasher& Level5, const InlineHasher& Level6)
+{
+    return Find(pTopLevel, (unsigned long)Level1, (unsigned long)Level2, (unsigned long)Level3,
+        (unsigned long)Level4, (unsigned long)Level5, (unsigned long)Level6);
+}
+
 #endif // _FEFINDER_FIND_IMPL_H_

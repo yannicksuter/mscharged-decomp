@@ -2892,8 +2892,8 @@ extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder
     if (pTargetFielder == NULL)
         return 0.0f;
     nlVector3 v3Direction;
-    nlVec3Sub(v3Direction, pTargetFielder->mUnidentified024.m_v3Position,
-        pCandidateFielder->mUnidentified024.m_v3Position);
+    nlVec3Sub(v3Direction, pTargetFielder->GetPosition(),
+        pCandidateFielder->GetPosition());
     unsigned short facingAngle = pCandidateFielder->mUnidentified024.m_aActualFacingDirection;
     if (pCandidateFielder->m_pController != NULL
         && pCandidateFielder->m_pController->GetMovementStickMagnitude() > 0.001f)
@@ -2906,7 +2906,7 @@ extern "C" float fn_800DE0A8(cPlayer* pPlayer)
     if (pPlayer == NULL)
         return 0.0f;
     nlVector3 v3Direction;
-    nlVec3Sub(v3Direction, g_pBall->m_v3Position, pPlayer->mUnidentified024.m_v3Position);
+    nlVec3Sub(v3Direction, g_pBall->GetPosition(), pPlayer->GetPosition());
     unsigned short facingAngle = pPlayer->mUnidentified024.m_aActualFacingDirection;
     if (pPlayer->m_pController != NULL && pPlayer->m_pController->GetMovementStickMagnitude() > 0.001f)
         facingAngle = pPlayer->m_pController->GetMovementStickDirection();
@@ -2920,11 +2920,11 @@ extern "C" float fn_800DE1F0(cPlayer* pCandidateFielder, cPlayer* pTargetFielder
     if (pTargetFielder == NULL)
         return 0.0f;
     nlVector3 v3Direction;
-    nlVec3Sub(v3Direction, pTargetFielder->mUnidentified024.m_v3Position,
-        pCandidateFielder->mUnidentified024.m_v3Position);
+    nlVec3Sub(v3Direction, pTargetFielder->GetPosition(),
+        pCandidateFielder->GetPosition());
     float fScore = Facing(pCandidateFielder->mUnidentified024.m_aActualFacingDirection, v3Direction);
-    nlVec3Sub(v3Direction, pCandidateFielder->mUnidentified024.m_v3Position,
-        pTargetFielder->mUnidentified024.m_v3Position);
+    nlVec3Sub(v3Direction, pCandidateFielder->GetPosition(),
+        pTargetFielder->GetPosition());
     fScore += Facing(pTargetFielder->mUnidentified024.m_aActualFacingDirection, v3Direction);
     fScore *= 0.5f;
     return fScore;
@@ -2979,10 +2979,10 @@ float ClosingTo(cPlayer* pFielder1, cPlayer* pFielder2)
     }
 
     float fClosingSpeed = GetClosingSpeed2D(
-        pFielder1->mUnidentified024.m_v3Position,
-        pFielder1->mUnidentified024.m_v3Velocity,
-        pFielder2->mUnidentified024.m_v3Position,
-        pFielder2->mUnidentified024.m_v3Velocity);
+        pFielder1->GetPosition(),
+        pFielder1->GetVelocity(),
+        pFielder2->GetPosition(),
+        pFielder2->GetVelocity());
     return NormalizeVal(fClosingSpeed, 0.0f, g_pGame->m_pFuzzyTweaks->mUnidentified5B4);
 }
 
@@ -2999,8 +2999,8 @@ float ClosingTo(cPlayer* pPlayer, cBall* pBall)
     }
 
     float fClosingSpeed = GetClosingSpeed2D(
-        pPlayer->mUnidentified024.m_v3Position,
-        pPlayer->mUnidentified024.m_v3Velocity,
+        pPlayer->GetPosition(),
+        pPlayer->GetVelocity(),
         pBall->m_v3Position,
         pBall->m_v3Velocity);
     return NormalizeVal(fClosingSpeed, 0.0f, g_pGame->m_pFuzzyTweaks->mUnidentified5B4);

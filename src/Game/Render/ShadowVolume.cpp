@@ -1,3 +1,4 @@
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/glPlat.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
@@ -7,14 +8,13 @@
 #include "NL/gl/glView.h"
 #include "NL/nlString.h"
 #include "Game/GL/GLShadowBlendMeshWriter.h"
-#include "unclassified/tu_8037091C.h"
+#include "Game/Render/ShadowVolume.h"
 
+static char sShadowVolumeTargetName[] = "shadowvolume";
+static char sShadowVolumeTextureName[] = "target/shadowvolume";
+static GLRenderPair sShadowVolumeTarget;
 
-static char sString_805356E0[] = "shadowvolume";
-static char sString_805356F0[] = "target/shadowvolume";
-static GLRenderPair sRenderPair_806E2408;
-
-extern "C" void fn_8037091C()
+void CreateShadowVolumeTarget()
 {
     GLTargetInfo info;
     nlZeroMemory(&info, sizeof(info));
@@ -22,17 +22,17 @@ extern "C" void fn_8037091C()
     info.height = glplatGetDefaultTargetHeight();
     info.format = 6;
     info.unknown18 = 0;
-    sRenderPair_806E2408 = glCreateTarget(sString_805356E0, &info);
+    sShadowVolumeTarget = glCreateTarget(sShadowVolumeTargetName, &info);
 }
 
-extern "C" void fn_80370998(GLView* view, GLView*)
+void SetShadowVolumeTarget(GLView* view, GLView*)
 {
-    view->SetRenderPair(sRenderPair_806E2408);
+    view->SetRenderPair(sShadowVolumeTarget);
     view->m_Target = GLViewTarget_Mode8;
 }
 
-extern "C" void fn_803709C4(
-    glModel* firstModel, glModel* secondModel, GLView* view)
+void AttachShadowVolumeModels(
+    glModel* firstModel, glModel* secondModel, GLView* view, GLView*)
 {
     glSetDefaultState(false);
     glSetRasterState(GLS_Culling, 1);
@@ -56,7 +56,7 @@ extern "C" void fn_803709C4(
 
 void RenderShadowVolumeBlend(GLView* view)
 {
-    static u32 texture_806E2410 = glGetTexture(sString_805356F0);
+    static u32 shadowVolumeTexture = glGetTexture(sShadowVolumeTextureName);
 
     GLShadowBlendMeshWriter writer;
     nlColour colour = { 0, 0, 0, 0 };
@@ -78,25 +78,27 @@ void RenderShadowVolumeBlend(GLView* view)
         glTextureBinding* state
             = &static_cast<GXShadowVolumeParameters*>(writer.GetModel()
                    ->packets->materialParameters)->diffuseTexture;
-        state->texture = texture_806E2410;
+        state->texture = shadowVolumeTexture;
         state->textureIndex = 0xFFFF;
         state->SetWrapS(true);
         state->SetWrapT(true);
         state->unknown07 = 0;
 
-        writer.Texcoord(1.0f, 0.0f);
+        float uMin = 0.0f;
+        float uMax = 1.0f;
+        writer.Texcoord(uMax, 0.0f);
         writer.Colour(colour);
         writer.Vertex(width, 0.0f, 0.0f);
 
-        writer.Texcoord(0.0f, 0.0f);
+        writer.Texcoord(uMin, 0.0f);
         writer.Colour(colour);
         writer.Vertex(0.0f, 0.0f, 0.0f);
 
-        writer.Texcoord(1.0f, 1.0f);
+        writer.Texcoord(uMax, 1.0f);
         writer.Colour(colour);
         writer.Vertex(width, height, 0.0f);
 
-        writer.Texcoord(0.0f, 1.0f);
+        writer.Texcoord(uMin, 1.0f);
         writer.Colour(colour);
         writer.Vertex(0.0f, height, 0.0f);
 

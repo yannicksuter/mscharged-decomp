@@ -153,7 +153,7 @@ void FrontEnd::SetControllerState()
 void FrontEnd::EnterStartScreen(bool bStraightToKickoff)
 {
     bool isInStrikers101 = false;
-    if (nlSingleton<GameInfoManager>::Instance()->unknown_0x122
+    if (nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode
         || nlSingleton<GameInfoManager>::Instance()->IsInMode4())
     {
         isInStrikers101 = true;
@@ -168,7 +168,7 @@ void FrontEnd::ExitWinnerScreen()
     cCameraManager::PopCamera();
     delete m_pPauseMenuCamera;
     m_pPauseMenuCamera = 0;
-    if (!nlSingleton<GameInfoManager>::Instance()->unknown_0x122
+    if (!nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode
         && !nlSingleton<GameInfoManager>::Instance()->IsInMode4())
     {
         g_AllActorsHidden = 0.5f;
@@ -215,7 +215,7 @@ void FrontEnd::EnterMenuState(FrontEnd::MenuEnterType menuType)
     switch (m_menuType)
     {
     case MET_PAUSE:
-        if (nlSingleton<GameInfoManager>::Instance()->unknown_0x122)
+        if (nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode)
         {
             g_pOverlayManager->Push((SceneList)0x54, SCREEN_NOTHING, false);
         }
@@ -335,7 +335,7 @@ void FrontEnd::Update(float fTimeDelta)
 
     case eFE_PRE_GAME_START:
         g_pBall->m_bVisible = true;
-        if ((nlSingleton<GameInfoManager>::Instance()->unknown_0x122
+        if ((nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode
                 || nlSingleton<GameInfoManager>::Instance()->IsInMode4())
             && !AlreadyStartedStrikers101Menu)
         {

@@ -16,12 +16,12 @@ public:
     virtual void SceneCreated();
 
     void fn_8020E300();
-    void fn_8020E8FC(int index, void* context);
-    void fn_8020E9C8(int index, void* context);
-    void fn_802102C0(int index, void* context);
-    void fn_80210364(int index, void* context);
-    void fn_802103F0(int index, void* context);
-    void fn_80210490(int index, void* context);
+    void fn_8020E8FC(unsigned int index, void* context);
+    void fn_8020E9C8(unsigned int index, void* context);
+    void fn_802102C0(unsigned int index, void* context);
+    void fn_80210364(unsigned int index, void* context);
+    void fn_802103F0(unsigned int index, void* context);
+    void fn_80210490(unsigned int index, void* context);
 
     /* 0x01C */ unsigned char mUnidentified1C[0xB0];
     /* 0x0CC */ bool mUnidentifiedCC;

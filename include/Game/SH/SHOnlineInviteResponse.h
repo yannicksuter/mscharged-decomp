@@ -14,9 +14,9 @@ public:
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
     void InitializeButtons();
-    void OnPointerEnter(int index, void* context);
-    void OnPointerLeave(int index, void* context);
-    void OnPointerPress(int index, void* context);
+    void OnPointerEnter(unsigned int index, void* context);
+    void OnPointerLeave(unsigned int index, void* context);
+    void OnPointerPress(unsigned int index, void* context);
     void ApplySelectedAction();
 
     /* 0x01C */ FEPointerButton mButtons[4];

@@ -12,6 +12,7 @@ public:
     virtual ~FontManager();
 
     nlFont* GetFontByHashID(unsigned long hashID);
+    bool IsLoadingComplete() const;
     bool LoadFont(const char* bundlePath, const char* fontName, const char* fontFileName);
 
     /* 0x04 */ nlDLListSlotPool<nlFont*> m_fonts;

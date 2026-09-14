@@ -42,7 +42,7 @@ TU80203D70Scene::~TU80203D70Scene()
 {
 }
 
-void TU80203D70Scene::fn_802066C8(int index, void* context)
+void TU80203D70Scene::fn_802066C8(unsigned int index, void* context)
 {
     ++mButtonStates[index];
 
@@ -82,7 +82,7 @@ void TU80203D70Scene::fn_802066C8(int index, void* context)
     }
 }
 
-void TU80203D70Scene::fn_8020688C(int index, void* context)
+void TU80203D70Scene::fn_8020688C(unsigned int index, void* context)
 {
     --mButtonStates[index];
 
@@ -118,7 +118,7 @@ void TU80203D70Scene::fn_8020688C(int index, void* context)
     }
 }
 
-void TU80203D70Scene::fn_802069F0(int, void* context)
+void TU80203D70Scene::fn_802069F0(unsigned int, void* context)
 {
     mUnidentified21D = true;
     for (int i = 0; i < 4; ++i)

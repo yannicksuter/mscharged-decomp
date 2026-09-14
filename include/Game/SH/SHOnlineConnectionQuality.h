@@ -21,11 +21,11 @@ public:
     void OnCountdownTick(FETimer* timer);
     void OnReturnTimer(FETimer* timer);
     void InitializeInput();
-    void OnDecisionPointerPress(int index, void* context);
+    void OnDecisionPointerPress(unsigned int index, void* context);
     void OnConnectionDecision(NetMessageConnectionDecision* message);
     void UpdateConnectionQuality();
-    void OnDecisionPointerEnter(int index, void* context);
-    void OnDecisionPointerLeave(int index, void* context);
+    void OnDecisionPointerEnter(unsigned int index, void* context);
+    void OnDecisionPointerLeave(unsigned int index, void* context);
     void CloseConnectionsAndReturn();
 
     /* 0x01C */ unsigned int mUnidentified01C;

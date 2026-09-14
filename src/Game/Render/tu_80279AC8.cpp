@@ -9,6 +9,7 @@
 #include "Game/Render/AttackSideIndicators.h"
 #include "Game/Render/Frustum.h"
 #include "Game/Render/RLViewLayers.h"
+#include "Game/Render/ShadowVolume.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Team.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -39,7 +40,6 @@ extern "C"
     void fn_802092A4(StadiumGoalObject_8027A2C8* object);
     void fn_802BC678(const ShapeRender* renderer, const nlVector3& boundsMin,
         const nlVector3& boundsMax, const nlColour& colour);
-    void fn_803709C4(glModel* first, glModel* second, GLView* nearView, GLView* farView);
     void* GetPresentation();
     void fn_80279E88(StadiumWorldObject_80279AC8* object);
 }
@@ -505,7 +505,7 @@ extern "C" void fn_8027A19C(StadiumWorldObject_80279AC8*)
  */
 extern "C" void fn_8027A1A0(StadiumWorldObject_80279AC8* object)
 {
-    fn_803709C4(object->m_pLayerModels[0], object->m_pLayerModels[1],
+    AttachShadowVolumeModels(object->m_pLayerModels[0], object->m_pLayerModels[1],
         (GLView*)GetLayerView((eCLV)0x14), (GLView*)GetLayerView((eCLV)0x14));
     fn_80273A14((eCLV)0x14);
     fn_80273A14((eCLV)0x15);

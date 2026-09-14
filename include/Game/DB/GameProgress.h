@@ -30,6 +30,13 @@ struct CupRecord_8010C5C0
         mValues[2] = 0;
     }
 
+    CupRecord_8010C5C0(int value0, int value1, int value2)
+    {
+        mValues[0] = value0;
+        mValues[1] = value1;
+        mValues[2] = value2;
+    }
+
     u16 mValues[3];
 };
 
@@ -87,6 +94,8 @@ public:
     TeamStats* pGetTeamStatsByIndex(u16 index) const;
     BasicGameInfo* GetMatchupInfo(int phase, short round, int matchup) const;
     eTeamID GetUserSelectedCupTeam() const;
+    void SetSidekicks(GameRules sidekicks) { unknown_0x8A2C = sidekicks; }
+    int fn_8022ED7C() const { return unknown_0x8A28; }
     int GetPreviousGameTeam(int index) const;
     bool ShouldShowCupPhasePopup() const;
     void SetShowCupPhasePopup(bool value);

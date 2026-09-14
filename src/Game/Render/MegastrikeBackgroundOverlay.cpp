@@ -1,4 +1,8 @@
-#include "unclassified/tu_801A6824.h"
+#include "Game/DB/CharacterInfo.h"
+#include "Game/Character.h"
+#include "Game/CharacterTemplate.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Render/MegastrikeBackgroundOverlay.h"
 
 #include "Game/Render/RLView.h"
 
@@ -7,58 +11,42 @@
 #include "NL/gl/glTexture.h"
 #include "NL/nlPrint.h"
 
-struct PlayerPresentationName_801A6834
-{
-    char _000[4];
-    const char* name;
-};
-
-struct Player_801A6834
-{
-    char _000[0x11C];
-    PlayerPresentationName_801A6834* presentationName;
-};
-
-extern "C"
-{
-    extern Player_801A6834* lbl_8056B800[10];
-    extern int lbl_806DCFB0;
-}
+static int sBackgroundIntensity = 104;
 
 static char sWhiteTexture[] = "global/white";
 static char sGameplayBackgroundFormat[] = "%s/mega_gameplay_bg";
 static char sBlackTexture[] = "global/black";
 
-ScreenOverlay_801A6824 gScreenOverlay_801A6824;
+MegastrikeBackgroundOverlay gMegastrikeBackgroundOverlay;
 
-void ScreenOverlay_801A6824::Start(
+void MegastrikeBackgroundOverlay::Start(
     float rate, float target, int mode)
 {
-    mRate = rate;
-    mTarget = target;
-    mMode = mode;
+    mFadeRate = rate;
+    mTargetAlpha = target;
+    mTeamIndex = mode;
 }
 
-void ScreenOverlay_801A6824::UpdateAndRender(float deltaTime)
+void MegastrikeBackgroundOverlay::UpdateAndRender(float deltaTime)
 {
-    mValue += mRate * deltaTime;
-    if (mRate == 0.0f)
+    mAlpha += mFadeRate * deltaTime;
+    if (mFadeRate == 0.0f)
     {
-        mValue = mTarget;
+        mAlpha = mTargetAlpha;
     }
-    else if (mRate > 0.0f)
+    else if (mFadeRate > 0.0f)
     {
-        if (mValue > mTarget)
+        if (mAlpha > mTargetAlpha)
         {
-            mValue = mTarget;
+            mAlpha = mTargetAlpha;
         }
     }
-    else if (mRate < 0.0f && mValue < mTarget)
+    else if (mFadeRate < 0.0f && mAlpha < mTargetAlpha)
     {
-        mValue = mTarget;
+        mAlpha = mTargetAlpha;
     }
 
-    if (mValue <= 0.0f)
+    if (mAlpha <= 0.0f)
     {
         mActive = false;
         return;
@@ -71,11 +59,8 @@ void ScreenOverlay_801A6824::UpdateAndRender(float deltaTime)
     glSetDefaultState(false);
     glSetCurrentTexture(glGetTexture(sWhiteTexture), GLTT_Diffuse);
 
-    colour.c[3] = 0xFF;
-    u8 shade = (int)(mValue * (float)lbl_806DCFB0);
-    colour.c[0] = shade;
-    colour.c[1] = shade;
-    colour.c[2] = shade;
+    u8 shade = (int)(mAlpha * (float)sBackgroundIntensity);
+    nlColourSet(colour, shade, shade, shade, 0xFF);
     poly.FullCoverage(colour, -1.0f);
     poly.Attach(GetLayerView(eCLV_MegastrikeBackground), 0, 0);
 
@@ -83,9 +68,9 @@ void ScreenOverlay_801A6824::UpdateAndRender(float deltaTime)
     glSetRasterState(GLS_AlphaBlend, 1);
     glSetCurrentRasterState(glHandleizeRasterState());
 
-    int playerIndex = mMode == 0 ? 0 : 4;
+    int playerIndex = mTeamIndex == 0 ? 0 : 4;
     char textureName[64];
-    nlSNPrintf(textureName, sizeof(textureName), sGameplayBackgroundFormat, lbl_8056B800[playerIndex]->presentationName->name);
+    nlSNPrintf(textureName, sizeof(textureName), sGameplayBackgroundFormat, g_pCharacters[playerIndex]->mUnidentified11C->mName);
 
     u32 texture = glGetTexture(textureName);
     u32 selectedTexture;
@@ -99,7 +84,7 @@ void ScreenOverlay_801A6824::UpdateAndRender(float deltaTime)
     }
     glSetCurrentTexture(selectedTexture, GLTT_Diffuse);
 
-    nlColourSet(colour, 0xFF, 0xFF, 0xFF, (int)(255.0f * mValue));
+    nlColourSet(colour, 0xFF, 0xFF, 0xFF, (int)(255.0f * mAlpha));
     poly.FullCoverage(colour, 0.0f);
     poly.Attach(GetLayerView(eCLV_MegastrikeBackground), 0, 0);
 }

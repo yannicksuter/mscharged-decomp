@@ -65,7 +65,7 @@ void StrikerTimesOverlay::Update(float dt)
     if (!mButtonsHidden)
     {
         FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-        TLInstance* buttons = FEFinder<TLInstance, 1>::Find(presentation->m_currentSlide, "Layer", "buttons");
+        TLInstance* buttons = FEFinder<TLInstance, 1>::Find<>(presentation->m_currentSlide, "Layer", "buttons");
         if (mIsNetworkGame)
         {
             buttons->m_bVisible = false;
@@ -84,7 +84,7 @@ void StrikerTimesOverlay::Update(float dt)
         mCountdownTimer.Update(dt);
         if (mCountdownTicked)
         {
-            TLTextInstance* timerText = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide, "Layer", "TimerText");
+            TLTextInstance* timerText = FEFinder<TLTextInstance, 3>::Find<>(mPresentation->m_currentSlide, "Layer", "TimerText");
             char buffer[8];
             nlSNPrintf(buffer, 8, "%d", mCountdownSeconds);
             nlStrToWcs(buffer, mTimerText, 8);

@@ -1319,13 +1319,13 @@ void SHHallOfFamePlayerCard::UpdateText()
     WideBasicString name;
 
     FEPresentation* presentation = mFEScene->GetPackage()->GetPresentation();
-    TLTextInstance* titleText = FEFinder<TLTextInstance, 3>::Find(
+    TLTextInstance* titleText = FEFinder<TLTextInstance, 3>::Find<>(
         presentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("player card"),
         InlineHasher("title"));
-    TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::Find(
+    TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::Find<>(
         presentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("player card"),
         InlineHasher("name"));
-    TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::Find(
+    TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::Find<>(
         presentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("player card"),
         InlineHasher("description"));
 

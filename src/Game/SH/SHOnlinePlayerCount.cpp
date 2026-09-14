@@ -199,7 +199,7 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
 
 void SHOnlinePlayerCount::InitializeButtons()
 {
-    typedef Detail::MemFunImpl<void, void (SHOnlinePlayerCount::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHOnlinePlayerCount::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHOnlinePlayerCount*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback buttonOver(
@@ -219,7 +219,7 @@ void SHOnlinePlayerCount::InitializeButtons()
     }
 }
 
-void SHOnlinePlayerCount::OnButtonPointerEnter(int index, void* context)
+void SHOnlinePlayerCount::OnButtonPointerEnter(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mPointerInsideCount[index];
@@ -231,7 +231,7 @@ void SHOnlinePlayerCount::OnButtonPointerEnter(int index, void* context)
     }
 }
 
-void SHOnlinePlayerCount::OnButtonPointerLeave(int index, void* context)
+void SHOnlinePlayerCount::OnButtonPointerLeave(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mPointerInsideCount[index];
@@ -304,7 +304,7 @@ void InitializeOnlineMatch(bool twoLocalPlayers, unsigned char tournament, bool 
     }
 }
 
-void SHOnlinePlayerCount::OnButtonPointerPress(int, void* context)
+void SHOnlinePlayerCount::OnButtonPointerPress(unsigned int, void* context)
 {
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     mState = 2;

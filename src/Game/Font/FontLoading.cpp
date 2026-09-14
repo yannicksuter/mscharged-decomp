@@ -1,3 +1,4 @@
+#include "Game/Font/FontLoading.h"
 #include "Game/Font/fontmanager.h"
 
 #include "Game/GameInfo.h"
@@ -6,19 +7,28 @@
 #include "NL/nlLocalization.h"
 #include "NL/nlPrint.h"
 
-extern "C" bool fn_80306EF4(FontManager*);
+struct FontLanguagePrefix
+{
+    char value[4];
+};
+
+static FontLanguagePrefix sDefaultLanguagePrefix = { "eur" };
+static FontLanguagePrefix sJapaneseInGameLanguagePrefix = { "jpn" };
+static FontLanguagePrefix sJapanese101LanguagePrefix = { "jpn" };
+
+bool gLoadInGameFonts;
 
 static inline void LoadFonts()
 {
     const char* TEXT_FONT_NAME = "fot-rodinprob18";
     const char* HEADING_FONT_NAME = "Scratchy36";
-    char langprefix[4] = "eur";
+    FontLanguagePrefix langprefix = sDefaultLanguagePrefix;
 
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
     {
-        langprefix[0] = 'j';
-        langprefix[1] = 'p';
-        langprefix[2] = 'n';
+        langprefix.value[0] = 'j';
+        langprefix.value[1] = 'p';
+        langprefix.value[2] = 'n';
     }
 
     char textfontbundlename[64];
@@ -26,10 +36,10 @@ static inline void LoadFonts()
     char headingfontbundlename[64];
     char headingfontfilename[64];
 
-    nlSNPrintf(textfontbundlename, 64, "art/fe/fonts/%sfonttext18.res", langprefix);
-    nlSNPrintf(textfontfilename, 64, "fe/fonts/%sfonttext18", langprefix);
-    nlSNPrintf(headingfontbundlename, 64, "art/fe/fonts/%sfontheading36.res", langprefix);
-    nlSNPrintf(headingfontfilename, 64, "fe/fonts/%sfontheading36", langprefix);
+    nlSNPrintf(textfontbundlename, 64, "art/fe/fonts/%sfonttext18.res", langprefix.value);
+    nlSNPrintf(textfontfilename, 64, "fe/fonts/%sfonttext18", langprefix.value);
+    nlSNPrintf(headingfontbundlename, 64, "art/fe/fonts/%sfontheading36.res", langprefix.value);
+    nlSNPrintf(headingfontfilename, 64, "fe/fonts/%sfontheading36", langprefix.value);
     FontManager::Instance()->LoadFont(textfontbundlename, textfontfilename, TEXT_FONT_NAME);
     FontManager::Instance()->LoadFont(headingfontbundlename, headingfontfilename, HEADING_FONT_NAME);
 }
@@ -42,12 +52,12 @@ static inline void LoadFontsJapaneseInGame()
     char textfontfilename[64];
     char headingfontbundlename[64];
     char headingfontfilename[64];
-    char langprefix[4] = "jpn";
+    FontLanguagePrefix langprefix = sJapaneseInGameLanguagePrefix;
 
-    nlSNPrintf(textfontbundlename, 64, "art/fe/fonts/%sfonttextingame18.res", langprefix);
-    nlSNPrintf(textfontfilename, 64, "fe/fonts/%sfonttextingame18", langprefix);
-    nlSNPrintf(headingfontbundlename, 64, "art/fe/fonts/%sfontheadingingame36.res", langprefix);
-    nlSNPrintf(headingfontfilename, 64, "fe/fonts/%sfontheadingingame36", langprefix);
+    nlSNPrintf(textfontbundlename, 64, "art/fe/fonts/%sfonttextingame18.res", langprefix.value);
+    nlSNPrintf(textfontfilename, 64, "fe/fonts/%sfonttextingame18", langprefix.value);
+    nlSNPrintf(headingfontbundlename, 64, "art/fe/fonts/%sfontheadingingame36.res", langprefix.value);
+    nlSNPrintf(headingfontfilename, 64, "fe/fonts/%sfontheadingingame36", langprefix.value);
     FontManager::Instance()->LoadFont(textfontbundlename, textfontfilename, TEXT_FONT_NAME);
     FontManager::Instance()->LoadFont(headingfontbundlename, headingfontfilename, HEADING_FONT_NAME);
 }
@@ -60,26 +70,26 @@ static inline void LoadFontsJapanese101()
     char textfontfilename[64];
     char headingfontbundlename[64];
     char headingfontfilename[64];
-    char langprefix[4] = "jpn";
+    FontLanguagePrefix langprefix = sJapanese101LanguagePrefix;
 
-    nlSNPrintf(textfontbundlename, 64, "art/fe/fonts/%sfonttext10118.res", langprefix);
-    nlSNPrintf(textfontfilename, 64, "art/fe/fonts/%sfonttext10118", langprefix);
-    nlSNPrintf(headingfontbundlename, 64, "art/fe/fonts/%sfontheading10124.res", langprefix);
-    nlSNPrintf(headingfontfilename, 64, "art/fe/fonts/%sfontheading10124", langprefix);
+    nlSNPrintf(textfontbundlename, 64, "art/fe/fonts/%sfonttext10118.res", langprefix.value);
+    nlSNPrintf(textfontfilename, 64, "art/fe/fonts/%sfonttext10118", langprefix.value);
+    nlSNPrintf(headingfontbundlename, 64, "art/fe/fonts/%sfontheading10124.res", langprefix.value);
+    nlSNPrintf(headingfontfilename, 64, "art/fe/fonts/%sfontheading10124", langprefix.value);
     FontManager::Instance()->LoadFont(textfontbundlename, textfontfilename, TEXT_FONT_NAME);
     FontManager::Instance()->LoadFont(headingfontbundlename, headingfontfilename, HEADING_FONT_NAME);
 }
 
-extern "C" bool fn_8020078C(bool*)
+bool UpdateFontLoading(bool*)
 {
     if (g_pLocalization->m_pFile == 0)
     {
         return false;
     }
-    return fn_80306EF4(FontManager::Instance());
+    return FontManager::Instance()->IsLoadingComplete();
 }
 
-extern "C" bool fn_80200380(bool* inGame)
+bool BeginFontLoading(bool* inGame)
 {
     g_pLocalization->Load(g_Language, false, &VirtualAllocator);
 
@@ -87,7 +97,7 @@ extern "C" bool fn_80200380(bool* inGame)
     {
         if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
         {
-            if (GameInfoManager::Instance()->unknown_0x122)
+            if (GameInfoManager::Instance()->mIsInStrikers101Mode)
             {
                 LoadFontsJapanese101();
             }
@@ -110,5 +120,5 @@ extern "C" bool fn_80200380(bool* inGame)
     {
         return false;
     }
-    return fn_80306EF4(FontManager::Instance());
+    return FontManager::Instance()->IsLoadingComplete();
 }

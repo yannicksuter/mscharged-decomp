@@ -14,6 +14,7 @@
 #include "NL/glx/glxGXColour.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/glx/glxTexture.h"
+#include "NL/glx/glxFresnelTexture.h"
 
 static Mtx sMegaFresnelLookupMatrix = {
     { 0.0f, 0.0f, 1.0f, 0.0f },
@@ -176,28 +177,8 @@ void GXMaterialProgramImpl<GXMegaSpecularFresnelMaterialProgram>::Draw(
     unsigned long fresnelTexture = sMegaSpecularFresnelTextures[fresnelRamp];
     if (sMegaSpecularFresnelBoundTexture != fresnelTexture)
     {
-        if (!sMegaSpecularFresnelIndicesInitialized)
-        {
-            sMegaSpecularFresnelTextureIndices[0] = 0xFFFF;
-            sMegaSpecularFresnelTextureIndices[1] = 0xFFFF;
-            sMegaSpecularFresnelTextureIndices[2] = 0xFFFF;
-            sMegaSpecularFresnelTextureIndices[3] = 0xFFFF;
-            sMegaSpecularFresnelTextureIndices[4] = 0xFFFF;
-            sMegaSpecularFresnelIndicesInitialized = true;
-        }
-        if (sMegaSpecularFresnelTextureIndices[fresnelRamp] == 0xFFFF
-            || sMegaSpecularFresnelTextureIndices[fresnelRamp] == 0)
-        {
-            sMegaSpecularFresnelTextureIndices[fresnelRamp] = glGetTextureManager()->GetTextureIndex(fresnelTexture);
-        }
-        glTextureBinding fresnelBinding;
-        fresnelBinding.texture = fresnelTexture;
-        fresnelBinding.flags = 0;
-        fresnelBinding.SetWrapS(true);
-        fresnelBinding.SetWrapT(true);
-        fresnelBinding.unknown07 = 0;
-        fresnelBinding.textureIndex = sMegaSpecularFresnelTextureIndices[fresnelRamp];
-        glx_BindTexture(5, &fresnelBinding);
+        glxBindFresnelTexture(5, fresnelTexture, fresnelRamp,
+            sMegaSpecularFresnelTextureIndices, sMegaSpecularFresnelIndicesInitialized);
         sMegaSpecularFresnelBoundTexture = fresnelTexture;
     }
 

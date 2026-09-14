@@ -301,11 +301,11 @@ void FEScrollBar::SetComponent(TLComponentInstance* instance)
 {
     mComponent = (TLComponentInstance*)instance;
     mAssetPosition = instance->GetAssetPosition();
-    TLComponentInstance* up = FEFinder<TLComponentInstance, 4>::Find(mComponent->GetActiveSlide(), "up_arrow");
+    TLComponentInstance* up = FEFinder<TLComponentInstance, 4>::Find<>(mComponent->GetActiveSlide(), "up_arrow");
     mButtonInstances[0] = up == 0 ? &UnidentifiedTLComponentDefault::sInstance : up;
-    TLComponentInstance* down = FEFinder<TLComponentInstance, 4>::Find(mComponent->GetActiveSlide(), "down_arrow");
+    TLComponentInstance* down = FEFinder<TLComponentInstance, 4>::Find<>(mComponent->GetActiveSlide(), "down_arrow");
     mButtonInstances[1] = down == 0 ? &UnidentifiedTLComponentDefault::sInstance : down;
-    TLImageInstance* found = FEFinder<TLImageInstance, 2>::Find(mComponent->GetActiveSlide(), "track", "btn_scroll_minmax");
+    TLImageInstance* found = FEFinder<TLImageInstance, 2>::Find<>(mComponent->GetActiveSlide(), "track", "btn_scroll_minmax");
     mThumb = found == 0 ? &UnidentifiedTLImageDefault::sInstance : found;
 }
 
@@ -313,7 +313,7 @@ void FEScrollBar::SetRange(int value)
 {
     if (value > 0)
     {
-        TLInstance* track = FEFinder<TLInstance, 2>::Find(mComponent->GetActiveSlide(), "track", "btn_track ");
+        TLInstance* track = FEFinder<TLInstance, 2>::Find<>(mComponent->GetActiveSlide(), "track", "btn_track ");
         feVector3 trackScale = track->GetScale();
         feVector3 scale = mThumb->GetScale();
         float distance = 0.63671875 * trackScale.f.y;

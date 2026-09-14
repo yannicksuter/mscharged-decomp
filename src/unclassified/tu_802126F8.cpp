@@ -51,7 +51,7 @@ TU802126F8Scene::~TU802126F8Scene()
 
 void TU802126F8Scene::fn_802129EC()
 {
-    typedef Detail::MemFunImpl<void, void (TU802126F8Scene::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (TU802126F8Scene::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, TU802126F8Scene*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback componentOver(
@@ -81,7 +81,7 @@ void TU802126F8Scene::fn_802129EC()
     }
 }
 
-void TU802126F8Scene::fn_80212F2C(int, void* context)
+void TU802126F8Scene::fn_80212F2C(unsigned int, void* context)
 {
     mUnidentifiedFD = true;
     for (int i = 0; i < 4; ++i)
@@ -107,12 +107,12 @@ void TU802126F8Scene::fn_80212F2C(int, void* context)
     }
 }
 
-void TU802126F8Scene::fn_80212FF8(int index, void* context)
+void TU802126F8Scene::fn_80212FF8(unsigned int index, void* context)
 {
     mUnidentified458[(unsigned int)context].SetPointerState(1, index);
 }
 
-void TU802126F8Scene::fn_80213014(int index, void* context)
+void TU802126F8Scene::fn_80213014(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     mUnidentified458[item].SetPointerState(0, index);
@@ -120,7 +120,7 @@ void TU802126F8Scene::fn_80213014(int index, void* context)
     fn_80213D48(item, item + mUnidentified2C);
 }
 
-void TU802126F8Scene::fn_802140C4(int index, void* context)
+void TU802126F8Scene::fn_802140C4(unsigned int index, void* context)
 {
     ++mUnidentified100[index];
     if (context == 0 && !mUnidentified3A4.HasOtherPointerState(1, index))
@@ -131,7 +131,7 @@ void TU802126F8Scene::fn_802140C4(int index, void* context)
     }
 }
 
-void TU802126F8Scene::fn_80214168(int index, void* context)
+void TU802126F8Scene::fn_80214168(unsigned int index, void* context)
 {
     --mUnidentified100[index];
     if (context == 0 && !mUnidentified3A4.HasOtherPointerState(1, index))

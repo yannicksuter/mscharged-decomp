@@ -1,3 +1,4 @@
+#include "NL/nlIntersection.h"
 #include "Game/AI/DesireSuperPower.h"
 #include "Game/AI/Fuzzy.h"
 
@@ -74,8 +75,6 @@ extern "C" cPlayer* fn_800D674C(cFielder*);
 extern "C" float fn_800DDF54(cFielder*, cPlayer*);
 extern "C" cTeam* fn_800D6688(cFielder*);
 extern "C" void fn_8003EBD0(cFielder*, int, UnidentifiedVariantCollection*);
-extern "C" bool fn_802B6BC8(const nlVector2*, const nlVector2*,
-    const nlVector2*, const nlVector2*, float*, float*);
 extern "C" float fn_800DD234(cFielder*);
 extern "C" float fn_800DD744(cFielder*);
 extern "C" float fn_800DAFCC(const nlVector3*, const nlVector3*, cFielder*,
@@ -1067,7 +1066,7 @@ inline bool AvoidablePolygon::IntersectsSegment(const nlVector2& start, const nl
             edgeEnd = points[0];
         }
         float a, b;
-        if (fn_802B6BC8(&start, &end, &edgeStart, &edgeEnd, &a, &b))
+        if (nlIntersectLineSegments2D(&start, &end, &edgeStart, &edgeEnd, &a, &b))
             return true;
     }
     return false;

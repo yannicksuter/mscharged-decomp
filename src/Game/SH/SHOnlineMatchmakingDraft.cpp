@@ -192,14 +192,14 @@ void SHOnlineMatchmakingDraft::SceneCreated()
     {
         char buffer[32];
         nlSNPrintf(buffer, sizeof(buffer), "FRIEND_%d", i);
-        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(
             mPresentation->GetActiveSlide(), "Layer",
             buffer);
         if (instance == 0)
             instance = &UnidentifiedTLComponentDefault::sInstance;
         mPlayerInstances[i] = instance;
     }
-    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find<>(
         mPresentation->GetActiveSlide(), "Layer",
         "scrollbar");
     mScrollWidget.SetComponent(scrollbar == 0 ? &UnidentifiedTLComponentDefault::sInstance : scrollbar);
@@ -224,14 +224,14 @@ void SHOnlineMatchmakingDraft::SceneCreated()
     for (int i = 0; i < 4; ++i)
         gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
 
-    TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::Find(
+    TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::Find<>(
         mPresentation->GetActiveSlide(), "Layer",
         "Title2");
-    TLTextInstance* title1 = FEFinder<TLTextInstance, 2>::Find(
+    TLTextInstance* title1 = FEFinder<TLTextInstance, 2>::Find<>(
         title->GetActiveSlide(), "Title");
-    TLTextInstance* title2 = FEFinder<TLTextInstance, 2>::Find(
+    TLTextInstance* title2 = FEFinder<TLTextInstance, 2>::Find<>(
         title->GetActiveSlide(), "Title2");
-    TLTextInstance* title3 = FEFinder<TLTextInstance, 2>::Find(
+    TLTextInstance* title3 = FEFinder<TLTextInstance, 2>::Find<>(
         title->GetActiveSlide(), "Title3");
     if (g_pNetworkSession->mCupMode)
     {
@@ -249,7 +249,7 @@ void SHOnlineMatchmakingDraft::SceneCreated()
     int countdown = NetworkDraft::Instance()->GetCountdown();
     mCountdown = countdown;
     TLSlide* timerSlide = mPresentation->GetActiveSlide();
-    FEFinder<TLInstance, 2>::Find(timerSlide,
+    FEFinder<TLInstance, 2>::Find<>(timerSlide,
         "Layer", "Timer")->m_bVisible = false;
     TLTextInstance* text = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
     if (countdown == -1)

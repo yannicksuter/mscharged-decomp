@@ -10,13 +10,20 @@ public:
     FEPointerButton(void* context);
 
     bool HasOtherPointerState(int value, unsigned int which) const;
-    int GetPointerState(unsigned int which)
+    int GetPointerState(int which)
     {
         return mPointerStates[which];
     }
-    void SetPointerState(int value, unsigned int which)
+    void SetPointerState(int value, int which)
     {
         mPointerStates[which] = value;
+    }
+    void ResetPointerStates()
+    {
+        mPointerStates[0] = 0;
+        mPointerStates[1] = 0;
+        mPointerStates[2] = 0;
+        mPointerStates[3] = 0;
     }
     void PlayHoverFeedback(int index);
     void HandlePointerEvent(const FEPointerEvent* event);

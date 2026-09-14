@@ -33,7 +33,6 @@
 #include "NL/nlTask.h"
 #include "NL/nlString.h"
 
-extern "C" void fn_801DCCEC(TU801DA134Component* comp);
 
 TU801DA134Component::TU801DA134Component()
     : mComponent(0)
@@ -53,19 +52,19 @@ void TU801DA134Component::fn_801DA198(TLComponentInstance* component, int side)
     mUnidentified08 = 0;
     if (mComponent != 0)
     {
-        TLComponentInstance* screens = FEFinder<TLComponentInstance, 4>::Find(mComponent->GetActiveSlide(), "pda_screens");
-        mUnidentified08 = FEFinder<TLComponentInstance, 4>::Find(screens->GetActiveSlide(), "positions");
+        TLComponentInstance* screens = FEFinder<TLComponentInstance, 4>::Find<>(mComponent->GetActiveSlide(), "pda_screens");
+        mUnidentified08 = FEFinder<TLComponentInstance, 4>::Find<>(screens->GetActiveSlide(), "positions");
     }
     if (mUnidentified08 != 0)
     {
         TLComponentInstance* indicator = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified08, "sidekick_indicator");
         indicator->m_bVisible = false;
-        TLInstance* highlight = FEFinder<TLInstance, 1>::Find(
+        TLInstance* highlight = FEFinder<TLInstance, 1>::Find<>(
             mUnidentified08->GetActiveSlide(), "positions", "field_positions", "idle", "highlight");
         highlight->m_bVisible = false;
     }
 
-    TLComponentInstance* logos = FEFinder<TLComponentInstance, 4>::Find(mUnidentified08->GetActiveSlide(), "team_logos");
+    TLComponentInstance* logos = FEFinder<TLComponentInstance, 4>::Find<>(mUnidentified08->GetActiveSlide(), "team_logos");
     int team;
     if (GameInfoManager::Instance()->IsInMode3())
     {
@@ -85,7 +84,7 @@ void TU801DA134Component::fn_801DA198(TLComponentInstance* component, int side)
     char name[16];
     nlSNPrintf(name, sizeof(name), "%s", GetCharacterInfo(GetCharacterIndexFromCaptain(team)).mName);
     logos->SetActiveSlide(name, true, false);
-    TLInstance* background = FEFinder<TLInstance, 1>::Find(mUnidentified08->GetActiveSlide(), "positions", "white_8x8");
+    TLInstance* background = FEFinder<TLInstance, 1>::Find<>(mUnidentified08->GetActiveSlide(), "positions", "white_8x8");
     fn_801DA718(background, team, 180);
     fn_801DABAC(0, 1);
     fn_801DABAC(1, 1);
@@ -159,7 +158,7 @@ TLImageInstance* TU801DA134Component::fn_801DA924(int index, const char* name)
         return 0;
     }
 
-    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
+    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find<>(
         mUnidentified08->GetActiveSlide(), "positions", "field_positions", "idle", "dummies", textureName);
     if (name == 0)
     {
@@ -199,19 +198,19 @@ void TU801DA134Component::fn_801DABAC(int index, int state)
         return;
     }
 
-    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
+    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find<>(
         mUnidentified08->GetActiveSlide(), "positions", "field_positions", "idle", "dummies", textureName);
     component = FEFinder<TLComponentInstance, 4>::FindOrDefault(component->GetActiveSlide(), "recycle");
     if (state == 1)
     {
         component->SetActiveSlide("Slide1", true, false);
-        TLInstance* button = FEFinder<TLInstance, 1>::Find(component->GetActiveSlide(), "button_recycle_or_die");
+        TLInstance* button = FEFinder<TLInstance, 1>::Find<>(component->GetActiveSlide(), "button_recycle_or_die");
         fn_801DA718(button, team, 102);
     }
     else
     {
         component->SetActiveSlide("on", true, false);
-        TLInstance* button = FEFinder<TLInstance, 1>::Find(component->GetActiveSlide(), "button_recycle_or_die");
+        TLInstance* button = FEFinder<TLInstance, 1>::Find<>(component->GetActiveSlide(), "button_recycle_or_die");
         nlColour colour;
         nlColourSet(colour, 255, 255, 255, 255);
         button->SetAssetColour(colour);
@@ -225,7 +224,7 @@ void TU801DA134Component::fn_801DAFC8()
         return;
     }
 
-    TLComponentInstance* overall = FEFinder<TLComponentInstance, 4>::Find(mUnidentified08->GetActiveSlide(), "positions", "overall_0");
+    TLComponentInstance* overall = FEFinder<TLComponentInstance, 4>::Find<>(mUnidentified08->GetActiveSlide(), "positions", "overall_0");
     const CharacterInfo& info = GetCharacterInfo(GetCharacterIndexFromCaptain(mUnidentified14));
     if (overall != 0)
     {
@@ -249,7 +248,7 @@ void TU801DA134Component::fn_801DAFC8()
         }
     }
 
-    overall = FEFinder<TLComponentInstance, 4>::Find(mUnidentified08->GetActiveSlide(), "positions", "overall_1");
+    overall = FEFinder<TLComponentInstance, 4>::Find<>(mUnidentified08->GetActiveSlide(), "positions", "overall_1");
     if (mSidekicks[0] == -1)
     {
         overall->m_bVisible = false;
@@ -281,7 +280,7 @@ void TU801DA134Component::fn_801DAFC8()
         }
     }
 
-    overall = FEFinder<TLComponentInstance, 4>::Find(mUnidentified08->GetActiveSlide(), "positions", "overall_2");
+    overall = FEFinder<TLComponentInstance, 4>::Find<>(mUnidentified08->GetActiveSlide(), "positions", "overall_2");
     if (mSidekicks[1] == -1)
     {
         overall->m_bVisible = false;
@@ -313,7 +312,7 @@ void TU801DA134Component::fn_801DAFC8()
         }
     }
 
-    overall = FEFinder<TLComponentInstance, 4>::Find(mUnidentified08->GetActiveSlide(), "positions", "overall_3");
+    overall = FEFinder<TLComponentInstance, 4>::Find<>(mUnidentified08->GetActiveSlide(), "positions", "overall_3");
     if (mSidekicks[2] == -1)
     {
         overall->m_bVisible = false;
@@ -498,7 +497,7 @@ void TU801DA134Component::fn_801DCC28()
         team = nlSingleton<GameInfoManager>::Instance()->GetTeam((short)mSide);
     }
     nlSingleton<GameInfoManager>::Instance()->ResetRules(team);
-    fn_801DCCEC(this);
+    fn_801DCCEC();
 }
 
 int TU801DA134Component::fn_801DCD74(int index)
@@ -1180,7 +1179,7 @@ void TU801DCD9CComponent::fn_801E0B8C(int captain, int opponent)
 
     if (captain != -1)
     {
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find<>(
             mUnidentified7C->GetActiveSlide(), "attributes_captains", "captains_pda");
         if (alternate)
         {
@@ -1457,13 +1456,12 @@ BaseSceneHandler* OverlayManager::Push(SceneList scene, ScreenMovement movement,
     return h;
 }
 
-extern "C" void fn_801E0AD0(void* p)
+void TU801DCD9CComponent::fn_801E0AD0()
 {
-    ((TLComponentInstance*)(*(void**)((char*)p + 116)))->SetActiveSlide("in", true, false);
-    void* q = *(void**)((char*)p + 116);
-    if (q != 0)
+    mUnidentified74->SetActiveSlide("in", true, false);
+    if (mUnidentified74 != 0)
     {
-        *(unsigned char*)((char*)q + 142) = 1;
+        mUnidentified74->m_bVisible = true;
     }
 }
 
@@ -1587,7 +1585,7 @@ void OverlayManager::fn_801E29C0(nlVector3 position)
     ov->fn_801F6E8C(position);
 }
 
-extern "C" void fn_801DCCEC(TU801DA134Component* comp)
+void TU801DA134Component::fn_801DCCEC()
 {
     int team;
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode3())
@@ -1596,10 +1594,10 @@ extern "C" void fn_801DCCEC(TU801DA134Component* comp)
     }
     else
     {
-        team = nlSingleton<GameInfoManager>::Instance()->GetTeam((short)comp->mSide);
+        team = nlSingleton<GameInfoManager>::Instance()->GetTeam((short)mSide);
     }
     GameRules rules = nlSingleton<GameInfoManager>::Instance()->mRulesTable[team];
-    comp->mSidekicks[0] = rules.mValues[0];
-    comp->mSidekicks[1] = rules.mValues[1];
-    comp->mSidekicks[2] = rules.mValues[2];
+    mSidekicks[0] = rules.mValues[0];
+    mSidekicks[1] = rules.mValues[1];
+    mSidekicks[2] = rules.mValues[2];
 }

@@ -13,8 +13,7 @@
 #include "NL/nlString.h"
 #include "unclassified/tu_801A2004.h"
 
-extern "C" void fn_8037091C();
-extern "C" void fn_80370998(GLView*, GLView*);
+#include "Game/Render/ShadowVolume.h"
 void CopyShadowVolumeColour(const GXColor* colour);
 
 struct RLViewLayerDesc
@@ -518,8 +517,8 @@ void fn_80272AB4()
     sLayerViews[eCLV_Warble]->m_Enabled = true;
 
     fn_80272388();
-    fn_8037091C();
-    fn_80370998(sLayerViews[eCLV_ShadowVolume], sLayerViews[eCLV_ShadowVolume]);
+    CreateShadowVolumeTarget();
+    SetShadowVolumeTarget(sLayerViews[eCLV_ShadowVolume], sLayerViews[eCLV_ShadowVolume]);
 
     GXColor colour = sShadowVolumeColour;
     CopyShadowVolumeColour(&colour);

@@ -19,10 +19,10 @@ public:
     virtual void SceneCreated();
 
     void InitializeMenuItems();
-    void CloseItem(int index, void* context);
+    void CloseItem(unsigned int index, void* context);
     void ReturnToWiiMenu();
-    void OpenItem(int index, void* context);
-    void SelectItem(int index, void* context);
+    void OpenItem(unsigned int index, void* context);
+    void SelectItem(unsigned int index, void* context);
     void ApplyItem(unsigned int item);
 
     static const int NUM_ITEMS = 7;

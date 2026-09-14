@@ -38,12 +38,12 @@ SHOnlineInviteStatus::~SHOnlineInviteStatus()
 void SHOnlineInviteStatus::SceneCreated()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLTextInstance* title = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide,
+    TLTextInstance* title = FEFinder<TLTextInstance, 3>::Find<>(mPresentation->m_currentSlide,
         InlineHasher("Layer"), InlineHasher("INVITATION"), InlineHasher("TITLE"));
     if (title == 0)
         title = &UnidentifiedTLTextDefault::sInstance;
     title->SetStringId("ONLINE_INVITATION_TITLE");
-    mStatusInstance = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
+    mStatusInstance = FEFinder<TLComponentInstance, 4>::Find<>(presentation->m_currentSlide,
         InlineHasher("Layer"), InlineHasher("INVITATION"), InlineHasher("LOGIN"));
     if (mStatusInstance == 0)
         mStatusInstance = &UnidentifiedTLComponentDefault::sInstance;
@@ -55,7 +55,7 @@ void SHOnlineInviteStatus::SceneCreated()
     case 2:
     {
         mStatusInstance->SetActiveSlide("DECLINED", false, false);
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mStatusInstance->GetActiveSlide(), InlineHasher("INVITE"));
+        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(mStatusInstance->GetActiveSlide(), InlineHasher("INVITE"));
         if (text == 0)
             text = &UnidentifiedTLTextDefault::sInstance;
         text->SetStringId("LOC_ONLINE_CANCELED_INVITATION");
@@ -109,7 +109,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
             mReturnDelay = 2.0f;
             mElapsedTime = 0.0f;
             mStatusInstance->SetActiveSlide("DECLINED", false, false);
-            TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mStatusInstance->GetActiveSlide(), InlineHasher("INVITE"));
+            TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(mStatusInstance->GetActiveSlide(), InlineHasher("INVITE"));
             if (text == 0)
                 text = &UnidentifiedTLTextDefault::sInstance;
             text->SetStringId("LOC_ONLINE_CANCELED_INVITATION");

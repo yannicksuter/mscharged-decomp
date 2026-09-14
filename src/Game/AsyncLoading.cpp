@@ -1,3 +1,4 @@
+#include "Game/Font/FontLoading.h"
 #include "Game/MiiManager.h"
 #include "Game/HBMManager.h"
 
@@ -93,7 +94,7 @@
 #include "NL/nlTime.h"
 #include "NL/plat/nlFileCache.h"
 #include "types.h"
-#include "unclassified/tu_80188884.h"
+#include "Game/Render/TimedObject.h"
 #include "Game/InputManager.h"
 #include "Game/NetworkInput.h"
 #include "Game/NetworkSync.h"
@@ -125,8 +126,6 @@ extern "C" void fn_8013DB18();
  void ShutdownWarbleRendering(void*);
 extern "C" void fn_8013DDD4();
 extern "C" void fn_802EC9D0(void*);
-extern "C" bool fn_80200380(bool* inGame);
-extern "C" bool fn_8020078C(bool* inGame);
 extern "C" bool fn_802773B8(bool stadiumViewer);
 extern "C" const char* fn_800E3198();
 extern "C" void fn_80311AFC(const char* filename, bool async);
@@ -156,7 +155,6 @@ extern FrameTimingStat* lbl_806E16A0;
 extern cBall* g_pBall;
 extern u8 lbl_80574148[];
 extern bool gAudioEnabled;
-extern bool lbl_806E18A0;
 extern SlotPool<cSAnimCallback> lbl_805840D8;
 extern SlotPoolBase lbl_8057AB80;
 extern bool g_e3_Build;
@@ -348,8 +346,8 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
             nlSingleton<FontManager>::s_pInstance = new (8, false) FontManager;
         }
         fn_8030753C(FontManager::Instance(), GetFEResourcePool());
-        lbl_806E18A0 = false;
-        fn_80200380(&lbl_806E18A0);
+        gLoadInGameFonts = false;
+        BeginFontLoading(&gLoadInGameFonts);
         FinishLoadingStep(this);
         break;
     case 12:
@@ -480,8 +478,8 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
             nlSingleton<FontManager>::s_pInstance = new (8, false) FontManager;
         }
         fn_8030753C(FontManager::Instance(), GetFEResourcePool());
-        lbl_806E18A0 = true;
-        fn_80200380(&lbl_806E18A0);
+        gLoadInGameFonts = true;
+        BeginFontLoading(&gLoadInGameFonts);
         FinishLoadingStep(this);
         break;
     case 26:
@@ -522,7 +520,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 33:
         mLoadingComment = "AsyncFELocalizationFinalize";
-        FinishLoadingStepOrUndo(this, fn_8020078C(&lbl_806E18A0));
+        FinishLoadingStepOrUndo(this, UpdateFontLoading(&gLoadInGameFonts));
         break;
     case 34:
         mLoadingComment = "AsyncMiiLoadingBegin";
@@ -1542,10 +1540,10 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     ShutdownWarble(&gWarble);
     ShutdownWarbleRendering(&gWarbleEnabled);
 
-    if (nlSingleton<UnidentifiedManager_80188928>::s_pInstance != 0)
+    if (nlSingleton<TimedObjectManager>::s_pInstance != 0)
     {
-        delete nlSingleton<UnidentifiedManager_80188928>::s_pInstance;
-        nlSingleton<UnidentifiedManager_80188928>::s_pInstance = 0;
+        delete nlSingleton<TimedObjectManager>::s_pInstance;
+        nlSingleton<TimedObjectManager>::s_pInstance = 0;
     }
 
     FreeElectricFence();

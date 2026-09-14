@@ -1252,7 +1252,7 @@ Game/Render/Wiper.cpp:
 	.sbss       start:0x806E14A0 end:0x806E14B0
 	.sdata2     start:0x806E4DA0 end:0x806E4DB8
 
-unclassified/tu_80188884.cpp:
+Game/Render/TimedObject.cpp:
 	.text       start:0x80188884 end:0x80188C5C
 	.data       start:0x80511770 end:0x805117A8
 	.sbss       start:0x806E14B0 end:0x806E14B8
@@ -1433,7 +1433,7 @@ unclassified/tu_801A5F10.cpp:
 	.sdata      start:0x806DCF98 end:0x806DCFB0
 	.sdata2     start:0x806E5178 end:0x806E5188
 
-unclassified/tu_801A6824.cpp:
+Game/Render/MegastrikeBackgroundOverlay.cpp:
 	.text       start:0x801A6824 end:0x801A6AAC
 	.ctors      start:0x804DB718 end:0x804DB71C
 	.data       start:0x805141D8 end:0x80514210
@@ -1865,7 +1865,7 @@ Game/Render/Presentation.cpp:
 	.sbss       start:0x806E1898 end:0x806E18A0
 	.sdata2     start:0x806E5800 end:0x806E5818
 
-unclassified/tu_80200380.cpp:
+Game/Font/FontLoading.cpp:
 	.text       start:0x80200380 end:0x802007B0
 	.data       start:0x8051B1F8 end:0x8051B3B0
 	.sdata      start:0x806DDB18 end:0x806DDB28
@@ -3083,7 +3083,7 @@ unclassified/tu_802B68E8.cpp:
 	.text       start:0x802B68E8 end:0x802B6BC8
 	.sdata2     start:0x806E6138 end:0x806E6148
 
-unclassified/tu_802B6BC8.cpp:
+NL/nlIntersection.cpp:
 	.text       start:0x802B6BC8 end:0x802B6CD8
 	.sdata2     start:0x806E6148 end:0x806E6154
 
@@ -4562,7 +4562,7 @@ Game/GL/ShaderSkinMesh.cpp:
 	.sbss       start:0x806E2400 end:0x806E2408
 	.sdata2     start:0x806E6DB0 end:0x806E6DB8
 
-unclassified/tu_8037091C.cpp:
+Game/Render/ShadowVolume.cpp:
 	.text       start:0x8037091C end:0x80370E20
 	.ctors      start:0x804DBB5C end:0x804DBB60
 	.data       start:0x805356E0 end:0x80535704

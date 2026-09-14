@@ -38,7 +38,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
-#include "unclassified/tu_801A6824.h"
+#include "Game/Render/MegastrikeBackgroundOverlay.h"
 
 extern "C"
 {
@@ -646,7 +646,7 @@ void RestoreWorldRendering(UnidentifiedPresentationState* presentation)
     BasicStadium* stadium = BasicStadium::GetCurrentStadium();
     stadium->m_pHighRangeTweaks = stadium->m_pStadiumHighRangeTweaks;
 
-    gScreenOverlay_801A6824.Start(
+    gMegastrikeBackgroundOverlay.Start(
         0.0f, 0.0f, NisPlayer::Instance()->mUnidentified34238);
 }
 

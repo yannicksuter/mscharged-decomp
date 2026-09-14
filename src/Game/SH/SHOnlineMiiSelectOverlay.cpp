@@ -80,7 +80,7 @@ SHOnlineMiiSelectOverlay::~SHOnlineMiiSelectOverlay()
 
 void SHOnlineMiiSelectOverlay::InitializeButtons()
 {
-    typedef Detail::MemFunImpl<void, void (SHOnlineMiiSelectOverlay::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHOnlineMiiSelectOverlay::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHOnlineMiiSelectOverlay*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback over(
@@ -100,7 +100,7 @@ void SHOnlineMiiSelectOverlay::InitializeButtons()
     }
 }
 
-void SHOnlineMiiSelectOverlay::SelectOption(int, void* context)
+void SHOnlineMiiSelectOverlay::SelectOption(unsigned int, void* context)
 {
     for (int i = 0; i < 4; ++i)
     {
@@ -480,7 +480,7 @@ void SHOnlineMiiSelectOverlay::Update(float fDeltaT)
     }
 }
 
-void SHOnlineMiiSelectOverlay::OpenItem(int index, void* context)
+void SHOnlineMiiSelectOverlay::OpenItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mHoverCounts[index];
@@ -492,7 +492,7 @@ void SHOnlineMiiSelectOverlay::OpenItem(int index, void* context)
     }
 }
 
-void SHOnlineMiiSelectOverlay::CloseItem(int index, void* context)
+void SHOnlineMiiSelectOverlay::CloseItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mHoverCounts[index];

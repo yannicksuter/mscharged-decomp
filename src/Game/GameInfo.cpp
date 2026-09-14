@@ -43,7 +43,7 @@ GameInfoManager::GameInfoManager()
     : mCurrentMode(-1)
     , mIsOnlineMode(0)
     , unknown_0x121(1)
-    , unknown_0x122(0)
+    , mIsInStrikers101Mode(0)
     , unknown_0x123(0)
     , mOnlineRankedMatch(false)
     , mOnlineTwoLocalPlayers(false)
@@ -182,7 +182,7 @@ void GameInfoManager::ResetPlayingSides()
 void GameInfoManager::SetMode(int mode, u8 flag)
 {
     mCurrentMode = mode;
-    unknown_0x122 = 0;
+    mIsInStrikers101Mode = 0;
     mIsOnlineMode = flag;
 }
 
@@ -385,7 +385,7 @@ void GameInfoManager::SetupGameFromConfig()
     if (mCurrentMode == GM_MODE_2) {
         mCurGameGameplayOptions.GameTime = 0x78;
         mCurGameGameplayOptions.SkillLevel = GameplaySettings::PROFESSIONAL;
-    } else if (unknown_0x122) {
+    } else if (mIsInStrikers101Mode) {
         mCurGameGameplayOptions.GameTime = 0xEA24;
     } else if (g_e3_Build) {
         mCurGameGameplayOptions.GameTime = 0xB4;
@@ -462,7 +462,7 @@ void GameInfoManager::ApplyDifficultySettings()
     }
 
     int skillLevel;
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         skillLevel = 0;
     } else {
         skillLevel = GetCurrentSettings()->SkillLevel;
@@ -474,7 +474,7 @@ void GameInfoManager::ApplyDifficultySettings()
 
 bool GameInfoManager::IsRule0x8Equal4() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -487,7 +487,7 @@ bool GameInfoManager::IsRule0x8Equal4() const
 
 bool GameInfoManager::IsRule0x0Equal10() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -512,7 +512,7 @@ bool GameInfoManager::IsRule0x0Equal10() const
 
 bool GameInfoManager::IsRule0x4Equal4() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -525,7 +525,7 @@ bool GameInfoManager::IsRule0x4Equal4() const
 
 bool GameInfoManager::IsRule0x8Equal2() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -538,7 +538,7 @@ bool GameInfoManager::IsRule0x8Equal2() const
 
 bool GameInfoManager::IsRule0x4Equal1() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -551,7 +551,7 @@ bool GameInfoManager::IsRule0x4Equal1() const
 
 bool GameInfoManager::IsRule0x8Equal3() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -564,7 +564,7 @@ bool GameInfoManager::IsRule0x8Equal3() const
 
 bool GameInfoManager::IsRule0x8Equal1() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -577,7 +577,7 @@ bool GameInfoManager::IsRule0x8Equal1() const
 
 bool GameInfoManager::IsRule0x4Equal3() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -590,7 +590,7 @@ bool GameInfoManager::IsRule0x4Equal3() const
 
 bool GameInfoManager::IsRule0x4Equal2() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -603,7 +603,7 @@ bool GameInfoManager::IsRule0x4Equal2() const
 
 bool GameInfoManager::IsRule0x4Equal5() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -616,7 +616,7 @@ bool GameInfoManager::IsRule0x4Equal5() const
 
 bool GameInfoManager::IsRule0x0Equal11() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return false;
     }
 
@@ -798,7 +798,7 @@ int GameInfoManager::GetMappedRule0x0() const
     int table[6] = { 0, 1, 2, 3, 4, 5 };
     int index;
 
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         index = 0;
     } else {
         index = GetCurrentSettings()->SkillLevel;
@@ -809,7 +809,7 @@ int GameInfoManager::GetMappedRule0x0() const
 
 int GameInfoManager::GetRule0x0() const
 {
-    if (unknown_0x122) {
+    if (mIsInStrikers101Mode) {
         return 0;
     }
 

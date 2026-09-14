@@ -19,12 +19,12 @@ public:
 
     void fn_8021292C();
     void fn_802129EC();
-    void fn_80212F2C(int index, void* context);
-    void fn_80212FF8(int index, void* context);
-    void fn_80213014(int index, void* context);
+    void fn_80212F2C(unsigned int index, void* context);
+    void fn_80212FF8(unsigned int index, void* context);
+    void fn_80213014(unsigned int index, void* context);
     bool fn_80213D48(int index, int teamIndex);
-    void fn_802140C4(int index, void* context);
-    void fn_80214168(int index, void* context);
+    void fn_802140C4(unsigned int index, void* context);
+    void fn_80214168(unsigned int index, void* context);
 
     /* 0x01C */ TLComponentInstance* mUnidentified1C[4];
     /* 0x02C */ int mUnidentified2C;

@@ -258,6 +258,10 @@ public:
     {
         return mUnidentified024.m_v3Position;
     }
+    const nlVector3& GetVelocity() const
+    {
+        return mUnidentified024.m_v3Velocity;
+    }
     int GetHeadJointIndex() const
     {
         return m_nHeadJointIndex;

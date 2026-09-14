@@ -86,13 +86,13 @@ SHOnlineFriendsChooseSides::~SHOnlineFriendsChooseSides()
 void SHOnlineFriendsChooseSides::SceneCreated()
 {
     NetworkDraft::Instance();
-    mSideInstances[0] = FEFinder<TLComponentInstance, 4>::Find(
+    mSideInstances[0] = FEFinder<TLComponentInstance, 4>::Find<>(
         mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("home"));
     if (mSideInstances[0] == 0)
     {
         mSideInstances[0] = &UnidentifiedTLComponentDefault::sInstance;
     }
-    mSideInstances[1] = FEFinder<TLComponentInstance, 4>::Find(
+    mSideInstances[1] = FEFinder<TLComponentInstance, 4>::Find<>(
         mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("away"));
     if (mSideInstances[1] == 0)
     {
@@ -120,25 +120,25 @@ void SHOnlineFriendsChooseSides::SceneCreated()
         nlSNPrintf(controller, sizeof(controller), "controller%d", i);
         nlSNPrintf(friendName, sizeof(friendName), "friend_%d", i);
 
-        TLComponentInstance* home = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* home = FEFinder<TLComponentInstance, 4>::Find<>(
             mSideInstances[0], nlStringLowerHash("controllers"),
             nlStringLowerHash(gOnlineSideGroupNames[0]), nlStringLowerHash(controller), 0, 0, 0);
-        TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find<>(
             mSideInstances[0], nlStringLowerHash("over"),
             nlStringLowerHash(gOnlineSideGroupNames[0]), nlStringLowerHash(controller), 0, 0, 0);
-        TLComponentInstance* away = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* away = FEFinder<TLComponentInstance, 4>::Find<>(
             mSideInstances[1], nlStringLowerHash("controllers"),
             nlStringLowerHash(gOnlineSideGroupNames[1]), nlStringLowerHash(controller), 0, 0, 0);
-        TLComponentInstance* awayOver = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* awayOver = FEFinder<TLComponentInstance, 4>::Find<>(
             mSideInstances[1], nlStringLowerHash("over"),
             nlStringLowerHash(gOnlineSideGroupNames[1]), nlStringLowerHash(controller), 0, 0, 0);
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
+        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(
             mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher(friendName));
 
-        FEFinder<TLTextInstance, 3>::Find(home->GetActiveSlide(), InlineHasher("Text"));
-        FEFinder<TLTextInstance, 3>::Find(homeOver->GetActiveSlide(), InlineHasher("Text"));
-        FEFinder<TLTextInstance, 3>::Find(away->GetActiveSlide(), InlineHasher("Text"));
-        FEFinder<TLTextInstance, 3>::Find(awayOver->GetActiveSlide(), InlineHasher("Text"));
+        FEFinder<TLTextInstance, 3>::Find<>(home->GetActiveSlide(), InlineHasher("Text"));
+        FEFinder<TLTextInstance, 3>::Find<>(homeOver->GetActiveSlide(), InlineHasher("Text"));
+        FEFinder<TLTextInstance, 3>::Find<>(away->GetActiveSlide(), InlineHasher("Text"));
+        FEFinder<TLTextInstance, 3>::Find<>(awayOver->GetActiveSlide(), InlineHasher("Text"));
 
         if (machine < mDraftMessage.mMachineCount)
         {
@@ -198,7 +198,7 @@ void SHOnlineFriendsChooseSides::SceneCreated()
         awayOver->m_bVisible = false;
     }
 
-    mSelectSideText = FEFinder<TLTextInstance, 3>::Find(
+    mSelectSideText = FEFinder<TLTextInstance, 3>::Find<>(
         mPresentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("Text"));
     if (mSelectSideText == 0)
     {
@@ -399,7 +399,7 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
 
 void SHOnlineFriendsChooseSides::InitializeButtons()
 {
-    typedef Detail::MemFunImpl<void, void (SHOnlineFriendsChooseSides::*)(int, void*)> PointerMethod;
+    typedef Detail::MemFunImpl<void, void (SHOnlineFriendsChooseSides::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHOnlineFriendsChooseSides*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     mSideButtons[0].SetInstanceBounds(mSideInstances[0], true, 0.0f, 0.0f, 1.0f, 1.0f);
@@ -438,7 +438,7 @@ void SHOnlineFriendsChooseSides::InitializeButtons()
     mDoneButton.Disable();
 }
 
-void SHOnlineFriendsChooseSides::OnSidePointerEnter(int index, void* context)
+void SHOnlineFriendsChooseSides::OnSidePointerEnter(unsigned int index, void* context)
 {
     int value = mPlayerSides[GetOnlinePlayerIndex(index)];
     if (value != -1 && context != (void*)value)
@@ -472,7 +472,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerEnter(int index, void* context)
     FEAudio::PlayAnimAudioEvent(0x19E7B6AE, 0, 0, 1);
 }
 
-void SHOnlineFriendsChooseSides::OnSidePointerLeave(int index, void* context)
+void SHOnlineFriendsChooseSides::OnSidePointerLeave(unsigned int index, void* context)
 {
     int value = mPlayerSides[GetOnlinePlayerIndex(index)];
     if (value != -1 && context != (void*)value)
@@ -487,7 +487,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerLeave(int index, void* context)
     --mPointerInsideCounts[index];
 }
 
-void SHOnlineFriendsChooseSides::OnSidePointerInside(int index, void* context)
+void SHOnlineFriendsChooseSides::OnSidePointerInside(unsigned int index, void* context)
 {
     int slot = GetOnlinePlayerIndex(index);
     if (mSideButtons[(int)context].GetPointerState(index) == 0)
@@ -533,7 +533,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerInside(int index, void* context)
     }
 }
 
-void SHOnlineFriendsChooseSides::OnSidePointerPress(int index, void* context)
+void SHOnlineFriendsChooseSides::OnSidePointerPress(unsigned int index, void* context)
 {
     int slot = GetOnlinePlayerIndex(index);
     if (mPlayerSides[slot] != -1 && context != (void*)mPlayerSides[slot])
@@ -577,7 +577,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerPress(int index, void* context)
     g_pNetworkSession->SendSidesChangedToHost(&message);
 }
 
-void SHOnlineFriendsChooseSides::OnDonePointerEnter(int index, void* context)
+void SHOnlineFriendsChooseSides::OnDonePointerEnter(unsigned int index, void* context)
 {
     if (mDraftMessage.mMachineIndex != 0)
     {
@@ -593,7 +593,7 @@ void SHOnlineFriendsChooseSides::OnDonePointerEnter(int index, void* context)
     }
 }
 
-void SHOnlineFriendsChooseSides::OnDonePointerInside(int index, void* context)
+void SHOnlineFriendsChooseSides::OnDonePointerInside(unsigned int index, void* context)
 {
     if (mDoneButton.GetPointerState(index) == 0)
     {
@@ -601,7 +601,7 @@ void SHOnlineFriendsChooseSides::OnDonePointerInside(int index, void* context)
     }
 }
 
-void SHOnlineFriendsChooseSides::OnDonePointerLeave(int index, void* context)
+void SHOnlineFriendsChooseSides::OnDonePointerLeave(unsigned int index, void* context)
 {
     if (mDraftMessage.mMachineIndex != 0)
     {
@@ -615,7 +615,7 @@ void SHOnlineFriendsChooseSides::OnDonePointerLeave(int index, void* context)
     }
 }
 
-void SHOnlineFriendsChooseSides::OnDonePointerPress(int index, void* context)
+void SHOnlineFriendsChooseSides::OnDonePointerPress(unsigned int index, void* context)
 {
     if (mDraftMessage.mMachineIndex != 0)
     {
@@ -685,7 +685,7 @@ void SHOnlineFriendsChooseSides::UpdateDoneButton()
             mDoneButtonAnimating = false;
             mDoneButtonInstance->m_bVisible = false;
             mDoneButton.Disable();
-            for (unsigned int i = 0; i < 4; ++i)
+            for (int i = 0; i < 4; ++i)
             {
                 if (mDoneButton.GetPointerState(i) == 1)
                 {
@@ -828,19 +828,19 @@ void SHOnlineFriendsChooseSides::DoChangeSides(int newSide, int oldSide, int ind
             }
         }
         nlSNPrintf(controller, sizeof(controller), "controller%d", slot);
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find<>(
             mSideInstances[newSide], nlStringLowerHash("controllers"),
             nlStringLowerHash(gOnlineSideGroupNames[newSide]), nlStringLowerHash(controller), 0, 0, 0);
-        TLComponentInstance* over = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* over = FEFinder<TLComponentInstance, 4>::Find<>(
             mSideInstances[newSide], nlStringLowerHash("over"),
             nlStringLowerHash(gOnlineSideGroupNames[newSide]), nlStringLowerHash(controller), 0, 0, 0);
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
+        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(
             component->GetActiveSlide(), InlineHasher("Text"));
         if (text == 0)
         {
             text = &UnidentifiedTLTextDefault::sInstance;
         }
-        TLTextInstance* overText = FEFinder<TLTextInstance, 3>::Find(
+        TLTextInstance* overText = FEFinder<TLTextInstance, 3>::Find<>(
             over->GetActiveSlide(), InlineHasher("Text"));
         if (overText == 0)
         {
@@ -865,14 +865,14 @@ void SHOnlineFriendsChooseSides::DoChangeSides(int newSide, int oldSide, int ind
             }
         }
         nlSNPrintf(controller, sizeof(controller), "controller%d", slot);
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find<>(
             mSideInstances[oldSide], nlStringLowerHash("controllers"),
             nlStringLowerHash(gOnlineSideGroupNames[oldSide]), nlStringLowerHash(controller), 0, 0, 0);
-        TLComponentInstance* over = FEFinder<TLComponentInstance, 4>::Find(
+        TLComponentInstance* over = FEFinder<TLComponentInstance, 4>::Find<>(
             mSideInstances[oldSide], nlStringLowerHash("over"),
             nlStringLowerHash(gOnlineSideGroupNames[oldSide]), nlStringLowerHash(controller), 0, 0, 0);
-        FEFinder<TLTextInstance, 3>::Find(component->GetActiveSlide(), InlineHasher("Text"));
-        FEFinder<TLTextInstance, 3>::Find(over->GetActiveSlide(), InlineHasher("Text"));
+        FEFinder<TLTextInstance, 3>::Find<>(component->GetActiveSlide(), InlineHasher("Text"));
+        FEFinder<TLTextInstance, 3>::Find<>(over->GetActiveSlide(), InlineHasher("Text"));
         component->m_bVisible = false;
         over->m_bVisible = false;
     }

@@ -23,9 +23,9 @@ public:
     void fn_80205AD4();
     void fn_80205D00();
     void fn_80206268();
-    void fn_802066C8(int index, void* context);
-    void fn_8020688C(int index, void* context);
-    void fn_802069F0(int index, void* context);
+    void fn_802066C8(unsigned int index, void* context);
+    void fn_8020688C(unsigned int index, void* context);
+    void fn_802069F0(unsigned int index, void* context);
 
     /* 0x01C */ u16 mDescriptorBuffer[256];
     /* 0x21C */ bool mUnidentified21C;
