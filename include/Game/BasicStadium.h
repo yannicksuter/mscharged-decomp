@@ -34,6 +34,7 @@ bool SetWorldAnimation(const char* objectName, const char* animationName,
     ePlayMode playMode);
 void UpdateHighRange();
 void RenderWorldNPCs();
+void fn_80278860(BasicStadium* pStadium, int active);
 void fn_802789A8(BasicStadium* pStadium, unsigned long uType);
 
 #endif // GAME_BASIC_STADIUM_H

@@ -9,7 +9,8 @@
 #include "Game/NetworkLobby.h"
 
 #include "Game/GameSceneManager.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.inl"
+#include "Game/FE/feFinderFind_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/feTextureResource.h"
@@ -775,3 +776,5 @@ void SHOnlineFriends::Update(float dt)
 }
 
 #include "Game/MiiManager.inl"
+
+#include "Game/FE/feFinderDefault_impl.h"

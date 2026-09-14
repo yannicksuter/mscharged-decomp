@@ -26,6 +26,17 @@ struct CharacterImpactEvent
     cCharacter* pCharacter;
 };
 
+struct GoalieSaveData
+{
+    /* 0x00 */ nlVector3 v3BallVelocity;
+    /* 0x0C */ cPlayer* pGoalie;
+    /* 0x10 */ cPlayer* pShooter;
+    /* 0x14 */ u32 saveType;
+    /* 0x18 */ float fWowFactor;
+    /* 0x1C */ unsigned int isSTS : 1;
+    /* 0x1C */ unsigned int padding : 31;
+}; // total size: 0x20
+
 struct GoalScoredData
 {
     /* 0x00 */ unsigned int uTeamIndex : 8;

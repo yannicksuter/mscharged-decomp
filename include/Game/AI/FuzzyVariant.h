@@ -207,6 +207,13 @@ public:
         return -1;
     }
 
+    float UnidentifiedGetFloat(int index)
+    {
+        if (ExtraData.IsSet(index))
+            return ExtraData.Get(index)->mData.f;
+        return 0.0f;
+    }
+
     UnidentifiedVariant_80054AB8* next;
     UnidentifiedVariantCollection ExtraData;
     bool mTemporary;
@@ -310,26 +317,7 @@ inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
     UnidentifiedVariant_80054AB8* other)
     : FuzzyVariant((const FuzzyVariant&)*other)
 {
-    for (int i = 0; i < 19; i++)
-    {
-        if (other->ExtraData.IsSet(i))
-        {
-            if (ExtraData.mData[i] == 0)
-            {
-                ExtraData.mData[i] = new (lbl_80584200.Allocate())
-                    UnidentifiedFuzzyVariantData(
-                        i, (const FuzzyVariant&)*other->ExtraData.mData[i]);
-            }
-            else
-            {
-                *ExtraData.mData[i] = *other->ExtraData.mData[i];
-            }
-        }
-        else if (ExtraData.IsSet(i))
-        {
-            ExtraData.Remove(i);
-        }
-    }
+    ExtraData = other->ExtraData;
 
     mTemporary = false;
     if (other->mTemporary)

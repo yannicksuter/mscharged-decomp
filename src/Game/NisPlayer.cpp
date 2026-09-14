@@ -104,8 +104,8 @@ void NisPlayer::fn_8027DA28()
         UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(callback, 0, -1);
     }
     {
-        Function<UnidentifiedEventData_8006649C*> callback(Bind<void>(MemFun(&NisPlayer::fn_8027DFE0), this, placeholder0));
-        UnidentifiedFindEvent<UnidentifiedEventData_8006649C>("GoalieSave", -1)->Add(callback, 0, -1);
+        Function<GoalieSaveData*> callback(Bind<void>(MemFun(&NisPlayer::fn_8027DFE0), this, placeholder0));
+        UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(callback, 0, -1);
     }
     {
         Function<cPlayer*> callback(Bind<void>(MemFun(&NisPlayer::fn_8027DFE4), this, placeholder0));
@@ -196,7 +196,7 @@ cAnimCamera* NisPlayer::fn_8027E708()
     return &mCamera[1];
 }
 
-void NisPlayer::fn_8027DFE0(UnidentifiedEventData_8006649C*)
+void NisPlayer::fn_8027DFE0(GoalieSaveData*)
 {
 }
 

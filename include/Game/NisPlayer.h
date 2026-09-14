@@ -12,7 +12,7 @@ class cPlayer;
 struct glModel;
 struct glModelPacket;
 struct GoalScoredData;
-struct UnidentifiedEventData_8006649C;
+struct GoalieSaveData;
 
 enum NisUseFilter
 {
@@ -80,7 +80,7 @@ public:
     void fn_8027D11C();
     void fn_8027DF70(GoalScoredData* goalScoredData);
     void fn_8027D994();
-    void fn_8027DFE0(UnidentifiedEventData_8006649C*);
+    void fn_8027DFE0(GoalieSaveData*);
     void fn_8027D1EC();
     void fn_8027DFE4(cPlayer* param1);
     void fn_8027E5D4();

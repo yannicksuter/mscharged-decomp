@@ -26,6 +26,9 @@ public:
     virtual ContactType Contact(PhysicsObject*, dContact*, int);
 
     AvoidablePolygon* GetAvoidablePolygon() const { return mAvoidable; }
+    const nlVector3& GetStartPoint() const { return mStartPoint; }
+    const nlVector3& GetEndPoint() const { return mEndPoint; }
+    unsigned int GetID() const { return mID; }
     void SetEndPoint(const nlVector3& end);
     void ApplyDamage(float damage);
     void Shrink(float dt);

@@ -94,14 +94,14 @@ template <>
 UnidentifiedCameraEffects*
     nlSingleton<UnidentifiedCameraEffects>::s_pInstance = 0;
 
-static UnidentifiedTypedEvent<UnidentifiedEventData_8006649C>*
+static UnidentifiedTypedEvent<GoalieSaveData>*
 GetGoalieSaveEvent(const char* name, int length)
 {
     unsigned int hash = HashEventName(name, length);
     UnidentifiedEventBase** foundEvent = 0;
     g_pEventRegistry->Find(hash, &foundEvent, 0);
     UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-    return (UnidentifiedTypedEvent<UnidentifiedEventData_8006649C>*)event;
+    return (UnidentifiedTypedEvent<GoalieSaveData>*)event;
 }
 
 void UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess(
@@ -215,7 +215,7 @@ void UnidentifiedCameraEffects::OnCollisionThwompPlayer(
 }
 
 void UnidentifiedCameraEffects::OnGoalieSave(
-    UnidentifiedEventData_8006649C*)
+    GoalieSaveData*)
 {
     if (g_pGame->m_eGameState == 3)
     {
@@ -785,7 +785,7 @@ void UnidentifiedCameraEffects::RegisterEventListeners()
         UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(callback, 0, -1);
     }
     {
-        Function<UnidentifiedEventData_8006649C*> callback(Bind<void>(
+        Function<GoalieSaveData*> callback(Bind<void>(
             MemFun(&UnidentifiedCameraEffects::OnGoalieSave),
             this, placeholder0));
         GetGoalieSaveEvent("GoalieSave", -1)->Add(callback, 0, -1);

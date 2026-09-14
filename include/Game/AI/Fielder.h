@@ -219,7 +219,7 @@ public:
     virtual void CollideWithWallCallback(
         const CollisionPlayerWallData* pData);
     virtual void InitActionPostWhistle();
-    virtual void fn_80099074(UnidentifiedEventData24*);
+    virtual void fn_80099074(const UnidentifiedEventData24*);
 
     void ClearPassTargetIfAmThePassTarget();
     void CleanUpAction(eFielderActionState actionState);
@@ -272,12 +272,18 @@ public:
         mUnidentified3E0 -= amount;
     }
     bool IsStuck() const;
+    bool UnidentifiedClass17Or2() const
+    {
+        return (int)mUnidentified024.m_eCharacterClass == 0x11
+            || (int)mUnidentified024.m_eCharacterClass == 2;
+    }
+    bool UnidentifiedClass17Or2Or6() const
+    {
+        return UnidentifiedClass17Or2() || (int)mUnidentified024.m_eCharacterClass == 6;
+    }
     bool IsInvincible() const
     {
-        bool result = false;
-        if (!IsStuck() && (muInvincibleStatus & 0x1F) == 0x1F)
-            result = true;
-        return result;
+        return !IsStuck() && (muInvincibleStatus & 0x1F) == 0x1F;
     }
     bool UnidentifiedInvinciblePowerups() const
     {
@@ -442,6 +448,9 @@ public:
     bool IsMidField() const;
     bool IsDefense() const;
     PlayerTweaks* UnidentifiedGetTweaks() const { return mUnidentified32C; }
+
+public:
+    /* 0x324 */ PlayerTweaks* m_pTweaks;
 
 private:
     /* 0x328 */ PlayerTweaks* mUnidentified328;

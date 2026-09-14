@@ -2,17 +2,50 @@
 
 #include "NL/nlTask.h"
 
-int cRumbleFilter::vfunc_0x14()
+cRumbleFilter::cRumbleFilter()
 {
-    return 0;
+    nlVec2Set(v2Pos0, 0.0f, 0.0f);
+    nlVec2Set(v2Pos1, 0.0f, 0.0f);
+    nlVec2Set(v2Vel0, 0.0f, 0.0f);
+    nlVec2Set(v2Vel1, 0.0f, 0.0f);
+    nlVec2Set(v2Force0, 0.0f, 0.0f);
+    nlVec2Set(v2Force1, 0.0f, 0.0f);
+    Ks = 5000.0f;
+    Kd = 10.0f;
+}
+
+void cRumbleFilter::Filter(const nlMatrix4& matViewIn, nlMatrix4& matViewOut)
+{
+    matViewOut = matViewIn;
+    matViewOut.m41 += v2Pos1.x;
+    matViewOut.m42 += v2Pos1.y;
+}
+
+void cRumbleFilter::Reset()
+{
+    nlVec2Set(v2Pos0, 0.0f, 0.0f);
+    nlVec2Set(v2Pos1, 0.0f, 0.0f);
+    nlVec2Set(v2Vel0, 0.0f, 0.0f);
+    nlVec2Set(v2Vel1, 0.0f, 0.0f);
+    nlVec2Set(v2Force0, 0.0f, 0.0f);
+    nlVec2Set(v2Force1, 0.0f, 0.0f);
+}
+
+void cRumbleFilter::Rumble(float x, float y, float ks, float kd)
+{
+    nlVec2Set(v2Pos0, 0.0f, 0.0f);
+    nlVec2Set(v2Pos1, x, y);
+    nlVec2Set(v2Vel0, 0.0f, 0.0f);
+    nlVec2Set(v2Vel1, 0.0f, 0.0f);
+    Ks = ks;
+    Kd = kd;
 }
 
 void cRumbleFilter::Update(float dt)
 {
-    float dx;
-    float dy;
-    float fHTerm;
+    nlVector2 d;
     float fDTerm;
+    float fHTerm;
 
     if (nlTaskManager::m_pInstance->mCurrentState == 1 ||
         nlTaskManager::m_pInstance->mCurrentState == 0x20)
@@ -22,15 +55,13 @@ void cRumbleFilter::Update(float dt)
 
     float step = dt <= 0.02f ? dt : 0.02f;
 
-    dy = v2Pos0.y - v2Pos1.y;
-    dx = v2Pos0.x - v2Pos1.x;
-    const float len = nlSqrt(dx * dx + dy * dy, true);
+    nlVec2Sub(d, v2Pos0, v2Pos1);
+    const float len = nlVec2Length(d);
     fHTerm = len * Ks;
 
     nlVector2 _dv;
-    _dv.y = v2Vel0.y - v2Vel1.y;
-    _dv.x = v2Vel0.x - v2Vel1.x;
-    float proj = (_dv.x * dx) + (_dv.y * dy);
+    nlVec2Sub(_dv, v2Vel0, v2Vel1);
+    float proj = nlVec2DotProduct(_dv, d);
     if (len == 0.0f)
     {
         fDTerm = 0.0f;
@@ -43,8 +74,7 @@ void cRumbleFilter::Update(float dt)
     nlVector2 unit;
     if (len == 0.0f)
     {
-        unit.x = 0.0f;
-        unit.y = 0.0f;
+        nlVec2Set(unit, 0.0f, 0.0f);
     }
     else
     {
@@ -62,71 +92,26 @@ void cRumbleFilter::Update(float dt)
             bIsBouncing = true;
         }
 
-        float invLen = 1.0f / len;
-        unit.x = invLen * dx;
-        unit.y = invLen * dy;
+        nlVec2Scale(unit, d, 1.0f / len);
     }
 
+    nlVec2Scale(unit, unit, -(fHTerm + fDTerm));
     nlVec2Set(v2Force0, 0.0f, 0.0f);
     nlVec2Set(v2Force1, 0.0f, 0.0f);
+    nlVec2Add(v2Force0, unit, v2Force0);
+    nlVec2Sub(v2Force1, v2Force1, unit);
 
-    float total = -(fHTerm + fDTerm);
-    nlVec2Set(unit, total * unit.x, total * unit.y);
-    nlVec2Set(v2Force0, unit.x + v2Force0.x, unit.y + v2Force0.y);
-    nlVec2Set(v2Force1, v2Force1.x - unit.x, v2Force1.y - unit.y);
+    nlVector2 acceleration;
+    nlVec2Scale(acceleration, v2Force0, 0.0f);
+    nlVec2ScaleAdd(v2Vel0, step, acceleration, v2Vel0);
+    nlVec2ScaleAdd(v2Pos0, step, v2Vel0, v2Pos0);
 
-    float factor0 = 0.0f;
-    nlVec2Set(v2Vel0,
-        v2Vel0.x + (step * (factor0 * v2Force0.x)),
-        v2Vel0.y + (step * (factor0 * v2Force0.y)));
-    nlVec2Set(v2Pos0,
-        v2Pos0.x + (step * v2Vel0.x),
-        v2Pos0.y + (step * v2Vel0.y));
-
-    float factor1 = 1.0f;
-    nlVec2Set(v2Vel1,
-        v2Vel1.x + (step * (factor1 * v2Force1.x)),
-        v2Vel1.y + (step * (factor1 * v2Force1.y)));
-    nlVec2Set(v2Pos1,
-        v2Pos1.x + (step * v2Vel1.x),
-        v2Pos1.y + (step * v2Vel1.y));
+    nlVec2Scale(acceleration, v2Force1, 1.0f);
+    nlVec2ScaleAdd(v2Vel1, step, acceleration, v2Vel1);
+    nlVec2ScaleAdd(v2Pos1, step, v2Vel1, v2Pos1);
 }
 
-void cRumbleFilter::Rumble(float x, float y, float ks, float kd)
+int cRumbleFilter::vfunc_0x14()
 {
-    nlVec2Set(v2Pos0, 0.0f, 0.0f);
-    nlVec2Set(v2Pos1, x, y);
-    nlVec2Set(v2Vel0, 0.0f, 0.0f);
-    nlVec2Set(v2Vel1, 0.0f, 0.0f);
-    Ks = ks;
-    Kd = kd;
-}
-
-void cRumbleFilter::Reset()
-{
-    nlVec2Set(v2Pos0, 0.0f, 0.0f);
-    nlVec2Set(v2Pos1, 0.0f, 0.0f);
-    nlVec2Set(v2Vel0, 0.0f, 0.0f);
-    nlVec2Set(v2Vel1, 0.0f, 0.0f);
-    nlVec2Set(v2Force0, 0.0f, 0.0f);
-    nlVec2Set(v2Force1, 0.0f, 0.0f);
-}
-
-void cRumbleFilter::Filter(const nlMatrix4& matViewIn, nlMatrix4& matViewOut)
-{
-    matViewOut = matViewIn;
-    matViewOut.m41 += v2Pos1.x;
-    matViewOut.m42 += v2Pos1.y;
-}
-
-cRumbleFilter::cRumbleFilter()
-{
-    nlVec2Set(v2Pos0, 0.0f, 0.0f);
-    nlVec2Set(v2Pos1, 0.0f, 0.0f);
-    nlVec2Set(v2Vel0, 0.0f, 0.0f);
-    nlVec2Set(v2Vel1, 0.0f, 0.0f);
-    nlVec2Set(v2Force0, 0.0f, 0.0f);
-    nlVec2Set(v2Force1, 0.0f, 0.0f);
-    Ks = 5000.0f;
-    Kd = 10.0f;
+    return 0;
 }

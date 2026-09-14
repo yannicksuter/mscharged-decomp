@@ -254,6 +254,10 @@ public:
     {
         return m_pAnimInventory;
     }
+    const nlVector3& GetPosition() const
+    {
+        return mUnidentified024.m_v3Position;
+    }
     int GetHeadJointIndex() const
     {
         return m_nHeadJointIndex;

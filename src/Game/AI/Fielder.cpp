@@ -415,10 +415,10 @@ bool cFielder::CanGetElectrocuted(
         if (IsFallenDown())
         {
             float netPostRadius = cNet::GetPostRadius();
-            float netWidth = cNet::GetNetWidth();
+            float netWidth = m_pTeam->m_pNet->GetNetWidth();
             float minYElectrocutionPosition
                 = netWidth * lbl_806E3424 + netPostRadius;
-            float netHeight = cNet::GetNetHeight();
+            float netHeight = m_pTeam->m_pNet->GetNetHeight();
             nlVector3 jointPos
                 = GetJointPosition(m_nBip01JointIndex_0xA4);
             if ((float)fabs(eventData->contactPoint.y)
@@ -433,10 +433,10 @@ bool cFielder::CanGetElectrocuted(
     default:
     {
         float netPostRadius = cNet::GetPostRadius();
-        float netWidth = cNet::GetNetWidth();
+        float netWidth = m_pTeam->m_pNet->GetNetWidth();
         float minYElectrocutionPosition
             = netWidth * lbl_806E3424 + netPostRadius;
-        float netHeight = cNet::GetNetHeight();
+        float netHeight = m_pTeam->m_pNet->GetNetHeight();
         nlVector3 jointPos
             = GetJointPosition(m_nBip01JointIndex_0xA4);
         if ((float)fabs(eventData->contactPoint.y)
@@ -1218,7 +1218,15 @@ void cFielder::CollideWithWallCallback(
     }
 }
 
-void cFielder::fn_80099074(UnidentifiedEventData24* eventData)
+bool cFielder::IsStuck() const
+{
+    return ((DesireFrozen*)fn_80319FC0(mUnidentified428->mUnidentified18, 0x1D))
+               ->IsUnidentifiedState(1)
+        || ((DesireFrozen*)fn_80319FC0(mUnidentified428->mUnidentified18, 0x1D))
+               ->IsUnidentifiedState(2);
+}
+
+void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
 {
     int type = eventData->mUnidentified10->m_Type;
     if (type == 1)
@@ -2521,13 +2529,7 @@ bool cFielder::IsFallenDown() const
         < fGetUpFrame / m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
 }
 
-bool cFielder::IsStuck() const
-{
-    return ((DesireFrozen*)fn_80319FC0(mUnidentified428->mUnidentified18, 0x1D))
-               ->IsUnidentifiedState(1)
-        || ((DesireFrozen*)fn_80319FC0(mUnidentified428->mUnidentified18, 0x1D))
-               ->IsUnidentifiedState(2);
-}
+
 
 bool cFielder::fn_80038918() const
 {
@@ -3847,16 +3849,6 @@ eFielderDesireState cFielder::fn_8002E060()
 void cFielder::SetPosition(const nlVector3& v3Position)
 {
     cCharacter::SetPosition(v3Position);
-}
-
-float cNet::GetNetHeight()
-{
-    return m_fNetHeight;
-}
-
-float cNet::GetNetWidth()
-{
-    return m_fNetWidth;
 }
 
 void Desire::UnidentifiedVirtual7(void*, DebugWriteCache*)

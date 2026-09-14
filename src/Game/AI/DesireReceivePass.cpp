@@ -112,8 +112,6 @@ extern "C" float fn_8002CFC4(PlayerTweaks*);
 extern "C" float fn_8002C730(PlayerTweaks*);
 extern "C" float fn_8002C6E8(PlayerTweaks*);
 extern "C" float fn_8002C678(PlayerTweaks*);
-extern "C" void fn_80097858(cPlayer*, cPlayer*, int,
-    int, int, int, float, float);
 extern "C" void* fn_80311734(void*);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     InterpreterCore*, void*, int, cPlayer*, cPlayer*);

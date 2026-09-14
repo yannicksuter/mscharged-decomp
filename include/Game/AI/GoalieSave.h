@@ -5,6 +5,7 @@
 #include "NL/nlList.h"
 
 class Goalie;
+class DebugWriteCache;
 struct SaveInfo;
 
 class SavePositionData
@@ -49,7 +50,8 @@ public:
 
 struct SaveBlendInfo
 {
-    SaveBlendInfo();
+    void fn_80091704();
+    void UnidentifiedSyncLog(void* context, DebugWriteCache* cache);
 
     /* 0x00 */ float mfStartTime;
     /* 0x04 */ float mfMilestoneTime[5];

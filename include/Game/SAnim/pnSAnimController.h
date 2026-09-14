@@ -50,6 +50,10 @@ public:
         m_fTime = time;
         m_bLooped = false;
     }
+    bool UnidentifiedAtEnd() const
+    {
+        return m_ePlayMode == PM_HOLD && m_fTime == 1.0f;
+    }
     void ProcessCallbacks();
     bool TestTrigger(float time) const;
     bool TestFrameTrigger(float frame);

@@ -168,6 +168,17 @@ extern "C" void* fn_800E34EC()
     return g_pGame;
 }
 
+extern "C" float fn_800E7EF4(
+    void*, UnidentifiedRuntimeCollection* value)
+{
+    if (value->mCollection.IsSet(4))
+    {
+        return value->mCollection.Get(4)->mData.f;
+    }
+
+    return 0.0f;
+}
+
 extern "C" float fn_800E34F4(
     UnidentifiedFuzzyRuntime* runtime, unsigned long hash)
 {
@@ -482,16 +493,7 @@ extern "C" float fn_800E7F48(bool value)
     return value ? 1.0f : 0.0f;
 }
 
-extern "C" float fn_800E7EF4(
-    void*, UnidentifiedRuntimeCollection* value)
-{
-    if (value->mCollection.IsSet(4))
-    {
-        return value->mCollection.Get(4)->mData.f;
-    }
 
-    return 0.0f;
-}
 
 UnidentifiedVariant_80054AB8* UnidentifiedFuzzyRuntimeBase::UnidentifiedReturn(
     UnidentifiedVariant_80054AB8* value, float)

@@ -55,7 +55,7 @@ inline float DegreesToRadians(float degrees)
 
 inline int DegreesToAngle(float degrees)
 {
-    return (int)(65536.0f * degrees / 360.0f);
+    return (int)(degrees * 65536.0f) / 360;
 }
 
 inline bool nlNear(float first, float second)
@@ -148,6 +148,11 @@ inline void nlVec2Scale(nlVector2& result, const nlVector2& source, float scale)
 inline void nlVec2Sub(nlVector2& result, const nlVector2& a, const nlVector2& b)
 {
     nlVec2Set(result, a.x - b.x, a.y - b.y);
+}
+
+inline void nlVec2Add(nlVector2& result, const nlVector2& a, const nlVector2& b)
+{
+    nlVec2Set(result, a.x + b.x, a.y + b.y);
 }
 
 inline void nlVec2Neg(nlVector2& result, const nlVector2& v)
@@ -310,6 +315,13 @@ inline void nlVec3Project(nlVector3& result, const nlVector3& v, const nlVector3
     float normalLength = nlVec3DotProduct(normal, normal);
     float scale = alongNormal / normalLength;
     nlVec3Scale(result, normal, scale);
+}
+
+inline void nlVec3Normalize(nlVector3& result, const nlVector3& value)
+{
+    float lengthSquared = nlVec3LengthSquared(value);
+    float scale = nlRecipSqrt(lengthSquared, true);
+    nlVec3Scale(result, value, scale);
 }
 
 inline void nlVecLerp(nlVector3& result, const nlVector3& a, const nlVector3& b, float alpha)

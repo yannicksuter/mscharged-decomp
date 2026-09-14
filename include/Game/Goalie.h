@@ -3,6 +3,7 @@
 
 #include "Game/AI/GoalieSave.h"
 #include "Game/GoalieFatigue.h"
+#include "Game/EventDataTypes.h"
 #include "Game/Player.h"
 #include "NL/nlMath.h"
 #include "NL/nlTimer.h"
@@ -69,6 +70,10 @@ enum eGoalieMoveDirection
 {
     GOALIEDIR_IDLE = 0,
     GOALIEDIR_FORWARD = 1,
+    GOALIEDIR_BACKWARD = 2,
+    GOALIEDIR_SIDE = 3,
+    GOALIEDIR_BACK2FRONT = 4,
+    GOALIEDIR_FRONT2BACK = 5,
 };
 
 enum eGoalieCrouchType
@@ -97,34 +102,33 @@ enum eUrgency
     URGENCY_HIGH = 2,
 };
 
-struct GoalieSaveData
-{
-    /* 0x00 */ nlVector3 v3BallVelocity;
-    /* 0x0C */ cPlayer* pGoalie;
-    /* 0x10 */ cPlayer* pShooter;
-    /* 0x14 */ u32 saveType;
-    /* 0x18 */ float fWowFactor;
-    /* 0x1C */ unsigned int isSTS : 1;
-    /* 0x1C */ unsigned int padding : 31;
-}; // total size: 0x20
 
 class Goalie : public cPlayer
 {
 public:
+    enum eNaviMode
+    {
+        NAVI_FACE_DESIRED = 0,
+        NAVI_FACE_BALL = 1,
+        NAVI_FOLLOW_TARGET = 2,
+    };
+
     Goalie(eCharacterClass gcc, const int* pTemplate, cSHierarchy* pHierarchy,
         cAnimInventory* pAnimInventory,
         const CharacterPhysicsData* pPhysicsData, GoalieTweaks* pTweaks,
         AnimRetargetList* pAnimRetargetList, int nIndex);
     ~Goalie();
     virtual void UnidentifiedVirtual1C();
+    virtual void Update(float dt);
     virtual void Unknown10(
         const nlVector3& v3Position, unsigned short aDirection);
+    virtual void Unknown11(void* context, DebugWriteCache* cache);
     virtual void Unknown12(RunningChecksum* pChecksum);
     virtual void CollideWithBallCallback(cBall* pBall);
     virtual void CollideWithCharacterCallback(
         CollisionPlayerPlayerData* pData);
     virtual void InitActionPostWhistle();
-    virtual void fn_80099074(UnidentifiedEventData24*);
+    virtual void fn_80099074(const UnidentifiedEventData24*);
 
     void SetGoalieAction(eGoalieActionState newGoalieState, int newSubstate);
     static void SaveBlendCallback(
@@ -161,8 +165,10 @@ public:
     inline void InitActionPursueBallPounce();
     inline void InitActionPursueRecover();
     void CleanupStun();
+    void fn_8007EB90();
     void ChooseSwatAnim(int nParam);
     void DoPassRelease();
+    void DoNavigation(float fDeltaT, float fIdleDistance, eNaviMode naviMode);
     static void fn_8007FE28(int nTeamSide);
     void fn_8007EA90();
     bool fn_8007EB10();
@@ -176,18 +182,42 @@ public:
     bool IsCloseToPlane(const nlVector3& rPos1,
         const nlVector3& rPos2, float fThreshold);
     bool IsInsideNetArea(const nlVector3& v3Target);
+    bool UnidentifiedOffplayState() const
+    {
+        return mGoalieActionState == GOALIEACTION_OFFPLAY;
+    }
+    static unsigned char ClampToGoalCone(nlVector3& v3Position, float fDistFromEnd);
     void MakeSaveEvent(bool bIsSTS);
     void MakeExertEvent();
     bool CanInterceptPass();
     bool CheckForSTSAttack();
     bool IsOpponentInSTS();
+    bool UnidentifiedOpponentShooting();
     bool IsWithinPounceRange();
     bool IsOpponentBallCarrierInRange();
+    bool IsLooseBallTowardNet();
+    bool fn_8007B9A0(const nlVector3& v3Position, float fRange);
+    void fn_8007CB78(bool bBlocked, unsigned int uWallID);
+    bool UnidentifiedWallBlocked() const { return mfWallBlock > 0.0f; }
+    void ChooseDesperationAnim(float fFudgeDist);
+    float CalcTimeToPlane(float fPlaneOffset);
+    void UpdateActionState(float fDeltaTime);
+    void fn_80084EB0(float fDeltaTime);
+    bool fn_800779D0();
+    void fn_80080EFC();
+    bool PreCollideWithBallCallback();
+    bool InitiatePickup();
+    void InitiatePanicGrab(cPlayer* pPlayer);
+    float fn_8007BEEC(cFielder* pTarget);
+    bool CheckForLooseBallShotInProgress();
+    float IsSoloBreakaway();
+    unsigned int FindDumpDirection(unsigned short aDesired, bool bConstrain);
     bool FindSTSMissData(const nlVector3& rPos);
     cPlayer* FindOpenPassTarget();
     bool IsTargetViable(cPlayer* pTarget);
     bool ShouldReposition();
     bool fn_8007BC40();
+    bool fn_8007BF68(bool bParam);
     bool fn_8007C73C();
     bool fn_8007D740();
     void FindDesiredGoaliePosition(nlVector3& pos, nlVector3& dir,
@@ -200,6 +230,8 @@ public:
     void TrackTarget(
         const nlVector3& v3Target, float fRatio, float fParam3);
     void TacklePlayer(cPlayer* pPlayer);
+    void fn_80080638(cFielder* pFielder, bool bParam);
+    void fn_800809D0(cFielder* pTarget, bool bParam);
     void fn_80080BFC(float fDeltaT);
     void StealBall(cPlayer* pPlayer);
     void WhackSTSPlayer(cFielder* pFielder);
@@ -282,8 +314,18 @@ public:
     static bool mbNegGoalieNetCheck;
 
     static float mfGoalieStepDist;
+    static float mfGoalieStrafeDist;
+    static float mfGoalieRunDist;
+    static u8 mbActionDataSetup;
+
+private:
+    void UnidentifiedResetState();
+    void InitGoalieActionData();
+    void UnidentifiedStunResponse();
+    void CheckForBallOnHead();
 
 public:
+    /* 0x324 */ GoalieTweaks* m_pTweaks;
     /* 0x328 */ eGoalieActionState mGoalieActionState;
     /* 0x32C */ eGoalieActionState mPrevGoalieActionState;
     /* 0x330 */ eUrgency mUrgency;
@@ -322,9 +364,9 @@ public:
     /* 0x3A4 */ nlVector3 mv3NavTarget;
     /* 0x3B0 */ nlVector3 mv3LocalNavTarget;
     /* 0x3BC */ unsigned short maLocalAngle;
-    /* 0x3BE */ unsigned short mUnidentified3BE;
-    /* 0x3C0 */ unsigned short maInitialAngle;
-    /* 0x3C2 */ unsigned short maSaveAngle;
+    /* 0x3BE */ unsigned short maInitialAngle;
+    /* 0x3C0 */ unsigned short maSaveAngle;
+    /* 0x3C2 */ unsigned short mUnidentified3C2;
     /* 0x3C4 */ float mfTargetTime;
     /* 0x3C8 */ float mfTargetDist;
     /* 0x3CC */ float mfSpeedScale;

@@ -35,6 +35,18 @@ timers, power-up events and camera-flash interactions follow R4QE01. The
 reference project's licensing notice below describes its source origins and
 applicable rights.
 
+The navigation, save blending, passing and loose-ball decisions in
+`Game/Goalie.cpp` use the corresponding
+[Super Mario Strikers goalie implementation](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/Goalie.cpp)
+and shared math and animation interfaces as ancestry references. R4QE01
+determines the retained state layout, collision responses, Mega Strike and
+Striker Challenge behavior, event payloads and synchronization fields. The net
+dimension accessors follow the predecessor's
+[shared net interface](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/include/Game/Net.h),
+including the object-receiver calls used by its fielder collision response. The
+reference project's licensing notice below describes its source origins and
+applicable rights.
+
 The popup layout and string-formatting operations in `Game/FE/fePopupMenu.cpp`
 use the corresponding
 [Super Mario Strikers popup implementation](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/FE/fePopupMenu.cpp)

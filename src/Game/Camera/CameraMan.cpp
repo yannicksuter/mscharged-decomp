@@ -25,7 +25,6 @@
 extern float g_fSimulationTick;
 
 extern "C" void fn_800F02DC(void*, unsigned long, void*);
-extern "C" cRumbleFilter* fn_800EF5F8(void*);
 extern "C" UnidentifiedCameraFilter* fn_800EF9F0(void*);
 extern "C" void fn_8005B330(nlVector3*, float, float);
 extern "C" void fn_80277BB0();
@@ -671,9 +670,7 @@ extern "C" void fn_800F06D4()
 {
     cBaseCamera* pBaseCamera = new ((cDebugCamera*)nlMalloc(0xA0, 8, false)) cDebugCamera(false);
 
-    cRumbleFilter* pRumbleFilter = static_cast<cRumbleFilter*>(nlMalloc(sizeof(cRumbleFilter), 8, false));
-    if (pRumbleFilter != 0)
-        pRumbleFilter = fn_800EF5F8(pRumbleFilter);
+    cRumbleFilter* pRumbleFilter = new (8, false) cRumbleFilter();
     lbl_806E0EDC = pRumbleFilter;
     pBaseCamera->m_pFilter[pRumbleFilter->vfunc_0x14()] = pRumbleFilter;
 
@@ -706,9 +703,7 @@ extern "C" void fn_800F030C(bool bUnidentified)
         pBaseCamera = new ((GameplayCamera*)nlMalloc(sizeof(GameplayCamera), 8, false)) GameplayCamera();
     }
 
-    cRumbleFilter* pRumbleFilter = static_cast<cRumbleFilter*>(nlMalloc(sizeof(cRumbleFilter), 8, false));
-    if (pRumbleFilter != 0)
-        pRumbleFilter = fn_800EF5F8(pRumbleFilter);
+    cRumbleFilter* pRumbleFilter = new (8, false) cRumbleFilter();
     lbl_806E0EDC = pRumbleFilter;
     pBaseCamera->m_pFilter[pRumbleFilter->vfunc_0x14()] = pRumbleFilter;
 

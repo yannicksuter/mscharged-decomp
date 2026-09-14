@@ -860,9 +860,10 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
 
     for (i = 0; i < 4; i++)
     {
-        nlVec2Set(av2FormationPositions[i],
-            m_pFormationSpec->m_Positions[i].m_Location.x + v2CenterOfPlayers.x,
-            m_pFormationSpec->m_Positions[i].m_Location.y + v2CenterOfPlayers.y);
+        const nlVector2& v2Location = m_pFormationSpec->m_Positions[i].m_Location;
+        float y = v2Location.y + v2CenterOfPlayers.y;
+        float x = v2Location.x + v2CenterOfPlayers.x;
+        nlVec2Set(av2FormationPositions[i], x, y);
     }
 
     const int* pFielderOrder = lbl_804DBF78;

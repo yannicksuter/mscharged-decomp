@@ -308,7 +308,7 @@ void ReliableSocket::Update()
                 "Deleting connection address %d.%d.%d.%d state %d host %d",
                 mConnections[i]->mAddress[0], mConnections[i]->mAddress[1],
                 mConnections[i]->mAddress[2], mConnections[i]->mAddress[3],
-                mConnections[i]->mState, mConnections[i]->mIncoming);
+                mConnections[i]->GetState(), mConnections[i]->mIncoming);
             delete mConnections[i];
             mConnections[i] = 0;
             for (int j = i; j < mConnectionCount - 1; j++)

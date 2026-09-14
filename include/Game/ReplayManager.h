@@ -8,7 +8,7 @@
 struct GoalScoredData;
 struct ReceiveBallData;
 struct UnidentifiedEventData_800663A8;
-struct UnidentifiedEventData_8006649C;
+struct GoalieSaveData;
 struct UnidentifiedEventData_80066590;
 
 class ReplayManager
@@ -28,7 +28,7 @@ public:
     void fn_801895D0(UnidentifiedEventData_80066590* event);
     void fn_801895E0(UnidentifiedEventData_800663A8* event);
     void fn_801895F0(GoalScoredData* event);
-    void fn_80189610(UnidentifiedEventData_8006649C* event);
+    void fn_80189610(GoalieSaveData* event);
     void fn_80189620();
     void Uninitialize();
     void GrabSnapshot();

@@ -60,7 +60,7 @@ public:
 
     void LoadByteCode(void* data);
     void Reset();
-    FunctionEntryPoint* FindFunctionEntryPoint(const u32& hash);
+    FunctionEntryPoint* FindFunctionEntryPoint(const unsigned int& hash);
     FunctionEntryPoint* GetFunctionEntryPoint(unsigned int index);
     void RunFunction(FunctionEntryPoint* entry, unsigned int count);
     bool ExecuteFunction(FunctionEntryPoint* entry, unsigned int count, const unsigned int* values);

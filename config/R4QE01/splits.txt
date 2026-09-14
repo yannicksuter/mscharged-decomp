@@ -6428,9 +6428,8 @@ RVL_SDK/hbm/nw4hbm/math/math_triangular.cpp:
 
 RVL_SDK/hbm/nw4hbm/snd/snd_AxManager.cpp:
 	.text       start:0x80454D68 end:0x80456B48
-	.data       start:0x8055A010 end:0x8055A264
+	.data       start:0x8055A040 end:0x8055A264
 	.bss        start:0x806AEEE0 end:0x806B92F8
-	.sdata      start:0x806E0248 end:0x806E0250
 	.sbss       start:0x806E2E00 end:0x806E2E01
 	.sdata2     start:0x806E7798 end:0x806E77AC
 

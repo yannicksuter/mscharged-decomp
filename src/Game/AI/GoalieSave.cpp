@@ -129,7 +129,7 @@ static float fDefaultMilestoneValues[2] = { 0.4f, 0.7f };
 
 float GoalieSave::mfCatchAllowDistSq = 0.25f;
 
-SaveBlendInfo::SaveBlendInfo()
+void SaveBlendInfo::fn_80091704()
 {
     mfStartTime = 0.0f;
     for (int milestone = 0; milestone < 5; ++milestone)
@@ -738,6 +738,7 @@ SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
         if (uSaveType & pCur->muSaveType)
         {
             SaveBlendInfo candidateBlendInfo;
+            candidateBlendInfo.fn_80091704();
             fSaveTime = pCur->mfDuration * pCur->mfMilestonePercent[2];
             {
                 float fMilestoneVal = pCur->mfMilestonePercent[milestone];

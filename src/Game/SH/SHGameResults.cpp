@@ -2,6 +2,7 @@
 #include "Game/SH/SHGameResults.h"
 
 #include "Game/GameSceneManager.h"
+#include "Game/DB/BasicGameInfo.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
@@ -40,7 +41,7 @@ GameResultsScene::~GameResultsScene()
         scene->RestoreButtonVisibility();
 }
 
-void GameResultsScene::fn_8020A494(UnidentifiedGameResultsData* data, UnidentifiedResultsListener* listener, UnidentifiedGameClock* clock)
+void GameResultsScene::fn_8020A494(BasicGameInfo* data, BaseSceneHandler* listener, UnidentifiedGameClock* clock)
 {
     mUnidentifiedA10 = data;
     mUnidentifiedA14 = listener;
@@ -50,7 +51,7 @@ void GameResultsScene::fn_8020A494(UnidentifiedGameResultsData* data, Unidentifi
 void GameResultsScene::OnDoneTransitionComplete()
 {
     SHStrikerTimesBase::OnDoneTransitionComplete();
-    mUnidentifiedA14->Virtual28(1);
+    mUnidentifiedA14->SetVisible(true);
     GameSceneManager::Instance()->Pop();
 }
 
@@ -81,7 +82,7 @@ void GameResultsScene::Update(float dt)
     if (!mUnidentified5D8 && mUnidentifiedA10 != 0)
     {
         FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-        mSummary.fn_802095D0(mUnidentifiedA10->mHome, mUnidentifiedA10->mAway, presentation);
+        mSummary.fn_802095D0(mUnidentifiedA10->mSides[0], mUnidentifiedA10->mSides[1], presentation);
     }
     UnidentifiedGameClock* clock = mUnidentifiedA18;
     if (clock != 0)

@@ -659,7 +659,7 @@ bool InterpreterCore::ExecuteFunction(FunctionEntryPoint* entry, unsigned int co
     return true;
 }
 
-FunctionEntryPoint* InterpreterCore::FindFunctionEntryPoint(const u32& hash)
+FunctionEntryPoint* InterpreterCore::FindFunctionEntryPoint(const unsigned int& hash)
 {
     unsigned long value = hash;
     return nlBSearch<FunctionEntryPoint, unsigned long>(value, m_Header->m_FunctionTable, m_Header->numFunctions);

@@ -30,6 +30,8 @@ void EmitStar(cFielder* pFielder, bool bParam);
 void KillStar(cFielder* pFielder);
 bool KillDaze(cPlayer* player);
 void EmitDaze(cPlayer* pCharacter);
+extern "C" void fn_801B73B8(cPlayer* pCharacter, bool bParam);
+extern "C" void fn_801B74C8(cPlayer* pCharacter);
 extern "C" void fn_8001EFE4(cFielder*, bool);
 extern "C" void fn_801B8CF4(const nlVector3& v3Position);
 

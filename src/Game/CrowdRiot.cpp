@@ -1,5 +1,6 @@
 #include "Game/Sys/audio.h"
 #include "Game/CrowdRiot.h"
+#include "Game/Goalie.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
@@ -28,13 +29,10 @@ typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
     UnidentifiedEventRegistry;
 
-class Goalie;
-
 extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" float lbl_806E0C40;
 extern "C" float lbl_806E0C44;
 
-extern "C" void fn_8007EB90(Goalie*);
 extern "C" void fn_8005E29C(cGame*, void*);
 extern "C" void fn_800298D8(void*);
 extern "C" void fn_800299C4(void*);
@@ -417,7 +415,7 @@ void fn_80029B9C(void* param)
             }
             else
             {
-                fn_8007EB90((Goalie*)player);
+                static_cast<Goalie*>(player)->fn_8007EB90();
             }
         }
         else

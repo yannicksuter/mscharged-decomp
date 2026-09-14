@@ -2209,7 +2209,7 @@ inline void cCharacter::UnidentifiedSetScale(float unidentifiedScale)
     if (m_eClassType == FIELDER)
         unidentifiedRadius = fn_8002BFA8(((cFielder*)this)->GetTweaks(), 1.0f);
     else if (m_eClassType == GOALIE)
-        unidentifiedRadius = ((GoalieTweaks*)((cPlayer*)this)->m_pTweaks)->fPhysCapsuleRadius;
+        unidentifiedRadius = ((Goalie*)this)->m_pTweaks->fPhysCapsuleRadius;
     unidentifiedRadius *= unidentifiedScale;
     m_pPhysicsCharacter->m_pPlayerPlayerColumn->SetRadius(unidentifiedRadius);
     m_pPhysicsCharacter->SetBoneVolumeScale(unidentifiedScale);

@@ -180,7 +180,6 @@ extern "C" void fn_801B7A28(cBall* pBall);
 extern "C" void fn_801B79A4(const char* szEffectName, bool bReallyKill);
 extern "C" void fn_801B75C8(cFielder* pCharacter, eBallShotEffectType eNewBallEffect, cPlayer* pPassTarget, bool bSilent, bool bParam5);
 extern "C" void fn_801B74C8(cPlayer* pCharacter);
-extern "C" void fn_801B73B8(cPlayer* pCharacter, bool);
 void GetAnimTriggerInfo(cCharacter* pCharacter, int animIndex, bool (*callback)(float, float, unsigned long, float, void*), void* pData);
 
 EmissionController* EmitGeneric(cCharacter* pCharacter, const char* baseName, const char* characterName);

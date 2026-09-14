@@ -14,8 +14,14 @@ public:
     static void SetNetDimensions(float fWidth, float fHeight,
         float fPostRadius, float fPostOffsetFromGoalLine);
 
-    static float GetNetHeight();
-    static float GetNetWidth();
+    static float GetNetHeight()
+    {
+        return m_fNetHeight;
+    }
+    static float GetNetWidth()
+    {
+        return m_fNetWidth;
+    }
     static float GetPostRadius()
     {
         return m_fNetPostRadius;

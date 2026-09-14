@@ -60,6 +60,10 @@ public:
     cFielder* GetFielder(int nIndex);
     cFielder* GetBallInterceptFielder(int i) { return m_pBallInterceptOrderedFielders[i]; }
     cFielder* GetAIOrderedFielder(int i) { return m_pAIOrderedFielders[i]; }
+    const nlVector3& UnidentifiedInterceptPosition(int i) const
+    {
+        return mvBallInterceptPosition[i];
+    }
     cPlayer* GetPlayer(int nIndex);
     cPlayer* GetControlledPlayer(cGlobalPad* pController);
     cFielder* GetCaptain();

@@ -125,9 +125,6 @@ extern "C" float fn_8002C730(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C678(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C6E8(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CFC4(PlayerTweaks* pTweaks);
-extern "C" void fn_80097858(cPlayer* pPlayer, cPlayer* pPassTarget,
-    int nParam1, int nParam2, int nParam3, int nParam4, float fParam1,
-    float fParam2);
 extern "C" float fn_8002CF88(PlayerTweaks* pTweaks);
 extern "C" float fn_80030750(cFielder* pFielder);
 extern "C" float fn_8002D020(PlayerTweaks* pTweaks);
@@ -2155,7 +2152,7 @@ void cFielder::InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam)
     InitMovementFromAnim(
         (s16)(nTurnAdjust + facingDelta2), v3Zero, lbl_806E3540, false);
 
-    fn_80097858(this, pPlayer, bParam, true, true, bParam,
+    DoRegularPassing(pPlayer, bParam, true, true, bParam,
         fn_8002CFC4(this->GetTweaks()), fn_8002C730(this->GetTweaks()));
 
     mUnidentified371 = true;
@@ -2258,7 +2255,7 @@ void cFielder::ActionPass(float fDeltaT)
             fA = fn_8002C6E8(this->GetTweaks());
             fB = fn_8002C678(this->GetTweaks());
         }
-        fn_80097858(this, mUnidentified36C, bIsModified,
+        DoRegularPassing(mUnidentified36C, bIsModified,
             mUnidentified370, false, false, fA, fB);
     }
 

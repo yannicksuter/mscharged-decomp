@@ -64,13 +64,13 @@ inline void TransportConnection::SetClosed()
 {
     if (!IsClosed())
     {
-        if (mState == 5)
+        if (mState == STATE_5)
         {
-            mState = 9;
+            mState = STATE_9;
         }
         else
         {
-            mState = 8;
+            mState = STATE_8;
         }
     }
 }
@@ -84,7 +84,7 @@ inline void TransportConnection::SetClosed()
         int nReason = (reason);                                                \
         tDebugPrintManager::Print(DC_NETWORK, "Connection Error result %d reason %d\n", nResult,  \
             nReason);                                                          \
-        if (mState < 6)                                              \
+        if (mState < STATE_6)                                              \
         {                                                                      \
             SetClosed();                                           \
             if (!mIncoming)                                             \
@@ -154,7 +154,7 @@ TransportConnection::TransportConnection(
     , mCloseDelayFrames(5)
     , mUpdateFrameCount(0)
     , mOutOfOrderCount(0)
-    , mState(0)
+    , mState(STATE_0)
     , mNextSendSequence(0)
     , mNextReceiveSequence(0)
     , mPort(port)
@@ -174,11 +174,11 @@ TransportConnection::TransportConnection(
     if (outgoing)
     {
         mIncoming = false;
-        mState = 1;
+        mState = STATE_1;
     }
     else
     {
-        mState = 3;
+        mState = STATE_3;
         mIncoming = true;
     }
 }
@@ -223,15 +223,15 @@ void TransportConnection::Update()
     {
         return;
     }
-    if (mState == 8 && mCloseDelayFrames > 0)
+    if (mState == STATE_8 && mCloseDelayFrames > 0)
     {
         mCloseDelayFrames--;
     }
-    if (mState < 6)
+    if (mState < STATE_6)
     {
         UpdateConnecting();
     }
-    else if (mState == 6 || mState == 7)
+    else if (mState == STATE_6 || mState == STATE_7)
     {
         UpdateConnected();
     }
@@ -579,7 +579,7 @@ void TransportConnection::UpdateConnected()
 
 void TransportConnection::CheckTimeouts()
 {
-    if (mState < 6)
+    if (mState < STATE_6)
     {
         bool timedOut = false;
         unsigned long long now = nlGetTime();
@@ -591,7 +591,7 @@ void TransportConnection::CheckTimeouts()
                 timedOut = true;
             }
         }
-        else if (mState < 5)
+        else if (mState < STATE_5)
         {
             if ((int)nlGetTimeDifference(mConnectStartTime, now)
                 > s_nConnectServerTimeoutMS)
@@ -617,7 +617,7 @@ void TransportConnection::CheckTimeouts()
     {
         switch (mState)
         {
-        case 6:
+        case STATE_6:
         {
             int elapsed = (int)nlGetTimeDifference(mKeepAliveReceiveTime, nlGetTime());
             if (s_bExpireKeepAliveEnabled && elapsed > s_nExpireKeepAliveMS)
@@ -637,7 +637,7 @@ void TransportConnection::CheckTimeouts()
             }
             break;
         }
-        case 7:
+        case STATE_7:
         {
             if ((int)nlGetTickerDifference(mClosingStartTick, nlGetTicker())
                 > s_nClosingTimeoutMS)
@@ -864,7 +864,7 @@ void TransportConnection::HandleTransportMessage(
         if (!IsClosed())
         {
             tDebugPrintManager::Print(DC_NETWORK, "Received unreliable CLOSED message\n");
-            TRANSPORT_CONNECTION_ERROR(2, mState != 7);
+            TRANSPORT_CONNECTION_ERROR(2, mState != STATE_7);
         }
     }
 }
@@ -902,7 +902,7 @@ void TransportConnection::Deliver(
         TransportClientResponse payload;
         payload.Serialize(&serializer);
         tDebugPrintManager::Print(DC_NETWORK, "Received Client Response Message\n");
-        if (mState != 4)
+        if (mState != STATE_4)
         {
             TRANSPORT_CONNECTION_ERROR(7, 2);
         }
@@ -912,7 +912,7 @@ void TransportConnection::Deliver(
         }
         else
         {
-            mState = 5;
+            mState = STATE_5;
             GetCallback()->OnConnectionRequest(
                 (u32)this, mAddress, 0, 0, 0);
         }
@@ -922,13 +922,13 @@ void TransportConnection::Deliver(
     {
         TransportServerResponse payload;
         payload.Serialize(&serializer);
-        if (mState != 2)
+        if (mState != STATE_2)
         {
             TRANSPORT_CONNECTION_ERROR(7, 2);
         }
         else if (payload.mAccepted)
         {
-            mState = 6;
+            mState = STATE_6;
             GetCallback()->OnConnectionAttempted((u32)this, 0);
         }
         else
@@ -945,7 +945,7 @@ void TransportConnection::Deliver(
         payload.Serialize(&serializer);
         tDebugPrintManager::Print(DC_NETWORK, "Received closing message\n");
         mPendingClosedCount += 3;
-        TRANSPORT_CONNECTION_ERROR(2, mState != 7);
+        TRANSPORT_CONNECTION_ERROR(2, mState != STATE_7);
         break;
     }
     case 0xE5:
@@ -1117,7 +1117,7 @@ void TransportConnection::SendClientChallenge()
     u8* data = serializer.mBuffer;
     int length = serializer.GetLength();
     SubmitReliable(0xE0, data, length);
-    mState = 1;
+    mState = STATE_1;
 }
 
 void TransportConnection::HandleClientChallenge(
@@ -1125,7 +1125,7 @@ void TransportConnection::HandleClientChallenge(
 {
     tDebugPrintManager::Print(DC_NETWORK, "Received Client Challenge Message\n");
     mSocket->mScreenPrinter.Print("Received Client Challenge Message\n");
-    if (mState != 3)
+    if (mState != STATE_3)
     {
         TRANSPORT_CONNECTION_ERROR(7, 2);
     }
@@ -1141,7 +1141,7 @@ void TransportConnection::HandleClientChallenge(
         u8* data = serializer.mBuffer;
         int length = serializer.GetLength();
         SubmitReliable(0xE1, data, length);
-        mState = 4;
+        mState = STATE_4;
     }
 }
 
@@ -1150,7 +1150,7 @@ void TransportConnection::HandleServerChallenge(
 {
     tDebugPrintManager::Print(DC_NETWORK, "Received Server Challenge Message\n");
     mSocket->mScreenPrinter.Print("Received Server Challenge Message");
-    if (mState != 1)
+    if (mState != STATE_1)
     {
         TRANSPORT_CONNECTION_ERROR(7, 2);
     }
@@ -1168,18 +1168,18 @@ void TransportConnection::HandleServerChallenge(
         u8* data = serializer.mBuffer;
         int length = serializer.GetLength();
         SubmitReliable(0xE2, data, length);
-        mState = 2;
+        mState = STATE_2;
     }
 }
 
 bool TransportConnection::Accept()
 {
-    if (mState == 9)
+    if (mState == STATE_9)
     {
-        mState = 8;
+        mState = STATE_8;
         return false;
     }
-    if (mState != 5)
+    if (mState != STATE_5)
     {
         return false;
     }
@@ -1190,18 +1190,18 @@ bool TransportConnection::Accept()
     u8* data = serializer.mBuffer;
     int length = serializer.GetLength();
     SubmitReliable(0xE3, data, length);
-    mState = 6;
+    mState = STATE_6;
     return true;
 }
 
 void TransportConnection::Reject()
 {
-    if (mState == 9)
+    if (mState == STATE_9)
     {
-        mState = 8;
+        mState = STATE_8;
         return;
     }
-    if (mState == 5)
+    if (mState == STATE_5)
     {
         TransportServerResponse payload;
         u8 buffer[50];
@@ -1210,7 +1210,7 @@ void TransportConnection::Reject()
         u8* data = serializer.mBuffer;
         int length = serializer.GetLength();
         SubmitReliable(0xE3, data, length);
-        mState = 7;
+        mState = STATE_7;
         mClosingStartTick = nlGetTicker();
     }
 }
@@ -1226,9 +1226,9 @@ void TransportConnection::Disconnect(bool immediate)
             GetCallback()->OnConnectionClosed((u32)this, 0);
         }
     }
-    else if (mState != 7 && !IsClosed())
+    else if (mState != STATE_7 && !IsClosed())
     {
-        mState = 7;
+        mState = STATE_7;
         mClosingStartTick = nlGetTicker();
         tDebugPrintManager::Print(DC_NETWORK, "Sending Closing Message\n");
         u8 buffer[50];
@@ -1243,7 +1243,7 @@ void TransportConnection::Disconnect(bool immediate)
 
 bool TransportConnection::IsFinished() const
 {
-    if (mState == 8 && mPendingClosedCount <= 0 && mCloseDelayFrames <= 0)
+    if (mState == STATE_8 && mPendingClosedCount <= 0 && mCloseDelayFrames <= 0)
     {
         return true;
     }

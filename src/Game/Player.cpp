@@ -951,12 +951,12 @@ extern "C" bool fn_800977A4(const cPlayer* pPlayer, float fParam)
     return false;
 }
 
-extern "C" void fn_80097858(cPlayer* pPasser, cFielder* pPassTarget,
-                            bool bVolleyPass, bool bFindPosition, bool bPerfectPass,
-                            float fMinPassSpeed, float fMaxPassSpeed)
+void cPlayer::DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
+    bool bFindPosition, bool bPerfectPass, bool bParam4,
+    float fMinPassSpeed, float fMaxPassSpeed)
 {
-    DesireReceivePass* pDesire = (DesireReceivePass*)fn_8002E08C(pPassTarget, 22);
-    fn_800C22CC(pDesire, pPasser, bVolleyPass, bFindPosition, bPerfectPass, NULL, fMinPassSpeed, fMaxPassSpeed);
+    DesireReceivePass* pDesire = (DesireReceivePass*)fn_8002E08C((cFielder*)pTeammate, 22);
+    fn_800C22CC(pDesire, this, bVolleyPass, bFindPosition, bPerfectPass, NULL, fMinPassSpeed, fMaxPassSpeed);
 }
 
 void cPlayer::SetPowerupAnimState(int animID)
@@ -1355,7 +1355,7 @@ extern "C" void fn_80099030(UnidentifiedEventData00*)
     }
 }
 
-void cPlayer::fn_80099074(UnidentifiedEventData24*)
+void cPlayer::fn_80099074(const UnidentifiedEventData24*)
 {
 }
 

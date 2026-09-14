@@ -358,6 +358,47 @@ void AxManager::SetMasterVolume(f32 volume, int frame) {
     }
 }
 
+void AxManager::AuxCallbackFunc(void* chans, void* context) {
+    int num;
+    void* buffer[AX_DPL2_MAX];
+
+    void** ppChans = static_cast<void**>(chans);
+    AuxBus bus = static_cast<AuxBus>(reinterpret_cast<u32>(context));
+
+    if (GetInstance().GetOutputMode() == OUTPUT_MODE_DPL2) {
+        num = AX_DPL2_MAX;
+
+        buffer[AX_DPL2_L] = ppChans[AX_DPL2_L];
+        buffer[AX_DPL2_R] = ppChans[AX_DPL2_R];
+        buffer[AX_DPL2_LS] = ppChans[AX_DPL2_LS];
+        buffer[AX_DPL2_RS] = ppChans[AX_DPL2_RS];
+    } else {
+        num = AX_STEREO_MAX;
+
+        buffer[AX_STEREO_L] = ppChans[AX_STEREO_L];
+        buffer[AX_STEREO_R] = ppChans[AX_STEREO_R];
+        buffer[AX_STEREO_S] = ppChans[AX_STEREO_S];
+    }
+
+    if (GetInstance().mAuxCallbackWaitCounter[bus] > 0) {
+        GetInstance().mAuxCallbackWaitCounter[bus]--;
+
+        for (int i = 0; i < num; i++) {
+            memset(buffer[i], 0, FX_BUFFER_SIZE);
+        }
+    } else if (GetInstance().GetEffectList(bus).IsEmpty()) {
+        for (int i = 0; i < num; i++) {
+            memset(buffer[i], 0, FX_BUFFER_SIZE);
+        }
+    } else {
+        for (FxList::Iterator it = GetInstance().GetEffectList(bus).GetBeginIter();
+             it != GetInstance().GetEffectList(bus).GetEndIter(); it++) {
+
+            it->UpdateBuffer(num, buffer, FX_BUFFER_SIZE, FX_SAMPLE_FORMAT, FX_SAMPLE_RATE,
+                             GetInstance().GetOutputMode());
+        }
+    }
+}
 
 void AxManager::AxCallbackFunc() {
     for (CallbackList::Iterator it = GetInstance().mCallbackList.GetBeginIter();
@@ -458,48 +499,6 @@ int AxManager::DropLowestPriorityVoice(int priority) {
     }
 
     return dropped;
-}
-
-void AxManager::AuxCallbackFunc(void* chans, void* context) {
-    int num;
-    void* buffer[AX_DPL2_MAX];
-
-    void** ppChans = static_cast<void**>(chans);
-    AuxBus bus = static_cast<AuxBus>(reinterpret_cast<u32>(context));
-
-    if (GetInstance().GetOutputMode() == OUTPUT_MODE_DPL2) {
-        num = AX_DPL2_MAX;
-
-        buffer[AX_DPL2_L] = ppChans[AX_DPL2_L];
-        buffer[AX_DPL2_R] = ppChans[AX_DPL2_R];
-        buffer[AX_DPL2_LS] = ppChans[AX_DPL2_LS];
-        buffer[AX_DPL2_RS] = ppChans[AX_DPL2_RS];
-    } else {
-        num = AX_STEREO_MAX;
-
-        buffer[AX_STEREO_L] = ppChans[AX_STEREO_L];
-        buffer[AX_STEREO_R] = ppChans[AX_STEREO_R];
-        buffer[AX_STEREO_S] = ppChans[AX_STEREO_S];
-    }
-
-    if (GetInstance().mAuxCallbackWaitCounter[bus] > 0) {
-        GetInstance().mAuxCallbackWaitCounter[bus]--;
-
-        for (int i = 0; i < num; i++) {
-            memset(buffer[i], 0, FX_BUFFER_SIZE);
-        }
-    } else if (GetInstance().GetEffectList(bus).IsEmpty()) {
-        for (int i = 0; i < num; i++) {
-            memset(buffer[i], 0, FX_BUFFER_SIZE);
-        }
-    } else {
-        for (FxList::Iterator it = GetInstance().GetEffectList(bus).GetBeginIter();
-             it != GetInstance().GetEffectList(bus).GetEndIter(); it++) {
-
-            it->UpdateBuffer(num, buffer, FX_BUFFER_SIZE, FX_SAMPLE_FORMAT, FX_SAMPLE_RATE,
-                             GetInstance().GetOutputMode());
-        }
-    }
 }
 
 } // namespace detail

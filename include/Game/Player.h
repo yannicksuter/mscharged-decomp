@@ -126,7 +126,7 @@ public:
     virtual void CollideWithWallCallback(
         const CollisionPlayerWallData* pData);
     virtual void InitActionPostWhistle();
-    virtual void fn_80099074(UnidentifiedEventData24*);
+    virtual void fn_80099074(const UnidentifiedEventData24*);
 
     void ClearSwapControllerTimer()
     {
@@ -134,6 +134,9 @@ public:
             m_tSwapControllerTimer[i].UnidentifiedClear();
     }
     void ReleaseBall(int nParam);
+    void DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
+        bool bFindPosition, bool bPerfectPass, bool bParam4,
+        float fMinPassSpeed, float fMaxPassSpeed);
     void fn_80095DF4(float fDeltaT);
     void GetAnimatedBallOrientation(nlQuaternion& qRetval);
     bool UnidentifiedPowerupPredicate();
@@ -211,8 +214,6 @@ public:
     /* 0x31C */ SpaceSearch* m_pSpaceSearch;
     /* 0x320 */ AvoidableObject* mUnidentified320;
 
-public:
-    /* 0x324 */ PlayerTweaks* m_pTweaks;
-}; // total size: 0x328
+}; // total size: 0x324
 
 #endif // GAME_PLAYER_H

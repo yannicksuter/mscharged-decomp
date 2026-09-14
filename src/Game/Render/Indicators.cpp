@@ -1,5 +1,6 @@
 #include "Game/Render/Indicators.h"
 #include "Game/AI/Fielder.h"
+#include "Game/Goalie.h"
 
 #include "Game/Render/RLView.h"
 
@@ -339,7 +340,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
         else
         {
             IndicatorPlayerTweaks* pTweaks
-                = (IndicatorPlayerTweaks*)pCharacter->m_pTweaks;
+                = (IndicatorPlayerTweaks*)((Goalie*)pCharacter)->m_pTweaks;
             worldPos.z += *pTweaks->fGoalieCapsuleHeight * 0.5f;
         }
 
@@ -439,7 +440,7 @@ static void UpdateAndRenderPlayerIndicators(float)
         else
         {
             IndicatorPlayerTweaks* pTweaks
-                = (IndicatorPlayerTweaks*)pCharacter->m_pTweaks;
+                = (IndicatorPlayerTweaks*)((Goalie*)pCharacter)->m_pTweaks;
             fVerticalOffset += *pTweaks->fGoalieCapsuleHeight;
         }
         v3Position.z += fVerticalOffset;

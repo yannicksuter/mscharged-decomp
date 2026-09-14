@@ -6,26 +6,7 @@
 
 class TLTextInstance;
 
-struct UnidentifiedGameResultsData
-{
-    /* 0x00 */ u8 mUnidentified00[0x24];
-    /* 0x24 */ TeamStats mHome;
-    /* 0x94 */ TeamStats mAway;
-}; // size 0x104
-
-class UnidentifiedResultsListener
-{
-public:
-    virtual void Virtual08() = 0;
-    virtual void Virtual0C() = 0;
-    virtual void Virtual10() = 0;
-    virtual void Virtual14() = 0;
-    virtual void Virtual18() = 0;
-    virtual void Virtual1C() = 0;
-    virtual void Virtual20() = 0;
-    virtual void Virtual24() = 0;
-    virtual void Virtual28(int value) = 0;
-};
+class BasicGameInfo;
 
 struct UnidentifiedGameClock
 {
@@ -43,13 +24,13 @@ public:
     virtual void SceneCreated();
     virtual void OnDoneTransitionComplete();
 
-    void fn_8020A494(UnidentifiedGameResultsData* data, UnidentifiedResultsListener* listener, UnidentifiedGameClock* clock);
+    void fn_8020A494(BasicGameInfo* data, BaseSceneHandler* listener, UnidentifiedGameClock* clock);
 
     /* 0x5D4 */ TLTextInstance* mTitleText;
     /* 0x5D8 */ bool mUnidentified5D8;
     /* 0x5DC */ TU80209584Summary mSummary;
-    /* 0xA10 */ UnidentifiedGameResultsData* mUnidentifiedA10;
-    /* 0xA14 */ UnidentifiedResultsListener* mUnidentifiedA14;
+    /* 0xA10 */ BasicGameInfo* mUnidentifiedA10;
+    /* 0xA14 */ BaseSceneHandler* mUnidentifiedA14;
     /* 0xA18 */ UnidentifiedGameClock* mUnidentifiedA18;
     /* 0xA1C */ u16 mTitleBuffer[0x20];
 }; // size 0xA5C

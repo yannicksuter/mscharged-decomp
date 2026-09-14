@@ -252,7 +252,7 @@ void ReplayManager::fn_80188D88()
             ->Add(callback, 0, -1);
     }
     {
-        Function<UnidentifiedEventData_8006649C*> callback(
+        Function<GoalieSaveData*> callback(
             UnidentifiedMakeReplayBinding(
                 &ReplayManager::fn_80189610, this));
         UnidentifiedEventBase** foundEvent;
@@ -261,7 +261,7 @@ void ReplayManager::fn_80188D88()
         foundEvent = 0;
         g_pEventRegistry->Find(hash, &foundEvent, 0);
         UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventData_8006649C>*)event)
+        ((UnidentifiedTypedEvent<GoalieSaveData>*)event)
             ->Add(callback, 0, -1);
     }
     {
@@ -314,7 +314,7 @@ void ReplayManager::fn_801895F0(GoalScoredData* event)
     }
 }
 
-void ReplayManager::fn_80189610(UnidentifiedEventData_8006649C* event)
+void ReplayManager::fn_80189610(GoalieSaveData* event)
 {
     mEvents |= 0x11;
 }
@@ -467,4 +467,54 @@ void ReplayManager::RenderSnapshotAt(float deltaTime)
 extern "C" bool fn_80194660(cCharacter* character)
 {
     return character->mUnidentified024.m_eCharacterClass == 13;
+}
+
+extern "C" void* fn_801925BC(void* pParam)
+{
+    return (char*)pParam + 24;
+}
+
+extern "C" void fn_80192EC0(void* pParam, int value)
+{
+    *(int*)pParam = value;
+}
+
+extern "C" void fn_80192EC8(void* pParam, int value)
+{
+    *(int*)pParam = value;
+}
+
+extern "C" void fn_80192ED0(void* pParam, int value)
+{
+    *(int*)pParam = value;
+}
+
+extern "C" void fn_80192ED8(void* pParam, int value)
+{
+    *(int*)pParam = value;
+}
+
+extern "C" void fn_80192EE0(void* pParam, int value)
+{
+    *(int*)pParam = value;
+}
+
+extern "C" void fn_80192EE8(void* pParam, int value)
+{
+    *(int*)pParam = value;
+}
+
+extern "C" void fn_80192EF0(void* pParam, int value)
+{
+    *(int*)pParam = value;
+}
+
+extern "C" void* fn_801948A8(void* pParam)
+{
+    return *(void**)pParam;
+}
+
+extern "C" float fn_801948B0(void* pParam)
+{
+    return *(float*)((char*)pParam + 16);
 }

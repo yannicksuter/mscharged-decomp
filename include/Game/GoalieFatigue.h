@@ -3,10 +3,15 @@
 
 #include "types.h"
 
+class DebugWriteCache;
+
 class GoalieFatigue
 {
 public:
-    GoalieFatigue();
+    float GetEnergyLevel() const
+    {
+        return mfEnergyLevel;
+    }
     void Reset()
     {
         mfEnergyLevel = 100.0f;
@@ -16,6 +21,7 @@ public:
     }
     void Update(float dt);
     void RegisterShot(float fLevel);
+    void UnidentifiedSyncLog(void* context, DebugWriteCache* cache);
 
     /* 0x00 */ f32 mfEnergyLevel;
     /* 0x04 */ f32 mfRecoverRate;

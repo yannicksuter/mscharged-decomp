@@ -17,6 +17,11 @@ struct FEPageControls
     virtual void OnPointerPress(int index, void* context);
     virtual void OnPadPress(int index, void* context);
 
+    bool IsButtonPressed(int direction) const
+    {
+        return mPointerPressed[direction] || mPadPressed[direction];
+    }
+
     void SetButtonState(int direction, bool enabled, bool visible);
     void InitializeButtons();
     void ClearButtonHighlight(int index);

@@ -18,6 +18,11 @@ public:
     void InitInstance(cPlayer* pPlayer, int nAnimID,
         eLooseBallAnimType eAnimType);
 
+    float GetPickupTime() const
+    {
+        return mfPickupTime;
+    }
+
     /* 0x00 */ nlVector3 mv3PickupPos;
     /* 0x0C */ int mnAnimID;
     /* 0x10 */ eLooseBallAnimType mAnimType;

@@ -14,6 +14,20 @@
 class TransportConnection
 {
 public:
+    enum State
+    {
+        STATE_0,
+        STATE_1,
+        STATE_2,
+        STATE_3,
+        STATE_4,
+        STATE_5,
+        STATE_6,
+        STATE_7,
+        STATE_8,
+        STATE_9,
+    };
+
     static void* operator new(
         unsigned long size, unsigned int alignment, bool fromEnd);
     void operator delete(void* connection);
@@ -45,9 +59,11 @@ public:
     void Disconnect(bool immediate);
     bool IsFinished() const;
 
+    State GetState() const { return mState; }
+
     bool IsClosed()
     {
-        return mState == 8 || mState == 9;
+        return mState == STATE_8 || mState == STATE_9;
     }
 
 private:
@@ -83,7 +99,7 @@ public:
     /* 0x614 */ StaticCircularQueue<TransportPacket*, 20> m_OutgoingUnreliableSendQ;
     /* 0x674 */ StaticCircularQueue<TransportPacket*, 20> m_OutgoingVoiceSendQ;
     /* 0x6D4 */ StaticCircularQueue<TransportPacket*, 60> mFreeAfterSendQ;
-    /* 0x7D4 */ int mState;
+    /* 0x7D4 */ State mState;
     /* 0x7D8 */ u16 mNextSendSequence;
     /* 0x7DA */ u16 mNextReceiveSequence;
     /* 0x7DC */ u16 mPort;

@@ -324,7 +324,6 @@ extern "C" void fn_8014545C(void* data)
 
 extern "C" void fn_80032534(cFielder*, const nlVector3&);
 extern "C" bool fn_800167A8(cBall*);
-extern "C" void fn_80080EFC(cPlayer*);
 extern "C" void fn_800ED92C(unsigned long soundID);
 
 float lbl_806DCA90 = 1.0f;
@@ -502,7 +501,7 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
             {
                 cPlayer* pGoalie = pBall->GetOwnerGoalie();
                 pGoalie->ReleaseBall(0);
-                fn_80080EFC(pGoalie);
+                static_cast<Goalie*>(pGoalie)->fn_80080EFC();
             }
         }
 

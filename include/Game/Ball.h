@@ -61,6 +61,10 @@ public:
     void Update(float fDeltaT);
     void SyncLog(void* context, DebugWriteCache* cache);
     void fn_8001A898(RunningChecksum* runningChecksum);
+    unsigned int UnidentifiedGetGoalType() const
+    {
+        return m_uGoalType;
+    }
     nlVector3* GetAIVelocity() const;
     nlVector3* GetDrawablePosition() const;
     float fn_80014F38(float fScale) const;
@@ -73,6 +77,16 @@ public:
     bool HasActivePassTarget() const
     {
         return (meBallState == 5 || meBallState == 3) && m_pPassTarget != 0;
+    }
+
+    bool UnidentifiedState8Shot()
+    {
+        return m_tLightningTimer.m_uPackedTime != 0 && meBallState == 8;
+    }
+
+    bool UnidentifiedState7Shot()
+    {
+        return m_tLightningTimer.m_uPackedTime != 0 && meBallState == 7;
     }
 
     /* 0x00 */ bool m_bVisible;
