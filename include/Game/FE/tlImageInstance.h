@@ -15,8 +15,12 @@ public:
         m_type = TLAT_IMAGE;
     }
 
-    FETextureResource*& fn_802332D0();
-    void fn_802332D8(FETextureResource* resource);
+    FETextureResource*& GetTextureResource() { return m_pTextureResource; }
+    void SetTextureResource(FETextureResource* resource)
+    {
+        if (resource != 0)
+            m_pTextureResource = resource;
+    }
 
     /* 0x90 */ FETextureResource* m_pTextureResource;
     /* 0x94 */ unsigned long field_0x94;

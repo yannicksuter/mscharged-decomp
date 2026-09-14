@@ -1,4 +1,5 @@
 #include "Game/SH/SHOptionsCheatsList.h"
+#include "NL/nlFunction.inl"
 #include "Game/SH/SHGameplayOptions.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"

@@ -1,4 +1,5 @@
 #include "Game/SH/SHHallOfFame.h"
+#include "NL/nlBasicString.inl"
 #include "Game/SH/SHNavigation.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/FE/feCupFlow.h"
@@ -40,7 +41,6 @@
 #include "Game/SH/SHNavigation.h"
 
 #include <string.h>
-#include "NL/nlBasicString.inl"
 
 AsyncImage* sHallOfFameImages[12];
 int sHallOfFamePlayerCardIndex;

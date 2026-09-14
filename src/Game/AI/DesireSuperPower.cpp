@@ -49,7 +49,6 @@ extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" cGame* g_pGame;
 extern "C" const nlVector3* fn_80040234(cFielder*);
 extern "C" float fn_800DEAB4(cFielder*);
-extern "C" float fn_800E03A8(cFielder*);
 extern "C" cFielder* fn_800D66A0(cFielder*);
 extern "C" cFielder* fn_800C2E78(const FuzzyVariant*);
 extern "C" cTeam* fn_800C2F38(const cFielder*);
@@ -71,9 +70,7 @@ extern "C" int fn_800D1D24(int);
 extern "C" void fn_800CD8E4(nlVector2*, const nlVector2*);
 extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311750(UnidentifiedFuzzyRuntimeValue*);
 extern "C" float fn_800DBB0C(cFielder*);
-extern "C" float fn_800E040C(cFielder*);
 extern "C" cPlayer* fn_800D674C(cFielder*);
-extern "C" float fn_800DC744(cFielder*, cPlayer*);
 extern "C" float fn_800DDF54(cFielder*, cPlayer*);
 extern "C" cTeam* fn_800D6688(cFielder*);
 extern "C" void fn_8003EBD0(cFielder*, int, UnidentifiedVariantCollection*);
@@ -1255,7 +1252,7 @@ void DesireSuperPower::fn_800CDBF0(UnidentifiedDesireUpdate*, float)
         {
             mUnidentifiedFielder->fn_8005001C(true);
         }
-        else if (mUnidentifiedFielder->m_pBall != 0 && fn_800E03A8(mUnidentifiedFielder) < 0.5f)
+        else if (mUnidentifiedFielder->m_pBall != 0 && InDefensiveZone(mUnidentifiedFielder) < 0.5f)
         {
             float x;
             if (mUnidentifiedFielder->m_pBall != 0)
@@ -1382,7 +1379,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CEA20(
         if (active)
             shoot = false;
     }
-    if (fielder->m_pBall != 0 && shoot && fn_800E040C(fielder) > 0.9f)
+    if (fielder->m_pBall != 0 && shoot && InOffensiveZone(fielder) > 0.9f)
     {
         result = 3;
         fn_800B6A1C(&result, 8, FuzzyVariant(lbl_806DC374));
@@ -1394,7 +1391,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CEA20(
     {
         bool turn = false;
         cPlayer* bestPlayer = fn_800D674C(fielder);
-        float q = fn_800DC744(fielder, bestPlayer);
+        float q = CloseTo(fielder, bestPlayer);
         float pass = fn_800DDF54(fielder, bestPlayer);
         float best = pass / 2.0f + q / 2.0f;
         for (int i = 0; i < 5; i++)
@@ -1402,7 +1399,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CEA20(
             cPlayer* player = fn_800D6688(fielder)->GetPlayer(i);
             if (player != bestPlayer)
             {
-                float q = fn_800DC744(fielder, bestPlayer);
+                float q = CloseTo(fielder, bestPlayer);
                 float pass = fn_800DDF54(fielder, bestPlayer);
                 float score = pass / 2.0f + q / 2.0f;
                 if (score > best)
@@ -1433,7 +1430,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CEA20(
             unsigned short angles[3] = { facing, facing + 0x4000, facing - 0x4000 };
             float score = 0.0f;
             unsigned short angle = angles[fn_800CFCC8(fielder, angles, 3, &direction, &score)];
-            if (score == 0.0f && fielder->m_pBall != 0 && fn_800E040C(fielder) > 0.0f)
+            if (score == 0.0f && fielder->m_pBall != 0 && InOffensiveZone(fielder) > 0.0f)
             {
                 result = 3;
                 fn_800B6A1C(&result, 8, FuzzyVariant(lbl_806DC378));

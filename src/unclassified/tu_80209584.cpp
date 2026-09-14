@@ -1,4 +1,5 @@
 #include "unclassified/tu_80209584.h"
+#include "NL/nlBasicString.inl"
 
 #include "Game/FE/feFinder.h"
 #include "Game/FE/fePresentation.h"
@@ -9,7 +10,6 @@
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
 #include "NL/nlPrint.h"
-#include "NL/nlBasicString.inl"
 
 extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
 

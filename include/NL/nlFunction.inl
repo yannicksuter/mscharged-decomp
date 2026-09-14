@@ -32,4 +32,19 @@ inline Function<FnVoidVoid>::Function(Callable callable)
 {
 }
 
+template <typename ReturnType, typename P1, typename P2>
+template <typename Callable>
+inline ReturnType Function2<ReturnType, P1, P2>::FunctorImpl<Callable>::operator()(P1 p1, P2 p2)
+{
+    return Call(p1, p2, BoolToType<IsVoid<ReturnType>::value>());
+}
+
+template <typename ReturnType, typename P1, typename P2>
+template <typename Callable>
+inline typename Function2<ReturnType, P1, P2>::FunctorBase*
+Function2<ReturnType, P1, P2>::FunctorImpl<Callable>::Clone() const
+{
+    return new FunctorImpl(*this);
+}
+
 #endif // NL_FUNCTION_INL

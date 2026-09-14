@@ -49,4 +49,9 @@ public:
     /* 0x34 */ float errorCorrectionDepth;
 }; // size: 0x38
 
+// Ball contact soft_cfm: goal wall set A (IsGoalWallSetA) and the
+// back/top/angled walls (IsAGoalWall). Set B uses sfWallSoftness.
+extern float lbl_806DCAB0;
+extern float lbl_806DCAB4;
+
 #endif // GAME_PHYSICS_PHYSICS_NET_H

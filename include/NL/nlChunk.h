@@ -1,6 +1,7 @@
 #ifndef NL_CHUNK_H
 #define NL_CHUNK_H
 
+#include "NL/nlMath.h"
 #include "types.h"
 
 class nlChunk
@@ -30,7 +31,10 @@ inline nlChunk* nlChunk::GetNextChunk()
 
 inline nlChunk* nlChunk::GetLastChunk()
 {
-    return (nlChunk*)((u8*)this + GetSize() + sizeof(nlChunk));
+    unsigned int offset;
+    u8* address = (u8*)GetUnalignedData() + GetSize();
+    offset = (unsigned int)address & 3;
+    return (nlChunk*)(address + (offset != 0) * (4 - offset));
 }
 
 inline nlChunk* nlChunk::GetFirstChunk()
@@ -61,11 +65,7 @@ inline void* nlChunk::GetAlignedData()
         return GetUnalignedData();
     }
 
-    unsigned int alignment = GetChunkAlignment();
-    unsigned int address = (unsigned int)GetUnalignedData();
-    unsigned int remainder = address % alignment;
-    return (void*)(address
-        + (remainder != 0) * (alignment - remainder));
+    return (void*)nlAlignUp((unsigned int)GetUnalignedData(), GetChunkAlignment());
 }
 
 inline unsigned int nlChunk::GetChunkAlignment()
@@ -76,7 +76,9 @@ inline unsigned int nlChunk::GetChunkAlignment()
 
 inline bool nlChunk::IsAlignedChunk()
 {
-    return m_ID & 0x0F000000;
+    unsigned int alignmentBits = m_ID;
+    alignmentBits &= 0x0F000000;
+    return alignmentBits != 0;
 }
 
 inline unsigned int nlChunk::GetSize()

@@ -52,7 +52,7 @@
 #include "NL/globalpad.h"
 #include "NL/nlMain.h"
 #include "NL/nlPrint.h"
-#include "unclassified/tu_800A9B78.h"
+#include "Game/Weather.h"
 #include "unclassified/tu_801A6AAC.h"
 #include "Game/NetworkPeer.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -1125,7 +1125,7 @@ extern "C" void fn_8007F534(Goalie* pGoalie)
     {
         fn_8005DB7C();
     }
-    g_pGame->mUnidentified10DC->fn_800AA5F8();
+    g_pGame->mpWeatherManager->Resume();
     SetRenderWorldEffects(1);
     g_pGame->fn_800586C0();
 
@@ -2195,7 +2195,7 @@ float Goalie::IsSoloBreakaway()
 
 extern "C" bool fn_80016768(cBall* pBall);
 
-bool Goalie::PreCollideWithBallCallback()
+bool Goalie::PreCollideWithBallCallback(const dContact& contact)
 {
     if (g_pBall->meBallState == 8 && !g_pBall->m_bVisible)
         return false;

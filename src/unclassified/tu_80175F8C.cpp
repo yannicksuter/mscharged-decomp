@@ -6,9 +6,11 @@
 #include "Game/Game.h"
 #include "Game/Physics/Physics.h"
 #include "Game/Physics/PhysicsCharacter.h"
+#include "Game/Physics/PhysicsPatch.h"
 #include "Game/Physics/PhysicsSphere.h"
 #include "NL/nlSlotPool.h"
 #include "unclassified/tu_80175F8C.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 #include "types.h"
 
@@ -22,16 +24,10 @@ extern "C" void fn_800F026C(
 extern "C" SlotPool<UnidentifiedEventData38> lbl_805701B0;
 extern "C" void fn_8014A2BC(UnidentifiedEventData38*);
 
-struct PhysicsObjectType28_80510968 : PhysicsObject
-{
-    /* 0x38 */ u8 unknown38[0x10];
-    /* 0x48 */ u32 unknown48;
-};
-
 static const float sInitialRadius = 0.5f;
 static const float sRadiusOvershoot = 0.01f;
 
-inline PhysicsSphere_80175F8C::PhysicsSphere_80175F8C(void* owner,
+PhysicsSphere_80175F8C::PhysicsSphere_80175F8C(void* owner,
     const nlVector3& position, int effectType, float maximumRadius,
     float growthRate)
     : PhysicsSphere(g_CollisionSpace, 0, sInitialRadius)
@@ -66,21 +62,14 @@ float lbl_806DCAF8 = 20.0f;
 float lbl_806DCAFC = 30.0f;
 float lbl_806DCB00 = 1.0f;
 
-static inline void QueuePhysicsEvent(
-    PhysicsSphere_80175F8C* source, PhysicsObject* target)
-{
-    UnidentifiedEventData38* event = 0;
-    lbl_805701B0.Allocate(event);
-    event->mUnidentified00 = source;
-    event->mUnidentified04 = target;
-    fn_8014A2BC(event);
-}
-
 ContactType PhysicsSphere_80175F8C::Contact(
     PhysicsObject* other, dContact*, int)
 {
     nlVector3 spherePosition;
+    UnidentifiedEventData38* eventData;
     GetPosition(&spherePosition);
+
+    ContactType result = NO_CONTACT;
 
     switch (other->GetObjectType())
     {
@@ -88,21 +77,29 @@ ContactType PhysicsSphere_80175F8C::Contact(
     {
         cFielder* fielder =
             (cFielder*)((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
-        float radius = GetRadius();
-        if (fielder->IsCharacterInAir(GetPosition().z + radius))
+        if (fielder->IsCharacterInAir(GetPosition().z + GetRadius()))
         {
             return NO_CONTACT;
         }
 
-        radius = GetRadius();
-        if (fn_800977A4(fielder, GetPosition().z - radius))
+        if (fn_800977A4(fielder, GetPosition().z - GetRadius()))
         {
             return NO_CONTACT;
         }
 
-        QueuePhysicsEvent(this, other);
+        eventData = 0;
+        lbl_805701B0.Allocate(eventData);
+        eventData->mUnidentified00 = this;
+        eventData->mUnidentified04 = other;
+        fn_8014A2BC(eventData);
         break;
     }
+    case 28:
+        if (((PhysicsPatch*)other)->m_Type != 0)
+        {
+            break;
+        }
+    // fall through
     case 16:
     case 20:
     case 21:
@@ -112,21 +109,20 @@ ContactType PhysicsSphere_80175F8C::Contact(
     case 32:
     case 33:
     case 34:
-        QueuePhysicsEvent(this, other);
+    {
+        eventData = 0;
+        lbl_805701B0.Allocate(eventData);
+        eventData->mUnidentified00 = this;
+        eventData->mUnidentified04 = other;
+        fn_8014A2BC(eventData);
         break;
+    }
     case 24:
-        return ONE_WAY_CONTACT_OTHER;
-    case 28:
-        if (((PhysicsObjectType28_80510968*)other)->unknown48 == 0)
-        {
-            QueuePhysicsEvent(this, other);
-        }
-        break;
-    default:
+        result = ONE_WAY_CONTACT_OTHER;
         break;
     }
 
-    return NO_CONTACT;
+    return result;
 }
 
 bool PhysicsSphere_80175F8C::SetContactInfo(
@@ -182,8 +178,8 @@ extern "C" void fn_801762F0(float dt)
             continue;
         }
 
-        int state = g_pGame->m_eGameState;
-        if ((state != 5 && state != 6 && state != 3) || sphere->finished)
+        if ((!g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != 3)
+            || sphere->finished)
         {
             delete sphere;
             sActiveSpheres[i] = 0;
@@ -205,9 +201,8 @@ extern "C" void fn_801762F0(float dt)
     }
 }
 
-static inline PhysicsSphere_80175F8C* CreateSphere(void* owner,
-    const nlVector3& position, int effectType, float maximumRadius,
-    float growthRate)
+static inline PhysicsSphere_80175F8C* CreateSphere(const nlVector3& position,
+    int effectType, float maximumRadius, float growthRate, void* owner)
 {
     for (int i = 0; i < 20; ++i)
     {
@@ -225,8 +220,7 @@ extern "C" PhysicsSphere_80175F8C* fn_8017642C(
     const nlVector3* position, cFielder* owner, bool frozen,
     int sourceIndex, float maximumRadius)
 {
-    PhysicsSphere_80175F8C* sphere = CreateSphere(
-        owner, *position, 0, maximumRadius, lbl_806DCAE8);
+    PhysicsSphere_80175F8C* sphere = CreateSphere(*position, 0, maximumRadius, lbl_806DCAE8, owner);
     if (sphere != 0)
     {
         sphere->sourceIndex = sourceIndex;
@@ -241,22 +235,19 @@ extern "C" PhysicsSphere_80175F8C* fn_8017642C(
 extern "C" PhysicsSphere_80175F8C* fn_801765C8(
     cFielder* owner, const nlVector3* position, float maximumRadius)
 {
-    return CreateSphere(
-        owner, *position, 1, maximumRadius, lbl_806DCAEC);
+    return CreateSphere(*position, 1, maximumRadius, lbl_806DCAEC, owner);
 }
 
 extern "C" PhysicsSphere_80175F8C* fn_80176754(
     BulletBillObject* bulletBill)
 {
-    return CreateSphere(bulletBill->target, bulletBill->position, 4,
-        lbl_806DCAD8, lbl_806DCADC);
+    return CreateSphere(bulletBill->position, 4, lbl_806DCAD8, lbl_806DCADC, bulletBill->target);
 }
 
 extern "C" PhysicsSphere_80175F8C* fn_801768E0(
     const nlVector3* position, float maximumRadius)
 {
-    return CreateSphere(
-        0, *position, 2, maximumRadius, lbl_806DCAF0);
+    return CreateSphere(*position, 2, maximumRadius, lbl_806DCAF0, 0);
 }
 
 static char sBowserExplodeEffect[] = "bowser_explode";
@@ -271,8 +262,7 @@ extern "C" PhysicsSphere_80175F8C* fn_80176A60(
         EmissionController* controller = EmissionManager::Instance()->Create(group, 3, true, 0);
         controller->SetPosition(*position);
     }
-    return CreateSphere(
-        0, *position, 0, lbl_806DCAE0, lbl_806DCAF4);
+    return CreateSphere(*position, 0, lbl_806DCAE0, lbl_806DCAF4, 0);
 }
 
 PhysicsSphere_80175F8C* CreateDaisyFistImpact(
@@ -285,8 +275,7 @@ PhysicsSphere_80175F8C* CreateDaisyFistImpact(
         controller->SetPosition(*position);
     }
     fn_800F026C(sDaisyCameraShake, lbl_806DCAFC, lbl_806DCB00);
-    return CreateSphere(
-        owner, *position, 5, lbl_806DCAE4, lbl_806DCAF8);
+    return CreateSphere(*position, 5, lbl_806DCAE4, lbl_806DCAF8, owner);
 }
 
 SlotPool<PhysicsSphere_80175F8C> PhysicsSphere_80175F8C::pool(16, 16);

@@ -1280,7 +1280,7 @@ void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
         if (eventData->mUnidentified10->m_pOwner != this
             && !fn_800344B0() && !IsInvincible())
         {
-            UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(&type);
+            UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(type);
             UnidentifiedVariantCollection params;
             if (type == 5)
             {

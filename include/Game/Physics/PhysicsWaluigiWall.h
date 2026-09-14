@@ -17,7 +17,7 @@ extern unsigned int gWaluigiWallNextID;
 class PhysicsWaluigiWall : public PhysicsBox
 {
 public:
-    inline PhysicsWaluigiWall(cFielder* owner, float width, float height);
+    PhysicsWaluigiWall(cFielder* owner, float width, float height);
     virtual ~PhysicsWaluigiWall();
 
     virtual int GetObjectType() const { return 0x1D; }
@@ -30,6 +30,7 @@ public:
     const nlVector3& GetEndPoint() const { return mEndPoint; }
     unsigned int GetID() const { return mID; }
     void SetEndPoint(const nlVector3& end);
+    void Initialize(const nlMatrix3& rotation, float height);
     void ApplyDamage(float damage);
     void Shrink(float dt);
     ContactType FielderContact(cFielder* player);

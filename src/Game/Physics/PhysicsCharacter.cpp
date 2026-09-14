@@ -2,19 +2,25 @@
 
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
-#include "Game/Render/NPCManager.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Field.h"
 #include "Game/GameInfo.h"
+#include "Game/Goalie.h"
+#include "Game/Net.h"
 #include "Game/Physics/CollisionSpace.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsColumn.h"
 #include "Game/Physics/PhysicsFakeBall.h"
+#include "Game/Physics/PhysicsHammer.h"
 #include "Game/Player.h"
+#include "Game/Render/BirdoEgg.h"
+#include "Game/Render/NPCManager.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "math.h"
 #include "types.h"
+#include "unclassified/tu_801A0E64.h"
+#include "unclassified/tu_801A5F10.h"
 
 extern PhysicsWorld* g_PhysicsWorld;
 
@@ -30,36 +36,6 @@ static CollisionPlayerPlayerData* sPlayerPlayerCollisionData[100];
 static bool sbDoDKBallStuckHack = true;
 static float sfBallStuckHackShoveMagnitude = 10.0f;
 
-static inline unsigned int& CharacterFlags(PhysicsCharacter* character)
-{
-    return *(unsigned int*)((char*)character + 0x98);
-}
-
-static inline int CharacterID(const cCharacter* character)
-{
-    return *(const int*)((const char*)character + 0x120);
-}
-
-static inline bool ReadBool(const void* object, unsigned int offset)
-{
-    return *(const bool*)((const char*)object + offset);
-}
-
-static inline unsigned int ReadU32(const void* object, unsigned int offset)
-{
-    return *(const unsigned int*)((const char*)object + offset);
-}
-
-static inline int ReadS32(const void* object, unsigned int offset)
-{
-    return *(const int*)((const char*)object + offset);
-}
-
-static inline void* ReadPointer(const void* object, unsigned int offset)
-{
-    return *(void* const*)((const char*)object + offset);
-}
-
 void fn_80142A1C()
 {
     for (int i = 0; i < 100; ++i)
@@ -71,8 +47,11 @@ void fn_80142A1C()
 PhysicsCharacter::PhysicsCharacter(float radius, float heightScale)
     : PhysicsCharacterBase(
           g_CollisionSpace, g_PhysicsWorld, radius + heightScale / 2.0f)
+    , m_CanCollideWithWall(true)
+    , m_CanCollideWithBall(true)
+    , m_CanCollideWithCharacters(true)
+    , m_CanCollideWithGoalLine(true)
 {
-    CharacterFlags(this) |= 0xE8000000;
     m_nDKBallStuckHackCounter = 0;
     m_bInsideNet = false;
     m_bWasInsideNet = false;
@@ -91,14 +70,14 @@ PhysicsCharacter::PhysicsCharacter(float radius, float heightScale)
 
 void PhysicsCharacter::Unknown0()
 {
-    unsigned int flags = CharacterFlags(this);
     m_nDKBallStuckHackCounter = 0;
-    flags |= 0xE0000000;
-    flags &= ~0x10000000;
+    m_CanCollideWithWall = true;
+    m_CanCollideWithBall = true;
+    m_CanCollideWithCharacters = true;
+    m_HasCollidedWithBall = false;
     m_bSupportingBallThisFrame = false;
-    flags |= 0x08000000;
+    m_CanCollideWithGoalLine = true;
     m_bInsideNet = false;
-    CharacterFlags(this) = flags;
     m_bWasInsideNet = false;
     PhysicsCharacterBase::Unknown0();
 }
@@ -133,6 +112,8 @@ bool PhysicsCharacter::SetContactInfo(
 ContactType PhysicsCharacter::Contact(PhysicsObject* other,
     dContact* contacts, int numContacts, PhysicsObject* originalOther)
 {
+    cBall* ball;
+    eFielderActionState actionState;
     int objectType = other->GetObjectType();
     fn_8013F854(
         "PhysChar Contact objID %d numContacts %d\n", objectType, numContacts);
@@ -160,13 +141,14 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
     }
     if (objectType == 0x1F && m_pAICharacter->m_eClassType == GOALIE)
     {
-        void* hammer = *(void**)((char*)other + 0x38);
-        bool onGround = *(float*)((char*)hammer + 0x48) > 0.0f;
+        HammerObject* hammer = ((PhysicsHammer*)other)->mHammer;
+        bool onGround = hammer->_048 > 0.0f;
         if (onGround)
         {
             fn_8013F854("PhysChar PHYSOBJ_HAMMER OnGround\n");
-            int actionState = *(int*)((char*)m_pAICharacter + 0x328);
-            if (actionState != 0x20 && actionState != 4)
+            Goalie* goalie = (Goalie*)m_pAICharacter;
+            if (goalie->mGoalieActionState != GOALIEACTION_UNIDENTIFIED_32
+                && goalie->mGoalieActionState != GOALIEACTION_SAVE)
             {
                 fn_8013F854("PhysChar PHYSOBJ_HAMMER Goalie return\n");
                 return ONE_WAY_CONTACT_THIS;
@@ -189,8 +171,8 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         {
             if (contacts[i].geom.normal[2] < 0.08f)
             {
-                CollisionPlayerWallData* wallData = 0;
-                g_CollisionPlayerWallDataPool.Allocate(wallData);
+                CollisionPlayerWallData* wallData
+                    = g_CollisionPlayerWallDataPool.Allocate();
                 wallData->pPlayer = (cPlayer*)m_pAICharacter;
                 wallData->contactPoint = contactPosition;
                 nlVec3Set(wallData->wallNormal,
@@ -213,9 +195,9 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         {
             cFielder* fielder = (cFielder*)m_pAICharacter;
             if (fielder->m_pBall == 0 || fielder->m_eActionState == 1
-                || (fn_8003E948(fielder) && ReadBool(fielder, 0x3DC)))
+                || (fn_8003E948(fielder) && fielder->mUnidentified3DC))
             {
-                int actionState = fielder->m_eActionState;
+                actionState = fielder->m_eActionState;
                 bool superWall = fn_8003E948(fielder);
                 fn_8013F854(
                     "bSidelineCollision action state %d superwal %d\n",
@@ -238,14 +220,12 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 contactPosition.y,
                 m_CanCollideWithGoalLine);
 
-            float netDepth = cNet::m_fNetDepth;
-            float absoluteX = fabsf(contactPosition.x);
-            if (absoluteX
-                    >= netDepth + cField::GetGoalLineX(1U) - radius
+            if (fabsf(contactPosition.x)
+                    >= cNet::GetNetDepth() + cField::GetGoalLineX(1U) - radius
                 || fabsf(contactPosition.y)
-                       >= 0.5f * cNet::m_fNetWidth - radius
+                       >= 0.5f * cNet::GetNetWidth() - radius
                 || contactPosition.z
-                       >= cNet::m_fNetHeight - cNet::m_fNetPostRadius)
+                       >= cNet::GetNetHeight() - cNet::GetPostRadius())
             {
                 fn_8013F854("UseClipping\n");
                 if (m_bInsideNet)
@@ -295,7 +275,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         }
 
         PhysicsAIBall* physicsBall = (PhysicsAIBall*)other;
-        cBall* ball = physicsBall->m_pAIBall;
+        ball = physicsBall->m_pAIBall;
         cCharacter* character = m_pAICharacter;
         if ((!physicsBall->mbCanCollidePlayer
                 && character->m_eClassType == FIELDER)
@@ -315,7 +295,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             fn_8013F854("PhysChar Fielder\n");
             cFielder* fielder = (cFielder*)m_pAICharacter;
             if (fielder->IsFallenDown()
-                && *(void**)((char*)fielder + 0x254) == 0)
+                && fielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
             {
                 fn_8013F854("PhysChar Fallen down not on fire\n");
                 if (ball->GetOwnerFielder()->fn_800345EC(fielder)
@@ -325,7 +305,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                     return NO_CONTACT;
                 }
                 if (fn_8003E948(ball->GetOwnerFielder())
-                    && ReadBool(ball->GetOwnerFielder(), 0x3DC))
+                    && ball->GetOwnerFielder()->mUnidentified3DC)
                 {
                     fn_8013F854("PhysChar SuperWal\n");
                     return ONE_WAY_CONTACT_THIS;
@@ -334,9 +314,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 return ONE_WAY_CONTACT_OTHER;
             }
 
-            bool invincible = !fielder->IsStuck()
-                           && (fielder->muInvincibleStatus & 1) != 0;
-            if (invincible)
+            if (fielder->IsInvincibleChars())
             {
                 fn_8013F854("PhysChar IsInvincibleChars\n");
                 return ONE_WAY_CONTACT_THIS;
@@ -356,14 +334,13 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         }
 
         fn_8013F854("PhysChar Not fielder\n");
-        void* koopaShell = ReadPointer(gNPCManager, 0x2C);
-        if (koopaShell != 0 && ReadBool(koopaShell, 0x20))
+        if (gNPCManager->mUnidentified02C != 0
+            && gNPCManager->mUnidentified02C->mVisible)
         {
             fn_8013F854("PhysChar KoopaShell->IsVisible\n");
             return NO_CONTACT;
         }
-        void* egg = ReadPointer(gNPCManager, 0x28);
-        if (egg != 0 && ReadBool(egg, 0x30))
+        if (gNPCManager->mpBirdoEgg != 0 && gNPCManager->mpBirdoEgg->mVisible)
         {
             fn_8013F854("PhysChar Egg->IsVisible\n");
             return NO_CONTACT;
@@ -371,8 +348,8 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
 
         if (!m_HasCollidedWithBall)
         {
-            CollisionPlayerBallData* ballData = 0;
-            g_CollisionPlayerBallDataPool.Allocate(ballData);
+            CollisionPlayerBallData* ballData
+                = g_CollisionPlayerBallDataPool.Allocate();
             ballData->pPlayer = (cPlayer*)m_pAICharacter;
             ballData->pBall = ball;
             ballData->velocity = other->GetLinearVelocity();
@@ -401,7 +378,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         {
             cCharacter* otherPlayer = otherCharacter->m_pAICharacter;
             float height = thisPlayer
-                               ->GetJointPosition(ReadS32(thisPlayer, 0xD8))
+                               ->GetJointPosition(thisPlayer->m_nHeadJointIndex)
                                .z
                          + 0.25f;
             if (((cFielder*)otherPlayer)->IsCharacterInAir(height))
@@ -412,7 +389,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         {
             cCharacter* otherPlayer = otherCharacter->m_pAICharacter;
             float height = otherPlayer
-                               ->GetJointPosition(ReadS32(otherPlayer, 0xD8))
+                               ->GetJointPosition(otherPlayer->m_nHeadJointIndex)
                                .z
                          + 0.25f;
             if (((cFielder*)thisPlayer)->IsCharacterInAir(height))
@@ -431,20 +408,16 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 return NO_CONTACT;
             }
 
-            bool invincible = !fielder->IsStuck()
-                           && (fielder->muInvincibleStatus & 1) != 0;
-            if (invincible
+            if (fielder->IsInvincibleChars()
                 || fn_800344DC(fielder, &otherFielder->mUnidentified024.m_v3Position)
                 || fielder->IsStuck()
-                || (fn_8003E948(fielder) && ReadBool(fielder, 0x3DC)))
+                || (fn_8003E948(fielder) && fielder->mUnidentified3DC))
             {
                 contactType = ONE_WAY_CONTACT_OTHER;
             }
             else
             {
-                invincible = !otherFielder->IsStuck()
-                          && (otherFielder->muInvincibleStatus & 1) != 0;
-                if (invincible
+                if (otherFielder->IsInvincibleChars()
                     || fn_800344DC(otherFielder, &fielder->mUnidentified024.m_v3Position)
                     || otherFielder->IsStuck())
                 {
@@ -464,7 +437,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                     contactType = NO_CONTACT;
                 }
                 else if (fielder->IsFallenDown()
-                         && ReadPointer(fielder, 0x254) == 0)
+                         && fielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
                 {
                     if (fielder->m_eAnimID == 0x76)
                         contactType = NO_CONTACT;
@@ -474,7 +447,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                         contactType = ONE_WAY_CONTACT_THIS;
                 }
                 else if (otherFielder->IsFallenDown()
-                         && ReadPointer(otherFielder, 0x254) == 0)
+                         && otherFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
                 {
                     if (otherFielder->m_eAnimID == 0x76)
                         contactType = NO_CONTACT;
@@ -490,13 +463,13 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
 
         cCharacter* collisionPlayer1 = m_pAICharacter;
         cCharacter* collisionPlayer2 = otherCharacter->m_pAICharacter;
-        int id1 = CharacterID(collisionPlayer1);
-        int id2 = CharacterID(collisionPlayer2);
+        int id1 = collisionPlayer1->mUnidentified120;
+        int id2 = collisionPlayer2->mUnidentified120;
         int collisionIndex = id1 * 10 + id2;
         if (sPlayerPlayerCollisionData[collisionIndex] == 0)
         {
-            CollisionPlayerPlayerData* data = 0;
-            g_CollisionPlayerPlayerDataPool.Allocate(data);
+            CollisionPlayerPlayerData* data
+                = g_CollisionPlayerPlayerDataPool.Allocate();
             sPlayerPlayerCollisionData[collisionIndex] = data;
             data->player1 = (cPlayer*)collisionPlayer1;
             data->player2 = (cPlayer*)collisionPlayer2;

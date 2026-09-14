@@ -37,6 +37,11 @@ public:
         return mUnidentifiedActive;
     }
 
+    bool IsOneTouchShot() const
+    {
+        return mbOneTouchShot;
+    }
+
     const nlVector3& GetAnimStartPosition() const
     {
         return mEstimated.v3AnimStartPos;

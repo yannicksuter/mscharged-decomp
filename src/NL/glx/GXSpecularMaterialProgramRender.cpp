@@ -136,10 +136,7 @@ void GXMaterialProgramImpl<GXSpecularMaterialProgram>::Draw(
     float specularLevel = static_cast<const GXSpecularParameters*>(packet->materialParameters)->specularLevel;
     nlFloatColour specularColour;
     nlFloatColourSet(specularColour,
-        static_cast<const GXSpecularParameters*>(packet->materialParameters)->specularColour.c[0],
-        static_cast<const GXSpecularParameters*>(packet->materialParameters)->specularColour.c[1],
-        static_cast<const GXSpecularParameters*>(packet->materialParameters)->specularColour.c[2],
-        static_cast<const GXSpecularParameters*>(packet->materialParameters)->specularColour.c[3]);
+        static_cast<const GXSpecularParameters*>(packet->materialParameters)->specularColour);
 
     if (alphaValue == 0.0f)
         return;

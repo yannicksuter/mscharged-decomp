@@ -29,58 +29,6 @@ public:
     virtual ~SimpleCollisionSpace() { }
 };
 
-static inline void ResetBallIteratorState()
-{
-    static nlDLListIterator<BallCacheInfo*> iter
-        = FakeBallWorld::mBallCacheList.Begin();
-
-    iter = FakeBallWorld::mBallCacheList.Begin();
-    FakeBallWorld::mpCacheIterator = &iter;
-
-    if (FakeBallWorld::mpCacheIterator->m_Curr != 0)
-    {
-        FakeBallWorld::mpCacheIterator->next();
-    }
-}
-
-FakeBallWorld::FakeBallWorld(cBall* pBall)
-    : mpBall(pBall)
-{
-    mpPhysicsWorld
-        = new (nlMalloc(sizeof(PhysicsWorld), 8, false)) PhysicsWorld();
-    mpCollisionSpace
-        = new (nlMalloc(sizeof(SimpleCollisionSpace), 8, false))
-            SimpleCollisionSpace(mpPhysicsWorld, true);
-    mpPhysicsWorld->SetCFM(0.00001f);
-    mpGroundPlane
-        = new (nlMalloc(sizeof(PhysicsGroundPlane), 8, false))
-            PhysicsGroundPlane(mpCollisionSpace);
-    mpPhysicsBall = new (nlMalloc(sizeof(FakePhysicsBall), 8, false))
-        FakePhysicsBall(0.18f, *this);
-    nlVector4 plane;
-    nlVec4Set(plane, 1.0f, 0.0f, 0.0f, 20.6f);
-    mpGoaliePlane1
-        = new (nlMalloc(sizeof(PhysicsGoaliePlane), 8, false))
-            PhysicsGoaliePlane(plane, *this);
-    plane.x = -1.0f;
-    mpGoaliePlane2
-        = new (nlMalloc(sizeof(PhysicsGoaliePlane), 8, false))
-            PhysicsGoaliePlane(plane, *this);
-    mpGoaliePlane1->DisableCollisions();
-    mpGoaliePlane2->DisableCollisions();
-    mbHitSuccess = false;
-}
-
-FakeBallWorld::~FakeBallWorld()
-{
-    delete mpPhysicsBall;
-    delete mpGoaliePlane1;
-    delete mpGoaliePlane2;
-    delete mpGroundPlane;
-    delete mpCollisionSpace;
-    delete mpPhysicsWorld;
-}
-
 void FakeBallWorld::Init(cBall* pBall)
 {
     if (mpPredictWorld == 0)
@@ -465,9 +413,7 @@ float FakeBallWorld::GetPredictedHeightLimitTime(float fHeight,
     nlVector3& v3ContactVelocity, float& fTargetHeight, bool bDownOnly)
 {
     cBall* pBall = mpPredictWorld->mpBall;
-    float speedSq = nlGetLengthSquared3D(pBall->m_v3Velocity.x,
-        pBall->m_v3Velocity.y,
-        pBall->m_v3Velocity.z);
+    float speedSq = pBall->m_v3Velocity.GetLengthSq3D();
     if (speedSq < 0.0001f)
     {
         v3ContactPoint = pBall->m_v3Position;
@@ -478,10 +424,10 @@ float FakeBallWorld::GetPredictedHeightLimitTime(float fHeight,
 
     bool freeball = GetPredictedBallPosition(
         fMinTime, v3ContactPoint, v3ContactVelocity);
-    fTargetHeight = v3ContactPoint.z;
     if (v3ContactPoint.z <= fHeight
         && (!bDownOnly || v3ContactVelocity.z <= 0.0f))
     {
+        fTargetHeight = v3ContactPoint.z;
         return fMinTime;
     }
     if (!freeball)
@@ -489,46 +435,54 @@ float FakeBallWorld::GetPredictedHeightLimitTime(float fHeight,
         return -2.0f;
     }
 
+    float fSimulationTime;
     float fPhysicsTick = FixedUpdateTask::GetPhysicsUpdateTick();
-    float fSimulationTime = GetFixedUpdateTask()->mSimulationTime;
+    fSimulationTime = GetFixedUpdateTask()->mSimulationTime;
     float fTestTime = fSimulationTime + fMinTime;
     float fLastZVel = 0.0f;
+    fTargetHeight = 0.0f;
     nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
     while (iter.hasNext())
     {
         BallCacheInfo* pCur = *iter;
-        if (pCur->mfTime >= fTestTime
-            && ((pCur->mv3Position.z <= fHeight
-                    && (!bDownOnly
-                        || pCur->mv3LinearVelocity.z <= 0.0f))
-                || (fLastZVel < 0.0f
-                    && pCur->mv3LinearVelocity.z > 0.0f)))
+        if (pCur->mfTime >= fTestTime)
         {
-            v3ContactPoint = pCur->mv3Position;
-            v3ContactVelocity = pCur->mv3LinearVelocity;
-            fTargetHeight = v3ContactPoint.z;
-            return pCur->mfTime - fSimulationTime;
+            float zVel = pCur->mv3LinearVelocity.z;
+            if (fTargetHeight < pCur->mv3Position.z)
+            {
+                fTargetHeight = pCur->mv3Position.z;
+            }
+            if ((pCur->mv3Position.z <= fHeight
+                    && (!bDownOnly || zVel <= 0.0f))
+                || (fLastZVel < 0.0f && zVel > 0.0f))
+            {
+                v3ContactPoint = pCur->mv3Position;
+                v3ContactVelocity = pCur->mv3LinearVelocity;
+                return pCur->mfTime - fSimulationTime;
+            }
         }
         fLastZVel = pCur->mv3LinearVelocity.z;
-        iter.next();
+        iter.Step();
     }
 
-    fTestTime = fSimulationTime + 6.0f;
-    while (mfLastCacheTime < fTestTime)
+    while (mfLastCacheTime < 6.0f + fSimulationTime)
     {
         PhysicsUpdate(mpPredictWorld->mpPhysicsWorld, fPhysicsTick);
         mfLastCacheTime += fPhysicsTick;
         BallCacheInfo* pNewInfo = AddCacheEntry(
             mfLastCacheTime, mpPredictWorld->mpPhysicsBall);
+        float zVel = pNewInfo->mv3LinearVelocity.z;
+        if (fTargetHeight < pNewInfo->mv3Position.z)
+        {
+            fTargetHeight = pNewInfo->mv3Position.z;
+        }
         if ((pNewInfo->mv3Position.z <= fHeight
-                && (!bDownOnly
-                    || pNewInfo->mv3LinearVelocity.z <= 0.0f))
+                && (!bDownOnly || zVel <= 0.0f))
             || (fLastZVel < 0.0f
                 && pNewInfo->mv3LinearVelocity.z > 0.0f))
         {
             v3ContactPoint = pNewInfo->mv3Position;
             v3ContactVelocity = pNewInfo->mv3LinearVelocity;
-            fTargetHeight = v3ContactPoint.z;
             return pNewInfo->mfTime - fSimulationTime;
         }
         fLastZVel = pNewInfo->mv3LinearVelocity.z;
@@ -540,100 +494,157 @@ float FakeBallWorld::GetPredictedPosAtDistance(float fDistance,
     nlVector3& v3Position, nlVector3& v3Velocity, bool bFreeBallOnly)
 {
     cBall* pBall = mpPredictWorld->GetBall();
-    float speedSq = nlGetLengthSquared3D(pBall->m_v3Velocity.x,
-        pBall->m_v3Velocity.y,
-        pBall->m_v3Velocity.z);
-    if (speedSq < 0.0001f || fDistance < 0.0001f)
+    if (pBall->m_v3Velocity.GetLengthSq3D() < 0.0001f || fDistance < 0.0001f)
     {
         v3Position = pBall->m_v3Position;
         v3Velocity = v3Zero;
         return -1.0f;
     }
-    if (bFreeBallOnly && pBall->m_pOwner != 0)
+
+    float fSimulationTime;
+    float fDistanceTargetSq;
+    float fPhysicsTick = FixedUpdateTask::GetPhysicsUpdateTick();
+    fSimulationTime = GetFixedUpdateTask()->mSimulationTime;
+    fDistanceTargetSq = fDistance * fDistance;
+
+    if (bFreeBallOnly)
     {
-        return -1.5f;
+        if (mpPredictWorld->mpBall->m_pOwner != 0)
+        {
+            return -1.5f;
+        }
+
+        nlVector3 v3LastPos;
+        nlVector3 v3LastVel;
+        float fDistanceLastSq;
+        ClearBallCache();
+        mpPredictWorld->mpGroundPlane->DisableCollisions();
+        mpPredictWorld->mpPhysicsBall->CloneBall(
+            *mpPredictWorld->mpBall->m_pPhysicsBall);
+
+        float fTime = 0.0f;
+        float fDistanceCurSq = 0.0f;
+        mpPredictWorld->mpPhysicsBall->mbCanGoThroughGround = true;
+        mpPredictWorld->mpPhysicsBall->GetLinearVelocity(&v3Velocity);
+        mpPredictWorld->mpPhysicsBall->GetPosition(&v3Position);
+        nlVector3 v3StartPos = v3Position;
+        bool bFound = false;
+        while (fTime < 6.0f)
+        {
+            v3LastPos = v3Position;
+            v3LastVel = v3Velocity;
+            fDistanceLastSq = fDistanceCurSq;
+            PhysicsUpdate(mpPredictWorld->mpPhysicsWorld, fPhysicsTick);
+            mpPredictWorld->mpPhysicsBall->GetLinearVelocity(&v3Velocity);
+            mpPredictWorld->mpPhysicsBall->GetPosition(&v3Position);
+            fDistanceCurSq = CalculateDistanceSquared(v3Position, v3StartPos);
+            if (fDistanceCurSq > fDistanceTargetSq)
+            {
+                float fDistLast = nlSqrt(fDistanceLastSq, true);
+                float fDistCur = nlSqrt(fDistanceCurSq, true);
+                float fPercent
+                    = (fDistance - fDistLast) / (fDistCur - fDistLast);
+                nlVecLerp(v3Position, v3LastPos, v3Position, fPercent);
+                fTime += fPercent * fPhysicsTick;
+                nlVecLerp(v3Velocity, v3LastVel, v3Velocity, fPercent);
+                bFound = true;
+                break;
+            }
+            if (fDistanceCurSq <= fDistanceLastSq)
+            {
+                v3Position = v3LastPos;
+                v3Velocity = v3LastVel;
+                bFound = true;
+                fTime = -2.0f;
+                break;
+            }
+            fTime += fPhysicsTick;
+        }
+
+        mpPredictWorld->mpPhysicsBall->mbCanGoThroughGround = false;
+        mpPredictWorld->mpGroundPlane->EnableCollisions();
+        if (bFound)
+        {
+            return fTime;
+        }
+        return -3.0f;
     }
+
     if (!GetPredictedBallPosition(0.0f, v3Position, v3Velocity))
     {
         return -1.5f;
     }
 
-    float fPhysicsTick = FixedUpdateTask::GetPhysicsUpdateTick();
-    float fSimulationTime = GetFixedUpdateTask()->mSimulationTime;
-    float fDistanceTargetSq = fDistance * fDistance;
-    nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
-    BallCacheInfo* pNext = *iter;
-    float fDistanceNextSq = nlGetLengthSquared3D(
-        pNext->mv3Position.x - pBall->m_v3Position.x,
-        pNext->mv3Position.y - pBall->m_v3Position.y,
-        pNext->mv3Position.z - pBall->m_v3Position.z);
-
-    while (!iter.IsEnd())
+    if (!mBallCacheList.IsEmpty())
     {
-        BallCacheInfo* pPrev = pNext;
-        float fDistancePrevSq = fDistanceNextSq;
-        iter.next();
-        pNext = *iter;
-        fDistanceNextSq = nlGetLengthSquared3D(
-            pNext->mv3Position.x - pBall->m_v3Position.x,
-            pNext->mv3Position.y - pBall->m_v3Position.y,
-            pNext->mv3Position.z - pBall->m_v3Position.z);
-        if (fDistanceNextSq > fDistanceTargetSq)
+        nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
+        BallCacheInfo* pPrev;
+        BallCacheInfo* pNext = *iter;
+        float fDistanceNextSq
+            = CalculateDistanceSquared(pNext->mv3Position, pBall->m_v3Position);
+
+        while (!nlDLRingIsEnd(iter.m_Head, iter.m_Curr))
         {
-            float sqrtPrev = nlSqrt(fDistancePrevSq, true);
-            float sqrtNext = nlSqrt(fDistanceNextSq, true);
-            float fPercent
-                = (fDistance - sqrtPrev) / (sqrtNext - sqrtPrev);
-            nlVecLerp(v3Position,
-                pPrev->mv3Position,
-                pNext->mv3Position,
-                fPercent);
-            nlVecLerp(v3Velocity, pPrev->mv3LinearVelocity, pNext->mv3LinearVelocity, fPercent);
-            return Interpolate(
-                       pPrev->mfTime, pNext->mfTime, fPercent)
-                 - fSimulationTime;
-        }
-        if (fDistanceNextSq <= fDistancePrevSq)
-        {
-            v3Position = pPrev->mv3Position;
-            v3Velocity = pPrev->mv3LinearVelocity;
-            return -2.0f;
+            iter.next();
+            pPrev = pNext;
+            pNext = *iter;
+            float fDistancePrevSq = fDistanceNextSq;
+            fDistanceNextSq = CalculateDistanceSquared(
+                pNext->mv3Position, pBall->m_v3Position);
+            if (fDistanceNextSq > fDistanceTargetSq)
+            {
+                float fDistPrev = nlSqrt(fDistancePrevSq, true);
+                float fDistNext = nlSqrt(fDistanceNextSq, true);
+                float fPercent
+                    = (fDistance - fDistPrev) / (fDistNext - fDistPrev);
+                float fTime = Interpolate(pPrev->mfTime, pNext->mfTime, fPercent)
+                            - fSimulationTime;
+                nlVecLerp(v3Position,
+                    pPrev->mv3Position,
+                    pNext->mv3Position,
+                    fPercent);
+                nlVecLerp(v3Velocity, pPrev->mv3LinearVelocity, pNext->mv3LinearVelocity, fPercent);
+                return fTime;
+            }
+            if (fDistanceNextSq <= fDistancePrevSq)
+            {
+                v3Position = pPrev->mv3Position;
+                v3Velocity = pPrev->mv3LinearVelocity;
+                return -2.0f;
+            }
         }
     }
 
-    BallCacheInfo* pCurCache
-        = nlDLRingGetEnd(mBallCacheList.m_Head)->entry;
-    float fDistanceCurSq = nlGetLengthSquared3D(
-        pCurCache->mv3Position.x - pBall->m_v3Position.x,
-        pCurCache->mv3Position.y - pBall->m_v3Position.y,
-        pCurCache->mv3Position.z - pBall->m_v3Position.z);
-    float fMaxTime = fSimulationTime + 6.0f;
-    while (mfLastCacheTime < fMaxTime)
+    BallCacheInfo* pLastCache;
+    nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.End();
+    BallCacheInfo* pCurCache = *iter;
+    float fDistanceCurSq
+        = CalculateDistanceSquared(pCurCache->mv3Position, pBall->m_v3Position);
+    while (mfLastCacheTime < 6.0f + fSimulationTime)
     {
-        BallCacheInfo* pLastCache = pCurCache;
+        pLastCache = pCurCache;
         float fDistanceLastSq = fDistanceCurSq;
         PhysicsUpdate(mpPredictWorld->mpPhysicsWorld, fPhysicsTick);
         mfLastCacheTime += fPhysicsTick;
         pCurCache = AddCacheEntry(
             mfLastCacheTime, mpPredictWorld->mpPhysicsBall);
-        fDistanceCurSq = nlGetLengthSquared3D(
-            pCurCache->mv3Position.x - pBall->m_v3Position.x,
-            pCurCache->mv3Position.y - pBall->m_v3Position.y,
-            pCurCache->mv3Position.z - pBall->m_v3Position.z);
+        fDistanceCurSq = CalculateDistanceSquared(
+            pCurCache->mv3Position, pBall->m_v3Position);
         if (fDistanceCurSq > fDistanceTargetSq)
         {
-            float sqrtLast = nlSqrt(fDistanceLastSq, true);
-            float sqrtCur = nlSqrt(fDistanceCurSq, true);
+            float fDistLast = nlSqrt(fDistanceLastSq, true);
+            float fDistCur = nlSqrt(fDistanceCurSq, true);
             float fPercent
-                = (fDistance - sqrtLast) / (sqrtCur - sqrtLast);
+                = (fDistance - fDistLast) / (fDistCur - fDistLast);
+            float fTime = Interpolate(
+                              pLastCache->mfTime, pCurCache->mfTime, fPercent)
+                        - fSimulationTime;
             nlVecLerp(v3Position, pLastCache->mv3Position, pCurCache->mv3Position, fPercent);
             nlVecLerp(v3Velocity,
                 pLastCache->mv3LinearVelocity,
                 pCurCache->mv3LinearVelocity,
                 fPercent);
-            return Interpolate(
-                       pLastCache->mfTime, pCurCache->mfTime, fPercent)
-                 - fSimulationTime;
+            return fTime;
         }
         if (fDistanceCurSq <= fDistanceLastSq)
         {
@@ -648,19 +659,65 @@ float FakeBallWorld::GetPredictedPosAtDistance(float fDistance,
     return -4.0f;
 }
 
+FakeBallWorld::FakeBallWorld(cBall* pBall)
+    : mpBall(pBall)
+{
+    mpPhysicsWorld
+        = new (nlMalloc(sizeof(PhysicsWorld), 8, false)) PhysicsWorld();
+    mpCollisionSpace
+        = new (nlMalloc(sizeof(SimpleCollisionSpace), 8, false))
+            SimpleCollisionSpace(mpPhysicsWorld, true);
+    mpPhysicsWorld->SetCFM(0.00001f);
+    mpGroundPlane
+        = new (nlMalloc(sizeof(PhysicsGroundPlane), 8, false))
+            PhysicsGroundPlane(mpCollisionSpace);
+    mpPhysicsBall = new (nlMalloc(sizeof(FakePhysicsBall), 8, false))
+        FakePhysicsBall(0.18f, *this);
+    nlVector4 plane;
+    nlVec4Set(plane, 1.0f, 0.0f, 0.0f, 20.6f);
+    mpGoaliePlane1
+        = new (nlMalloc(sizeof(PhysicsGoaliePlane), 8, false))
+            PhysicsGoaliePlane(plane, *this);
+    plane.x = -1.0f;
+    mpGoaliePlane2
+        = new (nlMalloc(sizeof(PhysicsGoaliePlane), 8, false))
+            PhysicsGoaliePlane(plane, *this);
+    mpGoaliePlane1->DisableCollisions();
+    mpGoaliePlane2->DisableCollisions();
+    mbHitSuccess = false;
+}
+
+FakeBallWorld::~FakeBallWorld()
+{
+    delete mpPhysicsBall;
+    delete mpGoaliePlane1;
+    delete mpGoaliePlane2;
+    delete mpGroundPlane;
+    delete mpCollisionSpace;
+    delete mpPhysicsWorld;
+}
+
 void FakeBallWorld::ResetBallIterator()
 {
     nlVector3 v3Position;
     nlVector3 v3Velocity;
     GetPredictedBallPosition(0.0f, v3Position, v3Velocity);
-    ResetBallIteratorState();
+
+    static nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
+    iter = mBallCacheList.Begin();
+    mpCacheIterator = &iter;
+
+    if (mpCacheIterator->m_Curr != 0)
+    {
+        mpCacheIterator->next();
+    }
 }
 
 void FakeBallWorld::GetNextBallPosition(nlVector3& v3BallPos)
 {
     if (mpCacheIterator->m_Curr != 0)
     {
-        v3BallPos = (**mpCacheIterator)->mv3Position;
+        v3BallPos = mpCacheIterator->m_Curr->entry->mv3Position;
         mpCacheIterator->next();
         return;
     }
@@ -678,16 +735,16 @@ void FakeBallWorld::GetNextBallPosVel(
 {
     if (mpCacheIterator->m_Curr != 0)
     {
-        BallCacheInfo* info = **mpCacheIterator;
-        v3BallPos = info->mv3Position;
-        v3BallVel = info->mv3LinearVelocity;
+        BallCacheInfo* pCur = mpCacheIterator->m_Curr->entry;
+        v3BallPos = pCur->mv3Position;
+        v3BallVel = pCur->mv3LinearVelocity;
         mpCacheIterator->next();
         return;
     }
 
-    float tick = FixedUpdateTask::GetPhysicsUpdateTick();
-    PhysicsUpdate(mpPredictWorld->mpPhysicsWorld, tick);
-    mfLastCacheTime += tick;
+    float fPhysicsTick = FixedUpdateTask::GetPhysicsUpdateTick();
+    PhysicsUpdate(mpPredictWorld->mpPhysicsWorld, fPhysicsTick);
+    mfLastCacheTime += fPhysicsTick;
     BallCacheInfo* newInfo
         = AddCacheEntry(mfLastCacheTime, mpPredictWorld->mpPhysicsBall);
     v3BallPos = newInfo->mv3Position;
@@ -707,22 +764,16 @@ bool FakeBallWorld::FindBallIntercept(const nlVector3& v3PlayerPos,
 
     nlVector3 v3NewBallPos;
     nlVector3 v3NewBallVel;
-    nlVector3 v3CurrentVelocity;
-    nlVector3 v3CurrentPosition;
-    GetPredictedBallPosition(
-        0.0f, v3CurrentPosition, v3CurrentVelocity);
-    ResetBallIteratorState();
+    ResetBallIterator();
 
     float fPlayerDistanceFromStartingPoint = fPlayerReach;
     while (!bDone)
     {
         GetNextBallPosVel(v3NewBallPos, v3NewBallVel);
         fPlayerDistanceFromStartingPoint += fPlayerDistPerTick;
-        float dx = v3NewBallPos.x - v3PlayerPos.x;
-        float dy = v3NewBallPos.y - v3PlayerPos.y;
-        float dist = nlSqrt(dx * dx + dy * dy, true);
-        float adjustedDist
-            = (float)fabs(dist - fPlayerDistanceFromStartingPoint);
+        float adjustedDist = (float)fabs(
+            nlSqrt(nlVec3DistanceSquared2D(v3NewBallPos, v3PlayerPos), true)
+            - fPlayerDistanceFromStartingPoint);
         if (adjustedDist >= fClosestDist)
         {
             bDone = true;

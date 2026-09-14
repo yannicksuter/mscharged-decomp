@@ -1,4 +1,5 @@
 #include "Game/HBMManager.h"
+#include "NL/nlBasicString.inl"
 
 #include "Game/SH/SHLoading.h"
 
@@ -27,7 +28,6 @@
 #include "Game/Render/RLViewLayers.h"
 #include "NL/nlPrint.h"
 #include "Game/FE/FEAudio.h"
-#include "NL/nlBasicString.inl"
 
 
 SuperLoadingScene::SuperLoadingScene()

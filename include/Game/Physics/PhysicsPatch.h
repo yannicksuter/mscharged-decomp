@@ -1,6 +1,7 @@
 #ifndef GAME_PHYSICS_PHYSICS_PATCH_H
 #define GAME_PHYSICS_PHYSICS_PATCH_H
 
+#include "Game/DebugWriteCache.h"
 #include "Game/EventConnection.h"
 #include "Game/Physics/PhysicsSphere.h"
 #include "NL/nlFunction.h"
@@ -24,13 +25,19 @@ struct UnidentifiedPhysicsPatchInfo_80510BF0
 }; // total size: 0x20
 
 extern "C" UnidentifiedPhysicsPatchInfo_80510BF0* fn_80174ED4(
-    const int* type);
+    const int& type);
 
 class PhysicsPatch : public PhysicsSphere
 {
 public:
     PhysicsPatch();
     virtual ~PhysicsPatch();
+    static void* operator new(unsigned long)
+    {
+        PhysicsPatch* patch = 0;
+        lbl_805705D0.Allocate(patch);
+        return patch;
+    }
     static void operator delete(void* ptr)
     {
         lbl_805705D0.Free((PhysicsPatch*)ptr);
@@ -40,9 +47,12 @@ public:
     virtual int GetObjectType() const { return 0x1C; }
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual ContactType Contact(PhysicsObject*, dContact*, int);
-    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void RegisterDebugFields(unsigned short* type, DebugWriteCache* cache);
 
     int GetType() const { return m_Type; }
+    int GetCurrentPathPoint() const { return m_CurrentPathPoint; }
+    inline void UnidentifiedKillEffect();
+    inline void UnidentifiedDestroyEffect();
 
     void fn_80172EE0(const int* type);
     void Update(float dt);
@@ -52,8 +62,8 @@ public:
     void fn_80173B08(float time);
     void fn_80173B10(float time);
     void fn_80173B18();
-    void fn_80173C9C(nlVector3* points, int pointCount, double speed);
-    nlVector3 fn_80173CCC();
+    void fn_80173C9C(nlVector3* points, int pointCount, float speed);
+    nlVector3 fn_80173CCC() const;
     void fn_80173DA4(float dt);
 
     static SlotPool<PhysicsPatch> lbl_805705D0;
@@ -106,5 +116,38 @@ public:
 }; // total size: 0xF8
 
 extern PhysicsPatchManager_801740D0* lbl_806E12C8;
+
+inline void PhysicsPatch::RegisterDebugFields(unsigned short* type, DebugWriteCache* cache)
+{
+    *type = cache->BeginType("PhysicsPatch");
+
+#define REGISTER_FIELD(kind, field) \
+    cache->AddField(kind, gDebugFieldTypes[kind].size, (unsigned char*)&field - (unsigned char*)&m_Type, #field)
+
+    REGISTER_FIELD(14, m_Type);
+    REGISTER_FIELD(15, m_pOwner);
+    REGISTER_FIELD(17, m_fStartRadius);
+    REGISTER_FIELD(17, m_fEndRadius);
+    REGISTER_FIELD(17, m_fLifetime);
+    REGISTER_FIELD(17, m_fCurtime);
+    REGISTER_FIELD(8, m_Index);
+    REGISTER_FIELD(16, m_bVisible);
+    REGISTER_FIELD(16, m_bKillMe);
+    REGISTER_FIELD(22, m_Velocity);
+    REGISTER_FIELD(17, m_Gravity);
+    REGISTER_FIELD(15, m_pTarget);
+    REGISTER_FIELD(17, m_TargetSeekSpeed);
+    REGISTER_FIELD(17, m_fStartRadiusTime);
+    REGISTER_FIELD(17, m_fEndRadiusTime);
+    REGISTER_FIELD(16, m_bFrozen);
+    REGISTER_FIELD(17, m_FreezeTimer);
+    REGISTER_FIELD(17, m_PathSpeed);
+    REGISTER_FIELD(8, m_CurrentPathPoint);
+    REGISTER_FIELD(8, m_PathPointCount);
+
+#undef REGISTER_FIELD
+
+    cache->EndType();
+}
 
 #endif // GAME_PHYSICS_PHYSICS_PATCH_H

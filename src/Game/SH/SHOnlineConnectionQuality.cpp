@@ -1,4 +1,5 @@
 #include "Game/GameInfo.h"
+#include "NL/nlBasicString.inl"
 #include "Game/FE/fePresentation.inl"
 #include "Game/SH/SHOnlineConnectionQuality.h"
 #include "Game/FE/FEAudio.h"

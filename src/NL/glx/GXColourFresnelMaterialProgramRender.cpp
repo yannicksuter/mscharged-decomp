@@ -68,8 +68,7 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Activate(GLView* vie
     unsigned int numTevStages;
     if (sColourFresnelLightingEnabled && sColourFresnelLightRampEnabled)
     {
-        glTextureBinding lightBinding;
-        lightBinding.texture = GetGameObjectLightTexture();
+        glTextureBinding lightBinding(GetGameObjectLightTexture());
         lightBinding.textureIndex = 0xFFFF;
         lightBinding.flags = 0;
         lightBinding.SetWrapS(true);
@@ -183,12 +182,10 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Draw(
     if (!sRenderColourFresnel)
         return;
 
-    float alphaValue = 1.0f != sColourFresnelAlphaOverride
-        ? sColourFresnelAlphaOverride
-        : static_cast<const GXColourFresnelParameters*>(packet->materialParameters)->alphaValue;
-    float blendAmount = 1.0f != sColourFresnelBlendOverride
-        ? sColourFresnelBlendOverride
-        : static_cast<const GXColourFresnelParameters*>(packet->materialParameters)->blendAmount;
+    float alphaValue = glGetMaterialFloatParameterWithOverride(packet,
+        &GXColourFresnelParameters::alphaValue, sColourFresnelAlphaOverride);
+    float blendAmount = glGetMaterialFloatParameterWithOverride(packet,
+        &GXColourFresnelParameters::blendAmount, sColourFresnelBlendOverride);
     int colourFresnelRamp = sColourFresnelRampOverride >= 0
         ? sColourFresnelRampOverride
         : static_cast<const GXColourFresnelParameters*>(packet->materialParameters)->colourFresnelRamp;

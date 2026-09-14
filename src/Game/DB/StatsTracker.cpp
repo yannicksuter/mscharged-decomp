@@ -1,4 +1,5 @@
 #include "Game/DB/StatsTracker.h"
+#include "NL/nlBasicString.inl"
 #include "Game/FE/feHelpFuncs_decl.h"
 
 #include <stdio.h>
@@ -108,22 +109,6 @@ static inline void InitializePlayerStats(
     stats.mType = type;
 }
 
-static inline void InitializeTeamStats(TeamStats& stats, eTeamID team)
-{
-    memset(&stats.mPlayerTotalStats, 0, sizeof(stats.mPlayerTotalStats));
-    stats.mPlayerTotalStats.mRecordType.mTeamID = team;
-    stats.mPlayerTotalStats.mType = TYPE_TEAM;
-    stats.mTeamIndex = team;
-    stats.unknown_0x10 = 0;
-    stats.unknown_0x12 = 0;
-    stats.unknown_0x14 = 0;
-    stats.unknown_0x16 = 0;
-    stats.unknown_0x04[0] = 0;
-    stats.unknown_0x04[1] = 0;
-    stats.unknown_0x04[2] = 0;
-    stats.mType = TYPE_TEAM;
-}
-
 static int GetStatValue(const PlayerStats& stats, ePlayerStats stat);
 
 static inline void AddStatValue(
@@ -229,10 +214,10 @@ void StatsTracker::SetBasicGameInfoPointer(
         return;
     }
 
-    InitializeTeamStats(*mCumulativeTeamStats[0], homeid);
-    InitializeTeamStats(*mCumulativeTeamStats[1], awayid);
-    InitializeTeamStats(mCurrentTeamStats[0], homeid);
-    InitializeTeamStats(mCurrentTeamStats[1], awayid);
+    mCumulativeTeamStats[0]->Initialize(homeid);
+    mCumulativeTeamStats[1]->Initialize(awayid);
+    mCurrentTeamStats[0].Initialize(homeid);
+    mCurrentTeamStats[1].Initialize(awayid);
 
     characterClass = (eCharacterClass)ConvertToCharacterClass(homeid);
     InitializePlayerStats(
@@ -272,9 +257,9 @@ void StatsTracker::ResetCurrentStats()
     mIsOvertime = false;
     mHasGameEnded = false;
 
-    InitializeTeamStats(mCurrentTeamStats[0],
+    mCurrentTeamStats[0].Initialize(
         mCumulativeTeamStats[0]->mTeamIndex);
-    InitializeTeamStats(mCurrentTeamStats[1],
+    mCurrentTeamStats[1].Initialize(
         mCumulativeTeamStats[1]->mTeamIndex);
 
     mNumConsecutiveGamesPlayed++;

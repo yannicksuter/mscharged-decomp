@@ -26,7 +26,9 @@ public:
         {
             return 0;
         }
-        return &mBuffer[(mHead + mCount++) % mCapacity];
+        T* slot = &mBuffer[(mHead + mCount) % mCapacity];
+        mCount++;
+        return slot;
     }
 
     void Push(const T& value) { *PushSlot() = value; }

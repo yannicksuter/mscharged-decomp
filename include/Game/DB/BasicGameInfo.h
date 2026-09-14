@@ -6,11 +6,6 @@
 #include "Game/DB/StatsTracker.h"
 #include "types.h"
 
-enum eSidekickID
-{
-    SK_INVALID = -1,
-};
-
 enum eStadiumID
 {
     STAD_INVALID = -1,
@@ -27,8 +22,35 @@ struct BasicGameInfo
 
     void Reset(bool clearTeams);
 
-    int GetTeam(short side) const { return mTeamIndex[side]; }
+    eTeamID GetTeam(short side) const
+    {
+        eTeamID team = (eTeamID)mTeamIndex[side];
+        return team;
+    }
+    eSidekickID GetSidekick(short side, int slot) const
+    {
+        eSidekickID sidekick = (eSidekickID)mSidekickIndex[side][slot];
+        return sidekick;
+    }
     short GetFinalScore(short side) const { return mFinalScore[side]; }
+    int GetWinningSide() const
+    {
+        if (mFinalScore[0] == 0 && mFinalScore[1] == 0)
+        {
+            return -1;
+        }
+        return mFinalScore[0] <= mFinalScore[1];
+    }
+    void SetSidekick(short side, int sidekick, int slot)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if (slot < 0 || slot == i)
+            {
+                mSidekickIndex[side][i] = sidekick;
+            }
+        }
+    }
 
     /* 0x000 */ int mTeamIndex[2];
     /* 0x008 */ int mSidekickIndex[2][3];

@@ -234,26 +234,26 @@ void PhysicsBall::CloneBall(const PhysicsBall& other)
 ContactType PhysicsBall::Contact(
     PhysicsObject* other, dContact* contact, int numContacts)
 {
-    nlVector3 pos = v3Zero;
-    nlVector3 _pos = v3Zero;
     nlVector3 normal = v3Zero;
+    nlVector3 myPos = v3Zero;
+    nlVector3 pos;
 
-    int objType = other->GetObjectType();
+    int objID = other->GetObjectType();
     fn_8013F854(
-        "Ball Contact objID %d numContacts %d\n", objType, numContacts);
-    GetPosition(&pos);
+        "Ball Contact objID %d numContacts %d\n", objID, numContacts);
+    GetPosition(&myPos);
 
-    if (objType == 0x1C)
+    if (objID == 0x1C)
     {
         return NO_CONTACT;
     }
 
-    if (objType == 0x12 && !mbCanFreeFall && !mbCanGoThroughGround)
+    if (objID == 0x12 && !mbCanFreeFall && !mbCanGoThroughGround)
     {
         dContact* c = contact;
         for (int i = 0; i < numContacts; ++i, ++c)
         {
-            if (c->geom.pos[2] <= pos.z && c->geom.normal[2] > 0.9f)
+            if (c->geom.pos[2] <= myPos.z && c->geom.normal[2] > 0.9f)
             {
                 mbIsSupportedByGround = true;
                 break;
@@ -263,7 +263,7 @@ ContactType PhysicsBall::Contact(
 
     if (m_parentObject != 0)
     {
-        if (objType == 0x12)
+        if (objID == 0x12)
         {
             if (mbCanFreeFall)
             {
@@ -271,15 +271,15 @@ ContactType PhysicsBall::Contact(
                 return NO_CONTACT;
             }
 
-            GetPosition(&pos);
+            GetPosition(&myPos);
             if (contact->geom.normal[2] > 0.0f
-                && contact->geom.pos[2] + GetRadius() < pos.z)
+                && contact->geom.pos[2] + GetRadius() < myPos.z)
             {
-                _pos = GetPosition();
-                float depth = contact->geom.normal[2]
-                            * contact->geom.depth;
-                _pos.z += depth;
-                SetPosition(_pos, WORLD_COORDINATES);
+                pos = GetPosition();
+                float zPosAdjust = contact->geom.normal[2]
+                                 * contact->geom.depth;
+                pos.z += zPosAdjust;
+                SetPosition(pos, WORLD_COORDINATES);
 
                 if (contact->geom.normal[2] > 0.95f)
                 {
@@ -290,14 +290,13 @@ ContactType PhysicsBall::Contact(
                 normal.x = contact->geom.normal[0];
                 normal.y = contact->geom.normal[1];
                 normal.z = 0.0f;
-                float invLength = nlRecipSqrt(
-                    normal.x * normal.x + normal.y * normal.y
-                        + normal.z * normal.z,
-                    true);
-                contact->geom.normal[0] = invLength * normal.x;
-                contact->geom.normal[1] = invLength * normal.y;
-                contact->geom.normal[2] = invLength * normal.z;
-                contact->geom.depth -= depth;
+                float invLength = nlRecipSqrt(normal.GetLengthSq3D(), true);
+                nlVec3Set(normal, invLength * normal.x, invLength * normal.y,
+                    invLength * normal.z);
+                contact->geom.normal[0] = normal.x;
+                contact->geom.normal[1] = normal.y;
+                contact->geom.normal[2] = normal.z;
+                contact->geom.depth -= zPosAdjust;
             }
             fn_8013F854(
                 "Ball contact call parent depth %f\n", contact->geom.depth);
@@ -305,10 +304,9 @@ ContactType PhysicsBall::Contact(
         return m_parentObject->Contact(other, contact, numContacts);
     }
 
-    if (objType != 0x12 && objType != 0xD && objType != 0xE
-        && objType != 8)
+    if (objID != 0x12 && objID != 0xD && objID != 0xE && objID != 8)
     {
-        if (objType == 0x16)
+        if (objID == 0x16)
         {
             fn_8013F854("Ball contact PHYSOBJ_GOALIE_PLANE\n");
             return TWO_WAY_CONTACT;
@@ -316,7 +314,7 @@ ContactType PhysicsBall::Contact(
 
         mbUseMagnusEffect = false;
         mfChargeBonus = 0.0f;
-        if (objType == 0x17)
+        if (objID == 0x17)
         {
             float absX = fabsf(GetPosition().x);
             float absY = fabsf(GetPosition().y);
@@ -339,37 +337,42 @@ ContactType PhysicsBall::Contact(
 
 void PhysicsBall::AddResistanceForces()
 {
-    nlVector3 velocity = GetLinearVelocity();
+    nlVector3 velocity;
     nlVector3 resistance;
+    nlVector3 v3Torque;
+    nlVector3 v3CurAngularVel;
+    nlVector3 v3BallSurfaceSpeed;
+    nlVector3 v3CurBallSpeed;
+    nlVector3 v3CurLinVel;
+    nlVector3 v3CurAngVel;
+    nlVector3 v3MagnusForce;
 
+    velocity = GetLinearVelocity();
     if (m_parentObject == 0)
     {
         if (mbIsSupportedByGround && !mbUseAngularVel)
         {
-            float speed = nlSqrt(velocity.x * velocity.x
-                    + velocity.y * velocity.y + velocity.z * velocity.z,
-                true);
+            float speed = nlVec3Length(velocity);
             if (speed > 0.01f)
             {
-                float factor = -g_pGame->mpTerrain->GetRollingResistance(g_BallRollingResistance)
+                float factor = -g_pGame->mpTerrain->GetRollingResistance(
+                                   g_BallRollingResistance)
                              / speed;
-                resistance.x = factor * velocity.x;
-                resistance.y = factor * velocity.y;
-                resistance.z = factor * velocity.z;
+                nlVec3Scale(resistance, velocity, factor);
                 AddForceAtCentreOfMass(resistance);
             }
         }
 
         float drag = -mfBallAirResistance;
-        resistance.x = drag * velocity.x;
-        resistance.y = drag * velocity.y;
+        resistance.x = velocity.x * drag;
+        resistance.y = velocity.y * drag;
         if (velocity.z > 0.0f)
         {
-            resistance.z = drag * velocity.z;
+            resistance.z = velocity.z * drag;
         }
         else
         {
-            resistance.z = g_BallAirResistance * velocity.z;
+            resistance.z = velocity.z * g_BallAirResistance;
         }
         AddForceAtCentreOfMass(resistance);
     }
@@ -405,49 +408,21 @@ void PhysicsBall::AddResistanceForces()
         float threshold = 0.02f + GetRadius();
         if (GetPosition().z < threshold)
         {
-            nlVector3 v3DesiredAngularVel;
-            CalcAngularFromLinearVelocity(v3DesiredAngularVel);
-            nlVector3 v3CurAngularVel;
+            CalcAngularFromLinearVelocity(v3Torque);
             GetAngularVelocity(&v3CurAngularVel);
+            nlVec3Sub(v3Torque, v3Torque, v3CurAngularVel);
+            nlVec3Scale(v3Torque, 0.25f);
+            dBodyAddTorque(m_bodyID, v3Torque.x, v3Torque.y, v3Torque.z);
 
-            nlVector3 torque;
-            torque.x = 0.25f
-                     * (v3DesiredAngularVel.x - v3CurAngularVel.x);
-            torque.y = 0.25f
-                     * (v3DesiredAngularVel.y - v3CurAngularVel.y);
-            torque.z = 0.25f
-                     * (v3DesiredAngularVel.z - v3CurAngularVel.z);
-            dBodyAddTorque(m_bodyID, torque.x, torque.y, torque.z);
-
-            nlVector3 v3AngVelocity;
-            GetAngularVelocity(&v3AngVelocity);
-            v3AngVelocity.z = 0.0f;
-            nlVector3 v3Up = { 0.0f, 0.0f, 0.0f };
-            v3Up.z = GetRadius();
-            nlVector3 v3BallSurfaceSpeed;
-            v3BallSurfaceSpeed.x = v3AngVelocity.y * v3Up.z
-                                 - v3AngVelocity.z * v3Up.y;
-            v3BallSurfaceSpeed.y = -v3AngVelocity.x * v3Up.z
-                                 + v3AngVelocity.z * v3Up.x;
-            v3BallSurfaceSpeed.z = v3AngVelocity.x * v3Up.y
-                                 - v3AngVelocity.y * v3Up.x;
-
-            nlVector3 v3CurBallSpeed;
+            CalcSurfaceVelocity(v3BallSurfaceSpeed);
             GetLinearVelocity(&v3CurBallSpeed);
-            v3BallSurfaceSpeed.x -= v3CurBallSpeed.x;
-            v3BallSurfaceSpeed.y -= v3CurBallSpeed.y;
-            v3BallSurfaceSpeed.z -= v3CurBallSpeed.z;
+            nlVec3Sub(v3BallSurfaceSpeed, v3BallSurfaceSpeed, v3CurBallSpeed);
             nlVec3Scale(v3BallSurfaceSpeed, 5.0f);
             AddForceAtCentreOfMass(v3BallSurfaceSpeed);
             v3BallSurfaceSpeed.z = 0.0f;
 
-            if (torque.x * torque.x + torque.y * torque.y
-                        + torque.z * torque.z
-                    < 0.0001f
-                && v3BallSurfaceSpeed.x * v3BallSurfaceSpeed.x
-                            + v3BallSurfaceSpeed.y * v3BallSurfaceSpeed.y
-                            + v3BallSurfaceSpeed.z * v3BallSurfaceSpeed.z
-                        < 0.00003f)
+            if (v3Torque.GetLengthSq3D() < 0.0001f
+                && v3BallSurfaceSpeed.GetLengthSq3D() < 0.00003f)
             {
                 mbUseAngularVel = false;
             }
@@ -456,17 +431,12 @@ void PhysicsBall::AddResistanceForces()
 
     if (m_parentObject == 0 && mbUseMagnusEffect)
     {
-        nlVector3 v3CurLinVel;
         GetLinearVelocity(&v3CurLinVel);
-        float speedSquared = v3CurLinVel.x * v3CurLinVel.x
-                           + v3CurLinVel.y * v3CurLinVel.y
-                           + v3CurLinVel.z * v3CurLinVel.z;
-        if (speedSquared > 1.0f)
+        if (v3CurLinVel.GetLengthSq3D() > 1.0f)
         {
-            nlVector3 v3CurAngVel;
             GetAngularVelocity(&v3CurAngVel);
-            float angularScale
-                = 1.0f - lbl_806DCA7C * mfBallAirResistance;
+            float airResistance = mfBallAirResistance;
+            float angularScale = 1.0f - lbl_806DCA7C * airResistance;
             if (angularScale > 0.0001f)
             {
                 nlVec3Scale(v3CurAngVel, angularScale);
@@ -479,23 +449,20 @@ void PhysicsBall::AddResistanceForces()
             }
             SetAngularVelocity(v3CurAngVel);
 
-            float angularSpeedSquared
-                = v3CurAngVel.x * v3CurAngVel.x
-                + v3CurAngVel.y * v3CurAngVel.y
-                + v3CurAngVel.z * v3CurAngVel.z;
-            if (angularSpeedSquared > 1.0f)
+            if (v3CurAngVel.GetLengthSq3D() > 1.0f)
             {
-                float speed = nlSqrt(speedSquared, true);
+                float speed = nlVec3Length(v3CurLinVel);
+                float chargeValue = mfChargeBonus * lbl_806E11E8;
                 float speedScale = InterpolateRangeClamped(
                     0.0f, 1.0f, 30.0f, 55.0f, speed);
-                float chargeScale = mfChargeBonus * lbl_806E11E8
-                                  + speedScale * (1.0f - lbl_806E11E8);
+                float speedValue = speedScale * (1.0f - lbl_806E11E8);
                 float magnusScale = InterpolateClamped(
-                    lbl_806DCA80, lbl_806DCA84, chargeScale);
+                    lbl_806DCA80, lbl_806DCA84, chargeValue + speedValue);
 
-                nlVector3 v3MagnusForce;
-                nlVec3Cross(v3MagnusForce, v3CurAngVel, v3CurLinVel);
-                nlVec3Scale(v3MagnusForce, magnusScale);
+                nlVec3CrossProduct(v3MagnusForce, v3CurAngVel, v3CurLinVel);
+                v3MagnusForce.x *= magnusScale;
+                v3MagnusForce.y *= magnusScale;
+                v3MagnusForce.z *= magnusScale;
                 AddForceAtCentreOfMass(v3MagnusForce);
             }
         }
@@ -510,6 +477,18 @@ void PhysicsBall::fn_80140C30()
 float PhysicsBall::fn_80140C3C()
 {
     return g_BallAirResistance;
+}
+
+void PhysicsBall::CalcSurfaceVelocity(nlVector3& v3VelocityOut)
+{
+    nlVector3 v3AngVelocity;
+    GetAngularVelocity(&v3AngVelocity);
+    v3AngVelocity.z = 0.0f;
+
+    nlVector3 v3Up = { 0.0f, 0.0f, 0.0f };
+    v3Up.z = GetRadius();
+
+    nlVec3CrossProduct(v3VelocityOut, v3AngVelocity, v3Up);
 }
 
 void PhysicsBall::ScaleAngularVelocity(float scale)
@@ -546,29 +525,4 @@ void PhysicsBall::CalcAngularFromLinearVelocity(nlVector3& v3AngularVel)
     v3Look.y = v3Velocity.y;
 
     nlVec3CrossProduct(v3AngularVel, v3Up, v3Look);
-}
-
-void PhysicsBall::RegisterDebugFields(
-    unsigned short* type, DebugWriteCache* cache)
-{
-#define REGISTER_FIELD(kind, field) \
-    cache->AddField(kind, gDebugFieldTypes[kind].size, \
-        (unsigned char*)&field - (unsigned char*)&mv3TiltForce, #field)
-
-    REGISTER_FIELD(22, mv3TiltForce);
-    REGISTER_FIELD(22, mv3WindForce);
-    REGISTER_FIELD(16, mbUseTiltForce);
-    REGISTER_FIELD(16, mbUseWindForce);
-    REGISTER_FIELD(16, mbIsSupportedByGround);
-    REGISTER_FIELD(16, mbUseAngularVel);
-    REGISTER_FIELD(16, mbUseMagnusEffect);
-    REGISTER_FIELD(16, mbIgnoreForces);
-    REGISTER_FIELD(16, mbCanFreeFall);
-    REGISTER_FIELD(16, mbCanGoThroughGround);
-    REGISTER_FIELD(16, mbPassLockedIn);
-    REGISTER_FIELD(17, mfSpinTimer);
-    REGISTER_FIELD(17, mfBallAirResistance);
-    REGISTER_FIELD(17, mfChargeBonus);
-
-#undef REGISTER_FIELD
 }

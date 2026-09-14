@@ -9,66 +9,63 @@
 static GXLightObj glx_LightObjects[8];
 static GXLightObj glx_LoadedLightObjects[8];
 
-void glx_LoadDirectionalLight(unsigned int index, const nlVector3* vector, const nlFloatColour* pColour)
+static inline void LoadLightIfChanged(unsigned int index, GXLightObj* light)
 {
-    GXLightObj* light = &glx_LightObjects[index];
-    nlColour colour;
-    ConvertColour(colour, *pColour);
-    GXColor lightColour = *(GXColor*)&colour;
-    GXInitLightDir(light, vector->x, vector->y, vector->z);
-    GXInitLightPos(light, 100000.0f * vector->x, 100000.0f * vector->y, 100000.0f * vector->z);
-    GXInitLightColor(light, lightColour);
-
-    if (memcmp(light, &glx_LoadedLightObjects[index], sizeof(GXLightObj)) != 0)
+    GXLightObj* loaded = &glx_LoadedLightObjects[index];
+    if (memcmp(light, loaded, sizeof(GXLightObj)) != 0)
     {
         GXLoadLightObjImm(light, (GXLightID)(1 << index));
-        memcpy(&glx_LoadedLightObjects[index], light, sizeof(GXLightObj));
+        memcpy(loaded, light, sizeof(GXLightObj));
     }
 }
 
-void glx_SetAmbientColour(const nlFloatColour* pColour)
+static inline GXColor ConvertLightColour(const nlFloatColour& input)
 {
-    nlColour colour = { {
-        (s32)(pColour->c[0] * 255.0f),
-        (s32)(pColour->c[1] * 255.0f),
-        (s32)(pColour->c[2] * 255.0f),
-        (s32)(pColour->c[3] * 255.0f),
-    } };
+    nlColour colour;
+    ConvertColour(colour, input);
+    return *(GXColor*)&colour;
+}
+
+void glx_LoadDirectionalLight(unsigned int index, const nlVector3* vector, nlFloatColour* pColour)
+{
+    GXColor lightColour = ConvertLightColour(*pColour);
+    GXInitLightDir(&glx_LightObjects[index], vector->x, vector->y, vector->z);
+    GXInitLightPos(&glx_LightObjects[index], 100000.0f * vector->x, 100000.0f * vector->y, 100000.0f * vector->z);
+    GXInitLightColor(&glx_LightObjects[index], lightColour);
+
+    LoadLightIfChanged(index, &glx_LightObjects[index]);
+}
+
+void glx_SetAmbientColour(nlFloatColour* pColour)
+{
+    nlColour colour;
+    ConvertColour(colour, *pColour);
     gxSetChanAmbColour(0, colour);
 }
 
-void glx_LoadPointLight(unsigned int index, const nlVector3* vector, const nlFloatColour* pColour, float value)
+void glx_LoadPointLight(unsigned int index, const nlVector3* vector, nlFloatColour* pColour, float value)
 {
+    GXColor lightColour = ConvertLightColour(*pColour);
     GXLightObj* light = &glx_LightObjects[index];
-    nlColour colour;
-    ConvertColour(colour, *pColour);
     GXInitLightPos(light, vector->x, vector->y, vector->z);
-    GXInitLightColor(light, *(GXColor*)&colour);
+    GXInitLightColor(light, lightColour);
     GXInitLightAttnA(light, 1.0f, 0.0f, 0.0f);
     if (value > 0.0f)
         GXInitLightDistAttn(light, value, 1.0f / 256.0f, GX_DA_STEEP);
     else
         GXInitLightDistAttn(light, 0.0f, 0.0f, GX_DA_OFF);
 
-    if (memcmp(light, &glx_LoadedLightObjects[index], sizeof(GXLightObj)) != 0)
-    {
-        GXLoadLightObjImm(light, (GXLightID)(1 << index));
-        memcpy(&glx_LoadedLightObjects[index], light, sizeof(GXLightObj));
-    }
+    LoadLightIfChanged(index, light);
 }
 
-void glx_LoadSpecular(unsigned int index, const nlVector3* vector, const nlFloatColour* pColour, float value)
+void glx_LoadSpecular(unsigned int index, const nlVector3* vector, nlFloatColour* pColour, float value)
 {
+    GXColor lightColour = ConvertLightColour(*pColour);
     GXLightObj* light = &glx_LightObjects[index];
-    nlColour colour;
-    ConvertColour(colour, *pColour);
-    GXInitLightColor(light, *(GXColor*)&colour);
+    GXInitLightColor(light, lightColour);
     GXInitSpecularDir(light, vector->x, vector->y, vector->z);
-    GXInitLightAttn(light, 0.0f, 0.0f, 1.0f, value * 0.5f, 0.0f, 1.0f - value * 0.5f);
+    float half = 0.5f;
+    GXInitLightAttn(light, 0.0f, 0.0f, 1.0f, value * half, 0.0f, 1.0f - value * half);
 
-    if (memcmp(light, &glx_LoadedLightObjects[index], sizeof(GXLightObj)) != 0)
-    {
-        GXLoadLightObjImm(light, (GXLightID)(1 << index));
-        memcpy(&glx_LoadedLightObjects[index], light, sizeof(GXLightObj));
-    }
+    LoadLightIfChanged(index, light);
 }

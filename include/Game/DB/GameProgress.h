@@ -23,12 +23,44 @@ struct CupHistoryRecord
 
 struct CupRecord_8010C5C0
 {
+    CupRecord_8010C5C0()
+    {
+        mValues[0] = 0;
+        mValues[1] = 0;
+        mValues[2] = 0;
+    }
+
     u16 mValues[3];
+};
+
+struct CupHistory
+{
+    CupHistoryRecord mRecords[9][12];
+    u8 mWriteIndex[9];
+};
+
+struct CupRecord_8010EB90
+{
+    CupRecord_8010EB90()
+        : mUnlockFlags(0)
+    {
+        memset(mHistory.mRecords, 0, sizeof(mHistory.mRecords));
+        memset(mHistory.mWriteIndex, 0, sizeof(mHistory.mWriteIndex));
+    }
+
+    CupRecord_8010C5C0 mUnidentified86A0;
+    CupRecord_8010C5C0 mUnidentified86A6;
+    u16 mUnlockFlags : 9;
+    u16 mUnidentified86AD : 7;
+    u8 unknown_0x86AE[2];
+    CupHistory mHistory;
 };
 
 class CupManager : public CupInterface
 {
 public:
+    CupManager();
+
     virtual BasicGameInfo* GetGameInfo(int phase, int matchup);
     virtual bool HasGameBeenPlayed(int phase, int matchup);
     virtual NetworkTournamentGame* GetTournamentGame(int phase, int matchup);
@@ -47,20 +79,52 @@ public:
     int fn_8010DE2C(int* value);
     int fn_8010D9C4(int* value);
     s16 GetNextRoundNumber(int* roundType);
-    int GetTeamRank(int team) const;
-    TeamStats GetTeamStats(int team) const;
+    int GetTeamRank(int team);
+    TeamStats GetTeamStats(int team);
     u16 GetNumRegularRounds() const { return mCurrentCup->GetNumRegularRounds(); }
     u16 GetNumPlayingTeams() const;
-    TeamStats GetTeamStatsByIndex(u16 index) const;
+    TeamStats GetTeamStatsByIndex(u16 index);
     TeamStats* pGetTeamStatsByIndex(u16 index) const;
     BasicGameInfo* GetMatchupInfo(int phase, short round, int matchup) const;
-    int GetUserSelectedCupTeam() const;
+    eTeamID GetUserSelectedCupTeam() const;
     int GetPreviousGameTeam(int index) const;
     bool ShouldShowCupPhasePopup() const;
     void SetShowCupPhasePopup(bool value);
     void RestoreCupRecord();
     void RestartCupSeries();
     void ShowRoundNews();
+    void fn_8010EB90(int index);
+    int fn_8010AFA4() const;
+    void fn_8010C4DC();
+    void fn_8010C52C(int mode);
+    void fn_8010C57C();
+    void fn_8010C5A0();
+    u16 fn_8010D600() const;
+    int fn_8010B25C(bool final) const;
+    void fn_8010B348(int* stadiums);
+    void fn_8010B578(int* teams, CupSidekicks* sidekicks);
+    void fn_8010B918();
+    void fn_8010BA10();
+    bool fn_8010C280(int flags);
+    void fn_8010CAE8();
+    void fn_8010C5E0();
+    void fn_8010CBE4();
+    void fn_8010BCB8(bool overtime, int winningSide);
+    void IncreaseGameNumber(bool shouldIncreaseRound);
+    void IncreaseRoundNumber();
+    void SetUserSelectedCupTeam(int team);
+    void SetUserSelectedCupSidekicks(CupSidekicks sidekicks);
+    CupSidekicks GetUserSelectedCupSidekicks() const { return mCurrentCup->mUserSelectedSidekick; }
+    CupSidekicks GetPendingCupSidekicks() const
+    {
+        return unknown_0x8A2C;
+    }
+    void fn_8010D838();
+    int fn_8010E460();
+    void fn_8010E8E0();
+    void fn_8010EA28();
+    u32 GetUnlockFlags() const { return mCupRecord.mUnlockFlags; }
+    bool HasUnlockFlag(int flag) const { return (mCupRecord.mUnlockFlags & flag) != 0; }
 
     int GetSaveDataSize() const;
     int UnidentifiedSize_8010D6CC() const
@@ -75,13 +139,12 @@ public:
     /* 0x14F0 */ Cup<6, 12> mCrystalCupSeries;
     /* 0x41DC */ Cup<10, 11> mStrikerCupSeries;
     /* 0x8680 */ int mState;
-    /* 0x8684 */ u8 unknown_0x8684[0x10];
+    /* 0x8684 */ int mUnidentified8684[4];
     /* 0x8694 */ int mPreviousGameTeams[2];
     /* 0x869C */ bool mUnidentified869C;
-    /* 0x869D */ u8 unknown_0x869D[3];
-    /* 0x86A0 */ CupRecord_8010C5C0 mUnidentified86A0;
-    /* 0x86A6 */ CupRecord_8010C5C0 mUnidentified86A6;
-    /* 0x86AC */ u8 unknown_0x86AC[0x370];
+    /* 0x869D */ bool mUnidentified869D;
+    /* 0x869E */ u8 unknown_0x869E[2];
+    /* 0x86A0 */ CupRecord_8010EB90 mCupRecord;
     /* 0x8A1C */ int mCurrentMode;
     /* 0x8A20 */ BaseCup* mCurrentCup;
     /* 0x8A24 */ bool mShowCupPhasePopup;
@@ -93,6 +156,22 @@ public:
 
 extern CupManager* g_pCupManager;
 inline CupManager* CupManager::Instance() { return g_pCupManager; }
+
+struct ChallengeCompletionDate
+{
+    u32 mDay : 5;
+    u32 mMonth : 4;
+    u32 mYearOffset : 10;
+    u32 mUnidentified : 13;
+};
+
+struct ChallengeUnlockRecord
+{
+    bool IsUnlocked(int flag) const;
+
+    ChallengeCompletionDate mCompletionDates[12];
+    u32 mUnlockedChallenges;
+};
 
 class StrikerChallenge
 {
@@ -132,8 +211,7 @@ public:
     /* 0x2F */ bool mStunnedAwayGoalies;
     /* 0x30 */ int mCustomPowerups;
     /* 0x34 */ int mCurrentChallenge;
-    /* 0x38 */ u32 mCompletionDates[12];
-    /* 0x68 */ u32 mUnlockedChallenges;
+    /* 0x38 */ ChallengeUnlockRecord mUnlocks;
     /* 0x6C */ u8 mUnidentified6C;
     /* 0x6D */ s8 mHeadlineVariant;
     /* 0x6E */ u8 mPadding6E[2];
@@ -142,8 +220,8 @@ public:
 extern StrikerChallenge* g_pStrikerChallenge;
 StrikerChallenge* fn_801CA670();
 
-bool IsUnlockFlagSet(unsigned int flag);
-void SetUnlockFlag(unsigned int flag);
+bool IsUnlockFlagSet(int flag);
+void SetUnlockFlag(int flag);
 
 
 bool IsWastelandsUnlocked();

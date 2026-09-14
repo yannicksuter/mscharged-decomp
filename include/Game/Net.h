@@ -26,6 +26,10 @@ public:
     {
         return m_fNetPostRadius;
     }
+    static float GetNetDepth()
+    {
+        return m_fNetDepth;
+    }
 
     /* 0x00 */ int m_nIndex;
     /* 0x04 */ float m_fDirection;

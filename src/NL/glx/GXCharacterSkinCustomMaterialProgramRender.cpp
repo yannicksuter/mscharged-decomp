@@ -138,16 +138,10 @@ void GXMaterialProgramImpl<GXCharacterSkinCustomMaterialProgram>::Draw(
     if (!sRenderCharacterSkin)
         return;
 
-    float blendAmount;
-    if (sBlendAmountOverride != 1.0f)
-        blendAmount = sBlendAmountOverride;
-    else
-        blendAmount = static_cast<const GXCharacterSkinCustomParameters*>(packet->materialParameters)->blendAmount;
-    float alphaValue;
-    if (sAlphaValueOverride != 1.0f)
-        alphaValue = sAlphaValueOverride;
-    else
-        alphaValue = static_cast<const GXCharacterSkinCustomParameters*>(packet->materialParameters)->alphaValue;
+    float blendAmount = glGetMaterialFloatParameterWithOverride(packet,
+        &GXCharacterSkinCustomParameters::blendAmount, sBlendAmountOverride);
+    float alphaValue = glGetMaterialFloatParameterWithOverride(packet,
+        &GXCharacterSkinCustomParameters::alphaValue, sAlphaValueOverride);
     if (alphaValue == 0.0f)
         return;
 

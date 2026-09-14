@@ -53,7 +53,7 @@
 #include "NL/gl/tu_802A12E4.h"
 #include "Game/FE/feDPD.h"
 #include "NL/plat/nlFlash.h"
-#include "NL/plat/tu_80372B4C.h"
+#include "NL/plat/nlFileCache.h"
 
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
@@ -465,7 +465,7 @@ static void Initialize()
 
     AddTasks();
     nlFlashInitialize();
-    fn_803730D8();
+    nlInitFileCache();
     fn_80272AB4();
     Wiper::Instance().Initialize();
     fn_80184858();
@@ -492,7 +492,7 @@ static void AddTasks()
     nlTaskManager::AddTask(&feDPDTask, 13, 5);
     nlTaskManager::AddTask(
         &flashMemoryTask, 13, (u32)-1);
-    nlTaskManager::AddTask(fn_803733D4(), 3, (u32)-1);
+    nlTaskManager::AddTask(nlGetFileCache(), 3, (u32)-1);
     nlTaskManager::AddTask(&Wiper::Instance(), 13, (u32)-1);
 }
 

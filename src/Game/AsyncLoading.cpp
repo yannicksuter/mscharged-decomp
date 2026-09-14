@@ -52,6 +52,7 @@
 #include "Game/SH/SHPause.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Game.h"
+#include "Game/Weather.h"
 #include "Game/NetworkSession.h"
 #include "Game/NisPlayer.h"
 #include "Game/Team.h"
@@ -90,7 +91,7 @@
 #include "NL/nlTask.h"
 #include "NL/nlTicker.h"
 #include "NL/nlTime.h"
-#include "NL/plat/tu_80372B4C.h"
+#include "NL/plat/nlFileCache.h"
 #include "types.h"
 #include "unclassified/tu_80188884.h"
 #include "Game/InputManager.h"
@@ -116,7 +117,6 @@ extern "C" void OSYieldThread();
 
 extern "C" void fn_801B2770();
 extern "C" void fn_8027E5D4();
-extern "C" void fn_800AA3E8(void*, int);
 extern "C" void fn_801AF97C(void*);
 extern "C" void fn_80013660(void*, int);
 extern "C" void fn_801A01F8();
@@ -760,8 +760,8 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 81:
     {
-        FileCache_80535C20* fileCache = fn_803733D4();
-        fileCache->m_5D4 = true;
+        nlFileCache* fileCache = nlGetFileCache();
+        fileCache->mCacheWritesEnabled = true;
         fn_80370E20();
         break;
     }
@@ -1521,7 +1521,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     DestroyPowerups();
     lbl_806E12C8->ResetEffects();
     DestroyCharacters();
-    fn_800AA3E8(g_pGame->mUnidentified10DC, 1);
+    g_pGame->mpWeatherManager->Stop(true);
     fn_801AF97C(lbl_80574148);
     fn_80013660(g_pBall, 1);
     g_pBall = 0;

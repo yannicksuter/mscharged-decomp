@@ -387,7 +387,11 @@ struct UnidentifiedEventData26
 struct UnidentifiedEventData27;
 struct UnidentifiedEventData28;
 struct UnidentifiedEventData29;
-struct UnidentifiedEventData30;
+struct UnidentifiedEventData30
+{
+    /* 0x00 */ PowerupBase* mUnidentified00;
+    /* 0x04 */ PhysicsPatch* mUnidentified04;
+}; // total size: 0x8
 struct UnidentifiedEventData31;
 struct UnidentifiedEventData33;
 class UnidentifiedObject_801B535C;

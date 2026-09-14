@@ -444,11 +444,7 @@ void ApplyGameObjectShadowLighting(s32 arg0, u32 arg1)
         gxSetTevColourIn(numTevStages, 15, 0, 8, 15);
         gxSetTevAlphaIn(numTevStages, 7, 7, 7, 0);
 
-        glTextureBinding textureState;
-        textureState.texture = lbl_806DCC6C;
-        textureState.textureIndex = 0xFFFF;
-        textureState.flags = 0;
-        textureState.unknown07 = 0;
+        glTextureBinding textureState(lbl_806DCC6C);
         textureState.SetWrapS(!lbl_806E1413);
         textureState.SetWrapT(!lbl_806E1413);
         glx_BindTexture(numTexGens, &textureState);
@@ -628,7 +624,7 @@ void LoadGameObjectSpecularLight(s32 index, GameObjectLight* lightData, f32 expo
     GXLoadLightObjImm(&light, (GXLightID)lbl_806E4D10[index]);
 }
 
-void SetGameObjectLightingEnabled(s32 arg0, s32 arg1, s32 arg2)
+void SetGameObjectLightingEnabled(bool arg0, s32 arg1, bool arg2)
 {
     if (arg0)
     {
@@ -963,7 +959,7 @@ GameObjectLight* GetGameObjectLight(s32 arg0, bool arg1)
     }
 }
 
-int GetGameObjectLightCount(int arg0, int arg1)
+int GetGameObjectLightCount(bool arg0, bool arg1)
 {
     bool var0 = arg1 && lbl_806DCC48;
     int var1 = var0 ? GetEmissionManager()->GetNumLights() : 0;

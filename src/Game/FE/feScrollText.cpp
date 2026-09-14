@@ -1,4 +1,5 @@
 #include "Game/FE/feScrollText.h"
+#include "NL/nlBasicString.inl"
 #include "Game/FE/feText.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/Render/RLViewLayers.h"

@@ -197,7 +197,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
             char name[32];
             nlSNPrintf(name, sizeof(name), "%s_%d", mHeader->name, mNumCameras);
             nlChunk* cameraBegin = (nlChunk*)chunk->GetData();
-            nlChunk* cameraEnd = chunk->GetNextChunk();
+            nlChunk* cameraEnd = chunk->GetLastChunk();
             if (LoadAnimCameraData(cameraBegin, cameraEnd, mUnidentified158[mNumCameras], false)
                 && mNumCameras < 10)
             {

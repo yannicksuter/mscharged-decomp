@@ -29,7 +29,7 @@
 #include "Game/Physics/PhysicsObject.h"
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Team.h"
-#include "unclassified/tu_800A9B78.h"
+#include "Game/Weather.h"
 #include "Game/NetworkSession.h"
 #include "Game/TweakValue.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
@@ -173,16 +173,6 @@ extern "C" void fn_8002E39C(cFielder* pFielder);
 extern "C" void fn_8002E2E4(cFielder* pFielder);
 extern "C" void fn_801BB640(cFielder* pFielder, int nParam);
 extern "C" void fn_8001458C(cBall* pBall);
-struct UnidentifiedTornado806E0C94
-{
-    /* 0x00 */ u8 mUnidentified00[0x0C];
-    /* 0x0C */ bool mUnidentified0C;
-
-    virtual void Allocate() = 0;
-    virtual void UnidentifiedVirtual0C() = 0;
-};
-extern "C" UnidentifiedTornado806E0C94* fn_800AA060(
-    void* pParam, int nParam);
 
 extern "C" bool fn_802B6BC8(const nlVector3* v3Start,
     const nlVector3* v3End, const nlVector3* v3A, const nlVector3* v3B,
@@ -201,7 +191,6 @@ extern "C" void fn_8005C830(cGame* pGame);
 extern "C" float fn_8004F58C(void);
 extern bool gbUseTurboCharging;
 extern "C" void fn_8005F238(cGame* pGame, void* pEvent);
-extern "C" void fn_800AA568(void* pParam);
 
 class UnidentifiedHandler8011166C
 {
@@ -1622,7 +1611,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         event.v3Position = v3Column;
         fn_8005F238(g_pGame, &event);
 
-        fn_800AA568(g_pGame->mUnidentified10DC);
+        g_pGame->mpWeatherManager->Pause();
 
         fn_800978E8(this, 0);
 
@@ -1838,7 +1827,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
 
         m_pTeam->GetOtherTeam()->GetGoalie()->fn_8008EF58();
 
-        g_pGame->mUnidentified10DC->fn_800AA3E8(false);
+        g_pGame->mpWeatherManager->Stop(false);
         g_pGame->fn_80058704();
         g_pGame->mUnidentified03C = this;
         fn_8005F82C(g_pGame, this);
@@ -3713,11 +3702,10 @@ void cFielder::fn_80045930()
     nlVector3 v3Direction;
     if (!g_pBall->m_pPhysicsBall->mbUseWindForce)
     {
-        UnidentifiedTornado806E0C94* pObject
-            = fn_800AA060(g_pGame->mUnidentified10DC, 2);
-        if (pObject != 0 && !pObject->mUnidentified0C)
+        Weather* pObject = g_pGame->mpWeatherManager->GetWeather(2);
+        if (pObject != 0 && !pObject->mbPaused)
         {
-            pObject->UnidentifiedVirtual0C();
+            pObject->Start();
             v3Direction = g_pBall->m_pPhysicsBall->mv3WindForce;
         }
         else

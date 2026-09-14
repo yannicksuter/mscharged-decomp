@@ -44,6 +44,19 @@ public:
     {
         return mUnidentified00C;
     }
+    float GetTime() const
+    {
+        return m_fTime;
+    }
+    float UnidentifiedGetShotDuration() const
+    {
+        return mUnidentified008;
+    }
+    bool UnidentifiedIsCharging() const
+    {
+        return m_eShotMeterState == SHOT_METER_ACTIVE
+            || m_eShotMeterState == SHOT_METER_STS_ACTIVE;
+    }
     static bool IsActive(eShotMeterState state)
     {
         bool bShotMeterActive = false;

@@ -1,4 +1,5 @@
-#include "unclassified/tu_801E4630.h"
+#include "Game/SH/SHStadiumSelect.h"
+#include "NL/nlBasicString.inl"
 #include "NL/nlFunction.inl"
 #include "NL/nlBindMember.h"
 #include "Game/EventRegistry.h"
@@ -39,96 +40,98 @@
 extern "C" unsigned char SCGetSoundMode();
 extern "C" int THPSimpleSetVolume(long volume, long time);
 
-extern Config lbl_80578320;
-extern const int lbl_804E8390[];
+extern Config gMovieConfig;
+static const int STADIUM_ORDER[17] = {
+    13, 11, 15, 16, 7, 14, 3, 4, 9, 5, 0, 1, 2, 6, 10, 8, 12,
+};
 
-inline void TU801E68F0Control::Stop()
+inline void MoviePlayerControl::Stop()
 {
-    if (mUnidentified05 && MovieStop())
+    if (mMovieStarted && MovieStop())
     {
-        if (mUnidentified08)
+        if (mMovieInstance)
         {
-            mUnidentified08->m_bVisible = false;
+            mMovieInstance->m_bVisible = false;
         }
-        mUnidentified05 = false;
+        mMovieStarted = false;
     }
 }
 
-bool TU801E68F0Control::fn_801E45C0()
+bool MoviePlayerControl::CheckMoviePlayerAbort()
 {
     bool b = g_pFEInput->JustPressed(FE_ALL_PADS, 31, true, 0) || g_pFEInput->JustPressed(FE_ALL_PADS, 30, true, 0);
     return b;
 }
 
-TU801E4630Scene::TU801E4630Scene()
-    : mUnidentifiedB0(0)
-    , mUnidentifiedB4(false)
-    , mUnidentifiedB5(false)
-    , mUnidentifiedB6(false)
-    , mUnidentified29C(true)
-    , mUnidentified44C(0)
+StadiumSelectScene::StadiumSelectScene()
+    : m_pTicker(0)
+    , mControlsInitialized(false)
+    , mPointerOverPlayButton(false)
+    , mProceeding(false)
+    , mPageControls(true)
+    , mPlayButtonInstance(0)
 {
     if (GameInfoManager::Instance()->UseAltRules())
     {
-        mUnidentified1C4.SetBackScene(27);
+        mBackButton.SetBackScene(27);
     }
     else
     {
-        mUnidentified1C4.SetBackScene(4);
+        mBackButton.SetBackScene(4);
     }
-    fn_801E4F40();
-    Function<FnVoidVoid> callback(BindMember(this, &TU801E4630Scene::fn_801E68DC));
+    SortStadiums();
+    Function<FnVoidVoid> callback(BindMember(this, &StadiumSelectScene::OnHBMHide));
     UnidentifiedFindEvent<UnidentifiedEventNoData>("HBMHide", -1)->Add(
-        callback, (unsigned int)&mUnidentifiedB8, -1);
+        callback, (unsigned int)&mHBMHideConnection, -1);
 }
 
-TU801E4630Scene::~TU801E4630Scene()
+StadiumSelectScene::~StadiumSelectScene()
 {
-    if (mUnidentifiedB0 != 0)
+    if (m_pTicker != 0)
     {
-        delete mUnidentifiedB0;
+        delete m_pTicker;
     }
-    if (mUnidentifiedC0 != -1)
+    if (mPlayingStadiumIndex != -1)
     {
-        FEAudio::StopAnimAudioEvent(GetStadiumUnknown0x28(mUnidentifiedC8[mUnidentifiedC0]), this);
+        FEAudio::StopAnimAudioEvent(GetStadiumUnknown0x28(mStadiumOrder[mPlayingStadiumIndex]), this);
     }
-    mUnidentified01C.Stop();
+    mMoviePlayer.Stop();
 }
 
-inline void TU801E68F0Control::Initialize(const char* filename)
+inline void MoviePlayerControl::Initialize(const char* filename)
 {
-    mUnidentified08 = 0;
-    nlStrNCpy<char>(mUnidentified0C, filename, sizeof(mUnidentified0C));
-    mUnidentified04 = false;
-    mUnidentified05 = false;
-    mUnidentified8C = true;
-    mUnidentified8D = true;
+    mMovieInstance = 0;
+    nlStrNCpy<char>(mMovieFilename, filename, sizeof(mMovieFilename));
+    mSwappedTexture = false;
+    mMovieStarted = false;
+    mWithSound = true;
+    mLoopMovie = true;
 }
 
-void TU801E4630Scene::SceneCreated()
+void StadiumSelectScene::SceneCreated()
 {
-    mUnidentified01C.Initialize("art/movies/stadiumtest.thp");
+    mMoviePlayer.Initialize("art/movies/stadiumtest.thp");
 
-    mUnidentified448 = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(mPresentation->m_currentSlide, "Layer", "stadium_names");
-    mUnidentified450 = FEFinder<TLInstance, TLAT_UNKNOWN>::Find(mPresentation->m_currentSlide, "Layer", "locked");
-    mUnidentified450->m_bVisible = false;
+    mStadiumNames = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(mPresentation->m_currentSlide, "Layer", "stadium_names");
+    mLockedIcon = FEFinder<TLInstance, TLAT_UNKNOWN>::Find(mPresentation->m_currentSlide, "Layer", "locked");
+    mLockedIcon->m_bVisible = false;
 
     TLTextInstance* tickerText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(mPresentation->m_currentSlide, "Layer", "TickerText");
     if (tickerText != 0)
     {
         glGetScreenInfo();
-        mUnidentifiedB0 = new (8, false) FEScrollText(0);
-        mUnidentifiedB0->ApplyNewTextInstancePointer(tickerText, 0, 242, 0);
-        mUnidentifiedB0->SetDisplayMessage(GetStadiumTickerStringID(0));
+        m_pTicker = new (8, false) FEScrollText(0);
+        m_pTicker->ApplyNewTextInstancePointer(tickerText, 0, 242, 0);
+        m_pTicker->SetDisplayMessage(GetStadiumTickerStringID(0));
     }
 
-    mUnidentifiedBC = 1;
+    mPreviewState = 1;
     for (int i = 0; i < 17; ++i)
     {
-        if (IsStadiumEnabled(mUnidentifiedC8[i]) && IsStadiumUnlocked(mUnidentifiedC8[i]))
+        if (IsStadiumEnabled(mStadiumOrder[i]) && IsStadiumUnlocked(mStadiumOrder[i]))
         {
-            mUnidentifiedC4 = i;
-            mUnidentifiedC0 = -1;
+            mStadiumIndex = i;
+            mPlayingStadiumIndex = -1;
             break;
         }
     }
@@ -142,25 +145,25 @@ void TU801E4630Scene::SceneCreated()
         if (GameInfoManager::Instance()->UseAltRules())
         {
             navigation->SetButtons(0x2F, true);
-            mUnidentified44C = navigation->GetButton(0x20);
+            mPlayButtonInstance = navigation->GetButton(0x20);
         }
         else
         {
             navigation->SetButtons(0x1F, true);
-            mUnidentified44C = navigation->GetButton(0x10);
+            mPlayButtonInstance = navigation->GetButton(0x10);
         }
         backButton = navigation->GetButton(4);
         plusButton = navigation->GetButton(1);
         minusButton = navigation->GetButton(2);
         navigation->HideButtons();
     }
-    mUnidentified1C4.SetButtonInstance(backButton);
+    mBackButton.SetButtonInstance(backButton);
     for (int i = 0; i < 4; ++i)
     {
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
-    mUnidentified29C.SetPlusButton(plusButton);
-    mUnidentified29C.SetMinusButton(minusButton);
+    mPageControls.SetPlusButton(plusButton);
+    mPageControls.SetMinusButton(minusButton);
     FEMusic::StopStream();
     if (GameInfoManager::Instance()->UseAltRules())
     {
@@ -172,39 +175,39 @@ void TU801E4630Scene::SceneCreated()
     }
 }
 
-void TU801E4630Scene::fn_801E4F40()
+void StadiumSelectScene::SortStadiums()
 {
     int unlockedCount = 0;
     int lockedCount = 0;
     int lockedStadiums[17];
     for (int i = 0; i < 17; ++i)
     {
-        if (IsStadiumUnlocked(lbl_804E8390[i]))
+        if (IsStadiumUnlocked(STADIUM_ORDER[i]))
         {
-            mUnidentifiedC8[unlockedCount] = lbl_804E8390[i];
+            mStadiumOrder[unlockedCount] = STADIUM_ORDER[i];
             ++unlockedCount;
         }
         else
         {
-            lockedStadiums[lockedCount] = lbl_804E8390[i];
+            lockedStadiums[lockedCount] = STADIUM_ORDER[i];
             ++lockedCount;
         }
     }
     int j = 0;
     for (int i = unlockedCount; i < 17; ++i)
     {
-        mUnidentifiedC8[i] = lockedStadiums[j];
+        mStadiumOrder[i] = lockedStadiums[j];
         ++j;
     }
 }
 
 static const unsigned short stadiumCount[] = { '1', '7', 0 };
 
-static void UpdateStadiumLabel(TU801E4630Scene* scene);
+static void UpdateStadiumLabel(StadiumSelectScene* scene);
 
-void TU801E4630Scene::Update(float deltaTime)
+void StadiumSelectScene::Update(float deltaTime)
 {
-    switch (mUnidentifiedBC)
+    switch (mPreviewState)
     {
     case 0:
         break;
@@ -213,63 +216,63 @@ void TU801E4630Scene::Update(float deltaTime)
         {
             return;
         }
-        mUnidentified01C.fn_801E68F0(GetStadiumMoviePath(mUnidentifiedC8[mUnidentifiedC4]));
-        mUnidentifiedBC = 4;
-        mUnidentifiedC0 = mUnidentifiedC4;
-        if (mUnidentifiedB0 != 0)
+        mMoviePlayer.Start(GetStadiumMoviePath(mStadiumOrder[mStadiumIndex]));
+        mPreviewState = 4;
+        mPlayingStadiumIndex = mStadiumIndex;
+        if (m_pTicker != 0)
         {
-            mUnidentifiedB0->SetDisplayMessage(GetStadiumTickerStringID(mUnidentifiedC8[mUnidentifiedC0]));
+            m_pTicker->SetDisplayMessage(GetStadiumTickerStringID(mStadiumOrder[mPlayingStadiumIndex]));
         }
-        if (mUnidentified448 != 0)
+        if (mStadiumNames != 0)
         {
-            mUnidentified448->m_bVisible = true;
-            mUnidentified448->SetActiveSlide(GetStadiumName(mUnidentifiedC8[mUnidentifiedC0]), true, false);
+            mStadiumNames->m_bVisible = true;
+            mStadiumNames->SetActiveSlide(GetStadiumName(mStadiumOrder[mPlayingStadiumIndex]), true, false);
             UpdateStadiumLabel(this);
         }
-        mUnidentifiedBC = 2;
+        mPreviewState = 2;
         break;
     case 2:
     {
         cAnimCamera* camera = (cAnimCamera*)cCameraManager::PeekCamera();
         if (camera != 0 && camera->GetUnidentifiedAnimationTime() >= 1.0f)
         {
-            mUnidentifiedBC = 4;
+            mPreviewState = 4;
         }
         break;
     }
     case 3:
-        mUnidentified01C.fn_801E68F0(GetStadiumMoviePath(mUnidentifiedC8[mUnidentifiedC4]));
-        mUnidentifiedBC = 4;
-        mUnidentifiedC0 = mUnidentifiedC4;
-        if (mUnidentifiedB0 != 0)
+        mMoviePlayer.Start(GetStadiumMoviePath(mStadiumOrder[mStadiumIndex]));
+        mPreviewState = 4;
+        mPlayingStadiumIndex = mStadiumIndex;
+        if (m_pTicker != 0)
         {
-            mUnidentifiedB0->SetDisplayMessage(GetStadiumTickerStringID(mUnidentifiedC8[mUnidentifiedC0]));
+            m_pTicker->SetDisplayMessage(GetStadiumTickerStringID(mStadiumOrder[mPlayingStadiumIndex]));
         }
-        if (mUnidentified448 != 0)
+        if (mStadiumNames != 0)
         {
-            mUnidentified448->m_bVisible = true;
-            mUnidentified448->SetActiveSlide(GetStadiumName(mUnidentifiedC8[mUnidentifiedC0]), true, false);
+            mStadiumNames->m_bVisible = true;
+            mStadiumNames->SetActiveSlide(GetStadiumName(mStadiumOrder[mPlayingStadiumIndex]), true, false);
             UpdateStadiumLabel(this);
         }
         break;
     case 4:
-        if (mUnidentifiedC0 != mUnidentifiedC4)
+        if (mPlayingStadiumIndex != mStadiumIndex)
         {
-            mUnidentifiedBC = 5;
+            mPreviewState = 5;
         }
         break;
     case 5:
-        mUnidentified01C.Stop();
-        mUnidentifiedBC = 6;
+        mMoviePlayer.Stop();
+        mPreviewState = 6;
         break;
     case 6:
-        mUnidentifiedBC = 3;
+        mPreviewState = 3;
         break;
     }
 
-    mUnidentified01C.fn_801E6BA4(deltaTime);
+    mMoviePlayer.Update(deltaTime);
     BaseSceneHandler::Update(deltaTime);
-    if (!mUnidentifiedB4)
+    if (!mControlsInitialized)
     {
         TLInstance* titles = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(mPresentation->m_currentSlide, "Layer", "SCREEN_TITLES");
         TLSlide* slide = ((TLComponentInstance*)(titles == 0 ? &UnidentifiedTLComponentDefault::sInstance : titles))->GetActiveSlide();
@@ -293,21 +296,21 @@ void TU801E4630Scene::Update(float deltaTime)
         if (navigation != 0)
         {
             navigation->RestoreButtonVisibility();
-            SetBreadcrumbs(17, mUnidentifiedC4);
+            SetBreadcrumbs(17, mStadiumIndex);
         }
-        fn_801E6170();
-        mUnidentifiedB4 = true;
+        InitializeButtons();
+        mControlsInitialized = true;
     }
 
-    if (mUnidentifiedBC > 2)
+    if (mPreviewState > 2)
     {
-        TLSlide* activeSlide = mUnidentified448->GetActiveSlide();
+        TLSlide* activeSlide = mStadiumNames->GetActiveSlide();
         bool finished = true;
         if (activeSlide != 0)
         {
-            TLSlide* slide = mUnidentified448->GetActiveSlide();
+            TLSlide* slide = mStadiumNames->GetActiveSlide();
             float endTime = slide->GetStartTime() + slide->GetDuration();
-            finished = mUnidentified448->GetActiveSlide()->GetCurrentTime() >= endTime;
+            finished = mStadiumNames->GetActiveSlide()->GetCurrentTime() >= endTime;
         }
         if (finished)
         {
@@ -317,7 +320,7 @@ void TU801E4630Scene::Update(float deltaTime)
             event.mIndex = pad;
             event.mPosition = GetPointerPosition(pad, &valid);
             event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 30, true, 0);
-            if (mUnidentified1C4.UpdateBackButton(event, deltaTime))
+            if (mBackButton.UpdateBackButton(event, deltaTime))
             {
                 if (GameInfoManager::Instance()->UseAltRules())
                 {
@@ -332,47 +335,47 @@ void TU801E4630Scene::Update(float deltaTime)
                     FEMusic::StartStreamIfDifferent(2);
                     Presentation::GetInstance()->Call("FromStadiumSelectToGrudgeMatch");
                 }
-                mUnidentified01C.Stop();
-                mUnidentified1C4.Disable();
+                mMoviePlayer.Stop();
+                mBackButton.Disable();
                 return;
             }
-            mUnidentified29C.Update(event, deltaTime);
-            mUnidentified110.HandlePointerEvent(&event);
+            mPageControls.Update(event, deltaTime);
+            mPlayButton.HandlePointerEvent(&event);
 
             bool changed = false;
-            bool previous = mUnidentified29C.mPointerPressed[1] || mUnidentified29C.mPadPressed[1];
+            bool previous = mPageControls.mPointerPressed[1] || mPageControls.mPadPressed[1];
             if (previous)
             {
                 FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, true);
-                mUnidentifiedC4 = (mUnidentifiedC4 + 16) % 17;
-                SetBreadcrumbs(17, mUnidentifiedC4);
+                mStadiumIndex = (mStadiumIndex + 16) % 17;
+                SetBreadcrumbs(17, mStadiumIndex);
                 changed = true;
             }
             else
             {
-                bool next = mUnidentified29C.mPointerPressed[0] || mUnidentified29C.mPadPressed[0];
+                bool next = mPageControls.mPointerPressed[0] || mPageControls.mPadPressed[0];
                 if (next)
                 {
                     FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, true);
-                    mUnidentifiedC4 = (mUnidentifiedC4 + 1) % 17;
-                    SetBreadcrumbs(17, mUnidentifiedC4);
+                    mStadiumIndex = (mStadiumIndex + 1) % 17;
+                    SetBreadcrumbs(17, mStadiumIndex);
                     changed = true;
                 }
             }
             if (changed)
             {
-                if (IsStadiumUnlocked(mUnidentifiedC8[mUnidentifiedC4]))
+                if (IsStadiumUnlocked(mStadiumOrder[mStadiumIndex]))
                 {
-                    mUnidentified110.Enable();
-                    mUnidentified44C->m_bVisible = true;
-                    mUnidentified450->m_bVisible = false;
+                    mPlayButton.Enable();
+                    mPlayButtonInstance->m_bVisible = true;
+                    mLockedIcon->m_bVisible = false;
                 }
                 else
                 {
-                    mUnidentified110.Disable();
-                    mUnidentified44C->m_bVisible = false;
-                    mUnidentified44C->SetActiveSlide("off", true, false);
-                    mUnidentified450->m_bVisible = true;
+                    mPlayButton.Disable();
+                    mPlayButtonInstance->m_bVisible = false;
+                    mPlayButtonInstance->SetActiveSlide("off", true, false);
+                    mLockedIcon->m_bVisible = true;
                 }
             }
 
@@ -393,12 +396,12 @@ void TU801E4630Scene::Update(float deltaTime)
     for (int i = 0; i < 4; ++i)
     {
         TLComponentInstance* pointer = GetPointerInstance(i);
-        if (i != gFEControllerIndex || mUnidentifiedB6 == true)
+        if (i != gFEControllerIndex || mProceeding == true)
         {
             pointer->SetActiveSlide("waiting", true, false);
         }
-        else if (mUnidentifiedB5 || mUnidentified29C.mPointerInside[1]
-            || mUnidentified29C.mPointerInside[0] || mUnidentified1C4.mPointerInside[i])
+        else if (mPointerOverPlayButton || mPageControls.mPointerInside[1]
+            || mPageControls.mPointerInside[0] || mBackButton.mPointerInside[i])
         {
             pointer->SetActiveSlide("A", true, false);
         }
@@ -407,68 +410,68 @@ void TU801E4630Scene::Update(float deltaTime)
             pointer->SetActiveSlide("cursor", true, false);
         }
     }
-    if (mUnidentifiedB0 != 0)
+    if (m_pTicker != 0)
     {
-        mUnidentifiedB0->Update(deltaTime);
+        m_pTicker->Update(deltaTime);
     }
 }
 
-static void UpdateStadiumLabel(TU801E4630Scene* scene)
+static void UpdateStadiumLabel(StadiumSelectScene* scene)
 {
     unsigned short number[4];
-    nlSNPrintf(number, 4, (const unsigned short*)L"%d", scene->mUnidentifiedC4 + 1);
+    nlSNPrintf(number, 4, (const unsigned short*)L"%d", scene->mStadiumIndex + 1);
     WideBasicString text(Format(WideBasicString(LookupLocString("X_OF_X")), number, stadiumCount));
-    nlStrNCpy(scene->mUnidentified424, text.c_str(), 16);
-    FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(scene->mUnidentified448->GetActiveSlide(), "quantity")->SetString(scene->mUnidentified424);
+    nlStrNCpy(scene->mStadiumCountText, text.c_str(), 16);
+    FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(scene->mStadiumNames->GetActiveSlide(), "quantity")->SetString(scene->mStadiumCountText);
 }
 
-void TU801E4630Scene::fn_801E6170()
+void StadiumSelectScene::InitializeButtons()
 {
-    typedef Detail::MemFunImpl<void, void (TU801E4630Scene::*)(int, void*)> PointerMethod;
-    typedef BindExp3<void, PointerMethod, TU801E4630Scene*, Placeholder<0>, Placeholder<1> > PointerBinding;
+    typedef Detail::MemFunImpl<void, void (StadiumSelectScene::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, StadiumSelectScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     if (GameInfoManager::Instance()->UseAltRules())
     {
-        SetDoneButtonBounds(&mUnidentified110, mUnidentified44C, 0);
+        SetDoneButtonBounds(&mPlayButton, mPlayButtonInstance, 0);
     }
     else
     {
-        SetPlayButtonBounds(&mUnidentified110, mUnidentified44C);
+        SetPlayButtonBounds(&mPlayButton, mPlayButtonInstance);
     }
 
-    Function2<void, int, void*> callback = PointerBinding(MemFun(&TU801E4630Scene::fn_801E6504), this, Placeholder<0>(), Placeholder<1>());
-    mUnidentified110.SetPointerEnterCallback(callback);
-    callback = PointerBinding(MemFun(&TU801E4630Scene::fn_801E6578), this, Placeholder<0>(), Placeholder<1>());
-    mUnidentified110.SetPointerLeaveCallback(callback);
-    Function2<void, int, void*> pressCallback = PointerBinding(MemFun(&TU801E4630Scene::fn_801E65D4), this, Placeholder<0>(), Placeholder<1>());
-    mUnidentified110.SetPointerPressCallback(pressCallback);
+    Function2<void, int, void*> callback = PointerBinding(MemFun(&StadiumSelectScene::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>());
+    mPlayButton.SetPointerEnterCallback(callback);
+    callback = PointerBinding(MemFun(&StadiumSelectScene::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>());
+    mPlayButton.SetPointerLeaveCallback(callback);
+    Function2<void, int, void*> pressCallback = PointerBinding(MemFun(&StadiumSelectScene::OnSelectStadium), this, Placeholder<0>(), Placeholder<1>());
+    mPlayButton.SetPointerPressCallback(pressCallback);
 }
 
-void TU801E4630Scene::fn_801E6504(int index, void*)
+void StadiumSelectScene::OnPointerEnter(int index, void*)
 {
-    mUnidentified44C->SetActiveSlide("over", true, false);
-    mUnidentified110.SetPointerState(1, index);
+    mPlayButtonInstance->SetActiveSlide("over", true, false);
+    mPlayButton.SetPointerState(1, index);
     FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, true);
-    mUnidentifiedB5 = true;
+    mPointerOverPlayButton = true;
 }
 
-void TU801E4630Scene::fn_801E6578(int index, void*)
+void StadiumSelectScene::OnPointerLeave(int index, void*)
 {
-    mUnidentified44C->SetActiveSlide("off", true, false);
-    mUnidentified110.SetPointerState(0, index);
-    mUnidentifiedB5 = false;
+    mPlayButtonInstance->SetActiveSlide("off", true, false);
+    mPlayButton.SetPointerState(0, index);
+    mPointerOverPlayButton = false;
 }
 
-void TU801E4630Scene::fn_801E65D4(int, void*)
+void StadiumSelectScene::OnSelectStadium(int, void*)
 {
-    if (IsStadiumUnlocked(mUnidentifiedC8[mUnidentifiedC4]))
+    if (IsStadiumUnlocked(mStadiumOrder[mStadiumIndex]))
     {
         if (GameInfoManager::Instance()->UseAltRules())
         {
             FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, true);
             FEAudio::PlayAnimAudioEvent(0xBF2ED62D, 0, 0, true);
             Presentation::GetInstance()->Call("FromStadiumSelectToUnrankedMatch");
-            GameInfoManager::Instance()->SetStadium(mUnidentifiedC8[mUnidentifiedC4]);
+            GameInfoManager::Instance()->SetStadium(mStadiumOrder[mStadiumIndex]);
             SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_NOTHING, true);
             scene->mIsHost = true;
             scene->mStartFriendServer = true;
@@ -485,12 +488,12 @@ void TU801E4630Scene::fn_801E65D4(int, void*)
             {
                 SaveLoad::StartSave(false);
             }
-            GameInfoManager::Instance()->SetStadium(mUnidentifiedC8[mUnidentifiedC4]);
+            GameInfoManager::Instance()->SetStadium(mStadiumOrder[mStadiumIndex]);
             GetNavigationScene()->SetButtons(0, true);
         }
-        mUnidentified1C4.Disable();
-        mUnidentified110.Disable();
-        mUnidentifiedB6 = true;
+        mBackButton.Disable();
+        mPlayButton.Disable();
+        mProceeding = true;
     }
     for (int i = 0; i < 4; ++i)
     {
@@ -498,22 +501,22 @@ void TU801E4630Scene::fn_801E65D4(int, void*)
     }
 }
 
-void TU801E4630Scene::fn_801E68DC()
+void StadiumSelectScene::OnHBMHide()
 {
-    mUnidentified01C.mUnidentified05 = false;
-    mUnidentifiedBC = 3;
+    mMoviePlayer.mMovieStarted = false;
+    mPreviewState = 3;
 }
 
-void TU801E68F0Control::fn_801E68F0(const char* filename)
+void MoviePlayerControl::Start(const char* filename)
 {
-    if (!mUnidentified05)
+    if (!mMovieStarted)
     {
-        nlStrNCpy<char>(mUnidentified0C, filename, sizeof(mUnidentified0C));
-        mUnidentified05 = MovieStart(mUnidentified0C, mUnidentified8C, mUnidentified8D, SCGetSoundMode() == 0);
+        nlStrNCpy<char>(mMovieFilename, filename, sizeof(mMovieFilename));
+        mMovieStarted = MovieStart(mMovieFilename, mWithSound, mLoopMovie, SCGetSoundMode() == 0);
         fn_80370E90(false);
 
         const char* streamName;
-        if (strstr(mUnidentified0C, "nlg"))
+        if (strstr(mMovieFilename, "nlg"))
         {
             streamName = "FE_Eggman_Movie";
         }
@@ -523,52 +526,52 @@ void TU801E68F0Control::fn_801E68F0(const char* filename)
         }
         char key[64];
         nlSNPrintf(key, sizeof(key), "%s/Volume", streamName);
-        float volume = (float)GetConfigInt(lbl_80578320, key, 100) / 100.0f;
+        float volume = (float)GetConfigInt(gMovieConfig, key, 100) / 100.0f;
         nlSNPrintf(key, sizeof(key), "%s/FadeIn", streamName);
-        int fadeIn = GetConfigInt(lbl_80578320, key, 500);
+        int fadeIn = GetConfigInt(gMovieConfig, key, 500);
         THPSimpleSetVolume(0, 0);
         THPSimpleSetVolume((int)(127.0f * volume), fadeIn);
-        if (mUnidentified08)
+        if (mMovieInstance)
         {
-            mUnidentified08->m_bVisible = true;
+            mMovieInstance->m_bVisible = true;
         }
-        mUnidentified90 = 0;
+        mEndFrameCount = 0;
     }
 }
 
-const char* lbl_806DD5D4 = "movie";
+const char* gMovieTextureName = "movie";
 
-void TU801E68F0Control::fn_801E6BA4(float)
+void MoviePlayerControl::Update(float)
 {
     if (fn_803713C4())
     {
-        if (!mUnidentified05)
+        if (!mMovieStarted)
         {
             Stop();
         }
         else
         {
-            if (!mUnidentified04)
+            if (!mSwappedTexture)
             {
-                unsigned long texture = glGetTexture(lbl_806DD5D4);
-                if (mUnidentified08)
+                unsigned long texture = glGetTexture(gMovieTextureName);
+                if (mMovieInstance)
                 {
-                    mUnidentified08->m_pTextureResource->SetTextureHandle(texture);
+                    mMovieInstance->m_pTextureResource->SetTextureHandle(texture);
                 }
-                mUnidentified04 = true;
+                mSwappedTexture = true;
             }
             if (fn_803713CC())
             {
-                ++mUnidentified90;
+                ++mEndFrameCount;
                 fn_803713D4();
-                if (mUnidentified90 >= 5)
+                if (mEndFrameCount >= 5)
                 {
                     Stop();
                 }
             }
             else
             {
-                mUnidentified90 = 0;
+                mEndFrameCount = 0;
             }
         }
     }

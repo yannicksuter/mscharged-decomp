@@ -28,7 +28,7 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/nlFile.h"
 #include "NL/nlCompressedFile.h"
-#include "NL/plat/tu_80372B4C.h"
+#include "NL/plat/nlFileCache.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -643,7 +643,7 @@ void CharacterLoader_8056B290::fn_8000AE90()
         {
             nlStrNCpy(szPath, szAnimFilename, sizeof(szPath));
             *strstr(szPath, ".zlib") = '\0';
-            fn_80372B4C(szPath, fn_8000AE7C, mCurrent, 0x20, AllocateStart, 0, 0, 0);
+            nlLoadEntireCachedFileAsync(szPath, fn_8000AE7C, mCurrent, 0x20, AllocateStart, 0, 0, 0);
         }
         else
         {

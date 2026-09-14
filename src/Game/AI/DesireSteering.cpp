@@ -36,12 +36,7 @@ extern "C" void fn_80060804(cGame*, cFielder*);
 extern "C" cTeam* fn_800D6670(cFielder*);
 extern "C" cFielder* fn_800D6734(cFielder*);
 extern "C" float fn_800D6A90(cFielder*);
-extern "C" float fn_800D6E54(cFielder*);
 extern "C" float fn_800D8C84(cFielder*);
-extern "C" float fn_800D8CC4(cFielder*);
-extern "C" float fn_800D8E3C(cFielder*);
-extern "C" float fn_800D8EF8(cFielder*);
-extern "C" float fn_800D9070(cFielder*);
 extern "C" float fn_800DC19C(cFielder*, cBall*);
 extern "C" float fn_800DED80(cFielder*);
 extern "C" float fn_800DFD74(cTeam*);
@@ -529,7 +524,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
 extern "C" float fn_800C6EB0(cFielder* pFielder)
 {
     float result = 0.0f;
-    if (fn_800D6E54(pFielder) >= 0.5f)
+    if (StrategicBallOwner(pFielder) >= 0.5f)
     {
         if (g_pBall->GetOwnerGoalie() != NULL)
         {
@@ -544,13 +539,13 @@ extern "C" float fn_800C6EB0(cFielder* pFielder)
             }
             else if (Defensive(fn_800D6670(pFielder)) >= 0.5f)
             {
-                result = 1.0f - fn_800D8E3C(pFielder);
+                result = 1.0f - FarToMyNet(pFielder);
                 float fBall = fn_800DC19C(pFielder, g_pBall);
                 result = fBall / 2.0f + result / 2.0f;
             }
             else if (Offensive(fn_800D6670(pFielder)) >= 0.5f)
             {
-                result = 1.0f - fn_800D9070(pFielder);
+                result = 1.0f - FarToTheirNet(pFielder);
             }
             else
             {

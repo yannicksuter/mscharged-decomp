@@ -211,6 +211,11 @@ void PhysicsBulletBill::PreCollide()
     }
 }
 
+int PhysicsBulletBill::GetObjectType() const
+{
+    return 0x1E;
+}
+
 PhysicsBulletBill::~PhysicsBulletBill()
 {
 }

@@ -1,6 +1,6 @@
 #include "Game/NetworkMessageRegistry.h"
 #include "Game/Game.h"
-#include "unclassified/tu_800A9B78.h"
+#include "Game/Weather.h"
 #include "Game/Sys/debug.h"
 #include "Game/NetworkDiagnostics.h"
 
@@ -113,8 +113,6 @@ extern "C" int GetAudioPauseDepth();
 extern "C" void ResumeAllAudio();
 extern "C" void fn_800EDC2C();
 extern "C" void fn_801E999C(BaseSceneHandler* scene);
-extern "C" void* fn_800AA060(void* param1, int param2);
-extern "C" void fn_800AF404(void* param1);
 extern "C" void fn_800EDB9C();
 extern "C" void fn_800EDCAC();
 extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
@@ -130,11 +128,9 @@ extern "C" void fn_8031A02C(ScriptQuestionCache* cache);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" void fn_800EC2A4(unsigned long soundID, cGame* game);
 extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
-extern "C" void fn_800A9B78(void* param1);
 extern "C" void fn_80061AF0();
 extern "C" void fn_80061AF4();
 extern "C" void fn_8005B330(nlVector3* pVector, float fXAxisTilt, float fYAxisTilt);
-extern "C" void fn_800A9BC4(void* param1, int param2);
 extern "C" void StopSuddenDeathMusic();
 extern int gNextAvoidableObjectId;
 
@@ -249,7 +245,7 @@ cGame::cGame(void* param1, int param2, bool param3)
     , mUnidentified134((bool*)mUnidentified144, 0, 0, 16)
 {
     mpTerrain = 0;
-    mUnidentified10DC = 0;
+    mpWeatherManager = 0;
     mUnidentified10E0 = 0;
     m_eGameState = -1;
 
@@ -260,14 +256,9 @@ cGame::cGame(void* param1, int param2, bool param3)
     mpTerrain = new (nlMalloc(sizeof(Terrain), 8, false))
         Terrain((int)param1);
 
-    void* mem28 = nlMalloc(28, 8, false);
-    if (mem28 != 0)
-    {
-        fn_800A9B78(mem28);
-    }
-    mUnidentified10DC = (TU800A9B78*)mem28;
+    mpWeatherManager = new (nlMalloc(sizeof(WeatherManager), 8, false)) WeatherManager();
 
-    mUnidentified10DC->fn_800A9E48(param2);
+    mpWeatherManager->Initialize(param2);
 
     mUnidentified10E0 = new (nlMalloc(sizeof(CrowdRiot), 8, false))
         CrowdRiot(param3);
@@ -325,7 +316,7 @@ cGame::~cGame()
 
     delete mpTerrain;
 
-    fn_800A9BC4(mUnidentified10DC, 1);
+    delete mpWeatherManager;
 
     delete mUnidentified10E0;
 
@@ -1186,12 +1177,12 @@ void cGame::fn_8005DF38()
     static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E2498(lbl_806E3770);
     fn_801E999C(g_pOverlayManager->GetScene((SceneList)89));
 
-    if (mUnidentified10DC != 0)
+    if (mpWeatherManager != 0)
     {
-        void* param = fn_800AA060(mUnidentified10DC, 7);
-        if (param != 0)
+        SandTombWeather* weather = static_cast<SandTombWeather*>(mpWeatherManager->GetWeather(7));
+        if (weather != 0)
         {
-            fn_800AF404(param);
+            weather->InvalidateSandPatches();
         }
     }
 }

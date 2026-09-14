@@ -42,6 +42,8 @@ public:
     static RemoteSpk* GetInstance();
 
 private:
+    static RemoteSpk* spInstance;
+
     static void UpdateSpeaker(OSAlarm* alarm, OSContext* context);
 
     static void SpeakerOnCallback(WPADChannel chan, WPADResult result);

@@ -1,4 +1,5 @@
 #include "Game/Sys/simpleparser.h"
+#include "NL/nlBasicString.inl"
 #include "Game/Sys/debug.h"
 #include "Game/TweakRegistry.h"
 #include "Game/TweakValue.h"
@@ -12,7 +13,6 @@
 #include <cstring>
 #include <stdlib.h>
 #include "NL/nlstring_tmpl.h"
-#include "NL/nlBasicString.inl"
 
 typedef Config::String BString;
 

@@ -59,6 +59,7 @@ public:
     void SetGoalie(Goalie* pGoalie);
     cFielder* GetFielder(int nIndex);
     cFielder* GetBallInterceptFielder(int i) { return m_pBallInterceptOrderedFielders[i]; }
+    const nlVector3& GetBallInterceptPosition(int i) const { return mvBallInterceptPosition[i]; }
     cFielder* GetAIOrderedFielder(int i) { return m_pAIOrderedFielders[i]; }
     const nlVector3& UnidentifiedInterceptPosition(int i) const
     {

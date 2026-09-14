@@ -131,10 +131,7 @@ void GXMaterialProgramImpl<GXMegaSpecularMaterialProgram>::Draw(
     float alphaValue = static_cast<const GXMegaSpecularParameters*>(packet->materialParameters)->alphaValue;
     nlFloatColour specularColour;
     nlFloatColourSet(specularColour,
-        static_cast<const GXMegaSpecularParameters*>(packet->materialParameters)->specularColour.c[0],
-        static_cast<const GXMegaSpecularParameters*>(packet->materialParameters)->specularColour.c[1],
-        static_cast<const GXMegaSpecularParameters*>(packet->materialParameters)->specularColour.c[2],
-        static_cast<const GXMegaSpecularParameters*>(packet->materialParameters)->specularColour.c[3]);
+        static_cast<const GXMegaSpecularParameters*>(packet->materialParameters)->specularColour);
     float blendAmount = static_cast<const GXMegaSpecularParameters*>(packet->materialParameters)->blendAmount;
     float megaBlend = static_cast<const GXMegaSpecularParameters*>(packet->materialParameters)->megaBlend;
     float specularExponent = static_cast<const GXMegaSpecularParameters*>(packet->materialParameters)->specularExponent;

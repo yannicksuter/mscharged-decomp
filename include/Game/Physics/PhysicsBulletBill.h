@@ -10,7 +10,7 @@ class PhysicsBulletBill : public PhysicsSphere
 public:
     PhysicsBulletBill(BulletBillObject*, float, float);
     virtual ~PhysicsBulletBill();
-    virtual int GetObjectType() const { return 0x1E; }
+    virtual int GetObjectType() const;
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual void PreCollide();
     virtual ContactType Contact(PhysicsObject*, dContact*, int);

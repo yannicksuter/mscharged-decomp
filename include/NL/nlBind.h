@@ -8,6 +8,38 @@ struct Placeholder
 
 extern Placeholder<0> placeholder0;
 
+// Bound arguments are selected per call: a placeholder yields the call
+// argument, any other bound value yields itself.
+template <typename P, typename T>
+inline const T& UnidentifiedBindArg(P&, const T& bound)
+{
+    return bound;
+}
+
+template <typename P>
+inline P& UnidentifiedBindArg(P& p0, const Placeholder<0>&)
+{
+    return p0;
+}
+
+template <typename P0, typename P1, typename T>
+inline const T& UnidentifiedBindArg(P0&, P1&, const T& bound)
+{
+    return bound;
+}
+
+template <typename P0, typename P1>
+inline P0& UnidentifiedBindArg(P0& p0, P1&, const Placeholder<0>&)
+{
+    return p0;
+}
+
+template <typename P0, typename P1>
+inline P1& UnidentifiedBindArg(P0&, P1& p1, const Placeholder<1>&)
+{
+    return p1;
+}
+
 template <typename R, typename F, typename A>
 struct BindExp1
 {
@@ -29,9 +61,9 @@ public:
     }
 
     template <typename P>
-    R operator()(P&)
+    R operator()(P& p0)
     {
-        return mFunction(mT0);
+        return mFunction(UnidentifiedBindArg(p0, mT0));
     }
 };
 
@@ -66,26 +98,7 @@ public:
     template <typename P>
     R operator()(P& p0)
     {
-        return DoCall(p0, mT0, mT1);
-    }
-
-private:
-    template <typename P, typename B1>
-    R DoCall(P& p0, const Placeholder<0>&, const B1& t1)
-    {
-        return mFunction(p0, t1);
-    }
-
-    template <typename P, typename A1>
-    R DoCall(P& p0, const A1& t0, const Placeholder<0>&)
-    {
-        return mFunction(t0, p0);
-    }
-
-    template <typename P, typename A1, typename B1>
-    R DoCall(P&, const A1& t0, const B1& t1)
-    {
-        return mFunction(t0, t1);
+        return mFunction(UnidentifiedBindArg(p0, mT0), UnidentifiedBindArg(p0, mT1));
     }
 };
 
@@ -122,40 +135,15 @@ public:
     template <typename P0, typename P1>
     R operator()(P0& p0, P1& p1)
     {
-        return DoCall(p0, p1, mT0, mT1, mT2);
+        return mFunction(UnidentifiedBindArg(p0, p1, mT0),
+            UnidentifiedBindArg(p0, p1, mT1),
+            UnidentifiedBindArg(p0, p1, mT2));
     }
 
     template <typename P>
     R operator()(P& p0)
     {
-        return DoCall(p0, mT0, mT1, mT2);
-    }
-
-private:
-    template <typename P, typename A1, typename C1>
-    R DoCall(P& p0, const A1& t0, const Placeholder<0>&, const C1& t2)
-    {
-        return mFunction(t0, p0, t2);
-    }
-
-    template <typename P, typename A1, typename B1>
-    R DoCall(P& p0, const A1& t0, const B1& t1, const Placeholder<0>&)
-    {
-        return mFunction(t0, t1, p0);
-    }
-
-    template <typename P0, typename P1, typename A1>
-    R DoCall(P0& p0, P1& p1, const A1& t0, const Placeholder<0>&,
-        const Placeholder<1>&)
-    {
-        return mFunction(t0, p0, p1);
-    }
-
-    template <typename P0, typename P1, typename C1>
-    R DoCall(P0& p0, P1& p1, const Placeholder<0>&,
-        const Placeholder<1>&, const C1& t2)
-    {
-        return mFunction(p0, p1, t2);
+        return mFunction(UnidentifiedBindArg(p0, mT0), UnidentifiedBindArg(p0, mT1), UnidentifiedBindArg(p0, mT2));
     }
 };
 
@@ -195,55 +183,16 @@ public:
     template <typename P>
     R operator()(P& p0)
     {
-        return DoCall(p0, mT0, mT1, mT2, mT3);
+        return mFunction(UnidentifiedBindArg(p0, mT0), UnidentifiedBindArg(p0, mT1), UnidentifiedBindArg(p0, mT2), UnidentifiedBindArg(p0, mT3));
     }
 
     template <typename P0, typename P1>
     R operator()(P0& p0, P1& p1)
     {
-        return DoCall(p0, p1, mT0, mT1, mT2, mT3);
-    }
-
-private:
-    template <typename P0, typename P1, typename A1, typename D1>
-    R DoCall(P0& p0, P1& p1, const A1& t0, const Placeholder<0>&,
-        const Placeholder<1>&, const D1& t3)
-    {
-        return mFunction(t0, p0, p1, t3);
-    }
-
-    template <typename P, typename B1, typename C1, typename D1>
-    R DoCall(P& p0, const Placeholder<0>&, const B1& t1, const C1& t2,
-        const D1& t3)
-    {
-        return mFunction(p0, t1, t2, t3);
-    }
-
-    template <typename P, typename A1, typename C1, typename D1>
-    R DoCall(P& p0, const A1& t0, const Placeholder<0>&, const C1& t2,
-        const D1& t3)
-    {
-        return mFunction(t0, p0, t2, t3);
-    }
-
-    template <typename P, typename A1, typename B1, typename D1>
-    R DoCall(P& p0, const A1& t0, const B1& t1,
-        const Placeholder<0>&, const D1& t3)
-    {
-        return mFunction(t0, t1, p0, t3);
-    }
-
-    template <typename P, typename A1, typename B1, typename C1>
-    R DoCall(P& p0, const A1& t0, const B1& t1, const C1& t2,
-        const Placeholder<0>&)
-    {
-        return mFunction(t0, t1, t2, p0);
-    }
-
-    template <typename P, typename A1, typename B1, typename C1, typename D1>
-    R DoCall(P&, const A1& t0, const B1& t1, const C1& t2, const D1& t3)
-    {
-        return mFunction(t0, t1, t2, t3);
+        return mFunction(UnidentifiedBindArg(p0, p1, mT0),
+            UnidentifiedBindArg(p0, p1, mT1),
+            UnidentifiedBindArg(p0, p1, mT2),
+            UnidentifiedBindArg(p0, p1, mT3));
     }
 };
 

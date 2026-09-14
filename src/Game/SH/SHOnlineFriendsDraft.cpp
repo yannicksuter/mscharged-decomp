@@ -1,4 +1,5 @@
 #include "Game/SH/SHOnlineFriendsDraft.h"
+#include "NL/nlBasicString.inl"
 
 #include "Game/GameSceneManager.h"
 #include "Game/FE/FEAudio.h"

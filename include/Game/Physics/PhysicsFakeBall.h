@@ -74,16 +74,6 @@ public:
     static FakeBallWorld* mpPredictWorld;
 }; // total size: 0x4C
 
-class PhysicsGoaliePlane : public PhysicsWall
-{
-public:
-    PhysicsGoaliePlane(
-        const nlVector4& plane, FakeBallWorld& fakeBallWorld);
-    virtual int GetObjectType() const { return 0x16; }
-
-    /* 0x38 */ FakeBallWorld& mWorld;
-}; // total size: 0x3C
-
 class FakePhysicsBall : public PhysicsBall
 {
 public:
@@ -94,6 +84,16 @@ public:
 
     /* 0x68 */ FakeBallWorld& mWorld;
 }; // total size: 0x6C
+
+class PhysicsGoaliePlane : public PhysicsWall
+{
+public:
+    PhysicsGoaliePlane(
+        const nlVector4& plane, FakeBallWorld& fakeBallWorld);
+    virtual int GetObjectType() const { return 0x16; }
+
+    /* 0x38 */ FakeBallWorld& mWorld;
+}; // total size: 0x3C
 
 extern "C" void fn_8016EEC8();
 extern "C" void fn_8016F06C();

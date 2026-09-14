@@ -2,6 +2,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
+#include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
@@ -14,8 +15,6 @@
 extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
 extern "C" nlVector3* fn_80040234(cFielder*);
 extern "C" bool fn_800381B4(cFielder*, nlVector3*);
-extern "C" float fn_800DA6E8(cFielder*);
-extern "C" float fn_800D9070(cFielder*);
 float ReceivingPass(cFielder*);
 extern "C" float fn_800DEAB4(cFielder*);
 extern "C" cPlayer* fn_800DF790(cTeam*);
@@ -97,7 +96,7 @@ void DesireDefendPos::Update(
 
     float fFormationBalanceScale = InterpolateRangeClamped(
         1.5f, 1.0f, 0.0f, 0.5f,
-        fn_800DA6E8(mUnidentifiedFielder));
+        NearToFormationPosition(mUnidentifiedFielder));
     fMarkFormationBalance /= fFormationBalanceScale;
 
     nlVector3 v3NetPosition =
@@ -137,7 +136,7 @@ void DesireDefendPos::Update(
             v3Dir, nlRecipSqrt(nlVec3LengthSquared(v3Dir), true));
 
         fMarkingDistance *= Interpolate(
-            0.5f, 1.0f, fn_800D9070(pMark));
+            0.5f, 1.0f, FarToTheirNet(pMark));
 
         if (pMark->m_pBall == 0)
         {

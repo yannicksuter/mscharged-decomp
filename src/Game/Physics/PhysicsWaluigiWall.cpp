@@ -2,6 +2,7 @@
 #include "Game/Physics/PhysicsWaluigiWall.h"
 
 #include "Game/AI/Fielder.h"
+#include "Game/Goalie.h"
 #include "Game/Ball.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/Drawable/DrawableCharacter.h"
@@ -33,7 +34,6 @@ extern "C" bool fn_802B6BC8(const nlVector3*, const nlVector3*,
 extern "C" void fn_8014A180(cFielder*);
 extern "C" bool fn_800167A8(cBall*);
 extern "C" float fn_800156A8(cBall*);
-extern "C" void fn_8007CB78(cPlayer*, int, unsigned int);
 extern "C" void fn_80060608(cGame*, cFielder*);
 extern "C" void fn_80146060(UnidentifiedEventData24*);
 extern "C" void fn_801461A8();
@@ -92,6 +92,11 @@ PhysicsWaluigiWall::PhysicsWaluigiWall(cFielder* owner, float width, float heigh
     rotation.GetRow_(0, direction);
     nlVec3ScaleAdd(mStartPoint, -0.1f, direction, owner->mUnidentified024.m_v3Position);
     nlVec3ScaleAdd(mEndPoint, -0.0f, direction, owner->mUnidentified024.m_v3Position);
+    Initialize(rotation, height);
+}
+
+void PhysicsWaluigiWall::Initialize(const nlMatrix3& rotation, float height)
+{
     nlVector3 position;
     nlVecLerp(position, mStartPoint, mEndPoint, 0.5f);
     position.z = 0.5f * height;
@@ -128,7 +133,7 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         if (player->m_eClassType == 3)
         {
             cFielder* goalie = (cFielder*)player;
-            fn_8007CB78(goalie, 1, mID);
+            ((Goalie*)goalie)->fn_8007CB78(true, mID);
             return FielderContact(goalie);
         }
         return ONE_WAY_CONTACT_OTHER;

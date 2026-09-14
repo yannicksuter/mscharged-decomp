@@ -332,14 +332,14 @@ Game/TweaksBase.cpp:
 	.text       start:0x800A9AE0 end:0x800A9B78
 	.data       start:0x80500D18 end:0x80500D28
 
-unclassified/tu_800A9B78.cpp:
+Game/Weather.cpp:
 	.text       start:0x800A9B78 end:0x800B0358
 	.ctors      start:0x804DB55C end:0x804DB560
 	.rodata     start:0x804DC128 end:0x804DC180
 	.data       start:0x80500D28 end:0x805012B8
 	.bss        start:0x8056D9E8 end:0x8056DA00
-	.sdata      start:0x806DBF20 end:0x806DC04C
-	.sbss       start:0x806E0E10 end:0x806E0E48
+	.sdata      start:0x806DBF20 end:0x806DC048
+	.sbss       start:0x806E0E10 end:0x806E0E20
 	.sdata2     start:0x806E3E00 end:0x806E3EA0
 
 Game/AI/Desire.cpp:
@@ -348,7 +348,8 @@ Game/AI/Desire.cpp:
 	.rodata     start:0x804DC180 end:0x804DC190
 	.data       start:0x805012B8 end:0x80501B10
 	.bss        start:0x8056DA00 end:0x8056DA60
-	.sdata      start:0x806DC04C end:0x806DC0B8 align:4
+	.sdata      start:0x806DC048 end:0x806DC0B8 align:4
+	.sbss       start:0x806E0E20 end:0x806E0E30
 	.sdata2     start:0x806E3EA0 end:0x806E3F58
 
 Game/AI/DesireMark.cpp:
@@ -363,6 +364,7 @@ Game/AI/DesireMegaStrike.cpp:
 	.ctors      start:0x804DB568 end:0x804DB56C
 	.data       start:0x80501BB8 end:0x80501C38
 	.sdata      start:0x806DC118 end:0x806DC130
+	.sbss       start:0x806E0E30 end:0x806E0E38
 	.sdata2     start:0x806E3F78 end:0x806E3FC0
 
 Game/AI/DesirePass.cpp:
@@ -371,6 +373,7 @@ Game/AI/DesirePass.cpp:
 	.rodata     start:0x804DC190 end:0x804DC1A0
 	.data       start:0x80501C38 end:0x80501D18
 	.sdata      start:0x806DC130 end:0x806DC150
+	.sbss       start:0x806E0E38 end:0x806E0E40
 	.sdata2     start:0x806E3FC0 end:0x806E3FD8
 
 Game/AI/tu_800BC0C4.cpp:
@@ -380,6 +383,7 @@ Game/AI/tu_800BC0C4.cpp:
 	.data       start:0x80501D18 end:0x80502030
 	.bss        start:0x8056DA60 end:0x8056DA78
 	.sdata      start:0x806DC150 end:0x806DC190
+	.sbss       start:0x806E0E40 end:0x806E0E48
 	.sdata2     start:0x806E3FD8 end:0x806E4008
 
 Game/AI/DesireReceivePass.cpp:
@@ -929,7 +933,7 @@ Game/NetMeshModelLoader.cpp:
 	.sdata2     start:0x806E47E0 end:0x806E47F8
 
 Game/Physics.cpp:
-	.text       start:0x8013D720 end:0x8013E2EC
+	.text       start:0x8013D720 end:0x8013E2E4
 	.ctors      start:0x804DB638 end:0x804DB63C
 	.data       start:0x8050E220 end:0x8050E280
 	.bss        start:0x8056FF08 end:0x8056FF70
@@ -938,7 +942,7 @@ Game/Physics.cpp:
 	.sdata2     start:0x806E47F8 end:0x806E4810
 
 Game/tu_8013E2EC.cpp:
-	.text       start:0x8013E2EC end:0x8013E354
+	.text       start:0x8013E2E4 end:0x8013E354
 	.ctors      start:0x804DB63C end:0x804DB640
 	.data       start:0x8050E280 end:0x8050E2B8
 	.sbss       start:0x806E11D8 end:0x806E11E4
@@ -1058,12 +1062,16 @@ Game/Physics/PhysicsPatch.cpp:
 	.sbss       start:0x806E12C8 end:0x806E12D0
 	.sdata2     start:0x806E4A20 end:0x806E4A48
 
+unclassified/tu_80174ED4.cpp:
+	.text       start:0x80174ED4 end:0x8017508C
+	.data       start:0x80510AB8 end:0x80510DC0
+	.sdata      start:0x806DCAD0 end:0x806DCAD8
+
 Game/Physics/PhysicsShell.cpp:
-	.text       start:0x80174ED4 end:0x80175F8C
+	.text       start:0x8017508C end:0x80175F8C
 	.ctors      start:0x804DB66C end:0x804DB670
 	.rodata     start:0x804DCCB8 end:0x804DCCD0
-	.data       start:0x80510AB8 end:0x80510E68
-	.sdata      start:0x806DCAD0 end:0x806DCAD8
+	.data       start:0x80510DC0 end:0x80510E68
 	.sdata2     start:0x806E4A48 end:0x806E4A78
 
 unclassified/tu_80175F8C.cpp:
@@ -1683,7 +1691,7 @@ Game/SH/SHLoading.cpp:
 Game/SH/SHTitleScreen.cpp:
 	.text       start:0x801D0F90 end:0x801D28CC
 	.ctors      start:0x804DB778 end:0x804DB77C
-	.rodata     start:0x804E8368 end:0x804E83D8
+	.rodata     start:0x804E8368 end:0x804E8390
 	.data       start:0x80518D90 end:0x80518EF8
 	.sdata      start:0x806DD398 end:0x806DD3D0
 	.sbss       start:0x806E1858 end:0x806E1860
@@ -1721,9 +1729,10 @@ Game/FE/feScrollText.cpp:
 	.sdata      start:0x806DD570 end:0x806DD580
 	.sdata2     start:0x806E56A0 end:0x806E56C8
 
-unclassified/tu_801E4630.cpp:
+Game/SH/SHStadiumSelect.cpp:
 	.text       start:0x801E45C0 end:0x801E73A4
 	.ctors      start:0x804DB780 end:0x804DB784
+	.rodata     start:0x804E8390 end:0x804E83D8
 	.data       start:0x80519AE8 end:0x80519CA8
 	.bss        start:0x80578338 end:0x80578350
 	.sdata      start:0x806DD580 end:0x806DD5D8
@@ -1995,7 +2004,7 @@ Game/FE/feScrollBar.cpp:
 	.sdata      start:0x806DE288 end:0x806DE2AC
 	.sdata2     start:0x806E5960 end:0x806E5990
 
-unclassified/tu_80231118.cpp:
+Game/SH/SHChallengeSelect.cpp:
 	.text       start:0x80231118 end:0x802337F4
 	.data       start:0x8051D6D0 end:0x8051D890
 	.sdata      start:0x806DE2AC end:0x806DE320 align:4
@@ -4580,7 +4589,7 @@ unclassified/tu_80372980.cpp:
 	.data       start:0x80535828 end:0x80535880
 	.bss        start:0x8059C400 end:0x8059C418
 
-unclassified/tu_80372B4C.cpp:
+NL/plat/nlFileCache.cpp:
 	.text       start:0x80372B4C end:0x80374098
 	.ctors      start:0x804DBB60 end:0x804DBB64
 	.data       start:0x80535880 end:0x80535C98
@@ -6313,12 +6322,13 @@ RVL_SDK/hbm/HBMGUIManager.cpp:
 RVL_SDK/hbm/HBMController.cpp:
 	.text       start:0x80443120 end:0x80443C5C
 	.bss        start:0x806AE668 end:0x806AE7F8
-	.sbss       start:0x806E2D90 end:0x806E2DA0
+	.sbss       start:0x806E2D90 end:0x806E2D98
 	.sdata2     start:0x806E76B0 end:0x806E76C0
 
 RVL_SDK/hbm/HBMRemoteSpk.cpp:
 	.text       start:0x80443C5C end:0x80444438
 	.data       start:0x80556A80 end:0x80556A90
+	.sbss       start:0x806E2D98 end:0x806E2DA0
 
 RVL_SDK/hbm/nw4hbm/db/db_assert.cpp:
 	.text       start:0x80444438 end:0x80444A48

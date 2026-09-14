@@ -144,6 +144,7 @@ public:
     void PickupBall(cBall* pBall);
     void SetNoPickUpTime(float NewNoPickUpTime);
     DetInput* GetGlobalPad();
+    bool HasBall() const { return m_pBall != 0; }
     u8 SwapController(bool bParam);
     void* fn_800972CC();
     void SetAIPad(cAIPad* pPad);

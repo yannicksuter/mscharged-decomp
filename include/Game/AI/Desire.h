@@ -9,6 +9,7 @@
 class DebugWriteCache;
 class cFielder;
 class cPlayer;
+class cBall;
 class Desire;
 class SpaceSearch;
 class UnidentifiedScriptMachine;
@@ -242,9 +243,11 @@ public:
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
+    cBall* GetTargetBall() const { return m_pTargetBall; }
+
 private:
     cFielder* m_pTargetFielder;
-    u8 mUnidentifiedA8[4];
+    cBall* m_pTargetBall;
     nlVector3 m_vTargetPos;
     int m_eDirection;
     float m_fDistOffset;

@@ -91,7 +91,6 @@ public:
             out = (T*)m_FreeList;
             m_FreeList = m_FreeList->next;
         }
-        new (out) T;
     }
 
     void AllocateForReturn(T*& out)
@@ -144,8 +143,6 @@ template <typename T>
 class SlotPool : public BasicSlotPool<T>
 {
 public:
-    using BasicSlotPool<T>::Allocate;
-
     SlotPool(int initial, int delta)
         : BasicSlotPool<T>()
     {
@@ -154,19 +151,6 @@ public:
         if (this->m_Delta == 0)
         {
             SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
-        }
-    }
-
-    void Allocate(T*& out)
-    {
-        if (this->m_FreeList == 0)
-        {
-            SlotPoolBase::BaseAddNewBlock(this, sizeof(T));
-        }
-        if (this->m_FreeList != 0)
-        {
-            out = (T*)this->m_FreeList;
-            this->m_FreeList = this->m_FreeList->next;
         }
     }
 

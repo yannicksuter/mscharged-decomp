@@ -334,7 +334,7 @@ void NetworkStartScene::fn_801FD834()
         else if (g_pFEInput->JustPressed(FE_ALL_PADS, 30, true, &pad))
         {
             if (mMenuItems.RunCallbackOnCurrent(ON_APPLY) == RES_OK)
-                GameInfoManager::Instance()->unknown_0x278 = pad;
+                GameInfoManager::Instance()->mMainUserPadNumber = pad;
         }
         else if (g_pFEInput->JustPressed(FE_ALL_PADS, 31, true, 0))
         {

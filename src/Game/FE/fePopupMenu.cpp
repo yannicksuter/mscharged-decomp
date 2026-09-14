@@ -1,4 +1,5 @@
 #include "Game/HBMManager.h"
+#include "NL/nlFunction.inl"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/fePopupMenu.h"
 

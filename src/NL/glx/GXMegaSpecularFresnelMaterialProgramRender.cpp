@@ -193,9 +193,9 @@ void GXMaterialProgramImpl<GXMegaSpecularFresnelMaterialProgram>::Draw(
         glTextureBinding fresnelBinding;
         fresnelBinding.texture = fresnelTexture;
         fresnelBinding.flags = 0;
-        fresnelBinding.unknown07 = 0;
         fresnelBinding.SetWrapS(true);
         fresnelBinding.SetWrapT(true);
+        fresnelBinding.unknown07 = 0;
         fresnelBinding.textureIndex = sMegaSpecularFresnelTextureIndices[fresnelRamp];
         glx_BindTexture(5, &fresnelBinding);
         sMegaSpecularFresnelBoundTexture = fresnelTexture;

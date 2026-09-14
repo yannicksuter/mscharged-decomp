@@ -1,9 +1,8 @@
 #ifndef GAME_PHYSICS_PHYSICS_BALL_H
 #define GAME_PHYSICS_PHYSICS_BALL_H
 
+#include "Game/DebugWriteCache.h"
 #include "Game/Physics/PhysicsSphere.h"
-
-class DebugWriteCache;
 
 class PhysicsBall : public PhysicsSphere
 {
@@ -50,5 +49,30 @@ public:
     /* 0x60 */ float mfBallAirResistance;
     /* 0x64 */ float mfChargeBonus;
 }; // total size: 0x68
+
+inline void PhysicsBall::RegisterDebugFields(
+    unsigned short* type, DebugWriteCache* cache)
+{
+#define REGISTER_FIELD(kind, field) \
+    cache->AddField(kind, gDebugFieldTypes[kind].size, \
+        (unsigned char*)&field - (unsigned char*)&mv3TiltForce, #field)
+
+    REGISTER_FIELD(22, mv3TiltForce);
+    REGISTER_FIELD(22, mv3WindForce);
+    REGISTER_FIELD(16, mbUseTiltForce);
+    REGISTER_FIELD(16, mbUseWindForce);
+    REGISTER_FIELD(16, mbIsSupportedByGround);
+    REGISTER_FIELD(16, mbUseAngularVel);
+    REGISTER_FIELD(16, mbUseMagnusEffect);
+    REGISTER_FIELD(16, mbIgnoreForces);
+    REGISTER_FIELD(16, mbCanFreeFall);
+    REGISTER_FIELD(16, mbCanGoThroughGround);
+    REGISTER_FIELD(16, mbPassLockedIn);
+    REGISTER_FIELD(17, mfSpinTimer);
+    REGISTER_FIELD(17, mfBallAirResistance);
+    REGISTER_FIELD(17, mfChargeBonus);
+
+#undef REGISTER_FIELD
+}
 
 #endif // GAME_PHYSICS_PHYSICS_BALL_H

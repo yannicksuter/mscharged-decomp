@@ -13,6 +13,11 @@ enum eTeamID
     TEAM_INVALID = -1,
 };
 
+enum eSidekickID
+{
+    SK_INVALID = -1,
+};
+
 enum eType
 {
     TYPE_INVALID = -1,
@@ -120,34 +125,48 @@ struct PlayerStats
     /* 0x50 */ eType mType;
 };
 
+struct CupSidekicks
+{
+    CupSidekicks()
+        : mValues()
+    {
+    }
+
+    eSidekickID mValues[3];
+};
+
 struct TeamStats
 {
-    TeamStats()
+    void Initialize(eTeamID team)
     {
-        unknown_0x04[0] = 0;
-        unknown_0x04[1] = 0;
-        unknown_0x04[2] = 0;
         memset(&mPlayerTotalStats, 0, sizeof(mPlayerTotalStats));
-        mPlayerTotalStats.mRecordType.mTeamID = (eTeamID)0;
+        mPlayerTotalStats.mRecordType.mTeamID = team;
         mPlayerTotalStats.mType = TYPE_TEAM;
-        mTeamIndex = (eTeamID)0;
+        mTeamIndex = team;
         unknown_0x10 = 0;
         unknown_0x12 = 0;
         unknown_0x14 = 0;
         unknown_0x16 = 0;
-        unknown_0x04[0] = 0;
-        unknown_0x04[1] = 0;
-        unknown_0x04[2] = 0;
-        mType = TYPE_TEAM;
+        mSidekicks.mValues[0] = (eSidekickID)0;
+        mSidekicks.mValues[1] = (eSidekickID)0;
+        mSidekicks.mValues[2] = (eSidekickID)0;
+        mUnidentified18 = 1;
     }
 
+    TeamStats()
+    {
+        Initialize((eTeamID)0);
+    }
+
+    void SetSidekicks(CupSidekicks sidekicks) { mSidekicks = sidekicks; }
+
     /* 0x00 */ eTeamID mTeamIndex;
-    /* 0x04 */ int unknown_0x04[3];
+    /* 0x04 */ CupSidekicks mSidekicks;
     /* 0x10 */ u16 unknown_0x10;
     /* 0x12 */ u16 unknown_0x12;
     /* 0x14 */ u16 unknown_0x14;
     /* 0x16 */ u16 unknown_0x16;
-    /* 0x18 */ eType mType;
+    /* 0x18 */ int mUnidentified18;
     /* 0x1C */ PlayerStats mPlayerTotalStats;
 };
 

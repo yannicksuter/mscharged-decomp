@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "NL/nlBasicString.inl"
 #include <string.h>
 
 #include "Game/AI/SkillTweaks.h"

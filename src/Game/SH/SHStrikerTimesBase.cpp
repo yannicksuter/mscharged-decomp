@@ -1,4 +1,6 @@
 #include "Game/SH/SHNavigation.h"
+#include "NL/nlBasicString.inl"
+#include "NL/nlFunction.inl"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/SH/SHStrikerTimesBase.h"
 #include "Game/FE/tlImageInstance.h"

@@ -190,7 +190,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
     {
         PhysicsPatch* patch = (PhysicsPatch*)other;
         int type = patch->GetType();
-        UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(&type);
+        UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(type);
         if (patch->GetType() == 1 || patch->GetType() == 8 || patch->GetType() == 9)
         {
             crackData = 0;

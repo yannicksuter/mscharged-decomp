@@ -136,13 +136,10 @@ void GXMaterialProgramImpl<GXSpecularFresnelMaterialProgram>::Draw(
     program->BindVertexArrays(packet);
     program->BindParameters(packet);
 
-    const float one = 1.0f;
-    float blendAmount = one != sSpecularFresnelBlendOverride
-        ? sSpecularFresnelBlendOverride
-        : static_cast<const GXSpecularFresnelParameters*>(packet->materialParameters)->blendAmount;
-    float alphaValue = one != sSpecularFresnelAlphaOverride
-        ? sSpecularFresnelAlphaOverride
-        : static_cast<const GXSpecularFresnelParameters*>(packet->materialParameters)->alphaValue;
+    float blendAmount = glGetMaterialFloatParameterWithOverride(packet,
+        &GXSpecularFresnelParameters::blendAmount, sSpecularFresnelBlendOverride);
+    float alphaValue = glGetMaterialFloatParameterWithOverride(packet,
+        &GXSpecularFresnelParameters::alphaValue, sSpecularFresnelAlphaOverride);
     if (alphaValue == 0.0f)
         return;
 
@@ -202,9 +199,9 @@ void GXMaterialProgramImpl<GXSpecularFresnelMaterialProgram>::Draw(
         glTextureBinding fresnelBinding;
         fresnelBinding.texture = fresnelTexture;
         fresnelBinding.flags = 0;
-        fresnelBinding.unknown07 = 0;
         fresnelBinding.SetWrapS(true);
         fresnelBinding.SetWrapT(true);
+        fresnelBinding.unknown07 = 0;
         fresnelBinding.textureIndex = sSpecularFresnelTextureIndices[fresnelRamp];
         glx_BindTexture(4, &fresnelBinding);
         sSpecularFresnelBoundTexture = fresnelTexture;

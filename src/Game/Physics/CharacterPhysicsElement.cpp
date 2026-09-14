@@ -1,30 +1,21 @@
 #include "Game/Physics/CharacterPhysicsElement.h"
 
-#include "Game/SAnim.h"
+#include "NL/nlChunk.h"
 #include "NL/nlMemory.h"
-
-static inline void CopyPhysicsElements(CharacterPhysicsData* pPhysicsData,
-    CharacterPhysicsElement* pSrc)
-{
-    u32 n;
-    for (n = 0; n < pPhysicsData->physicsElementCount; n++)
-    {
-        pPhysicsData->pPhysicsElements[n] = pSrc[n];
-    }
-}
 
 bool LoadCharacterPhysicsElements(void* pFileData, unsigned long nFileSize,
     CharacterPhysicsData* pPhysicsData, bool arg3)
 {
     nlChunk* outerChunk;
     nlChunk* endChunk;
+    unsigned long i;
 
     if (pFileData == 0)
     {
         return false;
     }
 
-    endChunk = ((nlChunk*)pFileData)->GetNextChunk();
+    endChunk = ((nlChunk*)pFileData)->GetLastChunk();
     outerChunk = ((nlChunk*)pFileData)->GetFirstChunk();
 
     while (outerChunk < endChunk)
@@ -40,7 +31,11 @@ bool LoadCharacterPhysicsElements(void* pFileData, unsigned long nFileSize,
         }
         case 0x0001D002:
         {
-            CopyPhysicsElements(pPhysicsData, (CharacterPhysicsElement*)outerChunk->GetData());
+            CharacterPhysicsElement* pPhysicsElements = (CharacterPhysicsElement*)outerChunk->GetData();
+            for (i = 0; i < pPhysicsData->physicsElementCount; i++)
+            {
+                pPhysicsData->pPhysicsElements[i] = pPhysicsElements[i];
+            }
             break;
         }
         }

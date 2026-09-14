@@ -30,7 +30,7 @@ public:
 
     /* 0x68 */ cBall* m_pAIBall;
     /* 0x6C */ nlVector3 m_prevPosition;
-    /* 0x78 */ unsigned int m_goalieContactFramesAgo;
+    /* 0x78 */ int m_goalieContactFramesAgo;
     /* 0x7C */ bool mbIsInsideNet;
     /* 0x7D */ bool mbGoalPlaneContact;
     /* 0x7E */ bool mbBallSpeedBelowSweepTestThreshold;

@@ -171,11 +171,7 @@ public:
 
     BasicString& operator=(BasicString other);
 
-    const CharT* c_str() const
-    {
-        static CharT emptyString = 0;
-        return mData ? mData->c_str() : &emptyString;
-    }
+    const CharT* c_str() const;
 
     int size() const
     {

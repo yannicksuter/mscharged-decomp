@@ -1,51 +1,51 @@
-#include "NL/plat/tu_80372B4C.h"
+#include "NL/plat/nlFileCache.h"
 #include "Game/Sys/debug.h"
 
 #include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/plat/nlFlash.h"
 #include "NL/nlstring_tmpl.h"
 
-
 static bool g_bDisableAllFileCaching = true;
-static FileCache_80535C20* lbl_806E2460;
+static nlFileCache* sFileCache;
 
-struct AsyncFileLoadData_80372D84
+struct CachedFileLoadData
 {
-    AsyncFileLoadData_80372D84(nlFile* const f, const char* filename,
+    CachedFileLoadData(nlFile* const f, const char* filename,
         void* const alloc, const unsigned long size, unsigned int bufferSize,
-        LoadAsyncCallback const cb, void* const user, int value)
+        LoadAsyncCallback const cb, void* const user, int fromDisc)
         : file(f)
         , alloc_data(alloc)
         , datasize(size)
-        , m_8C(bufferSize)
+        , bufferSize(bufferSize)
         , callback(cb)
         , user_data(user)
-        , m_98(value)
+        , fromDisc(fromDisc)
     {
-        nlStrNCpy(m_04, filename, sizeof(m_04));
+        nlStrNCpy(this->filename, filename, sizeof(this->filename));
     }
 
     nlFile* file;
-    char m_04[128];
+    char filename[128];
     void* alloc_data;
     unsigned long datasize;
-    unsigned int m_8C;
+    unsigned int bufferSize;
     LoadAsyncCallback callback;
     void* user_data;
-    int m_98;
+    int fromDisc;
 };
 
-static void fn_80372F14(s32, const char*, void*, u32, void*);
-static void fn_80372F88(nlFile*, void*, unsigned int, unsigned long);
-static void fn_80373024(nlFile*, void*, unsigned int, unsigned long);
+static void AfterReadFromCacheCallback(s32, const char*, void*, u32, void*);
+static void AfterReadFromDiscToCacheCallback(nlFile*, void*, unsigned int, unsigned long);
+static void AfterReadFromDiscCallback(nlFile*, void*, unsigned int, unsigned long);
 static void AfterWriteToCacheCallback(s32, const char*, void*, u32, void*);
 static void FlashWriteCallback(s32);
 static void FlashReadCallback(s32);
 
-extern "C" bool fn_80372B4C(const char* filename, LoadAsyncCallback callback,
+bool nlLoadEntireCachedFileAsync(const char* filename, LoadAsyncCallback callback,
     void* user_data, unsigned int alignment, eAllocType type, void* buffer,
     unsigned long bufferSize, MemoryAllocator* allocator)
 {
@@ -58,7 +58,7 @@ extern "C" bool fn_80372B4C(const char* filename, LoadAsyncCallback callback,
     unsigned int filesize = 0;
     unsigned long datasize;
     bool cached = false;
-    datasize = lbl_806E2460->fn_80372BB0(filename, &filesize);
+    datasize = sFileCache->GetCachedFileSize(filename, &filesize);
     if (datasize != 0)
     {
         cached = true;
@@ -97,9 +97,9 @@ extern "C" bool fn_80372B4C(const char* filename, LoadAsyncCallback callback,
 
     if (cached)
     {
-        AsyncFileLoadData_80372D84* asyncData = new (8, true)
-            AsyncFileLoadData_80372D84(0, filename, alloc_data, datasize, filesize, callback, user_data, 0);
-        if (!lbl_806E2460->LoadEntireCachedFileAsync(filename, alloc_data, datasize, filesize, fn_80372F14, asyncData))
+        CachedFileLoadData* asyncData = new (8, true)
+            CachedFileLoadData(0, filename, alloc_data, datasize, filesize, callback, user_data, 0);
+        if (!sFileCache->LoadEntireCachedFileAsync(filename, alloc_data, datasize, filesize, AfterReadFromCacheCallback, asyncData))
         {
             tDebugPrintManager::Print(DC_LOADER, "Error calling LoadEntireCachedFileAsync\n");
             delete asyncData;
@@ -109,16 +109,16 @@ extern "C" bool fn_80372B4C(const char* filename, LoadAsyncCallback callback,
     }
     else
     {
-        AsyncFileLoadData_80372D84* asyncData = new (8, true)
-            AsyncFileLoadData_80372D84(file, filename, alloc_data, datasize, filesize, callback, user_data, 1);
-        nlReadAsync(file, alloc_data, datasize, lbl_806E2460->m_5D4 ? fn_80372F88 : fn_80373024, (unsigned long)asyncData, 0);
+        CachedFileLoadData* asyncData = new (8, true)
+            CachedFileLoadData(file, filename, alloc_data, datasize, filesize, callback, user_data, 1);
+        nlReadAsync(file, alloc_data, datasize, sFileCache->mCacheWritesEnabled ? AfterReadFromDiscToCacheCallback : AfterReadFromDiscCallback, (unsigned long)asyncData, 0);
         return true;
     }
 }
 
-static void fn_80372F14(s32 result, const char*, void*, u32 size, void* user)
+static void AfterReadFromCacheCallback(s32 result, const char*, void*, u32 size, void* user)
 {
-    AsyncFileLoadData_80372D84* data = (AsyncFileLoadData_80372D84*)user;
+    CachedFileLoadData* data = (CachedFileLoadData*)user;
     if (result == size)
     {
         data->callback(data->alloc_data, data->datasize, data->user_data);
@@ -131,11 +131,11 @@ static void fn_80372F14(s32 result, const char*, void*, u32 size, void* user)
     }
 }
 
-static void fn_80372F88(nlFile*, void* pBuffer, unsigned int, unsigned long uParam)
+static void AfterReadFromDiscToCacheCallback(nlFile*, void* pBuffer, unsigned int, unsigned long uParam)
 {
-    AsyncFileLoadData_80372D84* data = (AsyncFileLoadData_80372D84*)uParam;
+    CachedFileLoadData* data = (CachedFileLoadData*)uParam;
     nlClose(data->file);
-    if (!lbl_806E2460->WriteEntireFileToCacheAsync(data->m_04, pBuffer, data->datasize, data->m_8C, AfterWriteToCacheCallback, data))
+    if (!sFileCache->WriteEntireFileToCacheAsync(data->filename, pBuffer, data->datasize, data->bufferSize, AfterWriteToCacheCallback, data))
     {
         tDebugPrintManager::Print(DC_LOADER, "Initial WriteEntireFileToCacheAsync failure\n");
         data->callback(data->alloc_data, data->datasize, data->user_data);
@@ -143,9 +143,9 @@ static void fn_80372F88(nlFile*, void* pBuffer, unsigned int, unsigned long uPar
     }
 }
 
-static void fn_80373024(nlFile*, void*, unsigned int, unsigned long uParam)
+static void AfterReadFromDiscCallback(nlFile*, void*, unsigned int, unsigned long uParam)
 {
-    AsyncFileLoadData_80372D84* data = (AsyncFileLoadData_80372D84*)uParam;
+    CachedFileLoadData* data = (CachedFileLoadData*)uParam;
     data->callback(data->alloc_data, data->datasize, data->user_data);
     nlClose(data->file);
     delete data;
@@ -153,84 +153,84 @@ static void fn_80373024(nlFile*, void*, unsigned int, unsigned long uParam)
 
 static void AfterWriteToCacheCallback(s32 result, const char*, void*, u32 size, void* user)
 {
-    AsyncFileLoadData_80372D84* data = (AsyncFileLoadData_80372D84*)user;
+    CachedFileLoadData* data = (CachedFileLoadData*)user;
     if (result != size)
         tDebugPrintManager::Print(DC_LOADER, "Failed in AfterWriteToCacheCallback\n");
     data->callback(data->alloc_data, data->datasize, data->user_data);
     delete data;
 }
 
-extern "C" void fn_803730D8()
+void nlInitFileCache()
 {
-    lbl_806E2460 = new (8, false) FileCache_80535C20;
+    sFileCache = new (8, false) nlFileCache;
 }
 
-extern "C" FileCache_80535C20* fn_803733D4()
+nlFileCache* nlGetFileCache()
 {
-    return lbl_806E2460;
+    return sFileCache;
 }
 
-bool FileCache_80535C20::LoadEntireCachedFileAsync(const char* filename,
-    void* buffer, u32, u32, FileCacheCallback_80372F14 callback, void* user)
+bool nlFileCache::LoadEntireCachedFileAsync(const char* filename,
+    void* buffer, u32, u32, FileCacheCallback callback, void* user)
 {
     u32 hash = nlStringLowerHash(filename);
-    CachedFile_80373588* value = 0;
-    m_20.FindGet(hash, &value);
+    CachedFile* value = 0;
+    mFiles.FindGet(hash, &value);
     if (nlFlashChangeDirectory(2, 0) != 0)
     {
         tDebugPrintManager::Print(DC_LOADER, "nlFileCache cannot ensure in temp directory for load\n");
         return false;
     }
-    if (m_4C.IsFull())
+    if (mRequests.IsFull())
     {
         tDebugPrintManager::Print(DC_LOADER, "Cannot load from cache, work request Q is full\n");
         return false;
     }
-    CacheRequest_803734A0 request;
-    request.m_00 = CacheRequest_803734A0::State3;
-    request.m_04 = buffer;
-    request.m_0C = callback;
-    request.m_10 = value->m_00;
-    request.m_14 = user;
-    request.m_18 = value;
-    bool start = m_4C.GetCount() == 0;
-    m_4C.Push(request);
+    CacheRequest request;
+    request.mState = CacheRequest::ReadPending;
+    request.mBuffer = buffer;
+    request.mReadCallback = callback;
+    request.mBufferSize = value->mBufferSize;
+    request.mUserData = user;
+    request.mFile = value;
+    bool start = mRequests.GetCount() == 0;
+    mRequests.Push(request);
     if (start)
         Run(0.01f);
     return true;
 }
 
-bool FileCache_80535C20::WriteEntireFileToCacheAsync(const char* filename,
+bool nlFileCache::WriteEntireFileToCacheAsync(const char* filename,
     void* buffer, u32 size, u32 bufferSize,
-    FileCacheCallback_80372F14 callback, void* user)
+    FileCacheCallback callback, void* user)
 {
     if (nlFlashChangeDirectory(2, 0) != 0)
     {
         tDebugPrintManager::Print(DC_LOADER, "nlFileCache cannot ensure in temp directory for write\n");
         return false;
     }
-    if (m_4C.IsFull())
+    if (mRequests.IsFull())
     {
         tDebugPrintManager::Print(DC_LOADER, "Cannot write to cache, work request Q is full\n");
         return false;
     }
     u32 hash = nlStringLowerHash(filename);
-    CachedFile_80373588 value;
-    value.m_04 = size;
-    value.m_00 = bufferSize;
-    nlStrNCpy(value.m_08, filename, sizeof(value.m_08));
-    nlSNPrintf(value.m_88, sizeof(value.m_88), "C%x", hash);
-    m_20.Add(hash, value);
-    CachedFile_80373588* found = 0;
-    m_20.FindGet(hash, &found);
-    CacheRequest_803734A0 request;
-    request.m_00 = CacheRequest_803734A0::State1;
-    request.m_04 = buffer;
-    request.m_08 = callback;
-    request.m_14 = user;
-    request.m_18 = found;
-    bool start = m_4C.GetCount() == 0;
-    m_4C.Push(request);
+    CachedFile value;
+    value.mFileSize = size;
+    value.mBufferSize = bufferSize;
+    nlStrNCpy(value.mFilename, filename, sizeof(value.mFilename));
+    nlSNPrintf(value.mCacheFilename, sizeof(value.mCacheFilename), "C%x", hash);
+    mFiles.Add(hash, value);
+    CachedFile* found = 0;
+    mFiles.FindGet(hash, &found);
+    CacheRequest request;
+    request.mState = CacheRequest::WritePending;
+    request.mBuffer = buffer;
+    request.mWriteCallback = callback;
+    request.mUserData = user;
+    request.mFile = found;
+    bool start = mRequests.GetCount() == 0;
+    mRequests.Push(request);
     if (start)
         Run(0.01f);
     return true;
@@ -238,63 +238,63 @@ bool FileCache_80535C20::WriteEntireFileToCacheAsync(const char* filename,
 
 static void FlashWriteCallback(s32 result)
 {
-    FileCache_80535C20* cache = lbl_806E2460;
-    CacheRequest_803734A0 request = cache->m_4C.Pop();
-    CachedFile_80373588* value = request.m_18;
+    nlFileCache* cache = sFileCache;
+    CacheRequest request = cache->mRequests.Pop();
+    CachedFile* value = request.mFile;
     s32 closeResult = nlFlashClose(0);
     if (closeResult != 0)
         tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashMemClose returned error %d after write callback\n", closeResult);
-    if (result != value->m_00)
+    if (result != value->mBufferSize)
     {
         tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashWriteCallback returned error %d\n", result);
-        request.m_08(result, value->m_08, 0, 0, request.m_14);
-        cache->m_20.Remove(nlStringLowerHash(value->m_08));
+        request.mWriteCallback(result, value->mFilename, 0, 0, request.mUserData);
+        cache->mFiles.Remove(nlStringLowerHash(value->mFilename));
     }
     else
     {
-        request.m_08(result, value->m_08, request.m_04, value->m_00, request.m_14);
+        request.mWriteCallback(result, value->mFilename, request.mBuffer, value->mBufferSize, request.mUserData);
     }
 }
 
 static void FlashReadCallback(s32 result)
 {
-    CacheRequest_803734A0 request = lbl_806E2460->m_4C.Pop();
-    CachedFile_80373588* value = request.m_18;
+    CacheRequest request = sFileCache->mRequests.Pop();
+    CachedFile* value = request.mFile;
     s32 closeResult = nlFlashClose(0);
     if (closeResult != 0)
         tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashMemClose returned error %d after read callback\n", closeResult);
-    if (result != value->m_00)
+    if (result != value->mBufferSize)
     {
         tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashReadCallback returned error %d\n", result);
-        request.m_0C(result, value->m_08, 0, 0, request.m_14);
+        request.mReadCallback(result, value->mFilename, 0, 0, request.mUserData);
     }
     else
     {
-        request.m_0C(result, value->m_08, request.m_04, value->m_00, request.m_14);
+        request.mReadCallback(result, value->mFilename, request.mBuffer, value->mBufferSize, request.mUserData);
     }
 }
 
-void FileCache_80535C20::Run(float)
+void nlFileCache::Run(float)
 {
-    if (m_4C.GetCount() == 0)
+    if (mRequests.GetCount() == 0)
         return;
-    CacheRequest_803734A0& request = m_4C.Peek();
-    switch (request.m_00)
+    CacheRequest& request = mRequests.Peek();
+    switch (request.mState)
     {
-    case CacheRequest_803734A0::State0:
-    case CacheRequest_803734A0::State2:
+    case CacheRequest::Idle:
+    case CacheRequest::Writing:
         break;
-    case CacheRequest_803734A0::State1:
+    case CacheRequest::WritePending:
     {
-        CachedFile_80373588* value = request.m_18;
+        CachedFile* value = request.mFile;
         bool started = false;
-        s32 result = nlFlashCreate(value->m_88, 0x30, 0);
+        s32 result = nlFlashCreate(value->mCacheFilename, 0x30, 0);
         if (result == 0)
         {
-            result = nlFlashOpen(value->m_88, 2, 0);
+            result = nlFlashOpen(value->mCacheFilename, 2, 0);
             if (result == 0)
             {
-                result = nlFlashWrite(request.m_04, value->m_00, FlashWriteCallback);
+                result = nlFlashWrite(request.mBuffer, value->mBufferSize, FlashWriteCallback);
                 if (result == 0)
                     started = true;
                 else
@@ -312,22 +312,22 @@ void FileCache_80535C20::Run(float)
             tDebugPrintManager::Print(DC_LOADER, "nlFileCache: Error %d calling FlashMemCreate\n", result);
         if (!started)
         {
-            request.m_08(result, value->m_08, 0, 0, request.m_14);
-            m_20.Remove(nlStringLowerHash(value->m_08));
-            m_4C.Pop();
+            request.mWriteCallback(result, value->mFilename, 0, 0, request.mUserData);
+            mFiles.Remove(nlStringLowerHash(value->mFilename));
+            mRequests.Pop();
         }
         else
-            request.m_00 = CacheRequest_803734A0::State2;
+            request.mState = CacheRequest::Writing;
         break;
     }
-    case CacheRequest_803734A0::State3:
+    case CacheRequest::ReadPending:
     {
-        CachedFile_80373588* value = request.m_18;
+        CachedFile* value = request.mFile;
         bool started = false;
-        s32 result = nlFlashOpen(value->m_88, 1, 0);
+        s32 result = nlFlashOpen(value->mCacheFilename, 1, 0);
         if (result == 0)
         {
-            result = nlFlashRead(&request.m_04, &request.m_10, FlashReadCallback, true);
+            result = nlFlashRead(&request.mBuffer, &request.mBufferSize, FlashReadCallback, true);
             if (result == 0)
                 started = true;
             else
@@ -342,19 +342,19 @@ void FileCache_80535C20::Run(float)
             tDebugPrintManager::Print(DC_LOADER, "nlFileCache: Error %d calling FlashMemOpen\n", result);
         if (!started)
         {
-            request.m_0C(result, value->m_08, 0, 0, request.m_14);
-            m_4C.Pop();
+            request.mReadCallback(result, value->mFilename, 0, 0, request.mUserData);
+            mRequests.Pop();
         }
         else
-            request.m_00 = CacheRequest_803734A0::State4;
+            request.mState = CacheRequest::Reading;
         break;
     }
-    case CacheRequest_803734A0::State4:
-    case CacheRequest_803734A0::State5:
-    case CacheRequest_803734A0::State6:
+    case CacheRequest::Reading:
+    case CacheRequest::State5:
+    case CacheRequest::State6:
         break;
     }
 }
 
-static TweakBoolBinding lbl_8059C428(
+static TweakBoolBinding sDisableAllFileCachingTweak(
     "g_bDisableAllFileCaching", "FileCache", &g_bDisableAllFileCaching, true);

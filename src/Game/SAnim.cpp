@@ -11,7 +11,7 @@ cSAnim* cSAnim::Initialize(nlChunk* pChunk)
 {
     cSAnim* pRetval;
     nlChunk* chunkA;
-    nlChunk* end = pChunk->GetNextChunk();
+    nlChunk* end = pChunk->GetLastChunk();
     chunkA = pChunk->GetFirstChunk();
     nlChunk* chunkB;
 
@@ -106,7 +106,7 @@ void cSAnim::fn_80308610(nlChunk* nodeChunk, int nodeIndex)
 {
     nlChunk* subEnd;
     nlChunk* subChunk;
-    subEnd = nodeChunk->GetNextChunk();
+    subEnd = nodeChunk->GetLastChunk();
     subChunk = nodeChunk->GetFirstChunk();
 
     while (subChunk != subEnd)

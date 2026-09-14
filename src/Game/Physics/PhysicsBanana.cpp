@@ -3,6 +3,7 @@
 #include "Game/Ball.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Render/NPCManager.h"
+#include "Game/Render/BirdoEgg.h"
 #include "Game/Field.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
@@ -13,6 +14,7 @@
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Physics/PhysicsNPC.h"
+#include "Game/Physics/PhysicsPatch.h"
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Render/SkinAnimatedNPC.h"
 #include "NL/nlSlotPool.h"
@@ -26,7 +28,6 @@ extern "C" bool fn_800977A4(cFielder*, float);
 extern "C" void fn_801473A4(CollisionPowerupGroundData*);
 extern "C" void fn_80147634(CollisionPowerupWallData*);
 extern "C" void fn_801481BC(SkinAnimatedNPC*);
-extern "C" int* fn_80174ED4(int*);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -93,6 +94,7 @@ void PhysicsBanana::PreCollide()
 ContactType PhysicsBanana::Contact(
     PhysicsObject* other, dContact* contact, int numContacts)
 {
+    cBall* ball;
     nlVector3 bananaPos;
     GetPosition(&bananaPos);
 
@@ -183,7 +185,7 @@ ContactType PhysicsBanana::Contact(
     }
     case 0x10:
     {
-        cBall* ball = ((PhysicsAIBall*)other)->m_pAIBall;
+        ball = ((PhysicsAIBall*)other)->m_pAIBall;
         if (ball->m_pOwner != 0 && ball->m_pOwner->m_eClassType == FIELDER)
         {
             cFielder* fielder = (cFielder*)ball->m_pOwner;
@@ -207,14 +209,12 @@ ContactType PhysicsBanana::Contact(
             return NO_CONTACT;
         }
 
-        KoopaShellObject* koopaShell =
-            gNPCManager->mUnidentified02C;
-        if (koopaShell != 0 && koopaShell->mVisible)
+        if (gNPCManager->mUnidentified02C != 0
+            && gNPCManager->mUnidentified02C->mVisible)
         {
             return NO_CONTACT;
         }
-        void* egg = gNPCManager->mpBirdoEgg;
-        if (egg != 0 && *(bool*)((u8*)egg + 0x30))
+        if (gNPCManager->mpBirdoEgg != 0 && gNPCManager->mpBirdoEgg->mVisible)
         {
             return NO_CONTACT;
         }
@@ -283,7 +283,7 @@ ContactType PhysicsBanana::Contact(
     case 0x1C:
     {
         int value = *(int*)((u8*)other + 0x48);
-        int result = *fn_80174ED4(&value);
+        int result = fn_80174ED4(value)->mUnidentified00;
         if (result == 8 || result == 9)
         {
             m_pPowerupObject->m_bShouldDestroy = true;
@@ -312,8 +312,8 @@ ContactType PhysicsBanana::Contact(
             if (fabsf(powerupPos.x)
                     > cField::GetGoalLineX(1U) - 2.0f * radius
                 && fabsf(powerupPos.y)
-                       < 0.5f * cNet::m_fNetWidth - radius
-                && fabsf(powerupPos.z) < cNet::m_fNetHeight - radius)
+                       < 0.5f * cNet::GetNetWidth() - radius
+                && fabsf(powerupPos.z) < cNet::GetNetHeight() - radius)
             {
                 return NO_CONTACT;
             }

@@ -15,7 +15,6 @@ extern const int sCupPageOrder[3] = { 4, 5, 6 };
 extern const int sCupRoundPageOrderThree[3] = { 3, 2, 1 };
 extern const int sCupRoundPageOrderTwo[2] = { 2, 1 };
 
-
 extern StadiumGoalObject_8027A2C8* gCupAwardModels[];
 extern int gCupAwardModelCount;
 

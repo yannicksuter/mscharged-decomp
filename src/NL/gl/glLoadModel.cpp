@@ -156,12 +156,12 @@ void RLGReader::Read(void* data)
     {
         nlChunk* header = outerChunk;
         outerChunk = header->GetFirstChunk();
-        outerEnd = header->GetNextChunk();
+        outerEnd = header->GetLastChunk();
     }
 
     while (outerChunk != outerEnd)
     {
-        nlChunk* chunkEnd = outerChunk->GetNextChunk();
+        nlChunk* chunkEnd = outerChunk->GetLastChunk();
         chunk = outerChunk->GetFirstChunk();
         while (chunk != chunkEnd)
         {
@@ -215,7 +215,7 @@ void RLGReader::Read(void* data)
             case 0x8001B200:
             {
                 nlChunk* subChunk = chunk->GetFirstChunk();
-                while (subChunk != chunk->GetNextChunk())
+                while (subChunk != chunk->GetLastChunk())
                 {
                     LoadVertexAnim(subChunk);
                     subChunk = subChunk->GetNextChunk();

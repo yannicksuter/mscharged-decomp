@@ -35,7 +35,8 @@ float nlFastExp2(float value);
 
 inline unsigned int nlAlignUp(unsigned int value, unsigned int alignment)
 {
-    return (value + alignment - 1) & ~(alignment - 1);
+    unsigned int remainder = value % alignment;
+    return value + (remainder != 0) * (alignment - remainder);
 }
 
 inline float nlAbs(const float& value)

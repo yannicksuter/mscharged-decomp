@@ -1,4 +1,5 @@
 #include "Game/AI/AvoidableObject.h"
+#include "Game/AI/Scripts/ScriptQuestions.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Desire.h"
@@ -26,7 +27,6 @@ extern "C" bool fn_8003E8A0(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" bool fn_8003E99C(cFielder*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
-extern "C" float fn_800D6E54(cFielder*);
 extern "C" float fn_800D9EC4(cPlayer*);
 extern "C" float fn_800DEAB4(cFielder*);
 extern "C" float fn_800DED80(cFielder*);
@@ -318,7 +318,7 @@ float AvoidableFielder::UnidentifiedVirtual28(
             {
                 fStrength *= 0.4f;
             }
-            float fValue = fn_800D6E54(pOther);
+            float fValue = StrategicBallOwner(pOther);
             if (pOther->IsOnSameTeam(m_pFielder) && fValue >= 0.7f)
             {
                 fStrength *= 2.0f;
@@ -617,8 +617,8 @@ AvoidablePolygon::AvoidablePolygon(
     int mode, const nlVector3& center, float length, float width)
     : AvoidableObject(AVOID_UNIDENTIFIED_08)
 {
-    nlVector2 a;
     nlVector2 b;
+    nlVector2 a;
     InitPolygon(this);
     mUnidentified014 = mode;
     nlVec2Set(a, center.x, center.y - 0.5f * width);

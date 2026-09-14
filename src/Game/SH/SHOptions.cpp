@@ -1,4 +1,5 @@
 #include "Game/SH/SHNavigation.h"
+#include "NL/nlFunction.inl"
 #include "Game/GameSceneManager.h"
 #include "Game/SH/SHOptions.h"
 #include "Game/FE/FEAudio.h"

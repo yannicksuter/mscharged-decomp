@@ -1,4 +1,5 @@
 #include "NL/nlSingleton.inl"
+#include "NL/nlFunction.inl"
 #include "Game/SH/SHOnlinePlayerCount.h"
 #include "Game/DB/GameProgress.h"
 #include "Game/FE/FEAudio.h"

@@ -1,7 +1,8 @@
 #ifndef NL_GL_MODEL_PARAMETERS_H
 #define NL_GL_MODEL_PARAMETERS_H
 
-struct glModelPacket;
+#include "NL/gl/glModel.h"
+
 struct GXMaterialParameter;
 
 const GXMaterialParameter* glGetMaterialParameterInfo(
@@ -23,5 +24,15 @@ void* glGetMaterialParameterData(const glModelPacket* packet, unsigned long hash
 bool glHasMaterialParameter(const glModelPacket* packet, unsigned long hash);
 void glSetMaterialTextureAlphaState(
     void* program, glModelPacket* packet, unsigned long texture);
+
+// An override of 1.0f selects the value stored in the packet.
+template <class Parameters>
+inline float glGetMaterialFloatParameterWithOverride(const glModelPacket* packet,
+    float Parameters::*member, const float& overrideValue)
+{
+    if (1.0f != overrideValue)
+        return overrideValue;
+    return static_cast<const Parameters*>(packet->materialParameters)->*member;
+}
 
 #endif // NL_GL_MODEL_PARAMETERS_H

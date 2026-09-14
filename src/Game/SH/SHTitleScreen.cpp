@@ -1,4 +1,5 @@
 #include "Game/SH/SHNavigation.h"
+#include "NL/nlFunction.inl"
 #include "Game/GameSceneManager.h"
 #include "Game/SH/SHTitleScreen.h"
 #include "Game/Render/RLViewLayers.h"
@@ -32,10 +33,6 @@ extern bool g_e3_Build;
 
 extern const int lbl_804E8368[10] = {
     13, 14, 13, 14, 11, 12, 0, 1, 2, 0,
-};
-
-extern const int lbl_804E8390[18] = {
-    13, 11, 15, 16, 7, 14, 3, 4, 9, 5, 0, 1, 2, 6, 10, 8, 12, 0,
 };
 
 void StartMovieCB()

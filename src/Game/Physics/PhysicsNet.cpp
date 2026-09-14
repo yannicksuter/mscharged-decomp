@@ -4,6 +4,7 @@
 #include "Game/Ball.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Field.h"
+#include "Game/MathHelpers.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Team.h"
 #include "NL/nlMemory.h"
@@ -26,6 +27,8 @@ static bool sbTestLowerHorizontalGoalpost = false;
 
 bool PhysicsNet::sbSweepTestEnabled = true;
 float PhysicsNet::sfWallSoftness = 0.01f;
+float lbl_806DCAB0 = 0.04f;
+float lbl_806DCAB4 = 0.06f;
 
 PhysicsNet::PhysicsNet(CollisionSpace* space, bool positive_x)
 {
@@ -94,64 +97,64 @@ PhysicsNet::PhysicsNet(CollisionSpace* space, bool positive_x)
         }
     }
 
-    nlVector3 center;
-    nlVector3 vector1;
-    nlVector3 vector2;
+    nlVector3 c;
+    nlVector3 v1;
+    nlVector3 v2;
     nlVector3 postPosition;
     nlMatrix4 rotation;
 
     halfDepth = 0.5f * (sfPhysicsNetDepth + errorCorrectionDepth);
+    planeX = sideSign * ((goalLineX + halfDepth) - zero);
     physicsNetHeight = sfPhysicsNetHeight;
     halfHeight = 0.5f * (physicsNetHeight + errorCorrectionDepth);
     halfWidth = 0.5f * sfPhysicsNetWidth;
     halfWidthWithError = 0.5f * sfPhysicsNetWidth + errorCorrectionDepth;
-    planeX = sideSign * ((goalLineX + halfDepth) - zero);
     backX = sideSign * ((goalLineX + sfPhysicsNetDepth) - zero);
     nlSinCos(&sin45, &cos45, 0x2000);
     angledX = sideSign * (((2.2f + goalLineX) - zero));
     angledHeight = 1.7f;
 
-    nlVec3Set(center, planeX, halfWidth - 0.3f, halfHeight);
-    nlVec3Set(vector1, halfDepth, 0.0f, 0.0f);
-    nlVec3Set(vector2, 0.0f, 0.0f, halfHeight);
+    nlVec3Set(c, planeX, halfWidth - 0.3f, halfHeight);
+    nlVec3Set(v1, halfDepth, 0.0f, 0.0f);
+    nlVec3Set(v2, 0.0f, 0.0f, halfHeight);
     mpGoalWallA1 = new (nlMalloc(sizeof(PhysicsFinitePlane), 8, false)) PhysicsFinitePlane(
-        g_CollisionSpace, center, vector1, vector2, true, errorCorrectionDepth);
+        g_CollisionSpace, c, v1, v2, true, errorCorrectionDepth);
 
-    nlVec3Set(center, planeX, 0.3f - halfWidth, halfHeight);
-    nlVec3Set(vector1, halfDepth, 0.0f, 0.0f);
-    nlVec3Set(vector2, 0.0f, 0.0f, halfHeight);
+    nlVec3Set(c, planeX, 0.3f - halfWidth, halfHeight);
+    nlVec3Set(v1, halfDepth, 0.0f, 0.0f);
+    nlVec3Set(v2, 0.0f, 0.0f, halfHeight);
     mpGoalWallA2 = new (nlMalloc(sizeof(PhysicsFinitePlane), 8, false)) PhysicsFinitePlane(
-        g_CollisionSpace, center, vector2, vector1, true, errorCorrectionDepth);
+        g_CollisionSpace, c, v2, v1, true, errorCorrectionDepth);
 
-    nlVec3Set(center, planeX, halfWidth, halfHeight);
-    nlVec3Set(vector1, halfDepth, 0.0f, 0.0f);
-    nlVec3Set(vector2, 0.0f, 0.0f, halfHeight);
+    nlVec3Set(c, planeX, halfWidth, halfHeight);
+    nlVec3Set(v1, halfDepth, 0.0f, 0.0f);
+    nlVec3Set(v2, 0.0f, 0.0f, halfHeight);
     mpGoalWallB1 = new (nlMalloc(sizeof(PhysicsFinitePlane), 8, false)) PhysicsFinitePlane(
-        g_CollisionSpace, center, vector1, vector2, true, errorCorrectionDepth);
+        g_CollisionSpace, c, v1, v2, true, errorCorrectionDepth);
 
-    nlVec3Set(center, planeX, -halfWidth, halfHeight);
-    nlVec3Set(vector1, halfDepth, 0.0f, 0.0f);
-    nlVec3Set(vector2, 0.0f, 0.0f, halfHeight);
+    nlVec3Set(c, planeX, -halfWidth, halfHeight);
+    nlVec3Set(v1, halfDepth, 0.0f, 0.0f);
+    nlVec3Set(v2, 0.0f, 0.0f, halfHeight);
     mpGoalWallB2 = new (nlMalloc(sizeof(PhysicsFinitePlane), 8, false)) PhysicsFinitePlane(
-        g_CollisionSpace, center, vector2, vector1, true, errorCorrectionDepth);
+        g_CollisionSpace, c, v2, v1, true, errorCorrectionDepth);
 
-    nlVec3Set(center, backX, 0.0f, halfHeight);
-    nlVec3Set(vector1, 0.0f, sideSign * halfWidthWithError, 0.0f);
-    nlVec3Set(vector2, 0.0f, 0.0f, halfHeight);
+    nlVec3Set(c, backX, 0.0f, halfHeight);
+    nlVec3Set(v1, 0.0f, sideSign * halfWidthWithError, 0.0f);
+    nlVec3Set(v2, 0.0f, 0.0f, halfHeight);
     mpBackWall = new (nlMalloc(sizeof(PhysicsFinitePlane), 8, false)) PhysicsFinitePlane(
-        g_CollisionSpace, center, vector2, vector1, true, errorCorrectionDepth);
+        g_CollisionSpace, c, v2, v1, true, errorCorrectionDepth);
 
-    nlVec3Set(center, planeX, 0.0f, physicsNetHeight);
-    nlVec3Set(vector1, 0.0f, halfWidthWithError, 0.0f);
-    nlVec3Set(vector2, halfDepth, 0.0f, 0.0f);
+    nlVec3Set(c, planeX, 0.0f, physicsNetHeight);
+    nlVec3Set(v1, 0.0f, halfWidthWithError, 0.0f);
+    nlVec3Set(v2, halfDepth, 0.0f, 0.0f);
     mpTopWall = new (nlMalloc(sizeof(PhysicsFinitePlane), 8, false)) PhysicsFinitePlane(
-        g_CollisionSpace, center, vector1, vector2, true, errorCorrectionDepth);
+        g_CollisionSpace, c, v1, v2, true, errorCorrectionDepth);
 
-    nlVec3Set(center, angledX, 0.0f, angledHeight);
-    nlVec3Set(vector1, 0.0f, sideSign * halfWidthWithError, 0.0f);
-    nlVec3Set(vector2, sin45 * (-sideSign * halfHeight), 0.0f, halfHeight * cos45);
+    nlVec3Set(c, angledX, 0.0f, angledHeight);
+    nlVec3Set(v1, 0.0f, sideSign * halfWidthWithError, 0.0f);
+    nlVec3Set(v2, sin45 * (-sideSign * halfHeight), 0.0f, halfHeight * cos45);
     mpAngledWall = new (nlMalloc(sizeof(PhysicsFinitePlane), 8, false)) PhysicsFinitePlane(
-        g_CollisionSpace, center, vector2, vector1, true, errorCorrectionDepth);
+        g_CollisionSpace, c, v2, v1, true, errorCorrectionDepth);
 
     mpBackWall->SetCategory(0x200);
     mpBackWall->SetCollide(0x20);
@@ -280,28 +283,21 @@ bool PhysicsNet::SweepTestForBallContact(const nlVector3& startPos, const nlVect
     nlVector3 goalPost1Location;
     nlVector3 goalPostSpherePos0;
     nlVector3 ballLinearVelocity;
-    nlVector3 goalPostSpherePos1;
     float height;
-    bool hitHorizontalGoalpost;
-    bool hitLeftVerticalGoalpost;
-    bool hitRightVerticalGoalpost;
     float absEndX;
     float absLeftPostX;
     float startZ;
     float endZ;
-    float normalY;
-    float normalX;
-    float normalZ;
 
     cField::GetGoalLineX((unsigned int)1);
-    float netPostRadius = cNet::m_fNetPostRadius;
+    float netPostRadius = cNet::GetPostRadius();
     float radiusSum = netPostRadius + ballRadius;
 
-    hitHorizontalGoalpost = false;
-    hitLeftVerticalGoalpost = false;
-    hitRightVerticalGoalpost = false;
+    bool hitHorizontalGoalpost = false;
+    bool hitLeftVerticalGoalpost = false;
+    bool hitRightVerticalGoalpost = false;
 
-    height = cNet::m_fNetHeight;
+    height = cNet::GetNetHeight();
 
     mpNet->GetPostLocation(leftPostPos, 0, 0.0f);
     mpNet->GetPostLocation(rightPostPos, 1, 0.0f);
@@ -403,10 +399,10 @@ bool PhysicsNet::SweepTestForBallContact(const nlVector3& startPos, const nlVect
         }
     }
 
-    float horizontalPostHeight = cNet::m_fNetHeight;
+    float horizontalPostHeight = cNet::GetNetHeight();
     if (sbTestLowerHorizontalGoalpost)
     {
-        horizontalPostHeight = 0.5f * cNet::m_fNetHeight;
+        horizontalPostHeight = 0.5f * cNet::GetNetHeight();
     }
 
     goalPost0Location = rightPostPos;
@@ -468,16 +464,13 @@ bool PhysicsNet::SweepTestForBallContact(const nlVector3& startPos, const nlVect
         }
         else if (hitHorizontalGoalpost != 0)
         {
-            float endY = endPos.y;
-            float startY = startPos.y;
-            float goalHeight = cNet::m_fNetHeight;
             goalPost0Location = rightPostPos;
-            goalPost0Location.y = startY;
-            goalPost0Location.z = goalHeight;
+            goalPost0Location.y = startPos.y;
+            goalPost0Location.z = cNet::GetNetHeight();
 
             goalPost1Location = rightPostPos;
-            goalPost1Location.y = endY;
-            goalPost1Location.z = goalHeight;
+            goalPost1Location.y = endPos.y;
+            goalPost1Location.z = cNet::GetNetHeight();
         }
 
         nlVec3Sub(goalPostSpherePos0, endPos, startPos);
@@ -492,19 +485,13 @@ bool PhysicsNet::SweepTestForBallContact(const nlVector3& startPos, const nlVect
             goalPost0Location.z = contactPos.z;
         }
 
-        normalY = contactPos.y - goalPost0Location.y;
-        normalX = contactPos.x - goalPost0Location.x;
-        normalZ = contactPos.z - goalPost0Location.z;
-        nlVec3Set(contactNormal, normalX, normalY, normalZ);
+        nlVec3Sub(contactNormal, contactPos, goalPost0Location);
 
         float normalLength = nlRecipSqrt(contactNormal.x * contactNormal.x + contactNormal.y * contactNormal.y + contactNormal.z * contactNormal.z, true);
-
-        height = ballRadius + netPostRadius;
-        nlVec3Scale(contactNormal, normalLength);
-        nlVec3Sub(goalPostSpherePos1, contactPos, goalPost0Location);
-        if (nlGetLengthSquared3D(goalPostSpherePos1.x, goalPostSpherePos1.y, goalPostSpherePos1.z) < (height * height))
+        nlVec3Set(contactNormal, normalLength * contactNormal.x, normalLength * contactNormal.y, normalLength * contactNormal.z);
+        if (CalculateDistanceSquared(contactPos, goalPost0Location) < nlGetLengthSquared1D(ballRadius + netPostRadius))
         {
-            nlVec3ScaleAdd(contactPos, height, contactNormal, goalPost0Location);
+            nlVec3ScaleAdd(contactPos, ballRadius + netPostRadius, contactNormal, goalPost0Location);
         }
 
         ballLinearVelocity = g_pBall->m_pPhysicsBall->GetLinearVelocity();

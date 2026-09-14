@@ -1,4 +1,5 @@
 #include <RVLFaceLib/RFL_Database.h>
+#include "NL/nlBasicString.inl"
 #include <RVLFaceLib/RFL_DataUtility.h>
 #include "Game/FE/FEAudio.h"
 #include <RVLFaceLib/RFL_Model.h>

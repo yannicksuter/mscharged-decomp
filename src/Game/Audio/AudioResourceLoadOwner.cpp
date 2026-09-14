@@ -32,7 +32,7 @@ void OnAudioResourceBundleLoaded(
 
     nlChunk* outer = (nlChunk*)data;
     nlChunk* chunk = (nlChunk*)outer->GetData();
-    while (chunk != outer->GetNextChunk())
+    while (chunk != outer->GetLastChunk())
     {
         switch (chunk->GetID())
         {

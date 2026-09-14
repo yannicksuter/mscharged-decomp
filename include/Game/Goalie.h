@@ -15,6 +15,7 @@ class CharacterPhysicsData;
 class cBaseCamera;
 
 class PhysicsGoalie;
+struct dContact;
 class LooseBallInfo;
 class cFielder;
 class cPoseNode;
@@ -205,7 +206,7 @@ public:
     void fn_80084EB0(float fDeltaTime);
     bool fn_800779D0();
     void fn_80080EFC();
-    bool PreCollideWithBallCallback();
+    bool PreCollideWithBallCallback(const dContact& contact);
     bool InitiatePickup();
     void InitiatePanicGrab(cPlayer* pPlayer);
     float fn_8007BEEC(cFielder* pTarget);
@@ -216,6 +217,26 @@ public:
     cPlayer* FindOpenPassTarget();
     bool IsTargetViable(cPlayer* pTarget);
     bool ShouldReposition();
+    bool IsRecovering() const
+    {
+        return mGoalieActionState == GOALIEACTION_STS_RECOVER;
+    }
+    bool IsBusy() const
+    {
+        return mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0
+            && (m_pBall != 0
+                || mGoalieActionState == GOALIEACTION_PASS
+                || mGoalieActionState == GOALIEACTION_PASS_INTERCEPT
+                || mGoalieActionState == GOALIEACTION_MOVE
+                || mGoalieActionState == GOALIEACTION_MOVE_WB
+                || mGoalieActionState == GOALIEACTION_PURSUE_BALL_CARRIER
+                || mGoalieActionState == GOALIEACTION_PURSUE_BALL_POUNCE
+                || mGoalieActionState == GOALIEACTION_LOOSEBALL_SETUP
+                || mGoalieActionState == GOALIEACTION_LOOSEBALL_CATCH
+                || mGoalieActionState == GOALIEACTION_LOOSEBALL_PICKUP
+                || mGoalieActionState == GOALIEACTION_LOOSEBALL_PURSUE_BOUNCING
+                || mGoalieActionState == GOALIEACTION_LOOSEBALL_PURSUE_ROLLING);
+    }
     bool fn_8007BC40();
     bool fn_8007BF68(bool bParam);
     bool fn_8007C73C();

@@ -24,7 +24,7 @@
 #include "NL/nlPrint.h"
 #include "Game/TweakFileLoader.h"
 #include "Game/FE/feDPD.h"
-#include "unclassified/tu_80231118.h"
+#include "Game/SH/SHChallengeSelect.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/UnidentifiedTLDefault.h"
 
@@ -66,7 +66,7 @@ void TU802337F4Scene::OnBackTransitionComplete()
     SceneList sceneID = (SceneList)75;
     if (g_pStrikerChallenge->mCurrentChallenge < 10)
         sceneID = (SceneList)76;
-    TU80231118Scene* scene = static_cast<TU80231118Scene*>(GameSceneManager::Instance()->Push(sceneID, SCREEN_BACK, true));
+    ChallengeSelectScene* scene = static_cast<ChallengeSelectScene*>(GameSceneManager::Instance()->Push(sceneID, SCREEN_BACK, true));
     if (scene != 0)
         scene->mChallengeOffset = g_pStrikerChallenge->mUnidentified6C;
 }

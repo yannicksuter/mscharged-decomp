@@ -146,12 +146,16 @@ public:
 
     virtual ~UnidentifiedEvent()
     {
+        UnidentifiedRemoveAll();
+        UnregisterEvent(this);
+    }
+
+    void UnidentifiedRemoveAll()
+    {
         while (mListeners.m_Head != 0)
         {
-            Listener* listener = &mListeners.Begin().CurrentEntry()->entry;
-            Remove(listener);
+            Remove(&*mListeners.Begin());
         }
-        UnregisterEvent(this);
     }
 
     virtual void Disconnect(void* owner);
@@ -253,9 +257,10 @@ protected:
     void UnidentifiedRestartAt(nlDLListIterator<Listener>& iterator, ListenerEntry* current);
 
     // The listener list runs a single Clear()/FreeBlocks() teardown, so it is
-    // the plain container over a slot-pool adapter rather than nlDLListSlotPool,
-    // whose destructor tears down twice (see Game/Render/ImpostorCharacter.cpp).
-    DLListContainerBase<Listener, BasicSlotPool<ListenerEntry> > mListeners;
+    // the plain container rather than nlDLListSlotPool, whose destructor tears
+    // down twice (see Game/Render/ImpostorCharacter.cpp). Its adapter is the
+    // SlotPool level, like EventDispatcher's callback list.
+    DLListContainerBase<Listener, SlotPool<ListenerEntry> > mListeners;
 };
 
 // The callback may have changed the list while it ran, so the walk is
@@ -321,11 +326,14 @@ public:
 
     void Allocate(T*& out)
     {
-        out = mFreeList;
-        if (mFreeList != 0)
+        if (mFreeList == 0)
         {
-            mFreeList = *(T**)mFreeList;
-            new (out) T;
+            out = 0;
+        }
+        else
+        {
+            out = mFreeList;
+            mFreeList = *(T**)out;
         }
     }
 
@@ -364,12 +372,16 @@ public:
 
     virtual ~UnidentifiedStaticEvent()
     {
+        UnidentifiedRemoveAll();
+        UnregisterEvent(this);
+    }
+
+    void UnidentifiedRemoveAll()
+    {
         while (mListeners.m_Head != 0)
         {
-            Listener* listener = &mListeners.Begin().CurrentEntry()->entry;
-            Remove(listener);
+            Remove(&*mListeners.Begin());
         }
-        UnregisterEvent(this);
     }
 
     virtual void Disconnect(void* owner)
@@ -528,12 +540,16 @@ public:
 
     virtual ~UnidentifiedStaticEvent3()
     {
+        UnidentifiedRemoveAll();
+        UnregisterEvent(this);
+    }
+
+    void UnidentifiedRemoveAll()
+    {
         while (mListeners.m_Head != 0)
         {
-            Listener* listener = &mListeners.Begin().CurrentEntry()->entry;
-            Remove(listener);
+            Remove(&*mListeners.Begin());
         }
-        UnregisterEvent(this);
     }
 
     virtual void Disconnect(void* owner)
@@ -606,8 +622,23 @@ protected:
     DLListContainerBase<Listener, ListenerPool> mListeners;
 };
 
+// Retail queued-event destructors inline one more non-trivial destructor
+// level than UnidentifiedEvent's own copies, with no code of its own; its
+// vtable store is dead in the constructor and the vtable is not retained.
 template <typename T>
-class UnidentifiedQueuedEvent : public UnidentifiedEvent<T>
+class UnidentifiedQueuedEventBase : public UnidentifiedEvent<T>
+{
+public:
+    UnidentifiedQueuedEventBase(const char* name, int length)
+        : UnidentifiedEvent<T>(name, length)
+    {
+    }
+
+    virtual ~UnidentifiedQueuedEventBase() { }
+};
+
+template <typename T>
+class UnidentifiedQueuedEvent : public UnidentifiedQueuedEventBase<T>
 {
 public:
     typedef typename UnidentifiedEvent<T>::Callback Callback;
@@ -649,7 +680,7 @@ private:
 template <typename T>
 UnidentifiedQueuedEvent<T>::UnidentifiedQueuedEvent(
     EventDispatcher* dispatcher, const char* name, int length)
-    : UnidentifiedEvent<T>(name, length)
+    : UnidentifiedQueuedEventBase<T>(name, length)
     , mDispatcher(dispatcher)
 {
 }

@@ -1,4 +1,5 @@
 #include "Game/FE/feScrollBar.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlPrint.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"

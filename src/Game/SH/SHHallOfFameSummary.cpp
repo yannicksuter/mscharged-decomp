@@ -1,4 +1,5 @@
 #include <string.h>
+#include "NL/nlBasicString.inl"
 
 #include "Game/SH/SHHallOfFameSummary.h"
 #include "Game/DB/GameProgress.h"

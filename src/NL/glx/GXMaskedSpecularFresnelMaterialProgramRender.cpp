@@ -149,8 +149,7 @@ void GXMaterialProgramImpl<GXMaskedSpecularFresnelMaterialProgram>::Activate(GLV
     sMaskedSpecularFresnelLightCount = GetGameObjectLightCount(0, 1);
     LoadGameObjectLights(sMaskedSpecularFresnelLightCount, view, 0);
 
-    glTextureBinding texture;
-    texture.texture = GetGameObjectLightTexture();
+    glTextureBinding texture(GetGameObjectLightTexture());
     texture.textureIndex = 0xFFFF;
     texture.flags = 0;
     texture.SetWrapS(true);

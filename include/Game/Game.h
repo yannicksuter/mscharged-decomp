@@ -7,7 +7,7 @@
 class Clock;
 class FuzzyTweaks;
 class DebugWriteCache;
-class TU800A9B78;
+class WeatherManager;
 class RunningChecksum;
 class UnidentifiedGameRegion;
 class Terrain;
@@ -224,7 +224,7 @@ public:
 
 public:
     /* 0x10D8 */ Terrain* mpTerrain;
-    /* 0x10DC */ TU800A9B78* mUnidentified10DC;
+    /* 0x10DC */ WeatherManager* mpWeatherManager;
     /* 0x10E0 */ CrowdRiot* mUnidentified10E0;
     /* 0x10E4 */ AvoidablePolygon* mUnidentified10E4[4];
 };

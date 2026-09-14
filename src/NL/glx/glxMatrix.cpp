@@ -45,7 +45,7 @@ void glplatMatrixLookAt(nlMatrix4& m, const nlVector3& eye, const nlVector3& at,
     float length = nlSqrt(nlVec3LengthSquared(view), true);
     nlVec3Scale(view, view, 1.0f / length);
     nlVec3CrossProduct(side, up, view);
-    nlVec3Scale(side, side, nlRecipSqrt(nlVec3LengthSquared(side), true));
+    nlVec3Normalize(side, side);
     nlVec3CrossProduct(cameraUp, view, side);
 
     if (fabsf(up.z) > 0.5f && (fabsf(up.x) > 0.001f || fabsf(up.y) > 0.001f))

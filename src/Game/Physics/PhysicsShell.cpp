@@ -5,6 +5,7 @@
 #include "Game/AI/Powerups.h"
 #include "Game/Ball.h"
 #include "Game/Render/NPCManager.h"
+#include "Game/Render/BirdoEgg.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/EventDataTypes.h"
@@ -38,66 +39,6 @@ extern "C" void fn_801481BC(SkinAnimatedNPC*);
 
 static const nlVector3 v3Unidentified = { 0.0f, 0.0f, 160.0f };
 static const nlVector3 v3Direction = { 0.0f, 0.0f, 1.0f };
-
-UnidentifiedPhysicsPatchInfo_80510BF0 lbl_80510BF0[13] = {
-    { 0, "GAS BALL", "gas_cloud", 0x13062, 0, 3.0f, 0.0f, 0.1f },
-    { 1, "FIRE BALL", "bowser_fire", 0x40, 0, 0.001f, 0.0f, 0.0f },
-    { 2, "HEAVENLY LIGHT", "heavenly_light", 0x40, 0, 0.0f, 0.0f, 0.001f },
-    { 3, "MUCK BALL", "fx_mud_ball", 0x202, 0, 8.0f, 0.0f, 0.0f },
-    { 4, "MUCK HOLE", "fx_mud_hole", 0x60, 0, 0.0f, 0.15f, 0.0f },
-    { 5, "YOSHI YOKE", "yoshi_yoke", 0x60, 0, 0.0f, 0.15f, 0.0f },
-    { 6, "YOSHI TONGUE", 0, 0x40, 0, 0.0f, 0.0f, 0.0f },
-    { 7, "SHRINKER", "shrill_shrinker", 0x40, 0, 0.0f, 0.0f, 0.0f },
-    { 8, "LAVA BALL", "fx_lava_ball", 0x2, 0, 8.0f, 0.0f, 0.0f },
-    { 9, "LAVA HOLE", "fx_lava_hole", 0x60, 0, 0.0f, 0.0f, 0.0f },
-    { 10, "CHAINLIGHTNING", "fx_electric_ground_effect", 0x40, 0, 0.0f, 0.0f, 0.0f },
-    { 11, "SANDPATCH", 0, 0x40, 0, 0.0f, 0.6f, 0.0f },
-    { 12, "SPEEDER", "yoshi_yoke", 0x40, 0, 0.0f, 1.5f, 0.001f },
-};
-
-PhysicsSphere_80174F04::PhysicsSphere_80174F04(float radius)
-    : PhysicsSphere(g_CollisionSpace, 0, radius)
-{
-    m_pTriggerCallbackFunc = 0;
-    m_pCallbackParam = 0;
-    SetCollide(0x60);
-    SetCategory(2);
-}
-
-ContactType PhysicsSphere_80174F04::Contact(
-    PhysicsObject* other, dContact* info, int numContacts)
-{
-    nlVector3 position;
-    nlVec3Set(position, info->geom.pos[0], info->geom.pos[1], info->geom.pos[2]);
-
-    switch (other->GetObjectType())
-    {
-    case 0x18:
-    {
-        bool isChainChomp
-            = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)
-                  ->GetSkinAnimatedNPC_Type()
-           == SkinAnimatedNPC_CHAIN_CHOMP;
-        if (isChainChomp)
-        {
-            fn_801481BC(
-                (SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC);
-        }
-        break;
-    }
-    default:
-    {
-        if (m_pTriggerCallbackFunc != 0)
-        {
-            m_pTriggerCallbackFunc(
-                this, other, position, m_pCallbackParam);
-        }
-        break;
-    }
-    }
-
-    return NO_CONTACT;
-}
 
 PhysicsShell::PhysicsShell(float radius)
     : PhysicsSphere(g_CollisionSpace, g_PhysicsWorld, radius)
@@ -142,6 +83,7 @@ ContactType PhysicsShell::Contact(
     PhysicsObject* obj, dContact* info, int numContacts)
 {
     nlVector3 myPos;
+    cBall* ball;
     bool bWasRicochet;
     cFielder* pFielder;
     ContactType eType;
@@ -195,7 +137,7 @@ ContactType PhysicsShell::Contact(
             }
 
             if (m_pPowerupObject->meSize == POWERUPSIZE_LARGE
-                || m_pPowerupObject->m_eType == POWER_UP_SPINY_SHELL)
+                || m_pPowerupObject->GetType() == POWER_UP_SPINY_SHELL)
             {
                 return NO_CONTACT;
             }
@@ -206,7 +148,7 @@ ContactType PhysicsShell::Contact(
             CollisionPowerupGroundData* eventData = 0;
             g_CollisionPowerupGroundDataPool.Allocate(eventData);
             GetPosition(&eventData->position);
-            eventData->eType = m_pPowerupObject->m_eType;
+            eventData->eType = m_pPowerupObject->GetType();
             fn_801474EC(eventData);
         }
         break;
@@ -214,13 +156,13 @@ ContactType PhysicsShell::Contact(
 
     case 0x10:
     {
+        ball = ((PhysicsAIBall*)obj)->m_pAIBall;
         numContacts = eType;
-        cPlayer* owner = ((PhysicsAIBall*)obj)->m_pAIBall->m_pOwner;
-        if (owner != 0)
+        if (ball->m_pOwner != 0)
         {
-            if (owner->m_eClassType == FIELDER)
+            if (ball->m_pOwner->m_eClassType == FIELDER)
             {
-                pFielder = (cFielder*)owner;
+                cFielder* pFielder = (cFielder*)ball->m_pOwner;
                 if (!pFielder->mbTangible)
                 {
                     return NO_CONTACT;
@@ -237,21 +179,20 @@ ContactType PhysicsShell::Contact(
             }
 
             if (m_pPowerupObject->meSize == POWERUPSIZE_LARGE
-                || m_pPowerupObject->m_eType == POWER_UP_SPINY_SHELL)
+                || m_pPowerupObject->GetType() == POWER_UP_SPINY_SHELL)
             {
                 return NO_CONTACT;
             }
         }
         else
         {
-            KoopaShellObject* koopaShell
-                = gNPCManager->mUnidentified02C;
-            if (koopaShell != 0 && koopaShell->mVisible)
+            if (gNPCManager->mUnidentified02C != 0
+                && gNPCManager->mUnidentified02C->mVisible)
             {
                 return NO_CONTACT;
             }
-            void* egg = gNPCManager->mpBirdoEgg;
-            if (egg != 0 && *(bool*)((u8*)egg + 0x30))
+            if (gNPCManager->mpBirdoEgg != 0
+                && gNPCManager->mpBirdoEgg->mVisible)
             {
                 return NO_CONTACT;
             }
@@ -262,7 +203,6 @@ ContactType PhysicsShell::Contact(
             }
         }
 
-        cBall* ball = ((PhysicsAIBall*)obj)->m_pAIBall;
         if (ball->m_tLightningTimer.m_uPackedTime != 0
             && fn_800167A8(ball))
         {
@@ -360,7 +300,7 @@ ContactType PhysicsShell::Contact(
     {
         int value = ((PhysicsPatch*)obj)->m_Type;
         UnidentifiedPhysicsPatchInfo_80510BF0* patchInfo
-            = fn_80174ED4(&value);
+            = fn_80174ED4(value);
         if (patchInfo->mUnidentified18 != 0.0f)
         {
             if (mUnidentified048 != 2
@@ -408,7 +348,7 @@ ContactType PhysicsShell::Contact(
                             g_CollisionPowerupGroundDataPool.Allocate(eventData);
                             GetPosition(&eventData->position);
                             eventData->fVecZComponent = v3IncidentVel.z;
-                            eventData->eType = m_pPowerupObject->m_eType;
+                            eventData->eType = m_pPowerupObject->GetType();
                             fn_801473A4(eventData);
                         }
                     }
@@ -423,9 +363,7 @@ ContactType PhysicsShell::Contact(
 
         if (mbIsInNet)
         {
-            float fNetWidth = cNet::m_fNetWidth;
-            float fNetLimitY = 0.5f * fNetWidth - fPowerupRadius;
-            if (fabsf(v3PowerupPosition.y) > fNetLimitY
+            if (fabsf(v3PowerupPosition.y) > 0.5f * cNet::GetNetWidth() - fPowerupRadius
                 && fabsf(v3PowerupPosition.x)
                        > fabsf(cField::GetGoalLineX(1U)))
             {
@@ -433,7 +371,7 @@ ContactType PhysicsShell::Contact(
                 return NO_CONTACT;
             }
 
-            if (NetMesh::s_bAnimatedNetMeshEnabled)
+            if (!NetMesh::s_bAnimatedNetMeshEnabled)
             {
                 return NO_CONTACT;
             }
@@ -441,27 +379,11 @@ ContactType PhysicsShell::Contact(
             float fMaxX;
             if (v3PowerupPosition.x > 0.0f)
             {
-                NetMesh* pMesh = NetMesh::spPositiveXNetMesh;
-                if (v3PowerupPosition.x > 0.0f)
-                {
-                    fMaxX = pMesh->mfMaxX;
-                }
-                else
-                {
-                    fMaxX = pMesh->mfMinX;
-                }
+                fMaxX = NetMesh::spPositiveXNetMesh->GetOuterX(v3PowerupPosition);
             }
             else
             {
-                NetMesh* pMesh = NetMesh::spNegativeXNetMesh;
-                if (v3PowerupPosition.x > 0.0f)
-                {
-                    fMaxX = pMesh->mfMaxX;
-                }
-                else
-                {
-                    fMaxX = pMesh->mfMinX;
-                }
+                fMaxX = NetMesh::spNegativeXNetMesh->GetOuterX(v3PowerupPosition);
             }
 
             if (fabsf(v3PowerupPosition.x)
@@ -471,8 +393,7 @@ ContactType PhysicsShell::Contact(
                 return NO_CONTACT;
             }
 
-            float fNetLimit = cNet::m_fNetHeight - fPowerupRadius;
-            if (fabsf(v3PowerupPosition.z) > fNetLimit)
+            if (fabsf(v3PowerupPosition.z) > cNet::GetNetHeight() - fPowerupRadius)
             {
                 m_pPowerupObject->m_bShouldDestroy = true;
                 return NO_CONTACT;
@@ -485,13 +406,10 @@ ContactType PhysicsShell::Contact(
             }
         }
 
-        float fNetWidth = cNet::m_fNetWidth;
-        float fNetLimitY = 0.5f * fNetWidth - fPowerupRadius;
-        if (fabsf(v3PowerupPosition.y) < fNetLimitY
+        if (fabsf(v3PowerupPosition.y) < 0.5f * cNet::GetNetWidth() - fPowerupRadius
             && fabsf(v3PowerupPosition.x)
                    > cField::GetGoalLineX(1U) - fPowerupRadius
-            && fabsf(v3PowerupPosition.z)
-                   < cNet::m_fNetHeight - fPowerupRadius)
+            && fabsf(v3PowerupPosition.z) < cNet::GetNetHeight() - fPowerupRadius)
         {
             mbIsInNet = true;
             return NO_CONTACT;
@@ -564,13 +482,13 @@ ContactType PhysicsShell::Contact(
                 CollisionPowerupWallData* eventData = 0;
                 g_CollisionPowerupWallDataPool.Allocate(eventData);
                 eventData->eSize = m_pPowerupObject->meSize;
-                eventData->eType = m_pPowerupObject->m_eType;
+                eventData->eType = m_pPowerupObject->GetType();
                 nlVec3Set(eventData->position, info->geom.pos[0], info->geom.pos[1], info->geom.pos[2]);
                 nlVec3Set(eventData->normal, info->geom.normal[0], info->geom.normal[1], info->geom.normal[2]);
                 fn_80147634(eventData);
 
-                if ((m_pPowerupObject->m_eType == POWER_UP_GREEN_SHELL
-                        || m_pPowerupObject->m_eType == POWER_UP_RED_SHELL)
+                if ((m_pPowerupObject->GetType() == POWER_UP_GREEN_SHELL
+                        || m_pPowerupObject->GetType() == POWER_UP_RED_SHELL)
                     && m_pPowerupObject->meSize == POWERUPSIZE_SMALL)
                 {
                     m_pPowerupObject->m_bShouldDestroy = true;
@@ -651,14 +569,4 @@ bool PhysicsShell::SetContactInfo(
 
     contact->surface.bounce_vel = 0.0f;
     return true;
-}
-
-extern "C" UnidentifiedPhysicsPatchInfo_80510BF0* fn_80174ED4(
-    const int* type)
-{
-    if (*type > -1 && *type < 13)
-    {
-        return &lbl_80510BF0[*type];
-    }
-    return 0;
 }

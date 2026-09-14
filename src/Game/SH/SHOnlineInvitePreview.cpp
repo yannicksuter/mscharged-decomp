@@ -1,4 +1,6 @@
 #include "Game/SH/SHOnlineInvitePreview.h"
+#include "NL/nlBasicString.inl"
+#include "NL/nlFunction.inl"
 #include "Game/SH/SHOnlineInviteStatus.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feHelpFuncs_decl.h"
@@ -23,7 +25,6 @@
 #include "NL/nlPrint.h"
 
 #include <string.h>
-#include "NL/nlBasicString.inl"
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 

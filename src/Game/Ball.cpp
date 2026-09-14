@@ -3322,7 +3322,7 @@ extern "C" void fn_80019910(PhysicsPatch* pPatch)
 
     int nPatchType = pPatch->m_Type;
     UnidentifiedPhysicsPatchInfo_80510BF0* pPatchInfo
-        = fn_80174ED4(&nPatchType);
+        = fn_80174ED4(nPatchType);
     if (pPatchInfo->mUnidentified18 != 0.0f)
     {
         nlVector3 v3Force;

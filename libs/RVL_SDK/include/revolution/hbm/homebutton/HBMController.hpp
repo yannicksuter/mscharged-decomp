@@ -67,9 +67,6 @@ public:
     void initCallback();
     void clearCallback();
 
-    static RemoteSpk* GetInstance() { return sPInstance; }
-    static void SetInstance(RemoteSpk* p) { sPInstance = p; }
-
 private:
     static void wpadConnectCallback(WPADChannel chan, WPADResult result);
     static void wpadExtensionCallback(WPADChannel chan, s32 result);
@@ -95,9 +92,6 @@ private:
     static OSAlarm sAlarm[WPAD_MAX_CONTROLLERS];
     static OSAlarm sAlarmSoundOff[WPAD_MAX_CONTROLLERS];
     static Controller* sThis[WPAD_MAX_CONTROLLERS];
-    static bool sSetInfoAsync[WPAD_MAX_CONTROLLERS];
-    static RemoteSpk* sPInstance;
-    static s32 lbl_8025DBBC;
 }; // size = 0x48
 
 } // namespace homebutton

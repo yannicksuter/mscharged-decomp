@@ -1,4 +1,5 @@
 #include "Game/Audio/UnidentifiedAudioScriptRuntime.h"
+#include "NL/nlFunction.inl"
 
 #include "NL/nlAlgorithm.h"
 #include "NL/nlBind.h"

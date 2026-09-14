@@ -547,15 +547,8 @@ public:
         {
         }
 
-        virtual ReturnType operator()(P1 p1, P2 p2)
-        {
-            return Call(p1, p2, BoolToType<IsVoid<ReturnType>::value>());
-        }
-
-        virtual FunctorBase* Clone() const
-        {
-            return new FunctorImpl(*this);
-        }
+        virtual ReturnType operator()(P1 p1, P2 p2);
+        virtual FunctorBase* Clone() const;
 
     private:
         ReturnType Call(P1 p1, P2 p2, BoolToType<false>)

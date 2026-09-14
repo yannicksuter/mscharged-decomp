@@ -5,8 +5,6 @@
 #include "Game/DB/StatsTracker.h"
 #include "NL/nlMath.h"
 
-extern "C" void fn_8010BCB8(void*, bool, int);
-
 /**
  * Offset/Address/Size: 0x0 | 0x80109E30 | size: 0x4
  */
@@ -200,5 +198,5 @@ void Simulator::fn_80109E34()
             STATS_WIN, winningSide, 0, goals[0], goals[1], 0, 0);
     }
 
-    fn_8010BCB8(g_pCupManager, overtime, winningSide);
+    g_pCupManager->fn_8010BCB8(overtime, winningSide);
 }

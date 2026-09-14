@@ -22,7 +22,7 @@ extern "C" unsigned char SCGetSoundMode();
 extern "C" void THPSimpleSetVolume(int, int);
 extern "C" char* strstr(const char*, const char*);
 
-Config lbl_80578320(Config::ALLOCATE_HIGH, 0x2800, 0x400);
+Config gMovieConfig(Config::ALLOCATE_HIGH, 0x2800, 0x400);
 
 MoviePlayerScene::MoviePlayerScene()
     : mNextScene(SCENE_INVALID)
@@ -100,9 +100,9 @@ void MoviePlayerScene::Update(float fDeltaT)
         }
         char var_68[64];
         nlSNPrintf(var_68, 64, "%s/Volume", streamName);
-        float volume = (float)GetConfigInt(lbl_80578320, var_68, 100) / 100.0f;
+        float volume = (float)GetConfigInt(gMovieConfig, var_68, 100) / 100.0f;
         nlSNPrintf(var_68, 64, "%s/FadeIn", streamName);
-        int fadeIn = GetConfigInt(lbl_80578320, var_68, 500);
+        int fadeIn = GetConfigInt(gMovieConfig, var_68, 500);
         THPSimpleSetVolume(0, 0);
         THPSimpleSetVolume((int)(127.0f * volume), fadeIn);
         if (GameInfoManager::Instance()->unknown_0x122)

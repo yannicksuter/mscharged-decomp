@@ -42,16 +42,16 @@ void GXMaterialProgramImpl<GXThreeLightDiffuseMaterialProgram>::Draw(
     const glModelPacket* packet)
 {
     glx_LoadDirectionalLight(0,
-        &static_cast<const GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightDirections[0],
-        &static_cast<const GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightColours[0]);
+        &static_cast<GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightDirections[0],
+        &static_cast<GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightColours[0]);
     glx_LoadDirectionalLight(1,
-        &static_cast<const GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightDirections[1],
-        &static_cast<const GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightColours[1]);
+        &static_cast<GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightDirections[1],
+        &static_cast<GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightColours[1]);
     glx_LoadDirectionalLight(2,
-        &static_cast<const GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightDirections[2],
-        &static_cast<const GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightColours[2]);
+        &static_cast<GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightDirections[2],
+        &static_cast<GXThreeLightDiffuseParameters*>(packet->materialParameters)->lightColours[2]);
     glx_SetAmbientColour(
-        &static_cast<const GXThreeLightDiffuseParameters*>(packet->materialParameters)->ambientColour);
+        &static_cast<GXThreeLightDiffuseParameters*>(packet->materialParameters)->ambientColour);
 
     static_cast<GXThreeLightDiffuseMaterialProgram*>(this)->BindVertexArrays(packet);
     static_cast<GXThreeLightDiffuseMaterialProgram*>(this)->BindParameters(packet);

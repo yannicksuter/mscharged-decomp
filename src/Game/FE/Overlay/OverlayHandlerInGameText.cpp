@@ -1,4 +1,5 @@
 #include "Game/OverlayHandlerInGameText.h"
+#include "NL/nlBasicString.inl"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/Render/RLViewLayers.h"
 
@@ -24,7 +25,6 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "Game/Render/RLViewLayers.h"
-#include "NL/nlBasicString.inl"
 
 extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
 extern BaseGameSceneManager* g_pOverlayManager;

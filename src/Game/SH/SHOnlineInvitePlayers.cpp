@@ -1,4 +1,5 @@
 #include "NL/nlSingleton.inl"
+#include "NL/nlBasicString.inl"
 #include "Game/SH/SHOnlineInvitePlayers.h"
 #include "Game/FE/feOnlineError.h"
 #include "Game/FE/feHelpFuncs_decl.h"

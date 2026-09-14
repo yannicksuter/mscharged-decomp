@@ -70,9 +70,9 @@ void TU801DA134Component::fn_801DA198(TLComponentInstance* component, int side)
     if (GameInfoManager::Instance()->IsInMode3())
     {
         GameRules rules = g_pCupManager->unknown_0x8A2C;
-        mSidekicks[0] = rules.unknown_0x0;
-        mSidekicks[1] = rules.unknown_0x4;
-        mSidekicks[2] = rules.unknown_0x8;
+        mSidekicks[0] = rules.mValues[0];
+        mSidekicks[1] = rules.mValues[1];
+        mSidekicks[2] = rules.mValues[2];
         team = g_pCupManager->unknown_0x8A28;
     }
     else
@@ -476,13 +476,13 @@ void TU801DA134Component::fn_801DCB28()
         }
     }
 
-    GameRules rules = { 0, 0, 0 };
-    rules.unknown_0x0 = sidekicks[nlRandom(count, &nlDefaultSeed)];
-    rules.unknown_0x4 = sidekicks[nlRandom(count, &nlDefaultSeed)];
-    rules.unknown_0x8 = sidekicks[nlRandom(count, &nlDefaultSeed)];
-    mSidekicks[0] = rules.unknown_0x0;
-    mSidekicks[1] = rules.unknown_0x4;
-    mSidekicks[2] = rules.unknown_0x8;
+    GameRules rules;
+    rules.mValues[0] = (eSidekickID)sidekicks[nlRandom(count, &nlDefaultSeed)];
+    rules.mValues[1] = (eSidekickID)sidekicks[nlRandom(count, &nlDefaultSeed)];
+    rules.mValues[2] = (eSidekickID)sidekicks[nlRandom(count, &nlDefaultSeed)];
+    mSidekicks[0] = rules.mValues[0];
+    mSidekicks[1] = rules.mValues[1];
+    mSidekicks[2] = rules.mValues[2];
     nlSingleton<GameInfoManager>::Instance()->SetRules(mUnidentified14, rules);
 }
 
@@ -1599,7 +1599,7 @@ extern "C" void fn_801DCCEC(TU801DA134Component* comp)
         team = nlSingleton<GameInfoManager>::Instance()->GetTeam((short)comp->mSide);
     }
     GameRules rules = nlSingleton<GameInfoManager>::Instance()->mRulesTable[team];
-    comp->mSidekicks[0] = rules.unknown_0x0;
-    comp->mSidekicks[1] = rules.unknown_0x4;
-    comp->mSidekicks[2] = rules.unknown_0x8;
+    comp->mSidekicks[0] = rules.mValues[0];
+    comp->mSidekicks[1] = rules.mValues[1];
+    comp->mSidekicks[2] = rules.mValues[2];
 }

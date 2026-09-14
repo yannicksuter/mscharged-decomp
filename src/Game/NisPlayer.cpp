@@ -1,4 +1,5 @@
 #include "Game/NisPlayer.h"
+#include "NL/nlBasicString.inl"
 #include "NL/nlBasicString.h"
 #include "Game/Render/StadiumLoading.h"
 #include "Game/CharacterTemplate.h"
@@ -11,7 +12,7 @@
 #include "Game/ReplayManager.h"
 #include "Game/Game.h"
 #include "Game/Render/ShootToScoreArrow.h"
-#include "unclassified/tu_800A9B78.h"
+#include "Game/Weather.h"
 #include "Game/GameInfo.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/DB/CharacterInfo.h"
@@ -497,7 +498,7 @@ void NisPlayer::fn_8027D11C()
     mUnidentified34468 = 0.0f;
     ResetEffects();
     fn_8027D1EC();
-    g_pGame->mUnidentified10DC->fn_800AA3E8(true);
+    g_pGame->mpWeatherManager->Stop(true);
     if (mUnidentified34338 != 4)
     {
         WorldDarkening::Instance().fn_801AF550();

@@ -3,8 +3,6 @@
 #include "revolution/hbm/nw4hbm/ut/CharWriter.h"
 #include "revolution/hbm/nw4hbm/ut/inlines.h"
 
-//! TODO: remove this
-#define NO_THIS_ASSERT
 #include "revolution/hbm/nw4hbm/ut/Font.h"
 
 #include "decomp.h"

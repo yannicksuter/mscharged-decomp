@@ -1,11 +1,76 @@
 # Source provenance
 
+The light setup in `NL/glx/glxLight.cpp` follows the GX lighting operations in
+[Super Mario Strikers' glxSend](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/NL/glx/glxSend.cpp).
+R4QE01 supplies the indexed light cache, directional scale, point attenuation,
+and retained interfaces. `nlFloatColourToByte` retains the predecessor's
+[colour-conversion API name](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/include/NL/nlColour.h),
+with Charged's truncation after multiplication by 255 instead of the
+predecessor's clamped 255.5 conversion. The reference project's licensing
+notice below also applies to this ancestry.
+
 `RVL_SDK/hbm/nw4hbm/db/db_DbgPrintBase.cpp` uses the unreferenced helper from
 [Twilight Princess's HBM reconstruction](https://github.com/zeldaret/tp/blob/c8fa8c9e2aab72cf4e5db0e5d1c84a9ea6ee6eb0/libs/revolution/src/homebuttonLib/nw4hbm/db/db_DbgPrintBase.cpp)
 to emit the shared `nw4hbm::ut::Color` destructor at its retained link position.
 This is a dummy emitter; the original stripped debug-print implementation has
 not been reconstructed. The helper is discarded by the linker, leaving only
 the 64-byte destructor used by other HBM objects.
+
+The Home Button Menu `RemoteSpk::spInstance` ownership and spelling follow
+the corresponding [Kirby's Epic Yarn HBM source](https://github.com/Swiftshine/key/blob/904ed70ca1db76e2bf4dbde1d2a5c4adbda9bbb4/src/hbm/homebutton/HBMRemoteSpk.cpp).
+R4QE01's speaker constructor, destructor and callbacks establish the singleton's
+lifetime and uses; the controller and speaker small-data sections align separately.
+
+`NL/plat/nlFileCache.cpp` and its header reconstruct R4QE01's asynchronous
+NAND file cache from the cache diagnostics, file callbacks, task registration,
+and request state transitions. `nlFileCache`, the public file-cache functions,
+and the record and callback names describe those observed roles; their original
+Charged spellings are unknown. `g_bDisableAllFileCaching` and `FileCacheTask`
+survive in retail strings. Fields and request states without an established
+meaning retain neutral names.
+
+`Game/SH/SHStadiumSelect.cpp` reconstructs the R4QE01 stadium-selection
+scene from its presentation transitions, stadium database calls, pointer
+callbacks and preview-movie control. `StadiumSelectScene`, `MoviePlayerControl`
+and their operation names describe those observed roles. The file name,
+`STADIUM_ORDER`, `OnSelectStadium`, `mStadiumIndex`, `m_pTicker` and matching
+movie-field names follow the corresponding Super Mario Strikers interfaces.
+The Wii scene layout, 17-entry display order and movie state machine follow
+R4QE01; these names are not claims about original Charged symbols.
+
+`Game/Weather.cpp` and `Game/Weather.h` reconstruct R4QE01's weather manager
+and stadium weather effects. The weather class names and serialized field
+spellings survive in synchronization-logging strings. Manager, operation and
+tuning-variable names describe the observed behavior; their original source
+spellings are unknown.
+
+The spatial, interception, possession and timing questions in
+`Game/AI/Scripts/ScriptQuestions.cpp` use
+[Super Mario Strikers' script questions](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/AI/Scripts/ScriptQuestions.cpp)
+as an ancestry reference. Charged's cached intercept positions, controller-aware
+facing, power-up availability, shot and pass obstruction weights, skill-shot
+cases and tweak registration follow R4QE01 rather than predecessor offsets or
+state IDs. `Goalie::IsBusy` and `IsRecovering` retain the predecessor interface
+with Charged's fire-timer condition. The target-ball field of
+`DesireRunToTarget` follows its variant initialization and ball-owner accesses.
+New accessors expose these existing fields; their spellings are not claimed as
+original Charged symbols.
+
+`cCharacter::GetPosition`, `cPlayer::HasBall` and the vector-form defensive-zone
+query retain their predecessor interfaces. The formation-position overloads
+follow Charged's position-taking query and its single-player wrappers.
+Shot-meter time and duration accessors expose the existing R4QE01 fields; the
+charging predicate follows the shared ACTIVE/STS_ACTIVE test in player input
+and user-control processing, excluding the transition state. Planar net-post
+construction and vector-to-angle evaluation use the existing math interfaces.
+
+ScriptQuestions' retained definition order and confidence-range placement follow
+R4QE01's code and interleaved literal/aggregate sequence. With the configured
+GC/3.0a5 compiler, ordinary inlining plus file-level IPA preserves that sequence
+and the expansions of later-defined queries. This is a reconstruction of this
+translation unit's emission behavior, not identification of the original
+compiler options for the game. Unused predecessor-only confidence storage is
+not retained.
 
 `Game/Physics/PhysicsWaluigiWall.cpp` reconstructs the Charged-specific Waluigi
 wall ability from R4QE01's collision dispatch, segment geometry, event
@@ -109,3 +174,10 @@ camera operations. Its separate state, constant pools and initializer follow the
 retail layout; the address-based filename does not identify an original source
 filename. The reference project's licensing notice above also applies to the
 shared source ancestry.
+Cup scheduling and advancement in `Game/DB/GameProgress.cpp` use the
+corresponding `GameInfoManager` routines from
+[Super Mario Strikers](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/GameInfo.cpp)
+as ancestry references, together with its cup and statistics interfaces.
+Charged's cup phases, three-sidekick records, packed history and challenge-unlock
+mappings follow R4QE01. The reference licensing notice above also applies
+to this source ancestry.

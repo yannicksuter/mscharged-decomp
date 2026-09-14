@@ -9,6 +9,7 @@
 #include "NL/glx/glxLight.h"
 #include "NL/glx/glxSkinMatrix.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxGXColour.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/nlMath.h"
@@ -84,10 +85,10 @@ extern "C" void glxConfigureSkinnedMultiLightBlend(float blendAmount)
 }
 
 static inline void LoadMaterialDiffuseLight(unsigned int index,
-    const GXSkinnedMultiLightParameters* parameters,
+    GXSkinnedMultiLightParameters* parameters,
     const nlMatrix4& viewMatrix)
 {
-    const nlFloatColour* colour = &parameters->lightColours[index];
+    nlFloatColour* colour = &parameters->lightColours[index];
     const GXSkinnedMultiLightParameters::PointLight* point = &parameters->pointLights[index];
     const nlVector3* direction = &parameters->lightDirections[index];
     nlVector3 transformed;
@@ -142,9 +143,7 @@ void GXMaterialProgramImpl<GXSkinnedMultiLightMaterialProgram>::Draw(
         static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters)->blendAmount,
         static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters)->blendAmount,
         static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters)->blendAmount } };
-    nlColour colour;
-    ConvertColour(colour, floatColour);
-    GXColor gxColour = *(GXColor*)&colour;
+    GXColor gxColour = gxConvertColour(floatColour);
     GXSetTevKColor(GX_KCOLOR0, gxColour);
     GXSetTevKColor(GX_KCOLOR1, gxColour);
     GXSetTevKColor(GX_KCOLOR2, gxColour);
@@ -176,23 +175,48 @@ void GXMaterialProgramImpl<GXSkinnedMultiLightMaterialProgram>::Draw(
         gxSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     }
 
+    GXSkinnedMultiLightParameters* parameters;
     if (diffuseLightCount > 0)
-        LoadMaterialDiffuseLight(0, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters), sSkinnedMultiLightViewMatrix);
+    {
+        parameters = static_cast<GXSkinnedMultiLightParameters*>(packet->materialParameters);
+        LoadMaterialDiffuseLight(0, parameters, sSkinnedMultiLightViewMatrix);
+    }
     if (diffuseLightCount > 1)
-        LoadMaterialDiffuseLight(1, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters), sSkinnedMultiLightViewMatrix);
+    {
+        parameters = static_cast<GXSkinnedMultiLightParameters*>(packet->materialParameters);
+        LoadMaterialDiffuseLight(1, parameters, sSkinnedMultiLightViewMatrix);
+    }
     if (diffuseLightCount > 2)
-        LoadMaterialDiffuseLight(2, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters), sSkinnedMultiLightViewMatrix);
+    {
+        parameters = static_cast<GXSkinnedMultiLightParameters*>(packet->materialParameters);
+        LoadMaterialDiffuseLight(2, parameters, sSkinnedMultiLightViewMatrix);
+    }
     if (diffuseLightCount > 3)
-        LoadMaterialDiffuseLight(3, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters), sSkinnedMultiLightViewMatrix);
+    {
+        parameters = static_cast<GXSkinnedMultiLightParameters*>(packet->materialParameters);
+        LoadMaterialDiffuseLight(3, parameters, sSkinnedMultiLightViewMatrix);
+    }
 
     if (specularLightCount > 0)
-        LoadMaterialSpecularLight(0, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters), sSkinnedMultiLightViewMatrix);
+    {
+        parameters = static_cast<GXSkinnedMultiLightParameters*>(packet->materialParameters);
+        LoadMaterialSpecularLight(0, parameters, sSkinnedMultiLightViewMatrix);
+    }
     if (specularLightCount > 1)
-        LoadMaterialSpecularLight(1, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters), sSkinnedMultiLightViewMatrix);
+    {
+        parameters = static_cast<GXSkinnedMultiLightParameters*>(packet->materialParameters);
+        LoadMaterialSpecularLight(1, parameters, sSkinnedMultiLightViewMatrix);
+    }
     if (specularLightCount > 2)
-        LoadMaterialSpecularLight(2, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters), sSkinnedMultiLightViewMatrix);
+    {
+        parameters = static_cast<GXSkinnedMultiLightParameters*>(packet->materialParameters);
+        LoadMaterialSpecularLight(2, parameters, sSkinnedMultiLightViewMatrix);
+    }
     if (specularLightCount > 3)
-        LoadMaterialSpecularLight(3, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters), sSkinnedMultiLightViewMatrix);
+    {
+        parameters = static_cast<GXSkinnedMultiLightParameters*>(packet->materialParameters);
+        LoadMaterialSpecularLight(3, parameters, sSkinnedMultiLightViewMatrix);
+    }
 
     static_cast<GXSkinnedMultiLightParameters*>(packet->materialParameters)->rampTexture.SetWrapS(true);
     static_cast<GXSkinnedMultiLightParameters*>(packet->materialParameters)->rampTexture.SetWrapT(true);

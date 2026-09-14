@@ -137,6 +137,7 @@ inline T* DLListContainerBase<T, Adapter>::AllocateAtEnd(
 {
     DLListEntry<T>* result;
     m_Allocator.Allocate(result);
+    new (result) DLListEntry<T>;
     nlDLRingAddEnd(&m_Head, result);
 
     if (outEntry != 0)

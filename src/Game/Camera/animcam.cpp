@@ -245,7 +245,7 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
 
 bool cAnimCamera::LoadCameraAnimation(nlChunk* begin, unsigned long, const char* cameraName, bool ownsKeyData)
 {
-    nlChunk* end = begin->GetNextChunk();
+    nlChunk* end = begin->GetLastChunk();
     nlChunk* first = begin->GetFirstChunk();
 
     cCameraData* pData = new (8, false) cCameraData();

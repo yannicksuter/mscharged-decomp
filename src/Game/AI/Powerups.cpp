@@ -1,3 +1,4 @@
+#include "Game/Weather.h"
 #include "Game/Sys/audio.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/Powerups.h"
@@ -14,6 +15,7 @@
 #include "Game/EventDataTypes.h"
 #include "Game/GameTweaks.h"
 #include "Game/GameInfo.h"
+#include "Game/Game.h"
 #include "Game/ObjectBlur.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBanana.h"
@@ -36,7 +38,6 @@ extern "C" float fn_8002BFA8(PlayerTweaks*, float);
 extern "C" float fn_8002CFF0(PlayerTweaks*);
 extern "C" void fn_800EDCE8(cPlayer*);
 extern "C" bool fn_8019C988(void*);
-extern "C" bool fn_800AA060(void*, int);
 extern "C" void fn_80146964(CollisionBallShellData*);
 extern "C" void fn_8014777C(void*);
 extern "C" void fn_801478C4(CollisionPlayerBananaData*);
@@ -51,14 +52,6 @@ enum eGameState
 {
     GS_GAMEPLAY = 4,
 };
-
-struct cGame
-{
-    /* 0x00 */ u8 unknown_0x00[0x18];
-    /* 0x18 */ eGameState m_eGameState;
-};
-
-extern cGame* g_pGame;
 
 u8 lbl_806DBDA0 = true;
 float lbl_806DBDA4 = 6.0f;
@@ -1202,7 +1195,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     }
 
     if (!gNPCManager->mpChainChomp->IsHidden()
-        || fn_800AA060(*(void**)((u8*)g_pGame + 0x10DC), 7))
+        || g_pGame->mpWeatherManager->GetWeather(7))
     {
         nChanceForChainChomp = 0;
     }

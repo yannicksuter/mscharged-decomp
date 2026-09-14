@@ -38,31 +38,11 @@
 #include "unclassified/tu_801A0E64.h"
 #include "unclassified/tu_801A5F10.h"
 #include "unclassified/tu_801B535C.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" void fn_8017617C();
 extern "C" void fn_801761E0();
 extern "C" void fn_80144AB8();
-
-extern "C" void fn_80065D4C(void*, EventDispatcher*, const char*, int);
-extern "C" void fn_80062254(void*, int);
-
-class UnidentifiedExternalEvent00
-{
-public:
-    UnidentifiedExternalEvent00(EventDispatcher* dispatcher, const char* name,
-        int length)
-    {
-        fn_80065D4C(this, dispatcher, name, length);
-    }
-
-    ~UnidentifiedExternalEvent00()
-    {
-        fn_80062254(this, -1);
-    }
-
-private:
-    unsigned char mStorage[0x2C];
-};
 
 
 class PhysicsEventQueue
@@ -78,7 +58,7 @@ public:
 
 public:
     EventDispatcher mDispatcher;
-    UnidentifiedExternalEvent00 mEvent00;
+    UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent00;
     UnidentifiedQueuedEvent<CollisionPlayerPlayerData> mEvent01;
     UnidentifiedQueuedEvent<CollisionPlayerWallData> mEvent02;
     UnidentifiedQueuedEvent<CollisionPlayerBallData> mEvent03;
@@ -106,7 +86,7 @@ public:
     UnidentifiedQueuedEvent<CollisionBulletBillData> mEvent25;
     UnidentifiedQueuedEvent<CollisionBulletBillData> mEvent26;
     UnidentifiedQueuedEvent<UnidentifiedEventData24> mEvent27;
-    UnidentifiedExternalEvent00 mEvent28;
+    UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent28;
     UnidentifiedQueuedEvent<UnidentifiedEventData25> mEvent29;
     UnidentifiedQueuedEvent<UnidentifiedEventData26> mEvent30;
     UnidentifiedQueuedEvent<UnidentifiedEventData26> mEvent31;
@@ -232,12 +212,11 @@ struct UnidentifiedMemberFunction
 extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" long __ptmf_test(UnidentifiedMemberFunction*);
 extern "C" UnidentifiedMemberFunction lbl_8050F58C;
-extern "C" unsigned char lbl_804DCC60[];
+extern "C" const nlVector3 lbl_804DCC60;
 
 extern "C" void fn_800156F8(void*, void*);
 extern "C" void fn_80015B38(void*, int);
 extern "C" void fn_8002E5F4(void*, int);
-extern "C" void fn_8004AC68(void*, nlVector3*, void*);
 extern "C" PhysicsSphere_80175F8C* fn_80176A60(const nlVector3*);
 
 extern "C" void fn_801452F4(void* object)
@@ -259,7 +238,7 @@ extern "C" void fn_80145318(void* object)
     nlVector3 direction;
     nlPolarToCartesian(direction.x, direction.y, *(unsigned short*)((unsigned char*)object + 0x62), 1.0f);
     direction.z = 0.0f;
-    fn_8004AC68(object, &direction, lbl_804DCC60);
+    ((cFielder*)object)->InitActionShellReact(direction, lbl_804DCC60);
 }
 
 extern "C" void fn_80145370(void* object)
@@ -325,6 +304,7 @@ extern "C" void fn_8014545C(void* data)
 extern "C" void fn_80032534(cFielder*, const nlVector3&);
 extern "C" bool fn_800167A8(cBall*);
 extern "C" void fn_800ED92C(unsigned long soundID);
+extern "C" void fn_80080EFC(cPlayer*);
 
 float lbl_806DCA90 = 1.0f;
 
@@ -438,7 +418,7 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
                     {
                         soundID = 0xF68B3F0F;
                     }
-                    fn_800ED92C(soundID);
+                    PlayCrowdReaction(soundID);
                 }
                 break;
             }
@@ -683,9 +663,7 @@ extern "C" void fn_8016A8F8(void*);
 
 extern "C" void fn_80145C9C()
 {
-    ((UnidentifiedQueuedEvent<UnidentifiedEventData00>*)&lbl_806E11F0->mEvent00)
-        ->Queue((UnidentifiedEventData00*)0,
-            Function<UnidentifiedEventData00*>());
+    lbl_806E11F0->mEvent00.Queue(Function<FnVoidVoid>());
 }
 
 extern "C" void fn_80145DD0(CollisionPlayerPlayerData* data)
@@ -706,10 +684,9 @@ extern "C" void fn_80146060(UnidentifiedEventData24* data)
         data, Function<UnidentifiedEventData24*>((void (*)(UnidentifiedEventData24*))fn_8016A670));
 }
 
-extern "C" void fn_801461A8(UnidentifiedEventData00* data)
+extern "C" void fn_801461A8()
 {
-    ((UnidentifiedQueuedEvent<UnidentifiedEventData00>*)&lbl_806E11F0->mEvent00)
-        ->Queue(data, Function<UnidentifiedEventData00*>());
+    lbl_806E11F0->mEvent28.Queue(Function<FnVoidVoid>());
 }
 
 extern "C" void fn_801462DC(CollisionPlayerBallData* data)

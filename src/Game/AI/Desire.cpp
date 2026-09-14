@@ -481,9 +481,9 @@ void DesireRunToTarget::UnidentifiedVirtual7(void* context, DebugWriteCache* cac
     }
 }
 
-class UnidentifiedWeatherExtendedStateF;
+class SandTombWeather;
 
-extern "C" int fn_800B04B4(UnidentifiedWeatherExtendedStateF*)
+extern "C" int fn_800B04B4(SandTombWeather*)
 {
     return 4;
 }

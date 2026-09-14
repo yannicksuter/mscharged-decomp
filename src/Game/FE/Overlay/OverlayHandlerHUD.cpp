@@ -1,4 +1,5 @@
 #include "Game/OverlayHandlerHUD.h"
+#include "NL/nlBasicString.inl"
 #include "Game/AI/Fielder.h"
 
 #include "Game/DB/GameProgress.h"

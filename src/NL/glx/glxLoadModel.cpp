@@ -212,7 +212,7 @@ GLSkinMesh* glx_MakeSkinMesh(
     mesh->SetHierarchy(hierarchy);
 
     nlChunk* chunk = outerChunk->GetFirstChunk();
-    nlChunk* chunkEnd = outerChunk->GetNextChunk();
+    nlChunk* chunkEnd = outerChunk->GetLastChunk();
     while (chunk != chunkEnd)
     {
         unsigned long chunkType = chunk->GetID();

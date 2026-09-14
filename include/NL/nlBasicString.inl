@@ -12,4 +12,11 @@ inline BasicString<CharT, Allocator>& BasicString<CharT, Allocator>::operator=(B
     return *this;
 }
 
+template <typename CharT, typename Allocator>
+inline const CharT* BasicString<CharT, Allocator>::c_str() const
+{
+    static CharT emptyString = 0;
+    return mData ? mData->c_str() : &emptyString;
+}
+
 #endif

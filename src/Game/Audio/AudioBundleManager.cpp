@@ -33,7 +33,7 @@ void AudioBundleManager::OnBundleLoaded(
     AudioBundleManager* self = (AudioBundleManager*)manager;
     self->m_LoadedData = data;
 
-    nlChunk* end = chunk->GetNextChunk();
+    nlChunk* end = chunk->GetLastChunk();
     chunk = chunk->GetFirstChunk();
     while (chunk != end)
     {

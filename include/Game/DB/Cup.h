@@ -10,8 +10,20 @@
 
 struct BaseCup
 {
+    bool IsHumanTeam(eTeamID team) const { return (mHumanTeams & (1 << team)) != 0; }
+
+    BaseCup()
+        : mUserSelectedTeam(-1)
+        , mUserSelectedSidekick()
+        , mRoundType(0)
+        , mRoundNumber(0)
+        , mGameNumber(0)
+        , mHumanTeams(0)
+    {
+    }
+
     /* 0x00 */ int mUserSelectedTeam;
-    /* 0x04 */ int mUserSelectedSidekick[3];
+    /* 0x04 */ CupSidekicks mUserSelectedSidekick;
     /* 0x10 */ int mRoundType;
     /* 0x14 */ s16 mRoundNumber;
     /* 0x16 */ s16 mGameNumber;

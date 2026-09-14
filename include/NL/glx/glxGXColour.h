@@ -5,6 +5,13 @@
 
 #include "NL/nlColour.h"
 
+inline GXColor gxConvertColour(const nlFloatColour& input)
+{
+    nlColour colour;
+    ConvertColour(colour, input);
+    return *(GXColor*)&colour;
+}
+
 inline void gxSetTevKColour(int stage, const nlColour& colour)
 {
     GXColor gxColour = { colour.c[0], colour.c[1], colour.c[2], colour.c[3] };

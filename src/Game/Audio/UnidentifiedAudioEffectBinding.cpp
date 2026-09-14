@@ -1,4 +1,5 @@
 #include "Game/Audio/UnidentifiedAudioScriptRuntime.h"
+#include "NL/nlFunction.inl"
 
 #include "Game/Audio/AudioEffects.h"
 #include "Game/Audio/AudioResourceRuntime.h"

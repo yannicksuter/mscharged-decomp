@@ -2,6 +2,7 @@
 #define GAME_GAMEINFO_H
 
 #include "Game/TrophyInfo.h"
+#include "Game/FE/feInput.h"
 #include "Game/DB/BasicGameInfo.h"
 #include "Game/DB/UserOptions.h"
 #include "NL/nlSingleton.h"
@@ -9,16 +10,7 @@
 
 typedef unsigned long long u64;
 
-/**
- * A three-word rules preset stored in the settings data. Its word fields
- * keep offset-derived names until their individual roles are established.
- */
-struct GameRules
-{
-    /* 0x0 */ int unknown_0x0;
-    /* 0x4 */ int unknown_0x4;
-    /* 0x8 */ int unknown_0x8;
-};
+typedef CupSidekicks GameRules;
 
 struct UserInfo
 {
@@ -212,7 +204,7 @@ public:
     /* 0x0126 */ bool mOnlineFriendSelectionMode;
     /* 0x0127 */ u8 unknown_0x127;
     /* 0x0128 */ GameInfoSlotEntry unknown_0x128[4];
-    /* 0x0278 */ int unknown_0x278;
+    /* 0x0278 */ eFEINPUT_PAD mMainUserPadNumber;
     /* 0x027C */ u8 mUseCurGameSettings;
     /* 0x027D */ u8 unknown_0x27D[3];
     /* 0x0280 */ AudioSettings mCurGameAudioSettings;

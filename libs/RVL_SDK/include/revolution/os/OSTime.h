@@ -10,19 +10,6 @@ extern "C" {
 #endif
 
 
-typedef struct OSCalendarTime {
-    s32 sec;
-    s32 min;
-    s32 hour;
-    s32 mday;
-    s32 month;
-    s32 year;
-    s32 wday;
-    s32 yday;
-    s32 msec;
-    s32 usec;
-} OSCalendarTime;
-
 #define OS_TIME_SPEED (OS_BUS_CLOCK_SPEED / 4)
 
 #define OS_TICKS_TO_SEC(x) ((x) / OS_TIME_SPEED)
@@ -44,9 +31,6 @@ typedef struct OSCalendarTime {
 
 #define OS_TICKS_DELTA(x, y) ((s32)(x) - (s32)(y))
 #define OSDiffTick(tick1, tick0) ((s32)(tick1) - (s32)(tick0))
-
-void OSTicksToCalendarTime(OSTime time, OSCalendarTime* calendar);
-OSTime OSCalendarTimeToTicks(const OSCalendarTime* calendar);
 
 #ifdef __cplusplus
 }

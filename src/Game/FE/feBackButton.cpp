@@ -1,4 +1,5 @@
 #include "Game/FE/feBackButton.h"
+#include "NL/nlFunction.inl"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/FEAudio.h"

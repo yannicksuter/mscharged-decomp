@@ -299,9 +299,7 @@ public:
     }
     bool IsInvincibleChars() const
     {
-        bool result = false;
-        if (!IsStuck() && (muInvincibleStatus & 1))
-            result = true;
+        bool result = !IsStuck() && (muInvincibleStatus & 1);
         return result;
     }
     void TestCollisionForInvicibility(cFielder* pOpponent);

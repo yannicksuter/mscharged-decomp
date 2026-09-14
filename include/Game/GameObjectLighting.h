@@ -37,13 +37,13 @@ extern "C"
     int IsGameObjectLightingEnabled();
     int ShouldUseGameObjectLightTexture(int character);
     int ShouldDoubleGameObjectLighting();
-    int GetGameObjectLightCount(int character, int includeEffects);
+    int GetGameObjectLightCount(bool character, bool includeEffects);
     GameObjectLight* GetGameObjectLight(s32 index, bool character);
     void LoadGameObjectSpecularLight(s32 index, GameObjectLight* light, f32 exponent, const nlMatrix4& viewMatrix);
     void SetGameObjectSpecularLightingEnabled(s32 enabled, s32 count);
     unsigned long GetGameObjectLightTexture();
     void LoadGameObjectLights(s32 count, GLView* view, bool character);
-    void SetGameObjectLightingEnabled(s32 enabled, s32 count, s32 useVertexColour);
+    void SetGameObjectLightingEnabled(bool enabled, s32 count, bool useVertexColour);
     void SetGameObjectAmbientLightingEnabled(s32 enabled);
     void ApplyGameObjectShadowLighting(s32 skinned, u32 shadowLevel);
     void RestoreGameObjectShadowLighting();

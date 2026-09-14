@@ -1534,7 +1534,7 @@ void cTeam::AssignMarks(bool bForceReMark)
                           || Incapacitated(pMyFielder);
         if (!bUnidentified)
         {
-            fDownfield = DownfieldFrom(
+            fDownfield = NearTo(
                 pMyFielder, pUnidentifiedFielder);
             float fInBetween =
                 InBetweenMyNetAnd(pMyFielder, pUnidentifiedFielder);

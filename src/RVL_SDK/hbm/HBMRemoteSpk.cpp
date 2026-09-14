@@ -1,16 +1,16 @@
 #include "revolution/hbm/homebutton/HBMRemoteSpk.hpp"
 
-#include "revolution/hbm/homebutton/HBMController.hpp"
-
 #include "string.h"
 
 namespace homebutton {
 
+RemoteSpk* RemoteSpk::spInstance;
+
 static bool MakeVolumeData(const s16* src, s16* dst, int vol, u32 size);
 
-void RemoteSpk::SetInstance(RemoteSpk* pThis) { Controller::SetInstance(pThis); }
+void RemoteSpk::SetInstance(RemoteSpk* pThis) { spInstance = pThis; }
 
-RemoteSpk* RemoteSpk::GetInstance(void) { return Controller::GetInstance(); }
+RemoteSpk* RemoteSpk::GetInstance(void) { return spInstance; }
 
 void RemoteSpk::GetPCMFromSeID(int in_ID, s16*& out_wave, int& out_length) {
     ARCFileInfo af;

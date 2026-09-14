@@ -84,6 +84,19 @@ public:
     static void SetDontUseLowestNetTextureLOD(bool value);
     void SetTexture(unsigned long texture);
 
+    float GetOuterX(float side) const
+    {
+        if (side > 0.0f)
+        {
+            return mfMaxX;
+        }
+        return mfMinX;
+    }
+    float GetOuterX(const nlVector3& v3Position) const
+    {
+        return GetOuterX(v3Position.x);
+    }
+
     /* 0x00 */ int m_iClosestParticle;
     /* 0x04 */ bool mbInitialized;
     /* 0x05 */ bool mbFirstUpdate;

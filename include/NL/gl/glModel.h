@@ -13,6 +13,14 @@ struct glTextureBinding
     /* 0x06 */ u8 flags;
     /* 0x07 */ u8 unknown07;
 
+    glTextureBinding(u32 handle = 0)
+    {
+        texture = handle;
+        textureIndex = 0xFFFF;
+        flags = 0;
+        unknown07 = 0;
+    }
+
     void SetWrapS(unsigned char enabled)
     {
         flags = (flags & 2) | enabled;

@@ -22,6 +22,7 @@
 #include "NL/nlBind.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
+#include "unclassified/tu_80174ED4.h"
 
 #include <math.h>
 

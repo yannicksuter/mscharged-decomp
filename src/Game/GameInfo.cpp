@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-static const GameRules kDefaultRules[12] = {
+static const int kDefaultRules[12][3] = {
     { 1, 1, 7 },
     { 4, 5, 5 },
     { 6, 1, 5 },
@@ -48,10 +48,8 @@ GameInfoManager::GameInfoManager()
     , mOnlineRankedMatch(false)
     , mOnlineTwoLocalPlayers(false)
     , mOnlineFriendSelectionMode(false)
-    , unknown_0x278(0)
+    , mMainUserPadNumber(FE_PAD1_ID)
 {
-    memset(mRulesTable, 0, sizeof(mRulesTable));
-
     unknown_0x71C8 = 0;
     mGameInfo[GM_FRIENDLY] = 0;
     mGameInfo[GM_MODE_1] = 0;
@@ -106,7 +104,9 @@ GameInfoManager::GameInfoManager()
     sThis = this;
 
     for (int i = 0; i < 12; i++) {
-        mRulesTable[i] = kDefaultRules[i];
+        mRulesTable[i].mValues[0] = (eSidekickID)kDefaultRules[i][0];
+        mRulesTable[i].mValues[1] = (eSidekickID)kDefaultRules[i][1];
+        mRulesTable[i].mValues[2] = (eSidekickID)kDefaultRules[i][2];
     }
 
     memset(mSaveSlots, 0, sizeof(mSaveSlots));
@@ -142,18 +142,12 @@ void GameInfoManager::SetTeam(short side, int team)
 
 int GameInfoManager::GetSidekick(short side, int slot) const
 {
-    return mGameInfo[mCurrentMode]->mSidekickIndex[side][slot];
+    return mGameInfo[mCurrentMode]->GetSidekick(side, slot);
 }
 
 void GameInfoManager::SetSidekick(short side, int sidekick, int slot)
 {
-    BasicGameInfo* info = mGameInfo[mCurrentMode];
-
-    for (int i = 0; i < 3; i++) {
-        if (slot < 0 || slot == i) {
-            info->mSidekickIndex[side][i] = sidekick;
-        }
-    }
+    mGameInfo[mCurrentMode]->SetSidekick(side, sidekick, slot);
 }
 
 int GameInfoManager::GetStadium() const
@@ -832,5 +826,7 @@ int GameInfoManager::GetRule0x0() const
 
 void GameInfoManager::ResetRules(int index)
 {
-    mRulesTable[index] = kDefaultRules[index];
+    mRulesTable[index].mValues[0] = (eSidekickID)kDefaultRules[index][0];
+    mRulesTable[index].mValues[1] = (eSidekickID)kDefaultRules[index][1];
+    mRulesTable[index].mValues[2] = (eSidekickID)kDefaultRules[index][2];
 }

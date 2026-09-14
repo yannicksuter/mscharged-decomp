@@ -247,9 +247,9 @@ void GXMaterialProgramImpl<GXCharacterDamageMaterialProgram>::Draw(
         glTextureBinding fresnelBinding;
         fresnelBinding.texture = fresnelTexture;
         fresnelBinding.flags = 0;
-        fresnelBinding.unknown07 = 0;
         fresnelBinding.SetWrapS(true);
         fresnelBinding.SetWrapT(true);
+        fresnelBinding.unknown07 = 0;
         fresnelBinding.textureIndex = sCharacterDamageFresnelTextureIndices[fresnelRamp];
         glx_BindTexture(fresnelTextureSlot, &fresnelBinding);
     }

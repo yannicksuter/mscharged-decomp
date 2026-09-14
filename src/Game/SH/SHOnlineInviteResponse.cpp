@@ -1,4 +1,6 @@
 #include "Game/SH/SHOnlineInviteResponse.h"
+#include "NL/nlBasicString.inl"
+#include "NL/nlFunction.inl"
 #include "Game/SH/SHOnlineInviteStatus.h"
 #include "Game/FE/FEAudio.h"
 

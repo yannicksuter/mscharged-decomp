@@ -212,8 +212,3 @@ void PhysicsUpdate(PhysicsWorld* world, float dt)
         fn_80144130(lbl_806E11F0);
     }
 }
-
-extern "C" bool fn_8013E2E4()
-{
-    return true;
-}
