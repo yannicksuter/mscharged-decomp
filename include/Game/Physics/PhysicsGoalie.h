@@ -22,6 +22,7 @@ public:
         const nlVector3& ballCurrentPosition, nlVector3& contactNormal,
         nlVector3& positionWhenHit) const;
     void CollideGoalieWithPost();
+    void CollideHeldBallWithGoalLine();
 
     static bool IsBallNearGoalie(float goalieRadius, float ballRadius,
         const nlVector3& goaliePos,

@@ -444,7 +444,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual7()
         }
 
         nlVector3 position;
-        formation->m_Positions[GetFielder()->m_ID].GetLocationForTeam(
+        formation->m_Positions[GetFielder()->mUnidentified1E4.m_ID].GetLocationForTeam(
             *(nlVector2*)&position, team->m_nSide);
         position.z = 0.0f;
         state = 13;

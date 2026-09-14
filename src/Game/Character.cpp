@@ -26,8 +26,8 @@
 #include "Game/Ball.h"
 #include "Game/Render/BirdoEgg.h"
 #include "unclassified/tu_801B535C.h"
-#include "Game/Physics/PhysicsSphere_801798A8.h"
-#include "Game/BulletBill.h"
+#include "Game/Physics/PhysicsYoshiEgg.h"
+#include "Game/Render/BulletBill.h"
 #include "unclassified/tu_80175F8C.h"
 #include "unclassified/tu_801A5F10.h"
 #include "Game/ExcitementSystem.h"
@@ -1451,7 +1451,7 @@ extern "C" void fn_80020FD4(CollisionBulletBillData* pEventData)
     if (g_pGame != NULL && pEventData->bulletBill->active)
     {
         fn_80176754(pEventData->bulletBill);
-        fn_8019ABB8(pEventData->bulletBill, false);
+        pEventData->bulletBill->Hide(false);
         PlayOwnedSound(pEventData->bulletBill->target->mUnidentified318,
             0xFD0DC03DUL, (XSoundOwner*)g_pBall->mUnidentifiedEC, NULL, NULL);
     }

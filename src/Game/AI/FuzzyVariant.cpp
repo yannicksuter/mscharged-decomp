@@ -53,7 +53,7 @@ NLString FuzzyVariant::ToString() const
                 int playerID;
                 const char* playerName;
                 playerName = GetCharacterInfo(pPlayer->mUnidentified024.m_eCharacterClass).mName;
-                playerID = pPlayer->m_ID;
+                playerID = pPlayer->mUnidentified1E4.m_ID;
                 dataString = Format(formatString, playerID, playerName);
             }
             break;

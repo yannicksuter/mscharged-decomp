@@ -12,7 +12,7 @@ class cPlayer;
 class Desire;
 class SpaceSearch;
 class UnidentifiedScriptMachine;
-struct UnidentifiedDesireUpdate;
+typedef UnidentifiedVariant_80054AB8 UnidentifiedDesireUpdate;
 
 extern "C" Desire* fn_8002E08C(cFielder*, int);
 
@@ -256,6 +256,8 @@ private:
 class DesireRunInDirection : public Desire
 {
 public:
+    float GetMaxDistance() const { return m_fMaxDistance; }
+    float GetDistanceTravelled() const { return m_fDistTravelled; }
     DesireRunInDirection(
         int state, const UnidentifiedStateTransition& transition)
         : Desire(state, transition)

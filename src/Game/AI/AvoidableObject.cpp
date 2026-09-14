@@ -8,7 +8,7 @@
 #include "Game/GameTweaks.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsPatch.h"
-#include "Game/Physics/PhysicsSphere_801798A8.h"
+#include "Game/Physics/PhysicsYoshiEgg.h"
 #include "Game/Player.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/ChainChomp.h"
@@ -604,53 +604,13 @@ static inline void InitPolygon(AvoidablePolygon* pPolygon)
     pPolygon->mUnidentified064 = 0;
 }
 
-static inline void BuildPolygon(AvoidablePolygon* pPolygon,
-    const nlVector2& a, const nlVector2& b, float fHalfWidth)
-{
-    // Retail zero-initializes one more stack vector here that is never read.
-    nlVector2 v2Temp = v2Zero;
-    nlVec2Sub(pPolygon->mNormals[1], b, a);
-    float fScale = nlRecipSqrt(nlVec2LengthSquared(pPolygon->mNormals[1]), true);
-    nlVec2Set(pPolygon->mNormals[1], fScale * pPolygon->mNormals[1].x,
-        fScale * pPolygon->mNormals[1].y);
-    nlVec2Set(pPolygon->mNormals[3], -pPolygon->mNormals[1].x,
-        -pPolygon->mNormals[1].y);
-    {
-        float fCos;
-        float fSin;
-        nlSinCos(&fSin, &fCos, 0x4000);
-        pPolygon->mNormals[0].x
-            = pPolygon->mNormals[1].x * fCos - pPolygon->mNormals[1].y * fSin;
-        pPolygon->mNormals[0].y
-            = pPolygon->mNormals[1].y * fCos + pPolygon->mNormals[1].x * fSin;
-    }
-    {
-        float fCos;
-        float fSin;
-        nlSinCos(&fSin, &fCos, 0x4000);
-        pPolygon->mNormals[2].x
-            = pPolygon->mNormals[3].x * fCos - pPolygon->mNormals[3].y * fSin;
-        pPolygon->mNormals[2].y
-            = pPolygon->mNormals[3].y * fCos + pPolygon->mNormals[3].x * fSin;
-    }
-    float fExtent = 0.5f * fHalfWidth;
-    nlVec2Set(pPolygon->mPoints[0], fExtent * pPolygon->mNormals[0].x + a.x,
-        fExtent * pPolygon->mNormals[0].y + a.y);
-    nlVec2Set(pPolygon->mPoints[1], fExtent * pPolygon->mNormals[0].x + b.x,
-        fExtent * pPolygon->mNormals[0].y + b.y);
-    nlVec2Set(pPolygon->mPoints[2], fExtent * pPolygon->mNormals[2].x + b.x,
-        fExtent * pPolygon->mNormals[2].y + b.y);
-    nlVec2Set(pPolygon->mPoints[3], fExtent * pPolygon->mNormals[2].x + a.x,
-        fExtent * pPolygon->mNormals[2].y + a.y);
-}
-
 AvoidablePolygon::AvoidablePolygon(
     int mode, const nlVector3& a, const nlVector3& b, float width)
     : AvoidableObject(AVOID_UNIDENTIFIED_08)
 {
     InitPolygon(this);
     mUnidentified014 = mode;
-    BuildPolygon(this, *(const nlVector2*)&a, *(const nlVector2*)&b, width);
+    Update(*(const nlVector2*)&a, *(const nlVector2*)&b, width);
 }
 
 AvoidablePolygon::AvoidablePolygon(
@@ -663,7 +623,7 @@ AvoidablePolygon::AvoidablePolygon(
     mUnidentified014 = mode;
     nlVec2Set(a, center.x, center.y - 0.5f * width);
     nlVec2Set(b, center.x, center.y + 0.5f * width);
-    BuildPolygon(this, a, b, length);
+    Update(a, b, length);
 }
 
 AvoidablePolygon::~AvoidablePolygon()
@@ -796,4 +756,3 @@ bool AvoidablePolygon::UnidentifiedVirtual20(
     }
     return bInside;
 }
-

@@ -59,6 +59,7 @@ public:
 
     static void CreateInstance();
     static NetTournManager* Instance();
+    int fn_801CA9D0() const { return mWinningMachine; }
     static void GenerateFirstRoundSeedings(int machineCount, u8* seedings);
 
     void Reset(bool clearTeams);

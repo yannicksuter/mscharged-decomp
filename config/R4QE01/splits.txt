@@ -1004,7 +1004,7 @@ Game/Physics/PhysicsFakeBall.cpp:
 	.sbss       start:0x806E1280 end:0x806E1298
 	.sdata2     start:0x806E4928 end:0x806E4968
 
-unclassified/tu_8016F34C.cpp:
+Game/Physics/PhysicsGoalie.cpp:
 	.text       start:0x8016F520 end:0x80170028
 	.ctors      start:0x804DB65C end:0x804DB660
 	.rodata     start:0x804DCC80 end:0x804DCC90
@@ -1020,7 +1020,7 @@ Game/Physics/PhysicsGroundPlane.cpp:
 	.data       start:0x805106A8 end:0x805106D8
 	.sdata2     start:0x806E4998 end:0x806E49A0
 
-unclassified/tu_801700D8.cpp:
+Game/Physics/PhysicsHammer.cpp:
 	.text       start:0x801700D8 end:0x801709D0
 	.ctors      start:0x804DB660 end:0x804DB664
 	.rodata     start:0x804DCC90 end:0x804DCCA0
@@ -1030,7 +1030,7 @@ unclassified/tu_801700D8.cpp:
 	.sbss       start:0x806E1298 end:0x806E12A8
 	.sdata2     start:0x806E49A0 end:0x806E49B0
 
-unclassified/tu_801709D0.cpp:
+Game/Physics/PhysicsKoopaShell.cpp:
 	.text       start:0x801709D0 end:0x80171298
 	.ctors      start:0x804DB664 end:0x804DB668
 	.data       start:0x80510790 end:0x80510848
@@ -1084,7 +1084,7 @@ Game/Physics/PhysicsThwomp.cpp:
 	.sbss       start:0x806E12D8 end:0x806E12E8
 	.sdata2     start:0x806E4A80 end:0x806E4A98
 
-unclassified/tu_80177498.cpp:
+Game/Physics/PhysicsWaluigiWall.cpp:
 	.text       start:0x80177498 end:0x80179858
 	.ctors      start:0x804DB678 end:0x804DB67C
 	.data       start:0x80510FD8 end:0x805110E8
@@ -1096,15 +1096,15 @@ unclassified/tu_80177498.cpp:
 unclassified/tu_80179858.cpp:
 	.text       start:0x80179858 end:0x801798A8
 	.data       start:0x805110E8 end:0x80511118
-	.sdata2     start:0x806E4AE8 end:0x806E4AEC
+	.sdata2     start:0x806E4AE8 end:0x806E4AF0
 
-unclassified/tu_801798A8.cpp:
+Game/Physics/PhysicsYoshiEgg.cpp:
 	.text       start:0x801798A8 end:0x8017A0F0
 	.ctors      start:0x804DB67C end:0x804DB680
 	.data       start:0x80511118 end:0x805111D0
-	.sdata2     start:0x806E4AEC end:0x806E4B00 align:4
+	.sdata2     start:0x806E4AF0 end:0x806E4B00
 
-unclassified/tu_8017A0F0.cpp:
+Game/Drawable/DrawableModel.cpp:
 	.text       start:0x8017A0F0 end:0x8017A9EC
 	.ctors      start:0x804DB680 end:0x804DB684
 	.data       start:0x805111D0 end:0x805111F8
@@ -1306,7 +1306,7 @@ Game/Render/BirdoEgg.cpp:
 	.sdata      start:0x806DCD68 end:0x806DCD80
 	.sdata2     start:0x806E4ED0 end:0x806E4EE0
 
-unclassified/tu_8019A710.cpp:
+Game/Render/BulletBill.cpp:
 	.text       start:0x8019A710 end:0x8019AE7C
 	.ctors      start:0x804DB6E4 end:0x804DB6E8
 	.rodata     start:0x804DCDB8 end:0x804DCDD0

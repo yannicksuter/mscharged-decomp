@@ -45,6 +45,10 @@ public:
     void KillBlurHandler();
     void ClearBallBlur();
     void SetOwner(cPlayer* pOwner);
+    const nlVector3& GetPosition() const
+    {
+        return m_v3Position;
+    }
     void SetPosition(const nlVector3& pos);
     void SetVelocity(const nlVector3& velocity, eSpinType spin,
         const nlVector3* pAngularVelocity);
@@ -66,6 +70,10 @@ public:
     void InitiateBallBlur(
         eBallShotEffectType effectType, cPlayer* pPlayer);
     bool GetInNet(int& nSide);
+    bool HasActivePassTarget() const
+    {
+        return (meBallState == 5 || meBallState == 3) && m_pPassTarget != 0;
+    }
 
     /* 0x00 */ bool m_bVisible;
     /* 0x01 */ u8 mPadding001[0x03];

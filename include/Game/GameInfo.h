@@ -167,6 +167,7 @@ public:
     bool IsRule0x0Equal11() const;
 
     UserInfo& GetUserInfo();
+    int fn_801CA658() const { return mCurrentMode; }
     AudioSettings* GetAudioSettings();
     VisualSettings* GetVisualOptions();
     void ResetUnknown0xA0();

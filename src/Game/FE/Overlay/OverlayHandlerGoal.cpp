@@ -46,11 +46,11 @@ void GoalOverlay::fn_801F178C(GoalScoredData* data)
     int playerIndex;
     if (data->uGoalType == 5)
     {
-        playerIndex = data->pLastTouch[data->uTeamIndex]->m_ID;
+        playerIndex = data->pLastTouch[data->uTeamIndex]->mUnidentified1E4.m_ID;
     }
     else
     {
-        playerIndex = data->pScorer->m_ID;
+        playerIndex = data->pScorer->mUnidentified1E4.m_ID;
     }
     UpdateGoalInfo(data->uTeamIndex, playerIndex, false, data->uNumGoalsScored);
 }

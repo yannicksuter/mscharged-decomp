@@ -2,45 +2,22 @@
 #include "Game/Render/BirdoEgg.h"
 
 #include "Game/AI/Fielder.h"
-#include "Game/Render/BirdoEgg.h"
 #include "Game/AI/Powerups.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Physics/Physics.h"
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsCharacter.h"
+#include "Game/Physics/PhysicsEventQueue.h"
+#include "Game/Physics/PhysicsHammer.h"
 #include "Game/Physics/PhysicsNPC.h"
+#include "Game/Physics/PhysicsPatch.h"
 #include "Game/Physics/PhysicsShell.h"
+#include "Game/Physics/PhysicsYoshiEgg.h"
 #include "Game/Render/SkinAnimatedNPC.h"
+#include "unclassified/tu_801A0E64.h"
+#include "unclassified/tu_801B535C.h"
 #include "NL/nlSlotPool.h"
 #include "Game/UnidentifiedStaticStorage.h"
-
-struct CollisionCrackEggData
-{
-    void* mUnidentified00;
-    cFielder* player;
-    void* source;
-    void* mUnidentified0C;
-    void* mUnidentified10;
-};
-
-extern SlotPool<CollisionCrackEggData> lbl_80570188;
-
-extern "C" void fn_80146FCC(CollisionBirdoShotBallPlayerData*);
-extern "C" void fn_80147114(CollisionBirdoEggGoalieData*);
-extern "C" void fn_8014725C(CollisionBirdoEggEndData*);
-extern "C" void fn_801490E0(PowerupBase*);
-extern "C" void fn_80149358(void*);
-extern "C" void fn_801495D0(cFielder*);
-extern "C" void fn_80149EFC(CollisionCrackEggData*);
-
-static inline void QueueBirdoEggEnd(BirdoEggObject* egg, bool cracked)
-{
-    CollisionBirdoEggEndData* eventData = 0;
-    g_CollisionBirdoEggEndDataPool.Allocate(eventData);
-    eventData->egg = egg;
-    eventData->cracked = cracked;
-    fn_8014725C(eventData);
-}
 
 PhysicsBirdoEgg::PhysicsBirdoEgg(BirdoEggObject* egg, float radius)
     : PhysicsSphere(g_CollisionSpace, 0, radius)
@@ -55,6 +32,9 @@ ContactType PhysicsBirdoEgg::Contact(
     PhysicsObject* other, dContact*, int)
 {
     nlVector3 eggPosition;
+    CollisionBirdoShotBallPlayerData* shotData;
+    CollisionBirdoEggGoalieData* goalieData;
+    CollisionBirdoEggEndData* endData;
     GetPosition(&eggPosition);
 
     switch (other->GetObjectType())
@@ -70,9 +50,7 @@ ContactType PhysicsBirdoEgg::Contact(
             {
                 return NO_CONTACT;
             }
-
-            float radius = GetRadius();
-            if (fielder->IsCharacterInAir(GetPosition().z + radius))
+            if (fielder->IsCharacterInAir(GetPosition().z + GetRadius()))
             {
                 return NO_CONTACT;
             }
@@ -81,135 +59,186 @@ ContactType PhysicsBirdoEgg::Contact(
                 break;
             }
 
-            CollisionBirdoShotBallPlayerData* eventData = 0;
-            g_CollisionBirdoShotBallPlayerDataPool.Allocate(eventData);
-            eventData->player = fielder;
-            eventData->egg = mBirdoEgg;
-            fn_80146FCC(eventData);
+            shotData = 0;
+            g_CollisionBirdoShotBallPlayerDataPool.Allocate(shotData);
+            shotData->player = fielder;
+            shotData->egg = mBirdoEgg;
+            QueueCollisionBirdoShotBallPlayer(shotData);
 
-            if (!fielder->fn_8003E73C()
-                && mBirdoEgg->mShooter->m_pBall == 0)
+            if (!fielder->fn_8003E73C() && mBirdoEgg->mShooter->m_pBall == 0)
             {
-                QueueBirdoEggEnd(mBirdoEgg, false);
+                endData = 0;
+                g_CollisionBirdoEggEndDataPool.Allocate(endData);
+                endData->egg = mBirdoEgg;
+                endData->cracked = false;
+                QueueCollisionBirdoEggEnd(endData);
             }
         }
         else
         {
-            CollisionBirdoEggGoalieData* eventData = 0;
-            g_CollisionBirdoEggGoalieDataPool.Allocate(eventData);
-            eventData->goalie = character;
-            eventData->egg = mBirdoEgg;
-            fn_80147114(eventData);
+            goalieData = 0;
+            g_CollisionBirdoEggGoalieDataPool.Allocate(goalieData);
+            goalieData->goalie = character;
+            goalieData->egg = mBirdoEgg;
+            QueueCollisionBirdoEggGoalie(goalieData);
         }
         break;
     }
-    case 0x14:
     case 0x15:
     {
-        PowerupBase* powerup = other->GetObjectType() == 0x14
-                                 ? ((PhysicsShell*)other)->m_pPowerupObject
-                                 : ((PhysicsBanana*)other)->m_pPowerupObject;
-        if (powerup->m_pThrower == mBirdoEgg->mShooter
+        PowerupBase* powerup = ((PhysicsBanana*)other)->m_pPowerupObject;
+        if (mBirdoEgg->mShooter == powerup->m_pThrower
             && powerup->mtNoHitTimer.m_uPackedTime != 0)
         {
             return NO_CONTACT;
         }
-
-        fn_801490E0(powerup);
-        if (other->GetObjectType() == 0x15
-            && powerup->m_eType == POWER_UP_BOBOMB)
+        QueueBirdoEggDestroyPowerup((UnidentifiedEventData27*)powerup);
+        if (((PhysicsBanana*)other)->m_pPowerupObject->m_eType == POWER_UP_BOBOMB)
         {
-            QueueBirdoEggEnd(mBirdoEgg, false);
+            endData = 0;
+            g_CollisionBirdoEggEndDataPool.Allocate(endData);
+            endData->egg = mBirdoEgg;
+            endData->cracked = false;
+            QueueCollisionBirdoEggEnd(endData);
+        }
+        break;
+    }
+    case 0x14:
+    {
+        PowerupBase* powerup = ((PhysicsShell*)other)->m_pPowerupObject;
+        if (mBirdoEgg->mShooter == powerup->m_pThrower
+            && powerup->mtNoHitTimer.m_uPackedTime != 0)
+        {
+            return NO_CONTACT;
+        }
+        QueueBirdoEggDestroyPowerup((UnidentifiedEventData27*)powerup);
+        break;
+    }
+    case 0x1F:
+    {
+        HammerObject* hammer = ((PhysicsHammer*)other)->mHammer;
+        if (mBirdoEgg->mShooter == hammer->_034)
+        {
+            bool isTimerRunning = hammer->_01C > 0.0f;
+            if (isTimerRunning)
+            {
+                return NO_CONTACT;
+            }
+        }
+        QueueBirdoEggDestroyHammer((UnidentifiedEventData35*)hammer);
+        break;
+    }
+    case 0x20:
+    {
+        UnidentifiedObject_801B535C* egg = ((PhysicsYoshiEgg*)other)->mYoshiEgg;
+        if (egg->mUnidentified28)
+        {
+            endData = 0;
+            g_CollisionBirdoEggEndDataPool.Allocate(endData);
+            endData->egg = mBirdoEgg;
+            endData->cracked = true;
+            QueueCollisionBirdoEggEnd(endData);
+
+            UnidentifiedEventData34* crackData = 0;
+            lbl_80570188.Allocate(crackData);
+            crackData->mUnidentified00 = 0;
+            crackData->mUnidentified04 = egg->mUnidentified34;
+            crackData->mUnidentified08 = egg;
+            crackData->mUnidentified0C = 0;
+            crackData->mUnidentified10 = 0;
+            QueueCollisionCrackEgg(crackData);
         }
         break;
     }
     case 0x18:
     {
-        SkinAnimatedNPC* npc
-            = (SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC;
-        if (npc->GetSkinAnimatedNPC_Type() == SkinAnimatedNPC_CHAIN_CHOMP)
+        bool isChainChomp
+            = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)
+                  ->GetSkinAnimatedNPC_Type()
+            == SkinAnimatedNPC_CHAIN_CHOMP;
+        if (isChainChomp)
         {
-            QueueBirdoEggEnd(mBirdoEgg, true);
-        }
-        if (npc->GetSkinAnimatedNPC_Type() == SkinAnimatedNPC_BOWSER)
-        {
-            QueueBirdoEggEnd(mBirdoEgg, true);
-        }
-        break;
-    }
-    case 0x1C:
-    {
-        u8* object = (u8*)other;
-        if (object[0x65] != 0)
-        {
-            break;
+            CollisionBirdoEggEndData* eventData = 0;
+            g_CollisionBirdoEggEndDataPool.Allocate(eventData);
+            eventData->egg = mBirdoEgg;
+            eventData->cracked = true;
+            QueueCollisionBirdoEggEnd(eventData);
         }
 
-        switch (*(u32*)(object + 0x48))
+        bool isBowser
+            = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)
+                  ->GetSkinAnimatedNPC_Type()
+            == SkinAnimatedNPC_BOWSER;
+        if (isBowser)
         {
-        case 1:
-        case 3:
-        case 8:
-            QueueBirdoEggEnd(mBirdoEgg, true);
-            break;
-        case 6:
-        {
-            cFielder* fielder = *(cFielder**)(object + 0x4C);
-            bool protectedFromEgg = false;
-            if (!fielder->IsStuck()
-                && (*(u32*)((u8*)fielder + 0x454) & 0x1F) == 0x1F)
-            {
-                protectedFromEgg = true;
-            }
-            if (!protectedFromEgg)
-            {
-                fn_801495D0(fielder);
-            }
-            break;
-        }
-        default:
-            break;
-        }
-        break;
-    }
-    case 0x1E:
-    case 0x23:
-        QueueBirdoEggEnd(mBirdoEgg, false);
-        break;
-    case 0x1F:
-    {
-        u8* hammer = *(u8**)((u8*)other + 0x38);
-        if (*(cFielder**)(hammer + 0x34) == mBirdoEgg->mShooter
-            && *(float*)(hammer + 0x1C) > 0.0f)
-        {
-            return NO_CONTACT;
-        }
-        fn_80149358(hammer);
-        break;
-    }
-    case 0x20:
-    {
-        u8* source = *(u8**)((u8*)other + 0x3C);
-        if (*(bool*)(source + 0x28))
-        {
-            QueueBirdoEggEnd(mBirdoEgg, true);
-
-            CollisionCrackEggData* eventData = 0;
-            lbl_80570188.Allocate(eventData);
-            eventData->mUnidentified00 = 0;
-            eventData->player = *(cFielder**)(source + 0x34);
-            eventData->source = source;
-            eventData->mUnidentified0C = 0;
-            eventData->mUnidentified10 = 0;
-            fn_80149EFC(eventData);
+            CollisionBirdoEggEndData* eventData = 0;
+            g_CollisionBirdoEggEndDataPool.Allocate(eventData);
+            eventData->egg = mBirdoEgg;
+            eventData->cracked = true;
+            QueueCollisionBirdoEggEnd(eventData);
         }
         break;
     }
     case 0x24:
-        QueueBirdoEggEnd(mBirdoEgg, true);
+    {
+        CollisionBirdoEggEndData* eventData = 0;
+        g_CollisionBirdoEggEndDataPool.Allocate(eventData);
+        eventData->egg = mBirdoEgg;
+        eventData->cracked = true;
+        QueueCollisionBirdoEggEnd(eventData);
         break;
-    default:
+    }
+    case 0x1E:
+    {
+        CollisionBirdoEggEndData* eventData = 0;
+        g_CollisionBirdoEggEndDataPool.Allocate(eventData);
+        eventData->egg = mBirdoEgg;
+        eventData->cracked = false;
+        QueueCollisionBirdoEggEnd(eventData);
         break;
+    }
+    case 0x23:
+    {
+        CollisionBirdoEggEndData* eventData = 0;
+        g_CollisionBirdoEggEndDataPool.Allocate(eventData);
+        eventData->egg = mBirdoEgg;
+        eventData->cracked = false;
+        QueueCollisionBirdoEggEnd(eventData);
+        break;
+    }
+    case 0x1C:
+    {
+        PhysicsPatch* patch = (PhysicsPatch*)other;
+        if (patch->m_bKillMe)
+        {
+            break;
+        }
+
+        switch (patch->m_Type)
+        {
+        case 1:
+        case 3:
+        case 8:
+        {
+            CollisionBirdoEggEndData* eventData = 0;
+            g_CollisionBirdoEggEndDataPool.Allocate(eventData);
+            eventData->egg = mBirdoEgg;
+            eventData->cracked = true;
+            QueueCollisionBirdoEggEnd(eventData);
+            break;
+        }
+        case 6:
+        {
+            cFielder* fielder = (cFielder*)patch->m_pOwner;
+            if (!fielder->IsInvincible())
+            {
+                QueueBirdoEggKnockYoshiTongue(fielder);
+            }
+            break;
+        }
+        }
+        break;
+    }
     }
 
     return NO_CONTACT;
@@ -230,6 +259,11 @@ bool PhysicsBirdoEgg::SetContactInfo(
 
 void PhysicsBirdoEgg::PreCollide()
 {
+}
+
+int PhysicsBirdoEgg::GetObjectType() const
+{
+    return 0x21;
 }
 
 PhysicsBirdoEgg::~PhysicsBirdoEgg()

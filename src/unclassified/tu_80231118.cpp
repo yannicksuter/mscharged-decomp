@@ -34,7 +34,6 @@ extern "C" TLComponentInstance* fn_801F9FEC(TLInstance* pTopLevel, InlineHasher 
     InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL),
     InlineHasher Level6 = InlineHasher(0UL));
 
-extern "C" StrikerChallenge* fn_801CA670();
 
 
 extern char lbl_8051D6D0[] = "challenge_screen";

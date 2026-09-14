@@ -27,6 +27,7 @@ struct TransportScreenPrinter
 {
     void Printf(const char* format, ...);
     void Print(const char* text);
+    void Draw();
 
     /* 0x000 */ char mLines[10][100];
     /* 0x3E8 */ int mNextLine;
@@ -47,6 +48,7 @@ struct ReliableSocket
     void DebugDraw(int column, int* row, bool showBandwidth);
     void SocketVirtual48();
     void Update();
+    void UpdateBandwidth();
     void LogMessage(int size, TransportMessage* message);
     void HandleMessage(TransportMessage* message, const u8* address, u16 port);
     void SendMessage(TransportMessage* message, const u8* address,

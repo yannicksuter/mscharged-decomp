@@ -44,6 +44,8 @@ public:
     virtual ~CupManager();
 
     static CupManager* Instance();
+    int fn_8010DE2C(int* value);
+    int fn_8010D9C4(int* value);
     s16 GetNextRoundNumber(int* roundType);
     int GetTeamRank(int team) const;
     TeamStats GetTeamStats(int team) const;
@@ -99,6 +101,7 @@ public:
     virtual ~StrikerChallenge();
 
     int GetCaptain(int challenge) const;
+    int fn_801CAA18() const { return mCaptain; }
     void SetCurrentChallenge(int challenge);
     void LoadSettings();
     bool IsUnlocked(int challenge) const;
@@ -137,6 +140,7 @@ public:
 };
 
 extern StrikerChallenge* g_pStrikerChallenge;
+StrikerChallenge* fn_801CA670();
 
 bool IsUnlockFlagSet(unsigned int flag);
 void SetUnlockFlag(unsigned int flag);

@@ -19,6 +19,11 @@ public:
     float* m_pVal;
 };
 
+inline float FuzzyNot(float value)
+{
+    return 1.0f - value;
+}
+
 inline float FMIN(float f1, float f2)
 {
     return (f1 <= f2) ? f1 : f2;

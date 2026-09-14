@@ -1,12 +1,12 @@
 #include <revolution/gx.h>
 #include "NL/gl/glMaterialParameters.h"
 
-#include "NL/glx/GXMaterialProgram.h"
+#include "NL/glx/GXConstantColourMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-static inline GXColor makeColor(float r, float g, float b, float a)
+static inline GXColor MakeGXColour(float r, float g, float b, float a)
 {
     GXColor colour;
     colour.r = (unsigned char)(r * 255.0f);
@@ -24,11 +24,11 @@ void GXMaterialProgramImpl<GXConstantColourMaterialProgram>::Activate(
     gxSetNumChans(0);
     gxSetNumTexGens(1);
     gxSetNumTevStages(1);
-    gxSetTevOrder(0, 0, 0, 255);
+    gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0);
     GXSetTevKAlphaSel(GX_TEVSTAGE0, GX_TEV_KASEL_K0_A);
-    gxSetTevColourIn(0, 15, 14, 8, 15);
-    gxSetTevAlphaIn(0, 7, 6, 4, 7);
+    gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_KONST, GX_CC_TEXC, GX_CC_ZERO);
+    gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_ZERO);
 }
 
 template <>
@@ -40,19 +40,19 @@ template <>
 void GXMaterialProgramImpl<GXConstantColourMaterialProgram>::Prepare(
     glModelPacket* packet)
 {
-    glSetMaterialTextureAlphaState(this, packet, *(unsigned long*)packet->materialParameters);
+    glSetMaterialTextureAlphaState(this, packet, static_cast<const GXConstantColourParameters*>(packet->materialParameters)->diffuseTexture.texture);
 }
 
 template <>
 void GXMaterialProgramImpl<GXConstantColourMaterialProgram>::Draw(
     const glModelPacket* packet)
 {
-    float* values = (float*)((unsigned char*)packet->materialParameters + 8);
-    float r = values[0];
-    float g = values[1];
-    float b = values[2];
-    float a = values[3];
-    GXSetTevKColor(GX_KCOLOR0, makeColor(r, g, b, a));
+    const nlFloatColour& colour = static_cast<const GXConstantColourParameters*>(packet->materialParameters)->constantColour;
+    float r = colour.c[0];
+    float g = colour.c[1];
+    float b = colour.c[2];
+    float a = colour.c[3];
+    GXSetTevKColor(GX_KCOLOR0, MakeGXColour(r, g, b, a));
 
     static_cast<GXConstantColourMaterialProgram*>(this)->BindVertexArrays(packet);
     static_cast<GXConstantColourMaterialProgram*>(this)->BindParameters(packet);

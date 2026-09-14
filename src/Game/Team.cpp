@@ -1630,7 +1630,7 @@ cFielder* cTeam::GetFrontMostFielder()
     {
         pFielder = (cFielder*)m_pPlayers[i_fielder];
         if ((pFrontMostFielder == NULL)
-            || (pFielder->m_v3AIPosition.x > pFrontMostFielder->m_v3AIPosition.x))
+            || (pFielder->mUnidentified1E4.m_v3AIPosition.x > pFrontMostFielder->mUnidentified1E4.m_v3AIPosition.x))
         {
             pFrontMostFielder = pFielder;
         }
@@ -1651,7 +1651,7 @@ cFielder* cTeam::GetRearMostFielder()
     {
         pFielder = (cFielder*)m_pPlayers[i_fielder];
         if ((pRearMostFielder == NULL)
-            || (pFielder->m_v3AIPosition.x < pRearMostFielder->m_v3AIPosition.x))
+            || (pFielder->mUnidentified1E4.m_v3AIPosition.x < pRearMostFielder->mUnidentified1E4.m_v3AIPosition.x))
         {
             pRearMostFielder = pFielder;
         }

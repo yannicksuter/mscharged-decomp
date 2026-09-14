@@ -1,7 +1,8 @@
 #include <revolution/gx.h>
 
-#include "NL/glx/GXMaterialProgram.h"
+#include "NL/glx/GXConstantColourMaterialProgram.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/gl/glLoadModel.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -9,8 +10,8 @@ GXConstantColourMaterialProgram* GXConstantColourMaterialProgram::Instance;
 bool GXConstantColourMaterialProgram::Initialized;
 
 GXMaterialParameter GXConstantColourMaterialProgram::Parameters[2] = {
-    { 0x69F44DC5, 0x01010103, 0 },
-    { 0xEE9D919D, 0x01040101, 8 },
+    { 0x69F44DC5, 0x01010103, 0 }, // diffuseTexture
+    { 0xEE9D919D, 0x01040101, 8 }, // constantColour
 };
 
 GXConstantColourMaterialProgram::GXConstantColourMaterialProgram()
@@ -89,7 +90,7 @@ void GXConstantColourMaterialProgram::DrawDirect(const glModelPacket* packet)
 
 void GXConstantColourMaterialProgram::BindParameters(const glModelPacket* packet)
 {
-    glx_BindTexture(0, (glTextureBinding*)(packet->materialParameters));
+    glx_BindTexture(0, &static_cast<GXConstantColourParameters*>(packet->materialParameters)->diffuseTexture);
 }
 
 const GXMaterialParameter* GXConstantColourMaterialProgram::GetParameters()

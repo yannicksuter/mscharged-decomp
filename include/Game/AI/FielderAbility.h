@@ -1,7 +1,7 @@
 #ifndef GAME_AI_FIELDER_ABILITY_H
 #define GAME_AI_FIELDER_ABILITY_H
 
-class WaluigiWallManager_80178400;
+class WaluigiWallManager;
 
 struct UnidentifiedFielderAbility3E8
 {
@@ -31,7 +31,7 @@ struct UnidentifiedAbilityEffect
 
     /* 0x00 */ float mUnidentified00;
     /* 0x04 */ float mUnidentified04;
-    /* 0x08 */ WaluigiWallManager_80178400* mUnidentified08;
+    /* 0x08 */ WaluigiWallManager* mUnidentified08;
 }; // size: 0xC
 
 #endif // GAME_AI_FIELDER_ABILITY_H

@@ -469,6 +469,8 @@ public:
     /* 0x247C */ int mUnidentified247C;
     /* 0x2480 */ int mOverlayRequest;
     /* 0x2484 */ int mPoppedOverlay;
+    long fn_801CA9D8() const { return mDWCErrorCode; }
+
     /* 0x2488 */ long mDWCErrorCode;
     /* 0x248C */ DWCErrorType mDWCErrorType;
     /* 0x2490 */ int mDWCLastError;

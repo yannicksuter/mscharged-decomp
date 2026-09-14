@@ -10,6 +10,7 @@
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsFakeBall.h"
+#include "Game/Physics/PhysicsPatch.h"
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 
@@ -88,6 +89,15 @@ ContactType PhysicsNPC::Contact(
         return ONE_WAY_CONTACT_OTHER;
     }
     case 0x14:
+    {
+        if (mpTriggerCallbackFunc != 0)
+        {
+            nlVector3 contactPosition;
+            nlVec3Set(contactPosition, contact->geom.pos[0], contact->geom.pos[1], contact->geom.pos[2]);
+            mpTriggerCallbackFunc(this, object, contactPosition);
+        }
+        break;
+    }
     case 0x15:
     {
         if (mpTriggerCallbackFunc != 0)
@@ -101,21 +111,51 @@ ContactType PhysicsNPC::Contact(
     case 0x23:
         return ONE_WAY_CONTACT_THIS;
     default:
+    {
+        if (object->GetObjectType() == 0x17
+            && GameInfoManager::Instance()->GetStadium() == 0x0B)
+        {
+            bool isChainChomp
+                = ((SkinAnimatedNPC*)mpAINPC)->GetSkinAnimatedNPC_Type()
+               == SkinAnimatedNPC_CHAIN_CHOMP;
+            if (isChainChomp)
+            {
+                ChainChomp* chainChomp = (ChainChomp*)mpAINPC;
+                float bottom = chainChomp->mv3Position.y
+                             - chainChomp->mpPhysObj->GetRadius();
+                bool isPastSideline = bottom > cField::GetSidelineY(1U);
+                bool isInsideGoalLine = fabsf(chainChomp->mv3Position.x)
+                                     < cField::GetGoalLineX(1U) - 0.5f;
+                if (isInsideGoalLine && isPastSideline)
+                {
+                    chainChomp->Fall();
+                    mUnidentified040 = true;
+                }
+            }
+        }
+
+        if (object->GetObjectType() == 0x1C)
+        {
+            bool isChainChomp
+                = ((SkinAnimatedNPC*)mpAINPC)->GetSkinAnimatedNPC_Type()
+               == SkinAnimatedNPC_CHAIN_CHOMP;
+            if (isChainChomp)
+            {
+                int type = ((PhysicsPatch*)object)->m_Type;
+                UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(&type);
+                if (info->mUnidentified18 != 0.0f)
+                {
+                    if (mUnidentified044 != 2
+                        || info->mUnidentified18 > mUnidentified048)
+                    {
+                        mUnidentified048 = info->mUnidentified18;
+                    }
+                    mUnidentified044 = 2;
+                }
+            }
+        }
         break;
     }
-
-    if (object->GetObjectType() == 0x17
-        && GameInfoManager::Instance()->GetStadium() == 0x0B
-        && mpAINPC->GetSkinAnimatedNPC_Type() == SkinAnimatedNPC_CHAIN_CHOMP)
-    {
-        float bottom = mpAINPC->mv3Position.y - mpAINPC->mpPhysObj->GetRadius();
-        if ((float)fabs(mpAINPC->mv3Position.x)
-                < cField::GetGoalLineX(1U) - 0.5f
-            && bottom > cField::GetSidelineY(1U))
-        {
-            ((ChainChomp*)mpAINPC)->Fall();
-            mUnidentified040 = true;
-        }
     }
 
     return NO_CONTACT;

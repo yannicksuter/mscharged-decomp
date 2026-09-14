@@ -14,6 +14,8 @@
 #include "NL/glx/GXMegaSpecularMaterialProgram.h"
 #include "NL/glx/GXColourFresnelMaterialProgram.h"
 #include "NL/glx/GXBlackTextureAlphaMaterialProgram.h"
+#include "NL/glx/GXCrystalMaterialProgram.h"
+#include "NL/glx/GXConstantColourMaterialProgram.h"
 #include "NL/glx/GXSpecularLookupMaterialProgram.h"
 #include "NL/glx/GXShadowedDiffuseMaterialProgram.h"
 #include "NL/glx/GXMaskedDiffuseBlendMaterialProgram.h"
@@ -53,36 +55,6 @@ class GLView;
 
 void glx_EnableWarble(bool enabled);
 
-struct GXCrystalMaterialParameters
-{
-    /* 0x00 */ glTextureBinding texture0;
-    /* 0x08 */ glTextureBinding texture1;
-    /* 0x10 */ glTextureBinding texture2;
-}; // size: 0x18
-
-class GXCrystalMaterialProgram : public GXMaterialProgramImpl<GXCrystalMaterialProgram>
-{
-public:
-    GXCrystalMaterialProgram();
-    virtual ~GXCrystalMaterialProgram();
-    virtual void Configure(glModelPacket* packet);
-    virtual const GXMaterialParameter* GetParameters()
-    {
-        return Parameters;
-    }
-    virtual void Initialize();
-
-    void ConfigureVertexFormat(bool indexed);
-    void BindVertexArrays(const glModelPacket* packet);
-    void DrawIndexed(const glModelPacket* packet);
-    void DrawDirect(const glModelPacket* packet);
-    void BindParameters(const glModelPacket* packet);
-
-    static GXCrystalMaterialProgram* Instance;
-    static bool Initialized;
-    static GXMaterialParameter Parameters[3];
-};
-
 class GXWarbleMaterialProgram : public GXMaterialProgramImpl<GXWarbleMaterialProgram>
 {
 public:
@@ -101,26 +73,6 @@ public:
     static GXWarbleMaterialProgram* Instance;
     static bool Initialized;
     static GXMaterialParameter Parameters[1];
-};
-
-class GXConstantColourMaterialProgram : public GXMaterialProgramImpl<GXConstantColourMaterialProgram>
-{
-public:
-    GXConstantColourMaterialProgram();
-    virtual ~GXConstantColourMaterialProgram();
-    virtual void Configure(glModelPacket* packet);
-    virtual const GXMaterialParameter* GetParameters();
-    virtual void Initialize();
-
-    void ConfigureVertexFormat(bool indexed);
-    void BindVertexArrays(const glModelPacket* packet);
-    void DrawIndexed(const glModelPacket* packet);
-    void DrawDirect(const glModelPacket* packet);
-    void BindParameters(const glModelPacket* packet);
-
-    static GXConstantColourMaterialProgram* Instance;
-    static bool Initialized;
-    static GXMaterialParameter Parameters[2];
 };
 
 class GXRedColourMaterialProgram : public GXMaterialProgramImpl<GXRedColourMaterialProgram>

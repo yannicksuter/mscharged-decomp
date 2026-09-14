@@ -254,7 +254,7 @@ RLView* GetUnshadowedView()
     return sLayerViews[eCLV_Unshadowed];
 }
 
-glModelStream* fn_8027263C(const glModelPacket* packet, int id)
+glModelStream* glModelPacketGetStream(const glModelPacket* packet, int id)
 {
     for (unsigned int i = 0; i < packet->numStreams; i++)
     {

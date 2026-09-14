@@ -60,6 +60,8 @@ struct glModel
     /* 0x08 */ glModelPacket* packets;
 }; // size: 0xC
 
+glModelStream* glModelPacketGetStream(const glModelPacket* packet, int id);
+
 inline glModelStream* glModelPacketGetStream(glModelPacket* pPacket, int id)
 {
     for (unsigned long i = 0; i < pPacket->numStreams; i++)

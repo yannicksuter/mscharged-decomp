@@ -2,7 +2,6 @@
 #include "Game/AI/FielderInput.h"
 #include "Game/AI/TeamPlayMachine.h"
 
-#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/InterpreterCore.h"
 #include "NL/nlMemory.h"
@@ -16,7 +15,6 @@ extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311734(
 extern "C" void fn_80315A64(
     UnidentifiedStateTransition*, UnidentifiedFuzzyRuntimeValue*,
     UnidentifiedVariant_80054AB8*, UnidentifiedFuzzyRuntimeValue*);
-extern "C" void fn_800C2C18(UnidentifiedVariant_80054AB8*, int);
 extern "C" int fn_800C2BD4(UnidentifiedVariant_80054AB8*);
 extern "C" UnidentifiedFuzzyRuntimeValue* fn_80317E2C(
     UnidentifiedScriptMachine*);
@@ -204,7 +202,7 @@ extern "C" bool fn_80316A84(
                 {
                     machine->mUnidentified01C.mData[i] = new (lbl_80584200.Allocate())
                         UnidentifiedFuzzyVariantData(
-                            i, FuzzyVariant(*parameters->mData[i]));
+                            i, (const FuzzyVariant&)*parameters->mData[i]);
                 }
                 else
                 {
@@ -225,7 +223,7 @@ extern "C" void fn_80317010(
     shdStateMachine* machine, UnidentifiedVariant_80054AB8* update,
     bool runUpdate, float deltaTime)
 {
-    fn_800C2C18(update, 0);
+    *update = 0;
     machine->mUnidentifiedTimer.Countup(deltaTime, 0.00001f);
     machine->mUnidentified014 = lbl_806DF564();
 
@@ -252,16 +250,16 @@ extern "C" void fn_80317010(
 
     if ((unsigned int)update->GetType() == FT_UNSPECIFIED)
     {
-        fn_800C2C18(update, 0);
+        *update = 0;
     }
     if (fn_80317E88(machine) && fn_800C2BD4(update) != 1)
     {
-        fn_800C2C18(update, 2);
+        *update = 2;
     }
     if (runUpdate && fn_800C2BD4(update) != 1)
     {
         machine->Update(
-            (UnidentifiedDesireUpdate*)update, deltaTime);
+            update, deltaTime);
     }
 }
 

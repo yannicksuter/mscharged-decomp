@@ -15,7 +15,6 @@ extern const int sCupPageOrder[3] = { 4, 5, 6 };
 extern const int sCupRoundPageOrderThree[3] = { 3, 2, 1 };
 extern const int sCupRoundPageOrderTwo[2] = { 2, 1 };
 
-extern "C" int fn_8010D9C4(CupManager* cupManager, int* statistic);
 
 extern StadiumGoalObject_8027A2C8* gCupAwardModels[];
 extern int gCupAwardModelCount;
@@ -205,7 +204,7 @@ void FinishCupAwardPresentation()
 void AdvanceCupAwardPresentation()
 {
     int statistic = 0;
-    int team = fn_8010D9C4(g_pCupManager, &statistic);
+    int team = g_pCupManager->fn_8010D9C4(&statistic);
     if (team == g_pCupManager->GetUserSelectedCupTeam())
     {
         Presentation::GetInstance()->Call("TransitionCupLeftToRightAward");

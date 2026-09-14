@@ -59,6 +59,7 @@ public:
     void SetGoalie(Goalie* pGoalie);
     cFielder* GetFielder(int nIndex);
     cFielder* GetBallInterceptFielder(int i) { return m_pBallInterceptOrderedFielders[i]; }
+    cFielder* GetAIOrderedFielder(int i) { return m_pAIOrderedFielders[i]; }
     cPlayer* GetPlayer(int nIndex);
     cPlayer* GetControlledPlayer(cGlobalPad* pController);
     cFielder* GetCaptain();

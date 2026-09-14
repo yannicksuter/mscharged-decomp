@@ -17,8 +17,6 @@ public:
 
 extern "C"
 {
-    extern SlotPoolEntry* lbl_806E12A0;
-
     extern float lbl_806DCE40;
     extern float lbl_806DCE44;
     float lbl_806DCE48 = 25.0f;
@@ -37,9 +35,6 @@ extern "C"
 
     nlVector4 lbl_80511E28 = { 1.0f, 0.0f, 0.0f, 0.0f };
 
-    extern PhysicsSphere_801700D8* fn_801700D8(PhysicsSphere_801700D8*);
-    extern void fn_80170760(PhysicsObject*);
-    extern void fn_8017076C(PhysicsObject*);
     extern void fn_801BCA5C(const nlVector3*);
 }
 
@@ -95,7 +90,7 @@ static inline void Reset(HammerObject* object)
     SetVelocity(object, lbl_804DCE30);
     object->_038 = object->_028->GetLinearVelocity();
     object->_028->DisableCollisions();
-    fn_80170760(object->_028);
+    object->_028->EnableGravity();
 
     object->_024 = false;
     object->_018 = lbl_806E5058;
@@ -123,22 +118,9 @@ extern "C" HammerObject* fn_801A0E64(
     object->_044 = lbl_806E505C;
     object->_048 = lbl_806E505C;
 
-    PhysicsSphere_801700D8* physics;
-    if (lbl_806E12A0 == 0)
-    {
-        physics = 0;
-    }
-    else
-    {
-        physics = (PhysicsSphere_801700D8*)lbl_806E12A0;
-        lbl_806E12A0 = lbl_806E12A0->next;
-    }
-    if (physics != 0)
-    {
-        physics = fn_801700D8(physics);
-    }
+    PhysicsHammer* physics = new PhysicsHammer(radius);
     object->_028 = physics;
-    physics->_038 = object;
+    physics->mHammer = object;
     object->_028->SetPosition(
         lbl_804DCE3C, PhysicsObject::WORLD_COORDINATES);
     object->_02C = GetRenderObject(2, index);
@@ -222,12 +204,12 @@ extern "C" void fn_801A16A4(HammerObject* object, float dt)
         if (object->_044 <= lbl_806E505C)
         {
             object->_028->EnableCollisions();
-            fn_80170760(object->_028);
+            object->_028->EnableGravity();
             object->_028->SetLinearVelocity(object->_038);
         }
         else
         {
-            fn_8017076C(object->_028);
+            object->_028->Freeze();
             return;
         }
     }
@@ -241,7 +223,7 @@ extern "C" void fn_801A16A4(HammerObject* object, float dt)
             Reset(object);
             return;
         }
-        fn_8017076C(object->_028);
+        object->_028->Freeze();
     }
 
     if (object->_01C > lbl_806E505C)

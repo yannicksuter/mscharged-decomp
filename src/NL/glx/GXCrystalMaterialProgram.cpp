@@ -2,7 +2,8 @@
 
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "NL/glx/GXMaterialProgram.h"
+#include "NL/glx/GXCrystalMaterialProgram.h"
+#include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/gl/glLoadModel.h"
 
@@ -10,9 +11,9 @@ GXCrystalMaterialProgram* GXCrystalMaterialProgram::Instance;
 bool GXCrystalMaterialProgram::Initialized;
 
 GXMaterialParameter GXCrystalMaterialProgram::Parameters[3] = {
-    { 0xEBAF55D2, 0x01010103, 0 },
-    { 0x69F44DC5, 0x01010103, 8 },
-    { 0x8099480F, 0x01010103, 16 },
+    { 0xEBAF55D2, 0x01010103, 0 }, // NLG_DETAIL
+    { 0x69F44DC5, 0x01010103, 8 }, // NLG_DIFFUSE
+    { 0x8099480F, 0x01010103, 16 }, // NLG_RAMP
 };
 
 TweakFloatBinding sCrystalSilhouetteGlowMultiplier;
@@ -36,9 +37,9 @@ void GXCrystalMaterialProgram::Initialize()
     if (Initialized)
         return;
 
-    sCrystalSilhouetteGlowMultiplier.BindWithDefault( "SilhouetteGlowMultiplier", 1.0f,
+    sCrystalSilhouetteGlowMultiplier.BindWithDefault("SilhouetteGlowMultiplier", 1.0f,
         "Materials/", false, 0.0f, 1.0f, 0.05f);
-    sCrystalEdgeGlowMultiplier.BindWithDefault( "EdgeGlowMultiplier", 1.0f,
+    sCrystalEdgeGlowMultiplier.BindWithDefault("EdgeGlowMultiplier", 1.0f,
         "Materials/", false, 0.0f, 1.0f, 0.05f);
 
     Initialized = true;
@@ -126,7 +127,7 @@ void GXCrystalMaterialProgram::DrawDirect(const glModelPacket* packet)
 void GXCrystalMaterialProgram::BindParameters(
     const glModelPacket* packet)
 {
-    glx_BindTexture(0, (glTextureBinding*)(packet->materialParameters));
-    glx_BindTexture(1, (glTextureBinding*)((unsigned char*)packet->materialParameters + 8));
-    glx_BindTexture(2, (glTextureBinding*)((unsigned char*)packet->materialParameters + 16));
+    glx_BindTexture(0, &static_cast<GXCrystalMaterialParameters*>(packet->materialParameters)->detailTexture);
+    glx_BindTexture(1, &static_cast<GXCrystalMaterialParameters*>(packet->materialParameters)->diffuseTexture);
+    glx_BindTexture(2, &static_cast<GXCrystalMaterialParameters*>(packet->materialParameters)->rampTexture);
 }

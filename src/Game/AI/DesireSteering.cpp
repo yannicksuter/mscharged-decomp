@@ -545,7 +545,8 @@ extern "C" float fn_800C6EB0(cFielder* pFielder)
             else if (Defensive(fn_800D6670(pFielder)) >= 0.5f)
             {
                 result = 1.0f - fn_800D8E3C(pFielder);
-                result = result * 0.5f + fn_800DC19C(pFielder, g_pBall) * 0.5f;
+                float fBall = fn_800DC19C(pFielder, g_pBall);
+                result = fBall / 2.0f + result / 2.0f;
             }
             else if (Offensive(fn_800D6670(pFielder)) >= 0.5f)
             {

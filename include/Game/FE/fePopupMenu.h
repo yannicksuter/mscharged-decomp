@@ -6,8 +6,10 @@
 #include "NL/nlFunction.h"
 #include "Game/FE/fePointerButton.h"
 #include "types.h"
+#include "NL/nlColour.h"
 
 class TLComponentInstance;
+class TLTextInstance;
 
 typedef Function<FnVoidVoid> _FEPopupMenuCB;
 
@@ -33,7 +35,12 @@ public:
 
     void SetPositions();
     void CentrePopup(float totalHeight, float topOfMessageBox);
-    void ResizeHighlight();
+    void fn_801C83AC(bool visible);
+    void fn_801C8494();
+    void fn_801C87E0(int index, void* context);
+    void fn_801C88B4(int index, void* context);
+    void fn_801C8960(int index, void* context);
+    ePopupMenu fn_801CA644() const { return mType; }
     void SetBackButtonCallback(_FEPopupMenuCB callback);
 
     void Create(ePopupMenu type)
@@ -84,18 +91,20 @@ public:
     /* 0x9AC */ float mAcceptDelayTime;
     /* 0x9B0 */ Popup mPopup;
     /* 0x9C4 */ TLComponentInstance* mOptionInstances[3];
-    /* 0x9D0 */ TLComponentInstance* mUnidentified9D0[3];
+    /* 0x9D0 */ TLTextInstance* mUnidentified9D0[3];
     /* 0x9DC */ FEPointerButton mControllerComponents[3];
     /* 0xBF8 */ unsigned int mUnidentifiedBF8[4];
     /* 0xC08 */ int mUnidentifiedC08;
     /* 0xC0C */ int mUnidentifiedC0C;
     /* 0xC10 */ Function<FnVoidVoid> callBacks[3];
     /* 0xC28 */ Function<FnVoidVoid> mUnknownA64;
-    /* 0xC30 */ unsigned char mUnidentifiedC30[0x10];
+    /* 0xC30 */ nlColour mHighlightedOptionColour;
+    /* 0xC34 */ unsigned char mUnidentifiedC34[0x0C];
     /* 0xC40 */ ePopupMenu mType;
     /* 0xC44 */ bool mUnknownAA4;
     /* 0xC45 */ bool mUnknownAA5;
-    /* 0xC46 */ unsigned char mUnidentifiedC46[6];
+    /* 0xC46 */ unsigned char mUnidentifiedC46[2];
+    /* 0xC48 */ TLComponentInstance* mUnidentifiedC48;
     /* 0xC4C */ bool mUnidentifiedC4C;
     /* 0xC4D */ unsigned char mUnidentifiedC4D[3];
     /* 0xC50 */ float mUnidentifiedC50;

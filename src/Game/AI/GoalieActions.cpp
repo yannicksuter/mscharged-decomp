@@ -27,7 +27,7 @@
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsFakeBall.h"
-#include "unclassified/tu_80177498.h"
+#include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/SAnim/pnBlender.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/SAnim/pnFeather.h"
@@ -508,7 +508,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
         if (g_pBall->m_pOwner != this && mfWaitTime > 0.0f
             && mpLooseBallInfo->mAnimType != LOOSEBALL_ANIM_KICK)
         {
-            m_tNoPickupTimer.SetSeconds(0.0f);
+            mUnidentified1E4.m_tNoPickupTimer.SetSeconds(0.0f);
         }
         else
         {
@@ -594,7 +594,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
         TacklePlayer(g_pBall->m_pOwner);
         StealBall(g_pBall->m_pOwner);
 
-        float fNoPickupTime = m_tNoPickupTimer.GetSeconds();
+        float fNoPickupTime = mUnidentified1E4.m_tNoPickupTimer.GetSeconds();
         if (fNoPickupTime > 0.0f)
         {
             const nlVector3& pickupPos
@@ -650,7 +650,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
             m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
             m_pPhysicsCharacter->m_CanCollideWithWall = true;
 
-            if (m_tFireTimer.m_uPackedTime != 0
+            if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
                 && m_eAnimID != 2 && m_eAnimID != 3)
             {
                 fn_8007EB90(this);
@@ -766,9 +766,9 @@ void Goalie::fn_80083750(float)
     {
         fn_801B93E8(this);
         fn_80097648(0.06f);
-        m_bForceFeatherUpdate = false;
-        m_bSkipAnimUpdate = false;
-        m_fSkipTimer = 0.0f;
+        mUnidentified1E4.m_bForceFeatherUpdate = false;
+        mUnidentified1E4.m_bSkipAnimUpdate = false;
+        mUnidentified1E4.m_fSkipTimer = 0.0f;
         SetGoalieAction(GOALIEACTION_DIVE_RECOVER, 0);
         mbIsDown = true;
         SetAnimState(0x8F, false, 0.0f, false, false);
@@ -868,7 +868,7 @@ void Goalie::fn_80083960(float)
     else
     {
         if (mpMonty != g_pBall->GetOwnerFielder()
-            || m_tFireTimer.m_uPackedTime != 0
+            || mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
             || mpMonty->fn_8003E6FC()
             || mpMonty->mbTangible
             || mpMonty->m_eActionState != ACTION_UNKNOWN_32
@@ -1946,12 +1946,12 @@ void Goalie::ActionMove(float deltaTime)
 
     if (fn_8007EB10())
     {
-        if (m_tFireTimer.m_uPackedTime == 0)
+        if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
         {
             fn_80097648(0.1f);
         }
     }
-    else if (m_tFireTimer.m_uPackedTime != 0 && !fn_800976C4())
+    else if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0 && !fn_800976C4())
     {
         fn_8007EA90();
     }
@@ -2028,29 +2028,29 @@ void Goalie::ActionMove(float deltaTime)
     if (bWallBlocked)
     {
         cFielder* pCaptain = m_pTeam->GetOtherTeam()->GetCaptain();
-        PhysicsBox_80177498* pWall = 0;
+        PhysicsWaluigiWall* pWall = 0;
         if (pCaptain->mUnidentified024.m_eCharacterClass == MARIO)
         {
-            pWall = pCaptain->mUnidentified3F8.mUnidentified08->fn_801792D0(muWallID);
+            pWall = pCaptain->mUnidentified3F8.mUnidentified08->FindWall(muWallID);
         }
         else
         {
             pCaptain = m_pTeam->GetCaptain();
             if (pCaptain->mUnidentified024.m_eCharacterClass == MARIO)
             {
-                pWall = pCaptain->mUnidentified3F8.mUnidentified08->fn_801792D0(muWallID);
+                pWall = pCaptain->mUnidentified3F8.mUnidentified08->FindWall(muWallID);
             }
         }
 
         if (pWall != 0)
         {
             nlVec3Set(v3WallNormal,
-                pWall->mUnidentified038.y
-                    - pWall->mUnidentified044.y,
-                pWall->mUnidentified044.x
-                    - pWall->mUnidentified038.x,
+                pWall->mStartPoint.y
+                    - pWall->mEndPoint.y,
+                pWall->mEndPoint.x
+                    - pWall->mStartPoint.x,
                 0.0f);
-            MakePerpendicularPlane(pWall->mUnidentified038,
+            MakePerpendicularPlane(pWall->mStartPoint,
                 v3WallNormal,
                 wallPlane,
                 0.0f);
@@ -2340,7 +2340,7 @@ void Goalie::StartRunBlend()
 
 void Goalie::ActionMoveWB(float fDeltaT)
 {
-    if (m_tFireTimer.m_uPackedTime != 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {
         if (m_pBall != 0)
         {
@@ -2610,14 +2610,14 @@ void Goalie::ActionMoveWB(float fDeltaT)
 
         if (GetGlobalPad()->JustPressed(0x1C, true))
         {
-            m_eLastPadAction = 0x32;
+            mUnidentified1E4.m_eLastPadAction = 0x32;
             InitActionPass(false);
             return;
         }
 
         if (GetGlobalPad()->JustPressed(0x1B, true))
         {
-            m_eLastPadAction = 0x32;
+            mUnidentified1E4.m_eLastPadAction = 0x32;
             InitActionPass(true);
             return;
         }
@@ -2950,7 +2950,7 @@ bool Goalie::fn_80090958(bool bParam)
 
 bool Goalie::IsTeammateHoardingBall()
 {
-    if (m_tFireTimer.m_uPackedTime == 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
     {
         cBall* pBall;
         cFielder* pOwner = g_pBall->GetOwnerFielder();
@@ -3997,7 +3997,7 @@ void Goalie::ActionLooseBallPursueBouncing(float deltaTime)
     FakeBallWorld::GetPredictedBallPosition(
         mfTargetTime, v3TargetPos, v3TargetVel);
 
-    if (m_tFireTimer.m_uPackedTime == 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
     {
         nlVector2 delta;
         delta.x = mUnidentified024.m_v3Position.x - v3TargetPos.x;
@@ -4056,12 +4056,12 @@ void Goalie::ActionSnapBall(float fDeltaT)
         return;
     }
 
-    if (m_tFireTimer.m_uPackedTime == 0 && g_pBall->m_pOwner != this)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0 && g_pBall->m_pOwner != this)
     {
         TacklePlayer(g_pBall->m_pOwner);
         StealBall(g_pBall->m_pOwner);
 
-        fTimeLeft = m_tNoPickupTimer.GetSeconds();
+        fTimeLeft = mUnidentified1E4.m_tNoPickupTimer.GetSeconds();
 
         if (fTimeLeft > 0.0f)
         {
@@ -4114,7 +4114,7 @@ void Goalie::ActionSnapBall(float fDeltaT)
 void Goalie::ActionGrabBall(float fDeltaT)
 {
     bool bShouldInitMove = true;
-    if (m_tFireTimer.m_uPackedTime == 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
     {
         bShouldInitMove = false;
         if (m_pCurrentAnimController->m_ePlayMode == PM_HOLD
@@ -4361,7 +4361,7 @@ void Goalie::fn_8008BBB0(
         break;
     }
 
-    if (m_tFireTimer.m_uPackedTime != 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {
         fn_80097648(0.1f);
     }
@@ -4500,7 +4500,7 @@ void Goalie::InitActionLooseBallSetup()
 
             if (fTimeTilSave > 0.0f && fTimeTilSave < 2.0f)
             {
-                if (m_tFireTimer.m_uPackedTime != 0)
+                if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
                 {
                     muSaveType = 0x0000FFFC;
                 }
@@ -4555,7 +4555,7 @@ void Goalie::InitActionLooseBallSetup()
 
     if (pBallVelocity->z < 3.0f && v3BallPosition.z < 1.5f)
     {
-        if (m_tFireTimer.m_uPackedTime == 0 && bInCone
+        if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0 && bInCone
             && fBallSpeed > 0.25f
             && fn_8007B9A0(this, v3BallPosition, 5.0f))
         {
@@ -4746,7 +4746,7 @@ void Goalie::InitActionLooseBallSetup()
                 }
             }
         }
-        else if (m_tFireTimer.m_uPackedTime != 0)
+        else if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
         {
             bDoGrab = false;
         }
@@ -4829,7 +4829,7 @@ void Goalie::InitActionLooseBallSetup()
             }
         }
 
-        if (!bDoGrab && m_tFireTimer.m_uPackedTime == 0)
+        if (!bDoGrab && mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
         {
             float fAbsGoalieX = (float)fabs(mUnidentified024.m_v3Position.x);
             float fAbsBallXPos = (float)fabs(v3BallPosition.x);
@@ -5118,7 +5118,7 @@ void Goalie::fn_8008CED8(float fTargetTime,
     }
 
     SaveData* pOtherAnim;
-    if (m_tFireTimer.m_uPackedTime != 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {
         mLowLobAnim = 0x5D;
         pOtherAnim = fn_80093780(0x5B);
@@ -5317,7 +5317,7 @@ void Goalie::fn_8008D210(float fDeltaT)
 
     bool bUseShortSave = true;
     bool bSubstateOne = mnSubstate == 1;
-    if (m_tFireTimer.m_uPackedTime == 0 && lbl_806E0D20 == 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0 && lbl_806E0D20 == 0)
     {
         bUseShortSave = false;
     }
@@ -5736,9 +5736,9 @@ void Goalie::fn_8008E130()
 
         int nNodeIndex = m_nBip01JointIndex_0xA4;
         mbIsDown = true;
-        m_bSkipAnimUpdate = true;
-        m_fSkipTimer = 0.0f;
-        m_bForceFeatherUpdate = true;
+        mUnidentified1E4.m_bSkipAnimUpdate = true;
+        mUnidentified1E4.m_fSkipTimer = 0.0f;
+        mUnidentified1E4.m_bForceFeatherUpdate = true;
         SetPowerupAnimState(nNodeIndex, 0xAF, 0.0f);
 
         while (nNodeIndex >= 0)
@@ -5807,8 +5807,8 @@ void Goalie::fn_8008E2D0()
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         mUnidentified024.m_fActualSpeed = 0.0f;
         SetVelocity(v3Zero);
-        m_bSkipAnimUpdate = true;
-        m_fSkipTimer = 0.0f;
+        mUnidentified1E4.m_bSkipAnimUpdate = true;
+        mUnidentified1E4.m_fSkipTimer = 0.0f;
         if (GetGlobalPad() != 0)
         {
             SwapController(false);
@@ -6783,7 +6783,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         = nlVec3LengthSquared(mv3TargetVelocity);
     unsigned int uSaveType = 0xFFFC;
 
-    if (m_tFireTimer.m_uPackedTime == 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
     {
         bool bState7Shot = g_pBall->m_tLightningTimer.m_uPackedTime != 0
                         && g_pBall->meBallState == 7;
@@ -6992,7 +6992,7 @@ void Goalie::InitActionSave()
                 false);
             InitMovementFromAnim(0, v3Zero, 0.0f, false);
 
-            if (m_tFireTimer.m_uPackedTime != 0)
+            if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
             {
                 fn_80097648(0.1f);
             }
@@ -7111,7 +7111,7 @@ void Goalie::InitActionDiveRecover()
             return;
         }
     }
-    else if (m_tFireTimer.m_uPackedTime != 0)
+    else if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {
         fn_80097358(this, -1.0f);
         if (mnOffplayPending == GOALIE_OFFPLAY_NONE)

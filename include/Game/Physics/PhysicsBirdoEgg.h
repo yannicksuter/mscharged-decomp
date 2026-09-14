@@ -10,7 +10,7 @@ class PhysicsBirdoEgg : public PhysicsSphere
 public:
     PhysicsBirdoEgg(BirdoEggObject*, float);
     virtual ~PhysicsBirdoEgg();
-    virtual int GetObjectType() const { return 0x21; }
+    virtual int GetObjectType() const;
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual void PreCollide();
     virtual ContactType Contact(PhysicsObject*, dContact*, int);

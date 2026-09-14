@@ -6,8 +6,6 @@
 
 #include <string.h>
 
-glModelStream* fn_8027263C(const glModelPacket* packet, int id);
-
 static nlAVLTreeSlotPool<unsigned long, AABBDimensions,
     DefaultKeyCompare<unsigned long> >
     boundingBoxCache(16, 16);
@@ -25,9 +23,10 @@ void GetAABBDimensions(const glModel* model,
         return;
     }
 
+    u16* pVert;
     unsigned char first = 1;
     unsigned int packetIndex = 0;
-    glModelPacket* packet;
+    const glModelPacket* packet;
     int vertexIndex;
     packetOffset = 0;
     nlVector3 min;
@@ -35,9 +34,9 @@ void GetAABBDimensions(const glModel* model,
 
     while (packetIndex < model->numPackets)
     {
-        packet = (glModelPacket*)((u8*)model->packets + packetOffset);
-        glModelStream* stream = fn_8027263C(packet, 1);
-        u16* pVert = packet->indexBuffer;
+        packet = (const glModelPacket*)((const u8*)model->packets + packetOffset);
+        glModelStream* stream = glModelPacketGetStream(packet, 1);
+        pVert = packet->indexBuffer;
         vertexIndex = 0;
 
         while (vertexIndex < packet->numVertices)
@@ -53,17 +52,15 @@ void GetAABBDimensions(const glModel* model,
             }
             else if (stream->stride == 6)
             {
-                float scale = 1.0f / 128.0f;
-
                 point.x = (float)*(s8*)((u8*)stream->address
                                         + vert * stream->stride)
-                        * scale;
+                        / 128.0f;
                 point.y = (float)*(s8*)((u8*)stream->address
                                         + vert * stream->stride + 1)
-                        * scale;
+                        / 128.0f;
                 point.z = (float)*(s8*)((u8*)stream->address
                                         + vert * stream->stride + 2)
-                        * scale;
+                        / 128.0f;
             }
 
             if (point.x < min.x || first)
@@ -90,20 +87,14 @@ void GetAABBDimensions(const glModel* model,
 
     dimensions.mMin = min;
     dimensions.mMax = max;
-    float dz = dimensions.mMax.z - dimensions.mMin.z;
-    float dy = dimensions.mMax.y - dimensions.mMin.y;
-    float dx = dimensions.mMax.x - dimensions.mMin.x;
-    dimensions.mDim.x = dx;
-    dimensions.mDim.y = dy;
-    dimensions.mDim.z = dz;
+    nlVec3Set(dimensions.mDim,
+        dimensions.mMax.x - dimensions.mMin.x,
+        dimensions.mMax.y - dimensions.mMin.y,
+        dimensions.mMax.z - dimensions.mMin.z);
 
     if (boundingBoxCacheKey != 0)
     {
-        AVLTreeNode* existingNode;
-        boundingBoxCache.AddAVLNode((AVLTreeNode**)&boundingBoxCache.m_Root,
-            &boundingBoxCacheKey,
-            &dimensions,
-            &existingNode);
+        boundingBoxCache.Add(boundingBoxCacheKey, dimensions);
     }
 }
 

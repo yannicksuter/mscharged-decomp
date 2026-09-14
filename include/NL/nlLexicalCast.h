@@ -88,6 +88,39 @@ struct LexicalCastImpl<To, From[N]>
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
+namespace Detail
+{
+template <typename Allocator>
+struct LexicalCastImpl<BasicString<unsigned short, Allocator>, const char*>
+{
+    static BasicString<unsigned short, Allocator> Do(const char* f)
+    {
+        unsigned short buffer[256];
+        nlStrToWcs(f, buffer, 256);
+        return BasicString<unsigned short, Allocator>(buffer);
+    }
+};
+
+template <typename To, typename Allocator>
+struct LexicalCastImpl<To, BasicString<char, Allocator> >
+{
+    static To Do(const BasicString<char, Allocator>& f)
+    {
+        return LexicalCast<To>(f.c_str());
+    }
+};
+
+template <typename Allocator>
+struct LexicalCastImpl<BasicString<unsigned short, Allocator>, int>
+{
+    static BasicString<unsigned short, Allocator> Do(int t)
+    {
+        return LexicalCast<BasicString<unsigned short, Allocator> >(
+            LexicalCast<BasicString<char, StringAllocator_801CBA50> >(t));
+    }
+};
+} // namespace Detail
+
 template <>
 inline WideBasicString Detail::LexicalCastImpl<WideBasicString, WideBasicString>::Do(
     const WideBasicString& f)

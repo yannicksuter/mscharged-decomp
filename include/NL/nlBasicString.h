@@ -52,22 +52,7 @@ public:
 
         void insertRange(CharT* at, const CharT* begin, const CharT* end)
         {
-            int count = end - begin;
-            int offset = at - mData.mData;
-            reserve(mData.mSize + count);
-
-            at = mData.mData + offset;
-            CharT* current = mData.mData + mData.mSize - 1;
-            while (current >= at)
-            {
-                *(current + count) = *current;
-                --current;
-            }
-            while (begin != end)
-            {
-                *at++ = *begin++;
-            }
-            mData.mSize += count;
+            mData.insert(at, begin, end);
         }
 
         void erase(const CharT* begin, const CharT* end)
@@ -394,16 +379,7 @@ BasicString<CharT, Allocator> BasicString<CharT, Allocator>::Append(const CharT*
 {
     BasicString r(*this);
     r.AppendInPlace(rhs);
-    Data* data = r.mData;
-    if (data != 0)
-    {
-        data->mRefCount++;
-    }
-    else
-    {
-        data = 0;
-    }
-    return BasicString(data);
+    return r;
 }
 
 template <typename CharT, typename Allocator>

@@ -8,7 +8,7 @@
 #include "Game/Field.h"
 #include "Game/Game.h"
 #include "Game/Physics/PhysicsCharacter.h"
-#include "Game/Physics/PhysicsSphere_801798A8.h"
+#include "Game/Physics/PhysicsYoshiEgg.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/ReplayManager.h"
 #include "Game/Sys/audio.h"
@@ -40,7 +40,7 @@ UnidentifiedObject_801B535C::UnidentifiedObject_801B535C(RenderObject* param)
     mUnidentified10 = lbl_804DCFA4;
     mUnidentified00.x = mUnidentified00.y = mUnidentified00.z = 0.0f;
     mUnidentified00.w = 1.0f;
-    mUnidentified2C = new (8, false) PhysicsSphere_801798A8(this, 1.0f);
+    mUnidentified2C = new (8, false) PhysicsYoshiEgg(this, 1.0f);
     mUnidentified2C->SetPosition(lbl_804DCFA4, PhysicsObject::WORLD_COORDINATES);
     mUnidentified2C->DisableCollisions();
 }

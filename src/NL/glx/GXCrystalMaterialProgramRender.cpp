@@ -2,24 +2,30 @@
 #include "NL/gl/glMaterialParameters.h"
 
 #include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
 #include "NL/glx/GXMaterialCrystalTweaks.h"
-#include "NL/glx/GXMaterialProgram.h"
+#include "NL/glx/GXCrystalMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
-static bool glx_CompiledDraw = true;
-static bool glx_AllowUncompiledDraws = true;
-static bool sUseCrystalTexture1 = true;
-static bool sUseCrystalTexture2 = true;
-static bool sUseCrystalTexture0 = true;
+static bool sUseCrystalDisplayLists = true;
+static bool sAllowCrystalUncompiledDraws = true;
+static bool sUseCrystalDiffuseTexture = true;
+static bool sUseCrystalRampTexture = true;
+static bool sUseCrystalDetailTexture = true;
 
-static nlMatrix4 sViewMatrix;
+TweakValueFloat sfSilhouetteLightingScale(
+    "sfSilhouetteLightingScale", "/Rendering/Materials/Crystal");
+TweakValueFloat sfEdgeTextureScale(
+    "sfEdgeTextureScale", gLastTweakCategory);
+
+static nlMatrix4 sCrystalViewMatrix;
 
 static void ConfigureCrystalStages()
 {
@@ -27,41 +33,39 @@ static void ConfigureCrystalStages()
     gxSetNumTexGens(3);
     gxSetNumChans(1);
 
-    int texture0Colour = 15;
-    if (sUseCrystalTexture1)
-        texture0Colour = 10;
-    int texture0Alpha = 7;
-    if (sUseCrystalTexture1)
-        texture0Alpha = 5;
-    int texture1Colour = 15;
-    if (sUseCrystalTexture2)
-        texture1Colour = 14;
-    int texture1Alpha = 7;
-    if (sUseCrystalTexture2)
-        texture1Alpha = 6;
-    int texture2Colour = 15;
-    if (sUseCrystalTexture0)
-        texture2Colour = 14;
-    int texture2Alpha = 7;
-    if (sUseCrystalTexture0)
-        texture2Alpha = 6;
+    GXTevColorArg diffuseColourInput = GX_CC_ZERO;
+    if (sUseCrystalDiffuseTexture)
+        diffuseColourInput = GX_CC_RASC;
+    GXTevAlphaArg diffuseAlphaInput = GX_CA_ZERO;
+    if (sUseCrystalDiffuseTexture)
+        diffuseAlphaInput = GX_CA_RASA;
+    GXTevColorArg rampColourInput = GX_CC_ZERO;
+    if (sUseCrystalRampTexture)
+        rampColourInput = GX_CC_KONST;
+    GXTevAlphaArg rampAlphaInput = GX_CA_ZERO;
+    if (sUseCrystalRampTexture)
+        rampAlphaInput = GX_CA_KONST;
+    GXTevColorArg detailColourInput = GX_CC_ZERO;
+    if (sUseCrystalDetailTexture)
+        detailColourInput = GX_CC_KONST;
+    GXTevAlphaArg detailAlphaInput = sUseCrystalDetailTexture ? GX_CA_KONST : GX_CA_ZERO;
 
     gxSetTevOrder(0, 1, 1, 4);
-    gxSetTevColourIn(0, 15, 8, texture0Colour, 15);
-    gxSetTevAlphaIn(0, 7, 4, texture0Alpha, 7);
+    gxSetTevColourIn(0, 15, 8, diffuseColourInput, 15);
+    gxSetTevAlphaIn(0, 7, 4, diffuseAlphaInput, 7);
 
     gxSetTexCoordGen(1, 1, 5, 60);
     gxSetTevOrder(1, 2, 2, 4);
-    gxSetTevColourIn(1, 15, 8, texture1Colour, 0);
-    gxSetTevAlphaIn(1, 7, 4, texture1Alpha, 0);
+    gxSetTevColourIn(1, 15, 8, rampColourInput, 0);
+    gxSetTevAlphaIn(1, 7, 4, rampAlphaInput, 0);
 
     gxSetTexCoordGen(2, 1, 1, 30);
     gxSetTevKColourSel(1, 12);
     gxSetTevKAlphaSel(1, 28);
 
     gxSetTevOrder(2, 0, 0, 4);
-    gxSetTevColourIn(2, 15, texture2Colour, 8, 0);
-    gxSetTevAlphaIn(2, 7, texture2Alpha, 4, 0);
+    gxSetTevColourIn(2, 15, detailColourInput, 8, 0);
+    gxSetTevAlphaIn(2, 7, detailAlphaInput, 4, 0);
 
     gxSetTexCoordGen(0, 1, 4, 60);
     gxSetTevKColourSel(2, 13);
@@ -73,7 +77,7 @@ void GXMaterialProgramImpl<GXCrystalMaterialProgram>::Activate(GLView* view)
 {
     static_cast<GXCrystalMaterialProgram*>(this)->ConfigureVertexFormat(true);
     ConfigureCrystalStages();
-    view->m_Interface->GetViewMatrix(sViewMatrix);
+    view->m_Interface->GetViewMatrix(sCrystalViewMatrix);
 }
 
 template <>
@@ -90,8 +94,8 @@ template <>
 void GXMaterialProgramImpl<GXCrystalMaterialProgram>::Prepare(
     glModelPacket* packet)
 {
-    GXCrystalMaterialParameters* parameters = (GXCrystalMaterialParameters*)packet->materialParameters;
-    glSetMaterialTextureAlphaState(this, packet, parameters->texture1.texture);
+    GXCrystalMaterialParameters* parameters = static_cast<GXCrystalMaterialParameters*>(packet->materialParameters);
+    glSetMaterialTextureAlphaState(this, packet, parameters->diffuseTexture.texture);
     unsigned int& rasterState = packet->rasterState;
     glSetRasterState(rasterState, GLS_Culling, 1);
     glSetRasterState(rasterState, GLS_AlphaTest, 0);
@@ -112,45 +116,39 @@ void GXMaterialProgramImpl<GXCrystalMaterialProgram>::Draw(
     GXSetTevKColor(GX_KCOLOR0, silhouetteColour);
     GXSetTevKColor(GX_KCOLOR1, edgeColour);
 
-    GXCrystalMaterialParameters* parameters = (GXCrystalMaterialParameters*)packet->materialParameters;
-    parameters->texture2.SetWrapS(1);
+    GXCrystalMaterialParameters* parameters = static_cast<GXCrystalMaterialParameters*>(packet->materialParameters);
+    parameters->rampTexture.SetWrapS(true);
 
     nlMatrix4 model;
     nlMatrix4 modelview;
-    float source[3][4];
-    float inverse[3][4];
-    float textureMatrix[3][4];
+    Mtx modelViewTransform;
+    Mtx normalMatrix;
+    Mtx rampMatrix;
     glGetMatrix(packet->matrix, model);
-    nlMultMatrices(modelview, model, sViewMatrix);
-    glxCopyMatrix(source, modelview);
-    PSMTXInvXpose(source, inverse);
+    nlMultMatrices(modelview, model, sCrystalViewMatrix);
+    glxCopyMatrix(modelViewTransform, modelview);
+    PSMTXInvXpose(modelViewTransform, normalMatrix);
 
-    float offset = -inverse[2][3];
-    textureMatrix[0][0] = -inverse[2][0];
-    textureMatrix[1][0] = 0.0f;
-    textureMatrix[0][1] = -inverse[2][1];
-    textureMatrix[1][1] = 0.0f;
-    textureMatrix[0][2] = -inverse[2][2];
-    textureMatrix[1][2] = 0.0f;
-    textureMatrix[1][3] = 0.0f;
-    textureMatrix[0][3] = offset + 1.0f;
-    GXLoadTexMtxImm(textureMatrix, 30, GX_MTX3x4);
-
-    if (packet->displayList != 0 && glx_CompiledDraw)
+    for (int column = 0; column < 4; ++column)
     {
-        GXCallDisplayList(
-            packet->displayList->list, packet->displayList->size);
+        rampMatrix[0][column] = -normalMatrix[2][column];
+        rampMatrix[1][column] = 0.0f;
     }
-    else if (glx_AllowUncompiledDraws)
+    rampMatrix[0][3] += 1.0f;
+    GXLoadTexMtxImm(rampMatrix, 30, GX_MTX3x4);
+
+    if (packet->displayList == 0 || !sUseCrystalDisplayLists)
     {
-        if (packet->indexBuffer == 0)
-            static_cast<GXCrystalMaterialProgram*>(this)->DrawDirect(packet);
-        else
-            static_cast<GXCrystalMaterialProgram*>(this)->DrawIndexed(packet);
+        if (sAllowCrystalUncompiledDraws)
+        {
+            if (packet->indexBuffer == 0)
+                static_cast<GXCrystalMaterialProgram*>(this)->DrawDirect(packet);
+            else
+                static_cast<GXCrystalMaterialProgram*>(this)->DrawIndexed(packet);
+        }
+    }
+    else
+    {
+        GXCallDisplayList(packet->displayList->list, packet->displayList->size);
     }
 }
-
-TweakValueFloat sfSilhouetteLightingScale(
-    "sfSilhouetteLightingScale", "/Rendering/Materials/Crystal");
-TweakValueFloat sfEdgeTextureScale(
-    "sfEdgeTextureScale", gLastTweakCategory);

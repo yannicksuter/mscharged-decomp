@@ -2375,7 +2375,7 @@ void cBall::UpdateOrientation(float fDeltaT)
     {
         m_pPhysicsBall->SetUseAngularVelocity(false);
 
-        switch (m_pOwner->m_eBallRotationMode)
+        switch (m_pOwner->mUnidentified1E4.m_eBallRotationMode)
         {
         case BRM_ANIMATED:
             m_pOwner->GetAnimatedBallOrientation(m_qOrientation);

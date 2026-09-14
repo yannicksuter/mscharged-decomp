@@ -308,7 +308,7 @@ void ChainChomp::Update(float fDeltaT)
             break;
         }
         if (mpTarget == 0
-            || (mpTarget != 0 && mpTarget->IsFallenDown() && mpTarget->m_tFireTimer.m_uPackedTime == 0)
+            || (mpTarget != 0 && mpTarget->IsFallenDown() && mpTarget->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
             || fabsf(mpTarget->mUnidentified024.m_v3Position.x) > cField::GetGoalLineX(1U))
         {
             mpTarget = FindTarget(mpThrower->m_pTeam->GetOtherTeam());
@@ -535,7 +535,7 @@ cFielder* ChainChomp::FindTarget(cTeam* pTeam)
         pFielder = g_pBall->GetOwnerFielder();
         if (pFielder->IsOnSameTeam(pTeam->GetStriker())
             && !pFielder->IsFrozen() && !pFielder->IsShattered()
-            && (!pFielder->IsFallenDown() || pFielder->m_tFireTimer.m_uPackedTime != 0)
+            && (!pFielder->IsFallenDown() || pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
             && pFielder != mpTarget)
         {
             pBestCandidate = g_pBall->GetOwnerFielder();
@@ -546,7 +546,7 @@ cFielder* ChainChomp::FindTarget(cTeam* pTeam)
         pFielder2 = g_pBall->GetPassTargetFielder();
         if (pFielder2->IsOnSameTeam(pTeam->GetStriker())
             && !pFielder2->IsFrozen() && !pFielder2->IsShattered()
-            && (!pFielder2->IsFallenDown() || pFielder2->m_tFireTimer.m_uPackedTime != 0)
+            && (!pFielder2->IsFallenDown() || pFielder2->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
             && pFielder2 != mpTarget)
         {
             pBestCandidate = pFielder2;
@@ -558,7 +558,7 @@ cFielder* ChainChomp::FindTarget(cTeam* pTeam)
         {
             fTempScore = 999999.9f;
             pCandidate = pTeam->GetFielder(i);
-            if ((!pCandidate->IsFallenDown() || pCandidate->m_tFireTimer.m_uPackedTime != 0)
+            if ((!pCandidate->IsFallenDown() || pCandidate->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
                 && !pCandidate->IsFrozen() && !pCandidate->IsShattered()
                 && pCandidate != mpTarget
                 && fabsf(pCandidate->mUnidentified024.m_v3Position.x) < cField::GetGoalLineX(1U))

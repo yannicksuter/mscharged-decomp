@@ -136,38 +136,38 @@ extern "C" void fn_80186354(DrawableObject* arg0)
             p.nAlpha1 = g_nBallGlowA1;
 
             int red;
-            int green;
             int blue;
+            int green;
             float scale = arg0->snapshotScale;
             if (scale < 1.0f)
             {
                 red = 180;
-                green = 15;
                 blue = 200;
+                green = 15;
             }
             else if (scale >= 1.0f && scale < 2.0f)
             {
                 red = 200;
-                green = 25;
                 blue = 25;
+                green = 25;
             }
             else if (scale >= 2.0f && scale < 3.0f)
             {
                 red = 200;
-                green = 100;
                 blue = 15;
+                green = 100;
             }
             else if (scale >= 3.0f && scale < 4.0f)
             {
                 red = 200;
-                green = 200;
                 blue = 10;
+                green = 200;
             }
             else
             {
                 red = 200;
-                green = 200;
                 blue = 200;
+                green = 200;
             }
             p.colour.c[0] = red;
             p.colour.c[1] = green;
@@ -192,7 +192,7 @@ static void DrawBallShadow(
         frac = 1.0f;
     }
 
-    f32 fX0, fY0, fX1, fY1;
+    f32 fX0, fY0, fY1, fX1;
     f32 half_dim = (1.0f - frac) * p.fRadius0 + frac * p.fRadius1;
     f32 fAlpha
         = (1.0f - frac) * (f32)p.nAlpha0 + frac * (f32)p.nAlpha1;
@@ -866,38 +866,14 @@ extern "C" void fn_80186650(const glModel* model, const nlMatrix4& transform,
     GetAABBDimensions(model, dimensions, boundingBoxCacheKey);
 
     nlVector4 corners[8];
-    corners[0].x = dimensions.mMin.x;
-    corners[0].y = dimensions.mMin.y;
-    corners[0].z = dimensions.mMin.z;
-    corners[0].w = 1.0f;
-    corners[1].x = dimensions.mMin.x;
-    corners[1].y = dimensions.mMin.y;
-    corners[1].z = dimensions.mMax.z;
-    corners[1].w = 1.0f;
-    corners[2].x = dimensions.mMin.x;
-    corners[2].y = dimensions.mMax.y;
-    corners[2].z = dimensions.mMin.z;
-    corners[2].w = 1.0f;
-    corners[3].x = dimensions.mMin.x;
-    corners[3].y = dimensions.mMax.y;
-    corners[3].z = dimensions.mMax.z;
-    corners[3].w = 1.0f;
-    corners[4].x = dimensions.mMax.x;
-    corners[4].y = dimensions.mMin.y;
-    corners[4].z = dimensions.mMin.z;
-    corners[4].w = 1.0f;
-    corners[5].x = dimensions.mMax.x;
-    corners[5].y = dimensions.mMin.y;
-    corners[5].z = dimensions.mMax.z;
-    corners[5].w = 1.0f;
-    corners[6].x = dimensions.mMax.x;
-    corners[6].y = dimensions.mMax.y;
-    corners[6].z = dimensions.mMin.z;
-    corners[6].w = 1.0f;
-    corners[7].x = dimensions.mMax.x;
-    corners[7].y = dimensions.mMax.y;
-    corners[7].z = dimensions.mMax.z;
-    corners[7].w = 1.0f;
+    nlVec4Set(corners[0], dimensions.mMin.x, dimensions.mMin.y, dimensions.mMin.z, 1.0f);
+    nlVec4Set(corners[1], dimensions.mMin.x, dimensions.mMin.y, dimensions.mMax.z, 1.0f);
+    nlVec4Set(corners[2], dimensions.mMin.x, dimensions.mMax.y, dimensions.mMin.z, 1.0f);
+    nlVec4Set(corners[3], dimensions.mMin.x, dimensions.mMax.y, dimensions.mMax.z, 1.0f);
+    nlVec4Set(corners[4], dimensions.mMax.x, dimensions.mMin.y, dimensions.mMin.z, 1.0f);
+    nlVec4Set(corners[5], dimensions.mMax.x, dimensions.mMin.y, dimensions.mMax.z, 1.0f);
+    nlVec4Set(corners[6], dimensions.mMax.x, dimensions.mMax.y, dimensions.mMin.z, 1.0f);
+    nlVec4Set(corners[7], dimensions.mMax.x, dimensions.mMax.y, dimensions.mMax.z, 1.0f);
 
     nlMatrix4 projection;
     fn_80186524(projection, transform);

@@ -1127,7 +1127,7 @@ extern "C" float fn_800DF838(cPlayer* pPlayer)
     float fScore = 0.0f;
     if (pPlayer->m_pBall != NULL)
     {
-        fScore = NormalizeVal(pPlayer->m_tBallPossessionTimer.GetSeconds(), 1.0f, 5.0f);
+        fScore = NormalizeVal(pPlayer->mUnidentified1E4.m_tBallPossessionTimer.GetSeconds(), 1.0f, 5.0f);
     }
     return fScore;
 }

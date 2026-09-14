@@ -202,7 +202,7 @@ bool DesireDeke::UnidentifiedInitialize(void* context)
 
 void DesireDeke::UnidentifiedCleanup()
 {
-    mUnidentifiedFielder->m_eLastPadAction = 50;
+    mUnidentifiedFielder->mUnidentified1E4.m_eLastPadAction = 50;
 }
 
 void DesireDeke::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)

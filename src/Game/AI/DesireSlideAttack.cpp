@@ -87,7 +87,7 @@ void DesireSlideAttack::Update(
     case 1:
     {
         mUnidentified078 = 5.0f;
-        if (pFielder->m_tSlideAttackTimer.m_uPackedTime != 0)
+        if (pFielder->mUnidentified1E4.m_tSlideAttackTimer.m_uPackedTime != 0)
         {
             if (!pFielder->bAttackSucceeded)
             {
@@ -107,7 +107,7 @@ void DesireSlideAttack::Update(
                     if (fBallClosingSpeed < 0.0f
                         && nlRandomf(1.0f) > 0.5f)
                     {
-                        pFielder->m_tSlideAttackTimer.SetSeconds(0.0f);
+                        pFielder->mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(0.0f);
                         meDesireSubState = 2;
                     }
                 }

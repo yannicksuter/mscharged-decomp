@@ -1,7 +1,7 @@
 #ifndef UNCLASSIFIED_TU_801A0E64_H
 #define UNCLASSIFIED_TU_801A0E64_H
 
-#include "Game/Physics/PhysicsSphere.h"
+#include "Game/Physics/PhysicsHammer.h"
 #include "NL/nlMath.h"
 #include "types.h"
 
@@ -11,14 +11,6 @@ class UnidentifiedHammerObjectMember030;
 typedef DrawableObject RenderObject;
 
 struct HammerObject;
-
-class PhysicsSphere_801700D8 : public PhysicsSphere
-{
-public:
-    virtual ~PhysicsSphere_801700D8();
-
-    /* 0x38 */ HammerObject* _038;
-};
 
 struct HammerObject
 {
@@ -31,7 +23,7 @@ struct HammerObject
     /* 0x24 */ bool _024;
     /* 0x25 */ bool _025;
     /* 0x26 */ u8 _026[2];
-    /* 0x28 */ PhysicsSphere_801700D8* _028;
+    /* 0x28 */ PhysicsHammer* _028;
     /* 0x2C */ RenderObject* _02C;
     /* 0x30 */ UnidentifiedHammerObjectMember030* _030;
     /* 0x34 */ cFielder* _034;
@@ -52,6 +44,7 @@ extern "C"
     void fn_801A16A4(HammerObject*, float);
     void fn_801A1B54(HammerObject*, cFielder*);
     void fn_801A1CFC(HammerObject*, int);
+    void fn_801A1304(HammerObject*);
     void fn_801A1ED0(HammerObject*, bool);
 }
 

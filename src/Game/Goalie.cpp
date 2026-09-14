@@ -398,7 +398,7 @@ void Goalie::MakeSaveEvent(bool bIsSTS)
 
     fn_8005D354(g_pGame, &pSaveData);
 
-    if (m_tFireTimer.m_uPackedTime == 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
     {
         PlaySound(9, 0xC65200C7, 0, 0);
     }
@@ -538,7 +538,7 @@ void Goalie::PlayBlendedAnims(
     int nMainAnimID;
     int milestone;
 
-    if (m_tFireTimer.m_uPackedTime != 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {
         fn_80097648(0.1f);
     }
@@ -786,9 +786,9 @@ void Goalie::CleanGoalieAction()
 
     case GOALIEACTION_UNIDENTIFIED_27:
         fn_80097648(-1.0f);
-        m_bSkipAnimUpdate = false;
-        m_fSkipTimer = 0.0f;
-        m_bForceFeatherUpdate = false;
+        mUnidentified1E4.m_bSkipAnimUpdate = false;
+        mUnidentified1E4.m_fSkipTimer = 0.0f;
+        mUnidentified1E4.m_bForceFeatherUpdate = false;
         fn_801B93E8(this);
         break;
 
@@ -863,8 +863,8 @@ int Goalie::ChooseRunAnim(
 
 void Goalie::fn_8007F430()
 {
-    m_bSkipAnimUpdate = false;
-    m_fSkipTimer = 0.0f;
+    mUnidentified1E4.m_bSkipAnimUpdate = false;
+    mUnidentified1E4.m_fSkipTimer = 0.0f;
     g_pBall->mbBallFrozen = false;
 }
 
@@ -986,7 +986,7 @@ void Goalie::CleanupStun()
 void Goalie::fn_8007EA90()
 {
     bool bUnidentified;
-    if (fn_800976C4() && m_nFeatherAnimID == 0xAA)
+    if (fn_800976C4() && mUnidentified1E4.m_nFeatherAnimID == 0xAA)
     {
         bUnidentified = true;
     }
@@ -1004,7 +1004,7 @@ void Goalie::fn_8007EA90()
 
 bool Goalie::fn_8007EB10()
 {
-    if (fn_800976C4() && m_nFeatherAnimID == 0xAA)
+    if (fn_800976C4() && mUnidentified1E4.m_nFeatherAnimID == 0xAA)
     {
         return true;
     }

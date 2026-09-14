@@ -29,6 +29,12 @@ enum eVariantType
     FT_BALL,
 };
 
+inline eVariantType VariantTypeOf(bool) { return FT_BOOL; }
+inline eVariantType VariantTypeOf(int) { return FT_INT; }
+inline eVariantType VariantTypeOf(unsigned long) { return FT_U32; }
+inline eVariantType VariantTypeOf(float) { return FT_FLOAT; }
+inline eVariantType VariantTypeOf(void*) { return FT_POINTER; }
+
 class Variant
 {
 public:
@@ -63,10 +69,11 @@ public:
         Reset();
     }
 
-    Variant& operator=(Variant other)
+    Variant& operator=(const Variant& other)
     {
+        Variant value(other);
         Reset();
-        CopyFrom(other);
+        CopyFrom(value);
         return *this;
     }
 

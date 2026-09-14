@@ -12,6 +12,7 @@
 #include "NL/glx/glxCharacterDamage.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxGXColour.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/glx/glxTexture.h"
 
@@ -195,19 +196,13 @@ void GXMaterialProgramImpl<GXCharacterDamageMaterialProgram>::Draw(
 
     nlFloatColour whiteColour;
     nlFloatColourSet(whiteColour, 1.0f, 1.0f, 1.0f, 1.0f);
-    nlColour whiteColour8;
-    ConvertColour(whiteColour8, whiteColour);
-    GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&whiteColour8);
+    gxSetTevKColour(GX_KCOLOR0, whiteColour);
     nlFloatColour alphaColour;
     nlFloatColourSet(alphaColour, alphaValue, alphaValue, alphaValue, alphaValue);
-    nlColour alphaColour8;
-    ConvertColour(alphaColour8, alphaColour);
-    GXSetTevKColor(GX_KCOLOR1, *(GXColor*)&alphaColour8);
+    gxSetTevKColour(GX_KCOLOR1, alphaColour);
     nlFloatColour specularColour;
     nlFloatColourSet(specularColour, specularAmount, specularAmount, specularAmount, specularAmount);
-    nlColour specularColour8;
-    ConvertColour(specularColour8, specularColour);
-    GXSetTevKColor(GX_KCOLOR2, *(GXColor*)&specularColour8);
+    gxSetTevKColour(GX_KCOLOR2, specularColour);
 
     bool enabled = static_cast<const GXCharacterDamageParameters*>(packet->materialParameters)->lightingEnabled == 1;
     if (sCharacterDamageLightingEnabled != enabled)

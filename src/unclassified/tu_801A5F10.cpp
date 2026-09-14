@@ -11,6 +11,7 @@
 #include "Game/Field.h"
 #include "Game/Game.h"
 #include "Game/Physics/PhysicsAIBall.h"
+#include "Game/Physics/PhysicsKoopaShell.h"
 #include "Game/Physics/PhysicsSphere.h"
 #include "Game/ReplayManager.h"
 #include "Game/RenderSnapshot.h"
@@ -18,8 +19,6 @@
 
 extern "C"
 {
-    PhysicsSphere* fn_801709D0(
-        PhysicsSphere*, KoopaShellObject*, float);
     void fn_801BC6E4(cFielder*);
     void fn_801BC96C(const nlVector3*);
 }
@@ -130,14 +129,7 @@ extern "C" KoopaShellObject* fn_801A5F30(
     object->mPosition = lbl_804DCEDC;
     object->mSpin = 0;
 
-    PhysicsSphere* physics =
-        (PhysicsSphere*)nlMalloc(0x40, 8, false);
-    if (physics != 0)
-    {
-        physics = fn_801709D0(
-            physics, object, sDefaultRadius);
-    }
-    object->mPhysics = physics;
+    object->mPhysics = new (8, false) PhysicsKoopaShell(object, sDefaultRadius);
     object->mPhysics->SetPosition(
         lbl_804DCEDC, PhysicsObject::WORLD_COORDINATES);
     object->mPhysics->DisableCollisions();

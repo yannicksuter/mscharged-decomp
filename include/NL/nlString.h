@@ -156,6 +156,34 @@ public:
             (char*)ptr - 4, size);
     }
 };
+
+class StringAllocator_801CBA50
+{
+public:
+    enum { kAtEnd = true };
+
+    template <typename T>
+    static T* New(int count, const char* name)
+    {
+        return new (8, kAtEnd, name) T[count];
+    }
+
+    template <typename T>
+    static void Delete(T* ptr)
+    {
+        delete[] ptr;
+    }
+
+    static void* Alloc(int size)
+    {
+        return nlMalloc(size, 8, kAtEnd);
+    }
+
+    static void Free(void* ptr)
+    {
+        nlFree(ptr);
+    }
+};
 } // namespace Detail
 
 void nlZeroMemory(void* ptr, unsigned long numBytes);

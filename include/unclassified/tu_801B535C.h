@@ -6,7 +6,7 @@
 
 class cFielder;
 class EmissionController;
-class PhysicsSphere_801798A8;
+class PhysicsYoshiEgg;
 
 class UnidentifiedObject_801B535C
 {
@@ -31,7 +31,7 @@ public:
     /* 0x20 */ float mUnidentified20;
     /* 0x24 */ float mUnidentified24;
     /* 0x28 */ bool mUnidentified28;
-    /* 0x2C */ PhysicsSphere_801798A8* mUnidentified2C;
+    /* 0x2C */ PhysicsYoshiEgg* mUnidentified2C;
     /* 0x30 */ RenderObject* mUnidentified30;
     /* 0x34 */ cFielder* mUnidentified34;
     /* 0x38 */ float mUnidentified38;

@@ -8,6 +8,7 @@
 #include "NL/glx/glxSkinMatrix.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxGXColour.h"
 #include "NL/nlMath.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -144,28 +145,20 @@ void GXMaterialProgramImpl<GXMegaSpecularMaterialProgram>::Draw(
 
     nlFloatColour blendColour;
     nlFloatColourSet(blendColour, blendAmount, blendAmount, blendAmount, blendAmount);
-    nlColour blendColour8;
-    ConvertColour(blendColour8, blendColour);
-    GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&blendColour8);
+    gxSetTevKColour(GX_KCOLOR0, blendColour);
     nlFloatColour alphaColour;
     nlFloatColourSet(alphaColour, alphaValue, alphaValue, alphaValue, alphaValue);
-    nlColour alphaColour8;
-    ConvertColour(alphaColour8, alphaColour);
-    GXSetTevKColor(GX_KCOLOR1, *(GXColor*)&alphaColour8);
+    gxSetTevKColour(GX_KCOLOR1, alphaColour);
 
     specularColour.c[0] *= specularLevel;
     specularColour.c[1] *= specularLevel;
     specularColour.c[2] *= specularLevel;
     specularColour.c[3] *= specularLevel;
-    nlColour specularColour8;
-    ConvertColour(specularColour8, specularColour);
-    GXSetTevKColor(GX_KCOLOR2, *(GXColor*)&specularColour8);
+    gxSetTevKColour(GX_KCOLOR2, specularColour);
 
     nlFloatColour megaColour;
     nlFloatColourSet(megaColour, megaBlend, megaBlend, megaBlend, megaBlend);
-    nlColour megaColour8;
-    ConvertColour(megaColour8, megaColour);
-    GXSetTevKColor(GX_KCOLOR3, *(GXColor*)&megaColour8);
+    gxSetTevKColour(GX_KCOLOR3, megaColour);
 
     if (sMegaSpecularExponent != specularExponent)
     {

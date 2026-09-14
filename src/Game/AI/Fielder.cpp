@@ -19,7 +19,7 @@
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/Ball.h"
-#include "Game/BulletBill.h"
+#include "Game/Render/BulletBill.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/DB/StatsTracker.h"
@@ -45,7 +45,7 @@
 #include "math.h"
 #include <stddef.h>
 #include "Game/DB/StadiumInfo.h"
-#include "unclassified/tu_80177498.h"
+#include "Game/Physics/PhysicsWaluigiWall.h"
 
 extern "C" shdStateMachine* fn_80319FC0(UnidentifiedScriptMachine*, int);
 extern "C" shdStateMachine* fn_80319F94(UnidentifiedScriptMachine*, int);
@@ -267,7 +267,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)6)
     {
         mUnidentified3F8.mUnidentified08
-            = new (8, false) WaluigiWallManager_80178400();
+            = new (8, false) WaluigiWallManager();
     }
     else
     {
@@ -301,7 +301,7 @@ cFielder::~cFielder()
     }
     if (mUnidentified420 != 0)
     {
-        fn_8019ABB8(mUnidentified420, true);
+        mUnidentified420->Hide(true);
     }
     delete m_pShotMeter;
     mUnidentified428->fn_8030F74C(true, true);
@@ -1224,7 +1224,7 @@ void cFielder::fn_80099074(UnidentifiedEventData24* eventData)
     if (type == 1)
     {
         if (eventData->mUnidentified10->m_pOwner != this
-            && m_tFireTimer.m_uPackedTime == 0
+            && mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0
             && m_eActionState != ACTION_ELECTROCUTION
             && !IsStuck() && !IsInvincible())
         {
@@ -1701,7 +1701,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
     }
 
     case ACTION_RUNNING_WB:
-        m_eLastPadAction = 50;
+        mUnidentified1E4.m_eLastPadAction = 50;
         if (fn_8003EA6C())
         {
             if (fn_80319FEC(mUnidentified428->mUnidentified18, 0x17))
@@ -2185,7 +2185,7 @@ void cFielder::DoRegularShooting(bool bParam)
     else if (m_eActionState == ACTION_ONETIMER
         || m_eActionState == ACTION_LATE_ONETIMER_FROM_VOLLEY
         || (m_eActionState == ACTION_UNKNOWN_15
-            && m_tBallPossessionTimer.GetSeconds() < 0.1f))
+            && mUnidentified1E4.m_tBallPossessionTimer.GetSeconds() < 0.1f))
     {
         g_pBall->m_uGoalType = 1;
     }
@@ -2322,7 +2322,7 @@ void cFielder::DoRegularShooting(bool bParam)
             {
                 stat = STATS_01;
             }
-            StatsTracker::Instance()->TrackStat(stat, m_pTeam->m_nSide, m_ID, 0, 0, 0, 0);
+            StatsTracker::Instance()->TrackStat(stat, m_pTeam->m_nSide, mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
     }
 }
@@ -2407,7 +2407,7 @@ const LooseBallContactAnimInfo* cFielder::fn_80038230(
 
 bool cFielder::IsFallenDown() const
 {
-    if (m_tFireTimer.m_uPackedTime != 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {
         return true;
     }
@@ -2683,7 +2683,7 @@ void cFielder::Update(float fDeltaT)
     cPlayer::Update(fDeltaT);
     mUnidentified428->fn_8030F800(true, fDeltaT);
 
-    if (!m_bSkipActionUpdate)
+    if (!mUnidentified1E4.m_bSkipActionUpdate)
     {
         UpdateActionState(fDeltaT);
         UpdateHeadTracking(fDeltaT);
@@ -2693,11 +2693,11 @@ void cFielder::Update(float fDeltaT)
         SetPosition(mUnidentified024.m_v3PrevPosition);
     }
 
-    if (!m_bSkipAnimUpdate)
+    if (!mUnidentified1E4.m_bSkipAnimUpdate)
     {
         cCharacter::Update(fDeltaT);
     }
-    else if (m_bForceFeatherUpdate && fn_800976C4())
+    else if (mUnidentified1E4.m_bForceFeatherUpdate && fn_800976C4())
     {
         cCharacter::Update(0.0f);
         m_pPowerupLayer->SetChild(
@@ -2707,7 +2707,7 @@ void cFielder::Update(float fDeltaT)
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)6
         && mUnidentified3F8.mUnidentified08 != 0)
     {
-        mUnidentified3F8.mUnidentified08->fn_80178DBC(fDeltaT);
+        mUnidentified3F8.mUnidentified08->Update(fDeltaT);
     }
     UpdateController(fDeltaT);
     m_bHasBeenUpdated = true;
@@ -3431,11 +3431,11 @@ void cFielder::ResetEffects()
     cCharacter::ResetEffects();
     if (mUnidentified3F8.mUnidentified08 != 0)
     {
-        mUnidentified3F8.mUnidentified08->fn_80178D0C();
+        mUnidentified3F8.mUnidentified08->ClearWalls();
     }
     if (mUnidentified420 != 0)
     {
-        fn_8019ABB8(mUnidentified420, true);
+        mUnidentified420->Hide(true);
     }
 }
 

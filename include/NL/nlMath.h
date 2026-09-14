@@ -140,9 +140,33 @@ inline void nlVec2Set(nlVector2& v0, float _x, float _y)
     v0.y = _y;
 }
 
+inline void nlVec2Scale(nlVector2& result, const nlVector2& source, float scale)
+{
+    nlVec2Set(result, scale * source.x, scale * source.y);
+}
+
 inline void nlVec2Sub(nlVector2& result, const nlVector2& a, const nlVector2& b)
 {
     nlVec2Set(result, a.x - b.x, a.y - b.y);
+}
+
+inline void nlVec2Neg(nlVector2& result, const nlVector2& v)
+{
+    nlVec2Set(result, -v.x, -v.y);
+}
+
+inline void nlVec2ScaleAdd(nlVector2& result, float scale, const nlVector2& dir, const nlVector2& origin)
+{
+    nlVec2Set(result, scale * dir.x + origin.x, scale * dir.y + origin.y);
+}
+
+// The source and destination vectors must not alias.
+inline void nlVec2Rotate(nlVector2& result, const nlVector2& v, unsigned short angle)
+{
+    float sine, cosine;
+    nlSinCos(&sine, &cosine, angle);
+    result.x = v.x * cosine - v.y * sine;
+    result.y = v.y * cosine + v.x * sine;
 }
 
 inline float nlGetLengthSquared1D(float x)
@@ -280,6 +304,14 @@ inline void nlVec3Scale(nlVector3& result, float scale)
     nlVec3Set(result, scale * result.x, scale * result.y, scale * result.z);
 }
 
+inline void nlVec3Project(nlVector3& result, const nlVector3& v, const nlVector3& normal)
+{
+    float alongNormal = nlVec3DotProduct(v, normal);
+    float normalLength = nlVec3DotProduct(normal, normal);
+    float scale = alongNormal / normalLength;
+    nlVec3Scale(result, normal, scale);
+}
+
 inline void nlVecLerp(nlVector3& result, const nlVector3& a, const nlVector3& b, float alpha)
 {
     float oneMinusAlpha = 1.0f - alpha;
@@ -373,6 +405,11 @@ public:
         };
     };
 
+    void GetRow_(int row, nlVector3& v) const
+    {
+        nlVec3Set(v, e2[row][0], e2[row][1], e2[row][2]);
+    }
+
     inline void SetIdentity()
     {
         m32 = 0.0f;
@@ -440,6 +477,11 @@ public:
         e2[row][0] = v.x;
         e2[row][1] = v.y;
         e2[row][2] = v.z;
+    }
+
+    void GetRow_(int row, nlVector3& v) const
+    {
+        nlVec3Set(v, e2[row][0], e2[row][1], e2[row][2]);
     }
 
     void SetRow4_(int row, const float x, const float y, const float z, const float w)

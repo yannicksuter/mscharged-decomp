@@ -12,6 +12,7 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxGXColour.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/nlColour.h"
 #include "NL/nlMath.h"
@@ -195,13 +196,9 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Draw(
         return;
 
     nlFloatColour blendColour = { { blendAmount, blendAmount, blendAmount, blendAmount } };
-    nlColour blendColour8;
-    ConvertColour(blendColour8, blendColour);
-    GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&blendColour8);
+    gxSetTevKColour(GX_KCOLOR0, blendColour);
     nlFloatColour alphaColour = { { alphaValue, alphaValue, alphaValue, alphaValue } };
-    nlColour alphaColour8;
-    ConvertColour(alphaColour8, alphaColour);
-    GXSetTevKColor(GX_KCOLOR1, *(GXColor*)&alphaColour8);
+    gxSetTevKColour(GX_KCOLOR1, alphaColour);
 
     static_cast<GXColourFresnelMaterialProgram*>(this)->BindVertexArrays(packet);
     static_cast<GXColourFresnelMaterialProgram*>(this)->BindParameters(packet);

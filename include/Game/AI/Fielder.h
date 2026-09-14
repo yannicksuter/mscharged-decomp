@@ -84,7 +84,7 @@ extern "C" bool fn_800344DC(cFielder*, const nlVector3*);
 class cSHierarchy;
 class AnimRetargetList;
 class CharacterPhysicsData;
-class WaluigiWallManager_80178400;
+class WaluigiWallManager;
 void fn_80048870(cFielder* pFielder);
 const LooseBallContactAnimInfo* GetOneTimerIdleGroundContactAnims();
 int GetNumOneTimerIdleGroundContactAnims();
@@ -237,6 +237,7 @@ public:
     void StartRunning();
     bool CanGetElectrocuted(
         const CollisionPlayerWallData* eventData);
+    eFielderActionState GetActionState() const { return m_eActionState; }
     bool CanDoCaptainShootToScore();
     bool CanReceivePass();
     void SetSlideAttackSuccessFlag();
@@ -266,6 +267,10 @@ public:
     void DoResetShotMeter(float fTime);
     bool IsActionDone() const;
     bool IsFallenDown() const;
+    void fn_800D0534(float amount)
+    {
+        mUnidentified3E0 -= amount;
+    }
     bool IsStuck() const;
     bool IsInvincible() const
     {
@@ -277,6 +282,13 @@ public:
     bool UnidentifiedInvinciblePowerups() const
     {
         bool result = !IsStuck() && (muInvincibleStatus & 8);
+        return result;
+    }
+    bool IsInvincibleHammers() const
+    {
+        bool result = false;
+        if (!IsStuck() && (muInvincibleStatus & 0x10))
+            result = true;
         return result;
     }
     bool IsInvincibleChars() const
@@ -533,8 +545,10 @@ public:
     /* 0x3D8 */ s16 mUnidentified3D8;
     /* 0x3DA */ s16 mUnidentified3DA;
 
-private:
+public:
     /* 0x3DC */ bool mUnidentified3DC;
+
+private:
     /* 0x3DD */ bool mUnidentified3DD;
 
 private:

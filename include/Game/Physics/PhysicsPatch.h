@@ -42,6 +42,8 @@ public:
     virtual ContactType Contact(PhysicsObject*, dContact*, int);
     virtual void SyncLog(void*, DebugWriteCache*);
 
+    int GetType() const { return m_Type; }
+
     void fn_80172EE0(const int* type);
     void Update(float dt);
     void fn_801739A4(const nlVector3& position);

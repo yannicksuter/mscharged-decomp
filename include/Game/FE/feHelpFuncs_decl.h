@@ -9,6 +9,8 @@ class TLComponentInstance;
 class FEPointerButton;
 class FEModelHandle;
 
+nlVector2 fn_801CC48C(TLTextInstance* instance);
+
 const char* GetLOCCharacterName(eTeamID teamid);
 const char* GetLOCTeamName(eTeamID teamID);
 eCharacterClass ConvertToCharacterClass(eTeamID teamID);

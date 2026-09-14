@@ -342,7 +342,10 @@ void FreeEventDataPools();
 struct UnidentifiedEventData_800673FC
 {
     /* 0x00 */ cPlayer* mUnidentified00;
-}; // total size: 0x4
+    /* 0x04 */ nlVector3 mUnidentified04;
+    /* 0x10 */ float mUnidentified10;
+    /* 0x14 */ float mUnidentified14;
+}; // total size: 0x18
 
 struct UnidentifiedEventData00;
 struct UnidentifiedEventData04;

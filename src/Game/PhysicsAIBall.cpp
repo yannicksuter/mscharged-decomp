@@ -172,7 +172,7 @@ void PhysicsAIBall::CheckIfBallWentThroughGoalie()
         pGoalie = (Goalie*)g_pCharacters[9];
     }
     if (pGoalie == 0 || pGoalie->m_pBall != 0
-        || pGoalie->m_tNoPickupTimer.m_uPackedTime != 0)
+        || pGoalie->mUnidentified1E4.m_tNoPickupTimer.m_uPackedTime != 0)
     {
         return;
     }

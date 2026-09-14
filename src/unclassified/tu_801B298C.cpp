@@ -161,7 +161,7 @@ extern "C" ThwompObject* fn_801B2B60(
     return object;
 }
 
-extern "C" void fn_801B2BFC(ThwompObject*)
+extern "C" void fn_801B2BFC(ThwompObject*, float)
 {
 }
 

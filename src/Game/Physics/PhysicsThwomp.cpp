@@ -11,7 +11,7 @@
 #include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Physics/PhysicsThwomp.h"
-#include "unclassified/tu_80177498.h"
+#include "Game/Physics/PhysicsWaluigiWall.h"
 #include "unclassified/tu_801B298C.h"
 
 extern "C" void fn_80149984(void* source, cCharacter* target);
@@ -110,7 +110,7 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
     case 29:
         if (thwomp->mState == 3)
         {
-            ((PhysicsBox_80177498*)other)->fn_80178170(1.0f);
+            ((PhysicsWaluigiWall*)other)->ApplyDamage(1.0f);
         }
         return NO_CONTACT;
     case 23:

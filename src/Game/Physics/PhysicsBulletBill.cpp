@@ -3,7 +3,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
 #include "Game/Ball.h"
-#include "Game/BulletBill.h"
+#include "Game/Render/BulletBill.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
@@ -36,6 +36,8 @@ ContactType PhysicsBulletBill::Contact(
     PhysicsObject* other, dContact*, int)
 {
     nlVector3 position;
+    CollisionBulletBillData* eventData;
+    cFielder* target;
     GetPosition(&position);
 
     switch (other->GetObjectType())
@@ -44,7 +46,7 @@ ContactType PhysicsBulletBill::Contact(
     {
         cCharacter* character
             = ((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
-        cFielder* target = mBulletBill->target;
+        target = mBulletBill->target;
         if (character == target || target == 0)
         {
             return NO_CONTACT;
@@ -52,15 +54,9 @@ ContactType PhysicsBulletBill::Contact(
 
         if (character->m_eClassType == FIELDER)
         {
-            bool canHit = false;
-            if (!target->IsStuck()
-                && (target->muInvincibleStatus & 1) != 0)
+            if (character != target && target->IsInvincibleChars())
             {
-                canHit = true;
-            }
-            if (character != target && canHit)
-            {
-                CollisionBulletBillData* eventData = 0;
+                eventData = 0;
                 g_CollisionBulletBillDataPool.Allocate(eventData);
                 eventData->player = character;
                 eventData->bulletBill = mBulletBill;
@@ -69,7 +65,7 @@ ContactType PhysicsBulletBill::Contact(
         }
         else
         {
-            CollisionBulletBillData* eventData = 0;
+            eventData = 0;
             g_CollisionBulletBillDataPool.Allocate(eventData);
             eventData->player = character;
             eventData->bulletBill = mBulletBill;
@@ -80,50 +76,54 @@ ContactType PhysicsBulletBill::Contact(
     case 0x10:
     {
         cPlayer* owner = ((PhysicsAIBall*)other)->m_pAIBall->m_pOwner;
-        cFielder* target = mBulletBill->target;
-        if ((owner != 0 && owner == target) || target == 0)
+        target = mBulletBill->target;
+        if ((owner != 0 && target == owner) || target == 0)
         {
             return NO_CONTACT;
         }
 
-        if (owner == 0)
+        if (owner != 0)
         {
-            return ONE_WAY_CONTACT_OTHER;
-        }
-
-        if (owner->m_eClassType == FIELDER)
-        {
-            bool canHit = false;
-            if (!target->IsStuck()
-                && (target->muInvincibleStatus & 1) != 0)
+            if (owner->m_eClassType == FIELDER)
             {
-                canHit = true;
+                bool canHit = false;
+                if (!target->IsStuck() && (target->muInvincibleStatus & 1))
+                {
+                    canHit = true;
+                }
+                if (canHit)
+                {
+                    eventData = 0;
+                    g_CollisionBulletBillDataPool.Allocate(eventData);
+                    eventData->player = owner;
+                    eventData->bulletBill = mBulletBill;
+                    fn_80147C9C(eventData);
+                }
             }
-            if (canHit)
+            else
             {
-                CollisionBulletBillData* eventData = 0;
+                eventData = 0;
                 g_CollisionBulletBillDataPool.Allocate(eventData);
                 eventData->player = owner;
                 eventData->bulletBill = mBulletBill;
-                fn_80147C9C(eventData);
+                fn_80147F2C(eventData);
             }
+            break;
         }
-        else
-        {
-            CollisionBulletBillData* eventData = 0;
-            g_CollisionBulletBillDataPool.Allocate(eventData);
-            eventData->player = owner;
-            eventData->bulletBill = mBulletBill;
-            fn_80147F2C(eventData);
-        }
-        break;
+        return ONE_WAY_CONTACT_OTHER;
     }
     case 0x14:
     case 0x15:
     {
-        PowerupBase* powerup = other->GetObjectType() == 0x14
-                                 ? ((PhysicsShell*)other)->m_pPowerupObject
-                                 : ((PhysicsBanana*)other)->m_pPowerupObject;
+        PowerupBase* powerup;
+        if (other->GetObjectType() == 0x14)
+        {
+            powerup = ((PhysicsShell*)other)->m_pPowerupObject;
+        }
+        else
+        {
+            powerup = ((PhysicsBanana*)other)->m_pPowerupObject;
+        }
         if (powerup->mtNoHitTimer.m_uPackedTime != 0
             && powerup->m_pThrower == mBulletBill->target)
         {
@@ -132,7 +132,7 @@ ContactType PhysicsBulletBill::Contact(
 
         if (powerup->m_eType == POWER_UP_FREEZE_SHELL)
         {
-            CollisionBulletBillData* eventData = 0;
+            eventData = 0;
             g_CollisionBulletBillDataPool.Allocate(eventData);
             eventData->player = mBulletBill->target;
             eventData->bulletBill = mBulletBill;
@@ -148,7 +148,7 @@ ContactType PhysicsBulletBill::Contact(
             return NO_CONTACT;
         }
 
-        CollisionBulletBillData* eventData = 0;
+        eventData = 0;
         g_CollisionBulletBillDataPool.Allocate(eventData);
         eventData->player = 0;
         eventData->bulletBill = mBulletBill;
@@ -156,15 +156,11 @@ ContactType PhysicsBulletBill::Contact(
         break;
     }
     case 0x17:
-        if (mBulletBill->target->m_pBall == 0)
+        if (mBulletBill->target->m_pBall != 0)
         {
-            CollisionBulletBillData* eventData = 0;
-            g_CollisionBulletBillDataPool.Allocate(eventData);
-            eventData->player = 0;
-            eventData->bulletBill = mBulletBill;
-            fn_80147F2C(eventData);
+            break;
         }
-        break;
+        // fall through
     case 0x18:
     case 0x19:
     case 0x1C:
@@ -175,7 +171,7 @@ ContactType PhysicsBulletBill::Contact(
     case 0x22:
     case 0x24:
     {
-        CollisionBulletBillData* eventData = 0;
+        eventData = 0;
         g_CollisionBulletBillDataPool.Allocate(eventData);
         eventData->player = 0;
         eventData->bulletBill = mBulletBill;

@@ -19,6 +19,7 @@
 #include "unclassified/tu_801A0E64.h"
 #include "Game/Render/DiddyBanana.h"
 #include "Game/Render/BirdoEgg.h"
+#include "Game/Render/BulletBill.h"
 #include "unclassified/tu_801B298C.h"
 #include "unclassified/tu_801B535C.h"
 
@@ -45,13 +46,6 @@ extern "C"
         KoopaShellObject* pObject, int bDelete);
     void fn_801A6074(KoopaShellObject* pObject, float fDeltaT);
     void fn_801A65F8(KoopaShellObject* pObject);
-
-    BulletBillObject* fn_8019A710(BulletBillObject* pObject,
-        void* pDrawable, unsigned int nIndex, float fRadius, float fParam);
-    BulletBillObject* fn_8019A7E4(BulletBillObject* pObject, int bDelete);
-    void fn_8019A854(BulletBillObject* pObject, float fDeltaT);
-    void fn_8019AD18(BulletBillObject* pObject);
-
 
     void fn_801A01F8();
     void fn_801A0208(float fDeltaT);
@@ -234,11 +228,8 @@ BulletBillObject* NPCManager::fn_801A9D20()
     {
         if (mUnidentified058[i] == 0)
         {
-            pObject = (BulletBillObject*)nlMalloc(0x48, 8, false);
-            if (pObject != 0)
-            {
-                pObject = fn_8019A710(pObject, GetRenderObject(1, i), i, lbl_806E5210, lbl_806E5214);
-            }
+            pObject = new (8, false) BulletBillObject(
+                GetRenderObject(1, i), i, lbl_806E5210, lbl_806E5214);
             mUnidentified058[i] = pObject;
             mUnidentified054 = i + 1;
             break;
@@ -535,7 +526,7 @@ NPCManager::~NPCManager()
     {
         if (mUnidentified058[i] != 0)
         {
-            fn_8019A7E4(mUnidentified058[i], 1);
+            delete mUnidentified058[i];
             mUnidentified058[i] = 0;
         }
     }
@@ -601,7 +592,7 @@ void NPCManager::DestroyNPCs()
     {
         if (mUnidentified058[i] != 0)
         {
-            fn_8019A7E4(mUnidentified058[i], 1);
+            delete mUnidentified058[i];
             mUnidentified058[i] = 0;
         }
     }
@@ -701,7 +692,7 @@ void NPCManager::UpdateAINPCs(float dt)
     }
     for (i = 0; i < mUnidentified054; ++i)
     {
-        fn_8019A854(mUnidentified058[i], dt);
+        mUnidentified058[i]->Update(dt);
     }
     for (i = 0; i < 15; ++i)
     {
@@ -761,7 +752,7 @@ void NPCManager::fn_801ABF8C()
     }
     for (i = 0; i < mUnidentified054; ++i)
     {
-        fn_8019AD18(mUnidentified058[i]);
+        mUnidentified058[i]->Reset();
     }
     for (i = 0; i < 15; ++i)
     {

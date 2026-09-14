@@ -453,7 +453,7 @@ bool FormationManager::CalculateFielderPosition(nlVector3& v3DestPosition,
     nlVector3 v3FutureDesiredPosition;
     nlVector3 v3FormationPosition[2][3];
 
-    int id = pFielder->m_ID;
+    int id = pFielder->mUnidentified1E4.m_ID;
     if (m_CachedPositions[id].bCacheIsValid)
     {
         v3DestPosition = m_CachedPositions[id].vPosition;
@@ -716,7 +716,7 @@ void FormationEval::AssignPositionsToFielders(
                     for (int iFielder = 0; iFielder < 4; iFielder++)
                     {
                         cFielder* pFielder = pTeam->GetFielder(iFielder);
-                        if (iFielder == pKeyPlayer->m_ID
+                        if (iFielder == pKeyPlayer->mUnidentified1E4.m_ID
                             && *piAssignedPos == m_pFormationSpec->m_iKeyIndex)
                         {
                             fCaptainPosScore += 25.0f;
@@ -982,7 +982,7 @@ void FormationEval::GetKeyPositions(cFielder* pFielder, nlVector3& v3KeyAIPositi
 
         if (pKeyFormationAIPosition != 0 && keyPlayer->m_eClassType != GOALIE)
         {
-            u32 posIndex = m_iFielderFormationPos[keyPlayer->m_ID];
+            u32 posIndex = m_iFielderFormationPos[keyPlayer->mUnidentified1E4.m_ID];
             const FormationPos* pPos = &m_pFormationSpec->m_Positions[posIndex];
             f32 px;
             f32 py;
@@ -1058,7 +1058,7 @@ void FormationEval::GetKeyPositions(cFielder* pFielder, nlVector3& v3KeyAIPositi
 
                 if (keyPlayer->m_eClassType != GOALIE)
                 {
-                    u32 posIndex = m_iFielderFormationPos[keyPlayer->m_ID];
+                    u32 posIndex = m_iFielderFormationPos[keyPlayer->mUnidentified1E4.m_ID];
                     const FormationPos* pPos = &m_pFormationSpec->m_Positions[posIndex];
                     f32 px;
                     f32 py;
@@ -1092,7 +1092,7 @@ void FormationEval::CalculateDesiredLocation(
     offset.y = dy;
     offset.x = dx;
 
-    u32 posIndex = m_iFielderFormationPos[pFielder->m_ID];
+    u32 posIndex = m_iFielderFormationPos[pFielder->mUnidentified1E4.m_ID];
 
     if (m_eFormationType == FTYPE_BALLPOSITION)
     {

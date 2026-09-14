@@ -355,7 +355,7 @@ void StatsTracker::OnPowerupStats(PowerupStatsData* data)
     if (data->pPlayer != 0)
     {
         Instance()->TrackStat(STATS_POWERUPS_USED,
-            data->pPlayer->m_pTeam->m_nSide, data->pPlayer->m_ID,
+            data->pPlayer->m_pTeam->m_nSide, data->pPlayer->mUnidentified1E4.m_ID,
             data->amount, 0, 0, 0);
     }
 }
@@ -365,7 +365,7 @@ void StatsTracker::OnAttackSuccess(AttackStatsData* data)
     if (data->track && data->pPlayer != 0 && data->pPlayer->m_pBall != 0)
     {
         Instance()->TrackStat(STATS_ATTACK_SUCCESSES,
-            data->pPlayer->m_pTeam->m_nSide, data->pPlayer->m_ID,
+            data->pPlayer->m_pTeam->m_nSide, data->pPlayer->mUnidentified1E4.m_ID,
             data->amount, 0, 0, 0);
     }
 }
@@ -375,15 +375,15 @@ void StatsTracker::OnAttackAttempt(AttackStatsData* data)
     if (data->track)
     {
         Instance()->TrackStat(STATS_ATTACK_ATTEMPTS,
-            data->pPlayer->m_pTeam->m_nSide, data->pPlayer->m_ID,
+            data->pPlayer->m_pTeam->m_nSide, data->pPlayer->mUnidentified1E4.m_ID,
             data->amount, 0, 0, 0);
     }
 }
 
 void StatsTracker::OnGoalScored(GoalScoredStatsData* data)
 {
-    int scorer = data->pScorer != 0 ? data->pScorer->m_ID : -1;
-    int assister = data->pAssister != 0 ? data->pAssister->m_ID : -1;
+    int scorer = data->pScorer != 0 ? data->pScorer->mUnidentified1E4.m_ID : -1;
+    int assister = data->pAssister != 0 ? data->pAssister->mUnidentified1E4.m_ID : -1;
     int side = data->goalData >> 24;
     s_pInstance->TrackStat(STATS_GOALS_FOR, side, scorer, assister,
         data->goalData & 0xFFFF, (data->goalData >> 8) & 0xFF,
@@ -400,14 +400,14 @@ void StatsTracker::OnMegastrikeEnd(MegaStrikeEndData* data)
     int side = 1 - data->defendingSide;
     if (data->goals > 0)
     {
-        s_pInstance->TrackStat(STATS_GOALS_FOR, side, data->pPlayer->m_ID, -1, 6,
+        s_pInstance->TrackStat(STATS_GOALS_FOR, side, data->pPlayer->mUnidentified1E4.m_ID, -1, 6,
             data->goals, data->goalValue);
     }
     s_pInstance->TrackStat(
-        STATS_09, side, data->pPlayer->m_ID, data->attempts, 0, 0, 0);
+        STATS_09, side, data->pPlayer->mUnidentified1E4.m_ID, data->attempts, 0, 0, 0);
     s_pInstance->TrackStat(
-        STATS_0A, side, data->pPlayer->m_ID, data->goals, 0, 0, 0);
-    s_pInstance->TrackStat(STATS_SHOTS_ON_GOAL, side, data->pPlayer->m_ID,
+        STATS_0A, side, data->pPlayer->mUnidentified1E4.m_ID, data->goals, 0, 0, 0);
+    s_pInstance->TrackStat(STATS_SHOTS_ON_GOAL, side, data->pPlayer->mUnidentified1E4.m_ID,
         data->attempts, 0, 0, 0);
 }
 
@@ -417,12 +417,12 @@ void StatsTracker::OnReceiveBall(ReceiveBallData* data)
     {
         s_pInstance->TrackStat(
             STATS_PASSES_RECEIVED, data->pReceiver->m_pTeam->m_nSide,
-            data->pReceiver->m_ID, 0, 0, 0, 0);
+            data->pReceiver->mUnidentified1E4.m_ID, 0, 0, 0, 0);
     }
     else if (data->eResult == RECEIVEBALL_PASS_INTERCEPT)
     {
         s_pInstance->TrackStat(STATS_PASSES_INTERCEPTED,
-            data->pReceiver->m_pTeam->m_nSide, data->pReceiver->m_ID,
+            data->pReceiver->m_pTeam->m_nSide, data->pReceiver->mUnidentified1E4.m_ID,
             0, 0, 0, 0);
     }
 }
@@ -431,25 +431,25 @@ void StatsTracker::OnPassBall(PassBallData* data)
 {
     s_pInstance->TrackStat(STATS_PASSES_MADE,
         data->pPasser->m_pTeam->m_nSide,
-        data->pPasser->m_ID, data->mPasserControllerID, 0, 0, 0);
+        data->pPasser->mUnidentified1E4.m_ID, data->mPasserControllerID, 0, 0, 0);
     if (data->bVolleyPass)
     {
         s_pInstance->TrackStat(STATS_0F,
             data->pPasser->m_pTeam->m_nSide,
-            data->pPasser->m_ID, data->mPasserControllerID, 0, 0, 0);
+            data->pPasser->mUnidentified1E4.m_ID, data->mPasserControllerID, 0, 0, 0);
     }
     else
     {
         s_pInstance->TrackStat(STATS_0E,
             data->pPasser->m_pTeam->m_nSide,
-            data->pPasser->m_ID, data->mPasserControllerID, 0, 0, 0);
+            data->pPasser->mUnidentified1E4.m_ID, data->mPasserControllerID, 0, 0, 0);
     }
 }
 
 void StatsTracker::OnPenalty(PenaltyStatsData* data)
 {
     s_pInstance->TrackStat(STATS_FOULS, data->pPlayer->m_pTeam->m_nSide,
-        data->pPlayer->m_ID, 0, 0, 0, 0);
+        data->pPlayer->mUnidentified1E4.m_ID, 0, 0, 0, 0);
 }
 
 void StatsTracker::OnGoalieSave(GoalieSaveData* data)
@@ -459,7 +459,7 @@ void StatsTracker::OnGoalieSave(GoalieSaveData* data)
     if (shooter != 0)
     {
         s_pInstance->TrackStat(
-            STATS_SHOTS_ON_GOAL, team->m_nSide, shooter->m_ID, 1, 0, 0, 0);
+            STATS_SHOTS_ON_GOAL, team->m_nSide, shooter->mUnidentified1E4.m_ID, 1, 0, 0, 0);
     }
 }
 
@@ -469,7 +469,7 @@ void StatsTracker::OnBallStateChange(int previousState, int currentState)
     {
         s_pInstance->TrackStat(
             STATS_04, g_pBall->m_pShooter->m_pTeam->m_nSide,
-            g_pBall->m_pShooter->m_ID, 1, 0, 0, 0);
+            g_pBall->m_pShooter->mUnidentified1E4.m_ID, 1, 0, 0, 0);
     }
 }
 
@@ -481,7 +481,7 @@ void StatsTracker::OnCollisionBallGoalpost(CollisionBallGoalpostData*)
     {
         s_pInstance->TrackStat(STATS_SHOTS_ON_GOAL,
             g_pBall->m_pShooter->m_pTeam->m_nSide,
-            g_pBall->m_pShooter->m_ID, 1, 0, 0, 0);
+            g_pBall->m_pShooter->mUnidentified1E4.m_ID, 1, 0, 0, 0);
     }
 }
 

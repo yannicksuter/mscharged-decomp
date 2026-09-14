@@ -1,16 +1,4 @@
-#include "NL/nlMath.h"
-#include "NL/nlMemory.h"
-
-struct UnidentifiedGameRegion
-{
-    /* 0x00 */ nlVector3 mCentre;
-    /* 0x0C */ float mRadius;
-    /* 0x10 */ unsigned char mUnidentified10[0x10];
-    /* 0x20 */ nlVector3* mPoints;
-    /* 0x24 */ int mNumPoints;
-    /* 0x28 */ int mCapacity;
-    /* 0x2C */ int mOwnsPoints;
-};
+#include "unclassified/tu_802B68E8.h"
 
 extern "C" void fn_802B68E8(UnidentifiedGameRegion* region, int capacity)
 {

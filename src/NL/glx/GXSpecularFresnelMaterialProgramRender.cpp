@@ -13,6 +13,7 @@
 #include "NL/glx/glxSkinMatrix.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxGXColour.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/nlColour.h"
@@ -95,8 +96,8 @@ void GXMaterialProgramImpl<GXSpecularFresnelMaterialProgram>::Activate(GLView* v
     SetGameObjectShadowViewMatrix(&sSpecularFresnelViewMatrix);
     SetGameObjectShadowModelMatrix(-1);
     sSpecularFresnelModelMatrix = -1;
-    sSpecularLookupScale[0] = 255.0f;
-    sSpecularLookupScale[1] = 255.0f;
+    sSpecularLookupScale[0] = -1.0f;
+    sSpecularLookupScale[1] = -1.0f;
     sSpecularFresnelBoundTexture = -1;
     GXLoadTexMtxImm(sFresnelLookupMatrix, 67, GX_MTX3x4);
     sSpecularFresnelLightCount = GetGameObjectLightCount(0, 1);
@@ -153,17 +154,11 @@ void GXMaterialProgramImpl<GXSpecularFresnelMaterialProgram>::Draw(
         : static_cast<const GXSpecularFresnelParameters*>(packet->materialParameters)->fresnelRamp;
 
     nlFloatColour blendColour = { { blendAmount, blendAmount, blendAmount, blendAmount } };
-    nlColour blendColour8;
-    ConvertColour(blendColour8, blendColour);
-    GXSetTevKColor(GX_KCOLOR0, *(GXColor*)&blendColour8);
+    gxSetTevKColour(GX_KCOLOR0, blendColour);
     nlFloatColour alphaColour = { { alphaValue, alphaValue, alphaValue, alphaValue } };
-    nlColour alphaColour8;
-    ConvertColour(alphaColour8, alphaColour);
-    GXSetTevKColor(GX_KCOLOR1, *(GXColor*)&alphaColour8);
+    gxSetTevKColour(GX_KCOLOR1, alphaColour);
     nlFloatColour specularColour = { { specularAmount, specularAmount, specularAmount, specularAmount } };
-    nlColour specularColour8;
-    ConvertColour(specularColour8, specularColour);
-    GXSetTevKColor(GX_KCOLOR2, *(GXColor*)&specularColour8);
+    gxSetTevKColour(GX_KCOLOR2, specularColour);
 
     bool enabled = static_cast<const GXSpecularFresnelParameters*>(packet->materialParameters)->lightingEnabled == 1;
     if (sSpecularFresnelLightingEnabled != enabled)

@@ -21,6 +21,7 @@ public:
     void SetButtonVisibility(int mask, bool visible);
     void RestoreButtonVisibility();
     void HideButtons();
+    void fn_801CA9E0(bool visible);
     void SetButtons(int value, bool enabled);
     TLComponentInstance* GetButton(int value);
     FEPageControls* GetPageControls()

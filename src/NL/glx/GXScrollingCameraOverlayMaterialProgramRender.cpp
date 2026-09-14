@@ -101,15 +101,11 @@ void GXMaterialProgramImpl<GXScrollingCameraOverlayMaterialProgram>::Draw(
     float cameraScroll = static_cast<const GXScrollingCameraOverlayParameters*>(packet->materialParameters)->cameraScroll;
     float inverseScale = 1.0f / static_cast<const GXScrollingCameraOverlayParameters*>(packet->materialParameters)->overlayScale;
     Mtx cameraTextureMatrix;
-    cameraTextureMatrix[0][1] = 0.0f;
-    cameraTextureMatrix[0][2] = 0.0f;
-    cameraTextureMatrix[0][3] = 0.0f;
-    cameraTextureMatrix[1][0] = 0.0f;
-    cameraTextureMatrix[1][2] = 0.0f;
-    cameraTextureMatrix[1][3] = 0.0f;
-    cameraTextureMatrix[2][0] = 0.0f;
-    cameraTextureMatrix[2][1] = 0.0f;
-    cameraTextureMatrix[2][3] = 0.0f;
+    for (int row = 0; row < 3; ++row)
+    {
+        for (int column = 0; column < 4; ++column)
+            cameraTextureMatrix[row][column] = 0.0f;
+    }
     cameraTextureMatrix[0][0] = inverseScale;
     cameraTextureMatrix[1][1] = inverseScale;
     cameraTextureMatrix[2][2] = 1.0f;

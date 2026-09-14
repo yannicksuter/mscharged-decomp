@@ -18,6 +18,7 @@ public:
     {
     }
     virtual ~OptionsSubMenu() { }
+    int fn_801CAA10() const { return mUnidentified20; }
 
     /* 0x01C */ int mUnidentified1C;
     /* 0x020 */ int mUnidentified20;

@@ -30,6 +30,11 @@ public:
     {
     }
 
+    void UnidentifiedSetTransition(const char* name)
+    {
+        mUnidentified00C = UnidentifiedStringHash(name);
+    }
+
     void UnidentifiedAddState(int, shdStateMachine*, bool);
 
     shdStateMachine* mUnidentified004;

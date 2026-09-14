@@ -41,7 +41,7 @@ extern "C"
 {
     ThwompObject* fn_801B298C(ThwompObject*, int);
     ThwompObject* fn_801B2B60(ThwompObject*, int);
-    void fn_801B2BFC(ThwompObject*);
+    void fn_801B2BFC(ThwompObject*, float);
     void fn_801B2C00(ThwompObject*, float);
     void fn_801B2DF4(ThwompObject*, float, float);
     void fn_801B2E64(ThwompObject*, bool);

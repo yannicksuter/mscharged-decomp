@@ -451,7 +451,7 @@ static void UpdateAndRenderPlayerIndicators(float)
         v3ScreenPosition.y -= lbl_806DCEF0;
 
         float switchScale
-            = pCharacter->m_UserControlledTime;
+            = pCharacter->mUnidentified1E4.m_UserControlledTime;
         if (switchScale < 0.5f)
         {
             switchScale = (0.5f - switchScale) / 0.5f;

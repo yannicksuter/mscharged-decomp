@@ -5,6 +5,7 @@
 #include "NL/gl/glView.h"
 #include "NL/glx/GXSpecularDetailBlendMaterialProgram.h"
 #include "NL/glx/glxGX.h"
+#include "NL/glx/glxGXColour.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -121,6 +122,7 @@ void GXMaterialProgramImpl<GXSpecularDetailBlendMaterialProgram>::Draw(
     static_cast<GXSpecularDetailBlendMaterialProgram*>(this)->BindVertexArrays(packet);
     static_cast<GXSpecularDetailBlendMaterialProgram*>(this)->BindParameters(packet);
 
+    int lightIndex;
     int mode;
     if (static_cast<const GXSpecularDetailBlendParameters*>(packet->materialParameters)->lightingEnabled == 0
         || IsGameObjectLightingEnabled() == 0)
@@ -135,34 +137,26 @@ void GXMaterialProgramImpl<GXSpecularDetailBlendMaterialProgram>::Draw(
     }
 
     const GXSpecularDetailBlendParameters* parameters = static_cast<const GXSpecularDetailBlendParameters*>(packet->materialParameters);
-    float detailWeight = 1.0f - parameters->blendAmount;
+    float blendAmount = parameters->blendAmount;
+    float detailWeight = 1.0f - blendAmount;
     float specularLevel = parameters->specularLevel;
     float specularExponent = parameters->specularExponent;
 
     nlFloatColour detailColour = { { detailWeight, detailWeight, detailWeight, detailWeight } };
-    nlColour detailColour8;
-    ConvertColour(detailColour8, detailColour);
-    GXColor detailGXColour = { detailColour8.c[0], detailColour8.c[1], detailColour8.c[2], detailColour8.c[3] };
-    GXSetTevKColor(GX_KCOLOR0, detailGXColour);
+    gxSetTevKColour(GX_KCOLOR0, detailColour);
 
     nlFloatColour specularLevelColour = { { specularLevel, specularLevel, specularLevel, specularLevel } };
-    nlColour specularLevelColour8;
-    ConvertColour(specularLevelColour8, specularLevelColour);
-    GXColor specularLevelGXColour = { specularLevelColour8.c[0], specularLevelColour8.c[1], specularLevelColour8.c[2], specularLevelColour8.c[3] };
-    GXSetTevKColor(GX_KCOLOR1, specularLevelGXColour);
+    gxSetTevKColour(GX_KCOLOR1, specularLevelColour);
 
-    nlColour specularColour8;
-    ConvertColour(specularColour8, parameters->specularColour);
-    GXColor specularGXColour = { specularColour8.c[0], specularColour8.c[1], specularColour8.c[2], specularColour8.c[3] };
-    GXSetTevKColor(GX_KCOLOR2, specularGXColour);
+    gxSetTevKColour(GX_KCOLOR2, parameters->specularColour);
 
     if (sSpecularDetailBlendSpecularExponent != specularExponent && specularLevel != 0.0f)
     {
         sSpecularDetailBlendSpecularExponent = specularExponent;
-        for (int i = 0; i < sSpecularDetailBlendLightCount; ++i)
+        for (lightIndex = 0; lightIndex < sSpecularDetailBlendLightCount; ++lightIndex)
         {
-            GameObjectLight* light = GetGameObjectLight(i, 0);
-            LoadGameObjectSpecularLight(i, light, specularExponent, sSpecularDetailBlendViewMatrix);
+            GameObjectLight* light = GetGameObjectLight(lightIndex, 0);
+            LoadGameObjectSpecularLight(lightIndex, light, specularExponent, sSpecularDetailBlendViewMatrix);
         }
     }
 

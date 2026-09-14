@@ -63,12 +63,14 @@ public:
 
     void CreateNPCTemplate(const char* pName, bool bPersistent);
     bool SelectNextNPCTemplate();
+    ChainChomp* GetChainChomp() const { return mpChainChomp; }
     void CreateChainChomp();
     void fn_801A9AF8();
     void CreateBirdoEgg();
     void fn_801A9BD0();
     void fn_801A9C3C();
     DaisyFistObject* fn_801A9CA4(int nIndex);
+    unsigned int UnidentifiedCount054() const { return mUnidentified054; }
     BulletBillObject* fn_801A9D10(int nIndex);
     BulletBillObject* fn_801A9D20();
     UnidentifiedNPC_801B43F8* fn_801A9DE0(int nIndex);

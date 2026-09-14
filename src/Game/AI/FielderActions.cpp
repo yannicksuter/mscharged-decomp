@@ -8,7 +8,7 @@
 #include "Game/AI/Fielder.h"
 #include "NL/gl/glView.h"
 #include "Game/AI/FielderInput.h"
-#include "Game/BulletBill.h"
+#include "Game/Render/BulletBill.h"
 
 #include "Game/Render/RLView.h"
 
@@ -32,7 +32,7 @@
 #include "unclassified/tu_800A9B78.h"
 #include "Game/NetworkSession.h"
 #include "Game/TweakValue.h"
-#include "unclassified/tu_80177498.h"
+#include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/AI/AIPad.h"
@@ -139,7 +139,6 @@ extern "C" bool fn_8003D9BC(cFielder* pFielder);
 extern "C" bool fn_8003E8A0(cFielder* pFielder);
 extern "C" void fn_801B98A0(cFielder* pFielder);
 extern "C" void fn_8002E340(cFielder* pFielder);
-extern "C" void fn_8019AA00(void* pParam, cFielder* pFielder);
 extern "C" void fn_801B8FF8(cFielder* pFielder);
 extern "C" void fn_8003C560(cFielder* pFielder, int nParam1, int nParam2);
 extern "C" void fn_801B90F8(cFielder* pFielder);
@@ -384,7 +383,7 @@ extern float lbl_806DB99C;
 
 void cFielder::EndAction()
 {
-    if (m_tFireTimer.m_uPackedTime == 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
     {
         SetAction(ACTION_NEED_ACTION);
     }
@@ -554,7 +553,7 @@ void cFielder::fn_8004643C(float fDeltaT)
                             && (pOther->fn_800344B0() || pOther->fn_80038918()))
                         {
                             SetAIPad(pOther->m_pController);
-                            m_bCanTestController = false;
+                            mUnidentified1E4.m_bCanTestController = false;
                             pOther->SetAIPad(0);
                             bGiven = true;
                         }
@@ -771,12 +770,12 @@ void cFielder::ActionHit(float fDeltaT)
             float fT2;
             for (int i = 0; i < 0x14; i++)
             {
-                PhysicsBox_80177498* pObject
-                    = pCaptain->mUnidentified3F8.mUnidentified08->fn_801792C4(i);
+                PhysicsWaluigiWall* pObject
+                    = pCaptain->mUnidentified3F8.mUnidentified08->GetWall(i);
                 if (pObject != 0
                     && fn_802B6BC8(&rv3Position, &v3Target,
-                        &pObject->mUnidentified038,
-                        &pObject->mUnidentified044, &fT1, &fT2))
+                        &pObject->mStartPoint,
+                        &pObject->mEndPoint, &fT1, &fT2))
                 {
                     bBlocked = true;
                 }
@@ -858,7 +857,7 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
 bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     int nReact, bool bDoFrameLock, bool bBookPenalty)
 {
-    if (IsFallenDown() && m_tFireTimer.m_uPackedTime == 0)
+    if (IsFallenDown() && mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
     {
         return false;
     }
@@ -931,7 +930,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     if (bTrackStats)
     {
         StatsTracker::Instance()->TrackStat((ePlayerStats)0x12,
-            pAttacker->m_pTeam->m_nSide, pAttacker->m_ID, 0, 0, 0, 0);
+            pAttacker->m_pTeam->m_nSide, pAttacker->mUnidentified1E4.m_ID, 0, 0, 0, 0);
     }
 
     switch (nReact)
@@ -1386,7 +1385,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_LOOSE_BALL_PASS);
         bIsModified = bVolleyPass;
-        m_bCanTestController = false;
+        mUnidentified1E4.m_bCanTestController = false;
         SetNoPickUpTime(3.0f);
     }
 }
@@ -1952,7 +1951,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
 
         if (!gNetworkInputRecording->mUnidentified004)
         {
-            g_pGame->fn_80059DEC(m_pTeam->m_nSide, m_ID,
+            g_pGame->fn_80059DEC(m_pTeam->m_nSide, mUnidentified1E4.m_ID,
                 mUnidentified3BC, mUnidentified3C0);
         }
 
@@ -2228,7 +2227,9 @@ bool cFielder::InitActionPass(
     if (bVolleyPass)
     {
         nlVector3 delta;
-        nlVec3Sub(delta, mUnidentified024.m_v3Position, pPassTarget->mUnidentified024.m_v3Position);
+        delta.y = mUnidentified024.m_v3Position.y - pPassTarget->mUnidentified024.m_v3Position.y;
+        delta.x = mUnidentified024.m_v3Position.x - pPassTarget->mUnidentified024.m_v3Position.x;
+        delta.z = mUnidentified024.m_v3Position.z - pPassTarget->mUnidentified024.m_v3Position.z;
         float minDistSq = lbl_806E35C8;
         minDistSq *= minDistSq;
         float distSq = delta.GetLengthSq3D();
@@ -2853,7 +2854,7 @@ void cFielder::asmRunning()
                     {
                         fn_8003A2D0(this, -1);
                     }
-                    else if (!m_tSwapFacingTimer.GetSeconds())
+                    else if (!mUnidentified1E4.m_tSwapFacingTimer.GetSeconds())
                     {
                         fn_8003ADAC(this);
                     }
@@ -2969,7 +2970,7 @@ void cFielder::asmRunning()
                     {
                         fn_8003A2D0(this, -1);
                     }
-                    else if (!m_tSwapFacingTimer.GetSeconds())
+                    else if (!mUnidentified1E4.m_tSwapFacingTimer.GetSeconds())
                     {
                         fn_8003ADAC(this);
                     }
@@ -3193,7 +3194,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     if (bUnidentified2)
     {
         StatsTracker::Instance()->TrackStat(
-            (ePlayerStats)0x15, m_pTeam->m_nSide, m_ID, 0, 0, 0, 0);
+            (ePlayerStats)0x15, m_pTeam->m_nSide, mUnidentified1E4.m_ID, 0, 0, 0, 0);
     }
 
     return true;
@@ -3334,7 +3335,7 @@ void cFielder::fn_80044BEC(float fDeltaT)
             {
                 if (m_pCurrentAnimController->TestFrameTrigger(5.0f))
                 {
-                    m_eLastPadAction = 0x1B;
+                    mUnidentified1E4.m_eLastPadAction = 0x1B;
                 }
             }
             break;
@@ -3348,14 +3349,14 @@ void cFielder::fn_80044BEC(float fDeltaT)
 
         if (m_pBall == 0)
         {
-            m_eLastPadAction = 0x32;
+            mUnidentified1E4.m_eLastPadAction = 0x32;
         }
 
         if (GetGlobalPad() != 0)
         {
             if (fn_8003D9BC(this))
             {
-                m_eLastPadAction = 0x32;
+                mUnidentified1E4.m_eLastPadAction = 0x32;
             }
         }
     }
@@ -3892,7 +3893,7 @@ void cFielder::fn_80045C74(float fDeltaT)
                             && (pOther->fn_800344B0() || pOther->fn_80038918()))
                         {
                             SetAIPad(pOther->m_pController);
-                            m_bCanTestController = false;
+                            mUnidentified1E4.m_bCanTestController = false;
                             pOther->SetAIPad(0);
                             bGiven = true;
                         }
@@ -4500,21 +4501,22 @@ void cFielder::InitActionSlideAttack(
         SetAnimState(0x5E, true, 0.2f, false, false);
         InitMovementRunning(0.0f, 0.0f, fn_8002C180(this->GetTweaks()),
             fn_8002CF24(this->GetTweaks()));
-        m_tSlideAttackTimer.SetSeconds(fn_8002C800(this->GetTweaks()));
+        mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(fn_8002C800(this->GetTweaks()));
 
         mUnidentified388 = 0;
         bAttackSucceeded = false;
         mUnidentified38D = false;
 
+        nlVector3 v3TargetPosition;
+        nlVector3 v3TargetVelocity;
         nlVector3 v3Target;
+        nlVector3 v3BallDelta;
         if (fTime < 0.0f)
         {
             fTime = fn_80038970(this, &v3Target, nParam);
         }
         else
         {
-            nlVector3 v3TargetPosition;
-            nlVector3 v3TargetVelocity;
             if (pTarget != 0)
             {
                 v3TargetPosition = pTarget->mUnidentified024.m_v3Position;
@@ -4539,8 +4541,9 @@ void cFielder::InitActionSlideAttack(
         }
         else
         {
-            nlVector3 v3BallDelta;
-            nlVec3Sub(v3BallDelta, mUnidentified024.m_v3Position, g_pBall->m_v3Position);
+            v3BallDelta.y = mUnidentified024.m_v3Position.y - g_pBall->m_v3Position.y;
+            v3BallDelta.x = mUnidentified024.m_v3Position.x - g_pBall->m_v3Position.x;
+            v3BallDelta.z = mUnidentified024.m_v3Position.z - g_pBall->m_v3Position.z;
             float fAdjust = mUnidentified024.m_fPlayerScale;
             float fBallDistance
                 = nlSqrt(v3BallDelta.GetLengthSq3D(), true);
@@ -4758,7 +4761,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
             }
             else
             {
-                if (m_tBallPossessionTimer.GetSeconds() < 0.1f
+                if (mUnidentified1E4.m_tBallPossessionTimer.GetSeconds() < 0.1f
                     || m_pShotMeter->m_fSpeedValue < 0.1f)
                 {
                     fn_801B75C8(this, 2, 0, 0, 1);
@@ -4917,17 +4920,17 @@ void cFielder::fn_8004C88C(float fDeltaT)
             }
         }
 
-        if (m_tSlideAttackTimer.m_uPackedTime == 0 || bUnidentified)
+        if (mUnidentified1E4.m_tSlideAttackTimer.m_uPackedTime == 0 || bUnidentified)
         {
             PlayRumbleAction(1, GetGlobalPad());
             mUnidentified388 = 1;
-            m_tSlideAttackTimer.SetSeconds(fn_8002C8D4(this->GetTweaks()));
+            mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(fn_8002C8D4(this->GetTweaks()));
         }
         break;
     }
     case 1:
     {
-        float fDecelTime = m_tSlideAttackTimer.GetSeconds();
+        float fDecelTime = mUnidentified1E4.m_tSlideAttackTimer.GetSeconds();
         if (fDecelTime < 0.01f)
         {
             fDecelTime = 0.01f;
@@ -4943,7 +4946,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
             0.0f, (mUnidentified024.m_fActualSpeed - fTargetSpeed) / fDecelTime);
         mUnidentified024.m_fDesiredSpeed = fTargetSpeed;
 
-        if (m_tSlideAttackTimer.m_uPackedTime == 0)
+        if (mUnidentified1E4.m_tSlideAttackTimer.m_uPackedTime == 0)
         {
             fn_8004D238();
         }
@@ -4975,7 +4978,7 @@ void cFielder::fn_8004D238()
         EndAction();
     }
 
-    m_eLastPadAction = 0x32;
+    mUnidentified1E4.m_eLastPadAction = 0x32;
 }
 
 void cFielder::fn_8004D480(const nlVector3& v3CollisionVelocity)
@@ -5081,7 +5084,7 @@ void cFielder::InitActionReceivePass(int animID, nlVector3& v3TargetPos,
 
 void cFielder::fn_8004E228()
 {
-    if (m_tFireTimer.m_uPackedTime == 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
     {
         mUnidentified3D8 = 0;
         mUnidentified3DA = 0;
@@ -5130,8 +5133,8 @@ void cFielder::fn_8004E438()
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_UNKNOWN_32);
 
-    nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
     nlVector3 v3Delta;
+    nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
     nlVec3Sub(v3Delta, v3NetPos, mUnidentified024.m_v3Position);
     Unknown8(nlVector3ToAngle(v3Delta), false);
     SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
@@ -5153,18 +5156,17 @@ void cFielder::fn_8004E438()
     else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
-        fn_8019AA00(mUnidentified420, this);
+        mUnidentified420->Show(this);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
         fn_801B8FF8(this);
         PlaySound(mUnidentified318, 0x1D6C8D56, 0, 0);
     }
 
-    bool bUnidentified = g_pGame->m_eGameState == 5
-        || g_pGame->m_eGameState == 6;
+    bool bUnidentified = g_pGame->IsGameplayOrOvertime();
     if (bUnidentified)
     {
         StatsTracker::Instance()->TrackStat(
-            (ePlayerStats)4, m_pTeam->m_nSide, m_ID, 1, 0, 0, 0);
+            (ePlayerStats)4, m_pTeam->m_nSide, mUnidentified1E4.m_ID, 1, 0, 0, 0);
     }
 }
 
@@ -5559,4 +5561,3 @@ static TweakBoolBinding s_UseTurboChargingTweak(
     &gbUseTurboCharging, true);
 
 u16 g_IdleTurnCompletionDelta = (u16)(65536.0f / 36.0f);
-

@@ -3,7 +3,7 @@
 #include "Game/Render/RLView.h"
 
 #include "Game/BasicStadium.h"
-#include "Game/BulletBill.h"
+#include "Game/Render/BulletBill.h"
 #include "Game/Drawable/DrawableBulletBill.h"
 #include "Game/Drawable/RenderObject.h"
 #include "NL/gl/glDraw3.h"

@@ -129,6 +129,16 @@ class AvoidablePoint : public AvoidableObject
 {
 public:
     AvoidablePoint(
+        int type, const nlVector2& position, float radius)
+        : AvoidableObject(type)
+        , mRadius(radius)
+    {
+        mPosition.x = position.x;
+        mPosition.y = position.y;
+        mPosition.z = 0.0f;
+    }
+
+    AvoidablePoint(
         int type, const nlVector3& position, float radius)
         : AvoidableObject(type)
         , mPosition(position)
@@ -169,10 +179,24 @@ public:
 class AvoidablePolygon : public AvoidableObject
 {
 public:
+    bool IntersectsSegment(const nlVector2& start, const nlVector2& end) const;
     AvoidablePolygon(
         int mode, const nlVector3& a, const nlVector3& b, float width);
     AvoidablePolygon(
         int mode, const nlVector3& center, float length, float width);
+    void Update(const nlVector2& a, const nlVector2& b, float width)
+    {
+        nlVec2Sub(mNormals[1], b, a);
+        float scale = nlRecipSqrt(nlVec2LengthSquared(mNormals[1]), true);
+        nlVec2Set(mNormals[1], scale * mNormals[1].x, scale * mNormals[1].y);
+        nlVec2Neg(mNormals[3], mNormals[1]);
+        nlVec2Rotate(mNormals[0], mNormals[1], 0x4000);
+        nlVec2Rotate(mNormals[2], mNormals[3], 0x4000);
+        nlVec2ScaleAdd(mPoints[0], 0.5f * width, mNormals[0], a);
+        nlVec2ScaleAdd(mPoints[1], 0.5f * width, mNormals[0], b);
+        nlVec2ScaleAdd(mPoints[3], 0.5f * width, mNormals[2], a);
+        nlVec2ScaleAdd(mPoints[2], 0.5f * width, mNormals[2], b);
+    }
     virtual ~AvoidablePolygon();
     virtual const nlVector3& GetPosition();
     virtual const nlVector3& GetVelocity()

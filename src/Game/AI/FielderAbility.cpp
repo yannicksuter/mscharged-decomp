@@ -2,7 +2,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/RumbleActions.h"
 #include "unclassified/tu_8019FE24.h"
-#include "unclassified/tu_80177498.h"
+#include "Game/Physics/PhysicsWaluigiWall.h"
 
 #include "Game/AI/Fuzzy.h"
 #include "Game/AI/FuzzyVariant.h"
@@ -488,7 +488,6 @@ void UnidentifiedAbilityEffect::fn_800504A8()
 {
     if (mUnidentified08 != 0)
     {
-        mUnidentified08->fn_80178D0C();
+        mUnidentified08->ClearWalls();
     }
 }
-
