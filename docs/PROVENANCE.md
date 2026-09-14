@@ -1,5 +1,12 @@
 # Source provenance
 
+`RVL_SDK/hbm/nw4hbm/db/db_DbgPrintBase.cpp` uses the unreferenced helper from
+[Twilight Princess's HBM reconstruction](https://github.com/zeldaret/tp/blob/c8fa8c9e2aab72cf4e5db0e5d1c84a9ea6ee6eb0/libs/revolution/src/homebuttonLib/nw4hbm/db/db_DbgPrintBase.cpp)
+to emit the shared `nw4hbm::ut::Color` destructor at its retained link position.
+This is a dummy emitter; the original stripped debug-print implementation has
+not been reconstructed. The helper is discarded by the linker, leaving only
+the 64-byte destructor used by other HBM objects.
+
 `Game/Physics/PhysicsWaluigiWall.cpp` reconstructs the Charged-specific Waluigi
 wall ability from R4QE01's collision dispatch, segment geometry, event
 callbacks and effect strings. `PhysicsWaluigiWall`, `WaluigiWallManager`, their
@@ -88,3 +95,17 @@ Striker Challenges and cup selection follow R4QE01. The float `std::ceil` and
 double C routines with the rounding conversion observed in R4QE01.
 The shared wide-string `LexicalCast` copy specialization follows the
 predecessor's `NL/nlLexicalCast.h` and the retained R4QE01 reference-counted copy.
+
+`Game/SH/SHNetworkStart.cpp` reconstructs the LAN lobby menu from R4QE01's
+presentation strings, listener callbacks, controller input and ranking payloads.
+Its menu and callable interfaces use the corresponding Super Mario Strikers
+`Game/FE/feMenu.h`, `NL/nlBind.h` and `NL/nlFunction.h` as ancestry references.
+The bound callback values, function-memory allocation and retained member layouts
+follow R4QE01. Pointer-listener consumers construct their bound member callables
+directly; the menu callbacks use the generic `Bind` wrapper.
+
+`unclassified/tu_801FE81C.cpp` contains the adjacent frontend stadium-loading and
+camera operations. Its separate state, constant pools and initializer follow the
+retail layout; the address-based filename does not identify an original source
+filename. The reference project's licensing notice above also applies to the
+shared source ancestry.

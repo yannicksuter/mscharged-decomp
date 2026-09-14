@@ -254,9 +254,12 @@ void SHMainMenu::Update(float fDeltaT)
  */
 void SHMainMenu::InitializeMenuItems()
 {
-    FEPointerListener::Callback openFunc(Bind<void>(MemFun(&SHMainMenu::OpenItem), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback closeFunc(Bind<void>(MemFun(&SHMainMenu::CloseItem), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback applyFunc(Bind<void>(MemFun(&SHMainMenu::SelectItem), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (SHMainMenu::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHMainMenu*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback openFunc(PointerBinding(MemFun(&SHMainMenu::OpenItem), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback closeFunc(PointerBinding(MemFun(&SHMainMenu::CloseItem), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback applyFunc(PointerBinding(MemFun(&SHMainMenu::SelectItem), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < NUM_ITEMS; ++i)
     {

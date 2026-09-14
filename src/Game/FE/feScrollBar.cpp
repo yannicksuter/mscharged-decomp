@@ -52,21 +52,24 @@ void FEScrollBar::SetIgnoreInputLock(bool enabled)
 
 void FEScrollBar::Initialize()
 {
+    typedef Detail::MemFunImpl<void, void (FEScrollBar::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, FEScrollBar*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     mInitialized = true;
     mButtons[0].SetInstanceBounds(mButtonInstances[0], false, mAssetPosition.f.x, mAssetPosition.f.y, 1.0f, 1.0f);
     mButtons[1].SetInstanceBounds(mButtonInstances[1], false, mAssetPosition.f.x, mAssetPosition.f.y, 1.0f, 1.0f);
 
-    FEPointerListener::Callback callback(Bind<void>(MemFun(&FEScrollBar::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback(PointerBinding(MemFun(&FEScrollBar::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     mButtons[0].SetPointerEnterCallback(callback);
     mButtons[1].SetPointerEnterCallback(callback);
-    callback = FEPointerListener::Callback(Bind<void>(MemFun(&FEScrollBar::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    callback = FEPointerListener::Callback(PointerBinding(MemFun(&FEScrollBar::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     mButtons[0].SetPointerLeaveCallback(callback);
     mButtons[1].SetPointerLeaveCallback(callback);
 
-    FEPointerListener::Callback callback2(Bind<void>(MemFun(&FEScrollBar::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback2(PointerBinding(MemFun(&FEScrollBar::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     mButtons[0].SetPointerPressCallback(callback2);
     mButtons[1].SetPointerPressCallback(callback2);
-    callback2 = FEPointerListener::Callback(Bind<void>(MemFun(&FEScrollBar::OnPointerRelease), this, Placeholder<0>(), Placeholder<1>()));
+    callback2 = FEPointerListener::Callback(PointerBinding(MemFun(&FEScrollBar::OnPointerRelease), this, Placeholder<0>(), Placeholder<1>()));
     mButtons[0].SetPointerReleaseCallback(callback2);
     mButtons[1].SetPointerReleaseCallback(callback2);
 }

@@ -399,38 +399,41 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
 
 void SHOnlineFriendsChooseSides::InitializeButtons()
 {
+    typedef Detail::MemFunImpl<void, void (SHOnlineFriendsChooseSides::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineFriendsChooseSides*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     mSideButtons[0].SetInstanceBounds(mSideInstances[0], true, 0.0f, 0.0f, 1.0f, 1.0f);
     mSideButtons[1].SetInstanceBounds(mSideInstances[1], true, 0.0f, 0.0f, 1.0f, 1.0f);
 
     FEPointerListener::Callback callback(
-        Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnSidePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendsChooseSides::OnSidePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     mSideButtons[0].SetPointerEnterCallback(callback);
     mSideButtons[1].SetPointerEnterCallback(callback);
     callback = FEPointerListener::Callback(
-        Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnSidePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendsChooseSides::OnSidePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     mSideButtons[0].SetPointerLeaveCallback(callback);
     mSideButtons[1].SetPointerLeaveCallback(callback);
     callback = FEPointerListener::Callback(
-        Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnSidePointerInside), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendsChooseSides::OnSidePointerInside), this, Placeholder<0>(), Placeholder<1>()));
     mSideButtons[0].SetPointerInsideCallback(callback);
     mSideButtons[1].SetPointerInsideCallback(callback);
 
     FEPointerListener::Callback callback2(
-        Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnSidePointerPress), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendsChooseSides::OnSidePointerPress), this, Placeholder<0>(), Placeholder<1>()));
     mSideButtons[0].SetPointerPressCallback(callback2);
     mSideButtons[1].SetPointerPressCallback(callback2);
 
     callback = FEPointerListener::Callback(
-        Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendsChooseSides::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerEnterCallback(callback);
     callback = FEPointerListener::Callback(
-        Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendsChooseSides::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerLeaveCallback(callback);
     callback = FEPointerListener::Callback(
-        Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnDonePointerInside), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendsChooseSides::OnDonePointerInside), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerInsideCallback(callback);
     callback2 = FEPointerListener::Callback(
-        Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendsChooseSides::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerPressCallback(callback2);
     mDoneButton.Disable();
 }

@@ -433,9 +433,12 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
 
 void SHOnlineHub::InitializeButtons()
 {
-    FEPointerListener::Callback over(Bind<void>(MemFun(&SHOnlineHub::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(Bind<void>(MemFun(&SHOnlineHub::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback down(Bind<void>(MemFun(&SHOnlineHub::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (SHOnlineHub::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineHub*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineHub::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineHub::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback down(PointerBinding(MemFun(&SHOnlineHub::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 4; ++i)
     {
         mUnidentified020[i].SetInstanceBounds(mUnidentified2F0[i], true, 0.0f, 0.0f, 1.0f, 1.0f);

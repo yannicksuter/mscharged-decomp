@@ -276,7 +276,6 @@ public:
 
         virtual ReturnType operator()(P1 p0);
         virtual FunctorBase* Clone() const;
-        virtual ~FunctorImpl() { }
 
     private:
         ReturnType Call(BoolToType<false>, P1 p0)
@@ -364,6 +363,11 @@ public:
     operator bool() const
     {
         return mTag != FUNCTION_EMPTY;
+    }
+
+    bool Empty() const
+    {
+        return mTag == FUNCTION_EMPTY;
     }
 
     ReturnType operator()(P1 p0) const

@@ -424,6 +424,9 @@ static void UpdateStadiumLabel(TU801E4630Scene* scene)
 
 void TU801E4630Scene::fn_801E6170()
 {
+    typedef Detail::MemFunImpl<void, void (TU801E4630Scene::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, TU801E4630Scene*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     if (GameInfoManager::Instance()->UseAltRules())
     {
         SetDoneButtonBounds(&mUnidentified110, mUnidentified44C, 0);
@@ -433,11 +436,11 @@ void TU801E4630Scene::fn_801E6170()
         SetPlayButtonBounds(&mUnidentified110, mUnidentified44C);
     }
 
-    Function2<void, int, void*> callback = Bind<void>(MemFun(&TU801E4630Scene::fn_801E6504), this, Placeholder<0>(), Placeholder<1>());
+    Function2<void, int, void*> callback = PointerBinding(MemFun(&TU801E4630Scene::fn_801E6504), this, Placeholder<0>(), Placeholder<1>());
     mUnidentified110.SetPointerEnterCallback(callback);
-    callback = Bind<void>(MemFun(&TU801E4630Scene::fn_801E6578), this, Placeholder<0>(), Placeholder<1>());
+    callback = PointerBinding(MemFun(&TU801E4630Scene::fn_801E6578), this, Placeholder<0>(), Placeholder<1>());
     mUnidentified110.SetPointerLeaveCallback(callback);
-    Function2<void, int, void*> pressCallback = Bind<void>(MemFun(&TU801E4630Scene::fn_801E65D4), this, Placeholder<0>(), Placeholder<1>());
+    Function2<void, int, void*> pressCallback = PointerBinding(MemFun(&TU801E4630Scene::fn_801E65D4), this, Placeholder<0>(), Placeholder<1>());
     mUnidentified110.SetPointerPressCallback(pressCallback);
 }
 

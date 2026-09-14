@@ -56,18 +56,21 @@ TU8020A74CScene::~TU8020A74CScene()
 
 void TU8020A74CScene::fn_8020D5C8()
 {
+    typedef Detail::MemFunImpl<void, void (TU8020A74CScene::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, TU8020A74CScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     FEPointerListener::Callback matchupOver(
-        Bind<void>(MemFun(&TU8020A74CScene::fn_8020DDC0), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU8020A74CScene::fn_8020DDC0), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback matchupOff(
-        Bind<void>(MemFun(&TU8020A74CScene::fn_8020DE60), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU8020A74CScene::fn_8020DE60), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback matchupSelect(
-        Bind<void>(MemFun(&TU8020A74CScene::fn_8020DEE8), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU8020A74CScene::fn_8020DEE8), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback bracketOver(
-        Bind<void>(MemFun(&TU8020A74CScene::fn_8020DBC4), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU8020A74CScene::fn_8020DBC4), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback bracketOff(
-        Bind<void>(MemFun(&TU8020A74CScene::fn_8020DC68), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU8020A74CScene::fn_8020DC68), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback bracketSelect(
-        Bind<void>(MemFun(&TU8020A74CScene::fn_8020DCF4), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU8020A74CScene::fn_8020DCF4), this, Placeholder<0>(), Placeholder<1>()));
 
     SetPlayButtonBounds(&mBracketComponent, mBracketInstance);
     mBracketComponent.SetPointerEnterCallback(bracketOver);

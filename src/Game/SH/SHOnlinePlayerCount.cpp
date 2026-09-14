@@ -198,12 +198,15 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
 
 void SHOnlinePlayerCount::InitializeButtons()
 {
+    typedef Detail::MemFunImpl<void, void (SHOnlinePlayerCount::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlinePlayerCount*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     FEPointerListener::Callback buttonOver(
-        Bind<void>(MemFun(&SHOnlinePlayerCount::OnButtonPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlinePlayerCount::OnButtonPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback buttonOff(
-        Bind<void>(MemFun(&SHOnlinePlayerCount::OnButtonPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlinePlayerCount::OnButtonPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback buttonSelect(
-        Bind<void>(MemFun(&SHOnlinePlayerCount::OnButtonPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlinePlayerCount::OnButtonPointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < mButtonCount; ++i)
     {

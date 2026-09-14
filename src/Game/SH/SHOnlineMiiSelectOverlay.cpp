@@ -79,12 +79,15 @@ SHOnlineMiiSelectOverlay::~SHOnlineMiiSelectOverlay()
 
 void SHOnlineMiiSelectOverlay::InitializeButtons()
 {
+    typedef Detail::MemFunImpl<void, void (SHOnlineMiiSelectOverlay::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineMiiSelectOverlay*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     FEPointerListener::Callback over(
-        Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::OpenItem), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineMiiSelectOverlay::OpenItem), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback off(
-        Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::CloseItem), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineMiiSelectOverlay::CloseItem), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback select(
-        Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::SelectOption), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineMiiSelectOverlay::SelectOption), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 2; ++i)
     {

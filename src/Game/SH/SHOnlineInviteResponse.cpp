@@ -33,9 +33,12 @@ SHOnlineInviteResponse::~SHOnlineInviteResponse()
 
 void SHOnlineInviteResponse::InitializeButtons()
 {
-    FEPointerListener::Callback over(Bind<void>(MemFun(&SHOnlineInviteResponse::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(Bind<void>(MemFun(&SHOnlineInviteResponse::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback select(Bind<void>(MemFun(&SHOnlineInviteResponse::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (SHOnlineInviteResponse::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineInviteResponse*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineInviteResponse::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineInviteResponse::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback select(PointerBinding(MemFun(&SHOnlineInviteResponse::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 4; ++i)
     {
         mButtons[i].SetInstanceBounds(mButtonInstances[i], true, 0.0f, 0.0f, 1.0f, 0.5f);

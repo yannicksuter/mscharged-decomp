@@ -382,10 +382,13 @@ void CupHubScene::fn_802025F4(TLTextInstance* roundText, int round, TLTextInstan
 
 void CupHubScene::fn_80202C34()
 {
-    FEPointerListener::Callback enter(Bind<void>(MemFun(&CupHubScene::fn_80203498), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback leave(Bind<void>(MemFun(&CupHubScene::fn_80203674), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback inside(Bind<void>(MemFun(&CupHubScene::fn_802037E8), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback press(Bind<void>(MemFun(&CupHubScene::fn_80203320), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (CupHubScene::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, CupHubScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback enter(PointerBinding(MemFun(&CupHubScene::fn_80203498), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback leave(PointerBinding(MemFun(&CupHubScene::fn_80203674), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback inside(PointerBinding(MemFun(&CupHubScene::fn_802037E8), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback press(PointerBinding(MemFun(&CupHubScene::fn_80203320), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 4; ++i)
     {
         mMatchupComponents[i].mContext = (void*)i;
@@ -395,9 +398,9 @@ void CupHubScene::fn_80202C34()
         mMatchupComponents[i].SetPointerInsideCallback(inside);
         mMatchupComponents[i].SetPointerPressCallback(press);
     }
-    FEPointerListener::Callback rulesEnter(Bind<void>(MemFun(&CupHubScene::fn_80203980), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback rulesLeave(Bind<void>(MemFun(&CupHubScene::fn_80203A10), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback rulesPress(Bind<void>(MemFun(&CupHubScene::fn_80203A88), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback rulesEnter(PointerBinding(MemFun(&CupHubScene::fn_80203980), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback rulesLeave(PointerBinding(MemFun(&CupHubScene::fn_80203A10), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback rulesPress(PointerBinding(MemFun(&CupHubScene::fn_80203A88), this, Placeholder<0>(), Placeholder<1>()));
     SetPlayButtonBounds(&mRulesComponent, mRulesButton);
     mRulesComponent.SetPointerEnterCallback(rulesEnter);
     mRulesComponent.SetPointerLeaveCallback(rulesLeave);

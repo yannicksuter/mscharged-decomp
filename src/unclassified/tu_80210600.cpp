@@ -150,16 +150,19 @@ void TU80210600Scene::fn_80210B1C(int index, void* context)
 
 void TU80210600Scene::fn_80211FA4()
 {
+    typedef Detail::MemFunImpl<void, void (TU80210600Scene::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, TU80210600Scene*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     FEPointerListener::Callback componentOver(
-        Bind<void>(MemFun(&TU80210600Scene::fn_802107AC), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU80210600Scene::fn_802107AC), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback componentOff(
-        Bind<void>(MemFun(&TU80210600Scene::fn_802108B0), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU80210600Scene::fn_802108B0), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback componentSelect(
-        Bind<void>(MemFun(&TU80210600Scene::fn_80210984), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU80210600Scene::fn_80210984), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback teamOver(
-        Bind<void>(MemFun(&TU80210600Scene::fn_80210B00), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU80210600Scene::fn_80210B00), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback teamOff(
-        Bind<void>(MemFun(&TU80210600Scene::fn_80210B1C), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU80210600Scene::fn_80210B1C), this, Placeholder<0>(), Placeholder<1>()));
 
     SetPlayButtonBounds(&mUnidentified55C, mUnidentified9A8);
     mUnidentified55C.SetPointerEnterCallback(componentOver);

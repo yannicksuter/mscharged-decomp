@@ -227,12 +227,15 @@ void OptionsScene::fn_801D3148(int index, void* context)
 
 void OptionsScene::fn_801D31E0()
 {
+    typedef Detail::MemFunImpl<void, void (OptionsScene::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, OptionsScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     FEPointerListener::Callback over(
-        Bind<void>(MemFun(&OptionsScene::fn_801D3098), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&OptionsScene::fn_801D3098), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback off(
-        Bind<void>(MemFun(&OptionsScene::fn_801D3148), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&OptionsScene::fn_801D3148), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback select(
-        Bind<void>(MemFun(&OptionsScene::fn_801D2A08), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&OptionsScene::fn_801D2A08), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 3; ++i)
     {

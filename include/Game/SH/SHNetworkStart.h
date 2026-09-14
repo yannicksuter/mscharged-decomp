@@ -27,6 +27,10 @@ public:
     void SetActionButtons(int state);
     void SelectMenuItem(TLComponentInstance* component);
     void DeselectMenuItem(TLComponentInstance* component);
+    void fn_801FC7E4(int state);
+    void fn_801FCA60(TLComponentInstance* component, int state);
+    void fn_801FD834();
+    void fn_801FDD08();
 
     /* 0x020 */ MenuList<TLComponentInstance> mMenuItems;
     /* 0x234 */ int mState;

@@ -149,9 +149,12 @@ int SHOnlineFriends::CompareFriendStatus(const void* a, const void* b)
 
 void SHOnlineFriends::InitializeButtons()
 {
-    FEPointerListener::Callback over(Bind<void>(MemFun(&SHOnlineFriends::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(Bind<void>(MemFun(&SHOnlineFriends::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback down(Bind<void>(MemFun(&SHOnlineFriends::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (SHOnlineFriends::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineFriends*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineFriends::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineFriends::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback down(PointerBinding(MemFun(&SHOnlineFriends::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 4; ++i)
     {
         mUnidentified0038[i].SetInstanceBounds(mUnidentified0618[i], true, -24.0f, 10.0f, 0.7f, 0.55f);

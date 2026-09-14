@@ -219,7 +219,7 @@ public:
 
     bool TestFlag(int flag) const
     {
-        return (mFlags & flag) != 0;
+        return mFlags & flag;
     }
 
     void SetFlag(int flag)

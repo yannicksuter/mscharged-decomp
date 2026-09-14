@@ -362,9 +362,12 @@ void PauseMenuScene::Update(float fDeltaT)
  */
 void PauseMenuScene::fn_8023A85C()
 {
-    FEPointerListener::Callback callback0(Bind<void>(MemFun(&PauseMenuScene::fn_8023AB94), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback callback1(Bind<void>(MemFun(&PauseMenuScene::fn_8023AC58), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback callback2(Bind<void>(MemFun(&PauseMenuScene::fn_8023AD04), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (PauseMenuScene::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, PauseMenuScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback callback0(PointerBinding(MemFun(&PauseMenuScene::fn_8023AB94), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback1(PointerBinding(MemFun(&PauseMenuScene::fn_8023AC58), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback2(PointerBinding(MemFun(&PauseMenuScene::fn_8023AD04), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 7; ++i)
     {
         mUnidentified044[i].SetInstanceBounds(mUnidentified028[i], true, 0.0f, 0.0f, 1.0f, 0.5f);

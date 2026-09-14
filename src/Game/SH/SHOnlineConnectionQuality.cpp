@@ -103,12 +103,15 @@ void OnlineConnectionQualityScene::OnReturnTimer(FETimer* timer)
 
 void OnlineConnectionQualityScene::InitializeInput()
 {
+    typedef Detail::MemFunImpl<void, void (OnlineConnectionQualityScene::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, OnlineConnectionQualityScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     FEPointerListener::Callback over(
-        Bind<void>(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback off(
-        Bind<void>(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback select(
-        Bind<void>(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 2; ++i)
     {

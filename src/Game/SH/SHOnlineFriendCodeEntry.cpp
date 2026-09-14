@@ -56,18 +56,21 @@ SHOnlineFriendCodeEntry::~SHOnlineFriendCodeEntry()
 
 void SHOnlineFriendCodeEntry::InitializeButtons()
 {
+    typedef Detail::MemFunImpl<void, void (SHOnlineFriendCodeEntry::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineFriendCodeEntry*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     FEPointerListener::Callback padSelect(
-        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback padOver(
-        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback padOff(
-        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback codeSelect(
-        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback codeOver(
-        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback codeOff(
-        Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 12; ++i)
     {

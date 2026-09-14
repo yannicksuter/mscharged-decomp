@@ -172,9 +172,12 @@ void FEPageControls::SetButtonState(int index, bool enabled, bool visible)
  */
 void FEPageControls::InitializeButtons()
 {
-    FEPointerListener::Callback callback0(Bind<void>(MemFun(&FEPageControls::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback callback1(Bind<void>(MemFun(&FEPageControls::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback callback2(Bind<void>(MemFun(&FEPageControls::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (FEPageControls::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, FEPageControls*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback callback0(PointerBinding(MemFun(&FEPageControls::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback1(PointerBinding(MemFun(&FEPageControls::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback2(PointerBinding(MemFun(&FEPageControls::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 2; ++i)
     {
         mButtonInstances[i]->SetActiveSlide("over", true, false);

@@ -492,9 +492,12 @@ void SHGameplayOptions::fn_80236ADC(int type, int value)
 
 void SHGameplayOptions::fn_80236E54()
 {
-    FEPointerListener::Callback over(Bind<void>(MemFun(&SHGameplayOptions::fn_802378F8), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(Bind<void>(MemFun(&SHGameplayOptions::fn_802379D0), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback down(Bind<void>(MemFun(&SHGameplayOptions::fn_80237A80), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (SHGameplayOptions::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHGameplayOptions*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(PointerBinding(MemFun(&SHGameplayOptions::fn_802378F8), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(MemFun(&SHGameplayOptions::fn_802379D0), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback down(PointerBinding(MemFun(&SHGameplayOptions::fn_80237A80), this, Placeholder<0>(), Placeholder<1>()));
     feVector3 skill = mUnidentified1390->GetAssetPosition();
     feVector3 series = mUnidentified1394->GetAssetPosition();
     feVector3 minutes = mUnidentified138C->GetAssetPosition();
@@ -515,9 +518,9 @@ void SHGameplayOptions::fn_80236E54()
         mOptionButtons[i].SetPointerLeaveCallback(off);
         mOptionButtons[i].SetPointerPressCallback(down);
     }
-    FEPointerListener::Callback cheatOver(Bind<void>(MemFun(&SHGameplayOptions::fn_80237C7C), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback cheatOff(Bind<void>(MemFun(&SHGameplayOptions::fn_80237D34), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback cheatDown(Bind<void>(MemFun(&SHGameplayOptions::fn_80237DE0), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cheatOver(PointerBinding(MemFun(&SHGameplayOptions::fn_80237C7C), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cheatOff(PointerBinding(MemFun(&SHGameplayOptions::fn_80237D34), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cheatDown(PointerBinding(MemFun(&SHGameplayOptions::fn_80237DE0), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 3; ++i)
     {
         TLInstance* instance = FEFinder<TLInstance, 2>::Find(mCheatInstances[i],
@@ -528,9 +531,9 @@ void SHGameplayOptions::fn_80236E54()
         mCheatButtons[i].SetPointerLeaveCallback(cheatOff);
         mCheatButtons[i].SetPointerPressCallback(cheatDown);
     }
-    FEPointerListener::Callback nextOver(Bind<void>(MemFun(&SHGameplayOptions::fn_80237E70), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback nextOff(Bind<void>(MemFun(&SHGameplayOptions::fn_80237EF8), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback nextDown(Bind<void>(MemFun(&SHGameplayOptions::fn_80237F68), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback nextOver(PointerBinding(MemFun(&SHGameplayOptions::fn_80237E70), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback nextOff(PointerBinding(MemFun(&SHGameplayOptions::fn_80237EF8), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback nextDown(PointerBinding(MemFun(&SHGameplayOptions::fn_80237F68), this, Placeholder<0>(), Placeholder<1>()));
     SetDoneButtonBounds(&mDoneButton, mDoneButtonInstance, true);
     mDoneButton.SetPointerEnterCallback(nextOver);
     mDoneButton.SetPointerLeaveCallback(nextOff);

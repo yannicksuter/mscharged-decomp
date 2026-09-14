@@ -372,14 +372,17 @@ void SHOptionsCheatsList::SceneCreated()
 
 void SHOptionsCheatsList::InitializeButtons()
 {
+    typedef Detail::MemFunImpl<void, void (SHOptionsCheatsList::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOptionsCheatsList*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     FEPointerListener::Callback over(
-        Bind<void>(MemFun(&SHOptionsCheatsList::OnCheatPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback off(
-        Bind<void>(MemFun(&SHOptionsCheatsList::OnCheatPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback down(
-        Bind<void>(MemFun(&SHOptionsCheatsList::OnCheatPointerInside), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerInside), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback select(
-        Bind<void>(MemFun(&SHOptionsCheatsList::OnCheatPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
     const char* listBack = "list_back_480x70 ";
     const char* challenge = "CHALLENGE_0";

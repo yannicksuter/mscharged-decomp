@@ -93,15 +93,18 @@ void SHOnlineInvitePlayers::RefreshRows()
 
 void SHOnlineInvitePlayers::InitializeButtons()
 {
-    FEPointerListener::Callback over(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnInvitePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnInvitePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback select(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnInvitePointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback cancelOver(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnCancelPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback cancelOff(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnCancelPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback cancelSelect(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnCancelPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback startOver(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnStartPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback startOff(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnStartPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback startSelect(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnStartPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (SHOnlineInvitePlayers::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineInvitePlayers*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnInvitePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnInvitePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback select(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnInvitePointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cancelOver(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnCancelPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cancelOff(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnCancelPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cancelSelect(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnCancelPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback startOver(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnStartPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback startOff(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnStartPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback startSelect(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnStartPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     mStartButton.SetPointerEnterCallback(startOver);
     mStartButton.SetPointerLeaveCallback(startOff);
     mStartButton.SetPointerPressCallback(startSelect);

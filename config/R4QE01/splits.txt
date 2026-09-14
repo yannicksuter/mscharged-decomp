@@ -1833,12 +1833,19 @@ Game/FE/feMusic.cpp:
 	.sbss       start:0x806E1878 end:0x806E1888
 
 Game/SH/SHNetworkStart.cpp:
-	.text       start:0x801FC4C8 end:0x801FEBEC
+	.text       start:0x801FC4C8 end:0x801FE81C
+	.data       start:0x8051AE40 end:0x8051B098
+	.sdata      start:0x806DDAA0 end:0x806DDAE8
+	.sbss       start:0x806E1888 end:0x806E1890
+	.sdata2     start:0x806E57E0 end:0x806E57F8
+
+unclassified/tu_801FE81C.cpp:
+	.text       start:0x801FE81C end:0x801FEBEC
 	.ctors      start:0x804DB798 end:0x804DB79C
-	.data       start:0x8051AE40 end:0x8051B0D0
-	.sdata      start:0x806DDAA0 end:0x806DDAF0
-	.sbss       start:0x806E1888 end:0x806E1898
-	.sdata2     start:0x806E57E0 end:0x806E5800
+	.data       start:0x8051B098 end:0x8051B0D0
+	.sdata      start:0x806DDAE8 end:0x806DDAF0
+	.sbss       start:0x806E1890 end:0x806E1898
+	.sdata2     start:0x806E57F8 end:0x806E5800
 
 Game/Render/Presentation.cpp:
 	.text       start:0x801FEBEC end:0x80200380

@@ -108,6 +108,9 @@ void FEBackButton::SetButtonInstance(TLComponentInstance* instance)
  */
 bool FEBackButton::UpdateBackButton(FEPointerEvent event, float)
 {
+    typedef Detail::MemFunImpl<void, void (FEBackButton::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, FEBackButton*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     if (mDisabled)
     {
         return false;
@@ -117,7 +120,7 @@ bool FEBackButton::UpdateBackButton(FEPointerEvent event, float)
     {
         mBoundsInitialized = true;
 
-        FEPointerListener::Callback callback(Bind<void>(
+        FEPointerListener::Callback callback(PointerBinding(
             MemFun(&FEBackButton::OnPointerInside), this, Placeholder<0>(), Placeholder<1>()));
         SetPointerInsideCallback(callback);
 

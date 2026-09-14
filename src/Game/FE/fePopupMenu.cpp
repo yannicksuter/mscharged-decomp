@@ -680,11 +680,14 @@ void FEPopupMenu::fn_801C83AC(bool visible)
 
 void FEPopupMenu::fn_801C8494()
 {
-    FEPointerListener::Callback enterCallback(Bind<void>(
+    typedef Detail::MemFunImpl<void, void (FEPopupMenu::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, FEPopupMenu*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback enterCallback(PointerBinding(
         MemFun(&FEPopupMenu::fn_801C87E0), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback leaveCallback(Bind<void>(
+    FEPointerListener::Callback leaveCallback(PointerBinding(
         MemFun(&FEPopupMenu::fn_801C88B4), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback pressCallback(Bind<void>(
+    FEPointerListener::Callback pressCallback(PointerBinding(
         MemFun(&FEPopupMenu::fn_801C8960), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)

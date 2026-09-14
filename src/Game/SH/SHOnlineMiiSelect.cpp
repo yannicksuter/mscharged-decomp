@@ -563,12 +563,15 @@ void SHOnlineMiiSelect::UpdatePage()
 
 void SHOnlineMiiSelect::InitializeButtons()
 {
+    typedef Detail::MemFunImpl<void, void (SHOnlineMiiSelect::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineMiiSelect*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     FEPointerListener::Callback over(
-        Bind<void>(MemFun(&SHOnlineMiiSelect::OpenItem), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineMiiSelect::OpenItem), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback off(
-        Bind<void>(MemFun(&SHOnlineMiiSelect::CloseItem), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineMiiSelect::CloseItem), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback select(
-        Bind<void>(MemFun(&SHOnlineMiiSelect::SelectMii), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHOnlineMiiSelect::SelectMii), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 10; ++i)
     {

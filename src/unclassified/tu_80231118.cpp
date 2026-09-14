@@ -421,14 +421,17 @@ void TU80231118Scene::Update(float dt)
 
 void TU80231118Scene::fn_80232E08()
 {
+    typedef Detail::MemFunImpl<void, void (TU80231118Scene::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, TU80231118Scene*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     FEPointerListener::Callback callback0(
-        Bind<void>(MemFun(&TU80231118Scene::fn_80231224), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU80231118Scene::fn_80231224), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback callback1(
-        Bind<void>(MemFun(&TU80231118Scene::fn_802312CC), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU80231118Scene::fn_802312CC), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback callback2(
-        Bind<void>(MemFun(&TU80231118Scene::fn_8023134C), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU80231118Scene::fn_8023134C), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback callback3(
-        Bind<void>(MemFun(&TU80231118Scene::fn_80231198), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TU80231118Scene::fn_80231198), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 3; ++i)
     {

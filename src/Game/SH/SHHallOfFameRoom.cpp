@@ -46,13 +46,16 @@ void SHHallOfFameCup::HandlePointerEvent(
 
 void SHHallOfFameCup::InitializeButtons()
 {
-    FEPointerListener::Callback enterFunc(Bind<void>(MemFun(&SHHallOfFameCup::OnItemPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback leaveFunc(Bind<void>(MemFun(&SHHallOfFameCup::OnItemPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback pressFunc(Bind<void>(MemFun(&SHHallOfFameCup::OnItemPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback insideFunc(Bind<void>(MemFun(&SHHallOfFameCup::OnItemPointerInside), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback progressEnterFunc(Bind<void>(MemFun(&SHHallOfFameCup::OnProgressPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback progressLeaveFunc(Bind<void>(MemFun(&SHHallOfFameCup::OnProgressPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback progressPressFunc(Bind<void>(MemFun(&SHHallOfFameCup::OnProgressPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (SHHallOfFameCup::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHHallOfFameCup*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback enterFunc(PointerBinding(MemFun(&SHHallOfFameCup::OnItemPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback leaveFunc(PointerBinding(MemFun(&SHHallOfFameCup::OnItemPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback pressFunc(PointerBinding(MemFun(&SHHallOfFameCup::OnItemPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback insideFunc(PointerBinding(MemFun(&SHHallOfFameCup::OnItemPointerInside), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback progressEnterFunc(PointerBinding(MemFun(&SHHallOfFameCup::OnProgressPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback progressLeaveFunc(PointerBinding(MemFun(&SHHallOfFameCup::OnProgressPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback progressPressFunc(PointerBinding(MemFun(&SHHallOfFameCup::OnProgressPointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
     mCupButton.SetInstanceBounds(mCupInstance, true, 0.0f, 0.0f, 1.0f, 1.0f);
     mCupButton.SetPointerEnterCallback(enterFunc);
@@ -145,9 +148,12 @@ void SHHallOfFameProfile::HandlePointerEvent(
 
 void SHHallOfFameProfile::InitializeButtons()
 {
-    FEPointerListener::Callback enterFunc(Bind<void>(MemFun(&SHHallOfFameProfile::OnSummaryPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback leaveFunc(Bind<void>(MemFun(&SHHallOfFameProfile::OnSummaryPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback pressFunc(Bind<void>(MemFun(&SHHallOfFameProfile::OnSummaryPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    typedef Detail::MemFunImpl<void, void (SHHallOfFameProfile::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHHallOfFameProfile*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback enterFunc(PointerBinding(MemFun(&SHHallOfFameProfile::OnSummaryPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback leaveFunc(PointerBinding(MemFun(&SHHallOfFameProfile::OnSummaryPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback pressFunc(PointerBinding(MemFun(&SHHallOfFameProfile::OnSummaryPointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
     mSummaryButton.SetInstanceBounds(mSummaryButtonInstance, true, 0.0f, 0.0f, 1.0f, 1.0f);
     mSummaryButton.SetPointerEnterCallback(enterFunc);

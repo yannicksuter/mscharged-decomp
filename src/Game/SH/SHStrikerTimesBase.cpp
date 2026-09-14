@@ -152,19 +152,22 @@ void SHStrikerTimesBase::OnDoneTransitionComplete()
 
 void SHStrikerTimesBase::InitializeControls()
 {
+    typedef Detail::MemFunImpl<void, void (SHStrikerTimesBase::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHStrikerTimesBase*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
     if (!mScrollBar.mInitialized)
     {
         mScrollBar.SetComponent(FindCurrentComponent("scrollbar"));
         mScrollBar.Initialize();
     }
     FEPointerListener::Callback callback(
-        Bind<void>(MemFun(&SHStrikerTimesBase::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHStrikerTimesBase::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerEnterCallback(callback);
     callback = FEPointerListener::Callback(
-        Bind<void>(MemFun(&SHStrikerTimesBase::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHStrikerTimesBase::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerLeaveCallback(callback);
     FEPointerListener::Callback callback2(
-        Bind<void>(MemFun(&SHStrikerTimesBase::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&SHStrikerTimesBase::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerPressCallback(callback2);
     SetDoneButtonBounds(&mDoneButton, 0, 0);
 }

@@ -106,7 +106,7 @@ private:
 
 public:
     BindExp3() { }
-    BindExp3(const F& function, const A& t0, const B& t1, const C& t2)
+    BindExp3(F function, const A& t0, const B& t1, const C& t2)
         : mFunction(function)
         , mT0(t0)
         , mT1(t1)
@@ -132,6 +132,12 @@ public:
     }
 
 private:
+    template <typename P, typename A1, typename C1>
+    R DoCall(P& p0, const A1& t0, const Placeholder<0>&, const C1& t2)
+    {
+        return mFunction(t0, p0, t2);
+    }
+
     template <typename P, typename A1, typename B1>
     R DoCall(P& p0, const A1& t0, const B1& t1, const Placeholder<0>&)
     {
