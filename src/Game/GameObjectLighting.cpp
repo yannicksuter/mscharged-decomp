@@ -4,6 +4,7 @@
 #include <revolution/mtx/mtx.h>
 
 #include "Game/GameObjectLighting.h"
+#include "Game/Render/ImpostorModel.h"
 
 #include "Game/BasicStadium.h"
 #include "Game/Camera/CameraMan.h"
@@ -70,12 +71,6 @@ struct GameObjectLight
     /* 0x1C */ nlColour colour;
     /* 0x20 */ f32 unknown20;
 }; // total size: 0x24
-
-struct UnidentifiedLightingObject
-{
-    /* 0x00 */ u8 mUnidentified00[0x34];
-    /* 0x34 */ nlVector3 mUnidentified34;
-};
 
 struct GameObjectLightArray
 {
@@ -330,9 +325,9 @@ int fn_80183DEC(const nlVector3* arg0)
     return (var0.c[0] * 140 + var0.c[1] * 88 + var0.c[2] * 29) >> 8;
 }
 
-void fn_80183E8C(UnidentifiedLightingObject* arg0, glModel* arg1)
+void fn_80183E8C(ImpostorModel* arg0, glModel* arg1)
 {
-    int var0 = fn_80183DEC(&arg0->mUnidentified34);
+    int var0 = fn_80183DEC(&arg0->mWorldMatrix.GetTranslation());
     nlColour var1;
     nlColourSet(var1, var0, var0, var0, 1);
     unsigned long var2 = *(unsigned long*)&var1;
@@ -781,9 +776,9 @@ void fn_80182EC8(s32 arg0)
     lbl_806E1428 = arg0;
 }
 
-void fn_80182EC0(u32 arg0)
+void SetGameObjectLightTexture(u32 texture)
 {
-    lbl_806DCC60 = arg0;
+    lbl_806DCC60 = texture;
 }
 
 u32 GetGameObjectLightTexture()

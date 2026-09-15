@@ -8,13 +8,6 @@ class DesireReceivePass;
 class SpaceSearch;
 struct LooseBallContactAnimInfo;
 
-extern "C" void fn_800C22CC(DesireReceivePass*, cPlayer*, bool,
-    bool, bool, const nlVector3*, float, float);
-extern "C" void fn_800C0704(DesireReceivePass*);
-extern "C" void fn_800C089C(DesireReceivePass*, bool);
-extern "C" void fn_800C0AE8(
-    DesireReceivePass*, bool, cPlayer*);
-
 class DesireReceivePass : public Desire
 {
 public:
@@ -27,6 +20,12 @@ public:
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
+    void fn_800C0704();
+    void fn_800C089C(bool);
+    void fn_800C0AE8(bool, cPlayer*);
+    void fn_800C22CC(cPlayer*, bool, bool, bool, const nlVector3*, float, float);
+    void fn_800C0F14();
+    bool fn_800C2F6C() { return !fn_800C0E54(); }
     bool fn_800C0E54();
     bool CalcRoughEstimates(int);
     bool CalcExactEstimates(bool);
@@ -86,6 +85,8 @@ private:
         float fReceivePassAnimTime;
     };
 
+    static int UnidentifiedAddReceiveFlags(int, bool);
+    bool UnidentifiedCanOneTouch();
     bool fn_800C0E74();
     const LooseBallContactAnimInfo* fn_800C1FA4(
         int, int&);
@@ -110,12 +111,6 @@ private:
     bool mbOneTouchPass;
     cPlayer* mpOneTouchPassTarget;
     Estimated mEstimated;
-
-    friend void fn_800C22CC(DesireReceivePass*, cPlayer*, bool,
-        bool, bool, const nlVector3*, float, float);
-    friend void fn_800C0704(DesireReceivePass*);
-    friend void fn_800C089C(DesireReceivePass*, bool);
-    friend void fn_800C0AE8(DesireReceivePass*, bool, cPlayer*);
 };
 
 #endif // GAME_AI_DESIRE_RECEIVE_PASS_H

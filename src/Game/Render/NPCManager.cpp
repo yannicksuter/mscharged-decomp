@@ -1,3 +1,4 @@
+#include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/tu_801B43F8.h"
 #include "Game/Render/tu_801B532C.h"
@@ -20,8 +21,8 @@
 #include "Game/Render/DiddyBanana.h"
 #include "Game/Render/BirdoEgg.h"
 #include "Game/Render/BulletBill.h"
-#include "unclassified/tu_801B298C.h"
-#include "unclassified/tu_801B535C.h"
+#include "Game/Render/ThwompObject.h"
+#include "Game/Render/YoshiEggObject.h"
 
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
@@ -39,13 +40,6 @@ extern "C"
     BirdoEggObject* __dt(BirdoEggObject* pObject, int bDelete);
     void Update(BirdoEggObject* pObject, float fDeltaT);
     void Reset(BirdoEggObject* pObject);
-
-    KoopaShellObject* fn_801A5F30(
-        KoopaShellObject* pObject, void* pDrawable);
-    KoopaShellObject* fn_801A6004(
-        KoopaShellObject* pObject, int bDelete);
-    void fn_801A6074(KoopaShellObject* pObject, float fDeltaT);
-    void fn_801A65F8(KoopaShellObject* pObject);
 
     void fn_801A01F8();
     void fn_801A0208(float fDeltaT);
@@ -104,7 +98,7 @@ NPCManager::NPCManager()
     }
     for (i = 0; i < 8; ++i)
     {
-        mUnidentified0AC[i] = 0;
+        mThwomps[i] = 0;
     }
 }
 
@@ -164,7 +158,7 @@ void NPCManager::CreateChainChomp()
 
 void NPCManager::fn_801A9AF8()
 {
-    mUnidentified024 = new (8, false) UnidentifiedObject_801B535C(GetRenderObject(3, 0));
+    mUnidentified024 = new (8, false) YoshiEggObject(GetRenderObject(3, 0));
 }
 
 void NPCManager::CreateBirdoEgg()
@@ -176,13 +170,7 @@ void NPCManager::CreateBirdoEgg()
 
 void NPCManager::fn_801A9BD0()
 {
-    KoopaShellObject* pObject
-        = (KoopaShellObject*)nlMalloc(0x3C, 8, false);
-    if (pObject != 0)
-    {
-        pObject = fn_801A5F30(pObject, GetRenderObject(5, 0));
-    }
-    mUnidentified02C = pObject;
+    mUnidentified02C = new (8, false) KoopaShellObject(GetRenderObject(5, 0));
 }
 
 void NPCManager::fn_801A9C3C()
@@ -322,33 +310,30 @@ HammerObject* NPCManager::fn_801AA3AC(int nIndex)
     return 0;
 }
 
-void NPCManager::fn_801AA4C0()
+void NPCManager::CreateThwomps()
 {
     for (unsigned int i = 0; i < 8; ++i)
     {
         ThwompObject* pObject
             = (ThwompObject*)nlMalloc(sizeof(ThwompObject), 8, false);
-        if (pObject != 0)
-        {
-            pObject = fn_801B298C(pObject, i);
-        }
-        mUnidentified0AC[i] = pObject;
+        pObject = new (pObject) ThwompObject(i);
+        mThwomps[i] = pObject;
     }
 }
 
-ThwompObject* NPCManager::fn_801AA528(
+ThwompObject* NPCManager::GetThwomp(
     int nIndex)
 {
     if (nIndex >= 0)
     {
-        return mUnidentified0AC[nIndex];
+        return mThwomps[nIndex];
     }
 
     for (int i = 0; i < 8; ++i)
     {
-        if (mUnidentified0AC[i] != 0 && !mUnidentified0AC[i]->mVisible)
+        if (mThwomps[i] != 0 && !mThwomps[i]->mVisible)
         {
-            return mUnidentified0AC[i];
+            return mThwomps[i];
         }
     }
     return 0;
@@ -512,7 +497,7 @@ NPCManager::~NPCManager()
     }
     if (mUnidentified02C != 0)
     {
-        fn_801A6004(mUnidentified02C, 1);
+        delete mUnidentified02C;
         mUnidentified02C = 0;
     }
 
@@ -546,10 +531,10 @@ NPCManager::~NPCManager()
     }
     for (i = 0; i < 8; ++i)
     {
-        if (mUnidentified0AC[i] != 0)
+        if (mThwomps[i] != 0)
         {
-            fn_801B2B60(mUnidentified0AC[i], 1);
-            mUnidentified0AC[i] = 0;
+            delete mThwomps[i];
+            mThwomps[i] = 0;
         }
     }
 
@@ -578,7 +563,7 @@ void NPCManager::DestroyNPCs()
     }
     if (mUnidentified02C != 0)
     {
-        fn_801A6004(mUnidentified02C, 1);
+        delete mUnidentified02C;
         mUnidentified02C = 0;
     }
 
@@ -612,10 +597,10 @@ void NPCManager::DestroyNPCs()
     }
     for (i = 0; i < 8; ++i)
     {
-        if (mUnidentified0AC[i] != 0)
+        if (mThwomps[i] != 0)
         {
-            fn_801B2B60(mUnidentified0AC[i], 1);
-            mUnidentified0AC[i] = 0;
+            delete mThwomps[i];
+            mThwomps[i] = 0;
         }
     }
     fn_801A01F8();
@@ -661,7 +646,7 @@ void NPCManager::UpdateAINPCs(float dt)
     mpChainChomp->Update(dt);
     if (mUnidentified024 != 0)
     {
-        mUnidentified024->fn_801B5544(dt);
+        mUnidentified024->Update(dt);
     }
     if (mpBirdoEgg != 0)
     {
@@ -669,7 +654,7 @@ void NPCManager::UpdateAINPCs(float dt)
     }
     if (mUnidentified02C != 0)
     {
-        fn_801A6074(mUnidentified02C, dt);
+        mUnidentified02C->Update(dt);
     }
     if (mpDiddyBanana != 0)
     {
@@ -710,9 +695,9 @@ void NPCManager::UpdateAINPCs(float dt)
     }
     for (i = 0; i < 8; ++i)
     {
-        if (mUnidentified0AC[i] != 0)
+        if (mThwomps[i] != 0)
         {
-            fn_801B2C00(mUnidentified0AC[i], dt);
+            mThwomps[i]->Update(dt);
         }
     }
     fn_801A0208(dt);
@@ -726,7 +711,7 @@ void NPCManager::fn_801ABF8C()
     }
     if (mUnidentified024 != 0)
     {
-        mUnidentified024->fn_801B5D14();
+        mUnidentified024->Reset();
     }
     if (mpBirdoEgg != 0)
     {
@@ -734,7 +719,7 @@ void NPCManager::fn_801ABF8C()
     }
     if (mUnidentified02C != 0)
     {
-        fn_801A65F8(mUnidentified02C);
+        mUnidentified02C->Reset();
     }
     if (mpDiddyBanana != 0)
     {
@@ -770,9 +755,9 @@ void NPCManager::fn_801ABF8C()
     }
     for (i = 0; i < 8; ++i)
     {
-        if (mUnidentified0AC[i] != 0)
+        if (mThwomps[i] != 0)
         {
-            fn_801B2E64(mUnidentified0AC[i], 1);
+            mThwomps[i]->Stop(true);
         }
     }
 }

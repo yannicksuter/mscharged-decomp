@@ -38,6 +38,11 @@ public:
     void PrepareForRecording();
     void SetCurrentTime(float time);
     void RenderSnapshotAt(float deltaTime);
+    int fn_8018A16C(float time) const;
+    bool fn_8018A4B4() const;
+    bool fn_8018A4BC() const;
+    bool fn_8018A4C4(int index);
+    bool fn_8018A5BC(int index);
 
     /* 0x0000 */ RenderSnapshot mSnapshots[3];
     /* 0x7554 */ RenderSnapshot* mCurrent;

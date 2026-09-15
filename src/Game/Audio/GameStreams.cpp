@@ -4,6 +4,7 @@
 #include "Game/Audio/AudioGlobals.h"
 
 #include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/AudioGlobals.h"
 #include "Game/Player.h"
 #include "Game/TweakRegistry.h"
@@ -46,9 +47,9 @@ void XSoundHandle::SetCallbackEnabled(unsigned char enabled)
     m_CallbackEnabled = enabled;
 }
 
-void InvalidateSoundHandle(XSoundHandle* handle)
+void XSoundCueHandle::Release()
 {
-    handle->m_State = 9;
+    m_State = 9;
 }
 
 void InitializeGameStreams()

@@ -13,7 +13,7 @@
 extern "C" void fn_800401C0(
     cFielder*, const nlVector3&, float, float);
 
-extern bool lbl_806E0E50;
+bool lbl_806E0E50;
 
 static float lbl_806DC1F8 = 5.0f;
 static float lbl_806DC1FC = 5.0f;
@@ -86,25 +86,18 @@ void DesireRunToNet::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0x21C | 0x800C3FB8 | size: 0xC8
  */
-void DesireRunToNet::UnidentifiedVirtual8(
+inline void DesireRunToNet::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireRunToNet");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
-        "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
-        "mThinkTimer");
+    Desire::UnidentifiedVirtual8(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x2E4 | 0x800C4080 | size: 0x9C
  */
-void DesireRunToNet::UnidentifiedVirtual7(
+inline void DesireRunToNet::UnidentifiedVirtual7(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireRunToNetType == 0xFFFF)
@@ -122,6 +115,6 @@ void DesireRunToNet::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x380 | 0x800C411C | size: 0x5C
  */
-DesireRunToNet::~DesireRunToNet()
+inline DesireRunToNet::~DesireRunToNet()
 {
 }

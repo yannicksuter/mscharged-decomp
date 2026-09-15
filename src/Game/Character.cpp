@@ -25,11 +25,11 @@
 #include "Game/CharacterTweaks.h"
 #include "Game/Ball.h"
 #include "Game/Render/BirdoEgg.h"
-#include "unclassified/tu_801B535C.h"
+#include "Game/Render/YoshiEggObject.h"
 #include "Game/Physics/PhysicsYoshiEgg.h"
 #include "Game/Render/BulletBill.h"
 #include "unclassified/tu_80175F8C.h"
-#include "unclassified/tu_801A5F10.h"
+#include "Game/Render/KoopaShellObject.h"
 #include "Game/ExcitementSystem.h"
 #include "Game/UnidentifiedBitPacker.h"
 #include "Game/CharacterTriggers.h"
@@ -66,7 +66,7 @@
 #include "math.h"
 #include <stddef.h>
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 extern PhysicsWorld* g_PhysicsWorld;
 
@@ -1081,7 +1081,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
 extern "C" void fn_80021D70(CollisionKoopaShellGoalieData* pEventData)
 {
     ((Goalie*)pEventData->goalie)->fn_80090958(pEventData->shell->mOwner != NULL);
-    fn_801A64A4(pEventData->shell, false);
+    pEventData->shell->Deactivate(false);
     fn_80015B38(g_pBall, false);
 }
 extern "C" void fn_80021DCC(CollisionBirdoEggGoalieData* pEventData)
@@ -1539,16 +1539,16 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
         {
             if (pFielder->fn_8003E74C())
             {
-                pFielder->InitActionShellReact(pEventData->mUnidentified08->mUnidentified10,
+                pFielder->InitActionShellReact(pEventData->mUnidentified08->mPosition,
                     pEventData->mUnidentified04->mUnidentified024.m_v3Velocity);
             }
-            else if (pFielder->IsCharacterInAir(pEventData->mUnidentified08->mUnidentified2C->GetRadius())
+            else if (pFielder->IsCharacterInAir(pEventData->mUnidentified08->mPhysics->GetRadius())
                 || (pFielder->m_eActionState == 0x1D && pFielder->mUnidentified024.m_eCharacterClass == HAMMERBROS)
                 || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == PEACH)
                 || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == WALUIGI)
                 || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == 13))
             {
-                pFielder->InitActionBombReact(pEventData->mUnidentified08->mUnidentified10, 0.0f);
+                pFielder->InitActionBombReact(pEventData->mUnidentified08->mPosition, 0.0f);
                 fn_801BAF0C(pFielder);
             }
             else
@@ -2186,7 +2186,7 @@ extern "C" void fn_8001EFE4(cFielder* character, bool bParam)
             lbl_806E0C28 = character->m_pPoseAccumulator->m_BaseSHierarchy->GetNodeIndexByID(
                 nlStringLowerHash("bip01 r prop"));
         }
-        character->mUnidentified184 = character->m_pPoseAccumulator->m_pQuaternions[lbl_806E0C28];
+        character->mUnidentified184 = character->m_pPoseAccumulator->GetNodeQuaternion(lbl_806E0C28);
         const nlMatrix4& m = character->m_pPoseAccumulator->GetNodeMatrix(lbl_806E0C28);
         character->mUnidentified194 = *(nlVector3*)&m.e2[3][0];
         character->mUnidentified1A0 = nlVec3Length(*(nlVector3*)&m.e2[0][0]);

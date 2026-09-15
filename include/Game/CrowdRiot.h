@@ -7,6 +7,7 @@
 class DebugWriteCache;
 class EmissionController;
 class PhysicsObject;
+class PhysicsTriggerVolume;
 
 struct Generators
 {
@@ -33,7 +34,7 @@ public:
     /* 0x14 */ nlVector3 mv3Position;
     /* 0x20 */ nlVector3 mv3Velocity;
     /* 0x2C */ u16 maDesiredFacingDirection;
-    /* 0x30 */ PhysicsObject* mUnidentified30;
+    /* 0x30 */ PhysicsTriggerVolume* mTriggerVolume;
     /* 0x34 */ int meState;
 }; // total size: 0x38
 

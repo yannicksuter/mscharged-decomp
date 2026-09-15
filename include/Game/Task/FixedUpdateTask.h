@@ -74,7 +74,7 @@ public:
 FixedUpdateTask* GetFixedUpdateTask();
 EventDispatcher* GetFixedUpdateEventDispatcher();
 void fn_80111654(int);
-void fn_80111658(bool);
+void fn_80111658(int);
 void fn_8011165C(int);
 void fn_80111660(int);
 bool fn_80111664();

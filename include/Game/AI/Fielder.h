@@ -352,7 +352,7 @@ public:
     void fn_80048484(float fDeltaT);
     void InitActionLooseBallShot(bool bIsChipShot);
     void fn_800486DC(float fDeltaT);
-    void fn_800489C0();
+    void fn_800489C0(float);
     float fn_800489C4();
     float fn_80048A08();
     void InitActionMegaStrikeMeter(bool bParam);

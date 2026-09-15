@@ -53,7 +53,7 @@ void fn_80111654(int)
 {
 }
 
-void fn_80111658(bool)
+void fn_80111658(int)
 {
 }
 

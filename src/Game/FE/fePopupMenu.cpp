@@ -369,17 +369,7 @@ void FEPopupMenu::Update(float fDeltaT)
     }
     BaseSceneHandler::Update(fDeltaT);
 
-    if (mMenuDisplayed && !mUnidentifiedC58)
-    {
-        TLImageInstance* pImage = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(
-            mPresentation->GetActiveSlide(), "Layer", "blackbox");
-        const feVector3 scale = pImage->GetAssetScale();
-        if (scale.e[0] >= mUnidentifiedC50 && scale.e[1] >= mUnidentifiedC54)
-            mUnidentifiedC58 = true;
-        else
-            pImage->SetAssetScale(scale.e[0] + mUnidentifiedC50 * fDeltaT / 0.75,
-                scale.e[1] + mUnidentifiedC54 * fDeltaT / 0.75, scale.e[2]);
-    }
+    UpdateBackgroundScale(fDeltaT);
     if (mPopup.numOptions <= 0)
         return;
     TLSlide* pSlide = mPresentation->GetActiveSlide();
@@ -411,6 +401,21 @@ void FEPopupMenu::Update(float fDeltaT)
             if (mUnidentified9A2)
                 break;
         }
+    }
+}
+
+void FEPopupMenu::UpdateBackgroundScale(float fDeltaT)
+{
+    if (mMenuDisplayed && !mUnidentifiedC58)
+    {
+        TLImageInstance* pImage = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(
+            mPresentation->GetActiveSlide(), "Layer", "blackbox");
+        const feVector3 scale = pImage->GetAssetScale();
+        if (scale.e[0] >= mUnidentifiedC50 && scale.e[1] >= mUnidentifiedC54)
+            mUnidentifiedC58 = true;
+        else
+            pImage->SetAssetScale(scale.e[0] + mUnidentifiedC50 * fDeltaT / 0.75,
+                scale.e[1] + mUnidentifiedC54 * fDeltaT / 0.75, scale.e[2]);
     }
 }
 
@@ -781,7 +786,7 @@ void FEPopupMenu::SetPositions()
     TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(
         presentation, "Slide1", "Layer", "Message");
     const feVector3 messagePosition = pText->GetAssetPosition();
-    pFont = ((const FEText*)pText->m_component)->m_pFeFontResource->m_pFontReference;
+    pFont = ((const FEText*)pText->m_component)->m_pFeFontResource->GetFontReference();
     nlTextBox::StringDrawInfo drawInfo = pText->m_DrawInfo;
     feVector3 messageScale = pText->GetAssetScale();
     float messageHeight = messageScale.e[1] * (float)(drawInfo.RowCount * pFont->m_Metrics.Height);

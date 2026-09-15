@@ -87,6 +87,10 @@ public:
     void SetExtraNameFilter(const char* filter);
     bool WorldIsFrozen() const;
     bool fn_8027E64C() const;
+    unsigned int IsPIPOverlayMode() const
+    {
+        return mUnidentified34338 == 0;
+    }
     float TimeLeft() const;
     float fn_8027C064(int param1) const;
     cAnimCamera* fn_8027E708();

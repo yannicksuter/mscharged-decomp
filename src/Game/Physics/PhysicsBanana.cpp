@@ -12,13 +12,14 @@
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsCharacter.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Physics/PhysicsNPC.h"
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Render/SkinAnimatedNPC.h"
 #include "NL/nlSlotPool.h"
-#include "unclassified/tu_801A5F10.h"
+#include "Game/Render/KoopaShellObject.h"
 #include "math.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -27,7 +28,6 @@ extern "C" bool fn_800167A8(cBall*);
 extern "C" bool fn_800977A4(cFielder*, float);
 extern "C" void fn_801473A4(CollisionPowerupGroundData*);
 extern "C" void fn_80147634(CollisionPowerupWallData*);
-extern "C" void fn_801481BC(SkinAnimatedNPC*);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -274,7 +274,8 @@ ContactType PhysicsBanana::Contact(
         bool isChainChomp = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)->GetSkinAnimatedNPC_Type() == SkinAnimatedNPC_CHAIN_CHOMP;
         if (isChainChomp)
         {
-            fn_801481BC((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC);
+            QueueCollisionChainCrowd(
+                (UnidentifiedEventData28*)((PhysicsNPC*)other)->mpAINPC);
         }
         break;
     }
@@ -283,7 +284,7 @@ ContactType PhysicsBanana::Contact(
     case 0x1C:
     {
         int value = *(int*)((u8*)other + 0x48);
-        int result = fn_80174ED4(value)->mUnidentified00;
+        int result = GetPhysicsPatchInfo(value)->mType;
         if (result == 8 || result == 9)
         {
             m_pPowerupObject->m_bShouldDestroy = true;

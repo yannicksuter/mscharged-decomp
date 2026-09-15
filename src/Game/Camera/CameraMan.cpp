@@ -12,6 +12,7 @@
 #include "Game/Camera/TopDownCamera.h"
 #include "Game/Camera/animcam.h"
 #include "Game/Camera/kickoffcam.h"
+#include "Game/Camera/noisefilter.h"
 #include "Game/Render/ImpostorManager.h"
 #include "Game/Task/BeginFrameTask.h"
 #include "NL/nlConfig.h"
@@ -25,7 +26,6 @@
 extern float g_fSimulationTick;
 
 extern "C" void fn_800F02DC(void*, unsigned long, void*);
-extern "C" UnidentifiedCameraFilter* fn_800EF9F0(void*);
 extern "C" void fn_8005B330(nlVector3*, float, float);
 extern "C" void fn_80277BB0();
 extern "C" void fn_800F0990(float);
@@ -43,7 +43,7 @@ int lbl_806E0ED0;
 int lbl_806E0ED4;
 bool lbl_806E0ED8;
 cRumbleFilter* lbl_806E0EDC;
-UnidentifiedCameraFilter* lbl_806E0EE0;
+cNoiseFilter* g_pNoiseFilter;
 int lbl_806E0EE4;
 
 nlMatrix4 cCameraManager::m_matView;
@@ -643,10 +643,10 @@ void cCameraManager::Shutdown()
         delete lbl_806E0EDC;
         lbl_806E0EDC = NULL;
     }
-    if (lbl_806E0EE0 != 0)
+    if (g_pNoiseFilter != 0)
     {
-        delete lbl_806E0EE0;
-        lbl_806E0EE0 = NULL;
+        delete g_pNoiseFilter;
+        g_pNoiseFilter = NULL;
     }
 }
 
@@ -672,13 +672,11 @@ extern "C" void fn_800F06D4()
 
     cRumbleFilter* pRumbleFilter = new (8, false) cRumbleFilter();
     lbl_806E0EDC = pRumbleFilter;
-    pBaseCamera->m_pFilter[pRumbleFilter->vfunc_0x14()] = pRumbleFilter;
+    pBaseCamera->m_pFilter[pRumbleFilter->GetFilterIndex()] = pRumbleFilter;
 
-    UnidentifiedCameraFilter* pFilter = static_cast<UnidentifiedCameraFilter*>(nlMalloc(sizeof(UnidentifiedCameraFilter), 8, false));
-    if (pFilter != 0)
-        pFilter = fn_800EF9F0(pFilter);
-    lbl_806E0EE0 = pFilter;
-    pBaseCamera->m_pFilter[pFilter->vfunc_0x14()] = pFilter;
+    cNoiseFilter* pFilter = new (8, false) cNoiseFilter();
+    g_pNoiseFilter = pFilter;
+    pBaseCamera->m_pFilter[pFilter->GetFilterIndex()] = pFilter;
 
     cCameraManager::PushCamera(pBaseCamera);
     lbl_806E0ED4 = 0;
@@ -705,13 +703,11 @@ extern "C" void fn_800F030C(bool bUnidentified)
 
     cRumbleFilter* pRumbleFilter = new (8, false) cRumbleFilter();
     lbl_806E0EDC = pRumbleFilter;
-    pBaseCamera->m_pFilter[pRumbleFilter->vfunc_0x14()] = pRumbleFilter;
+    pBaseCamera->m_pFilter[pRumbleFilter->GetFilterIndex()] = pRumbleFilter;
 
-    UnidentifiedCameraFilter* pFilter = static_cast<UnidentifiedCameraFilter*>(nlMalloc(sizeof(UnidentifiedCameraFilter), 8, false));
-    if (pFilter != 0)
-        pFilter = fn_800EF9F0(pFilter);
-    lbl_806E0EE0 = pFilter;
-    pBaseCamera->m_pFilter[pFilter->vfunc_0x14()] = pFilter;
+    cNoiseFilter* pFilter = new (8, false) cNoiseFilter();
+    g_pNoiseFilter = pFilter;
+    pBaseCamera->m_pFilter[pFilter->GetFilterIndex()] = pFilter;
 
     cCameraManager::PushCamera(pBaseCamera);
     g_eCurrentCameraType = pBaseCamera->GetType();
@@ -799,10 +795,10 @@ extern "C" void fn_800F02DC(void* pUnidentified0, unsigned long pUnidentified1, 
  */
 extern "C" void fn_800F026C(const nlVector3& v3Unidentified, float fUnidentified0, float fUnidentified1)
 {
-    UnidentifiedCameraFilter* pFilter = static_cast<UnidentifiedCameraFilter*>(cCameraManager::PeekCamera()->m_pFilter[1]);
+    cNoiseFilter* pFilter = static_cast<cNoiseFilter*>(cCameraManager::PeekCamera()->m_pFilter[1]);
     if (pFilter != 0)
     {
-        pFilter->vfunc_0x18(v3Unidentified, fUnidentified0, fUnidentified1);
+        pFilter->Start(v3Unidentified, fUnidentified0, fUnidentified1);
     }
 }
 

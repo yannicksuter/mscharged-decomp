@@ -24,8 +24,8 @@ public:
     void Fade(float rate, float to);
     void Update(float deltaTime);
     void Render();
-    void fn_801AF734(SaveFrame& frame);
-    void fn_801AF7A8(LoadFrame& frame);
+    void Replay(SaveFrame& frame);
+    void Replay(LoadFrame& frame);
 
     /* 0x00 */ float mRate;
     /* 0x04 */ float mPos;

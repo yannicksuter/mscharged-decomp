@@ -79,6 +79,17 @@ public:
         return (meBallState == 5 || meBallState == 3) && m_pPassTarget != 0;
     }
 
+    cPlayer* fn_800C2EC0() const { return m_pPassTarget; }
+    float fn_800C2EC8() const
+    {
+        if (m_fTotalPassTime > 0.0f)
+        {
+            return 1.0f - m_tPassTargetTimer.GetSeconds() / m_fTotalPassTime;
+        }
+        return 0.0f;
+    }
+    const nlVector3& fn_800C2F18() const { return m_v3PassIntercept; }
+
     bool UnidentifiedState8Shot()
     {
         return m_tLightningTimer.m_uPackedTime != 0 && meBallState == 8;

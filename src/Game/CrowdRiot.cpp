@@ -18,11 +18,11 @@
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsShell.h"
+#include "Game/Physics/PhysicsTriggerVolume.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
-#include "unclassified/tu_80174ED4.h"
 
 #include <math.h>
 
@@ -75,7 +75,7 @@ static inline void UnidentifiedRegisterEventCallback(
 }
 
 CrowdRiot::CrowdRiot(bool param1)
-    : mUnidentified30(0)
+    : mTriggerVolume(0)
 {
     fn_8002921C();
     if (param1)
@@ -107,10 +107,10 @@ CrowdRiot::CrowdRiot(bool param1)
 
 CrowdRiot::~CrowdRiot()
 {
-    if (mUnidentified30 != 0)
+    if (mTriggerVolume != 0)
     {
-        delete mUnidentified30;
-        mUnidentified30 = 0;
+        delete mTriggerVolume;
+        mTriggerVolume = 0;
     }
 }
 
@@ -232,10 +232,10 @@ void CrowdRiot::fn_80029460(bool param1)
         fn_8002921C();
     }
 
-    if (mUnidentified30 != 0)
+    if (mTriggerVolume != 0)
     {
-        delete mUnidentified30;
-        mUnidentified30 = 0;
+        delete mTriggerVolume;
+        mTriggerVolume = 0;
     }
 
     meState = 1;
@@ -267,18 +267,18 @@ void CrowdRiot::fn_80029460(bool param1)
         meState = 2;
         mfStateTime = sUnidentifiedFloat3;
 
-        if (mUnidentified30 == 0)
+        if (mTriggerVolume == 0)
         {
-            PhysicsSphere_80174F04* physicsObject
-                = new (8, false) PhysicsSphere_80174F04(
+            PhysicsTriggerVolume* physicsObject
+                = new (8, false) PhysicsTriggerVolume(
                     sUnidentifiedFloat0);
-            mUnidentified30 = physicsObject;
+            mTriggerVolume = physicsObject;
             physicsObject->m_pTriggerCallbackFunc
                 = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))fn_80029C80;
             physicsObject->m_pCallbackParam = this;
-            mUnidentified30->SetPosition(
+            mTriggerVolume->SetPosition(
                 mv3Position, PhysicsObject::WORLD_COORDINATES);
-            mUnidentified30->EnableCollisions();
+            mTriggerVolume->EnableCollisions();
         }
 
         group = EmissionManager::Instance()->GetEffectsGroup("crowd_riot_with_fade");

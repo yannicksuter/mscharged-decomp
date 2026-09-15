@@ -7,7 +7,7 @@
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "NL/platqmath.h"
-#include "unclassified/tu_801B298C.h"
+#include "Game/Render/ThwompObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 // Charged-only shadow prop, second of the run described beside
@@ -42,10 +42,10 @@ static void DrawShadow(ThwompObject* object, const nlMatrix4& matrix, void* mate
     float size = (1.0f - fade) * gShadowSizeLow + fade * gShadowSizeHigh;
     float alpha = (1.0f - fade) * gShadowAlphaLow + fade * gShadowAlphaHigh;
 
-    alpha = alpha * fn_801B3364(object);
+    alpha = alpha * object->GetScale();
     if (gShadowScalesWithObject == 1)
     {
-        size = size * fn_801B3364(object);
+        size = size * object->GetScale();
     }
 
     int value = (int)alpha;
@@ -136,7 +136,7 @@ void DrawableThwomp::Grab(const ThwompObject* object)
     }
 
     mVisible = object->mVisible;
-    mPosition = *fn_801B327C(object);
+    mPosition = *object->GetPosition();
     object->mPhysics->GetRotation(&rotation);
     nlMatrixToQuat(mOrientation, rotation);
 }
@@ -152,7 +152,7 @@ void DrawableThwomp::Render(ThwompObject* object) const
         return;
     }
 
-    fn_801B339C(object);
+    object->UpdateTexture();
 
     drawable = object->mDrawable;
     if (drawable == 0)
@@ -170,7 +170,8 @@ void DrawableThwomp::Render(ThwompObject* object) const
     }
 
     int state = object->mState;
-    if (state == 1 || state == 0 || state == 6)
+    if (state == THWOMP_STATE_IDLE || state == THWOMP_STATE_APPEARING
+        || state == THWOMP_STATE_DISAPPEARING)
     {
         drawable->m_uObjectFlags &= ~1;
     }

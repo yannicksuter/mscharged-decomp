@@ -46,6 +46,9 @@ public:
     /* 0x20 */ char m_szName[32];
     /* 0x40 */ u32 m_hash;
     /* 0x44 */ bool field_0x44;
+
+private:
+    void SetName(const char* name);
 };
 
 #endif // _TLSLIDE_H_

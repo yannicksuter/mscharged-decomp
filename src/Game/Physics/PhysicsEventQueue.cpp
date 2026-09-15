@@ -36,8 +36,8 @@
 #include "unclassified/tu_80175F8C.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "unclassified/tu_801A0E64.h"
-#include "unclassified/tu_801A5F10.h"
-#include "unclassified/tu_801B535C.h"
+#include "Game/Render/KoopaShellObject.h"
+#include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" void fn_8017617C();
@@ -283,7 +283,7 @@ extern "C" void fn_801453FC(void* data)
     {
         fn_80015B38(g_pBall, 0);
     }
-    fn_801A64A4(*(KoopaShellObject**)bytes, false);
+    (*(KoopaShellObject**)bytes)->Deactivate(false);
 }
 
 extern "C" void fn_8014545C(void* data)
@@ -549,20 +549,20 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
         ((PhysicsWaluigiWall*)pObject)->ApplyDamage(0.35f);
         break;
     case 32:
-        if (((PhysicsYoshiEgg*)pObject)->mYoshiEgg->mUnidentified34
+        if (((PhysicsYoshiEgg*)pObject)->mYoshiEgg->mFielder
             == pShockwave->owner)
         {
             break;
         }
         if (effectType == 3)
         {
-            ((PhysicsYoshiEgg*)pObject)->mYoshiEgg->fn_801B54AC(true,
+            ((PhysicsYoshiEgg*)pObject)->mYoshiEgg->Suspend(true,
                 gGameTweaks.m_pGameTweaks->fFreezeShellFrozenTime);
         }
         if (effectType != 2)
         {
             fn_8002E5F4(
-                ((PhysicsYoshiEgg*)pObject)->mYoshiEgg->mUnidentified34,
+                ((PhysicsYoshiEgg*)pObject)->mYoshiEgg->mFielder,
                 0);
         }
         break;
@@ -840,7 +840,7 @@ extern "C" void fn_80148074(UnidentifiedEventData25* data)
         data, Function<UnidentifiedEventData25*>((void (*)(UnidentifiedEventData25*))fn_8016A868));
 }
 
-extern "C" void fn_801481BC(UnidentifiedEventData28* data)
+void QueueCollisionChainCrowd(UnidentifiedEventData28* data)
 {
     lbl_806E11F0->mEvent35.Queue(data, Function<UnidentifiedEventData28*>());
 }

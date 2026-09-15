@@ -6,7 +6,7 @@
 #include "Game/AI/Powerups.h"
 #include "Game/Audio/GameStreams.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/Ball.h"
 #include "Game/BasicStadium.h"
 #include "Game/Camera/CameraMan.h"

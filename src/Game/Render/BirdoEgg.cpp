@@ -15,7 +15,7 @@
 #include "Game/Sys/audio.h"
 #include "Game/Team.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "types.h"

@@ -1,5 +1,5 @@
 #include "Game/Audio/AudioGlobals.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/XSoundHandle.h"
 #include "Game/Sys/debug.h"
 
@@ -24,7 +24,7 @@ XSoundHandle::XSoundHandle(void* value1,
     , m_Owner(owner)
     , m_PreviousTime(0.0f)
     , m_CurrentTime(0.0f)
-    , m_Unknown20(0)
+    , m_LocalSliders(0)
     , m_Callback(callback)
     , m_CallbackContext(callbackContext)
 {

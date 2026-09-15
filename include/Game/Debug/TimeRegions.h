@@ -30,4 +30,8 @@ public:
     /* 0x14 */ Histogram m_Histogram;
 };
 
+extern TimeRegion* pGamePlayTimeRegion;
+extern TimeRegion* pNISTimeRegion;
+extern TimeRegion* pAutoReplayTimeRegion;
+
 #endif // GAME_DEBUG_TIME_REGIONS_H

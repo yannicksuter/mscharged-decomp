@@ -2,6 +2,7 @@
 #define GAME_AI_DESIRE_H
 
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/DebugWriteCache.h"
 #include "NL/nlMath.h"
 #include "NL/nlTimer.h"
 #include "types.h"
@@ -61,6 +62,8 @@ public:
     }
 
 public:
+    UnidentifiedScriptMachine* fn_800C2F28() const { return mUnidentified018; }
+
     int mUnidentifiedState;
     bool mUnidentifiedActive;
     u8 mPadding009[3];
@@ -603,5 +606,12 @@ private:
     float mfConfusedPercentage;
     float mfConfusedDirection;
 };
+
+inline void Desire::UnidentifiedVirtual8(void*, DebugWriteCache* cache)
+{
+    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
+    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+}
 
 #endif // GAME_AI_DESIRE_H

@@ -9,6 +9,7 @@ class FEFontResource : public FEResourceHandle
 {
 public:
     void SetFontReference(nlFont* pFontReference);
+    nlFont* GetFontReference() const { return m_pFontReference; }
 
     /* 0x18 */ nlFont* m_pFontReference;
 }; // size 0x1C

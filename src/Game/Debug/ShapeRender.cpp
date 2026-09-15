@@ -4,7 +4,7 @@
 #include "Game/GL/GLColourMeshWriter.h"
 #include "Game/GL/MeshWriter.h"
 
-#include "unclassified/tu_802B7798.h"
+#include "NL/nlDebugViews.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 

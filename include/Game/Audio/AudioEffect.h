@@ -71,6 +71,11 @@ public:
     int AssignAuxiliary(const int& effect);
     int GetAuxiliary(const int& effect) const;
 
+    int& GetAuxiliaryIndex(const int& effect)
+    {
+        return m_Indices[effect];
+    }
+
     int m_Effects[2];
     int m_Indices[2];
 };

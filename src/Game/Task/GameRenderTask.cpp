@@ -58,7 +58,7 @@
 #include "Game/Render/PeachPhoto.h"
 #include "Game/Render/NumberDisplay.h"
 #include "Game/Render/Warble.h"
-#include "unclassified/tu_802B7798.h"
+#include "NL/nlDebugViews.h"
 #include "Game/Render/ShadowVolume.h"
 
 #include <string.h>

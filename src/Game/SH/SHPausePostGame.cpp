@@ -175,7 +175,7 @@ void PausePostGameScene::fn_801EE180()
             slide = slide->m_next;
         } while (slide != first);
     }
-    mSummary.fn_802095D0(TeamStats(*StatsTracker::Instance()->mCumulativeTeamStats[0]),
+    mSummary.DisplayMatchSummary(TeamStats(*StatsTracker::Instance()->mCumulativeTeamStats[0]),
         TeamStats(*StatsTracker::Instance()->mCumulativeTeamStats[1]), presentation);
 }
 

@@ -110,6 +110,9 @@ public:
     /* 0xC50 */ float mUnidentifiedC50;
     /* 0xC54 */ float mUnidentifiedC54;
     /* 0xC58 */ bool mUnidentifiedC58;
+
+private:
+    void UpdateBackgroundScale(float fDeltaT);
 }; // size 0xC5C
 
 #endif // GAME_FE_FE_POPUP_MENU_H

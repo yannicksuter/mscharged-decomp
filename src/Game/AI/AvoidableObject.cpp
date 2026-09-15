@@ -17,7 +17,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlList.h"
 #include "NL/nlMath.h"
-#include "unclassified/tu_801B535C.h"
+#include "Game/Render/YoshiEggObject.h"
 
 extern cTeam* g_pCurrentlyUpdatingTeam;
 
@@ -177,7 +177,7 @@ float AvoidableFielder::GetRadius()
     float fRadius = 0.0f;
     if (m_pFielder->fn_8003EA6C())
     {
-        fRadius = gNPCManager->mUnidentified024->mUnidentified2C->GetRadius();
+        fRadius = gNPCManager->mUnidentified024->mPhysics->GetRadius();
     }
     else
     {

@@ -35,12 +35,12 @@
 #include "NL/nlAVLTree.h"
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_801B535C.h"
-#include "unclassified/tu_801F877C.h"
+#include "Game/Render/YoshiEggObject.h"
+#include "Game/FE/Overlay/OverlayHandlerSuperAbility.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include <stdlib.h>
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
     DefaultKeyCompare<unsigned int> >
@@ -133,7 +133,6 @@ extern float lbl_806DC31C;
 extern float lbl_806DC320;
 extern float lbl_806DC324;
 extern float lbl_806DC328;
-extern int lbl_806E1870;
 extern float lbl_806DC240;
 extern float lbl_806DC260;
 extern float lbl_806DC264;
@@ -380,8 +379,8 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
         cFielder* fielder = mUnidentifiedFielder;
         if (fielder->m_pBall != 0 && g_pGame->IsGameplayOrOvertime())
         {
-            lbl_806E1870 = GameInfoManager::Instance()->GetTeam(fielder->m_pTeam->m_nSide);
-            ((TU801F877COverlay*)g_pOverlayManager->GetScene((SceneList)102))->fn_801F8B3C();
+            gSuperAbilityTeam = (eTeamID)GameInfoManager::Instance()->GetTeam(fielder->m_pTeam->m_nSide);
+            ((SuperAbilityOverlay*)g_pOverlayManager->GetScene((SceneList)102))->Start();
             PlaySound(fielder->mUnidentified318, 0x790F135F, 0, 0);
             fn_80060A00(g_pGame, fielder);
         }
@@ -550,7 +549,7 @@ void DesireSuperPower::UnidentifiedCleanup()
         fn_80039CF0(mUnidentifiedFielder, 0);
         mUnidentifiedFielder->bYoshiInWindup = false;
         fn_801B881C(mUnidentifiedFielder);
-        gNPCManager->mUnidentified024->fn_801B5DD0();
+        gNPCManager->mUnidentified024->Break();
         break;
     }
 
@@ -1750,7 +1749,7 @@ extern "C" float fn_800D1D4C(const DesireRunInDirection* desire)
  */
 extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
 {
-    gNPCManager->mUnidentified024->fn_801B5858(self->mUnidentifiedFielder);
+    gNPCManager->mUnidentified024->Activate(self->mUnidentifiedFielder);
     self->mUnidentifiedFielder->m_pTweaks
         = self->mUnidentifiedFielder->mUnidentified328;
     fn_8002E52C(self->mUnidentifiedFielder);

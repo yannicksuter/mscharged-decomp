@@ -18,7 +18,7 @@ typedef AVLTreeBase<unsigned int, EventRegistryValue,
 extern EventRegistry* g_pEventRegistry;
 
 template <typename T>
-UnidentifiedTypedEvent<T>* UnidentifiedFindEvent(const char* name, int length)
+inline UnidentifiedTypedEvent<T>* UnidentifiedFindEvent(const char* name, int length)
 {
     unsigned int hash = HashEventName(name, length);
     EventRegistryValue* value = 0;

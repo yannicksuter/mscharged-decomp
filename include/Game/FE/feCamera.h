@@ -3,6 +3,12 @@
 
 #include "Game/Camera/CameraMan.h"
 
+extern int gFEWorldLoadState;
+
+void BeginLoadFEWorld();
+bool FinishLoadFEWorld();
+void DestroyFEWorld();
+
 void PushPresentationCamera(const char* name, void (*callback)(eCameraMessage),
     float duration, bool deleteCurrentCamera);
 void PopPresentationCamera(void (*callback)(eCameraMessage), float duration);

@@ -16,7 +16,7 @@
 #include "NL/gl/glFont.h"
 #include "NL/nlMain.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_802B7798.h"
+#include "NL/nlDebugViews.h"
 
 #include <stdarg.h>
 

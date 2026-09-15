@@ -285,14 +285,9 @@ void LoadCrowdCharacterList()
 void InitializeCrowdImpostors(bool alternateView)
 {
     CrowdSidelineFilter* tweak = new (8, false) CrowdSidelineFilter;
-    bool found = tweak->mSidelineCullingDistance.Bind("mfSidelineCullingDistance",
-        sCrowdZero, "/Render/Crowd", true, sMaxCrowdSidelineCullingDistance,
-        sCrowdSidelineCullingDistanceStep);
-    if (!found)
-    {
-        tweak->mSidelineCullingDistance = tweak->mSidelineCullingDistance.GetDefaultValue();
-        tweak->mSidelineCullingDistance = sCrowdZero;
-    }
+    tweak->mSidelineCullingDistance.BindWithDefault("mfSidelineCullingDistance",
+        sCrowdZero, "/Render/Crowd", true, sCrowdZero,
+        sMaxCrowdSidelineCullingDistance, sCrowdSidelineCullingDistanceStep);
     sCrowdSidelineFilter = tweak;
 
     int crowdMax = GetTweakInt(sMaxCrowdSizePath, 10000);

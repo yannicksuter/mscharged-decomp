@@ -2,7 +2,7 @@
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/AnimInventory.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/CharacterLoader.h"
 #include "Game/CharacterTweaks.h"

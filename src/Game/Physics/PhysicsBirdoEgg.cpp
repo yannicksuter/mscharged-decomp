@@ -15,7 +15,7 @@
 #include "Game/Physics/PhysicsYoshiEgg.h"
 #include "Game/Render/SkinAnimatedNPC.h"
 #include "unclassified/tu_801A0E64.h"
-#include "unclassified/tu_801B535C.h"
+#include "Game/Render/YoshiEggObject.h"
 #include "NL/nlSlotPool.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -130,8 +130,8 @@ ContactType PhysicsBirdoEgg::Contact(
     }
     case 0x20:
     {
-        UnidentifiedObject_801B535C* egg = ((PhysicsYoshiEgg*)other)->mYoshiEgg;
-        if (egg->mUnidentified28)
+        YoshiEggObject* egg = ((PhysicsYoshiEgg*)other)->mYoshiEgg;
+        if (egg->mActive)
         {
             endData = 0;
             g_CollisionBirdoEggEndDataPool.Allocate(endData);
@@ -142,7 +142,7 @@ ContactType PhysicsBirdoEgg::Contact(
             UnidentifiedEventData34* crackData = 0;
             lbl_80570188.Allocate(crackData);
             crackData->mUnidentified00 = 0;
-            crackData->mUnidentified04 = egg->mUnidentified34;
+            crackData->mUnidentified04 = egg->mFielder;
             crackData->mUnidentified08 = egg;
             crackData->mUnidentified0C = 0;
             crackData->mUnidentified10 = 0;

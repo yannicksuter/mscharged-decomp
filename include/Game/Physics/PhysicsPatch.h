@@ -12,20 +12,19 @@ class PhysicsPatch;
 class cPlayer;
 class AvoidableObject;
 
-struct UnidentifiedPhysicsPatchInfo_80510BF0
+struct PhysicsPatchInfo
 {
-    /* 0x00 */ int mUnidentified00;
-    /* 0x04 */ const char* mUnidentified04;
-    /* 0x08 */ const char* mUnidentified08;
-    /* 0x0C */ unsigned int mUnidentified0C;
-    /* 0x10 */ unsigned long mUnidentified10;
-    /* 0x14 */ float mUnidentified14;
-    /* 0x18 */ float mUnidentified18;
-    /* 0x1C */ float mUnidentified1C;
+    /* 0x00 */ int mType;
+    /* 0x04 */ const char* mName;
+    /* 0x08 */ const char* mEffectName;
+    /* 0x0C */ unsigned int mCollisionMask;
+    /* 0x10 */ unsigned long mSoundID;
+    /* 0x14 */ float mGravity;
+    /* 0x18 */ float mFriction;
+    /* 0x1C */ float mBounce;
 }; // total size: 0x20
 
-extern "C" UnidentifiedPhysicsPatchInfo_80510BF0* fn_80174ED4(
-    const int& type);
+PhysicsPatchInfo* GetPhysicsPatchInfo(const int& type);
 
 class PhysicsPatch : public PhysicsSphere
 {

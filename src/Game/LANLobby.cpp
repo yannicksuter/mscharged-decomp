@@ -6,10 +6,11 @@
 #include "Game/NetworkRandom.h"
 
 #include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/glFont.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
-#include "unclassified/tu_802B7798.h"
+#include "NL/nlDebugViews.h"
 #include "NL/plat/TransportConnection.h"
 #include "Game/LANMessages.h"
 
@@ -136,7 +137,10 @@ int LANLobby::CreateGame(int value)
     mPeerInfoList[0].mUnidentified1C = -1;
     if (mFindGameEnabled)
         mFindGameEnabled = false;
-    mAdvertiseGame = !g_bDirectConnectMode;
+    if (g_bDirectConnectMode)
+        mAdvertiseGame = false;
+    else
+        mAdvertiseGame = true;
     mSocket->SocketVirtual10(true);
     if (mListener != 0)
         mListener->OnGameCreated(0);
@@ -197,14 +201,14 @@ int LANLobby::JoinGame(LANGameInfo* game, int value)
         if (g_bDirectConnectMode)
         {
             game = &gDirectConnectGameInfo;
-            nlStrNCpy(game->mUnidentified00, "Server", 11);
-            game->mUnidentified0C[0] = g_nConnectToServerAddress[0];
-            game->mUnidentified0C[1] = g_nConnectToServerAddress[1];
-            game->mUnidentified0C[2] = g_nConnectToServerAddress[2];
-            game->mUnidentified0C[3] = g_nConnectToServerAddress[3];
-            game->mUnidentified14 = 0.0f;
-            game->mUnidentified10 = 0;
-            game->mUnidentified18 = g_nConnectToServerPort;
+            nlStrNCpy(gDirectConnectGameInfo.mUnidentified00, "Server", 11);
+            gDirectConnectGameInfo.mUnidentified14 = 0.0f;
+            gDirectConnectGameInfo.mUnidentified10 = 0;
+            gDirectConnectGameInfo.mUnidentified0C[0] = g_nConnectToServerAddress[0];
+            gDirectConnectGameInfo.mUnidentified0C[1] = g_nConnectToServerAddress[1];
+            gDirectConnectGameInfo.mUnidentified0C[2] = g_nConnectToServerAddress[2];
+            gDirectConnectGameInfo.mUnidentified0C[3] = g_nConnectToServerAddress[3];
+            gDirectConnectGameInfo.mUnidentified18 = g_nConnectToServerPort;
         }
         else
         {
@@ -537,8 +541,10 @@ void LANLobby::Update(float dt)
         if (mFindGameElapsedTime >= g_fBroadCastFindGameTime)
         {
             NetMessageFindGame message;
-            message.mUnidentified08[0] = NetworkRandom();
-            message.mUnidentified08[1] = NetworkRandom();
+            u32 first = NetworkRandom();
+            u32 second = NetworkRandom();
+            message.mUnidentified08[1] = second;
+            message.mUnidentified08[0] = first;
             memcpy(mFindGameToken, message.mUnidentified08, 8);
             u8 buffer[200];
             int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
@@ -548,18 +554,7 @@ void LANLobby::Update(float dt)
     }
     if (mState == 1)
     {
-        bool ready = mPeerCount >= 2;
-        if (ready)
-        {
-            for (int peer = 1; peer < mPeerCount; ++peer)
-            {
-                if (mPeerInfoList[peer].mUnidentified18 != 3)
-                {
-                    ready = false;
-                    break;
-                }
-            }
-        }
+        bool ready = CheckPeerStates();
         if (ready)
         {
             if (GetTopology() == 0)
@@ -671,27 +666,6 @@ void LANLobby::SendReadyToLaunchRequest()
     }
 }
 
-bool LANLobby::ArePeerConnectionsReady()
-{
-    if (GetTopology() == 0)
-    {
-        bool ready = true;
-        for (int peer = 1; peer < mPeerCount; ++peer)
-        {
-            if (peer != mLocalMachineIndex)
-            {
-                int index = mPeerInfoList[peer].mUnidentified1C;
-                if (index == -1)
-                    ready = false;
-                else if (m_ConnectionPool[index].mUnidentified04 != 2)
-                    ready = false;
-            }
-        }
-        return ready;
-    }
-    return true;
-}
-
 void LANLobby::EnumerateGames()
 {
     for (int index = 0; index < mFoundGameCount; ++index)
@@ -757,13 +731,12 @@ void LANLobby::SendJoinResponse(TransportConnection* connection, bool accepted)
     {
         for (int peer = 1; peer < mPeerCount - 1; ++peer)
         {
-            LANPeerMessageInfo& info = message.mUnidentified24[peer - 1];
-            *(u32*)info.mUnidentified00 = *(u32*)mPeerInfoList[peer].mUnidentified14;
-            info.mUnidentified04 = mPeerInfoList[peer].mUnidentified20;
-            nlStrNCpy(info.mUnidentified06, mPeerInfoList[peer].mName, 11);
-            info.mUnidentified12 = mPeerInfoList[peer].mUnidentified0B;
-            memcpy(info.mUnidentified13, &mPeerInfoList[peer].mUnidentified0C, mPeerInfoList[peer].mUnidentified0B);
-            info.mUnidentified11 = peer;
+            message.mUnidentified24[peer - 1].mAddressWord = mPeerInfoList[peer].mAddressWord;
+            message.mUnidentified24[peer - 1].mUnidentified04 = mPeerInfoList[peer].mUnidentified20;
+            nlStrNCpy(message.mUnidentified24[peer - 1].mUnidentified06, mPeerInfoList[peer].mName, 11);
+            message.mUnidentified24[peer - 1].mUnidentified12 = mPeerInfoList[peer].mUnidentified0B;
+            memcpy(message.mUnidentified24[peer - 1].mUnidentified13, &mPeerInfoList[peer].mUnidentified0C, mPeerInfoList[peer].mUnidentified0B);
+            message.mUnidentified24[peer - 1].mUnidentified11 = peer;
             ++message.mUnidentified23;
         }
     }
@@ -853,8 +826,7 @@ void LANLobby::ProcessJoinResponse(int index, NetMessageJoinResponse* message)
         DumpPeerInfo();
         if (GetTopology() == 0)
         {
-            NetMessageClientConfirmedJoin response;
-            response.mUnidentified08 = mLocalMachineIndex;
+            NetMessageClientConfirmedJoin response(mLocalMachineIndex);
             u8 buffer[8];
             int size = gNetworkMessageRegistry->Serialize(&response, buffer, sizeof(buffer));
             u32 connection = GetMachineAid(0);
@@ -1020,6 +992,27 @@ int LANLobby::ProcessMessage(NetworkMessage* message)
         break;
     }
     return 1;
+}
+
+bool LANLobby::ArePeerConnectionsReady()
+{
+    if (GetTopology() == 0)
+    {
+        bool ready = true;
+        for (int peer = 1; peer < mPeerCount; ++peer)
+        {
+            if (peer != mLocalMachineIndex)
+            {
+                int index = mPeerInfoList[peer].mUnidentified1C;
+                if (index == -1)
+                    ready = false;
+                else if (m_ConnectionPool[index].mUnidentified04 != 2)
+                    ready = false;
+            }
+        }
+        return ready;
+    }
+    return true;
 }
 
 int LANLobby::GetTopology()

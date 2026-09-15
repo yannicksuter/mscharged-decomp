@@ -82,7 +82,7 @@ void GameResultsScene::Update(float dt)
     if (!mUnidentified5D8 && mUnidentifiedA10 != 0)
     {
         FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-        mSummary.fn_802095D0(mUnidentifiedA10->mSides[0], mUnidentifiedA10->mSides[1], presentation);
+        mSummary.DisplayMatchSummary(mUnidentifiedA10->mSides[0], mUnidentifiedA10->mSides[1], presentation);
     }
     UnidentifiedGameClock* clock = mUnidentifiedA18;
     if (clock != 0)

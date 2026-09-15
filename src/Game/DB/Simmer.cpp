@@ -1,9 +1,24 @@
-#include "Game/DB/GameProgress.h"
 #include "Game/DB/Simmer.h"
-#include "Game/DB/GameProgress.h"
 
+#include "Game/DB/GameProgress.h"
 #include "Game/DB/StatsTracker.h"
 #include "NL/nlMath.h"
+
+static int RandomRange(int minimum, int maximum)
+{
+    int value = (int)nlRandom(maximum - minimum, &nlDefaultSeed);
+    return minimum + value;
+}
+
+static int GetRandomPlayerIndex()
+{
+    unsigned int player = nlRandom(5, &nlDefaultSeed);
+    if (player == 5)
+    {
+        player = 0;
+    }
+    return player;
+}
 
 /**
  * Offset/Address/Size: 0x0 | 0x80109E30 | size: 0x4
@@ -21,40 +36,29 @@ void Simulator::fn_80109E34()
     int fouls[2] = { 0, 0 };
     int incompletePasses[2] = { 0, 0 };
 
-    int possession = (int)nlRandom(15, &nlDefaultSeed) + 10;
-    possession += (int)nlRandom(100 - possession * 2, &nlDefaultSeed);
+    int possession = RandomRange(0, 15) + 10;
+    possession += RandomRange(0, 100 - possession * 2);
     StatsTracker::Track(STATS_16, 0, 0, possession, 0, 0, 0);
     StatsTracker::Track(STATS_16, 1, 0, 100 - possession, 0, 0, 0);
 
     for (int team = 0; team < 2; team++)
     {
-        fouls[team] = (int)nlRandom(15, &nlDefaultSeed);
+        fouls[team] = RandomRange(0, 15);
         for (int i = 0; i < fouls[team]; i++)
         {
-            int player = (int)nlRandom(5, &nlDefaultSeed);
-            if (player == 5)
-            {
-                player = 0;
-            }
+            int player = GetRandomPlayerIndex();
             StatsTracker::Instance()->TrackStat(
                 STATS_FOULS, team, player, 0, 0, 0, 0);
         }
 
-        int passes = (int)nlRandom(15, &nlDefaultSeed);
-        int completedPasses = (int)nlRandom(15, &nlDefaultSeed);
-        if (completedPasses > passes)
-        {
-            completedPasses = passes;
-        }
+        int passes = RandomRange(0, 15);
+        int completedPasses = RandomRange(0, 15);
+        completedPasses = nlMin(completedPasses, passes);
         incompletePasses[team] = passes - completedPasses;
 
         for (int i = 0; i < passes; i++)
         {
-            int passer = (int)nlRandom(5, &nlDefaultSeed);
-            if (passer == 5)
-            {
-                passer = 0;
-            }
+            int passer = GetRandomPlayerIndex();
             StatsTracker::Instance()->TrackStat(
                 STATS_PASSES_MADE, team, passer, 0, 0, 0, 0);
 
@@ -63,11 +67,7 @@ void Simulator::fn_80109E34()
                 int receiver;
                 do
                 {
-                    receiver = (int)nlRandom(5, &nlDefaultSeed);
-                    if (receiver == 5)
-                    {
-                        receiver = 0;
-                    }
+                    receiver = GetRandomPlayerIndex();
                 } while (receiver == passer);
 
                 StatsTracker::Instance()->TrackStat(
@@ -79,50 +79,32 @@ void Simulator::fn_80109E34()
 
     for (int team = 0; team < 2; team++)
     {
-        int shotAttempts = (int)nlRandom(15, &nlDefaultSeed);
-        int maximumSpecialGoals = (int)nlRandom(5, &nlDefaultSeed);
-        int shotsOnGoal = (int)nlRandom(15, &nlDefaultSeed);
-        int maximumGoals = (int)nlRandom(5, &nlDefaultSeed);
+        int shotAttempts = RandomRange(0, 15);
+        int maximumSpecialGoals = RandomRange(0, 5);
+        int shotsOnGoal = RandomRange(0, 15);
+        int maximumGoals = RandomRange(0, 5);
 
-        if (shotAttempts > 0 && shotAttempts < 3)
-        {
-            shotAttempts = 3;
-        }
+        shotAttempts = (shotAttempts > 0 && shotAttempts < 3) ? 3 : shotAttempts;
 
-        int specialGoals = maximumSpecialGoals;
-        if (specialGoals > shotAttempts)
-        {
-            specialGoals = shotAttempts;
-        }
+        int specialGoals = nlMin(maximumSpecialGoals, shotAttempts);
+        int goalsRemaining = nlMin(maximumGoals, shotsOnGoal);
 
-        int goalsRemaining = maximumGoals;
-        if (goalsRemaining > shotsOnGoal)
-        {
-            goalsRemaining = shotsOnGoal;
-        }
+        goals[team] += goalsRemaining;
+        goals[team] += specialGoals;
 
-        goals[team] += goalsRemaining + specialGoals;
-
-        int assistedGoals = (int)nlRandom(5, &nlDefaultSeed);
-        if (assistedGoals > shotsOnGoal)
-        {
-            assistedGoals = shotsOnGoal;
-        }
+        int assistedGoals = RandomRange(0, 5);
+        assistedGoals = nlMin(assistedGoals, shotsOnGoal);
 
         for (int i = 0; i < shotsOnGoal; i++)
         {
-            int player = (int)nlRandom(5, &nlDefaultSeed);
-            if (player == 5)
-            {
-                player = 0;
-            }
+            int player = GetRandomPlayerIndex();
 
             StatsTracker::Instance()->TrackStat(
                 STATS_SHOTS_ON_GOAL, team, player, 1, 0, 0, 0);
 
             if (assistedGoals > 0)
             {
-                player = (int)nlRandom(3, &nlDefaultSeed) + 1;
+                player = RandomRange(1, 4);
                 StatsTracker::Instance()->TrackStat(
                     STATS_04, team, player, 1, 0, 0, 0);
                 assistedGoals--;
@@ -149,26 +131,18 @@ void Simulator::fn_80109E34()
                 STATS_GOALS_FOR, team, 0, -1, 0, specialGoals, 0);
         }
 
-        int attackSuccesses = (int)nlRandom(15, &nlDefaultSeed);
+        int attackSuccesses = RandomRange(0, 15);
         for (int i = 0; i < attackSuccesses; i++)
         {
-            int player = (int)nlRandom(5, &nlDefaultSeed);
-            if (player == 5)
-            {
-                player = 0;
-            }
+            int player = GetRandomPlayerIndex();
             StatsTracker::Instance()->TrackStat(
                 STATS_ATTACK_SUCCESSES, team, player, 0, 0, 0, 0);
         }
 
-        int hitsMade = (int)nlRandom(15, &nlDefaultSeed);
+        int hitsMade = RandomRange(0, 15);
         for (int i = 0; i < hitsMade; i++)
         {
-            int player = (int)nlRandom(5, &nlDefaultSeed);
-            if (player == 5)
-            {
-                player = 0;
-            }
+            int player = GetRandomPlayerIndex();
             StatsTracker::Instance()->TrackStat(
                 STATS_12, team, player, 0, 0, 0, 0);
         }
@@ -178,12 +152,8 @@ void Simulator::fn_80109E34()
     int winningSide;
     if (goals[0] == goals[1])
     {
-        winningSide = (int)nlRandom(2, &nlDefaultSeed);
-        int player = (int)nlRandom(5, &nlDefaultSeed);
-        if (player == 5)
-        {
-            player = 0;
-        }
+        winningSide = RandomRange(0, 2);
+        int player = GetRandomPlayerIndex();
         StatsTracker::Instance()->TrackStat(
             STATS_GOALS_FOR, winningSide, player, -1, 0, 1, 0);
         goals[winningSide]++;
@@ -193,7 +163,7 @@ void Simulator::fn_80109E34()
     }
     else
     {
-        winningSide = goals[0] < goals[1];
+        winningSide = goals[0] <= goals[1];
         StatsTracker::Instance()->TrackStat(
             STATS_WIN, winningSide, 0, goals[0], goals[1], 0, 0);
     }

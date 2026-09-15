@@ -38,6 +38,9 @@ struct shortVector2
 class NetMesh
 {
 public:
+    static NetMesh* fn_801919C0();
+    static NetMesh* fn_801919C8();
+    static bool fn_801919B8();
     static bool s_bAnimatedNetMeshEnabled;
     static bool s_bAlwaysActive;
     static float s_fReboundForceCoefficient;

@@ -1,5 +1,5 @@
 #include "Game/Audio/AudioBankTable.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/AudioSystem.h"
 #include "Game/Audio/AudioResourcePlatform.h"
 #include "Game/Audio/SoundMap.h"

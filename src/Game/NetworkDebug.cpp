@@ -5,7 +5,7 @@
 #include "Game/NetworkSession.h"
 #include "Game/TweakCallback.h"
 #include "NL/gl/glFont.h"
-#include "unclassified/tu_802B7798.h"
+#include "NL/nlDebugViews.h"
 #include "Game/InputRouter.h"
 
 char gNetworkMiiName[12];

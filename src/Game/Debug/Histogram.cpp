@@ -8,7 +8,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_802B7798.h"
+#include "NL/nlDebugViews.h"
 
 #include <math.h>
 

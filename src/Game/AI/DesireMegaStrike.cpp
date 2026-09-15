@@ -48,9 +48,9 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
     }
     else
     {
-        float fDelay = InterpolateClamped(lbl_806DC11C, lbl_806DC120,
+        mUnidentifiedB0 = InterpolateClamped(lbl_806DC11C, lbl_806DC120,
             1.0f - Difficult(fn_800D6670(mUnidentifiedFielder)));
-        mUnidentifiedB0 = fDelay;
+        float fDelay = mUnidentifiedB0;
 
         float fRange = fDelay * lbl_806DC124;
         mUnidentifiedB0 =
@@ -66,8 +66,8 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
                                    ->GetValue();
         }
 
-        float fRandom = nlRandomf(1.0f);
         float fTotal = 0.0f;
+        float fRandom = nlRandomf(1.0f);
         int nRequestedBalls;
         if (fRandom < (fTotal += probabilities[0]))
         {
@@ -103,11 +103,11 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
             if (nScoreDifference < 0)
             {
                 if ((unsigned int)mUnidentifiedA4
-                        < (unsigned int)abs(nScoreDifference)
-                    && (float)(unsigned int)abs(nScoreDifference)
+                        < (unsigned int)_abs(nScoreDifference)
+                    && (float)(unsigned int)_abs(nScoreDifference)
                         < mUnidentifiedFielder->fn_80048A08())
                 {
-                    mUnidentifiedA4 = abs(nScoreDifference);
+                    mUnidentifiedA4 = _abs(nScoreDifference);
                     if (nlRandomf(1.0f) < 0.33f)
                     {
                         ++mUnidentifiedA4;
@@ -121,10 +121,9 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
             Difficult(fn_800D6670(mUnidentifiedFielder)));
         mUnidentifiedA8 = nlRandomf(1.0f);
 
-        int nSkillIndex = (int)(
-            (float)mUnidentifiedA4 - mUnidentifiedFielder->fn_800489C4());
         float fAccuracy = fn_800A636C(g_pCurrentlyUpdatingTeam)
-                              ->MegaGoalAccuracy[nSkillIndex]
+                              ->MegaGoalAccuracy[(int)((float)mUnidentifiedA4
+                                  - mUnidentifiedFielder->fn_800489C4())]
                               ->GetValue();
         if (mUnidentifiedA8 < fAccuracy)
         {
@@ -160,14 +159,12 @@ void DesireMegaStrike::Update(
 {
     if (!g_pGame->IsGameplayOrOvertime())
     {
-        *update = FuzzyVariant(FT_INT, 1);
-        update->mTemporary = false;
+        *update = 1;
     }
 
     if (mUnidentifiedFielder->IsStuck())
     {
-        *update = FuzzyVariant(FT_INT, 1);
-        update->mTemporary = false;
+        *update = 1;
     }
 
     if (update->mData.i == 1)
@@ -177,14 +174,7 @@ void DesireMegaStrike::Update(
 
     if (lbl_806E0E31 || GameInfoManager::Instance()->IsRule0x8Equal2())
     {
-        cFielder* pFielder = mUnidentifiedFielder;
-        bool bAlreadySet = false;
-        if (!pFielder->IsStuck()
-            && (pFielder->muInvincibleStatus & 0x1F) == 0x1F)
-        {
-            bAlreadySet = true;
-        }
-        if (!bAlreadySet)
+        if (!mUnidentifiedFielder->IsInvincible())
         {
             mUnidentifiedFielder->muInvincibleStatus |= 0x1F;
         }
@@ -230,7 +220,7 @@ void DesireMegaStrike::Update(
     else if (mUnidentifiedFielder->m_eActionState == ACTION_SHOT)
     {
         fn_8002E39C(mUnidentifiedFielder);
-        mUnidentifiedFielder->fn_800489C0();
+        mUnidentifiedFielder->fn_800489C0(fDeltaT);
     }
 }
 
@@ -246,8 +236,7 @@ bool DesireMegaStrike::fn_800B9D84(
 
     if (update->mData.i == 3)
     {
-        *update = FuzzyVariant(FT_INT, 0);
-        update->mTemporary = false;
+        *update = 0;
         if (mUnidentifiedTimer.GetSeconds() >= mUnidentifiedB0
             && mUnidentifiedB4 < 1)
         {
@@ -256,10 +245,8 @@ bool DesireMegaStrike::fn_800B9D84(
         }
     }
 
-    UnidentifiedVariantCollection* pValues =
-        (UnidentifiedVariantCollection*)((u8*)this + 0x1C);
-    pValues->Set(0, FuzzyVariant(FT_INT, mUnidentifiedB4));
-    pValues->Set(1, FuzzyVariant(fMeterPosition));
+    mUnidentified01C.Set(0, FuzzyVariant(FT_INT, mUnidentifiedB4));
+    mUnidentified01C.Set(1, FuzzyVariant(fMeterPosition));
 
     if (bButtonPressed)
     {
@@ -279,13 +266,9 @@ bool DesireMegaStrike::fn_800B9D84(
             bAtRequestedValue = true;
         }
 
-        if (nMeterResult >= mUnidentifiedA4 && !bAtRequestedValue)
+        if (nMeterResult >= mUnidentifiedA4 && !bAtRequestedValue
+            && mUnidentifiedFielder->fn_8002E058() > 0.225f)
         {
-            if (mUnidentifiedFielder->fn_8002E058() <= 0.225f)
-            {
-                break;
-            }
-
             float fChance = InterpolateRangeClamped(
                 0.65f, 0.8f, 1.0f, 0.2f,
                 Difficult(mUnidentifiedFielder->m_pTeam));
@@ -304,14 +287,15 @@ bool DesireMegaStrike::fn_800B9D84(
                 {
                     mUnidentifiedB4 = 2;
                 }
-                break;
             }
-        }
-
-        if (nMeterResult > mUnidentifiedA4)
-        {
-            bButtonPressed = true;
-            mUnidentifiedB4 = nlRandomf(1.0f) < 0.5f ? 1 : 2;
+            else if (nMeterResult > mUnidentifiedA4)
+            {
+                bButtonPressed = true;
+                if (nlRandomf(1.0f) < 0.5f)
+                    mUnidentifiedB4 = 1;
+                else
+                    mUnidentifiedB4 = 2;
+            }
         }
         break;
     }
@@ -319,34 +303,34 @@ bool DesireMegaStrike::fn_800B9D84(
         if (mUnidentifiedAC > fMeterPosition)
         {
             if (mUnidentifiedA8 >= 0.0f)
-            {
                 bButtonPressed = true;
-            }
             else
-            {
                 mUnidentifiedB4 = 2;
-            }
         }
-        else if ((mUnidentifiedA8 < 0.0f
-                     && fMeterPosition < 0.0f
-                     && fMeterPosition >= mUnidentifiedA8)
-            || (mUnidentifiedA8 >= 0.0f
-                && fMeterPosition >= 0.0f
-                && fMeterPosition >= mUnidentifiedA8))
+        else if (mUnidentifiedA8 < 0.0f && fMeterPosition < 0.0f)
+        {
+            if (fMeterPosition >= mUnidentifiedA8)
+                bButtonPressed = true;
+        }
+        else if (mUnidentifiedA8 >= 0.0f && fMeterPosition >= 0.0f
+            && fMeterPosition >= mUnidentifiedA8)
         {
             bButtonPressed = true;
         }
         break;
     case 2:
-        if (fMeterPosition < mUnidentifiedAC
-            && ((mUnidentifiedA8 < 0.0f
-                    && fMeterPosition < 0.0f
-                    && mUnidentifiedA8 >= fMeterPosition)
-                || (mUnidentifiedA8 >= 0.0f
-                    && fMeterPosition >= 0.0f
-                    && mUnidentifiedA8 >= fMeterPosition)))
+        if (fMeterPosition < mUnidentifiedAC)
         {
-            bButtonPressed = true;
+            if (mUnidentifiedA8 < 0.0f && fMeterPosition < 0.0f)
+            {
+                if (mUnidentifiedA8 >= fMeterPosition)
+                    bButtonPressed = true;
+            }
+            else if (mUnidentifiedA8 >= 0.0f && fMeterPosition >= 0.0f
+                && mUnidentifiedA8 >= fMeterPosition)
+            {
+                bButtonPressed = true;
+            }
         }
         break;
     }

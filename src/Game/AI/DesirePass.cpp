@@ -5,6 +5,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Fuzzy.h"
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include <stddef.h>
 #include "Game/AI/SpaceSearch.h"
@@ -16,15 +17,6 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-struct UnidentifiedPassCallbackValue
-{
-    FuzzyVariant mValue;
-    float mConfidence;
-    unsigned int mUnidentified018;
-    UnidentifiedVariantCollection mExtraData;
-};
-
-extern "C" float fn_800D9EC4(cPlayer*);
 extern "C" void fn_800401C0(
     cFielder*, const nlVector3&, float, float);
 extern "C" float fn_8004028C(cFielder*);
@@ -100,10 +92,9 @@ bool DesirePreparePass::UnidentifiedInitialize(void* context)
 void DesirePreparePass::Update(
     UnidentifiedDesireUpdate* update, float fDeltaT)
 {
-    if (fn_800D9EC4(mpPassTarget) != 0.0f)
+    if (Incapacitated(mpPassTarget))
     {
-        *update = FuzzyVariant(FT_INT, 1);
-        update->mTemporary = false;
+        *update = 1;
         return;
     }
 
@@ -140,8 +131,7 @@ void DesirePreparePass::Update(
 
     if (bSwitchToPassDesire)
     {
-        *update = FuzzyVariant(FT_INT, 3);
-        update->mTemporary = false;
+        *update = 3;
         fn_800B6A1C(
             update, 8, FuzzyVariant(FT_INT, lbl_806DC148));
         fn_800B6A1C(
@@ -240,22 +230,24 @@ void DesirePass::UnidentifiedCleanup()
  * Offset/Address/Size: 0x9E4 | 0x800BAF60 | size: 0xCC8
  */
 extern "C" UnidentifiedVariant_80054AB8 fn_800BAF60(
-    Variant* fielderValue, UnidentifiedPassCallbackValue* value)
+    UnidentifiedFuzzyRuntimeValue* fielderValue,
+    UnidentifiedFuzzyRuntimeValue* value)
 {
     UnidentifiedVariant_80054AB8 result(FT_INT, lbl_806DC14C);
     if (g_pBall->m_pOwner != 0)
     {
-        result = FuzzyVariant(FT_INT, 1);
+        result = 1;
     }
-    else if (value->mValue.mType == (eVariantType)13)
+    else if (value->mType == (eVariantType)13)
     {
         cFielder* pFielder =
             (cFielder*)fielderValue->mData.pPlayer;
         if (fn_8002F858(pFielder, false))
         {
+            cFielder* pPassTarget;
             bool bVolleyPass = fn_80035F34(pFielder);
             bool bActionInitialized;
-            if (value->mExtraData.Get(1)->mData.b)
+            if (value->ExtraData.Get(1)->mData.b)
             {
                 pFielder->InitActionLooseBallShot(bVolleyPass);
                 bActionInitialized =
@@ -263,8 +255,8 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800BAF60(
             }
             else
             {
-                cFielder* pPassTarget = (cFielder*)
-                    value->mExtraData.Get(0)->mData.pPlayer;
+                pPassTarget = (cFielder*)
+                    value->ExtraData.Get(0)->mData.pPlayer;
                 if (pPassTarget != 0 && pPassTarget->CanReceivePass())
                 {
                     pFielder->InitActionLooseBallPass(
@@ -284,13 +276,13 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800BAF60(
             }
             if (bActionInitialized)
             {
-                result = FuzzyVariant(FT_INT, 1);
+                result = 1;
             }
         }
     }
     else
     {
-        result = FuzzyVariant(FT_INT, 1);
+        result = 1;
     }
     return result;
 }

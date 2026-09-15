@@ -2,6 +2,8 @@
 #define GAME_POSE_ACCUMULATOR_H
 
 #include "NL/nlMath.h"
+#include "Game/Replay.h"
+#include "Game/SHierarchy.h"
 #include "types.h"
 
 class cSHierarchy;
@@ -65,6 +67,9 @@ public:
     cPoseAccumulator(const cPoseAccumulator& other);
     ~cPoseAccumulator();
     cPoseAccumulator& operator=(const cPoseAccumulator& other);
+    template <typename T>
+    void Replay(T& frame);
+    void fn_801949E4(float scale);
     void InitAccumulators();
     void BuildNodeMatrices(const nlMatrix4& pWorldMatrix);
     void BlendRot(int nNode, const nlQuaternion* pRot, float fWeight,
@@ -79,6 +84,10 @@ public:
     void MultiplyScale(int nNode, const nlVector3* pScale, float fWeight);
     void BlendTransIdentity(int nNode, float fWeight);
     nlMatrix4& GetNodeMatrix(int nNode) const;
+    nlQuaternion& GetNodeQuaternion(int nNode) const
+    {
+        return m_pQuaternions[nNode];
+    }
     nlMatrix4& GetNodeMatrixByHashID(unsigned int nHashID) const;
     s32 GetNumNodes() const;
     void Pose(const cPoseNode& pPoseTree, const nlMatrix4& pWorldMatrix);
@@ -100,5 +109,38 @@ public:
     bool m_bUseObject;
     u8 m_Padding[3];
 };
+
+template <typename T>
+inline void cPoseAccumulator::Replay(T& frame)
+{
+    for (unsigned int i = 0; i < m_Unknown70; i++)
+    {
+        const UnidentifiedQuaternionCompressor quaternion(m_pQuaternions[i]);
+        frame.template Replayable<0>(quaternion);
+    }
+    for (unsigned int i = 0; i < m_Unknown70; i++)
+    {
+        if (!m_BaseSHierarchy->PreserveBoneLength(i))
+        {
+            Replayable<0>(frame, m_trans[i].bIdentity);
+            if (!m_trans[i].bIdentity)
+            {
+                Replayable<0>(frame, FloatCompressor<-32, 32, 10>(m_trans[i].t.x));
+                Replayable<0>(frame, FloatCompressor<-32, 32, 10>(m_trans[i].t.y));
+                Replayable<0>(frame, FloatCompressor<-32, 32, 10>(m_trans[i].t.z));
+            }
+        }
+    }
+    for (unsigned int i = 0; i < m_Unknown70; i++)
+    {
+        Replayable<0>(frame, m_scale[i].bIdentity);
+        if (!m_trans[i].bIdentity)
+        {
+            Replayable<0>(frame, FloatCompressor<0, 32, 11>(m_scale[i].s.x));
+            Replayable<0>(frame, FloatCompressor<0, 32, 11>(m_scale[i].s.y));
+            Replayable<0>(frame, FloatCompressor<0, 32, 11>(m_scale[i].s.z));
+        }
+    }
+}
 
 #endif // GAME_POSE_ACCUMULATOR_H

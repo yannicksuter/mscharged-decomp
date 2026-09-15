@@ -1,7 +1,7 @@
 #include "Game/DB/UserOptions.h"
 
 #include "Game/Audio/AudioSystem.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 #include <string.h>
 

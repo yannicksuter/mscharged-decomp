@@ -18,13 +18,14 @@
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsCharacter.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Physics/PhysicsNPC.h"
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Render/NetMesh.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 #include "NL/nlSlotPool.h"
-#include "unclassified/tu_801A5F10.h"
+#include "Game/Render/KoopaShellObject.h"
 
 #include <math.h>
 #include "Game/UnidentifiedStaticStorage.h"
@@ -35,7 +36,6 @@ extern "C" bool fn_800977A4(cFielder*, float);
 extern "C" void fn_801473A4(CollisionPowerupGroundData*);
 extern "C" void fn_801474EC(CollisionPowerupGroundData*);
 extern "C" void fn_80147634(CollisionPowerupWallData*);
-extern "C" void fn_801481BC(SkinAnimatedNPC*);
 
 static const nlVector3 v3Unidentified = { 0.0f, 0.0f, 160.0f };
 static const nlVector3 v3Direction = { 0.0f, 0.0f, 1.0f };
@@ -288,7 +288,8 @@ ContactType PhysicsShell::Contact(
            == SkinAnimatedNPC_CHAIN_CHOMP;
         if (isChainChomp)
         {
-            fn_801481BC((SkinAnimatedNPC*)((PhysicsNPC*)obj)->mpAINPC);
+            QueueCollisionChainCrowd(
+                (UnidentifiedEventData28*)((PhysicsNPC*)obj)->mpAINPC);
         }
         break;
     }
@@ -299,20 +300,19 @@ ContactType PhysicsShell::Contact(
     case 0x1C:
     {
         int value = ((PhysicsPatch*)obj)->m_Type;
-        UnidentifiedPhysicsPatchInfo_80510BF0* patchInfo
-            = fn_80174ED4(value);
-        if (patchInfo->mUnidentified18 != 0.0f)
+        PhysicsPatchInfo* patchInfo = GetPhysicsPatchInfo(value);
+        if (patchInfo->mFriction != 0.0f)
         {
             if (mUnidentified048 != 2
-                || patchInfo->mUnidentified18 > mUnidentified04C)
+                || patchInfo->mFriction > mUnidentified04C)
             {
-                mUnidentified04C = patchInfo->mUnidentified18;
+                mUnidentified04C = patchInfo->mFriction;
             }
             mUnidentified048 = 2;
         }
 
-        if (patchInfo->mUnidentified00 == 8
-            || patchInfo->mUnidentified00 == 9)
+        if (patchInfo->mType == 8
+            || patchInfo->mType == 9)
         {
             m_pPowerupObject->m_bShouldDestroy = true;
         }

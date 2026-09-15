@@ -12,7 +12,7 @@ AuxEffectMap::AuxEffectMap()
 
 int AuxEffectMap::AssignAuxiliary(const int& effect)
 {
-    int& effectIndex = m_Indices[effect];
+    int& effectIndex = GetAuxiliaryIndex(effect);
     for (u16 index = 0; index < 2; ++index)
     {
         if (m_Effects[index] == -1)

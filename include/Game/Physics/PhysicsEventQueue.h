@@ -9,6 +9,7 @@ extern SlotPool<UnidentifiedEventData24> lbl_80570138;
 extern SlotPool<UnidentifiedEventData34> lbl_80570188;
 
 void QueueCollisionBallChain(CollisionBallChainData* data);
+void QueueCollisionChainCrowd(UnidentifiedEventData28* data);
 void QueueCollisionChainPowerup(CollisionChainPowerupData* data);
 void QueueCollisionKoopaShotBallPlayer(CollisionKoopaShotBallPlayerData* data);
 void QueueCollisionKoopaShellGoalie(CollisionKoopaShellGoalieData* data);

@@ -111,7 +111,7 @@ void WorldDarkening::Render()
     glSetDefaultState(false);
 }
 
-void WorldDarkening::fn_801AF734(SaveFrame& frame)
+void WorldDarkening::Replay(SaveFrame& frame)
 {
     memcpy(frame.position, &mActive, sizeof(mActive));
     frame.position += sizeof(mActive);
@@ -122,7 +122,7 @@ void WorldDarkening::fn_801AF734(SaveFrame& frame)
     }
 }
 
-void WorldDarkening::fn_801AF7A8(LoadFrame& frame)
+void WorldDarkening::Replay(LoadFrame& frame)
 {
     memcpy(&mActive, frame.position, sizeof(mActive));
     frame.position += sizeof(mActive);

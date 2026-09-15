@@ -27,8 +27,21 @@ public:
     void GetRootRot(unsigned short* out);
     void GetRootTrans(nlVector3* out, unsigned short ang, float scale = 1.0f);
 
+    template <typename T>
+    void Replay(T& frame);
+
     cPoseNode* m_children[3];
     int m_numChildren;
 };
+
+template <typename T>
+inline void cPoseNode::Replay(T& frame)
+{
+    Replayable<0>(frame, m_numChildren);
+    for (int i = 0; i < m_numChildren; i++)
+    {
+        ReplayablePolymorphic<0>(frame, m_children[i]);
+    }
+}
 
 #endif // GAME_POSE_NODE_H

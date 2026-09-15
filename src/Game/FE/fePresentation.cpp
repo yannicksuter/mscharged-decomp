@@ -4,15 +4,20 @@
 #include "Game/FE/tlSlide.h"
 #include "NL/nlString.h"
 
-void FEPresentation::SetActiveSlide(const char* slideName, bool resetTime)
+void FEPresentation::SetActiveSlide(unsigned long hash, bool resetTime)
 {
-    u32 hash = nlStringLowerHash(slideName);
     TLSlide* slide = FindItemByHashID<TLSlide>(m_slides, hash);
     if (resetTime || m_currentSlide != slide)
     {
         m_fadeDuration = 0.0f;
     }
     m_currentSlide = slide;
+}
+
+void FEPresentation::SetActiveSlide(const char* slideName, bool resetTime)
+{
+    u32 hash = nlStringLowerHash(slideName);
+    SetActiveSlide(hash, resetTime);
 }
 
 void FEPresentation::Update(float deltaTime)

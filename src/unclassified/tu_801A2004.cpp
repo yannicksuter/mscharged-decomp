@@ -1,6 +1,6 @@
 #include "unclassified/tu_801A2004.h"
 
-#include "unclassified/tu_802B7798.h"
+#include "NL/nlDebugViews.h"
 
 #include "Game/Render/RLView.h"
 
@@ -58,18 +58,8 @@ extern "C" void fn_801A2004(
         *values->miHighRangeGray.m_pValue = 80;
     }
 
-    registered
-        = values->mbFineHighRange.Bind(
-            "mbFineHighRange", 0.0f, group, true, 0.0f, 0.0f);
-    if (!registered)
-    {
-        *values->mbFineHighRange.m_pValue
-            = values->mbFineHighRange.GetDefault();
-    }
-    if (!registered)
-    {
-        *values->mbFineHighRange.m_pValue = true;
-    }
+    values->mbFineHighRange.BindWithDefault(
+        "mbFineHighRange", true, group, true, 0.0f, 0.0f, 0.0f);
 
     registered = values->miRed.Bind(
             "miRed", 0.0f, group, true, 255.0f, 1.0f);
@@ -185,7 +175,7 @@ extern "C" void fn_801A2394(HighRangeState_801A2394* state)
         nlZeroMemory(&info, sizeof(info));
         info.width = widths[i];
         info.height = heights[i];
-        info.format = 6;
+        info.format = GLTargetFormat_6;
         info.unknown18 = 0;
         info.unknown1C = 0;
         state->mRenderPairs[i] = glCreateTarget(state->mNames[i], &info);

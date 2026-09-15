@@ -559,7 +559,7 @@ Game/Camera/rumblefilter.cpp:
 	.sbss       start:0x806E0EA8 end:0x806E0EB0
 	.sdata2     start:0x806E4348 end:0x806E4360
 
-unclassified/tu_800EF9F0.cpp:
+Game/Camera/noisefilter.cpp:
 	.text       start:0x800EF9F0 end:0x800F0240
 	.data       start:0x80504328 end:0x80504348
 	.sdata2     start:0x806E4360 end:0x806E4398
@@ -1062,7 +1062,7 @@ Game/Physics/PhysicsPatch.cpp:
 	.sbss       start:0x806E12C8 end:0x806E12D0
 	.sdata2     start:0x806E4A20 end:0x806E4A48
 
-unclassified/tu_80174ED4.cpp:
+Game/Physics/PhysicsTriggerVolume.cpp:
 	.text       start:0x80174ED4 end:0x8017508C
 	.data       start:0x80510AB8 end:0x80510DC0
 	.sdata      start:0x806DCAD0 end:0x806DCAD8
@@ -1101,7 +1101,7 @@ Game/Physics/PhysicsWaluigiWall.cpp:
 	.sbss       start:0x806E12E8 end:0x806E1320
 	.sdata2     start:0x806E4A98 end:0x806E4AE8
 
-unclassified/tu_80179858.cpp:
+Game/Physics/PhysicsWall.cpp:
 	.text       start:0x80179858 end:0x801798A8
 	.data       start:0x805110E8 end:0x80511118
 	.sdata2     start:0x806E4AE8 end:0x806E4AF0
@@ -1220,7 +1220,7 @@ Game/GameObjectLighting.cpp:
 	.sbss       start:0x806E1410 end:0x806E1460
 	.sdata2     start:0x806E4CD0 end:0x806E4D50
 
-unclassified/tu_8018480C.cpp:
+Game/Task/ParticleUpdateCallbacks.cpp:
 	.text       start:0x8018480C end:0x80184ACC
 	.ctors      start:0x804DB6BC end:0x804DB6C0
 	.sdata      start:0x806DCC98 end:0x806DCCA0
@@ -1409,7 +1409,7 @@ Game/Render/Indicators.cpp:
 Game/Render/CrowdImpostors.cpp:
 	.text       start:0x801A4188 end:0x801A4EC0
 	.ctors      start:0x804DB70C end:0x804DB710
-	.rodata     start:0x804DCEC0 end:0x804DCF08
+	.rodata     start:0x804DCEC0 end:0x804DCED0
 	.data       start:0x80511FC0 end:0x80514140
 	.bss        start:0x805721B8 end:0x80572238
 	.sdata      start:0x806DCF08 end:0x806DCF90
@@ -1425,11 +1425,16 @@ Game/Render/ImpostorLighting.cpp:
 	.sbss       start:0x806E15B8 end:0x806E15C0
 	.sdata2     start:0x806E5148 end:0x806E5178
 
-unclassified/tu_801A5F10.cpp:
-	.text       start:0x801A5F10 end:0x801A6824
+Game/Render/Jumbotron.cpp:
+	.text       start:0x801A5F10 end:0x801A5F30
+	.bss        start:0x805722F8 end:0x805723E0
+
+Game/Render/KoopaShellObject.cpp:
+	.text       start:0x801A5F30 end:0x801A6824
 	.ctors      start:0x804DB714 end:0x804DB718
+	.rodata     start:0x804DCED0 end:0x804DCEE8
 	.data       start:0x805141C0 end:0x805141D8
-	.bss        start:0x805722F8 end:0x805723F8
+	.bss        start:0x805723E0 end:0x805723F8
 	.sdata      start:0x806DCF98 end:0x806DCFB0
 	.sdata2     start:0x806E5178 end:0x806E5188
 
@@ -1469,6 +1474,7 @@ unclassified/tu_801AC30C.cpp:
 Game/Render/PeachPhoto.cpp:
 	.text       start:0x801AD15C end:0x801AE008
 	.ctors      start:0x804DB728 end:0x804DB72C
+	.rodata     start:0x804DCEE8 end:0x804DCF08
 	.data       start:0x80514430 end:0x80514480
 	.bss        start:0x80573C08 end:0x80574110
 	.sdata      start:0x806DD010 end:0x806DD030
@@ -1534,7 +1540,7 @@ Game/Debug/TimeRegions.cpp:
 	.sbss       start:0x806E1698 end:0x806E16B8
 	.sdata2     start:0x806E5350 end:0x806E5358
 
-unclassified/tu_801B298C.cpp:
+Game/Render/ThwompObject.cpp:
 	.text       start:0x801B298C end:0x801B369C
 	.ctors      start:0x804DB740 end:0x804DB744
 	.rodata     start:0x804DCF68 end:0x804DCFB0
@@ -1566,7 +1572,7 @@ Game/Render/tu_801B532C.cpp:
 	.text       start:0x801B532C end:0x801B535C
 	.data       start:0x80514830 end:0x80514898
 
-unclassified/tu_801B535C.cpp:
+Game/Render/YoshiEggObject.cpp:
 	.text       start:0x801B535C end:0x801B5EE8
 	.ctors      start:0x804DB74C end:0x804DB750
 	.data       start:0x80514898 end:0x805148A8
@@ -1782,13 +1788,13 @@ Game/FE/Overlay/OverlayHandlerDemo.cpp:
 	.text       start:0x801F698C end:0x801F6A24
 	.data       start:0x8051A6D0 end:0x8051A6FC
 
-unclassified/tu_801F6A24.cpp:
+Game/FE/Overlay/OverlayHandlerMegaStrikeMeter.cpp:
 	.text       start:0x801F6A24 end:0x801F6F60
 	.data       start:0x8051A700 end:0x8051A770
 	.sdata      start:0x806DD8B8 end:0x806DD900
 	.sdata2     start:0x806E5748 end:0x806E5760
 
-unclassified/tu_801F6F60.cpp:
+Game/FE/Overlay/OverlayHandlerPIP.cpp:
 	.text       start:0x801F6F60 end:0x801F7258
 	.data       start:0x8051A770 end:0x8051A7B8
 	.sdata      start:0x806DD900 end:0x806DD928
@@ -1800,7 +1806,7 @@ Game/FE/Overlay/OverlayHandlerStrikerTimes.cpp:
 	.sdata      start:0x806DD928 end:0x806DD958
 	.sdata2     start:0x806E5768 end:0x806E5778
 
-unclassified/tu_801F877C.cpp:
+Game/FE/Overlay/OverlayHandlerSuperAbility.cpp:
 	.text       start:0x801F877C end:0x801F8CB0
 	.ctors      start:0x804DB790 end:0x804DB794
 	.data       start:0x8051A960 end:0x8051A9E0
@@ -1814,7 +1820,7 @@ unclassified/tu_801F8CB0.cpp:
 	.sdata      start:0x806DD980 end:0x806DDA00
 	.sdata2     start:0x806E5780 end:0x806E5790
 
-unclassified/tu_801FA28C.cpp:
+Game/FE/Overlay/OverlayHandlerControllerMap.cpp:
 	.text       start:0x801FA28C end:0x801FADB4
 	.data       start:0x8051AB08 end:0x8051ACC8
 	.sdata      start:0x806DDA00 end:0x806DDA30
@@ -1848,7 +1854,7 @@ Game/SH/SHNetworkStart.cpp:
 	.sbss       start:0x806E1888 end:0x806E1890
 	.sdata2     start:0x806E57E0 end:0x806E57F8
 
-unclassified/tu_801FE81C.cpp:
+Game/FE/feCamera.cpp:
 	.text       start:0x801FE81C end:0x801FEBEC
 	.ctors      start:0x804DB798 end:0x804DB79C
 	.data       start:0x8051B098 end:0x8051B0D0
@@ -1893,7 +1899,7 @@ Game/FE/feCupFlow.cpp:
 	.sbss       start:0x806E18A8 end:0x806E18B4
 	.sdata2     start:0x806E5838 end:0x806E5848
 
-unclassified/tu_80209584.cpp:
+Game/FE/MatchSummary.cpp:
 	.text       start:0x80209584 end:0x8020A38C
 	.data       start:0x8051B970 end:0x8051BC98
 	.sdata      start:0x806DDC48 end:0x806DDC60
@@ -2010,7 +2016,7 @@ Game/SH/SHChallengeSelect.cpp:
 	.sdata      start:0x806DE2AC end:0x806DE320 align:4
 	.sdata2     start:0x806E5990 end:0x806E59A0
 
-unclassified/tu_802337F4.cpp:
+Game/SH/SHStrikerTimesChallenge.cpp:
 	.text       start:0x802337F4 end:0x8023483C
 	.data       start:0x8051D890 end:0x8051DA40
 	.sdata      start:0x806DE320 end:0x806DE338
@@ -3079,7 +3085,7 @@ Game/Core/mtRandom.cpp:
 	.bss        start:0x8057B730 end:0x8057C0F0
 	.sdata      start:0x806DF250 end:0x806DF254
 
-unclassified/tu_802B68E8.cpp:
+NL/nlPolygonRegion.cpp:
 	.text       start:0x802B68E8 end:0x802B6BC8
 	.sdata2     start:0x806E6138 end:0x806E6148
 
@@ -3097,7 +3103,7 @@ NL/nlTimer.cpp:
 	.text       start:0x802B75BC end:0x802B7798
 	.sdata2     start:0x806E6160 end:0x806E6178
 
-unclassified/tu_802B7798.cpp:
+NL/nlDebugViews.cpp:
 	.text       start:0x802B7798 end:0x802B77B0
 	.sbss       start:0x806E1DB8 end:0x806E1DC0
 
@@ -3183,10 +3189,10 @@ unclassified/tu_802BE64C.cpp:
 	.bss        start:0x8057C488 end:0x8057C4D8
 	.sdata      start:0x806DF308 end:0x806DF310
 
-unclassified/tu_802BF8E8.cpp:
+NL/nlRegistryLookup.cpp:
 	.text       start:0x802BF8E8 end:0x802BF984
 
-unclassified/tu_802BF984.cpp:
+NL/nlRegistryOwner.cpp:
 	.text       start:0x802BF984 end:0x802BFF14
 	.data       start:0x8052BBF0 end:0x8052BC20
 
@@ -3594,7 +3600,7 @@ unclassified/tu_802F076C.cpp:
 	.sdata      start:0x806DF4D8 end:0x806DF4E0
 	.sdata2     start:0x806E65F8 end:0x806E6608
 
-unclassified/tu_802F1758.cpp:
+Game/Audio/XSoundCueHandle.cpp:
 	.text       start:0x802F1758 end:0x802F2188
 	.ctors      start:0x804DBA5C end:0x804DBA60
 	.data       start:0x8052F680 end:0x8052F708
@@ -3615,7 +3621,7 @@ unclassified/tu_802F2C3C.cpp:
 	.bss        start:0x8057FAD8 end:0x8057FB68
 	.sdata2     start:0x806E6638 end:0x806E6650
 
-unclassified/tu_802F3E20.cpp:
+Game/Audio/AudioSequenceInstance.cpp:
 	.text       start:0x802F3E20 end:0x802F479C
 	.ctors      start:0x804DBA68 end:0x804DBA6C
 	.bss        start:0x8057FB68 end:0x8057FB90
@@ -4513,7 +4519,7 @@ NL/glx/glxSwap.cpp:
 NL/nlEndian.cpp:
 	.text       start:0x8036D6F0 end:0x8036D6F8
 
-unclassified/tu_8036D6F8.cpp:
+NL/nlAllocatorStack.cpp:
 	.text       start:0x8036D6F8 end:0x8036D774
 	.ctors      start:0x804DBB50 end:0x804DBB54
 
@@ -4541,13 +4547,20 @@ NL/glx/glxFont.cpp:
 	.text       start:0x8036E4C4 end:0x8036E550
 
 NL/glx/glxSend.cpp:
-	.text       start:0x8036E550 end:0x8036F2E8
-	.ctors      start:0x804DBB54 end:0x804DBB58
-	.data       start:0x805355D8 end:0x805356A0
-	.bss        start:0x8059BD20 end:0x8059BF18
-	.sdata      start:0x806DFAA0 end:0x806DFAB8
+	.text       start:0x8036E550 end:0x8036EB44
+	.data       start:0x805355D8 end:0x80535618
+	.bss        start:0x8059BD20 end:0x8059BE20
+	.sdata      start:0x806DFAA0 end:0x806DFAB0
 	.sbss       start:0x806E23E8 end:0x806E23F4
-	.sdata2     start:0x806E6D88 end:0x806E6DB0
+	.sdata2     start:0x806E6D88 end:0x806E6D8C
+
+NL/glx/glxFog.cpp:
+	.text       start:0x8036EB44 end:0x8036F2E8
+	.ctors      start:0x804DBB54 end:0x804DBB58
+	.data       start:0x80535618 end:0x805356A0
+	.bss        start:0x8059BE20 end:0x8059BF18
+	.sdata      start:0x806DFAB0 end:0x806DFAB8
+	.sdata2     start:0x806E6D90 end:0x806E6DAC
 
 NL/glx/glxDisplayList.cpp:
 	.text       start:0x8036F2E8 end:0x8036F648
@@ -4584,7 +4597,7 @@ RVL_SDK/thp/THPSimple.cpp:
 	.sbss       start:0x806E2448 end:0x806E2460
 	.sdata2     start:0x806E6DC0 end:0x806E6DD0
 
-unclassified/tu_80372980.cpp:
+NL/plat/nlMemory.cpp:
 	.text       start:0x80372980 end:0x80372B4C
 	.data       start:0x80535828 end:0x80535880
 	.bss        start:0x8059C400 end:0x8059C418

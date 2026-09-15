@@ -1,5 +1,5 @@
 #include "Game/Audio/AudioBackend.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/AudioSource.h"
 #include "Game/Audio/XSoundHandle.h"
 #include "NL/nlMath.h"
@@ -8,6 +8,7 @@
 
 #include <NMWException.h>
 
+#include "Game/Audio/SoundInstance_802F2110.h"
 #include "unclassified/tu_802F2C3C.h"
 
 
@@ -19,10 +20,8 @@ PlaybackObject_802F2C3C::~PlaybackObject_802F2C3C()
 {
 }
 
-extern "C" float fn_802F29F8(SoundInstance_802F2C3C*);
-extern "C" float fn_802F2A6C(SoundInstance_802F2C3C*);
-extern "C" void fn_802F4630(PlaybackOwner_802F2C3C*, float);
-extern "C" void fn_802F4638(PlaybackOwner_802F2C3C*, float);
+extern "C" float fn_802F29F8(SoundInstance_802F2110*);
+extern "C" float fn_802F2A6C(SoundInstance_802F2110*);
 
 static inline float RandomRange_802F2C3C(float minimum, float maximum)
 {
@@ -32,7 +31,7 @@ static inline float RandomRange_802F2C3C(float minimum, float maximum)
 extern "C" PlaybackObject_802F2C3C* fn_802F3114(PlaybackObject_8052F7B0* object);
 
 inline PlaybackObject_8052F7B0::PlaybackObject_8052F7B0(
-    PlaybackOwner_802F2C3C* owner, PlaybackRequest_802F2C3C* request)
+    AudioSequenceInstance* owner, PlaybackRequest_802F2C3C* request)
     : PlaybackObject_802F2C3C(owner)
 {
     selection = 0;
@@ -54,7 +53,7 @@ inline PlaybackObject_8052F7B0::PlaybackObject_8052F7B0(
 }
 
 inline PlaybackObject_8052F780::PlaybackObject_8052F780(
-    PlaybackOwner_802F2C3C* owner, PlaybackRequest_802F2C3C* request)
+    AudioSequenceInstance* owner, PlaybackRequest_802F2C3C* request)
     : PlaybackObject_802F2C3C(owner)
 {
     definition = request->definition;
@@ -67,7 +66,7 @@ inline PlaybackObject_8052F780::PlaybackObject_8052F780(
 }
 
 inline PlaybackObject_8052F750::PlaybackObject_8052F750(
-    PlaybackOwner_802F2C3C* owner, PlaybackRequest_802F2C3C* request)
+    AudioSequenceInstance* owner, PlaybackRequest_802F2C3C* request)
     : PlaybackObject_802F2C3C(owner)
 {
     definition = request->definition;
@@ -79,7 +78,7 @@ inline PlaybackObject_8052F750::PlaybackObject_8052F750(
     state = 0;
 }
 
-extern "C" PlaybackObject_802F2C3C* fn_802F2CAC(PlaybackOwner_802F2C3C* owner,
+extern "C" PlaybackObject_802F2C3C* fn_802F2CAC(AudioSequenceInstance* owner,
     PlaybackRequest_802F2C3C* request)
 {
     switch (request->kind)
@@ -123,7 +122,7 @@ void PlaybackObject_8052F7B0::UnidentifiedVirtual30()
     state = 4;
 }
 
-void PlaybackObject_8052F7B0::UnidentifiedVirtual10()
+void PlaybackObject_8052F7B0::Prepare()
 {
     backend->Prepare();
     state = 2;
@@ -159,7 +158,7 @@ extern "C" PlaybackObject_802F2C3C* fn_802F3114(
                                       + selectedIndex * 0x1C);
 }
 
-int PlaybackObject_8052F7B0::UnidentifiedVirtual20(float)
+int PlaybackObject_8052F7B0::Update(float)
 {
     if (backend != 0)
         backend->UpdateState();
@@ -196,7 +195,7 @@ int PlaybackObject_8052F7B0::UnidentifiedVirtual20(float)
     return state;
 }
 
-void PlaybackObject_8052F7B0::UnidentifiedVirtual18()
+void PlaybackObject_8052F7B0::Pause()
 {
     if (backend != 0)
         backend->Pause();
@@ -204,7 +203,7 @@ void PlaybackObject_8052F7B0::UnidentifiedVirtual18()
     state = 5;
 }
 
-void PlaybackObject_8052F7B0::UnidentifiedVirtual1C()
+void PlaybackObject_8052F7B0::Resume()
 {
     if (backend != 0)
         backend->Resume();
@@ -219,11 +218,11 @@ extern "C" void fn_802F3648(PlaybackObject_8052F7B0* object,
     *hasVolume = false;
     *hasPitch = false;
 
-    RpcListEntry_802F2C3C* start = object->owner->instance->rpcEntries;
-    RpcListEntry_802F2C3C* entry = start != 0 ? start->next : 0;
+    RpcListEntry_802F2110* start = object->owner->instance->rpcEntries;
+    RpcListEntry_802F2110* entry = start != 0 ? start->next : 0;
     while (entry != 0)
     {
-        ModifierNode_802F2C3C* node = entry->node;
+        RpcRuntimeNode_802F2110* node = entry->node;
         if (node->definition->kind == 1)
         {
             pitchCount++;
@@ -240,10 +239,10 @@ extern "C" void fn_802F3648(PlaybackObject_8052F7B0* object,
             entry = entry->next;
     }
 
-    SoundDefinition_802F2C3C* definition = object->owner->instance->definition;
+    VoiceDefinition_802F2110* definition = object->owner->instance->definition;
     for (u32 i = 0; i < definition->modifierCount; i++)
     {
-        ModifierNode_802F2C3C* node = definition->modifiers[i];
+        RpcRuntimeNode_802F2110* node = definition->modifiers[i];
         if (node->definition->kind == 1)
         {
             pitchCount++;
@@ -289,27 +288,27 @@ extern "C" void fn_802F34E4(
     }
 }
 
-void PlaybackObject_8052F7B0::UnidentifiedVirtual14()
+void PlaybackObject_8052F7B0::Stop()
 {
     backend->Stop();
     state = 7;
     flags = 0;
 }
 
-u32 PlaybackObject_8052F7B0::UnidentifiedVirtual2C(u32* results)
+u32 PlaybackObject_8052F7B0::GetSources(AudioSource** results)
 {
     if (backend != 0)
     {
         if (backend->HasVoice())
         {
-            *results = (u32)backend;
+            *results = backend;
             return true;
         }
     }
     return false;
 }
 
-int PlaybackObject_8052F780::UnidentifiedVirtual20(float)
+int PlaybackObject_8052F780::Update(float)
 {
     if (state == 2)
         state = 3;
@@ -324,19 +323,19 @@ int PlaybackObject_8052F780::UnidentifiedVirtual20(float)
     return state;
 }
 
-int PlaybackObject_8052F750::UnidentifiedVirtual20(float)
+int PlaybackObject_8052F750::Update(float)
 {
     if (state == 2)
         state = 3;
-    PlaybackOwner_802F2C3C* owner = this->owner;
+    AudioSequenceInstance* owner = this->owner;
     bool trigger = owner->instance->previousTime < startTime
         && owner->instance->currentTime >= startTime;
     if (trigger)
     {
         if (definition->mode == 0)
-            fn_802F4630(owner, definition->value);
+            owner->SetPitch(definition->value);
         else if (definition->mode == 1)
-            fn_802F4638(owner, definition->value);
+            owner->SetVolume(definition->value);
         state = 8;
     }
     return state;

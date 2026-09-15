@@ -48,6 +48,8 @@ public:
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
+    void fn_800C2F48(float fAvoidanceMult) { m_fAvoidanceMult = fAvoidanceMult; }
+
 private:
     friend void fn_800C574C(DesireSteering*);
     friend void fn_800C577C(DesireSteering*);

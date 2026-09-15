@@ -22,6 +22,7 @@
 #include "Game/Task/LoadingTask.h"
 #include "Game/Task/MovieRenderTask.h"
 #include "Game/Task/NetworkUpdateTask.h"
+#include "Game/Task/ParticleUpdateCallbacks.h"
 #include "Game/Task/ParticleUpdateTask.h"
 #include "Game/Task/PlatPadUpdateTask.h"
 #include "Game/Task/ProfilerTask.h"
@@ -58,7 +59,7 @@
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 #include "NL/gl/glPlat.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 class AudioUpdateTask : public nlTask
@@ -116,7 +117,6 @@ extern "C"
     void fn_8013D7A0();
     void fn_8013D7E0();
     void fn_80272AB4();
-    void fn_80184858();
     void OSYieldThread();
 }
 
@@ -468,7 +468,7 @@ static void Initialize()
     nlInitFileCache();
     fn_80272AB4();
     Wiper::Instance().Initialize();
-    fn_80184858();
+    InitializeParticleUpdateCallbacks();
     Detail::sTempStringAllocatorPool.allocator.pool.PushState();
 }
 

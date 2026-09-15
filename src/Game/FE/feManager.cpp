@@ -6,7 +6,7 @@
 #include <math.h>
 
 #include "Game/AI/AIPad.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/Camera/CameraMan.h"

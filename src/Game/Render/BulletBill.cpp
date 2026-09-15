@@ -11,7 +11,7 @@
 #include "Game/Physics/PhysicsBulletBill.h"
 #include "Game/Physics/PhysicsObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"

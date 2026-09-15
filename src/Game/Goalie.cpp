@@ -56,7 +56,7 @@
 #include "unclassified/tu_801A6AAC.h"
 #include "Game/NetworkPeer.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 #include <math.h>
 

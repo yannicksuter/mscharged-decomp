@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "NL/nlMath.h"
+#include "Game/Replay.h"
 
 class DrawableCharacter;
 class RenderSnapshot;
@@ -50,6 +51,9 @@ union DrawableBallFlags
 class DrawableBall
 {
 public:
+    const nlVector3& fn_801925BC() const;
+    template <typename T>
+    void Replay(T& frame);
     DrawableBall(RenderSnapshot*);
     DrawableCharacter* IndexToPlayer(int) const;
     void Grab();
@@ -67,5 +71,33 @@ public:
     BallTrailState mTrail[10];
     u32 mTrailCount;
 };
+
+
+template <typename T>
+void DrawableBall::Replay(T& frame)
+{
+    Replayable<1>(frame, FloatCompressor<-127, 127, 7>(mPosition.x));
+    Replayable<1>(frame, FloatCompressor<-127, 127, 7>(mPosition.y));
+    Replayable<1>(frame, FloatCompressor<-127, 127, 7>(mPosition.z));
+    Replayable<1>(frame, UnidentifiedQuaternionCompressor(mOrientation));
+    Replayable<1>(frame, FloatCompressor<-127, 127, 5>(mVelocity.x));
+    Replayable<1>(frame, FloatCompressor<-127, 127, 5>(mVelocity.y));
+    Replayable<1>(frame, FloatCompressor<-127, 127, 5>(mVelocity.z));
+    Replayable<1>(frame, mFlags.value);
+    Replayable<1>(frame, FloatCompressor<0, 8, 12>(mScale));
+    Replayable<1>(frame, mTrailCount);
+    for (unsigned int i = 0; i < mTrailCount; i++)
+    {
+        Replayable<1>(frame, mTrail[i].visible);
+        if (mTrail[i].visible)
+        {
+            nlVector3& position = mTrail[i].position;
+            Replayable<1>(frame, FloatCompressor<-127, 127, 7>(position.x));
+            Replayable<1>(frame, FloatCompressor<-127, 127, 7>(position.y));
+            Replayable<1>(frame, FloatCompressor<-127, 127, 7>(position.z));
+            Replayable<1>(frame, UnidentifiedQuaternionCompressor(mTrail[i].orientation));
+        }
+    }
+}
 
 #endif // _DRAWABLEBALL_H_

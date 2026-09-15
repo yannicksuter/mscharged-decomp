@@ -4,22 +4,22 @@
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioEffects.h"
 #include "Game/Audio/UnidentifiedAudioScriptRuntime.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "NL/nlFunction.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_802BE64C.h"
+#include "NL/nlRegistry.h"
 
 AudioResourceRuntime* g_pAudioResourceRuntime;
 
 inline UnidentifiedAudioPoolOwner::~UnidentifiedAudioPoolOwner()
 {
     SlotPoolBase::BaseFreeBlocks(
-        &UnidentifiedRegistryPoolTypes::sContainerPool,
-        sizeof(UnidentifiedRegistryScoped_802BEF0C));
+        &RegistryPoolTypes::sContainerPool,
+        sizeof(ScopedRegistryContainer));
     SlotPoolBase::BaseFreeBlocks(
-        &UnidentifiedRegistryPoolTypes::sNodePool,
-        sizeof(UnidentifiedRegistryNode_802BE64C));
+        &RegistryPoolTypes::sNodePool,
+        sizeof(RegistryNode));
 }
 
 // Configuration keys the runtime resolves by lower-cased name hash. The DOL
@@ -31,8 +31,8 @@ inline UnidentifiedAudioPoolOwner::~UnidentifiedAudioPoolOwner()
 AudioResourceRuntime::AudioResourceRuntime()
 {
     mRoot = 0;
-    mUnidentified14 = 1;
-    mUnidentified14_1 = 0;
+    mLoadFlag = 1;
+    mReservedFlag = 0;
     m_ConfigRoot = 0;
     g_pAudioResourceRuntime = this;
     m_EffectFactory = GetAudioEffectFactory();
@@ -107,8 +107,8 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
 
     u32 slot = AUDIO_EFFECT_KEY;
     u32 definitions = AUDIO_DEFINITIONS_KEY;
-    u32 effectId = (u32)((UnidentifiedRegistryContainer*)
-        ((UnidentifiedRegistryContainer*)((UnidentifiedRegistryContainer*)g_pAudioResourceRuntime->GetConfigRoot())
+    u32 effectId = (u32)((RegistryContainer*)
+        ((RegistryContainer*)((RegistryContainer*)g_pAudioResourceRuntime->GetConfigRoot())
                 ->Get(definitions)
                 .mData)
             ->Get(definition)
@@ -148,38 +148,38 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
  */
 extern "C" void fn_802F4E84(const unsigned long* hash, bool invert, void* owner)
 {
-    UnidentifiedRegistryContainer* transitions
-        = (UnidentifiedRegistryContainer*)
-            ((UnidentifiedRegistryContainer*)
+    RegistryContainer* transitions
+        = (RegistryContainer*)
+            ((RegistryContainer*)
                     g_pAudioResourceRuntime->GetConfigRoot())
                 ->Get(nlStringLowerHash("Transitions"))
                 .mData;
-    UnidentifiedRegistryContainer* set
-        = (UnidentifiedRegistryContainer*)transitions->Get(*hash).mData;
+    RegistryContainer* set
+        = (RegistryContainer*)transitions->Get(*hash).mData;
     if (set == 0)
     {
         return;
     }
 
-    UnidentifiedRegistryValue time = set->Get(nlStringLowerHash("Time"));
+    RegistryValue time = set->Get(nlStringLowerHash("Time"));
     float duration = time.mType == 5 ? 0.0f : *(float*)&time.mData;
 
-    UnidentifiedRegistryValue list = set->UnnamedList();
-    UnidentifiedRegistryIterator_802BFE44 entries;
-    ((UnidentifiedRegistryContainer*)list.mData)
+    RegistryValue list = set->UnnamedList();
+    RegistryIterator entries;
+    ((RegistryContainer*)list.mData)
         ->GetIterator(&entries, list.mType);
     for (; !entries.IsDone(); entries.Next())
     {
-        UnidentifiedRegistryContainer* entry
-            = (UnidentifiedRegistryContainer*)entries.GetValue().mData;
+        RegistryContainer* entry
+            = (RegistryContainer*)entries.GetValue().mData;
         u32 binding
             = (u32)entry->Get(nlStringLowerHash("EffectSet")).mData;
         bool inverted
             = invert != (entry->Get(nlStringLowerHash("Invert")).mData != 0);
 
-        UnidentifiedRegistryValue effects = entry->UnnamedList();
-        UnidentifiedRegistryIterator_802BFE44 effect;
-        ((UnidentifiedRegistryContainer*)effects.mData)
+        RegistryValue effects = entry->UnnamedList();
+        RegistryIterator effect;
+        ((RegistryContainer*)effects.mData)
             ->GetIterator(&effect, effects.mType);
         for (; !effect.IsDone(); effect.Next())
         {
@@ -200,23 +200,23 @@ AudioResourceRuntime::~AudioResourceRuntime()
 /**
  * Address/Size: 0x802F6704 | size: 0x68
  */
-UnidentifiedRegistryContainer* AudioResourceRuntime::AllocContainer()
+RegistryContainer* AudioResourceRuntime::AllocContainer()
 {
-    return UnidentifiedRegistryAllocContainer();
+    return RegistryAllocContainer();
 }
 
 /**
  * Address/Size: 0x802F676C | size: 0x68
  */
-UnidentifiedRegistryNode_802BE64C* AudioResourceRuntime::AllocNode()
+RegistryNode* AudioResourceRuntime::AllocNode()
 {
-    return UnidentifiedRegistryAllocNode();
+    return RegistryAllocNode();
 }
 
 /**
  * Address/Size: 0x802F67D4 | size: 0x10
  */
-void* AudioResourceRuntime::UnidentifiedVirtual2C(unsigned int size)
+void* AudioResourceRuntime::AllocItem(unsigned int size)
 {
     return nlMalloc(size, 8, true);
 }
@@ -224,18 +224,18 @@ void* AudioResourceRuntime::UnidentifiedVirtual2C(unsigned int size)
 /**
  * Address/Size: 0x802F67E4 | size: 0x18
  */
-void AudioResourceRuntime::UnidentifiedVirtual30(void* container)
+void AudioResourceRuntime::FreeContainer(void* container)
 {
-    UnidentifiedRegistryFreeContainer(
-        (UnidentifiedRegistryScoped_802BEF0C*)container);
+    RegistryFreeContainer(
+        (ScopedRegistryContainer*)container);
 }
 
 /**
  * Address/Size: 0x802F67FC | size: 0x18
  */
-void AudioResourceRuntime::UnidentifiedVirtual34(void* node)
+void AudioResourceRuntime::FreeNode(void* node)
 {
-    UnidentifiedRegistryFreeNode((UnidentifiedRegistryNode_802BE64C*)node);
+    RegistryFreeNode((RegistryNode*)node);
 }
 
 /**

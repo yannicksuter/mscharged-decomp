@@ -227,7 +227,11 @@ struct LANGameInfo
 
 struct NetworkTransportPeer : public TransportPlayerInfo
 {
-    /* 0x14 */ u8 mUnidentified14[4];
+    union
+    {
+        /* 0x14 */ u8 mUnidentified14[4];
+        /* 0x14 */ u32 mAddressWord;
+    };
     /* 0x18 */ int mUnidentified18;
     /* 0x1C */ int mUnidentified1C;
     /* 0x20 */ u16 mUnidentified20;
@@ -312,6 +316,18 @@ public:
     virtual int ProcessMessage(NetworkMessage* message);
 
 private:
+    bool CheckPeerStates()
+    {
+        if (mPeerCount < 2)
+            return false;
+        for (int peer = 1; peer < mPeerCount; ++peer)
+        {
+            if (mPeerInfoList[peer].mUnidentified18 != 3)
+                return false;
+        }
+        return true;
+    }
+
     int GetConnectionIndex(TransportConnection* connection)
     {
         if (connection == 0)

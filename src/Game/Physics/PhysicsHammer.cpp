@@ -1,5 +1,5 @@
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
 #include "Game/EventDataTypes.h"

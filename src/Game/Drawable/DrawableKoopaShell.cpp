@@ -7,7 +7,7 @@
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "math.h"
-#include "unclassified/tu_801A5F10.h"
+#include "Game/Render/KoopaShellObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Field.h"
 
@@ -145,7 +145,7 @@ void DrawableKoopaShell::Grab(const KoopaShellObject* object)
 
     mPosition = object->mPosition;
     mSpin = object->mSpin;
-    mScale = fn_801A65C0(object);
+    mScale = object->GetRadiusScale();
 }
 
 void DrawableKoopaShell::Render(const KoopaShellObject* object) const

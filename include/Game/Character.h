@@ -250,6 +250,8 @@ public:
     bool fn_8001E160();
     bool fn_8001E168() const;
     bool fn_8001E184();
+    cPN_SAnimController* fn_800C2F64() const { return m_pCurrentAnimController; }
+
     cAnimInventory* GetAnimInventory() const
     {
         return m_pAnimInventory;

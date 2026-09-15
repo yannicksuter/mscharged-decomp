@@ -7,7 +7,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "Game/Sys/DebugPolyList.h"
-#include "unclassified/tu_802B7798.h"
+#include "NL/nlDebugViews.h"
 #include "Game/Sys/tweak.h"
 
 #include <stdarg.h>

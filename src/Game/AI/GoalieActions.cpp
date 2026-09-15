@@ -34,7 +34,7 @@
 #include "Game/SAnim/pnSingleAxisBlender.h"
 #include "Game/Team.h"
 #include "NL/globalpad.h"
-#include "unclassified/tu_801A5F10.h"
+#include "Game/Render/KoopaShellObject.h"
 #include "unclassified/tu_801A6AAC.h"
 #include "Game/Render/NPCManager.h"
 #include "math.h"

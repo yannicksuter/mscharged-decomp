@@ -13,13 +13,13 @@
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Physics/PhysicsThwomp.h"
 #include "unclassified/tu_801A0E64.h"
-#include "unclassified/tu_801B298C.h"
-#include "unclassified/tu_801B535C.h"
+#include "Game/Render/ThwompObject.h"
+#include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" bool fn_800167A8(cBall*);
 
-PhysicsYoshiEgg::PhysicsYoshiEgg(UnidentifiedObject_801B535C* egg, float radius)
+PhysicsYoshiEgg::PhysicsYoshiEgg(YoshiEggObject* egg, float radius)
     : PhysicsSphere(g_CollisionSpace, 0, radius)
     , mUnidentified38(0)
     , mYoshiEgg(egg)
@@ -36,7 +36,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
     UnidentifiedEventData24* patchData;
     GetPosition(&eggPosition);
 
-    bool isTimerRunning = mYoshiEgg->mUnidentified38 > 0.0f;
+    bool isTimerRunning = mYoshiEgg->mDelay > 0.0f;
     if (isTimerRunning)
     {
         return ONE_WAY_CONTACT_OTHER;
@@ -48,7 +48,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
     {
         cCharacter* character
             = ((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
-        cFielder* player = mYoshiEgg->mUnidentified34;
+        cFielder* player = mYoshiEgg->mFielder;
         if (character == player)
         {
             return NO_CONTACT;
@@ -100,7 +100,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
     case 0x10:
     {
         cPlayer* owner = ((PhysicsAIBall*)other)->m_pAIBall->m_pOwner;
-        cFielder* player = mYoshiEgg->mUnidentified34;
+        cFielder* player = mYoshiEgg->mFielder;
         if (owner != 0)
         {
             if (player == owner)
@@ -167,12 +167,12 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         return ONE_WAY_CONTACT_OTHER;
     case 0x24:
     {
-        if (((PhysicsThwomp*)other)->mThwomp->mState == 3)
+        if (((PhysicsThwomp*)other)->mThwomp->mState == THWOMP_STATE_FALLING)
         {
             crackData = 0;
             lbl_80570188.Allocate(crackData);
             crackData->mUnidentified00 = 0;
-            crackData->mUnidentified04 = mYoshiEgg->mUnidentified34;
+            crackData->mUnidentified04 = mYoshiEgg->mFielder;
             crackData->mUnidentified08 = mYoshiEgg;
             crackData->mUnidentified0C = 0;
             crackData->mUnidentified10 = 0;
@@ -183,30 +183,30 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         normal.x = contact->geom.normal[0];
         normal.y = contact->geom.normal[1];
         normal.z = contact->geom.normal[2];
-        mYoshiEgg->fn_801B5DD8(normal, contact->geom.depth);
+        mYoshiEgg->SetPendingDisplacement(normal, contact->geom.depth);
         return ONE_WAY_CONTACT_THIS;
     }
     case 0x1C:
     {
         PhysicsPatch* patch = (PhysicsPatch*)other;
         int type = patch->GetType();
-        UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(type);
+        PhysicsPatchInfo* info = GetPhysicsPatchInfo(type);
         if (patch->GetType() == 1 || patch->GetType() == 8 || patch->GetType() == 9)
         {
             crackData = 0;
             lbl_80570188.Allocate(crackData);
             crackData->mUnidentified00 = 0;
-            crackData->mUnidentified04 = mYoshiEgg->mUnidentified34;
+            crackData->mUnidentified04 = mYoshiEgg->mFielder;
             crackData->mUnidentified08 = mYoshiEgg;
             crackData->mUnidentified0C = 0;
             crackData->mUnidentified10 = 0;
             QueueCollisionCrackEgg(crackData);
         }
-        else if (info->mUnidentified18 != 0.0f)
+        else if (info->mFriction != 0.0f)
         {
             patchData = 0;
             lbl_80570138.Allocate(patchData);
-            patchData->mUnidentified0C = mYoshiEgg->mUnidentified34;
+            patchData->mUnidentified0C = mYoshiEgg->mFielder;
             patchData->mUnidentified10 = patch;
             QueueCollisionPatchPlayer(patchData);
         }
@@ -225,7 +225,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         crackData = 0;
         lbl_80570188.Allocate(crackData);
         crackData->mUnidentified00 = 0;
-        crackData->mUnidentified04 = mYoshiEgg->mUnidentified34;
+        crackData->mUnidentified04 = mYoshiEgg->mFielder;
         crackData->mUnidentified08 = mYoshiEgg;
         crackData->mUnidentified0C = 0;
         crackData->mUnidentified10 = 0;
@@ -238,7 +238,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         crackData = 0;
         lbl_80570188.Allocate(crackData);
         crackData->mUnidentified00 = 0;
-        crackData->mUnidentified04 = mYoshiEgg->mUnidentified34;
+        crackData->mUnidentified04 = mYoshiEgg->mFielder;
         crackData->mUnidentified08 = mYoshiEgg;
         crackData->mUnidentified0C = 0;
         crackData->mUnidentified10 = 0;

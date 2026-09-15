@@ -1280,18 +1280,18 @@ void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
         if (eventData->mUnidentified10->m_pOwner != this
             && !fn_800344B0() && !IsInvincible())
         {
-            UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(type);
+            PhysicsPatchInfo* info = GetPhysicsPatchInfo(type);
             UnidentifiedVariantCollection params;
             if (type == 5)
             {
-                params.Set(0, FuzzyVariant(info->mUnidentified18));
+                params.Set(0, FuzzyVariant(info->mFriction));
                 params.Set(1, FuzzyVariant(lbl_806DB760));
                 params.Set(2, FuzzyVariant(lbl_806DB764));
                 params.Set(3, FuzzyVariant(lbl_806DB768));
             }
             else if (type == 4)
             {
-                params.Set(0, FuzzyVariant(info->mUnidentified18));
+                params.Set(0, FuzzyVariant(info->mFriction));
                 params.Set(1, FuzzyVariant(lbl_806DB76C));
                 params.Set(2, FuzzyVariant(lbl_806DB770));
                 params.Set(3, FuzzyVariant(lbl_806DB774));

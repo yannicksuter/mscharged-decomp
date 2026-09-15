@@ -53,7 +53,11 @@ struct LANPeerMessageInfo
     {
     }
 
-    /* 0x00 */ u8 mUnidentified00[4];
+    union
+    {
+        /* 0x00 */ u8 mUnidentified00[4];
+        /* 0x00 */ u32 mAddressWord;
+    };
     /* 0x04 */ u16 mUnidentified04;
     /* 0x06 */ char mUnidentified06[11];
     /* 0x11 */ s8 mUnidentified11;
@@ -124,8 +128,8 @@ public:
 class NetMessageClientConfirmedJoin : public NetworkMessage
 {
 public:
-    NetMessageClientConfirmedJoin()
-        : mUnidentified08(-1)
+    NetMessageClientConfirmedJoin(s8 index = -1)
+        : mUnidentified08(index)
     {
     }
 

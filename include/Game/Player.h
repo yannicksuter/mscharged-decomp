@@ -8,6 +8,7 @@
 class cBall;
 class cAIPad;
 class cFielder;
+class cGlobalPad;
 class cPN_Feather;
 class cPN_SAnimController;
 class cPN_SingleAxisBlender;
@@ -144,9 +145,10 @@ public:
     void PickupBall(cBall* pBall);
     void SetNoPickUpTime(float NewNoPickUpTime);
     DetInput* GetGlobalPad();
+    cBall* fn_800C2F40() const { return m_pBall; }
     bool HasBall() const { return m_pBall != 0; }
     u8 SwapController(bool bParam);
-    void* fn_800972CC();
+    cGlobalPad* fn_800972CC();
     void SetAIPad(cAIPad* pPad);
     void fn_80096CDC(cBall* pBall);
     void PlayAttackReactionSounds(float fScale);

@@ -1,13 +1,21 @@
 #include "Game/AI/DesireShoot.h"
 
+#include "Game/AI/AiUtil.h"
+#include "Game/AI/AvoidableObject.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/ShotMeter.h"
+#include "Game/AI/SkillTweaks.h"
 #include "Game/Ball.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/DebugWriteCache.h"
+#include "Game/Goalie.h"
+#include "Game/Net.h"
 #include "Game/Player.h"
+#include "Game/Team.h"
 #include "NL/nlString.h"
+#include <math.h>
 #include <stddef.h>
 
 #include "Game/UnidentifiedStaticStorage.h"
@@ -25,10 +33,17 @@ extern "C" UnidentifiedDesireMachine* fn_80316974(void*);
 extern "C" void fn_8031998C(
     void*, int, const UnidentifiedVariantCollection*);
 
+extern "C" void fn_800B6A1C(UnidentifiedDesireUpdate*, int, FuzzyVariant);
+extern "C" float fn_80039574(cFielder*);
+extern cTeam* g_pCurrentlyUpdatingTeam;
+
 static float lbl_806DC208 = 0.5f;
 static unsigned short sDesireWindupShotType = 0xFFFF;
 static unsigned short sDesireShootType = 0xFFFF;
 static bool lbl_806DC210 = true;
+int lbl_806DC214 = 32;
+int lbl_806DC218 = 15;
+int lbl_806DC21C = 3;
 static float lbl_806DC220 = 2.0f;
 
 /**
@@ -50,6 +65,88 @@ bool DesireWindupShot::UnidentifiedInitialize(void*)
         result = false;
     }
     return result;
+}
+
+/**
+ * Offset/Address/Size: 0x7C | 0x800C4214 | size: 0xBAC
+ */
+void DesireWindupShot::Update(UnidentifiedDesireUpdate* update, float fDeltaT)
+{
+    if (mUnidentifiedFielder->m_pBall == NULL)
+    {
+        *update = 1;
+        return;
+    }
+
+    bool bMeterTransition = false;
+    unsigned char bSwitchToShootDesire = 0;
+    ShotMeter* pShotMeter = mUnidentifiedFielder->m_pShotMeter;
+    if (pShotMeter->m_eShotMeterState == SHOT_METER_RELEASED
+        || pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
+    {
+        bSwitchToShootDesire = 1;
+    }
+    else if (pShotMeter->m_eShotMeterState == SHOT_METER_STS_TRANSISTION)
+    {
+        bMeterTransition = true;
+        bSwitchToShootDesire = 1;
+    }
+
+    if (bSwitchToShootDesire)
+    {
+        if (bMeterTransition)
+        {
+            *update = 3;
+            fn_800B6A1C(update, 8, FuzzyVariant(FT_INT, lbl_806DC214));
+        }
+        else
+        {
+            *update = 3;
+            fn_800B6A1C(update, 8, FuzzyVariant(FT_INT, lbl_806DC218));
+        }
+        return;
+    }
+
+    if (lbl_806DC210)
+    {
+        switch (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass)
+        {
+        case DONKEYKONG:
+        case MARIO:
+        case (eCharacterClass)17:
+        {
+            float fSign = AIsgn(mUnidentifiedFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
+            Goalie* pGoalie = mUnidentifiedFielder->m_pTeam->GetOtherTeam()->GetGoalie();
+            float fGoalieX = fSign * pGoalie->mUnidentified024.m_v3Position.x;
+            if (fSign * mUnidentifiedFielder->mUnidentified024.m_v3Position.x < fGoalieX
+                || (float)fabs(mUnidentifiedFielder->mUnidentified024.m_v3Position.y) > 0.6f * cNet::GetNetWidth())
+            {
+                float fRange = fn_80039574(mUnidentifiedFielder);
+                float fDistance = nlSqrt(nlVec3DistanceSquared2D(
+                    mUnidentifiedFielder->mUnidentified024.m_v3Position,
+                    mUnidentifiedFielder->m_pTeam->GetOtherTeam()->GetGoalie()->mUnidentified024.m_v3Position), true);
+                pGoalie = mUnidentifiedFielder->m_pTeam->GetOtherTeam()->GetGoalie();
+                AvoidableObject* pAvoidable = mUnidentifiedFielder->mUnidentified320;
+                if (0.25f + (fDistance + (pAvoidable->GetRadius()
+                        + pGoalie->mUnidentified320->GetRadius())) < fRange)
+                {
+                    float fSkillshotChance = fn_800A636C(g_pCurrentlyUpdatingTeam)->GetSkillValue(
+                        nlStringLowerHash("Windup/Skillshot"), mUnidentifiedFielder);
+                    if (nlRandomf(1.0f) < fSkillshotChance)
+                    {
+                        *update = 3;
+                        fn_800B6A1C(update, 8, FuzzyVariant(FT_INT, lbl_806DC21C));
+                    }
+                    else
+                    {
+                        lbl_806DC210 = false;
+                    }
+                }
+            }
+            break;
+        }
+        }
+    }
 }
 
 /**

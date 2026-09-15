@@ -231,8 +231,8 @@ void ImpostorSprite::CreateRenderTarget(const char* name)
     nlZeroMemory(&info, sizeof(info));
     info.width = mWidth;
     info.height = mHeight;
-    info.unknown10 = 1;
-    info.format = mUseIntensityAlpha ? 7 : 0;
+    info.unknown10 = GLTargetInfoMode10_1;
+    info.format = mUseIntensityAlpha ? GLTargetFormat_7 : GLTargetFormat_0;
     info.unknown18 = 7;
     info.unknown1C = 4;
     info.colour[0] = 0;

@@ -1,6 +1,7 @@
 #include "Game/Audio/AudioBackend.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/XSoundCueHandle.h"
 #include "NL/nlDebugString.h"
 #include "Game/Audio/AudioBankLoader.h"
 #include "NL/nlChunk.h"
@@ -117,9 +118,7 @@ extern void* lbl_8052F628[4];
 
 extern SlotPoolBase lbl_8057F9E8;
 extern SlotPoolBase lbl_8057FA10;
-extern SlotPoolBase lbl_8057FA68;
 extern SlotPoolBase lbl_8057FAA8;
-extern SlotPoolBase lbl_8057FB78;
 
 extern "C" void* fn_802EFB70(nlChunk* chunk);
 extern "C" void fn_802F00F0(void* controller, float dt);
@@ -435,12 +434,11 @@ extern "C" u8 fn_802EF870(u8* state)
 
 extern "C" void fn_802EF8B0(SliderManager_802EFA14* manager)
 {
-    fn_802B467C(&lbl_8057FA68);
-    SlotPoolBase::BaseFreeBlocks(&lbl_8057FA68, 0x40);
+    fn_802B467C(&sSoundCueHandlePool);
+    SlotPoolBase::BaseFreeBlocks(&sSoundCueHandlePool, 0x40);
     fn_802B467C(&lbl_8057FAA8);
     SlotPoolBase::BaseFreeBlocks(&lbl_8057FAA8, 0x7C);
-    fn_802B467C(&lbl_8057FB78);
-    SlotPoolBase::BaseFreeBlocks(&lbl_8057FB78, 0x1C);
+    sAudioSequenceInstancePool.FreeBlocks();
     fn_802B467C(&lbl_8057FAE8);
     SlotPoolBase::BaseFreeBlocks(&lbl_8057FAE8, 0x34);
     fn_802B467C(&lbl_8057FB10);

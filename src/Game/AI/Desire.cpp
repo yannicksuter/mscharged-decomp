@@ -139,13 +139,6 @@ void Desire::UnidentifiedCleanup()
 {
 }
 
-void Desire::UnidentifiedVirtual8(void*, DebugWriteCache* cache)
-{
-    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-}
-
 void Desire::Update(UnidentifiedDesireUpdate*, float)
 {
 }

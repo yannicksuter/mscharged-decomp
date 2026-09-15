@@ -20,7 +20,7 @@ void CreateShadowVolumeTarget()
     nlZeroMemory(&info, sizeof(info));
     info.width = glplatGetDefaultTargetWidth();
     info.height = glplatGetDefaultTargetHeight();
-    info.format = 6;
+    info.format = GLTargetFormat_6;
     info.unknown18 = 0;
     sShadowVolumeTarget = glCreateTarget(sShadowVolumeTargetName, &info);
 }

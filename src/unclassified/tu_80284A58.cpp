@@ -47,7 +47,6 @@ extern "C"
     void fn_801E2564(void* manager);
     void fn_80195868(ReplayChoreo* choreo, float deltaTime);
     void fn_801959F0(ReplayChoreo* choreo, int quality);
-    int fn_8018A16C(ReplayManager* manager, float time);
     float fn_800155A0(void* ball, int index);
 }
 
@@ -399,7 +398,7 @@ void UnidentifiedPresentationState::Update(float deltaTime)
         {
             int replayTime = -30;
             fn_801959F0(&ReplayChoreo::Instance(),
-                fn_8018A16C(ReplayManager::Instance(), replayTime));
+                ReplayManager::Instance()->fn_8018A16C(replayTime));
             mDisplayLetterBox = 0.0f;
         }
     }
@@ -515,7 +514,7 @@ void UnidentifiedPresentationState::Update(float deltaTime)
 /**
  * Address/Size: 0x80285E1C | size: 0x4
  */
-void fn_80285E1C()
+void UnidentifiedPresentationState::fn_80285E1C()
 {
 }
 

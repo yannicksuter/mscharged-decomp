@@ -172,7 +172,7 @@ void nlTextBox::DrawString(const nlTextBox::StringDrawInfo& DrawInfo, const nlVe
     }
 
     const Row* pIter = DrawInfo.Rows;
-    int vertOffset = yDir * (int)pFont->m_Metrics.Ascent - ascentAdj;
+    CurrentPos.y += (float)(yDir * (int)pFont->m_Metrics.Ascent - ascentAdj);
     nlColour overridecolour;
     overridecolour.c[0] = Color.c[0];
     overridecolour.c[1] = Color.c[1];
@@ -180,7 +180,6 @@ void nlTextBox::DrawString(const nlTextBox::StringDrawInfo& DrawInfo, const nlVe
     overridecolour.c[3] = Color.c[3];
     unsigned long hMatrix;
 
-    CurrentPos.y += (float)vertOffset;
     overridecolour.c[3] = 0;
     unsigned long row = 0;
 

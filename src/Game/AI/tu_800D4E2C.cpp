@@ -69,7 +69,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800B38AC(
 extern "C" UnidentifiedVariant_80054AB8 fn_800B4DC0(
     UnidentifiedFielderContext*);
 extern "C" UnidentifiedVariant_80054AB8 fn_800B7B1C(
-    UnidentifiedFielderContext*);
+    UnidentifiedFielderInput*);
 
 class UnidentifiedDesire33 : public Desire
 {

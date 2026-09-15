@@ -37,6 +37,8 @@ public:
 
     void UnidentifiedAddState(int, shdStateMachine*, bool);
 
+    shdStateMachine* fn_800C2F20() const { return mUnidentified004; }
+
     shdStateMachine* mUnidentified004;
     shdStateMachine* mUnidentified008;
     UnidentifiedStateTransition mUnidentified00C;

@@ -26,6 +26,7 @@ public:
     bool DetectSkipPress();
     void Finish();
     void Update(float deltaTime);
+    void fn_80285E1C();
     void Call(const char* functionName, const char* nisFilter);
     void OnGoalScored(void* data);
     void OnGoalieSave(void* data);

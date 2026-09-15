@@ -1,14 +1,11 @@
 #include <revolution/gx.h>
 #include <revolution/mtx.h>
 
-#include "Game/TweakValue.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
-#include "NL/glx/GXMaterialCrystalTweaks.h"
 #include "NL/gl/glMaterialProgram.h"
 #include "NL/gl/glModel.h"
-#include "NL/glx/GXMaterialShadowTweaks.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/glx/glxSend.h"
@@ -36,9 +33,6 @@ static GXCompare gx_AlphaTest[] = {
     GX_GREATER,
 };
 
-static float glx_FogNear = 0.25f;
-static float glx_FogFar = 130.0f;
-
 static GLView* prev_view;
 static GLMaterialProgram* glx_program;
 static unsigned long glx_DirtyFlags;
@@ -47,23 +41,6 @@ static nlMatrix4 mview;
 static nlMatrix4 mproj;
 static nlMatrix4 viewproj;
 static nlMatrix4 modelview;
-
-static TweakValueFloat glx_FogStart(
-    "sfFogStart", "/Render/Fog", 5.0f);
-static TweakValueFloat glx_FogEnd(
-    "sfFogEnd", "/Render/Fog", 160.0f);
-static TweakValueInt glx_FogRed(
-    "siFogRed", gLastTweakCategory, 255);
-static TweakValueInt glx_FogGreen(
-    "siFogGreen", gLastTweakCategory, 255);
-static TweakValueInt glx_FogBlue(
-    "siFogBlue", gLastTweakCategory, 255);
-static TweakValueFloat glx_FogIntensity(
-    "sfFogIntensity", gLastTweakCategory, 1.0f);
-static TweakValueBool glx_bFog(
-    "sbFogEnabled", gLastTweakCategory, false);
-static TweakValueInt glx_FogType(
-    "siFogType", gLastTweakCategory, 0);
 
 static void glx_SwitchViews(GLView* view);
 static void glx_SwitchRaster(const glModelPacket* p);
@@ -258,64 +235,5 @@ static void glx_SwitchRaster(const glModelPacket* p)
         gxSetColourUpdate(true);
         gxSetAlphaUpdate(glx_AllowAlphaUpdate);
         break;
-    }
-}
-
-static GXFogType fogtype[] = {
-    GX_FOG_PERSP_LIN,
-    GX_FOG_PERSP_EXP,
-    GX_FOG_PERSP_EXP2,
-    GX_FOG_PERSP_REVEXP,
-    GX_FOG_PERSP_REVEXP2,
-};
-
-void glx_SetFogClipPlanes(float nearPlane, float farPlane)
-{
-    glx_FogNear = nearPlane;
-    glx_FogFar = farPlane;
-}
-
-float glx_GetFogStart()
-{
-    return glx_FogStart.value;
-}
-
-void glx_SetFogStart(float value)
-{
-    glx_FogStart.value = value;
-}
-
-float glx_GetFogEnd()
-{
-    return glx_FogEnd.value;
-}
-
-void glx_SetFogEnd(float value)
-{
-    glx_FogEnd.value = value;
-}
-
-void glx_Fog(bool enable)
-{
-    if (enable && glx_bFog)
-    {
-        s32 r = (s32)(glx_FogIntensity.value * glx_FogRed.value);
-        s32 g = (s32)(glx_FogIntensity.value * glx_FogGreen.value);
-        s32 b = (s32)(glx_FogIntensity.value * glx_FogBlue.value);
-        GXColor fogColour;
-        fogColour.r = r;
-        fogColour.g = g;
-        fogColour.b = b;
-        fogColour.a = 0xFF;
-        GXSetFog(fogtype[glx_FogType.value], fogColour, glx_FogStart.value, glx_FogEnd.value, glx_FogNear, glx_FogFar);
-    }
-    else
-    {
-        GXColor fogColour;
-        fogColour.r = 0xFF;
-        fogColour.g = 0xFF;
-        fogColour.b = 0xFF;
-        fogColour.a = 0xFF;
-        GXSetFog(GX_FOG_NONE, fogColour, 0.0f, 0.0f, 0.0f, 0.0f);
     }
 }

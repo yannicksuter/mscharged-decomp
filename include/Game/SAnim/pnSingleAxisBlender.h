@@ -7,6 +7,7 @@
 class cPN_SingleAxisBlender : public cPoseNode
 {
 public:
+    cPN_SingleAxisBlender() { }
     cPN_SingleAxisBlender(int numChildren,
         void (*callback)(unsigned int, cPN_SingleAxisBlender*),
         unsigned int callbackParam, float weightSeek);
@@ -23,6 +24,13 @@ public:
     }
     virtual void BlendRootTrans(nlVector3* outBase, float weight, float* scratch);
     virtual void BlendRootRot(u16* outRot, float weight, float* scratch);
+
+    template <typename T>
+    void Replay(T& frame)
+    {
+        Replayable<0>(frame, (cPoseNode&)*this);
+        Replayable<0>(frame, FloatCompressor<0, 1, 7>(m_fSmoothedWeight));
+    }
 
     static void* operator new(unsigned long)
     {

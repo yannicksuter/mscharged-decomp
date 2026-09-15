@@ -15,7 +15,7 @@
 #include "Game/OverlayHandlerInGameText.h"
 #include "Game/OverlayHandlerGoal.h"
 #include "Game/OverlayHandlerHUD.h"
-#include "unclassified/tu_801F6A24.h"
+#include "Game/FE/Overlay/OverlayHandlerMegaStrikeMeter.h"
 #include "Game/Render/NumberDisplay.h"
 #include "Game/FE/feSceneManager.h"
 #include "Game/GameInfo.h"
@@ -1526,16 +1526,16 @@ void OverlayManager::fn_801E2608()
 void OverlayManager::fn_801E2784(UnidentifiedEventData_8006701C* eventData)
 {
     static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();
-    TU801F6A24Overlay* overlay = static_cast<TU801F6A24Overlay*>(g_pOverlayManager->GetScene((SceneList)100));
+    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
     overlay->SetVisible(true);
-    overlay->fn_801F6E2C(eventData->pFielder);
+    overlay->Start(eventData->pFielder);
 }
 
 void OverlayManager::fn_801E281C()
 {
-    TU801F6A24Overlay* overlay = static_cast<TU801F6A24Overlay*>(g_pOverlayManager->GetScene((SceneList)100));
+    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
     overlay->SetVisible(false);
-    if (!overlay->mUnidentified36)
+    if (!overlay->mMegaStrikeStarted)
     {
         static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E2498(0.0f);
     }
@@ -1569,20 +1569,20 @@ void OverlayManager::fn_801E2988(MegaStrikeEndData* eventData)
 
 void OverlayManager::fn_801E28A8(UnidentifiedEventData_8006701C* eventData)
 {
-    TU801F6A24Overlay* overlay = static_cast<TU801F6A24Overlay*>(g_pOverlayManager->GetScene((SceneList)100));
-    overlay->fn_801F6D94(eventData->fMeterValue);
+    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
+    overlay->SetFirstResult(eventData->fMeterValue);
 }
 
 void OverlayManager::fn_801E28E4(UnidentifiedEventData_8006701C* eventData)
 {
-    TU801F6A24Overlay* overlay = static_cast<TU801F6A24Overlay*>(g_pOverlayManager->GetScene((SceneList)100));
-    overlay->fn_801F6E18(eventData->fMeterValue);
+    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
+    overlay->SetSecondResult(eventData->fMeterValue);
 }
 
 void OverlayManager::fn_801E29C0(nlVector3 position)
 {
-    TU801F6A24Overlay* ov = static_cast<TU801F6A24Overlay*>(g_pOverlayManager->GetScene((SceneList)100));
-    ov->fn_801F6E8C(position);
+    MegaStrikeMeterOverlay* ov = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
+    ov->SetPosition(position);
 }
 
 void TU801DA134Component::fn_801DCCEC()

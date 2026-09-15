@@ -1,7 +1,9 @@
+#include "Game/Audio/AudioSequenceInstance.h"
+#include "Game/Audio/SoundInstance_802F2110.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/XSoundHandle.h"
 #include "Game/Audio/AudioSystem.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/Transition.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
@@ -9,40 +11,6 @@
 #include <NMWException.h>
 
 class AudioSource;
-struct VoiceDefinition_802F3E20;
-
-struct VoiceDefinition_802F2110
-{
-    const char* name;
-    float volume;
-    float pitch;
-    u32 sliderIndex;
-    u32 voiceCount;
-    VoiceDefinition_802F3E20** voiceIds;
-    u32 rpcGroupCount;
-    u32* rpcGroupIndices;
-};
-
-struct VoiceNode_802F2110
-{
-    VoiceNode_802F2110* next;
-    u8 pad_04[0x18];
-};
-
-struct RpcRuntimeNode_802F2110
-{
-    void* definition;
-    float value;
-    u8 valid;
-    u8 pad_09[7];
-};
-
-struct RpcListEntry_802F2110
-{
-    RpcListEntry_802F2110* next;
-    RpcListEntry_802F2110* previous;
-    RpcRuntimeNode_802F2110* node;
-};
 
 struct RpcDefinition_802F2110
 {
@@ -64,37 +32,6 @@ struct RpcController_802F2110
     RpcGroup_802F2110* groups;
 };
 
-struct CueHandle_802F2110;
-
-struct SoundInstance_802F2110
-{
-    CueHandle_802F2110* owner;
-    VoiceDefinition_802F2110* definition;
-    VoiceNode_802F2110* voices;
-    SlotPoolBase* entryPool;
-    RpcListEntry_802F2110* rpcEntries;
-    s32 state;
-    float previousTime;
-    float currentTime;
-    RpcRuntimeNode_802F2110* activeRpc;
-    float transitionTime;
-    Transition volume;
-    Transition pitch;
-    float field_70;
-    float releaseTime;
-    SoundInstance_802F2110* nextInstance;
-};
-
-struct CueHandle_802F2110
-{
-    void** vtable;
-    void* resource;
-    u8 pad_08[4];
-    s32 state;
-    u8 pad_10[0x10];
-    void* localSliders;
-};
-
 struct AudioResources_802F2110
 {
     u8 pad_00[0xC];
@@ -114,34 +51,11 @@ struct CalculationEntry_802F2110
 
 extern void* __vt__10Transition[];
 extern SlotPoolBase lbl_8057FA10;
-extern SlotPoolBase sPlaybackOwnerPool_802F3E20;
 
 SlotPool<SoundInstance_802F2110> lbl_8057FAA8(32, 16);
 
 extern "C" void* fn_802F0394(RpcController_802F2110*, RpcDefinition_802F2110*, SoundInstance_802F2110*);
 extern "C" void fn_802F04D4(RpcController_802F2110*, SoundInstance_802F2110*);
-extern "C" VoiceNode_802F2110* fn_802F3E20(VoiceNode_802F2110*, SoundInstance_802F2110*, VoiceDefinition_802F3E20*);
-extern "C" void fn_802F3ECC(VoiceNode_802F2110*, int);
-extern "C" void fn_802F3F6C(VoiceNode_802F2110*);
-extern "C" void fn_802F4070(VoiceNode_802F2110*);
-extern "C" int fn_802F437C(VoiceNode_802F2110*, float);
-extern "C" void fn_802F4174(VoiceNode_802F2110*);
-extern "C" void fn_802F4278(VoiceNode_802F2110*);
-extern "C" void fn_802F4518(VoiceNode_802F2110*);
-extern "C" void fn_802F4640(VoiceNode_802F2110*, AudioSource**, u32*);
-
-static inline VoiceNode_802F2110* AllocateVoice_802F2110()
-{
-    VoiceNode_802F2110* voice = 0;
-    if (sPlaybackOwnerPool_802F3E20.m_FreeList == 0)
-        SlotPoolBase::BaseAddNewBlock(&sPlaybackOwnerPool_802F3E20, sizeof(VoiceNode_802F2110));
-    if (sPlaybackOwnerPool_802F3E20.m_FreeList != 0)
-    {
-        voice = (VoiceNode_802F2110*)sPlaybackOwnerPool_802F3E20.m_FreeList;
-        sPlaybackOwnerPool_802F3E20.m_FreeList = sPlaybackOwnerPool_802F3E20.m_FreeList->next;
-    }
-    return voice;
-}
 
 static inline RpcListEntry_802F2110* AllocateEntry_802F2110(SlotPoolBase* pool)
 {
@@ -184,18 +98,18 @@ static inline void AppendEntry_802F2110(SoundInstance_802F2110* instance,
 
 static inline void DestroyVoices_802F2110(SoundInstance_802F2110* instance)
 {
-    VoiceNode_802F2110* voice = instance->voices;
+    AudioSequenceInstance* voice = instance->voices;
     while (voice != 0)
     {
-        VoiceNode_802F2110* next = voice->next;
-        fn_802F3ECC(voice, 1);
+        AudioSequenceInstance* next = voice->next;
+        delete voice;
         voice = next;
     }
     instance->voices = 0;
 }
 
 extern "C" SoundInstance_802F2110* fn_802F2188(SoundInstance_802F2110* instance,
-    CueHandle_802F2110* owner, VoiceDefinition_802F2110* definition)
+    XSoundHandle* owner, VoiceDefinition_802F2110* definition)
 {
     instance->previousTime = -1.0f;
     instance->volume.value = 0.0f;
@@ -235,12 +149,10 @@ extern "C" SoundInstance_802F2110* fn_802F2188(SoundInstance_802F2110* instance,
     instance->pitch.maximum = 12.0f;
     instance->pitch.valid = true;
 
-    VoiceNode_802F2110* previous = 0;
+    AudioSequenceInstance* previous = 0;
     for (u32 i = 0; i < instance->definition->voiceCount; i++)
     {
-        VoiceNode_802F2110* voice = AllocateVoice_802F2110();
-        if (voice != 0)
-            voice = fn_802F3E20(voice, instance, instance->definition->voiceIds[i]);
+        AudioSequenceInstance* voice = new AudioSequenceInstance(instance, instance->definition->voiceIds[i]);
         if (previous == 0)
             instance->voices = voice;
         else
@@ -255,7 +167,7 @@ extern "C" void fn_802F2320(SoundInstance_802F2110* instance, float)
     instance->volume.Update(0.0f, 1.0f);
     instance->pitch.Update(0.0f, 1.0f);
     if (instance->voices != 0)
-        fn_802F3F6C(instance->voices);
+        instance->voices->Play();
     instance->state = 4;
 }
 
@@ -299,7 +211,7 @@ extern "C" void fn_802F2398(SoundInstance_802F2110* instance)
 
     if (instance->voices != 0)
     {
-        fn_802F4070(instance->voices);
+        instance->voices->Prepare();
         instance->state = 2;
     }
     else
@@ -326,29 +238,29 @@ extern "C" void fn_802F25D4(SoundInstance_802F2110* instance, void* preserve)
     {
         instance->activeRpc = 0;
         if (instance->voices != 0)
-            fn_802F4518(instance->voices);
+            instance->voices->Stop();
     }
     instance->state = 7;
 }
 
 extern "C" void fn_802F2640(SoundInstance_802F2110* instance)
 {
-    fn_802F4174(instance->voices);
+    instance->voices->Pause();
 }
 
 extern "C" void fn_802F2648(SoundInstance_802F2110* instance)
 {
-    fn_802F4278(instance->voices);
+    instance->voices->Resume();
 }
 
 extern "C" void fn_802F2650(SoundInstance_802F2110* instance,
     AudioSource** value, u32* output)
 {
-    for (VoiceNode_802F2110* voice = instance->voices;
+    for (AudioSequenceInstance* voice = instance->voices;
         voice != 0;
         voice = voice->next)
     {
-        fn_802F4640(voice, value, output);
+        voice->GetSources(value, output);
     }
 }
 
@@ -377,13 +289,13 @@ extern "C" void fn_802F26B0(SoundInstance_802F2110* instance, float dt)
         if (instance->activeRpc->value < -94.0f)
         {
             if (instance->voices != 0)
-                fn_802F4518(instance->voices);
+                instance->voices->Stop();
             instance->activeRpc = 0;
         }
     }
 
     int voiceState = instance->voices != 0
-                       ? fn_802F437C(instance->voices, dt)
+                       ? instance->voices->Update(dt)
                        : 8;
     switch (instance->state)
     {
@@ -417,7 +329,7 @@ extern "C" void fn_802F26B0(SoundInstance_802F2110* instance, float dt)
             {
                 instance->activeRpc = 0;
                 if (instance->voices != 0)
-                    fn_802F4518(instance->voices);
+                    instance->voices->Stop();
             }
             instance->state = 7;
         }

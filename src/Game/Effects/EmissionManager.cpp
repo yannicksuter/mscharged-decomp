@@ -15,7 +15,7 @@
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "unclassified/tu_802B7798.h"
+#include "NL/nlDebugViews.h"
 
 static EffectsLight g_EffectsLights[3];
 static int g_nNumLights;

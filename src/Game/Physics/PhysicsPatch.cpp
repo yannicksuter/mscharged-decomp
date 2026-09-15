@@ -31,7 +31,7 @@
 
 #include <math.h>
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 class EffectsGroup;
 
@@ -62,10 +62,10 @@ inline void PhysicsPatch::UnidentifiedKillEffect()
 {
     if (m_Type != -1)
     {
-        UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(m_Type);
-        if (info->mUnidentified08 != 0)
+        PhysicsPatchInfo* info = GetPhysicsPatchInfo(m_Type);
+        if (info->mEffectName != 0)
         {
-            EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mUnidentified08);
+            EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mEffectName);
             if (effects != 0)
             {
                 EmissionManager::Instance()->Kill((unsigned long)this, effects);
@@ -83,10 +83,10 @@ inline void PhysicsPatch::UnidentifiedDestroyEffect()
 {
     if (m_Type != -1)
     {
-        UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(m_Type);
-        if (info->mUnidentified08 != 0)
+        PhysicsPatchInfo* info = GetPhysicsPatchInfo(m_Type);
+        if (info->mEffectName != 0)
         {
-            EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mUnidentified08);
+            EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mEffectName);
             if (effects != 0)
             {
                 EmissionManager::Instance()->Destroy((unsigned long)this, effects);
@@ -142,15 +142,15 @@ void PhysicsPatch::fn_80172EE0(const int* type)
     m_pTarget = 0;
     m_TargetSeekSpeed = 0.0f;
 
-    UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(m_Type);
-    SetCollide(info->mUnidentified0C);
+    PhysicsPatchInfo* info = GetPhysicsPatchInfo(m_Type);
+    SetCollide(info->mCollisionMask);
     EnableCollisions();
-    m_Gravity = info->mUnidentified14;
-    PlaySound(10, info->mUnidentified10, 0, 0);
+    m_Gravity = info->mGravity;
+    PlaySound(10, info->mSoundID, 0, 0);
 
-    if (info->mUnidentified08 != 0 && nlStrLen(info->mUnidentified08) != 0)
+    if (info->mEffectName != 0 && nlStrLen(info->mEffectName) != 0)
     {
-        EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mUnidentified08);
+        EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mEffectName);
         if (effects != 0)
         {
             view = 3;
@@ -214,7 +214,7 @@ ContactType PhysicsPatch::Contact(
     PhysicsObject* other, dContact*, int)
 {
     UnidentifiedEventData24* eventData;
-    fn_80174ED4(m_Type);
+    GetPhysicsPatchInfo(m_Type);
 
     switch (other->GetObjectType())
     {
@@ -351,7 +351,7 @@ void PhysicsPatch::Update(float dt)
 {
     if (m_bVisible == true && !m_bFrozen)
     {
-        UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(m_Type);
+        PhysicsPatchInfo* info = GetPhysicsPatchInfo(m_Type);
         m_fCurtime += dt;
         if (m_fCurtime <= m_fLifetime)
         {
@@ -382,7 +382,7 @@ void PhysicsPatch::Update(float dt)
                 return;
             }
 
-            float damping = 1.0f - InterpolateRangeClamped(info->mUnidentified18, 0.6f, 0.02f, 0.5f, dt);
+            float damping = 1.0f - InterpolateRangeClamped(info->mFriction, 0.6f, 0.02f, 0.5f, dt);
             nlVec3Scale(m_Velocity, damping);
             if (m_pTarget != 0)
             {
@@ -394,7 +394,7 @@ void PhysicsPatch::Update(float dt)
             position.x = GetPosition().x + m_Velocity.x * dt;
             position.y = GetPosition().y + m_Velocity.y * dt;
             position.z = GetPosition().z + m_Velocity.z * dt;
-            if (info->mUnidentified1C > 0.0f)
+            if (info->mBounce > 0.0f)
             {
                 float goalLineX = cField::GetGoalLineX(1u);
                 float halfWidth = 0.5f * (2.0f * cField::mv3FieldPosition.y);
@@ -402,7 +402,7 @@ void PhysicsPatch::Update(float dt)
                     && position.y < halfWidth && position.y > -1.0f * halfWidth)
                 {
                     position.z = 0.02f;
-                    m_Velocity.z *= -1.0f * info->mUnidentified1C;
+                    m_Velocity.z *= -1.0f * info->mBounce;
                 }
             }
             SetPosition(position, WORLD_COORDINATES);
@@ -432,9 +432,9 @@ bool PhysicsPatch::SetContactInfo(
         SetDefaultContactInfo(contact);
     }
 
-    UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(m_Type);
-    contact->surface.bounce = info->mUnidentified1C;
-    contact->surface.mu = info->mUnidentified18;
+    PhysicsPatchInfo* info = GetPhysicsPatchInfo(m_Type);
+    contact->surface.bounce = info->mBounce;
+    contact->surface.mu = info->mFriction;
     contact->surface.bounce_vel = 0.0f;
     return true;
 }
@@ -475,7 +475,7 @@ void PhysicsPatch::fn_80173B18()
     delta.x = m_pTarget->GetPosition().x - GetPosition().x;
     delta.y = m_pTarget->GetPosition().y - GetPosition().y;
     nlVec2Length(delta);
-    fn_80174ED4(m_Type);
+    GetPhysicsPatchInfo(m_Type);
 
     nlVec2Scale(direction, delta, 1.0f / nlVec2Length(delta));
     nlVec2Scale(delta, direction, m_TargetSeekSpeed);
@@ -697,10 +697,10 @@ extern "C" void fn_8017472C(void*)
     for (int j = 0; j < 13; ++j)
     {
         int type = j;
-        UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(type);
-        if (info->mUnidentified08 != 0 && nlStrLen(info->mUnidentified08) != 0)
+        PhysicsPatchInfo* info = GetPhysicsPatchInfo(type);
+        if (info->mEffectName != 0 && nlStrLen(info->mEffectName) != 0)
         {
-            EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mUnidentified08);
+            EffectsGroup* effects = EmissionManager::Instance()->GetEffectsGroup(info->mEffectName);
             if (effects != 0)
             {
                 EmissionManager::Instance()->Destroy(effects);

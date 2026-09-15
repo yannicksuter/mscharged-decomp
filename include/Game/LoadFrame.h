@@ -5,6 +5,12 @@ class LoadFrame
 {
 public:
     template <int N, typename T>
+    void ReplayablePolymorphicPtr(T*& current);
+    int GetInterval() const;
+    float fn_801948B0() const;
+    void fn_80191504();
+    bool fn_801919D0() const;
+    template <int N, typename T>
     void Replayable(T& current);
 
     template <int N, typename T>
@@ -22,7 +28,7 @@ public:
 template <int N, typename T>
 inline void LoadFrame::Replayable(T& current)
 {
-    typename ReplayableCategory<T>::Type category = ReplayableCategoryOf(current);
+    typename ReplayableCategory<T>::Type category;
     Replayable<N>(current, category);
 }
 
@@ -42,6 +48,30 @@ inline void LoadFrame::Replayable(T& current, NotReplayablePod)
     if (N == 0 || mInterval == N)
     {
         current.Replay(*this);
+    }
+}
+
+template <int N, typename T>
+inline void LoadFrame::ReplayablePolymorphicPtr(T*& current)
+{
+    if (N == 0 || mInterval == N)
+    {
+        unsigned char notNull = 1;
+        memcpy(&notNull, mStream.mStorage, 1);
+        mStream.mStorage++;
+        if (notNull)
+        {
+            char typeId = 0;
+            memcpy(&typeId, mStream.mStorage, 1);
+            mStream.mStorage++;
+            if (typeId < 0 || typeId > 4)
+                nlBreak();
+            ::Replayable<N>(*this, typeId, current);
+        }
+        else
+        {
+            current = 0;
+        }
     }
 }
 

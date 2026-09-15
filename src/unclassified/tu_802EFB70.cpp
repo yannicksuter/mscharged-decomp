@@ -1,13 +1,14 @@
 #include "NL/nlDebugString.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioSystem.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "NL/nlChunk.h"
 #include "Game/Sys/debug.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
+#include "Game/Audio/RpcList_802EFB70.h"
 
 struct RpcCurvePoint_802EFB70
 {
@@ -46,19 +47,6 @@ struct RpcRuntimeNode_802EFB70
     u8 valid;
     u8 pad_09[3];
     s32* localIndex;
-};
-
-struct RpcListEntry_802EFB70
-{
-    RpcListEntry_802EFB70* next;
-    RpcListEntry_802EFB70* previous;
-    RpcRuntimeNode_802EFB70* node;
-};
-
-struct RpcList_802EFB70
-{
-    SlotPoolBase* pool;
-    RpcListEntry_802EFB70* head;
 };
 
 struct RpcController_802EFB70
@@ -121,18 +109,18 @@ static inline RpcListEntry_802EFB70* AllocateListEntry_802EFB70(
     RpcList_802EFB70* list)
 {
     RpcListEntry_802EFB70* entry = 0;
-    if (list->pool->m_FreeList == 0)
+    if (list->m_Allocator.m_FreeList == 0)
         SlotPoolBase::BaseAddNewBlock(
-            list->pool, sizeof(RpcListEntry_802EFB70));
-    if (list->pool->m_FreeList != 0)
+            &list->m_Allocator, sizeof(RpcListEntry_802EFB70));
+    if (list->m_Allocator.m_FreeList != 0)
     {
-        entry = (RpcListEntry_802EFB70*)list->pool->m_FreeList;
-        list->pool->m_FreeList = list->pool->m_FreeList->next;
+        entry = (RpcListEntry_802EFB70*)list->m_Allocator.m_FreeList;
+        list->m_Allocator.m_FreeList = list->m_Allocator.m_FreeList->next;
     }
     if (entry != 0)
     {
-        entry->next = 0;
-        entry->previous = 0;
+        entry->m_next = 0;
+        entry->m_prev = 0;
     }
     return entry;
 }
@@ -203,12 +191,7 @@ extern "C" RpcController_802EFB70* fn_802EFB70(nlChunk* outer)
         controller->runtimeCount * sizeof(RpcRuntimeNode_802EFB70*),
         8,
         false);
-    controller->dynamicNodes = (RpcList_802EFB70*)nlMalloc(sizeof(RpcList_802EFB70), 8, false);
-    if (controller->dynamicNodes != 0)
-    {
-        controller->dynamicNodes->pool = &lbl_8057FA10;
-        controller->dynamicNodes->head = 0;
-    }
+    controller->dynamicNodes = new (8, false) RpcList_802EFB70(lbl_8057FA10);
     fn_802EFEFC(controller);
     return controller;
 }
@@ -243,12 +226,12 @@ extern "C" void fn_802F00F0(
     for (u32 i = 0; i < controller->runtimeCount; i++)
         UpdateRuntimeNode_802EFB70(controller->runtimeNodes[i]);
 
-    RpcListEntry_802EFB70* start = controller->dynamicNodes->head;
+    RpcListEntry_802EFB70* start = controller->dynamicNodes->m_Head;
     RpcListEntry_802EFB70* entry = start;
     while (entry != 0)
     {
-        UpdateRuntimeNode_802EFB70(entry->node);
-        entry = entry->next;
+        UpdateRuntimeNode_802EFB70(entry->entry);
+        entry = entry->m_next;
         if (entry == start)
             entry = 0;
     }
@@ -264,22 +247,22 @@ extern "C" RpcRuntimeNode_802EFB70* fn_802F0394(
 
     RpcList_802EFB70* list = controller->dynamicNodes;
     RpcListEntry_802EFB70* entry = AllocateListEntry_802EFB70(list);
-    entry->node = node;
-    if (list->head == 0)
+    entry->entry = node;
+    if (list->m_Head == 0)
     {
-        list->head = entry;
-        entry->next = entry;
-        entry->previous = entry;
+        list->m_Head = entry;
+        entry->m_next = entry;
+        entry->m_prev = entry;
     }
     else
     {
-        RpcListEntry_802EFB70* head = list->head;
-        head->next->previous = entry;
-        entry->next = head->next;
-        entry->previous = head;
-        head->next = entry;
+        RpcListEntry_802EFB70* head = list->m_Head;
+        head->m_next->m_prev = entry;
+        entry->m_next = head->m_next;
+        entry->m_prev = head;
+        head->m_next = entry;
     }
-    list->head = entry;
+    list->m_Head = entry;
     return node;
 }
 
@@ -287,40 +270,32 @@ extern "C" void fn_802F04D4(
     RpcController_802EFB70* controller, u32 localIndex)
 {
     RpcList_802EFB70* list = controller->dynamicNodes;
-    RpcListEntry_802EFB70* start = list->head;
+    RpcListEntry_802EFB70* start = list->m_Head;
     RpcListEntry_802EFB70* entry = start;
     while (entry != 0)
     {
-        RpcListEntry_802EFB70* next = entry->next;
-        if ((u32)entry->node->localIndex == localIndex)
+        RpcListEntry_802EFB70* next = entry->m_next;
+        if ((u32)entry->entry->localIndex == localIndex)
         {
-            RpcRuntimeNode_802EFB70* node = entry->node;
+            RpcRuntimeNode_802EFB70* node = entry->entry;
             node->definition = (RpcDefinition_802EFB70*)lbl_8057F9E8.m_FreeList;
             lbl_8057F9E8.m_FreeList = (SlotPoolEntry*)node;
 
-            if (entry->next == entry)
-                list->head = 0;
+            if (entry->m_next == entry)
+                list->m_Head = 0;
             else
             {
-                entry->previous->next = entry->next;
-                entry->next->previous = entry->previous;
-                if (list->head == entry)
-                    list->head = entry->previous;
+                entry->m_prev->m_next = entry->m_next;
+                entry->m_next->m_prev = entry->m_prev;
+                if (list->m_Head == entry)
+                    list->m_Head = entry->m_prev;
             }
-            entry->next = (RpcListEntry_802EFB70*)list->pool->m_FreeList;
-            list->pool->m_FreeList = (SlotPoolEntry*)entry;
+            list->m_Allocator.DeleteEntry(entry);
         }
 
-        if (next == start || list->head == 0)
+        if (next == start || list->m_Head == 0)
             entry = 0;
         else
             entry = next;
     }
-}
-
-extern "C" void fn_802F076C(RpcList_802EFB70* list, RpcListEntry_802EFB70* entry)
-{
-    SlotPoolBase* pool = list->pool;
-    entry->next = (RpcListEntry_802EFB70*)pool->m_FreeList;
-    pool->m_FreeList = (SlotPoolEntry*)entry;
 }

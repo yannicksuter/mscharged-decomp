@@ -7,7 +7,7 @@
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "math.h"
-#include "unclassified/tu_801B535C.h"
+#include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Field.h"
 
@@ -133,7 +133,7 @@ DrawableYoshiEgg::DrawableYoshiEgg()
     mOrientation.w = 1.0f;
 }
 
-void DrawableYoshiEgg::Grab(const UnidentifiedObject_801B535C* object)
+void DrawableYoshiEgg::Grab(const YoshiEggObject* object)
 {
     if (object == 0)
     {
@@ -141,18 +141,18 @@ void DrawableYoshiEgg::Grab(const UnidentifiedObject_801B535C* object)
         return;
     }
 
-    mVisible = object->mUnidentified28;
+    mVisible = object->mActive;
     if (!mVisible)
     {
         return;
     }
 
-    mPosition = object->mUnidentified10;
-    mOrientation = object->mUnidentified00;
-    mScale = object->fn_801B5B30();
+    mPosition = object->mPosition;
+    mOrientation = object->mOrientation;
+    mScale = object->GetRadius();
 }
 
-void DrawableYoshiEgg::Render(const UnidentifiedObject_801B535C* object) const
+void DrawableYoshiEgg::Render(const YoshiEggObject* object) const
 {
     nlMatrix4 matrix;
     RenderObject* drawable;
@@ -162,7 +162,7 @@ void DrawableYoshiEgg::Render(const UnidentifiedObject_801B535C* object) const
         return;
     }
 
-    drawable = object->mUnidentified30;
+    drawable = object->mDrawable;
     if (drawable == 0)
     {
         return;

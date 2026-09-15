@@ -161,9 +161,8 @@ public:
     {
     }
 
-    UnidentifiedVariant_80054AB8(const UnidentifiedVariant_80054AB8& other);
     UnidentifiedVariant_80054AB8(const UnidentifiedVariant_80054AB8& other,
-        float fParam1, float fParam2);
+        float fParam1 = -1.0f, float fParam2 = -1.0f);
     template <typename T>
     UnidentifiedVariant_80054AB8(const T& value, float fParam1, float fParam2)
         : FuzzyVariant(value)
@@ -193,6 +192,10 @@ public:
         CopyFrom(value);
         return *this;
     }
+
+    Variant* fn_800C2C00(int index) { return ExtraData.Get(index); }
+    UnidentifiedVariantCollection* fn_800C2C08() { return &ExtraData; }
+    bool fn_800C2C10(int index) const { return ExtraData.IsSet(index); }
 
     int GetInt() const
     {
@@ -303,14 +306,6 @@ inline void UnidentifiedVariant_80054AB8::operator delete(void* entry)
 inline void UnidentifiedActionQueue::operator delete(void* entry)
 {
     lbl_80584228.DeleteEntry((UnidentifiedActionQueue*)entry);
-}
-
-inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
-    const UnidentifiedVariant_80054AB8& other)
-    : FuzzyVariant((const FuzzyVariant&)other)
-    , mTemporary(false)
-{
-    ExtraData = other.ExtraData;
 }
 
 inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(

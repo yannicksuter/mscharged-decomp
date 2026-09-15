@@ -18,6 +18,7 @@ struct XSoundOwner
 };
 
 class XSoundHandle;
+struct LocalSliderSet_802F1758;
 typedef void (*XSoundHitMarkerCallback)(
     void*, XSoundHandle*, void*);
 
@@ -30,7 +31,7 @@ public:
     virtual ~XSoundHandle();
 
     virtual bool Play(bool) = 0;
-    virtual bool Prepare(u8) = 0;
+    virtual bool Prepare(bool) = 0;
     virtual void Stop(u8, void*) = 0;
     virtual void Pause() = 0;
     virtual void Resume() = 0;
@@ -39,7 +40,7 @@ public:
     virtual void Release() = 0;
     virtual void Update(float dt);
     virtual bool IsValid() = 0;
-    virtual void SetCue(u32** slot, u32 cueIndex);
+    virtual void SetCue(unsigned int** slot, unsigned int cueIndex);
 
     void FormatState(char* buffer, u32 size);
     void OnHitMarker(void* value);
@@ -53,7 +54,7 @@ public:
     XSoundOwner* m_Owner;
     float m_PreviousTime;
     float m_CurrentTime;
-    u32 m_Unknown20;
+    LocalSliderSet_802F1758* m_LocalSliders;
     XSoundHitMarkerCallback m_Callback;
     void* m_CallbackContext;
 };

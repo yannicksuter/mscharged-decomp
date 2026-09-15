@@ -1,20 +1,20 @@
-#include "unclassified/tu_802BE64C.h"
+#include "NL/nlRegistry.h"
 
-UnidentifiedRegistryNode_802BE64C::~UnidentifiedRegistryNode_802BE64C()
+RegistryNode::~RegistryNode()
 {
     if (mValue.mType == 2)
     {
-        ((UnidentifiedRegistryDynamic_802BEA10*)mOwner)
+        ((DynamicRegistryContainer*)mOwner)
             ->mAllocator->FreeItem(GetData());
     }
 }
 
-UnidentifiedRegistryNode_802BE64C* UnidentifiedRegistryDynamic_802BEA10::AddNamed(
+RegistryNode* DynamicRegistryContainer::AddNamed(
     const char* name)
 {
-    UnidentifiedRegistryNode_802BE64C* node
-        = new (mAllocator->AllocNode()) UnidentifiedRegistryNode_802BE64C(name, this);
-    UnidentifiedRegistryNode_802BE64C* tail = mNamed;
+    RegistryNode* node
+        = new (mAllocator->AllocNode()) RegistryNode(name, this);
+    RegistryNode* tail = mNamed;
     if (tail == 0)
     {
         mNamed = node;
@@ -32,26 +32,26 @@ UnidentifiedRegistryNode_802BE64C* UnidentifiedRegistryDynamic_802BEA10::AddName
     return node;
 }
 
-void UnidentifiedRegistryDynamic_802BEA10::UnidentifiedVirtual34() {}
+void DynamicRegistryContainer::UnidentifiedVirtual34() {}
 
-void UnidentifiedRegistryDynamic_802BEA10::UnidentifiedVirtual38() {}
+void DynamicRegistryContainer::UnidentifiedVirtual38() {}
 
-UnidentifiedRegistryContainer* UnidentifiedRegistryDynamic_802BEA10::AddChild(
+RegistryContainer* DynamicRegistryContainer::AddChild(
     const char* name)
 {
-    UnidentifiedRegistryNode_802BE64C* node = AddNamed(name);
+    RegistryNode* node = AddNamed(name);
     node->mValue.mType = 3;
-    UnidentifiedRegistryContainer* child = new (mAllocator->AllocContainer())
-        UnidentifiedRegistryDynamic_802BEA10(mAllocator);
+    RegistryContainer* child = new (mAllocator->AllocContainer())
+        DynamicRegistryContainer(mAllocator);
     node->mValue.mData = child;
     return child;
 }
 
-UnidentifiedRegistryNode_802BE64C* UnidentifiedRegistryDynamic_802BEA10::AddUnnamed()
+RegistryNode* DynamicRegistryContainer::AddUnnamed()
 {
-    UnidentifiedRegistryNode_802BE64C* node
-        = new (mAllocator->AllocNode()) UnidentifiedRegistryNode_802BE64C("", this);
-    UnidentifiedRegistryNode_802BE64C* tail = mUnnamed;
+    RegistryNode* node
+        = new (mAllocator->AllocNode()) RegistryNode("", this);
+    RegistryNode* tail = mUnnamed;
     if (tail == 0)
     {
         mUnnamed = node;
@@ -69,30 +69,30 @@ UnidentifiedRegistryNode_802BE64C* UnidentifiedRegistryDynamic_802BEA10::AddUnna
     return node;
 }
 
-UnidentifiedRegistryContainer*
-UnidentifiedRegistryDynamic_802BEA10::AddUnnamedChild()
+RegistryContainer*
+DynamicRegistryContainer::AddUnnamedChild()
 {
-    UnidentifiedRegistryNode_802BE64C* node = AddUnnamed();
+    RegistryNode* node = AddUnnamed();
     node->mValue.mType = 3;
-    UnidentifiedRegistryContainer* child = new (mAllocator->AllocContainer())
-        UnidentifiedRegistryDynamic_802BEA10(mAllocator);
+    RegistryContainer* child = new (mAllocator->AllocContainer())
+        DynamicRegistryContainer(mAllocator);
     node->mValue.mData = child;
     return child;
 }
 
-bool UnidentifiedRegistryDynamic_802BEA10::Has(const u32& hash) const
+bool DynamicRegistryContainer::Has(const u32& hash) const
 {
     return Get(hash).mType != 4;
 }
 
-UnidentifiedRegistryValue UnidentifiedRegistryDynamic_802BEA10::Get(
+RegistryValue DynamicRegistryContainer::Get(
     const u32& hash) const
 {
     if (mNamed == 0)
     {
-        return UnidentifiedRegistryValue();
+        return RegistryValue();
     }
-    UnidentifiedRegistryNode_802BE64C* node = First(1);
+    RegistryNode* node = First(1);
     do
     {
         if (hash == node->mHash)
@@ -101,17 +101,17 @@ UnidentifiedRegistryValue UnidentifiedRegistryDynamic_802BEA10::Get(
         }
         node = node->mNext;
     } while (!IsFirst(node, 1));
-    return UnidentifiedRegistryValue();
+    return RegistryValue();
 }
 
-UnidentifiedRegistryNode_802BE64C* UnidentifiedRegistryDynamic_802BEA10::Find(
+RegistryNode* DynamicRegistryContainer::Find(
     const u32& hash)
 {
     if (mNamed == 0)
     {
-        return &lbl_8057C498;
+        return &gEmptyRegistryNode;
     }
-    UnidentifiedRegistryNode_802BE64C* node = First(1);
+    RegistryNode* node = First(1);
     do
     {
         if (hash == node->mHash)
@@ -120,17 +120,17 @@ UnidentifiedRegistryNode_802BE64C* UnidentifiedRegistryDynamic_802BEA10::Find(
         }
         node = node->mNext;
     } while (!IsFirst(node, 1));
-    return &lbl_8057C498;
+    return &gEmptyRegistryNode;
 }
 
-int UnidentifiedRegistryDynamic_802BEA10::CountUnnamed() const
+int DynamicRegistryContainer::CountUnnamed() const
 {
     if (mUnnamed == 0)
     {
         return 0;
     }
     int count = 0;
-    UnidentifiedRegistryNode_802BE64C* node = mUnnamed;
+    RegistryNode* node = mUnnamed;
     do
     {
         node = node->mNext;
@@ -139,14 +139,14 @@ int UnidentifiedRegistryDynamic_802BEA10::CountUnnamed() const
     return count;
 }
 
-int UnidentifiedRegistryDynamic_802BEA10::CountNamed() const
+int DynamicRegistryContainer::CountNamed() const
 {
     if (mNamed == 0)
     {
         return 0;
     }
     int count = 0;
-    UnidentifiedRegistryNode_802BE64C* node = mNamed;
+    RegistryNode* node = mNamed;
     do
     {
         node = node->mNext;
@@ -155,12 +155,12 @@ int UnidentifiedRegistryDynamic_802BEA10::CountNamed() const
     return count;
 }
 
-void UnidentifiedRegistryListIterator_802BF828::Next()
+void RegistryListIterator::Next()
 {
     mCurrent = AtLast() ? 0 : mCurrent->mNext;
 }
 
-bool UnidentifiedRegistryListIterator_802BF828::UnidentifiedVirtual28()
+bool RegistryListIterator::MovePrevious()
 {
     if (AtFirst())
     {
@@ -169,14 +169,14 @@ bool UnidentifiedRegistryListIterator_802BF828::UnidentifiedVirtual28()
     mCurrent->mPrev->mPrev->mNext = mCurrent;
     mCurrent->mPrev->mNext = mCurrent->mNext;
     mCurrent->mNext->mPrev = mCurrent->mPrev;
-    UnidentifiedRegistryNode_802BE64C* previous = mCurrent->mPrev->mPrev;
+    RegistryNode* previous = mCurrent->mPrev->mPrev;
     mCurrent->mPrev->mPrev = mCurrent;
     mCurrent->mNext = mCurrent->mPrev;
     mCurrent->mPrev = previous;
     return true;
 }
 
-bool UnidentifiedRegistryListIterator_802BF828::UnidentifiedVirtual2C()
+bool RegistryListIterator::MoveNext()
 {
     if (AtLast())
     {
@@ -185,75 +185,75 @@ bool UnidentifiedRegistryListIterator_802BF828::UnidentifiedVirtual2C()
     mCurrent->mNext->mNext->mPrev = mCurrent;
     mCurrent->mNext->mPrev = mCurrent->mPrev;
     mCurrent->mPrev->mNext = mCurrent->mNext;
-    UnidentifiedRegistryNode_802BE64C* next = mCurrent->mNext->mNext;
+    RegistryNode* next = mCurrent->mNext->mNext;
     mCurrent->mNext->mNext = mCurrent;
     mCurrent->mPrev = mCurrent->mNext;
     mCurrent->mNext = next;
     return true;
 }
 
-bool UnidentifiedRegistryPacked_802BED28::Has(const u32& hash) const
+bool PackedRegistryContainer::Has(const u32& hash) const
 {
     u16 count = mNamedCount;
-    const UnidentifiedRegistryPackedEntry* entries
-        = UnidentifiedRegistryNamedEntries(mWords, count, mUnnamedCount);
+    const PackedRegistryEntry* entries
+        = RegistryNamedEntries(mWords, count, mUnnamedCount);
     u32 key = hash;
-    return UnidentifiedFindEntry(key, entries, count) != 0;
+    return FindPackedRegistryEntry(key, entries, count) != 0;
 }
 
-UnidentifiedRegistryValue UnidentifiedRegistryPacked_802BED28::Get(
+RegistryValue PackedRegistryContainer::Get(
     const u32& hash) const
 {
     const u32* types = mWords;
-    const UnidentifiedRegistryPackedEntry* entries
-        = UnidentifiedRegistryNamedEntries(types, mNamedCount, mUnnamedCount);
+    const PackedRegistryEntry* entries
+        = RegistryNamedEntries(types, mNamedCount, mUnnamedCount);
     u32 key = hash;
-    const UnidentifiedRegistryPackedEntry* entry
-        = UnidentifiedFindEntry(key, entries, mNamedCount);
+    const PackedRegistryEntry* entry
+        = FindPackedRegistryEntry(key, entries, mNamedCount);
     if (entry != 0)
     {
         int index = entry - entries;
-        return UnidentifiedRegistryValue(
-            entry->mData, UnidentifiedRegistryTypeAt(types, index));
+        return RegistryValue(
+            entry->mData, RegistryTypeAt(types, index));
     }
-    UnidentifiedRegistryValue none;
+    RegistryValue none;
     return none;
 }
 
-int UnidentifiedRegistryPacked_802BED28::CountUnnamed() const
+int PackedRegistryContainer::CountUnnamed() const
 {
     return mUnnamedCount;
 }
 
-int UnidentifiedRegistryPacked_802BED28::CountNamed() const
+int PackedRegistryContainer::CountNamed() const
 {
     return mNamedCount;
 }
 
-UnidentifiedRegistryNode_802BE64C* UnidentifiedRegistryPacked_802BED28::AddNamed(
+RegistryNode* PackedRegistryContainer::AddNamed(
     const char* name)
 {
-    return &lbl_8057C498;
+    return &gEmptyRegistryNode;
 }
 
-UnidentifiedRegistryContainer* UnidentifiedRegistryPacked_802BED28::AddChild(
+RegistryContainer* PackedRegistryContainer::AddChild(
     const char* name)
 {
     return 0;
 }
 
-UnidentifiedRegistryNode_802BE64C* UnidentifiedRegistryPacked_802BED28::AddUnnamed()
+RegistryNode* PackedRegistryContainer::AddUnnamed()
 {
     return AddNamed("");
 }
 
-UnidentifiedRegistryContainer*
-UnidentifiedRegistryPacked_802BED28::AddUnnamedChild()
+RegistryContainer*
+PackedRegistryContainer::AddUnnamedChild()
 {
     return AddChild("");
 }
 
-bool UnidentifiedRegistryScoped_802BEF0C::Has(const u32& hash) const
+bool ScopedRegistryContainer::Has(const u32& hash) const
 {
     if (mParent != 0 && mParent->Has(hash))
     {
@@ -262,49 +262,49 @@ bool UnidentifiedRegistryScoped_802BEF0C::Has(const u32& hash) const
     return Get(hash).mType != 4;
 }
 
-UnidentifiedRegistryValue UnidentifiedRegistryScoped_802BEF0C::Get(
+RegistryValue ScopedRegistryContainer::Get(
     const u32& hash) const
 {
     if (mParent != 0 && mParent->Has(hash))
     {
         return mParent->Get(hash);
     }
-    return UnidentifiedRegistryDynamic_802BEA10::Get(hash);
+    return DynamicRegistryContainer::Get(hash);
 }
 
-UnidentifiedRegistryNode_802BE64C* UnidentifiedRegistryScoped_802BEF0C::Find(
+RegistryNode* ScopedRegistryContainer::Find(
     const u32& hash)
 {
     if (mParent != 0)
     {
         mParent->Has(hash);
     }
-    return UnidentifiedRegistryDynamic_802BEA10::Find(hash);
+    return DynamicRegistryContainer::Find(hash);
 }
 
-int UnidentifiedRegistryScoped_802BEF0C::CountUnnamed() const
+int ScopedRegistryContainer::CountUnnamed() const
 {
     int count = mParent != 0 ? mParent->CountUnnamed() : 0;
-    return count + UnidentifiedRegistryDynamic_802BEA10::CountUnnamed();
+    return count + DynamicRegistryContainer::CountUnnamed();
 }
 
-int UnidentifiedRegistryScoped_802BEF0C::CountNamed() const
+int ScopedRegistryContainer::CountNamed() const
 {
     int count = mParent != 0 ? mParent->CountNamed() : 0;
-    return count + UnidentifiedRegistryDynamic_802BEA10::CountNamed();
+    return count + DynamicRegistryContainer::CountNamed();
 }
 
-UnidentifiedRegistryContainer* UnidentifiedRegistryScoped_802BEF0C::AddChild(
+RegistryContainer* ScopedRegistryContainer::AddChild(
     const char* name)
 {
-    UnidentifiedRegistryNode_802BE64C* node = AddNamed(name);
+    RegistryNode* node = AddNamed(name);
     node->mValue.mType = 3;
-    UnidentifiedRegistryContainer* child = new (mAllocator->AllocContainer())
-        UnidentifiedRegistryScoped_802BEF0C(mAllocator);
+    RegistryContainer* child = new (mAllocator->AllocContainer())
+        ScopedRegistryContainer(mAllocator);
     node->mValue.mData = child;
     return child;
 }
 
-UnidentifiedRegistryNode_802BE64C lbl_8057C498("");
+RegistryNode gEmptyRegistryNode("");
 
-#include "unclassified/tu_802BE64C_impl.h"
+#include "NL/nlRegistry.inl"

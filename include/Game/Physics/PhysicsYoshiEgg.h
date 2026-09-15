@@ -3,12 +3,12 @@
 
 #include "Game/Physics/PhysicsSphere.h"
 
-class UnidentifiedObject_801B535C;
+class YoshiEggObject;
 
 class PhysicsYoshiEgg : public PhysicsSphere
 {
 public:
-    PhysicsYoshiEgg(UnidentifiedObject_801B535C*, float);
+    PhysicsYoshiEgg(YoshiEggObject*, float);
     virtual ~PhysicsYoshiEgg();
     virtual int GetObjectType() const;
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
@@ -16,7 +16,7 @@ public:
     virtual ContactType Contact(PhysicsObject*, dContact*, int);
 
     /* 0x38 */ void* mUnidentified38;
-    /* 0x3C */ UnidentifiedObject_801B535C* mYoshiEgg;
+    /* 0x3C */ YoshiEggObject* mYoshiEgg;
 }; // total size: 0x40
 
 #endif // GAME_PHYSICS_PHYSICS_YOSHI_EGG_H

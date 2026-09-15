@@ -8,4 +8,9 @@ inline void TLInstance::SetVisible(bool visible)
     m_bVisible = visible;
 }
 
+inline eTimeLineAssetType TLInstance::GetType() const
+{
+    return m_type;
+}
+
 #endif

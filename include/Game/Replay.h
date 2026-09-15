@@ -4,8 +4,26 @@
 #include <string.h>
 
 #include "types.h"
+#include "NL/nlMath.h"
 
 class LoadFrame;
+
+template <typename T>
+struct ReplayFrameTraits
+{
+    enum
+    {
+        IsLoadFrame = false
+    };
+};
+template <>
+struct ReplayFrameTraits<LoadFrame>
+{
+    enum
+    {
+        IsLoadFrame = true
+    };
+};
 
 struct ReplayablePod
 {
@@ -23,6 +41,54 @@ struct ReplayableCategory
 
 template <>
 struct ReplayableCategory<int>
+{
+    typedef ReplayablePod Type;
+};
+
+template <>
+struct ReplayableCategory<bool>
+{
+    typedef ReplayablePod Type;
+};
+
+template <>
+struct ReplayableCategory<float>
+{
+    typedef ReplayablePod Type;
+};
+
+template <>
+struct ReplayableCategory<unsigned int>
+{
+    typedef ReplayablePod Type;
+};
+
+template <>
+struct ReplayableCategory<unsigned long>
+{
+    typedef ReplayablePod Type;
+};
+
+template <>
+struct ReplayableCategory<nlVector3>
+{
+    typedef ReplayablePod Type;
+};
+
+template <>
+struct ReplayableCategory<unsigned char>
+{
+    typedef ReplayablePod Type;
+};
+
+template <>
+struct ReplayableCategory<char>
+{
+    typedef ReplayablePod Type;
+};
+
+template <>
+struct ReplayableCategory<unsigned short>
 {
     typedef ReplayablePod Type;
 };
@@ -58,6 +124,11 @@ class SaveFrame
 {
 public:
     template <int N, typename T>
+    void ReplayablePolymorphicPtr(T* current);
+    int GetInterval() const;
+    void fn_80191504();
+    bool fn_801919D0() const;
+    template <int N, typename T>
     void Replayable(T& current);
 
     template <int N, typename T>
@@ -73,7 +144,7 @@ public:
 template <int N, typename T>
 inline void SaveFrame::Replayable(T& current)
 {
-    typename ReplayableCategory<T>::Type category = ReplayableCategoryOf(current);
+    typename ReplayableCategory<T>::Type category;
     Replayable<N>(current, category);
 }
 
@@ -97,17 +168,68 @@ inline void SaveFrame::Replayable(T& current, NotReplayablePod)
 }
 
 template <int N, typename FrameType, typename T>
-void Replayable(FrameType& frame, T& current);
-
-#include "Game/LoadFrame.h"
-
-template <int N, typename FrameType, typename T>
 inline void Replayable(FrameType& frame, T& current)
 {
     if (N == 0 || frame.mInterval == N)
     {
         frame.template Replayable<N>(current);
     }
+}
+
+void nlBreak();
+
+class cPoseNode;
+template <int N>
+void Replayable(SaveFrame& frame, char typeId, cPoseNode*& poseNode);
+template <int N>
+void Replayable(LoadFrame& frame, char typeId, cPoseNode*& poseNode);
+
+#include "Game/LoadFrame.h"
+
+template <int N, typename T>
+inline void SaveFrame::ReplayablePolymorphicPtr(T* current)
+{
+    if (N == 0 || mInterval == N)
+    {
+        unsigned char notNull = (current != 0);
+        memcpy(mStream.mStorage, &notNull, 1);
+        mStream.mStorage++;
+        if (notNull)
+        {
+            char typeId = (char)current->GetType();
+            if (typeId < 0 || typeId > 4)
+                nlBreak();
+            memcpy(mStream.mStorage, &typeId, 1);
+            mStream.mStorage++;
+            ::Replayable<N>(*this, typeId, current);
+        }
+    }
+}
+
+#include "Game/Compressor.h"
+
+template <int N, typename FrameType, typename T>
+inline void Replayable(FrameType& frame, const T& proxy)
+{
+    if (N == 0 || frame.mInterval == N)
+    {
+        if (N == 0)
+        {
+            proxy.Replay(frame);
+        }
+        else
+        {
+            proxy.template ReplayInterval<N>(frame);
+        }
+    }
+}
+
+#include "Game/UnidentifiedQuaternionCompressor.h"
+
+template <int N, typename FrameType, typename T>
+inline void ReplayablePolymorphic(FrameType& frame, T*& ptr)
+{
+    frame.template ReplayablePolymorphicPtr<N>(ptr);
 }
 
 class Replay
@@ -323,9 +445,7 @@ void Replay::Record(float time, T& snapshot, unsigned int events, unsigned int u
             mFree->mEvents = events;
             mFree->mUnidentifiedState = unidentifiedState;
 
-            Frame* allocated = lbl_806E1E9C->Allocate();
-            new (allocated) Frame(mFree->mBegin + frameSize, mFree->mSize - frameSize, mFree->mNext);
-            mFree->mNext = allocated;
+            mFree->mNext = new (lbl_806E1E9C->Allocate()) Frame(mFree->mBegin + frameSize, mFree->mSize - frameSize, mFree->mNext);
             mFree->mSize = frameSize;
             mFree = mFree->mNext;
         }

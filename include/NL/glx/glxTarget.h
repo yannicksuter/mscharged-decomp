@@ -19,7 +19,8 @@ public:
         mClearColourEnabled = (targetInfo->unknown18 & 1) != 0;
         mClearDepthEnabled = (targetInfo->unknown18 & 4) != 0;
         mClearDepthEnabled |= targetInfo->unknown1C != 0;
-        nlColourSet(mClearColour, targetInfo->colour[0], targetInfo->colour[1], targetInfo->colour[2], targetInfo->colour[3]);
+        for (int i = 0; i < 4; ++i)
+            mClearColour.c[i] = targetInfo->colour[i];
         mTextureData = 0;
         mTexture = 0;
     }

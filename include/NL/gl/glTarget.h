@@ -5,6 +5,21 @@
 
 class GLXTarget;
 
+enum GLTargetFormat
+{
+    GLTargetFormat_0 = 0,
+    GLTargetFormat_1 = 1,
+    GLTargetFormat_5 = 5,
+    GLTargetFormat_6 = 6,
+    GLTargetFormat_7 = 7
+};
+
+enum GLTargetInfoMode10
+{
+    GLTargetInfoMode10_0 = 0,
+    GLTargetInfoMode10_1 = 1
+};
+
 struct GLTargetInfo
 {
     GLTargetInfo()
@@ -17,8 +32,8 @@ struct GLTargetInfo
     /* 0x04 */ unsigned long width;
     /* 0x08 */ unsigned long unknown08;
     /* 0x0C */ unsigned long unknown0C;
-    /* 0x10 */ unsigned long unknown10;
-    /* 0x14 */ int format;
+    /* 0x10 */ GLTargetInfoMode10 unknown10;
+    /* 0x14 */ GLTargetFormat format;
     /* 0x18 */ unsigned long unknown18;
     /* 0x1C */ unsigned long unknown1C;
     /* 0x20 */ unsigned long unknown20;

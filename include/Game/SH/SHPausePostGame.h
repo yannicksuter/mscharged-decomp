@@ -4,7 +4,7 @@
 #include "Game/FE/feInput.h"
 #include "Game/FE/feTimer.h"
 #include "Game/SH/SHStrikerTimesBase.h"
-#include "unclassified/tu_80209584.h"
+#include "Game/FE/MatchSummary.h"
 
 class PausePostGameScene : public SHStrikerTimesBase
 {
@@ -31,7 +31,7 @@ public:
     /* 0x60D */ bool mUnidentified60D;
     /* 0x60E */ u8 mPadding60E[2];
     /* 0x610 */ int mUnidentified610;
-    /* 0x614 */ TU80209584Summary mSummary;
+    /* 0x614 */ MatchSummary mSummary;
 }; // size 0xA48
 
 void fn_801EDC90(bool online);

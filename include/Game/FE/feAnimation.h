@@ -23,6 +23,11 @@ enum AnimType
 class FEAnimationKeyframe
 {
 public:
+    float GetPoint() const { return m_fPoint; }
+    float GetControl1() const { return m_fControl1; }
+    float GetControl2() const { return m_fControl2; }
+    float GetTime() const { return m_fTime; }
+
     /* 0x00 */ float m_fPoint;
     /* 0x04 */ float m_fControl1;
     /* 0x08 */ float m_fControl2;
@@ -49,6 +54,8 @@ class FEAnimation
 {
 public:
     virtual ~FEAnimation() { }
+
+    void* GetKeyframeHead() const { return m_DLRingHead; }
 
     void Update(float fCurrentTime);
     void AnimateTargetAtTimeWithFloat(float fCurrentTime);

@@ -9,6 +9,12 @@
 class cPN_SAnimController : public cPoseNode
 {
 public:
+    cPN_SAnimController()
+        : cPoseNode(0)
+        , m_pSAnim(NULL)
+        , m_fTime(0.0f)
+    {
+    }
     cPN_SAnimController(cSAnim* anim, const AnimRetarget* retarget,
         ePlayMode playMode,
         void (*playbackSpeedCallback)(unsigned int, cPN_SAnimController*),
@@ -30,6 +36,28 @@ public:
         nlVector3* rootTranslation, float weight, float* accumulatedWeight);
     virtual void BlendRootRot(
         u16* rootRotation, float weight, float* accumulatedWeight);
+
+    template <typename T>
+    void Replay(T& frame)
+    {
+        Replayable<0>(frame, (cPoseNode&)*this);
+        Replayable<0>(frame, FloatCompressor<0, 1, 15>(m_fTime));
+
+        unsigned int animPtr = 0;
+        if (!ReplayFrameTraits<T>::IsLoadFrame)
+        {
+            animPtr = (unsigned int)m_pSAnim;
+            if (m_bMirror)
+                animPtr |= 1;
+        }
+        Replayable<0>(frame, animPtr);
+        if (ReplayFrameTraits<T>::IsLoadFrame)
+        {
+            m_bMirror = animPtr & 1;
+            m_pSAnim = (cSAnim*)(animPtr & ~1);
+        }
+        Replayable<0>(frame, (unsigned int&)m_pAnimRetarget);
+    }
 
     static void* operator new(unsigned long)
     {

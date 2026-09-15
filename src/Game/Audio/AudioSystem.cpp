@@ -2,7 +2,7 @@
 
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioBundleManager.h"
-#include "Game/Audio/CueHandle_802F1758.h"
+#include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/Plat3dSoundSrc.h"
 #include "Game/Audio/XSoundHandle.h"
 #include "NL/nlBind.h"
@@ -26,9 +26,6 @@ public:
     void* m_Unknown50;
 };
 
-extern BasicSlotPool<CueHandle_802F1758> lbl_8057FA68;
-extern "C" CueHandle_802F1758* fn_802F1758(CueHandle_802F1758*, void*,
-    CueOwner_802F1758*, u32, void (*)(void*, CueHandle_802F1758*, void*), void*);
 extern "C" void fn_802F499C(void*, unsigned long, XSoundHandle*);
 extern "C" void fn_802F49A4(void*, XSoundHandle*);
 u32 FindAudioResourceCue(AudioResourceLoadOwner*, u32, u32, u32, u32);
@@ -82,11 +79,8 @@ XSoundHandle* CreateAudioSoundHandle(AudioSystem* audio, int slotId, XSoundOwner
     if (cueIndex == 0xFFFF)
         return 0;
     ++lbl_806E2018;
-    CueHandle_802F1758* result = lbl_8057FA68.Allocate();
-    if (result != 0)
-        result = fn_802F1758(result, resource, (CueOwner_802F1758*)owner, cueIndex,
-            (void (*)(void*, CueHandle_802F1758*, void*))callback, (void*)context);
-    XSoundHandle* handle = (XSoundHandle*)result;
+    XSoundHandle* handle = new XSoundCueHandle(resource, owner, cueIndex,
+        (XSoundHitMarkerCallback)callback, (void*)context);
     if (owner != 0)
         ++audio->m_Unknown2E0;
     if (handle != 0)
@@ -122,7 +116,7 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
             if (handle->m_Owner != 0)
             {
                 Plat3dSoundSrc* owner = (Plat3dSoundSrc*)handle->m_Owner;
-                AudioSliderSet_802EC1F4* sliders = (AudioSliderSet_802EC1F4*)handle->m_Unknown20;
+                AudioSliderSet_802EC1F4* sliders = (AudioSliderSet_802EC1F4*)handle->m_LocalSliders;
                 float value1 = owner->m_Unknown10;
                 float value2 = owner->m_Unknown14;
                 float value3 = owner->m_Unknown18;

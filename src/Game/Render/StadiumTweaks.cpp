@@ -31,16 +31,8 @@ StadiumTweaks::StadiumTweaks(
     fSoftness.BindWithDefault(
         "physics net softness", -1.0f, category, false, 0.0f, 0.0f, 0.0f);
 
-    bool registered = bDontUseLowest.Bind(
-        "dont use lowest net texture LOD", 0.0f, category, false, 0.0f, 0.0f);
-    if (!registered)
-    {
-        *bDontUseLowest.m_pValue = bDontUseLowest.GetDefault();
-    }
-    if (!registered)
-    {
-        *bDontUseLowest.m_pValue = false;
-    }
+    bDontUseLowest.BindWithDefault(
+        "dont use lowest net texture LOD", false, category, false, 0.0f, 0.0f, 0.0f);
 
     fShadowHeight.BindWithDefault(
         "Shadow Height", 0.1f, category, false, 0.0f, 0.0f, 0.0f);

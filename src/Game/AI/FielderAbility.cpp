@@ -17,7 +17,7 @@
 #include "NL/nlSlotPool.h"
 #include "types.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 

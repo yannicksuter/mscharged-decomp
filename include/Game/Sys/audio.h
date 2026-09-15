@@ -67,7 +67,6 @@ bool StartTrackedSound(unsigned long cueId, void* context);
 void PauseAllAudio();
 void ResumeAllAudio();
 int GetAudioPauseDepth();
-void InvalidateSoundHandle(XSoundHandle* handle);
 void InitializeGameStreams();
 void StopCrowdReactions();
 void PlayCaptainChant(int slotId, unsigned long cueId, void* context);

@@ -142,13 +142,13 @@ ContactType PhysicsNPC::Contact(
             if (isChainChomp)
             {
                 int type = ((PhysicsPatch*)object)->m_Type;
-                UnidentifiedPhysicsPatchInfo_80510BF0* info = fn_80174ED4(type);
-                if (info->mUnidentified18 != 0.0f)
+                PhysicsPatchInfo* info = GetPhysicsPatchInfo(type);
+                if (info->mFriction != 0.0f)
                 {
                     if (mUnidentified044 != 2
-                        || info->mUnidentified18 > mUnidentified048)
+                        || info->mFriction > mUnidentified048)
                     {
-                        mUnidentified048 = info->mUnidentified18;
+                        mUnidentified048 = info->mFriction;
                     }
                     mUnidentified044 = 2;
                 }

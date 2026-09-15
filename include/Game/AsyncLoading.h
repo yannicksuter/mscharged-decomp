@@ -56,18 +56,7 @@ enum AsyncLoadingResult
 class AsyncLoadingManager : public InterpreterCore
 {
 public:
-    AsyncLoadingManager()
-        : InterpreterCore(100)
-    {
-        mLoadingHandle.mOwner = 0;
-        mByteCode = 0;
-        mSequenceState = ASYNC_LOADING_IDLE;
-        mLoadingState = 0;
-        mPreviousStageTick = 0;
-        mSequenceStartTime = 0;
-        mStageStartTick = 0;
-        mLoadingComment = "No Loading Comment";
-    }
+    AsyncLoadingManager();
 
     virtual ~AsyncLoadingManager();
     virtual void DoFunctionCall(unsigned int functionIndex);
@@ -121,7 +110,7 @@ void fn_8011B02C(AsyncLoadingManager* manager);
 void fn_8011B178(AsyncLoadingManager* manager);
 void fn_8011B2E4(AsyncLoadingManager* manager);
 void fn_8011B40C(AudioResourceLoadOwner*, void*);
-void fn_8011B418(void*, unsigned long, unsigned long);
+void fn_8011B418();
 void fn_8011B424(void*, unsigned long, unsigned long);
 void fn_8011B6E8(AsyncLoadingManager* manager);
 UnidentifiedOwnerHandle* fn_8011B858(UnidentifiedOwnerHandle* handle,

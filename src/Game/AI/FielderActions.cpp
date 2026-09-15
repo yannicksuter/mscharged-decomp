@@ -1,3 +1,4 @@
+#include "Game/FE/Overlay/OverlayHandlerMegaStrikeMeter.h"
 #include "NL/nlIntersection.h"
 #include "Game/Sys/audio.h"
 #include "Game/DetInput.h"
@@ -57,14 +58,14 @@
 #include "NL/nlSlotPool.h"
 #include "NL/utility.h"
 #include "unclassified/tu_801A0E64.h"
-#include "unclassified/tu_801A5F10.h"
+#include "Game/Render/KoopaShellObject.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/BirdoEgg.h"
 #include "Game/Render/ShootToScoreMeter.h"
 #include "math.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 static const nlVector3 v3ElectrocutionLaunch = { -5.0f, 0.0f, 5.0f };
@@ -228,12 +229,6 @@ extern UnidentifiedOnlineState* gNetworkInputRecording;
 bool IsNetworkOrRecordedGame(void);
 extern "C" void fn_8005F82C(cGame* pGame, cFielder* pFielder);
 extern BaseGameSceneManager* g_pOverlayManager;
-
-struct UnidentifiedMegaStrikeScene
-{
-    /* 0x00 */ u8 mUnknown00[0x36];
-    /* 0x36 */ bool mUnidentified36;
-};
 
 struct UnidentifiedSkillshotNode
 {
@@ -1475,7 +1470,7 @@ void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
     }
 }
 
-void cFielder::fn_800489C0()
+void cFielder::fn_800489C0(float)
 {
 }
 
@@ -1810,10 +1805,10 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
     }
     else if (mUnidentified478 == 3)
     {
-        UnidentifiedMegaStrikeScene* pScene
-            = (UnidentifiedMegaStrikeScene*)g_pOverlayManager->GetScene(
+        MegaStrikeMeterOverlay* pScene
+            = (MegaStrikeMeterOverlay*)g_pOverlayManager->GetScene(
                 (SceneList)0x64);
-        pScene->mUnidentified36 = true;
+        pScene->mMegaStrikeStarted = true;
         SetAction((eFielderActionState)0xB);
         fn_80048870(0);
 
@@ -4420,7 +4415,7 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
             {
                 if (gNPCManager->mUnidentified02C != 0)
                 {
-                    fn_801A6344(gNPCManager->mUnidentified02C, this);
+                    gNPCManager->mUnidentified02C->Activate(this);
                 }
             }
             else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0C)

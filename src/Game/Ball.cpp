@@ -44,13 +44,13 @@
 #include "NL/nlString.h"
 #include "NL/utility.h"
 #include "Game/Render/BirdoEgg.h"
-#include "unclassified/tu_801A5F10.h"
+#include "Game/Render/KoopaShellObject.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Render/StadiumLoading.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/Render/StadiumLoading.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 struct UnidentifiedBallRuntime
 {
@@ -1163,7 +1163,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
     if (pKoopaShell != NULL && pKoopaShell->mVisible)
     {
         pKoopaShell->mVelocity = m_v3Velocity;
-        fn_801A65D0(pKoopaShell, m_v3Position);
+        pKoopaShell->SetPosition(m_v3Position);
     }
 
     BirdoEggObject* pState = gNPCManager->mpBirdoEgg;
@@ -3321,14 +3321,13 @@ extern "C" void fn_80019910(PhysicsPatch* pPatch)
     }
 
     int nPatchType = pPatch->m_Type;
-    UnidentifiedPhysicsPatchInfo_80510BF0* pPatchInfo
-        = fn_80174ED4(nPatchType);
-    if (pPatchInfo->mUnidentified18 != 0.0f)
+    PhysicsPatchInfo* pPatchInfo = GetPhysicsPatchInfo(nPatchType);
+    if (pPatchInfo->mFriction != 0.0f)
     {
         nlVector3 v3Force;
         g_pBall->m_pPhysicsBall->GetLinearVelocity(&v3Force);
         nlVec3Scale(
-            v3Force, -10.0f * pPatchInfo->mUnidentified18);
+            v3Force, -10.0f * pPatchInfo->mFriction);
         g_pBall->m_pPhysicsBall->AddForceAtCentreOfMass(v3Force);
     }
 
@@ -3499,7 +3498,7 @@ extern "C" void fn_8001A108(int previousState, int currentState)
             = gNPCManager->mUnidentified02C;
         if (pKoopaShell != NULL && pKoopaShell->mVisible)
         {
-            fn_801A64A4(pKoopaShell, false);
+            pKoopaShell->Deactivate(false);
         }
 
         BirdoEggObject* pState = gNPCManager->mpBirdoEgg;

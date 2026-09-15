@@ -1,6 +1,7 @@
 #include "NL/glx/glxTexture.h"
 #include "Game/Sys/debug.h"
 #include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 #include "NL/gc/gcSwizzler.h"
 #include "NL/gl/glMemory.h"
@@ -54,7 +55,7 @@ extern "C"
     void GXInvalidateTexAll();
 }
 
-extern TweakValueBool gbReduceTextures;
+TweakValueBool gbReduceTextures("gbReduceTextures", "/Rendering/Engine", false);
 
 static glxTextureLoadCallback_t glxTextureLoad_cb;
 static unsigned long nGridMemory;
@@ -139,6 +140,86 @@ static PlatTexture* glx_GetGridTexture(int width, int height)
         ListEntry<PlatTexture*>(texture);
     nlListAddStart(&gridTextures.m_Head, entry, &gridTextures.m_Tail);
     return gridTextures.m_Head->entry;
+}
+
+PlatTexture* glx_MakeTexture(GXTextureHeader* header,
+    void* allocator, unsigned long texhandle)
+{
+    PlatTexture* pTex;
+    unsigned char* textureData;
+    int width;
+    int height;
+    eGXTextureFormat format;
+    int numLevels;
+    unsigned long numEntries;
+    int textureSize;
+
+    width = header->width;
+    height = header->height;
+    numLevels = header->numLevels;
+    textureData = (unsigned char*)(header + 1);
+
+    if (gbReduceTextures.mValue)
+    {
+        if (numLevels > 2)
+        {
+            textureData += GCTextureSize(
+                header->format, width, height, 2, -1);
+            width /= 4;
+            height /= 4;
+            numLevels -= 2;
+        }
+        else if (numLevels > 1)
+        {
+            textureData += GCTextureSize(
+                header->format, width, height, 1, -1);
+            width /= 2;
+            height /= 2;
+            numLevels -= 1;
+        }
+    }
+
+    textureSize = GCTextureSize(
+        header->format, width, height, numLevels, texhandle);
+    pTex = new (glResourceAlloc(sizeof(PlatTexture), GLM_Header, allocator)) PlatTexture();
+
+    format = header->format;
+    pTex->Create(width, height, format, allocator, numLevels, false, false);
+    memcpy(pTex->m_Bits, header->numBits, sizeof(pTex->m_Bits));
+    pTex->m_bMissingTexture = header->missingTexture ? true : false;
+
+    numEntries = header->numEntries;
+    if (numEntries != 0)
+    {
+        pTex->m_PaletteData =
+            (u16*)glResourceAlloc(numEntries * 2, GLM_TextureData, allocator);
+        pTex->m_nPaletteEntries = numEntries;
+        memcpy(pTex->m_PaletteData, textureData + textureSize,
+            header->numEntries * 2);
+    }
+
+    memcpy(pTex->m_SwizzledData, textureData, textureSize);
+    pTex->Prepare();
+    return pTex;
+}
+
+bool glplatBeginLoadTextureBundle(const char* filename,
+    void (*callback)(void*, unsigned long, void*), void* param)
+{
+    return nlLoadEntireFileAsync(filename, callback, param, 32, AllocateEnd, 0, 0, 0)
+        != 0;
+}
+
+bool glplatLoadTextureBundle(
+    const char* filename, void* allocator)
+{
+    bool result;
+    void* data;
+    unsigned long size;
+    data = nlLoadEntireFile(filename, &size, 32, AllocateStart, 0, 0, 0);
+    result = glEndLoadTextureBundle(data, size, allocator, 0);
+    delete[] (unsigned char*)data;
+    return result;
 }
 
 bool glplatTextureLoad(PlatTexture* texture)
@@ -327,86 +408,6 @@ void PlatTexture::Prepare()
     GXInitTexObjLOD(m_TexObj, m_Levels == 1 ? 1 : 5, 1, 0.0f, (float)(m_MaxLevel - 1), 0.0f, false, false, 0);
 }
 
-PlatTexture* glx_MakeTexture(GXTextureHeader* header,
-    void* allocator, unsigned long texhandle)
-{
-    PlatTexture* pTex;
-    unsigned char* textureData;
-    int width;
-    int height;
-    eGXTextureFormat format;
-    int numLevels;
-    unsigned long numEntries;
-    int textureSize;
-
-    width = header->width;
-    height = header->height;
-    numLevels = header->numLevels;
-    textureData = (unsigned char*)(header + 1);
-
-    if (gbReduceTextures.mValue)
-    {
-        if (numLevels > 2)
-        {
-            textureData += GCTextureSize(
-                header->format, width, height, 2, -1);
-            width /= 4;
-            height /= 4;
-            numLevels -= 2;
-        }
-        else if (numLevels > 1)
-        {
-            textureData += GCTextureSize(
-                header->format, width, height, 1, -1);
-            width /= 2;
-            height /= 2;
-            numLevels -= 1;
-        }
-    }
-
-    textureSize = GCTextureSize(
-        header->format, width, height, numLevels, texhandle);
-    pTex = new (glResourceAlloc(sizeof(PlatTexture), GLM_Header, allocator)) PlatTexture();
-
-    format = header->format;
-    pTex->Create(width, height, format, allocator, numLevels, false, false);
-    memcpy(pTex->m_Bits, header->numBits, sizeof(pTex->m_Bits));
-    pTex->m_bMissingTexture = header->missingTexture ? true : false;
-
-    numEntries = header->numEntries;
-    if (numEntries != 0)
-    {
-        pTex->m_PaletteData =
-            (u16*)glResourceAlloc(numEntries * 2, GLM_TextureData, allocator);
-        pTex->m_nPaletteEntries = numEntries;
-        memcpy(pTex->m_PaletteData, textureData + textureSize,
-            header->numEntries * 2);
-    }
-
-    memcpy(pTex->m_SwizzledData, textureData, textureSize);
-    pTex->Prepare();
-    return pTex;
-}
-
-bool glplatBeginLoadTextureBundle(const char* filename,
-    void (*callback)(void*, unsigned long, void*), void* param)
-{
-    return nlLoadEntireFileAsync(filename, callback, param, 32, AllocateEnd, 0, 0, 0)
-        != 0;
-}
-
-bool glplatLoadTextureBundle(
-    const char* filename, void* allocator)
-{
-    bool result;
-    void* data;
-    unsigned long size;
-    data = nlLoadEntireFile(filename, &size, 32, AllocateStart, 0, 0, 0);
-    result = glEndLoadTextureBundle(data, size, allocator, 0);
-    delete[] (unsigned char*)data;
-    return result;
-}
-
 PlatTexture* glplatTextureAddFromBundle(glTexBundleDict* entry,
     GXTextureHeader* header, void* allocator)
 {
@@ -474,9 +475,10 @@ void glxInitTex()
 void glx_BindTexture(
     int textureMap, glTextureBinding* textureState)
 {
+    GXTexWrapMode wrapS;
+    GXTexWrapMode wrapT;
     glTextureManager* textureManager;
     PlatTexture* pTex;
-    GXTexWrapMode mode[2];
     eGLTextureMode tmode;
     static unsigned long missingTexture =
         glGetTexture("font/fixedWidthMedium");
@@ -501,12 +503,26 @@ void glx_BindTexture(
     }
 
     tmode = (eGLTextureMode)(textureState->flags & 3);
-    mode[0] = (GXTexWrapMode)((tmode & 1) == 0);
-    mode[1] = (GXTexWrapMode)((tmode >> 1) != 1);
+    if ((tmode & 1) == GX_REPEAT)
+    {
+        wrapS = GX_CLAMP;
+    }
+    else
+    {
+        wrapS = GX_REPEAT;
+    }
+    if ((tmode >> 1) == GX_REPEAT)
+    {
+        wrapT = GX_CLAMP;
+    }
+    else
+    {
+        wrapT = GX_REPEAT;
+    }
 
     unsigned long textureObject[8];
     memcpy(textureObject, pTex->m_TexObj, sizeof(textureObject));
-    GXInitTexObjWrapMode(textureObject, mode[0], mode[1]);
+    GXInitTexObjWrapMode(textureObject, wrapS, wrapT);
 
     if (pTex->m_nPaletteEntries != 0)
     {

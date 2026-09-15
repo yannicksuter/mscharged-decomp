@@ -13,7 +13,7 @@
 #include "NL/nlAVLTree.h"
 #include "NL/nlPrint.h"
 #include "NL/nlTask.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 void UpdateAudioSystem(AudioSystem*, float);

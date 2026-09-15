@@ -7,7 +7,7 @@
 #include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
 #include "types.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 class CategoryVolumeParameter

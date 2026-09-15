@@ -28,6 +28,13 @@ public:
         nlVector3* outBase, float weight, float* scratch);
     virtual void BlendRootRot(u16* outRot, float weight, float* scratch);
 
+    template <typename T>
+    void Replay(T& frame)
+    {
+        Replayable<0>(frame, (cPoseNode&)*this);
+        Replayable<0>(frame, FloatCompressor<0, 1, 7>(m_fBlendTime));
+    }
+
     void BeginBlendIn(float duration);
     void BeginBlendOut(float duration);
 

@@ -138,7 +138,7 @@ void fn_80272388()
         nlZeroMemory(&info, sizeof(GLTargetInfo));
         info.width = 0x48;
         info.height = 0x48;
-        info.format = 6;
+        info.format = GLTargetFormat_6;
         info.unknown18 = 0;
         info.unknown1C = 0;
         GLRenderPair pair = glCreateTarget(sShadowDebugNames[i], &info);
@@ -285,7 +285,7 @@ void fn_802726AC()
     GLTargetInfo info;
     info.width = 0x40;
     info.height = 0x40;
-    info.format = 7;
+    info.format = GLTargetFormat_7;
     info.unknown18 = 0;
     info.unknown1C = 0;
     info.colour[0] = 0x7C;
@@ -297,7 +297,7 @@ void fn_802726AC()
 
     info.width = glplatGetDefaultTargetWidth();
     info.height = glplatGetDefaultTargetHeight();
-    info.format = 1;
+    info.format = GLTargetFormat_1;
     info.unknown18 = 0;
     info.unknown1C = 0;
     info.colour[0] = 0;
@@ -316,7 +316,7 @@ void fn_802726AC()
 
     info.width = glplatGetDefaultTargetWidth() >> 2;
     info.height = glplatGetDefaultTargetHeight() >> 2;
-    info.format = 5;
+    info.format = GLTargetFormat_5;
     info.unknown18 = 1;
     info.colour[0] = 0x80;
     info.colour[1] = 0x80;
@@ -335,7 +335,7 @@ void fn_80272850()
     nlZeroMemory(&info, sizeof(GLTargetInfo));
     info.width = glplatGetDefaultTargetWidth() >> 1;
     info.height = glplatGetDefaultTargetHeight() >> 1;
-    info.format = 1;
+    info.format = GLTargetFormat_1;
     info.unknown18 = 1;
     info.unknown1C = 0;
     info.colour[0] = 0xFF;
@@ -362,7 +362,7 @@ void fn_80272850()
     nlZeroMemory(&info, sizeof(GLTargetInfo));
     info.width = 0x100;
     info.height = 0x80;
-    info.format = 1;
+    info.format = GLTargetFormat_1;
     info.unknown18 = 1;
     info.unknown1C = 0;
     info.colour[0] = 0;
@@ -388,7 +388,7 @@ void fn_80272850()
 
     info.width = glplatGetDefaultTargetWidth() >> 1;
     info.height = glplatGetDefaultTargetHeight() >> 1;
-    info.format = 7;
+    info.format = GLTargetFormat_7;
     info.unknown18 = 0;
     GLRenderPair greyPair = glCreateTarget("grayscale", &info);
     sLayerViews[eCLV_Characters]->SetRenderPair(greyPair);

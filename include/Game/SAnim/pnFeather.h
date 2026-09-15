@@ -14,6 +14,7 @@ enum eFeatherBlendMode
 class cPN_Feather : public cPoseNode
 {
 public:
+    cPN_Feather() { }
     cPN_Feather(
         cSHierarchy* hierarchy,
         void (*callback)(unsigned int, cPN_Feather*),
@@ -29,6 +30,17 @@ public:
     }
     virtual void BlendRootTrans(nlVector3* outBase, float weight, float* scratch);
     virtual void BlendRootRot(u16* outRot, float weight, float* scratch);
+
+    template <typename T>
+    void Replay(T& frame)
+    {
+        Replayable<0>(frame, (cPoseNode&)*this);
+        if (ReplayFrameTraits<T>::IsLoadFrame)
+        {
+            m_fBlendTime = 0.0f;
+            m_pFeatherWeights = NULL;
+        }
+    }
 
     void ClearNodeWeights();
     void SetNodeWeight(int nodeIndex, float weight, float decayFactor);

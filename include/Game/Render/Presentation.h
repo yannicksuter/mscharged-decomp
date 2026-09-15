@@ -1,22 +1,12 @@
 #ifndef GAME_RENDER_PRESENTATION_H
 #define GAME_RENDER_PRESENTATION_H
 
-#include "Game/Camera/CameraMan.h"
+#include "Game/FE/feCamera.h"
 #include "Game/InterpreterCore.h"
-#include "Game/Camera/CameraMan.h"
 
 class FEModelHandle;
 
 void OnPresentationModelAnimationFinished(FEModelHandle* object);
-void PushPresentationCamera(const char* name, void (*callback)(eCameraMessage), float duration, bool deleteCurrentCamera);
-void PopPresentationCamera(void (*callback)(eCameraMessage), float duration);
-
-class FEModelHandle;
-
-void OnPresentationModelAnimationFinished(FEModelHandle* object);
-
-void PushPresentationCamera(const char* name, void (*callback)(eCameraMessage), float duration, bool deleteCurrentCamera);
-void PopPresentationCamera(void (*callback)(eCameraMessage), float duration);
 
 class Presentation : public InterpreterCore
 {

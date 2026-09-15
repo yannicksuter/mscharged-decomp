@@ -2,7 +2,7 @@
 #define GAME_AUDIO_AUDIO_RESOURCE_RUNTIME_H
 
 #include "types.h"
-#include "unclassified/tu_802BE64C.h"
+#include "NL/nlRegistry.h"
 
 class AudioConfigNode;
 class AudioBundleManager;
@@ -20,16 +20,16 @@ struct UnidentifiedAudioPoolOwner
 // Registry owner for the audio bundle's packed configuration tree. It supplies
 // the container and node storage from the two shared sound pools and owns the
 // script runtime the bundle drives.
-class AudioResourceRuntime : public UnidentifiedRegistryOwner_802BF984
+class AudioResourceRuntime : public RegistryOwner
 {
 public:
     AudioResourceRuntime();
 
-    virtual UnidentifiedRegistryContainer* AllocContainer();
-    virtual UnidentifiedRegistryNode_802BE64C* AllocNode();
-    virtual void* UnidentifiedVirtual2C(unsigned int size);
-    virtual void UnidentifiedVirtual30(void* container);
-    virtual void UnidentifiedVirtual34(void* node);
+    virtual RegistryContainer* AllocContainer();
+    virtual RegistryNode* AllocNode();
+    virtual void* AllocItem(unsigned int size);
+    virtual void FreeContainer(void* container);
+    virtual void FreeNode(void* node);
     virtual void FreeItem(void* data);
     virtual ~AudioResourceRuntime();
 

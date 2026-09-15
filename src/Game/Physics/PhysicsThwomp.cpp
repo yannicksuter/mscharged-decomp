@@ -1,5 +1,5 @@
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
 #include "Game/Ball.h"
@@ -12,7 +12,7 @@
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Physics/PhysicsThwomp.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
-#include "unclassified/tu_801B298C.h"
+#include "Game/Render/ThwompObject.h"
 
 extern "C" void fn_80149984(void* source, cCharacter* target);
 extern "C" void fn_80149B30(UnidentifiedEventData33* data);
@@ -42,7 +42,7 @@ PhysicsThwomp::~PhysicsThwomp()
 ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
 {
     ThwompObject* thwomp = mThwomp;
-    bool isDelayed = thwomp->mUnidentified018 > 0.0f;
+    bool isDelayed = thwomp->mDelayTimer > 0.0f;
     if (isDelayed && other->GetObjectType() != 4)
     {
         return NO_CONTACT;
@@ -97,7 +97,7 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
         return ONE_WAY_CONTACT_OTHER;
     }
     case 18:
-        fn_801B3284(thwomp);
+        thwomp->OnLanding();
         return ONE_WAY_CONTACT_THIS;
     case 21:
         ((PhysicsBanana*)other)->m_pPowerupObject->m_bShouldDestroy = true;
@@ -108,7 +108,7 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
     case 24:
         return ONE_WAY_CONTACT_OTHER;
     case 29:
-        if (thwomp->mState == 3)
+        if (thwomp->mState == THWOMP_STATE_FALLING)
         {
             ((PhysicsWaluigiWall*)other)->ApplyDamage(1.0f);
         }

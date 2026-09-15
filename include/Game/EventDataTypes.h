@@ -394,13 +394,13 @@ struct UnidentifiedEventData30
 }; // total size: 0x8
 struct UnidentifiedEventData31;
 struct UnidentifiedEventData33;
-class UnidentifiedObject_801B535C;
+class YoshiEggObject;
 
 struct UnidentifiedEventData34
 {
     /* 0x00 */ cPlayer* mUnidentified00;
     /* 0x04 */ cFielder* mUnidentified04;
-    /* 0x08 */ UnidentifiedObject_801B535C* mUnidentified08;
+    /* 0x08 */ YoshiEggObject* mUnidentified08;
     /* 0x0C */ u32 mUnidentified0C;
     /* 0x10 */ u32 mUnidentified10;
 }; // total size: 0x14

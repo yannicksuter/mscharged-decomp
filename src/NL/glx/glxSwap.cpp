@@ -7,7 +7,7 @@
 #include "NL/nlEndian.h"
 #include "NL/nlPrint.h"
 #include "NL/nlTicker.h"
-#include "unclassified/tu_8036D6F8.h"
+#include "NL/nlAllocatorStack.h"
 
 // Revolution SDK and neighbouring renderer entry points retained as automatic
 // objects in R4QE01. The SDK's own <revolution/gx.h> cannot be included from
@@ -201,9 +201,9 @@ static void glx_ScreenCapture(bool isMovie)
         nlSwapEndian(header.width, &(header.width));
         nlSwapEndian(header.height, &(header.height));
 
-        fn_8036D6F8(&VirtualAllocator);
+        PushMemoryAllocator(&VirtualAllocator);
         imageData = (u8*)ConfigParserAllocate(0xD2000, 8, false);
-        fn_8036D71C();
+        PopMemoryAllocator();
 
         GXDrawDone();
 

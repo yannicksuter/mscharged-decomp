@@ -8,6 +8,11 @@
 extern "C" {
 #endif
 
+inline int _abs(int __x)
+{
+    return __x > 0 ? __x : -__x;
+}
+
 /* Integer arithmetic (C89 4.10.6). CodeWarrior lowers abs/labs to inline
    intrinsics, so the library forms are macros rather than calls. */
 #ifndef abs

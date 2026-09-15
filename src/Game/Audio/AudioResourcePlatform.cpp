@@ -5,7 +5,7 @@
 #include "Game/Sys/debug.h"
 
 #include "NL/nlChunk.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlAVLTree.h"

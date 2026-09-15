@@ -111,7 +111,7 @@ void cRumbleFilter::Update(float dt)
     nlVec2ScaleAdd(v2Pos1, step, v2Vel1, v2Pos1);
 }
 
-int cRumbleFilter::vfunc_0x14()
+int cRumbleFilter::GetFilterIndex()
 {
     return 0;
 }

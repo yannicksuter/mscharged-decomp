@@ -21,7 +21,7 @@ struct BulletBillObject;
 struct BirdoEggObject;
 struct KoopaShellObject;
 struct ThwompObject;
-struct UnidentifiedObject_801B535C;
+struct YoshiEggObject;
 
 struct NPCTemplate
 {
@@ -58,6 +58,8 @@ struct NPCTemplate
 class NPCManager
 {
 public:
+    static NPCManager* fn_801948A0();
+    DiddyBanana* fn_801919A4() const;
     NPCManager();
     virtual ~NPCManager();
 
@@ -80,8 +82,8 @@ public:
     int fn_801AA32C();
     void fn_801AA348();
     HammerObject* fn_801AA3AC(int nIndex);
-    void fn_801AA4C0();
-    ThwompObject* fn_801AA528(int nIndex);
+    void CreateThwomps();
+    ThwompObject* GetThwomp(int nIndex);
     void BeginLoadNPCTemplate();
     bool FinishLoadNPCTemplate();
     void UnloadTransientNPCTemplates();
@@ -127,7 +129,7 @@ public:
         mTransientTemplates;
     /* 0x1C */ NPCTemplate* mPendingTemplate;
     /* 0x20 */ ChainChomp* mpChainChomp;
-    /* 0x24 */ UnidentifiedObject_801B535C* mUnidentified024;
+    /* 0x24 */ YoshiEggObject* mUnidentified024;
     /* 0x28 */ BirdoEggObject* mpBirdoEgg;
     /* 0x2C */ KoopaShellObject* mUnidentified02C;
     /* 0x30 */ unsigned int mUnidentified030;
@@ -135,7 +137,7 @@ public:
     /* 0x54 */ unsigned int mUnidentified054;
     /* 0x58 */ BulletBillObject* mUnidentified058[6];
     /* 0x70 */ HammerObject* mUnidentified070[15];
-    /* 0xAC */ ThwompObject* mUnidentified0AC[8];
+    /* 0xAC */ ThwompObject* mThwomps[8];
     /* 0xCC */ UnidentifiedNPC_801B43F8* mUnidentified0CC[3];
     /* 0xD8 */ DiddyBanana* mpDiddyBanana;
 }; // total size: 0xDC

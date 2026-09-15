@@ -13,7 +13,7 @@
 
 #include <string.h>
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 static bool sDoubleMixUpdate = true;
 static const int sDpl2ReverbAuxiliary = 1;

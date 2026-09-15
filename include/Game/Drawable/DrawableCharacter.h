@@ -21,6 +21,8 @@ enum eCharacterRenderPass
 class DrawableCharacter
 {
 public:
+    template <typename T>
+    void Replay(T& frame);
     DrawableCharacter();
     ~DrawableCharacter();
 
@@ -49,13 +51,13 @@ public:
     void RenderCharacterShadow(const cCharacter&, void*, int);
     static bool NoShadowCallback();
 
-    u8 visible;
-    u8 useObject;
-    u8 flag2;
-    u8 flag3;
-    u8 megaEnabled;
-    u8 flag5;
-    u8 flag6;
+    bool visible;
+    bool useObject;
+    bool flag2;
+    bool flag3;
+    bool megaEnabled;
+    bool flag5;
+    bool flag6;
     bool typeIsOne;
     u16 facingDirection;
     u16 headSpin;
@@ -70,11 +72,11 @@ public:
     float state40;
     float shadowLevel;
     nlVector3 velocity;
-    void* object;
+    cPoseNode* object;
     cPoseAccumulator* poseAccumulator;
     EffectsTexturing* effectsTexturing;
     cCharacter* character;
-    nlVector4 megaBasis;
+    nlQuaternion megaBasis;
     nlVector3 megaTranslation;
     float megaScale;
     float damage1;

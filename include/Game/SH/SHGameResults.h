@@ -2,7 +2,7 @@
 #define GAME_SH_SH_GAME_RESULTS_H
 
 #include "Game/SH/SHStrikerTimesBase.h"
-#include "unclassified/tu_80209584.h"
+#include "Game/FE/MatchSummary.h"
 
 class TLTextInstance;
 
@@ -28,7 +28,7 @@ public:
 
     /* 0x5D4 */ TLTextInstance* mTitleText;
     /* 0x5D8 */ bool mUnidentified5D8;
-    /* 0x5DC */ TU80209584Summary mSummary;
+    /* 0x5DC */ MatchSummary mSummary;
     /* 0xA10 */ BasicGameInfo* mUnidentifiedA10;
     /* 0xA14 */ BaseSceneHandler* mUnidentifiedA14;
     /* 0xA18 */ UnidentifiedGameClock* mUnidentifiedA18;

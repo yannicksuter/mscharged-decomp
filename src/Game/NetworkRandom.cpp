@@ -4,10 +4,11 @@
 
 static const char sNetworkNameConsonants[] = "bcdfghjklmnprstvwyz";
 static const char sNetworkNameVowels[] = "aeiou";
-static u32 sNetworkRandomSeed;
 
 u32 NetworkRandom()
 {
+    static u32 sNetworkRandomSeed;
+
     if (sNetworkRandomSeed == 0)
     {
         sNetworkRandomSeed = nlGetTicker() % 2147483647U;

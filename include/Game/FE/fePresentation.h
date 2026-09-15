@@ -10,6 +10,7 @@ class FEPresentation
 public:
     void Update(float deltaTime);
     TLSlide* GetActiveSlide();
+    void SetActiveSlide(unsigned long hash, bool resetTime);
     void SetActiveSlide(const char* slideName, bool resetTime);
 
     /* 0x00 */ TLSlide* m_slides;

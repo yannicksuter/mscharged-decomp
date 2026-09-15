@@ -6,6 +6,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/CharacterTweaks.h"
+#include "Game/CharacterTemplate.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/Game.h"
 #include "Game/MathHelpers.h"
@@ -23,31 +24,6 @@
 #include "NL/nlString.h"
 #include "types.h"
 #include "Game/NetworkInput.h"
-
-struct IndicatorControllerInfo
-{
-    /* 0x00 */ u32 mUnidentified00;
-    /* 0x04 */ int mPadIndex;
-};
-
-struct IndicatorPlayerTweaks
-{
-    /* 0x000 */ u8 mUnidentified000[0x10];
-    /* 0x010 */ float* fPhysCapsuleHeight;
-    /* 0x014 */ u8 mUnidentified014[0x2E0];
-    /* 0x2F4 */ float* fGoalieCapsuleHeight;
-};
-
-struct IndicatorCharacterInfoState
-{
-    /* 0x000 */ u8 mUnidentified000[0x11C];
-    /* 0x11C */ CharacterInfo* mCharacterInfo;
-};
-
-extern "C"
-{
-    extern cPlayer* lbl_8056B800[10];
-}
 
 static float s_fOverheadSize = 35.0f;
 static float lbl_806DCED4 = 15.0f;
@@ -70,10 +46,7 @@ static float lbl_806E157C;
 class IndicatorInfo
 {
 public:
-    IndicatorInfo()
-        : m_fOpacity(1.0f)
-    {
-    }
+    IndicatorInfo();
 
     inline void IncrementOnscreenTimer(float fTimeDelta)
     {
@@ -130,10 +103,8 @@ static inline nlColour GetIndicatorColour(cPlayer* pCharacter)
     cFielder* pCaptain = pCharacter->m_pTeam->GetCaptain();
     cFielder* pOtherCaptain
         = pCharacter->m_pTeam->GetOtherTeam()->GetCaptain();
-    CharacterInfo* pInfo
-        = ((IndicatorCharacterInfoState*)pCaptain)->mCharacterInfo;
-    CharacterInfo* pOtherInfo
-        = ((IndicatorCharacterInfoState*)pOtherCaptain)->mCharacterInfo;
+    const CharacterInfo* pInfo = pCaptain->mUnidentified11C;
+    const CharacterInfo* pOtherInfo = pOtherCaptain->mUnidentified11C;
     return GetTeamColour(*pInfo, *pOtherInfo, true);
 }
 
@@ -149,14 +120,14 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
         }
 
         NetworkPeer* pPeer = g_pNetworkSessionBase->GetLocalPeer();
+        int index = -1;
         NetworkPeerChannel* pOwner
             = (NetworkPeerChannel*)pGlobalPad->m_pMyUser;
-        int index = -1;
 
         if (pOwner->mPeer == pPeer)
         {
             *pSameMachine = true;
-            index = ((IndicatorControllerInfo*)pOwner->GetLocalChannelPad())->mPadIndex;
+            index = pOwner->GetLocalChannelPad()->m_padIndex;
         }
         else
         {
@@ -164,11 +135,11 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
             bool used[4] = { false, false, false, false };
             for (int i = 0; i < (int)pPeer->mPlayerCount; ++i)
             {
-                used[((IndicatorControllerInfo*)(pPeer->GetNetworkPeerChannel(i))->GetLocalChannelPad())
-                         ->mPadIndex]
+                used[pPeer->GetNetworkPeerChannel(i)->GetLocalChannelPad()->m_padIndex]
                     = true;
             }
 
+            int remoteChannelIndex = pOwner->mChannelIndex;
             int available[4] = { -1, -1, -1, -1 };
             int next = 0;
             if (!used[0])
@@ -188,19 +159,19 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
                 available[3] = next;
             }
 
-            if (pOwner->mChannelIndex == available[0])
+            if (remoteChannelIndex == available[0])
             {
                 index = 0;
             }
-            else if (pOwner->mChannelIndex == available[1])
+            else if (remoteChannelIndex == available[1])
             {
                 index = 1;
             }
-            else if (pOwner->mChannelIndex == available[2])
+            else if (remoteChannelIndex == available[2])
             {
                 index = 2;
             }
-            else if (pOwner->mChannelIndex == available[3])
+            else if (remoteChannelIndex == available[3])
             {
                 index = 3;
             }
@@ -208,12 +179,10 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
         return index;
     }
 
-    IndicatorControllerInfo* pInfo
-        = (IndicatorControllerInfo*)pCharacter->fn_800972CC();
     int index = -1;
-    if (pInfo != 0)
+    if (pCharacter->fn_800972CC() != 0)
     {
-        index = pInfo->mPadIndex;
+        index = pCharacter->fn_800972CC()->m_padIndex;
     }
     *pSameMachine = true;
     return index;
@@ -221,7 +190,7 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
 
 static void DrawIndicator(int xCentre, int yCentre, float fPixelWidth,
     float fPixelHeight, float fOpacity, unsigned long uTexID,
-    const nlColour& colour, float rotationAngle,
+    nlColour colour, float rotationAngle,
     unsigned char additiveBlending)
 {
     if (glTextureLoad(uTexID))
@@ -276,22 +245,24 @@ static inline unsigned long GetCharacterGlowTexID(
 static void DrawOffscreenIndicator(const nlVector3& v3NormalizedScreenPos,
     IndicatorInfo* pInfo, cPlayer* pCharacter)
 {
+    float screenPosX;
+    float screenPosY;
     GLView* pView = GetLayerView(eCLV_UnsortedSquareOrtho);
     float screenLimitX = glViewGetOrthographicWidth(pView);
     float screenLimitY = glViewGetOrthographicWidth(pView);
-    float screenPosX = v3NormalizedScreenPos.x;
-    float screenPosY = v3NormalizedScreenPos.y;
+    screenPosX = v3NormalizedScreenPos.x;
     screenLimitX -= 32.0f;
     screenLimitY -= 32.0f;
 
     screenPosX
         = nlMinEquals(nlMaxEquals(screenPosX, 32.0f), screenLimitX);
+    screenPosY = v3NormalizedScreenPos.y;
     screenPosY
         = nlMinEquals(nlMaxEquals(screenPosY, 32.0f), screenLimitY);
 
-    float scale = (float)__fabs(1.0f
-        - max_float((float)__fabs(screenPosY),
-            (float)__fabs(screenPosX)));
+    float absY = (float)__fabs(screenPosY);
+    float absX = (float)__fabs(screenPosX);
+    float scale = (float)__fabs(1.0f - max_float(absY, absX));
     scale = InterpolateRangeClamped(1.0f, 0.5f, 0.0f, 2.0f, scale);
 
     bool sameMachine = false;
@@ -312,11 +283,11 @@ static void DrawOffscreenIndicator(const nlVector3& v3NormalizedScreenPos,
 static void UpdateAndRenderOffScreenIndicators(float dt)
 {
     nlVector3 worldPos = { 0.0f, 0.0f, 0.0f };
+    float half = 0.5f;
 
     for (int i = 0; i < 10; ++i)
     {
-        cPlayer* pCharacter = lbl_8056B800[i];
-        if (pCharacter == 0)
+        if (g_pCharacters[i] == 0)
         {
             continue;
         }
@@ -328,33 +299,36 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
             worldPos = pReplay->mRender->mCharacters[i].position;
         }
 
-        if (pCharacter->m_eClassType == FIELDER)
         {
-            if (((cFielder*)pCharacter)->IsShattered())
+            cPlayer* pCharacter = (cPlayer*)g_pCharacters[i];
+            if (pCharacter->m_eClassType == FIELDER)
             {
-                continue;
+                if (((cFielder*)pCharacter)->IsShattered())
+                {
+                    continue;
+                }
+                float height = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue();
+                worldPos.z += height * half;
             }
-            worldPos.z += ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue()
-                * 0.5f;
-        }
-        else
-        {
-            IndicatorPlayerTweaks* pTweaks
-                = (IndicatorPlayerTweaks*)((Goalie*)pCharacter)->m_pTweaks;
-            worldPos.z += *pTweaks->fGoalieCapsuleHeight * 0.5f;
+            else
+            {
+                float height
+                    = ((Goalie*)pCharacter)->m_pTweaks->fPhysCapsuleHeight.GetValue();
+                worldPos.z += height * half;
+            }
         }
 
         nlVector3 projectedPos;
         glViewProjectPoint(GetLayerView(eCLV_Unshadowed), worldPos, projectedPos);
-        pCharacter->m_v3ScreenPosition = projectedPos;
+        ((cPlayer*)g_pCharacters[i])->m_v3ScreenPosition = projectedPos;
 
         bool sameMachine = false;
-        if (fn_801A323C(pCharacter, &sameMachine) == -1)
+        if (fn_801A323C((cPlayer*)g_pCharacters[i], &sameMachine) == -1)
         {
             continue;
         }
 
-        if (pCharacter->fn_8001E184() || !g_pGame->IsGameplayOrOvertime())
+        if (((cPlayer*)g_pCharacters[i])->fn_8001E184() || !g_pGame->IsGameplayOrOvertime())
         {
             indicatorInfo[i].IncrementOnscreenTimer(dt);
         }
@@ -363,28 +337,15 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
             indicatorInfo[i].IncrementOffscreenTimer(dt);
             projectedPos.y = -projectedPos.y;
 
-            if (projectedPos.x < -0.95f)
-            {
-                projectedPos.x = -0.95f;
-            }
-            else if (projectedPos.x > 0.95f)
-            {
-                projectedPos.x = 0.95f;
-            }
-
-            if (projectedPos.y < -0.925f)
-            {
-                projectedPos.y = -0.925f;
-            }
-            else if (projectedPos.y > 0.95f)
-            {
-                projectedPos.y = 0.95f;
-            }
+            projectedPos.x
+                = nlMinEquals(nlMaxEquals(projectedPos.x, -0.95f), 0.95f);
+            projectedPos.y
+                = nlMinEquals(nlMaxEquals(projectedPos.y, -0.925f), 0.95f);
 
             glViewUnprojectOrthographicPoint(
                 GetLayerView(eCLV_UnsortedSquareOrtho), &projectedPos, &projectedPos);
             DrawOffscreenIndicator(
-                projectedPos, &indicatorInfo[i], pCharacter);
+                projectedPos, &indicatorInfo[i], (cPlayer*)g_pCharacters[i]);
         }
     }
 }
@@ -396,14 +357,13 @@ static void UpdateAndRenderPlayerIndicators(float)
 
     for (int i = 0; i < 10; ++i)
     {
-        cPlayer* pCharacter = lbl_8056B800[i];
-        if (pCharacter == 0)
+        if (g_pCharacters[i] == 0)
         {
             continue;
         }
 
         bool sameMachine = false;
-        if (fn_801A323C(pCharacter, &sameMachine) == -1)
+        if (fn_801A323C((cPlayer*)g_pCharacters[i], &sameMachine) == -1)
         {
             continue;
         }
@@ -415,44 +375,51 @@ static void UpdateAndRenderPlayerIndicators(float)
         }
 
         unsigned long indicatorTexID
-            = GetCharacterTexID(pCharacter, &sameMachine);
+            = GetCharacterTexID((cPlayer*)g_pCharacters[i], &sameMachine);
         unsigned long glowTexID
-            = GetCharacterGlowTexID(pCharacter, &sameMachine);
+            = GetCharacterGlowTexID((cPlayer*)g_pCharacters[i], &sameMachine);
         unsigned long directionArrowTexID
             = nlStringLowerHash("fe/direction_arrow");
-        float opacityScale = sameMachine ? 1.0f : lbl_806DCEF4;
+        float opacityScale = 1.0f;
+        if (!sameMachine)
+        {
+            opacityScale = lbl_806DCEF4;
+        }
 
         ReplayManager* pReplay = ReplayManager::Instance();
         nlVector3 v3Position
             = pReplay->mRender->mCharacters[i].bip01Position;
 
         float fVerticalOffset = 0.0f;
-        if (pCharacter->m_eClassType == FIELDER)
         {
-            if (((cFielder*)pCharacter)->IsShattered())
+            cPlayer* pCharacter = (cPlayer*)g_pCharacters[i];
+            if (pCharacter->m_eClassType == FIELDER)
             {
-                continue;
+                if (((cFielder*)pCharacter)->IsShattered())
+                {
+                    continue;
+                }
+                fVerticalOffset
+                    = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue() * 0.5f
+                    * pCharacter->mUnidentified024.m_fPlayerScale;
             }
-            fVerticalOffset
-                = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue() * 0.5f
-                * pCharacter->mUnidentified024.m_fPlayerScale;
+            else
+            {
+                fVerticalOffset
+                    += ((Goalie*)pCharacter)->m_pTweaks->fPhysCapsuleHeight.GetValue();
+            }
         }
-        else
-        {
-            IndicatorPlayerTweaks* pTweaks
-                = (IndicatorPlayerTweaks*)((Goalie*)pCharacter)->m_pTweaks;
-            fVerticalOffset += *pTweaks->fGoalieCapsuleHeight;
-        }
-        v3Position.z += fVerticalOffset;
 
-        nlColour colour = GetIndicatorColour(pCharacter);
+        float screenOffset = lbl_806DCEF0;
+        nlColour colour = GetIndicatorColour((cPlayer*)g_pCharacters[i]);
+        v3Position.z += fVerticalOffset;
         nlVector3 v3ScreenPosition;
         glViewProjectPointBetweenViews(GetLayerView(eCLV_Unshadowed), GetLayerView(eCLV_UnsortedSquareOrtho), &v3Position,
             &v3ScreenPosition);
-        v3ScreenPosition.y -= lbl_806DCEF0;
+        v3ScreenPosition.y -= screenOffset;
 
         float switchScale
-            = pCharacter->mUnidentified1E4.m_UserControlledTime;
+            = ((cPlayer*)g_pCharacters[i])->mUnidentified1E4.m_UserControlledTime;
         if (switchScale < 0.5f)
         {
             switchScale = (0.5f - switchScale) / 0.5f;
@@ -472,7 +439,7 @@ static void UpdateAndRenderPlayerIndicators(float)
                 opacityScale * fOpacity, indicatorTexID, colour, 0.0f,
                 false);
         }
-        else if (pCharacter->m_pBall != 0)
+        else if (((cPlayer*)g_pCharacters[i])->m_pBall != 0)
         {
             whoHasBall = i;
             if (whoHadBall == -1)
@@ -480,14 +447,13 @@ static void UpdateAndRenderPlayerIndicators(float)
                 s_fGlowIntensityScale = 0.0f;
             }
 
-            float pulseScale
-                = s_bPulseGlowTexture ? s_fGlowIntensityScale : 1.0f;
             DrawIndicator((int)v3ScreenPosition.x,
                 (int)v3ScreenPosition.y,
                 s_fOverheadSize * s_fAdditiveTextureScale,
                 s_fOverheadSize * s_fAdditiveTextureScale,
                 opacityScale
-                    * (s_fAdditiveBlendingIntensity * pulseScale),
+                    * (s_fAdditiveBlendingIntensity
+                        * (s_bPulseGlowTexture ? s_fGlowIntensityScale : 1.0f)),
                 glowTexID, colour, 0.0f, true);
 
             DrawIndicator((int)v3ScreenPosition.x,
@@ -498,7 +464,7 @@ static void UpdateAndRenderPlayerIndicators(float)
             float rotationDegrees;
             float xOffset;
             float yOffset;
-            if (pCharacter->m_pTeam->m_nSide == HOME)
+            if (((cPlayer*)g_pCharacters[i])->m_pTeam->m_nSide == HOME)
             {
                 rotationDegrees = 180.0f;
                 xOffset = lbl_806DCED8;
@@ -556,4 +522,9 @@ void UpdateAndRenderIndicators(float dt)
             }
         }
     }
+}
+
+IndicatorInfo::IndicatorInfo()
+    : m_fOpacity(1.0f)
+{
 }

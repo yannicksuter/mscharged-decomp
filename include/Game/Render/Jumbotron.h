@@ -5,10 +5,12 @@
 
 // Retail keeps the predecessor's Jumbotron object and its eight methods as
 // empty stubs; the layout follows the predecessor header.
+class GLResourcePool;
+
 class Jumbotron
 {
 public:
-    void Initialize();
+    void Initialize(GLResourcePool* pool);
     void Uninitialize();
     void Reset();
     void BeginLoad();

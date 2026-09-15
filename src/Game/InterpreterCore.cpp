@@ -18,11 +18,6 @@ inline TweakIntBinding::TweakIntBinding(int* value)
 {
 }
 
-inline TweakBoolBinding::TweakBoolBinding(bool* value)
-    : m_pValue(value)
-{
-}
-
 struct InterpreterTweakStorage
 {
     /* 0x00 */ u32 unknown_0x00;
@@ -1018,23 +1013,12 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
         {
             TweakFloatBinding& target = storage->unknown_0x10[index - storage->unknown_0x00];
             float defaultValue = *(float*)&value0;
-            bool result = target.Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3);
-            if (result == 0)
-            {
-                *target.m_pValue = target.GetDefault();
-            }
-            if (result == 0)
-            {
-                *target.m_pValue = defaultValue;
-            }
+            target.BindWithDefault(name, defaultValue, sInterpreterEmptyTweakGroup, false, float1, float2, float3);
         }
         else
         {
             TweakFloatBinding* target = &storage->unknown_0x10[index - storage->unknown_0x00];
-            if (target->Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3) == 0)
-            {
-                *target->m_pValue = target->GetDefault();
-            }
+            target->Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3);
         }
         break;
     }

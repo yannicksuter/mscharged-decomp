@@ -3,7 +3,7 @@
 
 #include "Game/EventDataTypes.h"
 #include "Game/Camera/ReplayCamera.h"
-#include "Game/Camera/rumblefilter.h"
+#include "Game/Camera/noisefilter.h"
 #include "Game/InterpreterCore.h"
 #include "Game/ReplayManager.h"
 
@@ -65,7 +65,7 @@ public:
     /* 0x18C */ mutable Replay* mReplay;
     /* 0x190 */ ReplayCamera mCamera;
     /* 0x290 */ cRumbleFilter mUnidentified290;
-    /* 0x2CC */ u8 mUnidentifiedCameraFilter[0x60];
+    /* 0x2CC */ cNoiseFilter mNoiseFilter;
     /* 0x32C */ float mRunForTimeLeft;
     /* 0x330 */ bool mRunningFor;
     /* 0x331 */ u8 mPadding331[3];

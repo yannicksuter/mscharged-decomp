@@ -4,6 +4,7 @@
 
 #include "Game/Sys/audio.h"
 #include "Game/Render/StadiumLoading.h"
+#include "Game/Render/ShootToScoreMeter.h"
 #include "Game/Font/fontmanager.h"
 #include "Game/AsyncLoading.h"
 #include "Game/Ball.h"
@@ -22,6 +23,21 @@
 #include "Game/Sys/debug.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/FEAudio.h"
+#include "Game/FE/feCamera.h"
+#include "Game/FE/feInput.h"
+#include "Game/OverlayManager.h"
+#include "Game/Render/Presentation.h"
+#include "Game/SH/SHChallengeSelect.h"
+#include "Game/SH/SHHallOfFame.h"
+#include "Game/DB/SaveLoad.h"
+#include "Game/Effects/EmissionManager.h"
+#include "Game/EventRegistry.h"
+#include "Game/ExcitementSystem.h"
+#include "Game/Camera/tu_800F9460.h"
+#include "unclassified/tu_80284A58.h"
+#include "Game/SH/SHNavigation.h"
+#include "Game/FE/feModelManager.h"
+#include "Game/Render/ImpostorManager.h"
 #include "Game/FE/feResourceManager.h"
 #include "Game/Render/CrowdManager.h"
 #include "Game/Render/CrowdImpostors.h"
@@ -38,6 +54,8 @@
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioSystem.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/GameSceneManager.h"
 #include "Game/Sys/movie.h"
 #include "Game/Task/BeginFrameTask.h"
@@ -104,26 +122,14 @@
 #define OS_TIME_SPEED                (OS_BUS_CLOCK_SPEED / 4)
 #define OSTicksToMilliseconds(ticks) ((ticks) / (OS_TIME_SPEED / 1000))
 
-struct FrameTimingStat
-{
-    /* 0x00 */ u8 mUnidentified00[0xC];
-    /* 0x0C */ float mSeconds;
-    /* 0x10 */ int mCount;
-};
-
-extern "C" void fn_801CC114();
 bool IsNetworkOrRecordedGame();
 extern "C" u32 OSGetTick();
 extern "C" void OSYieldThread();
 
-extern "C" void fn_801B2770();
-extern "C" void fn_8027E5D4();
-extern "C" void fn_801AF97C(void*);
-extern "C" void fn_80013660(void*, int);
 extern "C" void fn_801A01F8();
 extern "C" void fn_801440BC();
 extern "C" void fn_8013DB18();
- void ShutdownWarbleRendering(void*);
+void ShutdownWarbleRendering(void*);
 extern "C" void fn_8013DDD4();
 extern "C" void fn_802EC9D0(void*);
 extern "C" bool fn_802773B8(bool stadiumViewer);
@@ -133,8 +139,15 @@ extern "C" bool fn_80311C5C();
 extern "C" bool fn_800F08A4();
 extern "C" void fn_800F06D4();
 extern "C" void fn_800F030C(bool stadiumViewer);
-extern "C" void fn_801FE81C();
-extern "C" bool fn_801FE8EC();
+extern "C" void fn_801FE99C();
+extern "C" bool fn_80277DD4(ImpostorModel*);
+extern "C" void fn_80194EF8(ReplayChoreo*);
+extern "C" void fn_80286298(UnidentifiedPresentationState*);
+extern "C" void fn_8001FE80();
+extern "C" void fn_80018A00();
+extern "C" void GoalieOnGameOver();
+extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
+    void* parameterData, bool immediate, float value);
 extern "C" void fn_8013D8DC();
 extern "C" void fn_80144070();
 extern "C" void fn_8013D85C();
@@ -142,24 +155,20 @@ void fn_80056CF4(void*, int, bool);
 extern "C" void fn_8030753C(FontManager*, GLResourcePool*);
 
 extern "C" void fn_801ACFC4();
- void FreeImpostorLighting();
-extern "C" void fn_802DB9C4(void*);
+void FreeImpostorLighting();
 extern "C" void fn_80143FD4();
 
 void fn_80056EA8();
 void DestroyCharacters();
 
-extern FrameTimingStat* lbl_806E1698;
-extern FrameTimingStat* lbl_806E169C;
-extern FrameTimingStat* lbl_806E16A0;
 extern cBall* g_pBall;
-extern u8 lbl_80574148[];
 extern bool gAudioEnabled;
 extern SlotPool<cSAnimCallback> lbl_805840D8;
 extern SlotPoolBase lbl_8057AB80;
 extern bool g_e3_Build;
 
 bool g_VerboseAudio;
+bool g_bDumpMemoryStatsOnLoad;
 float g_fScriptBlockingWarningMS = 50.0f;
 float g_fYieldScriptBlockingTimeMS = 45.0f;
 
@@ -182,13 +191,14 @@ static TweakBoolBinding lbl_8056E458(
     "g_VerboseAudio", "Audio", &g_VerboseAudio, true);
 static TweakBoolBinding lbl_8056E478(
     "g_bDumpMemoryStatsOnLoad", "General/Memory",
-    &g_e3_Build, true);
+    &g_bDumpMemoryStatsOnLoad, true);
 static TweakFloatBinding lbl_8056E498(
     "g_fScriptBlockingWarningMS", "Loading",
-    &g_fScriptBlockingWarningMS);
+    &g_fScriptBlockingWarningMS, true);
 static TweakFloatBinding lbl_8056E4B8(
     "g_fYieldScriptBlockingTimeMS", "Loading",
-    &g_fYieldScriptBlockingTimeMS);
+    &g_fYieldScriptBlockingTimeMS, true);
+
 static AsyncLoadingManager sAsyncLoadingManager;
 
 static inline void ReleaseUnidentifiedOwner(UnidentifiedOwnerHandle* handle)
@@ -536,8 +546,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 36:
     {
-        u32 value = m_SP[-1];
-        bool stadiumViewer = value != 0;
+        bool stadiumViewer = m_SP[-1] != 0;
         m_SP--;
         mLoadingComment = "AsyncStartCameraLoading";
         fn_800F030C(stadiumViewer);
@@ -581,12 +590,12 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 44:
         mLoadingComment = "AsyncStartupFEWorldBegin";
-        fn_801FE81C();
+        BeginLoadFEWorld();
         FinishLoadingStep(this);
         break;
     case 45:
         mLoadingComment = "AsyncStartupFEWorldFinalize";
-        FinishLoadingStepOrUndo(this, fn_801FE8EC());
+        FinishLoadingStepOrUndo(this, FinishLoadFEWorld());
         break;
     case 46:
         StopSound(0x7FC13AA3, this);
@@ -684,7 +693,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 68:
     {
         u32* stackPointer = m_SP;
-        u32 value = stackPointer[-1];
+        int value = stackPointer[-1];
         m_SP = stackPointer - 1;
         mLoadingComment = "FinalizeLoadingCharacterModel";
         FinishLoadingStepOrUndo(this,
@@ -902,16 +911,15 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     }
     case 103:
     {
-        int value = m_SP[-1];
-        u32 found;
+        eSidekickID value = (eSidekickID)m_SP[-1];
+        bool found;
         for (short side = 0; side < 2; ++side)
         {
             short sideIndex = side;
-            BasicGameInfo* info
-                = GameInfoManager::Instance()->GetCurrentGameInfo();
+            GameInfoManager* info = GameInfoManager::Instance();
             for (int slot = 0; slot < 3; ++slot)
             {
-                if (value == info->mSidekickIndex[sideIndex][slot])
+                if (value == info->GetCurrentGameInfo()->GetSidekick(sideIndex, slot))
                 {
                     found = true;
                     goto foundSidekick;
@@ -966,7 +974,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         gNPCManager->fn_801A9BD0();
         break;
     case 115:
-        gNPCManager->fn_801AA4C0();
+        gNPCManager->CreateThwomps();
         break;
     case 116:
         gNPCManager->fn_801A9DF0();
@@ -1030,7 +1038,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 130:
     {
         u32* stackPointer = m_SP;
-        u32 value = stackPointer[-1];
+        int value = stackPointer[-1];
         m_SP = stackPointer - 1;
         mLoadingComment = "StartLoadingCharacterModel";
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A8E4(value);
@@ -1164,11 +1172,11 @@ extern "C" u32 fn_80118B7C(AsyncLoadingManager* manager)
         return ASYNC_LOADING_WAITING_FOR_BYTE_CODE;
     }
 
-    u32 result = ASYNC_LOADING_NO_TRANSITION;
-    bool completed = false;
+    int result = ASYNC_LOADING_NO_TRANSITION;
     manager->mStageStartTick = nlGetTicker();
     manager->mLoadingComment = "No Loading Comment";
 
+    bool completed = false;
     switch (manager->mSequenceState)
     {
     case ASYNC_LOADING_BOOT_TO_FE_BEGIN:
@@ -1296,16 +1304,20 @@ extern "C" u32 fn_80118B7C(AsyncLoadingManager* manager)
         manager->mPreviousStageTick = ticker;
     }
 
-    if (nlGetTickerDifference(manager->mStageStartTick, nlGetTicker())
-        > g_fScriptBlockingWarningMS)
+    float elapsed = nlGetTickerDifference(manager->mStageStartTick, nlGetTicker());
+    if (elapsed > g_fScriptBlockingWarningMS)
     {
-        tDebugPrintManager::Print(DC_LOADER, "Script function %s blocked for more than %f MS\n",
-            manager->mLoadingComment, g_fScriptBlockingWarningMS);
+        tDebugPrintManager::Print(DC_LOADER, "Fixme: %s blocked for %fMS\n",
+            manager->mLoadingComment, elapsed);
     }
 
     if (completed)
     {
-        lbl_806E105C = 0.0f;
+        lbl_806E105C = nlGetTimeDifference(manager->mSequenceStartTime, nlGetTime());
+        char buffer[200];
+        nlSNPrintf(buffer, sizeof(buffer), "Total Load Time %f MS\n", lbl_806E105C);
+        tDebugPrintManager::Print(DC_LOADER, buffer);
+        fn_802BD718("Total Load Time", "seconds", lbl_806E105C / 1000.0f);
     }
     return result;
 }
@@ -1358,6 +1370,42 @@ extern "C" void fn_8011926C(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = 3;
     manager->mLoadingComment = "DestroyFEFast";
+    g_pFEInput->Reset(true);
+    while (!FESceneManager::Instance()->AreAllScenesValid())
+    {
+        nlServiceFileSystem();
+        FESceneManager::Instance()->Update(0.0f);
+        FEResourceManager::Instance()->Run(0.0f);
+    }
+    GameSceneManager::Instance()->PopEntireStack();
+    if (GameSceneManager::s_pInstance != 0)
+    {
+        delete GameSceneManager::s_pInstance;
+        GameSceneManager::s_pInstance = 0;
+    }
+
+    g_pAudioSystem->GetBundleManager()->GetSoundMap()->UnloadBank(0x15);
+    FESceneManager::Instance()->ForceImmediateStackProcessing();
+    FEResourceManager::Instance()->UnloadPermanentResourceBundle();
+    FEResourceManager::Instance()->Cleanup();
+    DestroyFEResourcePool();
+    DestroyPadBackends();
+    cPN_SAnimController::m_SAnimControllerSlotPool.FreeBlocks();
+    cPN_Blender::m_BlenderSlotPool.FreeBlocks();
+    cPN_SingleAxisBlender::m_SingleAxisBlenderSlotPool.FreeBlocks();
+    cPN_Feather::m_FeatherSlotPool.FreeBlocks();
+    cPN_8030E550::mSlotPool.FreeBlocks();
+    lbl_805840D8.FreeBlocks();
+    if (g_bTweaking)
+    {
+        fn_802BDA28();
+    }
+    ResetDynamicTweaks();
+    glCompact();
+    fn_802B467C(&lbl_8057AB80);
+    SlotPoolBase::BaseFreeBlocks(&lbl_8057AB80, 8);
+
+    fn_80111658(2);
     manager->mLoadingState = 0;
     FinishLoadingStep(manager);
 }
@@ -1366,13 +1414,179 @@ extern "C" void fn_80119454(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = 2;
     manager->mLoadingComment = "InitializeFEState1";
+    fn_80111654(2);
+    ClearTweakRegistryReset();
+    GLMemoryRequirement requirements[] = {
+        { GLM_Header, 0x100000 },
+        { GLM_TextureData, 0xA00000 },
+    };
+    glSetCurrentResourcePool(glCreateResourcePool(requirements, 2, "FE"));
+    manager->mUnidentified4C = (void*)glGetCurrentResourcePool()->MarkResource();
     FinishLoadingStep(manager);
+    if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_MODE_3)
+    {
+        CupManager::Instance()->fn_8010CAE8();
+    }
 }
 
 extern "C" void fn_80119528(AsyncLoadingManager* manager)
 {
+    static GLMemoryRequirement requirements[] = {
+        { GLM_Header, 0x400 },
+        { GLM_VertexData, 0x800 },
+    };
+    GLView* view = GetLayerView((eCLV)0);
+    ImpostorManager::GetInstance()->Initialize(view, 30, requirements, 2, true);
+    ImpostorManager::GetInstance()->SetEnabled(true);
     manager->mLoadingComment = "InitializeFEState2";
-    manager->mLoadingState = 0;
+    ParticleUpdateTask* particleTask = ParticleUpdateTask::sInstance;
+    particleTask->Initialize(GetLayerView((eCLV)0x19), 0x5F6, 0x2FB);
+    GameInfoManager::Instance()->ResetUnknown0xA0();
+    FEMusic::StopStream();
+    BaseSceneHandler* scene = GameSceneManager::Instance()->Push((SceneList)0x1D, SCREEN_NOTHING, false);
+    FESceneManager::Instance()->SetTopMostScene(scene);
+    SetPointerEnabled(false);
+    if (!lbl_806E1044)
+    {
+        lbl_806E1044 = true;
+        GameSceneManager::Instance()->Push((SceneList)0x16, SCREEN_NOTHING, false);
+        Presentation::GetInstance()->Call("StartTitleScreenSequence");
+    }
+    else
+    {
+        SetPointerEnabled(true);
+        if (g_e3_Build)
+        {
+            for (int i = 0; i < 4; ++i)
+            {
+                GameInfoManager::Instance()->SetPlayingSide(i, -1);
+            }
+        }
+        if (NetTournManager::Instance()->mState != 0)
+        {
+            NetTournManager::Instance()->NotifyFinishedLoadingToKnockout();
+            Presentation::GetInstance()->Call("TransitionGameToOnlineTournament");
+            GameSceneManager::Instance()->Push((SceneList)0x22, SCREEN_NOTHING, false);
+        }
+        else if (GameInfoManager::Instance()->IsOnline())
+        {
+            FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, true);
+            GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_NOTHING, false);
+            Presentation::GetInstance()->Call("TransitionGameToOnlineMainMenu");
+        }
+        else if (GameInfoManager::Instance()->IsInMode2())
+        {
+            GameSceneManager::Instance()->Push(SCENE_TITLE, SCREEN_NOTHING, false);
+            Presentation::GetInstance()->Call("StartTitleScreenSequence");
+            GameInfoManager::Instance()->SetMode(GameInfoManager::GM_MODE_2, 0);
+        }
+        else if (GameInfoManager::Instance()->IsInFriendlyMode())
+        {
+            if (GameInfoManager::Instance()->unknown_0x71C8 == 2)
+            {
+                Presentation::GetInstance()->Call("TransitionGameToChooseCaptains");
+                GameSceneManager::Instance()->Push(SCENE_CHOOSE_CAPTAINS_DOMINATION, SCREEN_BACK, false);
+                FEMusic::StartStreamIfDifferent(1);
+            }
+            else
+            {
+                FEAudio::PlayAnimAudioEvent(0x80060B2D, 0, 0, true);
+                Presentation::GetInstance()->Call("StartMainMenuSequence");
+            }
+        }
+        else if (GameInfoManager::Instance()->IsInMode3())
+        {
+            CupManager* cup = CupManager::Instance();
+            if (cup->GetCurrentRoundNumber() == -5 && cup->mState == 4)
+            {
+                if (cup->GetCurrentMode() == 0)
+                {
+                    SetUnlockFlag(1);
+                    cup->fn_8010C5A0();
+                }
+                else if (cup->GetCurrentMode() == 1)
+                {
+                    SetUnlockFlag(2);
+                    cup->fn_8010C5A0();
+                }
+                else
+                {
+                    SetUnlockFlag(4);
+                }
+            }
+            CupManager::Instance()->ShowRoundNews();
+            CupManager::Instance()->mUnidentified869C = false;
+            CupManager::Instance()->fn_8010E8E0();
+            SaveLoad::StartSave(false);
+            Presentation::GetInstance()->Call("TransitionGameToStrikerCup");
+        }
+        else if (GameInfoManager::Instance()->IsInMode4())
+        {
+            if (GameInfoManager::Instance()->unknown_0x71C8 == 1)
+            {
+                ChallengeSelectScene* challengeScene = static_cast<ChallengeSelectScene*>(
+                    GameSceneManager::Instance()->Push(g_pStrikerChallenge->mCurrentChallenge < 10 ? (SceneList)0x4C : (SceneList)0x4B,
+                        SCREEN_NOTHING, false));
+                if (challengeScene != 0)
+                {
+                    challengeScene->mChallengeOffset = g_pStrikerChallenge->mUnidentified6C;
+                }
+                Presentation::GetInstance()->Call("TransitionGameToStrikerChallenge");
+            }
+            else
+            {
+                FEAudio::PlayAnimAudioEvent(0x80060B2D, 0, 0, true);
+                Presentation::GetInstance()->Call("StartMainMenuSequence");
+            }
+        }
+    }
+    StopSound(0x7FC13AA3, manager);
+    g_pAudioSystem->GetBundleManager()->GetSoundMap()->UnloadBank(0x12);
+    {
+        int parameter[2];
+        parameter[0] = 1;
+        parameter[1] = 0;
+        u32 binding;
+        u32 definition;
+        definition = nlStringLowerHash("SendToSpeaker");
+        binding = nlStringLowerHash("ControllerSpeaker1");
+        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+    }
+    {
+        int parameter[2];
+        parameter[0] = 2;
+        parameter[1] = 0;
+        u32 binding;
+        u32 definition;
+        definition = nlStringLowerHash("SendToSpeaker");
+        binding = nlStringLowerHash("ControllerSpeaker2");
+        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+    }
+    {
+        int parameter[2];
+        parameter[0] = 3;
+        parameter[1] = 0;
+        u32 binding;
+        u32 definition;
+        definition = nlStringLowerHash("SendToSpeaker");
+        binding = nlStringLowerHash("ControllerSpeaker3");
+        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+    }
+    {
+        int parameter[2];
+        parameter[0] = 4;
+        parameter[1] = 0;
+        u32 binding;
+        u32 definition;
+        definition = nlStringLowerHash("SendToSpeaker");
+        binding = nlStringLowerHash("ControllerSpeaker4");
+        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+    }
+
+    GameInfoManager::Instance()->unknown_0x71C8 = 0;
+    manager->mLoadingState = 1;
+    lbl_806E1040->SetVisible(false);
+    ResetHallOfFameImagePreload();
     FinishLoadingStep(manager);
 }
 
@@ -1380,6 +1594,96 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = 3;
     manager->mLoadingComment = "DestroyFEState";
+    g_pFEInput->Reset(true);
+    while (!FESceneManager::Instance()->AreAllScenesValid())
+    {
+        nlServiceFileSystem();
+        FESceneManager::Instance()->Update(0.0f);
+        FEResourceManager::Instance()->Run(0.0f);
+    }
+
+    ImpostorManager::GetInstance()->ResetImpostors();
+    ImpostorManager::GetInstance()->Uninitialize();
+    FESceneManager::Instance()->ClearTopMostScene();
+    GameSceneManager::Instance()->PopEntireStack();
+    if (GameSceneManager::s_pInstance != 0)
+    {
+        delete GameSceneManager::s_pInstance;
+        GameSceneManager::s_pInstance = 0;
+    }
+
+    if (g_pMiiManager != 0)
+    {
+        delete g_pMiiManager;
+        g_pMiiManager = 0;
+    }
+    FESceneManager::Instance()->ForceImmediateStackProcessing();
+    FEResourceManager::Instance()->UnloadPermanentResourceBundle();
+    UnloadFEMiniBundle();
+    FEResourceManager::Instance()->Cleanup();
+    DestroyFEResourcePool();
+    if (FontManager::s_pInstance != 0)
+    {
+        delete FontManager::s_pInstance;
+        FontManager::s_pInstance = 0;
+    }
+    nlFree(g_pLocalization->m_pFile);
+    ParticleUpdateTask::sInstance->Shutdown();
+    cCameraManager::Shutdown();
+    fn_801FE99C();
+    if (FEModelManager::s_pInstance != 0)
+    {
+        delete FEModelManager::s_pInstance;
+        FEModelManager::s_pInstance = 0;
+    }
+    FEMusic::StopStream();
+    FlushAudio(g_pAudioSystem, true, true);
+    u32 startTick = OSGetTick();
+    while (!g_pAudioSystem->IsIdle())
+    {
+        FlushAudio(g_pAudioSystem, true, true);
+        static_cast<GameAudio*>(g_pAudioSystem)->Update(0.25f);
+        nlServiceFileSystem();
+        OSYieldThread();
+
+        if (OSTicksToMilliseconds(OSGetTick() - startTick) > 400)
+        {
+            fn_802EC9D0(g_pAudioSystem);
+            nlBreak();
+        }
+    }
+
+    UnloadSoundBanks(static_cast<GameAudio*>(g_pAudioSystem));
+    AudioBankTable* soundMap = g_pAudioSystem->GetBundleManager()->GetSoundMap();
+    if (soundMap != 0)
+    {
+        soundMap->ClearSelectedGroups();
+    }
+    g_pAudioSystem->Shutdown();
+
+    fn_80370E64();
+    DestroyPadBackends();
+    fn_802B467C(&Detail::sTempStringAllocatorPool.allocator.pool);
+    SlotPoolBase::BaseFreeBlocks(&Detail::sTempStringAllocatorPool.allocator.pool, 0x40);
+    cPN_SAnimController::m_SAnimControllerSlotPool.FreeBlocks();
+    cPN_Blender::m_BlenderSlotPool.FreeBlocks();
+    cPN_SingleAxisBlender::m_SingleAxisBlenderSlotPool.FreeBlocks();
+    cPN_Feather::m_FeatherSlotPool.FreeBlocks();
+    cPN_8030E550::mSlotPool.FreeBlocks();
+    lbl_805840D8.FreeBlocks();
+    if (g_bTweaking)
+    {
+        fn_802BDA28();
+    }
+    ResetDynamicTweaks();
+    glCompact();
+    fn_802B467C(&lbl_8057AB80);
+    SlotPoolBase::BaseFreeBlocks(&lbl_8057AB80, 8);
+
+    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified4C);
+    glDestroyResourcePool(glGetCurrentResourcePool());
+    glSetCurrentResourcePool(0);
+    fn_80111658(2);
     manager->mLoadingState = 0;
     FinishLoadingStep(manager);
 }
@@ -1388,12 +1692,78 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = 2;
     manager->mLoadingComment = "InitializeGameState1";
+    fn_80111654(1);
+    ClearTweakRegistryReset();
+    if (GameInfoManager::Instance()->IsInMode3())
+    {
+        CupManager::Instance()->fn_8010C5E0();
+    }
+    GameInfoManager::Instance()->SetupGameFromConfig();
+    GLMemoryRequirement requirements[] = {
+        { GLM_Header, 0 },
+        { GLM_TextureData, 0 },
+        { GLM_VertexData, 0 },
+    };
+    requirements[0].mSize = 0x140000;
+    requirements[1].mSize = 0x8B3333;
+    requirements[2].mSize = 0x580000;
+    glSetCurrentResourcePool(glCreateResourcePool(requirements, 3, "InGame"));
+    manager->mUnidentified4C = (void*)glGetCurrentResourcePool()->MarkResource();
+    CreatePadBackends();
+    NisPlayer::Instance()->fn_8027BD60();
+    gDispatchEventsTask->dispatcher.Dispatch(true);
+    if (g_pNetworkSessionBase->GetSessionMode() == 0)
+    {
+        if (gNetworkInputRecording->mPlaybackEnabled)
+        {
+            PlaybackRecordedGame();
+        }
+        else
+        {
+            StartSinglePlayerGame();
+        }
+    }
+    GameInfoManager::Instance()->ApplyDifficultySettings();
+    ReplayManager::Instance()->Initialize();
+    manager->mUnidentified50 = (void*)glGetCurrentResourcePool()->MarkResource();
+    g_pAudioSystem->GetBundleManager()->GetSoundMap()->SelectGroup(0);
+    lbl_806E1050 = new (8, false) WorldNPCManager;
+    lbl_806E1050->LoadTemplates("ini/WorldNPCs.ini");
+    lbl_806E1050->mModelCallback = fn_80183E8C;
+    lbl_806E1050->mRenderFilter = fn_80277DD4;
     FinishLoadingStep(manager);
 }
 
 extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
 {
     manager->mLoadingComment = "InitializeGameState2";
+    fn_80056CF4((void*)gGameTweaks.mTerrainType, gGameTweaks.mUnidentified08, gGameTweaks.mUnidentified0C);
+    static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E1514();
+    InitializeGameStreams();
+    StatsTracker::Instance()->SetBasicGameInfoPointer(GameInfoManager::Instance()->GetCurrentGameInfo(), true);
+    StatsTracker::Instance()->CreateEventHandler();
+    ReplayManager::Instance()->fn_80188D88();
+    fn_80194EF8(&ReplayChoreo::Instance());
+    NisPlayer::Instance()->fn_8027DA28();
+    fn_80286298(GetPresentation());
+    GetPresentation()->fn_80285E1C();
+    ExcitementSystem::fn_80196644().fn_80196924();
+    fn_8001FE80();
+    fn_80018A00();
+    UnidentifiedCameraEffects::Instance()->RegisterEventListeners();
+    {
+        Function<FnVoidVoid> callback(GoalieOnGameOver);
+        UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(callback, (unsigned int)&manager->mLoadingHandle, -1);
+    }
+    GLResourcePool* pool = glGetCurrentResourcePool();
+    Jumbotron::instance.Initialize(pool);
+    CrowdManager::instance.Initialize(pool);
+    InitializeWarble(&gWarble);
+    InitializeWarbleRendering(&gWarbleEnabled);
+    CreateInstance(nlSingleton<TimedObjectManager>::s_pInstance);
+    ParticleUpdateTask* particleTask = ParticleUpdateTask::sInstance;
+    particleTask->Initialize(GetLayerView((eCLV)0x19), 0x5F6, 0x2FB);
+    LoadCrowdCharacterList();
     FinishLoadingStep(manager);
 }
 
@@ -1406,12 +1776,90 @@ extern "C" void fn_8011A2DC(void* value0, unsigned long value1, void*)
 extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
 {
     manager->mLoadingComment = "AsyncStartGameWorldLoading";
+    int stadium = GameInfoManager::Instance()->GetStadium();
+    fn_802772D0(GetStadiumName(stadium), false);
+    fxSetTerrain(nlStringLowerHash(GetStadiumTerrain(stadium)));
+    lbl_806E1058 += gAudioEnabled ? 7 : 0;
+    GameAudio* audio = static_cast<GameAudio*>(g_pAudioSystem);
+    LoadSoundBank(audio, GetStadiumUnknown0x14(stadium), 0xB, fn_80116988, (void*)"STAD_*");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x1F, 0xA, fn_80116988, (void*)"STAD_GEN");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x35, 0xC, fn_80116988, (void*)"WEATHER_LIGHTNING");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x16, 0xD, fn_80116988, (void*)"CROWD_GEN");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x34, 0xE, fn_80116988, (void*)"CROWDStreams");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x31, 0x12, fn_80116988, (void*)"MUSICSTREAMS");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x33, 0x13, fn_80116988, (void*)"NisStreams");
+    {
+        int parameter[2];
+        parameter[0] = 1;
+        parameter[1] = 0;
+        u32 binding;
+        u32 definition;
+        definition = nlStringLowerHash("SendToSpeaker");
+        binding = nlStringLowerHash("ControllerSpeaker1");
+        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+    }
+    {
+        int parameter[2];
+        parameter[0] = 2;
+        parameter[1] = 0;
+        u32 binding;
+        u32 definition;
+        definition = nlStringLowerHash("SendToSpeaker");
+        binding = nlStringLowerHash("ControllerSpeaker2");
+        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+    }
+    {
+        int parameter[2];
+        parameter[0] = 3;
+        parameter[1] = 0;
+        u32 binding;
+        u32 definition;
+        definition = nlStringLowerHash("SendToSpeaker");
+        binding = nlStringLowerHash("ControllerSpeaker3");
+        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+    }
+    {
+        int parameter[2];
+        parameter[0] = 4;
+        parameter[1] = 0;
+        u32 binding;
+        u32 definition;
+        definition = nlStringLowerHash("SendToSpeaker");
+        binding = nlStringLowerHash("ControllerSpeaker4");
+        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+    }
+
     FinishLoadingStep(manager);
 }
 
 extern "C" void fn_8011A570(AsyncLoadingManager* manager)
 {
     manager->mLoadingComment = "InitializeGameStateInGameFE1";
+    g_pOverlayManager->Push((SceneList)0x5A, SCREEN_NOTHING, false);
+    g_pOverlayManager->Push(OVERLAY_HUD, SCREEN_NOTHING, false)->SetVisible(false);
+    lbl_806E1058 += gAudioEnabled ? 2 : 0;
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x1C, 0xF, fn_80116988, (void*)"HUD_GEN");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x1E, 0x10, fn_80116988, (void*)"HUD_PU");
+    FEAudio::SetSoundCategory(0xF);
+    FEMusic::SetInGame(true);
+    if (GameInfoManager::Instance()->mIsInStrikers101Mode)
+    {
+        g_pOverlayManager->Push((SceneList)0x61, SCREEN_NOTHING, false);
+        UnidentifiedPresentationState* presentation = GetPresentation();
+        presentation->mLetterBoxEnabled = false;
+        presentation->mLetterBoxDuration = 0.0f;
+    }
+    g_pOverlayManager->Push((SceneList)0x5F, SCREEN_NOTHING, false)->SetVisible(false);
+    if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_MODE_2)
+    {
+        g_pOverlayManager->Push((SceneList)0x60, SCREEN_NOTHING, false);
+    }
+    g_pOverlayManager->Push((SceneList)0x64, SCREEN_NOTHING, false)->SetVisible(false);
+    g_pOverlayManager->Push((SceneList)0x65, SCREEN_NOTHING, false)->SetVisible(false);
+    g_pOverlayManager->Push((SceneList)0x66, SCREEN_NOTHING, false)->SetVisible(false);
+    BaseSceneHandler* scene = g_pOverlayManager->Push((SceneList)0x1E, SCREEN_NOTHING, false);
+    FESceneManager::Instance()->SetTopMostScene(scene);
+    SetPointerEnabled(false);
     FinishLoadingStep(manager);
 }
 
@@ -1422,7 +1870,7 @@ extern "C" void fn_8011A800(AsyncLoadingManager* manager)
     PauseMenuScene::mLastSelectedIndex = 0;
     InitializeElectricFence(GetLayerView(eCLV_ElectricFence));
     BeginFrameTask::s_FramerateLocked = false;
-    fn_801CC114();
+    TakeGameMemSnapshot::ResetTimers();
     InitializeTimeRegions();
     UseDefaultFreestyleButtonRemap(IsNetworkOrRecordedGame());
 
@@ -1469,16 +1917,16 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     if (fn_802BD63C())
     {
-        fn_802BD718("FrameTime_GamePlay", "seconds",
-            lbl_806E1698->mSeconds / (float)lbl_806E1698->mCount);
-        fn_802BD718("FrameTime_NIS", "seconds",
-            lbl_806E169C->mSeconds / (float)lbl_806E169C->mCount);
-        fn_802BD718("FrameTime_AutoReplay", "seconds",
-            lbl_806E16A0->mSeconds / (float)lbl_806E16A0->mCount);
+        fn_802BD718("FrameTime_GamePlay", "ms",
+            pGamePlayTimeRegion->m_fThreshold / (float)pGamePlayTimeRegion->m_unk10);
+        fn_802BD718("FrameTime_NIS", "ms",
+            pNISTimeRegion->m_fThreshold / (float)pNISTimeRegion->m_unk10);
+        fn_802BD718("FrameTime_AutoReplay", "ms",
+            pAutoReplayTimeRegion->m_fThreshold / (float)pAutoReplayTimeRegion->m_unk10);
         g_FrameCounter.fn_802B80C4();
     }
 
-    fn_801B2770();
+    DestroyTimeRegions();
     FESceneManager::Instance()->ClearTopMostScene();
     g_pOverlayManager->PopEntireStack();
     if (g_pOverlayManager != 0)
@@ -1491,8 +1939,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FlareHandler::instance.Cleanup();
     NisPlayer::Instance()->fn_8027ED18();
     NisPlayer::Instance()->Reset();
-    NisPlayer::Instance();
-    fn_8027E5D4();
+    NisPlayer::Instance()->fn_8027E5D4();
     ReplayChoreo::Instance().Reset();
     ReplayManager::Instance()->Uninitialize();
 
@@ -1520,8 +1967,8 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     lbl_806E12C8->ResetEffects();
     DestroyCharacters();
     g_pGame->mpWeatherManager->Stop(true);
-    fn_801AF97C(lbl_80574148);
-    fn_80013660(g_pBall, 1);
+    ShootToScoreMeter::instance.fn_801AF97C();
+    delete g_pBall;
     g_pBall = 0;
     FakeBallWorld::Destroy();
     cCameraManager::Shutdown();
@@ -1582,7 +2029,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     fn_801ACFC4();
     FreeImpostorLighting();
     fn_80183E4C();
-    fn_802DB9C4(&gCrowdModelCollection);
+    gCrowdModelCollection.Clear();
     CleanBoundingBoxCache();
     StatsTracker::Instance()->DestroyEventHandler();
     FEResourceManager::Instance()->UnloadPermanentResourceBundle();
@@ -1623,7 +2070,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     glSetCurrentResourcePool(0);
     FreeEventDataPools();
     fn_80143FD4();
-    fn_80111658(true);
+    fn_80111658(1);
 
     manager->mLoadingState = 0;
     PopFunctionMemoryState();
@@ -1662,7 +2109,45 @@ extern "C" void fn_8011B178(AsyncLoadingManager* manager)
     manager->mLoadingComment = "AsyncFEResourceLoadBeing";
     lbl_806E1068 = false;
     lbl_806E1069 = false;
-    FinishLoadingStep(manager);
+    if (!lbl_806E1044)
+    {
+        if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
+        {
+            LoadFEMiniBundle("art/fe/JPBootLoadingUI.res");
+        }
+        else
+        {
+            LoadFEMiniBundle("art/fe/BootLoadingUI.res");
+        }
+    }
+    else
+    {
+        LoadFEMiniBundle("art/fe/LoadingUI.res");
+    }
+    if (GameSceneManager::s_pInstance == 0)
+    {
+        CreateInstance(GameSceneManager::s_pInstance);
+        if (!lbl_806E1044)
+        {
+            if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
+            {
+                lbl_806E1040 = GameSceneManager::Instance()->Push(SCENE_BOOT_LOADING_JPN, SCREEN_NOTHING, false);
+            }
+            else
+            {
+                lbl_806E1040 = GameSceneManager::Instance()->Push(SCENE_BOOT_LOADING, SCREEN_NOTHING, false);
+            }
+        }
+        else
+        {
+            lbl_806E1040 = GameSceneManager::Instance()->Push(SCENE_ASYNC_LOADING, SCREEN_NOTHING, false);
+        }
+    }
+    FEResourceManager::Instance()->LoadPermanentResourceBundle("art/fe/MainUI.Dmn", fn_8011B418);
+    lbl_806E1068 = false;
+    lbl_806E1069 = true;
+    CreatePadBackends();
+    EnableAutoPressed();
 }
 
 extern "C" void fn_8011B2E4(AsyncLoadingManager* manager)
@@ -1670,7 +2155,27 @@ extern "C" void fn_8011B2E4(AsyncLoadingManager* manager)
     manager->mLoadingComment = "AsyncFEGameResourceLoadBegin";
     lbl_806E1068 = false;
     lbl_806E1069 = false;
-    FinishLoadingStep(manager);
+    InitializeFunctionMemory();
+    PushFunctionMemoryState();
+    PushEventConnectionState();
+    if (g_pOverlayManager == 0)
+    {
+        g_pOverlayManager = new (8, false) OverlayManager;
+    }
+    if (g_e3_Build)
+    {
+        LoadFEMiniBundle("art/fe/LoadingUIE3.res");
+        lbl_806E1040 = g_pOverlayManager->Push(SCENE_WIDESCREEN_LOADING, SCREEN_NOTHING, false);
+    }
+    else
+    {
+        LoadFEMiniBundle("art/fe/GameLoadingUI.res");
+        lbl_806E1040 = g_pOverlayManager->Push(SCENE_WIDESCREEN_LOADING, SCREEN_NOTHING, false);
+    }
+    FESceneManager::Instance()->SetTopMostScene(lbl_806E1040);
+    FEResourceManager::Instance()->m_bPermanentBundleLoadInProgress = true;
+    FEResourceManager::Instance()->LoadPermanentResourceBundle("art/fe/InGameUI.Res", fn_8011B418);
+    FEResourceManager::Instance()->OpenOnDemandResourceBundle("art/fe/InGameUI.Dmn", fn_8011B424);
 }
 
 extern "C" void fn_8011B40C(AudioResourceLoadOwner*, void*)
@@ -1678,7 +2183,7 @@ extern "C" void fn_8011B40C(AudioResourceLoadOwner*, void*)
     lbl_806E106A = true;
 }
 
-extern "C" void fn_8011B418(void*, unsigned long, unsigned long)
+extern "C" void fn_8011B418()
 {
     lbl_806E1068 = true;
 }
@@ -1711,15 +2216,15 @@ void AsyncLoadingManager::LoadTrophyTemplates()
         && GameInfoManager::Instance()->IsInMode1())
     {
         int cupPersona = NetTournManager::Instance()->GetCupPersona();
-        const char** names = GetCupPersonaTrophyNames();
-        nlSNPrintf(trophyName, sizeof(trophyName), "Trophy%s", names[cupPersona]);
+        const char* name = GetCupPersonaTrophyNames()[cupPersona];
+        nlSNPrintf(trophyName, sizeof(trophyName), "Trophy%s", name);
         gNPCManager->CreateNPCTemplate(trophyName, false);
     }
     else if (GameInfoManager::Instance()->IsInMode3())
     {
         int cup = CupManager::Instance()->GetCurrentMode();
-        const char** names = GetCupTrophyNames();
-        nlSNPrintf(trophyName, sizeof(trophyName), "Trophy%s", names[cup]);
+        const char* name = GetCupTrophyNames()[cup];
+        nlSNPrintf(trophyName, sizeof(trophyName), "Trophy%s", name);
         gNPCManager->CreateNPCTemplate(trophyName, false);
     }
 }
@@ -1728,6 +2233,24 @@ extern "C" void fn_8011B6E8(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = 2;
     manager->mLoadingComment = "InitializeStadiumViewer";
+    fn_80111654(1);
+    ClearTweakRegistryReset();
+    GLMemoryRequirement requirements[] = {
+        { GLM_Header, 0x200000 },
+        { GLM_TextureData, 0xB00000 },
+    };
+    glSetCurrentResourcePool(glCreateResourcePool(requirements, 2, "StadiumViewer"));
+    manager->mUnidentified4C = (void*)glGetCurrentResourcePool()->MarkResource();
+    CreatePadBackends();
+    NisPlayer::Instance()->fn_8027BD60();
+    GameInfoManager::Instance()->SetMode(0, 0);
+    GameInfoManager::Instance()->mCurrentDifficulty[0] = 2;
+    GameInfoManager::Instance()->mCurrentDifficulty[1] = 2;
+    GameInfoManager::Instance()->SetupGameFromConfig();
+    ReplayManager::Instance()->Initialize();
+    CreateInstance(nlSingleton<TimedObjectManager>::s_pInstance);
+    lbl_806E1050 = new (8, false) WorldNPCManager;
+    manager->mUnidentified50 = (void*)glGetCurrentResourcePool()->MarkResource();
     FinishLoadingStep(manager);
 }
 
@@ -1752,4 +2275,18 @@ extern "C" UnidentifiedOwnerHandle* fn_8011B858(
         }
     }
     return handle;
+}
+
+AsyncLoadingManager::AsyncLoadingManager()
+    : InterpreterCore(100)
+{
+    mLoadingHandle.mOwner = 0;
+    mByteCode = 0;
+    mSequenceState = ASYNC_LOADING_IDLE;
+    mLoadingState = 0;
+    mPreviousStageTick = 0;
+    mSequenceStartTime = 0;
+    mStageStartTick = 0;
+    lbl_806E103C = 0;
+    mLoadingComment = "No Loading Comment";
 }

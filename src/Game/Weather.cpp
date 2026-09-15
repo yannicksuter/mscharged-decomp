@@ -4,7 +4,7 @@
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 #include "Game/Goalie.h"
 #include "Game/AI/AiUtil.h"
-#include "unclassified/tu_801B298C.h"
+#include "Game/Render/ThwompObject.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/EventRegistry.h"
 #include "Game/MathHelpers.h"
@@ -39,7 +39,7 @@
 #include "NL/nlDLListContainer.h"
 #include "NL/nlConfig.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/Weather.h"
 #include "types.h"
 
@@ -1155,7 +1155,7 @@ void BubblingLava::Start()
     {
         nlVector3 position = { 0.0f, 0.0f, 0.0f };
         nlVector3 velocity = { 0.0f, 0.0f, 28.0f };
-        fn_80174ED4(8);
+        GetPhysicsPatchInfo(8);
         float time = CalculateLavaTrajectory(position, velocity, gLavaGravity);
         PhysicsPatch* patch = lbl_806E12C8->fn_801743A8(8, 0, position, velocity, gLavaBallRadius, gLavaBallRadius, 999.0f);
         patch->m_Gravity = gLavaGravity;
@@ -1540,10 +1540,10 @@ float SandTombWeather::GetStartChance()
         bool available = true;
         for (int i = 0; i < 8; i++)
         {
-            if (gNPCManager->fn_801AA528(i)->mState != -1)
+            if (gNPCManager->GetThwomp(i)->mState != THWOMP_STATE_HIDDEN)
                 available = false;
-            if (gNPCManager->fn_801AA528(i)->mState == 1)
-                fn_801B2E64(gNPCManager->fn_801AA528(i), false);
+            if (gNPCManager->GetThwomp(i)->mState == THWOMP_STATE_IDLE)
+                gNPCManager->GetThwomp(i)->Stop(false);
         }
         if (available == true)
             return 100.0f;
@@ -1636,7 +1636,7 @@ void SandTombWeather::Stop(bool initialize)
     for (int i = 0; i < 8; i++)
     {
         if (m_Thwomps[i])
-            fn_801B2E64(m_Thwomps[i], initialize);
+            m_Thwomps[i]->Stop(initialize);
         m_Thwomps[i] = 0;
     }
     Weather::Stop(initialize);
@@ -1681,7 +1681,7 @@ void SandTombWeather::SpawnThwomps()
         {
             index = RandomWeatherIndex(8);
         }
-        thwomp = gNPCManager->fn_801AA528(-1);
+        thwomp = gNPCManager->GetThwomp(-1);
         m_Thwomps[index] = thwomp;
         if (thwomp)
         {
@@ -1690,7 +1690,7 @@ void SandTombWeather::SpawnThwomps()
             position.x += 6.0f * ((index + 1) % 4);
             if (side == 1)
                 position.y *= -1.0f;
-            fn_801B2DF4(thwomp, position.x, position.y);
+            thwomp->Spawn(position.x, position.y);
             m_NumActiveThwomps++;
         }
     }
@@ -1703,9 +1703,9 @@ void SandTombWeather::DropThwomp(int index)
         float distance = 999999.9f;
         for (int i = 0; i < 8; i++)
         {
-            if (m_Thwomps[i] && m_Thwomps[i]->mState == 1)
+            if (m_Thwomps[i] && m_Thwomps[i]->mState == THWOMP_STATE_IDLE)
             {
-                nlVector3 position = *fn_801B327C(m_Thwomps[i]);
+                nlVector3 position = *m_Thwomps[i]->GetPosition();
                 position.z = 0.0f;
                 nlVec3Sub(position, position, g_pBall->m_v3Position);
                 float candidateDistance = nlVec3LengthSquared(position);
@@ -1717,15 +1717,16 @@ void SandTombWeather::DropThwomp(int index)
             }
         }
     }
-    if (index != -1 && m_Thwomps[index] && m_Thwomps[index]->mState == 1)
-        fn_801B2EAC(m_Thwomps[index], 2);
+    if (index != -1 && m_Thwomps[index]
+        && m_Thwomps[index]->mState == THWOMP_STATE_IDLE)
+        m_Thwomps[index]->SetState(THWOMP_STATE_WARNING);
 }
 
 bool SandTombWeather::DropThwompNearPlayer()
 {
     for (int i = 0; i < 8; i++)
     {
-        if (m_Thwomps[i] && m_Thwomps[i]->mState == 1)
+        if (m_Thwomps[i] && m_Thwomps[i]->mState == THWOMP_STATE_IDLE)
         {
             int side = (int)floorf((i + 1) / 4.0f);
             const nlVector3 origin = sThwompOrigin;

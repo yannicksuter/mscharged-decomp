@@ -112,9 +112,9 @@ void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
 
     if (m_fSmoothTime > 0.0001f)
     {
+        float spinTemp;
         float spinChange;
         float x;
-        float spinVel;
         float omega = 2.0f / m_fSmoothTime;
         x = omega * fDeltaT;
         float exp = 1.0f
@@ -122,21 +122,19 @@ void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
                       + (x * (0.235f * x * x)));
 
         spinChange = m_fHeadSpin - m_fDesiredHeadSpin;
-        spinVel = m_fHeadSpinSeekVel;
-        float spinTemp = fDeltaT * ((omega * spinChange) + spinVel);
+        spinTemp = fDeltaT * ((omega * spinChange) + m_fHeadSpinSeekVel);
 
         m_fHeadSpinSeekVel = exp
-                           * (spinVel - (omega * spinTemp));
+                           * (m_fHeadSpinSeekVel - (omega * spinTemp));
         m_fHeadSpin
             = (exp * (spinChange + spinTemp))
             + m_fDesiredHeadSpin;
 
         float tiltChange = m_fHeadTilt - m_fDesiredHeadTilt;
-        float tiltVel = m_fHeadTiltSeekVel;
-        float tiltTemp = fDeltaT * ((omega * tiltChange) + tiltVel);
+        float tiltTemp = fDeltaT * ((omega * tiltChange) + m_fHeadTiltSeekVel);
 
         m_fHeadTiltSeekVel = exp
-                           * (tiltVel - (omega * tiltTemp));
+                           * (m_fHeadTiltSeekVel - (omega * tiltTemp));
         m_fHeadTilt
             = (exp * (tiltChange + tiltTemp))
             + m_fDesiredHeadTilt;
@@ -158,7 +156,7 @@ void CalcHeadTrackMatrix(unsigned short spin, unsigned short tilt,
     const nlMatrix4& m4AnimatedHeadMatrix
         = cPoseAccumulator->GetNodeMatrix(headNodeIndex);
     nlQuaternion& qAnimatedHead
-        = cPoseAccumulator->m_pQuaternions[headNodeIndex];
+        = cPoseAccumulator->GetNodeQuaternion(headNodeIndex);
 
     fn_802B53EC(qSpin, spin);
     fn_802B549C(qTilt, tilt);
@@ -168,6 +166,6 @@ void CalcHeadTrackMatrix(unsigned short spin, unsigned short tilt,
     nlMultMatrices(
         m4NewHeadMatrix, m4RotMatrix, m4AnimatedHeadMatrix);
 
-    cPoseAccumulator->m_pQuaternions[headNodeIndex] = qNewHead;
+    cPoseAccumulator->GetNodeQuaternion(headNodeIndex) = qNewHead;
     cPoseAccumulator->m_NodeMatrices[headNodeIndex] = m4NewHeadMatrix;
 }

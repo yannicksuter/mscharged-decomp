@@ -29,13 +29,14 @@ void glxInitTargets()
     GLTargetInfo info;
     info.width = 640;
     info.height = 448;
-    info.format = 0;
-    info.unknown18 = 7;
-    info.unknown1C = 3;
+    info.unknown10 = GLTargetInfoMode10_0;
+    info.format = GLTargetFormat_0;
     info.colour[0] = 0;
     info.colour[1] = 0;
     info.colour[2] = 0;
     info.colour[3] = 0;
+    info.unknown18 = 7;
+    info.unknown1C = 3;
     sBackBufferTarget = new (8, false) GLXTarget(&info);
     sCurrentTarget = 0;
 }
@@ -146,9 +147,13 @@ void GLXTarget::CopyToTexture(bool flag0, bool flag1)
     else
         GXInvalidateTexAll();
 
-    PlatformViewport viewport = *glplatGetViewport();
-    bool halfSize = mWidth == viewport.width / 2
-                 && mHeight == viewport.height / 2;
+    const PlatformViewport* viewport = glplatGetViewport();
+    int srcLeft = viewport->x;
+    int srcTop = viewport->y;
+    int srcWidth = viewport->width;
+    int srcHeight = viewport->height;
+    bool halfSize = mWidth == srcWidth / 2
+                 && mHeight == srcHeight / 2;
     bool colorUpdate = gxSetColourUpdate(true);
     bool alphaUpdate = gxSetAlphaUpdate(true);
     gxSaveZMode();
@@ -158,7 +163,7 @@ void GLXTarget::CopyToTexture(bool flag0, bool flag1)
         gxSetColourUpdate(false);
         gxSetZMode(false, GX_LEQUAL, false);
     }
-    GXSetTexCopySrc(viewport.x, viewport.y, viewport.width, viewport.height);
+    GXSetTexCopySrc(srcLeft, srcTop, srcWidth, srcHeight);
     GXSetTexCopyDst(mWidth, mHeight, (GXTexFmt)mCopyFormat, halfSize);
     GXCopyTex(mTexture->m_SwizzledData, flag0);
     GXPixModeSync();

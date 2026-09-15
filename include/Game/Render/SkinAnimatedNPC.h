@@ -56,7 +56,7 @@ public:
     /* 0x58 */ cPoseAccumulator* mpPoseAccumulator;
     /* 0x5C */ GLSkinMesh* mpSkinMesh;
     /* 0x60 */ cPoseNode* mpPoseTree;
-    /* 0x64 */ u8 mbIsVisible;
+    /* 0x64 */ bool mbIsVisible;
     /* 0x65 */ u8 m_unk65[3];
     /* 0x68 */ glModel* mpLastModel;
 }; // total size: 0x6C

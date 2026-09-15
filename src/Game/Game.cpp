@@ -51,6 +51,7 @@
 #include "NL/nlMain.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
+#include "NL/nlPolygonRegion.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
@@ -106,8 +107,6 @@ struct UnidentifiedRegistrationNode
 
 extern "C" EventDispatcher* fn_800721C4();
 extern "C" void fn_8007214C(ShotAtGoalData* node);
-extern "C" bool fn_802B6AF8(
-    const UnidentifiedGameRegion* param1, const nlVector2* param2);
 extern "C" int fn_800A9210(void* param1, int param2);
 extern "C" int GetAudioPauseDepth();
 extern "C" void ResumeAllAudio();
@@ -646,7 +645,7 @@ void cGame::fn_80058A78(float seconds)
 }
 
 void cGame::BlowUpPowerups(
-    const UnidentifiedGameRegion& v3ExplosionPosition,
+    const nlPolygonRegion& region,
     float fExplosionRadius)
 {
     for (int i = 0; i < 25; i++)
@@ -656,7 +655,7 @@ void cGame::BlowUpPowerups(
             nlVector2 position;
             position.x = g_pPowerups[i]->m_v3Position.x;
             position.y = g_pPowerups[i]->m_v3Position.y;
-            if (fn_802B6AF8(&v3ExplosionPosition, &position))
+            if (region.ContainsPoint2D(position))
             {
                 g_pPowerups[i]->fn_8009D74C(fExplosionRadius, false);
             }

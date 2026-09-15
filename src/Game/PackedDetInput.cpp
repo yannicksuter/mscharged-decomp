@@ -26,18 +26,15 @@ void UnpackDetInput(const PackedDetInput* record, DetInput* input)
     input->m_ButtonBitfield = record->mButtonBitfield;
     input->m_LeftTrigger = record->mTriggers & 0xF0;
     input->m_RightTrigger = (record->mTriggers & 0x0F) << 4;
-    nlVec3Set(input->m_v3RevRemoteAccel,
-        record->mRemoteAccel[0] * 0.019665834f,
-        record->mRemoteAccel[1] * 0.019665834f,
-        record->mRemoteAccel[2] * 0.019665834f);
-    nlVec3Set(input->m_v3RevFreeStyleAccel,
-        record->mFreeStyleAccel[0] * 0.019665834f,
-        record->mFreeStyleAccel[1] * 0.019665834f,
-        record->mFreeStyleAccel[2] * 0.019665834f);
+    input->m_v3RevRemoteAccel.x = record->mRemoteAccel[0] * 0.019665834f;
+    input->m_v3RevRemoteAccel.y = record->mRemoteAccel[1] * 0.019665834f;
+    input->m_v3RevRemoteAccel.z = record->mRemoteAccel[2] * 0.019665834f;
+    input->m_v3RevFreeStyleAccel.x = record->mFreeStyleAccel[0] * 0.019665834f;
+    input->m_v3RevFreeStyleAccel.y = record->mFreeStyleAccel[1] * 0.019665834f;
+    input->m_v3RevFreeStyleAccel.z = record->mFreeStyleAccel[2] * 0.019665834f;
     input->m_nRevDPDNumTargets = record->mDPDNumTargets;
-    nlVec2Set(input->m_v2RevDPDCoord,
-        record->mDPDCoord[0] * 0.007874016f,
-        record->mDPDCoord[1] * 0.007874016f);
+    input->m_v2RevDPDCoord.x = record->mDPDCoord[0] * 0.007874016f;
+    input->m_v2RevDPDCoord.y = record->mDPDCoord[1] * 0.007874016f;
     input->m_AnalogLeftX = record->mAnalogAxes[0] / 127.0f;
     input->m_AnalogLeftY = record->mAnalogAxes[1] / 127.0f;
     input->m_AnalogRightX = record->mAnalogAxes[2] / 127.0f;

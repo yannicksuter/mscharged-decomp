@@ -9,7 +9,7 @@ class FuzzyTweaks;
 class DebugWriteCache;
 class WeatherManager;
 class RunningChecksum;
-class UnidentifiedGameRegion;
+class nlPolygonRegion;
 class Terrain;
 class CrowdRiot;
 class AvoidablePolygon;
@@ -83,7 +83,7 @@ public:
     void fn_80058748();
     void fn_80058A78(float seconds);
     void BlowUpPowerups(
-        const UnidentifiedGameRegion& v3ExplosionPosition,
+        const nlPolygonRegion& region,
         float fExplosionRadius);
     void ResetPowerups(bool clearPowerUps);
     void fn_80059A1C();

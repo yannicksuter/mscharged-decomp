@@ -14,8 +14,8 @@
 #include "Game/Physics/PhysicsYoshiEgg.h"
 #include "Game/Render/SkinAnimatedNPC.h"
 #include "unclassified/tu_801A0E64.h"
-#include "unclassified/tu_801A5F10.h"
-#include "unclassified/tu_801B535C.h"
+#include "Game/Render/KoopaShellObject.h"
+#include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 PhysicsKoopaShell::PhysicsKoopaShell(KoopaShellObject* shell, float radius)
@@ -30,7 +30,7 @@ PhysicsKoopaShell::PhysicsKoopaShell(KoopaShellObject* shell, float radius)
 ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
 {
     nlVector3 shellPosition;
-    UnidentifiedObject_801B535C* egg;
+    YoshiEggObject* egg;
     GetPosition(&shellPosition);
 
     switch (other->GetObjectType())
@@ -161,7 +161,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
     case 0x20:
     {
         egg = ((PhysicsYoshiEgg*)other)->mYoshiEgg;
-        if (egg->mUnidentified28)
+        if (egg->mActive)
         {
             CollisionKoopaShellEndData* endData = 0;
             g_CollisionKoopaShellEndDataPool.Allocate(endData);
@@ -172,7 +172,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
             UnidentifiedEventData34* crackData = 0;
             lbl_80570188.Allocate(crackData);
             crackData->mUnidentified00 = 0;
-            crackData->mUnidentified04 = egg->mUnidentified34;
+            crackData->mUnidentified04 = egg->mFielder;
             crackData->mUnidentified08 = egg;
             crackData->mUnidentified0C = 0;
             crackData->mUnidentified10 = 0;

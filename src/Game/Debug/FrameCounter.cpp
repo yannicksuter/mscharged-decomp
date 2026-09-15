@@ -7,7 +7,7 @@
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
-#include "unclassified/tu_802B7798.h"
+#include "NL/nlDebugViews.h"
 
 #include "Game/Debug/TimeRegions.h"
 #include "NL/nlColour.h"

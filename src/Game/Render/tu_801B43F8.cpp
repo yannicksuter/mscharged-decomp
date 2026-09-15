@@ -16,8 +16,8 @@
 #include "Game/Sys/audio.h"
 #include "NL/nlString.h"
 
-extern "C" const nlVector3 lbl_804DCF80;
-extern "C" const nlVector3 lbl_804DCF8C;
+extern "C" const nlVector3 gWindDebrisZeroVelocity;
+extern "C" const nlVector3 gWindDebrisHiddenPosition;
 static RLView* lbl_806E16E8;
 
 static inline void fn_801B4F4C(CollisionWindDebrisPlayerData* pData)
@@ -151,9 +151,9 @@ void UnidentifiedNPC_801B43F8::fn_801B4AD0()
 
 void UnidentifiedNPC_801B43F8::fn_801B4B24(bool param)
 {
-    SetPosition(lbl_804DCF8C);
+    SetPosition(gWindDebrisHiddenPosition);
     maFacingDirection = 0;
-    mv3Velocity = lbl_804DCF80;
+    mv3Velocity = gWindDebrisZeroVelocity;
     mpPhysObj->DisableCollisions();
     mbIsVisible = false;
 }

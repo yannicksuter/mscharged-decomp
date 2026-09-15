@@ -45,13 +45,13 @@
 #include "NL/nlMain.h"
 #include "NL/nlString.h"
 #include "Game/NetworkInput.h"
-#include "unclassified/tu_801B535C.h"
-#include "unclassified/tu_801B298C.h"
+#include "Game/Render/YoshiEggObject.h"
+#include "Game/Render/ThwompObject.h"
 #include "unclassified/tu_801A0E64.h"
-#include "unclassified/tu_801A5F10.h"
-#include "unclassified/tu_802B68E8.h"
+#include "Game/Render/KoopaShellObject.h"
+#include "NL/nlPolygonRegion.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 extern "C" cPlayer* fn_80096514(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
@@ -741,11 +741,11 @@ DetInput* cPlayer::GetGlobalPad()
     return NULL;
 }
 
-void* cPlayer::fn_800972CC()
+cGlobalPad* cPlayer::fn_800972CC()
 {
     DetInput* pGlobalPad
         = m_pController != NULL ? m_pController->m_pGlobalPad : NULL;
-    void* pResult = NULL;
+    cGlobalPad* pResult = NULL;
     if (pGlobalPad != NULL)
     {
         pResult = ((NetworkPeerChannel*)pGlobalPad->m_pMyUser)->GetLocalChannelPad();
@@ -956,7 +956,7 @@ void cPlayer::DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
     float fMinPassSpeed, float fMaxPassSpeed)
 {
     DesireReceivePass* pDesire = (DesireReceivePass*)fn_8002E08C((cFielder*)pTeammate, 22);
-    fn_800C22CC(pDesire, this, bVolleyPass, bFindPosition, bPerfectPass, NULL, fMinPassSpeed, fMaxPassSpeed);
+    pDesire->fn_800C22CC(this, bVolleyPass, bFindPosition, bPerfectPass, NULL, fMinPassSpeed, fMaxPassSpeed);
 }
 
 void cPlayer::SetPowerupAnimState(int animID)
@@ -1350,7 +1350,7 @@ extern "C" void fn_80099030(UnidentifiedEventData00*)
         gNPCManager->fn_801AA348();
         if (gNPCManager->mUnidentified024 != NULL)
         {
-            gNPCManager->mUnidentified024->fn_801B59DC(true);
+            gNPCManager->mUnidentified024->Deactivate(true);
         }
     }
 }
@@ -1397,9 +1397,9 @@ static nlVector3 lbl_804FF5C8[] = {
 
 extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
 {
-    UnidentifiedGameRegion region;
+    nlPolygonRegion region;
     nlVector3 points[9];
-    fn_802B68E8(&region, 9);
+    region.Allocate(9);
     float width = 2.0f * pData->mUnidentified10;
     float height = 2.0f * pData->mUnidentified14;
     for (int i = 0; i < 9; i++)
@@ -1412,7 +1412,7 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
         point.y = (1.0f - point.y) * height;
         point.y -= height / 2.0f;
         point.y += pData->mUnidentified04.y;
-        fn_802B6944(&region, &point);
+        region.AddPoint(point);
     }
     if (g_pGame != NULL && g_pGame->IsGameplayOrOvertime())
     {
@@ -1431,7 +1431,7 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
                     nlVector2 position;
                     position.x = pFielder->mUnidentified024.m_v3Position.x;
                     position.y = pFielder->mUnidentified024.m_v3Position.y;
-                    if (fn_802B6AF8(&region, &position))
+                    if (region.ContainsPoint2D(position))
                         fn_80031C3C(pFielder, lbl_806DBD88);
                 }
             }
@@ -1439,10 +1439,10 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
         nlVector2 ballPosition;
         ballPosition.x = g_pBall->m_v3Position.x;
         ballPosition.y = g_pBall->m_v3Position.y;
-        if (fn_802B6AF8(&region, &ballPosition))
+        if (region.ContainsPoint2D(ballPosition))
         {
             if (gNPCManager->mUnidentified02C != NULL && gNPCManager->mUnidentified02C->mVisible)
-                fn_801A64A4(gNPCManager->mUnidentified02C, false);
+                gNPCManager->mUnidentified02C->Deactivate(false);
             if (gNPCManager->mpBirdoEgg != NULL && gNPCManager->mpBirdoEgg->mVisible)
                 gNPCManager->mpBirdoEgg->Hide(false);
             g_pBall->SetVelocity(v3Zero, SPINTYPE_NONE, NULL);
@@ -1459,7 +1459,7 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
                 nlVector2 position;
                 position.x = pChain->mv3Position.x;
                 position.y = pChain->mv3Position.y;
-                if (fn_802B6AF8(&region, &position))
+                if (region.ContainsPoint2D(position))
                     gNPCManager->GetChainChomp()->Freeze(lbl_806DBD88, false);
             }
             for (unsigned int i = 0; i < gNPCManager->UnidentifiedCount054(); i++)
@@ -1470,7 +1470,7 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
                     nlVector2 position;
                     position.x = pBill->position.x;
                     position.y = pBill->position.y;
-                    if (fn_802B6AF8(&region, &position))
+                    if (region.ContainsPoint2D(position))
                         pBill->Hide(false);
                 }
             }
@@ -1483,7 +1483,7 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
                     nlVector2 position;
                     position.x = pPosition->x;
                     position.y = pPosition->y;
-                    if (fn_802B6AF8(&region, &position))
+                    if (region.ContainsPoint2D(position))
                         fn_801A1650(pHammer, lbl_806DBD88);
                 }
             }
@@ -1495,21 +1495,21 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
                     nlVector2 position;
                     position.x = pNPC->mv3Position.x;
                     position.y = pNPC->mv3Position.y;
-                    if (fn_802B6AF8(&region, &position))
+                    if (region.ContainsPoint2D(position))
                         pNPC->fn_801B4C14(lbl_806DBD88);
                 }
             }
             for (unsigned int i = 0; i < 8; i++)
             {
-                ThwompObject* pThwomp = gNPCManager->fn_801AA528(i);
+                ThwompObject* pThwomp = gNPCManager->GetThwomp(i);
                 if (pThwomp != NULL && pThwomp->mVisible)
                 {
-                    const nlVector3* pPosition = fn_801B327C(pThwomp);
+                    const nlVector3* pPosition = pThwomp->GetPosition();
                     nlVector2 position;
                     position.x = pPosition->x;
                     position.y = pPosition->y;
-                    if (fn_802B6AF8(&region, &position))
-                        fn_801B2BFC(pThwomp, lbl_806DBD88);
+                    if (region.ContainsPoint2D(position))
+                        pThwomp->Freeze(lbl_806DBD88);
                 }
             }
             for (unsigned int i = 0; i < 60; i++)
@@ -1521,7 +1521,7 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
                     nlVector2 position;
                     position.x = v3Position.x;
                     position.y = v3Position.y;
-                    if (fn_802B6AF8(&region, &position))
+                    if (region.ContainsPoint2D(position))
                         pPatch->fn_80173A10(lbl_806DBD88);
                 }
             }

@@ -33,7 +33,7 @@
 #include "Game/TweakValue.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/Audio/UnidentifiedRegistryPools.h"
+#include "Game/Audio/RegistryPools.h"
 
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
 static bool lbl_806E16F8;

@@ -7,7 +7,6 @@
 #define dFabs(x) ((float)fabsf(float(x)))
 #define dInfinity (3.402823466e+38F)
 #define M_SQRT1_2 REAL(0.7071067811865475244008443621048490)
-#define dDOT44(a, b) dDOTpq(a, b, 4, 4)
 #define dCROSSpqr(a, op, b, c, p, q, r)                  \
     (a)[0] op((b)[q] * (c)[2 * (r)] - (b)[2 * (q)] * (c)[r]); \
     (a)[p] op((b)[2 * (q)] * (c)[0] - (b)[0] * (c)[2 * (r)]); \
@@ -38,8 +37,6 @@ int dCylinderClassUser = -1;
 //computes distances O1-O3, O1-O4, O2-O3, O2-O4
 //in "point" returns mean point between intersection points with smallest distance
 /////////////////////////////////////////////////////////////////////////////////////////////////
-#define dDOT(a, b) dDOTpq(a, b, 1, 1)
-#define dDOT14(a, b) dDOTpq(a, b, 1, 4)
 
 inline bool circleIntersection(const dReal* n1,const dReal* cp1,dReal r1,const dReal* n2,const dReal* cp2,dReal r2,dVector3 point){
 dReal c1=dDOT14(cp1,n1);
@@ -172,8 +169,6 @@ else
 return true;
 }
 
-#undef dDOT14
-#undef dDOT
 
 
 

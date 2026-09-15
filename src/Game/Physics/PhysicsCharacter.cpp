@@ -20,7 +20,7 @@
 #include "math.h"
 #include "types.h"
 #include "unclassified/tu_801A0E64.h"
-#include "unclassified/tu_801A5F10.h"
+#include "Game/Render/KoopaShellObject.h"
 
 extern PhysicsWorld* g_PhysicsWorld;
 

@@ -7,6 +7,7 @@
 class cPN_Blender : public cPoseNode
 {
 public:
+    cPN_Blender() { }
     cPN_Blender(cPoseNode* child0, cPoseNode* child1, float blendDuration);
     virtual ~cPN_Blender()
     {
@@ -21,6 +22,13 @@ public:
     }
     virtual void BlendRootTrans(nlVector3* outBase, float weight, float* scratch);
     virtual void BlendRootRot(u16* outRot, float weight, float* scratch);
+
+    template <typename T>
+    void Replay(T& frame)
+    {
+        Replayable<0>(frame, (cPoseNode&)*this);
+        Replayable<0>(frame, FloatCompressor<0, 1, 7>(m_fBlendTime));
+    }
 
     static void* operator new(unsigned long)
     {
