@@ -29,7 +29,9 @@ static EventRegistry* GetEventRegistry()
 {
     if (g_pEventRegistry == 0)
     {
-        g_pEventRegistry = new (8, false) EventRegistry;
+        g_pEventRegistry = new (8, false)
+            nlAVLTree<unsigned int, EventRegistryValue,
+                DefaultKeyCompare<unsigned int> >;
     }
     return g_pEventRegistry;
 }
@@ -125,13 +127,13 @@ void RegisterEventConnection(void* event, void* connectionPtr,
         *(UnidentifiedConnection**)owner = connection;
     }
 
-    if (group == -1)
+    if ((unsigned int)group == (unsigned int)-1)
     {
         return;
     }
 
-    ConnectionTree** foundTree = 0;
-    ConnectionTree* tree;
+    ConnectionTree** foundTree;
+    ConnectionTree* tree = 0;
     unsigned int key = (unsigned int)group;
     if (!sConnectionGroups.FindGet(key, &foundTree))
     {

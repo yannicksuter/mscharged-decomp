@@ -1,5 +1,5 @@
 #include "Game/Render/DaisyFist.h"
-#include "unclassified/tu_80175F8C.h"
+#include "Game/Physics/PhysicsShockwave.h"
 #include "Game/Drawable/RenderObject.h"
 
 #include "Game/AI/AiUtil.h"

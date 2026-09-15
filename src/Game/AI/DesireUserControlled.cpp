@@ -13,7 +13,7 @@
 
 extern "C" void fn_80098098(cFielder*);
 extern "C" void fn_80095870(cFielder*);
-extern "C" float fn_8002C254(PlayerTweaks*);
+extern "C" float fn_8002C254(const PlayerTweaks*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" float fn_8002C328(PlayerTweaks*);
 extern "C" void fn_8003C268(cFielder*, float, float);

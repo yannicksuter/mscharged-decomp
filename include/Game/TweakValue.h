@@ -350,6 +350,12 @@ public:
         return mValue;
     }
 
+    const bool& operator=(const bool& value)
+    {
+        mValue = value;
+        return mValue;
+    }
+
     /* 0x0A */ bool mValue;
 }; // total size: 0x0C
 

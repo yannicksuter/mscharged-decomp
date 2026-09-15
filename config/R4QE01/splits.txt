@@ -193,14 +193,14 @@ Game/TweakFileLoader.cpp:
 	.sdata2     start:0x806E37A0 end:0x806E37A8
 
 Game/GameTweaksManager.cpp:
-	.text       start:0x80073C98 end:0x800742DC
+	.text       start:0x80073C98 end:0x80074F04
 	.ctors      start:0x804DB528 end:0x804DB52C
 	.data       start:0x804FC7F0 end:0x804FC8C0
 	.bss        start:0x8056BA00 end:0x8056CF28
 	.sdata      start:0x806DBAE8 end:0x806DBB00
 
 Game/GameTweaks.cpp:
-	.text       start:0x800742DC end:0x8007722C
+	.text       start:0x80074F04 end:0x8007722C
 	.ctors      start:0x804DB52C end:0x804DB530
 	.data       start:0x804FC8C0 end:0x804FD8D8
 	.sdata      start:0x806DBB00 end:0x806DBB08
@@ -1074,7 +1074,7 @@ Game/Physics/PhysicsShell.cpp:
 	.data       start:0x80510DC0 end:0x80510E68
 	.sdata2     start:0x806E4A48 end:0x806E4A78
 
-unclassified/tu_80175F8C.cpp:
+Game/Physics/PhysicsShockwave.cpp:
 	.text       start:0x80175F8C end:0x80176EF4
 	.ctors      start:0x804DB670 end:0x804DB674
 	.data       start:0x80510E68 end:0x80510F40
@@ -1916,13 +1916,13 @@ unclassified/tu_8020A74C.cpp:
 	.sdata      start:0x806DDC80 end:0x806DDD40
 	.sdata2     start:0x806E5860 end:0x806E5870
 
-unclassified/tu_8020E1B0.cpp:
+Game/SH/SHCupFinalRounds.cpp:
 	.text       start:0x8020E1B0 end:0x80210600
 	.data       start:0x8051BE58 end:0x8051BF38
 	.sdata      start:0x806DDD40 end:0x806DDDD0
 	.sdata2     start:0x806E5870 end:0x806E5880
 
-unclassified/tu_80210600.cpp:
+Game/SH/SHStrikerCupStandings.cpp:
 	.text       start:0x80210600 end:0x802126F8
 	.data       start:0x8051BF38 end:0x8051C088
 	.sdata      start:0x806DDDD0 end:0x806DDE48
@@ -3578,13 +3578,26 @@ Game/Audio/SoundMap.cpp:
 	.ctors      start:0x804DBA4C end:0x804DBA50
 	.data       start:0x8052F570 end:0x8052F5D0
 	.bss        start:0x8057F9A8 end:0x8057F9C0
+	.sdata      start:0x806DF4D8 end:0x806DF4E0
 
-unclassified/tu_802EE964.cpp:
-	.text       start:0x802EE964 end:0x802EFB70
+Game/Audio/AudioSlider.cpp:
+	.text       start:0x802EE964 end:0x802EF218
+	.data       start:0x8052F5D0 end:0x8052F628
+	.sdata2     start:0x806E65C0 end:0x806E65D8
+
+Game/Audio/AudioCalculation.cpp:
+	.text       start:0x802EF218 end:0x802EF6B0
+	.data       start:0x8052F628 end:0x8052F638
+	.sdata2     start:0x806E65D8 end:0x806E65F0
+
+Game/Audio/AudioBankLoader.cpp:
+	.text       start:0x802EF6B0 end:0x802EF870
+
+Game/Audio/AudioBundleManagerPlatform.cpp:
+	.text       start:0x802EF870 end:0x802EFB70
 	.ctors      start:0x804DBA50 end:0x804DBA54
-	.data       start:0x8052F5D0 end:0x8052F668
+	.data       start:0x8052F638 end:0x8052F668
 	.bss        start:0x8057F9C0 end:0x8057F9D8
-	.sdata2     start:0x806E65C0 end:0x806E65F0
 
 unclassified/tu_802EFB70.cpp:
 	.text       start:0x802EFB70 end:0x802F0860
@@ -3593,11 +3606,10 @@ unclassified/tu_802EFB70.cpp:
 	.bss        start:0x8057F9D8 end:0x8057FA40
 	.sdata2     start:0x806E65F0 end:0x806E65F8
 
-unclassified/tu_802F076C.cpp:
+Game/Audio/AudioResourceBundle.cpp:
 	.text       start:0x802F0860 end:0x802F1758
 	.ctors      start:0x804DBA58 end:0x804DBA5C
 	.bss        start:0x8057FA40 end:0x8057FA58
-	.sdata      start:0x806DF4D8 end:0x806DF4E0
 	.sdata2     start:0x806E65F8 end:0x806E6608
 
 Game/Audio/XSoundCueHandle.cpp:
@@ -3614,7 +3626,7 @@ unclassified/tu_802F2110.cpp:
 	.bss        start:0x8057FA98 end:0x8057FAD8
 	.sdata2     start:0x806E6618 end:0x806E6638
 
-unclassified/tu_802F2C3C.cpp:
+Game/Audio/AudioSequenceEvent.cpp:
 	.text       start:0x802F2CAC end:0x802F3E20
 	.ctors      start:0x804DBA64 end:0x804DBA68
 	.data       start:0x8052F750 end:0x8052F818
@@ -6455,6 +6467,10 @@ RVL_SDK/hbm/nw4hbm/math/math_triangular.cpp:
 	.text       start:0x80454AF8 end:0x80454D68
 	.data       start:0x80558EF8 end:0x8055A010
 	.sdata2     start:0x806E7778 end:0x806E7798
+
+RVL_SDK/hbm/nw4hbm/snd/snd_AnimSound.cpp:
+	.data       start:0x8055A010 end:0x8055A040
+	.sdata      start:0x806E0248 end:0x806E0250
 
 RVL_SDK/hbm/nw4hbm/snd/snd_AxManager.cpp:
 	.text       start:0x80454D68 end:0x80456B48

@@ -70,7 +70,6 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80099660(
     UnidentifiedFuzzyRuntimeBase*, const char*, cPlayer*);
 extern "C" float fn_800DF028(cFielder*);
 extern "C" void fn_801B73B8(cPlayer*, bool);
-extern "C" bool fn_80007594(cAIPad*, unsigned short*);
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
 extern "C" bool fn_8003E99C(const cFielder*);
@@ -1251,9 +1250,9 @@ extern "C" void fn_80098098(cPlayer* pSelf)
         return;
     unsigned short aDirection = 0;
     bool bTogglePowerup;
-    if (fn_80007594(pSelf->m_pController, &aDirection))
+    if (pSelf->m_pController->DetectLeftShake(&aDirection))
     {
-        fn_80007A74(pSelf->m_pController);
+        pSelf->m_pController->ResetAccelerationHistory();
         bTogglePowerup = true;
     }
     else

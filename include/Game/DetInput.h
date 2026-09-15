@@ -12,7 +12,7 @@ public:
     DetInput();
 
     u8 GetConnectionStatus();
-    u8 GetControllerType();
+    int GetControllerType();
     nlVector3* GetRemoteAcceleration();
     nlVector3* GetFreestyleAcceleration();
     bool IsPressed(int button, bool remap);

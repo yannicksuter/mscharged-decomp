@@ -992,11 +992,12 @@ bool TransportConnection::Hold(
     if (count == 1)
     {
         TransportPacket* held = mOutOfOrderPackets[0];
-        if (packet->mSequence == held->mSequence)
+        u16 packetSequence = packet->mSequence;
+        if (packetSequence == held->mSequence)
         {
             return false;
         }
-        if (IsSequenceBefore(packet->mSequence, held->mSequence))
+        if (IsSequenceBefore(packetSequence, held->mSequence))
         {
             mOutOfOrderPackets[1] = held;
             mOutOfOrderPackets[0] = packet;
@@ -1015,19 +1016,22 @@ bool TransportConnection::Hold(
     }
 
     int last = mOutOfOrderCount - 1;
-    int low = 0;
     int high = last;
+    int low = 0;
     int middle = -1;
     while (high >= low)
     {
         middle = (low + high) >> 1;
         TransportPacket* held = mOutOfOrderPackets[middle];
-        if (IsSequenceAfter(packet->mSequence, held->mSequence))
+        u16 heldSequence;
+        u16 packetSequence;
+        packetSequence = packet->mSequence;
+        heldSequence = held->mSequence;
+        if (IsSequenceAfter(packetSequence, heldSequence))
         {
             low = middle + 1;
         }
-        else if (IsSequenceBefore(
-                     packet->mSequence, held->mSequence))
+        else if (IsSequenceBefore(packetSequence, heldSequence))
         {
             high = middle - 1;
         }

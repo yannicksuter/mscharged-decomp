@@ -2,6 +2,7 @@
 #define GAME_NETWORK_STATS_MANAGER_H
 
 #include "Game/NetworkStats.h"
+#include "NL/CircularQueue.h"
 #include "types.h"
 
 struct DWCDate;
@@ -44,17 +45,13 @@ class NetworkStatsManager : public NetworkStatsListener
 {
 public:
     NetworkStatsManager()
+        : mCurrentJob(0)
+        , mUnidentifiedC430(false)
+        , mUnidentifiedC431(false)
+        , mUnidentifiedC434(0)
+        , mUnidentifiedC438(0)
+        , mUnidentifiedC43C(0)
     {
-        mCurrentJob = 0;
-        mUnidentifiedC430 = false;
-        mUnidentifiedC431 = false;
-        mUnidentifiedC434 = 0;
-        mUnidentifiedC438 = 0;
-        mUnidentifiedC43C = 0;
-        mJobReadIndex = 0;
-        mJobCount = 0;
-        mJobCapacity = 10;
-        mJobs = mJobStorage;
         Reset(true);
     }
 
@@ -139,11 +136,7 @@ public:
     /* 0xC434 */ int mUnidentifiedC434;
     /* 0xC438 */ int mUnidentifiedC438;
     /* 0xC43C */ int mUnidentifiedC43C;
-    /* 0xC440 */ int* mJobs;
-    /* 0xC444 */ u32 mJobReadIndex;
-    /* 0xC448 */ u32 mJobCount;
-    /* 0xC44C */ u32 mJobCapacity;
-    /* 0xC450 */ int mJobStorage[10];
+    /* 0xC440 */ StaticCircularQueue<int, 10> mJobs;
 }; // size: 0xC478
 
 int CalculateResultPoints_80130684(int result, bool home, int homeScore,

@@ -33,15 +33,13 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "NL/globalpad.h"
-#include "unclassified/tu_80175F8C.h"
+#include "Game/Physics/PhysicsShockwave.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "unclassified/tu_801A0E64.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" void fn_8017617C();
-extern "C" void fn_801761E0();
 extern "C" void fn_80144AB8();
 
 
@@ -120,7 +118,7 @@ public:
     UnidentifiedQueuedEvent<cFielder> mEvent59;
     UnidentifiedQueuedEvent<UnidentifiedNPC_801B43F8> mEvent60;
     UnidentifiedQueuedEvent<cFielder> mEvent61;
-    UnidentifiedQueuedEvent<UnidentifiedEventData38> mEvent62;
+    UnidentifiedQueuedEvent<CollisionShockwaveData> mCollisionShockwaveEvent;
 };
 
 extern "C" PhysicsEventQueue* lbl_806E11F0;
@@ -189,7 +187,7 @@ PhysicsEventQueue::PhysicsEventQueue()
     , mEvent59(&mDispatcher, "KnockYoshiTongue", -1)
     , mEvent60(&mDispatcher, "CollisionDebrisBall", -1)
     , mEvent61(&mDispatcher, "CollisionWaluigiWall", -1)
-    , mEvent62(&mDispatcher, "CollisionShockwave", -1)
+    , mCollisionShockwaveEvent(&mDispatcher, "CollisionShockwave", -1)
 {
     fn_80144AB8();
 }
@@ -217,8 +215,6 @@ extern "C" const nlVector3 lbl_804DCC60;
 extern "C" void fn_800156F8(void*, void*);
 extern "C" void fn_80015B38(void*, int);
 extern "C" void fn_8002E5F4(void*, int);
-extern "C" PhysicsSphere_80175F8C* fn_80176A60(const nlVector3*);
-
 extern "C" void fn_801452F4(void* object)
 {
     ((unsigned char*)object)[4] = true;
@@ -308,7 +304,7 @@ extern "C" void fn_80080EFC(cPlayer*);
 
 float lbl_806DCA90 = 1.0f;
 
-extern "C" void fn_801454BC(UnidentifiedEventData38* data)
+extern "C" void HandleCollisionShockwave(CollisionShockwaveData* data)
 {
     if (g_pGame == 0)
     {
@@ -328,9 +324,9 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
     UnidentifiedEventData_80066A04* pStats;
     bool bInvincible;
     cBall* pBall;
-    PhysicsObject* pObject = data->mUnidentified04;
-    PhysicsSphere_80175F8C* pShockwave = data->mUnidentified00;
-    int effectType = pShockwave->effectType;
+    PhysicsObject* pObject = data->pObject;
+    PhysicsShockwave* pShockwave = data->pShockwave;
+    int shockwaveType = pShockwave->mType;
 
     switch (pObject->GetObjectType())
     {
@@ -341,10 +337,10 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
         if (pCharacter->m_eClassType == FIELDER)
         {
             cFielder* pFielder = (cFielder*)pCharacter;
-            switch (effectType)
+            switch (shockwaveType)
             {
-            case 1:
-                if (pShockwave->owner == pFielder)
+            case SHOCKWAVE_HIT:
+                if (pShockwave->mOwner == pFielder)
                 {
                     break;
                 }
@@ -356,15 +352,15 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
                 {
                     break;
                 }
-                fn_80032534(pFielder, pShockwave->position);
+                fn_80032534(pFielder, pShockwave->mPosition);
                 break;
-            case 3:
+            case SHOCKWAVE_FREEZE:
                 pFielder->CollideWithFreezeCallback();
                 break;
-            case 0:
-            case 4:
-            case 5:
-                if (pShockwave->owner == pFielder)
+            case SHOCKWAVE_EXPLOSION:
+            case SHOCKWAVE_BULLET_BILL:
+            case SHOCKWAVE_DAISY_FIST:
+                if (pShockwave->mOwner == pFielder)
                 {
                     break;
                 }
@@ -373,14 +369,15 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
                 {
                     break;
                 }
-                if (pFielder->CollideWithBobombCallback(pShockwave->position,
+                if (pFielder->CollideWithBobombCallback(pShockwave->mPosition,
                         pShockwave->GetRadius())
-                    && pShockwave->owner != 0 && effectType != 4)
+                    && pShockwave->mOwner != 0
+                    && shockwaveType != SHOCKWAVE_BULLET_BILL)
                 {
                     pStats = 0;
                     g_CollisionPowerupStatsDataPool.Allocate(pStats);
-                    pStats->mUnidentified08 = (cPlayer*)pShockwave->owner;
-                    pStats->mUnidentified0C = pShockwave->sourceIndex;
+                    pStats->mUnidentified08 = (cPlayer*)pShockwave->mOwner;
+                    pStats->mUnidentified0C = pShockwave->mSourceIndex;
                     pStats->mUnidentified00 = pFielder;
                     bool bHasPad = pFielder->GetGlobalPad() != 0;
                     pStats->mUnidentified04 =
@@ -390,7 +387,7 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
                             fn_80025A14));
                 }
                 break;
-            case 2:
+            case SHOCKWAVE_LIGHTNING:
                 if (!pFielder->mbTangible)
                 {
                     break;
@@ -409,7 +406,7 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
                 {
                     break;
                 }
-                pFielder->fn_800451B0(pShockwave->position);
+                pFielder->fn_800451B0(pShockwave->mPosition);
                 if (GetStadiumUnknown0x10(
                         GameInfoManager::Instance()->GetStadium()))
                 {
@@ -426,16 +423,16 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
         else if (pCharacter->m_eClassType == GOALIE)
         {
             Goalie* pGoalie = (Goalie*)pCharacter;
-            switch (effectType)
+            switch (shockwaveType)
             {
-            case 4:
+            case SHOCKWAVE_BULLET_BILL:
                 if (pGoalie->mGoalieActionState
                     != GOALIEACTION_UNIDENTIFIED_29)
                 {
                     pGoalie->fn_8008EC2C();
                 }
                 break;
-            case 2:
+            case SHOCKWAVE_LIGHTNING:
                 if (pGoalie->mGoalieActionState
                     != GOALIEACTION_UNIDENTIFIED_27)
                 {
@@ -449,13 +446,13 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
     case 16:
     {
         pBall = ((PhysicsAIBall*)pObject)->m_pAIBall;
-        if (effectType == 2)
+        if (shockwaveType == SHOCKWAVE_LIGHTNING)
         {
             break;
         }
-        if (effectType == 4)
+        if (shockwaveType == SHOCKWAVE_BULLET_BILL)
         {
-            cCharacter* pOwner = (cCharacter*)pShockwave->owner;
+            cCharacter* pOwner = (cCharacter*)pShockwave->mOwner;
             if (pOwner != 0 && pOwner->m_eClassType == FIELDER)
             {
                 fn_800156F8(pBall, pOwner);
@@ -465,7 +462,7 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
 
         if (pBall->GetOwnerFielder() != 0)
         {
-            cFielder* pOwner = (cFielder*)pShockwave->owner;
+            cFielder* pOwner = (cFielder*)pShockwave->mOwner;
             if (pBall->GetOwnerFielder() == pOwner)
             {
                 break;
@@ -488,15 +485,15 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
         eSpinType spinType =
             nlRandom(2) != 0 ? SPINTYPE_FORWARD : SPINTYPE_BACK;
         nlVector3 v3Velocity;
-        if (effectType == 5)
+        if (shockwaveType == SHOCKWAVE_DAISY_FIST)
         {
             pBall->ShootAtFast(v3Velocity,
-                ((cCharacter*)pShockwave->owner)->mUnidentified024.m_v3Position, lbl_806DCA90);
+                ((cCharacter*)pShockwave->mOwner)->mUnidentified024.m_v3Position, lbl_806DCA90);
             nlRandom(2);
         }
         else
         {
-            nlVec3Sub(v3Velocity, pBall->m_v3Position, pShockwave->position);
+            nlVec3Sub(v3Velocity, pBall->m_v3Position, pShockwave->mPosition);
             v3Velocity.z = 0.0f;
             float fLengthSquared = v3Velocity.GetLengthSq3D();
             if (fLengthSquared > 0.001f)
@@ -519,13 +516,13 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
         break;
     }
     case 21:
-        if (effectType == 1)
+        if (shockwaveType == SHOCKWAVE_HIT)
         {
             ((PhysicsBanana*)pObject)->m_pPowerupObject->fn_8009CEBC(
-                pShockwave->position);
+                pShockwave->mPosition);
             break;
         }
-        if (effectType == 0
+        if (shockwaveType == SHOCKWAVE_EXPLOSION
             && ((PhysicsBanana*)pObject)->m_pPowerupObject->m_eType
                 == POWER_UP_BOBOMB)
         {
@@ -534,10 +531,10 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
         ((PhysicsBanana*)pObject)->m_pPowerupObject->m_bShouldDestroy = true;
         break;
     case 20:
-        if (effectType == 1)
+        if (shockwaveType == SHOCKWAVE_HIT)
         {
             ((PhysicsShell*)pObject)->m_pPowerupObject->fn_8009CEBC(
-                pShockwave->position);
+                pShockwave->mPosition);
             break;
         }
         ((PhysicsShell*)pObject)->m_pPowerupObject->m_bShouldDestroy = true;
@@ -550,16 +547,16 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
         break;
     case 32:
         if (((PhysicsYoshiEgg*)pObject)->mYoshiEgg->mFielder
-            == pShockwave->owner)
+            == pShockwave->mOwner)
         {
             break;
         }
-        if (effectType == 3)
+        if (shockwaveType == SHOCKWAVE_FREEZE)
         {
             ((PhysicsYoshiEgg*)pObject)->mYoshiEgg->Suspend(true,
                 gGameTweaks.m_pGameTweaks->fFreezeShellFrozenTime);
         }
-        if (effectType != 2)
+        if (shockwaveType != SHOCKWAVE_LIGHTNING)
         {
             fn_8002E5F4(
                 ((PhysicsYoshiEgg*)pObject)->mYoshiEgg->mFielder,
@@ -573,7 +570,7 @@ extern "C" void fn_801454BC(UnidentifiedEventData38* data)
         if (((PhysicsPatch*)pObject)->m_Type == 0
             && !((PhysicsPatch*)pObject)->m_bKillMe)
         {
-            fn_80176A60(&pObject->GetPosition());
+            CreateExplosionShockwave(&pObject->GetPosition());
             pObject->Unknown0();
         }
         break;
@@ -590,7 +587,7 @@ extern "C" void fn_80145C3C(void* data)
     unsigned char* object = *(unsigned char**)((unsigned char*)data + 0x10);
     if (*(int*)(object + 0x48) == 0 && object[0x65] == false)
     {
-        fn_80176A60(&((PhysicsObject*)object)->GetPosition());
+        CreateExplosionShockwave(&((PhysicsObject*)object)->GetPosition());
         ((PhysicsObject*)object)->Unknown0();
     }
 }
@@ -621,7 +618,7 @@ extern "C" void fn_80144AB8()
     UnidentifiedRegisterEventCallback("CollisionFireballPowerup", fn_801452F4);
     UnidentifiedRegisterEventCallback("CollisionCrackEgg", fn_801453E0);
     UnidentifiedRegisterEventCallback(
-        "CollisionShockwave", (void (*)(void*))fn_801454BC);
+        "CollisionShockwave", (void (*)(void*))HandleCollisionShockwave);
     UnidentifiedRegisterEventCallback("CollisionKoopaShellEnd", fn_801453FC);
     UnidentifiedRegisterEventCallback("CollisionBirdoEggEnd", fn_8014545C);
     UnidentifiedRegisterEventCallback("CollisionPatchPatch", fn_80145C3C);
@@ -659,7 +656,7 @@ extern "C" void fn_8016A898(void*);
 extern "C" void fn_8016A8B0(UnidentifiedEventData26*);
 extern "C" void fn_8016A8C8(CollisionThwompPlayerData*);
 extern "C" void fn_8016A8E0(UnidentifiedEventData34*);
-extern "C" void fn_8016A8F8(void*);
+extern "C" void FreeCollisionShockwaveData(void*);
 
 extern "C" void fn_80145C9C()
 {
@@ -987,10 +984,11 @@ extern "C" void fn_8014A180(cFielder* data)
     lbl_806E11F0->mEvent61.Queue(data, Function<cFielder*>());
 }
 
-extern "C" void fn_8014A2BC(UnidentifiedEventData38* data)
+extern "C" void QueueCollisionShockwave(CollisionShockwaveData* data)
 {
-    lbl_806E11F0->mEvent62.Queue(
-        data, Function<UnidentifiedEventData38*>((void (*)(UnidentifiedEventData38*))fn_8016A8F8));
+    lbl_806E11F0->mCollisionShockwaveEvent.Queue(
+        data, Function<CollisionShockwaveData*>(
+                  (void (*)(CollisionShockwaveData*))FreeCollisionShockwaveData));
 }
 
 EventDispatcher::EventDispatcher(const char*)
@@ -1003,16 +1001,11 @@ struct UnidentifiedPooledData08
     unsigned char data[0x08];
 };
 
-struct UnidentifiedPooledData0C
-{
-    unsigned char data[0x0C];
-};
-
 SlotPool<UnidentifiedEventData26> lbl_80570110(16, 16);
 SlotPool<UnidentifiedEventData24> lbl_80570138(16, 16);
 static SlotPool<UnidentifiedPooledData08> lbl_80570160(16, 16);
 SlotPool<UnidentifiedEventData34> lbl_80570188(16, 16);
-static SlotPool<UnidentifiedPooledData0C> lbl_805701B0(16, 16);
+SlotPool<CollisionShockwaveData> gCollisionShockwaveDataPool(16, 16);
 
 PhysicsEventQueue* lbl_806E11F0;
 
@@ -1022,7 +1015,7 @@ extern "C" void fn_80143FD4()
     lbl_80570138.FreeBlocks();
     lbl_80570160.FreeBlocks();
     lbl_80570188.FreeBlocks();
-    lbl_805701B0.FreeBlocks();
+    gCollisionShockwaveDataPool.FreeBlocks();
 }
 
 extern "C" void fn_80144070()
@@ -1031,7 +1024,7 @@ extern "C" void fn_80144070()
     {
         lbl_806E11F0 = new (nlMalloc(sizeof(PhysicsEventQueue), 8, false))
             PhysicsEventQueue;
-        fn_8017617C();
+        InitializeShockwaves();
     }
 }
 
@@ -1050,7 +1043,7 @@ extern "C" void fn_801440BC()
 
         delete lbl_806E11F0;
         lbl_806E11F0 = 0;
-        fn_801761E0();
+        ShutdownShockwaves();
     }
 }
 
@@ -1204,9 +1197,9 @@ extern "C" void fn_8016A8E0(UnidentifiedEventData34* data)
     lbl_80570188.Free(data);
 }
 
-extern "C" void fn_8016A8F8(void* data)
+extern "C" void FreeCollisionShockwaveData(void* data)
 {
-    lbl_805701B0.Free((UnidentifiedPooledData0C*)data);
+    gCollisionShockwaveDataPool.Free((CollisionShockwaveData*)data);
 }
 
 #include "NL/nlBind_impl.h"

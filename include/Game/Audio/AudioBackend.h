@@ -29,6 +29,12 @@ struct AudioRead
     bool m_Unknown1B : 1;
 };
 
+class UnidentifiedAudioReadList
+    : public ListContainerBase<AudioRead,
+          nlStaticArrayAllocator<ListEntry<AudioRead>, 32> >
+{
+};
+
 class AudioBackendBase
 {
 public:
@@ -50,7 +56,7 @@ public:
     void ResumeControllerSpeakers();
     void* AllocateAudioMemory(unsigned long size);
     void FreeAudioMemory(void* pointer);
-    void ServiceReadQueue();
+    void ServiceReadQueue(float dt);
     AudioSource* CreateSource(AudioSourceInfo*, XSoundOwner* owner);
     void ReleaseSource(AudioSource* source);
     void QueueRead(nlFile* file, unsigned int offset, void* buffer,
@@ -61,9 +67,7 @@ public:
     void InitializeAuxEffects();
 
     /* 0x004 */ nlListSlotPool<AudioSource*> m_Unknown004;
-    /* 0x024 */ ListContainerBase<AudioRead,
-        nlStaticArrayAllocator<ListEntry<AudioRead>, 32> >
-        m_Unknown024;
+    /* 0x024 */ UnidentifiedAudioReadList m_Unknown024;
     /* 0x434 */ MemoryAllocator m_Unknown434;
     /* 0x44C */ u32 m_OutputMode;
     /* 0x450 */ bool m_Unknown450;

@@ -68,6 +68,7 @@ class AuxEffectMap
 {
 public:
     AuxEffectMap();
+    ~AuxEffectMap() { }
     int AssignAuxiliary(const int& effect);
     int GetAuxiliary(const int& effect) const;
 

@@ -21,6 +21,7 @@
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsShell.h"
+#include "Game/Physics/PhysicsShockwave.h"
 #include "Game/Physics/PhysicsSphere.h"
 #include "Game/Team.h"
 #include "NL/globalpad.h"
@@ -46,7 +47,6 @@ extern "C" void fn_80147B54(CollisionPlayerFreezeData*);
 extern "C" void fn_8009F1B8(EmissionController&);
 extern "C" bool fn_8002D2C4(nlVector3*, bool, float);
 extern "C" void fn_800F0240(float, float, float, float);
-extern "C" void fn_8017642C(const nlVector3*, cFielder*, bool, int, float);
 
 enum eGameState
 {
@@ -682,7 +682,7 @@ inline SpinyShell::SpinyShell(cFielder* pTarget, int nIndex, float fRadius,
 {
 }
 
-u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
+int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
     unk_8009A5D8* pUnidentified)
 {
     PowerupBase* pFirstPowerup = 0;
@@ -2071,7 +2071,7 @@ void PowerupBase::Destroy(bool bSilent)
             fExplosionRadius = lbl_806DBDD4;
             break;
         }
-        fn_8017642C(&m_v3Position, m_pThrower,
+        CreatePowerupShockwave(&m_v3Position, m_pThrower,
             m_eType == POWER_UP_FREEZE_SHELL, m_nThrowerPadID,
             fExplosionRadius);
     }

@@ -7,7 +7,7 @@
 #include "NL/nlPrint.h"
 
 template <int kBlockSize>
-class nlSlotPoolFixed : public SlotPoolBase
+class UnidentifiedSlotPoolFixedBase : public SlotPoolBase
 {
 public:
     struct SavedState
@@ -22,44 +22,26 @@ public:
         }
     };
 
-    nlSlotPoolFixed(int count = 16)
-        : SlotPoolBase()
+    ~UnidentifiedSlotPoolFixedBase()
     {
-        m_Depth = 0;
-        m_Delta = count;
-        m_Initial = count;
-        if (m_Initial == 0)
-        {
-            SlotPoolBase::BaseAddNewBlock(this, kBlockSize);
-        }
-    }
-
-    nlSlotPoolFixed(int initial, int delta)
-        : SlotPoolBase()
-    {
-        m_Depth = 0;
-        m_Initial = initial;
-        SlotPoolBase::BaseAddNewBlock(this, kBlockSize);
-        m_Delta = delta;
-    }
-
-    ~nlSlotPoolFixed()
-    {
-        if (this != 0)
-        {
-            while (m_Depth > 0)
-            {
-                FreeBlocks();
-                PopState();
-            }
-            FreeBlocks();
-        }
+        FreeBlocks();
     }
 
     void FreeBlocks()
     {
         fn_802B467C(this);
         SlotPoolBase::BaseFreeBlocks(this, kBlockSize);
+    }
+
+    void Initialize(int initial, int delta)
+    {
+        m_Depth = 0;
+        m_Delta = delta;
+        m_Initial = initial;
+        if (m_Delta == 0)
+        {
+            SlotPoolBase::BaseAddNewBlock(this, kBlockSize);
+        }
     }
 
     void PushState()
@@ -130,6 +112,41 @@ public:
     SavedState m_States[5];
     int m_Depth;
 }; // size: 0x44
+
+template <int kBlockSize>
+class UnidentifiedSlotPoolFixedState : public UnidentifiedSlotPoolFixedBase<kBlockSize>
+{
+public:
+    ~UnidentifiedSlotPoolFixedState()
+    {
+        while (this->m_Depth > 0)
+        {
+            this->FreeBlocks();
+            this->PopState();
+        }
+    }
+};
+
+template <int kBlockSize>
+class nlSlotPoolFixed : public UnidentifiedSlotPoolFixedState<kBlockSize>
+{
+public:
+    nlSlotPoolFixed(int count = 16)
+    {
+        this->m_Depth = 0;
+        this->m_Delta = count;
+        this->m_Initial = count;
+        if (this->m_Initial == 0)
+        {
+            SlotPoolBase::BaseAddNewBlock(this, kBlockSize);
+        }
+    }
+
+    nlSlotPoolFixed(int initial, int delta)
+    {
+        this->Initialize(initial, delta);
+    }
+};
 
 template <int kSize1, int kSize2, int kSize3, int kSize4>
 class nlSmallBlockAllocator;

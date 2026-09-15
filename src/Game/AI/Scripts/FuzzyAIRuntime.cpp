@@ -41,7 +41,7 @@ extern "C" float fn_800D85F8(cFielder*);
 extern "C" float fn_800D8764(cFielder*, int);
 extern "C" float fn_800D84F8(cFielder*);
 extern "C" float fn_800D7988(int, cFielder*);
-extern "C" shdStateMachine* fn_80318D34(UnidentifiedScriptMachine*, int, const char*, bool);
+extern "C" void fn_80318D34(UnidentifiedScriptMachine*, int, const char*, bool);
 float AggressiveT(cTeam*);
 extern "C" float fn_800DA330(cFielder*);
 extern "C" float fn_800DA310(cFielder*);

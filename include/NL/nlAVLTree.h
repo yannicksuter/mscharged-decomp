@@ -344,6 +344,11 @@ public:
         return m_Stack[m_NumStackEntries - 1];
     }
 
+    ValueType& CurrentValue() const
+    {
+        return m_Stack[m_NumStackEntries - 1]->value;
+    }
+
     Entry* m_Stack[32];
     unsigned int m_NumStackEntries;
 };

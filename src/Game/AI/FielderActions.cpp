@@ -90,7 +90,7 @@ extern "C" void fn_8003B5FC(cFielder* pFielder);
 extern "C" void fn_8003B254(cFielder* pFielder);
 extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
 extern "C" float fn_8002CD2C(PlayerTweaks* pTweaks);
-extern "C" float fn_8002CC44(PlayerTweaks* pTweaks);
+extern "C" float fn_8002CC44(const PlayerTweaks* pTweaks);
 extern "C" float fn_8002BFA8(PlayerTweaks* pTweaks, float fParam);
 
 extern "C" cFielder* fn_80096F54(cPlayer* pPlayer, bool bParam);

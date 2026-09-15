@@ -32,7 +32,9 @@ public:
 
     void UnidentifiedSetTransition(const char* name)
     {
-        mUnidentified00C = UnidentifiedStringHash(name);
+        UnidentifiedStringHash transition(name);
+        mUnidentified00C.mUnidentifiedHash = transition.mUnidentifiedHash;
+        mUnidentified00C.mUnidentifiedFunction = transition.mUnidentifiedFunction;
     }
 
     void UnidentifiedAddState(int, shdStateMachine*, bool);
@@ -41,7 +43,7 @@ public:
 
     shdStateMachine* mUnidentified004;
     shdStateMachine* mUnidentified008;
-    UnidentifiedStateTransition mUnidentified00C;
+    UnidentifiedUnsetTransition mUnidentified00C;
     int mUnidentified014;
     UnidentifiedVariantCollection mUnidentified018;
     UnidentifiedFielderInput* mUnidentified064;

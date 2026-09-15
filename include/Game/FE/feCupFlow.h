@@ -5,7 +5,7 @@ void CycleCupPage(int currentPage, bool advance);
 void CycleCupRoundPage(int currentPage, bool advance);
 void ShowFirstCupPage();
 void ShowCurrentCupRoundPage();
-void HandleCupBack(bool fromSubPage);
+void HandleCupBack(int page);
 void ShowCupExitPopup();
 void RequestMainMenuInputReset();
 void SaveAndShowCupHub();

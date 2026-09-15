@@ -268,7 +268,7 @@ public:
 
 PowerupBase* FindPowerUp(unsigned long hashOfDrawable);
 cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType);
-u8 PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
+int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
     unk_8009A5D8* pUnidentified);
 void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
     PowerupBase* pNewPowerup, PowerupBase* pFirstPowerup,

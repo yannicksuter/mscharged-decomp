@@ -1,6 +1,8 @@
 #ifndef _UNIDENTIFIEDQUATERNIONCOMPRESSOR_H_
 #define _UNIDENTIFIEDQUATERNIONCOMPRESSOR_H_
 
+#include <math.h>
+
 class UnidentifiedQuaternionCompressor
 {
 public:
@@ -14,14 +16,10 @@ public:
 
     void Read(SaveFrame& frame, unsigned int& value) const
     {
-        double absX = __fabs(mQ.x);
-        float x = (float)absX;
-        double absY = __fabs(mQ.y);
-        float y = (float)absY;
-        double absZ = __fabs(mQ.z);
-        float z = (float)absZ;
-        double absW = __fabs(mQ.w);
-        float w = (float)absW;
+        float x = fabsf(mQ.x);
+        float y = fabsf(mQ.y);
+        float z = fabsf(mQ.z);
+        float w = fabsf(mQ.w);
         if (w > x && w > y && w > z)
         {
             if (mQ.w < 0.0f)
@@ -102,7 +100,7 @@ public:
     }
 
     template <int N, typename T>
-    void ReplayInterval(T& frame) const
+    void ReplayInternal(T& frame) const
     {
         unsigned int value = 0;
         Read(frame, value);
@@ -110,8 +108,24 @@ public:
         Apply(frame, value);
     }
 
-    template <typename T>
-    void Replay(T& frame) const
+    template <int N>
+    void ReplayInterval(LoadFrame& frame) const
+    {
+        ReplayInternal<N>(frame);
+    }
+
+    template <int N>
+    void ReplayInterval(SaveFrame& frame) const
+    {
+        ReplayInternal<N>(frame);
+    }
+
+    void Replay(LoadFrame& frame) const
+    {
+        ReplayInterval<0>(frame);
+    }
+
+    void Replay(SaveFrame& frame) const
     {
         ReplayInterval<0>(frame);
     }

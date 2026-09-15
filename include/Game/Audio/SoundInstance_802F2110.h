@@ -9,15 +9,15 @@ class XSoundHandle;
 class AudioSequenceInstance;
 struct AudioSequenceDefinition;
 
-struct ModifierDefinition_802F2C3C
+struct RpcModifierDefinition
 {
     u8 pad_00[0xC];
-    u32 kind;
+    s32 kind;
 };
 
 struct RpcRuntimeNode_802F2110
 {
-    ModifierDefinition_802F2C3C* definition;
+    RpcModifierDefinition* definition;
     float value;
     u8 valid;
     u8 pad_09[7];

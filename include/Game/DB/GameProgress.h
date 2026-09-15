@@ -108,7 +108,7 @@ public:
     void fn_8010C52C(int mode);
     void fn_8010C57C();
     void fn_8010C5A0();
-    u16 fn_8010D600() const;
+    int fn_8010D600() const;
     int fn_8010B25C(bool final) const;
     void fn_8010B348(int* stadiums);
     void fn_8010B578(int* teams, CupSidekicks* sidekicks);

@@ -546,20 +546,21 @@ void LoadGameObjectSpecularLight(s32 index, GameObjectLight* lightData, f32 expo
         return;
 
     GXLightObj light;
+    nlVector3 var1;
+    nlVector3 var0;
+    nlVector3 initialDirection;
     nlVector3 viewDir;
     nlVector3 worldDir;
-    nlVector3 var0;
 
     s32 var3 = (s32)(lbl_806E4CD0 * lightData->intensity);
     if (var3 > 255)
         var3 = 255;
 
-    GXColor colour = {
-        (u8)var3,
-        (u8)var3,
-        (u8)var3,
-        lbl_806E4D3B,
-    };
+    GXColor colour;
+    colour.r = (u8)var3;
+    colour.a = lbl_806E4D3B;
+    colour.g = (u8)var3;
+    colour.b = (u8)var3;
     GXInitLightColor(&light, colour);
 
     if (lightData->enabled)
@@ -570,9 +571,7 @@ void LoadGameObjectSpecularLight(s32 index, GameObjectLight* lightData, f32 expo
     {
         float angleY = lightData->unknown08;
         angleY = (lbl_806E4D20 * angleY) / lbl_806E4D24;
-        nlVector3 initialDirection = lbl_804DCD3C;
-        nlVector3 var1;
-        nlVector3 var2;
+        initialDirection = lbl_804DCD3C;
         nlMatrix4 matY;
         nlMatrix4 matZ;
 
@@ -581,8 +580,7 @@ void LoadGameObjectSpecularLight(s32 index, GameObjectLight* lightData, f32 expo
         nlMakeRotationMatrixZ(
             matZ, (lbl_806E4D20 * angleZ) / lbl_806E4D24);
         nlMultDirVectorMatrix(var1, initialDirection, matY);
-        nlMultDirVectorMatrix(var2, var1, matZ);
-        var1 = var2;
+        nlMultDirVectorMatrix(var1, matZ);
 
         nlVec3Set(var0, -var1.x, -var1.y, -var1.z);
     }

@@ -15,6 +15,12 @@ public:
     float GetMovementStickMagnitude();
     u16 GetCStickMovementStickDirection();
     float GetCStickMovementStickMagnitude();
+    bool IsWiiController();
+    bool DetectLeftShake(u16* direction);
+    bool DetectRightShake(u16* direction);
+    int GetMaxRemoteAccelDelta(unsigned int count, nlVector3* deltaOut);
+    int GetMaxFreestyleAccelDelta(unsigned int count, nlVector3* deltaOut);
+    void ResetAccelerationHistory();
 
 private:
     /* 0x000 */ u32 mUnidentified000;
@@ -30,10 +36,10 @@ public:
 struct AIPadManager
 {
     static void Startup();
+    static void UpdateAccelerationHistory();
     static cAIPad mAIPads[16];
 };
 
 cAIPad* GetAIPad(int index);
-extern "C" void fn_80007A74(cAIPad*);
 
 #endif // GAME_AI_AIPAD_H

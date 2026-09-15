@@ -67,6 +67,7 @@ public:
     void WriteFloat(u16* type, const char* name, RunningChecksum* checksum, float value);
     u16 BeginType(const char* name);
     void EndType();
+    void AddField(const char* name, int fieldType, unsigned int offset);
     void AddField(int fieldType, u16 size, unsigned int offset, const char* name);
     void AddArrayField(int fieldType, u16 size, unsigned int count, unsigned int offset, const char* name);
     void WriteText(const char* value);
@@ -87,5 +88,10 @@ public:
 }; // size: 0x24
 
 extern DebugFieldType gDebugFieldTypes[32];
+
+inline void DebugWriteCache::AddField(const char* name, int fieldType, unsigned int offset)
+{
+    AddField(fieldType, gDebugFieldTypes[fieldType].size, offset, name);
+}
 
 #endif // GAME_DEBUGWRITECACHE_H

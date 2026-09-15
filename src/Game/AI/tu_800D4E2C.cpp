@@ -36,7 +36,6 @@ extern "C" void fn_80319E84(
     UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
 extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
 extern "C" float fn_800D85F8(cFielder*);
-extern "C" void fn_800D2074();
 
 extern bool lbl_806E0C50;
 extern bool lbl_806E0C51;

@@ -258,6 +258,11 @@ public:
     {
         this->m_Allocator.Initialize(initial, delta);
     }
+
+    ~nlListSlotPool()
+    {
+        this->m_Allocator.FreeBlocks();
+    }
 };
 
 template <typename T>

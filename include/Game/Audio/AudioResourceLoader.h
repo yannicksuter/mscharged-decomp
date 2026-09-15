@@ -1,6 +1,7 @@
 #ifndef GAME_AUDIO_AUDIO_RESOURCE_LOADER_H
 #define GAME_AUDIO_AUDIO_RESOURCE_LOADER_H
 
+#include "Game/Audio/AudioResourceBundle.h"
 #include "types.h"
 
 class MemoryAllocator;
@@ -32,7 +33,7 @@ struct AudioResourceLoadOwner
     void* m_LoadedData;
     u8 m_Completed;
     u8 m_Unknown09[3];
-    void* m_ResourceObject;
+    AudioResourceBundle* m_ResourceObject;
     AudioBankLoader* m_Loader;
     SoundMap* m_SoundMap;
     AudioResourceLoadCallback m_Callback;
@@ -60,9 +61,5 @@ protected:
     u32 m_Unknown08;
     MemoryAllocator* m_Allocator;
 };
-
-class nlChunk;
-struct ResourceBundle;
-ResourceBundle* ParseAudioResourceBundle(nlChunk* chunk);
 
 #endif // GAME_AUDIO_AUDIO_RESOURCE_LOADER_H

@@ -49,8 +49,11 @@ AudioBackend::AudioBackend()
 
 AudioBackend::~AudioBackend()
 {
-    delete g_pAuxEffectMap;
-    g_pAuxEffectMap = 0;
+    if (g_pAuxEffectMap != 0)
+    {
+        delete g_pAuxEffectMap;
+        g_pAuxEffectMap = 0;
+    }
     if (m_OutputMode == 3)
     {
         AXFXReverbHiShutdownDpl2(&m_Unknown454.m_ReverbDpl2);
@@ -145,7 +148,7 @@ void AudioReadState::SetInputVolume(float value)
     OSRestoreInterrupts(enabled);
 }
 
-void AudioBackend::ServiceReadQueue()
+void AudioBackend::ServiceReadQueue(float)
 {
     bool enabled = OSDisableInterrupts();
     while (m_Unknown024.m_Head != 0)

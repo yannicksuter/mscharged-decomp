@@ -1,36 +1,34 @@
 #include "Game/Audio/AudioSequenceInstance.h"
-#include "unclassified/tu_802F2C3C.h"
+#include "Game/Audio/AudioSequenceEvent.h"
 
 #include "NL/nlMath.h"
 
 SlotPool<AudioSequenceInstance> sAudioSequenceInstancePool(32, 16);
 
-extern "C" PlaybackObject_802F2C3C* fn_802F2CAC(
-    AudioSequenceInstance* owner, PlaybackRequest_802F2C3C* request);
-
 /**
  * Address/Size: 0x802F3E20 | size: 0xAC
  */
-AudioSequenceInstance::AudioSequenceInstance(SoundInstance_802F2110* instance, AudioSequenceDefinition* sequence)
+AudioSequenceInstance::AudioSequenceInstance(
+    SoundInstance_802F2110* soundInstance, AudioSequenceDefinition* definition)
 {
     next = 0;
-    this->instance = instance;
-    this->sequence = sequence;
-    objects = 0;
-    volumeOffset = sequence->volume;
+    this->soundInstance = soundInstance;
+    this->definition = definition;
+    events = 0;
+    volumeOffset = definition->volumeOffset;
     pitchOffset = 0.0f;
     stopped = false;
 
-    PlaybackObject_802F2C3C* previous = 0;
-    for (u32 index = 0; index < sequence->count; index++)
+    AudioSequenceEvent* previousEvent = 0;
+    for (u32 index = 0; index < definition->eventCount; index++)
     {
-        PlaybackObject_802F2C3C* object
-            = fn_802F2CAC(this, sequence->requests + index);
-        if (previous == 0)
-            objects = object;
+        AudioSequenceEvent* event
+            = AudioSequenceEvent::Create(this, definition->eventDefinitions + index);
+        if (previousEvent == 0)
+            events = event;
         else
-            previous->next = object;
-        previous = object;
+            previousEvent->next = event;
+        previousEvent = event;
     }
 }
 
@@ -39,14 +37,14 @@ AudioSequenceInstance::AudioSequenceInstance(SoundInstance_802F2110* instance, A
  */
 AudioSequenceInstance::~AudioSequenceInstance()
 {
-    PlaybackObject_802F2C3C* object = objects;
-    while (object != 0)
+    AudioSequenceEvent* event = events;
+    while (event != 0)
     {
-        PlaybackObject_802F2C3C* following = object->next;
-        delete object;
-        object = following;
+        AudioSequenceEvent* nextEvent = event->next;
+        delete event;
+        event = nextEvent;
     }
-    objects = 0;
+    events = 0;
 }
 
 /**
@@ -54,10 +52,10 @@ AudioSequenceInstance::~AudioSequenceInstance()
  */
 void AudioSequenceInstance::Play()
 {
-    for (PlaybackObject_802F2C3C* object = objects; object != 0;
-        object = object->next)
+    for (AudioSequenceEvent* event = events; event != 0;
+        event = event->next)
     {
-        object->Play();
+        event->Play();
     }
     if (next != 0)
         next->Play();
@@ -68,10 +66,10 @@ void AudioSequenceInstance::Play()
  */
 void AudioSequenceInstance::Prepare()
 {
-    for (PlaybackObject_802F2C3C* object = objects; object != 0;
-        object = object->next)
+    for (AudioSequenceEvent* event = events; event != 0;
+        event = event->next)
     {
-        object->Prepare();
+        event->Prepare();
     }
     if (next != 0)
         next->Prepare();
@@ -82,10 +80,10 @@ void AudioSequenceInstance::Prepare()
  */
 void AudioSequenceInstance::Pause()
 {
-    for (PlaybackObject_802F2C3C* object = objects; object != 0;
-        object = object->next)
+    for (AudioSequenceEvent* event = events; event != 0;
+        event = event->next)
     {
-        object->Pause();
+        event->Pause();
     }
     if (next != 0)
         next->Pause();
@@ -96,10 +94,10 @@ void AudioSequenceInstance::Pause()
  */
 void AudioSequenceInstance::Resume()
 {
-    for (PlaybackObject_802F2C3C* object = objects; object != 0;
-        object = object->next)
+    for (AudioSequenceEvent* event = events; event != 0;
+        event = event->next)
     {
-        object->Resume();
+        event->Resume();
     }
     if (next != 0)
         next->Resume();
@@ -111,12 +109,12 @@ void AudioSequenceInstance::Resume()
 int AudioSequenceInstance::Update(float time)
 {
     int result = 9;
-    for (PlaybackObject_802F2C3C* object = objects; object != 0;
-        object = object->next)
+    for (AudioSequenceEvent* event = events; event != 0;
+        event = event->next)
     {
-        if (!stopped || object->state != 0)
+        if (!stopped || event->state != 0)
         {
-            int state = object->Update(time);
+            int state = event->Update(time);
             result = nlMin(result, state);
         }
     }
@@ -134,11 +132,11 @@ int AudioSequenceInstance::Update(float time)
 void AudioSequenceInstance::Stop()
 {
     stopped = true;
-    for (PlaybackObject_802F2C3C* object = objects; object != 0;
-        object = object->next)
+    for (AudioSequenceEvent* event = events; event != 0;
+        event = event->next)
     {
-        if ((u32)(object->state - 2) <= 3)
-            object->Stop();
+        if ((u32)(event->state - 2) <= 3)
+            event->Stop();
     }
     if (next != 0)
         next->Stop();
@@ -165,9 +163,9 @@ void AudioSequenceInstance::SetVolume(float value)
  */
 void AudioSequenceInstance::GetSources(AudioSource** results, u32* count)
 {
-    for (PlaybackObject_802F2C3C* object = objects; object != 0;
-        object = object->next)
+    for (AudioSequenceEvent* event = events; event != 0;
+        event = event->next)
     {
-        *count += object->GetSources(results + *count);
+        *count += event->GetSources(results + *count);
     }
 }

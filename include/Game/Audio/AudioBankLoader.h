@@ -4,6 +4,7 @@
 #include "Game/Audio/AudioResourceLoader.h"
 
 class nlChunk;
+struct AudioSourceInfo;
 
 class AudioBankLoader : public AudioResourceLoader
 {
@@ -18,6 +19,11 @@ public:
     virtual void ParseChunk(nlChunk* chunk);
     virtual ~AudioBankLoader() { }
     virtual void Load(const char* name) = 0;
+
+    AudioSourceInfo* GetChunk23200Entries() const
+    {
+        return (AudioSourceInfo*)m_Chunk23200Entries;
+    }
 
 protected:
     void* m_Chunk23200;

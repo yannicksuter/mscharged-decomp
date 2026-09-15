@@ -67,9 +67,9 @@ extern "C" float fn_8002BFA8(PlayerTweaks* pTweaks, float fTime);
 extern "C" float fn_8002D020(PlayerTweaks* pTweaks);
 extern "C" float fn_8002D050(PlayerTweaks* pTweaks);
 extern "C" float fn_8002D038(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C254(PlayerTweaks* pTweaks);
+extern "C" float fn_8002C254(const PlayerTweaks* pTweaks);
 extern "C" float fn_8002BE38(PlayerTweaks* pTweaks);
-extern "C" float fn_8002BE84(PlayerTweaks* pTweaks);
+extern "C" float fn_8002BE84(const PlayerTweaks* pTweaks);
 extern "C" float fn_8002C758(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C780(PlayerTweaks* pTweaks);
 extern "C" float fn_800156A8(cBall* pBall);
@@ -1611,7 +1611,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
     case ACTION_HIT:
         if (m_pController != 0)
         {
-            fn_80007A74(m_pController);
+            m_pController->ResetAccelerationHistory();
         }
         if (mUnidentified024.m_eCharacterClass == (eCharacterClass)8)
         {

@@ -52,7 +52,6 @@ extern "C"
     void RestoreWorldRendering(UnidentifiedPresentationState* presentation);
     bool DuringEndOfGamePresentation(UnidentifiedPresentationState* presentation);
     void GoalieOnGameOver();
-    void GetMaxRemoteAccelDelta(cAIPad* pad, int index, nlVector3* out);
 
     extern UnidentifiedEventRegistry* g_pEventRegistry;
     extern float g_AllActorsHidden;
@@ -481,7 +480,7 @@ void FrontEnd::UpdateForGame(float fDeltaT)
                     if (g_pPlatPadManager->type[i] == 2)
                     {
                         nlVector3 stick;
-                        GetMaxRemoteAccelDelta(GetAIPad(i), 4, &stick);
+                        GetAIPad(i)->GetMaxRemoteAccelDelta(4, &stick);
                         float absZ = (float)fabs(stick.z);
                         float absY = (float)fabs(stick.y);
                         float largest = nlMaxEquals(absY, absZ);

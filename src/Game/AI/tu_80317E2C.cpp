@@ -47,6 +47,9 @@ extern "C" bool fn_80316A84(
 extern "C" void fn_80317010(
     shdStateMachine*, UnidentifiedVariant_80054AB8*, bool, float);
 extern "C" float fn_80314538(float, float, float, float, float);
+extern "C" void fn_80319DA0(UnidentifiedScriptMachine*);
+extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
+extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
 
 extern float (*lbl_806DF560)();
 extern UnidentifiedUnsetTransition lbl_806E20B8;
@@ -117,8 +120,6 @@ UnidentifiedScriptMachine::UnidentifiedScriptMachine(
     const char* name)
     : mUnidentified018()
 {
-    mUnidentified00C.mUnidentifiedFunction = 0;
-    mUnidentified00C.mUnidentifiedHash = -1;
     mUnidentified074 = stateCount;
     mUnidentified004 = 0;
     mUnidentified008 = 0;
@@ -180,16 +181,16 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual2()
     }
 }
 
-extern "C" shdStateMachine* fn_80318D34(
+extern "C" void fn_80318D34(
     UnidentifiedScriptMachine* machine, int state, const char* name,
     bool secondary)
 {
     UnidentifiedStateMachine_803171D0* result
         = new (nlMalloc(sizeof(UnidentifiedStateMachine_803171D0), 8, false))
             UnidentifiedStateMachine_803171D0(
-                state, name, machine, lbl_806E20B8);
+                state, name, machine,
+                UnidentifiedUnsetTransition(lbl_806E20B8));
     machine->UnidentifiedAddState(state, result, secondary);
-    return result;
 }
 
 void UnidentifiedScriptMachine::UnidentifiedAddState(
@@ -209,14 +210,7 @@ void UnidentifiedScriptMachine::UnidentifiedAddState(
 void UnidentifiedScriptMachine::UnidentifiedVirtual4(bool param)
 {
     UnidentifiedVirtual6();
-    for (int i = 0; i < mUnidentified074; i++)
-    {
-        shdStateMachine* machine = mUnidentified070[i];
-        if (machine != 0 && machine->UnidentifiedIsActive())
-        {
-            fn_80316980(machine, true);
-        }
-    }
+    fn_80319DA0(this);
 
     for (int i = 0; i < mUnidentified074; i++)
     {
@@ -426,7 +420,6 @@ extern "C" void fn_803198F4(UnidentifiedScriptMachine* machine)
 }
 
 extern "C" shdStateMachine* fn_80319FC0(UnidentifiedScriptMachine*, int);
-extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
 
 extern "C" void fn_80319904(
     UnidentifiedScriptMachine* machine, shdStateMachine* state)
@@ -462,10 +455,9 @@ extern "C" void fn_80319DA0(UnidentifiedScriptMachine* machine)
 {
     for (int i = 0; i < machine->mUnidentified074; i++)
     {
-        shdStateMachine* state = machine->mUnidentified070[i];
-        if (state != 0 && state->UnidentifiedIsActive())
+        if (fn_80319FEC(machine, i))
         {
-            fn_80316980(state, true);
+            fn_80319E58(machine, i);
         }
     }
 }

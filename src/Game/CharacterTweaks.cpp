@@ -184,7 +184,7 @@ extern "C" float fn_8002BE64(PlayerTweaks* tweaks)
          / 2.0f;
 }
 
-extern "C" float fn_8002BE84(PlayerTweaks* tweaks)
+extern "C" float fn_8002BE84(const PlayerTweaks* tweaks)
 {
     float result = tweaks->mUnidentified074.GetValue()
                  + tweaks->mUnidentified054.GetValue();
@@ -289,7 +289,7 @@ extern "C" float fn_8002C180(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C254(PlayerTweaks* tweaks)
+extern "C" float fn_8002C254(const PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified034;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -440,7 +440,7 @@ extern "C" float fn_8002C8D4(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C9A8(PlayerTweaks* tweaks)
+extern "C" float fn_8002C9A8(const PlayerTweaks* tweaks)
 {
     float result = fn_8002C254(tweaks);
     result *= Interpolate(gGameTweaks.mFielderTweaks->mUnidentified314,
@@ -473,7 +473,7 @@ extern "C" float fn_8002CBB8(PlayerTweaks*)
     return terrainScale * (float)gGameTweaks.mFielderTweaks->mUnidentified3E4;
 }
 
-extern "C" float fn_8002CC44(PlayerTweaks* tweaks)
+extern "C" float fn_8002CC44(const PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified034;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -605,4 +605,3 @@ extern "C" float fn_8002D050(PlayerTweaks* tweaks)
         gGameTweaks.mFielderTweaks->mUnidentified3A4,
         tweaks->mUnidentified074);
 }
-

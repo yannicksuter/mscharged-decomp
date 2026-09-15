@@ -3,6 +3,7 @@
 #include "Game/RumbleActions.h"
 #include "unclassified/tu_8019FE24.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
+#include "Game/Physics/PhysicsShockwave.h"
 
 #include "Game/AI/Fuzzy.h"
 #include "Game/AI/FuzzyVariant.h"
@@ -58,8 +59,6 @@ struct UnidentifiedAbilityEvent
     /* 0x14 */ float fParam2;
 };
 
-class PhysicsSphere_80175F8C;
-
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
 extern "C" void fn_8002FE54(cFielder* pFielder);
@@ -77,8 +76,6 @@ extern "C" void fn_80060210(cGame* pGame, void* pEvent);
 extern "C" void fn_800F026C(float* pParams, float fParam1, float fParam2);
 extern "C" void fn_80061B1C(int nParam, float fParam1, float fParam2);
 extern "C" void fn_80111D7C(float fParam);
-extern "C" PhysicsSphere_80175F8C* fn_801765C8(
-    cFielder* pFielder, const nlVector3* v3Position, float fParam);
 extern "C" void fn_801B897C(cFielder* pFielder);
 extern "C" void fn_801BAF98(cFielder* pFielder);
 extern "C" void fn_801BB0DC(cFielder* pFielder);
@@ -105,7 +102,7 @@ void cFielder::fn_8004F8E8()
     fn_800F026C(gUnidentified804FAD80, lbl_806DB9D0, lbl_806DB9D4);
     fn_80061B1C(1, lbl_806DBA10 * mUnidentified024.m_v3Position.y,
         lbl_806DBA10 * mUnidentified024.m_v3Position.x);
-    fn_801765C8(
+    CreateHitShockwave(
         this, &GetJointPosition(m_nHeadJointIndex), lbl_806DB9D8);
     PlayRumbleAction(4, GetGlobalPad());
 }

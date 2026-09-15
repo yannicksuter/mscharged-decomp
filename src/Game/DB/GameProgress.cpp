@@ -1101,7 +1101,7 @@ void CupManager::fn_8010C5A0()
     mCupRecord.mUnidentified86A6 = mCupRecord.mUnidentified86A0;
 }
 
-u16 CupManager::fn_8010D600() const
+int CupManager::fn_8010D600() const
 {
     u16 rounds = mCurrentCup->GetNumPlayoffRounds();
     u16 teams = 0;
@@ -1473,7 +1473,7 @@ void CupManager::fn_8010BA10()
     int indices[10];
     StatsTracker::Instance()->GetSortedTeamStats(mCurrentCup->GetTeamStats(0), mCurrentCup->GetNumTeams(), indices, mCurrentCup->GetNumTeams());
     bool human = false;
-    int playoffTeams = fn_8010D600();
+    u16 playoffTeams = fn_8010D600();
     for (int i = 0; i < GetNumGamesPerRound(1, 0); i++)
     {
         BasicGameInfo* info = mCurrentCup->GetGameInfo(1, 0, i);

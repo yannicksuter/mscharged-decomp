@@ -1,6 +1,8 @@
 #include "Game/Audio/AudioBackend.h"
+#include "Game/Audio/AudioCalculation.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioBankTable.h"
+#include "Game/Audio/AudioSlider.h"
 
 #include "Game/Audio/AudioSystem.h"
 

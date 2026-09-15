@@ -42,11 +42,11 @@ extern "C" bool fn_800381B4(cFielder* pFielder, nlVector3* pOutPos);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C328(PlayerTweaks* pTweaks);
 extern "C" float fn_8002BFB8(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C254(PlayerTweaks* pTweaks);
+extern "C" float fn_8002C254(const PlayerTweaks* pTweaks);
 extern "C" float fn_8002BE18(PlayerTweaks* pTweaks);
 extern "C" float fn_8002BE38(PlayerTweaks* pTweaks);
 extern "C" float fn_8002BE64(PlayerTweaks* pTweaks);
-extern "C" float fn_8002BE84(PlayerTweaks* pTweaks);
+extern "C" float fn_8002BE84(const PlayerTweaks* pTweaks);
 extern "C" float fn_800DB298(const nlVector3&, const nlVector3&, cFielder*,
     float, float, float, float, cPlayer*);
 extern "C" float fn_800DAFCC(const nlVector3&, const nlVector3&, cPlayer*,
@@ -60,7 +60,7 @@ extern "C" float fn_8004028C(cFielder*);
 extern "C" bool fn_8002F858(cFielder*, bool);
 extern "C" float fn_8002BE38(PlayerTweaks*);
 extern "C" float fn_8002BE18(PlayerTweaks*);
-extern "C" float fn_8002BE84(PlayerTweaks*);
+extern "C" float fn_8002BE84(const PlayerTweaks*);
 extern "C" float fn_8002BE64(PlayerTweaks*);
 extern "C" Desire* fn_8002E08C(cFielder* pFielder, int nAction);
 extern "C" float fn_800156A8(cBall*);

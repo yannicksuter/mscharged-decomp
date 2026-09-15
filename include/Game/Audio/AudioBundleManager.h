@@ -44,9 +44,24 @@ protected:
     void* m_LoadedData;
 };
 
-struct SliderTable_802EE964;
-struct LocalSliderTable_802EF218;
-SliderTable_802EE964* ParseAudioSliderTable(nlChunk* chunk);
-LocalSliderTable_802EF218* ParseAudioCalculationTable(nlChunk* chunk);
+class UnidentifiedAudioBundleManager_802ECD34 : public AudioBundleManager
+{
+public:
+    UnidentifiedAudioBundleManager_802ECD34()
+        : m_Unknown4C(0)
+        , m_RpcController(0)
+    {
+    }
+
+    virtual bool Initialize();
+    virtual void Shutdown();
+    virtual void Update(float dt);
+    virtual void ParseChunk(nlChunk* chunk);
+    virtual ~UnidentifiedAudioBundleManager_802ECD34();
+
+private:
+    void* m_Unknown4C;
+    void* m_RpcController;
+};
 
 #endif // GAME_AUDIO_AUDIO_BUNDLE_MANAGER_H

@@ -9,23 +9,6 @@
 #include "NL/nlDebugFile.h"
 #include "NL/nlstring_tmpl.h"
 
-class UnidentifiedAudioBundleManager_802ECD34 : public AudioBundleManager
-{
-public:
-    UnidentifiedAudioBundleManager_802ECD34()
-        : m_Unknown4C(0), m_Unknown50(0)
-    {
-    }
-    virtual ~UnidentifiedAudioBundleManager_802ECD34();
-    virtual bool Initialize();
-    virtual void ParseChunk(nlChunk* chunk);
-    virtual void Shutdown();
-    virtual void Update(float dt);
-
-    void* m_Unknown4C;
-    void* m_Unknown50;
-};
-
 extern "C" void fn_802F499C(void*, unsigned long, XSoundHandle*);
 extern "C" void fn_802F49A4(void*, XSoundHandle*);
 u32 FindAudioResourceCue(AudioResourceLoadOwner*, u32, u32, u32, u32);

@@ -40,9 +40,9 @@ struct ReplayableCategory
 };
 
 template <>
-struct ReplayableCategory<int>
+struct ReplayableCategory<int> : ReplayablePod
 {
-    typedef ReplayablePod Type;
+    typedef ReplayableCategory<int> Type;
 };
 
 template <>
@@ -168,11 +168,19 @@ inline void SaveFrame::Replayable(T& current, NotReplayablePod)
 }
 
 template <int N, typename FrameType, typename T>
+static inline void ReplayFrameValue(
+    FrameType& frame, T& current, typename ReplayableCategory<T>::Type category)
+{
+    frame.template Replayable<N>(current, category);
+}
+
+template <int N, typename FrameType, typename T>
 inline void Replayable(FrameType& frame, T& current)
 {
     if (N == 0 || frame.mInterval == N)
     {
-        frame.template Replayable<N>(current);
+        ReplayFrameValue<N>(
+            frame, current, ReplayableCategoryOf(current));
     }
 }
 

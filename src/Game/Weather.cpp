@@ -10,7 +10,7 @@
 #include "Game/MathHelpers.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Effects/EmissionController.h"
-#include "unclassified/tu_80175F8C.h"
+#include "Game/Physics/PhysicsShockwave.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/tu_801B532C.h"
 #include "math.h"
@@ -741,7 +741,11 @@ void Windy::AvoidDebrisObstacle(nlVector3& start, nlVector3& end, nlVector3& dis
             direction.x *= -1.0f;
             direction.y *= -1.0f;
         }
-        nlVec3Scale(direction, nlRecipSqrt(nlVec3LengthSquared(direction), false));
+        float inverseLength = nlRecipSqrt(nlVec3LengthSquared(direction), false);
+        nlVec3Set(direction,
+            inverseLength * direction.x,
+            inverseLength * direction.y,
+            inverseLength * direction.z);
         nlVec3Scale(offset, direction, radius - distance);
         nlVec3Add(displacement, displacement, offset);
         nlVec3Add(start, start, offset);
@@ -1431,7 +1435,7 @@ void StormShipWeather::Update(float value)
             if (m_FirstStrikeElectrocuteTimer <= 0.0f)
             {
                 m_FirstStrikeElectrocuteTimer = 0.0f;
-                fn_801768E0(&v3Zero, gStormStrikeRadius);
+                CreateLightningShockwave(&v3Zero, gStormStrikeRadius);
             }
         }
         if (m_StopChainLightningSound > 0.0f)

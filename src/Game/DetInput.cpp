@@ -18,7 +18,7 @@ u8 DetInput::GetConnectionStatus()
     return m_nConnected;
 }
 
-u8 DetInput::GetControllerType()
+int DetInput::GetControllerType()
 {
     return m_nConnected;
 }

@@ -5,9 +5,17 @@
 #include "Game/AI/Powerups.h"
 
 extern UnidentifiedUnsetTransition lbl_806E20B8;
+class DesireUsePowerup;
+class UnidentifiedFielderInput;
+extern "C" UnidentifiedDesireUpdate fn_800D2074(
+    UnidentifiedFielderInput*);
+extern "C" void fn_800D38D0(DesireUsePowerup*);
+extern "C" void fn_800D3CBC(DesireUsePowerup*);
 
 class DesireUsePowerup : public Desire
 {
+    friend void fn_800D38D0(DesireUsePowerup*);
+    friend void fn_800D3CBC(DesireUsePowerup*);
 public:
     DesireUsePowerup()
         : Desire(17, UnidentifiedStateTransition(lbl_806E20B8))
@@ -28,6 +36,7 @@ public:
 
 private:
     void fn_800D3A50(ePowerUpType, int, cFielder*);
+    inline void UnidentifiedResetPowerupState();
 
     cFielder* mpTarget;
     bool mbThrowingPowerup;

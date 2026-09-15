@@ -55,7 +55,7 @@ struct UnidentifiedConnection
         struct
         {
             unsigned short mUnidentified08;
-            unsigned short mGroupCount;
+            unsigned short mGroupCount : 16;
         };
     };
 };

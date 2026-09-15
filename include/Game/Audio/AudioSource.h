@@ -53,7 +53,7 @@ public:
     }
     virtual ~AudioSource() { }
     virtual void UpdateState();
-    virtual unsigned int GetState();
+    virtual int GetState() { return m_Unknown04; }
     virtual bool IsResident();
     virtual bool IsStream();
     virtual bool Prepare() = 0;

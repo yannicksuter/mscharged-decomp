@@ -1,6 +1,7 @@
 #include "NL/nlDebugString.h"
 #include "Game/Audio/AudioSource.h"
 #include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioResourceLoader.h"
 #include "Game/Audio/AudioSystem.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/XSoundHandle.h"
@@ -19,8 +20,6 @@ SlotPool<XSoundCueHandle> sSoundCueHandlePool(32, 16);
 
 extern "C" LocalSliderSet_802F1758* fn_802EED88(void*, XSoundCueHandle*);
 extern "C" SliderState_802F1758* fn_802EED38(void*, u32, XSoundCueHandle*);
-extern "C" void* fn_802F11A0(CueDefinition_802F1758*);
-extern "C" void* fn_802F1460(CueDefinition_802F1758*, float);
 extern "C" SoundInstance_802F1758* fn_802F2188(SoundInstance_802F1758*, XSoundCueHandle*, void*);
 extern "C" void fn_802F2320(SoundInstance_802F1758*, float);
 extern "C" void fn_802F2398(SoundInstance_802F1758*);
@@ -28,15 +27,15 @@ extern "C" void fn_802F2594(SoundInstance_802F1758*, bool, float, float);
 extern "C" void fn_802F25D4(SoundInstance_802F1758*, void*);
 extern "C" void fn_802F2640(SoundInstance_802F1758*);
 extern "C" void fn_802F2648(SoundInstance_802F1758*);
-extern "C" void fn_802F2650(SoundInstance_802F1758*, PlaybackBackend_802F2C3C**, u32*);
+extern "C" void fn_802F2650(SoundInstance_802F1758*, AudioSource**, u32*);
 extern "C" void fn_802F26B0(SoundInstance_802F1758*, float);
 void DumpAudioMemory();
 
-inline void* XSoundCueHandle::SelectSound()
+inline AudioVoiceDefinition* XSoundCueHandle::SelectSound()
 {
     if (definition->useSlider)
-        return fn_802F1460(definition, sliderValue);
-    return fn_802F11A0(definition);
+        return SelectAudioCueVoiceBySlider(definition, sliderValue);
+    return SelectAudioCueVoice(definition);
 }
 
 XSoundCueHandle::XSoundCueHandle(void* resource, XSoundOwner* owner, unsigned int cueIndex,
@@ -49,7 +48,8 @@ XSoundCueHandle::XSoundCueHandle(void* resource, XSoundOwner* owner, unsigned in
     bits.flag8000 = true;
     bits.playWhenPrepared = false;
 
-    this->definition = ((CueResource_802F1758*)m_Slot)->cues->definitions + cueIndex;
+    this->definition = ((AudioResourceLoadOwner*)m_Slot)->m_ResourceObject->cues
+                     + cueIndex;
     this->definition->activeCount++;
     if (this->definition->useSlider)
         bits.flag8000 = false;
@@ -72,7 +72,7 @@ XSoundCueHandle::XSoundCueHandle(void* resource, XSoundOwner* owner, unsigned in
         this->sliderValue = this->slider->value;
     }
 
-    void* selected = SelectSound();
+    AudioVoiceDefinition* selected = SelectSound();
     tDebugPrintManager::Print(DC_SOUND, sCueSelectionMessage, nlLookupDebugString(g_pDebugStringTable, (unsigned long)*(const char**)selected), nlLookupDebugString(g_pDebugStringTable, (unsigned long)this->definition->name));
 
     SoundInstance_802F1758* instance = lbl_8057FAA8.Allocate();
@@ -100,7 +100,7 @@ void GetSoundSources(void* handle, AudioSource** sources, unsigned int* output)
 {
     XSoundCueHandle* cue = (XSoundCueHandle*)handle;
     *output = 0;
-    fn_802F2650(cue->instance, (PlaybackBackend_802F2C3C**)sources, (u32*)output);
+    fn_802F2650(cue->instance, (AudioSource**)sources, (u32*)output);
 }
 
 bool XSoundCueHandle::Play(bool callbackEnabled)
@@ -223,7 +223,7 @@ void XSoundCueHandle::UpdateSlider(float dt)
     if (previousValue != value)
     {
         SoundInstance_802F1758* newInstance;
-        void* selected = SelectSound();
+        AudioVoiceDefinition* selected = SelectSound();
         SoundInstance_802F1758* oldInstance = this->instance;
         if (selected != oldInstance->definition)
         {

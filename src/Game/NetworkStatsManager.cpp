@@ -9,7 +9,11 @@
 #include "Game/FriendManager.h"
 
 #include "Game/GameInfo.h"
+#include "Game/NetTournManager.h"
+#include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkSync.h"
+#include "Game/Team.h"
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/main.h"
@@ -30,6 +34,17 @@ static float sRankingRequestTimeout = 30.0f;
 extern NetworkSeasonDate sNetworkSeasonDates[52];
 extern int sMonthDays[12];
 extern NetworkSeasonDateTable sNetworkSeasonDateTable;
+
+struct NetworkGameResultDetails
+{
+    int mPoints;
+    bool mWon;
+    bool mTied;
+    u8 mPadding06[2];
+    int mResultPoints;
+    int mScorePoints;
+    int mBonusPoints;
+}; // size: 0x14
 
 int NetworkLeaderboardCategory::FindPlayer(int profileId) const
 {
@@ -83,8 +98,8 @@ void NetworkStatsManager::Reset(bool)
     mDisconnectLossPending[1] = false;
     mUnidentifiedC424 = 0;
     mDisconnectLossPending[2] = false;
-    mJobReadIndex = 0;
-    mJobCount = 0;
+    mJobs.mHead = 0;
+    mJobs.mCount = 0;
 
     for (int i = 0; i < 6; ++i)
     {
@@ -493,26 +508,43 @@ int CalculateResultPoints_80130684(int result, bool home, int homeScore,
 void NetworkStatsManager::UpdateOnlineResultTotals(
     int result, bool home, int homeScore, int awayScore)
 {
+    if (g_pNetworkSessionBase->GetSessionMode() != 2)
+    {
+        return;
+    }
     if (IsOnlineRankedMatch())
     {
         return;
     }
 
-    bool won;
-    bool tied;
-    int resultPoints;
-    int scorePoints;
-    int bonusPoints;
-    CalculateResultPoints_80130684(result, home, homeScore, awayScore, &won, &tied, &resultPoints, &scorePoints, &bonusPoints);
+    NetworkGameResultDetails details;
+    details.mPoints = 0;
+    details.mWon = false;
+    details.mTied = false;
+    details.mResultPoints = 0;
+    details.mScorePoints = 0;
+    details.mBonusPoints = 0;
+    details.mPoints = CalculateResultPoints_80130684(result, home, homeScore,
+        awayScore, &details.mWon, &details.mTied, &details.mResultPoints,
+        &details.mScorePoints, &details.mBonusPoints);
 
-    GameInfoManager* gameInfo = GameInfoManager::GetInstance();
-    int* wins = gameInfo->GetUnknown0xAA0(gNetworkSaveSlotIndex);
-    int* losses = gameInfo->GetUnknown0xAA4(gNetworkSaveSlotIndex);
-    int* counter = won ? wins : losses;
-    ++*counter;
-    if (*counter > 9999)
+    int* wins = GameInfoManager::GetInstance()->GetUnknown0xAA0(gNetworkSaveSlotIndex);
+    int* losses = GameInfoManager::GetInstance()->GetUnknown0xAA4(gNetworkSaveSlotIndex);
+    if (details.mWon)
     {
-        *counter = 9999;
+        ++*wins;
+        if (*wins > 9999)
+        {
+            *wins = 9999;
+        }
+    }
+    else
+    {
+        ++*losses;
+        if (*losses > 9999)
+        {
+            *losses = 9999;
+        }
     }
     mSaveDataChanged = true;
 }
@@ -764,9 +796,9 @@ void NetworkStatsManager::OnReportGameResult(bool success, int category)
 
 void NetworkStatsManager::SubmitJob(int job)
 {
-    if (mJobCount < mJobCapacity)
+    if (!mJobs.IsFull())
     {
-        mJobs[(mJobReadIndex + mJobCount++) % mJobCapacity] = job;
+        mJobs.Push(job);
         return;
     }
     tDebugPrintManager::Print(DC_NETWORK, "ERROR JobsQ full failed to submit %d\n", job);
@@ -860,9 +892,9 @@ bool NetworkStatsManager::RefreshFriendStats_80131B50()
             }
             mSaveState = count;
         }
-        if (mJobCount == 0 && mCurrentTime - mOperationStartTime >= sRankingRequestTimeout)
+        if (mJobs.GetCount() == 0 && mCurrentTime - mOperationStartTime >= sRankingRequestTimeout)
             PreGameRestoreDefaultDisconnectLoss();
-        if (mJobCount == 0 && mCurrentTime - mOperationStartTime >= sSecondsPerMinute)
+        if (mJobs.GetCount() == 0 && mCurrentTime - mOperationStartTime >= sSecondsPerMinute)
         {
             SubmitJob(sLeaderboardJobs[mUnidentifiedC410]);
             ++mUnidentifiedC410;
@@ -885,71 +917,120 @@ void NetworkStatsManager::BeginOnlineGame_80131DB4()
 void NetworkStatsManager::Update(float dt)
 {
     mCurrentTime += dt;
-    if (mOperation != 0 && mCurrentTime - mOperationStartTime > sRankingRequestTimeout)
+    if (mOperation != 0)
     {
-        mOperation = 0;
-        mStatsError = true;
+        return;
     }
-    if (mOperation != 0 || mJobCount == 0)
+    if (g_pNetworkSession->mLoginStage != 14)
+    {
+        return;
+    }
+    if (mJobs.GetCount() == 0)
     {
         return;
     }
 
-    int job = mJobs[mJobReadIndex];
-    mJobReadIndex = (mJobReadIndex + 1) % mJobCapacity;
-    --mJobCount;
+    int job = mJobs.Pop();
     switch (job)
     {
     case 0:
-        PostResetMyPlayerStats(0, false);
+        if (g_pNetworkSession->GetRankingReporter()->ReportGameResult(
+                mPersistentCategories[0], 0, 0, 0, false, 0, 0,
+                reinterpret_cast<const NetworkScoreSubmission*>(&mLocalStats[0])))
+        {
+            mOperation = 2;
+            mOperationStartTime = mCurrentTime;
+            mSubmissionCategory = 0;
+        }
+        else
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Initial failure of ReportGameResultSeason\n");
+            mOperation = 0;
+            mStatsError = true;
+        }
         break;
     case 1:
-        PostResetMyPlayerStats(1, false);
+        if (g_pNetworkSession->GetRankingReporter()->ReportGameResult(
+                mPersistentCategories[1], 0, 0, 0, false, 0, 0,
+                reinterpret_cast<const NetworkScoreSubmission*>(&mLocalStats[1])))
+        {
+            mOperation = 2;
+            mOperationStartTime = mCurrentTime;
+            mSubmissionCategory = 1;
+        }
+        else
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Initial failure of ReportGameResultSOD\n");
+            mOperation = 0;
+            mStatsError = true;
+        }
         break;
     case 2:
-        PostResetMyPlayerStats(2, false);
+        if (g_pNetworkSession->GetRankingReporter()->ReportGameResult(
+                mPersistentCategories[2], 0, 0, 0, false, 0, 0,
+                reinterpret_cast<const NetworkScoreSubmission*>(&mLocalStats[2])))
+        {
+            mOperation = 2;
+            mOperationStartTime = mCurrentTime;
+            mSubmissionCategory = 2;
+        }
+        else
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Initial failure of ReportGameResultFriends\n");
+            mOperation = 0;
+            mStatsError = true;
+        }
         break;
     case 3:
-        if (!RequestRankings(2))
+        Instance()->PostResetMyPlayerStats(0, false);
+        break;
+    case 4:
+        Instance()->PostResetMyPlayerStats(1, false);
+        break;
+    case 5:
+        Instance()->PostResetMyPlayerStats(2, false);
+        break;
+    case 6:
+        if (!RequestRankings(0))
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure to RequestRankings STRIKER_OF_DAY Nearby\n");
         }
         break;
-    case 4:
-        if (!RequestRankings(3))
+    case 7:
+        if (!RequestRankings(1))
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure to RequestRankings STRIKER_OF_DAY TOP\n");
         }
         break;
-    case 5:
-        if (!RequestRankings(0))
+    case 8:
+        if (!RequestRankings(2))
         {
-            tDebugPrintManager::Print(DC_NETWORK, "Job initial failure getting nearby season stats\n");
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Job initial failure getting nearby season stats\n");
         }
         break;
-    case 6:
-        if (!RequestRankings(1))
+    case 9:
+        if (!RequestRankings(3))
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure getting TOP season stats\n");
         }
         break;
-    case 7:
+    case 10:
         if (!RequestRankings(4))
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure to RequestRankings Season FRIENDS\n");
         }
         break;
-    case 8:
-    case 9:
-    case 10:
-        RequestRankings(job - 5);
-        break;
     default:
-        tDebugPrintManager::Print(DC_NETWORK, "Bad eJob case %d\n", job);
+        char message[30];
+        nlSNPrintf(message, sizeof(message), "Bad eJob case %d\n", job);
         break;
     }
 
@@ -989,35 +1070,92 @@ void NetworkStatsManager::CalculateAndReportGameResult(int result)
             "A disc error previously occured.  Exiting CalculateAndReportGameResult\n");
         return;
     }
-    if (mGameResultReported)
+
+    int homeScore;
+    int awayScore;
+    BasicGameInfo* gameInfo = GameInfoManager::GetInstance()->GetCurrentGameInfo();
+    if (result == 0)
     {
-        tDebugPrintManager::Print(DC_NETWORK, "Already did CalculateAndReportGameResult..ignoring\n");
-        return;
+        homeScore = gameInfo->GetFinalScore(0);
+        awayScore = gameInfo->GetFinalScore(1);
     }
+    else
+    {
+        homeScore = g_pTeams[0]->m_nScore;
+        awayScore = g_pTeams[1]->m_nScore;
+    }
+
+    if (gNetworkSyncState->mTriggered)
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Detected sync error.  Should end up with net 0 points\n");
+        result = 2;
+    }
+
+    NetworkStatsPlayer home;
+    NetworkStatsPlayer away;
+    int playingSide = GetLocalPlayingSide_801323F4();
+
+    NetworkDraftTeam* homeTeam;
+    NetworkDraftTeam* awayTeam;
+    if (NetTournManager::Instance()->mState != 0)
+    {
+        int homeIndex = NetTournManager::Instance()->MachineIdxToTournamentIdx(0);
+        int awayIndex = NetTournManager::Instance()->MachineIdxToTournamentIdx(1);
+        homeTeam = NetworkDraft::Instance()->FindDraftTeamByPeerIndex(homeIndex);
+        awayTeam = NetworkDraft::Instance()->FindDraftTeamByPeerIndex(awayIndex);
+    }
+    else
+    {
+        homeTeam = NetworkDraft::Instance()->GetDraftTeam(0);
+        awayTeam = NetworkDraft::Instance()->GetDraftTeam(1);
+    }
+
+    char homeName[11] = { 0 };
+    char awayName[11] = { 0 };
+    nlWcsToStr(homeTeam->mPlayers[0].mName, homeName, 11);
+    nlStrNCpy(home.mName, homeTeam->mPlayers[0].mName, 11);
+    nlWcsToStr(awayTeam->mPlayers[0].mName, awayName, 11);
+    nlStrNCpy(away.mName, awayTeam->mPlayers[0].mName, 11);
 
     tDebugPrintManager::Print(DC_NETWORK,
         "Reporting Online Game Results HOME %s %d vs AWAY %s %d I am home: %d AlreadyReported %d\n",
-        "",
-        0,
-        "",
-        0,
-        GetLocalPlayingSide_801323F4() == 0,
+        homeName,
+        homeScore,
+        awayName,
+        awayScore,
+        playingSide == 0,
         mGameResultReported);
-    mUnidentifiedC41C = result;
+
+    if (result == 0 && !mGameResultReported)
+    {
+        UpdateOnlineResultTotals(result, playingSide == 0, homeScore, awayScore);
+    }
+    if (IsOnlineRankedMatch())
+    {
+        ReportGameResult(result, &home, &away, playingSide == 0,
+            homeScore, awayScore, 0);
+    }
     mGameResultReported = true;
 }
 
 bool IsNewNetworkSeason(const NetworkRankingMeta* previous)
 {
+    const NetworkSeasonDateTable* dates = &sNetworkSeasonDateTable;
+    const NetworkRankingMeta* oldStats = previous;
     DWCDate date;
     DWCTime time;
     GetAdjustedNetworkDate(&date, &time);
-    NetworkSeasonDate current = { date.month, date.mday };
+    NetworkSeasonDate current;
+    current.mMonth = date.month;
+    current.mDay = date.mday;
     int currentYear = date.year;
-    int currentSeason = FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, current);
-    NetworkSeasonDate old = { previous->mMonth, previous->mDay };
-    int previousYear = previous->mYear;
-    int previousSeason = FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, old);
+    int currentSeason = FindNetworkSeasonBoundary(dates, current);
+    NetworkSeasonDate old;
+    old.mMonth = oldStats->mMonth;
+    old.mDay = oldStats->mDay;
+    int previousYear = oldStats->mYear;
+    int previousSeason = FindNetworkSeasonBoundary(dates, old);
     if (currentYear != previousYear || currentSeason != previousSeason)
     {
         tDebugPrintManager::Print(DC_NETWORK,
@@ -1129,20 +1267,31 @@ bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time)
 int FindNetworkSeasonBoundary(
     const NetworkSeasonDateTable* dates, NetworkSeasonDate date)
 {
+    int count = dates->mCount;
     int index = 0;
-    for (; index < dates->mCount; ++index)
+    for (; index < count; ++index)
     {
-        if (date.mDay == dates->mDates[index].mDay && date.mMonth == dates->mDates[index].mMonth)
+        if (date.mDay == dates->mDates[index].mDay)
         {
-            return index;
+            if (date.mMonth == dates->mDates[index].mMonth)
+            {
+                return index;
+            }
         }
-        if (dates->mDates[index].mMonth > date.mMonth
-            || (date.mMonth == dates->mDates[index].mMonth && dates->mDates[index].mDay > date.mDay))
+        if (dates->mDates[index].mMonth > date.mMonth)
         {
             break;
         }
+        else if (date.mMonth == dates->mDates[index].mMonth)
+        {
+            if (dates->mDates[index].mDay > date.mDay)
+            {
+                break;
+            }
+        }
     }
-    return index - 1;
+    --index;
+    return index;
 }
 
 static int DayOfYear(NetworkSeasonDate date, int year)
@@ -1196,4 +1345,3 @@ static TweakIntBinding sAddHoursTimeTweak(
     "g_nAddHoursTime", "Network", &g_nAddHoursTime, true);
 static TweakIntBinding sAddMinsTimeTweak(
     "g_nAddMinsTime", "Network", &g_nAddMinsTime, true);
-

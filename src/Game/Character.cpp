@@ -28,7 +28,7 @@
 #include "Game/Render/YoshiEggObject.h"
 #include "Game/Physics/PhysicsYoshiEgg.h"
 #include "Game/Render/BulletBill.h"
-#include "unclassified/tu_80175F8C.h"
+#include "Game/Physics/PhysicsShockwave.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/ExcitementSystem.h"
 #include "Game/UnidentifiedBitPacker.h"
@@ -1413,7 +1413,7 @@ extern "C" void fn_80021050(LightningStrikeData* pEventData)
         {
             fn_80015C38(g_pBall, 9);
         }
-        fn_801768E0(&pEventData->position, pEventData->radius);
+        CreateLightningShockwave(&pEventData->position, pEventData->radius);
     }
 }
 extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData)
@@ -1450,7 +1450,7 @@ extern "C" void fn_80020FD4(CollisionBulletBillData* pEventData)
 {
     if (g_pGame != NULL && pEventData->bulletBill->active)
     {
-        fn_80176754(pEventData->bulletBill);
+        CreateBulletBillShockwave(pEventData->bulletBill);
         pEventData->bulletBill->Hide(false);
         PlayOwnedSound(pEventData->bulletBill->target->mUnidentified318,
             0xFD0DC03DUL, (XSoundOwner*)g_pBall->mUnidentifiedEC, NULL, NULL);

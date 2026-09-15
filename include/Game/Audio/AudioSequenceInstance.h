@@ -6,20 +6,21 @@
 
 class AudioSource;
 struct SoundInstance_802F2110;
-struct PlaybackObject_802F2C3C;
-struct PlaybackRequest_802F2C3C;
+struct AudioSequenceEvent;
+struct AudioSequenceEventDefinition;
 
 struct AudioSequenceDefinition
 {
-    float volume;
-    u32 count;
-    PlaybackRequest_802F2C3C* requests;
+    float volumeOffset;
+    u32 eventCount;
+    AudioSequenceEventDefinition* eventDefinitions;
 };
 
 class AudioSequenceInstance
 {
 public:
-    AudioSequenceInstance(SoundInstance_802F2110* instance, AudioSequenceDefinition* sequence);
+    AudioSequenceInstance(
+        SoundInstance_802F2110* soundInstance, AudioSequenceDefinition* definition);
     ~AudioSequenceInstance();
 
     void Play();
@@ -36,9 +37,9 @@ public:
     static void operator delete(void* instance);
 
     /* 0x00 */ AudioSequenceInstance* next;
-    /* 0x04 */ SoundInstance_802F2110* instance;
-    /* 0x08 */ AudioSequenceDefinition* sequence;
-    /* 0x0C */ PlaybackObject_802F2C3C* objects;
+    /* 0x04 */ SoundInstance_802F2110* soundInstance;
+    /* 0x08 */ AudioSequenceDefinition* definition;
+    /* 0x0C */ AudioSequenceEvent* events;
     /* 0x10 */ float volumeOffset;
     /* 0x14 */ float pitchOffset;
     /* 0x18 */ bool stopped;

@@ -248,8 +248,8 @@ void SHOnlineGuestControllerSelect::OnDonePointerPress(int, void*)
 
 void SHOnlineGuestControllerSelect::SceneCreated()
 {
-    TLComponentInstance* screen = 0;
     SHNavigation* object = GetNavigationScene();
+    TLComponentInstance* screen = 0;
     if (object != 0)
     {
         object->HideButtons();
@@ -260,23 +260,19 @@ void SHOnlineGuestControllerSelect::SceneCreated()
     mNavigation.SetButtonInstance(screen);
     mDoneButtonInstance->m_bVisible = false;
 
-    TLComponentInstance* sideGroup = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
+    TLComponentInstance* sideGroup = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide,
         nlStringLowerHash("Layer"),
         nlStringLowerHash("home"),
         0,
         0,
         0,
         0);
-    if (sideGroup == 0)
-    {
-        sideGroup = &UnidentifiedTLComponentDefault::sInstance;
-    }
     mHomeInstance = sideGroup;
     mHomeInstance->SetActiveSlide("controllers", true, false);
 
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
     TLComponentInstance* homeController = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance,

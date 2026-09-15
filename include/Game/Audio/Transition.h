@@ -5,8 +5,28 @@
 
 struct Transition
 {
+    Transition()
+    {
+        value = 0.0f;
+        valid = true;
+        elapsed = -1.0f;
+        duration = 1.0f;
+        enabled = true;
+    }
+
     virtual float GetValue();
     virtual void Update(float dt, float multiplier);
+
+    void SetTarget(float newTarget, float transitionTime)
+    {
+        if (newTarget < minimum)
+            target = minimum;
+        else if (newTarget > maximum)
+            target = maximum;
+        else
+            target = newTarget;
+        elapsed = transitionTime;
+    }
 
     float value;
     u8 valid;

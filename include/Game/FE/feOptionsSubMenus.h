@@ -39,9 +39,9 @@ public:
     void fn_801D4F70(int index, void* context);
     void fn_801D5108(int index, void* context);
     void fn_801D5278(int index, void* context);
-    void fn_801D575C(int index);
-    void fn_801D57D8(int index);
-    void fn_801D583C();
+    void fn_801D575C(int index, void* context);
+    void fn_801D57D8(int index, void* context);
+    void fn_801D583C(int index, void* context);
     void fn_801D58EC(int setting);
 
     bool UnidentifiedVolumeButtonEnabled(unsigned int item) const
@@ -87,7 +87,7 @@ public:
     /* 0x687 */ u8 mPadding687;
     /* 0x688 */ int mSettings[3];
     /* 0x694 */ int mBackupSettings[3];
-    /* 0x6A0 */ u8 mUnidentified6A0[0x60];
+    /* 0x6A0 */ u16 mFormattedSettings[3][16];
     /* 0x700 */ int mState;
 }; // size 0x704
 
@@ -106,9 +106,9 @@ public:
     void fn_801D7EC8(int index, void* context);
     void fn_801D7F9C(int index, void* context);
     void fn_801D8048(int index, void* context);
-    void fn_801D8458(int index);
-    void fn_801D84D4(int index);
-    void fn_801D8538();
+    void fn_801D8458(int index, void* context);
+    void fn_801D84D4(int index, void* context);
+    void fn_801D8538(int index, void* context);
 
     /* 0x028 */ int mUnidentified28;
     /* 0x02C */ FEBackButton mNavigation;
@@ -123,7 +123,7 @@ public:
     /* 0x6C6 */ bool mUnidentified6C6;
     /* 0x6C7 */ u8 mPadding6C7;
     /* 0x6C8 */ int mSettings[2];
-    /* 0x6D0 */ u8 mUnidentified6D0[0x20];
+    /* 0x6D0 */ u16 mFormattedZoomLevel[16];
     /* 0x6F0 */ int mState;
     /* 0x6F4 */ int mBackupSettings[2];
 }; // size 0x6FC

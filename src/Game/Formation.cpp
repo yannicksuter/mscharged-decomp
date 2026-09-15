@@ -1169,17 +1169,17 @@ float FormationEval::IsFielderInPosition(
     float distToTarget = nlVec2Length(offset2);
 
     float normalizedDist = NormalizeVal(distToDesired,
-        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.x,
-        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistX,
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistY);
 
     float inDist = Interpolate(
-        gGameTweaks.m_pGameTweaks->vGetInPositionInRadius.x,
-        gGameTweaks.m_pGameTweaks->vGetInPositionInRadius.y,
+        gGameTweaks.m_pGameTweaks->vGetInPositionInRadiusX,
+        gGameTweaks.m_pGameTweaks->vGetInPositionInRadiusY,
         normalizedDist);
 
     float outDist = Interpolate(
-        gGameTweaks.m_pGameTweaks->vGetInPositionOutRadius.x,
-        gGameTweaks.m_pGameTweaks->vGetInPositionOutRadius.y,
+        gGameTweaks.m_pGameTweaks->vGetInPositionOutRadiusX,
+        gGameTweaks.m_pGameTweaks->vGetInPositionOutRadiusY,
         normalizedDist);
 
     float result = 0.0f;
@@ -1258,8 +1258,8 @@ float FormationDefensive::IsFielderInPosition(
         = nlSqrt(keyOffset.x * keyOffset.x + keyOffset.y * keyOffset.y, true);
 
     fPercent = NormalizeVal(fPercent,
-        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.x,
-        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistX,
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistY);
 
     nlVector3 v3FielderPos = pFielder->mUnidentified024.m_v3Position;
     nlVector3 v3NetLocation = pFielder->GetAIOffNetLocation(0);
@@ -1384,8 +1384,8 @@ float FormationOffensive::IsFielderInPosition(
         = nlSqrt(keyOffset.x * keyOffset.x + keyOffset.y * keyOffset.y, true);
 
     fPercent = NormalizeVal(fPercent,
-        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.x,
-        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDist.y);
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistX,
+        gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistY);
 
     nlVector3 v3FielderPos = pFielder->mUnidentified024.m_v3Position;
     nlVector3 v3NetLocation = pFielder->GetAIOffNetLocation(0);

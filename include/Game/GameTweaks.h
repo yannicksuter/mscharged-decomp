@@ -4,12 +4,6 @@
 #include "Game/CharacterTweaks.h"
 #include "Game/AI/SkillTweaks.h"
 
-struct TweakVector2
-{
-    TweakFloatBinding x;
-    TweakFloatBinding y;
-};
-
 class GameTweaks : public TweaksBase
 {
 public:
@@ -21,9 +15,12 @@ public:
 public:
     /* 0x044 */ TweakFloatBinding fGameDuration;
     /* 0x054 */ TweakFloatBinding fFielderAttributeWeight;
-    /* 0x064 */ TweakVector2 vGetInPositionKeyFielderDist;
-    /* 0x084 */ TweakVector2 vGetInPositionInRadius;
-    /* 0x0A4 */ TweakVector2 vGetInPositionOutRadius;
+    /* 0x064 */ TweakFloatBinding vGetInPositionKeyFielderDistX;
+    /* 0x074 */ TweakFloatBinding vGetInPositionKeyFielderDistY;
+    /* 0x084 */ TweakFloatBinding vGetInPositionInRadiusX;
+    /* 0x094 */ TweakFloatBinding vGetInPositionInRadiusY;
+    /* 0x0A4 */ TweakFloatBinding vGetInPositionOutRadiusX;
+    /* 0x0B4 */ TweakFloatBinding vGetInPositionOutRadiusY;
     /* 0x0C4 */ TweakFloatBinding nStrafeToRunInDirectionDelta;
     /* 0x0D4 */ TweakFloatBinding nBackwardsToStrafeRunInDirectionDelta;
     /* 0x0E4 */ TweakFloatBinding nStrafeToRunOutDirectionDelta;
@@ -169,6 +166,10 @@ public:
     /* 0x9A4 */ TweakFloatBinding fShotHeightVariance;
     /* 0x9B4 */ const char* mCategory;
 }; // total size: 0x9B8
+
+inline GameTweaks::~GameTweaks()
+{
+}
 
 struct TerrainTweaks
 {

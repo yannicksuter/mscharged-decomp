@@ -15,6 +15,7 @@
 #include "Game/Game.h"
 #include "Game/Goalie.h"
 #include "Game/Physics/PhysicsCharacter.h"
+#include "Game/Physics/PhysicsShockwave.h"
 #include "Game/Player.h"
 #include "Game/SAnim.h"
 #include "NL/nlString.h"
@@ -64,7 +65,6 @@ extern "C" void fn_800611F0(cGame* pGame, const void* pEventData);
 extern "C" void fn_80060FF4(cGame* pGame, const void* pEventData);
 extern "C" EffectsGroup* fn_802E7D54(EmissionManager* pManager, unsigned long uHash);
 extern "C" void fn_802E83C4(EmissionManager* pManager, const EffectsGroup* pEffectsGroup);
-class PhysicsSphere_80175F8C;
 extern cCharacter* lbl_806E0C34;
 extern "C" bool fn_8019464C(cCharacter*);
 extern "C" bool fn_80194660(cCharacter*);
@@ -76,7 +76,6 @@ extern "C" void fn_800318F8(cFielder*);
 extern "C" void fn_800395C0(cFielder*);
 extern "C" void fn_800367B4(cFielder*);
 extern "C" void fn_80039CF0(cFielder*, int);
-extern "C" PhysicsSphere_80175F8C* fn_801765C8(cFielder*, const nlVector3*, float);
 
 extern "C" float fn_801BE138(TweakFloatBinding* pTweak);
 extern "C" int fn_801BE130(cFielder* pFielder);
@@ -572,7 +571,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
             break;
 
         case 0xC21A0381:
-            fn_801765C8((cFielder*)lbl_806E0C34, fn_800D1450(lbl_806E0C34),
+            CreateHitShockwave((cFielder*)lbl_806E0C34, fn_800D1450(lbl_806E0C34),
                 fn_801BE138(&gGameTweaks.mFielderTweaks->mUnidentified414));
             fn_801BB20C(lbl_806E0C34);
             break;

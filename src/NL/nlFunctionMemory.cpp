@@ -2,9 +2,19 @@
 
 #include "NL/nlSmallBlockAllocator.h"
 
-nlSlotPoolFixed<0x10> gFunctionMemoryPool16(0x40, 0);
-nlSlotPoolFixed<0x20> gFunctionMemoryPool32(0x200, 0);
-nlSlotPoolFixed<0x40> gFunctionMemoryPool64(0x40, 0);
+template <int BlockSize>
+class UnidentifiedFunctionMemoryPool : public UnidentifiedSlotPoolFixedState<BlockSize>
+{
+public:
+    UnidentifiedFunctionMemoryPool(const int initial, const int delta)
+    {
+        this->Initialize(initial, delta);
+    }
+};
+
+UnidentifiedFunctionMemoryPool<0x10> gFunctionMemoryPool16(0x40, 0);
+UnidentifiedFunctionMemoryPool<0x20> gFunctionMemoryPool32(0x200, 0);
+UnidentifiedFunctionMemoryPool<0x40> gFunctionMemoryPool64(0x40, 0);
 
 void PushFunctionMemoryState()
 {

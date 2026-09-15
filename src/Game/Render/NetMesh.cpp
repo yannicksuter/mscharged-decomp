@@ -621,9 +621,9 @@ void NetMesh::AddForcesToBall(
         }
 
         float forceMagnitude
-            = -(m_fBallPenetrationDepth * s_fReboundForceCoefficient);
+            = m_fBallPenetrationDepth * s_fReboundForceCoefficient;
         force = m_v3BallPenetrationNormal;
-        nlVec3Scale(force, force, forceMagnitude);
+        nlVec3Scale(force, force, -forceMagnitude);
 
         if (sphere != 0)
         {

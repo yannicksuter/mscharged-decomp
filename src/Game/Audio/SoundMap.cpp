@@ -6,13 +6,6 @@
 #include "NL/nlChunk.h"
 #include "NL/nlMemory.h"
 
-static inline const char* GetSoundCueString(u32 value)
-{
-    if (value != 0)
-        return nlLookupDebugString(g_pDebugStringTable, value);
-    return "--";
-}
-
 u32 SoundMap::FindCue(
     u32 field0, u32 field4, u32 field8, u32 fieldC)
 {
@@ -38,11 +31,6 @@ void SoundMap::Unload()
 
 SoundMap* SoundMap::ParseChunk(nlChunk* chunk)
 {
-    const char* fieldCString;
-    const char* field8String;
-    const char* field4String;
-    SoundCueTreeIterator::Entry* current;
-
     nlChunk* mapChunk = chunk->GetFirstChunk();
     SoundMap* map = (SoundMap*)mapChunk->GetData();
     nlChunk* cuesChunk = mapChunk->GetNextChunk();
@@ -61,18 +49,17 @@ SoundMap* SoundMap::ParseChunk(nlChunk* chunk)
         map->m_CueTree->GetIterator();
     while (iterator->IsValid())
     {
-        fieldCString = GetSoundCueString(
-            iterator->Current()->value->field_0xC);
-        field8String = GetSoundCueString(
-            iterator->Current()->value->field_0x8);
-        field4String = GetSoundCueString(
-            iterator->Current()->value->field_0x4);
-        current = iterator->Current();
         tDebugPrintManager::Print(DC_SOUND, " SoundCue %d = %s (%u),%s,%s,%s\n",
-            iterator->Current()->value->field_0x10,
-            GetSoundCueString(current->value->field_0x0),
-            current->value->field_0x0, field4String, field8String,
-            fieldCString);
+            iterator->CurrentValue()->field_0x10,
+            iterator->CurrentValue()->field_0x0 != 0
+                ? nlLookupDebugString(g_pDebugStringTable, iterator->CurrentValue()->field_0x0) : "--",
+            iterator->CurrentValue()->field_0x0,
+            iterator->CurrentValue()->field_0x4 != 0
+                ? nlLookupDebugString(g_pDebugStringTable, iterator->CurrentValue()->field_0x4) : "--",
+            iterator->CurrentValue()->field_0x8 != 0
+                ? nlLookupDebugString(g_pDebugStringTable, iterator->CurrentValue()->field_0x8) : "--",
+            iterator->CurrentValue()->field_0xC != 0
+                ? nlLookupDebugString(g_pDebugStringTable, iterator->CurrentValue()->field_0xC) : "--");
         iterator->Next();
     }
     if (iterator != 0)

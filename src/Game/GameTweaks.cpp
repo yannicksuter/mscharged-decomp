@@ -8,10 +8,6 @@
 
 #include <stdlib.h>
 
-GameTweaks::~GameTweaks()
-{
-}
-
 GameTweaks::GameTweaks(const char* name, const char* category)
     : TweaksBase(name)
     , mCategory(category)
@@ -125,12 +121,12 @@ void GameTweaks::Init()
 {
     fGameDuration.BindWithDefault("Game Duration", (float)GameInfoManager::Instance()->GetCurrentSettings()->GameTime, mCategory, false, 0.0f, 0.0f, 0.0f);
     fFielderAttributeWeight.BindWithDefault("Fielder Attributes Weight", 0.2f, mCategory, false, 0.0f, 0.0f, 0.0f);
-    vGetInPositionKeyFielderDist.x.BindWithDefault("Get In Position Key Fielder Min Distance", 2.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
-    vGetInPositionKeyFielderDist.y.BindWithDefault("Get In Position Key Fielder Max Distance", 12.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
-    vGetInPositionInRadius.x.BindWithDefault("At Target Position Min Radius", 0.3f, mCategory, false, 0.0f, 0.0f, 0.0f);
-    vGetInPositionInRadius.y.BindWithDefault("At Target Position Max Radius", 0.6f, mCategory, false, 0.0f, 0.0f, 0.0f);
-    vGetInPositionOutRadius.x.BindWithDefault("At Target Remain At Position Min Radius", 1.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
-    vGetInPositionOutRadius.y.BindWithDefault("At Target Remain At Position Max Radius", 4.5f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    vGetInPositionKeyFielderDistX.BindWithDefault("Get In Position Key Fielder Min Distance", 2.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    vGetInPositionKeyFielderDistY.BindWithDefault("Get In Position Key Fielder Max Distance", 12.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    vGetInPositionInRadiusX.BindWithDefault("At Target Position Min Radius", 0.3f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    vGetInPositionInRadiusY.BindWithDefault("At Target Position Max Radius", 0.6f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    vGetInPositionOutRadiusX.BindWithDefault("At Target Remain At Position Min Radius", 1.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    vGetInPositionOutRadiusY.BindWithDefault("At Target Remain At Position Max Radius", 4.5f, mCategory, false, 0.0f, 0.0f, 0.0f);
     nStrafeToRunInDirectionDelta.BindWithDefault("Run To Strafe Angle", 11500.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
     nBackwardsToStrafeRunInDirectionDelta.BindWithDefault("Backwards To Strafe Angle", 23000.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
     nStrafeToRunOutDirectionDelta.BindWithDefault("Strafe To Run Angle", 9000.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
@@ -274,4 +270,3 @@ void GameTweaks::Init()
     fShotWidthVariance.BindWithDefault("Shot Width Variance", 0.12f, mCategory, false, 0.0f, 0.0f, 0.0f);
     fShotHeightVariance.BindWithDefault("Shot Height Variance", 0.06f, mCategory, false, 0.0f, 0.0f, 0.0f);
 }
-

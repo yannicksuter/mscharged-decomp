@@ -11,6 +11,12 @@ nlMatrix4& nlMakeRotationMatrixZ(nlMatrix4& out, float theta);
 nlMatrix4& nlMakeRotationMatrixY(nlMatrix4& out, float theta);
 nlMatrix4& nlMakeRotationMatrixX(nlMatrix4& out, float theta);
 void nlMultDirVectorMatrix(nlVector3& result, const nlVector3& direction, const nlMatrix4& transformMatrix);
+inline void nlMultDirVectorMatrix(nlVector3& direction, const nlMatrix4& transformMatrix)
+{
+    nlVector3 result;
+    nlMultDirVectorMatrix(result, direction, transformMatrix);
+    direction = result;
+}
 void nlMultVectorMatrix(nlVector4& out, const nlVector4& in, const nlMatrix4& m);
 inline void nlMultVectorMatrix(nlVector4& v, const nlMatrix4& m)
 {

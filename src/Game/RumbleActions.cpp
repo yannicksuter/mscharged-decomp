@@ -1,7 +1,12 @@
+#include "revolution/wpad/WPAD.h"
+
 #include "Game/RumbleActions.h"
 
 #include "Game/NetworkPeer.h"
+#include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/globalpad.h"
+#include "NL/nlConfig.h"
 #include "types.h"
 
 struct RumbleOp
@@ -21,36 +26,44 @@ struct RumbleActionState
     float timer;
 };
 
-extern unsigned char gRumbleSettings[];
-extern RumbleActionState gRumbleActionStates[4];
-extern bool gRumbleEnabledOverride;
+RumbleOp opArrayShotContact[] = {
+    { 0, 0x29A },
+    { 2, 0 },
+};
 
-void PlayRumbleAction(int preset, DetInput* input)
-{
-    cGlobalPad* pad = 0;
-    if (input != 0)
-    {
-        pad = ((NetworkPeerChannel*)input->m_pMyUser)->GetLocalChannelPad();
-    }
-    BeginRumbleAction((eRumbleActionPreset)preset, pad);
-}
+RumbleOp opArraySolidContact[] = {
+    { 0, 0x1BC },
+    { 2, 0 },
+};
 
-bool IsRumbleActionActive(cGlobalPad* pad)
-{
-    if (pad == 0)
-    {
-        return false;
-    }
-    return gRumbleActionStates[pad->m_padIndex].active;
-}
+RumbleOp opArrayMediumContact[] = {
+    { 0, 0xDE },
+    { 2, 0 },
+};
+
+RumbleOp opArraySmallContact[] = {
+    { 0, 0x6F },
+    { 2, 0 },
+};
+
+RumbleOp lbl_8050DFF8[] = {
+    { 0, 0x2D },
+    { 1, 0x96 },
+    { 2, 0 },
+};
+
+static TweakValueBool g_bRumbleOn(
+    "g_bRumbleOn", "Controller Config", true);
+static RumbleActionState rumbleActionState[4];
+bool gRumbleEnabledOverride;
 
 void UpdateRumbleActions(float dt)
 {
-    if (gRumbleSettings[0xA] || gRumbleEnabledOverride)
+    if (g_bRumbleOn || gRumbleEnabledOverride)
     {
         for (int padIndex = 0; padIndex < 4; padIndex++)
         {
-            RumbleActionState* state = &gRumbleActionStates[padIndex];
+            RumbleActionState* state = &rumbleActionState[padIndex];
             if (state->active != 0)
             {
                 cGlobalPad* pad = g_pPadManager->GetPad(padIndex);
@@ -110,4 +123,96 @@ void UpdateRumbleActions(float dt)
             }
         }
     }
+}
+
+void PlayRumbleAction(int preset, DetInput* input)
+{
+    cGlobalPad* pad = 0;
+    if (input != 0)
+    {
+        pad = ((NetworkPeerChannel*)input->m_pMyUser)->GetLocalChannelPad();
+    }
+    BeginRumbleAction((eRumbleActionPreset)preset, pad);
+}
+
+static inline void StopRumble(cGlobalPad* pad)
+{
+    if ((g_bRumbleOn || gRumbleEnabledOverride) && pad != 0)
+    {
+        int idx = pad->m_padIndex;
+        pad->StopRumble();
+
+        rumbleActionState[idx].active = false;
+        rumbleActionState[idx].pending = false;
+        rumbleActionState[idx].ops = 0;
+        rumbleActionState[idx].current = 0;
+    }
+}
+
+void BeginRumbleAction(eRumbleActionPreset preset, cGlobalPad* pad)
+{
+    g_bRumbleOn
+        = WPADIsMotorEnabled() && preset != RUMBLE_POINTER_HOVER;
+    gRumbleEnabledOverride
+        = WPADIsMotorEnabled() && preset == RUMBLE_POINTER_HOVER;
+
+    if (!Config::Global().Get<bool>("rumble", true))
+    {
+        g_bRumbleOn = false;
+    }
+
+    if (preset == RUMBLE_POINTER_HOVER
+        && !Config::Global().Get<bool>("fe_rumble", true))
+    {
+        gRumbleEnabledOverride = false;
+    }
+
+    if ((g_bRumbleOn || gRumbleEnabledOverride) && pad != 0)
+    {
+        RumbleOp* ops;
+        int idx = pad->m_padIndex;
+
+        switch (preset)
+        {
+        case 0:
+            StopRumble(pad);
+            return;
+        case RUMBLE_SMALL_CONTACT:
+            ops = opArraySmallContact;
+            break;
+        case RUMBLE_MEDIUM_CONTACT:
+            ops = opArrayMediumContact;
+            break;
+        case RUMBLE_SOLID_CONTACT:
+            ops = opArraySolidContact;
+            break;
+        case RUMBLE_SHOT_CONTACT:
+            ops = opArrayShotContact;
+            break;
+        case RUMBLE_POINTER_HOVER:
+            ops = lbl_8050DFF8;
+            break;
+        default:
+            return;
+        }
+
+        rumbleActionState[idx].active = true;
+        rumbleActionState[idx].pending = false;
+        rumbleActionState[idx].current = 0;
+        rumbleActionState[idx].ops = ops;
+    }
+}
+
+void StopRumbleAction(cGlobalPad* pad)
+{
+    StopRumble(pad);
+}
+
+bool IsRumbleActionActive(cGlobalPad* pad)
+{
+    if (pad == 0)
+    {
+        return false;
+    }
+    return rumbleActionState[pad->m_padIndex].active;
 }
