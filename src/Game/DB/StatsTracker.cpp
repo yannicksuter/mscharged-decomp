@@ -66,7 +66,7 @@ public:
 
     virtual ~StatsTypedEvent2() { }
     virtual void Disconnect(void*) = 0;
-    virtual void Add(Function2<void, P1, P2>&, unsigned int, int) = 0;
+    virtual void Add(Function2<void, P1, P2>, unsigned int, int) = 0;
 };
 
 extern StatsEventRegistry* g_pEventRegistry;
@@ -276,59 +276,17 @@ void StatsTracker::ResetCurrentStats()
 
 void StatsTracker::CreateEventHandler()
 {
-    {
-        Function<PenaltyStatsData*> callback(OnPenalty);
-        FindStatsEvent<PenaltyStatsData>("Penalty")->Add(callback, 0, -1);
-    }
-    {
-        Function<GoalieSaveData*> callback(OnGoalieSave);
-        FindStatsEvent<GoalieSaveData>("GoalieSave")->Add(callback, 0, -1);
-    }
-    {
-        Function<PassBallData*> callback(OnPassBall);
-        FindStatsEvent<PassBallData>("PassBall")->Add(callback, 0, -1);
-    }
-    {
-        Function<ReceiveBallData*> callback(OnReceiveBall);
-        FindStatsEvent<ReceiveBallData>("ReceiveBall")
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<GoalScoredStatsData*> callback(OnGoalScored);
-        FindStatsEvent<GoalScoredStatsData>("GoalScored")
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<MegaStrikeEndData*> callback(OnMegastrikeEnd);
-        FindStatsEvent<MegaStrikeEndData>("MegastrikeEnd")
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<AttackStatsData*> callback(OnAttackSuccess);
-        FindStatsEvent<AttackStatsData>("AttackSuccess")
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<AttackStatsData*> callback(OnAttackAttempt);
-        FindStatsEvent<AttackStatsData>("AttackAttempt")
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<PowerupStatsData*> callback(OnPowerupStats);
-        FindStatsEvent<PowerupStatsData>("PowerupStats")
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function2<void, int, int> callback(OnBallStateChange);
-        FindStatsEvent2<int, int>("BallStateChange")
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBallGoalpostData*> callback(
-            OnCollisionBallGoalpost);
-        FindStatsEvent<CollisionBallGoalpostData>("CollisionBallGoalpost")
-            ->Add(callback, 0, -1);
-    }
+    FindStatsEvent<PenaltyStatsData>("Penalty")->Add(Function<PenaltyStatsData*>(OnPenalty), 0, -1);
+    FindStatsEvent<GoalieSaveData>("GoalieSave")->Add(Function<GoalieSaveData*>(OnGoalieSave), 0, -1);
+    FindStatsEvent<PassBallData>("PassBall")->Add(Function<PassBallData*>(OnPassBall), 0, -1);
+    FindStatsEvent<ReceiveBallData>("ReceiveBall")->Add(Function<ReceiveBallData*>(OnReceiveBall), 0, -1);
+    FindStatsEvent<GoalScoredStatsData>("GoalScored")->Add(Function<GoalScoredStatsData*>(OnGoalScored), 0, -1);
+    FindStatsEvent<MegaStrikeEndData>("MegastrikeEnd")->Add(Function<MegaStrikeEndData*>(OnMegastrikeEnd), 0, -1);
+    FindStatsEvent<AttackStatsData>("AttackSuccess")->Add(Function<AttackStatsData*>(OnAttackSuccess), 0, -1);
+    FindStatsEvent<AttackStatsData>("AttackAttempt")->Add(Function<AttackStatsData*>(OnAttackAttempt), 0, -1);
+    FindStatsEvent<PowerupStatsData>("PowerupStats")->Add(Function<PowerupStatsData*>(OnPowerupStats), 0, -1);
+    FindStatsEvent2<int, int>("BallStateChange")->Add(Function2<void, int, int>(OnBallStateChange), 0, -1);
+    FindStatsEvent<CollisionBallGoalpostData>("CollisionBallGoalpost")->Add(Function<CollisionBallGoalpostData*>(OnCollisionBallGoalpost), 0, -1);
 }
 
 void StatsTracker::DestroyEventHandler()

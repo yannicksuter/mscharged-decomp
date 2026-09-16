@@ -78,23 +78,22 @@ static inline void CastDirectional(nlVector3& p, const nlVector3& lightPos)
 {
     nlVector3 V;
     nlVector3 Q;
-    nlVector3 L = lightPos;
 
     V.x = 0.0f;
     V.y = 0.0f;
     V.z = 1.0f;
-    Q.x = p.x;
-    Q.y = p.y;
-    Q.z = p.z;
+    nlVec3Set(Q, p.x, p.y, p.z);
+    nlVector3 L = lightPos;
 
     nlVec3Scale(L, nlRecipSqrt(L.GetLengthSq3D(), false));
 
-    float t = -((V.x * Q.x + V.y * Q.y + V.z * Q.z)
-        / (V.x * L.x + V.y * L.y + V.z * L.z));
+    float num = nlVec3DotProduct(V, Q);
+    float den = nlVec3DotProduct(V, L);
+    float t = -(num / den);
 
+    p.z = Q.z + t * L.z;
     p.x = Q.x + t * L.x;
     p.y = Q.y + t * L.y;
-    p.z = Q.z + t * L.z;
 }
 
 static void DrawBallShadow(
@@ -285,13 +284,16 @@ static void RenderBlobShadow(const nlVector3& vPosition,
 
 void RenderProjectedShadow(const ProjectedShadowParams& params)
 {
+    nlVector3 vDir;
     nlVector3 vTemp;
     nlVector3 p[4];
+    nlVector3 dir;
+    nlVector3 light;
     nlVector3 vLight;
-    nlVector3 vDir;
     float radius;
     nlColour c;
-    nlVector3 dir;
+    nlColour colour;
+    nlMatrix4 mLight;
 
     if (g_bShadowBlobs)
     {
@@ -329,10 +331,11 @@ void RenderProjectedShadow(const ProjectedShadowParams& params)
 
         nlVector3 vUp = { 0.0f, 0.0f, 1.0f };
         nlVector3 vRight;
-        nlVec3CrossProduct(vRight, vDir, vUp);
 
         vTemp = params.vPosition;
         vTemp.z += 0.5f * params.fHeight;
+
+        nlVec3CrossProduct(vRight, vDir, vUp);
 
         nlVec3Scale(vRight,
             nlRecipSqrt(vRight.GetLengthSq3D(), true));
@@ -354,12 +357,13 @@ void RenderProjectedShadow(const ProjectedShadowParams& params)
 
     if (g_bShadowBounds)
     {
-        g_ShapeRenderer.DrawLine3D(p[0], p[1], c, false);
-        g_ShapeRenderer.DrawLine3D(p[1], p[2], c, false);
-        g_ShapeRenderer.DrawLine3D(p[2], p[3], c, false);
-        g_ShapeRenderer.DrawLine3D(p[3], p[0], c, false);
-        g_ShapeRenderer.DrawLine3D(p[0], p[2], c, false);
-        g_ShapeRenderer.DrawLine3D(p[1], p[3], c, false);
+        nlColour colour = c;
+        g_ShapeRenderer.DrawLine3D(p[0], p[1], colour, false);
+        g_ShapeRenderer.DrawLine3D(p[1], p[2], colour, false);
+        g_ShapeRenderer.DrawLine3D(p[2], p[3], colour, false);
+        g_ShapeRenderer.DrawLine3D(p[3], p[0], colour, false);
+        g_ShapeRenderer.DrawLine3D(p[0], p[2], colour, false);
+        g_ShapeRenderer.DrawLine3D(p[1], p[3], colour, false);
     }
 
     {
@@ -374,12 +378,13 @@ void RenderProjectedShadow(const ProjectedShadowParams& params)
     if (g_bShadowBounds)
     {
         nlColourSet(c, 0x40, 0xFF, 0x40, 0xFF);
-        g_ShapeRenderer.DrawLine3D(p[0], p[1], c, false);
-        g_ShapeRenderer.DrawLine3D(p[1], p[2], c, false);
-        g_ShapeRenderer.DrawLine3D(p[2], p[3], c, false);
-        g_ShapeRenderer.DrawLine3D(p[3], p[0], c, false);
-        g_ShapeRenderer.DrawLine3D(p[0], p[2], c, false);
-        g_ShapeRenderer.DrawLine3D(p[1], p[3], c, false);
+        nlColour colour = c;
+        g_ShapeRenderer.DrawLine3D(p[0], p[1], colour, false);
+        g_ShapeRenderer.DrawLine3D(p[1], p[2], colour, false);
+        g_ShapeRenderer.DrawLine3D(p[2], p[3], colour, false);
+        g_ShapeRenderer.DrawLine3D(p[3], p[0], colour, false);
+        g_ShapeRenderer.DrawLine3D(p[0], p[2], colour, false);
+        g_ShapeRenderer.DrawLine3D(p[1], p[3], colour, false);
 
         dir = vTemp;
         CastDirectional(dir, vDir);
@@ -388,10 +393,10 @@ void RenderProjectedShadow(const ProjectedShadowParams& params)
 
     {
         float newAntiFlimmer = GetCoPlanarZ();
-        nlColour colour = { 0, 0, 0, 0 };
         float oldAntiFlimmer = g_AntiFlimmer;
         g_AntiFlimmer = newAntiFlimmer;
 
+        *(u32*)&colour = 0;
         colour.c[3] = (u8)(g_Alpha[0] * params.fScalar);
 
         RenderBlobShadow(
@@ -401,11 +406,13 @@ void RenderProjectedShadow(const ProjectedShadowParams& params)
 
     if (g_bShadowBounds)
     {
-        nlMatrix4 mLight;
+        nlVec3Set(light,
+            params.vLight.x, params.vLight.y, params.vLight.z);
+
         mLight.SetIdentity();
-        mLight.m41 = params.vLight.x;
-        mLight.m42 = params.vLight.y;
-        mLight.m43 = params.vLight.z;
+        mLight.m41 = light.x;
+        mLight.m42 = light.y;
+        mLight.m43 = light.z;
         mLight.m44 = 1.0f;
 
         c.c[0] = 0xFF;

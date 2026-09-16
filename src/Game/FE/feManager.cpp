@@ -30,7 +30,6 @@
 
 #include "NL/glx/glxSwap.h"
 #include "NL/globalpad.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFunction.h"
 #include "NL/nlPrint.h"
@@ -42,10 +41,7 @@
 #include "unclassified/tu_80284A58.h"
 #include "Game/InputManager.h"
 #include "Game/OverlayManager.h"
-
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry;
+#include "Game/EventRegistry.h"
 
 extern "C"
 {
@@ -53,7 +49,6 @@ extern "C"
     bool DuringEndOfGamePresentation(UnidentifiedPresentationState* presentation);
     void GoalieOnGameOver();
 
-    extern UnidentifiedEventRegistry* g_pEventRegistry;
     extern float g_AllActorsHidden;
 }
 
@@ -102,41 +97,11 @@ void FrontEnd::Reset()
     AlreadyStartedStrikers101Menu = 0;
     DontCheckForControllerRemovalHack = 0;
 
-    {
-        Function<FnVoidVoid> callback(OnGetReadyForKickoff);
-        UnidentifiedEventBase** foundEvent;
-        unsigned int hash;
-        hash = HashEventName("GetReadyForKickoff", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventNoData>*)event)
-            ->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(OnGetReadyForKickoff), 0, -1);
 
-    {
-        Function<FnVoidVoid> callback(OnPresentationBypass);
-        UnidentifiedEventBase** foundEvent;
-        unsigned int hash;
-        hash = HashEventName("PresentationBypass", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventNoData>*)event)
-            ->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("PresentationBypass", -1)->Add(Function<FnVoidVoid>(OnPresentationBypass), 0, -1);
 
-    {
-        Function<FnVoidVoid> callback(OnGameOver);
-        UnidentifiedEventBase** foundEvent;
-        unsigned int hash;
-        hash = HashEventName("GameOver", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventNoData>*)event)
-            ->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnGameOver), 0, -1);
 }
 
 static const float sPauseCameraAnimationSpeed[1] = { 0.3f };

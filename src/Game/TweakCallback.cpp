@@ -23,13 +23,3 @@ void TweakCallback::Register()
 
     nlListAddEnd(&sTweakCallbackHead, &sTweakCallbackTail, this);
 }
-
-int TweakCallback::GetValueType()
-{
-    int result = 6;
-    if (mUnidentified010)
-    {
-        result = 7;
-    }
-    return result;
-}

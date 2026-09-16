@@ -662,15 +662,14 @@ bool NetworkInputRecording::ReadNetworkInputRecord(s8 machine, PackedDetInput* r
 {
     struct RecordedInput
     {
-        u8 mRecord[0x10];
+        PackedDetInput mRecord;
         u8 mConnected;
         u8 mPadding[3];
     } input;
-    memset(&input, 0, sizeof(input));
     if (nlAsyncFileBufferGetRemaining(&mReader) < sizeof(input))
         return false;
     nlAsyncFileBufferRead(&mReader, &input, sizeof(input));
-    memcpy(record, input.mRecord, sizeof(input.mRecord));
+    *record = input.mRecord;
     *connected = input.mConnected;
     return true;
 }

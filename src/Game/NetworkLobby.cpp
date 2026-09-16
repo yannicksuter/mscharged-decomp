@@ -5,6 +5,7 @@
 #include "Game/NetworkMessageRegistry.h"
 
 #include "Game/NetworkLobby.h"
+#include "Game/FriendManager.h"
 #include "Game/OnlineMatchmaking.h"
 #include "Game/GameInfo.h"
 #include "Game/main.h"
@@ -203,7 +204,14 @@ int NetworkLobby::GetPlayerCount()
         {
             if (mState == 2 && AllMachineInfoReceived())
             {
-                if (!gOnlineFourMachineFriendLobby || mFriendHostInviting)
+                if (gOnlineFourMachineFriendLobby)
+                {
+                    if (mFriendHostInviting)
+                    {
+                        return mMachineCount;
+                    }
+                }
+                else
                 {
                     return mMachineCount;
                 }
@@ -677,20 +685,93 @@ bool NetworkLobby::ConnectToFriendServer(int profileId)
 void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
     BOOL cancelled, BOOL self, BOOL isServer, int index, void* param)
 {
-    (void)self;
-    (void)isServer;
     (void)param;
-    if (error == 0 && !cancelled)
+    tDebugPrintManager::Print(DC_NETWORK,
+        "Friends Matching err:%d, cancel:%d self:%d isServer:%d index:%d\n",
+        error, cancelled, self, isServer, index);
+
+    if (cancelled && error == 0)
     {
-        if (index >= mMachineCount)
+        if (!self)
         {
-            mMachineCount = index + 1;
+            mCancelRequested = true;
         }
-        mState = 2;
-        mConnectionDeadline = mElapsedTime + 5.0f;
+        return;
+    }
+
+    if (error == 0)
+    {
+        int connectionCount = GetConnectionCount();
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Friends Matching Connected to anybody Number %d I am %d!\n",
+            connectionCount, DWC_GetMyAID());
+
+        bool acceptConnection = false;
+        if (!mHostingFriendMatch)
+        {
+            acceptConnection = true;
+        }
+        else if (g_pFriendManager->mOwnStatus.mStatus
+            == EFriendStatus_HostInvitingPlayer)
+        {
+            if (index == g_pFriendManager->mFriendStatusIndex)
+            {
+                acceptConnection = true;
+            }
+            else
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "Friends Matching FriendHostIsInviting %d does not match index %d\n",
+                    g_pFriendManager->mFriendStatusIndex, index);
+            }
+        }
+        else
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Friends Matching OwnFriendStatus %d not host inviting player\n",
+                g_pFriendManager->mOwnStatus.mStatus);
+        }
+
+        if (acceptConnection)
+        {
+            int previousMachineCount = mMachineCount;
+            while (mMachineCount < connectionCount)
+            {
+                mPlayers[mMachineCount].mUnidentified18[0] = mMachineCount;
+                mPlayers[mMachineCount].mConnection = 0;
+                mPlayers[mMachineCount].mName[0] = 0;
+                mPlayers[mMachineCount].mUnidentified0B = 0;
+                mPlayers[mMachineCount].mConnectionState = 0;
+                if (mMachineCount != DWC_GetMyAID())
+                {
+                    DWC_SetRecvBuffer(mMachineCount,
+                        mReceiveBuffers[mMachineCount], 0x4000);
+                }
+                ++mMachineCount;
+            }
+
+            if (previousMachineCount != mMachineCount)
+            {
+                g_pFriendManager->SetOwnStatusInitial(false);
+            }
+            mState = 2;
+            mConnectionDeadline = mElapsedTime + 5.0f;
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Friend Matchmaking Success Peers changed from %d to %d!\n",
+                previousMachineCount, mMachineCount);
+        }
+        else
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Friend Matchmaking cancelling after the fact - after we got a connection\n");
+            mUnidentified052 = true;
+        }
     }
     else
     {
+        tDebugPrintManager::Print(DC_NETWORK, "Matching Error\n");
+        g_pNetworkSession->ReadAndClearDWCError();
+        g_pNetworkSession->GetDirectSocket()->SocketVirtual10(false);
         mState = 0;
         mMatchFailed = true;
     }
@@ -795,4 +876,3 @@ int NetworkLobby::ProcessMessage(
 static TweakIntBinding sTimeoutFindingMaxPlayersAcceptMinTweak(
     "s_nTimeoutFindingMaxPlayersAcceptMin", "Network/DWCLobby",
     &s_nTimeoutFindingMaxPlayersAcceptMin, true);
-

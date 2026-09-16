@@ -32,7 +32,6 @@
 #include "Game/RumbleActions.h"
 #include "Game/Sys/audio.h"
 #include "Game/Team.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
 #include "Game/Render/YoshiEggObject.h"
@@ -41,12 +40,8 @@
 #include <stdlib.h>
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
+#include "Game/EventRegistry.h"
 
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry;
-
-extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" cGame* g_pGame;
 extern "C" const nlVector3* fn_80040234(cFielder*);
 extern "C" float fn_800DEAB4(cFielder*);
@@ -198,25 +193,6 @@ extern float lbl_806DC384;
 extern float lbl_806DC388;
 static unsigned short sDesireSuperPowerType = 0xFFFF;
 
-static inline void UnidentifiedRegisterEventCallback(
-    const char* name, void (*callback)(void*))
-{
-    Function<void*> function(callback);
-    unsigned int hash = HashEventName(name, -1);
-    UnidentifiedEventBase** foundEvent = 0;
-    g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event;
-    if (foundEvent != 0)
-    {
-        event = *foundEvent;
-    }
-    else
-    {
-        event = 0;
-    }
-    ((UnidentifiedTypedEvent<void>*)event)->Add(function, 0, -1);
-}
-
 /**
  * Offset/Address/Size: 0x0 | 0x800C86FC | size: 0x60
  */
@@ -237,12 +213,9 @@ void DesireSuperPower::UnidentifiedSetContext(
 
     if (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass == YOSHI)
     {
-        UnidentifiedRegisterEventCallback(
-            "CollisionPatchGround", fn_800D1140);
-        UnidentifiedRegisterEventCallback(
-            "CollisionPatchPlayer", fn_800D1140);
-        UnidentifiedRegisterEventCallback(
-            "CollisionPatchWall", fn_800D12E8);
+        UnidentifiedFindEvent<void>("CollisionPatchGround", -1)->Add(Function<void*>(fn_800D1140), 0, -1);
+        UnidentifiedFindEvent<void>("CollisionPatchPlayer", -1)->Add(Function<void*>(fn_800D1140), 0, -1);
+        UnidentifiedFindEvent<void>("CollisionPatchWall", -1)->Add(Function<void*>(fn_800D12E8), 0, -1);
     }
 }
 

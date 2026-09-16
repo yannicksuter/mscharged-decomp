@@ -173,11 +173,10 @@ extern "C"
     typedef struct IPCRequestEx
     {
         IPCRequest base;
-        IPCAsyncCallback callback;
+        IPCAsyncCallback callback __attribute__((aligned(32)));
         void* callbackArg;
         BOOL reboot;
         OSThreadQueue queue;
-        char padding[64 - 0x34];
     } IPCRequestEx;
 
     void IPCInit(void);

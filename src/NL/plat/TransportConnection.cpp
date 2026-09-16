@@ -46,7 +46,8 @@ static inline bool ContainsReliableSequence(
 {
     for (int i = 0; i < message.GetReliableCount(); i++)
     {
-        if (message.GetReliablePacket(i)->mSequence == sequence)
+        TransportPacket* packet = message.GetReliablePacket(i);
+        if (packet->mSequence == sequence)
         {
             return true;
         }
@@ -319,10 +320,9 @@ int TransportConnection::ResendNotACKed(
             limit = mRoundTripTimeMS + s_nSendPendingAckMS;
         }
         u32 now = nlGetTicker();
-        int count = m_SentNotACKedQ.GetCount();
         bool any = false;
-        int i;
-        for (i = 0; i < count; i++)
+        int count = m_SentNotACKedQ.GetCount();
+        for (int i = 0; i < count; i++)
         {
             TransportPacket* packet = m_SentNotACKedQ[i];
             bool resend
@@ -337,7 +337,7 @@ int TransportConnection::ResendNotACKed(
         if (any)
         {
             int resent = 0;
-            for (i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 TransportPacket* packet
                     = m_SentNotACKedQ[i];

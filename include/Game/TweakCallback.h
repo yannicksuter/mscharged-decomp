@@ -18,7 +18,15 @@ public:
     }
 
     virtual ~TweakCallback();
-    virtual int GetValueType();
+    virtual int GetValueType()
+    {
+        int result = 6;
+        if (mUnidentified010)
+        {
+            result = 7;
+        }
+        return result;
+    }
     void Register();
 
     static void operator delete(void* pointer)

@@ -11,6 +11,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
+#include "Game/EventRegistry.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
 #include "Game/Physics/PhysicsObject.h"
@@ -19,18 +20,12 @@
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Physics/PhysicsTriggerVolume.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 
 #include <math.h>
 
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry;
-
-extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" float lbl_806E0C40;
 extern "C" float lbl_806E0C44;
 
@@ -54,25 +49,6 @@ static unsigned short sGeneratorsType = 0xFFFF;
 
 extern "C" Generators lbl_8056B890[6];
 Generators lbl_8056B890[6];
-
-static inline void UnidentifiedRegisterEventCallback(
-    const char* name, void (*callback)(void*))
-{
-    Function<void*> function(callback);
-    unsigned int hash = HashEventName(name, -1);
-    UnidentifiedEventBase** foundEvent = 0;
-    g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event;
-    if (foundEvent != 0)
-    {
-        event = *foundEvent;
-    }
-    else
-    {
-        event = 0;
-    }
-    ((UnidentifiedTypedEvent<void>*)event)->Add(function, 0, -1);
-}
 
 CrowdRiot::CrowdRiot(bool param1)
     : mTriggerVolume(0)
@@ -99,10 +75,10 @@ CrowdRiot::CrowdRiot(bool param1)
         mv3Target.z = 0.0f;
     }
 
-    UnidentifiedRegisterEventCallback("CollisionCrowd", fn_80029B9C);
-    UnidentifiedRegisterEventCallback("GoalScored", fn_800298D8);
-    UnidentifiedRegisterEventCallback("MegastrikeEnd", fn_800299C4);
-    UnidentifiedRegisterEventCallback("GameOver", fn_80029AB0);
+    UnidentifiedFindEvent<void>("CollisionCrowd", -1)->Add(Function<void*>(fn_80029B9C), 0, -1);
+    UnidentifiedFindEvent<void>("GoalScored", -1)->Add(Function<void*>(fn_800298D8), 0, -1);
+    UnidentifiedFindEvent<void>("MegastrikeEnd", -1)->Add(Function<void*>(fn_800299C4), 0, -1);
+    UnidentifiedFindEvent<void>("GameOver", -1)->Add(Function<void*>(fn_80029AB0), 0, -1);
 }
 
 CrowdRiot::~CrowdRiot()

@@ -822,8 +822,9 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E8540(
     UnidentifiedFuzzyRuntime* runtime,
     UnidentifiedVariant_80054AB8* value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(value);
+    UnidentifiedVariant_80054AB8* result;
+    lbl_805842C8.Allocate(result);
+    result = new (result) UnidentifiedVariant_80054AB8(value);
     fn_800B6A1C(result, 4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);

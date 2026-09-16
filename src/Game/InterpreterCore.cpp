@@ -785,18 +785,19 @@ void InterpreterCore::Step()
                 u32 value;
                 u32 index = operand;
                 index -= m_Header->unknown_0x1C;
-                if (index < storage->unknown_0x00)
+                u32 intTweakCount = storage->unknown_0x00;
+                if (index < intTweakCount)
                 {
                     value = *storage->unknown_0x0C[index].m_pValue;
                 }
                 else if (index < m_Header->unknown_0x24)
                 {
-                    float floatValue = *storage->unknown_0x10[index - storage->unknown_0x00].m_pValue;
+                    float floatValue = *storage->unknown_0x10[index - intTweakCount].m_pValue;
                     value = *(u32*)&floatValue;
                 }
                 else
                 {
-                    value = *storage->unknown_0x14[index - storage->unknown_0x00 - storage->unknown_0x04].m_pValue;
+                    value = *storage->unknown_0x14[index - intTweakCount - storage->unknown_0x04].m_pValue;
                 }
                 *m_SP = value;
                 m_SP++;
@@ -816,17 +817,18 @@ void InterpreterCore::Step()
                 u32 value = Pop();
                 u32 index = operand;
                 index -= m_Header->unknown_0x1C;
-                if (index < storage->unknown_0x00)
+                u32 intTweakCount = storage->unknown_0x00;
+                if (index < intTweakCount)
                 {
                     *storage->unknown_0x0C[index].m_pValue = value;
                 }
                 else if (index < m_Header->unknown_0x24)
                 {
-                    *storage->unknown_0x10[index - storage->unknown_0x00].m_pValue = *(float*)&value;
+                    *storage->unknown_0x10[index - intTweakCount].m_pValue = *(float*)&value;
                 }
                 else
                 {
-                    *storage->unknown_0x14[index - storage->unknown_0x00 - storage->unknown_0x04].m_pValue = value != 0;
+                    *storage->unknown_0x14[index - intTweakCount - storage->unknown_0x04].m_pValue = value != 0;
                 }
             }
             break;
@@ -863,7 +865,7 @@ void InterpreterCore::Step()
             int index0;
             int index1;
             int index2;
-            index0 = operand;
+            index0 = instruction & 0x7FF;
             index0 >>= 6;
             index1 = index0 + 4 - ((operand >> 3) & 7);
             index2 = index1 + 4 - (operand & 7);

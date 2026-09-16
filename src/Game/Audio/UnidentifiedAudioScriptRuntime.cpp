@@ -20,9 +20,9 @@ void UnidentifiedAudioScriptRuntime::Unidentified6BC4()
 }
 
 void UnidentifiedAudioScriptRuntime::Unidentified6DF8(
-    const u32&, UnidentifiedAudioEffectBinding* binding)
+    const u32&, AudioEffectBinding* binding)
 {
-    binding->Unidentified8DA0();
+    binding->Destroy();
 }
 
 bool UnidentifiedAudioScriptRuntime::Unidentified6E00(void* data, unsigned int size)
@@ -51,10 +51,10 @@ static inline void UnidentifiedAddBinding(UnidentifiedAudioScriptRuntime* script
     u32 key, u32 instance)
 {
     bool added;
-    UnidentifiedAudioEffectBinding* binding = script->mBindings.UnidentifiedAddOrGet(key, added);
+    AudioEffectBinding* binding = script->mBindings.UnidentifiedAddOrGet(key, added);
     if (added)
         binding->Unidentified8418(key);
-    binding->Unidentified841C(instance);
+    binding->OnSoundStarted(instance);
 
     UnidentifiedAudioTransitionState* entry = 0;
     sUnidentifiedTransitions.Allocate(entry);
@@ -146,7 +146,7 @@ bool UnidentifiedAudioScriptRuntime::Unidentified77C8(u32 instance)
     UnidentifiedAudioTransitionState* current = head;
     for (;;)
     {
-        current->mBinding->Unidentified8720(instance);
+        current->mBinding->OnSoundStopped(instance);
         UnidentifiedAudioTransitionState* next = current->m_next;
         sUnidentifiedTransitions.Free(current);
         if (next == head)
@@ -157,7 +157,7 @@ bool UnidentifiedAudioScriptRuntime::Unidentified77C8(u32 instance)
     return true;
 }
 
-extern "C" bool fn_802F7CFC(const u32& key, UnidentifiedAudioEffectBinding* binding,
+extern "C" bool fn_802F7CFC(const u32& key, AudioEffectBinding* binding,
     UnidentifiedAudioScriptUpdate* update);
 
 void UnidentifiedAudioScriptRuntime::Unidentified78C0(float deltaTime)
@@ -165,16 +165,16 @@ void UnidentifiedAudioScriptRuntime::Unidentified78C0(float deltaTime)
     UnidentifiedAudioScriptUpdate update;
     update.mDeltaTime = deltaTime;
     update.mCount = 0;
-    mBindings.Walk(Function2<bool, const u32&, UnidentifiedAudioEffectBinding*>(
+    mBindings.Walk(Function2<bool, const u32&, AudioEffectBinding*>(
         Bind<bool>(fn_802F7CFC, Placeholder<0>(), Placeholder<1>(), &update)));
     for (u32 i = 0; i < update.mCount; ++i)
         mBindings.Remove(update.mKeys[i]);
 }
 
-extern "C" bool fn_802F7CFC(const u32& key, UnidentifiedAudioEffectBinding* binding,
+extern "C" bool fn_802F7CFC(const u32& key, AudioEffectBinding* binding,
     UnidentifiedAudioScriptUpdate* update)
 {
-    binding->Unidentified8A30(update->mDeltaTime);
+    binding->Update(update->mDeltaTime);
     if (binding->IsEmpty() && update->mCount < 8)
         update->mKeys[update->mCount++] = key;
     return true;

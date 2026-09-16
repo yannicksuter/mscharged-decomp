@@ -5,6 +5,7 @@
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioSource.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlString.h"
 
 #include <float.h>

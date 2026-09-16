@@ -578,6 +578,7 @@ void ModeledScreenTransition::Load(const char* szName)
 
 void ModeledScreenTransition::FixupModel()
 {
+    unsigned long diffuseTextureSemantic = gDiffuseTextureSemantic;
     glStateBundle savedState;
     glStateSave(savedState);
 
@@ -595,14 +596,14 @@ void ModeledScreenTransition::FixupModel()
             if (m_nTexture != 0xFFFFFFFF)
             {
                 glSetMaterialTextureParameter(&m_pModels[i].packets[j],
-                    gDiffuseTextureSemantic, m_nTexture);
+                    diffuseTextureSemantic, m_nTexture);
                 unsigned long unknown20 = m_Unknown20;
                 glSetMaterialTextureIndexParameter(&m_pModels[i].packets[j],
-                    gDiffuseTextureSemantic, &unknown20);
+                    diffuseTextureSemantic, &unknown20);
             }
 
-            m_pModels[i].packets[j].rasterState
-                = glGetCurrentRasterState();
+            glModelPacket* packet = &m_pModels[i].packets[j];
+            packet->rasterState = glGetCurrentRasterState();
         }
     }
 

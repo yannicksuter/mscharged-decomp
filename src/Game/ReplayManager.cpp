@@ -28,13 +28,13 @@
 #include "Game/Camera/CameraMan.h"
 #include "Game/Camera/DebugCam.h"
 #include "Game/Event.h"
+#include "Game/EventRegistry.h"
 #include "Game/ExcitementSystem.h"
 #include "Game/GameEventQueue.h"
 #include "Game/ReplayChoreo.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Task/ProfilerTask.h"
 #include "Game/Task/TweakerTask.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlConfig.h"
@@ -57,12 +57,6 @@ extern "C"
 {
     float fn_80189870();
 }
-
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry;
-
-extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 
 extern "C" bool fn_8019464C(cCharacter* character)
 {
@@ -137,83 +131,12 @@ extern "C" bool fn_80194674(cCharacter* character)
 
 void ReplayManager::fn_80188D88()
 {
-    {
-        Function<ReceiveBallData*> callback(
-            UnidentifiedMakeReplayBinding(
-                &ReplayManager::fn_801895C0, this));
-        UnidentifiedEventBase** foundEvent;
-        unsigned int hash;
-        hash = HashEventName("ReceiveBall", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<ReceiveBallData>*)event)
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData_80066590*> callback(
-            UnidentifiedMakeReplayBinding(
-                &ReplayManager::fn_801895D0, this));
-        UnidentifiedEventBase** foundEvent;
-        unsigned int hash;
-        hash = HashEventName("ShotAtGoal", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventData_80066590>*)event)
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData_800663A8*> callback(
-            UnidentifiedMakeReplayBinding(
-                &ReplayManager::fn_801895E0, this));
-        UnidentifiedEventBase** foundEvent;
-        unsigned int hash;
-        hash = HashEventName("PassBall", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventData_800663A8>*)event)
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<GoalScoredData*> callback(
-            UnidentifiedMakeReplayBinding(
-                &ReplayManager::fn_801895F0, this));
-        UnidentifiedEventBase** foundEvent;
-        unsigned int hash;
-        hash = HashEventName("GoalScored", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<GoalScoredData>*)event)
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<GoalieSaveData*> callback(
-            UnidentifiedMakeReplayBinding(
-                &ReplayManager::fn_80189610, this));
-        UnidentifiedEventBase** foundEvent;
-        unsigned int hash;
-        hash = HashEventName("GoalieSave", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<GoalieSaveData>*)event)
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(UnidentifiedMakeReplayBinding(
-            &ReplayManager::fn_80189620, this));
-        UnidentifiedEventBase** foundEvent;
-        unsigned int hash;
-        hash = HashEventName("Kickoff", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventNoData>*)event)
-            ->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_801895C0, this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_80066590>("ShotAtGoal", -1)->Add(Function<UnidentifiedEventData_80066590*>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_801895D0, this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_800663A8>("PassBall", -1)->Add(Function<UnidentifiedEventData_800663A8*>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_801895E0, this)), 0, -1);
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_801895F0, this)), 0, -1);
+    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_80189610, this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_80189620, this)), 0, -1);
 }
 
 void ReplayManager::InitializeSnapshots()

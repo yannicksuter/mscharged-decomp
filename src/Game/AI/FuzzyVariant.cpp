@@ -8,32 +8,6 @@
 
 FuzzyVariant fvNotSet;
 
-unsigned long FuzzyVariant::GetHash() const
-{
-    unsigned long hash = 0;
-
-    if (mType != FT_UNSPECIFIED && mType >= NUM_V_TYPES)
-    {
-        switch (GetType())
-        {
-        case FT_PLAYER:
-            hash = (unsigned long)mData.pointer;
-            break;
-        case FT_TEAM:
-            hash = mData.u;
-            break;
-        case FT_GAME:
-            hash = (unsigned long)mData.pointer;
-            break;
-        case FT_BALL:
-            hash = mData.u;
-            break;
-        }
-    }
-
-    return hash;
-}
-
 NLString FuzzyVariant::ToString() const
 {
     NLString toString;
@@ -90,4 +64,30 @@ NLString FuzzyVariant::ToString() const
     }
 
     return toString;
+}
+
+unsigned long FuzzyVariant::GetHash() const
+{
+    unsigned long hash = 0;
+
+    if (mType != FT_UNSPECIFIED && mType >= NUM_V_TYPES)
+    {
+        switch (GetType())
+        {
+        case FT_PLAYER:
+            hash = (unsigned long)mData.pointer;
+            break;
+        case FT_TEAM:
+            hash = mData.u;
+            break;
+        case FT_GAME:
+            hash = (unsigned long)mData.pointer;
+            break;
+        case FT_BALL:
+            hash = mData.u;
+            break;
+        }
+    }
+
+    return hash;
 }

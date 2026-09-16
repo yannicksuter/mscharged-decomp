@@ -25,7 +25,7 @@ extern "C"
     void* memcpy(void* destination, const void* source, u32 size);
 }
 
-extern u8 lbl_806DCDE0;
+u8 lbl_806DCDE0 = true;
 
 DepthOfFieldManager::DepthOfFieldManager()
     : m_bOn(false)

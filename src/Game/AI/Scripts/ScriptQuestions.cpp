@@ -534,10 +534,8 @@ float StrategicBallOwner(cFielder* pFielder)
     }
     else
     {
-        bool bHasTarget = (g_pBall->meBallState == 5
-                              || g_pBall->meBallState == 3)
-            && g_pBall->m_pPassTarget != NULL;
-        float fPassValid = bHasTarget ? 1.0f : 0.0f;
+        float fPassValid
+            = g_pBall->UnidentifiedHasPassTarget() ? 1.0f : 0.0f;
         if (!fPassValid && pFielder == pFielder->m_pTeam->mpBestBallInterceptor)
         {
             fScore = InterpolateClamped(0.7f, 0.95f, AbleToInterceptBall(pFielder));
@@ -635,10 +633,7 @@ float InPassingLane(cFielder* pFielder)
         return 0.0f;
     }
 
-    bool bHasTarget = (g_pBall->meBallState == 5
-                          || g_pBall->meBallState == 3)
-        && g_pBall->m_pPassTarget != NULL;
-    if (!bHasTarget)
+    if (!g_pBall->UnidentifiedHasPassTarget())
     {
         return 0.0f;
     }
@@ -3796,11 +3791,8 @@ extern "C" float fn_800E0034()
 
 extern "C" float fn_800E00F8()
 {
-    bool bValid = (g_pBall->meBallState == 5
-                      || g_pBall->meBallState == 3)
-        && g_pBall->m_pPassTarget != NULL;
     float fInitialScore;
-    if (bValid)
+    if (g_pBall->UnidentifiedHasPassTarget())
     {
         fInitialScore = 1.0f;
     }

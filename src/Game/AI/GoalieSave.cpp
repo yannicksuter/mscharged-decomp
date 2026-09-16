@@ -882,6 +882,7 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
 {
     SaveData* pClosest = pSaveData;
     SaveData* pEdge = 0;
+    SaveData* pLast;
 
     SaveData* pLeft;
     SaveData* pRight;
@@ -1134,7 +1135,6 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
         }
         else
         {
-            SaveData* pLast;
             SaveData* pCurEdge = pSaveData;
             while (pCurEdge != 0)
             {
@@ -1146,7 +1146,6 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
     }
     else
     {
-        SaveData* pLast;
         SaveData* pCurEdge = pSaveData;
         while (pCurEdge != 0)
         {

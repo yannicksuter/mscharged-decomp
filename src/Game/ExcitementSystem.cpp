@@ -2,21 +2,15 @@
 #include "Game/AI/FielderActions.h"
 
 #include "Game/Event.h"
+#include "Game/EventRegistry.h"
 #include "Game/EventDataTypes.h"
 #include "Game/GameEventQueue.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
 #include "NL/nlDebug.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "Game/UnidentifiedStaticStorage.h"
-
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry;
-
-extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 
 namespace
 {
@@ -75,36 +69,9 @@ void ExcitementSystem::fn_801967DC()
 
 void ExcitementSystem::fn_80196924()
 {
-    {
-        Function<PlayerAttackData*> callback(
-            Bind<void>(MemFun(&ExcitementSystem::fn_80196D30), this, placeholder0));
-        unsigned int hash = HashEventName("AttackSuccess", -1);
-        UnidentifiedEventBase** foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<PlayerAttackData>*)event)
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<LightningStrikeData*> callback(
-            Bind<void>(MemFun(&ExcitementSystem::fn_80196D64), this, placeholder0));
-        unsigned int hash = HashEventName("LightningStrike", -1);
-        UnidentifiedEventBase** foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<LightningStrikeData>*)event)
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBallGoalpostData*> callback(
-            Bind<void>(MemFun(&ExcitementSystem::fn_80196D8C), this, placeholder0));
-        unsigned int hash = HashEventName("CollisionBallGoalpost", -1);
-        UnidentifiedEventBase** foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-        ((UnidentifiedTypedEvent<CollisionBallGoalpostData>*)event)
-            ->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(Bind<void>(MemFun(&ExcitementSystem::fn_80196D30), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(Bind<void>(MemFun(&ExcitementSystem::fn_80196D64), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<CollisionBallGoalpostData>("CollisionBallGoalpost", -1)->Add(Function<CollisionBallGoalpostData*>(Bind<void>(MemFun(&ExcitementSystem::fn_80196D8C), this, placeholder0)), 0, -1);
 }
 
 void ExcitementSystem::fn_80196D30(

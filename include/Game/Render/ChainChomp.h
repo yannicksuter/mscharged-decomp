@@ -44,6 +44,7 @@ public:
     bool IsFrozen() const;
     void Freeze(float duration, bool immediate);
     void Leave();
+    void EmitTrail();
     void Hide();
     cFielder* FindTarget(cTeam* pTeam);
     void Fall();

@@ -130,6 +130,7 @@ void WorldDarkening::Replay(LoadFrame& frame)
     {
         memcpy(&mPos, frame.position, sizeof(mPos));
         frame.position += sizeof(mPos);
-        Update(frame.deltaTime);
+        float deltaTime = frame.deltaTime;
+        Update(deltaTime);
     }
 }

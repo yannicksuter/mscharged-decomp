@@ -147,10 +147,7 @@ void ImpostorSprite::UpdateView(const nlVector3* direction, const nlVector3* up)
     float cameraDistance = mCharacter->GetCameraDistance();
     float cameraLookatZ = mCharacter->GetCameraLookatZ();
 
-    nlVector3 target;
-    target.x = 0.0f;
-    target.y = 0.0f;
-    target.z = cameraLookatZ;
+    nlVector3 target = { 0.0f, 0.0f, cameraLookatZ };
 
     float inverseLength = nlRecipSqrt(direction->x * direction->x
             + direction->y * direction->y + direction->z * direction->z,
@@ -478,6 +475,7 @@ void ImpostorSprite::BuildQuad(ImpostorQuad* quad, const Impostor* impostor, con
         ImpostorManager::GetInstance()->GetImpostorSizeScale();
     float width = sizeScale * impostor->mWidth;
     float height = sizeScale * impostor->mHeight;
+    nlVector3 position = impostor->mPosition;
 
     quad->texcoord[0].x = 1.0f;
     quad->texcoord[0].y = 0.0f;
@@ -490,30 +488,35 @@ void ImpostorSprite::BuildQuad(ImpostorQuad* quad, const Impostor* impostor, con
 
     float sn;
     float cs;
-    nlSinCos(&sn, &cs, 0);
+    float angle = 0.0f;
+    nlSinCos(&sn, &cs, DegreesToAngle(angle));
+    position.z += 0.5f * height;
 
     nlVector3 a;
-    a.x = 0.5f * width * (cs * right->x + sn * up->x);
-    a.y = 0.5f * width * (cs * right->y + sn * up->y);
-    a.z = 0.5f * width * (cs * right->z + sn * up->z);
-
     nlVector3 b;
-    b.x = 0.5f * height * (-sn * right->x + cs * up->x);
-    b.y = 0.5f * height * (-sn * right->y + cs * up->y);
-    b.z = 0.5f * height * (-sn * right->z + cs * up->z);
+    a.x = cs * right->x + sn * up->x;
+    a.y = cs * right->y + sn * up->y;
+    a.z = cs * right->z + sn * up->z;
+    b.x = -sn * right->x + cs * up->x;
+    b.y = -sn * right->y + cs * up->y;
+    b.z = -sn * right->z + cs * up->z;
+    float halfWidth = 0.5f * width;
+    float halfHeight = 0.5f * height;
+    nlVec3Scale(a, halfWidth);
+    nlVec3Scale(b, halfHeight);
 
-    quad->position[0].x = impostor->mPosition.x + a.x + b.x;
-    quad->position[0].y = impostor->mPosition.y + a.y + b.y;
-    quad->position[0].z = impostor->mPosition.z + a.z + b.z;
-    quad->position[1].x = impostor->mPosition.x - a.x + b.x;
-    quad->position[1].y = impostor->mPosition.y - a.y + b.y;
-    quad->position[1].z = impostor->mPosition.z - a.z + b.z;
-    quad->position[2].x = impostor->mPosition.x - a.x - b.x;
-    quad->position[2].y = impostor->mPosition.y - a.y - b.y;
-    quad->position[2].z = impostor->mPosition.z - a.z - b.z;
-    quad->position[3].x = impostor->mPosition.x + a.x - b.x;
-    quad->position[3].y = impostor->mPosition.y + a.y - b.y;
-    quad->position[3].z = impostor->mPosition.z + a.z - b.z;
+    quad->position[0].x = position.x + a.x + b.x;
+    quad->position[0].y = position.y + a.y + b.y;
+    quad->position[0].z = position.z + a.z + b.z;
+    quad->position[1].x = position.x - a.x + b.x;
+    quad->position[1].y = position.y - a.y + b.y;
+    quad->position[1].z = position.z - a.z + b.z;
+    quad->position[2].x = position.x - a.x - b.x;
+    quad->position[2].y = position.y - a.y - b.y;
+    quad->position[2].z = position.z - a.z - b.z;
+    quad->position[3].x = position.x + a.x - b.x;
+    quad->position[3].y = position.y + a.y - b.y;
+    quad->position[3].z = position.z + a.z - b.z;
 }
 
 int ImpostorSprite::CalculateRenderChecksum()

@@ -849,7 +849,7 @@ void UnidentifiedPresentationState::UpdateAndRenderLetterBox()
 
     float height = glGetOrthographicHeight();
 
-    static bool letterBoxSizeValid;
+    static signed char letterBoxSizeValid;
     static float letterBoxSize;
     if (!letterBoxSizeValid)
     {
@@ -876,22 +876,20 @@ void UnidentifiedPresentationState::UpdateAndRenderLetterBox()
         mLetterBoxDuration = 1.0f;
     }
 
-    if (mLetterBoxDuration <= 0.0f)
+    if (mLetterBoxDuration > 0.0f)
     {
-        return;
+        RLView* view = GetLayerView(eCLV_FrontEnd);
+        static const nlColour black = { { 0x00, 0x00, 0x00, 0xFF } };
+        GLView* previous = g_ShapeRenderer.m_eView;
+        g_ShapeRenderer.m_eView = (GLView*)view;
+        nlColour colour = black;
+        g_ShapeRenderer.DrawRectangle2D(0.0f, 0.0f, glGetOrthographicWidth(),
+            letterBoxSize * mLetterBoxDuration, -2.0f, colour, 0);
+        g_ShapeRenderer.DrawRectangle2D(0.0f,
+            height - letterBoxSize * mLetterBoxDuration, glGetOrthographicWidth(),
+            letterBoxSize * mLetterBoxDuration, -2.0f, colour, 0);
+        g_ShapeRenderer.m_eView = previous;
     }
-
-    RLView* view = GetLayerView(eCLV_FrontEnd);
-    static const nlColour black = { { 0x00, 0x00, 0x00, 0xFF } };
-    nlColour colour = black;
-    GLView* previous = g_ShapeRenderer.m_eView;
-    g_ShapeRenderer.m_eView = (GLView*)view;
-    g_ShapeRenderer.DrawRectangle2D(0.0f, 0.0f, glGetOrthographicWidth(),
-        letterBoxSize * mLetterBoxDuration, -2.0f, colour, 0);
-    g_ShapeRenderer.DrawRectangle2D(0.0f,
-        height - letterBoxSize * mLetterBoxDuration, glGetOrthographicWidth(),
-        letterBoxSize * mLetterBoxDuration, -2.0f, colour, 0);
-    g_ShapeRenderer.m_eView = previous;
 }
 
 /**

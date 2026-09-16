@@ -522,9 +522,7 @@ Windy::Windy()
 {
     meWeather = 2;
     Reset();
-    Function<FnVoidVoid> callback(BindExp1<void, Detail::MemFunImpl<void, void (Windy::*)()>, Windy*>(
-        MemFun(&Windy::OnGetReadyForKickoff), this));
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(callback, 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindExp1<void, Detail::MemFunImpl<void, void (Windy::*)()>, Windy*>(MemFun(&Windy::OnGetReadyForKickoff), this)), 0, -1);
 }
 
 void Windy::OnGetReadyForKickoff()
@@ -785,16 +783,8 @@ void Windy::Stop(bool value)
 SolarFlare::SolarFlare()
 {
     meWeather = 4;
-    {
-        Function<FnVoidVoid> callback(BindExp1<void, Detail::MemFunImpl<void, void (SolarFlare::*)()>, SolarFlare*>(
-            MemFun(&SolarFlare::OnGetReadyForKickoff), this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(BindExp1<void, Detail::MemFunImpl<void, void (SolarFlare::*)()>, SolarFlare*>(
-            MemFun(&SolarFlare::OnKickoff), this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindExp1<void, Detail::MemFunImpl<void, void (SolarFlare::*)()>, SolarFlare*>(MemFun(&SolarFlare::OnGetReadyForKickoff), this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindExp1<void, Detail::MemFunImpl<void, void (SolarFlare::*)()>, SolarFlare*>(MemFun(&SolarFlare::OnKickoff), this)), 0, -1);
     m_StartCount = 0;
     for (int i = 0; i < 3; i++)
         m_TargetIndicies[i] = -1;
@@ -1063,15 +1053,7 @@ void SolarFlare::ResetFlares(bool initialize)
 BubblingLava::BubblingLava()
 {
     meWeather = 5;
-    {
-        Function<UnidentifiedEventData24*> callback(OnLavaCollisionPatchGround);
-        EventRegistryValue* foundEvent;
-        unsigned int hash = HashEventName("CollisionPatchGround", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? foundEvent->event : 0;
-        ((UnidentifiedTypedEvent<UnidentifiedEventData24>*)event)->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<UnidentifiedEventData24>("CollisionPatchGround", -1)->Add(Function<UnidentifiedEventData24*>(OnLavaCollisionPatchGround), 0, -1);
     Reset();
 }
 
@@ -1532,9 +1514,7 @@ SandTombWeather::SandTombWeather()
 {
     meWeather = 7;
     Reset();
-    Function<FnVoidVoid> callback(BindExp1<void, Detail::MemFunImpl<void, void (SandTombWeather::*)()>, SandTombWeather*>(
-        MemFun(&SandTombWeather::OnKickoff), this));
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(callback, 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindExp1<void, Detail::MemFunImpl<void, void (SandTombWeather::*)()>, SandTombWeather*>(MemFun(&SandTombWeather::OnKickoff), this)), 0, -1);
 }
 
 float SandTombWeather::GetStartChance()

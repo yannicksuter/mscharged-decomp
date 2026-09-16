@@ -10,6 +10,7 @@
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Event.h"
+#include "Game/EventRegistry.h"
 #include "Game/Field.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Game.h"
@@ -23,7 +24,6 @@
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Player.h"
 #include "Game/Render/SkinAnimatedNPC.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlstring_tmpl.h"
@@ -35,13 +35,7 @@
 
 class EffectsGroup;
 
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry;
-
 extern CollisionSpace* g_CollisionSpace;
-extern UnidentifiedEventRegistry* g_pEventRegistry;
-
 
 extern "C" void fn_8017472C(void*);
 extern "C" bool fn_800977A4(cFielder*, float);
@@ -587,13 +581,7 @@ PhysicsPatchManager_801740D0::PhysicsPatchManager_801740D0()
         mUnidentified000[i] = 0;
     }
 
-    Function<void*> callback(fn_8017472C);
-    UnidentifiedEventBase** foundEvent;
-    unsigned int hash = HashEventName("ResetEffects", -1);
-    foundEvent = 0;
-    g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-    ((UnidentifiedTypedEvent<void>*)event)->Add(callback, (unsigned int)&mUnidentified0F0, -1);
+    UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(fn_8017472C), (unsigned int)&mUnidentified0F0, -1);
 }
 
 PhysicsPatchManager_801740D0::~PhysicsPatchManager_801740D0()

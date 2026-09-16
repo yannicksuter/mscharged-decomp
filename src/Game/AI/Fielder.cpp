@@ -1431,10 +1431,7 @@ void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
 void cFielder::ClearPassTargetIfAmThePassTarget()
 {
     cBall* pBall = g_pBall;
-    bool bUnidentified = (pBall->meBallState == 5
-                            || pBall->meBallState == 3)
-        && pBall->m_pPassTarget != 0;
-    if (bUnidentified)
+    if (pBall->UnidentifiedHasPassTarget())
     {
         if (pBall->m_pPassTarget == this)
         {

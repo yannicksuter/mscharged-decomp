@@ -11,6 +11,7 @@
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
+#include "Game/EventRegistry.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
@@ -26,7 +27,6 @@
 #include "Game/Physics/PhysicsSphere.h"
 #include "Game/Physics/PhysicsYoshiEgg.h"
 #include "Game/Team.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
 #include "NL/nlDLListContainer.h"
 #include "NL/nlMath.h"
@@ -196,10 +196,6 @@ PhysicsEventQueue::~PhysicsEventQueue()
 {
 }
 
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry;
-
 struct UnidentifiedMemberFunction
 {
     long thisDelta;
@@ -207,7 +203,6 @@ struct UnidentifiedMemberFunction
     void* function;
 };
 
-extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" long __ptmf_test(UnidentifiedMemberFunction*);
 extern "C" UnidentifiedMemberFunction lbl_8050F58C;
 extern "C" const nlVector3 lbl_804DCC60;
@@ -592,39 +587,19 @@ extern "C" void fn_80145C3C(void* data)
     }
 }
 
-static void UnidentifiedRegisterEventCallback(const char* name,
-    void (*callback)(void*))
-{
-    Function<void*> function(callback);
-    unsigned int hash = HashEventName(name, -1);
-    UnidentifiedEventBase** foundEvent = 0;
-    g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event;
-    if (foundEvent != 0)
-    {
-        event = *foundEvent;
-    }
-    else
-    {
-        event = 0;
-    }
-    ((UnidentifiedTypedEvent<void>*)event)->Add(function, 0, -1);
-}
-
 extern "C" void fn_80144AB8()
 {
-    UnidentifiedRegisterEventCallback("CollisionPatchPowerup", fn_801453DC);
-    UnidentifiedRegisterEventCallback("CollisionHammerPowerup", fn_801453B8);
-    UnidentifiedRegisterEventCallback("CollisionFireballPowerup", fn_801452F4);
-    UnidentifiedRegisterEventCallback("CollisionCrackEgg", fn_801453E0);
-    UnidentifiedRegisterEventCallback(
-        "CollisionShockwave", (void (*)(void*))HandleCollisionShockwave);
-    UnidentifiedRegisterEventCallback("CollisionKoopaShellEnd", fn_801453FC);
-    UnidentifiedRegisterEventCallback("CollisionBirdoEggEnd", fn_8014545C);
-    UnidentifiedRegisterEventCallback("CollisionPatchPatch", fn_80145C3C);
-    UnidentifiedRegisterEventCallback("DestroyPowerup", fn_80145300);
-    UnidentifiedRegisterEventCallback("DestroyHammer", fn_80145370);
-    UnidentifiedRegisterEventCallback("CollisionWaluigiWall", fn_80145318);
+    UnidentifiedFindEvent<void>("CollisionPatchPowerup", -1)->Add(Function<void*>(fn_801453DC), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionHammerPowerup", -1)->Add(Function<void*>(fn_801453B8), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionFireballPowerup", -1)->Add(Function<void*>(fn_801452F4), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionCrackEgg", -1)->Add(Function<void*>(fn_801453E0), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionShockwave", -1)->Add(Function<void*>((void (*)(void*))HandleCollisionShockwave), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionKoopaShellEnd", -1)->Add(Function<void*>(fn_801453FC), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionBirdoEggEnd", -1)->Add(Function<void*>(fn_8014545C), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionPatchPatch", -1)->Add(Function<void*>(fn_80145C3C), 0, -1);
+    UnidentifiedFindEvent<void>("DestroyPowerup", -1)->Add(Function<void*>(fn_80145300), 0, -1);
+    UnidentifiedFindEvent<void>("DestroyHammer", -1)->Add(Function<void*>(fn_80145370), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionWaluigiWall", -1)->Add(Function<void*>(fn_80145318), 0, -1);
 }
 
 extern "C" void fn_800721AC(CollisionPlayerWallData*);

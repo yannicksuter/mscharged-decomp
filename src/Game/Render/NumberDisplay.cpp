@@ -89,9 +89,9 @@ NumberDisplay::NumberDisplay()
     mLeftScore = 0;
     mRightScore = 0;
 
-    Function<void*> callback(
-        Bind<void>(MemFun(&NumberDisplay::OnGetReadyForKickoff), this));
-    UnidentifiedFindEvent<void>("GetReadyForKickoff", -1)->Add(callback, 0, -1);
+    typedef Detail::MemFunImpl<void, void (NumberDisplay::*)()> MemFunImpl_NumberDisplay_v;
+    typedef BindExp1<void, MemFunImpl_NumberDisplay_v, NumberDisplay*> BindExp1_NumberDisplay_v;
+    UnidentifiedFindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(BindExp1_NumberDisplay_v(MemFun(&NumberDisplay::OnGetReadyForKickoff), this)), 0, -1);
 }
 
 NumberDisplay::~NumberDisplay()

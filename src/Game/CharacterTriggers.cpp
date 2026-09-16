@@ -2167,12 +2167,12 @@ extern "C" void fn_801BD4EC(cFielder* pFielder)
         if (pFielder->mUnidentified024.m_eCharacterClass == 11)
         {
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("petey_deke");
-            fn_802E83C4(EmissionManager::Instance(), pGroup);
+            EmissionManager::Instance()->Kill(pGroup);
         }
         else if (pFielder->mUnidentified024.m_eCharacterClass == 12)
         {
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("birdo_deke");
-            fn_802E83C4(EmissionManager::Instance(), pGroup);
+            EmissionManager::Instance()->Kill(pGroup);
         }
 
         if (pFielder->mUnidentified024.m_eCharacterClass == 1)
@@ -2187,7 +2187,7 @@ extern "C" void fn_801BD4EC(cFielder* pFielder)
             event.pCharacter = pFielder;
             fn_800611F0(g_pGame, &event);
             EmitGroundPound(pFielder);
-            fn_800EBBFC(pFielder->mUnidentified318, 0x5BF8E132, 0, 0);
+            PlaySound(pFielder->mUnidentified318, 0x5BF8E132, 0, 0);
         }
         else if (pFielder->mUnidentified024.m_eCharacterClass == 9)
         {
@@ -2197,13 +2197,14 @@ extern "C" void fn_801BD4EC(cFielder* pFielder)
             event.pCharacter = pFielder;
             fn_800611F0(g_pGame, &event);
             EmitGroundPound(pFielder);
-            fn_800EBBFC(pFielder->mUnidentified318, 0x560BD5F9, 0, 0);
+            PlaySound(pFielder->mUnidentified318, 0x560BD5F9, 0, 0);
         }
         else if (pFielder->mUnidentified024.m_eCharacterClass == 13)
         {
             CharacterImpactEvent event;
             nlVector3 v3Offset;
-            int nNodeIndex = pFielder->m_pPoseAccumulator->m_BaseSHierarchy->GetNodeIndexByID(
+            cSHierarchy* pHierarchy = pFielder->m_pPoseAccumulator->m_BaseSHierarchy;
+            int nNodeIndex = pHierarchy->GetNodeIndexByID(
                 nlStringLowerHash("bip01 R Prop"));
             event.v3Position = pFielder->GetJointPosition(nNodeIndex);
             event.v3Position.z = 0.0f;
@@ -2219,7 +2220,7 @@ extern "C" void fn_801BD4EC(cFielder* pFielder)
             EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
             pController->SetPosition(event.v3Position);
             pController->SetVelocity(v3Zero);
-            fn_800EBBFC(pFielder->mUnidentified318, 0x560BD5F9, 0, 0);
+            PlaySound(pFielder->mUnidentified318, 0x560BD5F9, 0, 0);
         }
     }
 }

@@ -497,17 +497,20 @@ void FriendManager::Update(float dt)
 
 void FriendManager::SynchronizeFriends()
 {
-    DWCFriendStatusCallback statusCallback = FriendStatusCallback;
     mFriendListChanged = false;
     DWC_SetBuddyFriendCallback(BuddyFriendCallback, 0);
-    DWC_SetFriendStatusCallback(statusCallback, 0);
-    DWC_UpdateServersAsync(0,
-        UpdateServersCallback,
-        0,
-        statusCallback,
-        0,
-        DeleteFriendCallback,
-        0);
+    DWC_SetFriendStatusCallback(FriendStatusCallback, 0);
+    if (!DWC_UpdateServersAsync(0,
+            UpdateServersCallback,
+            0,
+            FriendStatusCallback,
+            0,
+            DeleteFriendCallback,
+            0))
+    {
+        // Synchronization failed to start
+        return;
+    }
 }
 
 void FriendManager::SetOwnStatusInitial(

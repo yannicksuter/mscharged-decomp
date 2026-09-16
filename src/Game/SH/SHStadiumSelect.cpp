@@ -80,9 +80,7 @@ StadiumSelectScene::StadiumSelectScene()
         mBackButton.SetBackScene(4);
     }
     SortStadiums();
-    Function<FnVoidVoid> callback(BindMember(this, &StadiumSelectScene::OnHBMHide));
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("HBMHide", -1)->Add(
-        callback, (unsigned int)&mHBMHideConnection, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("HBMHide", -1)->Add(Function<FnVoidVoid>(BindMember(this, &StadiumSelectScene::OnHBMHide)), (unsigned int)&mHBMHideConnection, -1);
 }
 
 StadiumSelectScene::~StadiumSelectScene()

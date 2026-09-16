@@ -9,129 +9,38 @@
 #include "Game/BasicStadium.h"
 #include "Game/CharacterEffects.h"
 #include "Game/AI/HeadTrack.h"
+#include "Game/GameInfo.h"
+#include "Game/GL/ShaderSkinMesh.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/PoseNode.h"
 #include "Game/Render/RLView.h"
 #include "Game/Render/RenderShadow.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 #include "Game/Render/WorldNPC.h"
+#include "Game/SHierarchy.h"
 #include "Game/Team.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 
 #include "NL/gl/glMaterialParameters.h"
+#include "NL/glx/GXCharacterDamageMaterialProgram.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "NL/nlTask.h"
 #include "NL/gl/glTexture.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-#pragma cpp_extensions on
-
-struct SkinMesh
+extern "C"
 {
-    virtual void Reserved0() = 0;
-    virtual void Reserved1() = 0;
-    virtual void* FinishPreparing() = 0;
-    virtual void Reserved3() = 0;
-    virtual void PrepareToRender() = 0;
+    void fn_8030B9C8(cPoseAccumulator* pAccumulator, const nlMatrix4* pWorldMatrix);
+    void fn_80182EC8(s32 lightingMode);
+    RLView* fn_8027261C();
+    void fn_80273A4C(eCLV layer, const glModel* model, unsigned long key);
+}
 
-    int unknown04;
-    int unknown08;
-    int enabled;
-};
-
-struct PacketUserData
-{
-    struct TextureSlot
-    {
-        u32 texture;
-        u16 textureFrame;
-
-        void SetTexture(u32 newTexture, u16 newTextureFrame)
-        {
-            texture = newTexture;
-            textureFrame = newTextureFrame;
-        }
-    };
-
-    char _000[0x20];
-    union
-    {
-        struct
-        {
-            u32 texture;
-            u16 textureFrame;
-        };
-        TextureSlot textureSlots[1];
-    };
-};
-
-struct ModelPacket
-{
-    char _000[0x1C];
-    u32 raster;
-    PacketUserData* userData;
-    char _024[0x0C];
-};
-
-struct Model
-{
-    int unknown;
-    int packetCount;
-    ModelPacket* packets;
-};
-
-union Colour
-{
-    u32 value;
-    struct
-    {
-        u8 r;
-        u8 g;
-        u8 b;
-        u8 a;
-    };
-};
-
-struct TaskManager
-{
-    void* vtable;
-    char _004[4];
-    u32 state;
-};
-
-extern "C" void fn_8030B9C8(cPoseAccumulator*, const nlMatrix4*);
-extern "C" void fn_8030BD18(cPoseAccumulator*, int, const nlQuaternion*, bool, float);
-extern "C" void fn_8030BE68(cPoseAccumulator*, int, u16, float);
-extern "C" nlMatrix4* fn_8030C2F0(cPoseAccumulator*, int);
-extern "C" int fn_8030C374(cPoseAccumulator*);
-extern "C" void fn_8030C380(cPoseAccumulator*, int, void (*)(void*), void*, int);
-extern "C" int fn_8030CC1C(cSHierarchy*, u32);
-extern "C" void fn_8017BF84(void*);
-extern "C" SkinMesh* fn_8001C550(cCharacter*, int);
-extern "C" void fn_8001EFCC(cCharacter*, SkinMesh*, Model*);
-extern "C" void fn_80182EC8(int);
-extern "C" int fn_800FC748(int);
-extern "C" RLView* fn_8027261C();
-extern "C" void fn_80273A4C(int, Model*, int);
-
-int lbl_80511298[3] = { 2, 2, 2 };
-int lbl_805112A4[3] = { 4, 4, 4 };
-
-__declspec(weak) char CharacterAlphaValueName[] = "alphaValue";
-__declspec(weak) char CharacterLeftPropJointName[] = "bip01 l prop";
-__declspec(weak) char CharacterRightPropJointName[] = "bip01 r prop";
-__declspec(weak) char CharacterSpineJointName[] = "bip01 spine1";
-__declspec(weak) char CharacterBlendAmountName[] = "blendAmount";
-__declspec(weak) char CharacterBlackTextureName[] = "global/black";
-__declspec(weak) char CharacterShadowLevelName[] = "shadowLevel";
-__declspec(weak) char CharacterMegaBlendName[] = "megaBlend";
-__declspec(weak) char CharacterDamage1EnabledName[] = "damage1Enabled";
-__declspec(weak) char CharacterScorchTextureName[] = "global/scorch";
-__declspec(weak) char CharacterDamage2EnabledName[] = "damage2Enabled";
-__declspec(weak) char CharacterLightTextureName[] = "global/lightramp";
-__declspec(weak) char CharacterWhiteTextureName[] = "global/white";
+static int g_nOnscreenUpdate[3] = { 2, 2, 2 };
+static int g_nOffscreenUpdate[3] = { 4, 4, 4 };
 
 float lbl_806DCB48 = 1.0f;
 u8 lbl_806DCB4C = 1;
@@ -150,12 +59,11 @@ float lbl_806DCB7C = 28.0f;
 int lbl_806DCB80 = 8;
 int g_nCharacterView = eCLV_Characters;
 float lbl_806DCB88 = 0.25f;
-float lbl_806DCB8C = 1.175f;
-float lbl_806DCB90 = 1.125f;
+static float g_fRadiusScale = 1.175f;
 
-u32 lbl_806E1388 = glGetTexture(CharacterLightTextureName);
-u32 lbl_806E138C = glGetTexture(CharacterBlackTextureName);
-u32 lbl_806E1390 = glGetTexture(CharacterWhiteTextureName);
+static unsigned long LightTexture = glGetTexture("global/lightramp");
+static unsigned long BlackTexture = glGetTexture("global/black");
+static unsigned long WhiteTexture = glGetTexture("global/white");
 int lbl_806E1394;
 int lbl_806E1398;
 int lbl_806E139C;
@@ -170,87 +78,29 @@ u8 lbl_806E13B0;
 u8 lbl_806E13B1;
 u8 lbl_806E13B2;
 int lbl_806E13B4;
-u8 lbl_806E13B8;
-cCharacter* DrawableCharacter::renderOnlyCharacter;
-bool DrawableCharacter::renderOpposingGoalie;
-u8 lbl_806E13C1;
-bool DrawableCharacter::sCameraRelativeLighting;
 
-extern int lbl_806E0F54;
-extern TaskManager* m_pInstance__13nlTaskManager;
-
-static inline double BoolAsDouble(bool value)
-{
-    return value ? 1.0f : 0.0f;
-}
-
-static inline float Lerp(float lhs, float rhs, float weight, float one)
-{
-    float lhsWeight = one - weight;
-    float rhsWeighted = weight * rhs;
-    return lhsWeight * lhs + rhsWeighted;
-}
-
-static inline void VectorLerp(
-    nlVector3& output,
-    const nlVector3& lhs,
-    const nlVector3& rhs,
-    float weight)
-{
-    float lhsWeight = 1.0f - weight;
-    output.x = lhsWeight * lhs.x + weight * rhs.x;
-    output.y = lhsWeight * lhs.y + weight * rhs.y;
-    output.z = lhsWeight * lhs.z + weight * rhs.z;
-}
-
-static inline void SetMatrixTranslation(nlMatrix4& matrix, const nlVector3& translation)
-{
-    matrix.e2[3][0] = translation.x;
-    matrix.e2[3][1] = translation.y;
-    matrix.e2[3][2] = translation.z;
-    matrix.e2[3][3] = 1.0f;
-}
-
-static inline nlVector3& GetMatrixTranslation(nlMatrix4& matrix)
-{
-    return *(nlVector3*)&matrix.e2[3][0];
-}
-
-static inline void SetMatrixTranslation(
-    nlMatrix4& matrix,
-    float x,
-    float y,
-    float z,
-    float w)
-{
-    matrix.e2[3][0] = x;
-    matrix.e2[3][1] = y;
-    matrix.e2[3][2] = z;
-    matrix.e2[3][3] = w;
-}
+unsigned char DrawableCharacter::sShadowRenderingDisabled;
+cCharacter* DrawableCharacter::spRenderOnlyThisCharacter = 0;
+bool DrawableCharacter::sbRenderOpposingGoalieToo = false;
+bool DrawableCharacter::sSTSLighting = false;
+bool DrawableCharacter::sCameraRelativeLighting = false;
 
 static inline void BlendTranslationAccum(
     TransAccum& output,
     const TransAccum& lhs,
     const TransAccum& rhs,
-    float weight,
-    float one,
-    float zero)
+    float weight)
 {
-    output.fAccumulatedWeight = one;
+    output.fAccumulatedWeight = 1.0f;
     if (lhs.bIdentity && rhs.bIdentity)
     {
         output.bIdentity = true;
-        output.t.x = zero;
-        output.t.y = zero;
-        output.t.z = zero;
+        nlVec3Set(output.t, 0.0f, 0.0f, 0.0f);
     }
     else
     {
         output.bIdentity = false;
-        output.t.x = Lerp(lhs.t.x, rhs.t.x, weight, one);
-        output.t.y = Lerp(lhs.t.y, rhs.t.y, weight, one);
-        output.t.z = Lerp(lhs.t.z, rhs.t.z, weight, one);
+        nlVecLerp(output.t, lhs.t, rhs.t, weight);
     }
 }
 
@@ -258,51 +108,19 @@ static inline void BlendScaleAccum(
     ScaleAccum& output,
     const ScaleAccum& lhs,
     const ScaleAccum& rhs,
-    float weight,
-    float one)
+    float weight)
 {
-    output.fAccumulatedWeight = one;
+    output.fAccumulatedWeight = 1.0f;
     if (lhs.bIdentity && rhs.bIdentity)
     {
         output.bIdentity = true;
-        output.s.x = one;
-        output.s.y = one;
-        output.s.z = one;
+        nlVec3Set(output.s, 1.0f, 1.0f, 1.0f);
     }
     else
     {
         output.bIdentity = false;
-        output.s.x = Lerp(lhs.s.x, rhs.s.x, weight, one);
-        output.s.y = Lerp(lhs.s.y, rhs.s.y, weight, one);
-        output.s.z = Lerp(lhs.s.z, rhs.s.z, weight, one);
+        nlVecLerp(output.s, lhs.s, rhs.s, weight);
     }
-}
-
-static inline void BuildCharacterMatrices(DrawableCharacter* drawable, cPoseAccumulator* accumulator)
-{
-    nlMatrix4 matrix;
-    nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)drawable->facingDirection);
-    SetMatrixTranslation(matrix, drawable->position);
-    if (drawable->character != 0)
-    {
-        fn_8030C380(
-            accumulator, *(int*)((char*)drawable->character + 0xD8),
-            fn_8017BF84, drawable, 0);
-    }
-    accumulator->BuildNodeMatrices(matrix);
-    if (drawable->character != 0)
-    {
-        fn_8030C380(
-            accumulator, *(int*)((char*)drawable->character + 0xD8), 0, 0, 0);
-    }
-}
-
-static inline void BuildNpcMatrices(DrawableCharacter* drawable)
-{
-    nlMatrix4 matrix;
-    nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)drawable->facingDirection);
-    SetMatrixTranslation(matrix, drawable->position);
-    fn_8030B9C8(drawable->poseAccumulator, &matrix);
 }
 
 DrawableCharacter::DrawableCharacter()
@@ -330,7 +148,7 @@ DrawableCharacter::DrawableCharacter()
     damage1 = 0.0f;
     damage2 = 0.0f;
     damageType = 0;
-    savedScorchTexture = -1;
+    savedScorchTexture = 0xFFFFFFFF;
     scorchTexture = 0;
     position.x = 0.0f;
     position.y = 0.0f;
@@ -367,7 +185,7 @@ void DrawableCharacter::Free()
 
 cPN_SAnimController& DrawableCharacter::GetAnimController() const
 {
-    return *(cPN_SAnimController*)character->m_pCurrentAnimController;
+    return *character->m_pCurrentAnimController;
 }
 
 void DrawableCharacter::Grab(cCharacter& source)
@@ -392,12 +210,12 @@ void DrawableCharacter::Grab(cCharacter& source)
     typeIsOne = source.m_ModelType == 1;
     blendAmount = source.mUnidentified178;
     state40 = source.mUnidentified1A8;
-    shadowLevel = (float)BoolAsDouble(source.mUnidentified17C != 0);
-    shadowLevel = shadowLevel * blendAmount;
+    shadowLevel = source.mUnidentified17C ? 1.0f : 0.0f;
+    shadowLevel *= blendAmount;
     velocity = source.mUnidentified024.m_v3Velocity;
     facingDirection = source.mUnidentified024.m_aActualFacingDirection;
-    headSpin = (u16)(int)source.m_pHeadTrack->m_fHeadSpin;
-    headTilt = (u16)(int)source.m_pHeadTrack->m_fHeadTilt;
+    headSpin = (unsigned short)source.m_pHeadTrack->m_fHeadSpin;
+    headTilt = (unsigned short)source.m_pHeadTrack->m_fHeadTilt;
     visible = true;
     useObject = source.m_pPoseAccumulator->m_bUseObject;
     damage1 = source.m_Dirt;
@@ -410,11 +228,9 @@ void DrawableCharacter::Grab(cCharacter& source)
 
     if (poseAccumulator == 0)
     {
-        cPoseAccumulator* accumulator =
-            (cPoseAccumulator*)nlMalloc(sizeof(cPoseAccumulator), 8, false);
-        accumulator = new (accumulator)
-            cPoseAccumulator(*source.m_pPoseAccumulator);
-        poseAccumulator = accumulator;
+        cPoseAccumulator* p = (cPoseAccumulator*)nlMalloc(sizeof(cPoseAccumulator), 8, false);
+        p = new (p) cPoseAccumulator(*source.m_pPoseAccumulator);
+        poseAccumulator = p;
     }
     else
     {
@@ -432,62 +248,52 @@ void DrawableCharacter::Grab(cCharacter& source)
                 matrix.e2[row][column] *= megaScale;
             }
         }
-        matrix.e2[3][0] = megaTranslation.x;
-        matrix.e2[3][1] = megaTranslation.y;
-        matrix.e2[3][2] = megaTranslation.z;
-        matrix.e2[3][3] = 1.0f;
+        matrix.SetTranslation(megaTranslation);
 
         poseAccumulator->m_NodeMatrices[lbl_806E1398] = matrix;
     }
 
-    EffectsTexturing* texturing = source.m_pEffectsTexturing;
-    if (texturing == 0)
+    EffectsTexturing* tex = source.m_pEffectsTexturing;
+    if (tex == 0)
     {
-        texturing = fxGetTexturing(eFXTex_Nothing);
+        tex = fxGetTexturing(eFXTex_Nothing);
     }
-    effectsTexturing = texturing;
+    effectsTexturing = tex;
 }
 
-void DrawableCharacter::HeadTrackCallback(
-    u32 context, u32, cPoseAccumulator* accumulator, u32 headNodeIndex, int)
+static void DrawableCharacterHeadTrackCallback(unsigned int ctx, unsigned int, cPoseAccumulator* poseAccumulator, unsigned int currentNodeIndex, int)
 {
-    DrawableCharacter* drawable = (DrawableCharacter*)context;
-    CalcHeadTrackMatrix(drawable->headSpin, drawable->headTilt,
-        accumulator, headNodeIndex);
+    DrawableCharacter* drawableChar = (DrawableCharacter*)ctx;
+    CalcHeadTrackMatrix(drawableChar->headSpin, drawableChar->headTilt, poseAccumulator, currentNodeIndex);
 }
 
 void DrawableCharacter::BuildNodeMatrices(cPoseAccumulator* accumulator)
 {
-    nlMatrix4 matrix;
-    nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)facingDirection);
-    matrix.e2[3][0] = position.x;
-    matrix.e2[3][1] = position.y;
-    matrix.e2[3][2] = position.z;
-    matrix.e2[3][3] = 1.0f;
+    nlMatrix4 worldMatrix;
+    float angle = 0.0000958738f * (float)facingDirection;
+    nlMakeRotationMatrixZ(worldMatrix, angle);
+    worldMatrix.SetTranslation(position);
 
     if (character != 0)
     {
-        fn_8030C380(
-            accumulator, character->m_nHeadJointIndex,
-            fn_8017BF84, this, 0);
+        accumulator->SetBuildNodeMatrixCallback(character->m_nHeadJointIndex, DrawableCharacterHeadTrackCallback, (unsigned int)this, 0);
     }
-    accumulator->BuildNodeMatrices(matrix);
+
+    accumulator->BuildNodeMatrices(worldMatrix);
+
     if (character != 0)
     {
-        fn_8030C380(
-            accumulator, character->m_nHeadJointIndex, 0, 0, 0);
+        accumulator->SetBuildNodeMatrixCallback(character->m_nHeadJointIndex, 0, 0, 0);
     }
 }
 
 void DrawableCharacter::BuildNpcMatrix()
 {
-    nlMatrix4 matrix;
-    nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)facingDirection);
-    matrix.e2[3][0] = position.x;
-    matrix.e2[3][1] = position.y;
-    matrix.e2[3][2] = position.z;
-    matrix.e2[3][3] = 1.0f;
-    fn_8030B9C8(poseAccumulator, &matrix);
+    nlMatrix4 worldMatrix;
+    float angle = 0.0000958738f * (float)facingDirection;
+    nlMakeRotationMatrixZ(worldMatrix, angle);
+    worldMatrix.SetTranslation(position);
+    fn_8030B9C8(poseAccumulator, &worldMatrix);
 }
 
 void DrawableCharacter::Render(cCharacter& source)
@@ -511,7 +317,7 @@ void DrawableCharacter::Render(cCharacter& source)
 
     if (!special || lbl_806DCB4C != 0)
     {
-        if (m_pInstance__13nlTaskManager->state == 2)
+        if (nlTaskManager::m_pInstance->mCurrentState == 2)
         {
             source.PoseSkinMesh(poseAccumulator, 2);
         }
@@ -522,11 +328,10 @@ void DrawableCharacter::Render(cCharacter& source)
     }
     source.PoseSkinMesh(poseAccumulator, 3);
 
-    cCharacter* renderOnly = renderOnlyCharacter;
+    cCharacter* renderOnly = spRenderOnlyThisCharacter;
     if (renderOnly == 0 || renderOnly == &source
-        || (renderOpposingGoalie
-            && (void*)&source
-                == (void*)((cPlayer*)renderOnly)->m_pTeam->GetOtherTeam()->GetGoalie()))
+        || (sbRenderOpposingGoalieToo
+            && &source == (cCharacter*)((cPlayer*)renderOnly)->m_pTeam->GetOtherTeam()->GetGoalie()))
     {
         if (special)
         {
@@ -547,39 +352,39 @@ void DrawableCharacter::Render(cCharacter& source)
 
 void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
 {
-    SkinMesh* skinMesh;
+    GLSkinMesh* skinMesh;
     int characterClass = source.mUnidentified024.m_eCharacterClass;
     int view = g_nCharacterView;
     if (gPeachPhotoState.state == 1)
     {
-        view = 13;
+        view = eCLV_MoreCharacters;
         if (source.mUnidentified17D)
         {
-            view = 11;
+            view = eCLV_Characters;
         }
     }
     if (characterClass == 5 && source.mUnidentified1A8 > 0.0f)
     {
-        view = 15;
+        view = eCLV_HighRange3D;
     }
 
     if (renderPass != 2)
     {
-        if (m_pInstance__13nlTaskManager->state == 2)
+        if (nlTaskManager::m_pInstance->mCurrentState == 2)
         {
-            skinMesh = fn_8001C550(&source, 2);
+            skinMesh = source.GetSkinMesh(2);
         }
         else
         {
-            skinMesh = fn_8001C550(&source, 0);
+            skinMesh = source.GetSkinMesh(0);
         }
     }
     else
     {
-        skinMesh = fn_8001C550(&source, 1);
+        skinMesh = source.GetSkinMesh(1);
     }
 
-    if (lbl_806E13C1)
+    if (sSTSLighting)
     {
         fn_80182EC8(2);
     }
@@ -593,24 +398,23 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
     }
 
     bool isVisible;
-    if (m_pInstance__13nlTaskManager->state == 0x10)
+    if (nlTaskManager::m_pInstance->mCurrentState == 0x10)
     {
         isVisible = true;
     }
     else if (IsStadiumWorldLoaded())
     {
-        float radius;
+        float fRadius;
         if (characterClass == 3)
         {
-            radius = 3.5f;
+            fRadius = 3.5f;
         }
         else
         {
-            radius = 2.5f;
+            fRadius = 2.5f;
         }
-        const nlVector4* pPlanes
-            = fn_8027261C()->m_Interface->GetShadowMatrix();
-        isVisible = ClassifySphereInFrustum(pPlanes, &bip01Position, radius) != 0;
+        isVisible = ClassifySphereInFrustum(
+            fn_8027261C()->m_Interface->GetShadowMatrix(), &bip01Position, fRadius) != 0;
     }
     else
     {
@@ -622,86 +426,75 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
         return;
     }
 
-    skinMesh->enabled = 1;
+    skinMesh->m_Unknown0C = 1;
     if (lbl_806E13AD
-        || (m_pInstance__13nlTaskManager->state & 0x18) != 0
-        || (m_pInstance__13nlTaskManager->state & 8) != 0
-        || (m_pInstance__13nlTaskManager->state & 0x20000) != 0)
+        || (nlTaskManager::m_pInstance->mCurrentState & 0x18) != 0
+        || (nlTaskManager::m_pInstance->mCurrentState & 8) != 0
+        || (nlTaskManager::m_pInstance->mCurrentState & 0x20000) != 0)
     {
-        skinMesh->enabled = 0;
+        skinMesh->m_Unknown0C = 0;
     }
     skinMesh->PrepareToRender();
-    void* sourceModel = skinMesh->FinishPreparing();
-
-    Model* model
-        = (Model*)glModelDupNoStreams((const glModel*)sourceModel, false, 0);
-    ApplyDamageEffects(source, model, renderPass);
+    glModel* pModel = glModelDupNoStreams(skinMesh->GetModel(), false, 0);
+    ApplyDamageEffects(source, pModel, renderPass);
     bool attachEffects = false;
-    ApplyMaterialEffects(
-        source, model, (eCharacterRenderPass)renderPass, &attachEffects);
+    ApplyMaterialEffects(source, pModel, (eCharacterRenderPass)renderPass, &attachEffects);
     if (attachEffects)
     {
-        fn_8001EFCC(&source, skinMesh, model);
+        source.PerformBlinking(skinMesh, pModel);
     }
 
-    static u32 alphaValueHash = nlStringLowerHash(CharacterAlphaValueName);
+    static u32 alphaValueHash = nlStringLowerHash("alphaValue");
     if (characterClass == 10)
     {
-        int packetCount = model->packetCount;
-        if ((lbl_806E13B1 || !flag5)
-            && lbl_806E13B4 < packetCount)
+        int numPackets = pModel->numPackets;
+        if ((lbl_806E13B1 || !flag5) && lbl_806E13B4 < numPackets)
         {
-            glSetMaterialFloatParameter((glModelPacket*)(model->packets + lbl_806E13B4),
-                alphaValueHash, 0.0f);
+            glSetMaterialFloatParameter(&pModel->packets[lbl_806E13B4], alphaValueHash, 0.0f);
         }
-        if ((lbl_806E13B2 || !flag6)
-            && lbl_806DCB80 < packetCount)
+        if ((lbl_806E13B2 || !flag6) && lbl_806DCB80 < numPackets)
         {
-            glSetMaterialFloatParameter((glModelPacket*)(model->packets + lbl_806DCB80),
-                alphaValueHash, 0.0f);
+            glSetMaterialFloatParameter(&pModel->packets[lbl_806DCB80], alphaValueHash, 0.0f);
         }
     }
 
-    fn_80273A4C(view, model, 0);
+    fn_80273A4C((eCLV)view, pModel, 0);
     if (characterClass == 5)
     {
-        view = 13;
+        view = eCLV_MoreCharacters;
     }
 
-    SkinMesh* shadowMesh = fn_8001C550(&source, 3);
+    GLSkinMesh* shadowMesh = source.GetSkinMesh(3);
     if (shadowMesh != skinMesh)
     {
-        shadowMesh->enabled = 1;
+        shadowMesh->m_Unknown0C = 1;
         if (lbl_806E13AD
-            || (m_pInstance__13nlTaskManager->state & 0x18) != 0
-            || (m_pInstance__13nlTaskManager->state & 8) != 0
-            || (m_pInstance__13nlTaskManager->state & 0x20000) != 0)
+            || (nlTaskManager::m_pInstance->mCurrentState & 0x18) != 0
+            || (nlTaskManager::m_pInstance->mCurrentState & 8) != 0
+            || (nlTaskManager::m_pInstance->mCurrentState & 0x20000) != 0)
         {
-            shadowMesh->enabled = 0;
+            shadowMesh->m_Unknown0C = 0;
         }
         shadowMesh->PrepareToRender();
-        sourceModel = shadowMesh->FinishPreparing();
-        model
-            = (Model*)glModelDupNoStreams((const glModel*)sourceModel, false, 0);
+        pModel = glModelDupNoStreams(shadowMesh->GetModel(), false, 0);
     }
-    RenderCharacterShadow(source, model, view);
+    RenderCharacterShadow(source, pModel, view);
 }
 
 void DrawableCharacter::Grab(SkinAnimatedMovableNPC& npc)
 {
     position = npc.mv3Position;
-    height = npc.mpPoseAccumulator->GetNodeMatrix(0).e2[3][2];
+    nlMatrix4& nodeMatrix = npc.mpPoseAccumulator->GetNodeMatrix(0);
+    height = nodeMatrix.m43;
     facingDirection = npc.maFacingDirection;
     object = npc.mpPoseTree;
     visible = npc.mbIsVisible;
 
     if (poseAccumulator == 0)
     {
-        cPoseAccumulator* accumulator =
-            (cPoseAccumulator*)nlMalloc(sizeof(cPoseAccumulator), 8, false);
-        accumulator = new (accumulator)
-            cPoseAccumulator(*npc.mpPoseAccumulator);
-        poseAccumulator = accumulator;
+        cPoseAccumulator* p = (cPoseAccumulator*)nlMalloc(sizeof(cPoseAccumulator), 8, false);
+        p = new (p) cPoseAccumulator(*npc.mpPoseAccumulator);
+        poseAccumulator = p;
     }
     else
     {
@@ -716,23 +509,18 @@ void DrawableCharacter::Render(SkinAnimatedMovableNPC& npc)
         return;
     }
 
-    u16 angleValue = ((volatile DrawableCharacter*)this)->facingDirection;
     nlMatrix4 worldMatrix;
-    nlMakeRotationMatrixZ(worldMatrix, 0.0000958738f * (float)angleValue);
+    float angle = 0.0000958738f * (float)facingDirection;
+    nlMakeRotationMatrixZ(worldMatrix, angle);
+
     worldMatrix.SetRow_(3, position);
+
     npc.mbIsVisible = visible;
     npc.RenderFromReplay(*poseAccumulator, &worldMatrix);
 }
 
-#pragma opt_findoptimalunrollfactor off
-#pragma opt_unroll_count 1
-void DrawableCharacter::Blend(
-    float* blendFactors,
-    DrawableCharacter& lhs,
-    DrawableCharacter& rhs)
+void DrawableCharacter::Blend(float* blendFactors, DrawableCharacter& lhs, DrawableCharacter& rhs)
 {
-    float identityZero;
-    float identityOne;
     const float rhsWeight = *blendFactors;
     const float lhsWeight = 1.0f - rhsWeight;
 
@@ -751,14 +539,11 @@ void DrawableCharacter::Blend(
                 if (lbl_806E1394 <= 0)
                 {
                     cSHierarchy* hierarchy = lhs.poseAccumulator->m_BaseSHierarchy;
-                    u32 hash = nlStringLowerHash(CharacterLeftPropJointName);
-                    lbl_806E1394 = fn_8030CC1C(hierarchy, hash);
+                    lbl_806E1394 = hierarchy->GetNodeIndexByID(nlStringLowerHash("bip01 l prop"));
                     hierarchy = lhs.poseAccumulator->m_BaseSHierarchy;
-                    hash = nlStringLowerHash(CharacterRightPropJointName);
-                    lbl_806E1398 = fn_8030CC1C(hierarchy, hash);
+                    lbl_806E1398 = hierarchy->GetNodeIndexByID(nlStringLowerHash("bip01 r prop"));
                     hierarchy = lhs.poseAccumulator->m_BaseSHierarchy;
-                    hash = nlStringLowerHash(CharacterSpineJointName);
-                    lbl_806E139C = fn_8030CC1C(hierarchy, hash);
+                    lbl_806E139C = hierarchy->GetNodeIndexByID(nlStringLowerHash("bip01 spine1"));
                 }
 
                 megaEnabled = rhs.megaEnabled;
@@ -784,10 +569,8 @@ void DrawableCharacter::Blend(
         damage1 = lhs.damage1;
         damage2 = lhs.damage2;
         damageType = lhs.damageType;
-        VectorLerp(
-            bip01Position, lhs.bip01Position, rhs.bip01Position, rhsWeight);
-        VectorLerp(
-            headPosition, lhs.headPosition, rhs.headPosition, rhsWeight);
+        nlVecLerp(bip01Position, lhs.bip01Position, rhs.bip01Position, rhsWeight);
+        nlVecLerp(headPosition, lhs.headPosition, rhs.headPosition, rhsWeight);
         velocity = lhs.velocity;
         scale = lhs.scale * lhsWeight + rhsWeight * rhs.scale;
         blendAmount = lhs.blendAmount * lhsWeight + rhsWeight * rhs.blendAmount;
@@ -798,12 +581,10 @@ void DrawableCharacter::Blend(
 
         if (!lhs.useObject && !rhs.useObject)
         {
-            int headSpinOffset =
-                (short)(rhsWeight * (float)(short)(rhs.headSpin - lhs.headSpin));
+            int headSpinOffset = (short)(rhsWeight * (float)(short)(rhs.headSpin - lhs.headSpin));
             headSpin = lhs.headSpin + headSpinOffset;
             normalBlend = true;
-            int headTiltOffset =
-                (short)(rhsWeight * (float)(short)(rhs.headTilt - lhs.headTilt));
+            int headTiltOffset = (short)(rhsWeight * (float)(short)(rhs.headTilt - lhs.headTilt));
             headTilt = lhs.headTilt + headTiltOffset;
             object = 0;
         }
@@ -815,93 +596,68 @@ void DrawableCharacter::Blend(
         scale = 1.0f;
     }
 
-    float positionLhsWeight = 1.0f - rhsWeight;
-    position.x = positionLhsWeight * lhs.position.x + rhsWeight * rhs.position.x;
-    position.y = positionLhsWeight * lhs.position.y + rhsWeight * rhs.position.y;
-    position.z = positionLhsWeight * lhs.position.z + rhsWeight * rhs.position.z;
-    int facingOffset =
-        (short)(rhsWeight * (float)(short)(rhs.facingDirection - lhs.facingDirection));
+    nlVecLerp(position, lhs.position, rhs.position, rhsWeight);
+    int facingOffset = (short)(rhsWeight * (float)(short)(rhs.facingDirection - lhs.facingDirection));
     facingDirection = lhs.facingDirection + facingOffset;
     height = lhs.scale * lhsWeight + rhsWeight * rhs.scale;
 
     if (poseAccumulator == 0)
     {
-        cPoseAccumulator* accumulator = new (
-            nlMalloc(sizeof(cPoseAccumulator), 8, false))
-            cPoseAccumulator(lhs.poseAccumulator->m_BaseSHierarchy, false);
-        poseAccumulator = accumulator;
+        poseAccumulator = new (nlMalloc(sizeof(cPoseAccumulator), 8, false)) cPoseAccumulator(lhs.poseAccumulator->m_BaseSHierarchy, false);
     }
 
     poseAccumulator->m_Scale = scale;
     poseAccumulator->InitAccumulators();
 
-    for (int morphIndex = 0; morphIndex < 20; ++morphIndex)
+    for (int i = 0; i < 20; i++)
     {
-        float& lhsMorphWeight =
-            lhs.poseAccumulator->m_MorphWeights[morphIndex];
-        poseAccumulator->m_MorphWeights[morphIndex] +=
-            lhsMorphWeight * lhsWeight;
-        float& rhsMorphWeight =
-            rhs.poseAccumulator->m_MorphWeights[morphIndex];
-        poseAccumulator->m_MorphWeights[morphIndex] +=
-            rhsMorphWeight * rhsWeight;
+        float lhsMorphWeight = lhs.poseAccumulator->m_MorphWeights[i];
+        poseAccumulator->m_MorphWeights[i] += lhsMorphWeight * lhsWeight;
+        float rhsMorphWeight = rhs.poseAccumulator->m_MorphWeights[i];
+        poseAccumulator->m_MorphWeights[i] += rhsMorphWeight * rhsWeight;
     }
 
     if (normalBlend)
     {
-        identityOne = 1.0f;
-        identityZero = 0.0f;
-        for (int i = 0; i < fn_8030C374(poseAccumulator); ++i)
+        for (int i = 0; i < poseAccumulator->GetNumNodes(); i++)
         {
             RotAccum& lhsRot = lhs.poseAccumulator->m_rot[i];
             RotAccum& rhsRot = rhs.poseAccumulator->m_rot[i];
-            float lhsRotAroundZWeight =
-                lhsRot.rotAroundZAccumulatedWeight * lhsWeight;
+            float lhsRotAroundZWeight = lhsRot.rotAroundZAccumulatedWeight * lhsWeight;
             float rhsRotAroundZWeight = rhsRot.rotAroundZAccumulatedWeight * rhsWeight;
-            fn_8030BE68(
-                poseAccumulator, i, lhsRot.rotAroundZ,
-                lhsRotAroundZWeight);
-            fn_8030BE68(poseAccumulator, i, rhsRot.rotAroundZ, rhsRotAroundZWeight);
-            float lhsQuaternionWeight =
-                lhsRot.quatAccumulatedWeight * lhsWeight;
-            float rhsQuaternionWeight = rhsRot.quatAccumulatedWeight * rhsWeight;
-            fn_8030BD18(
-                poseAccumulator, i, &lhsRot.q,
-                false, lhsQuaternionWeight);
-            fn_8030BD18(
-                poseAccumulator, i, &rhsRot.q, false, rhsQuaternionWeight);
+            poseAccumulator->BlendRotAroundZ(i, lhsRot.rotAroundZ, lhsRotAroundZWeight);
+            poseAccumulator->BlendRotAroundZ(i, rhsRot.rotAroundZ, rhsRotAroundZWeight);
+            float lhsQuatWeight = lhsRot.quatAccumulatedWeight * lhsWeight;
+            float rhsQuatWeight = rhsRot.quatAccumulatedWeight * rhsWeight;
+            poseAccumulator->BlendRot(i, &lhsRot.q, lhsQuatWeight, false);
+            poseAccumulator->BlendRot(i, &rhsRot.q, rhsQuatWeight, false);
 
             BlendTranslationAccum(
                 poseAccumulator->m_trans[i],
                 lhs.poseAccumulator->m_trans[i],
                 rhs.poseAccumulator->m_trans[i],
-                rhsWeight,
-                identityOne,
-                identityZero);
+                rhsWeight);
             BlendScaleAccum(
                 poseAccumulator->m_scale[i],
                 lhs.poseAccumulator->m_scale[i],
                 rhs.poseAccumulator->m_scale[i],
-                rhsWeight,
-                identityOne);
+                rhsWeight);
         }
 
-        BuildCharacterMatrices(this, poseAccumulator);
+        BuildNodeMatrices(poseAccumulator);
     }
     else
     {
         if (!lhs.useObject)
         {
-            BuildCharacterMatrices(this, lhs.poseAccumulator);
+            BuildNodeMatrices(lhs.poseAccumulator);
         }
         else if (!rhs.useObject)
         {
-            BuildCharacterMatrices(this, rhs.poseAccumulator);
+            BuildNodeMatrices(rhs.poseAccumulator);
         }
 
-        identityZero = 1.0f;
-        identityOne = 0.0f;
-        for (int i = 0; i < fn_8030C374(poseAccumulator); ++i)
+        for (int i = 0; i < poseAccumulator->GetNumNodes(); i++)
         {
             nlQuatNLerp(
                 poseAccumulator->GetNodeQuaternion(i),
@@ -912,18 +668,15 @@ void DrawableCharacter::Blend(
                 poseAccumulator->m_trans[i],
                 lhs.poseAccumulator->m_trans[i],
                 rhs.poseAccumulator->m_trans[i],
-                rhsWeight,
-                identityZero,
-                identityOne);
+                rhsWeight);
             BlendScaleAccum(
                 poseAccumulator->m_scale[i],
                 lhs.poseAccumulator->m_scale[i],
                 rhs.poseAccumulator->m_scale[i],
-                rhsWeight,
-                identityZero);
+                rhsWeight);
         }
 
-        BuildNpcMatrices(this);
+        BuildNpcMatrix();
     }
 
     if (specialCharacter)
@@ -939,7 +692,7 @@ void DrawableCharacter::Blend(
                     matrix.e2[row][column] *= megaScale;
                 }
             }
-            SetMatrixTranslation(matrix, megaTranslation);
+            matrix.SetTranslation(megaTranslation);
             poseAccumulator->m_NodeMatrices[lbl_806E1398] = matrix;
         }
         else if (lbl_806E13AF || !flag3)
@@ -950,22 +703,9 @@ void DrawableCharacter::Blend(
                 DegreesToRadians(lbl_806DCB5C),
                 DegreesToRadians(lbl_806DCB60),
                 DegreesToRadians(lbl_806DCB64));
-            float translationW;
-            float translationX;
-            float translationY;
-            float translationZ;
-            translationZ = lbl_806DCB58;
-            translationY = lbl_806DCB54;
-            translationX = lbl_806DCB50;
-            translationW = 1.0f;
-            rotation.e2[3][0] = translationX;
-            rotation.e2[3][1] = translationY;
-            rotation.e2[3][2] = translationZ;
-            rotation.e2[3][3] = translationW;
+            rotation.SetRow4_(3, lbl_806DCB50, lbl_806DCB54, lbl_806DCB58, 1.0f);
             nlMatrix4 matrix;
-            nlMultMatrices(
-                matrix, rotation,
-                *fn_8030C2F0(poseAccumulator, lbl_806E139C));
+            nlMultMatrices(matrix, rotation, poseAccumulator->GetNodeMatrix(lbl_806E139C));
             poseAccumulator->m_NodeMatrices[lbl_806E1398] = matrix;
         }
 
@@ -977,44 +717,22 @@ void DrawableCharacter::Blend(
                 DegreesToRadians(lbl_806DCB74),
                 DegreesToRadians(lbl_806DCB78),
                 DegreesToRadians(lbl_806DCB7C));
-            float translationW;
-            float translationX;
-            float translationY;
-            float translationZ;
-            translationZ = lbl_806DCB70;
-            translationY = lbl_806DCB6C;
-            translationX = lbl_806DCB68;
-            translationW = 1.0f;
-            rotation.e2[3][0] = translationX;
-            rotation.e2[3][1] = translationY;
-            rotation.e2[3][2] = translationZ;
-            rotation.e2[3][3] = translationW;
+            rotation.SetRow4_(3, lbl_806DCB68, lbl_806DCB6C, lbl_806DCB70, 1.0f);
             nlMatrix4 matrix;
-            nlMultMatrices(
-                matrix, rotation,
-                *fn_8030C2F0(poseAccumulator, lbl_806E139C));
+            nlMultMatrices(matrix, rotation, poseAccumulator->GetNodeMatrix(lbl_806E139C));
             poseAccumulator->m_NodeMatrices[lbl_806E1394] = matrix;
         }
     }
 }
-#pragma opt_findoptimalunrollfactor reset
-#pragma opt_unroll_count reset
 
-void DrawableCharacter::EvaluateFrom(
-    const cPoseNode& poseNode,
-    const nlVector3& offset,
-    u16 facingAngle,
-    float poseScale)
+void DrawableCharacter::EvaluateFrom(const cPoseNode& poseNode, const nlVector3& offset, unsigned short facingAngle, float poseScale)
 {
-    static const float initialOne = 1.0f;
-    static const float initialZero = 0.0f;
-
     position = offset;
-    nlVec3Set(velocity, initialZero, initialZero, initialZero);
+    nlVec3Set(velocity, 0.0f, 0.0f, 0.0f);
     facingDirection = facingAngle;
     headSpin = 0;
     headTilt = 0;
-    height = initialZero;
+    height = 0.0f;
     scale = poseScale;
     flag2 = false;
     flag3 = false;
@@ -1022,59 +740,37 @@ void DrawableCharacter::EvaluateFrom(
     flag5 = false;
     flag6 = false;
     typeIsOne = false;
-    blendAmount = initialOne;
-    state40 = initialZero;
-
-    float currentDamage1 = character->m_Dirt;
-    damage1 = currentDamage1;
-    float currentDamage2 = character->m_MinDirt;
-    damage2 = currentDamage2;
+    blendAmount = 1.0f;
+    state40 = 0.0f;
+    float dirt = character->m_Dirt;
+    damage1 = dirt;
+    float minDirt = character->m_MinDirt;
+    damage2 = minDirt;
     damageType = character->mUnidentified16C;
-    shadowLevel = initialOne;
+    shadowLevel = 1.0f;
 
     poseAccumulator->m_Scale = poseScale;
     poseAccumulator->InitAccumulators();
+
     poseNode.Evaluate(1.0f, poseAccumulator);
+
     effectsTexturing = fxGetTexturing(eFXTex_Nothing);
 
-    cPoseAccumulator* accumulator = poseAccumulator;
-    nlMatrix4 matrix;
-    nlMakeRotationMatrixZ(matrix, 0.0000958738f * (float)facingDirection);
-    matrix.e2[3][0] = position.x;
-    matrix.e2[3][1] = position.y;
-    matrix.e2[3][2] = position.z;
-    matrix.e2[3][3] = 1.0f;
+    BuildNodeMatrices(poseAccumulator);
 
-    if (character != 0)
-    {
-        fn_8030C380(
-            accumulator, character->m_nHeadJointIndex,
-            fn_8017BF84, this, 0);
-    }
-    accumulator->BuildNodeMatrices(matrix);
-    if (character != 0)
-    {
-        fn_8030C380(
-            accumulator, character->m_nHeadJointIndex, 0, 0, 0);
-    }
+    nlMatrix4& bip01Matrix = poseAccumulator->GetNodeMatrix(character->m_nBip01JointIndex_0xA4);
+    bip01Position = bip01Matrix.GetTranslation();
 
-    nlMatrix4& bip01Matrix =
-        poseAccumulator->GetNodeMatrix(character->m_nBip01JointIndex_0xA4);
-    bip01Position = GetMatrixTranslation(bip01Matrix);
-    nlMatrix4& headMatrix =
-        poseAccumulator->GetNodeMatrix(character->m_nHeadJointIndex);
-    headPosition = GetMatrixTranslation(headMatrix);
+    nlMatrix4& headMatrix = poseAccumulator->GetNodeMatrix(character->m_nHeadJointIndex);
+    headPosition = headMatrix.GetTranslation();
 }
 
-#pragma schedule off
-nlVector3 DrawableCharacter::GetBallPosition() const
+nlVector3 DrawableCharacter::GetBallPosition()
 {
-    cCharacter* player = *(cCharacter* volatile*)&character;
-    nlMatrix4& matrix =
-        poseAccumulator->GetNodeMatrix(((cPlayer*)player)->m_nBallJointIndex);
-    return GetMatrixTranslation(matrix);
+    cPlayer* pPlayer = (cPlayer*)character;
+    nlMatrix4& matrix = poseAccumulator->GetNodeMatrix(pPlayer->m_nBallJointIndex);
+    return matrix.GetTranslation();
 }
-#pragma schedule reset
 
 nlQuaternion DrawableCharacter::GetBallOrientation()
 {
@@ -1084,142 +780,114 @@ nlQuaternion DrawableCharacter::GetBallOrientation()
 
     if (1.0f != scale)
     {
-        nlMatrix4* source =
-            fn_8030C2F0(poseAccumulator, ballJointIndex);
-        matrix = *source;
+        matrix = poseAccumulator->GetNodeMatrix(ballJointIndex);
 
-        float reciprocalLength = nlRecipSqrt(
-            nlVec3LengthSquared(*(nlVector3*)&matrix.e2[0][0]), true);
+        float reciprocalLength = nlRecipSqrt(nlVec3LengthSquared(*(nlVector3*)&matrix.e2[0][0]), true);
         nlVec3Scale(*(nlVector3*)&matrix.e2[0][0], reciprocalLength);
 
-        reciprocalLength = nlRecipSqrt(
-            nlVec3LengthSquared(*(nlVector3*)&matrix.e2[1][0]), true);
+        reciprocalLength = nlRecipSqrt(nlVec3LengthSquared(*(nlVector3*)&matrix.e2[1][0]), true);
         nlVec3Scale(*(nlVector3*)&matrix.e2[1][0], reciprocalLength);
 
-        reciprocalLength = nlRecipSqrt(
-            nlVec3LengthSquared(*(nlVector3*)&matrix.e2[2][0]), true);
+        reciprocalLength = nlRecipSqrt(nlVec3LengthSquared(*(nlVector3*)&matrix.e2[2][0]), true);
         nlVec3Scale(*(nlVector3*)&matrix.e2[2][0], reciprocalLength);
 
         nlMatrixToQuat(result, matrix);
     }
     else
     {
-        nlMatrix4* source =
-            fn_8030C2F0(poseAccumulator, ballJointIndex);
-        nlMatrixToQuat(result, *source);
+        nlMatrixToQuat(result, poseAccumulator->GetNodeMatrix(ballJointIndex));
     }
 
     return result;
 }
 
-void DrawableCharacter::RenderOnlyOneCharacter(
-    cCharacter& source, bool goalie)
+void DrawableCharacter::RenderOnlyOneCharacter(cCharacter& character, bool renderOpposingGoalieToo)
 {
-    renderOnlyCharacter = &source;
-    renderOpposingGoalie = goalie;
+    spRenderOnlyThisCharacter = &character;
+    sbRenderOpposingGoalieToo = renderOpposingGoalieToo;
 }
 
 void DrawableCharacter::RenderAllCharacters()
 {
-    renderOnlyCharacter = 0;
-    renderOpposingGoalie = false;
+    spRenderOnlyThisCharacter = 0;
+    sbRenderOpposingGoalieToo = false;
 }
 
 cCharacter* DrawableCharacter::OnlyRenderingOneCharacter()
 {
-    return (cCharacter*)renderOnlyCharacter;
+    return spRenderOnlyThisCharacter;
 }
 
-static inline void ApplyTexture(
-    Model* model, u32 texture, ResolvedTexture resolvedTexture)
+static inline void ApplyTexture(glModel* model, unsigned long texture, ResolvedTexture resolvedTexture)
 {
-    for (ModelPacket* packet = model->packets;
-         packet < model->packets + model->packetCount;
-         ++packet)
+    for (glModelPacket* packet = model->packets; packet < model->packets + model->numPackets; packet++)
     {
-        if (texture != glGetMaterialUnsignedParameter((glModelPacket*)packet, gDiffuseTextureSemantic))
+        if (texture != glGetMaterialUnsignedParameter(packet, gDiffuseTextureSemantic))
         {
-            glSetMaterialTextureParameter((glModelPacket*)packet, gDiffuseTextureSemantic, texture);
-            ResolvedTexture packetTexture = resolvedTexture;
-            glSetMaterialTextureIndexParameter((glModelPacket*)packet, gDiffuseTextureSemantic,
-                (const unsigned long*)&packetTexture.value);
+            glSetMaterialTextureParameter(packet, gDiffuseTextureSemantic, texture);
+            unsigned long packetTexture = resolvedTexture.value;
+            glSetMaterialTextureIndexParameter(packet, gDiffuseTextureSemantic, &packetTexture);
         }
     }
 }
 
-void DrawableCharacter::ApplyMaterialEffects(
-    const cCharacter& source,
-    Model* model,
-    eCharacterRenderPass renderPass,
-    bool* attachEffects)
+void DrawableCharacter::ApplyMaterialEffects(const cCharacter& source, glModel* model, eCharacterRenderPass renderPass, bool* attachEffects)
 {
-    static u32 blendAmountHash = nlStringLowerHash(CharacterBlendAmountName);
+    static u32 blendAmountHash = nlStringLowerHash("blendAmount");
 
-    EffectsTexturing* texturing = effectsTexturing;
+    EffectsTexturing* fxtex = effectsTexturing;
     int characterClass = source.mUnidentified024.m_eCharacterClass;
+    u32 texture;
+    glModelPacket* pPacket;
 
-    if (texturing != 0 && texturing->m_uTexture == 0xFFFFFFFF)
+    if (fxtex != 0 && fxtex->m_uTexture == 0xFFFFFFFF)
     {
-        texturing = 0;
+        fxtex = 0;
     }
-    if (texturing != 0 && texturing->m_bDetail)
+    if (fxtex != 0 && fxtex->m_bDetail)
     {
-        texturing = 0;
+        fxtex = 0;
     }
 
-    if (texturing != 0)
+    if (fxtex != 0)
     {
-        for (ModelPacket* packet = model->packets;
-             packet < model->packets + model->packetCount;
-             ++packet)
+        for (glModelPacket* pFxPacket = model->packets; pFxPacket < model->packets + model->numPackets; pFxPacket++)
         {
-            u32& raster = packet->raster;
-            if (texturing->m_eBlendMode != GLB_None)
+            unsigned int& raster = pFxPacket->rasterState;
+            if (fxtex->m_eBlendMode != GLB_None)
             {
-                glSetRasterState(
-                    raster, GLS_AlphaBlend, (unsigned long)texturing->m_eBlendMode);
+                glSetRasterState(raster, GLS_AlphaBlend, fxtex->m_eBlendMode);
             }
 
-            if (texturing->m_bDetail)
+            if (fxtex->m_bDetail)
             {
-                glSetMaterialTextureParameter((glModelPacket*)packet, gDetailTextureSemantic,
-                    texturing->m_uTexture);
-                ResolvedTexture texture = texturing->m_ResolvedTexture;
-                glSetMaterialTextureIndexParameter((glModelPacket*)packet, gDetailTextureSemantic,
-                    (const unsigned long*)&texture.value);
-                glSetMaterialFloatParameter(
-                    (glModelPacket*)packet, blendAmountHash, lbl_806DCB88);
+                glSetMaterialTextureParameter(pFxPacket, gDetailTextureSemantic, fxtex->m_uTexture);
+                unsigned long resolvedTexture = fxtex->m_ResolvedTexture.value;
+                glSetMaterialTextureIndexParameter(pFxPacket, gDetailTextureSemantic, &resolvedTexture);
+                glSetMaterialFloatParameter(pFxPacket, blendAmountHash, lbl_806DCB88);
             }
             else
             {
-                glSetMaterialTextureParameter((glModelPacket*)packet, gDiffuseTextureSemantic,
-                    texturing->m_uTexture);
-                ResolvedTexture texture = texturing->m_ResolvedTexture;
-                glSetMaterialTextureIndexParameter((glModelPacket*)packet, gDiffuseTextureSemantic,
-                    (const unsigned long*)&texture.value);
+                glSetMaterialTextureParameter(pFxPacket, gDiffuseTextureSemantic, fxtex->m_uTexture);
+                unsigned long resolvedTexture = fxtex->m_ResolvedTexture.value;
+                glSetMaterialTextureIndexParameter(pFxPacket, gDiffuseTextureSemantic, &resolvedTexture);
             }
         }
     }
     else
     {
-        u32 texture = source.mUnidentified100;
+        texture = source.mUnidentified100;
         if (renderPass == CRP_Default)
         {
             if (texture != source.mUnidentified104)
             {
-                for (ModelPacket* packet = model->packets;
-                     packet < model->packets + model->packetCount;
-                     ++packet)
+                for (pPacket = model->packets; pPacket < model->packets + model->numPackets; pPacket++)
                 {
-                    if (texture
-                        == glGetMaterialUnsignedParameter((glModelPacket*)packet, gDiffuseTextureSemantic))
+                    if (texture == glGetMaterialUnsignedParameter(pPacket, gDiffuseTextureSemantic))
                     {
-                        glSetMaterialTextureParameter((glModelPacket*)packet, gDiffuseTextureSemantic,
-                            source.mUnidentified104);
-                        ResolvedTexture packetTexture =
-                            source.mUnidentified110;
-                        glSetMaterialTextureIndexParameter((glModelPacket*)packet, gDiffuseTextureSemantic,
-                            (const unsigned long*)&packetTexture.value);
+                        glSetMaterialTextureParameter(pPacket, gDiffuseTextureSemantic, source.mUnidentified104);
+                        unsigned long resolvedTexture = source.mUnidentified110.value;
+                        glSetMaterialTextureIndexParameter(pPacket, gDiffuseTextureSemantic, &resolvedTexture);
                     }
                 }
             }
@@ -1229,238 +897,209 @@ void DrawableCharacter::ApplyMaterialEffects(
         {
             if (scorchTexture == 0)
             {
-                scorchTexture = glGetTexture(CharacterBlackTextureName);
-                glTextureManager* textureManager = glGetTextureManager();
-                resolvedScorchTexture.value =
-                    textureManager->GetTextureIndex(scorchTexture);
+                scorchTexture = glGetTexture("global/black");
+                resolvedScorchTexture.value = glGetTextureManager()->GetTextureIndex(scorchTexture);
             }
-            ApplyTexture(
-                model, scorchTexture, resolvedScorchTexture);
+            ApplyTexture(model, scorchTexture, resolvedScorchTexture);
         }
         else if (renderPass == CRP_Alternate)
         {
             if (characterClass != 0)
             {
-                ApplyTexture(
-                    model,
-                    source.mUnidentified108,
-                    source.mUnidentified114);
+                ApplyTexture(model, source.mUnidentified108, source.mUnidentified114);
             }
         }
     }
 }
 
-#pragma opt_common_subs off
-void DrawableCharacter::ApplyDamageEffects(
-    const cCharacter& source, Model* model, int renderPass)
+void DrawableCharacter::ApplyDamageEffects(const cCharacter& source, glModel* model, int renderPass)
 {
-    DrawableCharacter* self = this;
-    ModelPacket* packet;
-    u32 shadowColourValue;
-    u32 damageTexture;
-    static u32 shadowLevelHash = nlStringLowerHash(CharacterShadowLevelName);
+    glModelPacket* pPacket;
+    static u32 shadowLevelHash = nlStringLowerHash("shadowLevel");
 
-    int shadowAlpha = fn_80183DEC(&self->bip01Position);
+    int shadowAlpha = fn_80183DEC(&bip01Position);
     float fade = 1.0f;
-    if (self->bip01Position.z > fade)
+    if (bip01Position.z > fade)
     {
-        if (self->bip01Position.z > 10.0f)
+        if (bip01Position.z > 10.0f)
         {
             fade = 0.0f;
         }
         else
         {
-            fade = (10.0f - self->bip01Position.z) / 9.0f;
+            fade = (10.0f - bip01Position.z) / 9.0f;
         }
     }
 
-    Colour shadowColour;
+    nlColour shadowColour;
     u8 channel = 0xFF - (int)((float)(0xFF - shadowAlpha) * fade);
-    shadowColour.a = 1;
-    shadowColour.r = channel;
-    shadowColour.g = channel;
-    shadowColour.b = channel;
-    shadowColourValue = shadowColour.value;
+    shadowColour.c[3] = 1;
+    shadowColour.c[0] = channel;
+    shadowColour.c[1] = channel;
+    shadowColour.c[2] = channel;
+    unsigned long shadowColourValue = *(u32*)&shadowColour;
 
-    packet = model->packets;
-    while (packet < model->packets + model->packetCount)
+    pPacket = model->packets;
+    while (pPacket < model->packets + model->numPackets)
     {
-        glSetMaterialUnsignedParameter((glModelPacket*)packet, shadowLevelHash, shadowColourValue);
-        packet = (ModelPacket*)((char*)packet + 0x30);
+        glSetMaterialUnsignedParameter(pPacket, shadowLevelHash, shadowColourValue);
+        pPacket++;
     }
 
-    static u32 blackHash = nlStringLowerHash(CharacterAlphaValueName);
-    const float one = 1.0f;
-    float blackAmount =
-        one != lbl_806DCB48 ? lbl_806DCB48 : self->blendAmount;
-    if (blackAmount != one)
+    static u32 blackHash = nlStringLowerHash("alphaValue");
+    float blackAmount = 1.0f != lbl_806DCB48 ? lbl_806DCB48 : blendAmount;
+    if (blackAmount != 1.0f)
     {
-        for (packet = model->packets;
-             packet < model->packets + model->packetCount;
-             packet = (ModelPacket*)((char*)packet + 0x30))
+        for (pPacket = model->packets; pPacket < model->packets + model->numPackets; pPacket++)
         {
-            glSetMaterialFloatParameter((glModelPacket*)packet, blackHash, blackAmount);
+            glSetMaterialFloatParameter(pPacket, blackHash, blackAmount);
         }
     }
 
-    static u32 megaBlendHash = nlStringLowerHash(CharacterMegaBlendName);
-    const float zero = 0.0f;
-    float megaAmount =
-        zero != lbl_806E13A8 ? lbl_806E13A8 : source.mUnidentified1A8;
-    if (megaAmount != zero)
+    static u32 megaBlendHash = nlStringLowerHash("megaBlend");
+    float megaAmount = 0.0f != lbl_806E13A8 ? lbl_806E13A8 : source.mUnidentified1A8;
+    if (megaAmount != 0.0f)
     {
-        for (packet = model->packets;
-             packet < model->packets + model->packetCount;
-             packet = (ModelPacket*)((char*)packet + 0x30))
+        for (pPacket = model->packets; pPacket < model->packets + model->numPackets; pPacket++)
         {
-            if (glHasMaterialParameter((glModelPacket*)packet, megaBlendHash)
-                && glGetMaterialFloatParameter((glModelPacket*)packet, megaBlendHash) >= zero)
+            if (glHasMaterialParameter(pPacket, megaBlendHash)
+                && glGetMaterialFloatParameter(pPacket, megaBlendHash) >= 0.0f)
             {
-                glSetMaterialFloatParameter((glModelPacket*)packet, megaBlendHash, megaAmount);
+                glSetMaterialFloatParameter(pPacket, megaBlendHash, megaAmount);
             }
         }
     }
 
     if (renderPass == 1)
     {
-        for (packet = model->packets;
-             packet < model->packets + model->packetCount;
-             packet = (ModelPacket*)((char*)packet + 0x30))
+        for (pPacket = model->packets; pPacket < model->packets + model->numPackets; pPacket++)
         {
-            glSetRasterState(packet->raster, (eGLState)6, 2);
+            glSetRasterState(pPacket->rasterState, GLS_Culling, 2);
         }
     }
 
-    static u32 damage1EnabledHash = nlStringLowerHash(CharacterDamage1EnabledName);
+    static u32 damage1EnabledHash = nlStringLowerHash("damage1Enabled");
     bool damage1Enabled = false;
-    if (lbl_806E13A0 > 0.0f || self->damage1 > 0.0f)
+    if (lbl_806E13A0 > 0.0f || damage1 > 0.0f)
     {
         damage1Enabled = true;
     }
     if (damage1Enabled)
     {
-        int characterIndex = fn_800FC748(lbl_806E0F54);
-        damageTexture = glGetTexture(CharacterScorchTextureName);
+        int stadium = GameInfoManager::Instance()->GetStadium();
+        unsigned long damageTexture = glGetTexture("global/scorch");
         bool useDamageTexture = false;
-        if (self->damageType != 1
-            && (self->damageType == 2
-                || characterIndex == 0
-                || characterIndex == 5
-                || characterIndex == 7
-                || characterIndex == 9
-                || characterIndex == 0x10
-                || characterIndex == 8
-                || characterIndex == 0xE
-                || characterIndex == 0xB
-                || characterIndex == 0xF
-                || characterIndex == 1
-                || characterIndex == 6))
+        if (damageType != 1
+            && (damageType == 2
+                || stadium == 0
+                || stadium == 5
+                || stadium == 7
+                || stadium == 9
+                || stadium == 0x10
+                || stadium == 8
+                || stadium == 0xE
+                || stadium == 0xB
+                || stadium == 0xF
+                || stadium == 1
+                || stadium == 6))
         {
             useDamageTexture = true;
         }
-        if (self->damage2 > 0.0f)
+        if (damage2 > 0.0f)
         {
             useDamageTexture = true;
         }
 
-        for (packet = model->packets;
-             packet < model->packets + model->packetCount;
-             packet = (ModelPacket*)((char*)packet + 0x30))
+        for (pPacket = model->packets; pPacket < model->packets + model->numPackets; pPacket++)
         {
-            if (glHasMaterialParameter((glModelPacket*)packet, damage1EnabledHash))
+            if (glHasMaterialParameter(pPacket, damage1EnabledHash))
             {
-                glSetMaterialUnsignedParameter((glModelPacket*)packet, damage1EnabledHash, 1);
+                glSetMaterialUnsignedParameter(pPacket, damage1EnabledHash, 1);
                 if (useDamageTexture)
                 {
-                    PacketUserData* userData = packet->userData;
-                    if (self->savedScorchTexture == 0xFFFFFFFF)
+                    glTextureBinding& damageBinding = static_cast<GXCharacterDamageParameters*>(pPacket->materialParameters)->damage1Texture;
+                    if (savedScorchTexture == 0xFFFFFFFF)
                     {
-                        self->savedScorchTexture = userData->texture;
+                        savedScorchTexture = damageBinding.texture;
                     }
-                    userData->texture = damageTexture;
-                    userData->textureFrame = 0xFFFF;
+                    damageBinding.texture = damageTexture;
+                    damageBinding.textureIndex = 0xFFFF;
                 }
-                else if (self->savedScorchTexture != 0xFFFFFFFF)
+                else if (savedScorchTexture != 0xFFFFFFFF)
                 {
-                    packet->userData->textureSlots[0].SetTexture(
-                        self->savedScorchTexture, 0xFFFF);
-                    self->savedScorchTexture = 0xFFFFFFFF;
+                    glTextureBinding& damageBinding = static_cast<GXCharacterDamageParameters*>(pPacket->materialParameters)->damage1Texture;
+                    damageBinding.texture = savedScorchTexture;
+                    damageBinding.textureIndex = 0xFFFF;
+                    savedScorchTexture = 0xFFFFFFFF;
                 }
             }
         }
     }
 
-    static u32 damage2EnabledHash = nlStringLowerHash(CharacterDamage2EnabledName);
+    static u32 damage2EnabledHash = nlStringLowerHash("damage2Enabled");
     bool damage2Enabled = false;
-    if (lbl_806E13A4 > 0.0f || self->damage2 > 0.0f)
+    if (lbl_806E13A4 > 0.0f || damage2 > 0.0f)
     {
         damage2Enabled = true;
     }
     if (damage2Enabled)
     {
-        for (packet = model->packets;
-             packet < model->packets + model->packetCount;
-             packet = (ModelPacket*)((char*)packet + 0x30))
+        for (pPacket = model->packets; pPacket < model->packets + model->numPackets; pPacket++)
         {
-            if (glHasMaterialParameter((glModelPacket*)packet, damage2EnabledHash))
+            if (glHasMaterialParameter(pPacket, damage2EnabledHash))
             {
-                glSetMaterialUnsignedParameter((glModelPacket*)packet, damage2EnabledHash, 1);
+                glSetMaterialUnsignedParameter(pPacket, damage2EnabledHash, 1);
             }
         }
     }
 }
-#pragma opt_common_subs on
 
-void DrawableCharacter::RenderCharacterShadow(
-    const cCharacter& source, void* skinModel, int renderContext)
+void DrawableCharacter::RenderCharacterShadow(const cCharacter& source, glModel* model, int view)
 {
-    DrawableCharacter* drawable = this;
     ProjectedShadowParams params;
     BasicStadium* stadium;
-    const CharacterInfo* light;
-    float height;
-    float radius;
-    int intervalIndex;
+    const CharacterInfo* info;
+    float fHeight;
+    float fRadius;
+    int characterSizeIndex;
     float blackAmount;
-    float currentShadowLevel = drawable->shadowLevel;
+    float fScalar = shadowLevel;
 
-    if (lbl_806E13B8 || currentShadowLevel < 0.001f)
+    if (sShadowRenderingDisabled || fScalar < 0.001f)
     {
         return;
     }
 
     stadium = BasicStadium::GetCurrentStadium();
-    blackAmount = 1.0f != lbl_806DCB48
-        ? lbl_806DCB48
-        : drawable->blendAmount;
+    blackAmount = 1.0f != lbl_806DCB48 ? lbl_806DCB48 : blendAmount;
 
-    static u32 blackHash = nlStringLowerHash(CharacterAlphaValueName);
+    static u32 blackHash = nlStringLowerHash("alphaValue");
+    static float s_fHeightFudge = 1.125f;
     params.fScalar = 1.0f;
-    light = source.mUnidentified11C;
-    float lightRadius = light->unknown_0x30.unknown_0x4;
-    float lightHeight = light->unknown_0x30.unknown_0x0;
-    intervalIndex = light->unknown_0x2C;
-    radius = lbl_806DCB8C * lightRadius;
-    height = lbl_806DCB90 * lightHeight;
-    float one = 1.0f;
+    info = source.mUnidentified11C;
+    float shadowRadius = info->unknown_0x30.unknown_0x4;
+    float shadowHeight = info->unknown_0x30.unknown_0x0;
+    characterSizeIndex = info->unknown_0x2C;
+    fRadius = g_fRadiusScale * shadowRadius;
+    fHeight = s_fHeightFudge * shadowHeight;
     float characterScale = source.mUnidentified024.m_fPlayerScale;
     nlVec4Set(
         params.vLight,
         stadium->m_shadowLightPosition.x,
         stadium->m_shadowLightPosition.y,
         stadium->m_shadowLightPosition.z,
-        one);
-    params.vPosition = drawable->bip01Position;
-    params.fRadius = characterScale * radius;
-    params.fHeight = characterScale * height;
+        1.0f);
+    params.vPosition = bip01Position;
+    params.fRadius = characterScale * fRadius;
+    params.fHeight = characterScale * fHeight;
     params.pModel = 0;
-    params.fScalar = currentShadowLevel;
+    params.fScalar = fScalar;
     params.nPartitionIndex = source.mUnidentified120;
 
-    if (m_pInstance__13nlTaskManager->state == 2)
+    if (nlTaskManager::m_pInstance->mCurrentState == 2)
     {
-        params.nVisibleInterval = lbl_80511298[intervalIndex];
-        params.nInvisibleInterval = lbl_805112A4[intervalIndex];
+        params.nVisibleInterval = g_nOnscreenUpdate[characterSizeIndex];
+        params.nInvisibleInterval = g_nOffscreenUpdate[characterSizeIndex];
     }
     else
     {
@@ -1470,27 +1109,18 @@ void DrawableCharacter::RenderCharacterShadow(
 
     if (ShouldShadowBeUpdated(params))
     {
-        params.pModel
-            = glModelDupNoStreams((const glModel*)skinModel, false, 0);
+        params.pModel = glModelDupNoStreams(model, false, 0);
         if (1.0f != blackAmount)
         {
-            for (ModelPacket* packet = (ModelPacket*)params.pModel->packets;
-                 packet < (ModelPacket*)params.pModel->packets
-                         + params.pModel->numPackets;
-                 ++packet)
+            for (glModelPacket* pPacket = params.pModel->packets; pPacket < params.pModel->packets + params.pModel->numPackets; pPacket++)
             {
-                glSetMaterialFloatParameter((glModelPacket*)packet, blackHash, 1.0f);
+                glSetMaterialFloatParameter(pPacket, blackHash, 1.0f);
             }
         }
         RenderCharacterIntoTexture(params);
     }
 
-    RLView* oldContext = SetCharacterShadowView(GetLayerView((eCLV)renderContext));
+    RLView* oldView = SetCharacterShadowView(GetLayerView((eCLV)view));
     RenderProjectedShadow(params);
-    SetCharacterShadowView(oldContext);
-}
-
-bool DrawableCharacter::NoShadowCallback()
-{
-    return false;
+    SetCharacterShadowView(oldView);
 }

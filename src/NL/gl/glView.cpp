@@ -11,22 +11,47 @@
 
 #include <math.h>
 
+class UnidentifiedPacketSorterTree_8052E504
+    : public nlAVLTreeSlotPool<long, UnidentifiedPacketSorter*,
+          DefaultKeyCompare<long> >
+{
+public:
+    static void* operator new(unsigned long size)
+    {
+        return nlMalloc(size, 8, false);
+    }
+
+    UnidentifiedPacketSorterTree_8052E504(int initial, int delta)
+        : nlAVLTreeSlotPool<long, UnidentifiedPacketSorter*,
+              DefaultKeyCompare<long> >(initial, delta)
+    {
+    }
+};
+
+static bool IsSimpleProjection(const nlMatrix4* projection)
+{
+    bool diagonal = projection->m12 == 0.0f && projection->m13 == 0.0f
+        && projection->m21 == 0.0f && projection->m23 == 0.0f
+        && projection->m31 == 0.0f && projection->m32 == 0.0f;
+    return diagonal
+        ? projection->m41 == 0.0f && projection->m42 == 0.0f
+            && projection->m43 == 0.0f && projection->m44 == 1.0f
+        : false;
+}
+
 void glViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v3NDC)
 {
     const nlMatrix4* pProj = view->m_Interface->GetProjectionMatrix();
-    bool diagonal = pProj->m12 == 0.0f && pProj->m13 == 0.0f
-                 && pProj->m21 == 0.0f && pProj->m23 == 0.0f
-                 && pProj->m31 == 0.0f && pProj->m32 == 0.0f;
-    if (!(diagonal && pProj->m41 == 0.0f && pProj->m42 == 0.0f
-            && pProj->m43 == 0.0f && pProj->m44 == 1.0f))
+    bool simple = IsSimpleProjection(pProj);
+    if (!simple)
     {
         glplatViewProjectPoint(view, v3world, v3NDC);
     }
     else
     {
-        nlMatrix4 viewm;
-        nlMatrix4 projm;
         nlMatrix4 transposed;
+        nlMatrix4 projm;
+        nlMatrix4 viewm;
         nlVector3 v_out;
         view->m_Interface->GetViewMatrix(viewm);
         view->m_Interface->GetProjectionMatrix(projm);
@@ -40,7 +65,16 @@ void glViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v3NDC
 void glViewUnprojectOrthographicPoint(GLView* view, const nlVector3* normalized, nlVector3* viewPosition)
 {
     const nlMatrix4* pProj = view->m_Interface->GetProjectionMatrix();
-    nlVec3Set(*viewPosition, (normalized->x - pProj->m14) / pProj->m11, (normalized->y - pProj->m24) / pProj->m22, (normalized->z - pProj->m34) / pProj->m33);
+    const float xOffset = pProj->m14;
+    const float yOffset = pProj->m24;
+    const float zOffset = pProj->m34;
+    const float xScale = pProj->m11;
+    const float yScale = pProj->m22;
+    const float zScale = pProj->m33;
+    const float x = (normalized->x - xOffset) / xScale;
+    const float y = (normalized->y - yOffset) / yScale;
+    const float z = (normalized->z - zOffset) / zScale;
+    nlVec3Set(*viewPosition, x, y, z);
 }
 
 float glViewGetOrthographicWidth(GLView* view)
@@ -72,6 +106,17 @@ void glViewProjectPointBetweenViews(GLView* source, GLView* destination, const n
     glViewProjectPoint(source, *world, *projected);
     projected->y = -projected->y;
     glViewUnprojectOrthographicPoint(destination, projected, projected);
+}
+
+void gl_ViewReset()
+{
+    GLViewIterator iterator(&gRootView);
+    while (!iterator.IsDone())
+    {
+        GLView* view = iterator.Current();
+        view->m_Sorters->Clear();
+        iterator.Next();
+    }
 }
 
 void gl_ViewStartup()
@@ -112,23 +157,6 @@ void UnidentifiedPacketSorter_8052E554::fn_10(
     entry->next = 0;
     nlListAddEnd(&m_Head, &m_Tail, entry);
 }
-
-class UnidentifiedPacketSorterTree_8052E504
-    : public nlAVLTreeSlotPool<long, UnidentifiedPacketSorter*,
-          DefaultKeyCompare<long> >
-{
-public:
-    static void* operator new(unsigned long size)
-    {
-        return nlMalloc(size, 8, false);
-    }
-
-    UnidentifiedPacketSorterTree_8052E504(int initial, int delta)
-        : nlAVLTreeSlotPool<long, UnidentifiedPacketSorter*,
-              DefaultKeyCompare<long> >(initial, delta)
-    {
-    }
-};
 
 class UnidentifiedPacketSorterIterator
 {
@@ -430,15 +458,12 @@ void GLView::EndPacket(const glModelPacket*)
 inline void GLViewIterator::Push(const GLViewIteratorEntry& entry)
 {
     GLViewIteratorEntry* stackEntry = &m_Stack[++m_Depth];
-    stackEntry->next = entry.next;
-    stackEntry->view = entry.view;
+    *stackEntry = entry;
 
-    if (entry.view->m_Children.m_Head != 0)
+    if (entry.view->HasChildren())
     {
-        ListEntry<GLView*>* child = entry.view->m_Children.m_Head;
-        GLViewIteratorEntry childEntry;
-        childEntry.next = child->next;
-        childEntry.view = child->entry;
+        GLViewIteratorEntry childEntry(entry.view->m_Children.m_Head->next,
+            entry.view->m_Children.m_Head->Entry());
         Push(childEntry);
     }
 }
@@ -446,26 +471,24 @@ inline void GLViewIterator::Push(const GLViewIteratorEntry& entry)
 GLViewIterator::GLViewIterator(GLView* root)
 {
     m_Depth = -1;
-    GLViewIteratorEntry rootEntry;
-    rootEntry.view = root;
-    Push(rootEntry);
+    Push(GLViewIteratorEntry::Root(root));
 }
+
 void GLViewIterator::Next()
 {
     if (m_Depth < 0)
         return;
 
-    if (m_Stack[m_Depth].next != 0)
+    if (m_Stack[m_Depth].next.IsValid())
     {
-        m_Stack[m_Depth] = *(GLViewIteratorEntry*)m_Stack[m_Depth].next;
+        m_Stack[m_Depth] =
+            *(GLViewIteratorEntry*)m_Stack[m_Depth].next.CurrentEntry();
 
         GLView* view = m_Stack[m_Depth].view;
-        if (view->m_Children.m_Head != 0)
+        if (view->HasChildren())
         {
-            ListEntry<GLView*>* child = view->m_Children.m_Head;
-            GLViewIteratorEntry childEntry;
-            childEntry.next = child->next;
-            childEntry.view = child->entry;
+            GLViewIteratorEntry childEntry(view->m_Children.m_Head->next,
+                view->m_Children.m_Head->Entry());
             Push(childEntry);
         }
     }
@@ -488,17 +511,6 @@ bool GLViewIterator::IsDone() const
 
 extern const nlMatrix4 gGLViewIdentityMatrix;
 
-
-void gl_ViewReset()
-{
-    GLViewIterator iterator(&gRootView);
-    while (!iterator.IsDone())
-    {
-        GLView* view = iterator.Current();
-        view->m_Sorters->Clear();
-        iterator.Next();
-    }
-}
 
 void glViewCompact()
 {

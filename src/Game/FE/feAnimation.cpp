@@ -154,8 +154,11 @@ void FEAnimation::AnimateTargetAtTimeWithVector3(float fCurrentTime)
         break;
     case eAnimColor:
     {
+        u8 b = (u8)result[2];
+        u8 g = (u8)result[1];
+        u8 r = (u8)result[0];
         nlColour newColour;
-        nlColourSet(newColour, (u8)result[0], (u8)result[1], (u8)result[2], 255);
+        nlColourSet(newColour, r, g, b, 255);
         m_pTLInstanceTarget->SetAssetColour(newColour);
         break;
     }

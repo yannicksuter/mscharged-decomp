@@ -164,19 +164,22 @@ bool cField::FixCornerPosition(nlVector3& v, float fMinDistanceFromWall)
         if ((float)fabs(v.x) > (float)fabs(corner.vCenter.x)
             && (float)fabs(v.y) > (float)fabs(corner.vCenter.y))
         {
-            nlVec2Set(vFromCorner, v.x - corner.vCenter.x, v.y - corner.vCenter.y);
+            vFromCorner.x = v.x - corner.vCenter.x;
+            vFromCorner.y = v.y - corner.vCenter.y;
             float fDistance = nlVec2Length(vFromCorner);
-            u16 uAngle = RadToAng16(nlATan2f(vFromCorner.y, vFromCorner.x));
+            float x = vFromCorner.x;
+            float y = vFromCorner.y;
+            u16 uAngle = RadToAng16(nlATan2f(y, x));
 
             if (abs_ang16(nlAngleDiff(uAngle, corner.thetaStart)) <= 0x4000
                 && abs_ang16(nlAngleDiff(uAngle, corner.thetaEnd)) <= 0x4000
                 && fDistance > fLimitRadius)
             {
-                float fInvLength = nlRecipSqrt(nlVec2LengthSquared(vFromCorner), true);
-                float fOffsetY = fLimitRadius * (fInvLength * vFromCorner.y);
-                float fOffsetX = fLimitRadius * (fInvLength * vFromCorner.x);
-                vFromCorner.y = corner.vCenter.y + fOffsetY;
-                vFromCorner.x = corner.vCenter.x + fOffsetX;
+                float fInvLength = nlRecipSqrt(
+                    nlVec2DotProduct(vFromCorner, vFromCorner), true);
+                nlVec2Scale(vFromCorner, vFromCorner, fInvLength);
+                nlVec2Scale(vFromCorner, vFromCorner, fLimitRadius);
+                nlVec2Add(vFromCorner, corner.vCenter, vFromCorner);
                 v.x = vFromCorner.x;
                 v.y = vFromCorner.y;
             }

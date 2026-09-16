@@ -5,19 +5,33 @@
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/Scripts/ScriptQuestions.h"
+#include "Game/AI/ShotMeter.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/CharacterTriggers.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
 #include "Game/SAnim/pnSAnimController.h"
+#include "Game/Sys/audio.h"
 
 extern "C" float fn_8002C7D0(PlayerTweaks*);
 extern "C" float fn_8002CFD8(PlayerTweaks*);
+extern "C" float fn_8002BFA8(PlayerTweaks*, float);
+extern "C" void fn_8002E2E4(cFielder*);
 extern "C" void fn_8002E340(cFielder*);
+extern "C" void fn_8002E3F8(cFielder*);
+extern "C" void fn_8002E66C(cFielder*, bool);
+extern "C" void fn_8002E718(cFielder*);
+extern "C" void fn_8002E798(cFielder*);
+extern "C" void fn_8002E818(cFielder*);
+extern "C" void fn_8002E898(cFielder*, bool);
+extern "C" void fn_8002E934(cFielder*, bool);
 extern "C" void fn_80038158(cFielder*, bool);
+extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
 extern "C" void fn_801B8164(cFielder*);
 extern "C" void fn_801B7F8C(cFielder*);
 extern "C" void fn_801B865C(cFielder*);
+extern "C" void fn_801BA510(cFielder*);
 extern "C" UnidentifiedFielderInput* fn_80316974(void*);
 extern float lbl_806E0E40;
 extern const nlVector3 lbl_804DC1A0;
@@ -66,6 +80,43 @@ bool DesireStar::UnidentifiedReinitialize(void* context)
     mUnidentified078 = fn_8002CFD8(mUnidentifiedFielder->GetTweaks());
     EmitStar(mUnidentifiedFielder, true);
     return result;
+}
+
+/**
+ * Offset/Address/Size: 0xDC | 0x800BC1A0 | size: 0x58C
+ */
+void DesireStar::Update(
+    UnidentifiedDesireUpdate* update, float fDeltaT)
+{
+    eFielderActionState action = mUnidentifiedFielder->m_eActionState;
+    if (action == ACTION_SHOOT_TO_SCORE
+        || (action == ACTION_UNKNOWN_30
+            && mUnidentifiedFielder->m_pShotMeter->m_eShotMeterState
+                == SHOT_METER_STS_ACTIVE
+            && !mUnidentifiedFielder->fn_8001E168()))
+    {
+        mUnidentifiedTimer.Countup(
+            fDeltaT * lbl_806DC180 - fDeltaT, 10.0f);
+    }
+
+    action = mUnidentifiedFielder->m_eActionState;
+    if (action == ACTION_SHOT || action == ACTION_UNKNOWN_32
+        || action == (eFielderActionState)0x21)
+    {
+        *update = 1;
+    }
+    else
+    {
+        if (!mUnidentifiedFielder->IsInvincible())
+        {
+            mUnidentifiedFielder->muInvincibleStatus |= 0x1F;
+        }
+
+        if (!g_pGame->IsGameplayOrOvertime())
+        {
+            *update = 1;
+        }
+    }
 }
 
 /**
@@ -235,11 +286,7 @@ void DesireGooey::Update(
 
     if (!g_pGame->IsGameplayOrOvertime())
     {
-        {
-            FuzzyVariant result(FT_INT, 1);
-            *update = result;
-        }
-        update->mTemporary = false;
+        *update = 1;
     }
 }
 
@@ -251,6 +298,63 @@ void DesireGooey::UnidentifiedCleanup()
     mfMaxGooEffect = 1.0f;
     mUnidentifiedFielder->fn_8001EF6C(1.0f);
     mUnidentifiedFielder->m_pCurrentAnimController->m_fPlaybackSpeedScale = 1.0f;
+}
+
+/**
+ * Offset/Address/Size: 0x14D0 | 0x800BD594 | size: 0x1C8
+ */
+bool DesireShrink::UnidentifiedInitialize(void* context)
+{
+    bool result = Desire::UnidentifiedInitialize(context);
+    mUnidentified078 = lbl_806DC168;
+    mfSlowPercentage = 1.0f;
+
+    fn_8002E2E4(mUnidentifiedFielder);
+    fn_8002E718(mUnidentifiedFielder);
+    fn_8002E898(mUnidentifiedFielder, false);
+    fn_8002E934(mUnidentifiedFielder, false);
+    fn_8002E66C(mUnidentifiedFielder, false);
+    fn_8002E818(mUnidentifiedFielder);
+    fn_8002E798(mUnidentifiedFielder);
+    fn_8002E3F8(mUnidentifiedFielder);
+    mUnidentifiedFielder->fn_8001EE74(1.0f, 0.0f, -1.0f);
+    mUnidentifiedFielder->fn_8001EE74(
+        lbl_806DC174, lbl_806DC178, lbl_806DC170);
+
+    UnidentifiedVariantCollection* params
+        = (UnidentifiedVariantCollection*)context;
+    cFielder* source = (cFielder*)params->Get(14)->mData.pointer;
+    mUnidentifiedFielder->fn_8003063C(source->mUnidentified328);
+    mUnidentifiedFielder->m_pTweaks->mUnidentified004
+        = mUnidentifiedFielder->mUnidentified32C->mUnidentified004;
+    mUnidentifiedFielder->m_pTweaks->mUnidentified014
+        = fn_8002BFA8(mUnidentifiedFielder->mUnidentified32C, 1.0f);
+    fn_801BA510(mUnidentifiedFielder);
+
+    if (mUnidentifiedFielder->m_pBall != 0)
+    {
+        if (mUnidentifiedFielder->fn_8002E060()
+            == (eFielderDesireState)ACTION_UNKNOWN_32)
+        {
+            mUnidentifiedFielder->ReleaseBall(0);
+            mUnidentifiedFielder->EndDesire();
+            mUnidentifiedFielder->InitActionRunning();
+        }
+        else
+        {
+            mUnidentifiedFielder->ReleaseBall(0);
+            mUnidentifiedFielder->ShootBallDueToContact(
+                mUnidentifiedFielder->mUnidentified024
+                    .m_aActualFacingDirection);
+        }
+    }
+
+    if (g_pGame->IsGameplayOrOvertime()
+        && g_pGame->GetGameState() != 4)
+    {
+        PlaySound(source->mUnidentified318, 0xE6E31092, 0, 0);
+    }
+    return result;
 }
 
 /**
@@ -357,6 +461,59 @@ bool DesireConfused::UnidentifiedReinitialize(void* context)
             mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection);
     }
     return result;
+}
+
+/**
+ * Offset/Address/Size: 0x2464 | 0x800BE528 | size: 0x7FC
+ */
+void DesireConfused::Update(
+    UnidentifiedDesireUpdate* update, float)
+{
+    mfConfusedPercentage
+        += mUnidentifiedTimer.GetSeconds() / lbl_806DC184;
+    if (mfConfusedPercentage >= 1.0f)
+    {
+        mfConfusedPercentage = 1.0f;
+    }
+
+    if (!g_pGame->IsGameplayOrOvertime())
+    {
+        *update = 1;
+    }
+    if (mUnidentifiedFielder->fn_8003E6FC())
+    {
+        *update = 1;
+    }
+    if (mUnidentifiedFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime
+        != 0)
+    {
+        *update = 1;
+    }
+
+    if (mUnidentifiedFielder->GetGlobalPad() == 0)
+    {
+        UnidentifiedFielderInput* input = fn_80316974(this);
+        if (!input->fn_8030FB7C(0xFF))
+        {
+            input->fn_8030FA10(0xFF, 0.5f);
+            nlPolar polar;
+            polar.r = 1.0f;
+            polar.a = nlRandom(0xFFFF);
+            nlPolarToCartesian(mvDesiredPosition, polar);
+        }
+
+        if (ReceivingPass(mUnidentifiedFielder) == 0.0f)
+        {
+            nlVector3 position;
+            position.x = mUnidentifiedFielder->GetPosition().x
+                       + 5.0f * mvDesiredPosition.x;
+            position.y = mUnidentifiedFielder->GetPosition().y
+                       + 5.0f * mvDesiredPosition.y;
+            position.z = mUnidentifiedFielder->GetPosition().z
+                       + 5.0f * mvDesiredPosition.z;
+            fn_800401C0(mUnidentifiedFielder, position, 1.0f, 4.0f);
+        }
+    }
 }
 
 /**

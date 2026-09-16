@@ -12,6 +12,7 @@
 #include "Game/GameSceneManager.h"
 #include "Game/FE/feInlineHasher.inl"
 #include "Game/FE/feFinderFind_impl.h"
+#include "Game/FE/feFinderDefault_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/feTextureResource.h"
@@ -328,27 +329,17 @@ void SHOnlineFriends::OnErrorDismissed()
 
 void SHOnlineFriends::SceneCreated()
 {
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"),
-        InlineHasher("Group"),
-        InlineHasher("FRIEND CODE"));
-    mUnidentified0594 = text != 0 ? text : &UnidentifiedTLTextDefault::sInstance;
+    mUnidentified0594 = FEFinder<TLTextInstance, 3>::FindOrDefault(
+        mPresentation->m_currentSlide, "Layer", "Group", "FRIEND CODE");
     for (int i = 0; i < 4; ++i)
     {
         char name[9];
         nlSNPrintf(name, sizeof(name), "FRIEND_%d", i);
-        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
-            InlineHasher("Layer"),
-            InlineHasher("Group"),
-            InlineHasher(name));
-        mUnidentified0618[i] = instance != 0 ? instance : &UnidentifiedTLComponentDefault::sInstance;
+        mUnidentified0618[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+            mPresentation->m_currentSlide, "Layer", "Group", name);
     }
-    TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"),
-        InlineHasher("Group"),
-        InlineHasher("TITLE2"));
-    if (title == 0)
-        title = &UnidentifiedTLComponentDefault::sInstance;
+    TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+        mPresentation->m_currentSlide, "Layer", "Group", "TITLE2");
     if (IsOnlineFriendSelectionMode())
     {
         title->SetActiveSlide("friends2", true, false);
@@ -361,17 +352,13 @@ void SHOnlineFriends::SceneCreated()
     }
     RefreshFriends(this);
     UpdateVisibleRows();
-    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide,
-        InlineHasher("Layer"),
-        InlineHasher("Group"),
-        InlineHasher("scrollbar"));
-    if (scrollbar == 0)
-        scrollbar = &UnidentifiedTLComponentDefault::sInstance;
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+        mPresentation->m_currentSlide, "Layer", "Group", "scrollbar");
     mUnidentified0308.SetComponent(scrollbar);
     mUnidentified0308.SetValue(mUnidentified0020);
     UpdateScrollRange();
     for (int i = 0; i < 4; ++i)
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     SHNavigation* scene = GetNavigationScene();
     TLComponentInstance* done = 0;
     if (scene != 0)
@@ -513,55 +500,32 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
     u16* name, int nameSize, u16* description, int descriptionSize, int index, bool value)
 {
     TLInstance* views[2];
-    views[0] = FEFinder<TLComponentInstance, 4>::Find(instance,
-        nlStringLowerHash("off"),
-        nlStringLowerHash("FRIEND_0"),
-        0,
-        0,
-        0,
-        0);
-    views[1] = FEFinder<TLComponentInstance, 4>::Find(instance,
-        nlStringLowerHash("over"),
-        nlStringLowerHash("FRIEND_0"),
-        0,
-        0,
-        0,
-        0);
+    views[0] = FEFinder<TLInstance, 5>::FindOrDefault(instance, "off", "FRIEND_0");
+    views[1] = FEFinder<TLInstance, 5>::FindOrDefault(instance, "over", "FRIEND_0");
     for (int i = 0; i < 2; ++i)
     {
-        if (views[i] == 0)
-            views[i] = &UnidentifiedTLGroupDefault::sInstance;
-        views[i]->m_bVisible = row->mVisible;
+        views[i]->SetVisible(row->mVisible);
     }
     for (int i = 0; i < 2; ++i)
     {
-        TLComponentInstance* cancel = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("cancel"));
-        if (cancel == 0)
-            cancel = &UnidentifiedTLComponentDefault::sInstance;
-        cancel->m_bVisible = row->mShowCancel;
+        FEFinder<TLInstance, 4>::FindOrDefault(views[i], "cancel")->SetVisible(row->mShowCancel);
     }
     for (int i = 0; i < 2; ++i)
     {
-        TLComponentInstance* searching = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("SEARCHING_ADD"));
-        if (searching == 0)
-            searching = &UnidentifiedTLComponentDefault::sInstance;
+        TLComponentInstance* searching = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(views[i], "SEARCHING_ADD"));
         searching->SetActiveSlide(sOnlinePlayerSearchSlides[row->mSearchState], false, false);
     }
     for (int i = 0; i < 2; ++i)
     {
-        TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::Find(views[i], InlineHasher("NAME"));
-        if (nameText == 0)
-            nameText = &UnidentifiedTLTextDefault::sInstance;
+        TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::FindOrDefault(views[i], "NAME");
         nameText->SetString(row->mName);
-        nameText->m_bVisible = row->mSearchState == 4;
+        nameText->SetVisible(row->mSearchState == 4);
     }
     for (int i = 0; i < 2; ++i)
     {
-        TLComponentInstance* status = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("STATUS"));
-        if (status == 0)
-            status = &UnidentifiedTLComponentDefault::sInstance;
+        TLComponentInstance* status = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(views[i], "STATUS"));
         status->SetActiveSlide(sOnlinePlayerStatusSlides[row->mStatus], false, false);
-        status->m_bVisible = row->mSearchState == 4;
+        status->SetVisible(row->mSearchState == 4);
         if (row->mStatus == 6)
         {
             TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(status, InlineHasher("NAMES"), InlineHasher(0UL), InlineHasher(0UL), InlineHasher(0UL), InlineHasher(0UL), InlineHasher(0UL));
@@ -572,61 +536,47 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
              && row->mStatus != 7 && row->mStatus != 9 && row->mStatus != 10;
     for (int i = 0; i < 2; ++i)
     {
-        TLComponentInstance* guest = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("GUEST_HOME_AWAY"));
-        if (guest == 0)
-            guest = &UnidentifiedTLComponentDefault::sInstance;
+        TLComponentInstance* guest = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(views[i], "GUEST_HOME_AWAY"));
         guest->SetActiveSlide(sOnlinePlayerSideSlides[row->mSide], true, false);
-        guest->m_bVisible = show && row->mSide != 0;
+        guest->SetVisible(show && row->mSide != 0);
     }
     for (int i = 0; i < 2; ++i)
     {
-        TLComponentInstance* playerClass = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("PLAYER CLASS"));
-        if (playerClass == 0)
-            playerClass = &UnidentifiedTLComponentDefault::sInstance;
-        playerClass->m_bVisible = false;
+        FEFinder<TLInstance, 4>::FindOrDefault(views[i], "PLAYER CLASS")->SetVisible(false);
     }
     WideString string = Format(WideString(LookupLocString("ONLINE_RANKING")), row->mStats.mDisplayRank);
     nlStrNCpy(name, string.c_str(), nameSize);
     for (int i = 0; i < 2; ++i)
     {
-        TLTextInstance* rank = FEFinder<TLTextInstance, 3>::Find(views[i],
+        TLTextInstance* rank = FEFinder<TLTextInstance, 3>::FindOrDefault(views[i],
             InlineHasher("STATS"),
             InlineHasher("Slide1"),
             InlineHasher("RANK"),
             InlineHasher("RANK"));
-        if (rank == 0)
-            rank = &UnidentifiedTLTextDefault::sInstance;
         rank->SetString(name);
-        rank->m_bVisible = show && !row->mGuest;
+        rank->SetVisible(show && !row->mGuest);
     }
     string = Format(WideString(LookupLocString("ONLINE_SLOT_STATS")), row->mStats.mWins, row->mStats.mLosses, row->mStats.mScore);
     nlStrNCpy(description, string.c_str(), descriptionSize);
     for (int i = 0; i < 2; ++i)
     {
-        TLTextInstance* record = FEFinder<TLTextInstance, 3>::Find(views[i],
+        TLTextInstance* record = FEFinder<TLTextInstance, 3>::FindOrDefault(views[i],
             InlineHasher("STATS"),
             InlineHasher("Slide1"),
             InlineHasher("RECORD"),
             InlineHasher("RECORD"));
-        if (record == 0)
-            record = &UnidentifiedTLTextDefault::sInstance;
         record->SetString(description);
-        record->m_bVisible = show && !row->mGuest;
+        record->SetVisible(show && !row->mGuest);
     }
     for (int i = 0; i < 2; ++i)
     {
-        TLImageInstance* dummy = FEFinder<TLImageInstance, 2>::Find(views[i], InlineHasher("00_dummy_texture"));
-        if (dummy == 0)
-            dummy = &UnidentifiedTLImageDefault::sInstance;
-        dummy->m_bVisible = show;
+        FEFinder<TLImageInstance, 2>::FindOrDefault(views[i], "00_dummy_texture")->SetVisible(show);
     }
     for (int i = 0; i < 2; ++i)
     {
-        TLImageInstance* background = FEFinder<TLImageInstance, 2>::Find(views[i],
+        TLImageInstance* background = FEFinder<TLImageInstance, 2>::FindOrDefault(views[i],
             InlineHasher("Mii_btn"),
             InlineHasher("Online_Mii_select_background"));
-        if (background == 0)
-            background = &UnidentifiedTLImageDefault::sInstance;
         background->SetAssetVisible(show);
     }
     bool valid = MiiManager::Instance()->CreateIcon((const RFLStoreData*)row->mMiiData, index, (RFLExpression)0);
@@ -635,9 +585,9 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
     for (int i = 0; i < 2; ++i)
     {
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(views[i], InlineHasher("Mii_btn"), InlineHasher("Mii"));
-        image->m_pTextureResource->SetTextureHandle(texture);
+        image->GetTextureResource()->SetTextureHandle(texture);
         image->SetAssetVisible(valid && show && value);
-        image->m_bVisible = valid && show && value;
+        image->SetVisible(valid && show && value);
         if (row->mGuest)
             image->SetAssetColour(colour);
     }
@@ -645,7 +595,7 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
     {
         TLImageInstance* shoulders = FEFinder<TLImageInstance, 2>::Find(views[i], InlineHasher("Mii_btn"), InlineHasher("shoulders"));
         shoulders->SetAssetVisible(false);
-        shoulders->m_bVisible = false;
+        shoulders->SetVisible(false);
     }
 }
 
@@ -780,5 +730,3 @@ void SHOnlineFriends::Update(float dt)
 }
 
 #include "Game/MiiManager.inl"
-
-#include "Game/FE/feFinderDefault_impl.h"

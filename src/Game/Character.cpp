@@ -1562,236 +1562,52 @@ extern "C" void fn_80098750();
 
 extern "C" void fn_8001FE80()
 {
-    {
-        Function<CollisionChainPlayerData*> callback(fn_80022968);
-        UnidentifiedFindEvent<CollisionChainPlayerData>(
-            "CollisionChainPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionWindDebrisPlayerData*> callback(fn_800229F0);
-        UnidentifiedFindEvent<CollisionWindDebrisPlayerData>(
-            "CollisionWindDebrisPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionThwompPlayerData*> callback(fn_80022A78);
-        UnidentifiedFindEvent<CollisionThwompPlayerData>(
-            "CollisionThwompPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<cFielder*> callback(fn_80020B8C);
-        UnidentifiedFindEvent<cFielder>(
-            "KnockYoshiTongue", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(fn_8002276C);
-        UnidentifiedFindEvent<UnidentifiedEventNoData>(
-            "GameOver", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(fn_800227C8);
-        UnidentifiedFindEvent<UnidentifiedEventNoData>(
-            "Kickoff", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData_8006701C*> callback(fn_80022810);
-        UnidentifiedFindEvent<UnidentifiedEventData_8006701C>(
-            "MegaStrikeMeterStart", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(fn_80022908);
-        UnidentifiedFindEvent<UnidentifiedEventNoData>(
-            "MegaStrikeMeterEnd", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<cPlayer*> callback(fn_80022824);
-        UnidentifiedFindEvent<cPlayer>(
-            "MegaStrikeIntro", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionPlayerPlayerData*> callback(fn_80022664);
-        UnidentifiedFindEvent<CollisionPlayerPlayerData>(
-            "CollisionPlayerPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionPlayerWallData*> callback(fn_8002268C);
-        UnidentifiedFindEvent<CollisionPlayerWallData>(
-            "CollisionPlayerWall", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionPlayerBallData*> callback(fn_800226B4);
-        UnidentifiedFindEvent<CollisionPlayerBallData>(
-            "CollisionPlayerBall", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData04*> callback(fn_80022614);
-        UnidentifiedFindEvent<UnidentifiedEventData04>(
-            "CollisionBallNetmesh", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBallGroundData*> callback(fn_80022594);
-        UnidentifiedFindEvent<CollisionBallGroundData>(
-            "CollisionBallGround", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBallWallData*> callback(fn_800224DC);
-        UnidentifiedFindEvent<CollisionBallWallData>(
-            "CollisionBallWall", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBallShellData*> callback(fn_80021B68);
-        UnidentifiedFindEvent<CollisionBallShellData>(
-            "CollisionBallShell", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBallChainData*> callback(fn_80021BA8);
-        UnidentifiedFindEvent<CollisionBallChainData>(
-            "CollisionBallChain", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBallGoalpostData*> callback(fn_80021BB4);
-        UnidentifiedFindEvent<CollisionBallGoalpostData>(
-            "CollisionBallGoalpost", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionKoopaShotBallPlayerData*> callback(fn_80021E30);
-        UnidentifiedFindEvent<CollisionKoopaShotBallPlayerData>(
-            "CollisionKoopaShotBallPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBirdoShotBallPlayerData*> callback(fn_80022050);
-        UnidentifiedFindEvent<CollisionBirdoShotBallPlayerData>(
-            "CollisionBirdoShotBallPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionKoopaShellGoalieData*> callback(fn_80021D70);
-        UnidentifiedFindEvent<CollisionKoopaShellGoalieData>(
-            "CollisionKoopaShellGoalie", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBirdoEggGoalieData*> callback(fn_80021DCC);
-        UnidentifiedFindEvent<CollisionBirdoEggGoalieData>(
-            "CollisionBirdoEggGoalie", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData16*> callback(fn_80022280);
-        UnidentifiedFindEvent<UnidentifiedEventData16>(
-            "CollisionHammerbroShotBallPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionPowerupWallData*> callback(fn_80021C98);
-        UnidentifiedFindEvent<CollisionPowerupWallData>(
-            "CollisionPowerupWall", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionPlayerBananaData*> callback(fn_80021924);
-        UnidentifiedFindEvent<CollisionPlayerBananaData>(
-            "CollisionPlayerBanana", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionPlayerShellData*> callback(fn_800216C4);
-        UnidentifiedFindEvent<CollisionPlayerShellData>(
-            "CollisionPlayerShell", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionPlayerFreezeData*> callback(fn_80021484);
-        UnidentifiedFindEvent<CollisionPlayerFreezeData>(
-            "CollisionPlayerFreeze", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData24*> callback(fn_8002147C);
-        UnidentifiedFindEvent<UnidentifiedEventData24>(
-            "CollisionTongue", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CharacterImpactEvent*> callback(fn_800212A0);
-        UnidentifiedFindEvent<CharacterImpactEvent>(
-            "MontyReappear", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CharacterImpactEvent*> callback(fn_80021120);
-        UnidentifiedFindEvent<CharacterImpactEvent>(
-            "HammerBroHammer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CharacterImpactEvent*> callback(fn_80021120);
-        UnidentifiedFindEvent<CharacterImpactEvent>(
-            "WarioGroundPound", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<ReceiveBallData*> callback(fn_80020E20);
-        UnidentifiedFindEvent<ReceiveBallData>(
-            "ReceiveBall", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData_80066008*> callback(fn_80020E1C);
-        UnidentifiedFindEvent<UnidentifiedEventData_80066008>(
-            "DirectionBegin", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<GoalScoredData*> callback(fn_80020CDC);
-        UnidentifiedFindEvent<GoalScoredData>(
-            "GoalScored", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<MegaStrikeEndData*> callback(fn_80020E04);
-        UnidentifiedFindEvent<MegaStrikeEndData>(
-            "MegastrikeEnd", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<LightningStrikeData*> callback(fn_80021050);
-        UnidentifiedFindEvent<LightningStrikeData>(
-            "LightningStrike", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBulletBillData*> callback(fn_80020EE8);
-        UnidentifiedFindEvent<CollisionBulletBillData>(
-            "CollisionBulletBillPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBulletBillData*> callback(fn_80020FB8);
-        UnidentifiedFindEvent<CollisionBulletBillData>(
-            "CollisionBulletBillFreeze", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBulletBillData*> callback(fn_80020FD4);
-        UnidentifiedFindEvent<CollisionBulletBillData>(
-            "ExplosionBulletBill", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionBulletBillData*> callback(fn_80020FD4);
-        UnidentifiedFindEvent<CollisionBulletBillData>(
-            "BulletBillExplode", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData_80066A04*> callback(fn_80020C70);
-        UnidentifiedFindEvent<UnidentifiedEventData_80066A04>(
-            "PowerupStats", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<PlayerAttackData*> callback(fn_80020BB0);
-        UnidentifiedFindEvent<PlayerAttackData>(
-            "AttackSuccess", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData26*> callback(fn_80022B1C);
-        UnidentifiedFindEvent<UnidentifiedEventData26>(
-            "CollisionHammerPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData24*> callback(fn_80022B04);
-        UnidentifiedFindEvent<UnidentifiedEventData24>(
-            "CollisionPatchPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData26*> callback(fn_80022A98);
-        UnidentifiedFindEvent<UnidentifiedEventData26>(
-            "CollisionHammerGround", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData34*> callback(fn_80022BD8);
-        UnidentifiedFindEvent<UnidentifiedEventData34>(
-            "CollisionEggPlayer", -1)->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<CollisionChainPlayerData>("CollisionChainPlayer", -1)->Add(Function<CollisionChainPlayerData*>(fn_80022968), 0, -1);
+    UnidentifiedFindEvent<CollisionWindDebrisPlayerData>("CollisionWindDebrisPlayer", -1)->Add(Function<CollisionWindDebrisPlayerData*>(fn_800229F0), 0, -1);
+    UnidentifiedFindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(fn_80022A78), 0, -1);
+    UnidentifiedFindEvent<cFielder>("KnockYoshiTongue", -1)->Add(Function<cFielder*>(fn_80020B8C), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(fn_8002276C), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(fn_800227C8), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterStart", -1)->Add(Function<UnidentifiedEventData_8006701C*>(fn_80022810), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(fn_80022908), 0, -1);
+    UnidentifiedFindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(fn_80022824), 0, -1);
+    UnidentifiedFindEvent<CollisionPlayerPlayerData>("CollisionPlayerPlayer", -1)->Add(Function<CollisionPlayerPlayerData*>(fn_80022664), 0, -1);
+    UnidentifiedFindEvent<CollisionPlayerWallData>("CollisionPlayerWall", -1)->Add(Function<CollisionPlayerWallData*>(fn_8002268C), 0, -1);
+    UnidentifiedFindEvent<CollisionPlayerBallData>("CollisionPlayerBall", -1)->Add(Function<CollisionPlayerBallData*>(fn_800226B4), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData04>("CollisionBallNetmesh", -1)->Add(Function<UnidentifiedEventData04*>(fn_80022614), 0, -1);
+    UnidentifiedFindEvent<CollisionBallGroundData>("CollisionBallGround", -1)->Add(Function<CollisionBallGroundData*>(fn_80022594), 0, -1);
+    UnidentifiedFindEvent<CollisionBallWallData>("CollisionBallWall", -1)->Add(Function<CollisionBallWallData*>(fn_800224DC), 0, -1);
+    UnidentifiedFindEvent<CollisionBallShellData>("CollisionBallShell", -1)->Add(Function<CollisionBallShellData*>(fn_80021B68), 0, -1);
+    UnidentifiedFindEvent<CollisionBallChainData>("CollisionBallChain", -1)->Add(Function<CollisionBallChainData*>(fn_80021BA8), 0, -1);
+    UnidentifiedFindEvent<CollisionBallGoalpostData>("CollisionBallGoalpost", -1)->Add(Function<CollisionBallGoalpostData*>(fn_80021BB4), 0, -1);
+    UnidentifiedFindEvent<CollisionKoopaShotBallPlayerData>("CollisionKoopaShotBallPlayer", -1)->Add(Function<CollisionKoopaShotBallPlayerData*>(fn_80021E30), 0, -1);
+    UnidentifiedFindEvent<CollisionBirdoShotBallPlayerData>("CollisionBirdoShotBallPlayer", -1)->Add(Function<CollisionBirdoShotBallPlayerData*>(fn_80022050), 0, -1);
+    UnidentifiedFindEvent<CollisionKoopaShellGoalieData>("CollisionKoopaShellGoalie", -1)->Add(Function<CollisionKoopaShellGoalieData*>(fn_80021D70), 0, -1);
+    UnidentifiedFindEvent<CollisionBirdoEggGoalieData>("CollisionBirdoEggGoalie", -1)->Add(Function<CollisionBirdoEggGoalieData*>(fn_80021DCC), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData16>("CollisionHammerbroShotBallPlayer", -1)->Add(Function<UnidentifiedEventData16*>(fn_80022280), 0, -1);
+    UnidentifiedFindEvent<CollisionPowerupWallData>("CollisionPowerupWall", -1)->Add(Function<CollisionPowerupWallData*>(fn_80021C98), 0, -1);
+    UnidentifiedFindEvent<CollisionPlayerBananaData>("CollisionPlayerBanana", -1)->Add(Function<CollisionPlayerBananaData*>(fn_80021924), 0, -1);
+    UnidentifiedFindEvent<CollisionPlayerShellData>("CollisionPlayerShell", -1)->Add(Function<CollisionPlayerShellData*>(fn_800216C4), 0, -1);
+    UnidentifiedFindEvent<CollisionPlayerFreezeData>("CollisionPlayerFreeze", -1)->Add(Function<CollisionPlayerFreezeData*>(fn_80021484), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData24>("CollisionTongue", -1)->Add(Function<UnidentifiedEventData24*>(fn_8002147C), 0, -1);
+    UnidentifiedFindEvent<CharacterImpactEvent>("MontyReappear", -1)->Add(Function<CharacterImpactEvent*>(fn_800212A0), 0, -1);
+    UnidentifiedFindEvent<CharacterImpactEvent>("HammerBroHammer", -1)->Add(Function<CharacterImpactEvent*>(fn_80021120), 0, -1);
+    UnidentifiedFindEvent<CharacterImpactEvent>("WarioGroundPound", -1)->Add(Function<CharacterImpactEvent*>(fn_80021120), 0, -1);
+    UnidentifiedFindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(fn_80020E20), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_80066008>("DirectionBegin", -1)->Add(Function<UnidentifiedEventData_80066008*>(fn_80020E1C), 0, -1);
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(fn_80020CDC), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(fn_80020E04), 0, -1);
+    UnidentifiedFindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(fn_80021050), 0, -1);
+    UnidentifiedFindEvent<CollisionBulletBillData>("CollisionBulletBillPlayer", -1)->Add(Function<CollisionBulletBillData*>(fn_80020EE8), 0, -1);
+    UnidentifiedFindEvent<CollisionBulletBillData>("CollisionBulletBillFreeze", -1)->Add(Function<CollisionBulletBillData*>(fn_80020FB8), 0, -1);
+    UnidentifiedFindEvent<CollisionBulletBillData>("ExplosionBulletBill", -1)->Add(Function<CollisionBulletBillData*>(fn_80020FD4), 0, -1);
+    UnidentifiedFindEvent<CollisionBulletBillData>("BulletBillExplode", -1)->Add(Function<CollisionBulletBillData*>(fn_80020FD4), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_80066A04>("PowerupStats", -1)->Add(Function<UnidentifiedEventData_80066A04*>(fn_80020C70), 0, -1);
+    UnidentifiedFindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(fn_80020BB0), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData26>("CollisionHammerPlayer", -1)->Add(Function<UnidentifiedEventData26*>(fn_80022B1C), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData24>("CollisionPatchPlayer", -1)->Add(Function<UnidentifiedEventData24*>(fn_80022B04), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData26>("CollisionHammerGround", -1)->Add(Function<UnidentifiedEventData26*>(fn_80022A98), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData34>("CollisionEggPlayer", -1)->Add(Function<UnidentifiedEventData34*>(fn_80022BD8), 0, -1);
     fn_80098750();
 }
 

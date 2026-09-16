@@ -606,26 +606,27 @@ void NetworkStatsManager::ReportGameResult(int result,
 {
     if (g_pNetworkSession->GetRankingReporter() != 0)
     {
-        int points = 0;
-        bool won = false;
-        bool tied = false;
-        int resultPoints = 0;
-        int scorePoints = 0;
-        int bonusPoints = 0;
+        NetworkGameResultDetails details;
+        details.mPoints = 0;
+        details.mWon = false;
+        details.mTied = false;
+        details.mResultPoints = 0;
+        details.mScorePoints = 0;
+        details.mBonusPoints = 0;
 
         if (fallback == 0)
         {
             if (!mGameResultReported)
             {
-                points = CalculateResultPoints_80130684(result, reportHome,
-                    homeScore, awayScore, &won, &tied, &resultPoints,
-                    &scorePoints, &bonusPoints);
-                mCurrentJob = points;
-                mUnidentifiedC430 = won;
-                mUnidentifiedC431 = tied;
-                mUnidentifiedC434 = resultPoints;
-                mUnidentifiedC438 = scorePoints;
-                mUnidentifiedC43C = bonusPoints;
+                details.mPoints = CalculateResultPoints_80130684(result, reportHome,
+                    homeScore, awayScore, &details.mWon, &details.mTied, &details.mResultPoints,
+                    &details.mScorePoints, &details.mBonusPoints);
+                mCurrentJob = details.mPoints;
+                mUnidentifiedC430 = details.mWon;
+                mUnidentifiedC431 = details.mTied;
+                mUnidentifiedC434 = details.mResultPoints;
+                mUnidentifiedC438 = details.mScorePoints;
+                mUnidentifiedC43C = details.mBonusPoints;
             }
             else if (result == 0)
             {
@@ -655,7 +656,7 @@ void NetworkStatsManager::ReportGameResult(int result,
         for (int category = 0; category < categoryCount; ++category)
         {
             int oldPoints = mLocalStats[category].mScore;
-            int pointsScored = points;
+            int pointsScored = details.mPoints;
             bool startFresh = false;
 
             if (category == 1)
@@ -679,7 +680,7 @@ void NetworkStatsManager::ReportGameResult(int result,
                 mLocalStats[category].mLosses = 0;
                 if (result != 4 && result != 3 && result != 2)
                 {
-                    if (won)
+                    if (details.mWon)
                     {
                         ++mLocalStats[category].mWins;
                     }
@@ -707,7 +708,7 @@ void NetworkStatsManager::ReportGameResult(int result,
                 {
                     --mLocalStats[category].mLosses;
                 }
-                else if (won)
+                else if (details.mWon)
                 {
                     ++mLocalStats[category].mWins;
                     --mLocalStats[category].mLosses;
@@ -718,7 +719,7 @@ void NetworkStatsManager::ReportGameResult(int result,
                 mLocalStats[category].mScore += pointsScored;
                 if (result != 4 && result != 3 && result != 2)
                 {
-                    if (won)
+                    if (details.mWon)
                     {
                         ++mLocalStats[category].mWins;
                     }
@@ -749,7 +750,7 @@ void NetworkStatsManager::ReportGameResult(int result,
                 oldPoints,
                 pointsScored,
                 mLocalStats[category].mScore,
-                won,
+                details.mWon,
                 mLocalStats[category].mWins,
                 mLocalStats[category].mLosses,
                 mLocalStats[category].mUnidentified14);

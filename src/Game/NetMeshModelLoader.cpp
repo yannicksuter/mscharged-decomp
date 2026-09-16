@@ -1,7 +1,6 @@
 #include "Game/Physics/NetMeshModelLoader.h"
 
 #include "Game/Drawable/DrawableModel.h"
-#include "Game/MathHelpers.h"
 #include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMemory.h"
@@ -25,6 +24,20 @@ typedef nlAVLTreeIterator<NetMeshEdge, int,
 static int s_initialEdgeCount = 1;
 static int s_initialVertexCount = 1;
 static unsigned char sbPullGoalsOut;
+
+static inline float NetMeshMin(float current, float value)
+{
+    if (current <= value)
+        return current;
+    return value;
+}
+
+static inline float NetMeshMax(float current, float value)
+{
+    if (current >= value)
+        return current;
+    return value;
+}
 
 NetMeshModelLoader::NetMeshModelLoader(
     NetMesh& netMesh, unsigned long netMeshDrawableObjectID)
@@ -345,12 +358,13 @@ void NetMeshModelLoader::CreateNetMeshFromVertexList()
         shortCoord.e[0] = (s16)(scale * texCoord.x);
         shortCoord.e[1] = (s16)(scale * texCoord.y);
 
-        minimum.x = nlMinEquals(minimum.x, position.x);
-        maximum.x = nlMaxEquals(maximum.x, position.x);
-        minimum.y = nlMinEquals(minimum.y, position.y);
-        maximum.y = nlMaxEquals(maximum.y, position.y);
-        minimum.z = nlMinEquals(minimum.z, position.z);
-        maximum.z = nlMaxEquals(maximum.z, position.z);
+        for (int component = 0; component < 3; ++component)
+        {
+            minimum.e[component]
+                = NetMeshMin(minimum.e[component], position.e[component]);
+            maximum.e[component]
+                = NetMeshMax(maximum.e[component], position.e[component]);
+        }
 
         if (sbPullGoalsOut != 0)
             position.x -= pullDistance;

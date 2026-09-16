@@ -21,11 +21,6 @@ extern int* gGameCubePadButtonMap;
 
 bool g_bEnableGamecubePadMonkey;
 
-int PadMonkey::GetButtonMask(int buttonIndex)
-{
-    return GetPadButtonMask(buttonIndex);
-}
-
 int g_pPadRemapArray[51] = {
     0x00000020, 0x00000040, 0x00000800, 0x00000400, 0x00000001, 0x00000040, 0x00000020, 0x00000100, 0x00000010, 0x00000100, 0x00000200, 0x00000001, 0x00000002, 0x00000008, 0x00000004, 0x00000100, 0x00000200, 0x00000400, 0x00000800, 0x00001000, 0x00000020, 0x00000400, 0x00000010, 0x00000040, 0x00000800, 0x00000200, 0x00000100, 0x00000100, 0x00000200, 0x00000800, 0x00000100, 0x00000200, 0x00001000, 0x00000800, 0x00000800, 0x00000800, 0x00000200, 0x00000800, 0x00000040, 0x00000020, 0x00000800, 0x00000400, 0x00000040, 0x00000020, 0x00000040, 0x00000020, 0x00000010, 0x00001000, 0x00000020, 0x00000040, 0x00001000
 };
@@ -145,13 +140,13 @@ void InitPads()
 void InitPlatPad()
 {
     CurrentAllocator = &VirtualAllocator;
-    AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
+    unsigned int index = AllocatorStackDepth++;
+    AllocatorStack[index] = CurrentAllocator;
 
     if (g_pPlatPadManager == 0)
     {
-        g_pPlatPadManager = new (nlMalloc(
-            sizeof(PlatPadManager), 8, false))
-            PlatPadManager;
+        void* mem = nlMalloc(sizeof(PlatPadManager), 8, false);
+        g_pPlatPadManager = new (mem) PlatPadManager;
     }
 
     g_pPlatPadManager->Initialize();
@@ -179,33 +174,37 @@ void UpdateMonkeyState(int monkeySet)
         monkey->m_connectionChance
             = GetTweakFloat(monkeyPad.Append("connected").c_str(), 100.0f);
         monkey->SetButtonChance(0x0001,
-            GetTweakFloat(monkeyPad.Append("button_left").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_left").c_str(), 0.0f));
         monkey->SetButtonChance(0x0002,
-            GetTweakFloat(monkeyPad.Append("button_right").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_right").c_str(), 0.0f));
         monkey->SetButtonChance(0x0004,
-            GetTweakFloat(monkeyPad.Append("button_down").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_down").c_str(), 0.0f));
         monkey->SetButtonChance(0x0008,
-            GetTweakFloat(monkeyPad.Append("button_up").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_up").c_str(), 0.0f));
         monkey->SetButtonChance(0x0010,
-            GetTweakFloat(monkeyPad.Append("button_plus").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_plus").c_str(), 0.0f));
         monkey->SetButtonChance(0x0100,
-            GetTweakFloat(monkeyPad.Append("button_2").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_2").c_str(), 0.0f));
         monkey->SetButtonChance(0x0200,
-            GetTweakFloat(monkeyPad.Append("button_1").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_1").c_str(), 0.0f));
         monkey->SetButtonChance(0x0400,
-            GetTweakFloat(monkeyPad.Append("button_b").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_b").c_str(), 0.0f));
         monkey->SetButtonChance(0x0800,
-            GetTweakFloat(monkeyPad.Append("button_a").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_a").c_str(), 0.0f));
         monkey->SetButtonChance(0x1000,
-            GetTweakFloat(monkeyPad.Append("button_minus").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_minus").c_str(), 0.0f));
         monkey->SetButtonChance(0x8000,
-            GetTweakFloat(monkeyPad.Append("button_home").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_home").c_str(), 0.0f));
         monkey->SetButtonChance(0x2000,
-            GetTweakFloat(monkeyPad.Append("button_z").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_z").c_str(), 0.0f));
         monkey->SetButtonChance(0x4000,
-            GetTweakFloat(monkeyPad.Append("button_c").c_str(), 10.0f));
+            GetTweakFloat(monkeyPad.Append("button_c").c_str(), 0.0f));
 
         monkey->Update(0.0f);
     }
 }
 
+int PadMonkey::GetButtonMask(int buttonIndex)
+{
+    return GetPadButtonMask(buttonIndex);
+}

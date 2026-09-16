@@ -3379,11 +3379,8 @@ NL/gl/glView.cpp:
 	.sbss       start:0x806E1F38 end:0x806E1F40
 	.sdata2     start:0x806E6350 end:0x806E6368
 
-NL/gl/glResourceLoader.cpp:
-	.text       start:0x802D0458 end:0x802D0864
-
 Game/GL/GLInventory.cpp:
-	.text       start:0x802D0864 end:0x802D2B2C
+	.text       start:0x802D0458 end:0x802D2B2C
 	.text       start:0x802D2B2C end:0x802D38A4
 	.data       start:0x8052E5C0 end:0x8052E758
 
@@ -3654,7 +3651,7 @@ Game/Audio/UnidentifiedAudioScriptRuntime.cpp:
 	.data       start:0x8052F978 end:0x8052F998
 	.bss        start:0x8057FBC8 end:0x8057FBF0
 
-Game/Audio/UnidentifiedAudioEffectBinding.cpp:
+Game/Audio/AudioEffectBinding.cpp:
 	.text       start:0x802F8418 end:0x802F98F4
 	.data       start:0x8052F998 end:0x8052F9F0
 	.sdata      start:0x806DF4F0 end:0x806DF4F8

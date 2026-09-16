@@ -4,29 +4,25 @@
 
 float nlBezier(float* fControlPoints, int nNumPoints, float fMu)
 {
-    float oneMinusMu;
-    float powVal;
-    float result;
-    float oneMinusMuToNMinusK;
-    float muToK;
-    float blend;
-    float powTerm;
     int nFactorial;
     int kFactorial;
-    int i;
-    float* currentPoint;
     int nMinusKFactorial;
+    float powVal;
+    float oneMinusMuToNMinusK;
+    float muToK;
+    int i;
+    float result;
     int k;
+    float blend;
 
     if (fMu == 1.0f)
     {
         return fControlPoints[nNumPoints - 1];
     }
 
-    oneMinusMu = 1.0f - fMu;
     nFactorial = 1;
     kFactorial = 1;
-    powVal = pow(oneMinusMu, (float)nNumPoints);
+    powVal = pow(1.0f - fMu, (float)nNumPoints);
     oneMinusMuToNMinusK = powVal;
     muToK = 1.0f;
 
@@ -36,8 +32,7 @@ float nlBezier(float* fControlPoints, int nNumPoints, float fMu)
     }
 
     nMinusKFactorial = nFactorial;
-    currentPoint = fControlPoints + 1;
-    result = *fControlPoints * powVal;
+    result = *fControlPoints * oneMinusMuToNMinusK;
 
     for (k = 1; k <= nNumPoints; k++)
     {
@@ -47,14 +42,12 @@ float nlBezier(float* fControlPoints, int nNumPoints, float fMu)
             nMinusKFactorial /= (nNumPoints - k) + 1;
         }
 
-        oneMinusMuToNMinusK /= oneMinusMu;
+        oneMinusMuToNMinusK /= 1.0f - fMu;
         muToK *= fMu;
         blend = (float)(nFactorial / (kFactorial * nMinusKFactorial));
-        powTerm = muToK * oneMinusMuToNMinusK;
-        blend = blend * powTerm;
-        blend = blend * *currentPoint;
-        result = result + blend;
-        currentPoint += 1;
+        blend *= muToK * oneMinusMuToNMinusK;
+        blend *= fControlPoints[k];
+        result += blend;
     }
 
     return result;

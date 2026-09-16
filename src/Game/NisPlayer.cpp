@@ -100,22 +100,10 @@ void NisPlayer::fn_8027ED18()
 
 void NisPlayer::fn_8027DA28()
 {
-    {
-        Function<GoalScoredData*> callback(Bind<void>(MemFun(&NisPlayer::fn_8027DF70), this, placeholder0));
-        UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<GoalieSaveData*> callback(Bind<void>(MemFun(&NisPlayer::fn_8027DFE0), this, placeholder0));
-        UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<cPlayer*> callback(Bind<void>(MemFun(&NisPlayer::fn_8027DFE4), this, placeholder0));
-        UnidentifiedFindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(Bind<void>(MemFun(&NisPlayer::fn_8027E054), this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("PauseGame", -1)->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(Bind<void>(MemFun(&NisPlayer::fn_8027DF70), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(Bind<void>(MemFun(&NisPlayer::fn_8027DFE0), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(Bind<void>(MemFun(&NisPlayer::fn_8027DFE4), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("PauseGame", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&NisPlayer::fn_8027E054), this)), 0, -1);
 }
 
 void NisPlayer::fn_8027BD64()
@@ -1759,6 +1747,7 @@ void NisPlayer::Render(int pass) const
 
     HideAllActors();
 
+    int line;
     bool renderPass = false;
     if (fn_8027E64C() && pass == 0)
     {
@@ -1776,7 +1765,7 @@ void NisPlayer::Render(int pass) const
     }
     if (mUnidentified34359 && renderPass == 0)
     {
-        int line = 0;
+        line = 0;
         for (int i = 0; i < 8; i++)
         {
             if (mPlaying[i] != NULL)

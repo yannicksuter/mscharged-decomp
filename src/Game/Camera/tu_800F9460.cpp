@@ -728,98 +728,21 @@ void UnidentifiedCameraEffects::Update(float deltaTime)
 
 void UnidentifiedCameraEffects::RegisterEventListeners()
 {
-    {
-        Function<GoalScoredData*> callback(
-            Bind<void>(MemFun(&UnidentifiedCameraEffects::OnGoalScored),
-                this, placeholder0));
-        UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(
-            Bind<void>(MemFun(&UnidentifiedCameraEffects::OnShotPresentation),
-                this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("ShotPresentation", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnShotPresentationEnd),
-            this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("ShotPresentationEnd", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnCaptainClashPresentation),
-            this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("CaptainClashPresentation", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(Bind<void>(
-            MemFun(
-                &UnidentifiedCameraEffects::OnCaptainClashPresentationEnd),
-            this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("CaptainClashPresentationEnd", -1)
-            ->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnWindupPresentation),
-            this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("WindupPresentation", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnWindupPresentationEnd),
-            this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("WindupPresentationEnd", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData_8006701C*> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnMegaStrikeMeterStart),
-            this, placeholder0));
-        UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterStart", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<FnVoidVoid> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnMegaStrikeMeterEnd),
-            this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<GoalieSaveData*> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnGoalieSave),
-            this, placeholder0));
-        GetGoalieSaveEvent("GoalieSave", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionThwompPlayerData*> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnCollisionThwompPlayer),
-            this, placeholder0));
-        UnidentifiedFindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<PlayerAttackData*> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnGoalieDekeAttackAttempt),
-            this, placeholder0));
-        UnidentifiedFindEvent<PlayerAttackData>("GoalieDekeAttackAttempt", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<PlayerAttackData*> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnGoalieDekeAttackSuccess),
-            this, placeholder0));
-        UnidentifiedFindEvent<PlayerAttackData>("GoalieDekeAttackSuccess", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<PlayerAttackData*> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnGoalieSlamAttackAttempt),
-            this, placeholder0));
-        UnidentifiedFindEvent<PlayerAttackData>("GoalieSlamAttackAttempt", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<PlayerAttackData*> callback(Bind<void>(
-            MemFun(&UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess),
-            this, placeholder0));
-        UnidentifiedFindEvent<PlayerAttackData>("GoalieSlamAttackSuccess", -1)->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnGoalScored), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("ShotPresentation", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnShotPresentation), this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("ShotPresentationEnd", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnShotPresentationEnd), this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("CaptainClashPresentation", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnCaptainClashPresentation), this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("CaptainClashPresentationEnd", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnCaptainClashPresentationEnd), this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("WindupPresentation", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnWindupPresentation), this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("WindupPresentationEnd", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnWindupPresentationEnd), this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterStart", -1)->Add(Function<UnidentifiedEventData_8006701C*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnMegaStrikeMeterStart), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnMegaStrikeMeterEnd), this)), 0, -1);
+    GetGoalieSaveEvent("GoalieSave", -1)->Add(Function<GoalieSaveData*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnGoalieSave), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnCollisionThwompPlayer), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<PlayerAttackData>("GoalieDekeAttackAttempt", -1)->Add(Function<PlayerAttackData*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnGoalieDekeAttackAttempt), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<PlayerAttackData>("GoalieDekeAttackSuccess", -1)->Add(Function<PlayerAttackData*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnGoalieDekeAttackSuccess), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<PlayerAttackData>("GoalieSlamAttackAttempt", -1)->Add(Function<PlayerAttackData*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnGoalieSlamAttackAttempt), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<PlayerAttackData>("GoalieSlamAttackSuccess", -1)->Add(Function<PlayerAttackData*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess), this, placeholder0)), 0, -1);
 }
 
 UnidentifiedCameraEffects::UnidentifiedCameraEffects()

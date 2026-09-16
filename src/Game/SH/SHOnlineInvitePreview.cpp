@@ -55,6 +55,25 @@ void SHOnlineInvitePreview::OnPreviewDelayElapsed(FETimer* timer)
     mPreviewDelayTimer.SetEnabled(false);
 }
 
+inline void SHOnlineInvitePreview::InitializeContinueButton()
+{
+    typedef Detail::MemFunImpl<void, void (SHOnlineInvitePreview::*)(unsigned int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineInvitePreview*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(PointerBinding(
+        MemFun(&SHOnlineInvitePreview::OnContinuePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(
+        MemFun(&SHOnlineInvitePreview::OnContinuePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback select(PointerBinding(
+        MemFun(&SHOnlineInvitePreview::OnContinuePointerPress), this, Placeholder<0>(), Placeholder<1>()));
+
+    mContinueButton.SetInstanceBounds(
+        mContinueButtonInstance, true, 0.0f, 0.0f, 1.0f, 1.0f);
+    mContinueButton.SetPointerEnterCallback(over);
+    mContinueButton.SetPointerLeaveCallback(off);
+    mContinueButton.SetPointerPressCallback(select);
+}
+
 void SHOnlineInvitePreview::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
@@ -64,29 +83,18 @@ void SHOnlineInvitePreview::Update(float fDeltaT)
     if (state == 0 || (unsigned int)(state - 2) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->m_duration + slide->m_start)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int pad = 0; pad < 4; ++pad)
             {
-                gFEPointerInstances[pad]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(pad)->SetActiveSlide("waiting", true, false);
             }
             return;
         }
 
         if (state == 0)
         {
-            FEPointerListener::Callback over(Bind<void>(
-                MemFun(&SHOnlineInvitePreview::OnContinuePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-            FEPointerListener::Callback off(Bind<void>(
-                MemFun(&SHOnlineInvitePreview::OnContinuePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-            FEPointerListener::Callback select(Bind<void>(
-                MemFun(&SHOnlineInvitePreview::OnContinuePointerPress), this, Placeholder<0>(), Placeholder<1>()));
-
-            mContinueButton.SetInstanceBounds(
-                mContinueButtonInstance, true, 0.0f, 0.0f, 1.0f, 1.0f);
-            mContinueButton.SetPointerEnterCallback(over);
-            mContinueButton.SetPointerLeaveCallback(off);
-            mContinueButton.SetPointerPressCallback(select);
+            InitializeContinueButton();
             mButtonInitialized = true;
             mState = 1;
         }
@@ -114,7 +122,7 @@ void SHOnlineInvitePreview::Update(float fDeltaT)
 
     for (int pad = 0; pad < 4; ++pad)
     {
-        TLComponentInstance* controller = gFEPointerInstances[pad];
+        TLComponentInstance* controller = GetPointerInstance(pad);
         if ((unsigned int)pad != gFEControllerIndex)
         {
             controller->SetActiveSlide("waiting", true, false);

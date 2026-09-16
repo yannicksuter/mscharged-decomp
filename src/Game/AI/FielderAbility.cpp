@@ -9,10 +9,12 @@
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/CharacterTweaks.h"
+#include "Game/Field.h"
 #include "Game/Game.h"
 #include "Game/MathHelpers.h"
 #include "Game/SAnim.h"
 #include "Game/SAnim/pnSAnimController.h"
+#include "Game/Task/FixedUpdateTask.h"
 #include "NL/globalpad.h"
 #include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
@@ -67,7 +69,6 @@ extern "C" void fn_80038158(cFielder* pFielder, int nParam);
 extern "C" bool fn_80319FEC(void* pParam, int nAction);
 extern "C" void fn_80319E58(void* pParam, int nAction);
 extern "C" void fn_80319E84(void* pParam, int nAction, int nParam1, int nParam2);
-extern "C" bool fn_8002D2C4(nlVector3* v3Position, float fParam, int nParam);
 extern "C" void fn_80060014(cGame* pGame, void* pEvent);
 extern "C" void fn_8005FC1C(cGame* pGame, void* pEvent);
 extern "C" void fn_8005FE18(cGame* pGame, void* pEvent);
@@ -75,7 +76,6 @@ extern "C" void fn_80060210(cGame* pGame, void* pEvent);
 
 extern "C" void fn_800F026C(float* pParams, float fParam1, float fParam2);
 extern "C" void fn_80061B1C(int nParam, float fParam1, float fParam2);
-extern "C" void fn_80111D7C(float fParam);
 extern "C" void fn_801B897C(cFielder* pFielder);
 extern "C" void fn_801BAF98(cFielder* pFielder);
 extern "C" void fn_801BB0DC(cFielder* pFielder);
@@ -186,7 +186,7 @@ void cFielder::fn_8004FB04()
 
 void cFielder::fn_8004FC90(float fDeltaT)
 {
-    float fFrame = m_pCurrentAnimController->m_fTime
+    float fFrame = m_pCurrentAnimController->get_fTime()
         * (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys
         / lbl_806DB9FC;
 
@@ -195,7 +195,8 @@ void cFielder::fn_8004FC90(float fDeltaT)
         u32 aFacing = mUnidentified024.m_aActualFacingDirection;
         float fBlend = fFrame * (lbl_806E3650 * fFrame + lbl_806E364C);
         fBlend = fFrame * fBlend;
-        float fTurn = lbl_806DBA08 - (float)aFacing / 65536.0f;
+        float fTurn = (float)aFacing / 65536.0f;
+        fTurn = lbl_806DBA08 - fTurn;
         if (m_eAnimID == 0x69)
         {
             fTurn += 0.5f;
@@ -209,10 +210,10 @@ void cFielder::fn_8004FC90(float fDeltaT)
             fTurn += 1.0f;
         }
         fTurn = fTurn * fBlend;
-        SetFacingDirection(
-            (u16)(aFacing
-                + (s16)(s32)(65536.0f * (fTurn * fBlend))),
-            true);
+        s16 adjustedDelta
+            = (s16)(s32)(65536.0f * (fTurn * fBlend));
+        u16 newFacing = adjustedDelta + aFacing;
+        SetFacingDirection(newFacing, true);
     }
 
     if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB9FC))
@@ -230,7 +231,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
         event.v3Position = mUnidentified024.m_v3Position;
         event.fParam1 = lbl_806DB9F4;
         event.fParam2 = lbl_806DB9F8;
-        fn_8002D2C4(&event.v3Position, lbl_806DB9F4, 1);
+        cField::FixOutOfBoundsPosition(event.v3Position, lbl_806DB9F4, true);
         event.pFielder = this;
         fn_8005FC1C(g_pGame, &event);
 
@@ -249,7 +250,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
     {
         if (!IsNetworkOrRecordedGame())
         {
-            fn_80111D7C(lbl_806DB9F0);
+            FixedUpdateTask::SetFrameLock(lbl_806DB9F0);
         }
         fn_80038158(this, 0);
     }

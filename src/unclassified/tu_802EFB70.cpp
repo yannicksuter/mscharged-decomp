@@ -136,9 +136,9 @@ static inline float EvaluateCurve_802EFB70(
     {
         if (input < point[1].input)
         {
-            return ((input - point->input)
-                       / (point[1].input - point->input))
-                     * (point[1].output - point->output)
+            float fraction = (input - point->input)
+                           / (point[1].input - point->input);
+            return fraction * (point[1].output - point->output)
                  + point->output;
         }
     }
@@ -226,14 +226,12 @@ extern "C" void fn_802F00F0(
     for (u32 i = 0; i < controller->runtimeCount; i++)
         UpdateRuntimeNode_802EFB70(controller->runtimeNodes[i]);
 
-    RpcListEntry_802EFB70* start = controller->dynamicNodes->m_Head;
-    RpcListEntry_802EFB70* entry = start;
-    while (entry != 0)
+    nlDLListIterator<RpcRuntimeNode_802EFB70*> iterator =
+        controller->dynamicNodes->Begin();
+    while (iterator.hasNext())
     {
-        UpdateRuntimeNode_802EFB70(entry->entry);
-        entry = entry->m_next;
-        if (entry == start)
-            entry = 0;
+        UpdateRuntimeNode_802EFB70(*iterator);
+        iterator.Step();
     }
 }
 

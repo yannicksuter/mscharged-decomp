@@ -818,14 +818,7 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
         {
             if (ReceivingPass(pFielder))
             {
-                bool bStolen = false;
-                bool bAirborne = g_pBall->meBallState == 5
-                    || g_pBall->meBallState == 3;
-                if (bAirborne && g_pBall->m_pPassTarget != 0)
-                {
-                    bStolen = true;
-                }
-                if (bStolen)
+                if (g_pBall->UnidentifiedHasPassTarget())
                 {
                     av3FielderAILocs[i] = g_pBall->m_v3PassIntercept;
                     break;

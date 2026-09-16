@@ -151,9 +151,7 @@ void ScreenTransitionManager::SelectRandomTransition(const char* filter)
 
     for (int i = 0; i < m_Transitions.mSize; ++i)
     {
-        const char* transitionName = m_Transitions.mData[i].c_str();
-
-        if (nlStrNICmp<char>(transitionName, filter, nlStrLen<char>(filter)) == 0)
+        if (nlStrNICmp<char>(m_Transitions.mData[i].c_str(), filter, nlStrLen<char>(filter)) == 0)
         {
             candidates.push_back(m_Transitions.mData[i]);
         }

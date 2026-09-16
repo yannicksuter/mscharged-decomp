@@ -1185,18 +1185,7 @@ void cTeam::CalculateNewBallInterceptTimes()
                 }
                 else
                 {
-                    bool bUsePassTarget = false;
-                    bool bAirborne = true;
-                    if (g_pBall->meBallState != 5
-                        && g_pBall->meBallState != 3)
-                    {
-                        bAirborne = false;
-                    }
-                    if (bAirborne && g_pBall->m_pPassTarget != NULL)
-                    {
-                        bUsePassTarget = true;
-                    }
-                    if (bUsePassTarget)
+                    if (g_pBall->UnidentifiedHasPassTarget())
                     {
                         mvBallInterceptPosition[i]
                             = g_pBall->m_v3PassIntercept;

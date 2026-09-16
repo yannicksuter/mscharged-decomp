@@ -98,18 +98,9 @@ GoalOverlay::GoalOverlay()
 {
     mIsCreated = false;
     mIsInOvertime = false;
-    {
-        Function<FnVoidVoid> callback(Bind<void>(MemFun(&GoalOverlay::Reset), this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<GoalScoredData*> callback(Bind<void>(MemFun(&GoalOverlay::fn_801F178C), this, placeholder0));
-        UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<MegaStrikeEndData*> callback(Bind<void>(MemFun(&GoalOverlay::fn_801F17F4), this, placeholder0));
-        UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&GoalOverlay::Reset), this)), 0, -1);
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(Bind<void>(MemFun(&GoalOverlay::fn_801F178C), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(Bind<void>(MemFun(&GoalOverlay::fn_801F17F4), this, placeholder0)), 0, -1);
 
     if (GameInfoManager::Instance()->IsInFriendlyMode() || GameInfoManager::Instance()->IsInMode1())
     {

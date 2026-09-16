@@ -107,7 +107,9 @@ void NPCManager::CreateNPCTemplate(
 {
     NPCTemplate* pTemplate
         = new (nlMalloc(sizeof(NPCTemplate), 8, false))
-            NPCTemplate(pName, bPersistent);
+            NPCTemplate();
+    strcpy(pTemplate->mName, pName);
+    pTemplate->mPersistent = bPersistent;
 
     if (bPersistent)
     {

@@ -21,6 +21,11 @@ public:
         , entry(value)
     {
     }
+
+    const T& Entry() const
+    {
+        return entry;
+    }
 };
 
 template <typename T>

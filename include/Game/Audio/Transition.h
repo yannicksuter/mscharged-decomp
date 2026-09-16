@@ -13,6 +13,7 @@ struct Transition
         duration = 1.0f;
         enabled = true;
     }
+    ~Transition() { }
 
     virtual float GetValue();
     virtual void Update(float dt, float multiplier);
@@ -26,6 +27,15 @@ struct Transition
         else
             target = newTarget;
         elapsed = transitionTime;
+    }
+
+    void Reset(float initialValue, float minimumValue, float maximumValue)
+    {
+        target = initialValue;
+        value = initialValue;
+        minimum = minimumValue;
+        maximum = maximumValue;
+        valid = true;
     }
 
     float value;

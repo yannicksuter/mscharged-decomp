@@ -220,9 +220,8 @@ u8 cPlayer::SwapController(bool bParam)
 {
     if (mUnidentified1E4.m_bCanTestController)
     {
-        bool bPassTarget = (g_pBall->meBallState == 5 || g_pBall->meBallState == 3)
-                        && g_pBall->m_pPassTarget != NULL;
-        if (!bPassTarget || g_pBall->m_pPassTarget != this)
+        if (!g_pBall->UnidentifiedHasPassTarget()
+            || g_pBall->m_pPassTarget != this)
         {
             cPlayer* pSwapPlayer = NULL;
             float fSwapScore = -1.0f;
@@ -1362,22 +1361,10 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC*);
 
 extern "C" void fn_80098750()
 {
-    {
-        Function<UnidentifiedEventData_800673FC*> callback(fn_80098AA0);
-        UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachFlash", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData_800673FC*> callback(fn_80098A68);
-        UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachCamerasDown", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData_800673FC*> callback(fn_80098A84);
-        UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachCamerasAway", -1)->Add(callback, 0, -1);
-    }
-    {
-        Function<UnidentifiedEventData00*> callback(fn_80099030);
-        UnidentifiedFindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachFlash", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098AA0), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachCamerasDown", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098A68), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachCamerasAway", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098A84), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(fn_80099030), 0, -1);
 }
 
 float lbl_806DBD88 = 6.5f;

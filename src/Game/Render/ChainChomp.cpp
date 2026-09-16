@@ -96,36 +96,9 @@ ChainChomp::ChainChomp(cSHierarchy& pHierarchy, int nModelID,
     mnThrowerPadID = -1;
     mbIsVisible = false;
 
-    {
-        Function<void*> callback(CollisionFireballChain);
-        EventRegistryValue* foundEvent;
-        unsigned int hash;
-        hash = HashEventName("CollisionFireballChain", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? foundEvent->event : 0;
-        ((UnidentifiedTypedEvent<void>*)event)->Add(callback, 0, -1);
-    }
-    {
-        Function<void*> callback(CollisionChainCrowd);
-        EventRegistryValue* foundEvent;
-        unsigned int hash;
-        hash = HashEventName("CollisionChainCrowd", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? foundEvent->event : 0;
-        ((UnidentifiedTypedEvent<void>*)event)->Add(callback, 0, -1);
-    }
-    {
-        Function<CollisionChainPowerupData*> callback(CollisionChainPowerup);
-        EventRegistryValue* foundEvent;
-        unsigned int hash;
-        hash = HashEventName("CollisionChainPowerup", -1);
-        foundEvent = 0;
-        g_pEventRegistry->Find(hash, &foundEvent, 0);
-        UnidentifiedEventBase* event = foundEvent != 0 ? foundEvent->event : 0;
-        ((UnidentifiedTypedEvent<CollisionChainPowerupData>*)event)->Add(callback, 0, -1);
-    }
+    UnidentifiedFindEvent<void>("CollisionFireballChain", -1)->Add(Function<void*>(CollisionFireballChain), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionChainCrowd", -1)->Add(Function<void*>(CollisionChainCrowd), 0, -1);
+    UnidentifiedFindEvent<CollisionChainPowerupData>("CollisionChainPowerup", -1)->Add(Function<CollisionChainPowerupData*>(CollisionChainPowerup), 0, -1);
     mpAvoidable = 0;
 }
 
@@ -141,17 +114,6 @@ ChainChomp::~ChainChomp()
 static inline u16 UnidentifiedDeltaToAngle(float y, float x)
 {
     return (u16)(s32)(10430.378f * nlATan2f(y, x));
-}
-
-static inline void EmitTrail(ChainChomp* pChomp)
-{
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("chainchomp_trail");
-    SetEffectsGroupFountainLife(pGroup, 12.0f);
-
-    EmissionController* pControl = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    pControl->SetPosition(pChomp->mv3Position);
-    pControl->m_uUserData = (u32)pChomp;
-    pControl->SetUpdateCallback(Function<EmissionController&>(UpdateChainEmitter));
 }
 
 static inline void StartChasing(ChainChomp* pChomp)
@@ -189,7 +151,7 @@ void ChainChomp::Update(float fDeltaT)
             EmissionManager::Instance()->Destroy((unsigned long)this, pGroup);
             mpPhysObj->EnableCollisions();
 
-            EmitTrail(this);
+            EmitTrail();
             StartChasing(this);
             mtStateTimer.SetSeconds(0.5f * gGameTweaks.m_pGameTweaks->fChainChompActiveTime.GetValue());
         }
@@ -283,7 +245,7 @@ void ChainChomp::Update(float fDeltaT)
                 }
             }
 
-            EmitTrail(this);
+            EmitTrail();
         }
         else
         {
@@ -518,6 +480,17 @@ void UpdateChainEmitter(EmissionController& controller)
         nlVector3 direction = { 0.0f, 0.0f, 1.0f };
         controller.SetDirection(direction);
     }
+}
+
+void ChainChomp::EmitTrail()
+{
+    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("chainchomp_trail");
+    SetEffectsGroupFountainLife(pGroup, 12.0f);
+
+    EmissionController* pControl = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
+    pControl->SetPosition(mv3Position);
+    pControl->m_uUserData = (u32)this;
+    pControl->SetUpdateCallback(Function<EmissionController&>(UpdateChainEmitter));
 }
 
 cFielder* ChainChomp::FindTarget(cTeam* pTeam)
@@ -767,6 +740,7 @@ void ChainChomp::DrawShadow(
     switch (meChainChompState)
     {
     default:
+    {
         if (gbChainChompProjectedShadow)
         {
             SkinAnimatedNPC::DrawShadow(mpLastModel, mWorldMatrix);
@@ -857,10 +831,10 @@ void ChainChomp::DrawShadow(
         quad.m_uv[3].x = 1.0f;
         quad.m_uv[3].y = 0.0f;
 
-        *(u32*)&quad.m_colour[3] = *(u32*)&c;
-        *(u32*)&quad.m_colour[2] = *(u32*)&c;
-        *(u32*)&quad.m_colour[1] = *(u32*)&c;
-        *(u32*)&quad.m_colour[0] = *(u32*)&c;
+        quad.m_colour[3] = c;
+        quad.m_colour[2] = c;
+        quad.m_colour[1] = c;
+        quad.m_colour[0] = c;
 
         glSetDefaultState(true);
         glSetRasterState(GLS_AlphaBlend, 1);
@@ -871,17 +845,18 @@ void ChainChomp::DrawShadow(
         glSetTextureState(GLTS_DiffuseWrap, 3);
         glSetCurrentTextureState(glHandleizeTextureState());
 
-        void* renderContext;
+        RLView* view;
         if (gPeachPhotoState.state == 1)
         {
-            renderContext = GetLayerView(eCLV_MoreCharacters);
+            view = GetLayerView(eCLV_MoreCharacters);
         }
         else
         {
-            renderContext = gpChainChompShadowView;
+            view = gpChainChompShadowView;
         }
-        quad.Attach((eGLView)(u32)renderContext, 0);
+        quad.Attach((eGLView)(u32)view, 0);
         break;
+    }
     case CHAIN_STATE_HIDDEN:
     case CHAIN_STATE_FALL:
     case CHAIN_STATE_FROZEN:
@@ -919,8 +894,7 @@ void ChainChomp::Hide()
     mnThrowerPadID = -1;
     mbIsVisible = false;
     mpTarget = 0;
-    mtStateTimer.m_unk0 = mtStateTimer.m_uPackedTime != 0;
-    mtStateTimer.m_uPackedTime = 0;
+    mtStateTimer.UnidentifiedClear();
     mfChaseSpeed = 0.0f;
 }
 

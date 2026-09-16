@@ -346,10 +346,7 @@ extern "C" const nlVector3* fn_800C61FC(DesireSteering* desire)
     DesireReceivePass* receivePass = (DesireReceivePass*)fn_8002E08C(
         desire->mUnidentifiedFielder, 22);
 
-    bool bPassTarget = (g_pBall->meBallState == 5
-                           || g_pBall->meBallState == 3)
-                    && g_pBall->m_pPassTarget != NULL;
-    if (bPassTarget
+    if (g_pBall->UnidentifiedHasPassTarget()
         && g_pBall->m_pPassTarget == desire->mUnidentifiedFielder
         && receivePass != NULL && receivePass->UnidentifiedIsActive())
     {

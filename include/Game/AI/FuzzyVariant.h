@@ -78,6 +78,14 @@ public:
     {
     }
 
+    FuzzyVariant& operator=(const FuzzyVariant& other)
+    {
+        Variant value(other);
+        Reset();
+        CopyFrom(value);
+        return *this;
+    }
+
     virtual unsigned long GetHash() const;
     virtual NLString ToString() const;
     virtual bool IsPointerType() const;
@@ -104,11 +112,7 @@ public:
     UnidentifiedFuzzyVariantData& operator=(
         const UnidentifiedFuzzyVariantData& other)
     {
-        {
-            Variant value(other);
-            Reset();
-            CopyFrom(value);
-        }
+        FuzzyVariant::operator=(other);
         mIndex = other.mIndex;
         return *this;
     }
@@ -326,9 +330,7 @@ inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
 {
     {
         FuzzyVariant base((const FuzzyVariant&)other);
-        Variant value(base);
-        Reset();
-        CopyFrom(value);
+        FuzzyVariant::operator=(base);
     }
 
     for (int i = 0; i < 19; i++)

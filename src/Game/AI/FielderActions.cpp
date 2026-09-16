@@ -4830,11 +4830,8 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
         if (bTouched && bCanPickup)
         {
-            bool bAirborne = g_pBall->meBallState == 5
-                || g_pBall->meBallState == 3;
-            bool bStolen = bAirborne && g_pBall->m_pPassTarget != 0;
-
-            if (bStolen && g_pBall->m_pPrevOwner != 0
+            if (g_pBall->UnidentifiedHasPassTarget()
+                && g_pBall->m_pPrevOwner != 0
                 && g_pBall->m_pPrevOwner->m_eClassType == FIELDER
                 && !IsOnSameTeam(g_pBall->m_pPrevOwner))
             {
@@ -5353,16 +5350,17 @@ void cFielder::fn_8004EE48(float fDeltaT)
 {
     if (mUnidentified410.mUnidentified0C)
     {
-        float fGoalLineX = cField::GetGoalLineX(1U) - 0.5f;
+        float fAbsX;
+        float fDistSq;
+        float fGoalLineX;
+
+        fGoalLineX = cField::GetGoalLineX(1U) - 0.5f;
 
         nlVector3 v3BallPos = g_pBall->m_v3Position;
-        float fAbsX = (float)fabs(v3BallPos.x);
+        fAbsX = fabsf(v3BallPos.x);
 
-        nlVector3 v3Delta;
-        v3Delta.y = mUnidentified410.mUnidentified00.y - v3BallPos.y;
-        v3Delta.x = mUnidentified410.mUnidentified00.x - v3BallPos.x;
-        float fDistSq
-            = v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y;
+        fDistSq = nlVec3DistanceSquared2D(
+            mUnidentified410.mUnidentified00, v3BallPos);
 
         if (fn_800167A8(g_pBall)
             && !(fDistSq > lbl_806DB8A8 * lbl_806DB8A8)
@@ -5386,8 +5384,9 @@ void cFielder::fn_8004EE48(float fDeltaT)
     else
     {
         nlVector3 v3Position = mUnidentified024.m_v3Position;
+        float fAnimTime = m_pCurrentAnimController->m_fTime;
         v3Position.z
-            *= 1.0f - m_pCurrentAnimController->m_fTime;
+            *= 1.0f - fAnimTime;
         if (v3Position.z < 0.0f)
         {
             v3Position.z = 0.0f;
@@ -5538,4 +5537,4 @@ static TweakBoolBinding s_UseTurboChargingTweak(
     "gbUseTurboCharging", "Game/Gameplay/Charging/Turbo",
     &gbUseTurboCharging, true);
 
-u16 g_IdleTurnCompletionDelta = (u16)(65536.0f / 36.0f);
+u16 g_IdleTurnCompletionDelta = (u16)DegreesToAngle(10.0f);

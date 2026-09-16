@@ -146,14 +146,6 @@ void Presentation::Call(const char* functionName)
     CallFunction(nlStringHash(functionName));
 }
 
-void OnPresentationModelAnimationFinished(FEModelHandle* object)
-{
-    if (object != 0)
-    {
-        object->PlayAnimation(sIdleAnimation, PM_CYCLIC, 0.2f, 0.0f, false);
-    }
-}
-
 static void DisablePresentationEmission(EmissionController& controller)
 {
     Presentation& presentation = Presentation::Instance();
@@ -188,9 +180,10 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 1:
     {
-        unsigned int value = Pop();
-        int side = (int)Pop();
-        unsigned int name = Pop();
+        bool value = m_SP[-1] != 0;
+        int side = (int)m_SP[-2];
+        unsigned int name = m_SP[-3];
+        m_SP -= 3;
         bool alternate = false;
         if (side == -1 && GameInfoManager::Instance()->mCurrentMode == 3)
         {
@@ -201,8 +194,9 @@ void Presentation::DoFunctionCall(unsigned int function)
             int captain = GameInfoManager::Instance()->GetTeam((short)side);
             int opponent = GameInfoManager::Instance()->GetTeam((short)!side);
             alternate = CaptainsNeedAlternateColour(captain, opponent);
+            side = captain;
         }
-        FEModelManager::Instance()->CreateModel(FE_MODEL_IMPOSTOR, (const char*)name, side, value != 0, 0, 0, alternate);
+        FEModelManager::Instance()->CreateModel(FE_MODEL_IMPOSTOR, (const char*)name, side, value, 0, 0, alternate);
         break;
     }
     case 2:
@@ -216,7 +210,8 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 5:
     {
-        unsigned int value = Pop();
+        unsigned int value = m_SP[-1];
+        --m_SP;
         BasicStadium* stadium = BasicStadium::GetCurrentStadium();
         if (stadium != 0)
         {
@@ -241,27 +236,43 @@ void Presentation::DoFunctionCall(unsigned int function)
         StopWithUndo();
         break;
     case 9:
-        *m_SP++ = g_e3_Build;
+        ++m_SP;
+        m_SP[-1] = g_e3_Build;
         break;
     case 10:
     {
-        unsigned int original = m_SP[-2];
-        unsigned int value = Pop();
-        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)original);
-        m_SP[-1] = object != 0 && object->IsPlayingAnimation((const char*)value)
-                && !object->IsAnimationFinished();
+        const char* animationName;
+        FEModelHandle* object;
+        const char* objectName;
+        objectName = (const char*)m_SP[-2];
+        animationName = (const char*)m_SP[-1];
+        --m_SP;
+        object = FEModelManager::Instance()->GetModel(objectName);
+        unsigned int isPlaying;
+        if (object != 0 && object->IsPlayingAnimation(animationName)
+            && !object->IsAnimationFinished())
+        {
+            isPlaying = 1;
+        }
+        else
+        {
+            isPlaying = 0;
+        }
+        m_SP[-1] = isPlaying;
         if (m_RunState == 3)
         {
-            m_SP[-1] = original;
+            m_SP[-1] = (unsigned int)objectName;
         }
         break;
     }
     case 11:
-        *m_SP++ = IsWidescreen();
+        ++m_SP;
+        m_SP[-1] = IsWidescreen();
         break;
     case 12:
     {
-        const char* name = (const char*)Pop();
+        const char* name = (const char*)m_SP[-1];
+        --m_SP;
         EmissionManager* manager = EmissionManager::Instance();
         EffectsGroup* group = manager->GetEffectsGroup(name);
         if (group != 0)
@@ -275,7 +286,8 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 14:
     {
-        const char* name = (const char*)Pop();
+        const char* name = (const char*)m_SP[-1];
+        --m_SP;
         Presentation& presentation = Presentation::Instance();
         nlStrNCpy(presentation.mEmissionName, name, 64);
         Function1<void, EmissionController&> callback(DisablePresentationEmission);
@@ -284,7 +296,8 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 15:
     {
-        const char* name = (const char*)Pop();
+        const char* name = (const char*)m_SP[-1];
+        --m_SP;
         cAnimCamera* camera = GetCurrentAnimatedCamera();
         camera->SelectCameraAnimation(name);
         camera->m_bCyclic = false;
@@ -293,9 +306,10 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 16:
     {
-        ePlayMode playMode = (ePlayMode)Pop();
-        const char* animationName = (const char*)Pop();
-        const char* objectName = (const char*)Pop();
+        ePlayMode playMode = (ePlayMode)m_SP[-1];
+        const char* animationName = (const char*)m_SP[-2];
+        const char* objectName = (const char*)m_SP[-3];
+        m_SP -= 3;
         SetWorldAnimation(objectName, animationName, playMode);
         break;
     }
@@ -315,9 +329,10 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 18:
     {
-        unsigned int argument1 = Pop();
-        const char* argument0 = (const char*)Pop();
-        const char* objectName = (const char*)Pop();
+        unsigned int argument1 = m_SP[-1];
+        const char* argument0 = (const char*)m_SP[-2];
+        const char* objectName = (const char*)m_SP[-3];
+        m_SP -= 3;
         FEModelHandle* object = FEModelManager::Instance()->GetModel(objectName);
         if (object != 0)
         {
@@ -329,17 +344,25 @@ void Presentation::DoFunctionCall(unsigned int function)
         FEAudio::PlayAnimAudioEvent(0xB60A9CC0, 0, 0, true);
         break;
     case 20:
-        FEAudio::PlayAnimAudioEvent(Pop(), 0, 0, true);
-        break;
-    case 21:
-        PopPresentationCamera(OnCameraTransitionFinished, *(float*)&m_SP[-1]);
+    {
+        unsigned int event = m_SP[-1];
         --m_SP;
+        FEAudio::PlayAnimAudioEvent(event, 0, 0, true);
+        break;
+    }
+    case 21:
+    {
+        float duration = *(float*)&m_SP[-1];
+        --m_SP;
+        PopPresentationCamera(OnCameraTransitionFinished, duration);
         mCameraTransitionFinished = false;
         break;
+    }
     case 22:
     {
-        unsigned int childName = Pop();
-        unsigned int objectName = Pop();
+        unsigned int childName = m_SP[-1];
+        unsigned int objectName = m_SP[-2];
+        m_SP -= 2;
         FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)objectName);
         if (object != 0)
         {
@@ -353,10 +376,10 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 23:
     {
-        bool value = Pop() != 0;
-        float duration = *(float*)&m_SP[-1];
-        --m_SP;
-        const char* name = (const char*)Pop();
+        bool value = m_SP[-1] != 0;
+        float duration = *(float*)&m_SP[-2];
+        const char* name = (const char*)m_SP[-3];
+        m_SP -= 3;
         PushPresentationCamera(name, OnCameraTransitionFinished, duration, value);
         cAnimCamera* camera = GetCurrentAnimatedCamera();
         camera->m_bCyclic = false;
@@ -367,10 +390,10 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 24:
     {
-        bool value = Pop() != 0;
-        float duration = *(float*)&m_SP[-1];
-        --m_SP;
-        const char* baseName = (const char*)Pop();
+        bool value = m_SP[-1] != 0;
+        float duration = *(float*)&m_SP[-2];
+        const char* baseName = (const char*)m_SP[-3];
+        m_SP -= 3;
         char name[64];
         int mode = g_pCupManager->GetCurrentMode();
         if (mode == 0)
@@ -389,8 +412,9 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 25:
     {
-        int value1 = (int)Pop();
-        int value0 = (int)Pop();
+        int value1 = (int)m_SP[-1];
+        int value0 = (int)m_SP[-2];
+        m_SP -= 2;
         GameSceneManager::Instance()->Push((SceneList)value0, (ScreenMovement)value1, false);
         break;
     }
@@ -399,7 +423,9 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 27:
     {
-        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
+        const char* name = (const char*)m_SP[-1];
+        --m_SP;
+        FEModelHandle* object = FEModelManager::Instance()->GetModel(name);
         if (object != 0)
         {
             FEModelManager::Instance()->DestroyModel(object);
@@ -407,23 +433,25 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 28:
-        GetCurrentAnimatedCamera()->SetAnimationTime(
-            *(float*)&m_SP[-1], true);
+    {
+        float time = *(float*)&m_SP[-1];
         --m_SP;
+        GetCurrentAnimatedCamera()->SetAnimationTime(time, true);
         break;
+    }
     case 29:
     {
         cAnimCamera* camera = GetCurrentAnimatedCamera();
-        float time = camera->m_pActiveCameraData != 0
-                       ? (float)camera->m_pActiveCameraData->m_uKeyCount / 30.0f
-                       : 0.0f;
+        float time = camera->GetUnidentifiedDuration();
         camera->SetAnimationTime(time, true);
         break;
     }
     case 30:
     {
-        unsigned int value = Pop();
-        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
+        unsigned int value = m_SP[-1];
+        const char* name = (const char*)m_SP[-2];
+        m_SP -= 2;
+        FEModelHandle* object = FEModelManager::Instance()->GetModel(name);
         if (object != 0)
         {
             object->SetDefaultAnimation((const char*)value);
@@ -432,8 +460,10 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 31:
     {
-        unsigned int childName = Pop();
-        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
+        unsigned int childName = m_SP[-1];
+        const char* name = (const char*)m_SP[-2];
+        m_SP -= 2;
+        FEModelHandle* object = FEModelManager::Instance()->GetModel(name);
         if (object != 0)
         {
             PresentationLookupResult* child = (PresentationLookupResult*)FEModelManager::Instance()->GetObject(childName);
@@ -445,13 +475,18 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 32:
-        mWaitTime = *(float*)&m_SP[-1];
+    {
+        float time = *(float*)&m_SP[-1];
         --m_SP;
+        mWaitTime = time;
         break;
+    }
     case 33:
     {
-        bool value = Pop() != 0;
-        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
+        bool value = m_SP[-1] != 0;
+        const char* name = (const char*)m_SP[-2];
+        m_SP -= 2;
+        FEModelHandle* object = FEModelManager::Instance()->GetModel(name);
         if (object != 0)
         {
             object->mEnabled = value;
@@ -460,7 +495,9 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 34:
     {
-        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
+        const char* name = (const char*)m_SP[-1];
+        --m_SP;
+        FEModelHandle* object = FEModelManager::Instance()->GetModel(name);
         if (object != 0)
         {
             object->SetAnimationCompleteCallback(OnPresentationModelAnimationFinished);
@@ -469,7 +506,8 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 35:
     {
-        bool cyclic = Pop() != 0;
+        bool cyclic = m_SP[-1] != 0;
+        --m_SP;
         cAnimCamera* camera = GetCurrentAnimatedCamera();
         if (camera != 0)
         {
@@ -506,13 +544,14 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         for (int i = 0; i < 4; ++i)
         {
-            gFEPointerInstances[i]->SetActiveSlide(
+            GetPointerInstance(i)->SetActiveSlide(
                 sWaitingSlide, true, false);
         }
         break;
     case 43:
     {
-        const char* name = (const char*)Pop();
+        const char* name = (const char*)m_SP[-1];
+        --m_SP;
         Presentation& presentation = Presentation::Instance();
         nlStrNCpy(presentation.mEmissionName, name, 64);
         Function1<void, EmissionController&> callback(EnablePresentationEmission);
@@ -527,7 +566,9 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 45:
     {
-        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
+        const char* name = (const char*)m_SP[-1];
+        --m_SP;
+        FEModelHandle* object = FEModelManager::Instance()->GetModel(name);
         if (object != 0 && !object->IsAnimationFinished())
         {
             StopWithUndo();
@@ -554,15 +595,28 @@ void Presentation::DoFunctionCall(unsigned int function)
             mWaitTime = 0.0f;
         break;
     case 49:
-        if (FEModelManager::Instance()->GetModel((const char*)Pop()) == 0)
+    {
+        const char* name = (const char*)m_SP[-1];
+        --m_SP;
+        if (FEModelManager::Instance()->GetModel(name) == 0)
         {
             StopWithUndo();
         }
         break;
+    }
     case 50:
     {
-        FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)Pop());
-        if (object == 0 || !object->IsLoaded())
+        const char* name = (const char*)m_SP[-1];
+        --m_SP;
+        FEModelHandle* object = FEModelManager::Instance()->GetModel(name);
+        if (object != 0)
+        {
+            if (!object->IsLoaded())
+            {
+                StopWithUndo();
+            }
+        }
+        else
         {
             StopWithUndo();
         }
@@ -577,5 +631,13 @@ void Presentation::DoFunctionCall(unsigned int function)
     default:
         nlBreak();
         break;
+    }
+}
+
+void OnPresentationModelAnimationFinished(FEModelHandle* object)
+{
+    if (object != 0)
+    {
+        object->PlayAnimation(sIdleAnimation, PM_CYCLIC, 0.2f, 0.0f, false);
     }
 }

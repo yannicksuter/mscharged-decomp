@@ -165,13 +165,19 @@ protected:
 
             int size = nlStrLen(source) + 1;
             char* copy = (char*)nlMalloc(size, 8, false);
-            mData.string = copy;
-            nlStrNCpy(copy, source, size);
+            UnidentifiedCopyString(copy, source, size);
         }
         else
         {
             mData.vector = other.mData.vector;
         }
+    }
+
+    void UnidentifiedCopyString(
+        char* destination, const char* source, unsigned long length)
+    {
+        mData.string = destination;
+        nlStrNCpy(destination, source, length);
     }
 
 public:
@@ -189,7 +195,7 @@ public:
         void* pointer;
         cPlayer* pPlayer;
         cTeam* pTeam;
-        const char* string;
+        char* string;
     } mData;
 };
 

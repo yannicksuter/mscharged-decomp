@@ -19,6 +19,7 @@
 #include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Event.h"
+#include "Game/EventRegistry.h"
 #include "Game/Field.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Game.h"
@@ -37,7 +38,6 @@
 #include "Game/Sys/audio.h"
 #include "Game/Team.h"
 #include "Game/TweakValueFloat.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlMain.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
@@ -81,23 +81,6 @@ struct UnidentifiedGameState
     bool mUnidentified40;
 };
 
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry;
-
-class UnidentifiedTypedEvent0 : public UnidentifiedEventBase
-{
-public:
-    UnidentifiedTypedEvent0(const char* name, int length)
-        : UnidentifiedEventBase(name, length)
-    {
-    }
-
-    virtual ~UnidentifiedTypedEvent0() { }
-    virtual void Disconnect(void*) = 0;
-    virtual void Add(Function<FnVoidVoid>&, unsigned int, int) = 0;
-};
-
 template <typename P1, typename P2>
 class UnidentifiedTypedEvent2 : public UnidentifiedEventBase
 {
@@ -109,7 +92,7 @@ public:
 
     virtual ~UnidentifiedTypedEvent2() { }
     virtual void Disconnect(void*) = 0;
-    virtual void Add(Function2<void, P1, P2>&, unsigned int, int) = 0;
+    virtual void Add(Function2<void, P1, P2>, unsigned int, int) = 0;
 };
 
 template <typename P1, typename P2>
@@ -163,7 +146,6 @@ private:
 
 extern "C" LiveBallTrail lbl_8056B518[];
 extern "C" unsigned int lbl_806E0C10;
-extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" void fn_8001847C(cBall*, bool);
 extern "C" float fn_8002BE64(PlayerTweaks*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
@@ -2916,64 +2898,29 @@ bool cBall::GetInNet(int& nSide)
     return false;
 }
 
-template <typename T>
-static inline void UnidentifiedRegisterEventCallback(
-    const char* name, void (*callback)(T*))
-{
-    Function<T*> function(callback);
-    unsigned int hash = HashEventName(name, -1);
-    UnidentifiedEventBase** foundEvent = 0;
-    g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event
-        = foundEvent != 0 ? *foundEvent : 0;
-    ((UnidentifiedTypedEvent<T>*)event)->Add(function, 0, -1);
-}
-
-static inline void UnidentifiedRegisterEventCallback(
-    const char* name, void (*callback)())
-{
-    Function<FnVoidVoid> function(callback);
-    unsigned int hash = HashEventName(name, -1);
-    UnidentifiedEventBase** foundEvent = 0;
-    g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event
-        = foundEvent != 0 ? *foundEvent : 0;
-    ((UnidentifiedTypedEvent0*)event)->Add(function, 0, -1);
-}
-
 template <typename P1, typename P2>
-static inline void UnidentifiedRegisterEventCallback(
-    const char* name, void (*callback)(P1, P2))
+static inline UnidentifiedTypedEvent2<P1, P2>* UnidentifiedFindEvent2(
+    const char* name, int length)
 {
-    Function2<void, P1, P2> function(callback);
-    unsigned int hash = HashEventName(name, -1);
-    UnidentifiedEventBase** foundEvent = 0;
-    g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event
-        = foundEvent != 0 ? *foundEvent : 0;
-    ((UnidentifiedTypedEvent2<P1, P2>*)event)->Add(function, 0, -1);
+    unsigned int hash = HashEventName(name, length);
+    EventRegistryValue* value = 0;
+    g_pEventRegistry->Find(hash, &value, 0);
+    return value != 0 ? (UnidentifiedTypedEvent2<P1, P2>*)value->event : 0;
 }
 
 extern "C" void fn_80018A00()
 {
-    UnidentifiedRegisterEventCallback("BallFall", fn_800196FC);
-    UnidentifiedRegisterEventCallback(
-        "BallStateChange", fn_8001A108);
-    UnidentifiedRegisterEventCallback("ResetEffects", fn_800193A0);
-    UnidentifiedRegisterEventCallback("Kickoff", fn_800195D8);
-    UnidentifiedRegisterEventCallback(
-        "GetReadyForKickoff", fn_800194A4);
-    UnidentifiedRegisterEventCallback("GameOver", fn_8001929C);
-    UnidentifiedRegisterEventCallback(
-        "CollisionBallTronWall", fn_80019718);
-    UnidentifiedRegisterEventCallback(
-        "CollisionEggBall", fn_80019814);
-    UnidentifiedRegisterEventCallback(
-        "CollisionDebrisBall", fn_80019F10);
-    UnidentifiedRegisterEventCallback(
-        "CollisionPatchBall", fn_80019910);
-    UnidentifiedRegisterEventCallback(
-        "CollisionThwompBall", fn_8001A00C);
+    UnidentifiedFindEvent<void>("BallFall", -1)->Add(Function<void*>(fn_800196FC), 0, -1);
+    UnidentifiedFindEvent2<int, int>("BallStateChange", -1)->Add(Function2<void, int, int>(fn_8001A108), 0, -1);
+    UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(fn_800193A0), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(fn_800195D8), 0, -1);
+    UnidentifiedFindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(fn_800194A4), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(fn_8001929C), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionBallTronWall", -1)->Add(Function<void*>(fn_80019718), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionEggBall", -1)->Add(Function<void*>(fn_80019814), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionDebrisBall", -1)->Add(Function<void*>(fn_80019F10), 0, -1);
+    UnidentifiedFindEvent<PhysicsPatch>("CollisionPatchBall", -1)->Add(Function<PhysicsPatch*>(fn_80019910), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionThwompBall", -1)->Add(Function<void*>(fn_8001A00C), 0, -1);
 
     lbl_806E0C10 = 0;
     unsigned int i = 0;

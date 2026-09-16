@@ -31,7 +31,7 @@ struct LexicalCastImpl<To, int>
 template <typename Allocator>
 struct LexicalCastImpl<BasicString<char, Allocator>, const char*>
 {
-    static BasicString<char, Allocator> Do(const char* const& s)
+    static BasicString<char, Allocator> Do(const char* s)
     {
         return BasicString<char, Allocator>(s);
     }
@@ -73,6 +73,12 @@ inline NLString LexicalCastImpl<NLString, char>::Do(char value)
     char buffer[0x40];
     nlSNPrintf(buffer, sizeof(buffer), "%c", value);
     return NLString(buffer);
+}
+
+template <>
+inline NLString LexicalCastImpl<NLString, char*>::Do(char* const& f)
+{
+    return NLString(f);
 }
 
 template <typename To, typename From, int N>

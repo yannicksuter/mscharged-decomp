@@ -17,6 +17,16 @@
 
 static const unsigned long SkinMatricesHash = nlStringLowerHash("SkinMatrices");
 
+inline void ShaderSkinMesh::CopyMatrices(BoneMapList* node)
+{
+    float (*pMatrices)[3][4] = (float (*)[3][4])node->m_pMatrices;
+    for (unsigned long i = 0; i < node->m_nBones; i++)
+    {
+        glxCopyMatrix(*pMatrices, poseMatrices[node->m_pBoneIndices[i]]);
+        pMatrices++;
+    }
+}
+
 ShaderSkinMesh::~ShaderSkinMesh()
 {
     nlDeleteRing(&boneMaps);
@@ -67,15 +77,11 @@ void ShaderSkinMesh::InitializeSkinData()
 
     for (int i = 0; i < (int)pModel->numPackets; i++, pPacket++)
     {
-        float (*pMatrices)[3][4] = (float (*)[3][4])node->m_pMatrices;
-        for (unsigned long j = 0; j < node->m_nBones; j++)
-        {
-            glxCopyMatrix(*pMatrices, poseMatrices[node->m_pBoneIndices[j]]);
-            pMatrices++;
-        }
+        CopyMatrices(node);
 
         glSetMaterialBufferParameter(pPacket, SkinMatricesHash,
-            (unsigned long)node->m_pMatrices, node->m_nBones * sizeof(*pMatrices));
+            (unsigned long)node->m_pMatrices,
+            node->m_nBones * sizeof(float[3][4]));
         PacketSkinData* data = &packetSkinData[i];
         if (data->numBones == 0)
         {
@@ -195,14 +201,10 @@ void ShaderSkinMesh::PrepareToRender()
     BoneMapList* node = nlDLRingGetStart(boneMaps);
     for (int i = 0; i < (int)pModel->numPackets; i++, pPacket++)
     {
-        float (*pMatrices)[3][4] = (float (*)[3][4])node->m_pMatrices;
-        for (unsigned long j = 0; j < node->m_nBones; j++)
-        {
-            glxCopyMatrix(*pMatrices, poseMatrices[node->m_pBoneIndices[j]]);
-            pMatrices++;
-        }
+        CopyMatrices(node);
         glSetMaterialBufferParameter(pPacket, SkinMatricesHash,
-            (unsigned long)node->m_pMatrices, node->m_nBones * sizeof(*pMatrices));
+            (unsigned long)node->m_pMatrices,
+            node->m_nBones * sizeof(float[3][4]));
         node = node->m_next;
     }
 

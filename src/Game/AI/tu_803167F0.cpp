@@ -155,6 +155,9 @@ extern "C" bool fn_80316A84(
         switch (value->GetType())
         {
         case FT_INT:
+            machine->mUnidentified070.mUnidentifiedHash = value->mData.i;
+            machine->mUnidentified070.mUnidentifiedFunction = 0;
+            break;
         case FT_U32:
             machine->mUnidentified070.mUnidentifiedHash = value->mData.u;
             machine->mUnidentified070.mUnidentifiedFunction = 0;
@@ -325,7 +328,10 @@ void UnidentifiedStateMachine_803171D0::Update(
     void* context = mUnidentified018->mUnidentified064->mData.pointer;
     UnidentifiedVariant_80054AB8 result = fn_803184A8(
         fn_80311734(this), &mUnidentified08C, context, deltaTime);
-    *update = result;
+    FuzzyVariant value((const FuzzyVariant&)result);
+    *update = value;
+    update->ExtraData = result.ExtraData;
+    update->mTemporary = false;
     fn_8031A0C8(start, lbl_806DF560());
 }
 

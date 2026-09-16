@@ -185,6 +185,7 @@ class cFielder : public cPlayer
     friend class DesireUserControlled;
     friend class DesireSuperPower;
     friend class DesireUsePowerup;
+    friend class DesireShrink;
     friend bool fn_800D1C34(const cFielder*);
     friend bool fn_800D0DB0(class DesireSuperPower*, void*);
 

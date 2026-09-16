@@ -2,16 +2,12 @@
 
 #include "Game/AI/Fielder.h"
 #include "Game/Event.h"
+#include "Game/EventRegistry.h"
 #include "Game/MathHelpers.h"
 #include "Game/ReplayManager.h"
 #include "Game/WorldTriggers.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
-
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry;
 
 struct UnidentifiedFlyingCameraPool
 {
@@ -67,7 +63,6 @@ extern "C"
     extern void* lbl_806E1550;
     extern void* lbl_806E1554;
     extern UnidentifiedFlyingCameraPool lbl_806E1558;
-    extern UnidentifiedEventRegistry* g_pEventRegistry;
 
     extern const float lbl_806E5020;
     extern const float lbl_806E5024;
@@ -91,18 +86,6 @@ extern "C"
     bool fn_8003877C(cFielder* fielder);
     void fn_801A0C84(void*);
     void fn_801A0CD4(void*);
-}
-
-static inline void UnidentifiedRegisterEventCallback(
-    const char* name, void (*callback)(void*), void** connection)
-{
-    Function<void*> function(callback);
-    unsigned int hash = HashEventName(name, -1);
-    UnidentifiedEventBase** foundEvent = 0;
-    g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
-    ((UnidentifiedTypedEvent<void>*)event)
-        ->Add(function, (unsigned int)connection, -1);
 }
 
 void fn_8019FE24(Object_8019FE24* object, float dt)
@@ -361,18 +344,15 @@ void fn_801A0500(int count, cFielder* fielder, float duration)
     {
         if (lbl_806E154C == 0)
         {
-            UnidentifiedRegisterEventCallback(
-                lbl_80511DF0, fn_801A0C84, &lbl_806E154C);
+            UnidentifiedFindEvent<void>(lbl_80511DF0, -1)->Add(Function<void*>(fn_801A0C84), (unsigned int)&lbl_806E154C, -1);
         }
         if (lbl_806E1550 == 0)
         {
-            UnidentifiedRegisterEventCallback(
-                lbl_80511E04, fn_801A0CD4, &lbl_806E1550);
+            UnidentifiedFindEvent<void>(lbl_80511E04, -1)->Add(Function<void*>(fn_801A0CD4), (unsigned int)&lbl_806E1550, -1);
         }
         if (lbl_806E1554 == 0)
         {
-            UnidentifiedRegisterEventCallback(
-                lbl_80511E14, fn_801A0CD4, &lbl_806E1554);
+            UnidentifiedFindEvent<void>(lbl_80511E14, -1)->Add(Function<void*>(fn_801A0CD4), (unsigned int)&lbl_806E1554, -1);
         }
     }
 }

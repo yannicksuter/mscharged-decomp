@@ -10,7 +10,6 @@
 // The original runtime and packed-record type names are unidentified.
 
 class AudioEffectBase;
-class UnidentifiedAudioEffectInstance;
 class UnidentifiedAudioTransitionState;
 class UnidentifiedAudioEffectSetState;
 
@@ -30,7 +29,7 @@ struct UnidentifiedAudioInstanceVisitor
     {
     }
 
-    bool operator()(const u32& key, UnidentifiedAudioEffectInstance**) const
+    bool operator()(const u32& key, bool*) const
     {
         return mUnidentified00(key, mEffect);
     }
@@ -58,18 +57,19 @@ public:
     }
 };
 
-// Per-definition binding: the live effect instances and their parameter
-// states, both keyed by the lower-cased name hash.
-class UnidentifiedAudioEffectBinding
+// Per-definition binding: the set of playing sound instances and the live
+// effects, keyed by instance handle and effect id. The instance set stores a
+// one-byte value that no reader uses.
+class AudioEffectBinding
 {
 public:
-    UnidentifiedAudioEffectBinding()
+    AudioEffectBinding()
         : mInstances(16, 16)
         , mEffects(16, 16)
     {
     }
 
-    struct UnidentifiedUpdate
+    struct UpdateState
     {
         float mDeltaTime;
         struct Entry
@@ -85,17 +85,21 @@ public:
         return mInstances.m_Root == 0 && mEffects.m_Root == 0;
     }
 
-    void Unidentified8418(u32 key);
-    void Unidentified841C(u32 instance);
-    void Unidentified8720(u32 instance);
-    void Unidentified8A30(float deltaTime);
-    void Unidentified8DA0();
-    void Unidentified8F7C(const u32& key, AudioEffectBase** effect);
-    bool Unidentified8F98(const u32& key, AudioEffectBase** effect,
-        UnidentifiedUpdate* update);
+    bool WalkEffects(const Function2<bool, const u32&, AudioEffectBase**>& callback)
+    {
+        return mEffects.Walk(callback);
+    }
 
-    /* 0x00 */ nlAVLTreeSlotPool<u32, UnidentifiedAudioEffectInstance*,
-        DefaultKeyCompare<u32> > mInstances;
+    void Unidentified8418(u32 key);
+    void OnSoundStarted(u32 instance);
+    void OnSoundStopped(u32 instance);
+    void Update(float deltaTime);
+    void Destroy();
+    void ReleaseEffect(const u32& key, AudioEffectBase** effect);
+    bool UpdateEffect(const u32& key, AudioEffectBase** effect,
+        UpdateState* update);
+
+    /* 0x00 */ nlAVLTreeSlotPool<u32, bool, DefaultKeyCompare<u32> > mInstances;
     /* 0x24 */ nlAVLTreeSlotPool<u32, AudioEffectBase*,
         DefaultKeyCompare<u32> > mEffects;
 }; // size: 0x48
@@ -103,7 +107,7 @@ public:
 class UnidentifiedAudioTransitionState
 {
 public:
-    UnidentifiedAudioEffectBinding* mBinding;
+    AudioEffectBinding* mBinding;
     UnidentifiedAudioTransitionState* m_next;
     UnidentifiedAudioTransitionState* m_prev;
 };
@@ -157,7 +161,7 @@ public:
     }
 
     void Unidentified6BC4();
-    void Unidentified6DF8(const u32&, UnidentifiedAudioEffectBinding*);
+    void Unidentified6DF8(const u32&, AudioEffectBinding*);
     bool Unidentified6E00(void* data, unsigned int size);
     int Unidentified6E98(u32 hash, UnidentifiedAudioEffectSetState* value);
     void Unidentified6F00(u32 hash, u32 instance);
@@ -167,7 +171,7 @@ public:
     /* 0x00 */ UnidentifiedAudioScriptEntry* mUnidentified00;
     /* 0x04 */ u32 mUnidentified04;
     /* 0x08 */ UnidentifiedAudioScriptList* mUnidentified08;
-    /* 0x0C */ nlAVLTreeSlotPool<u32, UnidentifiedAudioEffectBinding,
+    /* 0x0C */ nlAVLTreeSlotPool<u32, AudioEffectBinding,
         DefaultKeyCompare<u32> > mBindings;
     /* 0x30 */ nlAVLTreeSlotPool<u32, UnidentifiedAudioTransitionState*,
         DefaultKeyCompare<u32> > mTransitions;

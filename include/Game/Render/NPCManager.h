@@ -25,7 +25,7 @@ struct YoshiEggObject;
 
 struct NPCTemplate
 {
-    NPCTemplate(const char* pName, bool bPersistent)
+    NPCTemplate()
         : mAnimationLoadStarted(false)
         , mAnimationsLoaded(false)
         , mHierarchyLoaded(false)
@@ -37,8 +37,6 @@ struct NPCTemplate
         , mResourcePool(0)
     {
         mName[0] = '\0';
-        strcpy(mName, pName);
-        mPersistent = bPersistent;
     }
 
     /* 0x00 */ bool mAnimationLoadStarted;

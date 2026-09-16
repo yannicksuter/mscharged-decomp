@@ -102,7 +102,7 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
 {
     u32 key = *bindingKey;
     u32 definition = *definitionKey;
-    UnidentifiedAudioEffectBinding* binding
+    AudioEffectBinding* binding
         = g_pAudioResourceRuntime->m_Script->mBindings.UnidentifiedAddOrGet(key);
 
     u32 slot = AUDIO_EFFECT_KEY;
@@ -127,7 +127,7 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
         effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
         binding->mEffects.Add(effectId, effect);
         binding->mInstances.Walk(
-            Function2<bool, const u32&, UnidentifiedAudioEffectInstance**>(
+            Function2<bool, const u32&, bool*>(
                 UnidentifiedAudioInstanceVisitor(effect)));
     }
 

@@ -4,7 +4,7 @@
 #include "Game/CharacterEffects.h"
 #include "NL/nlMath.h"
 
-struct Model;
+struct glModel;
 class cPoseNode;
 class cCharacter;
 class cPoseAccumulator;
@@ -28,28 +28,27 @@ public:
 
     void Free();
     cPN_SAnimController& GetAnimController() const;
-    void Grab(cCharacter&);
-    static void HeadTrackCallback(u32, u32, cPoseAccumulator*, u32, int);
-    void BuildNodeMatrices(cPoseAccumulator*);
+    void Grab(cCharacter& source);
+    void BuildNodeMatrices(cPoseAccumulator* accumulator);
     void BuildNpcMatrix();
-    void Render(cCharacter&);
-    void SendToGl(cCharacter&, int);
-    void Grab(SkinAnimatedMovableNPC&);
-    void Render(SkinAnimatedMovableNPC&);
-    void Blend(float*, DrawableCharacter&, DrawableCharacter&);
-    void EvaluateFrom(const cPoseNode&, const nlVector3&, u16, float);
-    nlVector3 GetBallPosition() const;
+    void Render(cCharacter& source);
+    void SendToGl(cCharacter& source, int renderPass);
+    void Grab(SkinAnimatedMovableNPC& npc);
+    void Render(SkinAnimatedMovableNPC& npc);
+    void Blend(float* blendFactors, DrawableCharacter& lhs, DrawableCharacter& rhs);
+    void EvaluateFrom(const cPoseNode& poseNode, const nlVector3& offset,
+        unsigned short facingAngle, float poseScale);
+    nlVector3 GetBallPosition();
     nlQuaternion GetBallOrientation();
 
-    static void RenderOnlyOneCharacter(cCharacter&, bool);
+    static void RenderOnlyOneCharacter(cCharacter& character, bool renderOpposingGoalieToo);
     static void RenderAllCharacters();
     static cCharacter* OnlyRenderingOneCharacter();
 
-    void ApplyMaterialEffects(
-        const cCharacter&, Model*, eCharacterRenderPass, bool*);
-    void ApplyDamageEffects(const cCharacter&, Model*, int);
-    void RenderCharacterShadow(const cCharacter&, void*, int);
-    static bool NoShadowCallback();
+    void ApplyMaterialEffects(const cCharacter& source, glModel* model,
+        eCharacterRenderPass renderPass, bool* attachEffects);
+    void ApplyDamageEffects(const cCharacter& source, glModel* model, int renderPass);
+    void RenderCharacterShadow(const cCharacter& source, glModel* model, int view);
 
     bool visible;
     bool useObject;
@@ -87,8 +86,10 @@ public:
     u32 scorchTexture;
     ResolvedTexture resolvedScorchTexture;
 
-    static cCharacter* renderOnlyCharacter;
-    static bool renderOpposingGoalie;
+    static unsigned char sShadowRenderingDisabled;
+    static cCharacter* spRenderOnlyThisCharacter;
+    static bool sbRenderOpposingGoalieToo;
+    static bool sSTSLighting;
     static bool sCameraRelativeLighting;
 };
 

@@ -79,6 +79,22 @@ public:
         return (meBallState == 5 || meBallState == 3) && m_pPassTarget != 0;
     }
 
+    bool UnidentifiedHasPassTarget()
+    {
+        bool bState;
+        bool bResult = false;
+        bState = true;
+        if (meBallState != 5 && meBallState != 3)
+        {
+            bState = false;
+        }
+        if (bState && m_pPassTarget != 0)
+        {
+            bResult = true;
+        }
+        return bResult;
+    }
+
     cPlayer* fn_800C2EC0() const { return m_pPassTarget; }
     float fn_800C2EC8() const
     {

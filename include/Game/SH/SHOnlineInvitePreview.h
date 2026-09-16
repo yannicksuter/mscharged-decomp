@@ -15,6 +15,7 @@ public:
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
+    inline void InitializeContinueButton();
     void OnPreviewDelayElapsed(FETimer* timer);
     void OnContinuePointerEnter(unsigned int index, void* context);
     void OnContinuePointerLeave(unsigned int index, void* context);

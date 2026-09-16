@@ -66,6 +66,11 @@ public:
     GLRenderPair GetRenderPair() const;
     inline UnidentifiedPacketSorter* GetSorter(long);
 
+    bool HasChildren() const
+    {
+        return m_Children.m_Head != 0;
+    }
+
     void SetRenderPair(GLRenderPair renderPair)
     {
         m_RenderPair = renderPair;
@@ -103,11 +108,23 @@ public:
 struct GLViewIteratorEntry
 {
     GLViewIteratorEntry()
-        : next(0)
+        : next((ListEntry<GLView*>*)0)
     {
     }
 
-    ListEntry<GLView*>* next;
+    GLViewIteratorEntry(
+        ListEntry<GLView*>* nextEntry, GLView* currentView)
+        : next(nextEntry)
+        , view(currentView)
+    {
+    }
+
+    static GLViewIteratorEntry Root(GLView* view)
+    {
+        return GLViewIteratorEntry(0, view);
+    }
+
+    nlListIterator<GLView*> next;
     GLView* view;
 };
 

@@ -157,6 +157,7 @@ public:
     /* 0x45 */ bool rigidSkin;
 
 private:
+    void CopyMatrices(BoneMapList* node);
     void BuildPacketSkinData(PacketSkinData* data, glModelPacket* pPacket,
         BoneMapList* node);
     void CreateMorphBuffer(unsigned long packetIndex, unsigned long count);

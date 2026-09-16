@@ -1,6 +1,7 @@
 #include "Game/SAnim.h"
 #include "Game/SAnimDecode_8030EC30.h"
 
+#include "Game/MathHelpers.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/SHierarchy.h"
 #include "NL/nlSlotPool.h"
@@ -71,15 +72,9 @@ cSAnim* cSAnim::Initialize(nlChunk* pChunk)
         pRetval->GetRootTrans(0.0f, &v3PosStart);
         pRetval->GetRootTrans(1.0f, &v3PosEnd);
 
-        float duration = pRetval->GetDuration();
-        nlVector3 v3Delta;
-        nlVec3Sub(v3Delta, v3PosEnd, v3PosStart);
-        float dist = nlSqrt(
-            nlGetLengthSquared3D(
-                v3Delta.x, v3Delta.y, v3Delta.z),
-            true);
-
-        pRetval->m_fLinearSpeed = dist / duration;
+        pRetval->m_fLinearSpeed = nlSqrt(
+            CalculateDistanceSquared(v3PosEnd, v3PosStart), true)
+            / pRetval->GetDuration();
     }
     else
     {
