@@ -996,7 +996,7 @@ config.libs = [
             Object(Matching, "Game/SH/SHCupFinalRounds.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHStrikerCupStandings.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "unclassified/tu_802126F8.cpp", cflags=cflags_game_deferred),
-            Object(NonMatching, "Game/SH/SHCupNews.cpp", cflags=cflags_game_deferred),
+            Object(Matching, "Game/SH/SHCupNews.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "unclassified/tu_80214DF8.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/SH/SHHallOfFameRoom.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/SH/SHChooseSides.cpp"),
