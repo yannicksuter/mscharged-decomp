@@ -12,7 +12,7 @@
 #include "Game/Physics/PhysicsNPC.h"
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
-#include "unclassified/tu_801A0E64.h"
+#include "Game/Render/HammerObject.h"
 #include "math.h"
 
 extern "C" bool fn_800977A4(cPlayer*, float);
@@ -42,8 +42,8 @@ PhysicsHammer::~PhysicsHammer()
 ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
 {
     HammerObject* hammer = mHammer;
-    cFielder* thrower = hammer->_034;
-    bool isDelayed = hammer->_044 > 0.0f;
+    cFielder* thrower = hammer->mOwner;
+    bool isDelayed = hammer->mFreezeTimer > 0.0f;
     bool isLanded;
     if (isDelayed)
     {
@@ -91,15 +91,15 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
             {
                 return NO_CONTACT;
             }
-            isLanded = hammer->_048 > 0.0f;
+            isLanded = hammer->mLandedTimer > 0.0f;
             if (isLanded)
             {
-                fn_801A1ED0(hammer, true);
+                hammer->Deactivate(true);
                 return NO_CONTACT;
             }
         }
 
-        isLanded = hammer->_048 > 0.0f;
+        isLanded = hammer->mLandedTimer > 0.0f;
         if (isLanded && gLandedHammersBlockFielders)
         {
             return ONE_WAY_CONTACT_OTHER;
@@ -115,7 +115,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
 
         if (gBreakHammerOnFielderHit)
         {
-            fn_801A1ED0(hammer, true);
+            hammer->Deactivate(true);
         }
         return NO_CONTACT;
     }
@@ -123,7 +123,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         return NO_CONTACT;
     case 0x12:
     {
-        isLanded = hammer->_048 > 0.0f;
+        isLanded = hammer->mLandedTimer > 0.0f;
         if (!isLanded)
         {
             UnidentifiedEventData26* data = 0;
@@ -134,13 +134,13 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
             data->v3Velocity = GetLinearVelocity();
             QueueCollisionHammerGround(data);
         }
-        fn_801A1304(hammer);
+        hammer->OnLanding();
         return NO_CONTACT;
     }
     case 0x15:
     {
         PowerupBase* powerup = ((PhysicsBanana*)other)->m_pPowerupObject;
-        if (hammer->_034 == powerup->m_pThrower
+        if (hammer->mOwner == powerup->m_pThrower
             && powerup->mtNoHitTimer.m_uPackedTime != 0)
         {
             return NO_CONTACT;
@@ -148,14 +148,14 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         QueueCollisionHammerPowerup((UnidentifiedEventData27*)powerup);
         if (((PhysicsBanana*)other)->m_pPowerupObject->m_eType == POWER_UP_BOBOMB)
         {
-            fn_801A1ED0(hammer, true);
+            hammer->Deactivate(true);
         }
         return NO_CONTACT;
     }
     case 0x14:
     {
         PowerupBase* powerup = ((PhysicsShell*)other)->m_pPowerupObject;
-        if (hammer->_034 == powerup->m_pThrower
+        if (hammer->mOwner == powerup->m_pThrower
             && powerup->mtNoHitTimer.m_uPackedTime != 0)
         {
             return NO_CONTACT;
@@ -163,7 +163,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         QueueCollisionHammerPowerup((UnidentifiedEventData27*)powerup);
         if (((PhysicsShell*)other)->m_pPowerupObject->meSize == POWERUPSIZE_LARGE)
         {
-            fn_801A1ED0(hammer, true);
+            hammer->Deactivate(true);
         }
         return NO_CONTACT;
     }
@@ -177,22 +177,22 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         {
             QueueCollisionHammerChain(
                 (UnidentifiedEventData28*)((PhysicsNPC*)other)->mpAINPC);
-            fn_801A1ED0(hammer, true);
+            hammer->Deactivate(true);
         }
         return NO_CONTACT;
     }
     case 0x1D:
         return NO_CONTACT;
     case 0x24:
-        fn_801A1ED0(hammer, true);
+        hammer->Deactivate(true);
         return NO_CONTACT;
     case 0x17:
     {
         float radius = GetRadius();
         float netWidth = cNet::m_fNetWidth;
         float netHeight = cNet::m_fNetHeight;
-        float y = (float)fabs(fn_801A1168(hammer)->y);
-        float z = (float)fabs(fn_801A1168(hammer)->z);
+        float y = (float)fabs(hammer->GetPosition()->y);
+        float z = (float)fabs(hammer->GetPosition()->z);
         if (y <= netWidth && z <= netHeight)
         {
             return NO_CONTACT;

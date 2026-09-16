@@ -128,6 +128,8 @@ extern RLViewOrthoCamera sOrthoCamera;
 extern RLViewOrthoCamera sOrthoCenteredCamera;
 extern RLViewOrthoCamera sOrtho640Camera;
 
+GLViewInterface* GetOrthoCamera();
+
 extern GLRenderPair sWarbleColourTarget;
 extern GLRenderPair sWarbleOffsetTarget;
 extern GLRenderPair sWarbleTextureTarget;

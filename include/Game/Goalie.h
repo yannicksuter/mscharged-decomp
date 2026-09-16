@@ -21,7 +21,7 @@ class cFielder;
 class cPoseNode;
 class cPN_SAnimController;
 class cPN_SingleAxisBlender;
-struct UnidentifiedMegaBallState;
+struct MegaBallIndicator;
 
 extern "C" float fn_800776B4();
 
@@ -304,10 +304,10 @@ public:
     void fn_8008418C(float fDeltaT);
     void fn_80084568(unsigned int nIndex, float fParam);
     bool fn_80084724(unsigned int nParam, float* pScore);
-    void fn_80084840(UnidentifiedMegaBallState* pState);
+    void fn_80084840(MegaBallIndicator* pState);
     void fn_80084C3C(bool bParam);
     void fn_80084CE0();
-    void fn_80084AE0(UnidentifiedMegaBallState* pState);
+    void fn_80084AE0(MegaBallIndicator* pState);
     void fn_80084D94(float fParam);
     void ActionDiveRecover(float fDeltaT);
     void ActionPass(float deltaTime);

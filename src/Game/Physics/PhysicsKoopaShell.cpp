@@ -13,7 +13,7 @@
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Physics/PhysicsYoshiEgg.h"
 #include "Game/Render/SkinAnimatedNPC.h"
-#include "unclassified/tu_801A0E64.h"
+#include "Game/Render/HammerObject.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -147,9 +147,9 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
     case 0x1F:
     {
         HammerObject* hammer = ((PhysicsHammer*)other)->mHammer;
-        if (mKoopaShell->mOwner == hammer->_034)
+        if (mKoopaShell->mOwner == hammer->mOwner)
         {
-            bool isTimerRunning = hammer->_01C > 0.0f;
+            bool isTimerRunning = hammer->mRadiusTimer > 0.0f;
             if (isTimerRunning)
             {
                 return NO_CONTACT;

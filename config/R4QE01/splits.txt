@@ -307,26 +307,25 @@ Game/Team.cpp:
 	.text       start:0x800A5D34 end:0x800A9140
 	.ctors      start:0x804DB550 end:0x804DB554
 	.rodata     start:0x804DC110 end:0x804DC128
-	.data       start:0x80500940 end:0x80500BE8
+	.data       start:0x80500940 end:0x80500B78
 	.bss        start:0x8056D988 end:0x8056D9A0
 	.sdata      start:0x806DBEF0 end:0x806DBF18
 	.sbss       start:0x806E0DF8 end:0x806E0E10
 	.sdata2     start:0x806E3D90 end:0x806E3DD8
 
 Game/Terrain.cpp:
-	.text       start:0x800A9140 end:0x800A9588
+	.text       start:0x800A9140 end:0x800A97E8
 	.ctors      start:0x804DB554 end:0x804DB558
-	.data       start:0x80500BE8 end:0x80500CC0
+	.data       start:0x80500B78 end:0x80500CC0
 	.bss        start:0x8056D9A0 end:0x8056D9E8
-	.sdata      start:0x806DBF18 end:0x806DBF1C
-	.sdata2     start:0x806E3DD8 end:0x806E3DE8
+	.sdata      start:0x806DBF18 end:0x806DBF20
+	.sdata2     start:0x806E3DD8 end:0x806E3DF0
 
-unclassified/tu_800A9588.cpp:
-	.text       start:0x800A9588 end:0x800A9AE0
+Game/TerrainTweaks.cpp:
+	.text       start:0x800A97E8 end:0x800A9AE0
 	.ctors      start:0x804DB558 end:0x804DB55C
 	.data       start:0x80500CC0 end:0x80500D18
-	.sdata      start:0x806DBF1C end:0x806DBF20 align:4
-	.sdata2     start:0x806E3DE8 end:0x806E3E00
+	.sdata2     start:0x806E3DF0 end:0x806E3E00
 
 Game/TweaksBase.cpp:
 	.text       start:0x800A9AE0 end:0x800A9B78
@@ -1367,7 +1366,7 @@ Game/Render/FlareHandler.cpp:
 	.bss        start:0x80571B98 end:0x80571C08
 	.sdata2     start:0x806E5010 end:0x806E5020
 
-unclassified/tu_8019FE24.cpp:
+Game/Render/FlyingCamera.cpp:
 	.text       start:0x8019FE24 end:0x801A0E64
 	.ctors      start:0x804DB6FC end:0x804DB700
 	.rodata     start:0x804DCE20 end:0x804DCE30
@@ -1377,7 +1376,7 @@ unclassified/tu_8019FE24.cpp:
 	.sbss       start:0x806E1538 end:0x806E1560
 	.sdata2     start:0x806E5020 end:0x806E5058
 
-unclassified/tu_801A0E64.cpp:
+Game/Render/HammerObject.cpp:
 	.text       start:0x801A0E64 end:0x801A2004
 	.ctors      start:0x804DB700 end:0x804DB704
 	.rodata     start:0x804DCE30 end:0x804DCE48
@@ -1386,7 +1385,7 @@ unclassified/tu_801A0E64.cpp:
 	.sdata      start:0x806DCE48 end:0x806DCE58
 	.sdata2     start:0x806E5058 end:0x806E5078
 
-unclassified/tu_801A2004.cpp:
+Game/Render/HighRange.cpp:
 	.text       start:0x801A2004 end:0x801A323C
 	.ctors      start:0x804DB704 end:0x804DB708
 	.rodata     start:0x804DCE48 end:0x804DCEB0
@@ -1446,7 +1445,7 @@ Game/Render/MegastrikeBackgroundOverlay.cpp:
 	.sdata      start:0x806DCFB0 end:0x806DCFB8
 	.sdata2     start:0x806E5188 end:0x806E51A0
 
-unclassified/tu_801A6AAC.cpp:
+Game/Render/MegaBallIndicators.cpp:
 	.text       start:0x801A6AAC end:0x801A9470
 	.ctors      start:0x804DB71C end:0x804DB720
 	.data       start:0x80514210 end:0x80514298
@@ -1463,7 +1462,7 @@ Game/Render/NPCManager.cpp:
 	.sbss       start:0x806E1608 end:0x806E1610
 	.sdata2     start:0x806E5210 end:0x806E5218
 
-unclassified/tu_801AC30C.cpp:
+Game/objectblur.cpp:
 	.text       start:0x801AC30C end:0x801AD15C
 	.ctors      start:0x804DB724 end:0x804DB728
 	.bss        start:0x80573BE0 end:0x80573C08
@@ -1814,7 +1813,7 @@ Game/FE/Overlay/OverlayHandlerSuperAbility.cpp:
 	.sbss       start:0x806E1870 end:0x806E1878
 	.sdata2     start:0x806E5778 end:0x806E5780
 
-unclassified/tu_801F8CB0.cpp:
+Game/FE/Overlay/OverlayHandlerChallengePreview.cpp:
 	.text       start:0x801F8CB0 end:0x801FA28C
 	.data       start:0x8051A9E0 end:0x8051AB08
 	.sdata      start:0x806DD980 end:0x806DDA00
@@ -1862,7 +1861,7 @@ Game/FE/feCamera.cpp:
 	.sbss       start:0x806E1890 end:0x806E1898
 	.sdata2     start:0x806E57F8 end:0x806E5800
 
-Game/Render/Presentation.cpp:
+Game/Render/FrontEndPresentation.cpp:
 	.text       start:0x801FEBEC end:0x80200380
 	.ctors      start:0x804DB79C end:0x804DB7A0
 	.data       start:0x8051B0D0 end:0x8051B1F8
@@ -1883,7 +1882,7 @@ Game/SH/SHCupHub.cpp:
 	.sdata      start:0x806DDB28 end:0x806DDB90
 	.sdata2     start:0x806E5818 end:0x806E5828
 
-unclassified/tu_80203D70.cpp:
+Game/SH/SHRoadToStrikersCupHub.cpp:
 	.text       start:0x80203D70 end:0x80206CE4
 	.data       start:0x8051B550 end:0x8051B770
 	.sdata      start:0x806DDB90 end:0x806DDBF8
@@ -1910,7 +1909,7 @@ Game/SH/SHGameResults.cpp:
 	.data       start:0x8051BC98 end:0x8051BD08
 	.sdata      start:0x806DDC60 end:0x806DDC80
 
-unclassified/tu_8020A74C.cpp:
+Game/SH/SHCupKnockout.cpp:
 	.text       start:0x8020A74C end:0x8020E1B0
 	.data       start:0x8051BD08 end:0x8051BE58
 	.sdata      start:0x806DDC80 end:0x806DDD40
@@ -1928,7 +1927,7 @@ Game/SH/SHStrikerCupStandings.cpp:
 	.sdata      start:0x806DDDD0 end:0x806DDE48
 	.sdata2     start:0x806E5880 end:0x806E5898
 
-unclassified/tu_802126F8.cpp:
+Game/SH/SHStrikerCupAwards.cpp:
 	.text       start:0x802126F8 end:0x802141FC
 	.data       start:0x8051C088 end:0x8051C168
 	.sdata      start:0x806DDE48 end:0x806DDEA8
@@ -1940,17 +1939,17 @@ Game/SH/SHCupNews.cpp:
 	.data       start:0x8051C168 end:0x8051C448
 	.sdata      start:0x806DDEA8 end:0x806DDEC8
 
-unclassified/tu_80214DF8.cpp:
+Game/SH/SHOnlineRanking.cpp:
 	.text       start:0x80214DF8 end:0x80216CB0
 	.data       start:0x8051C448 end:0x8051C5A8
-	.sdata      start:0x806DDEC8 end:0x806DDFA0
+	.sdata      start:0x806DDEC8 end:0x806DDF58
 	.sdata2     start:0x806E58A8 end:0x806E58B0
 
 Game/SH/SHHallOfFameRoom.cpp:
 	.text       start:0x80216CB0 end:0x80219248
 	.ctors      start:0x804DB7A4 end:0x804DB7A8
 	.data       start:0x8051C5A8 end:0x8051C840
-	.sdata      start:0x806DDFA0 end:0x806DDFF8
+	.sdata      start:0x806DDF58 end:0x806DDFF8
 	.sdata2     start:0x806E58B0 end:0x806E58C0
 
 Game/FE/fePointerButton.cpp:
@@ -2315,7 +2314,7 @@ Game/Render/tu_80283D9C.cpp:
 	.sbss       start:0x806E1A20 end:0x806E1A30
 	.sdata2     start:0x806E5D18 end:0x806E5D40
 
-unclassified/tu_80284A58.cpp:
+Game/Render/Presentation.cpp:
 	.text       start:0x80284A58 end:0x8028A98C
 	.ctors      start:0x804DB7F4 end:0x804DB7F8
 	.data       start:0x805238B8 end:0x805240B0
@@ -2725,7 +2724,7 @@ NL/glx/GXMaterialProgramRegistry.cpp:
 	.text       start:0x802A0A14 end:0x802A0F04
 	.ctors      start:0x804DB8D8 end:0x804DB8DC
 
-NL/gl/tu_802A0F04.cpp:
+Game/GL/GLFourTextureAddMeshWriter.cpp:
 	.text       start:0x802A0F04 end:0x802A12E4
 	.ctors      start:0x804DB8DC end:0x804DB8E0
 
@@ -3182,7 +3181,7 @@ NL/nlBundleFile.cpp:
 	.text       start:0x802BDB70 end:0x802BE64C
 	.data       start:0x8052BA40 end:0x8052BA70
 
-unclassified/tu_802BE64C.cpp:
+NL/nlRegistry.cpp:
 	.text       start:0x802BE64C end:0x802BF8E8
 	.ctors      start:0x804DB9AC end:0x804DB9B0
 	.data       start:0x8052BA70 end:0x8052BBF0
@@ -3596,7 +3595,7 @@ Game/Audio/AudioBundleManagerPlatform.cpp:
 	.data       start:0x8052F638 end:0x8052F668
 	.bss        start:0x8057F9C0 end:0x8057F9D8
 
-unclassified/tu_802EFB70.cpp:
+Game/Audio/AudioRpc.cpp:
 	.text       start:0x802EFB70 end:0x802F0860
 	.ctors      start:0x804DBA54 end:0x804DBA58
 	.data       start:0x8052F668 end:0x8052F680
@@ -3616,7 +3615,7 @@ Game/Audio/XSoundCueHandle.cpp:
 	.bss        start:0x8057FA58 end:0x8057FA98
 	.sdata2     start:0x806E6608 end:0x806E6614
 
-unclassified/tu_802F2110.cpp:
+Game/Audio/SoundInstance.cpp:
 	.text       start:0x802F2188 end:0x802F2CAC
 	.ctors      start:0x804DBA60 end:0x804DBA64
 	.data       start:0x8052F708 end:0x8052F750

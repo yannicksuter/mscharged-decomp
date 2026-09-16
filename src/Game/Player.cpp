@@ -47,7 +47,7 @@
 #include "Game/NetworkInput.h"
 #include "Game/Render/YoshiEggObject.h"
 #include "Game/Render/ThwompObject.h"
-#include "unclassified/tu_801A0E64.h"
+#include "Game/Render/HammerObject.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "NL/nlPolygonRegion.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -1463,14 +1463,14 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
             for (unsigned int i = 0; i < gNPCManager->fn_801AA32C(); i++)
             {
                 HammerObject* pHammer = gNPCManager->fn_801AA3AC(i);
-                if (pHammer != NULL && pHammer->_024)
+                if (pHammer != NULL && pHammer->mActive)
                 {
-                    const nlVector3* pPosition = fn_801A1168(pHammer);
+                    const nlVector3* pPosition = pHammer->GetPosition();
                     nlVector2 position;
                     position.x = pPosition->x;
                     position.y = pPosition->y;
                     if (region.ContainsPoint2D(position))
-                        fn_801A1650(pHammer, lbl_806DBD88);
+                        pHammer->Freeze(lbl_806DBD88);
                 }
             }
             for (unsigned int i = 0; i < 3; i++)

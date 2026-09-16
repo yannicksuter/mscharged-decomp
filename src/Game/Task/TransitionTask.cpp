@@ -20,7 +20,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlTask.h"
 #include "types.h"
-#include "unclassified/tu_80284A58.h"
+#include "Game/Render/Presentation.h"
 
 // Charged keeps the predecessor's transition-manager surface but replaces
 // several of its subsystem calls. Everything still address-named below lives
@@ -140,7 +140,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         if (from != 1 && to != 0x20000)
         {
             {
-                UnidentifiedPresentationState* presentation = GetPresentation();
+                Presentation* presentation = GetPresentation();
                 presentation->mLetterBoxEnabled = true;
             }
 
@@ -160,7 +160,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
     {
         if (to != 1 && to != 4)
         {
-            UnidentifiedPresentationState* presentation = GetPresentation();
+            Presentation* presentation = GetPresentation();
             presentation->mLetterBoxEnabled = false;
             presentation->mLetterBoxDuration = 0.0f;
 
@@ -174,7 +174,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         {
             if (g_pGame != NULL && g_pGame->m_eGameState == 3)
             {
-                UnidentifiedPresentationState* presentation = GetPresentation();
+                Presentation* presentation = GetPresentation();
                 presentation->mLetterBoxEnabled = false;
                 presentation->mLetterBoxDuration = 0.0f;
             }

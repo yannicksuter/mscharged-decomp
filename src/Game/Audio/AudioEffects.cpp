@@ -4,7 +4,7 @@
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioSource.h"
 #include "Game/Audio/XSoundCueHandle.h"
-#include "Game/Audio/SoundInstance_802F1758.h"
+#include "Game/Audio/SoundInstance.h"
 #include "NL/nlString.h"
 #include "revolution/os/OSInterrupt.h"
 
@@ -99,7 +99,7 @@ void ControllerSpeaker::CreateParameter(unsigned int, void* context, bool,
 
 void Volume::ApplyToSound(void* handle)
 {
-    ((XSoundCueHandle*)handle)->instance->field_70 = m_Final.m_Unknown10;
+    ((XSoundCueHandle*)handle)->instance->volumeOffset = m_Final.m_Unknown10;
 }
 
 void Volume::OnParameterFinished(AudioEffectParameter* parameter)

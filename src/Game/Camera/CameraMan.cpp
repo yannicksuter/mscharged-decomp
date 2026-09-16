@@ -82,6 +82,18 @@ static void ApplyCameraFilters(nlMatrix4& matView)
     }
 }
 
+static void ResetCameraFilters()
+{
+    for (int i = 0; i < 2; i++)
+    {
+        if (cCameraManager::PeekCamera()->m_pFilter[i] != 0)
+        {
+            cCameraManager::PeekCamera()->m_pFilter[i]->Reset();
+            cCameraManager::PeekCamera()->Reactivate();
+        }
+    }
+}
+
 /**
  * Offset/Address/Size: 0x21D0 | 0x800F2410 | size: 0xB0
  */
@@ -179,14 +191,7 @@ cBaseCamera* cCameraManager::PopCameraWithTransition(float fDuration, eCameraTra
     m_fTransitionTime = 1.0f - fTransitionTime;
 
     cBaseCamera* pCamera = nlDLRingRemoveStart<cBaseCamera>(&m_cameraStack);
-    for (int i = 0; i < 2; i++)
-    {
-        if (PeekCamera()->m_pFilter[i] != 0)
-        {
-            PeekCamera()->m_pFilter[i]->Reset();
-            PeekCamera()->Reactivate();
-        }
-    }
+    ResetCameraFilters();
     return pCamera;
 }
 
@@ -251,8 +256,6 @@ cBaseCamera* GetNextCamera()
  */
 cBaseCamera* cCameraManager::PopCamera()
 {
-    int i;
-
     if (cCameraManager::m_transition != eCT_NONE)
     {
         nlPrintf("Camera Transition In Progress\n");
@@ -263,14 +266,7 @@ cBaseCamera* cCameraManager::PopCamera()
     }
 
     cBaseCamera* pCamera = nlDLRingRemoveStart<cBaseCamera>(&cCameraManager::m_cameraStack);
-    for (i = 0; i < 2; i++)
-    {
-        if (cCameraManager::PeekCamera()->m_pFilter[i] != 0)
-        {
-            cCameraManager::PeekCamera()->m_pFilter[i]->Reset();
-            cCameraManager::PeekCamera()->Reactivate();
-        }
-    }
+    ResetCameraFilters();
     return pCamera;
 }
 
@@ -793,7 +789,7 @@ extern "C" void fn_800F02DC(void* pUnidentified0, unsigned long pUnidentified1, 
 /**
  * Offset/Address/Size: 0x2C | 0x800F026C | size: 0x70
  */
-extern "C" void fn_800F026C(const nlVector3& v3Unidentified, float fUnidentified0, float fUnidentified1)
+extern "C" void fn_800F026C(nlVector3& v3Unidentified, float fUnidentified0, float fUnidentified1)
 {
     cNoiseFilter* pFilter = static_cast<cNoiseFilter*>(cCameraManager::PeekCamera()->m_pFilter[1]);
     if (pFilter != 0)

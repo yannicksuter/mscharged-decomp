@@ -22,7 +22,7 @@
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
 #include "Game/NetTournManager.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "Game/Render/RLViewLayers.h"
@@ -47,7 +47,7 @@ void SuperLoadingScene::Update(float fDeltaT)
 
     if (mType == TT_3D_TRANSITION)
     {
-        if (!Presentation::GetInstance()->IsActive())
+        if (!FrontEndPresentation::GetInstance()->IsActive())
         {
             nlTaskManager::SetNextState(0x200000);
         }
@@ -177,20 +177,20 @@ void SuperLoadingScene::SceneCreated()
             if (gameInfo->mCurrentMode == 0)
             {
                 FEAudio::PlayAnimAudioEvent(0x7FEC4468, 0, 0, 1);
-                Presentation::GetInstance()->Call("StartOnlineGrudgeMatchSequence");
+                FrontEndPresentation::GetInstance()->Call("StartOnlineGrudgeMatchSequence");
             }
             else if (NetTournManager::Instance()->mState != 0)
             {
-                Presentation::GetInstance()->Call("TransitionOnlineTournamentToGame");
+                FrontEndPresentation::GetInstance()->Call("TransitionOnlineTournamentToGame");
             }
         }
         else if (gameInfo->mCurrentMode == 0)
         {
-            Presentation::GetInstance()->Call("StartGrudgeMatchSequence");
+            FrontEndPresentation::GetInstance()->Call("StartGrudgeMatchSequence");
         }
         else if (gameInfo->mCurrentMode == 3)
         {
-            Presentation::GetInstance()->Call("StartCupMatchSequence");
+            FrontEndPresentation::GetInstance()->Call("StartCupMatchSequence");
         }
     }
 }

@@ -37,12 +37,14 @@ AudioSliderTable* ParseAudioSliderTable(nlChunk* outer)
     return table;
 }
 
-extern "C" AudioSlider* fn_802EED38(AudioSliderTable* table, u32 index, SliderOwner_802EE964* owner)
+extern "C" AudioSlider* GetAudioSlider(
+    AudioSliderTable* table, u32 index, XSoundHandle* owner)
 {
     AudioSliderDefinition* definition = table->globalDefinitions + table->localToGlobal[index];
     if (definition->kind == 2)
         return table->globalSliders + definition->index;
-    return owner->localSet->sliders + definition->index;
+    return ((SliderOwner_802EE964*)owner)->localSet->sliders
+         + definition->index;
 }
 
 extern "C" AudioSliderSet* fn_802EED88(AudioSliderTable* table, SliderOwner_802EE964* owner)

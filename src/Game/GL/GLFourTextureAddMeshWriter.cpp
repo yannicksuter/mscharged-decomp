@@ -1,31 +1,30 @@
 #include <revolution/base/PPCArch.h>
 #include <revolution/os/OSCache.h>
 
-#include "NL/gl/tu_802A0F04.h"
+#include "Game/GL/GLFourTextureAddMeshWriter.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
 #include "Game/GL/glModelBuilder.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-
-State_802A0F04::State_802A0F04()
+GLFourTextureAddMeshWriter::GLFourTextureAddMeshWriter()
     : count(0)
     , model(0)
     , resource(0)
-    , value_0C(0)
-    , value_10(0)
-    , value_14(0)
-    , value_18(0)
-    , value_1C(0)
-    , value_20(0)
+    , positions(0)
+    , texcoords0(0)
+    , texcoords1(0)
+    , texcoords2(0)
+    , texcoords3(0)
+    , colours(0)
 {
 }
 
-State_802A0F04::~State_802A0F04()
+GLFourTextureAddMeshWriter::~GLFourTextureAddMeshWriter()
 {
 }
 
-bool State_802A0F04::fn_802A0F70(
+bool GLFourTextureAddMeshWriter::Begin(
     int vertexCount, int primitive, void* allocator)
 {
     glModel* newModel;
@@ -65,125 +64,118 @@ bool State_802A0F04::fn_802A0F70(
                 positionCount * sizeof(float), GLM_VertexData);
         }
     }
-    value_0C = positionData;
-    glSetModelStream(streams, 0, value_0C,
-        sizeof(float) * 3, 1);
+    positions = positionData;
+    glSetModelStream(streams, 0, positions, sizeof(float) * 3, 1);
 
     int texcoordCount = vertexCount * 2;
-    float* value_10Data;
+    float* texcoords0Data;
     if (texcoordCount == 0)
     {
-        value_10Data = 0;
+        texcoords0Data = 0;
     }
     else
     {
         if (allocator != 0)
         {
-            value_10Data = (float*)glResourceAlloc(
+            texcoords0Data = (float*)glResourceAlloc(
                 texcoordCount * sizeof(float), GLM_VertexData, allocator);
         }
         else
         {
-            value_10Data = (float*)glFrameAlloc(
+            texcoords0Data = (float*)glFrameAlloc(
                 texcoordCount * sizeof(float), GLM_VertexData);
         }
     }
-    value_10 = value_10Data;
-    glSetModelStream(streams + 1, 1, value_10,
-        sizeof(float) * 2, 4);
+    texcoords0 = texcoords0Data;
+    glSetModelStream(streams + 1, 1, texcoords0, sizeof(float) * 2, 4);
 
-    float* value_14Data;
+    float* texcoords1Data;
     if (texcoordCount == 0)
     {
-        value_14Data = 0;
+        texcoords1Data = 0;
     }
     else
     {
         if (allocator != 0)
         {
-            value_14Data = (float*)glResourceAlloc(
+            texcoords1Data = (float*)glResourceAlloc(
                 texcoordCount * sizeof(float), GLM_VertexData, allocator);
         }
         else
         {
-            value_14Data = (float*)glFrameAlloc(
+            texcoords1Data = (float*)glFrameAlloc(
                 texcoordCount * sizeof(float), GLM_VertexData);
         }
     }
-    value_14 = value_14Data;
-    glSetModelStream(streams + 2, 2, value_14,
-        sizeof(float) * 2, 4);
+    texcoords1 = texcoords1Data;
+    glSetModelStream(streams + 2, 2, texcoords1, sizeof(float) * 2, 4);
 
-    float* value_18Data;
+    float* texcoords2Data;
     if (texcoordCount == 0)
     {
-        value_18Data = 0;
+        texcoords2Data = 0;
     }
     else
     {
         if (allocator != 0)
         {
-            value_18Data = (float*)glResourceAlloc(
+            texcoords2Data = (float*)glResourceAlloc(
                 texcoordCount * sizeof(float), GLM_VertexData, allocator);
         }
         else
         {
-            value_18Data = (float*)glFrameAlloc(
+            texcoords2Data = (float*)glFrameAlloc(
                 texcoordCount * sizeof(float), GLM_VertexData);
         }
     }
-    value_18 = value_18Data;
-    glSetModelStream(streams + 3, 3, value_18,
-        sizeof(float) * 2, 4);
+    texcoords2 = texcoords2Data;
+    glSetModelStream(streams + 3, 3, texcoords2, sizeof(float) * 2, 4);
 
-    float* value_1CData;
+    float* texcoords3Data;
     if (texcoordCount == 0)
     {
-        value_1CData = 0;
+        texcoords3Data = 0;
     }
     else
     {
         if (allocator != 0)
         {
-            value_1CData = (float*)glResourceAlloc(
+            texcoords3Data = (float*)glResourceAlloc(
                 texcoordCount * sizeof(float), GLM_VertexData, allocator);
         }
         else
         {
-            value_1CData = (float*)glFrameAlloc(
+            texcoords3Data = (float*)glFrameAlloc(
                 texcoordCount * sizeof(float), GLM_VertexData);
         }
     }
-    value_1C = value_1CData;
-    glSetModelStream(streams + 4, 4, value_1C,
-        sizeof(float) * 2, 4);
+    texcoords3 = texcoords3Data;
+    glSetModelStream(streams + 4, 4, texcoords3, sizeof(float) * 2, 4);
 
-    u32* value_20Data;
+    u32* coloursData;
     if (vertexCount == 0)
     {
-        value_20Data = 0;
+        coloursData = 0;
     }
     else
     {
         if (allocator != 0)
         {
-            value_20Data = (u32*)glResourceAlloc(
+            coloursData = (u32*)glResourceAlloc(
                 vertexCount * sizeof(u32), GLM_VertexData, allocator);
         }
         else
         {
-            value_20Data =
-                (u32*)glFrameAlloc(vertexCount * sizeof(u32), GLM_VertexData);
+            coloursData = (u32*)glFrameAlloc(vertexCount * sizeof(u32), GLM_VertexData);
         }
     }
-    value_20 = value_20Data;
-    glSetModelStream(streams + 5, 5, value_20,
-        sizeof(u32), 3);
+    colours = coloursData;
+    glSetModelStream(streams + 5, 5, colours, sizeof(u32), 3);
 
     return true;
 }
 
-bool State_802A0F04::fn_802A1200()
+bool GLFourTextureAddMeshWriter::End()
 {
     for (u32 i = 0; i < model->numPackets; ++i)
     {

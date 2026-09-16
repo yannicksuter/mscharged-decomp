@@ -27,7 +27,7 @@
 #include "NL/nlBind.h"
 #include "NL/nlFunction.inl"
 #include "Game/FE/feMusic.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "NL/nlString.h"
 
 static int lbl_8051D198[8] = { 1, 0, 5, 4, 3, 2, 6, 7 };
@@ -177,7 +177,7 @@ void ChooseSidekicksSceneV2::SceneCreated()
     cupSidekicks->SetVisible(false);
     if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
     {
-        Presentation::GetInstance()->Call("StartStrikerCupCaptainHologramSequence");
+        FrontEndPresentation::GetInstance()->Call("StartStrikerCupCaptainHologramSequence");
         mUnidentified1914 = cupSidekicks;
     }
     else if (GameInfoManager::Instance()->IsOnline())
@@ -401,7 +401,7 @@ void ChooseSidekicksSceneV2::Update(float dt)
         {
             if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
             {
-                Presentation::GetInstance()->Call("RemoveStrikerCupCaptainHologram");
+                FrontEndPresentation::GetInstance()->Call("RemoveStrikerCupCaptainHologram");
                 GameSceneManager::Instance()->Push((SceneList)6, SCREEN_BACK, true);
             }
             else

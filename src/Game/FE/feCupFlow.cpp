@@ -14,7 +14,7 @@
 #include "Game/FE/feMusic.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/Render/tu_80279AC8.h"
 #include "Game/SH/SHCupNews.h"
 #include "Game/SH/SHNavigation.h"
@@ -270,7 +270,7 @@ extern "C" void fn_80207060(bool pad)
         }
         else
         {
-            Presentation::GetInstance()->Call("TransitionCupToChooseSides");
+            FrontEndPresentation::GetInstance()->Call("TransitionCupToChooseSides");
             GameSceneManager::Instance()->Pop();
         }
     }
@@ -388,7 +388,7 @@ extern "C" void fn_8020785C()
 {
     FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, true);
     GameSceneManager::Instance()->Pop();
-    Presentation::GetInstance()->Call("TransitionStrikerCupToMainMenu");
+    FrontEndPresentation::GetInstance()->Call("TransitionStrikerCupToMainMenu");
 }
 
 void ShowCupStartOptions()
@@ -449,7 +449,7 @@ void StartNewCup()
     GameSceneManager::Instance()->Pop();
     SaveLoad::StartSave(false);
     FEAudio::PlayAnimAudioEvent(0x5854D494, 0, 0, true);
-    Presentation::GetInstance()->Call("TransitionFromMainMenu");
+    FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
     gNextFETransition = "TransitionMainMenuToNewStrikerCup";
 }
 
@@ -474,12 +474,12 @@ extern "C" void fn_80207DC4()
         g_pCupManager->mUnidentified869C = false;
         g_pCupManager->fn_8010E8E0();
         SaveLoad::StartSave(false);
-        Presentation::GetInstance()->Call("TransitionFromMainMenu");
+        FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         gNextFETransition = "TransitionMainMenuToContinueStrikerCupForfeit";
     }
     else
     {
-        Presentation::GetInstance()->Call("TransitionFromMainMenu");
+        FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         gNextFETransition = "TransitionMainMenuToContinueStrikerCup";
     }
     for (int i = 0; i < 4; ++i)
@@ -569,11 +569,11 @@ void BeginCupAwardPresentation()
 
     if (secondTeam == userTeam)
     {
-        Presentation::GetInstance()->Call("TransitionCupToLeftAward");
+        FrontEndPresentation::GetInstance()->Call("TransitionCupToLeftAward");
     }
     else if (firstTeam == userTeam)
     {
-        Presentation::GetInstance()->Call("TransitionCupToRightAward");
+        FrontEndPresentation::GetInstance()->Call("TransitionCupToRightAward");
     }
     else
     {
@@ -594,11 +594,11 @@ void AdvanceCupAwardPresentation()
     int team = g_pCupManager->fn_8010D9C4(&statistic);
     if (team == g_pCupManager->GetUserSelectedCupTeam())
     {
-        Presentation::GetInstance()->Call("TransitionCupLeftToRightAward");
+        FrontEndPresentation::GetInstance()->Call("TransitionCupLeftToRightAward");
     }
     else
     {
-        Presentation::GetInstance()->Call("TransitionCupToCentreAward");
+        FrontEndPresentation::GetInstance()->Call("TransitionCupToCentreAward");
     }
 }
 
@@ -611,7 +611,7 @@ void ShowCupGoldenBootNews()
 
 void FinishCupAwardPresentation()
 {
-    Presentation::GetInstance()->Call("TransitionCupToCentreAward");
+    FrontEndPresentation::GetInstance()->Call("TransitionCupToCentreAward");
 }
 
 void ShowCupAwardRewardsPopup()
@@ -807,5 +807,5 @@ extern "C" void fn_80209474()
     {
         navigation->SetButtons(0, true);
     }
-    Presentation::GetInstance()->Call("TransitionCupToChooseNewCaptain");
+    FrontEndPresentation::GetInstance()->Call("TransitionCupToChooseNewCaptain");
 }

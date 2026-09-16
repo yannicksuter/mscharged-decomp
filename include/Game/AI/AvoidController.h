@@ -105,11 +105,11 @@ public:
         if (mUnidentified00C != mUnidentified010)
         {
             nlVector3 input = mUnidentified01C;
+            int next = (mUnidentified010 + 1) % mUnidentified008;
             float magnitude = mUnidentified028;
             float excess = mUnidentified028 - mUnidentified004;
             float weight = mUnidentified018[mUnidentified010];
-            if ((mUnidentified010 + 1) % mUnidentified008 != mUnidentified00C
-                && excess > 0.0f)
+            if (next != mUnidentified00C && excess > 0.0f)
             {
                 float fraction = excess / weight;
                 nlVec3ScaleAdd(input, fraction * -weight,
@@ -147,25 +147,18 @@ public:
     {
     }
     virtual void UnidentifiedGetValue(
-        nlVector3& value, float magnitude, const nlVector3& input) const
-    {
-        if (magnitude > 0.0001f)
-        {
-            nlVec3Scale(value, input, 1.0f / magnitude);
-        }
-        else
-        {
-            value = mUnidentified00C != mUnidentified010
-                ? mUnidentified014[mUnidentified00C - 1 >= 0
-                      ? mUnidentified00C - 1 : mUnidentified008 - 1]
-                : mUnidentified02C;
-        }
-    }
+        nlVector3& value, float magnitude, const nlVector3& input) const;
 };
 
 struct UnidentifiedAvoidanceContext
 {
     void UnidentifiedNormalize();
+    float UnidentifiedGetAlignment() const
+    {
+        return (mUnidentified044.x * mUnidentified054.x)
+            + (mUnidentified044.y * mUnidentified054.y)
+            + (mUnidentified044.z * mUnidentified054.z);
+    }
     nlVector3 mUnidentified000;
     float mUnidentified00C;
     float mUnidentified010;
@@ -236,6 +229,7 @@ public:
     bool CalcDesiredVelocityToAvoidCorner(nlVector2&, const sCornerSegment&, const nlVector2&, const nlVector2&);
     bool CalcDesiredVelocityToAvoidSideline(nlVector2&, const nlVector2&, const nlVector2&, const nlVector2&, const nlVector2&);
     void ApplyRepulsionVector(nlVector3 v3Repulsion);
+    void RegisterDebugFields(u16*, DebugWriteCache*);
     bool UnidentifiedCanAvoid(int);
     void UnidentifiedSetLast(eAvoidableThings, const nlVector3&, float);
 
@@ -259,5 +253,21 @@ public:
 class DebugWriteCache;
 extern "C" void fn_8000F324(AvoidController* controller,
     void* context, DebugWriteCache* cache);
+
+inline void UnidentifiedAvoidanceHistory::UnidentifiedGetValue(
+    nlVector3& value, float magnitude, const nlVector3& input) const
+{
+    if (magnitude > 0.0001f)
+    {
+        nlVec3Scale(value, input, 1.0f / magnitude);
+    }
+    else
+    {
+        value = mUnidentified00C != mUnidentified010
+            ? mUnidentified014[mUnidentified00C - 1 >= 0
+                  ? mUnidentified00C - 1 : mUnidentified008 - 1]
+            : mUnidentified02C;
+    }
+}
 
 #endif // GAME_AI_AVOID_CONTROLLER_H

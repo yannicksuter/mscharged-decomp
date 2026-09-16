@@ -9,7 +9,7 @@
 #include "Game/FE/feMusic.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "NL/nlBind.h"
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
@@ -157,7 +157,7 @@ void OptionsScene::Update(float fDeltaT)
         else if (mUnidentified320 == 3)
         {
             FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
-            Presentation::GetInstance()->Call("TransitionOptionsToMainMenu");
+            FrontEndPresentation::GetInstance()->Call("TransitionOptionsToMainMenu");
             GameSceneManager::Instance()->Pop();
             return;
         }

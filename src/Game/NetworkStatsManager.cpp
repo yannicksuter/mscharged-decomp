@@ -92,11 +92,11 @@ void NetworkStatsManager::Reset(bool)
     mSaveDataChanged = false;
     mGameResultReported = false;
     mDisconnectPending = false;
-    mUnidentifiedC41C = 0;
+    mUnidentifiedC41C[0] = 0;
     mDisconnectLossPending[0] = false;
-    mUnidentifiedC420 = 0;
+    mUnidentifiedC41C[1] = 0;
     mDisconnectLossPending[1] = false;
-    mUnidentifiedC424 = 0;
+    mUnidentifiedC41C[2] = 0;
     mDisconnectLossPending[2] = false;
     mJobs.mHead = 0;
     mJobs.mCount = 0;
@@ -412,8 +412,7 @@ bool NetworkStatsManager::PostResetMyPlayerStats(
         mLocalStats[category].mWins = 0;
         mLocalStats[category].mLosses = 0;
         mLocalStats[category].mUnidentified14 = 0;
-        NetworkRankingIdentity* identity = reinterpret_cast<NetworkRankingIdentity*>(&mLocalStats[category]);
-        identity->LoadLocal();
+        mLocalStats[category].LoadLocal();
     }
     mHasLocalStats[category] = true;
 
@@ -567,34 +566,63 @@ bool NetworkStatsManager::ShouldRestoreDefaultDisconnectLoss()
 
 void NetworkStatsManager::ReportDefaultDisconnectLoss()
 {
-    if (mGameResultReported)
+    if (g_pNetworkSession->GetRankingReporter() != 0)
     {
-        return;
-    }
-    if (IsNewNetworkDay(&mLocalStats[0]))
-    {
-        tDebugPrintManager::Print(DC_NETWORK, "Skipping default disconnect loss new day\n");
-        return;
-    }
-    if (IsNewNetworkSeason(&mLocalStats[1]))
-    {
-        tDebugPrintManager::Print(DC_NETWORK, "Skipping default disconnect loss new season\n");
-        return;
-    }
-
-    tDebugPrintManager::Print(DC_NETWORK, "Returning Default Disconnect Loss\n");
-    for (int i = 0; i < 3; ++i)
-    {
-        if (mDisconnectLossPending[i])
+        int categoryCount = UsesEuropeanRankings() ? 3 : 2;
+        NetworkRankingMeta* localStats = mLocalStats;
+        for (int category = 0; category < categoryCount; ++category)
         {
+            if (mLocalStats[category].mLosses >= 9999)
+            {
+                return;
+            }
+            if (category == 1)
+            {
+                if (IsNewNetworkDay(&mLocalStats[category]))
+                {
+                    tDebugPrintManager::Print(DC_NETWORK, "Skipping default disconnect loss new day\n");
+                    return;
+                }
+            }
+            else if (IsNewNetworkSeason(&localStats[category]))
+            {
+                tDebugPrintManager::Print(DC_NETWORK, "Skipping default disconnect loss new season\n");
+                return;
+            }
+        }
+
+        for (int category = 0; category < categoryCount; ++category)
+        {
+            int oldPoints = mLocalStats[category].mScore;
+            int pointsLost = oldPoints < 5 ? oldPoints : 5;
+            mUnidentifiedC41C[category] = pointsLost;
+            mDisconnectLossPending[category] = true;
+            mLocalStats[category].mScore -= pointsLost;
+            ++mLocalStats[category].mLosses;
+            mLocalStats[category].mUnidentified14 = GetOnlineRegion();
+
             tDebugPrintManager::Print(DC_NETWORK,
                 "ReportDefaultDisconnectLoss: pers cat %d oldPoints %d new points %d New W:L %d:%d OneBasedRegion:%d\n",
-                mPersistentCategories[i],
-                mLocalStats[i].mScore,
-                mLocalStats[i].mScore,
-                mLocalStats[i].mWins,
-                mLocalStats[i].mLosses,
-                GetRegion() + 1);
+                category,
+                oldPoints,
+                mLocalStats[category].mScore,
+                mLocalStats[category].mWins,
+                mLocalStats[category].mLosses,
+                mLocalStats[category].mUnidentified14);
+
+            localStats[category].LoadLocal();
+        }
+
+        if (categoryCount == 2)
+        {
+            SubmitJob(0);
+            SubmitJob(1);
+        }
+        else if (categoryCount == 3)
+        {
+            SubmitJob(0);
+            SubmitJob(1);
+            SubmitJob(2);
         }
     }
 }
@@ -652,7 +680,7 @@ void NetworkStatsManager::ReportGameResult(int result,
         }
 
         int categoryCount = UsesEuropeanRankings() ? 3 : 2;
-        int* disconnectPoints = &mUnidentifiedC41C;
+        int* disconnectPoints = mUnidentifiedC41C;
         for (int category = 0; category < categoryCount; ++category)
         {
             int oldPoints = mLocalStats[category].mScore;
@@ -755,10 +783,7 @@ void NetworkStatsManager::ReportGameResult(int result,
                 mLocalStats[category].mLosses,
                 mLocalStats[category].mUnidentified14);
 
-            NetworkRankingIdentity* identity =
-                reinterpret_cast<NetworkRankingIdentity*>(
-                    &mLocalStats[category]);
-            identity->LoadLocal();
+            mLocalStats[category].LoadLocal();
         }
 
         if (categoryCount == 2)
@@ -819,11 +844,11 @@ void NetworkStatsManager::ResetPregameDisconnectState()
 {
     mGameResultReported = false;
     mDisconnectPending = false;
-    mUnidentifiedC41C = 0;
+    mUnidentifiedC41C[0] = 0;
     mDisconnectLossPending[0] = false;
-    mUnidentifiedC420 = 0;
+    mUnidentifiedC41C[1] = 0;
     mDisconnectLossPending[1] = false;
-    mUnidentifiedC424 = 0;
+    mUnidentifiedC41C[2] = 0;
     mDisconnectLossPending[2] = false;
     if (IsOnlineRankedMatch())
     {
@@ -1060,7 +1085,7 @@ void NetworkStatsManager::HandleDisconnect_8013243C(int result)
     {
         SubmitJob(sLeaderboardJobs[i]);
     }
-    mUnidentifiedC41C = result;
+    mUnidentifiedC41C[0] = result;
 }
 
 void NetworkStatsManager::CalculateAndReportGameResult(int result)
@@ -1302,7 +1327,7 @@ static int DayOfYear(NetworkSeasonDate date, int year)
     {
         result += DaysInMonth(i, year);
     }
-    return result + date.mDay;
+    return result + date.mDay - 1;
 }
 
 int GetDaysUntilNextSeasonBoundary(
@@ -1325,7 +1350,8 @@ int GetDaysSinceSeasonBoundary(const NetworkSeasonDateTable* dates, int index,
     NetworkSeasonDate date, int year)
 {
     const NetworkSeasonDate& boundary = dates->mDates[index];
-    return DayOfYear(date, year) - DayOfYear(boundary, year);
+    int boundaryDay = DayOfYear(boundary, year);
+    return DayOfYear(date, year) - boundaryDay;
 }
 
 NetworkSeasonDate sNetworkSeasonDates[52] = {

@@ -7,7 +7,7 @@
 #include "Game/FE/feTextureResource.h"
 #include "Game/GameInfo.h"
 #include "Game/GameSceneManager.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/Sys/movie.h"
 #include "NL/gl/gl.h"
@@ -260,7 +260,7 @@ void IntroMovieScene::Update(float fDeltaT)
             if ((int)fn_803713E0() >= frame)
             {
                 mUnidentifiedB8 = true;
-                Presentation::GetInstance()->Call("TransitionFromMovieToTitleScreen");
+                FrontEndPresentation::GetInstance()->Call("TransitionFromMovieToTitleScreen");
                 mUnidentifiedB9 = true;
                 BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = true;
                 fn_80370E90(false);

@@ -1494,14 +1494,18 @@ bool cFielder::fn_800345EC(cFielder* pOtherFielder) const
     if (pOtherFielder->mUnidentified024.m_eCharacterClass == WALUIGI
         && pOtherFielder->m_eActionState == ACTION_SLIDE_ATTACK)
     {
-        return IsCharacterInAir(pOtherFielder->mUnidentified024.m_fPlayerScale * 0.5f);
+        float fPlayerScale = pOtherFielder->mUnidentified024.m_fPlayerScale;
+        fPlayerScale = 0.5f * fPlayerScale;
+        return IsCharacterInAir(fPlayerScale);
     }
     if (mUnidentified024.m_eCharacterClass == WALUIGI && m_eActionState == ACTION_SLIDE_ATTACK)
         return false;
     if (pOtherFielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10
         && pOtherFielder->m_eActionState == ACTION_SLIDE_ATTACK)
     {
-        return IsCharacterInAir(pOtherFielder->mUnidentified024.m_fPlayerScale * 0.6f);
+        float fPlayerScale = pOtherFielder->mUnidentified024.m_fPlayerScale;
+        fPlayerScale = 0.6f * fPlayerScale;
+        return IsCharacterInAir(fPlayerScale);
     }
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10
         && m_eActionState == ACTION_SLIDE_ATTACK)
@@ -1509,17 +1513,23 @@ bool cFielder::fn_800345EC(cFielder* pOtherFielder) const
 
     float leftFootZ = GetJointPosition(m_nLeftFootJointIndex).z;
     float rightFootZ = GetJointPosition(m_nRightFootJointIndex).z;
-    if (IsRunning())
+    bool bRunning = false;
+    eFielderActionState eActionState = m_eActionState;
+    if (eActionState == ACTION_RUNNING || eActionState == 0x13
+        || IsRunningWithBall())
+    {
+        bRunning = true;
+    }
+    if (bRunning)
         leftFootZ = rightFootZ = 0.0f;
 
     nlVector3 v3Unidentified0, v3Unidentified1;
     m_pPhysicsCharacter->GetBonePositions(
         PHYSBONE_FIELDER_HEAD, v3Unidentified0, v3Unidentified1);
-    float fUnidentified0 = nlMinEquals(
-                              nlMinEquals(leftFootZ, rightFootZ), v3Unidentified0.z)
+    leftFootZ = nlMinEquals(nlMinEquals(leftFootZ, rightFootZ), v3Unidentified0.z)
         - 0.15f;
-    if (fUnidentified0 < 0.0f)
-        fUnidentified0 = 0.0f;
+    if (leftFootZ < 0.0f)
+        leftFootZ = 0.0f;
 
     float fUnidentified1 = pOtherFielder->GetJointPosition(
                                           pOtherFielder->m_nLeftFootJointIndex)
@@ -1531,9 +1541,9 @@ bool cFielder::fn_800345EC(cFielder* pOtherFielder) const
     pOtherFielder->m_pPhysicsCharacter->GetBonePositions(
         PHYSBONE_FIELDER_HEAD, v3Unidentified2, v3Unidentified3);
     float fUnidentified3 = nlMaxEquals(
-                              nlMaxEquals(fUnidentified1, fUnidentified2), v3Unidentified2.z)
-        + 0.15f;
-    if (fUnidentified0 > fUnidentified3)
+        nlMaxEquals(fUnidentified1, fUnidentified2), v3Unidentified2.z);
+    fUnidentified3 += 0.15f;
+    if (leftFootZ > fUnidentified3)
         return true;
     return false;
 }
@@ -1578,16 +1588,6 @@ bool cFielder::fn_80034894(cFielder* pOtherFielder) const
         break;
     }
     return false;
-}
-
-bool cFielder::IsRunningWithBall() const
-{
-    bool bRunningWithBall = false;
-    if (m_eActionState == ACTION_RUNNING_WB)
-    {
-        bRunningWithBall = true;
-    }
-    return bRunningWithBall;
 }
 
 bool cFielder::IsRunning() const
@@ -1760,8 +1760,8 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
 
     case 0x21:
     {
-        m_pTeam->GetOtherTeam()->GetGoalie()
-            ->m_pPhysicsCharacter->m_CanCollideWithBall = true;
+        Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
+        pGoalie->m_pPhysicsCharacter->m_CanCollideWithBall = true;
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
         g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
         mUnidentified410.mUnidentified0C = false;

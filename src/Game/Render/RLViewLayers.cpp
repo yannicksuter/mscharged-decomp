@@ -11,7 +11,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_801A2004.h"
+#include "Game/Render/HighRange.h"
 
 #include "Game/Render/ShadowVolume.h"
 void CopyShadowVolumeColour(const GXColor* colour);
@@ -275,7 +275,7 @@ RLView* GetLayerView(eCLV layer)
     return 0;
 }
 
-GLViewInterface* fn_802726A0()
+GLViewInterface* GetOrthoCamera()
 {
     return &sOrthoCamera;
 }
@@ -529,7 +529,7 @@ void fn_80272AB4()
     sLayerViews[eCLV_HighRange3D]->m_Enabled = true;
     sLayerViews[eCLV_HighRange3DNoFog]->m_Enabled = true;
 
-    fn_801A2394(&lbl_80572020);
+    InitializeHighRange(&gHighRange);
 }
 
 float fn_8027313C()

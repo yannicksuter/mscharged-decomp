@@ -19,6 +19,7 @@ public:
     void Show();
     void Update();
     static void Render();
+    void Unblock();
     void SetBlocked(bool blocked) { mBlocked = blocked; }
     bool IsBlocked();
     void OnHomeButtonPressed();
@@ -37,6 +38,6 @@ public:
 }; // size 0x98
 
 extern HBMManager* gpHBMManager;
-
+HBMManager* fn_801FA19C();
 
 #endif // GAME_HBM_MANAGER_H

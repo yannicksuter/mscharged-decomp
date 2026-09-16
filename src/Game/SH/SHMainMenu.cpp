@@ -21,7 +21,7 @@
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "NL/nlBind.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlLocalization.h"
@@ -227,7 +227,7 @@ void SHMainMenu::Update(float fDeltaT)
             {
                 FEAudio::PlayAnimAudioEvent(0x29267FA1, 0, 0, true);
                 FEAudio::PlayAnimAudioEvent(0xD1A8E50D, 0, 0, true);
-                Presentation::GetInstance()->Call("TransitionMainMenuToTitleScreen");
+                FrontEndPresentation::GetInstance()->Call("TransitionMainMenuToTitleScreen");
                 return;
             }
             for (int i = 0; i < NUM_ITEMS; ++i)
@@ -390,7 +390,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         }
         FEAudio::PlayAnimAudioEvent(0x6C2AE132, 0, 0, true);
         gNextFETransition = "TransitionMainMenuToGrudgeMatch";
-        Presentation::GetInstance()->Call("TransitionFromMainMenu");
+        FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         break;
     }
     case 1:
@@ -406,7 +406,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         {
             scene->SetButtons(0, true);
         }
-        Presentation::GetInstance()->Call("TransitionFromMainMenu");
+        FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
         break;
     }
@@ -432,7 +432,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
             scene->HideButtons();
         }
         gNextFETransition = "TransitionMainMenuToStrikerChallenges";
-        Presentation::GetInstance()->Call("TransitionFromMainMenu");
+        FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         break;
     }
     case 4:
@@ -446,7 +446,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
             scene->HideButtons();
         }
         gNextFETransition = "TransitionMainMenuToTutorial";
-        Presentation::GetInstance()->Call("TransitionFromMainMenu");
+        FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         break;
     }
     case 5:
@@ -460,7 +460,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         }
         SetLockedTrophyVisibility(false);
         gNextFETransition = "TransitionMainMenuToHallOfFame";
-        Presentation::GetInstance()->Call("TransitionFromMainMenu");
+        FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         break;
     }
     case 6:
@@ -473,7 +473,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         }
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
         gNextFETransition = "TransitionMainMenuToOptions";
-        Presentation::GetInstance()->Call("TransitionFromMainMenu");
+        FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         break;
     }
     }

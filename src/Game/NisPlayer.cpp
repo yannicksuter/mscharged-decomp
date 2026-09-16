@@ -6,7 +6,7 @@
 #include "Game/EventDataTypes.h"
 #include "Game/EventRegistry.h"
 #include "NL/nlFunction.inl"
-#include "unclassified/tu_80284A58.h"
+#include "Game/Render/Presentation.h"
 #include "Game/Sys/tweak.h"
 #include "Game/Player.h"
 #include "Game/ReplayManager.h"

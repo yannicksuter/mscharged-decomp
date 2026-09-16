@@ -17,7 +17,7 @@
 #include "Game/GameInfo.h"
 #include "Game/GameObjectLighting.h"
 #include "Game/HBMManager.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/Render/HomeButtonFade.h"
 #include "Game/TweakRegistry.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -140,7 +140,7 @@ void FrontEndTask::Run(float dt)
         }
     }
 
-    Presentation::GetInstance()->Update(dt);
+    FrontEndPresentation::GetInstance()->Update(dt);
     DrawFrontEndElements(dt);
 
     if (nlTaskManager::m_pInstance->mCurrentState != 4)
@@ -232,7 +232,7 @@ void FrontEndTask::HandleE3IdleReset(float fDeltaT)
                         GameSceneManager::Instance()->PopToScene((SceneList)0x19);
                         FESceneManager::Instance()->ForceImmediateStackProcessing();
                         GameSceneManager::Instance()->Push(SCENE_TITLE, SCREEN_NOTHING, false);
-                        Presentation::GetInstance()->Call("StartTitleScreenSequence");
+                        FrontEndPresentation::GetInstance()->Call("StartTitleScreenSequence");
                     }
                 }
                 else

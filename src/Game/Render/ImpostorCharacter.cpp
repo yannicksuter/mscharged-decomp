@@ -72,18 +72,24 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     ImpostorManager::GetInstance()->AddCharacter(this);
 }
 
-ImpostorCharacter::~ImpostorCharacter()
+static inline void DestroyImpostorSprites(
+    nlDLListSlotPool<ImpostorSprite*>& sprites,
+    nlDLListIterator<ImpostorSprite*>& it)
 {
-    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
     while (it.m_Curr != 0)
     {
         ImpostorSprite* sprite = it.m_Curr->entry;
         delete sprite;
-        mSprites.Remove(&it);
+        sprites.Remove(&it);
     }
+    sprites.Clear();
+    sprites.m_Allocator.FreeBlocks();
+}
 
-    mSprites.Clear();
-    mSprites.m_Allocator.FreeBlocks();
+ImpostorCharacter::~ImpostorCharacter()
+{
+    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    DestroyImpostorSprites(mSprites, it);
 }
 
 u16 QuantizeImpostorAngle(u16 target, int count)
@@ -307,10 +313,7 @@ AnimatedImpostorCharacter::~AnimatedImpostorCharacter()
 {
     for (int i = 1; i < mNumModels; ++i)
     {
-        if (mModels[i] != 0)
-        {
-            delete mModels[i];
-        }
+        delete mModels[i];
     }
     delete[] mModels;
 }
@@ -332,4 +335,3 @@ void AnimatedImpostorCharacter::PlayAnimation(float dt,
         mModels[i]->PlayAnimation(unidentified, value, PM_CYCLIC);
     }
 }
-

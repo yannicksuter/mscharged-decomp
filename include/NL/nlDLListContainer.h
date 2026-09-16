@@ -132,6 +132,145 @@ public:
 }; // size: 0x08
 
 template <typename T, typename Adapter>
+class DLListContainerBase<T, Adapter&>
+{
+public:
+    typedef void (DLListContainerBase::*EntryCallback)(DLListEntry<T>*);
+
+    DLListContainerBase()
+        : m_Head(0)
+    {
+    }
+
+    DLListContainerBase(Adapter& allocator)
+        : m_Head(0)
+    {
+        m_Allocator = &allocator;
+    }
+
+    ~DLListContainerBase()
+    {
+        Clear();
+    }
+
+    void Clear()
+    {
+        nlWalkDLRing(m_Head, this, &DLListContainerBase::DeleteEntry);
+        m_Head = 0;
+    }
+
+    DLListEntry<T>* Allocate(const T& data)
+    {
+        DLListEntry<T> value(data);
+        DLListEntry<T>* entry = m_Allocator->Allocate();
+        new (entry) DLListEntry<T>(value);
+        return entry;
+    }
+
+    unsigned long AddEnd(const T& data)
+    {
+        DLListEntry<T>* entry = Allocate(data);
+        nlDLRingAddEnd(&m_Head, entry);
+        return (unsigned long)entry;
+    }
+
+    unsigned long AddAfter(nlDLListIterator<T>& position, const T& data)
+    {
+        DLListEntry<T>* entry = Allocate(data);
+        nlDLRingInsert(&m_Head, position.CurrentEntry(), entry);
+        return (unsigned long)entry;
+    }
+
+    void AddStart(const T& data)
+    {
+        DLListEntry<T>* entry = Allocate(data);
+        nlDLRingAddStart(&m_Head, entry);
+    }
+
+    void Deallocate(DLListEntry<T>* entry, T* outData)
+    {
+        if (outData != 0)
+        {
+            *outData = entry->entry;
+        }
+        m_Allocator->DeleteEntry(entry);
+    }
+
+    void RemoveStart(T* outData)
+    {
+        DLListEntry<T>* entry = nlDLRingRemoveStart(&m_Head);
+        Deallocate(entry, outData);
+    }
+
+    void Remove(nlDLListIterator<T>* position)
+    {
+        DLListEntry<T>* entry = position->next();
+        nlDLRingRemove(&m_Head, entry);
+        m_Allocator->DeleteEntry(entry);
+    }
+
+    nlDLListIterator<T> Begin() const
+    {
+        return nlDLListIterator<T>(m_Head, nlDLRingGetStart(m_Head));
+    }
+
+    nlDLListIterator<T> Begin(DLListEntry<T>* current) const
+    {
+        return nlDLListIterator<T>(m_Head, current);
+    }
+
+    nlDLListIterator<T> End() const
+    {
+        return nlDLListIterator<T>(m_Head, nlDLRingGetEnd(m_Head));
+    }
+
+    bool IsEmpty() const
+    {
+        return m_Head == 0;
+    }
+
+    T* AllocateAtEnd(unsigned long* outEntry)
+    {
+        DLListEntry<T>* result;
+        m_Allocator->Allocate(result);
+        new (result) DLListEntry<T>;
+        nlDLRingAddEnd(&m_Head, result);
+
+        if (outEntry != 0)
+        {
+            *outEntry = (unsigned long)result;
+        }
+
+        return &result->entry;
+    }
+
+    struct WalkCallback
+    {
+        const Function1<bool, T&>& m_Callback;
+        WalkCallback(const Function1<bool, T&>& callback) : m_Callback(callback) { }
+        bool Call(DLListEntry<T>* entry) { return m_Callback(entry->entry); }
+    };
+
+    bool Walk(const Function1<bool, T&>& callback)
+    {
+        WalkCallback adapter(callback);
+        return nlWalkRing(m_Head, &adapter, &WalkCallback::Call);
+    }
+
+    void DeleteEntry(DLListEntry<T>* entry)
+    {
+        if (entry != 0)
+        {
+            entry->entry.~T();
+        }
+        m_Allocator->DeleteEntry(entry);
+    }
+
+    /* 0x00 */ Adapter* m_Allocator;
+    /* 0x04 */ DLListEntry<T>* m_Head;
+}; // size: 0x08
+
+template <typename T, typename Adapter>
 inline T* DLListContainerBase<T, Adapter>::AllocateAtEnd(
     unsigned long* outEntry)
 {
@@ -202,11 +341,11 @@ void DLListContainerBase<T, Adapter>::DeleteEntry(
 
 // The list borrows its node pool and does not free the pool's blocks.
 template <typename T>
-class UnidentifiedDLListPool_802F2188
+class BorrowedDLListSlotPool
     : public DLListContainerBase<T, BasicSlotPool<DLListEntry<T> >&>
 {
 public:
-    UnidentifiedDLListPool_802F2188(BasicSlotPool<DLListEntry<T> >& allocator)
+    BorrowedDLListSlotPool(BasicSlotPool<DLListEntry<T> >& allocator)
         : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> >&>(allocator)
     {
     }

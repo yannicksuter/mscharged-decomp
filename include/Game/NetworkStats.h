@@ -47,6 +47,8 @@ struct NetworkRankingMeta
         mUnidentified14 = 0;
     }
 
+    void LoadLocal();
+
     /* 0x00 */ u8 mDay;
     /* 0x01 */ u8 mMonth;
     /* 0x02 */ u16 mYear;
@@ -176,15 +178,6 @@ struct NetworkRankingSortRow
     /* 0x00 */ NetworkStatsPlayer mPlayer;
     /* 0x68 */ NetworkRankingMeta mMetadata;
 }; // size: 0x80
-
-struct NetworkRankingIdentity
-{
-    void LoadLocal();
-
-    /* 0x00 */ u8 mDay;
-    /* 0x01 */ u8 mMonth;
-    /* 0x02 */ u16 mYear;
-}; // size: 0x4
 
 class NetworkRanking : public NetworkStatsInterface
 {

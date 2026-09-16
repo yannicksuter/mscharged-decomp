@@ -35,7 +35,7 @@
 #include "Game/Team.h"
 #include "NL/globalpad.h"
 #include "Game/Render/KoopaShellObject.h"
-#include "unclassified/tu_801A6AAC.h"
+#include "Game/Render/MegaBallIndicators.h"
 #include "Game/Render/NPCManager.h"
 #include "math.h"
 
@@ -956,7 +956,7 @@ void Goalie::fn_80083DE0(float fDeltaT)
 
 extern "C" void fn_80083EC0()
 {
-    fn_801A6DD8();
+    ResetMegaBallIndicators();
 
     nlVector2 v2Positions[6] = {
         { lbl_806DBC08, lbl_806DBC00 },
@@ -1008,17 +1008,17 @@ extern "C" void fn_80083EC0()
                    + (nlRandomf(lbl_806DBC0C)
                        - 0.5f * lbl_806DBC0C));
 
-        UnidentifiedMegaBallState* pState
-            = fn_801A75A8((float)nX, (float)nY, 0.0f);
-        pState->mUnidentified028 = false;
+        MegaBallIndicator* pState
+            = CreateMegaBallIndicator((float)nX, (float)nY, 0.0f);
+        pState->mVisible = false;
     }
 
     for (unsigned int i = 0;
         i < g_pGame->mUnidentified28;
         i++)
     {
-        UnidentifiedMegaBallState* pState = fn_801A7620(i);
-        pState->mUnidentified029 = false;
+        MegaBallIndicator* pState = GetMegaBallIndicator(i);
+        pState->mActive = false;
 
         LiveBallTrail* pBallTrail = fn_8001B284(i);
         pBallTrail->position = lbl_804DC03C;
@@ -1055,11 +1055,11 @@ void Goalie::fn_8008418C(float fDeltaT)
                 continue;
             }
 
-            UnidentifiedMegaBallState* pState = fn_801A7620(i);
+            MegaBallIndicator* pState = GetMegaBallIndicator(i);
             float fScreenX
-                = (2.0f * pState->mUnidentified000 - 640.0f) / 640.0f;
+                = (2.0f * pState->mX - 640.0f) / 640.0f;
             float fScreenY
-                = (480.0f - 2.0f * pState->mUnidentified004) / 480.0f;
+                = (480.0f - 2.0f * pState->mY) / 480.0f;
 
             const nlVector3& v3CameraPosition
                 = cCameraManager::PeekCamera()->GetCameraPosition();
@@ -1122,7 +1122,7 @@ void Goalie::fn_8008418C(float fDeltaT)
 
 void Goalie::fn_80084568(unsigned int nIndex, float)
 {
-    UnidentifiedMegaBallState* pState = fn_801A7620(nIndex);
+    MegaBallIndicator* pState = GetMegaBallIndicator(nIndex);
     LiveBallTrail* pBallTrail = fn_8001B284(nIndex);
 
     pBallTrail->velocity = v3Zero;
@@ -1143,7 +1143,7 @@ void Goalie::fn_80084568(unsigned int nIndex, float)
         pBallTrail->mUnidentified028 = v3Unidentified;
     }
 
-    fn_801A6B64(pState, false);
+    SetMegaBallIndicatorTexture(pState, false);
 
     float fParam;
     if (mfMegaAccuracy < 0.001f)
@@ -1159,19 +1159,19 @@ void Goalie::fn_80084568(unsigned int nIndex, float)
         fParam = lbl_806DBC34;
     }
 
-    fn_801A6D44(
+    SetMegaBallIndicatorScaleTween(
         pState, false, fParam, lbl_806DBC64, fParam, lbl_806DBC68);
     if (lbl_806E0D18)
     {
-        pState->mUnidentified028 = true;
+        pState->mVisible = true;
     }
-    pState->mUnidentified029 = true;
+    pState->mActive = true;
 }
 
 bool Goalie::fn_80084724(unsigned int nParam, float* pScore)
 {
-    UnidentifiedMegaBallState* pState = fn_801A7620(nParam);
-    if (!pState->mUnidentified029)
+    MegaBallIndicator* pState = GetMegaBallIndicator(nParam);
+    if (!pState->mActive)
     {
         return false;
     }
@@ -1179,38 +1179,38 @@ bool Goalie::fn_80084724(unsigned int nParam, float* pScore)
     *pScore = 0.0f;
     for (unsigned int i = 0; i < 10; i++)
     {
-        UnidentifiedMegaBallState* pCandidate = fn_801A76BC(i);
-        if (!pCandidate->mUnidentified029)
+        MegaBallIndicator* pCandidate = GetMegaBallCatchIndicator(i);
+        if (!pCandidate->mActive)
         {
             continue;
         }
 
-        if (!pCandidate->mUnidentified04C.mUnidentified01C)
+        if (!pCandidate->mOpacityTween.mActive)
         {
             SetPlayerAudioController(this);
             PlaySound(0, 0xCC36B742, 0, 0);
             PlaySound(0, 0x1B662C5F, 0, 0);
-            fn_801A7610(pCandidate);
+            ReleaseMegaBallIndicator(pCandidate);
             continue;
         }
 
-        float fCandidateScore = fn_801A78B8(pState, pCandidate);
+        float fCandidateScore = TestMegaBallIndicatorCollision(pState, pCandidate);
         if (fCandidateScore > 0.0f)
         {
             if (fCandidateScore > *pScore)
             {
                 *pScore = fCandidateScore;
             }
-            fn_801A7610(pCandidate);
+            ReleaseMegaBallIndicator(pCandidate);
             return true;
         }
     }
     return false;
 }
 
-void Goalie::fn_80084840(UnidentifiedMegaBallState* pState)
+void Goalie::fn_80084840(MegaBallIndicator* pState)
 {
-    LiveBallTrail* pBallTrail = fn_8001B284(pState->mUnidentified01C);
+    LiveBallTrail* pBallTrail = fn_8001B284(pState->mIndex);
     if (!mbShouldMiss)
     {
         return;
@@ -1268,12 +1268,12 @@ void Goalie::fn_80084840(UnidentifiedMegaBallState* pState)
     }
 }
 
-void Goalie::fn_80084AE0(UnidentifiedMegaBallState* pState)
+void Goalie::fn_80084AE0(MegaBallIndicator* pState)
 {
     if (m_pBall == 0)
     {
         LiveBallTrail* pBallTrail
-            = fn_8001B284(pState->mUnidentified01C);
+            = fn_8001B284(pState->mIndex);
         EmissionController* pController
             = fn_801B64E8(this, "mega_ball_explode", 0);
         pController->SetPosition(pBallTrail->position);
@@ -1293,13 +1293,13 @@ void Goalie::fn_80084AE0(UnidentifiedMegaBallState* pState)
         i < g_pGame->mUnidentified28;
         i++)
     {
-        UnidentifiedMegaBallState* pCurrentState = fn_801A7620(i);
-        if (pCurrentState->mUnidentified029
-            && pCurrentState->mUnidentified04C.mUnidentified01C)
+        MegaBallIndicator* pCurrentState = GetMegaBallIndicator(i);
+        if (pCurrentState->mActive
+            && pCurrentState->mOpacityTween.mActive)
         {
-            fn_801A6DC4(pCurrentState);
-            pCurrentState->mUnidentified028 = false;
-            pCurrentState->mUnidentified029 = false;
+            StopMegaBallIndicatorOpacityTween(pCurrentState);
+            pCurrentState->mVisible = false;
+            pCurrentState->mActive = false;
         }
     }
 }

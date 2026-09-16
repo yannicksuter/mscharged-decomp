@@ -15,7 +15,7 @@
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "NL/globalpad.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlColour.h"
@@ -148,7 +148,7 @@ void SHNavigation::Update(float fDeltaT)
             mTransition->m_bVisible = true;
             mTransitionPending = false;
             const char* functionName = gNextFETransition.c_str();
-            Presentation::GetInstance()->Call(functionName);
+            FrontEndPresentation::GetInstance()->Call(functionName);
         }
 
         if (mTransition->GetActiveSlide()->m_time >= 0.6f)

@@ -21,7 +21,7 @@
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/FriendManager.h"
 #include "NL/nlBind.h"
 #include "NL/nlFunction.inl"
@@ -324,7 +324,7 @@ void SHOnlineFriends::OnErrorDismissed()
     mUnidentified2FA8 = false;
     GameSceneManager::Instance()->Pop();
     FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
-    Presentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
+    FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
 }
 
 void SHOnlineFriends::SceneCreated()

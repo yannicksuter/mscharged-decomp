@@ -3,7 +3,7 @@
 #include "NL/gl/glModel.h"
 #include "NL/nlMath.h"
 #include "unclassified/tu_80186524.h"
-#include "unclassified/tu_801A0E64.h"
+#include "Game/Render/HammerObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 u8 lbl_806DCBE8 = 1;
@@ -29,10 +29,10 @@ void DrawableHammer::Grab(const HammerObject* object)
         return;
     }
 
-    mVisible = object->_024;
-    mScale = object->_014;
-    mPosition = *fn_801A1168(object);
-    mOrientation = *fn_801A1298((HammerObject*)object);
+    mVisible = object->mActive;
+    mScale = object->mRadiusScale;
+    mPosition = *object->GetPosition();
+    mOrientation = *((HammerObject*)object)->GetOrientation();
 }
 
 void DrawableHammer::Render(const HammerObject* object) const
@@ -45,7 +45,7 @@ void DrawableHammer::Render(const HammerObject* object) const
         return;
     }
 
-    drawable = object->_02C;
+    drawable = object->mDrawable;
     if (drawable == 0)
     {
         return;

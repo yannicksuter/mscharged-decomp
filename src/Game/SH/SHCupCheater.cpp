@@ -13,7 +13,7 @@
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
 #include "Game/GameSceneManager.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlBind.h"
 #include "NL/nlFunction.inl"
@@ -74,7 +74,7 @@ void CupCheaterScene::UpdateSlides()
 
 void CupCheaterScene::OnSelectGameplay()
 {
-    Presentation::GetInstance()->Call("TransitionCupToChooseSides");
+    FrontEndPresentation::GetInstance()->Call("TransitionCupToChooseSides");
     GameSceneManager::Instance()->Pop();
 }
 

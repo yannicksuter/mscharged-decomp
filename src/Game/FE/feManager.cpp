@@ -38,15 +38,15 @@
 #include "Game/RumbleActions.h"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
-#include "unclassified/tu_80284A58.h"
+#include "Game/Render/Presentation.h"
 #include "Game/InputManager.h"
 #include "Game/OverlayManager.h"
 #include "Game/EventRegistry.h"
 
 extern "C"
 {
-    void RestoreWorldRendering(UnidentifiedPresentationState* presentation);
-    bool DuringEndOfGamePresentation(UnidentifiedPresentationState* presentation);
+    void RestoreWorldRendering(Presentation* presentation);
+    bool DuringEndOfGamePresentation(Presentation* presentation);
     void GoalieOnGameOver();
 
     extern float g_AllActorsHidden;

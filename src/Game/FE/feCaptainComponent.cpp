@@ -24,7 +24,7 @@
 #include "Game/SH/SHStrikerTimesBase.h"
 #include "Game/TweakQuery.h"
 #include "Game/main.h"
-#include "unclassified/tu_80284A58.h"
+#include "Game/Render/Presentation.h"
 #include "NL/nlMath.h"
 #include "NL/nlFunctionMemory.h"
 #include "NL/nlFunction.inl"

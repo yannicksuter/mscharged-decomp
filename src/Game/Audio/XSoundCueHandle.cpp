@@ -1,5 +1,6 @@
 #include "NL/nlDebugString.h"
 #include "Game/Audio/AudioSource.h"
+#include "Game/Audio/AudioSlider.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioResourceLoader.h"
 #include "Game/Audio/AudioSystem.h"
@@ -13,22 +14,12 @@
 #include <NMWException.h>
 
 #include "Game/Audio/XSoundCueHandle.h"
-#include "Game/Audio/SoundInstance_802F1758.h"
+#include "Game/Audio/SoundInstance.h"
 
 static char sCueSelectionMessage[] = "XSoundCueHandle::ctor selecting sound %s from cue %s\n";
 SlotPool<XSoundCueHandle> sSoundCueHandlePool(32, 16);
 
 extern "C" LocalSliderSet_802F1758* fn_802EED88(void*, XSoundCueHandle*);
-extern "C" SliderState_802F1758* fn_802EED38(void*, u32, XSoundCueHandle*);
-extern "C" SoundInstance_802F1758* fn_802F2188(SoundInstance_802F1758*, XSoundCueHandle*, void*);
-extern "C" void fn_802F2320(SoundInstance_802F1758*, float);
-extern "C" void fn_802F2398(SoundInstance_802F1758*);
-extern "C" void fn_802F2594(SoundInstance_802F1758*, bool, float, float);
-extern "C" void fn_802F25D4(SoundInstance_802F1758*, void*);
-extern "C" void fn_802F2640(SoundInstance_802F1758*);
-extern "C" void fn_802F2648(SoundInstance_802F1758*);
-extern "C" void fn_802F2650(SoundInstance_802F1758*, AudioSource**, u32*);
-extern "C" void fn_802F26B0(SoundInstance_802F1758*, float);
 void DumpAudioMemory();
 
 inline AudioVoiceDefinition* XSoundCueHandle::SelectSound()
@@ -66,7 +57,8 @@ XSoundCueHandle::XSoundCueHandle(void* resource, XSoundOwner* owner, unsigned in
 
     if (this->definition->useSlider)
     {
-        this->slider = fn_802EED38(g_pAudioSystem->GetBundleManager()->GetSliderTable(),
+        this->slider = (SliderState_802F1758*)GetAudioSlider(
+            (AudioSliderTable*)g_pAudioSystem->GetBundleManager()->GetSliderTable(),
             this->definition->sliderIndex,
             this);
         this->sliderValue = this->slider->value;
@@ -75,9 +67,8 @@ XSoundCueHandle::XSoundCueHandle(void* resource, XSoundOwner* owner, unsigned in
     AudioVoiceDefinition* selected = SelectSound();
     tDebugPrintManager::Print(DC_SOUND, sCueSelectionMessage, nlLookupDebugString(g_pDebugStringTable, (unsigned long)*(const char**)selected), nlLookupDebugString(g_pDebugStringTable, (unsigned long)this->definition->name));
 
-    SoundInstance_802F1758* instance = lbl_8057FAA8.Allocate();
-    if (instance != 0)
-        instance = fn_802F2188(instance, this, selected);
+    SoundInstance* instance = sSoundInstancePool.Allocate();
+    instance = new (instance) SoundInstance(this, selected);
     this->instance = instance;
     return;
 }
@@ -100,7 +91,7 @@ void GetSoundSources(void* handle, AudioSource** sources, unsigned int* output)
 {
     XSoundCueHandle* cue = (XSoundCueHandle*)handle;
     *output = 0;
-    fn_802F2650(cue->instance, (AudioSource**)sources, (u32*)output);
+    cue->instance->GetSources(sources, output);
 }
 
 bool XSoundCueHandle::Play(bool callbackEnabled)
@@ -116,7 +107,7 @@ bool XSoundCueHandle::Play(bool callbackEnabled)
         bits.playWhenPrepared = true;
         return false;
     case 3:
-        fn_802F2320(this->instance, 0.0f);
+        this->instance->Play(0.0f);
         m_State = this->instance->state;
         return m_State == 4;
     case 4:
@@ -134,7 +125,7 @@ bool XSoundCueHandle::Prepare(bool callbackEnabled)
     if (m_State == 6)
         return false;
     m_CallbackEnabled = callbackEnabled;
-    fn_802F2398(this->instance);
+    this->instance->Prepare();
     m_State = 2;
     return true;
 }
@@ -145,12 +136,12 @@ void XSoundCueHandle::Stop(u8 callbackEnabled, void* value)
     {
     case 7:
         if (value != 0)
-            fn_802F25D4(this->instance, value);
+            this->instance->Stop(value);
         break;
     case 8:
         break;
     default:
-        fn_802F25D4(this->instance, value);
+        this->instance->Stop(value);
         break;
     }
     m_CallbackEnabled = callbackEnabled;
@@ -162,13 +153,13 @@ void XSoundCueHandle::Pause()
 {
     this->bits.savedState = m_State;
     m_State = 5;
-    fn_802F2640(this->instance);
+    this->instance->Pause();
 }
 
 void XSoundCueHandle::Resume()
 {
     m_State = bits.savedState;
-    fn_802F2648(this->instance);
+    this->instance->Resume();
 }
 
 void XSoundCueHandle::Update(float dt)
@@ -185,7 +176,7 @@ void XSoundCueHandle::Update(float dt)
     {
         if (this->definition->useSlider)
             UpdateSlider(dt);
-        fn_802F26B0(this->instance, dt);
+        this->instance->Update(dt);
 
         if (m_State != 9)
         {
@@ -196,7 +187,7 @@ void XSoundCueHandle::Update(float dt)
                     m_State = 3;
                     if (this->bits.playWhenPrepared)
                     {
-                        fn_802F2320(this->instance, 0.0f);
+                        this->instance->Play(0.0f);
                         m_State = this->instance->state;
                     }
                 }
@@ -222,31 +213,30 @@ void XSoundCueHandle::UpdateSlider(float dt)
     this->sliderValue = value;
     if (previousValue != value)
     {
-        SoundInstance_802F1758* newInstance;
+        SoundInstance* newInstance;
         AudioVoiceDefinition* selected = SelectSound();
-        SoundInstance_802F1758* oldInstance = this->instance;
+        SoundInstance* oldInstance = this->instance;
         if (selected != oldInstance->definition)
         {
             if (oldInstance->state == 4)
             {
-                fn_802F2594(oldInstance, false, 0.0f, 0.5f);
-                oldInstance->field_74 = 0.5f;
+                oldInstance->SetVolume(false, 0.0f, 0.5f);
+                oldInstance->releaseTime = 0.5f;
             }
-            newInstance = lbl_8057FAA8.Allocate();
-            if (newInstance != 0)
-                newInstance = fn_802F2188(newInstance, this, selected);
+            newInstance = sSoundInstancePool.Allocate();
+            newInstance = new (newInstance) SoundInstance(this, selected);
             this->instance = newInstance;
-            fn_802F2594(newInstance, false, 1.0f, 0.5f);
+            newInstance->SetVolume(false, 1.0f, 0.5f);
             this->instance->nextInstance = oldInstance;
             m_State = 4;
         }
     }
 
-    SoundInstance_802F1758* previous = this->instance;
-    SoundInstance_802F1758* instance = previous->nextInstance;
+    SoundInstance* previous = this->instance;
+    SoundInstance* instance = previous->nextInstance;
     while (previous != 0 && instance != 0)
     {
-        fn_802F26B0(instance, dt);
+        instance->Update(dt);
         if (instance->state == 8 && instance->nextInstance == 0)
         {
             previous->nextInstance = 0;

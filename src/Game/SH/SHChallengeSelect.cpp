@@ -15,7 +15,7 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlTextInstance.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/SH/SHStrikerTimesBase.h"
 #include "NL/nlBind.h"
 #include "NL/nlFunction.inl"
@@ -251,7 +251,7 @@ void ChallengeSelectScene::Update(float dt)
         else if (mState == 3)
         {
             FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
-            Presentation::GetInstance()->Call("TransitionChallengesToMainMenu");
+            FrontEndPresentation::GetInstance()->Call("TransitionChallengesToMainMenu");
             GameSceneManager::Instance()->Pop();
             return;
         }

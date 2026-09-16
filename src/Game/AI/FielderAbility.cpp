@@ -1,7 +1,7 @@
 #include "Game/Sys/audio.h"
 #include "Game/AI/Fielder.h"
 #include "Game/RumbleActions.h"
-#include "unclassified/tu_8019FE24.h"
+#include "Game/Render/FlyingCamera.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/Physics/PhysicsShockwave.h"
 
@@ -181,7 +181,7 @@ void cFielder::fn_8004FB04()
 
     float fParam = FMAX(lbl_806DB9F4, lbl_806DB9F8);
     fParam += 0.5f;
-    fn_801A0500(lbl_806DBA0C, this, fParam);
+    SetFlyingCameraCount(lbl_806DBA0C, this, fParam);
 }
 
 void cFielder::fn_8004FC90(float fDeltaT)
@@ -256,7 +256,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
     }
     else if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DBA04))
     {
-        fn_801A0C58(0);
+        SetFlyingCameraTarget(0);
 
         UnidentifiedAbilityEvent event;
         event.v3Position = mUnidentified024.m_v3Position;

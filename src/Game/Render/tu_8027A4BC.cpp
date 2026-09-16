@@ -268,10 +268,10 @@ extern "C" void fn_8027AA38(ChargeShadowDrawable_8027A7F0* self)
     {
         GLView* previous = (GLView*)self->m_pWorld->m_pHighRangeTweaks;
         self->m_pWorld->m_pHighRangeTweaks
-            = (HighRangeTweakValues_801A2004*)GetLayerView((eCLV)0xD);
+            = (HighRangeTweaks*)GetLayerView((eCLV)0xD);
         fn_80343C00(self);
         self->m_pWorld->m_pHighRangeTweaks
-            = (HighRangeTweakValues_801A2004*)previous;
+            = (HighRangeTweaks*)previous;
     }
 
     glModel* charged = self->m_pChargeModels[level];

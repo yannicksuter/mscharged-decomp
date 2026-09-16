@@ -124,9 +124,7 @@ public:
     /* 0xC419 */ bool mSaveDataChanged;
     /* 0xC41A */ bool mGameResultReported;
     /* 0xC41B */ bool mDisconnectPending;
-    /* 0xC41C */ int mUnidentifiedC41C;
-    /* 0xC420 */ int mUnidentifiedC420;
-    /* 0xC424 */ int mUnidentifiedC424;
+    /* 0xC41C */ int mUnidentifiedC41C[3];
     /* 0xC428 */ bool mDisconnectLossPending[3];
     /* 0xC42B */ u8 mPaddingC42B;
     /* 0xC42C */ int mCurrentJob;

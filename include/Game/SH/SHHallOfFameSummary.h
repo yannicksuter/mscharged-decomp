@@ -16,6 +16,7 @@ public:
     virtual void SceneCreated();
 
     void UpdateTitle();
+    void UpdateRows();
     void UpdateRow(int index, const char* stringId, bool unlocked);
 
     /* 0x01C */ int mMode;

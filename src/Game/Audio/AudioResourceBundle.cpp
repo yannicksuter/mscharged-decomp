@@ -1,4 +1,5 @@
 #include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioRpc.h"
 #include "Game/Audio/AudioResourceBundle.h"
 #include "Game/Audio/AudioSequenceEvent.h"
 #include "Game/Audio/AudioSystem.h"
@@ -8,29 +9,6 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
-
-struct AudioRpcDefinition
-{
-    u8 pad_00[0x10];
-    u32 enabled;
-    u8 pad_14[0xC];
-    void* runtimeNode;
-};
-
-struct AudioRpcGroup
-{
-    u8 pad_00[0xC];
-    u32 staticDefinitionCount;
-    AudioRpcDefinition* staticDefinitions;
-    u32 dynamicDefinitionCount;
-    u8 pad_18[4];
-};
-
-struct AudioRpcController
-{
-    u32 groupCount;
-    AudioRpcGroup* groups;
-};
 
 struct AudioBundleManagerRpcView
 {
@@ -297,7 +275,7 @@ void InitializeAudioVoiceRpcModifiers(AudioVoiceDefinition* voice)
     if (voice->modifierCount == 0)
         return;
 
-    voice->modifiers = (void**)nlMalloc(
+    voice->modifiers = (AudioRpcRuntimeNode**)nlMalloc(
         voice->modifierCount * sizeof(void*), 8, false);
     u32 outputIndex = 0;
     for (u32 i = 0; i < voice->rpcGroupCount; i++)

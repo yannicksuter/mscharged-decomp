@@ -9,7 +9,7 @@ SlotPool<AudioSequenceInstance> sAudioSequenceInstancePool(32, 16);
  * Address/Size: 0x802F3E20 | size: 0xAC
  */
 AudioSequenceInstance::AudioSequenceInstance(
-    SoundInstance_802F2110* soundInstance, AudioSequenceDefinition* definition)
+    SoundInstance* soundInstance, AudioSequenceDefinition* definition)
 {
     next = 0;
     this->soundInstance = soundInstance;

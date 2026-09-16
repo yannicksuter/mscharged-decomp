@@ -480,7 +480,7 @@ bool NetworkRanking::ReportGameResult(int category,
     return false;
 }
 
-void NetworkRankingIdentity::LoadLocal()
+void NetworkRankingMeta::LoadLocal()
 {
     if (g_pNetworkSessionBase->GetSessionMode() == 1)
     {

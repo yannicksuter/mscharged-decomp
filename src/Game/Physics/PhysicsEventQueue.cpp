@@ -35,7 +35,7 @@
 #include "NL/globalpad.h"
 #include "Game/Physics/PhysicsShockwave.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
-#include "unclassified/tu_801A0E64.h"
+#include "Game/Render/HammerObject.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -236,7 +236,7 @@ extern "C" void fn_80145370(void* object)
 {
     if (__ptmf_test(&lbl_8050F58C))
     {
-        fn_801A1CFC((HammerObject*)object, 0);
+        ((HammerObject*)object)->Reset(false);
     }
 }
 
@@ -535,7 +535,7 @@ extern "C" void HandleCollisionShockwave(CollisionShockwaveData* data)
         ((PhysicsShell*)pObject)->m_pPowerupObject->m_bShouldDestroy = true;
         break;
     case 31:
-        fn_801A1ED0(((PhysicsHammer*)pObject)->mHammer, true);
+        ((PhysicsHammer*)pObject)->mHammer->Deactivate(true);
         break;
     case 29:
         ((PhysicsWaluigiWall*)pObject)->ApplyDamage(0.35f);

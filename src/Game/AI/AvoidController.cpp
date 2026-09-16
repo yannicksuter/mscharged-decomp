@@ -19,7 +19,9 @@ extern "C" AvoidController* fn_8002E144(cFielder*);
 
 static const nlVector2 v2Zero = { 0.0f, 0.0f };
 
+#pragma explicit_zero_data on
 static float sUnidentifiedMemorySeconds = 0.0f;
+#pragma explicit_zero_data off
 static float sUnidentifiedRepulsionValue0 = 0.5f;
 static float sUnidentifiedRepulsionValue1 = 1.0f;
 static float sUnidentifiedInitialValue0 = 0.5f;
@@ -28,6 +30,68 @@ static float sUnidentifiedValue_806DB4F4 = -0.99f;
 static float sUnidentifiedValue_806DB4F8 = 0.01f;
 static unsigned short sAvoidControllerType = 0xFFFF;
 
+class UnidentifiedAvoidanceCallback_8000F7FC
+{
+public:
+    UnidentifiedAvoidanceCallback_8000F7FC(AvoidableObject* pObject, nlList<UnidentifiedAvoidanceValue>& list)
+        : mUnidentified000(pObject), mUnidentified004(list)
+    {
+    }
+    void UnidentifiedCallback(const u32&, UnidentifiedAvoidanceValue*);
+
+    AvoidableObject* mUnidentified000;
+    nlList<UnidentifiedAvoidanceValue>& mUnidentified004;
+};
+
+inline float UnidentifiedAvoidanceValue::UnidentifiedGetWeight() const
+{
+    float fWeight = 1.0f;
+    if (mUnidentified024.m_uPackedTime != 0)
+        fWeight = mUnidentified024.GetSeconds() / 0.3f;
+    return mUnidentified018 * fWeight;
+}
+
+class UnidentifiedAvoidanceCallback_800102A8
+{
+public:
+    UnidentifiedAvoidanceCallback_800102A8(float fDeltaT,
+        nlVector3& accumulated, float& totalWeight,
+        nlVector3* vectors, float* weights, int* counts,
+        nlList<UnidentifiedAvoidanceValue>& list)
+        : mUnidentified000(fDeltaT), mUnidentified004(accumulated),
+          mUnidentified008(totalWeight), mUnidentified00C(vectors),
+          mUnidentified010(weights), mUnidentified014(counts),
+          mUnidentified018(list)
+    {
+    }
+    void UnidentifiedCallback(const u32&, UnidentifiedAvoidanceValue*);
+    float mUnidentified000;
+    nlVector3& mUnidentified004;
+    float& mUnidentified008;
+    nlVector3* mUnidentified00C;
+    float* mUnidentified010;
+    int* mUnidentified014;
+    nlList<UnidentifiedAvoidanceValue>& mUnidentified018;
+};
+
+extern "C" const nlVector3& fn_80040318(cFielder*);
+extern "C" float fn_8002E1B0(cFielder*);
+extern "C" float fn_8002CE14(const PlayerTweaks*);
+bool lbl_806E0BB8;
+
+extern "C" const nlVector3& fn_80040234(cFielder*);
+
+bool lbl_806E0BB9;
+
+extern "C" void fn_802BCE50(
+    const ShapeRender*, const nlVector3&, float, float, float,
+    const nlColour&, bool);
+
+extern "C" float fn_8004028C(cFielder*);
+
+extern "C" float fn_8002C328(const PlayerTweaks*);
+
+extern "C" void fn_8000F178(AvoidController* controller);
 inline UnidentifiedAvoidanceMemory::UnidentifiedAvoidanceMemory()
     : mTimer()
 {
@@ -37,6 +101,114 @@ inline UnidentifiedAvoidanceMemory::UnidentifiedAvoidanceMemory()
 inline UnidentifiedAvoidanceValue::UnidentifiedAvoidanceValue()
 {
     UnidentifiedInitialize(0, 0);
+}
+
+inline void AvoidController::RegisterDebugFields(u16* type, DebugWriteCache* cache)
+{
+    *type = cache->BeginType("AvoidController");
+    cache->AddField(15, gDebugFieldTypes[15].size, 0,
+        "m_pFielder");
+    cache->AddField(8, gDebugFieldTypes[8].size,
+        (u8*)&m_ThingsToAvoid - (u8*)this,
+        "m_ThingsToAvoid");
+    cache->AddField(8, gDebugFieldTypes[8].size,
+        (u8*)&m_CurrentlyAvoiding - (u8*)this,
+        "m_CurrentlyAvoiding");
+    cache->AddField(17, gDebugFieldTypes[17].size,
+        (u8*)&m_fRepulsionMult - (u8*)this,
+        "m_fRepulsionMult");
+    cache->AddField(16, gDebugFieldTypes[16].size,
+        (u8*)&m_VeryCloseToSideline - (u8*)this,
+        "m_VeryCloseToSideline");
+    cache->AddField(16, gDebugFieldTypes[16].size,
+        (u8*)&m_SidelineUnavoidable - (u8*)this,
+        "m_SidelineUnavoidable");
+    cache->AddField(21, gDebugFieldTypes[21].size,
+        (u8*)&m_SidelineNormal - (u8*)this,
+        "m_SidelineNormal");
+    cache->AddField(21, gDebugFieldTypes[21].size,
+        (u8*)&m_SidelineDirection - (u8*)this,
+        "m_SidelineDirection");
+    cache->AddArrayField(22, gDebugFieldTypes[22].size,
+        NUM_AVOIDABLES,
+        (u8*)&m_LastRepulVec - (u8*)this,
+        "m_LastRepulVec[]");
+    cache->EndType();
+}
+
+inline bool AvoidController::UnidentifiedCanAvoid(int things)
+{
+    bool bCanAvoid = false;
+    if ((m_ThingsToAvoid & things) && Incapacitated(m_pFielder) == 0.0f)
+        bCanAvoid = true;
+    bool result = bCanAvoid;
+    switch (things)
+    {
+    case AVOID_FIELDERS:
+    {
+        result = false;
+        bool bCanAvoidFielder = bCanAvoid && !m_pFielder->fn_8003E74C();
+        if (bCanAvoidFielder && !m_pFielder->IsInvincibleChars())
+            result = true;
+        break;
+    }
+    case AVOID_POWERUPS:
+        result = false;
+        if (bCanAvoid && !m_pFielder->UnidentifiedInvinciblePowerups())
+            result = true;
+        break;
+    }
+    return result;
+}
+
+inline void UnidentifiedAvoidanceValue::UnidentifiedInitialize(
+    AvoidableObject* pObject, AvoidableObject* pOther)
+{
+    mUnidentified004 = pObject;
+    mUnidentified008 = pOther;
+    mUnidentified01C.UnidentifiedClear();
+    mUnidentified024.UnidentifiedClear();
+    mUnidentified00C = v3Zero;
+    mUnidentified018 = 0.0f;
+    mUnidentified02C.UnidentifiedReset();
+}
+
+inline void AvoidController::UnidentifiedSetLast(
+    eAvoidableThings things, const nlVector3& v3Repulsion, float fWeight)
+{
+    int index = GetAvoidableIndex(things);
+    m_LastRepulVec[index] = v3Repulsion;
+    mUnidentified094[index] = fWeight;
+}
+
+inline void UnidentifiedAvoidanceContext::UnidentifiedNormalize()
+{
+    mUnidentified00C = nlVec3Length(mUnidentified000);
+    float lengthSquared = nlVec3LengthSquared(mUnidentified000);
+    if (lengthSquared != 0.0f)
+        nlVec3Scale(mUnidentified000, nlRecipSqrt(lengthSquared, true));
+}
+
+static inline f32 ClampRunningWBSpeed(f32 speed, f32 maxSpeed)
+{
+    if (speed <= maxSpeed)
+        return speed;
+    else
+        return maxSpeed;
+}
+
+AvoidController::AvoidController(cFielder* fielder)
+    : mUnidentified174(16, 16)
+{
+    sUnidentifiedRepulsionValue0 = sUnidentifiedInitialValue0;
+    sUnidentifiedRepulsionValue1 = sUnidentifiedInitialValue1;
+    fn_8000F178(this);
+    m_pFielder = fielder;
+}
+
+AvoidController::~AvoidController()
+{
+    mUnidentified174.Clear();
 }
 
 extern "C" void fn_8000F178(AvoidController* controller)
@@ -61,18 +233,22 @@ extern "C" void fn_8000F178(AvoidController* controller)
     controller->mUnidentified198 = 0;
 }
 
-AvoidController::AvoidController(cFielder* fielder)
-    : mUnidentified174(16, 16)
+extern "C" void fn_8000F324(AvoidController* controller,
+    void* context, DebugWriteCache* cache)
 {
-    sUnidentifiedRepulsionValue0 = sUnidentifiedInitialValue0;
-    sUnidentifiedRepulsionValue1 = sUnidentifiedInitialValue1;
-    fn_8000F178(this);
-    m_pFielder = fielder;
-}
+    if (sAvoidControllerType == 0xFFFF)
+    {
+        controller->RegisterDebugFields(&sAvoidControllerType, cache);
+    }
 
-AvoidController::~AvoidController()
-{
-    mUnidentified174.Clear();
+    AvoidController* copy = (AvoidController*)cache->WriteData(sAvoidControllerType, controller, sizeof(AvoidController));
+    if (copy != 0)
+    {
+        *(int*)&copy->m_pFielder = controller->m_pFielder == 0
+            ? -1
+            : controller->m_pFielder->mUnidentified120;
+        cache->ChecksumData(sAvoidControllerType, copy, context);
+    }
 }
 
 void AvoidController::SetThingsToAvoid(int thingsToAvoid)
@@ -94,65 +270,6 @@ extern "C" float fn_8000F558(
 {
     return controller->mUnidentified094[GetAvoidableIndex(things)];
 }
-
-extern "C" void fn_8000F324(AvoidController* controller,
-    void* context, DebugWriteCache* cache)
-{
-    if (sAvoidControllerType == 0xFFFF)
-    {
-        sAvoidControllerType = cache->BeginType("AvoidController");
-        cache->AddField(15, gDebugFieldTypes[15].size, 0,
-            "m_pFielder");
-        cache->AddField(8, gDebugFieldTypes[8].size,
-            (u8*)&controller->m_ThingsToAvoid - (u8*)controller,
-            "m_ThingsToAvoid");
-        cache->AddField(8, gDebugFieldTypes[8].size,
-            (u8*)&controller->m_CurrentlyAvoiding - (u8*)controller,
-            "m_CurrentlyAvoiding");
-        cache->AddField(17, gDebugFieldTypes[17].size,
-            (u8*)&controller->m_fRepulsionMult - (u8*)controller,
-            "m_fRepulsionMult");
-        cache->AddField(16, gDebugFieldTypes[16].size,
-            (u8*)&controller->m_VeryCloseToSideline - (u8*)controller,
-            "m_VeryCloseToSideline");
-        cache->AddField(16, gDebugFieldTypes[16].size,
-            (u8*)&controller->m_SidelineUnavoidable - (u8*)controller,
-            "m_SidelineUnavoidable");
-        cache->AddField(21, gDebugFieldTypes[21].size,
-            (u8*)&controller->m_SidelineNormal - (u8*)controller,
-            "m_SidelineNormal");
-        cache->AddField(21, gDebugFieldTypes[21].size,
-            (u8*)&controller->m_SidelineDirection - (u8*)controller,
-            "m_SidelineDirection");
-        cache->AddArrayField(22, gDebugFieldTypes[22].size,
-            NUM_AVOIDABLES,
-            (u8*)&controller->m_LastRepulVec - (u8*)controller,
-            "m_LastRepulVec[]");
-        cache->EndType();
-    }
-
-    AvoidController* copy = (AvoidController*)cache->WriteData(sAvoidControllerType, controller, sizeof(AvoidController));
-    if (copy != 0)
-    {
-        *(int*)&copy->m_pFielder = controller->m_pFielder == 0
-            ? -1
-            : controller->m_pFielder->mUnidentified120;
-        cache->ChecksumData(sAvoidControllerType, copy, context);
-    }
-}
-
-class UnidentifiedAvoidanceCallback_8000F7FC
-{
-public:
-    UnidentifiedAvoidanceCallback_8000F7FC(AvoidableObject* pObject, nlList<UnidentifiedAvoidanceValue>& list)
-        : mUnidentified000(pObject), mUnidentified004(list)
-    {
-    }
-    void UnidentifiedCallback(const u32&, UnidentifiedAvoidanceValue*);
-
-    AvoidableObject* mUnidentified000;
-    nlList<UnidentifiedAvoidanceValue>& mUnidentified004;
-};
 
 extern "C" void fn_8000F594(AvoidableObject* pObject)
 {
@@ -196,82 +313,6 @@ void UnidentifiedAvoidanceCallback_8000F7FC::UnidentifiedCallback(
         nlListAddEnd(&mUnidentified004.m_pStart, &mUnidentified004.m_pEnd, value);
     }
 }
-
-inline bool AvoidController::UnidentifiedCanAvoid(int things)
-{
-    bool bCanAvoid = false;
-    if ((m_ThingsToAvoid & things) && Incapacitated(m_pFielder) == 0.0f)
-        bCanAvoid = true;
-    bool result = bCanAvoid;
-    switch (things)
-    {
-    case AVOID_FIELDERS:
-    {
-        result = false;
-        bool bCanAvoidFielder = bCanAvoid && !m_pFielder->fn_8003E74C();
-        if (bCanAvoidFielder && !m_pFielder->IsInvincibleChars())
-            result = true;
-        break;
-    }
-    case AVOID_POWERUPS:
-        result = false;
-        if (bCanAvoid && !m_pFielder->UnidentifiedInvinciblePowerups())
-            result = true;
-        break;
-    }
-    return result;
-}
-
-inline void UnidentifiedAvoidanceValue::UnidentifiedInitialize(
-    AvoidableObject* pObject, AvoidableObject* pOther)
-{
-    mUnidentified004 = pObject;
-    mUnidentified008 = pOther;
-    mUnidentified01C.UnidentifiedClear();
-    mUnidentified024.UnidentifiedClear();
-    mUnidentified00C = v3Zero;
-    mUnidentified018 = 0.0f;
-    mUnidentified02C.UnidentifiedReset();
-}
-
-inline float UnidentifiedAvoidanceValue::UnidentifiedGetWeight() const
-{
-    float fWeight = 1.0f;
-    if (mUnidentified024.m_uPackedTime != 0)
-        fWeight = mUnidentified024.GetSeconds() / 0.3f;
-    return mUnidentified018 * fWeight;
-}
-
-inline void AvoidController::UnidentifiedSetLast(
-    eAvoidableThings things, const nlVector3& v3Repulsion, float fWeight)
-{
-    int index = GetAvoidableIndex(things);
-    m_LastRepulVec[index] = v3Repulsion;
-    mUnidentified094[index] = fWeight;
-}
-
-class UnidentifiedAvoidanceCallback_800102A8
-{
-public:
-    UnidentifiedAvoidanceCallback_800102A8(float fDeltaT,
-        nlVector3& accumulated, float& totalWeight,
-        nlVector3* vectors, float* weights, int* counts,
-        nlList<UnidentifiedAvoidanceValue>& list)
-        : mUnidentified000(fDeltaT), mUnidentified004(accumulated),
-          mUnidentified008(totalWeight), mUnidentified00C(vectors),
-          mUnidentified010(weights), mUnidentified014(counts),
-          mUnidentified018(list)
-    {
-    }
-    void UnidentifiedCallback(const u32&, UnidentifiedAvoidanceValue*);
-    float mUnidentified000;
-    nlVector3& mUnidentified004;
-    float& mUnidentified008;
-    nlVector3* mUnidentified00C;
-    float* mUnidentified010;
-    int* mUnidentified014;
-    nlList<UnidentifiedAvoidanceValue>& mUnidentified018;
-};
 
 void AvoidController::Update(float fDeltaT)
 {
@@ -431,11 +472,253 @@ void UnidentifiedAvoidanceCallback_800102A8::UnidentifiedCallback(
     }
 }
 
-extern "C" const nlVector3& fn_80040318(cFielder*);
-extern "C" float fn_8002E1B0(cFielder*);
-extern "C" float fn_8002CE14(const PlayerTweaks*);
-extern "C" float fn_8003C300(cFielder*, float);
-extern bool lbl_806E0BB8;
+bool AvoidController::CalcDesiredVelocityToAvoidSideline(
+    nlVector2& vNewDesiredVelDir,
+    const nlVector2& vCurrentDesiredVelDir,
+    const nlVector2& vCurrentVelDir,
+    const nlVector2& vSidelinePos,
+    const nlVector2& vSidelineNormal)
+{
+    nlVector2 vParallelVelDir;
+    nlColour colour;
+    bool bHitSideline = false;
+
+    float fDotNormalVel = vSidelineNormal.x * vCurrentDesiredVelDir.x
+        + vSidelineNormal.y * vCurrentDesiredVelDir.y;
+
+    nlVector3 pPos = m_pFielder->m_pBall != NULL
+        ? m_pFielder->m_pBall->m_v3Position : m_pFielder->mUnidentified024.m_v3Position;
+    pPos.z = 0.0f;
+    nlVector3 v3SidelinePos = { 0.0f, 0.0f, 0.0f };
+    v3SidelinePos.x = vSidelinePos.x;
+    v3SidelinePos.y = vSidelinePos.y;
+    nlVector3 v3SidelineNormal = { 0.0f, 0.0f, 0.0f };
+    v3SidelineNormal.x = vSidelineNormal.x;
+    v3SidelineNormal.y = vSidelineNormal.y;
+    nlVector2 vUnidentified018;
+    vUnidentified018.x = v3SidelinePos.x - pPos.x;
+    vUnidentified018.y = v3SidelinePos.y - pPos.y;
+    float fDistanceSquared = nlVec2LengthSquared(vUnidentified018);
+    float fDistance = nlSqrt(fDistanceSquared, true);
+
+    fDistance -= m_pFielder->mUnidentified320->GetRadius();
+    float fMaxDistance = sUnidentifiedRepulsionValue0;
+    if (m_CurrentlyAvoiding & AVOID_SIDELINES)
+    {
+        fMaxDistance = sUnidentifiedRepulsionValue1;
+    }
+
+    m_SidelineUnavoidable = false;
+    m_VeryCloseToSideline = false;
+    float fMinDistance = 2.0f * sUnidentifiedRepulsionValue1;
+
+    if (fDistance <= fMinDistance)
+    {
+        m_VeryCloseToSideline = true;
+        m_SidelineNormal = vSidelineNormal;
+        m_SidelineDirection = vNewDesiredVelDir;
+    }
+
+    if (fDistance <= fMaxDistance)
+    {
+        if (fDotNormalVel <= 0.0f)
+        {
+            if (fDotNormalVel > sUnidentifiedValue_806DB4F4)
+            {
+                float fCos, fSin;
+                nlSinCos(&fSin, &fCos, 0x4000);
+
+                vParallelVelDir.x = vSidelineNormal.x * fCos - vSidelineNormal.y * fSin;
+                vParallelVelDir.y = vSidelineNormal.y * fCos + vSidelineNormal.x * fSin;
+
+                if (vParallelVelDir.x * vCurrentDesiredVelDir.x + vParallelVelDir.y * vCurrentDesiredVelDir.y < 0.0f)
+                {
+                    nlVec2Sub(vParallelVelDir,
+                        *(const nlVector2*)&v3Zero, vParallelVelDir);
+                }
+
+                vNewDesiredVelDir = vParallelVelDir;
+            }
+            else
+            {
+                vNewDesiredVelDir = v2Zero;
+                m_SidelineUnavoidable = true;
+            }
+            bHitSideline = true;
+            if (lbl_806E0BB9)
+            {
+                nlVector3 vUnidentified034;
+                nlVector3 vUnidentified028;
+                nlVec3Set(vUnidentified034,
+                    vSidelinePos.x, vSidelinePos.y, 0.0f);
+                nlVec3Set(vUnidentified028,
+                    vSidelinePos.x + vSidelineNormal.x,
+                    vSidelinePos.y + vSidelineNormal.y, 0.0f);
+                nlColourSet(colour, 255, 0, 0, 255);
+                fn_802BCE50(&g_ShapeRenderer, vUnidentified034,
+                    0.2f, 1.0f, 1.0f, colour, true);
+                nlColourSet(colour, 0, 0, 255, 255);
+                g_ShapeRenderer.DrawLine3D(vUnidentified034, vUnidentified028, colour, true);
+            }
+        }
+    }
+
+    return bHitSideline;
+}
+
+bool AvoidController::CalcDesiredVelocityToAvoidCorner(
+    nlVector2& vNewDesiredVelDir,
+    const sCornerSegment& corner,
+    const nlVector2& vCurrentDesiredVelDir,
+    const nlVector2& vCurrentVelDir)
+{
+    bool bHitSideline = false;
+    nlVector2 vSidelinePos;
+    nlVector2 vSidelineNormal;
+    nlVector2 vPosition = *(nlVector2*)&m_pFielder->mUnidentified024.m_v3Position;
+    nlVector2 vBallPosition;
+
+    if (m_pFielder->m_pBall != NULL)
+    {
+        vBallPosition = *(nlVector2*)&m_pFielder->m_pBall->m_v3Position;
+    }
+    else
+    {
+        vBallPosition = vPosition;
+    }
+
+    nlVector2 vUnidentified018;
+    nlVector2 vUnidentified010;
+    nlVector2 vUnidentified008;
+    nlVec2Sub(vUnidentified008, corner.vCenter, vBallPosition);
+    if (nlVec2Length(vUnidentified008) <= corner.fRadius)
+    {
+        nlVec2Sub(vUnidentified018, vBallPosition, corner.vCenter);
+
+        f32 fAngle = 10430.378f * nlATan2f(vUnidentified018.y, vUnidentified018.x);
+        u32 aCornerToPos = (u16)(s32)fAngle;
+
+        u16 absEnd = (u16)abs_s16((s16)(aCornerToPos - corner.thetaEnd));
+
+        u16 absStart = (u16)abs_s16((s16)(aCornerToPos - corner.thetaStart));
+
+        if (absStart >= absEnd)
+            absEnd = absStart;
+        if ((s16)absEnd <= 0x4000)
+        {
+            nlVec2Sub(vUnidentified010, vPosition, corner.vCenter);
+
+            f32 fAngle2 = 10430.378f * nlATan2f(vUnidentified010.y, vUnidentified010.x);
+            u32 aCornerToFielder = (u16)(s32)fAngle2;
+
+            u16 absEnd2 = (u16)abs_s16((s16)(aCornerToFielder - corner.thetaEnd));
+
+            u16 absStart2 = (u16)abs_s16((s16)(aCornerToFielder - corner.thetaStart));
+
+            if (absStart2 >= absEnd2)
+                absEnd2 = absStart2;
+            if ((s16)absEnd2 <= 0x4000)
+            {
+                float fInvDistance = nlRecipSqrt(nlVec2DotProduct(vUnidentified010, vUnidentified010), true);
+                nlVec2Set(vUnidentified010, fInvDistance * vUnidentified010.x, fInvDistance * vUnidentified010.y);
+                nlVec2Sub(vSidelineNormal, v2Zero, vUnidentified010);
+                float fRadius = corner.fRadius;
+                nlVec2Set(vSidelinePos, fRadius * vUnidentified010.x + corner.vCenter.x, fRadius * vUnidentified010.y + corner.vCenter.y);
+                bHitSideline = CalcDesiredVelocityToAvoidSideline(vNewDesiredVelDir, vCurrentDesiredVelDir, vCurrentVelDir, vSidelinePos, vSidelineNormal);
+            }
+
+        }
+    }
+    return bHitSideline;
+}
+
+bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
+{
+    bool bHitSideline;
+    bool bTurboAllowed;
+    nlVector2 vCurrentVelDir;
+    nlVector2 vCurrentDesiredVelDir;
+    nlVector2 vNewDesiredVelDir;
+    sCornerSegment corner;
+
+    mUnidentified028 = v3Zero;
+    if (fn_8004028C(m_pFielder) <= 0.25f)
+        return false;
+    bTurboAllowed = true;
+    nlSinCos(&vCurrentVelDir.y, &vCurrentVelDir.x, m_pFielder->mUnidentified024.m_aActualMovementDirection);
+    vCurrentDesiredVelDir = *(const nlVector2*)&fn_80040318(m_pFielder);
+    float fLengthSquared = vCurrentDesiredVelDir.x * vCurrentDesiredVelDir.x + vCurrentDesiredVelDir.y * vCurrentDesiredVelDir.y;
+    if (fLengthSquared > 0.0f)
+    {
+        float fInvLength = nlRecipSqrt(fLengthSquared, true);
+        nlVec2Set(vCurrentDesiredVelDir, fInvLength * vCurrentDesiredVelDir.x, fInvLength * vCurrentDesiredVelDir.y);
+    }
+    else
+        nlPolarToCartesian(vCurrentDesiredVelDir.x, vCurrentDesiredVelDir.y, m_pFielder->mUnidentified024.m_aDesiredMovementDirection, 1.0f);
+    vNewDesiredVelDir = vCurrentDesiredVelDir;
+    {
+        u8* pBase = (u8*)cField::mCorners;
+        int i = 0;
+        for (; i < 4; i++)
+        {
+            u32* pSrc = (u32*)(pBase + i * sizeof(sCornerSegment));
+            ((u32*)&corner)[0] = pSrc[0];
+            ((u32*)&corner)[1] = pSrc[1];
+            ((u32*)&corner)[2] = pSrc[2];
+            ((u32*)&corner)[3] = pSrc[3];
+            bHitSideline = CalcDesiredVelocityToAvoidCorner(vNewDesiredVelDir, corner, vCurrentDesiredVelDir, vCurrentVelDir);
+            if (bHitSideline)
+                break;
+        }
+    }
+    if (!bHitSideline)
+    {
+        u8* pBase = (u8*)cField::mSidelines;
+        int i = 0;
+        for (; i < 4; i++)
+        {
+            sSideLinePlane* pSide = (sSideLinePlane*)(pBase + i * sizeof(sSideLinePlane));
+            nlVector2 vSidelineNormal;
+            nlVector2 vSidelinePos = *(nlVector2*)&m_pFielder->mUnidentified024.m_v3Position;
+            float normY = v2Zero.y - pSide->vNormal.y;
+            vSidelineNormal.x = v2Zero.x - pSide->vNormal.x;
+            vSidelineNormal.y = normY;
+            if (vSidelineNormal.x == 0.0f)
+                vSidelinePos.y = pSide->fDistance * pSide->vNormal.y;
+            else
+                vSidelinePos.x = pSide->fDistance * pSide->vNormal.x;
+            bHitSideline = CalcDesiredVelocityToAvoidSideline(vNewDesiredVelDir, vCurrentDesiredVelDir, vCurrentVelDir, vSidelinePos, vSidelineNormal);
+            if (bHitSideline)
+                break;
+        }
+    }
+    if (bHitSideline)
+    {
+        bool isZero = nlNear(v2Zero.x, vNewDesiredVelDir.x) && nlNear(v2Zero.y, vNewDesiredVelDir.y);
+        if (isZero)
+            bTurboAllowed = false;
+        else
+        {
+            float fDot = nlVec2DotProduct(vNewDesiredVelDir, vCurrentVelDir);
+            if (fDot < 0.99f)
+                bTurboAllowed = false;
+            u16 aDesiredMovementDir = nlVector3ToAngle(
+                *(const nlVector3*)&vNewDesiredVelDir);
+            m_pFielder->fn_8001DCE0(aDesiredMovementDir);
+            m_pFielder->Unknown8(aDesiredMovementDir, false);
+        }
+    }
+    if (!bTurboAllowed && m_pFielder->IsRunning() && m_pFielder->m_pBall != NULL)
+    {
+        f32 fDesiredSpeed = ClampRunningWBSpeed(m_pFielder->mUnidentified024.m_fDesiredSpeed, fn_8002C328(m_pFielder->GetTweaks()));
+        u16 aDesiredMovementDir = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
+        m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
+        m_pFielder->fn_8001DCE0(aDesiredMovementDir);
+        m_pFielder->Unknown8(aDesiredMovementDir, false);
+    }
+    v3OutRepulsion = mUnidentified028;
+    return bHitSideline;
+}
 
 void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
 {
@@ -444,13 +727,13 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
         return;
 
     nlVector3 v3RepulsionDir;
-    float fInvRepulsionMag = nlRecipSqrt(nlVec3LengthSquared(v3Repulsion), true);
-    nlVec3Scale(v3RepulsionDir, v3Repulsion, fInvRepulsionMag);
+    nlVector3& rRepulsionDir = v3RepulsionDir;
+    nlVec3Normalize(rRepulsionDir, v3Repulsion);
 
     if (m_VeryCloseToSideline)
     {
-        float fDotNormalVel = v3RepulsionDir.x * m_SidelineNormal.x
-            + v3RepulsionDir.y * m_SidelineNormal.y;
+        float fDotNormalVel = rRepulsionDir.x * m_SidelineNormal.x
+            + rRepulsionDir.y * m_SidelineNormal.y;
         if (fDotNormalVel < -0.1f)
         {
             if (nlVec2DotProduct(m_SidelineDirection, m_SidelineDirection) > 0.0f)
@@ -458,21 +741,21 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
                 nlVector3 vUnidentified030;
                 nlVector3 vUnidentified024;
                 nlVector3 vUnidentified018;
-                nlVec3Set(vUnidentified018, m_SidelineDirection.x, m_SidelineDirection.y, 0.0f);
-                float fDot = nlVec3DotProduct(v3RepulsionDir, vUnidentified018);
-                float fLengthSquared = nlVec3LengthSquared(vUnidentified018);
-                float fScale = fDot / fLengthSquared;
-                nlVec3Scale(vUnidentified030, vUnidentified018, fScale);
-                nlVec3Sub(vUnidentified024, v3RepulsionDir, vUnidentified030);
-                nlVec3ScaleAdd(v3RepulsionDir, -1.0f, vUnidentified024, vUnidentified030);
-                v3RepulsionDir.z = 0.0f;
-                nlVec3Scale(v3Repulsion, v3RepulsionDir, fRepulsionMag);
+                nlVec3Set(vUnidentified018,
+                    m_SidelineDirection.x, m_SidelineDirection.y, 0.0f);
+                nlVec3Project(vUnidentified030,
+                    rRepulsionDir, vUnidentified018);
+                nlVec3Sub(vUnidentified024, rRepulsionDir, vUnidentified030);
+                nlVec3ScaleAdd(rRepulsionDir, -1.0f, vUnidentified024, vUnidentified030);
+                rRepulsionDir.z = 0.0f;
+                nlVec3Scale(v3Repulsion, rRepulsionDir, fRepulsionMag);
             }
             else
             {
-                nlVec2Set(*(nlVector2*)&v3Repulsion,
-                    fRepulsionMag * m_SidelineNormal.x,
-                    fRepulsionMag * m_SidelineNormal.y);
+                float fScaledNormalY = fRepulsionMag * m_SidelineNormal.y;
+                float fScaledNormalX = fRepulsionMag * m_SidelineNormal.x;
+                v3Repulsion.y = fScaledNormalY;
+                v3Repulsion.x = fScaledNormalX;
             }
         }
     }
@@ -490,13 +773,13 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
     float fDesiredSpeed = fn_8002E1B0(m_pFielder);
     float fResultantMag = nlVec3Length(v3Repulsion);
     fDesiredSpeed = fResultantMag <= fDesiredSpeed ? fResultantMag : fDesiredSpeed;
-    float fUnidentifiedSpeed = fn_8003C300(m_pFielder, fn_8002CE14(m_pFielder->GetTweaks()));
+    float fUnidentifiedSpeed = m_pFielder->GetSpeedPowerupAdjusted(fn_8002CE14(m_pFielder->GetTweaks()));
     if (fDesiredSpeed >= 0.35f * fUnidentifiedSpeed)
     {
         fDesiredSpeed = fDesiredSpeed >= fUnidentifiedSpeed ? fDesiredSpeed : fUnidentifiedSpeed;
         m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
-        m_pFielder->fn_8001DCE0((u16)(s32)(10430.378f * nlATan2f(v3Repulsion.y, v3Repulsion.x)));
-        m_pFielder->Unknown8((u16)(s32)(10430.378f * nlATan2f(v3Repulsion.y, v3Repulsion.x)), false);
+        m_pFielder->fn_8001DCE0(nlVector3ToAngle(v3Repulsion));
+        m_pFielder->Unknown8(nlVector3ToAngle(v3Repulsion), false);
     }
     else
         m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
@@ -594,7 +877,8 @@ void UnidentifiedAvoidanceValue::UnidentifiedPrepareContext(
     context.mUnidentified01C = GetClosingSpeed2D(
         context.mUnidentified020, fn_80040318(pFielder),
         context.mUnidentified02C, mUnidentified008->GetVelocity());
-    context.mUnidentified01C = nlMaxEquals(0.0f, context.mUnidentified01C);
+    float fClosingSpeed = context.mUnidentified01C;
+    context.mUnidentified01C = nlMaxEquals(0.0f, fClosingSpeed);
     context.mUnidentified050 = nlVec2Length(*(const nlVector2*)&fn_80040318(pFielder));
     if (context.mUnidentified050 > 0.1f)
         nlVec3Scale(context.mUnidentified054, fn_80040318(pFielder), 1.0f / context.mUnidentified050);
@@ -610,16 +894,6 @@ void UnidentifiedAvoidanceValue::UnidentifiedPrepareContext(
     }
 }
 
-extern "C" const nlVector3& fn_80040234(cFielder*);
-
-inline void UnidentifiedAvoidanceContext::UnidentifiedNormalize()
-{
-    mUnidentified00C = nlVec3Length(mUnidentified000);
-    float lengthSquared = nlVec3LengthSquared(mUnidentified000);
-    if (lengthSquared != 0.0f)
-        nlVec3Scale(mUnidentified000, nlRecipSqrt(lengthSquared, true));
-}
-
 bool UnidentifiedAvoidanceValue::UnidentifiedMovingResponse(
     UnidentifiedAvoidanceContext& context, float fDeltaT)
 {
@@ -633,13 +907,14 @@ bool UnidentifiedAvoidanceValue::UnidentifiedMovingResponse(
         return UnidentifiedResponse_800127E0(!bUnidentifiedCollision, context, fDeltaT);
     if (bUnidentifiedCollision)
     {
-        float fDot = -nlVec3DotProduct(context.mUnidentified044, context.mUnidentified054);
+        const nlVector3& v3Normal = context.mUnidentified044;
+        float fDot = -context.UnidentifiedGetAlignment();
         context.mUnidentified014 = 2;
-        nlVec3Scale(context.mUnidentified000, context.mUnidentified044, context.mUnidentified01C);
+        nlVec3Scale(context.mUnidentified000, v3Normal, context.mUnidentified01C);
         if (!(fDot >= 0.7f))
         {
             nlVector3 v3Repulsion;
-            UnidentifiedTurn(v3Repulsion, context.mUnidentified054, context.mUnidentified044, false);
+            UnidentifiedTurn(v3Repulsion, context.mUnidentified054, v3Normal, false);
             nlVec3ScaleAdd(context.mUnidentified000, context.mUnidentified050, v3Repulsion, context.mUnidentified000);
         }
         context.UnidentifiedNormalize();
@@ -703,13 +978,14 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800123D8(
         return UnidentifiedResponse_800127E0(1, context, fDeltaT);
     if (bUnidentifiedCollision)
     {
-        float fDot = -nlVec3DotProduct(context.mUnidentified044, context.mUnidentified054);
+        const nlVector3& v3Normal = context.mUnidentified044;
+        float fDot = -context.UnidentifiedGetAlignment();
         context.mUnidentified014 = 2;
-        nlVec3Scale(context.mUnidentified000, context.mUnidentified044, context.mUnidentified01C);
+        nlVec3Scale(context.mUnidentified000, v3Normal, context.mUnidentified01C);
         if (fDot >= 0.0f)
         {
             nlVector3 v3Repulsion;
-            UnidentifiedTurn(v3Repulsion, context.mUnidentified054, context.mUnidentified044, false);
+            UnidentifiedTurn(v3Repulsion, context.mUnidentified054, v3Normal, false);
             nlVec3ScaleAdd(context.mUnidentified000, context.mUnidentified050, v3Repulsion, context.mUnidentified000);
         }
         context.UnidentifiedNormalize();
@@ -799,244 +1075,4 @@ void UnidentifiedAvoidanceValue::UnidentifiedTurn(
         output.y = y * fCos + x * fSin;
     }
     output.z = 0.0f;
-}
-
-extern bool lbl_806E0BB9;
-
-extern "C" void fn_802BCE50(const ShapeRender*, const nlVector3&, const nlColour&, bool, float, float, float);
-
-bool AvoidController::CalcDesiredVelocityToAvoidSideline(
-    nlVector2& vNewDesiredVelDir,
-    const nlVector2& vCurrentDesiredVelDir,
-    const nlVector2& vCurrentVelDir,
-    const nlVector2& vSidelinePos,
-    const nlVector2& vSidelineNormal)
-{
-    bool bHitSideline = false;
-
-    float fDotNormalVel = vSidelineNormal.x * vCurrentDesiredVelDir.x + vSidelineNormal.y * vCurrentDesiredVelDir.y;
-
-    nlVector3 pPos = m_pFielder->m_pBall != NULL
-        ? m_pFielder->m_pBall->m_v3Position : m_pFielder->mUnidentified024.m_v3Position;
-    pPos.z = 0.0f;
-    nlVector2 vUnidentified018;
-    nlVec2Sub(vUnidentified018, vSidelinePos, *(nlVector2*)&pPos);
-    float fDistance = nlVec2Length(vUnidentified018);
-
-    fDistance -= m_pFielder->mUnidentified320->GetRadius();
-    float fMaxDistance = sUnidentifiedRepulsionValue0;
-    if (m_CurrentlyAvoiding & AVOID_SIDELINES)
-    {
-        fMaxDistance = sUnidentifiedRepulsionValue1;
-    }
-
-    float fMinDistance = 2.0f * sUnidentifiedRepulsionValue1;
-    m_SidelineUnavoidable = false;
-    m_VeryCloseToSideline = false;
-
-    if (fDistance <= fMinDistance)
-    {
-        m_VeryCloseToSideline = true;
-        m_SidelineNormal = vSidelineNormal;
-        m_SidelineDirection = vNewDesiredVelDir;
-    }
-
-    if (fDistance <= fMaxDistance)
-    {
-        if (fDotNormalVel <= 0.0f)
-        {
-            if (fDotNormalVel > sUnidentifiedValue_806DB4F4)
-            {
-                float fCos, fSin;
-                nlSinCos(&fSin, &fCos, 0x4000);
-
-                nlVector2 vParallelVelDir;
-                vParallelVelDir.x = vSidelineNormal.x * fCos - vSidelineNormal.y * fSin;
-                vParallelVelDir.y = vSidelineNormal.y * fCos + vSidelineNormal.x * fSin;
-
-                if (vParallelVelDir.x * vCurrentDesiredVelDir.x + vParallelVelDir.y * vCurrentDesiredVelDir.y < 0.0f)
-                {
-                    vParallelVelDir.y = v3Zero.y - vParallelVelDir.y;
-                    vParallelVelDir.x = v3Zero.x - vParallelVelDir.x;
-                }
-
-                vNewDesiredVelDir = vParallelVelDir;
-            }
-            else
-            {
-                vNewDesiredVelDir = v2Zero;
-                m_SidelineUnavoidable = true;
-            }
-            bHitSideline = true;
-            if (lbl_806E0BB9)
-            {
-                nlVector3 vUnidentified034;
-                nlVector3 vUnidentified028;
-                nlVec3Set(vUnidentified034, vSidelinePos.x, vSidelinePos.y, 0.0f);
-                nlVec3Set(vUnidentified028, vSidelinePos.x + vSidelineNormal.x,
-                    vSidelinePos.y + vSidelineNormal.y, 0.0f);
-                nlColour colour;
-                nlColourSet(colour, 255, 0, 0, 255);
-                fn_802BCE50(&g_ShapeRenderer, vUnidentified034, colour, true, 0.2f, 1.0f, 1.0f);
-                nlColourSet(colour, 0, 0, 255, 255);
-                g_ShapeRenderer.DrawLine3D(vUnidentified034, vUnidentified028, colour, true);
-            }
-        }
-    }
-
-    return bHitSideline;
-}
-
-bool AvoidController::CalcDesiredVelocityToAvoidCorner(
-    nlVector2& vNewDesiredVelDir,
-    const sCornerSegment& corner,
-    const nlVector2& vCurrentDesiredVelDir,
-    const nlVector2& vCurrentVelDir)
-{
-    bool bHitSideline = false;
-    nlVector2 vSidelinePos;
-    nlVector2 vSidelineNormal;
-    nlVector2 vPosition = *(nlVector2*)&m_pFielder->mUnidentified024.m_v3Position;
-    nlVector2 vBallPosition;
-
-    if (m_pFielder->m_pBall != NULL)
-    {
-        vBallPosition = *(nlVector2*)&m_pFielder->m_pBall->m_v3Position;
-    }
-    else
-    {
-        vBallPosition = vPosition;
-    }
-
-    nlVector2 vUnidentified018;
-    nlVector2 vUnidentified010;
-    nlVector2 vUnidentified008;
-    nlVec2Sub(vUnidentified008, corner.vCenter, vBallPosition);
-    if (nlVec2Length(vUnidentified008) <= corner.fRadius)
-    {
-        nlVec2Sub(vUnidentified018, vBallPosition, corner.vCenter);
-
-        f32 fAngle = 10430.378f * nlATan2f(vUnidentified018.y, vUnidentified018.x);
-        u32 aCornerToPos = (u16)(s32)fAngle;
-
-        u16 absEnd = (u16)abs_s16((s16)(aCornerToPos - corner.thetaEnd));
-
-        u16 absStart = (u16)abs_s16((s16)(aCornerToPos - corner.thetaStart));
-
-        if (absStart >= absEnd)
-            absEnd = absStart;
-        if ((s16)absEnd <= 0x4000)
-        {
-            nlVec2Sub(vUnidentified010, vPosition, corner.vCenter);
-
-            f32 fAngle2 = 10430.378f * nlATan2f(vUnidentified010.y, vUnidentified010.x);
-            u32 aCornerToFielder = (u16)(s32)fAngle2;
-
-            u16 absEnd2 = (u16)abs_s16((s16)(aCornerToFielder - corner.thetaEnd));
-
-            u16 absStart2 = (u16)abs_s16((s16)(aCornerToFielder - corner.thetaStart));
-
-            if (absStart2 >= absEnd2)
-                absEnd2 = absStart2;
-            if ((s16)absEnd2 <= 0x4000)
-            {
-                float fInvDistance = nlRecipSqrt(nlVec2DotProduct(vUnidentified010, vUnidentified010), true);
-                nlVec2Set(vUnidentified010, fInvDistance * vUnidentified010.x, fInvDistance * vUnidentified010.y);
-                nlVec2Sub(vSidelineNormal, v2Zero, vUnidentified010);
-                float fRadius = corner.fRadius;
-                nlVec2Set(vSidelinePos, fRadius * vUnidentified010.x + corner.vCenter.x, fRadius * vUnidentified010.y + corner.vCenter.y);
-                bHitSideline = CalcDesiredVelocityToAvoidSideline(vNewDesiredVelDir, vCurrentDesiredVelDir, vCurrentVelDir, vSidelinePos, vSidelineNormal);
-            }
-
-        }
-    }
-    return bHitSideline;
-}
-
-extern "C" float fn_8004028C(cFielder*);
-
-extern "C" float fn_8002C328(const PlayerTweaks*);
-
-bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
-{
-    bool bHitSideline;
-    bool bTurboAllowed;
-    nlVector2 vCurrentVelDir;
-    nlVector2 vCurrentDesiredVelDir;
-    nlVector2 vNewDesiredVelDir;
-    sCornerSegment corner;
-
-    mUnidentified028 = v3Zero;
-    if (fn_8004028C(m_pFielder) <= 0.25f)
-        return false;
-    bTurboAllowed = true;
-    nlSinCos(&vCurrentVelDir.y, &vCurrentVelDir.x, m_pFielder->mUnidentified024.m_aActualMovementDirection);
-    vCurrentDesiredVelDir = *(const nlVector2*)&fn_80040318(m_pFielder);
-    float fLengthSquared = vCurrentDesiredVelDir.x * vCurrentDesiredVelDir.x + vCurrentDesiredVelDir.y * vCurrentDesiredVelDir.y;
-    if (fLengthSquared > 0.0f)
-    {
-        float fInvLength = nlRecipSqrt(fLengthSquared, true);
-        nlVec2Set(vCurrentDesiredVelDir, fInvLength * vCurrentDesiredVelDir.x, fInvLength * vCurrentDesiredVelDir.y);
-    }
-    else
-        nlPolarToCartesian(vCurrentDesiredVelDir.x, vCurrentDesiredVelDir.y, m_pFielder->mUnidentified024.m_aDesiredMovementDirection, 1.0f);
-    vNewDesiredVelDir = vCurrentDesiredVelDir;
-    for (int i = 0; i < 4; ++i)
-    {
-        const u32* pSrc = (const u32*)&cField::GetCorner(i);
-        ((u32*)&corner)[0] = pSrc[0];
-        ((u32*)&corner)[1] = pSrc[1];
-        ((u32*)&corner)[2] = pSrc[2];
-        ((u32*)&corner)[3] = pSrc[3];
-        bHitSideline = CalcDesiredVelocityToAvoidCorner(vNewDesiredVelDir, corner, vCurrentDesiredVelDir, vCurrentVelDir);
-        if (bHitSideline)
-            break;
-    }
-    if (!bHitSideline)
-    {
-        for (int i = 0; i < 4; ++i)
-        {
-            const sSideLinePlane* pSide = &cField::GetSideline(i);
-            nlVector2 vSidelineNormal;
-            nlVector2 vSidelinePos = *(nlVector2*)&m_pFielder->mUnidentified024.m_v3Position;
-            float normY = v2Zero.y - pSide->vNormal.y;
-            vSidelineNormal.x = v2Zero.x - pSide->vNormal.x;
-            vSidelineNormal.y = normY;
-            if (vSidelineNormal.x == 0.0f)
-                vSidelinePos.y = pSide->fDistance * pSide->vNormal.y;
-            else
-                vSidelinePos.x = pSide->fDistance * pSide->vNormal.x;
-            bHitSideline = CalcDesiredVelocityToAvoidSideline(vNewDesiredVelDir, vCurrentDesiredVelDir, vCurrentVelDir, vSidelinePos, vSidelineNormal);
-            if (bHitSideline)
-                break;
-        }
-    }
-    if (bHitSideline)
-    {
-        bool isZero = false;
-        if (nlNear(v2Zero.x, vNewDesiredVelDir.x))
-            if (nlNear(v2Zero.y, vNewDesiredVelDir.y))
-                isZero = true;
-        if (isZero)
-            bTurboAllowed = false;
-        else
-        {
-            float fDot = nlVec2DotProduct(vNewDesiredVelDir, vCurrentVelDir);
-            if (fDot < 0.99f)
-                bTurboAllowed = false;
-            u16 aDesiredMovementDir = (u16)(s32)(10430.378f * nlATan2f(vNewDesiredVelDir.y, vNewDesiredVelDir.x));
-            m_pFielder->fn_8001DCE0(aDesiredMovementDir);
-            m_pFielder->Unknown8(aDesiredMovementDir, false);
-        }
-    }
-    if (!bTurboAllowed && m_pFielder->IsRunning() && m_pFielder->m_pBall != NULL)
-    {
-        f32 fDesiredSpeed = nlMinEquals(m_pFielder->mUnidentified024.m_fDesiredSpeed, fn_8002C328(m_pFielder->GetTweaks()));
-        u16 aDesiredMovementDir = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
-        m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
-        m_pFielder->fn_8001DCE0(aDesiredMovementDir);
-        m_pFielder->Unknown8(aDesiredMovementDir, false);
-    }
-    v3OutRepulsion = mUnidentified028;
-    return bHitSideline;
 }

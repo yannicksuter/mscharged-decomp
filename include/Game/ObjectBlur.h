@@ -1,7 +1,9 @@
 #ifndef GAME_OBJECT_BLUR_H
 #define GAME_OBJECT_BLUR_H
 
+#include "NL/nlDLRing.h"
 #include "NL/nlMath.h"
+#include "NL/nlSlotPool.h"
 
 struct BlurPointEntry
 {
@@ -12,9 +14,24 @@ struct BlurPointEntry
 class BlurHandler
 {
 public:
+    ~BlurHandler()
+    {
+        delete[] m_pointRingBuffer;
+    }
+
+    void operator delete(void* p)
+    {
+        ((BlurHandler*)p)->m_next
+            = (BlurHandler*)m_BlurHandlerSlotPool.m_FreeList;
+        m_BlurHandlerSlotPool.m_FreeList = (SlotPoolEntry*)p;
+    }
+
+    void RenderMesh(unsigned long uTexID);
     void Die(float timeToDie);
     void AddViewOrientedPoint(const nlVector3& position, const nlVector3& forwardVector);
     bool ConstructViewOrientedPoints(nlVector3& topPoint, nlVector3& bottomPoint, nlVector3 position, const nlVector3& forwardVector);
+
+    static SlotPool<BlurHandler> m_BlurHandlerSlotPool;
 
     /* 0x00 */ BlurHandler* m_next;
     /* 0x04 */ BlurHandler* m_prev;
@@ -37,11 +54,14 @@ public:
 class BlurManager
 {
 public:
+    static void Shutdown();
     static void Update(float fDeltaT);
     static void DestroyHandler(
         BlurHandler* handler, float timeToDie);
     static BlurHandler* GetNewHandler(
         const char* szTextureName, float fLineWidth, int maxPositionEntries, bool bAdditive);
+
+    static BlurHandler* m_activeBlurHandler;
 };
 
 #endif // GAME_OBJECT_BLUR_H

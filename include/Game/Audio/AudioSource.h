@@ -135,11 +135,23 @@ struct AudioReadQueueEntry
 
 struct AudioStreamHeader
 {
-    unsigned int m_Unknown00;
-    unsigned int m_Unknown04;
-    unsigned int m_Unknown08;
-    unsigned char m_Unknown0C[0x10];
-    AXPBADPCM m_Unknown1C;
+    unsigned long num_samples;
+    unsigned long num_adpcm_nibbles;
+    unsigned long sample_rate;
+    unsigned short loop_flag;
+    unsigned short format;
+    unsigned long sa;
+    unsigned long ea;
+    unsigned long ca;
+    unsigned short coef[16];
+    unsigned short gain;
+    unsigned short ps;
+    unsigned short yn1;
+    unsigned short yn2;
+    unsigned short lps;
+    unsigned short lyn1;
+    unsigned short lyn2;
+    unsigned short pad[11];
 };
 
 struct AudioStreamChannel
@@ -187,7 +199,7 @@ public:
     /* 0x1C */ unsigned int m_Unknown1C;
     /* 0x20 */ signed int m_Unknown20_00 : 7;
     unsigned int m_Unknown20_07 : 24;
-    unsigned int m_Unknown20_1F : 1;
+    bool m_Unknown20_1F : 1;
     /* 0x24 */ AudioReadQueueEntry* m_Unknown24;
     /* 0x28 */ int m_Unknown28;
 };

@@ -32,6 +32,15 @@
 
 const char* sConnectionDecisionComponentNames[2] = { "ACCEPT", "REJECT" };
 
+static inline void UpdateConnectionQualityTimerText(
+    OnlineConnectionQualityScene* scene, TLTextInstance* timer)
+{
+    typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
+    timer->SetString(nlStrNCpy(scene->mUnidentified044,
+        Format(WideBasicString(LookupLocString("ONLINE_CONNECTION_QUALITY_TIME")),
+            scene->mUnidentified180).c_str(), 128));
+}
+
 OnlineConnectionQualityScene::OnlineConnectionQualityScene()
     : mUnidentified030(false)
     , mUnidentified031(false)
@@ -217,16 +226,13 @@ void OnlineConnectionQualityScene::SceneCreated()
         mUnidentified2F4[i] = component;
     }
 
-    FEFinder<TLComponentInstance, 4>::Find(mPresentation->m_currentSlide, "Layer", "QUALITY");
+    FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "QUALITY");
 
     TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "WAITING");
     component->m_bVisible = false;
 
     TLTextInstance* timer = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide, "Layer", "TIMER");
-    typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-    timer->SetString(nlStrNCpy(mUnidentified044,
-        Format(WideBasicString(LookupLocString("ONLINE_CONNECTION_QUALITY_TIME")),
-            mUnidentified180).c_str(), 128));
+    UpdateConnectionQualityTimerText(this, timer);
 
     UpdateConnectionQuality();
     SHNavigation* scene = GetNavigationScene();
@@ -236,7 +242,7 @@ void OnlineConnectionQualityScene::SceneCreated()
     }
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, true);
 }
@@ -311,10 +317,7 @@ void OnlineConnectionQualityScene::Update(float dt)
     if (mUnidentified17C)
     {
         TLTextInstance* timer = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide, "Layer", "TIMER");
-        typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-        timer->SetString(nlStrNCpy(mUnidentified044,
-            Format(WideBasicString(LookupLocString("ONLINE_CONNECTION_QUALITY_TIME")),
-                mUnidentified180).c_str(), 128));
+        UpdateConnectionQualityTimerText(this, timer);
         mUnidentified17C = false;
     }
     if (mUnidentified180 <= 0)

@@ -2,6 +2,7 @@
 #define GAME_EVENT_H
 
 #include "Game/Task/DispatchEventsTask.h"
+#include "NL/nlArrayAllocator.h"
 #include "NL/nlBind.h"
 #include "NL/nlDLListContainer.h"
 
@@ -317,62 +318,18 @@ void UnidentifiedEvent<T>::Disconnect(void* owner)
 }
 
 template <typename T, int Count>
-class UnidentifiedStaticSlotPool
-{
-public:
-    UnidentifiedStaticSlotPool(int, int)
-        : mFreeList((T*)mStorage)
-        , mEntries((T*)mStorage)
-    {
-        for (int i = 0; i < Count - 1; ++i)
-        {
-            *(T**)&mEntries[i] = &mEntries[i + 1];
-        }
-        *(T**)&mEntries[Count - 1] = 0;
-    }
-
-    void Allocate(T*& out)
-    {
-        if (mFreeList == 0)
-        {
-            out = 0;
-        }
-        else
-        {
-            out = mFreeList;
-            mFreeList = *(T**)out;
-        }
-    }
-
-    void DeleteEntry(T* entry)
-    {
-        Free(entry);
-    }
-
-    void Free(T* entry)
-    {
-        *(T**)entry = mFreeList;
-        mFreeList = entry;
-    }
-
-    /* 0x00 */ T* mFreeList;
-    /* 0x04 */ T* mEntries;
-    /* 0x08 */ u8 mStorage[sizeof(T) * Count];
-};
-
-template <typename T, int Count>
 class UnidentifiedStaticEvent : public UnidentifiedTypedEvent<T>
 {
     typedef UnidentifiedListener<T> Listener;
     typedef DLListEntry<Listener> ListenerEntry;
-    typedef UnidentifiedStaticSlotPool<ListenerEntry, Count> ListenerPool;
+    typedef nlStaticArrayAllocator<ListenerEntry, Count> ListenerPool;
 
 public:
     typedef typename UnidentifiedTypedEvent<T>::Callback Callback;
 
     UnidentifiedStaticEvent(const char* name, int length)
         : UnidentifiedTypedEvent<T>(name, length)
-        , mListeners(Count, Count)
+        , mListeners()
     {
         RegisterEvent(this, UnidentifiedTypedEvent<T>::sType);
     }

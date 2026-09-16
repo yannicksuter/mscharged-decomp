@@ -174,6 +174,15 @@ reset argument and conditional timer reset follow R4QE01. The reference
 project's licensing notice below describes its source origins and applicable
 rights.
 
+The gameplay presentation interpreter in `Game/Render/Presentation.cpp`
+retains the `Presentation` class, interpreter operations, and shared state names
+from [Super Mario Strikers' presentation implementation](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/Render/Presentation.cpp).
+Networking, replay, cup, overlay, and Mega Strike behavior follows R4QE01. The
+separate `FrontEndPresentation` name describes the frontend byte-code
+interpreter used by menu and scene consumers; it does not claim an original
+Charged spelling. The reference project's licensing notice below also applies
+to this ancestry.
+
 The rematch actions in `Game/SH/SHPausePostGame.cpp` use the corresponding
 [Super Mario Strikers routines](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/SH/SHPausePostGame.cpp)
 as an ancestry reference. The network state, timer, statistics layout and article
@@ -332,6 +341,13 @@ The adjacent retained Jumbotron stubs and singleton live in
 `Game/Render/Jumbotron.cpp`; their interface and layout follow the predecessor,
 while their empty bodies follow R4QE01.
 
+`Game/objectblur.cpp`, `Game/ObjectBlur.h`, and `nlColourSeReversed` follow the
+corresponding [Super Mario Strikers ObjectBlur implementation](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/objectblur.cpp)
+and [shared colour interface](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/include/NL/nlColour.h).
+R4QE01 establishes the retained function order, Wii mesh writer and texture
+binding path, interpolation helper, constants, pool ownership, and manager
+lifetime behavior.
+
 ## Controller map overlay
 
 `Game/FE/Overlay/OverlayHandlerControllerMap.cpp` reconstructs R4QE01 code at
@@ -356,10 +372,21 @@ instance operations establish the interface and descriptive member names.
 `Release` at `0x800ED8C8` remains with its existing source input. Other member
 and field names are reconstruction names, rather than recovered source symbols.
 
-The RPC controller and sound instance share the node pool at `0x8057FA10`.
-Their construction, insertion and cleanup paths establish the borrowed-pool
-list type in `Game/Audio/RpcList_802EFB70.h`, using the existing NLG list and
-allocator templates. The shared entry-return helper is at `0x802F076C`.
+The RPC controller owns a runtime-node pool at `0x8057F9E8` and shares its
+list-entry pool at `0x8057FA10` with sound instances. Their construction,
+insertion and cleanup paths establish the borrowed-pool list type in
+`Game/Audio/AudioRpc.h`, using the existing NLG list and allocator templates.
+The shared entry-return helper is at `0x802F076C`. The RPC type, operation and
+field names describe the reconstructed behavior and do not claim original
+Charged spellings.
+
+`Game/Audio/SoundInstance.cpp` reconstructs the per-cue sound instance at
+`0x802F2188..0x802F2CAC`. Its cue-handle callers, sequence-instance chain,
+voice definition, RPC groups, transition sliders and lifecycle states establish
+the class layout and descriptive operation and field names. The shared RPC
+node list and pool ownership follow the adjacent controller implementation.
+These names describe R4QE01 behavior and do not claim original Charged
+spellings.
 
 `Game/Physics/PhysicsWall.cpp` follows the predecessor's PhysicsWall class and
 plane-construction formula. R4QE01's sideline creation and goalie-plane base
@@ -402,8 +429,9 @@ initializes the MEM2 and MEM1 allocator regions; the latter supplies the
 allocation entry points remain in `NL/nlMemory.cpp`, with their common
 interface in `NL/nlMemory.h`.
 
-`NL/nlRegistry.h`, `NL/nlRegistry.inl`, `NL/nlRegistryLookup.cpp` and
-`NL/nlRegistryOwner.cpp` reconstruct the dynamic and packed registry family at
+`NL/nlRegistry.h`, `NL/nlRegistry.inl`, `NL/nlRegistry.cpp`,
+`NL/nlRegistryLookup.cpp` and `NL/nlRegistryOwner.cpp` reconstruct the dynamic
+and packed registry family at
 `0x802BE64C..0x802BFF14`. R4QE01's list operations, packed type words,
 hash-sorted entries, image relocation, allocator callbacks and audio-resource
 tree consumer establish the common registry roles. The linked owner unit and
@@ -420,6 +448,13 @@ assignments establish their roles, while the predecessor's particle task
 corroborates the task-state and world-render gates. The source, function and
 global names describe that retained behavior and do not claim original Charged
 spellings.
+
+`Game/SH/SHRoadToStrikersCupHub.cpp` owns the scene constructed for scene ID 31,
+whose retained asset entry is `art/fe/roadtostrikerscup_hub.fen`. Its
+presentation paths, cup-flow calls, record formatting and four pointer targets
+establish the scene, helper and field roles. `RoadToStrikersCupHubScene` and its
+descriptive member names identify that R4QE01 behavior; they do not claim
+original Charged spellings.
 ## MSL integer absolute value
 
 The `_abs` inline helper in `libs/MSL_C/include/stdlib.h` follows the

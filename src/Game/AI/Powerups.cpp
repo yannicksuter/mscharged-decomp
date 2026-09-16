@@ -683,7 +683,7 @@ inline SpinyShell::SpinyShell(cFielder* pTarget, int nIndex, float fRadius,
 }
 
 int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
-    unk_8009A5D8* pUnidentified)
+    unk_8009A5D8 params)
 {
     PowerupBase* pFirstPowerup = 0;
     cTeam* pTargetTeam = pThrower->m_pTeam->GetOtherTeam();
@@ -694,7 +694,7 @@ int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
         pTargetFielders[a] = pTargetTeam->GetFielder(a);
     }
 
-    for (int j = 0; j < pUnidentified->nnumOfPowerups; j++)
+    for (int j = 0; j < params.nnumOfPowerups; j++)
     {
         u8 bFoundLocation = false;
 
@@ -712,14 +712,14 @@ int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
 
             PowerupBase* pPowerup;
 
-            switch (pUnidentified->eType)
+            switch (params.eType)
             {
             case POWER_UP_BANANA:
             {
                 Banana* pBanana = 0;
                 Banana::m_BananaSlotPool.Allocate(pBanana);
-                new (pBanana) Banana(pTarget, i, pUnidentified->fRadius,
-                    pUnidentified->eSize, pUnidentified->bExplode);
+                new (pBanana) Banana(pTarget, i, params.fRadius,
+                    params.eSize, params.bExplode);
                 pPowerup = pBanana;
                 break;
             }
@@ -728,7 +728,7 @@ int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
                 Bobomb* pBobomb = 0;
                 Bobomb::m_BobombSlotPool.Allocate(pBobomb);
                 new (pBobomb) Bobomb(pTarget, i,
-                    pUnidentified->fRadius, pUnidentified->eSize, true);
+                    params.fRadius, params.eSize, true);
                 pPowerup = pBobomb;
                 break;
             }
@@ -737,8 +737,8 @@ int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
                 GreenShell* pGreenShell = 0;
                 GreenShell::m_GreenShellSlotPool.Allocate(pGreenShell);
                 new (pGreenShell) GreenShell(pTarget, i,
-                    pUnidentified->fRadius, pUnidentified->eSize,
-                    pUnidentified->bExplode);
+                    params.fRadius, params.eSize,
+                    params.bExplode);
                 pPowerup = pGreenShell;
                 break;
             }
@@ -747,8 +747,8 @@ int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
                 FreezeShell* pFreezeShell = 0;
                 FreezeShell::m_FreezeShellSlotPool.Allocate(pFreezeShell);
                 new (pFreezeShell) FreezeShell(pTarget, i,
-                    pUnidentified->fRadius, pUnidentified->eSize,
-                    pUnidentified->bExplode);
+                    params.fRadius, params.eSize,
+                    params.bExplode);
                 pPowerup = pFreezeShell;
                 break;
             }
@@ -757,8 +757,8 @@ int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
                 RedShell* pRedShell = 0;
                 RedShell::m_RedShellSlotPool.Allocate(pRedShell);
                 new (pRedShell) RedShell(pTarget, i,
-                    pUnidentified->fRadius, pUnidentified->eSize,
-                    pUnidentified->bExplode);
+                    params.fRadius, params.eSize,
+                    params.bExplode);
                 pPowerup = pRedShell;
                 break;
             }
@@ -767,8 +767,8 @@ int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
                 SpinyShell* pSpinyShell = 0;
                 SpinyShell::m_SpinyShellSlotPool.Allocate(pSpinyShell);
                 new (pSpinyShell) SpinyShell(pTarget, i,
-                    pUnidentified->fRadius, pUnidentified->eSize,
-                    pUnidentified->bExplode);
+                    params.fRadius, params.eSize,
+                    params.bExplode);
                 pPowerup = pSpinyShell;
                 break;
             }
@@ -785,7 +785,7 @@ int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
             }
             else
             {
-                PowerupThrowPosition(j, pUnidentified->eStyle, pPowerup,
+                PowerupThrowPosition(j, params.eStyle, pPowerup,
                     pFirstPowerup, pThrower->mUnidentified024.m_aActualFacingDirection);
 
                 if (pPowerup->m_eType == POWER_UP_RED_SHELL)

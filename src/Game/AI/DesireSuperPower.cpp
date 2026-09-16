@@ -28,6 +28,7 @@
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/DaisyFist.h"
+#include "Game/Render/FlyingCamera.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/RumbleActions.h"
 #include "Game/Sys/audio.h"
@@ -91,7 +92,6 @@ extern "C" void fn_801BB0DC(cFielder*);
 extern "C" void fn_801BC094(cFielder*);
 extern "C" void fn_801B881C(cFielder*);
 extern "C" void fn_80039CF0(cFielder*, int);
-extern "C" void fn_801A0C58(cFielder*);
 extern "C" void fn_800A6968(cTeam*);
 extern "C" void fn_803198F4();
 extern "C" bool fn_8002EDC8(cFielder*, int);
@@ -485,7 +485,7 @@ void DesireSuperPower::UnidentifiedCleanup()
         break;
     case LUIGI:
         mUnidentifiedFielder->fn_8004FA34();
-        fn_801A0C58((cFielder*)0);
+        SetFlyingCameraTarget((cFielder*)0);
         break;
     case YOSHI:
         fn_80038158(mUnidentifiedFielder, 0);

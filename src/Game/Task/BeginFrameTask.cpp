@@ -29,7 +29,7 @@
 #include "NL/nlMath.h"
 #include "NL/platvmath.h"
 #include "types.h"
-#include "unclassified/tu_80284A58.h"
+#include "Game/Render/Presentation.h"
 #include "Game/Sys/tweak.h"
 
 extern "C" {

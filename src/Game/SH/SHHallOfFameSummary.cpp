@@ -136,6 +136,35 @@ SHHallOfFameSummary::~SHHallOfFameSummary()
 {
 }
 
+inline void SHHallOfFameSummary::UpdateRows()
+{
+    switch (mMode)
+    {
+    case 14:
+        for (int i = 0; i < 7; i++)
+        {
+            UpdateRow(i, sTrophyEntries[i + mFirstVisibleItem].mStringId,
+                IsUnlockFlagSet(sTrophyEntries[i + mFirstVisibleItem].mUnlockFlag));
+        }
+        break;
+    case 15:
+        for (int i = 0; i < 7; i++)
+        {
+            UpdateRow(i, sUnlockEntries[i + mFirstVisibleItem].mStringId,
+                sUnlockEntries[i + mFirstVisibleItem].mIsUnlocked());
+        }
+        break;
+    case 16:
+        for (int i = 0; i < 7; i++)
+        {
+            UpdateRow(i, sChallengeEntries[i + mFirstVisibleItem].mStringId,
+                g_pStrikerChallenge->IsUnlocked(
+                    sChallengeEntries[i + mFirstVisibleItem].mChallenge));
+        }
+        break;
+    }
+}
+
 void SHHallOfFameSummary::SceneCreated()
 {
     SHNavigation* scene = GetNavigationScene();
@@ -166,31 +195,7 @@ void SHHallOfFameSummary::SceneCreated()
     }
 
     UpdateTitle();
-
-    switch (mMode)
-    {
-    case 14:
-        for (int i = 0; i < 7; i++)
-        {
-            UpdateRow( i, sTrophyEntries[i + mFirstVisibleItem].mStringId,
-                IsUnlockFlagSet(sTrophyEntries[i + mFirstVisibleItem].mUnlockFlag));
-        }
-        break;
-    case 15:
-        for (int i = 0; i < 7; i++)
-        {
-            UpdateRow( i, sUnlockEntries[i + mFirstVisibleItem].mStringId,
-                sUnlockEntries[i + mFirstVisibleItem].mIsUnlocked());
-        }
-        break;
-    case 16:
-        for (int i = 0; i < 7; i++)
-        {
-            UpdateRow( i, sChallengeEntries[i + mFirstVisibleItem].mStringId,
-                g_pStrikerChallenge->IsUnlocked(sChallengeEntries[i + mFirstVisibleItem].mChallenge));
-        }
-        break;
-    }
+    UpdateRows();
 }
 
 void SHHallOfFameSummary::Update(float fDeltaT)
@@ -319,60 +324,12 @@ void SHHallOfFameSummary::Update(float fDeltaT)
     if (mScrollBar.IsScrolling(1, 1))
     {
         ++mFirstVisibleItem;
-        switch (mMode)
-        {
-        case 14:
-            for (int i = 0; i < 7; i++)
-            {
-                UpdateRow( i, sTrophyEntries[i + mFirstVisibleItem].mStringId,
-                    IsUnlockFlagSet(sTrophyEntries[i + mFirstVisibleItem].mUnlockFlag));
-            }
-            break;
-        case 15:
-            for (int i = 0; i < 7; i++)
-            {
-                UpdateRow( i, sUnlockEntries[i + mFirstVisibleItem].mStringId,
-                    sUnlockEntries[i + mFirstVisibleItem].mIsUnlocked());
-            }
-            break;
-        case 16:
-            for (int i = 0; i < 7; i++)
-            {
-                UpdateRow( i, sChallengeEntries[i + mFirstVisibleItem].mStringId,
-                    g_pStrikerChallenge->IsUnlocked(
-                        sChallengeEntries[i + mFirstVisibleItem].mChallenge));
-            }
-            break;
-        }
+        UpdateRows();
     }
     else if (mScrollBar.IsScrolling(0, 1))
     {
         --mFirstVisibleItem;
-        switch (mMode)
-        {
-        case 14:
-            for (int i = 0; i < 7; i++)
-            {
-                UpdateRow( i, sTrophyEntries[i + mFirstVisibleItem].mStringId,
-                    IsUnlockFlagSet(sTrophyEntries[i + mFirstVisibleItem].mUnlockFlag));
-            }
-            break;
-        case 15:
-            for (int i = 0; i < 7; i++)
-            {
-                UpdateRow( i, sUnlockEntries[i + mFirstVisibleItem].mStringId,
-                    sUnlockEntries[i + mFirstVisibleItem].mIsUnlocked());
-            }
-            break;
-        case 16:
-            for (int i = 0; i < 7; i++)
-            {
-                UpdateRow( i, sChallengeEntries[i + mFirstVisibleItem].mStringId,
-                    g_pStrikerChallenge->IsUnlocked(
-                        sChallengeEntries[i + mFirstVisibleItem].mChallenge));
-            }
-            break;
-        }
+        UpdateRows();
     }
 }
 

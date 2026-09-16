@@ -19,7 +19,7 @@
 #include "NL/nlSlotPool.h"
 #include "math.h"
 #include "types.h"
-#include "unclassified/tu_801A0E64.h"
+#include "Game/Render/HammerObject.h"
 #include "Game/Render/KoopaShellObject.h"
 
 extern PhysicsWorld* g_PhysicsWorld;
@@ -142,7 +142,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
     if (objectType == 0x1F && m_pAICharacter->m_eClassType == GOALIE)
     {
         HammerObject* hammer = ((PhysicsHammer*)other)->mHammer;
-        bool onGround = hammer->_048 > 0.0f;
+        bool onGround = hammer->mLandedTimer > 0.0f;
         if (onGround)
         {
             fn_8013F854("PhysChar PHYSOBJ_HAMMER OnGround\n");

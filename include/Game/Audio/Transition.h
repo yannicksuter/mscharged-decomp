@@ -9,8 +9,11 @@ struct Transition
     {
         value = 0.0f;
         valid = true;
+        target = 0.0f;
         elapsed = -1.0f;
         duration = 1.0f;
+        minimum = 0.0f;
+        maximum = 1.0f;
         enabled = true;
     }
     ~Transition() { }

@@ -17,7 +17,7 @@
 #include "Game/OnlinePlayer.h"
 #include "Game/FE/feOnlineError.h"
 #include "Game/OnlineMatchmaking.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "NL/nlBind.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlPrint.h"
@@ -449,7 +449,7 @@ void SHOnlineMatchmakingDraft::OnErrorDismissed()
     {
         g_pGameSceneManager->Pop();
         FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, true);
-        Presentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
+        FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
     }
     else
     {

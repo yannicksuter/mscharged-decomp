@@ -72,8 +72,6 @@ extern "C" UnidentifiedDesireUpdate fn_800D2074(
  */
 bool DesireUsePowerup::UnidentifiedInitialize(void* context)
 {
-    cFielder* pTarget;
-    cTeam* pTeam;
     bool result;
     ePowerUpType ePowerup;
     UnidentifiedVariantCollection* params;
@@ -94,22 +92,10 @@ bool DesireUsePowerup::UnidentifiedInitialize(void* context)
     if (params->IsSet(15))
     {
         ePowerup = (ePowerUpType)params->Get(15)->mData.i;
-        pTarget = (cFielder*)params->Get(14)->mData.pPlayer;
-
-        if (fn_8002EDC8(mUnidentifiedFielder, -1))
-        {
-            pTeam = mUnidentifiedFielder->m_pTeam;
-            if (ePowerup != POWER_UP_NONE
-                && ePowerup != pTeam->GetCurrentPowerUp().eType)
-            {
-                pTeam->TogglePowerup(false);
-            }
-
-            fn_800D3A50(
-                pTeam->GetCurrentPowerUp().eType,
-                pTeam->GetCurrentPowerUp().nnumOfPowerups,
-                pTarget);
-        }
+        fn_800D3968(
+            (cFielder*)params->Get(14)->mData.pPlayer,
+            ePowerup,
+            false);
     }
 
     return result;
@@ -236,6 +222,10 @@ void DesireUsePowerup::fn_800D3A50(
             pTarget = FindPowerupTarget(mUnidentifiedFielder, ePowerup);
         }
         break;
+    case POWER_UP_NONE:
+    case POWER_UP_CHAIN_CHOMP:
+    case POWER_UP_MUSHROOM:
+    case POWER_UP_STAR:
     default:
         pTarget = NULL;
         break;
@@ -254,6 +244,8 @@ void DesireUsePowerup::fn_800D3A50(
     switch (ePowerup)
     {
     case (ePowerUpType)12:
+    case (ePowerUpType)15:
+    case (ePowerUpType)16:
     case (ePowerUpType)20:
         bRetainPowerup = true;
     case (ePowerUpType)6:
@@ -350,8 +342,6 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
     ePowerUpType ePowerup = pDesire->mUnidentifiedFielder->GetPowerupType();
     switch (ePowerup)
     {
-    case POWER_UP_NONE:
-        return;
     case (ePowerUpType)9:
     case (ePowerUpType)10:
     case (ePowerUpType)11:
@@ -368,15 +358,10 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
         if (!pDesire->mUnidentifiedFielder->fn_8003E6EC())
         {
             UnidentifiedVariantCollection params;
-            UnidentifiedStateTransition* pTransition;
-            if (pDesire->mUnidentified070.UnidentifiedIsUnset())
-            {
-                pTransition = &pDesire->mUnidentified068;
-            }
-            else
-            {
-                pTransition = &pDesire->mUnidentified070;
-            }
+            UnidentifiedStateTransition* pTransition
+                = !pDesire->mUnidentified070.UnidentifiedIsUnset()
+                ? &pDesire->mUnidentified070
+                : &pDesire->mUnidentified068;
             params.Set(10, FuzzyVariant(FT_U32,
                 pTransition->mUnidentifiedHash));
             fn_80319E84(pDesire->mUnidentified018, 23, &params, false);
@@ -417,9 +402,8 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
         unk_8009A5D8 params;
         fn_8009A5D8(pDesire->mUnidentifiedFielder, pDesire->mePowerup,
             pDesire->mnNumPowerups, &params);
-        unk_8009A5D8 throwParams = params;
         if (PowerupCreateAndThrow(pDesire->mUnidentifiedFielder,
-                pDesire->mpTarget, &throwParams))
+                pDesire->mpTarget, params))
         {
             PowerupUsedEventData* event
                 = (PowerupUsedEventData*)g_PowerupUsedEventDataPool.Allocate();
@@ -433,12 +417,13 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
     }
     case POWER_UP_CHAIN_CHOMP:
     {
-        gNPCManager->GetChainChomp()->Spawn(pDesire->mUnidentifiedFielder);
+        gNPCManager->GetChainChomp()->Spawn(
+            pDesire->mUnidentifiedFielder, NULL);
         pDesire->UnidentifiedResetPowerupState();
         break;
     }
-    default:
-        break;
+    case POWER_UP_NONE:
+        return;
     }
 
     if (g_pGame->IsGameplayOrOvertime())

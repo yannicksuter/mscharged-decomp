@@ -57,7 +57,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "NL/utility.h"
-#include "unclassified/tu_801A0E64.h"
+#include "Game/Render/HammerObject.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Render/NPCManager.h"
@@ -5160,13 +5160,12 @@ void cFielder::fn_8004E6B4()
         HammerObject* pProjectile = gNPCManager->fn_801AA3AC(-1);
         if (pProjectile != 0)
         {
-            fn_801A1B54(pProjectile, this);
-            fn_801A1170(
-                pProjectile, &GetJointPosition(m_nLeftHandJointIndex));
+            pProjectile->Activate(this);
+            pProjectile->SetPosition(GetJointPosition(m_nLeftHandJointIndex));
 
             float fDistance = lbl_806DB89C
                 + lbl_806DB8A0
-                    * (float)(pProjectile->_020 % 5);
+                    * (float)(pProjectile->mIndex % 5);
 
             nlVector3 v3Target;
             v3Target.x = fDistance * m_m4WorldMatrix.e2[0][0]
@@ -5179,8 +5178,8 @@ void cFielder::fn_8004E6B4()
             nlVector3 v3Delta;
             nlVec3Sub(v3Delta, v3Target, mUnidentified024.m_v3Position);
 
-            float fSpeed = pProjectile->_028->m_gravity;
-            float fGravity = fn_801A1168(pProjectile)->z;
+            float fSpeed = pProjectile->mPhysics->m_gravity;
+            float fGravity = pProjectile->GetPosition()->z;
 
             float fHeight
                 = lbl_806DB8A4
@@ -5209,7 +5208,7 @@ void cFielder::fn_8004E6B4()
             v3Delta.x *= fScale;
             v3Delta.y *= fScale;
             v3Delta.z = fHeight;
-            fn_801A117C(pProjectile, &v3Delta);
+            pProjectile->SetVelocity(v3Delta);
         }
     }
 }

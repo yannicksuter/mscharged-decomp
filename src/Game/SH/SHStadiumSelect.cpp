@@ -19,7 +19,7 @@
 #include "Game/DB/StadiumInfo.h"
 #include "Game/DB/SaveLoad.h"
 #include "Game/GameSceneManager.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHOnlineInvitePlayers.h"
 #include "Game/Camera/animcam.h"
@@ -165,11 +165,11 @@ void StadiumSelectScene::SceneCreated()
     FEMusic::StopStream();
     if (GameInfoManager::Instance()->UseAltRules())
     {
-        Presentation::GetInstance()->Call("FromUnrankedMatchToStadiumSelect");
+        FrontEndPresentation::GetInstance()->Call("FromUnrankedMatchToStadiumSelect");
     }
     else
     {
-        Presentation::GetInstance()->Call("FromGrudgeMatchToStadiumSelect");
+        FrontEndPresentation::GetInstance()->Call("FromGrudgeMatchToStadiumSelect");
     }
 }
 
@@ -210,7 +210,7 @@ void StadiumSelectScene::Update(float deltaTime)
     case 0:
         break;
     case 1:
-        if (!Presentation::GetInstance()->mCameraFinished)
+        if (!FrontEndPresentation::GetInstance()->mCameraFinished)
         {
             return;
         }
@@ -325,13 +325,13 @@ void StadiumSelectScene::Update(float deltaTime)
                     FEAudio::PlayAnimAudioEvent(0xC385EFFB, 0, 0, true);
                     FEAudio::PlayAnimAudioEvent(0xBF2ED62D, 0, 0, true);
                     FEMusic::StartStreamIfDifferent(8);
-                    Presentation::GetInstance()->Call("FromStadiumSelectToUnrankedMatch");
+                    FrontEndPresentation::GetInstance()->Call("FromStadiumSelectToUnrankedMatch");
                 }
                 else
                 {
                     FEAudio::PlayAnimAudioEvent(0xBF2ED62D, 0, 0, true);
                     FEMusic::StartStreamIfDifferent(2);
-                    Presentation::GetInstance()->Call("FromStadiumSelectToGrudgeMatch");
+                    FrontEndPresentation::GetInstance()->Call("FromStadiumSelectToGrudgeMatch");
                 }
                 mMoviePlayer.Stop();
                 mBackButton.Disable();
@@ -384,7 +384,7 @@ void StadiumSelectScene::Update(float deltaTime)
                 FriendManager* manager = g_pFriendManager;
                 manager->mReturnScene = 5;
                 manager->mPreviousRankedMode = 0;
-                Presentation::GetInstance()->Call("FromStadiumSelectToUnrankedMatch");
+                FrontEndPresentation::GetInstance()->Call("FromStadiumSelectToUnrankedMatch");
                 GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_RESPONSE, SCREEN_FORWARD, true);
                 return;
             }
@@ -468,7 +468,7 @@ void StadiumSelectScene::OnSelectStadium(int, void*)
         {
             FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, true);
             FEAudio::PlayAnimAudioEvent(0xBF2ED62D, 0, 0, true);
-            Presentation::GetInstance()->Call("FromStadiumSelectToUnrankedMatch");
+            FrontEndPresentation::GetInstance()->Call("FromStadiumSelectToUnrankedMatch");
             GameInfoManager::Instance()->SetStadium(mStadiumOrder[mStadiumIndex]);
             SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_NOTHING, true);
             scene->mIsHost = true;

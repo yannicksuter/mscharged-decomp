@@ -8,6 +8,7 @@ struct AudioSequenceDefinition;
 struct SoundEventDefinition;
 struct HitMarkerEventDefinition;
 struct ParameterChangeEventDefinition;
+struct AudioRpcRuntimeNode;
 
 struct AudioVoiceDefinition;
 
@@ -48,7 +49,7 @@ struct AudioVoiceDefinition
     u32* rpcGroupIndices;
     u32 dynamicRpcCount;
     u32 modifierCount;
-    void** modifiers;
+    AudioRpcRuntimeNode** modifiers;
 };
 
 struct AudioResourceBundle

@@ -26,7 +26,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
-#include "unclassified/tu_801A2004.h"
+#include "Game/Render/HighRange.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 extern "C"
@@ -47,8 +47,8 @@ extern "C"
     extern char StadiumResourcePathFormat[];
     extern char StadiumTextureBundlePathFormat[];
     extern char StadiumModelBundlePathFormat[];
-    extern char StadiumTextureResourceLabel[];
-    extern char StadiumModelResourceLabel[];
+    extern char StadiumTextureResourceLabel[4];
+    extern char StadiumModelResourceLabel[6];
     extern StadiumLoadResult gTournamentTrophyLoadResults[3];
     extern bool lbl_806DEE60;
     extern char lbl_806DEE64[6];
@@ -336,26 +336,30 @@ bool FinishLoadStadiumResources()
     {
         for (int i = 0; i < 22; ++i)
         {
-            StadiumLoadResult& textures = gStadiumModelLoadResults[0][i];
-            StadiumLoadResult& geometry = gStadiumModelLoadResults[1][i];
-            if (ShouldLoadStadiumModel(&gStadiumModelEntries[i]) && !textures.mProcessed)
+            if (ShouldLoadStadiumModel(&gStadiumModelEntries[i])
+                && !gStadiumModelLoadResults[0][i].mProcessed)
             {
-                if (textures.mData != 0 && geometry.mData != 0)
+                if (gStadiumModelLoadResults[0][i].mData != 0
+                    && gStadiumModelLoadResults[1][i].mData != 0)
                 {
-                    glBeginResource("Tex");
-                    glEndLoadTextureBundle(textures.mData, textures.mSize, glGetCurrentResourcePool(), 1);
+                    glBeginResource(StadiumTextureResourceLabel);
+                    glEndLoadTextureBundle(gStadiumModelLoadResults[0][i].mData,
+                        gStadiumModelLoadResults[0][i].mSize,
+                        glGetCurrentResourcePool(), 1);
                     glEndResource();
-                    nlFree(textures.mData);
-                    textures.mData = 0;
-                    textures.mProcessed = true;
+                    nlFree(gStadiumModelLoadResults[0][i].mData);
+                    gStadiumModelLoadResults[0][i].mData = 0;
+                    gStadiumModelLoadResults[0][i].mProcessed = true;
 
-                    glBeginResource("Model");
+                    glBeginResource(StadiumModelResourceLabel);
                     unsigned long numModels = 0;
                     glModel* models = glEndLoadModel(
-                        geometry.mData, geometry.mSize, &numModels, glGetCurrentResourcePool());
-                    nlFree(geometry.mData);
-                    geometry.mData = 0;
-                    geometry.mProcessed = true;
+                        gStadiumModelLoadResults[1][i].mData,
+                        gStadiumModelLoadResults[1][i].mSize,
+                        &numModels, glGetCurrentResourcePool());
+                    nlFree(gStadiumModelLoadResults[1][i].mData);
+                    gStadiumModelLoadResults[1][i].mData = 0;
+                    gStadiumModelLoadResults[1][i].mProcessed = true;
                     if (i < 21)
                     {
                         CreateStadiumModelInstances(i, models, numModels);
@@ -549,7 +553,7 @@ void UpdateHighRange()
     {
         bDisable = true;
     }
-    else if (fn_801A238C(&lbl_80572020))
+    else if (IsHighRangeEnabled(&gHighRange))
     {
         cBaseCamera* pCamera = cCameraManager::PeekCamera();
         bool bBlocked = pCamera == 0 || pCamera->GetType() == 0;
@@ -566,13 +570,13 @@ void UpdateHighRange()
 
     if (bDisable)
     {
-        fn_801A2860(&lbl_80572020, 1);
-        fn_801A2A78(&lbl_80572020);
-        fn_801A28F0(&lbl_80572020);
+        SetHighRangeTargetsEnabled(&gHighRange, 1);
+        RenderHighRangeChain(&gHighRange);
+        CompositeHighRange(&gHighRange);
     }
     else
     {
-        fn_801A2860(&lbl_80572020, 0);
+        SetHighRangeTargetsEnabled(&gHighRange, 0);
     }
 }
 
@@ -703,7 +707,7 @@ float GetStadiumTime()
     return 0.0f;
 }
 
-HighRangeTweakValues_801A2004* fn_80277DC8()
+HighRangeTweaks* GetHighRangeTweaks()
 {
     return pBasicStadiumInstance->m_pHighRangeTweaks;
 }

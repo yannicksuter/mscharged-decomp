@@ -55,7 +55,8 @@ struct MegaStrikeEndData
     /* 0x05 */ s8 goals;
     /* 0x06 */ s8 defendingSide;
     /* 0x07 */ s8 goalValue;
-};
+    /* 0x08 */ u32 unknown_08;
+}; // total size: 0x0C
 
 struct UnidentifiedEventData_8006701C
 {

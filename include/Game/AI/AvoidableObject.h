@@ -129,6 +129,9 @@ class AvoidablePoint : public AvoidableObject
 {
 public:
     AvoidablePoint(
+        int type, float radius, const nlVector2& position);
+
+    AvoidablePoint(
         int type, const nlVector2& position, float radius)
         : AvoidableObject(type)
         , mRadius(radius)

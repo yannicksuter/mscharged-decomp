@@ -16,7 +16,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/nlTask.h"
-#include "unclassified/tu_801A2004.h"
+#include "Game/Render/HighRange.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -237,21 +237,21 @@ BasicStadium::BasicStadium(GLResourcePool* pResource)
     m_shadowLightPosition.y = -10.0f;
     m_shadowLightPosition.z = 40.0f;
 
-    m_pStadiumHighRangeTweaks = (HighRangeTweakValues_801A2004*)nlMalloc(
-        sizeof(HighRangeTweakValues_801A2004), 8, false);
+    m_pStadiumHighRangeTweaks = (HighRangeTweaks*)nlMalloc(
+        sizeof(HighRangeTweaks), 8, false);
     if (m_pStadiumHighRangeTweaks != 0)
     {
-        new (m_pStadiumHighRangeTweaks) HighRangeTweakValues_801A2004();
+        new (m_pStadiumHighRangeTweaks) HighRangeTweaks();
     }
-    fn_801A2004(m_pStadiumHighRangeTweaks, "/Rendering/Effects/HighRange/Stadium");
+    BindHighRangeTweaks(m_pStadiumHighRangeTweaks, "/Rendering/Effects/HighRange/Stadium");
 
-    m_pMegastrikeHighRangeTweaks = (HighRangeTweakValues_801A2004*)nlMalloc(
-        sizeof(HighRangeTweakValues_801A2004), 8, false);
+    m_pMegastrikeHighRangeTweaks = (HighRangeTweaks*)nlMalloc(
+        sizeof(HighRangeTweaks), 8, false);
     if (m_pMegastrikeHighRangeTweaks != 0)
     {
-        new (m_pMegastrikeHighRangeTweaks) HighRangeTweakValues_801A2004();
+        new (m_pMegastrikeHighRangeTweaks) HighRangeTweaks();
     }
-    fn_801A2004(
+    BindHighRangeTweaks(
         m_pMegastrikeHighRangeTweaks, "/Rendering/Effects/HighRange/Megastrike");
 
     m_pHighRangeTweaks = m_pStadiumHighRangeTweaks;

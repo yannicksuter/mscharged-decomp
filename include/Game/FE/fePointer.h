@@ -89,9 +89,8 @@ private:
     /* 0x88 */ float mMaxX;
     /* 0x8C */ float mMaxY;
     /* 0x90 */ float mMinY;
-    /* 0x94 */ float mRotation;
-    /* 0x98 */ float mPivotX;
-    /* 0x9C */ float mPivotY;
+    /* 0x94 */ mutable float mRotation;
+    /* 0x98 */ nlVector2 mPivot;
 }; // size 0xA0
 
 inline void FEPointerRegion::SetBounds(

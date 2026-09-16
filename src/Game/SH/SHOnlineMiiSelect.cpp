@@ -16,7 +16,7 @@
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/Task/ResetTask.h"
 #include "NL/nlAlgorithm.h"
 #include "NL/nlFormat.h"
@@ -371,7 +371,7 @@ void SHOnlineMiiSelect::Update(float fDeltaT)
             if (mBackButton.UpdateBackButton(event, fDeltaT))
             {
                 FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
-                Presentation::GetInstance()->Call(lbl_80520888);
+                FrontEndPresentation::GetInstance()->Call(lbl_80520888);
                 return;
             }
 

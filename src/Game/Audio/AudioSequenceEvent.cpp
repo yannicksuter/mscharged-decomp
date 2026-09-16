@@ -9,15 +9,12 @@
 
 #include <NMWException.h>
 
-#include "Game/Audio/SoundInstance_802F2110.h"
+#include "Game/Audio/SoundInstance.h"
 #include "Game/Audio/AudioSequenceEvent.h"
 
 SlotPool<SoundPlaybackEvent> sSoundPlaybackEventPool(32, 16);
 SlotPool<HitMarkerEvent> sHitMarkerEventPool(32, 16);
 SlotPool<ParameterChangeEvent> sParameterChangeEventPool(32, 16);
-
-extern "C" float fn_802F29F8(SoundInstance_802F2110*);
-extern "C" float fn_802F2A6C(SoundInstance_802F2110*);
 
 static inline float RandomRange(float minimum, float maximum)
 {
@@ -212,7 +209,7 @@ void SoundPlaybackEvent::Resume()
 }
 
 static inline void AccumulateRpcModifier(
-    RpcRuntimeNode_802F2110* node, u32& volumeCount, u32& pitchCount,
+    AudioRpcRuntimeNode* node, u32& volumeCount, u32& pitchCount,
     float* volume, float* pitch)
 {
     if (node->definition->kind == 1)
@@ -242,7 +239,7 @@ void SoundPlaybackEvent::UpdatePlaybackParameters(bool force)
     float pitch = 0.0f;
     AccumulateRpcModifiers(&hasVolume, &volume, &hasPitch, &pitch);
 
-    float instanceVolume = fn_802F29F8(owner->soundInstance);
+    float instanceVolume = owner->soundInstance->GetVolume();
     float volumeModifier = this->volumeModifier;
     float volumeOffset = owner->volumeOffset;
     float playbackVolume = volumeModifier + volumeOffset;
@@ -255,7 +252,7 @@ void SoundPlaybackEvent::UpdatePlaybackParameters(bool force)
         source->SetInputVolume(this->currentVolume);
     }
 
-    float instancePitch = fn_802F2A6C(owner->soundInstance);
+    float instancePitch = owner->soundInstance->GetPitch();
     float pitchModifier = this->pitchModifier;
     float playbackPitch = pitchModifier + instancePitch;
     float pitchOffset = owner->pitchOffset;
@@ -275,9 +272,8 @@ void SoundPlaybackEvent::AccumulateRpcModifiers(
     u32 volumeCount = 0;
     u32 pitchCount = 0;
 
-    typedef UnidentifiedDLListPool_802F2188<RpcRuntimeNode_802F2110*> RpcList;
-    nlDLListIterator<RpcRuntimeNode_802F2110*> iterator;
-    iterator = ((RpcList*)&owner->soundInstance->entryPool)->Begin();
+    nlDLListIterator<AudioRpcRuntimeNode*> iterator;
+    iterator = owner->soundInstance->rpcEntries.Begin();
     while (iterator.hasNext())
     {
         AccumulateRpcModifier(
@@ -285,10 +281,10 @@ void SoundPlaybackEvent::AccumulateRpcModifiers(
         iterator.Step();
     }
 
-    VoiceDefinition_802F2110* definition = owner->soundInstance->definition;
+    AudioVoiceDefinition* definition = owner->soundInstance->definition;
     for (u32 i = 0; i < definition->modifierCount; i++)
     {
-        RpcRuntimeNode_802F2110*& node = definition->modifiers[i];
+        AudioRpcRuntimeNode*& node = definition->modifiers[i];
         AccumulateRpcModifier(
             node, volumeCount, pitchCount, volume, pitch);
     }

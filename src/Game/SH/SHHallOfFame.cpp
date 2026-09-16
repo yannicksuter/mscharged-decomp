@@ -16,14 +16,14 @@
 #include "Game/DB/GameProgress.h"
 #include "Game/FE/feCupFlow.h"
 #include "Game/FE/feAsyncImage.h"
-#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/feScene.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlTextInstance.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "NL/MemAlloc.h"
 #include "NL/gl/glState.h"
 #include "NL/nlAlgorithm.h"
@@ -80,9 +80,9 @@ typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString
 
 void SetHallOfFameBreadcrumbs(int mode, TLComponentInstance* breadcrumbs)
 {
-    FEFinder<TLComponentInstance, 4>::FindOrDefault(breadcrumbs->GetActiveSlide(), nlStringLowerHash("breadcrumb_5"), 0, 0, 0, 0, 0)->m_bVisible = false;
-    FEFinder<TLComponentInstance, 4>::FindOrDefault(breadcrumbs->GetActiveSlide(), nlStringLowerHash("breadcrumb_6"), 0, 0, 0, 0, 0)->m_bVisible = false;
-    FEFinder<TLComponentInstance, 4>::FindOrDefault(breadcrumbs->GetActiveSlide(), nlStringLowerHash("breadcrumb_7"), 0, 0, 0, 0, 0)->m_bVisible = false;
+    FEFinder<TLComponentInstance, 4>::FindOrDefault(breadcrumbs->GetActiveSlide(), "breadcrumb_5")->m_bVisible = false;
+    FEFinder<TLComponentInstance, 4>::FindOrDefault(breadcrumbs->GetActiveSlide(), "breadcrumb_6")->m_bVisible = false;
+    FEFinder<TLComponentInstance, 4>::FindOrDefault(breadcrumbs->GetActiveSlide(), "breadcrumb_7")->m_bVisible = false;
 
     if (mode < 3)
     {
@@ -282,7 +282,7 @@ void LeaveHallOfFamePage(int mode)
         FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
         GameSceneManager::Instance()->Pop();
         SetLockedTrophyVisibility(true);
-        Presentation::GetInstance()->Call("TransitionHallOfFameToMainMenu");
+        FrontEndPresentation::GetInstance()->Call("TransitionHallOfFameToMainMenu");
         break;
     case 4:
     case 7:
@@ -590,6 +590,8 @@ bool IsHallOfFameImagePreloadPending()
 SHHallOfFameHistory::SHHallOfFameHistory(int mode)
     : mMode(mode)
 {
+    int modeIndex;
+
     mSelectedHistoryIndex = 0;
     mHistoryCount = 0;
     mUnidentified324 = false;
@@ -615,38 +617,54 @@ SHHallOfFameHistory::SHHallOfFameHistory(int mode)
     mImages[4] = new (0x20, true) AsyncImage(sHallOfFameResource, 0);
     mImageReady[4] = false;
 
+    modeIndex = mode - 4;
     memset(mHistory, 0, sizeof(mHistory));
 
-    int modeIndex = mode - 4;
-    unsigned char* historyBase = (unsigned char*)g_pCupManager + 0x86A0;
-    int historyIndex = 11;
-    unsigned char cursor = historyBase[0x370 + modeIndex];
-    if (cursor != 0)
+    int historyIndex;
+    CupRecord_8010EB90& cupRecord = g_pCupManager->mCupRecord;
+    historyIndex = 11;
+    if (cupRecord.mHistory.mWriteIndex[modeIndex] != 0)
     {
-        historyIndex = cursor - 1;
+        historyIndex = cupRecord.mHistory.mWriteIndex[modeIndex] - 1;
     }
 
-    CupHistoryRecord* source
-        = (CupHistoryRecord*)(historyBase + modeIndex * 0x60 + 0x10);
+    bool empty, emptyThrough32, emptyThrough2B, emptyThrough20,
+        emptyThrough16, emptyThrough12, emptyThrough0D, emptyThrough0A,
+        emptyThrough07, emptyThrough04;
     while (mHistoryCount < 12)
     {
-        CupHistoryRecord& record = source[historyIndex];
-        bool emptyThrough04
-            = record.mCaptain == 0 && record.mSidekick1 == 0;
-        bool emptyThrough07 = emptyThrough04 && record.mSidekick2 == 0;
-        bool emptyThrough0D = emptyThrough07 && record.mDay == 0;
-        bool emptyThrough12 = emptyThrough0D && record.mMonth == 0;
-        bool emptyThrough16 = emptyThrough12 && record.mYearOffset == 0;
-        bool emptyThrough20 = emptyThrough16 && record.mGoals == 0;
-        bool emptyThrough2B = emptyThrough20 && record.mUnidentified2B == 0;
-        bool emptyThrough32 = emptyThrough2B && record.mUnidentified32 == 0;
-        bool empty = emptyThrough32 && record.mUnidentified39 == 0;
+        const CupHistoryRecord* record
+            = &cupRecord.mHistory.mRecords[modeIndex][historyIndex];
+        emptyThrough04 = emptyThrough07 = emptyThrough0A = emptyThrough0D
+            = emptyThrough12 = emptyThrough16 = emptyThrough20 = emptyThrough2B
+            = emptyThrough32 = empty = false;
+
+        emptyThrough04 = record->mCaptain == 0 && record->mSidekick1 == 0;
+        if (emptyThrough04 && record->mSidekick2 == 0)
+            emptyThrough07 = true;
+        if (emptyThrough07 && record->mSidekick3 == 0)
+            emptyThrough0A = true;
+        if (emptyThrough0A && record->mDay == 0)
+            emptyThrough0D = true;
+        if (emptyThrough0D && record->mMonth == 0)
+            emptyThrough12 = true;
+        if (emptyThrough12 && record->mYearOffset == 0)
+            emptyThrough16 = true;
+        if (emptyThrough16 && record->mGoals == 0)
+            emptyThrough20 = true;
+        if (emptyThrough20 && record->mUnidentified2B == 0)
+            emptyThrough2B = true;
+        if (emptyThrough2B && record->mUnidentified32 == 0)
+            emptyThrough32 = true;
+        if (emptyThrough32 && record->mUnidentified39 == 0)
+            empty = true;
         if (empty)
         {
             break;
         }
 
-        mHistory[mHistoryCount] = record;
+        mHistory[mHistoryCount]
+            = cupRecord.mHistory.mRecords[modeIndex][historyIndex];
         ++mHistoryCount;
         historyIndex = historyIndex > 0 ? historyIndex - 1 : 11;
     }
@@ -1538,5 +1556,3 @@ void SHHallOfFamePlayerCard::UpdateImages()
     mFrontImage.QueueLoad(path0, false);
     mBackImage.QueueLoad(path1, false);
 }
-
-#include "Game/FE/feFinder_impl.h"

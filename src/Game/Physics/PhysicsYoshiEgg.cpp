@@ -12,7 +12,7 @@
 #include "Game/Physics/PhysicsHammer.h"
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Physics/PhysicsThwomp.h"
-#include "unclassified/tu_801A0E64.h"
+#include "Game/Render/HammerObject.h"
 #include "Game/Render/ThwompObject.h"
 #include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -215,10 +215,10 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
     case 0x1F:
     {
         HammerObject* hammer = ((PhysicsHammer*)other)->mHammer;
-        bool isLanded = hammer->_048 > 0.0f;
+        bool isLanded = hammer->mLandedTimer > 0.0f;
         if (isLanded)
         {
-            fn_801A1ED0(hammer, true);
+            hammer->Deactivate(true);
             break;
         }
 

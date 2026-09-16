@@ -14,7 +14,7 @@
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Physics/PhysicsYoshiEgg.h"
 #include "Game/Render/SkinAnimatedNPC.h"
-#include "unclassified/tu_801A0E64.h"
+#include "Game/Render/HammerObject.h"
 #include "Game/Render/YoshiEggObject.h"
 #include "NL/nlSlotPool.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -117,9 +117,9 @@ ContactType PhysicsBirdoEgg::Contact(
     case 0x1F:
     {
         HammerObject* hammer = ((PhysicsHammer*)other)->mHammer;
-        if (mBirdoEgg->mShooter == hammer->_034)
+        if (mBirdoEgg->mShooter == hammer->mOwner)
         {
-            bool isTimerRunning = hammer->_01C > 0.0f;
+            bool isTimerRunning = hammer->mRadiusTimer > 0.0f;
             if (isTimerRunning)
             {
                 return NO_CONTACT;

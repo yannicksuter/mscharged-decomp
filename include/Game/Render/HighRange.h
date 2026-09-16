@@ -1,5 +1,5 @@
-#ifndef UNCLASSIFIED_TU_801A2004_H
-#define UNCLASSIFIED_TU_801A2004_H
+#ifndef GAME_RENDER_HIGH_RANGE_H
+#define GAME_RENDER_HIGH_RANGE_H
 
 #include "Game/TweakValue.h"
 #include "NL/gl/glTarget.h"
@@ -7,7 +7,7 @@
 
 class GLView;
 
-struct HighRangeTweakValues_801A2004
+struct HighRangeTweaks
 {
     /* 0x00 */ TweakIntBinding miHighRangeIndex;
     /* 0x10 */ TweakFloatBinding mfHighRangeMult;
@@ -20,7 +20,7 @@ struct HighRangeTweakValues_801A2004
     /* 0x80 */ TweakIntBinding miAlpha;
 };
 
-struct HighRangeState_801A2394
+struct HighRange
 {
     struct Viewport
     {
@@ -37,17 +37,15 @@ struct HighRangeState_801A2394
     /* 0x118 */ GLRenderPair mRenderPairs[7];
 };
 
-extern "C"
-{
-    extern HighRangeState_801A2394 lbl_80572020;
+extern HighRange gHighRange;
 
-    void fn_801A2004(HighRangeTweakValues_801A2004*, const char*);
-    bool fn_801A238C(const HighRangeState_801A2394*);
-    void fn_801A2394(HighRangeState_801A2394*);
-    void fn_801A2860(HighRangeState_801A2394*, int);
-    void fn_801A28F0(HighRangeState_801A2394*);
-    void fn_801A2A78(HighRangeState_801A2394*);
-    void fn_801A2B80(HighRangeState_801A2394*, int, int);
-}
+void BindHighRangeTweaks(HighRangeTweaks*, const char*);
+bool IsHighRangeEnabled(const HighRange*);
+void InitializeHighRange(HighRange*);
+void SetHighRangeTargetsEnabled(HighRange*, int);
+void CompositeHighRange(HighRange*);
+void RenderHighRangeChain(HighRange*);
+void RenderHighRangePass(HighRange*, int, int);
+HighRangeTweaks* GetHighRangeTweaks();
 
-#endif // UNCLASSIFIED_TU_801A2004_H
+#endif // GAME_RENDER_HIGH_RANGE_H

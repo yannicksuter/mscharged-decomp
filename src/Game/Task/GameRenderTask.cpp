@@ -54,7 +54,7 @@
 #include "Game/Render/TimedObject.h"
 #include "Game/Render/CrowdImpostors.h"
 #include "Game/Render/MegastrikeBackgroundOverlay.h"
-#include "unclassified/tu_801A6AAC.h"
+#include "Game/Render/MegaBallIndicators.h"
 #include "Game/Render/PeachPhoto.h"
 #include "Game/Render/NumberDisplay.h"
 #include "Game/Render/Warble.h"

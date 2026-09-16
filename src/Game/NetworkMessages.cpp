@@ -68,7 +68,7 @@ static NetworkMessageFactory<NetMessageDraftPickedSidekicks> sFactoryType24;
 static NetworkMessageFactory<NetMessageSidesChanged> sSidesChangedFactory;
 static NetworkMessageFactory<NetMessageCheckConnection> sFactoryType26;
 static NetworkMessageFactory<NetMessageConnectionDecision> sFactoryType27;
-static NetworkMessageFactory<NetworkMessageType34> sFactoryType34;
+static NetworkMessageFactory<NetMessageMegaBallPointer> sMegaBallPointerFactory;
 static NetworkMessageFactory<NetworkMessageType35>
     sFactoryType35;
 
@@ -94,6 +94,6 @@ void RegisterNetworkMessages_801258A8()
     gNetworkMessageRegistry->RegisterFactory(31, &sFactoryType31);
     gNetworkMessageRegistry->RegisterFactory(32, &sFactoryType32);
     gNetworkMessageRegistry->RegisterFactory(33, &sFactoryType33);
-    gNetworkMessageRegistry->RegisterFactory(34, &sFactoryType34);
+    gNetworkMessageRegistry->RegisterFactory(34, &sMegaBallPointerFactory);
     gNetworkMessageRegistry->RegisterFactory(35, &sFactoryType35);
 }

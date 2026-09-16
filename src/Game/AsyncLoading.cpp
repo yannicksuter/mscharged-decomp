@@ -26,7 +26,7 @@
 #include "Game/FE/feCamera.h"
 #include "Game/FE/feInput.h"
 #include "Game/OverlayManager.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/SH/SHChallengeSelect.h"
 #include "Game/SH/SHHallOfFame.h"
 #include "Game/DB/SaveLoad.h"
@@ -34,7 +34,7 @@
 #include "Game/EventRegistry.h"
 #include "Game/ExcitementSystem.h"
 #include "Game/Camera/tu_800F9460.h"
-#include "unclassified/tu_80284A58.h"
+#include "Game/Render/Presentation.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/feModelManager.h"
 #include "Game/Render/ImpostorManager.h"
@@ -80,6 +80,7 @@
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Render/ElectricFence.h"
 #include "Game/Render/FlareHandler.h"
+#include "Game/Render/FlyingCamera.h"
 #include "Game/ReplayChoreo.h"
 #include "Game/ReplayManager.h"
 #include "NL/gl/glMemory.h"
@@ -126,7 +127,6 @@ bool IsNetworkOrRecordedGame();
 extern "C" u32 OSGetTick();
 extern "C" void OSYieldThread();
 
-extern "C" void fn_801A01F8();
 extern "C" void fn_801440BC();
 extern "C" void fn_8013DB18();
 void ShutdownWarbleRendering(void*);
@@ -142,7 +142,6 @@ extern "C" void fn_800F030C(bool stadiumViewer);
 extern "C" void fn_801FE99C();
 extern "C" bool fn_80277DD4(ImpostorModel*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
-extern "C" void fn_80286298(UnidentifiedPresentationState*);
 extern "C" void fn_8001FE80();
 extern "C" void fn_80018A00();
 extern "C" void GoalieOnGameOver();
@@ -1450,7 +1449,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
     {
         lbl_806E1044 = true;
         GameSceneManager::Instance()->Push((SceneList)0x16, SCREEN_NOTHING, false);
-        Presentation::GetInstance()->Call("StartTitleScreenSequence");
+        FrontEndPresentation::GetInstance()->Call("StartTitleScreenSequence");
     }
     else
     {
@@ -1465,33 +1464,33 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         if (NetTournManager::Instance()->mState != 0)
         {
             NetTournManager::Instance()->NotifyFinishedLoadingToKnockout();
-            Presentation::GetInstance()->Call("TransitionGameToOnlineTournament");
+            FrontEndPresentation::GetInstance()->Call("TransitionGameToOnlineTournament");
             GameSceneManager::Instance()->Push((SceneList)0x22, SCREEN_NOTHING, false);
         }
         else if (GameInfoManager::Instance()->IsOnline())
         {
             FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, true);
             GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_NOTHING, false);
-            Presentation::GetInstance()->Call("TransitionGameToOnlineMainMenu");
+            FrontEndPresentation::GetInstance()->Call("TransitionGameToOnlineMainMenu");
         }
         else if (GameInfoManager::Instance()->IsInMode2())
         {
             GameSceneManager::Instance()->Push(SCENE_TITLE, SCREEN_NOTHING, false);
-            Presentation::GetInstance()->Call("StartTitleScreenSequence");
+            FrontEndPresentation::GetInstance()->Call("StartTitleScreenSequence");
             GameInfoManager::Instance()->SetMode(GameInfoManager::GM_MODE_2, 0);
         }
         else if (GameInfoManager::Instance()->IsInFriendlyMode())
         {
             if (GameInfoManager::Instance()->unknown_0x71C8 == 2)
             {
-                Presentation::GetInstance()->Call("TransitionGameToChooseCaptains");
+                FrontEndPresentation::GetInstance()->Call("TransitionGameToChooseCaptains");
                 GameSceneManager::Instance()->Push(SCENE_CHOOSE_CAPTAINS_DOMINATION, SCREEN_BACK, false);
                 FEMusic::StartStreamIfDifferent(1);
             }
             else
             {
                 FEAudio::PlayAnimAudioEvent(0x80060B2D, 0, 0, true);
-                Presentation::GetInstance()->Call("StartMainMenuSequence");
+                FrontEndPresentation::GetInstance()->Call("StartMainMenuSequence");
             }
         }
         else if (GameInfoManager::Instance()->IsInMode3())
@@ -1518,7 +1517,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
             CupManager::Instance()->mUnidentified869C = false;
             CupManager::Instance()->fn_8010E8E0();
             SaveLoad::StartSave(false);
-            Presentation::GetInstance()->Call("TransitionGameToStrikerCup");
+            FrontEndPresentation::GetInstance()->Call("TransitionGameToStrikerCup");
         }
         else if (GameInfoManager::Instance()->IsInMode4())
         {
@@ -1531,12 +1530,12 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
                 {
                     challengeScene->mChallengeOffset = g_pStrikerChallenge->mUnidentified6C;
                 }
-                Presentation::GetInstance()->Call("TransitionGameToStrikerChallenge");
+                FrontEndPresentation::GetInstance()->Call("TransitionGameToStrikerChallenge");
             }
             else
             {
                 FEAudio::PlayAnimAudioEvent(0x80060B2D, 0, 0, true);
-                Presentation::GetInstance()->Call("StartMainMenuSequence");
+                FrontEndPresentation::GetInstance()->Call("StartMainMenuSequence");
             }
         }
     }
@@ -1745,7 +1744,7 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     ReplayManager::Instance()->fn_80188D88();
     fn_80194EF8(&ReplayChoreo::Instance());
     NisPlayer::Instance()->fn_8027DA28();
-    fn_80286298(GetPresentation());
+    GetPresentation()->RegisterEventListeners();
     GetPresentation()->fn_80285E1C();
     ExcitementSystem::fn_80196644().fn_80196924();
     fn_8001FE80();
@@ -1842,7 +1841,7 @@ extern "C" void fn_8011A570(AsyncLoadingManager* manager)
     if (GameInfoManager::Instance()->mIsInStrikers101Mode)
     {
         g_pOverlayManager->Push((SceneList)0x61, SCREEN_NOTHING, false);
-        UnidentifiedPresentationState* presentation = GetPresentation();
+        Presentation* presentation = GetPresentation();
         presentation->mLetterBoxEnabled = false;
         presentation->mLetterBoxDuration = 0.0f;
     }
@@ -1970,7 +1969,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FakeBallWorld::Destroy();
     cCameraManager::Shutdown();
     gNPCManager->DestroyNPCs();
-    fn_801A01F8();
+    ResetFlyingCameras();
     gNPCManager->UnloadTransientNPCTemplates();
     ParticleUpdateTask::sInstance->Shutdown();
     DestroyStadium();

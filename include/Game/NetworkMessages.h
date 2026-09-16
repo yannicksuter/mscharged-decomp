@@ -318,18 +318,18 @@ public:
     /* 0x09 */ u8 mFinishedLoadingToKnockout;
 };
 
-class NetworkMessageType34 : public NetworkMessage
+class NetMessageMegaBallPointer : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetworkMessageType34() { }
+    virtual ~NetMessageMegaBallPointer() { }
     virtual int GetType();
 
-    /* 0x08 */ u16 mUnidentified08;
-    /* 0x0A */ u16 mUnidentified0A;
-    /* 0x0C */ u8 mUnidentified0C;
-    /* 0x0D */ u8 mUnidentified0D;
-    /* 0x0E */ u8 mUnidentified0E;
+    /* 0x08 */ s16 mPointerX;
+    /* 0x0A */ s16 mPointerY;
+    /* 0x0C */ u8 mAngleHighByte;
+    /* 0x0D */ u8 mTextureIndex;
+    /* 0x0E */ u8 mStatus;
 };
 
 class NetworkMessageType35 : public NetworkMessage

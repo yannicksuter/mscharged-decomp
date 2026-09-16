@@ -7,6 +7,7 @@
 class nlChunk;
 class AudioBackend;
 struct AudioBankTable;
+struct AudioRpcController;
 
 class AudioBundleManager
 {
@@ -61,7 +62,7 @@ public:
 
 private:
     void* m_Unknown4C;
-    void* m_RpcController;
+    AudioRpcController* m_RpcController;
 };
 
 #endif // GAME_AUDIO_AUDIO_BUNDLE_MANAGER_H

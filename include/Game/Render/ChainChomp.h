@@ -48,7 +48,7 @@ public:
     void Hide();
     cFielder* FindTarget(cTeam* pTeam);
     void Fall();
-    void Spawn(cFielder* pThrower);
+    void Spawn(cFielder* pThrower, cFielder* pTarget);
     static void CollisionCallback(PhysicsObject* pPhysObj,
         PhysicsObject* pObjA, const nlVector3& v3Pos);
 

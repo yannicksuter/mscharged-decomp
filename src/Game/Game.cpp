@@ -107,7 +107,6 @@ struct UnidentifiedRegistrationNode
 
 extern "C" EventDispatcher* fn_800721C4();
 extern "C" void fn_8007214C(ShotAtGoalData* node);
-extern "C" int fn_800A9210(void* param1, int param2);
 extern "C" int GetAudioPauseDepth();
 extern "C" void ResumeAllAudio();
 extern "C" void fn_800EDC2C();
@@ -1132,9 +1131,9 @@ void cGame::fn_8005B508()
     lbl_806E0C9C = 0;
 }
 
-extern "C" int fn_8005C5CC(void* param1, int param2)
+void cGame::LoadTerrain(int terrain)
 {
-    return fn_800A9210(g_pGame->mpTerrain, param2);
+    g_pGame->mpTerrain->Load(terrain);
 }
 
 void cGame::SetDifficulty(

@@ -18,7 +18,7 @@
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/Render/ShootToScoreArrow.h"
 #include "NL/glx/glxSwap.h"
 #include "NL/nlConfig.h"
@@ -187,7 +187,7 @@ void SHStrikerTimesChallenge::Update(float dt)
         {
             gTweakFileLoader.mCount = 0;
             g_pStrikerChallenge->LoadSettings();
-            Presentation::GetInstance()->Call("TransitionToStrikerChallengeChooseSides");
+            FrontEndPresentation::GetInstance()->Call("TransitionToStrikerChallengeChooseSides");
             GameSceneManager::Instance()->Push((SceneList)78, SCREEN_FORWARD, true);
             return;
         }

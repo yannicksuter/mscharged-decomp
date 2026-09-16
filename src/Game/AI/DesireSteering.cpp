@@ -168,10 +168,9 @@ void DesireSteering::Update(
         nlVector3 v3UnfilteredDesired = m_v3LastDesiredPos;
         if (m_fTotalWeight > 0.0f)
         {
-            float fInvTotalWeight = 1.0f / m_fTotalWeight;
             m_fUrgency /= m_fTotalWeight;
             nlVec3Scale(
-                v3UnfilteredDesired, m_v3DesiredPos, fInvTotalWeight);
+                v3UnfilteredDesired, m_v3DesiredPos, 1.0f / m_fTotalWeight);
             m_fTotalWeight = 0.0f;
         }
 

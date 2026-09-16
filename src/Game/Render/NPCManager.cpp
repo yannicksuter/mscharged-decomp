@@ -1,5 +1,6 @@
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/NPCManager.h"
+#include "Game/Render/FlyingCamera.h"
 #include "Game/Render/tu_801B43F8.h"
 #include "Game/Render/tu_801B532C.h"
 #include "Game/AsyncLoading.h"
@@ -17,7 +18,7 @@
 #include "NL/nlCompressedFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_801A0E64.h"
+#include "Game/Render/HammerObject.h"
 #include "Game/Render/DiddyBanana.h"
 #include "Game/Render/BirdoEgg.h"
 #include "Game/Render/BulletBill.h"
@@ -40,9 +41,6 @@ extern "C"
     BirdoEggObject* __dt(BirdoEggObject* pObject, int bDelete);
     void Update(BirdoEggObject* pObject, float fDeltaT);
     void Reset(BirdoEggObject* pObject);
-
-    void fn_801A01F8();
-    void fn_801A0208(float fDeltaT);
 }
 
 int nlSNPrintf(char* pBuffer, unsigned long nSize, const char* pFormat, ...);
@@ -270,10 +268,7 @@ void NPCManager::fn_801AA2C0()
     {
         HammerObject* pObject
             = (HammerObject*)nlMalloc(sizeof(HammerObject), 8, false);
-        if (pObject != 0)
-        {
-            pObject = fn_801A0E64(pObject, i, lbl_806DD000);
-        }
+        pObject = new (pObject) HammerObject(i, lbl_806DD000);
         mUnidentified070[i] = pObject;
     }
 }
@@ -288,9 +283,9 @@ void NPCManager::fn_801AA348()
     for (int i = 0; i < 15; ++i)
     {
         HammerObject* pObject = mUnidentified070[i];
-        if (pObject != 0 && pObject->_024)
+        if (pObject != 0 && pObject->mActive)
         {
-            fn_801A1CFC(pObject, 1);
+            pObject->Reset(true);
         }
     }
 }
@@ -304,7 +299,7 @@ HammerObject* NPCManager::fn_801AA3AC(int nIndex)
 
     for (int i = 0; i < 15; ++i)
     {
-        if (mUnidentified070[i] != 0 && !mUnidentified070[i]->_024)
+        if (mUnidentified070[i] != 0 && !mUnidentified070[i]->mActive)
         {
             return mUnidentified070[i];
         }
@@ -522,7 +517,7 @@ NPCManager::~NPCManager()
     {
         if (mUnidentified070[i] != 0)
         {
-            fn_801A10D0(mUnidentified070[i], 1);
+            delete mUnidentified070[i];
             mUnidentified070[i] = 0;
         }
     }
@@ -540,7 +535,7 @@ NPCManager::~NPCManager()
         }
     }
 
-    fn_801A01F8();
+    ResetFlyingCameras();
     delete mPersistentHierarchies;
     delete mTransientHierarchies;
     gNPCManagerInstance = 0;
@@ -588,7 +583,7 @@ void NPCManager::DestroyNPCs()
     {
         if (mUnidentified070[i] != 0)
         {
-            fn_801A10D0(mUnidentified070[i], 1);
+            delete mUnidentified070[i];
             mUnidentified070[i] = 0;
         }
     }
@@ -605,7 +600,7 @@ void NPCManager::DestroyNPCs()
             mThwomps[i] = 0;
         }
     }
-    fn_801A01F8();
+    ResetFlyingCameras();
 }
 
 NPCTemplate* NPCManager::fn_801ABBDC(const char* pName)
@@ -685,7 +680,7 @@ void NPCManager::UpdateAINPCs(float dt)
     {
         if (mUnidentified070[i] != 0)
         {
-            fn_801A16A4(mUnidentified070[i], dt);
+            mUnidentified070[i]->Update(dt);
         }
     }
     for (i = 0; i < 3; ++i)
@@ -702,7 +697,7 @@ void NPCManager::UpdateAINPCs(float dt)
             mThwomps[i]->Update(dt);
         }
     }
-    fn_801A0208(dt);
+    UpdateFlyingCameras(dt);
 }
 
 void NPCManager::fn_801ABF8C()
@@ -745,7 +740,7 @@ void NPCManager::fn_801ABF8C()
     {
         if (mUnidentified070[i] != 0)
         {
-            fn_801A1CFC(mUnidentified070[i], 0);
+            mUnidentified070[i]->Reset(false);
         }
     }
     for (i = 0; i < 3; ++i)

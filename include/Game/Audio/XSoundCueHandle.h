@@ -23,7 +23,7 @@ struct LocalSliderSet_802F1758
     void* owner;
 };
 
-struct SoundInstance_802F1758;
+struct SoundInstance;
 
 class XSoundCueHandle : public XSoundHandle
 {
@@ -48,7 +48,7 @@ public:
     static void* operator new(unsigned long size);
     static void operator delete(void* handle);
     AudioCueDefinition* definition;
-    SoundInstance_802F1758* instance;
+    SoundInstance* instance;
     SliderState_802F1758* slider;
     float sliderValue;
     struct

@@ -132,8 +132,12 @@ void FEPointerRegion::SetInstanceBounds(TLInstance* instance, bool useRotation, 
         float width;
         {
             BasicString<unsigned short, Detail::TempStringAllocator> string(text->GetString());
-            FontCharString fontString(string.c_str(), font, (unsigned short*)0);
-            width = font->GetStringWidth(fontString, false, 640, true);
+            unsigned long stringWidth;
+            {
+                FontCharString fontString(string.c_str(), font, (unsigned short*)0);
+                stringWidth = font->GetStringWidth(fontString, false, 640, true);
+            }
+            width = stringWidth;
         }
         nlTextBox::StringDrawInfo drawInfo = text->m_DrawInfo;
         nlVector2 textSize;
@@ -160,16 +164,15 @@ void FEPointerRegion::SetInstanceBounds(TLInstance* instance, bool useRotation, 
     feVector3 position = instance->GetAssetPosition();
     float x = position.f.x + offsetX;
     float y = position.f.y + offsetY;
-    mMinX = x - size.x * 0.5f;
-    mMaxX = x + size.x * 0.5f;
-    mMaxY = y + size.y * 0.5f;
-    mMinY = y - size.y * 0.5f;
+    mMinX = x - size.x / 2.0f;
+    mMaxX = x + size.x / 2.0f;
+    mMaxY = y + size.y / 2.0f;
+    mMinY = y - size.y / 2.0f;
 
     if (useRotation)
     {
         mRotation = instance->GetAssetRotation().f.z;
-        mPivotX = position.f.x;
-        mPivotY = position.f.y;
+        nlVec2Set(mPivot, position.f.x, position.f.y);
     }
     else
     {
@@ -185,7 +188,7 @@ bool FEPointerRegion::ContainsPoint(nlVector2 position) const
     }
 
     nlVector3 local;
-    nlVec3Set(local, position.x - mPivotX, position.y - mPivotY, 0.0f);
+    nlVec3Set(local, position.x - mPivot.x, position.y - mPivot.y, 0.0f);
 
     float cosine = nlSin((unsigned short)(RadToAng16(mRotation) + 0x4000));
     float sineForY = nlSin(RadToAng16(mRotation));
@@ -194,7 +197,7 @@ bool FEPointerRegion::ContainsPoint(nlVector2 position) const
     cosine = nlSin((unsigned short)(RadToAng16(mRotation) + 0x4000));
     float rotatedX = local.x * cosine + local.y * sine;
     nlVec3Set(local, rotatedX, rotatedY, 0.0f);
-    nlVec3Set(local, local.x + mPivotX, local.y + mPivotY, 0.0f);
+    nlVec3Set(local, local.x + mPivot.x, local.y + mPivot.y, 0.0f);
 
     return local.x >= mMinX && local.x <= mMaxX && local.y >= mMinY && local.y <= mMaxY;
 }
@@ -212,17 +215,50 @@ nlVector2 MeasurePointerText(TLTextInstance* text)
         font = fontResource->m_pFontReference;
     }
 
+    nlVector2 size;
     float width;
     {
         BasicString<unsigned short, Detail::TempStringAllocator> string(text->GetString());
-        FontCharString fontString(string.c_str(), font, (unsigned short*)0);
-        width = font->GetStringWidth(fontString, false, 640, true);
+        unsigned long stringWidth;
+        {
+            FontCharString fontString(string.c_str(), font, (unsigned short*)0);
+            stringWidth = font->GetStringWidth(fontString, false, 640, true);
+        }
+        width = stringWidth;
     }
     nlTextBox::StringDrawInfo drawInfo = text->m_DrawInfo;
-    nlVector2 size;
     size.x = width;
     size.y = (float)(font->m_Metrics.Height * drawInfo.RowCount);
     return size;
+}
+
+static inline nlVector2 MeasurePointerInstance(TLInstance* instance)
+{
+    switch (instance->m_type)
+    {
+    case TLAT_LAYER:
+        return MeasurePointerInstanceList(instance->pChildren);
+    case TLAT_IMAGE:
+    {
+        float height = instance->GetScale().f.y * 100.0f;
+        nlVector2 size;
+        size.x = instance->GetScale().f.x * 100.0f;
+        size.y = height;
+        return size;
+    }
+    case TLAT_TEXT:
+        return MeasurePointerText((TLTextInstance*)instance);
+    case TLAT_COMPONENT:
+        return MeasurePointerInstanceList(((TLComponentInstance*)instance)->GetActiveSlide()->pChildren);
+    case TLAT_GROUP:
+        return MeasurePointerInstanceList(instance->pChildren);
+    default:
+    {
+        nlVector2 size;
+        nlVec2Set(size, 0.0f, 0.0f);
+        return size;
+    }
+    }
 }
 
 nlVector2 MeasurePointerInstanceList(TLInstance* first)
@@ -235,52 +271,30 @@ nlVector2 MeasurePointerInstanceList(TLInstance* first)
     }
 
     gl_ScreenInfo* screen = glGetScreenInfo();
-    float minX = 427.0f;
+    int screenWidth = 854;
+    float minX = (float)(screenWidth / 2);
     float minY = (float)(screen->ScreenHeight / 2);
     float maxX = -minX;
     float maxY = -minY;
 
-    TLInstance* instance = first;
+    TLInstance* end = first;
     do
     {
-        nlVector2 measuredSize;
-        switch (instance->m_type)
-        {
-        case TLAT_LAYER:
-            measuredSize = MeasurePointerInstanceList(instance->pChildren);
-            break;
-        case TLAT_IMAGE:
-            measuredSize.y = instance->GetScale().f.y * 100.0f;
-            measuredSize.x = instance->GetScale().f.x * 100.0f;
-            break;
-        case TLAT_TEXT:
-            measuredSize = MeasurePointerText((TLTextInstance*)instance);
-            break;
-        case TLAT_COMPONENT:
-            measuredSize = MeasurePointerInstanceList(((TLComponentInstance*)instance)->GetActiveSlide()->pChildren);
-            break;
-        case TLAT_GROUP:
-            measuredSize = MeasurePointerInstanceList(instance->pChildren);
-            break;
-        default:
-            nlVec2Set(measuredSize, 0.0f, 0.0f);
-            break;
-        }
+        nlVector2 size = MeasurePointerInstance(first);
 
-        nlVector2 size = measuredSize;
-        feVector3 position = instance->GetAssetPosition();
-        float left = position.f.x - size.x * 0.5f;
-        float right = position.f.x + size.x * 0.5f;
-        float bottom = position.f.y - size.y * 0.5f;
-        float top = position.f.y + size.y * 0.5f;
+        feVector3 position = first->GetAssetPosition();
+        float left = position.f.x - size.x / 2.0f;
+        float bottom = position.f.y - size.y / 2.0f;
+        float right = position.f.x + size.x / 2.0f;
+        float top = position.f.y + size.y / 2.0f;
 
         minX = left < minX ? left : minX;
         minY = bottom < minY ? bottom : minY;
         maxX = right > maxX ? right : maxX;
         maxY = top > maxY ? top : maxY;
 
-        instance = instance->m_next;
-    } while (instance != first);
+        first = first->m_next;
+    } while (first != end);
 
     nlVector2 size;
     nlVec2Set(size, maxX - minX, maxY - minY);

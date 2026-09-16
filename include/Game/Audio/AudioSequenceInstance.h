@@ -5,7 +5,7 @@
 #include "types.h"
 
 class AudioSource;
-struct SoundInstance_802F2110;
+struct SoundInstance;
 struct AudioSequenceEvent;
 struct AudioSequenceEventDefinition;
 
@@ -20,7 +20,7 @@ class AudioSequenceInstance
 {
 public:
     AudioSequenceInstance(
-        SoundInstance_802F2110* soundInstance, AudioSequenceDefinition* definition);
+        SoundInstance* soundInstance, AudioSequenceDefinition* definition);
     ~AudioSequenceInstance();
 
     void Play();
@@ -37,7 +37,7 @@ public:
     static void operator delete(void* instance);
 
     /* 0x00 */ AudioSequenceInstance* next;
-    /* 0x04 */ SoundInstance_802F2110* soundInstance;
+    /* 0x04 */ SoundInstance* soundInstance;
     /* 0x08 */ AudioSequenceDefinition* definition;
     /* 0x0C */ AudioSequenceEvent* events;
     /* 0x10 */ float volumeOffset;

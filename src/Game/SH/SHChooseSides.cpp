@@ -20,7 +20,7 @@
 #include "Game/FE/tlSlide.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/Team.h"
 #include "NL/nlBind.h"
 #include "NL/nlPrint.h"
@@ -75,7 +75,7 @@ SHChooseSides2::SHChooseSides2(eCSContext context, ScreenMovement movement)
 
     if (movement != SCREEN_BACK && mContext != CUP && mContext != PAUSE && mContext != TOURNAMENT)
     {
-        Presentation::GetInstance()->Call("StartHomeAwayCaptainHologramSequence");
+        FrontEndPresentation::GetInstance()->Call("StartHomeAwayCaptainHologramSequence");
     }
 
     mUnidentified2F0.SetPopScene(false);
@@ -633,7 +633,7 @@ void SHChooseSides2::fn_8021CBD0()
             SetPointerColour(i, white);
         }
         FEAudio::PlayAnimAudioEvent(0xA6F93A5D, 0, 0, 1);
-        Presentation::GetInstance()->Call("TransitionChooseSidesToCup");
+        FrontEndPresentation::GetInstance()->Call("TransitionChooseSidesToCup");
     }
     else if (mContext == TOURNAMENT)
     {
@@ -641,7 +641,7 @@ void SHChooseSides2::fn_8021CBD0()
         {
             SetPointerColour(i, white);
         }
-        Presentation::GetInstance()->Call("TransitionFromStrikerChallengeChooseSides");
+        FrontEndPresentation::GetInstance()->Call("TransitionFromStrikerChallengeChooseSides");
         TU8021CBD0Scene* scene = (TU8021CBD0Scene*)GameSceneManager::Instance()->Push(
             (SceneList)77, SCREEN_BACK, false);
         if (scene != 0)
@@ -651,8 +651,8 @@ void SHChooseSides2::fn_8021CBD0()
     }
     else if (mContext != PAUSE)
     {
-        Presentation::GetInstance()->Call("RemoveModels");
-        Presentation::GetInstance()->Call("KillLightCones");
+        FrontEndPresentation::GetInstance()->Call("RemoveModels");
+        FrontEndPresentation::GetInstance()->Call("KillLightCones");
         for (int i = 0; i < 4; ++i)
         {
             gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
@@ -994,7 +994,7 @@ void SHChooseSides2::Proceed()
     else if (mContext == TOURNAMENT)
     {
         GameInfoManager::Instance()->unknown_0x71C8 = 1;
-        Presentation::GetInstance()->Call("StartChallengeSequence");
+        FrontEndPresentation::GetInstance()->Call("StartChallengeSequence");
         GameSceneManager::Instance()->PushLoadingScene(true);
         object->SetButtons(0, true);
     }

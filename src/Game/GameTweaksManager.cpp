@@ -1,5 +1,6 @@
 #include "Game/GameTweaks.h"
 #include "Game/Terrain.h"
+#include "Game/TerrainTweaks.h"
 #include "Game/GameInfo.h"
 #include "Game/TweakFileLoader.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -10,7 +11,7 @@
 
 extern const char sUnidentifiedHomeSkillCategory[];
 extern const char sUnidentifiedAwaySkillCategory[];
-extern char sUnidentifiedTerrainCategory[];
+extern char sTerrainTweakCategory[];
 
 static const char* sSkillTweakCategories[2] = {
     sUnidentifiedHomeSkillCategory,
@@ -32,7 +33,7 @@ void InitializeGameTweaks(GameTweaksManager* state)
     GetTerrainConfigFilename(terrain, terrainName, sizeof(terrainName));
 
     TerrainTweaks* terrainTweaks = new (8, false)
-        TerrainTweaks(terrainName, sUnidentifiedTerrainCategory);
+        TerrainTweaks(terrainName, sTerrainTweakCategory);
     state->mTerrainTweaks = terrainTweaks;
 
     state->mUnidentified08 = GetStadiumUnknown0x0C(stadium);
@@ -155,5 +156,4 @@ void DestroyGameTweaks(GameTweaksManager* state)
     }
 }
 
-char sUnidentifiedTerrainCategory[] = "Game/Terrain/";
-
+char sTerrainTweakCategory[] = "Game/Terrain/";

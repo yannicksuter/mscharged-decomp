@@ -4,7 +4,7 @@
 #include "Game/World.h"
 #include "NL/nlMath.h"
 
-struct HighRangeTweakValues_801A2004;
+struct HighRangeTweaks;
 
 class BasicStadium : public World
 {
@@ -23,9 +23,9 @@ public:
     /* 0x8C */ nlVector3 m_shadowLightPosition;
     /* 0x98 */ float m_shadowHeight;
     /* 0x9C */ float m_fTime;
-    /* 0xA0 */ HighRangeTweakValues_801A2004* m_pHighRangeTweaks;
-    /* 0xA4 */ HighRangeTweakValues_801A2004* m_pStadiumHighRangeTweaks;
-    /* 0xA8 */ HighRangeTweakValues_801A2004* m_pMegastrikeHighRangeTweaks;
+    /* 0xA0 */ HighRangeTweaks* m_pHighRangeTweaks;
+    /* 0xA4 */ HighRangeTweaks* m_pStadiumHighRangeTweaks;
+    /* 0xA8 */ HighRangeTweaks* m_pMegastrikeHighRangeTweaks;
 };
 
 typedef char BasicStadium_size_check[sizeof(BasicStadium) == 0xAC ? 1 : -1];

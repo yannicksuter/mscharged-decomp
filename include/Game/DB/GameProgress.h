@@ -199,6 +199,9 @@ public:
     const char* GetTitle() const;
     const char* GetDifficulty() const;
     const char* GetDifficulty(int challenge) const;
+    int GetCurrentChallenge() const;
+    int GetRemainingTime() const;
+    int GetScore(int side) const;
     bool IsCurrentChallengeWon() const;
     void* SerializeData(void* dst) const;
     void* DeserializeData(void* src);

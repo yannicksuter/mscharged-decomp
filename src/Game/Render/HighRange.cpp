@@ -1,31 +1,38 @@
-#include "unclassified/tu_801A2004.h"
+#include "Game/Render/HighRange.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlDebugViews.h"
 
 #include "Game/Render/RLView.h"
+#include "Game/Render/RLViewLayers.h"
 
 #include "NL/gl/glDraw2.h"
+#include "NL/gl/glPlat.h"
 #include "NL/gl/glState.h"
+#include "Game/GL/GLFourTextureAddMeshWriter.h"
 #include "NL/gl/glView.h"
 #include "NL/nlColour.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 
-extern "C"
-{
-    int lbl_806DCE58 = -1;
-    bool lbl_806DCE5C = true;
-    int lbl_806DCE60 = 1;
-    int lbl_806DCE64 = 2;
-    int lbl_806DCE68 = 3;
+HighRange gHighRange;
 
-    HighRangeTweakValues_801A2004* fn_80277DC8();
-    GLViewInterface* fn_802726A0();
-}
+int sHighRangeDebugTextureIndex = -1;
+bool sHighRangeEnabled = true;
+int sHighRangeSampleOffset0 = 1;
+int sHighRangeSampleOffset1 = 2;
+int sHighRangeSampleOffset2 = 3;
 
-extern "C" void fn_801A2004(
-    HighRangeTweakValues_801A2004* values, const char* group)
+int sHighRangeSampleOffset3;
+int sHighRangeSampleOffset4;
+int sHighRangeSampleOffset5;
+int sHighRangeSampleOffset6;
+
+extern nlVector2 sHighRangeVertices[4];
+
+void BindHighRangeTweaks(
+    HighRangeTweaks* values, const char* group)
 {
     bool registered
         = values->miHighRangeIndex.Bind(
@@ -62,7 +69,7 @@ extern "C" void fn_801A2004(
         "mbFineHighRange", true, group, true, 0.0f, 0.0f, 0.0f);
 
     registered = values->miRed.Bind(
-            "miRed", 0.0f, group, true, 255.0f, 1.0f);
+        "miRed", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
         *values->miRed.m_pValue = values->miRed.GetDefault();
@@ -73,7 +80,7 @@ extern "C" void fn_801A2004(
     }
 
     registered = values->miGreen.Bind(
-            "miGreen", 0.0f, group, true, 255.0f, 1.0f);
+        "miGreen", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
         *values->miGreen.m_pValue
@@ -85,7 +92,7 @@ extern "C" void fn_801A2004(
     }
 
     registered = values->miBlue.Bind(
-            "miBlue", 0.0f, group, true, 255.0f, 1.0f);
+        "miBlue", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
         *values->miBlue.m_pValue
@@ -97,7 +104,7 @@ extern "C" void fn_801A2004(
     }
 
     registered = values->miAlpha.Bind(
-            "miAlpha", 0.0f, group, true, 255.0f, 1.0f);
+        "miAlpha", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
         *values->miAlpha.m_pValue
@@ -109,12 +116,12 @@ extern "C" void fn_801A2004(
     }
 }
 
-extern "C" bool fn_801A238C(const HighRangeState_801A2394*)
+bool IsHighRangeEnabled(const HighRange*)
 {
-    return lbl_806DCE5C;
+    return sHighRangeEnabled;
 }
 
-extern "C" void fn_801A2394(HighRangeState_801A2394* state)
+void InitializeHighRange(HighRange* state)
 {
     u32 widths[7] = { 320, 160, 80, 40, 80, 160, 320 };
     u32 heights[7] = { 224, 112, 56, 28, 56, 112, 224 };
@@ -178,13 +185,14 @@ extern "C" void fn_801A2394(HighRangeState_801A2394* state)
         info.format = GLTargetFormat_6;
         info.unknown18 = 0;
         info.unknown1C = 0;
-        state->mRenderPairs[i] = glCreateTarget(state->mNames[i], &info);
+        state->mRenderPairs[i]
+            = glCreateTarget(state->mNames[i], &info);
     }
 
     for (i = 0; i < 7; ++i)
     {
         GLView* view = new (8, false) GLView(
-            fn_802726A0(), state->mRenderPairs[i], GLViewSort_Texture);
+            GetOrthoCamera(), state->mRenderPairs[i], GLViewSort_Texture);
         view->m_Name = state->mNames[i];
         view->m_ViewportX = state->mViewports[i].x;
         view->m_ViewportY = state->mViewports[i].y;
@@ -198,18 +206,18 @@ extern "C" void fn_801A2394(HighRangeState_801A2394* state)
 
     for (i = 0; i < 7; ++i)
     {
+        state->mViews[i]->m_Enabled = true;
         GLView* view = state->mViews[i];
-        view->m_Enabled = true;
         GLView* parent = GetLayerView(eCLV_HighRangeChain);
         parent->m_Children.AddEnd(view);
         view->m_Parent = parent;
     }
 }
 
-extern "C" void fn_801A2860(
-    HighRangeState_801A2394* state, int enabled)
+void SetHighRangeTargetsEnabled(
+    HighRange* state, int enabled)
 {
-    bool fineHighRange = *fn_80277DC8()->mbFineHighRange.m_pValue;
+    bool fineHighRange = *GetHighRangeTweaks()->mbFineHighRange.m_pValue;
     for (int i = 0; i < 7; ++i)
     {
         GLView* view = state->mViews[i];
@@ -226,30 +234,30 @@ extern "C" void fn_801A2860(
     }
 }
 
-extern "C" void fn_801A28F0(HighRangeState_801A2394*)
+void CompositeHighRange(HighRange*)
 {
     glPoly2 poly;
-    int index = *fn_80277DC8()->miHighRangeIndex.m_pValue;
+    int index = *GetHighRangeTweaks()->miHighRangeIndex.m_pValue;
 
     glSetDefaultState(false);
-    glSetCurrentTexture(lbl_80572020.mTextures[index], GLTT_Diffuse);
+    glSetCurrentTexture(gHighRange.mTextures[index], GLTT_Diffuse);
     glSetRasterState(GLS_AlphaBlend, 3);
     glSetCurrentRasterState(glHandleizeRasterState());
     glSetTextureState(GLTS_DiffuseWrap, 3);
     glSetCurrentTextureState(glHandleizeTextureState());
 
-    HighRangeTweakValues_801A2004* values = fn_80277DC8();
+    HighRangeTweaks* values = GetHighRangeTweaks();
     nlColour colour;
     nlColourSet(colour, *values->miRed.m_pValue, *values->miGreen.m_pValue, *values->miBlue.m_pValue, *values->miAlpha.m_pValue);
     poly.FullCoverage(colour, 0.0f);
     poly.Attach(GetLayerView(eCLV_HighRange2D), 0, 0);
 
-    int debugIndex = lbl_806DCE58;
+    int debugIndex = sHighRangeDebugTextureIndex;
     if (debugIndex >= 0)
     {
         glSetDefaultState(false);
         glSetCurrentTexture(
-            lbl_80572020.mTextures[debugIndex], GLTT_Diffuse);
+            gHighRange.mTextures[debugIndex], GLTT_Diffuse);
         glSetRasterState(GLS_AlphaBlend, 1);
         glSetCurrentRasterState(glHandleizeRasterState());
         glSetTextureState(GLTS_DiffuseWrap, 3);
@@ -268,34 +276,126 @@ extern "C" void fn_801A28F0(HighRangeState_801A2394*)
     }
 }
 
-extern "C" void fn_801A2A78(HighRangeState_801A2394* state)
+void RenderHighRangeChain(HighRange* state)
 {
     int fineLevels[7] = { 0, 1, 2, 3, 4, 5, 6 };
     int coarseLevels[5] = { 0, 1, 2, 5, 6 };
 
-    if (*fn_80277DC8()->mbFineHighRange.m_pValue)
+    if (*GetHighRangeTweaks()->mbFineHighRange.m_pValue)
     {
         for (int i = 1; i < 7; ++i)
         {
-            fn_801A2B80(state, fineLevels[i], fineLevels[i - 1]);
+            RenderHighRangePass(state, fineLevels[i], fineLevels[i - 1]);
         }
     }
     else
     {
         for (int i = 1; i < 5; ++i)
         {
-            fn_801A2B80(state, coarseLevels[i], coarseLevels[i - 1]);
+            RenderHighRangePass(state, coarseLevels[i], coarseLevels[i - 1]);
         }
     }
 }
 
-extern "C" float lbl_80511EA8[8] = {
-    0.0f,
-    0.0f,
-    0.0f,
-    480.0f,
-    640.0f,
-    480.0f,
-    640.0f,
-    0.0f,
+static inline nlVector2 MakeHighRangeTexcoord(float x, float y)
+{
+    nlVector2 texcoord;
+    nlVec2Set(texcoord, x, y);
+    texcoord.x /= glplatGetOrthographicWidth();
+    texcoord.y /= glplatGetOrthographicHeight();
+    return texcoord;
+}
+
+void RenderHighRangePass(
+    HighRange*, int outputLevel, int inputLevel)
+{
+    u32 texture;
+    int* sampleOffset;
+    nlVector2* vertex;
+    HighRange* highRange;
+    int gray;
+    GLFourTextureAddMeshWriter writer;
+    int sampleOffsets[7] = {
+        sHighRangeSampleOffset0,
+        sHighRangeSampleOffset1,
+        sHighRangeSampleOffset2,
+        sHighRangeSampleOffset3,
+        sHighRangeSampleOffset4,
+        sHighRangeSampleOffset5,
+        sHighRangeSampleOffset6,
+    };
+    highRange = &gHighRange;
+    texture = highRange->mTextures[inputLevel];
+
+    glSetDefaultState(false);
+    glSetRasterState(GLS_AlphaBlend, 6);
+    glSetRasterState(GLS_ColourWrite, 2);
+    glSetCurrentRasterState(glHandleizeRasterState());
+
+    gray = *GetHighRangeTweaks()->miHighRangeGray.m_pValue;
+    if (writer.Begin(4, 3, 0))
+    {
+        sampleOffset = sampleOffsets;
+        vertex = sHighRangeVertices;
+        for (int i = 0; i < 4; ++i, ++sampleOffset)
+        {
+            nlColour colour;
+            nlColourSet(colour, gray, gray, gray, gray);
+            writer.Colour(colour);
+
+            HighRangeTweaks* values = GetHighRangeTweaks();
+            float sampleOffset0 = *sampleOffset
+                                * *values->mfHighRangeMult.m_pValue;
+            sampleOffset0
+                = sampleOffset0 * *values->mfHighRangeOffset.m_pValue;
+            writer.Texcoord0(MakeHighRangeTexcoord(
+                vertex->x - sampleOffset0, vertex->y));
+
+            values = GetHighRangeTweaks();
+            float sampleOffset1 = *sampleOffset
+                                * *values->mfHighRangeMult.m_pValue;
+            sampleOffset1
+                = sampleOffset1 * *values->mfHighRangeOffset.m_pValue;
+            writer.Texcoord1(MakeHighRangeTexcoord(
+                vertex->x + sampleOffset1, vertex->y));
+
+            values = GetHighRangeTweaks();
+            float sampleOffset2 = *sampleOffset
+                                * *values->mfHighRangeMult.m_pValue;
+            sampleOffset2
+                = sampleOffset2 * *values->mfHighRangeOffset.m_pValue;
+            writer.Texcoord2(MakeHighRangeTexcoord(
+                vertex->x, vertex->y - sampleOffset2));
+
+            values = GetHighRangeTweaks();
+            float sampleOffset3 = *sampleOffset
+                                * *values->mfHighRangeMult.m_pValue;
+            sampleOffset3
+                = sampleOffset3 * *values->mfHighRangeOffset.m_pValue;
+            nlVector2 texcoord3 = MakeHighRangeTexcoord(
+                vertex->x, vertex->y + sampleOffset3);
+            float positionX = vertex->x;
+            float positionY = vertex->y;
+            ++vertex;
+            writer.Texcoord3(texcoord3);
+            writer.Vertex(positionX, positionY, 0.0f);
+        }
+
+        writer.Texture(0, texture);
+        writer.Texture(1, texture);
+        writer.Texture(2, texture);
+        writer.Texture(3, texture);
+
+        if (writer.End())
+        {
+            highRange->mViews[outputLevel]->AttachModel(writer.model, 0);
+        }
+    }
+}
+
+nlVector2 sHighRangeVertices[4] = {
+    { { 0.0f, 0.0f } },
+    { { 0.0f, 480.0f } },
+    { { 640.0f, 480.0f } },
+    { { 640.0f, 0.0f } },
 };

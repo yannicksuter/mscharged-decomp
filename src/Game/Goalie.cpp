@@ -53,7 +53,7 @@
 #include "NL/nlMain.h"
 #include "NL/nlPrint.h"
 #include "Game/Weather.h"
-#include "unclassified/tu_801A6AAC.h"
+#include "Game/Render/MegaBallIndicators.h"
 #include "Game/NetworkPeer.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
@@ -1113,8 +1113,8 @@ extern "C" void fn_8007F534(Goalie* pGoalie)
         pGoalie->mUnidentified4C8 = 0;
     }
 
-    fn_801A6DD8();
-    fn_801A7800();
+    ResetMegaBallIndicators();
+    ResetMegaBallPointer();
     lbl_806DC7C8 = -1.0f;
     DrawableCharacter::RenderAllCharacters();
     UnFreezeEveryoneButCaptain(0);

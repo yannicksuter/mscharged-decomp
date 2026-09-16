@@ -105,6 +105,7 @@ public:
     void fn_8005B840(void* checksum, DebugWriteCache* cache);
     void ChangeGameState(int state);
     void InitGameState(int state);
+    void LoadTerrain(int terrain);
     void SetDifficulty(int diff0, int diff1, int diff2, bool param4);
     void fn_8005DB44(int param1, bool param2);
     void fn_8005DF38();
@@ -116,6 +117,7 @@ public:
     }
 
     inline int GetGameState() const { return m_eGameState; }
+    inline u32 GetMegaStrikeSaveMask() const { return mUnidentified038; }
 
     /* 0x04 */ FuzzyTweaks* m_pFuzzyTweaks;
     /* 0x08 */ Clock* m_pGameClock;

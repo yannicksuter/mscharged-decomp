@@ -320,30 +320,15 @@ void AudioStreamChannel::PrepareVoice(AudioStreamHeader* header)
     addr.currentAddressHi = start >> 16;
     addr.currentAddressLo = start;
     AXPBADPCM adpcm;
-    u16* p;
-    u16* p1;
-    p = (u16*)&adpcm;
-    p1 = (u16*)&header->m_Unknown1C;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
-    *p++ = *p1++;
+    unsigned short* coefficients = &adpcm.a[0][0];
+    for (int i = 0; i < 16; ++i)
+    {
+        coefficients[i] = header->coef[i];
+    }
+    adpcm.gain = header->gain;
+    adpcm.pred_scale = header->ps;
+    adpcm.yn1 = header->yn1;
+    adpcm.yn2 = header->yn2;
     AXSetVoiceSrcType(m_Unknown04, AX_SRC_TYPE_LINEAR);
     AXSetVoiceSrcRatio(m_Unknown04, m_Unknown00->m_Unknown0C);
     AXSetVoiceType(m_Unknown04, AX_VOICE_STREAM);
@@ -417,7 +402,7 @@ void AudioReadState::Initialize(AudioSourceInfo* info)
     while ((channel = GetNextChannel(channel)) != 0)
     {
         channel->m_Unknown00 = this;
-        channel->m_Unknown08 = g_pAudioBackend->AllocateAudioMemory(info->m_Unknown18->m_Unknown10->m_Unknown04 * 2);
+        channel->m_Unknown08 = g_pAudioBackend->AllocateAudioMemory(m_Unknown08->m_Unknown18->m_Unknown10->m_Unknown04 * 2);
         if (channel->m_Unknown08 == 0)
             DumpAudioMemory();
         channel->m_Unknown04 = AXAcquireVoice(31, AudioStreamChannel::OnVoiceDropped, (unsigned long)channel);

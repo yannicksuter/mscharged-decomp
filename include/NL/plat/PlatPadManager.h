@@ -14,13 +14,13 @@ class UnidentifiedStaticEvent3
 {
     typedef UnidentifiedListener3<P1, P2, P3> Listener;
     typedef DLListEntry<Listener> ListenerEntry;
-    typedef UnidentifiedStaticSlotPool<ListenerEntry, Count> ListenerPool;
+    typedef nlStaticArrayAllocator<ListenerEntry, Count> ListenerPool;
     typedef Function<void(P1, P2, P3)> Callback;
 
 public:
     UnidentifiedStaticEvent3(const char* name, int length)
         : UnidentifiedTypedEvent3<P1, P2, P3>(name, length)
-        , mListeners(Count, Count)
+        , mListeners()
     {
         RegisterEvent(
             this, UnidentifiedTypedEvent3<P1, P2, P3>::sType);

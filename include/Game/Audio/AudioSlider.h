@@ -6,6 +6,7 @@
 #include "types.h"
 
 class nlChunk;
+class XSoundHandle;
 
 struct AudioSliderDefinition
 {
@@ -87,5 +88,7 @@ struct AudioSliderTable
 };
 
 AudioSliderTable* ParseAudioSliderTable(nlChunk* chunk);
+extern "C" AudioSlider* GetAudioSlider(
+    AudioSliderTable* table, u32 index, XSoundHandle* owner);
 
 #endif // GAME_AUDIO_AUDIO_SLIDER_H

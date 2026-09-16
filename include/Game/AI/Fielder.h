@@ -235,7 +235,15 @@ public:
     bool fn_800345EC(cFielder* pOtherFielder) const;
     bool fn_80034894(cFielder* pOtherFielder) const;
     bool fn_800344B0() const;
-    bool IsRunningWithBall() const;
+    bool IsRunningWithBall() const
+    {
+        bool bRunningWithBall = false;
+        if (m_eActionState == ACTION_RUNNING_WB)
+        {
+            bRunningWithBall = true;
+        }
+        return bRunningWithBall;
+    }
     void StartRunning();
     bool CanGetElectrocuted(
         const CollisionPlayerWallData* eventData);

@@ -78,24 +78,17 @@ void FESceneManager::ForceImmediateStackProcessing()
 BaseSceneHandler* FESceneManager::GetSceneHandler(unsigned long hashID)
 {
     nlDLListIterator<BaseSceneHandler*> sceneIterator = m_sceneHandlerStack.Begin();
-    DLListEntry<BaseSceneHandler*>* headEntry = sceneIterator.m_Head;
-    DLListEntry<BaseSceneHandler*>* currentEntry = sceneIterator.m_Curr;
 
-    while (currentEntry != 0)
+    while (sceneIterator.hasNext())
     {
-        if (hashID == currentEntry->entry->mHashID)
+        BaseSceneHandler* pSceneHandler = *sceneIterator;
+
+        if (hashID == pSceneHandler->mHashID)
         {
-            return currentEntry->entry;
+            return pSceneHandler;
         }
 
-        if (nlDLRingIsEnd(headEntry, currentEntry) || currentEntry == 0)
-        {
-            currentEntry = 0;
-        }
-        else
-        {
-            currentEntry = currentEntry->m_next;
-        }
+        sceneIterator.Step();
     }
 
     return 0;

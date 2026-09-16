@@ -14,7 +14,7 @@
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/GameInfo.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/TweakRegistry.h"
 #include "NL/globalpad.h"
 #include "NL/nlBind.h"
@@ -41,7 +41,7 @@ void StartMovieCB()
     {
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
-    Presentation::GetInstance()->Call("TransitionTitleScreenToMainMenu");
+    FrontEndPresentation::GetInstance()->Call("TransitionTitleScreenToMainMenu");
     FEAudio::PlayAnimAudioEvent(0x80060B2D, 0, 0, 1);
 }
 
@@ -317,7 +317,7 @@ void HealthWarningSceneV2::Update(float fDeltaT)
         {
             mState = 3;
             GameSceneManager::Instance()->Push(SCENE_MAIN_MENU, SCREEN_FORWARD, true);
-            Presentation::GetInstance()->Call("TransitionTitleScreenToMainMenu");
+            FrontEndPresentation::GetInstance()->Call("TransitionTitleScreenToMainMenu");
         }
         break;
     }

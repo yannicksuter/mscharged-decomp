@@ -24,7 +24,7 @@
 #include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
 #include "Game/NetworkStatsManager.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/FriendManager.h"
 #include "NL/nlBind.h"
@@ -135,7 +135,7 @@ void SHOnlineHub::OnErrorDismissed()
     mUnidentified58C = false;
     GameSceneManager::Instance()->Pop();
     FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
-    Presentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
+    FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
 }
 
 void SHOnlineHub::SceneCreated()
@@ -229,7 +229,7 @@ void SHOnlineHub::Update(float dt)
         {
             FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
             GameSceneManager::Instance()->Pop();
-            Presentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
+            FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
             return;
         }
     }

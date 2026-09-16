@@ -7,13 +7,13 @@
 #include "NL/gl/glState.h"
 #include "NL/nlString.h"
 #include "NL/platqmath.h"
-#include "unclassified/tu_8019FE24.h"
+#include "Game/Render/FlyingCamera.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 // Charged-only shadow prop, sixth of the run described beside
 // DrawableBulletBill. This one carries the index of its live camera instead of
 // a pointer, and owns a lowercase hash of the flying-camera model name. The
-// live object and the render-object lookup stay address-named.
+// The render-object lookup remains address-named.
 
 static float gShadowScaleHigh = 0.5f;
 static int gShadowAlphaLow = 100;
@@ -116,9 +116,9 @@ DrawableFlyingCamera::DrawableFlyingCamera()
 
 void DrawableFlyingCamera::Grab()
 {
-    mVisible = fn_801A0C44(mIndex)->visible;
-    mPosition = fn_801A0C44(mIndex)->position;
-    mOrientation = fn_801A0C44(mIndex)->orientation;
+    mVisible = GetFlyingCamera(mIndex)->mVisible;
+    mPosition = GetFlyingCamera(mIndex)->mPosition;
+    mOrientation = GetFlyingCamera(mIndex)->mOrientation;
 }
 
 void DrawableFlyingCamera::Render() const
@@ -186,4 +186,3 @@ void DrawableFlyingCamera::Blend(const float* factors, const DrawableFlyingCamer
 }
 
 static u32 gFlyingCameraNameHash = nlStringLowerHash("gameplay/flyingcamera3");
-

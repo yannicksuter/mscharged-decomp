@@ -582,7 +582,7 @@ void ChainChomp::Fall()
         EmissionManager::Instance()->GetEffectsGroup("chainchomp_trail"));
 }
 
-void ChainChomp::Spawn(cFielder* pThrower)
+void ChainChomp::Spawn(cFielder* pThrower, cFielder* pTarget)
 {
     meChainChompState = CHAIN_STATE_RECOVER;
     mpThrower = pThrower;

@@ -568,9 +568,10 @@ extern "C" void fn_803140CC(
     UnidentifiedFuzzyRuntimeBase* runtime, int value,
     unsigned long hash, UnidentifiedVariant_80054AB8* action)
 {
+    int index = fn_80312208(hash);
     FuzzyVariant variant(FT_INT, value);
     runtime->UnidentifiedVirtual14(
-        action, fn_80312208(hash), variant);
+        action, index, variant);
 }
 
 extern "C" void fn_80314160(

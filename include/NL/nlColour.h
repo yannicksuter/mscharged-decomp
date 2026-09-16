@@ -49,6 +49,14 @@ inline void nlColourSet(nlColour& c0, u8 _r, u8 _g, u8 _b, u8 _a)
     c0.c[3] = _a;
 }
 
+inline void nlColourSeReversed(nlColour& c0, u8 _r, u8 _g, u8 _b, u8 _a)
+{
+    c0.c[3] = _a;
+    c0.c[2] = _b;
+    c0.c[1] = _g;
+    c0.c[0] = _r;
+}
+
 inline u8 nlFloatColourToByte(float input)
 {
     return (s32)(input * 255.0f);

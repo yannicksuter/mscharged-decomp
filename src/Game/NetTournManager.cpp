@@ -7,7 +7,7 @@
 #include "Game/GameInfo.h"
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/TweakValue.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
@@ -37,14 +37,14 @@ static TweakIntBinding sOverrideCupPersonaTweak(
     "s_nOverrideCupPersona", "Network/Tournament", &s_nOverrideCupPersona,
     true);
 
-void NetworkMessageType34::Serialize(
+void NetMessageMegaBallPointer::Serialize(
     NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
-    serializer->Transfer(&mUnidentified0A, sizeof(mUnidentified0A));
-    serializer->Transfer(&mUnidentified0C, sizeof(mUnidentified0C));
-    serializer->Transfer(&mUnidentified0D, sizeof(mUnidentified0D));
-    serializer->Transfer(&mUnidentified0E, sizeof(mUnidentified0E));
+    serializer->Transfer(&mPointerX, sizeof(mPointerX));
+    serializer->Transfer(&mPointerY, sizeof(mPointerY));
+    serializer->Transfer(&mAngleHighByte, sizeof(mAngleHighByte));
+    serializer->Transfer(&mTextureIndex, sizeof(mTextureIndex));
+    serializer->Transfer(&mStatus, sizeof(mStatus));
 }
 
 void NetworkMessageType35::Serialize(
@@ -89,7 +89,7 @@ int NetworkMessageType35::GetType()
     return 35;
 }
 
-int NetworkMessageType34::GetType()
+int NetMessageMegaBallPointer::GetType()
 {
     return 34;
 }
@@ -259,7 +259,7 @@ void NetTournManager::TransitionOnlineMenuToTournament(
 
     mWinningMachine = -1;
     BuildInitialBracket();
-    Presentation::Instance().Call("TransitionOnlineMenuToTournament");
+    FrontEndPresentation::Instance().Call("TransitionOnlineMenuToTournament");
 }
 
 void NetTournManager::GenerateFirstRoundSeedings(

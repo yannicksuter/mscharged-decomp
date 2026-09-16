@@ -38,7 +38,7 @@
 #include "NL/nlTask.h"
 #include "NL/gl/glState.h"
 #include "NL/nlstring_tmpl.h"
-#include "unclassified/tu_80284A58.h"
+#include "Game/Render/Presentation.h"
 
 GLView* g_pNisRenderView;
 

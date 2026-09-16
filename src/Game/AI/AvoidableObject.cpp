@@ -27,7 +27,6 @@ extern "C" bool fn_8003E8A0(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" bool fn_8003E99C(cFielder*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
-extern "C" float fn_800D9EC4(cPlayer*);
 extern "C" float fn_800DEAB4(cFielder*);
 extern "C" float fn_800DED80(cFielder*);
 extern "C" void fn_802B5CC0(
@@ -308,7 +307,7 @@ float AvoidableFielder::UnidentifiedVirtual28(
     {
         cFielder* pOther
             = ((AvoidableFielder*)other)->m_pFielder;
-        if (fn_800DED80(m_pFielder) && !fn_800D9EC4(pOther))
+        if (fn_800DED80(m_pFielder) && !Incapacitated(pOther))
         {
             fStrength *= 0.2f;
         }
@@ -647,20 +646,25 @@ bool AvoidablePolygon::UnidentifiedVirtual1C(
     const nlVector3& target, nlVector3& point, nlVector3& dir)
 {
     int aFront[2] = { -1, -1 };
-    int* pFront = aFront;
-    float fThreshold = 0.0f;
-    float fMinDist = 10000000000.0f;
-    int nClosest = -1;
+    float fThreshold;
+    float fMinDist;
+    int nClosest;
     nlVector2 aEdge[2];
     nlVector4 line;
     bool bInside;
     int i;
-    int nFront = 0;
+    int nFront;
+
+    fMinDist = 10000000000.0f;
+    fThreshold = 0.0f;
+    nFront = 0;
+    nClosest = -1;
+    const nlVector2& v2Target = *(const nlVector2*)&target;
 
     for (i = 0; i < 4; i++)
     {
         fn_802B5CC0(line, mPoints[i], mNormals[i]);
-        float fDist = fn_802B5DD0(*(const nlVector2*)&target, line);
+        float fDist = fn_802B5DD0(v2Target, line);
         bool bFront = fDist - fThreshold > 0.0001f || nlNear(fDist, fThreshold);
         int nSide = 2;
         if (bFront)
@@ -669,7 +673,7 @@ bool AvoidablePolygon::UnidentifiedVirtual1C(
         }
         if (nSide == 1)
         {
-            *pFront++ = i;
+            aFront[nFront] = i;
             nFront++;
         }
         float fAbs = nlAbs(fDist);
@@ -705,9 +709,8 @@ bool AvoidablePolygon::UnidentifiedVirtual1C(
         {
             for (; i < nFront; i++)
             {
-                nlVec2Set(*(nlVector2*)&dir,
-                    dir.x + (1.0f / (float)nFront) * mNormals[aFront[i]].x,
-                    dir.y + (1.0f / (float)nFront) * mNormals[aFront[i]].y);
+                nlVec2ScaleAdd(*(nlVector2*)&dir, 1.0f / (float)nFront,
+                    mNormals[aFront[i]], *(nlVector2*)&dir);
             }
         }
         if (nFront == 2)

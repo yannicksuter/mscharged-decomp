@@ -1,6 +1,8 @@
 #ifndef GAME_TERRAIN_H
 #define GAME_TERRAIN_H
 
+class DebugWriteCache;
+
 class Terrain
 {
 public:
@@ -11,6 +13,7 @@ public:
     float GetSlideFactor();
     float GetRollingResistance(float value);
     float GetRestitution(float value);
+    void SyncLog(void* context, DebugWriteCache* cache);
 
     /* 0x00 */ char mName[0x40];
     /* 0x40 */ int mIndex;

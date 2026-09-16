@@ -10,7 +10,7 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/FriendManager.h"
 #include "NL/nlBind.h"
 #include "NL/nlFormat.h"
@@ -173,7 +173,7 @@ void SHGameplayOptions::Update(float dt)
             {
                 FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
                 GameSceneManager::Instance()->Pop();
-                Presentation::GetInstance()->Call("TransitionGrudgeMatchToMainMenu");
+                FrontEndPresentation::GetInstance()->Call("TransitionGrudgeMatchToMainMenu");
             }
             return;
         }

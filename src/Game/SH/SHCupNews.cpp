@@ -6,7 +6,7 @@
 #include "Game/DB/GameProgress.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/tlComponentInstance.h"
-#include "Game/Render/Presentation.h"
+#include "Game/Render/FrontEndPresentation.h"
 #include "Game/FE/feDPD.h"
 #include "Game/FE/feCupFlow.h"
 #include "NL/nlFormat.h"
@@ -38,13 +38,13 @@ void CupNewsScene::OnDoneTransitionComplete()
     {
         GameSceneManager::Instance()->Pop();
         FEAudio::PlayAnimAudioEvent(0xD276AFE5, 0, 0, 1);
-        Presentation::GetInstance()->Call("TransitionToStrikerCupHub");
+        FrontEndPresentation::GetInstance()->Call("TransitionToStrikerCupHub");
     }
     else if (mDisplayMode == 0)
     {
         GameSceneManager::Instance()->Pop();
         FEAudio::PlayAnimAudioEvent(0xD276AFE5, 0, 0, 1);
-        Presentation::GetInstance()->Call("TransitionToInitialStrikerCupHub");
+        FrontEndPresentation::GetInstance()->Call("TransitionToInitialStrikerCupHub");
     }
     else if (mDisplayMode == 7)
     {
