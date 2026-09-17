@@ -1,7 +1,7 @@
 #ifndef _GOALCAM_H_
 #define _GOALCAM_H_
 
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 
 class GoalCamera : public cBaseCamera
 {

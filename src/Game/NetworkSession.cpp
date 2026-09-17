@@ -1,4 +1,5 @@
 #include "NL/nlSingleton.inl"
+#include "NL/nlFunction.inl"
 #include "Game/TweakQuery.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/NetworkMessageRegistry.h"
@@ -76,94 +77,10 @@ struct UnidentifiedVersionInfo
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/Game.h"
 
-typedef void (NetworkSession::*UnidentifiedNetworkCallback)();
-
-struct UnidentifiedNetworkCallbackRef
-{
-    UnidentifiedNetworkCallbackRef(UnidentifiedNetworkCallback callback)
-        : mCallback(callback)
-    {
-    }
-
-    UnidentifiedNetworkCallback mCallback;
-};
-
-struct UnidentifiedNetworkBinding
-{
-    UnidentifiedNetworkCallback mCallback;
-    NetworkSession* mTarget;
-};
-
-class UnidentifiedNetworkDelegate
-{
-public:
-    void* operator new(unsigned long size) { return AllocateFunctionMemory(size); }
-    void operator delete(void* p)
-    {
-        FreeFunctionMemory(p, sizeof(UnidentifiedNetworkDelegate));
-    }
-
-    UnidentifiedNetworkDelegate(const UnidentifiedNetworkBinding& binding)
-        : mCallback(binding.mCallback)
-        , mTarget(binding.mTarget)
-    {
-    }
-
-    virtual ~UnidentifiedNetworkDelegate() { }
-    virtual void Execute() { (mTarget->*mCallback)(); }
-    virtual UnidentifiedNetworkDelegate* Clone();
-
-    /* 0x04 */ UnidentifiedNetworkCallback mCallback;
-    /* 0x10 */ NetworkSession* mTarget;
-}; // size: 0x14
-
-struct UnidentifiedActionHandle
-{
-    /* 0x00 */ int mState;
-    /* 0x04 */ UnidentifiedNetworkDelegate* mDelegate;
-};
-
-class UnidentifiedActionRegistry
-{
-public:
-    virtual void RegistryVirtual00();
-    virtual void RegistryVirtual04();
-    virtual void Register(UnidentifiedActionHandle* handle, u32* slot, int);
-};
-
-static inline UnidentifiedNetworkDelegate* NewNetworkDelegate(
-    UnidentifiedNetworkBinding binding)
-{
-    return new UnidentifiedNetworkDelegate(binding);
-}
-
-static inline UnidentifiedNetworkDelegate* CreateNetworkDelegateInner(
-    UnidentifiedNetworkCallbackRef callback, NetworkSession* target)
-{
-    UnidentifiedNetworkBinding binding;
-    binding.mCallback = callback.mCallback;
-    binding.mTarget = target;
-    return NewNetworkDelegate(binding);
-}
-
-static inline UnidentifiedNetworkDelegate* CreateNetworkDelegate(
-    UnidentifiedNetworkCallbackRef callback, NetworkSession* target)
-{
-    return CreateNetworkDelegateInner(callback, target);
-}
-
-// The two registration dispatchers live inside cGame's still-unreconstructed
-// 0x49C..0x4C8 storage; the byte-offset casts express that target fact without
-// inventing cGame layout the Game translation unit does not yet own.
-static inline void RegisterNetworkAction(
-    UnidentifiedActionHandle* handle, UnidentifiedNetworkCallbackRef callback,
-    NetworkSession* session, UnidentifiedActionRegistry* registry,
-    u32* slot)
-{
-    handle->mState = 2;
-    handle->mDelegate = CreateNetworkDelegate(callback, session);
-    registry->Register(handle, slot, -1);
-}
+typedef Detail::MemFunImpl<void, void (NetworkSession::*)()>
+    NetworkSessionCallback;
+typedef BindExp1<void, NetworkSessionCallback, NetworkSession*>
+    NetworkSessionBinding;
 
 extern BaseGameSceneManager* g_pGameSceneManager;
 
@@ -1730,37 +1647,22 @@ typedef void (NetworkSession::*UnidentifiedSessionCallback)();
 
 static inline void RegisterLoadedGameActions(NetworkSession* session)
 {
-    UnidentifiedActionHandle first;
-    RegisterNetworkAction(
-        &first,
-        UnidentifiedNetworkCallbackRef(
-            &NetworkSession::OnPauseGame),
-        session, (UnidentifiedActionRegistry*)((u8*)g_pGame + 0x49C),
-        &session->mUnidentified2464);
+    Function<FnVoidVoid> first(NetworkSessionBinding(
+        MemFun<NetworkSession, void>(&NetworkSession::OnPauseGame), session));
+    UnidentifiedTypedEvent<UnidentifiedEventNoData>* pauseEvent
+        = &g_pGame->mUnidentified49C.mEvent00;
+    pauseEvent->Add(first, (unsigned int)&session->mUnidentified2464, -1);
 
-    UnidentifiedActionHandle second;
-    RegisterNetworkAction(
-        &second,
-        UnidentifiedNetworkCallbackRef(
-            &NetworkSession::OnResumingGame),
-        session, (UnidentifiedActionRegistry*)((u8*)g_pGame + 0x4C8),
-        &session->mUnidentified2468);
+    Function<FnVoidVoid> second(NetworkSessionBinding(
+        MemFun<NetworkSession, void>(&NetworkSession::OnResumingGame), session));
+    UnidentifiedTypedEvent<UnidentifiedEventNoData>* resumingEvent
+        = &g_pGame->mUnidentified49C.mEvent01;
+    resumingEvent->Add(second, (unsigned int)&session->mUnidentified2468, -1);
 
     if (NetTournManager::Instance()->mState != 0)
     {
         NetTournManager::Instance()->NotifyGameStarted();
     }
-
-    if (second.mState == 2 && second.mDelegate != 0)
-    {
-        delete second.mDelegate;
-    }
-    second.mState = 0;
-    if (first.mState == 2 && first.mDelegate != 0)
-    {
-        delete first.mDelegate;
-    }
-    first.mState = 0;
 }
 
 int NetworkSession::ProcessMessage(
@@ -2458,6 +2360,7 @@ int NetworkSession::PollGameLoaded()
 
     if (mOverlayRequest == 3)
     {
+        NetworkMachineRoster* roster;
         for (int machine = 0; machine < this->GetNumMachines(); ++machine)
         {
             if (machine == (s8)this->GetLocalMachineId())
@@ -2471,7 +2374,7 @@ int NetworkSession::PollGameLoaded()
             }
             else
             {
-                NetworkMachineRoster* roster = GetMachineRoster();
+                roster = GetMachineRoster();
                 int index;
                 if (NetTournManager::Instance()
                         ->mTournamentMachineMappingActive)
@@ -2715,8 +2618,4 @@ void SHOnlineFriendsChooseSides::SetDraftMessage(NetMessageDraft message)
 static TweakBoolBinding s_NoPopupNetworkErrorTweak(
     "g_bNoPopupNetworkError", "Network", &g_bNoPopupNetworkError, true);
 
-UnidentifiedNetworkDelegate* UnidentifiedNetworkDelegate::Clone()
-{
-    return new UnidentifiedNetworkDelegate(*this);
-}
 #include "Game/NetworkStatsManager.h"

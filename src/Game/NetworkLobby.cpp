@@ -17,6 +17,7 @@
 
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
 
 #include <string.h>
 
@@ -786,6 +787,26 @@ void NetworkLobby::UpdatePeerConnectionState(int aid)
     else if (DWC_GetMyAID() < aid)
     {
         mPlayers[aid].mConnectionState = 2;
+
+        u8 address[4];
+        address[0] = 0;
+        address[1] = 0;
+        address[2] = 0;
+        address[3] = aid;
+        NetworkSocket* socket =
+            g_pNetworkSessionBase->GetDirectSocket();
+        if (socket->Connect(&mPlayers[aid].mConnection, address, 0))
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Attempting Reliable connection to AID %d...\n", aid);
+        }
+        else
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Initial Failure to make reliable connection with AID %d\n",
+                aid);
+            mPlayers[aid].mConnectionState = 4;
+        }
     }
     else
     {
@@ -793,11 +814,82 @@ void NetworkLobby::UpdatePeerConnectionState(int aid)
     }
 }
 
+inline void NetworkLobby::UpdatePeerConnectionStates()
+{
+    for (int aid = 0; aid < GetConnectionCount(); ++aid)
+    {
+        UpdatePeerConnectionState(aid);
+    }
+}
+
 void NetworkLobby::BuildLocalMachineInfo(
     NetworkDraftMachineInfo* info)
 {
+    NetworkRankingMeta* record = 0;
+    if (IsOnlineRankedMatch())
+    {
+        record = NetworkStatsManager::Instance()->GetLocalStats(0);
+    }
+    else if (NetworkStatsManager::Instance()->UsesEuropeanRankings())
+    {
+        record = NetworkStatsManager::Instance()->GetLocalStats(2);
+    }
+    else
+    {
+        NetworkLeaderboardCategory* leaderboard =
+            NetworkStatsManager::Instance()->GetCategory(4);
+        if (leaderboard != 0)
+        {
+            int profileId = GameInfoManager::Instance()
+                                ->GetSaveSlot(gNetworkSaveSlotIndex)
+                                ->unknown_0x01C;
+            int index = leaderboard->FindPlayer(profileId);
+            if (index != -1)
+            {
+                record = &leaderboard->mMetadata[index];
+            }
+        }
+    }
+
+    if (record != 0)
+    {
+        info->mStats = *record;
+    }
+    else
+    {
+        info->mStats.Reset();
+    }
+
+    info->mProfileId = GameInfoManager::Instance()
+                           ->GetSaveSlot(gNetworkSaveSlotIndex)
+                           ->unknown_0x01C;
+
+    nlStrNCpy(info->mName, gNetworkMiiNameWide, 11);
+    memcpy(info->mMiiData, &gNetworkMiiData, sizeof(info->mMiiData));
+
     info->mMachineIndex = GetLocalMachineIndex();
     info->mGuestEnabled = HasOnlineTwoLocalPlayers();
+}
+
+inline void NetworkLobby::SendLocalMachineInfo(int aid)
+{
+    unsigned int connection = mPlayers[aid].mConnection;
+    if (connection == 0)
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "DWCLobby error no connection to peer %d\n", aid);
+    }
+    else
+    {
+        NetMessageDraftMachineInfo message;
+        u8 buffer[0xFF];
+        BuildLocalMachineInfo(&message.mEntry);
+        NetworkSocket* socket =
+            g_pNetworkSessionBase->GetDirectSocket();
+        int size = gNetworkMessageRegistry->Serialize(
+            &message, buffer, sizeof(buffer));
+        socket->Send(connection, buffer, size, true);
+    }
 }
 
 void NetworkLobby::Update(float dt)
@@ -806,12 +898,99 @@ void NetworkLobby::Update(float dt)
     if (mConnectionDeadline > 0.0f && mElapsedTime >= mConnectionDeadline
         && !mMatchFailed)
     {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Error Matchmaking - Lobby Start game timed out!");
         mMatchFailed = true;
     }
 
-    if (mCancelRequested && CanCancelMatchmaking())
+    switch (mState)
     {
-        CancelMatchmaking();
+    case 3:
+        mFriendProfileId =
+            DWC_GetMOMinCompState((u64*)&mUnidentified030);
+        break;
+    case 2:
+        for (int i = 0; i < mMachineCount; ++i)
+        {
+            switch (mPlayers[i].mConnectionState)
+            {
+            case 0:
+                UpdatePeerConnectionState(i);
+                break;
+            case 1:
+                BuildLocalMachineInfo(&mMachineInfo[i]);
+                mMachineInfoReceived[i] = true;
+                mPlayers[i].mConnectionState = 6;
+                break;
+            case 5:
+            {
+                SendLocalMachineInfo(i);
+                mPlayers[i].mConnectionState = 7;
+                break;
+            }
+            case 4:
+                mMatchFailed = true;
+                break;
+            }
+        }
+        break;
+    case 4:
+        UpdatePeerConnectionStates();
+        mState = 5;
+        break;
+    case 5:
+    {
+        bool connectionsReady = true;
+        for (int i = 0; i < mMachineCount; ++i)
+        {
+            if (mPlayers[i].mConnectionState != 1
+                && mPlayers[i].mConnectionState != 5)
+            {
+                connectionsReady = false;
+            }
+        }
+
+        if (connectionsReady)
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "DWCLobby finished establishing Rel Connections\n");
+            if (GetLocalMachineIndex() == 0)
+            {
+                mState = 6;
+                BuildLocalMachineInfo(&mMachineInfo[0]);
+                mMachineInfoReceived[0] = true;
+            }
+            else
+            {
+                SendLocalMachineInfo(0);
+                mState = 7;
+            }
+        }
+        break;
+    }
+    case 6:
+    {
+        bool allMachineInfoReceived = true;
+        for (int i = 0; i < mMachineCount; ++i)
+        {
+            if (!mMachineInfoReceived[i])
+            {
+                allMachineInfoReceived = false;
+            }
+        }
+        if (allMachineInfoReceived)
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "DWCLobby host finished waiting for all machine info\n");
+            mState = 7;
+        }
+        break;
+    }
+    case 0:
+    case 1:
+    case 7:
+    default:
+        break;
     }
 }
 

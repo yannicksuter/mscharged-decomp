@@ -128,7 +128,11 @@ bool cField::FixOutOfBoundsPosition(nlVector3& v, float fMinDistanceFromWall, bo
 
     if (bFixCorners)
     {
-        bFixed = FixCornerPosition(v, fMinDistanceFromWall);
+        bFixed = true;
+        if (!FixCornerPosition(v, fMinDistanceFromWall))
+        {
+            bFixed = false;
+        }
         if (!bFixed)
         {
             bFixed = FixOutOfBoundsX(v, bExcludeNet, fMinDistanceFromWall);
@@ -140,8 +144,13 @@ bool cField::FixOutOfBoundsPosition(nlVector3& v, float fMinDistanceFromWall, bo
     }
     else
     {
-        bool bFixedX = FixOutOfBoundsX(v, bExcludeNet, fMinDistanceFromWall);
-        bFixed = FixOutOfBoundsY(v, fMinDistanceFromWall) || bFixedX;
+        bool bFixedX = true;
+        if (!FixOutOfBoundsX(v, bExcludeNet, fMinDistanceFromWall))
+        {
+            bFixedX = false;
+        }
+        bool bFixedY = FixOutOfBoundsY(v, fMinDistanceFromWall);
+        bFixed = bFixedY || bFixedX;
     }
 
     return bFixed;
@@ -199,14 +208,14 @@ bool cField::FixOutOfBoundsX(nlVector3& v, bool bExcludeNet, float fMinDistanceF
         v.x = FixComponent(v.x, -mv3FieldPosition.x + fMinDistanceFromWall,
             mv3FieldPosition.x - fMinDistanceFromWall);
     }
-    else if ((float)fabs(v.y) > 0.5f * cNet::m_fNetWidth - fMinDistanceFromWall)
+    else if ((float)fabs(v.y) > 0.5f * cNet::GetNetWidth() - fMinDistanceFromWall)
     {
         v.x = FixComponent(v.x, -mv3FieldPosition.x + fMinDistanceFromWall,
             mv3FieldPosition.x - fMinDistanceFromWall);
     }
     else
     {
-        float fNetBack = mv3FieldPosition.x + cNet::m_fNetDepth;
+        float fNetBack = mv3FieldPosition.x + cNet::GetNetDepth();
         v.x = FixComponent(v.x, -fNetBack, fNetBack);
     }
 

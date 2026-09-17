@@ -1,7 +1,7 @@
 #ifndef _TOPDOWNCAMERA_H_
 #define _TOPDOWNCAMERA_H_
 
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 
 class TopDownCamera : public cBaseCamera
 {

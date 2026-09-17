@@ -84,7 +84,13 @@ void cSHierarchy::BuildPushPopFlags(
 
 cSHierarchy* cSHierarchy::Initialize(nlChunk* pChunk)
 {
-    pChunk = pChunk->GetFirstChunk();
+    nlChunk* pFirst = (nlChunk*)pChunk->GetUnalignedData();
+    if (pChunk->IsAlignedChunk())
+    {
+        pFirst = (nlChunk*)pChunk->GetAlignedData();
+    }
+
+    pChunk = pFirst;
     cSHierarchy* pRetval = (cSHierarchy*)pChunk->GetData();
 
     pChunk = pChunk->GetNextChunk();

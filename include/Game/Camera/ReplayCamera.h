@@ -1,7 +1,7 @@
 #ifndef GAME_CAMERA_REPLAY_CAMERA_H
 #define GAME_CAMERA_REPLAY_CAMERA_H
 
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 
 enum ReplayCameraPosition
 {

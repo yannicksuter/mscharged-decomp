@@ -1,7 +1,7 @@
 #ifndef _KICKOFFCAM_H_
 #define _KICKOFFCAM_H_
 
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 
 class cKickOffCamera : public cBaseCamera
 {

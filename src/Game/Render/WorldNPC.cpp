@@ -34,6 +34,48 @@ WorldNPCManager* gpWorldNPCManager;
 
 static const char* sWorldNPCTweakPath = "/Render/WorldNPCs";
 
+inline void WorldNPCManager::RegisterObject(WorldNPC* npc)
+{
+    unsigned long templateHash;
+    bool found;
+    int index;
+
+    found = false;
+    index = 0;
+    templateHash = npc->mTemplateHash;
+    for (; index < mNumTemplates; ++index)
+    {
+        if (templateHash
+            == nlStringLowerHash(mTemplates[index].mName))
+        {
+            found = true;
+            break;
+        }
+    }
+    if (found)
+    {
+        mSelectedTemplates[index] = true;
+    }
+    mPendingWorldNPCs.AddEnd(npc);
+}
+
+static inline bool FindLoadedTemplate(const WorldNPCManager& manager,
+    unsigned long templateHash, int& index)
+{
+    bool found = false;
+    index = 0;
+    for (; index < manager.mNumLoadTemplates; ++index)
+    {
+        if (templateHash
+            == nlStringLowerHash(manager.mLoadTemplates[index].mName))
+        {
+            found = true;
+            break;
+        }
+    }
+    return found;
+}
+
 static inline void nlPlaneNormalize(nlVector4& in, nlVector4& out)
 {
     float inverseLength = nlRecipSqrt(
@@ -207,44 +249,51 @@ FrustumResult ClassifySphereInFrustum(const nlVector4* pPlanes,
 void GetFrustumCorners(
     const nlVector4* pPlanes, nlVector4* pCorners)
 {
-    static const int planeIndices[4][2]
+    const int planeIndices[4][2]
         = { { 2, 0 }, { 2, 1 }, { 3, 1 }, { 3, 0 } };
 
     for (int end = 0; end < 2; ++end)
     {
-        const nlVector4& endPlane = pPlanes[end == 0 ? 4 : 5];
+        int endPlaneIndex = 5;
+        if (end == 0)
+        {
+            endPlaneIndex = 4;
+        }
+        const nlVector4& endPlane = pPlanes[endPlaneIndex];
         for (int side = 0; side < 4; ++side)
         {
+            nlVector4& corner = pCorners[end * 4 + side];
             const nlVector4& firstPlane = pPlanes[planeIndices[side][0]];
             const nlVector4& secondPlane = pPlanes[planeIndices[side][1]];
 
             nlMatrix4 planeMatrix;
             planeMatrix.m11 = endPlane.x;
-            planeMatrix.m12 = firstPlane.x;
-            planeMatrix.m13 = secondPlane.x;
-            planeMatrix.m14 = 0.0f;
             planeMatrix.m21 = endPlane.y;
-            planeMatrix.m22 = firstPlane.y;
-            planeMatrix.m23 = secondPlane.y;
-            planeMatrix.m24 = 0.0f;
             planeMatrix.m31 = endPlane.z;
+            planeMatrix.m41 = endPlane.w;
+            planeMatrix.m12 = firstPlane.x;
+            planeMatrix.m22 = firstPlane.y;
             planeMatrix.m32 = firstPlane.z;
+            planeMatrix.m42 = firstPlane.w;
+            planeMatrix.m13 = secondPlane.x;
+            planeMatrix.m23 = secondPlane.y;
             planeMatrix.m33 = secondPlane.z;
+            planeMatrix.m43 = secondPlane.w;
+            planeMatrix.m14 = 0.0f;
+            planeMatrix.m24 = 0.0f;
             planeMatrix.m34 = 0.0f;
             planeMatrix.m41 = 0.0f;
             planeMatrix.m42 = 0.0f;
             planeMatrix.m43 = 0.0f;
             planeMatrix.m44 = 1.0f;
 
-            nlVector4 distances;
+            nlVector4 distances = { 0.0f, 0.0f, 0.0f, 0.0f };
             distances.x = -endPlane.w;
             distances.y = -firstPlane.w;
             distances.z = -secondPlane.w;
-            distances.w = 0.0f;
 
             nlMatrix4 inverse;
             nlInvertMatrix(inverse, planeMatrix);
-            nlVector4 corner;
             nlMultVectorMatrix(corner, distances, inverse);
             pCorners[end * 4 + side] = corner;
         }
@@ -397,17 +446,8 @@ bool WorldNPCManager::UpdateModelLoading()
 ImpostorModel* WorldNPCManager::CreateNPC(
     unsigned long templateHash, const nlMatrix4& transform)
 {
-    bool found = false;
-    int index = 0;
-    for (; index < mNumLoadTemplates; ++index)
-    {
-        if (templateHash
-            == nlStringLowerHash(mLoadTemplates[index].mName))
-        {
-            found = true;
-            break;
-        }
-    }
+    int index;
+    bool found = FindLoadedTemplate(*this, templateHash, index);
 
     ImpostorModel* source
         = found ? mLoadedModels[index] : 0;
@@ -415,7 +455,7 @@ ImpostorModel* WorldNPCManager::CreateNPC(
         = source->Clone(glGetCurrentResourcePool());
     if (mModelCallback != 0)
     {
-        model->mModelCallback = mModelCallback;
+        model->mModelCallback = GetModelCallback();
     }
 
     model->PlayAnimation("idle", 0.0f, PM_CYCLIC);
@@ -460,22 +500,7 @@ void WorldNPCManager::Update(float dt)
 void WorldNPC::Initialize()
 {
     WorldNPCManager* manager = gpWorldNPCManager;
-    bool found = false;
-    int index = 0;
-    for (; index < manager->mNumTemplates; ++index)
-    {
-        if (mTemplateHash
-            == nlStringLowerHash(manager->mTemplates[index].mName))
-        {
-            found = true;
-            break;
-        }
-    }
-    if (found)
-    {
-        manager->mSelectedTemplates[index] = true;
-    }
-    manager->mPendingWorldNPCs.AddEnd(this);
+    manager->RegisterObject(this);
 }
 
 void WorldNPC::ReleaseResources()

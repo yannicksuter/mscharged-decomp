@@ -63,6 +63,8 @@ public:
 
     int GetVoiceOutCount() { return mVoiceOutCount; }
 
+    WsdTrack* GetPlayerTrack(int trackNo);
+
     void FinishPlayer();
 
     BOOL ParseNextTick(bool doNoteOn);

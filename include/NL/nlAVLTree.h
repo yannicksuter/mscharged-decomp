@@ -152,11 +152,13 @@ public:
         return &((Entry*)node)->value;
     }
 
-    void Remove(const KeyType& key)
+    bool Remove(const KeyType& key)
     {
         AVLTreeNode* removedNode = RemoveAVLNode((AVLTreeNode**)&m_Root, (void*)&key);
-        if (removedNode != 0)
-            DeleteEntry(this, removedNode);
+        if (removedNode == 0)
+            return false;
+        DeleteEntry(this, removedNode);
+        return true;
     }
 
     template <typename CallbackType>
@@ -252,9 +254,7 @@ public:
 
     virtual AVLTreeNode* AllocateEntry(void* key, void* value)
     {
-        Entry* storage;
-        m_Allocator.Allocate(storage);
-        Entry* newNode = new (storage) Entry;
+        Entry* newNode = new (m_Allocator.Allocate()) Entry;
         newNode->node.left = 0;
         newNode->node.right = 0;
         newNode->node.heavy = 0;
@@ -327,7 +327,7 @@ public:
         {
             m_Stack[m_NumStackEntries] = entry;
             ++m_NumStackEntries;
-            entry = (Entry*)entry->node.left;
+            entry = *(Entry**)&entry->node.left;
         }
         m_Stack[m_NumStackEntries] = entry;
         ++m_NumStackEntries;
@@ -342,17 +342,17 @@ public:
             PushLeft(right);
     }
 
-    bool IsValid() const
+    bool IsValid()
     {
         return m_NumStackEntries != 0;
     }
 
-    Entry* Current() const
+    Entry* Current()
     {
         return m_Stack[m_NumStackEntries - 1];
     }
 
-    ValueType& CurrentValue() const
+    ValueType& CurrentValue()
     {
         return m_Stack[m_NumStackEntries - 1]->value;
     }

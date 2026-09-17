@@ -13,15 +13,11 @@ struct NetworkMessageStorage
     u8 mStorage[0x800];
 };
 
-extern const char sUnreliablePayloadCountError[];
-extern const char sUnreliablePayloadSizeError[];
-extern const char sVoicePayloadCountError[];
-extern const char sVoicePayloadSizeError[];
-extern const char sReliablePayloadCountError[];
-extern const char sReliablePayloadSizeError[];
 SlotPool<NetworkMessageStorage> gNetworkMessagePool(15, 0);
 CBlowFish* gTransportChallengeCipher;
-extern u8 sTransportChallengeKey[8];
+static u8 sTransportChallengeKey[8] = {
+    0x17, 0xED, 0xFF, 0x12, 0x61, 0x40, 0x25, 0xB2
+};
 
 
 TransportMessage::TransportMessage()
@@ -113,13 +109,15 @@ bool TransportMessage::AddUnreliablePacket(TransportPacket* packet)
 {
     if (mUnreliableCount == 16)
     {
-        tDebugPrintManager::Print(DC_NETWORK, sUnreliablePayloadCountError);
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Failed to add unreliable payload..too many unreliable payloads\n");
         return false;
     }
     int size = mSize;
     if (size + packet->GetUnreliableSize() > 0x587)
     {
-        tDebugPrintManager::Print(DC_NETWORK, sUnreliablePayloadSizeError);
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Failed to add unreliable payload..size would be too great\n");
         return false;
     }
 
@@ -134,13 +132,15 @@ bool TransportMessage::AddVoicePacket(TransportPacket* packet)
 {
     if (mVoiceCount == 16)
     {
-        tDebugPrintManager::Print(DC_NETWORK, sVoicePayloadCountError);
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Failed to add voice payload..too many\n");
         return false;
     }
     int size = mSize;
     if (size + packet->GetUnreliableSize() > 0x587)
     {
-        tDebugPrintManager::Print(DC_NETWORK, sVoicePayloadSizeError);
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Failed to add voice payload..size would be too great\n");
         return false;
     }
 
@@ -155,13 +155,15 @@ bool TransportMessage::AddReliablePacket(TransportPacket* packet)
 {
     if (mReliableCount == 16)
     {
-        tDebugPrintManager::Print(DC_NETWORK, sReliablePayloadCountError);
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Failed to add reliable payload..too many\n");
         return false;
     }
     int size = mSize;
     if (size + packet->GetReliableSize() > 0x587)
     {
-        tDebugPrintManager::Print(DC_NETWORK, sReliablePayloadSizeError);
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Failed to add reliable payload..size would be too great\n");
         return false;
     }
 

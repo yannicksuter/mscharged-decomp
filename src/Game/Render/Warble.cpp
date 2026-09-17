@@ -114,8 +114,16 @@ WarbleInstance::WarbleInstance(const WarbleConfiguration& configuration)
     active = false;
 }
 
-static inline u8 DecodeWarblePaletteValue(u16 colour)
+static inline u8 ReadWarbleBlobValue(
+    const PlatTexture* texture, int x, int y)
 {
+    int block =
+        (y >> 2) * (texture->m_Width >> 3) + (x >> 3);
+    const u8 (*tiles)[4][8] =
+        static_cast<const u8 (*)[4][8]>(texture->m_SwizzledData);
+    const u8 paletteIndex =
+        tiles[block][y & 3][x & 7];
+    const u16 colour = texture->m_PaletteData[paletteIndex];
     if ((colour & 0x8000) != 0)
     {
         const unsigned int value = (colour >> 10) & 0x1F;
@@ -129,21 +137,19 @@ static inline u8 DecodeWarblePaletteValue(u16 colour)
 void LoadWarbleBlob()
 {
     PlatTexture* texture = glx_GetTex(glGetTexture(sWarbleBlobTexture));
+    int x;
+    int y;
 
-    for (int y = 0; y < 64; ++y)
+    for (y = 0; y < 64; ++y)
     {
-        for (int x = 0; x < 64; ++x)
+        for (x = 0; x < 64; ++x)
         {
-            const int tile = (y >> 2) * (texture->m_Width >> 3) + (x >> 3);
-            const int offset = tile * 32 + (y & 3) * 8 + (x & 7);
-            const u8 value = DecodeWarblePaletteValue(
-                texture->m_PaletteData[static_cast<const u8*>(texture->m_SwizzledData)[offset]]);
-            sWarbleBlob[y][x] = (float)value / 255.0f;
+            const u8 value = ReadWarbleBlobValue(texture, x, y);
+            sWarbleBlob[(unsigned int)y][(unsigned int)x] =
+                (float)value / 255.0f;
         }
     }
 
-    int y;
-    int x;
     for (y = 0; y < 64; ++y)
         for (x = 0; x < 64; ++x)
             sWarbleBlob[y][x] *= 127.0f;

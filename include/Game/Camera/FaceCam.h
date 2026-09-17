@@ -1,7 +1,7 @@
 #ifndef _FACECAM_H_
 #define _FACECAM_H_
 
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 #include "Game/Character.h"
 
 class FaceCam : public cBaseCamera

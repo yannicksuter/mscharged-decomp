@@ -206,7 +206,8 @@ Nis::Nis(NisHeader& header, char* data, int size)
         }
         chunk = chunk->GetNextChunk();
     }
-    LoadByteCode(NisPlayer::Instance()->mUnidentified34334);
+    NisPlayer* player = NisPlayer::Instance();
+    LoadByteCode(player->mUnidentified34334);
 }
 void Nis::fn_802815E0()
 {

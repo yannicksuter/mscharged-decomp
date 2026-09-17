@@ -1,7 +1,7 @@
 #ifndef _MATRIXEFFECTCAM_H_
 #define _MATRIXEFFECTCAM_H_
 
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 
 class MatrixEffectCam : public cBaseCamera
 {

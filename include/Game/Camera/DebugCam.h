@@ -1,7 +1,7 @@
 #ifndef _DEBUGCAM_H_
 #define _DEBUGCAM_H_
 
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 #include "NL/nlDLListContainer.h"
 #include "types.h"
 

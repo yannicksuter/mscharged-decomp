@@ -244,26 +244,29 @@ void ImpostorSprite::CreateRenderTarget(const char* name)
     mView->m_ClearColour = false;
     mView->m_ClearDepth = false;
     mView->m_Unknown32 = false;
-    mView->m_Enabled = true;
 
     int width = mWidth;
     int height = mHeight;
+    mView->m_Enabled = true;
     nlSNPrintf(mName, sizeof(mName), gImpostorSpriteNameFormat, name);
     mView->m_Name = mName;
     mView->m_Target = GLViewTarget_Mode9;
-    mView->m_ViewportX = 0;
-    mView->m_ViewportY = 0;
-    mView->m_ViewportWidth = width;
-    mView->m_ViewportHeight = height;
+    GLView* view = mView;
+    view->m_ViewportX = 0;
+    view->m_ViewportY = 0;
+    view->m_ViewportWidth = width;
+    view->m_ViewportHeight = height;
 
+    GLView* activeView;
     unsigned long activeWidth =
         mEnabled ? mWidth : 0;
     unsigned long activeHeight =
         mEnabled ? mHeight : 0;
-    mView->m_ViewportX = 0;
-    mView->m_ViewportY = 0;
-    mView->m_ViewportWidth = activeWidth;
-    mView->m_ViewportHeight = activeHeight;
+    activeView = mView;
+    activeView->m_ViewportX = 0;
+    activeView->m_ViewportY = 0;
+    activeView->m_ViewportWidth = activeWidth;
+    activeView->m_ViewportHeight = activeHeight;
     bool enabled = mEnabled && !mUnidentified079;
     mView->m_Target =
         enabled ? GLViewTarget_Mode9 : GLViewTarget_None;

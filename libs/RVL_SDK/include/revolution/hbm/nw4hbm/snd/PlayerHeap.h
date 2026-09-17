@@ -27,6 +27,8 @@ public:
         mPlayer(NULL) {}
     /* 0x08 */ virtual ~PlayerHeap() {}
 
+    void Destroy();
+
     void SetSound(BasicSound* sound) { mSound = sound; }
     void SetSoundPlayer(SoundPlayer* player) { mPlayer = player; }
 

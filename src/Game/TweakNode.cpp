@@ -156,9 +156,10 @@ TweakEntry* FindOrCreateTweakPath(TweakEntry* entry, const char* path, int noCre
     unsigned long length = nlStrLen(path) + 1;
     copy = (char*)nlMalloc(length, 8, false);
     nlStrNCpy(copy, start, length);
-    if (copy[nlStrLen(copy) - 1] == '/')
+    const char* copiedPath = copy;
+    if (copiedPath[nlStrLen(copiedPath) - 1] == '/')
     {
-        copy[nlStrLen(copy) - 1] = '\0';
+        copy[nlStrLen(copiedPath) - 1] = '\0';
     }
 
     char* rest = copy;

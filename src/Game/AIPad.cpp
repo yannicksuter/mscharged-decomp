@@ -64,7 +64,7 @@ u16 cAIPad::GetCStickMovementStickDirection()
     return m_pGlobalPad->m_aRemapAngle + m_pGlobalPad->m_PolarAnalogRight.a;
 }
 
-bool cAIPad::IsWiiController()
+bool cAIPad::IsWiiController() const
 {
     if (m_pGlobalPad != 0)
     {
@@ -139,10 +139,10 @@ int cAIPad::GetMaxRemoteAccelDelta(
     unsigned int count, nlVector3* deltaOut)
 {
     unsigned int currentIndex = (mUnidentified2D4 + 30) % 30;
+    const nlVector3& current = mUnidentified004[currentIndex];
     *deltaOut = sZeroAccelDelta;
     float maximum = 0.0f;
     int bestOffset = 0;
-    const nlVector3& current = mUnidentified004[currentIndex];
     if (current.x < 999.0f)
     {
         unsigned int sampleCount = count > 30 ? 30 : count;
@@ -179,10 +179,10 @@ int cAIPad::GetMaxFreestyleAccelDelta(
     unsigned int count, nlVector3* deltaOut)
 {
     unsigned int currentIndex = (mUnidentified2D4 + 30) % 30;
+    const nlVector3& current = mUnidentified16C[currentIndex];
     *deltaOut = sZeroAccelDelta;
     float maximum = 0.0f;
     int bestOffset = 0;
-    const nlVector3& current = mUnidentified16C[currentIndex];
     if (current.x < 999.0f)
     {
         unsigned int sampleCount = count > 30 ? 30 : count;

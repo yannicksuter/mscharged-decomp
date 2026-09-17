@@ -64,7 +64,9 @@ public:
     void OnFriendMatchmakingResult(DWCErrorType error, int cancelled,
         int self, int isServer, int index, void* param);
     void UpdatePeerConnectionState(int aid);
+    inline void UpdatePeerConnectionStates();
     void BuildLocalMachineInfo(NetworkDraftMachineInfo* info);
+    inline void SendLocalMachineInfo(int aid);
     void MarkGameStarted();
     bool AllMachineInfoReceived();
     NetworkDraftMachineInfo* GetLocalMachineInfo();

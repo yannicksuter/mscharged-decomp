@@ -1,7 +1,7 @@
 #ifndef GAME_CAMERA_ANIMCAM_H
 #define GAME_CAMERA_ANIMCAM_H
 
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 #include "Game/SAnim.h"
 
 class cCameraData

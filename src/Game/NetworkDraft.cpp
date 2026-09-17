@@ -110,7 +110,6 @@ void NetMessageConnectionDecision::Serialize(
     serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
 }
 
-NetMessageDraftMachineInfo::~NetMessageDraftMachineInfo() { }
 NetMessageDraftPickedCaptain::~NetMessageDraftPickedCaptain() { }
 NetMessageDraftPickedSidekicks::~NetMessageDraftPickedSidekicks() { }
 NetMessageConnectionDecision::~NetMessageConnectionDecision() { }
@@ -496,15 +495,27 @@ void NetworkDraft::SendCaptainChoice()
 
 void NetworkDraft::SendSidekickChoice()
 {
+    int teamIndex = mCurrentDraftingTeam;
     NetMessageDraftPickedSidekicks message;
-    message.mTeamIndex = mCurrentDraftingTeam;
-    NetworkDraftTeam& team = mTeams[mCurrentDraftingTeam];
-    message.mSidekick0 = team.mSidekick0;
-    message.mSidekick1 = team.mSidekick1;
-    message.mSidekick2 = team.mSidekick2;
+    message.mTeamIndex = teamIndex;
+    message.mSidekick0 = GameInfoManager::Instance()->GetSidekick(0, 0);
+    message.mSidekick1 = GameInfoManager::Instance()->GetSidekick(0, 1);
+    message.mSidekick2 = GameInfoManager::Instance()->GetSidekick(0, 2);
     u8 buffer[0x20];
     int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
     SendToAllDraftPlayers(buffer, size);
+    gOnlineStartMatchmaking = 0;
+    gOnlineSidekickChoiceSent = 1;
+    if (IsOnlineRankedMatch())
+    {
+        GameSceneManager::Instance()->Push(
+            (SceneList)0x31, SCREEN_NOTHING, true);
+    }
+    else
+    {
+        GameSceneManager::Instance()->Push(
+            (SceneList)0x32, SCREEN_NOTHING, true);
+    }
 }
 
 bool NetworkDraft::IsCaptainTaken(int captain) const

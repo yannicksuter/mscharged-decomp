@@ -1,9 +1,6 @@
 #include "Game/Audio/AudioCalculation.h"
 #include "NL/nlChunk.h"
-#include "NL/nlMemory.h"
 #include "types.h"
-
-#include <NMWException.h>
 
 AudioCalculationTable* ParseAudioCalculationTable(nlChunk* outer)
 {
@@ -36,30 +33,7 @@ AudioCalculationTable* ParseAudioCalculationTable(nlChunk* outer)
         relocationIndex++;
     }
 
-    table->sliders = new (8, false) AudioCalculationSlider[table->count];
-
-    u32 i = 0;
-    u32 definitionOffset = 0;
-    u32 sliderOffset = 0;
-    while (i < table->count)
-    {
-        AudioCalculationDefinition* definition
-            = (AudioCalculationDefinition*)((u8*)table->definitions
-                + definitionOffset);
-        AudioCalculationSlider* slider
-            = (AudioCalculationSlider*)((u8*)table->sliders + sliderOffset);
-        slider->definition = definition;
-        slider->SetTarget(definition->initialValue, 0.0f);
-        ((AudioCalculationSlider*)((u8*)table->sliders + sliderOffset))
-            ->SetTarget(
-                ((AudioCalculationDefinition*)((u8*)table->definitions
-                    + definitionOffset))
-                    ->initialValue,
-                0.0f);
-        definitionOffset += sizeof(AudioCalculationDefinition);
-        sliderOffset += sizeof(AudioCalculationSlider);
-        i++;
-    }
+    table->CreateSliders();
     return table;
 }
 
@@ -78,23 +52,3 @@ void AudioCalculationTable::Update(float dt)
         definition++;
     }
 }
-
-AudioCalculationSlider::AudioCalculationSlider()
-{
-    definition = 0;
-    target = 0.0f;
-    value = 0.0f;
-    minimum = -96.0f;
-    maximum = 6.0f;
-    valid = true;
-}
-
-float AudioCalculationSlider::GetValue()
-{
-    float result = duration + value;
-    result = (result >= -96.0f) ? result : -96.0f;
-    result = (result <= 6.0f) ? result : 6.0f;
-    return result;
-}
-
-AudioCalculationSlider::~AudioCalculationSlider() { }

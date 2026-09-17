@@ -3451,7 +3451,7 @@ static void initgx()
 #endif
 }
 
-void HomeButton::createSound(nw4hbm::snd::MemorySoundArchive* pNandSoundArchive, bool bCreateSoundHeap)
+void HomeButton::createSound(nw4hbm::snd::SoundArchive* pSoundArchive, bool bCreateSoundHeap)
 {
     void* buffer = MEMAllocFromAllocator(&sSoundAllocator, sizeof(nw4hbm::snd::SoundArchivePlayer));
     if (buffer != NULL)
@@ -3462,11 +3462,11 @@ void HomeButton::createSound(nw4hbm::snd::MemorySoundArchive* pNandSoundArchive,
 
     void* memBuffer;
     void* strmBuffer;
-    u32 memSize = mpSoundArchivePlayer->GetRequiredMemSize(pNandSoundArchive);
-    u32 strmSize = mpSoundArchivePlayer->GetRequiredStrmBufferSize(pNandSoundArchive);
+    u32 memSize = mpSoundArchivePlayer->GetRequiredMemSize(pSoundArchive);
+    u32 strmSize = mpSoundArchivePlayer->GetRequiredStrmBufferSize(pSoundArchive);
     strmBuffer = MEMAllocFromAllocator(&sSoundAllocator, strmSize);
     memBuffer = MEMAllocFromAllocator(&sSoundAllocator, memSize);
-    bool result = mpSoundArchivePlayer->Setup(pNandSoundArchive, memBuffer, memSize, strmBuffer, strmSize);
+    bool result = mpSoundArchivePlayer->Setup(pSoundArchive, memBuffer, memSize, strmBuffer, strmSize);
     NW4HBMAssert_Line(result, LN(3770, 3732));
 
     buffer = MEMAllocFromAllocator(&sSoundAllocator, sizeof(nw4hbm::snd::SoundHandle));
@@ -3496,6 +3496,58 @@ void HomeButton::createSound(nw4hbm::snd::MemorySoundArchive* pNandSoundArchive,
     {
         mpSoundHeap = NULL;
     }
+}
+
+void HomeButton::createDvdSound(const char* path)
+{
+    nw4hbm::ut::detail::AutoLock<OSMutex> lock(sMutex);
+
+    if (!AICheckInit())
+    {
+        AIInit(NULL);
+        AXInit();
+    }
+
+    nw4hbm::snd::SoundSystem::InitSoundSystem();
+
+    void* pvVar4 = MEMAllocFromAllocator(&sSoundAllocator, sizeof(nw4hbm::snd::DvdSoundArchive));
+    if (pvVar4 != NULL)
+    {
+        mpDvdSoundArchive = new (pvVar4) nw4hbm::snd::DvdSoundArchive();
+    }
+
+    NW4HBMAssert(mpDvdSoundArchive);
+    NW4HBMAssertMessage(mpDvdSoundArchive->Open(path), "Cannot open \"%s\"", path);
+
+    u32 size = mpDvdSoundArchive->GetHeaderSize();
+    mpDvdSoundArchive->LoadHeader(MEMAllocFromAllocator(&sSoundAllocator, size), size);
+    createSound(mpDvdSoundArchive, true);
+}
+
+void HomeButton::createNandSound(const char* path)
+{
+    nw4hbm::ut::detail::AutoLock<OSMutex> lock(sMutex);
+
+    if (!AICheckInit())
+    {
+        AIInit(NULL);
+        AXInit();
+    }
+
+    nw4hbm::snd::SoundSystem::InitSoundSystem();
+
+    void* pvVar4 = MEMAllocFromAllocator(&sSoundAllocator, sizeof(nw4hbm::snd::NandSoundArchive));
+    if (pvVar4 != NULL)
+    {
+        mpNandSoundArchive = new (pvVar4) nw4hbm::snd::NandSoundArchive();
+    }
+
+    NW4HBMAssert(mpNandSoundArchive);
+    NW4HBMAssertMessage(mpNandSoundArchive->Open(path), "Cannot open \"%s\"", path);
+
+    u32 size = mpNandSoundArchive->GetHeaderSize();
+    mpNandSoundArchive->LoadHeader(MEMAllocFromAllocator(&sSoundAllocator, size), size);
+    createSound(mpNandSoundArchive, true);
 }
 
 void HomeButton::deleteSound()

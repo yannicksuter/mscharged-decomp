@@ -179,7 +179,9 @@ private:
 
 public:
     void play_sound(int id);
-    void createSound(nw4hbm::snd::MemorySoundArchive* pNandSoundArchive, bool bCreateSoundHeap);
+    void createSound(nw4hbm::snd::SoundArchive* pSoundArchive, bool bCreateSoundHeap);
+    void createDvdSound(const char* path);
+    void createNandSound(const char* path);
     void deleteSound();
     void draw_impl();
     void updateSoundArchivePlayer();

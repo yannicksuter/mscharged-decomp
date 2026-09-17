@@ -213,11 +213,9 @@ void DrawableKoopaShell::Blend(const float* factors, const DrawableKoopaShell& l
         return;
     }
 
-    float t = factors[2];
-    mScale = (1.0f - t) * lhs.mScale + t * rhs.mScale;
-    mPosition.x = (1.0f - t) * lhs.mPosition.x + t * rhs.mPosition.x;
-    mPosition.y = (1.0f - t) * lhs.mPosition.y + t * rhs.mPosition.y;
-    int offset = (short)(t * (short)(rhs.mSpin - lhs.mSpin));
-    mSpin = lhs.mSpin + offset;
-    mPosition.z = (1.0f - t) * lhs.mPosition.z + t * rhs.mPosition.z;
+    float factor = factors[2];
+    mScale = (1.0f - factor) * lhs.mScale + factor * rhs.mScale;
+    int orientationDelta = (int)(factor * (s16)(rhs.mSpin - lhs.mSpin));
+    mSpin = lhs.mSpin + (s16)orientationDelta;
+    nlVecLerp(mPosition, lhs.mPosition, rhs.mPosition, factor);
 }

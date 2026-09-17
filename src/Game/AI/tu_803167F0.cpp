@@ -30,6 +30,11 @@ extern "C" float fn_8031A0C8(float, float);
 extern float (*lbl_806DF560)();
 extern float (*lbl_806DF564)();
 
+extern const float lbl_806E6880;
+extern const float lbl_806E6884;
+extern const float lbl_806E6888;
+extern const float lbl_806E688C;
+
 char lbl_80530248[] = "Cleanup_";
 char lbl_806DF5A0[] = "Init_";
 char lbl_806DF5A8[] = "Update_";
@@ -56,7 +61,7 @@ public:
 
 shdStateMachine::shdStateMachine(
     int state, const UnidentifiedStateTransition& transition)
-    : mUnidentifiedTimer(1.0f)
+    : mUnidentifiedTimer(lbl_806E6880)
     , mUnidentified01C()
 {
     mUnidentifiedState = state;
@@ -64,8 +69,8 @@ shdStateMachine::shdStateMachine(
     mUnidentified068.mUnidentifiedFunction
         = transition.mUnidentifiedFunction;
     mUnidentified018 = 0;
-    mUnidentified080 = 1.0f;
-    mUnidentified084 = 0.0f;
+    mUnidentified080 = lbl_806E6880;
+    mUnidentified084 = lbl_806E6884;
     UnidentifiedReset(0);
 }
 
@@ -74,9 +79,9 @@ void shdStateMachine::UnidentifiedReset(bool)
     mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     mUnidentifiedActive = false;
-    mUnidentified078 = 0.0f;
-    mUnidentified07C = 0.0f;
-    mUnidentified014 = 0.5f;
+    mUnidentified078 = lbl_806E6884;
+    mUnidentified07C = lbl_806E6884;
+    mUnidentified014 = lbl_806E6888;
     mUnidentified070 = lbl_806E20B8;
 }
 
@@ -143,8 +148,8 @@ extern "C" bool fn_80316A84(
     shdStateMachine* machine, UnidentifiedVariantCollection* parameters,
     bool initialize)
 {
-    machine->mUnidentified078 = 0.0f;
-    machine->mUnidentified07C = 0.0f;
+    machine->mUnidentified078 = lbl_806E6884;
+    machine->mUnidentified07C = lbl_806E6884;
     machine->mUnidentified070 = lbl_806E20B8;
 
     if (parameters->IsSet(10))
@@ -152,18 +157,21 @@ extern "C" bool fn_80316A84(
         Variant* value = parameters->Get(10);
         switch (value->GetType())
         {
-        case FT_INT:
-            machine->mUnidentified070.mUnidentifiedHash = value->mData.i;
-            machine->mUnidentified070.mUnidentifiedFunction = 0;
-            break;
         case FT_U32:
             machine->mUnidentified070.mUnidentifiedHash = value->mData.u;
             machine->mUnidentified070.mUnidentifiedFunction = 0;
             break;
-        case FT_POINTER:
-            machine->mUnidentified070.mUnidentifiedHash = -1;
-            machine->mUnidentified070.mUnidentifiedFunction = value->mData.pointer;
+        case FT_INT:
+            machine->mUnidentified070.mUnidentifiedHash = value->mData.i;
+            machine->mUnidentified070.mUnidentifiedFunction = 0;
             break;
+        case FT_POINTER:
+        {
+            void* function = value->mData.pointer;
+            machine->mUnidentified070.mUnidentifiedHash = -1;
+            machine->mUnidentified070.mUnidentifiedFunction = function;
+            break;
+        }
         case FT_STRING:
             machine->mUnidentified070.mUnidentifiedHash = nlStringHash(value->mData.string);
             machine->mUnidentified070.mUnidentifiedFunction = 0;
@@ -175,11 +183,11 @@ extern "C" bool fn_80316A84(
     {
         machine->mUnidentified078 = parameters->Get(7)->mData.f;
     }
-    if (machine->mUnidentified078 == 0.0f)
+    if (lbl_806E6884 == machine->mUnidentified078)
     {
         machine->mUnidentified078 = machine->mUnidentified084;
     }
-    if (machine->mUnidentified07C == 0.0f)
+    if (lbl_806E6884 == machine->mUnidentified07C)
     {
         machine->mUnidentified07C = machine->mUnidentified080;
     }
@@ -225,7 +233,7 @@ extern "C" void fn_80317010(
     bool runUpdate, float deltaTime)
 {
     *update = 0;
-    machine->mUnidentifiedTimer.Countup(deltaTime, 0.00001f);
+    machine->mUnidentifiedTimer.Countup(deltaTime, lbl_806E688C);
     machine->mUnidentified014 = lbl_806DF564();
 
     float start = lbl_806DF560();
@@ -317,19 +325,23 @@ bool UnidentifiedStateMachine_803171D0::UnidentifiedInitialize(void*)
 void UnidentifiedStateMachine_803171D0::Update(
     UnidentifiedDesireUpdate* update, float deltaTime)
 {
-    if (update->mData.pointer != 0 || mUnidentified08C == 0)
+    if (update->mData.pointer != 0)
+    {
+        return;
+    }
+    if (mUnidentified08C == 0)
     {
         return;
     }
 
     float start = lbl_806DF560();
     void* context = mUnidentified018->mUnidentified064->mData.pointer;
-    UnidentifiedVariant_80054AB8 result = fn_803184A8(
-        fn_80311734(this), &mUnidentified08C, context, deltaTime);
-    FuzzyVariant value((const FuzzyVariant&)result);
-    *update = value;
-    update->ExtraData = result.ExtraData;
-    update->mTemporary = false;
+    u32 hash = mUnidentified08C;
+    {
+        UnidentifiedVariant_80054AB8 result = fn_803184A8(
+            fn_80311734(this), &hash, context, deltaTime);
+        *update = result;
+    }
     fn_8031A0C8(start, lbl_806DF560());
 }
 

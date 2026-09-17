@@ -21,6 +21,12 @@ struct FE_FILE_HEADER
 class QueueResourceLoadCallback
 {
 public:
+    QueueResourceLoadCallback(FEResourceManager* resourceManager, MemoryAllocator* pAllocator)
+        : m_resourceManager(resourceManager)
+        , m_pAllocator(pAllocator)
+    {
+    }
+
     void Callback(FEResourceHandle* handle);
 
     FEResourceManager* m_resourceManager;
@@ -157,10 +163,8 @@ void FEScene::LoadPackage(void* pData, unsigned long)
     m_pPointerTable = 0;
     mState = 5;
 
-    QueueResourceLoadCallback cb;
     file = (nlFile*)m_pFEPackage;
-    cb.m_pAllocator = m_pAllocator;
-    cb.m_resourceManager = FEResourceManager::Instance();
+    QueueResourceLoadCallback cb(FEResourceManager::Instance(), m_pAllocator);
 
     m_feSceneResourceHandle.m_pFESceneContext = this;
     m_feSceneResourceHandle.m_hashID = m_uHashID;

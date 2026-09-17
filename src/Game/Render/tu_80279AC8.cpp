@@ -249,10 +249,10 @@ extern "C" void fn_80279B94(
         int second;
         if (nlTaskManager::m_pInstance->mCurrentState > 0x10)
         {
-            first = GetCharacterIndexFromCaptain(
-                nlSingleton<GameInfoManager>::Instance()->GetTeam(0));
-            second = GetCharacterIndexFromCaptain(
-                nlSingleton<GameInfoManager>::Instance()->GetTeam(1));
+            first = nlSingleton<GameInfoManager>::Instance()->GetTeam(0);
+            second = nlSingleton<GameInfoManager>::Instance()->GetTeam(1);
+            first = GetCharacterIndexFromCaptain(first);
+            second = GetCharacterIndexFromCaptain(second);
         }
         else
         {
@@ -260,18 +260,19 @@ extern "C" void fn_80279B94(
             second = GetCaptainCharacter(g_pTeams[1]->GetCaptain());
         }
 
+        const CharacterInfo& firstInfo = GetCharacterInfo(first);
+        const CharacterInfo& secondInfo = GetCharacterInfo(second);
         const char* name = GetCharacterInfo(first).mName;
         char bannerTexture[64];
-        if (NeedsAlternateColour(
-                GetCharacterInfo(first), GetCharacterInfo(second)))
+        if (NeedsAlternateColour(firstInfo, secondInfo))
         {
             nlSNPrintf(bannerTexture, sizeof(bannerTexture),
-                "banners/%s_%s_b", name, name);
+                "%s/%s_banners_alt", name, name);
         }
         else
         {
             nlSNPrintf(bannerTexture, sizeof(bannerTexture),
-                "banners/%s_%s", name, name);
+                "%s/%s_banners", name, name);
         }
         sTeamBannerTexture = glGetTexture(bannerTexture);
         sTeamBannerTextureIndex = glGetTextureManager()->GetTextureIndex(

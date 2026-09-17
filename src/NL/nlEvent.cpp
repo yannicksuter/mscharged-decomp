@@ -172,16 +172,13 @@ void UnregisterEventConnection(void*, void* connectionPtr)
                     GroupIterator;
                 GroupIterator iterator;
                 iterator.Initialize(sConnectionGroups.m_Root);
-                while (iterator.IsValid())
+                while (true)
                 {
-                    ConnectionTree* tree = iterator.Current()->value;
-                    ConnectionTree::Entry* removed
-                        = (ConnectionTree::Entry*)tree->RemoveAVLNode(
-                            (AVLTreeNode**)&tree->m_Root, &tracked);
-                    if (removed != 0)
+                    ConnectionKey key = tracked;
+                    ConnectionTree* tree = iterator.CurrentValue();
+                    if (tree->Remove(key))
                     {
-                        tree->m_Allocator.Free(removed);
-                        tracked->mGroupCount--;
+                        key->mGroupCount--;
                     }
                     if (tracked->mGroupCount == 0)
                     {

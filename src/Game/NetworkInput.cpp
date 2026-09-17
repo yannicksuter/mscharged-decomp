@@ -607,13 +607,15 @@ void NetworkInputRecording::WriteNetworkInputRecord(s8 machine, const PackedDetI
 {
     struct RecordedInput
     {
-        u8 mRecord[0x10];
+        PackedDetInput mRecord;
         u8 mConnected;
         u8 mPadding[3];
     } input;
-    memset(&input, 0, sizeof(input));
-    memcpy(input.mRecord, record, sizeof(input.mRecord));
+    input.mRecord = *record;
     input.mConnected = connected;
+    input.mPadding[0] = 0;
+    input.mPadding[1] = 0;
+    input.mPadding[2] = 0;
     nlBufferedWriterWrite(&mWriter, &input, sizeof(input));
 }
 

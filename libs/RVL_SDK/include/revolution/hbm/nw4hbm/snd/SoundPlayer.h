@@ -69,6 +69,7 @@ public:
 
     void detail_AppendPlayerHeap(detail::PlayerHeap* pHeap);
     void detail_AppendPlayerHeap2(detail::PlayerHeap* pHeap);
+    void detail_RemovePlayerHeap(detail::PlayerHeap* pHeap) { mHeapList.Erase(pHeap); }
     detail::PlayerHeap* detail_AllocPlayerHeap(detail::BasicSound* sound);
     void detail_FreePlayerHeap(detail::BasicSound* sound);
 

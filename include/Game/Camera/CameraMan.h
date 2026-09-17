@@ -2,7 +2,7 @@
 #define _CAMERAMAN_H_
 
 #include "types.h"
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 #include "NL/nlDLRing.h"
 #include "NL/nlMath.h"
 

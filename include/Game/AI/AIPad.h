@@ -15,7 +15,7 @@ public:
     float GetMovementStickMagnitude();
     u16 GetCStickMovementStickDirection();
     float GetCStickMovementStickMagnitude();
-    bool IsWiiController();
+    bool IsWiiController() const;
     bool DetectLeftShake(u16* direction);
     bool DetectRightShake(u16* direction);
     int GetMaxRemoteAccelDelta(unsigned int count, nlVector3* deltaOut);

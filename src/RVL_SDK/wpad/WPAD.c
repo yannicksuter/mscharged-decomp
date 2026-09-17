@@ -1,6 +1,7 @@
 #include <revolution/version.h>
 
 #include <revolution/bte.h>
+#include <revolution/dvd.h>
 #include <revolution/ipc.h>
 #include <revolution/os.h>
 #include <revolution/sc.h>
@@ -32,8 +33,10 @@ u32 _rumble;
 u8 _speakerVolume;
 u8 _scFlush;
 u8 _gametype;
+u16 _gameTitle[17];
 const char* _gamecode;
 u8 _chan_active_state[WPAD_MAX_CONTROLLERS];
+DVDDiskID _diskId;
 
 static u8 _scSetting;
 static u8 _shutdown;
@@ -1079,12 +1082,12 @@ static void firmwareCheckCallback(WPADChannel chan, WPADResult status) {
 
 static s32 WPADiRetrieveChannel(u8 devHandle) {
     BD_ADDR_PTR pAddr;
-    int i;
+    s32 i;
 
     pAddr = _WUDGetDevAddr(devHandle);
 
-    for (i = 0; (s16)i < WPAD_MAX_CONTROLLERS; i++) {
-        if (WUD_BDCMP(_scArray.active[(u32)i].addr, pAddr) != 0) {
+    for (i = 0; i < WPAD_MAX_CONTROLLERS; i++) {
+        if (WUD_BDCMP(_scArray.devices[WUD_MAX_DEV_ENTRY_FOR_STD + i].addr, pAddr) != 0) {
             continue;
         }
 
@@ -1102,7 +1105,7 @@ static s32 WPADiRetrieveChannel(u8 devHandle) {
         }
 
         _chan_active_state[i] = TRUE;
-        WUD_BDCPY(&_scArray.regist[WUD_MAX_DEV_ENTRY_FOR_STD + i].addr, pAddr);
+        WUD_BDCPY(&_scArray.devices[WUD_MAX_DEV_ENTRY_FOR_STD + i].addr, pAddr);
         _scFlush = TRUE;
 
         return i;

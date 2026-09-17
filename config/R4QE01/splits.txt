@@ -523,11 +523,11 @@ Game/Audio/GameStreams.cpp:
 	.bss        start:0x8056DC90 end:0x8056DCD0
 	.sbss       start:0x806E0E80 end:0x806E0E90
 
-Game/Camera/tu_800EDE54.cpp:
+Game/Camera/BaseCam.cpp:
 	.text       start:0x800EDE54 end:0x800EDEC0
 	.ctors      start:0x804DB5B0 end:0x804DB5B4
 	.data       start:0x80504228 end:0x80504250
-	.sdata2     start:0x806E42F8 end:0x806E4300
+	.sdata2     start:0x806E42F8 end:0x806E42FC
 
 Game/Camera/animcam.cpp:
 	.text       start:0x800EDEC0 end:0x800EF2E8

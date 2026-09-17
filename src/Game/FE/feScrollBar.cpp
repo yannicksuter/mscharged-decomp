@@ -51,6 +51,76 @@ void FEScrollBar::SetIgnoreInputLock(bool enabled)
     mButtons[1].mIgnoreInputLock = enabled;
 }
 
+void FEScrollBar::Update(FEPointerEvent event, float dt)
+{
+    if (g_pFEInput->m_InputLockDepth != 0 && !mIgnoreInputLock)
+        return;
+    if (mScrolling[0] || mScrolling[1])
+        mRepeatTimer += dt;
+    mButtons[0].HandlePointerEvent(&event);
+    mButtons[1].HandlePointerEvent(&event);
+    eFEINPUT_PAD pad = (eFEINPUT_PAD)event.mIndex;
+    if (g_pFEInput->JustPressed(pad, 13, true, 0) && !mUnidentified014[0] && !mUnidentified014[1])
+        OnPadPress(event.mIndex, (void*)0);
+    else if (g_pFEInput->JustReleased(pad, 13, true, 0))
+        OnPadRelease(event.mIndex, (void*)0);
+    else if (g_pFEInput->JustPressed(pad, 14, true, 0) && !mUnidentified014[0] && !mUnidentified014[1])
+        OnPadPress(event.mIndex, (void*)1);
+    else if (g_pFEInput->JustReleased(pad, 14, true, 0))
+        OnPadRelease(event.mIndex, (void*)1);
+
+    if (IsScrolling(0, false))
+    {
+        if (mCurrentValue > 0)
+        {
+            --mCurrentValue;
+            FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
+            feVector3 position = mThumb->GetAssetPosition();
+            float offset = mCurrentValue * mScrollStep;
+            mThumb->SetAssetPosition(position.f.x, mTopPosition - offset, position.f.z);
+        }
+        else
+            mRepeatTimer = 0.0f;
+    }
+    else if (IsScrolling(1, false))
+    {
+        if (mCurrentValue < mMaxValue)
+        {
+            ++mCurrentValue;
+            FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
+            feVector3 position = mThumb->GetAssetPosition();
+            float offset = mCurrentValue * mScrollStep;
+            mThumb->SetAssetPosition(position.f.x, mTopPosition - offset, position.f.z);
+        }
+        else
+            mRepeatTimer = 0.0f;
+    }
+    if (mCurrentValue <= 0)
+        mButtonInstances[0]->SetActiveSlide("unused", true, false);
+    if (mCurrentValue >= mMaxValue)
+        mButtonInstances[1]->SetActiveSlide("unused", true, false);
+    if (mUnidentified014[0] && !g_pFEInput->IsPressed(pad, 30, true, 0))
+        OnPointerRelease(event.mIndex, (void*)0);
+    if (mUnidentified014[1] && !g_pFEInput->IsPressed(pad, 30, true, 0))
+        OnPointerRelease(event.mIndex, (void*)1);
+    if (mUnidentified016[1] && !g_pFEInput->IsPressed(pad, 14, true, 0))
+        OnPadRelease(event.mIndex, (void*)1);
+    if (mUnidentified016[0] && !g_pFEInput->IsPressed(pad, 13, true, 0))
+        OnPadRelease(event.mIndex, (void*)0);
+}
+
+void FEScrollBar::SetComponent(TLComponentInstance* instance)
+{
+    mComponent = (TLComponentInstance*)instance;
+    mAssetPosition = instance->GetAssetPosition();
+    TLComponentInstance* up = FEFinder<TLComponentInstance, 4>::Find<>(mComponent->GetActiveSlide(), "up_arrow");
+    mButtonInstances[0] = up == 0 ? &UnidentifiedTLComponentDefault::sInstance : up;
+    TLComponentInstance* down = FEFinder<TLComponentInstance, 4>::Find<>(mComponent->GetActiveSlide(), "down_arrow");
+    mButtonInstances[1] = down == 0 ? &UnidentifiedTLComponentDefault::sInstance : down;
+    TLImageInstance* found = FEFinder<TLImageInstance, 2>::Find<>(mComponent->GetActiveSlide(), "track", "btn_scroll_minmax");
+    mThumb = found == 0 ? &UnidentifiedTLImageDefault::sInstance : found;
+}
+
 void FEScrollBar::Initialize()
 {
     typedef Detail::MemFunImpl<void, void (FEScrollBar::*)(int, void*)> PointerMethod;
@@ -73,6 +143,86 @@ void FEScrollBar::Initialize()
     callback2 = FEPointerListener::Callback(PointerBinding(MemFun(&FEScrollBar::OnPointerRelease), this, Placeholder<0>(), Placeholder<1>()));
     mButtons[0].SetPointerReleaseCallback(callback2);
     mButtons[1].SetPointerReleaseCallback(callback2);
+}
+
+void FEScrollBar::SetRange(int value)
+{
+    if (value > 0)
+    {
+        TLInstance* track = FEFinder<TLInstance, 2>::Find<>(mComponent->GetActiveSlide(), "track", "btn_track ");
+        feVector3 trackScale = track->GetScale();
+        feVector3 scale = mThumb->GetScale();
+        float distance = 0.63671875 * trackScale.f.y;
+        distance = (distance - scale.f.y / 2.0f) * 100.0f;
+        mScrollStep = distance / value;
+        feVector3 position = mThumb->GetAssetPosition();
+        if (mUnidentified048 == 9999.9f)
+            mUnidentified048 = position.f.y;
+        mTopPosition = distance / 2.0f + position.f.y;
+        mThumb->SetAssetPosition(position.f.x, mTopPosition, position.f.z);
+        mThumb->m_bVisible = true;
+    }
+    else
+    {
+        mScrollStep = 0.0f;
+        mTopPosition = 0.0f;
+        feVector3 position = mThumb->GetAssetPosition();
+        mThumb->SetAssetPosition(position.f.x, mTopPosition, position.f.z);
+        mThumb->m_bVisible = false;
+    }
+    mMaxValue = value;
+}
+
+void FEScrollBar::SetValue(int value)
+{
+    mCurrentValue = value;
+    feVector3 position = mThumb->GetAssetPosition();
+    float offset = mCurrentValue * mScrollStep;
+    mThumb->SetAssetPosition(position.f.x, mTopPosition - offset, position.f.z);
+    if (mCurrentValue <= 0)
+        mButtonInstances[0]->SetActiveSlide("unused", true, false);
+    else
+        mButtonInstances[0]->SetActiveSlide("off", true, false);
+    if (mCurrentValue >= mMaxValue)
+        mButtonInstances[1]->SetActiveSlide("unused", true, false);
+    else
+        mButtonInstances[1]->SetActiveSlide("off", true, false);
+}
+
+void FEScrollBar::OnPointerEnter(int index, void* context)
+{
+    int direction = (int)context;
+    mButtons[direction].SetPointerState(1, index);
+    int other = -1;
+    if (context == 0)
+    {
+        other = 1;
+        if (mCurrentValue <= 0)
+        {
+            mUnidentified019 = false;
+            return;
+        }
+    }
+    else if (context == (void*)1)
+    {
+        other = 0;
+        if (mCurrentValue >= mMaxValue)
+        {
+            mUnidentified019 = false;
+            return;
+        }
+    }
+    if (mUnidentified014[direction])
+        mButtonInstances[direction]->SetActiveSlide("slide1", true, false);
+    else if (!mUnidentified016[0] && !mUnidentified016[1] && !mUnidentified014[other])
+    {
+        mButtonInstances[direction]->SetActiveSlide("over", true, false);
+        FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
+        mButtons[direction].PlayHoverFeedback(index);
+    }
+    mUnidentified019 = true;
+    if (mUnidentified014[direction])
+        mScrolling[direction] = true;
 }
 
 bool FEScrollBar::IsScrolling(int direction, bool value)
@@ -237,154 +387,4 @@ void FEScrollBar::ResetScrolling()
     mUnidentified016[1] = false;
     mUnidentified016[0] = false;
     mRepeatTimer = 0.0f;
-}
-
-void FEScrollBar::Update(FEPointerEvent event, float dt)
-{
-    if (g_pFEInput->m_InputLockDepth != 0 && !mIgnoreInputLock)
-        return;
-    if (mScrolling[0] || mScrolling[1])
-        mRepeatTimer += dt;
-    mButtons[0].HandlePointerEvent(&event);
-    mButtons[1].HandlePointerEvent(&event);
-    eFEINPUT_PAD pad = (eFEINPUT_PAD)event.mIndex;
-    if (g_pFEInput->JustPressed(pad, 13, true, 0) && !mUnidentified014[0] && !mUnidentified014[1])
-        OnPadPress(event.mIndex, (void*)0);
-    else if (g_pFEInput->JustReleased(pad, 13, true, 0))
-        OnPadRelease(event.mIndex, (void*)0);
-    else if (g_pFEInput->JustPressed(pad, 14, true, 0) && !mUnidentified014[0] && !mUnidentified014[1])
-        OnPadPress(event.mIndex, (void*)1);
-    else if (g_pFEInput->JustReleased(pad, 14, true, 0))
-        OnPadRelease(event.mIndex, (void*)1);
-
-    if (IsScrolling(0, false))
-    {
-        if (mCurrentValue > 0)
-        {
-            --mCurrentValue;
-            FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
-            feVector3 position = mThumb->GetAssetPosition();
-            float offset = mCurrentValue * mScrollStep;
-            mThumb->SetAssetPosition(position.f.x, mTopPosition - offset, position.f.z);
-        }
-        else
-            mRepeatTimer = 0.0f;
-    }
-    else if (IsScrolling(1, false))
-    {
-        if (mCurrentValue < mMaxValue)
-        {
-            ++mCurrentValue;
-            FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
-            feVector3 position = mThumb->GetAssetPosition();
-            float offset = mCurrentValue * mScrollStep;
-            mThumb->SetAssetPosition(position.f.x, mTopPosition - offset, position.f.z);
-        }
-        else
-            mRepeatTimer = 0.0f;
-    }
-    if (mCurrentValue <= 0)
-        mButtonInstances[0]->SetActiveSlide("unused", true, false);
-    if (mCurrentValue >= mMaxValue)
-        mButtonInstances[1]->SetActiveSlide("unused", true, false);
-    if (mUnidentified014[0] && !g_pFEInput->IsPressed(pad, 30, true, 0))
-        OnPointerRelease(event.mIndex, (void*)0);
-    if (mUnidentified014[1] && !g_pFEInput->IsPressed(pad, 30, true, 0))
-        OnPointerRelease(event.mIndex, (void*)1);
-    if (mUnidentified016[1] && !g_pFEInput->IsPressed(pad, 14, true, 0))
-        OnPadRelease(event.mIndex, (void*)1);
-    if (mUnidentified016[0] && !g_pFEInput->IsPressed(pad, 13, true, 0))
-        OnPadRelease(event.mIndex, (void*)0);
-}
-
-void FEScrollBar::SetComponent(TLComponentInstance* instance)
-{
-    mComponent = (TLComponentInstance*)instance;
-    mAssetPosition = instance->GetAssetPosition();
-    TLComponentInstance* up = FEFinder<TLComponentInstance, 4>::Find<>(mComponent->GetActiveSlide(), "up_arrow");
-    mButtonInstances[0] = up == 0 ? &UnidentifiedTLComponentDefault::sInstance : up;
-    TLComponentInstance* down = FEFinder<TLComponentInstance, 4>::Find<>(mComponent->GetActiveSlide(), "down_arrow");
-    mButtonInstances[1] = down == 0 ? &UnidentifiedTLComponentDefault::sInstance : down;
-    TLImageInstance* found = FEFinder<TLImageInstance, 2>::Find<>(mComponent->GetActiveSlide(), "track", "btn_scroll_minmax");
-    mThumb = found == 0 ? &UnidentifiedTLImageDefault::sInstance : found;
-}
-
-void FEScrollBar::SetRange(int value)
-{
-    if (value > 0)
-    {
-        TLInstance* track = FEFinder<TLInstance, 2>::Find<>(mComponent->GetActiveSlide(), "track", "btn_track ");
-        feVector3 trackScale = track->GetScale();
-        feVector3 scale = mThumb->GetScale();
-        float distance = 0.63671875 * trackScale.f.y;
-        distance = (distance - scale.f.y / 2.0f) * 100.0f;
-        mScrollStep = distance / value;
-        feVector3 position = mThumb->GetAssetPosition();
-        if (mUnidentified048 == 9999.9f)
-            mUnidentified048 = position.f.y;
-        mTopPosition = distance / 2.0f + position.f.y;
-        mThumb->SetAssetPosition(position.f.x, mTopPosition, position.f.z);
-        mThumb->m_bVisible = true;
-    }
-    else
-    {
-        mScrollStep = 0.0f;
-        mTopPosition = 0.0f;
-        feVector3 position = mThumb->GetAssetPosition();
-        mThumb->SetAssetPosition(position.f.x, mTopPosition, position.f.z);
-        mThumb->m_bVisible = false;
-    }
-    mMaxValue = value;
-}
-
-void FEScrollBar::SetValue(int value)
-{
-    mCurrentValue = value;
-    feVector3 position = mThumb->GetAssetPosition();
-    float offset = mCurrentValue * mScrollStep;
-    mThumb->SetAssetPosition(position.f.x, mTopPosition - offset, position.f.z);
-    if (mCurrentValue <= 0)
-        mButtonInstances[0]->SetActiveSlide("unused", true, false);
-    else
-        mButtonInstances[0]->SetActiveSlide("off", true, false);
-    if (mCurrentValue >= mMaxValue)
-        mButtonInstances[1]->SetActiveSlide("unused", true, false);
-    else
-        mButtonInstances[1]->SetActiveSlide("off", true, false);
-}
-
-void FEScrollBar::OnPointerEnter(int index, void* context)
-{
-    int direction = (int)context;
-    mButtons[direction].SetPointerState(1, index);
-    int other = -1;
-    if (context == 0)
-    {
-        other = 1;
-        if (mCurrentValue <= 0)
-        {
-            mUnidentified019 = false;
-            return;
-        }
-    }
-    else if (context == (void*)1)
-    {
-        other = 0;
-        if (mCurrentValue >= mMaxValue)
-        {
-            mUnidentified019 = false;
-            return;
-        }
-    }
-    if (mUnidentified014[direction])
-        mButtonInstances[direction]->SetActiveSlide("slide1", true, false);
-    else if (!mUnidentified016[0] && !mUnidentified016[1] && !mUnidentified014[other])
-    {
-        mButtonInstances[direction]->SetActiveSlide("over", true, false);
-        FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
-        mButtons[direction].PlayHoverFeedback(index);
-    }
-    mUnidentified019 = true;
-    if (mUnidentified014[direction])
-        mScrolling[direction] = true;
 }

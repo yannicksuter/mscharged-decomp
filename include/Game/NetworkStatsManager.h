@@ -66,7 +66,7 @@ public:
         NetworkLeaderboardCategory* leaderboard, bool updateProfile);
     void CommitPendingOnlineTotals(NetworkRankingMeta* record);
     void UpdateFriendRankingNames(NetworkLeaderboardCategory* leaderboard);
-    void BuildFriendsLeaderboard(NetworkLeaderboardCategory* leaderboard);
+    void BuildFriendsLeaderboard();
     bool PostResetMyPlayerStats(int category, bool useExistingStats);
     void UpdateOnlineResultTotals(
         int result, bool home, int homeScore, int awayScore);

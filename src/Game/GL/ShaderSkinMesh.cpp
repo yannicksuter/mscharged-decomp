@@ -96,11 +96,15 @@ void ShaderSkinMesh::BuildPacketSkinData(
     PacketSkinData* data, glModelPacket* pPacket,
     BoneMapList* node)
 {
-    unsigned long numVertices = pPacket->numUniqueVertices;
-    unsigned long numBones = node->m_nBones;
-    SkinWeight* pairs =
-        (SkinWeight*)nlMalloc(
-            numVertices * 2 * sizeof(SkinWeight), 8, false);
+    unsigned long i;
+    unsigned long numBones;
+    unsigned long numVertices;
+    SkinWeight* pairs;
+
+    numVertices = pPacket->numUniqueVertices;
+    numBones = node->m_nBones;
+    pairs = (SkinWeight*)nlMalloc(
+        numVertices * 2 * sizeof(SkinWeight), 8, false);
     data->numVertices = numVertices;
     data->numBones = numBones;
     data->boneWeights = new (8, false)
@@ -111,7 +115,7 @@ void ShaderSkinMesh::BuildPacketSkinData(
     const unsigned char (*indices)[4] = (const unsigned char (*)[4])indexStream->address;
     const float (*weights)[4] = (const float (*)[4])weightStream->address;
 
-    for (unsigned long i = 0; i < numBones; i++)
+    for (i = 0; i < numBones; i++)
     {
         BoneSkinWeights* entry = &data->boneWeights[i];
         const unsigned char (*pIndices)[4] = indices;

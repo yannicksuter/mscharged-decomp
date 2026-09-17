@@ -46,7 +46,9 @@ cPoseAccumulator::cPoseAccumulator(
         }
         m_NodeMatrices[i].SetIdentity();
         m_cb[i].funcCallback = NULL;
-        nlQuatIdentity(m_pQuaternions[i]);
+        nlQuaternion& q = m_pQuaternions[i];
+        q.x = q.y = q.z = 0.0f;
+        q.w = 1.0f;
 
         if (m_BaseSHierarchy->PreserveBoneLength(i))
         {
@@ -292,7 +294,9 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
         }
         else
         {
-            nlQuatIdentity(*pLocalQuaternion);
+            pLocalQuaternion->x = pLocalQuaternion->y =
+                pLocalQuaternion->z = 0.0f;
+            pLocalQuaternion->w = 1.0f;
         }
 
         nlVector3 v3Position;

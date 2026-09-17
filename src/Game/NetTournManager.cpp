@@ -1,9 +1,12 @@
 #include "Game/NetTournManager.h"
+#include "NL/nlFunction.inl"
+#include "Game/EventRegistry.h"
 #include "Game/NetworkMessageRegistry.h"
-#include "NL/nlFunctionMemory.h"
 #include "Game/Sys/debug.h"
 
+#include "Game/BasicStadium.h"
 #include "Game/Drawable/DrawableObj.h"
+#include "Game/FE/feModelManager.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/NetworkDraft.h"
@@ -11,6 +14,7 @@
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/Team.h"
 #include "Game/TweakValue.h"
+#include "NL/gl/glMemory.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
@@ -828,7 +832,17 @@ void NetTournManager::Update(float dt)
 
 void NetTournManager::NotifyGameStarted()
 {
-    // TODO: register NotifyGameOver and broadcast the initial progress update.
+    typedef Detail::MemFunImpl<void, void (NetTournManager::*)()>
+        NetTournManagerCallback;
+    typedef BindExp1<void, NetTournManagerCallback, NetTournManager*>
+        NetTournManagerBinding;
+
+    Function<FnVoidVoid> callback(NetTournManagerBinding(
+        MemFun(&NetTournManager::NotifyGameOver), this));
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
+        ->Add(callback, 0, -1);
+
+    // TODO: broadcast the initial progress update.
     mLastGameProgressUpdate = 0;
     mGameProgressUpdateCount = 0;
 }
@@ -1022,7 +1036,13 @@ u16 NetTournManager::GetNumGames(int) const
 void NetTournManager::AttachTournamentTrophy(void* presentation)
 {
     mTrophyPresentation = presentation;
-    mTrophyResource = (void*)GetTournamentTrophyResource();
+    glModel* model;
+    DrawableObject* object
+        = (DrawableObject*)FEModelManager::Instance()->GetObject(4);
+    model = ((DrawableObject*)mTrophyPresentation)->m_pModel;
+    glModelSetMatrix(model, object->GetWorldMatrix());
+    ((DrawableObject*)mTrophyPresentation)
+        ->SetWorldMatrix(&object->GetWorldMatrix());
 }
 
 void NetTournManager::DetachTournamentTrophy()
@@ -1032,8 +1052,20 @@ void NetTournManager::DetachTournamentTrophy()
 
 void NetTournManager::DestroyTournamentTrophy()
 {
+    BasicStadium* stadium = BasicStadium::GetCurrentStadium();
+    if (mTrophyPresentation != 0 && stadium != 0
+        && stadium->FindDrawableObject(
+               ((DrawableObject*)mTrophyPresentation)->GetHashID())
+            != 0)
+    {
+        ((DrawableObject*)mTrophyPresentation)->V1();
+        stadium->RemoveDrawableObject(
+            (DrawableObject*)mTrophyPresentation);
+        glGetCurrentResourcePool()->ReleaseResource(
+            (unsigned long)mTrophyResource);
+        delete (DrawableObject*)mTrophyPresentation;
+    }
     mTrophyPresentation = 0;
-    mTrophyResource = 0;
 }
 
 const char* NetTournManager::GetTournamentTrophyResource() const
@@ -1093,51 +1125,6 @@ int NetTournManager::GetCurrentRoundType() const
 int NetTournManager::GetCurrentMode() const
 {
     return 3;
-}
-
-typedef void (NetTournManager::*NetTournManagerCallback)();
-
-struct NetTournManagerCallbackBinding
-{
-    NetTournManagerCallback mCallback;
-    NetTournManager* mTarget;
-};
-
-class NetTournManagerDelegate
-{
-public:
-    void* operator new(unsigned long size) { return AllocateFunctionMemory(size); }
-    void operator delete(void* p)
-    {
-        FreeFunctionMemory(p, sizeof(NetTournManagerDelegate));
-    }
-
-    NetTournManagerDelegate(const NetTournManagerCallbackBinding& binding)
-        : mCallback(binding.mCallback)
-        , mTarget(binding.mTarget)
-    {
-    }
-
-    virtual ~NetTournManagerDelegate();
-    virtual void Execute();
-    virtual NetTournManagerDelegate* Clone();
-
-    /* 0x04 */ NetTournManagerCallback mCallback;
-    /* 0x10 */ NetTournManager* mTarget;
-}; // size: 0x14
-
-void NetTournManagerDelegate::Execute()
-{
-    (mTarget->*mCallback)();
-}
-
-NetTournManagerDelegate* NetTournManagerDelegate::Clone()
-{
-    return new NetTournManagerDelegate(*this);
-}
-
-NetTournManagerDelegate::~NetTournManagerDelegate()
-{
 }
 
 nlMatrix4& DrawableObject::GetWorldMatrix()

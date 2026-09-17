@@ -284,6 +284,77 @@ FEModelHandle::FEModelHandle(FEModelType type, const char* name,
     mUnidentified5A = unidentified5A;
 }
 
+void FEModelManager::Update(float dt)
+{
+    nlDLListIterator<FEModelHandle*> danglingModels = mDanglingModels.Begin();
+    while (danglingModels.hasNext())
+    {
+        FEModelHandle* handle = *danglingModels;
+        if (!handle->mModel->mLoadQueued)
+        {
+            delete handle;
+            mDanglingModels.Remove(&danglingModels);
+        }
+        else
+        {
+            danglingModels.Step();
+        }
+    }
+
+    BeginLoadModels();
+
+    nlDLListIterator<FEModelHandle*> pendingModels = mPendingModels.Begin();
+    while (pendingModels.hasNext())
+    {
+        FEModelHandle* handle = *pendingModels;
+        if (handle->CanDestroy())
+        {
+            delete handle;
+            mPendingModels.Remove(&pendingModels);
+        }
+        else
+        {
+            pendingModels.Step();
+        }
+    }
+
+    ListEntry<FEModelHandle*>* entry = mHandles.m_Head;
+    while (entry != 0)
+    {
+        if (!entry->entry->mModel->mLoaded)
+        {
+            if (entry->entry->mModel->mPendingLoads == 0)
+            {
+                FinishLoadModel(entry->entry);
+                if (entry->entry->mModel->GetCurrentAnimation() == 0)
+                {
+                    entry->entry->PlayAnimation(entry->entry->mDefaultAnimation,
+                        PM_CYCLIC, 0.2f, 0.0f, false);
+                }
+            }
+            else
+            {
+                entry = entry->next;
+                continue;
+            }
+        }
+
+        entry->entry->mModel->Update(dt);
+        if (entry->entry->mModel->IsAnimationFinished())
+        {
+            FEModelHandle* handle = entry->entry;
+            if (handle->mAnimationCompleteCallback != 0)
+            {
+                handle->mAnimationCompleteCallback(handle);
+            }
+            handle->mAnimationCompleteCallback = 0;
+        }
+        entry = entry->next;
+    }
+
+    ImpostorManager::GetInstance()->UpdateAnimations(dt);
+}
+
 bool FEModelHandle::IsAnimationFinished()
 {
     return mModel->IsAnimationFinished();
@@ -316,7 +387,8 @@ void FEModelHandle::SetTransform(const nlMatrix4& transform)
 void FEModelHandle::PlayAnimation(const char* name, ePlayMode playMode,
     float blendTime, float speed, bool force)
 {
-    cSAnim* animation = mModel->mAnimations->Find(const_cast<char*>(name));
+    cInventory<cSAnim>* animations = mModel->mAnimations;
+    cSAnim* animation = animations->Find(nlStringHash(name));
 
     if (animation == 0)
     {
@@ -338,18 +410,22 @@ void FEModelHandle::PlayAnimation(const char* name, ePlayMode playMode,
         switch (mModel->mType)
         {
         case FE_MODEL_SKINNED:
+        {
             ((FESkinnedModel*)mModel)->mModel->SetAnimState(
                 *animation, blendTime, playMode);
             ((FESkinnedModel*)mModel)->mModel->mpAnimController->m_bMirror
                 = mUnidentified59;
             break;
+        }
         case FE_MODEL_IMPOSTOR:
+        {
             ((FEImpostorModel*)mModel)->mModel->PlayAnimation(
                 name, blendTime, playMode);
             ((FEImpostorModel*)mModel)->mModel->mAnimController->m_bMirror
                 = mUnidentified59;
             ((FEImpostorModel*)mModel)->mModel->mAnimController->SetTime(speed);
             break;
+        }
         }
     }
     mAnimationCompleteCallback = 0;
@@ -373,8 +449,13 @@ void FEModelHandle::SetDefaultAnimation(const char* animation)
 
 bool FEModelHandle::IsPlayingAnimation(const char* name) const
 {
-    cSAnim* animation = mModel->mAnimations->Find(nlStringHash(name));
-    return animation != 0 && animation == mModel->GetCurrentAnimation();
+    cInventory<cSAnim>* animations = mModel->mAnimations;
+    cSAnim* animation = animations->Find(nlStringHash(name));
+    if (animation != 0 && animation == mModel->GetCurrentAnimation())
+    {
+        return true;
+    }
+    return false;
 }
 
 FESkinnedModel::~FESkinnedModel()
@@ -457,45 +538,23 @@ void FEImpostorModel::Render()
 }
 
 FEModelManager::FEModelManager()
-    : mHandlesHead(0)
-    , mHandlesTail(0)
-    , mModelsHead(0)
-    , mModelsTail(0)
-    , mPendingModels(0)
-    , mLoadedModels(0)
-    , mDanglingModels(0)
-    , mResource(0)
+    : mResource(0)
 {
-}
-
-void FEModelManager::Update(float dt)
-{
-    FEModelHandleListEntry* entry = mHandlesHead;
-    while (entry != 0)
-    {
-        FEModelHandle* handle = entry->mHandle;
-        if (handle->mModel->mLoaded)
-        {
-            handle->mModel->Update(dt);
-        }
-        entry = entry->mNext;
-    }
-    BeginLoadModels();
 }
 
 void FEModelManager::Render()
 {
-    FEModelHandleListEntry* entry = mHandlesHead;
-    while (entry != 0)
+    nlListIterator<FEModelHandle*> iterator = mHandles.Begin();
+    while (iterator.IsValid())
     {
-        FEModelHandle* handle = entry->mHandle;
+        FEModelHandle* handle = iterator.Current();
         FEModel* model = handle->mModel;
         if (model->mLoaded && handle->mEnabled
             && model->mType == FE_MODEL_SKINNED)
         {
             model->Render();
         }
-        entry = entry->mNext;
+        iterator.Next();
     }
 
     UpdateImpostorPositions();
@@ -515,42 +574,22 @@ struct FEModelObject
     /* 0x60 */ int mUnidentified60;
 };
 
-struct FEModelObjectListEntry
-{
-    FEModelObjectListEntry* mNext;
-    FEModelObject* mModel;
-};
-
 void FEModelManager::RegisterObject(void* model)
 {
-    FEModelObjectListEntry* entry
-        = new (8, false) FEModelObjectListEntry;
-    if (entry != 0)
-    {
-        entry->mNext = 0;
-        entry->mModel = (FEModelObject*)model;
-    }
-
-    if (&mModelsTail != 0 && mModelsHead == 0)
-    {
-        mModelsTail = entry;
-    }
-    entry->mNext = (FEModelObjectListEntry*)mModelsHead;
-    mModelsHead = entry;
+    mModels.AddStart(model);
 }
 
 void* FEModelManager::GetObject(int id)
 {
-    FEModelObjectListEntry* entry
-        = (FEModelObjectListEntry*)mModelsHead;
-    while (entry != 0)
+    nlListIterator<void*> iterator = mModels.Begin();
+    while (iterator.IsValid())
     {
-        FEModelObject* model = entry->mModel;
+        FEModelObject* model = (FEModelObject*)iterator.Current();
         if (id == model->mUnidentified60)
         {
             return model;
         }
-        entry = entry->mNext;
+        iterator.Next();
     }
     return 0;
 }
@@ -578,18 +617,7 @@ FEModelHandle* FEModelManager::CreateModel(FEModelType type,
     {
         handle = new (8, false) FEModelHandle(type, name, modelData,
             unidentified59, unidentified4C, unidentified50, alternate);
-        FEModelHandleListEntry* entry
-            = new (8, false) FEModelHandleListEntry;
-        if (entry != 0)
-        {
-            entry->mNext = mHandlesHead;
-            entry->mHandle = handle;
-            mHandlesHead = entry;
-            if (mHandlesTail == 0)
-            {
-                mHandlesTail = entry;
-            }
-        }
+        mHandles.AddStart(handle);
     }
     return handle;
 }
@@ -597,14 +625,14 @@ FEModelHandle* FEModelManager::CreateModel(FEModelType type,
 FEModelHandle* FEModelManager::GetModel(const char* name)
 {
     u32 hash = nlStringLowerHash(name);
-    FEModelHandleListEntry* entry = mHandlesHead;
+    ListEntry<FEModelHandle*>* entry = mHandles.m_Head;
     while (entry != 0)
     {
-        if (hash == entry->mHandle->mNameHash)
+        if (hash == entry->entry->mNameHash)
         {
-            return entry->mHandle;
+            return entry->entry;
         }
-        entry = entry->mNext;
+        entry = entry->next;
     }
     return 0;
 }

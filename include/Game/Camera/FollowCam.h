@@ -1,7 +1,7 @@
 #ifndef GAME_CAMERA_FOLLOW_CAM_H
 #define GAME_CAMERA_FOLLOW_CAM_H
 
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 
 class cFollowCamera : public cBaseCamera
 {

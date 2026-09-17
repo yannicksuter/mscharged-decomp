@@ -47,6 +47,11 @@ public:
     bool UpdateModelLoading();
     void Render(GLView* view);
     void Update(float dt);
+    void RegisterObject(WorldNPC* npc);
+    void (*GetModelCallback() const)(ImpostorModel*, glModel*)
+    {
+        return mModelCallback;
+    }
 
     /* 0x004 */ bool mUnidentified004;
     /* 0x005 */ u8 mPadding005[3];

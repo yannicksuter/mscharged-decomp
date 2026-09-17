@@ -1,5 +1,5 @@
-#ifndef _BASECAMERA_H_
-#define _BASECAMERA_H_
+#ifndef _BASECAM_H_
+#define _BASECAM_H_
 
 #include "Game/Camera/rumblefilter.h"
 #include "NL/nlMath.h"
@@ -49,4 +49,4 @@ public:
     /* 0x14 */ nlVector3 mUpVector;
 }; // total size: 0x20
 
-#endif // _BASECAMERA_H_
+#endif // _BASECAM_H_

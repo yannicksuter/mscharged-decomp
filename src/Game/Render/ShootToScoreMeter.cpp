@@ -191,6 +191,7 @@ void ShootToScoreMeter::DrawColouredRegion(float startAngle,
     glSetTextureState(GLTS_DiffuseWrap, 0);
     glSetCurrentTextureState(glHandleizeTextureState());
 
+    float scaledMeterWidth;
     float scaledWhiteBarWidth;
     float radius;
     nlVector3 vertexPosition;
@@ -202,38 +203,33 @@ void ShootToScoreMeter::DrawColouredRegion(float startAngle,
     float innerRadius;
     float outerRadius;
 
+    scaledMeterWidth = MeterWidth * scale;
     scaledWhiteBarWidth = lbl_806DD0C0 * scale;
     widthAngle = endAngle - startAngle;
-    radius = lbl_806DD0C8 * (MeterWidth * scale);
-
-    float step = 0.125f;
-    float sinScale = 10430.378f;
-    float pi = 3.1415927f;
-    float deg = 180.0f;
+    radius = scaledMeterWidth * lbl_806DD0C8;
 
     for (i = 0; i < 8; i++)
     {
-        startFraction = (float)i * step;
-        endFraction = (float)(i + 1) * step;
+        startFraction = (float)i / 8.0f;
+        endFraction = (float)(i + 1) / 8.0f;
         innerRadius = radius - scaledWhiteBarWidth / 2.0f;
         outerRadius = radius + scaledWhiteBarWidth / 2.0f;
 
         float segmentStartAngle = startFraction * widthAngle + startAngle;
-        float segmentStartAngleRadians
-            = pi * segmentStartAngle / deg;
-        float segmentStartCosine = nlSin((u16)((u16)(s32)(sinScale
+        float segmentStartAngleRadians = DegreesToRadians(segmentStartAngle);
+        float segmentEndAngle = endFraction * widthAngle + startAngle;
+        float segmentEndAngleRadians = DegreesToRadians(segmentEndAngle);
+
+        float segmentStartCosine = nlSin((u16)((u16)(s32)(10430.378f
             * segmentStartAngleRadians)
             + 0x4000));
         float segmentStartSine = nlSin(
-            (u16)(s32)(sinScale * segmentStartAngleRadians));
-
-        float segmentEndAngle = endFraction * widthAngle + startAngle;
-        float segmentEndAngleRadians = pi * segmentEndAngle / deg;
-        float segmentEndCosine = nlSin((u16)((u16)(s32)(sinScale
+            (u16)(s32)(10430.378f * segmentStartAngleRadians));
+        float segmentEndCosine = nlSin((u16)((u16)(s32)(10430.378f
             * segmentEndAngleRadians)
             + 0x4000));
         float segmentEndSine = nlSin(
-            (u16)(s32)(sinScale * segmentEndAngleRadians));
+            (u16)(s32)(10430.378f * segmentEndAngleRadians));
 
         vertexPosition.x = innerRadius * segmentStartCosine;
         vertexPosition.y = innerRadius * segmentStartSine;
@@ -343,7 +339,7 @@ void ShootToScoreMeter::DrawMeter()
         rotation = -lbl_806DD0E4;
     }
     rotation = InterpolateRangeClamped(
-        rotation, 0.0f, 0.0f, 1.0f, rumbleScale);
+        0.0f, rotation, 0.0f, 1.0f, rumbleScale);
     nlMakeRotationMatrixZ(matrix, (3.1415927f * rotation) / 180.0f);
 
     static nlVector3 screenPosition;
@@ -356,18 +352,23 @@ void ShootToScoreMeter::DrawMeter()
     float screenWidth = (float)glplatGetDefaultTargetWidth();
     float screenHeight = (float)glplatGetDefaultTargetHeight();
     float scaledMeterWidth = MeterWidth * screenWidth;
-    float screenMargin = 60.0f;
-    float lowerY = 0.05f
+    float lowerY;
+    float upperY;
+    float upperX;
+    float screenMargin;
+
+    screenMargin = 60.0f;
+    lowerY = 0.05f
         * glViewGetOrthographicHeight(GetLayerView(eCLV_UnsortedSquareOrtho));
     GLView* view = GetLayerView(eCLV_UnsortedSquareOrtho);
-    float upperY = 0.05f * glViewGetOrthographicHeight(view);
-    upperY = glViewGetOrthographicHeight(view) - upperY;
+    float upperYMargin = 0.05f * glViewGetOrthographicHeight(view);
+    upperY = glViewGetOrthographicHeight(view) - upperYMargin;
     view = GetLayerView(eCLV_UnsortedSquareOrtho);
-    float upperX = 0.05f * glViewGetOrthographicWidth(view);
+    upperX = 0.05f * glViewGetOrthographicWidth(view);
     upperX = glViewGetOrthographicWidth(view) - upperX - screenMargin;
     float lowerX = 0.05f
         * glViewGetOrthographicWidth(GetLayerView(eCLV_UnsortedSquareOrtho));
-    lowerX += screenMargin;
+    lowerX = screenMargin + lowerX;
     screenPosition.x
         = clamp_le(clamp_ge(screenPosition.x, lowerX), upperX);
     screenPosition.y = clamp_le(
@@ -411,9 +412,9 @@ void ShootToScoreMeter::DrawMeter()
     {
         nlColour savedColour = white;
         if (m_fSavedWhiteBarAngle
-                >= mUnidentified3C - 0.5f * mUnidentified40
+                >= mUnidentified3C - mUnidentified40 / 2.0f
             && m_fSavedWhiteBarAngle
-                <= mUnidentified3C + 0.5f * mUnidentified40)
+                <= mUnidentified3C + mUnidentified40 / 2.0f)
         {
             yellow.c[3] = (u8)lbl_806DD0B8;
             DrawColouredRegion(mUnidentified3C - 0.5f * mUnidentified40,
@@ -422,9 +423,9 @@ void ShootToScoreMeter::DrawMeter()
             savedColour = yellow;
         }
         else if (m_fSavedWhiteBarAngle
-                >= mUnidentified44 - 0.5f * mUnidentified48
+                >= mUnidentified44 - mUnidentified48 / 2.0f
             && m_fSavedWhiteBarAngle
-                <= mUnidentified44 + 0.5f * mUnidentified48)
+                <= mUnidentified44 + mUnidentified48 / 2.0f)
         {
             orange.c[3] = (u8)lbl_806DD0B8;
             DrawColouredRegion(mUnidentified44 - 0.5f * mUnidentified48,
@@ -433,9 +434,9 @@ void ShootToScoreMeter::DrawMeter()
             savedColour = orange;
         }
         else if (m_fSavedWhiteBarAngle
-                >= mUnidentified4C - 0.5f * mUnidentified50
+                >= mUnidentified4C - mUnidentified50 / 2.0f
             && m_fSavedWhiteBarAngle
-                <= mUnidentified4C + 0.5f * mUnidentified50)
+                <= mUnidentified4C + mUnidentified50 / 2.0f)
         {
             red.c[3] = (u8)lbl_806DD0B8;
             DrawColouredRegion(mUnidentified4C - 0.5f * mUnidentified50,
@@ -444,9 +445,9 @@ void ShootToScoreMeter::DrawMeter()
             savedColour = red;
         }
         else if (m_fSavedWhiteBarAngle
-                >= mUnidentified54 - 0.5f * mUnidentified58
+                >= mUnidentified54 - mUnidentified58 / 2.0f
             && m_fSavedWhiteBarAngle
-                <= mUnidentified54 + 0.5f * mUnidentified58)
+                <= mUnidentified54 + mUnidentified58 / 2.0f)
         {
             orange.c[3] = (u8)lbl_806DD0B8;
             DrawColouredRegion(mUnidentified54 - 0.5f * mUnidentified58,
@@ -455,9 +456,9 @@ void ShootToScoreMeter::DrawMeter()
             savedColour = orange;
         }
         else if (m_fSavedWhiteBarAngle
-                >= mUnidentified5C - 0.5f * mUnidentified60
+                >= mUnidentified5C - mUnidentified60 / 2.0f
             && m_fSavedWhiteBarAngle
-                <= mUnidentified5C + 0.5f * mUnidentified60)
+                <= mUnidentified5C + mUnidentified60 / 2.0f)
         {
             yellow.c[3] = (u8)lbl_806DD0B8;
             DrawColouredRegion(mUnidentified5C - 0.5f * mUnidentified60,
@@ -487,41 +488,41 @@ void ShootToScoreMeter::DrawMeter()
             mUnidentified5C + 0.5f * mUnidentified60, yellow, yellow,
             matrix, screenWidth);
         DrawIndicatorBar(
-            m_fSavedWhiteBarAngle, white, matrix, screenWidth);
+            GetWhiteBarAngle(), white, matrix, screenWidth);
     }
 
     nlColour trailColour = sWhiteBarColour;
     if (mUnidentified2C)
     {
         if (m_fWhiteBarAngle
-                >= m_fGreenBarAngle - 0.5f * m_fYellowRegionWidth
+                >= m_fGreenBarAngle - m_fYellowRegionWidth / 2.0f
             && m_fWhiteBarAngle
-                <= m_fGreenBarAngle + 0.5f * m_fYellowRegionWidth)
+                <= m_fGreenBarAngle + m_fYellowRegionWidth / 2.0f)
         {
             DrawIndicatorBar(
-                m_fWhiteBarAngle, red, matrix, screenWidth);
+                GetWhiteBarAngle(), red, matrix, screenWidth);
             trailColour = red;
         }
         else if (m_fWhiteBarAngle
-                >= m_fGreenBarAngle - 0.5f * m_fGreenRegionWidth
+                >= m_fGreenBarAngle - m_fGreenRegionWidth / 2.0f
             && m_fWhiteBarAngle
-                <= m_fGreenBarAngle + 0.5f * m_fGreenRegionWidth)
+                <= m_fGreenBarAngle + m_fGreenRegionWidth / 2.0f)
         {
             DrawIndicatorBar(
-                m_fWhiteBarAngle, green, matrix, screenWidth);
+                GetWhiteBarAngle(), green, matrix, screenWidth);
             trailColour = green;
         }
         else
         {
             DrawIndicatorBar(
-                m_fWhiteBarAngle, sWhiteBarColour, matrix, screenWidth);
+                GetWhiteBarAngle(), sWhiteBarColour, matrix, screenWidth);
             trailColour = sWhiteBarColour;
         }
     }
     else
     {
         DrawIndicatorBar(
-            m_fWhiteBarAngle, sWhiteBarColour, matrix, screenWidth);
+            GetWhiteBarAngle(), sWhiteBarColour, matrix, screenWidth);
         trailColour = sWhiteBarColour;
     }
 

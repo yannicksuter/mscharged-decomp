@@ -6033,19 +6033,19 @@ void Goalie::ActionSTSAttackSetup(float deltaTime)
         mUnidentified024.m_v3Position,
         mUnidentified024.m_aActualFacingDirection);
 
-    float angle = nlATan2f(
-        mv3LocalContactPosition.y, mv3LocalContactPosition.x);
+    s16 angleDeltaInt = (s16)nlVector3ToAngle(mv3LocalContactPosition);
     float progressRatio = (mfTargetTime - mfWaitTime) / mfTargetTime;
-    s16 angleDeltaInt = (s16)(u16)(s32)(10430.378f * angle);
 
     progressRatio = nlMaxEquals(progressRatio, 0.0f);
     progressRatio = nlMinEquals(progressRatio, 1.0f);
 
-    s32 multiplierInt = (s32)(1024.0f
-                              * (progressRatio
-                                  * (progressRatio
-                                      * ((-2.0f * progressRatio) + 3.0f))));
-    s32 adjustedDelta = (multiplierInt * angleDeltaInt) / 1024;
+    s32 adjustedDelta
+        = ((s32)(1024.0f
+                 * (progressRatio
+                     * (progressRatio
+                         * ((-2.0f * progressRatio) + 3.0f))))
+              * angleDeltaInt)
+        / 1024;
     u16 newFacing = adjustedDelta + mUnidentified024.m_aActualFacingDirection;
 
     SetFacingDirection(newFacing, true);
@@ -6194,20 +6194,16 @@ void Goalie::fn_80088A94(float deltaTime)
             if (animTime > 0.1f)
             {
                 float t = (animTime - 0.1f)
-                        / (mpLooseBallInfo->mfPickupTime - 0.1f);
+                        / (mpLooseBallInfo->GetPickupTime() - 0.1f);
                 t = nlMaxEquals(t, 0.0f);
                 t = nlMinEquals(t, 1.0f);
                 float interp
                     = t * (t * ((-2.0f * t) + 3.0f));
-                float angle = nlATan2f(
-                    mv3LocalContactPosition.y,
-                    mv3LocalContactPosition.x);
-                s16 angleDeltaInt
-                    = (s16)(u16)(s32)(10430.378f * angle);
-                s32 multiplierInt = (s32)(1024.0f * interp);
-                s32 adjustedDelta
-                    = (multiplierInt * angleDeltaInt) / 1024;
-                u16 aNewAng = actualFacing + adjustedDelta;
+                u16 aNewAng = (u16)(actualFacing
+                    + ((s32)(1024.0f * interp)
+                          * (s16)nlVector3ToAngle(
+                              mv3LocalContactPosition))
+                        / 1024);
 
                 SetFacingDirection(aNewAng, true);
                 mUnidentified024.m_aDesiredFacingDirection = aNewAng;
@@ -6277,8 +6273,7 @@ void Goalie::fn_80088A94(float deltaTime)
         bool bWallBlock = mfWallBlock > 0.0f;
         if (!bWallBlock)
         {
-            cFielder* pShooter = mpShooter;
-            nlVector3& shooterPosition = pShooter->mUnidentified024.m_v3Position;
+            const nlVector3& shooterPosition = mpShooter->GetPosition();
             nlVector3 rightFootPos
                 = GetJointPosition(m_nRightFootJointIndex);
             float pushDist = lbl_806DBD08;
@@ -6304,7 +6299,8 @@ void Goalie::fn_80088A94(float deltaTime)
                     pushVec.x = -lbl_806DBD08;
                     pushVec.y = 0.0f;
                     pushVec.z = 0.0f;
-                    GetWorldPoint(pushVec, pushVec, shooterPosition, mUnidentified024.m_aActualFacingDirection);
+                    GetWorldPoint(pushVec, pushVec, shooterPosition,
+                        mUnidentified024.m_aActualFacingDirection);
                     pushVec.x += mUnidentified024.m_v3Position.x - rightFootPos.x;
                     pushVec.y += mUnidentified024.m_v3Position.y - rightFootPos.y;
                     SetPosition(pushVec);

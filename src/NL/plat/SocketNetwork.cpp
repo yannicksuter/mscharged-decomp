@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlMemory.h"
 #include "types.h"

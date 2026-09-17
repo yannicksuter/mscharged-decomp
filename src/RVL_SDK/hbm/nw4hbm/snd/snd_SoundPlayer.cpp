@@ -324,6 +324,14 @@ void SoundPlayer::InitAmbientArg(detail::BasicSound* sound, detail::BasicSound::
                                    ambientArgInfo->argAllocaterCallback, pExtArg);
 }
 
+void SoundPlayer::detail_AppendPlayerHeap(detail::PlayerHeap* heap) {
+    NW4HBMAssertPointerNonnull_Line(heap, 598);
+    heap->SetSoundPlayer(this);
+    mHeapList.PushBack(heap);
+
+    mUsePlayerHeap = true;
+}
+
 detail::PlayerHeap* SoundPlayer::detail_AllocPlayerHeap(detail::BasicSound* sound) {
     if (mHeapList.IsEmpty()) {
         return NULL;
@@ -337,15 +345,6 @@ detail::PlayerHeap* SoundPlayer::detail_AllocPlayerHeap(detail::BasicSound* soun
     rHeap.Clear();
 
     return &rHeap;
-}
-
-// THIS
-void SoundPlayer::detail_AppendPlayerHeap(detail::PlayerHeap* heap) {
-    NW4HBMAssertPointerNonnull_Line(heap, 598);
-    heap->SetSoundPlayer(this);
-    mHeapList.PushBack(heap);
-
-    mUsePlayerHeap = true;
 }
 
 void SoundPlayer::detail_FreePlayerHeap(detail::BasicSound* sound) {

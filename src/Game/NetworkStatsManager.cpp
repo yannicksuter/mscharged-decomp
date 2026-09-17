@@ -1,4 +1,5 @@
 #include "NL/nlSingleton.inl"
+#include <dwc/dwc_account.h>
 #include <dwc/dwc_nastime.h>
 #include "Game/OnlinePlayer.h"
 #include "Game/OnlineMatchmaking.h"
@@ -306,45 +307,80 @@ void NetworkStatsManager::CommitPendingOnlineTotals(
 void NetworkStatsManager::UpdateFriendRankingNames(
     NetworkLeaderboardCategory* leaderboard)
 {
-    if (leaderboard == 0)
-    {
-        return;
-    }
-
     for (int i = 0; i < leaderboard->mCount; ++i)
     {
-        if (leaderboard->mPlayers[i].mProfileId == 0)
+        int profileId = leaderboard->mPlayers[i].mProfileId;
+        for (int friendIndex = 0; friendIndex < 64; ++friendIndex)
         {
-            leaderboard->mMetadata[i].mDisplayRank = -1;
+            DWCAccFriendData* friendData = reinterpret_cast<DWCAccFriendData*>(
+                GameInfoManager::GetInstance()->GetUnknown0x40(
+                    gNetworkSaveSlotIndex, friendIndex));
+            u16* name = GameInfoManager::GetInstance()->GetSavedFriendName(
+                gNetworkSaveSlotIndex, friendIndex);
+            u8* region = static_cast<u8*>(
+                GameInfoManager::GetInstance()->GetUnknown0xA40(
+                    gNetworkSaveSlotIndex, friendIndex));
+            if (friendData->gs_profile_id.id == profileId)
+            {
+                if (leaderboard->mPlayers[i].mName[0] != 0)
+                {
+                    nlStrNCpy(name, leaderboard->mPlayers[i].mName, 11);
+                }
+                *region = leaderboard->mMetadata[i].mUnidentified14;
+            }
         }
     }
 }
 
-void NetworkStatsManager::BuildFriendsLeaderboard(
-    NetworkLeaderboardCategory* leaderboard)
+void NetworkStatsManager::BuildFriendsLeaderboard()
 {
-    if (leaderboard == 0)
-    {
-        return;
-    }
+    NetworkLeaderboardCategory& source = mCategories[4];
+    NetworkLeaderboardCategory& friends = mCategories[5];
+    friends.mAvailable = true;
+    friends.mFirstRank = -1;
+    friends.mCount = 0;
 
     int write = 0;
-    for (int read = 0; read < leaderboard->mCount; ++read)
+    GameInfoSaveSlot* slot = GameInfoManager::GetInstance()->GetSaveSlot(
+        gNetworkSaveSlotIndex);
+    int localProfileId = slot->unknown_0x01C;
+
+    for (int read = 0; read < source.mCount; ++read)
     {
-        if (leaderboard->mPlayers[read].mProfileId == 0)
+        int profileId = source.mPlayers[read].mProfileId;
+        if (profileId == localProfileId)
         {
-            continue;
+            friends.mPlayers[write].CopyFrom(source.mPlayers[read]);
+            friends.mMetadata[write] = source.mMetadata[read];
+            ++write;
         }
-        if (write != read)
+        else
         {
-            leaderboard->mPlayers[write].CopyFrom(
-                leaderboard->mPlayers[read]);
-            leaderboard->mMetadata[write] = leaderboard->mMetadata[read];
+            int friendIndex = 0;
+            for (; friendIndex < 64; ++friendIndex)
+            {
+                DWCAccFriendData* friendData =
+                    reinterpret_cast<DWCAccFriendData*>(
+                        GameInfoManager::GetInstance()->GetUnknown0x40(
+                            gNetworkSaveSlotIndex, friendIndex));
+                if (friendData->gs_profile_id.id == profileId)
+                {
+                    int type = DWC_GetFriendDataType(friendData);
+                    if (DWC_IsValidFriendData(friendData)
+                        && type == DWC_FRIENDDATA_GS_PROFILE_ID)
+                    {
+                        friends.mPlayers[write].CopyFrom(
+                            source.mPlayers[read]);
+                        friends.mMetadata[write] = source.mMetadata[read];
+                        ++write;
+                    }
+                    break;
+                }
+            }
         }
-        leaderboard->mMetadata[write].mDisplayRank = write + 1;
-        ++write;
     }
-    leaderboard->mCount = write;
+    friends.mCount = write;
+    NetworkRanking::AssignDisplayRanks(write, friends.mMetadata, 1);
 }
 
 void NetworkStatsManager::OnLeaderboardResult(bool success,
@@ -354,45 +390,45 @@ void NetworkStatsManager::OnLeaderboardResult(bool success,
     mOperation = 0;
     mLeaderboardRequestComplete = true;
     mLeaderboardCategory = mRequestedCategory;
-    NetworkLeaderboardCategory& leaderboard = mCategories[mRequestedCategory];
-    if (!success)
+    if ((int)success != 1)
     {
+        mStatsError = true;
+        mLeaderboardRequestSucceeded = false;
+        mCategories[mRequestedCategory].mAvailable = false;
+        mCategories[mRequestedCategory].mCount = 0;
+        mCategories[mRequestedCategory].mFirstRank = -1;
         tDebugPrintManager::Print(DC_NETWORK,
             "Unavailable Leaderboard Stats cat %d filter %d\n",
             category,
             filter);
-        mStatsError = true;
-        mLeaderboardRequestSucceeded = false;
-        leaderboard.mAvailable = false;
-        leaderboard.mCount = 0;
-        leaderboard.mFirstRank = -1;
         if (mRequestedCategory == 4)
         {
             mCategories[5].mAvailable = false;
             mCategories[5].mCount = 0;
             mCategories[5].mFirstRank = -1;
         }
-        return;
     }
-
-    tDebugPrintManager::Print(DC_NETWORK,
-        "Sucessfully got leaderboard stats cat %d filter %d\n",
-        category,
-        filter);
-    mLeaderboardRequestSucceeded = true;
-    leaderboard.mAvailable = true;
-    leaderboard.mCount = count;
-    leaderboard.mFirstRank = -1;
-    if (filter == 1)
+    else
     {
-        UpdateFriendRankingNames(&leaderboard);
-    }
-    ApplyLeaderboardToSave(&leaderboard, true);
-    if (mRequestedCategory == 4)
-    {
-        mCategories[5] = leaderboard;
-        BuildFriendsLeaderboard(&mCategories[5]);
-        ApplyLeaderboardToSave(&mCategories[5], false);
+        mLeaderboardRequestSucceeded = true;
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Sucessfully got leaderboard stats cat %d filter %d\n",
+            category,
+            filter);
+        mCategories[mRequestedCategory].mAvailable = true;
+        mCategories[mRequestedCategory].mCount = count;
+        mCategories[mRequestedCategory].mFirstRank = -1;
+        if (filter == 1)
+        {
+            GetRegion();
+            UpdateFriendRankingNames(&mCategories[mRequestedCategory]);
+        }
+        ApplyLeaderboardToSave(&mCategories[mRequestedCategory], true);
+        if (mRequestedCategory == 4)
+        {
+            BuildFriendsLeaderboard();
+            ApplyLeaderboardToSave(&mCategories[5], false);
+        }
     }
 }
 

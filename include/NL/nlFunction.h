@@ -208,13 +208,16 @@ public:
         mTag = FUNCTION_EMPTY;
     }
 
-    void* UnidentifiedTransfer(Function0& other)
+    // Transfers the callable out of the source, which the caller
+    // holds by const reference while handing over ownership.
+    void* UnidentifiedTransfer(const Function0& other)
     {
-        void* target = (void*)other.mFreeFunction;
-        mTag = other.mTag;
+        Function0& source = const_cast<Function0&>(other);
+        void* target = (void*)source.mFreeFunction;
+        mTag = source.mTag;
         mFunctor = (FunctorBase*)target;
-        other.mTag = FUNCTION_EMPTY;
-        other.mFreeFunction = 0;
+        source.mTag = FUNCTION_EMPTY;
+        source.mFreeFunction = 0;
         return target;
     }
 
@@ -350,13 +353,16 @@ public:
         return *this;
     }
 
-    void* UnidentifiedTransfer(Function1& other)
+    // Transfers the callable out of the source, which the caller
+    // holds by const reference while handing over ownership.
+    void* UnidentifiedTransfer(const Function1& other)
     {
-        void* target = (void*)other.mFreeFunction;
-        mTag = other.mTag;
+        Function1& source = const_cast<Function1&>(other);
+        void* target = (void*)source.mFreeFunction;
+        mTag = source.mTag;
         mFunctor = (FunctorBase*)target;
-        other.mTag = FUNCTION_EMPTY;
-        other.mFreeFunction = 0;
+        source.mTag = FUNCTION_EMPTY;
+        source.mFreeFunction = 0;
         return target;
     }
 

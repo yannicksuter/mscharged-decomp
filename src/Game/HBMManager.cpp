@@ -165,8 +165,8 @@ void HBMManager::LoadResources()
 
     AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
     CurrentAllocator = &VirtualAllocator;
-    unsigned int messageBufferSize;
-    void* messageBuffer = nlMalloc(messageSize, 32, false);
+    unsigned long messageBufferSize;
+    void* messageBuffer = operator new(messageSize, 32, false);
     messageBufferSize = messageSize;
     --AllocatorStackDepth;
     AllocatorStack[AllocatorStackDepth] = 0;
@@ -185,8 +185,8 @@ void HBMManager::LoadResources()
 
     AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
     CurrentAllocator = &VirtualAllocator;
-    unsigned int configBufferSize;
-    void* configBuffer = nlMalloc(configSize, 32, false);
+    unsigned long configBufferSize;
+    void* configBuffer = operator new(configSize, 32, false);
     configBufferSize = configSize;
     --AllocatorStackDepth;
     AllocatorStack[AllocatorStackDepth] = 0;

@@ -461,81 +461,96 @@ void NPCManager::UnloadTransientNPCTemplates()
     mTransientHierarchies->Clear();
 }
 
+static inline void DestroyNPCs(NPCManager* pManager)
+{
+    if (pManager->mpChainChomp != 0)
+    {
+        delete pManager->mpChainChomp;
+        pManager->mpChainChomp = 0;
+    }
+    if (pManager->mpDiddyBanana != 0)
+    {
+        delete pManager->mpDiddyBanana;
+        pManager->mpDiddyBanana = 0;
+    }
+
+    if (pManager->mUnidentified024 != 0)
+    {
+        delete pManager->mUnidentified024;
+        pManager->mUnidentified024 = 0;
+    }
+    if (pManager->mpBirdoEgg != 0)
+    {
+        delete pManager->mpBirdoEgg;
+        pManager->mpBirdoEgg = 0;
+    }
+    if (pManager->mUnidentified02C != 0)
+    {
+        delete pManager->mUnidentified02C;
+        pManager->mUnidentified02C = 0;
+    }
+
+    for (unsigned int i = 0; i < 8; ++i)
+    {
+        if (pManager->mDaisyFists[i] != 0)
+        {
+            delete pManager->mDaisyFists[i];
+            pManager->mDaisyFists[i] = 0;
+        }
+    }
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+        if (pManager->mUnidentified058[i] != 0)
+        {
+            delete pManager->mUnidentified058[i];
+            pManager->mUnidentified058[i] = 0;
+        }
+    }
+    pManager->mUnidentified054 = 0;
+    for (unsigned int i = 0; i < 15; ++i)
+    {
+        if (pManager->mUnidentified070[i] != 0)
+        {
+            delete pManager->mUnidentified070[i];
+            pManager->mUnidentified070[i] = 0;
+        }
+    }
+    for (int i = 0; i < 3; ++i)
+    {
+        if (pManager->mUnidentified0CC[i] != 0)
+        {
+            delete pManager->mUnidentified0CC[i];
+            pManager->mUnidentified0CC[i] = 0;
+        }
+    }
+    for (unsigned int i = 0; i < 8; ++i)
+    {
+        if (pManager->mThwomps[i] != 0)
+        {
+            delete pManager->mThwomps[i];
+            pManager->mThwomps[i] = 0;
+        }
+    }
+    ResetFlyingCameras();
+}
+
 NPCManager::~NPCManager()
 {
-    nlDLListContainer<NPCTemplate*>* pLists[2]
-        = { &mPersistentTemplates, &mTransientTemplates };
     for (int i = 0; i < 2; ++i)
     {
         nlDLListIterator<NPCTemplate*> iterator
-            = pLists[i]->Begin();
+            = i == 0 ? mPersistentTemplates.Begin()
+                     : mTransientTemplates.Begin();
         while (iterator.hasNext())
         {
             delete *iterator;
             iterator.next();
         }
-        pLists[i]->Clear();
     }
+    mPersistentTemplates.Clear();
+    mTransientTemplates.Clear();
 
-    delete mpChainChomp;
-    mpChainChomp = 0;
-    delete mpDiddyBanana;
-    mpDiddyBanana = 0;
-
-    if (mUnidentified024 != 0)
-    {
-        delete mUnidentified024;
-        mUnidentified024 = 0;
-    }
-    if (mpBirdoEgg != 0)
-    {
-        delete mpBirdoEgg;
-        mpBirdoEgg = 0;
-    }
-    if (mUnidentified02C != 0)
-    {
-        delete mUnidentified02C;
-        mUnidentified02C = 0;
-    }
-
-    unsigned int i;
-    for (i = 0; i < 8; ++i)
-    {
-        delete mDaisyFists[i];
-        mDaisyFists[i] = 0;
-    }
-    for (i = 0; i < 6; ++i)
-    {
-        if (mUnidentified058[i] != 0)
-        {
-            delete mUnidentified058[i];
-            mUnidentified058[i] = 0;
-        }
-    }
-    mUnidentified054 = 0;
-    for (i = 0; i < 15; ++i)
-    {
-        if (mUnidentified070[i] != 0)
-        {
-            delete mUnidentified070[i];
-            mUnidentified070[i] = 0;
-        }
-    }
-    for (i = 0; i < 3; ++i)
-    {
-        delete mUnidentified0CC[i];
-        mUnidentified0CC[i] = 0;
-    }
-    for (i = 0; i < 8; ++i)
-    {
-        if (mThwomps[i] != 0)
-        {
-            delete mThwomps[i];
-            mThwomps[i] = 0;
-        }
-    }
-
-    ResetFlyingCameras();
+    ::DestroyNPCs(this);
     delete mPersistentHierarchies;
     delete mTransientHierarchies;
     gNPCManagerInstance = 0;
@@ -543,64 +558,7 @@ NPCManager::~NPCManager()
 
 void NPCManager::DestroyNPCs()
 {
-    delete mpChainChomp;
-    mpChainChomp = 0;
-    delete mpDiddyBanana;
-    mpDiddyBanana = 0;
-
-    if (mUnidentified024 != 0)
-    {
-        delete mUnidentified024;
-        mUnidentified024 = 0;
-    }
-    if (mpBirdoEgg != 0)
-    {
-        delete mpBirdoEgg;
-        mpBirdoEgg = 0;
-    }
-    if (mUnidentified02C != 0)
-    {
-        delete mUnidentified02C;
-        mUnidentified02C = 0;
-    }
-
-    unsigned int i;
-    for (i = 0; i < 8; ++i)
-    {
-        delete mDaisyFists[i];
-        mDaisyFists[i] = 0;
-    }
-    for (i = 0; i < 6; ++i)
-    {
-        if (mUnidentified058[i] != 0)
-        {
-            delete mUnidentified058[i];
-            mUnidentified058[i] = 0;
-        }
-    }
-    mUnidentified054 = 0;
-    for (i = 0; i < 15; ++i)
-    {
-        if (mUnidentified070[i] != 0)
-        {
-            delete mUnidentified070[i];
-            mUnidentified070[i] = 0;
-        }
-    }
-    for (i = 0; i < 3; ++i)
-    {
-        delete mUnidentified0CC[i];
-        mUnidentified0CC[i] = 0;
-    }
-    for (i = 0; i < 8; ++i)
-    {
-        if (mThwomps[i] != 0)
-        {
-            delete mThwomps[i];
-            mThwomps[i] = 0;
-        }
-    }
-    ResetFlyingCameras();
+    ::DestroyNPCs(this);
 }
 
 NPCTemplate* NPCManager::fn_801ABBDC(const char* pName)
@@ -662,11 +620,10 @@ void NPCManager::UpdateAINPCs(float dt)
     unsigned int i;
     for (i = 0; i < 8; ++i)
     {
-        DaisyFistObject* pObject = mDaisyFists[i];
-        if (pObject != 0)
+        if (mDaisyFists[i] != 0)
         {
-            pObject->Update(dt);
-            if (pObject->mVisible)
+            mDaisyFists[i]->Update(dt);
+            if (mDaisyFists[i]->mVisible)
             {
                 ++mUnidentified030;
             }

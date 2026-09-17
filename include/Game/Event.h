@@ -117,7 +117,7 @@ public:
 
     virtual ~UnidentifiedTypedEvent() { }
     virtual void Disconnect(void* owner) = 0;
-    virtual void Add(Callback, unsigned int, int) = 0;
+    virtual void Add(const Callback&, unsigned int, int) = 0;
 
 protected:
     static void* sType;
@@ -161,7 +161,7 @@ public:
 
     virtual void Disconnect(void* owner);
 
-    virtual void Add(Callback callback, unsigned int value, int flags)
+    virtual void Add(const Callback& callback, unsigned int value, int flags)
     {
         UnidentifiedAddListener(callback, value, flags);
     }
@@ -249,9 +249,10 @@ public:
     }
 
 protected:
-    // The queued event's own Add shares this body with its by-value
-    // callback; forwarding the parameter by value would copy it.
-    void UnidentifiedAddListener(Callback& callback, unsigned int value, int flags)
+    // Add hands the listener its callback by reference: retail's copies
+    // clear the caller's Function instead of cloning it.
+    void UnidentifiedAddListener(
+        const Callback& callback, unsigned int value, int flags)
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
@@ -354,7 +355,7 @@ public:
         Remove(listener);
     }
 
-    virtual void Add(Callback callback, unsigned int value, int flags)
+    virtual void Add(const Callback& callback, unsigned int value, int flags)
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
@@ -509,7 +510,7 @@ public:
 
     virtual ~UnidentifiedQueuedEvent();
 
-    virtual void Add(typename UnidentifiedEvent<T>::Callback callback,
+    virtual void Add(const typename UnidentifiedEvent<T>::Callback& callback,
         unsigned int value, int flags)
     {
         this->UnidentifiedAddListener(callback, value, flags);

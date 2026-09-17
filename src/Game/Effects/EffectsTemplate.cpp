@@ -72,15 +72,14 @@ float fxAnimatedRange::GetMaximum() const
 
 EffectsTemplate* EffectsTemplate::LoadFromChunk(nlChunk* chunk)
 {
-    nlChunk* templateChunk = static_cast<nlChunk*>(chunk->GetData());
+    nlChunk* templateChunk = chunk->GetFirstChunk();
     EffectsTemplate* result
         = static_cast<EffectsTemplate*>(templateChunk->GetData());
 
     for (int i = 0; i < 8; ++i)
     {
         templateChunk = templateChunk->GetNextChunk();
-        nlChunk* valueChunk
-            = static_cast<nlChunk*>(templateChunk->GetData());
+        nlChunk* valueChunk = templateChunk->GetFirstChunk();
         fxAnimatedRange* value
             = static_cast<fxAnimatedRange*>(valueChunk->GetData());
         if (value->mUseCurve != 0)
@@ -97,8 +96,9 @@ EffectsTemplate* EffectsTemplate::LoadFromChunk(nlChunk* chunk)
         result->m_hTexture = glGetTexture("global/white");
     }
 
+    GLInventory* inventory = gEffectsModelInventory;
     if (result->m_uModelID != 0xFFFFFFFF
-        && gEffectsModelInventory->GetModel(result->m_uModelID) == 0)
+        && inventory->GetModel(result->m_uModelID) == 0)
     {
         result->m_uModelID = 0xFFFFFFFF;
     }

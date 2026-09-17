@@ -635,6 +635,7 @@ cPoseNode* Goalie::SetupBlender(bool bPrimary, const float* fStartPercent,
     float fBlend;
     int index1;
     cPN_SAnimController* pSaveController1;
+    cPoseNode* result;
     int index2;
 
     if (bPrimary)
@@ -657,7 +658,7 @@ cPoseNode* Goalie::SetupBlender(bool bPrimary, const float* fStartPercent,
     {
         pSaveController1->SetTime(fStartPercent[index1]);
     }
-    cPoseNode* result = pSaveController1;
+    result = pSaveController1;
     if (nMainAnimID == animID)
     {
         m_pCurrentAnimController = pSaveController1;
@@ -3437,6 +3438,8 @@ extern "C" void fn_8005D550(void* pManager, const GoalieSaveData* pData);
 
 void Goalie::DoPassRelease()
 {
+    GoalieTweaks* pTweaks;
+
     if (m_pBall == NULL && mGoalieActionState == GOALIEACTION_LOOSEBALL_PICKUP
         && ((int)m_eAnimID == 3 || (int)m_eAnimID == 2))
     {
@@ -3501,7 +3504,7 @@ void Goalie::DoPassRelease()
 
     nlVector3 v3Velocity;
     nlVector3 v3Direction;
-    GoalieTweaks* pTweaks = m_pTweaks;
+    pTweaks = m_pTweaks;
     eSpinType spinType = nlRandom(2) != 0 ? SPINTYPE_FORWARD : SPINTYPE_BACK;
     float fPercent = nlRandomf(1.0f);
     float fShotSpeed = Interpolate(pTweaks->fKickVelocityMin, pTweaks->fKickVelocityMax, fPercent);

@@ -1,7 +1,7 @@
 #ifndef _SHOOTTOSCORECAM_H_
 #define _SHOOTTOSCORECAM_H_
 
-#include "Game/Camera/BaseCamera.h"
+#include "Game/Camera/BaseCam.h"
 
 class cShootToScoreCamera : public cBaseCamera
 {

@@ -1983,32 +1983,38 @@ void cCharacter::SetAnimState(int animID, bool useBlendTime,
     {
         mUnidentified17E = false;
         mUnidentified17F = false;
-        fn_8001EFE4((cFielder*)this, 0);
+        SetHammerTransformFrozen(false);
     }
 }
 
 int lbl_806E0C28;
 
-extern "C" void fn_8001EFE4(cFielder* character, bool bParam)
+void cCharacter::SetHammerTransformFrozen(bool frozen)
 {
-    bool unidentifiedEnd = false;
-    if (character->mUnidentified180 && !bParam)
-        unidentifiedEnd = true;
-    character->mUnidentified180 = bParam;
-    if (bParam)
+    bool destroyHammer = false;
+    if (mUnidentified180 && !frozen)
+        destroyHammer = true;
+    mUnidentified180 = frozen;
+    if (frozen)
     {
-        if (lbl_806E0C28 == 0)
-        {
-            lbl_806E0C28 = character->m_pPoseAccumulator->m_BaseSHierarchy->GetNodeIndexByID(
-                nlStringLowerHash("bip01 r prop"));
-        }
-        character->mUnidentified184 = character->m_pPoseAccumulator->GetNodeQuaternion(lbl_806E0C28);
-        const nlMatrix4& m = character->m_pPoseAccumulator->GetNodeMatrix(lbl_806E0C28);
-        character->mUnidentified194 = *(nlVector3*)&m.e2[3][0];
-        character->mUnidentified1A0 = nlVec3Length(*(nlVector3*)&m.e2[0][0]);
+        CaptureHammerTransform();
     }
-    if (unidentifiedEnd)
-        fn_801B8CF4(character->mUnidentified194);
+    if (destroyHammer)
+        fn_801B8CF4(mUnidentified194);
+}
+
+void cCharacter::CaptureHammerTransform()
+{
+    cSHierarchy* hierarchy;
+    if (lbl_806E0C28 == 0)
+    {
+        hierarchy = m_pPoseAccumulator->m_BaseSHierarchy;
+        lbl_806E0C28 = hierarchy->GetNodeIndexByID(nlStringLowerHash("bip01 r prop"));
+    }
+    mUnidentified184 = m_pPoseAccumulator->GetNodeQuaternion(lbl_806E0C28);
+    const nlMatrix4& m = m_pPoseAccumulator->GetNodeMatrix(lbl_806E0C28);
+    mUnidentified194 = m.GetTranslation();
+    mUnidentified1A0 = nlVec3Length(*(nlVector3*)&m.e2[0][0]);
 }
 
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);

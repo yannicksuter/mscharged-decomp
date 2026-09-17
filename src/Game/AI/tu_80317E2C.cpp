@@ -64,6 +64,14 @@ float lbl_806E20C4;
 int lbl_806E20C8;
 float lbl_806E20CC;
 
+extern const float lbl_806E6880;
+extern const float lbl_806E6884;
+extern const float lbl_806E6888;
+extern const float lbl_806E688C;
+extern const float lbl_806E6890;
+extern const float lbl_806E6894;
+extern const float lbl_806E6898[2];
+
 extern "C" UnidentifiedFielderInput* fn_80317E2C(
     UnidentifiedScriptMachine* context)
 {
@@ -86,7 +94,7 @@ extern "C" bool fn_80317E60(
 extern "C" bool fn_80317E88(const shdStateMachine* machine)
 {
     bool result = false;
-    if (machine->mUnidentified078 >= 0.0f)
+    if (machine->mUnidentified078 >= lbl_806E6880)
     {
         if (machine->mUnidentifiedTimer.GetSeconds()
             > machine->mUnidentified078)
@@ -96,6 +104,11 @@ extern "C" bool fn_80317E88(const shdStateMachine* machine)
     }
     return result;
 }
+
+extern const float lbl_806E6880 = 0.0f;
+extern const float lbl_806E6884 = -1.0f;
+extern const float lbl_806E6888 = -99999.0f;
+extern const float lbl_806E688C = 10.0f;
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(
     UnidentifiedFuzzyRuntimeBase* runtime, u32* hash, void* argument)
@@ -564,16 +577,16 @@ extern "C" void fn_8031A02C(ScriptQuestionCache*)
     {
         lbl_806E20C4 = lbl_806E20C0;
     }
-    lbl_806E20C0 = 0.0f;
+    lbl_806E20C0 = lbl_806E6890;
 }
 
 extern "C" bool fn_8031A04C()
 {
-    if (lbl_806DF5B0[0] > 0.0f)
+    if (lbl_806DF5B0[0] > lbl_806E6890)
     {
-        float chance = fn_80314538(
-            0.2f, 1.0f, lbl_806DF5B0[0], 0.0f, lbl_806E20C0);
-        if (nlRandomf(1.0f, &nlDefaultSeed) > chance)
+        float chance = fn_80314538(lbl_806E6894, lbl_806E6898[0],
+            lbl_806DF5B0[0], lbl_806E6890, lbl_806E20C0);
+        if (nlRandomf(lbl_806E6898[0], &nlDefaultSeed) > chance)
         {
             lbl_806E20C8++;
             return false;
@@ -581,6 +594,10 @@ extern "C" bool fn_8031A04C()
     }
     return true;
 }
+
+extern const float lbl_806E6890 = 0.0f;
+extern const float lbl_806E6894 = 0.2f;
+extern const float lbl_806E6898[2] = { 1.0f, 0.0f };
 
 extern "C" float fn_8031A0C8(float start, float end)
 {

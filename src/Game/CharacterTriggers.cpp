@@ -455,7 +455,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0x09823AC3:
             if (fn_8019464C(lbl_806E0C34))
             {
-                fn_8001EFE4((cFielder*)lbl_806E0C34, 1);
+                lbl_806E0C34->SetHammerTransformFrozen(true);
             }
             break;
 

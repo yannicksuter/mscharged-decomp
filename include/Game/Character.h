@@ -176,6 +176,7 @@ public:
 
     void SetAnimState(int animID, bool useBlendTime, float nonDefaultBlendTime,
         bool restartCyclic, bool forceMirrorSwap);
+    void SetHammerTransformFrozen(bool frozen);
     cPN_SAnimController* NewAnimController(int animID, bool bRestartCyclic,
         bool bForceMirrorSwap,
         void (*funcPlaybackSpeedCallback)(
@@ -328,6 +329,9 @@ public:
     /* 0x1B4 */ nlVector3 m_v3ScreenPosition;
     /* 0x1C0 */ nlAVLTreeSlotPool<unsigned long, nlVector3,
         DefaultKeyCompare<unsigned long> > mUnidentified1C0;
+
+private:
+    void CaptureHammerTransform();
 }; // total size: 0x1E4
 
 #endif // GAME_CHARACTER_H

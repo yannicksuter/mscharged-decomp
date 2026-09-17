@@ -209,6 +209,10 @@ void WsdPlayer::SetChannelPriority(int prio) {
     mPriority = static_cast<u8>(prio);
 }
 
+WsdTrack* WsdPlayer::GetPlayerTrack(int trackNo) {
+    NW4HBMAssert(trackNo == 0);
+    return &mTrack;
+}
 
 void WsdPlayer::InvalidateData(const void* start, const void* end) {
     ut::AutoInterruptLock lock;

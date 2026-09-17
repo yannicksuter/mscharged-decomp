@@ -34,6 +34,8 @@ public:
     void fn_801B10C4(float value);
     void fn_801B10E4(float value);
 
+    float GetWhiteBarAngle() const { return m_fWhiteBarAngle; }
+
     /* 0x00 */ nlVector3 m_v3MeterPosition;
     /* 0x0C */ nlVector3 m_v3OriginalMeterPosition;
     /* 0x18 */ float mfRumbleAmount;

@@ -150,7 +150,7 @@ class NetMessageDraftMachineInfo : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageDraftMachineInfo();
+    virtual ~NetMessageDraftMachineInfo() { }
     virtual int GetType();
 
     /* 0x008 */ NetworkDraftMachineInfo mEntry;

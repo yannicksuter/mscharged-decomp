@@ -4,6 +4,7 @@
 #include "Game/SAnim.h"
 #include "Game/Inventory.h"
 #include "Game/SHierarchy.h"
+#include "NL/nlDLListContainer.h"
 #include "NL/nlMath.h"
 #include "NL/nlSingleton.h"
 #include "types.h"
@@ -36,6 +37,11 @@ public:
     static void OnHierarchyLoaded(void* data, unsigned long size, void* userData);
     static void OnAnimationsLoaded(void* data, unsigned long size, void* userData);
 
+    bool IsLoadFinished() const
+    {
+        return (mPendingLoads == 0x10 || mPendingLoads == 0) && !mLoadQueued;
+    }
+
     /* 0x04 */ FEModelType mType;
     /* 0x08 */ cInventory<cSAnim>* mAnimations;
     /* 0x0C */ cInventory<cSHierarchy>* mHierarchies;
@@ -54,7 +60,7 @@ public:
     /* 0x40 */ u32 mHierarchyFileDataSize;
     /* 0x44 */ void* mAnimationFileData;
     /* 0x48 */ u32 mAnimationFileDataSize;
-    /* 0x4C */ u32 mPendingLoads;
+    /* 0x4C */ int mPendingLoads;
     /* 0x50 */ bool mLoaded;
     /* 0x51 */ bool mSynchronousLoad;
     /* 0x52 */ bool mLoadQueued;
@@ -67,9 +73,14 @@ public:
     FEModelHandle(FEModelType type, const char* name, tCharacterTemplateInfo* modelData,
         bool unidentified59, void* unidentified4C, void* unidentified50,
         bool unidentified5A);
+    ~FEModelHandle() { delete mModel; }
 
     bool IsAnimationFinished();
     bool IsLoaded() const;
+    bool CanDestroy() const
+    {
+        return mModel->mLoaded || mModel->IsLoadFinished();
+    }
     void SetTransform(const nlMatrix4& transform);
     void PlayAnimation(const char* name, ePlayMode playMode,
         float blendTime, float speed, bool force);
@@ -91,12 +102,6 @@ public:
     /* 0x5B */ u8 mPadding5B;
     /* 0x5C */ nlVector3 mPosition;
 }; // size: 0x68
-
-struct FEModelHandleListEntry
-{
-    /* 0x00 */ FEModelHandleListEntry* mNext;
-    /* 0x04 */ FEModelHandle* mHandle;
-};
 
 class FEModelManager : public nlSingleton<FEModelManager>
 {
@@ -120,18 +125,11 @@ public:
     FEModelHandle* GetModel(const char* name);
     void ReleaseImpostors();
 
-    /* 0x04 */ void* mUnidentified04;
-    /* 0x08 */ FEModelHandleListEntry* mHandlesHead;
-    /* 0x0C */ FEModelHandleListEntry* mHandlesTail;
-    /* 0x10 */ void* mUnidentified10;
-    /* 0x14 */ void* mModelsHead;
-    /* 0x18 */ void* mModelsTail;
-    /* 0x1C */ void* mUnidentified1C;
-    /* 0x20 */ void* mPendingModels;
-    /* 0x24 */ void* mUnidentified24;
-    /* 0x28 */ void* mLoadedModels;
-    /* 0x2C */ void* mUnidentified2C;
-    /* 0x30 */ void* mDanglingModels;
+    /* 0x04 */ nlListContainer<FEModelHandle*> mHandles;
+    /* 0x10 */ nlListContainer<void*> mModels;
+    /* 0x1C */ nlDLListContainer<FEModelHandle*> mPendingModels;
+    /* 0x24 */ nlDLListContainer<FEModelHandle*> mLoadedModels;
+    /* 0x2C */ nlDLListContainer<FEModelHandle*> mDanglingModels;
     /* 0x34 */ void* mResource;
 }; // size: 0x38
 
