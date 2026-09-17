@@ -31,6 +31,11 @@ public:
         return (T*)glFrameAlloc(sizeof(T), GLM_Header);
     }
 
+    void Allocate(T*& out)
+    {
+        out = Allocate();
+    }
+
     void Delete(T* entry)
     {
         entry->~T();

@@ -183,11 +183,17 @@ public:
     {
         while (curr != 0)
         {
-            if (!InorderWalk((Entry*)curr->node.left, callback))
+            if (InorderWalk((Entry*)curr->node.left, callback))
+            {
+                if ((*callback)(curr->key, curr->value))
+                    curr = (Entry*)curr->node.right;
+                else
+                    return false;
+            }
+            else
+            {
                 return false;
-            if (!(*callback)(curr->key, curr->value))
-                return false;
-            curr = (Entry*)curr->node.right;
+            }
         }
         return true;
     }
@@ -246,7 +252,9 @@ public:
 
     virtual AVLTreeNode* AllocateEntry(void* key, void* value)
     {
-        Entry* newNode = new (m_Allocator.Allocate()) Entry;
+        Entry* storage;
+        m_Allocator.Allocate(storage);
+        Entry* newNode = new (storage) Entry;
         newNode->node.left = 0;
         newNode->node.right = 0;
         newNode->node.heavy = 0;

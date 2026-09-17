@@ -24,6 +24,7 @@ public:
     void RestoreFriendCodeInput();
     void UpdateConfirmButton();
     void OnAddFriendErrorDismissed();
+    unsigned long long ParseFriendKey();
     void OnKeypadPointerPress(int index, void* context);
 
     /* 0x001C */ int mHoverCount;

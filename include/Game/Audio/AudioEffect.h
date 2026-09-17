@@ -19,6 +19,8 @@ public:
     virtual void Update(float);
     virtual bool IsFinished();
 
+    float GetTargetScalar() const { return m_State.m_Target.scalar; }
+
     struct State
     {
         union Value
@@ -92,9 +94,9 @@ inline bool AudioEffectParameter::IsFinished()
 {
     return m_State.m_Flags.bytes[0]
         ? ((AudioEffectBase*)m_State.m_Current.pointer)->m_Enabled
-        : (m_State.m_Target.scalar != 0.0f
-            && (m_State.m_Current.scalar - m_State.m_Target.scalar > 0.0001f
-                || nlNear(m_State.m_Current.scalar, m_State.m_Target.scalar)));
+        : (GetTargetScalar() != 0.0f
+            && (m_State.m_Current.scalar - GetTargetScalar() > 0.0001f
+                || nlNear(m_State.m_Current.scalar, GetTargetScalar())));
 }
 
 inline void AudioEffectParameter::Update(float dt)

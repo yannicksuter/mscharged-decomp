@@ -409,7 +409,7 @@ void SHOnlineMiiSelectOverlay::Update(float fDeltaT)
     if (!mInitialized)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             return;
         }
@@ -417,7 +417,7 @@ void SHOnlineMiiSelectOverlay::Update(float fDeltaT)
         InitializeButtons();
         mInitialized = true;
 
-        TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(
+        TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find<TLSlide>(
             mPresentation->m_currentSlide,
             nlStringLowerHash("Layer"),
             nlStringLowerHash("PLAYER_BOX"),

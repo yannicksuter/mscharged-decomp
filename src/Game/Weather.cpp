@@ -1156,24 +1156,25 @@ float BubblingLava::CalculateLavaTrajectory(nlVector3& outputPosition, nlVector3
 {
     nlVector3 position;
     nlVector3 velocity;
+    float coefficient;
     float length = cField::GetGoalLineX(0U);
     float width = 2.0f * cField::mv3FieldPosition.y;
     float halfWidth = 0.5f * width;
-    float radius = gLavaPoolRadius;
-    float xRange = length - radius;
-    float yRange = halfWidth - radius;
-    float margin = 3.0f * radius;
-    float minX = gLavaMinXSpeed;
-    float maxX = gLavaMaxXSpeed;
-    float minY = gLavaMinYSpeed;
-    float maxY = gLavaMaxYSpeed;
-    float minZ = gLavaMinZSpeed;
-    float maxZ = gLavaMaxZSpeed;
-    float goalDistance = gLavaGoalClearance * gLavaGoalClearance;
+    float xRange = length - gLavaPoolRadius;
+    float yRange = halfWidth - gLavaPoolRadius;
+    float minX, maxX, minY, maxY, minZ, maxZ, margin;
+    minX = gLavaMinXSpeed;
+    maxX = gLavaMaxXSpeed;
+    minY = gLavaMinYSpeed;
+    maxY = gLavaMaxYSpeed;
+    minZ = gLavaMinZSpeed;
+    maxZ = gLavaMaxZSpeed;
     nlVector3 rightGoal = { 0.0f, 0.0f, 0.0f };
     rightGoal.x = length;
     nlVector3 leftGoal = { 0.0f, 0.0f, 0.0f };
     leftGoal.x = -1.0f * length;
+    margin = 3.0f * gLavaPoolRadius;
+    float goalDistance = gLavaGoalClearance * gLavaGoalClearance;
     position.x = nlRandomf(2.0f * xRange) - xRange;
     position.y = nlRandomf(2.0f * yRange) - yRange;
     position.z = 0.0f;
@@ -1193,7 +1194,7 @@ float BubblingLava::CalculateLavaTrajectory(nlVector3& outputPosition, nlVector3
         position.x = nlRandomf(2.0f * range) - range;
     }
     float time;
-    float coefficient = -0.5f * gravity;
+    coefficient = -0.5f * gravity;
     while (true)
     {
         velocity.x = minX + nlRandomf(maxX - minX);

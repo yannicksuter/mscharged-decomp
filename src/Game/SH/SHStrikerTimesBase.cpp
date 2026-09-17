@@ -32,30 +32,17 @@
 
 static inline TLInstance* FindInstance(TLSlide* slide, const char* item)
 {
-    TLInstance* result;
-    unsigned long itemHash = nlStringLowerHash(item);
-    result = FEFinder<TLInstance, 2>::_Find(slide, nlStringLowerHash("Layer"), itemHash, 0, 0, 0, 0);
-    if (result == 0)
-        return 0;
-    return result;
+    return FEFinder<TLInstance, 2>::Find<>(slide, "Layer", item);
 }
 
 static inline TLComponentInstance* FindComponent(TLSlide* slide, const char* item)
 {
-    TLComponentInstance* result = (TLComponentInstance*)FindInstance(slide, item);
-    if (result == 0)
-        result = &UnidentifiedTLComponentDefault::sInstance;
-    return result;
+    return FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault<>(slide, "Layer", item);
 }
 
 inline TLInstance* SHStrikerTimesBase::FindCurrentInstance(const char* item)
 {
-    TLInstance* result;
-    unsigned long itemHash = nlStringLowerHash(item);
-    result = FEFinder<TLInstance, 2>::_Find(mPresentation->m_currentSlide, nlStringLowerHash("Layer"), itemHash, 0, 0, 0, 0);
-    if (result == 0)
-        return 0;
-    return result;
+    return FEFinder<TLInstance, 2>::Find<>(mPresentation->m_currentSlide, "Layer", item);
 }
 
 inline TLComponentInstance* SHStrikerTimesBase::FindCurrentComponent(const char* item)
@@ -267,10 +254,7 @@ void SHStrikerTimesBase::SceneCreated()
 
     if (!mLogoReady)
     {
-        unsigned long logoHash = nlStringLowerHash("st_logo");
-        unsigned long itemHash = nlStringLowerHash("logo");
-        TLInstance* logo = FEFinder<TLImageInstance, 2>::Find(mPresentation, nlStringLowerHash("logo"),
-            nlStringLowerHash("Layer"), itemHash, logoHash, 0, 0);
+        TLInstance* logo = FEFinder<TLImageInstance, 2>::Find<>(mPresentation, "logo", "Layer", "logo", "st_logo");
         mLogoImage.mImageInstance = (TLImageInstance*)logo;
         mLogoImage.QueueLoad(buffer, false);
     }
@@ -306,11 +290,11 @@ void SHStrikerTimesBase::Update(float dt)
     {
         FEPresentation* presentation = mPresentation;
         TLSlide* slide = presentation->m_currentSlide;
-        if (slide->m_time < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int pad = 0; pad < 4; ++pad)
             {
-                gFEPointerInstances[pad]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(pad)->SetActiveSlide("waiting", true, false);
             }
             return;
         }
@@ -353,7 +337,7 @@ void SHStrikerTimesBase::Update(float dt)
     if (mPage == 0)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time >= slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             mPage = 1;
             mPresentation->SetActiveSlide("headline pic", true);
@@ -388,7 +372,7 @@ void SHStrikerTimesBase::Update(float dt)
     }
     for (int pad = 0; pad < 4; ++pad)
     {
-        TLComponentInstance* instance = gFEPointerInstances[pad];
+        TLComponentInstance* instance = GetPointerInstance(pad);
         if (mDisplayMode != 0xC && pad != gFEControllerIndex)
         {
             instance->SetActiveSlide("waiting", true, false);

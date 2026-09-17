@@ -90,7 +90,7 @@ void TLTextInstance::Render(eGLView view, const nlColour& colour) const
     {
         unsigned short* buffer = (unsigned short*)__alloca((nlStrLen<unsigned short>(pWideTextString) + 1) * sizeof(unsigned short));
 
-        pFont = component->m_pFeFontResource->m_pFontReference;
+        pFont = component->m_pFeFontResource->GetFontReference();
         FontCharString charString(pWideTextString, pFont, buffer);
 
         m_DrawInfo.String = charString.m_pString;
@@ -108,7 +108,7 @@ void TLTextInstance::Render(eGLView view, const nlColour& colour) const
         x = 0.0f;
         break;
     case nlTextBox::AlignCenter:
-        x = 0.5f * -m_OverloadedAttributes.BoxSize.x;
+        x = -m_OverloadedAttributes.BoxSize.x / 2.0f;
         break;
     case nlTextBox::AlignRight:
         x = -m_OverloadedAttributes.BoxSize.x;
@@ -122,7 +122,7 @@ void TLTextInstance::Render(eGLView view, const nlColour& colour) const
         y = 0.0f;
         break;
     case nlTextBox::VAlignCenter:
-        y = 0.5f * m_OverloadedAttributes.BoxSize.y;
+        y = m_OverloadedAttributes.BoxSize.y / 2.0f;
         break;
     case nlTextBox::VAlignBottom:
         y = m_OverloadedAttributes.BoxSize.y;

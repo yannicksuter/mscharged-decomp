@@ -26,12 +26,12 @@ struct NetworkTournamentGame
 {
     NetworkTournamentGame()
         : mState(NET_TOURN_GAME_EMPTY)
-        , mHomeMachine(-1)
-        , mAwayMachine(-1)
         , mBracketIndex(-1)
         , mHomeUpdate(0)
         , mAwayUpdate(0)
     {
+        mMachines[0] = -1;
+        mMachines[1] = -1;
         mGameInfo.Reset(true);
     }
 
@@ -39,8 +39,7 @@ struct NetworkTournamentGame
     bool GetWinnerAndLoser(int* winnerSide, int* winningMachine) const;
 
     /* 0x000 */ int mState;
-    /* 0x004 */ int mHomeMachine;
-    /* 0x008 */ int mAwayMachine;
+    /* 0x004 */ int mMachines[2];
     /* 0x00C */ int mBracketIndex;
     /* 0x010 */ BasicGameInfo mGameInfo;
     /* 0x138 */ int mHomeUpdate;

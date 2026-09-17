@@ -4,10 +4,12 @@
 #include "Game/Sys/debug.h"
 
 #include "Game/Drawable/DrawableObj.h"
+#include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
 #include "Game/Render/FrontEndPresentation.h"
+#include "Game/Team.h"
 #include "Game/TweakValue.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
@@ -185,8 +187,8 @@ void NetTournManager::Reset(bool)
     for (int i = 0; i < 7; ++i)
     {
         mGames[i].mState = NET_TOURN_GAME_EMPTY;
-        mGames[i].mHomeMachine = -1;
-        mGames[i].mAwayMachine = -1;
+        mGames[i].mMachines[0] = -1;
+        mGames[i].mMachines[1] = -1;
         mGames[i].mBracketIndex = i;
         mGames[i].mHomeUpdate = 0;
         mGames[i].mAwayUpdate = 0;
@@ -249,8 +251,8 @@ void NetTournManager::TransitionOnlineMenuToTournament(
     {
         NetworkTournamentGame& game = mGames[i];
         game.mState = NET_TOURN_GAME_EMPTY;
-        game.mHomeMachine = -1;
-        game.mAwayMachine = -1;
+        game.mMachines[0] = -1;
+        game.mMachines[1] = -1;
         game.mBracketIndex = i;
         game.mHomeUpdate = 0;
         game.mAwayUpdate = 0;
@@ -309,8 +311,8 @@ void NetTournManager::BuildInitialBracket()
     {
         NetworkTournamentGame& game = mGames[gameIndex];
         game.mState = NET_TOURN_GAME_READY;
-        game.mHomeMachine = mSeedings[gameIndex * 2];
-        game.mAwayMachine = mSeedings[gameIndex * 2 + 1];
+        game.mMachines[0] = mSeedings[gameIndex * 2];
+        game.mMachines[1] = mSeedings[gameIndex * 2 + 1];
         game.mBracketIndex = gameIndex;
         game.mHomeUpdate = 0;
         game.mAwayUpdate = 0;
@@ -335,8 +337,8 @@ void NetTournManager::AdvanceBracket()
     {
         NetworkTournamentGame& game = mGames[gameIndex];
         game.mState = NET_TOURN_GAME_READY;
-        game.mHomeMachine = -1;
-        game.mAwayMachine = -1;
+        game.mMachines[0] = -1;
+        game.mMachines[1] = -1;
         game.mBracketIndex = gameIndex;
         game.mHomeUpdate = 0;
         game.mAwayUpdate = 0;
@@ -347,12 +349,12 @@ void NetTournManager::AdvanceBracket()
         if (mGames[previousFirst++].GetWinnerAndLoser(
                 &winnerSide, &winnerMachine))
         {
-            game.mHomeMachine = winnerMachine;
+            game.mMachines[0] = winnerMachine;
         }
         if (mGames[previousFirst++].GetWinnerAndLoser(
                 &winnerSide, &winnerMachine))
         {
-            game.mAwayMachine = winnerMachine;
+            game.mMachines[1] = winnerMachine;
         }
     }
 }
@@ -412,7 +414,7 @@ int NetTournManager::TournamentIdxToMachineIdx(int machine) const
 
 bool NetTournManager::SendTournamentGameStart(NetworkTournamentGame* game)
 {
-    if (game == 0 || game->mHomeMachine == -1 || game->mAwayMachine == -1)
+    if (game == 0 || game->mMachines[0] == -1 || game->mMachines[1] == -1)
     {
         return false;
     }
@@ -502,19 +504,19 @@ void NetTournManager::StartReadyGames()
          ++gameIndex)
     {
         NetworkTournamentGame& game = mGames[gameIndex];
-        if (game.mHomeMachine == -1 && game.mAwayMachine == -1)
+        if (game.mMachines[0] == -1 && game.mMachines[1] == -1)
         {
             game.mState = NET_TOURN_GAME_NO_PLAYERS;
         }
-        else if (game.mHomeMachine == -1)
+        else if (game.mMachines[0] == -1)
         {
             game.mState = NET_TOURN_GAME_AWAY_ADVANCES;
         }
-        else if (game.mAwayMachine == -1)
+        else if (game.mMachines[1] == -1)
         {
             game.mState = NET_TOURN_GAME_HOME_ADVANCES;
         }
-        else if (game.mHomeMachine == mLocalMachineIndex)
+        else if (game.mMachines[0] == mLocalMachineIndex)
         {
             SendTournamentGameStart(&game);
         }
@@ -546,23 +548,29 @@ bool NetworkTournamentGame::GetWinnerAndLoser(
 {
     switch (mState)
     {
+    case NET_TOURN_GAME_EMPTY:
+    case NET_TOURN_GAME_READY:
+        return false;
+    case NET_TOURN_GAME_IN_PROGRESS:
+        return false;
+    case NET_TOURN_GAME_STATE_3:
+    case NET_TOURN_GAME_STATE_4:
+        return false;
     case NET_TOURN_GAME_OVER:
     {
-        int winner = -1;
-        if (mGameInfo.mFinalScore[0] != 0 || mGameInfo.mFinalScore[1] != 0)
-        {
-            winner = mGameInfo.mFinalScore[0] > mGameInfo.mFinalScore[1] ? 0 : 1;
-        }
-        if (winner >= 0 && winner <= 1)
+        int winner = mGameInfo.GetWinningSide();
+        if (winner == 0 || winner == 1)
         {
             if (winnerSide != 0)
             {
                 *winnerSide = winner;
             }
+            int machine = mMachines[winner];
             if (winningMachine != 0)
             {
-                *winningMachine = winner == 0 ? mHomeMachine : mAwayMachine;
+                *winningMachine = machine;
             }
+            return true;
         }
         else
         {
@@ -574,8 +582,8 @@ bool NetworkTournamentGame::GetWinnerAndLoser(
             {
                 *winningMachine = -1;
             }
+            return true;
         }
-        return true;
     }
     case NET_TOURN_GAME_NO_CONTEST:
     case NET_TOURN_GAME_NO_PLAYERS:
@@ -591,25 +599,31 @@ bool NetworkTournamentGame::GetWinnerAndLoser(
         }
         return true;
     case NET_TOURN_GAME_HOME_ADVANCES:
+    {
         if (winnerSide != 0)
         {
             *winnerSide = 0;
         }
+        int machine = mMachines[0];
         if (winningMachine != 0)
         {
-            *winningMachine = mHomeMachine;
+            *winningMachine = machine;
         }
         return true;
+    }
     case NET_TOURN_GAME_AWAY_ADVANCES:
+    {
         if (winnerSide != 0)
         {
             *winnerSide = 1;
         }
+        int machine = mMachines[1];
         if (winningMachine != 0)
         {
-            *winningMachine = mAwayMachine;
+            *winningMachine = machine;
         }
         return true;
+    }
     default:
         return false;
     }
@@ -621,22 +635,24 @@ void NetTournManager::MarkDisconnectedMachine(int machine)
          ++gameIndex)
     {
         NetworkTournamentGame& game = mGames[gameIndex];
-        if (game.mHomeMachine == machine || game.mAwayMachine == machine)
+        if (game.mMachines[0] != machine && game.mMachines[1] != machine)
         {
-            switch (game.mState)
-            {
-            case NET_TOURN_GAME_EMPTY:
-            case NET_TOURN_GAME_READY:
-                game.mState = NET_TOURN_GAME_STATE_11;
-                break;
-            case NET_TOURN_GAME_IN_PROGRESS:
-                game.mState = NET_TOURN_GAME_STATE_10;
-                break;
-            case NET_TOURN_GAME_STATE_3:
-            case NET_TOURN_GAME_STATE_4:
-                game.mState = NET_TOURN_GAME_OVER;
-                break;
-            }
+            continue;
+        }
+
+        switch (game.mState)
+        {
+        case NET_TOURN_GAME_EMPTY:
+        case NET_TOURN_GAME_READY:
+            game.mState = NET_TOURN_GAME_STATE_11;
+            break;
+        case NET_TOURN_GAME_IN_PROGRESS:
+            game.mState = NET_TOURN_GAME_STATE_10;
+            break;
+        case NET_TOURN_GAME_STATE_3:
+        case NET_TOURN_GAME_STATE_4:
+            game.mState = NET_TOURN_GAME_OVER;
+            break;
         }
     }
 }
@@ -654,8 +670,8 @@ bool NetTournManager::AreRoundGamesFinished()
         }
         if (winner != -1)
         {
-            int homeMachine = game.mHomeMachine;
-            int awayMachine = game.mAwayMachine;
+            int homeMachine = game.mMachines[0];
+            int awayMachine = game.mMachines[1];
             if (homeMachine != -1 && awayMachine != -1)
             {
                 if (!NetworkDraft::Instance()->FindDraftTeamByPeerIndex(homeMachine)->mPlayers[0].mDisconnected
@@ -676,41 +692,137 @@ bool NetTournManager::AreRoundGamesFinished()
 
 void NetTournManager::Update(float dt)
 {
-    if (mState != 1)
+    int gameIndex;
+    NetworkTournamentGame* game;
+    switch (mState)
     {
-        return;
-    }
+    case 1:
+        for (int machine = 0; machine < mMachineCount; ++machine)
+        {
+            if (machine != mLocalMachineIndex
+                && NetworkDraft::Instance()
+                       ->FindDraftTeamByPeerIndex(machine)
+                       ->mPlayers[0]
+                       .mDisconnected)
+            {
+                MarkDisconnectedMachine(machine);
+            }
+        }
 
-    if (mWaitingToStartGames)
-    {
-        if (mTimeToStartGames > 0.0f)
+        if (mWaitingToStartGames)
         {
-            mTimeToStartGames -= dt;
+            if (mTimeToStartGames > 0.0f)
+            {
+                mTimeToStartGames -= dt;
+                if (mTimeToStartGames <= 0.0f)
+                {
+                    StartReadyGames();
+                    mWaitingToStartGames = false;
+                }
+            }
         }
-        if (mTimeToStartGames <= 0.0f)
+        else if (AreRoundGamesFinished())
         {
-            StartReadyGames();
-            mWaitingToStartGames = false;
+            gameIndex = mFirstGameInRound;
+            game = &mGames[gameIndex];
+            for (; gameIndex <= mLastGameInRound; ++game, ++gameIndex)
+            {
+                if (game->mMachines[0] == mLocalMachineIndex
+                    || game->mMachines[1] == mLocalMachineIndex)
+                {
+                    int winningMachine = -1;
+                    game->GetWinnerAndLoser(0, &winningMachine);
+                    if (mLocalMachineIndex != winningMachine)
+                    {
+                        mLocalMachineEliminated = true;
+                    }
+                }
+            }
+
+            ++mCurrentRound;
+            if (mCurrentRound == GetNumPlayoffRounds())
+            {
+                gameIndex = mFirstGameInRound;
+                mWinningMachine = -1;
+                mGames[gameIndex].GetWinnerAndLoser(0, &mWinningMachine);
+                gNetworkMessageRegistry->UnregisterReceiver(32);
+                gNetworkMessageRegistry->UnregisterReceiver(33);
+                NetworkMachineRoster* roster
+                    = g_pNetworkSessionBase->GetMachineRoster();
+                if (roster != 0)
+                {
+                    roster->Shutdown(true);
+                }
+                mState = 2;
+            }
+            else
+            {
+                mTimeToStartGames = s_fDefaultTimeToStartGames;
+                mWaitingToStartGames = true;
+                AdvanceBracket();
+            }
         }
-    }
-    else if (AreRoundGamesFinished())
-    {
-        ++mCurrentRound;
-        if (mCurrentRound >= GetNumPlayoffRounds())
+
+        if (mLastGameProgressUpdate != -1)
         {
-            int winnerSide = -1;
-            mGames[mFirstGameInRound].GetWinnerAndLoser(
-                &winnerSide, &mWinningMachine);
-            gNetworkMessageRegistry->UnregisterReceiver(32);
-            gNetworkMessageRegistry->UnregisterReceiver(33);
-            mState = 2;
+            int gameTime = (int)g_pGame->GetGameTime();
+            if (gameTime
+                >= mLastGameProgressUpdate
+                    + s_nSendGameInProgressUpdateEvery)
+            {
+                bool majorUpdate = false;
+                ++mGameProgressUpdateCount;
+                if (mGameProgressUpdateCount
+                    >= s_nSendGameInProgressMajorUpdate)
+                {
+                    mGameProgressUpdateCount = 0;
+                    majorUpdate = true;
+                }
+
+                bool isHomeMachine = false;
+                if (mLocalMachineIndex == mTournamentToMachine[0])
+                {
+                    isHomeMachine = true;
+                }
+
+                int gameDuration = (int)g_pGame->m_fGameDuration;
+                int gameTimeDelta;
+                int gameStatus = 2;
+                if (gameTime > gameDuration)
+                {
+                    gameTimeDelta = gameTime - gameDuration;
+                    gameStatus = 3;
+                }
+                else
+                {
+                    gameTimeDelta = gameDuration - gameTime;
+                }
+
+                NetMessageTournamentGameUpdate message(1,
+                    mCurrentGameIndex, isHomeMachine, gameStatus,
+                    gameTimeDelta, majorUpdate);
+                if (majorUpdate)
+                {
+                    message.mGameInfo
+                        = *GameInfoManager::Instance()->GetCurrentGameInfo();
+                    message.mGameInfo.mFinalScore[0]
+                        = g_pTeams[0]->m_nScore;
+                    message.mGameInfo.mFinalScore[1]
+                        = g_pTeams[1]->m_nScore;
+                }
+                u8 buffer[0xFF];
+                int size = gNetworkMessageRegistry->Serialize(
+                    &message, buffer, sizeof(buffer));
+                SendToAllTournamentMachines(buffer, size);
+                mLastGameProgressUpdate = gameTime;
+            }
         }
-        else
-        {
-            mTimeToStartGames = s_fDefaultTimeToStartGames;
-            mWaitingToStartGames = true;
-            AdvanceBracket();
-        }
+
+        break;
+    case 0:
+    case 2:
+    default:
+        break;
     }
 }
 

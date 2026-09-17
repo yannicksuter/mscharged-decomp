@@ -89,7 +89,7 @@ public:
     virtual int UnidentifiedVirtual14() { return 0; }
     virtual TweakEntry* UnidentifiedVirtual18();
 
-    static void operator delete(void* ptr);
+    static void operator delete(void* ptr) { gTweakNodePool.Free(ptr); }
 
     /* 0x04 */ TweakNode* m_Next;
     /* 0x08 */ TweakEntry* m_Parent;

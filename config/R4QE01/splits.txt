@@ -3441,15 +3441,19 @@ Game/Render/ImpostorCluster.cpp:
 	.bss        start:0x8057F350 end:0x8057F410
 	.sdata2     start:0x806E6430 end:0x806E6448
 
+Game/Render/CrowdLayoutObject.cpp:
+	.text       start:0x802D88F4 end:0x802D8BAC
+	.sdata2     start:0x806E6448 end:0x806E6458
+
 Game/Render/CrowdImpostorManager.cpp:
-	.text       start:0x802D88F4 end:0x802DAEE0
+	.text       start:0x802D8BAC end:0x802DAEE0
 	.ctors      start:0x804DBA0C end:0x804DBA10
 	.rodata     start:0x804EB310 end:0x804EB320
 	.data       start:0x8052EAE8 end:0x8052EC78
 	.bss        start:0x8057F410 end:0x8057F580
 	.sdata      start:0x806DF440 end:0x806DF448
 	.sbss       start:0x806E1F70 end:0x806E1F80
-	.sdata2     start:0x806E6448 end:0x806E6478
+	.sdata2     start:0x806E6458 end:0x806E6478
 
 Game/Render/ImpostorModel.cpp:
 	.text       start:0x802DAEE0 end:0x802DB930

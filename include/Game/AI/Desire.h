@@ -71,8 +71,8 @@ public:
     float mUnidentified014;
     UnidentifiedScriptMachine* mUnidentified018;
     UnidentifiedVariantCollection mUnidentified01C;
-    UnidentifiedStateTransition mUnidentified068;
-    UnidentifiedStateTransition mUnidentified070;
+    UnidentifiedUnsetTransition mUnidentified068;
+    UnidentifiedUnsetTransition mUnidentified070;
     float mUnidentified078;
     float mUnidentified07C;
     float mUnidentified080;

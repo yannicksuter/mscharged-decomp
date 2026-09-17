@@ -65,11 +65,6 @@ TweakNode::~TweakNode()
     }
 }
 
-void TweakNode::operator delete(void* ptr)
-{
-    gTweakNodePool.Free(ptr);
-}
-
 TweakEntry* FindOrCreateTweakChildEntry(TweakEntry* entry, const char* name, int noCreate)
 {
     if (entry->UnidentifiedVirtual0C() == 0)

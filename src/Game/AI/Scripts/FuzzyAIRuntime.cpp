@@ -180,9 +180,9 @@ extern "C" float fn_80314428(UnidentifiedFuzzyRuntimeBase*);
 extern "C" cBall* fn_800E34E4();
 extern "C" cPlayer* fn_800E34D8();
 extern "C" void* fn_800E34EC();
-extern "C" void* fn_800E90EC(void*, cPlayer*);
-extern "C" void* fn_800E9194(void*, cPlayer*);
-extern "C" void* fn_800E923C(void*, cTeam*);
+extern "C" bool fn_800E90EC(void*, cPlayer*);
+extern "C" bool fn_800E9194(void*, cPlayer*);
+extern "C" bool fn_800E923C(void*, cTeam*);
 extern "C" int fn_803147A4(UnidentifiedFuzzyRuntimeBase*);
 extern "C" Variant* fn_80314830(UnidentifiedFuzzyRuntimeBase*, unsigned long);
 extern "C" float fn_80314690(UnidentifiedFuzzyRuntimeBase*, unsigned long);
@@ -332,7 +332,7 @@ extern "C" bool fn_800E7EB4(InterpreterCore*);
 extern "C" void fn_800A695C();
 extern "C" float fn_80314444(void*, float, bool);
 extern "C" void fn_803140CC(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void* fn_80312E0C(void*, const Variant&);
+extern "C" bool fn_80312E0C(void*, const Variant&);
 extern "C" void fn_800B6A1C(
     UnidentifiedVariant_80054AB8*, int, const Variant&);
 
@@ -915,7 +915,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E8F8C(
     return runtime->UnidentifiedReturn(result, confidence);
 }
 
-extern "C" void* fn_800E90EC(void* runtime, cPlayer* value)
+extern "C" bool fn_800E90EC(void* runtime, cPlayer* value)
 {
     FuzzyVariant variant;
     variant.mType = FT_PLAYER;
@@ -923,7 +923,7 @@ extern "C" void* fn_800E90EC(void* runtime, cPlayer* value)
     return fn_80312E0C(runtime, variant);
 }
 
-extern "C" void* fn_800E9194(void* runtime, cPlayer* value)
+extern "C" bool fn_800E9194(void* runtime, cPlayer* value)
 {
     FuzzyVariant variant;
     variant.mType = FT_PLAYER;
@@ -931,7 +931,7 @@ extern "C" void* fn_800E9194(void* runtime, cPlayer* value)
     return fn_80312E0C(runtime, variant);
 }
 
-extern "C" void* fn_800E923C(void* runtime, cTeam* value)
+extern "C" bool fn_800E923C(void* runtime, cTeam* value)
 {
     FuzzyVariant variant;
     variant.mType = FT_TEAM;

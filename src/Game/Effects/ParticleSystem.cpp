@@ -204,7 +204,7 @@ static void EmitSphericalPosition(nlVector3& pos, nlVector3& dir,
     const nlMatrix4& mLocalToWorld)
 {
     float randomZ = RandomizedValue(0.0f, 2.0f);
-    float randomAngleValue = RandomizedValue(0.0f, 6.2831855f);
+    float randomAngleValue = RandomizedValue(6.2831855f);
     float xyRadius = nlSqrt(1.0f - randomZ * randomZ, true);
 
     float sinVal;
@@ -244,7 +244,7 @@ static void EmitHemisphericalPosition(nlVector3& pos, nlVector3& dir,
     const nlMatrix4& mLocalToWorld)
 {
     float randomZ = RandomizedValue(-0.5f, 1.0f);
-    float randomAngleValue = RandomizedValue(0.0f, 6.2831855f);
+    float randomAngleValue = RandomizedValue(6.2831855f);
     float xyRadius = nlSqrt(1.0f - randomZ * randomZ, true);
 
     float sinVal;
@@ -489,14 +489,14 @@ void ParticleSystem::UpdateLight(EffectsLight* pLight, Particle* pPart,
     pLight->m_Colour = pTemplate->m_cColour[colourIndex];
 
     float size;
-    if (pTemplate->mProperties[1]->mUseCurve != 0)
-        size = pTemplate->mProperties[1]->Evaluate(
+    if (pPart->mUnidentified000->mProperties[1]->mUseCurve != 0)
+        size = pPart->mUnidentified000->mProperties[1]->Evaluate(
             pPart->mUnidentified008);
     else
         size = pPart->size;
 
-    if (pTemplate->mProperties[2]->mUseCurve != 0)
-        size *= pTemplate->mProperties[2]->Evaluate(
+    if (pPart->mUnidentified000->mProperties[2]->mUseCurve != 0)
+        size *= pPart->mUnidentified000->mProperties[2]->Evaluate(
             mUnidentified014);
     else
         size *= pPart->mUnidentified040;

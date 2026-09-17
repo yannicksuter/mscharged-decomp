@@ -8,9 +8,11 @@
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/DB/BasicGameInfo.h"
+#include "Game/DB/GameProgress.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
+#include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/Goalie.h"
 #include "Game/PassBallData.h"
@@ -38,12 +40,8 @@ struct AttackStatsData
 
 struct GoalScoredStatsData
 {
-    /* 0x00 */ u32 goalData;
-    /* 0x04 */ nlVector3 shotPosition;
-    /* 0x10 */ cPlayer* pScorer;
-    /* 0x14 */ cPlayer* pAssister;
-    /* 0x18 */ u8 unknown_0x18[8];
-    /* 0x20 */ int goalValue;
+    /* 0x00 */ GoalScoredData data;
+    /* 0x20 */ int sideOfInterest;
 };
 
 struct PenaltyStatsData
@@ -257,10 +255,10 @@ void StatsTracker::ResetCurrentStats()
     mIsOvertime = false;
     mHasGameEnded = false;
 
-    mCurrentTeamStats[0].Initialize(
-        mCumulativeTeamStats[0]->mTeamIndex);
-    mCurrentTeamStats[1].Initialize(
-        mCumulativeTeamStats[1]->mTeamIndex);
+    mCumulativeTeamStats[0]->Initialize(
+        mCurrentTeamStats[0].mTeamIndex);
+    mCumulativeTeamStats[1]->Initialize(
+        mCurrentTeamStats[1].mTeamIndex);
 
     mNumConsecutiveGamesPlayed++;
     mBasicGameInfo->mFinalScore[0] = 0;
@@ -325,16 +323,40 @@ void StatsTracker::OnAttackAttempt(AttackStatsData* data)
 
 void StatsTracker::OnGoalScored(GoalScoredStatsData* data)
 {
-    int scorer = data->pScorer != 0 ? data->pScorer->mUnidentified1E4.m_ID : -1;
-    int assister = data->pAssister != 0 ? data->pAssister->mUnidentified1E4.m_ID : -1;
-    int side = data->goalData >> 24;
-    s_pInstance->TrackStat(STATS_GOALS_FOR, side, scorer, assister,
-        data->goalData & 0xFFFF, (data->goalData >> 8) & 0xFF,
-        data->goalValue);
+    s_pInstance->TrackStat(STATS_GOALS_FOR, data->data.uTeamIndex,
+        data->data.pScorer != 0 ? data->data.pScorer->mUnidentified1E4.m_ID : -1,
+        data->data.pAssister != 0 ? data->data.pAssister->mUnidentified1E4.m_ID : -1,
+        data->data.uGoalType, data->data.uNumGoalsScored, data->sideOfInterest);
 
-    if (data->pScorer != 0)
+    bool scoreTied = g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore;
+    if (g_pGame != 0)
     {
-        s_pInstance->TrackStat(STATS_SHOTS_ON_GOAL, side, scorer, 1, 0, 0, 0);
+        float gameDuration = g_pGame->m_fGameDuration;
+        if (!((unsigned int)(10.0f * (gameDuration - g_pGame->GetGameTime())) == 0
+                && !scoreTied
+                && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0))
+        {
+            int teamScore = g_pTeams[data->data.uTeamIndex]->m_nScore;
+            if (teamScore < GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit
+                || GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType != 1)
+            {
+                goto skipTrackWinner;
+            }
+        }
+        s_pInstance->TrackWinner(-1);
+    }
+
+skipTrackWinner:
+    if (data->data.uTeamIndex != data->data.pScorer->m_pTeam->m_nSide)
+    {
+        s_pInstance->TrackStat(
+            STATS_SHOTS_ON_GOAL, data->data.uTeamIndex, 0, 1, 0, 0, 0);
+    }
+    else
+    {
+        s_pInstance->TrackStat(STATS_SHOTS_ON_GOAL,
+            data->data.pScorer->m_pTeam->m_nSide,
+            data->data.pScorer->mUnidentified1E4.m_ID, 1, 0, 0, 0);
     }
 }
 
@@ -586,24 +608,78 @@ void StatsTracker::AddMilestoneUserStat(ePlayerStats stat, int amount)
 
 void StatsTracker::TrackWinner(int forfeitSide)
 {
-    if (mHasGameEnded)
+    int homeScore = 0;
+    int awayScore = 0;
+    unsigned char wasForfeit = 0;
+    long winningSide;
+
+    if (g_pTeams[0] != 0 && g_pTeams[1] != 0)
     {
-        return;
+        homeScore = g_pTeams[0]->m_nScore;
+        awayScore = g_pTeams[1]->m_nScore;
     }
 
-    int homeScore = mBasicGameInfo->mFinalScore[0];
-    int awayScore = mBasicGameInfo->mFinalScore[1];
-    int winningSide = homeScore > awayScore ? 0 : 1;
-    if (forfeitSide == 0 || forfeitSide == 1)
+    if (forfeitSide == 0)
     {
-        winningSide = 1 - forfeitSide;
+        homeScore = -5;
+        if (awayScore < 7)
+        {
+            s_pInstance->TrackStat(
+                STATS_GOALS_FOR, 1, 0, 0, 0, 7 - awayScore, 0);
+            awayScore = 7;
+        }
+        wasForfeit = 1;
+    }
+    else if (forfeitSide == 1)
+    {
+        awayScore = -5;
+        if (homeScore < 7)
+        {
+            s_pInstance->TrackStat(
+                STATS_GOALS_FOR, 0, 0, 0, 0, 7 - homeScore, 0);
+            homeScore = 7;
+        }
+        wasForfeit = 1;
     }
 
-    s_pInstance->TrackStat(mIsOvertime ? STATS_21 : STATS_WIN, winningSide, 0,
-        homeScore, awayScore, 0, 0);
-    CompileEndOfGameStats();
-    mNumGamesWon[winningSide]++;
-    mHasGameEnded = true;
+    winningSide = awayScore >= homeScore;
+
+    if (!mHasGameEnded)
+    {
+        if (GameInfoManager::Instance()->IsInOddCupMode())
+        {
+            if (mIsOvertime && !wasForfeit)
+            {
+                s_pInstance->TrackStat(STATS_OT_WIN, winningSide, 0,
+                    homeScore, awayScore, 0, 0);
+                if (GameInfoManager::Instance()->IsInMode3())
+                {
+                    g_pCupManager->fn_8010BCB8(true, winningSide);
+                }
+            }
+            else
+            {
+                s_pInstance->TrackStat(STATS_WIN, winningSide, 0,
+                    homeScore, awayScore, 0, 0);
+                if (GameInfoManager::Instance()->IsInMode3())
+                {
+                    g_pCupManager->fn_8010BCB8(false, winningSide);
+                }
+            }
+
+            if (GameInfoManager::Instance()->IsInMode3())
+            {
+                s_pInstance->CompileEndOfGameStats();
+            }
+        }
+        else
+        {
+            mBasicGameInfo->mFinalScore[0] = homeScore;
+            mBasicGameInfo->mFinalScore[1] = awayScore;
+            s_pInstance->mNumGamesWon[winningSide]++;
+        }
+        mHasGameEnded = true;
+    }
 }
 
 static int CountNewlines(FILE* file)

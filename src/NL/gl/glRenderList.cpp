@@ -46,10 +46,11 @@ const glModelPacket* UnidentifiedPacketSorter_802CCBBC::fn_08()
 
 const glModelPacket* UnidentifiedPacketSorter_802CCBBC::fn_0C()
 {
-    if (!m_Iterator.IsValid())
+    if (m_Iterator.m_NumStackEntries == 0)
         return 0;
 
-    const glModelPacket* pPacket = m_Iterator.Current()->value;
+    const glModelPacket* pPacket =
+        m_Iterator.m_Stack[m_Iterator.m_NumStackEntries - 1]->value;
     m_Iterator.Next();
     return pPacket;
 }

@@ -72,6 +72,7 @@ public:
     void AddVisibilityFilter(CrowdSidelineFilter* filter);
     void UpdateCrowdVisibility(GLView* view);
     void ReleaseCrowdImpostors();
+    bool IsObjectEnabled(CrowdLayoutObject* object);
 
     CrowdLayoutRecord* AllocateLayout()
     {

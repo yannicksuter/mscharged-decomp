@@ -367,7 +367,10 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
             fn_80319E84(pDesire->mUnidentified018, 23, &params, false);
             UnidentifiedStateTransition transition;
             fn_80315A14(&transition, (void*)fn_800D2074);
-            pDesire->mUnidentified070 = transition;
+            pDesire->mUnidentified070.mUnidentifiedHash
+                = transition.mUnidentifiedHash;
+            pDesire->mUnidentified070.mUnidentifiedFunction
+                = transition.mUnidentifiedFunction;
             pDesire->UnidentifiedResetPowerupState();
         }
         break;

@@ -49,81 +49,6 @@ public:
     /* 0x0C */ CrowdLayoutRecord* mLayout;
 }; // size: 0x10
 
-extern "C" void fn_802D88F4(
-    CrowdLayoutObject* object)
-{
-    GetCrowdImpostorManager()->AddObject( object, false);
-}
-
-extern "C" void fn_802D892C(CrowdLayoutObject*)
-{
-}
-
-void CrowdLayoutObject::Initialize()
-{
-    mIsOcclusionVolume = 0;
-    mStartWidth = 0.0f;
-    mEndWidth = 0.0f;
-    mLength = 0.0f;
-    mEndOffset = 0.0f;
-}
-
-void CrowdLayoutObject::GetCorners(nlVector4* corners)
-{
-    nlVec4Set(corners[1], 0.0f, 0.0f, 0.0f, 1.0f);
-    nlVec4Set(corners[0], mStartWidth, 0.0f, 0.0f, 1.0f);
-
-    float offset = 0.5f
-        * (mStartWidth - mEndWidth);
-    nlVec4Set(corners[2], mEndOffset + offset,
-        mLength, 0.0f, 1.0f);
-    nlVec4Set(corners[3], mEndWidth
-            + mEndOffset + offset,
-        mLength, 0.0f, 1.0f);
-}
-
-void GetCrowdLayoutBounds(
-    const nlVector4* points, nlVector4* boundsMin, nlVector4* boundsMax)
-{
-    *boundsMin = points[0];
-    *boundsMax = points[0];
-
-    for (int i = 1; i < 4; ++i)
-    {
-        if (points[i].x < boundsMin->x)
-            boundsMin->x = points[i].x;
-        if (points[i].y < boundsMin->y)
-            boundsMin->y = points[i].y;
-        if (points[i].z < boundsMin->z)
-            boundsMin->z = points[i].z;
-
-        if (points[i].x > boundsMax->x)
-            boundsMax->x = points[i].x;
-        if (points[i].y > boundsMax->y)
-            boundsMax->y = points[i].y;
-        if (points[i].z > boundsMax->z)
-            boundsMax->z = points[i].z;
-    }
-}
-
-bool CrowdLayoutObject::ContainsLocalPoint(const nlVector3* point)
-{
-    nlVector4 corners[4];
-    nlVector4 boundsMin;
-    nlVector4 boundsMax;
-    GetCorners(corners);
-    GetCrowdLayoutBounds(corners, &boundsMin, &boundsMax);
-
-    float depth = 10.0f;
-    if (point->x > boundsMin.x && point->x < boundsMax.x
-        && point->y > boundsMin.y && point->y < boundsMax.y
-        && point->z > -depth && point->z < depth)
-    {
-        return true;
-    }
-    return false;
-}
-
 extern "C" nlMatrix4* fn_802D8BAC(
     CrowdLayoutObject* object)
 {
@@ -343,6 +268,19 @@ void CrowdImpostorManager::UpdateCrowdVisibility(GLView* view)
     }
 }
 
+inline bool CrowdImpostorManager::IsObjectEnabled(CrowdLayoutObject* object)
+{
+    nlDLListIterator<CrowdLayoutObject*> objectIt
+        = mEnabledObjects.Begin();
+    while (objectIt.hasNext())
+    {
+        if (object == *objectIt)
+            return true;
+        objectIt.Step();
+    }
+    return false;
+}
+
 void CrowdImpostorManager::ReleaseCrowdImpostors()
 {
     Impostor* impostors = ImpostorManager::GetInstance()->mImpostors;
@@ -353,20 +291,7 @@ void CrowdImpostorManager::ReleaseCrowdImpostors()
     {
         CrowdLayoutRecord& layout
             = mLayouts[layoutIndex];
-        bool found = false;
-        nlDLListIterator<CrowdLayoutObject*> objectIt
-            = mEnabledObjects.Begin();
-        while (objectIt.m_Curr != 0)
-        {
-            if (layout.mObject == objectIt.m_Curr->entry)
-            {
-                found = true;
-                break;
-            }
-            objectIt.Step();
-        }
-
-        if (!found)
+        if (!IsObjectEnabled(layout.mObject))
             continue;
 
         for (int i = 0; i < layout.mNumImpostors; ++i)
@@ -398,11 +323,16 @@ void CrowdPointCallback::Place(
     CrowdImpostorManager* manager = GetCrowdImpostorManager();
     nlDLListIterator<CrowdLayoutObject*> occlusionIt
         = manager->mOcclusionObjects.Begin();
-    bool occluded = false;
-    while (occlusionIt.m_Curr != 0)
+    nlVector4 occlusionPoint;
+    bool occluded;
+    for (;;)
     {
-        CrowdLayoutObject* object = occlusionIt.m_Curr->entry;
-        nlVector4 occlusionPoint;
+        if (!occlusionIt.hasNext())
+        {
+            occluded = false;
+            break;
+        }
+        CrowdLayoutObject* object = *occlusionIt;
         nlMultVectorMatrix(
             occlusionPoint, worldPoint, manager->mInverseMatrices[0]);
         if (object->ContainsLocalPoint((nlVector3*)&occlusionPoint))
@@ -429,8 +359,11 @@ void CrowdPointCallback::Place(
         GetCrowdImpostorManager()->mNumAngles = character->mNumAngles;
 
     int numAngles = GetCrowdImpostorManager()->mNumAngles;
+    nlVector4 transformedFacing;
     nlVector4 facing = { 0.0f, -1.0f, 0.0f, 0.0f };
-    nlMultVectorMatrix(facing, *mObject->UnidentifiedVirtual10());
+    nlMultVectorMatrix(transformedFacing, facing,
+        *mObject->UnidentifiedVirtual10());
+    facing = transformedFacing;
     u16 angle = QuantizeImpostorAngle(nlVector3ToAngle(*(nlVector3*)&facing),
         numAngles);
 
@@ -443,19 +376,7 @@ void CrowdPointCallback::Place(
     impostor->Set(character, *(nlVector3*)&worldPoint, angle,
         sfImpostorWidth.value, sfImpostorHeight.value);
 
-    nlDLListIterator<CrowdLayoutObject*> enabledIt
-        = GetCrowdImpostorManager()->mEnabledObjects.Begin();
-    bool enabled = false;
-    while (enabledIt.m_Curr != 0)
-    {
-        if (mObject == enabledIt.m_Curr->entry)
-        {
-            enabled = true;
-            break;
-        }
-        enabledIt.Step();
-    }
-    if (enabled)
+    if (GetCrowdImpostorManager()->IsObjectEnabled(mObject))
         impostor->mUnidentified02C = true;
 
     if (mFirst)
@@ -466,10 +387,11 @@ void CrowdPointCallback::Place(
     ++mLayout->mNumImpostors;
     CrowdLayoutRecord* layout = mLayout;
 
-    nlVector3 boundsMin = *(nlVector3*)&worldPoint;
+    nlVector3 boundsMax;
+    nlVector3 boundsMin = *(const nlVector3*)&worldPoint;
     boundsMin.x -= sfImpostorWidth.value;
     boundsMin.y -= sfImpostorWidth.value;
-    nlVector3 boundsMax = *(nlVector3*)&worldPoint;
+    boundsMax = *(const nlVector3*)&worldPoint;
     boundsMax.x += sfImpostorWidth.value;
     boundsMax.y += sfImpostorWidth.value;
     boundsMax.z += sfImpostorHeight.value;

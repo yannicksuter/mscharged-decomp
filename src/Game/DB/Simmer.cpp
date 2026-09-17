@@ -158,7 +158,7 @@ void Simulator::fn_80109E34()
             STATS_GOALS_FOR, winningSide, player, -1, 0, 1, 0);
         goals[winningSide]++;
         StatsTracker::Instance()->TrackStat(
-            STATS_LOSS, winningSide, 0, goals[0], goals[1], 0, 0);
+            STATS_OT_WIN, winningSide, 0, goals[0], goals[1], 0, 0);
         overtime = true;
     }
     else

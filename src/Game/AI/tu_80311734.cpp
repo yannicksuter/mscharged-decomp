@@ -15,6 +15,8 @@ extern "C" void fn_800B6A1C(
     UnidentifiedVariant_80054AB8*, int, const Variant&);
 extern "C" bool fn_8031A04C();
 extern "C" void fn_80311C54(void*, unsigned long, void*);
+extern "C" UnidentifiedVariant_80054AB8* fn_803152F0(
+    UnidentifiedFuzzyRuntimeBase*, UnidentifiedVariant_80054AB8, float);
 
 struct UnidentifiedFuzzyRuntimeReference
 {
@@ -52,16 +54,6 @@ struct UnidentifiedFuzzyRuntimeList
     UnidentifiedFuzzyRuntimeBase* mHead;
     UnidentifiedFuzzyRuntimeBase* mTail;
 };
-
-char lbl_80530154[] = "Undefined";
-char lbl_80530160[] = "Confidence";
-char lbl_8053016C[] = "ConfThreshold";
-char lbl_8053017C[] = "SelectChance";
-char lbl_8053018C[] = "Duration";
-char lbl_80530198[] = "Concurrent";
-char lbl_805301A4[] = "Transition";
-char lbl_805301B0[] = "Modifier";
-char lbl_805301BC[] = "AllowReinit";
 
 char lbl_806DF570[] = "Arg1";
 char lbl_806DF578[] = "Arg2";
@@ -130,7 +122,7 @@ UnidentifiedFuzzyRuntimeBase::~UnidentifiedFuzzyRuntimeBase()
         lbl_806E20A0 = 0;
 
         lbl_805842EC.Clear();
-        lbl_805842EC.mQuestionCacheMap.m_Allocator.FreeBlocks();
+        lbl_805842EC.mQuestionCacheMap.GetAllocator()->FreeBlocks();
         lbl_80584200.FreeBlocks();
         lbl_80584228.FreeBlocks();
         lbl_80584328.FreeBlocks();
@@ -138,30 +130,24 @@ UnidentifiedFuzzyRuntimeBase::~UnidentifiedFuzzyRuntimeBase()
 
         while (lbl_806E20B0.mHead != 0)
         {
-            UnidentifiedRuntimeTypeEntry* entry = lbl_806E20B0.mHead;
-            if (lbl_806E20B0.mTail == entry)
-            {
-                lbl_806E20B0.mTail = 0;
-            }
-            lbl_806E20B0.mHead = entry->next;
-            delete entry;
+            delete nlListRemoveStart(
+                &lbl_806E20B0.mHead, &lbl_806E20B0.mTail);
         }
     }
 
     while (mCollection.mHead != 0)
     {
-        UnidentifiedRuntimeActionQueue* entry = mCollection.mHead;
-        if (mCollection.mTail == entry)
+        UnidentifiedRuntimeActionQueue* entry =
+            nlListRemoveStart(
+                &mCollection.mHead, &mCollection.mTail);
+        if (entry != 0)
         {
-            mCollection.mTail = 0;
+            if (entry->mOwnsQueue)
+            {
+                delete entry->mQueue;
+            }
+            lbl_80584328.DeleteEntry(entry);
         }
-        mCollection.mHead = entry->next;
-
-        if (entry->mOwnsQueue)
-        {
-            delete entry->mQueue;
-        }
-        lbl_80584328.DeleteEntry(entry);
     }
 }
 
@@ -230,6 +216,16 @@ extern "C" bool fn_80311C5C()
     }
     return false;
 }
+
+char lbl_80530154[] = "Undefined";
+char lbl_80530160[] = "Confidence";
+char lbl_8053016C[] = "ConfThreshold";
+char lbl_8053017C[] = "SelectChance";
+char lbl_8053018C[] = "Duration";
+char lbl_80530198[] = "Concurrent";
+char lbl_805301A4[] = "Transition";
+char lbl_805301B0[] = "Modifier";
+char lbl_805301BC[] = "AllowReinit";
 
 void UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual15()
 {
@@ -467,10 +463,41 @@ UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual9()
     return selected;
 }
 
-extern "C" void* fn_80312E0C(
-    UnidentifiedFuzzyRuntimeBase*, const Variant& value)
+static inline float UnidentifiedGetExtraFloat(
+    UnidentifiedVariant_80054AB8* action, int index,
+    float defaultValue)
 {
-    return value.mData.pointer;
+    if (action->ExtraData.IsSet(index))
+    {
+        return action->ExtraData.Get(index)->mData.f;
+    }
+    return defaultValue;
+}
+
+static inline unsigned long StrategicQuestionHash(
+    unsigned long functionAddress, const Variant& argument)
+{
+    return functionAddress + argument.GetHash();
+}
+
+extern "C" bool fn_80312E0C(
+    UnidentifiedFuzzyRuntimeBase* runtime, const Variant& value)
+{
+    UnidentifiedVariant_80054AB8 action;
+    unsigned long hash = StrategicQuestionHash(
+        runtime->GetInstructionOffset(), value);
+
+    if (lbl_805842EC.Lookup(hash, action, 0))
+    {
+        UnidentifiedVariant_80054AB8* result = fn_803152F0(
+            runtime, action,
+            UnidentifiedGetExtraFloat(&action, 4, 0.0f));
+        runtime->UnidentifiedVirtual12(result);
+        return true;
+    }
+
+    runtime->mCollection.mHead->mUnidentified008 = hash;
+    return false;
 }
 
 float UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual10(float value)
@@ -508,17 +535,6 @@ float UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual11()
             ? mCollection.mHead->mConfidence
             : confidence;
     return confidence;
-}
-
-static inline float UnidentifiedGetExtraFloat(
-    UnidentifiedVariant_80054AB8* action, int index,
-    float defaultValue)
-{
-    if (action->ExtraData.IsSet(index))
-    {
-        return action->ExtraData.Get(index)->mData.f;
-    }
-    return defaultValue;
 }
 
 void UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual12(
@@ -802,7 +818,7 @@ extern "C" void fn_803148D0(void*, const char* value)
 
 extern "C" UnidentifiedVariant_80054AB8* fn_803152F0(
     UnidentifiedFuzzyRuntimeBase* runtime,
-    const UnidentifiedVariant_80054AB8& value, float confidence)
+    UnidentifiedVariant_80054AB8 value, float confidence)
 {
     UnidentifiedVariant_80054AB8* result =
         new (lbl_805842C8.Allocate())

@@ -2,6 +2,7 @@
 #define GAME_GL_SHADER_SKIN_MESH_H
 
 #include "NL/nlMath.h"
+#include "NL/gl/glModel.h"
 #include "types.h"
 
 class cSHierarchy;
@@ -76,6 +77,8 @@ public:
     virtual void Pose(cPoseAccumulator* pPoseAccumulator) = 0;
     virtual void PrepareToRender() = 0;
     virtual void GetPoseMatrix(nlMatrix4* matrix, int nodeIndex) = 0;
+
+    unsigned long GetNumPackets() { return GetModel()->numPackets; }
 
     void SetNumMorphs(unsigned long count);
     void SetMorphID(unsigned long index, unsigned long id);

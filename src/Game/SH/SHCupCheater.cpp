@@ -205,7 +205,7 @@ static inline void TrackHomeOTWinResult()
     g_pCupManager->fn_8010C5E0();
     StatsTracker::s_pInstance->TrackStat(
         STATS_GOALS_FOR, 0, nlRandom(4, &nlDefaultSeed), -1, 0, 1, 0);
-    StatsTracker::s_pInstance->TrackStat(STATS_LOSS, 0, 0, 1, 0, 0, 0);
+    StatsTracker::s_pInstance->TrackStat(STATS_OT_WIN, 0, 0, 1, 0, 0, 0);
     g_pCupManager->fn_8010BCB8(true, 0);
 }
 
@@ -217,7 +217,7 @@ static inline void TrackAwayOTWinResult()
     g_pCupManager->fn_8010C5E0();
     StatsTracker::s_pInstance->TrackStat(
         STATS_GOALS_FOR, 1, nlRandom(4, &nlDefaultSeed), -1, 0, 1, 0);
-    StatsTracker::s_pInstance->TrackStat(STATS_LOSS, 1, 0, 0, 1, 0, 0);
+    StatsTracker::s_pInstance->TrackStat(STATS_OT_WIN, 1, 0, 0, 1, 0, 0);
     g_pCupManager->fn_8010BCB8(true, 1);
 }
 

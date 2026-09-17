@@ -107,6 +107,11 @@ inline float RandomizedValue(float base, float range)
     }
 }
 
+inline float RandomizedValue(float value)
+{
+    return nlRandomf(value, &uSeed);
+}
+
 inline float RandomizedValue(const fxRange& value)
 {
     return RandomizedValue(value.base, value.range);

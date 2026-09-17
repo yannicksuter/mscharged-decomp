@@ -103,8 +103,28 @@ BaseSceneHandler* FESceneManager::GetTopSceneHandler()
     return *m_sceneHandlerStack.Begin();
 }
 
+void FESceneManager::LoadScene(
+    const char* szFilename,
+    BaseSceneHandler* pHandler,
+    MemoryAllocator* pAllocator)
+{
+    FESceneManager* pSceneManager = FESceneManager::Instance();
+    FEScene* pFEScene = new (nlMalloc(sizeof(FEScene), 8, false)) FEScene();
+    pFEScene->m_uHashID = nlStringLowerHash(szFilename);
+    pFEScene->m_uRenderView = pSceneManager->m_uDefaultRenderView;
+    pHandler->mFEScene = pFEScene;
+    pFEScene->m_pAllocator = pAllocator;
+
+    if (!pFEScene->LoadPackage(szFilename, pAllocator))
+    {
+        nlPrintf("Error: failed to load package!\n");
+        nlBreak();
+    }
+}
+
 void FESceneManager::ProcessPushPopQueue()
 {
+    FESceneManager* pSceneManager = this;
     PackagePushPopMessage* pPackagePushPopMessage;
 
     while (m_pushPopMessageQueue.m_Head != 0)
@@ -113,48 +133,26 @@ void FESceneManager::ProcessPushPopQueue()
 
         if (pPackagePushPopMessage->m_bPush != false)
         {
-            m_sceneHandlerStack.AddStart(pPackagePushPopMessage->m_pSceneHandler);
+            pSceneManager->m_sceneHandlerStack.AddStart(pPackagePushPopMessage->m_pSceneHandler);
 
-            FESceneManager* pSceneManager = FESceneManager::Instance();
-            MemoryAllocator* pAllocator = pPackagePushPopMessage->m_pAllocator;
-            const char* szFilename = pPackagePushPopMessage->m_szFilename;
-            BaseSceneHandler* pSceneHandler = pPackagePushPopMessage->m_pSceneHandler;
-            FEScene* pFEScene = new (nlMalloc(sizeof(FEScene), 8, false)) FEScene();
-            pFEScene->m_uHashID = nlStringLowerHash(szFilename);
-            pFEScene->m_uRenderView = pSceneManager->m_uDefaultRenderView;
-            pSceneHandler->mFEScene = pFEScene;
-            pFEScene->m_pAllocator = pAllocator;
-
-            if (!pFEScene->LoadPackage(szFilename, pAllocator))
-            {
-                nlPrintf("Error: failed to load package!\n");
-                nlBreak();
-            }
+            LoadScene(
+                pPackagePushPopMessage->m_szFilename,
+                pPackagePushPopMessage->m_pSceneHandler,
+                pPackagePushPopMessage->m_pAllocator);
         }
         else
         {
-            nlDLListIterator<BaseSceneHandler*> sceneIterator = m_sceneHandlerStack.Begin();
-            DLListEntry<BaseSceneHandler*>* headEntry = sceneIterator.m_Head;
-            DLListEntry<BaseSceneHandler*>* sceneEntry = sceneIterator.m_Curr;
+            nlDLListIterator<BaseSceneHandler*> sceneIterator = pSceneManager->m_sceneHandlerStack.Begin();
 
-            while (sceneEntry != 0)
+            while (sceneIterator.hasNext())
             {
-                if (sceneEntry->entry == pPackagePushPopMessage->m_pSceneHandler)
+                if (*sceneIterator == pPackagePushPopMessage->m_pSceneHandler)
                 {
-                    nlDLRingIsEnd(headEntry, sceneEntry);
-                    nlDLRingRemove(&m_sceneHandlerStack.m_Head, sceneEntry);
-                    m_sceneHandlerStack.m_Allocator.Free(sceneEntry);
+                    pSceneManager->m_sceneHandlerStack.Remove(&sceneIterator);
                     break;
                 }
 
-                if (nlDLRingIsEnd(headEntry, sceneEntry) || sceneEntry == 0)
-                {
-                    sceneEntry = 0;
-                }
-                else
-                {
-                    sceneEntry = sceneEntry->m_next;
-                }
+                sceneIterator.Step();
             }
 
             pPackagePushPopMessage->m_pSceneHandler->mFEScene->ReleaseResourceHandles();

@@ -2543,7 +2543,7 @@ void cCharacter::fn_80022E60()
                 {
                     for (glModelPacket* packet = m_pSkinMesh[i]->GetModel()->packets;
                          packet < m_pSkinMesh[i]->GetModel()->packets
-                                      + m_pSkinMesh[i]->GetModel()->numPackets;
+                                      + m_pSkinMesh[i]->GetNumPackets();
                          ++packet)
                     {
                         for (int k = 0; k < 10; ++k)

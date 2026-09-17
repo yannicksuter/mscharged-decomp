@@ -112,6 +112,29 @@ static inline bool IsDuringGamePauseState()
     return bDuringGamePauseState;
 }
 
+static inline void SendSkipNisToAll(u8* buffer, int size)
+{
+    int machines = g_pNetworkSessionBase->GetNumMachines();
+    for (s8 machine = 0; machine < machines; machine++)
+    {
+        g_pNetworkSessionBase->Send(machine, buffer, size, true);
+    }
+}
+
+static inline void SendSkipNisToAll(
+    NetworkMessageType30* message, u8* buffer)
+{
+    int size = gNetworkMessageRegistry->Serialize(message, buffer, 10);
+    SendSkipNisToAll(buffer, size);
+}
+
+static inline void SendSkipNisToHost(
+    NetworkMessageType31* message, u8* buffer)
+{
+    int size = gNetworkMessageRegistry->Serialize(message, buffer, 10);
+    g_pNetworkSessionBase->Send(0, buffer, size, true);
+}
+
 static inline bool IsCupWinner()
 {
     if (sUseCupTrophy)
@@ -507,7 +530,32 @@ void Presentation::Update(float deltaTime)
 
             if (!skipPastByPass)
             {
-                SendSkipNis();
+                if (g_pNetworkSession->IsLiveNetworkGame())
+                {
+                    if (g_pNetworkSessionBase->GetMachineRoster()->GetTopology()
+                        == 0)
+                    {
+                        tDebugPrintManager::Print(DC_NETWORK,
+                            "Sending NetworkSkipNIS message bypass# %d in peer-peer mode\n",
+                            mByPassNumber);
+
+                        NetworkMessageType30 message(mByPassNumber);
+                        u8 buffer[10];
+                        SendSkipNisToAll(buffer,
+                            gNetworkMessageRegistry->Serialize(
+                                &message, buffer, 10));
+                    }
+                    else
+                    {
+                        tDebugPrintManager::Print(DC_NETWORK,
+                            "Sending NetworkSkipNISClient message bypass# %d in client-server mode\n",
+                            mByPassNumber);
+
+                        u8 buffer[10];
+                        NetworkMessageType31 message(mByPassNumber);
+                        SendSkipNisToHost(&message, buffer);
+                    }
+                }
             }
 
             tDebugPrintManager::Print(DC_NETWORK, "Bypassing...\n");
@@ -1161,13 +1209,9 @@ void Presentation::SendSkipNis()
             mByPassNumber);
 
         NetworkMessageType30 message(mByPassNumber);
-        u8 buffer[12];
-        int size = gNetworkMessageRegistry->Serialize(&message, buffer, 10);
-        int machines = g_pNetworkSessionBase->GetNumMachines();
-        for (s8 machine = 0; machine < machines; machine++)
-        {
-            g_pNetworkSessionBase->Send(machine, buffer, size, true);
-        }
+        u8 buffer[10];
+        SendSkipNisToAll(buffer,
+            gNetworkMessageRegistry->Serialize(&message, buffer, 10));
     }
     else
     {
@@ -1175,10 +1219,9 @@ void Presentation::SendSkipNis()
             "Sending NetworkSkipNISClient message bypass# %d in client-server mode\n",
             mByPassNumber);
 
-        u8 buffer[12];
+        u8 buffer[10];
         NetworkMessageType31 message(mByPassNumber);
-        int size = gNetworkMessageRegistry->Serialize(&message, buffer, 10);
-        g_pNetworkSessionBase->Send(0, buffer, size, true);
+        SendSkipNisToHost(&message, buffer);
     }
 }
 
@@ -1187,9 +1230,6 @@ void Presentation::SendSkipNis()
  */
 int Presentation::ProcessMessage(NetworkMessage* message)
 {
-    int machines;
-    s8 target;
-    int size;
     NetworkMessage* receivedMessage = message;
     NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     s8 machine = roster->MachineIdxFromConnection(receivedMessage->mSource);
@@ -1232,15 +1272,10 @@ int Presentation::ProcessMessage(NetworkMessage* message)
                 machine,
                 ((NetworkMessageType31*)receivedMessage)->mUnidentified08);
 
-            u8 buffer[12];
+            u8 buffer[10];
             NetworkMessageType30 relay(
                 ((NetworkMessageType31*)receivedMessage)->mUnidentified08);
-            size = gNetworkMessageRegistry->Serialize(&relay, buffer, 10);
-            machines = g_pNetworkSessionBase->GetNumMachines();
-            for (target = 0; target < machines; target++)
-            {
-                g_pNetworkSessionBase->Send(target, buffer, size, true);
-            }
+            SendSkipNisToAll(&relay, buffer);
         }
         break;
     }

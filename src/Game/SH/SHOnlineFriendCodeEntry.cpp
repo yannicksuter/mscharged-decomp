@@ -546,6 +546,21 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
     }
 }
 
+inline unsigned long long SHOnlineFriendCodeEntry::ParseFriendKey()
+{
+    static char buffer[4] = "0";
+    unsigned long long friendKey = 0;
+    char* digit = buffer;
+    for (int i = 0; i < 12; ++i)
+    {
+        nlWcsToStr(mDigits[i], digit, 4);
+        int digitValue = atoi(digit);
+        double placeValue = pow(10.0, 11 - i);
+        friendKey += digitValue * placeValue;
+    }
+    return friendKey;
+}
+
 void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
 {
     unsigned int item = (unsigned int)context;
@@ -554,14 +569,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
     {
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
 
-        static char buffer[4] = "0";
-        char* digit = buffer;
-        unsigned long long friendKey = 0;
-        for (int i = 0; i < 12; ++i)
-        {
-            nlWcsToStr(mDigits[i], digit, 4);
-            friendKey += atoi(digit) * pow(10.0, 11 - i);
-        }
+        unsigned long long friendKey = ParseFriendKey();
 
         int error = -1;
         if (g_pFriendManager->AddFriendKey(friendKey, &error))
@@ -577,7 +585,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
 
             for (int i = 0; i < 4; ++i)
             {
-                gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             }
             mPresentation->SetActiveSlide("out", true);
             mPresentation->Update(0.0f);
@@ -585,19 +593,20 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
         else
         {
             g_pFriendManager->SetOwnStatusInitial(false);
+            ePopupMenu popupType = (ePopupMenu)error;
 
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene())
                 != (SceneList)10)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                     (SceneList)10, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)error,
-                    Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed), this)));
+                popup->Create(popupType,
+                    Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed), this));
                 mPopupActive = true;
             }
 
             FEAudio::EnableSounds(true);
-            FEAudio::PlayAnimAudioEvent(0xD642865E, 0, 0, 1);
+            FEAudio::PlayAnimAudioEvent(0xD641865E, 0, 0, 1);
             FEAudio::EnableSounds(false);
 
             if (mSelectedDigit != 0)
@@ -606,14 +615,9 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
                 mDigitInstances[mSelectedDigit]->SetActiveSlide(
                     "OFF", true, false);
 
-                mDigitButtons[0].mDisabled = true;
-                FEPointerEvent event;
-                mDigitButtons[0].mPreviousEvents[0] = event;
-                mDigitButtons[0].mPreviousEvents[1] = event;
-                mDigitButtons[0].mPreviousEvents[2] = event;
-                mDigitButtons[0].mPreviousEvents[3] = event;
+                mDigitButtons[0].Disable();
 
-                mDigitButtons[mSelectedDigit].mDisabled = false;
+                mDigitButtons[mSelectedDigit].Enable();
                 mSelectedDigit = 0;
             }
         }
@@ -640,88 +644,113 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
                 mDigitInstances[mSelectedDigit]->SetActiveSlide(
                     "OFF", true, false);
 
-                mDigitButtons[nextItem].mDisabled = true;
-                FEPointerEvent event;
-                mDigitButtons[nextItem].mPreviousEvents[0] = event;
-                mDigitButtons[nextItem].mPreviousEvents[1] = event;
-                mDigitButtons[nextItem].mPreviousEvents[2] = event;
-                mDigitButtons[nextItem].mPreviousEvents[3] = event;
+                mDigitButtons[nextItem].Disable();
 
-                mDigitButtons[mSelectedDigit].mDisabled = false;
+                mDigitButtons[mSelectedDigit].Enable();
                 mSelectedDigit = nextItem;
             }
         }
 
+        int selectedDigit = mSelectedDigit;
         nlStrNCpy(
-            mDigits[mSelectedDigit], (const unsigned short*)L"", 2);
+            mDigits[selectedDigit], (const unsigned short*)L"", 2);
 
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
-            mDigitInstances[mSelectedDigit], nlStringLowerHash("off"),
+            mDigitInstances[selectedDigit], nlStringLowerHash("off"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &UnidentifiedTLTextDefault::sInstance;
         }
-        text->SetString(mDigits[mSelectedDigit]);
+        text->SetString(mDigits[selectedDigit]);
 
         text = FEFinder<TLTextInstance, 3>::Find(
-            mDigitInstances[mSelectedDigit], nlStringLowerHash("over"),
+            mDigitInstances[selectedDigit], nlStringLowerHash("over"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &UnidentifiedTLTextDefault::sInstance;
         }
-        text->SetString(mDigits[mSelectedDigit]);
+        text->SetString(mDigits[selectedDigit]);
 
         text = FEFinder<TLTextInstance, 3>::Find(
-            mDigitInstances[mSelectedDigit], nlStringLowerHash("down"),
+            mDigitInstances[selectedDigit], nlStringLowerHash("down"),
             nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
         if (text == 0)
         {
             text = &UnidentifiedTLTextDefault::sInstance;
         }
-        text->SetString(mDigits[mSelectedDigit]);
+        text->SetString(mDigits[selectedDigit]);
     }
     else
     {
         if (item == 9)
         {
-            nlStrNCpy(mDigits[mSelectedDigit],
+            int selectedDigit = mSelectedDigit;
+            nlStrNCpy(mDigits[selectedDigit],
                 (const unsigned short*)L"0", 2);
+
+            TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
+                mDigitInstances[selectedDigit], nlStringLowerHash("off"),
+                nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
+            if (text == 0)
+            {
+                text = &UnidentifiedTLTextDefault::sInstance;
+            }
+            text->SetString(mDigits[selectedDigit]);
+
+            text = FEFinder<TLTextInstance, 3>::Find(
+                mDigitInstances[selectedDigit], nlStringLowerHash("over"),
+                nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
+            if (text == 0)
+            {
+                text = &UnidentifiedTLTextDefault::sInstance;
+            }
+            text->SetString(mDigits[selectedDigit]);
+
+            text = FEFinder<TLTextInstance, 3>::Find(
+                mDigitInstances[selectedDigit], nlStringLowerHash("down"),
+                nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
+            if (text == 0)
+            {
+                text = &UnidentifiedTLTextDefault::sInstance;
+            }
+            text->SetString(mDigits[selectedDigit]);
         }
         else
         {
             unsigned short character[2];
             nlSNPrintf(character, 2, (const unsigned short*)L"%d", item + 1);
-            nlStrNCpy(mDigits[mSelectedDigit], character, 2);
-        }
+            int selectedDigit = mSelectedDigit;
+            nlStrNCpy(mDigits[selectedDigit], character, 2);
 
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
-            mDigitInstances[mSelectedDigit], nlStringLowerHash("off"),
-            nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
-        if (text == 0)
-        {
-            text = &UnidentifiedTLTextDefault::sInstance;
-        }
-        text->SetString(mDigits[mSelectedDigit]);
+            TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
+                mDigitInstances[selectedDigit], nlStringLowerHash("off"),
+                nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
+            if (text == 0)
+            {
+                text = &UnidentifiedTLTextDefault::sInstance;
+            }
+            text->SetString(mDigits[selectedDigit]);
 
-        text = FEFinder<TLTextInstance, 3>::Find(
-            mDigitInstances[mSelectedDigit], nlStringLowerHash("over"),
-            nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
-        if (text == 0)
-        {
-            text = &UnidentifiedTLTextDefault::sInstance;
-        }
-        text->SetString(mDigits[mSelectedDigit]);
+            text = FEFinder<TLTextInstance, 3>::Find(
+                mDigitInstances[selectedDigit], nlStringLowerHash("over"),
+                nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
+            if (text == 0)
+            {
+                text = &UnidentifiedTLTextDefault::sInstance;
+            }
+            text->SetString(mDigits[selectedDigit]);
 
-        text = FEFinder<TLTextInstance, 3>::Find(
-            mDigitInstances[mSelectedDigit], nlStringLowerHash("down"),
-            nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
-        if (text == 0)
-        {
-            text = &UnidentifiedTLTextDefault::sInstance;
+            text = FEFinder<TLTextInstance, 3>::Find(
+                mDigitInstances[selectedDigit], nlStringLowerHash("down"),
+                nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
+            if (text == 0)
+            {
+                text = &UnidentifiedTLTextDefault::sInstance;
+            }
+            text->SetString(mDigits[selectedDigit]);
         }
-        text->SetString(mDigits[mSelectedDigit]);
 
         if (mSelectedDigit < 11)
         {
@@ -742,14 +771,9 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
                 mDigitInstances[mSelectedDigit]->SetActiveSlide(
                     "OFF", true, false);
 
-                mDigitButtons[nextItem].mDisabled = true;
-                FEPointerEvent event;
-                mDigitButtons[nextItem].mPreviousEvents[0] = event;
-                mDigitButtons[nextItem].mPreviousEvents[1] = event;
-                mDigitButtons[nextItem].mPreviousEvents[2] = event;
-                mDigitButtons[nextItem].mPreviousEvents[3] = event;
+                mDigitButtons[nextItem].Disable();
 
-                mDigitButtons[mSelectedDigit].mDisabled = false;
+                mDigitButtons[mSelectedDigit].Enable();
                 mSelectedDigit = nextItem;
             }
         }

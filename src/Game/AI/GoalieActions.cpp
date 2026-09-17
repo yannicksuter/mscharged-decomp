@@ -40,9 +40,6 @@
 #include "math.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
-extern const nlVector3 lbl_804DC03C = { 0.0f, 60.0f, -60.0f };
-extern const nlVector3 lbl_804DC048 = { 0.0f, 0.0f, 1.0f };
-extern const nlVector3 lbl_804DC054 = { 0.0f, 0.0f, 1.0f };
 static int gOffplayDejected[5] = { 0x99, 0x9A, 0x9B, 0x9C, 0x9D };
 
 struct UnidentifiedGoalieActionState
@@ -388,11 +385,13 @@ void Goalie::ActionLooseBallDesperate(float fDeltaT)
                                        - pInfo->mfAnimDuration
                                              * fAnimTime;
                 float fGoalLineX = cField::GetGoalLineX(1U);
-                float fTimeScale = fTimeUntilPickup * lbl_806DBC84;
                 float fLimit = fGoalLineX - 0.2f;
 
-                nlVec3ScaleAdd(v3GuessBallPos, fTimeScale, g_pBall->m_v3Velocity, v3BallPosition);
-                if ((float)fabs(v3GuessBallPos.x) > fLimit)
+                nlVec3ScaleAdd(v3GuessBallPos,
+                    fTimeUntilPickup * lbl_806DBC84,
+                    g_pBall->m_v3Velocity,
+                    v3BallPosition);
+                if (fabsf(v3GuessBallPos.x) > fLimit)
                 {
                     float fClampedX;
                     if (v3GuessBallPos.x > 0.0f)
@@ -403,10 +402,10 @@ void Goalie::ActionLooseBallDesperate(float fDeltaT)
                     {
                         fClampedX = -fLimit;
                     }
-                    if ((float)fabs(v3BallPosition.x) < fLimit)
+                    if (fabsf(v3BallPosition.x) < fLimit)
                     {
-                        float fBallX = pBall->m_v3Position.x;
-                        float fBallY = pBall->m_v3Position.y;
+                        float fBallX = v3BallPosition.x;
+                        float fBallY = v3BallPosition.y;
                         float fDX = fBallX - fClampedX;
                         float fDY = fBallY - v3GuessBallPos.y;
                         float fDXOrig = fBallX - v3GuessBallPos.x;
@@ -424,7 +423,7 @@ void Goalie::ActionLooseBallDesperate(float fDeltaT)
                 = GetJointPosition(m_nBallJointIndex);
             if (CalculateDistanceSquared(
                     pBall->m_v3Position, v3BallJoint)
-                < 0.36f)
+                < 0.25f)
             {
                 InitiatePanicGrab(NULL);
             }
@@ -456,15 +455,13 @@ void Goalie::ActionLooseBallDesperate(float fDeltaT)
     const LooseBallInfo* pInfoE = mpLooseBallInfo;
     cBall* pBallE = g_pBall;
     float fCatchRadSq;
-    float fCatchRadius = 1.0f + pInfoE->mfPickupDistance;
-    float fPickupTimeE = pInfoE->mfPickupTime;
-    float fAnimDurE = pInfoE->mfAnimDuration;
-    float fTimeProduct = fPickupTimeE * fAnimDurE;
+    float fCatchRadius = 0.5f + pInfoE->mfPickupDistance;
+    float fTimeProduct = pInfoE->mfPickupTime * pInfoE->mfAnimDuration;
     fCatchRadSq = fCatchRadius * fCatchRadius;
-    nlVec3ScaleAdd(v3GuessBallPosElse, fTimeProduct, pBallE->m_v3Velocity, pBall->m_v3Position);
+    nlVec3ScaleAdd(v3GuessBallPosElse, fTimeProduct, pBallE->m_v3Velocity, v3BallPosition);
 
     if (mfTargetTime < 0.02f
-        || (float)fabs(pBall->m_v3Position.x)
+        || fabsf(v3BallPosition.x)
                > cField::GetGoalLineX(1U) - 1.0f
         || (nlVec2Set(v2CurrentDelta,
                 mUnidentified024.m_v3Position.x - pBall->m_v3Position.x,
@@ -954,25 +951,22 @@ void Goalie::fn_80083DE0(float fDeltaT)
     }
 }
 
-extern "C" void fn_80083EC0()
+extern "C" void fn_80083EC0(Goalie*)
 {
     ResetMegaBallIndicators();
 
+    float fCenterX = 320.0f;
+    float fMiddleY = lbl_806DBC0C
+                   + (0.5f
+                           * ((480.0f - lbl_806DBC00) - lbl_806DBC04)
+                       + lbl_806DBC00);
     nlVector2 v2Positions[6] = {
         { lbl_806DBC08, lbl_806DBC00 },
         { 640.0f - lbl_806DBC08, lbl_806DBC00 },
-        { 320.0f - lbl_806DBC10, 480.0f - lbl_806DBC04 },
-        { 320.0f + lbl_806DBC10, 480.0f - lbl_806DBC04 },
-        { lbl_806DBC08,
-            lbl_806DBC0C
-                + (0.5f
-                        * ((480.0f - lbl_806DBC00) - lbl_806DBC04)
-                    + lbl_806DBC00) },
-        { 640.0f - lbl_806DBC08,
-            lbl_806DBC0C
-                + (0.5f
-                        * ((480.0f - lbl_806DBC00) - lbl_806DBC04)
-                    + lbl_806DBC00) },
+        { fCenterX - lbl_806DBC10, 480.0f - lbl_806DBC04 },
+        { fCenterX + lbl_806DBC10, 480.0f - lbl_806DBC04 },
+        { lbl_806DBC08, fMiddleY },
+        { 640.0f - lbl_806DBC08, fMiddleY },
     };
     int nIndices[6] = { 0 };
     nIndices[1] = 1;
@@ -999,7 +993,7 @@ extern "C" void fn_80083EC0()
         i < g_pGame->mUnidentified28;
         i++)
     {
-        nlVector2* pPosition = &v2Positions[nIndices[i % 6]];
+        const nlVector2* pPosition = &v2Positions[nIndices[i % 6]];
         int nX = (int)pPosition->x;
         nX = (int)((float)nX
                    + (nlRandomf(2.0f * lbl_806DBC0C) - lbl_806DBC0C));
@@ -1021,21 +1015,14 @@ extern "C" void fn_80083EC0()
         pState->mActive = false;
 
         LiveBallTrail* pBallTrail = fn_8001B284(i);
-        pBallTrail->position = lbl_804DC03C;
+        nlVector3 v3Position = { 0.0f, 60.0f, -60.0f };
+        pBallTrail->position = v3Position;
         fn_8001AA0C(pBallTrail, false);
     }
 }
 
 void Goalie::fn_8008418C(float fDeltaT)
 {
-    nlVector3 v3TargetPosition;
-    nlVector3 v3Velocity;
-    nlVector3 v3Rotation;
-    nlVector3 v3Axis;
-    nlVector3 v3Position;
-    nlQuaternion qOrientation;
-    nlVector3 v3CameraDelta;
-
     if (mBallsLaunched
         & (1 << (g_pGame->mUnidentified28 - 1)))
     {
@@ -1056,26 +1043,36 @@ void Goalie::fn_8008418C(float fDeltaT)
             }
 
             MegaBallIndicator* pState = GetMegaBallIndicator(i);
+            float fX = pState->mX;
+            float fY = pState->mY;
             float fScreenX
-                = (2.0f * pState->mX - 640.0f) / 640.0f;
+                = (2.0f * fX - 640.0f) / 640.0f;
             float fScreenY
-                = (480.0f - 2.0f * pState->mY) / 480.0f;
+                = (480.0f - 2.0f * fY) / 480.0f;
 
             const nlVector3& v3CameraPosition
                 = cCameraManager::PeekCamera()->GetCameraPosition();
-            nlVec3Sub(v3CameraDelta, mv3NavTarget, v3CameraPosition);
-            float fDistance = 0.5f + nlVec3Length(v3CameraDelta);
+            float fDistance = 0.5f
+                + nlSqrt(CalculateDistanceSquared(
+                             mv3NavTarget, v3CameraPosition),
+                    true);
 
+            nlVector3 v3TargetPosition;
+            nlVector3 v3Velocity;
+            nlVector3 v3Rotation;
             fn_802779EC(
                 v3TargetPosition, fScreenX, fScreenY, fDistance);
 
-            nlVec3Set(v3Position, 0.0f, 0.0f, 0.0f);
+            nlVector3 v3Axis = { 0.0f, 0.0f, 1.0f };
+            nlVector3 v3Position = { 0.0f, 0.0f, 0.0f };
             v3Position.y = v3TargetPosition.y;
             v3Position.z = lbl_806DBC38 + v3TargetPosition.z;
-            v3Axis = lbl_804DC048;
 
             LiveBallTrail* pBallTrail = fn_8001B284(i);
-            nlVec3Sub(v3Velocity, v3TargetPosition, v3Position);
+            float fVelocityY = v3TargetPosition.y - v3Position.y;
+            float fVelocityX = v3TargetPosition.x - v3Position.x;
+            float fVelocityZ = v3TargetPosition.z - v3Position.z;
+            nlVec3Set(v3Velocity, fVelocityX, fVelocityY, fVelocityZ);
 
             float fSpeed = nlVec3Length(v3Velocity);
             if (mfMegaAccuracy < 0.001f)
@@ -1091,8 +1088,8 @@ void Goalie::fn_8008418C(float fDeltaT)
                 fSpeed = lbl_806DBC14;
             }
 
-            pBallTrail->position = v3Position;
             nlVec3Scale(v3Velocity, 1.0f / fSpeed);
+            pBallTrail->position = v3Position;
             fn_8001AA0C(pBallTrail, true);
             pBallTrail->velocity = v3Velocity;
             fn_8001AD24(pBallTrail, mpShooter);
@@ -1102,6 +1099,7 @@ void Goalie::fn_8008418C(float fDeltaT)
             nlVec3Scale(v3Rotation, 2.0f + nlRandomf(1.0f));
             pBallTrail->mUnidentified028 = v3Rotation;
 
+            nlQuaternion qOrientation;
             qOrientation.x = nlRandomf(0.57f);
             qOrientation.y = nlRandomf(0.57f);
             qOrientation.z = nlRandomf(0.57f);
@@ -1219,7 +1217,6 @@ void Goalie::fn_80084840(MegaBallIndicator* pState)
     nlVector3 v3TargetPosition;
     nlVector3 v3Velocity;
     nlVector3 v3Unidentified = v3Zero;
-    nlVector3 v3Unidentified2;
 
     float fDirection;
     if (mUnidentified024.m_v3Position.x > 0.0f)
@@ -1254,7 +1251,7 @@ void Goalie::fn_80084840(MegaBallIndicator* pState)
     nlVec3Scale(v3Velocity, 10.0f);
     pBallTrail->velocity = v3Velocity;
 
-    v3Unidentified2 = lbl_804DC054;
+    nlVector3 v3Unidentified2 = { 0.0f, 0.0f, 1.0f };
     nlVec3CrossProduct(
         v3Unidentified, v3Unidentified2, v3Velocity);
     float fUnidentified = 2.0f + nlRandomf(1.0f);

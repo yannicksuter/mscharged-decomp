@@ -32,6 +32,7 @@ public:
     BaseSceneHandler* GetTopSceneHandler();
     void InitializeScene(FEScene* pFEScene);
     void ProcessPushPopQueue();
+    void LoadScene(const char* szFilename, BaseSceneHandler* pHandler, MemoryAllocator* pAllocator);
     void QueueScenePush(BaseSceneHandler* pSceneHandler, const char* szFilename, MemoryAllocator* pAllocator);
     void QueueScenePop();
     void RenderActiveScenes();

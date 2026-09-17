@@ -16,6 +16,7 @@
 #include "NL/nlTicker.h"
 #include "NL/plat/DPDData.h"
 #include "NL/plat/WiiPad.h"
+#include <math.h>
 
 void SendMegaBallPointerUpdate(u16 angle, u32 textureIndex, u32 status,
     float x, float y);
@@ -283,7 +284,7 @@ void ResetMegaBallTimer()
     unsigned int i;
     for (i = 0; i < 10; i++)
     {
-        ResetMegaBallIndicator(pTimerState, 5);
+        ResetMegaBallIndicator(pTimerState, 0);
         SetMegaBallIndicatorTexture(pTimerState, 5);
         pTimerState->mIndex = i;
         *pTimerStatus = -1;
@@ -497,8 +498,8 @@ void DrawMegaBallIndicator(int nX, int nY, unsigned int nTexture,
             float fSin;
             float fCos;
             nlSinCos(&fSin, &fCos, (u16)(int)(10430.378f * fAngle));
-            float fAbsCos = nlAbs(fCos);
-            float fAbsSin = nlAbs(fSin);
+            float fAbsCos = fabsf(fCos);
+            float fAbsSin = fabsf(fSin);
             fWidth = (float)((double)fWidth
                              * (1.0 - (double)(0.2f * fAbsCos)));
             fHeight = (float)((double)fHeight
@@ -823,6 +824,10 @@ void UpdateMegaBallIndicators(float fDeltaT)
 
 void SetMegaBallTimerCount(unsigned int nCount)
 {
+    float fY;
+    float fX;
+    float fLeftCapWidth;
+    float fRightCapWidth;
     gMegaBallTimerCount = nCount;
     if (nCount == 0)
     {
@@ -842,23 +847,19 @@ void SetMegaBallTimerCount(unsigned int nCount)
                            * gMegaBallTimerSegments[0].mScale)
                    - 1.0f;
     float fHalfWidth = 0.5f * fSpacing;
-    float fLeftCapWidth
+    fLeftCapWidth
         = gMegaBallTimerEndCaps[0].mWidth * gMegaBallTimerScale;
-    float fRightCapWidth
+    fRightCapWidth
         = gMegaBallTimerEndCaps[1].mWidth * gMegaBallTimerScale;
     float fRowHalfWidth
         = fHalfWidth * (float)(gMegaBallTimerCount - 1);
-    float fOuterHalfWidth = fRowHalfWidth + fHalfWidth;
-    float fX = gMegaBallScreenCenterX - fRowHalfWidth;
-    float fY = gMegaBallTimerY + gMegaBallTimerYOffset;
-    float fLeftCapX = gMegaBallScreenCenterX
-                    - fOuterHalfWidth
-                    - 0.5f * (fAspectScale * fLeftCapWidth)
-                    + 1.0f;
-    float fRightCapX = gMegaBallScreenCenterX
-                     + fOuterHalfWidth
-                     + 0.5f * (fAspectScale * fRightCapWidth)
-                     - 1.0f;
+    fHalfWidth += fRowHalfWidth;
+    float fLeftCapX = gMegaBallScreenCenterX - fHalfWidth
+                    - 0.5f * (fAspectScale * fLeftCapWidth) + 1.0f;
+    float fRightCapX = gMegaBallScreenCenterX + fHalfWidth
+                     + 0.5f * (fAspectScale * fRightCapWidth) - 1.0f;
+    fY = gMegaBallTimerY + gMegaBallTimerYOffset;
+    fX = gMegaBallScreenCenterX - fRowHalfWidth;
 
     gMegaBallTimerEndCaps[0].mActive = true;
     gMegaBallTimerEndCaps[0].mVisible = true;
@@ -924,6 +925,8 @@ void RenderMegaBallTimer(float)
                     state.mOpacity,
                     fAngle);
             }
+            float fWidth;
+            float fHeight;
             if (gMegaBallTimerStatuses[i] == 0)
             {
                 float fX;
@@ -933,10 +936,10 @@ void RenderMegaBallTimer(float)
                 int nX = (int)fX;
                 int nY = (int)fY;
                 float fScale = gMegaBallTimerScale;
-                float fWidth = gMegaBallTimerBallWidth;
-                float fHeight = gMegaBallTimerBallHeight;
-                fWidth *= fScale;
-                fHeight *= fScale;
+                fWidth = gMegaBallTimerBallWidth;
+                fHeight = gMegaBallTimerBallHeight;
+                fWidth = fScale * fWidth;
+                fHeight = fScale * fHeight;
                 float fOpacity = state.mOpacity;
                 DrawMegaBallIndicator(nX,
                     nY,
@@ -955,10 +958,10 @@ void RenderMegaBallTimer(float)
                 int nX = (int)fX;
                 int nY = (int)fY;
                 float fScale = gMegaBallTimerScale;
-                float fWidth = gMegaBallTimerExplodedWidth;
-                float fHeight = gMegaBallTimerExplodedHeight;
-                fWidth *= fScale;
-                fHeight *= fScale;
+                fWidth = gMegaBallTimerExplodedWidth;
+                fHeight = gMegaBallTimerExplodedHeight;
+                fWidth = fScale * fWidth;
+                fHeight = fScale * fHeight;
                 float fOpacity = state.mOpacity;
                 DrawMegaBallIndicator(nX,
                     nY,

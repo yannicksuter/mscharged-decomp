@@ -316,20 +316,41 @@ void FEModelHandle::SetTransform(const nlMatrix4& transform)
 void FEModelHandle::PlayAnimation(const char* name, ePlayMode playMode,
     float blendTime, float speed, bool force)
 {
-    cSAnim* animation = mModel->mAnimations->Find(nlStringHash(name));
+    cSAnim* animation = mModel->mAnimations->Find(const_cast<char*>(name));
 
     if (animation == 0)
     {
         return;
     }
 
-    bool changeAnimation = force || animation != mModel->GetCurrentAnimation();
-    if (changeAnimation && mModel->mType == FE_MODEL_SKINNED)
+    bool changeAnimation = false;
+    if (force)
     {
-        FESkinnedModel* model
-            = (FESkinnedModel*)mModel;
-        model->mModel->SetAnimState(
-            *animation, blendTime, playMode);
+        changeAnimation = true;
+    }
+    else if (animation != mModel->GetCurrentAnimation())
+    {
+        changeAnimation = true;
+    }
+
+    if (changeAnimation)
+    {
+        switch (mModel->mType)
+        {
+        case FE_MODEL_SKINNED:
+            ((FESkinnedModel*)mModel)->mModel->SetAnimState(
+                *animation, blendTime, playMode);
+            ((FESkinnedModel*)mModel)->mModel->mpAnimController->m_bMirror
+                = mUnidentified59;
+            break;
+        case FE_MODEL_IMPOSTOR:
+            ((FEImpostorModel*)mModel)->mModel->PlayAnimation(
+                name, blendTime, playMode);
+            ((FEImpostorModel*)mModel)->mModel->mAnimController->m_bMirror
+                = mUnidentified59;
+            ((FEImpostorModel*)mModel)->mModel->mAnimController->SetTime(speed);
+            break;
+        }
     }
     mAnimationCompleteCallback = 0;
 }

@@ -59,12 +59,10 @@ shdStateMachine::shdStateMachine(
     : mUnidentifiedTimer(1.0f)
     , mUnidentified01C()
 {
-    mUnidentified068.mUnidentifiedHash = -1;
-    mUnidentified068.mUnidentifiedFunction = 0;
-    mUnidentified070.mUnidentifiedHash = -1;
-    mUnidentified070.mUnidentifiedFunction = 0;
     mUnidentifiedState = state;
-    mUnidentified068 = transition;
+    mUnidentified068.mUnidentifiedHash = transition.mUnidentifiedHash;
+    mUnidentified068.mUnidentifiedFunction
+        = transition.mUnidentifiedFunction;
     mUnidentified018 = 0;
     mUnidentified080 = 1.0f;
     mUnidentified084 = 0.0f;

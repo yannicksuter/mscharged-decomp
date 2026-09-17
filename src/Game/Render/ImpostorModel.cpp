@@ -256,25 +256,26 @@ void ImpostorModel::ResolveTextures()
     if (mSkinMesh != 0)
     {
         int modelIndex = mSkinMesh->m_Unknown0C;
-        for (unsigned long i = 0; i < 2; ++i)
+        glModelPacket* packet;
+        for (int i = 0; i < 2; ++i)
         {
             mSkinMesh->m_Unknown0C = i;
-            glModel* skinModel = mSkinMesh->GetModel();
-            if (skinModel != 0)
+            if (mSkinMesh->GetModel() != 0)
             {
-                for (glModelPacket* packet = skinModel->packets;
+                for (packet = mSkinMesh->GetModel()->packets;
                     packet < mSkinMesh->GetModel()->packets
-                                 + mSkinMesh->GetModel()->numPackets;
+                                 + mSkinMesh->GetNumPackets();
                     ++packet)
                 {
                     for (int j = 0; j < 10; ++j)
                     {
-                        unsigned long parameter = sTextureParameterHashes[j];
-                        if (glHasMaterialParameter(packet, parameter))
+                        if (glHasMaterialParameter(packet, sTextureParameterHashes[j]))
                         {
-                            unsigned long texture = glGetMaterialUnsignedParameter(packet, parameter);
+                            unsigned long texture = glGetMaterialUnsignedParameter(
+                                packet, sTextureParameterHashes[j]);
                             unsigned long resolvedTexture = glGetTextureManager()->GetTextureIndex(texture);
-                            glSetMaterialTextureIndexParameter(packet, parameter, &resolvedTexture);
+                            glSetMaterialTextureIndexParameter(
+                                packet, sTextureParameterHashes[j], &resolvedTexture);
                         }
                     }
                 }

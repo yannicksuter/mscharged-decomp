@@ -251,7 +251,7 @@ void InGameTextOverlay::DisplayFinalScore()
         {
             if (g_pGame->m_eGameState == 6)
             {
-                StatsTracker::Track(STATS_LOSS, winningSide, 0,
+                StatsTracker::Track(STATS_OT_WIN, winningSide, 0,
                     scoreLeft, scoreRight, 0, 0);
             }
             else
