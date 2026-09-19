@@ -16,6 +16,7 @@ typedef Function<FnVoidVoid> _FEPopupMenuCB;
 enum ePopupMenu
 {
     INVALID_TYPE = -1,
+    POPUP_LOW_BATTERY = 0x8D,
 };
 
 struct Popup

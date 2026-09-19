@@ -59,6 +59,22 @@ public:
     virtual void Update(float);
     virtual void ReleaseParameter(AudioEffectParameter* state) { delete state; }
 
+    AudioEffectParameter* CreateParameter(unsigned int definition, void* data,
+        bool immediate)
+    {
+        AudioEffectParameter* parameter = 0;
+        CreateParameter(definition, data, immediate, &parameter);
+        return parameter;
+    }
+
+    bool AddParameter(AudioEffectParameter* parameter, float value)
+    {
+        parameter->m_State.m_Target.scalar = value;
+        parameter->m_State.m_Current.scalar = 0.0f;
+        m_Parameters.AddEnd(parameter);
+        return true;
+    }
+
     bool m_Enabled;
     u8 m_Pad05[3];
     nlDLListSlotPool<AudioEffectParameter*> m_Parameters;

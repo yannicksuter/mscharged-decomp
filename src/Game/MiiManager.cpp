@@ -18,18 +18,16 @@
 
 MiiManager* g_pMiiManager;
 
-
-void MiiManager::ResourceLoaded(void* buffer, unsigned long size, void* userData)
+inline void MiiManager::LoadResources(void* buffer)
 {
-    MiiManager* object = g_pMiiManager;
-    bool found = false;
-    void* resource;
     unsigned long resourceSize;
+    void* resource;
+    bool found = false;
     ARCHandle handle;
     ARCFileInfo file;
 
-    object->mResourceArchive = buffer;
-    object->mWorkBuffer = VirtualAllocator.Allocate(RFLGetWorkSize(TRUE), 32, false);
+    mResourceArchive = buffer;
+    mWorkBuffer = VirtualAllocator.Allocate(RFLGetWorkSize(TRUE), 32, false);
 
     if (ARCInitHandle(buffer, &handle))
     {
@@ -44,10 +42,15 @@ void MiiManager::ResourceLoaded(void* buffer, unsigned long size, void* userData
 
     if (found)
     {
-        object->mInitialized = RFLInitRes(
-            object->mWorkBuffer, resource, resourceSize, TRUE) == RFLErrcode_Success;
+        mInitialized = RFLInitRes(
+            mWorkBuffer, resource, resourceSize, TRUE) == RFLErrcode_Success;
     }
-    object->mResourcesLoaded = true;
+    mResourcesLoaded = true;
+}
+
+void MiiManager::ResourceLoaded(void* buffer, unsigned long size, void* userData)
+{
+    g_pMiiManager->LoadResources(buffer);
 }
 
 MiiManager::MiiManager()

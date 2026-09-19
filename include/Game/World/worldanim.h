@@ -90,8 +90,6 @@ public:
     AnimationSet* LoadHierarchy(nlChunk* pChunk);
     void LoadAnimationSet(AnimationSet* pAnimationSet, nlChunk* pChunk);
     void BindObjects();
-    void BindControllerObjects(const unsigned long& uHashID,
-        WorldAnimController** ppController);
     void Update(float fDeltaT);
 
     /* 0x00 */ cInventory<cSHierarchy>* m_pHierarchyInventory;

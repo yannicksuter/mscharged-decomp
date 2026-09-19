@@ -11,7 +11,6 @@
 
 extern "C" void fn_802F499C(void*, unsigned long, XSoundHandle*);
 extern "C" void fn_802F49A4(void*, XSoundHandle*);
-u32 FindAudioResourceCue(AudioResourceLoadOwner*, u32, u32, u32, u32);
 
 unsigned int lbl_806E2018;
 AudioSystem* g_pAudioSystem;
@@ -52,7 +51,7 @@ void AudioSystem::Shutdown()
     m_SoundOwnerPool.m_Allocator.FreeBlocks();
 }
 
-XSoundHandle* CreateAudioSoundHandle(AudioSystem* audio, int slotId, XSoundOwner* owner,
+XSoundCueHandle* CreateAudioSoundHandle(AudioSystem* audio, int slotId, XSoundOwner* owner,
     unsigned long cueId, int value1, int value2, int value3, int callback, int context)
 {
     if (!audio->IsInitialized())
@@ -62,7 +61,7 @@ XSoundHandle* CreateAudioSoundHandle(AudioSystem* audio, int slotId, XSoundOwner
     if (cueIndex == 0xFFFF)
         return 0;
     ++lbl_806E2018;
-    XSoundHandle* handle = new XSoundCueHandle(resource, owner, cueIndex,
+    XSoundCueHandle* handle = new XSoundCueHandle(resource, owner, cueIndex,
         (XSoundHitMarkerCallback)callback, (void*)context);
     if (owner != 0)
         ++audio->m_Unknown2E0;

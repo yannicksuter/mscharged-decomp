@@ -1,5 +1,4 @@
 #include "Game/OverlayHandlerGoal.h"
-#include "NL/nlBasicString.inl"
 
 #include "Game/DB/GameProgress.h"
 #include "Game/DB/CharacterInfo.h"

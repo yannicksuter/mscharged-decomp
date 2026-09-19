@@ -24,9 +24,13 @@ inline UnidentifiedAudioPoolOwner::~UnidentifiedAudioPoolOwner()
 
 // Configuration keys the runtime resolves by lower-cased name hash. The DOL
 // keeps only the hashes; the names behind them are not recoverable.
-#define AUDIO_DEFINITIONS_KEY 0xD2894EC5
-#define AUDIO_EFFECT_KEY 0xFE7CE6FB
+#define AUDIO_EFFECT_KEY 0xFE7BE6FB
 
+static inline u32 UnidentifiedGetEffectId(u32 definition)
+{
+    u32 key = AUDIO_EFFECT_KEY;
+    return ConfigFindDefinition(definition)->Get(key).m_Words.m_Value;
+}
 
 AudioResourceRuntime::AudioResourceRuntime()
 {
@@ -103,26 +107,18 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
     u32 key = *bindingKey;
     u32 definition = *definitionKey;
     AudioEffectBinding* binding
-        = g_pAudioResourceRuntime->m_Script->mBindings.UnidentifiedAddOrGet(key);
+        = g_pAudioResourceRuntime->m_Script->GetBinding(key);
 
-    u32 slot = AUDIO_EFFECT_KEY;
-    u32 definitions = AUDIO_DEFINITIONS_KEY;
-    u32 effectId = (u32)((RegistryContainer*)
-        ((RegistryContainer*)((RegistryContainer*)g_pAudioResourceRuntime->GetConfigRoot())
-                ->Get(definitions)
-                .mData)
-            ->Get(definition)
-            .mData)
-        ->Get(slot)
-        .mData;
+    u32 effectId = UnidentifiedGetEffectId(definition);
 
-    AudioEffectBase** found;
     AudioEffectBase* effect;
-    if (binding->mEffects.FindGet(effectId, &found))
+    AudioEffectBase** found;
+    bool foundEffect = binding->mEffects.FindGet(effectId, &found);
+    if (foundEffect)
     {
         effect = *found;
     }
-    else
+    if (!foundEffect)
     {
         effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
         binding->mEffects.Add(effectId, effect);
@@ -131,12 +127,9 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
                 UnidentifiedAudioInstanceVisitor(effect)));
     }
 
-    AudioEffectParameter* parameter = 0;
-    effect->CreateParameter(definition, parameterData, immediate, &parameter);
-    parameter->m_State.m_Target.scalar = value;
-    parameter->m_State.m_Current.scalar = 0.0f;
-    effect->m_Parameters.AddEnd(parameter);
-    return true;
+    AudioEffectParameter* parameter
+        = effect->CreateParameter(definition, parameterData, immediate);
+    return effect->AddParameter(parameter, value);
 }
 
 /**

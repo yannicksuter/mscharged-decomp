@@ -3,6 +3,7 @@
 
 #include "NL/gl/gl.h"
 #include "NL/nlAlgorithm.h"
+#include "NL/nlBasicString.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -10,8 +11,6 @@
 
 struct nlColour;
 class FontCharString;
-template <typename CharT, typename Allocator>
-class BasicString;
 
 struct TextMetrics
 {
@@ -204,6 +203,18 @@ inline FontCharString::FontCharString(const T* Source, const nlFont* pFont, T* p
     }
 
     *dest = 0;
+}
+
+inline unsigned long nlFont::GetStringWidth(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, bool SingleLine, unsigned long Width, bool WordWrap) const
+{
+    FontCharString fontText(Text.c_str(), this, (unsigned short*)0);
+    return GetStringWidth(fontText, SingleLine, Width, WordWrap);
+}
+
+inline unsigned long nlFont::fn_80305278(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, unsigned long Width, bool WordWrap) const
+{
+    FontCharString fontText(Text.c_str(), this, (unsigned short*)0);
+    return fn_80305278(fontText, Width, WordWrap);
 }
 
 #endif // NL_FONT_H

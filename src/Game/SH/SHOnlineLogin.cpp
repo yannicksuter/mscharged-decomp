@@ -32,25 +32,25 @@ SHOnlineLogin::SHOnlineLogin()
 
 SHOnlineLogin::~SHOnlineLogin()
 {
-    g_pNetworkSession->mLoginListener = 0;
+    g_pNetworkSession->SetLoginListener(0);
 }
 
 void SHOnlineLogin::SceneCreated()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     for (int i = 0; i < 4; ++i)
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
-    mLoginComponent = FEFinder<TLComponentInstance, 4>::Find(
-        presentation->m_currentSlide, InlineHasher("Layer"), InlineHasher("INVITATION"), InlineHasher("LOGIN"));
-    if (mLoginComponent == 0)
-        mLoginComponent = &UnidentifiedTLComponentDefault::sInstance;
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
+    mLoginComponent = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+        presentation->m_currentSlide, "Layer", "INVITATION", "LOGIN");
     mLoginComponent->SetActiveSlide("CONNECTING", false, false);
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
         scene->SetButtons(0, true);
-    g_pNetworkSession->mLoginListener = this;
+    g_pNetworkSession->SetLoginListener(this);
     FEAudio::PlayAnimAudioEvent(0x71D9CD2F, "FE_LOGIN", this, true);
 }
+
+static void CreateOnlineLoginErrorPopup(FEPopupMenu* menu, ePopupMenu popup, SHOnlineLogin* login);
 
 void SHOnlineLogin::Update(float fDeltaT)
 {
@@ -71,7 +71,7 @@ void SHOnlineLogin::Update(float fDeltaT)
                 mState = 1;
             }
         }
-        else if (slide->m_time >= slide->m_start + slide->m_duration)
+        else if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
             mSlideCompleteTime = mElapsedTime;
         break;
     }
@@ -90,7 +90,7 @@ void SHOnlineLogin::Update(float fDeltaT)
                 if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
                 {
                     FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-                    menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineLogin::OnErrorDismissed), this)));
+                    CreateOnlineLoginErrorPopup(menu, (ePopupMenu)popup, this);
                     mPopupActive = true;
                 }
                 mState = 7;
@@ -109,7 +109,7 @@ void SHOnlineLogin::Update(float fDeltaT)
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
             {
                 FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-                menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineLogin::OnErrorDismissed), this)));
+                CreateOnlineLoginErrorPopup(menu, (ePopupMenu)popup, this);
                 mPopupActive = true;
             }
             mState = 8;
@@ -122,6 +122,12 @@ void SHOnlineLogin::Update(float fDeltaT)
         GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_FORWARD, true);
         FEAudio::StopAnimAudioEvent(0x71D9CD2F, this);
         FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, true);
+        break;
+    case 4:
+    case 5:
+    case 7:
+    case 8:
+    case 9:
         break;
     }
 }
@@ -237,7 +243,7 @@ static OnlineErrorPopupRange sOnlineErrorPopupRanges[] = {
 
 int GetOnlineErrorPopup(int error, bool connected, int value)
 {
-    error = abs(error);
+    error = _abs(error);
     gOnlineErrorCode = error;
     bool found = false;
     for (int i = 0; i < 22; ++i)

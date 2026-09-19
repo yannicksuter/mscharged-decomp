@@ -44,6 +44,9 @@ struct AudioResourceLoadOwner
 };
 
 void UnloadAudioResource(AudioResourceLoadOwner* state);
+unsigned int FindAudioResourceCue(AudioResourceLoadOwner* state,
+    unsigned int field0, unsigned int field4,
+    unsigned int field8, unsigned int fieldC);
 void LoadAudioResource(AudioResourceLoadOwner* state,
     const char* name, AudioResourceLoadCallback field18,
     void* field1C, MemoryAllocator* allocator);

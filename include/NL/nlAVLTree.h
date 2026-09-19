@@ -90,6 +90,13 @@ public:
         }
     }
 
+    ValueType* FindGet(const KeyType& key) const
+    {
+        ValueType* foundValue;
+        Find(key, &foundValue, 0);
+        return foundValue;
+    }
+
     bool FindGet(const KeyType& key, ValueType** foundValue) const
     {
         Entry* node = (Entry*)FindAVLNode((AVLTreeNode*)m_Root, (void*)&key);
@@ -254,7 +261,8 @@ public:
 
     virtual AVLTreeNode* AllocateEntry(void* key, void* value)
     {
-        Entry* newNode = new (m_Allocator.Allocate()) Entry;
+        void* storage = m_Allocator.Allocate();
+        Entry* newNode = new (storage) Entry;
         newNode->node.left = 0;
         newNode->node.right = 0;
         newNode->node.heavy = 0;

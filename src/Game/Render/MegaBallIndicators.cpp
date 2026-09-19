@@ -425,15 +425,18 @@ float TestMegaBallIndicatorCollision(MegaBallIndicator* pState1,
     nlVector2 v2Rotated;
     v2Rotated.x = fCos * fDeltaX + fSin * fDeltaY;
     v2Rotated.y = fCos * fDeltaY - fSin * fDeltaX;
+    float fTargetWidth = pState2->mWidth * pState2->mScale;
+    float fIndicatorWidth = pState1->mWidth * pState1->mScale;
     nlVector2 v2LeftDelta;
     nlVec2Sub(v2LeftDelta, v2Left, v2Rotated);
     nlVector2 v2RightDelta;
     nlVec2Sub(v2RightDelta, v2Right, v2Rotated);
 
-    float fTargetWidth = pState2->mWidth * pState2->mScale;
-    float fIndicatorWidth = pState1->mWidth * pState1->mScale;
-    float fRadius = gMegaBallCollisionRadiusScale * fTargetWidth;
-    fRadius += 0.5f * fIndicatorWidth;
+    float fIndicatorRadius;
+    float fTargetRadius;
+    fTargetRadius = gMegaBallCollisionRadiusScale * fTargetWidth;
+    fIndicatorRadius = 0.5f * fIndicatorWidth;
+    float fRadius = fTargetRadius + fIndicatorRadius;
     float fRadiusSquared = fRadius * fRadius;
     float fLeftDistanceSquared = nlVec2LengthSquared(v2LeftDelta);
     float fRightDistanceSquared = nlVec2LengthSquared(v2RightDelta);

@@ -113,51 +113,57 @@ void NetworkStatsManager::Reset(bool)
     if (european)
     {
         int alternate = UsesEuropeanRankings() ? IsAlternateOnlineCountryGroup() : 0;
-        mPersistentCategories[0] = alternate == 1 ? 3 : 0;
-        mPersistentCategories[1] = alternate == 1 ? 4 : 1;
-        mPersistentCategories[2] = 2;
+        mPersistentCategories[0] =
+            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_3 : NETWORK_PERSISTENT_CATEGORY_0;
+        mPersistentCategories[1] =
+            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_4 : NETWORK_PERSISTENT_CATEGORY_1;
+        mPersistentCategories[2] = NETWORK_PERSISTENT_CATEGORY_2;
 
-        mCategories[0].mPersistentCategory = alternate == 1 ? 4 : 1;
+        mCategories[0].mPersistentCategory =
+            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_4 : NETWORK_PERSISTENT_CATEGORY_1;
         mCategories[0].mFilter = 0;
         mCategories[0].mResultType = 1;
-        mCategories[1].mPersistentCategory = alternate == 1 ? 4 : 1;
+        mCategories[1].mPersistentCategory =
+            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_4 : NETWORK_PERSISTENT_CATEGORY_1;
         mCategories[1].mFilter = 2;
         mCategories[1].mResultType = 1;
-        mCategories[2].mPersistentCategory = alternate == 1 ? 3 : 0;
+        mCategories[2].mPersistentCategory =
+            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_3 : NETWORK_PERSISTENT_CATEGORY_0;
         mCategories[2].mFilter = 0;
         mCategories[2].mResultType = 0;
-        mCategories[3].mPersistentCategory = alternate == 1 ? 3 : 0;
+        mCategories[3].mPersistentCategory =
+            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_3 : NETWORK_PERSISTENT_CATEGORY_0;
         mCategories[3].mFilter = 2;
         mCategories[3].mResultType = 0;
-        mCategories[4].mPersistentCategory = 2;
+        mCategories[4].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_2;
         mCategories[4].mFilter = 1;
         mCategories[4].mResultType = 2;
-        mCategories[5].mPersistentCategory = 2;
+        mCategories[5].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_2;
         mCategories[5].mFilter = 1;
         mCategories[5].mResultType = 2;
     }
     else
     {
-        mPersistentCategories[0] = 0;
-        mPersistentCategories[1] = 1;
-        mPersistentCategories[2] = 2;
+        mPersistentCategories[0] = NETWORK_PERSISTENT_CATEGORY_0;
+        mPersistentCategories[1] = NETWORK_PERSISTENT_CATEGORY_1;
+        mPersistentCategories[2] = NETWORK_PERSISTENT_CATEGORY_2;
 
-        mCategories[0].mPersistentCategory = 1;
+        mCategories[0].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_1;
         mCategories[0].mFilter = 0;
         mCategories[0].mResultType = 1;
-        mCategories[1].mPersistentCategory = 1;
+        mCategories[1].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_1;
         mCategories[1].mFilter = 2;
         mCategories[1].mResultType = 1;
-        mCategories[2].mPersistentCategory = 0;
+        mCategories[2].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_0;
         mCategories[2].mFilter = 0;
         mCategories[2].mResultType = 0;
-        mCategories[3].mPersistentCategory = 0;
+        mCategories[3].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_0;
         mCategories[3].mFilter = 2;
         mCategories[3].mResultType = 0;
-        mCategories[4].mPersistentCategory = 0;
+        mCategories[4].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_0;
         mCategories[4].mFilter = 1;
         mCategories[4].mResultType = 0;
-        mCategories[5].mPersistentCategory = 0;
+        mCategories[5].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_0;
         mCategories[5].mFilter = 1;
         mCategories[5].mResultType = 0;
     }

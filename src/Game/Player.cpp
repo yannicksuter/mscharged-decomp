@@ -561,6 +561,7 @@ bool cPlayer::IsOnSameTeam(cPlayer* other)
 
 void cPlayer::PickupBall(cBall* pBall)
 {
+    ReceiveBallData data;
     if (!(m_eClassType == GOALIE && ((Goalie*)this)->mbNoUserControl)
         && GetGlobalPad() == NULL)
     {
@@ -581,15 +582,15 @@ void cPlayer::PickupBall(cBall* pBall)
                 {
                     if (closest != NULL)
                     {
-                        nlVector2 delta;
-                        nlVec2Sub(delta, *(const nlVector2*)&player->mUnidentified024.m_v3Position, *(const nlVector2*)&mUnidentified024.m_v3Position);
-                        float distSq = nlVec2LengthSquared(delta);
-                        bool bPassTarget = (g_pBall->meBallState == 5 || g_pBall->meBallState == 3)
-                                        && g_pBall->m_pPassTarget != NULL;
+                        float distSq = nlVec3DistanceSquared2D(
+                            player->mUnidentified024.m_v3Position,
+                            mUnidentified024.m_v3Position);
+                        bool bPassTarget = g_pBall->UnidentifiedPassState()
+                            && g_pBall->m_pPassTarget != NULL;
                         if ((bPassTarget && closest == g_pBall->m_pPrevOwner) || distSq < bestDistSq)
                         {
-                            bool bPlayerPassTarget = (g_pBall->meBallState == 5 || g_pBall->meBallState == 3)
-                                                  && g_pBall->m_pPassTarget != NULL;
+                            bool bPlayerPassTarget = g_pBall->UnidentifiedPassState()
+                                && g_pBall->m_pPassTarget != NULL;
                             if (!bPlayerPassTarget || player != g_pBall->m_pPrevOwner)
                             {
                                 bestDistSq = distSq;
@@ -615,7 +616,6 @@ void cPlayer::PickupBall(cBall* pBall)
             closest->SetAIPad(NULL);
         }
     }
-    ReceiveBallData data;
     data.pReceiver = this;
     data.eResult = RECEIVEBALL_LOOSE_PICKUP;
     if (pBall->m_pPassTarget != NULL)
@@ -1183,15 +1183,13 @@ bool cPlayer::CanPickupBall(cBall* pBall, bool bParam)
         return false;
     bool result = false;
     float fMaxPickupSpeed = 15.0f;
-    float fSpeedSquared = pBall->m_v3Velocity.x * pBall->m_v3Velocity.x
-                        + pBall->m_v3Velocity.y * pBall->m_v3Velocity.y
-                        + pBall->m_v3Velocity.z * pBall->m_v3Velocity.z;
+    float fSpeedSquared = pBall->m_v3Velocity.GetLengthSq3D();
     if (bParam)
     {
         fMaxPickupSpeed = 50.0f;
     }
     if (pBall->m_pOwner == NULL && pBall->m_tNoPickupTimer.m_uPackedTime == 0
-        && fSpeedSquared <= fMaxPickupSpeed * fMaxPickupSpeed
+        && fSpeedSquared <= nlGetLengthSquared1D(fMaxPickupSpeed)
         && mUnidentified1E4.m_tNoPickupTimer.m_uPackedTime == 0)
     {
         float fPlayerRadius = 0.0f;

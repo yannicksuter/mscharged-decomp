@@ -167,7 +167,10 @@ void DrawableBulletBill::Render(const BulletBillObject* object) const
         nlVec3Scale(*(nlVector3*)matrix.e2[2], mScale);
     }
 
-    matrix.SetRow4_(3, mPosition.x, mPosition.y, mPosition.z, 1.0f);
+    matrix.m41 = mPosition.x;
+    matrix.m42 = mPosition.y;
+    matrix.m43 = mPosition.z;
+    matrix.m44 = 1.0f;
 
     drawable->SetWorldMatrix(&matrix);
     drawable->V8(GetLayerView(eCLV_MoreCharacters));

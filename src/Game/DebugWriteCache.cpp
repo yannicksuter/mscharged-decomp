@@ -17,16 +17,6 @@ struct DebugWriteRecordHeader
     /* 0x6 */ u16 mMarker;
 }; // size: 0x8
 
-static inline u16 GetAlignedRecordSize(u16 size)
-{
-    u16 remainder = size % 4;
-    if (remainder == 0)
-    {
-        return size;
-    }
-    return size + (4 - remainder);
-}
-
 static inline DebugWriteBuffer* GetCurrentDebugBuffer(
     DebugWriteCache* cache)
 {
@@ -204,22 +194,31 @@ void DebugWriteCache::WriteText(const char* value)
         return;
     }
 
-    u16 size = nlStrLen(value) + 1;
+    unsigned long length = nlStrLen(value);
     DebugWriteRecordHeader header;
     header.mType = 0xFFFE;
-    header.mSize = size;
-    header.mPaddedSize = GetAlignedRecordSize(size);
+    header.mSize = length + 1;
     header.mMarker = 0xDADA;
+    u16 dataSize = length + 1;
+    u16 remainder = dataSize % 4;
+    if (remainder == 0)
+    {
+        header.mPaddedSize = dataSize;
+    }
+    else
+    {
+        header.mPaddedSize = dataSize + (4 - remainder);
+    }
 
-    if (buffer->mCurrent + sizeof(header) + size
+    if (buffer->mCurrent + sizeof(header) + (u16)(length + 1)
         < buffer->mData + buffer->mSize)
     {
         memcpy(buffer->mCurrent, &header, sizeof(header));
         buffer->mCurrent += sizeof(header);
-        memcpy(buffer->mCurrent, value, size);
-        buffer->mCurrent += size;
+        memcpy(buffer->mCurrent, value, (u16)(length + 1));
+        buffer->mCurrent += (u16)(length + 1);
 
-        for (u16 i = header.mSize; i < header.mPaddedSize; ++i)
+        for (int i = header.mSize; i < header.mPaddedSize; ++i)
         {
             *buffer->mCurrent++ = 0;
         }
@@ -233,24 +232,36 @@ void* DebugWriteCache::WriteData(u16 type, void* value, unsigned int size)
     DebugWriteRecordHeader header;
     header.mType = type;
     header.mSize = size;
-    header.mPaddedSize = GetAlignedRecordSize(size);
     header.mMarker = 0xDADA;
+    u16 dataSize = size;
+    u16 remainder = dataSize % 4;
+    if (remainder == 0)
+    {
+        header.mPaddedSize = dataSize;
+    }
+    else
+    {
+        header.mPaddedSize = dataSize + (4 - remainder);
+    }
 
+    void* result;
     if (buffer->mCurrent + sizeof(header) + (u16)size
         >= buffer->mData + buffer->mSize)
     {
-        return 0;
+        result = 0;
     }
-
-    memcpy(buffer->mCurrent, &header, sizeof(header));
-    buffer->mCurrent += sizeof(header);
-    void* result = buffer->mCurrent;
-    memcpy(buffer->mCurrent, value, (u16)size);
-    buffer->mCurrent += (u16)size;
-
-    for (u16 i = header.mSize; i < header.mPaddedSize; ++i)
+    else
     {
-        *buffer->mCurrent++ = 0;
+        memcpy(buffer->mCurrent, &header, sizeof(header));
+        buffer->mCurrent += sizeof(header);
+        result = buffer->mCurrent;
+        memcpy(buffer->mCurrent, value, (u16)size);
+        buffer->mCurrent += (u16)size;
+
+        for (int i = header.mSize; i < header.mPaddedSize; ++i)
+        {
+            *buffer->mCurrent++ = 0;
+        }
     }
     return result;
 }
@@ -261,6 +272,7 @@ void DebugWriteCache::ChecksumData(u16 type,
     DebugWriteType* entry = &mTypes[type];
     if (entry->mKind == 1)
     {
+        u16 count = entry->mData.mComposite.mFieldCount;
         DebugWriteField* field;
         if (entry->mData.mComposite.mLastField == 0)
         {
@@ -271,14 +283,11 @@ void DebugWriteCache::ChecksumData(u16 type,
             field = entry->mData.mComposite.mLastField->mNext;
         }
 
-        u16 count = entry->mData.mComposite.mFieldCount;
         while (count != 0)
         {
-            u16 size = field->mSize;
-            if (field->mCount != 0)
-            {
-                size *= field->mCount;
-            }
+            u16 size = field->mCount == 0
+                ? field->mSize
+                : field->mSize * field->mCount;
             ((RunningChecksum*)context)->ChecksumData(
                 (const u8*)value + field->mOffset, size);
             field = field->mNext;
@@ -287,11 +296,9 @@ void DebugWriteCache::ChecksumData(u16 type,
     }
     else if (entry->mKind == 2)
     {
-        u16 size = entry->mData.mScalar.mSize;
-        if (entry->mData.mScalar.mCount != 0)
-        {
-            size *= entry->mData.mScalar.mCount;
-        }
+        u16 size = entry->mData.mScalar.mCount == 0
+            ? entry->mData.mScalar.mSize
+            : entry->mData.mScalar.mSize * entry->mData.mScalar.mCount;
         ((RunningChecksum*)context)->ChecksumData(value, size);
     }
 }

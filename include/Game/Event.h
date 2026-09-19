@@ -265,6 +265,7 @@ protected:
     void UnidentifiedDeleteListener(Listener* listener);
     void UnidentifiedRestartAt(nlDLListIterator<Listener>& iterator, ListenerEntry* current);
 
+public:
     // The listener list runs a single Clear()/FreeBlocks() teardown, so it is
     // the plain container rather than nlDLListSlotPool, whose destructor tears
     // down twice (see Game/Render/ImpostorCharacter.cpp). Its adapter is the

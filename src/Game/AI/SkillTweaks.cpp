@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include "NL/nlBasicString.inl"
 #include <string.h>
 
 #include "Game/AI/SkillTweaks.h"
@@ -433,8 +432,9 @@ SkillTweakCopier::SkillTweakCopier(SkillTweaks* tweaks, Config* config)
 void SkillTweakCopier::Copy(const unsigned long& key, SkillTweak** value)
 {
     SkillTweak* tweak;
+    unsigned long hash = (*value)->mHash;
     SkillTweak** foundValue;
-    bool found = mTweaks->mSkillTweaksList.FindGet((*value)->mHash, &foundValue);
+    bool found = mTweaks->mSkillTweaksList.FindGet(hash, &foundValue);
     if (found)
         tweak = *foundValue;
     if (found)
@@ -464,8 +464,9 @@ SkillTweak* SkillTweaks::AddTweak(const char* name)
     }
     else
     {
+        unsigned long hash = nlStringLowerHash(name);
         SkillTweak** found;
-        if (sDefaultSkillTweaks.FindGet(nlStringLowerHash(name), &found))
+        if (sDefaultSkillTweaks.FindGet(hash, &found))
             defaultTweak = *found;
     }
     if (defaultTweak != 0)

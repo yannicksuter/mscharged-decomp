@@ -3,7 +3,7 @@
 #include "Game/SH/SHOnlinePlayerCount.h"
 #include "Game/DB/GameProgress.h"
 #include "Game/FE/FEAudio.h"
-#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/feScene.h"
@@ -60,23 +60,12 @@ void SHOnlinePlayerCount::SceneCreated()
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    if (mButtonCount > 0)
+    for (int i = 0; i < mButtonCount; ++i)
     {
-        const char* groupName = "Group";
-        const char* layerName = "Layer";
-        for (int i = 0; i < mButtonCount; ++i)
-        {
-            char name[6];
-            nlSNPrintf(name, sizeof(name), "BTN_%d", i);
-            TLComponentInstance* button = FEFinder<TLComponentInstance, 4>::Find(
-                    presentation->m_currentSlide, nlStringLowerHash(layerName),
-                    nlStringLowerHash(groupName), nlStringLowerHash(name), 0, 0, 0);
-            if (button == 0)
-            {
-                button = &UnidentifiedTLComponentDefault::sInstance;
-            }
-            mButtonInstances[i] = button;
-        }
+        char name[6];
+        nlSNPrintf(name, sizeof(name), "BTN_%d", i);
+        mButtonInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(
+            presentation->m_currentSlide, "Layer", "Group", name);
     }
 
     SHNavigation* scene = GetNavigationScene();
@@ -360,4 +349,3 @@ static TweakIntBinding sTournamentLowBoundTweak(
     "s_nTournamentLowBound", "Network/DWCLobby", &s_nTournamentLowBound, true);
 static TweakIntBinding sTournamentHiBoundTweak(
     "s_nTournamentHiBound", "Network/DWCLobby", &s_nTournamentHiBound, true);
-

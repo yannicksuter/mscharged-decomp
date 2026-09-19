@@ -25,6 +25,7 @@ struct FEPageControls
     void SetButtonState(int direction, bool enabled, bool visible);
     void InitializeButtons();
     void ClearButtonHighlight(int index);
+    void UpdateButton(int index);
 
     /* 0x004 */ bool mInitialized;
     /* 0x005 */ bool mPointerPressed[2];

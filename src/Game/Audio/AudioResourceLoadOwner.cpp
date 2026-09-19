@@ -85,8 +85,9 @@ void UnloadAudioResource(AudioResourceLoadOwner* state)
     PopAllocator();
 }
 
-u32 FindAudioResourceCue(AudioResourceLoadOwner* state,
-    u32 field0, u32 field4, u32 field8, u32 fieldC)
+unsigned int FindAudioResourceCue(AudioResourceLoadOwner* state,
+    unsigned int field0, unsigned int field4,
+    unsigned int field8, unsigned int fieldC)
 {
     if (state->m_Completed)
         return state->m_SoundMap->FindCue(

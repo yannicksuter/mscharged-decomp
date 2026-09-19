@@ -116,7 +116,7 @@ extern "C"
     void fn_801BFB08();
     void fn_8013D7A0();
     void fn_8013D7E0();
-    void fn_80272AB4();
+    void SetupViews();
     void OSYieldThread();
 }
 
@@ -466,7 +466,7 @@ static void Initialize()
     AddTasks();
     nlFlashInitialize();
     nlInitFileCache();
-    fn_80272AB4();
+    SetupViews();
     Wiper::Instance().Initialize();
     InitializeParticleUpdateCallbacks();
     Detail::sTempStringAllocatorPool.allocator.pool.PushState();

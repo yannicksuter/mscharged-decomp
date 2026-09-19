@@ -197,26 +197,37 @@ SSearchOpenLane::SSearchOpenLane(cPlayer* pPlayer1, cPlayer* pPlayer2)
 {
     if (pPlayer2 != NULL)
     {
-        m_pBallOwner = pPlayer1;
-        m_pPassTarget = pPlayer2;
-        m_bOtherPosIsTarget = false;
-
-        if (pPlayer1 != NULL)
-        {
-            m_v3OtherPos = pPlayer1->mUnidentified024.m_v3Position;
-        }
-        else
-        {
-            m_v3OtherPos = g_pBall->m_v3Position;
-        }
+        InitializeForPass(pPlayer1, pPlayer2);
     }
     else
     {
-        m_pBallOwner = pPlayer1;
-        m_pPassTarget = NULL;
-        m_v3OtherPos = pPlayer1->GetAIOffNetLocation(NULL);
-        m_bOtherPosIsTarget = true;
+        InitializeForShot(pPlayer1);
     }
+}
+
+void SSearchOpenLane::InitializeForPass(
+    cPlayer* pBallOwner, cPlayer* pPassTarget)
+{
+    m_pBallOwner = pBallOwner;
+    m_pPassTarget = pPassTarget;
+    m_bOtherPosIsTarget = false;
+
+    if (pBallOwner != NULL)
+    {
+        m_v3OtherPos = pBallOwner->mUnidentified024.m_v3Position;
+    }
+    else
+    {
+        m_v3OtherPos = g_pBall->m_v3Position;
+    }
+}
+
+void SSearchOpenLane::InitializeForShot(cPlayer* pBallOwner)
+{
+    m_pBallOwner = pBallOwner;
+    m_pPassTarget = NULL;
+    m_v3OtherPos = pBallOwner->GetAIOffNetLocation(NULL);
+    m_bOtherPosIsTarget = true;
 }
 
 /**

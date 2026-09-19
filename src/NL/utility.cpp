@@ -15,9 +15,9 @@ void SolveQuadratic(float a, float b, float c, int& numRoots, float& x1,
     float absA = (float)fabs(a);
     float absB = (float)fabs(b);
     float absC = (float)fabs(c);
+    float p;
     float q;
     float r;
-    float p;
 
     if (absA < 1e-10f && absB < 1e-10f)
     {

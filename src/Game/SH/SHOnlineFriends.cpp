@@ -1,5 +1,4 @@
 #include <dwc/dwc_account.h>
-#include "NL/nlBasicString.inl"
 #include <dwc/dwc_friend.h>
 #include "Game/main.h"
 #include "Game/SH/SHOnlineFriends.h"

@@ -20,6 +20,7 @@ public:
     void fn_801D22C8(int index, void* context);
     void fn_801D2478(int index, void* context);
     void fn_801D24EC(int index, void* context);
+    void UnidentifiedInitializeControls();
 
     /* 0x01C */ float m_fTimeElapsed;
     /* 0x020 */ u8 mUnidentified20[4];

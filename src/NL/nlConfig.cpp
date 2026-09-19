@@ -7,7 +7,6 @@
 #include "ctype.h"
 #include "cstring"
 #include "NL/nlstring_tmpl.h"
-#include "NL/nlBasicString.inl"
 
 extern "C" double atof(const char* string);
 typedef Config::String BString;

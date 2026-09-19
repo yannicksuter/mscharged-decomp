@@ -31,11 +31,11 @@ void fn_80273A4C(eCLV, const glModel*, unsigned long);
 }
 
 
-int fn_802721BC();
-void fn_802721C4(int partition, bool enabled);
-GLView* fn_802721EC(int partition);
-u32 fn_80272200(int partition);
-void fn_80272214(int partition, const nlMatrix4& view,
+int GetShadowPartitionCount();
+void SetShadowPartitionEnabled(int partition, bool enabled);
+GLView* GetShadowPartitionView(int partition);
+u32 GetShadowPartitionTexture(int partition);
+void SetShadowPartitionCamera(int partition, const nlMatrix4& view,
     const nlMatrix4& projection);
 extern "C" void fn_80184C3C(
     GLView* pView, const ProjectedShadowParams& params);
@@ -272,9 +272,9 @@ static void DrawBallShadow(
 void ClearCharacterShadowsUpdated()
 {
     int shadowIndex;
-    for (shadowIndex = 0; shadowIndex < fn_802721BC(); shadowIndex++)
+    for (shadowIndex = 0; shadowIndex < GetShadowPartitionCount(); shadowIndex++)
     {
-        fn_802721C4(shadowIndex, false);
+        SetShadowPartitionEnabled(shadowIndex, false);
     }
 }
 
@@ -437,9 +437,7 @@ static void RenderBlobShadow(const nlVector3& vPosition,
     unsigned long texture;
 
     nlVector3 sp10;
-    sp10.z = g_AntiFlimmer;
-    sp10.y = vPosition.y;
-    sp10.x = vPosition.x;
+    nlVec3Set(sp10, vPosition.x, vPosition.y, g_AntiFlimmer);
 
     if (pColour == 0)
     {
@@ -456,21 +454,15 @@ static void RenderBlobShadow(const nlVector3& vPosition,
     if (pPoints == 0)
     {
         texture = glGetTexture("global/shadeblob");
-        float hw = half_w;
-        float hh = half_h;
 
-        quad.m_pos[0].x = sp10.x - hw;
-        quad.m_pos[0].y = sp10.y - hh;
-        quad.m_pos[0].z = sp10.z;
-        quad.m_pos[1].x = sp10.x - hw;
-        quad.m_pos[1].y = sp10.y + hh;
-        quad.m_pos[1].z = sp10.z;
-        quad.m_pos[2].x = sp10.x + hw;
-        quad.m_pos[2].y = sp10.y + hh;
-        quad.m_pos[2].z = sp10.z;
-        quad.m_pos[3].x = sp10.x + hw;
-        quad.m_pos[3].y = sp10.y - hh;
-        quad.m_pos[3].z = sp10.z;
+        nlVec3Set(quad.m_pos[0],
+            sp10.x - half_w, sp10.y - half_h, sp10.z);
+        nlVec3Set(quad.m_pos[1],
+            sp10.x - half_w, sp10.y + half_h, sp10.z);
+        nlVec3Set(quad.m_pos[2],
+            sp10.x + half_w, sp10.y + half_h, sp10.z);
+        nlVec3Set(quad.m_pos[3],
+            sp10.x + half_w, sp10.y - half_h, sp10.z);
 
         quad.m_uv[0].x = 1.0f;
         quad.m_uv[0].y = 1.0f;
@@ -483,7 +475,7 @@ static void RenderBlobShadow(const nlVector3& vPosition,
     }
     else
     {
-        texture = fn_80272200(index);
+        texture = GetShadowPartitionTexture(index);
 
         quad.m_pos[0] = pPoints[0];
         quad.m_pos[1] = pPoints[1];
@@ -561,41 +553,44 @@ static void RenderBlobShadow(const nlVector3& vPosition,
 
 void RenderCharacterIntoTexture(const ProjectedShadowParams& params)
 {
-    nlVector3 targetPos;
-    nlVector3 eyePos;
-    nlVector3 shadowPos;
     nlVector3 up = { 0.0f, 0.0f, 1.0f };
+    nlVector3 targetPos;
+    nlVector3 viewDir;
+    nlVector3 eyePos;
+    nlVector3 vTemp;
+    nlVector3 vDir;
+    nlVector3 shadowPos;
+    nlVector3 vLight;
 
     targetPos = params.vPosition;
     targetPos.z += 0.5f * params.fHeight;
 
     if (g_bShadowPositionOverride)
     {
-        float y;
         float z;
+        float y;
         float x;
-        y = lbl_806DCCA8;
         z = lbl_806DCCAC;
+        y = lbl_806DCCA8;
         x = lbl_806DCCA4;
         nlVec3Set(shadowPos, x, y, z);
     }
     else
     {
-        float y;
         float z;
+        float y;
         float x;
-        y = params.vLight.y;
         z = params.vLight.z;
+        y = params.vLight.y;
         x = params.vLight.x;
         nlVec3Set(shadowPos, x, y, z);
     }
 
-    nlVector3 vDir;
-    nlVec3Set(vDir, -shadowPos.x, -shadowPos.y, -shadowPos.z);
-    nlVec3Scale(vDir, nlRecipSqrt(vDir.GetLengthSq3D(), false));
-    nlVec3Set(vDir, -vDir.x, -vDir.y, -vDir.z);
+    nlVec3Set(viewDir, -shadowPos.x, -shadowPos.y, -shadowPos.z);
+    nlVec3Scale(viewDir, nlRecipSqrt(viewDir.GetLengthSq3D(), false));
+    nlVec3Set(viewDir, -viewDir.x, -viewDir.y, -viewDir.z);
 
-    nlVec3ScaleAdd(eyePos, 8.0f, vDir, targetPos);
+    nlVec3ScaleAdd(eyePos, 8.0f, viewDir, targetPos);
 
     nlMatrix4 view;
     glMatrixLookAt(view, eyePos, targetPos, up);
@@ -604,42 +599,40 @@ void RenderCharacterIntoTexture(const ProjectedShadowParams& params)
     float radius = 2.0f * params.fRadius;
     glMatrixOrthographicCentered(projection, radius, radius, 4.0f, 12.0f);
 
-    fn_80272214(params.nPartitionIndex, view, projection);
-    fn_802721C4(params.nPartitionIndex, true);
-    fn_80184C3C(fn_802721EC(params.nPartitionIndex), params);
-    fn_802721EC(params.nPartitionIndex)->AttachModel(params.pModel, 0);
+    SetShadowPartitionCamera(params.nPartitionIndex, view, projection);
+    SetShadowPartitionEnabled(params.nPartitionIndex, true);
+    fn_80184C3C(GetShadowPartitionView(params.nPartitionIndex), params);
+    GetShadowPartitionView(params.nPartitionIndex)->AttachModel(params.pModel, 0);
 
     if (g_bShadowBounds)
     {
         GLView* unknownView = g_ShapeRenderer.m_eView;
-        g_ShapeRenderer.m_eView = fn_802721EC(params.nPartitionIndex);
+        g_ShapeRenderer.m_eView = GetShadowPartitionView(params.nPartitionIndex);
 
-        nlVector3 vTemp = params.vPosition;
+        vTemp = params.vPosition;
         vTemp.z += 0.5f * params.fHeight;
 
-        nlVector3 vLight;
         if (g_bShadowPositionOverride)
         {
-            float y;
             float z;
+            float y;
             float x;
-            y = lbl_806DCCA8;
             z = lbl_806DCCAC;
+            y = lbl_806DCCA8;
             x = lbl_806DCCA4;
             nlVec3Set(vLight, x, y, z);
         }
         else
         {
-            float y;
             float z;
+            float y;
             float x;
-            y = params.vLight.y;
             z = params.vLight.z;
+            y = params.vLight.y;
             x = params.vLight.x;
             nlVec3Set(vLight, x, y, z);
         }
 
-        nlVector3 vDir;
         nlVec3Set(vDir, -vLight.x, -vLight.y, -vLight.z);
         nlVec3Scale(vDir, nlRecipSqrt(vDir.GetLengthSq3D(), false));
 

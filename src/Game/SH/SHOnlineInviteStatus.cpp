@@ -35,18 +35,27 @@ SHOnlineInviteStatus::~SHOnlineInviteStatus()
 {
 }
 
+inline bool SHOnlineInviteStatus::CanCancel()
+{
+    if (mStatus != 1)
+        return false;
+    NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
+    if (lobby != 0)
+    {
+        if (lobby->CanCancelMatchmaking())
+            return true;
+    }
+    return false;
+}
+
 void SHOnlineInviteStatus::SceneCreated()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLTextInstance* title = FEFinder<TLTextInstance, 3>::Find<>(mPresentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("INVITATION"), InlineHasher("TITLE"));
-    if (title == 0)
-        title = &UnidentifiedTLTextDefault::sInstance;
+    TLTextInstance* title = FEFinder<TLTextInstance, 3>::FindOrDefault<>(
+        mPresentation->m_currentSlide, "Layer", "INVITATION", "TITLE");
     title->SetStringId("ONLINE_INVITATION_TITLE");
-    mStatusInstance = FEFinder<TLComponentInstance, 4>::Find<>(presentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("INVITATION"), InlineHasher("LOGIN"));
-    if (mStatusInstance == 0)
-        mStatusInstance = &UnidentifiedTLComponentDefault::sInstance;
+    mStatusInstance = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(
+        presentation->m_currentSlide, "Layer", "INVITATION", "LOGIN");
     switch (mStatus)
     {
     case 1:
@@ -55,9 +64,8 @@ void SHOnlineInviteStatus::SceneCreated()
     case 2:
     {
         mStatusInstance->SetActiveSlide("DECLINED", false, false);
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(mStatusInstance->GetActiveSlide(), InlineHasher("INVITE"));
-        if (text == 0)
-            text = &UnidentifiedTLTextDefault::sInstance;
+        TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault<>(
+            mStatusInstance->GetActiveSlide(), "INVITE");
         text->SetStringId("LOC_ONLINE_CANCELED_INVITATION");
         break;
     }
@@ -69,13 +77,10 @@ void SHOnlineInviteStatus::SceneCreated()
         break;
     }
     SHNavigation* scene = GetNavigationScene();
-    bool canCancel = false;
-    if (mStatus == 1)
-    {
-        NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
-        canCancel = lobby != 0 && lobby->CanCancelMatchmaking();
-    }
-    mCanCancel = canCancel;
+    if (CanCancel())
+        mCanCancel = true;
+    else
+        mCanCancel = false;
     if (mCanCancel)
     {
         mBackButton.SetBackScene(g_pFriendManager->mReturnScene);
@@ -89,7 +94,20 @@ void SHOnlineInviteStatus::SceneCreated()
     else
         mBackButton.Disable();
     for (int i = 0; i < 4; ++i)
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
+}
+
+inline void SHOnlineInviteStatus::ShowConnectionError()
+{
+    FEPopupMenu* menu;
+    int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 0x5B);
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    {
+        menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        menu->Create((ePopupMenu)popup,
+            Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInviteStatus::OnConnectionErrorDismissed), this)));
+        mPopupActive = true;
+    }
 }
 
 void SHOnlineInviteStatus::Update(float fDeltaT)
@@ -109,9 +127,8 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
             mReturnDelay = 2.0f;
             mElapsedTime = 0.0f;
             mStatusInstance->SetActiveSlide("DECLINED", false, false);
-            TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(mStatusInstance->GetActiveSlide(), InlineHasher("INVITE"));
-            if (text == 0)
-                text = &UnidentifiedTLTextDefault::sInstance;
+            TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault<>(
+                mStatusInstance->GetActiveSlide(), "INVITE");
             text->SetStringId("LOC_ONLINE_CANCELED_INVITATION");
         }
         else if (gOnlineFourMachineFriendLobby && lobby->AreAllConnectionsReady())
@@ -137,23 +154,18 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
         {
             for (int i = 0; i < 4; ++i)
             {
+                TLComponentInstance* pointer = GetPointerInstance(i);
                 if ((unsigned int)i == gFEControllerIndex)
-                    gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+                    pointer->SetActiveSlide("cursor", true, false);
                 else
-                    gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+                    pointer->SetActiveSlide("waiting", true, false);
             }
         }
         mPointersInitialized = true;
     }
     if (mCanCancel)
     {
-        bool canCancel = false;
-        if (mStatus == 1)
-        {
-            NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
-            canCancel = lobby != 0 && lobby->CanCancelMatchmaking();
-        }
-        if (!canCancel)
+        if (!CanCancel())
         {
             GetNavigationScene()->SetButtons(0, true);
             mBackButton.Disable();
@@ -162,13 +174,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
     }
     else
     {
-        bool canCancel = false;
-        if (mStatus == 1)
-        {
-            NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
-            canCancel = lobby != 0 && lobby->CanCancelMatchmaking();
-        }
-        if (canCancel)
+        if (CanCancel())
         {
             GetNavigationScene()->SetButtons(4, true);
             mBackButton.Enable();
@@ -186,7 +192,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
         if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
             g_pFriendManager->SetOwnStatusAvailable();
-            NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
+            lobby = g_pNetworkSession->GetOnlineLobby();
             if (lobby != 0 && lobby->CanCancelMatchmaking())
                 lobby->CancelMatchmaking();
             return;
@@ -196,13 +202,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
     {
         if (g_pNetworkSession->RequiresDisconnectAfterError())
         {
-            int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 0x5B);
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
-            {
-                FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-                menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInviteStatus::OnConnectionErrorDismissed), this)));
-                mPopupActive = true;
-            }
+            ShowConnectionError();
         }
         else
         {

@@ -112,9 +112,10 @@ void RLGReader::HandleUnknownChunk(nlChunk* chunk)
 static void FixupModelData(RLGReader* reader)
 {
     glModelPacket* packets = (glModelPacket*)reader->m_pPackets;
+    unsigned char* pStreamData = (unsigned char*)reader->m_pStreamData;
     glModel* model = reader->m_pModels;
     for (unsigned long modelIndex = 0; modelIndex < reader->m_nModels;
-        ++modelIndex, ++model)
+        ++model, ++modelIndex)
     {
         model->packets = packets;
         packets += model->numPackets;
@@ -125,10 +126,10 @@ static void FixupModelData(RLGReader* reader)
             glModelPacket* packet = &model->packets[packetIndex];
             packet->materialParameters = (unsigned char*)reader->m_pParameterData
                               + (unsigned long)packet->materialParameters;
-            packet->streams = (glModelStream*)((unsigned char*)reader->m_pStreamData
-                                               + (unsigned long)packet->streams);
-            packet->indexBuffer = (unsigned short*)((unsigned char*)reader->m_pIndexData
-                                                    + (unsigned long)packet->indexBuffer);
+            packet->streams = (glModelStream*)((unsigned long)packet->streams
+                                               + (unsigned long)pStreamData);
+            packet->indexBuffer = (unsigned short*)((unsigned long)packet->indexBuffer
+                                                    + (unsigned long)reader->m_pIndexData);
             packet->matrix = (unsigned long)reader->m_pMatrices
                            + packet->matrix * 64;
 
@@ -136,8 +137,8 @@ static void FixupModelData(RLGReader* reader)
                 ++streamIndex)
             {
                 glModelStream* stream = &packet->streams[streamIndex];
-                stream->address = (unsigned char*)reader->m_pVertexData
-                                + (unsigned long)stream->address;
+                stream->address = (unsigned char*)((unsigned long)stream->address
+                                + (unsigned long)reader->m_pVertexData);
             }
         }
     }

@@ -11,6 +11,11 @@ class EmissionController;
 
 typedef DrawableObject RenderObject;
 
+// DrawableBulletBill reads this object through const pointers. R4QE01 keeps
+// its drawable load below Render's callee saves, which GC/3.0a5 emits only
+// when the pointed-to type has a mutable non-pointer member. The stripped DOL
+// cannot identify which member carried the qualifier; active is the state the
+// const snapshot readers consume.
 struct BulletBillObject
 {
     BulletBillObject(RenderObject* pDrawable, u32 nIndex, float radius, float parameter);
@@ -28,7 +33,7 @@ struct BulletBillObject
     /* 0x2C */ float scale;
     /* 0x30 */ float targetScale;
     /* 0x34 */ float scaleTimer;
-    /* 0x38 */ bool active;
+    /* 0x38 */ mutable bool active;
     /* 0x39 */ u8 padding_39[3];
     /* 0x3C */ PhysicsObject* physics;
     /* 0x40 */ RenderObject* drawable;

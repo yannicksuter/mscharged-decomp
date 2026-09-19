@@ -413,9 +413,8 @@ void CreateCrowdLayoutObject()
 
 void SetCrowdModelTexture(u32 hash, unsigned long texture)
 {
-    DLListEntry<WorldListObject0_80340AC8*>* head
-        = BasicStadium::GetCurrentStadium()->m_objectList0.m_Head;
-    nlDLListIterator<WorldListObject0_80340AC8*> iterator(head, nlDLRingGetStart(head));
+    nlDLListIterator<WorldListObject0_80340AC8*> iterator
+        = BasicStadium::GetCurrentStadium()->m_objectList0.Begin();
     unsigned long textureIndex = glGetTextureManager()->GetTextureIndex(texture);
 
     for (; iterator.hasNext(); iterator.next())
@@ -428,7 +427,10 @@ void SetCrowdModelTexture(u32 hash, unsigned long texture)
                  pPacket < pGlModel->packets + pGlModel->numPackets;
                  ++pPacket)
             {
-                if (glGetMaterialUnsignedParameter(pPacket, gDiffuseTextureSemantic) == hash)
+                unsigned long packetTexture
+                    = glGetMaterialUnsignedParameter(
+                        pPacket, gDiffuseTextureSemantic);
+                if (packetTexture == hash)
                 {
                     glSetMaterialTextureParameter(pPacket, gDiffuseTextureSemantic, texture);
                     unsigned long resolvedTexture = textureIndex;

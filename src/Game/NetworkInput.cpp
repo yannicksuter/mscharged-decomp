@@ -238,29 +238,27 @@ u8 NetMessageInput::GetNetworkInputMessagePlayerState(s8 player)
 void NetMessageInput::SetNetworkInputMessageRecord(s8 player, const PackedDetInput* record)
 {
     const u8* source = (const u8*)record;
-    u8* previous = mUnidentified01C[player].mData;
-    u8& changes = mUnidentified018[player];
 
-    if (*(const u16*)(source + 0) != *(u16*)(previous + 0))
-        changes |= 2;
-    if ((s8)source[12] != (s8)previous[12]
-        || (s8)source[13] != (s8)previous[13])
-        changes |= 4;
-    if ((s8)source[14] != (s8)previous[14]
-        || (s8)source[15] != (s8)previous[15])
-        changes |= 8;
-    if ((s8)source[3] != (s8)previous[3]
-        || (s8)source[4] != (s8)previous[4]
-        || (s8)source[5] != (s8)previous[5])
-        changes |= 0x10;
-    if ((s8)source[6] != (s8)previous[6]
-        || (s8)source[7] != (s8)previous[7]
-        || (s8)source[8] != (s8)previous[8])
-        changes |= 0x20;
+    if (*(const u16*)(source + 0) != *(u16*)(mUnidentified01C[player].mData + 0))
+        mUnidentified018[player] |= 2;
+    if ((s8)source[12] != (s8)mUnidentified01C[player].mData[12]
+        || (s8)source[13] != (s8)mUnidentified01C[player].mData[13])
+        mUnidentified018[player] |= 4;
+    if ((s8)source[14] != (s8)mUnidentified01C[player].mData[14]
+        || (s8)source[15] != (s8)mUnidentified01C[player].mData[15])
+        mUnidentified018[player] |= 8;
+    if ((s8)source[3] != (s8)mUnidentified01C[player].mData[3]
+        || (s8)source[4] != (s8)mUnidentified01C[player].mData[4]
+        || (s8)source[5] != (s8)mUnidentified01C[player].mData[5])
+        mUnidentified018[player] |= 0x10;
+    if ((s8)source[6] != (s8)mUnidentified01C[player].mData[6]
+        || (s8)source[7] != (s8)mUnidentified01C[player].mData[7]
+        || (s8)source[8] != (s8)mUnidentified01C[player].mData[8])
+        mUnidentified018[player] |= 0x20;
 
-    if (changes != 0)
+    if (mUnidentified018[player] != 0)
         mUnidentified008 |= 0x10 << player;
-    memcpy(previous, source, 0x10);
+    memcpy(mUnidentified01C[player].mData, source, 0x10);
 }
 
 void NetMessageInput::ApplyNetworkInputMessageRecord(s8 player, PackedDetInput* record)

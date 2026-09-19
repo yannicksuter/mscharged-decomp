@@ -71,9 +71,29 @@ public:
         return m_Children.m_Head != 0;
     }
 
+    void AddChild(GLView* child)
+    {
+        m_Children.AddEnd(child);
+        child->m_Parent = this;
+    }
+
+    void SetParent(GLView* parent)
+    {
+        parent->AddChild(this);
+    }
+
     void SetRenderPair(GLRenderPair renderPair)
     {
         m_RenderPair = renderPair;
+    }
+
+    void SetViewport(unsigned long x, unsigned long y, unsigned long width,
+        unsigned long height)
+    {
+        m_ViewportX = x;
+        m_ViewportY = y;
+        m_ViewportWidth = width;
+        m_ViewportHeight = height;
     }
 
     virtual void BeginRender();
@@ -102,7 +122,7 @@ public:
     unsigned long m_Unknown48;
     unsigned long m_TriangleCount;
     GLViewInterface* m_Interface;
-    void* m_Parent;
+    GLView* m_Parent;
 };
 
 struct GLViewIteratorEntry

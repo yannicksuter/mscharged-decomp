@@ -16,7 +16,7 @@ struct DetermDataEvent
     DetermDataEvent();
     DetermDataEvent(DetermDataEvent* other);
     DetermDataEvent(const void* data, u32 size);
-    ~DetermDataEvent();
+    ~DetermDataEvent() { }
 
     void* operator new(unsigned long)
     {

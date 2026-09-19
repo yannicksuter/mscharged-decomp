@@ -111,7 +111,10 @@ public:
     }; // size = 0x04
 
 protected:
-    static Iterator GetIteratorFromPointer(LinkListNode* pNode) { return Iterator(pNode); }
+    static Iterator GetIteratorFromPointer(LinkListNode* p) {
+        NW4HBMAssertPointerNonnull_Line(p, 328);
+        return Iterator(p);
+    }
 
     LinkListImpl() { Initialize_(); }
     ~LinkListImpl();
@@ -339,10 +342,14 @@ public:
         return *--GetEndIter();
     }
 
-    static Iterator GetIteratorFromPointer(T* pElem) { return GetIteratorFromPointer(GetNodeFromPointer(pElem)); }
+    static Iterator GetIteratorFromPointer(LinkListNode* p) {
+        NW4HBMAssertPointerNonnull_Line(p, 542);
+        return Iterator(LinkListImpl::GetIteratorFromPointer(p));
+    }
 
-    static Iterator GetIteratorFromPointer(LinkListNode* pNode) {
-        return Iterator(LinkListImpl::GetIteratorFromPointer(pNode));
+    static Iterator GetIteratorFromPointer(T* p) {
+        NW4HBMAssertPointerNonnull_Line(p, 552);
+        return GetIteratorFromPointer(GetNodeFromPointer(p));
     }
 
     static LinkListNode* GetNodeFromPointer(T* p) {

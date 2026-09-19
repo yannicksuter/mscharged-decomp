@@ -1,18 +1,40 @@
 #ifndef GAME_AUDIO_XSOUND_HANDLE_H
 #define GAME_AUDIO_XSOUND_HANDLE_H
 
+#include "NL/nlMath.h"
 #include "types.h"
 
 struct XSoundOwner
 {
-    u8 m_Unknown00[0x1C];
-    union
+    XSoundOwner()
     {
+        count.references = 0;
+        nlVec3Set(m_Unknown04.m_Value, 0.0f, 0.0f, 0.0f);
+        count.field_8000 = count.field_4000 = count.field_2000 = count.field_1000 = false;
+    }
+
+    virtual ~XSoundOwner() { }
+
+    /* 0x04 */ union
+    {
+        nlVector3 m_Value;
+        const nlVector3* m_Pointer;
+    } m_Unknown04;
+    /* 0x10 */ float m_Unknown10;
+    /* 0x14 */ float m_Unknown14;
+    /* 0x18 */ float m_Unknown18;
+    /* 0x1C */ union
+    {
+        u32 m_Unknown1C;
         u32 m_ReferencesAndFlags;
         struct
         {
             s32 references : 16;
-            u32 flags : 16;
+            u32 field_8000 : 1;
+            u32 field_4000 : 1;
+            u32 field_2000 : 1;
+            u32 field_1000 : 1;
+            u32 field_0FFF : 12;
         } count;
     };
 };

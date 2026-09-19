@@ -704,6 +704,7 @@ void SHOnlineFriendsChooseSides::UpdateDoneButton()
     }
 }
 
+#pragma dont_inline on
 int SHOnlineFriendsChooseSides::GetOnlinePlayerIndex(int pad)
 {
     int guest = -1;
@@ -727,6 +728,7 @@ int SHOnlineFriendsChooseSides::GetOnlinePlayerIndex(int pad)
     }
     return -1;
 }
+#pragma dont_inline reset
 
 void SHOnlineFriendsChooseSides::OnSidesChanged(NetMessageSidesChanged* message)
 {
@@ -736,18 +738,7 @@ void SHOnlineFriendsChooseSides::OnSidesChanged(NetMessageSidesChanged* message)
         {
             return;
         }
-        int index = -1;
-        int machine = (s8)message->mMachineIndex;
-        unsigned int guest = message->mGuest;
-        for (int i = 0; i < 4; ++i)
-        {
-            if (machine == mOnlinePlayers[i].mMachineIndex
-                && guest == mOnlinePlayers[i].mIsGuest)
-            {
-                index = i;
-                break;
-            }
-        }
+        int index = GetOnlinePlayerIndex((s8)message->mMachineIndex, message->mGuest);
         int side = (s8)message->mSide;
         if (side != -1)
         {
@@ -771,25 +762,15 @@ void SHOnlineFriendsChooseSides::OnSidesChanged(NetMessageSidesChanged* message)
     }
     else
     {
-        int index = -1;
-        int machine = (s8)message->mMachineIndex;
-        unsigned int guest = message->mGuest;
-        for (int i = 0; i < 4; ++i)
-        {
-            if (machine == mOnlinePlayers[i].mMachineIndex
-                && guest == mOnlinePlayers[i].mIsGuest)
-            {
-                index = i;
-                break;
-            }
-        }
+        int index = GetOnlinePlayerIndex((s8)message->mMachineIndex, message->mGuest);
         int oldSide = mPlayerSides[index];
-        mPlayerSides[index] = (s8)message->mSide;
-        DoChangeSides((s8)message->mSide, oldSide, index);
+        int newSide = (s8)message->mSide;
+        mPlayerSides[index] = newSide;
+        DoChangeSides(newSide, oldSide, index);
         UpdateDoneButton();
         if (mDraftMessage.mMachineIndex == (s8)message->mMachineIndex)
         {
-            TLComponentInstance* controller = gFEPointerInstances[index];
+            TLComponentInstance* controller = GetPointerInstance(index);
             if (mPlayerSides[index] == -1)
             {
                 controller->SetActiveSlide("holding", true, false);
@@ -801,7 +782,7 @@ void SHOnlineFriendsChooseSides::OnSidesChanged(NetMessageSidesChanged* message)
         }
         char friendName[16];
         nlSNPrintf(friendName, sizeof(friendName), "friend_%d", index);
-        FEFinder<TLTextInstance, 3>::Find(mPresentation->GetActiveSlide(),
+        FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide,
             InlineHasher("Layer"), InlineHasher(friendName))->m_bVisible = mPlayerSides[index] == -1;
     }
 }

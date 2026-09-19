@@ -44,6 +44,18 @@ public:
     void OnDonePointerPress(unsigned int index, void* context);
     void UpdateDoneButton();
     int GetOnlinePlayerIndex(int pad);
+    int GetOnlinePlayerIndex(int machine, bool guest)
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            if (machine == mOnlinePlayers[i].mMachineIndex
+                && guest == mOnlinePlayers[i].mIsGuest)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
     void OnSidesChanged(NetMessageSidesChanged* message);
     void DoChangeSides(int newSide, int oldSide, int index);
     void OnDisconnectPopupClosed();

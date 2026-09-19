@@ -1943,18 +1943,17 @@ int NetworkSession::ProcessMessage(
     return 1;
 }
 
-void NetworkSession::BaseVirtual3C(NetworkGameStartInfo* info)
+void NetworkSession::BaseVirtual3C(const NetworkGameStartInfo* info)
 {
-    int myId = info->mMyMachineId;
-    int count = info->mMachineCount;
-    mMachineCount = count;
-    mLocalMachineId = myId;
+    mMachineCount = info->mMachineCount;
+    mLocalMachineId = info->mMyMachineId;
 
+    int machine;
     NetworkPeer* peer = mPeers;
-    for (int machine = 0; machine < mMachineCount; ++machine)
+    for (machine = 0; machine < mMachineCount; ++machine)
     {
         peer->mMachineId = machine;
-        int players = info->mPlayerCounts[0];
+        int players = info->mPlayerCounts[machine];
         peer->mPlayerCount = players;
         for (int player = 0; player < players; ++player)
         {
@@ -1962,7 +1961,6 @@ void NetworkSession::BaseVirtual3C(NetworkGameStartInfo* info)
         }
         peer->ResetNetworkPeerInputs();
         ++peer;
-        info = (NetworkGameStartInfo*)((u8*)info + 4);
     }
     AIPadManager::Startup();
 }

@@ -1,5 +1,4 @@
 #include "NL/nlSingleton.inl"
-#include "NL/nlBasicString.inl"
 #include "Game/SH/SHOnlineInvitePlayers.h"
 #include "Game/FE/feOnlineError.h"
 #include "Game/FE/feHelpFuncs_decl.h"
@@ -30,7 +29,6 @@
 #include "Game/SH/SHNavigation.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/FE/FEAudio.h"
-
 
 SHOnlineInvitePlayers::SHOnlineInvitePlayers()
     : mIsHost(true)
@@ -619,35 +617,35 @@ void SHOnlineInvitePlayers::HidePlayerPortrait(int index)
         nlStringLowerHash("over"), nlStringLowerHash("FRIEND_0"), 0, 0, 0, 0);
     TLInstance* off = FEFinder<TLInstance, 5>::Find(mRowInstances[index],
         nlStringLowerHash("off"), nlStringLowerHash("FRIEND_0"), 0, 0, 0, 0);
-    TLInstance* image = FEFinder<TLComponentInstance, 4>::_Find(
+    TLInstance* image = FEFinder<TLComponentInstance, 4>::Find(
         over, nlStringLowerHash("Mii_btn"), nlStringLowerHash("Mii"), 0, 0, 0, 0);
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::_Find(
+    image = FEFinder<TLComponentInstance, 4>::Find(
         off, nlStringLowerHash("Mii_btn"), nlStringLowerHash("Mii"), 0, 0, 0, 0);
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::_Find(
+    image = FEFinder<TLComponentInstance, 4>::Find(
         over, nlStringLowerHash("Mii_btn"), nlStringLowerHash("logo_32x32"), 0, 0, 0, 0);
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::_Find(
+    image = FEFinder<TLComponentInstance, 4>::Find(
         off, nlStringLowerHash("Mii_btn"), nlStringLowerHash("logo_32x32"), 0, 0, 0, 0);
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::_Find(
+    image = FEFinder<TLComponentInstance, 4>::Find(
         over, nlStringLowerHash("Mii_btn"), nlStringLowerHash("shoulders"), 0, 0, 0, 0);
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::_Find(
+    image = FEFinder<TLComponentInstance, 4>::Find(
         off, nlStringLowerHash("Mii_btn"), nlStringLowerHash("shoulders"), 0, 0, 0, 0);
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::_Find(
+    image = FEFinder<TLComponentInstance, 4>::Find(
         over, nlStringLowerHash("Mii_btn"), nlStringLowerHash("Online_Mii_select_background"), 0, 0, 0, 0);
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::_Find(
+    image = FEFinder<TLComponentInstance, 4>::Find(
         off, nlStringLowerHash("Mii_btn"), nlStringLowerHash("Online_Mii_select_background"), 0, 0, 0, 0);
     image->m_bVisible = false;
     image->SetAssetVisible(false);

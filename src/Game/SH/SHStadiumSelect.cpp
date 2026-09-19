@@ -1,5 +1,4 @@
 #include "Game/SH/SHStadiumSelect.h"
-#include "NL/nlBasicString.inl"
 #include "NL/nlFunction.inl"
 #include "NL/nlBindMember.h"
 #include "Game/EventRegistry.h"

@@ -14,6 +14,7 @@ struct MiiManager
     unsigned long GetIconTextureId(int index);
 
     void LoadResources();
+    void LoadResources(void* buffer);
     bool CreateIcon(int index, int slot, RFLExpression value);
     bool CreateIcon(const RFLStoreData* data, int slot, RFLExpression value);
     static void ResourceLoaded(void* buffer, unsigned long size, void* userData);

@@ -33,6 +33,7 @@
 #include <cmath>
 
 char* optionNames[3] = { "button_1", "button_2", "button_3" };
+static const char* optionOKName = "button_OK";
 
 struct PopupEntry
 {
@@ -187,8 +188,6 @@ static const PopupEntry PopupEntries[] = {
     { 0, "POPUP_LOW_BATTERY", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_E3_THANKS_FOR_PLAYING", { "POPUP_OK", 0, 0, 0 }, 0 },
 };
-
-static const char* optionOKName = "button_OK";
 
 FEPopupMenu::FEPopupMenu()
     : mMenuDisplayed(false)
@@ -669,6 +668,103 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
     mHighlightedOption = popupEntry->mInitialHighlight;
 }
 
+void FEPopupMenu::CentrePopup(float totalHeight, float topOfMessageBox)
+{
+    float halfHeight = totalHeight;
+    halfHeight *= 0.5f;
+    float verticalOffset = halfHeight - topOfMessageBox;
+    FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
+    TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(
+        presentation, "Slide1", "Layer", "Message");
+    feVector3 position = pText->GetAssetPosition();
+    pText->SetAssetPosition(position.e[0], position.e[1] + verticalOffset, position.e[2]);
+    for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)
+    {
+        position = mOptionInstances[optionIndex]->GetAssetPosition();
+        mOptionInstances[optionIndex]->SetAssetPosition(position.e[0], position.e[1] + verticalOffset, position.e[2]);
+    }
+}
+
+void FEPopupMenu::SetPositions()
+{
+    float topOfMessage;
+    const nlFont* pFont;
+    feVector3 optionPosition;
+    float prevOptionHeight = 0.0f;
+    float totalHeight = 0.0f;
+    FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
+    TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(
+        presentation, nlStringLowerHash("Slide1"), nlStringLowerHash("Layer"), nlStringLowerHash("Message"), 0, 0, 0);
+    const feVector3 messagePosition = pText->GetAssetPosition();
+    pFont = ((const FEText*)pText->m_component)->m_pFeFontResource->GetFontReference();
+    nlTextBox::StringDrawInfo drawInfo = pText->m_DrawInfo;
+    feVector3 messageScale = pText->GetAssetScale();
+    float messageHeight = messageScale.e[1] * (float)(drawInfo.RowCount * pFont->m_Metrics.Height);
+    totalHeight += messageHeight;
+    topOfMessage = messagePosition.e[1] + messageHeight / 2.0f;
+
+    if (messageHeight == 0.0)
+    {
+        nlColour hiddenTextColour = pText->GetAssetColour();
+        hiddenTextColour.c[3] = 0;
+        pText->SetAssetColour(hiddenTextColour);
+        for (int hiddenOptionIndex = 0; hiddenOptionIndex < mPopup.numOptions; ++hiddenOptionIndex)
+        {
+            pText = mUnidentified9D0[hiddenOptionIndex];
+            hiddenTextColour = pText->GetAssetColour();
+            hiddenTextColour.c[3] = 0;
+            pText->SetAssetColour(hiddenTextColour);
+        }
+        glDiscardFrame(1);
+        return;
+    }
+    nlColour messageColour = pText->GetAssetColour();
+    messageColour.c[3] = 255;
+    pText->SetAssetColour(messageColour);
+
+    float firstOptionSpacing = GetConfigFloat(Config::Global(), "popup_first_option_spacing", 75.0f);
+    float otherOptionSpacing = GetConfigFloat(Config::Global(), "popup_other_option_spacing", 12.5f);
+    for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)
+    {
+        pText = mUnidentified9D0[optionIndex];
+        nlColour optionColour = pText->GetAssetColour();
+        optionColour.c[3] = 255;
+        pText->SetAssetColour(optionColour);
+        float optionHeight = 56.7f;
+        totalHeight += optionHeight;
+        float optionY;
+        if (optionIndex == 0)
+        {
+            totalHeight += firstOptionSpacing;
+            optionY = messagePosition.e[1] - messageHeight / 2.0f - optionHeight / 2.0f - firstOptionSpacing;
+        }
+        else
+        {
+            totalHeight += otherOptionSpacing;
+            optionY = optionPosition.e[1] - prevOptionHeight / 2.0f - optionHeight / 2.0f - otherOptionSpacing;
+        }
+        prevOptionHeight = optionHeight;
+        optionPosition = mOptionInstances[optionIndex]->GetAssetPosition();
+        optionPosition.e[1] = optionY;
+        mOptionInstances[optionIndex]->SetAssetPosition(optionPosition.e[0], optionPosition.e[1], optionPosition.e[2]);
+    }
+    CentrePopup(totalHeight, topOfMessage);
+
+    TLImageInstance* pImage = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(
+        presentation->GetActiveSlide(), "Layer", "blackbox");
+    pText = FEFinder<TLTextInstance, 3>::Find(
+        mPresentation, "Slide1", "Layer", "Message");
+    nlVector2 size = fn_801CC48C(pText);
+    float width = size.e[0] > 630.0f ? size.e[0] : 630.0f;
+    mUnidentifiedC50 = (40.0f + width) / 120.0f;
+    mUnidentifiedC54 = (40.0f + (totalHeight + 15.0f * mPopup.numOptions)) / 100.0f;
+    pImage->SetAssetScale(0.0f, 0.0f, 1.0f);
+    feVector3 position = pImage->GetAssetPosition();
+    pImage->SetAssetPosition(position.e[0], position.e[1], position.e[2]);
+    fn_801C83AC(false);
+    mMenuDisplayed = true;
+}
+
 void FEPopupMenu::fn_801C83AC(bool visible)
 {
     unsigned char alpha = visible ? 255 : 0;
@@ -758,106 +854,8 @@ void FEPopupMenu::fn_801C8960(unsigned int index, void* context)
     gpHBMManager->mBlocked = true;
 }
 
-void FEPopupMenu::CentrePopup(float totalHeight, float topOfMessageBox)
-{
-    float halfHeight = totalHeight;
-    halfHeight *= 0.5f;
-    float verticalOffset = halfHeight - topOfMessageBox;
-    FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(
-        presentation, "Slide1", "Layer", "Message");
-    feVector3 position = pText->GetAssetPosition();
-    pText->SetAssetPosition(position.e[0], position.e[1] + verticalOffset, position.e[2]);
-    for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)
-    {
-        position = mOptionInstances[optionIndex]->GetAssetPosition();
-        mOptionInstances[optionIndex]->SetAssetPosition(position.e[0], position.e[1] + verticalOffset, position.e[2]);
-    }
-}
-
-void FEPopupMenu::SetPositions()
-{
-    float topOfMessage;
-    const nlFont* pFont;
-    feVector3 optionPosition;
-    float prevOptionHeight = 0.0f;
-    float totalHeight = 0.0f;
-    FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(
-        presentation, "Slide1", "Layer", "Message");
-    const feVector3 messagePosition = pText->GetAssetPosition();
-    pFont = ((const FEText*)pText->m_component)->m_pFeFontResource->GetFontReference();
-    nlTextBox::StringDrawInfo drawInfo = pText->m_DrawInfo;
-    feVector3 messageScale = pText->GetAssetScale();
-    float messageHeight = messageScale.e[1] * (float)(drawInfo.RowCount * pFont->m_Metrics.Height);
-    totalHeight += messageHeight;
-    topOfMessage = messagePosition.e[1] + messageHeight / 2.0f;
-
-    if (messageHeight == 0.0)
-    {
-        nlColour hiddenTextColour = pText->GetAssetColour();
-        hiddenTextColour.c[3] = 0;
-        pText->SetAssetColour(hiddenTextColour);
-        for (int hiddenOptionIndex = 0; hiddenOptionIndex < mPopup.numOptions; ++hiddenOptionIndex)
-        {
-            pText = mUnidentified9D0[hiddenOptionIndex];
-            hiddenTextColour = pText->GetAssetColour();
-            hiddenTextColour.c[3] = 0;
-            pText->SetAssetColour(hiddenTextColour);
-        }
-        glDiscardFrame(1);
-        return;
-    }
-    nlColour messageColour = pText->GetAssetColour();
-    messageColour.c[3] = 255;
-    pText->SetAssetColour(messageColour);
-
-    float firstOptionSpacing = GetConfigFloat(Config::Global(), "popup_first_option_spacing", 75.0f);
-    float otherOptionSpacing = GetConfigFloat(Config::Global(), "popup_other_option_spacing", 12.5f);
-    for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)
-    {
-        pText = mUnidentified9D0[optionIndex];
-        nlColour optionColour = pText->GetAssetColour();
-        optionColour.c[3] = 255;
-        pText->SetAssetColour(optionColour);
-        float optionHeight = 56.7f;
-        totalHeight += optionHeight;
-        float optionY;
-        if (optionIndex == 0)
-        {
-            totalHeight += firstOptionSpacing;
-            optionY = messagePosition.e[1] - messageHeight / 2.0f - optionHeight / 2.0f - firstOptionSpacing;
-        }
-        else
-        {
-            totalHeight += otherOptionSpacing;
-            optionY = optionPosition.e[1] - prevOptionHeight / 2.0f - optionHeight / 2.0f - otherOptionSpacing;
-        }
-        prevOptionHeight = optionHeight;
-        optionPosition = mOptionInstances[optionIndex]->GetAssetPosition();
-        optionPosition.e[1] = optionY;
-        mOptionInstances[optionIndex]->SetAssetPosition(optionPosition.e[0], optionPosition.e[1], optionPosition.e[2]);
-    }
-    CentrePopup(totalHeight, topOfMessage);
-
-    TLImageInstance* pImage = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(
-        presentation->GetActiveSlide(), "Layer", "blackbox");
-    pText = FEFinder<TLTextInstance, 3>::Find(
-        mPresentation, "Slide1", "Layer", "Message");
-    nlVector2 size = fn_801CC48C(pText);
-    float width = size.e[0] > 630.0f ? size.e[0] : 630.0f;
-    mUnidentifiedC50 = (40.0f + width) / 120.0f;
-    mUnidentifiedC54 = (40.0f + (totalHeight + 15.0f * mPopup.numOptions)) / 100.0f;
-    pImage->SetAssetScale(0.0f, 0.0f, 1.0f);
-    feVector3 position = pImage->GetAssetPosition();
-    pImage->SetAssetPosition(position.e[0], position.e[1], position.e[2]);
-    fn_801C83AC(false);
-    mMenuDisplayed = true;
-}
-
 #include "Game/FE/feFinder.inl"
 #include "Game/FE/fePresentation.inl"
-#include "NL/nlBasicString.inl"
 #include "NL/nlstring_tmpl.h"
 
 #include "Game/DB/CharacterInfo.inl"

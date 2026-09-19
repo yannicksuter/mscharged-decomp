@@ -53,6 +53,11 @@ void FEPageControls::SetMinusButton(TLComponentInstance* component)
     mButtonInstances[1] = component;
 }
 
+inline void FEPageControls::UpdateButton(int index)
+{
+    mButtonInstances[index]->Update(mButtonInstances[!index]->GetActiveSlide()->GetCurrentTime());
+}
+
 /**
  * Offset/Address/Size: 0x124 | 0x802385D0 | size: 0x44C
  */
@@ -102,7 +107,7 @@ void FEPageControls::Update(FEPointerEvent event, float fDeltaT)
         else if (!mPadHeld)
         {
             mButtonInstances[mHeldButton]->SetActiveSlide("off", true, false);
-            mButtonInstances[mHeldButton]->Update(mButtonInstances[!mHeldButton]->GetActiveSlide()->m_time);
+            UpdateButton(mHeldButton);
         }
     }
     if (!g_pFEInput->IsPressed((eFEINPUT_PAD)event.mIndex, 48, true, 0) && mPadHeld[0])
@@ -116,7 +121,7 @@ void FEPageControls::Update(FEPointerEvent event, float fDeltaT)
         else if (!mPointerInside[0])
         {
             mButtonInstances[0]->SetActiveSlide("off", true, false);
-            mButtonInstances[0]->Update(mButtonInstances[1]->GetActiveSlide()->m_time);
+            UpdateButton(0);
         }
     }
     if (!g_pFEInput->IsPressed((eFEINPUT_PAD)event.mIndex, 49, true, 0) && mPadHeld[1])
@@ -130,7 +135,7 @@ void FEPageControls::Update(FEPointerEvent event, float fDeltaT)
         else if (!mPointerInside[1])
         {
             mButtonInstances[1]->SetActiveSlide("off", true, false);
-            mButtonInstances[1]->Update(mButtonInstances[0]->GetActiveSlide()->m_time);
+            UpdateButton(1);
         }
     }
     if (mPadInputEnabled)
@@ -232,7 +237,7 @@ void FEPageControls::OnPointerLeave(int index, void* context)
         if (!g_pFEInput->IsPressed((eFEINPUT_PAD)index, button, true, 0))
         {
             mButtonInstances[which]->SetActiveSlide("off", true, false);
-            mButtonInstances[which]->Update(mButtonInstances[!which]->GetActiveSlide()->m_time);
+            UpdateButton(which);
         }
         else
         {
@@ -281,6 +286,6 @@ void FEPageControls::ClearButtonHighlight(int index)
     {
         mButtonInstances[index]->SetActiveSlide("off", true, false);
         mPointerInside[index] = false;
-        mButtonInstances[index]->Update(mButtonInstances[!index]->GetActiveSlide()->GetCurrentTime());
+        UpdateButton(index);
     }
 }

@@ -215,6 +215,12 @@ void TLInstance::SetAssetVisible(bool visible)
     m_overloadedAttributes.colour = color;
 }
 
+inline void TLInstance::SetName(const char* name)
+{
+    nlStrNCpy<char>(m_szName, name, sizeof(m_szName));
+    m_hash = nlStringLowerHash(name);
+}
+
 TLInstance::TLInstance(FELibObject* component)
 {
     m_next = 0;
@@ -224,7 +230,5 @@ TLInstance::TLInstance(FELibObject* component)
     m_overloadFlags = 0;
     m_bVisible = true;
 
-    const char* name = "<Undefined Instance>";
-    nlStrNCpy<char>(m_szName, name, sizeof(m_szName));
-    m_hash = nlStringLowerHash(name);
+    SetName("<Undefined Instance>");
 }

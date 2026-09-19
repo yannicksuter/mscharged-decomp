@@ -79,6 +79,7 @@ public:
     virtual void GetPoseMatrix(nlMatrix4* matrix, int nodeIndex) = 0;
 
     unsigned long GetNumPackets() { return GetModel()->numPackets; }
+    int GetModelIndex() const { return m_Unknown0C; }
 
     void SetNumMorphs(unsigned long count);
     void SetMorphID(unsigned long index, unsigned long id);

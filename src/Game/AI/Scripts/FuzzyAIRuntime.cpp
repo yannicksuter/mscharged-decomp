@@ -337,13 +337,7 @@ extern "C" void fn_800B6A1C(
     UnidentifiedVariant_80054AB8*, int, const Variant&);
 
 char lbl_80503EEC[] = "art/Scripts/FuzzyAI.byte_code";
-char lbl_80503F0C[] = "Direction";
-char lbl_80503F18[] = "Distance";
 char* lbl_806DC3F0 = lbl_80503EEC;
-char lbl_806DC3F4[] = "Speed";
-char lbl_806DC3FC[] = "Target";
-char lbl_806DC408[] = "Powerup";
-char lbl_806DC410[] = "Lob";
 
 SlotPool<UnidentifiedFielderIterator> lbl_8056DBB0(16, 16);
 
@@ -369,29 +363,6 @@ extern "C" UnidentifiedFuzzyRuntimeBase* fn_800E30A8(cFielder* pFielder)
 extern "C" void fn_800E30AC()
 {
     fn_800A695C();
-}
-
-void UnidentifiedFuzzyRuntime::UnidentifiedVirtual15()
-{
-    UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual15();
-    lbl_806E20B0.AddEnd(new (nlMalloc(
-        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_806DC3F4, 13));
-    lbl_806E20B0.AddEnd(new (nlMalloc(
-        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_806DC3FC, 14));
-    lbl_806E20B0.AddEnd(new (nlMalloc(
-        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_806DC408, 15));
-    lbl_806E20B0.AddEnd(new (nlMalloc(
-        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_806DC410, 16));
-    lbl_806E20B0.AddEnd(new (nlMalloc(
-        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_80503F0C, 17));
-    lbl_806E20B0.AddEnd(new (nlMalloc(
-        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_80503F18, 18));
 }
 
 extern "C" const char* fn_800E3198()
@@ -4040,4 +4011,27 @@ void UnidentifiedFuzzyRuntime::DoFunctionCall(unsigned int function)
         nlBreak();
         break;
     }
+}
+
+void UnidentifiedFuzzyRuntime::UnidentifiedVirtual15()
+{
+    UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual15();
+    lbl_806E20B0.AddEnd(new (nlMalloc(
+        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
+            UnidentifiedRuntimeTypeEntry("Speed", 13));
+    lbl_806E20B0.AddEnd(new (nlMalloc(
+        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
+            UnidentifiedRuntimeTypeEntry("Target", 14));
+    lbl_806E20B0.AddEnd(new (nlMalloc(
+        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
+            UnidentifiedRuntimeTypeEntry("Powerup", 15));
+    lbl_806E20B0.AddEnd(new (nlMalloc(
+        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
+            UnidentifiedRuntimeTypeEntry("Lob", 16));
+    lbl_806E20B0.AddEnd(new (nlMalloc(
+        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
+            UnidentifiedRuntimeTypeEntry("Direction", 17));
+    lbl_806E20B0.AddEnd(new (nlMalloc(
+        sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
+            UnidentifiedRuntimeTypeEntry("Distance", 18));
 }

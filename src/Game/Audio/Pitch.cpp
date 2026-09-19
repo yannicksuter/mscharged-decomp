@@ -1,6 +1,7 @@
 #include "Game/Audio/AudioSource.h"
 #include "Game/Audio/AudioEffect.h"
 #include "Game/Audio/AudioConfig.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
 #include "NL/nlString.h"

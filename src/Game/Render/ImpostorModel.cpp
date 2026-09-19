@@ -255,7 +255,7 @@ void ImpostorModel::ResolveTextures()
     }
     if (mSkinMesh != 0)
     {
-        int modelIndex = mSkinMesh->m_Unknown0C;
+        int modelIndex = mSkinMesh->GetModelIndex();
         glModelPacket* packet;
         for (int i = 0; i < 2; ++i)
         {

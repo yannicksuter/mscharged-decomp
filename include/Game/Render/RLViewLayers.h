@@ -43,12 +43,12 @@ public:
 class RLViewOrthoCamera : public GLViewInterface
 {
 public:
-    virtual void GetViewMatrix(nlMatrix4&) const;
-    virtual void GetProjectionMatrix(nlMatrix4&) const;
-    virtual void GetInverseViewMatrix(nlMatrix4&) const;
-    virtual void GetViewProjectionMatrix(nlMatrix4&) const;
-    virtual const nlMatrix4* GetViewMatrix() const;
-    virtual const nlMatrix4* GetProjectionMatrix() const;
+    inline virtual void GetViewMatrix(nlMatrix4&) const;
+    inline virtual void GetProjectionMatrix(nlMatrix4&) const;
+    inline virtual void GetInverseViewMatrix(nlMatrix4&) const;
+    inline virtual void GetViewProjectionMatrix(nlMatrix4&) const;
+    inline virtual const nlMatrix4* GetViewMatrix() const;
+    inline virtual const nlMatrix4* GetProjectionMatrix() const;
 
     /* 0x04 */ nlMatrix4 mMatrix;
 }; // total size: 0x44
@@ -111,12 +111,12 @@ extern TweakValueBool eCLV_DebugEnabled;
 extern TweakValueBool eCLV_DebugSquareEnabled;
 extern TweakValueBool eCLV_NumEnabled;
 
-extern GLView* sViews[11];
-extern RLViewCamera sShadowDebugCameras[11];
-extern RLViewRect sShadowDebugRects[11];
-extern char sShadowDebugNames[11][16];
-extern u32 sShadowDebugTargets[11];
-extern GLRenderPair sShadowDebugPairs[11];
+extern GLView* sShadowPartitionViews[11];
+extern RLViewCamera sShadowPartitionCameras[11];
+extern RLViewRect sShadowPartitionRects[11];
+extern char sShadowPartitionNames[11][16];
+extern u32 sShadowPartitionTextures[11];
+extern GLRenderPair sShadowPartitionPairs[11];
 extern RLView* sLayerViews[eCLV_Num];
 extern RLViewCamera sPerspectiveCamera;
 extern RLViewCamera sPipCamera;

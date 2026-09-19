@@ -13,7 +13,6 @@
 #include "Game/OverlayManager.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHPausePostGame.h"
-#include "NL/nlBasicString.inl"
 #include "NL/nlBind.h"
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"

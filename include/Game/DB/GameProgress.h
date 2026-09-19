@@ -234,6 +234,8 @@ StrikerChallenge* fn_801CA670();
 
 bool IsUnlockFlagSet(int flag);
 void SetUnlockFlag(int flag);
+extern "C" bool fn_8010FD74();
+extern "C" void fn_8010FD7C(bool value);
 
 
 bool IsWastelandsUnlocked();

@@ -43,7 +43,7 @@ void BootLoadingScene::Update(float fDeltaT)
     if (mPhase == 0)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time >= slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             mPhase = 3;
             mElapsedTime = 0.0f;
@@ -54,7 +54,8 @@ void BootLoadingScene::Update(float fDeltaT)
     {
         if (mStrapDismissed)
         {
-            mStrapAlpha -= (2 * 255) * fDeltaT;
+            int fadeRate = 2 * 255;
+            mStrapAlpha -= fadeRate * fDeltaT;
             if (mStrapAlpha <= 0.0f)
                 mStrapAlpha = 0.0f;
             nlColour colour = { 255, 255, 255, 0 };
@@ -89,7 +90,7 @@ void BootLoadingScene::Update(float fDeltaT)
     else if (mPhase == 2)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time >= slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             mElapsedTime = 0.0f;
             if (GetRegion() == 0)
@@ -102,7 +103,7 @@ void BootLoadingScene::Update(float fDeltaT)
     else if (mPhase == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time >= slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             mPhase = 4;
             mElapsedTime = 0.0f;
@@ -124,7 +125,7 @@ void BootLoadingScene::Update(float fDeltaT)
     if (mHomeButtonWarningActive)
     {
         TLSlide* slide = mHomeButtonWarning->GetActiveSlide();
-        if (slide->m_time >= slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             mHomeButtonWarning->m_bVisible = false;
             mHomeButtonWarningActive = false;
@@ -156,10 +157,8 @@ void BootLoadingScene::SetPhaseSlide()
     if (mHomeButtonWarning != 0)
     {
         float time = mHomeButtonWarning->GetActiveSlide()->m_time;
-        mHomeButtonWarning = FEFinder<TLComponentInstance, 4>::Find(mPresentation->GetActiveSlide(),
-            InlineHasher("Layer"), InlineHasher("no home"));
-        if (mHomeButtonWarning == 0)
-            mHomeButtonWarning = &UnidentifiedTLComponentDefault::sInstance;
+        mHomeButtonWarning = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+            mPresentation->GetActiveSlide(), "Layer", "no home");
         if (mWidescreen)
             mHomeButtonWarning->SetActiveSlide("widescreen", true, false);
         else
@@ -167,7 +166,7 @@ void BootLoadingScene::SetPhaseSlide()
         if (mHomeButtonWarningActive)
         {
             TLSlide* slide = mHomeButtonWarning->GetActiveSlide();
-            if (time < slide->m_start + slide->m_duration)
+            if (time < slide->GetStartTime() + slide->GetDuration())
                 mHomeButtonWarning->m_bVisible = true;
         }
         mHomeButtonWarning->Update(time);

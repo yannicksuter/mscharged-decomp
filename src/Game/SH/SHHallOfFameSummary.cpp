@@ -1,5 +1,4 @@
 #include <string.h>
-#include "NL/nlBasicString.inl"
 
 #include "Game/SH/SHHallOfFameSummary.h"
 #include "Game/DB/GameProgress.h"
@@ -80,7 +79,6 @@ static HallOfFameChallengeEntry sChallengeEntries[] = {
     { "NAME_BOWSERJR", 20 },
     { "NAME_DIDDYKONG", 21 },
 };
-
 
 static inline const unsigned short* LookupLocString(const char* id)
 {

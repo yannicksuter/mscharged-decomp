@@ -168,6 +168,11 @@ public:
     bool Unidentified77C8(u32 instance);
     void Unidentified78C0(float deltaTime);
 
+    AudioEffectBinding* GetBinding(const u32& key)
+    {
+        return mBindings.UnidentifiedAddOrGet(key);
+    }
+
     /* 0x00 */ UnidentifiedAudioScriptEntry* mUnidentified00;
     /* 0x04 */ u32 mUnidentified04;
     /* 0x08 */ UnidentifiedAudioScriptList* mUnidentified08;

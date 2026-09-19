@@ -1,5 +1,4 @@
 #include <dwc/dwc_account.h>
-#include "NL/nlBasicString.inl"
 #include <dwc/dwc_friend.h>
 #include <dwc/dwc_nastime.h>
 
@@ -39,7 +38,7 @@
 #include "Game/MiiManager.h"
 #include "Game/FE/UnidentifiedTLDefault.h"
 
-static const char* const sOnlineHubButtonNames[4] = {
+static const char* sOnlineHubButtonNames[4] = {
     "BTN_UNRANKED", "BTN_RANKED", "BTN_LEADERBOARD", "BTN_FRIENDS"
 };
 
@@ -143,18 +142,16 @@ void SHOnlineHub::SceneCreated()
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
         mUnidentified4B8[i] = 0;
     }
     for (int i = 0; i < 4; ++i)
     {
-        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(presentation->m_currentSlide, "Layer", sOnlineHubButtonNames[i]);
-        mUnidentified2F0[i] = instance != 0 ? instance : &UnidentifiedTLComponentDefault::sInstance;
+        mUnidentified2F0[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", sOnlineHubButtonNames[i]);
     }
     TLComponentInstance* help = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "HELP_BUTTON");
     help->SetActiveSlide(IsWidescreen() ? "16:9" : "4:3", true, false);
-    TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(help, "HELP");
-    mUnidentified3B4 = instance != 0 ? instance : &UnidentifiedTLComponentDefault::sInstance;
+    mUnidentified3B4 = FEFinder<TLComponentInstance, 4>::FindOrDefault(help, "HELP");
     SHNavigation* scene = GetNavigationScene();
     TLComponentInstance* done = 0;
     if (scene != 0)

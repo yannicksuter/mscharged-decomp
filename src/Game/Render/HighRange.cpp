@@ -207,10 +207,7 @@ void InitializeHighRange(HighRange* state)
     for (i = 0; i < 7; ++i)
     {
         state->mViews[i]->m_Enabled = true;
-        GLView* view = state->mViews[i];
-        GLView* parent = GetLayerView(eCLV_HighRangeChain);
-        parent->m_Children.AddEnd(view);
-        view->m_Parent = parent;
+        GetLayerView(eCLV_HighRangeChain)->AddChild(state->mViews[i]);
     }
 }
 

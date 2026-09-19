@@ -129,6 +129,16 @@ public:
 
     nlListIterator<T> Begin();
     nlListConstIterator<T> Begin() const;
+
+    T* GetHead() const
+    {
+        if (m_Head == 0)
+        {
+            return 0;
+        }
+        return &m_Head->entry;
+    }
+
     T* AllocateAtEnd(unsigned long* outEntry);
 
     /* 0x00 */ Adapter m_Allocator;

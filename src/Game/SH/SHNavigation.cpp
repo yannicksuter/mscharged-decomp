@@ -1,5 +1,4 @@
 #include "NL/plat/PlatPadManager.h"
-#include "NL/nlBasicString.inl"
 #include "NL/plat/PlatPadStatus.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/BaseGameSceneManager.h"

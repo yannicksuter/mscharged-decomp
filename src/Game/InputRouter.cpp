@@ -2,14 +2,13 @@
 #include "Game/Sys/debug.h"
 #include "Game/EventDispatcher.inl"
 #include "Game/NetworkInput.h"
+#include "Game/NetworkSync.h"
 
 #include <string.h>
 
 #include "Game/NetworkEvents.h"
 #include "Game/TweakValue.h"
 #include "NL/nlMath.h"
-
-u32 gNetworkRandomSeed = 0x12345678;
 
 int g_TransmitSyncDataEvery = 4;
 int g_nTicksPerPacket = 2;
@@ -37,42 +36,6 @@ static EventDispatcher sDetermDataDispatcher;
 static UnidentifiedQueuedEvent<DetermDataEvent> sDetermDataEventQueue(
     &sDetermDataDispatcher, "DetermDataEventQueue", 21);
 
-NetMessageInput::~NetMessageInput()
-{
-}
-
-DetermDataEvent::~DetermDataEvent()
-{
-}
-
-NetMessageAllInputs::~NetMessageAllInputs()
-{
-}
-
-u32 GetNetworkRandomSeed()
-{
-    return gNetworkRandomSeed;
-}
-
-void SetNetworkRandomSeed(u32 seed)
-{
-    gNetworkRandomSeed = seed;
-}
-
-void OnInputSessionReset()
-{
-}
-
-u32 nlRandom(u32 range)
-{
-    return nlRandom(range, &gNetworkRandomSeed);
-}
-
-float nlRandomf(float maximum)
-{
-    return nlRandomf(maximum, &gNetworkRandomSeed);
-}
-
 void InitializeInputRouters()
 {
     gSimpleInputRouter = new SimpleInputRouter;
@@ -99,7 +62,7 @@ void InputRouter::Reset(int)
     int machineCount = mSession->GetNumMachines();
     for (int machine = 0; machine < machineCount; ++machine)
     {
-        (&mSession->mPeers[machine])->ResetNetworkPeerInputs();
+        mSession->GetPeer(machine)->ResetNetworkPeerInputs();
     }
 
     for (int input = 0; input < 16; ++input)
@@ -120,6 +83,20 @@ void InputRouter::Reset(int)
     mLastGameFrame = -1;
     m_OutgoingCustomDetermDataQ.mHead = 0;
     m_OutgoingCustomDetermDataQ.mCount = 0;
+
+    sDetermDataDispatcher.Clear();
+    BasicSlotPool<DLListEntry<EventCallback> >* callbackPool =
+        &sDetermDataDispatcher.callbacks.m_Allocator;
+    callbackPool->FreeBlocks();
+
+    sDetermDataEventQueue.UnidentifiedRemoveAll();
+    BasicSlotPool<DLListEntry<UnidentifiedListener<DetermDataEvent> > >*
+        listenerPool = &sDetermDataEventQueue.mListeners.m_Allocator;
+    listenerPool->FreeBlocks();
+
+    SlotPoolBase::BaseFreeBlocks(
+        &gDetermDataEventPool, sizeof(DetermDataEvent));
+
     mSyncMismatch = false;
     mSyncMismatchReported = false;
     mOutgoingQueueOverflowed = false;
@@ -128,17 +105,46 @@ void InputRouter::Reset(int)
 
 void InputRouter::CheckSyncMismatch()
 {
-    int machineCount = mSession->GetNumMachines();
+    bool mismatch = false;
     int gameFrame = gInputManager->mFrameProvider->GetFrame();
     u32 seed = GetNetworkRandomSeed();
+    int machineCount = mSession->GetNumMachines();
 
-    bool mismatch = false;
-    for (int machine = 0; machine < machineCount; ++machine)
+    for (s8 machine = 0; machine < machineCount; ++machine)
     {
-        if (mRemoteTicks[machine] != (u32)gameFrame
-            || mNetworkCRCs[machine] != mCurrentCRC
-            || mRandomSeeds[machine] != seed)
+        if (mRemoteTicks[machine] != gameFrame)
         {
+            if (gNetworkSyncState->mFrameMismatchFrame == -1)
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "NetworkSync ***PLAYBACK***: Network ticks don't match in playback from recording (Machine %d, Recorded Tick %d, Actual Tick %d\n",
+                    machine, mRemoteTicks[machine], gameFrame);
+            }
+            gNetworkSyncState->OnFrameMismatch(gameFrame);
+            mismatch = true;
+        }
+
+        if (mNetworkCRCs[machine] != mCurrentCRC)
+        {
+            if (gNetworkSyncState->mChecksumMismatchFrame == -1)
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "NetworkSync ***PLAYBACK***: Network CRCs don't match in playback from recording (Machine %d, Recorded CRC %x, Actual CRC %x, NetworkTick %d)\n",
+                    machine, mNetworkCRCs[machine], mCurrentCRC, gameFrame);
+            }
+            gNetworkSyncState->OnChecksumMismatch(gameFrame);
+            mismatch = true;
+        }
+
+        if (mRandomSeeds[machine] != seed)
+        {
+            if (gNetworkSyncState->mRandomSeedMismatchFrame == -1)
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "NetworkSync ***PLAYBACK***: Network Random seeds don't match in playback from recording (Machine %d, Recorded Seed %x, Actual Seed %x, NetworkTick %d)\n",
+                    machine, mRandomSeeds[machine], seed, gameFrame);
+            }
+            gNetworkSyncState->OnRandomSeedMismatch(gameFrame);
             mismatch = true;
         }
     }

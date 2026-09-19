@@ -17,7 +17,6 @@
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/SH/SHNavigation.h"
 #include "NL/nlBind.h"
-#include "NL/nlBasicString.inl"
 #include "NL/nlFormat.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlLocalizationLookup.h"

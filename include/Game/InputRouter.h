@@ -42,7 +42,7 @@ public:
     /* 0x104 */ u8 mInputStates[16];
     /* 0x114 */ u16 mNetworkTicks[4];
     /* 0x11C */ u32 mNetworkCRCs[4];
-    /* 0x12C */ u32 mRemoteTicks[4];
+    /* 0x12C */ s32 mRemoteTicks[4];
     /* 0x13C */ u32 mRandomSeeds[4];
     /* 0x14C */ bool mSyncMismatch;
     /* 0x14D */ bool mSyncMismatchReported;

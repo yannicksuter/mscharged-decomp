@@ -40,6 +40,8 @@ public:
 private:
     void RefreshPlayerRows();
     void UpdateCountdown(int countdown);
+    void SetCountdown(int countdown);
+    void UpdateDisplay(int countdown);
     void ShowDisconnectedError();
 }; // size 0x700
 

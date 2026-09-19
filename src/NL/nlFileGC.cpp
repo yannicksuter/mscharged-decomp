@@ -152,25 +152,25 @@ static bool sServicingReads;
 
 bool IsAsyncReadBusy(AsyncEntry* entry);
 
-static bool CheckDVDStatus()
+static unsigned char CheckDVDStatus()
 {
-    bool WasAProblem = false;
+    long Status;
+    unsigned char WasAProblem = 0;
 
-    for (;;)
+    do
     {
-        int Status = DVDGetDriveStatus();
-        switch (Status)
+        Status = DVDGetDriveStatus();
+        u32 statusPlusOne = (u32)(Status + 1);
+
+        switch (statusPlusOne)
         {
-        case DVD_STATE_FATAL:
-        case DVD_STATE_NO_DISK:
-        case DVD_STATE_COVER_OPENED:
-        case DVD_STATE_WRONG_DISK_ID:
-        case DVD_STATE_CANCELED:
-            if (g_HandleDVDMessageCallback)
-            {
-                g_HandleDVDMessageCallback(Status);
-            }
-            WasAProblem = true;
+        case DVD_STATE_FATAL + 1:
+        case DVD_STATE_NO_DISK + 1:
+        case DVD_STATE_COVER_OPENED + 1:
+        case DVD_STATE_WRONG_DISK_ID + 1:
+        case DVD_STATE_DISK_ERROR + 1:
+            g_HandleDVDMessageCallback(Status);
+            WasAProblem = 1;
 
             while (Status == DVDGetDriveStatus())
             {
@@ -182,9 +182,9 @@ static bool CheckDVDStatus()
             }
             break;
 
-        case DVD_STATE_BUSY:
-            WasAProblem = true;
-            if (g_HandleDVDRetryCB)
+        case DVD_STATE_BUSY + 1:
+            WasAProblem = 1;
+            if (!g_HandleDVDRetryCB.Empty())
             {
                 g_HandleDVDRetryCB(1);
             }
@@ -202,13 +202,9 @@ static bool CheckDVDStatus()
             break;
         }
 
-        if (Status == DVD_STATE_IDLE || Status == DVD_STATE_FATAL)
-        {
-            break;
-        }
-    }
+    } while ((Status != DVD_STATE_IDLE) && (Status != DVD_STATE_FATAL));
 
-    if (WasAProblem && g_HandleDVDAllClearCallback)
+    if (WasAProblem && !g_HandleDVDAllClearCallback.Empty())
     {
         g_HandleDVDAllClearCallback(0);
     }

@@ -41,7 +41,7 @@ public:
         mFirst = true;
     }
 
-    virtual void Place(const nlVector4& point);
+    virtual void Place(nlVector4 point);
 
     /* 0x04 */ CrowdLayoutObject* mObject;
     /* 0x08 */ bool mFirst;
@@ -135,16 +135,21 @@ void CrowdImpostorManager::GenerateCrowd(int reload)
 
 void CrowdImpostorManager::Clear()
 {
+    BasicSlotPool<DLListEntry<CrowdLayoutObject*> >* objectPool;
+
     mPrimaryObjects.Clear();
-    mPrimaryObjects.m_Allocator.FreeBlocks();
+    objectPool = &mPrimaryObjects.m_Allocator;
+    objectPool->FreeBlocks();
     mPrimaryObjectCount = 0;
 
     mOcclusionObjects.Clear();
-    mOcclusionObjects.m_Allocator.FreeBlocks();
+    objectPool = &mOcclusionObjects.m_Allocator;
+    objectPool->FreeBlocks();
     mOcclusionObjectCount = 0;
 
     mEnabledObjects.Clear();
-    mEnabledObjects.m_Allocator.FreeBlocks();
+    objectPool = &mEnabledObjects.m_Allocator;
+    objectPool->FreeBlocks();
     mEnabledObjectCount = 0;
 
     mCharacters.Clear();
@@ -162,52 +167,56 @@ void CrowdImpostorManager::Clear()
         delete mInverseMatrices;
 }
 
-static inline void InterpolateCrowdPoint(nlVector4& result,
-    const nlVector4& first, const nlVector4& second, float amount)
+static inline void InterpolateCrowdPoint(const nlVector4& first,
+    const nlVector4& second, float amount, nlVector4& result)
 {
-    float inverse = 1.0f - amount;
-    result.x = inverse * first.x + amount * second.x;
-    result.y = inverse * first.y + amount * second.y;
-    result.z = inverse * first.z + amount * second.z;
-    result.w = inverse * first.w + amount * second.w;
+    nlVec4Set(result,
+        (1.0f - amount) * first.x + amount * second.x,
+        (1.0f - amount) * first.y + amount * second.y,
+        (1.0f - amount) * first.z + amount * second.z,
+        (1.0f - amount) * first.w + amount * second.w);
 }
 
 int CrowdLayoutObject::PlacePoints(CrowdPointCallback* callback, float rowSpacing, float memberSpacing)
 {
     nlVector4 corners[4];
+    int total = 0;
     GetCorners(corners);
 
-    int total = 0;
-    int numRows = (int)floor(mLength / rowSpacing) + 1;
-    float rowOffset = 0.5f
-        * (mLength - (numRows - 1) * rowSpacing)
-        / mLength;
+    int numRows = (int)floorf(mLength / rowSpacing) + 1;
 
     for (int row = 0; row < numRows; ++row)
     {
+        float rowStep = rowSpacing / mLength;
+        float occupiedLength = (numRows - 1) * rowSpacing;
+        float rowOffset = 0.5f
+            * (mLength - occupiedLength)
+            / mLength;
         float rowAmount
-            = row * rowSpacing / mLength + rowOffset;
-        nlVector4 left;
+            = row * rowStep + rowOffset;
         nlVector4 right;
-        InterpolateCrowdPoint(left, corners[0], corners[2], rowAmount);
-        InterpolateCrowdPoint(right, corners[1], corners[3], rowAmount);
+        nlVector4 left;
+        InterpolateCrowdPoint(corners[3], corners[0], rowAmount, left);
+        InterpolateCrowdPoint(corners[2], corners[1], rowAmount, right);
 
-        float dx = left.x - right.x;
-        float dy = left.y - right.y;
-        float dz = left.z - right.z;
-        float rowLength = nlSqrt(dx * dx + dy * dy + dz * dz, true);
-        int numMembers = (int)floor(rowLength / memberSpacing) + 1;
-        float memberOffset
-            = 0.5f * (rowLength - (numMembers - 1) * memberSpacing)
-            / rowLength;
+        float rowLength = nlSqrt(
+            CalculateDistanceSquared(*(const nlVector3*)&left,
+                *(const nlVector3*)&right),
+            true);
+        int numMembers = (int)floorf(rowLength / memberSpacing) + 1;
+        float memberStep = memberSpacing / rowLength;
 
         for (int member = 0; member < numMembers; ++member)
         {
+            float occupiedWidth = (numMembers - 1) * memberSpacing;
+            float memberOffset
+                = 0.5f * (rowLength - occupiedWidth)
+                / rowLength;
             float memberAmount
-                = member * memberSpacing / rowLength + memberOffset;
+                = member * memberStep + memberOffset;
             nlVector4 point;
             InterpolateCrowdPoint(
-                point, left, right, memberAmount);
+                right, left, memberAmount, point);
             callback->Place(point);
             ++total;
         }
@@ -301,7 +310,7 @@ void CrowdImpostorManager::ReleaseCrowdImpostors()
 }
 
 void CrowdPointCallback::Place(
-    const nlVector4& point)
+    nlVector4 point)
 {
     float horizontalJitter = sfDistanceBetweenCrowdMembers.value
         * sfHorizontalJitterFraction.value;

@@ -1,5 +1,4 @@
 #include "Game/SH/SHOnlineInviteResponse.h"
-#include "NL/nlBasicString.inl"
 #include "NL/nlFunction.inl"
 #include "Game/SH/SHOnlineInviteStatus.h"
 #include "Game/FE/FEAudio.h"
@@ -20,6 +19,7 @@
 #include "NL/nlBasicString.h"
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
+#include "NL/nlLocalizationLookup.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
@@ -85,18 +85,16 @@ void SHOnlineInviteResponse::SceneCreated()
     {
         char name[6];
         nlSNPrintf(name, sizeof(name), "BTN_%d", i + 1);
-        mButtonInstances[i] = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
-            InlineHasher("Layer"), InlineHasher("INVITATION"), InlineHasher(name));
-        if (mButtonInstances[i] == 0)
-            mButtonInstances[i] = &UnidentifiedTLComponentDefault::sInstance;
+        mButtonInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(
+            presentation->m_currentSlide, "Layer", "INVITATION", name);
     }
     int index = g_pFriendManager->mHostInvitationIndex;
     const unsigned short* name = GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, index);
     typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
     WideBasicString string = Format(WideBasicString(g_pLocalization->GetString("ONLINE_INVITATION_INVITATION")), name);
     nlStrNCpy(mInvitationText, string.c_str(), 0x80);
-    FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide, InlineHasher("Layer"),
-        InlineHasher("INVITATION"), InlineHasher("INVITE"))->SetString(mInvitationText);
+    FEFinder<TLTextInstance, 3>::Find<>(
+        presentation->m_currentSlide, "Layer", "INVITATION", "INVITE")->SetString(mInvitationText);
     g_pFriendManager->SetOwnStatusReceivedInvitation(index);
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)

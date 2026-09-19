@@ -16,6 +16,11 @@ public:
 
     ~ScriptQuestionCache()
     {
+        FreeBlocks();
+    }
+
+    void FreeBlocks()
+    {
         Clear();
         mQuestionCacheMap.GetAllocator()->FreeBlocks();
     }

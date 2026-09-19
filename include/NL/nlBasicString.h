@@ -169,9 +169,19 @@ public:
         }
     }
 
-    BasicString& operator=(BasicString other);
+    BasicString& operator=(BasicString other)
+    {
+        Data* tmp = mData;
+        mData = other.mData;
+        other.mData = tmp;
+        return *this;
+    }
 
-    const CharT* c_str() const;
+    const CharT* c_str() const
+    {
+        static CharT emptyString = 0;
+        return mData ? mData->c_str() : &emptyString;
+    }
 
     int size() const
     {

@@ -1,10 +1,10 @@
 #include "Game/Camera/ReplayCamera.h"
-#include "NL/nlBasicString.inl"
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/Field.h"
+#include "Game/MathHelpers.h"
 #include "Game/ReplayManager.h"
 #include "Game/Render/depthoffield.h"
 #include "NL/nlConfig.h"
@@ -12,10 +12,16 @@
 #include "NL/nlPrint.h"
 #include "NL/nlTask.h"
 #include "NL/gl/glMatrix.h"
+#include "NL/gl/glPlat.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" float fn_800F2410(float fov);
+extern "C" void fn_802B5370(
+    nlQuaternion& out, const nlVector3& rotationAxis, unsigned short angle);
+extern float lbl_806E0F20[2];
+
+static const nlVector3 lbl_804DC520 = { 0.0f, 0.0f, 0.0f };
 
 float lbl_806DC510[2] = { 18.0f, 0.0f };
 float lbl_806DC518 = 0.25f;
@@ -33,6 +39,30 @@ u8 lbl_806E0F18[8];
 static inline float GetSideDirection(int side)
 {
     return side == 0 ? -1.0f : 1.0f;
+}
+
+static inline void Dampen(float& current, const float& target,
+    float& currentVelocity, float smoothTime, float deltaTime)
+{
+    float omega = 2.0f / smoothTime;
+    float x = omega * deltaTime;
+    float exp = 1.0f / ((0.48f * x * x + (1.0f + x)) + x * (0.235f * x * x));
+    float change = current - target;
+    float temp = deltaTime * (omega * change + currentVelocity);
+    currentVelocity = exp * (currentVelocity - omega * temp);
+    current = exp * (change + temp) + target;
+}
+
+static inline float LimitMagnitude(float value, float limit)
+{
+    if (nlAbs(value) > limit)
+    {
+        float sign = 0.0f;
+        if (value != 0.0f)
+            sign = value < 0.0f ? -1.0f : 1.0f;
+        value = nlMinEquals(nlAbs(value), limit) * sign;
+    }
+    return value;
 }
 
 /**
@@ -327,22 +357,88 @@ nlVector3 ReplayCamera::fn_800F63F8(const nlVector3& position,
     const nlVector3& lookAt, const nlVector3& previousLookAt,
     unsigned int width, unsigned int height, float fov) const
 {
-    nlVector3 result = position;
-    nlVector3 previousDirection;
-    nlVector3 direction;
-    nlVec3Sub(previousDirection, previousLookAt, lookAt);
-    nlVec3Sub(direction, position, lookAt);
+    float angleScale = 1.0 - 1.0 / 4.0f;
+    float horizontalLimit = fov * angleScale * 0.5f;
+    float aspectRatio = IsWidescreen() ? lbl_806DC538[0] : lbl_806DC534;
+    float verticalLimit = fov * (1.0 / aspectRatio) * angleScale;
+    verticalLimit = verticalLimit * 0.5f - DegreesToRadians(lbl_806DC530);
+    verticalLimit = nlMaxEquals(0.005f, verticalLimit);
+    float maximumAngle = DegreesToRadians(110.0f);
 
-    float distance = nlSqrt(direction.GetLengthSq3D(), true);
-    if (distance != 0.0f && width != 0 && height != 0)
+    nlVector3 result = lookAt;
+    if (nlNear(previousLookAt.x, lookAt.x)
+        && nlNear(previousLookAt.y, lookAt.y)
+        && nlNear(previousLookAt.z, lookAt.z))
     {
-        float aspect = (float)width / (float)height;
-        float framing = nlSqrt(previousDirection.GetLengthSq3D(), true);
-        float scale = framing / (fov * aspect);
-        result.x += scale * direction.x / distance;
-        result.y += scale * direction.y / distance;
-        result.z += scale * direction.z / distance;
+        return result;
     }
+
+    nlVector3 direction;
+    nlVec3Sub(direction, lookAt, position);
+    float distance = nlSqrt(direction.GetLengthSq3D(), true);
+    nlVec3Normalize(direction, direction);
+
+    nlVector3 previousDirection;
+    nlVec3Sub(previousDirection, previousLookAt, position);
+    nlVec3Normalize(previousDirection, previousDirection);
+
+    nlVector3 side;
+    nlVec3CrossProduct(side, direction, mUpVector);
+    nlVec3Normalize(side, side);
+
+    nlVector3 cameraUp;
+    nlVec3CrossProduct(cameraUp, direction, side);
+    nlVec3Normalize(cameraUp, cameraUp);
+    if (cameraUp.GetLengthSq3D() < 0.0f)
+        nlVec3Scale(cameraUp, -1.0f);
+
+    nlMatrix4 cameraMatrix;
+    nlMatrix4 inverseCameraMatrix;
+    nlMakeRotTransMatrix(cameraMatrix, direction, cameraUp, mUpVector, lbl_804DC520);
+    nlInvertRotTransMatrix(inverseCameraMatrix, cameraMatrix);
+
+    nlVector3 localDirection;
+    nlMultDirVectorMatrix(localDirection, previousDirection, inverseCameraMatrix);
+
+    float horizontalAngle = AngUnitsToRad_fromUnsignedShort(
+        (unsigned short)(int)(10430.378f * nlATan2f(localDirection.x, localDirection.y)));
+    if (localDirection.y < 0.0f && nlAbs(horizontalAngle) > horizontalLimit)
+        horizontalAngle = -1.0f * (DegreesToRadians(360.0f) - horizontalAngle);
+    if (nlAbs(horizontalAngle) > maximumAngle)
+        horizontalAngle = 0.0f;
+
+    float verticalAngle = AngUnitsToRad_fromUnsignedShort(
+        (unsigned short)(int)(10430.378f * nlATan2f(localDirection.z, 1.0f)));
+    if (nlAbs(verticalAngle) > DegreesToRadians(180.0f))
+        verticalAngle = DegreesToRadians(360.0f) - verticalAngle;
+    if (localDirection.y > 0.0f)
+        verticalAngle *= -1.0f;
+    if (nlAbs(verticalAngle) > maximumAngle)
+        verticalAngle = 0.0f;
+
+    horizontalAngle = LimitMagnitude(horizontalAngle, horizontalLimit);
+    verticalAngle = LimitMagnitude(verticalAngle, verticalLimit);
+
+    if (horizontalAngle != 0.0f)
+    {
+        nlQuaternion horizontalRotation;
+        fn_802B5370(horizontalRotation, cameraUp,
+            (unsigned short)(int)(10430.378f * horizontalAngle));
+        nlVector3 unrotatedDirection = direction;
+        RotateVector(direction, unrotatedDirection, horizontalRotation);
+    }
+
+    if (verticalAngle != 0.0f)
+    {
+        nlVec3CrossProduct(side, direction, mUpVector);
+        nlQuaternion verticalRotation;
+        fn_802B5370(verticalRotation, side,
+            (unsigned short)(int)(10430.378f * verticalAngle));
+        nlVector3 unrotatedDirection = direction;
+        RotateVector(direction, unrotatedDirection, verticalRotation);
+    }
+
+    nlVec3ScaleAdd(result, distance, direction, position);
     return result;
 }
 
@@ -381,25 +477,29 @@ void ReplayCamera::ManualUpdate(float deltaTime)
         }
         else
         {
-            mPosition.x = (1.0f - lbl_806DC518) * mPosition.x + lbl_806DC518 * position.x;
-            mPosition.y = (1.0f - lbl_806DC518) * mPosition.y + lbl_806DC518 * position.y;
-            mPosition.z = (1.0f - lbl_806DC518) * mPosition.z + lbl_806DC518 * position.z;
-            mLookAt.x = (1.0f - lbl_806DC51C) * mLookAt.x + lbl_806DC51C * lookAt.x;
-            mLookAt.y = (1.0f - lbl_806DC51C) * mLookAt.y + lbl_806DC51C * lookAt.y;
-            mLookAt.z = (1.0f - lbl_806DC51C) * mLookAt.z + lbl_806DC51C * lookAt.z;
+            nlVec3Sub(mLookAt, mLookAt, mUnidentified054);
+            Dampen(mPosition.x, position.x, mUnidentified030.x, lbl_806DC518, deltaTime);
+            Dampen(mPosition.y, position.y, mUnidentified030.y, lbl_806DC518, deltaTime);
+            Dampen(mPosition.z, position.z, mUnidentified030.z, lbl_806DC518, deltaTime);
+            Dampen(mLookAt.x, lookAt.x, mUnidentified03C.x, lbl_806DC51C, deltaTime);
+            Dampen(mLookAt.y, lookAt.y, mUnidentified03C.y, lbl_806DC51C, deltaTime);
+            Dampen(mLookAt.z, lookAt.z, mUnidentified03C.z, lbl_806DC51C, deltaTime);
         }
 
-        if (mUnidentified0D4)
+        if (mUnidentified0D4 == true)
         {
             nlVector3 difference;
             nlVec3Sub(difference, lookAt, position);
             float distance = nlSqrt(difference.GetLengthSq3D(), true);
+            float maxChange = mUnidentified0E8 * deltaTime;
             float fov = InterpolateRangeClamped(mUnidentified0D8, mUnidentified0DC,
                 mUnidentified0E0, mUnidentified0E4, distance);
-            float maxChange = mUnidentified0E8 * deltaTime;
             if (nlAbs(mFov - fov) > maxChange)
             {
-                fov = fov < mFov ? mFov - maxChange : mFov + maxChange;
+                if (fov < mFov)
+                    fov = nlMaxEquals(fov, mFov - maxChange);
+                else
+                    fov = nlMinEquals(fov, mFov + maxChange);
             }
             mFov = fov;
         }
@@ -410,13 +510,38 @@ void ReplayCamera::ManualUpdate(float deltaTime)
             else if (mFov > mUnidentified024)
                 mFov -= deltaTime * mDeltaFov;
 
-            if (nlAbs(mFov - mUnidentified024) < 2.0f * deltaTime * mDeltaFov)
+            if (nlAbs(mFov - mUnidentified024) < 2.0f * (deltaTime * mDeltaFov))
                 mDeltaFov = 0.0f;
         }
 
-        mLookAt.x += mUnidentified054.x;
-        mLookAt.y += mUnidentified054.y;
+        nlVector3 targetOffset = { 0.0f, 0.0f, 0.0f };
+        if (mUnidentified068 != mFocus)
+        {
+            nlVector3 previousLookAt = fn_800F6B40(mUnidentified068);
+            targetOffset = fn_800F63F8(position, lookAt, previousLookAt,
+                glplatGetDefaultTargetWidth(), glplatGetDefaultTargetHeight(),
+                DegreesToRadians(mFov));
+            nlVec3Sub(targetOffset, targetOffset, lookAt);
+        }
+
+        if (mUnidentified054.x != targetOffset.x
+            && mUnidentified054.y != targetOffset.y
+            && mUnidentified054.z != targetOffset.z)
+        {
+            nlVec3Scale(mUnidentified054, mUnidentified054, 10.0f);
+            nlVec3Scale(targetOffset, targetOffset, 10.0f);
+            Dampen(mUnidentified054.x, targetOffset.x,
+                mUnidentified048.x, lbl_806DC520, deltaTime);
+            Dampen(mUnidentified054.y, targetOffset.y,
+                mUnidentified048.y, lbl_806DC520, deltaTime);
+            Dampen(mUnidentified054.z, targetOffset.z,
+                mUnidentified048.z, lbl_806DC520, deltaTime);
+            nlVec3Scale(mUnidentified054, mUnidentified054, 0.1f);
+        }
+
         mLookAt.z += mUnidentified054.z;
+        mLookAt.y += mUnidentified054.y;
+        mLookAt.x += mUnidentified054.x;
 
         if (mFov < 10.0f)
             mFov = 10.0f;
@@ -426,9 +551,15 @@ void ReplayCamera::ManualUpdate(float deltaTime)
 
     if (nlTaskManager::m_pInstance->mCurrentState == 8)
     {
+        float fovScale = lbl_806DC528 / mFov;
+        fovScale = (1.0f - lbl_806DC52C) * 1.0f + fovScale * lbl_806DC52C;
+        fovScale *= fovScale;
+        lbl_806E0F20[0] = fovScale;
+
         nlVector3 direction;
         nlVec3Sub(direction, mPosition, mLookAt);
-        DepthOfFieldManager::instance.m_fDistanceFromCamera = 4.0f + nlSqrt(direction.GetLengthSq3D(), true);
+        DepthOfFieldManager::instance.m_fDistanceFromCamera
+            = lbl_806DC524 * lbl_806E0F20[0] + nlSqrt(direction.GetLengthSq3D(), true);
     }
 }
 

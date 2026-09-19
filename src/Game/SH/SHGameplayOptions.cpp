@@ -1,5 +1,4 @@
 #include "Game/SH/SHGameplayOptions.h"
-#include "NL/nlBasicString.inl"
 #include "NL/nlFunction.inl"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
@@ -21,7 +20,6 @@
 #include "Game/SH/SHOptionsCheatsList.h"
 
 #include <string.h>
-
 
 static const int lbl_804E8540[5] = { 1, 2, 3, 4, 5 };
 static const int lbl_804E8554[5] = { 1, 3, 5, 7, 9 };

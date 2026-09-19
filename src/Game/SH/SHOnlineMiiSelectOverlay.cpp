@@ -1,5 +1,4 @@
 #include <RVLFaceLib/RFL_Database.h>
-#include "NL/nlBasicString.inl"
 #include "Game/FE/FEAudio.h"
 #include <revolution/os/OSTime.h>
 
@@ -34,7 +33,6 @@
 #include "NL/nlstring_tmpl.h"
 
 static const char* sButtonNames[2] = { "USE", "UNLINK" };
-
 
 SHOnlineMiiSelectOverlay::SHOnlineMiiSelectOverlay()
     : mInitialized(false)

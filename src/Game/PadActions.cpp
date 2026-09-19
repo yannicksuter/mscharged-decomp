@@ -1,5 +1,4 @@
 #include "NL/plat/PlatPadManager.h"
-#include "NL/nlBasicString.inl"
 #include "NL/plat/WiiPad.h"
 #include "NL/plat/GameCubePad.h"
 #include "Game/PadActions.h"

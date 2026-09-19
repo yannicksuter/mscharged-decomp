@@ -1,5 +1,4 @@
 #include "Game/GameInfo.h"
-#include "NL/nlBasicString.inl"
 #include "Game/FE/fePresentation.inl"
 #include "Game/SH/SHOnlineConnectionQuality.h"
 #include "Game/FE/FEAudio.h"
@@ -28,7 +27,6 @@
 #include "NL/nlstring_tmpl.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/UnidentifiedTLDefault.h"
-
 
 const char* sConnectionDecisionComponentNames[2] = { "ACCEPT", "REJECT" };
 

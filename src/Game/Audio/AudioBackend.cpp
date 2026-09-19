@@ -153,7 +153,7 @@ void AudioBackend::ServiceReadQueue(float)
     bool enabled = OSDisableInterrupts();
     while (m_Unknown024.m_Head != 0)
     {
-        AudioRead* request = &m_Unknown024.m_Head->entry;
+        AudioRead* request = m_Unknown024.GetHead();
         if (request->m_Unknown1B)
         {
             CancelAudioReads(request->m_Unknown14);

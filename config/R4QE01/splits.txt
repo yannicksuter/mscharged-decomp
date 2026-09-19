@@ -2224,18 +2224,14 @@ Game/Render/RLView.cpp:
 	.sbss       start:0x806E1920 end:0x806E1928
 
 Game/Render/RLViewLayers.cpp:
-	.text       start:0x80271DE0 end:0x80273D78
-	.rodata     start:0x804E8690 end:0x804E86E8
-	.data       start:0x80520FE0 end:0x80521734
-	.sdata      start:0x806DEE28 end:0x806DEE30
-	.sdata2     start:0x806E5C18 end:0x806E5C48
-
-Game/Render/RLViewData.cpp:
-	.text       start:0x80273D78 end:0x80276264
+	.text       start:0x80271DE0 end:0x80276264
 	.ctors      start:0x804DB7C8 end:0x804DB7CC
-	.data       start:0x80521734 end:0x80521CA0 align:4
+	.rodata     start:0x804E8690 end:0x804E86E8
+	.data       start:0x80520FE0 end:0x80521CA0
 	.bss        start:0x80578670 end:0x8057A698
+	.sdata      start:0x806DEE28 end:0x806DEE30
 	.sbss       start:0x806E1928 end:0x806E1960
+	.sdata2     start:0x806E5C18 end:0x806E5C48
 
 Game/Render/StadiumLoading.cpp:
 	.text       start:0x80276264 end:0x80277E28
@@ -4120,18 +4116,22 @@ Game/DetInput.cpp:
 	.sdata2     start:0x806E6958 end:0x806E6970
 
 Game/InputManager.cpp:
-	.text       start:0x80332770 end:0x80332DC0
+	.text       start:0x80332770 end:0x80332EB8
 	.ctors      start:0x804DBAE0 end:0x804DBAE4
 	.data       start:0x80533480 end:0x80533508
 	.sbss       start:0x806E2138 end:0x806E214C
 	.sdata2     start:0x806E6970 end:0x806E6978
 
+Game/NetworkRandomSeed.cpp:
+	.text       start:0x80332EB8 end:0x80332EDC
+	.sdata      start:0x806DF748 end:0x806DF750
+
 Game/InputRouter.cpp:
-	.text       start:0x80332DC0 end:0x80336B6C
+	.text       start:0x80332EDC end:0x80336B6C
 	.ctors      start:0x804DBAE4 end:0x804DBAE8
 	.data       start:0x80533508 end:0x80533BB8
 	.bss        start:0x80584900 end:0x80584B68 align:4
-	.sdata      start:0x806DF748 end:0x806DF7A8
+	.sdata      start:0x806DF750 end:0x806DF7A8
 	.sbss       start:0x806E2150 end:0x806E2160
 
 Game/NetworkInput.cpp:
@@ -4199,13 +4199,19 @@ Game/world.cpp:
 	.sdata2     start:0x806E69E8 end:0x806E69F0
 
 Game/World/worldanim.cpp:
-	.text       start:0x80341EE8 end:0x80344814
+	.text       start:0x80341EE8 end:0x803437C8
+	.data       start:0x80534340 end:0x80534428
+	.sbss       start:0x806E2188 end:0x806E2190
+	.sdata2     start:0x806E69F0 end:0x806E6A00
+
+Game/World/worldanimobjects.cpp:
+	.text       start:0x803437C8 end:0x80344814
 	.ctors      start:0x804DBAF8 end:0x804DBAFC
-	.data       start:0x80534340 end:0x805344D8
+	.data       start:0x80534428 end:0x805344D8
 	.bss        start:0x80584BC8 end:0x80584C08
 	.sdata      start:0x806DF868 end:0x806DF870
-	.sbss       start:0x806E2188 end:0x806E2198
-	.sdata2     start:0x806E69F0 end:0x806E6A20
+	.sbss       start:0x806E2190 end:0x806E2198
+	.sdata2     start:0x806E6A00 end:0x806E6A20
 
 ode/collision_kernel.cpp:
 	.text       start:0x80344814 end:0x80345C44

@@ -11,7 +11,6 @@
 
 #include "NL/gl/gl.h"
 #include "NL/nlMath.h"
-#include "NL/nlBasicString.inl"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 

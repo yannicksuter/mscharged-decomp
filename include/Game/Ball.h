@@ -74,6 +74,10 @@ public:
     void InitiateBallBlur(
         eBallShotEffectType effectType, cPlayer* pPlayer);
     bool GetInNet(int& nSide);
+    bool UnidentifiedPassState() const
+    {
+        return meBallState == 5 || meBallState == 3;
+    }
     bool HasActivePassTarget() const
     {
         return (meBallState == 5 || meBallState == 3) && m_pPassTarget != 0;

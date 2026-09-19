@@ -21,10 +21,6 @@ Impostor::Impostor()
     mUnidentified02C = false;
 }
 
-Impostor::~Impostor()
-{
-}
-
 void Impostor::Reset()
 {
     mpCharacter = 0;
@@ -68,3 +64,6 @@ void Impostor::Release()
     }
 }
 
+Impostor::~Impostor()
+{
+}

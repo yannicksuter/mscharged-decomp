@@ -5,7 +5,7 @@
 #include "Game/FE/FEAudio.h"
 
 #include "Game/GameSceneManager.h"
-#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
@@ -164,15 +164,12 @@ void SHOptionsCheatsList::UpdateCheatText(int item)
         }
     }
 
-    const char* challenge = "CHALLENGE_0";
-    const char* stat0 = "stat_0";
-    const char* stat1 = "stat_1";
     for (int i = 0; i < 3; ++i)
     {
         TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::Find(
-            mCheatInstances[item], nlStringLowerHash(slideNames[i]), nlStringLowerHash(challenge), nlStringLowerHash(stat0), 0, 0, 0);
+            mCheatInstances[item], slideNames[i], "CHALLENGE_0", "stat_0");
         TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::Find(
-            mCheatInstances[item], nlStringLowerHash(slideNames[i]), nlStringLowerHash(challenge), nlStringLowerHash(stat1), 0, 0, 0);
+            mCheatInstances[item], slideNames[i], "CHALLENGE_0", "stat_1");
 
         nameText->SetStringId(strings[0]);
         descriptionText->SetStringId(strings[1]);

@@ -141,7 +141,7 @@ public:
     virtual NetworkSocket* GetDirectSocket();
     virtual NetworkMachineRoster* GetMachineRoster();
     virtual LANLobby* GetTransport();
-    virtual void BaseVirtual3C(NetworkGameStartInfo* info);
+    virtual void BaseVirtual3C(const NetworkGameStartInfo* info);
     virtual void BaseVirtual40();
     virtual void BaseVirtual44(NetMessageGameStart* message);
     virtual void BaseVirtual48(int reason);
@@ -406,6 +406,7 @@ public:
     void SendConnectionDecisionToEveryone(NetworkMessage* message);
     void SendConnectionDecisionToHost(NetworkMessage* message);
     void ShutdownLAN();
+    void SetLoginListener(NetworkLoginListener* listener) { mLoginListener = listener; }
     void StartLoginThread();
     bool IsLoginThreadComplete();
     bool RequiresDisconnectAfterError();
@@ -438,7 +439,7 @@ public:
     virtual NetworkSocket* GetDirectSocket();
     virtual NetworkMachineRoster* GetMachineRoster();
     virtual LANLobby* GetTransport();
-    virtual void BaseVirtual3C(NetworkGameStartInfo* info);
+    virtual void BaseVirtual3C(const NetworkGameStartInfo* info);
     virtual void BaseVirtual40();
     virtual void BaseVirtual44(NetMessageGameStart* message);
     virtual void BaseVirtual48(int reason);

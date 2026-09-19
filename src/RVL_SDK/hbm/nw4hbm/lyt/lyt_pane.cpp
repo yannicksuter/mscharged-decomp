@@ -94,19 +94,19 @@ void Pane::SetUserData(const char* userData) { strncpy(mUserData, userData, size
 
 void Pane::AppendChild(Pane* pChild) { InsertChild(mChildList.GetEndIter(), pChild); }
 
-void Pane::InsertChild(PaneList::Iterator next, Pane* pChild) {
-    NW4HBMAssertPointerNonnull_Line(pChild, 253);
-    NW4HBMAssert_Line(pChild->mpParent == 0, 254);
-    mChildList.Insert(next, pChild);
-    pChild->mpParent = this;
-}
-
 void Pane::PrependChild(Pane* pChild) { InsertChild(mChildList.GetBeginIter(), pChild); }
 
 void Pane::InsertChild(Pane* pNext, Pane* pChild) {
     NW4HBMAssertPointerNonnull(pNext);
     NW4HBMAssert(pNext->mpParent == this);
     InsertChild(mChildList.GetIteratorFromPointer(pNext), pChild);
+}
+
+void Pane::InsertChild(PaneList::Iterator next, Pane* pChild) {
+    NW4HBMAssertPointerNonnull_Line(pChild, 253);
+    NW4HBMAssert_Line(pChild->mpParent == 0, 254);
+    mChildList.Insert(next, pChild);
+    pChild->mpParent = this;
 }
 
 void Pane::RemoveChild(Pane* pChild) {

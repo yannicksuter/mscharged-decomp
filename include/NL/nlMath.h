@@ -39,7 +39,7 @@ inline unsigned int nlAlignUp(unsigned int value, unsigned int alignment)
     return value + (remainder != 0) * (alignment - remainder);
 }
 
-inline float nlAbs(const float& value)
+inline float nlAbs(float value)
 {
     return __fabs(value);
 }
@@ -61,7 +61,7 @@ inline int DegreesToAngle(float degrees)
 
 inline bool nlNear(float first, float second)
 {
-    return (float)__fabs(first - second) <= 0.0001f;
+    return nlAbs(first - second) <= 0.0001f;
 }
 
 inline s16 nlAngleDiff(u16 a, u16 b)

@@ -39,24 +39,35 @@ public:
     u32 count;
 };
 
-static inline void DumpFreeMemory(MemoryAllocator* allocator, const char* filename)
+static inline unsigned int GetTotalFreeMemory(MemoryAllocator* allocator)
 {
-    MemoryStatsCallback_802AF2E4 callback1;
-    MemoryStatsCallback_802AF2E4 callback2;
     MemoryStats_802AF2E4 stats;
-    callback1.stats = &stats;
+    MemoryStatsCallback_802AF2E4 callback;
+    callback.stats = &stats;
     stats.total = 0;
     stats.largest = 0;
     stats.count = 0;
-    nlWalkDLRing(allocator->m_free_block_list, &callback1, &MemoryStatsCallback_802AF2E4::Callback);
-    nlPrintf(sTotalFreeMemoryFormat, stats.total);
+    nlWalkDLRing(allocator->m_free_block_list, &callback, &MemoryStatsCallback_802AF2E4::Callback);
+    return stats.total;
+}
 
-    callback2.stats = &stats;
+static inline unsigned int GetLargestFreeBlock(MemoryAllocator* allocator)
+{
+    MemoryStats_802AF2E4 stats;
+    MemoryStatsCallback_802AF2E4 callback;
+    callback.stats = &stats;
     stats.total = 0;
     stats.largest = 0;
     stats.count = 0;
-    nlWalkDLRing(allocator->m_free_block_list, &callback2, &MemoryStatsCallback_802AF2E4::Callback);
-    nlPrintf(sLargestFreeBlockFormat, stats.largest);
+    nlWalkDLRing(allocator->m_free_block_list, &callback, &MemoryStatsCallback_802AF2E4::Callback);
+    return stats.largest;
+}
+
+static inline void DumpFreeMemory(MemoryAllocator* allocator)
+{
+    const char* filename = sFreePanicDumpFilename;
+    nlPrintf(sTotalFreeMemoryFormat, GetTotalFreeMemory(allocator));
+    nlPrintf(sLargestFreeBlockFormat, GetLargestFreeBlock(allocator));
 
     FreePanicDumpCallback_802AF470 dump;
     if (filename == 0)
@@ -70,9 +81,9 @@ static inline void DumpFreeMemory(MemoryAllocator* allocator, const char* filena
     dump.total = 0;
     dump.count = 0;
     void* file = dump.file;
-    if (nlDebugFileIsValid(file))
+    if (nlDebugFileIsValid(dump.file))
     {
-        nlWriteLineDebug(file, sFreeMemoryDumpHeader, false);
+        nlWriteLineDebug(dump.file, sFreeMemoryDumpHeader, false);
     }
     else
     {
@@ -84,9 +95,9 @@ static inline void DumpFreeMemory(MemoryAllocator* allocator, const char* filena
     char buffer[512];
     nlSNPrintf(buffer, sizeof(buffer), sFreeMemoryDumpTotalFormat, dump.total);
     buffer[511] = 0;
-    if (nlDebugFileIsValid(file))
+    if (nlDebugFileIsValid(dump.file))
     {
-        nlWriteLineDebug(file, buffer, false);
+        nlWriteLineDebug(dump.file, buffer, false);
     }
     else
     {
@@ -128,7 +139,7 @@ void* MemoryAllocator::AllocateFromStart(unsigned long size, unsigned int alignm
         cur = cur->m_next;
         if (cur == start)
         {
-            DumpFreeMemory(this, sFreePanicDumpFilename);
+            DumpFreeMemory(this);
         }
     }
 
@@ -206,12 +217,12 @@ void* MemoryAllocator::AllocateFromStart(unsigned long size, unsigned int alignm
 void* MemoryAllocator::AllocateFromEnd(unsigned long size, unsigned int alignment)
 {
     FreeBlockList* end = nlDLRingGetEnd(m_free_block_list);
-    FreeBlockList* cur = end;
     u32 alignedSize = (size + 3) & ~3u;
     u32 alignMask = ~(alignment - 1);
+    FreeBlockList* cur = end;
+    u32 blockSize;
     u32 offset;
     u32 requestSize;
-    u32 blockSize;
 
     for (;;)
     {
@@ -219,7 +230,8 @@ void* MemoryAllocator::AllocateFromEnd(unsigned long size, unsigned int alignmen
         if (blockSize > alignedSize)
         {
             u32 endAddress = (u32)cur + blockSize;
-            offset = (endAddress - alignedSize) & alignMask;
+            u32 delta = endAddress - alignedSize;
+            offset = delta & alignMask;
             requestSize = (endAddress - offset) + 4;
             if (requestSize <= blockSize)
             {
@@ -230,40 +242,28 @@ void* MemoryAllocator::AllocateFromEnd(unsigned long size, unsigned int alignmen
         cur = cur->m_next;
         if (cur == end)
         {
-            DumpFreeMemory(this, sFreePanicDumpFilename);
+            DumpFreeMemory(this);
         }
     }
 
     u32 remaining = blockSize - requestSize;
-    u32 prefix = 4;
+    alignment = 4;
     if (remaining > 0xC)
     {
         cur->m_size = remaining;
     }
     else
     {
-        prefix = remaining + 4;
-        if (cur->m_next == cur)
-        {
-            m_free_block_list = 0;
-        }
-        else
-        {
-            cur->m_prev->m_next = cur->m_next;
-            cur->m_next->m_prev = cur->m_prev;
-            if (m_free_block_list == cur)
-            {
-                m_free_block_list = cur->m_prev;
-            }
-        }
+        alignment = remaining + 4;
+        nlDLRingRemove(&m_free_block_list, cur);
     }
 
-    void* result = (u8*)(offset - prefix) + prefix;
+    void* result = (u8*)(offset - alignment) + alignment;
     u32 header = size;
-    if (prefix > 4)
+    if (alignment > 4)
     {
         header = size | 0x80000000;
-        *(u32*)((u8*)result - 8) = prefix - 4;
+        *(u32*)((u8*)result - 8) = alignment - 4;
     }
     u32 suffixGap = requestSize - alignedSize - 4;
     u8* blockEnd = (u8*)result + size;

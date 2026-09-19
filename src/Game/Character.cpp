@@ -2533,21 +2533,23 @@ unsigned long lbl_8056B7B0[10] = {
 
 void cCharacter::fn_80022E60()
 {
+    int i;
+    glModelPacket* packet;
     if (mUnidentified118)
     {
         return;
     }
-    for (int i = 0; i < 4; ++i)
+    for (i = 0; i < 4; ++i)
     {
         if (m_pSkinMesh[i] != NULL)
         {
-            int modelIndex = m_pSkinMesh[i]->m_Unknown0C;
+            int modelIndex = m_pSkinMesh[i]->GetModelIndex();
             for (int j = 0; j < 2; ++j)
             {
                 m_pSkinMesh[i]->m_Unknown0C = j;
                 if (m_pSkinMesh[i]->GetModel() != NULL)
                 {
-                    for (glModelPacket* packet = m_pSkinMesh[i]->GetModel()->packets;
+                    for (packet = m_pSkinMesh[i]->GetModel()->packets;
                          packet < m_pSkinMesh[i]->GetModel()->packets
                                       + m_pSkinMesh[i]->GetNumPackets();
                          ++packet)

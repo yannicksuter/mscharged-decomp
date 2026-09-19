@@ -1,5 +1,4 @@
 #include "Game/FE/MatchSummary.h"
-#include "NL/nlBasicString.inl"
 
 #include "Game/FE/feFinder.inl"
 #include "Game/FE/fePresentation.h"

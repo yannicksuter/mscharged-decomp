@@ -35,7 +35,7 @@ public:
     DetermDataEvent* GetNetworkInputMessageEvent(int index);
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageInput();
+    virtual ~NetMessageInput() { }
     virtual int GetType();
 
     /* 0x008 */ u8 mUnidentified008;
@@ -71,7 +71,7 @@ public:
     NetMessageAllInputs();
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageAllInputs();
+    virtual ~NetMessageAllInputs() { }
     virtual int GetType();
 
     /* 0x008 */ u8 mUnidentified008[4];

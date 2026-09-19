@@ -14,6 +14,8 @@ public:
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
+    inline bool CanCancel();
+    void ShowConnectionError();
     void OnConnectionErrorDismissed();
 
     /* 0x01C */ int mStatus;

@@ -398,18 +398,22 @@ static int EvaluateMatchmakingPlayer(int index, void*)
 static void ConnectionClosedCallback(
     int error, int isLocal, int isServer, u8 aid, int index, void* param)
 {
-    (void)error;
-    (void)isLocal;
-    (void)isServer;
-    (void)index;
     (void)param;
 
-    u8 address[4] = { 0, 0, 0, aid };
-    NetworkSocket* socket = g_pNetworkSession->GetDirectSocket();
-    void* connection = socket->FindConnection(address);
+    g_pNetworkSession->GetOnlineLobby();
+    tDebugPrintManager::Print(DC_NETWORK,
+        "DWC Connection Closed error %d isLocal %d isServer %d aid %d index %d\n",
+        error, isLocal, isServer, aid, index);
+
+    u8 address[4];
+    address[0] = 0;
+    address[1] = 0;
+    address[2] = 0;
+    address[3] = aid;
+    void* connection = g_pNetworkSession->GetDirectSocket()->FindConnection(address);
     if (connection != 0 && connection != (void*)-1)
     {
-        socket->Disconnect(
+        g_pNetworkSession->GetDirectSocket()->Disconnect(
             (TransportConnection*)connection, true);
     }
 }

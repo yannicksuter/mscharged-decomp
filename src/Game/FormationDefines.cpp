@@ -1,5 +1,4 @@
 #include "Game/FormationDefines.h"
-#include "NL/nlBasicString.inl"
 
 #include "Game/AI/AiUtil.h"
 #include "NL/nlConfig.h"

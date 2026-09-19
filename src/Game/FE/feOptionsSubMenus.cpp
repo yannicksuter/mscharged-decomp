@@ -16,7 +16,6 @@
 #include "NL/nlColour.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFormat.h"
-#include "NL/nlBasicString.inl"
 #include "NL/nlLocalizationLookup.h"
 #include "NL/nlPrint.h"
 #include "Game/FE/feFinder.h"

@@ -1,5 +1,4 @@
 #include "Game/NisPlayer.h"
-#include "NL/nlBasicString.inl"
 #include "NL/nlBasicString.h"
 #include "Game/Render/StadiumLoading.h"
 #include "Game/CharacterTemplate.h"

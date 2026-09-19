@@ -6,18 +6,20 @@
 #include "Game/Task/TextWindowTask.h"
 
 #include "Game/Audio/AudioBankTable.h"
+#include "Game/Audio/XSoundCueHandle.h"
 #include "revolution/sc.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/TweakRegistry.h"
 #include "NL/nlAVLTree.h"
+#include "NL/nlDebugString.h"
 #include "NL/nlPrint.h"
 #include "NL/nlTask.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 void UpdateAudioSystem(AudioSystem*, float);
-XSoundHandle* CreateAudioSoundHandle(
+XSoundCueHandle* CreateAudioSoundHandle(
     AudioSystem*, int, XSoundOwner*, unsigned long,
     int, int, int, int, int);
 
@@ -231,38 +233,49 @@ XSoundHandle* CreateSoundHandle(int slotId,
     unsigned long cueId, XSoundOwner* owner,
     const void* debugName, void* context, bool findExisting)
 {
-    if (gExclusiveAudioContext != 0 || !gAudioEnabled)
+    if (gExclusiveAudioContext != 0)
+    {
+        return 0;
+    }
+    if (!gAudioEnabled)
     {
         return 0;
     }
 
+    AudioSystem* audio = g_pAudioSystem;
     g_pLastAudioHandle = 0;
-    if (slotId < 0)
+    AudioResourceLoadOwner* resource = audio->GetBundleManager()
+        ->GetSoundMap()->records_0C[slotId].field_10;
+    if (resource == 0)
     {
         PrintTextWindowMessage(sMissingSlot, slotId);
         return 0;
     }
-    if (cueId == 0xFFFFFFFF)
+    if (FindAudioResourceCue(resource, cueId, 0, 0, 0) == 0xFFFF)
     {
-        PrintTextWindowMessage(sMissingCue, (const char*)debugName, cueId);
+        PrintTextWindowMessage(sMissingCue,
+            nlLookupDebugString(g_pDebugStringTable, cueId), cueId);
         return 0;
     }
 
-    XSoundHandle* handle = CreateAudioSoundHandle(g_pAudioSystem,
-        slotId, owner, cueId, 0, 0, 0, 0, 0);
+    XSoundCueHandle* handle = CreateAudioSoundHandle(
+        audio, slotId, owner, cueId, 0, 0, 0, 0, 0);
     g_pLastAudioHandle = handle;
 
-    if (context != 0 && handle != 0)
+    if (context != 0)
     {
-        unsigned long key = MakeAudioHandleKey(cueId, context);
         if (!findExisting)
         {
-            sAudioHandles.Add(key, handle);
+            XSoundHandle* soundHandle;
+            unsigned long key;
+            key = (unsigned long)context ^ cueId;
+            soundHandle = handle;
+            sAudioHandles.Add(key, soundHandle);
         }
         else
         {
-            XSoundHandle** existing = 0;
-            sAudioHandles.FindGet(key, &existing);
+            unsigned long key = (unsigned long)context ^ cueId;
+            sAudioHandles.FindGet(key);
         }
     }
     return handle;

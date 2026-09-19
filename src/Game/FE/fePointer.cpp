@@ -1,5 +1,4 @@
 #include "Game/FE/fePointer.h"
-#include "NL/nlBasicString.inl"
 
 #include "Game/FE/feInput.h"
 #include "Game/FE/feText.h"

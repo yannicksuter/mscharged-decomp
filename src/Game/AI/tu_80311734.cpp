@@ -121,8 +121,7 @@ UnidentifiedFuzzyRuntimeBase::~UnidentifiedFuzzyRuntimeBase()
         delete[] (u8*)lbl_806E20A0;
         lbl_806E20A0 = 0;
 
-        lbl_805842EC.Clear();
-        lbl_805842EC.mQuestionCacheMap.GetAllocator()->FreeBlocks();
+        lbl_805842EC.FreeBlocks();
         lbl_80584200.FreeBlocks();
         lbl_80584228.FreeBlocks();
         lbl_80584328.FreeBlocks();

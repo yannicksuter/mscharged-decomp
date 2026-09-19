@@ -1,5 +1,6 @@
 #include "Game/FE/feRender.h"
 
+#include "Game/UnidentifiedStaticStorage.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/feScene.h"
@@ -9,6 +10,7 @@
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/FE/tlSlide.h"
+#include "Game/FE/tlInstance.inl"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
@@ -29,6 +31,13 @@ static MovieRenderCallback s_movieRenderCallback;
 static const unsigned long grabTex = nlStringLowerHash("target/grab_texture");
 static const unsigned long movieTex = nlStringLowerHash("movie");
 
+void FERender::CalculateCurrentAssetColour(const TLInstance* instance)
+{
+    for (unsigned long i = 0; i < 4; i++)
+    {
+        s_currentAssetColour.c[i] = (instance->GetColour().c[i] * s_currentAssetColour.c[i]) / 255.0f;
+    }
+}
 
 void FERender::Initialize()
 {
@@ -107,10 +116,11 @@ void FERender::RenderSlide(const TLSlide* slide, const nlMatrix4& matrix)
         return;
     if (slide->pChildren == 0)
         return;
+    TLInstance* next;
     TLInstance* curr = slide->pChildren->m_next;
     for (;;)
     {
-        TLInstance* next = curr->m_next;
+        next = curr->m_next;
         nlFloatColour colour = s_currentAssetColour;
         RenderTimeLineAsset(curr, slide->GetCurrentTime(), matrix);
         s_currentAssetColour = colour;
@@ -122,20 +132,12 @@ void FERender::RenderSlide(const TLSlide* slide, const nlMatrix4& matrix)
 
 void FERender::RenderComponentInstance(TLComponentInstance* instance, const nlMatrix4& matrix)
 {
-    TLComponent* component = static_cast<TLComponent*>(instance->m_component);
+    TLComponent* component = static_cast<TLComponent*>(instance->GetLibRefObject());
     if (component == 0)
         return;
     if (component->GetActiveSlide() == 0)
         return;
     RenderSlide(component->GetActiveSlide(), matrix);
-}
-
-void FERender::CalculateCurrentAssetColour(const TLInstance* instance)
-{
-    for (unsigned long i = 0; i < 4; i++)
-    {
-        s_currentAssetColour.c[i] = (instance->GetColour().c[i] * s_currentAssetColour.c[i]) / 255.0f;
-    }
 }
 
 void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, const nlMatrix4& parentMatrix)
@@ -144,11 +146,7 @@ void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, 
     {
         return;
     }
-    if (!pTLInstance->m_bVisible)
-    {
-        return;
-    }
-    if (!pTLInstance->m_component->m_attributes.bVisible)
+    if (!pTLInstance->IsVisible() || !pTLInstance->m_component->m_attributes.bVisible)
     {
         return;
     }
@@ -158,7 +156,7 @@ void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, 
 
     CalculateCurrentAssetColour(pTLInstance);
 
-    switch (pTLInstance->m_type)
+    switch (pTLInstance->GetType())
     {
     case TLAT_IMAGE:
         RenderImageInstance((const TLImageInstance*)pTLInstance, combinedMatrix);
@@ -250,10 +248,7 @@ void FERender::RenderScene(FEScene* scene)
 unsigned char FERender::RenderImageInstance(const TLImageInstance* pTLImageInstance, const nlMatrix4& matrix)
 {
     nlColour colour;
-    for (unsigned long i = 0; i < 4; i++)
-    {
-        colour.c[i] = (unsigned char)(255.0f * s_currentAssetColour.c[i]);
-    }
+    ConvertColour(colour, s_currentAssetColour);
 
     FETextureResource* pTexRes = pTLImageInstance->m_pTextureResource;
     if (!pTexRes->IsValid())
@@ -262,13 +257,14 @@ unsigned char FERender::RenderImageInstance(const TLImageInstance* pTLImageInsta
     }
 
     unsigned long textureHandle = pTexRes->GetTextureHandle();
-    float halfPixelU = 0.5f / (float)pTexRes->m_uWidth;
-    float halfPixelV = 0.5f / (float)pTexRes->m_uHeight;
+    float halfPixelU = 0.5f / (float)(s32)pTexRes->m_uWidth;
+    float halfPixelV = 0.5f / (float)(s32)pTexRes->m_uHeight;
     float left = pTLImageInstance->GetUVX();
-    float top = pTLImageInstance->GetUVY();
-    float bottom = 1.0f - (pTLImageInstance->GetUVHeight() + top);
+    float uvY = pTLImageInstance->GetUVY();
+    float uvH = pTLImageInstance->GetUVHeight();
+    float bottom = 1.0f - (uvH + uvY);
     float right = left + pTLImageInstance->GetUVWidth();
-    top = 1.0f - pTLImageInstance->GetUVY();
+    float top = 1.0f - pTLImageInstance->GetUVY();
 
     glSetDefaultState(false);
     glSetRasterState(GLS_Culling, 0);
@@ -281,9 +277,10 @@ unsigned char FERender::RenderImageInstance(const TLImageInstance* pTLImageInsta
     glSetCurrentRasterState(glHandleizeRasterState());
 
     nlMatrix4 matTM = matrix;
-    matTM.m41 += m_pRenderScene->m_matView.m41;
-    matTM.m42 += m_pRenderScene->m_matView.m42;
-    matTM.m43 += m_pRenderScene->m_matView.m43;
+    const nlMatrix4& view = m_pRenderScene->m_matView;
+    matTM.m41 += view.m41;
+    matTM.m42 += view.m42;
+    matTM.m43 += view.m43;
     unsigned long matrixHandle = glAllocMatrix();
     if (matrixHandle != 0xFFFFFFFF)
     {
@@ -293,8 +290,8 @@ unsigned char FERender::RenderImageInstance(const TLImageInstance* pTLImageInsta
 
     if (textureHandle == movieTex && s_movieRenderCallback != 0)
     {
-        nlVector2 pos[4];
         nlVector2 uv[4];
+        nlVector2 pos[4];
         pos[0].x = s_quadPositions[0].x;
         pos[0].y = s_quadPositions[0].y;
         pos[1].x = s_quadPositions[1].x;

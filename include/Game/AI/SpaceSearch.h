@@ -76,6 +76,8 @@ class SSearchOpenLane : public SpaceSearch
 {
 public:
     SSearchOpenLane(cPlayer* pPlayer1, cPlayer* pPlayer2);
+    void InitializeForShot(cPlayer* pBallOwner);
+    void InitializeForPass(cPlayer* pBallOwner, cPlayer* pPassTarget);
     virtual float EvaluatePosition(
         const nlVector3& position,
         const nlVector3& v3CenterPos,

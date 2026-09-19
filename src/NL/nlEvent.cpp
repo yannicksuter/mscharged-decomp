@@ -53,22 +53,24 @@ private:
     PoolCallback mCallback;
 };
 
+static void ApplyConnectionPoolState(
+    ConnectionPoolStateCallback::PoolCallback callback)
+{
+    ConnectionPoolStateCallback stateCallback(callback);
+    sConnectionGroups.Walk(
+        &stateCallback, &ConnectionPoolStateCallback::Apply);
+}
+
 void PushEventConnectionState()
 {
     sConnectionGroups.m_Allocator.PushState();
-
-    ConnectionPoolStateCallback callback(&ConnectionTreePool::PushState);
-    sConnectionGroups.Walk(
-        &callback, &ConnectionPoolStateCallback::Apply);
+    ApplyConnectionPoolState(&ConnectionTreePool::PushState);
 }
 
 void PopEventConnectionState()
 {
     sConnectionGroups.m_Allocator.PopState();
-
-    ConnectionPoolStateCallback callback(&ConnectionTreePool::PopState);
-    sConnectionGroups.Walk(
-        &callback, &ConnectionPoolStateCallback::Apply);
+    ApplyConnectionPoolState(&ConnectionTreePool::PopState);
 }
 
 unsigned int HashEventName(const char* name, int length)

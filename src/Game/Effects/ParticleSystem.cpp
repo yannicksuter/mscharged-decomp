@@ -739,25 +739,36 @@ void ParticleSystem::ClearParticles()
 int ParticleSystem::RenderAllParticles(GLView* view)
 {
     static int _tris[6] = { 0, 1, 2, 0, 2, 3 };
+    ParticleReturn ret;
+    u32 hMatrix;
 
-    if (!m_bVisible || !sUnidentified_806DF470 || mUnidentified0BC == 0)
+    if (!m_bVisible)
+        return 0;
+    if (!sUnidentified_806DF470)
         return 0;
 
-    EmissionManager::RecordRenderedParticles(mUnidentified000, mUnidentified0BC);
+    int numParticles = mUnidentified0BC;
+    if (numParticles == 0)
+        return 0;
+
+    const nlMatrix4* pCoord = &mUnidentified058;
+    EmissionManager::RecordRenderedParticles(mUnidentified000, numParticles);
     if ((unsigned int)sUnidentified_806E1FAC
         > (unsigned int)MaxNumParticles)
         return 0;
-    sUnidentified_806E1FAC += mUnidentified0BC;
+    sUnidentified_806E1FAC += numParticles;
 
     nlVector3 viewRight;
     nlVector3 viewUp;
-    bool cullBackFaces = true;
+    nlVector3 viewForward;
+    int cullBackFaces = true;
     if (m_pTemplate->m_eBillboard == EfBill_Billboard)
     {
         nlMatrix4 viewMatrix;
         view->m_Interface->GetViewMatrix(viewMatrix);
         nlVec3Set(viewRight, viewMatrix.e[0], viewMatrix.e[4], viewMatrix.e[8]);
         nlVec3Set(viewUp, viewMatrix.e[1], viewMatrix.e[5], viewMatrix.e[9]);
+        nlVec3Set(viewForward, viewMatrix.e[2], viewMatrix.e[6], viewMatrix.e[10]);
         nlVec3Scale(viewRight, m_fAspect);
     }
     else if (m_pTemplate->m_eBillboard == EfBill_Groundboard)
@@ -765,95 +776,140 @@ int ParticleSystem::RenderAllParticles(GLView* view)
         nlVec3Set(viewRight, 1.0f, 0.0f, 0.0f);
         nlVec3Set(viewUp, 0.0f, 1.0f, 0.0f);
     }
-    else
+    else if (m_pTemplate->m_eBillboard == EfBill_SoftwareControlled)
     {
-        nlVec3Set(viewRight, 1.0f, 0.0f, 0.0f);
-        nlVec3Set(viewUp, 0.0f, 0.0f, 1.0f);
+        viewUp.x = 0.0f;
+        viewUp.y = 0.0f;
+        viewUp.z = 1.0f;
+        viewRight.x = 1.0f;
+        viewRight.y = 0.0f;
+        viewRight.z = 0.0f;
         cullBackFaces = false;
         nlMatrix4 rot;
         nlMakeRotationMatrixZ(rot,
             0.0000958738f * (float)(unsigned short)(m_aFacing + 0x4000));
-        nlVector3 rotated;
-        nlMultDirVectorMatrix(rotated, viewRight, rot);
-        viewRight = rotated;
+        nlMultDirVectorMatrix(viewRight, rot);
     }
 
     glSetDefaultState(true);
     glSetRasterState(GLS_DepthWrite, 0);
     glSetRasterState(GLS_Culling, cullBackFaces ? 1 : 0);
-    if (sUnidentified_806E1F99
-        || (m_AllowInFront
-            && (m_pTemplate->IsInFront()
-                || (m_pSpec != 0 && m_pSpec->m_bInFront))))
+    if (sUnidentified_806E1F99)
+        glSetRasterState(GLS_DepthTest, 0);
+    if (m_AllowInFront
+        && (m_pTemplate->IsInFront()
+            || (m_pSpec != 0 && m_pSpec->m_bInFront)))
     {
         glSetRasterState(GLS_DepthTest, 0);
     }
-    if (sUnidentified_806E1F98
-        || m_pTemplate->m_eBlend == EfBlend_Additive)
+    if (sUnidentified_806E1F98)
+    {
         glSetRasterState(GLS_AlphaBlend, 3);
-    else if (m_pTemplate->m_eBlend == EfBlend_Normal)
-        glSetRasterState(GLS_AlphaBlend, 1);
+    }
+    else
+    {
+        switch (m_pTemplate->m_eBlend)
+        {
+        case EfBlend_Normal:
+            glSetRasterState(GLS_AlphaBlend, 1);
+            break;
+        case EfBlend_Additive:
+            glSetRasterState(GLS_AlphaBlend, 3);
+            break;
+        }
+    }
     glSetRasterState(GLS_AlphaTest, 1);
     glSetCurrentRasterState(glHandleizeRasterState());
 
     static unsigned long WhiteTexture = glGetTexture("global/white");
-    glSetCurrentTexture(
-        mUnidentified09C == 0xFFFFFFFF ? WhiteTexture : mUnidentified09C,
-        GLTT_Diffuse);
-
-    const nlMatrix4* pCoord
-        = m_pTemplate->IsLocalSpace() ? &mUnidentified058 : 0;
     if (m_pSpec != 0 && m_pSpec->m_bLight)
     {
+        pCoord = m_pTemplate->IsLocalSpace() ? pCoord : 0;
         nlDLListIterator<Particle*> iterator = m_Particles.Begin();
         while (iterator.hasNext())
         {
             Particle* pPart = *iterator;
-            iterator.Step();
             EffectsLight light;
             UpdateLight(&light, pPart, m_pTemplate, viewRight, viewUp,
                 pCoord);
             EmissionManager::Instance()->AddEffectsLight(light);
             RenderLightOnField(view, light);
+            iterator.Step();
         }
     }
     else if (m_pTemplate->m_uModelID != 0xFFFFFFFF)
     {
-        GLVertexAnim* pAnim = gEffectsModelInventory->GetVertexAnim(m_pTemplate->m_uModelID);
+        glModel* pModel;
+        GLVertexAnim* pAnim = gEffectsModelInventory->GetVertexAnim(
+            m_pTemplate->m_uModelID);
+        eEffectsBlend blendType;
+
+        nlMatrix4 m;
+        nlMatrix4 mScale;
+        nlMatrix4 mRot;
+        nlMatrix4 mCoord;
+        mCoord = *pCoord;
+        mCoord.e[2] = -mCoord.e[2];
+        mCoord.e[6] = -mCoord.e[6];
+        mCoord.e[10] = -mCoord.e[10];
+
+        switch (m_pTemplate->m_eBlend)
+        {
+        case EfBlend_Normal:
+            blendType = EfBlend_Additive;
+            break;
+        case EfBlend_Additive:
+            blendType = (eEffectsBlend)3;
+            break;
+        }
+
+        pCoord = m_pTemplate->IsLocalSpace() ? pCoord : 0;
         nlDLListIterator<Particle*> iterator = m_Particles.Begin();
         while (iterator.hasNext())
         {
             Particle* pPart = *iterator;
-            iterator.Step();
-            glModel* pModel;
             if (pAnim == 0)
             {
-                pModel = glModelDupNoStreams(
+                glModelDupNoStreams(
                     gEffectsModelInventory->GetModel(m_pTemplate->m_uModelID),
                     false,
                     0);
             }
-            ParticleReturn ret;
             UpdateParticle(&ret, pPart, m_pTemplate, viewRight, viewUp, pCoord);
-            nlMatrix4 mRot;
-            nlMatrix4 mScale;
-            nlMatrix4 m;
-            nlMakeRotationMatrixZ(mRot,
-                3.1415927f * ret.position[1].y / 180.0f);
-            nlMakeScaleMatrix(mScale, ret.position[1].x,
-                ret.position[1].x, ret.position[1].x);
-            nlMultMatrices(m, mScale, mRot);
-            m.SetTranslation(ret.position[0]);
+            float rotRad = 3.1415927f * ret.position[1].y / 180.0f;
+            float size = ret.position[1].x;
+            if (m_pTemplate->m_eBillboard == EfBill_Billboard)
+            {
+                float facingRot = 0.0000958738f
+                    * (float)(unsigned short)(m_aFacing + 0x8000);
+                rotRad += facingRot;
+            }
+            nlMakeRotationMatrixZ(mRot, rotRad);
+            nlMakeScaleMatrix(mScale, size, size, size);
+            nlMultMatrices(mScale, mRot);
+            nlMultMatrices(m, mCoord, mScale);
+            m.e[12] = ret.position[0].x;
+            m.e[13] = ret.position[0].y;
+            m.e[14] = ret.position[0].z;
+
+            hMatrix = glAllocMatrix();
+            if (hMatrix != 0xFFFFFFFF)
+                glSetMatrix(hMatrix, m);
+
+            float meshRateScale = 1.0f;
             if (pAnim != 0)
             {
                 if ((m_pTemplate->mUnidentified037 & 8) != 0)
                 {
+                    meshRateScale = ((float)(int)pAnim->m_nNumFrames
+                        / pAnim->m_fFrameRate) / pPart->lifeSpan;
                     float frameFrac = pPart->timeElapsed / pPart->lifeSpan;
                     float frame = frameFrac * (float)((int)pAnim->m_nNumFrames - 1);
                     pModel = pAnim->GetModel((int)frame);
                 }
                 else
                 {
+                    meshRateScale = pPart->FPS / pAnim->m_fFrameRate;
                     float frame = pPart->FPS * pPart->timeElapsed;
                     float numFrames = (float)(int)pAnim->m_nNumFrames;
                     while (frame >= numFrames)
@@ -863,12 +919,6 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                     pModel = pAnim->GetModel((int)frame);
                 }
             }
-            if (m_pTemplate->IsLit() && m_LightingCallback != 0)
-                pModel = m_LightingCallback(pModel);
-
-            unsigned long hMatrix = glAllocMatrix();
-            if (hMatrix != 0xFFFFFFFF)
-                glSetMatrix(hMatrix, m);
 
             static unsigned long constantColourHash_806E1FBC
                 = nlStringLowerHash("constantcolour");
@@ -878,26 +928,27 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                 if (glHasMaterialParameter(pPacket, constantColourHash_806E1FBC))
                 {
                     nlVector4 colour;
-                    colour.x = (float)ret.c.c[0] / 255.0f;
-                    colour.y = (float)ret.c.c[1] / 255.0f;
-                    colour.z = (float)ret.c.c[2] / 255.0f;
-                    colour.w = (float)ret.c.c[3] / 255.0f;
+                    colour.x = (float)ret.c.c[0] * (1.0f / 255.0f);
+                    colour.y = (float)ret.c.c[1] * (1.0f / 255.0f);
+                    colour.z = (float)ret.c.c[2] * (1.0f / 255.0f);
+                    colour.w = (float)ret.c.c[3] * (1.0f / 255.0f);
                     glSetMaterialParameterArray(pPacket, constantColourHash_806E1FBC,
                         &colour, 4);
                 }
                 glSetRasterState(pPacket->rasterState, GLS_Culling, 0);
                 glSetRasterState(pPacket->rasterState, GLS_AlphaBlend,
-                    m_pTemplate->m_eBlend == EfBlend_Additive ? 3 : 1);
+                    blendType);
                 glSetRasterState(pPacket->rasterState, GLS_AlphaTest, 1);
                 glSetRasterState(pPacket->rasterState, GLS_AlphaTestRef, 3);
-                if (m_pTemplate->IsInFront())
+                if ((m_pTemplate->mUnidentified037 & 4) != 0)
                     glSetRasterState(
-                        pPacket->rasterState, GLS_DepthTest, 0);
+                        pPacket->rasterState, GLS_DepthWrite, 0);
                 pPacket->matrix = hMatrix;
                 ++pPacket;
             }
             glModelSetMatrix(pModel, hMatrix);
             view->AttachModel(pModel, m_uLayer + 1);
+            iterator.Step();
         }
     }
     else if (m_Callback == 0)
@@ -915,12 +966,11 @@ int ParticleSystem::RenderAllParticles(GLView* view)
         }
         if (began)
         {
+            pCoord = m_pTemplate->IsLocalSpace() ? pCoord : 0;
             nlDLListIterator<Particle*> iterator = m_Particles.Begin();
             while (iterator.hasNext())
             {
                 Particle* pPart = *iterator;
-                iterator.Step();
-                ParticleReturn ret;
                 UpdateParticle(&ret, pPart, m_pTemplate, viewRight,
                     viewUp, pCoord);
                 int i;
@@ -942,7 +992,31 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                         mesh.Vertex(ret.position[_tris[i]]);
                     }
                 }
+                iterator.Step();
             }
+
+            if (sUnidentified_806E1F98)
+            {
+                glTextureBinding* textureState
+                    = (glTextureBinding*)mesh.GetModel()
+                        ->packets->materialParameters;
+                textureState->texture = WhiteTexture;
+                textureState->textureIndex = 0xFFFF;
+                textureState->SetWrapS(false);
+                textureState->SetWrapT(false);
+                textureState->unknown07 = 0;
+            }
+            else
+            {
+                glTextureBinding* textureState
+                    = (glTextureBinding*)mesh.GetModel()
+                        ->packets->materialParameters;
+                textureState->textureIndex = mUnidentified09C;
+                textureState->SetWrapS(false);
+                textureState->SetWrapT(false);
+                textureState->unknown07 = 0;
+            }
+
             if (mesh.End())
                 view->AttachModel(mesh.GetModel(), m_uLayer);
             else
@@ -955,14 +1029,17 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                 "could not begin a mesh for sprites\n");
         }
     }
-    else if (!m_Callback(this, view, &m_Particles, viewRight, viewUp,
-                 pCoord))
+    else
     {
-        tDebugPrintManager::Print(DC_RENDER,
-            "too many particles for the fast-path\n");
+        if (!m_Callback(this, view, &m_Particles, viewRight, viewUp,
+                m_pTemplate->IsLocalSpace() ? pCoord : 0))
+        {
+            tDebugPrintManager::Print(DC_RENDER,
+                "too many particles for the fast-path\n");
+        }
     }
 
-    return mUnidentified0BC;
+    return numParticles;
 }
 
 void ParticleSystem::Die()

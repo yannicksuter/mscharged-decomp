@@ -228,4 +228,6 @@ CharT* nlStrChr(const CharT* str, CharT c);
 
 #include "NL/nlPrint.h"
 
+#include "NL/nlstring_tmpl.h"
+
 #endif // NL_STRING_H

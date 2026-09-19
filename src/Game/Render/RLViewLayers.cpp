@@ -14,6 +14,7 @@
 #include "Game/Render/HighRange.h"
 
 #include "Game/Render/ShadowVolume.h"
+#include "Game/UnidentifiedStaticStorage.h"
 void CopyShadowVolumeColour(const GXColor* colour);
 
 struct RLViewLayerDesc
@@ -31,10 +32,85 @@ const nlMatrix4 sIdentityMatrix = {
     0.0f, 0.0f, 0.0f, 1.0f,
 };
 
-static const GXColor sShadowVolumeColour = { 0, 0, 0, 0 };
+static const GXColor sShadowVolumeColour = { 0, 0, 0, 0x9B };
 
 static char sDofTargetName[] = "dof";
 static char sPipTargetName[] = "pip";
+
+TweakValueBool eCLV_ImpostorTextureEnabled("eCLV_ImpostorTextureEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_ShadowTextureEnabled("eCLV_ShadowTextureEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_GrabTextureEnabled("eCLV_GrabTextureEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_PictureInPictureEnabled("eCLV_PictureInPictureEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_PictureInPictureAlphaEnabled("eCLV_PictureInPictureAlphaEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_NoFogEnabled("eCLV_NoFogEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_ShadowedEnabled("eCLV_ShadowedEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_WorldShadowedEnabled("eCLV_WorldShadowedEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_UnshadowedEnabled("eCLV_UnshadowedEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_MegastrikeBackgroundEnabled("eCLV_MegastrikeBackgroundEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_ImpostorOutEnabled("eCLV_ImpostorOutEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_CharactersEnabled("eCLV_CharactersEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_PeachPhoto3DEnabled("eCLV_PeachPhoto3DEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_MoreCharactersEnabled("eCLV_MoreCharactersEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_WorldAlphaBlendedEnabled("eCLV_WorldAlphaBlendedEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_HighRange3DEnabled("eCLV_HighRange3DEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_HighRange3DNoFogEnabled("eCLV_HighRange3DNoFogEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_HighRangeChainEnabled("eCLV_HighRangeChainEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_HighRange2DEnabled("eCLV_HighRange2DEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_BigBlackPolygonEnabled("eCLV_BigBlackPolygonEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_ShadowVolumeEnabled("eCLV_ShadowVolumeEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_ShadowVolumeBlendEnabled("eCLV_ShadowVolumeBlendEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_UnsortedPerspectiveEnabled("eCLV_UnsortedPerspectiveEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_DepthOfFieldEnabled("eCLV_DepthOfFieldEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_LingeringParticlesEnabled("eCLV_LingeringParticlesEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_ParticlesEnabled("eCLV_ParticlesEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_BallChargeAlphaBlendedEnabled("eCLV_BallChargeAlphaBlendedEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_CoPlanarEnabled("eCLV_CoPlanarEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_InvisiblePlaneEnabled("eCLV_InvisiblePlaneEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_ElectricFenceEnabled("eCLV_ElectricFenceEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_PreWarbleEnabled("eCLV_PreWarbleEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_WarbleEnabled("eCLV_WarbleEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_WarbleBlendEnabled("eCLV_WarbleBlendEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_CameraSpaceEnabled("eCLV_CameraSpaceEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_ScreenBlurEnabled("eCLV_ScreenBlurEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_ScreenBlur2Enabled("eCLV_ScreenBlur2Enabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_ScreenGrabEnabled("eCLV_ScreenGrabEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_FrontEndEnabled("eCLV_FrontEndEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_UnsortedOrtho640Enabled("eCLV_UnsortedOrtho640Enabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_UnsortedSquareOrthoEnabled("eCLV_UnsortedSquareOrthoEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_Transitions3DEnabled("eCLV_Transitions3DEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_TransitionsEnabled("eCLV_TransitionsEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_Anark3D_BGEnabled("eCLV_Anark3D_BGEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_AnarkEnabled("eCLV_AnarkEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_Anark3D_FGEnabled("eCLV_Anark3D_FGEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_HomeButtonFadeOutEnabled("eCLV_HomeButtonFadeOutEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_DebugEnabled("eCLV_DebugEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_DebugSquareEnabled("eCLV_DebugSquareEnabled", "/Rendering/RLView Toggles", true);
+TweakValueBool eCLV_NumEnabled("eCLV_NumEnabled", "/Rendering/RLView Toggles", true);
+
+GLView* sShadowPartitionViews[11];
+RLViewCamera sShadowPartitionCameras[11];
+RLViewRect sShadowPartitionRects[11];
+char sShadowPartitionNames[11][16];
+u32 sShadowPartitionTextures[11];
+GLRenderPair sShadowPartitionPairs[11];
+RLView* sLayerViews[eCLV_Num];
+RLViewCamera sPerspectiveCamera;
+RLViewCamera sPipCamera;
+RLViewCamera sNoTranslationCamera;
+RLViewCamera sCameraSpaceCamera;
+RLViewCamera sTransitions3DCamera;
+RLViewCamera sAnark3DCamera;
+RLViewOrthoCamera sOrthoCamera;
+RLViewOrthoCamera sOrthoCenteredCamera;
+RLViewOrthoCamera sOrtho640Camera;
+
+GLRenderPair sWarbleColourTarget;
+GLRenderPair sWarbleOffsetTarget;
+GLRenderPair sWarbleTextureTarget;
+GLRenderPair sDofTarget;
+GLRenderPair sScreenGrabTarget;
+GLRenderPair sTarget_806E1950;
+bool sWidescreen;
 
 void fn_80271DE0()
 {
@@ -88,49 +164,49 @@ void fn_80271DE0()
     sLayerViews[eCLV_DebugSquare]->m_Visible = eCLV_DebugSquareEnabled.GetValue();
 }
 
-int fn_802721BC()
+int GetShadowPartitionCount()
 {
     return 11;
 }
 
-void fn_802721C4(int view, bool enabled)
+void SetShadowPartitionEnabled(int partition, bool enabled)
 {
-    GLView* v = sViews[view];
+    GLView* v = sShadowPartitionViews[partition];
     v->m_Target = enabled ? GLViewTarget_Mode8 : GLViewTarget_None;
 }
 
-GLView* fn_802721EC(int view)
+GLView* GetShadowPartitionView(int partition)
 {
-    return sViews[view];
+    return sShadowPartitionViews[partition];
 }
 
-u32 fn_80272200(int view)
+u32 GetShadowPartitionTexture(int partition)
 {
-    return sShadowDebugTargets[view];
+    return sShadowPartitionTextures[partition];
 }
 
-void fn_80272214(int view, const nlMatrix4& viewMatrix, const nlMatrix4& projectionMatrix)
+void SetShadowPartitionCamera(int partition, const nlMatrix4& viewMatrix, const nlMatrix4& projectionMatrix)
 {
-    sShadowDebugCameras[view].Set(viewMatrix, projectionMatrix);
+    sShadowPartitionCameras[partition].Set(viewMatrix, projectionMatrix);
 }
 
-void fn_80272388()
+void CreateShadowPartitionViews()
 {
     GLTargetInfo info;
     int i;
 
     for (i = 0; i < 11; i++)
     {
-        nlZeroMemory(&sShadowDebugRects[i], sizeof(RLViewRect));
-        sShadowDebugRects[i].width = 0x90;
-        sShadowDebugRects[i].height = 0x90;
-        sShadowDebugRects[i].x = (i % 4) * 0x90;
-        sShadowDebugRects[i].y = (i / 4) * 0x90;
+        nlZeroMemory(&sShadowPartitionRects[i], sizeof(RLViewRect));
+        sShadowPartitionRects[i].width = 0x90;
+        sShadowPartitionRects[i].height = 0x90;
+        sShadowPartitionRects[i].x = (i % 4) * 0x90;
+        sShadowPartitionRects[i].y = (i / 4) * 0x90;
     }
 
     for (i = 0; i < 11; i++)
     {
-        nlSNPrintf(sShadowDebugNames[i], sizeof(sShadowDebugNames[i]), "shadow_%02d", i);
+        nlSNPrintf(sShadowPartitionNames[i], sizeof(sShadowPartitionNames[i]), "shadow_%02d", i);
     }
 
     for (i = 0; i < 11; i++)
@@ -141,30 +217,29 @@ void fn_80272388()
         info.format = GLTargetFormat_6;
         info.unknown18 = 0;
         info.unknown1C = 0;
-        GLRenderPair pair = glCreateTarget(sShadowDebugNames[i], &info);
-        sShadowDebugPairs[i] = pair;
-        sShadowDebugTargets[i] = pair.hash;
+        GLRenderPair pair = glCreateTarget(sShadowPartitionNames[i], &info);
+        sShadowPartitionPairs[i] = pair;
+        sShadowPartitionTextures[i] = pair.hash;
     }
 
     for (i = 0; i < 11; i++)
     {
-        RLView* view = new (8, false) RLView(&sShadowDebugCameras[i], sShadowDebugPairs[i], GLViewSort_None);
-        view->m_Name = sShadowDebugNames[i];
-        view->m_ViewportX = sShadowDebugRects[i].x;
-        view->m_ViewportY = sShadowDebugRects[i].y;
-        view->m_ViewportWidth = sShadowDebugRects[i].width;
-        view->m_ViewportHeight = sShadowDebugRects[i].height;
-        view->m_ClearColour = false;
-        view->m_ClearDepth = false;
-        view->m_Target = 0;
-        sViews[i] = view;
+        RLView* newView = new (8, false) RLView(&sShadowPartitionCameras[i], sShadowPartitionPairs[i], GLViewSort_None);
+        newView->m_Name = sShadowPartitionNames[i];
+        newView->m_ViewportX = sShadowPartitionRects[i].x;
+        newView->m_ViewportY = sShadowPartitionRects[i].y;
+        newView->m_ViewportWidth = sShadowPartitionRects[i].width;
+        newView->m_ViewportHeight = sShadowPartitionRects[i].height;
+        newView->m_ClearColour = false;
+        newView->m_ClearDepth = false;
+        newView->m_Target = 0;
+        sShadowPartitionViews[i] = newView;
     }
 
     for (i = 0; i < 11; i++)
     {
-        sViews[i]->m_Enabled = true;
-        sLayerViews[eCLV_ShadowTexture]->m_Children.AddEnd(sViews[i]);
-        sViews[i]->m_Parent = sLayerViews[eCLV_ShadowTexture];
+        GetShadowPartitionView(i)->m_Enabled = true;
+        GetShadowPartitionView(i)->SetParent(sLayerViews[eCLV_ShadowTexture]);
     }
 
     sLayerViews[eCLV_ShadowTexture]->m_ClearColour = true;
@@ -280,7 +355,7 @@ GLViewInterface* GetOrthoCamera()
     return &sOrthoCamera;
 }
 
-void fn_802726AC()
+void CreateWarbleTargets()
 {
     GLTargetInfo info;
     info.width = 0x40;
@@ -306,13 +381,12 @@ void fn_802726AC()
     info.colour[3] = 0;
     GLRenderPair colourPair = glCreateTarget("warblecolour", &info);
     sWarbleColourTarget = colourPair;
-    sLayerViews[eCLV_PreWarble]->m_RenderPair = colourPair;
+    sLayerViews[eCLV_PreWarble]->SetRenderPair(sWarbleColourTarget);
     sLayerViews[eCLV_PreWarble]->m_Target = 8;
 
-    sLayerViews[eCLV_Warble]->m_ViewportX = 0;
-    sLayerViews[eCLV_Warble]->m_ViewportY = 0;
-    sLayerViews[eCLV_Warble]->m_ViewportWidth = glplatGetDefaultTargetWidth() >> 1;
-    sLayerViews[eCLV_Warble]->m_ViewportHeight = glplatGetDefaultTargetHeight() >> 1;
+    unsigned long warbleWidth = glplatGetDefaultTargetWidth() >> 1;
+    unsigned long warbleHeight = glplatGetDefaultTargetHeight() >> 1;
+    sLayerViews[eCLV_Warble]->SetViewport(0, 0, warbleWidth, warbleHeight);
 
     info.width = glplatGetDefaultTargetWidth() >> 2;
     info.height = glplatGetDefaultTargetHeight() >> 2;
@@ -324,12 +398,12 @@ void fn_802726AC()
     info.colour[3] = 0x80;
     GLRenderPair offsetPair = glCreateTarget("warbleoffset", &info);
     sWarbleOffsetTarget = offsetPair;
-    sLayerViews[eCLV_Warble]->m_RenderPair = offsetPair;
+    sLayerViews[eCLV_Warble]->SetRenderPair(sWarbleOffsetTarget);
     sLayerViews[eCLV_Warble]->m_ClearColour = true;
     sLayerViews[eCLV_Warble]->m_Target = 8;
 }
 
-void fn_80272850()
+void CreateRenderTargets()
 {
     GLTargetInfo info;
     nlZeroMemory(&info, sizeof(GLTargetInfo));
@@ -344,7 +418,7 @@ void fn_80272850()
     info.colour[3] = 0;
     GLRenderPair dofPair = glCreateTarget(sDofTargetName, &info);
     sDofTarget = dofPair;
-    sLayerViews[eCLV_UnsortedPerspective]->m_RenderPair = dofPair;
+    sLayerViews[eCLV_UnsortedPerspective]->SetRenderPair(sDofTarget);
     sLayerViews[eCLV_UnsortedPerspective]->m_ClearColour = false;
     sLayerViews[eCLV_UnsortedPerspective]->m_ClearDepth = false;
 
@@ -355,7 +429,7 @@ void fn_80272850()
     info.colour[3] = 0;
     GLRenderPair grabPair = glCreateTarget("screengrab", &info);
     sScreenGrabTarget = grabPair;
-    sLayerViews[eCLV_ScreenGrab]->m_RenderPair = grabPair;
+    sLayerViews[eCLV_ScreenGrab]->SetRenderPair(sScreenGrabTarget);
     sLayerViews[eCLV_ScreenGrab]->m_ClearColour = false;
     sLayerViews[eCLV_ScreenGrab]->m_ClearDepth = false;
 
@@ -372,19 +446,13 @@ void fn_80272850()
     sLayerViews[eCLV_PictureInPicture]->m_Target = 0;
     sLayerViews[eCLV_PictureInPicture]->m_ClearDepth = true;
     sLayerViews[eCLV_PictureInPicture]->m_ClearColour = true;
-    sLayerViews[eCLV_PictureInPicture]->m_ViewportX = 0;
-    sLayerViews[eCLV_PictureInPicture]->m_ViewportY = 0;
-    sLayerViews[eCLV_PictureInPicture]->m_ViewportWidth = 0x200;
-    sLayerViews[eCLV_PictureInPicture]->m_ViewportHeight = 0x100;
+    sLayerViews[eCLV_PictureInPicture]->SetViewport(0, 0, 0x200, 0x100);
     GLRenderPair pipPair = glCreateTarget(sPipTargetName, &info);
     sLayerViews[eCLV_PictureInPictureAlpha]->SetRenderPair(pipPair);
     sLayerViews[eCLV_PictureInPictureAlpha]->m_Target = 9;
     sLayerViews[eCLV_PictureInPictureAlpha]->m_ClearDepth = false;
     sLayerViews[eCLV_PictureInPictureAlpha]->m_ClearColour = false;
-    sLayerViews[eCLV_PictureInPictureAlpha]->m_ViewportX = 0;
-    sLayerViews[eCLV_PictureInPictureAlpha]->m_ViewportY = 0;
-    sLayerViews[eCLV_PictureInPictureAlpha]->m_ViewportWidth = 0x200;
-    sLayerViews[eCLV_PictureInPictureAlpha]->m_ViewportHeight = 0x100;
+    sLayerViews[eCLV_PictureInPictureAlpha]->SetViewport(0, 0, 0x200, 0x100);
 
     info.width = glplatGetDefaultTargetWidth() >> 1;
     info.height = glplatGetDefaultTargetHeight() >> 1;
@@ -395,108 +463,44 @@ void fn_80272850()
     sLayerViews[eCLV_Characters]->m_ClearDepth = false;
     sLayerViews[eCLV_Characters]->m_ClearColour = false;
 
-    fn_802726AC();
+    CreateWarbleTargets();
 }
 
-void fn_80272AB4()
+static void CreateLayerViews(
+    GLViewInterface* camera, const RLViewLayerDesc* layers, int count)
+{
+    GLRenderPair display = glGetBackBufferTarget();
+    GLRenderPair blank;
+    int i;
+
+    for (i = 0; i < count; i++)
+    {
+        RLView* view = new (8, false) RLView(camera, layers[i].useDisplayTarget ? display : blank, layers[i].sortMode);
+        sLayerViews[layers[i].layer] = view;
+        sLayerViews[layers[i].layer]->m_Name = layers[i].name;
+        sLayerViews[layers[i].layer]->m_Unknown48 = layers[i].layer;
+    }
+}
+
+void SetupViews()
 {
     int i;
 
-    {
-        GLRenderPair display = glGetBackBufferTarget();
-        GLRenderPair pairs[2] = { display, GLRenderPair() };
-        for (i = 0; i < 27; i++)
-        {
-            RLView* view = new (8, false) RLView(&sPerspectiveCamera, sPerspectiveLayers[i].useDisplayTarget ? pairs[0] : pairs[1], sPerspectiveLayers[i].sortMode);
-            sLayerViews[sPerspectiveLayers[i].layer] = view;
-            sLayerViews[sPerspectiveLayers[i].layer]->m_Name = sPerspectiveLayers[i].name;
-            sLayerViews[sPerspectiveLayers[i].layer]->m_Unknown48 = sPerspectiveLayers[i].layer;
-        }
-    }
+    CreateLayerViews(&sPerspectiveCamera, sPerspectiveLayers, 27);
 
-    {
-        GLRenderPair display = glGetBackBufferTarget();
-        GLRenderPair pairs[2] = { display, GLRenderPair() };
-        for (i = 0; i < 2; i++)
-        {
-            RLView* view = new (8, false) RLView(&sPipCamera, sPipLayers[i].useDisplayTarget ? pairs[0] : pairs[1], sPipLayers[i].sortMode);
-            sLayerViews[sPipLayers[i].layer] = view;
-            sLayerViews[sPipLayers[i].layer]->m_Name = sPipLayers[i].name;
-            sLayerViews[sPipLayers[i].layer]->m_Unknown48 = sPipLayers[i].layer;
-        }
-    }
+    CreateLayerViews(&sPipCamera, sPipLayers, 2);
 
-    {
-        GLRenderPair display = glGetBackBufferTarget();
-        GLRenderPair pairs[2] = { display, GLRenderPair() };
-        for (i = 0; i < 12; i++)
-        {
-            RLView* view = new (8, false) RLView(&sOrthoCamera, sOrthoLayers[i].useDisplayTarget ? pairs[0] : pairs[1], sOrthoLayers[i].sortMode);
-            sLayerViews[sOrthoLayers[i].layer] = view;
-            sLayerViews[sOrthoLayers[i].layer]->m_Name = sOrthoLayers[i].name;
-            sLayerViews[sOrthoLayers[i].layer]->m_Unknown48 = sOrthoLayers[i].layer;
-        }
-    }
+    CreateLayerViews(&sOrthoCamera, sOrthoLayers, 12);
 
-    {
-        GLRenderPair display = glGetBackBufferTarget();
-        GLRenderPair pairs[2] = { display, GLRenderPair() };
-        for (i = 0; i < 2; i++)
-        {
-            RLView* view = new (8, false) RLView(&sOrtho640Camera, sSquareOrthoLayers[i].useDisplayTarget ? pairs[0] : pairs[1], sSquareOrthoLayers[i].sortMode);
-            sLayerViews[sSquareOrthoLayers[i].layer] = view;
-            sLayerViews[sSquareOrthoLayers[i].layer]->m_Name = sSquareOrthoLayers[i].name;
-            sLayerViews[sSquareOrthoLayers[i].layer]->m_Unknown48 = sSquareOrthoLayers[i].layer;
-        }
-    }
+    CreateLayerViews(&sOrtho640Camera, sSquareOrthoLayers, 2);
 
-    {
-        GLRenderPair display = glGetBackBufferTarget();
-        GLRenderPair pairs[2] = { display, GLRenderPair() };
-        for (i = 0; i < 1; i++)
-        {
-            RLView* view = new (8, false) RLView(&sOrthoCenteredCamera, sAnarkLayers[i].useDisplayTarget ? pairs[0] : pairs[1], sAnarkLayers[i].sortMode);
-            sLayerViews[sAnarkLayers[i].layer] = view;
-            sLayerViews[sAnarkLayers[i].layer]->m_Name = sAnarkLayers[i].name;
-            sLayerViews[sAnarkLayers[i].layer]->m_Unknown48 = sAnarkLayers[i].layer;
-        }
-    }
+    CreateLayerViews(&sOrthoCenteredCamera, sAnarkLayers, 1);
 
-    {
-        GLRenderPair display = glGetBackBufferTarget();
-        GLRenderPair pairs[2] = { display, GLRenderPair() };
-        for (i = 0; i < 1; i++)
-        {
-            RLView* view = new (8, false) RLView(&sCameraSpaceCamera, sCameraSpaceLayers[i].useDisplayTarget ? pairs[0] : pairs[1], sCameraSpaceLayers[i].sortMode);
-            sLayerViews[sCameraSpaceLayers[i].layer] = view;
-            sLayerViews[sCameraSpaceLayers[i].layer]->m_Name = sCameraSpaceLayers[i].name;
-            sLayerViews[sCameraSpaceLayers[i].layer]->m_Unknown48 = sCameraSpaceLayers[i].layer;
-        }
-    }
+    CreateLayerViews(&sCameraSpaceCamera, sCameraSpaceLayers, 1);
 
-    {
-        GLRenderPair display = glGetBackBufferTarget();
-        GLRenderPair pairs[2] = { display, GLRenderPair() };
-        for (i = 0; i < 1; i++)
-        {
-            RLView* view = new (8, false) RLView(&sTransitions3DCamera, sTransitions3DLayers[i].useDisplayTarget ? pairs[0] : pairs[1], sTransitions3DLayers[i].sortMode);
-            sLayerViews[sTransitions3DLayers[i].layer] = view;
-            sLayerViews[sTransitions3DLayers[i].layer]->m_Name = sTransitions3DLayers[i].name;
-            sLayerViews[sTransitions3DLayers[i].layer]->m_Unknown48 = sTransitions3DLayers[i].layer;
-        }
-    }
+    CreateLayerViews(&sTransitions3DCamera, sTransitions3DLayers, 1);
 
-    {
-        GLRenderPair display = glGetBackBufferTarget();
-        GLRenderPair pairs[2] = { display, GLRenderPair() };
-        for (i = 0; i < 2; i++)
-        {
-            RLView* view = new (8, false) RLView(&sAnark3DCamera, sAnark3DLayers[i].useDisplayTarget ? pairs[0] : pairs[1], sAnark3DLayers[i].sortMode);
-            sLayerViews[sAnark3DLayers[i].layer] = view;
-            sLayerViews[sAnark3DLayers[i].layer]->m_Name = sAnark3DLayers[i].name;
-            sLayerViews[sAnark3DLayers[i].layer]->m_Unknown48 = sAnark3DLayers[i].layer;
-        }
-    }
+    CreateLayerViews(&sAnark3DCamera, sAnark3DLayers, 2);
 
     sLayerViews[eCLV_NoFog]->mFogEnabled = false;
     sLayerViews[eCLV_HighRange3DNoFog]->mFogEnabled = false;
@@ -505,18 +509,17 @@ void fn_80272AB4()
     sLayerViews[eCLV_MegastrikeBackground]->mFogEnabled = false;
     sLayerViews[eCLV_CoPlanar]->mCoPlanarEnabled = true;
 
-    fn_80272850();
+    CreateRenderTargets();
 
     for (i = 0; i < eCLV_Num; i++)
     {
         sLayerViews[i]->m_Enabled = false;
-        gRootView.m_Children.AddEnd(sLayerViews[i]);
-        sLayerViews[i]->m_Parent = &gRootView;
+        sLayerViews[i]->SetParent(&gRootView);
     }
 
     sLayerViews[eCLV_Warble]->m_Enabled = true;
 
-    fn_80272388();
+    CreateShadowPartitionViews();
     CreateShadowVolumeTarget();
     SetShadowVolumeTarget(sLayerViews[eCLV_ShadowVolume], sLayerViews[eCLV_ShadowVolume]);
 
@@ -669,4 +672,40 @@ void RLViewCamera::GetViewMatrix(nlMatrix4& matrix) const
 const nlMatrix4* RLViewCamera::GetViewMatrix() const
 {
     return &mView;
+}
+
+RLViewCamera::RLViewCamera()
+{
+    mView.SetIdentity();
+    mShadowDirty = true;
+}
+
+inline const nlMatrix4* RLViewOrthoCamera::GetViewMatrix() const
+{
+    return &sIdentityMatrix;
+}
+
+inline void RLViewOrthoCamera::GetViewMatrix(nlMatrix4& matrix) const
+{
+    matrix.SetIdentity();
+}
+
+inline const nlMatrix4* RLViewOrthoCamera::GetProjectionMatrix() const
+{
+    return &mMatrix;
+}
+
+inline void RLViewOrthoCamera::GetProjectionMatrix(nlMatrix4& matrix) const
+{
+    matrix = mMatrix;
+}
+
+inline void RLViewOrthoCamera::GetInverseViewMatrix(nlMatrix4& matrix) const
+{
+    matrix.SetIdentity();
+}
+
+inline void RLViewOrthoCamera::GetViewProjectionMatrix(nlMatrix4& matrix) const
+{
+    matrix = mMatrix;
 }

@@ -1821,8 +1821,7 @@ void cFielder::ShootBallDueToContact(const nlVector3& v3IncomingVelocity)
         return;
     }
 
-    nlVec3Scale(v3ReleaseVelocity, v3ReleaseVelocity,
-        nlRecipSqrt(nlVec3LengthSquared(v3ReleaseVelocity), true));
+    nlVec3Normalize(v3ReleaseVelocity, v3ReleaseVelocity);
     nlVec3Scale(v3ReleaseVelocity, v3ReleaseVelocity, 2.0f + mUnidentified024.m_fActualSpeed);
     v3ReleaseVelocity.z = 0.5f;
     g_pBall->ShootRelease(v3ReleaseVelocity, SPINTYPE_NONE);

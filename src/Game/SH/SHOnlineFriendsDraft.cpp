@@ -1,5 +1,4 @@
 #include "Game/SH/SHOnlineFriendsDraft.h"
-#include "NL/nlBasicString.inl"
 
 #include "Game/GameSceneManager.h"
 #include "Game/FE/FEAudio.h"
@@ -161,8 +160,8 @@ void SHOnlineFriendsDraft::SceneCreated()
     title2->SetStringId("TITLE_LW_DOMINATION_DRAFT");
     title3->SetStringId("TITLE_LW_DOMINATION_DRAFT");
 
-    int countdown = NetworkDraft::Instance()->GetCountdown();
-    UpdateCountdown(countdown);
+    mCountdownSeconds = NetworkDraft::Instance()->GetCountdown();
+    UpdateCountdown(mCountdownSeconds);
 }
 
 void SHOnlineFriendsDraft::RefreshPlayerRows()
@@ -174,7 +173,6 @@ void SHOnlineFriendsDraft::RefreshPlayerRows()
 
 void SHOnlineFriendsDraft::UpdateCountdown(int countdown)
 {
-    mCountdownSeconds = countdown;
     TLSlide* timerSlide = mPresentation->GetActiveSlide();
     FEFinder<TLTextInstance, TLAT_TEXT>::Find<TLSlide>(timerSlide, "Layer", "Timer")->m_bVisible = false;
     TLTextInstance* text = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
@@ -188,6 +186,21 @@ void SHOnlineFriendsDraft::UpdateCountdown(int countdown)
         nlStrToWcs(buffer, mCountdownText, 8);
         text->SetString(mCountdownText);
     }
+}
+
+void SHOnlineFriendsDraft::SetCountdown(int countdown)
+{
+    if (mCountdownSeconds != countdown)
+    {
+        mCountdownSeconds = countdown;
+        UpdateCountdown(countdown);
+    }
+}
+
+void SHOnlineFriendsDraft::UpdateDisplay(int countdown)
+{
+    SetCountdown(countdown);
+    RefreshPlayerRows();
 }
 
 inline void SHOnlineFriendsDraft::ShowDisconnectedError()
@@ -221,10 +234,7 @@ void SHOnlineFriendsDraft::Update(float fDeltaT)
         ShowDisconnectedError();
         return;
     }
-    int countdown = NetworkDraft::Instance()->GetCountdown();
-    if (mCountdownSeconds != countdown)
-        UpdateCountdown(countdown);
-    RefreshPlayerRows();
+    UpdateDisplay(NetworkDraft::Instance()->GetCountdown());
 }
 
 void SHOnlineFriendsDraft::OnErrorDismissed()

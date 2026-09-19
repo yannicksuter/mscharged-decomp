@@ -8,11 +8,20 @@
 struct DWCDate;
 struct DWCTime;
 
+enum NetworkPersistentCategory
+{
+    NETWORK_PERSISTENT_CATEGORY_0 = 0,
+    NETWORK_PERSISTENT_CATEGORY_1 = 1,
+    NETWORK_PERSISTENT_CATEGORY_2 = 2,
+    NETWORK_PERSISTENT_CATEGORY_3 = 3,
+    NETWORK_PERSISTENT_CATEGORY_4 = 4
+};
+
 struct NetworkLeaderboardCategory
 {
     int FindPlayer(int profileId) const;
 
-    /* 0x0000 */ int mPersistentCategory;
+    /* 0x0000 */ NetworkPersistentCategory mPersistentCategory;
     /* 0x0004 */ int mFilter;
     /* 0x0008 */ int mResultType;
     /* 0x000C */ bool mAvailable;
@@ -115,7 +124,7 @@ public:
     /* 0x0023 */ u8 mPadding0023;
     /* 0x0024 */ NetworkRankingMeta mLocalStats[3];
     /* 0x006C */ NetworkLeaderboardCategory mCategories[6];
-    /* 0xC3FC */ int mPersistentCategories[3];
+    /* 0xC3FC */ NetworkPersistentCategory mPersistentCategories[3];
     /* 0xC408 */ float mCurrentTime;
     /* 0xC40C */ float mOperationStartTime;
     /* 0xC410 */ int mUnidentifiedC410;

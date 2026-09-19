@@ -1,5 +1,4 @@
 #include "Game/SH/SHHallOfFame.h"
-#include "NL/nlBasicString.inl"
 #include "Game/SH/SHNavigation.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/FE/feCupFlow.h"
@@ -76,7 +75,6 @@ static const HallOfFameImageInfo sImageInfo[12] = {
 };
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-
 
 void SetHallOfFameBreadcrumbs(int mode, TLComponentInstance* breadcrumbs)
 {

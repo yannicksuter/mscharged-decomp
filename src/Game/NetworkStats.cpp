@@ -402,19 +402,17 @@ void NetworkRanking::InitializeRanking()
     DWCRnkError result = DWC_RnkInitialize(
         "DbfBialvJznkQWYuOrRa0002282500000ef90000020042db60ecmschargedwii",
         (DWCUserData*)save);
-    if (result == DWC_RNK_ERROR_INIT_ALREADYINITIALIZED)
+    switch (result)
     {
+    case DWC_RNK_ERROR_INIT_ALREADYINITIALIZED:
         tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkInitialize already initialized\n");
-    }
-    if (result == DWC_RNK_SUCCESS
-        || result == DWC_RNK_ERROR_INIT_ALREADYINITIALIZED)
-    {
+    case DWC_RNK_SUCCESS:
         tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkInitialize succeeded.\n");
         mInitialized = true;
-    }
-    else
-    {
+        break;
+    default:
         tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkInitialize returned error %d\n", result);
+        break;
     }
 }
 

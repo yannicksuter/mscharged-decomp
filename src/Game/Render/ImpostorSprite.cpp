@@ -37,6 +37,18 @@ int gImpostorClearColourChannel;
 class ImpostorView : public GLViewInterface
 {
 public:
+    void SetViewMatrix(const nlMatrix4& matrix)
+    {
+        mView = matrix;
+        mDirty = true;
+    }
+
+    void SetProjectionMatrix(const nlMatrix4& matrix)
+    {
+        mProjection = matrix;
+        mDirty = true;
+    }
+
     void UpdateMatrices() const
     {
         if (mDirty)
@@ -136,37 +148,30 @@ void ImpostorSprite::Initialize(const char* name)
 
 void ImpostorSprite::UpdateView(const nlVector3* direction, const nlVector3* up)
 {
-    nlMatrix4 projection;
-    glMatrixPerspective(projection,
-        (3.1415927f * gImpostorFieldOfViewDegrees) / 180.0f,
-        (float)mWidth / (float)mHeight,
+    float aspect = (float)mWidth / (float)mHeight;
+    float fieldOfView = DegreesToRadians(gImpostorFieldOfViewDegrees);
+    nlMatrix4 matrix;
+    glMatrixPerspective(matrix,
+        fieldOfView, aspect,
         gImpostorNearPlane, gImpostorFarPlane);
-    mViewInterface->mProjection = projection;
-    mViewInterface->mDirty = true;
+    mViewInterface->SetProjectionMatrix(matrix);
 
     float cameraDistance = mCharacter->GetCameraDistance();
     float cameraLookatZ = mCharacter->GetCameraLookatZ();
 
     nlVector3 target = { 0.0f, 0.0f, cameraLookatZ };
 
-    float inverseLength = nlRecipSqrt(direction->x * direction->x
-            + direction->y * direction->y + direction->z * direction->z,
-        true);
     nlVector3 normalizedDirection;
-    normalizedDirection.x = inverseLength * direction->x;
-    normalizedDirection.y = inverseLength * direction->y;
-    normalizedDirection.z = inverseLength * direction->z;
+    nlVec3Normalize(normalizedDirection, *direction);
 
     nlVector3 eye;
-    eye.x = -cameraDistance * normalizedDirection.x + target.x;
-    eye.y = -cameraDistance * normalizedDirection.y + target.y;
-    eye.z = -cameraDistance * normalizedDirection.z + target.z;
+    nlVec3ScaleAdd(eye, -cameraDistance, normalizedDirection, target);
 
     nlMatrix4 lookAt;
     glMatrixLookAt(lookAt, eye, target, *up);
 
-    float angle = (float)mAngle * 0.0000958738f
-        + (3.1415927f * (gImpostorAngleJitterDegrees * mAngleJitter)) / 180.0f;
+    float angle = AngUnitsToRad_fromUnsignedShort(mAngle)
+        + DegreesToRadians(gImpostorAngleJitterDegrees * mAngleJitter);
     nlMatrix4 rotation;
     nlMakeRotationMatrixZ(rotation, angle);
 
@@ -174,12 +179,11 @@ void ImpostorSprite::UpdateView(const nlVector3* direction, const nlVector3* up)
     nlMatrix4 scaleMatrix;
     nlMakeScaleMatrix(scaleMatrix, scale, scale, scale);
 
-    nlMatrix4 rotatedView;
-    nlMultMatrices(rotatedView, rotation, lookAt);
-    nlMatrix4 view;
-    nlMultMatrices(view, scaleMatrix, rotatedView);
-    mViewInterface->mView = view;
-    mViewInterface->mDirty = true;
+    nlMultMatrices(matrix, rotation, lookAt);
+    nlMatrix4 result;
+    nlMultMatrices(result, scaleMatrix, matrix);
+    matrix = result;
+    mViewInterface->SetViewMatrix(matrix);
     mViewInterface->UpdateMatrices();
 }
 
@@ -272,28 +276,20 @@ void ImpostorSprite::CreateRenderTarget(const char* name)
         enabled ? GLViewTarget_Mode9 : GLViewTarget_None;
 }
 
-static inline void WriteImpostorVertex(GLCompactColourMeshWriter* writer,
-    const ImpostorQuad& quad, int index,
-    const Impostor& impostor)
-{
-    *writer->texcoord++ = (short)(quad.texcoord[index].x * 1024.0f);
-    *writer->texcoord++ = (short)(quad.texcoord[index].y * 1024.0f);
-    *writer->colour++ = *(const u32*)&impostor.mColour;
-    *writer->position++ = (short)(quad.position[index].x * 64.0f);
-    *writer->position++ = (short)(quad.position[index].y * 64.0f);
-    *writer->position++ = (short)(quad.position[index].z * 64.0f);
-}
-
-
 int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, bool skipCapture)
 {
+    int rendered;
+    GLCompactColourMeshWriter* writer;
+    int i;
+    Impostor* impostor;
+
     if (cached)
     {
         if (mMesh != 0
             && mMesh->End())
         {
             target->AttachModel(
-                mMesh->model, gImpostorRenderLayer);
+                mMesh->GetModel(), gImpostorRenderLayer);
         }
         return 0;
     }
@@ -305,13 +301,12 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
     }
 
     int count = mNumRenderSlots;
-    int rendered = 0;
+    rendered = 0;
     if (count == 0)
     {
         return 0;
     }
 
-    GLCompactColourMeshWriter* writer;
     if (skipCapture)
     {
         writer = new (8, false) GLCompactColourMeshWriter;
@@ -339,11 +334,11 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
     bool began;
     if (hasQuads)
     {
-        began = writer->Begin( count * 4, 3, allocator);
+        began = writer->Begin(count * 4, GLP_QuadList, allocator);
     }
     else
     {
-        began = writer->Begin( count * 6, 0, allocator);
+        began = writer->Begin(count * 6, GLP_TriList, allocator);
     }
 
     if (began)
@@ -354,40 +349,44 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
         nlMatrix4 viewMatrix;
         target->m_Interface->GetViewMatrix(viewMatrix);
         nlVector3 right;
-        right.x = viewMatrix.m11;
-        right.y = viewMatrix.m21;
-        right.z = viewMatrix.m31;
         nlVector3 up;
-        up.x = viewMatrix.m12;
-        up.y = viewMatrix.m22;
-        up.z = viewMatrix.m32;
+        nlVector3 forward;
+        nlVec3Set(right,
+            viewMatrix.m11, viewMatrix.m21, viewMatrix.m31);
+        nlVec3Set(up,
+            viewMatrix.m12, viewMatrix.m22, viewMatrix.m32);
+        nlVec3Set(forward,
+            viewMatrix.m13, viewMatrix.m23, viewMatrix.m33);
 
         float aspect =
             (float)mWidth / (float)mHeight;
-        right.x *= aspect;
-        right.y *= aspect;
-        right.z *= aspect;
+        nlVec3Scale(right, aspect);
 
         int* slot = mRenderSlots;
-        for (int i = 0; i < count; ++i, ++slot)
+        for (i = 0; i < count; ++slot, ++i)
         {
-            Impostor* impostor = &impostors[*slot];
+            impostor = &impostors[*slot];
             ImpostorQuad quad;
             BuildQuad(&quad, impostor, &right, &up);
 
+            int vertex;
             if (hasQuads)
             {
-                for (int vertex = 0; vertex < 4; ++vertex)
+                for (vertex = 0; vertex < 4; ++vertex)
                 {
-                    WriteImpostorVertex(writer, quad, vertex, *impostor);
+                    writer->Texcoord(quad.texcoord[vertex]);
+                    writer->Colour(impostor->mColour);
+                    writer->Vertex(quad.position[vertex]);
                 }
             }
             else
             {
-                for (int vertex = 0; vertex < 6; ++vertex)
+                for (vertex = 0; vertex < 6; ++vertex)
                 {
-                    WriteImpostorVertex(
-                        writer, quad, sImpostorTriangleIndices[vertex], *impostor);
+                    int index = sImpostorTriangleIndices[vertex];
+                    writer->Texcoord(quad.texcoord[index]);
+                    writer->Colour(impostor->mColour);
+                    writer->Vertex(quad.position[index]);
                 }
             }
             ++rendered;
@@ -398,7 +397,7 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
             texture = checkerTexture;
         }
         glTextureBinding* textureState =
-            (glTextureBinding*)writer->model->packets->materialParameters;
+            (glTextureBinding*)writer->GetModel()->packets->materialParameters;
         textureState->texture = texture;
         textureState->textureIndex = 0xFFFF;
         textureState->SetWrapS(true);
@@ -407,7 +406,7 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
 
         if (writer->End())
         {
-            target->AttachModel(writer->model, gImpostorRenderLayer);
+            target->AttachModel(writer->GetModel(), gImpostorRenderLayer);
         }
         else
         {

@@ -2125,14 +2125,14 @@ extern "C" bool fn_8010FEF0(unsigned int flags)
     return (flags & CupManager::Instance()->unknown_0x8A38) == 0;
 }
 
-extern u8 lbl_806E0F98;
+extern bool lbl_806E0F98;
 
-extern "C" u8 fn_8010FD74()
+extern "C" bool fn_8010FD74()
 {
     return lbl_806E0F98;
 }
 
-extern "C" void fn_8010FD7C(u8 value)
+extern "C" void fn_8010FD7C(bool value)
 {
     lbl_806E0F98 = value;
 }

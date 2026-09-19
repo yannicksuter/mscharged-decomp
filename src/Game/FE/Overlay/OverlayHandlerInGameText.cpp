@@ -1,5 +1,4 @@
 #include "Game/OverlayHandlerInGameText.h"
-#include "NL/nlBasicString.inl"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/Render/RLViewLayers.h"
 
@@ -28,7 +27,6 @@
 
 extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
 extern BaseGameSceneManager* g_pOverlayManager;
-
 
 template <typename T>
 static inline T* FindInPresentation(FEPresentation* presentation,

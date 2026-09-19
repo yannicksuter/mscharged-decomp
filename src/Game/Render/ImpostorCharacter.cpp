@@ -254,14 +254,11 @@ void ImpostorCharacter::EnableSprites(bool enable)
 void ImpostorCharacter::RegisterSprites(GLView* registry)
 {
     nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
-    GLView* target;
     DLListEntry<ImpostorSprite*>* head = it.m_Head;
     DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        target = entry->entry->mView;
-        registry->m_Children.AddEnd(target);
-        target->m_Parent = registry;
+        registry->AddChild(entry->entry->mView);
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
