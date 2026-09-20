@@ -4,6 +4,10 @@
 #include "NL/InflateStream.h"
 #include "NL/nlMemory.h"
 
+void OnCompressedFileDataRead(nlFile*, void*, unsigned int, unsigned long);
+
+unsigned int gCompressedFileReadBufferIndex;
+
 struct CompressedFileLoad
 {
     CompressedFileLoad(nlFile* file, unsigned long param,
@@ -34,11 +38,29 @@ struct CompressedFileLoad
         }
         else
         {
-            readBuffers[0] = nlMalloc(chunkSize * 2, 32, true);
-            readBuffers[1] = (unsigned char*)readBuffers[0] + chunkSize;
+            readBuffers[0] = nlMalloc(this->chunkSize * 2, 32, true);
+            readBuffers[1] = (unsigned char*)readBuffers[0] + this->chunkSize;
             ownsReadBuffers = true;
         }
         inflateState.Initialize();
+    }
+
+    void QueueNextRead(nlFile* file)
+    {
+        if (nextRead < fullChunkCount)
+        {
+            nlReadAsync(file, readBuffers[gCompressedFileReadBufferIndex], chunkSize,
+                OnCompressedFileDataRead, (unsigned long)this, 0);
+            gCompressedFileReadBufferIndex = 1 - gCompressedFileReadBufferIndex;
+            ++nextRead;
+        }
+        else if (nextRead < readCount)
+        {
+            nlReadAsync(file, readBuffers[gCompressedFileReadBufferIndex], finalChunkSize,
+                OnCompressedFileDataRead, (unsigned long)this, 0);
+            gCompressedFileReadBufferIndex = 1 - gCompressedFileReadBufferIndex;
+            ++nextRead;
+        }
     }
 
     unsigned int uncompressedSize;
@@ -58,13 +80,9 @@ struct CompressedFileLoad
     int completedReads;
     int readCount;
     int fullChunkCount;
-    unsigned int finalChunkSize;
+    int finalChunkSize;
     InflateStream inflateState;
 };
-
-void OnCompressedFileDataRead(nlFile*, void*, unsigned int, unsigned long);
-
-unsigned int gCompressedFileReadBufferIndex;
 
 void* AllocateInflateMemory(void*, unsigned int count, unsigned int size)
 {
@@ -115,21 +133,7 @@ void OnCompressedFileDataRead(nlFile* file, void* buffer, unsigned int size, uns
 
     ++state->completedReads;
     state->inflateState.Process(buffer, size);
-
-    if (state->nextRead < state->fullChunkCount)
-    {
-        nlReadAsync(file, state->readBuffers[gCompressedFileReadBufferIndex], state->chunkSize,
-            OnCompressedFileDataRead, (unsigned long)state, 0);
-        gCompressedFileReadBufferIndex = 1 - gCompressedFileReadBufferIndex;
-        ++state->nextRead;
-    }
-    else if (state->nextRead < state->readCount)
-    {
-        nlReadAsync(file, state->readBuffers[gCompressedFileReadBufferIndex], state->finalChunkSize,
-            OnCompressedFileDataRead, (unsigned long)state, 0);
-        gCompressedFileReadBufferIndex = 1 - gCompressedFileReadBufferIndex;
-        ++state->nextRead;
-    }
+    state->QueueNextRead(file);
 
     if (state->completedReads == state->readCount)
     {
@@ -190,23 +194,8 @@ bool nlLoadCompressedFileAsync(const char* path, LoadAsyncCallback callback,
         ++state->readCount;
     }
 
-    for (int i = 0; i < 2; ++i)
-    {
-        if (state->nextRead < state->fullChunkCount)
-        {
-            nlReadAsync(file, state->readBuffers[gCompressedFileReadBufferIndex], state->chunkSize,
-                OnCompressedFileDataRead, (unsigned long)state, 0);
-            gCompressedFileReadBufferIndex = 1 - gCompressedFileReadBufferIndex;
-            ++state->nextRead;
-        }
-        else if (state->nextRead < state->readCount)
-        {
-            nlReadAsync(file, state->readBuffers[gCompressedFileReadBufferIndex], state->finalChunkSize,
-                OnCompressedFileDataRead, (unsigned long)state, 0);
-            gCompressedFileReadBufferIndex = 1 - gCompressedFileReadBufferIndex;
-            ++state->nextRead;
-        }
-    }
+    state->QueueNextRead(file);
+    state->QueueNextRead(file);
 
     return true;
 }

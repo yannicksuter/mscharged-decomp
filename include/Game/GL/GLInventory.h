@@ -3,6 +3,7 @@
 
 #include "NL/nlAVLTree.h"
 #include "NL/nlList.h"
+#include "NL/nlMemory.h"
 
 class cSHierarchy;
 class GLSkinMesh;
@@ -18,6 +19,11 @@ class freeing_GLInventory
 public:
     typedef nlAVLTree<unsigned long, ValueType*,
         DefaultKeyCompare<unsigned long> > Tree;
+
+    freeing_GLInventory()
+    {
+        m_pItems = new (8, false) Tree();
+    }
 
     ~freeing_GLInventory()
     {
@@ -47,6 +53,11 @@ public:
     typedef nlAVLTree<unsigned long, ValueType*,
         DefaultKeyCompare<unsigned long> > Tree;
 
+    deleting_GLInventory()
+    {
+        m_pItems = new (8, false) Tree();
+    }
+
     ~deleting_GLInventory()
     {
         Release();
@@ -75,6 +86,11 @@ public:
     typedef nlAVLTree<unsigned long, ValueType*,
         DefaultKeyCompare<unsigned long> >
         Tree;
+
+    clearing_GLInventory()
+    {
+        m_pItems = new (8, false) Tree();
+    }
 
     struct Callback
     {

@@ -1,4 +1,5 @@
 #include "Game/InputRouter.h"
+#include "Game/NetworkDebug.h"
 #include "Game/Sys/debug.h"
 #include "Game/EventDispatcher.inl"
 #include "Game/NetworkInput.h"
@@ -7,8 +8,12 @@
 #include <string.h>
 
 #include "Game/NetworkEvents.h"
+#include "Game/MathHelpers.h"
 #include "Game/TweakValue.h"
+#include "NL/gl/glFont.h"
+#include "NL/nlDebugViews.h"
 #include "NL/nlMath.h"
+#include "NL/nlPrint.h"
 
 int g_TransmitSyncDataEvery = 4;
 int g_nTicksPerPacket = 2;
@@ -26,8 +31,8 @@ float fMaxCongestionMultiplier = 10.0f;
 float fCongestionMultiplierIncrement = 0.3f;
 float fCongestionMultiplierDecrement = 0.06f;
 int g_nDumpSyncTextAt = -1;
-u32 g_SyncMismatchColour = 0xFF0000FF;
-u32 g_SyncTextColour = 0xFFFFFFFF;
+nlColour g_SyncMismatchColour = { 0xFF, 0x00, 0x00, 0xFF };
+nlColour g_SyncTextColour = { 0xFF, 0xFF, 0xFF, 0xFF };
 
 InputRouter* gSimpleInputRouter;
 NetworkInputRouter* gNetworkInputRouter;
@@ -360,18 +365,222 @@ void NetworkInputRouter::OnInputCaptured()
 
 void NetworkInputRouter::OnInputReady()
 {
-    CheckSyncMismatch();
+    bool congested = false;
+
+    if (mQueueLimit > mQueueCursor)
+    {
+        ++mQueueCursor;
+        int machineCount = mSession->GetNumMachines();
+        for (s8 machine = 0; machine < machineCount; ++machine)
+        {
+            NetworkPeer* peer = mSession->GetPeer(machine);
+            if (gNetworkInputRecording->mRecording)
+            {
+                int frame = gInputManager->mFrameProvider->GetFrame();
+                NetworkInputRecording* recording = gNetworkInputRecording;
+                u32 seed = GetNetworkRandomSeed();
+                recording->WriteNetworkInputPacketHeader(machine,
+                    mNetworkTicks[machine], mCurrentCRC, frame, seed, 0, 0);
+            }
+
+            for (s8 player = 0; player < (int)peer->mPlayerCount; ++player)
+            {
+                NetworkPeerChannel* channel
+                    = peer->GetNetworkPeerChannel(player);
+                s8 playerId = GetNetworkPlayerId(player, machine);
+                PackedDetInput* input = &mInputRecords[playerId];
+                channel->ApplyNetworkPeerChannelInput(
+                    input, mNetworkTicks[machine], mInputStates[playerId]);
+
+                if (gNetworkInputRecording->mRecording)
+                {
+                    gNetworkInputRecording->WriteNetworkInputRecord(
+                        player, input, mInputStates[playerId]);
+                }
+            }
+        }
+    }
+    else
+    {
+        int machineCount = mSession->GetNumMachines();
+        for (s8 machine = 0; machine < machineCount; ++machine)
+        {
+            NetworkPeer* peer = mSession->GetPeer(machine);
+            NetMessageInput* message = &mInputQueues[machine].Pop();
+
+            message->GetNetworkInputMessageRemapAngle(
+                &mNetworkTicks[machine]);
+            if ((message->mUnidentified008 & 4) != 0)
+            {
+                mNetworkCRCs[machine] = message->mUnidentified00C;
+                mRemoteTicks[machine] = message->mUnidentified010;
+                mRandomSeeds[machine] = message->mUnidentified014;
+            }
+            if ((message->mUnidentified008 & 8) != 0)
+            {
+                congested = true;
+            }
+
+            int eventCount = message->mUnidentified05C;
+            u8 serializedData[300];
+            NetworkMessageSerializer serializer(
+                1, serializedData, sizeof(serializedData));
+            message->Serialize(&serializer);
+            int serializedLength = serializer.GetLength();
+
+            if (gNetworkInputRecording->mRecording)
+            {
+                int frame = gInputManager->mFrameProvider->GetFrame();
+                NetworkInputRecording* recording = gNetworkInputRecording;
+                u32 seed = GetNetworkRandomSeed();
+                recording->WriteNetworkInputPacketHeader(machine,
+                    mNetworkTicks[machine], mCurrentCRC, frame, seed,
+                    eventCount, serializedLength);
+            }
+
+            for (int eventIndex = 0; eventIndex < eventCount; ++eventIndex)
+            {
+                DetermDataEvent* event = new DetermDataEvent(
+                    message->GetNetworkInputMessageEvent(eventIndex));
+                if (gNetworkInputRecording->mRecording)
+                {
+                    gNetworkInputRecording->WriteNetworkInputEvent(event);
+                }
+
+                Function<DetermDataEvent*> disposer(
+                    (void (*)(DetermDataEvent*))DetermDataEvent::operator delete);
+                sDetermDataEventQueue.Queue(event, disposer);
+            }
+
+            if (gNetworkInputRecording->mRecording)
+            {
+                gNetworkInputRecording->WriteData(
+                    serializer.mBuffer, serializedLength);
+            }
+
+            for (s8 player = 0; player < (int)peer->mPlayerCount; ++player)
+            {
+                NetworkPeerChannel* channel
+                    = peer->GetNetworkPeerChannel(player);
+                s8 playerId = GetNetworkPlayerId(player, machine);
+                PackedDetInput* input = &mInputRecords[playerId];
+                message->ApplyNetworkInputMessageRecord(player, input);
+                mInputStates[playerId]
+                    = message->GetNetworkInputMessagePlayerState(player);
+                channel->ApplyNetworkPeerChannelInput(
+                    input, mNetworkTicks[machine], mInputStates[playerId]);
+
+                if (gNetworkInputRecording->mRecording)
+                {
+                    gNetworkInputRecording->WriteNetworkInputRecord(
+                        player, input, mInputStates[playerId]);
+                }
+            }
+        }
+
+        if (congested)
+        {
+            mCongestionMultiplier = nlMinEquals(fMaxCongestionMultiplier,
+                mCongestionMultiplier + fCongestionMultiplierIncrement);
+        }
+        else
+        {
+            mCongestionMultiplier = nlMaxEquals(fMinCongestionMultiplier,
+                mCongestionMultiplier - fCongestionMultiplierDecrement);
+        }
+
+        if (g_nOverrideTickDelayTarget >= 0)
+        {
+            mQueueLimit = g_nOverrideTickDelayTarget;
+        }
+        else
+        {
+            u32 queueLimit = (u32)mCongestionMultiplier;
+            mQueueLimit = queueLimit < 20 ? queueLimit : 20;
+            if (mQueueLimit < 1)
+            {
+                mQueueLimit = 1;
+            }
+        }
+    }
+
+    if (gNetworkInputRecording->mRecording)
+    {
+        gNetworkInputRecording->Flush();
+    }
+    CheckPeerSynchronization();
+}
+
+void NetworkInputRouter::CheckPeerSynchronization()
+{
+    bool mismatch = false;
+    s8 localMachine = mSession->GetLocalMachineId();
+    int machineCount = mSession->GetNumMachines();
+
+    for (s8 machine = 0; machine < machineCount; ++machine)
+    {
+        if (machine == localMachine)
+        {
+            continue;
+        }
+
+        if (mRemoteTicks[localMachine] != mRemoteTicks[machine])
+        {
+            if (gNetworkSyncState->mFrameMismatchFrame == -1)
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "NetworkSync:Network ticks don't match (Machine %d, Tick %d)<-->(Machine %d, Tick %d) at frame %d\n",
+                    localMachine, mRemoteTicks[localMachine], machine,
+                    mRemoteTicks[machine],
+                    gInputManager->mFrameProvider->GetFrame());
+            }
+            gNetworkSyncState->OnFrameMismatch(mRemoteTicks[localMachine]);
+            mismatch = true;
+        }
+
+        if (mNetworkCRCs[localMachine] != mNetworkCRCs[machine])
+        {
+            if (gNetworkSyncState->mChecksumMismatchFrame == -1)
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "NetworkSync:Network CRCs don't match (Machine %d, CRC %x)<-->(Machine %d, CRC %x) at frame %d\n",
+                    localMachine, mNetworkCRCs[localMachine], machine,
+                    mNetworkCRCs[machine],
+                    gInputManager->mFrameProvider->GetFrame());
+            }
+            gNetworkSyncState->OnChecksumMismatch(mRemoteTicks[localMachine]);
+            mismatch = true;
+        }
+
+        if (mRandomSeeds[localMachine] != mRandomSeeds[machine])
+        {
+            if (gNetworkSyncState->mRandomSeedMismatchFrame == -1)
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "NetworkSync:Network Random seeds don't match (Machine %d, Seed %x)<-->(Machine %d, Seed %x) at frame %d\n",
+                    localMachine, mRandomSeeds[localMachine], machine,
+                    mRandomSeeds[machine],
+                    gInputManager->mFrameProvider->GetFrame());
+            }
+            gNetworkSyncState->OnRandomSeedMismatch(
+                mRemoteTicks[localMachine]);
+            mismatch = true;
+        }
+    }
+
+    if (mismatch)
+    {
+        MarkSyncMismatchReported();
+    }
 }
 
 void NetworkInputRouter::ReceiveInput(
     s8 machine, NetMessageInput* message)
 {
     NetworkInputMessageQueue& queue = mInputQueues[machine];
-    if (queue.mCount < queue.mCapacity)
+    if (!queue.IsFull())
     {
-        u32 position = (queue.mHead + queue.mCount) % queue.mCapacity;
-        memcpy(&queue.mMessages[position], message, sizeof(*message));
-        ++queue.mCount;
+        queue.PushSlot()->CopyFrom(message);
     }
     else
     {
@@ -382,9 +591,38 @@ void NetworkInputRouter::ReceiveInput(
 
 void NetworkInputRouter::DebugDraw(int column, int* row)
 {
+    int machineCount = mSession->GetNumMachines();
+    if (g_bDisplayNetworkVerbose)
+    {
+        glFontPrintf(GetDebugFontView(), column, (*row)++, "I am %d",
+            mSession->GetLocalMachineId());
+    }
+
+    char output[100];
+    for (int machine = 0; machine < machineCount; ++machine)
+    {
+        int inputCount = mInputQueues[machine].GetCount();
+        char queueText[100];
+        int maxTextLength = nlMin(inputCount, 99);
+        int queueTextLength = 0;
+        for (; queueTextLength < maxTextLength; ++queueTextLength)
+        {
+            queueText[queueTextLength] = '*';
+        }
+        queueText[queueTextLength] = '\0';
+
+        nlSNPrintf(output, sizeof(output), "M%d: %d %s\n",
+            machine, inputCount, queueText);
+        glFontPrintf(GetDebugFontView(), column, *row,
+            inputCount > 0 ? g_SyncTextColour : g_SyncMismatchColour,
+            output);
+        ++*row;
+    }
+
     if (mStarvedForInput)
     {
-        tDebugPrintManager::Print(DC_NETWORK, "StarvedForInput");
+        glFontPrintf(GetDebugFontView(), column, (*row)++,
+            g_SyncMismatchColour, "StarvedForInput");
     }
 }
 
@@ -393,10 +631,7 @@ NetMessageAllInputsBundle::~NetMessageAllInputsBundle()
 }
 
 NetworkInputMessageQueue::NetworkInputMessageQueue()
-    : mMessages(mStorage)
-    , mHead(0)
-    , mCount(0)
-    , mCapacity(60)
+    : CircularQueueBase<NetMessageInput>(mStorage, 60)
 {
 }
 

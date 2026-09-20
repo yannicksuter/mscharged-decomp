@@ -33,6 +33,11 @@ struct MegaBallIndicator
 {
     MegaBallIndicator();
 
+    bool IsActive() const
+    {
+        return mActive;
+    }
+
     /* 0x00 */ float mX;
     /* 0x04 */ float mY;
     /* 0x08 */ float mWidth;

@@ -1219,13 +1219,6 @@ void cPlayer::SetNoPickUpTime(float NewNoPickUpTime)
     mUnidentified1E4.m_tNoPickupTimer.SetSeconds(NewNoPickUpTime);
 }
 
-inline bool cPlayer::UnidentifiedIsPressed(int button)
-{
-    if (GetGlobalPad() != NULL)
-        return GetGlobalPad()->IsPressed(button, true);
-    return false;
-}
-
 inline bool cPlayer::UnidentifiedPowerupPredicate()
 {
     if (GetGlobalPad() != NULL)
@@ -1269,7 +1262,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
             }
         }
     }
-    if (pSelf->GetGlobalPad()->JustPressed(21, true))
+    if (pSelf->GetGlobalPad()->JustPressed(PAD_AIM, true))
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
         if ((fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
@@ -1291,7 +1284,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
             ((cFielder*)pSelf)->UseTeamPowerup(NULL);
         }
     }
-    else if (!pSelf->GetGlobalPad()->IsPressed(21, true))
+    else if (!pSelf->GetGlobalPad()->IsPressed(PAD_AIM, true))
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
         if (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
@@ -1303,7 +1296,12 @@ extern "C" void fn_80098098(cPlayer* pSelf)
                 cPlayer* pPlayer = pSelf->m_pTeam->GetPlayer(i);
                 if (pPlayer->GetGlobalPad() != NULL)
                 {
-                    bPressed = bPressed || pPlayer->UnidentifiedIsPressed(21);
+                    // Retail re-evaluates the pad inside the branch, matching
+                    // an inlined predicate called twice.
+                    if (pPlayer->GetGlobalPad() != NULL)
+                    {
+                        bPressed = bPressed || pPlayer->GetGlobalPad()->IsPressed(PAD_AIM, true);
+                    }
                 }
             }
             if (!bPressed)

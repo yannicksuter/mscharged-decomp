@@ -967,7 +967,7 @@ extern "C" void QueueCollisionShockwave(CollisionShockwaveData* data)
 }
 
 EventDispatcher::EventDispatcher(const char*)
-    : EventDispatcherBase()
+    : EventDispatcherBase<EventCallback>()
 {
 }
 

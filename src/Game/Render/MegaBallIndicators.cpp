@@ -530,7 +530,7 @@ void SetMegaBallController(cGlobalPad* pController)
 static inline void UpdateStateTweens(
     MegaBallIndicator& state, float fDeltaT)
 {
-    if (state.mActive)
+    if (state.IsActive())
     {
         if (UpdateMegaBallIndicatorTween(&state.mScaleTween, fDeltaT))
         {

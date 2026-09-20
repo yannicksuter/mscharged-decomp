@@ -217,21 +217,21 @@ void EmissionController::Die()
 
 float EmissionController::GetRemainingTime() const
 {
-    float maxTime = 0.0f;
+    float maxRemainingTime = 0.0f;
     nlDLListIterator<ParticleSystem*> node = m_Systems.Begin();
 
     while (node.hasNext())
     {
-        ParticleSystem* system = *node;
-        float remainingTime = system->GetRemainingTime();
-        if (remainingTime > maxTime)
+        ParticleSystem* p = *node;
+        float remainingTime = p->GetRemainingTime();
+        if (remainingTime > maxRemainingTime)
         {
-            maxTime = remainingTime;
+            maxRemainingTime = remainingTime;
         }
         node.Step();
     }
 
-    return maxTime;
+    return maxRemainingTime;
 }
 
 bool EmissionController::IsLingering() const

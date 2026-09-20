@@ -12,25 +12,10 @@ extern bool g_bRunSimAndRenderInLockStep;
 class FixedUpdateTask : public nlTask, public InputFrameProvider
 {
 public:
-    FixedUpdateTask()
-    {
-        mUnidentified28 = mAccumulatedDeltaT = g_fFixedUpdateTick;
-        mSimulationTime = 0.0f;
-        mTimeScale = 1.0f;
-        mfFrameLockTime = 0.0f;
-        mFrame = 0;
-        mUnidentified38 = false;
-
-        mEventDispatcher.Clear();
-        BasicSlotPool<DLListEntry<EventCallback> >* pool = &mEventDispatcher.callbacks.m_Allocator;
-        pool->FreeBlocks();
-    }
+    FixedUpdateTask();
 
     virtual void Run(float dt);
-    virtual const char* GetName()
-    {
-        return "Game Fixed Update";
-    }
+    virtual const char* GetName();
 
     virtual int GetFrame()
     {

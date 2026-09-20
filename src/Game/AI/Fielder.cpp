@@ -2546,22 +2546,22 @@ bool cFielder::IsHitting() const
     const float fAnimTime
         = pAnimController->m_fTime * pAnimController->m_pSAnim->m_nNumKeys;
 
+    bool isHitting = false;
+    bool bUnidentified2 = false;
+    bool bUnidentified1 = false;
     bool bUnidentified0 = false;
     if (mUnidentified024.m_eCharacterClass != TOAD && !fn_80038918())
     {
         bUnidentified0 = true;
     }
-    bool bUnidentified1 = false;
     if (bUnidentified0 && m_eActionState == ACTION_HIT)
     {
         bUnidentified1 = true;
     }
-    bool bUnidentified2 = false;
     if (bUnidentified1 && fAnimTime >= fn_8002D020(m_pTweaks))
     {
         bUnidentified2 = true;
     }
-    bool isHitting = false;
     if (bUnidentified2 && fAnimTime <= fn_8002D050(m_pTweaks))
     {
         isHitting = true;

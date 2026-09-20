@@ -52,7 +52,14 @@ public:
     /* 0x2C */ float m_Age;
     /* 0x30 */ float m_TimeScale;
     /* 0x34 */ float m_ReplayDeltaTime;
-    /* 0x38 */ bool m_bLingering;
+    // R4QE01 keeps the m_Systems head load below the callee saves in both const
+    // reductions (GetRemainingTime, GetBoundingRadius), which GC/3.0a5 emits only
+    // when the class carries a mutable non-pointer member; the constructor's
+    // store of m_pGroup at offset 0 rules out the vptr that produces the same
+    // gate. Which member held the qualifier is not recoverable from the stripped
+    // DOL - the gate is class-wide - and m_bLingering is the plain flag this
+    // class's const reader (IsLingering) consumes directly.
+    /* 0x38 */ mutable bool m_bLingering;
     /* 0x39 */ bool m_bDying;
     /* 0x3A */ u8 unknown_0x3A[0x02];
     /* 0x3C */ float m_fGround;

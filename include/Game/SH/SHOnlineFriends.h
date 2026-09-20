@@ -27,6 +27,8 @@ public:
     void UpdateFriendCode();
     void OnDialogDismissed();
     void OnErrorDismissed();
+    void ShowError(int error);
+    void StartFriendInvite();
     void UpdateAddFriendRow();
     void UpdateVisibleRows();
 

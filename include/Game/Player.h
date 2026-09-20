@@ -31,6 +31,7 @@ enum eBallRotationMode
 
 enum ePadActions
 {
+    PAD_AIM = 21,
     PAD_SWITCH = 26,
 };
 
@@ -141,7 +142,6 @@ public:
     void fn_80095DF4(float fDeltaT);
     void GetAnimatedBallOrientation(nlQuaternion& qRetval);
     bool UnidentifiedPowerupPredicate();
-    bool UnidentifiedIsPressed(int button);
     void PickupBall(cBall* pBall);
     void SetNoPickUpTime(float NewNoPickUpTime);
     DetInput* GetGlobalPad();

@@ -25,11 +25,92 @@ inline UnidentifiedAudioPoolOwner::~UnidentifiedAudioPoolOwner()
 // Configuration keys the runtime resolves by lower-cased name hash. The DOL
 // keeps only the hashes; the names behind them are not recoverable.
 #define AUDIO_EFFECT_KEY 0xFE7BE6FB
+#define AUDIO_EFFECT_SET_KEY 0xECBAFA4B
 
 static inline u32 UnidentifiedGetEffectId(u32 definition)
 {
     u32 key = AUDIO_EFFECT_KEY;
     return ConfigFindDefinition(definition)->Get(key).m_Words.m_Value;
+}
+
+static inline RegistryContainer* UnidentifiedGetEffectSet(u32 effectSet)
+{
+    u32 key = AUDIO_EFFECT_SET_KEY;
+    AudioConfigValue effectSets
+        = g_pAudioResourceRuntime->GetConfigRoot()->Get(key);
+    AudioConfigValue value
+        = ((AudioConfigNode*)effectSets.m_Words.m_Value)->Get(effectSet);
+    return (RegistryContainer*)value.m_Words.m_Value;
+}
+
+static inline RegistryContainer* UnidentifiedGetTransitionSet(
+    const u32& key, const u32& set)
+{
+    return (RegistryContainer*)((AudioConfigNode*)
+        g_pAudioResourceRuntime->GetConfigRoot()->Get(key).m_Words.m_Value)
+        ->Get(set).m_Words.m_Value;
+}
+
+static inline RegistryValue GetRegistryIteratorValue(
+    RegistryIteratorBase* iterator)
+{
+    return iterator->GetValue();
+}
+
+static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
+    RegistryIteratorBase* parameter, void* parameterData,
+    bool inverted, void* owner)
+{
+    u32 definition = parameter->GetHash();
+    u32 effectId = UnidentifiedGetEffectId(definition);
+
+    AudioEffectBase* effect;
+    AudioEffectBase** found;
+    bool foundEffect = binding->mEffects.FindGet(effectId, &found);
+    if (foundEffect)
+    {
+        effect = *found;
+    }
+    if (!foundEffect)
+    {
+        effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
+        binding->mEffects.Add(effectId, effect);
+        binding->mInstances.Walk(
+            Function2<bool, const u32&, bool*>(
+                UnidentifiedAudioInstanceVisitor(effect)));
+    }
+
+    AudioEffectParameter* effectParameter
+        = effect->CreateParameter(definition, parameterData, inverted);
+    effect->AddParameter(effectParameter, owner);
+}
+
+static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
+    RegistryIteratorBase* parameter, void* parameterData,
+    bool inverted, float duration)
+{
+    u32 definition = parameter->GetHash();
+    u32 effectId = UnidentifiedGetEffectId(definition);
+
+    AudioEffectBase* effect;
+    AudioEffectBase** found;
+    bool foundEffect = binding->mEffects.FindGet(effectId, &found);
+    if (foundEffect)
+    {
+        effect = *found;
+    }
+    if (!foundEffect)
+    {
+        effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
+        binding->mEffects.Add(effectId, effect);
+        binding->mInstances.Walk(
+            Function2<bool, const u32&, bool*>(
+                UnidentifiedAudioInstanceVisitor(effect)));
+    }
+
+    AudioEffectParameter* effectParameter
+        = effect->CreateParameter(definition, parameterData, inverted);
+    effect->AddParameter(effectParameter, duration);
 }
 
 AudioResourceRuntime::AudioResourceRuntime()
@@ -132,6 +213,58 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
     return effect->AddParameter(parameter, value);
 }
 
+static inline void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,
+    bool inverted, void* owner)
+{
+    AudioEffectBinding* binding
+        = g_pAudioResourceRuntime->m_Script->GetBinding(bindingKey);
+    RegistryContainer* effectSet = UnidentifiedGetEffectSet(effectSetKey);
+    if (effectSet == 0)
+    {
+        return;
+    }
+
+    RegistryValue parameters = effectSet->NamedList();
+    RegistryIterator parameterStorage;
+    ((RegistryContainer*)parameters.mData)
+        ->GetIterator(&parameterStorage, parameters.mType);
+    for (; !((RegistryIteratorBase*)&parameterStorage)->IsDone();
+         ((RegistryIteratorBase*)&parameterStorage)->Next())
+    {
+        RegistryValue value = GetRegistryIteratorValue(&parameterStorage);
+        RegistryValue parameterData = value;
+        void* context = &parameterData;
+        UnidentifiedApplyEffect(
+            binding, &parameterStorage, context, inverted, owner);
+    }
+}
+
+static inline void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,
+    bool inverted, float duration)
+{
+    AudioEffectBinding* binding
+        = g_pAudioResourceRuntime->m_Script->GetBinding(bindingKey);
+    RegistryContainer* effectSet = UnidentifiedGetEffectSet(effectSetKey);
+    if (effectSet == 0)
+    {
+        return;
+    }
+
+    RegistryValue parameters = effectSet->NamedList();
+    RegistryIterator parameterStorage;
+    ((RegistryContainer*)parameters.mData)
+        ->GetIterator(&parameterStorage, parameters.mType);
+    for (; !((RegistryIteratorBase*)&parameterStorage)->IsDone();
+         ((RegistryIteratorBase*)&parameterStorage)->Next())
+    {
+        RegistryValue value = GetRegistryIteratorValue(&parameterStorage);
+        RegistryValue parameterData = value;
+        void* context = &parameterData;
+        UnidentifiedApplyEffect(
+            binding, &parameterStorage, context, inverted, duration);
+    }
+}
+
 /**
  * Address/Size: 0x802F4E84 | size: 0xDC4
  *
@@ -139,47 +272,55 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
  * transition's "Time" and "Invert" properties and starts each effect of the
  * transition's "EffectSet" on the binding the entry names.
  */
-extern "C" void fn_802F4E84(const unsigned long* hash, bool invert, void* owner)
+extern "C" bool fn_802F4E84(const u32* hash, bool invert, void* owner)
 {
-    RegistryContainer* transitions
-        = (RegistryContainer*)
-            ((RegistryContainer*)
-                    g_pAudioResourceRuntime->GetConfigRoot())
-                ->Get(nlStringLowerHash("Transitions"))
-                .mData;
+    u32 transitionKey = nlStringLowerHash("Transitions");
     RegistryContainer* set
-        = (RegistryContainer*)transitions->Get(*hash).mData;
+        = UnidentifiedGetTransitionSet(transitionKey, *hash);
     if (set == 0)
     {
-        return;
+        return false;
     }
 
     RegistryValue time = set->Get(nlStringLowerHash("Time"));
     float duration = time.mType == 5 ? 0.0f : *(float*)&time.mData;
 
     RegistryValue list = set->UnnamedList();
-    RegistryIterator entries;
+    RegistryIterator entryStorage;
+    RegistryIteratorBase* entries = &entryStorage;
     ((RegistryContainer*)list.mData)
-        ->GetIterator(&entries, list.mType);
-    for (; !entries.IsDone(); entries.Next())
+        ->GetIterator(entries, list.mType);
+    for (; !entries->IsDone(); entries->Next())
     {
-        RegistryContainer* entry
-            = (RegistryContainer*)entries.GetValue().mData;
-        u32 binding
+        RegistryValue entryValue = GetRegistryIteratorValue(entries);
+        RegistryContainer* entry = (RegistryContainer*)entryValue.mData;
+        u32 effectSet
             = (u32)entry->Get(nlStringLowerHash("EffectSet")).mData;
         bool inverted
-            = invert != (entry->Get(nlStringLowerHash("Invert")).mData != 0);
+            = invert ^ (entry->Get(nlStringLowerHash("Invert")).mData != 0);
 
-        RegistryValue effects = entry->UnnamedList();
-        RegistryIterator effect;
-        ((RegistryContainer*)effects.mData)
-            ->GetIterator(&effect, effects.mType);
-        for (; !effect.IsDone(); effect.Next())
+        RegistryValue bindings = entry->UnnamedList();
+        RegistryIterator bindingStorage;
+        RegistryIteratorBase* binding = &bindingStorage;
+        ((RegistryContainer*)bindings.mData)
+            ->GetIterator(binding, bindings.mType);
+        for (; !binding->IsDone(); binding->Next())
         {
-            u32 definition = (u32)effect.GetValue().mData;
-            fn_802F49C0(&binding, &definition, owner, inverted, duration);
+            RegistryValue bindingValue = GetRegistryIteratorValue(binding);
+            u32 bindingKey = (u32)bindingValue.mData;
+            if (owner != 0)
+            {
+                UnidentifiedApplyEffectSet(
+                    bindingKey, effectSet, inverted, owner);
+            }
+            else
+            {
+                UnidentifiedApplyEffectSet(
+                    bindingKey, effectSet, inverted, duration);
+            }
         }
     }
+    return true;
 }
 
 /**

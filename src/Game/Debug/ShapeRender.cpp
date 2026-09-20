@@ -152,19 +152,15 @@ void ShapeRender::CreateBoxGeometry(PrimitiveShape& prim)
             tsrc[i] = &data_uv[ind_uv[iQuad * 4 + i]];
         }
 
-        for (i = 0; i < 6; i += 2)
+        for (i = 0; i < 6; i++)
         {
             *pdst = *psrc[tri_map[i]];
             *ndst = *nsrc[tri_map[i]];
             *tdst = *tsrc[tri_map[i]];
 
-            pdst[1] = *psrc[tri_map[i + 1]];
-            ndst[1] = *nsrc[tri_map[i + 1]];
-            tdst[1] = *tsrc[tri_map[i + 1]];
-
-            pdst += 2;
-            ndst += 2;
-            tdst += 2;
+            pdst++;
+            ndst++;
+            tdst++;
         }
     }
 }
@@ -733,4 +729,3 @@ extern "C" void fn_802BD2C8(PrimitiveShape* shape, int arg1, void* arg2)
         }
     }
 }
-

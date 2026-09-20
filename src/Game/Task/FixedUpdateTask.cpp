@@ -85,6 +85,23 @@ EventDispatcher* GetFixedUpdateEventDispatcher()
 
 void FixedUpdateTask::Reset()
 {
+    UnidentifiedDispatcherHeaderScope headerScope;
+    UnidentifiedDispatcherInlineScope inlineScope;
+
+    mUnidentified28 = mAccumulatedDeltaT = g_fFixedUpdateTick;
+    mSimulationTime = 0.0f;
+    mTimeScale = 1.0f;
+    mfFrameLockTime = 0.0f;
+    mFrame = 0;
+    mUnidentified38 = false;
+
+    mEventDispatcher.Clear();
+    BasicSlotPool<DLListEntry<EventCallback> >* pool = &mEventDispatcher.callbacks.m_Allocator;
+    pool->FreeBlocks();
+}
+
+FixedUpdateTask::FixedUpdateTask()
+{
     mUnidentified28 = mAccumulatedDeltaT = g_fFixedUpdateTick;
     mSimulationTime = 0.0f;
     mTimeScale = 1.0f;
@@ -116,30 +133,34 @@ u32 FixedUpdateTask::CalculateChecksum()
     return ~checksum.m_nChecksum;
 }
 
-static char sDetInputName[] = "DetInput";
-static char sAnalogLeftXName[] = "m_AnalogLeftX";
-static char sAnalogLeftYName[] = "m_AnalogLeftY";
-static char sAnalogRightXName[] = "m_AnalogRightX";
-static char sAnalogRightYName[] = "m_AnalogRightY";
-static char sConnectedName[] = "m_nConnected";
-static char sButtonBitfieldName[] = "m_ButtonBitfield";
-static char sLeftTriggerName[] = "m_LeftTrigger";
-static char sRightTriggerName[] = "m_RightTrigger";
-static char sRevRemoteAccelName[] = "m_v3RevRemoteAccel";
-static char sRevFreeStyleAccelName[] = "m_v3RevFreeStyleAccel";
-static char sRevDPDNumTargetsName[] = "m_nRevDPDNumTargets";
-static char sRevDPDCoordName[] = "m_v2RevDPDCoord";
-static char sPrevInputName[] = "m_pPrevInput";
-static char sMyUserName[] = "m_pMyUser";
-static char sPolarAnalogLeftAName[] = "m_PolarAnalogLeft.a";
-static char sPolarAnalogLeftRName[] = "m_PolarAnalogLeft.r";
-static char sPolarAnalogRightAName[] = "m_PolarAnalogLeft.a";
-static char sPolarAnalogRightRName[] = "m_PolarAnalogLeft.r";
-static char sButtonStateTicksName[] = "m_buttonStateTicks";
-static char sRemapAngleName[] = "m_aRemapAngle";
-
 #define PAD_FIELD_OFFSET(pad, field) \
     ((unsigned char*)&(pad)->field - (unsigned char*)(pad))
+
+inline void fn_801118C0(DebugWriteCache* cache, DetInput* pad)
+{
+    lbl_806DF740 = cache->BeginType("DetInput");
+    cache->AddField(17, gDebugFieldTypes[17].size, 0, "m_AnalogLeftX");
+    cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogLeftY), "m_AnalogLeftY");
+    cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogRightX), "m_AnalogRightX");
+    cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogRightY), "m_AnalogRightY");
+    cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_nConnected), "m_nConnected");
+    cache->AddField(1, gDebugFieldTypes[1].size, PAD_FIELD_OFFSET(pad, m_ButtonBitfield), "m_ButtonBitfield");
+    cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_LeftTrigger), "m_LeftTrigger");
+    cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_RightTrigger), "m_RightTrigger");
+    cache->AddField(22, gDebugFieldTypes[22].size, PAD_FIELD_OFFSET(pad, m_v3RevRemoteAccel), "m_v3RevRemoteAccel");
+    cache->AddField(22, gDebugFieldTypes[22].size, PAD_FIELD_OFFSET(pad, m_v3RevFreeStyleAccel), "m_v3RevFreeStyleAccel");
+    cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_nRevDPDNumTargets), "m_nRevDPDNumTargets");
+    cache->AddField(21, gDebugFieldTypes[21].size, PAD_FIELD_OFFSET(pad, m_v2RevDPDCoord), "m_v2RevDPDCoord");
+    cache->AddField(15, gDebugFieldTypes[15].size, PAD_FIELD_OFFSET(pad, m_pPrevInput), "m_pPrevInput");
+    cache->AddField(15, gDebugFieldTypes[15].size, PAD_FIELD_OFFSET(pad, m_pMyUser), "m_pMyUser");
+    cache->AddField(19, gDebugFieldTypes[19].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.a), "m_PolarAnalogLeft.a");
+    cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.r), "m_PolarAnalogLeft.r");
+    cache->AddField(19, gDebugFieldTypes[19].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.a), "m_PolarAnalogLeft.a");
+    cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.r), "m_PolarAnalogLeft.r");
+    cache->AddArrayField(8, gDebugFieldTypes[8].size, 13, PAD_FIELD_OFFSET(pad, m_buttonStateTicks), "m_buttonStateTicks");
+    cache->AddField(19, gDebugFieldTypes[19].size, PAD_FIELD_OFFSET(pad, m_aRemapAngle), "m_aRemapAngle");
+    cache->EndType();
+}
 
 u32 FixedUpdateTask::WriteSyncLog()
 {
@@ -167,28 +188,7 @@ u32 FixedUpdateTask::WriteSyncLog()
             DetInput* pad = (group->GetNetworkPeerChannel(controllerIndex))->GetNetworkPeerChannelInput();
             if (lbl_806DF740 == 0xFFFF)
             {
-                lbl_806DF740 = cache->BeginType(sDetInputName);
-                cache->AddField(17, gDebugFieldTypes[17].size, 0, sAnalogLeftXName);
-                cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogLeftY), sAnalogLeftYName);
-                cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogRightX), sAnalogRightXName);
-                cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogRightY), sAnalogRightYName);
-                cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_nConnected), sConnectedName);
-                cache->AddField(1, gDebugFieldTypes[1].size, PAD_FIELD_OFFSET(pad, m_ButtonBitfield), sButtonBitfieldName);
-                cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_LeftTrigger), sLeftTriggerName);
-                cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_RightTrigger), sRightTriggerName);
-                cache->AddField(22, gDebugFieldTypes[22].size, PAD_FIELD_OFFSET(pad, m_v3RevRemoteAccel), sRevRemoteAccelName);
-                cache->AddField(22, gDebugFieldTypes[22].size, PAD_FIELD_OFFSET(pad, m_v3RevFreeStyleAccel), sRevFreeStyleAccelName);
-                cache->AddField(0, gDebugFieldTypes[0].size, PAD_FIELD_OFFSET(pad, m_nRevDPDNumTargets), sRevDPDNumTargetsName);
-                cache->AddField(21, gDebugFieldTypes[21].size, PAD_FIELD_OFFSET(pad, m_v2RevDPDCoord), sRevDPDCoordName);
-                cache->AddField(15, gDebugFieldTypes[15].size, PAD_FIELD_OFFSET(pad, m_pPrevInput), sPrevInputName);
-                cache->AddField(15, gDebugFieldTypes[15].size, PAD_FIELD_OFFSET(pad, m_pMyUser), sMyUserName);
-                cache->AddField(19, gDebugFieldTypes[19].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.a), sPolarAnalogLeftAName);
-                cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.r), sPolarAnalogLeftRName);
-                cache->AddField(19, gDebugFieldTypes[19].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.a), sPolarAnalogRightAName);
-                cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_PolarAnalogLeft.r), sPolarAnalogRightRName);
-                cache->AddArrayField(8, gDebugFieldTypes[8].size, 13, PAD_FIELD_OFFSET(pad, m_buttonStateTicks), sButtonStateTicksName);
-                cache->AddField(19, gDebugFieldTypes[19].size, PAD_FIELD_OFFSET(pad, m_aRemapAngle), sRemapAngleName);
-                cache->EndType();
+                fn_801118C0(cache, pad);
             }
 
             DetInput* copy =
@@ -244,6 +244,11 @@ u16 FixedUpdateTask::GetInputRemapAngle()
 bool FixedUpdateTask::IsInPauseMenu()
 {
     return FrontEnd::m_bInPauseMenuState;
+}
+
+const char* FixedUpdateTask::GetName()
+{
+    return "Game Fixed Update";
 }
 
 float FixedUpdateTask::GetPhysicsUpdateTick()
@@ -460,58 +465,4 @@ void FixedUpdateTask::CallFixedUpdateTasks()
     mEventDispatcher.Dispatch(true);
     UpdatePeachPhoto(&gPeachPhotoState, g_fSimulationTick, lbl_806E2130--);
     ReplayManager::Instance()->GrabSnapshot();
-}
-
-EventDispatcher::~EventDispatcher()
-{
-    BasicSlotPool<DLListEntry<EventCallback> >* pool = &callbacks.m_Allocator;
-    pool->FreeBlocks();
-}
-
-void EventDispatcherBase::Dispatch(bool flag)
-{
-    state.fields.dispatching = 1;
-    int count;
-    do
-    {
-        count = state.fields.callbackCount;
-        state.fields.callbackCount = 0;
-        while (count != 0 && !state.fields.stopDispatch)
-        {
-            (*callbacks.Begin())(true);
-            callbacks.DeleteEntry(nlDLRingRemoveStart(&callbacks.m_Head));
-            count--;
-        }
-    } while (!flag && state.fields.callbackCount != 0);
-
-    while (count != 0)
-    {
-        callbacks.DeleteEntry(nlDLRingRemoveStart(&callbacks.m_Head));
-        state.fields.callbackCount--;
-    }
-
-    state.fields.dispatching = 0;
-    state.fields.stopDispatch = 0;
-}
-
-void EventDispatcherBase::Clear()
-{
-    if (!state.fields.dispatching)
-    {
-        nlDLListIterator<EventCallback> iterator = callbacks.Begin();
-        while (iterator.hasNext())
-        {
-            (*iterator)(false);
-            iterator.next();
-        }
-
-        callbacks.Clear();
-        state.fields.callbackCount = 0;
-    }
-}
-
-void EventDispatcherBase::Add(const EventCallback& callback)
-{
-    callbacks.AddEnd(callback);
-    state.fields.callbackCount++;
 }

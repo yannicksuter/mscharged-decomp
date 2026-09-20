@@ -26,8 +26,9 @@ public:
 
 extern "C" void fn_80343DE4(
     DrawableObject*, WorldObjectLoadContext*);
-extern "C" void fn_80343E3C(
-    DrawableObject*, WorldObjectLoadContext*);
+struct WorldVertexAnimDrawable_80343E3C;
+void CreateWorldVertexAnimDrawable(
+    WorldVertexAnimDrawable_80343E3C*, WorldObjectLoadContext*);
 extern "C" void fn_80344144(
     DrawableObject*, WorldObjectLoadContext*);
 
@@ -189,11 +190,11 @@ bool World::LoadChunks(nlChunk* pChunk, unsigned long uSize)
                         - ((u8*)pCurrent + sizeof(nlChunk))),
                 false);
             break;
-        case 0x80008000:
+        case 0x80018000:
             m_pAnimationSet
                 = mWorldAnimManager.LoadHierarchy(pCurrent);
             break;
-        case 0x80007000:
+        case 0x80017000:
             mWorldAnimManager.LoadAnimationSet(
                 m_pAnimationSet, pCurrent);
             break;
@@ -288,7 +289,8 @@ DrawableObject* World::CreateObject(
         break;
     case 0x102:
         pObject = (DrawableObject*)pContext->m_pObject;
-        fn_80343E3C(pObject, pContext);
+        CreateWorldVertexAnimDrawable(
+            (WorldVertexAnimDrawable_80343E3C*)pObject, pContext);
         uSize = 0x30;
         break;
     case 0x103:

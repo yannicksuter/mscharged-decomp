@@ -379,8 +379,7 @@ void NetworkRanking::Reset()
     memset(mSubmission.mData, 0, sizeof(mSubmission.mData));
     memset(mSubmission.mDigest, 0, sizeof(mSubmission.mDigest));
     mReportGame = false;
-    mFilter = 0;
-    mLimit = 0;
+    mLimit = mFilter = 0;
     mLeaderboardPlayers = 0;
     mLeaderboardMetadata = 0;
     mCategory = 0;
@@ -739,18 +738,27 @@ void NetworkRanking::ProcessLeaderboardResults()
 
 void NetworkRanking::FilterCurrentSeason(int count)
 {
-    DWCDate current;
+    DWCDate date;
     DWCTime time;
-    GetAdjustedNetworkDate(&current, &time);
+    GetAdjustedNetworkDate(&date, &time);
+    NetworkSeasonDate current;
+    current.mMonth = date.month;
+    current.mDay = date.mday;
+    int currentYear = date.year;
+    int currentSeason =
+        FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, current);
     for (int i = 0; i < count; ++i)
     {
-        if (mLeaderboardMetadata[i].mYear != current.year)
+        NetworkRankingMeta& metadata = mLeaderboardMetadata[i];
+        NetworkSeasonDate previous;
+        previous.mMonth = metadata.mMonth;
+        previous.mDay = metadata.mDay;
+        int previousYear = metadata.mYear;
+        int previousSeason =
+            FindNetworkSeasonBoundary(&sNetworkSeasonDateTable, previous);
+        if (currentYear != previousYear || currentSeason != previousSeason)
         {
-            mLeaderboardMetadata[i].mScore = 0;
-            mLeaderboardMetadata[i].mDisplayRank = 0;
-            mLeaderboardMetadata[i].mWins = 0;
-            mLeaderboardMetadata[i].mLosses = 0;
-            mLeaderboardMetadata[i].mUnidentified14 = 0;
+            metadata.Reset();
         }
     }
 }
@@ -945,4 +953,3 @@ static TweakIntBinding sConnectToStatsAddress2Tweak(
 static TweakIntBinding sConnectToStatsAddress3Tweak(
     "g_nConnectToStatsAddress3", "Network/Stats",
     &g_nConnectToStatsAddress[3], true);
-

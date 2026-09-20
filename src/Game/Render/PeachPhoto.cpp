@@ -217,12 +217,14 @@ void UpdatePeachPhoto(
 
 void RenderPeachPhoto(PeachPhotoState* photo)
 {
+    glModel* model;
+
     if (photo->state == 0)
     {
         return;
     }
 
-    float alpha = 1.0f;
+    float alpha;
     if (photo->state == 2)
     {
         float elapsed = photo->fadeTime / gPeachPhotoFadeTime;
@@ -231,6 +233,10 @@ void RenderPeachPhoto(PeachPhotoState* photo)
             elapsed = 1.0f;
         }
         alpha = 1.0f - elapsed;
+    }
+    else
+    {
+        alpha = 1.0f;
     }
 
     if (gPeachPhotoDebugBounds)
@@ -255,7 +261,8 @@ void RenderPeachPhoto(PeachPhotoState* photo)
 
     if (!photo->projected)
     {
-        for (int i = 0; i < 4; ++i)
+        int i;
+        for (i = 0; i < 4; ++i)
         {
             nlVector3 projected;
             glViewProjectPoint(GetLayerView(eCLV_Characters),
@@ -265,29 +272,35 @@ void RenderPeachPhoto(PeachPhotoState* photo)
             photo->projectedCorners[i].y = 0.5f * (1.0f + projected.y);
         }
 
-        for (int y = 0; y < 3; ++y)
+        float oneThird = 1.0f / 3.0f;
+        for (i = 0; i < 3; ++i)
         {
             for (int x = 0; x < 3; ++x)
             {
-                PeachPhotoCell& cell = photo->cells[y][x];
-                for (int i = 0; i < 4; ++i)
+                for (int corner = 0; corner < 4; ++corner)
                 {
                     nlVector3 projected;
                     glViewProjectPoint(GetLayerView(eCLV_Characters),
-                        cell.world[i],
+                        photo->cells[i][x].world[corner],
                         projected);
-                    cell.projected[i].x = 0.5f * (1.0f + projected.x);
-                    cell.projected[i].y = 0.5f * (1.0f + projected.y);
-                }
+                    photo->cells[i][x].projected[corner].x =
+                        0.5f * (1.0f + projected.x);
+                    photo->cells[i][x].projected[corner].y =
+                        0.5f * (1.0f + projected.y);
 
-                const float x0 = (1.0f / 3.0f) * (float)y;
-                const float x1 = (1.0f / 3.0f) * (float)(y + 1);
-                const float y0 = (1.0f / 3.0f) * (float)x;
-                const float y1 = (1.0f / 3.0f) * (float)(x + 1);
-                nlVec2Set(cell.texture[0], x0, y1);
-                nlVec2Set(cell.texture[1], x1, y1);
-                nlVec2Set(cell.texture[2], x1, y0);
-                nlVec2Set(cell.texture[3], x0, y0);
+                    nlVec2Set(photo->cells[i][x].texture[0],
+                        oneThird * (float)i,
+                        oneThird * (float)(x + 1));
+                    nlVec2Set(photo->cells[i][x].texture[1],
+                        oneThird * (float)(i + 1),
+                        oneThird * (float)(x + 1));
+                    nlVec2Set(photo->cells[i][x].texture[2],
+                        oneThird * (float)(i + 1),
+                        oneThird * (float)x);
+                    nlVec2Set(photo->cells[i][x].texture[3],
+                        oneThird * (float)i,
+                        oneThird * (float)x);
+                }
             }
         }
         photo->projected = true;
@@ -300,56 +313,42 @@ void RenderPeachPhoto(PeachPhotoState* photo)
 
     glMultiTextureModelWriter writer;
     nlVector2 texture[4];
-    memcpy(texture, sPeachPhotoTexcoords, sizeof(texture));
+    texture[0] = sPeachPhotoTexcoords[0];
+    texture[1] = sPeachPhotoTexcoords[1];
+    texture[2] = sPeachPhotoTexcoords[2];
+    texture[3] = sPeachPhotoTexcoords[3];
 
     if (writer.Begin(4, 3, 0))
     {
         for (int i = 0; i < 4; ++i)
         {
-            *writer.texcoords0++ = photo->projectedCorners[i].x;
-            *writer.texcoords0++ = photo->projectedCorners[i].y;
+            writer.Texcoord0(photo->projectedCorners[i].x,
+                photo->projectedCorners[i].y);
 
             const nlVector2& tex = texture[(i + gPeachPhotoTextureRotation) % 4];
-            *writer.texcoords1++ = tex.x;
-            *writer.texcoords1++ = tex.y;
-            *writer.texcoords2++ = tex.x;
-            *writer.texcoords2++ = tex.y;
-            *writer.colours++ = *(u32*)&colour;
+            writer.Texcoord1(tex.x, tex.y);
+            writer.Texcoord2(tex.x, tex.y);
+            writer.Colour(colour);
 
-            *writer.positions++ = photo->corners[i].x;
-            *writer.positions++ = photo->corners[i].y;
-            *writer.positions++ = photo->corners[i].z + gPeachPhotoDepthOffset;
+            nlVector3 position = photo->corners[i];
+            position.z += gPeachPhotoDepthOffset;
+            writer.Vertex(position);
         }
 
         if (writer.End())
         {
-            glTextureBinding* states =
-                static_cast<glTextureBinding*>(
-                    writer.model->packets->materialParameters);
-            states[0].texture = glGetTexture(
-                gPeachPhotoDisableImage ? sPeachPhotoWhiteTexture : sPeachPhotoTexture);
-            states[0].textureIndex = 0xFFFF;
-            states[0].SetWrapS(true);
-            states[0].SetWrapT(true);
-            states[0].unknown07 = 0;
+            writer.Texture(0, glGetTexture(
+                gPeachPhotoDisableImage ? sPeachPhotoWhiteTexture : sPeachPhotoTexture));
 
-            states[1].texture = glGetTexture(
-                gPeachPhotoDisableMasks ? sPeachPhotoWhiteTexture : sPeachPhotoMaskTexture1);
-            states[1].textureIndex = 0xFFFF;
-            states[1].SetWrapS(true);
-            states[1].SetWrapT(true);
-            states[1].unknown07 = 0;
+            writer.Texture(1, glGetTexture(
+                gPeachPhotoDisableMasks ? sPeachPhotoWhiteTexture : sPeachPhotoMaskTexture1));
 
-            states[2].texture = glGetTexture(
-                gPeachPhotoDisableMasks ? sPeachPhotoWhiteTexture : sPeachPhotoMaskTexture2);
-            states[2].textureIndex = 0xFFFF;
-            states[2].SetWrapS(true);
-            states[2].SetWrapT(true);
-            states[2].unknown07 = 0;
+            writer.Texture(2, glGetTexture(
+                gPeachPhotoDisableMasks ? sPeachPhotoWhiteTexture : sPeachPhotoMaskTexture2));
 
-            for (glModelPacket* packet = writer.model->packets;
-                 packet < writer.model->packets
-                        + writer.model->numPackets;
+            model = writer.GetModel();
+            for (glModelPacket* packet = model->packets;
+                 packet < model->packets + model->numPackets;
                  ++packet)
             {
                 glSetRasterState(
@@ -359,7 +358,7 @@ void RenderPeachPhoto(PeachPhotoState* photo)
             }
 
             GetLayerView(eCLV_PeachPhoto3D)->AttachModel(
-                writer.model, 0);
+                writer.GetModel(), 0);
         }
     }
 }

@@ -18,21 +18,26 @@ public:
     {
     }
 
+    void ParseChunk(nlChunk* chunk)
+    {
+        if (T::IsValidChunkID(chunk->GetID()))
+        {
+            T* item = T::Initialize(chunk);
+            m_lItemList.AddStart(item);
+            m_nItemCount++;
+        }
+        else
+        {
+            nlPrintf(
+                "Warning: inventory encountered an unknown chunk type\n");
+        }
+    }
+
     void ParseChunks(nlChunk* chunk, nlChunk* end)
     {
         while (chunk != end)
         {
-            if (T::IsValidChunkID(chunk->GetID()))
-            {
-                T* item = T::Initialize(chunk);
-                m_lItemList.AddStart(item);
-                m_nItemCount++;
-            }
-            else
-            {
-                nlPrintf(
-                    "Warning: inventory encountered an unknown chunk type\n");
-            }
+            ParseChunk(chunk);
             chunk = chunk->GetNextChunk();
         }
     }

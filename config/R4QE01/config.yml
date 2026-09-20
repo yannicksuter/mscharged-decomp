@@ -19,6 +19,11 @@ add_relocations:
   # The HUD power-up name table is hoisted through r0 and a stack slot.
   - { source: .text:0x801EB5D8, type: ha, target: POWER_UP_IMAGE_NAMES }
   - { source: .text:0x801EB620, type: l, target: POWER_UP_IMAGE_NAMES }
+  # CreateBoxGeometry hoists its two index-table addresses through r0 and stack slots.
+  - { source: .text:0x802BB6B8, type: ha, target: lbl_8052B668 }
+  - { source: .text:0x802BB6CC, type: ha, target: lbl_8052B6C8 }
+  - { source: .text:0x802BB708, type: l, target: lbl_8052B668 }
+  - { source: .text:0x802BB728, type: l, target: lbl_8052B6C8 }
   # inflate hoists these literal addresses through r0 and stack slots.
   - { source: .text:0x802AC9F8, type: ha, target: .data:0x8052B1B0 }
   - { source: .text:0x802ACA04, type: ha, target: .rodata:0x804EA900 }

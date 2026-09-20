@@ -171,6 +171,40 @@ static TweakFloatBinding lbl_8056DAE8("sfSpeedAdjustChargeLevelMax",
 
 extern float g_fSimulationTick;
 
+static inline float GetNormalizedContactTime(
+    const cSAnim* anim, float contactFrame)
+{
+    return contactFrame / (float)anim->m_nNumKeys;
+}
+
+static inline float DoCalculatePassSpeed(const nlVector2& distance,
+    float passSpeedMin, float passSpeedMax,
+    float passDistMin, float passDistMax)
+{
+    float fPassCharge = NormalizeVal(
+                            nlVec2Length(distance), passDistMin, passDistMax)
+        - lbl_806E0E48;
+    if (fn_800155A0(g_pBall, 0) > 1.0f)
+    {
+        fPassCharge += lbl_806DC1E4;
+    }
+    if (fn_800155A0(g_pBall, 0) > 2.0f)
+    {
+        fPassCharge += lbl_806DC1E8;
+    }
+    if (fn_800155A0(g_pBall, 0) > 3.0f)
+    {
+        fPassCharge += lbl_806DC1EC;
+    }
+    if (fn_800155A0(g_pBall, 0) >= 4.0f)
+    {
+        fPassCharge += lbl_806DC1F0;
+    }
+    fPassCharge = nlMaxEquals(fPassCharge, 0.0f);
+    fPassCharge = nlMinEquals(fPassCharge, 1.0f);
+    return Interpolate(passSpeedMin, passSpeedMax, fPassCharge);
+}
+
 DesireReceivePass::DesireReceivePass()
     : Desire(22, UnidentifiedStringHash("TransDesireReceivePass"))
     , mEstimated()
@@ -1086,19 +1120,16 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
 
     nlVector3 v3BallDirection;
     nlVec3Sub(v3BallDirection, v3BallPosition, v3BallContactPos);
-    unsigned short aActualFacingDirection =
-        mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
-    unsigned short aIncomingDirection =
-        nlVector3ToAngle(v3BallDirection) - aActualFacingDirection;
+    unsigned short aIncomingDirection = nlAngleDiff(
+        nlVector3ToAngle(v3BallDirection),
+        mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection);
 
     const LooseBallContactAnimInfo* pBestAnimInfo = 0;
     const LooseBallContactAnimInfo* pReachableAnimInfo = 0;
     float fBestContactOffset = lbl_806E4040;
-    nlVector2 v2DistanceToContact = {
-        mUnidentifiedFielder->mUnidentified024.m_v3Position.x - v3BallContactPos.x,
-        mUnidentifiedFielder->mUnidentified024.m_v3Position.y - v3BallContactPos.y,
-    };
-    float fDistanceToContact = nlVec2Length(v2DistanceToContact);
+    float fDistanceToContact = nlSqrt(nlVec3DistanceSquared2D(
+        mUnidentifiedFielder->mUnidentified024.m_v3Position,
+        v3BallContactPos), true);
 
     for (int i = 0; i < nNumAnims; ++i)
     {
@@ -1137,8 +1168,8 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
         mUnidentifiedFielder->GetJointPositionFuture(
             &v3ContactOffsetLocal, pCurrentAnimInfo->nAnimID,
             mUnidentifiedFielder->m_nBallJointIndex,
-            pCurrentAnimInfo->fAnimContactFrame
-                / (float)pAnim->m_nNumKeys,
+            GetNormalizedContactTime(
+                pAnim, pCurrentAnimInfo->fAnimContactFrame),
             true, true, false, true);
 
         float fSin;
@@ -1376,60 +1407,43 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
         pPassTarget->mUnidentified024.m_v3Position.x - g_pBall->m_v3Position.x,
         pPassTarget->mUnidentified024.m_v3Position.y - g_pBall->m_v3Position.y,
     };
-    float fPassCharge = NormalizeVal(
-                            nlSqrt(nlVec2LengthSquared(v2BallToTarget), true),
-                            lbl_806DC1AC, lbl_806DC1B0)
-        - lbl_806E0E48;
-    if (fn_800155A0(g_pBall, 0) > 1.0f)
-    {
-        fPassCharge += lbl_806DC1E4;
-    }
-    if (fn_800155A0(g_pBall, 0) > 2.0f)
-    {
-        fPassCharge += lbl_806DC1E8;
-    }
-    if (fn_800155A0(g_pBall, 0) > 3.0f)
-    {
-        fPassCharge += lbl_806DC1EC;
-    }
-    if (fn_800155A0(g_pBall, 0) >= 4.0f)
-    {
-        fPassCharge += lbl_806DC1F0;
-    }
-    fPassCharge = nlMaxEquals(fPassCharge, 0.0f);
-    fPassCharge = nlMinEquals(fPassCharge, 1.0f);
-
-    float fPassSpeed = Interpolate(
-        fMinPassSpeed, fMaxPassSpeed, fPassCharge);
+    float fPassSpeed = DoCalculatePassSpeed(v2BallToTarget,
+        fMinPassSpeed, fMaxPassSpeed, lbl_806DC1AC, lbl_806DC1B0);
     if (bFindPosition && lbl_806DC196)
     {
+        nlVector3 v3FoundPassPosition;
         if (pv3PassPosition != 0)
         {
-            v3PassPosition = *pv3PassPosition;
+            v3FoundPassPosition = *pv3PassPosition;
         }
         else
         {
+            eFieldDirection eSearchDirection;
+            cFielder* pFielder = mUnidentifiedFielder;
             InterpreterCore* pInterpreter =
                 (InterpreterCore*)fn_80311734(this);
-            eFieldDirection eSearchDirection = (eFieldDirection)
-                fn_800C33C8(pInterpreter, "PassDirection", pPasser, pPassTarget).fn_800C2BD4();
+            eSearchDirection = (eFieldDirection)
+                fn_800C33C8(pInterpreter, "PassDirection", pPasser,
+                    pFielder).fn_800C2BD4();
 
             m_pSpaceSearch = new (8, false)
-                SSearchBestPass(pPasser, pPassTarget,
+                SSearchBestPass(pPasser, pFielder,
                     bVolleyPass, bPerfectPass, fPassSpeed);
-            pPassTarget->SetSpaceSearch(m_pSpaceSearch);
-            pPassTarget->m_pSpaceSearch->m_bDebugOn = false;
-            pPassTarget->m_pSpaceSearch->FindBestPosition(
-                v3PassPosition, pPassTarget->mUnidentified024.m_v3Position,
+            pFielder->SetSpaceSearch(m_pSpaceSearch);
+            pFielder->m_pSpaceSearch->m_bDebugOn = false;
+            pFielder->m_pSpaceSearch->FindBestPosition(
+                v3FoundPassPosition,
+                pFielder->mUnidentified024.m_v3Position,
                 eSearchDirection, &pPasser->mUnidentified024.m_v3Position,
                 6.0f, 0xAAAA);
 
             float fRadius;
-            pPassTarget->m_pPhysicsCharacter->GetRadius(&fRadius);
+            pFielder->m_pPhysicsCharacter->GetRadius(&fRadius);
             fRadius += 0.25f;
             cField::FixOutOfBoundsPosition(
-                v3PassPosition, fRadius, true);
+                v3FoundPassPosition, fRadius, true);
         }
+        v3PassPosition = v3FoundPassPosition;
     }
 
     nlVector2 v2BallToPassPosition = {
@@ -1437,33 +1451,38 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
         v3PassPosition.y - g_pBall->m_v3Position.y,
     };
     float fPassDistance =
-        nlSqrt(nlVec2LengthSquared(v2BallToPassPosition), true);
+        nlVec2Length(v2BallToPassPosition);
     float fPassTime = nlMaxEquals(
         0.04f, fPassDistance / fPassSpeed);
 
     nlVector3 v3BallVelocity;
+    nlVector3 v3BallToPassPosition;
+    PassBallData eventData;
+    nlVector3 v3ContactOffsetLocal;
+    nlVector3 v3ContactOffsetWorld;
+    unsigned short aFacingDirection;
     int eSpinType = SPINTYPE_ROLLING;
     bool bHighArc = false;
     if (bVolleyPass)
     {
-        eSpinType = SPINTYPE_BACK;
+        float fCos;
+        float fSin;
         int nNumAnims;
+        eSpinType = SPINTYPE_BACK;
         const LooseBallContactAnimInfo* pAnimInfo =
             fn_800C1FA4(eReceiveAnimType, nNumAnims);
-        cSAnim* pAnim = pPassTarget->m_pAnimInventory
+        cSAnim* pAnim = mUnidentifiedFielder->m_pAnimInventory
                             ->GetAnim(pAnimInfo->nAnimID);
-        nlVector3 v3ContactOffsetLocal;
-        pPassTarget->GetJointPositionFuture(
+        aFacingDirection =
+            mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
+        mUnidentifiedFielder->GetJointPositionFuture(
             &v3ContactOffsetLocal, pAnimInfo->nAnimID,
-            pPassTarget->m_nBallJointIndex,
-            pAnimInfo->fAnimContactFrame / (float)pAnim->m_nNumKeys,
+            mUnidentifiedFielder->m_nBallJointIndex,
+            GetNormalizedContactTime(
+                pAnim, pAnimInfo->fAnimContactFrame),
             true, true, false, true);
 
-        float fSin;
-        float fCos;
-        nlSinCos(&fSin, &fCos,
-            pPassTarget->mUnidentified024.m_aActualFacingDirection);
-        nlVector3 v3ContactOffsetWorld;
+        nlSinCos(&fSin, &fCos, aFacingDirection);
         v3ContactOffsetWorld.z = v3ContactOffsetLocal.z;
         v3ContactOffsetWorld.x =
             v3ContactOffsetLocal.x * fCos
@@ -1475,7 +1494,7 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
         v3PassPosition.z = v3ContactOffsetWorld.z;
         g_pBall->ShootAtFast(
             v3BallVelocity, v3PassPosition, fPassTime);
-        if (!pPassTarget->fn_8003E74C()
+        if (!mUnidentifiedFielder->fn_8003E74C()
             && v3BallVelocity.z > lbl_806DC19C)
         {
             v3BallVelocity.z = lbl_806DC19C;
@@ -1484,7 +1503,6 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
     }
     else
     {
-        nlVector3 v3BallToPassPosition;
         nlVec3Sub(v3BallToPassPosition,
             v3PassPosition, g_pBall->m_v3Position);
         nlVec3Scale(v3BallVelocity, v3BallToPassPosition,
@@ -1497,7 +1515,7 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
         }
         else
         {
-            v3BallVelocity.z = nlMaxEquals(
+            v3BallVelocity.z = nlMinEquals(
                 0.0f, v3BallVelocity.z);
         }
     }
@@ -1509,11 +1527,11 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
 
     if (pPassTarget->CanReceivePass() && !bHighArc)
     {
-        PassBallData eventData;
         eventData.pPasser = pPasser;
         eventData.pTarget = pPassTarget;
         eventData.bVolleyPass = bVolleyPass;
-        eventData.mPasserControllerID = pPasser->GetGlobalPad() != 0
+        bool bHasGlobalPad = pPasser->GetGlobalPad() != 0;
+        eventData.mPasserControllerID = bHasGlobalPad
             ? pPasser->GetGlobalPad()->GetPadID()
             : -1;
         g_pGame->mUnidentified49C.mEvent16.Deliver(&eventData);

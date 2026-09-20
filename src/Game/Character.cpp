@@ -4,6 +4,7 @@
 #include "Game/Goalie.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
+#include "Game/MathHelpers.h"
 #include "Game/Terrain.h"
 #include "Game/Render/ElectricFence.h"
 #include "Game/Render/NPCManager.h"
@@ -1094,10 +1095,11 @@ extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
 {
     if (fn_8002F1E0(pEventData->pFielder))
     {
+        cFielder* pFielder;
         cBall* pBall = pEventData->pBall;
         if (pBall->m_pPrevOwner != NULL)
         {
-            cFielder* pFielder = pEventData->pFielder;
+            pFielder = pEventData->pFielder;
             nlVector4 plane;
             nlVector3 v3Velocity;
             if (nlGetLengthSquared2D(pBall->m_v3Velocity.x, pBall->m_v3Velocity.y) < 0.01f)
@@ -1118,7 +1120,7 @@ extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
             }
             v3Velocity.x += pBall->m_v3Velocity.x;
             v3Velocity.y += pBall->m_v3Velocity.y;
-            unsigned short aDirection = (unsigned short)(s32)(nlATan2f(v3Velocity.y, v3Velocity.x) * 10430.378f);
+            unsigned short aDirection = RadToAng16(nlATan2f(v3Velocity.y, v3Velocity.x));
             nlVector3 v3Position;
             nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, pFielder->mUnidentified024.m_v3Position);
             pEventData->pFielder->SetPosition(v3Position);

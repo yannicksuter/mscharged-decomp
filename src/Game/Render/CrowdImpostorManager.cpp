@@ -234,6 +234,16 @@ void CrowdImpostorManager::AddVisibilityFilter(CrowdSidelineFilter* filter)
     ++mNumVisibilityFilters;
 }
 
+static bool IsCrowdImpostorVisible(CrowdImpostorManager* manager, Impostor* impostor)
+{
+    for (int filter = 0; filter < manager->mNumVisibilityFilters; ++filter)
+    {
+        if (!manager->mVisibilityFilters[filter]->IsVisible(impostor))
+            return false;
+    }
+    return true;
+}
+
 void CrowdImpostorManager::UpdateCrowdVisibility(GLView* view)
 {
     Impostor* impostors = ImpostorManager::GetInstance()->mImpostors;
@@ -256,21 +266,11 @@ void CrowdImpostorManager::UpdateCrowdVisibility(GLView* view)
         for (int i = 0; i < layout.mNumImpostors; ++i)
         {
             Impostor* impostor
-                = &impostors[layout.mFirstImpostor + i];
+                = &impostors[i + layout.mFirstImpostor];
             if (impostor->mUnidentified02C)
                 continue;
 
-            bool visible = true;
-            for (int filter = 0; filter < mNumVisibilityFilters; ++filter)
-            {
-                if (!mVisibilityFilters[filter]
-                         ->IsVisible(impostor))
-                {
-                    visible = false;
-                    break;
-                }
-            }
-            if (visible)
+            if (IsCrowdImpostorVisible(this, impostor))
                 impostor->Release();
         }
         sNumVisibleCrowdMembers += layout.mNumImpostors;

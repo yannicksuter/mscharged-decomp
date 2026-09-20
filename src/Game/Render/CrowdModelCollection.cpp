@@ -184,15 +184,19 @@ void CrowdModelCollection::BeginNextModelLoad()
 
 bool CrowdModelCollection::UpdateModelLoad()
 {
+    unsigned long hierarchySize;
+    cInventory<cSHierarchy>* hierarchyInventory;
+
     if (!mTexturesLoaded)
     {
+        bool loaded;
         if (mTextureBundleData == (void*)-1)
         {
-            mTexturesLoaded = true;
+            loaded = true;
         }
         else if (mTextureBundleData == 0)
         {
-            mTexturesLoaded = false;
+            loaded = false;
         }
         else
         {
@@ -201,19 +205,21 @@ bool CrowdModelCollection::UpdateModelLoad()
                 glGetCurrentResourcePool(), 0);
             nlFree(mTextureBundleData);
             mTextureBundleData = 0;
-            mTexturesLoaded = true;
+            loaded = true;
         }
+        mTexturesLoaded = loaded;
     }
 
     if (!mModelsLoaded)
     {
+        bool loaded;
         if (mModelHash != 0)
         {
-            mModelsLoaded = true;
+            loaded = true;
         }
         else if (mModelData == 0)
         {
-            mModelsLoaded = false;
+            loaded = false;
         }
         else
         {
@@ -224,39 +230,46 @@ bool CrowdModelCollection::UpdateModelLoad()
             nlFree(mModelData);
             mModelData = 0;
             mModelHash = *models;
-            mModelsLoaded = true;
+            loaded = true;
         }
+        mModelsLoaded = loaded;
     }
 
     if (!mHierarchiesLoaded)
     {
-        if (mHierarchyData == 0)
+        bool loaded;
+        void* data = mHierarchyData;
+        if (data == 0)
         {
-            mHierarchiesLoaded = false;
+            loaded = false;
         }
         else
         {
-            mHierarchyInventory->AddFile(
-                (char*)mHierarchyData,
-                mHierarchySize);
+            hierarchySize = mHierarchySize;
+            hierarchyInventory = mHierarchyInventory;
+            hierarchyInventory->AddFile(
+                (char*)data,
+                hierarchySize);
 
             --AllocatorStackDepth;
             AllocatorStack[AllocatorStackDepth] = 0;
             CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
-            mHierarchiesLoaded = true;
+            loaded = true;
         }
+        mHierarchiesLoaded = loaded;
     }
 
     if (!mAnimationsLoaded)
     {
+        bool loaded;
         if (mAnimationData == 0)
         {
-            mAnimationsLoaded = false;
+            loaded = false;
         }
         else
         {
-            mCurrentAnimationInventory
-                = new (8, false) cInventory<cSAnim>;
+            void* mem = nlMalloc(sizeof(cInventory<cSAnim>), 8, false);
+            mCurrentAnimationInventory = new (mem) cInventory<cSAnim>;
             mCurrentAnimationInventory->AddFile(
                 (char*)mAnimationData,
                 mAnimationSize);
@@ -266,8 +279,9 @@ bool CrowdModelCollection::UpdateModelLoad()
             --AllocatorStackDepth;
             AllocatorStack[AllocatorStackDepth] = 0;
             CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
-            mAnimationsLoaded = true;
+            loaded = true;
         }
+        mAnimationsLoaded = loaded;
     }
 
     return mTexturesLoaded

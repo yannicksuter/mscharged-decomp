@@ -563,7 +563,8 @@ void nlSeek(nlFile* file, unsigned int offset, unsigned long origin)
 }
 
 void* nlLoadEntireHostFile(const char* fileName, unsigned long* outSize,
-    unsigned int alignment, eAllocType type, void* target)
+    unsigned int alignment, eAllocType type, void* target,
+    unsigned long bufferSize)
 {
     void* buffer = 0;
     FILE* file = fopen(fileName, "rb");

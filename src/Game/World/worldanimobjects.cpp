@@ -26,14 +26,6 @@
 
 #include <math.h>
 
-extern "C" void fn_8030B038(cPoseAccumulator*, const cPoseNode*,
-    const nlMatrix4*);
-extern "C" void fn_803438FC(WorldAnimObject_803437C8*);
-extern "C" void fn_803439A4(WorldAnimObject_803437C8*);
-extern "C" void fn_802E4358(EmissionController*);
-extern "C" EffectsGroup* fn_802E7D54(
-    EmissionManager*, unsigned long);
-
 struct WorldPhysicsOwner_80342170
 {
     u8 m_pad00[0x80];
@@ -86,6 +78,8 @@ public:
 
 struct WorldVertexAnimDrawable_80343E3C
 {
+    glModel* GetModel() const { return m_pModel; }
+
     /* 0x00 */ u8 m_pad00[0x10];
     /* 0x10 */ World* m_pWorld;
     /* 0x14 */ u8 m_pad14[0x0C];
@@ -93,12 +87,15 @@ struct WorldVertexAnimDrawable_80343E3C
     /* 0x24 */ WorldVisibilityNode* m_pVertexAnimNode;
 };
 
-extern "C" WorldVisibilityNode* fn_80343F78(
+WorldVisibilityNode* FindWorldVisibilityNode(
     WorldVertexAnimDrawable_80343E3C*, WorldVisibilityNode*);
 
 extern "C" PhysicsObject* fn_80341EEC(
-    WorldPhysicsDescription_80341EEC*, CollisionSpace*);
-extern "C" void fn_80342170(WorldPhysicsOwner_80342170*);
+    WorldPhysicsDescription_80341EEC* pDescription,
+    CollisionSpace* pCollisionSpace);
+extern "C" void fn_80342170(WorldPhysicsOwner_80342170* pOwner);
+extern "C" EffectsGroup* fn_802E7D54(
+    EmissionManager*, unsigned long);
 
 extern "C" void fn_803437C8(WorldAnimObject_803437C8* pObject,
     WorldObjectLoadContext* pContext)
@@ -329,18 +326,18 @@ extern "C" void fn_80343DE4(WorldAnimDrawable_80343A40* pObject,
         pContext->m_pWorld->m_pResource);
 }
 
-extern "C" void fn_80343E3C(
+void CreateWorldVertexAnimDrawable(
     WorldVertexAnimDrawable_80343E3C* pObject,
     WorldObjectLoadContext* pContext)
 {
     glModel*& pMaterial = pObject->m_pModel;
     pContext->m_pWorld->ResolveModel(pMaterial);
-    pObject->m_pModel = glModelDupNoStreams(pObject->m_pModel,
+    pObject->m_pModel = glModelDupNoStreams(pObject->GetModel(),
         true, pContext->m_pWorld->m_pResource);
 
     WorldVisibilityNode* pNode
         = pContext->m_pWorld->m_pVisibilityTree;
-    unsigned long uModelHash = pObject->m_pModel->id;
+    unsigned long uModelHash = pObject->GetModel()->id;
     for (int i = 0; i < pNode->mNumModelHashes; ++i)
     {
         if (pNode->mModelHashes[i] == uModelHash)
@@ -373,7 +370,7 @@ extern "C" void fn_80343E3C(
         {
             if (pChild->mChildren[j] != 0)
             {
-                pFound = fn_80343F78(
+                pFound = FindWorldVisibilityNode(
                     pObject, pChild->mChildren[j]);
             }
         }
@@ -381,27 +378,25 @@ extern "C" void fn_80343E3C(
     pObject->m_pVertexAnimNode = pFound;
 }
 
-extern "C" WorldVisibilityNode* fn_80343F78(
+WorldVisibilityNode* FindWorldVisibilityNode(
     WorldVertexAnimDrawable_80343E3C* pObject,
     WorldVisibilityNode* pNode)
 {
-    unsigned long uModelHash = pObject->m_pModel->id;
-    for (int i = 0; i < pNode->mNumModelHashes; ++i)
+    int i;
+    for (i = 0; i < pNode->mNumModelHashes; ++i)
     {
-        if (pNode->mModelHashes[i] == uModelHash)
+        if (pNode->mModelHashes[i] == pObject->GetModel()->id)
         {
             return pNode;
         }
     }
 
-    for (int i = 0; i < 2; ++i)
+    for (i = 0; i < 2; ++i)
     {
-        WorldVisibilityNode* pChild
-            = pNode->mChildren[i];
-        if (pChild != 0)
+        if (pNode->mChildren[i] != 0)
         {
-            WorldVisibilityNode* pFound
-                = fn_80343F78(pObject, pChild);
+            WorldVisibilityNode* pFound = FindWorldVisibilityNode(
+                pObject, pNode->mChildren[i]);
             if (pFound != 0)
             {
                 return pFound;
@@ -421,9 +416,9 @@ extern "C" void fn_80344088(
         pAlphaView = pOpaqueView;
     }
 
-    for (unsigned long i = 0; i < pObject->m_pModel->numPackets; ++i)
+    for (unsigned long i = 0; i < pObject->GetModel()->numPackets; ++i)
     {
-        glModelPacket* pPacket = &pObject->m_pModel->packets[i];
+        glModelPacket* pPacket = &pObject->GetModel()->packets[i];
         if (glGetRasterState(
                 pPacket->rasterState, GLS_AlphaBlend)
             == 0)
@@ -437,7 +432,8 @@ extern "C" void fn_80344088(
     }
 }
 
-extern "C" bool fn_8034412C(WorldVertexAnimDrawable_80343E3C* pObject)
+bool IsWorldVertexAnimDrawableVisible(
+    WorldVertexAnimDrawable_80343E3C* pObject)
 {
     return pObject->m_pVertexAnimNode->mVisible == 1;
 }
@@ -505,7 +501,7 @@ extern "C" void fn_80344218(WorldEffect* pEffect)
         EmissionController* pController = current->entry;
         if (pController->m_uUserData == (u32)pEffect)
         {
-            fn_802E4358(pController);
+            pController->ClearParticles();
             pController->mUpdateCallback.Clear();
         }
         if (nlDLRingIsEnd(head, current) || current == 0)

@@ -973,13 +973,30 @@ bool NetworkStatsManager::RefreshFriendStats_80131B50()
     return true;
 }
 
+static inline void BeginOnlineGame(NetworkStatsManager* manager)
+{
+    manager->mGameResultReported = false;
+    manager->mDisconnectPending = false;
+    manager->mUnidentifiedC41C[0] = 0;
+    manager->mDisconnectLossPending[0] = false;
+    manager->mUnidentifiedC41C[1] = 0;
+    manager->mDisconnectLossPending[1] = false;
+    manager->mUnidentifiedC41C[2] = 0;
+    manager->mDisconnectLossPending[2] = false;
+    if (!IsOnlineRankedMatch())
+    {
+        return;
+    }
+    manager->SubmitJob(6);
+    manager->SubmitJob(7);
+    manager->SubmitJob(8);
+    manager->SubmitJob(9);
+    manager->SubmitJob(10);
+}
+
 void NetworkStatsManager::BeginOnlineGame_80131DB4()
 {
-    mGameResultReported = false;
-    mDisconnectPending = false;
-    mDisconnectLossPending[0] = true;
-    mDisconnectLossPending[1] = true;
-    mDisconnectLossPending[2] = UsesEuropeanRankings();
+    BeginOnlineGame(this);
 }
 
 void NetworkStatsManager::Update(float dt)
@@ -1121,13 +1138,13 @@ void NetworkStatsManager::HandleDisconnect_8013243C(int result)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "A disc error previously occured.  Exiting PreGameRestoreDefaultDisconnectLoss\n");
+        BeginOnlineGame(this);
+        return;
     }
-    ResetPregameDisconnectState();
-    for (int i = 0; i < 5; ++i)
-    {
-        SubmitJob(sLeaderboardJobs[i]);
-    }
-    mUnidentifiedC41C[0] = result;
+
+    ReportGameResult(result, 0, 0, false, 0, 0,
+        reinterpret_cast<const NetworkScoreSubmission*>(1));
+    BeginOnlineGame(this);
 }
 
 void NetworkStatsManager::CalculateAndReportGameResult(int result)
@@ -1369,7 +1386,8 @@ static int DayOfYear(NetworkSeasonDate date, int year)
     {
         result += DaysInMonth(i, year);
     }
-    return result + date.mDay - 1;
+    result += date.mDay - 1;
+    return result;
 }
 
 int GetDaysUntilNextSeasonBoundary(
@@ -1382,7 +1400,7 @@ int GetDaysUntilNextSeasonBoundary(
         int currentDay = DayOfYear(current, year);
         int nextDay = DayOfYear(next, year + 1);
         int remaining = (year % 4 == 0) ? 366 : 365;
-        return remaining - currentDay + nextDay;
+        return remaining + nextDay - currentDay;
     }
     const NetworkSeasonDate& next = dates->mDates[index + 1];
     return DayOfYear(next, year) - DayOfYear(current, year);

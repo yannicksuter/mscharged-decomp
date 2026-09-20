@@ -22,6 +22,7 @@
 #include "Game/NetworkSession.h"
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/FriendManager.h"
+#include "Game/FriendManager.inl"
 #include "NL/nlBind.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlFormat.h"
@@ -169,6 +170,9 @@ void SHOnlineFriends::InitializeButtons()
 
 void SHOnlineFriends::OnPointerPress(int index, void* context)
 {
+    FEPopupMenu* popup;
+    int selected;
+    u8 region;
     int item = (int)context;
     mUnidentified002C = item;
     mUnidentified0031 = true;
@@ -180,7 +184,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
         {
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
             {
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+                popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
                 popup->Create((ePopupMenu)104, Bind<void>(MemFun(&SHOnlineFriends::OnDialogDismissed), this));
                 mUnidentified2FA8 = true;
             }
@@ -193,7 +197,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
         g_pFriendManager->SetOwnStatusInitial(0);
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)106,
                 Bind<void>(MemFun(&SHOnlineFriends::DeleteFriend), this, item),
                 Bind<void>(MemFun(&SHOnlineFriends::CancelDeleteFriend), this));
@@ -202,16 +206,17 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
     }
     else
     {
-        int selected = item + mUnidentified0020;
+        selected = item + mUnidentified0020;
         if (!IsOnlineFriendSelectionMode())
             --selected;
-        u8 region = *(u8*)GameInfoManager::Instance()->GetUnknown0xA40(
+        region = *(u8*)GameInfoManager::Instance()->GetUnknown0xA40(
             gNetworkSaveSlotIndex, mUnidentified2EA8[selected]->mFriendIndex);
-        if (region != GetOnlineRegion())
+        bool differentRegion = region != GetOnlineRegion();
+        if (differentRegion)
         {
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
             {
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+                popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
                 popup->Create((ePopupMenu)105, Bind<void>(MemFun(&SHOnlineFriends::OnDialogDismissed), this));
                 mUnidentified2FA8 = true;
             }
@@ -226,7 +231,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
         if (scene != 0)
             scene->HideButtons();
         for (int i = 0; i < 4; ++i)
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+            GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
         mPresentation->SetActiveSlide("out", true);
         mPresentation->Update(0.0f);
     }
@@ -324,6 +329,30 @@ void SHOnlineFriends::OnErrorDismissed()
     GameSceneManager::Instance()->Pop();
     FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
     FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
+}
+
+inline void SHOnlineFriends::ShowError(int error)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        popup->Create((ePopupMenu)error,
+            Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriends::OnErrorDismissed), this)));
+        mUnidentified2FA8 = true;
+    }
+}
+
+inline void SHOnlineFriends::StartFriendInvite()
+{
+    SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_FORWARD, true);
+    scene->mIsHost = true;
+    scene->mStartFriendServer = false;
+    SetOnlineFriendSelectionMode(false);
+    GameInfoManager* gameInfo = GameInfoManager::Instance();
+    int selected = mUnidentified2EA8[mUnidentified002C + mUnidentified0020]->mFriendIndex;
+    GetFriendManager()->SetOwnStatusHostInvitingPlayer(selected,
+        reinterpret_cast<const GameplaySettings*>(gameInfo->GetCurrentSettings()),
+        reinterpret_cast<const CheatSettings*>(gameInfo->GetActiveRules()), gameInfo->GetStadium());
 }
 
 void SHOnlineFriends::SceneCreated()
@@ -607,7 +636,7 @@ void SHOnlineFriends::Update(float dt)
     if (mUnidentified2FAC == 0 || mUnidentified2FAC == 2 || mUnidentified2FAC == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int i = 0; i < 4; ++i)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
@@ -627,18 +656,7 @@ void SHOnlineFriends::Update(float dt)
             if (!IsOnlineFriendSelectionMode())
                 GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIEND_CODE_ENTRY, SCREEN_FORWARD, true);
             else
-            {
-                SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_FORWARD, true);
-                scene->mIsHost = true;
-                scene->mStartFriendServer = false;
-                SetOnlineFriendSelectionMode(false);
-                GameInfoManager* gameInfo = GameInfoManager::Instance();
-                int selected = mUnidentified2EA8[mUnidentified002C + mUnidentified0020]->mFriendIndex;
-                u8 stadium = gameInfo->GetStadium();
-                const CheatSettings* rules = reinterpret_cast<const CheatSettings*>(gameInfo->GetActiveRules());
-                const GameplaySettings* settings = reinterpret_cast<const GameplaySettings*>(gameInfo->GetCurrentSettings());
-                g_pFriendManager->SetOwnStatusHostInvitingPlayer(selected, settings, rules, stadium);
-            }
+                StartFriendInvite();
             return;
         }
         else if (mUnidentified2FAC == 3)
@@ -658,8 +676,9 @@ void SHOnlineFriends::Update(float dt)
     }
     if (!IsOnlineFriendSelectionMode() && !GameSceneManager::Instance()->IsOnStack((SceneList)10) && g_pFriendManager->FindHostInvitation())
     {
-        g_pFriendManager->mReturnScene = 47;
-        g_pFriendManager->mPreviousRankedMode = 0;
+        FriendManager* friendManager = g_pFriendManager;
+        friendManager->mReturnScene = 47;
+        friendManager->mPreviousRankedMode = 0;
         GameSceneManager::Instance()->Push((SceneList)52, SCREEN_FORWARD, true);
         return;
     }
@@ -667,13 +686,7 @@ void SHOnlineFriends::Update(float dt)
     {
         if (g_pNetworkSession->mDWCLastError == 0)
             g_pNetworkSession->ReadAndClearDWCError();
-        int error = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 111);
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
-        {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)error, Bind<void>(MemFun(&SHOnlineFriends::OnErrorDismissed), this));
-            mUnidentified2FA8 = true;
-        }
+        ShowError(GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 111));
         return;
     }
     mUnidentified0034 -= dt;

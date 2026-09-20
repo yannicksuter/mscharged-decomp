@@ -13,7 +13,6 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/GL/GLInventory.h"
 #include "Game/GL/GLVertexAnim.h"
-#include "Game/UnidentifiedStaticStorage.h"
 #include "Game/World.h"
 #include "Game/World/WorldEffect.h"
 #include "Game/Render/Frustum.h"
@@ -30,7 +29,6 @@ extern "C" void fn_8030B038(cPoseAccumulator*, const cPoseNode*,
     const nlMatrix4*);
 extern "C" void fn_803438FC(WorldAnimObject_803437C8*);
 extern "C" void fn_803439A4(WorldAnimObject_803437C8*);
-extern "C" void fn_802E4358(EmissionController*);
 extern "C" EffectsGroup* fn_802E7D54(
     EmissionManager*, unsigned long);
 
@@ -40,10 +38,10 @@ struct WorldPhysicsOwner_80342170
     PhysicsObject* m_pPhysicsObject;
 };
 
-class WorldAnimBindCallback_80342BDC
+class WorldAnimBinder_80342BDC
 {
 public:
-    void fn_80342BDC(const unsigned long& uHashID,
+    void BindControllerObjects(const unsigned long& uHashID,
         WorldAnimController** ppController);
 };
 
@@ -197,7 +195,7 @@ WorldAnimController* WorldAnimManager::FindController(
 
 AnimationSet* WorldAnimManager::LoadHierarchy(nlChunk* pChunk)
 {
-    m_pHierarchyInventory->ParseChunks(pChunk, pChunk->GetNextChunk());
+    m_pHierarchyInventory->ParseChunk(pChunk);
     cSHierarchy* pHierarchy = m_pHierarchyInventory->Find(0);
 
     AnimationSet** ppAnimationSet;
@@ -222,18 +220,17 @@ AnimationSet* WorldAnimManager::LoadHierarchy(nlChunk* pChunk)
 void WorldAnimManager::LoadAnimationSet(
     AnimationSet* pAnimationSet, nlChunk* pChunk)
 {
-    pAnimationSet->m_animInventory.ParseChunks(
-        pChunk, pChunk->GetNextChunk());
+    pAnimationSet->m_animInventory.ParseChunk(pChunk);
 }
 
 void WorldAnimManager::BindObjects()
 {
-    WorldAnimBindCallback_80342BDC callback;
+    WorldAnimBinder_80342BDC binder;
     m_animationControllerMap.Walk(
-        &callback, &WorldAnimBindCallback_80342BDC::fn_80342BDC);
+        &binder, &WorldAnimBinder_80342BDC::BindControllerObjects);
 }
 
-void WorldAnimBindCallback_80342BDC::fn_80342BDC(const unsigned long&,
+void WorldAnimBinder_80342BDC::BindControllerObjects(const unsigned long&,
     WorldAnimController** ppController)
 {
     fn_803438FC((*ppController)->m_pWorldAnimObject);

@@ -6199,10 +6199,12 @@ void Goalie::fn_80088A94(float deltaTime)
                 t = nlMinEquals(t, 1.0f);
                 float interp
                     = t * (t * ((-2.0f * t) + 3.0f));
+                float x = mv3LocalContactPosition.x;
+                float y = mv3LocalContactPosition.y;
                 u16 aNewAng = (u16)(actualFacing
                     + ((s32)(1024.0f * interp)
-                          * (s16)nlVector3ToAngle(
-                              mv3LocalContactPosition))
+                          * (s16)(u16)(s32)(10430.378f
+                              * nlATan2f(y, x)))
                         / 1024);
 
                 SetFacingDirection(aNewAng, true);

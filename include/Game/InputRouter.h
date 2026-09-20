@@ -55,16 +55,12 @@ public:
     /* 0x194 */ NetworkSessionBase* mSession;
 }; // size: 0x198
 
-class NetworkInputMessageQueue
+class NetworkInputMessageQueue : public CircularQueueBase<NetMessageInput>
 {
 public:
     NetworkInputMessageQueue();
     ~NetworkInputMessageQueue();
 
-    /* 0x0000 */ NetMessageInput* mMessages;
-    /* 0x0004 */ u32 mHead;
-    /* 0x0008 */ u32 mCount;
-    /* 0x000C */ u32 mCapacity;
     /* 0x0010 */ NetMessageInput mStorage[60];
 }; // size: 0x3850
 

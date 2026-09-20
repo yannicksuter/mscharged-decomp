@@ -75,6 +75,14 @@ public:
         return true;
     }
 
+    bool AddParameter(AudioEffectParameter* parameter, void* owner)
+    {
+        parameter->m_State.m_Current.pointer = owner;
+        parameter->m_State.m_Flags.bytes[0] = true;
+        m_Parameters.AddEnd(parameter);
+        return true;
+    }
+
     bool m_Enabled;
     u8 m_Pad05[3];
     nlDLListSlotPool<AudioEffectParameter*> m_Parameters;

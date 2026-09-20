@@ -5,8 +5,9 @@
 #include "Game/AI/Desire.h"
 #include "Game/AI/UnidentifiedStringHash.h"
 #include "Game/MathHelpers.h"
+#include "Game/TweakConfig.h"
 #include "NL/nlAVLTree.h"
-#include "NL/nlFile.h"
+#include "NL/nlFileGC.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlPrint.h"
@@ -152,6 +153,7 @@ UnidentifiedFuzzyRuntimeBase::~UnidentifiedFuzzyRuntimeBase()
 
 extern "C" void fn_80311AFC(const char* filename, bool async)
 {
+    bool reload = false;
     if (lbl_806E20A0 != 0)
     {
         UnidentifiedFuzzyRuntimeBase* runtime = lbl_806E20A8.mHead;
@@ -166,6 +168,7 @@ extern "C" void fn_80311AFC(const char* filename, bool async)
 
         delete[] (u8*)lbl_806E20A0;
         lbl_806E20A0 = 0;
+        reload = true;
     }
 
     if (lbl_806E20A0 == 0)
@@ -179,8 +182,16 @@ extern "C" void fn_80311AFC(const char* filename, bool async)
         else
         {
             unsigned long size = 0;
-            lbl_806E20A0 = nlLoadEntireFile(
-                filename, &size, 0x20, AllocateStart, 0, 0, 0);
+            if (reload && g_bSupportReloading)
+            {
+                lbl_806E20A0 = nlLoadEntireHostFile(
+                    filename, &size, 0x20, AllocateStart, 0, 0);
+            }
+            else
+            {
+                lbl_806E20A0 = nlLoadEntireFile(
+                    filename, &size, 0x20, AllocateStart, 0, 0, 0);
+            }
             if (lbl_806E20A0 != 0)
             {
                 UnidentifiedFuzzyRuntimeBase* runtime =

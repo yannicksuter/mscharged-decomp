@@ -133,66 +133,14 @@ void GLInventory::Create()
 {
     m_bCreated = true;
 
-    int i = 0;
-
-    for (; i < 16; i++)
+    for (int i = 0; i < 16; i++)
     {
-        nlListContainer<void*>* fileData = new (
-            nlMalloc(sizeof(nlListContainer<void*>), 8, false))
-            nlListContainer<void*>();
-        m_pFileData[i] = fileData;
-
-        freeing_GLInventory<nlChunk>* pSkinData =
-            (freeing_GLInventory<nlChunk>*)nlMalloc(
-                sizeof(freeing_GLInventory<nlChunk>), 8, false);
-        if (pSkinData != 0)
-        {
-            pSkinData->m_pItems = new (nlMalloc(
-                sizeof(freeing_GLInventory<nlChunk>::Tree), 8, false))
-                freeing_GLInventory<nlChunk>::Tree();
-        }
-        m_pSkinData[i] = pSkinData;
-
-        clearing_GLInventory<glModel>* pModels = (clearing_GLInventory<glModel>*)nlMalloc(
-            sizeof(clearing_GLInventory<glModel>), 8, false);
-        if (pModels != 0)
-        {
-            pModels->m_pItems = new (nlMalloc(
-                sizeof(clearing_GLInventory<glModel>::Tree), 8, false))
-                clearing_GLInventory<glModel>::Tree();
-        }
-        m_pModels[i] = pModels;
-
-        clearing_GLInventory<GLTextureAnim>* pTextureAnims = (clearing_GLInventory<GLTextureAnim>*)nlMalloc(
-            sizeof(clearing_GLInventory<GLTextureAnim>), 8, false);
-        if (pTextureAnims != 0)
-        {
-            pTextureAnims->m_pItems = new (nlMalloc(
-                sizeof(clearing_GLInventory<GLTextureAnim>::Tree), 8, false))
-                clearing_GLInventory<GLTextureAnim>::Tree();
-        }
-        m_pTextureAnims[i] = pTextureAnims;
-
-        deleting_GLInventory<GLVertexAnim>* pVertexAnims =
-            (deleting_GLInventory<GLVertexAnim>*)nlMalloc(
-                sizeof(deleting_GLInventory<GLVertexAnim>), 8, false);
-        if (pVertexAnims != 0)
-        {
-            pVertexAnims->m_pItems = new (nlMalloc(
-                sizeof(deleting_GLInventory<GLVertexAnim>::Tree), 8, false))
-                deleting_GLInventory<GLVertexAnim>::Tree();
-        }
-        m_pVertexAnims[i] = pVertexAnims;
-
-        clearing_GLInventory<PlatTexture>* pTextures = (clearing_GLInventory<PlatTexture>*)nlMalloc(
-            sizeof(clearing_GLInventory<PlatTexture>), 8, false);
-        if (pTextures != 0)
-        {
-            pTextures->m_pItems = new (nlMalloc(
-                sizeof(clearing_GLInventory<PlatTexture>::Tree), 8, false))
-                clearing_GLInventory<PlatTexture>::Tree();
-        }
-        m_pTextures[i] = pTextures;
+        m_pFileData[i] = new (8, false) nlListContainer<void*>();
+        m_pSkinData[i] = new (8, false) freeing_GLInventory<nlChunk>();
+        m_pModels[i] = new (8, false) clearing_GLInventory<glModel>();
+        m_pTextureAnims[i] = new (8, false) clearing_GLInventory<GLTextureAnim>();
+        m_pVertexAnims[i] = new (8, false) deleting_GLInventory<GLVertexAnim>();
+        m_pTextures[i] = new (8, false) clearing_GLInventory<PlatTexture>();
     }
 }
 
