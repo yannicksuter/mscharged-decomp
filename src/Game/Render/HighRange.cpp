@@ -34,14 +34,8 @@ extern nlVector2 sHighRangeVertices[4];
 void BindHighRangeTweaks(
     HighRangeTweaks* values, const char* group)
 {
-    bool registered
-        = values->miHighRangeIndex.Bind(
-            "miHighRangeIndex", 0.0f, group, true, 6.0f, 1.0f);
-    if (!registered)
-    {
-        *values->miHighRangeIndex.m_pValue
-            = values->miHighRangeIndex.GetDefault();
-    }
+    bool registered = values->miHighRangeIndex.Bind(
+        "miHighRangeIndex", 0.0f, group, true, 6.0f, 1.0f);
     if (!registered)
     {
         *values->miHighRangeIndex.m_pValue = 6;
@@ -52,14 +46,8 @@ void BindHighRangeTweaks(
     values->mfHighRangeOffset.BindWithDefault(
         "mfHighRangeOffset", 3.5f, group, true, 0.0f, 8.0f, 0.125f);
 
-    registered
-        = values->miHighRangeGray.Bind(
-            "miHighRangeGray", 0.0f, group, true, 255.0f, 1.0f);
-    if (!registered)
-    {
-        *values->miHighRangeGray.m_pValue
-            = values->miHighRangeGray.GetDefault();
-    }
+    registered = values->miHighRangeGray.Bind(
+        "miHighRangeGray", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
         *values->miHighRangeGray.m_pValue = 80;
@@ -72,20 +60,11 @@ void BindHighRangeTweaks(
         "miRed", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
-        *values->miRed.m_pValue = values->miRed.GetDefault();
-    }
-    if (!registered)
-    {
         *values->miRed.m_pValue = 255;
     }
 
     registered = values->miGreen.Bind(
         "miGreen", 0.0f, group, true, 255.0f, 1.0f);
-    if (!registered)
-    {
-        *values->miGreen.m_pValue
-            = values->miGreen.GetDefault();
-    }
     if (!registered)
     {
         *values->miGreen.m_pValue = 255;
@@ -95,21 +74,11 @@ void BindHighRangeTweaks(
         "miBlue", 0.0f, group, true, 255.0f, 1.0f);
     if (!registered)
     {
-        *values->miBlue.m_pValue
-            = values->miBlue.GetDefault();
-    }
-    if (!registered)
-    {
         *values->miBlue.m_pValue = 255;
     }
 
     registered = values->miAlpha.Bind(
         "miAlpha", 0.0f, group, true, 255.0f, 1.0f);
-    if (!registered)
-    {
-        *values->miAlpha.m_pValue
-            = values->miAlpha.GetDefault();
-    }
     if (!registered)
     {
         *values->miAlpha.m_pValue = 108;

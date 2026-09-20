@@ -382,19 +382,10 @@ void SHOptionsCheatsList::InitializeButtons()
     FEPointerListener::Callback select(
         PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
-    const char* listBack = "list_back_480x70 ";
-    const char* challenge = "CHALLENGE_0";
-    const char* slide = "off";
     for (int i = 0; i < 5; ++i)
     {
         TLComponentInstance* instance = FEFinder<TLComponentInstance, 3>::Find(
-            mCheatInstances[i],
-            nlStringLowerHash(slide),
-            nlStringLowerHash(challenge),
-            nlStringLowerHash(listBack),
-            0,
-            0,
-            0);
+            mCheatInstances[i], "off", "CHALLENGE_0", "list_back_480x70 ");
         feVector3 position = mCheatInstances[i]->GetAssetPosition();
         mComponents[i].SetInstanceBounds(
             instance, true, position.f.x, position.f.y, 1.0f, 0.5f);

@@ -7,6 +7,7 @@
 #include "Game/DB/SaveLoad.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/fePresentation.h"
@@ -76,9 +77,9 @@ void SHOnlineFriendCodeEntry::InitializeButtons()
     {
         float scale = 0.8f;
         TLInstance* positionInstance =
-            FEFinder<TLInstance, 5>::_Find<TLSlide>(
-                mPresentation->m_currentSlide, nlStringLowerHash("Layer"),
-                nlStringLowerHash("Group"), nlStringLowerHash("PAD"), 0, 0, 0);
+            FEFinder<TLInstance, 5>::Find(
+                mPresentation->m_currentSlide, InlineHasher("Layer"),
+                InlineHasher("Group"), InlineHasher("PAD"));
         if (positionInstance == 0)
         {
             positionInstance = &UnidentifiedTLGroupDefault::sInstance;
@@ -98,10 +99,11 @@ void SHOnlineFriendCodeEntry::InitializeButtons()
 
     for (int i = 0; i < 12; ++i)
     {
+        float scale = 0.8f;
         TLInstance* positionInstance =
-            FEFinder<TLInstance, 5>::_Find<TLSlide>(
-                mPresentation->m_currentSlide, nlStringLowerHash("Layer"),
-                nlStringLowerHash("Group"), nlStringLowerHash("CODE"), 0, 0, 0);
+            FEFinder<TLInstance, 5>::Find(
+                mPresentation->m_currentSlide, InlineHasher("Layer"),
+                InlineHasher("Group"), InlineHasher("CODE"));
         if (positionInstance == 0)
         {
             positionInstance = &UnidentifiedTLGroupDefault::sInstance;
@@ -109,7 +111,7 @@ void SHOnlineFriendCodeEntry::InitializeButtons()
 
         feVector3 position = positionInstance->GetAssetPosition();
         mDigitButtons[i].SetInstanceBounds(
-            mDigitInstances[i], true, position.f.x, position.f.y, 0.8f, 0.8f);
+            mDigitInstances[i], true, position.f.x, position.f.y, scale, scale);
         mDigitButtons[i].SetPointerPressCallback(codeSelect);
         mDigitButtons[i].SetPointerEnterCallback(codeOver);
         mDigitButtons[i].SetPointerLeaveCallback(codeOff);

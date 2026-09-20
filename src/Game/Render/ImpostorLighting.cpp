@@ -63,7 +63,7 @@ CrowdDefinitionArray::~CrowdDefinitionArray()
     delete[] data;
 }
 
-void CrowdLayoutObject::SetTransform(const nlMatrix4& matrix)
+void CrowdLayoutObject::SetWorldMatrix(const nlMatrix4& matrix)
 {
     mTransform = matrix;
 }

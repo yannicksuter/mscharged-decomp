@@ -9,6 +9,7 @@
 #include "Game/FE/feModelManager.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
+#include "Game/GameSceneManager.h"
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
 #include "Game/Render/FrontEndPresentation.h"
@@ -190,13 +191,7 @@ void NetTournManager::Reset(bool)
 
     for (int i = 0; i < 7; ++i)
     {
-        mGames[i].mState = NET_TOURN_GAME_EMPTY;
-        mGames[i].mMachines[0] = -1;
-        mGames[i].mMachines[1] = -1;
-        mGames[i].mBracketIndex = i;
-        mGames[i].mHomeUpdate = 0;
-        mGames[i].mAwayUpdate = 0;
-        mGames[i].mGameInfo.Reset(true);
+        mGames[i].Reset(i);
     }
 
     mWinningMachine = -1;
@@ -230,9 +225,8 @@ void NetTournManager::Reset(bool)
 void NetTournManager::TransitionOnlineMenuToTournament(
     NetMessageTournamentStart* message)
 {
-    NetworkMessageReceiver* receiver = this;
-    gNetworkMessageRegistry->RegisterReceiver(32, receiver);
-    gNetworkMessageRegistry->RegisterReceiver(33, receiver);
+    gNetworkMessageRegistry->RegisterReceiver(32, this);
+    gNetworkMessageRegistry->RegisterReceiver(33, this);
 
     mMachineCount = (s8)message->mMachineCount;
     mLocalMachineIndex = (s8)message->mMachineIndex;
@@ -251,21 +245,14 @@ void NetTournManager::TransitionOnlineMenuToTournament(
     mWaitingToStartGames = true;
     mLocalMachineEliminated = false;
 
-    for (int i = 0; i < 7; ++i)
-    {
-        NetworkTournamentGame& game = mGames[i];
-        game.mState = NET_TOURN_GAME_EMPTY;
-        game.mMachines[0] = -1;
-        game.mMachines[1] = -1;
-        game.mBracketIndex = i;
-        game.mHomeUpdate = 0;
-        game.mAwayUpdate = 0;
-        game.mGameInfo.Reset(true);
-    }
+    ResetGames();
 
     mWinningMachine = -1;
     BuildInitialBracket();
-    FrontEndPresentation::Instance().Call("TransitionOnlineMenuToTournament");
+    FrontEndPresentation::GetInstance()->Call(
+        "TransitionOnlineMenuToTournament");
+    GameSceneManager::Instance()->Push(
+        (SceneList)0x22, SCREEN_NOTHING, true);
 }
 
 void NetTournManager::GenerateFirstRoundSeedings(
@@ -309,25 +296,53 @@ void NetTournManager::GenerateFirstRoundSeedings(
 
 void NetTournManager::BuildInitialBracket()
 {
+    tDebugPrintManager::Print(DC_NETWORK,
+        "1st Rnd Seedings: %d %d %d %d %d %d %d %d\n", mSeedings[0],
+        mSeedings[1], mSeedings[2], mSeedings[3], mSeedings[4], mSeedings[5],
+        mSeedings[6], mSeedings[7]);
+
+    int seedingIndex = 0;
+    int teamIndex = mSeedings[seedingIndex];
     UpdateRoundGameRange();
     for (int gameIndex = mFirstGameInRound; gameIndex <= mLastGameInRound;
          ++gameIndex)
     {
         NetworkTournamentGame& game = mGames[gameIndex];
-        game.mState = NET_TOURN_GAME_READY;
-        game.mMachines[0] = mSeedings[gameIndex * 2];
-        game.mMachines[1] = mSeedings[gameIndex * 2 + 1];
+        game.mState = NET_TOURN_GAME_EMPTY;
+        game.mMachines[0] = -1;
+        game.mMachines[1] = -1;
         game.mBracketIndex = gameIndex;
         game.mHomeUpdate = 0;
         game.mAwayUpdate = 0;
-        game.mGameInfo.Reset(true);
+        BasicGameInfo& gameInfo = game.mGameInfo;
+        gameInfo.Reset(true);
+        game.mState = NET_TOURN_GAME_READY;
         if (mCurrentRound == 1)
         {
-            game.mGameInfo.mStadiumIndex = mSecondStadium;
+            gameInfo.mStadiumIndex = mSecondStadium;
         }
         else
         {
-            game.mGameInfo.mStadiumIndex = mFirstStadium;
+            gameInfo.mStadiumIndex = mFirstStadium;
+        }
+
+        for (int side = 0; side < 2; ++side, ++seedingIndex)
+        {
+            if (teamIndex < mMachineCount
+                && !NetworkDraft::Instance()->HasDisconnectedPlayer(teamIndex))
+            {
+                NetworkDraftTeam* draftTeam
+                    = NetworkDraft::Instance()->GetDraftTeam(teamIndex);
+                int machineIndex = draftTeam->mPlayers[0].mPeerIndex;
+                gameInfo.mTeamIndex[side] = draftTeam->mCaptain;
+                for (int sidekick = 0; sidekick < 3; ++sidekick)
+                {
+                    gameInfo.SetSidekick(
+                        side, draftTeam->mSidekicks[sidekick], sidekick);
+                }
+                game.mMachines[side] = machineIndex;
+            }
+            teamIndex = mSeedings[seedingIndex + 1];
         }
     }
 }
@@ -340,25 +355,41 @@ void NetTournManager::AdvanceBracket()
          ++gameIndex)
     {
         NetworkTournamentGame& game = mGames[gameIndex];
-        game.mState = NET_TOURN_GAME_READY;
+        game.mState = NET_TOURN_GAME_EMPTY;
         game.mMachines[0] = -1;
         game.mMachines[1] = -1;
         game.mBracketIndex = gameIndex;
         game.mHomeUpdate = 0;
         game.mAwayUpdate = 0;
-        game.mGameInfo.Reset(true);
-
-        int winnerSide = -1;
-        int winnerMachine = -1;
-        if (mGames[previousFirst++].GetWinnerAndLoser(
-                &winnerSide, &winnerMachine))
+        BasicGameInfo& gameInfo = game.mGameInfo;
+        gameInfo.Reset(true);
+        game.mState = NET_TOURN_GAME_READY;
+        if (mCurrentRound == 1)
         {
-            game.mMachines[0] = winnerMachine;
+            gameInfo.mStadiumIndex = mSecondStadium;
         }
-        if (mGames[previousFirst++].GetWinnerAndLoser(
-                &winnerSide, &winnerMachine))
+        else
         {
-            game.mMachines[1] = winnerMachine;
+            gameInfo.mStadiumIndex = mFirstStadium;
+        }
+
+        for (int side = 0; side < 2; ++side, ++previousFirst)
+        {
+            int winningMachine = -1;
+            mGames[previousFirst].GetWinnerAndLoser(0, &winningMachine);
+            if (winningMachine != -1)
+            {
+                NetworkDraftTeam* draftTeam
+                    = NetworkDraft::Instance()->FindDraftTeamByPeerIndex(
+                        winningMachine);
+                gameInfo.mTeamIndex[side] = draftTeam->mCaptain;
+                for (int sidekick = 0; sidekick < 3; ++sidekick)
+                {
+                    gameInfo.SetSidekick(
+                        side, draftTeam->mSidekicks[sidekick], sidekick);
+                }
+                game.mMachines[side] = winningMachine;
+            }
         }
     }
 }

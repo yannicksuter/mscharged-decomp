@@ -4,7 +4,7 @@
 struct RFLStoreData;
 
 extern char gNetworkMiiName[12];
-extern unsigned short gNetworkMiiNameWide[12];
+extern unsigned short gNetworkMiiNameWide[11];
 extern RFLStoreData gNetworkMiiData;
 
 extern int gNetworkSaveSlotIndex;

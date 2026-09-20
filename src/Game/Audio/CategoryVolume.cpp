@@ -151,10 +151,9 @@ void CategoryVolume::CreateParameter(u32 definition, void*, bool negate,
     volume = volume <= 6.0f ? volume : 6.0f;
     parameter->m_Volume = volume;
 
-    CategoryEntry category(parameter->m_Category, 0);
     CategoryEntry* entry
         = nlBSearch<CategoryEntry, CategoryEntry>(
-            category, s_CategoryEntries, 5);
+            CategoryEntry(parameter->m_Category, 0), s_CategoryEntries, 5);
     if (entry != 0)
     {
         CategoryBackendEntry* backend

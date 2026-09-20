@@ -10,7 +10,7 @@
 #include "Game/InputRouter.h"
 
 char gNetworkMiiName[12];
-unsigned short gNetworkMiiNameWide[12];
+unsigned short gNetworkMiiNameWide[11];
 RFLStoreData gNetworkMiiData;
 
 NetworkSessionBase* g_pNetworkSessionBase;

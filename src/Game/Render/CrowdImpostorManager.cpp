@@ -49,12 +49,6 @@ public:
     /* 0x0C */ CrowdLayoutRecord* mLayout;
 }; // size: 0x10
 
-extern "C" nlMatrix4* fn_802D8BAC(
-    CrowdLayoutObject* object)
-{
-    return &object->mTransform;
-}
-
 CrowdImpostorManager* GetCrowdImpostorManager()
 {
     static CrowdImpostorManager manager;
@@ -114,7 +108,7 @@ void CrowdImpostorManager::GenerateCrowd(int reload)
         CrowdLayoutObject* object
             = occlusionIt.m_Curr->entry;
         nlInvertMatrix(*mInverseMatrices,
-            *object->UnidentifiedVirtual10());
+            *object->GetWorldMatrix());
         occlusionIt.Step();
     }
 
@@ -304,7 +298,7 @@ void CrowdImpostorManager::ReleaseCrowdImpostors()
             continue;
 
         for (int i = 0; i < layout.mNumImpostors; ++i)
-            impostors[layout.mFirstImpostor + i].Release();
+            impostors[i + layout.mFirstImpostor].Release();
         sNumVisibleCrowdMembers += layout.mNumImpostors;
     }
 }
@@ -327,7 +321,7 @@ void CrowdPointCallback::Place(
 
     nlVector4 worldPoint;
     nlMultVectorMatrix(
-        worldPoint, localPoint, *mObject->UnidentifiedVirtual10());
+        worldPoint, localPoint, *mObject->GetWorldMatrix());
 
     CrowdImpostorManager* manager = GetCrowdImpostorManager();
     nlDLListIterator<CrowdLayoutObject*> occlusionIt
@@ -371,7 +365,7 @@ void CrowdPointCallback::Place(
     nlVector4 transformedFacing;
     nlVector4 facing = { 0.0f, -1.0f, 0.0f, 0.0f };
     nlMultVectorMatrix(transformedFacing, facing,
-        *mObject->UnidentifiedVirtual10());
+        *mObject->GetWorldMatrix());
     facing = transformedFacing;
     u16 angle = QuantizeImpostorAngle(nlVector3ToAngle(*(nlVector3*)&facing),
         numAngles);

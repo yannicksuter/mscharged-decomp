@@ -289,18 +289,17 @@ void NetworkStatsManager::ApplyLeaderboardToSave(
 void NetworkStatsManager::CommitPendingOnlineTotals(
     NetworkRankingMeta*)
 {
-    GameInfoManager* gameInfo = GameInfoManager::GetInstance();
-    int* wins = gameInfo->GetUnknown0xA90(gNetworkSaveSlotIndex);
-    int* losses = gameInfo->GetUnknown0xA94(gNetworkSaveSlotIndex);
-    int* pendingWins = gameInfo->GetUnknown0xA98(gNetworkSaveSlotIndex);
-    int* pendingLosses = gameInfo->GetUnknown0xA9C(gNetworkSaveSlotIndex);
+    int* pendingWins = GameInfoManager::GetInstance()->GetUnknown0xA98(gNetworkSaveSlotIndex);
+    int* pendingLosses = GameInfoManager::GetInstance()->GetUnknown0xA9C(gNetworkSaveSlotIndex);
+    int* wins = GameInfoManager::GetInstance()->GetUnknown0xA90(gNetworkSaveSlotIndex);
+    int* losses = GameInfoManager::GetInstance()->GetUnknown0xA94(gNetworkSaveSlotIndex);
 
     *wins += *pendingWins;
+    *losses += *pendingLosses;
     if (*wins > 9999)
     {
         *wins = 9999;
     }
-    *losses += *pendingLosses;
     if (*losses > 9999)
     {
         *losses = 9999;

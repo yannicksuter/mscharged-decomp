@@ -147,6 +147,7 @@ public:
     void fn_802816CC();
     void Update(float dt);
     void UpdateTriggers(float oldTime, float newTime, float duration);
+    void SelectCamera(cAnimCamera& camera, int cameraIndex);
     void fn_80281C70(cAnimCamera& camera);
     void Render(int param1);
     nlVector3 Offset() const;

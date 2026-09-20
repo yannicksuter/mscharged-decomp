@@ -341,7 +341,7 @@ void NetworkDraft::Update(float dt)
         for (int team = 0; team < mTeamCount; ++team)
         {
             if (!HasDisconnectedPlayer(team)
-                && mTeams[team].mSidekick0 == -1)
+                && mTeams[team].mSidekicks[0] == -1)
             {
                 allTeamsFinished = false;
             }
@@ -605,9 +605,9 @@ int NetworkDraft::ProcessMessage(NetworkMessage* message)
         else
         {
             NetworkDraftTeam& team = mTeams[(s8)pickedSidekicks->mTeamIndex];
-            team.mSidekick0 = pickedSidekicks->mSidekick0;
-            team.mSidekick1 = pickedSidekicks->mSidekick1;
-            team.mSidekick2 = pickedSidekicks->mSidekick2;
+            team.mSidekicks[0] = pickedSidekicks->mSidekick0;
+            team.mSidekicks[1] = pickedSidekicks->mSidekick1;
+            team.mSidekicks[2] = pickedSidekicks->mSidekick2;
         }
     }
     return 1;

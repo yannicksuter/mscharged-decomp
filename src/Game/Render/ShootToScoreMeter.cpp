@@ -215,10 +215,10 @@ void ShootToScoreMeter::DrawColouredRegion(float startAngle,
         innerRadius = radius - scaledWhiteBarWidth / 2.0f;
         outerRadius = radius + scaledWhiteBarWidth / 2.0f;
 
-        float segmentStartAngle = startFraction * widthAngle + startAngle;
-        float segmentStartAngleRadians = DegreesToRadians(segmentStartAngle);
-        float segmentEndAngle = endFraction * widthAngle + startAngle;
-        float segmentEndAngleRadians = DegreesToRadians(segmentEndAngle);
+        float segmentStartAngleRadians
+            = DegreesToRadians(startFraction * widthAngle + startAngle);
+        float segmentEndAngleRadians
+            = DegreesToRadians(endFraction * widthAngle + startAngle);
 
         float segmentStartCosine = nlSin((u16)((u16)(s32)(10430.378f
             * segmentStartAngleRadians)

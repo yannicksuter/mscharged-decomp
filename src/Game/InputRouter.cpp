@@ -318,17 +318,24 @@ void NetworkInputRouter::Reset(int resetQueues)
 void NetworkInputRouter::CheckCongestion()
 {
     mCongested = false;
-    int machineCount = mSession->GetNumMachines();
-    for (int machine = 0; machine < machineCount; ++machine)
+    if (mQueueLimit > mQueueCursor)
     {
-        if (mInputQueues[machine].mCount <= 1)
+        mCongested = false;
+    }
+    else
+    {
+        int machineCount = mSession->GetNumMachines();
+        for (s8 machine = 0; machine < machineCount; ++machine)
         {
-            mCongested = true;
+            if (mInputQueues[machine].mCount <= 1)
+            {
+                mCongested = true;
+            }
         }
     }
     if (mCongested)
     {
-        mWasCongested = true;
+        mWasCongested = mCongested;
     }
 }
 

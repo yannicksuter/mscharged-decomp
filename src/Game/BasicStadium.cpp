@@ -50,7 +50,7 @@ void BasicStadium::Update(float fDeltaT, bool bUpdateState, bool bUpdateNPCs)
 void fn_802785FC(BasicStadium* pStadium, float fDeltaT)
 {
     pStadium->m_fTime += fDeltaT;
-    pStadium->UpdateAnimations(fDeltaT);
+    pStadium->World::UpdateAnimations(fDeltaT);
 
     if (nlTaskManager::m_pInstance->mCurrentState == 0x10)
     {
@@ -61,7 +61,7 @@ void fn_802785FC(BasicStadium* pStadium, float fDeltaT)
              iterator.IsValid(); iterator.Next())
         {
             WorldEffect* pEffect = iterator.Current();
-            if (pEffect->m_nTimingMode != 0x37)
+            if (pEffect->m_nTimingMode != 0x37U)
             {
                 continue;
             }
@@ -77,10 +77,10 @@ void fn_802785FC(BasicStadium* pStadium, float fDeltaT)
                 if (nlRandom(100, &nlDefaultSeed) < pEffect->m_uProbability)
                 {
                     pEffect->Emit();
-                    if (-1.0f != pEffect->m_fEmissionRadius)
+                    if (-1.0f != pEffect->mUnidentified064)
                     {
                         fNextTime = pEffect->m_fEmissionInterval
-                            + pEffect->m_fEmissionRadius;
+                            + pEffect->mUnidentified064;
                     }
                     else
                     {

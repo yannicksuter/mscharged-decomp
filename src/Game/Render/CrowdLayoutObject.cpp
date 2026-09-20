@@ -1,12 +1,11 @@
 #include "Game/Render/CrowdImpostorManager.h"
 
-extern "C" void fn_802D88F4(
-    CrowdLayoutObject* object)
+void CrowdLayoutObject::UnidentifiedVirtual1C(WorldObjectLoadContext*)
 {
-    GetCrowdImpostorManager()->AddObject(object, false);
+    GetCrowdImpostorManager()->AddObject(this, false);
 }
 
-extern "C" void fn_802D892C(CrowdLayoutObject*)
+void CrowdLayoutObject::ReleaseResources()
 {
 }
 

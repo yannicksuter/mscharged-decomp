@@ -188,11 +188,11 @@ void RLGReader::Read(void* data)
                 LoadPackets(chunk->GetData(),
                     chunk->GetDataSize());
                 break;
-            case 0x1B002:
+            case 0x1B003:
                 LoadModels(chunk->GetData(),
                     chunk->GetDataSize());
                 break;
-            case 0x1B003:
+            case 0x1B002:
                 LoadMatrices(chunk->GetData(),
                     chunk->GetDataSize());
                 break;

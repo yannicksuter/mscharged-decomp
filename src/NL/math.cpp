@@ -357,11 +357,8 @@ void fn_802B549C(nlQuaternion& out, unsigned short angle)
 {
     float fSin;
     float fCos;
-    nlSinCos(&fSin, &fCos, (unsigned short)(angle >> 1));
-    out.z = fSin;
-    out.x = 0.0f;
-    out.y = 0.0f;
-    out.w = fCos;
+    nlSinCos(&fSin, &fCos, (u16)((u32)angle >> 1));
+    nlVec4Set(*(nlVector4*)&out, 0.0f, 0.0f, fSin, fCos);
 }
 
 extern "C" void fn_802B5444(nlQuaternion& out, unsigned short angle)

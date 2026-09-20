@@ -9,7 +9,6 @@ class LowPassFilterParameter : public AudioEffectParameter
 {
 public:
     LowPassFilterParameter();
-    virtual ~LowPassFilterParameter() { }
 
     static void* operator new(unsigned long)
     {
@@ -32,7 +31,6 @@ public:
 class LowPassFilter : public AudioEffectBase
 {
 public:
-    virtual ~LowPassFilter() { }
     virtual void CreateParameter(unsigned int definition, void* context,
         bool disabled, AudioEffectParameter** output);
     virtual void BeginBlend();
@@ -123,39 +121,66 @@ void LowPassFilter::BlendParameter(
     LowPassFilterParameter* sourceParameter
         = (LowPassFilterParameter*)source;
 
-    float amount;
-    if (sourceParameter->m_State.m_Flags.bytes[0])
-    {
-        amount = *(float*)sourceParameter->m_State.m_Current.pointer;
-    }
-    else if (sourceParameter->m_State.m_Target.scalar != 0.0f)
-    {
-        amount = sourceParameter->m_State.m_Current.scalar
-               / sourceParameter->m_State.m_Target.scalar;
-    }
-    else
-    {
-        amount = 1.0f;
-    }
-
-    amount = amount >= 0.0f ? amount : 0.0f;
-    amount = amount <= 1.0f ? amount : 1.0f;
-
     s32 adjustment;
     if (sourceParameter->m_Frequency != 0)
     {
+        float amount;
+        if (sourceParameter->m_State.m_Flags.bytes[0])
+        {
+            amount = *(float*)sourceParameter->m_State.m_Current.pointer;
+            amount = amount >= 0.0f ? amount : 0.0f;
+            amount = amount <= 1.0f ? amount : 1.0f;
+        }
+        else
+        {
+            amount = sourceParameter->m_State.m_Target.scalar;
+            if (amount)
+            {
+                amount = sourceParameter->m_State.m_Current.scalar / amount;
+                amount = amount >= 0.0f ? amount : 0.0f;
+                amount = amount <= 1.0f ? amount : 1.0f;
+            }
+            else
+            {
+                amount = 1.0f;
+            }
+        }
+
         adjustment = (u32)(sourceParameter->m_Frequency * amount);
     }
     else
     {
-        adjustment = -(s32)(16000.0f * amount);
+        float amount;
+        if (sourceParameter->m_State.m_Flags.bytes[0])
+        {
+            amount = *(float*)sourceParameter->m_State.m_Current.pointer;
+            amount = amount >= 0.0f ? amount : 0.0f;
+            amount = amount <= 1.0f ? amount : 1.0f;
+        }
+        else
+        {
+            amount = sourceParameter->m_State.m_Target.scalar;
+            if (amount)
+            {
+                amount = sourceParameter->m_State.m_Current.scalar / amount;
+                amount = amount >= 0.0f ? amount : 0.0f;
+                amount = amount <= 1.0f ? amount : 1.0f;
+            }
+            else
+            {
+                amount = 1.0f;
+            }
+        }
+
+        adjustment = -(u32)(16000.0f * amount);
         if ((u32)-adjustment > destinationParameter->m_Frequency)
             adjustment = -(s32)destinationParameter->m_Frequency;
     }
 
     destinationParameter->m_Frequency += adjustment;
-    if (sourceParameter->m_On > destinationParameter->m_On)
-        destinationParameter->m_On = sourceParameter->m_On;
+    destinationParameter->m_On = sourceParameter->m_On >= destinationParameter->m_On
+                                   ? sourceParameter->m_On
+                                   : destinationParameter->m_On;
     ++m_FilterCount;
 }
 
@@ -188,4 +213,3 @@ void LowPassFilter::OnParameterFinished(AudioEffectParameter* parameter)
     m_Initial.m_Frequency = filterParameter->m_Frequency;
     m_Initial.m_On = m_Initial.m_Frequency != 0;
 }
-

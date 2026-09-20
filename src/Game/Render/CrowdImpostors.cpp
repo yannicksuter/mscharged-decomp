@@ -406,7 +406,7 @@ void CreateCrowdLayoutObject()
     sCrowdLayoutObject->mEndWidth = distance;
     sCrowdLayoutObject->mLength = distance;
     sCrowdLayoutObject->mEndOffset = zero;
-    sCrowdLayoutObject->SetTransform(transform);
+    sCrowdLayoutObject->SetWorldMatrix(transform);
     GetCrowdImpostorManager()->AddObject( sCrowdLayoutObject, 1);
     delete context;
 }

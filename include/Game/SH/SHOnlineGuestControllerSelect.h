@@ -25,6 +25,11 @@ public:
     void InitializeButtons();
     void OnDonePointerLeave(int index, void*);
 
+    bool IsLocalController(unsigned int index) const
+    {
+        return mPrimaryController == index || mGuestController == index;
+    }
+
     /* 0x01C */ bool mRespondingToInvitation;
     /* 0x01D */ unsigned char mPadding1D[3];
     /* 0x020 */ int mState;

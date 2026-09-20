@@ -292,7 +292,7 @@ void StrikerChallenge::LoadSettings()
         {
             nlSNPrintf(name, sizeof(name), side == 0 ? "challenge/sidekickhome%d" : "challenge/sidekickaway%d", sidekick);
             int id = ConvertToSidekickID(GetTweakString(name, "toad"));
-            info->SetSidekick(side, id, sidekick);
+            info->SetSidekick((short)side, id, sidekick);
         }
     }
 
@@ -2034,9 +2034,9 @@ void CupManager::fn_8010C5E0()
         skill = GetTeamStats(opponent).mUnidentified18;
     }
     mCurrentCup->mCupSettings.SkillLevel = (GameplaySettings::eSkillLevel)skill;
-    info->SetSidekick(side, sidekicks.mValues[0], 0);
-    info->SetSidekick(side, sidekicks.mValues[1], 1);
-    info->SetSidekick(side, sidekicks.mValues[2], 2);
+    info->SetSidekick((short)side, sidekicks.mValues[0], 0);
+    info->SetSidekick((short)side, sidekicks.mValues[1], 1);
+    info->SetSidekick((short)side, sidekicks.mValues[2], 2);
     fn_8010FED8();
 }
 

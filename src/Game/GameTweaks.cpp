@@ -35,10 +35,6 @@ bool TweakIntBinding::BindWithDefault(const char* name, int defaultValue,
     bool found = Bind(name, value, group, reload, min, max);
     if (!found)
     {
-        *m_pValue = GetDefault();
-    }
-    if (!found)
-    {
         *m_pValue = defaultValue;
     }
     return found;

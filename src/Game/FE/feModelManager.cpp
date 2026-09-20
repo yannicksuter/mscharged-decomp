@@ -650,8 +650,8 @@ FEImpostorCharacter::FEImpostorCharacter(
     mEnabled = true;
     if (alternate)
     {
-        char originalTexture[64];
         char alternateTexture[64];
+        char originalTexture[64];
         nlSNPrintf(originalTexture, sizeof(originalTexture), "%s/%s", name, name);
         nlSNPrintf(alternateTexture, sizeof(alternateTexture), "%s_alt/%s_alt", name, name);
         unsigned long original = glGetTexture(originalTexture);

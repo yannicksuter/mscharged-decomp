@@ -200,6 +200,20 @@ public:
     virtual void BindValueAddress(void* value);
     virtual int GetDefault();
 
+    using TweakBindingBase::Bind;
+
+    bool Bind(const char* name, float value,
+        const char* group, bool reload, float min, float max)
+    {
+        bool found = TweakBindingBase::Bind(name, value, group, reload, min, max);
+        if (!found)
+        {
+            *m_pValue = GetDefault();
+            return found;
+        }
+        return found;
+    }
+
     bool BindWithDefault(const char*, int, const char*, bool, float, float, float);
 
     operator int() const

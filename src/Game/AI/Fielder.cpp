@@ -2868,8 +2868,10 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
     {
         if (fn_80038660() && !fn_8003E74C())
         {
+            float fPlayerScale = mUnidentified024.m_fPlayerScale;
             float fUnidentified = 0.18f
-                + fn_8002BFA8(m_pTweaks, mUnidentified024.m_fPlayerScale) + lbl_806DB74C;
+                + fn_8002BFA8(GetTweaks(), fPlayerScale);
+            fUnidentified += lbl_806DB74C;
             if (nlVec3DistanceSquared2D(mUnidentified024.m_v3Position, g_pBall->m_v3Position)
                 < fUnidentified * fUnidentified)
                 bUnidentified = true;
@@ -2879,9 +2881,10 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
     {
         if (pOpponent->fn_80038660() && !pOpponent->fn_8003E74C())
         {
+            float fPlayerScale = pOpponent->mUnidentified024.m_fPlayerScale;
             float fUnidentified = 0.18f
-                + fn_8002BFA8(pOpponent->m_pTweaks, pOpponent->mUnidentified024.m_fPlayerScale)
-                + lbl_806DB74C;
+                + fn_8002BFA8(pOpponent->GetTweaks(), fPlayerScale);
+            fUnidentified += lbl_806DB74C;
             if (nlVec3DistanceSquared2D(pOpponent->mUnidentified024.m_v3Position, g_pBall->m_v3Position)
                 < fUnidentified * fUnidentified)
                 bUnidentified = true;

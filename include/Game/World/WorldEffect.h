@@ -21,7 +21,7 @@ public:
     /* 0x18 */ WorldAnimController* m_pAnimController;
     /* 0x1C */ u8 m_pad1C[0x44];
     /* 0x60 */ float m_fEmissionInterval;
-    /* 0x64 */ u8 m_pad64[0x04];
+    /* 0x64 */ float mUnidentified064;
     /* 0x68 */ float m_fEmissionRadius;
     /* 0x6C */ u8 m_pad6C[0x04];
     /* 0x70 */ unsigned long m_uEffectHash;

@@ -103,9 +103,9 @@ public:
     /* 0x5A4 */ TweakFloatBinding mUnidentified5A4;
     /* 0x5B4 */ TweakFloatBinding mUnidentified5B4;
     /* 0x5C4 */ TweakFloatBinding mUnidentified5C4;
-    /* 0x5D4 */ TweakFloatBinding mUnidentified5D4;
-    /* 0x5E4 */ TweakFloatBinding mUnidentified5E4;
-    /* 0x5F4 */ TweakFloatBinding mUnidentified5F4;
+    /* 0x5D4 */ TweakFloatBinding fFrontOfNetMidAngle;
+    /* 0x5E4 */ TweakFloatBinding fFrontOfNetMaxAngle;
+    /* 0x5F4 */ TweakFloatBinding fFrontOfNetMidScore;
     /* 0x604 */ TweakFloatBinding mUnidentified604;
     /* 0x614 */ TweakFloatBinding mUnidentified614;
     /* 0x624 */ TweakFloatBinding mUnidentified624;

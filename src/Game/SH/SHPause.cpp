@@ -68,16 +68,7 @@ PauseMenuScene::~PauseMenuScene()
     g_bRenderWorld = true;
 }
 
-inline void PauseMenuScene::TransitionOut(TransitionType newtype)
-{
-    mIsInTransition = true;
-    mTransitionTo = newtype;
-    FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    presentation->SetActiveSlide("menu out", true);
-    presentation->Update(0.0f);
-}
-
-inline void PauseMenuScene::OnSelectRESUME(TLComponentInstance* instance)
+void PauseMenuScene::OnSelectRESUME(TLComponentInstance* instance)
 {
     TransitionOut(TT_OUT);
     g_pFEInput->Reset();
@@ -183,15 +174,6 @@ void PauseMenuScene::OnSelectPopupYESFORFEIT()
     mQuitDelay = 1.0f;
 }
 
-static inline TLTextInstance* FindOptionText(TLComponentInstance* instance, const char* slide)
-{
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(instance,
-        nlStringLowerHash(slide), nlStringLowerHash("option"), 0, 0, 0, 0);
-    if (text == 0)
-        text = &UnidentifiedTLTextDefault::sInstance;
-    return text;
-}
-
 /**
  * Offset/Address/Size: 0xAC0 | 0x80239F14 | size: 0x394
  */
@@ -201,29 +183,25 @@ void PauseMenuScene::SceneCreated()
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     for (int i = 0; i < 7; ++i)
     {
-        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(
-            presentation->m_currentSlide, InlineHasher("Layer"), InlineHasher(MENU_NAMES[i]));
-        if (instance == 0)
-            instance = &UnidentifiedTLComponentDefault::sInstance;
-        mUnidentified028[i] = instance;
+        mUnidentified028[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+            presentation->m_currentSlide, "Layer", MENU_NAMES[i]);
     }
     FEAudio::EnableSounds(true);
     if (GameInfoManager::Instance()->IsInMode4())
     {
         if (GetRegion() == 1)
         {
-            FindOptionText(mUnidentified028[4], "off")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
-            FindOptionText(mUnidentified028[4], "over")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
-            FindOptionText(mUnidentified028[4], "down")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "off", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "over", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "down", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
         }
         else
         {
-            const char* string = "CHALLENGES_OBJECTIVES_BUTTON";
-            if (g_pStrikerChallenge->mCurrentChallenge < 10)
-                string = "101_OBJECTIVES_BUTTON";
-            FindOptionText(mUnidentified028[4], "off")->SetStringId(string);
-            FindOptionText(mUnidentified028[4], "over")->SetStringId(string);
-            FindOptionText(mUnidentified028[4], "down")->SetStringId(string);
+            const char* string = g_pStrikerChallenge->mCurrentChallenge < 10
+                ? "101_OBJECTIVES_BUTTON" : "CHALLENGES_OBJECTIVES_BUTTON";
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "off", "option")->SetStringId(string);
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "over", "option")->SetStringId(string);
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "down", "option")->SetStringId(string);
         }
     }
 }
@@ -259,19 +237,21 @@ void PauseMenuScene::Update(float fDeltaT)
     if (!mUnidentified530)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
             return;
         fn_8023A85C();
         mUnidentified530 = true;
         for (int i = 0; i < 4; ++i)
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+            GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
     if (mIsInTransition)
     {
         for (int i = 0; i < 4; ++i)
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+            GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (!(slide->m_time >= slide->m_start + slide->m_duration))
+        float currentTime = slide->GetCurrentTime();
+        float endTime = slide->GetStartTime() + slide->GetDuration();
+        if (!(currentTime >= endTime))
             return;
         switch (mTransitionTo)
         {
@@ -342,7 +322,7 @@ void PauseMenuScene::Update(float fDeltaT)
         event.mIndex = i;
         event.mPosition = GetPointerPosition(i, &valid);
         event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 30, true, 0);
-        TLComponentInstance* cursor = gFEPointerInstances[i];
+        TLComponentInstance* cursor = GetPointerInstance(i);
         for (int j = 0; j < 7; ++j)
             mUnidentified044[j].HandlePointerEvent(&event);
         if (mUnidentified534[i] > 0)
@@ -352,9 +332,19 @@ void PauseMenuScene::Update(float fDeltaT)
     }
     if (goToChooseSides)
         return;
-    mDelayBeforeUnpause -= fDeltaT;
-    if (mDelayBeforeUnpause <= 0.0f)
-        mDelayBeforeUnpause = 0.0f;
+    mDelayBeforeUnpause = mDelayBeforeUnpause - fDeltaT;
+    if (mDelayBeforeUnpause > 0.0f)
+        return;
+    mDelayBeforeUnpause = 0.0f;
+}
+
+void PauseMenuScene::TransitionOut(TransitionType newtype)
+{
+    mIsInTransition = true;
+    mTransitionTo = newtype;
+    FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
+    presentation->SetActiveSlide("menu out", true);
+    presentation->Update(0.0f);
 }
 
 /**

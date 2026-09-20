@@ -671,60 +671,67 @@ extern "C" void fn_80184C3C(
     GLView* pView, const ProjectedShadowParams& params)
 {
     nlVector3 p[4];
-    nlVector3 vLight;
     nlVector3 vDir;
-    nlVector3 vRight;
+    nlVector3 vTemp;
+    nlVector3 vLight;
+    float radius;
 
     if (g_bShadowPositionOverride)
     {
-        float y;
         float z;
+        float y;
         float x;
-        y = lbl_806DCCA8;
         z = lbl_806DCCAC;
+        y = lbl_806DCCA8;
         x = lbl_806DCCA4;
         nlVec3Set(vLight, x, y, z);
     }
     else
     {
-        float y;
         float z;
+        float y;
         float x;
-        y = params.vLight.y;
         z = params.vLight.z;
+        y = params.vLight.y;
         x = params.vLight.x;
         nlVec3Set(vLight, x, y, z);
     }
 
-    nlVec3Set(vDir, -vLight.x, -vLight.y, -vLight.z);
-    nlVec3Scale(vDir, nlRecipSqrt(vDir.GetLengthSq3D(), false));
-    nlVector3 vUp = { 0.0f, 0.0f, 1.0f };
-    nlVec3CrossProduct(vRight, vDir, vUp);
-
-    nlVector3 vTemp = params.vPosition;
-    vTemp.z += 0.5f * params.fHeight;
-    float radius = params.fRadius;
-
-    nlVec3Scale(
-        vRight, nlRecipSqrt(vRight.GetLengthSq3D(), true));
-    nlVec3CrossProduct(vUp, vRight, vDir);
-    nlVec3Scale(
-        vUp, nlRecipSqrt(vUp.GetLengthSq3D(), true));
-
-    nlVec3ScaleAdd(p[0], radius, vRight, vTemp);
-    nlVec3ScaleAdd(p[1], -radius, vRight, vTemp);
-    nlVec3ScaleAdd(p[0], -radius, vUp, p[0]);
-    nlVec3ScaleAdd(p[1], -radius, vUp, p[1]);
-    nlVec3ScaleAdd(p[2], -radius, vRight, vTemp);
-    nlVec3ScaleAdd(p[3], radius, vRight, vTemp);
-    nlVec3ScaleAdd(p[2], radius, vUp, p[2]);
-    nlVec3ScaleAdd(p[3], radius, vUp, p[3]);
-
-    nlVector3* pPoint = p;
-    for (int i = 0; i < 4; i++, pPoint++)
     {
-        CastDirectional(*pPoint, vDir);
-        pPoint->z = g_AntiFlimmer;
+        nlVec3Set(vDir, -vLight.x, -vLight.y, -vLight.z);
+        nlVec3Scale(vDir, nlRecipSqrt(vDir.GetLengthSq3D(), false));
+        nlVector3 vUp = { 0.0f, 0.0f, 1.0f };
+        nlVector3 vRight;
+
+        vTemp = params.vPosition;
+        vTemp.z += 0.5f * params.fHeight;
+        radius = params.fRadius;
+
+        nlVec3CrossProduct(vRight, vDir, vUp);
+
+        nlVec3Scale(
+            vRight, nlRecipSqrt(vRight.GetLengthSq3D(), true));
+        nlVec3CrossProduct(vUp, vRight, vDir);
+        nlVec3Scale(
+            vUp, nlRecipSqrt(vUp.GetLengthSq3D(), true));
+
+        nlVec3ScaleAdd(p[0], radius, vRight, vTemp);
+        nlVec3ScaleAdd(p[1], -radius, vRight, vTemp);
+        nlVec3ScaleAdd(p[0], -radius, vUp, p[0]);
+        nlVec3ScaleAdd(p[1], -radius, vUp, p[1]);
+        nlVec3ScaleAdd(p[2], -radius, vRight, vTemp);
+        nlVec3ScaleAdd(p[3], radius, vRight, vTemp);
+        nlVec3ScaleAdd(p[2], radius, vUp, p[2]);
+        nlVec3ScaleAdd(p[3], radius, vUp, p[3]);
+    }
+
+    {
+        nlVector3* pPoint = p;
+        for (int i = 0; i < 4; i++, pPoint++)
+        {
+            CastDirectional(*pPoint, vDir);
+            pPoint->z = g_AntiFlimmer;
+        }
     }
 
     glSetDefaultState(true);

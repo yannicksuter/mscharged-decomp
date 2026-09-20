@@ -37,6 +37,16 @@ struct NetworkTournamentGame
 
     bool IsFinished() const;
     bool GetWinnerAndLoser(int* winnerSide, int* winningMachine) const;
+    void Reset(int bracketIndex)
+    {
+        mState = NET_TOURN_GAME_EMPTY;
+        mMachines[0] = -1;
+        mMachines[1] = -1;
+        mBracketIndex = bracketIndex;
+        mHomeUpdate = 0;
+        mAwayUpdate = 0;
+        mGameInfo.Reset(true);
+    }
 
     /* 0x000 */ int mState;
     /* 0x004 */ int mMachines[2];
@@ -62,6 +72,13 @@ public:
     static void GenerateFirstRoundSeedings(int machineCount, u8* seedings);
 
     void Reset(bool clearTeams);
+    void ResetGames()
+    {
+        for (int i = 0; i < 7; ++i)
+        {
+            mGames[i].Reset(i);
+        }
+    }
     void TransitionOnlineMenuToTournament(NetMessageTournamentStart* message);
     void BuildInitialBracket();
     void AdvanceBracket();

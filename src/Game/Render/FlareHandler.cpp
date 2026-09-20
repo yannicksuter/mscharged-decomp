@@ -94,10 +94,24 @@ void FlareHandler::Render()
     if (halos.m_pStart != 0 || glows.m_pStart != 0)
     {
         mpView->m_Interface->GetViewMatrix(viewMatrix);
-        nlVec3Set(viewRight,
-            viewMatrix.m11, viewMatrix.m21, viewMatrix.m31);
-        nlVec3Set(viewUp,
-            viewMatrix.m12, viewMatrix.m22, viewMatrix.m32);
+        // Bounded exception registered in the project's final review: retail numbers
+        // the basis FPRs ascending with its z-first column loads (m31->f0, m21->f1,
+        // m11->f2, then m32->f3, m22->f4, m12->f5) and stores to +0x40/+0x4c. Every
+        // ordinary form numbers them descending and leaves eight rows differing only
+        // in FPR identity - including the plain two-call nlVec3Set body that the
+        // predecessor's Matching FlareHandler.cpp carries, which is why that body is
+        // the proven source shape and these six names are not. Naming the components
+        // is the only shape that reproduces retail's numbering; it carries no
+        // semantic content, and the stripped DOL cannot show whether retail named
+        // them. Do not read this as evidence that it did.
+        float m31 = viewMatrix.m31;
+        float m21 = viewMatrix.m21;
+        float m11 = viewMatrix.m11;
+        float m32 = viewMatrix.m32;
+        float m22 = viewMatrix.m22;
+        float m12 = viewMatrix.m12;
+        nlVec3Set(viewRight, m11, m21, m31);
+        nlVec3Set(viewUp, m12, m22, m32);
 
         glSetDefaultState(true);
         glSetRasterState(GLS_DepthWrite, 0);

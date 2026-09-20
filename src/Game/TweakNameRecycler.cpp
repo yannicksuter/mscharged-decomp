@@ -19,9 +19,13 @@ public:
     {
     }
     virtual ~TweakNameTable();
-};
+
+    /* 0x14 */ u8 mUnidentified014[4]; // not accessed by retained code
+}; // size: 0x18
 
 nlSlotPoolFixed<0x10> gTweakNamePool;
+TweakRecycledName* gRecycledTweakNameHead;
+TweakRecycledName* gRecycledTweakNameTail;
 
 TweakNameTable::~TweakNameTable()
 {
@@ -57,6 +61,3 @@ void RecycleTweakNames(void)
     gRecycledTweakNameHead = 0;
     gRecycledTweakNameTail = 0;
 }
-
-TweakRecycledName* gRecycledTweakNameHead;
-TweakRecycledName* gRecycledTweakNameTail;

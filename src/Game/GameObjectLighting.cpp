@@ -644,13 +644,15 @@ void SetGameObjectLightingEnabled(bool arg0, s32 arg1, bool arg2)
     }
 }
 
-void fn_80182F74(s32 lightId, GameObjectLight* pLight, const nlMatrix4& mview)
+void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mview)
 {
     GXLightObj light;
+    nlVector3 var1;
+    nlVector3 var0;
+    nlVector3 initialDirection;
     nlVector3 viewPos;
     nlVector3 viewDir;
     nlVector3 worldDir;
-    nlVector3 var0;
 
     if (pLight->unknown01)
     {
@@ -658,12 +660,11 @@ void fn_80182F74(s32 lightId, GameObjectLight* pLight, const nlMatrix4& mview)
         if (var3 > 255)
             var3 = 255;
 
-        GXColor colour = {
-            (u8)((var3 * pLight->colour.c[0]) >> 8),
-            (u8)((var3 * pLight->colour.c[1]) >> 8),
-            (u8)((var3 * pLight->colour.c[2]) >> 8),
-            lbl_806E4D1B,
-        };
+        GXColor colour;
+        colour.r = (u8)((var3 * pLight->colour.c[0]) >> 8);
+        colour.a = lbl_806E4D1B;
+        colour.g = (u8)((var3 * pLight->colour.c[1]) >> 8);
+        colour.b = (u8)((var3 * pLight->colour.c[2]) >> 8);
         GXInitLightColor(&light, colour);
     }
     else
@@ -672,12 +673,11 @@ void fn_80182F74(s32 lightId, GameObjectLight* pLight, const nlMatrix4& mview)
         if (var3 > 255)
             var3 = 255;
 
-        GXColor colour = {
-            (u8)var3,
-            (u8)var3,
-            (u8)var3,
-            lbl_806E4D1F,
-        };
+        GXColor colour;
+        colour.r = (u8)var3;
+        colour.a = lbl_806E4D1F;
+        colour.g = (u8)var3;
+        colour.b = (u8)var3;
         GXInitLightColor(&light, colour);
     }
 
@@ -687,19 +687,18 @@ void fn_80182F74(s32 lightId, GameObjectLight* pLight, const nlMatrix4& mview)
     }
     else
     {
-        nlVector3 initialDirection = lbl_804DCD30;
-        nlVector3 var1;
-        nlVector3 var2;
-        nlMatrix4 matZ;
+        float angleY = pLight->unknown08;
+        angleY = (lbl_806E4D20 * angleY) / lbl_806E4D24;
+        initialDirection = lbl_804DCD30;
         nlMatrix4 matY;
+        nlMatrix4 matZ;
 
-        nlMakeRotationMatrixY(
-            matY, (lbl_806E4D20 * pLight->unknown08) / lbl_806E4D24);
+        nlMakeRotationMatrixY(matY, angleY);
+        float angleZ = pLight->unknown0C;
         nlMakeRotationMatrixZ(
-            matZ, (lbl_806E4D20 * pLight->unknown0C) / lbl_806E4D24);
+            matZ, (lbl_806E4D20 * angleZ) / lbl_806E4D24);
         nlMultDirVectorMatrix(var1, initialDirection, matY);
-        nlMultDirVectorMatrix(var2, var1, matZ);
-        var1 = var2;
+        nlMultDirVectorMatrix(var1, matZ);
 
         nlVec3Set(var0, -var1.x, -var1.y, -var1.z);
     }
@@ -792,12 +791,12 @@ u32 GetGameObjectLightRamp()
 
 void FillInGameObjectLightRamp()
 {
-    s32 i;
-    f32 deltaB;
-    f32 deltaG;
-    f32 deltaR;
-    u8* pTextureData;
     StadiumLightingParams* pRampParams = &gStadiumGameObjectLightingParams;
+    u8* pTextureData;
+    s32 i;
+    f32 deltaR;
+    f32 deltaG;
+    f32 deltaB;
 
     deltaR = (f32)(pRampParams->rampEndR - pRampParams->rampStartR);
     deltaG = (f32)(pRampParams->rampEndG - pRampParams->rampStartG);

@@ -4,22 +4,23 @@
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorCharacter.h"
 #include "Game/TweakValue.h"
+#include "Game/World/WorldObject_80278E94.h"
 #include "NL/nlMath.h"
 #include "NL/nlDLListContainer.h"
 #include "types.h"
 
 class CrowdPointCallback;
 class GLView;
+struct WorldObjectLoadContext;
 
-class CrowdLayoutObject
+class CrowdLayoutObject : public WorldObject_80278E94
 {
 public:
     virtual ~CrowdLayoutObject() {}
-    virtual void UnidentifiedVirtual0C();
-    virtual nlMatrix4* UnidentifiedVirtual10();
-    virtual void SetTransform(const nlMatrix4& transform);
-    virtual void UnidentifiedVirtual18();
-    virtual void UnidentifiedVirtual1C();
+    virtual void ReleaseResources();
+    virtual nlMatrix4* GetWorldMatrix() { return &mTransform; }
+    virtual void SetWorldMatrix(const nlMatrix4& transform);
+    virtual void UnidentifiedVirtual1C(WorldObjectLoadContext* context);
 
     void Initialize();
     void GetCorners(nlVector4* corners);

@@ -257,15 +257,15 @@ void NetworkSession::SendGameStartToEveryone()
 
     NetworkDraftTeam* home = NetworkDraft::Instance()->GetDraftTeam(0);
     message.mHomeCharacters[0] = home->mCaptain;
-    message.mHomeCharacters[1] = home->mSidekick0;
-    message.mHomeCharacters[2] = home->mSidekick1;
-    message.mHomeCharacters[3] = home->mSidekick2;
+    message.mHomeCharacters[1] = home->mSidekicks[0];
+    message.mHomeCharacters[2] = home->mSidekicks[1];
+    message.mHomeCharacters[3] = home->mSidekicks[2];
 
     NetworkDraftTeam* away = NetworkDraft::Instance()->GetDraftTeam(1);
     message.mAwayCharacters[0] = away->mCaptain;
-    message.mAwayCharacters[1] = away->mSidekick0;
-    message.mAwayCharacters[2] = away->mSidekick1;
-    message.mAwayCharacters[3] = away->mSidekick2;
+    message.mAwayCharacters[1] = away->mSidekicks[0];
+    message.mAwayCharacters[2] = away->mSidekicks[1];
+    message.mAwayCharacters[3] = away->mSidekicks[2];
 
     if (IsOnlineRankedMatch())
     {

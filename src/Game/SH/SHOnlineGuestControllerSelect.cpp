@@ -10,6 +10,7 @@
 #include "Game/GameSceneManager.h"
 #include "Game/GameInfo.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feManager.h"
 #include "Game/FE/tlComponentInstance.h"
@@ -60,191 +61,6 @@ SHOnlineGuestControllerSelect::~SHOnlineGuestControllerSelect()
 {
 }
 
-void SHOnlineGuestControllerSelect::UpdateDoneButtonVisibility()
-{
-    if (mDoneButtonInstance->m_bVisible == true)
-    {
-        if (mGuestController == -1)
-        {
-            mDoneButtonEntering = false;
-            mDoneButtonInstance->m_bVisible = false;
-            mDoneButton.mDisabled = true;
-            FEPointerEvent event;
-            mDoneButton.mPreviousEvents[0] = event;
-            mDoneButton.mPreviousEvents[1] = event;
-            mDoneButton.mPreviousEvents[2] = event;
-            mDoneButton.mPreviousEvents[3] = event;
-
-            for (int i = 0; i < 4; ++i)
-            {
-                if (mDoneButton.GetPointerState(i) == 1)
-                {
-                    --mHoverCounts[i];
-                    mDoneButton.SetPointerState(0, i);
-                }
-            }
-        }
-    }
-    else if (mGuestController != -1)
-    {
-        FEAudio::PlayAnimAudioEvent(0x2AB04562, 0, 0, 1);
-        mDoneButtonInstance->m_bVisible = true;
-        mDoneButtonInstance->SetActiveSlide("in", true, false);
-        mDoneButtonEntering = true;
-    }
-}
-
-void SHOnlineGuestControllerSelect::OnControllerPointerEnter(int index, void*)
-{
-    unsigned int which = index;
-    if (mGuestController != -1)
-    {
-        bool valid = mPrimaryController == which || mGuestController == which;
-        if (!valid)
-            return;
-    }
-
-    if (mPrimaryController == which)
-        return;
-
-    if (!mControllerButton.HasOtherPointerState(1, which))
-    {
-        mHomeInstance->SetActiveSlide("over", true, false);
-        FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
-    }
-
-    mControllerButton.SetPointerState(1, which);
-    ++mHoverCounts[which];
-    mControllerButton.PlayHoverFeedback(index);
-}
-
-void SHOnlineGuestControllerSelect::OnControllerPointerLeave(int index, void*)
-{
-    unsigned int which = index;
-    if (mGuestController != -1)
-    {
-        bool valid = mPrimaryController == which || mGuestController == which;
-        if (!valid)
-            return;
-    }
-
-    if (mPrimaryController == which)
-        return;
-
-    if (!mControllerButton.HasOtherPointerState(1, which))
-        mHomeInstance->SetActiveSlide("controllers", true, false);
-
-    mControllerButton.SetPointerState(0, which);
-    --mHoverCounts[which];
-}
-
-void SHOnlineGuestControllerSelect::OnControllerPointerPress(int index, void*)
-{
-    TLComponentInstance* controller = gFEPointerInstances[index];
-    unsigned int which = index;
-    if (mGuestController != -1)
-    {
-        bool valid = mPrimaryController == which || mGuestController == which;
-        if (!valid)
-            return;
-    }
-
-    if (mPrimaryController == which)
-        return;
-
-    TLComponentInstance* selected = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance,
-        nlStringLowerHash("controllers"),
-        nlStringLowerHash("home_group"),
-        nlStringLowerHash("controller1"),
-        0,
-        0,
-        0);
-    TLTextInstance* text = FEFinder<TLTextInstance, 1>::Find(
-        selected, nlStringLowerHash("Text"), 0, 0, 0, 0, 0);
-    text->SetString(mGuestName);
-
-    TLComponentInstance* highlighted = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance,
-        nlStringLowerHash("over"),
-        nlStringLowerHash("home_group"),
-        nlStringLowerHash("controller1"),
-        0,
-        0,
-        0);
-    text = FEFinder<TLTextInstance, 1>::Find(
-        highlighted, nlStringLowerHash("Text"), 0, 0, 0, 0, 0);
-    text->SetString(mGuestName);
-
-    bool already = mPrimaryController == which || mGuestController == which;
-    if (!already)
-    {
-        mGuestController = index;
-        controller->SetActiveSlide("A", true, false);
-        selected->m_bVisible = true;
-        highlighted->m_bVisible = true;
-        FEAudio::PlayAnimAudioEvent(0xB3586309, 0, 0, 1);
-    }
-    else
-    {
-        if (which == mGuestController)
-            mGuestController = -1;
-        controller->SetActiveSlide("holding", true, false);
-        selected->m_bVisible = false;
-        highlighted->m_bVisible = false;
-    }
-
-    UpdateDoneButtonVisibility();
-}
-
-void SHOnlineGuestControllerSelect::OnDonePointerEnter(int index, void*)
-{
-    ++mHoverCounts[index];
-    mDoneButton.SetPointerState(1, index);
-    mDoneButton.PlayHoverFeedback(index);
-    if (!mDoneButton.HasOtherPointerState(1, index))
-    {
-        mDoneButtonInstance->SetActiveSlide("over", true, false);
-        FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
-    }
-}
-
-void SHOnlineGuestControllerSelect::OnDonePointerInside(int index, void*)
-{
-    if (mDoneButton.GetPointerState(index) != 0)
-        return;
-
-    ++mHoverCounts[index];
-    mDoneButton.SetPointerState(1, index);
-    mDoneButton.PlayHoverFeedback(index);
-    if (!mDoneButton.HasOtherPointerState(1, index))
-    {
-        mDoneButtonInstance->SetActiveSlide("over", true, false);
-        FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
-    }
-}
-
-void SHOnlineGuestControllerSelect::OnDonePointerPress(int, void*)
-{
-    mControllerButton.Disable();
-    mDoneButton.Disable();
-
-    for (int i = 0; i < 4; ++i)
-    {
-        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
-    }
-
-    mSelectionConfirmed = true;
-    mState = 2;
-
-    SHNavigation* object = GetNavigationScene();
-    if (object != 0)
-    {
-        object->HideButtons();
-    }
-
-    mPresentation->SetActiveSlide("out", true);
-    mPresentation->Update(0.0f);
-}
-
 void SHOnlineGuestControllerSelect::SceneCreated()
 {
     SHNavigation* object = GetNavigationScene();
@@ -259,13 +75,7 @@ void SHOnlineGuestControllerSelect::SceneCreated()
     mNavigation.SetButtonInstance(screen);
     mDoneButtonInstance->m_bVisible = false;
 
-    TLComponentInstance* sideGroup = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide,
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("home"),
-        0,
-        0,
-        0,
-        0);
+    TLComponentInstance* sideGroup = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "home");
     mHomeInstance = sideGroup;
     mHomeInstance->SetActiveSlide("controllers", true, false);
 
@@ -274,51 +84,23 @@ void SHOnlineGuestControllerSelect::SceneCreated()
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    TLComponentInstance* homeController = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance,
-        nlStringLowerHash("controllers"),
-        nlStringLowerHash("home_group"),
-        nlStringLowerHash("controller0"),
-        0,
-        0,
-        0);
-    TLTextInstance* text = FEFinder<TLTextInstance, 1>::Find(
-        homeController, nlStringLowerHash("Text"), 0, 0, 0, 0, 0);
+    TLComponentInstance* homeController = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance, "controllers", "home_group", "controller0");
+    TLTextInstance* text = FEFinder<TLTextInstance, 1>::Find(homeController, "Text");
     homeController->m_bVisible = true;
     text->SetString(gNetworkMiiNameWide);
 
-    TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance,
-        nlStringLowerHash("over"),
-        nlStringLowerHash("home_group"),
-        nlStringLowerHash("controller0"),
-        0,
-        0,
-        0);
-    text = FEFinder<TLTextInstance, 1>::Find(
-        homeOver, nlStringLowerHash("Text"), 0, 0, 0, 0, 0);
+    TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance, "over", "home_group", "controller0");
+    text = FEFinder<TLTextInstance, 1>::Find(homeOver, "Text");
     homeOver->m_bVisible = true;
     text->SetString(gNetworkMiiNameWide);
 
-    homeController = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance,
-        nlStringLowerHash("controllers"),
-        nlStringLowerHash("home_group"),
-        nlStringLowerHash("controller1"),
-        0,
-        0,
-        0);
-    text = FEFinder<TLTextInstance, 1>::Find(
-        homeController, nlStringLowerHash("Text"), 0, 0, 0, 0, 0);
+    homeController = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance, "controllers", "home_group", "controller1");
+    text = FEFinder<TLTextInstance, 1>::Find(homeController, "Text");
     homeController->m_bVisible = mGuestController != -1;
     text->SetString(mGuestName);
 
-    homeOver = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance,
-        nlStringLowerHash("over"),
-        nlStringLowerHash("home_group"),
-        nlStringLowerHash("controller1"),
-        0,
-        0,
-        0);
-    text = FEFinder<TLTextInstance, 1>::Find(
-        homeOver, nlStringLowerHash("Text"), 0, 0, 0, 0, 0);
+    homeOver = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance, "over", "home_group", "controller1");
+    text = FEFinder<TLTextInstance, 1>::Find(homeOver, "Text");
     homeOver->m_bVisible = mGuestController != -1;
     text->SetString(mGuestName);
 
@@ -332,7 +114,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
     if (mDoneButtonEntering)
     {
         TLSlide* slide = mDoneButtonInstance->GetActiveSlide();
-        if (slide->GetCurrentTime() >= slide->m_duration + slide->m_start)
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             SetDoneButtonBounds(&mDoneButton, mDoneButtonInstance, 0);
             mDoneButton.mDisabled = false;
@@ -357,11 +139,11 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
     if (state == 0 || (unsigned int)(state - 2) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->m_duration + slide->m_start)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int pad = 0; pad < 4; ++pad)
             {
-                gFEPointerInstances[pad]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(pad)->SetActiveSlide("waiting", true, false);
             }
             return;
         }
@@ -437,8 +219,8 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
 
     for (int pad = 0; pad < 4; ++pad)
     {
+        TLComponentInstance* controller = GetPointerInstance(pad);
         unsigned char valid = 1;
-        TLComponentInstance* controller = gFEPointerInstances[pad];
         FEPointerEvent event;
         event.mIndex = pad;
         event.mPosition = GetPointerPosition(pad, &valid);
@@ -466,43 +248,27 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             return;
         }
 
-        bool playing
-            = mPrimaryController == (unsigned int)pad
-           || mGuestController == (unsigned int)pad;
+        bool playing = IsLocalController(pad);
         if (playing
             && !g_pFEInput->IsConnected((eFEINPUT_PAD)pad)
             && (unsigned int)pad != mPrimaryController)
         {
-            controller->SetActiveSlide("holding", true, false);
+            GetPointerInstance(pad)->SetActiveSlide("holding", true, false);
             if ((unsigned int)pad == mGuestController)
             {
                 mGuestController = -1;
             }
-            mHoverCounts[pad] = 0;
+            mHoverCounts[(unsigned int)pad] = 0;
 
-            TLComponentInstance* homeController = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance,
-                nlStringLowerHash("controllers"),
-                nlStringLowerHash("home_group"),
-                nlStringLowerHash("controller1"),
-                0,
-                0,
-                0);
+            TLComponentInstance* homeController = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance, "controllers", "home_group", "controller1");
             homeController->m_bVisible = false;
 
-            TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance,
-                nlStringLowerHash("over"),
-                nlStringLowerHash("home_group"),
-                nlStringLowerHash("controller1"),
-                0,
-                0,
-                0);
+            TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance, "over", "home_group", "controller1");
             homeOver->m_bVisible = false;
             UpdateDoneButtonVisibility();
         }
 
-        playing
-            = mPrimaryController == (unsigned int)pad
-           || mGuestController == (unsigned int)pad;
+        playing = IsLocalController(pad);
         if (!playing)
         {
             controller->SetActiveSlide("holding", true, false);
@@ -520,48 +286,196 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
 
 void SHOnlineGuestControllerSelect::InitializeButtons()
 {
-    TLInstance* homeAwayBox = FEFinder<TLInstance, 2>::Find(mHomeInstance->GetActiveSlide(),
-        nlStringLowerHash("home_group"),
-        nlStringLowerHash("home_away_box"),
-        0,
-        0,
-        0,
-        0);
+    typedef Detail::MemFunImpl<void, void (SHOnlineGuestControllerSelect::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineGuestControllerSelect*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    TLInstance* homeAwayBox = FEFinder<TLInstance, 2>::Find<TLSlide>(mHomeInstance->GetActiveSlide(), "home_group", "home_away_box");
     mControllerButton.SetInstanceBounds(homeAwayBox, true, 0.0f, 0.0f, 1.0f, 1.0f);
 
-    FEPointerListener::Callback callback(Bind<void>(
-        MemFun(&SHOnlineGuestControllerSelect::OnControllerPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback(PointerBinding(MemFun(&SHOnlineGuestControllerSelect::OnControllerPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     mControllerButton.SetPointerEnterCallback(callback);
-    callback = FEPointerListener::Callback(Bind<void>(
-        MemFun(&SHOnlineGuestControllerSelect::OnControllerPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    callback = FEPointerListener::Callback(PointerBinding(MemFun(&SHOnlineGuestControllerSelect::OnControllerPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     mControllerButton.SetPointerLeaveCallback(callback);
 
-    FEPointerListener::Callback selectCallback(Bind<void>(
-        MemFun(&SHOnlineGuestControllerSelect::OnControllerPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback selectCallback(PointerBinding(MemFun(&SHOnlineGuestControllerSelect::OnControllerPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     mControllerButton.SetPointerPressCallback(selectCallback);
     mControllerButton.mSpeakerEnabled = false;
 
-    callback = FEPointerListener::Callback(Bind<void>(
-        MemFun(&SHOnlineGuestControllerSelect::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    callback = FEPointerListener::Callback(PointerBinding(MemFun(&SHOnlineGuestControllerSelect::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerEnterCallback(callback);
-    callback = FEPointerListener::Callback(Bind<void>(
-        MemFun(&SHOnlineGuestControllerSelect::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    callback = FEPointerListener::Callback(PointerBinding(MemFun(&SHOnlineGuestControllerSelect::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerLeaveCallback(callback);
-    callback = FEPointerListener::Callback(Bind<void>(
-        MemFun(&SHOnlineGuestControllerSelect::OnDonePointerInside), this, Placeholder<0>(), Placeholder<1>()));
+    callback = FEPointerListener::Callback(PointerBinding(MemFun(&SHOnlineGuestControllerSelect::OnDonePointerInside), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerInsideCallback(callback);
-    selectCallback = FEPointerListener::Callback(Bind<void>(
-        MemFun(&SHOnlineGuestControllerSelect::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    selectCallback = FEPointerListener::Callback(PointerBinding(MemFun(&SHOnlineGuestControllerSelect::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
     mDoneButton.SetPointerPressCallback(selectCallback);
 
+    mDoneButton.Disable();
+}
+
+void SHOnlineGuestControllerSelect::UpdateDoneButtonVisibility()
+{
+    if (mDoneButtonInstance->m_bVisible == true)
     {
-        mDoneButton.mDisabled = true;
-        FEPointerEvent event;
-        mDoneButton.mPreviousEvents[0] = event;
-        mDoneButton.mPreviousEvents[1] = event;
-        mDoneButton.mPreviousEvents[2] = event;
-        mDoneButton.mPreviousEvents[3] = event;
+        if (mGuestController == -1)
+        {
+            mDoneButtonEntering = false;
+            mDoneButtonInstance->m_bVisible = false;
+            mDoneButton.Disable();
+
+            for (int i = 0; i < 4; ++i)
+            {
+                if (mDoneButton.GetPointerState(i) == 1)
+                {
+                    --mHoverCounts[i];
+                    mDoneButton.SetPointerState(0, i);
+                }
+            }
+        }
     }
+    else if (mGuestController != -1)
+    {
+        FEAudio::PlayAnimAudioEvent(0x2AB04562, 0, 0, 1);
+        mDoneButtonInstance->m_bVisible = true;
+        mDoneButtonInstance->SetActiveSlide("in", true, false);
+        mDoneButtonEntering = true;
+    }
+}
+
+void SHOnlineGuestControllerSelect::OnControllerPointerEnter(int index, void*)
+{
+    unsigned int which = index;
+    if (mGuestController != -1)
+    {
+        if (!IsLocalController(which))
+            return;
+    }
+
+    if (mPrimaryController == which)
+        return;
+
+    if (!mControllerButton.HasOtherPointerState(1, which))
+    {
+        mHomeInstance->SetActiveSlide("over", true, false);
+        FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
+    }
+
+    mControllerButton.SetPointerState(1, which);
+    ++mHoverCounts[which];
+    mControllerButton.PlayHoverFeedback(index);
+}
+
+void SHOnlineGuestControllerSelect::OnControllerPointerLeave(int index, void*)
+{
+    unsigned int which = index;
+    if (mGuestController != -1)
+    {
+        if (!IsLocalController(which))
+            return;
+    }
+
+    if (mPrimaryController == which)
+        return;
+
+    if (!mControllerButton.HasOtherPointerState(1, which))
+        mHomeInstance->SetActiveSlide("controllers", true, false);
+
+    mControllerButton.SetPointerState(0, which);
+    --mHoverCounts[which];
+}
+
+void SHOnlineGuestControllerSelect::OnControllerPointerPress(int index, void*)
+{
+    TLComponentInstance* controller = GetPointerInstance(index);
+    unsigned int which = index;
+    if (mGuestController != -1)
+    {
+        if (!IsLocalController(which))
+            return;
+    }
+
+    if (mPrimaryController == which)
+        return;
+
+    TLComponentInstance* selected
+        = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance, "controllers", "home_group", "controller1");
+    TLTextInstance* text = FEFinder<TLTextInstance, 1>::Find(selected, "Text");
+    text->SetString(mGuestName);
+
+    TLComponentInstance* highlighted
+        = FEFinder<TLComponentInstance, 4>::Find(mHomeInstance, "over", "home_group", "controller1");
+    text = FEFinder<TLTextInstance, 1>::Find(highlighted, "Text");
+    text->SetString(mGuestName);
+
+    bool already = IsLocalController(which);
+    if (!already)
+    {
+        mGuestController = index;
+        controller->SetActiveSlide("A", true, false);
+        selected->m_bVisible = true;
+        highlighted->m_bVisible = true;
+        FEAudio::PlayAnimAudioEvent(0xB3586309, 0, 0, 1);
+    }
+    else
+    {
+        if (which == mGuestController)
+            mGuestController = -1;
+        controller->SetActiveSlide("holding", true, false);
+        selected->m_bVisible = false;
+        highlighted->m_bVisible = false;
+    }
+
+    UpdateDoneButtonVisibility();
+}
+
+void SHOnlineGuestControllerSelect::OnDonePointerEnter(int index, void*)
+{
+    ++mHoverCounts[index];
+    mDoneButton.SetPointerState(1, index);
+    mDoneButton.PlayHoverFeedback(index);
+    if (!mDoneButton.HasOtherPointerState(1, index))
+    {
+        mDoneButtonInstance->SetActiveSlide("over", true, false);
+        FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
+    }
+}
+
+void SHOnlineGuestControllerSelect::OnDonePointerInside(int index, void*)
+{
+    if (mDoneButton.GetPointerState(index) != 0)
+        return;
+
+    ++mHoverCounts[index];
+    mDoneButton.SetPointerState(1, index);
+    mDoneButton.PlayHoverFeedback(index);
+    if (!mDoneButton.HasOtherPointerState(1, index))
+    {
+        mDoneButtonInstance->SetActiveSlide("over", true, false);
+        FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
+    }
+}
+
+void SHOnlineGuestControllerSelect::OnDonePointerPress(int, void*)
+{
+    mControllerButton.Disable();
+    mDoneButton.Disable();
+
+    for (int i = 0; i < 4; ++i)
+    {
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
+    }
+
+    mSelectionConfirmed = true;
+    mState = 2;
+
+    SHNavigation* object = GetNavigationScene();
+    if (object != 0)
+    {
+        object->HideButtons();
+    }
+
+    mPresentation->SetActiveSlide("out", true);
+    mPresentation->Update(0.0f);
 }
 
 void SHOnlineGuestControllerSelect::OnDonePointerLeave(int index, void*)
@@ -571,56 +485,5 @@ void SHOnlineGuestControllerSelect::OnDonePointerLeave(int index, void*)
     if (!mDoneButton.HasOtherPointerState(1, index))
     {
         mDoneButtonInstance->SetActiveSlide("off", true, false);
-    }
-}
-
-void SetOnlineRankedMatch(bool value)
-{
-    GameInfoManager::Instance()->mOnlineRankedMatch = value;
-}
-
-bool IsOnlineRankedMatch()
-{
-    return GameInfoManager::Instance()->mOnlineRankedMatch;
-}
-
-void SetOnlineTwoLocalPlayers(bool value)
-{
-    GameInfoManager::Instance()->mOnlineTwoLocalPlayers = value;
-}
-
-bool HasOnlineTwoLocalPlayers()
-{
-    return GameInfoManager::Instance()->mOnlineTwoLocalPlayers;
-}
-
-void SetOnlineFriendSelectionMode(bool value)
-{
-    GameInfoManager::Instance()->mOnlineFriendSelectionMode = value;
-}
-
-bool IsOnlineFriendSelectionMode()
-{
-    return GameInfoManager::Instance()->mOnlineFriendSelectionMode;
-}
-
-void SetOnlineFriendSelectionContext(void* context)
-{
-    gOnlineFriendSelectionContext = context;
-}
-
-void FormatFriendKey(unsigned long long friendKey, u16* output)
-{
-    if (friendKey != 0)
-    {
-        nlSNPrintf(output,
-            14,
-            (const unsigned short*)L"%.6llu %.6llu",
-            friendKey / 1000000,
-            friendKey % 1000000);
-    }
-    else
-    {
-        nlSNPrintf(output, 14, (const unsigned short*)L"UNKNOWN");
     }
 }

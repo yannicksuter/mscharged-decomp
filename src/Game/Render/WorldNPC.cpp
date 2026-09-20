@@ -11,16 +11,16 @@
 #include "Game/Render/CrowdImpostors.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/World/WorldObject_80278E94.h"
 
 // Serialized world-NPC record used by the stadium/world object stream.
-class WorldNPC
+class WorldNPC : public WorldObject_80278E94
 {
 public:
     virtual ~WorldNPC();
     virtual void ReleaseResources();
     virtual nlMatrix4* GetWorldMatrix();
     virtual void SetWorldMatrix(const nlMatrix4& transform);
-    virtual void fn_80278E94();
     virtual void Initialize();
 
     /* 0x04 */ u8 mUnidentified004[0x1C];

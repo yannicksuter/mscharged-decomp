@@ -381,13 +381,13 @@ public:
     {
     }
 
-    virtual ~DesireMegaStrike();
+    virtual inline ~DesireMegaStrike();
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
     virtual void Update(UnidentifiedDesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
     bool fn_800B9D84(UnidentifiedDesireUpdate*, float);

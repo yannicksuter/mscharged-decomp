@@ -47,9 +47,9 @@ struct NetworkDraftTeam
     void Reset()
     {
         mCaptain = -1;
-        mSidekick0 = -1;
-        mSidekick1 = -1;
-        mSidekick2 = -1;
+        mSidekicks[0] = -1;
+        mSidekicks[1] = -1;
+        mSidekicks[2] = -1;
         mPlayerCount = 0;
         mPlayers[0].Reset();
         mPlayers[1].Reset();
@@ -68,9 +68,7 @@ struct NetworkDraftTeam
 
     /* 0x000 */ int mPlayerCount;
     /* 0x004 */ int mCaptain;
-    /* 0x008 */ int mSidekick0;
-    /* 0x00C */ int mSidekick1;
-    /* 0x010 */ int mSidekick2;
+    /* 0x008 */ int mSidekicks[3];
     /* 0x014 */ NetworkDraftPlayer mPlayers[3];
 }; // size: 0x1A0
 

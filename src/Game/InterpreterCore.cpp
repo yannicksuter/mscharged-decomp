@@ -975,11 +975,8 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
         if (flags & 1)
         {
             TweakIntBinding* intTarget = &storage->unknown_0x0C[index];
-            bool result = intTarget->Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3);
-            if (result == 0)
-            {
-                *intTarget->m_pValue = intTarget->GetDefault();
-            }
+            bool result = intTarget->Bind(name, float1,
+                sInterpreterEmptyTweakGroup, false, float2, float3);
             if (result == 0)
             {
                 *intTarget->m_pValue = value0;
@@ -988,10 +985,8 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
         else
         {
             TweakIntBinding* target = &storage->unknown_0x0C[index];
-            if (target->Bind(name, float1, sInterpreterEmptyTweakGroup, false, float2, float3) == 0)
-            {
-                *target->m_pValue = target->GetDefault();
-            }
+            target->Bind(name, float1,
+                sInterpreterEmptyTweakGroup, false, float2, float3);
         }
         break;
     }

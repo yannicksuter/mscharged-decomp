@@ -334,10 +334,9 @@ void Nis::UpdateTriggers(float oldTime, float newTime, float duration)
     }
 }
 
-void Nis::fn_80281C70(cAnimCamera& camera)
+void Nis::SelectCamera(cAnimCamera& camera, int cameraIndex)
 {
-    int randomIndex = nlRandom(mNumCameras, fn_80287B2C(GetPresentation()));
-    int index = randomIndex % mNumCameras;
+    int index = cameraIndex % mNumCameras;
     camera.m_pActiveCameraData = mUnidentified158[index];
     if (mMirrored)
     {
@@ -350,6 +349,12 @@ void Nis::fn_80281C70(cAnimCamera& camera)
     camera.SetAnimationTime(0.0f, false);
     camera.m_bCyclic = false;
     mCamera = &camera;
+}
+
+void Nis::fn_80281C70(cAnimCamera& camera)
+{
+    int randomIndex = nlRandom(mNumCameras, fn_80287B2C(GetPresentation()));
+    SelectCamera(camera, randomIndex);
 }
 
 void Nis::Render(int param1)

@@ -120,9 +120,9 @@ void FuzzyTweaks::Init()
     mUnidentified5A4.BindWithDefault("Downfield Max Distance", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
     mUnidentified5B4.BindWithDefault("Closing Max Speed", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
     mUnidentified5C4.BindWithDefault("Separating Max Speed", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified5D4.BindWithDefault("InFrontOfNet Mid Angle", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified5E4.BindWithDefault("InFrontOfNet Max Angle", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified5F4.BindWithDefault("InFrontOfNet Mid Score", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
+    fFrontOfNetMidAngle.BindWithDefault("InFrontOfNet Mid Angle", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
+    fFrontOfNetMaxAngle.BindWithDefault("InFrontOfNet Max Angle", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
+    fFrontOfNetMidScore.BindWithDefault("InFrontOfNet Mid Score", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
     mUnidentified604.BindWithDefault("OpenToPosition Pass Lane Offset Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
     mUnidentified614.BindWithDefault("OpenToPosition Pass Lane Offset Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
     mUnidentified624.BindWithDefault("OpenToPosition Pass Lane Dist Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);

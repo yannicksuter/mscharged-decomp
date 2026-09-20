@@ -23,8 +23,8 @@ public:
     void OnSelectQUIT();
     void OnSelectPopupNOFORFEIT();
     void OnSelectPopupYESFORFEIT();
-    inline void OnSelectRESUME(TLComponentInstance* instance);
-    inline void TransitionOut(TransitionType newtype);
+    void OnSelectRESUME(TLComponentInstance* instance);
+    void TransitionOut(TransitionType newtype);
     void fn_8023A85C();
     void fn_8023AB94(unsigned int index, void* context);
     void fn_8023AC58(unsigned int index, void* context);

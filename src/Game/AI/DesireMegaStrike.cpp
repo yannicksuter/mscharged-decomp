@@ -26,8 +26,8 @@ extern "C" float fn_80049CC0(cFielder*, int);
 extern "C" void fn_8005FA2C(cGame*);
 extern "C" void fn_80098098(cFielder*);
 extern cTeam* g_pCurrentlyUpdatingTeam;
-extern bool lbl_806E0E30;
-extern bool lbl_806E0E31;
+bool lbl_806E0E30;
+bool lbl_806E0E31;
 
 static float lbl_806DC118 = 10.0f;
 static float lbl_806DC11C = 0.5f;
@@ -351,23 +351,18 @@ void DesireMegaStrike::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0xFD8 | 0x800BA39C | size: 0xC8
  */
-void DesireMegaStrike::UnidentifiedVirtual8(
+inline void DesireMegaStrike::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireMegaStrike");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    Desire::UnidentifiedVirtual8(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x10A0 | 0x800BA464 | size: 0x9C
  */
-void DesireMegaStrike::UnidentifiedVirtual7(
+inline void DesireMegaStrike::UnidentifiedVirtual7(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireMegaStrikeType == 0xFFFF)
@@ -385,6 +380,6 @@ void DesireMegaStrike::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x113C | 0x800BA500 | size: 0x5C
  */
-DesireMegaStrike::~DesireMegaStrike()
+inline DesireMegaStrike::~DesireMegaStrike()
 {
 }

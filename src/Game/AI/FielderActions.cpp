@@ -380,9 +380,10 @@ void cFielder::fn_80043C18(float fDeltaT)
     {
         float fSpin
             = 1.0f - this->GetTweaks()->mUnidentified064;
-        Unknown8(mUnidentified024.m_aActualFacingDirection
-                + (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f)),
-            false);
+        int nSpinStep
+            = (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f));
+        Unknown8(
+            mUnidentified024.m_aActualFacingDirection + nSpinStep, false);
 
         SetFacingDirection(
             SeekDirection(mUnidentified024.m_aActualFacingDirection,
@@ -413,12 +414,9 @@ void cFielder::fn_80043C18(float fDeltaT)
                     = (UnidentifiedActionTarget806E0C94*)
                           g_pGame->mUnidentified10E0;
                 nlVector3 v3Position;
-                v3Position.x = fTime * mUnidentified024.m_v3Position.x
-                    + fBlend * pTarget->mUnidentified14.x;
-                v3Position.y = fTime * mUnidentified024.m_v3Position.y
-                    + fBlend * pTarget->mUnidentified14.y;
-                v3Position.z = fTime * mUnidentified024.m_v3Position.z
-                    + fBlend * pTarget->mUnidentified14.z;
+                nlVec3WeightedSum(v3Position, fBlend,
+                    pTarget->mUnidentified14, fTime,
+                    mUnidentified024.m_v3Position);
                 SetPosition(v3Position);
             }
         }

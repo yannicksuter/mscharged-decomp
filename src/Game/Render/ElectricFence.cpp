@@ -1,9 +1,11 @@
 #include "Game/Render/ElectricFence.h"
 
+#include "Game/AI/AiUtil.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Field.h"
 #include "Game/GL/MeshWriter.h"
 #include "Game/Net.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
@@ -14,7 +16,6 @@
 
 class EffectsGroup;
 
-extern "C" float AIsgn(float);
 extern "C" void* memcpy(void*, const void*, unsigned long);
 
 static float sfGridTextureSize = 7.0f;
@@ -94,9 +95,9 @@ static void GetWallPoint(const nlVector3& impactPosition, float xOffset,
     }
     else if (outCoordinate >= cornerCircumference)
     {
-        nlVec3Set(outPosition,
-            (goalLineX - radius) - (outCoordinate - cornerCircumference),
-            sideLineY, impactPositionPositive.z + zOffset);
+        inCoordinate = outCoordinate - cornerCircumference;
+        nlVec3Set(outPosition, (goalLineX - radius) - inCoordinate, sideLineY,
+            impactPositionPositive.z + zOffset);
     }
     else
     {
@@ -152,19 +153,11 @@ static void CreateElectricFenceGeometry(
             0.0f, wallPoint);
 
         int segment = nSegment;
-        float wallY = wallPoint.y;
-        float wallX = wallPoint.x;
-        pdst[0].x = wallX;
-        pdst[0].y = wallY;
-        pdst[0].z = z0;
+        nlVec3Set(pdst[0], wallPoint.x, wallPoint.y, z0);
         tdst[0].x = (float)segment / 15.0f;
         tdst[0].y = 0.0f;
 
-        float wY2 = wallPoint.y;
-        float wX2 = wallPoint.x;
-        pdst[1].x = wX2;
-        pdst[1].y = wY2;
-        pdst[1].z = z1;
+        nlVec3Set(pdst[1], wallPoint.x, wallPoint.y, z1);
         tdst[1].x = (float)segment / 15.0f;
         tdst[1].y = 1.0f;
         nSegment++;
@@ -350,53 +343,49 @@ static void RenderElectricFence(EmissionController& ec)
         GLP_TriStrip, GridTexture, intensity);
 }
 
-bool EmitElectricFenceBallEffect(const nlVector3& pos,
-    const nlVector3& dir, unsigned long emitterID, bool bNoSpark)
+bool EmitElectricFenceBallEffect(const nlVector3& v3Position,
+    const nlVector3& v3Normal, unsigned long userData, bool bNoSparks)
 {
     ElectricFenceData* data;
     const char* groupName;
-    EmissionController* controller;
+    EmissionController* pControl;
 
-    nlVector3 clampedPos;
-    clampedPos.as_u32[0] = pos.as_u32[0];
-    clampedPos.as_u32[1] = pos.as_u32[1];
-    clampedPos.as_u32[2] = pos.as_u32[2];
+    nlVector3 effectPosition = v3Position;
 
     float goalLineX = cField::GetGoalLineX(1U);
-    float absPosX = (float)__fabs(clampedPos.x);
-    if ((float)__fabs(absPosX - goalLineX) < 0.2f)
+    if (fabsf(fabsf(effectPosition.x) - goalLineX) < 0.2f)
     {
-        if (clampedPos.x > 0.0f)
+        if (effectPosition.x > 0.0f)
         {
-            clampedPos.x = goalLineX;
+            effectPosition.x = goalLineX;
         }
         else
         {
-            clampedPos.x = -goalLineX;
+            effectPosition.x = -goalLineX;
         }
     }
 
-    groupName = bNoSpark ? "electric_fence_nospark" : "electric_fence";
-    if (!EmissionManager::Instance()->IsPlaying(emitterID,
+    groupName = bNoSparks ? "electric_fence_nospark" : "electric_fence";
+    if (!EmissionManager::Instance()->IsPlaying(userData,
             EmissionManager::Instance()->GetEffectsGroup(groupName)))
     {
-        EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(groupName);
-        controller = EmissionManager::Instance()->Create(group, 3, true, 0);
-        controller->m_uUserData = emitterID;
-        controller->SetPosition(clampedPos);
+        EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
+        pControl = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
+        pControl->m_uUserData = userData;
+        pControl->SetPosition(effectPosition);
 
-        float dirX = dir.x;
-        float dirY = dir.y;
+        float dirX = v3Normal.x;
+        float dirY = v3Normal.y;
         float angle = nlATan2f(dirY, dirX);
-        controller->m_aFacing = (u16)(10430.378f * angle);
+        pControl->m_aFacing = (u16)(10430.378f * angle);
 
         data = 0;
         ElectricFenceData::sElectricFenceDataPool.Allocate(data);
-        new (data) ElectricFenceData(controller);
+        new (data) ElectricFenceData(pControl);
 
-        controller->SetUpdateCallback(
+        pControl->SetUpdateCallback(
             Function1<void, EmissionController&>(RenderElectricFence));
-        controller->SetFinishedCallback(
+        pControl->SetFinishedCallback(
             Function2<void, EmissionController&, int>(ElectricFenceFinished));
         return true;
     }

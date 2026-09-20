@@ -1750,12 +1750,14 @@ extern "C" float fn_800DA330(cFielder* pFielder)
 
 float PositionIsInFrontOfNet(const nlVector3& v3Position, const cNet* pNet)
 {
+    float sideSign;
     nlVector3 diff;
     nlVec3Set(diff,
         v3Position.x - pNet->m_v3NetLocation.x,
         v3Position.y - pNet->m_v3NetLocation.y,
         v3Position.z - pNet->m_v3NetLocation.z);
-    nlVec3Scale(diff, diff, pNet->m_fDirection);
+    sideSign = pNet->m_fDirection;
+    nlVec3Scale(diff, diff, sideSign);
 
     nlPolar polar;
     nlCartesianToPolar(polar, diff);
@@ -1764,26 +1766,25 @@ float PositionIsInFrontOfNet(const nlVector3& v3Position, const cNet* pNet)
     if (angleRad > 180.0f)
     {
         FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
-        float complementaryMidAngle = 360.0f - pFuzzyTweaks->mUnidentified5D4;
+        float complementaryMidAngle = 360.0f - pFuzzyTweaks->fFrontOfNetMidAngle;
         if (angleRad < complementaryMidAngle)
         {
-            return InterpolateRangeClamped(0.0f, pFuzzyTweaks->mUnidentified5F4,
-                360.0f - pFuzzyTweaks->mUnidentified5E4, complementaryMidAngle, angleRad);
+            return InterpolateRangeClamped(0.0f, pFuzzyTweaks->fFrontOfNetMidScore,
+                360.0f - pFuzzyTweaks->fFrontOfNetMaxAngle, complementaryMidAngle, angleRad);
         }
-        return InterpolateRangeClamped(1.0f, pFuzzyTweaks->mUnidentified5F4,
+        return InterpolateRangeClamped(1.0f, pFuzzyTweaks->fFrontOfNetMidScore,
             360.0f, complementaryMidAngle, angleRad);
     }
 
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
-    float midAngle = pFuzzyTweaks->mUnidentified5D4;
-    bool bGreaterThanMid = (angleRad > midAngle);
+    bool bGreaterThanMid = (angleRad > *pFuzzyTweaks->fFrontOfNetMidAngle.m_pValue);
     if (bGreaterThanMid)
     {
-        return InterpolateRangeClamped(0.0f, pFuzzyTweaks->mUnidentified5F4,
-            pFuzzyTweaks->mUnidentified5E4, pFuzzyTweaks->mUnidentified5D4, angleRad);
+        return InterpolateRangeClamped(0.0f, pFuzzyTweaks->fFrontOfNetMidScore,
+            pFuzzyTweaks->fFrontOfNetMaxAngle, pFuzzyTweaks->fFrontOfNetMidAngle, angleRad);
     }
-    return InterpolateRangeClamped(1.0f, pFuzzyTweaks->mUnidentified5F4,
-        0.0f, pFuzzyTweaks->mUnidentified5D4, angleRad);
+    return InterpolateRangeClamped(1.0f, pFuzzyTweaks->fFrontOfNetMidScore,
+        0.0f, pFuzzyTweaks->fFrontOfNetMidAngle, angleRad);
 }
 
 float InFrontOfTheirNet(cFielder* pFielder)

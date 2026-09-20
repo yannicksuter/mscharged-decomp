@@ -8,6 +8,7 @@
 #include "Game/GameSceneManager.h"
 #include "Game/DB/SaveLoad.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/feTextureResource.h"
@@ -20,6 +21,7 @@
 #include "NL/nlAlgorithm.h"
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
+#include "NL/nlLocalizationLookup.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlBind.h"
@@ -35,34 +37,7 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern char lbl_80520808[];
-extern char lbl_80520814[];
-extern char lbl_80520838[];
-extern char lbl_80520888[];
-extern char lbl_805208A8[];
-extern char lbl_805208B4[];
-
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-
-static inline const unsigned short* LookupLocString(const char* id)
-{
-    nlLocalization* localization = g_pLocalization;
-    unsigned long hash = nlStringLowerHash(id);
-    if (localization->m_LookupTable == 0)
-    {
-        return LocalizationTableNotFound;
-    }
-
-    nlLocalization::StringLookup* lookup
-        = nlBSearch<nlLocalization::StringLookup, unsigned long>(
-            hash, localization->m_LookupTable, (int)localization->m_pFile->StringCount);
-    if (lookup != 0)
-    {
-        return localization->m_FirstString + lookup->StringOffset;
-    }
-
-    return MissingLocString;
-}
 
 SHOnlineMiiSelect::SHOnlineMiiSelect()
     : mInitialized(false)
@@ -101,53 +76,19 @@ void SHOnlineMiiSelect::SceneCreated()
     for (int i = 0; i < 10; ++i)
     {
         char componentName[16];
-        nlSNPrintf(componentName, sizeof(componentName), lbl_80520838, i + 1);
+        nlSNPrintf(componentName, sizeof(componentName), "Mii_component%d", i + 1);
 
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
-            mPresentation->m_currentSlide,
-            nlStringLowerHash("Layer"),
-            nlStringLowerHash(lbl_80520808),
-            nlStringLowerHash(componentName),
-            0,
-            0,
-            0);
-        if (component == 0)
-        {
-            component = &UnidentifiedTLComponentDefault::sInstance;
-        }
-        mMiiInstances[i] = component;
+        mMiiInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+            mPresentation->m_currentSlide, "Layer", "Mii_Buttons", componentName);
 
-        TLInstance* off = FEFinder<TLInstance, 5>::Find(mMiiInstances[i],
-            nlStringLowerHash("off"),
-            nlStringLowerHash("Mii_btn"),
-            0,
-            0,
-            0,
-            0);
-        if (off == 0)
-        {
-            off = &UnidentifiedTLGroupDefault::sInstance;
-        }
+        TLInstance* off = FEFinder<TLInstance, 5>::FindOrDefault(mMiiInstances[i], "off", "Mii_btn");
+        TLInstance* over = FEFinder<TLInstance, 5>::FindOrDefault(mMiiInstances[i], "over", "Mii_btn");
 
-        TLInstance* over = FEFinder<TLInstance, 5>::Find(mMiiInstances[i],
-            nlStringLowerHash("over"),
-            nlStringLowerHash("Mii_btn"),
-            0,
-            0,
-            0,
-            0);
-        if (over == 0)
-        {
-            over = &UnidentifiedTLGroupDefault::sInstance;
-        }
-
-        TLImageInstance* overBackground = FEFinder<TLImageInstance, 2>::Find(
-            over, nlStringLowerHash(lbl_80520814), 0, 0, 0, 0, 0);
+        TLImageInstance* overBackground = FEFinder<TLImageInstance, 2>::Find(over, "Online_Mii_select_background");
         overBackground->m_bVisible = false;
         overBackground->SetAssetVisible(false);
 
-        TLImageInstance* offBackground = FEFinder<TLImageInstance, 2>::Find(
-            off, nlStringLowerHash(lbl_80520814), 0, 0, 0, 0, 0);
+        TLImageInstance* offBackground = FEFinder<TLImageInstance, 2>::Find(off, "Online_Mii_select_background");
         offBackground->m_bVisible = false;
         offBackground->SetAssetVisible(false);
     }
@@ -333,18 +274,20 @@ void SHOnlineMiiSelect::Update(float fDeltaT)
     for (unsigned int pad = 0; pad < 4; ++pad)
     {
         TLComponentInstance* controller = GetPointerInstance(pad);
-        bool processInput = true;
+        bool processInput;
         if (g_pFEInput->m_InputLockDepth == 0)
         {
             if (pad != gFEControllerIndex)
             {
                 controller->SetActiveSlide("waiting", true, false);
                 processInput = false;
+                goto checkInput;
             }
-            else if (mHoverCounts[pad] > 0
-                     || mBackButton.mPointerInside[pad]
-                     || mPageControls->mPointerInside[0]
-                     || mPageControls->mPointerInside[1])
+
+            if (mHoverCounts[pad] > 0
+                || mBackButton.mPointerInside[pad]
+                || mPageControls->mPointerInside[0]
+                || mPageControls->mPointerInside[1])
             {
                 controller->SetActiveSlide("A", true, false);
             }
@@ -353,7 +296,9 @@ void SHOnlineMiiSelect::Update(float fDeltaT)
                 controller->SetActiveSlide("cursor", true, false);
             }
         }
+        processInput = true;
 
+    checkInput:
         if (processInput)
         {
             unsigned char valid = 1;
@@ -370,7 +315,7 @@ void SHOnlineMiiSelect::Update(float fDeltaT)
             if (mBackButton.UpdateBackButton(event, fDeltaT))
             {
                 FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
-                FrontEndPresentation::GetInstance()->Call(lbl_80520888);
+                FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
                 return;
             }
 
@@ -415,6 +360,7 @@ void SHOnlineMiiSelect::UpdatePage()
 {
     for (int i = 0; i < 10; ++i)
     {
+        bool hasSaveSlot = false;
         bool visible = i < mMiiCount - mCurrentPage * 10;
         mMiiInstances[i]->m_bVisible = visible;
         if (visible)
@@ -426,22 +372,10 @@ void SHOnlineMiiSelect::UpdatePage()
             mMiiButtons[i].Disable();
         }
 
-        TLInstance* off = FEFinder<TLInstance, 5>::Find(
-            mMiiInstances[i], nlStringLowerHash("off"), nlStringLowerHash("Mii_btn"), 0, 0, 0, 0);
-        if (off == 0)
-        {
-            off = &UnidentifiedTLGroupDefault::sInstance;
-        }
-
-        TLInstance* over = FEFinder<TLInstance, 5>::Find(
-            mMiiInstances[i], nlStringLowerHash("over"), nlStringLowerHash("Mii_btn"), 0, 0, 0, 0);
-        if (over == 0)
-        {
-            over = &UnidentifiedTLGroupDefault::sInstance;
-        }
+        TLInstance* off = FEFinder<TLInstance, 5>::FindOrDefault(mMiiInstances[i], "off", "Mii_btn");
+        TLInstance* over = FEFinder<TLInstance, 5>::FindOrDefault(mMiiInstances[i], "over", "Mii_btn");
 
         int officialIndex = mOfficialIndices[mCurrentPage * 10 + i];
-        bool hasSaveSlot = false;
         if (officialIndex >= 0)
         {
             RFLAdditionalInfo info;
@@ -458,53 +392,29 @@ void SHOnlineMiiSelect::UpdatePage()
             }
         }
 
-        TLImageInstance* logo = FEFinder<TLImageInstance, 2>::Find(
-            off, nlStringLowerHash(lbl_805208A8), 0, 0, 0, 0, 0);
-        if (logo == 0)
-        {
-            logo = &UnidentifiedTLImageDefault::sInstance;
-        }
+        TLImageInstance* logo = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "logo_32x32");
         logo->SetAssetVisible(hasSaveSlot);
 
-        logo = FEFinder<TLImageInstance, 2>::Find(
-            over, nlStringLowerHash(lbl_805208A8), 0, 0, 0, 0, 0);
-        if (logo == 0)
-        {
-            logo = &UnidentifiedTLImageDefault::sInstance;
-        }
+        logo = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "logo_32x32");
         logo->SetAssetVisible(hasSaveSlot);
 
         unsigned long textureReference = g_pMiiManager->mIconTextureIds[i];
         bool imageReady
             = g_pMiiManager->CreateIcon(officialIndex, i, RFLExp_Normal);
 
-        TLImageInstance* image
-            = FEFinder<TLImageInstance, 2>::Find(
-                off, nlStringLowerHash("Mii"), 0, 0, 0, 0, 0);
-        if (image == 0)
-        {
-            image = &UnidentifiedTLImageDefault::sInstance;
-        }
+        TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii");
         image->m_pTextureResource->SetTextureHandle(textureReference);
         image->SetAssetVisible(imageReady && mInitialized);
 
-        image
-            = FEFinder<TLImageInstance, 2>::Find(
-                over, nlStringLowerHash("Mii"), 0, 0, 0, 0, 0);
-        if (image == 0)
-        {
-            image = &UnidentifiedTLImageDefault::sInstance;
-        }
+        image = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii");
         image->m_pTextureResource->SetTextureHandle(textureReference);
         image->SetAssetVisible(imageReady && mInitialized);
 
-        TLImageInstance* background = FEFinder<TLImageInstance, 2>::Find(
-            over, nlStringLowerHash(lbl_80520814), 0, 0, 0, 0, 0);
+        TLImageInstance* background = FEFinder<TLImageInstance, 2>::Find(over, "Online_Mii_select_background");
         background->m_bVisible = imageReady;
         background->SetAssetVisible(imageReady);
 
-        background = FEFinder<TLImageInstance, 2>::Find(
-            off, nlStringLowerHash(lbl_80520814), 0, 0, 0, 0, 0);
+        background = FEFinder<TLImageInstance, 2>::Find(off, "Online_Mii_select_background");
         background->m_bVisible = imageReady;
         background->SetAssetVisible(imageReady);
     }
@@ -515,16 +425,10 @@ void SHOnlineMiiSelect::UpdatePage()
     nlSNPrintf(pageCount, 4, (const unsigned short*)L"%d", mPageCount);
 
     WideBasicString formatted(Format(
-        WideBasicString(LookupLocString(lbl_805208B4)), currentPage, pageCount));
+        WideBasicString(LookupLocString("ONLINE_MII_SELECT_PAGE")), currentPage, pageCount));
     nlStrNCpy(mPageText, formatted.c_str(), 24);
 
-    TLTextInstance* pages
-        = FEFinder<TLTextInstance, 3>::Find(
-            mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("PAGES"), 0, 0, 0, 0);
-    if (pages == 0)
-    {
-        pages = &UnidentifiedTLTextDefault::sInstance;
-    }
+    TLTextInstance* pages = FEFinder<TLTextInstance, 3>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "PAGES");
     pages->SetString(mPageText);
 
     SHNavigation* scene = GetNavigationScene();

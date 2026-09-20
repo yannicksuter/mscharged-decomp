@@ -2127,11 +2127,15 @@ Game/SH/SHOptionsCheatsList.cpp:
 	.sdata2     start:0x806E5AF0 end:0x806E5B08
 
 Game/SH/SHOnlineGuestControllerSelect.cpp:
-	.text       start:0x80259B88 end:0x8025BE74
-	.data       start:0x8051FE30 end:0x8051FF70
+	.text       start:0x80259B88 end:0x8025BD7C
+	.data       start:0x8051FE30 end:0x8051FF40
 	.sdata      start:0x806DEA50 end:0x806DEA98
-	.sbss       start:0x806E18F8 end:0x806E1900
 	.sdata2     start:0x806E5B08 end:0x806E5B18
+
+Game/SH/tu_8025BD7C.cpp:
+	.text       start:0x8025BD7C end:0x8025BE74
+	.data       start:0x8051FF40 end:0x8051FF70
+	.sbss       start:0x806E18F8 end:0x806E1900
 
 Game/SH/SHOnlineInvitePreview.cpp:
 	.text       start:0x8025BE74 end:0x8025D170
@@ -2175,13 +2179,13 @@ Game/SH/SHBootLoading.cpp:
 Game/SH/SHOnlineMiiSelect.cpp:
 	.text       start:0x80264E98 end:0x802672D4
 	.ctors      start:0x804DB7C0 end:0x804DB7C4
-	.data       start:0x80520808 end:0x80520948 align:4
+	.data       start:0x80520808 end:0x80520944
 	.sdata      start:0x806DEC20 end:0x806DEC68
 	.sdata2     start:0x806E5BB0 end:0x806E5BC0
 
 Game/SH/SHOnlineMiiSelectOverlay.cpp:
 	.text       start:0x802672D4 end:0x80269078
-	.data       start:0x80520948 end:0x80520A68 align:4
+	.data       start:0x80520948 end:0x80520A68
 	.sdata      start:0x806DEC68 end:0x806DECB8
 	.sdata2     start:0x806E5BC0 end:0x806E5BD0
 
@@ -3029,13 +3033,9 @@ NL/nlEvent.cpp:
 	.sbss       start:0x806E1D90 end:0x806E1D98
 
 NL/nlFile.cpp:
-	.text       start:0x802B36B8 end:0x802B3C28
+	.text       start:0x802B36B8 end:0x802B41B4
 	.data       start:0x8052B538 end:0x8052B54C
-	.sbss       start:0x806E1D98 end:0x806E1D9C
-
-NL/nlCompressedFile.cpp:
-	.text       start:0x802B3C28 end:0x802B41B4
-	.sbss       start:0x806E1D9C end:0x806E1DA0 align:4
+	.sbss       start:0x806E1D98 end:0x806E1DA0
 
 NL/nlAsyncFileBuffer.cpp:
 	.text       start:0x802B41B4 end:0x802B4474
@@ -3438,14 +3438,15 @@ Game/Render/ImpostorCluster.cpp:
 	.sdata2     start:0x806E6430 end:0x806E6448
 
 Game/Render/CrowdLayoutObject.cpp:
-	.text       start:0x802D88F4 end:0x802D8BAC
+	.text       start:0x802D88F4 end:0x802D8BB4
+	.data       start:0x8052EAE8 end:0x8052EB08
 	.sdata2     start:0x806E6448 end:0x806E6458
 
 Game/Render/CrowdImpostorManager.cpp:
-	.text       start:0x802D8BAC end:0x802DAEE0
+	.text       start:0x802D8BB4 end:0x802DAEE0
 	.ctors      start:0x804DBA0C end:0x804DBA10
 	.rodata     start:0x804EB310 end:0x804EB320
-	.data       start:0x8052EAE8 end:0x8052EC78
+	.data       start:0x8052EB08 end:0x8052EC78
 	.bss        start:0x8057F410 end:0x8057F580
 	.sdata      start:0x806DF440 end:0x806DF448
 	.sbss       start:0x806E1F70 end:0x806E1F80
@@ -4124,7 +4125,7 @@ Game/InputManager.cpp:
 
 Game/NetworkRandomSeed.cpp:
 	.text       start:0x80332EB8 end:0x80332EDC
-	.sdata      start:0x806DF748 end:0x806DF750
+	.sdata      start:0x806DF748 end:0x806DF74C
 
 Game/InputRouter.cpp:
 	.text       start:0x80332EDC end:0x80336B6C
@@ -4332,7 +4333,7 @@ Game/Audio/Delay.cpp:
 	.text       start:0x80359D74 end:0x8035A9E0
 	.ctors      start:0x804DBB00 end:0x804DBB04
 	.data       start:0x805347C0 end:0x80534848
-	.bss        start:0x805853F0 end:0x80585450
+	.bss        start:0x805853F0 end:0x80585440
 	.sdata      start:0x806DF918 end:0x806DF988
 	.sbss       start:0x806E21C8 end:0x806E21D0
 	.sdata2     start:0x806E6BB8 end:0x806E6BC8
@@ -4341,7 +4342,7 @@ Game/Audio/LowPassFilter.cpp:
 	.text       start:0x8035A9E0 end:0x8035B220
 	.ctors      start:0x804DBB04 end:0x804DBB08
 	.data       start:0x80534848 end:0x805348A8
-	.bss        start:0x80585450 end:0x80585490
+	.bss        start:0x80585440 end:0x80585490
 	.sdata      start:0x806DF988 end:0x806DF9A0
 	.sbss       start:0x806E21D0 end:0x806E21D8
 	.sdata2     start:0x806E6BC8 end:0x806E6BE0

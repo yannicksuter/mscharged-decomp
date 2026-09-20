@@ -41,7 +41,7 @@ struct BasicGameInfo
         }
         return mFinalScore[0] <= mFinalScore[1];
     }
-    void SetSidekick(short side, int sidekick, int slot)
+    void SetSidekick(int side, int sidekick, int slot)
     {
         for (int i = 0; i < 3; i++)
         {

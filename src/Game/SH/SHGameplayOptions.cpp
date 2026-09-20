@@ -25,8 +25,6 @@ static const int lbl_804E8540[5] = { 1, 2, 3, 4, 5 };
 static const int lbl_804E8554[5] = { 1, 3, 5, 7, 9 };
 static const int lbl_804E8568[8] = { 3, 4, 5, 6, 7, 8, 9, 10 };
 static const int lbl_804E8588[4] = { 120, 180, 240, 300 };
-static const char* const lbl_804E8598[3] = { "off", "over", "down" };
-
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
 SHGameplayOptions::SHGameplayOptions()
@@ -706,24 +704,24 @@ void SHGameplayOptions::fn_80238050()
 
 void SHGameplayOptions::UpdateCheatText()
 {
-    const char* strings[6];
-    strings[0] = GetLOCEnvironmentCheatName(mPowerupSettings.mEnvironmentCheat);
-    strings[1] = GetLOCEnvironmentCheatDescription(mPowerupSettings.mEnvironmentCheat);
-    strings[2] = GetLOCPowerupCheatName(mPowerupSettings.mCustomPowerups);
-    strings[3] = GetLOCPowerupCheatDescription(mPowerupSettings.mCustomPowerups);
-    strings[4] = GetLOCPlayerCheatName(mPowerupSettings.mPlayerCheat);
-    strings[5] = GetLOCPlayerCheatDescription(mPowerupSettings.mPlayerCheat);
-    const char* slides[3] = { lbl_804E8598[0], lbl_804E8598[1], lbl_804E8598[2] };
+    const char* strings[3][2];
+    strings[0][0] = GetLOCEnvironmentCheatName(mPowerupSettings.mEnvironmentCheat);
+    strings[0][1] = GetLOCEnvironmentCheatDescription(mPowerupSettings.mEnvironmentCheat);
+    strings[1][0] = GetLOCPowerupCheatName(mPowerupSettings.mCustomPowerups);
+    strings[1][1] = GetLOCPowerupCheatDescription(mPowerupSettings.mCustomPowerups);
+    strings[2][0] = GetLOCPlayerCheatName(mPowerupSettings.mPlayerCheat);
+    strings[2][1] = GetLOCPlayerCheatDescription(mPowerupSettings.mPlayerCheat);
+    const char* const slides[3] = { "off", "over", "down" };
     for (int i = 0; i < 3; ++i)
     {
         for (int j = 0; j < 3; ++j)
         {
             TLTextInstance* text0 = FEFinder<TLTextInstance, 3>::Find(mCheatInstances[i],
-                nlStringLowerHash(slides[j]), nlStringLowerHash("CHALLENGE_0"), nlStringLowerHash("stat_0"), 0, 0, 0);
+                slides[j], "CHALLENGE_0", "stat_0");
             TLTextInstance* text1 = FEFinder<TLTextInstance, 3>::Find(mCheatInstances[i],
-                nlStringLowerHash(slides[j]), nlStringLowerHash("CHALLENGE_0"), nlStringLowerHash("stat_1"), 0, 0, 0);
-            text0->SetStringId(strings[i * 2]);
-            text1->SetStringId(strings[i * 2 + 1]);
+                slides[j], "CHALLENGE_0", "stat_1");
+            text0->SetStringId(strings[i][0]);
+            text1->SetStringId(strings[i][1]);
         }
     }
 }
